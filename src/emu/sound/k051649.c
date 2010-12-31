@@ -55,7 +55,7 @@ struct _k051649_state
 	int f[10];
 };
 
-INLINE k051649_state *get_safe_token(running_device *device)
+INLINE k051649_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == K051649);

@@ -62,7 +62,7 @@ struct _nile_state
 	UINT16 ctrl;
 };
 
-INLINE nile_state *get_safe_token(running_device *device)
+INLINE nile_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == NILE);

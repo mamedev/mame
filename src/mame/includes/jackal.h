@@ -24,8 +24,8 @@ public:
 	UINT8    *spritebank;
 
 	/* devices */
-	running_device *mastercpu;
-	running_device *slavecpu;
+	device_t *mastercpu;
+	device_t *slavecpu;
 };
 
 

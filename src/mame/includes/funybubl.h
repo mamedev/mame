@@ -11,7 +11,7 @@ public:
 	UINT8 *    paletteram;
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 };
 
 

@@ -133,7 +133,7 @@ WRITE16_HANDLER( micro3d_xfer3dk_w )
 	state->xfer3dk = data;
 }
 
-void micro3d_tms_interrupt(running_device *device, int state)
+void micro3d_tms_interrupt(device_t *device, int state)
 {
 //  mc68901_int_gen(device->machine, GPIP4);
 }

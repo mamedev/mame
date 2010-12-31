@@ -82,7 +82,7 @@ struct _upd4990a_state
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE upd4990a_state *get_safe_token(running_device *device)
+INLINE upd4990a_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == UPD4990A));
@@ -103,7 +103,7 @@ INLINE UINT8 convert_to_bcd(int val)
     upd4990a_increment_month
 -------------------------------------------------*/
 
-static void upd4990a_increment_month( running_device *device )
+static void upd4990a_increment_month( device_t *device )
 {
 	upd4990a_state *upd4990a = get_safe_token(device);
 
@@ -126,7 +126,7 @@ static void upd4990a_increment_month( running_device *device )
     upd4990a_increment_day
 -------------------------------------------------*/
 
-static void upd4990a_increment_day( running_device *device )
+static void upd4990a_increment_day( device_t *device )
 {
 	upd4990a_state *upd4990a = get_safe_token(device);
 	int real_year;
@@ -184,7 +184,7 @@ static void upd4990a_increment_day( running_device *device )
     upd4990a_addretrace
 -------------------------------------------------*/
 
-void upd4990a_addretrace( running_device *device )
+void upd4990a_addretrace( device_t *device )
 {
 	upd4990a_state *upd4990a = get_safe_token(device);
 
@@ -257,7 +257,7 @@ READ8_DEVICE_HANDLER( upd4990a_databit_r )
     upd4990a_readbit
 -------------------------------------------------*/
 
-static void upd4990a_readbit( running_device *device )
+static void upd4990a_readbit( device_t *device )
 {
 	upd4990a_state *upd4990a = get_safe_token(device);
 
@@ -299,7 +299,7 @@ static void upd4990a_readbit( running_device *device )
     upd4990a_resetbitstream
 -------------------------------------------------*/
 
-static void upd4990a_resetbitstream( running_device *device )
+static void upd4990a_resetbitstream( device_t *device )
 {
 	upd4990a_state *upd4990a = get_safe_token(device);
 
@@ -312,7 +312,7 @@ static void upd4990a_resetbitstream( running_device *device )
     upd4990a_writebit
 -------------------------------------------------*/
 
-static void upd4990a_writebit( running_device *device , UINT8 bit )
+static void upd4990a_writebit( device_t *device , UINT8 bit )
 {
 	upd4990a_state *upd4990a = get_safe_token(device);
 	if (upd4990a->bitno <= 31)	//low part
@@ -325,7 +325,7 @@ static void upd4990a_writebit( running_device *device , UINT8 bit )
     upd4990a_nextbit
 -------------------------------------------------*/
 
-static void upd4990a_nextbit( running_device *device )
+static void upd4990a_nextbit( device_t *device )
 {
 	upd4990a_state *upd4990a = get_safe_token(device);
 	++upd4990a->bitno;
@@ -345,7 +345,7 @@ static void upd4990a_nextbit( running_device *device )
     upd4990a_getcommand
 -------------------------------------------------*/
 
-static UINT8 upd4990a_getcommand( running_device *device )
+static UINT8 upd4990a_getcommand( device_t *device )
 {
 	upd4990a_state *upd4990a = get_safe_token(device);
 	//Warning: problems if the 4 bits are in different
@@ -360,7 +360,7 @@ static UINT8 upd4990a_getcommand( running_device *device )
     upd4990a_update_date
 -------------------------------------------------*/
 
-static void upd4990a_update_date( running_device *device )
+static void upd4990a_update_date( device_t *device )
 {
 	upd4990a_state *upd4990a = get_safe_token(device);
 
@@ -377,7 +377,7 @@ static void upd4990a_update_date( running_device *device )
     upd4990a_process_command
 -------------------------------------------------*/
 
-static void upd4990a_process_command( running_device *device )
+static void upd4990a_process_command( device_t *device )
 {
 	upd4990a_state *upd4990a = get_safe_token(device);
 
@@ -411,7 +411,7 @@ static void upd4990a_process_command( running_device *device )
     upd4990a_serial_control
 -------------------------------------------------*/
 
-static void upd4990a_serial_control( running_device *device, UINT8 data )
+static void upd4990a_serial_control( device_t *device, UINT8 data )
 {
 	upd4990a_state *upd4990a = get_safe_token(device);
 

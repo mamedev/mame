@@ -322,7 +322,7 @@ INLINE DRIVER_INIT( m72_8751 )
 	address_space *program = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	address_space *io = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 	address_space *sndio = cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_IO);
-	running_device *dac = machine->device("dac");
+	device_t *dac = machine->device("dac");
 
 	protection_ram = auto_alloc_array(machine, UINT16, 0x10000/2);
 	memory_install_read_bank(program, 0xb0000, 0xbffff, 0, 0, "bank1");

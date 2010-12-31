@@ -10,7 +10,7 @@ void ym2612_update_request(void *param);
 typedef struct _ym2612_interface ym2612_interface;
 struct _ym2612_interface
 {
-	void (*handler)(running_device *device, int irq);
+	void (*handler)(device_t *device, int irq);
 };
 
 READ8_DEVICE_HANDLER( ym2612_r );
@@ -33,7 +33,7 @@ DECLARE_LEGACY_SOUND_DEVICE(YM2612, ym2612);
 typedef struct _ym3438_interface ym3438_interface;
 struct _ym3438_interface
 {
-	void (*handler)(running_device *device, int irq);
+	void (*handler)(device_t *device, int irq);
 };
 
 

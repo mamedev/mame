@@ -20,8 +20,8 @@ public:
 	int        prev_coin;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *mb14241;
+	device_t *maincpu;
+	device_t *mb14241;
 };
 
 

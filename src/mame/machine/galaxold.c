@@ -45,14 +45,14 @@ WRITE_LINE_DEVICE_HANDLER( galaxold_7474_9m_1_callback )
 
 WRITE8_HANDLER( galaxold_nmi_enable_w )
 {
-    running_device *target = space->machine->device("7474_9m_1");
+    device_t *target = space->machine->device("7474_9m_1");
 	ttl7474_preset_w(target, data ? 1 : 0);
 }
 
 
 TIMER_DEVICE_CALLBACK( galaxold_interrupt_timer )
 {
-    running_device *target = timer.machine->device("7474_9m_2");
+    device_t *target = timer.machine->device("7474_9m_2");
 
 	/* 128V, 64V and 32V go to D */
 	ttl7474_d_w(target, ((param & 0xe0) != 0xe0) ? 1 : 0);
@@ -68,8 +68,8 @@ TIMER_DEVICE_CALLBACK( galaxold_interrupt_timer )
 
 static void machine_reset_common(running_machine *machine, int line)
 {
-    running_device *ttl7474_9m_1 = machine->device("7474_9m_1");
-    running_device *ttl7474_9m_2 = machine->device("7474_9m_2");
+    device_t *ttl7474_9m_1 = machine->device("7474_9m_1");
+    device_t *ttl7474_9m_2 = machine->device("7474_9m_2");
 	irq_line = line;
 
 	/* initalize main CPU interrupt generator flip-flops */

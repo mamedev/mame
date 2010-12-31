@@ -33,8 +33,8 @@ public:
 	UINT8      misc_flags;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *discrete;
+	device_t *maincpu;
+	device_t *discrete;
 };
 
 

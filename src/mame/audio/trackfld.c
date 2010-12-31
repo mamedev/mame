@@ -18,11 +18,11 @@ struct _trackfld_audio_state
 	int      last_irq;
 
 	cpu_device *audiocpu;
-	running_device *vlm;
+	device_t *vlm;
 };
 
 
-INLINE trackfld_audio_state *get_safe_token( running_device *device )
+INLINE trackfld_audio_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == TRACKFLD_AUDIO);
@@ -87,7 +87,7 @@ READ8_DEVICE_HANDLER( trackfld_speech_r )
 
 WRITE8_DEVICE_HANDLER( trackfld_sound_w )
 {
-	running_device *audio = device->machine->device("trackfld_audio");
+	device_t *audio = device->machine->device("trackfld_audio");
 	trackfld_audio_state *state = get_safe_token(audio);
 	int changes = offset ^ state->last_addr;
 
@@ -108,7 +108,7 @@ WRITE8_DEVICE_HANDLER( trackfld_sound_w )
 
 READ8_HANDLER( hyperspt_sh_timer_r )
 {
-	running_device *audio = space->machine->device("trackfld_audio");
+	device_t *audio = space->machine->device("trackfld_audio");
 	trackfld_audio_state *state = get_safe_token(audio);
 	UINT32 clock = state->audiocpu->total_cycles() / TIMER_RATE;
 
@@ -120,7 +120,7 @@ READ8_HANDLER( hyperspt_sh_timer_r )
 
 WRITE8_DEVICE_HANDLER( hyperspt_sound_w )
 {
-	running_device *audio = device->machine->device("trackfld_audio");
+	device_t *audio = device->machine->device("trackfld_audio");
 	trackfld_audio_state *state = get_safe_token(audio);
 	int changes = offset ^ state->last_addr;
 
@@ -146,7 +146,7 @@ WRITE8_DEVICE_HANDLER( hyperspt_sound_w )
 
 WRITE8_HANDLER( konami_sh_irqtrigger_w )
 {
-	running_device *audio = space->machine->device("trackfld_audio");
+	device_t *audio = space->machine->device("trackfld_audio");
 	trackfld_audio_state *state = get_safe_token(audio);
 	if (state->last_irq == 0 && data)
 	{
@@ -160,7 +160,7 @@ WRITE8_HANDLER( konami_sh_irqtrigger_w )
 
 WRITE8_HANDLER( konami_SN76496_latch_w )
 {
-	running_device *audio = space->machine->device("trackfld_audio");
+	device_t *audio = space->machine->device("trackfld_audio");
 	trackfld_audio_state *state = get_safe_token(audio);
 	state->SN76496_latch = data;
 }
@@ -168,7 +168,7 @@ WRITE8_HANDLER( konami_SN76496_latch_w )
 
 WRITE8_DEVICE_HANDLER( konami_SN76496_w )
 {
-	running_device *audio = device->machine->device("trackfld_audio");
+	device_t *audio = device->machine->device("trackfld_audio");
 	trackfld_audio_state *state = get_safe_token(audio);
 	sn76496_w(device, offset, state->SN76496_latch);
 }

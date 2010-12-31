@@ -55,7 +55,7 @@ struct _i8008_state
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE i8008_state *get_safe_token(running_device *device)
+INLINE i8008_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == I8008);

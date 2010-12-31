@@ -15,9 +15,9 @@
 #define LOG 0
 #define LOG_EXTRA 0
 
-static void execute_instruction_64kw(running_device *device);
-static void execute_instruction_8kw(running_device *device);
-static void pulse_reset(running_device *device);
+static void execute_instruction_64kw(device_t *device);
+static void execute_instruction_8kw(device_t *device);
+static void pulse_reset(device_t *device);
 
 
 /* TX-0 Registers */
@@ -68,7 +68,7 @@ struct _tx0_state
 	address_space *program;
 };
 
-INLINE tx0_state *get_safe_token(running_device *device)
+INLINE tx0_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TX0_64KW ||
@@ -677,7 +677,7 @@ CPU_GET_INFO( tx0_8kw )
 
 
 /* execute one instruction */
-static void execute_instruction_64kw(running_device *device)
+static void execute_instruction_64kw(device_t *device)
 {
 	tx0_state *cpustate = get_safe_token(device);
 
@@ -868,7 +868,7 @@ static void indexed_address_eval(tx0_state *cpustate)
 }
 
 /* execute one instruction */
-static void execute_instruction_8kw(running_device *device)
+static void execute_instruction_8kw(device_t *device)
 {
 	tx0_state *cpustate = get_safe_token(device);
 
@@ -1274,7 +1274,7 @@ static void execute_instruction_8kw(running_device *device)
     reset most registers and flip-flops, and initialize a few emulator state
     variables.
 */
-static void pulse_reset(running_device *device)
+static void pulse_reset(device_t *device)
 {
 	tx0_state *cpustate = get_safe_token(device);
 

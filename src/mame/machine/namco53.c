@@ -64,14 +64,14 @@
 typedef struct _namco_53xx_state namco_53xx_state;
 struct _namco_53xx_state
 {
-	running_device *	cpu;
+	device_t *	cpu;
 	UINT8					portO;
 	devcb_resolved_read8	k;
 	devcb_resolved_read8	in[4];
 	devcb_resolved_write8	p;
 };
 
-INLINE namco_53xx_state *get_safe_token(running_device *device)
+INLINE namco_53xx_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == NAMCO_53XX);
@@ -112,11 +112,11 @@ static WRITE8_HANDLER( namco_53xx_P_w )
 
 static TIMER_CALLBACK( namco_53xx_irq_clear )
 {
-	namco_53xx_state *state = get_safe_token((running_device *)ptr);
+	namco_53xx_state *state = get_safe_token((device_t *)ptr);
 	cpu_set_input_line(state->cpu, 0, CLEAR_LINE);
 }
 
-void namco_53xx_read_request(running_device *device)
+void namco_53xx_read_request(device_t *device)
 {
 	namco_53xx_state *state = get_safe_token(device);
 	cpu_set_input_line(state->cpu, 0, ASSERT_LINE);

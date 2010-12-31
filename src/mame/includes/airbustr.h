@@ -29,10 +29,10 @@ public:
 	int        slave_addr;
 
 	/* devices */
-	running_device *master;
-	running_device *slave;
-	running_device *audiocpu;
-	running_device *pandora;
+	device_t *master;
+	device_t *slave;
+	device_t *audiocpu;
+	device_t *pandora;
 };
 
 

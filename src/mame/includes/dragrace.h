@@ -40,7 +40,7 @@ public:
 	int       gear[2];
 
 	/* devices */
-	running_device *discrete;
+	device_t *discrete;
 };
 
 

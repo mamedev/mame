@@ -107,7 +107,7 @@ public:
 	int   oldsteer;
 
 	/* devices */
-	running_device *slavecpu;
+	device_t *slavecpu;
 };
 
 

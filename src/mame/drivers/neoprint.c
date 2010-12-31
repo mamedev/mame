@@ -343,7 +343,7 @@ public:
 		: driver_device(machine, config) { }
 };
 
-static void audio_cpu_irq(running_device *device, int assert)
+static void audio_cpu_irq(device_t *device, int assert)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, assert ? ASSERT_LINE : CLEAR_LINE);
 }

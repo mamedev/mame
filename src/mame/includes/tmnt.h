@@ -34,19 +34,19 @@ public:
 	UINT16	   m_cuebrick_nvram[0x400 * 0x20];	// 32k paged in a 1k window
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *k007232;
-	running_device *k053260;
-	running_device *k054539;
-	running_device *k052109;
-	running_device *k051960;
-	running_device *k053245;
-	running_device *k053251;
-	running_device *k053936;
-	running_device *k054000;
-	running_device *upd;
-	running_device *samples;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *k007232;
+	device_t *k053260;
+	device_t *k054539;
+	device_t *k052109;
+	device_t *k051960;
+	device_t *k053245;
+	device_t *k053251;
+	device_t *k053936;
+	device_t *k054000;
+	device_t *upd;
+	device_t *samples;
 };
 
 

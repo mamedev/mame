@@ -22,8 +22,8 @@ public:
 	int palette_bank1, palette_bank2;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *soundcpu;
+	device_t *maincpu;
+	device_t *soundcpu;
 };
 
 /*----------- defined in video/mcatadv.c -----------*/

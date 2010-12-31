@@ -47,7 +47,7 @@ struct _h83xx_state
 	int mode_8bit;
 };
 
-INLINE h83xx_state *get_safe_token(running_device *device)
+INLINE h83xx_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == H83002 ||

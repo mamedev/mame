@@ -27,10 +27,10 @@ public:
 
 	/* devices */
 	cpu_device *audiocpu;
-	running_device *sn1;
-	running_device *sn2;
-	running_device *dac;
-	running_device *discrete;
+	device_t *sn1;
+	device_t *sn2;
+	device_t *dac;
+	device_t *discrete;
 };
 
 

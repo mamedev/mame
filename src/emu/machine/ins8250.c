@@ -139,7 +139,7 @@ typedef struct {
 #define COM_INT_PENDING_MODEM_STATUS_REGISTER 0x0008
 
 
-INLINE ins8250_t *get_safe_token(running_device *device)
+INLINE ins8250_t *get_safe_token(device_t *device)
 {
 	assert( device != NULL );
 	assert( ( device->type() == INS8250 ) ||
@@ -153,7 +153,7 @@ INLINE ins8250_t *get_safe_token(running_device *device)
 
 
 /* setup iir with the priority id */
-static void ins8250_setup_iir(running_device *device)
+static void ins8250_setup_iir(device_t *device)
 {
 	ins8250_t	*ins8250 = get_safe_token(device);
 
@@ -183,7 +183,7 @@ static void ins8250_setup_iir(running_device *device)
 
 
 /* ints will continue to be set for as long as there are ints pending */
-static void ins8250_update_interrupt(running_device *device)
+static void ins8250_update_interrupt(device_t *device)
 {
 	ins8250_t	*ins8250 = get_safe_token(device);
 	int state;
@@ -219,7 +219,7 @@ static void ins8250_update_interrupt(running_device *device)
 
 
 /* set pending bit and trigger int */
-static void ins8250_trigger_int(running_device *device, int flag)
+static void ins8250_trigger_int(device_t *device, int flag)
 {
 	ins8250_t	*ins8250 = get_safe_token(device);
 
@@ -231,7 +231,7 @@ static void ins8250_trigger_int(running_device *device, int flag)
 
 /* clear pending bit, if any ints are pending, then int will be triggered, otherwise it
 will be cleared */
-static void ins8250_clear_int(running_device *device, int flag)
+static void ins8250_clear_int(device_t *device, int flag)
 {
 	ins8250_t	*ins8250 = get_safe_token(device);
 
@@ -481,7 +481,7 @@ READ8_DEVICE_HANDLER( ins8250_r )
 
 
 
-void ins8250_receive(running_device *device, int data)
+void ins8250_receive(device_t *device, int data)
 {
 	ins8250_t	*ins8250 = get_safe_token(device);
 
@@ -515,7 +515,7 @@ void ins8250_receive(running_device *device, int data)
 /**************************************************************************
  *  change the modem status register
  **************************************************************************/
-void ins8250_handshake_in(running_device *device, int new_msr)
+void ins8250_handshake_in(device_t *device, int new_msr)
 {
 	ins8250_t	*ins8250 = get_safe_token(device);
 
@@ -540,7 +540,7 @@ void ins8250_handshake_in(running_device *device, int new_msr)
 }
 
 
-static void common_start( running_device *device, int device_type )
+static void common_start( device_t *device, int device_type )
 {
 	ins8250_t	*ins8250 = get_safe_token(device);
 

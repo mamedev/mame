@@ -582,7 +582,7 @@ READ32_HANDLER(archimedes_ioc_r)
 {
 	UINT32 ioc_addr;
 	#ifdef MESS
-	running_device *fdc = (running_device *)space->machine->device("wd1772");
+	device_t *fdc = (device_t *)space->machine->device("wd1772");
 	#endif
 
 	ioc_addr = offset*4;
@@ -640,7 +640,7 @@ WRITE32_HANDLER(archimedes_ioc_w)
 {
 	UINT32 ioc_addr;
 	#ifdef MESS
-	running_device *fdc = (running_device *)space->machine->device("wd1772");
+	device_t *fdc = (device_t *)space->machine->device("wd1772");
 	#endif
 
 	ioc_addr = offset*4;

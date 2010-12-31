@@ -649,7 +649,7 @@ INLINE void serial_transmit(mcs51_state_t *mcs51_state, UINT8 data);
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE mcs51_state_t *get_safe_token(running_device *device)
+INLINE mcs51_state_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == I8031 ||
@@ -1282,13 +1282,13 @@ INLINE void	update_irq_prio(mcs51_state_t *mcs51_state, UINT8 ipl, UINT8 iph)
 ***************************************************************************/
 
 
-void i8051_set_serial_tx_callback(running_device *device, mcs51_serial_tx_func tx_func)
+void i8051_set_serial_tx_callback(device_t *device, mcs51_serial_tx_func tx_func)
 {
 	mcs51_state_t *mcs51_state = get_safe_token(device);
 	mcs51_state->serial_tx_callback = tx_func;
 }
 
-void i8051_set_serial_rx_callback(running_device *device, mcs51_serial_rx_func rx_func)
+void i8051_set_serial_rx_callback(device_t *device, mcs51_serial_rx_func rx_func)
 {
 	mcs51_state_t *mcs51_state = get_safe_token(device);
 	mcs51_state->serial_rx_callback = rx_func;

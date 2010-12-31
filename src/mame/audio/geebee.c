@@ -25,7 +25,7 @@ struct _geebee_sound_state
 	int vcount;
 };
 
-INLINE geebee_sound_state *get_safe_token(running_device *device)
+INLINE geebee_sound_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == GEEBEE);

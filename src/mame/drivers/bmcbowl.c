@@ -233,7 +233,7 @@ static WRITE8_DEVICE_HANDLER(via_ca2_out)
 }
 
 
-static void via_irq(running_device *device, int state)
+static void via_irq(device_t *device, int state)
 {
 	//used
 }

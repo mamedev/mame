@@ -129,7 +129,7 @@ static UINT8 upd_rom_bank;
  *
  *************************************/
 
-static void ym2151_irq_gen(running_device *device, int state)
+static void ym2151_irq_gen(device_t *device, int state)
 {
 	ym2151_irq = state;
 	cputag_set_input_line(device->machine, "audiocpu", 0, (ym2151_irq | sound_busy) ? ASSERT_LINE : CLEAR_LINE);

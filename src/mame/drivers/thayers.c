@@ -19,7 +19,7 @@
 
 extern const char layout_dlair[];
 
-static running_device *laserdisc;
+static device_t *laserdisc;
 static UINT8 laserdisc_data;
 
 static int rx_bit;

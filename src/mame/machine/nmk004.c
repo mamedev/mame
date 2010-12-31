@@ -96,7 +96,7 @@ static struct
 	int protection_check;
 
 	running_machine *machine;
-	running_device *ymdevice;
+	device_t *ymdevice;
 	okim6295_device *oki1device;
 	okim6295_device *oki2device;
 
@@ -988,7 +988,7 @@ static void update_music(void)
 
 
 
-void NMK004_irq(running_device *device, int irq)
+void NMK004_irq(device_t *device, int irq)
 {
 	if (irq)
 	{

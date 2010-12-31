@@ -48,13 +48,13 @@ struct _cdp1863_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE cdp1863_t *get_safe_token(running_device *device)
+INLINE cdp1863_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	return (cdp1863_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE cdp1863_config *get_safe_config(running_device *device)
+INLINE cdp1863_config *get_safe_config(device_t *device)
 {
 	assert(device != NULL);
 	return (cdp1863_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
@@ -90,7 +90,7 @@ WRITE_LINE_DEVICE_HANDLER( cdp1863_oe_w )
     cdp1863_set_clk1 - set clock 1 frequency
 ------------------------------------------------*/
 
-void cdp1863_set_clk1(running_device *device, int frequency)
+void cdp1863_set_clk1(device_t *device, int frequency)
 {
 	cdp1863_t *cdp1863 = get_safe_token(device);
 
@@ -101,7 +101,7 @@ void cdp1863_set_clk1(running_device *device, int frequency)
     cdp1863_set_clk2 - set clock 2 frequency
 ------------------------------------------------*/
 
-void cdp1863_set_clk2(running_device *device, int frequency)
+void cdp1863_set_clk2(device_t *device, int frequency)
 {
 	cdp1863_t *cdp1863 = get_safe_token(device);
 

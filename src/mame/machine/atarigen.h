@@ -162,7 +162,7 @@ public:
 	offs_t					slapstic_base;
 	offs_t					slapstic_mirror;
 
-	running_device *		sound_cpu;
+	device_t *		sound_cpu;
 	UINT8					cpu_to_sound;
 	UINT8					sound_to_cpu;
 	UINT8					timed_int;
@@ -235,7 +235,7 @@ READ32_HANDLER( atarigen_eeprom_upper32_r );
     SLAPSTIC HANDLING
 ---------------------------------------------------------------*/
 
-void atarigen_slapstic_init(running_device *device, offs_t base, offs_t mirror, int chipnum);
+void atarigen_slapstic_init(device_t *device, offs_t base, offs_t mirror, int chipnum);
 void atarigen_slapstic_reset(atarigen_state *state);
 
 WRITE16_HANDLER( atarigen_slapstic_w );
@@ -246,13 +246,13 @@ READ16_HANDLER( atarigen_slapstic_r );
     SOUND I/O
 ---------------------------------------------------------------*/
 
-void atarigen_sound_io_reset(running_device *device);
+void atarigen_sound_io_reset(device_t *device);
 
 INTERRUPT_GEN( atarigen_6502_irq_gen );
 READ8_HANDLER( atarigen_6502_irq_ack_r );
 WRITE8_HANDLER( atarigen_6502_irq_ack_w );
 
-void atarigen_ym2151_irq_gen(running_device *device, int irq);
+void atarigen_ym2151_irq_gen(device_t *device, int irq);
 
 WRITE16_HANDLER( atarigen_sound_w );
 READ16_HANDLER( atarigen_sound_r );

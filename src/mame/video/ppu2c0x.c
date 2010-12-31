@@ -115,13 +115,13 @@ struct _ppu2c0x_state
     PROTOTYPES
 ***************************************************************************/
 
-static void update_scanline( running_device *device );
+static void update_scanline( device_t *device );
 
 static TIMER_CALLBACK( scanline_callback );
 static TIMER_CALLBACK( hblank_callback );
 static TIMER_CALLBACK( nmi_callback );
 
-void (*ppu_latch)( running_device *device, offs_t offset );
+void (*ppu_latch)( device_t *device, offs_t offset );
 
 /* palette handlers */
 static WRITE8_HANDLER( ppu2c0x_palette_write );
@@ -132,7 +132,7 @@ static READ8_HANDLER( ppu2c0x_palette_read );
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE ppu2c0x_state *get_token( running_device *device )
+INLINE ppu2c0x_state *get_token( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == PPU_2C02) || (device->type() == PPU_2C03B)
@@ -143,7 +143,7 @@ INLINE ppu2c0x_state *get_token( running_device *device )
 }
 
 
-INLINE const ppu2c0x_interface *get_interface( running_device *device )
+INLINE const ppu2c0x_interface *get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == PPU_2C02) || (device->type() == PPU_2C03B)
@@ -329,7 +329,7 @@ static const gfx_layout ppu_charlayout =
 
 static TIMER_CALLBACK( hblank_callback )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	ppu2c0x_state *ppu2c0x = get_token(device);
 	int *ppu_regs = &ppu2c0x->regs[0];
 
@@ -346,7 +346,7 @@ static TIMER_CALLBACK( hblank_callback )
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	ppu2c0x_state *ppu2c0x = get_token(device);
 	int *ppu_regs = &ppu2c0x->regs[0];
 
@@ -357,7 +357,7 @@ static TIMER_CALLBACK( nmi_callback )
 	timer_adjust_oneshot(ppu2c0x->nmi_timer, attotime_never, 0);
 }
 
-static void draw_background( running_device *device, UINT8 *line_priority )
+static void draw_background( device_t *device, UINT8 *line_priority )
 {
 	ppu2c0x_state *ppu2c0x = get_token(device);
 
@@ -503,7 +503,7 @@ static void draw_background( running_device *device, UINT8 *line_priority )
 	}
 }
 
-static void draw_sprites( running_device *device, UINT8 *line_priority )
+static void draw_sprites( device_t *device, UINT8 *line_priority )
 {
 	ppu2c0x_state *ppu2c0x = get_token(device);
 
@@ -710,7 +710,7 @@ static void draw_sprites( running_device *device, UINT8 *line_priority )
  *
  *************************************/
 
-static void render_scanline( running_device *device )
+static void render_scanline( device_t *device )
 {
 	ppu2c0x_state *ppu2c0x = get_token(device);
 	UINT8 line_priority[VISIBLE_SCREEN_WIDTH];
@@ -754,7 +754,7 @@ static void render_scanline( running_device *device )
 	g_profiler.stop();
 }
 
-static void update_scanline( running_device *device )
+static void update_scanline( device_t *device )
 {
 	ppu2c0x_state *ppu2c0x = get_token(device);
 	const int scanline = ppu2c0x->scanline;
@@ -834,7 +834,7 @@ static void update_scanline( running_device *device )
 
 static TIMER_CALLBACK( scanline_callback )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	ppu2c0x_state *ppu2c0x = get_token(device);
 	int *ppu_regs = &ppu2c0x->regs[0];
 	int blanked = (ppu_regs[PPU_CONTROL1] & (PPU_CONTROL1_BACKGROUND | PPU_CONTROL1_SPRITES)) == 0;
@@ -1179,7 +1179,7 @@ WRITE8_DEVICE_HANDLER( ppu2c0x_w )
  *
  *************************************/
 
-void ppu2c0x_spriteram_dma( address_space *space, running_device *device, const UINT8 page )
+void ppu2c0x_spriteram_dma( address_space *space, device_t *device, const UINT8 page )
 {
 	int i;
 	int address = page << 8;
@@ -1200,7 +1200,7 @@ void ppu2c0x_spriteram_dma( address_space *space, running_device *device, const 
  *
  *************************************/
 
-void ppu2c0x_render( running_device *device, bitmap_t *bitmap, int flipx, int flipy, int sx, int sy )
+void ppu2c0x_render( device_t *device, bitmap_t *bitmap, int flipx, int flipy, int sx, int sy )
 {
 	ppu2c0x_state *ppu2c0x = get_token(device);
 	copybitmap(bitmap, ppu2c0x->bitmap, flipx, flipy, sx, sy, 0);
@@ -1212,7 +1212,7 @@ void ppu2c0x_render( running_device *device, bitmap_t *bitmap, int flipx, int fl
  *
  *************************************/
 
-int ppu2c0x_get_pixel( running_device *device, int x, int y )
+int ppu2c0x_get_pixel( device_t *device, int x, int y )
 {
 	ppu2c0x_state *ppu2c0x = get_token(device);
 
@@ -1225,44 +1225,44 @@ int ppu2c0x_get_pixel( running_device *device, int x, int y )
 	return *BITMAP_ADDR16(ppu2c0x->bitmap, y, x);
 }
 
-int ppu2c0x_get_colorbase( running_device *device )
+int ppu2c0x_get_colorbase( device_t *device )
 {
 	ppu2c0x_state *ppu2c0x = get_token(device);
 	return ppu2c0x->color_base;
 }
 
-int ppu2c0x_get_current_scanline( running_device *device )
+int ppu2c0x_get_current_scanline( device_t *device )
 {
 	ppu2c0x_state *ppu2c0x = get_token(device);
 	return ppu2c0x->scanline;
 }
 
 // MMC5 has to be able to check this
-int ppu2c0x_is_sprite_8x16( running_device *device )
+int ppu2c0x_is_sprite_8x16( device_t *device )
 {
 	ppu2c0x_state *ppu2c0x = get_token(device);
 	return BIT(ppu2c0x->regs[0], 5);
 }
 
-void ppu2c0x_set_scanline_callback( running_device *device, ppu2c0x_scanline_cb cb )
+void ppu2c0x_set_scanline_callback( device_t *device, ppu2c0x_scanline_cb cb )
 {
 	ppu2c0x_state *ppu2c0x = get_token(device);
 	ppu2c0x->scanline_callback_proc = cb;
 }
 
-void ppu2c0x_set_hblank_callback( running_device *device, ppu2c0x_hblank_cb cb )
+void ppu2c0x_set_hblank_callback( device_t *device, ppu2c0x_hblank_cb cb )
 {
 	ppu2c0x_state *ppu2c0x = get_token(device);
 	ppu2c0x->hblank_callback_proc = cb;
 }
 
-void ppu2c0x_set_vidaccess_callback( running_device *device, ppu2c0x_vidaccess_cb cb )
+void ppu2c0x_set_vidaccess_callback( device_t *device, ppu2c0x_vidaccess_cb cb )
 {
 	ppu2c0x_state *ppu2c0x = get_token(device);
 	ppu2c0x->vidaccess_callback_proc = cb;
 }
 
-void ppu2c0x_set_scanlines_per_frame( running_device *device, int scanlines )
+void ppu2c0x_set_scanlines_per_frame( device_t *device, int scanlines )
 {
 	ppu2c0x_state *ppu2c0x = get_token(device);
 	ppu2c0x->scanlines_per_frame = scanlines;

@@ -67,7 +67,7 @@ struct _konami_state
 	konami_set_lines_func setlines_callback;
 };
 
-INLINE konami_state *get_safe_token(running_device *device)
+INLINE konami_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == KONAMI);
@@ -502,7 +502,7 @@ static CPU_EXECUTE( konami )
 }
 
 
-void konami_configure_set_lines(running_device *device, konami_set_lines_func func)
+void konami_configure_set_lines(device_t *device, konami_set_lines_func func)
 {
 	konami_state *cpustate = get_safe_token(device);
 	cpustate->setlines_callback = func;

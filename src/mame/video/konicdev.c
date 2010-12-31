@@ -1344,7 +1344,7 @@ struct _k007121_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE k007121_state *k007121_get_safe_token( running_device *device )
+INLINE k007121_state *k007121_get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == K007121);
@@ -1422,7 +1422,7 @@ WRITE8_DEVICE_HANDLER( k007121_ctrl_w )
  *
  */
 
-void k007121_sprites_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, gfx_element *gfx, colortable_t *ctable,
+void k007121_sprites_draw( device_t *device, bitmap_t *bitmap, const rectangle *cliprect, gfx_element *gfx, colortable_t *ctable,
 						  const UINT8 *source, int base_color, int global_x_offset, int bank_base, UINT32 pri_mask )
 {
 	k007121_state *k007121 = k007121_get_safe_token(device);
@@ -1606,7 +1606,7 @@ struct _k007342_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE k007342_state *k007342_get_safe_token( running_device *device )
+INLINE k007342_state *k007342_get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == K007342);
@@ -1614,7 +1614,7 @@ INLINE k007342_state *k007342_get_safe_token( running_device *device )
 	return (k007342_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const k007342_interface *k007342_get_interface( running_device *device )
+INLINE const k007342_interface *k007342_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == K007342));
@@ -1690,7 +1690,7 @@ WRITE8_DEVICE_HANDLER( k007342_vreg_w )
 	k007342->regs[offset] = data;
 }
 
-void k007342_tilemap_update( running_device *device )
+void k007342_tilemap_update( device_t *device )
 {
 	k007342_state *k007342 = k007342_get_safe_token(device);
 	int offs;
@@ -1748,13 +1748,13 @@ void k007342_tilemap_update( running_device *device )
 #endif
 }
 
-void k007342_tilemap_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int num, int flags, UINT32 priority )
+void k007342_tilemap_draw( device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int num, int flags, UINT32 priority )
 {
 	k007342_state *k007342 = k007342_get_safe_token(device);
 	tilemap_draw(bitmap, cliprect, k007342->tilemap[num], flags, priority);
 }
 
-int k007342_is_int_enabled( running_device *device )
+int k007342_is_int_enabled( device_t *device )
 {
 	k007342_state *k007342 = k007342_get_safe_token(device);
 	return k007342->int_enabled;
@@ -1783,7 +1783,7 @@ static TILEMAP_MAPPER( k007342_scan )
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 5);
 }
 
-INLINE void k007342_get_tile_info( running_device *device, tile_data *tileinfo, int tile_index, int layer, UINT8 *cram, UINT8 *vram )
+INLINE void k007342_get_tile_info( device_t *device, tile_data *tileinfo, int tile_index, int layer, UINT8 *cram, UINT8 *vram )
 {
 	k007342_state *k007342 = k007342_get_safe_token(device);
 	int color, code, flags;
@@ -1890,7 +1890,7 @@ struct _k007420_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE k007420_state *k007420_get_safe_token( running_device *device )
+INLINE k007420_state *k007420_get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == K007420);
@@ -1898,7 +1898,7 @@ INLINE k007420_state *k007420_get_safe_token( running_device *device )
 	return (k007420_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const k007420_interface *k007420_get_interface( running_device *device )
+INLINE const k007420_interface *k007420_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == K007420));
@@ -1941,7 +1941,7 @@ WRITE8_DEVICE_HANDLER( k007420_w )
  *   7  | xxxxxxxx | unused
  */
 
-void k007420_sprites_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, gfx_element *gfx )
+void k007420_sprites_draw( device_t *device, bitmap_t *bitmap, const rectangle *cliprect, gfx_element *gfx )
 {
 	k007420_state *k007420 = k007420_get_safe_token(device);
 	int offs;
@@ -2167,7 +2167,7 @@ struct _k052109_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE k052109_state *k052109_get_safe_token( running_device *device )
+INLINE k052109_state *k052109_get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == K052109);
@@ -2175,7 +2175,7 @@ INLINE k052109_state *k052109_get_safe_token( running_device *device )
 	return (k052109_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const k052109_interface *k052109_get_interface( running_device *device )
+INLINE const k052109_interface *k052109_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == K052109));
@@ -2387,27 +2387,27 @@ WRITE16_DEVICE_HANDLER( k052109_lsb_w )
 		k052109_w(device, offset, data & 0xff);
 }
 
-void k052109_set_rmrd_line( running_device *device, int state )
+void k052109_set_rmrd_line( device_t *device, int state )
 {
 	k052109_state *k052109 = k052109_get_safe_token(device);
 	k052109->rmrd_line = state;
 }
 
-int k052109_get_rmrd_line(running_device *device )
+int k052109_get_rmrd_line(device_t *device )
 {
 	k052109_state *k052109 = k052109_get_safe_token(device);
 	return k052109->rmrd_line;
 }
 
 
-void k052109_tilemap_mark_dirty( running_device *device, int tmap_num )
+void k052109_tilemap_mark_dirty( device_t *device, int tmap_num )
 {
 	k052109_state *k052109 = k052109_get_safe_token(device);
 	tilemap_mark_all_tiles_dirty(k052109->tilemap[tmap_num]);
 }
 
 
-void k052109_tilemap_update( running_device *device )
+void k052109_tilemap_update( device_t *device )
 {
 	k052109_state *k052109 = k052109_get_safe_token(device);
 	int xscroll, yscroll, offs;
@@ -2560,20 +2560,20 @@ if (input_code_pressed(machine, KEYCODE_F))
 #endif
 }
 
-void k052109_tilemap_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int tmap_num, UINT32 flags, UINT8 priority )
+void k052109_tilemap_draw( device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int tmap_num, UINT32 flags, UINT8 priority )
 {
 	k052109_state *k052109 = k052109_get_safe_token(device);
 	tilemap_draw(bitmap, cliprect, k052109->tilemap[tmap_num], flags, priority);
 }
 
-int k052109_is_irq_enabled( running_device *device )
+int k052109_is_irq_enabled( device_t *device )
 {
 	k052109_state *k052109 = k052109_get_safe_token(device);
 
 	return k052109->irq_enabled;
 }
 
-void k052109_set_layer_offsets( running_device *device, int layer, int dx, int dy )
+void k052109_set_layer_offsets( device_t *device, int layer, int dx, int dy )
 {
 	k052109_state *k052109 = k052109_get_safe_token(device);
 
@@ -2599,7 +2599,7 @@ void k052109_set_layer_offsets( running_device *device, int layer, int dx, int d
   color RAM    ------xx  depends on external connections (usually banking, flip)
 */
 
-INLINE void k052109_get_tile_info( running_device *device, tile_data *tileinfo, int tile_index, int layer, UINT8 *cram, UINT8 *vram1, UINT8 *vram2 )
+INLINE void k052109_get_tile_info( device_t *device, tile_data *tileinfo, int tile_index, int layer, UINT8 *cram, UINT8 *vram1, UINT8 *vram2 )
 {
 	k052109_state *k052109 = k052109_get_safe_token(device);
 	int flipy = 0;
@@ -2802,7 +2802,7 @@ struct _k051960_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE k051960_state *k051960_get_safe_token( running_device *device )
+INLINE k051960_state *k051960_get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == K051960);
@@ -2810,7 +2810,7 @@ INLINE k051960_state *k051960_get_safe_token( running_device *device )
 	return (k051960_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const k051960_interface *k051960_get_interface( running_device *device )
+INLINE const k051960_interface *k051960_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == K051960));
@@ -2821,7 +2821,7 @@ INLINE const k051960_interface *k051960_get_interface( running_device *device )
     DEVICE HANDLERS
 *****************************************************************************/
 
-static int k051960_fetchromdata( running_device *device, int byte )
+static int k051960_fetchromdata( device_t *device, int byte )
 {
 	k051960_state *k051960 = k051960_get_safe_token(device);
 	int code, color, pri, shadow, off1, addr;
@@ -2938,19 +2938,19 @@ WRITE8_DEVICE_HANDLER( k051937_w )
 	}
 }
 
-int k051960_is_irq_enabled( running_device *device )
+int k051960_is_irq_enabled( device_t *device )
 {
 	k051960_state *k051960 = k051960_get_safe_token(device);
 	return k051960->irq_enabled;
 }
 
-int k051960_is_nmi_enabled( running_device *device )
+int k051960_is_nmi_enabled( device_t *device )
 {
 	k051960_state *k051960 = k051960_get_safe_token(device);
 	return k051960->nmi_enabled;
 }
 
-void k051960_set_sprite_offsets( running_device *device, int dx, int dy )
+void k051960_set_sprite_offsets( device_t *device, int dx, int dy )
 {
 	k051960_state *k051960 = k051960_get_safe_token(device);
 	k051960->dx = dx;
@@ -3003,7 +3003,7 @@ WRITE16_DEVICE_HANDLER( k051937_word_w )
  * Note that Aliens also uses the shadow bit to select the second sprite bank.
  */
 
-void k051960_sprites_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int min_priority, int max_priority )
+void k051960_sprites_draw( device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int min_priority, int max_priority )
 {
 #define NUM_SPRITES 128
 	k051960_state *k051960 = k051960_get_safe_token(device);
@@ -3344,7 +3344,7 @@ struct _k05324x_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE k05324x_state *k05324x_get_safe_token( running_device *device )
+INLINE k05324x_state *k05324x_get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == K053244 || device->type() == K053245));
@@ -3352,7 +3352,7 @@ INLINE k05324x_state *k05324x_get_safe_token( running_device *device )
 	return (k05324x_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const k05324x_interface *k05324x_get_interface( running_device *device )
+INLINE const k05324x_interface *k05324x_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == K053244 || device->type() == K053245));
@@ -3363,7 +3363,7 @@ INLINE const k05324x_interface *k05324x_get_interface( running_device *device )
     DEVICE HANDLERS
 *****************************************************************************/
 
-void k053245_set_sprite_offs( running_device *device, int offsx, int offsy )
+void k053245_set_sprite_offs( device_t *device, int offsx, int offsy )
 {
 	k05324x_state *k053245 = k05324x_get_safe_token(device);
 	k053245->dx = offsx;
@@ -3403,7 +3403,7 @@ WRITE8_DEVICE_HANDLER( k053245_w )
 		k053245->ram[offset >> 1] = (k053245->ram[offset >> 1] & 0x00ff) | (data << 8);
 }
 
-void k053245_clear_buffer( running_device *device )
+void k053245_clear_buffer( device_t *device )
 {
 	k05324x_state *k053245 = k05324x_get_safe_token(device);
 	int i, e;
@@ -3412,7 +3412,7 @@ void k053245_clear_buffer( running_device *device )
 		k053245->buffer[i] = 0;
 }
 
-INLINE void k053245_update_buffer( running_device *device )
+INLINE void k053245_update_buffer( device_t *device )
 {
 	k05324x_state *k053245 = k05324x_get_safe_token(device);
 	memcpy(k053245->buffer, k053245->ram, k053245->ramsize);
@@ -3495,7 +3495,7 @@ WRITE16_DEVICE_HANDLER( k053244_word_w )
 		k053244_w(device, offset * 2 + 1, data & 0xff);
 }
 
-void k053244_bankselect( running_device *device, int bank )
+void k053244_bankselect( device_t *device, int bank )
 {
 	k05324x_state *k053244 = k05324x_get_safe_token(device);
 	k053244->rombank = bank;
@@ -3529,7 +3529,7 @@ void k053244_bankselect( running_device *device, int bank )
  * The rest of the sprite remains normal.
  */
 
-void k053245_sprites_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect )
+void k053245_sprites_draw( device_t *device, bitmap_t *bitmap, const rectangle *cliprect )
 {
 #define NUM_SPRITES 128
 	k05324x_state *k053245 = k05324x_get_safe_token(device);
@@ -3783,7 +3783,7 @@ if (input_code_pressed(machine, KEYCODE_D))
 
 /* Lethal Enforcers has 2 of these chips hooked up in parallel to give 6bpp gfx.. lets cheat a
   bit and make emulating it a little less messy by using a custom function instead */
-void k053245_sprites_draw_lethal( running_device *device, bitmap_t *bitmap, const rectangle *cliprect )
+void k053245_sprites_draw_lethal( device_t *device, bitmap_t *bitmap, const rectangle *cliprect )
 {
 #define NUM_SPRITES 128
 	k05324x_state *k053245 = k05324x_get_safe_token(device);
@@ -4134,7 +4134,7 @@ struct _k053247_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE k053247_state *k053247_get_safe_token( running_device *device )
+INLINE k053247_state *k053247_get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == K053246 || device->type() == K053247 || device->type() == K055673));
@@ -4142,7 +4142,7 @@ INLINE k053247_state *k053247_get_safe_token( running_device *device )
 	return (k053247_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const k053247_interface *k053247_get_interface( running_device *device )
+INLINE const k053247_interface *k053247_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == K053246 || device->type() == K053247 || device->type() == K055673));
@@ -4154,13 +4154,13 @@ INLINE const k053247_interface *k053247_get_interface( running_device *device )
 *****************************************************************************/
 
 #if 0
-void k053247_get_gfx( running_device *device, gfx_element **gfx )
+void k053247_get_gfx( device_t *device, gfx_element **gfx )
 {
 	k053247_state *k053247 = k053247_get_safe_token(device);
 	*gfx = k053247->gfx;
 }
 
-void k053247_get_cb( running_device *device, void (**callback)(int *, int *, int *) )
+void k053247_get_cb( device_t *device, void (**callback)(int *, int *, int *) )
 {
 	k053247_state *k053247 = k053247_get_safe_token(device);
 	*callback = k053247->callback;
@@ -4168,44 +4168,44 @@ void k053247_get_cb( running_device *device, void (**callback)(int *, int *, int
 
 #endif
 
-void k053247_get_ram( running_device *device, UINT16 **ram )
+void k053247_get_ram( device_t *device, UINT16 **ram )
 {
 	k053247_state *k053247 = k053247_get_safe_token(device);
 	*ram = k053247->ram;
 }
 
-int k053247_get_dx( running_device *device )
+int k053247_get_dx( device_t *device )
 {
 	k053247_state *k053247 = k053247_get_safe_token(device);
 	return k053247->dx;
 }
 
-int k053247_get_dy( running_device *device )
+int k053247_get_dy( device_t *device )
 {
 	k053247_state *k053247 = k053247_get_safe_token(device);
 	return k053247->dy;
 }
 
-int k053246_read_register( running_device *device, int regnum )
+int k053246_read_register( device_t *device, int regnum )
 {
 	k053247_state *k053247 = k053247_get_safe_token(device);
 	return(k053247->kx46_regs[regnum]);
 }
 
-int k053247_read_register( running_device *device, int regnum )
+int k053247_read_register( device_t *device, int regnum )
 {
 	k053247_state *k053247 = k053247_get_safe_token(device);
 	return(k053247->kx47_regs[regnum]);
 }
 
-void k053247_set_sprite_offs( running_device *device, int offsx, int offsy )
+void k053247_set_sprite_offs( device_t *device, int offsx, int offsy )
 {
 	k053247_state *k053247 = k053247_get_safe_token(device);
 	k053247->dx = offsx;
 	k053247->dy = offsy;
 }
 
-void k053247_wraparound_enable( running_device *device, int status )
+void k053247_wraparound_enable( device_t *device, int status )
 {
 	k053247_state *k053247 = k053247_get_safe_token(device);
 	k053247->wraparound = status;
@@ -4408,13 +4408,13 @@ WRITE32_DEVICE_HANDLER( k053246_long_w )
 	k053246_word_w(device, offset + 1, data, mem_mask);
 }
 
-void k053246_set_objcha_line( running_device *device, int state )
+void k053246_set_objcha_line( device_t *device, int state )
 {
 	k053247_state *k053246 = k053247_get_safe_token(device);
 	k053246->objcha_line = state;
 }
 
-int k053246_is_irq_enabled( running_device *device )
+int k053246_is_irq_enabled( device_t *device )
 {
 	k053247_state *k053247 = k053247_get_safe_token(device);
 	// This bit enables obj DMA rather than obj IRQ even though the two functions usually coincide.
@@ -4450,7 +4450,7 @@ int k053246_is_irq_enabled( running_device *device )
  * The rest of the sprite remains normal.
  */
 
-void k053247_sprites_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect )
+void k053247_sprites_draw( device_t *device, bitmap_t *bitmap, const rectangle *cliprect )
 {
 #define NUM_SPRITES 256
 	k053247_state *k053246 = k053247_get_safe_token(device);
@@ -5087,13 +5087,13 @@ static DEVICE_RESET( k053247 )
 */
 
 
-void k05324x_set_z_rejection( running_device *device, int zcode )
+void k05324x_set_z_rejection( device_t *device, int zcode )
 {
 	k05324x_state *k05324x = k05324x_get_safe_token(device);
 	k05324x->z_rejection = zcode;
 }
 
-void k053247_set_z_rejection( running_device *device, int zcode )
+void k053247_set_z_rejection( device_t *device, int zcode )
 {
 	k053247_state *k053247 = k053247_get_safe_token(device);
 	k053247->z_rejection = zcode;
@@ -5125,7 +5125,7 @@ struct _k051316_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE k051316_state *k051316_get_safe_token( running_device *device )
+INLINE k051316_state *k051316_get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == K051316);
@@ -5133,7 +5133,7 @@ INLINE k051316_state *k051316_get_safe_token( running_device *device )
 	return (k051316_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const k051316_interface *k051316_get_interface( running_device *device )
+INLINE const k051316_interface *k051316_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == K051316);
@@ -5189,7 +5189,7 @@ WRITE8_DEVICE_HANDLER( k051316_ctrl_w )
 }
 
 // a few games (ajax, rollerg, ultraman, etc.) can enable and disable wraparound after start
-void k051316_wraparound_enable( running_device *device, int status )
+void k051316_wraparound_enable( device_t *device, int status )
 {
 	k051316_state *k051316= k051316_get_safe_token(device);
 	k051316->wraparound = status;
@@ -5201,7 +5201,7 @@ void k051316_wraparound_enable( running_device *device, int status )
 
 ***************************************************************************/
 
-INLINE void k051316_get_tile_info( running_device *device, tile_data *tileinfo, int tile_index )
+INLINE void k051316_get_tile_info( device_t *device, tile_data *tileinfo, int tile_index )
 {
 	k051316_state *k051316 = k051316_get_safe_token(device);
 	int code = k051316->ram[tile_index];
@@ -5221,7 +5221,7 @@ INLINE void k051316_get_tile_info( running_device *device, tile_data *tileinfo, 
 static TILE_GET_INFO_DEVICE( k051316_get_tile_info0 ) { k051316_get_tile_info(device, tileinfo, tile_index); }
 
 
-void k051316_zoom_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority )
+void k051316_zoom_draw( device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority )
 {
 	k051316_state *k051316= k051316_get_safe_token(device);
 	UINT32 startx, starty;
@@ -5413,7 +5413,7 @@ struct _k053936_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE k053936_state *k053936_get_safe_token( running_device *device )
+INLINE k053936_state *k053936_get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == K053936);
@@ -5421,7 +5421,7 @@ INLINE k053936_state *k053936_get_safe_token( running_device *device )
 	return (k053936_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const k053936_interface *k053936_get_interface( running_device *device )
+INLINE const k053936_interface *k053936_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == K053936);
@@ -5459,7 +5459,7 @@ READ16_DEVICE_HANDLER( k053936_linectrl_r )
 
 // there is another implementation of this in  video/konamigx.c (!)
 //  why? shall they be merged?
-void k053936_zoom_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, tilemap_t *tmap, int flags, UINT32 priority, int glfgreat_hack )
+void k053936_zoom_draw( device_t *device, bitmap_t *bitmap, const rectangle *cliprect, tilemap_t *tmap, int flags, UINT32 priority, int glfgreat_hack )
 {
 	k053936_state *k053936= k053936_get_safe_token(device);
 	if (!tmap)
@@ -5638,7 +5638,7 @@ struct _k053251_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE k053251_state *k053251_get_safe_token( running_device *device )
+INLINE k053251_state *k053251_get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == K053251);
@@ -5707,26 +5707,26 @@ WRITE16_DEVICE_HANDLER( k053251_msb_w )
 		k053251_w(device, offset, (data >> 8) & 0xff);
 }
 
-int k053251_get_priority( running_device *device, int ci )
+int k053251_get_priority( device_t *device, int ci )
 {
 	k053251_state *k053251 = k053251_get_safe_token(device);
 	return k053251->ram[ci];
 }
 
-int k053251_get_palette_index( running_device *device, int ci )
+int k053251_get_palette_index( device_t *device, int ci )
 {
 	k053251_state *k053251 = k053251_get_safe_token(device);
 	return k053251->palette_index[ci];
 }
 
-int k053251_get_tmap_dirty( running_device *device, int tmap_num )
+int k053251_get_tmap_dirty( device_t *device, int tmap_num )
 {
 	k053251_state *k053251 = k053251_get_safe_token(device);
 	assert(tmap_num < 5);
 	return k053251->dirty_tmap[tmap_num];
 }
 
-void k053251_set_tmap_dirty( running_device *device, int tmap_num, int data )
+void k053251_set_tmap_dirty( device_t *device, int tmap_num, int data )
 {
 	k053251_state *k053251 = k053251_get_safe_token(device);
 	assert(tmap_num < 5);
@@ -5791,7 +5791,7 @@ struct _k054000_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE k054000_state *k054000_get_safe_token( running_device *device )
+INLINE k054000_state *k054000_get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == K054000);
@@ -5902,7 +5902,7 @@ struct _k051733_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE k051733_state *k051733_get_safe_token( running_device *device )
+INLINE k051733_state *k051733_get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == K051733);
@@ -6099,14 +6099,14 @@ struct _k056832_state
 
 	k056832_callback  callback;
 
-	running_device *k055555;	/* used to choose colorbase */
+	device_t *k055555;	/* used to choose colorbase */
 };
 
 /*****************************************************************************
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE k056832_state *k056832_get_safe_token( running_device *device )
+INLINE k056832_state *k056832_get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == K056832);
@@ -6114,7 +6114,7 @@ INLINE k056832_state *k056832_get_safe_token( running_device *device )
 	return (k056832_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const k056832_interface *k056832_get_interface( running_device *device )
+INLINE const k056832_interface *k056832_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == K056832);
@@ -6136,7 +6136,7 @@ static void k056832_mark_page_dirty( k056832_state *k056832, int page )
 		k056832_mark_all_lines_dirty(page);
 }
 
-void k056832_mark_plane_dirty( running_device *device, int layer )
+void k056832_mark_plane_dirty( device_t *device, int layer )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
 	int tilemode, i;
@@ -6168,7 +6168,7 @@ static void k056832_mark_all_tilemaps_dirty( k056832_state *k056832 )
 }
 
 /* moo.c needs to call this in its VIDEO_UPDATE */
-void k056832_mark_all_tmaps_dirty( running_device *device )
+void k056832_mark_all_tmaps_dirty( device_t *device )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
 	k056832_mark_all_tilemaps_dirty(k056832);
@@ -6227,7 +6227,7 @@ static void k056832_update_page_layout( k056832_state *k056832 )
 	k056832_mark_all_tilemaps_dirty(k056832);
 }
 
-int k056832_get_lookup( running_device *device, int bits )
+int k056832_get_lookup( device_t *device, int bits )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
 	int res;
@@ -6240,7 +6240,7 @@ int k056832_get_lookup( running_device *device, int bits )
 	return res;
 }
 
-INLINE void k056832_get_tile_info( running_device *device, tile_data *tileinfo, int tile_index, int pageIndex )
+INLINE void k056832_get_tile_info( device_t *device, tile_data *tileinfo, int tile_index, int pageIndex )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
 	static const struct K056832_SHIFTMASKS
@@ -6321,7 +6321,7 @@ static void k056832_change_rambank( k056832_state *k056832 )
 	k056832_mark_all_tilemaps_dirty(k056832);
 }
 
-int k056832_get_current_rambank( running_device *device )
+int k056832_get_current_rambank( device_t *device )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
 	int bank = k056832->regs[0x19];
@@ -6341,7 +6341,7 @@ static void k056832_change_rombank( k056832_state *k056832 )
 	k056832->cur_gfx_banks = bank % k056832->num_gfx_banks;
 }
 
-void k056832_set_tile_bank( running_device *device, int bank )
+void k056832_set_tile_bank( device_t *device, int bank )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
 	k056832->uses_tile_banks = 1;
@@ -6360,14 +6360,14 @@ void k056832_set_tile_bank( running_device *device, int bank )
 }
 
 /* call if a game uses external linescroll */
-void k056832_SetExtLinescroll( running_device *device )
+void k056832_SetExtLinescroll( device_t *device )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
 	k056832->use_ext_linescroll = 1;
 }
 
 /* generic helper routine for ROM checksumming */
-static int k056832_rom_read_b( running_device *device, int offset, int blksize, int blksize2, int zerosec )
+static int k056832_rom_read_b( device_t *device, int offset, int blksize, int blksize2, int zerosec )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
 	UINT8 *rombase;
@@ -6986,7 +6986,7 @@ WRITE32_DEVICE_HANDLER( k056832_b_long_w )
 	}
 }
 
-static int k056832_update_linemap( running_device *device, bitmap_t *bitmap, int page, int flags )
+static int k056832_update_linemap( device_t *device, bitmap_t *bitmap, int page, int flags )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
 
@@ -7110,7 +7110,7 @@ static int k056832_update_linemap( running_device *device, bitmap_t *bitmap, int
 	return(0);
 }
 
-void k056832_tilemap_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int layer, UINT32 flags, UINT32 priority )
+void k056832_tilemap_draw( device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int layer, UINT32 flags, UINT32 priority )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
 	UINT32 last_dx, last_visible, new_colorbase, last_active;
@@ -7417,7 +7417,7 @@ void k056832_tilemap_draw( running_device *device, bitmap_t *bitmap, const recta
 } // end of function
 
 
-void k056832_tilemap_draw_dj( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int layer, UINT32 flags, UINT32 priority )
+void k056832_tilemap_draw_dj( device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int layer, UINT32 flags, UINT32 priority )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
 	UINT32 last_dx, last_visible, new_colorbase, last_active;
@@ -7692,52 +7692,52 @@ void k056832_tilemap_draw_dj( running_device *device, bitmap_t *bitmap, const re
 } // end of function
 
 
-void k056832_set_layer_association( running_device *device, int status )
+void k056832_set_layer_association( device_t *device, int status )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
 	k056832->default_layer_association = status;
 }
 
-int k056832_get_layer_association( running_device *device )
+int k056832_get_layer_association( device_t *device )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
 	return(k056832->layer_association);
 }
 
-void k056832_set_layer_offs( running_device *device, int layer, int offsx, int offsy )
+void k056832_set_layer_offs( device_t *device, int layer, int offsx, int offsy )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
 	k056832->layer_offs[layer][0] = offsx;
 	k056832->layer_offs[layer][1] = offsy;
 }
 
-void k056832_set_lsram_page( running_device *device, int logical_page, int physical_page, int physical_offset )
+void k056832_set_lsram_page( device_t *device, int logical_page, int physical_page, int physical_offset )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
 	k056832->lsram_page[logical_page][0] = physical_page;
 	k056832->lsram_page[logical_page][1] = physical_offset;
 }
 
-void k056832_linemap_enable( running_device *device, int enable )
+void k056832_linemap_enable( device_t *device, int enable )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
 	k056832->linemap_enabled = enable;
 }
 
-int k056832_is_irq_enabled( running_device *device, int irqline )
+int k056832_is_irq_enabled( device_t *device, int irqline )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
 	return(k056832->regs[0x06/2] & (1 << irqline & 7));
 }
 
-void k056832_read_avac( running_device *device, int *mode, int *data )
+void k056832_read_avac( device_t *device, int *mode, int *data )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
 	*mode = k056832->regs[0x04/2] & 7;
 	*data = k056832->regs[0x38/2];
 }
 
-int k056832_read_register( running_device *device, int regnum )
+int k056832_read_register( device_t *device, int regnum )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
 	return(k056832->regs[regnum]);
@@ -8025,7 +8025,7 @@ struct _k055555_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE k055555_state *k055555_get_safe_token( running_device *device )
+INLINE k055555_state *k055555_get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == K055555);
@@ -8037,7 +8037,7 @@ INLINE k055555_state *k055555_get_safe_token( running_device *device )
     DEVICE HANDLERS
 *****************************************************************************/
 
-void k055555_write_reg( running_device *device, UINT8 regnum, UINT8 regdat )
+void k055555_write_reg( device_t *device, UINT8 regnum, UINT8 regdat )
 {
 	k055555_state *k055555 = k055555_get_safe_token(device);
 
@@ -8097,13 +8097,13 @@ WRITE16_DEVICE_HANDLER( k055555_word_w )
 	}
 }
 
-int k055555_read_register( running_device *device, int regnum )
+int k055555_read_register( device_t *device, int regnum )
 {
 	k055555_state *k055555 = k055555_get_safe_token(device);
 	return k055555->regs[regnum];
 }
 
-int k055555_get_palette_index( running_device *device, int idx )
+int k055555_get_palette_index( device_t *device, int idx )
 {
 	k055555_state *k055555 = k055555_get_safe_token(device);
 	return k055555->regs[K55_PALBASE_A + idx];
@@ -8145,14 +8145,14 @@ struct _k054338_state
 	int       alphainverted;
 
 	screen_device *screen;
-	running_device *k055555;	/* used to fill BG color */
+	device_t *k055555;	/* used to fill BG color */
 };
 
 /*****************************************************************************
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE k054338_state *k054338_get_safe_token( running_device *device )
+INLINE k054338_state *k054338_get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == K054338);
@@ -8160,7 +8160,7 @@ INLINE k054338_state *k054338_get_safe_token( running_device *device )
 	return (k054338_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const k054338_interface *k054338_get_interface( running_device *device )
+INLINE const k054338_interface *k054338_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == K054338);
@@ -8185,13 +8185,13 @@ WRITE32_DEVICE_HANDLER( k054338_long_w )
 }
 
 // returns a 16-bit '338 register
-int  k054338_register_r( running_device *device, int reg )
+int  k054338_register_r( device_t *device, int reg )
 {
 	k054338_state *k054338 = k054338_get_safe_token(device);
 	return k054338->regs[reg];
 }
 
-void k054338_update_all_shadows( running_device *device, int rushingheroes_hack )
+void k054338_update_all_shadows( device_t *device, int rushingheroes_hack )
 {
 	k054338_state *k054338 = k054338_get_safe_token(device);
 	running_machine *machine = device->machine;
@@ -8221,7 +8221,7 @@ void k054338_update_all_shadows( running_device *device, int rushingheroes_hack 
 }
 
 // k054338 BG color fill
-void k054338_fill_solid_bg( running_device *device, bitmap_t *bitmap )
+void k054338_fill_solid_bg( device_t *device, bitmap_t *bitmap )
 {
 	UINT32 bgcolor;
 	UINT32 *pLine;
@@ -8241,7 +8241,7 @@ void k054338_fill_solid_bg( running_device *device, bitmap_t *bitmap )
 }
 
 // Unified k054338/K055555 BG color fill
-void k054338_fill_backcolor( running_device *device, bitmap_t *bitmap, int mode ) // (see p.67)
+void k054338_fill_backcolor( device_t *device, bitmap_t *bitmap, int mode ) // (see p.67)
 {
 	k054338_state *k054338 = k054338_get_safe_token(device);
 	int clipx, clipy, clipw, cliph, i, dst_pitch;
@@ -8340,7 +8340,7 @@ void k054338_fill_backcolor( running_device *device, bitmap_t *bitmap, int mode 
 }
 
 // addition blending unimplemented (requires major changes to drawgfx and tilemap.c)
-int k054338_set_alpha_level( running_device *device, int pblend )
+int k054338_set_alpha_level( device_t *device, int pblend )
 {
 	k054338_state *k054338 = k054338_get_safe_token(device);
 	UINT16 *regs;
@@ -8388,7 +8388,7 @@ int k054338_set_alpha_level( running_device *device, int pblend )
 	return mixlv;
 }
 
-void k054338_invert_alpha( running_device *device, int invert )
+void k054338_invert_alpha( device_t *device, int invert )
 {
 	k054338_state *k054338 = k054338_get_safe_token(device);
 	k054338->alphainverted = invert;
@@ -8397,7 +8397,7 @@ void k054338_invert_alpha( running_device *device, int invert )
 
 #if 0
 // FIXME
-void k054338->export_config( running_device *device, int **shd_rgb )
+void k054338->export_config( device_t *device, int **shd_rgb )
 {
 	k054338_state *k054338 = k054338_get_safe_token(device);
 	*shd_rgb = k054338->shd_rgb;
@@ -8455,7 +8455,7 @@ struct _k053250_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE k053250_state *k053250_get_safe_token( running_device *device )
+INLINE k053250_state *k053250_get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == K053250);
@@ -8463,7 +8463,7 @@ INLINE k053250_state *k053250_get_safe_token( running_device *device )
 	return (k053250_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const k053250_interface *k053250_get_interface( running_device *device )
+INLINE const k053250_interface *k053250_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == K053250));
@@ -8477,7 +8477,7 @@ INLINE const k053250_interface *k053250_get_interface( running_device *device )
 
 // The DMA process should be instantaneous but since rendering in MAME is performed at VIDEO_UPDATE()
 // the k053250 memory must be buffered to maintain visual integrity.
-void k053250_dma( running_device *device, int limiter )
+void k053250_dma( device_t *device, int limiter )
 {
 	k053250_state *k053250 = k053250_get_safe_token(device);
 	int last_frame, current_frame;
@@ -8722,7 +8722,7 @@ INLINE void k053250_pdraw_scanline32(bitmap_t *bitmap, const pen_t *palette, UIN
 #undef FIXPOINT_PRECISION_HALF
 }
 
-void k053250_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int colorbase, int flags, int priority )
+void k053250_draw( device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int colorbase, int flags, int priority )
 {
 	k053250_state *k053250 = k053250_get_safe_token(device);
 	UINT16 *line_ram;
@@ -8998,7 +8998,7 @@ struct _k053252_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE k053252_state *k053252_get_safe_token( running_device *device )
+INLINE k053252_state *k053252_get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == K053252);
@@ -9084,7 +9084,7 @@ struct _k001006_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE k001006_state *k001006_get_safe_token( running_device *device )
+INLINE k001006_state *k001006_get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == K001006);
@@ -9092,7 +9092,7 @@ INLINE k001006_state *k001006_get_safe_token( running_device *device )
 	return (k001006_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const k001006_interface *k001006_get_interface( running_device *device )
+INLINE const k001006_interface *k001006_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == K001006));
@@ -9188,7 +9188,7 @@ WRITE32_DEVICE_HANDLER( k001006_w )
 	}
 }
 
-UINT32 k001006_get_palette( running_device *device, int index )
+UINT32 k001006_get_palette( device_t *device, int index )
 {
 	k001006_state *k001006 = k001006_get_safe_token(device);
 	return k001006->palette[index];
@@ -9253,10 +9253,10 @@ typedef struct _k001005_state k001005_state;
 struct _k001005_state
 {
 	screen_device *screen;
-	running_device *cpu;
-	running_device *dsp;
-	running_device *k001006_1;
-	running_device *k001006_2;
+	device_t *cpu;
+	device_t *dsp;
+	device_t *k001006_1;
+	device_t *k001006_2;
 
 	UINT8  *     texture;
 	UINT16 *     ram[2];
@@ -9294,7 +9294,7 @@ static const int decode_y_zr107[16] = {  0, 8, 32, 40, 4, 12, 36, 44, 64, 72, 96
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE k001005_state *k001005_get_safe_token( running_device *device )
+INLINE k001005_state *k001005_get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == K001005);
@@ -9302,7 +9302,7 @@ INLINE k001005_state *k001005_get_safe_token( running_device *device )
 	return (k001005_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const k001005_interface *k001005_get_interface( running_device *device )
+INLINE const k001005_interface *k001005_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == K001005));
@@ -9313,7 +9313,7 @@ INLINE const k001005_interface *k001005_get_interface( running_device *device )
     DEVICE HANDLERS
 *****************************************************************************/
 
-static void k001005_render_polygons( running_device *device );
+static void k001005_render_polygons( device_t *device );
 
 // rearranges the texture data to a more practical order
 void k001005_preprocess_texture_data( UINT8 *rom, int length, int gticlub )
@@ -9367,7 +9367,7 @@ void k001005_preprocess_texture_data( UINT8 *rom, int length, int gticlub )
 	}
 }
 
-void k001005_swap_buffers( running_device *device )
+void k001005_swap_buffers( device_t *device )
 {
 	k001005_state *k001005 = k001005_get_safe_token(device);
 
@@ -9546,7 +9546,7 @@ WRITE32_DEVICE_HANDLER( k001005_w )
 #define POLY_DEVICE 0
 
 #if POLY_DEVICE
-static void draw_scanline( running_device *device, void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid )
+static void draw_scanline( device_t *device, void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid )
 {
 	k001005_state *k001005 = k001005_get_safe_token(device);
 	const poly_extra_data *extra = (const poly_extra_data *)extradata;
@@ -9577,13 +9577,13 @@ static void draw_scanline( running_device *device, void *dest, INT32 scanline, c
 #endif
 
 #if POLY_DEVICE
-static void draw_scanline_tex( running_device *device, void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid )
+static void draw_scanline_tex( device_t *device, void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid )
 {
 	k001005_state *k001005 = k001005_get_safe_token(device);
 	const poly_extra_data *extra = (const poly_extra_data *)extradata;
 	bitmap_t *destmap = (bitmap_t *)dest;
 	UINT8 *texrom = k001005->gfxrom + (extra->texture_page * 0x40000);
-	running_device *pal_device = (extra->texture_palette & 0x8) ? k001005->k001006_2 : k001005->k001006_1;
+	device_t *pal_device = (extra->texture_palette & 0x8) ? k001005->k001006_2 : k001005->k001006_1;
 	int palette_index = (extra->texture_palette & 0x7) * 256;
 	float z = extent->param[0].start;
 	float u = extent->param[1].start;
@@ -9639,7 +9639,7 @@ static void draw_scanline_tex( running_device *device, void *dest, INT32 scanlin
 #endif
 
 
-static void k001005_render_polygons( running_device *device )
+static void k001005_render_polygons( device_t *device )
 {
 	k001005_state *k001005 = k001005_get_safe_token(device);
 	int i, j;
@@ -10047,7 +10047,7 @@ static void k001005_render_polygons( running_device *device )
 	}
 }
 
-void k001005_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect )
+void k001005_draw( device_t *device, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	k001005_state *k001005 = k001005_get_safe_token(device);
 	int i, j;
@@ -10186,7 +10186,7 @@ struct _k001604_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE k001604_state *k001604_get_safe_token( running_device *device )
+INLINE k001604_state *k001604_get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == K001604);
@@ -10194,7 +10194,7 @@ INLINE k001604_state *k001604_get_safe_token( running_device *device )
 	return (k001604_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const k001604_interface *k001604_get_interface( running_device *device )
+INLINE const k001604_interface *k001604_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == K001604));
@@ -10326,7 +10326,7 @@ static TILE_GET_INFO_DEVICE( k001604_tile_info_layer_roz )
 }
 
 
-void k001604_draw_back_layer( running_device *device, bitmap_t *bitmap, const rectangle *cliprect )
+void k001604_draw_back_layer( device_t *device, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	k001604_state *k001604 = k001604_get_safe_token(device);
 	int layer;
@@ -10361,7 +10361,7 @@ void k001604_draw_back_layer( running_device *device, bitmap_t *bitmap, const re
 	}
 }
 
-void k001604_draw_front_layer( running_device *device, bitmap_t *bitmap, const rectangle *cliprect )
+void k001604_draw_front_layer( device_t *device, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	k001604_state *k001604 = k001604_get_safe_token(device);
 
@@ -10599,7 +10599,7 @@ struct _k037122_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE k037122_state *k037122_get_safe_token( running_device *device )
+INLINE k037122_state *k037122_get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == K037122);
@@ -10607,7 +10607,7 @@ INLINE k037122_state *k037122_get_safe_token( running_device *device )
 	return (k037122_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const k037122_interface *k037122_get_interface( running_device *device )
+INLINE const k037122_interface *k037122_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == K037122));
@@ -10662,7 +10662,7 @@ static TILE_GET_INFO_DEVICE( k037122_tile_info_layer1 )
 }
 
 
-void k037122_tile_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect )
+void k037122_tile_draw( device_t *device, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	k037122_state *k037122 = k037122_get_safe_token(device);
 	const rectangle &visarea = k037122->screen->visible_area();
@@ -10681,7 +10681,7 @@ void k037122_tile_draw( running_device *device, bitmap_t *bitmap, const rectangl
 	}
 }
 
-static void update_palette_color( running_device *device, UINT32 palette_base, int color )
+static void update_palette_color( device_t *device, UINT32 palette_base, int color )
 {
 	k037122_state *k037122 = k037122_get_safe_token(device);
 	UINT32 data = k037122->tile_ram[(palette_base / 4) + color];

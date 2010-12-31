@@ -52,7 +52,7 @@ static STREAM_UPDATE( hc55516_update );
 
 
 
-INLINE hc55516_state *get_safe_token(running_device *device)
+INLINE hc55516_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == HC55516 ||
@@ -62,7 +62,7 @@ INLINE hc55516_state *get_safe_token(running_device *device)
 }
 
 
-static void start_common(running_device *device, UINT8 _shiftreg_mask, int _active_clock_hi)
+static void start_common(device_t *device, UINT8 _shiftreg_mask, int _active_clock_hi)
 {
 	hc55516_state *chip = get_safe_token(device);
 
@@ -243,7 +243,7 @@ static STREAM_UPDATE( hc55516_update )
 }
 
 
-void hc55516_clock_w(running_device *device, int state)
+void hc55516_clock_w(device_t *device, int state)
 {
 	hc55516_state *chip = get_safe_token(device);
 	UINT8 clock_state = state ? TRUE : FALSE;
@@ -268,7 +268,7 @@ void hc55516_clock_w(running_device *device, int state)
 }
 
 
-void hc55516_digit_w(running_device *device, int digit)
+void hc55516_digit_w(device_t *device, int digit)
 {
 	hc55516_state *chip = get_safe_token(device);
 
@@ -282,7 +282,7 @@ void hc55516_digit_w(running_device *device, int digit)
 }
 
 
-int hc55516_clock_state_r(running_device *device)
+int hc55516_clock_state_r(device_t *device)
 {
 	hc55516_state *chip = get_safe_token(device);
 

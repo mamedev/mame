@@ -65,9 +65,9 @@ public:
 	UINT8 sound_irq;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *deco16ic;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *deco16ic;
 };
 
 /*
@@ -621,7 +621,7 @@ static INPUT_PORTS_START( dblewing )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static void sound_irq( running_device *device, int state )
+static void sound_irq( device_t *device, int state )
 {
 	dblewing_state *driver_state = device->machine->driver_data<dblewing_state>();
 

@@ -365,8 +365,8 @@ static WRITE8_DEVICE_HANDLER( vid_o1_callback )
 
 	if (data)
 	{
-		running_device *acia_0 = device->machine->device("acia6850_0");
-		running_device *acia_1 = device->machine->device("acia6850_1");
+		device_t *acia_0 = device->machine->device("acia6850_0");
+		device_t *acia_1 = device->machine->device("acia6850_1");
 		acia6850_tx_clock_in(acia_0);
 		acia6850_rx_clock_in(acia_0);
 		acia6850_tx_clock_in(acia_1);
@@ -1876,7 +1876,7 @@ static WRITE16_DEVICE_HANDLER( oki_w )
 	// 0x12: .... ...x      OKIM6736 /ST
 }
 
-static void video_reset(running_device *device)
+static void video_reset(device_t *device)
 {
 	device->machine->device("6840ptm_68k")->reset();
 	device->machine->device("acia6850_1")->reset();
@@ -2587,7 +2587,7 @@ static DRIVER_INIT (crmaze3a)
 static DRIVER_INIT (mating)
 {
 	address_space *space = cputag_get_address_space(machine, "video", ADDRESS_SPACE_PROGRAM);
-	running_device *device = machine->device("oki");
+	device_t *device = machine->device("oki");
 
 	/* The Mating Game has an extra 256kB RAM on the program card */
 	memory_install_ram(space, 0x600000, 0x63ffff, 0, 0, NULL);

@@ -15,7 +15,7 @@ UINT32 *djmain_obj_ram;
 
 static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	running_device *k055555 = machine->device("k055555");
+	device_t *k055555 = machine->device("k055555");
 	int offs, pri_code;
 	int sortedlist[NUM_SPRITES];
 
@@ -136,7 +136,7 @@ void djmain_tile_callback(running_machine* machine, int layer, int *code, int *c
 
 VIDEO_START( djmain )
 {
-	running_device *k056832 = machine->device("k056832");
+	device_t *k056832 = machine->device("k056832");
 
 	k056832_set_layer_offs(k056832, 0, -92, -27);
 	// k056832_set_layer_offs(k056832, 1, -87, -27);
@@ -145,8 +145,8 @@ VIDEO_START( djmain )
 
 VIDEO_UPDATE( djmain )
 {
-	running_device *k056832 = screen->machine->device("k056832");
-	running_device *k055555 = screen->machine->device("k055555");
+	device_t *k056832 = screen->machine->device("k056832");
+	device_t *k055555 = screen->machine->device("k055555");
 	int enables = k055555_read_register(k055555, K55_INPUT_ENABLES);
 	int pri[NUM_LAYERS + 1];
 	int order[NUM_LAYERS + 1];

@@ -69,7 +69,7 @@ typedef struct
 	int		nmi_state;
 } m6805_Regs;
 
-INLINE m6805_Regs *get_safe_token(running_device *device)
+INLINE m6805_Regs *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == M6805 ||

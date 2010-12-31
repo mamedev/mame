@@ -39,9 +39,9 @@ static VIDEO_UPDATE( galaxia )
 	bitmap_t *s2636_1_bitmap;
 	bitmap_t *s2636_2_bitmap;
 
-	running_device *s2636_0 = screen->machine->device("s2636_0");
-	running_device *s2636_1 = screen->machine->device("s2636_1");
-	running_device *s2636_2 = screen->machine->device("s2636_2");
+	device_t *s2636_0 = screen->machine->device("s2636_0");
+	device_t *s2636_1 = screen->machine->device("s2636_1");
+	device_t *s2636_2 = screen->machine->device("s2636_2");
 
 	count = 0;
 

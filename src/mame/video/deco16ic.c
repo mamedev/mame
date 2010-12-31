@@ -205,7 +205,7 @@ struct _deco16ic_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE deco16ic_state *get_safe_token( running_device *device )
+INLINE deco16ic_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == DECO16IC);
@@ -213,7 +213,7 @@ INLINE deco16ic_state *get_safe_token( running_device *device )
 	return (deco16ic_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const deco16ic_interface *get_interface( running_device *device )
+INLINE const deco16ic_interface *get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == DECO16IC));
@@ -479,7 +479,7 @@ static TILE_GET_INFO_DEVICE( get_pf1_tile_info_b )
 */
 
 static void custom_tilemap_draw(
-	running_device *device,
+	device_t *device,
 	bitmap_t *bitmap,
 	tilemap_t *tilemap0_8x8,
 	tilemap_t *tilemap0_16x16,
@@ -588,7 +588,7 @@ static void custom_tilemap_draw(
 /******************************************************************************/
 
 /* robocop 2 can switch between 2 tilemaps at 4bpp, or 1 at 8bpp */
-void deco16ic_set_tilemap_colour_mask( running_device *device, int tmap, int mask )
+void deco16ic_set_tilemap_colour_mask( device_t *device, int tmap, int mask )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 
@@ -601,7 +601,7 @@ void deco16ic_set_tilemap_colour_mask( running_device *device, int tmap, int mas
 	}
 }
 
-void deco16ic_pf34_set_gfxbank( running_device *device, int small, int big )
+void deco16ic_pf34_set_gfxbank( device_t *device, int small, int big )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 
@@ -618,7 +618,7 @@ void deco16ic_pf34_set_gfxbank( running_device *device, int small, int big )
 }
 
 /* stoneage has broken scroll registers */
-void deco16ic_set_scrolldx( running_device *device, int tmap, int size, int dx, int dx_if_flipped )
+void deco16ic_set_scrolldx( device_t *device, int tmap, int size, int dx, int dx_if_flipped )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 
@@ -969,7 +969,7 @@ static int deco16_pf_update(
 	return use_custom;
 }
 
-void deco16ic_pf12_update( running_device *device, const UINT16 *rowscroll_1_ptr, const UINT16 *rowscroll_2_ptr )
+void deco16ic_pf12_update( device_t *device, const UINT16 *rowscroll_1_ptr, const UINT16 *rowscroll_2_ptr )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 	int bank1, bank2;
@@ -1012,7 +1012,7 @@ void deco16ic_pf12_update( running_device *device, const UINT16 *rowscroll_1_ptr
 	}
 }
 
-void deco16ic_pf34_update( running_device *device, const UINT16 *rowscroll_1_ptr, const UINT16 *rowscroll_2_ptr )
+void deco16ic_pf34_update( device_t *device, const UINT16 *rowscroll_1_ptr, const UINT16 *rowscroll_2_ptr )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 	int bank1, bank2;
@@ -1051,7 +1051,7 @@ void deco16ic_pf34_update( running_device *device, const UINT16 *rowscroll_1_ptr
 
 /*****************************************************************************************/
 
-void deco16ic_print_debug_info(running_device *device, bitmap_t *bitmap)
+void deco16ic_print_debug_info(device_t *device, bitmap_t *bitmap)
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 	char buf[64*5];
@@ -1082,7 +1082,7 @@ void deco16ic_print_debug_info(running_device *device, bitmap_t *bitmap)
 
 /*****************************************************************************************/
 
-void deco16ic_clear_sprite_priority_bitmap( running_device *device )
+void deco16ic_clear_sprite_priority_bitmap( device_t *device )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 
@@ -1092,7 +1092,7 @@ void deco16ic_clear_sprite_priority_bitmap( running_device *device )
 
 /* A special pdrawgfx z-buffered sprite renderer that is needed to properly draw multiple sprite sources with alpha */
 void deco16ic_pdrawgfx(
-		running_device *device,
+		device_t *device,
 		bitmap_t *dest, const rectangle *clip, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy,
 		int transparent_color, UINT32 pri_mask, UINT32 sprite_mask, UINT8 write_pri, UINT8 alpha)
@@ -1162,7 +1162,7 @@ void deco16ic_pdrawgfx(
 
 /*****************************************************************************************/
 
-void deco16ic_tilemap_1_draw( running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority )
+void deco16ic_tilemap_1_draw( device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 
@@ -1179,7 +1179,7 @@ void deco16ic_tilemap_1_draw( running_device *device, bitmap_t *bitmap, const re
 	}
 }
 
-void deco16ic_tilemap_2_draw(running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
+void deco16ic_tilemap_2_draw(device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 
@@ -1196,7 +1196,7 @@ void deco16ic_tilemap_2_draw(running_device *device, bitmap_t *bitmap, const rec
 	}
 }
 
-void deco16ic_tilemap_3_draw(running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
+void deco16ic_tilemap_3_draw(device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 
@@ -1206,7 +1206,7 @@ void deco16ic_tilemap_3_draw(running_device *device, bitmap_t *bitmap, const rec
 		tilemap_draw(bitmap, cliprect, deco16ic->pf3_tilemap_16x16, flags, priority);
 }
 
-void deco16ic_tilemap_4_draw(running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
+void deco16ic_tilemap_4_draw(device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 
@@ -1219,7 +1219,7 @@ void deco16ic_tilemap_4_draw(running_device *device, bitmap_t *bitmap, const rec
 /*****************************************************************************************/
 
 // Combines the output of two 4BPP tilemaps into an 8BPP tilemap
-void deco16ic_tilemap_34_combine_draw(running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
+void deco16ic_tilemap_34_combine_draw(device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 	custom_tilemap_draw(device, bitmap, 0, deco16ic->pf3_tilemap_16x16, 0, deco16ic->pf4_tilemap_16x16, deco16ic->pf3_rowscroll_ptr, deco16ic->pf34_control[1], deco16ic->pf34_control[2], deco16ic->pf34_control[5] & 0xff, deco16ic->pf34_control[6] & 0xff, 0xf, 4, 0xff, flags, priority);

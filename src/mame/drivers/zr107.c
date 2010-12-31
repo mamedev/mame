@@ -189,7 +189,7 @@ static VIDEO_START( jetwave )
 
 static VIDEO_UPDATE( jetwave )
 {
-	running_device *k001604 = screen->machine->device("k001604");
+	device_t *k001604 = screen->machine->device("k001604");
 
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
 
@@ -224,7 +224,7 @@ static void game_tile_callback(running_machine *machine, int layer, int *code, i
 
 static VIDEO_START( zr107 )
 {
-	running_device *k056832 = machine->device("k056832");
+	device_t *k056832 = machine->device("k056832");
 
 	k056832_set_layer_offs(k056832, 0, -29, -27);
 	k056832_set_layer_offs(k056832, 1, -29, -27);
@@ -241,7 +241,7 @@ static VIDEO_START( zr107 )
 
 static VIDEO_UPDATE( zr107 )
 {
-	running_device *k056832 = screen->machine->device("k056832");
+	device_t *k056832 = screen->machine->device("k056832");
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
 
 	k056832_tilemap_draw(k056832, bitmap, cliprect, 1, 0, 0);
@@ -639,7 +639,7 @@ static const sharc_config sharc_cfg =
 
 /* ADC0838 Interface */
 
-static double adc0838_callback( running_device *device, UINT8 input )
+static double adc0838_callback( device_t *device, UINT8 input )
 {
 	switch (input)
 	{

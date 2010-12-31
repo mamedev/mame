@@ -46,7 +46,7 @@ enum
 };
 
 /* PUBLIC FUNCTIONS */
-extern void tms7000_A6EC1( running_device *device ); /* External event counter */
+extern void tms7000_A6EC1( device_t *device ); /* External event counter */
 
 DECLARE_LEGACY_CPU_DEVICE(TMS7000, tms7000);
 DECLARE_LEGACY_CPU_DEVICE(TMS7000_EXL, tms7000_exl);

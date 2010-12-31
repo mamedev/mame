@@ -62,7 +62,7 @@ typedef float CGFloat;
 - (NSString *)selectedSubviewName;
 - (int)selectedSubviewIndex;
 - (void)selectSubviewAtIndex:(int)index;
-- (void)selectSubviewForCPU:(running_device *)device;
+- (void)selectSubviewForCPU:(device_t *)device;
 
 @end
 
@@ -143,7 +143,7 @@ typedef float CGFloat;
 - (NSString *)selectedSubviewName;
 - (int)selectedSubviewIndex;
 - (void)selectSubviewAtIndex:(int)index;
-- (void)selectSubviewForCPU:(running_device *)device;
+- (void)selectSubviewForCPU:(device_t *)device;
 
 - (NSString *)expression;
 - (void)setExpression:(NSString *)exp;
@@ -171,7 +171,7 @@ typedef float CGFloat;
 - (NSString *)selectedSubviewName;
 - (int)selectedSubviewIndex;
 - (void)selectSubviewAtIndex:(int)index;
-- (void)selectSubviewForCPU:(running_device *)device;
+- (void)selectSubviewForCPU:(device_t *)device;
 
 - (NSString *)expression;
 - (void)setExpression:(NSString *)exp;
@@ -199,7 +199,7 @@ typedef float CGFloat;
 - (NSString *)selectedSubviewName;
 - (int)selectedSubviewIndex;
 - (void)selectSubviewAtIndex:(int)index;
-- (void)selectSubviewForCPU:(running_device *)device;
+- (void)selectSubviewForCPU:(device_t *)device;
 
 @end
 
@@ -269,7 +269,7 @@ typedef float CGFloat;
 
 - (id)initWithMachine:(running_machine *)m;
 
-- (void)setCPU:(running_device *)device;
+- (void)setCPU:(device_t *)device;
 
 - (IBAction)doCommand:(id)sender;
 

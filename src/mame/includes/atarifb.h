@@ -45,7 +45,7 @@ public:
 	int counter_x_in2b, counter_y_in2b;
 
 	/* devices */
-	running_device *maincpu;
+	device_t *maincpu;
 };
 
 

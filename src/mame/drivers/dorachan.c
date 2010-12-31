@@ -30,7 +30,7 @@ public:
 	UINT8    flip_screen;
 
 	/* devices */
-	running_device *main_cpu;
+	device_t *main_cpu;
 };
 
 

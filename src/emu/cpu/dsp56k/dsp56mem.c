@@ -790,7 +790,7 @@ WRITE16_HANDLER( peripheral_register_w )
 
 /* These two functions are exposed to the outside world */
 /* They represent the host side of the dsp56k's host interface */
-void dsp56k_host_interface_write(running_device* device, UINT8 offset, UINT8 data)
+void dsp56k_host_interface_write(device_t* device, UINT8 offset, UINT8 data)
 {
 	dsp56k_core* cpustate = get_safe_token(device);
 
@@ -886,7 +886,7 @@ void dsp56k_host_interface_write(running_device* device, UINT8 offset, UINT8 dat
 	}
 }
 
-UINT8 dsp56k_host_interface_read(running_device* device, UINT8 offset)
+UINT8 dsp56k_host_interface_read(device_t* device, UINT8 offset)
 {
 	dsp56k_core* cpustate = get_safe_token(device);
 
@@ -953,7 +953,7 @@ UINT8 dsp56k_host_interface_read(running_device* device, UINT8 offset)
 }
 
 /* MISC*/
-UINT16 dsp56k_get_peripheral_memory(running_device* device, UINT16 addr)
+UINT16 dsp56k_get_peripheral_memory(device_t* device, UINT16 addr)
 {
 	dsp56k_core* cpustate = get_safe_token(device);
 	return cpustate->peripheral_ram[A2O(addr)];

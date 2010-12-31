@@ -10,7 +10,7 @@ struct _filter_volume_state
 	int				gain;
 };
 
-INLINE filter_volume_state *get_safe_token(running_device *device)
+INLINE filter_volume_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == FILTER_VOLUME);
@@ -39,7 +39,7 @@ static DEVICE_START( filter_volume )
 }
 
 
-void flt_volume_set_volume(running_device *device, float volume)
+void flt_volume_set_volume(device_t *device, float volume)
 {
 	filter_volume_state *info = get_safe_token(device);
 	info->gain = (int)(volume * 256);

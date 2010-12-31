@@ -26,7 +26,7 @@ public:
 	UINT8      wheel_return[2];
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 };
 
 

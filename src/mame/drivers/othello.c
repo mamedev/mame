@@ -68,11 +68,11 @@ public:
 	int n7751_busy;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *mc6845;
-	running_device *n7751;
-	running_device *ay1;
-	running_device *ay2;
+	device_t *maincpu;
+	device_t *mc6845;
+	device_t *n7751;
+	device_t *ay1;
+	device_t *ay2;
 };
 
 

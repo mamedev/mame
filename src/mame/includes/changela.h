@@ -46,7 +46,7 @@ public:
 	UINT8    mcu_pc_0;
 
 	/* devices */
-	running_device *mcu;
+	device_t *mcu;
 };
 
 /*----------- defined in video/changela.c -----------*/

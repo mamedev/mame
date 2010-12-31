@@ -163,9 +163,9 @@ public:
 	UINT8 register_active;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *duart;
-	running_device *hd63484;
+	device_t *maincpu;
+	device_t *duart;
+	device_t *hd63484;
 };
 
 
@@ -175,13 +175,13 @@ public:
 
 ***************************************************************************/
 
-static void duart_irq_handler( running_device *device, UINT8 vector )
+static void duart_irq_handler( device_t *device, UINT8 vector )
 {
 	adp_state *state = device->machine->driver_data<adp_state>();
 	cpu_set_input_line_and_vector(state->maincpu, 4, HOLD_LINE, vector);
 };
 
-static void duart_tx( running_device *device, int channel, UINT8 data )
+static void duart_tx( device_t *device, int channel, UINT8 data )
 {
 	if (channel == 0)
 	{
@@ -195,7 +195,7 @@ static void microtouch_tx( running_machine *machine, UINT8 data )
 	duart68681_rx_data(state->duart, 0, data);
 }
 
-static UINT8 duart_input( running_device *device )
+static UINT8 duart_input( device_t *device )
 {
 	return input_port_read(device->machine, "DSW1");
 }
@@ -226,7 +226,7 @@ static MACHINE_START( skattv )
 		UINT16 *rom = (UINT16*)memory_region(machine, "gfx1");
 		int i;
 
-		running_device *hd63484 = machine->device("hd63484");
+		device_t *hd63484 = machine->device("hd63484");
 
 		for(i = 0; i < 0x40000/2; ++i)
 		{

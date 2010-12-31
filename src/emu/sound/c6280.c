@@ -71,8 +71,8 @@ typedef struct {
 
 typedef struct {
 	sound_stream *stream;
-	running_device *device;
-	running_device *cpudevice;
+	device_t *device;
+	device_t *cpudevice;
     UINT8 select;
     UINT8 balance;
     UINT8 lfo_frequency;
@@ -83,7 +83,7 @@ typedef struct {
     UINT32 wave_freq_tab[4096];
 } c6280_t;
 
-INLINE c6280_t *get_safe_token(running_device *device)
+INLINE c6280_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == C6280);
@@ -95,7 +95,7 @@ INLINE c6280_t *get_safe_token(running_device *device)
 #include "cpu/h6280/h6280.h"
 
 
-static void c6280_init(running_device *device, c6280_t *p, double clk, double rate)
+static void c6280_init(device_t *device, c6280_t *p, double clk, double rate)
 {
 	const c6280_interface *intf = (const c6280_interface *)device->baseconfig().static_config();
     int i;

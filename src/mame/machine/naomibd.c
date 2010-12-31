@@ -205,7 +205,7 @@ struct _naomibd_state
 {
 	UINT8				index;					/* index of board */
 	UINT8				type;
-	running_device *device;				/* pointer to our containing device */
+	device_t *device;				/* pointer to our containing device */
 
 	UINT8 *				memory;
 	UINT8 *				protdata;
@@ -312,7 +312,7 @@ static UINT16 block_decrypt(UINT32 game_key, UINT16 sequence_key, UINT16 counter
     in device is, in fact, a naomibd device
 -------------------------------------------------*/
 
-INLINE naomibd_state *get_safe_token(running_device *device)
+INLINE naomibd_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == NAOMI_BOARD);
@@ -328,7 +328,7 @@ INLINE naomibd_state *get_safe_token(running_device *device)
  *
  *************************************/
 
-int naomibd_interrupt_callback(running_device *device, naomibd_interrupt_func callback)
+int naomibd_interrupt_callback(device_t *device, naomibd_interrupt_func callback)
 {
 	naomibd_config *config = (naomibd_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 	//naomibd_state *v = get_safe_token(device);
@@ -337,20 +337,20 @@ int naomibd_interrupt_callback(running_device *device, naomibd_interrupt_func ca
 	return 0;
 }
 
-int naomibd_get_type(running_device *device)
+int naomibd_get_type(device_t *device)
 {
 	naomibd_state *v = get_safe_token(device);
 	return v->type;
 }
 
 
-void *naomibd_get_memory(running_device *device)
+void *naomibd_get_memory(device_t *device)
 {
 	return get_safe_token(device)->memory;
 }
 
 
-offs_t naomibd_get_dmaoffset(running_device *device)
+offs_t naomibd_get_dmaoffset(device_t *device)
 {
 	offs_t result = 0;
 
@@ -409,7 +409,7 @@ static STATE_POSTLOAD( naomibd_postload )
 }
 
 
-static void init_save_state(running_device *device)
+static void init_save_state(device_t *device)
 {
 	naomibd_state *v = get_safe_token(device);
 

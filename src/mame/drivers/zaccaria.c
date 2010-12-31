@@ -157,7 +157,7 @@ static WRITE8_DEVICE_HANDLER( zaccaria_port0b_w )
 
 static INTERRUPT_GEN( zaccaria_cb1_toggle )
 {
-	running_device *pia0 = device->machine->device("pia0");
+	device_t *pia0 = device->machine->device("pia0");
 	static int toggle = 0;
 
 	pia6821_cb1_w(pia0, toggle & 1);
@@ -166,7 +166,7 @@ static INTERRUPT_GEN( zaccaria_cb1_toggle )
 
 static WRITE8_DEVICE_HANDLER( zaccaria_port1b_w )
 {
-	running_device *tms = device->machine->device("tms");
+	device_t *tms = device->machine->device("tms");
 
 	// bit 0 = /RS
 	tms5220_rsq_w(tms, (data >> 0) & 0x01);
@@ -189,7 +189,7 @@ static WRITE8_HANDLER( sound_command_w )
 
 static WRITE8_HANDLER( sound1_command_w )
 {
-	running_device *pia0 = space->machine->device("pia0");
+	device_t *pia0 = space->machine->device("pia0");
 	pia6821_ca1_w(pia0, data & 0x80);
 	soundlatch2_w(space, 0, data);
 }

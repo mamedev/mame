@@ -132,7 +132,7 @@ TIMER_DEVICE_CALLBACK( balsente_interrupt_timer );
 MACHINE_START( balsente );
 MACHINE_RESET( balsente );
 
-void balsente_noise_gen(running_device *device, int count, short *buffer);
+void balsente_noise_gen(device_t *device, int count, short *buffer);
 
 WRITE8_HANDLER( balsente_random_reset_w );
 READ8_HANDLER( balsente_random_num_r );

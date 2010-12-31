@@ -73,7 +73,7 @@ static WRITE8_HANDLER( ojankohs_msm5205_w )
 	state->vclk_left = 2;
 }
 
-static void ojankohs_adpcm_int( running_device *device )
+static void ojankohs_adpcm_int( device_t *device )
 {
 	ojankohs_state *state = device->machine->driver_data<ojankohs_state>();
 

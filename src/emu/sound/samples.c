@@ -23,14 +23,14 @@ struct _sample_channel
 typedef struct _samples_info samples_info;
 struct _samples_info
 {
-	running_device *device;
+	device_t *device;
 	int			numchannels;	/* how many channels */
 	sample_channel *channel;/* array of channels */
 	loaded_samples *samples;/* array of samples */
 };
 
 
-INLINE samples_info *get_safe_token(running_device *device)
+INLINE samples_info *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SAMPLES);
@@ -234,7 +234,7 @@ loaded_samples *readsamples(running_machine *machine, const char *const *samplen
 /* Start one of the samples loaded from disk. Note: channel must be in the range */
 /* 0 .. Samplesinterface->channels-1. It is NOT the discrete channel to pass to */
 /* mixer_play_sample() */
-void sample_start(running_device *device,int channel,int samplenum,int loop)
+void sample_start(device_t *device,int channel,int samplenum,int loop)
 {
     samples_info *info = get_safe_token(device);
     sample_channel *chan;
@@ -265,7 +265,7 @@ void sample_start(running_device *device,int channel,int samplenum,int loop)
 }
 
 
-void sample_start_raw(running_device *device,int channel,const INT16 *sampledata,int samples,int frequency,int loop)
+void sample_start_raw(device_t *device,int channel,const INT16 *sampledata,int samples,int frequency,int loop)
 {
     samples_info *info = get_safe_token(device);
     sample_channel *chan;
@@ -289,7 +289,7 @@ void sample_start_raw(running_device *device,int channel,const INT16 *sampledata
 }
 
 
-void sample_set_freq(running_device *device,int channel,int freq)
+void sample_set_freq(device_t *device,int channel,int freq)
 {
     samples_info *info = get_safe_token(device);
     sample_channel *chan;
@@ -305,7 +305,7 @@ void sample_set_freq(running_device *device,int channel,int freq)
 }
 
 
-void sample_set_volume(running_device *device,int channel,float volume)
+void sample_set_volume(device_t *device,int channel,float volume)
 {
     samples_info *info = get_safe_token(device);
     sample_channel *chan;
@@ -318,7 +318,7 @@ void sample_set_volume(running_device *device,int channel,float volume)
 }
 
 
-void sample_set_pause(running_device *device,int channel,int pause)
+void sample_set_pause(device_t *device,int channel,int pause)
 {
     samples_info *info = get_safe_token(device);
     sample_channel *chan;
@@ -334,7 +334,7 @@ void sample_set_pause(running_device *device,int channel,int pause)
 }
 
 
-void sample_stop(running_device *device,int channel)
+void sample_stop(device_t *device,int channel)
 {
     samples_info *info = get_safe_token(device);
     sample_channel *chan;
@@ -350,7 +350,7 @@ void sample_stop(running_device *device,int channel)
 }
 
 
-int sample_get_base_freq(running_device *device,int channel)
+int sample_get_base_freq(device_t *device,int channel)
 {
     samples_info *info = get_safe_token(device);
     sample_channel *chan;
@@ -365,7 +365,7 @@ int sample_get_base_freq(running_device *device,int channel)
 }
 
 
-int sample_playing(running_device *device,int channel)
+int sample_playing(device_t *device,int channel)
 {
     samples_info *info = get_safe_token(device);
     sample_channel *chan;

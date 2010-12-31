@@ -516,7 +516,7 @@ static TIMER_CALLBACK( scanline_callback )
  *
  *************************************/
 
-static void outrun_reset(running_device *device)
+static void outrun_reset(device_t *device)
 {
 	segas1x_state *state = device->machine->driver_data<segas1x_state>();
 	cpu_set_input_line(state->subcpu, INPUT_LINE_RESET, PULSE_LINE);

@@ -11,7 +11,7 @@ struct _ymf271_interface
 {
 	devcb_read8 ext_read;		/* external memory read */
 	devcb_write8 ext_write;	/* external memory write */
-	void (*irq_callback)(running_device *device, int state);	/* irq callback */
+	void (*irq_callback)(device_t *device, int state);	/* irq callback */
 };
 
 READ8_DEVICE_HANDLER( ymf271_r );

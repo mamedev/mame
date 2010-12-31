@@ -108,11 +108,11 @@ typedef struct
 	const UINT8 *rom;
 	devcb_resolved_read8 ext_mem_read;
 	devcb_resolved_write8 ext_mem_write;
-	void (*irq_callback)(running_device *, int);
+	void (*irq_callback)(device_t *, int);
 
 	UINT32 clock;
 	sound_stream * stream;
-	running_device *device;
+	device_t *device;
 } YMF271Chip;
 
 // slot mapping assists
@@ -272,7 +272,7 @@ static int channel_attenuation[16];
 static int total_level[128];
 static int env_volume_table[256];
 
-INLINE YMF271Chip *get_safe_token(running_device *device)
+INLINE YMF271Chip *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == YMF271);
@@ -1676,7 +1676,7 @@ static void init_tables(running_machine *machine)
 	}
 }
 
-static void init_state(YMF271Chip *chip, running_device *device)
+static void init_state(YMF271Chip *chip, device_t *device)
 {
 	int i;
 
@@ -1751,7 +1751,7 @@ static void init_state(YMF271Chip *chip, running_device *device)
 	state_save_register_device_item(device, 0, chip->ext_read);
 }
 
-static void ymf271_init(running_device *device, YMF271Chip *chip, UINT8 *rom, void (*cb)(running_device *,int), const devcb_read8 *ext_read, const devcb_write8 *ext_write)
+static void ymf271_init(device_t *device, YMF271Chip *chip, UINT8 *rom, void (*cb)(device_t *,int), const devcb_read8 *ext_read, const devcb_write8 *ext_write)
 {
 	chip->timA = timer_alloc(device->machine, ymf271_timer_a_tick, chip);
 	chip->timB = timer_alloc(device->machine, ymf271_timer_b_tick, chip);

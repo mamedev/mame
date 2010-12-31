@@ -16,13 +16,13 @@ struct _irem_audio_state
 {
 	UINT8                port1, port2;
 
-	running_device *ay1;
-	running_device *ay2;
-	running_device *adpcm1;
-	running_device *adpcm2;
+	device_t *ay1;
+	device_t *ay2;
+	device_t *adpcm1;
+	device_t *adpcm2;
 };
 
-INLINE irem_audio_state *get_safe_token( running_device *device )
+INLINE irem_audio_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == IREM_AUDIO);
@@ -204,7 +204,7 @@ static WRITE8_DEVICE_HANDLER( m62_adpcm_w )
 {
 	irem_audio_state *state = get_safe_token(device);
 
-	running_device *adpcm = (offset & 1) ? state->adpcm2 : state->adpcm1;
+	device_t *adpcm = (offset & 1) ? state->adpcm2 : state->adpcm1;
 	if (adpcm != NULL)
 		msm5205_data_w(adpcm, data);
 }
@@ -217,9 +217,9 @@ static WRITE8_DEVICE_HANDLER( m62_adpcm_w )
  *
  *************************************/
 
-static void adpcm_int(running_device *device)
+static void adpcm_int(device_t *device)
 {
-	running_device *adpcm2 = device->machine->device("msm2");
+	device_t *adpcm2 = device->machine->device("msm2");
 
 	cputag_set_input_line(device->machine, "iremsound", INPUT_LINE_NMI, PULSE_LINE);
 

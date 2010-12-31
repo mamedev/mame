@@ -53,7 +53,7 @@ struct _flower_sound_state
 	UINT8 soundregs2[0x40];
 };
 
-INLINE flower_sound_state *get_safe_token( running_device *device )
+INLINE flower_sound_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == FLOWER);
@@ -62,7 +62,7 @@ INLINE flower_sound_state *get_safe_token( running_device *device )
 }
 
 /* build a table to divide by the number of voices; gain is specified as gain*16 */
-static void make_mixer_table(running_device *device, int voices, int gain)
+static void make_mixer_table(device_t *device, int voices, int gain)
 {
 	flower_sound_state *state = get_safe_token(device);
 	int count = voices * 128;

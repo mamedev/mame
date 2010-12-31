@@ -40,7 +40,7 @@ public:
 
 	/* devices */
 	okim6295_device *oki;
-	running_device *eeprom;
+	device_t *eeprom;
 };
 
 /*----------- defined in video/playmark.c -----------*/

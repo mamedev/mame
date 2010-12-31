@@ -41,7 +41,7 @@ struct _rp5h01_state
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE rp5h01_state *get_safe_token(running_device *device)
+INLINE rp5h01_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == RP5H01));

@@ -112,7 +112,7 @@ static WRITE8_HANDLER( splash_adpcm_data_w )
 	state->adpcm_data = data;
 }
 
-static void splash_msm5205_int(running_device *device)
+static void splash_msm5205_int(device_t *device)
 {
 	splash_state *state = device->machine->driver_data<splash_state>();
 
@@ -420,7 +420,7 @@ static MACHINE_CONFIG_START( splash, splash_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static void ym_irq(running_device *device, int state)
+static void ym_irq(device_t *device, int state)
 {
 	logerror("2203 IRQ: %d\n", state);
 }

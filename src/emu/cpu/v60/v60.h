@@ -77,7 +77,7 @@ enum
 	V60_REGMAX
 };
 
-void v60_stall(running_device *device);
+void v60_stall(device_t *device);
 
 DECLARE_LEGACY_CPU_DEVICE(V60, v60);
 DECLARE_LEGACY_CPU_DEVICE(V70, v70);

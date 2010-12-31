@@ -45,7 +45,7 @@ static void tms7000_check_IRQ_lines(tms7000_state *cpustate);
 static void tms7000_do_interrupt( tms7000_state *cpustate, UINT16 address, UINT8 line );
 static CPU_EXECUTE( tms7000 );
 static CPU_EXECUTE( tms7000_exl );
-static void tms7000_service_timer1( running_device *device );
+static void tms7000_service_timer1( device_t *device );
 static UINT16 bcd_add( UINT16 a, UINT16 b );
 static UINT16 bcd_tencomp( UINT16 a );
 static UINT16 bcd_sub( UINT16 a, UINT16 b);
@@ -86,7 +86,7 @@ struct _tms7000_state
 	UINT8		idle_state;	/* Set after the execution of an idle instruction */
 };
 
-INLINE tms7000_state *get_safe_token(running_device *device)
+INLINE tms7000_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TMS7000 ||
@@ -525,7 +525,7 @@ static CPU_EXECUTE( tms7000_exl )
 /****************************************************************************
  * Trigger the event counter
  ****************************************************************************/
-void tms7000_A6EC1( running_device *device )
+void tms7000_A6EC1( device_t *device )
 {
 	tms7000_state *cpustate = get_safe_token(device);
     if( (cpustate->pf[0x03] & 0x80) == 0x80 ) /* Is timer system active? */
@@ -535,7 +535,7 @@ void tms7000_A6EC1( running_device *device )
     }
 }
 
-static void tms7000_service_timer1( running_device *device )
+static void tms7000_service_timer1( device_t *device )
 {
 	tms7000_state *cpustate = get_safe_token(device);
     if( --cpustate->t1_prescaler < 0 ) /* Decrement prescaler and check for underflow */

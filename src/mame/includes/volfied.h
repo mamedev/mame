@@ -26,9 +26,9 @@ public:
 	UINT8       current_cmd;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *pc090oj;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *pc090oj;
 };
 
 

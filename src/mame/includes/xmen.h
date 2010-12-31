@@ -26,14 +26,14 @@ public:
 	UINT8       sound_curbank;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *k054539;
-	running_device *k052109;
-	running_device *k053246;
-	running_device *k053251;
-	running_device *lscreen;
-	running_device *rscreen;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *k054539;
+	device_t *k052109;
+	device_t *k053246;
+	device_t *k053251;
+	device_t *lscreen;
+	device_t *rscreen;
 };
 
 /*----------- defined in video/xmen.c -----------*/

@@ -24,7 +24,7 @@ public:
 	int        last_irq;
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 };
 
 

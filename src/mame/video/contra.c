@@ -304,7 +304,7 @@ WRITE8_HANDLER( contra_K007121_ctrl_1_w )
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int bank )
 {
 	contra_state *state = machine->driver_data<contra_state>();
-	running_device *k007121 = bank ? state->k007121_2 : state->k007121_1;
+	device_t *k007121 = bank ? state->k007121_2 : state->k007121_1;
 	int base_color = (k007121_ctrlram_r(k007121, 6) & 0x30) * 2;
 	const UINT8 *source;
 

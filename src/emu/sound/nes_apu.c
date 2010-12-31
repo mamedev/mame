@@ -72,7 +72,7 @@ struct _nesapu_state
 };
 
 
-INLINE nesapu_state *get_safe_token(running_device *device)
+INLINE nesapu_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == NES);

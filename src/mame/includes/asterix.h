@@ -25,12 +25,12 @@ public:
 	UINT16      prot[2];
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *k053260;
-	running_device *k056832;
-	running_device *k053244;
-	running_device *k053251;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *k053260;
+	device_t *k056832;
+	device_t *k053244;
+	device_t *k053251;
 };
 
 

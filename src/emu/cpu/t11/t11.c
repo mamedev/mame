@@ -39,7 +39,7 @@ struct _t11_state
 };
 
 
-INLINE t11_state *get_safe_token(running_device *device)
+INLINE t11_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == T11);

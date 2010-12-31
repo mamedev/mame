@@ -368,7 +368,7 @@ struct _apexc_state
 #define DELAY(n)	{cpustate->icount -= (n); cpustate->current_word = (cpustate->current_word + (n)) & 0x1f;}
 
 
-INLINE apexc_state *get_safe_token(running_device *device)
+INLINE apexc_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == APEXC);

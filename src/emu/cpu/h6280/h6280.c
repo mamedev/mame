@@ -117,7 +117,7 @@ static void set_irq_line(h6280_Regs* cpustate, int irqline, int state);
 /* include the macros */
 #include "h6280ops.h"
 
-INLINE h6280_Regs *get_safe_token(running_device *device)
+INLINE h6280_Regs *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == H6280);
@@ -359,12 +359,12 @@ static CPU_TRANSLATE( h6280 )
 	return TRUE;
 }
 
-UINT8 h6280io_get_buffer(running_device *device)
+UINT8 h6280io_get_buffer(device_t *device)
 {
 	h6280_Regs* cpustate = get_safe_token(device);
 	return cpustate->io_buffer;
 }
-void h6280io_set_buffer(running_device *device, UINT8 data)
+void h6280io_set_buffer(device_t *device, UINT8 data)
 {
 	h6280_Regs* cpustate = get_safe_token(device);
 	cpustate->io_buffer=data;

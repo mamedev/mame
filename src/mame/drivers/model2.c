@@ -132,7 +132,7 @@ static int dsp_type;
 static int copro_fifoin_rpos, copro_fifoin_wpos;
 static UINT32 copro_fifoin_data[COPRO_FIFOIN_SIZE];
 static int copro_fifoin_num = 0;
-static int copro_fifoin_pop(running_device *device, UINT32 *result)
+static int copro_fifoin_pop(device_t *device, UINT32 *result)
 {
 	UINT32 r;
 
@@ -170,7 +170,7 @@ static int copro_fifoin_pop(running_device *device, UINT32 *result)
 	return 1;
 }
 
-static void copro_fifoin_push(running_device *device, UINT32 data)
+static void copro_fifoin_push(device_t *device, UINT32 data)
 {
 	if (copro_fifoin_num == COPRO_FIFOIN_SIZE)
 	{
@@ -242,7 +242,7 @@ static UINT32 copro_fifoout_pop(address_space *space)
 	return r;
 }
 
-static void copro_fifoout_push(running_device *device, UINT32 data)
+static void copro_fifoout_push(device_t *device, UINT32 data)
 {
 	//if (copro_fifoout_wpos == copro_fifoout_rpos)
 	if (copro_fifoout_num == COPRO_FIFOOUT_SIZE)
@@ -1891,7 +1891,7 @@ ADDRESS_MAP_END
 
 static int scsp_last_line = 0;
 
-static void scsp_irq(running_device *device, int irq)
+static void scsp_irq(device_t *device, int irq)
 {
 	if (irq > 0)
 	{

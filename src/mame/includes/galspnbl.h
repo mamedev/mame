@@ -21,7 +21,7 @@ public:
 	size_t      spriteram_size;
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 };
 
 

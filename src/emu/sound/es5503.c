@@ -63,7 +63,7 @@ typedef struct
 
 	sound_stream * stream;
 
-	void (*irq_callback)(running_device *, int);	// IRQ callback
+	void (*irq_callback)(device_t *, int);	// IRQ callback
 
 	read8_device_func adc_read;		// callback for the 5503's built-in analog to digital converter
 
@@ -73,10 +73,10 @@ typedef struct
 
 	UINT32 clock;
 	UINT32 output_rate;
-	running_device *device;
+	device_t *device;
 } ES5503Chip;
 
-INLINE ES5503Chip *get_safe_token(running_device *device)
+INLINE ES5503Chip *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == ES5503);
@@ -495,7 +495,7 @@ WRITE8_DEVICE_HANDLER( es5503_w )
 	}
 }
 
-void es5503_set_base(running_device *device, UINT8 *wavemem)
+void es5503_set_base(device_t *device, UINT8 *wavemem)
 {
 	ES5503Chip *chip = get_safe_token(device);
 

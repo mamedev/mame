@@ -26,7 +26,7 @@ public:
 	attotime time_released;
 
 	/* devices */
-	running_device *maincpu;
+	device_t *maincpu;
 };
 
 

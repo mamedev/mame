@@ -25,15 +25,15 @@ struct _timeplt_audio_state
 	UINT8    last_irq_state;
 	cpu_device *soundcpu;
 
-	running_device *filter_0_0;
-	running_device *filter_0_1;
-	running_device *filter_0_2;
-	running_device *filter_1_0;
-	running_device *filter_1_1;
-	running_device *filter_1_2;
+	device_t *filter_0_0;
+	device_t *filter_0_1;
+	device_t *filter_0_2;
+	device_t *filter_1_0;
+	device_t *filter_1_1;
+	device_t *filter_1_2;
 };
 
-INLINE timeplt_audio_state *get_safe_token( running_device *device )
+INLINE timeplt_audio_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == TIMEPLT_AUDIO);
@@ -110,7 +110,7 @@ static READ8_DEVICE_HANDLER( timeplt_portB_r )
  *
  *************************************/
 
-static void filter_w( running_device *device, int data )
+static void filter_w( device_t *device, int data )
 {
 	int C = 0;
 
@@ -145,7 +145,7 @@ static WRITE8_DEVICE_HANDLER( timeplt_filter_w )
 
 WRITE8_HANDLER( timeplt_sh_irqtrigger_w )
 {
-	running_device *audio = space->machine->device("timeplt_audio");
+	device_t *audio = space->machine->device("timeplt_audio");
 	timeplt_audio_state *state = get_safe_token(audio);
 
 	if (state->last_irq_state == 0 && data)

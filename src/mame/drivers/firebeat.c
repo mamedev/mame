@@ -1739,7 +1739,7 @@ static READ8_DEVICE_HANDLER( soundram_r )
 	return 0;
 }
 
-static void sound_irq_callback(running_device *device, int state)
+static void sound_irq_callback(device_t *device, int state)
 {
 }
 
@@ -2157,7 +2157,7 @@ static int ibutton_w(UINT8 data)
 	return r;
 }
 
-static void security_w(running_device *device, UINT8 data)
+static void security_w(device_t *device, UINT8 data)
 {
 	int r = ibutton_w(data);
 	if (r >= 0)

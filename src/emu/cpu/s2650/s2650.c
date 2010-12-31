@@ -48,7 +48,7 @@ struct _s2650_regs {
 	address_space *io;
 };
 
-INLINE s2650_regs *get_safe_token(running_device *device)
+INLINE s2650_regs *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == S2650);

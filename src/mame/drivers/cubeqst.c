@@ -49,7 +49,7 @@ static int video_field;
 static UINT8 io_latch;
 static UINT8 reset_latch;
 
-static running_device *laserdisc;
+static device_t *laserdisc;
 static rgb_t *colormap;
 
 
@@ -455,7 +455,7 @@ static MACHINE_RESET( cubeqst )
  */
 
 /* Called by the sound CPU emulation */
-static void sound_dac_w(running_device *device, UINT16 data)
+static void sound_dac_w(device_t *device, UINT16 data)
 {
 	static const char *const dacs[] =
 	{

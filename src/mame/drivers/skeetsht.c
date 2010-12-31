@@ -28,8 +28,8 @@ public:
 	UINT8 ay_sel;
 	UINT8 lastdataw;
 	UINT16 lastdatar;
-	running_device *ay;
-	running_device *tms;
+	device_t *ay;
+	device_t *tms;
 };
 
 
@@ -102,7 +102,7 @@ static WRITE16_HANDLER( ramdac_w )
  *
  *************************************/
 
-static void skeetsht_tms_irq(running_device *device, int state)
+static void skeetsht_tms_irq(device_t *device, int state)
 {
 	cputag_set_input_line(device->machine, "68hc11", MC68HC11_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }

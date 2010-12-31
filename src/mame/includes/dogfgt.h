@@ -28,7 +28,7 @@ public:
 	int       soundlatch, last_snd_ctrl;
 
 	/* devices */
-	running_device *subcpu;
+	device_t *subcpu;
 };
 
 

@@ -20,9 +20,9 @@ public:
 	/* video-related */
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *deco16ic;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *deco16ic;
 };
 
 

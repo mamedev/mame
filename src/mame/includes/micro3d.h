@@ -56,7 +56,7 @@ public:
 	} mc68901;
 
 	UINT16				*shared_ram;
-	running_device		*duart68681;
+	device_t		*duart68681;
 	UINT8				m68681_tx0;
 
 	/* Sound */
@@ -154,10 +154,10 @@ WRITE32_HANDLER( micro3d_mac1_w );
 WRITE32_HANDLER( micro3d_mac2_w );
 READ32_HANDLER( micro3d_mac2_r );
 
-void micro3d_duart_irq_handler(running_device *device, UINT8 vector);
-UINT8 micro3d_duart_input_r(running_device *device);
-void micro3d_duart_output_w(running_device *device, UINT8 data);
-void micro3d_duart_tx(running_device *device, int channel, UINT8 data);
+void micro3d_duart_irq_handler(device_t *device, UINT8 vector);
+UINT8 micro3d_duart_input_r(device_t *device);
+void micro3d_duart_output_w(device_t *device, UINT8 data);
+void micro3d_duart_tx(device_t *device, int channel, UINT8 data);
 
 MACHINE_RESET( micro3d );
 DRIVER_INIT( micro3d );
@@ -182,7 +182,7 @@ DECLARE_LEGACY_SOUND_DEVICE(MICRO3D, micro3d_sound);
 VIDEO_START( micro3d );
 VIDEO_RESET( micro3d );
 
-void micro3d_tms_interrupt(running_device *device, int state);
+void micro3d_tms_interrupt(device_t *device, int state);
 void micro3d_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params);
 
 WRITE16_HANDLER( micro3d_clut_w );

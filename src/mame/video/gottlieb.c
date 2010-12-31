@@ -84,7 +84,7 @@ WRITE8_HANDLER( gottlieb_video_control_w )
 
 WRITE8_HANDLER( gottlieb_laserdisc_video_control_w )
 {
-	running_device *laserdisc = space->machine->m_devicelist.first(LASERDISC);
+	device_t *laserdisc = space->machine->m_devicelist.first(LASERDISC);
 
 	/* bit 0 works like the other games */
 	gottlieb_video_control_w(space, offset, data & 0x01);

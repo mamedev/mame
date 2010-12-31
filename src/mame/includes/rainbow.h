@@ -28,10 +28,10 @@ public:
 	UINT8       current_bank;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *pc080sn;
-	running_device *pc090oj;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *pc080sn;
+	device_t *pc090oj;
 };
 
 

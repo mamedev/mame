@@ -94,7 +94,7 @@ struct _pic16c62x_state
 	address_space *io;
 };
 
-INLINE pic16c62x_state *get_safe_token(running_device *device)
+INLINE pic16c62x_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == PIC16C620 ||
@@ -917,7 +917,7 @@ static void pic16c62x_soft_reset(pic16c62x_state *cpustate)
 	pic16c62x_reset_regs(cpustate);
 }
 
-void pic16c62x_set_config(running_device *cpu, int data)
+void pic16c62x_set_config(device_t *cpu, int data)
 {
 	pic16c62x_state *cpustate = get_safe_token(cpu);
 

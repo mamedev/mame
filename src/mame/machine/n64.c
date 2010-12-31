@@ -427,7 +427,7 @@ static void sp_dma(int direction)
 	}
 }
 
-static void sp_set_status(running_device *device, UINT32 status)
+static void sp_set_status(device_t *device, UINT32 status)
 {
 	if (status & 0x1)
 	{

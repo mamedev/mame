@@ -164,7 +164,7 @@ struct _z80_state
 	const UINT8 *	cc_ex;
 };
 
-INLINE z80_state *get_safe_token(running_device *device)
+INLINE z80_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == Z80 || device->type() == NSC800);
@@ -3801,7 +3801,7 @@ static CPU_SET_INFO( nsc800 )
 	}
 }
 
-void z80_set_cycle_tables(running_device *device, const UINT8 *op, const UINT8 *cb, const UINT8 *ed, const UINT8 *xy, const UINT8 *xycb, const UINT8 *ex)
+void z80_set_cycle_tables(device_t *device, const UINT8 *op, const UINT8 *cb, const UINT8 *ed, const UINT8 *xy, const UINT8 *xycb, const UINT8 *ex)
 {
 	z80_state *z80 = get_safe_token(device);
 

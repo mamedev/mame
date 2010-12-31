@@ -18,7 +18,7 @@ struct _namco_53xx_interface
 	MCFG_DEVICE_CONFIG(_interface)
 
 
-void namco_53xx_read_request(running_device *device);
+void namco_53xx_read_request(device_t *device);
 READ8_DEVICE_HANDLER( namco_53xx_read );
 
 

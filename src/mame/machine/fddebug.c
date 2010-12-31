@@ -887,7 +887,7 @@ static void execute_fdeliminate(running_machine *machine, int ref, int params, c
 
 static void execute_fdunlock(running_machine *machine, int ref, int params, const char **param)
 {
-	running_device *cpu = debug_cpu_get_visible_cpu(machine);
+	device_t *cpu = debug_cpu_get_visible_cpu(machine);
 	int reps = keystatus_words / KEY_SIZE;
 	int keyaddr, repnum;
 	UINT64 offset;
@@ -925,7 +925,7 @@ static void execute_fdunlock(running_machine *machine, int ref, int params, cons
 
 static void execute_fdignore(running_machine *machine, int ref, int params, const char **param)
 {
-	running_device *cpu = debug_cpu_get_visible_cpu(machine);
+	device_t *cpu = debug_cpu_get_visible_cpu(machine);
 	UINT64 offset;
 
 	/* support 0 or 1 parameters */
@@ -1030,7 +1030,7 @@ static void execute_fdstate(running_machine *machine, int ref, int params, const
 
 static void execute_fdpc(running_machine *machine, int ref, int params, const char **param)
 {
-	running_device *cpu = debug_cpu_get_visible_cpu(machine);
+	device_t *cpu = debug_cpu_get_visible_cpu(machine);
 	UINT64 newpc;
 
 	/* support 0 or 1 parameters */

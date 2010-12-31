@@ -22,9 +22,9 @@ public:
 	int         charbank, charpalette, video_enable;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *k051316;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *k051316;
 };
 
 

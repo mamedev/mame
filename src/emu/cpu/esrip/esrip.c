@@ -121,7 +121,7 @@ typedef struct
 } esrip_state;
 
 
-INLINE esrip_state *get_safe_token(running_device *device)
+INLINE esrip_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == ESRIP);
@@ -133,7 +133,7 @@ INLINE esrip_state *get_safe_token(running_device *device)
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
-UINT8 get_rip_status(running_device *cpu)
+UINT8 get_rip_status(device_t *cpu)
 {
 	esrip_state *cpustate = get_safe_token(cpu);
 	return cpustate->status_out;

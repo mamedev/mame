@@ -25,7 +25,7 @@ public:
 	UINT8      port1, port2;
 
 	/* devices */
-	running_device *soundcpu;
+	device_t *soundcpu;
 };
 
 

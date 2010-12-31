@@ -49,7 +49,7 @@ public:
 	UINT8 snd_ack;
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 };
 
 
@@ -410,7 +410,7 @@ static INTERRUPT_GEN( sound_irq )
 	}
 }
 
-static void adpcm_int( running_device *device )
+static void adpcm_int( device_t *device )
 {
 	dacholer_state *state = device->machine->driver_data<dacholer_state>();
 	if (state->snd_interrupt_enable == 1 || (state->snd_interrupt_enable == 0 && state->msm_toggle == 1))

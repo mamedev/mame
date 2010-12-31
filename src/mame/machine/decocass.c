@@ -47,9 +47,9 @@ enum {
 
 
 
-static UINT8 tape_get_status_bits(running_device *device);
-static UINT8 tape_is_present(running_device *device);
-static void tape_change_speed(running_device *device, INT8 newspeed);
+static UINT8 tape_get_status_bits(device_t *device);
+static UINT8 tape_is_present(device_t *device);
+static void tape_change_speed(device_t *device, INT8 newspeed);
 
 
 WRITE8_HANDLER( decocass_coin_counter_w )
@@ -1906,7 +1906,7 @@ struct _tape_state
     in device is, in fact, an IDE controller
 -------------------------------------------------*/
 
-INLINE tape_state *get_safe_token(running_device *device)
+INLINE tape_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == DECOCASS_TAPE);
@@ -2013,7 +2013,7 @@ static const char *tape_describe_state(tape_state *tape)
 
 static TIMER_CALLBACK( tape_clock_callback )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	tape_state *tape = get_safe_token(device);
 
 	/* advance by one clock in the desired direction */
@@ -2070,7 +2070,7 @@ static TIMER_CALLBACK( tape_clock_callback )
     bits from the tape
 -------------------------------------------------*/
 
-static UINT8 tape_get_status_bits(running_device *device)
+static UINT8 tape_get_status_bits(device_t *device)
 {
 	tape_state *tape = get_safe_token(device);
 	UINT8 tape_bits = 0;
@@ -2127,7 +2127,7 @@ static UINT8 tape_get_status_bits(running_device *device)
     present
 -------------------------------------------------*/
 
-static UINT8 tape_is_present(running_device *device)
+static UINT8 tape_is_present(device_t *device)
 {
 	return device->region() != NULL;
 }
@@ -2138,7 +2138,7 @@ static UINT8 tape_is_present(running_device *device)
     playback
 -------------------------------------------------*/
 
-static void tape_change_speed(running_device *device, INT8 newspeed)
+static void tape_change_speed(device_t *device, INT8 newspeed)
 {
 	tape_state *tape = get_safe_token(device);
 	attotime newperiod;

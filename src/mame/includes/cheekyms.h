@@ -21,8 +21,8 @@ public:
 	bitmap_t       *bitmap_buffer;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *dac;
+	device_t *maincpu;
+	device_t *dac;
 };
 
 

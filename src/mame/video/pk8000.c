@@ -95,7 +95,7 @@ PALETTE_INIT( pk8000 )
 	palette_set_colors(machine, 0, pk8000_palette, ARRAY_LENGTH(pk8000_palette));
 }
 
-UINT32 pk8000_video_update(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect, UINT8 *videomem)
+UINT32 pk8000_video_update(device_t *screen, bitmap_t *bitmap, const rectangle *cliprect, UINT8 *videomem)
 {
 	int x,y,j,b;
 	UINT16 offset = (pk8000_video_mode & 0xc0) << 8;

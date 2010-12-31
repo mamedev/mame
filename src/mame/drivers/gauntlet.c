@@ -256,7 +256,7 @@ static READ8_HANDLER( switch_6502_r )
 
 static WRITE8_HANDLER( sound_ctl_w )
 {
-	running_device *tms = space->machine->device("tms");
+	device_t *tms = space->machine->device("tms");
 	switch (offset & 7)
 	{
 		case 0:	/* music reset, bit D7, low reset */

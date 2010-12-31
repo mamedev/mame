@@ -115,7 +115,7 @@ SOUND_RESET( m72 )
 	setvector_callback(machine, NULL, VECTOR_INIT);
 }
 
-void m72_ym2151_irq_handler(running_device *device, int irq)
+void m72_ym2151_irq_handler(device_t *device, int irq)
 {
 	if (irq)
 		timer_call_after_resynch(device->machine, NULL, YM2151_ASSERT,setvector_callback);

@@ -274,7 +274,7 @@ static WRITE16_HANDLER( batsugun_share2_w );
   Initialisation handlers
 ***************************************************************************/
 
-static void toaplan2_reset(running_device *device)
+static void toaplan2_reset(device_t *device)
 {
 	toaplan2_state *state = device->machine->driver_data<toaplan2_state>();
 
@@ -1328,7 +1328,7 @@ static WRITE16_HANDLER( bbakraid_nvram_w )
 }
 
 
-static void bbakraid_irqhandler(running_device *device, int state)
+static void bbakraid_irqhandler(device_t *device, int state)
 {
 	/* Not used ???  Connected to a test pin (TP082) */
 	logerror("YMZ280 is generating an interrupt. State=%08x\n",state);
@@ -3766,7 +3766,7 @@ static GFXDECODE_START( fixeighb )
 	GFXDECODE_ENTRY( "gfx2", 0, fixeighblayout , 0, 128 )
 GFXDECODE_END
 
-static void irqhandler(running_device *device, int linestate)
+static void irqhandler(device_t *device, int linestate)
 {
 	toaplan2_state *state = device->machine->driver_data<toaplan2_state>();
 
@@ -4423,7 +4423,7 @@ static MACHINE_RESET(batsugun)
 
 
 
-static void batsugun_ym2151_irqhandler(running_device *device, int linestate)
+static void batsugun_ym2151_irqhandler(device_t *device, int linestate)
 {
 	logerror("batsugun_ym2151_irqhandler %02x\n",linestate);
 //  update_irq_lines(machine, linestate ? assert : clear);

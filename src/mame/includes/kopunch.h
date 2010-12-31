@@ -22,7 +22,7 @@ public:
 	int        gfxbank;
 
 	/* devices */
-	running_device *maincpu;
+	device_t *maincpu;
 };
 
 /*----------- defined in video/kopunch.c -----------*/

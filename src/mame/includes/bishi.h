@@ -24,12 +24,12 @@ public:
 	UINT16     cur_control, cur_control2;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *k007232;
-	running_device *k056832;
-	running_device *k054338;
-	running_device *k055555;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *k007232;
+	device_t *k056832;
+	device_t *k054338;
+	device_t *k055555;
 };
 
 /*----------- defined in video/bishi.c -----------*/

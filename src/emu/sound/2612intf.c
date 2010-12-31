@@ -24,11 +24,11 @@ struct _ym2612_state
 	emu_timer *		timer[2];
 	void *			chip;
 	const ym2612_interface *intf;
-	running_device *device;
+	device_t *device;
 };
 
 
-INLINE ym2612_state *get_safe_token(running_device *device)
+INLINE ym2612_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == YM2612 || device->type() == YM3438);

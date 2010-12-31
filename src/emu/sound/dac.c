@@ -17,7 +17,7 @@ struct _dac_state
 };
 
 
-INLINE dac_state *get_safe_token(running_device *device)
+INLINE dac_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == DAC);
@@ -35,7 +35,7 @@ static STREAM_UPDATE( DAC_update )
 }
 
 
-void dac_data_w(running_device *device, UINT8 data)
+void dac_data_w(device_t *device, UINT8 data)
 {
 	dac_state *info = get_safe_token(device);
 	INT16 out = info->UnsignedVolTable[data];
@@ -49,7 +49,7 @@ void dac_data_w(running_device *device, UINT8 data)
 }
 
 
-void dac_signed_data_w(running_device *device, UINT8 data)
+void dac_signed_data_w(device_t *device, UINT8 data)
 {
 	dac_state *info = get_safe_token(device);
 	INT16 out = info->SignedVolTable[data];
@@ -63,7 +63,7 @@ void dac_signed_data_w(running_device *device, UINT8 data)
 }
 
 
-void dac_data_16_w(running_device *device, UINT16 data)
+void dac_data_16_w(device_t *device, UINT16 data)
 {
 	dac_state *info = get_safe_token(device);
 	INT16 out = data >> 1;		/* range      0..32767 */
@@ -77,7 +77,7 @@ void dac_data_16_w(running_device *device, UINT16 data)
 }
 
 
-void dac_signed_data_16_w(running_device *device, UINT16 data)
+void dac_signed_data_16_w(device_t *device, UINT16 data)
 {
 	dac_state *info = get_safe_token(device);
 	INT16 out = (INT32)data - (INT32)0x08000;	/* range -32768..32767 */

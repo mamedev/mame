@@ -493,7 +493,7 @@ const UINT8 m68ki_ea_idx_cycle_table[64] =
 #define MASK_040_OR_LATER			(CPU_TYPE_040 | CPU_TYPE_EC040)
 
 
-INLINE m68ki_cpu_core *get_safe_token(running_device *device)
+INLINE m68ki_cpu_core *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == M68000 ||
@@ -633,7 +633,7 @@ static CPU_EXECUTE( m68k )
 			debugger_instruction_hook(device, REG_PC);
 
 			// FIXME: remove this
-//          void apollo_debug_instruction(running_device *device);
+//          void apollo_debug_instruction(device_t *device);
 //          apollo_debug_instruction(device);
 
 			/* Record previous program counter */
@@ -1052,14 +1052,14 @@ static CPU_GET_INFO( m68k )
 
 /* global access */
 
-void m68k_set_encrypted_opcode_range(running_device *device, offs_t start, offs_t end)
+void m68k_set_encrypted_opcode_range(device_t *device, offs_t start, offs_t end)
 {
 	m68ki_cpu_core *m68k = get_safe_token(device);
 	m68k->encrypted_start = start;
 	m68k->encrypted_end = end;
 }
 
-void m68k_set_hmmu_enable(running_device *device, int enable)
+void m68k_set_hmmu_enable(device_t *device, int enable)
 {
 	m68ki_cpu_core *m68k = get_safe_token(device);
 
@@ -1487,25 +1487,25 @@ void m68k_memory_interface::init32hmmu(address_space &space)
 	write32 = m68k_write32_delegate(m68k_write32_proto_delegate::create_member(m68k_memory_interface, writelong_d32_hmmu), *this);
 }
 
-void m68k_set_reset_callback(running_device *device, m68k_reset_func callback)
+void m68k_set_reset_callback(device_t *device, m68k_reset_func callback)
 {
 	m68ki_cpu_core *m68k = get_safe_token(device);
 	m68k->reset_instr_callback = callback;
 }
 
-void m68k_set_cmpild_callback(running_device *device, m68k_cmpild_func callback)
+void m68k_set_cmpild_callback(device_t *device, m68k_cmpild_func callback)
 {
 	m68ki_cpu_core *m68k = get_safe_token(device);
 	m68k->cmpild_instr_callback = callback;
 }
 
-void m68k_set_rte_callback(running_device *device, m68k_rte_func callback)
+void m68k_set_rte_callback(device_t *device, m68k_rte_func callback)
 {
 	m68ki_cpu_core *m68k = get_safe_token(device);
 	m68k->rte_instr_callback = callback;
 }
 
-void m68k_set_tas_callback(running_device *device, m68k_tas_func callback)
+void m68k_set_tas_callback(device_t *device, m68k_tas_func callback)
 {
 	m68ki_cpu_core *m68k = get_safe_token(device);
 	m68k->tas_instr_callback = callback;
@@ -1516,7 +1516,7 @@ void m68k_set_tas_callback(running_device *device, m68k_tas_func callback)
  * State definition
  ****************************************************************************/
 
-static void define_state(running_device *device)
+static void define_state(device_t *device)
 {
 	m68ki_cpu_core *m68k = get_safe_token(device);
 	UINT32 addrmask = (m68k->cpu_type & MASK_24BIT_SPACE) ? 0xffffff : 0xffffffff;

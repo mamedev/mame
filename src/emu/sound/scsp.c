@@ -193,7 +193,7 @@ struct _scsp_state
 	unsigned char *SCSPRAM;
 	UINT32 SCSPRAM_LENGTH;
 	char Master;
-	void (*Int68kCB)(running_device *device, int irq);
+	void (*Int68kCB)(device_t *device, int irq);
 	sound_stream * stream;
 
 	INT32 *buffertmpl,*buffertmpr;
@@ -224,7 +224,7 @@ struct _scsp_state
 
 	struct _SCSPDSP DSP;
 
-	running_device *device;
+	device_t *device;
 };
 
 static void dma_scsp(address_space *space, scsp_state *scsp);		/*state DMA transfer function*/
@@ -244,7 +244,7 @@ static int length;
 static signed short *RBUFDST;	//this points to where the sample will be stored in the RingBuf
 
 
-INLINE scsp_state *get_safe_token(running_device *device)
+INLINE scsp_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SCSP);
@@ -516,7 +516,7 @@ static void SCSP_StopSlot(struct _SLOT *slot,int keyoff)
 
 #define log_base_2(n) (log((double)(n))/log(2.0))
 
-static void SCSP_Init(running_device *device, scsp_state *scsp, const scsp_interface *intf)
+static void SCSP_Init(device_t *device, scsp_state *scsp, const scsp_interface *intf)
 {
 	int i;
 
@@ -1255,7 +1255,7 @@ static DEVICE_START( scsp )
 }
 
 
-void scsp_set_ram_base(running_device *device, void *base)
+void scsp_set_ram_base(device_t *device, void *base)
 {
 	scsp_state *scsp = get_safe_token(device);
 	if (scsp)

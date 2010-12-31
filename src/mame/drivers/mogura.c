@@ -19,9 +19,9 @@ public:
 	tilemap_t *tilemap;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *dac1;
-	running_device *dac2;
+	device_t *maincpu;
+	device_t *dac1;
+	device_t *dac2;
 };
 
 

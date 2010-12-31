@@ -121,7 +121,7 @@ Not all regional versions are available for each Megatouch series
 #define UART_CLK	XTAL_18_432MHz
 
 static UINT8* meritm_ram;
-static running_device *meritm_z80pio[2];
+static device_t *meritm_z80pio[2];
 
 
 /*************************************

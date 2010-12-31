@@ -37,9 +37,9 @@ public:
 	int coin;
 
 	/* device */
-	running_device *maincpu;
-	running_device *subcpu;
-	running_device *audiocpu;
+	device_t *maincpu;
+	device_t *subcpu;
+	device_t *audiocpu;
 };
 
 

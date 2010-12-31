@@ -58,10 +58,10 @@ public:
 	UINT8      flip_yoffs;
 	UINT8      color_latch;
 
-	running_device *maincpu;
-	running_device *ppi8255_0;
-	running_device *ppi8255_1;
-	running_device *samples;
+	device_t *maincpu;
+	device_t *ppi8255_0;
+	device_t *ppi8255_1;
+	device_t *samples;
 };
 
 

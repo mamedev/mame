@@ -20,7 +20,7 @@ public:
 	UINT16   color;
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 };
 
 

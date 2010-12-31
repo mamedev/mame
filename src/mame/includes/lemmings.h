@@ -21,7 +21,7 @@ public:
 	UINT8 *vram_buffer;
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 };
 
 

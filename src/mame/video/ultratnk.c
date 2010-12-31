@@ -100,7 +100,7 @@ VIDEO_EOF( ultratnk )
 	ultratnk_state *state = machine->driver_data<ultratnk_state>();
 	int i;
 	UINT16 BG = colortable_entry_get_value(machine->colortable, 0);
-	running_device *discrete = machine->device("discrete");
+	device_t *discrete = machine->device("discrete");
 	UINT8 *videoram = state->videoram;
 
 	/* check for sprite-playfield collisions */

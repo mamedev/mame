@@ -157,7 +157,7 @@ struct _m4510_Regs {
 	m6510_port_write_func port_write;
 };
 
-INLINE m4510_Regs *get_safe_token(running_device *device)
+INLINE m4510_Regs *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == M4510);

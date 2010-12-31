@@ -127,7 +127,7 @@ static INTERRUPT_GEN( sprtmtch_vblank_interrupt )
 	sprtmtch_update_irq(device->machine);
 }
 
-static void sprtmtch_sound_callback( running_device *device, int state )
+static void sprtmtch_sound_callback( device_t *device, int state )
 {
 	dynax_state *driver_state = device->machine->driver_data<dynax_state>();
 	driver_state->sound_irq = state;
@@ -201,7 +201,7 @@ static WRITE8_HANDLER( jantouki_sound_vblank_ack_w )
 	jantouki_sound_update_irq(space->machine);
 }
 
-static void jantouki_sound_callback(running_device *device, int state)
+static void jantouki_sound_callback(device_t *device, int state)
 {
 	dynax_state *driver_state = device->machine->driver_data<dynax_state>();
 	driver_state->sound_irq = state;
@@ -409,7 +409,7 @@ static WRITE8_HANDLER( nanajign_palette_w )
 }
 
 
-static void adpcm_int( running_device *device )
+static void adpcm_int( device_t *device )
 {
 	dynax_state *state = device->machine->driver_data<dynax_state>();
 	msm5205_data_w(device, state->msm5205next >> 4);
@@ -424,7 +424,7 @@ static void adpcm_int( running_device *device )
 	}
 }
 
-static void adpcm_int_cpu1( running_device *device )
+static void adpcm_int_cpu1( device_t *device )
 {
 	dynax_state *state = device->machine->driver_data<dynax_state>();
 	msm5205_data_w(device, state->msm5205next >> 4);

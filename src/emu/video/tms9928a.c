@@ -100,17 +100,17 @@ static const rgb_t TMS9928A_palette[16] =
 /*
 ** Forward declarations of internal functions.
 */
-static void draw_mode0 (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect);
-static void draw_mode1 (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect);
-static void draw_mode2 (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect);
-static void draw_mode12 (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect);
-static void draw_mode3 (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect);
-static void draw_mode23 (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect);
-static void draw_modebogus (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect);
-static void draw_sprites (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw_mode0 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw_mode1 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw_mode2 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw_mode12 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw_mode3 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw_mode23 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw_modebogus (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw_sprites (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect);
 static void change_register (running_machine *machine, int reg, UINT8 data);
 
-static void (*const ModeHandlers[])(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect) = {
+static void (*const ModeHandlers[])(device_t *screen, bitmap_t *bitmap, const rectangle *cliprect) = {
         draw_mode0, draw_mode1, draw_mode2,  draw_mode12,
         draw_mode3, draw_modebogus, draw_mode23,
         draw_modebogus
@@ -450,7 +450,7 @@ int TMS9928A_interrupt(running_machine *machine) {
     return b;
 }
 
-static void draw_mode1 (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect) {
+static void draw_mode1 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect) {
     int pattern,x,y,yy,xx,name,charcode;
     UINT8 fg,bg,*patternptr;
     rectangle rt;
@@ -485,7 +485,7 @@ static void draw_mode1 (running_device *screen, bitmap_t *bitmap, const rectangl
     }
 }
 
-static void draw_mode12 (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect) {
+static void draw_mode12 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect) {
     int pattern,x,y,yy,xx,name,charcode;
     UINT8 fg,bg,*patternptr;
     const pen_t *pens;
@@ -520,7 +520,7 @@ static void draw_mode12 (running_device *screen, bitmap_t *bitmap, const rectang
     }
 }
 
-static void draw_mode0 (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect) {
+static void draw_mode0 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect) {
     int pattern,x,y,yy,xx,name,charcode,colour;
     UINT8 fg,bg,*patternptr;
     const pen_t *pens;
@@ -546,7 +546,7 @@ static void draw_mode0 (running_device *screen, bitmap_t *bitmap, const rectangl
     }
 }
 
-static void draw_mode2 (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect) {
+static void draw_mode2 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect) {
     int colour,name,x,y,yy,pattern,xx,charcode;
     UINT8 fg,bg;
     const pen_t *pens;
@@ -576,7 +576,7 @@ static void draw_mode2 (running_device *screen, bitmap_t *bitmap, const rectangl
     }
 }
 
-static void draw_mode3 (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect) {
+static void draw_mode3 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect) {
     int x,y,yy,yyy,name,charcode;
     UINT8 fg,bg,*patternptr;
     const pen_t *pens;
@@ -606,7 +606,7 @@ static void draw_mode3 (running_device *screen, bitmap_t *bitmap, const rectangl
     }
 }
 
-static void draw_mode23 (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect) {
+static void draw_mode23 (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect) {
     int x,y,yy,yyy,name,charcode;
     UINT8 fg,bg,*patternptr;
     const pen_t *pens;
@@ -637,7 +637,7 @@ static void draw_mode23 (running_device *screen, bitmap_t *bitmap, const rectang
     }
 }
 
-static void draw_modebogus (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect) {
+static void draw_modebogus (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect) {
     UINT8 fg,bg;
     int x,y,n,xx;
     const pen_t *pens;
@@ -666,7 +666,7 @@ static void draw_modebogus (running_device *screen, bitmap_t *bitmap, const rect
 **
 ** This code should be optimized. One day.
 */
-static void draw_sprites (running_device *screen, bitmap_t *bitmap, const rectangle *cliprect) {
+static void draw_sprites (device_t *screen, bitmap_t *bitmap, const rectangle *cliprect) {
     UINT8 *attributeptr,*patternptr,c;
     int p,x,y,size,i,j,large,yy,xx,limit[192],
         illegalsprite,illegalspriteline;

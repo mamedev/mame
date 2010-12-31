@@ -56,7 +56,7 @@ struct _generic_machine_private
     are enabled for the given CPU
 -------------------------------------------------*/
 
-INLINE int interrupt_enabled(running_device *device)
+INLINE int interrupt_enabled(device_t *device)
 {
 	generic_machine_private *state = device->machine->generic_machine_data;
 	for (int index = 0; index < ARRAY_LENGTH(state->interrupt_device); index++)
@@ -602,7 +602,7 @@ static TIMER_CALLBACK( clear_all_lines )
 
 static TIMER_CALLBACK( irq_pulse_clear )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	int irqline = param;
 	cpu_set_input_line(device, irqline, CLEAR_LINE);
 }
@@ -614,7 +614,7 @@ static TIMER_CALLBACK( irq_pulse_clear )
     later
 -------------------------------------------------*/
 
-void generic_pulse_irq_line(running_device *device, int irqline)
+void generic_pulse_irq_line(device_t *device, int irqline)
 {
 	assert(irqline != INPUT_LINE_NMI && irqline != INPUT_LINE_RESET);
 	cpu_set_input_line(device, irqline, ASSERT_LINE);
@@ -631,7 +631,7 @@ void generic_pulse_irq_line(running_device *device, int irqline)
     1 cycle later, specifying a vector
 -------------------------------------------------*/
 
-void generic_pulse_irq_line_and_vector(running_device *device, int irqline, int vector)
+void generic_pulse_irq_line_and_vector(device_t *device, int irqline, int vector)
 {
 	assert(irqline != INPUT_LINE_NMI && irqline != INPUT_LINE_RESET);
 	cpu_set_input_line_and_vector(device, irqline, ASSERT_LINE, vector);
@@ -647,7 +647,7 @@ void generic_pulse_irq_line_and_vector(running_device *device, int irqline, int 
     disable value for global interrupts
 -------------------------------------------------*/
 
-void cpu_interrupt_enable(running_device *device, int enabled)
+void cpu_interrupt_enable(device_t *device, int enabled)
 {
 	cpu_device *cpudevice = downcast<cpu_device *>(device);
 

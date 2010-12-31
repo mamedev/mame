@@ -256,7 +256,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static void irqhandler( running_device *device, int irq )
+static void irqhandler( device_t *device, int irq )
 {
 	battlane_state *state = device->machine->driver_data<battlane_state>();
 	cpu_set_input_line(state->maincpu, M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);

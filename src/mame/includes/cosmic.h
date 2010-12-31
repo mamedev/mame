@@ -34,8 +34,8 @@ public:
 	UINT32         pixel_clock;
 
 	/* devices */
-	running_device *samples;
-	running_device *dac;
+	device_t *samples;
+	device_t *dac;
 };
 
 

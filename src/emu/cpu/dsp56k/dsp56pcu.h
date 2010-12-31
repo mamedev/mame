@@ -10,7 +10,7 @@ namespace DSP56K
     PCU
 ***************************************************************************/
 void pcu_reset(dsp56k_core* cpustate);
-void pcu_init(dsp56k_core* cpustate, running_device *device);
+void pcu_init(dsp56k_core* cpustate, device_t *device);
 #define PC  (cpustate->PCU.pc)
 #define LA  (cpustate->PCU.la)
 #define LC  (cpustate->PCU.lc)

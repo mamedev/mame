@@ -33,7 +33,7 @@ public:
 	superdq_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	running_device *laserdisc;
+	device_t *laserdisc;
 	UINT8 ld_in_latch;
 	UINT8 ld_out_latch;
 

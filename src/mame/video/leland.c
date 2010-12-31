@@ -52,7 +52,7 @@ static emu_timer *scanline_timer;
 
 static TIMER_CALLBACK( scanline_callback )
 {
-	running_device *audio = machine->device("custom");
+	device_t *audio = machine->device("custom");
 	int scanline = param;
 
 	/* update the DACs */

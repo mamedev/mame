@@ -70,11 +70,11 @@ struct _phoenix_sound_state
 	UINT8				sound_latch_a;
 	sound_stream *		channel;
 	UINT32 *				poly18;
-	running_device *discrete;
-	running_device *tms;
+	device_t *discrete;
+	device_t *tms;
 };
 
-INLINE phoenix_sound_state *get_safe_token( running_device *device )
+INLINE phoenix_sound_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == PHOENIX);
@@ -507,7 +507,7 @@ WRITE8_DEVICE_HANDLER( phoenix_sound_control_a_w )
 	state->sound_latch_a = data;
 }
 
-static void register_state(running_device *device)
+static void register_state(device_t *device)
 {
 	phoenix_sound_state *state = get_safe_token(device);
 

@@ -32,9 +32,9 @@ public:
 	int mcu_ready;	/* cpu data/mcu ready status */
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *mcu;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *mcu;
 };
 
 /*----------- defined in machine/lkage.c -----------*/

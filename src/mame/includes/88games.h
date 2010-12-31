@@ -24,12 +24,12 @@ public:
 	int          speech_chip;
 
 	/* devices */
-	running_device *audiocpu;
-	running_device *k052109;
-	running_device *k051960;
-	running_device *k051316;
-	running_device *upd_1;
-	running_device *upd_2;
+	device_t *audiocpu;
+	device_t *k052109;
+	device_t *k051960;
+	device_t *k051316;
+	device_t *upd_1;
+	device_t *upd_2;
 };
 
 

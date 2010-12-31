@@ -22,7 +22,7 @@ public:
 	UINT8 scroll[2];
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 };
 
 

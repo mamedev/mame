@@ -77,7 +77,7 @@ typedef struct
 typedef struct _vr0video_state  vr0video_state;
 struct _vr0video_state
 {
-	running_device *cpu;
+	device_t *cpu;
 
 	UINT16 InternalPalette[256];
 	UINT32 LastPalUpdate;
@@ -90,7 +90,7 @@ struct _vr0video_state
  INLINE FUNCTIONS
  *****************************************************************************/
 
-INLINE vr0video_state *get_safe_token( running_device *device )
+INLINE vr0video_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == VIDEO_VRENDER0);
@@ -98,7 +98,7 @@ INLINE vr0video_state *get_safe_token( running_device *device )
 	return (vr0video_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const vr0video_interface *get_interface( running_device *device )
+INLINE const vr0video_interface *get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == VIDEO_VRENDER0);
@@ -400,7 +400,7 @@ static const _DrawTemplate DrawTile[]=
 #define Packet(i) space->read_word(PacketPtr + 2 * i)
 
 //Returns TRUE if the operation was a flip (sync or async)
-int vrender0_ProcessPacket(running_device *device, UINT32 PacketPtr, UINT16 *Dest, UINT8 *TEXTURE)
+int vrender0_ProcessPacket(device_t *device, UINT32 PacketPtr, UINT16 *Dest, UINT8 *TEXTURE)
 {
 	vr0video_state *vr0 = get_safe_token(device);
 	address_space *space = cpu_get_address_space(vr0->cpu, ADDRESS_SPACE_PROGRAM);

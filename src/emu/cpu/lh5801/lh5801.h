@@ -65,7 +65,7 @@ pc 8bit
 
 
 
-typedef UINT8 (*lh5801_in_func)(running_device *device);
+typedef UINT8 (*lh5801_in_func)(device_t *device);
 
 typedef struct _lh5801_cpu_core lh5801_cpu_core;
 struct _lh5801_cpu_core

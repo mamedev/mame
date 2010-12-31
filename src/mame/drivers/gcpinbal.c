@@ -202,7 +202,7 @@ static WRITE16_HANDLER( ioc_w )
 
 
 /* Controlled through ioc? */
-static void gcp_adpcm_int( running_device *device )
+static void gcp_adpcm_int( device_t *device )
 {
 	gcpinbal_state *state = device->machine->driver_data<gcpinbal_state>();
 

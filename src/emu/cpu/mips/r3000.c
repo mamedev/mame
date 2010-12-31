@@ -163,7 +163,7 @@ struct _r3000_state
 	size_t		dcache_size;
 };
 
-INLINE r3000_state *get_safe_token(running_device *device)
+INLINE r3000_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == R3000BE ||

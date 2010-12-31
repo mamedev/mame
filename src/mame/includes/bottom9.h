@@ -22,13 +22,13 @@ public:
 	int        nmienable;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *k007232_1;
-	running_device *k007232_2;
-	running_device *k052109;
-	running_device *k051960;
-	running_device *k051316;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *k007232_1;
+	device_t *k007232_2;
+	device_t *k052109;
+	device_t *k051960;
+	device_t *k051316;
 };
 
 /*----------- defined in video/bottom9.c -----------*/

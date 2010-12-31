@@ -1619,7 +1619,7 @@ static MACHINE_RESET( konami573 )
 	state->flash_bank = -1;
 }
 
-static void spu_irq(running_device *device, UINT32 data)
+static void spu_irq(device_t *device, UINT32 data)
 {
 	psx_irq_set(device->machine, data);
 }
@@ -1697,7 +1697,7 @@ todo:
 
 static READ32_HANDLER( ge765pwbba_r )
 {
-	running_device *upd4701 = space->machine->device("upd4701");
+	device_t *upd4701 = space->machine->device("upd4701");
 	UINT32 data = 0;
 
 	switch (offset)
@@ -1735,7 +1735,7 @@ static READ32_HANDLER( ge765pwbba_r )
 
 static WRITE32_HANDLER( ge765pwbba_w )
 {
-	running_device *upd4701 = space->machine->device("upd4701");
+	device_t *upd4701 = space->machine->device("upd4701");
 	switch (offset)
 	{
 	case 0x04:
@@ -2899,7 +2899,7 @@ static DRIVER_INIT( mamboagg )
 
 /* ADC0834 Interface */
 
-static double analogue_inputs_callback( running_device *device, UINT8 input )
+static double analogue_inputs_callback( device_t *device, UINT8 input )
 {
 	switch (input)
 	{

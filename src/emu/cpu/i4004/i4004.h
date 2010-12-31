@@ -30,5 +30,5 @@ DECLARE_LEGACY_CPU_DEVICE(I4004, i4004);
 
 CPU_DISASSEMBLE( i4004 );
 
-void i4004_set_test(running_device *device, UINT8 val);
+void i4004_set_test(device_t *device, UINT8 val);
 #endif

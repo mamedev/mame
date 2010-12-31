@@ -24,7 +24,7 @@ struct _ym2151_state
 };
 
 
-INLINE ym2151_state *get_safe_token(running_device *device)
+INLINE ym2151_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == YM2151);

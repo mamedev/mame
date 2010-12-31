@@ -61,8 +61,8 @@ public:
 	tilemap_t *fg_tilemap;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
+	device_t *maincpu;
+	device_t *audiocpu;
 };
 
 
@@ -323,7 +323,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static void irqhandler(running_device *device, int linestate)
+static void irqhandler(device_t *device, int linestate)
 {
 	onetwo_state *state = device->machine->driver_data<onetwo_state>();
 	cpu_set_input_line(state->audiocpu, 0, linestate);

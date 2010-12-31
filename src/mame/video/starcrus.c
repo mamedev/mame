@@ -30,7 +30,7 @@ VIDEO_START( starcrus )
 WRITE8_HANDLER( starcrus_ship_parm_1_w )
 {
 	starcrus_state *state = space->machine->driver_data<starcrus_state>();
-	running_device *samples = space->machine->device("samples");
+	device_t *samples = space->machine->device("samples");
 
 	state->s1_sprite = data&0x1f;
 	state->engine1_on = ((data&0x20)>>5)^0x01;
@@ -56,7 +56,7 @@ WRITE8_HANDLER( starcrus_ship_parm_1_w )
 WRITE8_HANDLER( starcrus_ship_parm_2_w )
 {
 	starcrus_state *state = space->machine->driver_data<starcrus_state>();
-	running_device *samples = space->machine->device("samples");
+	device_t *samples = space->machine->device("samples");
 
 	state->s2_sprite = data&0x1f;
 	set_led_status(space->machine, 2,~data & 0x80);			/* game over lamp */
@@ -85,7 +85,7 @@ WRITE8_HANDLER( starcrus_ship_parm_2_w )
 WRITE8_HANDLER( starcrus_proj_parm_1_w )
 {
 	starcrus_state *state = space->machine->driver_data<starcrus_state>();
-	running_device *samples = space->machine->device("samples");
+	device_t *samples = space->machine->device("samples");
 
 	state->p1_sprite = data&0x0f;
 	state->launch1_on = ((data&0x20)>>5)^0x01;
@@ -125,7 +125,7 @@ WRITE8_HANDLER( starcrus_proj_parm_1_w )
 WRITE8_HANDLER( starcrus_proj_parm_2_w )
 {
 	starcrus_state *state = space->machine->driver_data<starcrus_state>();
-	running_device *samples = space->machine->device("samples");
+	device_t *samples = space->machine->device("samples");
 
 	state->p2_sprite = data&0x0f;
 	state->launch2_on = ((data&0x20)>>5)^0x01;

@@ -42,7 +42,7 @@ struct _tlc34076_state
  *
  *************************************/
 
-INLINE tlc34076_state *get_safe_token( running_device *device )
+INLINE tlc34076_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == TLC34076);
@@ -56,7 +56,7 @@ INLINE tlc34076_state *get_safe_token( running_device *device )
  *
  *************************************/
 
-const pen_t *tlc34076_get_pens(running_device *device)
+const pen_t *tlc34076_get_pens(device_t *device)
 {
 	tlc34076_state *state = get_safe_token(device);
 	offs_t i;

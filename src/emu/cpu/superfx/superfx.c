@@ -66,7 +66,7 @@ struct _superfx_state
 	int icount;
 };
 
-INLINE superfx_state *get_safe_token(running_device *device)
+INLINE superfx_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SUPERFX);
@@ -471,7 +471,7 @@ INLINE UINT8 superfx_pipe(superfx_state *cpustate)
 /*****************************************************************************/
 
 /* reads to SuperFX RAM only happen if this returns 1 */
-int superfx_access_ram(running_device *cpu)
+int superfx_access_ram(device_t *cpu)
 {
 	superfx_state *cpustate = get_safe_token(cpu);
 
@@ -482,7 +482,7 @@ int superfx_access_ram(running_device *cpu)
 }
 
 /* reads to SuperFX ROM only happen if this returns 1 */
-int superfx_access_rom(running_device *cpu)
+int superfx_access_rom(device_t *cpu)
 {
 	superfx_state *cpustate = get_safe_token(cpu);
 
@@ -492,7 +492,7 @@ int superfx_access_rom(running_device *cpu)
 	return 1;
 }
 
-UINT8 superfx_mmio_read(running_device *cpu, UINT32 addr)
+UINT8 superfx_mmio_read(device_t *cpu, UINT32 addr)
 {
 	superfx_state *cpustate = get_safe_token(cpu);
 
@@ -544,7 +544,7 @@ UINT8 superfx_mmio_read(running_device *cpu, UINT32 addr)
 	return 0;
 }
 
-void superfx_mmio_write(running_device *cpu, UINT32 addr, UINT8 data)
+void superfx_mmio_write(device_t *cpu, UINT32 addr, UINT8 data)
 {
 	superfx_state *cpustate = get_safe_token(cpu);
 
@@ -659,7 +659,7 @@ static void superfx_timing_reset(superfx_state *cpustate)
 	cpustate->ramdr = 0;
 }
 
-void superfx_add_clocks(running_device *cpu, INT32 clocks)
+void superfx_add_clocks(device_t *cpu, INT32 clocks)
 {
 	superfx_state *cpustate = get_safe_token(cpu);
 

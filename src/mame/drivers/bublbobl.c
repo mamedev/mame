@@ -697,7 +697,7 @@ GFXDECODE_END
  *************************************/
 
 // handler called by the 2203 emulator when the internal timers cause an IRQ
-static void irqhandler(running_device *device, int irq)
+static void irqhandler(device_t *device, int irq)
 {
 	bublbobl_state *state = device->machine->driver_data<bublbobl_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);

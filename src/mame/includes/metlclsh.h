@@ -25,8 +25,8 @@ public:
 	UINT8          write_mask, gfxbank;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *subcpu;
+	device_t *maincpu;
+	device_t *subcpu;
 };
 
 

@@ -219,13 +219,13 @@ extern const device_type ACIA6850;
     PROTOTYPES
 ***************************************************************************/
 
-void acia6850_tx_clock_in(running_device *device) ATTR_NONNULL(1);
-void acia6850_rx_clock_in(running_device *device) ATTR_NONNULL(1);
+void acia6850_tx_clock_in(device_t *device) ATTR_NONNULL(1);
+void acia6850_rx_clock_in(device_t *device) ATTR_NONNULL(1);
 
-void acia6850_set_rx_clock(running_device *device, int clock) ATTR_NONNULL(1);
-void acia6850_set_tx_clock(running_device *device, int clock) ATTR_NONNULL(1);
+void acia6850_set_rx_clock(device_t *device, int clock) ATTR_NONNULL(1);
+void acia6850_set_tx_clock(device_t *device, int clock) ATTR_NONNULL(1);
 
-void acia6850_receive_data(running_device *device, UINT8 data) ATTR_NONNULL(1);
+void acia6850_receive_data(device_t *device, UINT8 data) ATTR_NONNULL(1);
 
 WRITE8_DEVICE_HANDLER( acia6850_ctrl_w );
 READ8_DEVICE_HANDLER( acia6850_stat_r );

@@ -258,7 +258,7 @@ void amiga_machine_config(running_machine *machine, const amiga_machine_interfac
 }
 
 
-static void amiga_m68k_reset(running_device *device)
+static void amiga_m68k_reset(device_t *device)
 {
 	amiga_state *state = device->machine->driver_data<amiga_state>();
 	address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
@@ -312,8 +312,8 @@ static TIMER_CALLBACK( scanline_callback )
 {
 	amiga_state *state = machine->driver_data<amiga_state>();
 	int scanline = param;
-	running_device *cia_0 = machine->device("cia_0");
-	running_device *cia_1 = machine->device("cia_1");
+	device_t *cia_0 = machine->device("cia_0");
+	device_t *cia_1 = machine->device("cia_1");
 
 	/* on the first scanline, we do some extra bookkeeping */
 	if (scanline == 0)
@@ -1017,7 +1017,7 @@ READ16_HANDLER( amiga_cia_r )
 {
 	UINT8 data;
 	int shift;
-	running_device *cia;
+	device_t *cia;
 
 	/* offsets 0000-07ff reference CIA B, and are accessed via the MSB */
 	if ((offset & 0x0800) == 0)
@@ -1052,7 +1052,7 @@ READ16_HANDLER( amiga_cia_r )
 
 WRITE16_HANDLER( amiga_cia_w )
 {
-	running_device *cia;
+	device_t *cia;
 
 	if (LOG_CIA)
 		logerror("%06x:cia_%c_write(%03x) = %04x & %04x\n", cpu_get_pc(space->cpu), 'A' + ((~offset & 0x0800) >> 11), offset * 2, data, mem_mask);
@@ -1087,13 +1087,13 @@ WRITE16_HANDLER( amiga_cia_w )
  *
  *************************************/
 
-void amiga_cia_0_irq(running_device *device, int state)
+void amiga_cia_0_irq(device_t *device, int state)
 {
 	amiga_custom_w(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_PORTS, 0xffff);
 }
 
 
-void amiga_cia_1_irq(running_device *device, int state)
+void amiga_cia_1_irq(device_t *device, int state)
 {
 	amiga_custom_w(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_EXTER, 0xffff);
 }
@@ -1250,8 +1250,8 @@ static TIMER_CALLBACK( finish_serial_write )
 WRITE16_HANDLER( amiga_custom_w )
 {
 	amiga_state *state = space->machine->driver_data<amiga_state>();
-	running_device *cia_0;
-	running_device *cia_1;
+	device_t *cia_0;
+	device_t *cia_1;
 	UINT16 temp;
 	offset &= 0xff;
 

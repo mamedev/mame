@@ -208,7 +208,7 @@ static WRITE8_HANDLER( seawolf2_lamps_w )
 
 static WRITE8_HANDLER( seawolf2_sound_1_w )  // Port 40
 {
-	running_device *samples = space->machine->device("samples");
+	device_t *samples = space->machine->device("samples");
 	UINT8 rising_bits = data & ~port_1_last;
 	port_1_last = data;
 
@@ -223,7 +223,7 @@ static WRITE8_HANDLER( seawolf2_sound_1_w )  // Port 40
 
 static WRITE8_HANDLER( seawolf2_sound_2_w )  // Port 41
 {
-	running_device *samples = space->machine->device("samples");
+	device_t *samples = space->machine->device("samples");
 	UINT8 rising_bits = data & ~port_2_last;
 	port_2_last = data;
 

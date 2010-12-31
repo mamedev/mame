@@ -370,7 +370,7 @@ static WRITE8_HANDLER( tturfbl_msm5205_data_w )
 	state->sample_buffer = data;
 }
 
-static void tturfbl_msm5205_callback( running_device *device )
+static void tturfbl_msm5205_callback( device_t *device )
 {
 	segas1x_bootleg_state *state = device->machine->driver_data<segas1x_bootleg_state>();
 	msm5205_data_w(device, (state->sample_buffer >> 4) & 0x0f);
@@ -1210,7 +1210,7 @@ static WRITE8_HANDLER( shdancbl_msm5205_data_w )
 	state->sample_buffer = data;
 }
 
-static void shdancbl_msm5205_callback(running_device *device)
+static void shdancbl_msm5205_callback(device_t *device)
 {
 	segas1x_bootleg_state *state = device->machine->driver_data<segas1x_bootleg_state>();
 	msm5205_data_w(device, state->sample_buffer & 0x0f);
@@ -2079,7 +2079,7 @@ static MACHINE_CONFIG_START( system16, segas1x_bootleg_state )
 MACHINE_CONFIG_END
 
 
-static void sound_cause_nmi( running_device *device, int chip )
+static void sound_cause_nmi( device_t *device, int chip )
 {
 	segas1x_bootleg_state *state = device->machine->driver_data<segas1x_bootleg_state>();
 

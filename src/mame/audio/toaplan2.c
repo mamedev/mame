@@ -98,13 +98,13 @@ static void play_oki_sound(okim6295_device *oki, int game_sound, int data)
 	}
 }
 
-void dogyuun_okisnd_w(running_device *device, int data)
+void dogyuun_okisnd_w(device_t *device, int data)
 {
 	/* Need a board to determine the sound commands */
 //  popmessage("Writing %04x to Sound CPU",data);
 }
 
-void kbash_okisnd_w(running_device *device, int data)
+void kbash_okisnd_w(device_t *device, int data)
 {
 //  popmessage("Writing %04x to Sound CPU",data);
 
@@ -119,7 +119,7 @@ void kbash_okisnd_w(running_device *device, int data)
 	}
 }
 
-void fixeight_okisnd_w(running_device *device, int data)
+void fixeight_okisnd_w(device_t *device, int data)
 {
 //  popmessage("Writing %04x to Sound CPU",data);
 
@@ -134,7 +134,7 @@ void fixeight_okisnd_w(running_device *device, int data)
 	}
 }
 
-void batsugun_okisnd_w(running_device *device, int data)
+void batsugun_okisnd_w(device_t *device, int data)
 {
 //  popmessage("Writing %04x to Sound CPU",data);
 

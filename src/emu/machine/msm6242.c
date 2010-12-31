@@ -38,7 +38,7 @@ struct _msm6242_t
 
 
 /* makes sure that the passed in device is the right type */
-INLINE msm6242_t *get_safe_token(running_device *device)
+INLINE msm6242_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == MSM6242);

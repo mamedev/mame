@@ -84,7 +84,7 @@ Side 2 = 0x8F7DDD (or 0x880000 | ( 0x77 << 12 ) | 0x0DDD)
 #define CLIFF_ENABLE_SND_1	NODE_01
 #define CLIFF_ENABLE_SND_2	NODE_02
 
-static running_device *laserdisc;
+static device_t *laserdisc;
 
 static int port_bank = 0;
 static int phillips_code = 0;

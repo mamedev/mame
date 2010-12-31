@@ -29,7 +29,7 @@ public:
 	UINT16         coinctrl;
 
 	/* devices */
-	running_device *audio_cpu;	// system 16c does not have sound CPU
+	device_t *audio_cpu;	// system 16c does not have sound CPU
 };
 
 

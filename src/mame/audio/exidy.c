@@ -83,7 +83,7 @@ struct _exidy_sound_state
 	UINT8 riot_irq_state;
 
 	/* 6532 variables */
-	running_device *riot;
+	device_t *riot;
 
 	struct sh6840_timer_channel sh6840_timer[3];
 	INT16 sh6840_volume[3];
@@ -104,9 +104,9 @@ struct _exidy_sound_state
 	int has_sh8253;
 
 	/* 5220/CVSD variables */
-	running_device *cvsd;
-	running_device *tms;
-	running_device *pia1;
+	device_t *cvsd;
+	device_t *tms;
+	device_t *pia1;
 
 	/* sound streaming variables */
 	sound_stream *stream;
@@ -116,7 +116,7 @@ struct _exidy_sound_state
 };
 
 
-INLINE exidy_sound_state *get_safe_token(running_device *device)
+INLINE exidy_sound_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == EXIDY || device->type() == EXIDY_VENTURE || device->type() == EXIDY_VICTORY);
@@ -241,7 +241,7 @@ INLINE int sh6840_update_noise(exidy_sound_state *state, int clocks)
  *
  *************************************/
 
-static void sh6840_register_state_globals(running_device *device)
+static void sh6840_register_state_globals(device_t *device)
 {
 	exidy_sound_state *state = get_safe_token(device);
 
@@ -480,7 +480,7 @@ DEVICE_GET_INFO( exidy_sound )
  *
  *************************************/
 
-static void r6532_irq(running_device *device, int state)
+static void r6532_irq(device_t *device, int state)
 {
 	exidy_sound_state *sndstate = get_safe_token(device);
 	sndstate->riot_irq_state = (state == ASSERT_LINE) ? 1 : 0;
@@ -556,7 +556,7 @@ static const riot6532_interface r6532_interface =
  *************************************/
 
 
-static void sh8253_register_state_globals(running_device *device)
+static void sh8253_register_state_globals(device_t *device)
 {
 	exidy_sound_state *state = get_safe_token(device);
 
@@ -998,7 +998,7 @@ READ8_DEVICE_HANDLER( victory_sound_status_r )
 
 static TIMER_CALLBACK( delayed_command_w )
 {
-	running_device *pia1 = (running_device *)ptr;
+	device_t *pia1 = (device_t *)ptr;
 	pia6821_set_input_a(pia1, param, 0);
 	pia6821_ca1_w(pia1, 0);
 }
@@ -1068,7 +1068,7 @@ static DEVICE_START( victory_sound )
 static DEVICE_RESET( victory_sound )
 {
 	exidy_sound_state *state = get_safe_token(device);
-	running_device *pia1 = state->pia1;
+	device_t *pia1 = state->pia1;
 
 	DEVICE_RESET_CALL(common_sh_reset);
 	pia1->reset();

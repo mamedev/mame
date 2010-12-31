@@ -21,7 +21,7 @@ struct _tms_state {
 	int enable; 			/* mask which tones to play */
 };
 
-INLINE tms_state *get_safe_token(running_device *device)
+INLINE tms_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TMS3615);
@@ -80,7 +80,7 @@ static STREAM_UPDATE( tms3615_sound_update )
 	tms->enable = 0;
 }
 
-void tms3615_enable_w(running_device *device, int enable)
+void tms3615_enable_w(device_t *device, int enable)
 {
 	tms_state *tms = get_safe_token(device);
 	tms->enable = enable;

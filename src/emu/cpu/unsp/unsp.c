@@ -10,7 +10,7 @@
 #include "debugger.h"
 #include "unsp.h"
 
-INLINE unsp_state *get_safe_token(running_device *device)
+INLINE unsp_state *get_safe_token(device_t *device)
 {
     assert(device != NULL);
     assert(device->type() == UNSP);

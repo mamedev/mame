@@ -32,7 +32,7 @@ public:
 	int            z80_nmi, mcu_status;
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 
 	/* game-specific */
 	// 1945 MCU

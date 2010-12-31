@@ -14,8 +14,8 @@ public:
 	tilemap_t *tilemap1;
 	tilemap_t *tilemap2;
 
-	running_device *maincpu;
-	running_device *audiocpu;
+	device_t *maincpu;
+	device_t *audiocpu;
 };
 
 

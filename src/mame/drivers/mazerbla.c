@@ -89,8 +89,8 @@ public:
 	UINT8 soundlatch;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *subcpu;
+	device_t *maincpu;
+	device_t *subcpu;
 };
 
 

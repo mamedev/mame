@@ -61,14 +61,14 @@ struct _sc61860_state
     int icount;
 };
 
-INLINE sc61860_state *get_safe_token(running_device *device)
+INLINE sc61860_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SC61860);
 	return (sc61860_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
-UINT8 *sc61860_internal_ram(running_device *device)
+UINT8 *sc61860_internal_ram(device_t *device)
 {
 	sc61860_state *cpustate = get_safe_token(device);
 	return cpustate->ram;

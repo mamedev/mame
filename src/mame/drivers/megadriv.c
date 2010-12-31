@@ -5133,7 +5133,7 @@ static MACHINE_RESET( segacd )
 
 	#ifdef MESS
 	{
-		running_device *device;
+		device_t *device;
 
 		device = machine->device("cdrom");
 		if ( device )
@@ -8963,7 +8963,7 @@ static IRQ_CALLBACK(genesis_int_callback)
 	return (0x60+irqline*4)/4; // vector address
 }
 
-static int megadriv_tas_callback(running_device *device)
+static int megadriv_tas_callback(device_t *device)
 {
 	return 0; // writeback not allowed
 }
@@ -9161,7 +9161,7 @@ static WRITE8_HANDLER( z80_unmapped_w )
 /* sets the megadrive z80 to it's normal ports / map */
 void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine, const char* tag)
 {
-	running_device *ym = machine->device("ymsnd");
+	device_t *ym = machine->device("ymsnd");
 
 	/* INIT THE PORTS *********************************************************************************************/
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, tag, ADDRESS_SPACE_IO), 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);

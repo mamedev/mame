@@ -467,7 +467,7 @@ static MACHINE_RESET( opwolf )
 	msm5205_reset_w(machine->device("msm2"), 1);
 }
 
-static void opwolf_msm5205_vck( running_device *device )
+static void opwolf_msm5205_vck( device_t *device )
 {
 	opwolf_state *state = device->machine->driver_data<opwolf_state>();
 	int chip = (strcmp(device->tag(), "msm1") == 0) ? 0 : 1;
@@ -694,7 +694,7 @@ GFXDECODE_END
 
 /* handler called by the YM2151 emulator when the internal timers cause an IRQ */
 
-static void irq_handler( running_device *device, int irq )
+static void irq_handler( device_t *device, int irq )
 {
 	opwolf_state *state = device->machine->driver_data<opwolf_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);

@@ -564,7 +564,7 @@ static WRITE8_HANDLER( equites_8155_portb_w )
 	equites_update_dac(space->machine);
 }
 
-static void equites_msm5232_gate( running_device *device, int state )
+static void equites_msm5232_gate( device_t *device, int state )
 {
 }
 

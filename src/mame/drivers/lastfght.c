@@ -88,7 +88,7 @@ public:
 	UINT16 c00006;
 
 	/* devices */
-	running_device *maincpu;
+	device_t *maincpu;
 };
 
 

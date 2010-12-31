@@ -19,7 +19,7 @@ struct _ym2413_state
 };
 
 
-INLINE ym2413_state *get_safe_token(running_device *device)
+INLINE ym2413_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == YM2413);

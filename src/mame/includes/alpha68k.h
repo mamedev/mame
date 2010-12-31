@@ -32,7 +32,7 @@ public:
 	unsigned    game_id;	// see below
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 };
 
 /* game_id - used to deal with a few game specific situations */

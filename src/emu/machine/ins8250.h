@@ -29,15 +29,15 @@ DECLARE_LEGACY_DEVICE(PC16550D, pc16550d);
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*ins8250_interrupt_func)(running_device *device, int state);
-typedef void (*ins8250_transmit_func)(running_device *device, int data);
-typedef void (*ins8250_handshake_out_func)(running_device *device, int data);
-typedef void (*ins8250_refresh_connect_func)(running_device *device);
+typedef void (*ins8250_interrupt_func)(device_t *device, int state);
+typedef void (*ins8250_transmit_func)(device_t *device, int data);
+typedef void (*ins8250_handshake_out_func)(device_t *device, int data);
+typedef void (*ins8250_refresh_connect_func)(device_t *device);
 
-#define INS8250_INTERRUPT(name)			void name(running_device *device, int state)
-#define INS8250_TRANSMIT(name)			void name(running_device *device, int data)
-#define INS8250_HANDSHAKE_OUT(name)		void name(running_device *device, int data)
-#define INS8250_REFRESH_CONNECT(name)	void name(running_device *device)
+#define INS8250_INTERRUPT(name)			void name(device_t *device, int state)
+#define INS8250_TRANSMIT(name)			void name(device_t *device, int data)
+#define INS8250_HANDSHAKE_OUT(name)		void name(device_t *device, int data)
+#define INS8250_REFRESH_CONNECT(name)	void name(device_t *device)
 
 typedef struct
 {
@@ -75,8 +75,8 @@ typedef struct
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-void ins8250_receive(running_device *device, int data);
-void ins8250_handshake_in(running_device *device, int new_msr);
+void ins8250_receive(device_t *device, int data);
+void ins8250_handshake_in(device_t *device, int new_msr);
 
 READ8_DEVICE_HANDLER( ins8250_r );
 WRITE8_DEVICE_HANDLER( ins8250_w );

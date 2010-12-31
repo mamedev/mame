@@ -44,9 +44,9 @@ public:
 	emu_timer *via_0_ca1_timer;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *riot;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *riot;
 	required_device<via6522_device> via_0;
 	required_device<via6522_device> via_1;
 	required_device<via6522_device> via_2;

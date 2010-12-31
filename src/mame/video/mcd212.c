@@ -1664,8 +1664,8 @@ VIDEO_START( cdimono1 )
 VIDEO_UPDATE( cdimono1 )
 {
     cdi_state *state = screen->machine->driver_data<cdi_state>();
-    running_device *main_screen = screen->machine->device("screen");
-    running_device *lcd_screen = screen->machine->device("lcd");
+    device_t *main_screen = screen->machine->device("screen");
+    device_t *lcd_screen = screen->machine->device("lcd");
 
     if (screen == main_screen)
     {

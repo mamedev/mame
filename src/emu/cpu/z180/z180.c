@@ -150,7 +150,7 @@ struct _z180_state
 	UINT8 *cc[6];
 };
 
-INLINE z180_state *get_safe_token(running_device *device)
+INLINE z180_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == Z180);

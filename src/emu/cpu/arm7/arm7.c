@@ -68,7 +68,7 @@ void arm7_dt_w_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, void (*wr
 #define ARM7REG(reg)        cpustate->sArmRegister[reg]
 #define ARM7_ICOUNT         cpustate->iCount
 
-INLINE arm_state *get_safe_token(running_device *device)
+INLINE arm_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == ARM7 || device->type() == ARM7_BE || device->type() == ARM9 || device->type() == ARM920T || device->type() == PXA255);

@@ -125,7 +125,7 @@ struct _v60_state
 	UINT8				moddim;
 };
 
-INLINE v60_state *get_safe_token(running_device *device)
+INLINE v60_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == V60 ||
@@ -397,7 +397,7 @@ static CPU_EXIT( v60 )
 {
 }
 
-void v60_stall(running_device *device)
+void v60_stall(device_t *device)
 {
 	v60_state *cpustate = get_safe_token(device);
 	cpustate->stall_io = 1;

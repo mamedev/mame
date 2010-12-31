@@ -47,7 +47,7 @@
 typedef struct _ttl74148_config ttl74148_config;
 struct _ttl74148_config
 {
-	void (*output_cb)(running_device *device);
+	void (*output_cb)(device_t *device);
 };
 
 
@@ -57,13 +57,13 @@ struct _ttl74148_config
 
 
 /* must call ttl74148_update() after setting the inputs */
-void ttl74148_update(running_device *device);
+void ttl74148_update(device_t *device);
 
-void ttl74148_input_line_w(running_device *device, int input_line, int data);
-void ttl74148_enable_input_w(running_device *device, int data);
-int  ttl74148_output_r(running_device *device);
-int  ttl74148_output_valid_r(running_device *device);
-int  ttl74148_enable_output_r(running_device *device);
+void ttl74148_input_line_w(device_t *device, int input_line, int data);
+void ttl74148_enable_input_w(device_t *device, int data);
+int  ttl74148_output_r(device_t *device);
+int  ttl74148_output_valid_r(device_t *device);
+int  ttl74148_enable_output_r(device_t *device);
 
 DECLARE_LEGACY_DEVICE(TTL74148, ttl74148);
 

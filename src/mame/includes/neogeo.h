@@ -105,9 +105,9 @@ public:
 	int        fixed_layer_bank_type;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *upd4990a;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *upd4990a;
 };
 
 

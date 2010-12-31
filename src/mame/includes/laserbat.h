@@ -34,16 +34,16 @@ public:
 	int        degr, filt, a, us, bit14;
 
 	/* device */
-	running_device *audiocpu;
-	running_device *s2636_1;
-	running_device *s2636_2;
-	running_device *s2636_3;
-	running_device *pia;
-	running_device *sn;
-	running_device *tms1;
-	running_device *tms2;
-	running_device *ay1;
-	running_device *ay2;
+	device_t *audiocpu;
+	device_t *s2636_1;
+	device_t *s2636_2;
+	device_t *s2636_3;
+	device_t *pia;
+	device_t *sn;
+	device_t *tms1;
+	device_t *tms2;
+	device_t *ay1;
+	device_t *ay2;
 };
 
 

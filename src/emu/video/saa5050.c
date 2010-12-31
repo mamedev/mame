@@ -34,7 +34,7 @@
 typedef struct _saa5050_state  saa5050_state;
 struct _saa5050_state
 {
-	running_device *screen;
+	device_t *screen;
 	int         gfxnum;
 	int         x, y;
 	int         size;
@@ -56,7 +56,7 @@ struct _saa5050_state
  *
  *************************************/
 
-INLINE saa5050_state *get_safe_token( running_device *device )
+INLINE saa5050_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == SAA5050);
@@ -64,7 +64,7 @@ INLINE saa5050_state *get_safe_token( running_device *device )
 	return (saa5050_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const saa5050_interface *get_interface( running_device *device )
+INLINE const saa5050_interface *get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == SAA5050));
@@ -197,7 +197,7 @@ READ8_DEVICE_HANDLER( saa5050_videoram_r )
 /* this should probably be put at the end of saa5050 update,
 but p2000t in MESS does not seem to currently support it.
 Hence, we leave it independent for the moment */
-void saa5050_frame_advance( running_device *device )
+void saa5050_frame_advance( device_t *device )
 {
 	saa5050_state *saa5050 = get_safe_token(device);
 
@@ -206,7 +206,7 @@ void saa5050_frame_advance( running_device *device )
 		saa5050->frame_count = 0;
 }
 
-void saa5050_update( running_device *device, bitmap_t *bitmap, const rectangle *cliprect  )
+void saa5050_update( device_t *device, bitmap_t *bitmap, const rectangle *cliprect  )
 {
 	saa5050_state *saa5050 = get_safe_token(device);
 	int code, colour;

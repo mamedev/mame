@@ -37,9 +37,9 @@ public:
 	UINT8    adpcm_play_reg;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *ay1;
-	running_device *ay2;
+	device_t *maincpu;
+	device_t *ay1;
+	device_t *ay2;
 };
 
 

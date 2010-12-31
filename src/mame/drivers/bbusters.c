@@ -642,7 +642,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static void sound_irq( running_device *device, int irq )
+static void sound_irq( device_t *device, int irq )
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }

@@ -18,12 +18,12 @@ public:
 	int        bank0, bank1, bank2;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *k051316_1;
-	running_device *k051316_2;
-	running_device *k051316_3;
-	running_device *k051960;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *k051316_1;
+	device_t *k051316_2;
+	device_t *k051316_3;
+	device_t *k051960;
 };
 
 

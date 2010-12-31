@@ -131,7 +131,7 @@ static INTERRUPT_GEN( cave_interrupt )
 }
 
 /* Called by the YMZ280B to set the IRQ state */
-static void sound_irq_gen( running_device *device, int state )
+static void sound_irq_gen( device_t *device, int state )
 {
 	cave_state *cave = device->machine->driver_data<cave_state>();
 	cave->sound_irq = (state != 0);
@@ -1824,7 +1824,7 @@ static const ymz280b_interface ymz280b_intf =
 	sound_irq_gen
 };
 
-static void irqhandler(running_device *device, int irq)
+static void irqhandler(device_t *device, int irq)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }

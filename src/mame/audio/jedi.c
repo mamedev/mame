@@ -147,7 +147,7 @@ static WRITE8_HANDLER( speech_strobe_w )
 
 	if ((new_speech_strobe_state != state->speech_strobe_state) && new_speech_strobe_state)
 	{
-		running_device *tms = space->machine->device("tms");
+		device_t *tms = space->machine->device("tms");
 		tms5220_data_w(tms, 0, *state->speech_data);
 	}
 	state->speech_strobe_state = new_speech_strobe_state;

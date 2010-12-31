@@ -40,7 +40,7 @@ public:
 	UINT32         sample_offs;	// only used if ROMTEST = 1
 
 	/* devices */
-	running_device *maincpu;
+	device_t *maincpu;
 };
 
 /*----------- defined in video/psikyosh.c -----------*/

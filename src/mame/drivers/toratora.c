@@ -39,10 +39,10 @@ public:
 	UINT8      clear_tv;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *pia_u1;
-	running_device *pia_u2;
-	running_device *pia_u3;
+	device_t *maincpu;
+	device_t *pia_u1;
+	device_t *pia_u2;
+	device_t *pia_u3;
 };
 
 

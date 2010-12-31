@@ -21,8 +21,8 @@ public:
 	int p1_wobble, p2_wobble;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
+	device_t *maincpu;
+	device_t *audiocpu;
 };
 
 /*----------- defined in video/oneshot.c -----------*/

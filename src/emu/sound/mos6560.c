@@ -120,7 +120,7 @@ struct _mos6560_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE mos6560_state *get_safe_token( running_device *device )
+INLINE mos6560_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == MOS656X);
@@ -128,7 +128,7 @@ INLINE mos6560_state *get_safe_token( running_device *device )
 	return (mos6560_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const mos6560_interface *get_interface( running_device *device )
+INLINE const mos6560_interface *get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == MOS656X));
@@ -202,13 +202,13 @@ INLINE const mos6560_interface *get_interface( running_device *device )
     IMPLEMENTATION
 *****************************************************************************/
 
-static void mos6560_soundport_w( running_device *device, int offset, int data );
+static void mos6560_soundport_w( device_t *device, int offset, int data );
 
 /*-------------------------------------------------
  mos6560_draw_character
 -------------------------------------------------*/
 
-static void mos6560_draw_character( running_device *device, int ybegin, int yend, int ch, int yoff, int xoff, UINT16 *color )
+static void mos6560_draw_character( device_t *device, int ybegin, int yend, int ch, int yoff, int xoff, UINT16 *color )
 {
 	mos6560_state *mos6560 = get_safe_token(device);
 	int y, code;
@@ -232,7 +232,7 @@ static void mos6560_draw_character( running_device *device, int ybegin, int yend
  mos6560_draw_character_multi
 -------------------------------------------------*/
 
-static void mos6560_draw_character_multi( running_device *device, int ybegin, int yend, int ch, int yoff, int xoff, UINT16 *color )
+static void mos6560_draw_character_multi( device_t *device, int ybegin, int yend, int ch, int yoff, int xoff, UINT16 *color )
 {
 	mos6560_state *mos6560 = get_safe_token(device);
 	int y, code;
@@ -256,7 +256,7 @@ static void mos6560_draw_character_multi( running_device *device, int ybegin, in
  mos6560_drawlines - draw a certain numer of lines
 -------------------------------------------------*/
 
-static void mos6560_drawlines( running_device *device, int first, int last )
+static void mos6560_drawlines( device_t *device, int first, int last )
 {
 	mos6560_state *mos6560 = get_safe_token(device);
 	int line, vline;
@@ -491,7 +491,7 @@ READ8_DEVICE_HANDLER( mos6560_port_r )
  mos6560_raster_interrupt_gen
 -------------------------------------------------*/
 
-void mos6560_raster_interrupt_gen( running_device *device )
+void mos6560_raster_interrupt_gen( device_t *device )
 {
 	mos6560_state *mos6560 = get_safe_token(device);
 
@@ -510,7 +510,7 @@ void mos6560_raster_interrupt_gen( running_device *device )
      main screen bitmap
 -------------------------------------------------*/
 
-UINT32 mos6560_video_update( running_device *device, bitmap_t *bitmap, const rectangle *cliprect )
+UINT32 mos6560_video_update( device_t *device, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	mos6560_state *mos6560 = get_safe_token(device);
 
@@ -575,7 +575,7 @@ UINT32 mos6560_video_update( running_device *device, bitmap_t *bitmap, const rec
  mos6560_soundport_w - write to regs
 -------------------------------------------------*/
 
-static void mos6560_soundport_w( running_device *device, int offset, int data )
+static void mos6560_soundport_w( device_t *device, int offset, int data )
 {
 	mos6560_state *mos6560 = get_safe_token(device);
 	int old = mos6560->reg[offset];
@@ -735,7 +735,7 @@ static STREAM_UPDATE( mos6560_update )
      (to be called at device start)
 -------------------------------------------------*/
 
-static void mos6560_sound_start( running_device *device )
+static void mos6560_sound_start( device_t *device )
 {
 	mos6560_state *mos6560 = get_safe_token(device);
 	int i;

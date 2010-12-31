@@ -30,7 +30,7 @@ static const UINT16 tcnt[] = { TCNT0, TCNT1, TCNT2 };
 static const UINT16 tcor[] = { TCOR0, TCOR1, TCOR2 };
 static const UINT16 tcr[] = { TCR0, TCR1, TCR2 };
 
-INLINE sh4_state *get_safe_token(running_device *device)
+INLINE sh4_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SH4);
@@ -995,7 +995,7 @@ READ32_HANDLER( sh4_internal_r )
 	return sh4->m[offset];
 }
 
-void sh4_set_frt_input(running_device *device, int state)
+void sh4_set_frt_input(device_t *device, int state)
 {
 	sh4_state *sh4 = get_safe_token(device);
 
@@ -1031,7 +1031,7 @@ void sh4_set_frt_input(running_device *device, int state)
 #endif
 }
 
-void sh4_set_irln_input(running_device *device, int value)
+void sh4_set_irln_input(device_t *device, int value)
 {
 	sh4_state *sh4 = get_safe_token(device);
 
@@ -1160,7 +1160,7 @@ void sh4_parse_configuration(sh4_state *sh4, const struct sh4_config *conf)
 	}
 }
 
-void sh4_common_init(running_device *device)
+void sh4_common_init(device_t *device)
 {
 	sh4_state *sh4 = get_safe_token(device);
 	int i;
@@ -1187,7 +1187,7 @@ void sh4_common_init(running_device *device)
 	sh4->m = auto_alloc_array(device->machine, UINT32, 16384);
 }
 
-void sh4_dma_ddt(running_device *device, struct sh4_ddt_dma *s)
+void sh4_dma_ddt(device_t *device, struct sh4_ddt_dma *s)
 {
 	sh4_state *sh4 = get_safe_token(device);
 	UINT32 chcr;

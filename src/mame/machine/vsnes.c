@@ -362,7 +362,7 @@ DRIVER_INIT( vsnormal )
 
 static WRITE8_HANDLER( gun_in0_w )
 {
-	running_device *ppu1 = space->machine->device("ppu1");
+	device_t *ppu1 = space->machine->device("ppu1");
 	static int zapstore;
 
 	if (vsnes_do_vrom_bank)
@@ -678,7 +678,7 @@ static void mapper4_set_chr( running_machine *machine )
 #define BOTTOM_VISIBLE_SCANLINE	239		/* The bottommost visible scanline */
 #define NUM_SCANLINE 262
 
-static void mapper4_irq( running_device *device, int scanline, int vblank, int blanked )
+static void mapper4_irq( device_t *device, int scanline, int vblank, int blanked )
 {
 	if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
 	{
@@ -699,7 +699,7 @@ static void mapper4_irq( running_device *device, int scanline, int vblank, int b
 
 static WRITE8_HANDLER( mapper4_w )
 {
-	running_device *ppu1 = space->machine->device("ppu1");
+	device_t *ppu1 = space->machine->device("ppu1");
 	UINT8 MMC3_helper, cmd;
 
 	switch (offset & 0x6001)
@@ -1019,7 +1019,7 @@ DRIVER_INIT( bnglngby )
 
 static WRITE8_HANDLER( vsdual_vrom_banking )
 {
-	running_device *other_cpu = (space->cpu == space->machine->device("maincpu")) ? space->machine->device("sub") : space->machine->device("maincpu");
+	device_t *other_cpu = (space->cpu == space->machine->device("maincpu")) ? space->machine->device("sub") : space->machine->device("maincpu");
 
 	/* switch vrom */
 	(space->cpu == space->machine->device("maincpu")) ? memory_set_bank(space->machine, "bank2", BIT(data, 2)) : memory_set_bank(space->machine, "bank3", BIT(data, 2));

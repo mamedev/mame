@@ -20,9 +20,9 @@ public:
 	int      clown_x, clown_y, clown_z;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *samples;
-	running_device *discrete;
+	device_t *maincpu;
+	device_t *samples;
+	device_t *discrete;
 
 	/* game id */
 	int      game_id;

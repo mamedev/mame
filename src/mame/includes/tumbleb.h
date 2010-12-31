@@ -28,9 +28,9 @@ public:
 	int         sprite_yoffset;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *oki;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *oki;
 };
 
 /*----------- defined in video/tumbleb.c -----------*/

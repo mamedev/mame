@@ -82,7 +82,7 @@ struct _i80286_state
 	UINT8 ea_seg;	/* effective segment of the address */
 };
 
-INLINE i80286_state *get_safe_token(running_device *device)
+INLINE i80286_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == I80286);

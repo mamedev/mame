@@ -93,7 +93,7 @@ static const UINT8 led_map[16] =
  *
  *************************************/
 
-static void dleuro_interrupt(running_device *device, int state)
+static void dleuro_interrupt(device_t *device, int state)
 {
 	cputag_set_input_line(device->machine, "maincpu", 0, state);
 }
@@ -105,7 +105,7 @@ static WRITE8_DEVICE_HANDLER( serial_transmit )
 }
 
 
-static int serial_receive(running_device *device, int channel)
+static int serial_receive(device_t *device, int channel)
 {
 	/* if we still have data to send, do it now */
 	if (channel == 0 && laserdisc_line_r(laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)

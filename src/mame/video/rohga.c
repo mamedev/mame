@@ -419,7 +419,7 @@ sprite 2:
 
 /******************************************************************************/
 
-static void update_rohga( running_device *screen, bitmap_t *bitmap, const rectangle *cliprect, int is_schmeisr )
+static void update_rohga( device_t *screen, bitmap_t *bitmap, const rectangle *cliprect, int is_schmeisr )
 {
 	rohga_state *state = screen->machine->driver_data<rohga_state>();
 	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);

@@ -874,7 +874,7 @@ static WRITE32_HANDLER( sound020_w )
 
 /* National Semiconductor ADC0834 4-channel serial ADC emulation */
 
-static double adc0834_callback( running_device *device, UINT8 input )
+static double adc0834_callback( device_t *device, UINT8 input )
 {
 	switch (input)
 	{
@@ -3620,7 +3620,7 @@ static MACHINE_START( konamigx )
 
 static MACHINE_RESET(konamigx)
 {
-	running_device *k054539_2 = machine->device("konami2");
+	device_t *k054539_2 = machine->device("konami2");
 	int i;
 
 	konamigx_wrport1_0 = konamigx_wrport1_1 = 0;

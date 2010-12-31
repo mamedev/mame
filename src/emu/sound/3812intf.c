@@ -30,11 +30,11 @@ struct _ym3812_state
 	emu_timer *		timer[2];
 	void *			chip;
 	const ym3812_interface *intf;
-	running_device *device;
+	device_t *device;
 };
 
 
-INLINE ym3812_state *get_safe_token(running_device *device)
+INLINE ym3812_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == YM3812);

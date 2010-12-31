@@ -33,13 +33,13 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 
 VIDEO_START( s3c2410 )
 {
-	running_device *device = machine->device( S3C2410_TAG);
+	device_t *device = machine->device( S3C2410_TAG);
 	s3c24xx_video_start( device, machine);
 }
 
 VIDEO_UPDATE( s3c2410 )
 {
-	running_device *device = screen->machine->device( S3C2410_TAG);
+	device_t *device = screen->machine->device( S3C2410_TAG);
 	return s3c24xx_video_update( device, screen, bitmap, cliprect);
 }
 
@@ -87,12 +87,12 @@ DEVICE_GET_INFO( s3c2410 )
 	}
 }
 
-void s3c2410_uart_fifo_w( running_device *device, int uart, UINT8 data)
+void s3c2410_uart_fifo_w( device_t *device, int uart, UINT8 data)
 {
 	s3c24xx_uart_fifo_w( device, uart, data);
 }
 
-void s3c2410_touch_screen( running_device *device, int state)
+void s3c2410_touch_screen( device_t *device, int state)
 {
 	s3c24xx_touch_screen( device, state);
 }
@@ -108,7 +108,7 @@ void s3c2410_nand_calculate_mecc( UINT8 *data, UINT32 size, UINT8 *mecc)
 	for (int i = 0; i < size; i++) nand_update_mecc( mecc, i, data[i]);
 }
 
-void s3c2410_request_eint( running_device *device, UINT32 number)
+void s3c2410_request_eint( device_t *device, UINT32 number)
 {
 	s3c24xx_request_eint( device, number);
 }

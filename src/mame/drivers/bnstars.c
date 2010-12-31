@@ -489,8 +489,8 @@ static VIDEO_START(bnstars)
 
 static VIDEO_UPDATE(bnstars)
 {
-	running_device *left_screen  = screen->machine->device("lscreen");
-	running_device *right_screen = screen->machine->device("rscreen");
+	device_t *left_screen  = screen->machine->device("lscreen");
+	device_t *right_screen = screen->machine->device("rscreen");
 
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 

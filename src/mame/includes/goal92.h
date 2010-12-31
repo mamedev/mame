@@ -27,7 +27,7 @@ public:
 	int         adpcm_toggle;
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 };
 
 

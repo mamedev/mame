@@ -162,7 +162,7 @@ static void set_irq_line(dsp56k_core* cpustate, int irqline, int state)
 /***************************************************************************
     INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
-static void agu_init(dsp56k_core* cpustate, running_device *device)
+static void agu_init(dsp56k_core* cpustate, device_t *device)
 {
 	/* save states - dsp56k_agu members */
 	state_save_register_device_item(device, 0, cpustate->AGU.r0);
@@ -180,7 +180,7 @@ static void agu_init(dsp56k_core* cpustate, running_device *device)
 	state_save_register_device_item(device, 0, cpustate->AGU.temp);
 }
 
-static void alu_init(dsp56k_core* cpustate, running_device *device)
+static void alu_init(dsp56k_core* cpustate, device_t *device)
 {
 	/* save states - dsp56k_alu members */
 	state_save_register_device_item(device, 0, cpustate->ALU.x);

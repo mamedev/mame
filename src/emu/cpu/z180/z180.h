@@ -130,8 +130,8 @@ enum
 
 #ifdef UNUSED_DEFINITION
 /* MMU mapped memory lookup */
-extern UINT8 z180_readmem(running_device *device, offs_t offset);
-extern void z180_writemem(running_device *device, offs_t offset, UINT8 data);
+extern UINT8 z180_readmem(device_t *device, offs_t offset);
+extern void z180_writemem(device_t *device, offs_t offset, UINT8 data);
 #endif
 
 DECLARE_LEGACY_CPU_DEVICE(Z180, z180);

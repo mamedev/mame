@@ -35,7 +35,7 @@ void jaguar_dsp_resume(running_machine *machine);
 
 void cojag_sound_init(running_machine *machine);
 
-void jaguar_external_int(running_device *device, int state);
+void jaguar_external_int(device_t *device, int state);
 
 READ16_HANDLER( jaguar_jerry_regs_r );
 WRITE16_HANDLER( jaguar_jerry_regs_w );
@@ -53,8 +53,8 @@ extern UINT8 blitter_status;
 void jaguar_gpu_suspend(running_machine *machine);
 void jaguar_gpu_resume(running_machine *machine);
 
-void jaguar_gpu_cpu_int(running_device *device);
-void jaguar_dsp_cpu_int(running_device *device);
+void jaguar_gpu_cpu_int(device_t *device);
+void jaguar_dsp_cpu_int(device_t *device);
 
 READ32_HANDLER( jaguar_blitter_r );
 WRITE32_HANDLER( jaguar_blitter_w );

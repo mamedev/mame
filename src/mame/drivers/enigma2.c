@@ -77,8 +77,8 @@ public:
 	emu_timer *interrupt_assert_timer;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
+	device_t *maincpu;
+	device_t *audiocpu;
 };
 
 

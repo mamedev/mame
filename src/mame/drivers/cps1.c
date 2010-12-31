@@ -2920,7 +2920,7 @@ GFXDECODE_END
 
 
 
-static void cps1_irq_handler_mus(running_device *device, int irq)
+static void cps1_irq_handler_mus(device_t *device, int irq)
 {
 	cps_state *state = device->machine->driver_data<cps_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
@@ -3095,7 +3095,7 @@ static ADDRESS_MAP_START( sf2mdt_z80map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 ADDRESS_MAP_END
 
-static void m5205_int1(running_device *device)
+static void m5205_int1(device_t *device)
 {
 //  msm5205_data_w(device, sample_buffer1 & 0x0F);
 //  sample_buffer1 >>= 4;
@@ -3104,7 +3104,7 @@ static void m5205_int1(running_device *device)
 //      cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static void m5205_int2(running_device *device)
+static void m5205_int2(device_t *device)
 {
 //  msm5205_data_w(device, sample_buffer2 & 0x0F);
 //  sample_buffer2 >>= 4;

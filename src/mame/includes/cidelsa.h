@@ -37,7 +37,7 @@ public:
 
 	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1869_device> m_vis;
-	optional_device<running_device> m_psg;
+	optional_device<device_t> m_psg;
 
 	virtual void machine_reset();
 

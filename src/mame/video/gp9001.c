@@ -594,7 +594,7 @@ static void gp9001_scroll_reg_data_w(gp9001vdp_device *vdp, offs_t offset, UINT1
 					if ((gp9001_sub_cpu == CPU_2_Z80) && (data == 3))
 					{
 						/* HACK! When tilted, sound CPU needs to be reset. */
-						running_device *ym = vdp->machine->device("ymsnd");
+						device_t *ym = vdp->machine->device("ymsnd");
 
 						if (ym && ym->type() == YM3812)
 						{

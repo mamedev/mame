@@ -73,7 +73,7 @@ Dumping Notes:
 #define SOUND_PCB_CLOCK (6000000)
 
 /* Misc variables */
-static running_device *laserdisc;
+static device_t *laserdisc;
 
 static UINT8 *tile_ram;
 static UINT8 *tile_control_ram;

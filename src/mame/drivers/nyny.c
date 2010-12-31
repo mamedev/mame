@@ -101,13 +101,13 @@ public:
 	UINT16   star_shift_reg;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *audiocpu2;
-	running_device *ic48_1;
-	running_device *mc6845;
-	running_device *pia1;
-	running_device *pia2;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *audiocpu2;
+	device_t *ic48_1;
+	device_t *mc6845;
+	device_t *pia1;
+	device_t *pia2;
 };
 
 

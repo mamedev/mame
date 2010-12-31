@@ -145,7 +145,7 @@ static WRITE8_HANDLER( fromance_adpcm_w )
 }
 
 
-static void fromance_adpcm_int( running_device *device )
+static void fromance_adpcm_int( device_t *device )
 {
 	fromance_state *state = device->machine->driver_data<fromance_state>();
 

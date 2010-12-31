@@ -64,13 +64,13 @@ struct _akiko_state
 	UINT8 *	cdrom_toc;
 	emu_timer *dma_timer;
 	emu_timer *frame_timer;
-	running_device *i2cmem;
+	device_t *i2cmem;
 };
 
 static TIMER_CALLBACK(akiko_dma_proc);
 static TIMER_CALLBACK(akiko_frame_proc);
 
-INLINE akiko_state *get_safe_token(running_device *device)
+INLINE akiko_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == AKIKO);
@@ -289,7 +289,7 @@ static const char* get_akiko_reg_name(int reg)
 
 static void akiko_cdda_stop(akiko_state *state)
 {
-	running_device *cdda = cdda_from_cdrom(state->machine, state->cdrom);
+	device_t *cdda = cdda_from_cdrom(state->machine, state->cdrom);
 
 	if (cdda != NULL)
 	{
@@ -300,7 +300,7 @@ static void akiko_cdda_stop(akiko_state *state)
 
 static void akiko_cdda_play(akiko_state *state, UINT32 lba, UINT32 num_blocks)
 {
-	running_device *cdda = cdda_from_cdrom(state->machine, state->cdrom);
+	device_t *cdda = cdda_from_cdrom(state->machine, state->cdrom);
 	if (cdda != NULL)
 	{
 		cdda_start_audio(cdda, lba, num_blocks);
@@ -310,7 +310,7 @@ static void akiko_cdda_play(akiko_state *state, UINT32 lba, UINT32 num_blocks)
 
 static void akiko_cdda_pause(akiko_state *state, int pause)
 {
-	running_device *cdda = cdda_from_cdrom(state->machine, state->cdrom);
+	device_t *cdda = cdda_from_cdrom(state->machine, state->cdrom);
 	if (cdda != NULL)
 	{
 		if (cdda_audio_active(cdda) && cdda_audio_paused(cdda) != pause )
@@ -331,7 +331,7 @@ static void akiko_cdda_pause(akiko_state *state, int pause)
 
 static UINT8 akiko_cdda_getstatus(akiko_state *state, UINT32 *lba)
 {
-	running_device *cdda = cdda_from_cdrom(state->machine, state->cdrom);
+	device_t *cdda = cdda_from_cdrom(state->machine, state->cdrom);
 
 	if ( lba ) *lba = 0;
 
@@ -373,7 +373,7 @@ static void akiko_set_cd_status(akiko_state *state, UINT32 status)
 static TIMER_CALLBACK(akiko_frame_proc)
 {
 	akiko_state *state = (akiko_state *)ptr;
-	running_device *cdda = cdda_from_cdrom(machine, state->cdrom);
+	device_t *cdda = cdda_from_cdrom(machine, state->cdrom);
 
 	(void)param;
 

@@ -175,7 +175,7 @@ typedef struct {
 
 } i860_state_t;
 
-INLINE i860_state_t *get_safe_token(running_device *device)
+INLINE i860_state_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == I860);
@@ -193,7 +193,7 @@ extern void i860_gen_interrupt(i860_state_t*);
 
 /* This is the external interface for asserting/deasserting a pin on
    the i860.  */
-extern void i860_set_pin(running_device *, int, int);
+extern void i860_set_pin(device_t *, int, int);
 
 /* Hard or soft reset.  */
 extern void reset_i860(i860_state_t*);

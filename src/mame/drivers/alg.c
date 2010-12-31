@@ -36,7 +36,7 @@ public:
 		: amiga_state(machine, config) { }
 
 
-	running_device *laserdisc;
+	device_t *laserdisc;
 	emu_timer *serial_timer;
 	UINT8 serial_timer_active;
 	UINT16 input_select;

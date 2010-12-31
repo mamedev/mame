@@ -3080,7 +3080,7 @@ static DRIVER_INIT( dkongx )
 {
 	UINT8 *decrypted;
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	running_device *eeprom = machine->device("eeprom");
+	device_t *eeprom = machine->device("eeprom");
 
 	decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 

@@ -426,7 +426,7 @@ static WRITE8_HANDLER( sound_vol )
 	flt_volume_set_volume(state->f2203_3r, rgain);
 }
 
-static void ym2203_irq(running_device *device, int irq)
+static void ym2203_irq(device_t *device, int irq)
 {
 	lockon_state *state = device->machine->driver_data<lockon_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE );

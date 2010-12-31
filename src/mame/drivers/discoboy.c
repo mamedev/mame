@@ -63,7 +63,7 @@ public:
 	int      adpcm_data;
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 };
 
 
@@ -321,7 +321,7 @@ ADDRESS_MAP_END
 //  state->adpcm_data = data;
 //}
 
-static void splash_msm5205_int( running_device *device )
+static void splash_msm5205_int( device_t *device )
 {
 	discoboy_state *state = device->machine->driver_data<discoboy_state>();
 	msm5205_data_w(device, state->adpcm_data >> 4);

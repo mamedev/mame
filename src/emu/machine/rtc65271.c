@@ -18,7 +18,7 @@
 #include "emu.h"
 #include "rtc65271.h"
 
-static void field_interrupts(running_device *device);
+static void field_interrupts(device_t *device);
 static TIMER_CALLBACK( rtc_SQW_callback );
 static TIMER_CALLBACK( rtc_begin_update_callback );
 static TIMER_CALLBACK( rtc_end_update_callback );
@@ -50,10 +50,10 @@ struct _rtc65271_state
 	UINT8 SQW_internal_state;
 
 	/* callback called when interrupt pin state changes (may be NULL) */
-	void (*interrupt_callback)(running_device *device, int state);
+	void (*interrupt_callback)(device_t *device, int state);
 };
 
-INLINE rtc65271_state *get_safe_token(running_device *device)
+INLINE rtc65271_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == RTC65271);
@@ -193,7 +193,7 @@ static UINT8 BCD_to_binary(UINT8 data)
 /*
     load the SRAM and register contents from file
 */
-static int rtc65271_file_load(running_device *device, mame_file *file)
+static int rtc65271_file_load(device_t *device, mame_file *file)
 {
 	rtc65271_state *state = get_safe_token(device);
 	UINT8 buf;
@@ -277,7 +277,7 @@ static int rtc65271_file_load(running_device *device, mame_file *file)
 /*
     save the SRAM and register contents to file
 */
-static int rtc65271_file_save(running_device *device, mame_file *file)
+static int rtc65271_file_save(device_t *device, mame_file *file)
 {
 	rtc65271_state *state = get_safe_token(device);
 	UINT8 buf;
@@ -321,7 +321,7 @@ static int rtc65271_file_save(running_device *device, mame_file *file)
     xramsel: select RTC register if 0, XRAM if 1
     offset: address (A0-A5 pins)
 */
-UINT8 rtc65271_r(running_device *device, int xramsel, offs_t offset)
+UINT8 rtc65271_r(device_t *device, int xramsel, offs_t offset)
 {
 	rtc65271_state *state = get_safe_token(device);
 	int reply;
@@ -379,7 +379,7 @@ READ8_DEVICE_HANDLER( rtc65271_xram_r )
     xramsel: select RTC register if 0, XRAM if 1
     offset: address (A0-A5 pins)
 */
-void rtc65271_w(running_device *device, int xramsel, offs_t offset, UINT8 data)
+void rtc65271_w(device_t *device, int xramsel, offs_t offset, UINT8 data)
 {
 	rtc65271_state *state = get_safe_token(device);
 	if (xramsel)
@@ -464,7 +464,7 @@ WRITE8_DEVICE_HANDLER( rtc65271_xram_w )
 	rtc65271_w( device, 1, offset, data );
 }
 
-static void field_interrupts(running_device *device)
+static void field_interrupts(device_t *device)
 {
 	rtc65271_state *state = get_safe_token(device);
 
@@ -493,7 +493,7 @@ static void field_interrupts(running_device *device)
 */
 static TIMER_CALLBACK( rtc_SQW_callback )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	rtc65271_state *state = get_safe_token(device);
 	attotime half_period;
 
@@ -514,7 +514,7 @@ static TIMER_CALLBACK( rtc_SQW_callback )
 */
 static TIMER_CALLBACK( rtc_begin_update_callback )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	rtc65271_state *state = get_safe_token(device);
 
 	if (((state->regs[reg_A] & reg_A_DV) == 0x20) && ! (state->regs[reg_B] & reg_B_SET))
@@ -537,7 +537,7 @@ static TIMER_CALLBACK( rtc_end_update_callback )
 		31,28,31, 30,31,30,
 		31,31,30, 31,30,31
 	};
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	rtc65271_state *state = get_safe_token(device);
 	UINT8 (*increment)(UINT8 data);
 	int c59, c23, c12, c11, c29;

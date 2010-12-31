@@ -213,7 +213,7 @@ WRITE8_HANDLER( hcastle_pf2_control_w )
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 *sbank, int bank )
 {
 	hcastle_state *state = machine->driver_data<hcastle_state>();
-	running_device *k007121 = bank ? state->k007121_2 : state->k007121_1;
+	device_t *k007121 = bank ? state->k007121_2 : state->k007121_1;
 	int base_color = (k007121_ctrlram_r(k007121, 6) & 0x30) * 2;
 	int bank_base = (bank == 0) ? 0x4000 * (state->gfx_bank & 1) : 0;
 

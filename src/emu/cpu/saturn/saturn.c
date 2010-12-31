@@ -88,7 +88,7 @@ struct _saturn_state
 	int icount;
 };
 
-INLINE saturn_state *get_safe_token(running_device *device)
+INLINE saturn_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SATURN);

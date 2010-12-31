@@ -31,7 +31,7 @@ public:
 	const int   *raiga_jumppoints;
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 };
 
 

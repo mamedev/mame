@@ -1384,7 +1384,7 @@ static void handle_menus(running_machine *machine)
 //  followers_set_cpu
 //============================================================
 
-static void followers_set_cpu(running_device *device)
+static void followers_set_cpu(device_t *device)
 {
 	astring title;
 
@@ -1439,7 +1439,7 @@ static void update_views(void)
 }
 
 
-void debugint_wait_for_debugger(running_device &device, bool firststop)
+void debugint_wait_for_debugger(device_t &device, bool firststop)
 {
 
 	if (firststop && list == NULL)

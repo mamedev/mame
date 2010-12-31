@@ -53,7 +53,7 @@ struct pic8259_interface
 /* device interface */
 READ8_DEVICE_HANDLER( pic8259_r );
 WRITE8_DEVICE_HANDLER( pic8259_w );
-int pic8259_acknowledge(running_device *device);
+int pic8259_acknowledge(device_t *device);
 
 /* interrupt requests */
 WRITE_LINE_DEVICE_HANDLER( pic8259_ir0_w );

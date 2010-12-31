@@ -67,7 +67,7 @@ enum
 typedef struct _dsp32_config dsp32_config;
 struct _dsp32_config
 {
-	void	(*output_pins_changed)(running_device *device, UINT32 pins);	/* a change has occurred on an output pin */
+	void	(*output_pins_changed)(device_t *device, UINT32 pins);	/* a change has occurred on an output pin */
 };
 
 
@@ -78,7 +78,7 @@ struct _dsp32_config
 
 DECLARE_LEGACY_CPU_DEVICE(DSP32C, dsp32c);
 
-extern void dsp32c_pio_w(running_device *device, int reg, int data);
-extern int dsp32c_pio_r(running_device *device, int reg);
+extern void dsp32c_pio_w(device_t *device, int reg, int data);
+extern int dsp32c_pio_r(device_t *device, int reg);
 
 #endif /* __DSP32_H__ */

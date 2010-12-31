@@ -189,6 +189,6 @@ void sh2_recalc_irq(sh2_state *sh2);
 void sh2_set_irq_line(sh2_state *sh2, int irqline, int state);
 void sh2_exception(sh2_state *sh2, const char *message, int irqline);
 void sh2_do_dma(sh2_state *sh2, int dma);
-void sh2_notify_dma_data_available(running_device *device);
+void sh2_notify_dma_data_available(device_t *device);
 
 #endif /* __SH2COMN_H__ */

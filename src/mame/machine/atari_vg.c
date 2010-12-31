@@ -13,7 +13,7 @@
 typedef struct _atari_vg_earom_state atari_vg_earom_state;
 struct _atari_vg_earom_state
 {
-	running_device *device;
+	device_t *device;
 
 	int offset;
 	int data;
@@ -31,7 +31,7 @@ struct _atari_vg_earom_state
     into a atari_vg_earom_state
 -------------------------------------------------*/
 
-INLINE atari_vg_earom_state *get_safe_token(running_device *device)
+INLINE atari_vg_earom_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == ATARIVGEAROM);

@@ -5,14 +5,14 @@
 typedef struct _filter_rc_state filter_rc_state;
 struct _filter_rc_state
 {
-	running_device *device;
+	device_t *device;
 	sound_stream *	stream;
 	int				k;
 	int				memory;
 	int				type;
 };
 
-INLINE filter_rc_state *get_safe_token(running_device *device)
+INLINE filter_rc_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == FILTER_RC);
@@ -102,7 +102,7 @@ static DEVICE_START( filter_rc )
 }
 
 
-void filter_rc_set_RC(running_device *device, int type, double R1, double R2, double R3, double C)
+void filter_rc_set_RC(device_t *device, int type, double R1, double R2, double R3, double C)
 {
 	filter_rc_state *info = get_safe_token(device);
 

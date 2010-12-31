@@ -19,7 +19,7 @@ struct _s2636_sound
 };
 
 
-static s2636_sound *get_token(running_device *device)
+static s2636_sound *get_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == S2636_SOUND);
@@ -27,7 +27,7 @@ static s2636_sound *get_token(running_device *device)
 }
 
 
-void s2636_soundport_w (running_device *device, int offset, int data)
+void s2636_soundport_w (device_t *device, int offset, int data)
 {
 	s2636_sound *token = get_token(device);
 

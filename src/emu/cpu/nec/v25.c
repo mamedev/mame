@@ -37,7 +37,7 @@ static const nec_config default_config =
 
 extern int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, const nec_config *config);
 
-INLINE v25_state_t *get_safe_token(running_device *device)
+INLINE v25_state_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == V25 || device->type() == V35);

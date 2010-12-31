@@ -163,10 +163,10 @@ typedef struct
 
 	UINT32		noise_tab[32];			/* 17bit Noise Generator periods */
 
-	void (*irqhandler)(running_device *device, int irq);		/* IRQ function handler */
+	void (*irqhandler)(device_t *device, int irq);		/* IRQ function handler */
 	write8_device_func porthandler;		/* port write function handler */
 
-	running_device *device;
+	device_t *device;
 	unsigned int clock;					/* chip clock in Hz (passed from 2151intf.c) */
 	unsigned int sampfreq;				/* sampling frequency in Hz (passed from 2151intf.c) */
 } YM2151;
@@ -1391,7 +1391,7 @@ STATE_POSTLOAD( ym2151_postload )
 		set_connect(YM2151_chip, &YM2151_chip->oper[j*4], j, YM2151_chip->connect[j]);
 }
 
-static void ym2151_state_save_register( YM2151 *chip, running_device *device )
+static void ym2151_state_save_register( YM2151 *chip, device_t *device )
 {
 	int j;
 
@@ -1493,7 +1493,7 @@ STATE_POSTLOAD( ym2151_postload )
 {
 }
 
-static void ym2151_state_save_register( YM2151 *chip, running_device *device )
+static void ym2151_state_save_register( YM2151 *chip, device_t *device )
 {
 }
 #endif
@@ -1506,7 +1506,7 @@ static void ym2151_state_save_register( YM2151 *chip, running_device *device )
 *   'clock' is the chip clock in Hz
 *   'rate' is sampling rate
 */
-void * ym2151_init(running_device *device, int clock, int rate)
+void * ym2151_init(device_t *device, int clock, int rate)
 {
 	YM2151 *PSG;
 
@@ -2488,7 +2488,7 @@ void ym2151_update_one(void *chip, SAMP **buffers, int length)
 	}
 }
 
-void ym2151_set_irq_handler(void *chip, void(*handler)(running_device *device, int irq))
+void ym2151_set_irq_handler(void *chip, void(*handler)(device_t *device, int irq))
 {
 	YM2151 *PSG = (YM2151 *)chip;
 	PSG->irqhandler = handler;

@@ -72,6 +72,6 @@ DECLARE_LEGACY_CPU_DEVICE(MB8844, mb8844);
 
 CPU_DISASSEMBLE( mb88 );
 
-void mb88_external_clock_w(running_device *device, int state);
+void mb88_external_clock_w(device_t *device, int state);
 
 #endif /* __MB88XX_H__ */

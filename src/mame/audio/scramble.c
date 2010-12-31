@@ -79,7 +79,7 @@ READ8_DEVICE_HANDLER( frogger_portB_r )
 
 WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w )
 {
-	running_device *target = device->machine->device("konami_7474");
+	device_t *target = device->machine->device("konami_7474");
 
 	/* the complement of bit 3 is connected to the flip-flop's clock */
 	ttl7474_clock_w(target, (~data & 0x08) >> 3);
@@ -90,7 +90,7 @@ WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w )
 
 WRITE8_DEVICE_HANDLER( mrkougar_sh_irqtrigger_w )
 {
-	running_device *target = device->machine->device("konami_7474");
+	device_t *target = device->machine->device("konami_7474");
 
 	/* the complement of bit 3 is connected to the flip-flop's clock */
 	ttl7474_clock_w(target, (~data & 0x08) >> 3);
@@ -98,7 +98,7 @@ WRITE8_DEVICE_HANDLER( mrkougar_sh_irqtrigger_w )
 
 static IRQ_CALLBACK(scramble_sh_irq_callback)
 {
-	running_device *target = device->machine->device("konami_7474");
+	device_t *target = device->machine->device("konami_7474");
 
 	/* interrupt acknowledge clears the flip-flop --
        we need to pulse the CLR line because MAME's core never clears this
@@ -128,7 +128,7 @@ READ8_DEVICE_HANDLER( hotshock_soundlatch_r )
 	return soundlatch_r(cputag_get_address_space(device->machine, "audiocpu", ADDRESS_SPACE_PROGRAM),0);
 }
 
-static void filter_w(running_device *device, int data)
+static void filter_w(device_t *device, int data)
 {
 	int C;
 

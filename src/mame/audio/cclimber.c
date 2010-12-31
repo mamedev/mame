@@ -27,7 +27,7 @@ static void cclimber_play_sample(running_machine *machine, int start,int freq,in
 	int len;
 	int romlen = memory_region_length(machine, "samples");
 	const UINT8 *rom = memory_region(machine, "samples");
-	running_device *samples = machine->device("samples");
+	device_t *samples = machine->device("samples");
 
 
 	if (!rom) return;

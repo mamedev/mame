@@ -54,7 +54,7 @@ struct _vtlb_state
     given CPU
 -------------------------------------------------*/
 
-vtlb_state *vtlb_alloc(running_device *cpu, int space, int fixed_entries, int dynamic_entries)
+vtlb_state *vtlb_alloc(device_t *cpu, int space, int fixed_entries, int dynamic_entries)
 {
 	vtlb_state *vtlb;
 

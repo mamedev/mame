@@ -152,9 +152,9 @@ public:
 	UINT8     OldPort4;
 	UINT32    *ResetPatch;
 
-	running_device *maincpu;
-	running_device *ds1302;
-	running_device *vr0video;
+	device_t *maincpu;
+	device_t *ds1302;
+	device_t *vr0video;
 };
 
 static void IntReq( running_machine *machine, int num )

@@ -66,7 +66,7 @@ struct _tx1_sound_state
 	UINT16 eng_voltages[16];
 };
 
-INLINE tx1_sound_state *get_safe_token(running_device *device)
+INLINE tx1_sound_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TX1 || device->type() == BUGGYBOY);
@@ -433,8 +433,8 @@ WRITE8_DEVICE_HANDLER( bb_ym2_a_w )
 WRITE8_DEVICE_HANDLER( bb_ym2_b_w )
 {
 	tx1_sound_state *state = get_safe_token(device);
-	running_device *ym1 = device->machine->device("ym1");
-	running_device *ym2 = device->machine->device("ym2");
+	device_t *ym1 = device->machine->device("ym1");
+	device_t *ym2 = device->machine->device("ym2");
 	double gain;
 
 	stream_update(state->stream);

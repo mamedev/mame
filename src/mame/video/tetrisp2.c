@@ -677,8 +677,8 @@ VIDEO_UPDATE( rocknms )
 	int scr_pri;
 	int rot_pri;
 
-	running_device *left_screen  = screen->machine->device("lscreen");
-	running_device *right_screen = screen->machine->device("rscreen");
+	device_t *left_screen  = screen->machine->device("lscreen");
+	device_t *right_screen = screen->machine->device("rscreen");
 
 	/* Black background color */
 	if (screen == left_screen)

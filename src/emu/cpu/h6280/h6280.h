@@ -82,8 +82,8 @@ READ8_HANDLER( h6280_timer_r );
 WRITE8_HANDLER( h6280_timer_w );
 
 /* functions for use by the PSG and joypad port only! */
-UINT8 h6280io_get_buffer(running_device*);
-void h6280io_set_buffer(running_device*, UINT8);
+UINT8 h6280io_get_buffer(device_t*);
+void h6280io_set_buffer(device_t*, UINT8);
 
 CPU_DISASSEMBLE( h6280 );
 

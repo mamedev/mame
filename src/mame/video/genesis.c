@@ -292,7 +292,7 @@ READ16_HANDLER( genesis_vdp_r )
 
 WRITE16_HANDLER( genesis_vdp_w )
 {
-	running_device *device;
+	device_t *device;
 	switch (offset)
 	{
 		case 0x00:	/* Write data */

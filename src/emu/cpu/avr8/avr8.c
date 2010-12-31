@@ -75,7 +75,7 @@ enum
 #define ZREG            ((READ_IO_8(cpustate, 31) << 8) | READ_IO_8(cpustate, 30))
 #define SPREG           ((READ_IO_8(cpustate, AVR8_IO_SPH) << 8) | READ_IO_8(cpustate, AVR8_IO_SPL))
 
-INLINE avr8_state *get_safe_token(running_device *device)
+INLINE avr8_state *get_safe_token(device_t *device)
 {
     assert(device != NULL);
     assert(device->type() == AVR8);

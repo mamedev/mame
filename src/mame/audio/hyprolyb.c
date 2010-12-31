@@ -6,14 +6,14 @@
 typedef struct _hyprolyb_adpcm_state hyprolyb_adpcm_state;
 struct _hyprolyb_adpcm_state
 {
-	running_device *msm;
+	device_t *msm;
 	address_space *space;
 	UINT8    adpcm_ready;	// only bootlegs
 	UINT8    adpcm_busy;
 	UINT8    vck_ready;
 };
 
-INLINE hyprolyb_adpcm_state *get_safe_token( running_device *device )
+INLINE hyprolyb_adpcm_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == HYPROLYB_ADPCM);
@@ -111,9 +111,9 @@ static ADDRESS_MAP_START( hyprolyb_adpcm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static void adpcm_vck_callback( running_device *device )
+static void adpcm_vck_callback( device_t *device )
 {
-	running_device *adpcm = device->machine->device("hyprolyb_adpcm");
+	device_t *adpcm = device->machine->device("hyprolyb_adpcm");
 	hyprolyb_adpcm_state *state = get_safe_token(adpcm);
 
 	state->vck_ready = 0x80;

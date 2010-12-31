@@ -786,7 +786,7 @@ static INPUT_PORTS_START( mjgtaste )
 INPUT_PORTS_END
 
 
-static void irqhandler(running_device *device, int linestate)
+static void irqhandler(device_t *device, int linestate)
 {
 	psikyosh_state *state = device->machine->driver_data<psikyosh_state>();
 	cpu_set_input_line(state->maincpu, 12, linestate ? ASSERT_LINE : CLEAR_LINE);

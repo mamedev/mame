@@ -29,8 +29,8 @@ public:
 	UINT8    sample_count;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
+	device_t *maincpu;
+	device_t *audiocpu;
 };
 
 /*----------- defined in video/crgolf.c -----------*/

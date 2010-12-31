@@ -49,7 +49,7 @@
 struct _ldplayer_data
 {
 	/* low-level emulation data */
-	running_device *cpu;					/* CPU index of the 8049 */
+	device_t *cpu;					/* CPU index of the 8049 */
 	timer_device *		tracktimer;				/* timer device */
 	vp931_data_ready_func data_ready_cb;		/* data ready callback */
 
@@ -187,7 +187,7 @@ const ldplayer_interface vp931_interface =
     ready callback
 -------------------------------------------------*/
 
-void vp931_set_data_ready_callback(running_device *device, vp931_data_ready_func callback)
+void vp931_set_data_ready_callback(device_t *device, vp931_data_ready_func callback)
 {
 	laserdisc_state *ld = ldcore_get_safe_token(device);
 	ld->player->data_ready_cb = callback;

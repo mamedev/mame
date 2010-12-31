@@ -177,7 +177,7 @@ struct _es5506_state
 	UINT32		write_latch;			/* currently accumulated data for write */
 	UINT32		read_latch;				/* currently accumulated data for read */
 	UINT32		master_clock;			/* master clock frequency */
-	void		(*irq_callback)(running_device *, int);	/* IRQ callback */
+	void		(*irq_callback)(device_t *, int);	/* IRQ callback */
 	UINT16		(*port_read)(void);		/* input port read */
 
 	UINT8		current_page;			/* current register page */
@@ -194,7 +194,7 @@ struct _es5506_state
 
 	INT16 *		ulaw_lookup;
 	UINT16 *	volume_lookup;
-	running_device *device;
+	device_t *device;
 
 #if MAKE_WAVS
 	void *		wavraw;					/* raw waveform */
@@ -202,7 +202,7 @@ struct _es5506_state
 };
 
 
-INLINE es5506_state *get_safe_token(running_device *device)
+INLINE es5506_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == ES5505 || device->type() == ES5506);
@@ -899,7 +899,7 @@ static STREAM_UPDATE( es5506_update )
 
 ***********************************************************************************************/
 
-static void es5506_start_common(running_device *device, const void *config, device_type sndtype)
+static void es5506_start_common(device_t *device, const void *config, device_type sndtype)
 {
 	const es5506_interface *intf = (const es5506_interface *)config;
 	es5506_state *chip = get_safe_token(device);
@@ -1540,7 +1540,7 @@ READ8_DEVICE_HANDLER( es5506_r )
 
 
 
-void es5506_voice_bank_w(running_device *device, int voice, int bank)
+void es5506_voice_bank_w(device_t *device, int voice, int bank)
 {
 	es5506_state *chip = get_safe_token(device);
 	chip->voice[voice].exbank=bank;
@@ -2142,7 +2142,7 @@ READ16_DEVICE_HANDLER( es5505_r )
 
 
 
-void es5505_voice_bank_w(running_device *device, int voice, int bank)
+void es5505_voice_bank_w(device_t *device, int voice, int bank)
 {
 	es5506_state *chip = get_safe_token(device);
 #if RAINE_CHECK

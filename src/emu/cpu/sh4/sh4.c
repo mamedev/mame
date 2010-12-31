@@ -30,7 +30,7 @@
 
 CPU_DISASSEMBLE( sh4 );
 
-INLINE sh4_state *get_safe_token(running_device *device)
+INLINE sh4_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SH4);
@@ -3606,7 +3606,7 @@ static CPU_SET_INFO( sh4 )
 	}
 }
 
-void sh4_set_ftcsr_callback(running_device *device, sh4_ftcsr_callback callback)
+void sh4_set_ftcsr_callback(device_t *device, sh4_ftcsr_callback callback)
 {
 	sh4_state *sh4 = get_safe_token(device);
 	sh4->ftcsr_read_callback = callback;

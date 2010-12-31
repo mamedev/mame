@@ -103,7 +103,7 @@ DECLARE_LEGACY_SOUND_DEVICE(LELAND, leland_sound);
 DECLARE_LEGACY_SOUND_DEVICE(LELAND_80186, leland_80186_sound);
 DECLARE_LEGACY_SOUND_DEVICE(REDLINE_80186, redline_80186_sound);
 
-void leland_dac_update(running_device *device, int dacnum, UINT8 sample);
+void leland_dac_update(device_t *device, int dacnum, UINT8 sample);
 
 READ8_DEVICE_HANDLER( leland_80186_response_r );
 

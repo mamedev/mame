@@ -13,7 +13,7 @@
 WRITE8_HANDLER( atarifb_out1_w )
 {
 	atarifb_state *state = space->machine->driver_data<atarifb_state>();
-	running_device *discrete = space->machine->device("discrete");
+	device_t *discrete = space->machine->device("discrete");
 
 	state->CTRLD = data;
 
@@ -27,7 +27,7 @@ WRITE8_HANDLER( atarifb_out1_w )
 WRITE8_HANDLER( atarifb4_out1_w )
 {
 	atarifb_state *state = space->machine->driver_data<atarifb_state>();
-	running_device *discrete = space->machine->device("discrete");
+	device_t *discrete = space->machine->device("discrete");
 
 	state->CTRLD = data;
 
@@ -43,7 +43,7 @@ WRITE8_HANDLER( atarifb4_out1_w )
 WRITE8_HANDLER( abaseb_out1_w )
 {
 	atarifb_state *state = space->machine->driver_data<atarifb_state>();
-	running_device *discrete = space->machine->device("discrete");
+	device_t *discrete = space->machine->device("discrete");
 
 	state->CTRLD = data;
 
@@ -70,7 +70,7 @@ WRITE8_HANDLER( abaseb_out1_w )
 WRITE8_HANDLER( soccer_out1_w )
 {
 	atarifb_state *state = space->machine->driver_data<atarifb_state>();
-	running_device *discrete = space->machine->device("discrete");
+	device_t *discrete = space->machine->device("discrete");
 
 	state->CTRLD = data;
 
@@ -94,7 +94,7 @@ WRITE8_HANDLER( soccer_out1_w )
 
 WRITE8_HANDLER( atarifb_out2_w )
 {
-	running_device *discrete = space->machine->device("discrete");
+	device_t *discrete = space->machine->device("discrete");
 
 	discrete_sound_w(discrete, ATARIFB_CROWD_DATA, data & 0x0f);	// Crowd
 
@@ -104,7 +104,7 @@ WRITE8_HANDLER( atarifb_out2_w )
 
 WRITE8_HANDLER( soccer_out2_w )
 {
-	running_device *discrete = space->machine->device("discrete");
+	device_t *discrete = space->machine->device("discrete");
 
 	discrete_sound_w(discrete, ATARIFB_CROWD_DATA, data & 0x0f);	// Crowd
 

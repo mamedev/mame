@@ -371,7 +371,7 @@ ADDRESS_MAP_END
 */
 
 /* YM2151 IRQ */
-static void megasys1_sound_irq(running_device *device, int irq)
+static void megasys1_sound_irq(device_t *device, int irq)
 {
 	if (irq)
 		cputag_set_input_line(device->machine, "soundcpu", 4, HOLD_LINE);
@@ -1637,7 +1637,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 
-static void irq_handler(running_device *device, int irq)
+static void irq_handler(device_t *device, int irq)
 {
 	cputag_set_input_line(device->machine, "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -3850,8 +3850,8 @@ static WRITE16_DEVICE_HANDLER( okim6295_both_w )
 
 static DRIVER_INIT( jitsupro )
 {
-	running_device *oki1 = machine->device("oki1");
-	running_device *oki2 = machine->device("oki2");
+	device_t *oki1 = machine->device("oki1");
+	device_t *oki2 = machine->device("oki2");
 	UINT16 *RAM  = (UINT16 *) memory_region(machine, "maincpu");
 
 	astyanax_rom_decode(machine, "maincpu");		// Code

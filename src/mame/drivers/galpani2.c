@@ -80,7 +80,7 @@ static MACHINE_RESET( galpani2 )
 	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(50)); //initial mcu xchk
 }
 
-static void galpani2_write_kaneko(running_device *device)
+static void galpani2_write_kaneko(device_t *device)
 {
 	address_space *dstspace = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 	int i,x,tpattidx;

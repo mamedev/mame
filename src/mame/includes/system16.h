@@ -87,8 +87,8 @@ public:
 	UINT8 *decrypted_region;	// goldnaxeb1 & bayrouteb1
 
 	/* devices */
-	running_device *maincpu;
-	running_device *soundcpu;
+	device_t *maincpu;
+	device_t *soundcpu;
 };
 
 /*----------- defined in video/system16.c -----------*/

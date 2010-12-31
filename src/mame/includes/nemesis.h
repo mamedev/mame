@@ -41,7 +41,7 @@ public:
 	/* devices */
 	cpu_device *maincpu;
 	cpu_device *audiocpu;
-	running_device *vlm;
+	device_t *vlm;
 };
 
 

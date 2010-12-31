@@ -5,7 +5,7 @@
 
 #include "devlegcy.h"
 
-extern void tms3615_enable_w(running_device *device, int enable);
+extern void tms3615_enable_w(device_t *device, int enable);
 
 #define TMS3615_FOOTAGE_8	0
 #define TMS3615_FOOTAGE_16	1

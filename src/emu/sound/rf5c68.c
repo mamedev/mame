@@ -32,12 +32,12 @@ struct _rf5c68_state
 	UINT8				wbank;
 	UINT8				enable;
 	UINT8				data[0x10000];
-	void				(*sample_callback)(running_device* device,int channel);
-	running_device* device;
+	void				(*sample_callback)(device_t* device,int channel);
+	device_t* device;
 };
 
 
-INLINE rf5c68_state *get_safe_token(running_device *device)
+INLINE rf5c68_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == RF5C68);

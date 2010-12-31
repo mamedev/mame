@@ -435,7 +435,7 @@ static const UINT8 fcmp_cr_table_source[32] =
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE powerpc_state *get_safe_token(running_device *device)
+INLINE powerpc_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == PPC403GA ||
@@ -817,7 +817,7 @@ static CPU_GET_INFO( ppcdrc )
     ppcdrc_set_options - configure DRC options
 -------------------------------------------------*/
 
-void ppcdrc_set_options(running_device *device, UINT32 options)
+void ppcdrc_set_options(device_t *device, UINT32 options)
 {
 	powerpc_state *ppc = get_safe_token(device);
 	ppc->impstate->drcoptions = options;
@@ -829,7 +829,7 @@ void ppcdrc_set_options(running_device *device, UINT32 options)
     region
 -------------------------------------------------*/
 
-void ppcdrc_add_fastram(running_device *device, offs_t start, offs_t end, UINT8 readonly, void *base)
+void ppcdrc_add_fastram(device_t *device, offs_t start, offs_t end, UINT8 readonly, void *base)
 {
 	powerpc_state *ppc = get_safe_token(device);
 	if (ppc->impstate->fastram_select < ARRAY_LENGTH(ppc->impstate->fastram))
@@ -847,7 +847,7 @@ void ppcdrc_add_fastram(running_device *device, offs_t start, offs_t end, UINT8 
     ppcdrc_add_hotspot - add a new hotspot
 -------------------------------------------------*/
 
-void ppcdrc_add_hotspot(running_device *device, offs_t pc, UINT32 opcode, UINT32 cycles)
+void ppcdrc_add_hotspot(device_t *device, offs_t pc, UINT32 opcode, UINT32 cycles)
 {
 	powerpc_state *ppc = get_safe_token(device);
 	if (ppc->impstate->hotspot_select < ARRAY_LENGTH(ppc->impstate->hotspot))

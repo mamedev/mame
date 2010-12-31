@@ -21,24 +21,24 @@
 typedef struct _msm5205_interface msm5205_interface;
 struct _msm5205_interface
 {
-	void (*vclk_callback)(running_device *);   /* VCLK callback              */
+	void (*vclk_callback)(device_t *);   /* VCLK callback              */
 	int select;       /* prescaler / bit width selector        */
 };
 
 /* reset signal should keep for 2cycle of VCLK      */
-void msm5205_reset_w (running_device *device, int reset);
+void msm5205_reset_w (device_t *device, int reset);
 /* adpcmata is latched after vclk_interrupt callback */
-void msm5205_data_w (running_device *device, int data);
+void msm5205_data_w (device_t *device, int data);
 /* VCLK slave mode option                                        */
 /* if VCLK and reset or data is changed at the same time,        */
 /* Call msm5205_vclk_w after msm5205_data_w and msm5205_reset_w. */
-void msm5205_vclk_w (running_device *device, int reset);
+void msm5205_vclk_w (device_t *device, int reset);
 /* option , selected pin seletor */
-void msm5205_playmode_w(running_device *device, int _select);
+void msm5205_playmode_w(device_t *device, int _select);
 
-void msm5205_set_volume(running_device *device,int volume);
+void msm5205_set_volume(device_t *device,int volume);
 
-void msm5205_change_clock_w(running_device *device, INT32 clock);
+void msm5205_change_clock_w(device_t *device, INT32 clock);
 
 DECLARE_LEGACY_SOUND_DEVICE(MSM5205, msm5205);
 

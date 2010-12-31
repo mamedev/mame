@@ -21,7 +21,7 @@ public:
 	int        flipscreen;
 
 	/* devices */
-	running_device *subcpu;
+	device_t *subcpu;
 };
 
 

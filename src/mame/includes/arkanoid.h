@@ -37,7 +37,7 @@ public:
 	UINT8    bootleg_cmd;
 
 	/* devices */
-	running_device *mcu;
+	device_t *mcu;
 };
 
 

@@ -30,7 +30,7 @@ public:
 	UINT8         nmi_enable, irq_enable;
 
 	/* devices */
-	running_device *audio_cpu;
+	device_t *audio_cpu;
 };
 
 

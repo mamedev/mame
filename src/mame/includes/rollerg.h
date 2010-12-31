@@ -20,11 +20,11 @@ public:
 	int        readzoomroms;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *k053260;
-	running_device *k053244;
-	running_device *k051316;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *k053260;
+	device_t *k053244;
+	device_t *k051316;
 };
 
 /*----------- defined in video/rollerg.c -----------*/

@@ -224,7 +224,7 @@ static MACHINE_RESET( yboard )
  *
  *************************************/
 
-static void sound_cpu_irq(running_device *device, int state)
+static void sound_cpu_irq(device_t *device, int state)
 {
 	segas1x_state *driver = device->machine->driver_data<segas1x_state>();
 

@@ -1097,12 +1097,12 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static void sound_irq(running_device *device, int linestate)
+static void sound_irq(device_t *device, int linestate)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, linestate); /* IRQ */
 }
 
-static void sound_irq2(running_device *device, int linestate)
+static void sound_irq2(device_t *device, int linestate)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 1, linestate); /* IRQ2 */
 }
@@ -1120,7 +1120,7 @@ static const ym3812_interface ym3812b_interface =
 /******************************************************************************/
 
 
-static void automat_vclk_cb(running_device *device)
+static void automat_vclk_cb(device_t *device)
 {
 	if (automat_msm5205_vclk_toggle == 0)
 	{

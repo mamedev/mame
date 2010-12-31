@@ -109,11 +109,11 @@ static VIDEO_UPDATE(pcat_dyn)
 }
 
 static struct {
-	running_device	*pit8253;
-	running_device	*pic8259_1;
-	running_device	*pic8259_2;
-	running_device	*dma8237_1;
-	running_device	*dma8237_2;
+	device_t	*pit8253;
+	device_t	*pic8259_1;
+	device_t	*pic8259_2;
+	device_t	*dma8237_1;
+	device_t	*dma8237_2;
 } pcat_dyn_devices;
 
 /******************
@@ -196,7 +196,7 @@ static WRITE8_HANDLER( pc_dma_write_byte )
 	space->write_byte(page_offset + offset, data);
 }
 
-static void set_dma_channel(running_device *device, int channel, int state)
+static void set_dma_channel(device_t *device, int channel, int state)
 {
 	if (!state) dma_channel = channel;
 }

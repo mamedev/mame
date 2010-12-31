@@ -21,7 +21,7 @@ public:
 	tilemap_t* bg_tilemap;
 
 	/* devices */
-	running_device *maincpu;
+	device_t *maincpu;
 };
 
 

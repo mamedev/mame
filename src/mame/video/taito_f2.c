@@ -1188,7 +1188,7 @@ VIDEO_UPDATE( taitof2_thundfox )
 	while (drawn[0] < 2 && drawn[1] < 2)
 	{
 		int pick;
-		running_device *tc0100scn;
+		device_t *tc0100scn;
 
 		if (tilepri[0][drawn[0]] < tilepri[1][drawn[1]])
 		{

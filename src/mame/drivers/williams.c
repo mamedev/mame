@@ -527,8 +527,8 @@ ADDRESS_MAP_END
 
 void defender_install_io_space(address_space *space)
 {
-	running_device *pia_0 = space->machine->device("pia_0");
-	running_device *pia_1 = space->machine->device("pia_1");
+	device_t *pia_0 = space->machine->device("pia_0");
+	device_t *pia_1 = space->machine->device("pia_1");
 
 	/* this routine dynamically installs the memory mapped above from c000-cfff */
 	memory_install_write_bank    (space, 0xc000, 0xc00f, 0, 0x03e0, "bank4");
@@ -2795,7 +2795,7 @@ static DRIVER_INIT( blastkit )
 
 static DRIVER_INIT( spdball )
 {
-	running_device *pia_3 = machine->device("pia_3");
+	device_t *pia_3 = machine->device("pia_3");
 
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
 

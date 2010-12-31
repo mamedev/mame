@@ -25,7 +25,7 @@ public:
 	int         addr_h, addr_l;
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 };
 
 

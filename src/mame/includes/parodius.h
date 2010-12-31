@@ -23,12 +23,12 @@ public:
 	//int        nmi_enabled;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *k053260;
-	running_device *k052109;
-	running_device *k053245;
-	running_device *k053251;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *k053260;
+	device_t *k052109;
+	device_t *k053245;
+	device_t *k053251;
 };
 
 /*----------- defined in video/parodius.c -----------*/

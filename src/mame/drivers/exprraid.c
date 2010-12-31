@@ -439,7 +439,7 @@ GFXDECODE_END
 
 
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
-static void irqhandler( running_device *device, int linestate )
+static void irqhandler( device_t *device, int linestate )
 {
 	exprraid_state *state = device->machine->driver_data<exprraid_state>();
 	cpu_set_input_line_and_vector(state->slave, 0, linestate, 0xff);

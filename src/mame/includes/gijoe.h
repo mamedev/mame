@@ -25,12 +25,12 @@ public:
 	emu_timer	*dmadelay_timer;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *k054539;
-	running_device *k056832;
-	running_device *k053246;
-	running_device *k053251;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *k054539;
+	device_t *k056832;
+	device_t *k053246;
+	device_t *k053251;
 };
 
 /*----------- defined in video/gijoe.c -----------*/

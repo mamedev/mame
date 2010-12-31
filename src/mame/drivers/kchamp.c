@@ -353,7 +353,7 @@ static INTERRUPT_GEN( kc_interrupt )
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static void msmint( running_device *device )
+static void msmint( device_t *device )
 {
 	kchamp_state *state = device->machine->driver_data<kchamp_state>();
 

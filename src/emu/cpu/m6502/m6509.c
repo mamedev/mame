@@ -88,7 +88,7 @@ struct _m6509_Regs {
 	write8_space_func wrmem_id;					/* writemem callback for indexed instructions */
 };
 
-INLINE m6509_Regs *get_safe_token(running_device *device)
+INLINE m6509_Regs *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == M6509);

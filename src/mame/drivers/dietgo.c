@@ -159,7 +159,7 @@ static GFXDECODE_START( dietgo )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,      512, 16 )	/* Sprites (16x16) */
 GFXDECODE_END
 
-static void sound_irq(running_device *device, int state)
+static void sound_irq(device_t *device, int state)
 {
 	dietgo_state *driver_state = device->machine->driver_data<dietgo_state>();
 	cpu_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */

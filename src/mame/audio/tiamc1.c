@@ -71,7 +71,7 @@ struct _tiamc1_sound_state
 #define T8253_CWORD		3
 
 
-INLINE tiamc1_sound_state *get_safe_token(running_device *device)
+INLINE tiamc1_sound_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TIAMC1);

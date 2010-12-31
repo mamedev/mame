@@ -48,11 +48,11 @@ enum
 	TMS9900_R12, TMS9900_R13, TMS9900_R14, TMS9900_R15
 };
 
-typedef void (*ti99xx_idle_func)(running_device *device, int state);
-typedef void (*ti99xx_rset_func)(running_device *device);
-typedef void (*ti99xx_lrex_func)(running_device *device);
-typedef void (*ti99xx_ckon_ckof_func)(running_device *device, int state);
-typedef void (*ti99xx_error_interrupt_func)(running_device *device, int state);
+typedef void (*ti99xx_idle_func)(device_t *device, int state);
+typedef void (*ti99xx_rset_func)(device_t *device);
+typedef void (*ti99xx_lrex_func)(device_t *device);
+typedef void (*ti99xx_ckon_ckof_func)(device_t *device, int state);
+typedef void (*ti99xx_error_interrupt_func)(device_t *device, int state);
 
 
 DECLARE_LEGACY_CPU_DEVICE(TI990_10, ti990_10);

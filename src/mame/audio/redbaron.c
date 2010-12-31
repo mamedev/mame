@@ -46,7 +46,7 @@ struct _redbaron_sound_state
 	int squeal_out;
 };
 
-INLINE redbaron_sound_state *get_safe_token(running_device *device)
+INLINE redbaron_sound_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == REDBARON);

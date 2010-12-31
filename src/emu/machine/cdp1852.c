@@ -37,13 +37,13 @@ struct _cdp1852_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE cdp1852_t *get_safe_token(running_device *device)
+INLINE cdp1852_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	return (cdp1852_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const cdp1852_interface *get_interface(running_device *device)
+INLINE const cdp1852_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == CDP1852));
@@ -74,7 +74,7 @@ static void set_sr_line(cdp1852_t *cdp1852, int level)
 
 static TIMER_CALLBACK( cdp1852_scan_tick )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	cdp1852_t *cdp1852 = get_safe_token(device);
 
 	switch (cdp1852->mode)

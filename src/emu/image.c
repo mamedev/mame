@@ -515,7 +515,7 @@ void image_add_device_with_subdevices(device_t *owner, device_type type, const c
 	machine_config *config = (machine_config *)owner->machine->config;
 
 	device_config *devconfig = type(*config, owner->subtag(tempstring,tag), &owner->baseconfig(), clock);
-	running_device *device = device_list->append(devconfig->tag(), devconfig->alloc_device(*owner->machine));
+	device_t *device = device_list->append(devconfig->tag(), devconfig->alloc_device(*owner->machine));
 
 	machine_config_constructor machconfig = device->machine_config_additions();
 	if (machconfig != NULL)

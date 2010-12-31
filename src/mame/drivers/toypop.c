@@ -82,9 +82,9 @@ static WRITE8_HANDLER( toypop_sound_interrupt_disable_w )
 
 static TIMER_CALLBACK( namcoio_run )
 {
-	running_device *io58xx = machine->device("58xx");
-	running_device *io56xx_1 = machine->device("56xx_1");
-	running_device *io56xx_2 = machine->device("56xx_2");
+	device_t *io58xx = machine->device("58xx");
+	device_t *io56xx_1 = machine->device("56xx_1");
+	device_t *io56xx_2 = machine->device("56xx_2");
 
 	switch (param)
 	{
@@ -102,9 +102,9 @@ static TIMER_CALLBACK( namcoio_run )
 
 static INTERRUPT_GEN( toypop_main_interrupt )
 {
-	running_device *namcoio_0 = device->machine->device("58xx");
-	running_device *namcoio_1 = device->machine->device("56xx_1");
-	running_device *namcoio_2 = device->machine->device("56xx_2");
+	device_t *namcoio_0 = device->machine->device("58xx");
+	device_t *namcoio_1 = device->machine->device("56xx_1");
+	device_t *namcoio_2 = device->machine->device("56xx_2");
 
 	irq0_line_assert(device);	// this also checks if irq is enabled - IMPORTANT!
 								// so don't replace with cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);

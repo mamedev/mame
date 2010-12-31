@@ -577,7 +577,7 @@ MACHINE_CONFIG_FRAGMENT( maze_audio )
 MACHINE_CONFIG_END
 
 
-void maze_write_discrete(running_device *device, UINT8 maze_tone_timing_state)
+void maze_write_discrete(device_t *device, UINT8 maze_tone_timing_state)
 {
 	/* controls need to be active low */
 	int controls = ~input_port_read(device->machine, "IN0") & 0xff;

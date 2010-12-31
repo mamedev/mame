@@ -57,7 +57,7 @@ struct _ga20_state
 };
 
 
-INLINE ga20_state *get_safe_token(running_device *device)
+INLINE ga20_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == IREMGA20);

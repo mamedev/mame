@@ -452,7 +452,7 @@ command 1 - stop?
 */
 
 
-static void tumbleb2_playmusic( running_device *device )
+static void tumbleb2_playmusic( device_t *device )
 {
 	tumbleb_state *state = device->machine->driver_data<tumbleb_state>();
 	okim6295_device *oki = downcast<okim6295_device *>(device);
@@ -2210,7 +2210,7 @@ MACHINE_CONFIG_END
 
 
 
-static void semicom_irqhandler( running_device *device, int irq )
+static void semicom_irqhandler( device_t *device, int irq )
 {
 	tumbleb_state *state = device->machine->driver_data<tumbleb_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
@@ -3384,7 +3384,7 @@ static DRIVER_INIT( tumblepb )
 
 static DRIVER_INIT( tumbleb2 )
 {
-	running_device *oki = machine->device("oki");
+	device_t *oki = machine->device("oki");
 
 	tumblepb_gfx1_rearrange(machine);
 

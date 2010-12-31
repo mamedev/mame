@@ -157,9 +157,9 @@
 #define CDP1869_INTERFACE(_name) \
 	const cdp1869_interface (_name) =
 
-#define CDP1869_CHAR_RAM_READ(name) UINT8 name(running_device *device, UINT16 pma, UINT8 cma, UINT8 pmd)
-#define CDP1869_CHAR_RAM_WRITE(name) void name(running_device *device, UINT16 pma, UINT8 cma, UINT8 pmd, UINT8 data)
-#define CDP1869_PCB_READ(name) int name(running_device *device, UINT16 pma, UINT8 cma, UINT8 pmd)
+#define CDP1869_CHAR_RAM_READ(name) UINT8 name(device_t *device, UINT16 pma, UINT8 cma, UINT8 pmd)
+#define CDP1869_CHAR_RAM_WRITE(name) void name(device_t *device, UINT16 pma, UINT8 cma, UINT8 pmd, UINT8 data)
+#define CDP1869_PCB_READ(name) int name(device_t *device, UINT16 pma, UINT8 cma, UINT8 pmd)
 
 #define CDP1869_PAL \
 	DEVCB_LINE_VCC
@@ -173,9 +173,9 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef UINT8 (*cdp1869_char_ram_read_func)(running_device *device, UINT16 pma, UINT8 cma, UINT8 pmd);
-typedef void (*cdp1869_char_ram_write_func)(running_device *device, UINT16 pma, UINT8 cma, UINT8 pmd, UINT8 data);
-typedef int (*cdp1869_pcb_read_func)(running_device *device, UINT16 pma, UINT8 cma, UINT8 pmd);
+typedef UINT8 (*cdp1869_char_ram_read_func)(device_t *device, UINT16 pma, UINT8 cma, UINT8 pmd);
+typedef void (*cdp1869_char_ram_write_func)(device_t *device, UINT16 pma, UINT8 cma, UINT8 pmd, UINT8 data);
+typedef int (*cdp1869_pcb_read_func)(device_t *device, UINT16 pma, UINT8 cma, UINT8 pmd);
 
 
 // ======================> cdp1869_interface

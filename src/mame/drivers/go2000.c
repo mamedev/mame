@@ -46,7 +46,7 @@ public:
 //  UINT16 *  paletteram;   // currently this uses generic palette handling
 
 	/* devices */
-	running_device *soundcpu;
+	device_t *soundcpu;
 };
 
 

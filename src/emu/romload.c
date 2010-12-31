@@ -1226,7 +1226,7 @@ static UINT32 normalize_flags_for_device(running_machine *machine, UINT32 startf
     more general process_region_list.
 -------------------------------------------------*/
 
-void load_software_part_region(running_device *device, char *swlist, char *swname, rom_entry *start_region)
+void load_software_part_region(device_t *device, char *swlist, char *swname, rom_entry *start_region)
 {
 	astring locationtag(swlist, PATH_SEPARATOR, swname);
 	rom_load_data *romdata = device->machine->romload_data;

@@ -174,7 +174,7 @@ struct _pokey_state
 	UINT32 r9;				/* rand9 index */
 	UINT32 r17;             /* rand17 index */
 	UINT32 clockmult;		/* clock multiplier */
-	running_device *device;
+	device_t *device;
 	sound_stream * channel; /* streams channel */
 	emu_timer *timer[3];	/* timers for channel 1,2 and 4 events */
 	attotime timer_period[3];	/* computed periods for these timers */
@@ -185,7 +185,7 @@ struct _pokey_state
 	devcb_resolved_read8 allpot_r;
 	devcb_resolved_read8 serin_r;
 	devcb_resolved_write8 serout_w;
-	void (*interrupt_cb)(running_device *device, int mask);
+	void (*interrupt_cb)(device_t *device, int mask);
 	UINT8 AUDF[4];          /* AUDFx (D200, D202, D204, D206) */
 	UINT8 AUDC[4];			/* AUDCx (D201, D203, D205, D207) */
 	UINT8 POTx[8];			/* POTx   (R/D200-D207) */
@@ -522,7 +522,7 @@ static TIMER_CALLBACK( pokey_pot_trigger );
 #endif
 
 
-INLINE pokey_state *get_safe_token(running_device *device)
+INLINE pokey_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == POKEY);
@@ -573,7 +573,7 @@ static void rand_init(UINT8 *rng, int size, int left, int right, int add)
 }
 
 
-static void register_for_save(pokey_state *chip, running_device *device)
+static void register_for_save(pokey_state *chip, device_t *device)
 {
 	state_save_register_device_item_array(device, 0, chip->counter);
 	state_save_register_device_item_array(device, 0, chip->divisor);
@@ -1336,13 +1336,13 @@ WRITE8_HANDLER( quad_pokey_w )
     pokey_w(space->machine->device(devname[pokey_num]), pokey_reg, data);
 }
 
-void pokey_serin_ready(running_device *device, int after)
+void pokey_serin_ready(device_t *device, int after)
 {
 	pokey_state *p = get_safe_token(device);
 	timer_set(device->machine, attotime_mul(p->clock_period, after), p, 0, pokey_serin_ready_cb);
 }
 
-void pokey_break_w(running_device *device, int shift)
+void pokey_break_w(device_t *device, int shift)
 {
 	pokey_state *p = get_safe_token(device);
 	if( shift )                     /* shift code ? */
@@ -1359,7 +1359,7 @@ void pokey_break_w(running_device *device, int shift)
 	}
 }
 
-void pokey_kbcode_w(running_device *device, int kbcode, int make)
+void pokey_kbcode_w(device_t *device, int kbcode, int make)
 {
 	pokey_state *p = get_safe_token(device);
     /* make code ? */

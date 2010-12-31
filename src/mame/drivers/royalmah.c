@@ -1126,7 +1126,7 @@ static READ8_HANDLER( mjvegasa_rom_io_r )
 		case 0x800e:
 		case 0x800f:
 		{
-			running_device *rtc = space->machine->device("rtc");
+			device_t *rtc = space->machine->device("rtc");
 			return msm6242_r(rtc, offset-0x8000);
 		}
 	}
@@ -1165,7 +1165,7 @@ static WRITE8_HANDLER( mjvegasa_rom_io_w )
 		case 0x800e:
 		case 0x800f:
 		{
-			running_device *rtc = space->machine->device("rtc");
+			device_t *rtc = space->machine->device("rtc");
 			msm6242_w(rtc, offset-0x8000, data);
 			return;
 		}

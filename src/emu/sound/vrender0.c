@@ -23,7 +23,7 @@ struct _vr0_state
 	sound_stream * stream;
 };
 
-INLINE vr0_state *get_safe_token(running_device *device)
+INLINE vr0_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == VRENDER0);
@@ -94,7 +94,7 @@ static const unsigned short ULawTo16[]=
 #define LOOPEND(chan)   (GETSOUNDREG32(chan,0x10)&0x3fffff)
 #define ENVVOL(chan)    (GETSOUNDREG32(chan,0x04)&0xffffff)
 */
-void vr0_snd_set_areas(running_device *device,UINT32 *texture,UINT32 *frame)
+void vr0_snd_set_areas(device_t *device,UINT32 *texture,UINT32 *frame)
 {
 	vr0_state *VR0 = get_safe_token(device);
 	VR0->TexBase=texture;

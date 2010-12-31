@@ -870,8 +870,8 @@ static MACHINE_START( mystwarr )
 
 static MACHINE_RESET(mystwarr)
 {
-	running_device *k054539_1 = machine->device("konami1");
-	running_device *k054539_2 = machine->device("konami2");
+	device_t *k054539_1 = machine->device("konami1");
+	device_t *k054539_2 = machine->device("konami2");
 	int i;
 
 	// soften chorus(chip 0 channel 0-3), boost voice(chip 0 channel 4-7)
@@ -887,7 +887,7 @@ static MACHINE_RESET(mystwarr)
 
 static MACHINE_RESET(dadandrn)
 {
-	running_device *k054539_1 = machine->device("konami1");
+	device_t *k054539_1 = machine->device("konami1");
 	int i;
 
 	// boost voice(chip 0 channel 4-7)
@@ -896,7 +896,7 @@ static MACHINE_RESET(dadandrn)
 
 static MACHINE_RESET(viostorm)
 {
-	running_device *k054539_1 = machine->device("konami1");
+	device_t *k054539_1 = machine->device("konami1");
 	int i;
 
 	// boost voice(chip 0 channel 4-7)
@@ -905,8 +905,8 @@ static MACHINE_RESET(viostorm)
 
 static MACHINE_RESET(metamrph)
 {
-	running_device *k054539_1 = machine->device("konami1");
-	running_device *k054539_2 = machine->device("konami2");
+	device_t *k054539_1 = machine->device("konami1");
+	device_t *k054539_2 = machine->device("konami2");
 	int i;
 
 	// boost voice(chip 0 channel 4-7) and soften other channels
@@ -921,7 +921,7 @@ static MACHINE_RESET(metamrph)
 
 static MACHINE_RESET(martchmp)
 {
-	running_device *k054539_1 = machine->device("konami1");
+	device_t *k054539_1 = machine->device("konami1");
 	int i;
 
 	k054539_init_flags(k054539_1, K054539_REVERSE_STEREO);
@@ -932,7 +932,7 @@ static MACHINE_RESET(martchmp)
 
 static MACHINE_RESET(gaiapols)
 {
-	running_device *k054539_1 = machine->device("konami1");
+	device_t *k054539_1 = machine->device("konami1");
 	int i;
 
 	// boost voice(chip 0 channel 5-7)

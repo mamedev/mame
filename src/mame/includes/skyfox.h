@@ -22,7 +22,7 @@ public:
 	int        palette_selected;
 
 	/* devices */
-	running_device *maincpu;
+	device_t *maincpu;
 };
 
 /*----------- defined in video/skyfox.c -----------*/

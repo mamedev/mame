@@ -374,7 +374,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static void soundirq( running_device *device, int state )
+static void soundirq( device_t *device, int state )
 {
 	fuuki16_state *fuuki16 = device->machine->driver_data<fuuki16_state>();
 	cpu_set_input_line(fuuki16->audiocpu, 0, state);

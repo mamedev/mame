@@ -41,7 +41,7 @@ struct _i960_state_t {
 	int icount;
 };
 
-INLINE i960_state_t *get_safe_token(running_device *device)
+INLINE i960_state_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == I960);
@@ -2217,13 +2217,13 @@ CPU_GET_INFO( i960 )
 
 // call from any read/write handler for a memory area that can't be bursted
 // on the real hardware (e.g. Model 2's interrupt control registers)
-void i960_noburst(running_device *device)
+void i960_noburst(device_t *device)
 {
 	i960_state_t *i960 = get_safe_token(device);
 	i960->bursting = 0;
 }
 
-void i960_stall(running_device *device)
+void i960_stall(device_t *device)
 {
 	i960_state_t *i960 = get_safe_token(device);
 	i960->IP = i960->PIP;

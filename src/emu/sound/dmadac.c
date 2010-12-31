@@ -56,7 +56,7 @@ struct _dmadac_state
 };
 
 
-INLINE dmadac_state *get_safe_token(running_device *device)
+INLINE dmadac_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == DMADAC);

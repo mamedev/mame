@@ -429,7 +429,7 @@ static WRITE32_HANDLER( tms_m68k_ram_w )
 }
 
 
-static void iack_w(running_device *device, UINT8 state, offs_t addr)
+static void iack_w(device_t *device, UINT8 state, offs_t addr)
 {
 	if (LOG)
 		logerror("iack_w(%d) - %06X\n", state, addr);

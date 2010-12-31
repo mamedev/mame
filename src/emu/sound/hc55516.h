@@ -7,13 +7,13 @@
 
 
 /* sets the digit (0 or 1) */
-void hc55516_digit_w(running_device *device, int digit);
+void hc55516_digit_w(device_t *device, int digit);
 
 /* sets the clock state (0 or 1, clocked on the rising edge) */
-void hc55516_clock_w(running_device *device, int state);
+void hc55516_clock_w(device_t *device, int state);
 
 /* returns whether the clock is currently LO or HI */
-int hc55516_clock_state_r(running_device *device);
+int hc55516_clock_state_r(device_t *device);
 
 DECLARE_LEGACY_SOUND_DEVICE(HC55516, hc55516);
 DECLARE_LEGACY_SOUND_DEVICE(MC3417, mc3417);

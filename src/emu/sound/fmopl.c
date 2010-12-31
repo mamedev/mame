@@ -318,7 +318,7 @@ typedef struct
 	UINT32 rate;					/* sampling rate (Hz)           */
 	double freqbase;				/* frequency base               */
 	attotime TimerBase;			/* Timer base time (==sampling time)*/
-	running_device *device;
+	device_t *device;
 
 	signed int phase_modulation;	/* phase modulation input (SLOT 2) */
 	signed int output[1];
@@ -1726,7 +1726,7 @@ static TIMER_CALLBACK( cymfile_callback )
 }
 
 /* lock/unlock for common table */
-static int OPL_LockTable(running_device *device)
+static int OPL_LockTable(device_t *device)
 {
 	num_lock++;
 	if(num_lock>1) return 0;
@@ -1870,7 +1870,7 @@ static STATE_POSTLOAD( OPL_postload )
 }
 
 
-static void OPLsave_state_channel(running_device *device, OPL_CH *CH)
+static void OPLsave_state_channel(device_t *device, OPL_CH *CH)
 {
 	int slot, ch;
 
@@ -1914,7 +1914,7 @@ static void OPLsave_state_channel(running_device *device, OPL_CH *CH)
 
 /* Register savestate for a virtual YM3812/YM3526Y8950 */
 
-static void OPL_save_state(FM_OPL *OPL, running_device *device)
+static void OPL_save_state(FM_OPL *OPL, device_t *device)
 {
 	OPLsave_state_channel(device, OPL->P_CH);
 
@@ -1964,7 +1964,7 @@ static void OPL_save_state(FM_OPL *OPL, running_device *device)
 /* Create one of virtual YM3812/YM3526/Y8950 */
 /* 'clock' is chip clock in Hz  */
 /* 'rate'  is sampling rate  */
-static FM_OPL *OPLCreate(running_device *device, UINT32 clock, UINT32 rate, int type)
+static FM_OPL *OPLCreate(device_t *device, UINT32 clock, UINT32 rate, int type)
 {
 	char *ptr;
 	FM_OPL *OPL;
@@ -2152,7 +2152,7 @@ static int OPLTimerOver(FM_OPL *OPL,int c)
 
 #if (BUILD_YM3812)
 
-void * ym3812_init(running_device *device, UINT32 clock, UINT32 rate)
+void * ym3812_init(device_t *device, UINT32 clock, UINT32 rate)
 {
 	/* emulator create */
 	FM_OPL *YM3812 = OPLCreate(device,clock,rate,OPL_TYPE_YM3812);
@@ -2280,7 +2280,7 @@ void ym3812_update_one(void *chip, OPLSAMPLE *buffer, int length)
 
 #if (BUILD_YM3526)
 
-void *ym3526_init(running_device *device, UINT32 clock, UINT32 rate)
+void *ym3526_init(device_t *device, UINT32 clock, UINT32 rate)
 {
 	/* emulator create */
 	FM_OPL *YM3526 = OPLCreate(device,clock,rate,OPL_TYPE_YM3526);
@@ -2419,7 +2419,7 @@ static void Y8950_deltat_status_reset(void *chip, UINT8 changebits)
 	OPL_STATUS_RESET(Y8950, changebits);
 }
 
-void *y8950_init(running_device *device, UINT32 clock, UINT32 rate)
+void *y8950_init(device_t *device, UINT32 clock, UINT32 rate)
 {
 	/* emulator create */
 	FM_OPL *Y8950 = OPLCreate(device,clock,rate,OPL_TYPE_Y8950);

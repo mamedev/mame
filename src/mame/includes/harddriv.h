@@ -180,8 +180,8 @@ MACHINE_RESET( harddriv );
 
 INTERRUPT_GEN( hd68k_irq_gen );
 WRITE16_HANDLER( hd68k_irq_ack_w );
-void hdgsp_irq_gen(running_device *device, int state);
-void hdmsp_irq_gen(running_device *device, int state);
+void hdgsp_irq_gen(device_t *device, int state);
+void hdmsp_irq_gen(device_t *device, int state);
 
 READ16_HANDLER( hd68k_gsp_io_r );
 WRITE16_HANDLER( hd68k_gsp_io_w );
@@ -254,7 +254,7 @@ READ16_HANDLER( hd68k_ds3_program_r );
 WRITE16_HANDLER( hd68k_ds3_program_w );
 
 /* DSK board */
-void hddsk_update_pif(running_device *device, UINT32 pins);
+void hddsk_update_pif(device_t *device, UINT32 pins);
 WRITE16_HANDLER( hd68k_dsk_control_w );
 READ16_HANDLER( hd68k_dsk_ram_r );
 WRITE16_HANDLER( hd68k_dsk_ram_w );

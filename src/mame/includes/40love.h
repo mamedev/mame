@@ -42,7 +42,7 @@ public:
 	UINT8       snd_ctrl0, snd_ctrl1, snd_ctrl2, snd_ctrl3;
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 };
 
 

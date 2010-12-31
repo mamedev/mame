@@ -674,7 +674,7 @@ static WRITE16_HANDLER( hotchase_soundlatch_w )
 
 static WRITE8_HANDLER( hotchase_sound_control_w )
 {
-	running_device *sound[3];
+	device_t *sound[3];
 
 	int reg[8];
 

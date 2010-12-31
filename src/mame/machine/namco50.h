@@ -9,7 +9,7 @@
 
 
 READ8_DEVICE_HANDLER( namco_50xx_read );
-void namco_50xx_read_request(running_device *device);
+void namco_50xx_read_request(device_t *device);
 WRITE8_DEVICE_HANDLER( namco_50xx_write );
 
 

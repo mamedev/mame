@@ -27,8 +27,8 @@ public:
 	int         pending_command;
 
 	/* devices */
-	running_device *audiocpu;
-	running_device *k053936;
+	device_t *audiocpu;
+	device_t *k053936;
 };
 
 

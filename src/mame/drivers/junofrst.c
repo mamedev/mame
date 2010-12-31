@@ -99,11 +99,11 @@ public:
 	int      i8039_status, last_irq;
 
 	cpu_device *soundcpu;
-	running_device *i8039;
+	device_t *i8039;
 
-	running_device *filter_0_0;
-	running_device *filter_0_1;
-	running_device *filter_0_2;
+	device_t *filter_0_0;
+	device_t *filter_0_1;
+	device_t *filter_0_2;
 };
 
 
@@ -205,7 +205,7 @@ static READ8_DEVICE_HANDLER( junofrst_portA_r )
 static WRITE8_DEVICE_HANDLER( junofrst_portB_w )
 {
 	junofrst_state *state = device->machine->driver_data<junofrst_state>();
-	running_device *filter[3] = { state->filter_0_0, state->filter_0_1, state->filter_0_2 };
+	device_t *filter[3] = { state->filter_0_0, state->filter_0_1, state->filter_0_2 };
 	int i;
 
 	for (i = 0; i < 3; i++)

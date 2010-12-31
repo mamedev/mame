@@ -177,13 +177,13 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static void volume_callback0(running_device *device, int v)
+static void volume_callback0(device_t *device, int v)
 {
 	k007232_set_volume(device, 0, (v >> 4) * 0x11, 0);
 	k007232_set_volume(device, 1, 0, (v & 0x0f) * 0x11);
 }
 
-static void volume_callback1(running_device *device, int v)
+static void volume_callback1(device_t *device, int v)
 {
 	k007232_set_volume(device, 0, (v >> 4) * 0x11, 0);
 	k007232_set_volume(device, 1, 0, (v & 0x0f) * 0x11);

@@ -66,7 +66,7 @@ struct _mb86233_state
 	UINT32			*Tables;
 };
 
-INLINE mb86233_state *get_safe_token(running_device *device)
+INLINE mb86233_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == MB86233);

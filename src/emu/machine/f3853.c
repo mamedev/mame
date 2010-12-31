@@ -210,7 +210,7 @@ void f3853_device::f3853_timer()
 }
 
 
-void f3853_set_external_interrupt_in_line(running_device *device, int level)
+void f3853_set_external_interrupt_in_line(device_t *device, int level)
 {
 	downcast<f3853_device*>(device)->f3853_set_external_interrupt_in_line(level);
 }
@@ -226,7 +226,7 @@ void f3853_device::f3853_set_external_interrupt_in_line(int level)
 }
 
 
-void f3853_set_priority_in_line(running_device *device, int level)
+void f3853_set_priority_in_line(device_t *device, int level)
 {
 	downcast<f3853_device*>(device)->f3853_set_priority_in_line(level);
 }

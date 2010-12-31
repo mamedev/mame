@@ -358,8 +358,8 @@ static void draw_sprites_cbombers(running_machine *machine, bitmap_t *bitmap,con
 
 VIDEO_UPDATE( undrfire )
 {
-	running_device *tc0100scn = screen->machine->device("tc0100scn");
-	running_device *tc0480scp = screen->machine->device("tc0480scp");
+	device_t *tc0100scn = screen->machine->device("tc0100scn");
+	device_t *tc0480scp = screen->machine->device("tc0480scp");
 	UINT8 layer[5];
 	UINT8 pivlayer[3];
 	UINT16 priority;
@@ -504,8 +504,8 @@ VIDEO_UPDATE( undrfire )
 
 VIDEO_UPDATE( cbombers )
 {
-	running_device *tc0100scn = screen->machine->device("tc0100scn");
-	running_device *tc0480scp = screen->machine->device("tc0480scp");
+	device_t *tc0100scn = screen->machine->device("tc0100scn");
+	device_t *tc0480scp = screen->machine->device("tc0480scp");
 	UINT8 layer[5];
 	UINT8 pivlayer[3];
 	UINT16 priority;

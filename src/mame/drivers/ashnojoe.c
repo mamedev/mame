@@ -274,7 +274,7 @@ static GFXDECODE_START( ashnojoe )
 GFXDECODE_END
 
 
-static void ym2203_irq_handler( running_device *device, int irq )
+static void ym2203_irq_handler( device_t *device, int irq )
 {
 	ashnojoe_state *state = device->machine->driver_data<ashnojoe_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
@@ -307,7 +307,7 @@ static const ym2203_interface ym2203_config =
 	ym2203_irq_handler
 };
 
-static void ashnojoe_vclk_cb( running_device *device )
+static void ashnojoe_vclk_cb( device_t *device )
 {
 	ashnojoe_state *state = device->machine->driver_data<ashnojoe_state>();
 	if (state->msm5205_vclk_toggle == 0)

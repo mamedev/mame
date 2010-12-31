@@ -466,7 +466,7 @@ VIDEO_UPDATE( toaplan2 )
 
 	if (state->vdp0)
 	{
-		running_device *screen1  = screen->machine->device("screen");
+		device_t *screen1  = screen->machine->device("screen");
 
 		gp9001_log_vram(state->vdp0, screen->machine);
 
@@ -482,7 +482,7 @@ VIDEO_UPDATE( toaplan2 )
 #ifdef DUAL_SCREEN_VDPS
 	if (state->vdp1)
 	{
-		running_device *screen2 = screen->machine->device("screen2");
+		device_t *screen2 = screen->machine->device("screen2");
 
 		gp9001_log_vram(state->vdp1, screen->machine);
 

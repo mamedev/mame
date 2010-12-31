@@ -183,7 +183,7 @@ struct _dsp32_state
 	int				icount;
 	UINT8			lastpins;
 	UINT32			ppc;
-	void			(*output_pins_changed)(running_device *device, UINT32 pins);
+	void			(*output_pins_changed)(device_t *device, UINT32 pins);
 	legacy_cpu_device *	device;
 	address_space *program;
 	direct_read_data *direct;
@@ -203,7 +203,7 @@ static CPU_RESET( dsp32c );
     STATE ACCESSORS
 ***************************************************************************/
 
-INLINE dsp32_state *get_safe_token(running_device *device)
+INLINE dsp32_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == DSP32C);
@@ -310,7 +310,7 @@ static void update_pcr(dsp32_state *cpustate, UINT16 newval)
     INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
 
-static void dsp32_register_save( running_device *device )
+static void dsp32_register_save( device_t *device )
 {
 	dsp32_state *cpustate = get_safe_token(device);
 
@@ -538,7 +538,7 @@ INLINE void dma_store(dsp32_state *cpustate)
 }
 
 
-void dsp32c_pio_w(running_device *device, int reg, int data)
+void dsp32c_pio_w(device_t *device, int reg, int data)
 {
 	dsp32_state *cpustate = get_safe_token(device);
 	UINT16 mask;
@@ -617,7 +617,7 @@ void dsp32c_pio_w(running_device *device, int reg, int data)
     PARALLEL INTERFACE READS
 ***************************************************************************/
 
-int dsp32c_pio_r(running_device *device, int reg)
+int dsp32c_pio_r(device_t *device, int reg)
 {
 	dsp32_state *cpustate = get_safe_token(device);
 	UINT16 mask, result = 0xffff;

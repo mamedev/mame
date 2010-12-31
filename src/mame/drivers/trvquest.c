@@ -153,7 +153,7 @@ static TIMER_CALLBACK( via_irq_delayed )
 	cpu_set_input_line(state->maincpu, 0, param);
 }
 
-static void via_irq( running_device *device, int state )
+static void via_irq( device_t *device, int state )
 {
 	// from gameplan.c
 

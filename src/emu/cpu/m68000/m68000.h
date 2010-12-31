@@ -70,11 +70,11 @@ enum
 	M68K_GENPCBASE = STATE_GENPCBASE
 };
 
-typedef void (*m68k_bkpt_ack_func)(running_device *device, UINT32 data);
-typedef void (*m68k_reset_func)(running_device *device);
-typedef void (*m68k_cmpild_func)(running_device *device, UINT32 data, UINT8 reg);
-typedef void (*m68k_rte_func)(running_device *device);
-typedef int (*m68k_tas_func)(running_device *device);
+typedef void (*m68k_bkpt_ack_func)(device_t *device, UINT32 data);
+typedef void (*m68k_reset_func)(device_t *device);
+typedef void (*m68k_cmpild_func)(device_t *device, UINT32 data, UINT8 reg);
+typedef void (*m68k_rte_func)(device_t *device);
+typedef int (*m68k_tas_func)(device_t *device);
 
 
 DECLARE_LEGACY_CPU_DEVICE(M68000, m68000);
@@ -92,15 +92,15 @@ DECLARE_LEGACY_CPU_DEVICE(M68040, m68040);
 DECLARE_LEGACY_CPU_DEVICE(SCC68070, scc68070);
 
 
-void m68k_set_encrypted_opcode_range(running_device *device, offs_t start, offs_t end);
+void m68k_set_encrypted_opcode_range(device_t *device, offs_t start, offs_t end);
 
-void m68k_set_hmmu_enable(running_device *device, int enable);
+void m68k_set_hmmu_enable(device_t *device, int enable);
 
 unsigned int m68k_disassemble_raw(char* str_buff, unsigned int pc, const unsigned char* opdata, const unsigned char* argdata, unsigned int cpu_type);
 
-void m68k_set_reset_callback(running_device *device, m68k_reset_func callback);
-void m68k_set_cmpild_callback(running_device *device, m68k_cmpild_func callback);
-void m68k_set_rte_callback(running_device *device, m68k_rte_func callback);
-void m68k_set_tas_callback(running_device *device, m68k_tas_func callback);
+void m68k_set_reset_callback(device_t *device, m68k_reset_func callback);
+void m68k_set_cmpild_callback(device_t *device, m68k_cmpild_func callback);
+void m68k_set_rte_callback(device_t *device, m68k_rte_func callback);
+void m68k_set_tas_callback(device_t *device, m68k_tas_func callback);
 
 #endif /* __M68000_H__ */

@@ -131,7 +131,7 @@ filter* filter_lp_fir_alloc(double freq, int order) {
 }
 
 
-void filter2_setup(running_device *device, int type, double fc, double d, double gain,
+void filter2_setup(device_t *device, int type, double fc, double d, double gain,
 					filter2_context *filter2)
 {
 	int sample_rate = device->machine->sample_rate;
@@ -202,7 +202,7 @@ void filter2_step(filter2_context *filter2)
 
 
 /* Setup a filter2 structure based on an op-amp multipole bandpass circuit. */
-void filter_opamp_m_bandpass_setup(running_device *device, double r1, double r2, double r3, double c1, double c2,
+void filter_opamp_m_bandpass_setup(device_t *device, double r1, double r2, double r3, double c1, double c2,
 					filter2_context *filter2)
 {
 	double	r_in, fc, d, gain;

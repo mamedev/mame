@@ -344,7 +344,7 @@ GFXDECODE_END
  *************************************/
 
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
-static void irqhandler( running_device *device, int linestate )
+static void irqhandler( device_t *device, int linestate )
 {
 	brkthru_state *state = device->machine->driver_data<brkthru_state>();
 	cpu_set_input_line(state->audiocpu, M6809_IRQ_LINE, linestate);

@@ -122,7 +122,7 @@ typedef void (*FM_IRQHANDLER)(void *param,int irq);
 ** 'IRQHandler'    IRQ callback handler when changed IRQ level
 ** return      0 = success
 */
-void * ym2203_init(void *param, running_device *device, int baseclock, int rate,
+void * ym2203_init(void *param, device_t *device, int baseclock, int rate,
                FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg);
 
 /*
@@ -165,7 +165,7 @@ void ym2203_postload(void *chip);
 
 #if BUILD_YM2608
 /* -------------------- YM2608(OPNA) Interface -------------------- */
-void * ym2608_init(void *param, running_device *device, int baseclock, int rate,
+void * ym2608_init(void *param, device_t *device, int baseclock, int rate,
                void *pcmroma,int pcmsizea,
                FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg);
 void ym2608_shutdown(void *chip);
@@ -180,7 +180,7 @@ void ym2608_postload(void *chip);
 
 #if (BUILD_YM2610||BUILD_YM2610B)
 /* -------------------- YM2610(OPNB) Interface -------------------- */
-void * ym2610_init(void *param, running_device *device, int baseclock, int rate,
+void * ym2610_init(void *param, device_t *device, int baseclock, int rate,
                void *pcmroma,int pcmasize,void *pcmromb,int pcmbsize,
                FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg);
 void ym2610_shutdown(void *chip);
@@ -198,7 +198,7 @@ void ym2610_postload(void *chip);
 #endif /* (BUILD_YM2610||BUILD_YM2610B) */
 
 #if (BUILD_YM2612||BUILD_YM3438)
-void * ym2612_init(void *param, running_device *device, int baseclock, int rate,
+void * ym2612_init(void *param, device_t *device, int baseclock, int rate,
                FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler);
 void ym2612_shutdown(void *chip);
 void ym2612_reset_chip(void *chip);

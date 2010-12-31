@@ -218,7 +218,7 @@ static int check_irqs(mcs48_state *cpustate);
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE mcs48_state *get_safe_token(running_device *device)
+INLINE mcs48_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == I8021 ||
@@ -1163,7 +1163,7 @@ static CPU_EXECUTE( mcs48 )
     read
 -------------------------------------------------*/
 
-UINT8 upi41_master_r(running_device *device, UINT8 a0)
+UINT8 upi41_master_r(device_t *device, UINT8 a0)
 {
 	mcs48_state *cpustate = get_safe_token(device);
 
@@ -1212,7 +1212,7 @@ static TIMER_CALLBACK( master_callback )
 		cpustate->sts |= STS_F1;
 }
 
-void upi41_master_w(running_device *_device, UINT8 a0, UINT8 data)
+void upi41_master_w(device_t *_device, UINT8 a0, UINT8 data)
 {
 	legacy_cpu_device *device = downcast<legacy_cpu_device *>(_device);
 	timer_call_after_resynch(device->machine, (void *)device, (a0 << 8) | data, master_callback);

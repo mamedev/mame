@@ -47,8 +47,8 @@ struct _sp0250_state
 	UINT8 fifo[15];
 	int fifo_pos;
 
-	running_device *device;
-	void (*drq)(running_device *device, int state);
+	device_t *device;
+	void (*drq)(device_t *device, int state);
 
 	struct
 	{
@@ -57,7 +57,7 @@ struct _sp0250_state
 	} filter[6];
 };
 
-INLINE sp0250_state *get_safe_token(running_device *device)
+INLINE sp0250_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SP0250);
@@ -231,7 +231,7 @@ WRITE8_DEVICE_HANDLER( sp0250_w )
 }
 
 
-UINT8 sp0250_drq_r(running_device *device)
+UINT8 sp0250_drq_r(device_t *device)
 {
 	sp0250_state *sp = get_safe_token(device);
 	stream_update(sp->stream);

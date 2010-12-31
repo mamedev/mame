@@ -323,7 +323,7 @@ static INTERRUPT_GEN( dokyusei_interrupt )
 	}
 }
 
-static void ymf278b_interrupt( running_device *device, int active )
+static void ymf278b_interrupt( device_t *device, int active )
 {
 	metro_state *state = device->machine->driver_data<metro_state>();
 	cpu_set_input_line(state->maincpu, 2, active);
@@ -337,7 +337,7 @@ static void ymf278b_interrupt( running_device *device, int active )
 
 ***************************************************************************/
 
-static int metro_io_callback( running_device *device, int ioline, int state )
+static int metro_io_callback( device_t *device, int ioline, int state )
 {
 	metro_state *driver_state = device->machine->driver_data<metro_state>();
 	address_space *space = cpu_get_address_space(driver_state->maincpu, ADDRESS_SPACE_PROGRAM);
@@ -526,7 +526,7 @@ static WRITE8_HANDLER( daitorid_portb_w )
 	state->portb = data;
 }
 
-static void metro_sound_irq_handler( running_device *device, int state )
+static void metro_sound_irq_handler( device_t *device, int state )
 {
 	metro_state *driver_state = device->machine->driver_data<metro_state>();
 	cpu_set_input_line(driver_state->audiocpu, UPD7810_INTF2, state ? ASSERT_LINE : CLEAR_LINE);
@@ -1270,7 +1270,7 @@ ADDRESS_MAP_END
                                 Mahjong Gakuensai
 ***************************************************************************/
 
-static void gakusai_oki_bank_set(running_device *device)
+static void gakusai_oki_bank_set(device_t *device)
 {
 	metro_state *state = device->machine->driver_data<metro_state>();
 	int bank = (state->gakusai_oki_bank_lo & 7) + (state->gakusai_oki_bank_hi & 1) * 8;
@@ -1706,7 +1706,7 @@ static WRITE8_HANDLER( blzntrnd_sh_bankswitch_w )
 	memory_set_bankptr(space->machine, "bank1", &RAM[bankaddress]);
 }
 
-static void blzntrnd_irqhandler(running_device *device, int irq)
+static void blzntrnd_irqhandler(device_t *device, int irq)
 {
 	metro_state *state = device->machine->driver_data<metro_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);

@@ -453,7 +453,7 @@ void YM_DELTAT_postload(YM_DELTAT *DELTAT,UINT8 *regs)
 		DELTAT->now_data = *(DELTAT->memory + (DELTAT->now_addr>>1) );
 
 }
-void YM_DELTAT_savestate(running_device *device,YM_DELTAT *DELTAT)
+void YM_DELTAT_savestate(device_t *device,YM_DELTAT *DELTAT)
 {
 #ifdef __STATE_H__
 	state_save_register_device_item(device, 0, DELTAT->portstate);

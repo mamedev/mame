@@ -218,7 +218,7 @@ static TIMER_CALLBACK( via_irq_delayed )
 }
 
 
-static void via_irq(running_device *device, int state)
+static void via_irq(device_t *device, int state)
 {
 	/* Kaos sits in a tight loop polling the VIA irq flags register, but that register is
        cleared by the irq handler. Therefore, I wait a bit before triggering the irq to

@@ -15,8 +15,8 @@ typedef struct _k054539_interface k054539_interface;
 struct _k054539_interface
 {
 	const char *rgnoverride;
-	void (*apan)(running_device *, double, double);	/* Callback for analog output mixing levels (0..1 for each channel) */
-	void (*irq)(running_device *);
+	void (*apan)(device_t *, double, double);	/* Callback for analog output mixing levels (0..1 for each channel) */
+	void (*irq)(device_t *);
 };
 
 
@@ -29,7 +29,7 @@ READ8_DEVICE_HANDLER( k054539_r );
 #define K054539_DISABLE_REVERB  2
 #define K054539_UPDATE_AT_KEYON 4
 
-void k054539_init_flags(running_device *device, int flags);
+void k054539_init_flags(device_t *device, int flags);
 
 /*
     Note that the eight PCM channels of a K054539 do not have seperate
@@ -43,7 +43,7 @@ void k054539_init_flags(running_device *device, int flags);
         channel : 0 - 7
         gain    : 0.0=silent, 1.0=no gain, 2.0=twice as loud, etc.
 */
-void k054539_set_gain(running_device *device, int channel, double gain);
+void k054539_set_gain(device_t *device, int channel, double gain);
 
 DECLARE_LEGACY_SOUND_DEVICE(K054539, k054539);
 

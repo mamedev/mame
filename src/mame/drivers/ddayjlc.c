@@ -81,7 +81,7 @@ public:
 	UINT8    prot_addr;
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 };
 
 

@@ -60,7 +60,7 @@ void asc_device_config::static_set_type(device_config *device, int type)
 //-------------------------------------------------
 
 
-void asc_device_config::static_set_irqf(device_config *device, void (*irqf)(running_device *device, int state))
+void asc_device_config::static_set_irqf(device_config *device, void (*irqf)(device_t *device, int state))
 {
 	asc_device_config *asc = downcast<asc_device_config *>(device);
 	asc->m_irq_func = irqf;

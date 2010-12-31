@@ -249,7 +249,7 @@ static void (*const dsp_op_table[64])(jaguar_state *jaguar, UINT16 op) =
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE jaguar_state *get_safe_token(running_device *device)
+INLINE jaguar_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == JAGUARGPU ||
@@ -1237,7 +1237,7 @@ void xor_rn_rn(jaguar_state *jaguar, UINT16 op)
     I/O HANDLING
 ***************************************************************************/
 
-UINT32 jaguargpu_ctrl_r(running_device *device, offs_t offset)
+UINT32 jaguargpu_ctrl_r(device_t *device, offs_t offset)
 {
 	jaguar_state *jaguar = get_safe_token(device);
 
@@ -1247,7 +1247,7 @@ UINT32 jaguargpu_ctrl_r(running_device *device, offs_t offset)
 }
 
 
-void jaguargpu_ctrl_w(running_device *device, offs_t offset, UINT32 data, UINT32 mem_mask)
+void jaguargpu_ctrl_w(device_t *device, offs_t offset, UINT32 data, UINT32 mem_mask)
 {
 	jaguar_state *jaguar = get_safe_token(device);
 	UINT32 oldval, newval;
@@ -1333,7 +1333,7 @@ void jaguargpu_ctrl_w(running_device *device, offs_t offset, UINT32 data, UINT32
     I/O HANDLING
 ***************************************************************************/
 
-UINT32 jaguardsp_ctrl_r(running_device *device, offs_t offset)
+UINT32 jaguardsp_ctrl_r(device_t *device, offs_t offset)
 {
 	jaguar_state *jaguar = get_safe_token(device);
 
@@ -1345,7 +1345,7 @@ UINT32 jaguardsp_ctrl_r(running_device *device, offs_t offset)
 }
 
 
-void jaguardsp_ctrl_w(running_device *device, offs_t offset, UINT32 data, UINT32 mem_mask)
+void jaguardsp_ctrl_w(device_t *device, offs_t offset, UINT32 data, UINT32 mem_mask)
 {
 	jaguar_state *jaguar = get_safe_token(device);
 	UINT32 oldval, newval;

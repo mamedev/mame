@@ -152,7 +152,7 @@ struct _m68_state_t
 	UINT8 const *index_cycle;
 };
 
-INLINE m68_state_t *get_safe_token(running_device *device)
+INLINE m68_state_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == HD6309);
@@ -505,7 +505,7 @@ static void check_irq_lines( m68_state_t *m68_state )
 
 static STATE_POSTLOAD( hd6309_postload )
 {
-	running_device *device = (legacy_cpu_device *)param;
+	device_t *device = (legacy_cpu_device *)param;
 	m68_state_t *m68_state = get_safe_token(device);
 
 	UpdateState(m68_state);

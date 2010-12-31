@@ -1157,7 +1157,7 @@ READ8_HANDLER( leland_master_input_r )
 
 WRITE8_HANDLER( leland_master_output_w )
 {
-	running_device *eeprom;
+	device_t *eeprom;
 
 	switch (offset)
 	{

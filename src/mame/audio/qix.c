@@ -101,7 +101,7 @@ static WRITE8_DEVICE_HANDLER( sndpia_2_warning_w )
 
 static TIMER_CALLBACK( deferred_sndpia1_porta_w )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	pia6821_porta_w(device, 0, param);
 }
 

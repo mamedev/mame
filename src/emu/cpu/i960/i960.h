@@ -62,7 +62,7 @@ enum
 
 DECLARE_LEGACY_CPU_DEVICE(I960, i960);
 
-void i960_noburst(running_device *device);
-void i960_stall(running_device *device);
+void i960_noburst(device_t *device);
+void i960_stall(device_t *device);
 
 #endif /* __I960_H__ */

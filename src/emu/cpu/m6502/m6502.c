@@ -85,7 +85,7 @@ struct _m6502_Regs
 	m6510_port_write_func port_write;
 };
 
-INLINE m6502_Regs *get_safe_token(running_device *device)
+INLINE m6502_Regs *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == M6502 ||
@@ -330,7 +330,7 @@ static CPU_INIT( n2a03 )
    Bit 7 of address $4011 (the PSG's DPCM control register), when set,
    causes an IRQ to be generated.  This function allows the IRQ to be called
    from the PSG core when such an occasion arises. */
-void n2a03_irq(running_device *device)
+void n2a03_irq(device_t *device)
 {
 	m6502_Regs *cpustate = get_safe_token(device);
 

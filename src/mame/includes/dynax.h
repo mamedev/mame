@@ -118,13 +118,13 @@ public:
 
 
 	/* devices */
-	running_device *maincpu;
-	running_device *soundcpu;
-	running_device *rtc;
-	running_device *ymsnd;
+	device_t *maincpu;
+	device_t *soundcpu;
+	device_t *rtc;
+	device_t *ymsnd;
 	okim6295_device *oki;
-	running_device *top_scr;
-	running_device *bot_scr;
+	device_t *top_scr;
+	device_t *bot_scr;
 };
 
 //----------- defined in drivers/dynax.c -----------

@@ -37,7 +37,7 @@ typedef enum { e_attack = 0, e_decay, e_sustain, e_sustainEnd, e_release, e_rele
 struct psxinfo
 {
 	const psx_spu_interface *intf;
-	running_device *device;
+	device_t *device;
 
 	UINT32 *m_p_n_psxram;
 	UINT16 m_n_mainvolumeleft;
@@ -85,7 +85,7 @@ struct psxinfo
 	UINT32 m_n_spu_delay;
 };
 
-INLINE struct psxinfo *get_safe_token(running_device *device)
+INLINE struct psxinfo *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == PSXSPU);

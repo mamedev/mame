@@ -173,7 +173,7 @@ static int dsc0, dsc1;
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	running_device *discrete = space->machine->device("discrete");
+	device_t *discrete = space->machine->device("discrete");
 
 	switch (offset)
 	{

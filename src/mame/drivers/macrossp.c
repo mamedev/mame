@@ -582,7 +582,7 @@ GFXDECODE_END
 
 /*** MACHINE DRIVER **********************************************************/
 
-static void irqhandler(running_device *device, int irq)
+static void irqhandler(device_t *device, int irq)
 {
 	// macrossp_state *state = space->machine->driver_data<macrossp_state>();
 	logerror("ES5506 irq %d\n", irq);

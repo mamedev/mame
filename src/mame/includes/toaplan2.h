@@ -41,7 +41,7 @@ public:
 #endif
 
 	int sub_cpu_type;
-	running_device *sub_cpu;
+	device_t *sub_cpu;
 
 	UINT16 mcu_data;
 	UINT16 video_status;
@@ -75,10 +75,10 @@ public:
 
 /*----------- defined in audio/toaplan2.c -----------*/
 
-void dogyuun_okisnd_w(running_device *device, int data);
-void kbash_okisnd_w(running_device *device, int data);
-void fixeight_okisnd_w(running_device *device, int data);
-void batsugun_okisnd_w(running_device *device, int data);
+void dogyuun_okisnd_w(device_t *device, int data);
+void kbash_okisnd_w(device_t *device, int data);
+void fixeight_okisnd_w(device_t *device, int data);
+void batsugun_okisnd_w(device_t *device, int data);
 
 
 /*----------- defined in video/toaplan2.c -----------*/

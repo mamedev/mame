@@ -400,7 +400,7 @@ static void sharrier_i8751_sim(running_machine *machine)
  *
  *************************************/
 
-static void sound_irq(running_device *device, int irq)
+static void sound_irq(device_t *device, int irq)
 {
 	segas1x_state *state = device->machine->driver_data<segas1x_state>();
 	cpu_set_input_line(state->soundcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);

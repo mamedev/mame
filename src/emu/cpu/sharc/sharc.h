@@ -21,10 +21,10 @@ typedef struct {
 	SHARC_BOOT_MODE boot_mode;
 } sharc_config;
 
-extern void sharc_set_flag_input(running_device *device, int flag_num, int state);
+extern void sharc_set_flag_input(device_t *device, int flag_num, int state);
 
-extern void sharc_external_iop_write(running_device *device, UINT32 address, UINT32 data);
-extern void sharc_external_dma_write(running_device *device, UINT32 address, UINT64 data);
+extern void sharc_external_iop_write(device_t *device, UINT32 address, UINT32 data);
+extern void sharc_external_dma_write(device_t *device, UINT32 address, UINT64 data);
 
 DECLARE_LEGACY_CPU_DEVICE(ADSP21062, adsp21062);
 

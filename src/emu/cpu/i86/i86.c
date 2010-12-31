@@ -72,7 +72,7 @@ struct _i8086_state
 	devcb_resolved_write_line	out_tmrout1_func;
 };
 
-INLINE i8086_state *get_safe_token(running_device *device)
+INLINE i8086_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == I8086 ||
@@ -111,7 +111,7 @@ static UINT8 parity_table[256];
 
 
 /***************************************************************************/
-static void i8086_state_register(running_device *device)
+static void i8086_state_register(device_t *device)
 {
 	i8086_state *cpustate = get_safe_token(device);
 	state_save_register_device_item_array(device, 0, cpustate->regs.w);

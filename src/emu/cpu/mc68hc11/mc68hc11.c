@@ -79,7 +79,7 @@ struct _hc11_state
 	UINT8 tflg1;
 };
 
-INLINE hc11_state *get_safe_token(running_device *device)
+INLINE hc11_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == MC68HC11);

@@ -14,7 +14,7 @@ typedef struct _ym2608_interface ym2608_interface;
 struct _ym2608_interface
 {
 	const ay8910_interface ay8910_intf;
-	void ( *handler )( running_device *device, int irq );	/* IRQ handler for the YM2608 */
+	void ( *handler )( device_t *device, int irq );	/* IRQ handler for the YM2608 */
 };
 
 READ8_DEVICE_HANDLER( ym2608_r );

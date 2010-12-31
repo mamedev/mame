@@ -525,7 +525,7 @@ GFXDECODE_END
 
 static VIDEO_UPDATE( slotcarn )
 {
-	running_device *mc6845 = screen->machine->device("crtc");
+	device_t *mc6845 = screen->machine->device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 
 	return 0;

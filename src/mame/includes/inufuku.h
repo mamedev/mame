@@ -25,7 +25,7 @@ public:
 	UINT16    pending_command;
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 };
 
 

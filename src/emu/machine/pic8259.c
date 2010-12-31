@@ -70,7 +70,7 @@ struct pic8259
 };
 
 
-INLINE pic8259_t *get_safe_token(running_device *device) {
+INLINE pic8259_t *get_safe_token(device_t *device) {
 	assert( device != NULL );
 	assert( device->type() == PIC8259 );
 	return ( pic8259_t *) downcast<legacy_device_base *>(device)->token();
@@ -79,7 +79,7 @@ INLINE pic8259_t *get_safe_token(running_device *device) {
 
 static TIMER_CALLBACK( pic8259_timerproc )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	pic8259_t	*pic8259 = get_safe_token(device);
 	int irq;
 	UINT8 mask;
@@ -118,7 +118,7 @@ INLINE void pic8259_set_timer(pic8259_t *pic8259)
 }
 
 
-static void pic8259_set_irq_line(running_device *device, int irq, int state)
+static void pic8259_set_irq_line(device_t *device, int irq, int state)
 {
 	pic8259_t	*pic8259 = get_safe_token(device);
 	UINT8		old_irq_lines = pic8259->irq_lines;
@@ -157,7 +157,7 @@ WRITE_LINE_DEVICE_HANDLER( pic8259_ir5_w ) { pic8259_set_irq_line(device, 5, sta
 WRITE_LINE_DEVICE_HANDLER( pic8259_ir6_w ) { pic8259_set_irq_line(device, 6, state); }
 WRITE_LINE_DEVICE_HANDLER( pic8259_ir7_w ) { pic8259_set_irq_line(device, 7, state); }
 
-int pic8259_acknowledge(running_device *device)
+int pic8259_acknowledge(device_t *device)
 {
 	pic8259_t	*pic8259 = get_safe_token(device);
 	UINT8 mask;

@@ -42,7 +42,7 @@
 typedef struct _ttl74153_config ttl74153_config;
 struct _ttl74153_config
 {
-	void (*output_cb)(running_device *device);
+	void (*output_cb)(device_t *device);
 };
 
 
@@ -53,13 +53,13 @@ struct _ttl74153_config
 
 
 /* must call TTL74153_update() after setting the inputs */
-void ttl74153_update(running_device *device);
+void ttl74153_update(device_t *device);
 
-void ttl74153_a_w(running_device *device, int data);
-void ttl74153_b_w(running_device *device, int data);
-void ttl74153_input_line_w(running_device *device, int section, int input_line, int data);
-void ttl74153_enable_w(running_device *device, int section, int data);
-int ttl74153_output_r(running_device *device, int section);
+void ttl74153_a_w(device_t *device, int data);
+void ttl74153_b_w(device_t *device, int data);
+void ttl74153_input_line_w(device_t *device, int section, int input_line, int data);
+void ttl74153_enable_w(device_t *device, int section, int data);
+int ttl74153_output_r(device_t *device, int section);
 
 DECLARE_LEGACY_DEVICE(TTL74153, ttl74153);
 

@@ -35,7 +35,7 @@ public:
 	UINT8 pot_latch;
 
 	/* devices */
-	running_device *maincpu;
+	device_t *maincpu;
 };
 
 /*************************************

@@ -3572,7 +3572,7 @@ MACHINE_CONFIG_END
 
 
 
-static void sound_irq(running_device *device, int state)
+static void sound_irq(device_t *device, int state)
 {
 //   cputag_set_input_line(machine, "maincpu", 3, state);
 }

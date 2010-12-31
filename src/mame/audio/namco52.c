@@ -52,8 +52,8 @@
 typedef struct _namco_52xx_state namco_52xx_state;
 struct _namco_52xx_state
 {
-	running_device *cpu;
-	running_device *discrete;
+	device_t *cpu;
+	device_t *discrete;
 	int basenode;
 	devcb_resolved_read8 romread;
 	devcb_resolved_read8 si;
@@ -61,7 +61,7 @@ struct _namco_52xx_state
 	UINT32 address;
 };
 
-INLINE namco_52xx_state *get_safe_token(running_device *device)
+INLINE namco_52xx_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == NAMCO_52XX);
@@ -73,7 +73,7 @@ INLINE namco_52xx_state *get_safe_token(running_device *device)
 
 static TIMER_CALLBACK( namco_52xx_latch_callback )
 {
-	namco_52xx_state *state = get_safe_token((running_device *)ptr);
+	namco_52xx_state *state = get_safe_token((device_t *)ptr);
 	state->latched_cmd = param;
 }
 
@@ -134,7 +134,7 @@ static WRITE8_HANDLER( namco_52xx_O_w )
 
 static TIMER_CALLBACK( namco_52xx_irq_clear )
 {
-	namco_52xx_state *state = get_safe_token((running_device *)ptr);
+	namco_52xx_state *state = get_safe_token((device_t *)ptr);
 	cpu_set_input_line(state->cpu, 0, CLEAR_LINE);
 }
 
@@ -160,7 +160,7 @@ WRITE8_DEVICE_HANDLER( namco_52xx_write )
 
 static TIMER_CALLBACK( external_clock_pulse )
 {
-	namco_52xx_state *state = get_safe_token((running_device *)ptr);
+	namco_52xx_state *state = get_safe_token((device_t *)ptr);
 	mb88_external_clock_w(state->cpu, 1);
 	mb88_external_clock_w(state->cpu, 0);
 }

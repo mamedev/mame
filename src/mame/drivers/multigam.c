@@ -334,7 +334,7 @@ static UINT8* multigam3_mmc3_prg_base;
 static int multigam3_mmc3_prg_size;
 static int multigam3_mmc3_chr_bank_base;
 
-static void multigam3_mmc3_scanline_cb( running_device *device, int scanline, int vblank, int blanked )
+static void multigam3_mmc3_scanline_cb( device_t *device, int scanline, int vblank, int blanked )
 {
 	if (!vblank && !blanked)
 	{
@@ -348,7 +348,7 @@ static void multigam3_mmc3_scanline_cb( running_device *device, int scanline, in
 
 static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 {
-	running_device *ppu = space->machine->device("ppu");
+	device_t *ppu = space->machine->device("ppu");
 
 	/* basically, a MMC3 mapper from the nes */
 	static int multigam3_mmc3_command;
@@ -816,7 +816,7 @@ static UINT8 supergm3_chr_bank;
 
 static void supergm3_set_bank(running_machine *machine)
 {
-	running_device *ppu = machine->device("ppu");
+	device_t *ppu = machine->device("ppu");
 	UINT8* mem = memory_region(machine, "maincpu");
 
 	// video bank
@@ -1038,7 +1038,7 @@ static PALETTE_INIT( multigam )
 	ppu2c0x_init_palette(machine, 0);
 }
 
-static void ppu_irq( running_device *device, int *ppu_regs )
+static void ppu_irq( device_t *device, int *ppu_regs )
 {
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }

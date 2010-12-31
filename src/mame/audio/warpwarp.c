@@ -36,7 +36,7 @@ struct _warpwarp_sound_state
 	int mcount;
 };
 
-INLINE warpwarp_sound_state *get_safe_token(running_device *device)
+INLINE warpwarp_sound_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == WARPWARP);

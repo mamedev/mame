@@ -396,7 +396,7 @@ static READ16_HANDLER( ninjaw_sound_r )
 static WRITE8_HANDLER( ninjaw_pancontrol )
 {
 	ninjaw_state *state = space->machine->driver_data<ninjaw_state>();
-	running_device *flt = NULL;
+	device_t *flt = NULL;
 	offset &= 3;
 
 	switch (offset)
@@ -646,7 +646,7 @@ GFXDECODE_END
 **************************************************************/
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-static void irqhandler( running_device *device, int irq )
+static void irqhandler( device_t *device, int irq )
 {
 	ninjaw_state *state = device->machine->driver_data<ninjaw_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);

@@ -33,7 +33,7 @@ struct _adc1038_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE adc1038_state *adc1038_get_safe_token( running_device *device )
+INLINE adc1038_state *adc1038_get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == ADC1038);
@@ -41,7 +41,7 @@ INLINE adc1038_state *adc1038_get_safe_token( running_device *device )
 	return (adc1038_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const adc1038_interface *adc1038_get_interface( running_device *device )
+INLINE const adc1038_interface *adc1038_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == ADC1038));

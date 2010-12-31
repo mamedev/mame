@@ -178,7 +178,7 @@ public:
 #define DC_CFIFO_DIAG			0x7c/4
 
 
-static void ide_interrupt(running_device *device, int state);
+static void ide_interrupt(device_t *device, int state);
 
 
 
@@ -485,7 +485,7 @@ static WRITE32_HANDLER(bios_ram_w)
 }
 #endif
 
-static UINT8 mediagx_config_reg_r(running_device *device)
+static UINT8 mediagx_config_reg_r(device_t *device)
 {
 	mediagx_state *state = device->machine->driver_data<mediagx_state>();
 
@@ -493,7 +493,7 @@ static UINT8 mediagx_config_reg_r(running_device *device)
 	return state->mediagx_config_regs[state->mediagx_config_reg_sel];
 }
 
-static void mediagx_config_reg_w(running_device *device, UINT8 data)
+static void mediagx_config_reg_w(device_t *device, UINT8 data)
 {
 	mediagx_state *state = device->machine->driver_data<mediagx_state>();
 
@@ -659,7 +659,7 @@ static WRITE32_HANDLER( parallel_port_w )
 	}
 }
 
-static UINT32 cx5510_pci_r(running_device *busdevice, running_device *device, int function, int reg, UINT32 mem_mask)
+static UINT32 cx5510_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
 {
 	mediagx_state *state = busdevice->machine->driver_data<mediagx_state>();
 
@@ -672,7 +672,7 @@ static UINT32 cx5510_pci_r(running_device *busdevice, running_device *device, in
 	return state->cx5510_regs[reg/4];
 }
 
-static void cx5510_pci_w(running_device *busdevice, running_device *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+static void cx5510_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
 {
 	mediagx_state *state = busdevice->machine->driver_data<mediagx_state>();
 
@@ -857,7 +857,7 @@ static WRITE8_HANDLER( pc_dma_write_byte )
 	space->write_byte(page_offset + offset, data);
 }
 
-static void set_dma_channel(running_device *device, int channel, int _state)
+static void set_dma_channel(device_t *device, int channel, int _state)
 {
 	mediagx_state *state = device->machine->driver_data<mediagx_state>();
 
@@ -1162,7 +1162,7 @@ static void keyboard_interrupt(running_machine *machine, int _state)
 	pic8259_ir1_w(state->pic8259_1, _state);
 }
 
-static void ide_interrupt(running_device *device, int _state)
+static void ide_interrupt(device_t *device, int _state)
 {
 	mediagx_state *state = device->machine->driver_data<mediagx_state>();
 

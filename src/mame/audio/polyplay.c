@@ -48,7 +48,7 @@ void polyplay_set_channel2(int active)
 
 void polyplay_play_channel1(running_machine *machine, int data)
 {
-	running_device *samples = machine->device("samples");
+	device_t *samples = machine->device("samples");
 	if (data) {
 		freq1 = 2457600 / 16 / data / 8;
 		sample_set_volume(samples, 0, channel_playing1 * 1.0);
@@ -62,7 +62,7 @@ void polyplay_play_channel1(running_machine *machine, int data)
 
 void polyplay_play_channel2(running_machine *machine, int data)
 {
-	running_device *samples = machine->device("samples");
+	device_t *samples = machine->device("samples");
 	if (data) {
 		freq2 = 2457600 / 16 / data / 8;
 		sample_set_volume(samples, 1, channel_playing2 * 1.0);

@@ -218,7 +218,7 @@ static void poly17_init(running_machine *machine)
 }
 
 
-void balsente_noise_gen(running_device *device, int count, short *buffer)
+void balsente_noise_gen(device_t *device, int count, short *buffer)
 {
 	balsente_state *state = device->machine->driver_data<balsente_state>();
 	int chip;

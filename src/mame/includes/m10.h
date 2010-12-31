@@ -56,10 +56,10 @@ public:
 	int                 last;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *ic8j1;
-	running_device *ic8j2;
-	running_device *samples;
+	device_t *maincpu;
+	device_t *ic8j1;
+	device_t *ic8j2;
+	device_t *samples;
 };
 
 

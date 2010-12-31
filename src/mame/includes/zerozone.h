@@ -20,7 +20,7 @@ public:
 	tilemap_t     *zz_tilemap;
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 };
 
 /*----------- defined in video/zerozone.c -----------*/

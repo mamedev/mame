@@ -40,8 +40,8 @@ public:
 	INT32 last_steering_val;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *discrete;
+	device_t *maincpu;
+	device_t *discrete;
 };
 
 

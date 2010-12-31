@@ -27,9 +27,9 @@ public:
 	UINT8    sound_msb_latch;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *bsmt;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *bsmt;
 };
 
 

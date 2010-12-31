@@ -28,8 +28,8 @@ public:
 	int           tilemap0_color;
 
 	/* devices */
-	running_device *audio_cpu;
-	running_device *eeprom;
+	device_t *audio_cpu;
+	device_t *eeprom;
 };
 
 

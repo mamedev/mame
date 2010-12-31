@@ -6,7 +6,7 @@
 #include "devlegcy.h"
 
 
-void flt_volume_set_volume(running_device *device, float volume);
+void flt_volume_set_volume(device_t *device, float volume);
 
 DECLARE_LEGACY_SOUND_DEVICE(FILTER_VOLUME, filter_volume);
 

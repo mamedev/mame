@@ -1123,8 +1123,8 @@ VIDEO_UPDATE ( wecleman )
 
 VIDEO_UPDATE( hotchase )
 {
-	running_device *k051316_1 = screen->machine->device("k051316_1");
-	running_device *k051316_2 = screen->machine->device("k051316_2");
+	device_t *k051316_1 = screen->machine->device("k051316_1");
+	device_t *k051316_2 = screen->machine->device("k051316_2");
 	int video_on;
 
 	video_on = wecleman_irqctrl & 0x40;

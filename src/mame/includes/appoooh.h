@@ -24,7 +24,7 @@ public:
 	UINT32   adpcm_address;
 
 	/* devices */
-	running_device *adpcm;
+	device_t *adpcm;
 };
 
 #define CHR1_OFST   0x00  /* palette page of char set #1 */

@@ -28,9 +28,9 @@ public:
 	int         int_enable_0, int_enable_1;
 
 	/* devices */
-	running_device *filter1;
-	running_device *filter2;
-	running_device *filter3;
+	device_t *filter1;
+	device_t *filter2;
+	device_t *filter3;
 };
 
 /*----------- defined in video/ddribble.c -----------*/

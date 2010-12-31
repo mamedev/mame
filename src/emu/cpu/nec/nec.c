@@ -118,7 +118,7 @@ typedef UINT32 DWORD;
 
 extern int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, const nec_config *config);
 
-INLINE nec_state_t *get_safe_token(running_device *device)
+INLINE nec_state_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == V20 ||

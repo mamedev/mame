@@ -238,7 +238,7 @@ static void log_add_disasm_comment(rsp_state *rsp, drcuml_block *block, UINT32 p
 #define SET_ZERO_FLAG(x)			{ rsp->flag[0] |= (0x100 << (x)); }
 #define CLEAR_ZERO_FLAG(x)			{ rsp->flag[0] &= ~(0x100 << (x)); }
 
-INLINE rsp_state *get_safe_token(running_device *device)
+INLINE rsp_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == RSP);
@@ -377,7 +377,7 @@ INLINE void WRITE32(rsp_state *rsp, UINT32 address, UINT32 data)
     rspdrc_set_options - configure DRC options
 -------------------------------------------------*/
 
-void rspdrc_set_options(running_device *device, UINT32 options)
+void rspdrc_set_options(device_t *device, UINT32 options)
 {
 	rsp_state *rsp = get_safe_token(device);
 	rsp->impstate->drcoptions = options;
@@ -388,7 +388,7 @@ void rspdrc_set_options(running_device *device, UINT32 options)
     rspdrc_add_imem - register an imem region
 -------------------------------------------------*/
 
-void rspdrc_add_imem(running_device *device, void *base)
+void rspdrc_add_imem(device_t *device, void *base)
 {
 	rsp_state *rsp = get_safe_token(device);
 	rsp->impstate->imem = base;
@@ -399,7 +399,7 @@ void rspdrc_add_imem(running_device *device, void *base)
     rspdrc_add_dmem - register a dmem region
 -------------------------------------------------*/
 
-void rspdrc_add_dmem(running_device *device, void *base)
+void rspdrc_add_dmem(device_t *device, void *base)
 {
 	rsp_state *rsp = get_safe_token(device);
 	rsp->impstate->dmem = base;
@@ -3383,7 +3383,7 @@ static CPU_EXECUTE( rsp )
     accessor to code_flush_cache
 -------------------------------------------------*/
 
-void rspdrc_flush_drc_cache(running_device *device)
+void rspdrc_flush_drc_cache(device_t *device)
 {
 	rsp_state *rsp = get_safe_token(device);
 	rsp->impstate->cache_dirty = TRUE;

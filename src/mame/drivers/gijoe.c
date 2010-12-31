@@ -159,7 +159,7 @@ static READ16_HANDLER( sound_status_r )
 	return soundlatch2_r(space, 0);
 }
 
-static void sound_nmi( running_device *device )
+static void sound_nmi( device_t *device )
 {
 	gijoe_state *state = device->machine->driver_data<gijoe_state>();
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);

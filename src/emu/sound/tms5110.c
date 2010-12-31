@@ -114,8 +114,8 @@ struct _tms5110_state
 	UINT8  addr_bit;
 
 	/* external callback */
-	int (*M0_callback)(running_device *);
-	void (*set_load_address)(running_device *, int);
+	int (*M0_callback)(device_t *);
+	void (*set_load_address)(device_t *, int);
 
 	/* callbacks */
 	devcb_resolved_write_line m0_func;		/* the M0 line */
@@ -125,7 +125,7 @@ struct _tms5110_state
 	devcb_resolved_write_line romclk_func;	/* rom clock - Only used to drive the data lines */
 
 
-	running_device *device;
+	device_t *device;
 
 	/* these contain data describing the current and previous voice frames */
 	UINT16 old_energy;
@@ -184,7 +184,7 @@ struct _tmsprom_state
 	devcb_resolved_write_line pdc_func;		/* tms pdc func */
 	devcb_resolved_write8 ctl_func;			/* tms ctl func */
 
-	running_device *device;
+	device_t *device;
 	emu_timer *romclk_timer;
 
 	const tmsprom_interface *intf;
@@ -195,7 +195,7 @@ struct _tmsprom_state
 
 
 
-INLINE tms5110_state *get_safe_token(running_device *device)
+INLINE tms5110_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TMS5110 ||
@@ -208,7 +208,7 @@ INLINE tms5110_state *get_safe_token(running_device *device)
 	return (tms5110_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE tmsprom_state *get_safe_token_prom(running_device *device)
+INLINE tmsprom_state *get_safe_token_prom(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TMSPROM);
@@ -979,7 +979,7 @@ static const unsigned int example_word_TEN[619]={
 #endif
 
 
-static int speech_rom_read_bit(running_device *device)
+static int speech_rom_read_bit(device_t *device)
 {
 	tms5110_state *tms = get_safe_token(device);
 
@@ -995,7 +995,7 @@ static int speech_rom_read_bit(running_device *device)
 	return r;
 }
 
-static void speech_rom_set_addr(running_device *device, int addr)
+static void speech_rom_set_addr(device_t *device, int addr)
 {
 	tms5110_state *tms = get_safe_token(device);
 
@@ -1225,7 +1225,7 @@ READ8_DEVICE_HANDLER( m58817_status_r )
 
 static TIMER_CALLBACK( romclk_hack_timer_cb )
 {
-	tms5110_state *tms = get_safe_token((running_device *) ptr);
+	tms5110_state *tms = get_safe_token((device_t *) ptr);
 	tms->romclk_hack_state = !tms->romclk_hack_state;
 }
 
@@ -1253,7 +1253,7 @@ READ8_DEVICE_HANDLER( tms5110_romclk_hack_r )
 
 ******************************************************************************/
 
-int tms5110_ready_r(running_device *device)
+int tms5110_ready_r(device_t *device)
 {
 	tms5110_state *tms = get_safe_token(device);
 
@@ -1300,7 +1300,7 @@ static STREAM_UPDATE( tms5110_update )
 
 ******************************************************************************/
 
-void tms5110_set_frequency(running_device *device, int frequency)
+void tms5110_set_frequency(device_t *device, int frequency)
 {
 	tms5110_state *tms = get_safe_token(device);
 	stream_set_sample_rate(tms->stream, frequency / 80);
@@ -1373,7 +1373,7 @@ static void update_prom_cnt(tmsprom_state *tms)
 
 static TIMER_CALLBACK( tmsprom_step )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	tmsprom_state *tms = get_safe_token_prom(device);
 
 	/* only 16 bytes needed ... The original dump is bad. This

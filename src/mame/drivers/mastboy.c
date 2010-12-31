@@ -623,7 +623,7 @@ static WRITE8_HANDLER( backupram_enable_w )
 
 static WRITE8_HANDLER( msm5205_mastboy_m5205_sambit0_w )
 {
-	running_device *adpcm = space->machine->device("msm");
+	device_t *adpcm = space->machine->device("msm");
 
 	mastboy_m5205_sambit0 = data & 1;
 	msm5205_playmode_w(adpcm,  (1 << 2) | (mastboy_m5205_sambit1 << 1) | (mastboy_m5205_sambit0) );
@@ -633,7 +633,7 @@ static WRITE8_HANDLER( msm5205_mastboy_m5205_sambit0_w )
 
 static WRITE8_HANDLER( msm5205_mastboy_m5205_sambit1_w )
 {
-	running_device *adpcm = space->machine->device("msm");
+	device_t *adpcm = space->machine->device("msm");
 
 	mastboy_m5205_sambit1 = data & 1;
 
@@ -653,7 +653,7 @@ static WRITE8_HANDLER( mastboy_msm5205_data_w )
 	mastboy_m5205_next = data;
 }
 
-static void mastboy_adpcm_int(running_device *device)
+static void mastboy_adpcm_int(device_t *device)
 {
 	msm5205_data_w(device, mastboy_m5205_next);
 	mastboy_m5205_next >>= 4;

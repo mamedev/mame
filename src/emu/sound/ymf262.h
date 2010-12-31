@@ -32,7 +32,7 @@ typedef void (*OPL3_IRQHANDLER)(void *param,int irq);
 typedef void (*OPL3_UPDATEHANDLER)(void *param,int min_interval_us);
 
 
-void *ymf262_init(running_device *device, int clock, int rate);
+void *ymf262_init(device_t *device, int clock, int rate);
 void ymf262_shutdown(void *chip);
 void ymf262_reset_chip(void *chip);
 int  ymf262_write(void *chip, int a, int v);

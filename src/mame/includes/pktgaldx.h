@@ -21,8 +21,8 @@ public:
 	UINT16*   pktgaldb_sprites;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *deco16ic;
+	device_t *maincpu;
+	device_t *deco16ic;
 };
 
 

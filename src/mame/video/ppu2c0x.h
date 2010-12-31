@@ -75,10 +75,10 @@ enum
 };
 
 /* callback datatypes */
-typedef void (*ppu2c0x_scanline_cb)( running_device *device, int scanline, int vblank, int blanked );
-typedef void (*ppu2c0x_hblank_cb)( running_device *device, int scanline, int vblank, int blanked );
-typedef void (*ppu2c0x_nmi_cb)( running_device *device, int *ppu_regs );
-typedef int  (*ppu2c0x_vidaccess_cb)( running_device *device, int address, int data );
+typedef void (*ppu2c0x_scanline_cb)( device_t *device, int scanline, int vblank, int blanked );
+typedef void (*ppu2c0x_hblank_cb)( device_t *device, int scanline, int vblank, int blanked );
+typedef void (*ppu2c0x_nmi_cb)( device_t *device, int *ppu_regs );
+typedef int  (*ppu2c0x_vidaccess_cb)( device_t *device, int address, int data );
 
 typedef struct _ppu2c0x_interface ppu2c0x_interface;
 struct _ppu2c0x_interface
@@ -108,19 +108,19 @@ DECLARE_LEGACY_MEMORY_DEVICE(PPU_2C07, ppu2c07);		// PAL NES
 void ppu2c0x_init_palette(running_machine *machine, int first_entry ) ATTR_NONNULL(1);
 void ppu2c0x_init_palette_rgb(running_machine *machine, int first_entry ) ATTR_NONNULL(1);
 
-void ppu2c0x_spriteram_dma(address_space *space, running_device *device, const UINT8 page ) ATTR_NONNULL(1);
-void ppu2c0x_render( running_device *device, bitmap_t *bitmap, int flipx, int flipy, int sx, int sy ) ATTR_NONNULL(1);
-int ppu2c0x_get_pixel( running_device *device, int x, int y ) ATTR_NONNULL(1);
-int ppu2c0x_get_colorbase( running_device *device ) ATTR_NONNULL(1);
-int ppu2c0x_get_current_scanline( running_device *device ) ATTR_NONNULL(1);
-int ppu2c0x_is_sprite_8x16( running_device *device ) ATTR_NONNULL(1);
-void ppu2c0x_set_scanline_callback( running_device *device, ppu2c0x_scanline_cb cb ) ATTR_NONNULL(1);
-void ppu2c0x_set_hblank_callback( running_device *device, ppu2c0x_scanline_cb cb ) ATTR_NONNULL(1);
-void ppu2c0x_set_vidaccess_callback( running_device *device, ppu2c0x_vidaccess_cb cb ) ATTR_NONNULL(1);
-void ppu2c0x_set_scanlines_per_frame( running_device *device, int scanlines ) ATTR_NONNULL(1);
+void ppu2c0x_spriteram_dma(address_space *space, device_t *device, const UINT8 page ) ATTR_NONNULL(1);
+void ppu2c0x_render( device_t *device, bitmap_t *bitmap, int flipx, int flipy, int sx, int sy ) ATTR_NONNULL(1);
+int ppu2c0x_get_pixel( device_t *device, int x, int y ) ATTR_NONNULL(1);
+int ppu2c0x_get_colorbase( device_t *device ) ATTR_NONNULL(1);
+int ppu2c0x_get_current_scanline( device_t *device ) ATTR_NONNULL(1);
+int ppu2c0x_is_sprite_8x16( device_t *device ) ATTR_NONNULL(1);
+void ppu2c0x_set_scanline_callback( device_t *device, ppu2c0x_scanline_cb cb ) ATTR_NONNULL(1);
+void ppu2c0x_set_hblank_callback( device_t *device, ppu2c0x_scanline_cb cb ) ATTR_NONNULL(1);
+void ppu2c0x_set_vidaccess_callback( device_t *device, ppu2c0x_vidaccess_cb cb ) ATTR_NONNULL(1);
+void ppu2c0x_set_scanlines_per_frame( device_t *device, int scanlines ) ATTR_NONNULL(1);
 
 //27/12/2002 (HACK!)
-extern void (*ppu_latch)( running_device *device, offs_t offset );
+extern void (*ppu_latch)( device_t *device, offs_t offset );
 
 WRITE8_DEVICE_HANDLER( ppu2c0x_w );
 READ8_DEVICE_HANDLER( ppu2c0x_r );

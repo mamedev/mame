@@ -26,9 +26,9 @@ struct _okim6258_interface
 #define	OUTPUT_10BITS		0
 #define	OUTPUT_12BITS		1
 
-void okim6258_set_divider(running_device *device, int val);
-void okim6258_set_clock(running_device *device, int val);
-int okim6258_get_vclk(running_device *device);
+void okim6258_set_divider(device_t *device, int val);
+void okim6258_set_clock(device_t *device, int val);
+int okim6258_get_vclk(device_t *device);
 
 READ8_DEVICE_HANDLER( okim6258_status_r );
 WRITE8_DEVICE_HANDLER( okim6258_data_w );

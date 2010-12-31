@@ -41,12 +41,12 @@ public:
 	INT32      banknum;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *tc0140syt;
-	running_device *tc0480scp;
-	running_device *tc0360pri;
-	running_device *tc0640fio;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *tc0140syt;
+	device_t *tc0480scp;
+	device_t *tc0360pri;
+	device_t *tc0640fio;
 };
 
 

@@ -29,7 +29,7 @@ public:
 	UINT8      snd_data;
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 };
 
 

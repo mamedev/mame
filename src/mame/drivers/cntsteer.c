@@ -54,9 +54,9 @@ public:
 	int      nmimask;	// zerotrgt only
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *subcpu;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *subcpu;
 };
 
 

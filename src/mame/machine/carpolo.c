@@ -69,25 +69,25 @@ static UINT8 car_border_collision_cause;
 static UINT8 priority_0_extension;
 static UINT8 last_wheel_value[4];
 
-static running_device *ttl74148_3s;
+static device_t *ttl74148_3s;
 
-static running_device *ttl74153_1k;
+static device_t *ttl74153_1k;
 
-static running_device *ttl7474_2s_1;
-static running_device *ttl7474_2s_2;
-static running_device *ttl7474_2u_1;
-static running_device *ttl7474_2u_2;
-static running_device *ttl7474_1f_1;
-static running_device *ttl7474_1f_2;
-static running_device *ttl7474_1d_1;
-static running_device *ttl7474_1d_2;
-static running_device *ttl7474_1c_1;
-static running_device *ttl7474_1c_2;
-static running_device *ttl7474_1a_1;
-static running_device *ttl7474_1a_2;
+static device_t *ttl7474_2s_1;
+static device_t *ttl7474_2s_2;
+static device_t *ttl7474_2u_1;
+static device_t *ttl7474_2u_2;
+static device_t *ttl7474_1f_1;
+static device_t *ttl7474_1f_2;
+static device_t *ttl7474_1d_1;
+static device_t *ttl7474_1d_2;
+static device_t *ttl7474_1c_1;
+static device_t *ttl7474_1c_2;
+static device_t *ttl7474_1a_1;
+static device_t *ttl7474_1a_2;
 
 
-void carpolo_74148_3s_cb(running_device *device)
+void carpolo_74148_3s_cb(device_t *device)
 {
 	cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, ttl74148_output_valid_r(device) ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -251,8 +251,8 @@ INTERRUPT_GEN( carpolo_timer_interrupt )
 	for (player = 0; player < 4; player++)
 	{
 		static const char *const portnames[] = { "DIAL0", "DIAL1", "DIAL2", "DIAL3" };
-		running_device *movement_flip_flop;
-		running_device *dir_flip_flop;
+		device_t *movement_flip_flop;
+		device_t *dir_flip_flop;
 
 		switch (player)
 		{

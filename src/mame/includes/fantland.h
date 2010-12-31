@@ -20,11 +20,11 @@ public:
 	int        adpcm_nibble[4];
 
 	/* devices */
-	running_device *audio_cpu;
-	running_device *msm1;
-	running_device *msm2;
-	running_device *msm3;
-	running_device *msm4;
+	device_t *audio_cpu;
+	device_t *msm1;
+	device_t *msm2;
+	device_t *msm3;
+	device_t *msm4;
 };
 
 

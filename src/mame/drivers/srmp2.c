@@ -221,7 +221,7 @@ static WRITE8_DEVICE_HANDLER( srmp3_adpcm_code_w )
 }
 
 
-static void srmp2_adpcm_int(running_device *device)
+static void srmp2_adpcm_int(device_t *device)
 {
 	srmp2_state *state = device->machine->driver_data<srmp2_state>();
 	UINT8 *ROM = memory_region(device->machine, "adpcm");

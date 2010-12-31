@@ -28,6 +28,6 @@ MCFG_DEVICE_CONFIG(_interface)
  DEVICE I/O FUNCTIONS
  ***************************************************************************/
 
-extern int vrender0_ProcessPacket(running_device *device, UINT32 PacketPtr, UINT16 *Dest, UINT8 *TEXTURE);
+extern int vrender0_ProcessPacket(device_t *device, UINT32 PacketPtr, UINT16 *Dest, UINT8 *TEXTURE);
 
 #endif /* __VR0VIDEO_H__ */

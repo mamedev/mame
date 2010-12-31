@@ -184,7 +184,7 @@ static void (* sharc_op[512])(SHARC_REGS *cpustate);
 						((UINT64)(cpustate->internal_ram[((pc-0x20000) * 3) + 1]) << 16) | \
 						((UINT64)(cpustate->internal_ram[((pc-0x20000) * 3) + 2]) << 0)
 
-INLINE SHARC_REGS *get_safe_token(running_device *device)
+INLINE SHARC_REGS *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == ADSP21062);
@@ -369,7 +369,7 @@ static void build_opcode_table(void)
 
 /*****************************************************************************/
 
-void sharc_external_iop_write(running_device *device, UINT32 address, UINT32 data)
+void sharc_external_iop_write(device_t *device, UINT32 address, UINT32 data)
 {
 	SHARC_REGS *cpustate = get_safe_token(device);
 	if (address == 0x1c)
@@ -386,7 +386,7 @@ void sharc_external_iop_write(running_device *device, UINT32 address, UINT32 dat
 	}
 }
 
-void sharc_external_dma_write(running_device *device, UINT32 address, UINT64 data)
+void sharc_external_dma_write(device_t *device, UINT32 address, UINT64 data)
 {
 	SHARC_REGS *cpustate = get_safe_token(device);
 	switch ((cpustate->dma[6].control >> 6) & 0x3)
@@ -606,7 +606,7 @@ static void sharc_set_irq_line(SHARC_REGS *cpustate, int irqline, int state)
 	}
 }
 
-void sharc_set_flag_input(running_device *device, int flag_num, int state)
+void sharc_set_flag_input(device_t *device, int flag_num, int state)
 {
 	SHARC_REGS *cpustate = get_safe_token(device);
 	if (flag_num >= 0 && flag_num < 4)

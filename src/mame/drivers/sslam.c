@@ -255,7 +255,7 @@ static TIMER_CALLBACK( music_playback )
 }
 
 
-static void sslam_play(running_device *device, int track, int data)
+static void sslam_play(device_t *device, int track, int data)
 {
 	sslam_state *state = device->machine->driver_data<sslam_state>();
 	okim6295_device *oki = downcast<okim6295_device *>(device);

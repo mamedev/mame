@@ -137,7 +137,7 @@ WRITE16_HANDLER( hd68k_irq_ack_w )
 }
 
 
-void hdgsp_irq_gen(running_device *device, int irqstate)
+void hdgsp_irq_gen(device_t *device, int irqstate)
 {
 	harddriv_state *state = device->machine->driver_data<harddriv_state>();
 	state->gsp_irq_state = irqstate;
@@ -145,7 +145,7 @@ void hdgsp_irq_gen(running_device *device, int irqstate)
 }
 
 
-void hdmsp_irq_gen(running_device *device, int irqstate)
+void hdmsp_irq_gen(device_t *device, int irqstate)
 {
 	harddriv_state *state = device->machine->driver_data<harddriv_state>();
 	state->msp_irq_state = irqstate;
@@ -1372,7 +1372,7 @@ WRITE16_HANDLER( hd68k_ds3_program_w )
  *
  *************************************/
 
-void hddsk_update_pif(running_device *device, UINT32 pins)
+void hddsk_update_pif(device_t *device, UINT32 pins)
 {
 	atarigen_state *atarigen = device->machine->driver_data<atarigen_state>();
 	atarigen->sound_int_state = ((pins & DSP32_OUTPUT_PIF) != 0);

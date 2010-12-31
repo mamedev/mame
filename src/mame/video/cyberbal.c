@@ -343,7 +343,7 @@ static void update_one_screen(screen_device &screen, bitmap_t *bitmap, const rec
 	rectangle visarea = screen.visible_area();
 
 	/* for 2p games, the left screen is the main screen */
-	running_device *left_screen = screen.machine->device("lscreen");
+	device_t *left_screen = screen.machine->device("lscreen");
 	if (left_screen == NULL)
 		left_screen = screen.machine->device("screen");
 

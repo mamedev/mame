@@ -26,7 +26,7 @@ struct _cps3_sound_state
 	INT8*	   base;
 };
 
-INLINE cps3_sound_state *get_safe_token(running_device *device)
+INLINE cps3_sound_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == CPS3);

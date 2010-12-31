@@ -68,7 +68,7 @@ public:
 	UINT8 hop_mux;
 
 	/* devices */
-	running_device *maincpu;
+	device_t *maincpu;
 };
 
 

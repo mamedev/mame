@@ -54,7 +54,7 @@ struct _scmp_state
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE scmp_state *get_safe_token(running_device *device)
+INLINE scmp_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SCMP || device->type() == INS8060);

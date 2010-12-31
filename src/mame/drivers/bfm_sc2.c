@@ -696,8 +696,8 @@ static WRITE8_HANDLER( volume_override_w )
 
 	if ( old != volume_override )
 	{
-		running_device *ym = space->machine->device("ymsnd");
-		running_device *upd = space->machine->device("upd");
+		device_t *ym = space->machine->device("ymsnd");
+		device_t *upd = space->machine->device("upd");
 		float percent = volume_override? 1.0f : (32-global_volume)/32.0f;
 
 		sound_set_output_gain(ym, 0, percent);
@@ -810,8 +810,8 @@ static WRITE8_HANDLER( expansion_latch_w )
 			}
 
 			{
-				running_device *ym = space->machine->device("ymsnd");
-				running_device *upd = space->machine->device("upd");
+				device_t *ym = space->machine->device("ymsnd");
+				device_t *upd = space->machine->device("upd");
 				float percent = volume_override ? 1.0f : (32-global_volume)/32.0f;
 
 				sound_set_output_gain(ym, 0, percent);

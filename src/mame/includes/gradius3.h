@@ -22,12 +22,12 @@ public:
 	int         irqAen, irqBmask;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *subcpu;
-	running_device *k007232;
-	running_device *k052109;
-	running_device *k051960;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *subcpu;
+	device_t *k007232;
+	device_t *k052109;
+	device_t *k051960;
 };
 
 /*----------- defined in video/gradius3.c -----------*/

@@ -34,7 +34,7 @@ public:
 	UINT8    potsense;
 
 	/* devices */
-	running_device *maincpu;
+	device_t *maincpu;
 };
 
 

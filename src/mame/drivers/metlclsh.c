@@ -253,7 +253,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static void metlclsh_irqhandler(running_device *device, int linestate)
+static void metlclsh_irqhandler(device_t *device, int linestate)
 {
 	metlclsh_state *state = device->machine->driver_data<metlclsh_state>();
 	cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, linestate);

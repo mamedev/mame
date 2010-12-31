@@ -247,7 +247,7 @@ INPUT_PORTS_END
 static UINT32 adpcm_pos;
 static UINT8 adpcm_idle=0;
 
-static void pf_adpcm_int(running_device *device)
+static void pf_adpcm_int(device_t *device)
 {
     static UINT8 trigger,adpcm_data;
 

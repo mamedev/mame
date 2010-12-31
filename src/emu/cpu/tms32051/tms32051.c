@@ -150,7 +150,7 @@ struct _tms32051_state
 	int icount;
 };
 
-INLINE tms32051_state *get_safe_token(running_device *device)
+INLINE tms32051_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TMS32051);

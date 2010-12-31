@@ -152,7 +152,7 @@ static const int ENVCNT[0x20]
 #define MEtoLE16( x ) LITTLE_ENDIANIZE_INT16(x)
 
 
-static int advance_envelope( running_device *device, int v);
+static int advance_envelope( device_t *device, int v);
 
 /***************************************************************************
  TYPE DEFINITIONS
@@ -232,7 +232,7 @@ struct _snes_sound_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE snes_sound_state *get_safe_token( running_device *device )
+INLINE snes_sound_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == SNES);
@@ -251,7 +251,7 @@ INLINE snes_sound_state *get_safe_token( running_device *device )
  Reset emulated DSP
 -------------------------------------------------*/
 
-static void dsp_reset( running_device *device )
+static void dsp_reset( device_t *device )
 {
 	snes_sound_state *spc700 = get_safe_token(device);
 	int   i;
@@ -291,7 +291,7 @@ static void dsp_reset( running_device *device )
  to mix audio into
 -------------------------------------------------*/
 
-static void dsp_update( running_device *device, short *sound_ptr )
+static void dsp_update( device_t *device, short *sound_ptr )
 {
 	snes_sound_state *spc700 = get_safe_token(device);
 	int V;
@@ -772,7 +772,7 @@ static void dsp_update( running_device *device, short *sound_ptr )
  to process envelope for.
 -------------------------------------------------*/
 
-static int advance_envelope( running_device *device, int v )
+static int advance_envelope( device_t *device, int v )
 {
 	snes_sound_state *spc700 = get_safe_token(device);
 	int envx;
@@ -1246,7 +1246,7 @@ WRITE8_DEVICE_HANDLER( spc_port_in )
 	spc700->port_in[offset] = data;
 }
 
-UINT8 *spc_get_ram( running_device *device )
+UINT8 *spc_get_ram( device_t *device )
 {
 	snes_sound_state *spc700 = get_safe_token(device);
 
@@ -1257,7 +1257,7 @@ UINT8 *spc_get_ram( running_device *device )
     DEVICE INTERFACE
 *****************************************************************************/
 
-static void state_register( running_device *device )
+static void state_register( device_t *device )
 {
 	snes_sound_state *spc700 = get_safe_token(device);
 	int v;

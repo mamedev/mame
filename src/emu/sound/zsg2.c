@@ -66,7 +66,7 @@ struct _zsg2_state
 	sound_stream *stream;
 };
 
-INLINE zsg2_state *get_safe_token(running_device *device)
+INLINE zsg2_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == ZSG2);

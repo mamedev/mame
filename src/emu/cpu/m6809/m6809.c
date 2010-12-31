@@ -107,7 +107,7 @@ struct _m68_state_t
 	UINT8	nmi_state;
 };
 
-INLINE m68_state_t *get_safe_token(running_device *device)
+INLINE m68_state_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == M6809 ||

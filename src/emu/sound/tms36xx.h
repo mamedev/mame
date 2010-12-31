@@ -20,13 +20,13 @@ struct _tms36xx_interface
 };
 
 /* MM6221AA interface functions */
-extern void mm6221aa_tune_w(running_device *device, int tune);
+extern void mm6221aa_tune_w(device_t *device, int tune);
 
 /* TMS3615/17 interface functions */
-extern void tms36xx_note_w(running_device *device, int octave, int note);
+extern void tms36xx_note_w(device_t *device, int octave, int note);
 
 /* TMS3617 interface functions */
-extern void tms3617_enable_w(running_device *device, int enable);
+extern void tms3617_enable_w(device_t *device, int enable);
 
 DECLARE_LEGACY_SOUND_DEVICE(TMS36XX, tms36xx);
 

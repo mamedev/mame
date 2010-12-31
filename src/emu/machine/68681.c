@@ -74,7 +74,7 @@ typedef struct
 typedef struct
 {
 	/* device */
-	running_device *device;
+	device_t *device;
 
 	/* config */
 	const duart68681_config *duart_config;
@@ -99,7 +99,7 @@ typedef struct
 
 } duart68681_state;
 
-INLINE duart68681_state *get_safe_token(running_device *device)
+INLINE duart68681_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == DUART68681);
@@ -237,7 +237,7 @@ static void duart68681_update_interrupts(duart68681_state *duart68681)
 
 static TIMER_CALLBACK( duart_timer_callback )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	duart68681_state	*duart68681 = get_safe_token(device);
 
 	duart68681->ISR |= INT_COUNTER_READY;
@@ -410,7 +410,7 @@ static UINT8 duart68681_read_rx_fifo(duart68681_state *duart68681, int ch)
 
 static TIMER_CALLBACK( tx_timer_callback )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	duart68681_state	*duart68681 = get_safe_token(device);
 	int ch = param & 1;
 
@@ -674,7 +674,7 @@ WRITE8_DEVICE_HANDLER(duart68681_w)
 	}
 }
 
-void duart68681_rx_data( running_device* device, int ch, UINT8 data )
+void duart68681_rx_data( device_t* device, int ch, UINT8 data )
 {
 	duart68681_state *duart68681 = get_safe_token(device);
 

@@ -39,7 +39,7 @@ struct _v810_state
 	int icount;
 };
 
-INLINE v810_state *get_safe_token(running_device *device)
+INLINE v810_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == V810);

@@ -354,7 +354,7 @@ MACHINE_CONFIG_END
 
 
 /* handler called by the 3526 emulator when the internal timers cause an IRQ */
-static void irqhandler(running_device *device, int linestate)
+static void irqhandler(device_t *device, int linestate)
 {
 	matmania_state *state = device->machine->driver_data<matmania_state>();
 	cpu_set_input_line(state->audiocpu, 1, linestate);

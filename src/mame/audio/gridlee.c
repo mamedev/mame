@@ -25,7 +25,7 @@ struct gridlee_sound_state
 
 	/* sound streaming variables */
 	sound_stream *stream;
-	running_device *samples;
+	device_t *samples;
 	double freq_to_step;
 };
 
@@ -36,7 +36,7 @@ struct gridlee_sound_state
  *
  *************************************/
 
-INLINE gridlee_sound_state *get_safe_token( running_device *device )
+INLINE gridlee_sound_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == GRIDLEE);
@@ -102,7 +102,7 @@ WRITE8_DEVICE_HANDLER( gridlee_sound_w )
 {
 	gridlee_sound_state *state = get_safe_token(device);
 	static UINT8 sound_data[24];
-	running_device *samples = state->samples;
+	device_t *samples = state->samples;
 
 	stream_update(state->stream);
 

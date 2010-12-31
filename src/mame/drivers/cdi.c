@@ -196,7 +196,7 @@ static MACHINE_RESET( cdi )
     cdi_state *state = machine->driver_data<cdi_state>();
     UINT16 *src   = (UINT16*)memory_region(machine, "maincpu");
     UINT16 *dst   = state->planea;
-    //running_device *cdrom_dev = machine->device("cdrom");
+    //device_t *cdrom_dev = machine->device("cdrom");
     memcpy(dst, src, 0x8);
 
     scc68070_init(machine, &state->scc68070_regs);

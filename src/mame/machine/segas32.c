@@ -205,7 +205,7 @@ WRITE16_HANDLER(brival_protection_w)
  ******************************************************************************
  ******************************************************************************/
 
-void darkedge_fd1149_vblank(running_device *device)
+void darkedge_fd1149_vblank(device_t *device)
 {
 	address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 

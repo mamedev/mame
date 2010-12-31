@@ -59,7 +59,7 @@ typedef void (*_OP)(se3208_state_t *se3208_state, UINT16 Opcode);
 #define INST(a) static void a(se3208_state_t *se3208_state, UINT16 Opcode)
 static _OP *OpTable=NULL;
 
-INLINE se3208_state_t *get_safe_token(running_device *device)
+INLINE se3208_state_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SE3208);

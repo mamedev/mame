@@ -63,7 +63,7 @@ static const int volume_table[4] =
 static int tables_computed = 0;
 
 
-INLINE okim6376_state *get_safe_token(running_device *device)
+INLINE okim6376_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == OKIM6376);
@@ -266,7 +266,7 @@ static STREAM_UPDATE( okim6376_update )
 
 ***********************************************************************************************/
 
-static void adpcm_state_save_register(struct ADPCMVoice *voice, running_device *device, int index)
+static void adpcm_state_save_register(struct ADPCMVoice *voice, device_t *device, int index)
 {
 	state_save_register_device_item(device, index, voice->playing);
 	state_save_register_device_item(device, index, voice->sample);
@@ -277,7 +277,7 @@ static void adpcm_state_save_register(struct ADPCMVoice *voice, running_device *
 	state_save_register_device_item(device, index, voice->base_offset);
 }
 
-static void okim6376_state_save_register(okim6376_state *info, running_device *device)
+static void okim6376_state_save_register(okim6376_state *info, device_t *device)
 {
 	int j;
 

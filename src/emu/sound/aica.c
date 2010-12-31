@@ -168,7 +168,7 @@ struct _AICA
 	unsigned char *AICARAM;
 	UINT32 AICARAM_LENGTH, RAM_MASK, RAM_MASK16;
 	char Master;
-	void (*IntARMCB)(running_device *device, int irq);
+	void (*IntARMCB)(device_t *device, int irq);
 	sound_stream * stream;
 
 	INT32 *buffertmpl, *buffertmpr;
@@ -198,7 +198,7 @@ struct _AICA
 	int ARTABLE[64], DRTABLE[64];
 
 	struct _AICADSP DSP;
-	running_device *device;
+	device_t *device;
 };
 
 static const float SDLT[16]={-1000000.0,-42.0,-39.0,-36.0,-33.0,-30.0,-27.0,-24.0,-21.0,-18.0,-15.0,-12.0,-9.0,-6.0,-3.0,0.0};
@@ -210,7 +210,7 @@ static int length;
 
 static signed short *RBUFDST;	//this points to where the sample will be stored in the RingBuf
 
-INLINE aica_state *get_safe_token(running_device *device)
+INLINE aica_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == AICA);
@@ -493,7 +493,7 @@ static void AICA_StopSlot(struct _SLOT *slot,int keyoff)
 
 #define log_base_2(n) (log((float) n)/log((float) 2))
 
-static void AICA_Init(running_device *device, aica_state *AICA, const aica_interface *intf)
+static void AICA_Init(device_t *device, aica_state *AICA, const aica_interface *intf)
 {
 	int i;
 
@@ -1263,7 +1263,7 @@ static DEVICE_STOP( aica )
 {
 }
 
-void aica_set_ram_base(running_device *device, void *base, int size)
+void aica_set_ram_base(device_t *device, void *base, int size)
 {
 	aica_state *AICA = get_safe_token(device);
 	if (AICA)

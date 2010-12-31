@@ -28,7 +28,7 @@ void atari_machine_start(running_machine *machine);
 
 MACHINE_START( atarixl );
 
-void atari_interrupt_cb(running_device *device, int mask);
+void atari_interrupt_cb(device_t *device, int mask);
 
 void a800_handle_keyboard(running_machine *machine);
 void a5200_handle_keypads(running_machine *machine);

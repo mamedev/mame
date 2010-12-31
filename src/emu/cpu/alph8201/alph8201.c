@@ -225,7 +225,7 @@ typedef struct {
 #define LP1				lp1
 #define LP2				lp2
 
-INLINE alpha8201_state *get_safe_token(running_device *device)
+INLINE alpha8201_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == ALPHA8201 ||
@@ -730,7 +730,7 @@ static CPU_EXIT( alpha8201 )
  * Execute cycles CPU cycles. Return number of cycles really executed
  ****************************************************************************/
 
-static void alpha8xxx_execute(running_device *device,const s_opcode *op_map)
+static void alpha8xxx_execute(device_t *device,const s_opcode *op_map)
 {
 	alpha8201_state *cpustate = get_safe_token(device);
 	unsigned opcode;

@@ -34,9 +34,9 @@ public:
 	int             mcu_sent, main_sent;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *mcu;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *mcu;
 };
 
 /*----------- defined in machine/maniach.c -----------*/

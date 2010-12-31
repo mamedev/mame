@@ -102,7 +102,7 @@ static void draw_fgbitmap(bitmap_t *bitmap, const rectangle *cliprect)
 
 VIDEO_UPDATE( galpanic )
 {
-	running_device *pandora = screen->machine->device("pandora");
+	device_t *pandora = screen->machine->device("pandora");
 
 	/* copy the temporary bitmap to the screen */
 	copybitmap(bitmap,screen->machine->generic.tmpbitmap,0,0,0,0,cliprect);

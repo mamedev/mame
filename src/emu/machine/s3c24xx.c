@@ -96,18 +96,18 @@ typedef s3c2440_interface s3c24xx_interface;
     PROTOTYPES
 ***************************************************************************/
 
-static UINT32 s3c24xx_get_fclk( running_device *device);
-static UINT32 s3c24xx_get_hclk( running_device *device);
-static UINT32 s3c24xx_get_pclk( running_device *device);
+static UINT32 s3c24xx_get_fclk( device_t *device);
+static UINT32 s3c24xx_get_hclk( device_t *device);
+static UINT32 s3c24xx_get_pclk( device_t *device);
 
-static void s3c24xx_dma_request_iis( running_device *device);
-static void s3c24xx_dma_request_pwm( running_device *device);
+static void s3c24xx_dma_request_iis( device_t *device);
+static void s3c24xx_dma_request_pwm( device_t *device);
 
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE s3c24xx_t *get_token( running_device *device)
+INLINE s3c24xx_t *get_token( device_t *device)
 {
 	assert(device != NULL);
 	return (s3c24xx_t *)downcast<legacy_device_base *>(device)->token();
@@ -119,14 +119,14 @@ INLINE s3c24xx_t *get_token( running_device *device)
 
 /* ... */
 
-static void s3c24xx_reset( running_device *device)
+static void s3c24xx_reset( device_t *device)
 {
 	fatalerror( "s3c24xx_reset\n");
 }
 
 /* LCD Controller */
 
-static rgb_t s3c24xx_get_color_tft_16( running_device *device, UINT16 data)
+static rgb_t s3c24xx_get_color_tft_16( device_t *device, UINT16 data)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	if ((s3c24xx->lcd.regs.lcdcon5 & (1 << 11)) == 0)
@@ -150,7 +150,7 @@ static rgb_t s3c24xx_get_color_tft_16( running_device *device, UINT16 data)
 
 #if defined(DEVICE_S3C2410) || defined(DEVICE_S3C2440)
 
-static rgb_t s3c24xx_get_color_tft_24( running_device *device, UINT32 data)
+static rgb_t s3c24xx_get_color_tft_24( device_t *device, UINT32 data)
 {
 	UINT8 r, g, b;
 	r = BITS( data, 23, 16);
@@ -161,7 +161,7 @@ static rgb_t s3c24xx_get_color_tft_24( running_device *device, UINT32 data)
 
 #endif
 
-static rgb_t s3c24xx_get_color_stn_12( running_device *device, UINT16 data)
+static rgb_t s3c24xx_get_color_stn_12( device_t *device, UINT16 data)
 {
 	UINT8 r, g, b;
 	r = BITS( data, 11, 8) << 4;
@@ -170,7 +170,7 @@ static rgb_t s3c24xx_get_color_stn_12( running_device *device, UINT16 data)
 	return MAKE_RGB( r, g, b);
 }
 
-static rgb_t s3c24xx_get_color_stn_08( running_device *device, UINT8 data)
+static rgb_t s3c24xx_get_color_stn_08( device_t *device, UINT8 data)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	UINT8 r, g, b;
@@ -180,7 +180,7 @@ static rgb_t s3c24xx_get_color_stn_08( running_device *device, UINT8 data)
 	return MAKE_RGB( r, g, b);
 }
 
-static rgb_t s3c24xx_get_color_stn_01( running_device *device, UINT8 data)
+static rgb_t s3c24xx_get_color_stn_01( device_t *device, UINT8 data)
 {
 	if ((data & 1) == 0)
 	{
@@ -192,7 +192,7 @@ static rgb_t s3c24xx_get_color_stn_01( running_device *device, UINT8 data)
 	}
 }
 
-static rgb_t s3c24xx_get_color_stn_02( running_device *device, UINT8 data)
+static rgb_t s3c24xx_get_color_stn_02( device_t *device, UINT8 data)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	UINT8 r, g, b;
@@ -200,14 +200,14 @@ static rgb_t s3c24xx_get_color_stn_02( running_device *device, UINT8 data)
 	return MAKE_RGB( r, g, b);
 }
 
-static rgb_t s3c24xx_get_color_stn_04( running_device *device, UINT8 data)
+static rgb_t s3c24xx_get_color_stn_04( device_t *device, UINT8 data)
 {
 	UINT8 r, g, b;
 	r = g = b = BITS( data, 3, 0) << 4;
 	return MAKE_RGB( r, g, b);
 }
 
-static rgb_t s3c24xx_get_color_tpal( running_device *device)
+static rgb_t s3c24xx_get_color_tpal( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 #if defined(DEVICE_S3C2400)
@@ -217,7 +217,7 @@ static rgb_t s3c24xx_get_color_tpal( running_device *device)
 #endif
 }
 
-static void s3c24xx_lcd_dma_reload( running_device *device)
+static void s3c24xx_lcd_dma_reload( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	s3c24xx->lcd.vramaddr_cur = s3c24xx->lcd.regs.lcdsaddr1 << 1;
@@ -230,7 +230,7 @@ static void s3c24xx_lcd_dma_reload( running_device *device)
 	s3c24xx->lcd.dma_bits = 0;
 }
 
-static void s3c24xx_lcd_dma_init( running_device *device)
+static void s3c24xx_lcd_dma_init( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	s3c24xx_lcd_dma_reload( device);
@@ -244,7 +244,7 @@ static void s3c24xx_lcd_dma_init( running_device *device)
 }
 
 #if 0
-static UINT32 s3c24xx_lcd_dma_read( running_device *device)
+static UINT32 s3c24xx_lcd_dma_read( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	address_space* space = cputag_get_address_space( device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -288,7 +288,7 @@ static UINT32 s3c24xx_lcd_dma_read( running_device *device)
 }
 #endif
 
-static UINT32 s3c24xx_lcd_dma_read( running_device *device)
+static UINT32 s3c24xx_lcd_dma_read( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	address_space* space = cputag_get_address_space( device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -361,7 +361,7 @@ static UINT32 s3c24xx_lcd_dma_read( running_device *device)
 	}
 }
 
-static UINT32 s3c24xx_lcd_dma_read_bits( running_device *device, int count)
+static UINT32 s3c24xx_lcd_dma_read_bits( device_t *device, int count)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	UINT32 data;
@@ -398,7 +398,7 @@ static UINT32 s3c24xx_lcd_dma_read_bits( running_device *device, int count)
 	return data;
 }
 
-static void s3c24xx_lcd_render_tpal( running_device *device)
+static void s3c24xx_lcd_render_tpal( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	bitmap_t *bitmap = s3c24xx->lcd.bitmap[0];
@@ -413,7 +413,7 @@ static void s3c24xx_lcd_render_tpal( running_device *device)
 	}
 }
 
-static void s3c24xx_lcd_render_stn_01( running_device *device)
+static void s3c24xx_lcd_render_stn_01( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	bitmap_t *bitmap = s3c24xx->lcd.bitmap[0];
@@ -445,7 +445,7 @@ static void s3c24xx_lcd_render_stn_01( running_device *device)
 	}
 }
 
-static void s3c24xx_lcd_render_stn_02( running_device *device)
+static void s3c24xx_lcd_render_stn_02( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	bitmap_t *bitmap = s3c24xx->lcd.bitmap[0];
@@ -469,7 +469,7 @@ static void s3c24xx_lcd_render_stn_02( running_device *device)
 	}
 }
 
-static void s3c24xx_lcd_render_stn_04( running_device *device)
+static void s3c24xx_lcd_render_stn_04( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	bitmap_t *bitmap = s3c24xx->lcd.bitmap[0];
@@ -493,7 +493,7 @@ static void s3c24xx_lcd_render_stn_04( running_device *device)
 	}
 }
 
-static void s3c24xx_lcd_render_stn_08( running_device *device)
+static void s3c24xx_lcd_render_stn_08( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	bitmap_t *bitmap = s3c24xx->lcd.bitmap[0];
@@ -517,7 +517,7 @@ static void s3c24xx_lcd_render_stn_08( running_device *device)
 	}
 }
 
-static void s3c24xx_lcd_render_stn_12_p( running_device *device)
+static void s3c24xx_lcd_render_stn_12_p( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	bitmap_t *bitmap = s3c24xx->lcd.bitmap[0];
@@ -536,7 +536,7 @@ static void s3c24xx_lcd_render_stn_12_p( running_device *device)
 	}
 }
 
-static void s3c24xx_lcd_render_stn_12_u( running_device *device) // not tested
+static void s3c24xx_lcd_render_stn_12_u( device_t *device) // not tested
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	bitmap_t *bitmap = s3c24xx->lcd.bitmap[0];
@@ -560,7 +560,7 @@ static void s3c24xx_lcd_render_stn_12_u( running_device *device) // not tested
 	}
 }
 
-static void s3c24xx_lcd_render_tft_01( running_device *device)
+static void s3c24xx_lcd_render_tft_01( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	bitmap_t *bitmap = s3c24xx->lcd.bitmap[0];
@@ -584,7 +584,7 @@ static void s3c24xx_lcd_render_tft_01( running_device *device)
 	}
 }
 
-static void s3c24xx_lcd_render_tft_02( running_device *device)
+static void s3c24xx_lcd_render_tft_02( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	bitmap_t *bitmap = s3c24xx->lcd.bitmap[0];
@@ -608,7 +608,7 @@ static void s3c24xx_lcd_render_tft_02( running_device *device)
 	}
 }
 
-static void s3c24xx_lcd_render_tft_04( running_device *device)
+static void s3c24xx_lcd_render_tft_04( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	bitmap_t *bitmap = s3c24xx->lcd.bitmap[0];
@@ -632,7 +632,7 @@ static void s3c24xx_lcd_render_tft_04( running_device *device)
 	}
 }
 
-static void s3c24xx_lcd_render_tft_08( running_device *device)
+static void s3c24xx_lcd_render_tft_08( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	bitmap_t *bitmap = s3c24xx->lcd.bitmap[0];
@@ -656,7 +656,7 @@ static void s3c24xx_lcd_render_tft_08( running_device *device)
 	}
 }
 
-static void s3c24xx_lcd_render_tft_16( running_device *device)
+static void s3c24xx_lcd_render_tft_16( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	bitmap_t *bitmap = s3c24xx->lcd.bitmap[0];
@@ -682,7 +682,7 @@ static void s3c24xx_lcd_render_tft_16( running_device *device)
 
 static TIMER_CALLBACK( s3c24xx_lcd_timer_exp )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	s3c24xx_t *s3c24xx = get_token( device);
 	screen_device *screen = machine->primary_screen;
 	UINT32 tpalen;
@@ -725,7 +725,7 @@ static TIMER_CALLBACK( s3c24xx_lcd_timer_exp )
 	timer_adjust_oneshot( s3c24xx->lcd.timer, screen->time_until_pos( s3c24xx->lcd.vpos, s3c24xx->lcd.hpos), 0);
 }
 
-static void s3c24xx_video_start( running_device *device, running_machine *machine)
+static void s3c24xx_video_start( device_t *device, running_machine *machine)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	screen_device *screen = machine->primary_screen;
@@ -758,7 +758,7 @@ static void bitmap_blend( bitmap_t *bitmap_dst, bitmap_t *bitmap_src_1, bitmap_t
 		}
 }
 
-static UINT32 s3c24xx_video_update( running_device *device, screen_device *screen, bitmap_t *bitmap, const rectangle *cliprect)
+static UINT32 s3c24xx_video_update( device_t *device, screen_device *screen, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	if (s3c24xx->lcd.framerate >= 1195)
@@ -809,7 +809,7 @@ READ32_DEVICE_HANDLER( s3c2440_lcd_r )
 	return data;
 }
 
-static void s3c24xx_lcd_configure_tft( running_device *device)
+static void s3c24xx_lcd_configure_tft( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	screen_device *screen = device->machine->primary_screen;
@@ -849,7 +849,7 @@ static void s3c24xx_lcd_configure_tft( running_device *device)
 	screen->configure( width, height, visarea, HZ_TO_ATTOSECONDS( s3c24xx->lcd.framerate));
 }
 
-static void s3c24xx_lcd_configure_stn( running_device *device)
+static void s3c24xx_lcd_configure_stn( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	screen_device *screen = device->machine->primary_screen;
@@ -894,7 +894,7 @@ static void s3c24xx_lcd_configure_stn( running_device *device)
 	screen->configure( width, height, visarea, HZ_TO_ATTOSECONDS( s3c24xx->lcd.framerate));
 }
 
-static void s3c24xx_lcd_configure( running_device *device)
+static void s3c24xx_lcd_configure( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	UINT32 bppmode;
@@ -910,7 +910,7 @@ static void s3c24xx_lcd_configure( running_device *device)
 	}
 }
 
-static void s3c24xx_lcd_start( running_device *device)
+static void s3c24xx_lcd_start( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	screen_device *screen = device->machine->primary_screen;
@@ -920,14 +920,14 @@ static void s3c24xx_lcd_start( running_device *device)
 	timer_adjust_oneshot( s3c24xx->lcd.timer, screen->time_until_pos( s3c24xx->lcd.vpos_min, s3c24xx->lcd.hpos_min), 0);
 }
 
-static void s3c24xx_lcd_stop( running_device *device)
+static void s3c24xx_lcd_stop( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	verboselog( device->machine, 1, "LCD stop\n");
 	timer_adjust_oneshot( s3c24xx->lcd.timer, attotime_never, 0);
 }
 
-static void s3c24xx_lcd_recalc( running_device *device)
+static void s3c24xx_lcd_recalc( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	if (s3c24xx->lcd.regs.lcdcon1 & (1 << 0))
@@ -983,7 +983,7 @@ static WRITE32_DEVICE_HANDLER( s3c24xx_lcd_palette_w )
 
 /* Clock & Power Management */
 
-static UINT32 s3c24xx_get_fclk( running_device *device)
+static UINT32 s3c24xx_get_fclk( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	UINT32 data, mdiv, pdiv, sdiv;
@@ -998,7 +998,7 @@ static UINT32 s3c24xx_get_fclk( running_device *device)
 #endif
 }
 
-static UINT32 s3c24xx_get_hclk( running_device *device)
+static UINT32 s3c24xx_get_hclk( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 #if defined(DEVICE_S3C2400) || defined(DEVICE_S3C2410)
@@ -1015,7 +1015,7 @@ static UINT32 s3c24xx_get_hclk( running_device *device)
 #endif
 }
 
-static UINT32 s3c24xx_get_pclk( running_device *device)
+static UINT32 s3c24xx_get_pclk( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	return s3c24xx_get_hclk( device) / (1 << BIT( s3c24xx->clkpow.regs.clkdivn, 0));
@@ -1047,7 +1047,7 @@ static WRITE32_DEVICE_HANDLER( s3c24xx_clkpow_w )
 
 /* Interrupt Controller */
 
-static void s3c24xx_check_pending_irq( running_device *device)
+static void s3c24xx_check_pending_irq( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	UINT32 temp;
@@ -1103,7 +1103,7 @@ static void s3c24xx_check_pending_irq( running_device *device)
 	}
 }
 
-static void s3c24xx_request_irq( running_device *device, UINT32 int_type)
+static void s3c24xx_request_irq( device_t *device, UINT32 int_type)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	verboselog( device->machine, 5, "request irq %d\n", int_type);
@@ -1113,7 +1113,7 @@ static void s3c24xx_request_irq( running_device *device, UINT32 int_type)
 
 #if defined(DEVICE_S3C2410) || defined(DEVICE_S3C2440)
 
-static void s3c24xx_check_pending_subirq( running_device *device)
+static void s3c24xx_check_pending_subirq( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	UINT32 temp = s3c24xx->irq.regs.subsrcpnd & ~s3c24xx->irq.regs.intsubmsk;
@@ -1129,7 +1129,7 @@ static void s3c24xx_check_pending_subirq( running_device *device)
 	}
 }
 
-ATTR_UNUSED static void s3c24xx_request_subirq( running_device *device, UINT32 int_type)
+ATTR_UNUSED static void s3c24xx_request_subirq( device_t *device, UINT32 int_type)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	verboselog( device->machine, 5, "request subirq %d\n", int_type);
@@ -1137,7 +1137,7 @@ ATTR_UNUSED static void s3c24xx_request_subirq( running_device *device, UINT32 i
 	s3c24xx_check_pending_subirq( device);
 }
 
-static void s3c24xx_check_pending_eint( running_device *device)
+static void s3c24xx_check_pending_eint( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	UINT32 temp = s3c24xx->gpio.regs.eintpend & ~s3c24xx->gpio.regs.eintmask;
@@ -1160,7 +1160,7 @@ static void s3c24xx_check_pending_eint( running_device *device)
 	}
 }
 
-ATTR_UNUSED static void s3c24xx_request_eint( running_device *device, UINT32 number)
+ATTR_UNUSED static void s3c24xx_request_eint( device_t *device, UINT32 number)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	verboselog( device->machine, 5, "request external interrupt %d\n", number);
@@ -1227,7 +1227,7 @@ static WRITE32_DEVICE_HANDLER( s3c24xx_irq_w )
 
 /* PWM Timer */
 
-static UINT16 s3c24xx_pwm_calc_observation( running_device *device, int ch)
+static UINT16 s3c24xx_pwm_calc_observation( device_t *device, int ch)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	double timeleft, x1, x2;
@@ -1278,7 +1278,7 @@ static READ32_DEVICE_HANDLER( s3c24xx_pwm_r )
 	return data;
 }
 
-static void s3c24xx_pwm_start( running_device *device, int timer)
+static void s3c24xx_pwm_start( device_t *device, int timer)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	const int mux_table[] = { 2, 4, 8, 16};
@@ -1365,14 +1365,14 @@ static void s3c24xx_pwm_start( running_device *device, int timer)
 	}
 }
 
-static void s3c24xx_pwm_stop( running_device *device, int timer)
+static void s3c24xx_pwm_stop( device_t *device, int timer)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	verboselog( device->machine, 1, "PWM %d stop\n", timer);
 	timer_adjust_oneshot( s3c24xx->pwm.timer[timer], attotime_never, 0);
 }
 
-static void s3c24xx_pwm_recalc( running_device *device, int timer)
+static void s3c24xx_pwm_recalc( device_t *device, int timer)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	const int tcon_shift[] = { 0, 8, 12, 16, 20};
@@ -1423,7 +1423,7 @@ static WRITE32_DEVICE_HANDLER( s3c24xx_pwm_w )
 
 static TIMER_CALLBACK( s3c24xx_pwm_timer_exp )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	s3c24xx_t *s3c24xx = get_token( device);
 	int ch = param;
 	const int ch_int[] = { S3C24XX_INT_TIMER0, S3C24XX_INT_TIMER1, S3C24XX_INT_TIMER2, S3C24XX_INT_TIMER3, S3C24XX_INT_TIMER4 };
@@ -1440,7 +1440,7 @@ static TIMER_CALLBACK( s3c24xx_pwm_timer_exp )
 
 /* DMA */
 
-static void s3c24xx_dma_reload( running_device *device, int ch)
+static void s3c24xx_dma_reload( device_t *device, int ch)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	s3c24xx_dma_regs_t *regs = &s3c24xx->dma[ch].regs;
@@ -1449,7 +1449,7 @@ static void s3c24xx_dma_reload( running_device *device, int ch)
 	regs->dcdst = S3C24XX_DCDST_SET_CURR_DST( regs->dcdst, S3C24XX_DIDST_GET_DADDR( regs->didst));
 }
 
-static void s3c24xx_dma_trigger( running_device *device, int ch)
+static void s3c24xx_dma_trigger( device_t *device, int ch)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	s3c24xx_dma_regs_t *regs = &s3c24xx->dma[ch].regs;
@@ -1508,7 +1508,7 @@ static void s3c24xx_dma_trigger( running_device *device, int ch)
 	}
 }
 
-static void s3c24xx_dma_request_iis( running_device *device)
+static void s3c24xx_dma_request_iis( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	s3c24xx_dma_regs_t *regs = &s3c24xx->dma[2].regs;
@@ -1519,7 +1519,7 @@ static void s3c24xx_dma_request_iis( running_device *device)
 	}
 }
 
-static void s3c24xx_dma_request_pwm( running_device *device)
+static void s3c24xx_dma_request_pwm( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	verboselog( device->machine, 5, "s3c24xx_dma_request_pwm\n");
@@ -1536,7 +1536,7 @@ static void s3c24xx_dma_request_pwm( running_device *device)
 	}
 }
 
-static void s3c24xx_dma_start( running_device *device, int ch)
+static void s3c24xx_dma_start( device_t *device, int ch)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	UINT32 addr_src, addr_dst, tc;
@@ -1570,12 +1570,12 @@ static void s3c24xx_dma_start( running_device *device, int ch)
 	}
 }
 
-static void s3c24xx_dma_stop( running_device *device, int ch)
+static void s3c24xx_dma_stop( device_t *device, int ch)
 {
 	verboselog( device->machine, 1, "DMA %d stop\n", ch);
 }
 
-static void s3c24xx_dma_recalc( running_device *device, int ch)
+static void s3c24xx_dma_recalc( device_t *device, int ch)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	if ((s3c24xx->dma[ch].regs.dmasktrig & (1 << 1)) != 0)
@@ -1588,13 +1588,13 @@ static void s3c24xx_dma_recalc( running_device *device, int ch)
 	}
 }
 
-static UINT32 s3c24xx_dma_r( running_device *device, UINT32 ch, UINT32 offset)
+static UINT32 s3c24xx_dma_r( device_t *device, UINT32 ch, UINT32 offset)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	return ((UINT32*)&s3c24xx->dma[ch].regs)[offset];
 }
 
-static void s3c24xx_dma_w( running_device *device, UINT32 ch, UINT32 offset, UINT32 data, UINT32 mem_mask)
+static void s3c24xx_dma_w( device_t *device, UINT32 ch, UINT32 offset, UINT32 data, UINT32 mem_mask)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	UINT32 old_value = ((UINT32*)&s3c24xx->dma[ch].regs)[offset];
@@ -1683,7 +1683,7 @@ static TIMER_CALLBACK( s3c24xx_dma_timer_exp )
 
 /* I/O Port */
 
-INLINE UINT32 iface_gpio_port_r( running_device *device, int port)
+INLINE UINT32 iface_gpio_port_r( device_t *device, int port)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	if (s3c24xx->iface->gpio.port_r)
@@ -1696,7 +1696,7 @@ INLINE UINT32 iface_gpio_port_r( running_device *device, int port)
 	}
 }
 
-INLINE void iface_gpio_port_w( running_device *device, int port, UINT32 data)
+INLINE void iface_gpio_port_w( device_t *device, int port, UINT32 data)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	if (s3c24xx->iface->gpio.port_w)
@@ -1883,7 +1883,7 @@ static WRITE32_DEVICE_HANDLER( s3c24xx_usb_host_w )
 
 /* UART */
 
-static UINT32 s3c24xx_uart_r( running_device *device, UINT32 ch, UINT32 offset)
+static UINT32 s3c24xx_uart_r( device_t *device, UINT32 ch, UINT32 offset)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	UINT32 data = ((UINT32*)&s3c24xx->uart[ch].regs)[offset];
@@ -1905,7 +1905,7 @@ static UINT32 s3c24xx_uart_r( running_device *device, UINT32 ch, UINT32 offset)
 	return data;
 }
 
-static void s3c24xx_uart_w( running_device *device, UINT32 ch, UINT32 offset, UINT32 data, UINT32 mem_mask)
+static void s3c24xx_uart_w( device_t *device, UINT32 ch, UINT32 offset, UINT32 data, UINT32 mem_mask)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	COMBINE_DATA(&((UINT32*)&s3c24xx->uart[ch].regs)[offset]);
@@ -1970,7 +1970,7 @@ static WRITE32_DEVICE_HANDLER( s3c24xx_uart_2_w )
 
 #endif
 
-static void s3c24xx_uart_fifo_w( running_device *device, int uart, UINT8 data)
+static void s3c24xx_uart_fifo_w( device_t *device, int uart, UINT8 data)
 {
 //  printf( "s3c24xx_uart_fifo_w (%c)\n", data);
 	s3c24xx_t *s3c24xx = get_token( device);
@@ -1999,7 +1999,7 @@ static WRITE32_DEVICE_HANDLER( s3c24xx_usb_device_w )
 
 #if defined(DEVICE_S3C2410)
 
-static UINT16 s3c24xx_wdt_calc_current_count( running_device *device)
+static UINT16 s3c24xx_wdt_calc_current_count( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	double timeleft, x1, x2;
@@ -2016,7 +2016,7 @@ static UINT16 s3c24xx_wdt_calc_current_count( running_device *device)
 
 #else
 
-static UINT16 s3c24xx_wdt_calc_current_count( running_device *device)
+static UINT16 s3c24xx_wdt_calc_current_count( device_t *device)
 {
 	return 0;
 }
@@ -2043,7 +2043,7 @@ static READ32_DEVICE_HANDLER( s3c24xx_wdt_r )
 	return data;
 }
 
-static void s3c24xx_wdt_start( running_device *device)
+static void s3c24xx_wdt_start( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	UINT32 pclk, prescaler, clock;
@@ -2062,7 +2062,7 @@ static void s3c24xx_wdt_start( running_device *device)
 #endif
 }
 
-static void s3c24xx_wdt_stop( running_device *device)
+static void s3c24xx_wdt_stop( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	verboselog( device->machine, 1, "WDT stop\n");
@@ -2070,7 +2070,7 @@ static void s3c24xx_wdt_stop( running_device *device)
 	timer_adjust_oneshot( s3c24xx->wdt.timer, attotime_never, 0);
 }
 
-static void s3c24xx_wdt_recalc( running_device *device)
+static void s3c24xx_wdt_recalc( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	if ((s3c24xx->wdt.regs.wtcon & (1 << 5)) != 0)
@@ -2104,7 +2104,7 @@ static WRITE32_DEVICE_HANDLER( s3c24xx_wdt_w )
 
 static TIMER_CALLBACK( s3c24xx_wdt_timer_exp )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	s3c24xx_t *s3c24xx = get_token( device);
 	verboselog( machine, 2, "WDT timer callback\n");
 	if ((s3c24xx->wdt.regs.wtcon & (1 << 2)) != 0)
@@ -2123,7 +2123,7 @@ static TIMER_CALLBACK( s3c24xx_wdt_timer_exp )
 
 /* IIC */
 
-INLINE void iface_i2c_scl_w( running_device *device, int state)
+INLINE void iface_i2c_scl_w( device_t *device, int state)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	if (s3c24xx->iface->i2c.scl_w)
@@ -2132,7 +2132,7 @@ INLINE void iface_i2c_scl_w( running_device *device, int state)
 	}
 }
 
-INLINE void iface_i2c_sda_w( running_device *device, int state)
+INLINE void iface_i2c_sda_w( device_t *device, int state)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	if (s3c24xx->iface->i2c.sda_w)
@@ -2141,7 +2141,7 @@ INLINE void iface_i2c_sda_w( running_device *device, int state)
 	}
 }
 
-INLINE int iface_i2c_sda_r( running_device *device)
+INLINE int iface_i2c_sda_r( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	if (s3c24xx->iface->i2c.sda_r)
@@ -2154,7 +2154,7 @@ INLINE int iface_i2c_sda_r( running_device *device)
 	}
 }
 
-static void i2c_send_start( running_device *device)
+static void i2c_send_start( device_t *device)
 {
 	verboselog( device->machine, 5, "i2c_send_start\n");
 	iface_i2c_sda_w( device, 1);
@@ -2163,7 +2163,7 @@ static void i2c_send_start( running_device *device)
 	iface_i2c_scl_w( device, 0);
 }
 
-static void i2c_send_stop( running_device *device)
+static void i2c_send_stop( device_t *device)
 {
 	verboselog( device->machine, 5, "i2c_send_stop\n");
 	iface_i2c_sda_w( device, 0);
@@ -2172,7 +2172,7 @@ static void i2c_send_stop( running_device *device)
 	iface_i2c_scl_w( device, 0);
 }
 
-static UINT8 i2c_receive_byte( running_device *device, int ack)
+static UINT8 i2c_receive_byte( device_t *device, int ack)
 {
 	UINT8 data = 0;
 	verboselog( device->machine, 5, "i2c_receive_byte ...\n");
@@ -2191,7 +2191,7 @@ static UINT8 i2c_receive_byte( running_device *device, int ack)
 	return data;
 }
 
-static int i2c_send_byte( running_device *device, UINT8 data)
+static int i2c_send_byte( device_t *device, UINT8 data)
 {
 	int ack;
 	verboselog( device->machine, 5, "i2c_send_byte ...\n");
@@ -2211,7 +2211,7 @@ static int i2c_send_byte( running_device *device, UINT8 data)
 	return ack;
 }
 
-static void iic_start( running_device *device)
+static void iic_start( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	int mode_selection;
@@ -2226,7 +2226,7 @@ static void iic_start( running_device *device)
 	timer_adjust_oneshot( s3c24xx->iic.timer, ATTOTIME_IN_USEC( 1), 0);
 }
 
-static void iic_stop( running_device *device)
+static void iic_stop( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	verboselog( device->machine, 1, "IIC stop\n");
@@ -2234,7 +2234,7 @@ static void iic_stop( running_device *device)
 	timer_adjust_oneshot( s3c24xx->iic.timer, attotime_never, 0);
 }
 
-static void iic_resume( running_device *device)
+static void iic_resume( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	int mode_selection;
@@ -2345,7 +2345,7 @@ static WRITE32_DEVICE_HANDLER( s3c24xx_iic_w )
 
 static TIMER_CALLBACK( s3c24xx_iic_timer_exp )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	s3c24xx_t *s3c24xx = get_token( device);
 	int enable_interrupt;
 	verboselog( machine, 2, "IIC timer callback\n");
@@ -2360,7 +2360,7 @@ static TIMER_CALLBACK( s3c24xx_iic_timer_exp )
 
 /* IIS */
 
-INLINE void iface_i2s_data_w( running_device *device, int ch, UINT16 data)
+INLINE void iface_i2s_data_w( device_t *device, int ch, UINT16 data)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	if (s3c24xx->iface->i2s.data_w)
@@ -2369,7 +2369,7 @@ INLINE void iface_i2s_data_w( running_device *device, int ch, UINT16 data)
 	}
 }
 
-static void s3c24xx_iis_start( running_device *device)
+static void s3c24xx_iis_start( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	const UINT32 codeclk_table[] = { 256, 384};
@@ -2386,14 +2386,14 @@ static void s3c24xx_iis_start( running_device *device)
 	timer_adjust_periodic( s3c24xx->iis.timer, ATTOTIME_IN_HZ( freq), 0, ATTOTIME_IN_HZ( freq));
 }
 
-static void s3c24xx_iis_stop( running_device *device)
+static void s3c24xx_iis_stop( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	verboselog( device->machine, 1, "IIS stop\n");
 	timer_adjust_oneshot( s3c24xx->iis.timer, attotime_never, 0);
 }
 
-static void s3c24xx_iis_recalc( running_device *device)
+static void s3c24xx_iis_recalc( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	if ((s3c24xx->iis.regs.iiscon & (1 << 0)) != 0)
@@ -2463,14 +2463,14 @@ static WRITE32_DEVICE_HANDLER( s3c24xx_iis_w )
 
 static TIMER_CALLBACK( s3c24xx_iis_timer_exp )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	verboselog( machine, 2, "IIS timer callback\n");
 	s3c24xx_dma_request_iis( device);
 }
 
 /* RTC */
 
-static void s3c24xx_rtc_init( running_device *device)
+static void s3c24xx_rtc_init( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	s3c24xx->rtc.regs.bcdsec = dec_2_bcd( 0);
@@ -2490,7 +2490,7 @@ static READ32_DEVICE_HANDLER( s3c24xx_rtc_r )
 	return data;
 }
 
-static void s3c24xx_rtc_recalc( running_device *device)
+static void s3c24xx_rtc_recalc( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	if (s3c24xx->rtc.regs.ticnt & (1 << 7))
@@ -2525,12 +2525,12 @@ static WRITE32_DEVICE_HANDLER( s3c24xx_rtc_w )
 
 static TIMER_CALLBACK( s3c24xx_rtc_timer_tick_count_exp )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	verboselog( machine, 2, "RTC timer callback (tick count)\n");
 	s3c24xx_request_irq( device, S3C24XX_INT_TICK);
 }
 
-static void s3c24xx_rtc_update( running_device *device)
+static void s3c24xx_rtc_update( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	UINT32 bcdday_max;
@@ -2576,7 +2576,7 @@ static void s3c24xx_rtc_update( running_device *device)
 	verboselog( device->machine, 5, "RTC - %04d/%02d/%02d %02d:%02d:%02d\n", bcd_2_dec( s3c24xx->rtc.regs.bcdyear) + 2000, bcd_2_dec( s3c24xx->rtc.regs.bcdmon), bcd_2_dec( s3c24xx->rtc.regs.bcdday), bcd_2_dec( s3c24xx->rtc.regs.bcdhour), bcd_2_dec( s3c24xx->rtc.regs.bcdmin), bcd_2_dec( s3c24xx->rtc.regs.bcdsec));
 }
 
-static void s3c24xx_rtc_check_alarm( running_device *device)
+static void s3c24xx_rtc_check_alarm( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	if (s3c24xx->rtc.regs.rtcalm & 0x40)
@@ -2597,7 +2597,7 @@ static void s3c24xx_rtc_check_alarm( running_device *device)
 
 static TIMER_CALLBACK( s3c24xx_rtc_timer_update_exp )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	verboselog( machine, 2, "RTC timer callback (update)\n");
 	s3c24xx_rtc_update( device);
 	s3c24xx_rtc_check_alarm( device);
@@ -2605,7 +2605,7 @@ static TIMER_CALLBACK( s3c24xx_rtc_timer_update_exp )
 
 /* A/D Converter */
 
-static UINT32 iface_adc_data_r( running_device *device, int ch)
+static UINT32 iface_adc_data_r( device_t *device, int ch)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	if (s3c24xx->iface->adc.data_r)
@@ -2647,7 +2647,7 @@ static READ32_DEVICE_HANDLER( s3c24xx_adc_r )
 	return data;
 }
 
-static void s3c24xx_adc_start( running_device *device)
+static void s3c24xx_adc_start( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	verboselog( device->machine, 1, "ADC start\n");
@@ -2676,7 +2676,7 @@ static WRITE32_DEVICE_HANDLER( s3c24xx_adc_w )
 
 #if defined(DEVICE_S3C2410) || defined(DEVICE_S3C2440)
 
-static void s3c24xx_touch_screen( running_device *device, int state)
+static void s3c24xx_touch_screen( device_t *device, int state)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	s3c24xx->adc.regs.adcdat0 = ((state ? 0 : 1) << 15);
@@ -2688,7 +2688,7 @@ static void s3c24xx_touch_screen( running_device *device, int state)
 
 /* SPI */
 
-static UINT32 s3c24xx_spi_r( running_device *device, UINT32 ch, UINT32 offset)
+static UINT32 s3c24xx_spi_r( device_t *device, UINT32 ch, UINT32 offset)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	UINT32 data = ((UINT32*)&s3c24xx->spi[ch].regs)[offset];
@@ -2703,7 +2703,7 @@ static UINT32 s3c24xx_spi_r( running_device *device, UINT32 ch, UINT32 offset)
 	return data;
 }
 
-static void s3c24xx_spi_w( running_device *device, UINT32 ch, UINT32 offset, UINT32 data, UINT32 mem_mask)
+static void s3c24xx_spi_w( device_t *device, UINT32 ch, UINT32 offset, UINT32 data, UINT32 mem_mask)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	COMBINE_DATA(&((UINT32*)&s3c24xx->spi[ch].regs)[offset]);
@@ -2789,7 +2789,7 @@ static WRITE32_DEVICE_HANDLER( s3c24xx_sdi_w )
 
 #if defined(DEVICE_S3C2410) || defined(DEVICE_S3C2440)
 
-INLINE void iface_nand_command_w( running_device *device, UINT8 data)
+INLINE void iface_nand_command_w( device_t *device, UINT8 data)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	if (s3c24xx->iface->nand.command_w)
@@ -2798,7 +2798,7 @@ INLINE void iface_nand_command_w( running_device *device, UINT8 data)
 	}
 }
 
-INLINE void iface_nand_address_w( running_device *device, UINT8 data)
+INLINE void iface_nand_address_w( device_t *device, UINT8 data)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	if (s3c24xx->iface->nand.address_w)
@@ -2807,7 +2807,7 @@ INLINE void iface_nand_address_w( running_device *device, UINT8 data)
 	}
 }
 
-INLINE UINT8 iface_nand_data_r( running_device *device)
+INLINE UINT8 iface_nand_data_r( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	if (s3c24xx->iface->nand.data_r)
@@ -2820,7 +2820,7 @@ INLINE UINT8 iface_nand_data_r( running_device *device)
 	}
 }
 
-INLINE void iface_nand_data_w( running_device *device, UINT8 data)
+INLINE void iface_nand_data_w( device_t *device, UINT8 data)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	if (s3c24xx->iface->nand.data_w)
@@ -2894,7 +2894,7 @@ static void nand_update_secc( UINT8 *ecc, int pos, UINT8 data)
 
 #endif
 
-static void s3c24xx_nand_update_ecc( running_device *device, UINT8 data)
+static void s3c24xx_nand_update_ecc( device_t *device, UINT8 data)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	UINT8 temp[4];
@@ -2927,19 +2927,19 @@ static void s3c24xx_nand_update_ecc( running_device *device, UINT8 data)
 #endif
 }
 
-static void s3c24xx_nand_command_w( running_device *device, UINT8 data)
+static void s3c24xx_nand_command_w( device_t *device, UINT8 data)
 {
 	verboselog( device->machine, 5, "NAND write command %02X\n", data);
 	iface_nand_command_w( device, data);
 }
 
-static void s3c24xx_nand_address_w( running_device *device, UINT8 data)
+static void s3c24xx_nand_address_w( device_t *device, UINT8 data)
 {
 	verboselog( device->machine, 5, "NAND write address %02X\n", data);
 	iface_nand_address_w( device, data);
 }
 
-static UINT8 s3c24xx_nand_data_r( running_device *device)
+static UINT8 s3c24xx_nand_data_r( device_t *device)
 {
 	UINT8 data = iface_nand_data_r( device);
 	verboselog( device->machine, 5, "NAND data read %02X\n", data);
@@ -2947,7 +2947,7 @@ static UINT8 s3c24xx_nand_data_r( running_device *device)
 	return data;
 }
 
-static void s3c24xx_nand_data_w( running_device *device, UINT8 data)
+static void s3c24xx_nand_data_w( device_t *device, UINT8 data)
 {
 	verboselog( device->machine, 5, "NAND write data %02X\n", data);
 	iface_nand_data_w( device, data);
@@ -3005,7 +3005,7 @@ static READ32_DEVICE_HANDLER( s3c24xx_nand_r )
 	return data;
 }
 
-static void s3c24xx_nand_init_ecc( running_device *device)
+static void s3c24xx_nand_init_ecc( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	verboselog( device->machine, 5, "NAND - init ecc\n");

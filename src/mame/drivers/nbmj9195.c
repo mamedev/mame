@@ -471,7 +471,7 @@ static WRITE8_HANDLER( tmpz84c011_1_dir_pe_w )	{ pio_dir[9] = data; }
 /* CTC of main cpu, ch0 trigger is vblank */
 static INTERRUPT_GEN( ctc0_trg1 )
 {
-	running_device *ctc = device->machine->device("main_ctc");
+	device_t *ctc = device->machine->device("main_ctc");
 	z80ctc_trg1_w(ctc, 1);
 	z80ctc_trg1_w(ctc, 0);
 }

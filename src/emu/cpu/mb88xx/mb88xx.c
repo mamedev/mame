@@ -82,7 +82,7 @@ struct _mb88_state
     int icount;
 };
 
-INLINE mb88_state *get_safe_token(running_device *device)
+INLINE mb88_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == MB88 ||
@@ -334,7 +334,7 @@ static void update_pio( mb88_state *cpustate, int cycles )
 	}
 }
 
-void mb88_external_clock_w(running_device *device, int state)
+void mb88_external_clock_w(device_t *device, int state)
 {
 	mb88_state *cpustate = get_safe_token(device);
 	if (state != cpustate->ctr)

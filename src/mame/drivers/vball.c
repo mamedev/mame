@@ -404,7 +404,7 @@ static GFXDECODE_START( vb )
 GFXDECODE_END
 
 
-static void vball_irq_handler(running_device *device, int irq)
+static void vball_irq_handler(device_t *device, int irq)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0 , irq ? ASSERT_LINE : CLEAR_LINE);
 }

@@ -27,7 +27,7 @@ public:
 	int         sound_nmi_enable, pending_nmi;
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 };
 
 

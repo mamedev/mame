@@ -100,7 +100,7 @@ struct saa1099_noise
 typedef struct _saa1099_state saa1099_state;
 struct _saa1099_state
 {
-	running_device *device;
+	device_t *device;
 	sound_stream * stream;			/* our stream */
 	int noise_params[2];			/* noise generators parameters */
 	int env_enable[2];				/* envelope generators enable */
@@ -168,7 +168,7 @@ static const UINT8 envelope[8][64] = {
 };
 
 
-INLINE saa1099_state *get_safe_token(running_device *device)
+INLINE saa1099_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SAA1099);

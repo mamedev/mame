@@ -923,7 +923,7 @@ UINT16 mos6526_device::cia_timer::get_count()
     TRAMPOLINES
 ***************************************************************************/
 
-void cia_set_port_mask_value(running_device *device, int port, int data) { downcast<mos6526_device *>(device)->set_port_mask_value(port, data); }
+void cia_set_port_mask_value(device_t *device, int port, int data) { downcast<mos6526_device *>(device)->set_port_mask_value(port, data); }
 
 READ8_DEVICE_HANDLER( mos6526_r ) { return downcast<mos6526_device *>(device)->reg_r(offset); }
 WRITE8_DEVICE_HANDLER( mos6526_w ) { downcast<mos6526_device *>(device)->reg_w(offset, data); }

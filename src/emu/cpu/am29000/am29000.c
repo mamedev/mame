@@ -143,7 +143,7 @@ typedef struct _am29000_state
     STATE ACCESSORS
 ***************************************************************************/
 
-INLINE am29000_state *get_safe_token(running_device *device)
+INLINE am29000_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == AM29000);

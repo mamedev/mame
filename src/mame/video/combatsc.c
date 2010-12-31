@@ -358,7 +358,7 @@ WRITE8_HANDLER( combatsc_video_w )
 WRITE8_HANDLER( combatsc_pf_control_w )
 {
 	combatsc_state *state = space->machine->driver_data<combatsc_state>();
-	running_device *k007121 = state->video_circuit ? state->k007121_2 : state->k007121_1;
+	device_t *k007121 = state->video_circuit ? state->k007121_2 : state->k007121_1;
 	k007121_ctrl_w(k007121, offset, data);
 
 	if (offset == 7)
@@ -396,7 +396,7 @@ WRITE8_HANDLER( combatsc_scrollram_w )
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *source, int circuit, UINT32 pri_mask )
 {
 	combatsc_state *state = machine->driver_data<combatsc_state>();
-	running_device *k007121 = circuit ? state->k007121_2 : state->k007121_1;
+	device_t *k007121 = circuit ? state->k007121_2 : state->k007121_1;
 	int base_color = (circuit * 4) * 16 + (k007121_ctrlram_r(k007121, 6) & 0x10) * 2;
 
 	k007121_sprites_draw(k007121, bitmap, cliprect, machine->gfx[circuit], machine->colortable, source, base_color, 0, 0, pri_mask);

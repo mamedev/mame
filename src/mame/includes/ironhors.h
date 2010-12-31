@@ -24,7 +24,7 @@ public:
 	int        palettebank, charbank, spriterambank;
 
 	/* devices */
-	running_device *soundcpu;
+	device_t *soundcpu;
 };
 
 

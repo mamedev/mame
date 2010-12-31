@@ -64,7 +64,7 @@ public:
 	UINT8 *bg_scroll;
 	UINT8 port_last;
 	UINT8 port_last2;
-	running_device *samples;
+	device_t *samples;
 };
 
 
@@ -233,7 +233,7 @@ static VIDEO_UPDATE( safarir )
 static WRITE8_HANDLER( safarir_audio_w )
 {
 	safarir_state *state = space->machine->driver_data<safarir_state>();
-	running_device *samples = state->samples;
+	device_t *samples = state->samples;
 	UINT8 rising_bits = data & ~state->port_last;
 
 	if (rising_bits == 0x12) sample_start(samples, CHANNEL_SOUND1, SAMPLE_SOUND1_1, 0);

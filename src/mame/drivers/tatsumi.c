@@ -827,7 +827,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static void sound_irq(running_device *device, int state)
+static void sound_irq(device_t *device, int state)
 {
 	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_IRQ0, state);
 }
@@ -842,7 +842,7 @@ static INTERRUPT_GEN( roundup5_interrupt )
 	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc8/4);	/* VBL */
 }
 
-static void apache3_68000_reset(running_device *device)
+static void apache3_68000_reset(device_t *device)
 {
 	cputag_set_input_line(device->machine, "sub2", INPUT_LINE_RESET, PULSE_LINE);
 }

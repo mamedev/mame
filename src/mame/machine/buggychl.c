@@ -10,11 +10,11 @@ struct _buggychl_mcu_state
 	UINT8       port_c_in, port_c_out, ddr_c;
 	UINT8       from_main, from_mcu;
 	int         mcu_sent, main_sent;
-	running_device *mcu;
+	device_t *mcu;
 };
 
 
-INLINE buggychl_mcu_state *get_safe_token( running_device *device )
+INLINE buggychl_mcu_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == BUGGYCHL_MCU);

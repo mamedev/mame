@@ -197,7 +197,7 @@ static const int sampleLimits[] =
     0x7200      // (end of samples)
 };
 
-void stfight_adpcm_int(running_device *device)
+void stfight_adpcm_int(device_t *device)
 {
 	UINT8 *SAMPLES = memory_region(device->machine, "adpcm");
 	int adpcm_data = SAMPLES[adpcm_data_offs & 0x7fff];

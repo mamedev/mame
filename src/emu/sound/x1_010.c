@@ -98,7 +98,7 @@ struct _x1_010_state
 /* mixer tables and internal buffers */
 //static short  *mixer_buffer = NULL;
 
-INLINE x1_010_state *get_safe_token(running_device *device)
+INLINE x1_010_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == X1_010);
@@ -221,7 +221,7 @@ static DEVICE_START( x1_010 )
 }
 
 
-void seta_sound_enable_w(running_device *device, int data)
+void seta_sound_enable_w(device_t *device, int data)
 {
 	x1_010_state *info = get_safe_token(device);
 	info->sound_enable = data;

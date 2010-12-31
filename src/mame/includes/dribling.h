@@ -23,9 +23,9 @@ public:
 	UINT8    di;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *ppi_0;
-	running_device *ppi_1;
+	device_t *maincpu;
+	device_t *ppi_0;
+	device_t *ppi_1;
 };
 
 

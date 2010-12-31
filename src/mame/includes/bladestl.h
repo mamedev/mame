@@ -21,9 +21,9 @@ public:
 	int        last_track[4];
 
 	/* devices */
-	running_device *audiocpu;
-	running_device *k007342;
-	running_device *k007420;
+	device_t *audiocpu;
+	device_t *k007342;
+	device_t *k007420;
 };
 
 

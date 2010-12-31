@@ -29,7 +29,7 @@ typedef INT8 SAMP;
 
 
 
-void *ym2413_init(running_device *device, int clock, int rate);
+void *ym2413_init(device_t *device, int clock, int rate);
 void ym2413_shutdown(void *chip);
 void ym2413_reset_chip(void *chip);
 void ym2413_write(void *chip, int a, int v);

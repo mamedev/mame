@@ -410,7 +410,7 @@ static UINT8 sonic_last[6];
 typedef void (*sys32_output_callback)(int which, UINT16 data);
 static sys32_output_callback segas32_sw1_output, segas32_sw2_output, segas32_sw3_output;
 
-static void (*system32_prot_vblank)(running_device *device);
+static void (*system32_prot_vblank)(device_t *device);
 
 
 /*************************************
@@ -1147,7 +1147,7 @@ static WRITE8_HANDLER( sound_int_control_hi_w )
 }
 
 
-static void ym3438_irq_handler(running_device *device, int state)
+static void ym3438_irq_handler(device_t *device, int state)
 {
 	if (state)
 		signal_sound_irq(device->machine, SOUND_IRQ_YM3438);

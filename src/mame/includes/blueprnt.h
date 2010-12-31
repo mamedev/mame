@@ -25,7 +25,7 @@ public:
 	int     dipsw;
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 };
 
 

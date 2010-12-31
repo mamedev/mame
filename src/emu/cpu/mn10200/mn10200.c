@@ -146,7 +146,7 @@ INLINE void mn102_change_pc(mn102_info *mn102, UINT32 pc)
 	 mn102->pc = pc & 0xffffff;
 }
 
-INLINE mn102_info *get_safe_token(running_device *device)
+INLINE mn102_info *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == MN10200);

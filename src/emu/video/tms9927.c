@@ -60,7 +60,7 @@ const tms9927_interface tms9927_null_interface = { 0 };
 
 
 /* makes sure that the passed in device is the right type */
-INLINE tms9927_state *get_safe_token(running_device *device)
+INLINE tms9927_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TMS9927);
@@ -74,7 +74,7 @@ static STATE_POSTLOAD( tms9927_state_save_postload )
 }
 
 
-static void generic_access(running_device *device, offs_t offset)
+static void generic_access(device_t *device, offs_t offset)
 {
 	tms9927_state *tms = get_safe_token(device);
 
@@ -174,21 +174,21 @@ READ8_DEVICE_HANDLER( tms9927_r )
 }
 
 
-int tms9927_screen_reset(running_device *device)
+int tms9927_screen_reset(device_t *device)
 {
 	tms9927_state *tms = get_safe_token(device);
 	return tms->reset;
 }
 
 
-int tms9927_upscroll_offset(running_device *device)
+int tms9927_upscroll_offset(device_t *device)
 {
 	tms9927_state *tms = get_safe_token(device);
 	return tms->start_datarow;
 }
 
 
-int tms9927_cursor_bounds(running_device *device, rectangle *bounds)
+int tms9927_cursor_bounds(device_t *device, rectangle *bounds)
 {
 	tms9927_state *tms = get_safe_token(device);
 	int cursorx = CURSOR_CHAR_ADDRESS(tms);

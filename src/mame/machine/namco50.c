@@ -138,13 +138,13 @@ Flags: 80=high score, 40=first bonus, 20=interval bonus, 10=?
 typedef struct _namco_50xx_state namco_50xx_state;
 struct _namco_50xx_state
 {
-	running_device *	cpu;
+	device_t *	cpu;
 	UINT8					latched_cmd;
 	UINT8					latched_rw;
 	UINT8					portO;
 };
 
-INLINE namco_50xx_state *get_safe_token(running_device *device)
+INLINE namco_50xx_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == NAMCO_50XX);
@@ -156,7 +156,7 @@ INLINE namco_50xx_state *get_safe_token(running_device *device)
 
 static TIMER_CALLBACK( namco_50xx_latch_callback )
 {
-	namco_50xx_state *state = get_safe_token((running_device *)ptr);
+	namco_50xx_state *state = get_safe_token((device_t *)ptr);
 	state->latched_cmd = param;
 	state->latched_rw = 0;
 }
@@ -164,7 +164,7 @@ static TIMER_CALLBACK( namco_50xx_latch_callback )
 
 static TIMER_CALLBACK( namco_50xx_readrequest_callback )
 {
-	namco_50xx_state *state = get_safe_token((running_device *)ptr);
+	namco_50xx_state *state = get_safe_token((device_t *)ptr);
 	state->latched_rw = 1;
 }
 
@@ -204,11 +204,11 @@ static WRITE8_HANDLER( namco_50xx_O_w )
 
 static TIMER_CALLBACK( namco_50xx_irq_clear )
 {
-	namco_50xx_state *state = get_safe_token((running_device *)ptr);
+	namco_50xx_state *state = get_safe_token((device_t *)ptr);
 	cpu_set_input_line(state->cpu, 0, CLEAR_LINE);
 }
 
-static void namco_50xx_irq_set(running_device *device)
+static void namco_50xx_irq_set(device_t *device)
 {
 	namco_50xx_state *state = get_safe_token(device);
 
@@ -230,7 +230,7 @@ WRITE8_DEVICE_HANDLER( namco_50xx_write )
 }
 
 
-void namco_50xx_read_request(running_device *device)
+void namco_50xx_read_request(device_t *device)
 {
 	timer_call_after_resynch(device->machine, (void *)device, 0, namco_50xx_readrequest_callback);
 

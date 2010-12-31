@@ -31,7 +31,7 @@ public:
 
 	/* devices */
 	cpu_device *maincpu;
-	running_device *samples;
+	device_t *samples;
 };
 
 

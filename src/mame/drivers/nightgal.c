@@ -49,8 +49,8 @@ public:
 	UINT8 *comms_ram;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *subcpu;
+	device_t *maincpu;
+	device_t *subcpu;
 };
 
 

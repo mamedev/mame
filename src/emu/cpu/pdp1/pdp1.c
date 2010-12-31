@@ -422,7 +422,7 @@ struct _pdp1_state
 	int icount;
 };
 
-INLINE pdp1_state *get_safe_token(running_device *device)
+INLINE pdp1_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == PDP1);
@@ -430,10 +430,10 @@ INLINE pdp1_state *get_safe_token(running_device *device)
 }
 
 static void execute_instruction(pdp1_state *cpustate);
-static void null_iot (running_device *device, int op2, int nac, int mb, int *io, int ac);
-static void lem_eem_iot(running_device *device, int op2, int nac, int mb, int *io, int ac);
-static void sbs_iot(running_device *device, int op2, int nac, int mb, int *io, int ac);
-static void type_20_sbs_iot(running_device *device, int op2, int nac, int mb, int *io, int ac);
+static void null_iot (device_t *device, int op2, int nac, int mb, int *io, int ac);
+static void lem_eem_iot(device_t *device, int op2, int nac, int mb, int *io, int ac);
+static void sbs_iot(device_t *device, int op2, int nac, int mb, int *io, int ac);
+static void type_20_sbs_iot(device_t *device, int op2, int nac, int mb, int *io, int ac);
 static void pulse_start_clear(pdp1_state *cpustate);
 
 
@@ -1698,7 +1698,7 @@ no_fetch:
 /*
     Handle unimplemented IOT
 */
-static void null_iot(running_device *device, int op2, int nac, int mb, int *io, int ac)
+static void null_iot(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *cpustate = get_safe_token(device);
 	/* Note that the dummy IOT 0 is used to wait for the completion pulse
@@ -1721,7 +1721,7 @@ static void null_iot(running_device *device, int op2, int nac, int mb, int *io, 
 
     IOT 74: LEM/EEM
 */
-static void lem_eem_iot(running_device *device, int op2, int nac, int mb, int *io, int ac)
+static void lem_eem_iot(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *cpustate = get_safe_token(device);
 	if (! cpustate->extend_support)	/* extend mode supported? */
@@ -1745,7 +1745,7 @@ static void lem_eem_iot(running_device *device, int op2, int nac, int mb, int *i
     IOT 55: esm
     IOT 56: cbs
 */
-static void sbs_iot(running_device *device, int op2, int nac, int mb, int *io, int ac)
+static void sbs_iot(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *cpustate = get_safe_token(device);
 	switch (op2)
@@ -1789,7 +1789,7 @@ static void sbs_iot(running_device *device, int op2, int nac, int mb, int *io, i
     IOT 52: isb
     IOT 53: cac
 */
-static void type_20_sbs_iot(running_device *device, int op2, int nac, int mb, int *io, int ac)
+static void type_20_sbs_iot(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *cpustate = get_safe_token(device);
 	int channel, mask;

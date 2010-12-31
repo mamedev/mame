@@ -27,9 +27,9 @@ public:
 	int        nmi_enable;
 
 	/* devices */
-	running_device *video_cpu;
-	running_device *sprite_cpu;
-	running_device *audio_cpu;
+	device_t *video_cpu;
+	device_t *sprite_cpu;
+	device_t *audio_cpu;
 };
 
 

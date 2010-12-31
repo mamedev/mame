@@ -82,7 +82,7 @@ static WRITE16_HANDLER( snowbros_flipscreen_w )
 
 static VIDEO_UPDATE( snowbros )
 {
-	running_device *pandora = screen->machine->device("pandora");
+	device_t *pandora = screen->machine->device("pandora");
 
 	/* This clears & redraws the entire screen each pass */
 	bitmap_fill(bitmap,cliprect,0xf0);
@@ -93,7 +93,7 @@ static VIDEO_UPDATE( snowbros )
 
 static VIDEO_EOF( snowbros )
 {
-	running_device *pandora = machine->device("pandora");
+	device_t *pandora = machine->device("pandora");
 	pandora_eof(pandora);
 }
 
@@ -1401,7 +1401,7 @@ static GFXDECODE_START( hyperpac )
 GFXDECODE_END
 
 /* handler called by the 3812/2151 emulator when the internal timers cause an IRQ */
-static void irqhandler(running_device *device, int irq)
+static void irqhandler(device_t *device, int irq)
 {
 	cputag_set_input_line(device->machine, "soundcpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }

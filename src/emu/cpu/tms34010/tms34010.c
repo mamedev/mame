@@ -81,7 +81,7 @@ struct _tms34010_state
 	UINT16 IOregs[64];
 };
 
-INLINE tms34010_state *get_safe_token(running_device *device)
+INLINE tms34010_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TMS34010 ||
@@ -1044,7 +1044,7 @@ static TIMER_CALLBACK( scanline_callback )
 }
 
 
-void tms34010_get_display_params(running_device *cpu, tms34010_display_params *params)
+void tms34010_get_display_params(device_t *cpu, tms34010_display_params *params)
 {
 	tms34010_state *tms = get_safe_token(cpu);
 
@@ -1557,7 +1557,7 @@ static STATE_POSTLOAD( tms34010_state_postload )
     HOST INTERFACE WRITES
 ***************************************************************************/
 
-void tms34010_host_w(running_device *cpu, int reg, int data)
+void tms34010_host_w(device_t *cpu, int reg, int data)
 {
 	address_space *space;
 	tms34010_state *tms = get_safe_token(cpu);
@@ -1613,7 +1613,7 @@ void tms34010_host_w(running_device *cpu, int reg, int data)
     HOST INTERFACE READS
 ***************************************************************************/
 
-int tms34010_host_r(running_device *cpu, int reg)
+int tms34010_host_r(device_t *cpu, int reg)
 {
 	tms34010_state *tms = get_safe_token(cpu);
 	unsigned int addr;

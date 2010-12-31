@@ -94,7 +94,7 @@ enum {
 };
 
 
-INLINE rf5c400_state *get_safe_token(running_device *device)
+INLINE rf5c400_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == RF5C400);
@@ -238,7 +238,7 @@ static STREAM_UPDATE( rf5c400_update )
 	}
 }
 
-static void rf5c400_init_chip(running_device *device, rf5c400_state *info)
+static void rf5c400_init_chip(device_t *device, rf5c400_state *info)
 {
 	int i;
 

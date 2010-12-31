@@ -89,7 +89,7 @@ struct _tms6100_state
 
 	const UINT8 *rom;
 
-	running_device *device;
+	device_t *device;
 
 #if 0
 	const tms5110_interface *intf;
@@ -102,7 +102,7 @@ struct _tms6100_state
 
 ***********************************************************************************************/
 
-INLINE tms6100_state *get_safe_token(running_device *device)
+INLINE tms6100_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TMS6100 ||

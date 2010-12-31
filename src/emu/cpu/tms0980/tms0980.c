@@ -446,7 +446,7 @@ static const UINT32 tms1100_default_decode[256] = {
 };
 
 
-INLINE tms0980_state *get_safe_token(running_device *device)
+INLINE tms0980_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TMS0980 ||
@@ -758,7 +758,7 @@ static const UINT8 tms1000_pc_decode[64] =
 };
 
 
-static void tms0980_set_cki_bus( running_device *device )
+static void tms0980_set_cki_bus( device_t *device )
 {
 	tms0980_state *cpustate = get_safe_token( device );
 

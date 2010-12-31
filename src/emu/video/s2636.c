@@ -114,7 +114,7 @@ struct _s2636_state
  *
  *************************************/
 
-INLINE s2636_state *get_safe_token( running_device *device )
+INLINE s2636_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == S2636);
@@ -122,7 +122,7 @@ INLINE s2636_state *get_safe_token( running_device *device )
 	return (s2636_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const s2636_interface *get_interface( running_device *device )
+INLINE const s2636_interface *get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == S2636));
@@ -190,7 +190,7 @@ static void draw_sprite( UINT8 *gfx, int color, int y, int x, int expand, int or
  *
  *************************************/
 
-static int check_collision( running_device *device, int spriteno1, int spriteno2, const rectangle *cliprect )
+static int check_collision( device_t *device, int spriteno1, int spriteno2, const rectangle *cliprect )
 {
 	s2636_state *s2636 = get_safe_token(device);
 	int checksum = 0;
@@ -254,7 +254,7 @@ static int check_collision( running_device *device, int spriteno1, int spriteno2
  *
  *************************************/
 
-bitmap_t *s2636_update( running_device *device, const rectangle *cliprect )
+bitmap_t *s2636_update( device_t *device, const rectangle *cliprect )
 {
 	s2636_state *s2636 = get_safe_token(device);
 	UINT8 collision = 0;

@@ -104,7 +104,7 @@ struct _tms32010_state
 	address_space *io;
 };
 
-INLINE tms32010_state *get_safe_token(running_device *device)
+INLINE tms32010_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TMS32010 ||

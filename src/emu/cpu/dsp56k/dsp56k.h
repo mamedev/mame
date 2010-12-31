@@ -200,7 +200,7 @@ typedef struct
 } dsp56k_core;
 
 
-INLINE dsp56k_core *get_safe_token(running_device *device)
+INLINE dsp56k_core *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == DSP56156);
@@ -211,9 +211,9 @@ INLINE dsp56k_core *get_safe_token(running_device *device)
 /***************************************************************************
     PUBLIC FUNCTIONS - ACCESSIBLE TO DRIVERS
 ***************************************************************************/
-void  dsp56k_host_interface_write(running_device* device, UINT8 offset, UINT8 data);
-UINT8 dsp56k_host_interface_read(running_device* device, UINT8 offset);
+void  dsp56k_host_interface_write(device_t* device, UINT8 offset, UINT8 data);
+UINT8 dsp56k_host_interface_read(device_t* device, UINT8 offset);
 
-UINT16 dsp56k_get_peripheral_memory(running_device* device, UINT16 addr);
+UINT16 dsp56k_get_peripheral_memory(device_t* device, UINT16 addr);
 
 #endif /* __DSP56K_H__ */

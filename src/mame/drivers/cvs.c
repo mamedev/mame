@@ -245,7 +245,7 @@ static INTERRUPT_GEN( cvs_main_cpu_interrupt )
 }
 
 
-static void cvs_slave_cpu_interrupt( running_device *cpu, int state )
+static void cvs_slave_cpu_interrupt( device_t *cpu, int state )
 {
 	cpu_set_input_line_vector(cpu, 0, 0x03);
 	//cpu_set_input_line(cpu, 0, state ? ASSERT_LINE : CLEAR_LINE);
@@ -437,7 +437,7 @@ static WRITE8_DEVICE_HANDLER( cvs_tms5110_pdc_w )
 }
 
 
-static int speech_rom_read_bit( running_device *device )
+static int speech_rom_read_bit( device_t *device )
 {
 	cvs_state *state = device->machine->driver_data<cvs_state>();
 	running_machine *machine = device->machine;

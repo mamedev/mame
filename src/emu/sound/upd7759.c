@@ -147,7 +147,7 @@ enum
 typedef struct _upd7759_state upd7759_state;
 struct _upd7759_state
 {
-	running_device *device;
+	device_t *device;
 	sound_stream *channel;					/* stream channel for playback */
 
 	/* internal clock to output sample rate mapping */
@@ -161,7 +161,7 @@ struct _upd7759_state
 	UINT8		reset;						/* current state of the RESET line */
 	UINT8		start;						/* current state of the START line */
 	UINT8		drq;						/* current state of the DRQ line */
-	void (*drqcallback)(running_device *device, int param);			/* drq callback */
+	void (*drqcallback)(device_t *device, int param);			/* drq callback */
 
 	/* internal state machine */
 	INT8		state;						/* current overall chip state */
@@ -221,7 +221,7 @@ static const int upd7759_state_table[16] = { -1, -1, 0, 0, 1, 2, 2, 3, -1, -1, 0
 
 
 
-INLINE upd7759_state *get_safe_token(running_device *device)
+INLINE upd7759_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == UPD7759);
@@ -600,7 +600,7 @@ static STATE_POSTLOAD( upd7759_postload )
 }
 
 
-static void register_for_save(upd7759_state *chip, running_device *device)
+static void register_for_save(upd7759_state *chip, device_t *device)
 {
 	state_save_register_device_item(device, 0, chip->pos);
 	state_save_register_device_item(device, 0, chip->step);
@@ -679,7 +679,7 @@ static DEVICE_START( upd7759 )
 
 *************************************************************/
 
-void upd7759_reset_w(running_device *device, UINT8 data)
+void upd7759_reset_w(device_t *device, UINT8 data)
 {
 	/* update the reset value */
 	upd7759_state *chip = get_safe_token(device);
@@ -694,7 +694,7 @@ void upd7759_reset_w(running_device *device, UINT8 data)
 		upd7759_reset(chip);
 }
 
-void upd7759_start_w(running_device *device, UINT8 data)
+void upd7759_start_w(device_t *device, UINT8 data)
 {
 	/* update the start value */
 	upd7759_state *chip = get_safe_token(device);
@@ -726,7 +726,7 @@ WRITE8_DEVICE_HANDLER( upd7759_port_w )
 }
 
 
-int upd7759_busy_r(running_device *device)
+int upd7759_busy_r(device_t *device)
 {
 	/* return /BUSY */
 	upd7759_state *chip = get_safe_token(device);
@@ -734,7 +734,7 @@ int upd7759_busy_r(running_device *device)
 }
 
 
-void upd7759_set_bank_base(running_device *device, UINT32 base)
+void upd7759_set_bank_base(device_t *device, UINT32 base)
 {
 	upd7759_state *chip = get_safe_token(device);
 	chip->rom = chip->rombase + base;

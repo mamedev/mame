@@ -91,7 +91,7 @@ struct _z8000_state
 
 #include "z8000cpu.h"
 
-INLINE z8000_state *get_safe_token(running_device *device)
+INLINE z8000_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == Z8001 || device->type() == Z8002);

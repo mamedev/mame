@@ -41,8 +41,8 @@ public:
 	UINT32 dac_adr, dac_bank, dac_adr_s, dac_adr_e, dac_busy;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *dac;
+	device_t *maincpu;
+	device_t *dac;
 };
 
 

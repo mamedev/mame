@@ -30,7 +30,7 @@ CPU_DISASSEMBLE( rsp );
 
 extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
 
-INLINE rsp_state *get_safe_token(running_device *device)
+INLINE rsp_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == RSP);
@@ -3123,19 +3123,19 @@ CPU_GET_INFO( rsp )
 	}
 }
 
-void rspdrc_set_options(running_device *device, UINT32 options)
+void rspdrc_set_options(device_t *device, UINT32 options)
 {
 }
 
-void rspdrc_add_imem(running_device *device, void *base)
+void rspdrc_add_imem(device_t *device, void *base)
 {
 }
 
-void rspdrc_add_dmem(running_device *device, void *base)
+void rspdrc_add_dmem(device_t *device, void *base)
 {
 }
 
-void rspdrc_flush_drc_cache(running_device *device)
+void rspdrc_flush_drc_cache(device_t *device)
 {
 }
 

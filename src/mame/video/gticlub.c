@@ -977,7 +977,7 @@ VIDEO_START( gticlub )
 
 VIDEO_UPDATE( gticlub )
 {
-	running_device *k001604 = screen->machine->device("k001604_1");
+	device_t *k001604 = screen->machine->device("k001604_1");
 
 	k001604_draw_back_layer(k001604, bitmap, cliprect);
 

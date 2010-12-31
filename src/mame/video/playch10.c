@@ -59,7 +59,7 @@ PALETTE_INIT( playch10 )
 	ppu2c0x_init_palette_rgb(machine, 256 );
 }
 
-static void ppu_irq( running_device *device, int *ppu_regs )
+static void ppu_irq( device_t *device, int *ppu_regs )
 {
 	cputag_set_input_line(device->machine, "cart", INPUT_LINE_NMI, PULSE_LINE );
 	pc10_int_detect = 1;
@@ -122,12 +122,12 @@ VIDEO_START( playch10_hboard )
 
 VIDEO_UPDATE( playch10 )
 {
-	running_device *ppu = screen->machine->device("ppu");
+	device_t *ppu = screen->machine->device("ppu");
 
 	/* Dual monitor version */
 	if (pc10_bios == 1)
 	{
-		running_device *top_screen = screen->machine->device("top");
+		device_t *top_screen = screen->machine->device("top");
 
 		/* On Playchoice 10 single monitor, this bit toggles    */
 		/* between PPU and BIOS display.                        */

@@ -34,11 +34,11 @@ public:
 	INT32       banknum;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *subcpu;
-	running_device *tc0100scn;
-	running_device *tc0140syt;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *subcpu;
+	device_t *tc0100scn;
+	device_t *tc0140syt;
 };
 
 

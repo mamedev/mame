@@ -159,7 +159,7 @@ static TIMER_CALLBACK( sh2_timer_callback )
 
 
 
-void sh2_notify_dma_data_available(running_device *device)
+void sh2_notify_dma_data_available(device_t *device)
 {
 	sh2_state *sh2 = GET_SH2(device);
 	//printf("call notify\n");
@@ -719,13 +719,13 @@ READ32_HANDLER( sh2_internal_r )
 	return sh2->m[offset];
 }
 
-void sh2_set_ftcsr_read_callback(running_device *device, void (*callback)(UINT32))
+void sh2_set_ftcsr_read_callback(device_t *device, void (*callback)(UINT32))
 {
 	sh2_state *sh2 = GET_SH2(device);
 	sh2->ftcsr_read_callback = callback;
 }
 
-void sh2_set_frt_input(running_device *device, int state)
+void sh2_set_frt_input(device_t *device, int state)
 {
 	sh2_state *sh2 = GET_SH2(device);
 

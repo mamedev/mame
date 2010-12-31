@@ -8,7 +8,7 @@
 typedef struct _ym3812_interface ym3812_interface;
 struct _ym3812_interface
 {
-	void (*handler)(running_device *device, int linestate);
+	void (*handler)(device_t *device, int linestate);
 };
 
 READ8_DEVICE_HANDLER( ym3812_r );

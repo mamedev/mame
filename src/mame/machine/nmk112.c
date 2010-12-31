@@ -30,7 +30,7 @@ struct _nmk112_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE nmk112_state *get_safe_token( running_device *device )
+INLINE nmk112_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == NMK112);
@@ -38,7 +38,7 @@ INLINE nmk112_state *get_safe_token( running_device *device )
 	return (nmk112_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const nmk112_interface *get_interface( running_device *device )
+INLINE const nmk112_interface *get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == NMK112));

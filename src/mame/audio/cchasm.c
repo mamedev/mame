@@ -14,7 +14,7 @@
 
 static int sound_flags;
 static int coin_flag;
-static running_device *ctc;
+static device_t *ctc;
 
 WRITE8_HANDLER( cchasm_reset_coin_flag_w )
 {

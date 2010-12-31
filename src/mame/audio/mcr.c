@@ -53,7 +53,7 @@ static UINT8 mcr_sound_config;
 static UINT16 dacval;
 
 /* SSIO-specific globals */
-static running_device *ssio_sound_cpu;
+static device_t *ssio_sound_cpu;
 static UINT8 ssio_data[4];
 static UINT8 ssio_status;
 static UINT8 ssio_14024_count;
@@ -67,19 +67,19 @@ static read8_space_func ssio_custom_input[5];
 static write8_space_func ssio_custom_output[2];
 
 /* Chip Squeak Deluxe-specific globals */
-static running_device *csdeluxe_sound_cpu;
+static device_t *csdeluxe_sound_cpu;
 static UINT8 csdeluxe_status;
 
 /* Turbo Chip Squeak-specific globals */
-static running_device *turbocs_sound_cpu;
+static device_t *turbocs_sound_cpu;
 static UINT8 turbocs_status;
 
 /* Sounds Good-specific globals */
-static running_device *soundsgood_sound_cpu;
+static device_t *soundsgood_sound_cpu;
 static UINT8 soundsgood_status;
 
 /* Squawk n' Talk-specific globals */
-static running_device *squawkntalk_sound_cpu;
+static device_t *squawkntalk_sound_cpu;
 static UINT8 squawkntalk_tms_command;
 static UINT8 squawkntalk_tms_strobes;
 
@@ -316,8 +316,8 @@ static TIMER_CALLBACK( ssio_delayed_data_w )
 
 static void ssio_update_volumes(running_machine *machine)
 {
-	running_device *ay0 = machine->device("ssio.1");
-	running_device *ay1 = machine->device("ssio.2");
+	device_t *ay0 = machine->device("ssio.1");
+	device_t *ay1 = machine->device("ssio.2");
 	ay8910_set_volume(ay0, 0, ssio_mute ? 0 : ssio_ayvolume_lookup[ssio_duty_cycle[0][0]]);
 	ay8910_set_volume(ay0, 1, ssio_mute ? 0 : ssio_ayvolume_lookup[ssio_duty_cycle[0][1]]);
 	ay8910_set_volume(ay0, 2, ssio_mute ? 0 : ssio_ayvolume_lookup[ssio_duty_cycle[0][2]]);
@@ -514,7 +514,7 @@ static WRITE_LINE_DEVICE_HANDLER( csdeluxe_irq )
 
 static TIMER_CALLBACK( csdeluxe_delayed_data_w )
 {
-	running_device *pia = machine->device("csdpia");
+	device_t *pia = machine->device("csdpia");
 
 	pia6821_portb_w(pia, 0, param & 0x0f);
 	pia6821_ca1_w(pia, ~param & 0x10);
@@ -652,7 +652,7 @@ static WRITE_LINE_DEVICE_HANDLER( soundsgood_irq )
 
 static TIMER_CALLBACK( soundsgood_delayed_data_w )
 {
-	running_device *pia = machine->device("sgpia");
+	device_t *pia = machine->device("sgpia");
 
 	pia6821_portb_w(pia, 0, (param >> 1) & 0x0f);
 	pia6821_ca1_w(pia, ~param & 0x01);
@@ -756,7 +756,7 @@ static WRITE_LINE_DEVICE_HANDLER( turbocs_irq )
 
 static TIMER_CALLBACK( turbocs_delayed_data_w )
 {
-	running_device *pia = machine->device("tcspia");
+	device_t *pia = machine->device("tcspia");
 
 	pia6821_portb_w(pia, 0, (param >> 1) & 0x0f);
 	pia6821_ca1_w(pia, ~param & 0x01);
@@ -853,7 +853,7 @@ static WRITE8_DEVICE_HANDLER( squawkntalk_porta2_w )
 
 static WRITE8_DEVICE_HANDLER( squawkntalk_portb2_w )
 {
-	running_device *tms = device->machine->device("sntspeech");
+	device_t *tms = device->machine->device("sntspeech");
 
 	/* bits 0-1 select read/write strobes on the TMS5200 */
 	data &= 0x03;
@@ -884,8 +884,8 @@ static WRITE8_DEVICE_HANDLER( squawkntalk_portb2_w )
 
 static WRITE_LINE_DEVICE_HANDLER( squawkntalk_irq )
 {
-	running_device *pia0 = device->machine->device("sntpia0");
-	running_device *pia1 = device->machine->device("sntpia1");
+	device_t *pia0 = device->machine->device("sntpia0");
+	device_t *pia1 = device->machine->device("sntpia1");
 	int combined_state = pia6821_get_irq_a(pia0) | pia6821_get_irq_b(pia0) | pia6821_get_irq_a(pia1) | pia6821_get_irq_b(pia1);
 
 	cpu_set_input_line(squawkntalk_sound_cpu, M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
@@ -893,7 +893,7 @@ static WRITE_LINE_DEVICE_HANDLER( squawkntalk_irq )
 
 static TIMER_CALLBACK( squawkntalk_delayed_data_w )
 {
-	running_device *pia0 = machine->device("sntpia0");
+	device_t *pia0 = machine->device("sntpia0");
 
 	pia6821_porta_w(pia0, 0, ~param & 0x0f);
 	pia6821_cb1_w(pia0, ~param & 0x10);

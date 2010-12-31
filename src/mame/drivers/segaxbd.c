@@ -392,7 +392,7 @@ static void sound_data_w(running_machine *machine, UINT8 data)
 }
 
 
-static void sound_cpu_irq(running_device *device, int state)
+static void sound_cpu_irq(device_t *device, int state)
 {
 	segas1x_state *driver = device->machine->driver_data<segas1x_state>();
 
@@ -416,7 +416,7 @@ static READ8_HANDLER( sound_data_r )
  *
  *************************************/
 
-static void xboard_reset(running_device *device)
+static void xboard_reset(device_t *device)
 {
 	segas1x_state *state = device->machine->driver_data<segas1x_state>();
 

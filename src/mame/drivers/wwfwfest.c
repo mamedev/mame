@@ -369,7 +369,7 @@ static TIMER_DEVICE_CALLBACK( wwfwfest_scanline )
  Straight from Ddragon 3 with some adjusted volumes
 *******************************************************************************/
 
-static void dd3_ymirq_handler(running_device *device, int irq)
+static void dd3_ymirq_handler(device_t *device, int irq)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0 , irq ? ASSERT_LINE : CLEAR_LINE );
 }

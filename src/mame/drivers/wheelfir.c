@@ -231,10 +231,10 @@ public:
 	wheelfir_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	running_device *maincpu;
-	running_device *subcpu;
-	running_device *screen;
-	running_device *eeprom;
+	device_t *maincpu;
+	device_t *subcpu;
+	device_t *screen;
+	device_t *eeprom;
 
 	INT32 *zoom_table;
 	UINT16 *blitter_data;

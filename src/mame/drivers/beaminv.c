@@ -72,7 +72,7 @@ public:
 	UINT8      controller_select;
 
 	/* devices */
-	running_device *maincpu;
+	device_t *maincpu;
 };
 
 

@@ -38,8 +38,8 @@ void triplhnt_set_collision(running_machine *machine, int code)
 
 static void triplhnt_update_misc(running_machine *machine, int offset)
 {
-	running_device *samples = machine->device("samples");
-	running_device *discrete = machine->device("discrete");
+	device_t *samples = machine->device("samples");
+	device_t *discrete = machine->device("discrete");
 	UINT8 is_witch_hunt;
 	UINT8 bit = offset >> 1;
 

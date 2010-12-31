@@ -16,7 +16,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*smc91c9x_irq_func)(running_device *device, int state);
+typedef void (*smc91c9x_irq_func)(device_t *device, int state);
 
 
 typedef struct _smc91c9x_config smc91c9x_config;

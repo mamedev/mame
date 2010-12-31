@@ -30,7 +30,7 @@ typedef enum
  * It will be called whenever an output signal changes or a new
  * input line state is to be sampled.
  */
-typedef int (*upd7810_io_callback)(running_device *device, int ioline, int state);
+typedef int (*upd7810_io_callback)(device_t *device, int ioline, int state);
 
 // use it as reset parameter in the Machine struct
 typedef struct {

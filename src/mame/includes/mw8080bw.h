@@ -81,16 +81,16 @@ public:
 	emu_timer   *interrupt_timer;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *mb14241;
-	running_device *samples;
-	running_device *samples1;
-	running_device *samples2;
-	running_device *speaker;
-	running_device *sn1;
-	running_device *sn2;
-	running_device *sn;
-	running_device *discrete;
+	device_t *maincpu;
+	device_t *mb14241;
+	device_t *samples;
+	device_t *samples1;
+	device_t *samples2;
+	device_t *speaker;
+	device_t *sn1;
+	device_t *sn2;
+	device_t *sn;
+	device_t *discrete;
 };
 
 
@@ -171,7 +171,7 @@ WRITE8_HANDLER( zzzap_audio_1_w );
 WRITE8_HANDLER( zzzap_audio_2_w );
 
 MACHINE_CONFIG_EXTERN( maze_audio );
-void maze_write_discrete(running_device *device, UINT8 maze_tone_timing_state);
+void maze_write_discrete(device_t *device, UINT8 maze_tone_timing_state);
 
 MACHINE_CONFIG_EXTERN( boothill_audio );
 WRITE8_DEVICE_HANDLER( boothill_audio_w );

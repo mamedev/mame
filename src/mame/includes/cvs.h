@@ -57,14 +57,14 @@ public:
 	UINT8      page, io_page;	// quasar
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *speech;
-	running_device *dac3;
-	running_device *tms;
-	running_device *s2636_0;
-	running_device *s2636_1;
-	running_device *s2636_2;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *speech;
+	device_t *dac3;
+	device_t *tms;
+	device_t *s2636_0;
+	device_t *s2636_1;
+	device_t *s2636_2;
 };
 
 /*----------- defined in drivers/cvs.c -----------*/

@@ -25,8 +25,8 @@ public:
 	emu_timer   *raster_interrupt_timer;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
+	device_t *maincpu;
+	device_t *audiocpu;
 };
 
 

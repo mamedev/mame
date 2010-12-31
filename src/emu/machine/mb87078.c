@@ -111,7 +111,7 @@ static const int mb87078_gain_percent[66] = {
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE mb87078_state *get_safe_token( running_device *device )
+INLINE mb87078_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == MB87078);
@@ -119,7 +119,7 @@ INLINE mb87078_state *get_safe_token( running_device *device )
 	return (mb87078_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const mb87078_interface *get_interface( running_device *device )
+INLINE const mb87078_interface *get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == MB87078));
@@ -165,7 +165,7 @@ static int calc_gain_index( int data0, int data1 )
 }
 
 
-static void gain_recalc( running_device *device )
+static void gain_recalc( device_t *device )
 {
 	mb87078_state *mb87078 = get_safe_token(device);
 	int i;
@@ -181,7 +181,7 @@ static void gain_recalc( running_device *device )
 
 
 
-void mb87078_data_w( running_device *device, int data, int dsel )
+void mb87078_data_w( device_t *device, int data, int dsel )
 {
 	mb87078_state *mb87078 = get_safe_token(device);
 
@@ -201,20 +201,20 @@ void mb87078_data_w( running_device *device, int data, int dsel )
 }
 
 
-float mb87078_gain_decibel_r( running_device *device, int channel )
+float mb87078_gain_decibel_r( device_t *device, int channel )
 {
 	mb87078_state *mb87078 = get_safe_token(device);
 	return mb87078_gain_decibel[mb87078->gain[channel]];
 }
 
 
-int mb87078_gain_percent_r( running_device *device, int channel )
+int mb87078_gain_percent_r( device_t *device, int channel )
 {
 	mb87078_state *mb87078 = get_safe_token(device);
 	return mb87078_gain_percent[mb87078->gain[channel]];
 }
 
-void mb87078_reset_comp_w( running_device *device, int level )
+void mb87078_reset_comp_w( device_t *device, int level )
 {
 	mb87078_state *mb87078 = get_safe_token(device);
 

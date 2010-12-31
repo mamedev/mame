@@ -2102,7 +2102,7 @@ ADDRESS_MAP_END
     specific TX handler configuration
 -------------------------------------------------*/
 
-void ppc4xx_spu_set_tx_handler(running_device *device, ppc4xx_spu_tx_handler handler)
+void ppc4xx_spu_set_tx_handler(device_t *device, ppc4xx_spu_tx_handler handler)
 {
 	powerpc_state *ppc = *(powerpc_state **)downcast<legacy_cpu_device *>(device)->token();
 	ppc->spu.tx_handler = handler;
@@ -2114,7 +2114,7 @@ void ppc4xx_spu_set_tx_handler(running_device *device, ppc4xx_spu_tx_handler han
     specific serial byte receive
 -------------------------------------------------*/
 
-void ppc4xx_spu_receive_byte(running_device *device, UINT8 byteval)
+void ppc4xx_spu_receive_byte(device_t *device, UINT8 byteval)
 {
 	powerpc_state *ppc = *(powerpc_state **)downcast<legacy_cpu_device *>(device)->token();
 	ppc4xx_spu_rx_data(ppc, byteval);

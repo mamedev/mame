@@ -23,7 +23,7 @@ public:
 	int         sprite_flipy_mask, sprite_pri_mask, tilemap_priority;
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 };
 
 /*----------- defined in video/lastduel.c -----------*/

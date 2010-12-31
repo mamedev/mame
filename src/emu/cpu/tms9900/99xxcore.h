@@ -509,7 +509,7 @@ struct _tms99xx_state
 	int extra_byte;	/* buffer holding the unused byte in a word read */
 };
 
-INLINE tms99xx_state *get_safe_token(running_device *device)
+INLINE tms99xx_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 //  assert(device->type() == TMS99XX_GET_INFO);
@@ -1208,7 +1208,7 @@ static void set_flag1(tms99xx_state *cpustate, int val);
 
 /**************************************************************************/
 
-static void register_for_save_state(running_device *device)
+static void register_for_save_state(device_t *device)
 {
 	tms99xx_state *cpustate = get_safe_token(device);
 	state_save_register_device_item(device, 0, cpustate->WP);

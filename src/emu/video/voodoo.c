@@ -309,7 +309,7 @@ static const raster_info predef_raster_table[] =
     in device is, in fact, a voodoo device
 -------------------------------------------------*/
 
-INLINE voodoo_state *get_safe_token(running_device *device)
+INLINE voodoo_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == VOODOO_GRAPHICS);
@@ -325,7 +325,7 @@ INLINE voodoo_state *get_safe_token(running_device *device)
  *
  *************************************/
 
-int voodoo_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
+int voodoo_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	voodoo_state *v = get_safe_token(device);
 	int changed = v->fbi.video_changed;
@@ -462,21 +462,21 @@ int voodoo_update(running_device *device, bitmap_t *bitmap, const rectangle *cli
  *
  *************************************/
 
-int voodoo_get_type(running_device *device)
+int voodoo_get_type(device_t *device)
 {
 	voodoo_state *v = get_safe_token(device);
 	return v->type;
 }
 
 
-int voodoo_is_stalled(running_device *device)
+int voodoo_is_stalled(device_t *device)
 {
 	voodoo_state *v = get_safe_token(device);
 	return (v->pci.stall_state != NOT_STALLED);
 }
 
 
-void voodoo_set_init_enable(running_device *device, UINT32 newval)
+void voodoo_set_init_enable(device_t *device, UINT32 newval)
 {
 	voodoo_state *v = get_safe_token(device);
 	v->pci.init_enable = newval;
@@ -651,7 +651,7 @@ static STATE_POSTLOAD( voodoo_postload )
 }
 
 
-static void init_save_state(running_device *device)
+static void init_save_state(device_t *device)
 {
 	voodoo_state *v = get_safe_token(device);
 	int index, subindex;

@@ -26,7 +26,7 @@
 typedef struct _ide_config ide_config;
 struct _ide_config
 {
-	void	(*interrupt)(running_device *device, int state);
+	void	(*interrupt)(device_t *device, int state);
 	const char *master;		/* name of master region (defaults to device tag) */
 	const char *slave;		/* name of slave region (defaults to NULL) */
 	const char *bmcpu;		/* name of bus master CPU */
@@ -57,18 +57,18 @@ struct _ide_config
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-UINT8 *ide_get_features(running_device *device);
+UINT8 *ide_get_features(device_t *device);
 
-void ide_set_master_password(running_device *device, const UINT8 *password);
-void ide_set_user_password(running_device *device, const UINT8 *password);
+void ide_set_master_password(device_t *device, const UINT8 *password);
+void ide_set_user_password(device_t *device, const UINT8 *password);
 
-void ide_set_gnet_readlock(running_device *device, const UINT8 onoff);
+void ide_set_gnet_readlock(device_t *device, const UINT8 onoff);
 
-int ide_bus_r(running_device *config, int select, int offset);
-void ide_bus_w(running_device *config, int select, int offset, int data);
+int ide_bus_r(device_t *config, int select, int offset);
+void ide_bus_w(device_t *config, int select, int offset, int data);
 
-UINT32 ide_controller_r(running_device *config, int reg, int size);
-void ide_controller_w(running_device *config, int reg, int size, UINT32 data);
+UINT32 ide_controller_r(device_t *config, int reg, int size);
+void ide_controller_w(device_t *config, int reg, int size, UINT32 data);
 
 READ32_DEVICE_HANDLER( ide_controller32_r );
 WRITE32_DEVICE_HANDLER( ide_controller32_w );

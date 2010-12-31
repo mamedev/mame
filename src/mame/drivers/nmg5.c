@@ -248,8 +248,8 @@ public:
 	UINT8 prot_val, input_data, priority_reg, gfx_bank;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *soundcpu;
+	device_t *maincpu;
+	device_t *soundcpu;
 };
 
 
@@ -996,7 +996,7 @@ static GFXDECODE_START( pclubys )
 GFXDECODE_END
 
 
-static void soundirq( running_device *device, int state )
+static void soundirq( device_t *device, int state )
 {
 	nmg5_state *driver_state = device->machine->driver_data<nmg5_state>();
 	cpu_set_input_line(driver_state->soundcpu, 0, state);

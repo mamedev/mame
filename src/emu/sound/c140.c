@@ -106,7 +106,7 @@ struct _c140_state
 	VOICE voi[MAX_VOICE];
 };
 
-INLINE c140_state *get_safe_token(running_device *device)
+INLINE c140_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == C140);
@@ -254,7 +254,7 @@ WRITE8_DEVICE_HANDLER( c140_w )
 	}
 }
 
-void c140_set_base(running_device *device, void *base)
+void c140_set_base(device_t *device, void *base)
 {
 	c140_state *info = get_safe_token(device);
 	info->pRom = base;

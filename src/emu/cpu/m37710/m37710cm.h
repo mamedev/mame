@@ -127,7 +127,7 @@ struct _m37710i_cpu_struct
 	emu_timer *timers[8];
 };
 
-INLINE m37710i_cpu_struct *get_safe_token(running_device *device)
+INLINE m37710i_cpu_struct *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == M37710 ||

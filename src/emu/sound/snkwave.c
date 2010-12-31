@@ -33,7 +33,7 @@ struct _snkwave_state
 	INT16 waveform[WAVEFORM_LENGTH];
 };
 
-INLINE snkwave_state *get_safe_token(running_device *device)
+INLINE snkwave_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SNKWAVE);

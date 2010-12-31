@@ -121,7 +121,7 @@ static INTERRUPT_GEN( sandscrp_interrupt )
 
 static VIDEO_EOF( sandscrp )
 {
-	running_device *pandora = machine->device("pandora");
+	device_t *pandora = machine->device("pandora");
 	sprite_irq = 1;
 	update_irq_state(machine);
 	pandora_eof(pandora);
@@ -412,7 +412,7 @@ GFXDECODE_END
 
 /* YM3014B + YM2203C */
 
-static void irq_handler(running_device *device, int irq)
+static void irq_handler(device_t *device, int irq)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }

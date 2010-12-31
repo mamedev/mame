@@ -109,7 +109,7 @@ static const char *const ethernet_regname[64] =
 typedef struct _smc91c9x_state smc91c9x_state;
 struct _smc91c9x_state
 {
-	running_device *device;
+	device_t *device;
 	smc91c9x_irq_func irq_handler;
 
 	/* raw register data and masks */
@@ -151,7 +151,7 @@ static void update_ethernet_irq(smc91c9x_state *smc);
     in device is, in fact, an IDE controller
 -------------------------------------------------*/
 
-INLINE smc91c9x_state *get_safe_token(running_device *device)
+INLINE smc91c9x_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SMC91C94 || device->type() == SMC91C96);

@@ -110,7 +110,7 @@
 int rtc_address_strobe = 0;
 int rtc_data_strobe = 0;
 
-running_device *samples;
+device_t *samples;
 UINT8 *shapeRomPtr;     // pointer to tile_gfx shape roms
 UINT8 shapeRom[0xc000]; // shaperom restore array.
 

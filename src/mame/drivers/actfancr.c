@@ -263,7 +263,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static void sound_irq(running_device *device, int linestate)
+static void sound_irq(device_t *device, int linestate)
 {
 	actfancr_state *state = device->machine->driver_data<actfancr_state>();
 	cpu_set_input_line(state->audiocpu, 0, linestate); /* IRQ */

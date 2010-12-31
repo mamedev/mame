@@ -60,7 +60,7 @@ typedef struct
 
 }	t90_Regs;
 
-INLINE t90_Regs *get_safe_token(running_device *device)
+INLINE t90_Regs *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TMP90840 ||

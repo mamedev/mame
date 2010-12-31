@@ -124,7 +124,7 @@ struct _tms32031_state
 	direct_read_data *direct;
 };
 
-INLINE tms32031_state *get_safe_token(running_device *device)
+INLINE tms32031_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TMS32031 ||

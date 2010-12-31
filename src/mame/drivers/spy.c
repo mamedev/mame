@@ -466,7 +466,7 @@ INPUT_PORTS_END
 
 
 
-static void volume_callback( running_device *device, int v )
+static void volume_callback( device_t *device, int v )
 {
 	k007232_set_volume(device, 0, (v >> 4) * 0x11, 0);
 	k007232_set_volume(device, 1, 0, (v & 0x0f) * 0x11);
@@ -478,7 +478,7 @@ static const k007232_interface spy_k007232_interface =
 };
 
 
-static void irqhandler( running_device *device, int linestate )
+static void irqhandler( device_t *device, int linestate )
 {
 	spy_state *state = device->machine->driver_data<spy_state>();
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, linestate);

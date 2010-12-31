@@ -77,14 +77,14 @@ struct _i8255a_t
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE i8255a_t *get_safe_token(running_device *device)
+INLINE i8255a_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 
 	return (i8255a_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const i8255a_interface *get_interface(running_device *device)
+INLINE const i8255a_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == I8255A));
@@ -573,7 +573,7 @@ static void write_pc(i8255a_t *i8255a, UINT8 data)
 	}
 }
 
-static void set_mode(running_device *device, UINT8 data)
+static void set_mode(device_t *device, UINT8 data)
 {
 	i8255a_t *i8255a = get_safe_token(device);
 
@@ -628,7 +628,7 @@ static void set_mode(running_device *device, UINT8 data)
 	output_pc(i8255a);
 }
 
-static void set_pc_bit(running_device *device, int bit, int state)
+static void set_pc_bit(device_t *device, int bit, int state)
 {
 	i8255a_t *i8255a = get_safe_token(device);
 

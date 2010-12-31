@@ -12,7 +12,7 @@ UINT16 *segaic16_spriteram_1;
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE sega16sp_state *get_safe_token( running_device *device )
+INLINE sega16sp_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == SEGA16SP);
@@ -20,7 +20,7 @@ INLINE sega16sp_state *get_safe_token( running_device *device )
 	return (sega16sp_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const sega16sp_interface *get_interface( running_device *device )
+INLINE const sega16sp_interface *get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == SEGA16SP));
@@ -76,7 +76,7 @@ INLINE const sega16sp_interface *get_interface( running_device *device )
 		pri[x] = 0xff;														\
 	}																		\
 
-void segaic16_sprites_hangon_draw(running_machine *machine, running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_hangon_draw(running_machine *machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 numbanks = memory_region_length(machine, "gfx2") / 0x10000;
 	const UINT16 *spritebase = (const UINT16 *)memory_region(machine, "gfx2");
@@ -241,7 +241,7 @@ void segaic16_sprites_hangon_draw(running_machine *machine, running_device *devi
 		pri[x] = 0xff;														\
 	}																		\
 
-void segaic16_sprites_sharrier_draw(running_machine *machine, running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_sharrier_draw(running_machine *machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 numbanks = memory_region_length(machine, "gfx2") / 0x20000;
 	const UINT32 *spritebase = (const UINT32 *)memory_region(machine, "gfx2");
@@ -412,7 +412,7 @@ void segaic16_sprites_sharrier_draw(running_machine *machine, running_device *de
 		pri[x] = 0xff;														\
 	}																		\
 
-void segaic16_sprites_16a_draw(running_machine *machine, running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_16a_draw(running_machine *machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 numbanks = memory_region_length(machine, "gfx2") / 0x10000;
 	const UINT16 *spritebase = (const UINT16 *)memory_region(machine, "gfx2");
@@ -573,7 +573,7 @@ void segaic16_sprites_16a_draw(running_machine *machine, running_device *device,
 		pri[x] = 0xff;														\
 	}																		\
 
-void segaic16_sprites_16b_draw(running_machine *machine, running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_16b_draw(running_machine *machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 numbanks;
 	const UINT16 *spritebase;
@@ -739,7 +739,7 @@ void segaic16_sprites_16b_draw(running_machine *machine, running_device *device,
 		pri[x] = 0;															\
 	}																		\
 
-void segaic16_sprites_yboard_16b_draw(running_machine *machine, running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_yboard_16b_draw(running_machine *machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 numbanks = memory_region_length(machine, "gfx2") / 0x20000;
 	const UINT16 *spritebase = (const UINT16 *)memory_region(machine, "gfx2");
@@ -917,7 +917,7 @@ void segaic16_sprites_yboard_16b_draw(running_machine *machine, running_device *
 		pri[x] = 0xff;														\
 	}																		\
 
-static void segaic16_sprites_xboard_outrun_draw(running_machine *machine, running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int type)
+static void segaic16_sprites_xboard_outrun_draw(running_machine *machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int type)
 {
 	UINT8 numbanks = memory_region_length(machine, "gfx2") / 0x40000;
 	const UINT32 *spritebase = (const UINT32 *)memory_region(machine, "gfx2");
@@ -1043,12 +1043,12 @@ static void segaic16_sprites_xboard_outrun_draw(running_machine *machine, runnin
 	}
 }
 
-void segaic16_sprites_outrun_draw(running_machine *machine, running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_outrun_draw(running_machine *machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	segaic16_sprites_xboard_outrun_draw(machine, device, bitmap, cliprect, SEGAIC16_SPRITES_OUTRUN);
 }
 
-void segaic16_sprites_xboard_draw(running_machine *machine, running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_xboard_draw(running_machine *machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	segaic16_sprites_xboard_outrun_draw(machine, device, bitmap, cliprect, SEGAIC16_SPRITES_XBOARD);
 }
@@ -1088,7 +1088,7 @@ void segaic16_sprites_xboard_draw(running_machine *machine, running_device *devi
 	if (x >= minx && x <= maxx && ind < 0x1fe)								\
 		dest[x] = ind | colorpri;											\
 
-void segaic16_sprites_yboard_draw(running_machine *machine, running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_yboard_draw(running_machine *machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 numbanks = memory_region_length(machine, "gfx1") / 0x80000;
 	const UINT64 *spritebase = (const UINT64 *)memory_region(machine, "gfx1");
@@ -1382,7 +1382,7 @@ void segaic16_sprites_yboard_draw(running_machine *machine, running_device *devi
 
 
 
-void segaic16_sprites_16a_bootleg_wb3bl_draw(running_machine *machine, running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_16a_bootleg_wb3bl_draw(running_machine *machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 numbanks = memory_region_length(machine, "gfx2") / 0x10000;
 	const UINT16 *spritebase = (const UINT16 *)memory_region(machine, "gfx2");
@@ -1405,7 +1405,7 @@ void segaic16_sprites_16a_bootleg_wb3bl_draw(running_machine *machine, running_d
 }
 
 /* 4 player passing shot is different to this.. */
-void segaic16_sprites_16a_bootleg_passhtb_draw(running_machine *machine, running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_16a_bootleg_passhtb_draw(running_machine *machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 numbanks = memory_region_length(machine, "gfx2") / 0x10000;
 	const UINT16 *spritebase = (const UINT16 *)memory_region(machine, "gfx2");
@@ -1427,7 +1427,7 @@ void segaic16_sprites_16a_bootleg_passhtb_draw(running_machine *machine, running
 	}
 }
 
-void segaic16_sprites_16a_bootleg_shinobld_draw(running_machine *machine, running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_16a_bootleg_shinobld_draw(running_machine *machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 numbanks = memory_region_length(machine, "gfx2") / 0x10000;
 	const UINT16 *spritebase = (const UINT16 *)memory_region(machine, "gfx2");
@@ -1455,9 +1455,9 @@ void segaic16_sprites_16a_bootleg_shinobld_draw(running_machine *machine, runnin
  *
  *************************************/
 
-void segaic16_sprites_draw(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect, int which)
+void segaic16_sprites_draw(device_t *screen, bitmap_t *bitmap, const rectangle *cliprect, int which)
 {
-	running_device* device = 0;
+	device_t* device = 0;
 	sega16sp_state *sega16sp;
 
 	if (!which)
@@ -1488,7 +1488,7 @@ void segaic16_sprites_draw(running_device *screen, bitmap_t *bitmap, const recta
 
 void segaic16_sprites_set_bank(running_machine *machine, int which, int banknum, int offset)
 {
-	running_device* device = 0;
+	device_t* device = 0;
 
 	if (!which)
 		device = machine->device("segaspr1");
@@ -1518,7 +1518,7 @@ void segaic16_sprites_set_bank(running_machine *machine, int which, int banknum,
 
 void segaic16_sprites_set_flip(running_machine *machine, int which, int flip)
 {
-	running_device* device = 0;
+	device_t* device = 0;
 
 	if (!which)
 		device = machine->device("segaspr1");
@@ -1549,7 +1549,7 @@ void segaic16_sprites_set_flip(running_machine *machine, int which, int flip)
 
 void segaic16_sprites_set_shadow(running_machine *machine, int which, int shadow)
 {
-	running_device* device = 0;
+	device_t* device = 0;
 
 	if (!which)
 		device = machine->device("segaspr1");
@@ -1578,7 +1578,7 @@ void segaic16_sprites_set_shadow(running_machine *machine, int which, int shadow
  *
  *************************************/
 
-static void segaic16_sprites_buffer(running_device* device)
+static void segaic16_sprites_buffer(device_t* device)
 {
 	sega16sp_state *sega16sp = get_safe_token(device);
 
@@ -1612,7 +1612,7 @@ static void segaic16_sprites_buffer(running_device* device)
 
 WRITE16_HANDLER( segaic16_sprites_draw_0_w )
 {
-	running_device* device = 0;
+	device_t* device = 0;
 
 	device = space->machine->device("segaspr1");
 
@@ -1625,7 +1625,7 @@ WRITE16_HANDLER( segaic16_sprites_draw_0_w )
 
 WRITE16_HANDLER( segaic16_sprites_draw_1_w )
 {
-	running_device* device = 0;
+	device_t* device = 0;
 
 	device = space->machine->device("segaspr2");
 

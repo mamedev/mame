@@ -22,10 +22,10 @@ public:
 	int         adpcm_data;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *pc090oj;
-	running_device *pc080sn;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *pc090oj;
+	device_t *pc080sn;
 };
 
 

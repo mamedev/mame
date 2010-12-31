@@ -51,7 +51,7 @@ struct _cp1610_state
 	int icount;
 };
 
-INLINE cp1610_state *get_safe_token(running_device *device)
+INLINE cp1610_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == CP1610);

@@ -72,7 +72,7 @@ static emu_timer *pr8210_bit_timer;
 static UINT32 pr8210_command_buffer_in, pr8210_command_buffer_out;
 static UINT8 pr8210_command_buffer[10];
 
-static void (*execute_command)(running_device *laserdisc, int command);
+static void (*execute_command)(device_t *laserdisc, int command);
 
 
 
@@ -87,7 +87,7 @@ static void free_string(running_machine &machine)
 }
 
 
-static chd_file *get_disc(running_device *device)
+static chd_file *get_disc(device_t *device)
 {
 	mame_file *image_file = NULL;
 	chd_file *image_chd = NULL;
@@ -152,7 +152,7 @@ static chd_file *get_disc(running_device *device)
  *
  *************************************/
 
-static void process_commands(running_device *laserdisc)
+static void process_commands(device_t *laserdisc)
 {
 	input_port_value controls = input_port_read(laserdisc->machine, "controls");
 	int number;
@@ -227,7 +227,7 @@ static void process_commands(running_device *laserdisc)
 
 static TIMER_CALLBACK( vsync_update )
 {
-	running_device *laserdisc = machine->m_devicelist.first(LASERDISC);
+	device_t *laserdisc = machine->m_devicelist.first(LASERDISC);
 	int vblank_scanline;
 	attotime target;
 
@@ -250,7 +250,7 @@ static MACHINE_START( ldplayer )
 
 static TIMER_CALLBACK( autoplay )
 {
-	running_device *laserdisc = machine->m_devicelist.first(LASERDISC);
+	device_t *laserdisc = machine->m_devicelist.first(LASERDISC);
 
 	/* start playing */
 	(*execute_command)(laserdisc, CMD_PLAY);
@@ -284,7 +284,7 @@ INLINE void pr8210_add_command(UINT8 command)
 
 static TIMER_CALLBACK( pr8210_bit_off_callback )
 {
-	running_device *laserdisc = (running_device *)ptr;
+	device_t *laserdisc = (device_t *)ptr;
 
 	/* deassert the control line */
 	laserdisc_line_w(laserdisc, LASERDISC_LINE_CONTROL, CLEAR_LINE);
@@ -294,7 +294,7 @@ static TIMER_CALLBACK( pr8210_bit_off_callback )
 static TIMER_CALLBACK( pr8210_bit_callback )
 {
 	attotime duration = ATTOTIME_IN_MSEC(30);
-	running_device *laserdisc = (running_device *)ptr;
+	device_t *laserdisc = (device_t *)ptr;
 	UINT8 bitsleft = param >> 16;
 	UINT8 data = param;
 
@@ -323,7 +323,7 @@ static TIMER_CALLBACK( pr8210_bit_callback )
 
 static MACHINE_START( pr8210 )
 {
-	running_device *laserdisc = machine->m_devicelist.first(LASERDISC);
+	device_t *laserdisc = machine->m_devicelist.first(LASERDISC);
 	MACHINE_START_CALL(ldplayer);
 	pr8210_bit_timer = timer_alloc(machine, pr8210_bit_callback, (void *)laserdisc);
 }
@@ -336,7 +336,7 @@ static MACHINE_RESET( pr8210 )
 }
 
 
-static void pr8210_execute(running_device *laserdisc, int command)
+static void pr8210_execute(device_t *laserdisc, int command)
 {
 	static const UINT8 digits[10] = { 0x01, 0x11, 0x09, 0x19, 0x05, 0x15, 0x0d, 0x1d, 0x03, 0x13 };
 
@@ -452,7 +452,7 @@ static void pr8210_execute(running_device *laserdisc, int command)
  *
  *************************************/
 
-static void ldv1000_execute(running_device *laserdisc, int command)
+static void ldv1000_execute(device_t *laserdisc, int command)
 {
 	static const UINT8 digits[10] = { 0x3f, 0x0f, 0x8f, 0x4f, 0x2f, 0xaf, 0x6f, 0x1f, 0x9f, 0x5f };
 	switch (command)

@@ -34,7 +34,7 @@ public:
 	int      timer_count, sense_state, dac_data;
 
 	/* device */
-	running_device *dac;
+	device_t *dac;
 };
 
 

@@ -34,19 +34,19 @@ public:
 	int        pan[4];
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *eeprom;
-	running_device *tc0220ioc;
-	running_device *tc0100scn;
-	running_device *tc0110pcr;
-	running_device *tc0140syt;
-	running_device *_2610_0l;
-	running_device *_2610_0r;
-	running_device *_2610_1l;
-	running_device *_2610_1r;
-	running_device *_2610_2l;
-	running_device *_2610_2r;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *eeprom;
+	device_t *tc0220ioc;
+	device_t *tc0100scn;
+	device_t *tc0110pcr;
+	device_t *tc0140syt;
+	device_t *_2610_0l;
+	device_t *_2610_0r;
+	device_t *_2610_1l;
+	device_t *_2610_1r;
+	device_t *_2610_2l;
+	device_t *_2610_2r;
 };
 
 

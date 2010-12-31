@@ -38,7 +38,7 @@ public:
 	UINT8      sraider_0x30, sraider_0x38;
 
 	/* devices */
-	running_device *maincpu;
+	device_t *maincpu;
 };
 
 

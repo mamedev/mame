@@ -171,11 +171,11 @@ extern const device_type PTM6840;
     PROTOTYPES
 ***************************************************************************/
 
-int ptm6840_get_status( running_device *device, int clock );	// get whether timer is enabled
-int ptm6840_get_irq( running_device *device );					// get IRQ state
-UINT16 ptm6840_get_count( running_device *device, int counter );// get counter value
-void ptm6840_set_ext_clock( running_device *device, int counter, double clock ); // set clock frequency
-int ptm6840_get_ext_clock( running_device *device, int counter );// get clock frequency
+int ptm6840_get_status( device_t *device, int clock );	// get whether timer is enabled
+int ptm6840_get_irq( device_t *device );					// get IRQ state
+UINT16 ptm6840_get_count( device_t *device, int counter );// get counter value
+void ptm6840_set_ext_clock( device_t *device, int counter, double clock ); // set clock frequency
+int ptm6840_get_ext_clock( device_t *device, int counter );// get clock frequency
 
 WRITE8_DEVICE_HANDLER( ptm6840_set_g1 );	// set gate1 state
 WRITE8_DEVICE_HANDLER( ptm6840_set_g2 );	// set gate2 state

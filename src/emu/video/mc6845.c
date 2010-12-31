@@ -163,7 +163,7 @@ const mc6845_interface mc6845_null_interface = { 0 };
 
 
 /* makes sure that the passed in device is the right type */
-INLINE mc6845_t *get_safe_token(running_device *device)
+INLINE mc6845_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == MC6845) ||
@@ -187,7 +187,7 @@ static STATE_POSTLOAD( mc6845_state_save_postload )
 
 static TIMER_CALLBACK( on_update_address_cb )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	mc6845_t *mc6845 = get_safe_token(device);
 	int addr = (param >> 8);
 	int strobe = (param & 0xff);
@@ -203,7 +203,7 @@ static TIMER_CALLBACK( on_update_address_cb )
 	}
 }
 
-INLINE void call_on_update_address(running_device *device, int strobe)
+INLINE void call_on_update_address(device_t *device, int strobe)
 {
 	mc6845_t *mc6845 = get_safe_token(device);
 
@@ -525,7 +525,7 @@ static void update_upd_adr_timer(mc6845_t *mc6845)
 
 static TIMER_CALLBACK( upd_adr_timer_cb )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 
 	/* fire a update address strobe */
 	call_on_update_address(device, 0);
@@ -534,7 +534,7 @@ static TIMER_CALLBACK( upd_adr_timer_cb )
 
 static TIMER_CALLBACK( de_off_timer_cb )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	mc6845_t *mc6845 = get_safe_token(device);
 
 	mc6845_set_de( mc6845, FALSE );
@@ -543,7 +543,7 @@ static TIMER_CALLBACK( de_off_timer_cb )
 
 static TIMER_CALLBACK( cur_on_timer_cb )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	mc6845_t *mc6845 = get_safe_token(device);
 
 	mc6845_set_cur( mc6845, TRUE );
@@ -555,7 +555,7 @@ static TIMER_CALLBACK( cur_on_timer_cb )
 
 static TIMER_CALLBACK( cur_off_timer_cb )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	mc6845_t *mc6845 = get_safe_token(device);
 
 	mc6845_set_cur( mc6845, FALSE );
@@ -564,7 +564,7 @@ static TIMER_CALLBACK( cur_off_timer_cb )
 
 static TIMER_CALLBACK( hsync_on_timer_cb )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	mc6845_t *mc6845 = get_safe_token(device);
 	UINT8 hsync_width = ( mc6845->sync_width & 0x0f ) ? ( mc6845->sync_width & 0x0f ) : 0x10;
 
@@ -578,7 +578,7 @@ static TIMER_CALLBACK( hsync_on_timer_cb )
 
 static TIMER_CALLBACK( hsync_off_timer_cb )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	mc6845_t *mc6845 = get_safe_token(device);
 
 	mc6845_set_hsync( mc6845, FALSE );
@@ -587,7 +587,7 @@ static TIMER_CALLBACK( hsync_off_timer_cb )
 
 static TIMER_CALLBACK( line_timer_cb )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	mc6845_t *mc6845 = get_safe_token(device);
 	int new_vsync = mc6845->vsync;
 
@@ -696,7 +696,7 @@ static TIMER_CALLBACK( line_timer_cb )
 }
 
 
-UINT16 mc6845_get_ma(running_device *device)
+UINT16 mc6845_get_ma(device_t *device)
 {
 	mc6845_t *mc6845 = get_safe_token(device);
 
@@ -706,7 +706,7 @@ UINT16 mc6845_get_ma(running_device *device)
 }
 
 
-UINT8 mc6845_get_ra(running_device *device)
+UINT8 mc6845_get_ra(device_t *device)
 {
 	mc6845_t *mc6845 = get_safe_token(device);
 
@@ -716,7 +716,7 @@ UINT8 mc6845_get_ra(running_device *device)
 
 static TIMER_CALLBACK( light_pen_latch_timer_cb )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	mc6845_t *mc6845 = get_safe_token(device);
 
 	mc6845->light_pen_addr = mc6845_get_ma(device);
@@ -724,7 +724,7 @@ static TIMER_CALLBACK( light_pen_latch_timer_cb )
 }
 
 
-void mc6845_assert_light_pen_input(running_device *device)
+void mc6845_assert_light_pen_input(device_t *device)
 {
 	mc6845_t *mc6845 = get_safe_token(device);
 
@@ -734,7 +734,7 @@ void mc6845_assert_light_pen_input(running_device *device)
 }
 
 
-void mc6845_set_clock(running_device *device, int clock)
+void mc6845_set_clock(device_t *device, int clock)
 {
 	mc6845_t *mc6845 = get_safe_token(device);
 
@@ -749,7 +749,7 @@ void mc6845_set_clock(running_device *device, int clock)
 }
 
 
-void mc6845_set_hpixels_per_column(running_device *device, int hpixels_per_column)
+void mc6845_set_hpixels_per_column(device_t *device, int hpixels_per_column)
 {
 	mc6845_t *mc6845 = get_safe_token(device);
 
@@ -795,7 +795,7 @@ static void update_cursor_state(mc6845_t *mc6845)
 }
 
 
-void mc6845_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
+void mc6845_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	mc6845_t *mc6845 = get_safe_token(device);
 	assert(bitmap != NULL);
@@ -854,7 +854,7 @@ void mc6845_update(running_device *device, bitmap_t *bitmap, const rectangle *cl
 
 
 /* device interface */
-static void common_start(running_device *device, int device_type)
+static void common_start(device_t *device, int device_type)
 {
 	mc6845_t *mc6845 = get_safe_token(device);
 

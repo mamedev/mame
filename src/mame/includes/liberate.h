@@ -23,8 +23,8 @@ public:
 	tilemap_t *back_tilemap;
 	tilemap_t *fix_tilemap;
 
-	running_device *maincpu;
-	running_device *audiocpu;
+	device_t *maincpu;
+	device_t *audiocpu;
 };
 
 

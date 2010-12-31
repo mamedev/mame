@@ -25,8 +25,8 @@ typedef struct _tms5110_interface tms5110_interface;
 struct _tms5110_interface
 {
 	/* legacy interface */
-	int (*M0_callback)(running_device *device);	/* function to be called when chip requests another bit */
-	void (*load_address)(running_device *device, int addr);	/* speech ROM load address callback */
+	int (*M0_callback)(device_t *device);	/* function to be called when chip requests another bit */
+	void (*load_address)(device_t *device, int addr);	/* speech ROM load address callback */
 	/* new rom controller interface */
 	devcb_write_line m0_func;		/* the M0 line */
 	devcb_write_line m1_func;		/* the M1 line */
@@ -52,9 +52,9 @@ READ8_DEVICE_HANDLER( tms5110_romclk_hack_r );
 /* m58817 status line */
 READ8_DEVICE_HANDLER( m58817_status_r );
 
-int tms5110_ready_r(running_device *device);
+int tms5110_ready_r(device_t *device);
 
-void tms5110_set_frequency(running_device *device, int frequency);
+void tms5110_set_frequency(device_t *device, int frequency);
 
 DECLARE_LEGACY_SOUND_DEVICE(TMS5110, tms5110);
 DECLARE_LEGACY_SOUND_DEVICE(TMS5100, tms5100);

@@ -192,7 +192,7 @@ struct _z8_state
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE z8_state *get_safe_token(running_device *device)
+INLINE z8_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == Z8601) ||

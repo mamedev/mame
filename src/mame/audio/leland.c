@@ -225,7 +225,7 @@ struct _leland_sound_state
  *
  *************************************/
 
-INLINE leland_sound_state *get_safe_token(running_device *device)
+INLINE leland_sound_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == LELAND || device->type() == LELAND_80186 || device->type() == REDLINE_80186);
@@ -297,7 +297,7 @@ DEVICE_GET_INFO( leland_sound )
 }
 
 
-void leland_dac_update(running_device *device, int dacnum, UINT8 sample)
+void leland_dac_update(device_t *device, int dacnum, UINT8 sample)
 {
 	leland_sound_state *state = get_safe_token(device);
 	UINT8 *buffer = state->dac_buffer[dacnum];
@@ -628,7 +628,7 @@ DEFINE_LEGACY_SOUND_DEVICE(LELAND_80186, leland_80186_sound);
 DEFINE_LEGACY_SOUND_DEVICE(REDLINE_80186, redline_80186_sound);
 
 
-static void leland_80186_reset(running_device *device)
+static void leland_80186_reset(device_t *device)
 {
 	leland_sound_state *state = get_safe_token(device);
 	struct i80186_state oldstate = state->i80186;
@@ -727,7 +727,7 @@ static IRQ_CALLBACK( int_callback )
 }
 
 
-static void update_interrupt_state(running_device *device)
+static void update_interrupt_state(device_t *device)
 {
 	leland_sound_state *state = get_safe_token(device);
 	running_machine *machine = device->machine;
@@ -814,7 +814,7 @@ generate_int:
 }
 
 
-static void handle_eoi(running_device *device, int data)
+static void handle_eoi(device_t *device, int data)
 {
 	leland_sound_state *state = get_safe_token(device);
 	running_machine *machine = device->machine;
@@ -885,7 +885,7 @@ static void handle_eoi(running_device *device, int data)
 
 static TIMER_CALLBACK( internal_timer_int )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	leland_sound_state *state = get_safe_token(device);
 	int which = param;
 	struct timer_state *t = &state->i80186.timer[which];
@@ -1081,7 +1081,7 @@ static void internal_timer_update(leland_sound_state *state, int which, int new_
 
 static TIMER_CALLBACK( dma_timer_callback )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	leland_sound_state *state = get_safe_token(device);
 	int which = param;
 	struct dma_state *d = &state->i80186.dma[which];
@@ -1806,7 +1806,7 @@ WRITE8_DEVICE_HANDLER( leland_80186_control_w )
 
 static TIMER_CALLBACK( command_lo_sync )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	leland_sound_state *state = get_safe_token(device);
 	if (LOG_COMM) logerror("%s:Write sound command latch lo = %02X\n", cpuexec_describe_context(machine), param);
 	state->sound_command = (state->sound_command & 0xff00) | param;
@@ -1845,7 +1845,7 @@ static READ16_DEVICE_HANDLER( main_to_sound_comm_r )
 
 static TIMER_CALLBACK( delayed_response_r )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	leland_sound_state *state = get_safe_token(device);
 	cpu_device *master = machine->device<cpu_device>("master");
 	int checkpc = param;

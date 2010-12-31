@@ -152,6 +152,6 @@ WRITE_LINE_DEVICE_HANDLER( cdp1864_aoe_w ) ATTR_NONNULL(1);
 WRITE8_DEVICE_HANDLER( cdp1864_dma_w ) ATTR_NONNULL(1);
 
 /* screen update */
-void cdp1864_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect) ATTR_NONNULL(1) ATTR_NONNULL(2) ATTR_NONNULL(3);
+void cdp1864_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect) ATTR_NONNULL(1) ATTR_NONNULL(2) ATTR_NONNULL(3);
 
 #endif

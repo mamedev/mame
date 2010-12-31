@@ -101,11 +101,11 @@ struct _namco_06xx_state
 	cpu_device *nmicpu;
 	device_t *device[4];
 	read8_device_func read[4];
-	void (*readreq[4])(running_device *device);
+	void (*readreq[4])(device_t *device);
 	write8_device_func write[4];
 };
 
-INLINE namco_06xx_state *get_safe_token(running_device *device)
+INLINE namco_06xx_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == NAMCO_06XX);
@@ -117,7 +117,7 @@ INLINE namco_06xx_state *get_safe_token(running_device *device)
 
 static TIMER_CALLBACK( nmi_generate )
 {
-	namco_06xx_state *state = get_safe_token((running_device *)ptr);
+	namco_06xx_state *state = get_safe_token((device_t *)ptr);
 
 	if (!state->nmicpu->suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
 	{

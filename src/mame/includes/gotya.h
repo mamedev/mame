@@ -20,7 +20,7 @@ public:
 	int      theme_playing;
 
 	/* devices */
-	running_device *samples;
+	device_t *samples;
 };
 
 

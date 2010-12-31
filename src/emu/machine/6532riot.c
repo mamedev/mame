@@ -405,7 +405,7 @@ UINT8 riot6532_device::reg_r(UINT8 offset)
     porta_in_set - set port A input value
 -------------------------------------------------*/
 
-void riot6532_porta_in_set(running_device *device, UINT8 data, UINT8 mask)
+void riot6532_porta_in_set(device_t *device, UINT8 data, UINT8 mask)
 {
 	riot6532_device *via = downcast<riot6532_device *>(device);
 	via->porta_in_set(data, mask);
@@ -422,7 +422,7 @@ void riot6532_device::porta_in_set(UINT8 data, UINT8 mask)
     portb_in_set - set port B input value
 -------------------------------------------------*/
 
-void riot6532_portb_in_set(running_device *device, UINT8 data, UINT8 mask)
+void riot6532_portb_in_set(device_t *device, UINT8 data, UINT8 mask)
 {
 	riot6532_device *via = downcast<riot6532_device *>(device);
 	via->portb_in_set(data, mask);
@@ -438,7 +438,7 @@ void riot6532_device::portb_in_set(UINT8 data, UINT8 mask)
     porta_in_get - return port A input value
 -------------------------------------------------*/
 
-UINT8 riot6532_porta_in_get(running_device *device)
+UINT8 riot6532_porta_in_get(device_t *device)
 {
 	riot6532_device *via = downcast<riot6532_device *>(device);
 	return via->porta_in_get();
@@ -454,7 +454,7 @@ UINT8 riot6532_device::porta_in_get()
     portb_in_get - return port B input value
 -------------------------------------------------*/
 
-UINT8 riot6532_portb_in_get(running_device *device)
+UINT8 riot6532_portb_in_get(device_t *device)
 {
 	riot6532_device *via = downcast<riot6532_device *>(device);
 	return via->portb_in_get();
@@ -470,7 +470,7 @@ UINT8 riot6532_device::portb_in_get()
     porta_in_get - return port A output value
 -------------------------------------------------*/
 
-UINT8 riot6532_porta_out_get(running_device *device)
+UINT8 riot6532_porta_out_get(device_t *device)
 {
 	riot6532_device *via = downcast<riot6532_device *>(device);
 	return via->porta_out_get();
@@ -486,7 +486,7 @@ UINT8 riot6532_device::porta_out_get()
     portb_in_get - return port B output value
 -------------------------------------------------*/
 
-UINT8 riot6532_portb_out_get(running_device *device)
+UINT8 riot6532_portb_out_get(device_t *device)
 {
 	riot6532_device *via = downcast<riot6532_device *>(device);
 	return via->portb_out_get();

@@ -199,7 +199,7 @@ static WRITE8_HANDLER( capbowl_sndcmd_w )
  *
  *************************************/
 
-static void firqhandler( running_device *device, int irq )
+static void firqhandler( device_t *device, int irq )
 {
 	capbowl_state *state = device->machine->driver_data<capbowl_state>();
 	cpu_set_input_line(state->audiocpu, 1, irq ? ASSERT_LINE : CLEAR_LINE);

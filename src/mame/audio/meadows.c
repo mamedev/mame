@@ -60,7 +60,7 @@ SAMPLES_START( meadows_sh_start )
 /************************************/
 void meadows_sh_update(running_machine *machine)
 {
-	running_device *samples = machine->device("samples");
+	device_t *samples = machine->device("samples");
 	int preset, amp;
 
 	if (latched_0c01 != meadows_0c01 || latched_0c03 != meadows_0c03)

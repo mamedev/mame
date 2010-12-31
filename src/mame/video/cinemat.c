@@ -46,7 +46,7 @@ static UINT8 last_control;
  *
  *************************************/
 
-void cinemat_vector_callback(running_device *device, INT16 sx, INT16 sy, INT16 ex, INT16 ey, UINT8 shift)
+void cinemat_vector_callback(device_t *device, INT16 sx, INT16 sy, INT16 ex, INT16 ey, UINT8 shift)
 {
 	const rectangle &visarea = device->machine->primary_screen->visible_area();
 	int intensity = 0xff;

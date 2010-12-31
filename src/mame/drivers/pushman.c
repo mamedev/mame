@@ -401,7 +401,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static void irqhandler(running_device *device, int irq)
+static void irqhandler(device_t *device, int irq)
 {
 	pushman_state *state = device->machine->driver_data<pushman_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);

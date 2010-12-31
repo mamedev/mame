@@ -290,7 +290,7 @@ static INPUT_PORTS_START( sothello )
 
 INPUT_PORTS_END
 
-static void irqhandler(running_device *device, int irq)
+static void irqhandler(device_t *device, int irq)
 {
     cputag_set_input_line(device->machine, "sub", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -305,7 +305,7 @@ static INTERRUPT_GEN( sothello_interrupt )
     v9938_interrupt(device->machine, 0);
 }
 
-static void adpcm_int(running_device *device)
+static void adpcm_int(device_t *device)
 {
     /* only 4 bits are used */
     msm5205_data_w( device, msm_data & 0x0f );

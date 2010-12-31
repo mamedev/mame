@@ -341,7 +341,7 @@ static const int *const tunes[] = {NULL,tune1,tune2,tune3,tune4};
 	}
 
 
-INLINE tms_state *get_safe_token(running_device *device)
+INLINE tms_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TMS36XX);
@@ -409,7 +409,7 @@ static void tms36xx_reset_counters(tms_state *tms)
 	memset(tms->counter, 0, sizeof(tms->counter));
 }
 
-void mm6221aa_tune_w(running_device *device, int tune)
+void mm6221aa_tune_w(device_t *device, int tune)
 {
 	tms_state *tms = get_safe_token(device);
 
@@ -428,7 +428,7 @@ void mm6221aa_tune_w(running_device *device, int tune)
     tms->tune_max = 96; /* fixed for now */
 }
 
-void tms36xx_note_w(running_device *device, int octave, int note)
+void tms36xx_note_w(device_t *device, int octave, int note)
 {
 	tms_state *tms = get_safe_token(device);
 
@@ -487,7 +487,7 @@ static void tms3617_enable(tms_state *tms, int enable)
 	LOG(("%s\n", bits ? "" : " none"));
 }
 
-void tms3617_enable_w(running_device *device, int enable)
+void tms3617_enable_w(device_t *device, int enable)
 {
 	tms_state *tms = get_safe_token(device);
 	tms3617_enable(tms, enable);

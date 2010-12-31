@@ -16,9 +16,9 @@ struct _tms5220_interface
 	devcb_write_line irq_func;		/* IRQ callback function, active low, i.e. state=0 */
 	devcb_write_line readyq_func;	/* Ready callback function, active low, i.e. state=0 */
 
-	int (*read)(running_device *device, int count);			/* speech ROM read callback */
-	void (*load_address)(running_device *device, int data);	/* speech ROM load address callback */
-	void (*read_and_branch)(running_device *device);		/* speech ROM read and branch callback */
+	int (*read)(device_t *device, int count);			/* speech ROM read callback */
+	void (*load_address)(device_t *device, int data);	/* speech ROM load address callback */
+	void (*read_and_branch)(device_t *device);		/* speech ROM read and branch callback */
 };
 
 /* Control lines - once written to will switch interface into
@@ -37,9 +37,9 @@ READ_LINE_DEVICE_HANDLER( tms5220_readyq_r );
 READ_LINE_DEVICE_HANDLER( tms5220_intq_r );
 
 
-double tms5220_time_to_ready(running_device *device);
+double tms5220_time_to_ready(device_t *device);
 
-void tms5220_set_frequency(running_device *device, int frequency);
+void tms5220_set_frequency(device_t *device, int frequency);
 
 DECLARE_LEGACY_SOUND_DEVICE(TMS5220C, tms5220c);
 DECLARE_LEGACY_SOUND_DEVICE(TMS5220, tms5220);

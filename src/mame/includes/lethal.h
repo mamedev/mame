@@ -20,12 +20,12 @@ public:
 	UINT8      cur_control2;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *k054539;
-	running_device *k056832;
-	running_device *k053244;
-	running_device *k054000;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *k054539;
+	device_t *k056832;
+	device_t *k053244;
+	device_t *k054000;
 };
 
 /*----------- defined in video/lethal.c -----------*/

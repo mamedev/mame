@@ -145,10 +145,10 @@ public:
 	INT16    *samplebuf;
 
 	/* sound devices */
-	running_device *soundcpu;
-	running_device *ay1;
-	running_device *ay2;
-	running_device *samples;
+	device_t *soundcpu;
+	device_t *ay1;
+	device_t *ay2;
+	device_t *samples;
 };
 
 

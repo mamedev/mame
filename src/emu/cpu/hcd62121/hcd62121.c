@@ -302,7 +302,7 @@ INLINE int check_cond( hcd62121_state *cpustate, UINT8 op )
 }
 
 
-INLINE hcd62121_state *get_safe_token(running_device *device)
+INLINE hcd62121_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == HCD62121);

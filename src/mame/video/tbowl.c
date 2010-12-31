@@ -213,8 +213,8 @@ VIDEO_START( tbowl )
 
 VIDEO_UPDATE( tbowl )
 {
-	running_device *left_screen  = screen->machine->device("lscreen");
-	running_device *right_screen = screen->machine->device("rscreen");
+	device_t *left_screen  = screen->machine->device("lscreen");
+	device_t *right_screen = screen->machine->device("rscreen");
 
 	if (screen == left_screen)
 	{

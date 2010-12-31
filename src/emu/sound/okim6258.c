@@ -49,7 +49,7 @@ static int diff_lookup[49*16];
 /* tables computed? */
 static int tables_computed = 0;
 
-INLINE okim6258_state *get_safe_token(running_device *device)
+INLINE okim6258_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == OKIM6258);
@@ -170,7 +170,7 @@ static STREAM_UPDATE( okim6258_update )
 
 ***********************************************************************************************/
 
-static void okim6258_state_save_register(okim6258_state *info, running_device *device)
+static void okim6258_state_save_register(okim6258_state *info, device_t *device)
 {
 	state_save_register_device_item(device, 0, info->status);
 	state_save_register_device_item(device, 0, info->master_clock);
@@ -235,7 +235,7 @@ static DEVICE_RESET( okim6258 )
 
 ***********************************************************************************************/
 
-void okim6258_set_divider(running_device *device, int val)
+void okim6258_set_divider(device_t *device, int val)
 {
 	okim6258_state *info = get_safe_token(device);
 	int divider = dividers[val];
@@ -251,7 +251,7 @@ void okim6258_set_divider(running_device *device, int val)
 
 ***********************************************************************************************/
 
-void okim6258_set_clock(running_device *device, int val)
+void okim6258_set_clock(device_t *device, int val)
 {
 	okim6258_state *info = get_safe_token(device);
 
@@ -266,7 +266,7 @@ void okim6258_set_clock(running_device *device, int val)
 
 ***********************************************************************************************/
 
-int okim6258_get_vclk(running_device *device)
+int okim6258_get_vclk(device_t *device)
 {
 	okim6258_state *info = get_safe_token(device);
 

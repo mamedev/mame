@@ -58,7 +58,7 @@ WRITE8_HANDLER( senjyo_volume_w )
 
 static TIMER_CALLBACK( senjyo_sh_update )
 {
-	running_device *samples = machine->device("samples");
+	device_t *samples = machine->device("samples");
 	senjyo_state *state = machine->driver_data<senjyo_state>();
 
 	/* ctc2 timer single tone generator frequency */

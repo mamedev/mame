@@ -26,9 +26,9 @@ static UINT8 vram_bank;
 static UINT16 joust2_current_sound_data;
 
 /* older-Williams routines */
-static void williams_main_irq(running_device *device, int state);
-static void williams_main_firq(running_device *device, int state);
-static void williams_snd_irq(running_device *device, int state);
+static void williams_main_irq(device_t *device, int state);
+static void williams_main_firq(device_t *device, int state);
+static void williams_snd_irq(device_t *device, int state);
 static WRITE8_DEVICE_HANDLER( williams_snd_cmd_w );
 static WRITE8_DEVICE_HANDLER( playball_snd_cmd_w );
 
@@ -40,8 +40,8 @@ static READ8_DEVICE_HANDLER( williams_49way_port_0_r );
 
 /* newer-Williams routines */
 static WRITE8_DEVICE_HANDLER( williams2_snd_cmd_w );
-static void mysticm_main_irq(running_device *device, int state);
-static void tshoot_main_irq(running_device *device, int state);
+static void mysticm_main_irq(device_t *device, int state);
+static void tshoot_main_irq(device_t *device, int state);
 
 /* Lotto Fun-specific code */
 static WRITE8_DEVICE_HANDLER( lottofun_coin_lock_w );
@@ -287,7 +287,7 @@ TIMER_DEVICE_CALLBACK( williams_count240_callback )
 }
 
 
-static void williams_main_irq(running_device *device, int state)
+static void williams_main_irq(device_t *device, int state)
 {
 	pia6821_device *pia_1 = device->machine->device<pia6821_device>("pia_1");
 	int combined_state = pia6821_get_irq_a(pia_1) | pia6821_get_irq_b(pia_1);
@@ -297,14 +297,14 @@ static void williams_main_irq(running_device *device, int state)
 }
 
 
-static void williams_main_firq(running_device *device, int state)
+static void williams_main_firq(device_t *device, int state)
 {
 	/* FIRQ to the main CPU */
 	cputag_set_input_line(device->machine, "maincpu", M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-static void williams_snd_irq(running_device *device, int state)
+static void williams_snd_irq(device_t *device, int state)
 {
 	pia6821_device *pia_2 = device->machine->device<pia6821_device>("pia_2");
 	int combined_state = pia6821_get_irq_a(pia_2) | pia6821_get_irq_b(pia_2);
@@ -321,7 +321,7 @@ static void williams_snd_irq(running_device *device, int state)
  *
  *************************************/
 
-static void mysticm_main_irq(running_device *device, int state)
+static void mysticm_main_irq(device_t *device, int state)
 {
 	pia6821_device *pia_0 = device->machine->device<pia6821_device>("pia_0");
 	pia6821_device *pia_1 = device->machine->device<pia6821_device>("pia_1");
@@ -332,7 +332,7 @@ static void mysticm_main_irq(running_device *device, int state)
 }
 
 
-static void tshoot_main_irq(running_device *device, int state)
+static void tshoot_main_irq(device_t *device, int state)
 {
 	pia6821_device *pia_0 = device->machine->device<pia6821_device>("pia_0");
 	pia6821_device *pia_1 = device->machine->device<pia6821_device>("pia_1");

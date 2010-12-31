@@ -19,18 +19,18 @@ struct _latch8_t
 	UINT8			 has_node_map;
 	UINT8			 has_devread;
 	UINT8			 has_read;
-	running_device	*devices[8];
+	device_t	*devices[8];
 };
 
 /* ----------------------------------------------------------------------- */
 
-INLINE latch8_t *get_safe_token(running_device *device) {
+INLINE latch8_t *get_safe_token(device_t *device) {
 	assert( device != NULL );
 	assert( device->type() == LATCH8 );
 	return ( latch8_t * ) downcast<legacy_device_base *>(device)->token();
 }
 
-static void update(running_device *device, UINT8 new_val, UINT8 mask)
+static void update(device_t *device, UINT8 new_val, UINT8 mask)
 {
 	/*  temporary hack until the discrete system is a device */
 	latch8_t *latch8 = get_safe_token(device);
@@ -50,7 +50,7 @@ static void update(running_device *device, UINT8 new_val, UINT8 mask)
 
 static TIMER_CALLBACK( latch8_timerproc )
 {
-	running_device *device = (running_device *)ptr;
+	device_t *device = (device_t *)ptr;
 	UINT8 new_val = param & 0xFF;
 	UINT8 mask = param >> 8;
 
@@ -72,7 +72,7 @@ READ8_DEVICE_HANDLER( latch8_r )
 		int i;
 		for (i=0; i<8; i++)
 		{
-			running_device *read_dev = latch8->devices[i];
+			device_t *read_dev = latch8->devices[i];
 			if (read_dev != NULL)
 			{
 				res &= ~( 1 << i);
@@ -123,7 +123,7 @@ WRITE8_DEVICE_HANDLER( latch8_reset)
 /* read bit x                 */
 /* return (latch >> x) & 0x01 */
 
-INLINE UINT8 latch8_bitx_r(running_device *device, offs_t offset, int bit)
+INLINE UINT8 latch8_bitx_r(device_t *device, offs_t offset, int bit)
 {
 	latch8_t *latch8 = get_safe_token(device);
 
@@ -153,7 +153,7 @@ READ8_DEVICE_HANDLER( latch8_bit7_q_r) { return latch8_bitx_r(device, offset, 7)
 /* write bit x from data into bit determined by offset */
 /* latch = (latch & ~(1<<offset)) | (((data >> x) & 0x01) << offset) */
 
-INLINE void latch8_bitx_w(running_device *device, int bit, offs_t offset, UINT8 data)
+INLINE void latch8_bitx_w(device_t *device, int bit, offs_t offset, UINT8 data)
 {
 	latch8_t *latch8 = get_safe_token(device);
 	UINT8 mask = (1<<offset);

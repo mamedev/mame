@@ -1498,7 +1498,7 @@ static GFXDECODE_START( vm )
 GFXDECODE_END
 
 
-static void irqhandler(running_device *device, int linestate)
+static void irqhandler(device_t *device, int linestate)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, linestate);
 }

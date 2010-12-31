@@ -237,7 +237,7 @@ static WRITE32_HANDLER( paletteram32_w )
 	palette_set_color_rgb(space->machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
-static void voodoo_vblank_0(running_device *device, int param)
+static void voodoo_vblank_0(device_t *device, int param)
 {
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
 }
@@ -245,8 +245,8 @@ static void voodoo_vblank_0(running_device *device, int param)
 
 static VIDEO_UPDATE( nwktr )
 {
-	running_device *voodoo = screen->machine->device("voodoo");
-	running_device *k001604 = screen->machine->device("k001604");
+	device_t *voodoo = screen->machine->device("voodoo");
+	device_t *k001604 = screen->machine->device("k001604");
 
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
 
@@ -263,7 +263,7 @@ static VIDEO_UPDATE( nwktr )
 
 static READ32_HANDLER( sysreg_r )
 {
-	running_device *adc12138 = space->machine->device("adc12138");
+	device_t *adc12138 = space->machine->device("adc12138");
 	UINT32 r = 0;
 	if (offset == 0)
 	{
@@ -296,7 +296,7 @@ static READ32_HANDLER( sysreg_r )
 
 static WRITE32_HANDLER( sysreg_w )
 {
-	running_device *adc12138 = space->machine->device("adc12138");
+	device_t *adc12138 = space->machine->device("adc12138");
 	if( offset == 0 )
 	{
 		if (ACCESSING_BITS_24_31)
@@ -596,7 +596,7 @@ static const sharc_config sharc_cfg =
 };
 
 
-static double adc12138_input_callback( running_device *device, UINT8 input )
+static double adc12138_input_callback( device_t *device, UINT8 input )
 {
 	int value = 0;
 	switch (input)

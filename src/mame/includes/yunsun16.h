@@ -25,7 +25,7 @@ public:
 	int         sprites_scrolldx, sprites_scrolldy;
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 };
 
 

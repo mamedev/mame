@@ -483,7 +483,7 @@ static WRITE8_HANDLER( z80_l3_w )
 	soundlatch3_w(space, 0, data);
 }
 
-static void sound_irq( running_device *device, int level )
+static void sound_irq( device_t *device, int level )
 {
 	pgm_state *state = device->machine->driver_data<pgm_state>();
 	cpu_set_input_line(state->soundcpu, 0, level);

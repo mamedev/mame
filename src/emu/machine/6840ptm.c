@@ -194,7 +194,7 @@ void ptm6840_device::device_reset()
     ptm6840_get_status - Get enabled status
 -------------------------------------------------*/
 
-int ptm6840_get_status( running_device *device, int clock )
+int ptm6840_get_status( device_t *device, int clock )
 {
 	return downcast<ptm6840_device*>(device)->ptm6840_get_status(clock);
 }
@@ -210,7 +210,7 @@ int ptm6840_device::ptm6840_get_status( int clock )
     ptm6840_get_irq - Get IRQ state
 -------------------------------------------------*/
 
-int ptm6840_get_irq( running_device *device )
+int ptm6840_get_irq( device_t *device )
 {
 	return downcast<ptm6840_device*>(device)->ptm6840_get_irq();
 }
@@ -333,7 +333,7 @@ void ptm6840_device::ptm_tick(int counter, int count)
     update_interrupts - Update Internal Interrupts
 -------------------------------------------------*/
 
-void update_interrupts( running_device *device )
+void update_interrupts( device_t *device )
 {
 	downcast<ptm6840_device*>(device)->update_interrupts();
 }
@@ -784,7 +784,7 @@ WRITE8_DEVICE_HANDLER( ptm6840_set_c3 )
     ptm6840_get_count - get count value
 -------------------------------------------------*/
 
-UINT16 ptm6840_get_count(running_device *device, int counter)
+UINT16 ptm6840_get_count(device_t *device, int counter)
 {
 	return downcast<ptm6840_device*>(device)->ptm6840_get_count(counter);
 }
@@ -799,7 +799,7 @@ UINT16 ptm6840_device::ptm6840_get_count(int counter)
     ptm6840_set_ext_clock - set external clock frequency
 ------------------------------------------------------------*/
 
-void ptm6840_set_ext_clock(running_device *device, int counter, double clock)
+void ptm6840_set_ext_clock(device_t *device, int counter, double clock)
 {
 	downcast<ptm6840_device*>(device)->ptm6840_set_ext_clock(counter, clock);
 }
@@ -851,7 +851,7 @@ void ptm6840_device::ptm6840_set_ext_clock(int counter, double clock)
     ptm6840_get_ext_clock - get external clock frequency
 ------------------------------------------------------------*/
 
-int ptm6840_get_ext_clock( running_device *device, int counter )
+int ptm6840_get_ext_clock( device_t *device, int counter )
 {
 	return downcast<ptm6840_device*>(device)->ptm6840_get_ext_clock(counter);
 }

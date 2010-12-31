@@ -37,11 +37,11 @@ public:
 #endif
 
 	/* devices */
-	running_device *mcu;
-	running_device *audio_cpu;
-	running_device *msm;
-	running_device *dac_1;
-	running_device *dac_2;
+	device_t *mcu;
+	device_t *audio_cpu;
+	device_t *msm;
+	device_t *dac_1;
+	device_t *dac_2;
 };
 
 

@@ -48,8 +48,8 @@ public:
 	const char *portf1_tag;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
+	device_t *maincpu;
+	device_t *audiocpu;
 };
 
 /*----------- defined in video/taito_l.c -----------*/

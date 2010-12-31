@@ -506,7 +506,7 @@ struct _upd7810_state
 	int icount;
 };
 
-INLINE upd7810_state *get_safe_token(running_device *device)
+INLINE upd7810_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == UPD7810 ||

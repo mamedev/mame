@@ -33,13 +33,13 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 
 VIDEO_START( s3c2400 )
 {
-	running_device *device = machine->device( S3C2400_TAG);
+	device_t *device = machine->device( S3C2400_TAG);
 	s3c24xx_video_start( device, machine);
 }
 
 VIDEO_UPDATE( s3c2400 )
 {
-	running_device *device = screen->machine->device( S3C2400_TAG);
+	device_t *device = screen->machine->device( S3C2400_TAG);
 	return s3c24xx_video_update( device, screen, bitmap, cliprect);
 }
 
@@ -84,7 +84,7 @@ DEVICE_GET_INFO( s3c2400 )
     }
 }
 
-void s3c2400_uart_fifo_w( running_device *device, int uart, UINT8 data)
+void s3c2400_uart_fifo_w( device_t *device, int uart, UINT8 data)
 {
 	s3c24xx_uart_fifo_w( device, uart, data);
 }

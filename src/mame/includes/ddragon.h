@@ -48,11 +48,11 @@ public:
 #endif
 
 	/* devices */
-	running_device *maincpu;
-	running_device *snd_cpu;
-	running_device *sub_cpu;
-	running_device *adpcm_1;
-	running_device *adpcm_2;
+	device_t *maincpu;
+	device_t *snd_cpu;
+	device_t *sub_cpu;
+	device_t *adpcm_1;
+	device_t *adpcm_2;
 };
 
 

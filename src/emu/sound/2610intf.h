@@ -12,7 +12,7 @@ void ym2610_update_request(void *param);
 typedef struct _ym2610_interface ym2610_interface;
 struct _ym2610_interface
 {
-	void ( *handler )( running_device *device, int irq );	/* IRQ handler for the YM2610 */
+	void ( *handler )( device_t *device, int irq );	/* IRQ handler for the YM2610 */
 };
 
 READ8_DEVICE_HANDLER( ym2610_r );

@@ -255,13 +255,13 @@ struct _sn76477_state
 	/* others */
 	sound_stream *channel;				/* returned by stream_create() */
 	int sample_rate;					/* from machine->sample_rate */
-	running_device *device;
+	device_t *device;
 
 	wav_file *file;						/* handle of the wave file to produce */
 };
 
 
-INLINE sn76477_state *get_safe_token(running_device *device)
+INLINE sn76477_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SN76477);
@@ -1000,7 +1000,7 @@ static void SN76477_test_enable_w(sn76477_state *sn, UINT32 data)
 }
 
 
-void sn76477_enable_w(running_device *device, UINT32 data)
+void sn76477_enable_w(device_t *device, UINT32 data)
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
@@ -1025,7 +1025,7 @@ static void _SN76477_mixer_a_w(sn76477_state *sn, UINT32 data)
 }
 
 
-void sn76477_mixer_a_w(running_device *device, UINT32 data)
+void sn76477_mixer_a_w(device_t *device, UINT32 data)
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
@@ -1050,7 +1050,7 @@ static void _SN76477_mixer_b_w(sn76477_state *sn, UINT32 data)
 }
 
 
-void sn76477_mixer_b_w(running_device *device, UINT32 data)
+void sn76477_mixer_b_w(device_t *device, UINT32 data)
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
@@ -1075,7 +1075,7 @@ static void _SN76477_mixer_c_w(sn76477_state *sn, UINT32 data)
 }
 
 
-void sn76477_mixer_c_w(running_device *device, UINT32 data)
+void sn76477_mixer_c_w(device_t *device, UINT32 data)
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
@@ -1107,7 +1107,7 @@ static void _SN76477_envelope_1_w(sn76477_state *sn, UINT32 data)
 }
 
 
-void sn76477_envelope_1_w(running_device *device, UINT32 data)
+void sn76477_envelope_1_w(device_t *device, UINT32 data)
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
@@ -1132,7 +1132,7 @@ static void _SN76477_envelope_2_w(sn76477_state *sn, UINT32 data)
 }
 
 
-void sn76477_envelope_2_w(running_device *device, UINT32 data)
+void sn76477_envelope_2_w(device_t *device, UINT32 data)
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
@@ -1164,7 +1164,7 @@ static void _SN76477_vco_w(sn76477_state *sn, UINT32 data)
 }
 
 
-void sn76477_vco_w(running_device *device, UINT32 data)
+void sn76477_vco_w(device_t *device, UINT32 data)
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
@@ -1196,7 +1196,7 @@ static void _SN76477_one_shot_res_w(sn76477_state *sn, double data)
 }
 
 
-void sn76477_one_shot_res_w(running_device *device, double data)
+void sn76477_one_shot_res_w(device_t *device, double data)
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
@@ -1228,7 +1228,7 @@ static void _SN76477_one_shot_cap_w(sn76477_state *sn, double data)
 }
 
 
-void sn76477_one_shot_cap_w(running_device *device, double data)
+void sn76477_one_shot_cap_w(device_t *device, double data)
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
@@ -1254,7 +1254,7 @@ void sn76477_one_shot_cap_w(running_device *device, double data)
  *
  *****************************************************************************/
 
-void sn76477_one_shot_cap_voltage_w(running_device *device, double data)
+void sn76477_one_shot_cap_voltage_w(device_t *device, double data)
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
@@ -1303,7 +1303,7 @@ static void _SN76477_slf_res_w(sn76477_state *sn, double data)
 }
 
 
-void sn76477_slf_res_w(running_device *device, double data)
+void sn76477_slf_res_w(device_t *device, double data)
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
@@ -1335,7 +1335,7 @@ static void _SN76477_slf_cap_w(sn76477_state *sn, double data)
 }
 
 
-void sn76477_slf_cap_w(running_device *device, double data)
+void sn76477_slf_cap_w(device_t *device, double data)
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
@@ -1363,7 +1363,7 @@ void sn76477_slf_cap_w(running_device *device, double data)
  *
  *****************************************************************************/
 
-void sn76477_slf_cap_voltage_w(running_device *device, double data)
+void sn76477_slf_cap_voltage_w(device_t *device, double data)
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
@@ -1412,7 +1412,7 @@ static void _SN76477_vco_res_w(sn76477_state *sn, double data)
 }
 
 
-void sn76477_vco_res_w(running_device *device, double data)
+void sn76477_vco_res_w(device_t *device, double data)
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
@@ -1444,7 +1444,7 @@ static void _SN76477_vco_cap_w(sn76477_state *sn, double data)
 }
 
 
-void sn76477_vco_cap_w(running_device *device, double data)
+void sn76477_vco_cap_w(device_t *device, double data)
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
@@ -1470,7 +1470,7 @@ void sn76477_vco_cap_w(running_device *device, double data)
  *
  *****************************************************************************/
 
-void sn76477_vco_cap_voltage_w(running_device *device, double data)
+void sn76477_vco_cap_voltage_w(device_t *device, double data)
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
@@ -1519,7 +1519,7 @@ static void _SN76477_vco_voltage_w(sn76477_state *sn, double data)
 }
 
 
-void sn76477_vco_voltage_w(running_device *device, double data)
+void sn76477_vco_voltage_w(device_t *device, double data)
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
@@ -1552,7 +1552,7 @@ static void _SN76477_pitch_voltage_w(sn76477_state *sn, double data)
 }
 
 
-void sn76477_pitch_voltage_w(running_device *device, double data)
+void sn76477_pitch_voltage_w(device_t *device, double data)
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
@@ -1579,7 +1579,7 @@ void sn76477_pitch_voltage_w(running_device *device, double data)
  *
  *****************************************************************************/
 
-void sn76477_noise_clock_w(running_device *device, UINT32 data)
+void sn76477_noise_clock_w(device_t *device, UINT32 data)
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
@@ -1625,7 +1625,7 @@ static void _SN76477_noise_clock_res_w(sn76477_state *sn, double data)
 }
 
 
-void sn76477_noise_clock_res_w(running_device *device, double data)
+void sn76477_noise_clock_res_w(device_t *device, double data)
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
@@ -1658,7 +1658,7 @@ static void _SN76477_noise_filter_res_w(sn76477_state *sn, double data)
 }
 
 
-void sn76477_noise_filter_res_w(running_device *device, double data)
+void sn76477_noise_filter_res_w(device_t *device, double data)
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
@@ -1690,7 +1690,7 @@ static void _SN76477_noise_filter_cap_w(sn76477_state *sn, double data)
 }
 
 
-void sn76477_noise_filter_cap_w(running_device *device, double data)
+void sn76477_noise_filter_cap_w(device_t *device, double data)
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
@@ -1716,7 +1716,7 @@ void sn76477_noise_filter_cap_w(running_device *device, double data)
  *
  *****************************************************************************/
 
-void sn76477_noise_filter_cap_voltage_w(running_device *device, double data)
+void sn76477_noise_filter_cap_voltage_w(device_t *device, double data)
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
@@ -1765,7 +1765,7 @@ static void _SN76477_attack_res_w(sn76477_state *sn, double data)
 }
 
 
-void sn76477_attack_res_w(running_device *device, double data)
+void sn76477_attack_res_w(device_t *device, double data)
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
@@ -1797,7 +1797,7 @@ static void _SN76477_decay_res_w(sn76477_state *sn, double data)
 }
 
 
-void sn76477_decay_res_w(running_device *device, double data)
+void sn76477_decay_res_w(device_t *device, double data)
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
@@ -1829,7 +1829,7 @@ static void _SN76477_attack_decay_cap_w(sn76477_state *sn, double data)
 }
 
 
-void sn76477_attack_decay_cap_w(running_device *device, double data)
+void sn76477_attack_decay_cap_w(device_t *device, double data)
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
@@ -1856,7 +1856,7 @@ void sn76477_attack_decay_cap_w(running_device *device, double data)
  *
  *****************************************************************************/
 
-void sn76477_attack_decay_cap_voltage_w(running_device *device, double data)
+void sn76477_attack_decay_cap_voltage_w(device_t *device, double data)
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
@@ -1907,7 +1907,7 @@ static void _SN76477_amplitude_res_w(sn76477_state *sn, double data)
 }
 
 
-void sn76477_amplitude_res_w(running_device *device, double data)
+void sn76477_amplitude_res_w(device_t *device, double data)
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
@@ -1939,7 +1939,7 @@ static void _SN76477_feedback_res_w(sn76477_state *sn, double data)
 }
 
 
-void sn76477_feedback_res_w(running_device *device, double data)
+void sn76477_feedback_res_w(device_t *device, double data)
 {
 #if TEST_MODE == 0
 	sn76477_state *sn = get_safe_token(device);
@@ -2328,7 +2328,7 @@ static STREAM_UPDATE( SN76477_update )
  *
  *****************************************************************************/
 
-static void state_save_register(running_device *device, sn76477_state *sn)
+static void state_save_register(device_t *device, sn76477_state *sn)
 {
 	state_save_register_device_item(device, 0, sn->enable);
 	state_save_register_device_item(device, 0, sn->envelope_mode);

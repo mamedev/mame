@@ -127,10 +127,10 @@ public:
 	int          cps_version;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *msm_1;	// fcrash
-	running_device *msm_2;	// fcrash
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *msm_1;	// fcrash
+	device_t *msm_2;	// fcrash
 };
 
 /*----------- defined in drivers/cps1.c -----------*/

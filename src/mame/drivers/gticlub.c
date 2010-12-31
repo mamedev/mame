@@ -248,12 +248,12 @@ static WRITE32_HANDLER( paletteram32_w )
 	palette_set_color_rgb(space->machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
-static void voodoo_vblank_0(running_device *device, int param)
+static void voodoo_vblank_0(device_t *device, int param)
 {
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_IRQ0, param ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static void voodoo_vblank_1(running_device *device, int param)
+static void voodoo_vblank_1(device_t *device, int param)
 {
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_IRQ1, param ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -264,8 +264,8 @@ static VIDEO_UPDATE( hangplt )
 
 	if (strcmp(screen->tag(), "lscreen") == 0)
 	{
-		running_device *k001604 = screen->machine->device("k001604_1");
-		running_device *voodoo = screen->machine->device("voodoo0");
+		device_t *k001604 = screen->machine->device("k001604_1");
+		device_t *voodoo = screen->machine->device("voodoo0");
 
 	//  k001604_draw_back_layer(k001604, bitmap, cliprect);
 
@@ -275,8 +275,8 @@ static VIDEO_UPDATE( hangplt )
 	}
 	else if (strcmp(screen->tag(), "rscreen") == 0)
 	{
-		running_device *k001604 = screen->machine->device("k001604_2");
-		running_device *voodoo = screen->machine->device("voodoo1");
+		device_t *k001604 = screen->machine->device("k001604_2");
+		device_t *voodoo = screen->machine->device("voodoo1");
 
 	//  k001604_draw_back_layer(k001604, bitmap, cliprect);
 
@@ -293,38 +293,38 @@ static VIDEO_UPDATE( hangplt )
 
 static READ32_HANDLER( gticlub_k001604_tile_r )
 {
-	running_device *k001604 = space->machine->device(get_cgboard_id() ? "k001604_2" : "k001604_1");
+	device_t *k001604 = space->machine->device(get_cgboard_id() ? "k001604_2" : "k001604_1");
 	return k001604_tile_r(k001604, offset, mem_mask);
 }
 
 static WRITE32_HANDLER( gticlub_k001604_tile_w )
 {
-	running_device *k001604 = space->machine->device(get_cgboard_id() ? "k001604_2" : "k001604_1");
+	device_t *k001604 = space->machine->device(get_cgboard_id() ? "k001604_2" : "k001604_1");
 	k001604_tile_w(k001604, offset, data, mem_mask);
 }
 
 
 static READ32_HANDLER( gticlub_k001604_char_r )
 {
-	running_device *k001604 = space->machine->device(get_cgboard_id() ? "k001604_2" : "k001604_1");
+	device_t *k001604 = space->machine->device(get_cgboard_id() ? "k001604_2" : "k001604_1");
 	return k001604_char_r(k001604, offset, mem_mask);
 }
 
 static WRITE32_HANDLER( gticlub_k001604_char_w )
 {
-	running_device *k001604 = space->machine->device(get_cgboard_id() ? "k001604_2" : "k001604_1");
+	device_t *k001604 = space->machine->device(get_cgboard_id() ? "k001604_2" : "k001604_1");
 	k001604_char_w(k001604, offset, data, mem_mask);
 }
 
 static READ32_HANDLER( gticlub_k001604_reg_r )
 {
-	running_device *k001604 = space->machine->device(get_cgboard_id() ? "k001604_2" : "k001604_1");
+	device_t *k001604 = space->machine->device(get_cgboard_id() ? "k001604_2" : "k001604_1");
 	return k001604_reg_r(k001604, offset, mem_mask);
 }
 
 static WRITE32_HANDLER( gticlub_k001604_reg_w )
 {
-	running_device *k001604 = space->machine->device(get_cgboard_id() ? "k001604_2" : "k001604_1");
+	device_t *k001604 = space->machine->device(get_cgboard_id() ? "k001604_2" : "k001604_1");
 	k001604_reg_w(k001604, offset, data, mem_mask);
 }
 
@@ -348,8 +348,8 @@ static const eeprom_interface eeprom_intf =
 static READ8_HANDLER( sysreg_r )
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
-	running_device *adc1038 = space->machine->device("adc1038");
-	running_device *eeprom = space->machine->device("eeprom");
+	device_t *adc1038 = space->machine->device("adc1038");
+	device_t *eeprom = space->machine->device("eeprom");
 
 	switch (offset)
 	{
@@ -383,8 +383,8 @@ static READ8_HANDLER( sysreg_r )
 
 static WRITE8_HANDLER( sysreg_w )
 {
-	running_device *adc1038 = space->machine->device("adc1038");
-	running_device *eeprom = space->machine->device("eeprom");
+	device_t *adc1038 = space->machine->device("adc1038");
+	device_t *eeprom = space->machine->device("eeprom");
 
 	switch (offset)
 	{
@@ -739,7 +739,7 @@ static const k056800_interface gticlub_k056800_interface =
 };
 
 
-static int adc1038_input_callback( running_device *device, int input )
+static int adc1038_input_callback( device_t *device, int input )
 {
 	int value = 0;
 	switch (input)

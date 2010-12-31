@@ -183,7 +183,7 @@ struct _tms32025_state
 	UINT16 *datamap[0x200];
 };
 
-INLINE tms32025_state *get_safe_token(running_device *device)
+INLINE tms32025_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TMS32025 ||

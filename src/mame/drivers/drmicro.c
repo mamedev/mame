@@ -43,7 +43,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 }
 
 
-static void pcm_w(running_device *device)
+static void pcm_w(device_t *device)
 {
 	drmicro_state *state = device->machine->driver_data<drmicro_state>();
 	UINT8 *PCM = memory_region(device->machine, "adpcm");

@@ -520,7 +520,7 @@ void acia6850_device::transmit_event()
     tx_clock_in - As above, but using the tx pin
 -------------------------------------------------*/
 
-void acia6850_tx_clock_in(running_device *device) { downcast<acia6850_device*>(device)->tx_clock_in(); }
+void acia6850_tx_clock_in(device_t *device) { downcast<acia6850_device*>(device)->tx_clock_in(); }
 
 void acia6850_device::tx_clock_in()
 {
@@ -709,7 +709,7 @@ void acia6850_device::receive_event()
     rx_clock_in - As above, but using the rx pin
 -------------------------------------------------*/
 
-void acia6850_rx_clock_in(running_device *device) { downcast<acia6850_device*>(device)->rx_clock_in(); }
+void acia6850_rx_clock_in(device_t *device) { downcast<acia6850_device*>(device)->rx_clock_in(); }
 
 void acia6850_device::rx_clock_in()
 {
@@ -756,7 +756,7 @@ void acia6850_device::set_rx_clock(int clock)
     dynamically
 -------------------------------------------------*/
 
-void acia6850_set_rx_clock(running_device *device, int clock)
+void acia6850_set_rx_clock(device_t *device, int clock)
 {
 	downcast<acia6850_device*>(device)->set_rx_clock(clock);
 }
@@ -783,7 +783,7 @@ void acia6850_device::set_tx_clock(int clock)
     dynamically
 -------------------------------------------------*/
 
-void acia6850_set_tx_clock(running_device *device, int clock)
+void acia6850_set_tx_clock(device_t *device, int clock)
 {
 	downcast<acia6850_device*>(device)->set_tx_clock(clock);
 }
@@ -805,7 +805,7 @@ void acia6850_device::receive_data(UINT8 data)
     acia6850_receive_data - Receive data byte
 -------------------------------------------------*/
 
-void acia6850_receive_data(running_device *device, UINT8 data)
+void acia6850_receive_data(device_t *device, UINT8 data)
 {
 	downcast<acia6850_device*>(device)->receive_data(data);
 }

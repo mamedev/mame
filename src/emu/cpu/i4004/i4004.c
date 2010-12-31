@@ -52,7 +52,7 @@ struct _i4004_state
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE i4004_state *get_safe_token(running_device *device)
+INLINE i4004_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == I4004);
@@ -155,7 +155,7 @@ INLINE void POP_STACK(i4004_state *cpustate)
 	cpustate->pc_pos = (cpustate->pc_pos - 1) & cpustate->addr_mask;
 }
 
-void i4004_set_test(running_device *device, UINT8 val)
+void i4004_set_test(device_t *device, UINT8 val)
 {
 	i4004_state *cpustate = get_safe_token(device);
 	cpustate->TEST = val;

@@ -52,7 +52,7 @@ struct _hd63484_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE hd63484_state *get_safe_token( running_device *device )
+INLINE hd63484_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == HD63484);
@@ -60,7 +60,7 @@ INLINE hd63484_state *get_safe_token( running_device *device )
 	return (hd63484_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const hd63484_interface *get_interface( running_device *device )
+INLINE const hd63484_interface *get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == HD63484);
@@ -71,7 +71,7 @@ INLINE const hd63484_interface *get_interface( running_device *device )
     IMPLEMENTATION
 *****************************************************************************/
 
-static int get_pixel(running_device *device, int x, int y);
+static int get_pixel(device_t *device, int x, int y);
 
 static const int instruction_length[64] =
 {
@@ -113,7 +113,7 @@ static const char *const instruction_name[64] =
 	"RGCPY","RGCPY","RGCPY","RGCPY" 	/* Fx */
 };
 
-static void doclr16( running_device *device, int opcode, UINT16 fill, int *dst, INT16 _ax, INT16 _ay )
+static void doclr16( device_t *device, int opcode, UINT16 fill, int *dst, INT16 _ax, INT16 _ay )
 {
 	hd63484_state *hd63484 = get_safe_token(device);
 	INT16 ax,ay;
@@ -172,7 +172,7 @@ static void doclr16( running_device *device, int opcode, UINT16 fill, int *dst, 
 	}
 }
 
-static void docpy16( running_device *device, int opcode, int src, int *dst, INT16 _ax, INT16 _ay )
+static void docpy16( device_t *device, int opcode, int src, int *dst, INT16 _ax, INT16 _ay )
 {
 	hd63484_state *hd63484 = get_safe_token(device);
 	int dstep1,dstep2;
@@ -301,7 +301,7 @@ static void docpy16( running_device *device, int opcode, int src, int *dst, INT1
 	}
 }
 
-static int org_first_pixel( running_device *device, int _org_dpd )
+static int org_first_pixel( device_t *device, int _org_dpd )
 {
 	hd63484_state *hd63484 = get_safe_token(device);
 	int gbm = (hd63484->reg[0x02/2] & 0x700) >> 8;
@@ -325,7 +325,7 @@ static int org_first_pixel( running_device *device, int _org_dpd )
 	}
 }
 
-static void dot( running_device *device, int x, int y, int opm, UINT16 color )
+static void dot( device_t *device, int x, int y, int opm, UINT16 color )
 {
 	hd63484_state *hd63484 = get_safe_token(device);
 	int dst, x_int, x_mod, bpp;
@@ -420,7 +420,7 @@ static void dot( running_device *device, int x, int y, int opm, UINT16 color )
 	}
 }
 
-static int get_pixel( running_device *device, int x, int y )
+static int get_pixel( device_t *device, int x, int y )
 {
 	hd63484_state *hd63484 = get_safe_token(device);
 	int dst, x_int, x_mod, bpp;
@@ -476,7 +476,7 @@ static int get_pixel( running_device *device, int x, int y )
 	return ((hd63484->ram[dst] & bitmask_shifted) >> (x_mod * bpp));
 }
 
-static int get_pixel_ptn( running_device *device, int x, int y )
+static int get_pixel_ptn( device_t *device, int x, int y )
 {
 	hd63484_state *hd63484 = get_safe_token(device);
 	int dst, x_int, x_mod, bpp;
@@ -510,7 +510,7 @@ static int get_pixel_ptn( running_device *device, int x, int y )
 		return 0;
 }
 
-static void agcpy( running_device *device, int opcode, int src_x, int src_y, int dst_x, int dst_y, INT16 _ax, INT16 _ay )
+static void agcpy( device_t *device, int opcode, int src_x, int src_y, int dst_x, int dst_y, INT16 _ax, INT16 _ay )
 {
 	int dst_step1_x,dst_step1_y,dst_step2_x,dst_step2_y;
 	int src_step1_x,src_step1_y,src_step2_x,src_step2_y;
@@ -670,7 +670,7 @@ static void agcpy( running_device *device, int opcode, int src_x, int src_y, int
 	}
 }
 
-static void ptn( running_device *device, int opcode, int src_x, int src_y, INT16 _ax, INT16 _ay )
+static void ptn( device_t *device, int opcode, int src_x, int src_y, INT16 _ax, INT16 _ay )
 {
 	hd63484_state *hd63484 = get_safe_token(device);
 	int dst_step1_x = 0,dst_step1_y = 0,dst_step2_x = 0,dst_step2_y = 0;
@@ -837,7 +837,7 @@ static void ptn( running_device *device, int opcode, int src_x, int src_y, INT16
 	}
 }
 
-static void line( running_device *device, INT16 sx, INT16 sy, INT16 ex, INT16 ey, INT16 col )
+static void line( device_t *device, INT16 sx, INT16 sy, INT16 ex, INT16 ey, INT16 col )
 {
 	hd63484_state *hd63484 = get_safe_token(device);
 	INT16 ax,ay;
@@ -889,7 +889,7 @@ static void line( running_device *device, INT16 sx, INT16 sy, INT16 ex, INT16 ey
 
 }
 
-static void circle( running_device *device, INT16 sx, INT16 sy, UINT16 r, INT16 col )
+static void circle( device_t *device, INT16 sx, INT16 sy, UINT16 r, INT16 col )
 {
 	const float DEG2RAD = 3.14159f/180;
 	hd63484_state *hd63484 = get_safe_token(device);
@@ -902,7 +902,7 @@ static void circle( running_device *device, INT16 sx, INT16 sy, UINT16 r, INT16 
 	}
 }
 
-static void paint( running_device *device, int sx, int sy, int col )
+static void paint( device_t *device, int sx, int sy, int col )
 {
 	hd63484_state *hd63484 = get_safe_token(device);
 	int getpixel;
@@ -1013,7 +1013,7 @@ static void paint( running_device *device, int sx, int sy, int col )
 		}
 }
 
-static void hd63484_command_w(running_device *device, UINT16 cmd)
+static void hd63484_command_w(device_t *device, UINT16 cmd)
 {
 	hd63484_state *hd63484 = get_safe_token(device);
 	int len;

@@ -116,7 +116,7 @@ enum
     CONFIGURATION STRUCTURE
 ***************************************************************************/
 
-typedef void (*cubeqst_dac_w_func)(running_device *, UINT16);
+typedef void (*cubeqst_dac_w_func)(device_t *, UINT16);
 
 typedef struct _cubeqst_snd_config cubeqst_snd_config;
 struct _cubeqst_snd_config
@@ -148,11 +148,11 @@ extern WRITE16_DEVICE_HANDLER( cubeqcpu_sndram_w );
 extern READ16_DEVICE_HANDLER( cubeqcpu_rotram_r );
 extern WRITE16_DEVICE_HANDLER( cubeqcpu_rotram_w );
 
-void cubeqcpu_swap_line_banks(running_device *device);
+void cubeqcpu_swap_line_banks(device_t *device);
 
-void cubeqcpu_clear_stack(running_device *device);
-UINT8 cubeqcpu_get_ptr_ram_val(running_device *device, int i);
-UINT32* cubeqcpu_get_stack_ram(running_device *device);
+void cubeqcpu_clear_stack(device_t *device);
+UINT8 cubeqcpu_get_ptr_ram_val(device_t *device, int i);
+UINT32* cubeqcpu_get_stack_ram(device_t *device);
 
 DECLARE_LEGACY_CPU_DEVICE(CQUESTSND, cquestsnd);
 DECLARE_LEGACY_CPU_DEVICE(CQUESTROT, cquestrot);

@@ -57,7 +57,7 @@ struct _flt_rc_config
 
 extern const flt_rc_config flt_rc_ac_default;
 
-void filter_rc_set_RC(running_device *device, int type, double R1, double R2, double R3, double C);
+void filter_rc_set_RC(device_t *device, int type, double R1, double R2, double R3, double C);
 
 DECLARE_LEGACY_SOUND_DEVICE(FILTER_RC, filter_rc);
 

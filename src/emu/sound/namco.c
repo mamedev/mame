@@ -75,7 +75,7 @@ struct _namco_sound
 };
 
 
-INLINE namco_sound *get_safe_token(running_device *device)
+INLINE namco_sound *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == NAMCO ||
@@ -551,7 +551,7 @@ it select the 54XX/52XX outputs on those channels
     0x3f        ch 7
 */
 
-void polepos_sound_enable(running_device *device, int enable)
+void polepos_sound_enable(device_t *device, int enable)
 {
 	namco_sound *chip = get_safe_token(device);
 	chip->sound_enable = enable;
@@ -629,7 +629,7 @@ WRITE8_DEVICE_HANDLER( polepos_sound_w )
     0x3e        ch 7    waveform select & frequency
 */
 
-void mappy_sound_enable(running_device *device, int enable)
+void mappy_sound_enable(device_t *device, int enable)
 {
 	namco_sound *chip = get_safe_token(device);
 	chip->sound_enable = enable;

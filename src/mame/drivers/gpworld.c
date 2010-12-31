@@ -56,7 +56,7 @@ static UINT8* tile_RAM;
 static UINT8* sprite_RAM;
 static UINT8* palette_RAM;
 
-static running_device *laserdisc;
+static device_t *laserdisc;
 
 
 /* VIDEO GOODS */

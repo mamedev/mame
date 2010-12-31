@@ -102,7 +102,7 @@ struct _v30mz_state
 
 extern int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, const nec_config *config);
 
-INLINE v30mz_state *get_safe_token(running_device *device)
+INLINE v30mz_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == V30MZ);

@@ -468,7 +468,7 @@ static UINT16
 ReadWriteC148( address_space *space, offs_t offset, UINT16 data, int bWrite )
 {
 	offs_t addr = ((offset * 2) + 0x1c0000) & 0x1fe000;
-	running_device *altcpu = NULL;
+	device_t *altcpu = NULL;
 	UINT16 *pC148Reg = NULL;
 	UINT16 *pC148RegAlt = NULL;
 	UINT16 result = 0;

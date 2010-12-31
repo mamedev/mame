@@ -68,7 +68,7 @@ INLINE void z180_mmu(z180_state *cpustate)
  ***************************************************************/
 #define RM(cs,addr)	(cs)->program->read_byte(MMU_REMAP_ADDR(cs,addr))
 #ifdef UNUSED_FUNCTION
-UINT8 z180_readmem(running_device *device, offs_t offset)
+UINT8 z180_readmem(device_t *device, offs_t offset)
 {
 	z180_state *cpustate = get_safe_token(device);
 	return RM(cpustate, offset);
@@ -80,7 +80,7 @@ UINT8 z180_readmem(running_device *device, offs_t offset)
  ***************************************************************/
 #define WM(cs,addr,value) (cs)->program->write_byte(MMU_REMAP_ADDR(cs,addr),value)
 #ifdef UNUSED_FUNCTION
-void z180_writemem(running_device *device, offs_t offset, UINT8 data)
+void z180_writemem(device_t *device, offs_t offset, UINT8 data)
 {
 	z180_state *cpustate = get_safe_token(device);
 	WM(cpustate, offset, data);

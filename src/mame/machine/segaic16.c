@@ -33,7 +33,7 @@
 struct memory_mapper_chip
 {
 	UINT8	regs[0x20];
-	running_device *cpu;
+	device_t *cpu;
 	const segaic16_memory_map_entry *map;
 	void	(*sound_w)(running_machine *, UINT8);
 	UINT8	(*sound_r)(running_machine *);
@@ -96,7 +96,7 @@ READ16_HANDLER( segaic16_open_bus_r )
  *
  *************************************/
 
-void segaic16_memory_mapper_init(running_device *cpu, const segaic16_memory_map_entry *entrylist, void (*sound_w_callback)(running_machine *, UINT8), UINT8 (*sound_r_callback)(running_machine *))
+void segaic16_memory_mapper_init(device_t *cpu, const segaic16_memory_map_entry *entrylist, void (*sound_w_callback)(running_machine *, UINT8), UINT8 (*sound_r_callback)(running_machine *))
 {
 	struct memory_mapper_chip *chip = &memory_mapper;
 
@@ -415,7 +415,7 @@ struct _ic_315_5248_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE ic_315_5248_state *_315_5248_get_safe_token( running_device *device )
+INLINE ic_315_5248_state *_315_5248_get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == _315_5248);
@@ -493,7 +493,7 @@ struct _ic_315_5249_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE ic_315_5249_state *_315_5249_get_safe_token( running_device *device )
+INLINE ic_315_5249_state *_315_5249_get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == _315_5249);
@@ -505,7 +505,7 @@ INLINE ic_315_5249_state *_315_5249_get_safe_token( running_device *device )
     IMPLEMENTATION
 *****************************************************************************/
 
-static void update_divide( running_device *device, int mode )
+static void update_divide( device_t *device, int mode )
 {
 	ic_315_5249_state *ic_315_5249 = _315_5249_get_safe_token(device);
 
@@ -651,7 +651,7 @@ struct _ic_315_5250_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE ic_315_5250_state *_315_5250_get_safe_token( running_device *device )
+INLINE ic_315_5250_state *_315_5250_get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == _315_5250);
@@ -659,7 +659,7 @@ INLINE ic_315_5250_state *_315_5250_get_safe_token( running_device *device )
 	return (ic_315_5250_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const ic_315_5250_interface *_315_5250_get_interface( running_device *device )
+INLINE const ic_315_5250_interface *_315_5250_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == _315_5250));
@@ -670,7 +670,7 @@ INLINE const ic_315_5250_interface *_315_5250_get_interface( running_device *dev
     IMPLEMENTATION
 *****************************************************************************/
 
-int segaic16_compare_timer_clock( running_device *device )
+int segaic16_compare_timer_clock( device_t *device )
 {
 	ic_315_5250_state *ic_315_5250 = _315_5250_get_safe_token(device);
 	int old_counter = ic_315_5250->counter;
@@ -690,7 +690,7 @@ int segaic16_compare_timer_clock( running_device *device )
 }
 
 
-static void update_compare( running_device *device, int update_history )
+static void update_compare( device_t *device, int update_history )
 {
 	ic_315_5250_state *ic_315_5250 = _315_5250_get_safe_token(device);
 	int bound1 = (INT16)ic_315_5250->regs[0];
@@ -720,7 +720,7 @@ static void update_compare( running_device *device, int update_history )
 }
 
 
-static void timer_interrupt_ack( running_device *device )
+static void timer_interrupt_ack( device_t *device )
 {
 	ic_315_5250_state *ic_315_5250 = _315_5250_get_safe_token(device);
 

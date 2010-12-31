@@ -236,7 +236,7 @@ GFXDECODE_END
 
 
 
-static void irqhandler( running_device *device, int linestate )
+static void irqhandler( device_t *device, int linestate )
 {
 	gotcha_state *state = device->machine->driver_data<gotcha_state>();
 	cpu_set_input_line(state->audiocpu, 0, linestate);

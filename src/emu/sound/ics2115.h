@@ -103,11 +103,11 @@ public:
 	virtual device_t *alloc_device(running_machine &machine) const;
 
 	// inline configuration helpers
-	static void static_set_irqf(device_config *device, void (*irqf)(running_device *device, int state));
+	static void static_set_irqf(device_config *device, void (*irqf)(device_t *device, int state));
 
 protected:
 	// inline data
-	void (*m_irq_func)(running_device *device, int state);
+	void (*m_irq_func)(device_t *device, int state);
 };
 
 // ======================> ics2115_device
@@ -144,7 +144,7 @@ protected:
 	// internal state
 	const ics2115_device_config &m_config;
 
-	void (*m_irq_cb)(running_device *device, int state);
+	void (*m_irq_cb)(device_t *device, int state);
 
 	UINT8 *m_rom;
 	INT16 m_ulaw[256];

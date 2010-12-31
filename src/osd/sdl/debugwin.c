@@ -75,7 +75,7 @@ struct _win_i {
 	edit					ed;
 	running_machine *		machine;	// machine
 	DView *					views[MAX_VIEWS];
-	running_device *		cpu;	// current CPU
+	device_t *		cpu;	// current CPU
 };
 
 struct windowState
@@ -452,7 +452,7 @@ static void disasmview_update_checks(win_i *info)
 //  debugmain_set_cpu
 //============================================================
 
-static void debugmain_set_cpu(running_device *device)
+static void debugmain_set_cpu(device_t *device)
 {
 	win_i *dmain = get_first_win_i(WIN_TYPE_MAIN);
 	DView *dv;
@@ -553,7 +553,7 @@ void sdl_osd_interface::init_debugger()
 //  wait_for_debugger
 //============================================================
 
-void sdl_osd_interface::wait_for_debugger(running_device &device, bool firststop)
+void sdl_osd_interface::wait_for_debugger(device_t &device, bool firststop)
 {
 	win_i *dmain = get_first_win_i(WIN_TYPE_MAIN);
 
@@ -765,7 +765,7 @@ static void memorywin_new(running_machine *machine)
 {
 	win_i *mem;
 	int item, cursel;
-	running_device *curcpu = debug_cpu_get_visible_cpu(machine);
+	device_t *curcpu = debug_cpu_get_visible_cpu(machine);
 	GtkComboBox *		zone_w;
 
 	mem = add_win_i(machine, WIN_TYPE_MEMORY);
@@ -859,7 +859,7 @@ static void disasmwin_new(running_machine *machine)
 {
 	win_i *dis;
 	int item, cursel;
-	running_device *curcpu = debug_cpu_get_visible_cpu(machine);
+	device_t *curcpu = debug_cpu_get_visible_cpu(machine);
 	GtkComboBox 		*cpu_w;
 	astring title;
 
@@ -1286,7 +1286,7 @@ void sdl_osd_interface::init_debugger()
 {
 }
 
-void sdl_osd_interface::wait_for_debugger(running_device &device, bool firststop)
+void sdl_osd_interface::wait_for_debugger(device_t &device, bool firststop)
 {
 }
 

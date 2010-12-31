@@ -31,10 +31,10 @@ public:
 	int      toggle;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *subcpu;
-	running_device *audiocpu;
-	running_device *mcu;
+	device_t *maincpu;
+	device_t *subcpu;
+	device_t *audiocpu;
+	device_t *mcu;
 };
 
 /*----------- defined in video/dec8.c -----------*/

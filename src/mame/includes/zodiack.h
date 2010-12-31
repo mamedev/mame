@@ -23,8 +23,8 @@ public:
 	int       percuss_hardware;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
+	device_t *maincpu;
+	device_t *audiocpu;
 };
 
 /*----------- defined in video/zodiack.c -----------*/

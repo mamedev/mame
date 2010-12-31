@@ -29,8 +29,8 @@ public:
 	UINT8   z80_latch, i8751_latch;
 
 	/* devices */
-	running_device *mcu;
-	running_device *audiocpu;
+	device_t *mcu;
+	device_t *audiocpu;
 };
 
 

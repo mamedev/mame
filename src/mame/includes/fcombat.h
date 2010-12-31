@@ -46,7 +46,7 @@ public:
 	int        tx, ty;
 
 	/* devices */
-	running_device *maincpu;
+	device_t *maincpu;
 };
 
 

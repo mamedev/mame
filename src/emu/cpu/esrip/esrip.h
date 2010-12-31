@@ -96,6 +96,6 @@ struct _esrip_config_
 
 DECLARE_LEGACY_CPU_DEVICE(ESRIP, esrip);
 
-extern UINT8 get_rip_status(running_device *cpu);
+extern UINT8 get_rip_status(device_t *cpu);
 
 #endif /* _ESRIP_H */

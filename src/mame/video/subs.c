@@ -44,9 +44,9 @@ VIDEO_UPDATE( subs )
 	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
 	int offs;
 
-	running_device *left_screen  = screen->machine->device("lscreen");
-	running_device *right_screen = screen->machine->device("rscreen");
-	running_device *discrete = screen->machine->device("discrete");
+	device_t *left_screen  = screen->machine->device("lscreen");
+	device_t *right_screen = screen->machine->device("rscreen");
+	device_t *discrete = screen->machine->device("discrete");
 
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */

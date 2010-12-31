@@ -194,7 +194,7 @@ struct _psxcpu_state
 	UINT32 bad_word_address_mask;
 };
 
-INLINE psxcpu_state *get_safe_token(running_device *device)
+INLINE psxcpu_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == PSXCPU ||

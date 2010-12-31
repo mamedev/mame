@@ -1220,7 +1220,7 @@ void segaic16_tilemap_init(running_machine *machine, int which, int type, int co
  *
  *************************************/
 
-void segaic16_tilemap_draw(running_device *screen, bitmap_t *bitmap, const rectangle *cliprect, int which, int map, int priority, int priority_mark)
+void segaic16_tilemap_draw(device_t *screen, bitmap_t *bitmap, const rectangle *cliprect, int which, int map, int priority, int priority_mark)
 {
 	running_machine *machine = screen->machine;
 	struct tilemap_info *info = &bg_tilemap[which];

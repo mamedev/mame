@@ -274,7 +274,7 @@ static WRITE32_HANDLER( skimaxx_sub_ctrl_w )
 	// 7e/7f at the start. 3f/7f, related to reads from 1018xxxx
 	if (ACCESSING_BITS_0_7)
 	{
-		running_device *subcpu = space->machine->device("subcpu");
+		device_t *subcpu = space->machine->device("subcpu");
 
 		cpu_set_input_line(subcpu, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 		cpu_set_input_line(subcpu, INPUT_LINE_HALT,  (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
@@ -468,7 +468,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static void skimaxx_tms_irq(running_device *device, int state)
+static void skimaxx_tms_irq(device_t *device, int state)
 {
 	// TODO
 }

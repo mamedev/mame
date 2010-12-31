@@ -87,7 +87,7 @@ struct _ymz280b_state
 	UINT8 irq_enable;				/* current IRQ enable */
 	UINT8 keyon_enable;				/* key on enable */
 	double master_clock;			/* master clock frequency */
-	void (*irq_callback)(running_device *, int);		/* IRQ callback */
+	void (*irq_callback)(device_t *, int);		/* IRQ callback */
 	struct YMZ280BVoice	voice[8];	/* the 8 voices */
 	UINT32 rom_readback_addr;		/* where the CPU can read the ROM */
 	devcb_resolved_read8 ext_ram_read;		/* external RAM read handler */
@@ -98,7 +98,7 @@ struct _ymz280b_state
 #endif
 
 	INT16 *scratch;
-	running_device *device;
+	device_t *device;
 };
 
 /* step size index shift table */
@@ -130,7 +130,7 @@ static const timer_fired_func update_irq_state_cb[] =
 };
 
 
-INLINE ymz280b_state *get_safe_token(running_device *device)
+INLINE ymz280b_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == YMZ280B);

@@ -57,9 +57,9 @@ public:
 
 
 	/* devices */
-	running_device *audiocpu;
-	running_device *subcpu;
-	running_device *mcu;
+	device_t *audiocpu;
+	device_t *subcpu;
+	device_t *mcu;
 };
 
 

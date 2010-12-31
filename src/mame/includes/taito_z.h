@@ -32,15 +32,15 @@ public:
 //  UINT8       pandata[4];
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *subcpu;
-	running_device *eeprom;
-	running_device *tc0480scp;
-	running_device *tc0150rod;
-	running_device *tc0100scn;
-	running_device *tc0220ioc;
-	running_device *tc0140syt;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *subcpu;
+	device_t *eeprom;
+	device_t *tc0480scp;
+	device_t *tc0150rod;
+	device_t *tc0100scn;
+	device_t *tc0220ioc;
+	device_t *tc0140syt;
 
 	/* dblaxle motor flag */
 	int	    dblaxle_vibration;

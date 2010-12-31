@@ -120,7 +120,7 @@ INLINE void desc_free(drcfe_state *drcfe, opcode_desc *desc)
     drcfe_init - initializate the drcfe state
 -------------------------------------------------*/
 
-drcfe_state *drcfe_init(running_device *cpu, const drcfe_config *config, void *param)
+drcfe_state *drcfe_init(device_t *cpu, const drcfe_config *config, void *param)
 {
 	drcfe_state *drcfe;
 

@@ -37,7 +37,7 @@ public:
 	UINT8* fix_RAM;
 	UINT8* out_RAM;
 
-	running_device *laserdisc;
+	device_t *laserdisc;
 	UINT8 ldv1000_input_latch;
 	UINT8 ldv1000_output_latch;
 

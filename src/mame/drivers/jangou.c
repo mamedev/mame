@@ -59,10 +59,10 @@ public:
 	UINT8        nsc_latch, z80_latch;
 
 	/* devices */
-	running_device *cpu_0;
-	running_device *cpu_1;
-	running_device *cvsd;
-	running_device *nsc;
+	device_t *cpu_0;
+	device_t *cpu_1;
+	device_t *cvsd;
+	device_t *nsc;
 };
 
 
@@ -331,7 +331,7 @@ static WRITE8_HANDLER( adpcm_w )
 	state->adpcm_byte = data;
 }
 
-static void jngolady_vclk_cb( running_device *device )
+static void jngolady_vclk_cb( device_t *device )
 {
 	jangou_state *state = device->machine->driver_data<jangou_state>();
 

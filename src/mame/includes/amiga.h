@@ -389,7 +389,7 @@ public:
 	autoconfig_device *cur_autoconfig;
 	emu_timer * irq_timer;
 	emu_timer * blitter_timer;
-	running_device *sound_device;
+	device_t *sound_device;
 
 	/* sprite states */
 	UINT8 sprite_comparitor_enable_mask;
@@ -457,8 +457,8 @@ void amiga_add_autoconfig(running_machine *machine, const amiga_autoconfig_devic
 READ16_HANDLER( amiga_autoconfig_r );
 WRITE16_HANDLER( amiga_autoconfig_w );
 
-void amiga_cia_0_irq(running_device *device, int state);
-void amiga_cia_1_irq(running_device *device, int state);
+void amiga_cia_0_irq(device_t *device, int state);
+void amiga_cia_1_irq(device_t *device, int state);
 
 const amiga_machine_interface *amiga_get_interface(running_machine *machine);
 
@@ -467,8 +467,8 @@ const amiga_machine_interface *amiga_get_interface(running_machine *machine);
 
 DECLARE_LEGACY_SOUND_DEVICE(AMIGA, amiga_sound);
 
-void amiga_audio_update(running_device *device);
-void amiga_audio_data_w(running_device *device, int which, UINT16 data);
+void amiga_audio_update(device_t *device);
+void amiga_audio_data_w(device_t *device, int which, UINT16 data);
 
 
 /*----------- defined in video/amiga.c -----------*/

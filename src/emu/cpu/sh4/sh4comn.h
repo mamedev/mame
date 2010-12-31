@@ -149,7 +149,7 @@ void sh4_set_irq_line(sh4_state *sh4, int irqline, int state); // set state of e
 #ifdef LSB_FIRST
 void sh4_swap_fp_couples(sh4_state *sh4);
 #endif
-void sh4_common_init(running_device *device);
+void sh4_common_init(device_t *device);
 
 INLINE void sh4_check_pending_irq(sh4_state *sh4, const char *message) // look for highest priority active exception and handle it
 {

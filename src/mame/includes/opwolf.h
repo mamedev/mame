@@ -41,10 +41,10 @@ public:
 	/* devices */
 	cpu_device *maincpu;
 	cpu_device *audiocpu;
-	running_device *pc080sn;
-	running_device *pc090oj;
-	running_device *msm1;
-	running_device *msm2;
+	device_t *pc080sn;
+	device_t *pc090oj;
+	device_t *msm1;
+	device_t *msm2;
 };
 
 

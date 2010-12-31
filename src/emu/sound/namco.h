@@ -15,10 +15,10 @@ struct _namco_interface
 WRITE8_DEVICE_HANDLER( pacman_sound_enable_w );
 WRITE8_DEVICE_HANDLER( pacman_sound_w );
 
-void polepos_sound_enable(running_device *device, int enable);
+void polepos_sound_enable(device_t *device, int enable);
 WRITE8_DEVICE_HANDLER( polepos_sound_w );
 
-void mappy_sound_enable(running_device *device, int enable);
+void mappy_sound_enable(device_t *device, int enable);
 
 WRITE8_DEVICE_HANDLER( namcos1_cus30_w );	/* wavedata + sound registers + RAM */
 READ8_DEVICE_HANDLER( namcos1_cus30_r );

@@ -39,8 +39,8 @@ DECLARE_LEGACY_DEVICE(S3C2400, s3c2400);
     TYPE DEFINITIONS
 *******************************************************************************/
 
-typedef UINT32 (*s3c24xx_gpio_port_r_func)( running_device *device, int port);
-typedef void (*s3c24xx_gpio_port_w_func)( running_device *device, int port, UINT32 data);
+typedef UINT32 (*s3c24xx_gpio_port_r_func)( device_t *device, int port);
+typedef void (*s3c24xx_gpio_port_w_func)( device_t *device, int port, UINT32 data);
 
 typedef struct _s3c2400_interface_gpio s3c2400_interface_gpio;
 struct _s3c2400_interface_gpio
@@ -94,7 +94,7 @@ DEVICE_GET_INFO( s3c2400 );
 VIDEO_START( s3c2400 );
 VIDEO_UPDATE( s3c2400 );
 
-void s3c2400_uart_fifo_w( running_device *device, int uart, UINT8 data);
+void s3c2400_uart_fifo_w( device_t *device, int uart, UINT8 data);
 
 /*******************************************************************************
     MACROS & CONSTANTS

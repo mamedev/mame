@@ -109,9 +109,9 @@ static MACHINE_RESET( magmax )
 
 static WRITE8_DEVICE_HANDLER( ay8910_portA_0_w )
 {
-running_device *ay1 = device->machine->device("ay1");
-running_device *ay2 = device->machine->device("ay2");
-running_device *ay3 = device->machine->device("ay3");
+device_t *ay1 = device->machine->device("ay1");
+device_t *ay2 = device->machine->device("ay2");
+device_t *ay3 = device->machine->device("ay3");
 float percent;
 
 /*There are three AY8910 chips and four(!) separate amplifiers on the board

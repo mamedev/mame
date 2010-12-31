@@ -27,7 +27,7 @@ public:
 	UINT8      layer_ctrl;
 
 	/* devices */
-	running_device *subcpu;
+	device_t *subcpu;
 };
 
 

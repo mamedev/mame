@@ -15,10 +15,10 @@
 /* private area */
 typedef struct __SID6581
 {
-    running_device *device;
+    device_t *device;
     sound_stream *mixer_channel; // mame stream/ mixer channel
 
-    int (*ad_read) (running_device *device, int which);
+    int (*ad_read) (device_t *device, int which);
     SIDTYPE type;
     UINT32 clock;
 

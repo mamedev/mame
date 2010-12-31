@@ -207,7 +207,7 @@ GFXDECODE_END
 
 /* handler called by the YM2203 emulator when the internal timers cause an IRQ */
 
-static void irqhandler( running_device *device, int irq )
+static void irqhandler( device_t *device, int irq )
 {
 	volfied_state *state = device->machine->driver_data<volfied_state>();
 	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);

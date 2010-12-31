@@ -31,7 +31,7 @@ struct _ticket_state
 	emu_timer *timer;
 };
 
-INLINE ticket_state *get_safe_token(running_device *device)
+INLINE ticket_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TICKET_DISPENSER);
@@ -42,7 +42,7 @@ INLINE ticket_state *get_safe_token(running_device *device)
 
 static TIMER_CALLBACK( ticket_dispenser_toggle )
 {
-	ticket_state *state = get_safe_token((running_device *)ptr);
+	ticket_state *state = get_safe_token((device_t *)ptr);
 
 	/* If we still have power, keep toggling ticket states. */
 	if (state->power)

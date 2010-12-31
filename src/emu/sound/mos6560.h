@@ -106,8 +106,8 @@ DECLARE_LEGACY_SOUND_DEVICE(MOS656X, mos6560);
 WRITE8_DEVICE_HANDLER( mos6560_port_w );
 READ8_DEVICE_HANDLER( mos6560_port_r );
 
-void mos6560_raster_interrupt_gen( running_device *device );
-UINT32 mos6560_video_update( running_device *device, bitmap_t *bitmap, const rectangle *cliprect );
+void mos6560_raster_interrupt_gen( device_t *device );
+UINT32 mos6560_video_update( device_t *device, bitmap_t *bitmap, const rectangle *cliprect );
 
 
 #endif /* __MOS6560_H__ */

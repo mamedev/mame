@@ -243,7 +243,7 @@ static GFXDECODE_START( pkscram )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 0x80 )
 GFXDECODE_END
 
-static void irqhandler(running_device *device, int irq)
+static void irqhandler(device_t *device, int irq)
 {
 	if(out & 0x10)
 		cputag_set_input_line(device->machine, "maincpu", 2, irq ? ASSERT_LINE : CLEAR_LINE);

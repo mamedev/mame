@@ -132,14 +132,14 @@ struct _namcoio_state
 	INT32          creds_per_coin[2];
 	INT32          in_count;
 
-	running_device *device;
+	device_t *device;
 };
 
 /*****************************************************************************
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE namcoio_state *get_safe_token( running_device *device )
+INLINE namcoio_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == NAMCO56XX || device->type() == NAMCO58XX || device->type() == NAMCO59XX);
@@ -147,7 +147,7 @@ INLINE namcoio_state *get_safe_token( running_device *device )
 	return (namcoio_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const namcoio_interface *get_interface( running_device *device )
+INLINE const namcoio_interface *get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == NAMCO56XX || device->type() == NAMCO58XX || device->type() == NAMCO59XX);
@@ -165,7 +165,7 @@ INLINE const namcoio_interface *get_interface( running_device *device )
 #define IORAM_READ(offset) (namcoio->ram[offset] & 0x0f)
 #define IORAM_WRITE(offset,data) {namcoio->ram[offset] = (data) & 0x0f;}
 
-static void handle_coins( running_device *device, int swap )
+static void handle_coins( device_t *device, int swap )
 {
 	namcoio_state *namcoio = get_safe_token(device);
 	int val, toggled;
@@ -240,7 +240,7 @@ static void handle_coins( running_device *device, int swap )
 }
 
 
-void namco_customio_56xx_run( running_device *device )
+void namco_customio_56xx_run( device_t *device )
 {
 	namcoio_state *namcoio = get_safe_token(device);
 
@@ -322,7 +322,7 @@ void namco_customio_56xx_run( running_device *device )
 
 
 
-void namco_customio_59xx_run( running_device *device )
+void namco_customio_59xx_run( device_t *device )
 {
 	namcoio_state *namcoio = get_safe_token(device);
 
@@ -347,7 +347,7 @@ void namco_customio_59xx_run( running_device *device )
 
 
 
-void namco_customio_58xx_run( running_device *device )
+void namco_customio_58xx_run( device_t *device )
 {
 	namcoio_state *namcoio = get_safe_token(device);
 

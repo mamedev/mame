@@ -51,7 +51,7 @@ struct _ccpu_state
 };
 
 
-INLINE ccpu_state *get_safe_token(running_device *device)
+INLINE ccpu_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == CCPU);
@@ -103,7 +103,7 @@ do { \
     INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
 
-static UINT8 read_jmi(running_device *device)
+static UINT8 read_jmi(device_t *device)
 {
 	/* this routine is called when there is no external input */
 	/* and the JMI jumper is present */
@@ -112,7 +112,7 @@ static UINT8 read_jmi(running_device *device)
 }
 
 
-void ccpu_wdt_timer_trigger(running_device *device)
+void ccpu_wdt_timer_trigger(device_t *device)
 {
 	ccpu_state *cpustate = get_safe_token(device);
 	cpustate->waiting = FALSE;

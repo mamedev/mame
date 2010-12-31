@@ -35,7 +35,7 @@ public:
 	int         MC6809_FLAG;
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 };
 
 

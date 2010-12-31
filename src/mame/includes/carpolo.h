@@ -13,7 +13,7 @@
 extern const pia6821_interface carpolo_pia0_intf;
 extern const pia6821_interface carpolo_pia1_intf;
 
-void carpolo_74148_3s_cb(running_device *device);
+void carpolo_74148_3s_cb(device_t *device);
 
 WRITE_LINE_DEVICE_HANDLER( carpolo_7474_2s_1_q_cb );
 WRITE_LINE_DEVICE_HANDLER( carpolo_7474_2s_2_q_cb );

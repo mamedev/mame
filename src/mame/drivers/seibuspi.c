@@ -1109,7 +1109,7 @@ static WRITE8_DEVICE_HANDLER( flashrom_write )
 	}
 }
 
-static void irqhandler(running_device *device, int state)
+static void irqhandler(device_t *device, int state)
 {
 	if (state)
 		cputag_set_input_line_and_vector(device->machine, "soundcpu", 0, ASSERT_LINE, 0xd7);	// IRQ is RST10

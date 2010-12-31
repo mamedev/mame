@@ -85,7 +85,7 @@ ADDRESS_MAP_END
 
 static int msm5205next;
 
-static void battlera_adpcm_int(running_device *device)
+static void battlera_adpcm_int(device_t *device)
 {
 	static int toggle;
 

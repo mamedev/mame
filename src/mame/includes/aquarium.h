@@ -23,7 +23,7 @@ public:
 	int aquarium_snd_ack;
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 };
 
 

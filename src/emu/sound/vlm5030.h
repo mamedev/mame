@@ -12,18 +12,18 @@ struct _vlm5030_interface
 };
 
 /* set speech rom address */
-void vlm5030_set_rom(running_device *device, void *speech_rom);
+void vlm5030_set_rom(device_t *device, void *speech_rom);
 
 /* get BSY pin level */
-int vlm5030_bsy(running_device *device);
+int vlm5030_bsy(device_t *device);
 /* latch contoll data */
 WRITE8_DEVICE_HANDLER( vlm5030_data_w );
 /* set RST pin level : reset / set table address A8-A15 */
-void vlm5030_rst (running_device *device, int pin );
+void vlm5030_rst (device_t *device, int pin );
 /* set VCU pin level : ?? unknown */
-void vlm5030_vcu(running_device *device, int pin );
+void vlm5030_vcu(device_t *device, int pin );
 /* set ST pin level  : set table address A0-A7 / start speech */
-void vlm5030_st(running_device *device, int pin );
+void vlm5030_st(device_t *device, int pin );
 
 DECLARE_LEGACY_SOUND_DEVICE(VLM5030, vlm5030);
 

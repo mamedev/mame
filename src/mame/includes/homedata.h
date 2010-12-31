@@ -30,11 +30,11 @@ public:
 	int      to_cpu, from_cpu;
 
 	/* device */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *dac;
-	running_device *ym;
-	running_device *sn;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *dac;
+	device_t *ym;
+	device_t *sn;
 };
 
 

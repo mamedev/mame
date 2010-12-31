@@ -1614,7 +1614,7 @@ static const ay8910_interface ay8910_interface_2 =
 	DEVCB_DEVICE_HANDLER("k007232", k005289_control_B_w)
 };
 
-static void sound_irq(running_device *device, int state)
+static void sound_irq(device_t *device, int state)
 {
 /* Interrupts _are_ generated, I wonder where they go.. */
 // nemesis_state *driver_state = device->machine->driver_data<nemesis_state>();
@@ -1631,7 +1631,7 @@ static const ym3812_interface ym3812_config =
 	sound_irq
 };
 
-static void volume_callback(running_device *device, int v)
+static void volume_callback(device_t *device, int v)
 {
 	k007232_set_volume(device, 0, (v >> 4) * 0x11, 0);
 	k007232_set_volume(device, 1, 0, (v & 0x0f) * 0x11);

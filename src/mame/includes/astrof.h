@@ -32,9 +32,9 @@ public:
 	UINT8      astrof_bosskill_playing;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *samples;	// astrof & abattle
-	running_device *sn;	// tomahawk
+	device_t *maincpu;
+	device_t *samples;	// astrof & abattle
+	device_t *sn;	// tomahawk
 };
 
 /*----------- defined in audio/astrof.c -----------*/

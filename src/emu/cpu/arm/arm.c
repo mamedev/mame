@@ -253,7 +253,7 @@ static void arm_check_irq_state(ARM_REGS* cpustate);
 
 /***************************************************************************/
 
-INLINE ARM_REGS *get_safe_token(running_device *device)
+INLINE ARM_REGS *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == ARM || device->type() == ARM_BE);

@@ -23,7 +23,7 @@ public:
 	int       bestri_tilebank;
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 };
 
 

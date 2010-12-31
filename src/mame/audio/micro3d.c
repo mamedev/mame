@@ -185,7 +185,7 @@ void micro3d_noise_sh_w(running_machine *machine, UINT8 data)
 
 	if (~data & 8)
 	{
-		running_device *device = machine->device(data & 4 ? "noise_2" : "noise_1");
+		device_t *device = machine->device(data & 4 ? "noise_2" : "noise_1");
 		noise_state *nstate = (noise_state *)downcast<legacy_device_base *>(device)->token();
 
 		if (state->dac_data != nstate->dac[data & 3])
@@ -210,7 +210,7 @@ void micro3d_noise_sh_w(running_machine *machine, UINT8 data)
 	}
 }
 
-INLINE noise_state *get_safe_token(running_device *device)
+INLINE noise_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == MICRO3D);
@@ -397,7 +397,7 @@ WRITE8_HANDLER( micro3d_sound_io_w )
 		}
 		case 0x03:
 		{
-			running_device *upd = space->machine->device("upd7759");
+			device_t *upd = space->machine->device("upd7759");
 			upd7759_set_bank_base(upd, (data & 0x4) ? 0x20000 : 0);
 			upd7759_reset_w(upd, (data & 0x10) ? 0 : 1);
 			break;

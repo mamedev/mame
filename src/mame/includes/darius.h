@@ -32,35 +32,35 @@ public:
 	UINT8      pan[DARIUS_PAN_MAX];
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *cpub;
-	running_device *adpcm;
-	running_device *tc0140syt;
-	running_device *pc080sn;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *cpub;
+	device_t *adpcm;
+	device_t *tc0140syt;
+	device_t *pc080sn;
 
-	running_device *lscreen;
-	running_device *mscreen;
-	running_device *rscreen;
+	device_t *lscreen;
+	device_t *mscreen;
+	device_t *rscreen;
 
-	running_device *filter0_0l;
-	running_device *filter0_0r;
-	running_device *filter0_1l;
-	running_device *filter0_1r;
-	running_device *filter0_2l;
-	running_device *filter0_2r;
-	running_device *filter0_3l;
-	running_device *filter0_3r;
-	running_device *filter1_0l;
-	running_device *filter1_0r;
-	running_device *filter1_1l;
-	running_device *filter1_1r;
-	running_device *filter1_2l;
-	running_device *filter1_2r;
-	running_device *filter1_3l;
-	running_device *filter1_3r;
-	running_device *msm5205_l;
-	running_device *msm5205_r;
+	device_t *filter0_0l;
+	device_t *filter0_0r;
+	device_t *filter0_1l;
+	device_t *filter0_1r;
+	device_t *filter0_2l;
+	device_t *filter0_2r;
+	device_t *filter0_3l;
+	device_t *filter0_3r;
+	device_t *filter1_0l;
+	device_t *filter1_0r;
+	device_t *filter1_1l;
+	device_t *filter1_1r;
+	device_t *filter1_2l;
+	device_t *filter1_2r;
+	device_t *filter1_3l;
+	device_t *filter1_3r;
+	device_t *msm5205_l;
+	device_t *msm5205_r;
 };
 
 

@@ -127,7 +127,7 @@ The current set of Super Model is an example of type C
 
 static VIDEO_EOF( galpanic )
 {
-	running_device *pandora = machine->device("pandora");
+	device_t *pandora = machine->device("pandora");
 	pandora_eof(pandora);
 }
 
@@ -153,7 +153,7 @@ static INTERRUPT_GEN( galhustl_interrupt )
 
 static WRITE16_HANDLER( galpanic_6295_bankswitch_w )
 {
-	running_device *pandora = space->machine->device("pandora");
+	device_t *pandora = space->machine->device("pandora");
 
 	if (ACCESSING_BITS_8_15)
 	{
@@ -179,7 +179,7 @@ static WRITE16_HANDLER( galpanica_6295_bankswitch_w )
 #ifdef UNUSED_FUNCTION
 static WRITE16_HANDLER( galpanica_misc_w )
 {
-	running_device *pandora = machine->device("pandora");
+	device_t *pandora = machine->device("pandora");
 
 	if (ACCESSING_BITS_0_7)
 	{

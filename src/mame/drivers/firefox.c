@@ -57,7 +57,7 @@ fffe=reset e7cc
 /* FXXXXX for first field
    AXXXXX for second field */
 
-static running_device *laserdisc;
+static device_t *laserdisc;
 static int m_n_disc_lock;
 static int m_n_disc_data;
 static int m_n_disc_read_data;
@@ -304,7 +304,7 @@ static READ8_DEVICE_HANDLER( riot_porta_r )
 
 static WRITE8_DEVICE_HANDLER( riot_porta_w )
 {
-	running_device *tms = device->machine->device("tms");
+	device_t *tms = device->machine->device("tms");
 
 	/* handle 5220 read */
 	tms5220_rsq_w(tms, (data>>1) & 1);
@@ -420,7 +420,7 @@ static WRITE8_HANDLER( firefox_coin_counter_w )
 
 
 
-static void firq_gen(running_device *device, int state)
+static void firq_gen(device_t *device, int state)
 {
 	if (state)
 	    cputag_set_input_line( device->machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE );

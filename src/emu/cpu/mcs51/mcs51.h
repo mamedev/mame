@@ -89,11 +89,11 @@ struct _ds5002fp_config
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-typedef void (*mcs51_serial_tx_func)(running_device *device, int data);
-typedef int (*mcs51_serial_rx_func)(running_device *device);
+typedef void (*mcs51_serial_tx_func)(device_t *device, int data);
+typedef int (*mcs51_serial_rx_func)(device_t *device);
 
-extern void i8051_set_serial_tx_callback(running_device *device, mcs51_serial_tx_func tx_func);
-extern void i8051_set_serial_rx_callback(running_device *device, mcs51_serial_rx_func rx_func);
+extern void i8051_set_serial_tx_callback(device_t *device, mcs51_serial_tx_func tx_func);
+extern void i8051_set_serial_rx_callback(device_t *device, mcs51_serial_rx_func rx_func);
 
 /* variants with no internal rom and 128 byte internal memory */
 DECLARE_LEGACY_CPU_DEVICE(I8031, i8031);

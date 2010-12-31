@@ -414,7 +414,7 @@ static void set_ea(address_space *space, int ea)
 static SOUND_START( mario )
 {
 	mario_state	*state = machine->driver_data<mario_state>();
-	running_device *audiocpu = machine->device("audiocpu");
+	device_t *audiocpu = machine->device("audiocpu");
 #if USE_8039
 	UINT8 *SND = memory_region(machine, "audiocpu");
 

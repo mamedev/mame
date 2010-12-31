@@ -457,13 +457,13 @@ static TIMER_CALLBACK( sndirq_update_callback )
 
 
 
-static void ymirq_callback_1(running_device *device, int irq)
+static void ymirq_callback_1(device_t *device, int irq)
 {
 	if (irq)
 		timer_call_after_resynch(device->machine, NULL, YM1IRQ_ASSERT, sndirq_update_callback);
 }
 
-static void ymirq_callback_2(running_device *device, int irq)
+static void ymirq_callback_2(device_t *device, int irq)
 {
 	if (irq)
 		timer_call_after_resynch(device->machine, NULL, YM2IRQ_ASSERT, sndirq_update_callback);

@@ -81,21 +81,21 @@ public:
 
 
 	/* devices */
-	running_device *maincpu;
-	running_device *soundcpu;
-	running_device *subcpu;
-	running_device *subx;
-	running_device *suby;
-	running_device *mcu;
-	running_device *ymsnd;
-	running_device *ppi8255;
-	running_device *n7751;
-	running_device *ppi8255_1;
-	running_device *ppi8255_2;
+	device_t *maincpu;
+	device_t *soundcpu;
+	device_t *subcpu;
+	device_t *subx;
+	device_t *suby;
+	device_t *mcu;
+	device_t *ymsnd;
+	device_t *ppi8255;
+	device_t *n7751;
+	device_t *ppi8255_1;
+	device_t *ppi8255_2;
 	optional_device<timer_device> interrupt_timer;
-	running_device *_315_5248_1;
-	running_device *_315_5250_1;
-	running_device *_315_5250_2;
+	device_t *_315_5248_1;
+	device_t *_315_5250_1;
+	device_t *_315_5250_2;
 };
 
 
@@ -146,5 +146,5 @@ VIDEO_UPDATE( yboard );
 /*----------- defined in machine/s16fd.c -----------*/
 
 void *fd1094_get_decrypted_base(void);
-void fd1094_machine_init(running_device *device);
+void fd1094_machine_init(device_t *device);
 void fd1094_driver_init(running_machine *machine, const char* tag, void (*set_decrypted)(running_machine *, UINT8 *));

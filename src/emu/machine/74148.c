@@ -46,7 +46,7 @@ typedef struct _ttl74148_state ttl74148_state;
 struct _ttl74148_state
 {
 	/* callback */
-	void (*output_cb)(running_device *device);
+	void (*output_cb)(device_t *device);
 
 	/* inputs */
 	int input_lines[8];	/* pins 1-4,10-13 */
@@ -64,7 +64,7 @@ struct _ttl74148_state
 };
 
 
-INLINE ttl74148_state *get_safe_token(running_device *device)
+INLINE ttl74148_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TTL74148);
@@ -72,7 +72,7 @@ INLINE ttl74148_state *get_safe_token(running_device *device)
 	return (ttl74148_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-void ttl74148_update(running_device *device)
+void ttl74148_update(device_t *device)
 {
 	ttl74148_state *state = get_safe_token(device);
 
@@ -143,35 +143,35 @@ void ttl74148_update(running_device *device)
 }
 
 
-void ttl74148_input_line_w(running_device *device, int input_line, int data)
+void ttl74148_input_line_w(device_t *device, int input_line, int data)
 {
 	ttl74148_state *state = get_safe_token(device);
 	state->input_lines[input_line] = data ? 1 : 0;
 }
 
 
-void ttl74148_enable_input_w(running_device *device, int data)
+void ttl74148_enable_input_w(device_t *device, int data)
 {
 	ttl74148_state *state = get_safe_token(device);
 	state->enable_input = data ? 1 : 0;
 }
 
 
-int ttl74148_output_r(running_device *device)
+int ttl74148_output_r(device_t *device)
 {
 	ttl74148_state *state = get_safe_token(device);
 	return state->output;
 }
 
 
-int ttl74148_output_valid_r(running_device *device)
+int ttl74148_output_valid_r(device_t *device)
 {
 	ttl74148_state *state = get_safe_token(device);
 	return state->output_valid;
 }
 
 
-int ttl74148_enable_output_r(running_device *device)
+int ttl74148_enable_output_r(device_t *device)
 {
 	ttl74148_state *state = get_safe_token(device);
 	return state->enable_output;

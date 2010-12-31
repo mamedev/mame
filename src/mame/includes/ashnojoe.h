@@ -31,7 +31,7 @@ public:
 	int         msm5205_vclk_toggle;
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 };
 
 

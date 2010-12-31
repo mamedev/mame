@@ -1386,7 +1386,7 @@ static READ8_DEVICE_HANDLER( upd7759_status_r )
 }
 
 
-static void upd7759_generate_nmi(running_device *device, int state)
+static void upd7759_generate_nmi(device_t *device, int state)
 {
 	segas1x_state *driver = device->machine->driver_data<segas1x_state>();
 

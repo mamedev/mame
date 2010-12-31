@@ -69,13 +69,13 @@ typedef struct {
 	int		rate;		/* sample rate in Hz */
 
 	double	external_capacity[8]; /* in Farads, eg 0.39e-6 = 0.36 uF (microFarads) */
-	running_device *device;
-	void (*gate_handler)(running_device *device, int state);	/* callback called when the GATE output pin changes state */
+	device_t *device;
+	void (*gate_handler)(device_t *device, int state);	/* callback called when the GATE output pin changes state */
 
 } msm5232_state;
 
 
-INLINE msm5232_state *get_safe_token(running_device *device)
+INLINE msm5232_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == MSM5232);
@@ -838,7 +838,7 @@ static DEVICE_START( msm5232 )
 	}
 }
 
-void msm5232_set_clock(running_device *device, int clock)
+void msm5232_set_clock(device_t *device, int clock)
 {
 	msm5232_state *chip = get_safe_token(device);
 

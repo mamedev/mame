@@ -32,7 +32,7 @@ public:
 	int            noise;
 
 	/* devices */
-	running_device *maincpu;
+	device_t *maincpu;
 };
 
 

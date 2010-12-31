@@ -37,9 +37,9 @@ public:
 	INT32         banknum;
 
 	/* devices */
-	running_device *audiocpu;
-	running_device *dsp;
-	running_device *tc0080vco;
+	device_t *audiocpu;
+	device_t *dsp;
+	device_t *tc0080vco;
 };
 
 

@@ -70,7 +70,7 @@ struct _astrocade_state
 };
 
 
-INLINE astrocade_state *get_safe_token(running_device *device)
+INLINE astrocade_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == ASTROCADE);
@@ -234,7 +234,7 @@ static DEVICE_RESET( astrocade )
  *
  *************************************/
 
-static void astrocade_state_save_register(astrocade_state *chip, running_device *device)
+static void astrocade_state_save_register(astrocade_state *chip, device_t *device)
 {
 	state_save_register_device_item_array(device, 0, chip->reg);
 

@@ -39,8 +39,8 @@ DECLARE_LEGACY_DEVICE(S3C2440, s3c2440);
     TYPE DEFINITIONS
 *******************************************************************************/
 
-typedef UINT32 (*s3c24xx_gpio_port_r_func)( running_device *device, int port);
-typedef void (*s3c24xx_gpio_port_w_func)( running_device *device, int port, UINT32 data);
+typedef UINT32 (*s3c24xx_gpio_port_r_func)( device_t *device, int port);
+typedef void (*s3c24xx_gpio_port_w_func)( device_t *device, int port, UINT32 data);
 
 typedef struct _s3c2440_interface_gpio s3c2440_interface_gpio;
 struct _s3c2440_interface_gpio
@@ -104,10 +104,10 @@ DEVICE_GET_INFO( s3c2440 );
 VIDEO_START( s3c2440 );
 VIDEO_UPDATE( s3c2440 );
 
-void s3c2440_uart_fifo_w( running_device *device, int uart, UINT8 data);
-void s3c2440_touch_screen( running_device *device, int state);
-void s3c2440_request_irq( running_device *device, UINT32 int_type);
-void s3c2440_request_eint( running_device *device, UINT32 number);
+void s3c2440_uart_fifo_w( device_t *device, int uart, UINT8 data);
+void s3c2440_touch_screen( device_t *device, int state);
+void s3c2440_request_irq( device_t *device, UINT32 int_type);
+void s3c2440_request_eint( device_t *device, UINT32 number);
 
 WRITE_LINE_DEVICE_HANDLER( s3c2440_pin_frnb_w );
 

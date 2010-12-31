@@ -30,8 +30,8 @@ public:
 	int       vclk_left;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *msm;
+	device_t *maincpu;
+	device_t *msm;
 };
 
 

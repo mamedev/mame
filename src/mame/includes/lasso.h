@@ -27,10 +27,10 @@ public:
 	UINT8    track_enable;	/* used by wwjgtin */
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *sn_1;
-	running_device *sn_2;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *sn_1;
+	device_t *sn_2;
 };
 
 

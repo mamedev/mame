@@ -22,8 +22,8 @@ public:
 	rectangle  clip0, clip1;
 
 	/* devices */
-	running_device *konami2;
-	running_device *k007121;
+	device_t *konami2;
+	device_t *k007121;
 };
 
 

@@ -68,7 +68,7 @@ struct _k054539_channel {
 typedef struct _k054539_state k054539_state;
 struct _k054539_state {
 	const k054539_interface *intf;
-	running_device *device;
+	device_t *device;
 	double voltab[256];
 	double pantab[0xf];
 
@@ -91,7 +91,7 @@ struct _k054539_state {
 	k054539_channel channels[8];
 };
 
-INLINE k054539_state *get_safe_token(running_device *device)
+INLINE k054539_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == K054539);
@@ -100,13 +100,13 @@ INLINE k054539_state *get_safe_token(running_device *device)
 
 //*
 
-void k054539_init_flags(running_device *device, int flags)
+void k054539_init_flags(device_t *device, int flags)
 {
 	k054539_state *info = get_safe_token(device);
 	info->k054539_flags = flags;
 }
 
-void k054539_set_gain(running_device *device, int channel, double gain)
+void k054539_set_gain(device_t *device, int channel, double gain)
 {
 	k054539_state *info = get_safe_token(device);
 	if (gain >= 0) info->k054539_gain[channel] = gain;
@@ -443,7 +443,7 @@ static TIMER_CALLBACK( k054539_irq )
 		info->intf->irq(info->device);
 }
 
-static void k054539_init_chip(running_device *device, k054539_state *info)
+static void k054539_init_chip(device_t *device, k054539_state *info)
 {
 	int i;
 

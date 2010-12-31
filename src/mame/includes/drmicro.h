@@ -23,7 +23,7 @@ public:
 	int            pcm_adr;
 
 	/* devices */
-	running_device *msm;
+	device_t *msm;
 };
 
 

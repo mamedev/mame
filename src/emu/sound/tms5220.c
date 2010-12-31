@@ -426,7 +426,7 @@ struct _tms5220_state
        TODO: add a way to set/reset this other than the FORCE_DIGITAL define
      */
 	UINT8 digital_select;
-	running_device *device;
+	device_t *device;
 
 	const tms5220_interface *intf;
 	sound_stream *stream;
@@ -438,7 +438,7 @@ struct _tms5220_state
 #include "tms5110r.c"
 
 
-INLINE tms5220_state *get_safe_token(running_device *device)
+INLINE tms5220_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == TMS5220 ||
@@ -1848,7 +1848,7 @@ READ_LINE_DEVICE_HANDLER( tms5220_readyq_r )
 
 ***********************************************************************************************/
 
-double tms5220_time_to_ready(running_device *device)
+double tms5220_time_to_ready(device_t *device)
 {
 	tms5220_state *tms = get_safe_token(device);
 	double cycles;
@@ -1913,7 +1913,7 @@ static STREAM_UPDATE( tms5220_update )
 
 ***********************************************************************************************/
 
-void tms5220_set_frequency(running_device *device, int frequency)
+void tms5220_set_frequency(device_t *device, int frequency)
 {
 	tms5220_state *tms = get_safe_token(device);
 	stream_set_sample_rate(tms->stream, frequency / 80);

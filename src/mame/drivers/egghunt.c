@@ -66,7 +66,7 @@ public:
 	UINT8     gfx_banking;
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 };
 
 

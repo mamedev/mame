@@ -44,7 +44,7 @@ public:
 	UINT8 portb;
 
 	/* devices */
-	running_device *maincpu;
+	device_t *maincpu;
 };
 
 

@@ -3874,7 +3874,7 @@ struct _discrete_source_node
 
 struct _discrete_info
 {
-	running_device *device;
+	device_t *device;
 
 	/* emulation info */
 	int					sample_rate;

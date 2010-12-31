@@ -14,7 +14,7 @@
 
 const device_type ICS2115 = ics2115_device_config::static_alloc_device_config;
 
-void ics2115_device_config::static_set_irqf(device_config *device, void (*irqf)(running_device *device, int state))
+void ics2115_device_config::static_set_irqf(device_config *device, void (*irqf)(device_t *device, int state))
 {
 	ics2115_device_config *ics2115 = downcast<ics2115_device_config *>(device);
 	ics2115->m_irq_func = irqf;

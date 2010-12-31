@@ -321,10 +321,10 @@ static WRITE8_DEVICE_HANDLER( peplus_crtc_mode_w )
 
 static TIMER_CALLBACK(assert_lp_cb)
 {
-	mc6845_assert_light_pen_input((running_device *) ptr);
+	mc6845_assert_light_pen_input((device_t *) ptr);
 }
 
-static void handle_lightpen( running_device *device )
+static void handle_lightpen( device_t *device )
 {
     int x_val = input_port_read_safe(device->machine, "TOUCH_X",0x00);
     int y_val = input_port_read_safe(device->machine, "TOUCH_Y",0x00);

@@ -102,7 +102,7 @@ VIDEO_UPDATE( ninjaw )
 	ninjaw_state *state = screen->machine->driver_data<ninjaw_state>();
 	int xoffs = 0;
 	UINT8 layer[3], nodraw;
-	running_device *tc0100scn = NULL;
+	device_t *tc0100scn = NULL;
 
 	if (screen == state->lscreen)
 	{

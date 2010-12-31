@@ -200,8 +200,8 @@ static void draw_pixel( bitmap_t* bitmap, const rectangle *cliprect, int y, int 
 
 static VIDEO_UPDATE( cybertnk )
 {
-	running_device *left_screen  = screen->machine->device("lscreen");
-	running_device *right_screen = screen->machine->device("rscreen");
+	device_t *left_screen  = screen->machine->device("lscreen");
+	device_t *right_screen = screen->machine->device("rscreen");
 	int screen_shift = 0;
 
 	if (screen==left_screen)

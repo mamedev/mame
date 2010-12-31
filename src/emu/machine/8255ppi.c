@@ -606,65 +606,65 @@ void ppi8255_device::set_mode(int data, int call_handlers)
 	m_control = data;
 }
 
-void ppi8255_set_port_a_read(running_device *device, const devcb_read8 *config)
+void ppi8255_set_port_a_read(device_t *device, const devcb_read8 *config)
 {
 	downcast<ppi8255_device*>(device)->ppi8255_set_port_read(0, config);
 }
 
-void ppi8255_set_port_b_read(running_device *device, const devcb_read8 *config)
+void ppi8255_set_port_b_read(device_t *device, const devcb_read8 *config)
 {
 	downcast<ppi8255_device*>(device)->ppi8255_set_port_read(1, config);
 }
 
-void ppi8255_set_port_c_read(running_device *device, const devcb_read8 *config)
+void ppi8255_set_port_c_read(device_t *device, const devcb_read8 *config)
 {
 	downcast<ppi8255_device*>(device)->ppi8255_set_port_read(2, config);
 }
 
 
-void ppi8255_set_port_a_write(running_device *device, const devcb_write8 *config)
+void ppi8255_set_port_a_write(device_t *device, const devcb_write8 *config)
 {
 	downcast<ppi8255_device*>(device)->ppi8255_set_port_write(0, config);
 }
 
-void ppi8255_set_port_b_write(running_device *device, const devcb_write8 *config)
+void ppi8255_set_port_b_write(device_t *device, const devcb_write8 *config)
 {
 	downcast<ppi8255_device*>(device)->ppi8255_set_port_write(1, config);
 }
 
-void ppi8255_set_port_c_write(running_device *device, const devcb_write8 *config)
+void ppi8255_set_port_c_write(device_t *device, const devcb_write8 *config)
 {
 	downcast<ppi8255_device*>(device)->ppi8255_set_port_write(2, config);
 }
 
 
-void ppi8255_set_port_a( running_device *device, UINT8 data )
+void ppi8255_set_port_a( device_t *device, UINT8 data )
 {
 	downcast<ppi8255_device*>(device)->ppi8255_set_port(0, data);
 }
 
-void ppi8255_set_port_b( running_device *device, UINT8 data )
+void ppi8255_set_port_b( device_t *device, UINT8 data )
 {
 	downcast<ppi8255_device*>(device)->ppi8255_set_port(1, data);
 }
 
-void ppi8255_set_port_c( running_device *device, UINT8 data )
+void ppi8255_set_port_c( device_t *device, UINT8 data )
 {
 	downcast<ppi8255_device*>(device)->ppi8255_set_port(2, data);
 }
 
 
-UINT8 ppi8255_get_port_a( running_device *device )
+UINT8 ppi8255_get_port_a( device_t *device )
 {
 	return downcast<ppi8255_device*>(device)->ppi8255_get_port(0);
 }
 
-UINT8 ppi8255_get_port_b( running_device *device )
+UINT8 ppi8255_get_port_b( device_t *device )
 {
 	return downcast<ppi8255_device*>(device)->ppi8255_get_port(1);
 }
 
-UINT8 ppi8255_get_port_c( running_device *device )
+UINT8 ppi8255_get_port_c( device_t *device )
 {
 	return downcast<ppi8255_device*>(device)->ppi8255_get_port(2);
 }

@@ -104,7 +104,7 @@ struct nand_t
 
 static struct nand_t nand;
 
-static UINT32 s3c2410_gpio_port_r( running_device *device, int port)
+static UINT32 s3c2410_gpio_port_r( device_t *device, int port)
 {
 	UINT32 data = bballoon_port[port];
 	switch (port)
@@ -124,7 +124,7 @@ static UINT32 s3c2410_gpio_port_r( running_device *device, int port)
 	return data;
 }
 
-static void s3c2410_gpio_port_w( running_device *device, int port, UINT32 data)
+static void s3c2410_gpio_port_w( device_t *device, int port, UINT32 data)
 {
 	UINT32 old_value = bballoon_port[port];
 	bballoon_port[port] = data;
@@ -155,7 +155,7 @@ static void s3c2410_gpio_port_w( running_device *device, int port, UINT32 data)
 
 static WRITE8_DEVICE_HANDLER( s3c2410_nand_command_w )
 {
-//  running_device *nand = device->machine->device( "nand");
+//  device_t *nand = device->machine->device( "nand");
 	logerror( "s3c2410_nand_command_w %02X\n", data);
 	switch (data)
 	{
@@ -177,7 +177,7 @@ static WRITE8_DEVICE_HANDLER( s3c2410_nand_command_w )
 
 static WRITE8_DEVICE_HANDLER( s3c2410_nand_address_w )
 {
-//  running_device *nand = device->machine->device( "nand");
+//  device_t *nand = device->machine->device( "nand");
 	logerror( "s3c2410_nand_address_w %02X\n", data);
 	switch (nand.mode)
 	{
@@ -209,7 +209,7 @@ static WRITE8_DEVICE_HANDLER( s3c2410_nand_address_w )
 
 static READ8_DEVICE_HANDLER( s3c2410_nand_data_r )
 {
-//  running_device *nand = device->machine->device( "nand");
+//  device_t *nand = device->machine->device( "nand");
 	UINT8 data = 0;
 	switch (nand.mode)
 	{
@@ -254,20 +254,20 @@ static READ8_DEVICE_HANDLER( s3c2410_nand_data_r )
 
 static WRITE8_DEVICE_HANDLER( s3c2410_nand_data_w )
 {
-//  running_device *nand = device->machine->device( "nand");
+//  device_t *nand = device->machine->device( "nand");
 	logerror( "s3c2410_nand_data_w %02X\n", data);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( s3c2410_i2c_scl_w )
 {
-	running_device *i2cmem = device->machine->device( "i2cmem");
+	device_t *i2cmem = device->machine->device( "i2cmem");
 //  logerror( "s3c2410_i2c_scl_w %d\n", state ? 1 : 0);
 	i2cmem_scl_write( i2cmem, state);
 }
 
 static READ_LINE_DEVICE_HANDLER( s3c2410_i2c_sda_r )
 {
-	running_device *i2cmem = device->machine->device( "i2cmem");
+	device_t *i2cmem = device->machine->device( "i2cmem");
 	int state;
 	state = i2cmem_sda_read( i2cmem);
 //  logerror( "s3c2410_i2c_sda_r %d\n", state ? 1 : 0);
@@ -276,7 +276,7 @@ static READ_LINE_DEVICE_HANDLER( s3c2410_i2c_sda_r )
 
 static WRITE_LINE_DEVICE_HANDLER( s3c2410_i2c_sda_w )
 {
-	running_device *i2cmem = device->machine->device( "i2cmem");
+	device_t *i2cmem = device->machine->device( "i2cmem");
 //  logerror( "s3c2410_i2c_sda_w %d\n", state ? 1 : 0);
 	i2cmem_sda_write( i2cmem, state);
 }
@@ -391,7 +391,7 @@ static const i2cmem_interface i2cmem_interface =
 };
 
 
-running_device* s3c2410;
+device_t* s3c2410;
 
 static READ32_HANDLER( bballoon_speedup_r )
 {

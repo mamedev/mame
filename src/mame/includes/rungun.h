@@ -25,13 +25,13 @@ public:
 	int         sound_status;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *k054539_1;
-	running_device *k054539_2;
-	running_device *k053936;
-	running_device *k055673;
-	running_device *k053252;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *k054539_1;
+	device_t *k054539_2;
+	device_t *k053936;
+	device_t *k055673;
+	device_t *k053252;
 };
 
 

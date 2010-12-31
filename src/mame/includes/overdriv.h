@@ -20,15 +20,15 @@ public:
 	UINT16     cpuB_ctrl;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *subcpu;
-	running_device *audiocpu;
-	running_device *k053260_1;
-	running_device *k053260_2;
-	running_device *k051316_1;
-	running_device *k051316_2;
-	running_device *k053246;
-	running_device *k053251;
+	device_t *maincpu;
+	device_t *subcpu;
+	device_t *audiocpu;
+	device_t *k053260_1;
+	device_t *k053260_2;
+	device_t *k051316_1;
+	device_t *k051316_2;
+	device_t *k053246;
+	device_t *k053251;
 };
 
 /*----------- defined in video/overdriv.c -----------*/

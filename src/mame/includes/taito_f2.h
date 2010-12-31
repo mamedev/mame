@@ -66,16 +66,16 @@ public:
 	INT32           oki_bank;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
+	device_t *maincpu;
+	device_t *audiocpu;
 	optional_device<okim6295_device> oki;
-	running_device *tc0100scn;
-	running_device *tc0100scn_1;
-	running_device *tc0100scn_2;
-	running_device *tc0360pri;
-	running_device *tc0280grd;
-	running_device *tc0430grw;
-	running_device *tc0480scp;
+	device_t *tc0100scn;
+	device_t *tc0100scn_1;
+	device_t *tc0100scn_2;
+	device_t *tc0360pri;
+	device_t *tc0280grd;
+	device_t *tc0430grw;
+	device_t *tc0480scp;
 };
 
 /*----------- defined in video/taito_f2.c -----------*/

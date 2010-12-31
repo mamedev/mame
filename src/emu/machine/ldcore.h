@@ -121,7 +121,7 @@ struct _ldplayer_state
 typedef struct _laserdisc_state laserdisc_state;
 struct _laserdisc_state
 {
-	running_device *		device;					/* pointer to owning device */
+	device_t *		device;					/* pointer to owning device */
 	screen_device *	screen;					/* pointer to the screen device */
 	ldcore_data *			core;					/* private core data */
 	ldplayer_data *			player;					/* private player data */
@@ -184,7 +184,7 @@ extern const ldplayer_interface vp932_interface;
 /* ----- player interface ----- */
 
 /* return a token with type checking from a device */
-laserdisc_state *ldcore_get_safe_token(running_device *device);
+laserdisc_state *ldcore_get_safe_token(device_t *device);
 
 /* set the left/right audio squelch states */
 void ldcore_set_audio_squelch(laserdisc_state *ld, UINT8 squelchleft, UINT8 squelchright);

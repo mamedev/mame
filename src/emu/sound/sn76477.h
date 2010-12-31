@@ -86,44 +86,44 @@ struct _sn76477_interface
  *****************************************************************************/
 
 /* these functions take 0 or 1 as a logic input */
-void sn76477_enable_w(running_device *device, UINT32 data);		/* active LO, 0 = enabled, 1 = disabled */
-void sn76477_mixer_a_w(running_device *device, UINT32 data);
-void sn76477_mixer_b_w(running_device *device, UINT32 data);
-void sn76477_mixer_c_w(running_device *device, UINT32 data);
-void sn76477_envelope_1_w(running_device *device, UINT32 data);
-void sn76477_envelope_2_w(running_device *device, UINT32 data);
-void sn76477_vco_w(running_device *device, UINT32 data);			/* 0 = external, 1 = controlled by SLF */
-void sn76477_noise_clock_w(running_device *device, UINT32 data);  /* noise clock write, if noise_clock_res = 0 */
+void sn76477_enable_w(device_t *device, UINT32 data);		/* active LO, 0 = enabled, 1 = disabled */
+void sn76477_mixer_a_w(device_t *device, UINT32 data);
+void sn76477_mixer_b_w(device_t *device, UINT32 data);
+void sn76477_mixer_c_w(device_t *device, UINT32 data);
+void sn76477_envelope_1_w(device_t *device, UINT32 data);
+void sn76477_envelope_2_w(device_t *device, UINT32 data);
+void sn76477_vco_w(device_t *device, UINT32 data);			/* 0 = external, 1 = controlled by SLF */
+void sn76477_noise_clock_w(device_t *device, UINT32 data);  /* noise clock write, if noise_clock_res = 0 */
 
 /* these functions take a resistor value in Ohms */
-void sn76477_one_shot_res_w(running_device *device, double data);
-void sn76477_slf_res_w(running_device *device, double data);
-void sn76477_vco_res_w(running_device *device, double data);
-void sn76477_noise_clock_res_w(running_device *device, double data);  /* = 0 if the noise gen is clocked via noise_clock */
-void sn76477_noise_filter_res_w(running_device *device, double data);
-void sn76477_decay_res_w(running_device *device, double data);
-void sn76477_attack_res_w(running_device *device, double data);
-void sn76477_amplitude_res_w(running_device *device, double data);
-void sn76477_feedback_res_w(running_device *device, double data);
+void sn76477_one_shot_res_w(device_t *device, double data);
+void sn76477_slf_res_w(device_t *device, double data);
+void sn76477_vco_res_w(device_t *device, double data);
+void sn76477_noise_clock_res_w(device_t *device, double data);  /* = 0 if the noise gen is clocked via noise_clock */
+void sn76477_noise_filter_res_w(device_t *device, double data);
+void sn76477_decay_res_w(device_t *device, double data);
+void sn76477_attack_res_w(device_t *device, double data);
+void sn76477_amplitude_res_w(device_t *device, double data);
+void sn76477_feedback_res_w(device_t *device, double data);
 
 /* these functions take a capacitor value in Farads or the voltage on it in Volts */
 #define SN76477_EXTERNAL_VOLTAGE_DISCONNECT   (-1.0)	/* indicates that the voltage is internally computed,
                                                            can be used in all the functions that take a
                                                            voltage on a capacitor */
-void sn76477_one_shot_cap_w(running_device *device, double data);
-void sn76477_one_shot_cap_voltage_w(running_device *device, double data);
-void sn76477_slf_cap_w(running_device *device, double data);
-void sn76477_slf_cap_voltage_w(running_device *device, double data);
-void sn76477_vco_cap_w(running_device *device, double data);
-void sn76477_vco_cap_voltage_w(running_device *device, double data);
-void sn76477_noise_filter_cap_w(running_device *device, double data);
-void sn76477_noise_filter_cap_voltage_w(running_device *device, double data);
-void sn76477_attack_decay_cap_w(running_device *device, double data);
-void sn76477_attack_decay_cap_voltage_w(running_device *device, double data);
+void sn76477_one_shot_cap_w(device_t *device, double data);
+void sn76477_one_shot_cap_voltage_w(device_t *device, double data);
+void sn76477_slf_cap_w(device_t *device, double data);
+void sn76477_slf_cap_voltage_w(device_t *device, double data);
+void sn76477_vco_cap_w(device_t *device, double data);
+void sn76477_vco_cap_voltage_w(device_t *device, double data);
+void sn76477_noise_filter_cap_w(device_t *device, double data);
+void sn76477_noise_filter_cap_voltage_w(device_t *device, double data);
+void sn76477_attack_decay_cap_w(device_t *device, double data);
+void sn76477_attack_decay_cap_voltage_w(device_t *device, double data);
 
 /* these functions take a voltage value in Volts */
-void sn76477_vco_voltage_w(running_device *device, double data);
-void sn76477_pitch_voltage_w(running_device *device, double data);
+void sn76477_vco_voltage_w(device_t *device, double data);
+void sn76477_pitch_voltage_w(device_t *device, double data);
 
 DECLARE_LEGACY_SOUND_DEVICE(SN76477, sn76477);
 

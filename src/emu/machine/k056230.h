@@ -92,7 +92,7 @@ private:
 	UINT32 *m_ram;
 	int		m_is_thunderh;
 
-	running_device *m_cpu;
+	device_t *m_cpu;
 
     const k056230_device_config &m_config;
 };

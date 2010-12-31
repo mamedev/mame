@@ -414,7 +414,7 @@ static ADDRESS_MAP_START( e132_16k_iram_map, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 
-INLINE hyperstone_state *get_safe_token(running_device *device)
+INLINE hyperstone_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == E116T ||

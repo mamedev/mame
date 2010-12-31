@@ -30,8 +30,8 @@ public:
 	UINT16          io_reg[8];
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
+	device_t *maincpu;
+	device_t *audiocpu;
 };
 
 

@@ -194,7 +194,7 @@ static const UINT32 banks[4] = { 0, 0x40000/2, 0x20000/2, 0x60000/2 };
 
 static struct
 {
-	running_device *duart68681;
+	device_t *duart68681;
 } maygayv1_devices;
 
 #define DRAM_BANK_SEL		(banks[(VREG(DSBA) >> 7) & 3])
@@ -894,7 +894,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static void duart_irq_handler(running_device *device, UINT8 vector)
+static void duart_irq_handler(device_t *device, UINT8 vector)
 {
 	cputag_set_input_line_and_vector(device->machine, "maincpu", 5, ASSERT_LINE, vector);
 //  cputag_set_input_line(device->machine, "maincpu", 5, state ? ASSERT_LINE : CLEAR_LINE);
@@ -902,7 +902,7 @@ static void duart_irq_handler(running_device *device, UINT8 vector)
 
 static int d68681_val;
 
-static void duart_tx(running_device *device, int channel, UINT8 data)
+static void duart_tx(device_t *device, int channel, UINT8 data)
 {
 	if (channel == 0)
 	{
@@ -921,12 +921,12 @@ static const duart68681_config maygayv1_duart68681_config =
 };
 
 
-static int data_to_i8031(running_device *device)
+static int data_to_i8031(device_t *device)
 {
 	return d68681_val;
 }
 
-static void data_from_i8031(running_device *device, int data)
+static void data_from_i8031(device_t *device, int data)
 {
 	duart68681_rx_data(maygayv1_devices.duart68681, 0, data);
 }

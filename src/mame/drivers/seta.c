@@ -1326,7 +1326,7 @@ Note: on screen copyright is (c)1998 Coinmaster.
 /*------------------------------
     update timer
 ------------------------------*/
-static void uPD71054_update_timer( running_machine *machine, running_device *cpu, int no )
+static void uPD71054_update_timer( running_machine *machine, device_t *cpu, int no )
 {
 	seta_state *state = machine->driver_data<seta_state>();
 	uPD71054_state *uPD71054 = &state->uPD71054;
@@ -1435,7 +1435,7 @@ static const x1_010_interface seta_sound_intf2 =
 	0x1000,		/* address */
 };
 
-static void utoukond_ym3438_interrupt(running_device *device, int linestate)
+static void utoukond_ym3438_interrupt(device_t *device, int linestate)
 {
 	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, linestate);
 }

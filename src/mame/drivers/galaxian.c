@@ -611,7 +611,7 @@ static READ8_DEVICE_HANDLER( konami_sound_timer_r )
 
 static WRITE8_HANDLER( konami_sound_filter_w )
 {
-	running_device *discrete = space->machine->device("konami");
+	device_t *discrete = space->machine->device("konami");
 	static const char *const ayname[2] = { "8910.0", "8910.1" };
 	int which, chan;
 
@@ -991,7 +991,7 @@ static WRITE8_DEVICE_HANDLER( scorpion_protection_w )
 
 static READ8_HANDLER( scorpion_digitalker_intr_r )
 {
-	running_device *digitalker = space->machine->device("digitalker");
+	device_t *digitalker = space->machine->device("digitalker");
 	return digitalker_0_intr_r(digitalker);
 }
 

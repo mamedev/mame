@@ -25,7 +25,7 @@ public:
 	rectangle tilemap_clip;
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 };
 
 

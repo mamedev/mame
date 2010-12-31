@@ -154,13 +154,13 @@ GFXDECODE_END
 
 /*****************************************************************************/
 
-static void irqhandler(running_device *device, int linestate)
+static void irqhandler(device_t *device, int linestate)
 {
 //  hcastle_state *state = device->machine->driver_data<hcastle_state>();
 //  cputag_set_input_line(state->audiocpu, 0, linestate);
 }
 
-static void volume_callback(running_device *device, int v)
+static void volume_callback(device_t *device, int v)
 {
 	k007232_set_volume(device, 0, (v >> 4) * 0x11, 0);
 	k007232_set_volume(device, 1, 0, (v & 0x0f) * 0x11);

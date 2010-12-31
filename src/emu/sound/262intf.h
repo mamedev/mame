@@ -9,7 +9,7 @@
 typedef struct _ymf262_interface ymf262_interface;
 struct _ymf262_interface
 {
-	void (*handler)(running_device *device, int irq);
+	void (*handler)(device_t *device, int irq);
 };
 
 

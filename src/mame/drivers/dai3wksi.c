@@ -197,7 +197,7 @@ static VIDEO_UPDATE( dai3wksi )
 static WRITE8_HANDLER( dai3wksi_audio_1_w )
 {
 	dai3wksi_state *state = space->machine->driver_data<dai3wksi_state>();
-	running_device *samples = space->machine->device("samples");
+	device_t *samples = space->machine->device("samples");
 	UINT8 rising_bits = data & ~state->port_last1;
 
 	state->enabled_sound = data & 0x80;
@@ -218,7 +218,7 @@ static WRITE8_HANDLER( dai3wksi_audio_1_w )
 static WRITE8_HANDLER( dai3wksi_audio_2_w )
 {
 	dai3wksi_state *state = space->machine->driver_data<dai3wksi_state>();
-	running_device *samples = space->machine->device("samples");
+	device_t *samples = space->machine->device("samples");
 	UINT8 rising_bits = data & ~state->port_last2;
 
 	state->dai3wksi_flipscreen = data & 0x10;
@@ -247,7 +247,7 @@ static WRITE8_HANDLER( dai3wksi_audio_2_w )
 static WRITE8_HANDLER( dai3wksi_audio_3_w )
 {
 	dai3wksi_state *state = space->machine->driver_data<dai3wksi_state>();
-	running_device *samples = space->machine->device("samples");
+	device_t *samples = space->machine->device("samples");
 
 	if (state->enabled_sound)
 	{
@@ -284,7 +284,7 @@ static const samples_interface dai3wksi_samples_interface =
 
 static WRITE8_HANDLER( dai3wksi_audio_1_w )
 {
-	running_device *ic79 = space->machine->device("ic79");
+	device_t *ic79 = space->machine->device("ic79");
 
 	sound_global_enable(space->machine, data & 0x80);
 
@@ -296,9 +296,9 @@ static WRITE8_HANDLER( dai3wksi_audio_2_w )
 {
 	
 	dai3wksi_state *state = space->machine->driver_data<dai3wksi_state>();
-	running_device *ic77 = space->machine->device("ic77");
-	running_device *ic78 = space->machine->device("ic78");
-	running_device *ic80 = space->machine->device("ic80");
+	device_t *ic77 = space->machine->device("ic77");
+	device_t *ic78 = space->machine->device("ic78");
+	device_t *ic80 = space->machine->device("ic80");
 
 	state->dai3wksi_flipscreen =  data & 0x10;
 	state->dai3wksi_redscreen  = ~data & 0x20;
@@ -312,7 +312,7 @@ static WRITE8_HANDLER( dai3wksi_audio_2_w )
 
 static WRITE8_HANDLER( dai3wksi_audio_3_w )
 {
-	running_device *ic81 = space->machine->device("ic81");
+	device_t *ic81 = space->machine->device("ic81");
 
 	sn76477_enable_w(ic81, (~data >> 2) & 0x01);	/* player shoot enable */
 	sn76477_vco_w(ic81, (~data >> 3) & 0x01);		/* player shoot vco control */

@@ -38,10 +38,10 @@ public:
 	int      ic43_a, ic43_b;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *mcu;
-	running_device *audiocpu;
-	running_device *slave;
+	device_t *maincpu;
+	device_t *mcu;
+	device_t *audiocpu;
+	device_t *slave;
 };
 
 

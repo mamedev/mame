@@ -755,7 +755,7 @@ static INTERRUPT_GEN( karnov_interrupt )
 	cpu_set_input_line(device, 7, HOLD_LINE);	/* VBL */
 }
 
-static void sound_irq( running_device *device, int linestate )
+static void sound_irq( device_t *device, int linestate )
 {
 	karnov_state *state = device->machine->driver_data<karnov_state>();
 	cpu_set_input_line(state->audiocpu, 0, linestate); /* IRQ */

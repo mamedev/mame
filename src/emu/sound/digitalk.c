@@ -240,7 +240,7 @@ complete set of waveforms is repeated R times.
 
 typedef struct {
 	const UINT8 *rom;
-	running_device *device;
+	device_t *device;
 	sound_stream *stream;
 
 	// Port/lines state
@@ -285,7 +285,7 @@ static const int pitch_vals[32] = {
 };
 
 
-INLINE digitalker *get_safe_token(running_device *device)
+INLINE digitalker *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == DIGITALKER);
@@ -675,25 +675,25 @@ DEVICE_GET_INFO(digitalker)
 	}
 }
 
-void digitalker_0_cs_w(running_device *device, int line)
+void digitalker_0_cs_w(device_t *device, int line)
 {
 	digitalker *dg = get_safe_token(device);
 	digitalker_cs_w(dg, line);
 }
 
-void digitalker_0_cms_w(running_device *device, int line)
+void digitalker_0_cms_w(device_t *device, int line)
 {
 	digitalker *dg = get_safe_token(device);
 	digitalker_cms_w(dg, line);
 }
 
-void digitalker_0_wr_w(running_device *device, int line)
+void digitalker_0_wr_w(device_t *device, int line)
 {
 	digitalker *dg = get_safe_token(device);
 	digitalker_wr_w(dg, line);
 }
 
-int digitalker_0_intr_r(running_device *device)
+int digitalker_0_intr_r(device_t *device)
 {
 	digitalker *dg = get_safe_token(device);
 	return digitalker_intr_r(dg);

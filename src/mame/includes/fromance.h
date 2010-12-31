@@ -40,7 +40,7 @@ public:
 	UINT8    pending_command, sound_command;
 
 	/* devices */
-	running_device *subcpu;
+	device_t *subcpu;
 };
 
 

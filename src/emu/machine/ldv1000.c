@@ -55,8 +55,8 @@
 struct _ldplayer_data
 {
 	/* low-level emulation data */
-	running_device *cpu;					/* CPU index of the Z80 */
-	running_device *ctc;					/* CTC device */
+	device_t *cpu;					/* CPU index of the Z80 */
+	device_t *ctc;					/* CTC device */
 	timer_device *		multitimer;			/* multi-jump timer device */
 
 	/* communication status */
@@ -98,7 +98,7 @@ static TIMER_CALLBACK( vsync_off );
 static TIMER_CALLBACK( vbi_data_fetch );
 static TIMER_DEVICE_CALLBACK( multijump_timer );
 
-static void ctc_interrupt(running_device *device, int state);
+static void ctc_interrupt(device_t *device, int state);
 
 static WRITE8_HANDLER( decoder_display_port_w );
 static READ8_HANDLER( decoder_display_port_r );

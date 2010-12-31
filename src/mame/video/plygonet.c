@@ -126,7 +126,7 @@ VIDEO_START( polygonet )
 VIDEO_UPDATE( polygonet )
 {
 	polygonet_state *state = screen->machine->driver_data<polygonet_state>();
-	running_device *k053936 = screen->machine->device("k053936");
+	device_t *k053936 = screen->machine->device("k053936");
 	bitmap_fill(screen->machine->priority_bitmap, NULL, 0);
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 

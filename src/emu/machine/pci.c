@@ -78,9 +78,9 @@
 typedef struct _pci_bus_state pci_bus_state;
 struct _pci_bus_state
 {
-	running_device *	busdevice;
+	device_t *	busdevice;
 	const pci_bus_config *	config;
-	running_device *	device[32];
+	device_t *	device[32];
 	pci_bus_state *		siblings[8];
 	UINT8				siblings_busnum[8];
 	int					siblings_count;
@@ -101,7 +101,7 @@ struct _pci_bus_state
     in device is, in fact, a PCI bus
 -------------------------------------------------*/
 
-INLINE pci_bus_state *get_safe_token(running_device *device)
+INLINE pci_bus_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == PCI_BUS);
@@ -224,8 +224,8 @@ WRITE64_DEVICE_HANDLER(pci_64be_w) { write64be_with_32le_device_handler(pci_32le
 
 int pci_add_sibling( running_machine *machine, char *pcitag, char *sibling )
 {
-	running_device *device1 = machine->device(pcitag);
-	running_device *device2 = machine->device(sibling);
+	device_t *device1 = machine->device(pcitag);
+	device_t *device2 = machine->device(sibling);
 	pci_bus_state *pcibus1 = get_safe_token(device1);
 	pci_bus_state *pcibus2 = get_safe_token(device2);
 	pci_bus_config *config2;

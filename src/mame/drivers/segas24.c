@@ -935,7 +935,7 @@ static INTERRUPT_GEN(irq_vbl)
 	}
 }
 
-static void irq_ym(running_device *device, int irq)
+static void irq_ym(device_t *device, int irq)
 {
 	irq_yms = irq;
 	cputag_set_input_line(device->machine, "maincpu", IRQ_YM2151+1, irq_yms && (irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);

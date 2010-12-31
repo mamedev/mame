@@ -63,7 +63,7 @@ struct _amiga_audio
 };
 
 
-INLINE amiga_audio *get_safe_token( running_device *device )
+INLINE amiga_audio *get_safe_token( device_t *device )
 {
         assert(device != NULL);
         assert(device->type() == AMIGA);
@@ -99,7 +99,7 @@ static void dma_reload(amiga_state *state, audio_channel *chan)
  *
  *************************************/
 
-void amiga_audio_data_w(running_device *device, int which, UINT16 data)
+void amiga_audio_data_w(device_t *device, int which, UINT16 data)
 {
 	amiga_audio *audio_state = get_safe_token(device);
 
@@ -114,7 +114,7 @@ void amiga_audio_data_w(running_device *device, int which, UINT16 data)
  *
  *************************************/
 
-void amiga_audio_update(running_device *device)
+void amiga_audio_update(device_t *device)
 {
 	amiga_audio *audio_state = get_safe_token(device);
 

@@ -309,8 +309,8 @@ static READ8_DEVICE_HANDLER( demoneye_ay8910_latch_2_r )
 
 static WRITE8_DEVICE_HANDLER( demoneye_ay8910_data_w )
 {
-	running_device *ay1 = device->machine->device("ay1");
-	running_device *ay2 = device->machine->device("ay2");
+	device_t *ay1 = device->machine->device("ay1");
+	device_t *ay2 = device->machine->device("ay2");
 
 	switch (ay8910_latch_1 & 0x03)
 	{

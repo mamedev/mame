@@ -56,7 +56,7 @@ struct _sm8500_state
 	UINT8 register_ram[0x108];
 };
 
-INLINE sm8500_state *get_safe_token(running_device *device)
+INLINE sm8500_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SM8500);

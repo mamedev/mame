@@ -101,7 +101,7 @@ VIDEO_EOF( sprint4 )
 
 	/* check for sprite-playfield collisions */
 
-	running_device *discrete = machine->device("discrete");
+	device_t *discrete = machine->device("discrete");
 
 	for (i = 0; i < 4; i++)
 	{

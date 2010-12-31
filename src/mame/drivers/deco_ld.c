@@ -118,7 +118,7 @@ public:
 
 
 static UINT8 vram_bank;
-static running_device *laserdisc;
+static device_t *laserdisc;
 static UINT8 laserdisc_data;
 
 static VIDEO_UPDATE( rblaster )

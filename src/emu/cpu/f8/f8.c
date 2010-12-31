@@ -62,7 +62,7 @@ struct _f8_Regs
 	int     irq_request;
 };
 
-INLINE f8_Regs *get_safe_token(running_device *device)
+INLINE f8_Regs *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == F8);

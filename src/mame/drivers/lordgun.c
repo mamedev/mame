@@ -144,7 +144,7 @@ static WRITE8_DEVICE_HANDLER(fake2_w)
 
 static WRITE8_DEVICE_HANDLER( lordgun_eeprom_w )
 {
-	running_device *eeprom = device->machine->device("eeprom");
+	device_t *eeprom = device->machine->device("eeprom");
 	static UINT8 old;
 	int i;
 
@@ -177,7 +177,7 @@ static WRITE8_DEVICE_HANDLER( lordgun_eeprom_w )
 
 static WRITE8_DEVICE_HANDLER( aliencha_eeprom_w )
 {
-	running_device *eeprom = device->machine->device("eeprom");
+	device_t *eeprom = device->machine->device("eeprom");
 
 	if (~data & ~0xf8)
 	{
@@ -640,7 +640,7 @@ static const ppi8255_interface aliencha_ppi8255_intf[2] =
 	}
 };
 
-static void soundirq(running_device *device, int state)
+static void soundirq(device_t *device, int state)
 {
 	cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_IRQ0, state);
 }

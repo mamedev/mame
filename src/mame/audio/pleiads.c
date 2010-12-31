@@ -42,7 +42,7 @@ struct n_state
 typedef struct _pleiads_sound_state pleiads_sound_state;
 struct _pleiads_sound_state
 {
-	running_device *tms;
+	device_t *tms;
 	sound_stream *channel;
 
 	int sound_latch_a;
@@ -71,7 +71,7 @@ struct _pleiads_sound_state
 	int opamp_resistor;
 };
 
-INLINE pleiads_sound_state *get_safe_token(running_device *device)
+INLINE pleiads_sound_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == PLEIADS || device->type() == POPFLAME || device->type() == NAUGHTYB);

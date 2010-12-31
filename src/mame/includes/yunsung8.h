@@ -24,7 +24,7 @@ public:
 	int         toggle;
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 };
 
 

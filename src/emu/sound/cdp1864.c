@@ -73,14 +73,14 @@ struct _cdp1864_t
 	emu_timer *efx_timer;			/* EFx timer */
 	emu_timer *dma_timer;			/* DMA timer */
 
-	running_device *cpu;
+	device_t *cpu;
 };
 
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE cdp1864_t *get_safe_token(running_device *device)
+INLINE cdp1864_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	return (cdp1864_t *)downcast<legacy_device_base *>(device)->token();
@@ -96,7 +96,7 @@ INLINE cdp1864_t *get_safe_token(running_device *device)
 
 static TIMER_CALLBACK( cdp1864_int_tick )
 {
-	running_device *device = (running_device *) ptr;
+	device_t *device = (device_t *) ptr;
 	cdp1864_t *cdp1864 = get_safe_token(device);
 
 	int scanline = cdp1864->screen->vpos();
@@ -127,7 +127,7 @@ static TIMER_CALLBACK( cdp1864_int_tick )
 
 static TIMER_CALLBACK( cdp1864_efx_tick )
 {
-	running_device *device = (running_device *) ptr;
+	device_t *device = (device_t *) ptr;
 	cdp1864_t *cdp1864 = get_safe_token(device);
 
 	int scanline = cdp1864->screen->vpos();
@@ -162,7 +162,7 @@ static TIMER_CALLBACK( cdp1864_efx_tick )
 
 static TIMER_CALLBACK( cdp1864_dma_tick )
 {
-	running_device *device = (running_device *) ptr;
+	device_t *device = (device_t *) ptr;
 	cdp1864_t *cdp1864 = get_safe_token(device);
 
 	int scanline = cdp1864->screen->vpos();
@@ -201,7 +201,7 @@ static TIMER_CALLBACK( cdp1864_dma_tick )
     cdp1864_init_palette - initialize palette
 -------------------------------------------------*/
 
-static void cdp1864_init_palette(running_device *device, const cdp1864_interface *intf)
+static void cdp1864_init_palette(device_t *device, const cdp1864_interface *intf)
 {
 	int i;
 
@@ -400,7 +400,7 @@ static STREAM_UPDATE( cdp1864_stream_update )
     cdp1864_update - update screen
 -------------------------------------------------*/
 
-void cdp1864_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
+void cdp1864_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	cdp1864_t *cdp1864 = get_safe_token(device);
 

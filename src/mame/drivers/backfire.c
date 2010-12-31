@@ -42,11 +42,11 @@ public:
 	bitmap_t  *right;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *deco16ic;
-	running_device *lscreen;
-	running_device *rscreen;
-	running_device *eeprom;
+	device_t *maincpu;
+	device_t *deco16ic;
+	device_t *lscreen;
+	device_t *rscreen;
+	device_t *eeprom;
 };
 
 //UINT32 *backfire_180010, *backfire_188010;
@@ -427,7 +427,7 @@ static GFXDECODE_START( backfire )
 GFXDECODE_END
 
 
-static void sound_irq_gen(running_device *device, int state)
+static void sound_irq_gen(device_t *device, int state)
 {
 	logerror("sound irq\n");
 }

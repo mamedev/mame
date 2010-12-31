@@ -116,8 +116,8 @@ typedef struct
 	int irq_line;
 
 	UINT8 port_A, port_B, port_C;
-	void (*irq_callback)(running_device *, int);
-	running_device *device;
+	void (*irq_callback)(device_t *, int);
+	device_t *device;
 
 	const UINT8 *rom;
 	int clock;
@@ -129,7 +129,7 @@ typedef struct
 	sound_stream * stream;
 } YMF278BChip;
 
-INLINE YMF278BChip *get_safe_token(running_device *device)
+INLINE YMF278BChip *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == YMF278B);
@@ -663,7 +663,7 @@ WRITE8_DEVICE_HANDLER( ymf278b_w )
 	}
 }
 
-static void ymf278b_init(running_device *device, YMF278BChip *chip, void (*cb)(running_device *, int))
+static void ymf278b_init(device_t *device, YMF278BChip *chip, void (*cb)(device_t *, int))
 {
 	chip->rom = *device->region();
 	chip->irq_callback = cb;
@@ -673,7 +673,7 @@ static void ymf278b_init(running_device *device, YMF278BChip *chip, void (*cb)(r
 	chip->clock = device->clock();
 }
 
-static void ymf278b_register_save_state(running_device *device, YMF278BChip *chip)
+static void ymf278b_register_save_state(device_t *device, YMF278BChip *chip)
 {
 	int i;
 

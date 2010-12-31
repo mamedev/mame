@@ -1597,12 +1597,12 @@ GFXDECODE_END
 
 /**********************************************************************************/
 
-static void sound_irq(running_device *device, int state)
+static void sound_irq(device_t *device, int state)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 1, state); /* IRQ 2 */
 }
 
-static void sound_irq_nslasher(running_device *device, int state)
+static void sound_irq_nslasher(device_t *device, int state)
 {
 	/* bit 0 of nslasher_sound_irq specifies IRQ from sound chip */
 	if (state)

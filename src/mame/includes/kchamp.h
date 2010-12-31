@@ -27,7 +27,7 @@ public:
 	int        counter;
 
 	/* devices */
-	running_device *audiocpu;
+	device_t *audiocpu;
 };
 
 

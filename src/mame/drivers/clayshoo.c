@@ -99,7 +99,7 @@ static TIMER_CALLBACK( reset_analog_bit )
 }
 
 
-static attotime compute_duration( running_device *device, int analog_pos )
+static attotime compute_duration( device_t *device, int analog_pos )
 {
 	/* the 58 comes from the length of the loop used to
        read the analog position */

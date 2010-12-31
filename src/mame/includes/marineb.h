@@ -16,8 +16,8 @@ public:
 	UINT8     marineb_active_low_flipscreen;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
+	device_t *maincpu;
+	device_t *audiocpu;
 };
 
 

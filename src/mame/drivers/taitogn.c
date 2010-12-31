@@ -601,7 +601,7 @@ static WRITE32_HANDLER(control_w)
 	// selection too, but they're always 0.
 
 	UINT32 p = state->control;
-	running_device *mb3773 = space->machine->device("mb3773");
+	device_t *mb3773 = space->machine->device("mb3773");
 
 	COMBINE_DATA(&state->control);
 
@@ -958,7 +958,7 @@ static ADDRESS_MAP_START( zn_map, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 
-static void psx_spu_irq(running_device *device, UINT32 data)
+static void psx_spu_irq(device_t *device, UINT32 data)
 {
 	psx_irq_set(device->machine, data);
 }

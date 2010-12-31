@@ -105,7 +105,7 @@ struct _ldcore_data
 	UINT32				audiobufout;			/* output index */
 	UINT32				audiocursamples;		/* current samples this track */
 	UINT32				audiomaxsamples;		/* maximum samples per track */
-	running_device *audiocustom;			/* custom sound device */
+	device_t *audiocustom;			/* custom sound device */
 
 	/* metadata */
 	vbi_metadata		metadata[2];			/* metadata parsed from the stream, for each field */
@@ -144,7 +144,7 @@ struct _sound_token
 /* generic helper functions */
 static TIMER_CALLBACK( perform_player_update );
 static void read_track_data(laserdisc_state *ld);
-static void process_track_data(running_device *device);
+static void process_track_data(device_t *device);
 static DEVICE_START( laserdisc_sound );
 static STREAM_UPDATE( custom_stream_callback );
 static void configuration_load(running_machine *machine, int config_type, xml_data_node *parentnode);
@@ -178,7 +178,7 @@ static const ldplayer_interface *const player_interfaces[] =
     in device is, in fact, a laserdisc device
 -------------------------------------------------*/
 
-INLINE laserdisc_state *get_safe_token(running_device *device)
+INLINE laserdisc_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == LASERDISC);
@@ -290,7 +290,7 @@ static void update_slider_pos(ldcore_data *ldcore, attotime curtime)
 
 static void vblank_state_changed(screen_device &screen, void *param, bool vblank_state)
 {
-	running_device *device = (running_device *)param;
+	device_t *device = (device_t *)param;
 	laserdisc_state *ld = get_safe_token(device);
 	ldcore_data *ldcore = ld->core;
 	attotime curtime = timer_get_time(screen.machine);
@@ -346,7 +346,7 @@ static TIMER_CALLBACK( perform_player_update )
     laserdisc player
 -------------------------------------------------*/
 
-void laserdisc_data_w(running_device *device, UINT8 data)
+void laserdisc_data_w(device_t *device, UINT8 data)
 {
 	laserdisc_state *ld = get_safe_token(device);
 	ldcore_data *ldcore = ld->core;
@@ -363,7 +363,7 @@ void laserdisc_data_w(running_device *device, UINT8 data)
     laserdisc_line_w - control an input line
 -------------------------------------------------*/
 
-void laserdisc_line_w(running_device *device, UINT8 line, UINT8 newstate)
+void laserdisc_line_w(device_t *device, UINT8 line, UINT8 newstate)
 {
 	laserdisc_state *ld = get_safe_token(device);
 	ldcore_data *ldcore = ld->core;
@@ -402,7 +402,7 @@ void laserdisc_line_w(running_device *device, UINT8 line, UINT8 newstate)
     data byte
 -------------------------------------------------*/
 
-UINT8 laserdisc_data_r(running_device *device)
+UINT8 laserdisc_data_r(device_t *device)
 {
 	laserdisc_state *ld = get_safe_token(device);
 	ldcore_data *ldcore = ld->core;
@@ -421,7 +421,7 @@ UINT8 laserdisc_data_r(running_device *device)
     of an output line
 -------------------------------------------------*/
 
-UINT8 laserdisc_line_r(running_device *device, UINT8 line)
+UINT8 laserdisc_line_r(device_t *device, UINT8 line)
 {
 	laserdisc_state *ld = get_safe_token(device);
 	ldcore_data *ldcore = ld->core;
@@ -444,7 +444,7 @@ UINT8 laserdisc_line_r(running_device *device, UINT8 line)
     if video off
 -------------------------------------------------*/
 
-int laserdisc_get_video(running_device *device, bitmap_t **bitmap)
+int laserdisc_get_video(device_t *device, bitmap_t **bitmap)
 {
 	laserdisc_state *ld = get_safe_token(device);
 	ldcore_data *ldcore = ld->core;
@@ -474,7 +474,7 @@ int laserdisc_get_video(running_device *device, bitmap_t **bitmap)
     information read from the disc
 -------------------------------------------------*/
 
-UINT32 laserdisc_get_field_code(running_device *device, UINT32 code, UINT8 zero_if_squelched)
+UINT32 laserdisc_get_field_code(device_t *device, UINT32 code, UINT8 zero_if_squelched)
 {
 	laserdisc_state *ld = get_safe_token(device);
 	ldcore_data *ldcore = ld->core;
@@ -516,7 +516,7 @@ UINT32 laserdisc_get_field_code(running_device *device, UINT32 code, UINT8 zero_
     type checking from a device
 -------------------------------------------------*/
 
-laserdisc_state *ldcore_get_safe_token(running_device *device)
+laserdisc_state *ldcore_get_safe_token(device_t *device)
 {
 	return get_safe_token(device);
 }
@@ -905,7 +905,7 @@ static void read_track_data(laserdisc_state *ld)
     track after it has been read
 -------------------------------------------------*/
 
-static void process_track_data(running_device *device)
+static void process_track_data(device_t *device)
 {
 	laserdisc_state *ld = get_safe_token(device);
 	ldcore_data *ldcore = ld->core;
@@ -1090,7 +1090,7 @@ static void configuration_load(running_machine *machine, int config_type, xml_da
 	for (ldnode = xml_get_sibling(parentnode->child, "device"); ldnode != NULL; ldnode = xml_get_sibling(ldnode->next, "device"))
 	{
 		const char *devtag = xml_get_attribute_string(ldnode, "tag", "");
-		running_device *device = machine->device(devtag);
+		device_t *device = machine->device(devtag);
 		if (device != NULL)
 		{
 			laserdisc_state *ld = get_safe_token(device);
@@ -1118,7 +1118,7 @@ static void configuration_load(running_machine *machine, int config_type, xml_da
 
 static void configuration_save(running_machine *machine, int config_type, xml_data_node *parentnode)
 {
-	running_device *device;
+	device_t *device;
 
 	/* we only care about game files */
 	if (config_type != CONFIG_TYPE_GAME)
@@ -1190,7 +1190,7 @@ static void configuration_save(running_machine *machine, int config_type, xml_da
     video
 -------------------------------------------------*/
 
-void laserdisc_video_enable(running_device *device, int enable)
+void laserdisc_video_enable(device_t *device, int enable)
 {
 	laserdisc_state *ld = get_safe_token(device);
 	ld->core->videoenable = enable;
@@ -1202,7 +1202,7 @@ void laserdisc_video_enable(running_device *device, int enable)
     video
 -------------------------------------------------*/
 
-void laserdisc_overlay_enable(running_device *device, int enable)
+void laserdisc_overlay_enable(device_t *device, int enable)
 {
 	laserdisc_state *ld = get_safe_token(device);
 	ld->core->overenable = enable;
@@ -1215,7 +1215,7 @@ void laserdisc_overlay_enable(running_device *device, int enable)
 
 VIDEO_UPDATE( laserdisc )
 {
-	running_device *laserdisc = screen->machine->m_devicelist.first(LASERDISC);
+	device_t *laserdisc = screen->machine->m_devicelist.first(LASERDISC);
 	if (laserdisc != NULL)
 	{
 		const rectangle &visarea = screen->visible_area();
@@ -1292,7 +1292,7 @@ VIDEO_UPDATE( laserdisc )
     current live configuration settings
 -------------------------------------------------*/
 
-void laserdisc_get_config(running_device *device, laserdisc_config *config)
+void laserdisc_get_config(device_t *device, laserdisc_config *config)
 {
 	laserdisc_state *ld = get_safe_token(device);
 	*config = ld->core->config;
@@ -1304,7 +1304,7 @@ void laserdisc_get_config(running_device *device, laserdisc_config *config)
     configuration settings
 -------------------------------------------------*/
 
-void laserdisc_set_config(running_device *device, const laserdisc_config *config)
+void laserdisc_set_config(device_t *device, const laserdisc_config *config)
 {
 	laserdisc_state *ld = get_safe_token(device);
 	ld->core->config = *config;
@@ -1321,7 +1321,7 @@ void laserdisc_set_config(running_device *device, const laserdisc_config *config
     CHD disc
 -------------------------------------------------*/
 
-static void init_disc(running_device *device)
+static void init_disc(device_t *device)
 {
 	const laserdisc_config *config = (const laserdisc_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 	laserdisc_state *ld = get_safe_token(device);
@@ -1387,7 +1387,7 @@ static void init_disc(running_device *device)
     video rendering
 -------------------------------------------------*/
 
-static void init_video(running_device *device)
+static void init_video(device_t *device)
 {
 	laserdisc_state *ld = get_safe_token(device);
 	ldcore_data *ldcore = ld->core;
@@ -1447,7 +1447,7 @@ static void init_video(running_device *device)
     audio rendering
 -------------------------------------------------*/
 
-static void init_audio(running_device *device)
+static void init_audio(device_t *device)
 {
 	laserdisc_state *ld = get_safe_token(device);
 	ldcore_data *ldcore = ld->core;
@@ -1594,7 +1594,7 @@ static DEVICE_RESET( laserdisc )
     device set info callback
 -------------------------------------------------*/
 
-int laserdisc_get_type(running_device *device)
+int laserdisc_get_type(device_t *device)
 {
 	laserdisc_state *ld = get_safe_token(device);
 	if (ld->core != NULL)
@@ -1602,7 +1602,7 @@ int laserdisc_get_type(running_device *device)
 	return LASERDISC_TYPE_UNKNOWN;
 }
 
-void laserdisc_set_type(running_device *device, int type)
+void laserdisc_set_type(device_t *device, int type)
 {
 	laserdisc_state *ld = get_safe_token(device);
 	if (ld->core != NULL && ld->core->config.type != type)

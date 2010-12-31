@@ -645,7 +645,7 @@ static WRITE8_HANDLER( itech8_nmi_ack_w )
 }
 
 
-static void generate_sound_irq(running_device *device, int state)
+static void generate_sound_irq(device_t *device, int state)
 {
 	cputag_set_input_line(device->machine, "soundcpu", M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }

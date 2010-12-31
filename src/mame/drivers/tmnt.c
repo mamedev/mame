@@ -2060,7 +2060,7 @@ static INPUT_PORTS_START( prmrsocr )
 INPUT_PORTS_END
 
 
-static void cuebrick_irq_handler( running_device *device, int state )
+static void cuebrick_irq_handler( device_t *device, int state )
 {
 	tmnt_state *tmnt = device->machine->driver_data<tmnt_state>();
 	tmnt->cuebrick_snd_irqlatch = state;
@@ -2071,7 +2071,7 @@ static const ym2151_interface ym2151_interface_cbj =
 	cuebrick_irq_handler
 };
 
-static void volume_callback(running_device *device, int v)
+static void volume_callback(device_t *device, int v)
 {
 	k007232_set_volume(device, 0, (v >> 4) * 0x11, 0);
 	k007232_set_volume(device, 1, 0, (v & 0x0f) * 0x11);
@@ -2616,7 +2616,7 @@ static MACHINE_CONFIG_START( glfgreat, tmnt_state )
 MACHINE_CONFIG_END
 
 
-static void sound_nmi( running_device *device )
+static void sound_nmi( device_t *device )
 {
 	tmnt_state *state = device->machine->driver_data<tmnt_state>();
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);

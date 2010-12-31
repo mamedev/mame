@@ -24,7 +24,7 @@ the variable VotraxBaseFrequency, this is defaulted to 8000
 typedef struct _votrax_state votrax_state;
 struct _votrax_state
 {
-	running_device *device;
+	device_t *device;
 	int		stream;
 	int		frequency;		/* Some games (Qbert) change this */
 	int 	volume;
@@ -38,7 +38,7 @@ struct _votrax_state
 	loaded_samples *samples;
 };
 
-INLINE votrax_state *get_safe_token(running_device *device)
+INLINE votrax_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == VOTRAX);
@@ -150,7 +150,7 @@ WRITE8_DEVICE_HANDLER( votrax_w )
 	}
 }
 
-int votrax_status_r(running_device *device)
+int votrax_status_r(device_t *device)
 {
 	votrax_state *info = get_safe_token(device);
 	stream_update(info->channel);

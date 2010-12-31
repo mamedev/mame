@@ -39,10 +39,10 @@ DECLARE_LEGACY_DEVICE(KANEKO_PANDORA, kaneko_pandora);
     DEVICE I/O FUNCTIONS
 ***************************************************************************/
 
-void pandora_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect);
-void pandora_eof(running_device *device);
-void pandora_set_clear_bitmap(running_device *device, int clear);
-void pandora_set_bg_pen( running_device *device, int pen );
+void pandora_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect);
+void pandora_eof(device_t *device);
+void pandora_set_clear_bitmap(device_t *device, int clear);
+void pandora_set_bg_pen( device_t *device, int pen );
 
 WRITE8_DEVICE_HANDLER ( pandora_spriteram_w );
 READ8_DEVICE_HANDLER( pandora_spriteram_r );

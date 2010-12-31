@@ -27,8 +27,8 @@ public:
 	UINT8 game_selected;	/* 0 = Ms. Pac-Man, 1 = Galaga */
 
 	/* devices */
-	running_device *maincpu;
-	running_device *eeprom;
+	device_t *maincpu;
+	device_t *eeprom;
 
 	/* bank support */
 	UINT8 *ram_48000;

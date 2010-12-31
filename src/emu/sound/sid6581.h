@@ -24,7 +24,7 @@ typedef enum
 typedef struct _sid6581_interface sid6581_interface;
 struct _sid6581_interface
 {
-	int (*ad_read)(running_device *device, int channel);
+	int (*ad_read)(device_t *device, int channel);
 } ;
 
 

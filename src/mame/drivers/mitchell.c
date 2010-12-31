@@ -1198,7 +1198,7 @@ GFXDECODE_END
 
 
 
-static void spangbl_adpcm_int( running_device *device )
+static void spangbl_adpcm_int( device_t *device )
 {
 	mitchell_state *state = device->machine->driver_data<mitchell_state>();
 	msm5205_data_w(device, state->sample_buffer & 0x0f);

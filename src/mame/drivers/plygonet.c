@@ -360,7 +360,7 @@ DIRECT_UPDATE_HANDLER( plygonet_dsp56k_direct_handler )
                                  bit 0002 turns on *just* before this happens.
 */
 
-static UINT8 dsp56k_bank_group(running_device* cpu)
+static UINT8 dsp56k_bank_group(device_t* cpu)
 {
 	UINT16 portC = dsp56k_get_peripheral_memory(cpu, 0xffe3);
 
@@ -373,7 +373,7 @@ static UINT8 dsp56k_bank_group(running_device* cpu)
 	return INVALID_BANK_GROUP;
 }
 
-static UINT8 dsp56k_bank_num(running_device* cpu, UINT8 bank_group)
+static UINT8 dsp56k_bank_num(device_t* cpu, UINT8 bank_group)
 {
 	UINT16 portC = dsp56k_get_peripheral_memory(cpu, 0xffe3);
 

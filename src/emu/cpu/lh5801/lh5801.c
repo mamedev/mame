@@ -69,7 +69,7 @@ struct _lh5810_state
 	int icount;
 };
 
-INLINE lh5801_state *get_safe_token(running_device *device)
+INLINE lh5801_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == LH5801);

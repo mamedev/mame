@@ -81,10 +81,10 @@ public:
 	size_t            sprite_ram_size;
 
 	/* devices */
-	running_device *dev_n2a03a;
-	running_device *dev_n2a03b;
-	running_device *dev_vp2;		/* virtual port 2 */
-	running_device *dev_6h;
+	device_t *dev_n2a03a;
+	device_t *dev_n2a03b;
+	device_t *dev_vp2;		/* virtual port 2 */
+	device_t *dev_6h;
 
 #if 0
 	/* machine states */

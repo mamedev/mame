@@ -11,7 +11,7 @@
 typedef struct _ymf278b_interface ymf278b_interface;
 struct _ymf278b_interface
 {
-	void (*irq_callback)(running_device *device, int state);	/* irq callback */
+	void (*irq_callback)(device_t *device, int state);	/* irq callback */
 };
 
 READ8_DEVICE_HANDLER( ymf278b_r );

@@ -577,7 +577,7 @@ static MACHINE_RESET( yunsun16 )
                                 Magic Bubble
 ***************************************************************************/
 
-static void soundirq(running_device *device, int state)
+static void soundirq(device_t *device, int state)
 {
 	yunsun16_state *yunsun16 = device->machine->driver_data<yunsun16_state>();
 	cpu_set_input_line(yunsun16->audiocpu, 0, state);

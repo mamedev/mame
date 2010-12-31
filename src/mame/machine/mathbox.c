@@ -32,7 +32,7 @@
 typedef struct _mathbox_state mathbox_state;
 struct _mathbox_state
 {
-	running_device *device;
+	device_t *device;
 	/* math box scratch registers */
 	INT16 reg[16];
 
@@ -51,7 +51,7 @@ struct _mathbox_state
     into a mathbox_state
 -------------------------------------------------*/
 
-INLINE mathbox_state *get_safe_token(running_device *device)
+INLINE mathbox_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == MATHBOX);

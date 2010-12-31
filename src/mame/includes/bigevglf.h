@@ -35,8 +35,8 @@ public:
 	UINT8    port_select;     /* for muxed controls */
 
 	/* devices */
-	running_device *audiocpu;
-	running_device *mcu;
+	device_t *audiocpu;
+	device_t *mcu;
 };
 
 

@@ -18,10 +18,10 @@ public:
 	INT32       banknum;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *tc0080vco;
-	running_device *tc0220ioc;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *tc0080vco;
+	device_t *tc0220ioc;
 };
 
 /*----------- defined in video/taito_h.c -----------*/

@@ -323,8 +323,8 @@ struct _dcs_state
 	UINT16		progflags;
 	void		(*output_full_cb)(running_machine *, int);
 	void		(*input_empty_cb)(running_machine *, int);
-	UINT16		(*fifo_data_r)(running_device *device);
-	UINT16		(*fifo_status_r)(running_device *device);
+	UINT16		(*fifo_data_r)(device_t *device);
+	UINT16		(*fifo_status_r)(device_t *device);
 
 	/* timers */
 	UINT8		timer_enable;
@@ -1491,7 +1491,7 @@ void dcs_set_io_callbacks(void (*output_full_cb)(running_machine *, int), void (
 }
 
 
-void dcs_set_fifo_callbacks(UINT16 (*fifo_data_r)(running_device *device), UINT16 (*fifo_status_r)(running_device *device))
+void dcs_set_fifo_callbacks(UINT16 (*fifo_data_r)(device_t *device), UINT16 (*fifo_status_r)(device_t *device))
 {
 	dcs.fifo_data_r = fifo_data_r;
 	dcs.fifo_status_r = fifo_status_r;

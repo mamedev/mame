@@ -113,7 +113,7 @@ union _lr35902_state {
 	lr35902_8BitRegs b;
 };
 
-INLINE lr35902_state *get_safe_token(running_device *device)
+INLINE lr35902_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == LR35902);

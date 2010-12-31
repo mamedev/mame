@@ -98,7 +98,7 @@ typedef struct
 	int spc_int32;
 } spc700i_cpu;
 
-INLINE spc700i_cpu *get_safe_token(running_device *device)
+INLINE spc700i_cpu *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SPC700);

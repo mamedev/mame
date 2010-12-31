@@ -114,8 +114,8 @@ extern const device_type COSMAC;
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef void (*cosmac_out_sc_func)(running_device *device, cosmac_state_code sc);
-#define COSMAC_SC_WRITE(name) void name(running_device *device, cosmac_state_code sc)
+typedef void (*cosmac_out_sc_func)(device_t *device, cosmac_state_code sc);
+#define COSMAC_SC_WRITE(name) void name(device_t *device, cosmac_state_code sc)
 
 
 // ======================> cosmac_interface

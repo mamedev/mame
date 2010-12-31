@@ -38,8 +38,8 @@ public:
 	UINT8       shared_ram[16];
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
+	device_t *maincpu;
+	device_t *audiocpu;
 };
 
 

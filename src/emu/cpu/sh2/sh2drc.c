@@ -138,7 +138,7 @@ static void cfunc_DIV1(void *param);
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE sh2_state *get_safe_token(running_device *device)
+INLINE sh2_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SH1 ||
@@ -3179,7 +3179,7 @@ static int generate_group_12(sh2_state *sh2, drcuml_block *block, compiler_state
     sh2drc_set_options - configure DRC options
 -------------------------------------------------*/
 
-void sh2drc_set_options(running_device *device, UINT32 options)
+void sh2drc_set_options(device_t *device, UINT32 options)
 {
 	sh2_state *sh2 = get_safe_token(device);
 	sh2->drcoptions = options;
@@ -3191,7 +3191,7 @@ void sh2drc_set_options(running_device *device, UINT32 options)
     the PC must be flushed for speedups to work
 -------------------------------------------------*/
 
-void sh2drc_add_pcflush(running_device *device, offs_t address)
+void sh2drc_add_pcflush(device_t *device, offs_t address)
 {
 	sh2_state *sh2 = get_safe_token(device);
 

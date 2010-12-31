@@ -102,10 +102,10 @@ public:
 	INT32     type5_latch;		/* latched enable PROM (1100xxxx written to E5x1) */
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *mcu;
-	running_device *cassette;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *mcu;
+	device_t *cassette;
 };
 
 

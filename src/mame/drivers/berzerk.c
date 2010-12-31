@@ -468,7 +468,7 @@ static VIDEO_UPDATE( berzerk )
 
 static WRITE8_HANDLER( berzerk_audio_w )
 {
-	running_device *device;
+	device_t *device;
 	int clock_divisor;
 
 	switch (offset)
@@ -525,7 +525,7 @@ static WRITE8_HANDLER( berzerk_audio_w )
 
 static READ8_HANDLER( berzerk_audio_r )
 {
-	running_device *device = space->machine->device("speech");
+	device_t *device = space->machine->device("speech");
 	switch (offset)
 	{
 	/* offset 4 reads from the S14001A */

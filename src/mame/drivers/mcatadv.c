@@ -414,7 +414,7 @@ GFXDECODE_END
 
 
 /* Stolen from Psikyo.c */
-static void sound_irq( running_device *device, int irq )
+static void sound_irq( device_t *device, int irq )
 {
 	mcatadv_state *state = device->machine->driver_data<mcatadv_state>();
 	cpu_set_input_line(state->soundcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);

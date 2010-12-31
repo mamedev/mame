@@ -93,7 +93,7 @@ typedef struct {
 #define WR(offset,data)	minx->program->write_byte( offset, data )
 #define GET_MINX_PC		( ( minx->PC & 0x8000 ) ? ( minx->V << 15 ) | (minx->PC & 0x7FFF ) : minx->PC )
 
-INLINE minx_state *get_safe_token(running_device *device)
+INLINE minx_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == MINX);

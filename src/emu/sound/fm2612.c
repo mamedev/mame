@@ -599,7 +599,7 @@ typedef struct
 
 typedef struct
 {
-	running_device *device;
+	device_t *device;
 	void *		param;				/* this chip parameter  */
 	double		freqbase;			/* frequency base       */
 	int			timer_prescaler;	/* timer prescaler      */
@@ -1684,7 +1684,7 @@ INLINE void CSMKeyControll(FM_OPN *OPN, FM_CH *CH)
 
 #ifdef __STATE_H__
 /* FM channel save , internal state only */
-static void FMsave_state_channel(running_device *device,FM_CH *CH,int num_ch)
+static void FMsave_state_channel(device_t *device,FM_CH *CH,int num_ch)
 {
 	int slot , ch;
 
@@ -1704,7 +1704,7 @@ static void FMsave_state_channel(running_device *device,FM_CH *CH,int num_ch)
 	}
 }
 
-static void FMsave_state_st(running_device *device,FM_ST *ST)
+static void FMsave_state_st(device_t *device,FM_ST *ST)
 {
 #if FM_BUSY_FLAG_SUPPORT
 	state_save_register_device_item(device, 0, ST->busy_expiry_time.seconds );
@@ -2349,7 +2349,7 @@ void ym2612_postload(void *chip)
 	}
 }
 
-static void YM2612_save_state(YM2612 *F2612, running_device *device)
+static void YM2612_save_state(YM2612 *F2612, device_t *device)
 {
 	state_save_register_device_item_array(device, 0, F2612->REGS);
 	FMsave_state_st(device,&F2612->OPN.ST);
@@ -2364,7 +2364,7 @@ static void YM2612_save_state(YM2612 *F2612, running_device *device)
 #endif /* _STATE_H */
 
 /* initialize YM2612 emulator(s) */
-void * ym2612_init(void *param, running_device *device, int clock, int rate,
+void * ym2612_init(void *param, device_t *device, int clock, int rate,
                FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler)
 {
 	YM2612 *F2612;

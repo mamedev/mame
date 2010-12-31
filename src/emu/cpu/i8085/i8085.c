@@ -273,7 +273,7 @@ static void execute_one(i8085_state *cpustate, int opcode);
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE i8085_state *get_safe_token(running_device *device)
+INLINE i8085_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == I8080 ||

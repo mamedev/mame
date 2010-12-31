@@ -265,7 +265,7 @@ GFXDECODE_END
 
 /*** MORE SOUND RELATED ******************************************************/
 
-static void gs_ym2610_irq(running_device *device, int irq)
+static void gs_ym2610_irq(device_t *device, int irq)
 {
 	if (irq)
 		cputag_set_input_line(device->machine, "audiocpu", 0, ASSERT_LINE);

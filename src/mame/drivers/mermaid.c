@@ -403,7 +403,7 @@ static MACHINE_RESET( mermaid )
 }
 
 /* Similar to Jantotsu, apparently the HW has three ports that controls what kind of sample should be played. Every sample size is 0x1000. */
-static void rougien_adpcm_int( running_device *device )
+static void rougien_adpcm_int( device_t *device )
 {
 	mermaid_state *state = device->machine->driver_data<mermaid_state>();
 

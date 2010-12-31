@@ -32,9 +32,9 @@ public:
 	int           coin_command_pending;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *msm;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *msm;
 };
 
 

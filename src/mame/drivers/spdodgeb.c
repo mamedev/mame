@@ -51,7 +51,7 @@ static WRITE8_HANDLER( sound_command_w )
 static WRITE8_HANDLER( spd_adpcm_w )
 {
 	int chip = offset & 1;
-	running_device *adpcm = space->machine->device((chip == 0) ? "msm1" : "msm2");
+	device_t *adpcm = space->machine->device((chip == 0) ? "msm1" : "msm2");
 
 	switch (offset/2)
 	{
@@ -75,7 +75,7 @@ static WRITE8_HANDLER( spd_adpcm_w )
 	}
 }
 
-static void spd_adpcm_int(running_device *device)
+static void spd_adpcm_int(device_t *device)
 {
 	int chip = (strcmp(device->tag(), "msm1") == 0) ? 0 : 1;
 	if (adpcm_pos[chip] >= adpcm_end[chip] || adpcm_pos[chip] >= 0x10000)
@@ -390,7 +390,7 @@ static GFXDECODE_START( spdodgeb )
 GFXDECODE_END
 
 
-static void irq_handler(running_device *device, int irq)
+static void irq_handler(device_t *device, int irq)
 {
 	cputag_set_input_line(device->machine, "audiocpu", M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }

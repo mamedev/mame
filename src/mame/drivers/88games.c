@@ -82,7 +82,7 @@ static WRITE8_HANDLER( k88games_sh_irqtrigger_w )
 static WRITE8_HANDLER( speech_control_w )
 {
 	_88games_state *state = space->machine->driver_data<_88games_state>();
-	running_device *upd;
+	device_t *upd;
 
 	state->speech_chip = (data & 4) ? 1 : 0;
 	upd = state->speech_chip ? state->upd_2 : state->upd_1;
@@ -94,7 +94,7 @@ static WRITE8_HANDLER( speech_control_w )
 static WRITE8_HANDLER( speech_msg_w )
 {
 	_88games_state *state = space->machine->driver_data<_88games_state>();
-	running_device *upd = state->speech_chip ? state->upd_2 : state->upd_1;
+	device_t *upd = state->speech_chip ? state->upd_2 : state->upd_1;
 
 	upd7759_port_w(upd, 0, data);
 }

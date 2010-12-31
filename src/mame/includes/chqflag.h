@@ -24,13 +24,13 @@ public:
 	int        accel, wheel;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *k007232_1;
-	running_device *k007232_2;
-	running_device *k051960;
-	running_device *k051316_1;
-	running_device *k051316_2;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *k007232_1;
+	device_t *k007232_2;
+	device_t *k051960;
+	device_t *k051316_1;
+	device_t *k051316_2;
 };
 
 /*----------- defined in video/chqflag.c -----------*/

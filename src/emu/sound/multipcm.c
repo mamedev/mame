@@ -126,7 +126,7 @@ static const int val2chan[] =
 #define MULTIPCM_RATE	44100.0
 
 
-INLINE MultiPCM *get_safe_token(running_device *device)
+INLINE MultiPCM *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == MULTIPCM);
@@ -665,7 +665,7 @@ WRITE8_DEVICE_HANDLER( multipcm_w )
 
 /* MAME/M1 access functions */
 
-void multipcm_set_bank(running_device *device, UINT32 leftoffs, UINT32 rightoffs)
+void multipcm_set_bank(device_t *device, UINT32 leftoffs, UINT32 rightoffs)
 {
 	MultiPCM *ptChip = get_safe_token(device);
 	ptChip->BankL = leftoffs;

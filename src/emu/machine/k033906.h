@@ -91,7 +91,7 @@ private:
 
 	int          m_reg_set;	// 1 = access reg / 0 = access ram
 
-	running_device *m_voodoo;
+	device_t *m_voodoo;
 
     const k033906_device_config &m_config;
 };

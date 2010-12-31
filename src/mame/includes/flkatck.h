@@ -23,8 +23,8 @@ public:
 	int        multiply_reg[2];
 
 	/* devices */
-	running_device *audiocpu;
-	running_device *k007121;
+	device_t *audiocpu;
+	device_t *k007121;
 };
 
 

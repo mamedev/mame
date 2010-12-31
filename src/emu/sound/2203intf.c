@@ -12,11 +12,11 @@ struct _ym2203_state
 	void *			chip;
 	void *			psg;
 	const ym2203_interface *intf;
-	running_device *device;
+	device_t *device;
 };
 
 
-INLINE ym2203_state *get_safe_token(running_device *device)
+INLINE ym2203_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == YM2203);

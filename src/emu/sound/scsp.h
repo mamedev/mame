@@ -13,10 +13,10 @@ typedef struct _scsp_interface scsp_interface;
 struct _scsp_interface
 {
 	int roffset;				/* offset in the region */
-	void (*irq_callback)(running_device *device, int state);	/* irq callback */
+	void (*irq_callback)(device_t *device, int state);	/* irq callback */
 };
 
-void scsp_set_ram_base(running_device *device, void *base);
+void scsp_set_ram_base(device_t *device, void *base);
 
 // SCSP register access
 READ16_DEVICE_HANDLER( scsp_r );

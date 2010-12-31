@@ -332,55 +332,55 @@ static emu_timer *sound_irq_timer;
 
 static READ32_HANDLER( hornet_k037122_sram_r )
 {
-	running_device *k037122 = space->machine->device(get_cgboard_id() ? "k037122_2" : "k037122_1");
+	device_t *k037122 = space->machine->device(get_cgboard_id() ? "k037122_2" : "k037122_1");
 	return k037122_sram_r(k037122, offset, mem_mask);
 }
 
 static WRITE32_HANDLER( hornet_k037122_sram_w )
 {
-	running_device *k037122 = space->machine->device(get_cgboard_id() ? "k037122_2" : "k037122_1");
+	device_t *k037122 = space->machine->device(get_cgboard_id() ? "k037122_2" : "k037122_1");
 	k037122_sram_w(k037122, offset, data, mem_mask);
 }
 
 
 static READ32_HANDLER( hornet_k037122_char_r )
 {
-	running_device *k037122 = space->machine->device(get_cgboard_id() ? "k037122_2" : "k037122_1");
+	device_t *k037122 = space->machine->device(get_cgboard_id() ? "k037122_2" : "k037122_1");
 	return k037122_char_r(k037122, offset, mem_mask);
 }
 
 static WRITE32_HANDLER( hornet_k037122_char_w )
 {
-	running_device *k037122 = space->machine->device(get_cgboard_id() ? "k037122_2" : "k037122_1");
+	device_t *k037122 = space->machine->device(get_cgboard_id() ? "k037122_2" : "k037122_1");
 	k037122_char_w(k037122, offset, data, mem_mask);
 }
 
 static READ32_HANDLER( hornet_k037122_reg_r )
 {
-	running_device *k037122 = space->machine->device(get_cgboard_id() ? "k037122_2" : "k037122_1");
+	device_t *k037122 = space->machine->device(get_cgboard_id() ? "k037122_2" : "k037122_1");
 	return k037122_reg_r(k037122, offset, mem_mask);
 }
 
 static WRITE32_HANDLER( hornet_k037122_reg_w )
 {
-	running_device *k037122 = space->machine->device(get_cgboard_id() ? "k037122_2" : "k037122_1");
+	device_t *k037122 = space->machine->device(get_cgboard_id() ? "k037122_2" : "k037122_1");
 	k037122_reg_w(k037122, offset, data, mem_mask);
 }
 
-static void voodoo_vblank_0(running_device *device, int param)
+static void voodoo_vblank_0(device_t *device, int param)
 {
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-static void voodoo_vblank_1(running_device *device, int param)
+static void voodoo_vblank_1(device_t *device, int param)
 {
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
 static VIDEO_UPDATE( hornet )
 {
-	running_device *voodoo = screen->machine->device("voodoo0");
-	running_device *k037122 = screen->machine->device("k037122_1");
+	device_t *voodoo = screen->machine->device("voodoo0");
+	device_t *k037122 = screen->machine->device("k037122_1");
 
 	voodoo_update(voodoo, bitmap, cliprect);
 
@@ -395,8 +395,8 @@ static VIDEO_UPDATE( hornet_2board )
 {
 	if (strcmp(screen->tag(), "lscreen") == 0)
 	{
-		running_device *k037122 = screen->machine->device("k037122_1");
-		running_device *voodoo = screen->machine->device("voodoo0");
+		device_t *k037122 = screen->machine->device("k037122_1");
+		device_t *voodoo = screen->machine->device("voodoo0");
 		voodoo_update(voodoo, bitmap, cliprect);
 
 		/* TODO: tilemaps per screen */
@@ -404,8 +404,8 @@ static VIDEO_UPDATE( hornet_2board )
 	}
 	else if (strcmp(screen->tag(), "rscreen") == 0)
 	{
-		running_device *k037122 = screen->machine->device("k037122_2");
-		running_device *voodoo = screen->machine->device("voodoo1");
+		device_t *k037122 = screen->machine->device("k037122_2");
+		device_t *voodoo = screen->machine->device("voodoo1");
 		voodoo_update(voodoo, bitmap, cliprect);
 
 		/* TODO: tilemaps per screen */
@@ -423,8 +423,8 @@ static READ8_HANDLER( sysreg_r )
 {
 	UINT8 r = 0;
 	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
-	running_device *adc12138 = space->machine->device("adc12138");
-	running_device *eeprom = space->machine->device("eeprom");
+	device_t *adc12138 = space->machine->device("adc12138");
+	device_t *eeprom = space->machine->device("eeprom");
 
 	switch (offset)
 	{
@@ -457,7 +457,7 @@ static READ8_HANDLER( sysreg_r )
 
 static WRITE8_HANDLER( sysreg_w )
 {
-	running_device *adc12138 = space->machine->device("adc12138");
+	device_t *adc12138 = space->machine->device("adc12138");
 
 	switch (offset)
 	{
@@ -867,7 +867,7 @@ static MACHINE_RESET( hornet )
 		memory_set_bankptr(machine, "bank5", usr5);
 }
 
-static double adc12138_input_callback( running_device *device, UINT8 input )
+static double adc12138_input_callback( device_t *device, UINT8 input )
 {
 	return (double)0.0;
 }
@@ -1061,7 +1061,7 @@ MACHINE_CONFIG_END
 
 static void jamma_jvs_cmd_exec(running_machine *machine);
 
-static void jamma_jvs_w(running_device *device, UINT8 data)
+static void jamma_jvs_w(device_t *device, UINT8 data)
 {
 	if (jvs_sdata_ptr == 0 && data != 0xe0)
 		return;

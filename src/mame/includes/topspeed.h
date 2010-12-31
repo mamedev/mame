@@ -27,12 +27,12 @@ public:
 	int        adpcm_data;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *audiocpu;
-	running_device *subcpu;
-	running_device *pc080sn_1;
-	running_device *pc080sn_2;
-	running_device *tc0220ioc;
+	device_t *maincpu;
+	device_t *audiocpu;
+	device_t *subcpu;
+	device_t *pc080sn_1;
+	device_t *pc080sn_2;
+	device_t *tc0220ioc;
 };
 
 

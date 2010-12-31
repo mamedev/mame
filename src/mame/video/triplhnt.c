@@ -130,7 +130,7 @@ static void draw_sprites(running_machine *machine, bitmap_t* bitmap, const recta
 
 VIDEO_UPDATE( triplhnt )
 {
-	running_device *discrete = screen->machine->device("discrete");
+	device_t *discrete = screen->machine->device("discrete");
 
 	tilemap_mark_all_tiles_dirty(bg_tilemap);
 

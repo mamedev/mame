@@ -20,9 +20,9 @@ public:
 	int collision_counter;
 
 	/* devices */
-	running_device *s2636_0;
-	running_device *s2636_1;
-	running_device *saa5050;
+	device_t *s2636_0;
+	device_t *s2636_1;
+	device_t *saa5050;
 };
 
 

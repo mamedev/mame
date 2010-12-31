@@ -19,7 +19,7 @@ WRITE8_DEVICE_HANDLER( seta_sound_w );
 READ16_DEVICE_HANDLER ( seta_sound_word_r );
 WRITE16_DEVICE_HANDLER( seta_sound_word_w );
 
-void seta_sound_enable_w(running_device *device, int data);
+void seta_sound_enable_w(device_t *device, int data);
 
 DECLARE_LEGACY_SOUND_DEVICE(X1_010, x1_010);
 

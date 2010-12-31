@@ -98,11 +98,11 @@ public:
 	UINT8			mermaid_p[4];
 
 	/* Devices */
-	running_device	*master_cpu;
-	running_device	*slave_cpu;
-	running_device	*sound_cpu;
-	running_device	*mermaid;
-	running_device	*pandora;
+	device_t	*master_cpu;
+	device_t	*slave_cpu;
+	device_t	*sound_cpu;
+	device_t	*mermaid;
+	device_t	*pandora;
 };
 
 

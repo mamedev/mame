@@ -4,7 +4,7 @@
 #define __LR35902_H__
 
 
-typedef void (*lr35902_timer_fired_func)(running_device *device, int cycles);
+typedef void (*lr35902_timer_fired_func)(device_t *device, int cycles);
 
 typedef struct _lr35902_cpu_core lr35902_cpu_core;
 struct _lr35902_cpu_core

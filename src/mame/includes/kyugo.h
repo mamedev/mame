@@ -26,8 +26,8 @@ public:
 	const UINT8 *color_codes;
 
 	/* devices */
-	running_device *maincpu;
-	running_device *subcpu;
+	device_t *maincpu;
+	device_t *subcpu;
 };
 
 

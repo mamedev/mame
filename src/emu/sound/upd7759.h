@@ -15,14 +15,14 @@
 typedef struct _upd7759_interface upd7759_interface;
 struct _upd7759_interface
 {
-	void (*drqcallback)(running_device *device, int param);	/* drq callback (per chip, slave mode only) */
+	void (*drqcallback)(device_t *device, int param);	/* drq callback (per chip, slave mode only) */
 };
 
-void upd7759_set_bank_base(running_device *device, offs_t base);
+void upd7759_set_bank_base(device_t *device, offs_t base);
 
-void upd7759_reset_w(running_device *device, UINT8 data);
-void upd7759_start_w(running_device *device, UINT8 data);
-int upd7759_busy_r(running_device *device);
+void upd7759_reset_w(device_t *device, UINT8 data);
+void upd7759_start_w(device_t *device, UINT8 data);
+int upd7759_busy_r(device_t *device);
 WRITE8_DEVICE_HANDLER( upd7759_port_w );
 
 DECLARE_LEGACY_SOUND_DEVICE(UPD7759, upd7759);

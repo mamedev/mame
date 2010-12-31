@@ -39,7 +39,7 @@ static CUSTOM_INPUT( wolfpack_dial_r )
 
 static READ8_HANDLER( wolfpack_misc_r )
 {
-	running_device *device = space->machine->device("speech");
+	device_t *device = space->machine->device("speech");
 	UINT8 val = 0;
 
 	/* BIT0 => SPEECH BUSY */

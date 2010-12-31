@@ -23,7 +23,7 @@ public:
 	int            bg_image;
 
 	/* devices */
-	running_device *maincpu;
+	device_t *maincpu;
 };
 
 

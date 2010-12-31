@@ -168,7 +168,7 @@ INPUT_PORTS_END
 
 
 
-static void irqhandler( running_device *device, int linestate )
+static void irqhandler( device_t *device, int linestate )
 {
 	surpratk_state *state = device->machine->driver_data<surpratk_state>();
 	cpu_set_input_line(state->maincpu, KONAMI_FIRQ_LINE, linestate);

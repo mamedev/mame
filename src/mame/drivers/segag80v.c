@@ -1359,7 +1359,7 @@ static DRIVER_INIT( spacfury )
 static DRIVER_INIT( zektor )
 {
 	address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
-	running_device *ay = machine->device("aysnd");
+	device_t *ay = machine->device("aysnd");
 
 	/* configure security */
 	sega_security(82);

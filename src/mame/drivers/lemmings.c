@@ -244,7 +244,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static void sound_irq( running_device *device, int state )
+static void sound_irq( device_t *device, int state )
 {
 	lemmings_state *lemmings = device->machine->driver_data<lemmings_state>();
 	cpu_set_input_line(lemmings->audiocpu, 0, state);

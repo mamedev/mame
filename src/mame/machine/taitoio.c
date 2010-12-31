@@ -69,7 +69,7 @@ struct _tc0220ioc_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE tc0220ioc_state *tc0220ioc_get_safe_token( running_device *device )
+INLINE tc0220ioc_state *tc0220ioc_get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == TC0220IOC);
@@ -77,7 +77,7 @@ INLINE tc0220ioc_state *tc0220ioc_get_safe_token( running_device *device )
 	return (tc0220ioc_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const tc0220ioc_interface *tc0220ioc_get_interface( running_device *device )
+INLINE const tc0220ioc_interface *tc0220ioc_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == TC0220IOC));
@@ -226,7 +226,7 @@ struct _tc0510nio_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE tc0510nio_state *tc0510nio_get_safe_token( running_device *device )
+INLINE tc0510nio_state *tc0510nio_get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == TC0510NIO);
@@ -234,7 +234,7 @@ INLINE tc0510nio_state *tc0510nio_get_safe_token( running_device *device )
 	return (tc0510nio_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const tc0510nio_interface *tc0510nio_get_interface( running_device *device )
+INLINE const tc0510nio_interface *tc0510nio_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == TC0510NIO));
@@ -377,7 +377,7 @@ struct _tc0640fio_state
     INLINE FUNCTIONS
 *****************************************************************************/
 
-INLINE tc0640fio_state *tc0640fio_get_safe_token( running_device *device )
+INLINE tc0640fio_state *tc0640fio_get_safe_token( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == TC0640FIO);
@@ -385,7 +385,7 @@ INLINE tc0640fio_state *tc0640fio_get_safe_token( running_device *device )
 	return (tc0640fio_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const tc0640fio_interface *tc0640fio_get_interface( running_device *device )
+INLINE const tc0640fio_interface *tc0640fio_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == TC0640FIO));

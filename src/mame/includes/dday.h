@@ -26,7 +26,7 @@ public:
 	int            timer_value;
 
 	/* devices */
-	running_device *ay1;
+	device_t *ay1;
 };
 
 

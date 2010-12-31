@@ -598,10 +598,6 @@ protected:
 };
 
 
-// running_device is an alias for device_t for now
-typedef device_t running_device;
-
-
 
 // ======================> device_interface
 

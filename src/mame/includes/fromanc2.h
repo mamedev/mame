@@ -21,11 +21,11 @@ public:
 	UINT8    datalatch_2h, datalatch_2l;
 
 	/* devices */
-	running_device *audiocpu;
-	running_device *subcpu;
-	running_device *eeprom;
-	running_device *left_screen;
-	running_device *right_screen;
+	device_t *audiocpu;
+	device_t *subcpu;
+	device_t *eeprom;
+	device_t *left_screen;
+	device_t *right_screen;
 };
 
 

@@ -579,8 +579,8 @@ TODO:
 
 static WRITE8_HANDLER( superpac_latch_w )
 {
-	running_device *namcoio_1 = space->machine->device("namcoio_1");
-	running_device *namcoio_2 = space->machine->device("namcoio_2");
+	device_t *namcoio_1 = space->machine->device("namcoio_1");
+	device_t *namcoio_2 = space->machine->device("namcoio_2");
 	int bit = offset & 1;
 
 	switch (offset & 0x0e)
@@ -623,8 +623,8 @@ static WRITE8_HANDLER( superpac_latch_w )
 
 static WRITE8_HANDLER( phozon_latch_w )
 {
-	running_device *namcoio_1 = space->machine->device("namcoio_1");
-	running_device *namcoio_2 = space->machine->device("namcoio_2");
+	device_t *namcoio_1 = space->machine->device("namcoio_1");
+	device_t *namcoio_2 = space->machine->device("namcoio_2");
 	int bit = offset & 1;
 
 	switch (offset & 0x0e)
@@ -671,8 +671,8 @@ static WRITE8_HANDLER( phozon_latch_w )
 
 static WRITE8_HANDLER( mappy_latch_w )
 {
-	running_device *namcoio_1 = space->machine->device("namcoio_1");
-	running_device *namcoio_2 = space->machine->device("namcoio_2");
+	device_t *namcoio_1 = space->machine->device("namcoio_1");
+	device_t *namcoio_2 = space->machine->device("namcoio_2");
 	int bit = offset & 1;
 
 	switch (offset & 0x0e)
@@ -749,8 +749,8 @@ static MACHINE_RESET( mappy )
 
 static TIMER_CALLBACK( superpac_io_run )
 {
-	running_device *io56xx_1 = machine->device("namcoio_1");
-	running_device *io56xx_2 = machine->device("namcoio_2");
+	device_t *io56xx_1 = machine->device("namcoio_1");
+	device_t *io56xx_2 = machine->device("namcoio_2");
 
 	switch (param)
 	{
@@ -765,8 +765,8 @@ static TIMER_CALLBACK( superpac_io_run )
 
 static INTERRUPT_GEN( superpac_interrupt_1 )
 {
-	running_device *namcoio_1 = device->machine->device("namcoio_1");
-	running_device *namcoio_2 = device->machine->device("namcoio_2");
+	device_t *namcoio_1 = device->machine->device("namcoio_1");
+	device_t *namcoio_2 = device->machine->device("namcoio_2");
 
 	irq0_line_assert(device);	// this also checks if irq is enabled - IMPORTANT!
 						// so don't replace with cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
@@ -780,8 +780,8 @@ static INTERRUPT_GEN( superpac_interrupt_1 )
 
 static TIMER_CALLBACK( pacnpal_io_run )
 {
-	running_device *io56xx = machine->device("namcoio_1");
-	running_device *io59xx = machine->device("namcoio_2");
+	device_t *io56xx = machine->device("namcoio_1");
+	device_t *io59xx = machine->device("namcoio_2");
 
 	switch (param)
 	{
@@ -796,8 +796,8 @@ static TIMER_CALLBACK( pacnpal_io_run )
 
 static INTERRUPT_GEN( pacnpal_interrupt_1 )
 {
-	running_device *namcoio_1 = device->machine->device("namcoio_1");
-	running_device *namcoio_2 = device->machine->device("namcoio_2");
+	device_t *namcoio_1 = device->machine->device("namcoio_1");
+	device_t *namcoio_2 = device->machine->device("namcoio_2");
 
 	irq0_line_assert(device);	// this also checks if irq is enabled - IMPORTANT!
 						// so don't replace with cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
@@ -811,8 +811,8 @@ static INTERRUPT_GEN( pacnpal_interrupt_1 )
 
 static TIMER_CALLBACK( phozon_io_run )
 {
-	running_device *io58xx = machine->device("namcoio_1");
-	running_device *io56xx = machine->device("namcoio_2");
+	device_t *io58xx = machine->device("namcoio_1");
+	device_t *io56xx = machine->device("namcoio_2");
 
 	switch (param)
 	{
@@ -827,8 +827,8 @@ static TIMER_CALLBACK( phozon_io_run )
 
 static INTERRUPT_GEN( phozon_interrupt_1 )
 {
-	running_device *namcoio_1 = device->machine->device("namcoio_1");
-	running_device *namcoio_2 = device->machine->device("namcoio_2");
+	device_t *namcoio_1 = device->machine->device("namcoio_1");
+	device_t *namcoio_2 = device->machine->device("namcoio_2");
 
 	irq0_line_assert(device);	// this also checks if irq is enabled - IMPORTANT!
 						// so don't replace with cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
@@ -842,8 +842,8 @@ static INTERRUPT_GEN( phozon_interrupt_1 )
 
 static TIMER_CALLBACK( mappy_io_run )
 {
-	running_device *io58xx_1 = machine->device("namcoio_1");
-	running_device *io58xx_2 = machine->device("namcoio_2");
+	device_t *io58xx_1 = machine->device("namcoio_1");
+	device_t *io58xx_2 = machine->device("namcoio_2");
 
 	switch (param)
 	{
@@ -858,8 +858,8 @@ static TIMER_CALLBACK( mappy_io_run )
 
 static INTERRUPT_GEN( mappy_interrupt_1 )
 {
-	running_device *namcoio_1 = device->machine->device("namcoio_1");
-	running_device *namcoio_2 = device->machine->device("namcoio_2");
+	device_t *namcoio_1 = device->machine->device("namcoio_1");
+	device_t *namcoio_2 = device->machine->device("namcoio_2");
 
 	irq0_line_assert(device);	// this also checks if irq is enabled - IMPORTANT!
 						// so don't replace with cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
@@ -2239,7 +2239,7 @@ static DRIVER_INIT( grobda )
        However, removing the 15XX from the board causes sound to disappear completely, so
        the DAC might be built-in after all.
       */
-	running_device *dac = machine->device("dac");
+	device_t *dac = machine->device("dac");
 	memory_install_write8_device_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), dac, 0x0002, 0x0002, 0, 0, grobda_DAC_w );
 }
 

@@ -12,7 +12,7 @@ struct _vr0_interface
 	UINT32 RegBase;
 };
 
-void vr0_snd_set_areas(running_device *device,UINT32 *texture,UINT32 *frame);
+void vr0_snd_set_areas(device_t *device,UINT32 *texture,UINT32 *frame);
 
 READ32_DEVICE_HANDLER( vr0_snd_read );
 WRITE32_DEVICE_HANDLER( vr0_snd_write );

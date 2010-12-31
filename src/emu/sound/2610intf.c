@@ -25,11 +25,11 @@ struct _ym2610_state
 	void *			chip;
 	void *			psg;
 	const ym2610_interface *intf;
-	running_device *device;
+	device_t *device;
 };
 
 
-INLINE ym2610_state *get_safe_token(running_device *device)
+INLINE ym2610_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == YM2610 || device->type() == YM2610B);

@@ -191,7 +191,7 @@ MACHINE_RESET( mcr )
 
 INTERRUPT_GEN( mcr_interrupt )
 {
-	running_device *ctc = device->machine->device("ctc");
+	device_t *ctc = device->machine->device("ctc");
 
 	/* CTC line 2 is connected to VBLANK, which is once every 1/2 frame */
 	/* for the 30Hz interlaced display */
@@ -210,7 +210,7 @@ INTERRUPT_GEN( mcr_interrupt )
 
 INTERRUPT_GEN( mcr_ipu_interrupt )
 {
-	running_device *ctc = device->machine->device("ipu_ctc");
+	device_t *ctc = device->machine->device("ipu_ctc");
 
 	/* CTC line 3 is connected to 493, which is signalled once every */
 	/* frame at 30Hz */

@@ -58,7 +58,7 @@ struct _ssp1601_state_t
 	address_space *io;
 };
 
-INLINE ssp1601_state_t *get_safe_token(running_device *device)
+INLINE ssp1601_state_t *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == SSP1601);

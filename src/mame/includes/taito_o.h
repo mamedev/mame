@@ -14,8 +14,8 @@ public:
 //  UINT16 *    paletteram;    // currently this uses generic palette handling
 
 	/* devices */
-	running_device *maincpu;
-	running_device *tc0080vco;
+	device_t *maincpu;
+	device_t *tc0080vco;
 };
 
 /*----------- defined in video/taito_o.c -----------*/

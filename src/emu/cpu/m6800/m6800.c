@@ -154,7 +154,7 @@ struct _m6800_state
 
 };
 
-INLINE m6800_state *get_safe_token(running_device *device)
+INLINE m6800_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == M6800 ||

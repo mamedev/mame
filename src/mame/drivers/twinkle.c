@@ -672,7 +672,7 @@ ADDRESS_MAP_END
 
 /* SPU board */
 
-static void ide_interrupt(running_device *device, int state_)
+static void ide_interrupt(device_t *device, int state_)
 {
 	twinkle_state *state = device->machine->driver_data<twinkle_state>();
 
@@ -889,7 +889,7 @@ static DRIVER_INIT( twinkle )
 	psx_dma_install_read_handler(machine, 5, scsi_dma_read);
 	psx_dma_install_write_handler(machine, 5, scsi_dma_write);
 
-	running_device *i2cmem = machine->device("security");
+	device_t *i2cmem = machine->device("security");
 	i2cmem_e0_write( i2cmem, 0 );
 	i2cmem_e1_write( i2cmem, 0 );
 	i2cmem_e2_write( i2cmem, 0 );
@@ -904,7 +904,7 @@ static MACHINE_RESET( twinkle )
 	cdda_set_cdrom(machine->device("cdda"), am53cf96_get_device(SCSI_ID_4));
 }
 
-static void spu_irq(running_device *device, UINT32 data)
+static void spu_irq(device_t *device, UINT32 data)
 {
 	psx_irq_set(device->machine, data);
 }

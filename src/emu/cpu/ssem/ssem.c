@@ -26,7 +26,7 @@ struct _ssem_state
     int icount;
 };
 
-INLINE ssem_state *get_safe_token(running_device *device)
+INLINE ssem_state *get_safe_token(device_t *device)
 {
     assert(device != NULL);
     assert(device->type() == SSEM);

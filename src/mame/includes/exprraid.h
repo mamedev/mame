@@ -26,8 +26,8 @@ public:
 	//int          coin;    // used in the commented out INTERRUPT_GEN - can this be removed?
 
 	/* devices */
-	running_device *maincpu;
-	running_device *slave;
+	device_t *maincpu;
+	device_t *slave;
 };
 
 
