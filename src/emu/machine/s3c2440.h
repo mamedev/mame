@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    Samsung S3C2440 private data
+    Samsung S3C2440
 
 *******************************************************************************/
 
@@ -12,8 +12,6 @@
 *******************************************************************************/
 
 #define S3C2440_TAG "s3c2440"
-
-#define S3C2440 DEVICE_GET_INFO_NAME( s3c2440 )
 
 #define MDRV_S3C2440_ADD(_tag, _clock, _config) \
     MDRV_DEVICE_ADD(_tag, S3C2440, _clock) \
@@ -34,6 +32,8 @@ enum
 	S3C2440_GPIO_PORT_H,
 	S3C2440_GPIO_PORT_J
 };
+
+DECLARE_LEGACY_DEVICE(S3C2440, s3c2440);
 
 /*******************************************************************************
     TYPE DEFINITIONS
@@ -78,6 +78,12 @@ struct _s3c2440_interface_nand
 	write8_device_func data_w;
 };
 
+typedef struct _s3c2440_interface_lcd s3c2440_interface_lcd;
+struct _s3c2440_interface_lcd
+{
+	int flags;
+};
+
 typedef struct _s3c2440_interface s3c2440_interface;
 struct _s3c2440_interface
 {
@@ -86,6 +92,7 @@ struct _s3c2440_interface
 	s3c2440_interface_adc adc;
 	s3c2440_interface_i2s i2s;
 	s3c2440_interface_nand nand;
+	s3c2440_interface_lcd lcd;
 };
 
 /*******************************************************************************
@@ -107,6 +114,10 @@ WRITE_LINE_DEVICE_HANDLER( s3c2440_pin_frnb_w );
 /*******************************************************************************
     MACROS & CONSTANTS
 *******************************************************************************/
+
+/* Interface */
+
+#define S3C24XX_INTERFACE_LCD_REVERSE 1
 
 /* Memory Controller */
 
@@ -770,6 +781,7 @@ typedef struct
 typedef struct
 {
 	s3c24xx_irq_regs_t regs;
+	int line_irq, line_fiq;
 } s3c24xx_irq_t;
 
 typedef struct

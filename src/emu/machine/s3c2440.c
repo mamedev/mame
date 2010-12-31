@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
-#include "s3c2440.h"
+#include "machine/s3c2440.h"
 #include "sound/dac.h"
 
 #define VERBOSE_LEVEL ( 0 )
@@ -26,8 +26,6 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 		logerror( "%s: %s", cpuexec_describe_context( machine), buf);
 	}
 }
-
-#include "machine/s3c2440.h"
 
 #define DEVICE_S3C2440
 #include "machine/s3c24xx.c"
@@ -115,3 +113,5 @@ WRITE_LINE_DEVICE_HANDLER( s3c2440_pin_frnb_w )
 {
 	s3c24xx_pin_frnb_w( device, state);
 }
+
+DEFINE_LEGACY_DEVICE(S3C2440, s3c2440);

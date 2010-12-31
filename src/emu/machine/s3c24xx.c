@@ -243,50 +243,50 @@ static void s3c24xx_lcd_dma_init( running_device *device)
 	s3c24xx->lcd.dma_bits = 0;
 }
 
-/*
+#if 0
 static UINT32 s3c24xx_lcd_dma_read( running_device *device)
 {
-    s3c24xx_t *s3c24xx = get_token( device);
-    address_space* space = cputag_get_address_space( device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-    UINT8 *vram, data[4];
-    vram = (UINT8 *)space->get_read_ptr( s3c24xx->lcd.vramaddr_cur);
-    for (int i = 0; i < 2; i++)
-    {
-        data[i*2+0] = *vram++;
-        data[i*2+1] = *vram++;
-        s3c24xx->lcd.vramaddr_cur += 2;
-        s3c24xx->lcd.pagewidth_cur++;
-        if (s3c24xx->lcd.pagewidth_cur >= s3c24xx->lcd.pagewidth_max)
-        {
-            s3c24xx->lcd.vramaddr_cur += s3c24xx->lcd.offsize << 1;
-            s3c24xx->lcd.pagewidth_cur = 0;
-            vram = (UINT8 *)space->get_read_ptr( s3c24xx->lcd.vramaddr_cur);
-        }
-    }
-    if (s3c24xx->lcd.hwswp == 0)
-    {
-        if (s3c24xx->lcd.bswp == 0)
-        {
-            return (data[3] << 24) | (data[2] << 16) | (data[1] << 8) | (data[0] << 0);
-        }
-        else
-        {
-            return (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | (data[3] << 0);
-        }
-    }
-    else
-    {
-        if (s3c24xx->lcd.bswp == 0)
-        {
-            return (data[1] << 24) | (data[0] << 16) | (data[3] << 8) | (data[2] << 0);
-        }
-        else
-        {
-            return (data[2] << 24) | (data[3] << 16) | (data[0] << 8) | (data[1] << 0);
-        }
-    }
+	s3c24xx_t *s3c24xx = get_token( device);
+	address_space* space = cputag_get_address_space( device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8 *vram, data[4];
+	vram = (UINT8 *)space->get_read_ptr( s3c24xx->lcd.vramaddr_cur);
+	for (int i = 0; i < 2; i++)
+	{
+		data[i*2+0] = *vram++;
+		data[i*2+1] = *vram++;
+		s3c24xx->lcd.vramaddr_cur += 2;
+		s3c24xx->lcd.pagewidth_cur++;
+		if (s3c24xx->lcd.pagewidth_cur >= s3c24xx->lcd.pagewidth_max)
+		{
+			s3c24xx->lcd.vramaddr_cur += s3c24xx->lcd.offsize << 1;
+			s3c24xx->lcd.pagewidth_cur = 0;
+			vram = (UINT8 *)space->get_read_ptr( s3c24xx->lcd.vramaddr_cur);
+		}
+	}
+	if (s3c24xx->lcd.hwswp == 0)
+	{
+		if (s3c24xx->lcd.bswp == 0)
+		{
+			return (data[3] << 24) | (data[2] << 16) | (data[1] << 8) | (data[0] << 0);
+		}
+		else
+		{
+			return (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | (data[3] << 0);
+		}
+	}
+	else
+	{
+		if (s3c24xx->lcd.bswp == 0)
+		{
+			return (data[1] << 24) | (data[0] << 16) | (data[3] << 8) | (data[2] << 0);
+		}
+		else
+		{
+			return (data[2] << 24) | (data[3] << 16) | (data[0] << 8) | (data[1] << 0);
+		}
+	}
 }
-*/
+#endif
 
 static UINT32 s3c24xx_lcd_dma_read( running_device *device)
 {
@@ -351,7 +351,14 @@ static UINT32 s3c24xx_lcd_dma_read( running_device *device)
 			vram += 2;
 		}
 	}
-	return (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | (data[3] << 0);
+	if (s3c24xx->iface->lcd.flags & S3C24XX_INTERFACE_LCD_REVERSE)
+	{
+		return (data[3] << 24) | (data[2] << 16) | (data[1] << 8) | (data[0] << 0);
+	}
+	else
+	{
+		return (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | (data[3] << 0);
+	}
 }
 
 static UINT32 s3c24xx_lcd_dma_read_bits( running_device *device, int count)
@@ -416,8 +423,16 @@ static void s3c24xx_lcd_render_stn_01( running_device *device)
 		UINT32 data = s3c24xx_lcd_dma_read( device);
 		for (int j = 0; j < 32; j++)
 		{
-			*scanline++ = s3c24xx_get_color_stn_01( device, (data >> 31) & 0x01);
-			data = data << 1;
+			if (s3c24xx->iface->lcd.flags & S3C24XX_INTERFACE_LCD_REVERSE)
+			{
+				*scanline++ = s3c24xx_get_color_stn_01( device, data & 0x01);
+				data = data >> 1;
+			}
+			else
+			{
+				*scanline++ = s3c24xx_get_color_stn_01( device, (data >> 31) & 0x01);
+				data = data << 1;
+			}
 			s3c24xx->lcd.hpos++;
 			if (s3c24xx->lcd.hpos >= s3c24xx->lcd.hpos_min + (s3c24xx->lcd.pagewidth_max << 4))
 			{
@@ -517,6 +532,30 @@ static void s3c24xx_lcd_render_stn_12_p( running_device *device)
 			if (s3c24xx->lcd.vpos > s3c24xx->lcd.vpos_max) s3c24xx->lcd.vpos = s3c24xx->lcd.vpos_min;
 			s3c24xx->lcd.hpos = s3c24xx->lcd.hpos_min;
 			scanline = BITMAP_ADDR32( bitmap, s3c24xx->lcd.vpos, s3c24xx->lcd.hpos);
+		}
+	}
+}
+
+static void s3c24xx_lcd_render_stn_12_u( running_device *device) // not tested
+{
+	s3c24xx_t *s3c24xx = get_token( device);
+	bitmap_t *bitmap = s3c24xx->lcd.bitmap[0];
+	UINT32 *scanline = BITMAP_ADDR32( bitmap, s3c24xx->lcd.vpos, s3c24xx->lcd.hpos);
+	for (int i = 0; i < 4; i++)
+	{
+		UINT32 data = s3c24xx_lcd_dma_read( device);
+		for (int j = 0; j < 2; j++)
+		{
+			*scanline++ = s3c24xx_get_color_stn_12( device, (data >> 16) & 0x0FFF);
+			data = data << 16;
+			s3c24xx->lcd.hpos++;
+			if (s3c24xx->lcd.hpos >= s3c24xx->lcd.hpos_min + (s3c24xx->lcd.pagewidth_max << 0))
+			{
+				s3c24xx->lcd.vpos++;
+				if (s3c24xx->lcd.vpos > s3c24xx->lcd.vpos_max) s3c24xx->lcd.vpos = s3c24xx->lcd.vpos_min;
+				s3c24xx->lcd.hpos = s3c24xx->lcd.hpos_min;
+				scanline = BITMAP_ADDR32( bitmap, s3c24xx->lcd.vpos, s3c24xx->lcd.hpos);
+			}
 		}
 	}
 }
@@ -668,6 +707,7 @@ static TIMER_CALLBACK( s3c24xx_lcd_timer_exp )
 				case S3C24XX_BPPMODE_STN_04   : s3c24xx_lcd_render_stn_04( device); break;
 				case S3C24XX_BPPMODE_STN_08   : s3c24xx_lcd_render_stn_08( device); break;
 				case S3C24XX_BPPMODE_STN_12_P : s3c24xx_lcd_render_stn_12_p( device); break;
+				case S3C24XX_BPPMODE_STN_12_U : s3c24xx_lcd_render_stn_12_u( device); break;
 				case S3C24XX_BPPMODE_TFT_01   : s3c24xx_lcd_render_tft_01( device); break;
 				case S3C24XX_BPPMODE_TFT_02   : s3c24xx_lcd_render_tft_02( device); break;
 				case S3C24XX_BPPMODE_TFT_04   : s3c24xx_lcd_render_tft_04( device); break;
@@ -765,7 +805,6 @@ READ32_DEVICE_HANDLER( s3c2440_lcd_r )
 		}
 		break;
 	}
-if (offset != S3C24XX_LCDCON5)
 	verboselog( device->machine, 9, "(LCD) %08X -> %08X\n", S3C24XX_BASE_LCD + (offset << 2), data);
 	return data;
 }
@@ -1011,7 +1050,9 @@ static WRITE32_DEVICE_HANDLER( s3c24xx_clkpow_w )
 static void s3c24xx_check_pending_irq( running_device *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	UINT32 temp = s3c24xx->irq.regs.srcpnd & ~s3c24xx->irq.regs.intmsk;
+	UINT32 temp;
+	// normal irq
+	temp = (s3c24xx->irq.regs.srcpnd & ~s3c24xx->irq.regs.intmsk) & ~s3c24xx->irq.regs.intmod;
 	if (temp != 0)
 	{
 		UINT32 int_type = 0;
@@ -1022,11 +1063,43 @@ static void s3c24xx_check_pending_irq( running_device *device)
 		}
 		s3c24xx->irq.regs.intpnd |= (1 << int_type);
 		s3c24xx->irq.regs.intoffset = int_type;
-		cputag_set_input_line( device->machine, "maincpu", ARM7_IRQ_LINE, ASSERT_LINE);
+		if (s3c24xx->irq.line_irq != ASSERT_LINE)
+		{
+			cputag_set_input_line( device->machine, "maincpu", ARM7_IRQ_LINE, ASSERT_LINE);
+			s3c24xx->irq.line_irq = ASSERT_LINE;
+		}
 	}
 	else
 	{
-		cputag_set_input_line( device->machine, "maincpu", ARM7_IRQ_LINE, CLEAR_LINE);
+		if (s3c24xx->irq.line_irq != CLEAR_LINE)
+		{
+			cputag_set_input_line( device->machine, "maincpu", ARM7_IRQ_LINE, CLEAR_LINE);
+			s3c24xx->irq.line_irq = CLEAR_LINE;
+		}
+	}
+	// fast irq
+	temp = (s3c24xx->irq.regs.srcpnd & ~s3c24xx->irq.regs.intmsk) & s3c24xx->irq.regs.intmod;
+	if (temp != 0)
+	{
+		UINT32 int_type = 0;
+		while ((temp & 1) == 0)
+		{
+			int_type++;
+			temp = temp >> 1;
+		}
+		if (s3c24xx->irq.line_fiq != ASSERT_LINE)
+		{
+			cputag_set_input_line( device->machine, "maincpu", ARM7_FIRQ_LINE, ASSERT_LINE);
+			s3c24xx->irq.line_fiq = ASSERT_LINE;
+		}
+	}
+	else
+	{
+		if (s3c24xx->irq.line_fiq != CLEAR_LINE)
+		{
+			cputag_set_input_line( device->machine, "maincpu", ARM7_FIRQ_LINE, CLEAR_LINE);
+			s3c24xx->irq.line_fiq = CLEAR_LINE;
+		}
 	}
 }
 
@@ -1530,13 +1603,13 @@ static void s3c24xx_dma_w( running_device *device, UINT32 ch, UINT32 offset, UIN
 	{
 		case S3C24XX_DCON :
 		{
-			/* --- is this code necessary ???
-            if ((data & (1 << 22)) != 0) // reload
-            {
-                s3c24xx_dma_regs_t *regs = &s3c24xx->dma[ch].regs;
-                regs->dmasktrig &= ~(1 << 1); // clear on/off
-            }
-            */
+			#if 0 // is this code necessary ???
+			if ((data & (1 << 22)) != 0) // reload
+			{
+				s3c24xx_dma_regs_t *regs = &s3c24xx->dma[ch].regs;
+				regs->dmasktrig &= ~(1 << 1); // clear on/off
+			}
+			#endif
 		}
 		break;
 		case S3C24XX_DMASKTRIG :
@@ -1924,6 +1997,32 @@ static WRITE32_DEVICE_HANDLER( s3c24xx_usb_device_w )
 
 /* Watchdog Timer */
 
+#if defined(DEVICE_S3C2410)
+
+static UINT16 s3c24xx_wdt_calc_current_count( running_device *device)
+{
+	s3c24xx_t *s3c24xx = get_token( device);
+	double timeleft, x1, x2;
+	UINT32 cnt;
+	timeleft = attotime_to_double( timer_timeleft( s3c24xx->wdt.timer));
+//	printf( "timeleft %f freq %d cnt %d\n", timeleft, s3c24xx->wdt.freq, s3c24xx->wdt.cnt);
+	x1 = 1 / ((double)s3c24xx->wdt.freq / s3c24xx->wdt.cnt);
+	x2 = x1 / timeleft;
+//	printf( "x1 %f\n", x1);
+	cnt = s3c24xx->wdt.cnt / x2;
+//	printf( "cnt %d\n", cnt);
+	return cnt;
+}
+
+#else
+
+static UINT16 s3c24xx_wdt_calc_current_count( running_device *device)
+{
+	return 0;
+}
+
+#endif
+
 static READ32_DEVICE_HANDLER( s3c24xx_wdt_r )
 {
 	s3c24xx_t *s3c24xx = get_token( device);
@@ -1932,7 +2031,11 @@ static READ32_DEVICE_HANDLER( s3c24xx_wdt_r )
 	{
 		case S3C24XX_WTCNT :
 		{
-			data = 0;
+			// is wdt active?
+			if ((s3c24xx->wdt.regs.wtcon & (1 << 5)) != 0)
+			{
+				data = s3c24xx_wdt_calc_current_count( device);
+			}
 		}
 		break;
 	}
@@ -1953,12 +2056,17 @@ static void s3c24xx_wdt_start( running_device *device)
 	hz = freq / s3c24xx->wdt.regs.wtcnt;
 	verboselog( device->machine, 5, "WDT pclk %d prescaler %d clock %d freq %f hz %f\n", pclk, prescaler, clock, freq, hz);
 	timer_adjust_periodic( s3c24xx->wdt.timer, ATTOTIME_IN_HZ( hz), 0, ATTOTIME_IN_HZ( hz));
+#if defined(DEVICE_S3C2410)
+	s3c24xx->wdt.freq = freq;
+	s3c24xx->wdt.cnt = s3c24xx->wdt.regs.wtcnt;
+#endif
 }
 
 static void s3c24xx_wdt_stop( running_device *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	verboselog( device->machine, 1, "WDT stop\n");
+	s3c24xx->wdt.regs.wtcnt = s3c24xx_wdt_calc_current_count( device);
 	timer_adjust_oneshot( s3c24xx->wdt.timer, attotime_never, 0);
 }
 
@@ -3050,6 +3158,10 @@ static DEVICE_RESET( s3c24xx )
 	s3c24xx_t *s3c24xx = get_token( device);
 	s3c24xx->iis.fifo_index = 0;
 //  s3c24xx->iic.data_index = 0;
+#if defined(DEVICE_S3C2410) || defined(DEVICE_S3C2440)
+	s3c24xx->gpio.regs.gstatus2 = 0x00000001; // Boot is caused by power on reset
+#endif
+	s3c24xx->irq.line_irq = s3c24xx->irq.line_fiq = CLEAR_LINE;
 }
 
 static DEVICE_START( s3c24xx )

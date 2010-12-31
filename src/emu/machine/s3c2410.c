@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
-#include "s3c2410.h"
+#include "machine/s3c2410.h"
 #include "sound/dac.h"
 
 #define VERBOSE_LEVEL ( 0 )
@@ -26,8 +26,6 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 		logerror( "%s: %s", cpuexec_describe_context( machine), buf);
 	}
 }
-
-#include "machine/s3c2410.h"
 
 #define DEVICE_S3C2410
 #include "machine/s3c24xx.c"
@@ -108,6 +106,11 @@ void s3c2410_nand_calculate_mecc( UINT8 *data, UINT32 size, UINT8 *mecc)
 {
 	mecc[0] = mecc[1] = mecc[2] = mecc[3] = 0;
 	for (int i = 0; i < size; i++) nand_update_mecc( mecc, i, data[i]);
+}
+
+void s3c2410_request_eint( running_device *device, UINT32 number)
+{
+	s3c24xx_request_eint( device, number);
 }
 
 DEFINE_LEGACY_DEVICE(S3C2410, s3c2410);

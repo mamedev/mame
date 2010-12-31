@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
-#include "s3c2400.h"
+#include "machine/s3c2400.h"
 #include "sound/dac.h"
 
 #define VERBOSE_LEVEL ( 0 )
@@ -26,8 +26,6 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 		logerror( "%s: %s", cpuexec_describe_context( machine), buf);
 	}
 }
-
-#include "machine/s3c2400.h"
 
 #define DEVICE_S3C2400
 #include "machine/s3c24xx.c"
@@ -90,3 +88,5 @@ void s3c2400_uart_fifo_w( running_device *device, int uart, UINT8 data)
 {
 	s3c24xx_uart_fifo_w( device, uart, data);
 }
+
+DEFINE_LEGACY_DEVICE(S3C2400, s3c2400);

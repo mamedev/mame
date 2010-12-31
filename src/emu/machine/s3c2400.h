@@ -1,19 +1,19 @@
 /*******************************************************************************
 
-    Samsung S3C2400 private data
+    Samsung S3C2400
 
 *******************************************************************************/
 
 #ifndef __S3C2400_H__
 #define __S3C2400_H__
 
+#include "devlegcy.h"
+
 /*******************************************************************************
     MACROS / CONSTANTS
 *******************************************************************************/
 
 #define S3C2400_TAG "s3c2400"
-
-#define S3C2400 DEVICE_GET_INFO_NAME( s3c2400 )
 
 #define MDRV_S3C2400_ADD(_tag, _clock, _config) \
     MDRV_DEVICE_ADD(_tag, S3C2400, _clock) \
@@ -32,6 +32,8 @@ enum
 	S3C2400_GPIO_PORT_F,
 	S3C2400_GPIO_PORT_G
 };
+
+DECLARE_LEGACY_DEVICE(S3C2400, s3c2400);
 
 /*******************************************************************************
     TYPE DEFINITIONS
@@ -67,6 +69,12 @@ struct _s3c2400_interface_i2s
 	write16_device_func data_w;
 };
 
+typedef struct _s3c2400_interface_lcd s3c2400_interface_lcd;
+struct _s3c2400_interface_lcd
+{
+	int flags;
+};
+
 typedef struct _s3c2400_interface s3c2400_interface;
 struct _s3c2400_interface
 {
@@ -74,6 +82,7 @@ struct _s3c2400_interface
 	s3c2400_interface_i2c i2c;
 	s3c2400_interface_adc adc;
 	s3c2400_interface_i2s i2s;
+	s3c2400_interface_lcd lcd;
 };
 
 /*******************************************************************************
@@ -90,6 +99,10 @@ void s3c2400_uart_fifo_w( running_device *device, int uart, UINT8 data);
 /*******************************************************************************
     MACROS & CONSTANTS
 *******************************************************************************/
+
+/* Interface */
+
+#define S3C24XX_INTERFACE_LCD_REVERSE 1
 
 /* Memory Controller */
 
@@ -583,6 +596,7 @@ typedef struct
 typedef struct
 {
 	s3c24xx_irq_regs_t regs;
+	int line_irq, line_fiq;
 } s3c24xx_irq_t;
 
 typedef struct
