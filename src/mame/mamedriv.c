@@ -9544,6 +9544,11 @@ Other Sun games
 	DRIVER( potnpkrc )	/* Bootleg */
 	DRIVER( potnpkrd )	/* Bootleg */
 	DRIVER( potnpkre )	/* Bootleg */
+	DRIVER( goodluck )	/* Unknown */
+	DRIVER( superdbl )	/* 198? Karateco */
+	DRIVER( ngold )		/* 198? Unknown */
+	DRIVER( ngolda )	/* 198? Unknown */
+	DRIVER( ngoldb )	/* 198? Unknown */
 	DRIVER( witchcrd )	/* (c) 1991, Video Klein */
 	DRIVER( witchcda )	/* 1991, Unknown */
 	DRIVER( witchcdb )	/* 1991, Unknown */
@@ -9580,7 +9585,6 @@ Other Sun games
 	DRIVER( bsuertet )	/* 1991, Unknown */
 	DRIVER( bsuerteu )	/* 1991, Unknown */
 	DRIVER( pmpoker )	/* (c) 1981 PlayMan */
-	DRIVER( goodluck )	/* Unknown */
 	DRIVER( royale )	/* Unknown */
 	DRIVER( royalea )	/* Unknown */
 	DRIVER( sloco93 )	/* 1993, Unknown */
@@ -9589,7 +9593,6 @@ Other Sun games
 	DRIVER( brasil89 )	/* 1989, Unknown */
 	DRIVER( poker91 )	/* 1991, Unknown */
 	DRIVER( genie )		/* (c) 198? Video Fun Games Ltd. */
-	DRIVER( superdbl )	/* 198? Karateco */
 	DRIVER( silverga )	/* 1983, Unknown */
 	DRIVER( pokerdub )	/* 198?, Unknown */
 	DRIVER( pokerduc )	/* 198?, Unknown */
