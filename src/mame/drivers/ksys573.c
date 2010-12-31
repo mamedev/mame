@@ -1461,7 +1461,7 @@ static ADDRESS_MAP_START( konami573_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f801c00, 0x1f801dff) AM_DEVREADWRITE("spu", psx_spu_r, psx_spu_w)
 	AM_RANGE(0x1f802020, 0x1f802033) AM_RAM /* ?? */
 	AM_RANGE(0x1f802040, 0x1f802043) AM_WRITENOP
-	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE("share2") AM_REGION("user1", 0) /* bios */
+	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE("share2") AM_REGION("bios", 0)
 	AM_RANGE(0x80000000, 0x803fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
 	AM_RANGE(0x9fc00000, 0x9fc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
 	AM_RANGE(0xa0000000, 0xa03fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
@@ -3312,17 +3312,17 @@ static INPUT_PORTS_START( mamboagg )
 	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNUSED ) /* P2 BUTTON6 */
 INPUT_PORTS_END
 
-#define SYS573_BIOS_A ROM_LOAD( "700a01.22g",   0x0000000, 0x080000, CRC(11812ef8) SHA1(e1284add4aaddd5337bd7f4e27614460d52b5b48))
+#define SYS573_BIOS_A \
+	ROM_REGION32_LE( 0x080000, "bios", 0 ) \
+	ROM_LOAD( "700a01.22g",   0x0000000, 0x080000, CRC(11812ef8) SHA1(e1284add4aaddd5337bd7f4e27614460d52b5b48))
 
 // BIOS
 ROM_START( sys573 )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 ROM_END
 
 // Games
 ROM_START( bassangl )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -3333,7 +3333,6 @@ ROM_START( bassangl )
 ROM_END
 
 ROM_START( bassang2 )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -3344,7 +3343,6 @@ ROM_START( bassang2 )
 ROM_END
 
 ROM_START( cr589fw )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	DISK_REGION( "cdrom0" )
@@ -3352,7 +3350,6 @@ ROM_START( cr589fw )
 ROM_END
 
 ROM_START( cr589fwa )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	DISK_REGION( "cdrom0" )
@@ -3360,7 +3357,6 @@ ROM_START( cr589fwa )
 ROM_END
 
 ROM_START( darkhleg )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -3371,7 +3367,6 @@ ROM_START( darkhleg )
 ROM_END
 
 ROM_START( fmania )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -3382,7 +3377,6 @@ ROM_START( fmania )
 ROM_END
 
 ROM_START( ddrextrm )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
@@ -3396,7 +3390,6 @@ ROM_START( ddrextrm )
 ROM_END
 
 ROM_START( ddru )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -3407,7 +3400,6 @@ ROM_START( ddru )
 ROM_END
 
 ROM_START( ddrj )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -3418,7 +3410,6 @@ ROM_START( ddrj )
 ROM_END
 
 ROM_START( ddrja )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -3449,7 +3440,6 @@ ROM_START( ddrja )
 ROM_END
 
 ROM_START( ddrjb )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -3480,7 +3470,6 @@ ROM_START( ddrjb )
 ROM_END
 
 ROM_START( ddra )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -3491,7 +3480,6 @@ ROM_START( ddra )
 ROM_END
 
 ROM_START( ddr2m )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -3502,7 +3490,6 @@ ROM_START( ddr2m )
 ROM_END
 
 ROM_START( ddr2mc )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -3516,7 +3503,6 @@ ROM_START( ddr2mc )
 ROM_END
 
 ROM_START( ddr2mc2 )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -3530,7 +3516,6 @@ ROM_START( ddr2mc2 )
 ROM_END
 
 ROM_START( ddr2ml )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x080000, "cpu2", 0 ) /* memory card reader */
@@ -3544,7 +3529,6 @@ ROM_START( ddr2ml )
 ROM_END
 
 ROM_START( ddr3ma )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000084, "user2", 0 ) /* install security cart eeprom */
@@ -3564,7 +3548,6 @@ ROM_START( ddr3ma )
 ROM_END
 
 ROM_START( ddr3mj )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000084, "user2", 0 ) /* install security cart eeprom */
@@ -3584,7 +3567,6 @@ ROM_START( ddr3mj )
 ROM_END
 
 ROM_START( ddr3mk )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000084, "user2", 0 ) /* install security cart eeprom */
@@ -3604,7 +3586,6 @@ ROM_START( ddr3mk )
 ROM_END
 
 ROM_START( ddr3mka )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000084, "user2", 0 ) /* install security cart eeprom */
@@ -3624,7 +3605,6 @@ ROM_START( ddr3mka )
 ROM_END
 
 ROM_START( ddr3mp )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
@@ -3644,7 +3624,6 @@ ROM_START( ddr3mp )
 ROM_END
 
 ROM_START( ddr4m )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
@@ -3664,7 +3643,6 @@ ROM_START( ddr4m )
 ROM_END
 
 ROM_START( ddr4mj )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
@@ -3684,7 +3662,6 @@ ROM_START( ddr4mj )
 ROM_END
 
 ROM_START( ddr4ms )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
@@ -3704,7 +3681,6 @@ ROM_START( ddr4ms )
 ROM_END
 
 ROM_START( ddr4msj )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
@@ -3724,7 +3700,6 @@ ROM_START( ddr4msj )
 ROM_END
 
 ROM_START( ddr4mp )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
@@ -3747,7 +3722,6 @@ ROM_START( ddr4mp )
 ROM_END
 
 ROM_START( ddr4mps )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
@@ -3770,7 +3744,6 @@ ROM_START( ddr4mps )
 ROM_END
 
 ROM_START( ddr5m )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
@@ -3784,7 +3757,6 @@ ROM_START( ddr5m )
 ROM_END
 
 ROM_START( ddrbocd )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -3798,7 +3770,6 @@ ROM_START( ddrbocd )
 ROM_END
 
 ROM_START( ddrs2k )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000084, "user2", 0 ) /* install security cart eeprom */
@@ -3818,7 +3789,6 @@ ROM_START( ddrs2k )
 ROM_END
 
 ROM_START( ddrs2kj )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000084, "user2", 0 ) /* install security cart eeprom */
@@ -3838,7 +3808,6 @@ ROM_START( ddrs2kj )
 ROM_END
 
 ROM_START( ddrmax )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
@@ -3852,7 +3821,6 @@ ROM_START( ddrmax )
 ROM_END
 
 ROM_START( ddrmax2 )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
@@ -3866,7 +3834,6 @@ ROM_START( ddrmax2 )
 ROM_END
 
 ROM_START( ddrsbm )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000084, "user2", 0 ) /* security cart eeprom */
@@ -3880,7 +3847,6 @@ ROM_START( ddrsbm )
 ROM_END
 
 ROM_START( ddrusa )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
@@ -3894,7 +3860,6 @@ ROM_START( ddrusa )
 ROM_END
 
 ROM_START( drmn )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -3916,7 +3881,6 @@ ROM_START( drmn )
 ROM_END
 
 ROM_START( drmn2m )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
@@ -3936,7 +3900,6 @@ ROM_START( drmn2m )
 ROM_END
 
 ROM_START( drmn2mpu )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
@@ -3959,7 +3922,6 @@ ROM_START( drmn2mpu )
 ROM_END
 
 ROM_START( drmn3m )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
@@ -3979,7 +3941,6 @@ ROM_START( drmn3m )
 ROM_END
 
 ROM_START( dmx )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
@@ -3993,7 +3954,6 @@ ROM_START( dmx )
 ROM_END
 
 ROM_START( dmx2m )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
@@ -4007,7 +3967,6 @@ ROM_START( dmx2m )
 ROM_END
 
 ROM_START( dmx2majp )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
@@ -4026,7 +3985,6 @@ ROM_START( dmx2majp )
 ROM_END
 
 ROM_START( dncfrks )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
@@ -4040,7 +3998,6 @@ ROM_START( dncfrks )
 ROM_END
 
 ROM_START( dsem )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
@@ -4054,7 +4011,6 @@ ROM_START( dsem )
 ROM_END
 
 ROM_START( dsem2 )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
@@ -4068,7 +4024,6 @@ ROM_START( dsem2 )
 ROM_END
 
 ROM_START( dsfdct )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000084, "user2", 0 ) /* install security cart eeprom */
@@ -4088,7 +4043,6 @@ ROM_START( dsfdct )
 ROM_END
 
 ROM_START( dsfdcta )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000084, "user2", 0 ) /* install security cart eeprom */
@@ -4108,7 +4062,6 @@ ROM_START( dsfdcta )
 ROM_END
 
 ROM_START( dsfdr )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
@@ -4128,7 +4081,6 @@ ROM_START( dsfdr )
 ROM_END
 
 ROM_START( dsftkd )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000084, "user2", 0 ) /* security cart eeprom */
@@ -4142,7 +4094,6 @@ ROM_START( dsftkd )
 ROM_END
 
 ROM_START( dstage )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4153,7 +4104,6 @@ ROM_START( dstage )
 ROM_END
 
 ROM_START( fbait2bc )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4164,7 +4114,6 @@ ROM_START( fbait2bc )
 ROM_END
 
 ROM_START( fbaitbc )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4175,7 +4124,6 @@ ROM_START( fbaitbc )
 ROM_END
 
 ROM_START( fbaitmc )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4186,7 +4134,6 @@ ROM_START( fbaitmc )
 ROM_END
 
 ROM_START( fbaitmca )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4197,7 +4144,6 @@ ROM_START( fbaitmca )
 ROM_END
 
 ROM_START( fbaitmcj )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4208,7 +4154,6 @@ ROM_START( fbaitmcj )
 ROM_END
 
 ROM_START( fbaitmcu )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4219,7 +4164,6 @@ ROM_START( fbaitmcu )
 ROM_END
 
 ROM_START( gtrfrks )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4230,7 +4174,6 @@ ROM_START( gtrfrks )
 ROM_END
 
 ROM_START( gtrfrksu )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4241,7 +4184,6 @@ ROM_START( gtrfrksu )
 ROM_END
 
 ROM_START( gtrfrksj )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4252,7 +4194,6 @@ ROM_START( gtrfrksj )
 ROM_END
 
 ROM_START( gtrfrksa )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4263,7 +4204,6 @@ ROM_START( gtrfrksa )
 ROM_END
 
 ROM_START( gtrfrk2m )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000084, "user2", 0 ) /* security cart eeprom */
@@ -4277,7 +4217,6 @@ ROM_START( gtrfrk2m )
 ROM_END
 
 ROM_START( gtrfrk3m )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
@@ -4300,7 +4239,6 @@ ROM_START( gtrfrk3m )
 ROM_END
 
 ROM_START( gtfrk3ma )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
@@ -4320,7 +4258,6 @@ ROM_START( gtfrk3ma )
 ROM_END
 
 ROM_START( gtfrk3mb )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* game security cart eeprom */
@@ -4334,7 +4271,6 @@ ROM_START( gtfrk3mb )
 ROM_END
 
 ROM_START( gtrfrk4m )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
@@ -4354,7 +4290,6 @@ ROM_START( gtrfrk4m )
 ROM_END
 
 ROM_START( gtrfrk5m )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
@@ -4373,7 +4308,6 @@ ROM_START( gtrfrk5m )
 ROM_END
 
 ROM_START( gtrfrk6m )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* install security cart eeprom */
@@ -4387,7 +4321,6 @@ ROM_START( gtrfrk6m )
 ROM_END
 
 ROM_START( gtrfrk7m )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* install security cart eeprom */
@@ -4406,7 +4339,6 @@ ROM_START( gtrfrk7m )
 ROM_END
 
 ROM_START( gtfrk11m )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
@@ -4420,7 +4352,6 @@ ROM_START( gtfrk11m )
 ROM_END
 
 ROM_START( hyperbbc )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000084, "user2", 0 ) /* security cart eeprom */
@@ -4431,7 +4362,6 @@ ROM_START( hyperbbc )
 ROM_END
 
 ROM_START( hyperbbck )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000084, "user2", 0 ) /* security cart eeprom */
@@ -4442,7 +4372,6 @@ ROM_START( hyperbbck )
 ROM_END
 
 ROM_START( konam80a )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4453,7 +4382,6 @@ ROM_START( konam80a )
 ROM_END
 
 ROM_START( konam80j )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4464,7 +4392,6 @@ ROM_START( konam80j )
 ROM_END
 
 ROM_START( konam80k )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4475,7 +4402,6 @@ ROM_START( konam80k )
 ROM_END
 
 ROM_START( konam80s )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4486,7 +4412,6 @@ ROM_START( konam80s )
 ROM_END
 
 ROM_START( konam80u )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4497,7 +4422,6 @@ ROM_START( konam80u )
 ROM_END
 
 ROM_START( mamboagg )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
@@ -4511,7 +4435,6 @@ ROM_START( mamboagg )
 ROM_END
 
 ROM_START( pbballex )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
@@ -4522,7 +4445,6 @@ ROM_START( pbballex )
 ROM_END
 
 ROM_START( pcnfrk3m )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
@@ -4542,7 +4464,6 @@ ROM_START( pcnfrk3m )
 ROM_END
 
 ROM_START( salarymc )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000084, "user2", 0 ) /* security cart eeprom */
