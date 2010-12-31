@@ -4382,6 +4382,6 @@ GAME(  1991, poker91,  0,        witchcrd, poker91,  0,        ROT0,   "<unknown
 GAME(  198?, genie,    0,        genie,    genie,    0,        ROT0,   "Video Fun Games Ltd.",     "Genie",                                   0 )
 
 GAMEL( 1983, silverga, 0,        goldnpkr, goldnpkr, 0,        ROT0,   "<unknown>",                "Silver Game",                             0,                layout_goldnpkr )
-GAME(  198?, pokerdub, 0,        pottnpkr, goldnpkr, 0,        ROT0,   "<unknown>",                "Unknown french poker game",               GAME_NOT_WORKING )	// lacks of 2nd program ROM.
-GAME(  198?, pokerduc, 0,        goldnpkr, goldnpkr, icp1db,   ROT0,   "<unknown>",                "Unknown encrypted poker game",            GAME_NOT_WORKING )	// encrypted.
+GAME(  198?, pokerdub, 0,        pottnpkr, goldnpkr, 0,        ROT0,   "<unknown>",                "unknown French poker game",               GAME_NOT_WORKING )	// lacks of 2nd program ROM.
+GAME(  198?, pokerduc, 0,        goldnpkr, goldnpkr, icp1db,   ROT0,   "<unknown>",                "unknown encrypted poker game",            GAME_NOT_WORKING )	// encrypted.
 
