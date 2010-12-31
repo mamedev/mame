@@ -92,7 +92,7 @@ static void do_prefetch(v25_state_t *nec_state, int previous_ICount)
 INLINE UINT8 fetch(v25_state_t *nec_state)
 {
 	prefetch(nec_state);
-	return nec_state->direct->read_raw_byte(FETCH_XOR((Sreg(PS)<<4)+nec_state->ip++));
+	return nec_state->direct->read_raw_byte((Sreg(PS)<<4)+nec_state->ip++, nec_state->fetch_xor);
 }
 
 INLINE UINT16 fetchword(v25_state_t *nec_state)
@@ -115,7 +115,7 @@ static UINT8 fetchop(v25_state_t *nec_state)
 	UINT8 ret;
 
 	prefetch(nec_state);
-	ret = nec_state->direct->read_decrypted_byte(FETCH_XOR( ( Sreg(PS)<<4)+nec_state->ip++));
+	ret = nec_state->direct->read_decrypted_byte(( Sreg(PS)<<4)+nec_state->ip++, nec_state->fetch_xor);
 
 	if (nec_state->MF == 0)
 		if (nec_state->config->v25v35_decryptiontable)

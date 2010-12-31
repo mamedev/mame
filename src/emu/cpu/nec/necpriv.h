@@ -143,7 +143,6 @@ typedef enum {
 /* prefetch timing */
 
 #define FETCH() 			fetch(nec_state)
-#define FETCH_XOR(a)		((a) ^ nec_state->fetch_xor)
 #define FETCHWORD()			fetchword(nec_state)
 #define EMPTY_PREFETCH()	nec_state->prefetch_reset = 1
 

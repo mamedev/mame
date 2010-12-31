@@ -241,7 +241,7 @@ static void (*const dsp_op_table[64])(jaguar_state *jaguar, UINT16 op) =
     MEMORY ACCESSORS
 ***************************************************************************/
 
-#define ROPCODE(J,pc)		((J)->direct->read_decrypted_word(WORD_XOR_BE((UINT32)(pc))))
+#define ROPCODE(J,pc)		((J)->direct->read_decrypted_word(pc, WORD_XOR_BE(0)))
 
 
 

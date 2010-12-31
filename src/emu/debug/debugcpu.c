@@ -942,6 +942,7 @@ UINT64 debug_read_opcode(address_space *_space, offs_t address, int size, int ar
 
 	/* keep in physical range */
 	address &= space->bytemask();
+	offs_t addrxor = 0;
 	switch (space->data_width() / 8 * 10 + size)
 	{
 		/* dump opcodes in bytes from a byte-sized bus */
@@ -950,7 +951,7 @@ UINT64 debug_read_opcode(address_space *_space, offs_t address, int size, int ar
 
 		/* dump opcodes in bytes from a word-sized bus */
 		case 21:
-			address ^= (space->endianness() == ENDIANNESS_LITTLE) ? BYTE_XOR_LE(0) : BYTE_XOR_BE(0);
+			addrxor = (space->endianness() == ENDIANNESS_LITTLE) ? BYTE_XOR_LE(0) : BYTE_XOR_BE(0);
 			break;
 
 		/* dump opcodes in words from a word-sized bus */
@@ -959,12 +960,12 @@ UINT64 debug_read_opcode(address_space *_space, offs_t address, int size, int ar
 
 		/* dump opcodes in bytes from a dword-sized bus */
 		case 41:
-			address ^= (space->endianness() == ENDIANNESS_LITTLE) ? BYTE4_XOR_LE(0) : BYTE4_XOR_BE(0);
+			addrxor = (space->endianness() == ENDIANNESS_LITTLE) ? BYTE4_XOR_LE(0) : BYTE4_XOR_BE(0);
 			break;
 
 		/* dump opcodes in words from a dword-sized bus */
 		case 42:
-			address ^= (space->endianness() == ENDIANNESS_LITTLE) ? WORD_XOR_LE(0) : WORD_XOR_BE(0);
+			addrxor = (space->endianness() == ENDIANNESS_LITTLE) ? WORD_XOR_LE(0) : WORD_XOR_BE(0);
 			break;
 
 		/* dump opcodes in dwords from a dword-sized bus */
@@ -973,17 +974,17 @@ UINT64 debug_read_opcode(address_space *_space, offs_t address, int size, int ar
 
 		/* dump opcodes in bytes from a qword-sized bus */
 		case 81:
-			address ^= (space->endianness() == ENDIANNESS_LITTLE) ? BYTE8_XOR_LE(0) : BYTE8_XOR_BE(0);
+			addrxor = (space->endianness() == ENDIANNESS_LITTLE) ? BYTE8_XOR_LE(0) : BYTE8_XOR_BE(0);
 			break;
 
 		/* dump opcodes in words from a qword-sized bus */
 		case 82:
-			address ^= (space->endianness() == ENDIANNESS_LITTLE) ? WORD2_XOR_LE(0) : WORD2_XOR_BE(0);
+			addrxor = (space->endianness() == ENDIANNESS_LITTLE) ? WORD2_XOR_LE(0) : WORD2_XOR_BE(0);
 			break;
 
 		/* dump opcodes in dwords from a qword-sized bus */
 		case 84:
-			address ^= (space->endianness() == ENDIANNESS_LITTLE) ? DWORD_XOR_LE(0) : DWORD_XOR_BE(0);
+			addrxor = (space->endianness() == ENDIANNESS_LITTLE) ? DWORD_XOR_LE(0) : DWORD_XOR_BE(0);
 			break;
 
 		/* dump opcodes in qwords from a qword-sized bus */
@@ -1003,14 +1004,14 @@ UINT64 debug_read_opcode(address_space *_space, offs_t address, int size, int ar
 	switch (size)
 	{
 		case 1:
-			result = (arg) ? space->direct().read_raw_byte(address) : space->direct().read_decrypted_byte(address);
+			result = (arg) ? space->direct().read_raw_byte(address, addrxor) : space->direct().read_decrypted_byte(address, addrxor);
 			break;
 
 		case 2:
-			result = (arg) ? space->direct().read_raw_word(address & ~1) : space->direct().read_decrypted_word(address & ~1);
+			result = (arg) ? space->direct().read_raw_word(address & ~1, addrxor) : space->direct().read_decrypted_word(address & ~1, addrxor);
 			if ((address & 1) != 0)
 			{
-				result2 = (arg) ? space->direct().read_raw_word((address & ~1) + 2) : space->direct().read_decrypted_word((address & ~1) + 2);
+				result2 = (arg) ? space->direct().read_raw_word((address & ~1) + 2, addrxor) : space->direct().read_decrypted_word((address & ~1) + 2, addrxor);
 				if (space->endianness() == ENDIANNESS_LITTLE)
 					result = (result >> (8 * (address & 1))) | (result2 << (16 - 8 * (address & 1)));
 				else
@@ -1020,10 +1021,10 @@ UINT64 debug_read_opcode(address_space *_space, offs_t address, int size, int ar
 			break;
 
 		case 4:
-			result = (arg) ? space->direct().read_raw_dword(address & ~3) : space->direct().read_decrypted_dword(address & ~3);
+			result = (arg) ? space->direct().read_raw_dword(address & ~3, addrxor) : space->direct().read_decrypted_dword(address & ~3, addrxor);
 			if ((address & 3) != 0)
 			{
-				result2 = (arg) ? space->direct().read_raw_dword((address & ~3) + 4) : space->direct().read_decrypted_dword((address & ~3) + 4);
+				result2 = (arg) ? space->direct().read_raw_dword((address & ~3) + 4, addrxor) : space->direct().read_decrypted_dword((address & ~3) + 4, addrxor);
 				if (space->endianness() == ENDIANNESS_LITTLE)
 					result = (result >> (8 * (address & 3))) | (result2 << (32 - 8 * (address & 3)));
 				else
@@ -1033,10 +1034,10 @@ UINT64 debug_read_opcode(address_space *_space, offs_t address, int size, int ar
 			break;
 
 		case 8:
-			result = (arg) ? space->direct().read_raw_qword(address & ~7) : space->direct().read_decrypted_qword(address & ~7);
+			result = (arg) ? space->direct().read_raw_qword(address & ~7, addrxor) : space->direct().read_decrypted_qword(address & ~7, addrxor);
 			if ((address & 7) != 0)
 			{
-				result2 = (arg) ? space->direct().read_raw_qword((address & ~7) + 8) : space->direct().read_decrypted_qword((address & ~7) + 8);
+				result2 = (arg) ? space->direct().read_raw_qword((address & ~7) + 8, addrxor) : space->direct().read_decrypted_qword((address & ~7) + 8, addrxor);
 				if (space->endianness() == ENDIANNESS_LITTLE)
 					result = (result >> (8 * (address & 7))) | (result2 << (64 - 8 * (address & 7)));
 				else

@@ -1760,7 +1760,7 @@ static CPU_EXECUTE( se3208 )
 
 	do
 	{
-		UINT16 Opcode=se3208_state->direct->read_decrypted_word(WORD_XOR_LE(se3208_state->PC));
+		UINT16 Opcode=se3208_state->direct->read_decrypted_word(se3208_state->PC, WORD_XOR_LE(0));
 
 		debugger_instruction_hook(device, se3208_state->PC);
 

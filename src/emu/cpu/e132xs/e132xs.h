@@ -63,7 +63,7 @@ extern unsigned dasm_hyperstone(char *buffer, unsigned pc, const UINT8 *oprom, u
 #define IO_WRITE_W(H,addr, data) (H)->io->write_dword(((addr) >> 11) & 0x7ffc, data)
 
 
-#define READ_OP(H,addr)	       (H)->direct->read_decrypted_word((addr) ^ (H)->opcodexor)
+#define READ_OP(H,addr)	       (H)->direct->read_decrypted_word((addr), (H)->opcodexor)
 
 
 /* Registers Number */

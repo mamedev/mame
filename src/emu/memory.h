@@ -254,18 +254,18 @@ public:
 	void explicit_configure(offs_t bytestart, offs_t byteend, offs_t bytemask, void *raw, void *decrypted = NULL);
 
 	// accessor methods for reading raw data
-	void *read_raw_ptr(offs_t byteaddress);
-	UINT8 read_raw_byte(offs_t byteaddress);
-	UINT16 read_raw_word(offs_t byteaddress);
-	UINT32 read_raw_dword(offs_t byteaddress);
-	UINT64 read_raw_qword(offs_t byteaddress);
+	void *read_raw_ptr(offs_t byteaddress, offs_t directxor = 0);
+	UINT8 read_raw_byte(offs_t byteaddress, offs_t directxor = 0);
+	UINT16 read_raw_word(offs_t byteaddress, offs_t directxor = 0);
+	UINT32 read_raw_dword(offs_t byteaddress, offs_t directxor = 0);
+	UINT64 read_raw_qword(offs_t byteaddress, offs_t directxor = 0);
 
 	// accessor methods for reading decrypted data
-	void *read_decrypted_ptr(offs_t byteaddress);
-	UINT8 read_decrypted_byte(offs_t byteaddress);
-	UINT16 read_decrypted_word(offs_t byteaddress);
-	UINT32 read_decrypted_dword(offs_t byteaddress);
-	UINT64 read_decrypted_qword(offs_t byteaddress);
+	void *read_decrypted_ptr(offs_t byteaddress, offs_t directxor = 0);
+	UINT8 read_decrypted_byte(offs_t byteaddress, offs_t directxor = 0);
+	UINT16 read_decrypted_word(offs_t byteaddress, offs_t directxor = 0);
+	UINT32 read_decrypted_dword(offs_t byteaddress, offs_t directxor = 0);
+	UINT64 read_decrypted_qword(offs_t byteaddress, offs_t directxor = 0);
 
 private:
 	// internal helpers
@@ -759,17 +759,17 @@ void memory_dump(running_machine *machine, FILE *file);
 //  backing that address
 //-------------------------------------------------
 
-inline void *direct_read_data::read_raw_ptr(offs_t byteaddress)
+inline void *direct_read_data::read_raw_ptr(offs_t byteaddress, offs_t directxor)
 {
 	if (address_is_valid(byteaddress))
-		return &m_raw[byteaddress & m_bytemask];
+		return &m_raw[(byteaddress ^ directxor) & m_bytemask];
 	return NULL;
 }
 
-inline void *direct_read_data::read_decrypted_ptr(offs_t byteaddress)
+inline void *direct_read_data::read_decrypted_ptr(offs_t byteaddress, offs_t directxor)
 {
 	if (address_is_valid(byteaddress))
-		return &m_decrypted[byteaddress & m_bytemask];
+		return &m_decrypted[(byteaddress ^ directxor) & m_bytemask];
 	return NULL;
 }
 
@@ -779,17 +779,17 @@ inline void *direct_read_data::read_decrypted_ptr(offs_t byteaddress)
 //  direct_read_data class
 //-------------------------------------------------
 
-inline UINT8 direct_read_data::read_raw_byte(offs_t byteaddress)
+inline UINT8 direct_read_data::read_raw_byte(offs_t byteaddress, offs_t directxor)
 {
 	if (address_is_valid(byteaddress))
-		return m_raw[byteaddress & m_bytemask];
+		return m_raw[(byteaddress ^ directxor) & m_bytemask];
 	return m_space.read_byte(byteaddress);
 }
 
-inline UINT8 direct_read_data::read_decrypted_byte(offs_t byteaddress)
+inline UINT8 direct_read_data::read_decrypted_byte(offs_t byteaddress, offs_t directxor)
 {
 	if (address_is_valid(byteaddress))
-		return m_decrypted[byteaddress & m_bytemask];
+		return m_decrypted[(byteaddress ^ directxor) & m_bytemask];
 	return m_space.read_byte(byteaddress);
 }
 
@@ -799,17 +799,17 @@ inline UINT8 direct_read_data::read_decrypted_byte(offs_t byteaddress)
 //  direct_read_data class
 //-------------------------------------------------
 
-inline UINT16 direct_read_data::read_raw_word(offs_t byteaddress)
+inline UINT16 direct_read_data::read_raw_word(offs_t byteaddress, offs_t directxor)
 {
 	if (address_is_valid(byteaddress))
-		return *reinterpret_cast<UINT16 *>(&m_raw[byteaddress & m_bytemask]);
+		return *reinterpret_cast<UINT16 *>(&m_raw[(byteaddress ^ directxor) & m_bytemask]);
 	return m_space.read_word(byteaddress);
 }
 
-inline UINT16 direct_read_data::read_decrypted_word(offs_t byteaddress)
+inline UINT16 direct_read_data::read_decrypted_word(offs_t byteaddress, offs_t directxor)
 {
 	if (address_is_valid(byteaddress))
-		return *reinterpret_cast<UINT16 *>(&m_decrypted[byteaddress & m_bytemask]);
+		return *reinterpret_cast<UINT16 *>(&m_decrypted[(byteaddress ^ directxor) & m_bytemask]);
 	return m_space.read_word(byteaddress);
 }
 
@@ -819,17 +819,17 @@ inline UINT16 direct_read_data::read_decrypted_word(offs_t byteaddress)
 //  direct_read_data class
 //-------------------------------------------------
 
-inline UINT32 direct_read_data::read_raw_dword(offs_t byteaddress)
+inline UINT32 direct_read_data::read_raw_dword(offs_t byteaddress, offs_t directxor)
 {
 	if (address_is_valid(byteaddress))
-		return *reinterpret_cast<UINT32 *>(&m_raw[byteaddress & m_bytemask]);
+		return *reinterpret_cast<UINT32 *>(&m_raw[(byteaddress ^ directxor) & m_bytemask]);
 	return m_space.read_dword(byteaddress);
 }
 
-inline UINT32 direct_read_data::read_decrypted_dword(offs_t byteaddress)
+inline UINT32 direct_read_data::read_decrypted_dword(offs_t byteaddress, offs_t directxor)
 {
 	if (address_is_valid(byteaddress))
-		return *reinterpret_cast<UINT32 *>(&m_decrypted[byteaddress & m_bytemask]);
+		return *reinterpret_cast<UINT32 *>(&m_decrypted[(byteaddress ^ directxor) & m_bytemask]);
 	return m_space.read_dword(byteaddress);
 }
 
@@ -839,17 +839,17 @@ inline UINT32 direct_read_data::read_decrypted_dword(offs_t byteaddress)
 //  direct_read_data class
 //-------------------------------------------------
 
-inline UINT64 direct_read_data::read_raw_qword(offs_t byteaddress)
+inline UINT64 direct_read_data::read_raw_qword(offs_t byteaddress, offs_t directxor)
 {
 	if (address_is_valid(byteaddress))
-		return *reinterpret_cast<UINT64 *>(&m_raw[byteaddress & m_bytemask]);
+		return *reinterpret_cast<UINT64 *>(&m_raw[(byteaddress ^ directxor) & m_bytemask]);
 	return m_space.read_qword(byteaddress);
 }
 
-inline UINT64 direct_read_data::read_decrypted_qword(offs_t byteaddress)
+inline UINT64 direct_read_data::read_decrypted_qword(offs_t byteaddress, offs_t directxor)
 {
 	if (address_is_valid(byteaddress))
-		return *reinterpret_cast<UINT64 *>(&m_decrypted[byteaddress & m_bytemask]);
+		return *reinterpret_cast<UINT64 *>(&m_decrypted[(byteaddress ^ directxor) & m_bytemask]);
 	return m_space.read_qword(byteaddress);
 }
 

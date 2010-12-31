@@ -3341,11 +3341,11 @@ static CPU_EXECUTE( sh4 )
 
 		if (sh4->delay)
 		{
-			opcode = sh4->direct->read_decrypted_word(WORD2_XOR_LE((UINT32)(sh4->delay & AM)));
+			opcode = sh4->direct->read_decrypted_word((UINT32)(sh4->delay & AM), WORD2_XOR_LE(0));
 			sh4->pc -= 2;
 		}
 		else
-			opcode = sh4->direct->read_decrypted_word(WORD2_XOR_LE((UINT32)(sh4->pc & AM)));
+			opcode = sh4->direct->read_decrypted_word((UINT32)(sh4->pc & AM), WORD2_XOR_LE(0));
 
 		debugger_instruction_hook(device, sh4->pc & AM);
 

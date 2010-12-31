@@ -172,7 +172,6 @@ void v25_write_word(v25_state_t *nec_state, unsigned a, unsigned d);
 /* prefetch timing */
 
 #define FETCH() 			fetch(nec_state)
-#define FETCH_XOR(a)		((a) ^ nec_state->fetch_xor)
 #define FETCHWORD()			fetchword(nec_state)
 #define EMPTY_PREFETCH()	nec_state->prefetch_reset = 1
 

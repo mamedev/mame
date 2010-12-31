@@ -142,7 +142,7 @@ int ppcfe_describe(void *param, opcode_desc *desc, const opcode_desc *prev)
 	}
 
 	/* fetch the opcode */
-	op = desc->opptr.l[0] = ppc->direct->read_decrypted_dword(desc->physpc ^ ppc->codexor);
+	op = desc->opptr.l[0] = ppc->direct->read_decrypted_dword(desc->physpc, ppc->codexor);
 
 	/* all instructions are 4 bytes and default to a single cycle each */
 	desc->length = 4;

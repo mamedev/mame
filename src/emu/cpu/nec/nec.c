@@ -175,7 +175,7 @@ static void do_prefetch(nec_state_t *nec_state, int previous_ICount)
 INLINE UINT8 fetch(nec_state_t *nec_state)
 {
 	prefetch(nec_state);
-	return nec_state->direct->read_raw_byte(FETCH_XOR((Sreg(PS)<<4)+nec_state->ip++));
+	return nec_state->direct->read_raw_byte((Sreg(PS)<<4)+nec_state->ip++, nec_state->fetch_xor);
 }
 
 INLINE UINT16 fetchword(nec_state_t *nec_state)
@@ -194,7 +194,7 @@ static UINT8 parity_table[256];
 static UINT8 fetchop(nec_state_t *nec_state)
 {
 	prefetch(nec_state);
-	return nec_state->direct->read_decrypted_byte(FETCH_XOR( ( Sreg(PS)<<4)+nec_state->ip++));
+	return nec_state->direct->read_decrypted_byte(( Sreg(PS)<<4)+nec_state->ip++, nec_state->fetch_xor);
 }
 
 

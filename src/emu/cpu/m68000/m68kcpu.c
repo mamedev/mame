@@ -1097,7 +1097,7 @@ void m68k_memory_interface::init8(address_space &space)
 
 UINT16 m68k_memory_interface::read_immediate_16(offs_t address)
 {
-	return m_direct->read_decrypted_word((address) ^ opcode_xor);
+	return m_direct->read_decrypted_word((address), opcode_xor);
 }
 
 UINT16 m68k_memory_interface::simple_read_immediate_16(offs_t address)
@@ -1179,7 +1179,7 @@ UINT16 m68k_memory_interface::read_immediate_16_mmu(offs_t address)
 		}
 	}
 
-	return m_direct->read_decrypted_word((address) ^ m_cpustate->memory.opcode_xor);
+	return m_direct->read_decrypted_word((address), m_cpustate->memory.opcode_xor);
 }
 
 /* potentially misaligned 16-bit reads with a 32-bit data bus (and 24-bit address bus) */
@@ -1389,7 +1389,7 @@ UINT16 m68k_memory_interface::read_immediate_16_hmmu(offs_t address)
 		address = hmmu_translate_addr(m_cpustate, address);
 	}
 
-	return m_direct->read_decrypted_word((address) ^ m_cpustate->memory.opcode_xor);
+	return m_direct->read_decrypted_word((address), m_cpustate->memory.opcode_xor);
 }
 
 /* potentially misaligned 16-bit reads with a 32-bit data bus (and 24-bit address bus) */
