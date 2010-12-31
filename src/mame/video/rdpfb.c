@@ -5,161 +5,271 @@
 namespace N64
 {
 
-bool RDP::Framebuffer::Write(void *fb, UINT8* hb, UINT32 r, UINT32 g, UINT32 b)
+namespace RDP
+{
+
+void Framebuffer::Write(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b)
 {
 	switch(m_misc_state->m_fb_size)
 	{
 		case PIXEL_SIZE_16BIT:
-			return Write16Bit((UINT16*)fb, hb, r, g, b);
+			Write16Bit(curpixel, r, g, b);
+			break;
 
 		case PIXEL_SIZE_32BIT:
-			return Write32Bit((UINT32*)fb, r, g, b);
+			Write32Bit(curpixel, r, g, b);
+			break;
 
 		default:
 			fatalerror("Unsupported bit depth: %d\n", m_misc_state->m_fb_size);
 			break;
 	}
-
-	return false;
 }
 
-bool RDP::Framebuffer::Write16Bit(UINT16 *fb, UINT8* hb, UINT32 r, UINT32 g, UINT32 b)
+void Framebuffer::Write16Bit(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b)
 {
 #undef CVG_DRAW
-//#define CVG_DRAW
 #ifdef CVG_DRAW
-	int covdraw;
-	if (m_misc_state->m_curpixel_cvg == 8)
-	{
-		covdraw = 255;
-	}
-	else
-	{
-		covdraw = m_misc_state->m_curpixel_cvg << 5;
-	}
+	int covdraw = (curpixel_cvg - 1) << 5;
 	r = covdraw;
 	g = covdraw;
 	b = covdraw;
 #endif
 
-	if (!m_other_modes->z_compare_en)
-	{
-		m_misc_state->m_curpixel_overlap = 0;
-	}
+	UINT32 fb = (m_misc_state->m_fb_address >> 1) + curpixel;
+	UINT32 hb = fb;
 
-	UINT32 memory_cvg = 8;
-	if (m_other_modes->image_read_en)
+#if 0
+	if (m_misc_state->m_curpixel_cvg > 8 && m_other_modes->z_mode != 1)
 	{
-		memory_cvg = ((*fb & 1) << 2) + (*hb & 3) + 1;
+		stricterror("FBWRITE_16: curpixel_cvg %d", m_misc_state->m_curpixel_cvg);
 	}
-
-	UINT32 newcvg = m_misc_state->m_curpixel_cvg + memory_cvg;
-	bool wrapped = newcvg > 8;
+#endif
 
 	UINT16 finalcolor = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1);
+	UINT32 finalcvg = 0;
 
-	UINT32 clamped_cvg = wrapped ? 8 : newcvg;
-	newcvg = wrapped ? (newcvg - 8) : newcvg;
-
-	m_misc_state->m_curpixel_cvg--;
-	newcvg--;
-	memory_cvg--;
-	clamped_cvg--;
-
-	if (m_other_modes->color_on_cvg && !wrapped)
+	if (m_other_modes->color_on_cvg && !m_pre_wrap)
 	{
-		*fb &= 0xfffe;
-		*fb |= ((newcvg >> 2) & 1);
-		*hb = (newcvg & 3);
-		return false;
+		finalcolor = RREADIDX16(fb) & 0xfffe;
 	}
 
 	switch(m_other_modes->cvg_dest)
 	{
-		case 0:
-			if (!m_other_modes->force_blend && !m_misc_state->m_curpixel_overlap)
+	case 0:
+		if (!m_rdp->GetBlender()->GetBlendEnable())
+		{
+			finalcvg = (m_misc_state->m_curpixel_cvg - 1) & 7;
+			RWRITEIDX16(fb, finalcolor | ((finalcvg >> 2) & 1));
+			HWRITEADDR8(hb, finalcvg & 3);
+		}
+		else
+		{
+			finalcvg = m_misc_state->m_curpixel_cvg + m_misc_state->m_curpixel_memcvg;
+			if (finalcvg & 8)
 			{
-				*fb = finalcolor | ((m_misc_state->m_curpixel_cvg >> 2) & 1);
-				*hb = (m_misc_state->m_curpixel_cvg & 3);
+				finalcvg = 7;
 			}
-			else
-			{
-				*fb = finalcolor | ((clamped_cvg >> 2) & 1);
-				*hb = (clamped_cvg & 3);
-			}
-			break;
-
-		case 1:
-			*fb = finalcolor | ((newcvg >> 2) & 1);
-			*hb = (newcvg & 3);
-			break;
-
-		case 2:
-			*fb = finalcolor | 1;
-			*hb = 3;
-			break;
-
-		case 3:
-			*fb = finalcolor | ((memory_cvg >> 2) & 1);
-			*hb = (memory_cvg & 3);
-			break;
+			RWRITEIDX16(fb, finalcolor | ((finalcvg >> 2) & 1));
+			HWRITEADDR8(hb, finalcvg & 3);
+		}
+		break;
+	case 1:
+		finalcvg = (m_misc_state->m_curpixel_cvg + m_misc_state->m_curpixel_memcvg) & 7;
+		RWRITEIDX16(fb, finalcolor | ((finalcvg >> 2) & 1));
+		HWRITEADDR8(hb, finalcvg & 3);
+		break;
+	case 2:
+		RWRITEIDX16(fb, finalcolor | 1);
+		HWRITEADDR8(hb, 3);
+		break;
+	case 3:
+		RWRITEIDX16(fb, finalcolor | ((m_misc_state->m_curpixel_memcvg >> 2) & 1));
+		HWRITEADDR8(hb, m_misc_state->m_curpixel_memcvg & 3);
+		break;
 	}
-
-	return true;
 }
 
-bool RDP::Framebuffer::Write32Bit(UINT32 *fb, UINT32 r, UINT32 g, UINT32 b)
+void Framebuffer::Write32Bit(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b)
 {
-	UINT32 finalcolor = (r << 24) | (g << 16) | (b << 8);
-	UINT32 memory_alphachannel = *fb & 0xff;
+	UINT32 fb = (m_misc_state->m_fb_address >> 2) + curpixel;
+	UINT32 finalcolor = (r << 24) | (g << 16) | (b << 8);//cvg as 3 MSBs of alpha channel;
+	UINT32 finalcvg = 0;
 
-	UINT32 memory_cvg = 8;
+#if 0
+	if (curpixel_cvg > 8 && m_other_modes->z_mode != 1)
+	{
+		stricterror("FBWRITE_16: curpixel_cvg %d", curpixel_cvg);
+	}
+#endif
+
+	if (m_other_modes->color_on_cvg && !m_pre_wrap)
+	{
+		finalcolor = RREADIDX32(fb) & 0xffffff00;
+	}
+
+	switch(m_other_modes->cvg_dest)
+	{
+	case 0: //normal
+		if (!m_rdp->GetBlender()->GetBlendEnable())
+		{
+			finalcvg = (m_misc_state->m_curpixel_cvg - 1) & 7;
+			finalcolor |= (finalcvg << 5);
+			RWRITEIDX32(fb, finalcolor);
+		}
+		else
+		{
+			finalcvg = m_misc_state->m_curpixel_cvg + m_misc_state->m_curpixel_memcvg;
+			if (finalcvg & 8)
+			{
+				finalcvg = 7;
+			}
+			finalcolor |= (finalcvg << 5);
+			RWRITEIDX32(fb, finalcolor);
+		}
+		break;
+	case 1:
+		finalcvg = (m_misc_state->m_curpixel_cvg + m_misc_state->m_curpixel_memcvg) & 7;
+		finalcolor |= (finalcvg << 5);
+		RWRITEIDX32(fb, finalcolor);
+		break;
+	case 2:
+		RWRITEIDX32(fb, finalcolor | 0xE0);
+		break;
+	case 3:
+		finalcolor |= (m_misc_state->m_curpixel_memcvg << 5);
+		RWRITEIDX32(fb, finalcolor);
+		break;
+	}
+}
+
+void Framebuffer::Read(UINT32 curpixel)
+{
+	switch(m_misc_state->m_fb_size)
+	{
+		case PIXEL_SIZE_16BIT:
+			Read16Bit(curpixel);
+			break;
+
+		case PIXEL_SIZE_32BIT:
+			Read32Bit(curpixel);
+			break;
+
+		default:
+			fatalerror("Unsupported bit depth: %d\n", m_misc_state->m_fb_size);
+			break;
+	}
+}
+
+void Framebuffer::Read16Bit(UINT32 curpixel)
+{
+	UINT16 fword = RREADIDX16((m_misc_state->m_fb_address >> 1) + curpixel);
+	UINT8 hbyte = HREADADDR8((m_misc_state->m_fb_address >> 1) + curpixel);
+	m_rdp->GetMemoryColor()->i.r = GETHICOL(fword);
+	m_rdp->GetMemoryColor()->i.g = GETMEDCOL(fword);
+	m_rdp->GetMemoryColor()->i.b = GETLOWCOL(fword);
 	if (m_other_modes->image_read_en)
 	{
-		memory_cvg = ((*fb >>5) & 7) + 1;
+		m_misc_state->m_curpixel_memcvg = ((fword & 1) << 2) | (hbyte & 3);
+		m_rdp->GetMemoryColor()->i.a = m_misc_state->m_curpixel_memcvg << 5;
 	}
-
-	UINT32 newcvg = m_misc_state->m_curpixel_cvg + memory_cvg;
-	bool wrapped = (newcvg > 8);
-	UINT32 clamped_cvg = wrapped ? 8 : newcvg;
-	newcvg = (wrapped) ? (newcvg - 8) : newcvg;
-
-	m_misc_state->m_curpixel_cvg--;
-	newcvg--;
-	memory_cvg--;
-	clamped_cvg--;
-
-	if (m_other_modes->color_on_cvg && !wrapped)
+	else
 	{
-		*fb &= 0xffffff00;
-		*fb |= ((newcvg << 5) & 0xff);
-		return 0;
+		m_misc_state->m_curpixel_memcvg = 7;
+		m_rdp->GetMemoryColor()->i.a = 0xff;
 	}
-
-	switch(m_other_modes->cvg_dest)
-	{
-		case 0:
-			if (!m_other_modes->force_blend && !m_misc_state->m_curpixel_overlap)
-			{
-				*fb = finalcolor|(m_misc_state->m_curpixel_cvg << 5);
-			}
-			else
-			{
-				*fb = finalcolor|(clamped_cvg << 5);
-			}
-			break;
-		case 1:
-			*fb = finalcolor | (newcvg << 5);
-			break;
-		case 2:
-			*fb = finalcolor | 0xE0;
-			break;
-		case 3:
-			*fb = finalcolor | memory_alphachannel;
-			break;
-	}
-
-	return true;
 }
+
+void Framebuffer::Read32Bit(UINT32 curpixel)
+{
+	UINT32 mem = RREADIDX32((m_misc_state->m_fb_address >> 2) + curpixel);
+	m_rdp->GetMemoryColor()->i.r = (mem >> 24) & 0xff;
+	m_rdp->GetMemoryColor()->i.g = (mem >> 16) & 0xff;
+	m_rdp->GetMemoryColor()->i.b = (mem >> 8) & 0xff;
+	if (m_other_modes->image_read_en)
+	{
+		m_misc_state->m_curpixel_memcvg = (mem >> 5) & 7;
+		m_rdp->GetMemoryColor()->i.a = (mem) & 0xff;
+	}
+	else
+	{
+		m_misc_state->m_curpixel_memcvg = 7;
+		m_rdp->GetMemoryColor()->i.a = 0xff;
+	}
+}
+
+void Framebuffer::Copy(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b)
+{
+	switch(m_misc_state->m_fb_size)
+	{
+		case PIXEL_SIZE_16BIT:
+			Copy16Bit(curpixel, r, g, b);
+			break;
+
+		case PIXEL_SIZE_32BIT:
+			Copy32Bit(curpixel, r, g, b);
+			break;
+
+		default:
+			fatalerror("Unsupported bit depth: %d\n", m_misc_state->m_fb_size);
+			break;
+	}
+}
+
+void Framebuffer::Copy16Bit(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b)
+{
+	UINT16 val = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1) | ((m_misc_state->m_curpixel_cvg >> 2) & 1);
+	RWRITEIDX16((m_misc_state->m_fb_address >> 1) + curpixel, val);
+	HWRITEADDR8((m_misc_state->m_fb_address >> 1) + curpixel, m_misc_state->m_curpixel_cvg & 3);
+}
+
+void Framebuffer::Copy32Bit(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b)
+{
+	UINT32 val = (r << 24) | (g << 16) | (b << 8) | (m_misc_state->m_curpixel_cvg << 5);
+	RWRITEIDX32((m_misc_state->m_fb_address >> 2) + curpixel, val);
+}
+
+void Framebuffer::Fill(UINT32 curpixel)
+{
+	switch(m_misc_state->m_fb_size)
+	{
+		case PIXEL_SIZE_16BIT:
+			Fill16Bit(curpixel);
+			break;
+
+		case PIXEL_SIZE_32BIT:
+			Fill32Bit(curpixel);
+			break;
+
+		default:
+			fatalerror("Unsupported bit depth: %d\n", m_misc_state->m_fb_size);
+			break;
+	}
+}
+
+void Framebuffer::Fill16Bit(UINT32 curpixel)
+{
+	UINT16 val;
+	if (curpixel & 1)
+	{
+		val = m_rdp->GetFillColor32() & 0xffff;
+	}
+	else
+	{
+		val = (m_rdp->GetFillColor32() >> 16) & 0xffff;
+	}
+	RWRITEIDX16((m_misc_state->m_fb_address >> 1) + curpixel, val);
+	HWRITEADDR8((m_misc_state->m_fb_address >> 1) + curpixel, ((val & 1) << 1) | (val & 1));
+}
+
+void Framebuffer::Fill32Bit(UINT32 curpixel)
+{
+	UINT32 fill_color = m_rdp->GetFillColor32();
+	RWRITEIDX32((m_misc_state->m_fb_address >> 2) + curpixel, fill_color);
+	HWRITEADDR8((m_misc_state->m_fb_address >> 1) + (curpixel << 1), (fill_color & 0x10000) ? 3 : 0);
+	HWRITEADDR8((m_misc_state->m_fb_address >> 1) + (curpixel << 1) + 1, (fill_color & 0x1) ? 3 : 0);
+}
+
+} // namespace RDP
 
 } // namespace N64

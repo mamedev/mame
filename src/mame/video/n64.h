@@ -5,11 +5,8 @@
 #include "video/rdpblend.h"
 #include "video/rdptri.h"
 #include "video/rdpfb.h"
-#include "video/rdpfrect.h"
-#include "video/rdptrect.h"
 #include "video/rdptpipe.h"
 #include "video/rdpspn16.h"
-#include "video/rdpfetch.h"
 
 /*****************************************************************************/
 
@@ -37,10 +34,54 @@
 #define XOR_SWAP_WORD	2
 #define XOR_SWAP_DWORD	1
 
+#define FORMAT_RGBA				0
+#define FORMAT_YUV				1
+#define FORMAT_CI				2
+#define FORMAT_IA				3
+#define FORMAT_I				4
+
+#if LSB_FIRST
+#define BYTE_XOR_DWORD_SWAP 7
+#define WORD_XOR_DWORD_SWAP 3
+#else
+#define BYTE_XOR_DWORD_SWAP 4
+#define WORD_XOR_DWORD_SWAP 2
+#endif
+#define DWORD_XOR_DWORD_SWAP 1
+
+#define GET_LOW_RGBA16_TMEM(x)	(m_rdp->ReplicatedRGBA()[((x) >> 1) & 0x1f])
+#define GET_MED_RGBA16_TMEM(x)	(m_rdp->ReplicatedRGBA()[((x) >> 6) & 0x1f])
+#define GET_HI_RGBA16_TMEM(x)	(m_rdp->ReplicatedRGBA()[((x) >> 11) & 0x1f])
+
+#define MEM8_LIMIT  0x7fffff
+#define MEM16_LIMIT 0x3fffff
+#define MEM32_LIMIT 0x1fffff
+
+#define RREADADDR8(in) (((in) <= MEM8_LIMIT) ? (((UINT8*)rdram)[(in) ^ BYTE_ADDR_XOR]) : 0)
+#define RREADIDX16(in) (((in) <= MEM16_LIMIT) ? (((UINT16*)rdram)[(in) ^ WORD_ADDR_XOR]) : 0)
+#define RREADIDX32(in) (((in) <= MEM32_LIMIT) ? (rdram[(in)]) : 0)
+
+#define RWRITEADDR8(in, val)	{if ((in) <= MEM8_LIMIT) ((UINT8*)rdram)[(in) ^ BYTE_ADDR_XOR] = val;}
+#define RWRITEIDX16(in, val)	{if ((in) <= MEM16_LIMIT) ((UINT16*)rdram)[(in) ^ WORD_ADDR_XOR] = val;}
+#define RWRITEIDX32(in, val)	{if ((in) <= MEM32_LIMIT) rdram[(in)] = val;}
+
+#define GETLOWCOL(x)	(((x) & 0x3e) << 2)
+#define GETMEDCOL(x)	(((x) & 0x7c0) >> 3)
+#define GETHICOL(x)		(((x) & 0xf800) >> 8)
+
+#define HREADADDR8(in)			(((in) <= MEM8_LIMIT) ? (m_rdp->GetHiddenBits()[(in) ^ BYTE_ADDR_XOR]) : 0)
+#define HWRITEADDR8(in, val)	{if ((in) <= MEM8_LIMIT) m_rdp->GetHiddenBits()[(in) ^ BYTE_ADDR_XOR] = val;}
+
 //sign-extension macros
+#define SIGN22(x)	(((x) & 0x200000) ? ((x) | ~0x3fffff) : ((x) & 0x3fffff))
 #define SIGN17(x)	(((x) & 0x10000) ? ((x) | ~0x1ffff) : ((x) & 0x1ffff))
 #define SIGN16(x)	(((x) & 0x8000) ? ((x) | ~0xffff) : ((x) & 0xffff))
+#define SIGN13(x)	(((x) & 0x1000) ? ((x) | ~0x1fff) : ((x) & 0x1fff))
 #define SIGN11(x)	(((x) & 0x400) ? ((x) | ~0x7ff) : ((x) & 0x7ff))
+#define SIGN9(x)	(((x) & 0x100) ? ((x) | ~0x1ff) : ((x) & 0x1ff))
+#define SIGN8(x)	(((x) & 0x80) ? ((x) | ~0xff) : ((x) & 0xff))
+
+#define KURT_AKELEY_SIGN9(x)	((((x) & 0x180) == 0x180) ? ((x) | ~0x1ff) : ((x) & 0x1ff))
 
 /*****************************************************************************/
 
@@ -86,8 +127,8 @@ class Tile
 	public:
 		int format;	// Image data format: RGBA, YUV, CI, IA, I
 		int size; // Size of texel element: 4b, 8b, 16b, 32b
-		UINT32 line; // Size of tile line in bytes
-		UINT32 tmem; // Starting tmem address for this tile in bytes
+		int line; // Size of tile line in bytes
+		int tmem; // Starting tmem address for this tile in bytes
 		int palette; // Palette number for 4b CI texels
 		int ct, mt, cs, ms; // Clamp / mirror enable bits for S / T direction
 		int mask_t, shift_t, mask_s, shift_s; // Mask values / LOD shifts
@@ -101,6 +142,8 @@ class MiscState
 		MiscState()
 		{
 			m_curpixel_cvg = 0;
+			m_curpixel_memcvg = 0;
+			m_curpixel_cvbit = 0;
 			m_curpixel_overlap = 0;
 
 			m_max_level = 0;
@@ -121,6 +164,8 @@ class MiscState
 		UINT32 m_ti_address;
 
 		UINT32 m_curpixel_cvg;
+		UINT32 m_curpixel_memcvg;
+		UINT32 m_curpixel_cvbit;
 		UINT32 m_curpixel_overlap;
 
 		UINT8 m_random_seed;
@@ -232,6 +277,14 @@ class ColorInputs
 		UINT8 *blender2b_a[2];
 };
 
+struct Rectangle
+{
+	UINT16 m_xl;	// 10.2 fixed-point
+	UINT16 m_yl;	// 10.2 fixed-point
+	UINT16 m_xh;	// 10.2 fixed-point
+	UINT16 m_yh;	// 10.2 fixed-point
+};
+
 class Processor
 {
 	public:
@@ -244,47 +297,6 @@ class Processor
 			m_end = 0;
 			m_current = 0;
 			m_status = 0x88;
-
-			for(int i = 0; i < (1 << 16); i++)
-			{
-				UINT8 r = ((i >> 8) & 0xf8) | (i >> 13);
-				UINT8 g = ((i >> 3) & 0xf8) | ((i >>  8) & 0x07);
-				UINT8 b = ((i << 2) & 0xf8) | ((i >>  3) & 0x07);
-				UINT8 a = (i & 1) ? 0xff : 0;
-				m_rgb16_to_rgb32_lut[i] = (r << 24) | (g << 16) | (b << 8) | a;
-
-				r = g = b = (i >> 8) & 0xff;
-				a = i & 0xff;
-				m_ia8_to_rgb32_lut[i] = (r << 24) | (g << 16) | (b << 8) | a;
-			}
-
-			for(int i = 0; i < (1 << 24); i++)
-			{
-				UINT8 A = (i >> 16) & 0x000000ff;
-				UINT8 B = (i >> 8) & 0x000000ff;
-				UINT8 C = i & 0x000000ff;
-				m_cc_lut1[i] = (INT16)((((((INT32)A - (INT32)B) * (INT32)C) + 0x80) >> 8) & 0x0000ffff);
-			}
-
-			for(int i = 0; i < (1 << 16); i++)
-			{
-				for(int j = 0; j < (1 << 8); j++)
-				{
-					INT32 temp = (INT32)((INT16)i) + j;
-					if(temp > 255)
-					{
-						m_cc_lut2[(i << 8) | j] = 255;
-					}
-					else if(temp < 0)
-					{
-						m_cc_lut2[(i << 8) | j] = 0;
-					}
-					else
-					{
-						m_cc_lut2[(i << 8) | j] = (UINT8)temp;
-					}
-				}
-			}
 
 			for (int i = 0; i < 8; i++)
 			{
@@ -325,7 +337,7 @@ class Processor
 
 			m_machine = NULL;
 
-			memset(m_hidden_bits, 3, 4194304); // Hack / fix for letters in Rayman 2
+			//memset(m_hidden_bits, 3, 8388608);
 
 			m_prim_lod_frac = 0;
 			m_lod_frac = 0;
@@ -342,15 +354,71 @@ class Processor
 				m_gamma_dither_table[i] <<= 1;
 			}
 
-			BuildCompressedZTable();
+			z_build_com_table();
+
+			for (int i = 0; i < 0x4000; i++)
+			{
+				UINT32 exponent = (i >> 11) & 7;
+				UINT32 mantissa = i & 0x7ff;
+				z_complete_dec_table[i] = ((mantissa << z_dec_table[exponent].shift) + z_dec_table[exponent].add) & 0x3fffff;
+			}
+
+			precalc_cvmask_derivatives();
+
+			for(int i = 0; i < 0x200; i++)
+			{
+				switch((i >> 7) & 3)
+				{
+				case 0:
+				case 1:
+					m_special_9bit_clamptable[i] = i & 0xff;
+					break;
+				case 2:
+					m_special_9bit_clamptable[i] = 0xff;
+					break;
+				case 3:
+					m_special_9bit_clamptable[i] = 0;
+					break;
+				}
+			}
+
+			for(int i = 0; i < 32; i++)
+			{
+				m_replicated_rgba[i] = (i << 3) | ((i >> 2) & 7);
+			}
 		}
 
 		~Processor() { }
+
+		UINT8*	ReplicatedRGBA() { return m_replicated_rgba; }
 
 		void	Dasm(char *buffer);
 
 		void	ProcessList();
 		UINT32	ReadData(UINT32 address);
+
+		void set_span_base(int dr, int dg, int db, int da, int ds, int dt, int dw, int dz, int dymax, int dzpix)
+		{
+			m_span_dr = dr;
+			m_span_dg = dg;
+			m_span_db = db;
+			m_span_da = da;
+			m_span_ds = ds;
+			m_span_dt = dt;
+			m_span_dw = dw;
+			m_span_dz = dz;
+			m_span_dymax = dymax;
+			m_span_dzpix = dzpix;
+		}
+
+		void set_span_base_y(int dr, int dg, int db, int da, int dz)
+		{
+			m_span_drdy = dr;
+			m_span_dgdy = dg;
+			m_span_dbdy = db;
+			m_span_dady = da;
+			m_span_dzdy = dz;
+		}
 
 		void	InitInternalState()
 		{
@@ -362,7 +430,7 @@ class Processor
 				UINT8 *normpoint = memory_region(m_machine, "normpoint");
 				UINT8 *normslope = memory_region(m_machine, "normslope");
 
-				for(int i = 0; i < 64; i++)
+				for(INT32 i = 0; i < 64; i++)
 				{
 					m_norm_point_rom[i] = (normpoint[(i << 1) + 1] << 8) | normpoint[i << 1];
 					m_norm_slope_rom[i] = (normslope[(i << 1) + 1] << 8) | normslope[i << 1];
@@ -430,6 +498,9 @@ class Processor
 		Color*		GetTexel1Color() { return &m_texel1_color; }
 		void		SetTexel1Color(UINT32 color) { m_texel1_color.c = color; }
 
+		Color*		GetNextTexelColor() { return &m_next_texel_color; }
+		void		SetNextTexelColor(UINT32 color) { m_next_texel_color.c = color; }
+
 		Color*		GetShadeColor() { return &m_shade_color; }
 		void		SetShadeColor(UINT32 color) { m_shade_color.c = color; }
 
@@ -442,13 +513,17 @@ class Processor
 		Color*		GetOne() { return &m_one_color; }
 		Color*		GetZero() { return &m_zero_color; }
 
-		UINT8*		GetLODFrac() { return &m_lod_frac; }
+		UINT8		GetLODFrac() { return m_lod_frac; }
 		void		SetLODFrac(UINT8 lod_frac) { m_lod_frac = lod_frac; }
 
-		UINT8*		GetPrimLODFrac() { return &m_prim_lod_frac; }
+		UINT8		GetPrimLODFrac() { return m_prim_lod_frac; }
 		void		SetPrimLODFrac(UINT8 prim_lod_frac) { m_prim_lod_frac = prim_lod_frac; }
 
 		// Color Combiner
+		INT32		ColorCombinerEquation(INT32 a, INT32 b, INT32 c, INT32 d);
+		INT32		AlphaCombinerEquation(INT32 a, INT32 b, INT32 c, INT32 d);
+		void		ColorCombiner2Cycle(bool noisecompute);
+		void		ColorCombiner1Cycle(bool noisecompute);
 		void		SetSubAInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code);
 		void		SetSubBInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code);
 		void		SetMulInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code);
@@ -464,10 +539,6 @@ class Processor
 		Tile*		GetTiles(){ return m_tiles; }
 
 		// Emulation Accelerators
-		UINT32		LookUp16To32(UINT16 in) const { return m_rgb16_to_rgb32_lut[in]; }
-		UINT32		LookUpIA8To32(UINT16 in) const { return m_ia8_to_rgb32_lut[in]; }
-		UINT16*		GetCCLUT1() { return m_cc_lut1; }
-		UINT8*		GetCCLUT2() { return m_cc_lut2; }
 		UINT8		GetRandom() { return m_misc_state.m_random_seed += 0x13; }
 
 		// YUV Factors
@@ -485,8 +556,9 @@ class Processor
 		// Render-related (move into eventual drawing-related classes?)
 		Rectangle*		GetScissor() { return &m_scissor; }
 		void			TCDiv(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst);
+		void			TCDivNoPersp(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst);
 		UINT32			GetLog2(UINT32 lod_clamp);
-		void			RenderSpans(int start, int end, int tilenum, bool shade, bool texture, bool zbuffer, bool flip);
+		void			RenderSpans(int start, int end, int tilenum, bool flip);
 		UINT8*			GetHiddenBits() { return m_hidden_bits; }
 		void			GetAlphaCvg(UINT8 *comb_alpha);
 		const UINT8*	GetBayerMatrix() const { return s_bayer_matrix; }
@@ -495,11 +567,12 @@ class Processor
 		int				GetCurrFIFOIndex() const { return m_cmd_cur; }
 		UINT32			GetFillColor32() const { return m_fill_color; }
 
-		void			ZStore(UINT16* zb, UINT8* zhb, UINT32 z, UINT32 deltaz);
-		UINT32			DecompressZ(UINT16 *zb);
-		UINT16			DecompressDZ(UINT16* zb, UINT8* zhb);
+		void			ZStore(UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 z);
+		UINT32			ZDecompress(UINT32 zcurpixel);
+		UINT32			DZDecompress(UINT32 zcurpixel, UINT32 dzcurpixel);
+		UINT32			DZCompress(UINT32 value);
 		INT32			NormalizeDZPix(INT32 sum);
-		bool			ZCompare(void* fb, UINT8* hb, UINT16* zb, UINT8* zhb, UINT32 sz, UINT16 dzpix);
+		bool			ZCompare(UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 sz, UINT16 dzpix);
 
 		// Fullscreen update-related
 		void			VideoUpdate(bitmap_t *bitmap);
@@ -548,6 +621,31 @@ class Processor
 		UINT32		AddLeftCvg(UINT32 x, UINT32 k);
 
 		UINT32*		GetCommandData() { return m_cmd_data; }
+		UINT32*		GetTempRectData() { return m_temp_rect_data; }
+
+		void 		GetDitherValues(int x, int y, int* cdith, int* adith);
+
+
+		int 			m_span_dr;
+		int 			m_span_drdy;
+		int 			m_span_dg;
+		int 			m_span_dgdy;
+		int 			m_span_db;
+		int 			m_span_dbdy;
+		int 			m_span_da;
+		int 			m_span_dady;
+		int 			m_span_ds;
+		int 			m_span_dt;
+		int 			m_span_dw;
+		int 			m_span_dz;
+		int 			m_span_dzdy;
+		int 			m_span_dymax;
+		int 			m_span_dzpix;
+
+		UINT32*			GetSpecial9BitClampTable() { return m_special_9bit_clamptable; }
+
+		UINT16 decompress_cvmask_frombyte(UINT8 x);
+		void lookup_cvmask_derivatives(UINT32 mask, UINT8* offx, UINT8* offy);
 
 	protected:
 		Blender			m_blender;
@@ -571,6 +669,7 @@ class Processor
 		Color		m_combined_color;
 		Color		m_texel0_color;
 		Color		m_texel1_color;
+		Color		m_next_texel_color;
 		Color		m_shade_color;
 		Color		m_key_scale;
 		Color		m_noise_color;
@@ -582,12 +681,22 @@ class Processor
 
 		UINT32		m_fill_color;
 
-		UINT16		m_cc_lut1[(1<<24)];
-		UINT8		m_cc_lut2[(1<<24)];
-		UINT32		m_rgb16_to_rgb32_lut[(1 << 16)];
-		UINT32		m_ia8_to_rgb32_lut[(1 << 16)];
+		typedef struct
+		{
+			UINT8 cvg;
+			UINT8 cvbit;
+			UINT8 xoff;
+			UINT8 yoff;
+		} CVMASKDERIVATIVE;
+		CVMASKDERIVATIVE cvarray[(1 << 8)];
+
+		UINT16 z_com_table[0x40000]; //precalced table of compressed z values, 18b: 512 KB array!
+		UINT32 z_complete_dec_table[0x4000]; //the same for decompressed z values, 14b
+		UINT8 compressed_cvmasks[0x10000]; //16bit cvmask -> to byte
 
 		UINT32		m_cmd_data[0x1000];
+		UINT32		m_temp_rect_data[0x1000];
+
 		int 		m_cmd_ptr;
 		int 		m_cmd_cur;
 
@@ -627,6 +736,13 @@ class Processor
 		INT32 m_gamma_table[256];
 		INT32 m_gamma_dither_table[0x4000];
 
+		UINT32 m_special_9bit_clamptable[512];
+
+		UINT8 m_replicated_rgba[32];
+
+		INT32 m_dzpix_enc;
+		INT32 m_dz_enc;
+
 		class ZDecompressEntry
 		{
 			public:
@@ -634,9 +750,9 @@ class Processor
 				UINT32 add;
 		};
 
-		void BuildCompressedZTable();
-		UINT16 m_z_compress_table[0x40000];
-		static const ZDecompressEntry m_z_decompress_table[8];
+		void precalc_cvmask_derivatives(void);
+		void z_build_com_table(void);
+		static const ZDecompressEntry z_dec_table[8];
 
 		// Internal screen-update functions
 		void			VideoUpdate16(bitmap_t *bitmap);

@@ -27,13 +27,11 @@ TODO:
 #include "includes/n64.h"
 #include "video/n64.h"
 
-#define LOG_RDP_EXECUTION		0
+#define LOG_RDP_EXECUTION		1
 
 static FILE *rdp_exec;
 
 /*****************************************************************************/
-
-#define LookUpCC(A, B, C, D) state->m_rdp.GetCCLUT2()[(state->m_rdp.GetCCLUT1()[(A << 16) | (B << 8) | C] << 8) | D]
 
 // The functions in this file should be moved into the parent Processor class.
 #include "rdpfiltr.c"
@@ -46,62 +44,24 @@ namespace RDP
 
 void Processor::GetAlphaCvg(UINT8 *comb_alpha)
 {
-	if(m_other_modes.cvg_times_alpha)
+	INT32 temp = *comb_alpha;
+	INT32 temp2 = m_misc_state.m_curpixel_cvg;
+	INT32 temp3 = 0;
+
+	if (m_other_modes.cvg_times_alpha)
 	{
-		if(m_other_modes.alpha_cvg_select)
-		{
-			UINT32 temp = *comb_alpha;
-			UINT32 temp2 = m_misc_state.m_curpixel_cvg;
-
-			UINT32 temp3 = (temp * temp2) + 4;
-			m_misc_state.m_curpixel_cvg = temp3 >> 8;
-
-			temp = (temp3 >> 3);
-
-			if (temp > 0xff)
-			{
-				*comb_alpha = 0xff;
-			}
-			else
-			{
-				*comb_alpha = (UINT8)temp;
-			}
-		}
-		else
-		{
-			UINT32 temp = *comb_alpha;
-			UINT32 temp2 = m_misc_state.m_curpixel_cvg;
-			UINT32 temp3 = (temp * temp2) + 4;
-
-			m_misc_state.m_curpixel_cvg = temp3 >> 8;
-
-			if (temp > 0xff)
-			{
-				*comb_alpha = 0xff;
-			}
-			else
-			{
-				*comb_alpha = (UINT8)temp;
-			}
-		}
+		temp3 = (temp * temp2) + 4;
+		m_misc_state.m_curpixel_cvg = (temp3 >> 8) & 0xf;
 	}
-	else
+	if (m_other_modes.alpha_cvg_select)
 	{
-		if(m_other_modes.alpha_cvg_select)
-		{
-			UINT32 temp2 = m_misc_state.m_curpixel_cvg;
-			UINT32 temp = temp2 << 5;
-
-			if (temp > 0xff)
-			{
-				*comb_alpha = 0xff;
-			}
-			else
-			{
-				*comb_alpha = (UINT8)temp;
-			}
-		}
+		temp = (m_other_modes.cvg_times_alpha) ? (temp3 >> 3) : (temp2 << 5);
 	}
+	if (temp > 0xff)
+	{
+		temp = 0xff;
+	}
+	*comb_alpha = temp;
 }
 
 /*****************************************************************************/
@@ -119,7 +79,7 @@ void Processor::VideoUpdate(bitmap_t *bitmap)
 			break;
 
 		default:
-			fatalerror("Unsupported framebuffer depth: m_fb_size=%d\n", m_misc_state.m_fb_size);
+			//fatalerror("Unsupported framebuffer depth: m_fb_size=%d\n", m_misc_state.m_fb_size);
 			break;
 	}
 }
@@ -182,10 +142,9 @@ void Processor::VideoUpdate16(bitmap_t *bitmap)
 						next_cvg = ((frame_buffer[(pixels + 1)^WORD_ADDR_XOR] & 1) << 2) | (hidden_buffer[(pixels + 1)^BYTE_ADDR_XOR] & 3);
 					}
 				}
-				c.c = LookUp16To32(pix);
-				//r = ((pix >> 8) & 0xf8) | (pix >> 13);
-				//g = ((pix >> 3) & 0xf8) | ((pix >>  8) & 0x07);
-				//b = ((pix << 2) & 0xf8) | ((pix >>  3) & 0x07);
+				c.i.r = ((pix >> 8) & 0xf8) | (pix >> 13);
+				c.i.g = ((pix >> 3) & 0xf8) | ((pix >>  8) & 0x07);
+				c.i.b = ((pix << 2) & 0xf8) | ((pix >>  3) & 0x07);
 
 				if(fsaa)
 				{
@@ -342,30 +301,150 @@ void Processor::VideoUpdate32(bitmap_t *bitmap)
 
 /*****************************************************************************/
 
+void Processor::TCDivNoPersp(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst)
+{
+	*sss = (SIGN16(ss)) & 0x1ffff;
+	*sst = (SIGN16(st)) & 0x1ffff;
+}
+
 void Processor::TCDiv(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst)
 {
-	int shift;
+	int w_carry = 0;
+	if ((sw & 0x8000) || !(sw & 0x7fff))
+	{
+		w_carry = 1;
+	}
 
 	sw &= 0x7fff;
-	for(shift = 1; shift <= 14 && !((sw << shift) & 0x8000); shift++);
+
+	int shift;
+	for (shift = 1; shift <= 14 && !((sw << shift) & 0x8000); shift++);
 	shift -= 1;
 
-	int normout = ((sw << shift) & 0x3fff) >> 8;
-	int wnorm = ((sw << shift) & 0xff) << 2;
+	int normout = (sw << shift) & 0x3fff;
+	int wnorm = (normout & 0xff) << 2;
+	normout >>= 8;
 
-	int tlu_rcp = ((-(m_norm_slope_rom[normout] * wnorm)) >> 10) + m_norm_point_rom[normout];
+	int temppoint = m_norm_point_rom[normout];
+	int tempslope = m_norm_slope_rom[normout];
 
-	if(shift == 14)
+	int tlu_rcp = ((-(tempslope * wnorm)) >> 10) + temppoint;
+
+	int sprod = SIGN16(ss) * tlu_rcp;
+	int tprod = SIGN16(st) * tlu_rcp;
+	int tempmask = ((1 << (shift + 1)) - 1) << (29 - shift);//tc.c,658
+	int shift_value = 13 - shift;//tc.c,653
+
+	int outofbounds_s = sprod & tempmask;//tc.c, 661
+	int outofbounds_t = tprod & tempmask;
+	if (shift == 0xe)//tc.c, 664
 	{
-		*sss = (SIGN16(ss) * tlu_rcp) << 1;
-		*sst = (SIGN16(st) * tlu_rcp) << 1;
+		*sss = sprod << 1;//sw, tw здесь не изменились
+		*sst = tprod << 1;
 	}
 	else
 	{
-		int shift_value = 13 - shift;
-		*sss = (SIGN16(ss) * tlu_rcp) >> shift_value;
-		*sst = (SIGN16(st) * tlu_rcp) >> shift_value;
+		*sss = sprod = (sprod >> shift_value);
+		*sst = tprod = (tprod >> shift_value);
 	}
+	//compute clamp flags
+	int under_s = 0;
+	int under_t = 0;
+	int over_s = 0;
+	int over_t = 0;
+
+	if (outofbounds_s != tempmask && outofbounds_s != 0)
+	{
+		if (sprod & (1 << 29))
+		{
+			under_s = 1;
+		}
+		else
+		{
+			over_s = 1;
+		}
+	}
+
+	if (outofbounds_t != tempmask && outofbounds_t != 0)
+	{
+		if (tprod & (1 << 29))
+		{
+			under_t = 1;
+		}
+		else
+		{
+			over_t = 1;
+		}
+	}
+
+	over_s |= w_carry;
+	over_t |= w_carry;
+
+	*sss = (*sss & 0x1ffff) | (over_s << 18) | (under_s << 17);
+	*sst = (*sst & 0x1ffff) | (over_s << 18) | (under_s << 17);
+}
+
+INT32 Processor::ColorCombinerEquation(INT32 a, INT32 b, INT32 c, INT32 d)
+{
+	a = KURT_AKELEY_SIGN9(a);
+	b = KURT_AKELEY_SIGN9(b);
+	c = SIGN9(c);
+	d = KURT_AKELEY_SIGN9(d);
+	a = (((a - b) * c) + (d << 8) + 0x80);
+	a = SIGN17(a) >> 8;
+	a = m_special_9bit_clamptable[a & 0x1ff];
+	return a;
+}
+
+INT32 Processor::AlphaCombinerEquation(INT32 a, INT32 b, INT32 c, INT32 d)
+{
+	a = KURT_AKELEY_SIGN9(a);
+	b = KURT_AKELEY_SIGN9(b);
+	c = SIGN9(c);
+	d = KURT_AKELEY_SIGN9(d);
+	a = (((a - b) * c) + (d << 8) + 0x80) >> 8;
+	a = SIGN9(a);
+	a = m_special_9bit_clamptable[a & 0x1ff];
+	return a;
+}
+
+void Processor::ColorCombiner1Cycle(bool noisecompute)
+{
+	if (noisecompute)
+	{
+		m_noise_color.i.r = m_noise_color.i.g = m_noise_color.i.b = mame_rand(m_machine) & 0xff; // Not accurate...
+	}
+
+	m_pixel_color.i.r = ColorCombinerEquation(*m_color_inputs.combiner_rgbsub_a_r[1],*m_color_inputs.combiner_rgbsub_b_r[1],*m_color_inputs.combiner_rgbmul_r[1],*m_color_inputs.combiner_rgbadd_r[1]);
+	m_pixel_color.i.g = ColorCombinerEquation(*m_color_inputs.combiner_rgbsub_a_g[1],*m_color_inputs.combiner_rgbsub_b_g[1],*m_color_inputs.combiner_rgbmul_g[1],*m_color_inputs.combiner_rgbadd_g[1]);
+	m_pixel_color.i.b = ColorCombinerEquation(*m_color_inputs.combiner_rgbsub_a_b[1],*m_color_inputs.combiner_rgbsub_b_b[1],*m_color_inputs.combiner_rgbmul_b[1],*m_color_inputs.combiner_rgbadd_b[1]);
+	m_pixel_color.i.a = AlphaCombinerEquation(*m_color_inputs.combiner_alphasub_a[1],*m_color_inputs.combiner_alphasub_b[1],*m_color_inputs.combiner_alphamul[1],*m_color_inputs.combiner_alphaadd[1]);
+
+	//Alpha coverage combiner
+	GetAlphaCvg(&m_pixel_color.i.a);
+}
+
+void Processor::ColorCombiner2Cycle(bool noisecompute)
+{
+	if (noisecompute)
+	{
+		m_noise_color.i.r = m_noise_color.i.g = m_noise_color.i.b = mame_rand(m_machine) & 0xff; // HACK
+	}
+
+	m_combined_color.i.r = ColorCombinerEquation(*m_color_inputs.combiner_rgbsub_a_r[0],*m_color_inputs.combiner_rgbsub_b_r[0],*m_color_inputs.combiner_rgbmul_r[0],*m_color_inputs.combiner_rgbadd_r[0]);
+	m_combined_color.i.g = ColorCombinerEquation(*m_color_inputs.combiner_rgbsub_a_g[0],*m_color_inputs.combiner_rgbsub_b_g[0],*m_color_inputs.combiner_rgbmul_g[0],*m_color_inputs.combiner_rgbadd_g[0]);
+	m_combined_color.i.b = ColorCombinerEquation(*m_color_inputs.combiner_rgbsub_a_b[0],*m_color_inputs.combiner_rgbsub_b_b[0],*m_color_inputs.combiner_rgbmul_b[0],*m_color_inputs.combiner_rgbadd_b[0]);
+	m_combined_color.i.a = AlphaCombinerEquation(*m_color_inputs.combiner_alphasub_a[0],*m_color_inputs.combiner_alphasub_b[0],*m_color_inputs.combiner_alphamul[0],*m_color_inputs.combiner_alphaadd[0]);
+
+	m_texel0_color = m_texel1_color;
+	m_texel1_color = m_next_texel_color;
+
+	m_pixel_color.i.r = ColorCombinerEquation(*m_color_inputs.combiner_rgbsub_a_r[1],*m_color_inputs.combiner_rgbsub_b_r[1],*m_color_inputs.combiner_rgbmul_r[1],*m_color_inputs.combiner_rgbadd_r[1]);
+	m_pixel_color.i.g = ColorCombinerEquation(*m_color_inputs.combiner_rgbsub_a_g[1],*m_color_inputs.combiner_rgbsub_b_g[1],*m_color_inputs.combiner_rgbmul_g[1],*m_color_inputs.combiner_rgbadd_g[1]);
+	m_pixel_color.i.b = ColorCombinerEquation(*m_color_inputs.combiner_rgbsub_a_b[1],*m_color_inputs.combiner_rgbsub_b_b[1],*m_color_inputs.combiner_rgbmul_b[1],*m_color_inputs.combiner_rgbadd_b[1]);
+	m_pixel_color.i.a = AlphaCombinerEquation(*m_color_inputs.combiner_alphasub_a[1],*m_color_inputs.combiner_alphasub_b[1],*m_color_inputs.combiner_alphamul[1],*m_color_inputs.combiner_alphaadd[1]);
+
+	GetAlphaCvg(&m_pixel_color.i.a);
 }
 
 void Processor::SetSubAInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code)
@@ -468,13 +547,13 @@ void Processor::SetMulInputAlpha(UINT8 **input, int code)
 {
 	switch (code & 0x7)
 	{
-		case 0:		*input = &m_lod_frac; break; //HACK
+		case 0:		*input = &m_lod_frac; break;
 		case 1:		*input = &m_texel0_color.i.a; break;
 		case 2:		*input = &m_texel1_color.i.a; break;
 		case 3:		*input = &m_prim_color.i.a; break;
 		case 4:		*input = &m_shade_color.i.a; break;
 		case 5:		*input = &m_env_color.i.a; break;
-		case 6:		*input = &m_prim_lod_frac; break; //HACK
+		case 6:		*input = &m_prim_lod_frac; break;
 		case 7:		*input = &m_zero_color.i.a; break;
 	}
 }
@@ -563,7 +642,7 @@ const UINT8 Processor::s_magic_matrix[16] =
 	 7,  1,  6, 0
 };
 
-const Processor::ZDecompressEntry Processor::m_z_decompress_table[8] =
+const Processor::ZDecompressEntry Processor::z_dec_table[8] =
 {
 	{ 6, 0x00000 },
 	{ 5, 0x20000 },
@@ -577,59 +656,232 @@ const Processor::ZDecompressEntry Processor::m_z_decompress_table[8] =
 
 /*****************************************************************************/
 
-void Processor::BuildCompressedZTable()
+void Processor::z_build_com_table(void)
 {
-	for(int j = 0; j < 0x40000; j++)
+	UINT16 altmem = 0;
+	for(int z = 0; z < 0x40000; z++)
 	{
-		UINT32 exponent = 0;
-		UINT32 testbit = 0x20000;
-		UINT32 mantissa = 0;
-		while( (j & testbit) && (exponent < 7) )
+	switch((z >> 11) & 0x7f)
+	{
+	case 0x00:
+	case 0x01:
+	case 0x02:
+	case 0x03:
+	case 0x04:
+	case 0x05:
+	case 0x06:
+	case 0x07:
+	case 0x08:
+	case 0x09:
+	case 0x0a:
+	case 0x0b:
+	case 0x0c:
+	case 0x0d:
+	case 0x0e:
+	case 0x0f:
+	case 0x10:
+	case 0x11:
+	case 0x12:
+	case 0x13:
+	case 0x14:
+	case 0x15:
+	case 0x16:
+	case 0x17:
+	case 0x18:
+	case 0x19:
+	case 0x1a:
+	case 0x1b:
+	case 0x1c:
+	case 0x1d:
+	case 0x1e:
+	case 0x1f:
+	case 0x20:
+	case 0x21:
+	case 0x22:
+	case 0x23:
+	case 0x24:
+	case 0x25:
+	case 0x26:
+	case 0x27:
+	case 0x28:
+	case 0x29:
+	case 0x2a:
+	case 0x2b:
+	case 0x2c:
+	case 0x2d:
+	case 0x2e:
+	case 0x2f:
+	case 0x30:
+	case 0x31:
+	case 0x32:
+	case 0x33:
+	case 0x34:
+	case 0x35:
+	case 0x36:
+	case 0x37:
+	case 0x38:
+	case 0x39:
+	case 0x3a:
+	case 0x3b:
+	case 0x3c:
+	case 0x3d:
+	case 0x3e:
+	case 0x3f:
+		altmem = (z >> 4) & 0x1ffc;
+		break;
+	case 0x40:
+	case 0x41:
+	case 0x42:
+	case 0x43:
+	case 0x44:
+	case 0x45:
+	case 0x46:
+	case 0x47:
+	case 0x48:
+	case 0x49:
+	case 0x4a:
+	case 0x4b:
+	case 0x4c:
+	case 0x4d:
+	case 0x4e:
+	case 0x4f:
+	case 0x50:
+	case 0x51:
+	case 0x52:
+	case 0x53:
+	case 0x54:
+	case 0x55:
+	case 0x56:
+	case 0x57:
+	case 0x58:
+	case 0x59:
+	case 0x5a:
+	case 0x5b:
+	case 0x5c:
+	case 0x5d:
+	case 0x5e:
+	case 0x5f:
+		altmem = ((z >> 3) & 0x1ffc) | 0x2000;
+		break;
+	case 0x60:
+	case 0x61:
+	case 0x62:
+	case 0x63:
+	case 0x64:
+	case 0x65:
+	case 0x66:
+	case 0x67:
+	case 0x68:
+	case 0x69:
+	case 0x6a:
+	case 0x6b:
+	case 0x6c:
+	case 0x6d:
+	case 0x6e:
+	case 0x6f:
+		altmem = ((z >> 2) & 0x1ffc) | 0x4000;
+		break;
+	case 0x70:
+	case 0x71:
+	case 0x72:
+	case 0x73:
+	case 0x74:
+	case 0x75:
+	case 0x76:
+	case 0x77:
+		altmem = ((z >> 1) & 0x1ffc) | 0x6000;
+		break;
+	case 0x78://uncompressed z = 0x3c000
+	case 0x79:
+	case 0x7a:
+	case 0x7b:
+		altmem = (z & 0x1ffc) | 0x8000;
+		break;
+	case 0x7c://uncompressed z = 0x3e000
+	case 0x7d:
+		altmem = ((z << 1) & 0x1ffc) | 0xa000;
+		break;
+	case 0x7e://uncompressed z = 0x3f000
+		altmem = ((z << 2) & 0x1ffc) | 0xc000;
+		break;
+	case 0x7f://uncompressed z = 0x3f000
+		altmem = ((z << 2) & 0x1ffc) | 0xe000;
+		break;
+	}
+
+    z_com_table[z] = altmem;
+
+    }
+}
+
+void Processor::precalc_cvmask_derivatives(void)
+{
+	const UINT8 yarray[16] = {0, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0};
+	const UINT8 xarray[16] = {0, 3, 2, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
+
+	for (int i = 0; i < 0x10000; i++)
+	{
+		compressed_cvmasks[i] = (i & 1) | ((i & 4) >> 1) | ((i & 0x20) >> 3) | ((i & 0x80) >> 4) |
+		((i & 0x100) >> 4) | ((i & 0x400) >> 5) | ((i & 0x2000) >> 7) | ((i & 0x8000) >> 8);
+	}
+
+	for (int i = 0; i < 0x100; i++)
+	{
+		UINT16 mask = decompress_cvmask_frombyte(i);
+		cvarray[i].cvg = cvarray[i].cvbit = 0;
+		cvarray[i].cvbit = (i >> 7) & 1;
+		for (int k = 0; k < 8; k++)
 		{
-			exponent++;
-			testbit = 1 << (17 - exponent);
+			cvarray[i].cvg += ((i >> k) & 1);
 		}
 
-		mantissa = (j >> (6 - (6 < exponent ? 6 : exponent))) & 0x7ff;
-		m_z_compress_table[j] = (UINT16)(((exponent << 11) | mantissa) << 2);
+		UINT16 masky = 0;
+		for (int k = 0; k < 4; k++)
+		{
+			masky |= ((mask & (0xf000 >> (k << 2))) > 0) << k;
+		}
+		UINT8 offy = yarray[masky];
+
+		UINT16 maskx = (mask & (0xf000 >> (offy << 2))) >> ((offy ^ 3) << 2);
+		UINT8 offx = xarray[maskx];
+
+		cvarray[i].xoff = offx;
+		cvarray[i].yoff = offy;
 	}
 }
 
-void Processor::ZStore(UINT16* zb, UINT8* zhb, UINT32 z, UINT32 deltaz)
+UINT16 Processor::decompress_cvmask_frombyte(UINT8 x)
 {
-	UINT8 deltazmem = 15;
-	z &= 0x3ffff;
-	deltaz &= 0xffff;
-	for(int j = 15; j >= 0; j--)
-	{
-		if( (deltaz >> j) == 1 )
-		{
-			break;
-		}
-		else
-		{
-			deltazmem--;
-		}
-	}
-	if (deltazmem>15)
-	{
-		deltazmem=0;
-	}
-	*zb = m_z_compress_table[z] | (deltazmem>>2);
-	*zhb = (deltazmem & 3);
+	UINT16 y = (x & 1) | ((x & 2) << 1) | ((x & 4) << 3) | ((x & 8) << 4) |
+		((x & 0x10) << 4) | ((x & 0x20) << 5) | ((x & 0x40) << 7) | ((x & 0x80) << 8);
+	return y;
 }
 
-UINT32 Processor::DecompressZ(UINT16 *zb)
+void Processor::lookup_cvmask_derivatives(UINT32 mask, UINT8* offx, UINT8* offy)
 {
-	UINT32 exponent = (*zb >> 13) & 7;
-	UINT32 mantissa = (*zb >> 2) & 0x7ff;
-	return ((mantissa << m_z_decompress_table[exponent].shift) + m_z_decompress_table[exponent].add);
+	UINT32 index;
+	/*
+	if (mask != (mask & 0xa5a5))//never happens
+		stricterror("wrong cvmask computed: %x", mask);
+	*/
+	index = compressed_cvmasks[mask];//согласно VTune, где-то на 50% быстрее, чем сжатие до 8 бит на месте в этой ф-ии
+	m_misc_state.m_curpixel_cvg = cvarray[index].cvg;
+	m_misc_state.m_curpixel_cvbit = cvarray[index].cvbit;//бит mask15b: cv.c, bl.c
+	*offx = cvarray[index].xoff;
+	*offy = cvarray[index].yoff;
 }
 
-UINT16 Processor::DecompressDZ(UINT16* zb, UINT8* zhb)
+void Processor::ZStore(UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 z)
 {
-	UINT32 dz_compressed = (((*zb & 3) << 2)|(*zhb & 3));
-	return (1 << dz_compressed);
+	UINT16 zval = z_com_table[z & 0x3ffff]|(m_dzpix_enc >> 2);
+	if(zcurpixel <= MEM16_LIMIT)
+	{
+		((UINT16*)rdram)[zcurpixel ^ WORD_ADDR_XOR] = zval;
+	}
+	if(dzcurpixel <= MEM8_LIMIT)
+	{
+		m_hidden_bits[dzcurpixel ^ BYTE_ADDR_XOR] = m_dzpix_enc & 3;
+	}
 }
 
 INT32 Processor::NormalizeDZPix(INT32 sum)
@@ -652,109 +904,214 @@ INT32 Processor::NormalizeDZPix(INT32 sum)
     return 0;
 }
 
-bool Processor::ZCompare(void* fb, UINT8* hb, UINT16* zb, UINT8* zhb, UINT32 sz, UINT16 dzpix)
+UINT32 Processor::ZDecompress(UINT32 zcurpixel)
 {
-	int force_coplanar = 0;
-	UINT32 oz = DecompressZ(zb);
-	UINT32 dzmem = DecompressDZ(zb, zhb);
-	UINT32 dznew = 0;
-	UINT32 diff = 0;
-	int precision_factor = (oz >> 15) & 0xf;
-	int cvgcoeff = 0;
-	UINT32 mempixel;
-	UINT32 memory_cvg;
+	UINT32 zb = RREADIDX16(zcurpixel);
+	return z_complete_dec_table[(zb >> 2) & 0x3fff];
+}
 
+UINT32 Processor::DZDecompress(UINT32 zcurpixel, UINT32 dzcurpixel)
+{
+	UINT16 zval = RREADIDX16(zcurpixel);
+	UINT8 dzval = (((dzcurpixel) <= 0x7fffff) ? (GetHiddenBits()[(dzcurpixel) ^ BYTE_ADDR_XOR]) : 0);
+	UINT32 dz_compressed = ((zval & 3) << 2) | (dzval & 3);
+	return (1 << dz_compressed);
+}
+
+UINT32 Processor::DZCompress(UINT32 value)
+{
+	INT32 j = 0;
+	for (; value > 1; j++, value >>= 1);
+	return j;
+}
+
+void Processor::GetDitherValues(int x, int y, int* cdith, int* adith)
+{
+	int dithindex = ((y & 3) << 2) | (x & 3);
+	switch((m_other_modes.rgb_dither_sel << 2) | m_other_modes.alpha_dither_sel)
+	{
+	case 0:
+		*adith = *cdith = s_magic_matrix[dithindex];
+		break;
+	case 1:
+		*cdith = s_magic_matrix[dithindex];
+		*adith = (~(*cdith)) & 7;
+		break;
+	case 2:
+		*cdith = s_magic_matrix[dithindex];
+		*adith = mame_rand(m_machine) & 7;
+		break;
+	case 3:
+		*cdith = s_magic_matrix[dithindex];
+		*adith = 0;
+		break;
+	case 4:
+		*adith = *cdith = s_bayer_matrix[dithindex];
+		break;
+	case 5:
+		*cdith = s_bayer_matrix[dithindex];
+		*adith = (~(*cdith)) & 7;
+		break;
+	case 6:
+		*cdith = s_bayer_matrix[dithindex];
+		*adith = mame_rand(m_machine) & 7;
+		break;
+	case 7:
+		*cdith = s_bayer_matrix[dithindex];
+		*adith = 0;
+		break;
+	case 8:
+		*cdith = mame_rand(m_machine) & 7;
+		*adith = s_magic_matrix[dithindex];
+		break;
+	case 9:
+		*cdith = mame_rand(m_machine) & 7;
+		*adith = (~s_magic_matrix[dithindex]) & 7;
+		break;
+	case 10:
+		*cdith = mame_rand(m_machine) & 7;
+		*adith = (*cdith + 17) & 7;
+		break;
+	case 11:
+		*cdith = mame_rand(m_machine) & 7;
+		*adith = 0;
+		break;
+	case 12:
+		*cdith = 0;
+		*adith = s_bayer_matrix[dithindex];
+		break;
+	case 13:
+		*cdith = 0;
+		*adith = (~s_bayer_matrix[dithindex]) & 7;
+		break;
+	case 14:
+		*cdith = 0;
+		*adith = mame_rand(m_machine) & 7;
+		break;
+	case 15:
+		*adith = *cdith = 0;
+		break;
+	}
+}
+
+INT32 CLAMP(INT32 in, INT32 min, INT32 max)
+{
+	if(in < min) return min;
+	if(in > max) return max;
+	return in;
+}
+
+bool Processor::ZCompare(UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 sz, UINT16 dzpix)
+{
+	bool force_coplanar = false;
 	sz &= 0x3ffff;
-	if (dzmem == 0x8000 && precision_factor < 3)
+
+	UINT32 oz;
+	UINT32 dzmem;
+	UINT32 zval;
+	INT32 rawdzmem;
+
+	if (m_other_modes.z_compare_en)
 	{
-		force_coplanar = 1;
+		oz = ZDecompress(zcurpixel);
+		dzmem = DZDecompress(zcurpixel, dzcurpixel);
+		zval = RREADIDX16(zcurpixel);
+		rawdzmem = ((zval & 3) << 2) | ((((dzcurpixel) <= 0x3fffff) ? (GetHiddenBits()[(dzcurpixel) ^ BYTE_ADDR_XOR]) : 0) & 3);
 	}
-	if (!precision_factor)
+	else
 	{
-		dzmem = ((dzmem << 1) > 16) ? (dzmem << 1) : 16;
+		oz = 0;
+		dzmem = 1 << 0xf;
+		zval = 0x3;
+		rawdzmem = 0xf;
 	}
-	else if (precision_factor == 1)
+
+	m_dzpix_enc = DZCompress(dzpix & 0xffff);
+	m_blender.SetShiftA(CLAMP(m_dzpix_enc - rawdzmem, 0, 4));
+	m_blender.SetShiftB(CLAMP(rawdzmem - m_dzpix_enc, 0, 4));
+
+	int precision_factor = (zval >> 13) & 0xf;
+
+	bool precision_important = precision_factor < 3;
+	int dzmemmodifier;
+	if (precision_important)
 	{
-		dzmem = ((dzmem << 1) > 8) ? (dzmem << 1) : 8;
-	}
-	else if (precision_factor == 2)
-	{
-		dzmem = ((dzmem << 1) > 4) ? (dzmem << 1) : 4;
-	}
-	if (dzmem == 0 && precision_factor < 3)
-	{
-		dzmem = 0xffff;
+		dzmemmodifier = 16 >> precision_factor;
+		if (dzmem == 0x8000)
+		{
+			force_coplanar = true;
+		}
+		dzmem <<= 1;
+		if (dzmem <= dzmemmodifier)
+		{
+			dzmem = dzmemmodifier;
+		}
+		if (!dzmem)
+		{
+			dzmem = 0xffff;
+		}
 	}
 	if (dzmem > 0x8000)
 	{
 		dzmem = 0xffff;
 	}
-	dznew =((dzmem > dzpix) ? dzmem : (UINT32)dzpix) << 3;
-	dznew &= 0x3ffff;
 
-	bool farther = ((sz + dznew) >= oz);
-	diff = (sz >= dznew) ? (sz - dznew) : 0;
-	bool nearer = (diff <= oz);
-	bool infront = (sz < oz);
-	bool max = (dzmem == 0x3ffff);
+	UINT32 dznew = (dzmem > dzpix) ? dzmem : (UINT32)dzpix;
+	UINT32 dznotshift = dznew;
+	dznew <<= 3;
+
+	bool farther = (sz + dznew) >= oz;
+	bool infront = sz < oz;
 
 	if (force_coplanar)
 	{
-		farther = nearer = true;
+		farther = true;
 	}
 
-	m_misc_state.m_curpixel_overlap = 0;
+	bool overflow = ((m_misc_state.m_curpixel_memcvg + m_misc_state.m_curpixel_cvg) & 8) > 0;
+	m_blender.SetBlendEnable(m_other_modes.force_blend || (!overflow && m_other_modes.antialias_en && farther));
+	m_framebuffer.SetPreWrap(overflow);
 
-	switch(m_misc_state.m_fb_size)
-	{
-		case 1: /* Banjo Tooie */
-			memory_cvg = 0; //??
-			break;
-		case 2:
-			mempixel = *(UINT16*)fb;
-			memory_cvg = ((mempixel & 1) << 2) + (*hb & 3);
-			break;
-		case 3:
-			mempixel = *(UINT32*)fb;
-			memory_cvg = (mempixel >> 5) & 7;
-			break;
-		default:
-			fatalerror("z_compare: fb_size = %d",m_misc_state.m_fb_size);
-			break;
-	}
-
-	if (!m_other_modes.image_read_en)
-	{
-		memory_cvg = 7;
-	}
-
-	bool overflow = ((memory_cvg + m_misc_state.m_curpixel_cvg - 1) > 7);
-	m_misc_state.m_curpixel_overlap = (m_other_modes.force_blend || (!overflow && m_other_modes.antialias_en && farther));
+	int cvgcoeff = 0;
+	UINT32 dzenc = 0;
 
 	if (m_other_modes.z_mode == 1 && infront && farther && overflow)
 	{
-		cvgcoeff = ((dzmem >> dznew) - (sz >> dznew)) & 0xf;
-		m_misc_state.m_curpixel_cvg = ((cvgcoeff * (m_misc_state.m_curpixel_cvg - 1)) >> 3) & 0xf;
+		dzenc = DZCompress(dznotshift & 0xffff);
+		cvgcoeff = ((oz >> dzenc) - (sz >> dzenc)) & 0xf;
+		m_misc_state.m_curpixel_cvg = ((cvgcoeff * m_misc_state.m_curpixel_cvg) >> 3) & 0xf;
 	}
-	if (m_misc_state.m_curpixel_cvg > 8)
+
+	if (!m_other_modes.z_compare_en)
 	{
-		m_misc_state.m_curpixel_cvg = 8;
+		return true;
+	}
+
+	INT32 diff = (INT32)sz - (INT32)dznew;
+	bool nearer = diff <= (INT32)oz;
+	bool max = (oz == 0x3ffff);
+	if (force_coplanar)
+	{
+		nearer = true;
 	}
 
 	switch(m_other_modes.z_mode)
 	{
-		case 0: // Opaque
-			return (max || (overflow ? infront : nearer));
-		case 1: // Interpenetrating
-			return (max || (overflow ? infront : nearer));
-		case 2: // Transparent
-			return (infront || max);
-		case 3: // Decal
-			return (farther && nearer && !max);
-		default:
-			fatalerror( "z_mode = %d", m_other_modes.z_mode);
-			break;
+	case 0:
+		return (max || (overflow ? infront : nearer));
+		break;
+	case 1:
+		return (max || (overflow ? infront : nearer));
+		break;
+	case 2:
+		return (infront || max);
+		break;
+	case 3:
+		return (farther && nearer && !max);
+		break;
 	}
+
+	return false;
 }
 
 UINT32 Processor::GetLog2(UINT32 lod_clamp)
@@ -942,6 +1299,36 @@ void N64::RDP::Processor::Dasm(char *buffer)
 					sprintf(buffer, "Tri_NoShade            %d, XL: %s, XM: %s, XH: %s, YL: %s, YM: %s, YH: %s\n", lft, xl,xm,xh,yl,ym,yh);
 			break;
 		}
+		case 0x09:		// Tri_NoShadeZ
+		{
+			int lft = (command >> 23) & 0x1;
+
+			if (length != rdp_command_length[command])
+			{
+				sprintf(buffer, "ERROR: Tri_NoShadeZ length = %d\n", length);
+				return;
+			}
+
+			cmd[2] = m_cmd_data[m_cmd_cur+2];
+			cmd[3] = m_cmd_data[m_cmd_cur+3];
+			cmd[4] = m_cmd_data[m_cmd_cur+4];
+			cmd[5] = m_cmd_data[m_cmd_cur+5];
+			cmd[6] = m_cmd_data[m_cmd_cur+6];
+			cmd[7] = m_cmd_data[m_cmd_cur+7];
+
+			sprintf(yl,		"%4.4f", (float)((cmd[0] >>  0) & 0x1fff) / 4.0f);
+			sprintf(ym,		"%4.4f", (float)((cmd[1] >> 16) & 0x1fff) / 4.0f);
+			sprintf(yh,		"%4.4f", (float)((cmd[1] >>  0) & 0x1fff) / 4.0f);
+			sprintf(xl,		"%4.4f", (float)(cmd[2] / 65536.0f));
+			sprintf(dxldy,	"%4.4f", (float)(cmd[3] / 65536.0f));
+			sprintf(xh,		"%4.4f", (float)(cmd[4] / 65536.0f));
+			sprintf(dxhdy,	"%4.4f", (float)(cmd[5] / 65536.0f));
+			sprintf(xm,		"%4.4f", (float)(cmd[6] / 65536.0f));
+			sprintf(dxmdy,	"%4.4f", (float)(cmd[7] / 65536.0f));
+
+					sprintf(buffer, "Tri_NoShadeZ            %d, XL: %s, XM: %s, XH: %s, YL: %s, YM: %s, YH: %s\n", lft, xl,xm,xh,yl,ym,yh);
+			break;
+		}
 		case 0x0a:		// Tri_Tex
 		{
 			int lft = (command >> 23) & 0x1;
@@ -982,6 +1369,56 @@ void N64::RDP::Processor::Dasm(char *buffer)
 
 
 			buffer+=sprintf(buffer, "Tri_Tex               %d, XL: %s, XM: %s, XH: %s, YL: %s, YM: %s, YH: %s\n", lft, xl,xm,xh,yl,ym,yh);
+			buffer+=sprintf(buffer, "                              ");
+			buffer+=sprintf(buffer, "                       S: %s, T: %s, W: %s\n", s, t, w);
+			buffer+=sprintf(buffer, "                              ");
+			buffer+=sprintf(buffer, "                       DSDX: %s, DTDX: %s, DWDX: %s\n", dsdx, dtdx, dwdx);
+			buffer+=sprintf(buffer, "                              ");
+			buffer+=sprintf(buffer, "                       DSDE: %s, DTDE: %s, DWDE: %s\n", dsde, dtde, dwde);
+			buffer+=sprintf(buffer, "                              ");
+			buffer+=sprintf(buffer, "                       DSDY: %s, DTDY: %s, DWDY: %s\n", dsdy, dtdy, dwdy);
+			break;
+		}
+		case 0x0b:		// Tri_TexZ
+		{
+			int lft = (command >> 23) & 0x1;
+
+			if (length < rdp_command_length[command])
+			{
+				sprintf(buffer, "ERROR: Tri_TexZ length = %d\n", length);
+				return;
+			}
+
+			for (i=2; i < 24; i++)
+			{
+				cmd[i] = m_cmd_data[m_cmd_cur+i];
+			}
+
+			sprintf(yl,		"%4.4f", (float)((cmd[0] >>  0) & 0x1fff) / 4.0f);
+			sprintf(ym,		"%4.4f", (float)((cmd[1] >> 16) & 0x1fff) / 4.0f);
+			sprintf(yh,		"%4.4f", (float)((cmd[1] >>  0) & 0x1fff) / 4.0f);
+			sprintf(xl,		"%4.4f", (float)((INT32)cmd[2] / 65536.0f));
+			sprintf(dxldy,	"%4.4f", (float)((INT32)cmd[3] / 65536.0f));
+			sprintf(xh,		"%4.4f", (float)((INT32)cmd[4] / 65536.0f));
+			sprintf(dxhdy,	"%4.4f", (float)((INT32)cmd[5] / 65536.0f));
+			sprintf(xm,		"%4.4f", (float)((INT32)cmd[6] / 65536.0f));
+			sprintf(dxmdy,	"%4.4f", (float)((INT32)cmd[7] / 65536.0f));
+
+			sprintf(s,		"%4.4f", (float)(INT32)((cmd[ 8] & 0xffff0000) | ((cmd[12] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(t,		"%4.4f", (float)(INT32)(((cmd[ 8] & 0xffff) << 16) | (cmd[12] & 0xffff)) / 65536.0f);
+			sprintf(w,		"%4.4f", (float)(INT32)((cmd[ 9] & 0xffff0000) | ((cmd[13] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dsdx,	"%4.4f", (float)(INT32)((cmd[10] & 0xffff0000) | ((cmd[14] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dtdx,	"%4.4f", (float)(INT32)(((cmd[10] & 0xffff) << 16) | (cmd[14] & 0xffff)) / 65536.0f);
+			sprintf(dwdx,	"%4.4f", (float)(INT32)((cmd[11] & 0xffff0000) | ((cmd[15] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dsde,	"%4.4f", (float)(INT32)((cmd[16] & 0xffff0000) | ((cmd[20] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dtde,	"%4.4f", (float)(INT32)(((cmd[16] & 0xffff) << 16) | (cmd[20] & 0xffff)) / 65536.0f);
+			sprintf(dwde,	"%4.4f", (float)(INT32)((cmd[17] & 0xffff0000) | ((cmd[21] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dsdy,	"%4.4f", (float)(INT32)((cmd[18] & 0xffff0000) | ((cmd[22] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dtdy,	"%4.4f", (float)(INT32)(((cmd[18] & 0xffff) << 16) | (cmd[22] & 0xffff)) / 65536.0f);
+			sprintf(dwdy,	"%4.4f", (float)(INT32)((cmd[19] & 0xffff0000) | ((cmd[23] >> 16) & 0xffff)) / 65536.0f);
+
+
+			buffer+=sprintf(buffer, "Tri_TexZ               %d, XL: %s, XM: %s, XH: %s, YL: %s, YM: %s, YH: %s\n", lft, xl,xm,xh,yl,ym,yh);
 			buffer+=sprintf(buffer, "                              ");
 			buffer+=sprintf(buffer, "                       S: %s, T: %s, W: %s\n", s, t, w);
 			buffer+=sprintf(buffer, "                              ");
@@ -1034,6 +1471,58 @@ void N64::RDP::Processor::Dasm(char *buffer)
 			sprintf(dady,	"%4.4f", (float)(INT32)(((cmd[19] & 0xffff) << 16) | (cmd[23] & 0xffff)) / 65536.0f);
 
 			buffer+=sprintf(buffer, "Tri_Shade              %d, XL: %s, XM: %s, XH: %s, YL: %s, YM: %s, YH: %s\n", lft, xl,xm,xh,yl,ym,yh);
+			buffer+=sprintf(buffer, "                              ");
+			buffer+=sprintf(buffer, "                       R: %s, G: %s, B: %s, A: %s\n", rt, gt, bt, at);
+			buffer+=sprintf(buffer, "                              ");
+			buffer+=sprintf(buffer, "                       DRDX: %s, DGDX: %s, DBDX: %s, DADX: %s\n", drdx, dgdx, dbdx, dadx);
+			buffer+=sprintf(buffer, "                              ");
+			buffer+=sprintf(buffer, "                       DRDE: %s, DGDE: %s, DBDE: %s, DADE: %s\n", drde, dgde, dbde, dade);
+			buffer+=sprintf(buffer, "                              ");
+			buffer+=sprintf(buffer, "                       DRDY: %s, DGDY: %s, DBDY: %s, DADY: %s\n", drdy, dgdy, dbdy, dady);
+			break;
+		}
+		case 0x0d:		// Tri_ShadeZ
+		{
+			int lft = (command >> 23) & 0x1;
+
+			if (length != rdp_command_length[command])
+			{
+				sprintf(buffer, "ERROR: Tri_ShadeZ length = %d\n", length);
+				return;
+			}
+
+			for (i=2; i < 24; i++)
+			{
+				cmd[i] = m_cmd_data[i];
+			}
+
+			sprintf(yl,		"%4.4f", (float)((cmd[0] >>  0) & 0x1fff) / 4.0f);
+			sprintf(ym,		"%4.4f", (float)((cmd[1] >> 16) & 0x1fff) / 4.0f);
+			sprintf(yh,		"%4.4f", (float)((cmd[1] >>  0) & 0x1fff) / 4.0f);
+			sprintf(xl,		"%4.4f", (float)((INT32)cmd[2] / 65536.0f));
+			sprintf(dxldy,	"%4.4f", (float)((INT32)cmd[3] / 65536.0f));
+			sprintf(xh,		"%4.4f", (float)((INT32)cmd[4] / 65536.0f));
+			sprintf(dxhdy,	"%4.4f", (float)((INT32)cmd[5] / 65536.0f));
+			sprintf(xm,		"%4.4f", (float)((INT32)cmd[6] / 65536.0f));
+			sprintf(dxmdy,	"%4.4f", (float)((INT32)cmd[7] / 65536.0f));
+			sprintf(rt,		"%4.4f", (float)(INT32)((cmd[8] & 0xffff0000) | ((cmd[12] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(gt,		"%4.4f", (float)(INT32)(((cmd[8] & 0xffff) << 16) | (cmd[12] & 0xffff)) / 65536.0f);
+			sprintf(bt,		"%4.4f", (float)(INT32)((cmd[9] & 0xffff0000) | ((cmd[13] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(at,		"%4.4f", (float)(INT32)(((cmd[9] & 0xffff) << 16) | (cmd[13] & 0xffff)) / 65536.0f);
+			sprintf(drdx,	"%4.4f", (float)(INT32)((cmd[10] & 0xffff0000) | ((cmd[14] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dgdx,	"%4.4f", (float)(INT32)(((cmd[10] & 0xffff) << 16) | (cmd[14] & 0xffff)) / 65536.0f);
+			sprintf(dbdx,	"%4.4f", (float)(INT32)((cmd[11] & 0xffff0000) | ((cmd[15] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dadx,	"%4.4f", (float)(INT32)(((cmd[11] & 0xffff) << 16) | (cmd[15] & 0xffff)) / 65536.0f);
+			sprintf(drde,	"%4.4f", (float)(INT32)((cmd[16] & 0xffff0000) | ((cmd[20] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dgde,	"%4.4f", (float)(INT32)(((cmd[16] & 0xffff) << 16) | (cmd[20] & 0xffff)) / 65536.0f);
+			sprintf(dbde,	"%4.4f", (float)(INT32)((cmd[17] & 0xffff0000) | ((cmd[21] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dade,	"%4.4f", (float)(INT32)(((cmd[17] & 0xffff) << 16) | (cmd[21] & 0xffff)) / 65536.0f);
+			sprintf(drdy,	"%4.4f", (float)(INT32)((cmd[18] & 0xffff0000) | ((cmd[22] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dgdy,	"%4.4f", (float)(INT32)(((cmd[18] & 0xffff) << 16) | (cmd[22] & 0xffff)) / 65536.0f);
+			sprintf(dbdy,	"%4.4f", (float)(INT32)((cmd[19] & 0xffff0000) | ((cmd[23] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dady,	"%4.4f", (float)(INT32)(((cmd[19] & 0xffff) << 16) | (cmd[23] & 0xffff)) / 65536.0f);
+
+			buffer+=sprintf(buffer, "Tri_ShadeZ              %d, XL: %s, XM: %s, XH: %s, YL: %s, YM: %s, YH: %s\n", lft, xl,xm,xh,yl,ym,yh);
 			buffer+=sprintf(buffer, "                              ");
 			buffer+=sprintf(buffer, "                       R: %s, G: %s, B: %s, A: %s\n", rt, gt, bt, at);
 			buffer+=sprintf(buffer, "                              ");
@@ -1119,6 +1608,81 @@ void N64::RDP::Processor::Dasm(char *buffer)
 			buffer+=sprintf(buffer, "                       DSDY: %s, DTDY: %s, DWDY: %s\n", dsdy, dtdy, dwdy);
 			break;
 		}
+		case 0x0f:		// Tri_TexShadeZ
+		{
+			int lft = (command >> 23) & 0x1;
+
+			if (length < rdp_command_length[command])
+			{
+				sprintf(buffer, "ERROR: Tri_TexShadeZ length = %d\n", length);
+				return;
+			}
+
+			for (i=2; i < 40; i++)
+			{
+				cmd[i] = m_cmd_data[m_cmd_cur+i];
+			}
+
+			sprintf(yl,		"%4.4f", (float)((cmd[0] >>  0) & 0x1fff) / 4.0f);
+			sprintf(ym,		"%4.4f", (float)((cmd[1] >> 16) & 0x1fff) / 4.0f);
+			sprintf(yh,		"%4.4f", (float)((cmd[1] >>  0) & 0x1fff) / 4.0f);
+			sprintf(xl,		"%4.4f", (float)((INT32)cmd[2] / 65536.0f));
+			sprintf(dxldy,	"%4.4f", (float)((INT32)cmd[3] / 65536.0f));
+			sprintf(xh,		"%4.4f", (float)((INT32)cmd[4] / 65536.0f));
+			sprintf(dxhdy,	"%4.4f", (float)((INT32)cmd[5] / 65536.0f));
+			sprintf(xm,		"%4.4f", (float)((INT32)cmd[6] / 65536.0f));
+			sprintf(dxmdy,	"%4.4f", (float)((INT32)cmd[7] / 65536.0f));
+			sprintf(rt,		"%4.4f", (float)(INT32)((cmd[8] & 0xffff0000) | ((cmd[12] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(gt,		"%4.4f", (float)(INT32)(((cmd[8] & 0xffff) << 16) | (cmd[12] & 0xffff)) / 65536.0f);
+			sprintf(bt,		"%4.4f", (float)(INT32)((cmd[9] & 0xffff0000) | ((cmd[13] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(at,		"%4.4f", (float)(INT32)(((cmd[9] & 0xffff) << 16) | (cmd[13] & 0xffff)) / 65536.0f);
+			sprintf(drdx,	"%4.4f", (float)(INT32)((cmd[10] & 0xffff0000) | ((cmd[14] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dgdx,	"%4.4f", (float)(INT32)(((cmd[10] & 0xffff) << 16) | (cmd[14] & 0xffff)) / 65536.0f);
+			sprintf(dbdx,	"%4.4f", (float)(INT32)((cmd[11] & 0xffff0000) | ((cmd[15] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dadx,	"%4.4f", (float)(INT32)(((cmd[11] & 0xffff) << 16) | (cmd[15] & 0xffff)) / 65536.0f);
+			sprintf(drde,	"%4.4f", (float)(INT32)((cmd[16] & 0xffff0000) | ((cmd[20] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dgde,	"%4.4f", (float)(INT32)(((cmd[16] & 0xffff) << 16) | (cmd[20] & 0xffff)) / 65536.0f);
+			sprintf(dbde,	"%4.4f", (float)(INT32)((cmd[17] & 0xffff0000) | ((cmd[21] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dade,	"%4.4f", (float)(INT32)(((cmd[17] & 0xffff) << 16) | (cmd[21] & 0xffff)) / 65536.0f);
+			sprintf(drdy,	"%4.4f", (float)(INT32)((cmd[18] & 0xffff0000) | ((cmd[22] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dgdy,	"%4.4f", (float)(INT32)(((cmd[18] & 0xffff) << 16) | (cmd[22] & 0xffff)) / 65536.0f);
+			sprintf(dbdy,	"%4.4f", (float)(INT32)((cmd[19] & 0xffff0000) | ((cmd[23] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dady,	"%4.4f", (float)(INT32)(((cmd[19] & 0xffff) << 16) | (cmd[23] & 0xffff)) / 65536.0f);
+
+			sprintf(s,		"%4.4f", (float)(INT32)((cmd[24] & 0xffff0000) | ((cmd[28] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(t,		"%4.4f", (float)(INT32)(((cmd[24] & 0xffff) << 16) | (cmd[28] & 0xffff)) / 65536.0f);
+			sprintf(w,		"%4.4f", (float)(INT32)((cmd[25] & 0xffff0000) | ((cmd[29] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dsdx,	"%4.4f", (float)(INT32)((cmd[26] & 0xffff0000) | ((cmd[30] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dtdx,	"%4.4f", (float)(INT32)(((cmd[26] & 0xffff) << 16) | (cmd[30] & 0xffff)) / 65536.0f);
+			sprintf(dwdx,	"%4.4f", (float)(INT32)((cmd[27] & 0xffff0000) | ((cmd[31] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dsde,	"%4.4f", (float)(INT32)((cmd[32] & 0xffff0000) | ((cmd[36] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dtde,	"%4.4f", (float)(INT32)(((cmd[32] & 0xffff) << 16) | (cmd[36] & 0xffff)) / 65536.0f);
+			sprintf(dwde,	"%4.4f", (float)(INT32)((cmd[33] & 0xffff0000) | ((cmd[37] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dsdy,	"%4.4f", (float)(INT32)((cmd[34] & 0xffff0000) | ((cmd[38] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dtdy,	"%4.4f", (float)(INT32)(((cmd[34] & 0xffff) << 16) | (cmd[38] & 0xffff)) / 65536.0f);
+			sprintf(dwdy,	"%4.4f", (float)(INT32)((cmd[35] & 0xffff0000) | ((cmd[39] >> 16) & 0xffff)) / 65536.0f);
+
+
+			buffer+=sprintf(buffer, "Tri_TexShadeZ           %d, XL: %s, XM: %s, XH: %s, YL: %s, YM: %s, YH: %s\n", lft, xl,xm,xh,yl,ym,yh);
+			buffer+=sprintf(buffer, "                              ");
+			buffer+=sprintf(buffer, "                       R: %s, G: %s, B: %s, A: %s\n", rt, gt, bt, at);
+			buffer+=sprintf(buffer, "                              ");
+			buffer+=sprintf(buffer, "                       DRDX: %s, DGDX: %s, DBDX: %s, DADX: %s\n", drdx, dgdx, dbdx, dadx);
+			buffer+=sprintf(buffer, "                              ");
+			buffer+=sprintf(buffer, "                       DRDE: %s, DGDE: %s, DBDE: %s, DADE: %s\n", drde, dgde, dbde, dade);
+			buffer+=sprintf(buffer, "                              ");
+			buffer+=sprintf(buffer, "                       DRDY: %s, DGDY: %s, DBDY: %s, DADY: %s\n", drdy, dgdy, dbdy, dady);
+
+			buffer+=sprintf(buffer, "                              ");
+			buffer+=sprintf(buffer, "                       S: %s, T: %s, W: %s\n", s, t, w);
+			buffer+=sprintf(buffer, "                              ");
+			buffer+=sprintf(buffer, "                       DSDX: %s, DTDX: %s, DWDX: %s\n", dsdx, dtdx, dwdx);
+			buffer+=sprintf(buffer, "                              ");
+			buffer+=sprintf(buffer, "                       DSDE: %s, DTDE: %s, DWDE: %s\n", dsde, dtde, dwde);
+			buffer+=sprintf(buffer, "                              ");
+			buffer+=sprintf(buffer, "                       DSDY: %s, DTDY: %s, DWDY: %s\n", dsdy, dtdy, dwdy);
+			break;
+		}
 		case 0x24:
 		case 0x25:
 		{
@@ -1169,62 +1733,239 @@ void N64::RDP::Processor::Dasm(char *buffer)
 
 /*****************************************************************************/
 
-N64::RDP::Triangle::Triangle(running_machine *machine, bool shade, bool texture, bool zbuffer)
+N64::RDP::Triangle::Triangle(running_machine *machine, bool shade, bool texture, bool zbuffer, bool rect, bool flip)
 {
-	InitFromData(machine, shade, texture, zbuffer);
+	InitFromData(machine, shade, texture, zbuffer, rect, flip);
 }
 
-void N64::RDP::Triangle::InitFromData(running_machine *machine, bool shade, bool texture, bool zbuffer)
+void N64::RDP::Triangle::InitFromData(running_machine *machine, bool shade, bool texture, bool zbuffer, bool rect, bool flip)
 {
 	m_machine = machine;
 	m_rdp = &(machine->driver_data<_n64_state>())->m_rdp;
-	m_cmd_data = m_rdp->GetCommandData();
+	m_cmd_data = rect ? m_rdp->GetTempRectData() : m_rdp->GetCommandData();
 	m_misc_state = m_rdp->GetMiscState();
 	m_shade = shade;
 	m_texture = texture;
 	m_zbuffer = zbuffer;
+	m_rect = rect;
+}
+
+static UINT32 rightcvghex(UINT32 x, UINT32 fmask)
+{
+	UINT32 stickybit = ((x >> 1) & 0x1fff) > 0;
+	UINT32 covered = ((x >> 14) & 3) + stickybit;
+	covered = (0xf0 >> covered) & 0xf;
+	return (covered & fmask);
+}
+
+static UINT32 leftcvghex(UINT32 x, UINT32 fmask)
+{
+	UINT32 stickybit = ((x >> 1) & 0x1fff) > 0;
+	UINT32 covered = ((x >> 14) & 3) + stickybit;
+	covered = 0xf >> covered;
+	return (covered & fmask);
+}
+
+static INT32 CLIP(INT32 value,INT32 min,INT32 max)
+{
+	if (value < min)
+	{
+		return min;
+	}
+	else if (value > max)
+	{
+		return max;
+	}
+	else
+	{
+		return value;
+	}
+}
+
+void N64::RDP::Triangle::compute_cvg_noflip(INT32* majorx, INT32* minorx, INT32* majorxint, INT32* minorxint, INT32 scanline, INT32 yh, INT32 yl)
+{
+	INT32 purgestart = 0xfff;
+	INT32 purgeend = 0;
+	bool writablescanline = !(scanline & ~0x3ff);
+	INT32 scanlinespx = scanline << 2;
+
+	if (!writablescanline) return;
+
+	for(int i = 0; i < 4; i++)
+	{
+		if (minorxint[i] < purgestart)
+		{
+			purgestart = minorxint[i];
+		}
+		if (majorxint[i] > purgeend)
+		{
+			purgeend = majorxint[i];
+		}
+	}
+
+	purgestart = CLIP(purgestart, 0, 1023);
+	purgeend = CLIP(purgeend, 0, 1023);
+	INT32 length = purgeend - purgestart;
+
+	if (length < 0) return;
+
+	memset(&m_rdp->GetSpans()[scanline].m_cvg[purgestart], 0, (length + 1) << 2);
+
+	for(int i = 0; i < 4; i++)
+	{
+		INT32 minorcur = minorx[i];
+		INT32 majorcur = majorx[i];
+		INT32 minorcurint = minorxint[i];
+		INT32 majorcurint = majorxint[i];
+		length = majorcurint - minorcurint;
+
+		INT32 fmask = (i & 1) ? 5 : 0xa;
+		INT32 maskshift = (i ^ 3) << 2;
+		INT32 fmaskshifted = fmask << maskshift;
+		INT32 fleft = CLIP(minorcurint + 1, 0, 647);
+		INT32 fright = CLIP(majorcurint - 1, 0, 647);
+		bool valid_y = ((scanlinespx + i) >= yh && (scanlinespx + i) < yl);
+		if (valid_y && length >= 0)
+		{
+			if (minorcurint != majorcurint)
+			{
+				if (!(minorcurint & ~0x3ff))
+				{
+					m_rdp->GetSpans()[scanline].m_cvg[minorcurint] |= (leftcvghex(minorcur, fmask) << maskshift);
+				}
+				if (!(majorcurint & ~0x3ff))
+				{
+					m_rdp->GetSpans()[scanline].m_cvg[majorcurint] |= (rightcvghex(majorcur, fmask) << maskshift);
+				}
+			}
+			else
+			{
+				if (!(majorcurint & ~0x3ff))
+				{
+					INT32 samecvg = leftcvghex(minorcur, fmask) & rightcvghex(majorcur, fmask);
+					m_rdp->GetSpans()[scanline].m_cvg[majorcurint] |= (samecvg << maskshift);
+				}
+			}
+			for (; fleft <= fright; fleft++)
+			{
+				m_rdp->GetSpans()[scanline].m_cvg[fleft] |= fmaskshifted;
+			}
+		}
+	}
+}
+
+void N64::RDP::Triangle::compute_cvg_flip(INT32* majorx, INT32* minorx, INT32* majorxint, INT32* minorxint, INT32 scanline, INT32 yh, INT32 yl)
+{
+	INT32 purgestart = 0xfff;
+	INT32 purgeend = 0;
+	bool writablescanline = !(scanline & ~0x3ff);
+	INT32 scanlinespx = scanline << 2;
+
+	if(!writablescanline) return;
+
+	for(int i = 0; i < 4; i++)
+	{
+		if (majorxint[i] < purgestart)
+		{
+			purgestart = majorxint[i];
+		}
+		if (minorxint[i] > purgeend)
+		{
+			purgeend = minorxint[i];
+		}
+	}
+
+	purgestart = CLIP(purgestart, 0, 1023);
+	purgeend = CLIP(purgeend, 0, 1023);
+
+	int length = purgeend - purgestart;
+
+	if (length < 0) return;
+
+	memset(&m_rdp->GetSpans()[scanline].m_cvg[purgestart], 0, (length + 1) << 2);
+
+	for(int i = 0; i < 4; i++)
+	{
+		INT32 minorcur = minorx[i];
+		INT32 majorcur = majorx[i];
+		INT32 minorcurint = minorxint[i];
+		INT32 majorcurint = majorxint[i];
+		length = minorcurint - majorcurint;
+
+		INT32 fmask = (i & 1) ? 5 : 0xa;
+		INT32 maskshift = (i ^ 3) << 2;
+		INT32 fmaskshifted = fmask << maskshift;
+		INT32 fleft = CLIP(majorcurint + 1, 0, 647);
+		INT32 fright = CLIP(minorcurint - 1, 0, 647);
+		bool valid_y = ((scanlinespx + i) >= yh && (scanlinespx + i) < yl);
+		if (valid_y && length >= 0)
+		{
+			if (minorcurint != majorcurint)
+			{
+				if (!(minorcurint & ~0x3ff))
+				{
+					m_rdp->GetSpans()[scanline].m_cvg[minorcurint] |= (rightcvghex(minorcur, fmask) << maskshift);
+				}
+				if (!(majorcurint & ~0x3ff))
+				{
+					m_rdp->GetSpans()[scanline].m_cvg[majorcurint] |= (leftcvghex(majorcur, fmask) << maskshift);
+				}
+			}
+			else
+			{
+				if (!(majorcurint & ~0x3ff))
+				{
+					INT32 samecvg = rightcvghex(minorcur, fmask) & leftcvghex(majorcur, fmask);
+					m_rdp->GetSpans()[scanline].m_cvg[majorcurint] |= (samecvg << maskshift);
+				}
+			}
+			for (; fleft <= fright; fleft++)
+			{
+				m_rdp->GetSpans()[scanline].m_cvg[fleft] |= fmaskshifted;
+			}
+		}
+	}
 }
 
 void N64::RDP::Triangle::Draw()
 {
-	UINT32 w1 = m_cmd_data[m_rdp->GetCurrFIFOIndex()+0];
-	UINT32 w2 = m_cmd_data[m_rdp->GetCurrFIFOIndex()+1];
+	UINT32 fifo_index = m_rect ? 0 : m_rdp->GetCurrFIFOIndex();
+	UINT32 w1 = m_cmd_data[fifo_index + 0];
+	UINT32 w2 = m_cmd_data[fifo_index + 1];
 
 	int flip = (w1 & 0x800000) ? 1 : 0;
-	int sign = (w1 & 0x800000) ? -1 : 1;
-	int inv_sign = (w1 & 0x800000) ?  1 : -1;
+	m_misc_state->m_max_level = ((w1 >> 19) & 7);
+	int tilenum = (w1 >> 16) & 0x7;
 
 	int dsdiff = 0, dtdiff = 0, dwdiff = 0, drdiff = 0, dgdiff = 0, dbdiff = 0, dadiff = 0, dzdiff = 0;
-	int dseoff = 0, dteoff = 0, dweoff = 0, dreoff = 0, dgeoff = 0, dbeoff = 0, daeoff = 0, dzeoff = 0;
 	int dsdeh = 0, dtdeh = 0, dwdeh = 0, drdeh = 0, dgdeh = 0, dbdeh = 0, dadeh = 0, dzdeh = 0;
 	int dsdxh = 0, dtdxh = 0, dwdxh = 0, drdxh = 0, dgdxh = 0, dbdxh = 0, dadxh = 0, dzdxh = 0;
 	int dsdyh = 0, dtdyh = 0, dwdyh = 0, drdyh = 0, dgdyh = 0, dbdyh = 0, dadyh = 0, dzdyh = 0;
-	int xfrac = 0;
 
 	INT32 maxxmx = 0;
 	INT32 minxmx = 0;
 	INT32 maxxhx = 0;
 	INT32 minxhx = 0;
 
-	int shade_base = m_rdp->GetCurrFIFOIndex() + 8;
-	int texture_base = m_rdp->GetCurrFIFOIndex() + 8;
-	int zbuffer_base = m_rdp->GetCurrFIFOIndex() + 8;
-	if(m_texture)
+	int shade_base = fifo_index + 8;
+	int texture_base = fifo_index + 8;
+	int zbuffer_base = fifo_index + 8;
+	if(m_shade)
 	{
 		texture_base += 16;
 		zbuffer_base += 16;
 	}
-	if(m_zbuffer)
+	if(m_texture)
 	{
 		zbuffer_base += 16;
 	}
 
-	UINT32 w3 = m_cmd_data[m_rdp->GetCurrFIFOIndex()+2];
-	UINT32 w4 = m_cmd_data[m_rdp->GetCurrFIFOIndex()+3];
-	UINT32 w5 = m_cmd_data[m_rdp->GetCurrFIFOIndex()+4];
-	UINT32 w6 = m_cmd_data[m_rdp->GetCurrFIFOIndex()+5];
-	UINT32 w7 = m_cmd_data[m_rdp->GetCurrFIFOIndex()+6];
-	UINT32 w8 = m_cmd_data[m_rdp->GetCurrFIFOIndex()+7];
+	UINT32 w3 = m_cmd_data[fifo_index + 2];
+	UINT32 w4 = m_cmd_data[fifo_index + 3];
+	UINT32 w5 = m_cmd_data[fifo_index + 4];
+	UINT32 w6 = m_cmd_data[fifo_index + 5];
+	UINT32 w7 = m_cmd_data[fifo_index + 6];
+	UINT32 w8 = m_cmd_data[fifo_index + 7];
 
 	INT32 yl = (w1 & 0x3fff);
 	INT32 ym = ((w2 >> 16) & 0x3fff);
@@ -1236,9 +1977,6 @@ void N64::RDP::Triangle::Draw()
 	INT32 dxldy = (INT32)(w4);
 	INT32 dxhdy = (INT32)(w6);
 	INT32 dxmdy = (INT32)(w8);
-
-	m_misc_state->m_max_level = ((w1 >> 19) & 7);
-	int tilenum = (w1 >> 16) & 0x7;
 
 	if (yl & 0x2000)  yl |= 0xffffc000;
 	if (ym & 0x2000)  ym |= 0xffffc000;
@@ -1281,36 +2019,41 @@ void N64::RDP::Triangle::Draw()
 	int dzde = m_cmd_data[zbuffer_base+2];
 	int dzdy = m_cmd_data[zbuffer_base+3];
 
+	//printf("%08x %08x %08x %08x\n", m_cmd_data[0], m_cmd_data[1], m_cmd_data[2], m_cmd_data[3]);
+	//printf("%08x %08x %08x %08x\n", m_cmd_data[4], m_cmd_data[5], m_cmd_data[6], m_cmd_data[7]);
+	//printf("%08x %08x %08x %08x\n", m_cmd_data[8], m_cmd_data[9], m_cmd_data[10], m_cmd_data[11]);
+	//printf("%08x %08x %08x %08x\n", m_cmd_data[12], m_cmd_data[13], m_cmd_data[14], m_cmd_data[15]);
+	//printf("%08x %08x %08x %08x\n", m_cmd_data[16], m_cmd_data[17], m_cmd_data[18], m_cmd_data[19]);
+	//printf("%08x %08x %08x %08x\n", m_cmd_data[20], m_cmd_data[21], m_cmd_data[22], m_cmd_data[23]);
+	//printf("%08x %08x %08x %08x\n", m_cmd_data[24], m_cmd_data[25], m_cmd_data[26], m_cmd_data[27]);
+	//printf("%08x %08x %08x %08x\n", m_cmd_data[28], m_cmd_data[29], m_cmd_data[30], m_cmd_data[31]);
+	//printf("%08x %08x %08x %08x\n", m_cmd_data[32], m_cmd_data[33], m_cmd_data[34], m_cmd_data[35]);
+	//printf("%08x %08x %08x %08x\n", m_cmd_data[36], m_cmd_data[37], m_cmd_data[38], m_cmd_data[39]);
+	//printf("%08x %08x %08x %08x\n", m_cmd_data[40], m_cmd_data[41], m_cmd_data[42], m_cmd_data[43]);
+	//printf("%08x %08x %08x %08x\n", m_cmd_data[44], m_cmd_data[45], m_cmd_data[46], m_cmd_data[47]);
+
 	int dzdy_dz = (dzdy >> 16) & 0xffff;
 	int dzdx_dz = (dzdx >> 16) & 0xffff;
-	int dsdylod = dsdy >> 16;
-	int dtdylod = dtdy >> 16;
-	if (dsdylod & 0x20000)
-	{
-		dsdylod = ~dsdylod & 0x1ffff;
-	}
-	if (dtdylod & 0x20000)
-	{
-		dtdylod = ~dtdylod & 0x1ffff;
-	}
 
-	int xleft_inc = dxmdy >> 2;
-	int xright_inc = dxhdy >> 2;
+	m_rdp->set_span_base_y(drdy, dgdy, dbdy, dady, dzdy);
+	UINT32 temp_dzpix = ((dzdy_dz & 0x8000) ? ((~dzdy_dz) & 0x7fff) : dzdy_dz) + ((dzdx_dz & 0x8000) ? ((~dzdx_dz) & 0x7fff) : dzdx_dz);
+	m_rdp->set_span_base(drdx & ~0x1f,
+						 dgdx & ~0x1f,
+						 dbdx & ~0x1f,
+						 dadx & ~0x1f,
+						 dsdx,
+						 dtdx,
+						 dwdx,
+						 dzdx,
+						 0,
+						 m_rdp->NormalizeDZPix(temp_dzpix & 0xffff) & 0xffff
+						);
 
-	int xright = xh;
-	int xleft = xm;
+	int xleft_inc = (dxmdy >> 2) & ~1;
+	int xright_inc = (dxhdy >> 2) & ~1;
 
-	INT32 limcvg = ((yl>>2) <= 1023) ? (yl>>2) : 1023; // Needed by 40 Winks
-	if (limcvg < 0)
-	{
-		limcvg = 0;
-	}
-
-	INT32 startcvg = ((yh>>2)>=0) ? (yh>>2) : 0;
-	for (int k = startcvg; k <= limcvg; k++)
-	{
-		memset((void*)&m_rdp->GetSpans()[k].m_cvg[0],0,640);
-	}
+	int xright = xh & ~1;
+	int xleft = xm & ~1;
 
 	int sign_dxhdy = (dxhdy & 0x80000000) ? 1 : 0;
 	int do_offset = !(sign_dxhdy ^ (flip));
@@ -1326,28 +2069,18 @@ void N64::RDP::Triangle::Draw()
 		dadeh = dade >> 9;	dadyh = dady >> 9;
 		dzdeh = dzde >> 9;	dzdyh = dzdy >> 9;
 
-		dsdiff = (dsdeh*3 - dsdyh*3) << 7;
-		dtdiff = (dtdeh*3 - dtdyh*3) << 7;
-		dwdiff = (dwdeh*3 - dwdyh*3) << 7;
-		drdiff = (drdeh*3 - drdyh*3) << 7;
-		dgdiff = (dgdeh*3 - dgdyh*3) << 7;
-		dbdiff = (dbdeh*3 - dbdyh*3) << 7;
-		dadiff = (dadeh*3 - dadyh*3) << 7;
-		dzdiff = (dzdeh*3 - dzdyh*3) << 7;
-
-		dseoff = (dsdeh*3) << 7;
-		dteoff = (dtdeh*3) << 7;
-		dweoff = (dwdeh*3) << 7;
-		dreoff = (drdeh*3) << 7;
-		dgeoff = (dgdeh*3) << 7;
-		dbeoff = (dbdeh*3) << 7;
-		daeoff = (dadeh*3) << 7;
-		dzeoff = (dzdeh*3) << 7;
+		dsdiff = (dsdeh << 8) + (dsdeh << 7) - (dsdyh << 8) - (dsdyh << 7);
+		dtdiff = (dtdeh << 8) + (dtdeh << 7) - (dtdyh << 8) - (dtdyh << 7);
+		dwdiff = (dwdeh << 8) + (dwdeh << 7) - (dwdyh << 8) - (dwdyh << 7);
+		drdiff = (drdeh << 8) + (drdeh << 7) - (drdyh << 8) - (drdyh << 7);
+		dgdiff = (dgdeh << 8) + (dgdeh << 7) - (dgdyh << 8) - (dgdyh << 7);
+		dbdiff = (dbdeh << 8) + (dbdeh << 7) - (dbdyh << 8) - (dbdyh << 7);
+		dadiff = (dadeh << 8) + (dadeh << 7) - (dadyh << 8) - (dadyh << 7);
+		dzdiff = (dzdeh << 8) + (dzdeh << 7) - (dzdyh << 8) - (dzdyh << 7);
 	}
 	else
 	{
 		dsdiff = dtdiff = dwdiff = drdiff = dgdiff = dbdiff = dadiff = dzdiff = 0;
-		dseoff = dteoff = dweoff = dreoff = dgeoff = dbeoff = daeoff = dzeoff = 0;
 	}
 
 	dsdxh = dsdx >> 8;
@@ -1359,16 +2092,16 @@ void N64::RDP::Triangle::Draw()
 	dadxh = dadx >> 8;
 	dzdxh = dzdx >> 8;
 
-	int ycur =	yh & ~3;
-	int ylfar = yl | 3;
-	int ldflag = (sign_dxhdy ^ flip) ? 0 : 3;
-	int yhpix = yh >> 2;
-	int ylpix = yl >> 2;
+	INT32 ycur = yh & ~3;
+	INT32 ylfar = yl | 3;
+	INT32 ldflag = (sign_dxhdy ^ flip) ? 0 : 3;
+	INT32 majorx[4];
+	INT32 minorx[4];
+	INT32 majorxint[4];
+	INT32 minorxint[4];
+	bool valid_y = true;
 
-	if(ylfar >= 0x1000)
-	{
-		ylfar = 0x0fff;
-	}
+	int xfrac = ((xright >> 8) & 0xff);
 
 	if(flip)
 	{
@@ -1376,175 +2109,70 @@ void N64::RDP::Triangle::Draw()
 		{
 			if (k == ym)
 			{
-				xleft = xl;
-				xleft_inc = dxldy >> 2;
+				xleft = xl & ~1;
+				xleft_inc = (dxldy >> 2) & ~1;
 			}
 
 			int xstart = xleft >> 16;
 			int xend = xright >> 16;
 			int j = k >> 2;
 			int spix = k & 3;
+			valid_y = !(k < yh || k >= yl);
 
-			int m = 0;
-			int n = 0;
-			UINT32 min = 0;
-			UINT32 max = 3;
-			if (j == yhpix)
+			if (k >= 0 && k < 0x1000)
 			{
-				min = yh & 3;
-			}
-			if (j == ylpix)
-			{
-				max = yl & 3;
-			}
-			if (spix >= min && spix <= max)
-			{
-				if (spix == min)
+				majorxint[spix] = xend;
+				minorxint[spix] = xstart;
+				majorx[spix] = xright;
+				minorx[spix] = xleft;
+
+				if (spix == 0)
 				{
-					minxmx = maxxmx = xstart;
-					minxhx = maxxhx = xend;
+					maxxmx = 0;
+					minxhx = 0xfff;
 				}
-				else
+
+				if (valid_y)
 				{
-					minxmx = (xstart < minxmx) ? xstart : minxmx;
 					maxxmx = (xstart > maxxmx) ? xstart : maxxmx;
 					minxhx = (xend < minxhx) ? xend : minxhx;
-					maxxhx = (xend > maxxhx) ? xend : maxxhx;
 				}
-			}
 
-			if (spix == max)
-			{
-				m_rdp->GetSpans()[j].m_lx = maxxmx;
-				m_rdp->GetSpans()[j].m_rx = minxhx;
-				if(m_shade)
+				if (spix == 3)
 				{
-					m_rdp->GetSpans()[j].m_dr.w = drdx & ~0x1f;
-					m_rdp->GetSpans()[j].m_dg.w = dgdx & ~0x1f;
-					m_rdp->GetSpans()[j].m_db.w = dbdx & ~0x1f;
-					m_rdp->GetSpans()[j].m_da.w = dadx & ~0x1f;
+					m_rdp->GetSpans()[j].m_lx = maxxmx;
+					m_rdp->GetSpans()[j].m_rx = minxhx;
+					compute_cvg_flip(majorx, minorx, majorxint, minorxint, j, yh, yl);
 				}
-				else
-				{
-					m_rdp->GetSpans()[j].m_dr.w = 0;
-					m_rdp->GetSpans()[j].m_dg.w = 0;
-					m_rdp->GetSpans()[j].m_db.w = 0;
-					m_rdp->GetSpans()[j].m_da.w = 0;
-				}
-				if(m_texture)
-				{
-					m_rdp->GetSpans()[j].m_ds.w = dsdx;
-					m_rdp->GetSpans()[j].m_dt.w = dtdx;
-					m_rdp->GetSpans()[j].m_dw.w = dwdx;
-				}
-				else
-				{
-					m_rdp->GetSpans()[j].m_ds.w = 0;
-					m_rdp->GetSpans()[j].m_dt.w = 0;
-					m_rdp->GetSpans()[j].m_dw.w = 0;
-				}
-				if(m_zbuffer)
-				{
-					m_rdp->GetSpans()[j].m_dymax = (dsdylod > dtdylod)? dsdylod : dtdylod;
-					m_rdp->GetSpans()[j].m_dz.w = dzdx;
-					m_rdp->GetSpans()[j].m_dzpix = ((dzdy_dz & 0x8000) ? ((~dzdy_dz) & 0x7fff) : dzdy_dz) + ((dzdx_dz & 0x8000) ? ((~dzdx_dz) & 0x7fff) : dzdx_dz);
-					m_rdp->GetSpans()[j].m_dzpix = m_rdp->NormalizeDZPix(m_rdp->GetSpans()[j].m_dzpix);
-				}
-				else
-				{
-					m_rdp->GetSpans()[j].m_dymax = 0;
-					m_rdp->GetSpans()[j].m_dz.w = 0;
-					m_rdp->GetSpans()[j].m_dzpix = 0;
-					m_rdp->GetSpans()[j].m_dzpix = 0;
-				}
-			}
 
-			int length = (xend - xstart) * sign;
-
-			if (spix == ldflag)
-			{
-				xfrac = ((xright >> 8) & 0xff);
-				if(m_shade)
+				if (spix == ldflag)
 				{
-					m_rdp->GetSpans()[j].m_r.w = r + drdiff - (xfrac * drdxh);
-					m_rdp->GetSpans()[j].m_g.w = g + dgdiff - (xfrac * dgdxh);
-					m_rdp->GetSpans()[j].m_b.w = b + dbdiff - (xfrac * dbdxh);
-					m_rdp->GetSpans()[j].m_a.w = a + dadiff - (xfrac * dadxh);
-				}
-				else
-				{
-					m_rdp->GetSpans()[j].m_r.w = m_rdp->GetSpans()[j].m_g.w = m_rdp->GetSpans()[j].m_b.w = m_rdp->GetSpans()[j].m_a.w = 0;
-				}
-				if(m_texture)
-				{
-					m_rdp->GetSpans()[j].m_s.w = (s + dsdiff - (xfrac * dsdxh)) & ~0x1f;
-					m_rdp->GetSpans()[j].m_t.w = (t + dtdiff - (xfrac * dtdxh)) & ~0x1f;
-					m_rdp->GetSpans()[j].m_w.w = (w + dwdiff - (xfrac * dwdxh)) & ~0x1f;
-				}
-				else
-				{
-					m_rdp->GetSpans()[j].m_s.w = m_rdp->GetSpans()[j].m_t.w = m_rdp->GetSpans()[j].m_w.w = 0;
-				}
-				if(m_zbuffer)
-				{
-					m_rdp->GetSpans()[j].m_z.w = z + dzdiff - (xfrac * dzdxh);
-				}
-				else
-				{
-					m_rdp->GetSpans()[j].m_z.w = 0;
-				}
-			}
-
-			m = xend + 1;
-
-			if (k >= yh && length >= 0 && k <= yl)
-			{
-				if (xstart>=0 && xstart <1024)
-				{
-					m_rdp->GetSpans()[j].m_cvg[xstart] += m_rdp->AddRightCvg(xleft, k);
-				}
-				if (xend>=0 && xend<1024)
-				{
-					if (xstart != xend)
-					{
-						m_rdp->GetSpans()[j].m_cvg[xend] += m_rdp->AddLeftCvg(xright, k);
-					}
-					else
-					{
-						m_rdp->GetSpans()[j].m_cvg[xend] -= (2 - m_rdp->AddLeftCvg(xright, k));
-					}
-				}
-				for (n = 0; n < (length - 1); n++)
-				{
-					if (m>=0 && m < 640)
-					{
-						m_rdp->GetSpans()[j].m_cvg[m] += 2;
-					}
-
-					m += inv_sign;
+					m_rdp->GetSpans()[j].m_unscissored_rx = xend;
+					xfrac = ((xright >> 8) & 0xff);
+					m_rdp->GetSpans()[j].m_r.w = ((r >> 9) << 9) + drdiff - (xfrac * drdxh);
+					m_rdp->GetSpans()[j].m_g.w = ((g >> 9) << 9) + dgdiff - (xfrac * dgdxh);
+					m_rdp->GetSpans()[j].m_b.w = ((b >> 9) << 9) + dbdiff - (xfrac * dbdxh);
+					m_rdp->GetSpans()[j].m_a.w = ((a >> 9) << 9) + dadiff - (xfrac * dadxh);
+					m_rdp->GetSpans()[j].m_s.w = (((s >> 9) << 9)  + dsdiff - (xfrac * dsdxh)) & ~0x1f;
+					m_rdp->GetSpans()[j].m_t.w = (((t >> 9) << 9)  + dtdiff - (xfrac * dtdxh)) & ~0x1f;
+					m_rdp->GetSpans()[j].m_w.w = (((w >> 9) << 9)  + dwdiff - (xfrac * dwdxh)) & ~0x1f;
+					m_rdp->GetSpans()[j].m_z.w = ((z >> 9) << 9)  + dzdiff - (xfrac * dzdxh);
+					//printf("%d - %08x\n", j, m_rdp->GetSpans()[j].m_z.w);
 				}
 			}
 
 			if (spix == 3)
 			{
-				if(m_shade)
-				{
-					r += drde;
-					g += dgde;
-					b += dbde;
-					a += dade;
-				}
-				if(m_texture)
-				{
-					s += dsde;
-					t += dtde;
-					w += dwde;
-				}
-				if(m_zbuffer)
-				{
-					z += dzde;
-				}
+				r += drde;
+				g += dgde;
+				b += dbde;
+				a += dade;
+				s += dsde;
+				t += dtde;
+				w += dwde;
+				z += dzde;
 			}
+
 			xleft += xleft_inc;
 			xright += xright_inc;
 		}
@@ -1555,153 +2183,74 @@ void N64::RDP::Triangle::Draw()
 		{
 			if (k == ym)
 			{
-				xleft = xl;
-				xleft_inc = dxldy >> 2;
+				xleft = xl & ~1;
+				xleft_inc = (dxldy >> 2) & ~1;
 			}
 
 			int xstart = xleft >> 16;
 			int xend = xright >> 16;
 			int j = k >> 2;
 			int spix = k & 3;
+			valid_y = !(k < yh || k >= yl);
 
-			int m = 0;
-			int n = 0;
-			UINT32 min = 0;
-			UINT32 max = 3;
-			if (j == yhpix)
+			if (k >= 0 && k < 0x1000)
 			{
-				min = yh & 3;
-			}
-			if (j == ylpix)
-			{
-				max = yl & 3;
-			}
-			if (spix >= min && spix <= max)
-			{
-				if (spix == min)
+				majorxint[spix] = xend;
+				minorxint[spix] = xstart;
+				majorx[spix] = xright;
+				minorx[spix] = xleft;
+
+				if (spix == 0)
 				{
-					minxmx = maxxmx = xstart;
-					minxhx = maxxhx = xend;
+					maxxhx = 0;
+					minxmx = 0xfff;
 				}
-				else
+
+				if (valid_y)
 				{
 					minxmx = (xstart < minxmx) ? xstart : minxmx;
-					maxxmx = (xstart > maxxmx) ? xstart : maxxmx;
-					minxhx = (xend < minxhx) ? xend : minxhx;
 					maxxhx = (xend > maxxhx) ? xend : maxxhx;
 				}
-			}
 
-			if (spix == max)
-			{
-				m_rdp->GetSpans()[j].m_lx = minxmx;
-				m_rdp->GetSpans()[j].m_rx = maxxhx;
-				m_rdp->GetSpans()[j].m_dymax = (dsdylod > dtdylod)? dsdylod : dtdylod;
-				if(m_shade)
+				if (spix == 3)
 				{
-					m_rdp->GetSpans()[j].m_dr.w = drdx & ~0x1f;
-					m_rdp->GetSpans()[j].m_dg.w = dgdx & ~0x1f;
-					m_rdp->GetSpans()[j].m_db.w = dbdx & ~0x1f;
-					m_rdp->GetSpans()[j].m_da.w = dadx & ~0x1f;
+					m_rdp->GetSpans()[j].m_lx = minxmx;
+					m_rdp->GetSpans()[j].m_rx = maxxhx;
+					compute_cvg_noflip(majorx, minorx, majorxint, minorxint, j, yh, yl);
 				}
-				if(m_texture)
-				{
-					m_rdp->GetSpans()[j].m_ds.w = dsdx;
-					m_rdp->GetSpans()[j].m_dt.w = dtdx;
-					m_rdp->GetSpans()[j].m_dw.w = dwdx;
-				}
-				if(m_zbuffer)
-				{
-					m_rdp->GetSpans()[j].m_dz.w = dzdx;
-					m_rdp->GetSpans()[j].m_dzpix = ((dzdy_dz & 0x8000) ? ((~dzdy_dz) & 0x7fff) : dzdy_dz) + ((dzdx_dz & 0x8000) ? ((~dzdx_dz) & 0x7fff) : dzdx_dz);
-					m_rdp->GetSpans()[j].m_dzpix = m_rdp->NormalizeDZPix(m_rdp->GetSpans()[j].m_dzpix);
-				}
-			}
 
-			int length = (xend - xstart) * sign;
-
-			if (spix == ldflag)
-			{
-				xfrac = ((xright >> 8) & 0xff);
-				if(m_texture)
+				if (spix == ldflag)
 				{
-					m_rdp->GetSpans()[j].m_s.w = (s + dsdiff - (xfrac * dsdxh)) & ~0x1f;
-					m_rdp->GetSpans()[j].m_t.w = (t + dtdiff - (xfrac * dtdxh)) & ~0x1f;
-					m_rdp->GetSpans()[j].m_w.w = (w + dwdiff - (xfrac * dwdxh)) & ~0x1f;
-				}
-				if(m_shade)
-				{
-					m_rdp->GetSpans()[j].m_r.w = r + drdiff - (xfrac * drdxh);
-					m_rdp->GetSpans()[j].m_g.w = g + dgdiff - (xfrac * dgdxh);
-					m_rdp->GetSpans()[j].m_b.w = b + dbdiff - (xfrac * dbdxh);
-					m_rdp->GetSpans()[j].m_a.w = a + dadiff - (xfrac * dadxh);
-				}
-				if(m_zbuffer)
-				{
-					m_rdp->GetSpans()[j].m_z.w = z + dzdiff - (xfrac * dzdxh);
-				}
-			}
-
-			m = xend - 1;
-
-			if (k >= yh && length >= 0 && k <= yl)
-			{
-				if (xstart>=0 && xstart <1024)
-				{
-					m_rdp->GetSpans()[j].m_cvg[xstart] += m_rdp->AddLeftCvg(xleft, k);
-				}
-				if (xend>=0 && xend<1024)
-				{
-					if (xstart != xend)
-					{
-						m_rdp->GetSpans()[j].m_cvg[xend] += m_rdp->AddRightCvg(xright, k);
-					}
-					else
-					{
-						m_rdp->GetSpans()[j].m_cvg[xend] -= (2 - m_rdp->AddRightCvg(xright, k));
-						if (m_rdp->GetSpans()[j].m_cvg[xend] > 200)
-						{
-							m_rdp->GetSpans()[j].m_cvg[xend] = 0;
-						}
-					}
-				}
-				for (n = 0; n < (length - 1); n++)
-				{
-					if (m>=0 && m < 640)
-					{
-						m_rdp->GetSpans()[j].m_cvg[m] += 2;
-					}
-
-					m += inv_sign;
+					m_rdp->GetSpans()[j].m_unscissored_rx = xend;
+					xfrac = ((xright >> 8) & 0xff);
+					m_rdp->GetSpans()[j].m_r.w = ((r >> 9) << 9) + drdiff - (xfrac * drdxh);
+					m_rdp->GetSpans()[j].m_g.w = ((g >> 9) << 9) + dgdiff - (xfrac * dgdxh);
+					m_rdp->GetSpans()[j].m_b.w = ((b >> 9) << 9) + dbdiff - (xfrac * dbdxh);
+					m_rdp->GetSpans()[j].m_a.w = ((a >> 9) << 9) + dadiff - (xfrac * dadxh);
+					m_rdp->GetSpans()[j].m_s.w = (((s >> 9) << 9)  + dsdiff - (xfrac * dsdxh)) & ~0x1f;
+					m_rdp->GetSpans()[j].m_t.w = (((t >> 9) << 9)  + dtdiff - (xfrac * dtdxh)) & ~0x1f;
+					m_rdp->GetSpans()[j].m_w.w = (((w >> 9) << 9)  + dwdiff - (xfrac * dwdxh)) & ~0x1f;
+					m_rdp->GetSpans()[j].m_z.w = ((z >> 9) << 9)  + dzdiff - (xfrac * dzdxh);
 				}
 			}
 
 			if (spix == 3)
 			{
-				if(m_shade)
-				{
-					r += drde;
-					g += dgde;
-					b += dbde;
-					a += dade;
-				}
-				if(m_texture)
-				{
-					s += dsde;
-					t += dtde;
-					w += dwde;
-				}
-				if(m_zbuffer)
-				{
-					z += dzde;
-				}
+				r += drde;
+				g += dgde;
+				b += dbde;
+				a += dade;
+				s += dsde;
+				t += dtde;
+				w += dwde;
+				z += dzde;
 			}
 			xleft += xleft_inc;
 			xright += xright_inc;
 		}
 	}
 
-	m_rdp->RenderSpans(yh >> 2, yl >> 2, tilenum, m_shade, m_texture, m_zbuffer, flip);
+	m_rdp->RenderSpans(yh >> 2, yl >> 2, tilenum, flip);
 }
 
 /*****************************************************************************/
@@ -1712,7 +2261,7 @@ void N64::RDP::Triangle::Draw()
 
 void N64::RDP::Processor::Triangle(bool shade, bool texture, bool zbuffer)
 {
-	N64::RDP::Triangle tri(m_machine, shade, texture, zbuffer);
+	N64::RDP::Triangle tri(m_machine, shade, texture, zbuffer, false, false);
 	tri.Draw();
 }
 
@@ -1756,37 +2305,124 @@ void N64::RDP::Processor::CmdTriangleSTZ(UINT32 w1, UINT32 w2)
 	Triangle(true, true, true);
 }
 
-void N64::RDP::Rectangle::InitFromBuffer(UINT32 *data)
-{
-	m_xl		= (data[0] >> 12) & 0xfff;
-	m_yl		= (data[0] >>  0) & 0xfff;
-	m_xh		= (data[1] >> 12) & 0xfff;
-	m_yh		= (data[1] >>  0) & 0xfff;
-}
-
-void N64::RDP::TexRectangle::InitFromBuffer(UINT32 *data)
-{
-	m_tilenum	= (data[1] >> 24) & 0x7;
-	m_xl		= (data[0] >> 12) & 0xfff;
-	m_yl		= (data[0] >>  0) & 0xfff;
-	m_xh		= (data[1] >> 12) & 0xfff;
-	m_yh		= (data[1] >>  0) & 0xfff;
-	m_s			= (data[2] >> 16) & 0xffff;
-	m_t			= (data[2] >>  0) & 0xffff;
-	m_dsdx		= (data[3] >> 16) & 0xffff;
-	m_dtdy		= (data[3] >>  0) & 0xffff;
-}
-
 void N64::RDP::Processor::CmdTexRect(UINT32 w1, UINT32 w2)
 {
-	N64::RDP::TexRectangle rect(m_machine, m_cmd_data + m_cmd_cur, 0);
-	rect.Draw();
+	UINT32 *data = m_cmd_data + m_cmd_cur;
+
+	UINT32 w3 = data[2];
+	UINT32 w4 = data[3];
+
+	UINT32 tilenum	= (w2 >> 24) & 0x7;
+	UINT32 xl = (w1 >> 12) & 0xfff;
+	UINT32 yl	= (w1 >>  0) & 0xfff;
+	UINT32 xh	= (w2 >> 12) & 0xfff;
+	UINT32 yh	= (w2 >>  0) & 0xfff;
+	INT32 s = (w3 >> 16) & 0xffff;
+	INT32 t = (w3 >>  0) & 0xffff;
+	INT32 dsdx = (w4 >> 16) & 0xffff;
+	INT32 dtdy = (w4 >>  0) & 0xffff;
+
+	dsdx = SIGN16(dsdx);
+	dtdy = SIGN16(dtdy);
+
+	if (m_other_modes.cycle_type == CYCLE_TYPE_FILL || m_other_modes.cycle_type == CYCLE_TYPE_COPY)
+	{
+		yl |= 3;
+	}
+
+	UINT32 xlint = (xl >> 2) & 0x3ff;
+	UINT32 xhint = (xh >> 2) & 0x3ff;
+
+	UINT32* ewdata = GetTempRectData();
+	ewdata[0] = (0x24 << 24) | ((0x80 | tilenum) << 16) | yl;	// command, flipped, tile, yl
+	ewdata[1] = (yl << 16) | yh; 								// ym, yh
+	ewdata[2] = (xlint << 16) | ((xl & 3) << 14);				// xl, xl frac
+	ewdata[3] = 0;												// dxldy, dxldy frac
+	ewdata[4] = (xhint << 16) | ((xh & 3) << 14);				// xh, xh frac
+	ewdata[5] = 0;												// dxhdy, dxhdy frac
+	ewdata[6] = (xlint << 16) | ((xl & 3) << 14);				// xm, xm frac
+	ewdata[7] = 0;												// dxmdy, dxmdy frac
+	memset(&ewdata[8], 0, 16 * sizeof(UINT32));					// shade
+	ewdata[24] = (s << 16) | t;									// s, t
+	ewdata[25] = 0;												// w
+	ewdata[26] = ((dsdx >> 5) << 16);							// dsdx, dtdx
+	ewdata[27] = 0;												// dwdx
+	ewdata[28] = 0;												// s frac, t frac
+	ewdata[29] = 0;												// w frac
+	ewdata[30] = ((dsdx & 0x1f) << 11) << 16;					// dsdx frac, dtdx frac
+	ewdata[31] = 0;												// dwdx frac
+	ewdata[32] = (dtdy >> 5) & 0xffff;//dsde, dtde
+	ewdata[33] = 0;//dwde
+	ewdata[34] = (dtdy >> 5) & 0xffff;//dsdy, dtdy
+	ewdata[35] = 0;//dwdy
+	ewdata[36] = (dtdy & 0x1f) << 11;//dsde frac, dtde frac
+	ewdata[37] = 0;//dwde frac
+	ewdata[38] = (dtdy & 0x1f) << 11;//dsdy frac, dtdy frac
+	ewdata[39] = 0;//dwdy frac
+	memset(&ewdata[40], 0, 4 * sizeof(UINT32));//depth
+
+	N64::RDP::Triangle tri(m_machine, true, true, false, true, false);
+	tri.Draw();
 }
 
 void N64::RDP::Processor::CmdTexRectFlip(UINT32 w1, UINT32 w2)
 {
-	N64::RDP::TexRectangle rect(m_machine, m_cmd_data + m_cmd_cur, 1);
-	rect.Draw();
+	UINT32 *data = m_cmd_data + m_cmd_cur;
+
+	UINT32 w3 = data[2];
+	UINT32 w4 = data[3];
+
+	UINT32 tilenum	= (w2 >> 24) & 0x7;
+	UINT32 xl = (w1 >> 12) & 0xfff;
+	UINT32 yl	= (w1 >>  0) & 0xfff;
+	UINT32 xh	= (w2 >> 12) & 0xfff;
+	UINT32 yh	= (w2 >>  0) & 0xfff;
+	INT32 s = (w3 >> 16) & 0xffff;
+	INT32 t = (w3 >>  0) & 0xffff;
+	INT32 dsdx = (w4 >> 16) & 0xffff;
+	INT32 dtdy = (w4 >>  0) & 0xffff;
+
+	dsdx = SIGN16(dsdx);
+	dtdy = SIGN16(dtdy);
+
+	if (m_other_modes.cycle_type == CYCLE_TYPE_FILL || m_other_modes.cycle_type == CYCLE_TYPE_COPY)
+	{
+		yl |= 3;
+	}
+
+	UINT32 xlint = (xl >> 2) & 0x3ff;
+	UINT32 xhint = (xh >> 2) & 0x3ff;
+
+	UINT32* ewdata = GetTempRectData();
+	ewdata[0] = (0x25 << 24) | ((0x80 | tilenum) << 16) | yl;//command, flipped, tile, yl
+	ewdata[1] = (yl << 16) | yh;//ym, yh
+	ewdata[2] = (xlint << 16) | ((xl & 3) << 14);//xl, xl frac
+	ewdata[3] = 0;//dxldy, dxldy frac
+	ewdata[4] = (xhint << 16) | ((xh & 3) << 14);//xh, xh frac
+	ewdata[5] = 0;//dxhdy, dxhdy frac
+	ewdata[6] = (xlint << 16) | ((xl & 3) << 14);//xm, xm frac
+	ewdata[7] = 0;//dxmdy, dxmdy frac
+	memset(&ewdata[8], 0, 16 * sizeof(UINT32));//shade
+	ewdata[24] = (s << 16) | t;//s, t
+	ewdata[25] = 0;//w
+	ewdata[26] = (dtdy >> 5) & 0xffff;//dsdx, dtdx
+	ewdata[27] = 0;//dwdx
+	ewdata[28] = 0;//s frac, t frac
+	ewdata[29] = 0;//w frac
+	ewdata[30] = ((dtdy & 0x1f) << 11);//dsdx frac, dtdx frac
+	ewdata[31] = 0;//dwdx frac
+	ewdata[32] = (dsdx >> 5) << 16;//dsde, dtde
+	ewdata[33] = 0;//dwde
+	ewdata[34] = (dsdx >> 5) << 16;//dsdy, dtdy
+	ewdata[35] = 0;//dwdy
+	ewdata[36] = (dsdx & 0x1f) << 27;//dsde frac, dtde frac
+	ewdata[37] = 0;//dwde frac
+	ewdata[38] = (dsdx & 0x1f) << 27;//dsdy frac, dtdy frac
+	ewdata[39] = 0;//dwdy frac
+	memset(&ewdata[40], 0, 4 * sizeof(UINT32));//depth
+
+	N64::RDP::Triangle tri(m_machine, true, true, false, true, false);
+	tri.Draw();
 }
 
 void N64::RDP::Processor::CmdSyncLoad(UINT32 w1, UINT32 w2)
@@ -1861,83 +2497,95 @@ void N64::RDP::Processor::CmdSetPrimDepth(UINT32 w1, UINT32 w2)
 
 void N64::RDP::Processor::CmdSetOtherModes(UINT32 w1, UINT32 w2)
 {
-	m_other_modes.cycle_type		= (w1 >> 20) & 0x3;
-	m_other_modes.persp_tex_en		= (w1 & 0x80000) ? true : false;
-	m_other_modes.detail_tex_en		= (w1 & 0x40000) ? true : false;
-	m_other_modes.sharpen_tex_en	= (w1 & 0x20000) ? true : false;
-	m_other_modes.tex_lod_en		= (w1 & 0x10000) ? true : false;
-	m_other_modes.en_tlut			= (w1 & 0x08000) ? true : false;
-	m_other_modes.tlut_type			= (w1 & 0x04000) ? true : false;
-	m_other_modes.sample_type		= (w1 & 0x02000) ? true : false;
-	m_other_modes.mid_texel			= (w1 & 0x01000) ? true : false;
-	m_other_modes.bi_lerp0			= (w1 & 0x00800) ? true : false;
-	m_other_modes.bi_lerp1			= (w1 & 0x00400) ? true : false;
-	m_other_modes.convert_one		= (w1 & 0x00200) ? true : false;
-	m_other_modes.key_en			= (w1 & 0x00100) ? true : false;
-	m_other_modes.rgb_dither_sel	= (w1 >> 6) & 0x3;
-	m_other_modes.alpha_dither_sel	= (w1 >> 4) & 0x3;
-	m_other_modes.blend_m1a_0		= (w2 >> 30) & 0x3;
-	m_other_modes.blend_m1a_1		= (w2 >> 28) & 0x3;
-	m_other_modes.blend_m1b_0		= (w2 >> 26) & 0x3;
-	m_other_modes.blend_m1b_1		= (w2 >> 24) & 0x3;
-	m_other_modes.blend_m2a_0		= (w2 >> 22) & 0x3;
-	m_other_modes.blend_m2a_1		= (w2 >> 20) & 0x3;
-	m_other_modes.blend_m2b_0		= (w2 >> 18) & 0x3;
-	m_other_modes.blend_m2b_1		= (w2 >> 16) & 0x3;
-	m_other_modes.force_blend		= (w2 & 0x4000) ? true : false;
-	m_other_modes.alpha_cvg_select	= (w2 & 0x2000) ? true : false;
-	m_other_modes.cvg_times_alpha	= (w2 & 0x1000) ? true : false;
-	m_other_modes.z_mode			= (w2 >> 10) & 0x3;
-	m_other_modes.cvg_dest			= (w2 >> 8) & 0x3;
-	m_other_modes.color_on_cvg		= (w2 & 0x80) ? true : false;
-	m_other_modes.image_read_en		= (w2 & 0x40) ? true : false;
-	m_other_modes.z_update_en		= (w2 & 0x20) ? true : false;
-	m_other_modes.z_compare_en		= (w2 & 0x10) ? true : false;
-	m_other_modes.antialias_en		= (w2 & 0x08) ? true : false;
-	m_other_modes.z_source_sel		= (w2 & 0x04) ? true : false;
-	m_other_modes.dither_alpha_en	= (w2 & 0x02) ? true : false;
-	m_other_modes.alpha_compare_en	= (w2 & 0x01) ? true : false;
+	m_other_modes.cycle_type		= (w1 >> 20) & 0x3; // 01
+	m_other_modes.persp_tex_en		= (w1 & 0x80000) ? 1 : 0; // 1
+	m_other_modes.detail_tex_en		= (w1 & 0x40000) ? 1 : 0; // 0
+	m_other_modes.sharpen_tex_en	= (w1 & 0x20000) ? 1 : 0; // 0
+	m_other_modes.tex_lod_en		= (w1 & 0x10000) ? 1 : 0; // 0
+	m_other_modes.en_tlut			= (w1 & 0x08000) ? 1 : 0; // 0
+	m_other_modes.tlut_type			= (w1 & 0x04000) ? 1 : 0; // 0
+	m_other_modes.sample_type		= (w1 & 0x02000) ? 1 : 0; // 1
+	m_other_modes.mid_texel			= (w1 & 0x01000) ? 1 : 0; // 0
+	m_other_modes.bi_lerp0			= (w1 & 0x00800) ? 1 : 0; // 1
+	m_other_modes.bi_lerp1			= (w1 & 0x00400) ? 1 : 0; // 1
+	m_other_modes.convert_one		= (w1 & 0x00200) ? 1 : 0; // 0
+	m_other_modes.key_en			= (w1 & 0x00100) ? 1 : 0; // 0
+	m_other_modes.rgb_dither_sel	= (w1 >> 6) & 0x3; // 00
+	m_other_modes.alpha_dither_sel	= (w1 >> 4) & 0x3; // 01
+	m_other_modes.blend_m1a_0		= (w2 >> 30) & 0x3; // 11
+	m_other_modes.blend_m1a_1		= (w2 >> 28) & 0x3; // 00
+	m_other_modes.blend_m1b_0		= (w2 >> 26) & 0x3; // 10
+	m_other_modes.blend_m1b_1		= (w2 >> 24) & 0x3; // 00
+	m_other_modes.blend_m2a_0		= (w2 >> 22) & 0x3; // 00
+	m_other_modes.blend_m2a_1		= (w2 >> 20) & 0x3; // 01
+	m_other_modes.blend_m2b_0		= (w2 >> 18) & 0x3; // 00
+	m_other_modes.blend_m2b_1		= (w2 >> 16) & 0x3; // 01
+	m_other_modes.force_blend		= (w2 >> 14) & 1; // 0
+	m_other_modes.alpha_cvg_select	= (w2 >> 13) & 1; // 1
+	m_other_modes.cvg_times_alpha	= (w2 >> 12) & 1; // 0
+	m_other_modes.z_mode			= (w2 >> 10) & 0x3; // 00
+	m_other_modes.cvg_dest			= (w2 >> 8) & 0x3; // 00
+	m_other_modes.color_on_cvg		= (w2 >> 7) & 1; // 0
+	m_other_modes.image_read_en		= (w2 >> 6) & 1; // 1
+	m_other_modes.z_update_en		= (w2 >> 5) & 1; // 1
+	m_other_modes.z_compare_en		= (w2 >> 4) & 1; // 1
+	m_other_modes.antialias_en		= (w2 >> 3) & 1; // 1
+	m_other_modes.z_source_sel		= (w2 >> 2) & 1; // 0
+	m_other_modes.dither_alpha_en	= (w2 >> 1) & 1; // 0
+	m_other_modes.alpha_compare_en	= (w2) & 1; // 0
 
 	// These should belong to the Blender class
 	SetBlenderInput(0, 0, &m_color_inputs.blender1a_r[0], &m_color_inputs.blender1a_g[0], &m_color_inputs.blender1a_b[0], &m_color_inputs.blender1b_a[0], m_other_modes.blend_m1a_0, m_other_modes.blend_m1b_0);
 	SetBlenderInput(0, 1, &m_color_inputs.blender2a_r[0], &m_color_inputs.blender2a_g[0], &m_color_inputs.blender2a_b[0], &m_color_inputs.blender2b_a[0], m_other_modes.blend_m2a_0, m_other_modes.blend_m2b_0);
 	SetBlenderInput(1, 0, &m_color_inputs.blender1a_r[1], &m_color_inputs.blender1a_g[1], &m_color_inputs.blender1a_b[1], &m_color_inputs.blender1b_a[1], m_other_modes.blend_m1a_1, m_other_modes.blend_m1b_1);
 	SetBlenderInput(1, 1, &m_color_inputs.blender2a_r[1], &m_color_inputs.blender2a_g[1], &m_color_inputs.blender2a_b[1], &m_color_inputs.blender2b_a[1], m_other_modes.blend_m2a_1, m_other_modes.blend_m2b_1);
-	m_misc_state.m_special_bsel0 = (m_color_inputs.blender2b_a[0] == &m_memory_color.i.a) ? 2 : 0;
-	m_misc_state.m_special_bsel1 = (m_color_inputs.blender2b_a[1] == &m_memory_color.i.a) ? 2 : 0;
 }
 
 void N64::RDP::Processor::CmdLoadTLUT(UINT32 w1, UINT32 w2)
 {
-	const int tilenum = (w2 >> 24) & 7;
-	N64::RDP::Tile* tex_tile = &m_tiles[tilenum];
+	Tile* tile = GetTiles();
 
-	int sl = tex_tile->sl = (w1 >> 12) & 0xfff;
-	int tl = tex_tile->tl = (w1 >>  0) & 0xfff;
-	int sh = tex_tile->sh = (w2 >> 12) & 0xfff;
+	int tilenum = (w2 >> 24) & 0x7;
+	int sl = tile[tilenum].sl = ((w1 >> 12) & 0xfff);
+	int tl = tile[tilenum].tl =  w1 & 0xfff;
+	int sh = tile[tilenum].sh = ((w2 >> 12) & 0xfff);
+	int th = tile[tilenum].th = w2 & 0xfff;
+
+	if (tl != th)
+	{
+		fatalerror("Load tlut: tl=%d, th=%d",tl,th);
+	}
+
+	int count = (sh >> 2) - (sl >> 2) + 1;
+	count <<= 2;
 
 	switch (m_misc_state.m_ti_size)
 	{
 		case PIXEL_SIZE_16BIT:
 		{
-			UINT16 *src = (UINT16*)rdram;
-			UINT32 srcstart = (m_misc_state.m_ti_address + (tl >> 2) * (m_misc_state.m_ti_width << 1) + (sl >> 1)) >> 1;
-			UINT16 *dst = (UINT16*)&m_tmem[tex_tile->tmem];
-			int count = ((sh >> 2) - (sl >> 2)) + 1;
-
-			for (int i = 0; i < count; i++)
+			if (tile[tilenum].tmem < 256)
 			{
-				if((i*4) < 0x400)
+				fatalerror("rdp_load_tlut: loading tlut into low half at %d qwords",tile[tilenum].tmem);
+			}
+			UINT32 srcstart = (m_misc_state.m_ti_address + (tl >> 2) * (m_misc_state.m_ti_width << 1) + (sl >> 1)) >> 1;
+			UINT16 *dst = GetTMEM16();
+			UINT32 dststart = tile[tilenum].tmem << 2;
+
+			for (int i = 0; i < count; i += 4)
+			{
+				if (dststart < 2048)
 				{
-					dst[i*4] = src[(srcstart + i) ^ WORD_ADDR_XOR];
-					dst[i*4+1] = 0;
-					dst[i*4+2] = 0;
-					dst[i*4+3] = 0;
+					dst[dststart] = RREADIDX16(srcstart);
+					dst[dststart + 1] = dst[dststart];
+					dst[dststart + 2] = dst[dststart];
+					dst[dststart + 3] = dst[dststart];
+					dststart += 4;
+					srcstart += 1;
 				}
 			}
 			break;
 		}
-		default:	fatalerror("RDP::LoadTLUT: size = %d\n", m_misc_state.m_ti_size);
+		default:	fatalerror("RDP: load_tlut: size = %d\n", m_misc_state.m_ti_size);
 	}
 }
 
@@ -1953,209 +2601,281 @@ void N64::RDP::Processor::CmdSetTileSize(UINT32 w1, UINT32 w2)
 
 void N64::RDP::Processor::CmdLoadBlock(UINT32 w1, UINT32 w2)
 {
-	const int tilenum = (w2 >> 24) & 0x7;
-	const UINT32 ti_address2 = m_misc_state.m_ti_address - ((m_misc_state.m_ti_address & 3) ? 4 : 0);
-	UINT16 *ram16 = (UINT16*)rdram;
-	int ti_width2 = m_misc_state.m_ti_width;
-	int slindwords = 0;
+	Tile* tile = GetTiles();
 
-	UINT32 sl = m_tiles[tilenum].sl = ((w1 >> 12) & 0xfff);
-	UINT32 tl = m_tiles[tilenum].tl = ((w1 >>  0) & 0xfff);
-	UINT32 sh = m_tiles[tilenum].sh = ((w2 >> 12) & 0xfff);
-	UINT32 dxt	= ((w2 >>  0) & 0xfff);
+	int tilenum = (w2 >> 24) & 0x7;
+	UINT16* tc = GetTMEM16();
 
-	int width = (sh - sl) + 1;
+	UINT16 sl, sh, tl;
+	tile[tilenum].sl = sl = ((w1 >> 12) & 0xfff);
+	tile[tilenum].tl = tl = ((w1 >>  0) & 0xfff);
+	tile[tilenum].sh = sh = ((w2 >> 12) & 0xfff);
+	UINT16 dxt = ((w2 >>  0) & 0xfff);
 
-	if (width > 2048) // Hack for Magical Tetris Challenge
+	if (sh < sl)
 	{
-		width = 2048;
+		fatalerror("load_block: sh < sl");
 	}
 
-	if ((m_misc_state.m_ti_address & 3) && (m_misc_state.m_ti_address & 0xffffff00) != 0xf8a00)
+	INT32 width = (sh - sl) + 1;
+
+	width = (width << m_misc_state.m_ti_size) >> 1;
+	if (width & 7)
 	{
-		fatalerror( "load block: unaligned ti_address 0x%x",m_misc_state.m_ti_address ); // Rat Attack, Frogger 2 prototype
+		width = (width & ~7) + 8;
 	}
+	width >>= 3;
 
-	UINT32* src = (UINT32*)&ram16[ti_address2 >> 1];
-	UINT32* tc = GetTMEM32();
-	UINT32 tb = m_tiles[tilenum].tmem >> 2;
+	UINT32 tb = tile[tilenum].tmem << 2;
 
-	slindwords = sl;
+	int tiwinwords = m_misc_state.m_ti_width;
+	UINT32 slinwords = sl;
 
-	switch (m_misc_state.m_ti_size) // slindwords Neededby Vigilante 8
-	{
-		case PIXEL_SIZE_4BIT:	ti_width2 >>= 1;	slindwords >>= 3;	width >>= 1;	break;
-		case PIXEL_SIZE_8BIT:						slindwords >>= 2;					break;
-		case PIXEL_SIZE_16BIT:	ti_width2 <<= 1;	slindwords >>= 1;	width <<= 1;	break;
-		case PIXEL_SIZE_32BIT:	ti_width2 <<= 2;						width <<= 2;	break;
-	}
+	tiwinwords = (tiwinwords << m_misc_state.m_ti_size) >> 2;
+	slinwords = (slinwords << m_misc_state.m_ti_size) >> 2;
 
-	if ((tb + (width >> 2)) > 0x400)
-	{
-		width = 0x1000 - tb*4; // Hack for Magical Tetris Challenge
-	}
-
-	if (width & 7)	// Sigh... another Rat Attack-specific thing.
-	{
-		width = (width & (~7)) + 8;
-	}
+	int ptr = 0, srcptr = 0;
+	UINT16 first, sec;
+	UINT32 src = (m_misc_state.m_ti_address >> 1) + (tl * tiwinwords) + slinwords;
 
 	if (dxt != 0)
 	{
 		int j = 0;
 		int t = 0;
 		int oldt = 0;
-		int ptr;
-		int xorval = (m_misc_state.m_fb_size == PIXEL_SIZE_16BIT &&
-					  m_misc_state.m_ti_size == PIXEL_SIZE_32BIT ) ? 2 : 1; // Wave Race-specific
-		UINT32 srcstart = ((tl * ti_width2) >> 2) + slindwords;
-		src = &src[srcstart];
-		for (int i = 0; i < (width >> 2); i += 2)
+
+		if (tile[tilenum].size != PIXEL_SIZE_32BIT && tile[tilenum].format != FORMAT_YUV)
 		{
-			oldt = t;
-			t = ((j >> 11) & 1) ? xorval : 0;
-			if (t > oldt)
+			for (int i = 0; i < width; i ++)
 			{
-				i += ((m_tiles[tilenum].line >> 3) << 1);
+				oldt = t;
+				t = ((j >> 11) & 1) ? WORD_XOR_DWORD_SWAP : WORD_ADDR_XOR;
+				if (t != oldt)
+				{
+					i += tile[tilenum].line;
+				}
+
+				ptr = tb + (i << 2);
+				srcptr = src + (i << 2);
+
+				tc[(ptr ^ t) & 0x7ff] = RREADIDX16(srcptr);
+				tc[((ptr + 1) ^ t) & 0x7ff] = RREADIDX16(srcptr + 1);
+				tc[((ptr + 2) ^ t) & 0x7ff] = RREADIDX16(srcptr + 2);
+				tc[((ptr + 3) ^ t) & 0x7ff] = RREADIDX16(srcptr + 3);
+				j += dxt;
 			}
-			ptr = tb + i;
-			tc[ptr & 0x3ff] = src[i ^ t];
-			tc[(ptr + 1) & 0x3ff] = src[(i + 1) ^ t];
-			j += dxt;
 		}
-		m_tiles[tilenum].th = tl + (j >> 11);
+		else if (tile[tilenum].format == FORMAT_YUV)
+		{
+			for (int i = 0; i < width; i ++)
+			{
+				oldt = t;
+				t = ((j >> 11) & 1) ? WORD_XOR_DWORD_SWAP : WORD_ADDR_XOR;
+				if (t != oldt)
+				{
+					i += tile[tilenum].line;
+				}
+
+				ptr = ((tb + (i << 1)) ^ t) & 0x3ff;
+				srcptr = src + (i << 2);
+
+				first = RREADIDX16(srcptr);
+				sec = RREADIDX16(srcptr + 1);
+				tc[ptr] = ((first >> 8) << 8) | (sec >> 8);
+				tc[ptr | 0x400] = ((first & 0xff) << 8) | (sec & 0xff);
+
+				ptr = ((tb + (i << 1) + 1) ^ t) & 0x3ff;
+				first = RREADIDX16(srcptr + 2);
+				sec = RREADIDX16(srcptr + 3);
+				tc[ptr] = ((first >> 8) << 8) | (sec >> 8);
+				tc[ptr | 0x400] = ((first & 0xff) << 8) | (sec & 0xff);
+
+				j += dxt;
+			}
+		}
+		else
+		{
+			for (int i = 0; i < width; i ++)
+			{
+				oldt = t;
+				t = ((j >> 11) & 1) ? WORD_XOR_DWORD_SWAP : WORD_ADDR_XOR;
+				if (t != oldt)
+					i += tile[tilenum].line;
+
+				ptr = ((tb + (i << 1)) ^ t) & 0x3ff;
+				srcptr = src + (i << 2);
+				tc[ptr] = RREADIDX16(srcptr);
+				tc[ptr | 0x400] = RREADIDX16(srcptr + 1);
+
+				ptr = ((tb + (i << 1) + 1) ^ t) & 0x3ff;
+				tc[ptr] = RREADIDX16(srcptr + 2);
+				tc[ptr | 0x400] = RREADIDX16(srcptr + 3);
+
+				j += dxt;
+			}
+		}
+		tile[tilenum].th = tl + (j >> 11);
 	}
-	else // Needed by Pilotwings 64 intro, Top Gear Rally intro
+	else
 	{
-		UINT32 srcstart = ((tl * ti_width2) >> 2) + slindwords;
-		memcpy(&tc[tb],&src[srcstart],width);
-		m_tiles[tilenum].th = tl;
+		if (tile[tilenum].size != PIXEL_SIZE_32BIT && tile[tilenum].format != FORMAT_YUV)
+		{
+			for (int i = 0; i < width; i ++)
+			{
+				ptr = tb + (i << 2);
+				srcptr = src + (i << 2);
+				tc[(ptr ^ WORD_ADDR_XOR) & 0x7ff] = RREADIDX16(srcptr);
+				tc[((ptr + 1) ^ WORD_ADDR_XOR) & 0x7ff] = RREADIDX16(srcptr + 1);
+				tc[((ptr + 2) ^ WORD_ADDR_XOR) & 0x7ff] = RREADIDX16(srcptr + 2);
+				tc[((ptr + 3) ^ WORD_ADDR_XOR) & 0x7ff] = RREADIDX16(srcptr + 3);
+			}
+		}
+		else if (tile[tilenum].format == FORMAT_YUV)
+		{
+			for (int i = 0; i < width; i ++)
+			{
+				ptr = ((tb + (i << 1)) ^ WORD_ADDR_XOR) & 0x3ff;
+				srcptr = src + (i << 2);
+				first = RREADIDX16(srcptr);
+				sec = RREADIDX16(srcptr + 1);
+				tc[ptr] = ((first >> 8) << 8) | (sec >> 8);//UV pair
+				tc[ptr | 0x400] = ((first & 0xff) << 8) | (sec & 0xff);
+
+				ptr = ((tb + (i << 1) + 1) ^ WORD_ADDR_XOR) & 0x3ff;
+				first = RREADIDX16(srcptr + 2);
+				sec = RREADIDX16(srcptr + 3);
+				tc[ptr] = ((first >> 8) << 8) | (sec >> 8);
+				tc[ptr | 0x400] = ((first & 0xff) << 8) | (sec & 0xff);
+			}
+		}
+		else
+		{
+			for (int i = 0; i < width; i ++)
+			{
+				ptr = ((tb + (i << 1)) ^ WORD_ADDR_XOR) & 0x3ff;
+				srcptr = src + (i << 2);
+				tc[ptr] = RREADIDX16(srcptr);
+				tc[ptr | 0x400] = RREADIDX16(srcptr + 1);
+
+				ptr = ((tb + (i << 1) + 1) ^ WORD_ADDR_XOR) & 0x3ff;
+				tc[ptr] = RREADIDX16(srcptr + 2);
+				tc[ptr | 0x400] = RREADIDX16(srcptr + 3);
+			}
+		}
+		tile[tilenum].th = tl;
 	}
 }
 
 void N64::RDP::Processor::CmdLoadTile(UINT32 w1, UINT32 w2)
 {
-	const int tilenum = (w2 >> 24) & 0x7;
-	N64::RDP::Tile *tex_tile = &m_tiles[tilenum];
-	int line = tex_tile->line; // Per Ziggy
-	int toppad = 0;
+	Tile* tile = GetTiles();
+	int tilenum = (w2 >> 24) & 0x7;
 
-	if (!line)
-	{
-		return; // Needed by Wipeout 64
-	}
+	tile[tilenum].sl	= ((w1 >> 12) & 0xfff);
+	tile[tilenum].tl	= ((w1 >>  0) & 0xfff);
+	tile[tilenum].sh	= ((w2 >> 12) & 0xfff);
+	tile[tilenum].th	= ((w2 >>  0) & 0xfff);
 
-	tex_tile->sl = ((w1 >> 12) & 0xfff);
-	tex_tile->tl = ((w1 >>  0) & 0xfff);
-	tex_tile->sh = ((w2 >> 12) & 0xfff);
-	tex_tile->th = ((w2 >>  0) & 0xfff);
+	UINT16 sl = tile[tilenum].sl >> 2;
+	UINT16 tl = tile[tilenum].tl >> 2;
+	UINT16 sh = tile[tilenum].sh >> 2;
+	UINT16 th = tile[tilenum].th >> 2;
 
-	UINT16 sl = tex_tile->sl >> 2;
-	UINT16 tl = tex_tile->tl >> 2;
-	UINT16 sh = tex_tile->sh >> 2;
-	UINT16 th = tex_tile->th >> 2;
+	INT32 width = (sh - sl) + 1;
+	INT32 height = (th - tl) + 1;
 
-	int width = (sh - sl) + 1;
-	int height = (th - tl) + 1;
-
+	int topad;
 	if (m_misc_state.m_ti_size < 3)
 	{
-		toppad = (width * m_misc_state.m_ti_size) & 0x7;
+		topad = (width * m_misc_state.m_ti_size) & 0x7;
 	}
 	else
 	{
-		toppad = (width << 2) & 0x7;
+		topad = (width << 2) & 0x7;
 	}
-	toppad = 0; // Currently disabled
+	topad = 0; // ????
 
 	switch (m_misc_state.m_ti_size)
 	{
 		case PIXEL_SIZE_8BIT:
 		{
-			UINT8 *src = (UINT8*)rdram;
+			UINT32 src = m_misc_state.m_ti_address;
 			UINT8 *tc = GetTMEM();
-			int tb = m_tiles[tilenum].tmem;
-
-			if (tb + (width * height) > 4096)
-			{
-				height = (4096 - tb) / line; // Per Ziggy
-			}
+			int tb = tile[tilenum].tmem << 3;
 
 			for (int j = 0; j < height; j++)
 			{
-				int tline = tb + (tex_tile->line * j);
+				int tline = tb + ((tile[tilenum].line << 3) * j);
 				int s = ((j + tl) * m_misc_state.m_ti_width) + sl;
-#define BYTE_XOR_DWORD_SWAP 7
-				int xorval8 = ((j & 1) ? BYTE_XOR_DWORD_SWAP : BYTE_ADDR_XOR); // Per Ziggy
 
+				int xorval8 = ((j & 1) ? BYTE_XOR_DWORD_SWAP : BYTE_ADDR_XOR);//попроще,чем у Ziggy
 				for (int i = 0; i < width; i++)
 				{
-					tc[(tline + i) ^ xorval8] = src[(m_misc_state.m_ti_address + s + i) ^ BYTE_ADDR_XOR];
+					tc[((tline + i) ^ xorval8) & 0xfff] = RREADADDR8(src + s + i);
 				}
 			}
 			break;
 		}
 		case PIXEL_SIZE_16BIT:
 		{
-			UINT16 *src = (UINT16*)rdram;
-			UINT32 ti_addr16 = m_misc_state.m_ti_address >> 1;
+			UINT32 src = m_misc_state.m_ti_address >> 1;
 			UINT16 *tc = GetTMEM16();
-			int tb = (tex_tile->tmem / 2);
-			int taddr;
+			UINT16 yuvword;
 
-			if ((tb + (width * height)) > 2048)
+			if (tile[tilenum].format != FORMAT_YUV)
 			{
-				height = (2048 - tb) / (line / 2); // Per Ziggy
-			}
-
-			for (int j = 0; j < height; j++)
-			{
-				int tline = tb + ((tex_tile->line / 2) * j);
-				int s = 0;
-				int xorval16 = 0;
-				if (tex_tile->format == 1) // Needed by Ogre Battle 64
+				for (int j = 0; j < height; j++)
 				{
-					tline = tb + (tex_tile->line * j);
-				}
-				s = ((j + tl) * m_misc_state.m_ti_width) + sl;
-#define WORD_XOR_DWORD_SWAP 3
-				xorval16 = (j & 1) ? WORD_XOR_DWORD_SWAP : WORD_ADDR_XOR;
+					int tb = tile[tilenum].tmem << 2;
+					int tline = tb + ((tile[tilenum].line << 2) * j);
+					int s = ((j + tl) * m_misc_state.m_ti_width) + sl;
+					int xorval16 = (j & 1) ? WORD_XOR_DWORD_SWAP : WORD_ADDR_XOR;
 
-				for (int i = 0; i < width; i++)
-				{
-					taddr = (tline+i) ^ xorval16;
-					if (taddr < 2048) // Needed by World Driver Championship
+					for (int i = 0; i < width; i++)
 					{
-						tc[taddr] = src[(ti_addr16 + s + i) ^ WORD_ADDR_XOR];
+						UINT32 taddr = (tline + i) ^ xorval16;
+						tc[taddr & 0x7ff] = RREADIDX16(src + s + i);
 					}
 				}
-				//for (int k=0; k < (topad>>1); k++) // Padding is possibly necessary, not yet known.
-				//{
-				//    tc[((tline+i+k) ^ xorval16] = src[(ti_addr16+s+i) ^ WORD_ADDR_XOR];
-				//}
+			}
+			else
+			{
+				for (int j = 0; j < height; j++)
+				{
+					int tb = tile[tilenum].tmem << 3;
+					int tline = tb + ((tile[tilenum].line << 3) * j);
+					int s = ((j + tl) * m_misc_state.m_ti_width) + sl;
+					int xorval8 = (j & 1) ? BYTE_XOR_DWORD_SWAP : BYTE_ADDR_XOR;
+
+					for (int i = 0; i < width; i++)
+					{
+						UINT32 taddr = ((tline + i) ^ xorval8) & 0x7ff;
+						yuvword = RREADIDX16(src + s + i);
+						GetTMEM()[taddr] = yuvword >> 8;
+						GetTMEM()[taddr | 0x800] = yuvword & 0xff;
+					}
+				}
 			}
 			break;
 		}
 		case PIXEL_SIZE_32BIT:
 		{
-			UINT32 *src = (UINT32*)&rdram[m_misc_state.m_ti_address / 4];
-			UINT32 *tc = GetTMEM32();
-			int tb = (tex_tile->tmem / 4);
-			int xorval32 = ((m_misc_state.m_fb_size == PIXEL_SIZE_16BIT) ? 2 : 1);
-
-			if (tb + (width * height) > 1024)
-			{
-				height = (1024 - tb) / (line/4); // Per Ziggy
-			}
+			UINT32 src = m_misc_state.m_ti_address >> 2;
+			UINT16 *tc16 = GetTMEM16();
+			int tb = (tile[tilenum].tmem << 2);
 
 			for (int j = 0; j < height; j++)
 			{
-				int tline = tb + ((tex_tile->line / 2) * j);
+				int tline = tb + ((tile[tilenum].line << 2) * j);
+
 				int s = ((j + tl) * m_misc_state.m_ti_width) + sl;
-				int xorval32cur = (j & 1) ? xorval32 : 0;
+				int xorval32cur = (j & 1) ? WORD_XOR_DWORD_SWAP : WORD_ADDR_XOR;
 				for (int i = 0; i < width; i++)
 				{
-					tc[(tline + i) ^ xorval32cur] = src[s + i];
+					UINT32 c = RREADIDX32(src + s + i);
+					UINT32 ptr = ((tline + i) ^ xorval32cur) & 0x3ff;
+					tc16[ptr] = c >> 16;
+					tc16[ptr | 0x400] = c & 0xffff;
 				}
 			}
 			break;
@@ -2172,8 +2892,8 @@ void N64::RDP::Processor::CmdSetTile(UINT32 w1, UINT32 w2)
 
 	tex_tile->format	= (w1 >> 21) & 0x7;
 	tex_tile->size		= (w1 >> 19) & 0x3;
-	tex_tile->line		= ((w1 >>  9) & 0x1ff) * 8;
-	tex_tile->tmem		= ((w1 >>  0) & 0x1ff) * 8;
+	tex_tile->line		= (w1 >>  9) & 0x1ff;
+	tex_tile->tmem		= (w1 >>  0) & 0x1ff;
 	tex_tile->palette	= (w2 >> 20) & 0xf;
 	tex_tile->ct		= (w2 >> 19) & 0x1;
 	tex_tile->mt		= (w2 >> 18) & 0x1;
@@ -2183,16 +2903,36 @@ void N64::RDP::Processor::CmdSetTile(UINT32 w1, UINT32 w2)
 	tex_tile->ms		= (w2 >>  8) & 0x1;
 	tex_tile->mask_s	= (w2 >>  4) & 0xf;
 	tex_tile->shift_s	= (w2 >>  0) & 0xf;
-
-	tex_tile->mask_s = (tex_tile->mask_s > 10) ? 10 : tex_tile->mask_s;
-	tex_tile->mask_t = (tex_tile->mask_t > 10) ? 10 : tex_tile->mask_t;
 }
 
 void N64::RDP::Processor::CmdFillRect(UINT32 w1, UINT32 w2)
 {
-	N64::RDP::Rectangle rect(m_machine, m_cmd_data + m_cmd_cur);
+	UINT32 xl = (w1 >> 12) & 0xfff;
+	UINT32 yl = (w1 >>  0) & 0xfff;
+	UINT32 xh = (w2 >> 12) & 0xfff;
+	UINT32 yh = (w2 >>  0) & 0xfff;
 
-	rect.Draw();
+	if (m_other_modes.cycle_type == CYCLE_TYPE_FILL || m_other_modes.cycle_type == CYCLE_TYPE_COPY)
+	{
+		yl |= 3;
+	}
+
+	UINT32 xlint = (xl >> 2) & 0x3ff;
+	UINT32 xhint = (xh >> 2) & 0x3ff;
+
+	UINT32* ewdata = GetTempRectData();
+	ewdata[0] = (0x3680 << 16) | yl;//command, flipped, tile, yl
+	ewdata[1] = (yl << 16) | yh;//ym, yh
+	ewdata[2] = (xlint << 16) | ((xl & 3) << 14);//xl, xl frac
+	ewdata[3] = 0;//dxldy, dxldy frac
+	ewdata[4] = (xhint << 16) | ((xh & 3) << 14);//xh, xh frac
+	ewdata[5] = 0;//dxhdy, dxhdy frac
+	ewdata[6] = (xlint << 16) | ((xl & 3) << 14);//xm, xm frac
+	ewdata[7] = 0;//dxmdy, dxmdy frac
+	memset(&ewdata[8], 0, 36 * sizeof(UINT32));//shade, texture, depth
+
+	N64::RDP::Triangle tri(m_machine, false, false, false, true, false);
+	tri.Draw();
 }
 
 void N64::RDP::Processor::CmdSetFogColor(UINT32 w1, UINT32 w2)
@@ -2408,6 +3148,8 @@ void N64::RDP::Processor::ProcessList()
 	UINT32 cmd = (m_cmd_data[0] >> 24) & 0x3f;
 	UINT32 cmd_length = (m_cmd_ptr + 1) * 4;
 
+	SetStatusReg(GetStatusReg() &~ DP_STATUS_FREEZE);
+
 	// check if more data is needed
 	if (cmd_length < rdp_command_length[cmd])
 	{
@@ -2515,6 +3257,7 @@ VIDEO_START(n64)
 
 	state->m_rdp.GetFramebuffer()->SetOtherModes(state->m_rdp.GetOtherModes());
 	state->m_rdp.GetFramebuffer()->SetMiscState(state->m_rdp.GetMiscState());
+	state->m_rdp.GetFramebuffer()->SetProcessor(&state->m_rdp);
 
 	state->m_rdp.GetTexPipe()->SetMachine(machine);
 

@@ -10,10 +10,8 @@ namespace RDP
 
 #define LookUpCC(A, B, C, D) m_rdp->GetCCLUT2()[(m_rdp->GetCCLUT1()[(A << 16) | (B << 8) | C] << 8) | D]
 
-void Processor::RenderSpans(int start, int end, int tilenum, bool shade, bool texture, bool zbuffer, bool flip)
+void Processor::RenderSpans(int start, int end, int tilenum, bool flip)
 {
-	m_tex_pipe.CalculateClampDiffs(tilenum);
-
 	int clipy1 = GetScissor()->m_yh;
 	int clipy2 = GetScissor()->m_yl;
 
@@ -37,7 +35,14 @@ void Processor::RenderSpans(int start, int end, int tilenum, bool shade, bool te
 	for(int i = start; i <= end; i++)
 	{
 		m_span[i].SetMachine(m_machine);
-		m_span[i].Draw(i, tilenum, shade, texture, zbuffer, flip);
+		switch(m_other_modes.cycle_type)
+		{
+			case CYCLE_TYPE_1: m_span[i].Draw1Cycle(i, tilenum, flip); break;
+			case CYCLE_TYPE_2: m_span[i].Draw2Cycle(i, tilenum, flip); break;
+			case CYCLE_TYPE_COPY: m_span[i].DrawCopy(i, tilenum, flip); break;
+			case CYCLE_TYPE_FILL: m_span[i].DrawFill(i, tilenum, flip); break;
+		}
+
 	}
 }
 
@@ -60,17 +65,6 @@ void Span::Dump()
 		printf("%d", m_cvg[index]);
 	}
 	printf("\n");
-
-	printf("    m_dymax = %08x\n", m_dymax);
-	printf("    m_ds.w = %08x\n", m_ds.w);
-	printf("    m_dt.w = %08x\n", m_dt.w);
-	printf("    m_dw.w = %08x\n", m_dw.w);
-	printf("    m_dr.w = %08x\n", m_dr.w);
-	printf("    m_dg.w = %08x\n", m_dg.w);
-	printf("    m_db.w = %08x\n", m_db.w);
-	printf("    m_da.w = %08x\n", m_da.w);
-	printf("    m_dz.w = %08x\n", m_dz.w);
-	printf("    m_dzpix = %08x\n", m_dzpix);
 }
 
 void Span::SetMachine(running_machine *machine)
@@ -83,7 +77,58 @@ void Span::SetMachine(running_machine *machine)
 	m_misc_state = m_rdp->GetMiscState();
 }
 
-void Span::Draw(int index, int tilenum, bool shade, bool texture, bool zbuffer, bool flip)
+void Span::RGBAZClip(int sr, int sg, int sb, int sa, int *sz)
+{
+	m_rdp->GetShadeColor()->i.r = m_rdp->GetSpecial9BitClampTable()[sr & 0x1ff];
+	m_rdp->GetShadeColor()->i.g = m_rdp->GetSpecial9BitClampTable()[sg & 0x1ff];
+	m_rdp->GetShadeColor()->i.b = m_rdp->GetSpecial9BitClampTable()[sb & 0x1ff];
+	m_rdp->GetShadeColor()->i.a = m_rdp->GetSpecial9BitClampTable()[sa & 0x1ff];
+
+	INT32 zanded = (*sz) & 0x60000;
+
+	zanded >>= 17;
+	switch(zanded)
+	{
+		case 0: *sz &= 0x3ffff;											break;
+		case 1:	*sz &= 0x3ffff;											break;
+		case 2: *sz = 0x3ffff;											break;
+		case 3: *sz = 0x3ffff;											break;
+	}
+}
+
+void Span::RGBAZCorrectTriangle(INT32 offx, INT32 offy, INT32* r, INT32* g, INT32* b, INT32* a, INT32* z)
+{
+	if (m_rdp->GetMiscState()->m_curpixel_cvg == 8)
+	{
+		*r >>= 2;
+		*g >>= 2;
+		*b >>= 2;
+		*a >>= 2;
+		*z = (*z >> 3) & 0x7ffff;
+	}
+	else
+	{
+		INT32 summand_xr = offx * SIGN13(m_rdp->m_span_dr >> 14);
+		INT32 summand_yr = offy * SIGN13(m_rdp->m_span_drdy >> 14);
+		INT32 summand_xb = offx * SIGN13(m_rdp->m_span_db >> 14);
+		INT32 summand_yb = offy * SIGN13(m_rdp->m_span_dbdy >> 14);
+		INT32 summand_xg = offx * SIGN13(m_rdp->m_span_dg >> 14);
+		INT32 summand_yg = offy * SIGN13(m_rdp->m_span_dgdy >> 14);
+		INT32 summand_xa = offx * SIGN13(m_rdp->m_span_da >> 14);
+		INT32 summand_ya = offy * SIGN13(m_rdp->m_span_dady >> 14);
+
+		INT32 summand_xz = offx * SIGN22(m_rdp->m_span_dz >> 10);
+		INT32 summand_yz = offy * SIGN22(m_rdp->m_span_dzdy >> 10);
+
+		*r = ((*r << 2) + summand_xr + summand_yr) >> 4;
+		*g = ((*g << 2) + summand_xg + summand_yg) >> 4;
+		*b = ((*b << 2) + summand_xb + summand_yb) >> 4;
+		*a = ((*a << 2) + summand_xa + summand_ya) >> 4;
+		*z = (((*z << 2) + summand_xz + summand_yz) >> 5) & 0x7ffff;
+	}
+}
+
+void Span::Draw1Cycle(int index, int tilenum, bool flip)
 {
 	int clipx1 = m_rdp->GetScissor()->m_xh;
 	int clipx2 = m_rdp->GetScissor()->m_xl;
@@ -97,356 +142,360 @@ void Span::Draw(int index, int tilenum, bool shade, bool texture, bool zbuffer, 
 	SpanParam t = m_t;
 	SpanParam w = m_w;
 
-	UINT16 *fb = (UINT16*)&rdram[m_misc_state->m_fb_address / 4];
-	UINT16 *zb = (UINT16*)&rdram[m_misc_state->m_zb_address / 4];
-	UINT8 *hb = &m_rdp->GetHiddenBits()[m_misc_state->m_fb_address >> 1];
-	UINT8 *zhb = &m_rdp->GetHiddenBits()[m_misc_state->m_zb_address >> 1];
+	UINT32 zb = m_misc_state->m_zb_address >> 1;
+	UINT32 zhb = zb;
+	UINT8 offx = 0, offy = 0;
 
-	UINT32 prim_tile = tilenum;
-	UINT32 tilenum2 = 0;
+	INT32 tile1 = tilenum;
 
-	int dzpix = m_dzpix;
-	int drinc = flip ? (m_dr.w) : -m_dr.w;
-	int dginc = flip ? (m_dg.w) : -m_dg.w;
-	int dbinc = flip ? (m_db.w) : -m_db.w;
-	int dainc = flip ? (m_da.w) : -m_da.w;
-	int dzinc = flip ? (m_dz.w) : -m_dz.w;
-	int dsinc = flip ? (m_ds.w) : -m_ds.w;
-	int dtinc = flip ? (m_dt.w) : -m_dt.w;
-	int dwinc = flip ? (m_dw.w) : -m_dw.w;
+	m_rdp->GetTexPipe()->CalculateClampDiffs(tile1);
+
+	bool noisecompute = m_rdp->GetColorInputs()->combiner_rgbsub_a_r[1] == &m_rdp->GetNoiseColor()->i.r;
+	bool partialreject = (m_rdp->GetColorInputs()->blender2b_a[0] == &m_rdp->GetInvPixelColor()->i.a && m_rdp->GetColorInputs()->blender1b_a[0] == &m_rdp->GetPixelColor()->i.a);
+	bool bsel0 = (m_rdp->GetColorInputs()->blender2b_a[0] == &m_rdp->GetMemoryColor()->i.a);
+
+	int drinc = flip ? (m_rdp->m_span_dr) : -m_rdp->m_span_dr;
+	int dginc = flip ? (m_rdp->m_span_dg) : -m_rdp->m_span_dg;
+	int dbinc = flip ? (m_rdp->m_span_db) : -m_rdp->m_span_db;
+	int dainc = flip ? (m_rdp->m_span_da) : -m_rdp->m_span_da;
+	int dzinc = flip ? (m_rdp->m_span_dz) : -m_rdp->m_span_dz;
+	int dsinc = flip ? (m_rdp->m_span_ds) : -m_rdp->m_span_ds;
+	int dtinc = flip ? (m_rdp->m_span_dt) : -m_rdp->m_span_dt;
+	int dwinc = flip ? (m_rdp->m_span_dw) : -m_rdp->m_span_dw;
+	int dzpix = m_rdp->m_span_dzpix;
 	int xinc = flip ? 1 : -1;
-
-	int nexts;
-	int nextt;
-	int nextsw;
 
 	int fb_index = m_misc_state->m_fb_width * index;
 
-	int x = m_rx;
+	int cdith = 0;
+	int adith = 0;
 
-	int length = flip ? (m_lx - m_rx) : (m_rx - m_lx);
+	int xstart = m_lx;
+	int xend = m_unscissored_rx;
+	int xend_scissored = m_rx;
 
-	bool disable_lod = false;
-	if (m_other_modes->cycle_type != CYCLE_TYPE_2) // Used by World Driver Championship
-	{
-		disable_lod = true;
-	}
+	int x = xend;
 
-	if (m_other_modes->cycle_type == CYCLE_TYPE_2 && texture && !m_other_modes->tex_lod_en)
-	{
-		tilenum2 = (prim_tile + 1) & 7;
-	}
-
-	if (texture && !m_other_modes->tex_lod_en)
-	{
-		tilenum = prim_tile;
-	}
-
-	if(!shade)
-	{
-		m_rdp->GetShadeColor()->c = m_rdp->GetPrimColor()->c;
-	}
+	int length = flip ? (xstart - xend) : (xend - xstart);
+	m_rdp->GetTexPipe()->m_start_span = true;
+	UINT32 fir, fig, fib;
 
 	for (int j = 0; j <= length; j++)
 	{
-		int sr = 0;
-		int sg = 0;
-		int sb = 0;
-		int sa = 0;
-		int ss = 0;
-		int st = 0;
-		int sw = 0;
-		int sz = 0;
-		int sss = 0;
-		int sst = 0;
+		int sr = r.w >> 14;
+		int sg = g.w >> 14;
+		int sb = b.w >> 14;
+		int sa = a.w >> 14;
+		int ss = s.w >> 16;
+		int st = t.w >> 16;
+		int sw = w.w >> 16;
+		int sz = (z.w >> 10) & 0x3fffff;
+		INT32 sss = 0;
+		INT32 sst = 0;
+
+		if (m_other_modes->z_source_sel)
+		{
+			sz = (((UINT32)m_misc_state->m_primitive_z) << 6) & 0x3fffff;
+			dzpix = m_misc_state->m_primitive_delta_z;
+			dzinc = m_rdp->m_span_dz = m_rdp->m_span_dzdy = 0;
+		}
+
+		bool valid_x = (flip) ? (x >= xend_scissored) : (x <= xend_scissored);
+
+		if (x >= clipx1 && x < clipx2 && valid_x)
+		{
+			m_rdp->lookup_cvmask_derivatives(m_cvg[x], &offx, &offy);
+
+			if (m_rdp->GetTexPipe()->m_start_span)
+			{
+				if (m_other_modes->persp_tex_en)
+				{
+					m_rdp->TCDiv(ss, st, sw, &sss, &sst);
+				}
+				else
+				{
+					m_rdp->TCDivNoPersp(ss, st, sw, &sss, &sst);
+				}
+			}
+			else
+			{
+				sss = m_rdp->GetTexPipe()->m_precomp_s;
+				sst = m_rdp->GetTexPipe()->m_precomp_t;
+			}
+
+			m_rdp->GetTexPipe()->LOD1Cycle(&sss, &sst, s.w, t.w, w.w, dsinc, dtinc, dwinc);
+
+			RGBAZCorrectTriangle(offx, offy, &sr, &sg, &sb, &sa, &sz);
+			RGBAZClip(sr, sg, sb, sa, &sz);
+
+			m_rdp->GetTexPipe()->Cycle(m_rdp->GetTexel0Color(), m_rdp->GetTexel0Color(), sss, sst, tilenum, 0);
+
+			m_rdp->ColorCombiner1Cycle(noisecompute);
+
+			UINT32 curpixel = fb_index + x;
+			UINT32 zbcur = zb + curpixel;
+			UINT32 zhbcur = zhb + curpixel;
+
+			m_rdp->GetFramebuffer()->Read(curpixel);
+
+			if(m_rdp->ZCompare(zbcur, zhbcur, sz, dzpix))
+			{
+				m_rdp->GetDitherValues(index, j, &cdith, &adith);
+
+				bool rendered = m_rdp->GetBlender()->Blend1Cycle(&fir, &fig, &fib, cdith, adith, partialreject, bsel0);
+
+                if (rendered)
+				{
+					m_rdp->GetFramebuffer()->Write(curpixel, fir, fig, fib);
+					if (m_other_modes->z_update_en)
+					{
+						m_rdp->ZStore(zbcur, zhbcur, sz);
+					}
+				}
+			}
+		}
+
+		r.w += drinc;
+		g.w += dginc;
+		b.w += dbinc;
+		a.w += dainc;
+		s.w += dsinc;
+		t.w += dtinc;
+		w.w += dwinc;
+		z.w += dzinc;
+
+		x += xinc;
+	}
+}
+
+void Span::Draw2Cycle(int index, int tilenum, bool flip)
+{
+	int clipx1 = m_rdp->GetScissor()->m_xh;
+	int clipx2 = m_rdp->GetScissor()->m_xl;
+
+	SpanParam r = m_r;
+	SpanParam g = m_g;
+	SpanParam b = m_b;
+	SpanParam a = m_a;
+	SpanParam z = m_z;
+	SpanParam s = m_s;
+	SpanParam t = m_t;
+	SpanParam w = m_w;
+
+	UINT32 zb = m_misc_state->m_zb_address >> 1;
+	UINT32 zhb = zb;
+	UINT8 offx = 0, offy = 0;
+
+	INT32 tile2 = (tilenum + 1) & 7;
+	INT32 tile1 = tilenum;
+	UINT32 prim_tile = tilenum;
+
+	int newtile1 = tile1;
+	INT32 news = 0;
+	INT32 newt = 0;
+
+	m_rdp->GetTexPipe()->CalculateClampDiffs(tile1);
+
+	bool noisecompute = (m_rdp->GetColorInputs()->combiner_rgbsub_a_r[0] == &m_rdp->GetNoiseColor()->i.r || m_rdp->GetColorInputs()->combiner_rgbsub_a_r[1] == &m_rdp->GetPixelColor()->i.r);
+	bool partialreject = (m_rdp->GetColorInputs()->blender2b_a[1] == &m_rdp->GetInvPixelColor()->i.a && m_rdp->GetColorInputs()->blender1b_a[1] == &m_rdp->GetPixelColor()->i.a);
+	bool bsel0 = (m_rdp->GetColorInputs()->blender2b_a[0] == &m_rdp->GetMemoryColor()->i.a);
+	bool bsel1 = (m_rdp->GetColorInputs()->blender2b_a[1] == &m_rdp->GetMemoryColor()->i.a);
+
+	int dzpix = m_rdp->m_span_dzpix;
+	int drinc = flip ? (m_rdp->m_span_dr) : -m_rdp->m_span_dr;
+	int dginc = flip ? (m_rdp->m_span_dg) : -m_rdp->m_span_dg;
+	int dbinc = flip ? (m_rdp->m_span_db) : -m_rdp->m_span_db;
+	int dainc = flip ? (m_rdp->m_span_da) : -m_rdp->m_span_da;
+	int dzinc = flip ? (m_rdp->m_span_dz) : -m_rdp->m_span_dz;
+	int dsinc = flip ? (m_rdp->m_span_ds) : -m_rdp->m_span_ds;
+	int dtinc = flip ? (m_rdp->m_span_dt) : -m_rdp->m_span_dt;
+	int dwinc = flip ? (m_rdp->m_span_dw) : -m_rdp->m_span_dw;
+	int xinc = flip ? 1 : -1;
+
+	int fb_index = m_misc_state->m_fb_width * index;
+
+	int cdith = 0;
+	int adith = 0;
+
+	int xstart = m_lx;
+	int xend = m_unscissored_rx;
+	int xend_scissored = m_rx;
+
+	int x = xend;
+
+	int length = flip ? (xstart - xend) : (xend - xstart);
+	m_rdp->GetTexPipe()->m_start_span = true;
+	UINT32 fir, fig, fib;
+
+	//printf( "Span length: %d\n", length);
+
+	for (int j = 0; j <= length; j++)
+	{
+		int sr = r.w >> 14;
+		int sg = g.w >> 14;
+		int sb = b.w >> 14;
+		int sa = a.w >> 14;
+		int ss = s.h.h;
+		int st = t.h.h;
+		int sw = w.h.h;
+		int sz = (z.w >> 10) & 0x3fffff;
+		INT32 sss = 0;
+		INT32 sst = 0;
 		Color c1;
 		Color c2;
 
-		if(shade)
+		if (m_other_modes->z_source_sel)
 		{
-			sr = r.h.h;
-			sg = g.h.h;
-			sb = b.h.h;
-			sa = a.h.h;
+			sz = (((UINT32)m_misc_state->m_primitive_z) << 6) & 0x3fffff;
+			dzpix = m_misc_state->m_primitive_delta_z;
+			dzinc = m_rdp->m_span_dz = m_rdp->m_span_dzdy = 0;
 		}
 
-		if(texture)
-		{
-			ss = s.h.h;
-			st = t.h.h;
-			sw = w.h.h;
-		}
+		bool valid_x = (flip) ? (x >= xend_scissored) : (x <= xend_scissored);
 
-		if(zbuffer)
+		if (x >= clipx1 && x < clipx2 && valid_x)
 		{
-			sz = z.w >> 13;
+			m_rdp->lookup_cvmask_derivatives(m_cvg[x], &offx, &offy);
 
-			if (m_other_modes->z_source_sel)
+			if (m_rdp->GetTexPipe()->m_start_span)
 			{
-				sz = (((UINT32)m_misc_state->m_primitive_z) << 3) & 0x3ffff;
-				dzpix = m_misc_state->m_primitive_delta_z;
+				if (m_other_modes->persp_tex_en)
+				{
+					m_rdp->TCDiv(ss, st, sw, &sss, &sst);
+				}
+				else
+				{
+					m_rdp->TCDivNoPersp(ss, st, sw, &sss, &sst);
+				}
+			}
+			else
+			{
+				sss = m_rdp->GetTexPipe()->m_precomp_s;
+				sst = m_rdp->GetTexPipe()->m_precomp_t;
+			}
+
+			m_rdp->GetTexPipe()->LOD2Cycle(&sss, &sst, s.w, t.w, w.w, dsinc, dtinc, dwinc, prim_tile, &tile1, &tile2);
+
+			news = m_rdp->GetTexPipe()->m_precomp_s;
+			newt = m_rdp->GetTexPipe()->m_precomp_t;
+			m_rdp->GetTexPipe()->LOD2CycleLimited(&news, &newt, s.w + dsinc, t.w + dtinc, w.w + dwinc, dsinc, dtinc, dwinc, prim_tile, &newtile1);
+
+			RGBAZCorrectTriangle(offx, offy, &sr, &sg, &sb, &sa, &sz);
+			RGBAZClip(sr, sg, sb, sa, &sz);
+
+			m_rdp->GetTexPipe()->Cycle(m_rdp->GetTexel0Color(), m_rdp->GetTexel0Color(), sss, sst, tile1, 0);
+			m_rdp->GetTexPipe()->Cycle(m_rdp->GetTexel1Color(), m_rdp->GetTexel0Color(), sss, sst, tile2, 1);
+
+			m_rdp->GetTexPipe()->Cycle(m_rdp->GetNextTexelColor(), m_rdp->GetNextTexelColor(), sss, sst, tile2, 1);
+
+			m_rdp->ColorCombiner2Cycle(noisecompute);
+
+			UINT32 curpixel = fb_index + x;
+			UINT32 zbcur = zb + curpixel;
+			UINT32 zhbcur = zhb + curpixel;
+
+			m_rdp->GetFramebuffer()->Read(curpixel);
+
+			if(m_rdp->ZCompare(zbcur, zhbcur, sz, dzpix))
+			{
+				m_rdp->GetDitherValues(index, j, &cdith, &adith);
+
+				bool rendered = m_rdp->GetBlender()->Blend2Cycle(&fir, &fig, &fib, cdith, adith, partialreject, bsel0, bsel1);
+
+                if (rendered)
+				{
+					m_rdp->GetFramebuffer()->Write(curpixel, fir, fig, fib);
+					if (m_other_modes->z_update_en)
+					{
+						m_rdp->ZStore(zbcur, zhbcur, sz);
+					}
+				}
 			}
 		}
 
+		r.w += drinc;
+		g.w += dginc;
+		b.w += dbinc;
+		a.w += dainc;
+		s.w += dsinc;
+		t.w += dtinc;
+		w.w += dwinc;
+		z.w += dzinc;
+
+		x += xinc;
+	}
+}
+
+void Span::DrawCopy(int index, int tilenum, bool flip)
+{
+	int clipx1 = m_rdp->GetScissor()->m_xh;
+	int clipx2 = m_rdp->GetScissor()->m_xl;
+
+	SpanParam s = m_s;
+	SpanParam t = m_t;
+
+	int ds = m_rdp->m_span_ds / 4;
+	int dt = m_rdp->m_span_dt / 4;
+	int dsinc = flip ? (ds) : -ds;
+	int dtinc = flip ? (dt) : -dt;
+	int xinc = flip ? 1 : -1;
+
+	int fb_index = m_misc_state->m_fb_width * index;
+
+	int xstart = m_lx;
+	int xend = m_unscissored_rx;
+	int xend_scissored = m_rx;
+
+	int x = xend;
+
+	int length = flip ? (xstart - xend) : (xend - xstart);
+
+	for (int j = 0; j <= length; j++)
+	{
+		bool valid_x = (flip) ? (x >= xend_scissored) : (x <= xend_scissored);
+
+		if (x >= clipx1 && x < clipx2 && valid_x)
+		{
+			INT32 sss = s.h.h;
+			INT32 sst = t.h.h;
+			m_rdp->GetTexPipe()->Copy(m_rdp->GetTexel0Color(), sss, sst, tilenum);
+
+			UINT32 curpixel = fb_index + x;
+			m_misc_state->m_curpixel_cvg = m_rdp->GetTexel0Color()->i.a ? 7 : 0;
+			if ((m_rdp->GetTexel0Color()->i.a != 0) || (!m_other_modes->alpha_compare_en))
+			{
+				m_rdp->GetFramebuffer()->Copy(curpixel, m_rdp->GetTexel0Color()->i.r, m_rdp->GetTexel0Color()->i.g, m_rdp->GetTexel0Color()->i.b);
+			}
+		}
+
+		s.w += dsinc;
+		t.w += dtinc;
+		x += xinc;
+	}
+}
+
+void Span::DrawFill(int index, int tilenum, bool flip)
+{
+	int clipx1 = m_rdp->GetScissor()->m_xh;
+	int clipx2 = m_rdp->GetScissor()->m_xl;
+
+	int xinc = flip ? 1 : -1;
+
+	int fb_index = m_misc_state->m_fb_width * index;
+
+	int xstart = m_lx;
+	int xend_scissored = m_rx;
+
+	int x = xend_scissored;
+
+	int length = flip ? (xstart - xend_scissored) : (xend_scissored - xstart);
+
+	for (int j = 0; j <= length; j++)
+	{
 		if (x >= clipx1 && x < clipx2)
 		{
-			bool z_compare_result = true;
-
-			m_misc_state->m_curpixel_cvg = m_cvg[x];
-
-			if (m_misc_state->m_curpixel_cvg)
-			{
-				int curpixel = fb_index + x;
-				UINT16* fbcur = &fb[curpixel ^ WORD_ADDR_XOR];
-				UINT16* zbcur = &zb[curpixel ^ WORD_ADDR_XOR];
-				UINT8* hbcur = &hb[curpixel ^ BYTE_ADDR_XOR];
-				UINT8* zhbcur = &zhb[curpixel ^ BYTE_ADDR_XOR];
-
-				if(texture)
-				{
-					if (m_other_modes->persp_tex_en)
-					{
-						m_rdp->TCDiv(ss, st, sw, &sss, &sst);
-					}
-					else // Hack for Bust-a-Move 2
-					{
-						sss = ss;
-						sst = st;
-					}
-
-					if (m_other_modes->tex_lod_en && !disable_lod)
-					{
-						if (m_other_modes->persp_tex_en)
-						{
-							nextsw = (w.w + dwinc) >> 16;
-							nexts = (s.w + dsinc) >> 16;
-							nextt = (t.w + dtinc) >> 16;
-							m_rdp->TCDiv(nexts, nextt, nextsw, &nexts, &nextt);
-						}
-						else
-						{
-							nexts = (s.w + dsinc)>>16;
-							nextt = (t.w + dtinc)>>16;
-						}
-
-						INT32 horstep = SIGN17(nexts & 0x1ffff) - SIGN17(sss & 0x1ffff);
-						INT32 vertstep = SIGN17(nextt & 0x1ffff) - SIGN17(sst & 0x1ffff);
-						if (horstep & 0x20000)
-						{
-							horstep = ~horstep & 0x1ffff;
-						}
-						if (vertstep & 0x20000)
-						{
-							vertstep = ~vertstep & 0x1ffff;
-						}
-
-						int LOD = (horstep >= vertstep) ? horstep : vertstep;
-						LOD = (LOD >= m_dymax) ? LOD : m_dymax;
-
-						if (LOD & 0x1c000)
-						{
-							LOD = 0x7fff;
-						}
-						if (LOD < m_misc_state->m_min_level)
-						{
-							LOD = m_misc_state->m_min_level;
-						}
-
-						bool magnify = (LOD < 32);
-						INT32 l_tile = m_rdp->GetLog2((LOD >> 5) & 0xff);
-						bool distant = ((LOD & 0x6000) || (l_tile >= m_misc_state->m_max_level));
-
-						m_rdp->SetLODFrac(((LOD << 3) >> l_tile) & 0xff);
-
-						if (distant)
-						{
-							l_tile = m_misc_state->m_max_level;
-						}
-						if(!m_other_modes->sharpen_tex_en && !m_other_modes->detail_tex_en && magnify)
-						{
-							m_rdp->SetLODFrac(0);
-						}
-						if(!m_other_modes->sharpen_tex_en && !m_other_modes->detail_tex_en && distant)
-						{
-							m_rdp->SetLODFrac(0xff);
-						}
-						if(m_other_modes->sharpen_tex_en && magnify)
-						{
-							m_rdp->SetLODFrac(*(m_rdp->GetLODFrac()) | 0x100);
-						}
-
-						if (!m_other_modes->detail_tex_en)
-						{
-							tilenum = (prim_tile + l_tile);
-							tilenum &= 7;
-							if (m_other_modes->sharpen_tex_en)
-							{
-								tilenum2 = (tilenum + 1) & 7;
-							}
-							else if (!distant)
-							{
-								tilenum2 = (tilenum + 1) & 7;
-							}
-							else
-							{
-								tilenum2 = tilenum;
-							}
-						}
-						else
-						{
-							if (!magnify)
-							{
-								tilenum = (prim_tile + l_tile + 1);
-							}
-							else
-							{
-								tilenum = (prim_tile + l_tile);
-							}
-							tilenum &= 7;
-
-							if (!distant && !magnify)
-							{
-								tilenum2 = (prim_tile + l_tile + 2) & 7;
-							}
-							else
-							{
-								tilenum2 = (prim_tile + l_tile + 1) & 7;
-							}
-						}
-					}
-
-					if (m_other_modes->cycle_type == CYCLE_TYPE_1)
-					{
-						m_rdp->GetTexel0Color()->c = m_rdp->GetTexPipe()->Fetch(sss, sst, &m_rdp->GetTiles()[tilenum]);
-					}
-					else
-					{
-						m_rdp->GetTexel0Color()->c = m_rdp->GetTexPipe()->Fetch(sss, sst, &m_rdp->GetTiles()[tilenum]);
-						m_rdp->GetTexel1Color()->c = m_rdp->GetTexPipe()->Fetch(sss, sst, &m_rdp->GetTiles()[tilenum2]);
-					}
-				}
-
-				if (shade)
-				{
-					if (sr > 0xff) sr = 0xff;
-					if (sg > 0xff) sg = 0xff;
-					if (sb > 0xff) sb = 0xff;
-					if (sa > 0xff) sa = 0xff;
-					if (sr < 0) sr = 0;
-					if (sg < 0) sg = 0;
-					if (sb < 0) sb = 0;
-					if (sa < 0) sa = 0;
-					m_rdp->GetShadeColor()->i.r = sr;
-					m_rdp->GetShadeColor()->i.g = sg;
-					m_rdp->GetShadeColor()->i.b = sb;
-					m_rdp->GetShadeColor()->i.a = sa;
-				}
-
-				if (m_other_modes->cycle_type == CYCLE_TYPE_1)
-				{
-					c1.i.r = LookUpCC(*m_rdp->GetColorInputs()->combiner_rgbsub_a_r[1],
-									  *m_rdp->GetColorInputs()->combiner_rgbsub_b_r[1],
-									  *m_rdp->GetColorInputs()->combiner_rgbmul_r[1],
-									  *m_rdp->GetColorInputs()->combiner_rgbadd_r[1]);
-					c1.i.g = LookUpCC(*m_rdp->GetColorInputs()->combiner_rgbsub_a_g[1],
-									  *m_rdp->GetColorInputs()->combiner_rgbsub_b_g[1],
-									  *m_rdp->GetColorInputs()->combiner_rgbmul_g[1],
-									  *m_rdp->GetColorInputs()->combiner_rgbadd_g[1]);
-					c1.i.b = LookUpCC(*m_rdp->GetColorInputs()->combiner_rgbsub_a_b[1],
-									  *m_rdp->GetColorInputs()->combiner_rgbsub_b_b[1],
-									  *m_rdp->GetColorInputs()->combiner_rgbmul_b[1],
-									  *m_rdp->GetColorInputs()->combiner_rgbadd_b[1]);
-					c1.i.a = LookUpCC(*m_rdp->GetColorInputs()->combiner_alphasub_a[1],
-									  *m_rdp->GetColorInputs()->combiner_alphasub_b[1],
-									  *m_rdp->GetColorInputs()->combiner_alphamul[1],
-									  *m_rdp->GetColorInputs()->combiner_alphaadd[1]);
-					m_rdp->GetAlphaCvg(&c1.i.a);
-				}
-				else if (m_other_modes->cycle_type == CYCLE_TYPE_2)
-				{
-					c1.i.r = LookUpCC(*m_rdp->GetColorInputs()->combiner_rgbsub_a_r[0],
-									  *m_rdp->GetColorInputs()->combiner_rgbsub_b_r[0],
-									  *m_rdp->GetColorInputs()->combiner_rgbmul_r[0],
-									  *m_rdp->GetColorInputs()->combiner_rgbadd_r[0]);
-					c1.i.g = LookUpCC(*m_rdp->GetColorInputs()->combiner_rgbsub_a_g[0],
-									  *m_rdp->GetColorInputs()->combiner_rgbsub_b_g[0],
-									  *m_rdp->GetColorInputs()->combiner_rgbmul_g[0],
-									  *m_rdp->GetColorInputs()->combiner_rgbadd_g[0]);
-					c1.i.b = LookUpCC(*m_rdp->GetColorInputs()->combiner_rgbsub_a_b[0],
-									  *m_rdp->GetColorInputs()->combiner_rgbsub_b_b[0],
-									  *m_rdp->GetColorInputs()->combiner_rgbmul_b[0],
-									  *m_rdp->GetColorInputs()->combiner_rgbadd_b[0]);
-					c1.i.a = LookUpCC(*m_rdp->GetColorInputs()->combiner_alphasub_a[0],
-									  *m_rdp->GetColorInputs()->combiner_alphasub_b[0],
-									  *m_rdp->GetColorInputs()->combiner_alphamul[0],
-									  *m_rdp->GetColorInputs()->combiner_alphaadd[0]);
-					m_rdp->GetCombinedColor()->c = c1.c;
-					c2.c = m_rdp->GetTexel0Color()->c;
-					m_rdp->GetTexel0Color()->c = m_rdp->GetTexel1Color()->c;
-					m_rdp->GetTexel1Color()->c = c2.c;
-					c2.i.r = LookUpCC(*m_rdp->GetColorInputs()->combiner_rgbsub_a_r[1],
-									  *m_rdp->GetColorInputs()->combiner_rgbsub_b_r[1],
-									  *m_rdp->GetColorInputs()->combiner_rgbmul_r[1],
-									  *m_rdp->GetColorInputs()->combiner_rgbadd_r[1]);
-					c2.i.g = LookUpCC(*m_rdp->GetColorInputs()->combiner_rgbsub_a_g[1],
-									  *m_rdp->GetColorInputs()->combiner_rgbsub_b_g[1],
-									  *m_rdp->GetColorInputs()->combiner_rgbmul_g[1],
-									  *m_rdp->GetColorInputs()->combiner_rgbadd_g[1]);
-					c2.i.b = LookUpCC(*m_rdp->GetColorInputs()->combiner_rgbsub_a_b[1],
-									  *m_rdp->GetColorInputs()->combiner_rgbsub_b_b[1],
-									  *m_rdp->GetColorInputs()->combiner_rgbmul_b[1],
-									  *m_rdp->GetColorInputs()->combiner_rgbadd_b[1]);
-					c2.i.a = LookUpCC(*m_rdp->GetColorInputs()->combiner_alphasub_a[1],
-									  *m_rdp->GetColorInputs()->combiner_alphasub_b[1],
-									  *m_rdp->GetColorInputs()->combiner_alphamul[1],
-									  *m_rdp->GetColorInputs()->combiner_alphaadd[1]);
-					m_rdp->GetAlphaCvg(&c2.i.a);
-				}
-
-				if ((zbuffer || m_other_modes->z_source_sel) && m_other_modes->z_compare_en)
-				{
-					z_compare_result = m_rdp->ZCompare(fbcur, hbcur, zbcur, zhbcur, sz, dzpix);
-				}
-
-				if(z_compare_result)
-				{
-					bool rendered = false;
-					int dith = 0;
-					if (!m_other_modes->rgb_dither_sel)
-					{
-						dith = m_rdp->GetMagicMatrix()[(((index) & 3) << 2) + ((x ^ WORD_ADDR_XOR) & 3)];
-					}
-					else if (m_other_modes->rgb_dither_sel == 1)
-					{
-						dith = m_rdp->GetBayerMatrix()[(((index) & 3) << 2) + ((x ^ WORD_ADDR_XOR) & 3)];
-					}
-
-					rendered = m_rdp->GetBlender()->Blend(fbcur, hbcur, c1, c2, dith);
-
-					if (m_other_modes->z_update_en && rendered)
-					{
-						m_rdp->ZStore(zbcur, zhbcur, sz, dzpix);
-					}
-				}
-			}
-		}
-
-		if (shade)
-		{
-			r.w += drinc;
-			g.w += dginc;
-			b.w += dbinc;
-			a.w += dainc;
-		}
-		if (texture)
-		{
-			s.w += dsinc;
-			t.w += dtinc;
-			w.w += dwinc;
-		}
-		if (zbuffer)
-		{
-			z.w += dzinc;
+			UINT32 curpixel = fb_index + x;
+			m_rdp->GetFramebuffer()->Fill(curpixel);
 		}
 
 		x += xinc;

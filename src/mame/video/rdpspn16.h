@@ -34,13 +34,18 @@ class Span
 	public:
 		Span() { }
 
-		void	Draw(int index, int tilenum, bool shade, bool texture, bool zbuffer, bool flip);
 		void	Dump();
 		void	SetMachine(running_machine* machine);
+
+		void	Draw1Cycle(int index, int tilenum, bool flip);
+		void	Draw2Cycle(int index, int tilenum, bool flip);
+		void	DrawCopy(int index, int tilenum, bool flip);
+		void	DrawFill(int index, int tilenum, bool flip);
 
 	public:
 		int m_lx;
 		int m_rx;
+		int m_unscissored_rx;
 
 		SpanParam m_s;
 		SpanParam m_t;
@@ -51,22 +56,12 @@ class Span
 		SpanParam m_a;
 		SpanParam m_z;
 
-		UINT8 m_cvg[RDP_CVG_SPAN_MAX];
-
-		int m_dymax;
-
-		SpanParam m_ds;
-		SpanParam m_dt;
-		SpanParam m_dw;
-		SpanParam m_dr;
-		SpanParam m_dg;
-		SpanParam m_db;
-		SpanParam m_da;
-		SpanParam m_dz;
-
-		int m_dzpix;
+		UINT16 m_cvg[RDP_CVG_SPAN_MAX];
 
 	private:
+		void RGBAZClip(int sr, int sg, int sb, int sa, int *sz);
+		void RGBAZCorrectTriangle(INT32 offx, INT32 offy, INT32* r, INT32* g, INT32* b, INT32* a, INT32* z);
+
 		running_machine* m_machine;
 		Processor* m_rdp;
 		MiscState* m_misc_state;

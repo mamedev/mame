@@ -139,51 +139,20 @@ void rspdrc_add_dmem(running_device *device, void *base);
 
 #define RSPDRC_STRICT_VERIFY	0x0001			/* verify all instructions */
 
-typedef struct
+typedef union
 {
-	union
-	{
-		UINT8 b[16];
-		UINT16 s[8];
-		UINT32 l[4];
-		UINT64 d[2];
-	};
+	UINT64 d[2];
+	UINT32 l[4];
+	INT16 s[8];
+	UINT8 b[16];
 } VECTOR_REG;
 
-typedef struct
+typedef union
 {
-	union
-	{
-		INT64 l;
-#ifdef LSB_FIRST
-		struct
-		{
-			INT16 z;
-			INT16 low;
-			INT16 mid;
-			INT16 high;
-		} h;
-		struct
-		{
-			INT32 zl;
-			INT32 mh;
-		} w;
-#else
-		struct
-		{
-			INT16 high;
-			INT16 mid;
-			INT16 low;
-			INT16 z;
-		} h;
-		struct
-		{
-			INT32 mh;
-			INT32 zl;
-		} w;
-#endif
-	};
-} ACCUMULATOR;
+	INT64 q;
+	INT32 l[2];
+	INT16 w[4];
+} ACCUMULATOR_REG;
 
 typedef struct _rspimp_state rspimp_state;
 typedef struct _rsp_state rsp_state;
@@ -199,11 +168,12 @@ struct _rsp_state
 	UINT32 sr;
 	UINT32 step_count;
 
-	ACCUMULATOR accum[8];
+	ACCUMULATOR_REG accum[8];
 	INT32 square_root_res;
 	INT32 square_root_high;
 	INT32 reciprocal_res;
 	INT32 reciprocal_high;
+	INT32 dp_allowed;
 
 	UINT32 ppc;
 	UINT32 nextpc;
