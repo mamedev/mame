@@ -2285,13 +2285,16 @@ static WRITE16_HANDLER( generic_cop_w )
 				return;
 			}
 
+			/* "automatic" movement, for arks in Legionnaire / Zero Team */
 			if(COP_CMD(0x194,0x288,0x088,0x000,0x000,0x000,0x000,0x000,6,0xfbfb))
 			{
-				//static UINT8 offs;
+				static UINT8 offs;
 
-				//offs = (offset & 3) * 4;
+				offs = (offset & 3) * 4;
 
-				//space->write_dword(cop_register[0] + 16 + offs, space->read_dword(cop_register[0] + 16 + offs) + 0x2000);
+				//popmessage("%d %d",space->read_dword(cop_register[0] + 0x2c + 0),space->read_dword(cop_register[0] + 0x2c + 4));
+
+				space->write_dword(cop_register[0] + 16 + offs, space->read_dword(cop_register[0] + 16 + offs) + space->read_dword(cop_register[0] + 0x28 + offs));
 			}
 
 			/* SINE math - 0x8100 */
