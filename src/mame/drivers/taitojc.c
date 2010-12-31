@@ -426,7 +426,7 @@ static READ32_HANDLER ( jc_control_r )
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				//r |= (mame_rand(space->machine) & 0xff) << 24;
+				//r |= (space->machine->rand() & 0xff) << 24;
 			}
 			return r;
 		}

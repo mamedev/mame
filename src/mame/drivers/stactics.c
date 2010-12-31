@@ -130,7 +130,7 @@ static void move_motor(running_machine *machine, stactics_state *state)
 static CUSTOM_INPUT( get_rng )
 {
 	/* this is a 555 timer, but cannot read one of the resistor values */
-	return mame_rand(field->port->machine) & 0x07;
+	return field->port->machine->rand() & 0x07;
 }
 
 

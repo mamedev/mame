@@ -144,7 +144,7 @@ READ8_HANDLER(st0016_vregs_r)
 	{
 		case 0:
 		case 1:
-			return mame_rand(space->machine);
+			return space->machine->rand();
 	}
 
 	return st0016_vregs[offset];

@@ -254,7 +254,7 @@ static READ8_HANDLER(m72_mcu_data_r )
 static INTERRUPT_GEN( m72_mcu_int )
 {
 	//mcu_snd_cmd_latch |= 0x11; /* 0x10 is special as well - FIXME */
-	mcu_snd_cmd_latch = 0x11;// | (mame_rand(machine) & 1); /* 0x10 is special as well - FIXME */
+	mcu_snd_cmd_latch = 0x11;// | (machine->rand() & 1); /* 0x10 is special as well - FIXME */
 	cpu_set_input_line(device, 1, ASSERT_LINE);
 }
 

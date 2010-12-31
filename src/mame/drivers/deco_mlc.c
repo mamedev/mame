@@ -117,7 +117,7 @@ static READ32_HANDLER(test2_r)
 //  if (offset==0)
 //      return input_port_read(space->machine, "IN0"); //0xffffffff;
 //   logerror("%08x:  Test2_r %d\n",cpu_get_pc(space->cpu),offset);
-	return mame_rand(space->machine); //0xffffffff;
+	return space->machine->rand(); //0xffffffff;
 }
 
 static READ32_HANDLER(test3_r)
@@ -127,7 +127,7 @@ static READ32_HANDLER(test3_r)
 
 */
 //if (offset==0)
-//  return mame_rand(space->machine)|(mame_rand(space->machine)<<16);
+//  return space->machine->rand()|(space->machine->rand()<<16);
 //  logerror("%08x:  Test3_r %d\n",cpu_get_pc(space->cpu),offset);
 	return 0xffffffff;
 }

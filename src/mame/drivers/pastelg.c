@@ -215,7 +215,7 @@ INPUT_PORTS_END
 // stops the game hanging..
 static CUSTOM_INPUT( nb1413m3_hackbusyflag_r )
 {
-	return mame_rand(field->port->machine) & 3;
+	return field->port->machine->rand() & 3;
 }
 
 static INPUT_PORTS_START( threeds )

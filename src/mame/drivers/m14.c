@@ -153,7 +153,7 @@ static WRITE8_HANDLER( m14_cram_w )
 static READ8_HANDLER( m14_rng_r )
 {
 	/* graphic artifacts happens if this doesn't return random values. */
-	return (mame_rand(space->machine) & 0x0f) | 0xf0; /* | (input_port_read(space->machine, "IN1") & 0x80)*/;
+	return (space->machine->rand() & 0x0f) | 0xf0; /* | (input_port_read(space->machine, "IN1") & 0x80)*/;
 }
 
 /* Here routes the hopper & the inputs */

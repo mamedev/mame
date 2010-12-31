@@ -714,7 +714,7 @@ static void request_world_data( running_machine *machine )
 static void request_goalin_data( running_machine *machine )
 {
 	rainbow_state *state = machine->driver_data<rainbow_state>();
-	int n = mame_rand(machine) % 15;
+	int n = machine->rand() % 15;
 
 	state->CRAM[1][0x14B] = 0x00; /* x coordinates */
 	state->CRAM[1][0x14D] = 0x10;

@@ -542,7 +542,7 @@ VIDEO_UPDATE( ms32 )
 				}
 				else if (primask == 0xc0)
 				{
-					dstptr_bitmap[xx] = paldata[mame_rand(screen->machine)&0xfff];
+					dstptr_bitmap[xx] = paldata[screen->machine->rand()&0xfff];
 				}
 				else if (primask == 0xf0)
 				{
@@ -626,12 +626,12 @@ VIDEO_UPDATE( ms32 )
 					}
 					else if (src_tilepri==0x06)
 					{
-						//dstptr_bitmap[xx] = paldata[mame_rand(screen->machine)&0xfff];
+						//dstptr_bitmap[xx] = paldata[screen->machine->rand()&0xfff];
 						dstptr_bitmap[xx] = paldata[src_tile]; // assumed
 					}
 					else if (src_tilepri==0x07)
 					{
-						//dstptr_bitmap[xx] = paldata[mame_rand(screen->machine)&0xfff];
+						//dstptr_bitmap[xx] = paldata[screen->machine->rand()&0xfff];
 						dstptr_bitmap[xx] = paldata[src_tile]; // assumed
 					}
 				}

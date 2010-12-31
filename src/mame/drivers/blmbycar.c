@@ -81,7 +81,7 @@ static WRITE16_HANDLER( blmbycar_pot_wheel_shift_w )
 static READ16_HANDLER( blmbycar_pot_wheel_r )
 {
 	blmbycar_state *state = space->machine->driver_data<blmbycar_state>();
-	return ((state->pot_wheel & 0x80) ? 0x04 : 0) | (mame_rand(space->machine) & 0x08);
+	return ((state->pot_wheel & 0x80) ? 0x04 : 0) | (space->machine->rand() & 0x08);
 }
 
 

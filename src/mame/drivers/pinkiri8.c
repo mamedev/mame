@@ -302,7 +302,7 @@ static VIDEO_UPDATE( pinkiri8 )
 
 			if (bit)
 			{
-				//col = mame_rand(screen->machine);
+				//col = screen->machine->rand();
 				width = 2;
 			}
 			else

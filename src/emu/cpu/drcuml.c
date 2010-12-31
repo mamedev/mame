@@ -2252,27 +2252,27 @@ static void bevalidate_initialize_random_state(drcuml_state *drcuml, drcuml_bloc
 	int regnum;
 
 	/* initialize core state to random values */
-	state->fmod = mame_rand(machine) & 0x03;
-	state->flags = mame_rand(machine) & 0x1f;
-	state->exp = mame_rand(machine);
+	state->fmod = machine->rand() & 0x03;
+	state->flags = machine->rand() & 0x1f;
+	state->exp = machine->rand();
 
 	/* initialize integer registers to random values */
 	for (regnum = 0; regnum < ARRAY_LENGTH(state->r); regnum++)
 	{
-		state->r[regnum].w.h = mame_rand(machine);
-		state->r[regnum].w.l = mame_rand(machine);
+		state->r[regnum].w.h = machine->rand();
+		state->r[regnum].w.l = machine->rand();
 	}
 
 	/* initialize float registers to random values */
 	for (regnum = 0; regnum < ARRAY_LENGTH(state->f); regnum++)
 	{
-		*(UINT32 *)&state->f[regnum].s.h = mame_rand(machine);
-		*(UINT32 *)&state->f[regnum].s.l = mame_rand(machine);
+		*(UINT32 *)&state->f[regnum].s.h = machine->rand();
+		*(UINT32 *)&state->f[regnum].s.l = machine->rand();
 	}
 
 	/* initialize map variables to random values */
 	for (regnum = 0; regnum < DRCUML_MAPVAR_END - DRCUML_MAPVAR_M0; regnum++)
-		UML_MAPVAR(block, MVAR(regnum), mame_rand(machine));
+		UML_MAPVAR(block, MVAR(regnum), machine->rand());
 }
 
 

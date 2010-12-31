@@ -168,7 +168,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(unk_r)
 {
-	return (mame_rand(space->machine) & 0xff);
+	return (space->machine->rand() & 0xff);
 }
 
 static ADDRESS_MAP_START( jubileep_cru_map, ADDRESS_SPACE_IO, 8 )

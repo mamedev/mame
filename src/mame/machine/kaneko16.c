@@ -92,7 +92,7 @@ READ16_HANDLER(galpanib_calc_r) /* Simulation of the CALC1 MCU */
 			return (((UINT32)hit.mult_a * (UINT32)hit.mult_b) & 0xffff);
 
 		case 0x14/2:
-			return (mame_rand(space->machine) & 0xffff);
+			return (space->machine->rand() & 0xffff);
 
 		default:
 			logerror("CPU #0 PC %06x: warning - read unmapped calc address %06x\n",cpu_get_pc(space->cpu),offset<<1);
@@ -243,7 +243,7 @@ READ16_HANDLER(bloodwar_calc_r)
 			return data;
 
 		case 0x14/2:
-			return (mame_rand(space->machine) & 0xffff);
+			return (space->machine->rand() & 0xffff);
 
 		case 0x20/2: return hit.x1p;
 		case 0x22/2: return hit.x1s;
@@ -488,7 +488,7 @@ static READ16_HANDLER(shogwarr_calc_r)
 			return shogwarr_hit.flags;
 
 		case 0x28:
-			return (mame_rand(space->machine) & 0xffff);
+			return (space->machine->rand() & 0xffff);
 
 		case 0x40: return shogwarr_hit.x1po;
 		case 0x44: return shogwarr_hit.x1so;

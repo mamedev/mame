@@ -188,7 +188,7 @@ static READ8_HANDLER( chinsan_input_port_0_r )
 	}
 
 	printf("chinsan_input_port_0_r unk_r %02x\n", state->port_select);
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static READ8_HANDLER( chinsan_input_port_1_r )
@@ -219,7 +219,7 @@ static READ8_HANDLER( chinsan_input_port_1_r )
 	}
 
 	printf("chinsan_input_port_1_r unk_r %02x\n", state->port_select);
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static WRITE8_DEVICE_HANDLER( chin_adpcm_w )

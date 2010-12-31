@@ -238,7 +238,7 @@ static READ8_HANDLER( mixport_r )
 */
 	static int mixdata;
 
-	mixdata = (input_port_read(space->machine, "SW2") & 0xfd) | (mame_rand(space->machine) & 0x02);
+	mixdata = (input_port_read(space->machine, "SW2") & 0xfd) | (space->machine->rand() & 0x02);
 
 	return mixdata;
 }

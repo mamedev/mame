@@ -1736,7 +1736,7 @@ static READ8_HANDLER(indianbt_r)
 		case 0x5ffc:	return 0;
 	}
 	logerror("unknown port 0 read @ %x\n",cpu_get_pc(space->cpu));
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static ADDRESS_MAP_START( indianbt_io_map, ADDRESS_SPACE_IO, 8 )

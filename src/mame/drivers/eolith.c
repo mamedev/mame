@@ -87,7 +87,7 @@ static READ32_HANDLER( eolith_custom_r )
     */
 	eolith_speedup_read(space);
 
-	return (input_port_read(space->machine, "IN0") & ~0x300) | (mame_rand(space->machine) & 0x300);
+	return (input_port_read(space->machine, "IN0") & ~0x300) | (space->machine->rand() & 0x300);
 }
 
 static WRITE32_HANDLER( systemcontrol_w )

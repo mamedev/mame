@@ -211,7 +211,7 @@ static WRITE8_HANDLER( hitpoker_pic_w )
 #if 0
 static READ8_HANDLER( test_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 #endif
 

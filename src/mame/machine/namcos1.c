@@ -532,7 +532,7 @@ static READ8_HANDLER( key_type3_r )
 	op = (offset & 0x70) >> 4;
 
 	if (op == key_reg)		return key_id;
-	if (op == key_rng)		return mame_rand(space->machine);
+	if (op == key_rng)		return space->machine->rand();
 	if (op == key_swap4)	return (key[key_swap4_arg] << 4) | (key[key_swap4_arg] >> 4);
 	if (op == key_bottom4)	return (offset << 4) | (key[key_swap4_arg] & 0x0f);
 	if (op == key_top4)		return (offset << 4) | (key[key_swap4_arg] >> 4);

@@ -149,7 +149,7 @@ static PALETTE_INIT( sdpoker )
 
 static READ8_HANDLER( sdpoker_rng_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static WRITE8_HANDLER( wdog8000_w )

@@ -344,9 +344,9 @@ static WRITE8_HANDLER(qx2_w){ }
 
 static WRITE8_HANDLER(qx3_w){ }
 
-static READ8_HANDLER(qx2_r){ return mame_rand(space->machine); }
+static READ8_HANDLER(qx2_r){ return space->machine->rand(); }
 
-static READ8_HANDLER(qx3_r){ return mame_rand(space->machine)&0xf; }
+static READ8_HANDLER(qx3_r){ return space->machine->rand()&0xf; }
 
 static READ8_HANDLER(qx0_r)
 {
@@ -623,7 +623,7 @@ GFXDECODE_END
 
 static READ8_DEVICE_HANDLER(f1_r)
 {
-	return mame_rand(device->machine);
+	return device->machine->rand();
 }
 
 static const ym2203_interface ppking_ym2203_interface =

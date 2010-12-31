@@ -354,7 +354,7 @@ static READ16_HANDLER(sharedram_r)
 				if(state->read_latch)
 				{
 					state->read_latch = 0;
-					return mame_rand(space->machine); // TODO
+					return space->machine->rand(); // TODO
 				}
 				break;
 
@@ -380,7 +380,7 @@ static READ16_HANDLER(sharedram_r)
 				if(state->read_latch)
 				{
 					state->read_latch = 0;
-					return mame_rand(space->machine); // TODO
+					return space->machine->rand(); // TODO
 				}
 				break;
 			case 0x642/2:

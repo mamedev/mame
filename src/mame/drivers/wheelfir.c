@@ -286,7 +286,7 @@ static READ16_HANDLER( wheelfir_status_r )
 
 */
 	wheelfir_state *state = space->machine->driver_data<wheelfir_state>();
-	return state->toggle_bit| (mame_rand(space->machine)&0x2000);
+	return state->toggle_bit| (space->machine->rand()&0x2000);
 }
 
 static WRITE16_HANDLER( wheelfir_scanline_cnt_w )

@@ -634,7 +634,7 @@ static WRITE8_HANDLER( led_w )
 
 static READ8_DEVICE_HANDLER( caterplr_rand_r )
 {
-	return mame_rand(device->machine) % 0xff;
+	return device->machine->rand() % 0xff;
 }
 
 

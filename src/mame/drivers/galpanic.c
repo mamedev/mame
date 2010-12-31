@@ -233,7 +233,7 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( kludge )
 {
-	return mame_rand(space->machine) & 0x0700;
+	return space->machine->rand() & 0x0700;
 }
 
 /* a kludge! */
@@ -242,7 +242,7 @@ static READ8_DEVICE_HANDLER( comad_okim6295_r )
 	UINT16 retvalue;
 
 //  retvalue = okim6295_r(offset,mem_mask) << 8; // doesn't work, causes lockups when girls change..
-	retvalue = mame_rand(device->machine);
+	retvalue = device->machine->rand();
 
 	return retvalue;
 }
@@ -306,7 +306,7 @@ ADDRESS_MAP_END
 #ifdef UNUSED_FUNCTION
 READ16_HANDLER( zipzap_random_read )
 {
-    return mame_rand(space->machine);
+    return space->machine->rand();
 }
 #endif
 

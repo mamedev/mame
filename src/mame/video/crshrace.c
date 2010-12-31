@@ -132,7 +132,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		zoomx = 16 - zoomtable[zoomx] / 8;
 		zoomy = 16 - zoomtable[zoomy] / 8;
 
-		if (buffered_spriteram[attr_start + 2] & 0x20ff) color = mame_rand(machine);
+		if (buffered_spriteram[attr_start + 2] & 0x20ff) color = machine->rand();
 
 		for (y = 0; y <= ysize; y++)
 		{

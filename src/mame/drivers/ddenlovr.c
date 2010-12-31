@@ -1640,8 +1640,8 @@ static READ8_DEVICE_HANDLER( quiz365_input_r )
 	if (!BIT(state->dsw_sel, 0))	return input_port_read(device->machine, "DSW1");
 	if (!BIT(state->dsw_sel, 1))	return input_port_read(device->machine, "DSW2");
 	if (!BIT(state->dsw_sel, 2))	return input_port_read(device->machine, "DSW3");
-	if (!BIT(state->dsw_sel, 3))	return 0xff;//mame_rand(device->machine);
-	if (!BIT(state->dsw_sel, 4))	return 0xff;//mame_rand(device->machine);
+	if (!BIT(state->dsw_sel, 3))	return 0xff;//device->machine->rand();
+	if (!BIT(state->dsw_sel, 4))	return 0xff;//device->machine->rand();
 	return 0xff;
 }
 
@@ -2016,8 +2016,8 @@ static READ8_HANDLER( rongrong_input_r )
 
 	if (!BIT(state->dsw_sel, 0))	return input_port_read(space->machine, "DSW1");
 	if (!BIT(state->dsw_sel, 1))	return input_port_read(space->machine, "DSW2");
-	if (!BIT(state->dsw_sel, 2))	return 0xff;//mame_rand(space->machine);
-	if (!BIT(state->dsw_sel, 3))	return 0xff;//mame_rand(space->machine);
+	if (!BIT(state->dsw_sel, 2))	return 0xff;//space->machine->rand();
+	if (!BIT(state->dsw_sel, 3))	return 0xff;//space->machine->rand();
 	if (!BIT(state->dsw_sel, 4))	return input_port_read(space->machine, "DSW3");
 	return 0xff;
 }
@@ -2536,7 +2536,7 @@ static WRITE8_DEVICE_HANDLER( hanakanz_oki_bank_w )
 
 static READ8_HANDLER( hanakanz_rand_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static ADDRESS_MAP_START( hanakanz_portmap, ADDRESS_SPACE_IO, 8 )

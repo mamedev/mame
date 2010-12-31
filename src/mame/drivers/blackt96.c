@@ -444,7 +444,7 @@ static WRITE8_HANDLER( blackt96_soundio_port00_w )
 
 static READ8_HANDLER( blackt96_soundio_port01_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static WRITE8_HANDLER( blackt96_soundio_port01_w )
@@ -454,7 +454,7 @@ static WRITE8_HANDLER( blackt96_soundio_port01_w )
 
 static READ8_HANDLER( blackt96_soundio_port02_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static WRITE8_HANDLER( blackt96_soundio_port02_w )

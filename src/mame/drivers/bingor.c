@@ -493,7 +493,7 @@ static VIDEO_UPDATE(bingor)
 #if 0
 static READ16_HANDLER( test_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 #endif
 
@@ -514,7 +514,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( test8_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static ADDRESS_MAP_START( pic_io_map, ADDRESS_SPACE_IO, 8 )

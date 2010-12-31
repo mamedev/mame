@@ -6044,7 +6044,7 @@ static DRIVER_INIT( karatour )
 	state->vram_2 = RAM + (0x20000/2) * 2;
 
 	for (i = 0; i < (0x20000 * 3) / 2; i++)
-		RAM[i] = mame_rand(machine);
+		RAM[i] = machine->rand();
 
 	DRIVER_INIT_CALL(metro);
 

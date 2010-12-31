@@ -97,7 +97,7 @@ static VIDEO_UPDATE(unclepoo)
 
 static READ8_HANDLER( unk_inp_r )
 {
-	return 0x00;//mame_rand(space->machine);
+	return 0x00;//space->machine->rand();
 }
 
 #if 0
@@ -109,7 +109,7 @@ static READ8_HANDLER( unk_inp2_r )
 
 static READ8_HANDLER( unk_inp3_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 #endif
 

@@ -181,7 +181,7 @@ static void ultennis_protection(running_machine *machine)
 	{
 		case 0x00:	/* reset */
 			prot_input_index = prot_output_index = 0;
-			prot_output[0] = mame_rand(machine);
+			prot_output[0] = machine->rand();
 			break;
 
 		case 0x01:	/* 01 aaaa bbbb cccc dddd (xxxx) */
@@ -271,7 +271,7 @@ static void cheesech_protection(running_machine *machine)
 	{
 		case 0x00:	/* reset */
 			prot_input_index = prot_output_index = 0;
-			prot_output[0] = mame_rand(machine);
+			prot_output[0] = machine->rand();
 			break;
 
 		case 0x01:	/* 01 aaaa bbbb (xxxx) */
@@ -465,7 +465,7 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER(unk_r)
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static ADDRESS_MAP_START( shtstar_map, ADDRESS_SPACE_PROGRAM, 16 )

@@ -838,7 +838,7 @@ static READ32_HANDLER ( stv_io_r32 )
 				}
 			}
 			//default:
-			//case 0x40: return mame_rand(space->machine);
+			//case 0x40: return space->machine->rand();
 			default:
 			//popmessage("%02x PORT SEL",port_sel);
 			return (input_port_read(space->machine, "P1") << 16) | (input_port_read(space->machine, "P2"));

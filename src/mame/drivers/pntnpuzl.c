@@ -259,7 +259,7 @@ static WRITE16_HANDLER( pntnpuzl_palette_w )
 #ifdef UNUSED_FUNCTION
 READ16_HANDLER ( pntnpuzl_random_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 #endif
 

@@ -93,7 +93,7 @@ static READ16_HANDLER( bmc_RAMDAC_color_r )
 
 static READ16_HANDLER(random_number_r)
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static UINT16 prot_data;
@@ -109,7 +109,7 @@ static READ16_HANDLER(prot_r)
 	}
 
 	logerror("unk prot r %x %x\n",prot_data,	cpu_get_previouspc(space->cpu));
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static WRITE16_HANDLER(prot_w)

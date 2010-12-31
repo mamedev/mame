@@ -1356,7 +1356,7 @@ ROM_END
 /*Temporary kludge for make the RNG work*/
 static READ8_HANDLER( jngolady_rng_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static DRIVER_INIT( jngolady )

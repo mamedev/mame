@@ -401,7 +401,7 @@ READ8_HANDLER( starwars_prng_r )
      */
 
 	/* Use MAME's PRNG for now */
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 

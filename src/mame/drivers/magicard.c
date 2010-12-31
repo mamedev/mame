@@ -438,7 +438,7 @@ static VIDEO_UPDATE(magicard)
 
 static READ16_HANDLER( test_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static WRITE16_HANDLER( paletteram_io_w )
@@ -481,7 +481,7 @@ static READ16_HANDLER( philips_66470_r )
 	switch(offset)
 	{
 //      case 0/2:
-//          return mame_rand(space->machine); //TODO
+//          return space->machine->rand(); //TODO
 	}
 
 	//printf("[%04x]\n",offset*2);
@@ -533,7 +533,7 @@ static READ16_HANDLER( scc68070_uart_r )
 
 	switch(offset)
 	{
-		case 0x02/2: return mame_rand(space->machine); //uart mode register
+		case 0x02/2: return space->machine->rand(); //uart mode register
 	}
 
 	return scc68070_uart_regs[offset];

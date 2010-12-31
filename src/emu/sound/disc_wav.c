@@ -586,7 +586,7 @@ DISCRETE_STEP(dss_noise)
 		if(context->phase > (2.0 * M_PI))
 		{
 			/* GCC's rand returns a RAND_MAX value of 0x7fff */
-			int newval = (mame_rand(node->info->device->machine) & 0x7fff) - 16384;
+			int newval = (node->info->device->machine->rand() & 0x7fff) - 16384;
 
 			/* make sure the peak to peak values are the amplitude */
 			node->output[0] = DSS_NOISE__AMP / 2;

@@ -28,7 +28,7 @@ static READ16_HANDLER( pip )
 
 static READ16_HANDLER( pap )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 

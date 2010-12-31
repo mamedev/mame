@@ -370,7 +370,7 @@ static READ32_HANDLER( skns_hit_r )
 	switch(adr) {
 	case 0x28:
 	case 0x2a:
-		return (UINT16)mame_rand(space->machine);
+		return (UINT16)space->machine->rand();
 	case 0x00:
 	case 0x10:
 		return (UINT16)hit.x_in;

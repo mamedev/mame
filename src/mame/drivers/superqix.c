@@ -516,7 +516,7 @@ static READ8_DEVICE_HANDLER(pbillian_ay_port_a_r)
 {
 //  logerror("%04x: ay_port_a_r\n",cpu_get_pc(space->cpu));
 	 /* bits 76------  MCU status bits */
-	return (mame_rand(device->machine) & 0xc0) | input_port_read(device->machine, "BUTTONS");
+	return (device->machine->rand() & 0xc0) | input_port_read(device->machine, "BUTTONS");
 }
 
 

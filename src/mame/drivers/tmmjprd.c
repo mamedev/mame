@@ -339,7 +339,7 @@ static READ32_HANDLER( tmmjprd_tilemap3_r )
 
 static READ32_HANDLER( randomtmmjprds )
 {
-	return 0x0000;//mame_rand(space->machine);
+	return 0x0000;//space->machine->rand();
 }
 
 

@@ -790,7 +790,7 @@ static UINT8 v9938_status_r(running_machine *machine)
             if ( (n < 28) || (n > 199) ) vdp.statReg[2] |= 0x20;
             else vdp.statReg[2] &= ~0x20;
 */
-			if (mame_rand(machine) & 1) vdp->statReg[2] |= 0x20;
+			if (machine->rand() & 1) vdp->statReg[2] |= 0x20;
 			else vdp->statReg[2] &= ~0x20;
 			ret = vdp->statReg[2];
 			break;

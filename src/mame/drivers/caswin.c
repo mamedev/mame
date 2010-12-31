@@ -105,7 +105,7 @@ static WRITE8_HANDLER( vvillage_vregs_w )
 
 static READ8_HANDLER( vvillage_rng_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static WRITE8_HANDLER( vvillage_output_w )

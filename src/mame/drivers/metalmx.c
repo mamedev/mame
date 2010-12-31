@@ -312,7 +312,7 @@ static VIDEO_UPDATE( metalmx )
 
 static READ32_HANDLER( unk_r )
 {
-	return 0;//mame_rand(space->machine);
+	return 0;//space->machine->rand();
 }
 
 static READ32_HANDLER( watchdog_r )

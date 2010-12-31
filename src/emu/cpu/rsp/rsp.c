@@ -303,7 +303,7 @@ static CPU_INIT( rsp )
 #endif
 
 	// ...except for the accumulators.
-	// We're not calling mame_rand() because initializing something with mame_rand()
+	// We're not calling machine->rand() because initializing something with machine->rand()
 	//   makes me retch uncontrollably.
 	for(accumIdx = 0; accumIdx < 8; accumIdx++ )
 	{

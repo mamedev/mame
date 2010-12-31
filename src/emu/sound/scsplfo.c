@@ -86,7 +86,7 @@ static void LFO_Init(running_machine *machine)
 
 		//noise
 		//a=lfo_noise[i];
-		a=mame_rand(machine)&0xff;
+		a=machine->rand()&0xff;
 		p=128-a;
 		ALFO_NOI[i]=a;
 		PLFO_NOI[i]=p;

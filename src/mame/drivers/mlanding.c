@@ -524,7 +524,7 @@ static READ16_HANDLER( dsp_HOLD_signal_r )
 
 static READ8_HANDLER( test_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 //mecha driver ?

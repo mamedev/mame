@@ -41,13 +41,13 @@ static VIDEO_UPDATE( timetrv )
 
 static READ8_HANDLER( test1_r )
 {
-	return input_port_read(space->machine, "IN0");//mame_rand(space->machine);
+	return input_port_read(space->machine, "IN0");//space->machine->rand();
 }
 
 static READ8_HANDLER( test2_r )
 {
 	/*bit 7,eeprom read bit*/
-	return (input_port_read(space->machine, "IN1") & 0x7f);//mame_rand(space->machine);
+	return (input_port_read(space->machine, "IN1") & 0x7f);//space->machine->rand();
 }
 
 
@@ -58,7 +58,7 @@ static READ8_HANDLER( in_r )
 
 static READ8_HANDLER( ld_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static ADDRESS_MAP_START( timetrv_map, ADDRESS_SPACE_PROGRAM, 8 )

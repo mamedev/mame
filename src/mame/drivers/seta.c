@@ -2184,37 +2184,37 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( setaroul_c0_r )
 {
-	return 0x00;//mame_rand(space->machine);
+	return 0x00;//space->machine->rand();
 }
 
 static READ16_HANDLER( setaroul_d4_0_r )
 {
-	return 0x00;//mame_rand(space->machine);
+	return 0x00;//space->machine->rand();
 }
 
 static READ16_HANDLER( setaroul_d4_4_r )
 {
-	return 0x00;//mame_rand(space->machine);
+	return 0x00;//space->machine->rand();
 }
 
 static READ16_HANDLER( setaroul_d4_6_r )
 {
-	return 0xffff;//mame_rand(space->machine);
+	return 0xffff;//space->machine->rand();
 }
 
 static READ16_HANDLER( setaroul_d4_8_r )
 {
-	return mame_rand(space->machine)&0x000f;
+	return space->machine->rand()&0x000f;
 }
 
 static READ16_HANDLER( setaroul_d4_a_r )
 {
-	return 0x00;//mame_rand(space->machine);
+	return 0x00;//space->machine->rand();
 }
 
 static READ16_HANDLER( setaroul_d4_10_r )
 {
-	return 0x00;// mame_rand(space->machine);
+	return 0x00;// space->machine->rand();
 }
 
 
@@ -2872,7 +2872,7 @@ static WRITE16_HANDLER( jockeyc_mux_w )
 
 static READ16_HANDLER( unk_r )
 {
-	return 0xffff;//mame_rand(space->machine);
+	return 0xffff;//space->machine->rand();
 }
 
 /* same as International Toote but without the protection and different RTC hook-up */

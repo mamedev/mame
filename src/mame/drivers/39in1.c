@@ -829,23 +829,23 @@ static READ32_HANDLER( pxa255_gpio_r )
 			verboselog( space->machine, 3, "pxa255_gpio_r: GPIO Pin Direction Register 2: %08x & %08x\n", gpio_regs->gpdr2, mem_mask );
 			return gpio_regs->gpdr2;
 		case PXA255_GPSR0:
-			verboselog( space->machine, 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Set Register 0: %08x & %08x\n", mame_rand(space->machine), mem_mask );
-			return mame_rand(space->machine);
+			verboselog( space->machine, 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Set Register 0: %08x & %08x\n", space->machine->rand(), mem_mask );
+			return space->machine->rand();
 		case PXA255_GPSR1:
-			verboselog( space->machine, 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Set Register 1: %08x & %08x\n", mame_rand(space->machine), mem_mask );
-			return mame_rand(space->machine);
+			verboselog( space->machine, 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Set Register 1: %08x & %08x\n", space->machine->rand(), mem_mask );
+			return space->machine->rand();
 		case PXA255_GPSR2:
-			verboselog( space->machine, 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Set Register 2: %08x & %08x\n", mame_rand(space->machine), mem_mask );
-			return mame_rand(space->machine);
+			verboselog( space->machine, 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Set Register 2: %08x & %08x\n", space->machine->rand(), mem_mask );
+			return space->machine->rand();
 		case PXA255_GPCR0:
-			verboselog( space->machine, 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Clear Register 0: %08x & %08x\n", mame_rand(space->machine), mem_mask );
-			return mame_rand(space->machine);
+			verboselog( space->machine, 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Clear Register 0: %08x & %08x\n", space->machine->rand(), mem_mask );
+			return space->machine->rand();
 		case PXA255_GPCR1:
-			verboselog( space->machine, 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Clear Register 1: %08x & %08x\n", mame_rand(space->machine), mem_mask );
-			return mame_rand(space->machine);
+			verboselog( space->machine, 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Clear Register 1: %08x & %08x\n", space->machine->rand(), mem_mask );
+			return space->machine->rand();
 		case PXA255_GPCR2:
-			verboselog( space->machine, 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Clear Register 2: %08x & %08x\n", mame_rand(space->machine), mem_mask );
-			return mame_rand(space->machine);
+			verboselog( space->machine, 3, "pxa255_gpio_r: (Invalid Read) GPIO Pin Output Clear Register 2: %08x & %08x\n", space->machine->rand(), mem_mask );
+			return space->machine->rand();
 		case PXA255_GRER0:
 			verboselog( space->machine, 3, "pxa255_gpio_r: GPIO Rising Edge Detect Enable Register 0: %08x & %08x\n", gpio_regs->grer0, mem_mask );
 			return gpio_regs->grer0;

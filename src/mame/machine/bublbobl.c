@@ -323,7 +323,7 @@ READ8_HANDLER( boblbobl_ic43_a_r )
 	if (offset == 0)
 		return state->ic43_a << 4;
 	else
-		return mame_rand(space->machine) & 0xff;
+		return space->machine->rand() & 0xff;
 }
 
 WRITE8_HANDLER( boblbobl_ic43_a_w )
@@ -505,7 +505,7 @@ WRITE8_HANDLER( bublbobl_68705_port_b_w )
 	if ((state->ddr_b & 0x20) && (~data & 0x20) && (state->port_b_out & 0x20))
 	{
 		/* hack to get random EXTEND letters (who is supposed to do this? 68705? PAL?) */
-		state->mcu_sharedram[0x7c] = mame_rand(space->machine) % 6;
+		state->mcu_sharedram[0x7c] = space->machine->rand() % 6;
 
 		cpu_set_input_line_vector(state->maincpu, 0, state->mcu_sharedram[0]);
 		cpu_set_input_line(state->maincpu, 0, HOLD_LINE);

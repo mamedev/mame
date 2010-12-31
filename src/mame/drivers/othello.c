@@ -134,7 +134,7 @@ ADDRESS_MAP_END
 static READ8_HANDLER( unk_87_r )
 {
 	/* n7751_status_r ?  bit 7 = ack/status from device connected  to port 8a? */
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static WRITE8_HANDLER( unk_8a_w )
@@ -158,7 +158,7 @@ static WRITE8_HANDLER( unk_8c_w )
 
 static READ8_HANDLER( unk_8c_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static READ8_HANDLER( sound_ack_r )

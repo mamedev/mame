@@ -614,9 +614,9 @@ static INT8 cyclemb_8741_r(address_space *space,int num,int offset)
 					static UINT8 mux_r;
 					mux_r^=0x20;
 					if(mux_r & 0x20)
-						cyclemb_mcu.rxd = ((input_port_read(space->machine,"DSW3")) & 0x9f) | (mux_r) | (mame_rand(space->machine) & 0x40);
+						cyclemb_mcu.rxd = ((input_port_read(space->machine,"DSW3")) & 0x9f) | (mux_r) | (space->machine->rand() & 0x40);
 					else
-						cyclemb_mcu.rxd = ((input_port_read(space->machine,"IN0")) & 0x9f) | (mux_r) | (mame_rand(space->machine) & 0x40);
+						cyclemb_mcu.rxd = ((input_port_read(space->machine,"IN0")) & 0x9f) | (mux_r) | (space->machine->rand() & 0x40);
 				}
 				break;
 			}

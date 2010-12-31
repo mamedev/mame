@@ -282,7 +282,7 @@ static PALETTE_INIT( goldngam )
 
 static READ16_HANDLER(unk_r)
 {
-    int test1 = (mame_rand(space->machine) & 0xae00);
+    int test1 = (space->machine->rand() & 0xae00);
 //  popmessage("VAL = %02x", test1);
 
 	return test1;

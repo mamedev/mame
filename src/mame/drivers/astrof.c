@@ -455,7 +455,7 @@ static VIDEO_UPDATE( tomahawk )
 static READ8_HANDLER( shoot_r )
 {
 	/* not really sure about this */
-	return mame_rand(space->machine) & 8;
+	return space->machine->rand() & 8;
 }
 
 

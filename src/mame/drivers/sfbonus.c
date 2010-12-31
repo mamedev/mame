@@ -1097,22 +1097,22 @@ static WRITE8_HANDLER( sfbonus_bank_w )
 
 static READ8_HANDLER( sfbonus_2800_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static READ8_HANDLER( sfbonus_2801_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static READ8_HANDLER( sfbonus_2c00_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static READ8_HANDLER( sfbonus_2c01_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static READ8_HANDLER( sfbonus_3800_r )

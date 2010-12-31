@@ -21,7 +21,7 @@ static VIDEO_UPDATE( neptunp2 )
 
 static READ8_HANDLER( test_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static ADDRESS_MAP_START( neptunp2_map, ADDRESS_SPACE_PROGRAM, 8 )

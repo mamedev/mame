@@ -740,7 +740,7 @@ static void mjzoomin_mcu_run(running_machine *machine)
 		MCU_READ("KEY1", 0x0002, 0x000/2, 0x13);		/*CHI   (trusted)*/
 		MCU_READ("KEY0", 0x0004, 0x000/2, 0x14);		/*START1*/
 	}
-	jm_shared_ram[0x00c/2] = mame_rand(machine) & 0xffff;
+	jm_shared_ram[0x00c/2] = machine->rand() & 0xffff;
 	prg_prot++;
 	if(prg_prot > 0x10) { prg_prot = 0; }
 	jm_shared_ram[0x00e/2] = prg_prot;
@@ -784,7 +784,7 @@ static void urashima_mcu_run(running_machine *machine)
 		MCU_READ("KEY1", 0x0002, 0x300/2, 0x13);		/*CHI   (trusted)*/
 		MCU_READ("KEY0", 0x0004, 0x300/2, 0x14);		/*START1*/
 	}
-	jm_shared_ram[0x30c/2] = mame_rand(machine) & 0xffff;
+	jm_shared_ram[0x30c/2] = machine->rand() & 0xffff;
 	prg_prot++;
 	if(prg_prot > 0x10) { prg_prot = 0; }
 	jm_shared_ram[0x30e/2] = prg_prot;
@@ -825,7 +825,7 @@ static void second_mcu_run(running_machine *machine)
 
 //      MCU_READ("KEY0", 0x0004, 0x7b8/2, 0x03);        /*START1(correct?)  */
 	}
-	jm_shared_ram[0x20c/2] = mame_rand(machine) & 0xffff; //kakumei2
+	jm_shared_ram[0x20c/2] = machine->rand() & 0xffff; //kakumei2
 
 }
 

@@ -169,11 +169,11 @@ static void spacewar_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bi
 
 	/* Explosion - rising edge */
 	if (SOUNDVAL_RISING_EDGE(0x01))
-		sample_start(samples, 0, (mame_rand(machine) & 1) ? 0 : 6, 0);
+		sample_start(samples, 0, (machine->rand() & 1) ? 0 : 6, 0);
 
 	/* Fire sound - rising edge */
 	if (SOUNDVAL_RISING_EDGE(0x02))
-		sample_start(samples, 1, (mame_rand(machine) & 1) ? 1 : 7, 0);
+		sample_start(samples, 1, (machine->rand() & 1) ? 1 : 7, 0);
 
 	/* Player 1 thrust - 0=on, 1=off */
 	if (SOUNDVAL_FALLING_EDGE(0x04))

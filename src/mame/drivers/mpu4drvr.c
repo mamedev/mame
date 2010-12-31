@@ -1867,7 +1867,7 @@ INPUT_PORTS_END
 /* OKI M6376 (for Mating Game) FIXME */
 static READ16_DEVICE_HANDLER( oki_r )
 {
-	return mame_rand(device->machine);
+	return device->machine->rand();
 }
 
 static WRITE16_DEVICE_HANDLER( oki_w )

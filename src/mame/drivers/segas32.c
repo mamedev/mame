@@ -1020,7 +1020,7 @@ static WRITE16_HANDLER( random_number_16_w )
 
 static READ16_HANDLER( random_number_16_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static WRITE32_HANDLER( random_number_32_w )
@@ -1030,7 +1030,7 @@ static WRITE32_HANDLER( random_number_32_w )
 
 static READ32_HANDLER( random_number_32_r )
 {
-	return mame_rand(space->machine) ^ (mame_rand(space->machine) << 16);
+	return space->machine->rand() ^ (space->machine->rand() << 16);
 }
 
 

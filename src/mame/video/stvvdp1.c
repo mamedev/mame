@@ -962,7 +962,7 @@ static void drawpixel_generic(running_machine *machine, int x, int y, int patter
 				pix = pix+(stv2_current_sprite.CMDCOLR&0xff80);
 				transmask = 0x7f;
 				mode = 3;
-			//  pix = mame_rand(machine);
+			//  pix = machine->rand();
 				break;
 			case 0x0020: // mode 4 256 colour bank mode (8bits) (hanagumi title)
 				pix = gfxdata[patterndata+offsetcnt];
@@ -976,7 +976,7 @@ static void drawpixel_generic(running_machine *machine, int x, int y, int patter
 				transmask = 0xffff;
 				break;
 			default: // other settings illegal
-				pix = mame_rand(machine);
+				pix = machine->rand();
 				mode = 0;
 				transmask = 0xff;
 		}

@@ -179,7 +179,7 @@ void nvram_device::nvram_default()
 		{
 			UINT8 *nvram = reinterpret_cast<UINT8 *>(m_base);
 			for (int index = 0; index < m_length; index++)
-				nvram[index] = mame_rand(&m_machine);
+				nvram[index] = m_machine.rand();
 			break;
 		}
 

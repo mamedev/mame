@@ -679,7 +679,7 @@ static TGP_FUNCTION( f42 )
 	(void)b;
 	(void)c;
 	logerror("TGP f42 %f, %f, %f (%x)\n", a, b, c, pushpc);
-	//  fifoout_push_f((mame_rand(machine) % 1000) - 500);
+	//  fifoout_push_f((machine->rand() % 1000) - 500);
 	fifoout_push_f(0);
 	fifoout_push_f(0);
 	fifoout_push_f(0);
@@ -1531,7 +1531,7 @@ static TGP_FUNCTION( f100 )
 	int i;
 	logerror("TGP f100 get list (%x)\n", pushpc);
 	for(i=0; i<list_length; i++)
-		fifoout_push_f((mame_rand(machine) % 1000)/100.0);
+		fifoout_push_f((machine->rand() % 1000)/100.0);
 	next_fn();
 }
 

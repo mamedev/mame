@@ -75,7 +75,7 @@ static WRITE8_HANDLER( ddribble_coin_counter_w )
 
 static READ8_DEVICE_HANDLER( ddribble_vlm5030_busy_r )
 {
-	return mame_rand(device->machine); /* patch */
+	return device->machine->rand(); /* patch */
 	/* FIXME: remove ? */
 #if 0
 	if (vlm5030_bsy(device)) return 1;

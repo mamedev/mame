@@ -1026,7 +1026,7 @@ static WRITE8_HANDLER( youmab_extra_bank_w )
 
 static READ8_HANDLER( youmab_8a_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static WRITE8_HANDLER( youmab_81_w )

@@ -931,5 +931,5 @@ WRITE8_HANDLER( tigerhb_e803_w )
 READ8_HANDLER( perfrman_port_00_r )
 {
 	/* TODO */
-	return mame_rand(space->machine) & 1;
+	return space->machine->rand() & 1;
 }

@@ -338,7 +338,7 @@ static WRITE16_HANDLER( ramdac_fg_w )
 /*
 static READ16_HANDLER( test_r )
 {
-    return mame_rand(space->machine);
+    return space->machine->rand();
 }*/
 
 /*************************

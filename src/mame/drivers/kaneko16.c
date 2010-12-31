@@ -270,7 +270,7 @@ static MACHINE_RESET( shogwarr )
 
 static READ16_HANDLER( kaneko16_rnd_r )
 {
-	return mame_rand(space->machine) & 0xffff;
+	return space->machine->rand() & 0xffff;
 }
 
 static WRITE16_HANDLER( kaneko16_coin_lockout_w )

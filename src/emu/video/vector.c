@@ -200,7 +200,7 @@ void vector_add_point (running_machine *machine, int x, int y, rgb_t color, int 
 
 	if (flicker && (intensity > 0))
 	{
-		intensity += (intensity * (0x80-(mame_rand(machine)&0xff)) * flicker)>>16;
+		intensity += (intensity * (0x80-(machine->rand()&0xff)) * flicker)>>16;
 		if (intensity < 0)
 			intensity = 0;
 		if (intensity > 0xff)

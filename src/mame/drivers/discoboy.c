@@ -107,7 +107,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			}
 			else
 			{
-				code = mame_rand(machine);
+				code = machine->rand();
 			}
 		}
 
@@ -261,7 +261,7 @@ static READ8_HANDLER( rambank2_r )
 	else
 		printf("unk rb2_r\n");
 
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static WRITE8_HANDLER( rambank2_w )

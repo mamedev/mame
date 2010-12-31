@@ -668,11 +668,6 @@ inline const region_info *running_machine::region(const char *tag)
 	return m_regionlist.find(tag);
 }
 
-inline UINT32 mame_rand(running_machine *machine)
-{
-	return machine->rand();
-}
-
 inline UINT8 *memory_region(running_machine *machine, const char *name)
 {
 	const region_info *region = machine->region(name);

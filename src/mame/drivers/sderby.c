@@ -135,7 +135,7 @@ static READ16_HANDLER( rprot_r )
    If someone more skilled in 68K code can help to trace it,
    searching for an accurated response, I'll appreciate.
 */
-	return mame_rand(space->machine) & 0x1f;
+	return space->machine->rand() & 0x1f;
 }
 
 static WRITE16_HANDLER( rprot_w )

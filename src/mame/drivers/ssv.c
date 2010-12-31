@@ -425,7 +425,7 @@ static READ16_HANDLER( fake_r )   {   return ssv_scroll[offset];  }
 
 static READ16_HANDLER( drifto94_rand_r )
 {
-	return mame_rand(space->machine) & 0xffff;
+	return space->machine->rand() & 0xffff;
 }
 
 static ADDRESS_MAP_START( drifto94_map, ADDRESS_SPACE_PROGRAM, 16 )

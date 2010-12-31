@@ -209,8 +209,8 @@ static WRITE16_HANDLER( nndmseal_sound_bank_w )
 static READ16_HANDLER( tetrisp2_ip_1_word_r )
 {
 	return	( input_port_read(space->machine, "SYSTEM") &  0xfcff ) |
-			(           mame_rand(space->machine) & ~0xfcff ) |
-			(      1 << (8 + (mame_rand(space->machine)&1)) );
+			(           space->machine->rand() & ~0xfcff ) |
+			(      1 << (8 + (space->machine->rand()&1)) );
 }
 
 

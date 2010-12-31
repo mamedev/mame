@@ -70,7 +70,7 @@ static VIDEO_UPDATE(lions)
 
 static READ8_HANDLER( test_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 
@@ -215,39 +215,39 @@ static const ay8910_interface ay8910_config =
 //static READ8_DEVICE_HANDLER( input_a )
 //{
 //return input_port_read(machine, "IN0");
-//  return mame_rand(device->machine);
+//  return device->machine->rand();
 //return 0xff;
 //}
 
 //static READ8_DEVICE_HANDLER( input_b )
 //{
 //return input_port_read(machine, "IN1");
-//      return mame_rand(device->machine);
+//      return device->machine->rand();
 //return 0xff;
 //}
 
 static READ8_DEVICE_HANDLER( input_ca1 )
 {
-//      return mame_rand(device->machine);
+//      return device->machine->rand();
 	return 0x00;
 }
 
 static READ8_DEVICE_HANDLER( input_cb1 )
 {
-//      return mame_rand(device->machine);
+//      return device->machine->rand();
 	return 0x00;
 }
 
 static READ8_DEVICE_HANDLER( input_ca2 )
 {
-//      return mame_rand(device->machine);
+//      return device->machine->rand();
 
 	return 0x00;
 }
 
 static READ8_DEVICE_HANDLER( input_cb2 )
 {
-//      return mame_rand(device->machine);
+//      return device->machine->rand();
 
 	return 0x00;
 }

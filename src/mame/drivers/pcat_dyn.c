@@ -313,7 +313,7 @@ ADDRESS_MAP_END
 
 static READ32_HANDLER( kludge_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 /* 3c8-3c9 -> ramdac*/

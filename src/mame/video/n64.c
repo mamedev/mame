@@ -182,7 +182,7 @@ void Processor::VideoUpdate16(bitmap_t *bitmap)
 				/*
                 if (gamma_dither)
                 {
-                    dith = mame_rand(screen->machine) & 0x3f;
+                    dith = screen->machine->rand() & 0x3f;
                 }
                 if (gamma)
                 {
@@ -412,7 +412,7 @@ void Processor::ColorCombiner1Cycle(bool noisecompute)
 {
 	if (noisecompute)
 	{
-		m_noise_color.i.r = m_noise_color.i.g = m_noise_color.i.b = mame_rand(m_machine) & 0xff; // Not accurate...
+		m_noise_color.i.r = m_noise_color.i.g = m_noise_color.i.b = m_machine->rand() & 0xff; // Not accurate...
 	}
 
 	m_pixel_color.i.r = ColorCombinerEquation(*m_color_inputs.combiner_rgbsub_a_r[1],*m_color_inputs.combiner_rgbsub_b_r[1],*m_color_inputs.combiner_rgbmul_r[1],*m_color_inputs.combiner_rgbadd_r[1]);
@@ -428,7 +428,7 @@ void Processor::ColorCombiner2Cycle(bool noisecompute)
 {
 	if (noisecompute)
 	{
-		m_noise_color.i.r = m_noise_color.i.g = m_noise_color.i.b = mame_rand(m_machine) & 0xff; // HACK
+		m_noise_color.i.r = m_noise_color.i.g = m_noise_color.i.b = m_machine->rand() & 0xff; // HACK
 	}
 
 	m_combined_color.i.r = ColorCombinerEquation(*m_color_inputs.combiner_rgbsub_a_r[0],*m_color_inputs.combiner_rgbsub_b_r[0],*m_color_inputs.combiner_rgbmul_r[0],*m_color_inputs.combiner_rgbadd_r[0]);
@@ -939,7 +939,7 @@ void Processor::GetDitherValues(int x, int y, int* cdith, int* adith)
 		break;
 	case 2:
 		*cdith = s_magic_matrix[dithindex];
-		*adith = mame_rand(m_machine) & 7;
+		*adith = m_machine->rand() & 7;
 		break;
 	case 3:
 		*cdith = s_magic_matrix[dithindex];
@@ -954,26 +954,26 @@ void Processor::GetDitherValues(int x, int y, int* cdith, int* adith)
 		break;
 	case 6:
 		*cdith = s_bayer_matrix[dithindex];
-		*adith = mame_rand(m_machine) & 7;
+		*adith = m_machine->rand() & 7;
 		break;
 	case 7:
 		*cdith = s_bayer_matrix[dithindex];
 		*adith = 0;
 		break;
 	case 8:
-		*cdith = mame_rand(m_machine) & 7;
+		*cdith = m_machine->rand() & 7;
 		*adith = s_magic_matrix[dithindex];
 		break;
 	case 9:
-		*cdith = mame_rand(m_machine) & 7;
+		*cdith = m_machine->rand() & 7;
 		*adith = (~s_magic_matrix[dithindex]) & 7;
 		break;
 	case 10:
-		*cdith = mame_rand(m_machine) & 7;
+		*cdith = m_machine->rand() & 7;
 		*adith = (*cdith + 17) & 7;
 		break;
 	case 11:
-		*cdith = mame_rand(m_machine) & 7;
+		*cdith = m_machine->rand() & 7;
 		*adith = 0;
 		break;
 	case 12:
@@ -986,7 +986,7 @@ void Processor::GetDitherValues(int x, int y, int* cdith, int* adith)
 		break;
 	case 14:
 		*cdith = 0;
-		*adith = mame_rand(m_machine) & 7;
+		*adith = m_machine->rand() & 7;
 		break;
 	case 15:
 		*adith = *cdith = 0;

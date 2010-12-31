@@ -141,7 +141,7 @@ static READ8_HANDLER( panther_interrupt_clear_r )
 
 static READ8_HANDLER( panther_unk_r )
 {
-	return ((mame_rand(space->machine) & 0x01) | (input_port_read(space->machine, "C020") & 0xfe));
+	return ((space->machine->rand() & 0x01) | (input_port_read(space->machine, "C020") & 0xfe));
 }
 
 /*************************************

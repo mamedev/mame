@@ -2031,7 +2031,7 @@ static READ16_HANDLER( generic_cop_r )
 
 		/* needed by Godzilla for selecting a character ... rng? PIT? */
 		case 0x1a4/2:
-			return mame_rand(space->machine);
+			return space->machine->rand();
 
 		case 0x1b0/2:
 			return cop_status;

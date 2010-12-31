@@ -2581,7 +2581,7 @@ static WRITE8_HANDLER( s23_iob_p4_w )
 
 static READ8_HANDLER(iob_r)
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 /* H8/3334 (Namco C78) I/O board MCU */

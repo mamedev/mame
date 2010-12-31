@@ -586,7 +586,7 @@ INLINE void cps3_drawgfxzoom(bitmap_t *dest_bmp,const rectangle *clip,const gfx_
 											if (c&0x02) dest[x] |= 0x4000;
 											if (c&0x04) dest[x] |= 0x8000;
 											if (c&0x08) dest[x] |= 0x10000;
-											if (c&0xf0) dest[x] |= mame_rand(gfx->machine); // ?? not used?
+											if (c&0xf0) dest[x] |= gfx->machine->rand(); // ?? not used?
 										}
 										else
 										{

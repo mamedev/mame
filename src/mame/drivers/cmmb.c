@@ -148,7 +148,7 @@ static WRITE8_HANDLER( cmmb_output_w )
 
 static READ8_HANDLER( kludge_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 /* overlap empty addresses */

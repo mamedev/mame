@@ -568,7 +568,7 @@ static WRITE8_HANDLER(output2_w)
 
 static READ8_HANDLER(qc_b8_r)
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static ADDRESS_MAP_START( mem_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -725,7 +725,7 @@ static void drawCrt( running_machine *machine, bitmap_t *bitmap,const rectangle 
 					if ((tile & 0xc0) == 0xc0)
 					{
 						b = 1;
-						tile = mame_rand(machine) & 0x7f;//(tile >> 2) & 0xf;
+						tile = machine->rand() & 0x7f;//(tile >> 2) & 0xf;
 					}
 				}
 				else
@@ -887,9 +887,9 @@ static PALETTE_INIT(dwarfd)
 
 	for (i = 0; i < 256; i++)
 	{
-		int r = mame_rand(machine)|0x80;
-		int g = mame_rand(machine)|0x80;
-		int b = mame_rand(machine)|0x80;
+		int r = machine->rand()|0x80;
+		int g = machine->rand()|0x80;
+		int b = machine->rand()|0x80;
 		if (i == 0) r = g = b = 0;
 
 		palette_set_color(machine,i,MAKE_RGB(r,g,b));

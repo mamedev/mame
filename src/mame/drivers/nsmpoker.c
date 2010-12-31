@@ -139,7 +139,7 @@ static INTERRUPT_GEN( nsmpoker_interrupt )
 
 static READ8_HANDLER( debug_r )
 {
-	return mame_rand(space->machine) & 0xff;
+	return space->machine->rand() & 0xff;
 }
 
 

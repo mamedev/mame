@@ -297,20 +297,20 @@ static VIDEO_UPDATE(galpani3)
 				/*
                 else if (pridat==0x2f) // area outside of the girl
                 {
-                    //dst[0] = mame_rand(screen->machine)&0x3fff;
+                    //dst[0] = screen->machine->rand()&0x3fff;
                 }
 
                 else if (pridat==0x00) // the initial line / box that gets drawn
                 {
-                    //dst[0] = mame_rand(screen->machine)&0x3fff;
+                    //dst[0] = screen->machine->rand()&0x3fff;
                 }
                 else if (pridat==0x30) // during the 'gals boxes' on the intro
                 {
-                    //dst[0] = mame_rand(screen->machine)&0x3fff;
+                    //dst[0] = screen->machine->rand()&0x3fff;
                 }
                 else if (pridat==0x0c) // 'nice' at end of level
                 {
-                    //dst[0] = mame_rand(screen->machine)&0x3fff;
+                    //dst[0] = screen->machine->rand()&0x3fff;
                 }
                 else
                 {

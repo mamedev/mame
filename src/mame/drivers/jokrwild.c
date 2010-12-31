@@ -171,7 +171,7 @@ static READ8_HANDLER( rng_r )
 	if(cpu_get_pc(space->cpu) == 0xab3a)
 		return (offset == 2) ? 0x49 : 0x92;
 
-	return mame_rand(space->machine) & 0xff;
+	return space->machine->rand() & 0xff;
 }
 
 /*************************

@@ -470,7 +470,7 @@ static READ16_HANDLER( tmaster_blitter_r )
 
 static READ16_HANDLER( tmaster_coins_r )
 {
-	return input_port_read(space->machine, "COIN")|(mame_rand(space->machine)&0x0800);
+	return input_port_read(space->machine, "COIN")|(space->machine->rand()&0x0800);
 }
 
 static ADDRESS_MAP_START( tmaster_map, ADDRESS_SPACE_PROGRAM, 16 )

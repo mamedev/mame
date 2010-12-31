@@ -459,7 +459,7 @@ WRITE32_HANDLER( trap_write )
 
 static READ32_HANDLER( hng64_random_read )
 {
-	return mame_rand(space->machine)&0xffffffff;
+	return space->machine->rand()&0xffffffff;
 }
 #endif
 
@@ -530,7 +530,7 @@ static READ32_HANDLER( hng64_sysregs_r )
 
 	switch(offset*4)
 	{
-		case 0x001c: return mame_rand(space->machine); // hng64 hangs on start-up if zero.
+		case 0x001c: return space->machine->rand(); // hng64 hangs on start-up if zero.
 		//case 0x106c:
 		//case 0x107c:
 		case 0x1084: return 0x00000002; //MCU->MIPS latch port
@@ -559,7 +559,7 @@ static READ32_HANDLER( hng64_sysregs_r )
 
 //  printf("%08x\n",offset*4);
 
-//  return mame_rand(space->machine)&0xffffffff;
+//  return space->machine->rand()&0xffffffff;
 	return state->sysregs[offset];
 }
 
@@ -697,7 +697,7 @@ static READ32_HANDLER( shoot_io_r )
 		{
 			/* Quick kludge for use the input test items */
 			if(input_port_read(space->machine, "D_IN") & 0x01000000)
-				state->p1_trig = mame_rand(space->machine) & 0x01000000;
+				state->p1_trig = space->machine->rand() & 0x01000000;
 
 			return (input_port_read(space->machine, "D_IN") & ~0x01000000) | (state->p1_trig);
 		}

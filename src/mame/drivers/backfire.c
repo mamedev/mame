@@ -215,7 +215,7 @@ static VIDEO_UPDATE( backfire )
 static READ32_DEVICE_HANDLER( backfire_eeprom_r )
 {
 	/* some kind of screen indicator?  checked by backfirea set before it will boot */
-	int backfire_screen = mame_rand(device->machine) & 1;
+	int backfire_screen = device->machine->rand() & 1;
 	return ((eeprom_read_bit(device) << 24) | input_port_read(device->machine, "IN0")
 			| ((input_port_read(device->machine, "IN2") & 0xbf) << 16)
 			| ((input_port_read(device->machine, "IN3") & 0x40) << 16)) ^ (backfire_screen << 26) ;
@@ -278,12 +278,12 @@ READ32_HANDLER( backfire_unknown_wheel_r )
 
 READ32_HANDLER( backfire_wheel1_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 READ32_HANDLER( backfire_wheel2_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 #endif
 

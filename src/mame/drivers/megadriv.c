@@ -895,7 +895,7 @@ static UINT16 vdp_get_word_from_68k_mem_default(running_machine *machine, UINT32
 	else
 	{
 		printf("DMA Read unmapped %06x\n",source);
-		return mame_rand(machine);
+		return machine->rand();
 	}
 
 
@@ -1275,7 +1275,7 @@ static UINT16 megadriv_vdp_data_port_r(running_machine *machine)
 {
 	UINT16 retdata=0;
 
-	//return mame_rand(machine);
+	//return machine->rand();
 
 	megadrive_vdp_command_pending = 0;
 
@@ -1289,12 +1289,12 @@ static UINT16 megadriv_vdp_data_port_r(running_machine *machine)
 
 		case 0x0001:
 			logerror("Attempting to READ from DATA PORT in VRAM WRITE MODE\n");
-			retdata = mame_rand(machine);
+			retdata = machine->rand();
 			break;
 
 		case 0x0003:
 			logerror("Attempting to READ from DATA PORT in CRAM WRITE MODE\n");
-			retdata = mame_rand(machine);
+			retdata = machine->rand();
 			break;
 
 		case 0x0004:
@@ -1315,7 +1315,7 @@ static UINT16 megadriv_vdp_data_port_r(running_machine *machine)
 
 		default:
 			logerror("Attempting to READ from DATA PORT in #UNDEFINED# MODE\n");
-			retdata = mame_rand(machine);
+			retdata = machine->rand();
 			break;
 	}
 
@@ -1622,7 +1622,7 @@ READ16_HANDLER( megadriv_vdp_r )
 		case 0x06:
 		//  if ((!ACCESSING_BITS_8_15) || (!ACCESSING_BITS_0_7)) mame_printf_debug("8-bit VDP read control port access, offset %04x mem_mask %04x\n",offset,mem_mask);
 			retvalue = megadriv_vdp_ctrl_port_r();
-		//  retvalue = mame_rand(space->machine);
+		//  retvalue = space->machine->rand();
 		//  mame_printf_debug("%06x: Read Control Port at scanline %d hpos %d (return %04x)\n",cpu_get_pc(space->cpu),genesis_scanline_counter, get_hposition(),retvalue);
 			break;
 
@@ -1632,7 +1632,7 @@ READ16_HANDLER( megadriv_vdp_r )
 		case 0x0e:
 		//  if ((!ACCESSING_BITS_8_15) || (!ACCESSING_BITS_0_7)) mame_printf_debug("8-bit VDP read HV counter port access, offset %04x mem_mask %04x\n",offset,mem_mask);
 			retvalue = megadriv_read_hv_counters();
-		//  retvalue = mame_rand(space->machine);
+		//  retvalue = space->machine->rand();
 		//  mame_printf_debug("%06x: Read HV counters at scanline %d hpos %d (return %04x)\n",cpu_get_pc(space->cpu),genesis_scanline_counter, get_hposition(),retvalue);
 			break;
 
@@ -1979,7 +1979,7 @@ READ16_HANDLER( megadriv_68k_io_read )
           D0 : Bit 0 of version number
       */
 
-	//return (mame_rand(space->machine)&0x0f0f)|0xf0f0;//0x0000;
+	//return (space->machine->rand()&0x0f0f)|0xf0f0;//0x0000;
 	switch (offset)
 	{
 		case 0:
@@ -2172,7 +2172,7 @@ static READ16_HANDLER( megadriv_68k_read_z80_ram )
 	else
 	{
 		logerror("%06x: 68000 attempting to access Z80 (read) address space without bus\n", cpu_get_pc(space->cpu));
-		return mame_rand(space->machine);
+		return space->machine->rand();
 	}
 }
 
@@ -2214,7 +2214,7 @@ static READ16_HANDLER( megadriv_68k_check_z80_bus )
        the value is never zero.  Time Killers is the most fussy, and doesn't like the
        read_next_instruction function from system16, so I just return a random value
        in the unused bits */
-	UINT16 nextvalue = mame_rand(space->machine);//read_next_instruction(space)&0xff00;
+	UINT16 nextvalue = space->machine->rand();//read_next_instruction(space)&0xff00;
 
 
 	/* Check if the 68k has the z80 bus */
@@ -2404,7 +2404,7 @@ static WRITE8_HANDLER( megadriv_z80_vdp_write )
 static READ8_HANDLER( megadriv_z80_vdp_read )
 {
 	mame_printf_debug("megadriv_z80_vdp_read %02x\n",offset);
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static READ8_HANDLER( megadriv_z80_unmapped_read )
@@ -5670,7 +5670,7 @@ INLINE UINT8 read_pixel_from_stampmap( running_machine* machine, bitmap_t* srcbi
 /*
     if (!srcbitmap)
     {
-        return mame_rand(machine);
+        return machine->rand();
     }
 
     if (x >= srcbitmap->width) return 0;
@@ -5739,8 +5739,8 @@ INLINE void write_pixel_to_imagebuffer( running_machine* machine, UINT32 pix, in
 
 		default:
 		case 0x03: // invalid?
-			segacd_dataram[offset] = mame_rand(machine);
-			segacd_dataram[offset+1] = mame_rand(machine);
+			segacd_dataram[offset] = machine->rand();
+			segacd_dataram[offset+1] = machine->rand();
 			break;
 
 	}
@@ -6759,7 +6759,7 @@ static void genesis_render_videoline_to_videobuffer(int scanline)
 
 	//mame_printf_debug("screenwidth %d\n",screenwidth);
 
-	//base_w = mame_rand(Machine)&0xff;
+	//base_w = Machine->rand()&0xff;
 
 	/* Calculate Exactly where we're going to draw the Window, and if the Window Bug applies */
 	window_is_bugged = 0;
@@ -7930,7 +7930,7 @@ static void genesis_render_videobuffer_to_screenbuffer(running_machine *machine,
 					case 0x1a000: // (sprite)shadow set, highlight set - not possible
 					case 0x1e000: // (sprite)shadow set, highlight set, normal set, not possible
 					default:
-						lineptr[x] = mame_rand(machine)&0x3f;
+						lineptr[x] = machine->rand()&0x3f;
 					break;
 				}
 			}
@@ -8681,7 +8681,7 @@ static NVRAM_HANDLER( megadriv )
 			{
 				int x;
 				for (x=0;x<megadriv_backupram_length/2;x++)
-					megadriv_backupram[x]=0xffff;//mame_rand(machine); // dino dini's needs 0xff or game rules are broken
+					megadriv_backupram[x]=0xffff;//machine->rand(); // dino dini's needs 0xff or game rules are broken
 			}
 		}
 	}

@@ -51,9 +51,9 @@ PALETTE_INIT(sbugger)
 
 	for (i = 0;i < 256;i++)
 	{
-		int r = mame_rand(machine)|0x80;
-		int g = mame_rand(machine)|0x80;
-		int b = mame_rand(machine)|0x80;
+		int r = machine->rand()|0x80;
+		int g = machine->rand()|0x80;
+		int b = machine->rand()|0x80;
 		if (i == 0) r = g = b = 0;
 
 		palette_set_color(machine,i*2+1,MAKE_RGB(r,g,b));

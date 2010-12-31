@@ -811,7 +811,7 @@ static int mhavoc_strobe2(vgdata *vg)
 					| ((vg->dvy >> 1) & 2)
 					| ((vg->dvy << 1) & 4)
 					| ((vg->dvy << 2) & 8)
-					| ((mame_rand(vg->machine) & 0x7) << 4);
+					| ((vg->machine->rand() & 0x7) << 4);
 			}
 			else
 			{

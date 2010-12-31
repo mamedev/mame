@@ -218,10 +218,6 @@ inline void operator--(_Type &value, int) { value = (_Type)((int)value - 1); }
 #define mame_strwildcmp		core_strwildcmp
 
 
-// prevent the use of rand() -- use mame_rand() instead
-#define rand __error_use_mame_rand_instead__
-
-
 // macros to convert radians to degrees and degrees to radians
 #define RADIAN_TO_DEGREE(x)   ((180.0 / M_PI) * (x))
 #define DEGREE_TO_RADIAN(x)   ((M_PI / 180.0) * (x))

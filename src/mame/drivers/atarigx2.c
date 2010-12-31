@@ -1126,7 +1126,7 @@ static READ32_HANDLER( atarigx2_protection_r )
 		if (lookup_table[i][0] == 0xffffffff)
 		{
 			if (state->last_write_offset*2 >= 0x700 && state->last_write_offset*2 < 0x720)
-				result = mame_rand(space->machine) << 16;
+				result = space->machine->rand() << 16;
 			else
 				result = 0xffff << 16;
 			logerror("%06X:Unhandled protection R@%04X = %04X\n", cpu_get_previouspc(space->cpu), offset, result);

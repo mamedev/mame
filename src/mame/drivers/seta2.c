@@ -759,7 +759,7 @@ static READ16_HANDLER( pzlbowl_protection_r )
 
 static READ16_HANDLER( pzlbowl_coins_r )
 {
-	return input_port_read(space->machine, "SYSTEM") | (mame_rand(space->machine) & 0x80 );
+	return input_port_read(space->machine, "SYSTEM") | (space->machine->rand() & 0x80 );
 }
 
 static WRITE16_HANDLER( pzlbowl_coin_counter_w )
@@ -939,7 +939,7 @@ static READ32_HANDLER( coldfire_regs_r )
 	switch( offset )
 	{
 		case CF_MBSR:
-			return mame_rand(space->machine);
+			return space->machine->rand();
 
 		case CF_PPDAT:
 			return input_port_read(space->machine, "BATTERY") << 16;

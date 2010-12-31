@@ -564,7 +564,7 @@ static WRITE16_HANDLER( lamps_w )
 
 static READ16_HANDLER( test_r )
 {
-	return 0xffff;//mame_rand(space->machine);
+	return 0xffff;//space->machine->rand();
 }
 
 #if 0
@@ -644,13 +644,13 @@ ADDRESS_MAP_END
 // MCU simulation (to be done)
 static READ8_HANDLER( bankrob_mcu1_r )
 {
-	UINT8 ret = 0;	// mame_rand(space->machine) gives "interesting" results
+	UINT8 ret = 0;	// space->machine->rand() gives "interesting" results
 	logerror("%s: mcu1 reads %02x\n", cpuexec_describe_context(space->machine), ret);
 	return ret;
 }
 static READ8_HANDLER( bankrob_mcu2_r )
 {
-	UINT8 ret = 0;	// mame_rand(space->machine) gives "interesting" results
+	UINT8 ret = 0;	// space->machine->rand() gives "interesting" results
 	logerror("%s: mcu2 reads %02x\n", cpuexec_describe_context(space->machine), ret);
 	return ret;
 }
@@ -727,13 +727,13 @@ ADDRESS_MAP_END
 // MCU simulation (to be done)
 static READ8_HANDLER( bankroba_mcu1_r )
 {
-	UINT8 ret = mame_rand(space->machine);	// mame_rand(space->machine) gives "interesting" results
+	UINT8 ret = space->machine->rand();	// space->machine->rand() gives "interesting" results
 	logerror("%s: mcu1 reads %02x\n", cpuexec_describe_context(space->machine), ret);
 	return ret;
 }
 static READ8_HANDLER( bankroba_mcu2_r )
 {
-	UINT8 ret = mame_rand(space->machine);	// mame_rand(space->machine) gives "interesting" results
+	UINT8 ret = space->machine->rand();	// space->machine->rand() gives "interesting" results
 	logerror("%s: mcu2 reads %02x\n", cpuexec_describe_context(space->machine), ret);
 	return ret;
 }
@@ -883,7 +883,7 @@ static WRITE16_DEVICE_HANDLER( crtc_lpen_w )
 // MCU simulation (to be done)
 static READ16_HANDLER( cjffruit_mcu_r )
 {
-	UINT8 ret = 0x00;	// mame_rand(space->machine) gives "interesting" results
+	UINT8 ret = 0x00;	// space->machine->rand() gives "interesting" results
 	logerror("%s: mcu reads %02x\n", cpuexec_describe_context(space->machine), ret);
 	return ret << 8;
 }
@@ -934,7 +934,7 @@ ADDRESS_MAP_END
 // MCU simulation (to be done)
 static READ16_HANDLER( deucesw2_mcu_r )
 {
-	UINT8 ret = 0x00;	// mame_rand(space->machine) gives "interesting" results
+	UINT8 ret = 0x00;	// space->machine->rand() gives "interesting" results
 	logerror("%s: mcu reads %02x\n", cpuexec_describe_context(space->machine), ret);
 	return ret << 8;
 }
@@ -1030,13 +1030,13 @@ ADDRESS_MAP_END
 // MCU simulation (to be done)
 static READ8_HANDLER( dualgame_mcu1_r )
 {
-	UINT8 ret = 0;	// mame_rand(space->machine) gives "interesting" results
+	UINT8 ret = 0;	// space->machine->rand() gives "interesting" results
 	logerror("%s: mcu1 reads %02x\n", cpuexec_describe_context(space->machine), ret);
 	return ret;
 }
 static READ8_HANDLER( dualgame_mcu2_r )
 {
-	UINT8 ret = 0;	// mame_rand(space->machine) gives "interesting" results
+	UINT8 ret = 0;	// space->machine->rand() gives "interesting" results
 	logerror("%s: mcu2 reads %02x\n", cpuexec_describe_context(space->machine), ret);
 	return ret;
 }
@@ -1118,7 +1118,7 @@ ADDRESS_MAP_END
 // MCU simulation (to be done)
 static READ16_HANDLER( hermit_mcu_r )
 {
-	UINT8 ret = 0x00;	// mame_rand(space->machine) gives "interesting" results
+	UINT8 ret = 0x00;	// space->machine->rand() gives "interesting" results
 	logerror("%s: mcu reads %02x\n", cpuexec_describe_context(space->machine), ret);
 	return ret << 8;
 }
@@ -1197,13 +1197,13 @@ ADDRESS_MAP_END
 // MCU simulation (to be done)
 static READ8_HANDLER( maxidbl_mcu1_r )
 {
-	UINT8 ret = 0;	// mame_rand(space->machine) gives "interesting" results
+	UINT8 ret = 0;	// space->machine->rand() gives "interesting" results
 	logerror("%s: mcu1 reads %02x\n", cpuexec_describe_context(space->machine), ret);
 	return ret;
 }
 static READ8_HANDLER( maxidbl_mcu2_r )
 {
-	UINT8 ret = 0;	// mame_rand(space->machine) gives "interesting" results
+	UINT8 ret = 0;	// space->machine->rand() gives "interesting" results
 	logerror("%s: mcu2 reads %02x\n", cpuexec_describe_context(space->machine), ret);
 	return ret;
 }

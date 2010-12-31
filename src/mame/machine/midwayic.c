@@ -126,8 +126,8 @@ static void generate_serial_data(running_machine *machine, int upper)
 	serial_digit[7] = (serial_number / 10) % 10;
 	serial_digit[8] = (serial_number / 1) % 10;
 
-	serial.data[12] = mame_rand(machine) & 0xff;
-	serial.data[13] = mame_rand(machine) & 0xff;
+	serial.data[12] = machine->rand() & 0xff;
+	serial.data[13] = machine->rand() & 0xff;
 
 	serial.data[14] = 0; /* ??? */
 	serial.data[15] = 0; /* ??? */

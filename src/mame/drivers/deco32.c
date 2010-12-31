@@ -396,10 +396,10 @@ static READ32_HANDLER( dragngun_service_r )
 static READ32_HANDLER( lockload_gun_mirror_r )
 {
 //logerror("%08x:Read gun %d\n",cpu_get_pc(space->cpu),offset);
-//return ((mame_rand(space->machine)%0xffff)<<16) | mame_rand(space->machine)%0xffff;
+//return ((space->machine->rand()%0xffff)<<16) | space->machine->rand()%0xffff;
 	if (offset) /* Mirror of player 1 and player 2 fire buttons */
-		return input_port_read(space->machine, "IN4") | ((mame_rand(space->machine)%0xff)<<16);
-	return input_port_read(space->machine, "IN3") | input_port_read(space->machine, "LIGHT0_X") | (input_port_read(space->machine, "LIGHT0_X")<<16) | (input_port_read(space->machine, "LIGHT0_X")<<24); //((mame_rand(space->machine)%0xff)<<16);
+		return input_port_read(space->machine, "IN4") | ((space->machine->rand()%0xff)<<16);
+	return input_port_read(space->machine, "IN3") | input_port_read(space->machine, "LIGHT0_X") | (input_port_read(space->machine, "LIGHT0_X")<<16) | (input_port_read(space->machine, "LIGHT0_X")<<24); //((space->machine->rand()%0xff)<<16);
 }
 
 static READ32_HANDLER( dragngun_prot_r )

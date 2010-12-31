@@ -70,7 +70,7 @@ static WRITE8_HANDLER( spcforce_SN76496_select_w )
 static READ8_HANDLER( spcforce_t0_r )
 {
 	/* SN76496 status according to Al - not supported by MAME?? */
-	return mame_rand(space->machine) & 1;
+	return space->machine->rand() & 1;
 }
 
 

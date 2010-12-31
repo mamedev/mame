@@ -278,7 +278,7 @@ static READ16_HANDLER ( dblewing_prot_r )
 
 	mame_printf_debug("dblewing prot r %08x, %04x, %04x\n", cpu_get_pc(space->cpu), offset * 2, mem_mask);
 
-	return 0;//mame_rand(space->machine);
+	return 0;//space->machine->rand();
 }
 
 static WRITE16_HANDLER( dblewing_prot_w )

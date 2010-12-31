@@ -35,7 +35,7 @@ static TILE_GET_INFO( get_macrossp_scra_tile_info )
 			break;
 
 		default:
-			color = mame_rand(machine) & 7;
+			color = machine->rand() & 7;
 			break;
 	}
 
@@ -73,7 +73,7 @@ static TILE_GET_INFO( get_macrossp_scrb_tile_info )
 			break;
 
 		default:
-			color = mame_rand(machine) & 7;
+			color = machine->rand() & 7;
 			break;
 	}
 
@@ -111,7 +111,7 @@ static TILE_GET_INFO( get_macrossp_scrc_tile_info )
 			break;
 
 		default:
-			color = mame_rand(machine) & 7;
+			color = machine->rand() & 7;
 			break;
 	}
 
@@ -232,7 +232,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					break;
 
 				default:
-					col = mame_rand(machine);
+					col = machine->rand();
 					break;
 			}
 

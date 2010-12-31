@@ -154,7 +154,7 @@ static WRITE8_HANDLER( ace_scoreram_w )
 
 static READ8_HANDLER( unk_r )
 {
-	return mame_rand(space->machine) & 0xff;
+	return space->machine->rand() & 0xff;
 }
 
 

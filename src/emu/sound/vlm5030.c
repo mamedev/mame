@@ -47,7 +47,7 @@ RST not only resets the chip on its rising edge but grabs a byte of mode state d
     9bit DAC is composed of 5bit Physical and 3bitPWM.
 
   todo:
-    Noise Generator circuit without 'mame_rand()' function.
+    Noise Generator circuit without 'machine->rand()' function.
 
 ----------- command format (Analytical result) ----------
 
@@ -411,7 +411,7 @@ static STREAM_UPDATE( vlm5030_update_callback )
 			}
 			else if (chip->old_pitch <= 1)
 			{	/* generate unvoiced samples here */
-				current_val = (mame_rand(chip->device->machine)&1) ? chip->current_energy : -chip->current_energy;
+				current_val = (chip->device->machine->rand()&1) ? chip->current_energy : -chip->current_energy;
 			}
 			else
 			{

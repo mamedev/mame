@@ -504,7 +504,7 @@ static READ16_HANDLER( mkturbo_prot_r )
 {
 	/* the security GAL overlays a counter of some sort at 0xfffff400 in ROM space.
      * A startup protection check expects to read back two different values in succession */
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 DRIVER_INIT( mkyturbo )

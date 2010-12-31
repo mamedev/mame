@@ -350,10 +350,10 @@ static TIMER_DEVICE_CALLBACK( ddealer_mcu_sim )
 	}
 
 	/*random number generators,controls order of cards*/
-	state->mcu_shared_ram[0x10 / 2] = mame_rand(timer.machine) & 0xffff;
-	state->mcu_shared_ram[0x12 / 2] = mame_rand(timer.machine) & 0xffff;
-	state->mcu_shared_ram[0x14 / 2] = mame_rand(timer.machine) & 0xffff;
-	state->mcu_shared_ram[0x16 / 2] = mame_rand(timer.machine) & 0xffff;
+	state->mcu_shared_ram[0x10 / 2] = timer.machine->rand() & 0xffff;
+	state->mcu_shared_ram[0x12 / 2] = timer.machine->rand() & 0xffff;
+	state->mcu_shared_ram[0x14 / 2] = timer.machine->rand() & 0xffff;
+	state->mcu_shared_ram[0x16 / 2] = timer.machine->rand() & 0xffff;
 }
 
 

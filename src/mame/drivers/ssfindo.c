@@ -313,7 +313,7 @@ static READ32_HANDLER(PS7500_IO_r)
 	switch(offset)
 	{
 		case MSECR:
-			return mame_rand(space->machine);
+			return space->machine->rand();
 
 		case IOLINES: //TODO: eeprom  24c01
 #if 0
@@ -323,7 +323,7 @@ static READ32_HANDLER(PS7500_IO_r)
 		if(flashType == 1)
 			return 0;
 		else
-			return mame_rand(space->machine);
+			return space->machine->rand();
 
 		case IRQSTA:
 			return (PS7500_IO[offset] & (~2)) | 0x80;
@@ -351,7 +351,7 @@ static READ32_HANDLER(PS7500_IO_r)
 		//default:
 			//mame_printf_debug("ior %i @%x\n",offset,cpu_get_pc(space->cpu));
 	}
-	return mame_rand(space->machine);//PS7500_IO[offset];
+	return space->machine->rand();//PS7500_IO[offset];
 }
 
 static WRITE32_HANDLER(PS7500_IO_w)
@@ -473,17 +473,17 @@ static WRITE32_HANDLER(debug_w)
 
 static READ32_HANDLER(ff4_r)
 {
-	return mame_rand(space->machine)&0x20;
+	return space->machine->rand()&0x20;
 }
 
 static READ32_HANDLER(SIMPLEIO_r)
 {
-	return mame_rand(space->machine)&1;
+	return space->machine->rand()&1;
 }
 
 static READ32_HANDLER(randomized_r)
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static ADDRESS_MAP_START( ssfindo_map, ADDRESS_SPACE_PROGRAM, 32 )

@@ -137,7 +137,7 @@ WRITE16_HANDLER( K055550_word_w )
 				else
 					if (dy < 0) i = 0x80;
 				else
-					i = mame_rand(space->machine) & 0xff; // vector direction indeterminate
+					i = space->machine->rand() & 0xff; // vector direction indeterminate
 
 				prot_data[0x10] = i;
 			break;

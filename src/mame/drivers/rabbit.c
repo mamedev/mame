@@ -486,7 +486,7 @@ static READ32_HANDLER( rabbit_tilemap3_r )
 
 static READ32_HANDLER( randomrabbits )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 /* rom bank is used when testing roms, not currently hooked up */

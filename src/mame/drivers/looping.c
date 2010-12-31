@@ -434,7 +434,7 @@ static WRITE8_HANDLER( plr2_w )
 
 static READ8_HANDLER( cop_io_r )
 {
-	// if (offset == 1) return mame_rand(space->machine) & 0x01;
+	// if (offset == 1) return space->machine->rand() & 0x01;
 	return 1; // cop_io[offset];
 }
 

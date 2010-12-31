@@ -110,13 +110,13 @@ static WRITE16_HANDLER( paldat_w )
 
 static READ16_HANDLER( peno_rand )
 {
-    return 0xffff;// mame_rand(space->machine);
+    return 0xffff;// space->machine->rand();
 }
 
 #ifdef UNUSED_FUNCTION
 static READ16_HANDLER( peno_rand2 )
 {
-    return mame_rand(space->machine);
+    return space->machine->rand();
 }
 #endif
 

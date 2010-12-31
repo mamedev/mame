@@ -298,7 +298,7 @@ static WRITE16_HANDLER( rdx_tx_vram_w )
 
 static READ16_HANDLER( rdx_v33_unknown_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 

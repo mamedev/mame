@@ -107,7 +107,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(rng_r)
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static WRITE8_HANDLER(port_w)

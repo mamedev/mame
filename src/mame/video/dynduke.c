@@ -213,7 +213,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 			if ((srcdat & 0x20) == pri)
 			{
 				if (srcdat & 0x10) srcdat += 0x400;
-				//if (srcdat & 0x10) srcdat += mame_rand(machine)&0x1f;
+				//if (srcdat & 0x10) srcdat += machine->rand()&0x1f;
 
 				srcdat = (srcdat & 0x000f) | ((srcdat & 0xffc0) >> 2);
 				dst[x] = srcdat;

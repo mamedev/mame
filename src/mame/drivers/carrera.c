@@ -258,7 +258,7 @@ static VIDEO_UPDATE(carrera)
 
 static READ8_DEVICE_HANDLER( unknown_r )
 {
-	return mame_rand(device->machine);
+	return device->machine->rand();
 }
 
 /* these are set as input, but I have no idea which input port it uses is for the AY */

@@ -666,7 +666,7 @@ static READ32_HANDLER( custom_key_r )
 
 	do
 	{ /* pick a random number, but don't pick the same twice in a row */
-		count = mame_rand(space->machine);
+		count = space->machine->rand();
 	} while( count==old_count );
 
 	switch( namcos2_gametype )
@@ -824,7 +824,7 @@ static READ32_HANDLER( gunbulet_gun_r )
 static
 READ32_HANDLER( randgen_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 } /* randgen_r */
 
 static

@@ -1470,7 +1470,7 @@ READ16_DEVICE_HANDLER( hd63484_status_r )
 //  if (cpu_get_pc(space->cpu) != 0xfced6 && cpu_get_pc(space->cpu) != 0xfe1d6)
 //      logerror("%05x: HD63484 status read\n",cpu_get_pc(space->cpu));
 
-	return 0xff22 | (mame_rand(device->machine) & 0x0004);	/* write FIFO ready + command end    +  (read FIFO ready or read FIFO not ready) */
+	return 0xff22 | (device->machine->rand() & 0x0004);	/* write FIFO ready + command end    +  (read FIFO ready or read FIFO not ready) */
 }
 
 WRITE16_DEVICE_HANDLER( hd63484_address_w )

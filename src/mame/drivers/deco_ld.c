@@ -173,7 +173,7 @@ static WRITE8_HANDLER( laserdisc_w )
 
 static READ8_HANDLER( test_r )
 {
-	return mame_rand(space->machine);
+	return space->machine->rand();
 }
 
 static ADDRESS_MAP_START( begas_map, ADDRESS_SPACE_PROGRAM, 8 )

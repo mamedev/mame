@@ -362,7 +362,7 @@ static WRITE32_HANDLER(sysh1_unk_w)
 #if 0
 static READ32_HANDLER(sysh1_ioga_r)
 {
-	//return mame_rand(space->machine);//h1_ioga[offset];
+	//return space->machine->rand();//h1_ioga[offset];
 	return h1_ioga[offset];
 }
 

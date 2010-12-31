@@ -26,7 +26,7 @@
       game will reset the index prior to playback so this isn't an issue.
 
     - While the noise emulation is complete, the data for the pseudo-random
-      bitstream is calculated by mame_rand() and is not a representation of what
+      bitstream is calculated by machine->rand() and is not a representation of what
       the actual hardware does.
 
     For some background on Hudson Soft's C62 chipset:
@@ -278,7 +278,7 @@ static STREAM_UPDATE( c6280_update )
                     p->channel[ch].noise_counter += step;
                     if(p->channel[ch].noise_counter >= 0x800)
                     {
-                        data = (mame_rand(p->device->machine) & 1) ? 0x1F : 0;
+                        data = (p->device->machine->rand() & 1) ? 0x1F : 0;
                     }
                     p->channel[ch].noise_counter &= 0x7FF;
                     outputs[0][i] += (INT16)(vll * (data - 16));
