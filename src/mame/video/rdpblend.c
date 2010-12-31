@@ -22,7 +22,7 @@ bool Blender::Blend1Cycle(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adse
 
 	if (!AlphaCompare(m_rdp->GetPixelColor()->i.a))
 	{
-		//return false;
+		return false;
 	}
 
 	if (m_other_modes->antialias_en ? (!m_misc_state->m_curpixel_cvg) : (!m_misc_state->m_curpixel_cvbit))
@@ -65,7 +65,7 @@ bool Blender::Blend2Cycle(UINT32* fr, UINT32* fg, UINT32* fb, int dith, int adse
 
 	if (!AlphaCompare(m_rdp->GetPixelColor()->i.a))
 	{
-		//return false;
+		return false;
 	}
 
 	if (m_other_modes->antialias_en ? (!m_misc_state->m_curpixel_cvg) : (!m_misc_state->m_curpixel_cvbit))
