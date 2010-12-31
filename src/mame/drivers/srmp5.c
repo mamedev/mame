@@ -35,7 +35,6 @@ This is not a bug (real machine behaves the same).
 
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mips/r3000.h"
 #include "sound/st0016.h"
@@ -194,7 +193,7 @@ static VIDEO_UPDATE( srmp5 )
 		{
 			if (state->tileduty[i] == 1)
 			{
-				decodechar(screen->machine->gfx[0], i, (UINT8 *)state->tileram);
+				gfx_element_decode(screen->machine->gfx[0], i);
 				state->tileduty[i] = 0;
 			}
 		}

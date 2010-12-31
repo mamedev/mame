@@ -26,7 +26,7 @@ UINT8 no_priority_size_is_wrong[2 * (sizeof(NO_PRIORITY) == 3) - 1];
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-void decodechar(const gfx_element *gfx, UINT32 code, const UINT8 *src);
+static void decodechar(const gfx_element *gfx, UINT32 code, const UINT8 *src);
 
 
 
@@ -429,7 +429,7 @@ static void calc_penusage(const gfx_element *gfx, UINT32 code)
     on a specified layout
 -------------------------------------------------*/
 
-void decodechar(const gfx_element *gfx, UINT32 code, const UINT8 *src)
+static void decodechar(const gfx_element *gfx, UINT32 code, const UINT8 *src)
 {
 	const gfx_layout *gl = &gfx->layout;
 	int israw = (gl->planeoffset[0] == GFX_RAW);
