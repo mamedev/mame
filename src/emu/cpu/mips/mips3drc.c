@@ -36,7 +36,7 @@
 
 extern unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op);
 
-
+#ifdef MIPS3_USE_DRC
 
 /***************************************************************************
     DEBUGGING
@@ -3665,7 +3665,6 @@ static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, i
 	}
 }
 
-
 /***************************************************************************
     NEC VR4300 VARIANTS
 ***************************************************************************/
@@ -4087,3 +4086,6 @@ DEFINE_LEGACY_CPU_DEVICE(QED5271LE, qed5271le);
 
 DEFINE_LEGACY_CPU_DEVICE(RM7000BE, rm7000be);
 DEFINE_LEGACY_CPU_DEVICE(RM7000LE, rm7000le);
+
+#endif	// MIPS3_USE_DRC
+

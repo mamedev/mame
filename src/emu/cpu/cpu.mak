@@ -832,7 +832,7 @@ $(CPUOBJ)/pic16c62x/pic16c62x.o:	$(CPUSRC)/pic16c62x/pic16c62x.c \
 ifneq ($(filter MIPS,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/mips
 CPUOBJS += $(CPUOBJ)/mips/r3000.o
-CPUOBJS += $(CPUOBJ)/mips/mips3com.o $(CPUOBJ)/mips/mips3fe.o $(CPUOBJ)/mips/mips3drc.o $(DRCOBJ)
+CPUOBJS += $(CPUOBJ)/mips/mips3com.o $(CPUOBJ)/mips/mips3.o $(CPUOBJ)/mips/mips3fe.o $(CPUOBJ)/mips/mips3drc.o $(DRCOBJ)
 CPUOBJS += $(CPUOBJ)/mips/psx.o
 DASMOBJS += $(CPUOBJ)/mips/r3kdasm.o
 DASMOBJS += $(CPUOBJ)/mips/mips3dsm.o
@@ -841,6 +841,9 @@ endif
 
 $(CPUOBJ)/mips/r3000.o:	$(CPUSRC)/mips/r3000.c \
 			$(CPUSRC)/mips/r3000.h
+
+$(CPUOBJ)/mips/mips3.o:	$(CPUSRC)/mips/mips3.h \
+				$(CPUSRC)/mips/mips3.c
 
 $(CPUOBJ)/mips/mips3com.o:	$(CPUSRC)/mips/mips3.h \
 				$(CPUSRC)/mips/mips3com.h
