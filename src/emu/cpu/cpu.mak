@@ -842,7 +842,7 @@ endif
 $(CPUOBJ)/mips/r3000.o:	$(CPUSRC)/mips/r3000.c \
 			$(CPUSRC)/mips/r3000.h
 
-$(CPUOBJ)/mips/mips3.o:	$(CPUSRC)/mips/mips3.h \
+$(CPUOBJ)/mips/mips3.o:	$(CPUSRC)/mips/mips3.h $(CPUSRC)/mips/mips3com.h \
 				$(CPUSRC)/mips/mips3.c
 
 $(CPUOBJ)/mips/mips3com.o:	$(CPUSRC)/mips/mips3.h \
