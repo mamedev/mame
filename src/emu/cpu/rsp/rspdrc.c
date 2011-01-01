@@ -2539,7 +2539,7 @@ INLINE void cfunc_rsp_vne(void *param)
 	int sel;
 	rsp->flag[1] = 0;
 
-	for (i=0; i < 8; i++)//переписано мной
+	for (i=0; i < 8; i++)//?????????? ????
 	{
 		sel = VEC_EL_2(EL, i);
 
@@ -2894,7 +2894,7 @@ INLINE void cfunc_rsp_vmrg(void *param)
 		}
 		else
 		{
-			vres[i] = VREG_S(VS2REG, sel);//моё исправление
+			vres[i] = VREG_S(VS2REG, sel);//??? ???????????
 		}
 
 		ACCUM_L(i) = vres[i];
@@ -3056,7 +3056,7 @@ INLINE void cfunc_rsp_vrcp(void *param)
 	{
 		for (i = 0; i < 32; i++)
 		{
-			if (datainput & (1 << ((~i) & 0x1f)))//т.ж.что 31 - i
+			if (datainput & (1 << ((~i) & 0x1f)))//?.?.??? 31 - i
 			{
 				shifter = i;
 				break;
@@ -3141,7 +3141,7 @@ INLINE void cfunc_rsp_vrcpl(void *param)
 	{
 		for (i = 0; i < 32; i++)
 		{
-			if (datainput & (1 << ((~i) & 0x1f)))//т.ж.что 31 - i
+			if (datainput & (1 << ((~i) & 0x1f)))//?.?.??? 31 - i
 			{
 				shifter = i;
 				break;
@@ -3259,7 +3259,7 @@ INLINE void cfunc_rsp_vrsql(void *param)
 	{
 		for (i = 0; i < 32; i++)
 		{
-			if (datainput & (1 << ((~i) & 0x1f)))//т.ж.что 31 - i
+			if (datainput & (1 << ((~i) & 0x1f)))//?.?.??? 31 - i
 			{
 				shifter = i;
 				break;
@@ -3677,11 +3677,11 @@ static void static_generate_memory_accessor(rsp_state *rsp, int size, int iswrit
 	{
 		if (size == 1)
 		{
-			//UML_MOV(block, MEM(&rsp->impstate->arg0), IREG(0));					// mov     [arg0],i0
-			//UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(1));					// mov     [arg1],i1
-			//UML_MOV(block, MEM(&rsp->impstate->arg2), IMM(0));					// mov     [arg2],0
-			//UML_MOV(block, MEM(&rsp->impstate->arg3), MEM(&rsp->pc));			// mov     [arg3],pc
-			//UML_CALLC(block, cfunc_printf_debug, rsp);							// callc   cfunc_printf_debug
+			//UML_MOV(block, MEM(&rsp->impstate->arg0), IREG(0));                   // mov     [arg0],i0
+			//UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(1));                   // mov     [arg1],i1
+			//UML_MOV(block, MEM(&rsp->impstate->arg2), IMM(0));                    // mov     [arg2],0
+			//UML_MOV(block, MEM(&rsp->impstate->arg3), MEM(&rsp->pc));         // mov     [arg3],pc
+			//UML_CALLC(block, cfunc_printf_debug, rsp);                            // callc   cfunc_printf_debug
 #ifdef LSB_FIRST
 			UML_XOR(block, IREG(0), IREG(0), IMM(3));									// xor     i0,i0,3
 #endif
@@ -3690,11 +3690,11 @@ static void static_generate_memory_accessor(rsp_state *rsp, int size, int iswrit
 		}
 		else if (size == 2)
 		{
-			//UML_MOV(block, MEM(&rsp->impstate->arg0), IREG(0));					// mov     [arg0],i0
-			//UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(1));					// mov     [arg1],i1
-			//UML_MOV(block, MEM(&rsp->impstate->arg2), IMM(1));					// mov     [arg2],1
-			//UML_MOV(block, MEM(&rsp->impstate->arg3), MEM(&rsp->pc));			// mov     [arg3],pc
-			//UML_CALLC(block, cfunc_printf_debug, rsp);							// callc   cfunc_printf_debug
+			//UML_MOV(block, MEM(&rsp->impstate->arg0), IREG(0));                   // mov     [arg0],i0
+			//UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(1));                   // mov     [arg1],i1
+			//UML_MOV(block, MEM(&rsp->impstate->arg2), IMM(1));                    // mov     [arg2],1
+			//UML_MOV(block, MEM(&rsp->impstate->arg3), MEM(&rsp->pc));         // mov     [arg3],pc
+			//UML_CALLC(block, cfunc_printf_debug, rsp);                            // callc   cfunc_printf_debug
 #ifdef LSB_FIRST
 			UML_TEST(block, IREG(0), IMM(1));											// test    i0,1
 			UML_JMPc(block, IF_NZ, unaligned_case);										// jnz     <unaligned_case>
@@ -3719,11 +3719,11 @@ static void static_generate_memory_accessor(rsp_state *rsp, int size, int iswrit
 		}
 		else if (size == 4)
 		{
-			//UML_MOV(block, MEM(&rsp->impstate->arg0), IREG(0));					// mov     [arg0],i0
-			//UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(1));					// mov     [arg1],i1
-			//UML_MOV(block, MEM(&rsp->impstate->arg2), IMM(2));					// mov     [arg2],2
-			//UML_MOV(block, MEM(&rsp->impstate->arg3), MEM(&rsp->pc));			// mov     [arg3],pc
-			//UML_CALLC(block, cfunc_printf_debug, rsp);							// callc   cfunc_printf_debug
+			//UML_MOV(block, MEM(&rsp->impstate->arg0), IREG(0));                   // mov     [arg0],i0
+			//UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(1));                   // mov     [arg1],i1
+			//UML_MOV(block, MEM(&rsp->impstate->arg2), IMM(2));                    // mov     [arg2],2
+			//UML_MOV(block, MEM(&rsp->impstate->arg3), MEM(&rsp->pc));         // mov     [arg3],pc
+			//UML_CALLC(block, cfunc_printf_debug, rsp);                            // callc   cfunc_printf_debug
 #ifdef LSB_FIRST
 			UML_TEST(block, IREG(0), IMM(3));											// test    i0,3
 			UML_JMPc(block, IF_NZ, unaligned_case);										// jnz     <unaligned_case>
@@ -3750,20 +3750,20 @@ static void static_generate_memory_accessor(rsp_state *rsp, int size, int iswrit
 		UML_MOV(block, MEM(&rsp->impstate->arg0), IREG(0));					// mov     [arg0],i0
 		if (size == 1)
 		{
-			//UML_MOV(block, MEM(&rsp->impstate->arg2), IMM(3));							// mov     [arg2],3
-			//UML_MOV(block, MEM(&rsp->impstate->arg3), MEM(&rsp->pc));			// mov     [arg3],pc
+			//UML_MOV(block, MEM(&rsp->impstate->arg2), IMM(3));                            // mov     [arg2],3
+			//UML_MOV(block, MEM(&rsp->impstate->arg3), MEM(&rsp->pc));         // mov     [arg3],pc
 #ifdef LSB_FIRST
 			UML_XOR(block, IREG(0), IREG(0), IMM(3));									// xor     i0,i0,3
 #endif
 			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));							// and     i0,i0,0xfff
 			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), BYTE);				// load    i0,dmem,i0,byte
-			//UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(0));							// mov     [arg1],i0
-			//UML_CALLC(block, cfunc_printf_debug, rsp);									// callc   cfunc_printf_debug
+			//UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(0));                           // mov     [arg1],i0
+			//UML_CALLC(block, cfunc_printf_debug, rsp);                                    // callc   cfunc_printf_debug
 		}
 		else if (size == 2)
 		{
-			//UML_MOV(block, MEM(&rsp->impstate->arg2), IMM(4));							// mov     [arg2],4
-			//UML_MOV(block, MEM(&rsp->impstate->arg3), MEM(&rsp->pc));			// mov     [arg3],pc
+			//UML_MOV(block, MEM(&rsp->impstate->arg2), IMM(4));                            // mov     [arg2],4
+			//UML_MOV(block, MEM(&rsp->impstate->arg3), MEM(&rsp->pc));         // mov     [arg3],pc
 #ifdef LSB_FIRST
 			UML_TEST(block, IREG(0), IMM(1));											// test    i0,1
 			UML_JMPc(block, IF_NZ, unaligned_case);										// jnz     <unaligned_case>
@@ -3771,8 +3771,8 @@ static void static_generate_memory_accessor(rsp_state *rsp, int size, int iswrit
 #endif
 			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));							// and     i0,i0,0xfff
 			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), WORD_x1);			// load    i0,dmem,i0,word_x1
-			//UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(0));							// mov     [arg1],i0
-			//UML_CALLC(block, cfunc_printf_debug, rsp);									// callc   cfunc_printf_debug
+			//UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(0));                           // mov     [arg1],i0
+			//UML_CALLC(block, cfunc_printf_debug, rsp);                                    // callc   cfunc_printf_debug
 			UML_RET(block);
 #ifdef LSB_FIRST
 			UML_LABEL(block, unaligned_case);										// unaligned_case:
@@ -3783,21 +3783,21 @@ static void static_generate_memory_accessor(rsp_state *rsp, int size, int iswrit
 			UML_ADD(block, IREG(1), IREG(1), IMM(48));									// add     i1,i1,48
 			UML_DROLAND(block, IREG(0), IREG(0), IREG(1), IMM(0xffff));					// droland i0,i0,i1,0xffff
 #endif
-			//UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(0));							// mov     [arg1],i0
-			//UML_CALLC(block, cfunc_printf_debug, rsp);									// callc   cfunc_printf_debug
+			//UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(0));                           // mov     [arg1],i0
+			//UML_CALLC(block, cfunc_printf_debug, rsp);                                    // callc   cfunc_printf_debug
 		}
 		else if (size == 4)
 		{
-			//UML_MOV(block, MEM(&rsp->impstate->arg2), IMM(5));							// mov     [arg2],5
-			//UML_MOV(block, MEM(&rsp->impstate->arg3), MEM(&rsp->pc));			// mov     [arg3],pc
+			//UML_MOV(block, MEM(&rsp->impstate->arg2), IMM(5));                            // mov     [arg2],5
+			//UML_MOV(block, MEM(&rsp->impstate->arg3), MEM(&rsp->pc));         // mov     [arg3],pc
 #ifdef LSB_FIRST
 			UML_TEST(block, IREG(0), IMM(3));											// test    i0,3
 			UML_JMPc(block, IF_NZ, unaligned_case);										// jnz     <unaligned_case>
 #endif
 			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));							// and     i0,i0,0xfff
 			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), DWORD_x1);			// load    i0,dmem,i0,dword_x1
-			//UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(0));							// mov     [arg1],i0
-			//UML_CALLC(block, cfunc_printf_debug, rsp);									// callc   cfunc_printf_debug
+			//UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(0));                           // mov     [arg1],i0
+			//UML_CALLC(block, cfunc_printf_debug, rsp);                                    // callc   cfunc_printf_debug
 			UML_RET(block);
 #ifdef LSB_FIRST
 			UML_LABEL(block, unaligned_case);										// unaligned_case:
@@ -3807,8 +3807,8 @@ static void static_generate_memory_accessor(rsp_state *rsp, int size, int iswrit
 			UML_DLOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), QWORD_x1);			// dload   i0,dmem,i0,qword_x1
 			UML_DROL(block, IREG(0), IREG(0), IREG(1));									// drol    i0,i0,i1
 #endif
-			//UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(0));							// mov     [arg1],i0
-			//UML_CALLC(block, cfunc_printf_debug, rsp);									// callc   cfunc_printf_debug
+			//UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(0));                           // mov     [arg1],i0
+			//UML_CALLC(block, cfunc_printf_debug, rsp);                                    // callc   cfunc_printf_debug
 		}
 	}
 	UML_RET(block);

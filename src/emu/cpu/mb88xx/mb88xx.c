@@ -310,7 +310,7 @@ static void update_pio( mb88_state *cpustate, int cycles )
 		cpustate->SI = ( cpustate->SI + 1 ) & 3;
 
 		/* the datasheet doesn't mention interrupt vectors but
-		the Arabian MCU program expects the following */
+        the Arabian MCU program expects the following */
 		if (cpustate->pending_interrupt & cpustate->pio & INT_CAUSE_EXTERNAL)
 		{
 			/* if we have a live external source, call the irqcallback */

@@ -45,7 +45,7 @@ struct ics2115_voice {
 	union {
         struct {
             UINT8 ulaw       : 1;
-            UINT8 stop	 	 : 1;	//stops wave + vol envelope
+            UINT8 stop		 : 1;	//stops wave + vol envelope
             UINT8 eightbit   : 1;
             UINT8 loop       : 1;
             UINT8 loop_bidir : 1;

@@ -912,7 +912,7 @@ static WRITE8_HANDLER( prot_io_w )
 			UINT16 word = state->mainram[(protbase/2) + semicom_prot_offset];
 			word = (word & 0x00ff) | (data << 8);
 			state->mainram[(protbase/2) + semicom_prot_offset] = word;
-			
+
 			break;
 		}
 

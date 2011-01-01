@@ -6756,7 +6756,7 @@ GFXDECODE_END
 ***************************************************************************/
 
 static GFXDECODE_START( usclssic )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       0, 			32 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       0,			32 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_3roms, 512+64*32*0, 32 ) // [1] Layer 1
 	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_3roms, 512+64*32*1, 32 ) // [2] Layer 1
 GFXDECODE_END

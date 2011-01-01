@@ -137,13 +137,13 @@ enum
 #define COPRO_CTRL_INTVEC_F                 1
 #define COPRO_CTRL_MASK                     0x0000338f
 
-#define COPRO_DOMAIN_ACCESS_CONTROL        	cpustate->domainAccessControl
+#define COPRO_DOMAIN_ACCESS_CONTROL     	cpustate->domainAccessControl
 
-#define COPRO_FAULT_STATUS        	cpustate->faultStatus
+#define COPRO_FAULT_STATUS      	cpustate->faultStatus
 
-#define COPRO_FAULT_ADDRESS       	cpustate->faultAddress
+#define COPRO_FAULT_ADDRESS     	cpustate->faultAddress
 
-#define COPRO_FCSE_PID       	cpustate->fcsePID
+#define COPRO_FCSE_PID      	cpustate->fcsePID
 
 /* Coprocessor Registers */
 #define ARM7COPRO_REGS \

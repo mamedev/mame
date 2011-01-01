@@ -10,7 +10,7 @@
 // set this to 0 if compiling against a "hg update 4464"
 // checkout of SDL 1.3
 
-#define SDL13_POST_HG4464 	(1)
+#define SDL13_POST_HG4464	(1)
 
 //============================================================
 //  System dependent defines

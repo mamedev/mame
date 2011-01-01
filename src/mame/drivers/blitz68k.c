@@ -492,7 +492,7 @@ static WRITE8_HANDLER( blit_draw_w )
 				pen = blit_rom[src];
 				src++;
 			}
-	
+
 			if (pen || !blit.trans)
 			{
 				if (pen <= 3)
@@ -768,7 +768,7 @@ static ADDRESS_MAP_START( bankroba_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x900000, 0x900007) AM_WRITE8( paletteram_bt476_w, 0xff00 ) // RAMDAC
 
-//	AM_RANGE(0x940000, 0x940001) AM_WRITE	// lev 6
+//  AM_RANGE(0x940000, 0x940001) AM_WRITE   // lev 6
 
 	AM_RANGE(0x980000, 0x980001) AM_WRITE8(blit_flag0_w, 0xff00)
 	AM_RANGE(0x980002, 0x980003) AM_WRITE8(blit_flag1_w, 0xff00)
@@ -817,7 +817,7 @@ static WRITE16_HANDLER( cjffruit_leds1_w )
 	{
 		coin_counter_w(space->machine, 0, data & 0x0100);	// coin in
 		set_led_status(space->machine, 0, data & 0x0200);	// win???
-//		                               1  data & 0x0400		// win???
+//                                     1  data & 0x0400     // win???
 		set_led_status(space->machine, 2, data & 0x0800);	// small
 		set_led_status(space->machine, 3, data & 0x1000);	// big
 		set_led_status(space->machine, 4, data & 0x2000);	// take
@@ -951,7 +951,7 @@ static WRITE16_HANDLER( deucesw2_leds1_w )
 	{
 		coin_counter_w(space->machine, 0, data & 0x0100);	// coin in
 		set_led_status(space->machine, 0, data & 0x0200);	// win???
-//		                               1  data & 0x0400		// win???
+//                                     1  data & 0x0400     // win???
 		set_led_status(space->machine, 2, data & 0x0800);	// small
 		set_led_status(space->machine, 3, data & 0x1000);	// big
 		set_led_status(space->machine, 4, data & 0x2000);	// take
@@ -1151,10 +1151,10 @@ static WRITE16_HANDLER( hermit_leds2_w )
 static READ16_HANDLER( hermit_track_r )
 {
 #ifdef MAME_DEBUG
-//	popmessage("track %02x %02x", input_port_read(space->machine, "TRACK_X"), input_port_read(space->machine, "TRACK_Y"));
+//  popmessage("track %02x %02x", input_port_read(space->machine, "TRACK_X"), input_port_read(space->machine, "TRACK_Y"));
 #endif
 
-	return 
+	return
 		((0xf - ((input_port_read(space->machine, "TRACK_Y") + 0x7) & 0xf)) << 12) |
 		((0xf - ((input_port_read(space->machine, "TRACK_X") + 0x7) & 0xf)) << 8)  ;
 }
@@ -1777,7 +1777,7 @@ static MACHINE_CONFIG_START( bankrob, driver_device )
 
 	// MC68HC705C8P (MCU2)
 
-//	MCFG_NVRAM_ADD_0FILL("nvram")
+//  MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1806,7 +1806,7 @@ static MACHINE_CONFIG_START( bankroba, driver_device )
 
 	// MC68HC705C8P (MCU)
 
-//	MCFG_NVRAM_ADD_0FILL("nvram")
+//  MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1834,7 +1834,7 @@ static MACHINE_CONFIG_START( deucesw2, driver_device )
 
 	// MC68HC705C8P (MCU)
 
-//	MCFG_NVRAM_ADD_0FILL("nvram")
+//  MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1864,7 +1864,7 @@ static MACHINE_CONFIG_START( dualgame, driver_device )
 
 	// MC68HC705C8P (MCU2)
 
-//	MCFG_NVRAM_ADD_0FILL("nvram")
+//  MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1892,7 +1892,7 @@ static MACHINE_CONFIG_START( hermit, driver_device )
 
 	// MC68HC705C8P (MCU)
 
-//	MCFG_NVRAM_ADD_0FILL("nvram")
+//  MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1925,7 +1925,7 @@ static MACHINE_CONFIG_START( maxidbl, driver_device )
 
 	// MC68HC705C8P (MCU3)
 
-//	MCFG_NVRAM_ADD_0FILL("nvram")
+//  MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1986,7 +1986,7 @@ Other:
   Jumpers for ROMs size
   DSW4
   3.6V Lithium battery
- 
+
 Sub Board --------------------
 
   Unknown
@@ -2008,7 +2008,7 @@ ROM_START( bankrob )
 	ROM_LOAD16_BYTE( "unknown_label.u70", 0x00000, 0x80000, CRC(35225bf6) SHA1(cd3176ab43c0678c6b9a92b9fafea116babdd534) )
 	ROM_LOAD16_BYTE( "unknown_label.u54", 0x00001, 0x80000, CRC(c7c0c2d1) SHA1(3b3b6954fbded65418492374aaa94e3c60af69c5) )
 
-//	ROM_REGION( 0x20000, "samples", 0 )	// 8 bit unsigned
+//  ROM_REGION( 0x20000, "samples", 0 ) // 8 bit unsigned
 
     ROM_REGION( 0x117, "plds", 0 )
     ROM_LOAD( "palce16v8h.u10", 0x000, 0x117, NO_DUMP )
@@ -2054,7 +2054,7 @@ Other:
   Jumpers for ROMs size
   DSW4
   3.6V Lithium battery
- 
+
 Sub Board --------------------
 
   Unknown
@@ -2506,7 +2506,7 @@ Hopper Board -----------------
   Model: HOP?
   Code:  ?
   Copyright 1992, Blitz System Inc.
- 
+
 Other:
   20 pin chip labelled "HOP-DEC"
   2 x DSW4

@@ -623,7 +623,7 @@ class Processor
 		UINT32*		GetCommandData() { return m_cmd_data; }
 		UINT32*		GetTempRectData() { return m_temp_rect_data; }
 
-		void 		GetDitherValues(int x, int y, int* cdith, int* adith);
+		void		GetDitherValues(int x, int y, int* cdith, int* adith);
 
 
 		int 			m_span_dr;

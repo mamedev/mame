@@ -5,7 +5,7 @@
 
 #include "devlegcy.h"
 
-int s14001a_bsy_r(device_t *device);  		/* read BUSY pin */
+int s14001a_bsy_r(device_t *device);		/* read BUSY pin */
 void s14001a_reg_w(device_t *device, int data);		/* write to input latch */
 void s14001a_rst_w(device_t *device, int data);		/* write to RESET pin */
 void s14001a_set_clock(device_t *device, int clock);     /* set VSU-1000 clock */

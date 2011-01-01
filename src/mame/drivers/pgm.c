@@ -491,7 +491,7 @@ static void sound_irq( device_t *device, int level )
 
 /*static const ics2115_interface pgm_ics2115_interface =
 {
-	sound_irq
+    sound_irq
 };*/
 
 
@@ -1402,8 +1402,8 @@ static MACHINE_CONFIG_START( pgm, pgm_state )
 	/*sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
     MCFG_ICS2115_ADD("ics", 0, sound_irq)
-//	MCFG_SOUND_ADD("ics", ICS2115, 0)
-//	MCFG_SOUND_CONFIG(pgm_ics2115_interface)
+//  MCFG_SOUND_ADD("ics", ICS2115, 0)
+//  MCFG_SOUND_CONFIG(pgm_ics2115_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
 MACHINE_CONFIG_END
 

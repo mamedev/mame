@@ -127,7 +127,7 @@ void TexturePipe::ShiftCopy(INT32* S, INT32* T, UINT32 num)
 	Tile* tile = m_rdp->GetTiles();
 	*S = SIGN16(*S);
 	*T = SIGN16(*T);
-	if (tile[num].shift_s < 11)//ô-ÿ tcu_tile
+	if (tile[num].shift_s < 11)//?-? tcu_tile
 	{
 		*S >>= tile[num].shift_s;
 	}
@@ -922,7 +922,7 @@ UINT32 TexturePipe::Fetch(INT32 s, INT32 t, INT32 tilenum)
 			switch(tsize)
 			{
 			case PIXEL_SIZE_16BIT:
- 				{
+				{
 					UINT16 *tc = m_rdp->GetTMEM16();
 
 					int taddr = (tbase << 3) + s;

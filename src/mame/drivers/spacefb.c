@@ -11,10 +11,10 @@
     Known issues/to-do's:
         * Bullet colors are incorrect.  The schematics cannot be right, so
           I am using pure red for now
-		  
-		  "MAME has the bullets and missiles as red, the real pcb shows them as
-		   yellow with red tinges, they are overal yellow/orange in appearance."
-		   (Andrew Welburn 24/12/10)
+
+          "MAME has the bullets and missiles as red, the real pcb shows them as
+           yellow with red tinges, they are overal yellow/orange in appearance."
+           (Andrew Welburn 24/12/10)
 
         * Analog sounds
 
@@ -396,7 +396,7 @@ ROM_START( spacefb )
 ROM_END
 
 
-// pcb is revision 03 and has roms with suffix 'e' 
+// pcb is revision 03 and has roms with suffix 'e'
 ROM_START( spacefbe )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tst-c-e.5e",      0x0000, 0x0800, CRC(77dda05b) SHA1(b8a42632587260509ba023c7e05d252972f90363) ) // only 5e differs to above set, by 2 bytes.
@@ -422,7 +422,7 @@ ROM_START( spacefbe )
 	ROM_LOAD( "mb7051.3n",   0x0000, 0x0020, CRC(465d07af) SHA1(25e246f7674c25d05e5f6e68db88c15aaa10cee1) )
 ROM_END
 
-// pcb is revision 04 and has roms with suffix 'u' 
+// pcb is revision 04 and has roms with suffix 'u'
 ROM_START( spacefbu )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tst-c-u.5e",      0x0000, 0x0800, CRC(79c3527e) SHA1(5f2d9f3a8b573333e40e78222996f556ed6686ea) )

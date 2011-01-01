@@ -3038,9 +3038,9 @@ ROM_END
 
   Nothing about them, except that they are running
   on ICP-1 type boards.
-  
+
   It's a supossed Jack Potten's Poker upgrade.
-  
+
 *************************************************************/
 
 ROM_START( ngold )
@@ -3056,7 +3056,7 @@ ROM_START( ngold )
 	ROM_LOAD( "1.4a",	0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    /* cards deck gfx, bitplane1 */
 	ROM_LOAD( "2.5a",	0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
 	ROM_LOAD( "3.7a",	0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
-	
+
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "n82s129n.9c",	0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )	/* PROM dump needed */
 ROM_END
@@ -3074,7 +3074,7 @@ ROM_START( ngolda )
 	ROM_LOAD( "1.4a",	0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    /* cards deck gfx, bitplane1 */
 	ROM_LOAD( "2.5a",	0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
 	ROM_LOAD( "3.7a",	0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
-	
+
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "n82s129n.9c",	0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )	/* PROM dump needed */
 ROM_END
@@ -3092,7 +3092,7 @@ ROM_START( ngoldb )
 	ROM_LOAD( "7.bin",	0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    /* cards deck gfx, bitplane1 */
 	ROM_LOAD( "8.bin",	0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
 	ROM_LOAD( "9.bin",	0x1000, 0x0800, BAD_DUMP CRC(d5471775) SHA1(ce3953ef1a21db055f92a6eeb7a64ea32bb539da) )    /* cards deck gfx, bitplane3. need to be redumped */
-	
+
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "n82s129n.9c",	0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )	/* PROM dump needed */
 ROM_END
@@ -4054,7 +4054,7 @@ ROM_END
   There are french strings related to the game, so maybe is
   a leftover, or maybe there is a unknown way to switch the
   language.
-  
+
 
 *****************************************************/
 
@@ -4065,7 +4065,7 @@ ROM_START( silverga )
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
 	ROM_FILL(			0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "13",	  	0x2000, 0x1000, CRC(98b8cb4f) SHA1(420ea544a41e24478a8eb1c7076f4569607d0379) )    /* text layer */
+	ROM_LOAD( "13",		0x2000, 0x1000, CRC(98b8cb4f) SHA1(420ea544a41e24478a8eb1c7076f4569607d0379) )    /* text layer */
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
 	ROM_LOAD( "11",		0x0000, 0x0800, CRC(1f41c541) SHA1(00df5079193f78db0617a6b8a613d8a0616fc8e9) )    /* cards deck gfx, bitplane1 */
@@ -4083,7 +4083,7 @@ ROM_END
 
   There are french strings related to the game into
   the program ROM.
-  
+
   The dump lacks of 1 program ROM located at 17a.
   (empty socket in the PCB picture)
 
@@ -4102,7 +4102,7 @@ ROM_START( pokerdub )
 	ROM_LOAD( "1.4a",	0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    /* cards deck gfx, bitplane1 */
 	ROM_LOAD( "2.6a",	0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
 	ROM_LOAD( "3.7a",	0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
-	
+
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "s287.8c",	0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
@@ -4115,9 +4115,9 @@ ROM_END
   This one is totally encrypted.
   The PCB has a daughterboard coated with some plastic
   or epoxy resin.
-  
-  Char ROM is identical to the Witch Card one. 
-  
+
+  Char ROM is identical to the Witch Card one.
+
 *****************************************************/
 
 ROM_START( pokerduc )
@@ -4232,10 +4232,10 @@ static DRIVER_INIT( flcnw )
 /***********************************************
 
   ICP1 Daughterboard encryption
-  
+
   The PCB has a daughterboard coated with some plastic
   or epoxy resin.
-  
+
   pattern:
 
   0000:  FF FF FF FF FF FF FF FF | FB FB FB FB FB FB FB FB

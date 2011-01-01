@@ -294,7 +294,7 @@ static WRITE8_HANDLER( dai3wksi_audio_1_w )
 
 static WRITE8_HANDLER( dai3wksi_audio_2_w )
 {
-	
+
 	dai3wksi_state *state = space->machine->driver_data<dai3wksi_state>();
 	device_t *ic77 = space->machine->device("ic77");
 	device_t *ic78 = space->machine->device("ic78");

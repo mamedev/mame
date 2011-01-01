@@ -2005,12 +2005,12 @@ static UINT16 s3c24xx_wdt_calc_current_count( device_t *device)
 	double timeleft, x1, x2;
 	UINT32 cnt;
 	timeleft = attotime_to_double( timer_timeleft( s3c24xx->wdt.timer));
-//	printf( "timeleft %f freq %d cnt %d\n", timeleft, s3c24xx->wdt.freq, s3c24xx->wdt.cnt);
+//  printf( "timeleft %f freq %d cnt %d\n", timeleft, s3c24xx->wdt.freq, s3c24xx->wdt.cnt);
 	x1 = 1 / ((double)s3c24xx->wdt.freq / s3c24xx->wdt.cnt);
 	x2 = x1 / timeleft;
-//	printf( "x1 %f\n", x1);
+//  printf( "x1 %f\n", x1);
 	cnt = s3c24xx->wdt.cnt / x2;
-//	printf( "cnt %d\n", cnt);
+//  printf( "cnt %d\n", cnt);
 	return cnt;
 }
 

@@ -287,14 +287,14 @@ stream_sample_t ics2115_device::get_sample(ics2115_voice& voice)
     //no need for interpolation since it's around 1 note a cycle?
     //if(voice.osc.fc >> 10)
     //    return sample1;
-    
+
     //linear interpolation as in US patent 6,246,774 B1, column 2 row 59
     //LEN=1, BLEN=0, DIR=0, start+end interpolation
     INT32 sample, diff;
     UINT16 fract;
     diff = sample2 - sample1;
     fract = (voice.osc.acc >> 3) & 0x1ff;
-    
+
     sample = (((INT32)sample1 << 9) + diff * fract) >> 9;
     //sample = sample1;
     return sample;
@@ -331,7 +331,7 @@ int ics2115_device::fill_output(ics2115_voice& voice, stream_sample_t *outputs[2
         UINT32 volume = (m_volume[volacc >> 4] * voice.state.ramp) >> 6;
         UINT16 vleft = volume; //* (255 - voice.vol.pan) / 0x80];
         UINT16 vright = volume; //* (voice.vol.pan + 1) / 0x80];
-        
+
         //From GUS doc:
         //In general, it is necessary to remember that all voices are being summed in to the
         //final output, even if they are not running.  This means that whatever data value
@@ -344,7 +344,7 @@ int ics2115_device::fill_output(ics2115_voice& voice, stream_sample_t *outputs[2
         }
         else
             sample = get_sample(voice);
-        
+
         //15-bit volume + (5-bit worth of 32 channel sum) + 16-bit samples = 4-bit extra
         if (!m_vmode || voice.playing()) {
         //if (voice.playing()) {
@@ -494,13 +494,13 @@ UINT16 ics2115_device::reg_read() {
 
 		/* DDP3 code (trap15's reversal) */
 		/* 0xA13's work:
-			res = read() & 0xC3;
-			if(!(res & 2)) res |= 1;
-			e = d = res;
-		*/
+            res = read() & 0xC3;
+            if(!(res & 2)) res |= 1;
+            e = d = res;
+        */
 		/* 0xA4F's work:
-			while(!(read() & 1))
-		*/
+            while(!(read() & 1))
+        */
 		case 0x0D: // [osc] Volume Envelope Control
 			//ret = v->Vol.Ctl | ((v->state & FLAG_STATE_VOLIRQ) ? 0x81 : 1);
 			// may expect |8 on voice irq with &40 == 0
@@ -659,7 +659,7 @@ void ics2115_device::reg_write(UINT8 data, bool msb) {
 #ifdef ICS2115_ISOLATE
             if(m_osc_select == ICS2115_ISOLATE)
 #endif
-                printf("<%d:oa:H[%d]=%x>", m_osc_select, msb, data); 
+                printf("<%d:oa:H[%d]=%x>", m_osc_select, msb, data);
 #endif
 			if(msb)
 				voice.osc.acc = (voice.osc.acc & 0x00ffffff) | (data << 24);
@@ -672,7 +672,7 @@ void ics2115_device::reg_write(UINT8 data, bool msb) {
 #ifdef ICS2115_ISOLATE
             if(m_osc_select == ICS2115_ISOLATE)
 #endif
-                printf("<%d:oa:L[%d]=%x>", m_osc_select, msb, data); 
+                printf("<%d:oa:L[%d]=%x>", m_osc_select, msb, data);
 #endif
 			if(msb)
 				voice.osc.acc = (voice.osc.acc & 0xffff00ff) | (data << 8);
@@ -702,7 +702,7 @@ void ics2115_device::reg_write(UINT8 data, bool msb) {
 		case 0x10: // [osc] Oscillator Control
             //Could this be 2X9?
             //[7 R | 6 M2 | 5 M1 | 4-2 Reserve | 1 - Timer 2 Strt | 0 - Timer 1 Strt]
-            
+
             if (msb) {
                 voice.osc.ctl = data;
                 if (!data)

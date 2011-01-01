@@ -89,13 +89,13 @@ Notes:
 // ASC trampolines
 /*static READ8_DEVICE_HANDLER(igs011_ics2115_r)
 {
-	return downcast<ics2115_device *>(device)->read(offset);
-	//return 0;
+    return downcast<ics2115_device *>(device)->read(offset);
+    //return 0;
 }
 
 static WRITE8_DEVICE_HANDLER(igs011_ics2115_w)
 {
-//	device<ics2115_device>("asc")->write(offset, data);
+//  device<ics2115_device>("asc")->write(offset, data);
 }*/
 
 static UINT8 *layer[8];
@@ -2340,7 +2340,7 @@ static ADDRESS_MAP_START( vbowl, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE( igs011_layers_r, igs011_layers_w )
 	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE( 0x520000, 0x520001 ) AM_READ_PORT( "COIN" )
-//	AM_RANGE( 0x600000, 0x600007 ) AM_DEVREADWRITE( "ics", ics2115_word_r, ics2115_word_w )
+//  AM_RANGE( 0x600000, 0x600007 ) AM_DEVREADWRITE( "ics", ics2115_word_r, ics2115_word_w )
     AM_RANGE( 0x600000, 0x600007 ) AM_READWRITE( ics2115_word_r, ics2115_word_w )
 	AM_RANGE( 0x700000, 0x700003 ) AM_RAM AM_BASE( &vbowl_trackball )
 	AM_RANGE( 0x700004, 0x700005 ) AM_WRITE( vbowl_pen_hi_w )
@@ -3578,7 +3578,7 @@ static void sound_irq(device_t *device, int state)
 }
 
 /*static const ics2115_interface vbowl_ics2115_interface = {
-	sound_irq
+    sound_irq
 };*/
 
 static INTERRUPT_GEN( vbowl_interrupt )
@@ -3602,9 +3602,9 @@ static MACHINE_CONFIG_DERIVED( vbowl, igs011_base )
 //  MCFG_GFXDECODE(igs011_hi)
 
 	MCFG_DEVICE_REMOVE("oki")
-//	MCFG_SOUND_ADD("ics", ICS2115, 0)
+//  MCFG_SOUND_ADD("ics", ICS2115, 0)
 	MCFG_ICS2115_ADD("ics", 0, sound_irq)
-//	MCFG_SOUND_CONFIG(vbowl_ics2115_interface)
+//  MCFG_SOUND_CONFIG(vbowl_ics2115_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
 MACHINE_CONFIG_END
 

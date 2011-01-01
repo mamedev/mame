@@ -1710,8 +1710,8 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 					}
 					break;
 				}
-				default:	//fatalerror("RSP: VSAW: el = %d\n", EL);//потупим
-					printf("RSP: VSAW: el = %d\n", EL);//мой код
+				default:	//fatalerror("RSP: VSAW: el = %d\n", EL);//???????
+					printf("RSP: VSAW: el = %d\n", EL);//??? ???
 					exit(0);
 			}
 			break;
@@ -1810,7 +1810,7 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 			int sel;
 			rsp->flag[1] = 0;
 
-			for (i=0; i < 8; i++)//переписано мной
+			for (i=0; i < 8; i++)//?????????? ????
 			{
 				sel = VEC_EL_2(EL, i);
 
@@ -2151,7 +2151,7 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 				}
 				else
 				{
-					vres[i] = VREG_S(VS2REG, sel);//моё исправление
+					vres[i] = VREG_S(VS2REG, sel);//??? ???????????
 				}
 
 				ACCUM_L(i) = vres[i];
@@ -2292,7 +2292,7 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 			{
 				for (i = 0; i < 32; i++)
 				{
-					if (datainput & (1 << ((~i) & 0x1f)))//т.ж.что 31 - i
+					if (datainput & (1 << ((~i) & 0x1f)))//?.?.??? 31 - i
 					{
 						shifter = i;
 						break;
@@ -2377,7 +2377,7 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 			{
 				for (i = 0; i < 32; i++)
 				{
-					if (datainput & (1 << ((~i) & 0x1f)))//т.ж.что 31 - i
+					if (datainput & (1 << ((~i) & 0x1f)))//?.?.??? 31 - i
 					{
 						shifter = i;
 						break;
@@ -2493,7 +2493,7 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 			{
 				for (i = 0; i < 32; i++)
 				{
-					if (datainput & (1 << ((~i) & 0x1f)))//т.ж.что 31 - i
+					if (datainput & (1 << ((~i) & 0x1f)))//?.?.??? 31 - i
 					{
 						shifter = i;
 						break;

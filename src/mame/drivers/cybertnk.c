@@ -977,14 +977,14 @@ DRIVER_INIT( cybertnk )
 {
 	/* make the gfx decode easier by swapping bits around */
 /*
-	UINT8* road_data;
-	int i;
+    UINT8* road_data;
+    int i;
 
-	road_data = machine->region("road_data")->base();
-	for (i=0;i < 0x40000;i++)
-	{
-		road_data[i] = BITSWAP8(road_data[i],3,2,1,0,7,6,5,4);
-	}
+    road_data = machine->region("road_data")->base();
+    for (i=0;i < 0x40000;i++)
+    {
+        road_data[i] = BITSWAP8(road_data[i],3,2,1,0,7,6,5,4);
+    }
 */
 }
 

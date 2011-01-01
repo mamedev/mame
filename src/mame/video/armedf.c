@@ -46,24 +46,24 @@ static TILE_GET_INFO( get_tx_tile_info )
 static TILE_GET_INFO( get_legion_tx_tile_info )
 {
 	armedf_state *state = machine->driver_data<armedf_state>();
-	
+
 	int tile_number = state->text_videoram[tile_index] & 0xff;
-	
+
 	if(tile_index<0x10) tile_number=0x20;
-	
+
 	int attributes;
 
 	if (state->scroll_type == 1)
 		attributes = state->text_videoram[tile_index + 0x800] & 0xff;
 	else
 		attributes = state->text_videoram[tile_index + 0x400] & 0xff;
-		
-		
+
+
 	tileinfo->category = 0;
 
 	if((attributes & 0x3) == 3)
 	{
-		tileinfo->category = 1;	
+		tileinfo->category = 1;
 	}
 
 	SET_TILE_INFO(
@@ -291,41 +291,41 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 static void copy_textmap(running_machine *machine, int index)
 {
 	/*
-		(not simulated)
-		1st half of the MCU ROM contains various strings and
-		gfx elements (copied by MCU to textram)
-				
-		
-		(partially simulated)
-		2nd half of the MCu external ROM contains text tilemaps:
+        (not simulated)
+        1st half of the MCU ROM contains various strings and
+        gfx elements (copied by MCU to textram)
 
-		 4 - title screen
-		 5 - bottom layer gfx, visible  in later levels, during boss fight
-		 6 - test mode screen (not hooked up)
-		 7 - portraits (title)
 
-	*/
+        (partially simulated)
+        2nd half of the MCu external ROM contains text tilemaps:
+
+         4 - title screen
+         5 - bottom layer gfx, visible  in later levels, during boss fight
+         6 - test mode screen (not hooked up)
+         7 - portraits (title)
+
+    */
 
 	armedf_state *state = machine->driver_data<armedf_state>();
 	UINT8 * data = (UINT8 *)machine->region("gfx5")->base();
-	
+
 	for(int i=0;i<0x400;++i)
 	{
 		if(i<0x10) continue;
 
 		int tile=data[0x800*index+i];
 		int bank=data[0x800*index+i+0x400]&3;
-			
+
 		if( (tile|(bank<<8))!=0x20)
 		{
 			state->text_videoram[i]=tile;
 			state->text_videoram[i+0x400]=data[0x800*index+i+0x400];
 		}
-	
+
 	}
-	
+
 	tilemap_mark_all_tiles_dirty(state->tx_tilemap);
-	
+
 }
 
 VIDEO_UPDATE( armedf )
@@ -358,7 +358,7 @@ VIDEO_UPDATE( armedf )
 			//logerror("MCU Change => %04x\n", state->mcu_mode);
 		}
 	}
-	
+
 	switch (state->scroll_type)
 	{
 		case 0: /* terra force */
@@ -398,7 +398,7 @@ VIDEO_UPDATE( armedf )
 
 
 	bitmap_fill(bitmap, cliprect , 0xff);
-	
+
 	if(state->scroll_type == 3 || state->scroll_type == 6) /* legion / legiono */
 	{
 		tilemap_draw(bitmap, cliprect, state->tx_tilemap, 1, 0);
@@ -440,13 +440,13 @@ VIDEO_UPDATE( armedf )
 
 	if (sprite_enable)
 		draw_sprites(screen->machine, bitmap, cliprect, 0);
-		
+
 	if(state->scroll_type == 3) /* legion */
 	{
-		static int oldmode=-1;	
-	
+		static int oldmode=-1;
+
 		int mode=state->text_videoram[1]&0xff;
-		
+
 		if (mode != oldmode)
 		{
 			oldmode=mode;
@@ -458,9 +458,9 @@ VIDEO_UPDATE( armedf )
 				default: logerror("unknown mode %d\n", mode); break;
 			}
 		}
-			
+
 	}
-	
+
 
 	return 0;
 }

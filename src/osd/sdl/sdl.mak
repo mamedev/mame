@@ -353,9 +353,9 @@ LIBS += -lm `sdl-config --libs`
 else
 # The commented out statements document what sdl-config returns when build from svn.
 # sdl-config --libs on ubuntu returns "-L/usr/lib -lSDL" which is not what we really
-# want in a multi-version SDL environment. Should the svn sdl-config at some point 
+# want in a multi-version SDL environment. Should the svn sdl-config at some point
 # return the same output, we need the commented out section again.
- 
+
 #INCPATH += -I$(SDL_INSTALL_ROOT)/include
 #CCOMFLAGS += -D_GNU_SOURCE=1
 #LIBS += -lm -L$(SDL_INSTALL_ROOT)/lib -Wl,-rpath,$(SDL_INSTALL_ROOT)/lib -lSDL

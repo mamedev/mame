@@ -167,11 +167,11 @@ INLINE UINT32 arm7_tlb_translate(arm_state *cpustate, UINT32 vaddr, int mode)
     	UINT32 pid = ((COPRO_FCSE_PID >> 25) & 0x7F);
     	if (pid > 0)
     	{
-      		//LOG( ( "ARM7: FCSE PID vaddr %08X -> %08X\n", vaddr, vaddr + (pid * (32 * 1024 * 1024))) );
-      		vaddr = vaddr + (((COPRO_FCSE_PID >> 25) & 0x7F) * (32 * 1024 * 1024));
-      	}
+    		//LOG( ( "ARM7: FCSE PID vaddr %08X -> %08X\n", vaddr, vaddr + (pid * (32 * 1024 * 1024))) );
+    		vaddr = vaddr + (((COPRO_FCSE_PID >> 25) & 0x7F) * (32 * 1024 * 1024));
+    	}
     }
-    
+
     desc_lvl1 = arm7_tlb_get_first_level_descriptor( cpustate, vaddr );
 
     paddr = vaddr;
@@ -216,7 +216,7 @@ INLINE UINT32 arm7_tlb_translate(arm_state *cpustate, UINT32 vaddr, int mode)
             }
             else
             {
-       	    	LOG( ( "domain %d permission = %d\n", domain, permission ) );
+    	    	LOG( ( "domain %d permission = %d\n", domain, permission ) );
                 LOG( ( "ARM7: Coarse Table, Section Domain fault on virtual address, vaddr = %08x, domain = %08x, PC = %08x\n", vaddr, domain, R15 ) );
             }
             break;
@@ -230,7 +230,7 @@ INLINE UINT32 arm7_tlb_translate(arm_state *cpustate, UINT32 vaddr, int mode)
             {
                 if (mode == ARM7_TLB_ABORT_D)
                 {
-	       	    	LOG( ( "domain %d permission = %d\n", domain, permission ) );
+	    	    	LOG( ( "domain %d permission = %d\n", domain, permission ) );
 	                LOG( ( "ARM7: Section Table, Section Domain fault on virtual address, vaddr = %08x, domain = %08x, PC = %08x\n", vaddr, domain, R15 ) );
                 	COPRO_FAULT_STATUS = (9 << 0);
                 	COPRO_FAULT_ADDRESS = vaddr;
@@ -238,7 +238,7 @@ INLINE UINT32 arm7_tlb_translate(arm_state *cpustate, UINT32 vaddr, int mode)
             	}
             	else if (mode == ARM7_TLB_ABORT_P)
             	{
-	       	    	LOG( ( "domain %d permission = %d\n", domain, permission ) );
+	    	    	LOG( ( "domain %d permission = %d\n", domain, permission ) );
 	                LOG( ( "ARM7: Section Table, Section Domain fault on virtual address, vaddr = %08x, domain = %08x, PC = %08x\n", vaddr, domain, R15 ) );
             	    cpustate->pendingAbtP = 1;
             	}

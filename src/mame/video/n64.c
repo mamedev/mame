@@ -339,7 +339,7 @@ void Processor::TCDiv(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst)
 	int outofbounds_t = tprod & tempmask;
 	if (shift == 0xe)//tc.c, 664
 	{
-		*sss = sprod << 1;//sw, tw здесь не изменились
+		*sss = sprod << 1;//sw, tw ????? ?? ??????????
 		*sst = tprod << 1;
 	}
 	else
@@ -861,12 +861,12 @@ void Processor::lookup_cvmask_derivatives(UINT32 mask, UINT8* offx, UINT8* offy)
 {
 	UINT32 index;
 	/*
-	if (mask != (mask & 0xa5a5))//never happens
-		stricterror("wrong cvmask computed: %x", mask);
-	*/
-	index = compressed_cvmasks[mask];//согласно VTune, где-то на 50% быстрее, чем сжатие до 8 бит на месте в этой ф-ии
+    if (mask != (mask & 0xa5a5))//never happens
+        stricterror("wrong cvmask computed: %x", mask);
+    */
+	index = compressed_cvmasks[mask];//???????? VTune, ???-?? ?? 50% ???????, ??? ?????? ?? 8 ??? ?? ????? ? ???? ?-??
 	m_misc_state.m_curpixel_cvg = cvarray[index].cvg;
-	m_misc_state.m_curpixel_cvbit = cvarray[index].cvbit;//бит mask15b: cv.c, bl.c
+	m_misc_state.m_curpixel_cvbit = cvarray[index].cvbit;//??? mask15b: cv.c, bl.c
 	*offx = cvarray[index].xoff;
 	*offy = cvarray[index].yoff;
 }
@@ -2335,7 +2335,7 @@ void N64::RDP::Processor::CmdTexRect(UINT32 w1, UINT32 w2)
 
 	UINT32* ewdata = GetTempRectData();
 	ewdata[0] = (0x24 << 24) | ((0x80 | tilenum) << 16) | yl;	// command, flipped, tile, yl
-	ewdata[1] = (yl << 16) | yh; 								// ym, yh
+	ewdata[1] = (yl << 16) | yh;								// ym, yh
 	ewdata[2] = (xlint << 16) | ((xl & 3) << 14);				// xl, xl frac
 	ewdata[3] = 0;												// dxldy, dxldy frac
 	ewdata[4] = (xhint << 16) | ((xh & 3) << 14);				// xh, xh frac
@@ -2808,7 +2808,7 @@ void N64::RDP::Processor::CmdLoadTile(UINT32 w1, UINT32 w2)
 				int tline = tb + ((tile[tilenum].line << 3) * j);
 				int s = ((j + tl) * m_misc_state.m_ti_width) + sl;
 
-				int xorval8 = ((j & 1) ? BYTE_XOR_DWORD_SWAP : BYTE_ADDR_XOR);//попроще,чем у Ziggy
+				int xorval8 = ((j & 1) ? BYTE_XOR_DWORD_SWAP : BYTE_ADDR_XOR);//???????,??? ? Ziggy
 				for (int i = 0; i < width; i++)
 				{
 					tc[((tline + i) ^ xorval8) & 0xfff] = RREADADDR8(src + s + i);

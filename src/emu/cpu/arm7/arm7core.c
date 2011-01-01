@@ -649,7 +649,7 @@ static void arm7_check_irq_state(arm_state *cpustate)
     // IRQ
     if (cpustate->pendingIrq && (cpsr & I_MASK) == 0) {
         SwitchMode(cpustate, eARM7_MODE_IRQ);             /* Set IRQ mode so PC is saved to correct R14 bank */
-       	SET_REGISTER(cpustate, 14, pc - 4 + 4);                   /* save PC to R14 */
+    	SET_REGISTER(cpustate, 14, pc - 4 + 4);                   /* save PC to R14 */
         if (MODE32)
         {
         	SET_REGISTER(cpustate, SPSR, cpsr);               /* Save current CPSR */
@@ -1282,7 +1282,7 @@ static void HandleHalfWordDT(arm_state *cpustate, UINT32 insn)
             }
         }
     }
-    
+
     }
 
 }
@@ -1790,7 +1790,7 @@ static void HandleMemBlock(arm_state *cpustate, UINT32 insn)
                     else
                     {
                     	UINT32 temp;
-//                    	LOG(("LDM + S | R15 %08X CPSR %08X\n", R15, GET_CPSR));
+//                      LOG(("LDM + S | R15 %08X CPSR %08X\n", R15, GET_CPSR));
 						temp = (GET_CPSR & 0x0FFFFF20) | (R15 & 0xF0000000) /* N Z C V */ | ((R15 & 0x0C000000) >> (26 - 6)) /* I F */ | (R15 & 0x00000003) /* M1 M0 */;
 						SET_CPSR( temp);
 						SwitchMode(cpustate, temp & 3);
@@ -1843,7 +1843,7 @@ static void HandleMemBlock(arm_state *cpustate, UINT32 insn)
                     else
                     {
                     	UINT32 temp;
-//                    	LOG(("LDM + S | R15 %08X CPSR %08X\n", R15, GET_CPSR));
+//                      LOG(("LDM + S | R15 %08X CPSR %08X\n", R15, GET_CPSR));
 						temp = (GET_CPSR & 0x0FFFFF20) /* N Z C V I F M4 M3 M2 M1 M0 */ | (R15 & 0xF0000000) /* N Z C V */ | ((R15 & 0x0C000000) >> (26 - 6)) /* I F */ | (R15 & 0x00000003) /* M1 M0 */;
 						SET_CPSR( temp);
 						SwitchMode(cpustate, temp & 3);

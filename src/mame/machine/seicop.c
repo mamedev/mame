@@ -2070,7 +2070,7 @@ static WRITE16_HANDLER( generic_cop_w )
 
 		/* another parameter (priority?) */
 		//case (0x002/2):
-		//	break;
+		//  break;
 
 		case (0x00c/2): { cop_sprite_dma_size = cop_mcu_ram[offset]; break; }
 		case (0x010/2):
@@ -2227,7 +2227,7 @@ static WRITE16_HANDLER( generic_cop_w )
 			/* search the uploaded 'trigger' table for a matching trigger*/
 			/* note, I don't know what the 'mask' or 'value' tables are... probably important, might determine what actually gets executed! */
 			/* note: Zero Team triggers macro 0x904 instead of 0x905, Seibu Cup Soccer triggers 0xe30e instead of 0xe38e. I highly doubt that AT LEAST
-			   it isn't supposed to do anything, especially in the former case (it definitely NEED that sprites have an ark movement when they are knocked down). */
+               it isn't supposed to do anything, especially in the former case (it definitely NEED that sprites have an ark movement when they are knocked down). */
 			for (i=0;i<32;i++)
 			{
 				if ((cop_mcu_ram[offset] & 0xff00) == (copd2_table_4[i] & 0xff00))
@@ -2268,11 +2268,11 @@ static WRITE16_HANDLER( generic_cop_w )
 			cop_status &= 0x7fff;
 
 			/*
-			endianess changes:
-			dword no change
-			word Add / Subtract two
-			byte ?
-			*/
+            endianess changes:
+            dword no change
+            word Add / Subtract two
+            byte ?
+            */
 
 			/* "automatic" movement */
 			if(COP_CMD(0x188,0x282,0x082,0xb8e,0x98e,0x000,0x000,0x000,6,0xffeb))
@@ -2381,17 +2381,17 @@ static WRITE16_HANDLER( generic_cop_w )
 			}
 
 			/*
-				collision detection:
+                collision detection:
 
-				int dy_0 = space->read_dword(cop_register[0]+4);
-				int dx_0 = space->read_dword(cop_register[0]+8);
-				int dy_1 = space->read_dword(cop_register[1]+4);
-				int dx_1 = space->read_dword(cop_register[1]+8);
-				int hitbox_param1 = space->read_dword(cop_register[2]);
-				int hitbox_param2 = space->read_dword(cop_register[3]);
+                int dy_0 = space->read_dword(cop_register[0]+4);
+                int dx_0 = space->read_dword(cop_register[0]+8);
+                int dy_1 = space->read_dword(cop_register[1]+4);
+                int dx_1 = space->read_dword(cop_register[1]+8);
+                int hitbox_param1 = space->read_dword(cop_register[2]);
+                int hitbox_param2 = space->read_dword(cop_register[3]);
 
 
-			*/
+            */
 
 			/* note: these four are bad! */
 			if(COP_CMD(0xb80,0xb82,0xb84,0xb86,0x000,0x000,0x000,0x000,0,0xffff))
@@ -2451,7 +2451,7 @@ static WRITE16_HANDLER( generic_cop_w )
 				//printf("4: %08x %08x\n",dx_0,dx_1);
 
 				//if((space->read_word(cop_register[3]) & 0xff00) == 0x0600)
-//				popmessage("%04x %04x %04x %04x %04x %04x %08x %08x\n",space->read_word(cop_register[0]+4),space->read_word(cop_register[0]+8),space->read_word(cop_register[1]+4),space->read_word(cop_register[1]+8),space->read_word(cop_register[2]),space->read_word(cop_register[3]),cop_register[2],cop_register[3]);
+//              popmessage("%04x %04x %04x %04x %04x %04x %08x %08x\n",space->read_word(cop_register[0]+4),space->read_word(cop_register[0]+8),space->read_word(cop_register[1]+4),space->read_word(cop_register[1]+8),space->read_word(cop_register[2]),space->read_word(cop_register[3]),cop_register[2],cop_register[3]);
 				popmessage("%08x %08x",cop_hit_val_x,cop_hit_val_y);
 
 				if(dx >= 0)
@@ -2536,7 +2536,7 @@ static WRITE16_HANDLER( generic_cop_w )
 				static UINT32 src,dst,size,i;
 
 				/*
-				Apparently all of those are just different DMA channels, brightness effects are done thru a RAM table and the pal_brightness_val / mode
+                Apparently all of those are just different DMA channels, brightness effects are done thru a RAM table and the pal_brightness_val / mode
                 0x80 is used by Legionnaire
                 0x81 is used by SD Gundam and Godzilla
                 0x82 is used by Zero Team and X Se Dae
@@ -2645,7 +2645,7 @@ static WRITE16_HANDLER( generic_cop_w )
 				int i;
 
 				//if(cop_dma_dst[cop_dma_trigger] != 0x0000) // Invalid?
-				//	return;
+				//  return;
 
 				address = (cop_dma_src[cop_dma_trigger] << 6);
 				length = ((cop_dma_size[cop_dma_trigger]+1) << 4);
