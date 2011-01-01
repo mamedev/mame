@@ -2085,7 +2085,8 @@ static READ16_HANDLER( generic_cop_r )
 static UINT32 fill_val;
 static UINT8 pal_brightness_val,pal_brightness_mode;
 static UINT32 cop_sprite_dma_src;
-static int cop_sprite_dma_abs_x,cop_sprite_dma_abs_y,cop_sprite_dma_param,cop_sprite_dma_size;
+static int cop_sprite_dma_abs_x,cop_sprite_dma_abs_y,cop_sprite_dma_size;
+static UINT32 cop_sprite_dma_param;
 
 static WRITE16_HANDLER( generic_cop_w )
 {
@@ -2099,12 +2100,10 @@ static WRITE16_HANDLER( generic_cop_w )
 
 		/* Sprite DMA */
 		case (0x000/2):
-			cop_sprite_dma_param = cop_mcu_ram[offset];
+		case (0x002/2):
+			cop_sprite_dma_param = (cop_mcu_ram[0x000/2]) | (cop_mcu_ram[0x002/2] << 16);
+			popmessage("%08x",cop_sprite_dma_param);
 			break;
-
-		/* another parameter (priority?) */
-		//case (0x002/2):
-		//  break;
 
 		case (0x00c/2): { cop_sprite_dma_size = cop_mcu_ram[offset]; break; }
 		case (0x010/2):
@@ -2504,7 +2503,8 @@ static WRITE16_HANDLER( generic_cop_w )
 				rel_xy = space->read_word(cop_sprite_dma_src + 4 + offs);
 
 				space->write_word(cop_register[4] + offs + 4,(((rel_xy & 0x7f) + (abs_x) - ((rel_xy & 0x80) ? 0x80 : 0))));
-				space->write_word(cop_register[4] + offs + 6,(((rel_xy & 0x7f00) >> 8) + (abs_y) + (0x10) - ((rel_xy & 0x8000) ? 0x80 : 0)));
+				space->write_word(cop_register[4] + offs + 6,(((rel_xy & 0x7f00) >> 8) + (abs_y) - ((rel_xy & 0x8000) ? 0x80 : 0)));
+
 				return;
 			}
 
@@ -2515,8 +2515,8 @@ static WRITE16_HANDLER( generic_cop_w )
 
 				offs = (offset & 3) * 4;
 
-				space->write_word(cop_register[4] + offs,space->read_word(cop_sprite_dma_src + offs) + (cop_sprite_dma_param & 0x3f));
-				//space->write_word(cop_register[4] + offs ,space->read_word(cop_sprite_dma_src+2 + offs));
+				space->write_word(cop_register[4] + offs + 0,space->read_word(cop_sprite_dma_src + offs) + (cop_sprite_dma_param & 0x3f));
+				//space->write_word(cop_register[4] + offs + 2,space->read_word(cop_sprite_dma_src+2 + offs));
 				return;
 			}
 
@@ -2576,10 +2576,10 @@ static WRITE16_HANDLER( generic_cop_w )
 				}
 
 				space->write_word(cop_register[0]+(0x34^2),cur_angle);
+				return;
 			}
 
-			if(cop_mcu_ram[offset] != 0x3bb0)
-				printf("%04x\n",cop_mcu_ram[offset]);
+			printf("%04x\n",cop_mcu_ram[offset]);
 			break;
 		}
 

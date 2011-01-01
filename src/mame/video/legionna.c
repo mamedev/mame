@@ -11,7 +11,7 @@ UINT16 *legionna_back_data,*legionna_fore_data,*legionna_mid_data,*legionna_scro
 
 static tilemap_t *background_layer,*foreground_layer,*midground_layer,*text_layer;
 UINT16 legionna_layer_disable;
-int legionna_sprite_xoffs;
+int legionna_sprite_xoffs,legionna_sprite_yoffs;
 
 /******************************************************************************/
 
@@ -146,6 +146,7 @@ VIDEO_START( legionna )
 
 	legionna_scrollram16 = auto_alloc_array(machine, UINT16, 0x60/2);
 	legionna_sprite_xoffs = 0;
+	legionna_sprite_yoffs = 0;
 
 	tilemap_set_transparent_pen(background_layer,15);
 	tilemap_set_transparent_pen(midground_layer,15);
@@ -162,6 +163,7 @@ VIDEO_START( denjinmk )
 
 	legionna_scrollram16 = auto_alloc_array(machine, UINT16, 0x60/2);
 	legionna_sprite_xoffs = 0;
+	legionna_sprite_yoffs = 0;
 
 	tilemap_set_transparent_pen(background_layer,15);
 	tilemap_set_transparent_pen(midground_layer,15);
@@ -178,6 +180,7 @@ VIDEO_START( cupsoc )
 
 	legionna_scrollram16 = auto_alloc_array(machine, UINT16, 0x60/2);
 	legionna_sprite_xoffs = 0;
+	legionna_sprite_yoffs = 0;
 
 	tilemap_set_transparent_pen(background_layer,15);
 	tilemap_set_transparent_pen(midground_layer,15);
@@ -188,7 +191,7 @@ VIDEO_START( cupsoc )
 VIDEO_START(grainbow)
 {
 	VIDEO_START_CALL(legionna);
-	legionna_sprite_xoffs = 16;
+	legionna_sprite_xoffs = legionna_sprite_yoffs = 16;
 
 }
 /*************************************************************************
@@ -285,7 +288,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 					{
 						pdrawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 						sprite++,
-						color,fx,fy,(x+ax*16)+legionna_sprite_xoffs,y+ay*16,
+						color,fx,fy,(x+ax*16)+legionna_sprite_xoffs,y+ay*16+legionna_sprite_yoffs,
 						machine->priority_bitmap,pri_mask, 15);
 					}
 			}
@@ -296,7 +299,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 					{
 						pdrawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 						sprite++,
-						color,fx,fy,(x+ax*16)+legionna_sprite_xoffs,y+(dy-ay-1)*16,
+						color,fx,fy,(x+ax*16)+legionna_sprite_xoffs,y+(dy-ay-1)*16+legionna_sprite_yoffs,
 						machine->priority_bitmap,pri_mask,15);
 					}
 			}
@@ -310,7 +313,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 					{
 						pdrawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 						sprite++,
-						color,fx,fy,(x+(dx-ax-1)*16)+legionna_sprite_xoffs,y+ay*16,
+						color,fx,fy,(x+(dx-ax-1)*16)+legionna_sprite_xoffs,y+ay*16+legionna_sprite_yoffs,
 						machine->priority_bitmap,pri_mask,15);
 					}
 			}
@@ -321,7 +324,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 					{
 						pdrawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 						sprite++,
-						color,fx,fy,(x+(dx-ax-1)*16)+legionna_sprite_xoffs,y+(dy-ay-1)*16,
+						color,fx,fy,(x+(dx-ax-1)*16)+legionna_sprite_xoffs,y+(dy-ay-1)*16+legionna_sprite_yoffs,
 						machine->priority_bitmap,pri_mask, 15);
 					}
 			}
