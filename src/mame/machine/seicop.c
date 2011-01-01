@@ -2102,7 +2102,7 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x000/2):
 		case (0x002/2):
 			cop_sprite_dma_param = (cop_mcu_ram[0x000/2]) | (cop_mcu_ram[0x002/2] << 16);
-			popmessage("%08x",cop_sprite_dma_param);
+			popmessage("%08x",cop_sprite_dma_param & 0xffffffc0);
 			break;
 
 		case (0x00c/2): { cop_sprite_dma_size = cop_mcu_ram[offset]; break; }
@@ -2502,9 +2502,15 @@ static WRITE16_HANDLER( generic_cop_w )
 				abs_y = space->read_word(cop_register[0] + 4) - cop_sprite_dma_abs_y;
 				rel_xy = space->read_word(cop_sprite_dma_src + 4 + offs);
 
-				space->write_word(cop_register[4] + offs + 4,(((rel_xy & 0x7f) + (abs_x) - ((rel_xy & 0x80) ? 0x80 : 0))));
-				space->write_word(cop_register[4] + offs + 6,(((rel_xy & 0x7f00) >> 8) + (abs_y) - ((rel_xy & 0x8000) ? 0x80 : 0)));
+				if(rel_xy & 0x0706)
+					printf("sprite rel_xy = %04x\n",rel_xy);
 
+				if(rel_xy & 1)
+					space->write_word(cop_register[4] + offs + 4,0xc0 + abs_x - (rel_xy & 0xf8));
+				else
+					space->write_word(cop_register[4] + offs + 4,(((rel_xy & 0x78) + (abs_x) - ((rel_xy & 0x80) ? 0x80 : 0))));
+
+				space->write_word(cop_register[4] + offs + 6,(((rel_xy & 0x7800) >> 8) + (abs_y) - ((rel_xy & 0x8000) ? 0x80 : 0)));
 				return;
 			}
 
@@ -3071,17 +3077,6 @@ READ16_HANDLER( grainbow_mcu_r )
 		default:
 			return generic_cop_r(space, offset, mem_mask);
 
-		#if 0
-		case (0x1b0/2):
-			return 2;
-			/*check if the DMA has been finished*/
-			if(dma_status == 1)
-			{
-				dma_status = 0;
-				return 2;
-			}
-			return cop_mcu_ram[offset];
-		#endif
 
 		/* Non-protection reads */
 		case (0x308/2): return seibu_main_word_r(space,2,0xffff);
