@@ -2004,18 +2004,6 @@ static UINT8 cop_calculate_collsion_detection(running_machine *machine)
 
 	res = 3;
 
-	/* TODO: Legionnaire does collision detection via the other two regs ... */
-	//cop_hit_val_x = cop_collision_info[0].min_x;
-	//cop_hit_val_y = cop_collision_info[0].min_y;
-
-	/*
-
-	*---* *---*
-	|   | |   |
-	*---* *---*
-
-	*/
-
 	/* outbound X check */
 	if(cop_collision_info[0].max_x >= cop_collision_info[1].min_x && cop_collision_info[0].min_x <= cop_collision_info[1].max_x)
 		res &= ~1;
@@ -2024,8 +2012,12 @@ static UINT8 cop_calculate_collsion_detection(running_machine *machine)
 	if(cop_collision_info[0].max_y >= cop_collision_info[1].min_y && cop_collision_info[0].min_y <= cop_collision_info[1].max_y)
 		res &= ~2;
 
-	if(res == 0)
-		printf("0:%08x %08x 1:%08x %08x\n",cop_collision_info[0].min_x,cop_collision_info[0].min_y,cop_collision_info[1].min_x,cop_collision_info[1].min_y);
+	/* TODO: Legionnaire does collision detection via the other two regs ... */
+	cop_hit_val_x = cop_collision_info[0].max_x - cop_collision_info[1].min_x;
+	cop_hit_val_y = cop_collision_info[0].max_y - cop_collision_info[1].min_y;
+
+	//if(res == 0)
+	//	printf("0:%08x %08x 1:%08x %08x\n",cop_collision_info[0].min_x,cop_collision_info[0].min_y,cop_collision_info[1].min_x,cop_collision_info[1].min_y);
 
 	return res;
 }
