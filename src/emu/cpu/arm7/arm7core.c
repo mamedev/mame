@@ -1187,6 +1187,8 @@ static void HandleHalfWordDT(arm_state *cpustate, UINT32 insn)
             if (rd == eR15)
             {
                 R15 = newval + 8;
+                // extra cycles for LDR(H,SH,SB) PC (5 total cycles)
+                ARM7_ICOUNT -= 2;
             }
             else
             {
@@ -1423,6 +1425,11 @@ static void HandleALU(arm_state *cpustate, UINT32 insn)
     UINT32 op2, sc = 0, rd, rn, opcode;
     UINT32 by, rdn;
 
+	// Normal Data Processing : 1S
+	// Data Processing with register specified shift : 1S + 1I
+	// Data Processing with PC written : 2S + 1N
+	// Data Processing with register specified shift and PC written : 2S + 1N + 1I
+
     opcode = (insn & INSN_OPCODE) >> INSN_OPCODE_SHIFT;
 
     rd = 0;
@@ -1455,6 +1462,9 @@ static void HandleALU(arm_state *cpustate, UINT32 insn)
         // LD TODO sc will always be 0 if this applies
         if (!(insn & INSN_S))
             sc = 0;
+
+        // extra cycle (register specified shift)
+        ARM7_ICOUNT -= 1;
     }
 
     // LD TODO this comment is wrong
@@ -1553,6 +1563,8 @@ static void HandleALU(arm_state *cpustate, UINT32 insn)
 	        {
 	            R15 = (R15 & ~0x03FFFFFC) | (rd & 0x03FFFFFC);
 	        }
+            // extra cycles (PC written)
+            ARM7_ICOUNT -= 2;
         }
         else
         {
@@ -1583,6 +1595,9 @@ static void HandleALU(arm_state *cpustate, UINT32 insn)
 					SET_CPSR( temp);
 					SwitchMode( cpustate, temp & 3);
                 }
+
+                // extra cycles (PC written)
+                ARM7_ICOUNT -= 2;
 
                 /* IRQ masks may have changed in this instruction */
 //              ARM7_CHECKIRQ;
@@ -1620,16 +1635,29 @@ static void HandleALU(arm_state *cpustate, UINT32 insn)
                 LOG(("%08x: TST class on R15 no s bit set\n", R15));
 #endif
         }
+        // extra cycles (PC written)
+        ARM7_ICOUNT -= 2;
     }
+
+    // compensate for the -3 at the end
+    ARM7_ICOUNT += 2;
 }
 
 static void HandleMul(arm_state *cpustate, UINT32 insn)
 {
-    UINT32 r;
+    UINT32 r, rm, rs;
+
+	// MUL takes 1S + mI and MLA 1S + (m+1)I cycles to execute, where S and I are as
+	// defined in 6.2 Cycle Types on page 6-2.
+	// m is the number of 8 bit multiplier array cycles required to complete the
+	// multiply, which is controlled by the value of the multiplier operand
+	// specified by Rs.
+
+	rm = GET_REGISTER(cpustate, insn & INSN_MUL_RM);
+	rs = GET_REGISTER(cpustate, (insn & INSN_MUL_RS) >> INSN_MUL_RS_SHIFT);
 
     /* Do the basic multiply of Rm and Rs */
-    r = GET_REGISTER(cpustate, insn & INSN_MUL_RM) *
-        GET_REGISTER(cpustate, (insn & INSN_MUL_RS) >> INSN_MUL_RS_SHIFT);
+    r = rm * rs;
 
 #if ARM7_DEBUG_CORE
     if ((insn & INSN_MUL_RM) == 0xf ||
@@ -1642,6 +1670,8 @@ static void HandleMul(arm_state *cpustate, UINT32 insn)
     if (insn & INSN_MUL_A)
     {
         r += GET_REGISTER(cpustate, (insn & INSN_MUL_RN) >> INSN_MUL_RN_SHIFT);
+        // extra cycle for MLA
+		ARM7_ICOUNT -= 1;
     }
 
     /* Write the result */
@@ -1652,6 +1682,14 @@ static void HandleMul(arm_state *cpustate, UINT32 insn)
     {
         SET_CPSR((GET_CPSR & ~(N_MASK | Z_MASK)) | HandleALUNZFlags(r));
     }
+
+	if (rs & SIGN_BIT) rs = -rs;
+	if (rs < 0x00000100) ARM7_ICOUNT -= 1 + 1;
+	else if (rs < 0x00010000) ARM7_ICOUNT -= 1 + 2;
+	else if (rs < 0x01000000) ARM7_ICOUNT -= 1 + 3;
+	else ARM7_ICOUNT -= 1 + 4;
+
+	ARM7_ICOUNT += 3;
 }
 
 // todo: add proper cycle counts
@@ -1660,6 +1698,10 @@ static void HandleSMulLong(arm_state *cpustate, UINT32 insn)
     INT32 rm, rs;
     UINT32 rhi, rlo;
     INT64 res = 0;
+
+	// MULL takes 1S + (m+1)I and MLAL 1S + (m+2)I cycles to execute, where m is the
+	// number of 8 bit multiplier array cycles required to complete the multiply, which is
+	// controlled by the value of the multiplier operand specified by Rs.
 
     rm  = (INT32)GET_REGISTER(cpustate, insn & 0xf);
     rs  = (INT32)GET_REGISTER(cpustate, ((insn >> 8) & 0xf));
@@ -1679,6 +1721,8 @@ static void HandleSMulLong(arm_state *cpustate, UINT32 insn)
     {
         INT64 acum = (INT64)((((INT64)(GET_REGISTER(cpustate, rhi))) << 32) | GET_REGISTER(cpustate, rlo));
         res += acum;
+        // extra cycle for MLA
+		ARM7_ICOUNT -= 1;
     }
 
     /* Write the result (upper dword goes to RHi, lower to RLo) */
@@ -1690,6 +1734,14 @@ static void HandleSMulLong(arm_state *cpustate, UINT32 insn)
     {
         SET_CPSR((GET_CPSR & ~(N_MASK | Z_MASK)) | HandleLongALUNZFlags(res));
     }
+
+	if (rs < 0) rs = -rs;
+	if (rs < 0x00000100) ARM7_ICOUNT -= 1 + 1 + 1;
+	else if (rs < 0x00010000) ARM7_ICOUNT -= 1 + 2 + 1;
+	else if (rs < 0x01000000) ARM7_ICOUNT -= 1 + 3 + 1;
+	else ARM7_ICOUNT -= 1 + 4 + 1;
+
+	ARM7_ICOUNT += 3;
 }
 
 // todo: add proper cycle counts
@@ -1698,6 +1750,10 @@ static void HandleUMulLong(arm_state *cpustate, UINT32 insn)
     UINT32 rm, rs;
     UINT32 rhi, rlo;
     UINT64 res = 0;
+
+	// MULL takes 1S + (m+1)I and MLAL 1S + (m+2)I cycles to execute, where m is the
+	// number of 8 bit multiplier array cycles required to complete the multiply, which is
+	// controlled by the value of the multiplier operand specified by Rs.
 
     rm  = (INT32)GET_REGISTER(cpustate, insn & 0xf);
     rs  = (INT32)GET_REGISTER(cpustate, ((insn >> 8) & 0xf));
@@ -1717,6 +1773,8 @@ static void HandleUMulLong(arm_state *cpustate, UINT32 insn)
     {
         UINT64 acum = (UINT64)((((UINT64)(GET_REGISTER(cpustate, rhi))) << 32) | GET_REGISTER(cpustate, rlo));
         res += acum;
+        // extra cycle for MLA
+		ARM7_ICOUNT -= 1;
     }
 
     /* Write the result (upper dword goes to RHi, lower to RLo) */
@@ -1728,6 +1786,13 @@ static void HandleUMulLong(arm_state *cpustate, UINT32 insn)
     {
         SET_CPSR((GET_CPSR & ~(N_MASK | Z_MASK)) | HandleLongALUNZFlags(res));
     }
+
+	if (rs < 0x00000100) ARM7_ICOUNT -= 1 + 1 + 1;
+	else if (rs < 0x00010000) ARM7_ICOUNT -= 1 + 2 + 1;
+	else if (rs < 0x01000000) ARM7_ICOUNT -= 1 + 3 + 1;
+	else ARM7_ICOUNT -= 1 + 4 + 1;
+
+	ARM7_ICOUNT += 3;
 }
 
 static void HandleMemBlock(arm_state *cpustate, UINT32 insn)
@@ -1740,6 +1805,11 @@ static void HandleMemBlock(arm_state *cpustate, UINT32 insn)
     if (rbp & 3)
         LOG(("%08x: Unaligned Mem Transfer @ %08x\n", R15, rbp));
 #endif
+
+	// Normal LDM instructions take nS + 1N + 1I and LDM PC takes (n+1)S + 2N + 1I
+	// incremental cycles, where S,N and I are as defined in 6.2 Cycle Types on page 6-2.
+	// STM instructions take (n-1)S + 2N incremental cycles to execute, where n is the
+	// number of words transferred.
 
     if (insn & INSN_BDT_L)
     {
@@ -1795,12 +1865,9 @@ static void HandleMemBlock(arm_state *cpustate, UINT32 insn)
 						SwitchMode(cpustate, temp & 3);
                     }
                 }
+                // LDM PC - takes 2 extra cycles
+                ARM7_ICOUNT -= 2;
             }
-
-			// note: the next statement should be located within the previous "if" statement (right?), however, doing so will break "39in1"
-
-            // LDM PC - takes 1 extra cycle
-            ARM7_ICOUNT -= 1;
         }
         else
         {
@@ -1851,13 +1918,12 @@ static void HandleMemBlock(arm_state *cpustate, UINT32 insn)
 						SwitchMode(cpustate, temp & 3);
                     }
                 }
-                // LDM PC - takes 1 extra cycle
-                ARM7_ICOUNT -= 1;
+                // LDM PC - takes 2 extra cycles
+                ARM7_ICOUNT -= 2;
             }
-
-            // LDM (NO PC) takes nS + 1n + 1I cycles (n = # of register transfers)
-            ARM7_ICOUNT -= result + 1 + 1;
         }
+        // LDM (NO PC) takes (n)S + 1N + 1I cycles (n = # of register transfers)
+        ARM7_ICOUNT -= result + 1 + 1;
     } /* Loading */
     else
     {
@@ -1929,8 +1995,8 @@ static void HandleMemBlock(arm_state *cpustate, UINT32 insn)
         if (insn & (1 << eR15))
             R15 -= 12;
 
-        // STM takes (n+1)S+2N+1I cycles (n = # of register transfers)
-        ARM7_ICOUNT -= (result + 1) + 2 + 1;
+        // STM takes (n-1)S + 2N cycles (n = # of register transfers)
+        ARM7_ICOUNT -= (result - 1) + 2;
     }
 
     // We will specify the cycle count for each case, so remove the -3 that occurs at the end
