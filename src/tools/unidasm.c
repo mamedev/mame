@@ -161,6 +161,7 @@ CPU_DISASSEMBLE( r3000be );
 CPU_DISASSEMBLE( r3000le );
 CPU_DISASSEMBLE( nec_generic );
 CPU_DISASSEMBLE( pdp1 );
+CPU_DISASSEMBLE( pps4 );
 CPU_DISASSEMBLE( tx0_64kw );
 CPU_DISASSEMBLE( tx0_8kw );
 CPU_DISASSEMBLE( pic16c5x );
@@ -286,6 +287,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "r3000le",    _32le,  0, CPU_DISASSEMBLE_NAME(r3000le) },
 	{ "nec",        _8bit,  0, CPU_DISASSEMBLE_NAME(nec_generic) },
 	{ "pdp1",       _32be,  0, CPU_DISASSEMBLE_NAME(pdp1) },
+	{ "pps4",		_8bit,  0, CPU_DISASSEMBLE_NAME(pps4) },
 	{ "tx0_64kw",   _32be, -2, CPU_DISASSEMBLE_NAME(tx0_64kw) },
 	{ "tx0_8kw",    _32be, -2, CPU_DISASSEMBLE_NAME(tx0_8kw) },
 	{ "pic16c5x",   _16le, -1, CPU_DISASSEMBLE_NAME(pic16c5x) },

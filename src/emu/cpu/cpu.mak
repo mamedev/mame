@@ -1755,3 +1755,16 @@ endif
 
 $(CPUOBJ)/superfx/superfx.o:$(CPUSRC)/superfx/superfx.c \
 							$(CPUSRC)/superfx/superfx.h
+
+#-------------------------------------------------
+# Rockwell PPS-4
+#-------------------------------------------------
+
+ifneq ($(filter PPS4,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/pps4
+CPUOBJS += $(CPUOBJ)/pps4/pps4.o
+DASMOBJS += $(CPUOBJ)/pps4/pps4dasm.o
+endif
+
+$(CPUOBJ)/pps4/pps4.o:	$(CPUSRC)/pps4/pps4.c \
+							$(CPUSRC)/pps4/pps4.h

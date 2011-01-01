@@ -122,7 +122,7 @@ CPUS += I8008
 CPUS += SCMP
 CPUS += MN10200
 CPUS += COSMAC
-
+CPUS += PPS4
 
 
 #-------------------------------------------------
@@ -326,6 +326,7 @@ DRVLIBS = \
 	$(MAMEOBJ)/yunsung.a \
 	$(MAMEOBJ)/zaccaria.a \
 	$(MAMEOBJ)/misc.a \
+	$(MAMEOBJ)/pinball.a \
 	$(MAMEOBJ)/shared.a \
 
 
@@ -1482,6 +1483,84 @@ $(MAMEOBJ)/zaccaria.a: \
 
 
 #-------------------------------------------------
+# pinball drivers
+#-------------------------------------------------
+$(MAMEOBJ)/pinball.a: \
+	$(DRIVERS)/allied.o  \
+	$(DRIVERS)/alvg.o  \
+	$(DRIVERS)/atari_s1.o  \
+	$(DRIVERS)/atari_s2.o  \
+	$(DRIVERS)/atari_s3.o  \
+	$(DRIVERS)/bingo.o  \
+	$(DRIVERS)/by17.o  \
+	$(DRIVERS)/by35.o  \
+	$(DRIVERS)/by6803.o  \
+	$(DRIVERS)/by68701.o  \
+	$(DRIVERS)/byvid.o  \
+	$(DRIVERS)/capcom.o  \
+	$(DRIVERS)/de_1.o  \
+	$(DRIVERS)/de_2.o  \
+	$(DRIVERS)/de_3.o  \
+	$(DRIVERS)/de_3b.o  \
+	$(DRIVERS)/flicker.o  \
+	$(DRIVERS)/g627.o  \
+	$(DRIVERS)/gp_1.o  \
+	$(DRIVERS)/gp_2.o  \
+	$(DRIVERS)/gts1.o  \
+	$(DRIVERS)/gts3.o  \
+	$(DRIVERS)/gts80.o  \
+	$(DRIVERS)/gts80a.o  \
+	$(DRIVERS)/gts80b.o  \
+	$(DRIVERS)/hankin.o  \
+	$(DRIVERS)/icecold.o  \
+	$(DRIVERS)/inder.o  \
+	$(DRIVERS)/jp.o  \
+	$(DRIVERS)/jvh.o  \
+	$(DRIVERS)/kissproto.o  \
+	$(DRIVERS)/ltd.o  \
+	$(DRIVERS)/micropin.o  \
+	$(DRIVERS)/mephisto.o  \
+	$(DRIVERS)/mrgame.o  \
+	$(DRIVERS)/nsm.o  \
+	$(DRIVERS)/peyper.o  \
+	$(DRIVERS)/play_1.o  \
+	$(DRIVERS)/play_2.o  \
+	$(DRIVERS)/play_3.o  \
+	$(DRIVERS)/play_5.o  \
+	$(DRIVERS)/rowamet.o  \
+	$(DRIVERS)/s11.o  \
+	$(DRIVERS)/s11a.o  \
+	$(DRIVERS)/s11b.o  \
+	$(DRIVERS)/s11c.o  \
+	$(DRIVERS)/s3.o  \
+	$(DRIVERS)/s4.o  \
+	$(DRIVERS)/s6.o  \
+	$(DRIVERS)/s6a.o  \
+	$(DRIVERS)/s7.o  \
+	$(DRIVERS)/s8.o  \
+	$(DRIVERS)/s9.o  \
+	$(DRIVERS)/sleic.o  \
+	$(DRIVERS)/spinb.o  \
+	$(DRIVERS)/st_mp100.o  \
+	$(DRIVERS)/st_mp200.o  \
+	$(DRIVERS)/taito.o  \
+	$(DRIVERS)/techno.o  \
+	$(DRIVERS)/vd.o  \
+	$(DRIVERS)/whitestar.o  \
+	$(DRIVERS)/white_mod.o  \
+	$(DRIVERS)/wico.o  \
+	$(DRIVERS)/wpc_95.o  \
+	$(DRIVERS)/wpc_an.o  \
+	$(DRIVERS)/wpc_dcs.o  \
+	$(DRIVERS)/wpc_dot.o  \
+	$(DRIVERS)/wpc_flip1.o  \
+	$(DRIVERS)/wpc_flip2.o  \
+	$(DRIVERS)/wpc_s.o  \
+	$(DRIVERS)/zac_1.o  \
+	$(DRIVERS)/zac_2.o  \
+	$(DRIVERS)/zac_proto.o  \
+
+#-------------------------------------------------
 # remaining drivers
 #-------------------------------------------------
 
@@ -1909,7 +1988,9 @@ $(DRIVERS)/wecleman.o:	$(LAYOUT)/wecleman.lh
 
 $(DRIVERS)/zac2650.o:	$(LAYOUT)/tinv2650.lh
 
+$(DRIVERS)/peyper.o:	$(LAYOUT)/peyper.lh
 
+$(MAMEOBJ)/mamedriv.o:	$(LAYOUT)/pinball.lh
 
 #-------------------------------------------------
 # misc dependencies
