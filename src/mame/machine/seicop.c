@@ -1921,6 +1921,7 @@ static struct
 {
 	int x,y;
 	int min_x,min_y,max_x,max_y;
+	UINT16 hitbox;
 }cop_collision_info[2];
 
 /* Taken from Seibu Cup Soccer bootleg (TODO: understand the algorythm and remove this) */
@@ -2216,7 +2217,8 @@ static WRITE16_HANDLER( generic_cop_w )
 
 		case (0x044/2):
 		{
-			cop_scale = data;
+			/*TODO: this appears to control sine cosine maths, but all games here doesn't seem to like current implementation ... */
+			cop_scale = 1;
 			break;
 		}
 
@@ -2225,22 +2227,22 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x0c0/2): { cop_register[0] = (cop_register[0]&0xffff0000)|(cop_mcu_ram[offset]<<0);  break; }
 
 		case (0x0a2/2): { cop_register[1] = (cop_register[1]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
-		case (0x0c2/2): { cop_register[1] = (cop_register[1]&0xffff0000)|(cop_mcu_ram[offset]<<0);   break; }
+		case (0x0c2/2): { cop_register[1] = (cop_register[1]&0xffff0000)|(cop_mcu_ram[offset]<<0);  break; }
 
 		case (0x0a4/2): { cop_register[2] = (cop_register[2]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
 		case (0x0c4/2): { cop_register[2] = (cop_register[2]&0xffff0000)|(cop_mcu_ram[offset]<<0);  break; }
 
 		case (0x0a6/2): { cop_register[3] = (cop_register[3]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
-		case (0x0c6/2): { cop_register[3] = (cop_register[3]&0xffff0000)|(cop_mcu_ram[offset]<<0);   break; }
+		case (0x0c6/2): { cop_register[3] = (cop_register[3]&0xffff0000)|(cop_mcu_ram[offset]<<0);  break; }
 
 		case (0x0a8/2): { cop_register[4] = (cop_register[4]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
-		case (0x0c8/2): { cop_register[4] = (cop_register[4]&0xffff0000)|(cop_mcu_ram[offset]<<0);   break; }
+		case (0x0c8/2): { cop_register[4] = (cop_register[4]&0xffff0000)|(cop_mcu_ram[offset]<<0);  break; }
 
 		case (0x0aa/2): { cop_register[5] = (cop_register[5]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
-		case (0x0ca/2): { cop_register[5] = (cop_register[5]&0xffff0000)|(cop_mcu_ram[offset]<<0);   break; }
+		case (0x0ca/2): { cop_register[5] = (cop_register[5]&0xffff0000)|(cop_mcu_ram[offset]<<0);  break; }
 
 		case (0x0ac/2): { cop_register[6] = (cop_register[6]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
-		case (0x0cc/2): { cop_register[6] = (cop_register[6]&0xffff0000)|(cop_mcu_ram[offset]<<0);   break; }
+		case (0x0cc/2): { cop_register[6] = (cop_register[6]&0xffff0000)|(cop_mcu_ram[offset]<<0);  break; }
 
 
 		case (0x100/2):
@@ -2436,12 +2438,22 @@ static WRITE16_HANDLER( generic_cop_w )
 			if(COP_CMD(0xb40,0xbc0,0xbc2,0x000,0x000,0x000,0x000,0x000,u1,u2))
 			{
 				/* Take hitbox param, TODO */
-				//cop_collision_info[0].hitbox = space->read_word(cop_register[2]);
-				cop_collision_info[0].min_x = cop_collision_info[0].x + (0 << 16);
-				cop_collision_info[0].min_y = cop_collision_info[0].y + (0 << 16);
-				cop_collision_info[0].max_x = cop_collision_info[0].x + (0x10 << 16);
-				cop_collision_info[0].max_y = cop_collision_info[0].y + (0x10 << 16);
+				cop_collision_info[0].hitbox = space->read_word(cop_register[2]);
 
+				if(cop_collision_info[0].hitbox == 0xc8) //hack for SD Gundam
+				{
+					cop_collision_info[0].min_x = cop_collision_info[0].x + (0 << 16);
+					cop_collision_info[0].min_y = cop_collision_info[0].y - (0x10 << 16);
+					cop_collision_info[0].max_x = cop_collision_info[0].x + (0xc0 << 16);
+					cop_collision_info[0].max_y = cop_collision_info[0].y + (0 << 16);
+				}
+				else
+				{
+					cop_collision_info[0].min_x = cop_collision_info[0].x + (0 << 16);
+					cop_collision_info[0].min_y = cop_collision_info[0].y + (0 << 16);
+					cop_collision_info[0].max_x = cop_collision_info[0].x + (0x10 << 16);
+					cop_collision_info[0].max_y = cop_collision_info[0].y + (0x10 << 16);
+				}
 				/* do the math */
 				cop_hit_status = cop_calculate_collsion_detection(space->machine);
 				return;
@@ -2458,14 +2470,15 @@ static WRITE16_HANDLER( generic_cop_w )
 			if(COP_CMD(0xb60,0xbe0,0xbe2,0x000,0x000,0x000,0x000,0x000,u1,u2))
 			{
 				/* Take hitbox param, TODO */
-				//cop_collision_info[1].hitbox = space->read_word(cop_register[3]);
+				cop_collision_info[1].hitbox = space->read_word(cop_register[3]);
+
 				cop_collision_info[1].min_x = cop_collision_info[1].x + (0 << 16);
 				cop_collision_info[1].min_y = cop_collision_info[1].y + (0 << 16);
 				cop_collision_info[1].max_x = cop_collision_info[1].x + (0x10 << 16);
 				cop_collision_info[1].max_y = cop_collision_info[1].y + (0x10 << 16);
 
 				//if(cop_collision_info[0].x || cop_collision_info[1].x)
-				//	popmessage("%08x %08x",cop_collision_info[0].x,cop_collision_info[1].x);
+				popmessage("0: %08x %08x %08x 1: %08x %08x %08x",cop_collision_info[0].x,cop_collision_info[0].y,cop_collision_info[0].hitbox,cop_collision_info[1].x,cop_collision_info[1].y,cop_collision_info[1].hitbox);
 
 				/* do the math */
 				cop_hit_status = cop_calculate_collsion_detection(space->machine);
@@ -2531,8 +2544,8 @@ static WRITE16_HANDLER( generic_cop_w )
 				//space->write_byte(cop_register[0]+(0x34^3), test ^ 0x80);
 			}
 
+			if(cop_mcu_ram[offset] != 0x3bb0)
 			printf("%04x\n",cop_mcu_ram[offset]);
-
 			break;
 		}
 
