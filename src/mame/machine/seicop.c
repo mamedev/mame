@@ -1917,6 +1917,8 @@ static UINT16 cop_status,cop_dist,cop_angle;
 static UINT16 cop_hit_status;
 static UINT32 cop_hit_val_x,cop_hit_val_y;
 static UINT32 cop_sort_lookup,cop_sort_ram_addr,cop_sort_param;
+static INT8 cop_angle_compare;
+static UINT8 cop_angle_mod_val;
 static struct
 {
 	int x,y;
@@ -2131,7 +2133,8 @@ static WRITE16_HANDLER( generic_cop_w )
 			break;
 
 		/* triggered before 0x6200 in Seibu Cup, looks like an angle value ... */
-		//case (0x1c/2): break;
+		case (0x1c/2): cop_angle_compare = cop_mcu_ram[0x1c/2] & 0xff;	break;
+		case (0x1e/2): cop_angle_mod_val = cop_mcu_ram[0x1e/2] & 0xff; break;
 
 		case (0x08c/2): cop_sprite_dma_abs_y = (cop_mcu_ram[0x08c/2]); break;
 		case (0x08e/2): cop_sprite_dma_abs_x = (cop_mcu_ram[0x08e/2]); break;
@@ -2151,7 +2154,7 @@ static WRITE16_HANDLER( generic_cop_w )
             This looks like a register for the BCD...
             Godzilla and Heated Barrel sets 3
             Denjin Makai sets 3 at start-up and toggles between 2 and 3 during gameplay on the BCD subroutine
-            SD Gundam sets 0 (maybe there's a mirror somewhere else? 0x01e for example is setted with an 8)
+            SD Gundam sets 0
             */
 			break;
 
@@ -2218,7 +2221,9 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x044/2):
 		{
 			/*TODO: this appears to control sine cosine maths, but all games here doesn't seem to like current implementation ... */
-			cop_scale = 1;
+			cop_scale = 2;
+			if(data == 4)
+				cop_scale = 0;
 			break;
 		}
 
@@ -2318,7 +2323,7 @@ static WRITE16_HANDLER( generic_cop_w )
 				return;
 			}
 
-			/* "automatic" movement, for arks in Legionnaire / Zero Team */
+			/* "automatic" movement, for arks in Legionnaire / Zero Team (expression adjustment) */
 			if(COP_CMD(0x194,0x288,0x088,0x000,0x000,0x000,0x000,0x000,6,0xfbfb))
 			{
 				static UINT8 offs;
@@ -2478,7 +2483,7 @@ static WRITE16_HANDLER( generic_cop_w )
 				cop_collision_info[1].max_y = cop_collision_info[1].y + (0x10 << 16);
 
 				//if(cop_collision_info[0].x || cop_collision_info[1].x)
-				popmessage("0: %08x %08x %08x 1: %08x %08x %08x",cop_collision_info[0].x,cop_collision_info[0].y,cop_collision_info[0].hitbox,cop_collision_info[1].x,cop_collision_info[1].y,cop_collision_info[1].hitbox);
+				//popmessage("0: %08x %08x %08x 1: %08x %08x %08x",cop_collision_info[0].x,cop_collision_info[0].y,cop_collision_info[0].hitbox,cop_collision_info[1].x,cop_collision_info[1].y,cop_collision_info[1].hitbox);
 
 				/* do the math */
 				cop_hit_status = cop_calculate_collsion_detection(space->machine);
@@ -2544,8 +2549,37 @@ static WRITE16_HANDLER( generic_cop_w )
 				//space->write_byte(cop_register[0]+(0x34^3), test ^ 0x80);
 			}
 
+			//(grainbow) | 8 | f3e7 | 6200 | 380 39a 380 a80 29a
+			/* search direction, used on SD Gundam homing weapon */
+			/* FIXME: It mustn't change direction */
+			if(COP_CMD(0x380,0x39a,0x380,0xa80,0x29a,0x000,0x000,0x000,8,0xf3e7))
+			{
+				static INT8 cur_angle;
+				cur_angle = space->read_word(cop_register[0]+(0x34^2)) & 0xff;
+
+				//popmessage("(%02x %02x) %02x",cur_angle,cop_angle_compare,cop_angle_mod_val);
+
+				if(cur_angle < cop_angle_compare)
+				{
+					//if((cop_angle_compare - cur_angle) < cop_angle_mod_val)
+					//	cur_angle += (cop_angle_compare - cur_angle);
+					//else
+						cur_angle += cop_angle_mod_val;
+				}
+
+				if(cur_angle > cop_angle_compare)
+				{
+					//if((cur_angle - cop_angle_compare) < cop_angle_mod_val)
+					//	cur_angle -= (cop_angle_compare - cur_angle);
+					//else
+						cur_angle -= cop_angle_mod_val;
+				}
+
+				space->write_word(cop_register[0]+(0x34^2),cur_angle);
+			}
+
 			if(cop_mcu_ram[offset] != 0x3bb0)
-			printf("%04x\n",cop_mcu_ram[offset]);
+				printf("%04x\n",cop_mcu_ram[offset]);
 			break;
 		}
 
