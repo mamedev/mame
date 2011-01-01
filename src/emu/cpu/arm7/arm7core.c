@@ -731,7 +731,6 @@ static void arm7_check_irq_state(arm_state *cpustate)
         	SET_CPSR(temp);            /* Mask IRQ */
         }
         if ((COPRO_CTRL & COPRO_CTRL_MMU_EN) && (COPRO_CTRL & COPRO_CTRL_INTVEC_ADJUST)) R15 |= 0xFFFF0000;
-        if ((COPRO_CTRL & COPRO_CTRL_MMU_EN) && (COPRO_CTRL & COPRO_CTRL_INTVEC_ADJUST)) R15 |= 0xFFFF0000;
         cpustate->pendingSwi = 0;
         return;
     }
@@ -1796,9 +1795,12 @@ static void HandleMemBlock(arm_state *cpustate, UINT32 insn)
 						SwitchMode(cpustate, temp & 3);
                     }
                 }
-               // LDM PC - takes 1 extra cycle
-    	        ARM7_ICOUNT -= 1;
             }
+
+			// note: the next statement should be located within the previous "if" statement (right?), however, doing so will break "39in1"
+
+            // LDM PC - takes 1 extra cycle
+            ARM7_ICOUNT -= 1;
         }
         else
         {
