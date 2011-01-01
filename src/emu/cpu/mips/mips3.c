@@ -393,60 +393,60 @@ INLINE int RDOUBLE_MASKED(offs_t address, UINT64 *result, UINT64 mem_mask)
 INLINE void WBYTE(offs_t address, UINT8 data)
 {
 	UINT32 tlbval = mips3.tlb_table[address >> 12];
-	if (tlbval & 1)
-		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
+	if (tlbval & VTLB_WRITE_ALLOWED)
+		(*mips3.core.memory.write_byte)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff), data);
 	else
-		(*mips3.core.memory.write_byte)(mips3.core.program, tlbval | (address & 0xfff), data);
+		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
 }
 
 
 INLINE void WHALF(offs_t address, UINT16 data)
 {
 	UINT32 tlbval = mips3.tlb_table[address >> 12];
-	if (tlbval & 1)
-		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
+	if (tlbval & VTLB_WRITE_ALLOWED)
+		(*mips3.core.memory.write_word)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff), data);
 	else
-		(*mips3.core.memory.write_word)(mips3.core.program, tlbval | (address & 0xfff), data);
+		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
 }
 
 
 INLINE void WWORD(offs_t address, UINT32 data)
 {
 	UINT32 tlbval = mips3.tlb_table[address >> 12];
-	if (tlbval & 1)
-		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
+	if (tlbval & VTLB_WRITE_ALLOWED)
+		(*mips3.core.memory.write_dword)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff), data);
 	else
-		(*mips3.core.memory.write_dword)(mips3.core.program, tlbval | (address & 0xfff), data);
+		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
 }
 
 
 INLINE void WWORD_MASKED(offs_t address, UINT32 data, UINT32 mem_mask)
 {
 	UINT32 tlbval = mips3.tlb_table[address >> 12];
-	if (tlbval & 1)
-		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
+	if (tlbval & VTLB_WRITE_ALLOWED)
+		(*mips3.core.memory.write_dword_masked)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff), data, mem_mask);
 	else
-		(*mips3.core.memory.write_dword_masked)(mips3.core.program, tlbval | (address & 0xfff), data, mem_mask);
+		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
 }
 
 
 INLINE void WDOUBLE(offs_t address, UINT64 data)
 {
 	UINT32 tlbval = mips3.tlb_table[address >> 12];
-	if (tlbval & 1)
-		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
+	if (tlbval & VTLB_WRITE_ALLOWED)
+		(*mips3.core.memory.write_qword)(mips3.core.program, (tlbval & ~0xfff)  | (address & 0xfff), data);
 	else
-		(*mips3.core.memory.write_qword)(mips3.core.program, tlbval | (address & 0xfff), data);
+		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
 }
 
 
 INLINE void WDOUBLE_MASKED(offs_t address, UINT64 data, UINT64 mem_mask)
 {
 	UINT32 tlbval = mips3.tlb_table[address >> 12];
-	if (tlbval & 1)
-		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
+	if (tlbval & VTLB_WRITE_ALLOWED)
+		(*mips3.core.memory.write_qword_masked)(mips3.core.program, (tlbval & ~0xfff)  | (address & 0xfff), data, mem_mask);
 	else
-		(*mips3.core.memory.write_qword_masked)(mips3.core.program, tlbval | (address & 0xfff), data, mem_mask);
+		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
 }
 
 
@@ -2133,6 +2133,97 @@ static CPU_GET_INFO( mips3 )
 
 
 /***************************************************************************
+    NEC VR4300 VARIANTS
+***************************************************************************/
+
+// NEC VR4300 series is MIPS III with 32-bit address bus and slightly custom COP0/TLB
+static CPU_INIT( vr4300be )
+{
+	mips3com_init(&mips3.core, MIPS3_TYPE_VR4300, TRUE, device, irqcallback);
+	mips3.tlb_table = vtlb_table(mips3.core.vtlb);
+}
+
+static CPU_INIT( vr4300le )
+{
+	mips3com_init(&mips3.core, MIPS3_TYPE_VR4300, FALSE, device, irqcallback);
+	mips3.tlb_table = vtlb_table(mips3.core.vtlb);
+}
+
+CPU_GET_INFO( vr4300be )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(vr4300be);				break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "VR4300 (big)");			break;
+
+		/* --- everything else is handled generically --- */
+		default:										CPU_GET_INFO_CALL(mips3);			break;
+	}
+}
+
+CPU_GET_INFO( vr4300le )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(vr4300le);				break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "VR4300 (little)");		break;
+
+		/* --- everything else is handled generically --- */
+		default:										CPU_GET_INFO_CALL(mips3);			break;
+	}
+}
+
+// VR4310 = VR4300 with different speed bin
+CPU_GET_INFO( vr4310be )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(vr4300be);				break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "VR4310 (big)");			break;
+
+		/* --- everything else is handled generically --- */
+		default:										CPU_GET_INFO_CALL(mips3);			break;
+	}
+}
+
+CPU_GET_INFO( vr4310le )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(vr4300le);				break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "VR4310 (little)");		break;
+
+		/* --- everything else is handled generically --- */
+		default:										CPU_GET_INFO_CALL(mips3);			break;
+	}
+}
+
+
+/***************************************************************************
     R4600 VARIANTS
 ***************************************************************************/
 
@@ -2453,6 +2544,14 @@ CPU_GET_INFO( rm7000le )
 		/* --- everything else is handled generically --- */
 		default:										CPU_GET_INFO_CALL(mips3);			break;
 	}
+}
+
+void mips3drc_set_options(running_device *device, UINT32 options)
+{
+}
+
+void mips3drc_add_fastram(running_device *device, offs_t start, offs_t end, UINT8 readonly, void *base)
+{
 }
 
 DEFINE_LEGACY_CPU_DEVICE(VR4300BE, vr4300be);
