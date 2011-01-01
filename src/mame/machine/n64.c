@@ -335,9 +335,9 @@ static int sp_dma_skip;
 static UINT32 sp_semaphore;
 static UINT32 dp_clock = 0;
 
-static void sp_dma(int direction)
+static void sp_dma(running_machine *machine, int direction)
 {
-	UINT8 *src, *dst;
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i, c;
 
 	if (sp_dma_length == 0)
@@ -387,14 +387,14 @@ static void sp_dma(int direction)
 	{
         for (c=0; c <= sp_dma_count; c++)
         {
-            src = (UINT8*)&rdram[sp_dram_addr / 4];
-            dst = (sp_mem_addr & 0x1000) ? (UINT8*)&rsp_imem[(sp_mem_addr & 0xfff) / 4] : (UINT8*)&rsp_dmem[(sp_mem_addr & 0xfff) / 4];
+            UINT32 src = sp_dram_addr;
+            UINT32 dst = 0x04000000 | (sp_mem_addr & 0x1fff);
 
 			//printf("CPU %08x -> RSP %08x\n", sp_dram_addr, 0x04000000 | sp_mem_addr);
             for (i=0; i < sp_dma_length; i++)
             {
-				//printf("%02x ", src[i]);
-				dst[i] = src[i];
+				//printf("%02x ", space->read_byte((src + i)^3));
+				space->write_byte(dst + i, space->read_byte(src + i));
             }
             //printf("\n");
 
@@ -408,14 +408,14 @@ static void sp_dma(int direction)
 	{
         for (c=0; c <= sp_dma_count; c++)
         {
-            src = (sp_mem_addr & 0x1000) ? (UINT8*)&rsp_imem[(sp_mem_addr & 0xfff) / 4] : (UINT8*)&rsp_dmem[(sp_mem_addr & 0xfff) / 4];
-            dst = (UINT8*)&rdram[sp_dram_addr / 4];
+            UINT32 src = 0x04000000 | (sp_mem_addr & 0x1fff);
+            UINT32 dst = sp_dram_addr;
 
 			//printf("RSP %08x -> CPU %08x\n", 0x04000000 | sp_mem_addr, sp_dram_addr);
             for (i=0; i < sp_dma_length; i++)
             {
-				//printf("%02x ", src[i]);
-                dst[i] = src[i];
+				//printf("%02x ", space->read_byte((src + i)^3));
+				space->write_byte(dst + i, space->read_byte(src + i));
             }
             //printf("\n");
 
@@ -525,14 +525,14 @@ WRITE32_DEVICE_HANDLER( n64_sp_reg_w )
 				sp_dma_length = data & 0xfff;
 				sp_dma_count = (data >> 12) & 0xff;
 				sp_dma_skip = (data >> 20) & 0xfff;
-				sp_dma(0);
+				sp_dma(device->machine, 0);
 				break;
 
 			case 0x0c/4:		// SP_WR_LEN_REG
 				sp_dma_length = data & 0xfff;
 				sp_dma_count = (data >> 12) & 0xff;
 				sp_dma_skip = (data >> 20) & 0xfff;
-				sp_dma(1);
+				sp_dma(device->machine, 1);
 				break;
 
             case 0x10/4:        // RSP_STATUS_REG
@@ -1120,7 +1120,7 @@ static void start_audio_dma(running_machine *machine)
 
 	dmadac[0] = machine->device<dmadac_sound_device>("dac1");
 	dmadac[1] = machine->device<dmadac_sound_device>("dac2");
-    dmadac_transfer(&dmadac[0], 2, 2, 2, current->length/4, ram);
+    dmadac_transfer(&dmadac[0], 2, 1, 2, current->length/4, ram);
 
     ai_status |= 0x40000000;
 
@@ -1335,7 +1335,7 @@ WRITE32_HANDLER( n64_pi_reg_w )
                 dma_length = (dma_length + 3) & ~3;
             }
 
-			//mame_printf_debug("PI DMA: %08X to %08X, length %08X\n", pi_cart_addr, pi_dram_addr, dma_length);
+			//printf("PI DMA: %08X to %08X, length %08X\n", pi_cart_addr, pi_dram_addr, dma_length);
 
 			if (pi_dram_addr != 0xffffffff)
 			{
@@ -2022,8 +2022,6 @@ MACHINE_START( n64 )
 	mips3drc_add_fastram(machine->device("maincpu"), 0x00000000, 0x007fffff, FALSE, rdram);
 
 	rspdrc_set_options(machine->device("rsp"), RSPDRC_STRICT_VERIFY);
-	rspdrc_add_imem(machine->device("rsp"), rsp_imem);
-	rspdrc_add_dmem(machine->device("rsp"), rsp_dmem);
 	rspdrc_flush_drc_cache(machine->device("rsp"));
 
 	audio_timer = timer_alloc(machine, audio_timer_callback, NULL);
@@ -2032,8 +2030,8 @@ MACHINE_START( n64 )
 MACHINE_RESET( n64 )
 {
 	int i;
-	//UINT32 *pif_rom   = (UINT32*)machine->region("user1")->base();
-	UINT32 *cart = (UINT32*)machine->region("user2")->base();
+	//UINT32 *pif_rom   = (UINT32*)machine->region("user1");
+	UINT32 *cart = (UINT32*)machine->region("user2");
 	UINT64 boot_checksum;
 
 	mi_version = 0;

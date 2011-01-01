@@ -123,7 +123,7 @@ struct _rspimp_state
 	UINT32				vres[8];					/* used for temporary vector results */
 
 	/* register mappings */
-	drcuml_parameter	regmap[34];					/* parameter to register mappings for all 32 integer registers */
+	drcuml_parameter	regmap[32];					/* parameter to register mappings for all 32 integer registers */
 
 	/* subroutines */
 	drcuml_codehandle *	entry;						/* entry point */
@@ -135,10 +135,6 @@ struct _rspimp_state
 	drcuml_codehandle *	write16;					/* write half */
 	drcuml_codehandle *	read32;						/* read word */
 	drcuml_codehandle *	write32;					/* write word */
-
-	/* fast RAM */
-	void*				dmem;
-	void*				imem;
 };
 
 /***************************************************************************
@@ -305,70 +301,98 @@ INLINE void save_fast_iregs(rsp_state *rsp, drcuml_block *block)
     CORE CALLBACKS
 ***************************************************************************/
 
-/* Legacy.  Needed for vector cfuncs. */
 INLINE UINT8 READ8(rsp_state *rsp, UINT32 address)
 {
-	UINT8* dmem = (UINT8*)rsp->impstate->dmem;
-	UINT8 ret = dmem[BYTE4_XOR_BE(address & 0x00000fff)];
-	//printf("%04xr%02x\n", address & 0x00001fff, ret);
+	UINT8 ret;
+	address = 0x04000000 | (address & 0xfff);
+	ret = rsp->program->read_byte(address);
+	//printf("%04xr%02x\n",address & 0x1fff, ret);
 	return ret;
 }
 
-/* Legacy.  Needed for vector cfuncs. */
+static void cfunc_read8(void *param)
+{
+	rsp_state *rsp = (rsp_state *)param;
+	rsp->impstate->arg0 = READ8(rsp, rsp->impstate->arg0);
+}
+
 INLINE UINT16 READ16(rsp_state *rsp, UINT32 address)
 {
-	UINT8* dmem = (UINT8*)rsp->impstate->dmem;
-	UINT16 ret = 0;
-	address &= 0x00000fff;
-	ret  = (UINT16)dmem[BYTE4_XOR_BE(address+0)] << 8;
-	ret |= (UINT16)dmem[BYTE4_XOR_BE(address+1)];
-	//printf("%04xr%04x\n", address & 0x00001fff, ret);
+	UINT16 ret;
+	address = 0x04000000 | (address & 0xfff);
+	ret = rsp->program->read_byte(address+0) << 8;
+	ret |= rsp->program->read_byte(address+1) << 0;
+	//printf("%04xr%04x\n",address & 0x1fff, ret);
 	return ret;
 }
 
-/* Legacy.  Needed for vector cfuncs. */
+static void cfunc_read16(void *param)
+{
+	rsp_state *rsp = (rsp_state *)param;
+	rsp->impstate->arg0 = READ16(rsp, rsp->impstate->arg0);
+}
+
 INLINE UINT32 READ32(rsp_state *rsp, UINT32 address)
 {
-	UINT8* dmem = (UINT8*)rsp->impstate->dmem;
-	UINT32 ret = 0;
-	address &= 0x00000fff;
-	ret  = (UINT32)dmem[BYTE4_XOR_BE(address+0)] << 24;
-	ret |= (UINT32)dmem[BYTE4_XOR_BE(address+1)] << 16;
-	ret |= (UINT32)dmem[BYTE4_XOR_BE(address+2)] <<  8;
-	ret |= (UINT32)dmem[BYTE4_XOR_BE(address+3)];
-	//printf("%04xr%08x\n", address & 0x00001fff, ret);
+	UINT32 ret;
+	address = 0x04000000 | (address & 0xfff);
+	ret = rsp->program->read_byte(address+0) << 24;
+	ret |= rsp->program->read_byte(address+1) << 16;
+	ret |= rsp->program->read_byte(address+2) << 8;
+	ret |= rsp->program->read_byte(address+3) << 0;
+	//printf("%04xr%08x\n",address & 0x1fff, ret);
 	return ret;
 }
 
-/* Legacy.  Needed for vector cfuncs. */
+static void cfunc_read32(void *param)
+{
+	rsp_state *rsp = (rsp_state *)param;
+	rsp->impstate->arg0 = READ32(rsp, rsp->impstate->arg0);
+}
+
 INLINE void WRITE8(rsp_state *rsp, UINT32 address, UINT8 data)
 {
-	UINT8* dmem = (UINT8*)rsp->impstate->dmem;
-	address &= 0x00000fff;
-	//printf("%04x:%02x\n", address & 0x00001fff, data);
-	dmem[BYTE4_XOR_BE(address)] = data;
+	address = 0x04000000 | (address & 0xfff);
+	//printf("%04x:%02x\n",address & 0x1fff, data);
+	rsp->program->write_byte(address, data);
 }
 
-/* Legacy.  Needed for vector cfuncs. */
+static void cfunc_write8(void *param)
+{
+	rsp_state *rsp = (rsp_state *)param;
+	WRITE8(rsp, rsp->impstate->arg0, (UINT8)rsp->impstate->arg1);
+}
+
 INLINE void WRITE16(rsp_state *rsp, UINT32 address, UINT16 data)
 {
-	UINT8* dmem = (UINT8*)rsp->impstate->dmem;
-	address &= 0x00000fff;
-	//printf("%04x:%04x\n", address & 0x00001fff, data);
-	dmem[BYTE4_XOR_BE(address+0)] = (UINT8)(data >> 8);
-	dmem[BYTE4_XOR_BE(address+1)] = (UINT8)(data >> 0);
+	address = 0x04000000 | (address & 0xfff);
+
+	//printf("%04x:%04x\n",address & 0x1fff, data);
+	rsp->program->write_byte(address + 0, (data >> 8) & 0xff);
+	rsp->program->write_byte(address + 1, (data >> 0) & 0xff);
 }
 
-/* Legacy.  Needed for vector cfuncs. */
+static void cfunc_write16(void *param)
+{
+	rsp_state *rsp = (rsp_state *)param;
+	WRITE16(rsp, rsp->impstate->arg0, (UINT16)rsp->impstate->arg1);
+}
+
 INLINE void WRITE32(rsp_state *rsp, UINT32 address, UINT32 data)
 {
-	UINT8* dmem = (UINT8*)rsp->impstate->dmem;
-	address &= 0x00000fff;
-	//printf("%04x:%08x\n", address & 0x00001fff, data);
-	dmem[BYTE4_XOR_BE(address+0)] = (UINT8)(data >> 24);
-	dmem[BYTE4_XOR_BE(address+1)] = (UINT8)(data >> 16);
-	dmem[BYTE4_XOR_BE(address+2)] = (UINT8)(data >>  8);
-	dmem[BYTE4_XOR_BE(address+3)] = (UINT8)(data >>  0);
+	address = 0x04000000 | (address & 0xfff);
+
+	//printf("%04x:%08x\n",address & 0x1fff, data);
+	rsp->program->write_byte(address + 0, (data >> 24) & 0xff);
+	rsp->program->write_byte(address + 1, (data >> 16) & 0xff);
+	rsp->program->write_byte(address + 2, (data >> 8) & 0xff);
+	rsp->program->write_byte(address + 3, (data >> 0) & 0xff);
+}
+
+static void cfunc_write32(void *param)
+{
+	rsp_state *rsp = (rsp_state *)param;
+	WRITE32(rsp, rsp->impstate->arg0, rsp->impstate->arg1);
 }
 
 /*****************************************************************************/
@@ -385,33 +409,11 @@ void rspdrc_set_options(device_t *device, UINT32 options)
 
 
 /*-------------------------------------------------
-    rspdrc_add_imem - register an imem region
--------------------------------------------------*/
-
-void rspdrc_add_imem(device_t *device, void *base)
-{
-	rsp_state *rsp = get_safe_token(device);
-	rsp->impstate->imem = base;
-}
-
-
-/*-------------------------------------------------
-    rspdrc_add_dmem - register a dmem region
--------------------------------------------------*/
-
-void rspdrc_add_dmem(device_t *device, void *base)
-{
-	rsp_state *rsp = get_safe_token(device);
-	rsp->impstate->dmem = base;
-}
-
-
-/*-------------------------------------------------
     cfunc_printf_debug - generic printf for
     debugging
 -------------------------------------------------*/
 
-#ifdef UNUSED_FUNCTION
+#ifdef UNUSED_CODE
 static void cfunc_printf_debug(void *param)
 {
 	rsp_state *rsp = (rsp_state *)param;
@@ -674,11 +676,41 @@ static CPU_INIT( rsp )
 	rsp->impstate->drcfe = drcfe_init(device, &feconfig, rsp);
 
 	/* compute the register parameters */
-	for (regnum = 0; regnum < 34; regnum++)
+	for (regnum = 0; regnum < 32; regnum++)
 	{
 		rsp->impstate->regmap[regnum].type = (regnum == 0) ? DRCUML_PTYPE_IMMEDIATE : DRCUML_PTYPE_MEMORY;
 		rsp->impstate->regmap[regnum].value = (regnum == 0) ? 0 : (FPTR)&rsp->r[regnum];
 	}
+
+	/*
+	drcbe_info beinfo;
+	drcuml_get_backend_info(rsp->impstate->drcuml, &beinfo);
+	if (beinfo.direct_iregs > 2)
+	{
+		rsp->impstate->regmap[30].type = DRCUML_PTYPE_INT_REGISTER;
+		rsp->impstate->regmap[30].value = DRCUML_REG_I2;
+	}
+	if (beinfo.direct_iregs > 3)
+	{
+		rsp->impstate->regmap[31].type = DRCUML_PTYPE_INT_REGISTER;
+		rsp->impstate->regmap[31].value = DRCUML_REG_I3;
+	}
+	if (beinfo.direct_iregs > 4)
+	{
+		rsp->impstate->regmap[2].type = DRCUML_PTYPE_INT_REGISTER;
+		rsp->impstate->regmap[2].value = DRCUML_REG_I4;
+	}
+	if (beinfo.direct_iregs > 5)
+	{
+		rsp->impstate->regmap[3].type = DRCUML_PTYPE_INT_REGISTER;
+		rsp->impstate->regmap[3].value = DRCUML_REG_I5;
+	}
+	if (beinfo.direct_iregs > 6)
+	{
+		rsp->impstate->regmap[4].type = DRCUML_PTYPE_INT_REGISTER;
+		rsp->impstate->regmap[4].value = DRCUML_REG_I6;
+	}
+	*/
 
 	/* mark the cache dirty so it is updated on next execute */
 	rsp->impstate->cache_dirty = TRUE;
@@ -699,19 +731,6 @@ static CPU_RESET( rsp )
 {
 	rsp_state *rsp = get_safe_token(device);
 	rsp->nextpc = ~0;
-}
-
-INLINE UINT32 IREAD32(rsp_state *rsp, UINT32 address)
-{
-	UINT8* imem = (UINT8*)rsp->impstate->imem;
-	UINT32 ret = 0;
-	address &= 0x00000fff;
-	ret  = (UINT32)imem[address+0] << 24;
-	ret |= (UINT32)imem[address+1] << 16;
-	ret |= (UINT32)imem[address+2] <<  8;
-	ret |= (UINT32)imem[address+3];
-	//printf("%04xr%08x\n", address & 0x00001fff, ret);
-	return ret;
 }
 
 static void cfunc_rsp_lbv(void *param)
@@ -2539,7 +2558,7 @@ INLINE void cfunc_rsp_vne(void *param)
 	int sel;
 	rsp->flag[1] = 0;
 
-	for (i=0; i < 8; i++)//?????????? ????
+	for (i=0; i < 8; i++)//переписано мной
 	{
 		sel = VEC_EL_2(EL, i);
 
@@ -2894,7 +2913,7 @@ INLINE void cfunc_rsp_vmrg(void *param)
 		}
 		else
 		{
-			vres[i] = VREG_S(VS2REG, sel);//??? ???????????
+			vres[i] = VREG_S(VS2REG, sel);//моё исправление
 		}
 
 		ACCUM_L(i) = vres[i];
@@ -3056,7 +3075,7 @@ INLINE void cfunc_rsp_vrcp(void *param)
 	{
 		for (i = 0; i < 32; i++)
 		{
-			if (datainput & (1 << ((~i) & 0x1f)))//?.?.??? 31 - i
+			if (datainput & (1 << ((~i) & 0x1f)))//т.ж.что 31 - i
 			{
 				shifter = i;
 				break;
@@ -3141,7 +3160,7 @@ INLINE void cfunc_rsp_vrcpl(void *param)
 	{
 		for (i = 0; i < 32; i++)
 		{
-			if (datainput & (1 << ((~i) & 0x1f)))//?.?.??? 31 - i
+			if (datainput & (1 << ((~i) & 0x1f)))//т.ж.что 31 - i
 			{
 				shifter = i;
 				break;
@@ -3259,7 +3278,7 @@ INLINE void cfunc_rsp_vrsql(void *param)
 	{
 		for (i = 0; i < 32; i++)
 		{
-			if (datainput & (1 << ((~i) & 0x1f)))//?.?.??? 31 - i
+			if (datainput & (1 << ((~i) & 0x1f)))//т.ж.что 31 - i
 			{
 				shifter = i;
 				break;
@@ -3649,15 +3668,12 @@ static void static_generate_out_of_cycles(rsp_state *rsp)
 
 static void static_generate_memory_accessor(rsp_state *rsp, int size, int iswrite, const char *name, drcuml_codehandle **handleptr)
 {
-	/* on entry, address is in I0; data for writes is in I1; mask for accesses is in I2 */
+	/* on entry, address is in I0; data for writes is in I1 */
 	/* on exit, read result is in I0 */
-	/* routine trashes I0-I3 */
+	/* routine trashes I0-I1 */
 	drcuml_state *drcuml = rsp->impstate->drcuml;
 	drcuml_block *block;
 	jmp_buf errorbuf;
-#ifdef LSB_FIRST
-	int unaligned_case = 1;
-#endif
 
 	/* if we get an error back, we're screwed */
 	if (setjmp(errorbuf) != 0)
@@ -3677,138 +3693,42 @@ static void static_generate_memory_accessor(rsp_state *rsp, int size, int iswrit
 	{
 		if (size == 1)
 		{
-			//UML_MOV(block, MEM(&rsp->impstate->arg0), IREG(0));                   // mov     [arg0],i0
-			//UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(1));                   // mov     [arg1],i1
-			//UML_MOV(block, MEM(&rsp->impstate->arg2), IMM(0));                    // mov     [arg2],0
-			//UML_MOV(block, MEM(&rsp->impstate->arg3), MEM(&rsp->pc));         // mov     [arg3],pc
-			//UML_CALLC(block, cfunc_printf_debug, rsp);                            // callc   cfunc_printf_debug
-#ifdef LSB_FIRST
-			UML_XOR(block, IREG(0), IREG(0), IMM(3));									// xor     i0,i0,3
-#endif
-			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));							// and     i0,i0,0xfff
-			UML_STORE(block, rsp->impstate->dmem, IREG(0), IREG(1), BYTE);				// store   dmem,i0,i1,byte
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IREG(0));				// mov     [arg0],i0 ; address
+			UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(1));				// mov     [arg1],i1 ; data
+			UML_CALLC(block, cfunc_write8, rsp);							// callc   cfunc_write8
 		}
 		else if (size == 2)
 		{
-			//UML_MOV(block, MEM(&rsp->impstate->arg0), IREG(0));                   // mov     [arg0],i0
-			//UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(1));                   // mov     [arg1],i1
-			//UML_MOV(block, MEM(&rsp->impstate->arg2), IMM(1));                    // mov     [arg2],1
-			//UML_MOV(block, MEM(&rsp->impstate->arg3), MEM(&rsp->pc));         // mov     [arg3],pc
-			//UML_CALLC(block, cfunc_printf_debug, rsp);                            // callc   cfunc_printf_debug
-#ifdef LSB_FIRST
-			UML_TEST(block, IREG(0), IMM(1));											// test    i0,1
-			UML_JMPc(block, IF_NZ, unaligned_case);										// jnz     <unaligned_case>
-			UML_XOR(block, IREG(0), IREG(0), IMM(2));									// xor     i0,i0,2
-#endif
-			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));							// and     i0,i0,0xfff
-			UML_STORE(block, rsp->impstate->dmem, IREG(0), IREG(1), WORD_x1);			// store   dmem,i0,i1,word_x1
-			UML_RET(block);
-#ifdef LSB_FIRST
-			UML_LABEL(block, unaligned_case);										// unaligned_case:
-			UML_AND(block, IREG(2), IREG(0), IMM(3));									// and     i2,i0,3
-			UML_AND(block, IREG(0), IREG(0), IMM(0xffc));								// and     i0,i0,0xffc
-			UML_SHL(block, IREG(2), IREG(2), IMM(3));									// shl     i2,i2,3
-			UML_DLOAD(block, IREG(3), rsp->impstate->dmem, IREG(0), QWORD_x1);			// dload   i3,dmem,i0,qword_x1
-			UML_ADD(block, IREG(2), IREG(2), IMM(48));									// add     i2,i2,48
-			UML_DAND(block, IREG(1), IREG(1), IMM(0xffff));								// dand    i1,i1,0xffff
-			UML_DROLAND(block, IREG(3), IREG(3), IREG(2), IMM(U64(0xffffffffffff0000)));// droland i3,i3,i2,~0xffff
-			UML_DOR(block, IREG(1), IREG(1), IREG(3));									// dor     i1,i1,i3
-			UML_DROR(block, IREG(1), IREG(1), IREG(2));									// dror    i1,i1,i2
-			UML_DSTORE(block, rsp->impstate->dmem, IREG(0), IREG(1), QWORD_x1); 		// dstore  dmem,i0,i1,qword_x1
-#endif
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IREG(0));				// mov     [arg0],i0 ; address
+			UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(1));				// mov     [arg1],i1 ; data
+			UML_CALLC(block, cfunc_write16, rsp);							// callc   cfunc_write16
 		}
 		else if (size == 4)
 		{
-			//UML_MOV(block, MEM(&rsp->impstate->arg0), IREG(0));                   // mov     [arg0],i0
-			//UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(1));                   // mov     [arg1],i1
-			//UML_MOV(block, MEM(&rsp->impstate->arg2), IMM(2));                    // mov     [arg2],2
-			//UML_MOV(block, MEM(&rsp->impstate->arg3), MEM(&rsp->pc));         // mov     [arg3],pc
-			//UML_CALLC(block, cfunc_printf_debug, rsp);                            // callc   cfunc_printf_debug
-#ifdef LSB_FIRST
-			UML_TEST(block, IREG(0), IMM(3));											// test    i0,3
-			UML_JMPc(block, IF_NZ, unaligned_case);										// jnz     <unaligned_case>
-#endif
-			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));							// and     i0,i0,0xfff
-			UML_STORE(block, rsp->impstate->dmem, IREG(0), IREG(1), DWORD_x1);			// store   dmem,i0,i1,dword_x1
-			UML_RET(block);
-#ifdef LSB_FIRST
-			UML_LABEL(block, unaligned_case);										// unaligned_case:
-			UML_AND(block, IREG(2), IREG(0), IMM(3));									// and     i2,i0,3
-			UML_AND(block, IREG(0), IREG(0), IMM(0xffc));								// and     i0,i0,0xffc
-			UML_SHL(block, IREG(2), IREG(2), IMM(3));									// shl     i2,i2,3
-			UML_DLOAD(block, IREG(3), rsp->impstate->dmem, IREG(0), QWORD_x1);			// dload   i3,dmem,i0,qword_x1
-			UML_DAND(block, IREG(1), IREG(1), IMM(0xffffffff));							// dand    i1,i1,0xffffffff
-			UML_DROLAND(block, IREG(3), IREG(3), IREG(2), IMM(U64(0xffffffff00000000)));// droland i3,i3,i2,~0xffffffff
-			UML_DOR(block, IREG(1), IREG(1), IREG(3));									// dor     i1,i1,i3
-			UML_DROR(block, IREG(1), IREG(1), IREG(2));									// dror    i1,i1,i2
-			UML_DSTORE(block, rsp->impstate->dmem, IREG(0), IREG(1), QWORD_x1); 		// dstore  dmem,i0,i1,qword_x1
-#endif
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IREG(0));				// mov     [arg0],i0 ; address
+			UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(1));				// mov     [arg1],i1 ; data
+			UML_CALLC(block, cfunc_write32, rsp);							// callc   cfunc_write32
 		}
 	}
 	else
 	{
-		UML_MOV(block, MEM(&rsp->impstate->arg0), IREG(0));					// mov     [arg0],i0
 		if (size == 1)
 		{
-			//UML_MOV(block, MEM(&rsp->impstate->arg2), IMM(3));                            // mov     [arg2],3
-			//UML_MOV(block, MEM(&rsp->impstate->arg3), MEM(&rsp->pc));         // mov     [arg3],pc
-#ifdef LSB_FIRST
-			UML_XOR(block, IREG(0), IREG(0), IMM(3));									// xor     i0,i0,3
-#endif
-			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));							// and     i0,i0,0xfff
-			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), BYTE);				// load    i0,dmem,i0,byte
-			//UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(0));                           // mov     [arg1],i0
-			//UML_CALLC(block, cfunc_printf_debug, rsp);                                    // callc   cfunc_printf_debug
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IREG(0));			// mov     [arg0],i0 ; address
+			UML_CALLC(block, cfunc_read8, rsp);							// callc   cfunc_printf_debug
+			UML_MOV(block, IREG(0), MEM(&rsp->impstate->arg0));			// mov     i0,[arg0],i0 ; result
 		}
 		else if (size == 2)
 		{
-			//UML_MOV(block, MEM(&rsp->impstate->arg2), IMM(4));                            // mov     [arg2],4
-			//UML_MOV(block, MEM(&rsp->impstate->arg3), MEM(&rsp->pc));         // mov     [arg3],pc
-#ifdef LSB_FIRST
-			UML_TEST(block, IREG(0), IMM(1));											// test    i0,1
-			UML_JMPc(block, IF_NZ, unaligned_case);										// jnz     <unaligned_case>
-			UML_XOR(block, IREG(0), IREG(0), IMM(2));									// xor     i0,i0,2
-#endif
-			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));							// and     i0,i0,0xfff
-			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), WORD_x1);			// load    i0,dmem,i0,word_x1
-			//UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(0));                           // mov     [arg1],i0
-			//UML_CALLC(block, cfunc_printf_debug, rsp);                                    // callc   cfunc_printf_debug
-			UML_RET(block);
-#ifdef LSB_FIRST
-			UML_LABEL(block, unaligned_case);										// unaligned_case:
-			UML_AND(block, IREG(1), IREG(0), IMM(3));									// and     i1,i0,3
-			UML_AND(block, IREG(0), IREG(0), IMM(0xffc));								// and     i0,i0,0xffc
-			UML_SHL(block, IREG(1), IREG(1), IMM(3));									// shl     i1,i1,3
-			UML_DLOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), QWORD_x1);			// dload   i0,dmem,i0,qword_x1
-			UML_ADD(block, IREG(1), IREG(1), IMM(48));									// add     i1,i1,48
-			UML_DROLAND(block, IREG(0), IREG(0), IREG(1), IMM(0xffff));					// droland i0,i0,i1,0xffff
-#endif
-			//UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(0));                           // mov     [arg1],i0
-			//UML_CALLC(block, cfunc_printf_debug, rsp);                                    // callc   cfunc_printf_debug
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IREG(0));			// mov     [arg0],i0 ; address
+			UML_CALLC(block, cfunc_read16, rsp);						// callc   cfunc_read16
+			UML_MOV(block, IREG(0), MEM(&rsp->impstate->arg0));			// mov     i0,[arg0],i0 ; result
 		}
 		else if (size == 4)
 		{
-			//UML_MOV(block, MEM(&rsp->impstate->arg2), IMM(5));                            // mov     [arg2],5
-			//UML_MOV(block, MEM(&rsp->impstate->arg3), MEM(&rsp->pc));         // mov     [arg3],pc
-#ifdef LSB_FIRST
-			UML_TEST(block, IREG(0), IMM(3));											// test    i0,3
-			UML_JMPc(block, IF_NZ, unaligned_case);										// jnz     <unaligned_case>
-#endif
-			UML_AND(block, IREG(0), IREG(0), IMM(0x00000fff));							// and     i0,i0,0xfff
-			UML_LOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), DWORD_x1);			// load    i0,dmem,i0,dword_x1
-			//UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(0));                           // mov     [arg1],i0
-			//UML_CALLC(block, cfunc_printf_debug, rsp);                                    // callc   cfunc_printf_debug
-			UML_RET(block);
-#ifdef LSB_FIRST
-			UML_LABEL(block, unaligned_case);										// unaligned_case:
-			UML_AND(block, IREG(1), IREG(0), IMM(3));									// and     i1,i0,3
-			UML_AND(block, IREG(0), IREG(0), IMM(0xffc));								// and     i0,i0,0xffc
-			UML_SHL(block, IREG(1), IREG(1), IMM(3));									// shl     i1,i1,3
-			UML_DLOAD(block, IREG(0), rsp->impstate->dmem, IREG(0), QWORD_x1);			// dload   i0,dmem,i0,qword_x1
-			UML_DROL(block, IREG(0), IREG(0), IREG(1));									// drol    i0,i0,i1
-#endif
-			//UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(0));                           // mov     [arg1],i0
-			//UML_CALLC(block, cfunc_printf_debug, rsp);                                    // callc   cfunc_printf_debug
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IREG(0));			// mov     [arg0],i0 ; address
+			UML_CALLC(block, cfunc_read32, rsp);						// callc   cfunc_read32
+			UML_MOV(block, IREG(0), MEM(&rsp->impstate->arg0));			// mov     i0,[arg0],i0 ; result
 		}
 	}
 	UML_RET(block);
@@ -4813,7 +4733,7 @@ CPU_GET_INFO( rsp )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(rsp_state);					break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 1;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
+		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;				break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 4;							break;
