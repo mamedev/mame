@@ -33,6 +33,7 @@
 #ifndef __ARM7CORE_H__
 #define __ARM7CORE_H__
 
+#define ARM7_MMU_ENABLE_HACK 0
 
 /****************************************************************************************************
  *  INTERRUPT LINES/EXCEPTIONS
@@ -188,6 +189,9 @@ typedef struct
 	UINT8 archRev;			// ARM architecture revision (3, 4, and 5 are valid)
 	UINT8 archFlags;		// architecture flags
 
+#if ARM7_MMU_ENABLE_HACK
+	UINT32 mmu_enable_addr;	// workaround for "MMU is enabled when PA != VA" problem
+#endif
 } arm_state;
 
 /****************************************************************************************************
@@ -485,7 +489,7 @@ enum
 #define R15                     ARM7REG(eR15)
 #define SPSR                    17                     // SPSR is always the 18th register in our 0 based array sRegisterTable[][18]
 #define GET_CPSR                ARM7REG(eCPSR)
-#define SET_CPSR(v)             (GET_CPSR = (v))
+#define SET_CPSR(v)             set_cpsr(cpustate,v)
 #define MODE_FLAG               0xF                    // Mode bits are 4:0 of CPSR, but we ignore bit 4.
 #define GET_MODE                (GET_CPSR & MODE_FLAG)
 #define SIGN_BIT                ((UINT32)(1 << 31))
@@ -493,6 +497,17 @@ enum
 /* I really don't know why these were set to 16-bit, the thumb registers are still 32-bit ... */
 #define THUMB_SIGN_BIT               ((UINT32)(1 << 31))
 #define THUMB_SIGN_BITS_DIFFER(a, b) (((a)^(b)) >> 31)
+
+#define MODE32					(GET_CPSR & 0x10)
+#define MODE26					(!(GET_CPSR & 0x10))
+#define GET_PC                  (MODE32 ? R15 : R15 & 0x03FFFFFC)
+
+enum
+{
+	ARM7_TLB_NO_ABORT,
+	ARM7_TLB_ABORT_D,
+	ARM7_TLB_ABORT_P
+};
 
 /* At one point I thought these needed to be cpu implementation specific, but they don't.. */
 #define GET_REGISTER(state, reg)       GetRegister(state, reg)

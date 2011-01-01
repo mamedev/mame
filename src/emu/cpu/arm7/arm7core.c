@@ -131,7 +131,7 @@ INLINE void arm7_cpu_write32(arm_state *cpustate, UINT32 addr, UINT32 data)
 {
     if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
     {
-        addr = arm7_tlb_translate( cpustate, addr, 0 );
+        addr = arm7_tlb_translate( cpustate, addr, ARM7_TLB_ABORT_D );
     }
 
     addr &= ~3;
@@ -146,7 +146,7 @@ INLINE void arm7_cpu_write16(arm_state *cpustate, UINT32 addr, UINT16 data)
 {
     if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
     {
-        addr = arm7_tlb_translate( cpustate, addr, 0 );
+        addr = arm7_tlb_translate( cpustate, addr, ARM7_TLB_ABORT_D );
     }
 
     addr &= ~1;
@@ -160,7 +160,7 @@ INLINE void arm7_cpu_write8(arm_state *cpustate, UINT32 addr, UINT8 data)
 {
     if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
     {
-        addr = arm7_tlb_translate( cpustate, addr, 0 );
+        addr = arm7_tlb_translate( cpustate, addr, ARM7_TLB_ABORT_D );
     }
 
 	if ( cpustate->endian == ENDIANNESS_BIG )
@@ -175,7 +175,7 @@ INLINE UINT32 arm7_cpu_read32(arm_state *cpustate, offs_t addr)
 
     if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
     {
-        addr = arm7_tlb_translate( cpustate, addr, 0 );
+        addr = arm7_tlb_translate( cpustate, addr, ARM7_TLB_ABORT_D );
     }
 
     if (addr & 3)
@@ -203,7 +203,7 @@ INLINE UINT16 arm7_cpu_read16(arm_state *cpustate, offs_t addr)
 
     if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
     {
-        addr = arm7_tlb_translate( cpustate, addr, 0 );
+        addr = arm7_tlb_translate( cpustate, addr, ARM7_TLB_ABORT_D );
     }
 
 	if ( cpustate->endian == ENDIANNESS_BIG )
@@ -223,7 +223,7 @@ INLINE UINT8 arm7_cpu_read8(arm_state *cpustate, offs_t addr)
 {
     if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
     {
-        addr = arm7_tlb_translate( cpustate, addr, 0 );
+        addr = arm7_tlb_translate( cpustate, addr, ARM7_TLB_ABORT_D );
     }
 
     // Handle through normal 8 bit handler (for 32 bit cpu)
@@ -474,7 +474,12 @@ static int loadInc(arm_state *cpustate, UINT32 pat, UINT32 rbv, UINT32 s)
                 if (s) /* Pull full contents from stack */
                     SET_REGISTER(cpustate, 15, data);
                 else /* Pull only address, preserve mode & status flags */
-                    SET_REGISTER(cpustate, 15, data);
+                	if (MODE32)
+                    	SET_REGISTER(cpustate, 15, data);
+                    else
+                    {
+                    	SET_REGISTER(cpustate, 15, (GET_REGISTER(cpustate, 15) & ~0x03FFFFFC) | (data & 0x03FFFFFC));
+                    }
             } else
                 SET_REGISTER(cpustate, i, data);
 
@@ -501,7 +506,12 @@ static int loadDec(arm_state *cpustate, UINT32 pat, UINT32 rbv, UINT32 s)
                 if (s) /* Pull full contents from stack */
                     SET_REGISTER(cpustate, 15, data);
                 else /* Pull only address, preserve mode & status flags */
-                    SET_REGISTER(cpustate, 15, data);
+                	if (MODE32)
+                    	SET_REGISTER(cpustate, 15, data);
+                    else
+                    {
+                    	SET_REGISTER(cpustate, 15, (GET_REGISTER(cpustate, 15) & ~0x03FFFFFC) | (data & 0x03FFFFFC));
+                    }
             }
             else
                 SET_REGISTER(cpustate, i, data);
@@ -584,8 +594,8 @@ static void arm7_core_reset(legacy_cpu_device *device)
 	cpustate->direct = &cpustate->program->direct();
 
     /* start up in SVC mode with interrupts disabled. */
+    ARM7REG(eCPSR) = I_MASK | F_MASK | 0x10;
     SwitchMode(cpustate, eARM7_MODE_SVC);
-    SET_CPSR(GET_CPSR | I_MASK | F_MASK | 0x10);
     R15 = 0;
 }
 
@@ -611,6 +621,7 @@ static void arm7_check_irq_state(arm_state *cpustate)
 
     // Data Abort
     if (cpustate->pendingAbtD) {
+    	if (MODE26) fatalerror( "pendingAbtD (todo)");
         SwitchMode(cpustate, eARM7_MODE_ABT);             /* Set ABT mode so PC is saved to correct R14 bank */
         SET_REGISTER(cpustate, 14, pc - 8 + 8);                   /* save PC to R14 */
         SET_REGISTER(cpustate, SPSR, cpsr);               /* Save current CPSR */
@@ -624,6 +635,7 @@ static void arm7_check_irq_state(arm_state *cpustate)
 
     // FIQ
     if (cpustate->pendingFiq && (cpsr & F_MASK) == 0) {
+    	if (MODE26) fatalerror( "pendingFiq (todo)");
         SwitchMode(cpustate, eARM7_MODE_FIQ);             /* Set FIQ mode so PC is saved to correct R14 bank */
         SET_REGISTER(cpustate, 14, pc - 4 + 4);                   /* save PC to R14 */
         SET_REGISTER(cpustate, SPSR, cpsr);               /* Save current CPSR */
@@ -637,17 +649,28 @@ static void arm7_check_irq_state(arm_state *cpustate)
     // IRQ
     if (cpustate->pendingIrq && (cpsr & I_MASK) == 0) {
         SwitchMode(cpustate, eARM7_MODE_IRQ);             /* Set IRQ mode so PC is saved to correct R14 bank */
-        SET_REGISTER(cpustate, 14, pc - 4 + 4);                   /* save PC to R14 */
-        SET_REGISTER(cpustate, SPSR, cpsr);               /* Save current CPSR */
-        SET_CPSR(GET_CPSR | I_MASK);            /* Mask IRQ */
-        SET_CPSR(GET_CPSR & ~T_MASK);
-        R15 = 0x18;                             /* IRQ Vector address */
+       	SET_REGISTER(cpustate, 14, pc - 4 + 4);                   /* save PC to R14 */
+        if (MODE32)
+        {
+        	SET_REGISTER(cpustate, SPSR, cpsr);               /* Save current CPSR */
+        	SET_CPSR(GET_CPSR | I_MASK);            /* Mask IRQ */
+        	SET_CPSR(GET_CPSR & ~T_MASK);
+        	R15 = 0x18;                             /* IRQ Vector address */
+        }
+        else
+        {
+        	UINT32 temp;
+        	R15 = (pc & 0xF4000000) /* N Z C V F */ | 0x18 | 0x00000002 /* IRQ */ | 0x08000000 /* I */;
+        	temp = (GET_CPSR & 0x0FFFFF3F) /* N Z C V I F */ | (R15 & 0xF0000000) /* N Z C V */ | ((R15 & 0x0C000000) >> (26 - 6)) /* I F */;
+        	SET_CPSR(temp);            /* Mask IRQ */
+        }
         if ((COPRO_CTRL & COPRO_CTRL_MMU_EN) && (COPRO_CTRL & COPRO_CTRL_INTVEC_ADJUST)) R15 |= 0xFFFF0000;
         return;
     }
 
     // Prefetch Abort
     if (cpustate->pendingAbtP) {
+    	if (MODE26) fatalerror( "pendingAbtP (todo)");
         SwitchMode(cpustate, eARM7_MODE_ABT);             /* Set ABT mode so PC is saved to correct R14 bank */
         SET_REGISTER(cpustate, 14, pc - 4 + 4);                   /* save PC to R14 */
         SET_REGISTER(cpustate, SPSR, cpsr);               /* Save current CPSR */
@@ -661,7 +684,9 @@ static void arm7_check_irq_state(arm_state *cpustate)
 
     // Undefined instruction
     if (cpustate->pendingUnd) {
+    	if (MODE26) fatalerror( "pendingUnd (todo)");
         SwitchMode(cpustate, eARM7_MODE_UND);             /* Set UND mode so PC is saved to correct R14 bank */
+        // compensate for prefetch (should this also be done for normal IRQ?)
         if (T_IS_SET(GET_CPSR))
         {
                 SET_REGISTER(cpustate, 14, pc - 4 + 2);         /* save PC to R14 */
@@ -691,10 +716,21 @@ static void arm7_check_irq_state(arm_state *cpustate)
         {
                 SET_REGISTER(cpustate, 14, pc - 4 + 4);           /* save PC to R14 */
         }
-        SET_REGISTER(cpustate, SPSR, cpsr);               /* Save current CPSR */
-        SET_CPSR(GET_CPSR | I_MASK);            /* Mask IRQ */
-        SET_CPSR(GET_CPSR & ~T_MASK);           /* Go to ARM mode */
-        R15 = 0x08;                             /* Jump to the SWI vector */
+        if (MODE32)
+        {
+        	SET_REGISTER(cpustate, SPSR, cpsr);               /* Save current CPSR */
+        	SET_CPSR(GET_CPSR | I_MASK);            /* Mask IRQ */
+        	SET_CPSR(GET_CPSR & ~T_MASK);           /* Go to ARM mode */
+        	R15 = 0x08;                             /* Jump to the SWI vector */
+        }
+        else
+        {
+        	UINT32 temp;
+        	R15 = (pc & 0xF4000000) /* N Z C V F */ | 0x08 | 0x00000003 /* SVC */ | 0x08000000 /* I */;
+        	temp = (GET_CPSR & 0x0FFFFF3F) /* N Z C V I F */ | (R15 & 0xF0000000) /* N Z C V */ | ((R15 & 0x0C000000) >> (26 - 6)) /* I F */;
+        	SET_CPSR(temp);            /* Mask IRQ */
+        }
+        if ((COPRO_CTRL & COPRO_CTRL_MMU_EN) && (COPRO_CTRL & COPRO_CTRL_INTVEC_ADJUST)) R15 |= 0xFFFF0000;
         if ((COPRO_CTRL & COPRO_CTRL_MMU_EN) && (COPRO_CTRL & COPRO_CTRL_INTVEC_ADJUST)) R15 |= 0xFFFF0000;
         cpustate->pendingSwi = 0;
         return;
@@ -846,11 +882,17 @@ INLINE void HandleBranch(arm_state *cpustate, UINT32 insn)
     /* Sign-extend the 24-bit offset in our calculations */
     if (off & 0x2000000u)
     {
-        R15 -= ((~(off | 0xfc000000u)) + 1) - 8;
+    	if (MODE32)
+        	R15 -= ((~(off | 0xfc000000u)) + 1) - 8;
+        else
+        	R15 = ((R15 - (((~(off | 0xfc000000u)) + 1) - 8)) & 0x03FFFFFC) | (R15 & ~0x03FFFFFC);
     }
     else
     {
-        R15 += off + 8;
+    	if (MODE32)
+	        R15 += off + 8;
+        else
+        	R15 = ((R15 + (off + 8)) & 0x03FFFFFC) | (R15 & ~0x03FFFFFC);
     }
 }
 
@@ -878,11 +920,17 @@ static void HandleMemSingle(arm_state *cpustate, UINT32 insn)
         /* Pre-indexed addressing */
         if (insn & INSN_SDT_U)
         {
-            rnv = (GET_REGISTER(cpustate, rn) + off);
+        	if ((MODE32) || (rn != eR15))
+            	rnv = (GET_REGISTER(cpustate, rn) + off);
+            else
+            	rnv = (GET_PC + off);
         }
         else
         {
-            rnv = (GET_REGISTER(cpustate, rn) - off);
+        	if ((MODE32) || (rn != eR15))
+	            rnv = (GET_REGISTER(cpustate, rn) - off);
+			else
+	            rnv = (GET_PC - off);
         }
 
         if (insn & INSN_SDT_W)
@@ -902,7 +950,10 @@ static void HandleMemSingle(arm_state *cpustate, UINT32 insn)
         /* Post-indexed addressing */
         if (rn == eR15)
         {
-            rnv = R15 + 8;
+        	if (MODE32)
+	            rnv = R15 + 8;
+	        else
+	            rnv = GET_PC + 8;
         }
         else
         {
@@ -930,8 +981,11 @@ static void HandleMemSingle(arm_state *cpustate, UINT32 insn)
             {
                 if (rd == eR15)
                 {
-                    R15 = data - 4;
-                    // LDR, PC takes 2S + 2N + 1I (5 total cycles)
+                	if (MODE32)
+	            		R15 = data - 4;
+			        else
+			        	R15 = (R15 & ~0x03FFFFFC) /* N Z C V I F M1 M0 */ | ((data - 4) & 0x03FFFFFC);
+        	    // LDR, PC takes 2S + 2N + 1I (5 total cycles)
                     ARM7_ICOUNT -= 2;
                 }
                 else
@@ -1171,9 +1225,11 @@ static void HandleHalfWordDT(arm_state *cpustate, UINT32 insn)
 	        // WRITE16(rnv, rd == eR15 ? R15 + 8 : GET_REGISTER(cpustate, rd));
 	        WRITE16(rnv, rd == eR15 ? R15 + 8 + 4 : GET_REGISTER(cpustate, rd)); // manual says STR RD=PC, +12 of address
 
-			// if R15 is not increased then e.g. "STRH R10, [R15,#$10]" will be executed over and over again		        
-			//if (rn != eR15)
-	        R15 += 4;
+// if R15 is not increased then e.g. "STRH R10, [R15,#$10]" will be executed over and over again
+#if 0
+	        if (rn != eR15)
+#endif
+	            R15 += 4;
 
 	        // STRH takes 2 cycles, so we add + 1
 	        ARM7_ICOUNT += 1;
@@ -1340,11 +1396,16 @@ static void HandlePSRTransfer(arm_state *cpustate, UINT32 insn)
             }
         }
 
+#if 0
         // force valid mode
         newval |= 0x10;
+#endif
 
         // Update the Register
-        SET_REGISTER(cpustate, reg, newval);
+        if (reg == eCPSR)
+        	SET_CPSR(newval);
+        else
+        	SET_REGISTER(cpustate, reg, newval);
 
         // Switch to new mode if changed
         if ((newval & MODE_FLAG) != oldmode)
@@ -1406,7 +1467,10 @@ static void HandleALU(arm_state *cpustate, UINT32 insn)
 #if ARM7_DEBUG_CORE
             LOG(("%08x:  Pipelined R15 (Shift %d)\n", R15, (insn & INSN_I ? 8 : insn & 0x10u ? 12 : 12)));
 #endif
-            rn = R15 + 8;
+			if (MODE32)
+            	rn = R15 + 8;
+            else
+            	rn = GET_PC + 8;
         }
         else
         {
@@ -1482,23 +1546,44 @@ static void HandleALU(arm_state *cpustate, UINT32 insn)
         // If Rd = R15, but S Flag not set, Result is placed in R15, but CPSR is not affected (page 44)
         if (rdn == eR15 && !(insn & INSN_S))
         {
-            R15 = rd;
+			if (MODE32)
+			{
+	            R15 = rd;
+	        }
+	        else
+	        {
+	            R15 = (R15 & ~0x03FFFFFC) | (rd & 0x03FFFFFC);
+	        }
         }
         else
         {
             // Rd = 15 and S Flag IS set, Result is placed in R15, and current mode SPSR moved to CPSR
-            if (rdn == eR15) 
-			{
-	            // When Rd is R15 and the S flag is set the result of the operation is placed in R15 and the SPSR corresponding to
-	            // the current mode is moved to the CPSR. This allows state changes which automatically restore both PC and
-	            // CPSR. --> This form of instruction should not be used in User mode. <--
+            if (rdn == eR15) {
+
+				if (MODE32)
+				{
+				// When Rd is R15 and the S flag is set the result of the operation is placed in R15 and the SPSR corresponding to
+				// the current mode is moved to the CPSR. This allows state changes which automatically restore both PC and
+				// CPSR. --> This form of instruction should not be used in User mode. <--
+
 				if (GET_MODE != eARM7_MODE_USER)
 				{
-					   // Update CPSR from SPSR
-					   SET_CPSR(GET_REGISTER(cpustate, SPSR));
-					   SwitchMode(cpustate, GET_MODE);
-				}
+	                // Update CPSR from SPSR
+    	            SET_CPSR(GET_REGISTER(cpustate, SPSR));
+        	        SwitchMode(cpustate, GET_MODE);
+            	}
+
                 R15 = rd;
+
+                }
+                else
+                {
+	            	UINT32 temp;
+					R15 = rd; //(R15 & 0x03FFFFFC) | (rd & 0xFC000003);
+					temp = (GET_CPSR & 0x0FFFFF20) | (rd & 0xF0000000) /* N Z C V */ | ((rd & 0x0C000000) >> (26 - 6)) /* I F */ | (rd & 0x00000003) /* M1 M0 */;
+					SET_CPSR( temp);
+					SwitchMode( cpustate, temp & 3);
+                }
 
                 /* IRQ masks may have changed in this instruction */
 //              ARM7_CHECKIRQ;
@@ -1516,7 +1601,16 @@ static void HandleALU(arm_state *cpustate, UINT32 insn)
 #if ARM7_DEBUG_CORE
                 LOG(("%08x: TST class on R15 s bit set\n", R15));
 #endif
-            R15 = rd;
+			if (MODE32)
+            	R15 = rd;
+            else
+            {
+            	UINT32 temp;
+				R15 = (R15 & 0x03FFFFFC) | (rd & ~0x03FFFFFC);
+				temp = (GET_CPSR & 0x0FFFFF20) | (rd & 0xF0000000) /* N Z C V */ | ((rd & 0x0C000000) >> (26 - 6)) /* I F */ | (rd & 0x00000003) /* M1 M0 */;
+				SET_CPSR( temp);
+				SwitchMode( cpustate, temp & 3);
+			}
 
             /* IRQ masks may have changed in this instruction */
 //          ARM7_CHECKIRQ;
@@ -1688,12 +1782,22 @@ static void HandleMemBlock(arm_state *cpustate, UINT32 insn)
                 // S - Flag Set? Signals transfer of current mode SPSR->CPSR
                 if (insn & INSN_BDT_S)
 				{
-                    SET_CPSR(GET_REGISTER(cpustate, SPSR));
-                    SwitchMode(cpustate, GET_MODE);
+                	if (MODE32)
+                	{
+                    	SET_CPSR(GET_REGISTER(cpustate, SPSR));
+                    	SwitchMode(cpustate, GET_MODE);
+                    }
+                    else
+                    {
+                    	UINT32 temp;
+//                    	LOG(("LDM + S | R15 %08X CPSR %08X\n", R15, GET_CPSR));
+						temp = (GET_CPSR & 0x0FFFFF20) | (R15 & 0xF0000000) /* N Z C V */ | ((R15 & 0x0C000000) >> (26 - 6)) /* I F */ | (R15 & 0x00000003) /* M1 M0 */;
+						SET_CPSR( temp);
+						SwitchMode(cpustate, temp & 3);
+                    }
                 }
-
-				// LDM PC - takes 1 extra cycle
-				ARM7_ICOUNT -= 1;
+               // LDM PC - takes 1 extra cycle
+    	        ARM7_ICOUNT -= 1;
             }
         }
         else
@@ -1731,8 +1835,19 @@ static void HandleMemBlock(arm_state *cpustate, UINT32 insn)
                 // S - Flag Set? Signals transfer of current mode SPSR->CPSR
                 if (insn & INSN_BDT_S)
 				{
-                    SET_CPSR(GET_REGISTER(cpustate, SPSR));
-                    SwitchMode(cpustate, GET_MODE);
+                	if (MODE32)
+                	{
+	                    SET_CPSR(GET_REGISTER(cpustate, SPSR));
+    	                SwitchMode(cpustate, GET_MODE);
+                    }
+                    else
+                    {
+                    	UINT32 temp;
+//                    	LOG(("LDM + S | R15 %08X CPSR %08X\n", R15, GET_CPSR));
+						temp = (GET_CPSR & 0x0FFFFF20) /* N Z C V I F M4 M3 M2 M1 M0 */ | (R15 & 0xF0000000) /* N Z C V */ | ((R15 & 0x0C000000) >> (26 - 6)) /* I F */ | (R15 & 0x00000003) /* M1 M0 */;
+						SET_CPSR( temp);
+						SwitchMode(cpustate, temp & 3);
+                    }
                 }
                 // LDM PC - takes 1 extra cycle
                 ARM7_ICOUNT -= 1;

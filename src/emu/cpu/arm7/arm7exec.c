@@ -47,7 +47,7 @@
 
     do
     {
-        debugger_instruction_hook(cpustate->device, R15);
+        debugger_instruction_hook(cpustate->device, GET_PC);
 
         /* handle Thumb instructions if active */
         if (T_IS_SET(GET_CPSR))
@@ -60,7 +60,7 @@
 	    raddr = pc & (~1);
 	    if ( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	    {
-	    	raddr = arm7_tlb_translate(cpustate, raddr, 1);
+	    	raddr = arm7_tlb_translate(cpustate, raddr, ARM7_TLB_ABORT_P);
 	    	if (cpustate->pendingAbtP != 0)
 	    	{
 	    		goto skip_exec;
@@ -1171,15 +1171,26 @@
         {
 
             /* load 32 bit instruction */
-            pc = R15;
+            pc = GET_PC;
 	    if ( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	    {
-	    	pc = arm7_tlb_translate(cpustate, pc, 1);
+	    	pc = arm7_tlb_translate(cpustate, pc, ARM7_TLB_ABORT_P);
 	    	if (cpustate->pendingAbtP != 0)
 	    	{
 	    		goto skip_exec;
 	    	}
 	    }
+
+#if 0
+			if (MODE26)
+			{
+				UINT32 temp1, temp2;
+				temp1 = GET_CPSR & 0xF00000C3;
+				temp2 = (R15 & 0xF0000000) | ((R15 & 0x0C000000) >> (26 - 6)) | (R15 & 0x00000003);
+				if (temp1 != temp2) fatalerror( "%08X: 32-bit and 26-bit modes are out of sync (%08X %08X)", pc, temp1, temp2);
+			}
+#endif
+
             insn = cpustate->direct->read_decrypted_dword(pc);
 
             /* process condition codes for this instruction */

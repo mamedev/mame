@@ -71,8 +71,35 @@ void arm7_dt_w_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, void (*wr
 INLINE arm_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
-	assert(device->type() == ARM7 || device->type() == ARM7_BE || device->type() == ARM9 || device->type() == ARM920T || device->type() == PXA255);
+	assert(device->type() == ARM7 || device->type() == ARM7_BE || device->type() == ARM7500 || device->type() == ARM9 || device->type() == ARM920T || device->type() == PXA255);
 	return (arm_state *)downcast<legacy_cpu_device *>(device)->token();
+}
+
+void set_cpsr( arm_state *cpustate, UINT32 val)
+{
+	if ((val & 0x10) != (ARM7REG(eCPSR) & 0x10))
+	{
+		if (val & 0x10)
+		{
+			// 26 -> 32
+			val = (val & 0x0FFFFF3F) | (R15 & 0xF0000000) /* N Z C V */ | ((R15 & 0x0C000000) >> (26 - 6)) /* I F */;
+			R15 = R15 & 0x03FFFFFC;
+		}
+		else
+		{
+			// 32 -> 26
+			R15 = (R15 & 0x03FFFFFC) /* PC */ | (val & 0xF0000000) /* N Z C V */ | ((val & 0x000000C0) << (26 - 6)) /* I F */ | (val & 0x00000003) /* M1 M0 */;
+		}
+	}
+	else
+	{
+		if (!(val & 0x10))
+		{
+			// mirror bits in pc
+			R15 = (R15 & 0x03FFFFFF) | (val & 0xF0000000) /* N Z C V */ | ((val & 0x000000C0) << (26 - 6)) /* I F */;
+		}
+	}
+	ARM7REG(eCPSR) = val;
 }
 
 INLINE INT64 saturate_qbit_overflow(arm_state *cpustate, INT64 res)
@@ -128,8 +155,6 @@ INLINE UINT32 arm7_tlb_get_second_level_descriptor( arm_state *cpustate, UINT32 
     return cpustate->program->read_dword( desc_lvl2 );
 }
 
-static UINT32 r15_mmu_enable_addr = 1;
-
 INLINE UINT32 arm7_tlb_translate(arm_state *cpustate, UINT32 vaddr, int mode)
 {
     UINT32 desc_lvl1;
@@ -151,15 +176,17 @@ INLINE UINT32 arm7_tlb_translate(arm_state *cpustate, UINT32 vaddr, int mode)
 
     paddr = vaddr;
 
-    if ((R15 == (r15_mmu_enable_addr + 4)) || (R15 == (r15_mmu_enable_addr + 8)))
+#if ARM7_MMU_ENABLE_HACK
+    if ((R15 == (cpustate->mmu_enable_addr + 4)) || (R15 == (cpustate->mmu_enable_addr + 8)))
     {
         LOG( ( "ARM7: fetch flat, PC = %08x, vaddr = %08x\n", R15, vaddr ) );
     	return vaddr;
     }
     else
     {
-    	r15_mmu_enable_addr = 1;
+    	cpustate->mmu_enable_addr = 1;
     }
+#endif
 
 	domain = (desc_lvl1 >> 5) & 0xF;
 	permission = (COPRO_DOMAIN_ACCESS_CONTROL >> (domain << 1)) & 3;
@@ -168,14 +195,14 @@ INLINE UINT32 arm7_tlb_translate(arm_state *cpustate, UINT32 vaddr, int mode)
     {
         case COPRO_TLB_UNMAPPED:
             // Unmapped, generate a translation fault
-            if (mode == 0)
+            if (mode == ARM7_TLB_ABORT_D)
             {
 	            LOG( ( "ARM7: Not Yet Implemented: Translation fault on unmapped virtual address, PC = %08x, vaddr = %08x\n", R15, vaddr ) );
             	COPRO_FAULT_STATUS = (5 << 0);
             	COPRO_FAULT_ADDRESS = vaddr;
             	cpustate->pendingAbtD = 1;
             }
-            else if (mode == 1)
+            else if (mode == ARM7_TLB_ABORT_P)
             {
 	            LOG( ( "ARM7: Not Yet Implemented: Translation fault on unmapped virtual address, PC = %08x, vaddr = %08x\n", R15, vaddr ) );
             	cpustate->pendingAbtP = 1;
@@ -201,7 +228,7 @@ INLINE UINT32 arm7_tlb_translate(arm_state *cpustate, UINT32 vaddr, int mode)
             }
             else
             {
-                if (mode == 0)
+                if (mode == ARM7_TLB_ABORT_D)
                 {
 	       	    	LOG( ( "domain %d permission = %d\n", domain, permission ) );
 	                LOG( ( "ARM7: Section Table, Section Domain fault on virtual address, vaddr = %08x, domain = %08x, PC = %08x\n", vaddr, domain, R15 ) );
@@ -209,7 +236,7 @@ INLINE UINT32 arm7_tlb_translate(arm_state *cpustate, UINT32 vaddr, int mode)
                 	COPRO_FAULT_ADDRESS = vaddr;
             	    cpustate->pendingAbtD = 1;
             	}
-            	else if (mode == 1)
+            	else if (mode == ARM7_TLB_ABORT_P)
             	{
 	       	    	LOG( ( "domain %d permission = %d\n", domain, permission ) );
 	                LOG( ( "ARM7: Section Table, Section Domain fault on virtual address, vaddr = %08x, domain = %08x, PC = %08x\n", vaddr, domain, R15 ) );
@@ -232,14 +259,14 @@ INLINE UINT32 arm7_tlb_translate(arm_state *cpustate, UINT32 vaddr, int mode)
         {
             case COPRO_TLB_UNMAPPED:
                 // Unmapped, generate a translation fault
-                if (mode == 0)
+                if (mode == ARM7_TLB_ABORT_D)
                 {
 	                LOG( ( "ARM7: Not Yet Implemented: Translation fault on unmapped virtual address, vaddr = %08x, PC %08X\n", vaddr, R15 ) );
                 	COPRO_FAULT_STATUS = (7 << 0);
                 	COPRO_FAULT_ADDRESS = vaddr;
 	        	    cpustate->pendingAbtD = 1;
 	            }
-	            else if (mode == 1)
+	            else if (mode == ARM7_TLB_ABORT_P)
 	            {
 	                LOG( ( "ARM7: Not Yet Implemented: Translation fault on unmapped virtual address, vaddr = %08x, PC %08X\n", vaddr, R15 ) );
             		cpustate->pendingAbtP = 1;
@@ -274,7 +301,7 @@ static CPU_TRANSLATE( arm7 )
 	/* only applies to the program address space and only does something if the MMU's enabled */
 	if( space == ADDRESS_SPACE_PROGRAM && ( COPRO_CTRL & COPRO_CTRL_MMU_EN ) )
 	{
-		*address = arm7_tlb_translate(cpustate, *address, 2);
+		*address = arm7_tlb_translate(cpustate, *address, ARM7_TLB_NO_ABORT);
 	}
 	return TRUE;
 }
@@ -323,6 +350,17 @@ static CPU_RESET( arm7_be )
 
 	CPU_RESET_CALL( arm7 );
 	cpustate->endian = ENDIANNESS_BIG;
+}
+
+static CPU_RESET( arm7500 )
+{
+	arm_state *cpustate = get_safe_token(device);
+
+	// must call core reset
+	arm7_core_reset(device);
+
+	cpustate->archRev = 3;	// ARMv3
+	cpustate->archFlags = 0;
 }
 
 static CPU_RESET( arm9 )
@@ -551,7 +589,7 @@ CPU_GET_INFO( arm7 )
 
         case CPUINFO_INT_PREVIOUSPC:            info->i = 0;    /* not implemented */           break;
         case CPUINFO_INT_PC:
-        case CPUINFO_INT_REGISTER + ARM7_PC:    info->i = R15;                                  break;
+        case CPUINFO_INT_REGISTER + ARM7_PC:    info->i = GET_PC;                                  break;
         case CPUINFO_INT_SP:                    info->i = GetRegister(cpustate, 13);            break;
 
         /* FIRQ Mode Shadowed Registers */
@@ -616,7 +654,7 @@ CPU_GET_INFO( arm7 )
         break;
 
         /* registers shared by all operating modes */
-        case CPUINFO_STR_REGISTER + ARM7_PC:    sprintf(info->s, "PC  :%08x", R15);            break;
+        case CPUINFO_STR_REGISTER + ARM7_PC:    sprintf(info->s, "PC  :%08x", GET_PC);            break;
         case CPUINFO_STR_REGISTER + ARM7_R0:    sprintf(info->s, "R0  :%08x", ARM7REG( 0));    break;
         case CPUINFO_STR_REGISTER + ARM7_R1:    sprintf(info->s, "R1  :%08x", ARM7REG( 1));    break;
         case CPUINFO_STR_REGISTER + ARM7_R2:    sprintf(info->s, "R2  :%08x", ARM7REG( 2));    break;
@@ -677,6 +715,17 @@ CPU_GET_INFO( arm7_be )
 		case DEVINFO_STR_NAME:				strcpy(info->s, "ARM7 (big endian)");					break;
 		default:							CPU_GET_INFO_CALL(arm7);
 	}
+}
+
+CPU_GET_INFO( arm7500 )
+{
+    switch (state)
+    {
+        case CPUINFO_FCT_RESET:		info->reset = CPU_RESET_NAME(arm7500);		break;
+        case DEVINFO_STR_NAME:		strcpy(info->s, "ARM7500");				break;
+		default:					CPU_GET_INFO_CALL(arm7);
+		break;
+    }
 }
 
 CPU_GET_INFO( arm9 )
@@ -808,6 +857,7 @@ static READ32_DEVICE_HANDLER( arm7_rt_r_callback )
 				{
 					data = 0x41 | (1 << 23) | (7 << 12);
 					//data = (0x41 << 24) | (1 << 20) | (2 << 16) | (0x920 << 4) | (0 << 0); // ARM920T (S3C24xx)
+					//data = (0x41 << 24) | (0 << 20) | (1 << 16) | (0x710 << 4) | (0 << 0); // ARM7500
 				}
 				break;
 
@@ -935,14 +985,16 @@ static WRITE32_DEVICE_HANDLER( arm7_rt_w_callback )
                    ( data & COPRO_CTRL_ROM ) >> COPRO_CTRL_ROM_SHIFT,
                    ( data & COPRO_CTRL_ICACHE_EN ) >> COPRO_CTRL_ICACHE_EN_SHIFT ) );
             LOG( ( "    Int Vector Adjust:%d\n", ( data & COPRO_CTRL_INTVEC_ADJUST ) >> COPRO_CTRL_INTVEC_ADJUST_SHIFT ) );
+#if ARM7_MMU_ENABLE_HACK
             if (((data & COPRO_CTRL_MMU_EN) != 0) && ((COPRO_CTRL & COPRO_CTRL_MMU_EN) == 0))
             {
-            	r15_mmu_enable_addr = R15;
+            	cpustate->mmu_enable_addr = R15;
             }
             if (((data & COPRO_CTRL_MMU_EN) == 0) && ((COPRO_CTRL & COPRO_CTRL_MMU_EN) != 0))
             {
-            	R15 = arm7_tlb_translate( cpustate, R15, 0);
+            	R15 = arm7_tlb_translate( cpustate, R15, ARM7_TLB_NO_ABORT);
             }
+#endif
             COPRO_CTRL = data & COPRO_CTRL_MASK;
             break;
         case 2:             // Translation Table Base
@@ -995,6 +1047,7 @@ void arm7_dt_w_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, void (*wr
 
 DEFINE_LEGACY_CPU_DEVICE(ARM7, arm7);
 DEFINE_LEGACY_CPU_DEVICE(ARM7_BE, arm7_be);
+DEFINE_LEGACY_CPU_DEVICE(ARM7500, arm7500);
 DEFINE_LEGACY_CPU_DEVICE(ARM9, arm9);
 DEFINE_LEGACY_CPU_DEVICE(ARM920T, arm920t);
 DEFINE_LEGACY_CPU_DEVICE(PXA255, pxa255);
