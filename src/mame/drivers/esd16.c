@@ -18,7 +18,7 @@ Year + Game            PCB             Notes
 ---------------------------------------------------------------------------
 98  Multi Champ        ESD 11-09-98   (also a year 1999 revision)
 99  Multi Champ Deluxe ESD 08-26-1999 (also a year 2000 revision)
-99  Head Panic         ESD 08-26-1999 (All English version, copyright 1999)
+99  Head Panic         ESD 05-28-99   (All English version, copyright 1999)
 00  Head Panic         ESD 08-26-1999 (All English version, copyright 2000)
 00  Head Panic         ESD 08-26-1999 (with Fuuki, Story in Japanese)
 00  Tang Tang          ESD            (no date is marked on PCB)
@@ -28,7 +28,8 @@ Year + Game            PCB             Notes
 Other ESD games:
 
 3 Cushion Billiards (c) 2000 - Undumped
-Deluxe 5            (c) 2000 - Undumped
+Deluxe 5            (c) 2000 - Undumped (PCB looks identical to the ESD 08-26-1999)
+Tang Tang           (c) 2000 - Undumped ESD 05-28-99 version
 Fire Hawk           (c) 2001 - see nmk16.c driver
 Jumping Pop         (c) 2001 - see tumbleb.c driver
 
@@ -880,6 +881,45 @@ ROM_END
 PCB Layout (Head Panic)
 ----------
 
+ESD 05-28-99
++-----------------------------------------+
+|            3812 3014 W24165 6295 ESD4   |
+|VOL                 ESD3                 |
+|                   PAL Z80               |
+|                                         |
+|                       +-------+    SM4  |
+|      W24165    62256  | ESD   |         |
+|J     W24165    62256  |CRTC99 |    SM3  |
+|A               62256  |       |         |
+|M               62256  +-------+    PAL  |
+|M   68000 ESD1                      PAL  |
+|A     PAL ESD2 W24165  +-------+   ESD5  |
+|      PAL      W24165  |ACTEL  |         |
+|                       |A40MX04|         |
+|               W24165  |       |   SM2   |
+|               W24165  +-------+         |
+|S1 93C46       W24165   PAL        SM1   |
+|S2 16MHz 14MHZ W24165   PAL PAL          |
++-----------------------------------------+
+
+Notes:
+      68000 (MC68HC000FN16)
+      Z80 (Z84C00006FEC)
+      YM3014/YM3812 & OKI M6295 (rebaged as U6614/U6612 & AD-65)
+      A40MX04 - Actel A40MX04-F FPGA (PLCC84)
+      CRTC99  - ESD CRTC99 Graphics Controller (QFP240)
+
+      ESD1, ESD2 are 27C2001
+      ESD3 is a 27C2000
+      ESD4 is a 27C010 Mask ROM
+      ESD5 is a 27C040
+      SM1, SM2, SM3 & SM4 are MX29F1610MC 16M SOP44 smt flash ROM
+
+1x connector JAMMA
+1x trimmer (volume)
+2x pushbutton
+
+
 ESD 08-26-1999
 |-----------------------------------------|
 |  3014  3812 6116   6295   ESD4          |
@@ -976,10 +1016,10 @@ ROM_START( hedpanicf ) /* Story line in Japanese, game instructions in English *
 ROM_END
 
 
-ROM_START( hedpanico ) /* Story line & game instructions in English, copyright year is 1999 - uses older style sprites */
+ROM_START( hedpanico ) /* Story line & game instructions in English, copyright year is 1999 - ESD 05-28-99 PCB which uses older style sprites */
 	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
-	ROM_LOAD16_BYTE( "esd2.rom", 0x000000, 0x040000, CRC(70b08424) SHA1(2ba4fb3b749e31db4239a9173b8509366400152f) )
-	ROM_LOAD16_BYTE( "esd1.rom", 0x000001, 0x040000, CRC(4e0682c5) SHA1(f4117f31b6426d7bf126a6c62c489b9347885b42) )
+	ROM_LOAD16_BYTE( "esd2.rom", 0x000000, 0x040000, CRC(70b08424) SHA1(2ba4fb3b749e31db4239a9173b8509366400152f) ) /* CU03 */
+	ROM_LOAD16_BYTE( "esd1.rom", 0x000001, 0x040000, CRC(4e0682c5) SHA1(f4117f31b6426d7bf126a6c62c489b9347885b42) ) /* CU02 */
 
 	ROM_REGION( 0x44000, "audiocpu", 0 )		/* Z80 Code */
 	// this rom is severely corrupted, however, I think it should be the same, so I'm using the one from the other sets
@@ -992,7 +1032,7 @@ ROM_START( hedpanico ) /* Story line & game instructions in English, copyright y
 	ROM_LOAD( "sm1.ju01", 0x000000, 0x200000, CRC(8083813f) SHA1(9492e7e844e45d59f0506f69d40c338b27bd3ce3) )
 	ROM_LOAD( "sm2.ju02", 0x200000, 0x200000, CRC(7a9610e4) SHA1(21ae3ec3fbddfc66416c109b091bd885d5ba0558) )
 	/* expand this to take up 0x200000 bytes too so we can decode it */
-	ROM_LOAD16_BYTE( "esd5.rom", 0x400000, 0x080000, CRC(82c5727f) SHA1(017f1d0c94475c51d17f12e24895f47a273a2dbb) )
+	ROM_LOAD16_BYTE( "esd5.rom", 0x400000, 0x080000, CRC(82c5727f) SHA1(017f1d0c94475c51d17f12e24895f47a273a2dbb) ) /* JU07 */
 	ROM_FILL(                    0x500000, 0x100000, 0 )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )	/* Layers, 16x16x8 */
@@ -1000,7 +1040,7 @@ ROM_START( hedpanico ) /* Story line & game instructions in English, copyright y
 	ROM_LOAD16_BYTE( "sm4.fu34", 0x000001, 0x200000, CRC(6da0fb9e) SHA1(c4e7487953f45c5f6ce2ebe558b4c325f6ec54eb) )
 
 	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
-	ROM_LOAD( "esd4.rom", 0x000000, 0x020000, CRC(d7ca6806) SHA1(8ad668bfb5b7561cc0f3e36dfc3c936b136a4274) )
+	ROM_LOAD( "esd4.rom", 0x000000, 0x020000, CRC(d7ca6806) SHA1(8ad668bfb5b7561cc0f3e36dfc3c936b136a4274) ) /* SU10 */
 
 	ROM_REGION( 0x80, "eeprom", 0 )
 	ROM_LOAD( "hedpanic.nv", 0x0000, 0x0080, CRC(e91f4038) SHA1(f492de71170900f87912a272ab4f4a3a37ba31fe) )
@@ -1056,8 +1096,8 @@ Notes:
 1x trimmer (volume)
 2x pushbutton
 
-      * : Board has positions for 6x standard 32 pin EPROMs but only 5 positions are populated
-          with an EPROM.
+      * : Board has positions for 6x standard 32 pin EPROMs but only 5 positions are populated with an EPROM.
+      * : Tang Tang also known to be found on a ESD 05-28-99 PCB (see Head Panic above for PCB layout)
 
 */
 
@@ -1171,13 +1211,15 @@ ROM_END
 GAME( 1999, multchmp, 0,        multchmp, multchmp, 0, ROT0, "ESD",         "Multi Champ (World)", GAME_SUPPORTS_SAVE )
 GAME( 1998, multchmpk,multchmp, multchmp, multchmp, 0, ROT0, "ESD",         "Multi Champ (Korea)", GAME_SUPPORTS_SAVE )
 
+/* ESD 05-28-99 */
+GAME( 1999, hedpanico,hedpanic, hedpanio, hedpanic, 0, ROT0, "ESD",         "Head Panic (ver. 0615, 15/06/1999)", GAME_SUPPORTS_SAVE ) // 15/06/1999 ?
+
 /* ESD 08-26-1999 */
 GAME( 2000, mchampdx, 0,        mchampdx, hedpanic, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 0106, 06/01/2000)", GAME_SUPPORTS_SAVE ) // 06/01/2000 ?
 GAME( 1999, mchampdxa,mchampdx, mchampdx, hedpanic, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1126, 26/11/1999)", GAME_SUPPORTS_SAVE ) // 26/11/1999 ?
 GAME( 1999, mchampdxb,mchampdx, mchampdx, hedpanic, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1114, 14/11/1999)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING ) // 14/11/1999 ? needs correct GFX roms
 GAME( 2000, hedpanic, 0,        hedpanic, hedpanic, 0, ROT0, "ESD",         "Head Panic (ver. 0117, 17/01/2000)", GAME_SUPPORTS_SAVE ) // 17/01/2000 ?
 GAME( 2000, hedpanicf,hedpanic, hedpanic, hedpanic, 0, ROT0, "ESD / Fuuki", "Head Panic (ver. 0315, 15/03/2000)", GAME_SUPPORTS_SAVE ) // 15/03/2000 ?
-GAME( 1999, hedpanico,hedpanic, hedpanio, hedpanic, 0, ROT0, "ESD",         "Head Panic (ver. 0615, 15/06/1999)", GAME_SUPPORTS_SAVE ) // 15/06/1999 ?
 
 /* ESD - This PCB looks identical to the ESD 08-26-1999 PCB */
 GAME( 2000, tangtang, 0,        tangtang, hedpanic, 0, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000)", GAME_SUPPORTS_SAVE ) // 26/05/2000 ?
