@@ -456,7 +456,7 @@ static WRITE8_HANDLER(meritm_crt250_questions_bank_w)
 		return;
 	}
 
-	dst = memory_region(space->machine, "maincpu") + 0x70000 + 2;
+	dst = space->machine->region("maincpu")->base() + 0x70000 + 2;
 
 	if (data == 0)
 	{
@@ -485,7 +485,7 @@ static WRITE8_HANDLER(meritm_crt250_questions_bank_w)
 			default: logerror( "meritm_crt250_questions_bank_w: unknown data = %02x\n", data ); return;
 		}
 		logerror( "Reading question byte at %06X\n", questions_address | questions_loword_address);
-		*dst = memory_region(space->machine, "extra")[questions_address | questions_loword_address];
+		*dst = space->machine->region("extra")->base()[questions_address | questions_loword_address];
 	}
 };
 
@@ -975,7 +975,7 @@ static MACHINE_START(merit_common)
 
 static MACHINE_START(meritm_crt250)
 {
-	memory_configure_bank(machine, "bank1", 0, 8, memory_region(machine, "maincpu"), 0x10000);
+	memory_configure_bank(machine, "bank1", 0, 8, machine->region("maincpu")->base(), 0x10000);
 	meritm_bank = 0xff;
 	meritm_crt250_switch_banks(machine);
 	MACHINE_START_CALL(merit_common);
@@ -1001,8 +1001,8 @@ static MACHINE_START(meritm_crt260)
 	meritm_ram = auto_alloc_array(machine, UINT8,  0x8000 );
 	machine->device<nvram_device>("nvram")->set_base(meritm_ram, 0x8000);
 	memset(meritm_ram, 0x00, 0x8000);
-	memory_configure_bank(machine, "bank1", 0, 128, memory_region(machine, "maincpu"), 0x8000);
-	memory_configure_bank(machine, "bank2", 0, 128, memory_region(machine, "maincpu"), 0x8000);
+	memory_configure_bank(machine, "bank1", 0, 128, machine->region("maincpu")->base(), 0x8000);
+	memory_configure_bank(machine, "bank2", 0, 128, machine->region("maincpu")->base(), 0x8000);
 	memory_configure_bank(machine, "bank3", 0, 4, meritm_ram, 0x2000);
 	meritm_bank = 0xff;
 	meritm_psd_a15 = 0;

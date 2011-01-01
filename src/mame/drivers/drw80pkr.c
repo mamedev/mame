@@ -371,7 +371,7 @@ GFXDECODE_END
 
 static DRIVER_INIT( drw80pkr )
 {
-	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "maincpu"), 0x1000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine->region("maincpu")->base(), 0x1000);
 }
 
 

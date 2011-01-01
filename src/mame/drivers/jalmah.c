@@ -279,7 +279,7 @@ priority = 8, then 4, 2 and finally 1).
 ***************************************************************************************/
 static void jalmah_priority_system(running_machine *machine)
 {
-    UINT8 *pri_rom = memory_region(machine, "user1");
+    UINT8 *pri_rom = machine->region("user1")->base();
     UINT8 i;
     UINT8 prinum[0x10];
 
@@ -862,7 +862,7 @@ static WRITE16_HANDLER( jalmah_okirom_w )
 {
 	if(ACCESSING_BITS_0_7)
 	{
-		UINT8 *oki = memory_region(space->machine, "oki");
+		UINT8 *oki = space->machine->region("oki")->base();
 
 		oki_rom = data & 1;
 
@@ -879,7 +879,7 @@ static WRITE16_HANDLER( jalmah_okibank_w )
 {
 	if(ACCESSING_BITS_0_7)
 	{
-		UINT8 *oki = memory_region(space->machine, "oki");
+		UINT8 *oki = space->machine->region("oki")->base();
 
 		oki_bank = data & 3;
 

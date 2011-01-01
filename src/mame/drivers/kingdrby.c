@@ -936,8 +936,8 @@ static PALETTE_INIT(kingdrby)
 
 static PALETTE_INIT(kingdrbb)
 {
-	UINT8 *raw_prom = memory_region(machine, "raw_prom");
-	UINT8 *prom = memory_region(machine, "proms");
+	UINT8 *raw_prom = machine->region("raw_prom")->base();
+	UINT8 *prom = machine->region("proms")->base();
 	int	bit0, bit1, bit2 , r, g, b;
 	int	i;
 

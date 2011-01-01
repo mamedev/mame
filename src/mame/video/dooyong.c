@@ -638,8 +638,8 @@ VIDEO_UPDATE( popbingo )
 VIDEO_START( lastday )
 {
 	/* Configure tilemap callbacks */
-	bg_tilerom = memory_region(machine, "gfx5");
-	fg_tilerom = memory_region(machine, "gfx6");
+	bg_tilerom = machine->region("gfx5")->base();
+	fg_tilerom = machine->region("gfx6")->base();
 	bg_tilerom2 = NULL;
 	fg_tilerom2 = NULL;
 	bg_gfx = 2;
@@ -675,8 +675,8 @@ VIDEO_START( lastday )
 VIDEO_START( gulfstrm )
 {
 	/* Configure tilemap callbacks */
-	bg_tilerom = memory_region(machine, "gfx5");
-	fg_tilerom = memory_region(machine, "gfx6");
+	bg_tilerom = machine->region("gfx5")->base();
+	fg_tilerom = machine->region("gfx6")->base();
 	bg_tilerom2 = NULL;
 	fg_tilerom2 = NULL;
 	bg_gfx = 2;
@@ -711,8 +711,8 @@ VIDEO_START( gulfstrm )
 VIDEO_START( pollux )
 {
 	/* Configure tilemap callbacks */
-	bg_tilerom = memory_region(machine, "gfx5");
-	fg_tilerom = memory_region(machine, "gfx6");
+	bg_tilerom = machine->region("gfx5")->base();
+	fg_tilerom = machine->region("gfx6")->base();
 	bg_tilerom2 = NULL;
 	fg_tilerom2 = NULL;
 	bg_gfx = 2;
@@ -744,9 +744,9 @@ VIDEO_START( pollux )
 VIDEO_START( bluehawk )
 {
 	/* Configure tilemap callbacks */
-	bg_tilerom = memory_region(machine, "gfx3") + 0x78000;
-	fg_tilerom = memory_region(machine, "gfx4") + 0x78000;
-	fg2_tilerom = memory_region(machine, "gfx5") + 0x38000;
+	bg_tilerom = machine->region("gfx3")->base() + 0x78000;
+	fg_tilerom = machine->region("gfx4")->base() + 0x78000;
+	fg2_tilerom = machine->region("gfx5")->base() + 0x38000;
 	bg_tilerom2 = NULL;
 	fg_tilerom2 = NULL;
 	fg2_tilerom2 = NULL;
@@ -784,8 +784,8 @@ VIDEO_START( bluehawk )
 VIDEO_START( flytiger )
 {
 	/* Configure tilemap callbacks */
-	bg_tilerom = memory_region(machine, "gfx3") + 0x78000;
-	fg_tilerom = memory_region(machine, "gfx4") + 0x78000;
+	bg_tilerom = machine->region("gfx3")->base() + 0x78000;
+	fg_tilerom = machine->region("gfx4")->base() + 0x78000;
 	bg_tilerom2 = NULL;
 	fg_tilerom2 = NULL;
 	bg_gfx = 2;
@@ -819,8 +819,8 @@ VIDEO_START( flytiger )
 VIDEO_START( primella )
 {
 	/* Configure tilemap callbacks */
-	bg_tilerom = memory_region(machine, "gfx2") + memory_region_length(machine, "gfx2") - 0x8000;
-	fg_tilerom = memory_region(machine, "gfx3") + memory_region_length(machine, "gfx3") - 0x8000;
+	bg_tilerom = machine->region("gfx2")->base() + machine->region("gfx2")->bytes() - 0x8000;
+	fg_tilerom = machine->region("gfx3")->base() + machine->region("gfx3")->bytes() - 0x8000;
 	bg_tilerom2 = NULL;
 	fg_tilerom2 = NULL;
 	bg_gfx = 1;
@@ -853,14 +853,14 @@ VIDEO_START( primella )
 VIDEO_START( rshark )
 {
 	/* Configure tilemap callbacks */
-	bg_tilerom = memory_region(machine, "gfx5");
-	bg2_tilerom = memory_region(machine, "gfx4");
-	fg_tilerom = memory_region(machine, "gfx3");
-	fg2_tilerom = memory_region(machine, "gfx2");
-	bg_tilerom2 = memory_region(machine, "gfx6") + 0x60000;
-	bg2_tilerom2 = memory_region(machine, "gfx6") + 0x40000;
-	fg_tilerom2 = memory_region(machine, "gfx6") + 0x20000;
-	fg2_tilerom2 = memory_region(machine, "gfx6") + 0x00000;
+	bg_tilerom = machine->region("gfx5")->base();
+	bg2_tilerom = machine->region("gfx4")->base();
+	fg_tilerom = machine->region("gfx3")->base();
+	fg2_tilerom = machine->region("gfx2")->base();
+	bg_tilerom2 = machine->region("gfx6")->base() + 0x60000;
+	bg2_tilerom2 = machine->region("gfx6")->base() + 0x40000;
+	fg_tilerom2 = machine->region("gfx6")->base() + 0x20000;
+	fg2_tilerom2 = machine->region("gfx6")->base() + 0x00000;
 	bg_gfx = 4;
 	bg2_gfx = 3;
 	fg_gfx = 2;
@@ -897,7 +897,7 @@ VIDEO_START( rshark )
 VIDEO_START( popbingo )
 {
 	/* Configure tilemap callbacks */
-	bg_tilerom = memory_region(machine, "gfx2");
+	bg_tilerom = machine->region("gfx2")->base();
 	bg_gfx = 1;
 
 	/* Create tilemaps */

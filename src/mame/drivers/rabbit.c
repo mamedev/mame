@@ -492,7 +492,7 @@ static READ32_HANDLER( randomrabbits )
 /* rom bank is used when testing roms, not currently hooked up */
 static WRITE32_HANDLER ( rabbit_rombank_w )
 {
-	UINT8 *dataroms = memory_region(space->machine, "gfx1");
+	UINT8 *dataroms = space->machine->region("gfx1")->base();
 #if 0
 	int bank;
 	printf("rabbit rombank %08x\n",data);
@@ -591,7 +591,7 @@ static TIMER_CALLBACK( rabbit_blit_done )
 
 static void rabbit_do_blit(running_machine *machine)
 {
-	UINT8 *blt_data = memory_region(machine, "gfx1");
+	UINT8 *blt_data = machine->region("gfx1")->base();
 	int blt_source = (rabbit_blitterregs[0]&0x000fffff)>>0;
 	int blt_column = (rabbit_blitterregs[1]&0x00ff0000)>>16;
 	int blt_line   = (rabbit_blitterregs[1]&0x000000ff);

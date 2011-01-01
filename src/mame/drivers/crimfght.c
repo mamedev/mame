@@ -258,7 +258,7 @@ static const k051960_interface crimfght_k051960_intf =
 static MACHINE_START( crimfght )
 {
 	crimfght_state *state = machine->driver_data<crimfght_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank2", 0, 12, &ROM[0x10000], 0x2000);
 	memory_set_bank(machine, "bank2", 0);

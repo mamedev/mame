@@ -111,7 +111,7 @@ WRITE8_HANDLER( threeds_output_w )
 
 READ8_HANDLER( threeds_rom_readback_r )
 {
-	UINT8 *GFX = memory_region(space->machine, "gfx1");
+	UINT8 *GFX = space->machine->region("gfx1")->base();
 
 	return GFX[(blitter_src_addr | (pastelg_gfxrom << 16)) & 0x3ffff];
 }
@@ -119,7 +119,7 @@ READ8_HANDLER( threeds_rom_readback_r )
 
 WRITE8_HANDLER( pastelg_romsel_w )
 {
-	int gfxlen = memory_region_length(space->machine, "gfx1");
+	int gfxlen = space->machine->region("gfx1")->bytes();
 	pastelg_gfxrom = ((data & 0xc0) >> 6);
 	pastelg_palbank = ((data & 0x10) >> 4);
 	nb1413m3_sndrombank1_w(space, 0, data);
@@ -168,7 +168,7 @@ static TIMER_CALLBACK( blitter_timer_callback )
 
 static void pastelg_gfxdraw(running_machine *machine)
 {
-	UINT8 *GFX = memory_region(machine, "gfx1");
+	UINT8 *GFX = machine->region("gfx1")->base();
 	int width = machine->primary_screen->width();
 
 	int x, y;
@@ -212,7 +212,7 @@ static void pastelg_gfxdraw(running_machine *machine)
 		incy = -1;
 	}
 
-	gfxlen = memory_region_length(machine, "gfx1");
+	gfxlen = machine->region("gfx1")->bytes();
 	gfxaddr = (pastelg_gfxrom << 16) + blitter_src_addr;
 
 	readflag = 0;

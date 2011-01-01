@@ -21,9 +21,9 @@ VIDEO_START( ccastles )
 	static const int resistances[3] = { 22000, 10000, 4700 };
 
 	/* get pointers to our PROMs */
-	state->syncprom = memory_region(machine, "proms") + 0x000;
-	state->wpprom = memory_region(machine, "proms") + 0x200;
-	state->priprom = memory_region(machine, "proms") + 0x300;
+	state->syncprom = machine->region("proms")->base() + 0x000;
+	state->wpprom = machine->region("proms")->base() + 0x200;
+	state->priprom = machine->region("proms")->base() + 0x300;
 
 	/* compute the color output resistor weights at startup */
 	compute_resistor_weights(0,	255, -1.0,

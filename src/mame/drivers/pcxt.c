@@ -238,7 +238,7 @@ static VIDEO_UPDATE( filetto )
 static void vga_bitmap_layer(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int x,y,z;
-	UINT8 *region = memory_region(machine, "user1");
+	UINT8 *region = machine->region("user1")->base();
 	static UINT32 cur_bank;
 
 	/*TODO: might be a different descramble algorythm plus plain bg bank*/
@@ -382,7 +382,7 @@ static WRITE8_HANDLER( disk_iobank_w )
 	if (newbank != bank)
 	{
 		bank = newbank;
-		memory_set_bankptr(space->machine,  "bank1",memory_region(space->machine, "user1") + 0x10000 * bank );
+		memory_set_bankptr(space->machine,  "bank1",space->machine->region("user1")->base() + 0x10000 * bank );
 	}
 
 	lastvalue = data;
@@ -1064,8 +1064,8 @@ static DRIVER_INIT( tetriskr )
 {
 	int i,j,k;
 	int index=0;
-	UINT8 *region = memory_region(machine, "user1");
-	UINT8 *gfx = memory_region(machine, "gfx2");
+	UINT8 *region = machine->region("user1")->base();
+	UINT8 *gfx = machine->region("gfx2")->base();
 
 	for(i=0;i<0x20000;i++)
 	{

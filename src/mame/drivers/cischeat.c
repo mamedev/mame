@@ -1792,8 +1792,8 @@ MACHINE_CONFIG_END
 */
 static void cischeat_untangle_sprites(running_machine *machine, const char *region)
 {
-	UINT8		*src = memory_region(machine, region);
-	const UINT8	*end = src + memory_region_length(machine, region);
+	UINT8		*src = machine->region(region)->base();
+	const UINT8	*end = src + machine->region(region)->bytes();
 
 	while (src < end)
 	{
@@ -1946,7 +1946,7 @@ ROM_END
 static DRIVER_INIT( bigrun )
 {
 	/* Split ROMs */
-	rom_1 = (UINT16 *) memory_region(machine, "user1");
+	rom_1 = (UINT16 *) machine->region("user1")->base();
 
 	cischeat_untangle_sprites(machine, "gfx4");	// Untangle sprites
 	phantasm_rom_decode(machine, "soundcpu");					// Decrypt sound cpu code
@@ -2068,17 +2068,17 @@ ROM_END
 static DRIVER_INIT( cischeat )
 {
 	/* Split ROMs */
-	rom_1 = (UINT16 *) (memory_region(machine, "user1") + 0x00000);
-	rom_2 = (UINT16 *) (memory_region(machine, "cpu2")  + 0x40000);
-	rom_3 = (UINT16 *) (memory_region(machine, "cpu3")  + 0x40000);
+	rom_1 = (UINT16 *) (machine->region("user1")->base() + 0x00000);
+	rom_2 = (UINT16 *) (machine->region("cpu2")->base()  + 0x40000);
+	rom_3 = (UINT16 *) (machine->region("cpu3")->base()  + 0x40000);
 
-	memcpy(memory_region(machine, "user1") + 0x80000, rom_2, 0x40000);
+	memcpy(machine->region("user1")->base() + 0x80000, rom_2, 0x40000);
 	memset(rom_2, 0, 0x40000);
-	rom_2 = (UINT16 *) (memory_region(machine, "user1") + 0x80000);
+	rom_2 = (UINT16 *) (machine->region("user1")->base() + 0x80000);
 
-	memcpy(memory_region(machine, "user1") + 0xc0000, rom_3, 0x40000);
+	memcpy(machine->region("user1")->base() + 0xc0000, rom_3, 0x40000);
 	memset(rom_3, 0, 0x40000);
-	rom_3 = (UINT16 *) (memory_region(machine, "user1") + 0xc0000);
+	rom_3 = (UINT16 *) (machine->region("user1")->base() + 0xc0000);
 
 	cischeat_untangle_sprites(machine, "gfx4");	// Untangle sprites
 	astyanax_rom_decode(machine, "soundcpu");					// Decrypt sound cpu code
@@ -2295,7 +2295,7 @@ ROM_END
 static DRIVER_INIT( f1gpstar )
 {
 	/* Split ROMs */
-	rom_1 = (UINT16 *) memory_region(machine, "user1");
+	rom_1 = (UINT16 *) machine->region("user1")->base();
 
 	cischeat_untangle_sprites(machine, "gfx4");
 }

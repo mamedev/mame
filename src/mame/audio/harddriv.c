@@ -24,8 +24,8 @@
 void hdsnd_init(running_machine *machine)
 {
 	harddriv_state *state = machine->driver_data<harddriv_state>();
-	state->rombase = (UINT8 *)memory_region(machine, "serialroms");
-	state->romsize = memory_region_length(machine, "serialroms");
+	state->rombase = (UINT8 *)machine->region("serialroms")->base();
+	state->romsize = machine->region("serialroms")->bytes();
 }
 
 

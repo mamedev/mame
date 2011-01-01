@@ -203,9 +203,9 @@ void fd1094_driver_init(running_machine *machine, const char* tag, void (*set_de
 
 	strcpy(fd1094_cputag, tag);
 
-	fd1094_cpuregion = (UINT16*)memory_region(machine, fd1094_cputag);
-	fd1094_cpuregionsize = memory_region_length(machine, fd1094_cputag);
-	fd1094_key = memory_region(machine, "user1");
+	fd1094_cpuregion = (UINT16*)machine->region(fd1094_cputag)->base();
+	fd1094_cpuregionsize = machine->region(fd1094_cputag)->bytes();
+	fd1094_key = machine->region("user1")->base();
 	fd1094_set_decrypted = set_decrypted;
 
 	/* punt if no key; this allows us to be called even for non-FD1094 games */
@@ -221,7 +221,7 @@ void fd1094_driver_init(running_machine *machine, const char* tag, void (*set_de
 	fd1094_state = -1;
 
 	/* key debugging */
-	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0 && memory_region(machine, "user2") != NULL)
+	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0 && machine->region("user2")->base() != NULL)
 	{
 		fd1094_init_debugging(machine, fd1094_cputag, "user1", "user2", key_changed);
 	}

@@ -128,10 +128,10 @@ static DEVICE_START( nmk112 )
 	nmk112_state *nmk112 = get_safe_token(device);
 	const nmk112_interface *intf = get_interface(device);
 
-	nmk112->rom0 = memory_region(device->machine, intf->rgn0);
-	nmk112->size0 = memory_region_length(device->machine, intf->rgn0) - 0x40000;
-	nmk112->rom1 = memory_region(device->machine, intf->rgn1);
-	nmk112->size1 = memory_region_length(device->machine, intf->rgn1) - 0x40000;
+	nmk112->rom0 = device->machine->region(intf->rgn0)->base();
+	nmk112->size0 = device->machine->region(intf->rgn0)->bytes() - 0x40000;
+	nmk112->rom1 = device->machine->region(intf->rgn1)->base();
+	nmk112->size1 = device->machine->region(intf->rgn1)->bytes() - 0x40000;
 
 	nmk112->page_mask = ~intf->disable_page_mask;
 

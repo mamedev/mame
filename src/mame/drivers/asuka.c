@@ -270,7 +270,7 @@ static void asuka_msm5205_vck( device_t *device )
 	}
 	else
 	{
-		state->adpcm_data = memory_region(device->machine, "ymsnd")[state->adpcm_pos];
+		state->adpcm_data = device->machine->region("ymsnd")->base()[state->adpcm_pos];
 		state->adpcm_pos = (state->adpcm_pos + 1) & 0xffff;
 		msm5205_data_w(device, state->adpcm_data >> 4);
 	}
@@ -843,8 +843,8 @@ static MACHINE_START( asuka )
 	state->tc0100scn = machine->device("tc0100scn");
 
 	/* configure the banks */
-	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, "audiocpu"), 0);
-	memory_configure_bank(machine, "bank1", 1, 3, memory_region(machine, "audiocpu") + 0x10000, 0x04000);
+	memory_configure_bank(machine, "bank1", 0, 1, machine->region("audiocpu")->base(), 0);
+	memory_configure_bank(machine, "bank1", 1, 3, machine->region("audiocpu")->base() + 0x10000, 0x04000);
 
 	state_save_register_global(machine, state->adpcm_pos);
 	state_save_register_global(machine, state->adpcm_data);

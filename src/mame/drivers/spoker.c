@@ -424,7 +424,7 @@ MACHINE_CONFIG_END
 static DRIVER_INIT( spk116it )
 {
 	int A;
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 
 	for (A = 0;A < 0x10000;A++)

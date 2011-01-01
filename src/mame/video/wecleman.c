@@ -95,8 +95,8 @@ static pen_t black_pen;
 static void get_sprite_info(running_machine *machine)
 {
 	const pen_t *base_pal = machine->pens;
-	UINT8 *base_gfx = memory_region(machine, "gfx1");
-	int gfx_max     = memory_region_length(machine, "gfx1");
+	UINT8 *base_gfx = machine->region("gfx1")->base();
+	int gfx_max     = machine->region("gfx1")->bytes();
 
 	UINT16 *source = machine->generic.spriteram.u16;
 

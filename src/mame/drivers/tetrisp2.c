@@ -112,7 +112,7 @@ static READ16_HANDLER( rockn_adpcmbank_r )
 
 static WRITE16_HANDLER( rockn_adpcmbank_w )
 {
-	UINT8 *SNDROM = memory_region(space->machine, "ymz");
+	UINT8 *SNDROM = space->machine->region("ymz")->base();
 	int bank;
 
 	rockn_adpcmbank = data;
@@ -129,7 +129,7 @@ static WRITE16_HANDLER( rockn_adpcmbank_w )
 
 static WRITE16_HANDLER( rockn2_adpcmbank_w )
 {
-	UINT8 *SNDROM = memory_region(space->machine, "ymz");
+	UINT8 *SNDROM = space->machine->region("ymz")->base();
 	int bank;
 
 	char banktable[9][3]=
@@ -177,13 +177,13 @@ static WRITE16_HANDLER( nndmseal_sound_bank_w )
 
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *rom = memory_region(space->machine, "okisource");
+		UINT8 *rom = space->machine->region("okisource")->base();
 
 		if (data & 0x04)
 		{
 			bank_lo = data & 0x03;
 
-			memcpy(memory_region(space->machine, "oki"), rom + (bank_lo * 0x80000), 0x20000);
+			memcpy(space->machine->region("oki")->base(), rom + (bank_lo * 0x80000), 0x20000);
 
 //          logerror("PC:%06X sound bank_lo = %02X\n",cpu_get_pc(space->cpu),bank_lo);
 		}
@@ -191,7 +191,7 @@ static WRITE16_HANDLER( nndmseal_sound_bank_w )
 		{
 			bank_hi = data & 0x03;
 
-			memcpy(memory_region(space->machine, "oki") + 0x20000, rom + (bank_lo * 0x80000) + (bank_hi * 0x20000), 0x20000);
+			memcpy(space->machine->region("oki")->base() + 0x20000, rom + (bank_lo * 0x80000) + (bank_hi * 0x20000), 0x20000);
 
 //          logerror("PC:%06X sound bank_hi = %02X\n",cpu_get_pc(space->cpu),bank_hi);
 		}

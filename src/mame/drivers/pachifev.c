@@ -259,7 +259,7 @@ static void pf_adpcm_int(device_t *device)
     }
     else
     {
-        UINT8 *ROM = memory_region(device->machine, "adpcm");
+        UINT8 *ROM = device->machine->region("adpcm")->base();
 
         adpcm_data = ((trigger ? (ROM[adpcm_pos] & 0x0f) : (ROM[adpcm_pos] & 0xf0)>>4) );
         msm5205_data_w(device,adpcm_data & 0xf);

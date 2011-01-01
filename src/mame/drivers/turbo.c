@@ -1760,7 +1760,7 @@ static void turbo_rom_decode(running_machine *machine)
 		2,1,2,1	 /* 0x5000-0x5fff */
 	};
 
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 	int offs, i, j;
 	UINT8 src;
 

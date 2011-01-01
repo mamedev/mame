@@ -212,7 +212,7 @@ static WRITE16_HANDLER( tv_vcf_paletteram_w )
 static WRITE16_HANDLER( tv_vcf_bankselect_w )
 {
 	static UINT32 bankaddress;
-	UINT8 *ROM = memory_region(space->machine, "user1");
+	UINT8 *ROM = space->machine->region("user1")->base();
 
 	/* bits 0, 1 select the ROM bank */
 	bankaddress = (data & 0x03) * 0x40000;
@@ -328,7 +328,7 @@ static WRITE16_HANDLER( tv_tcf_paletteram_w )
 static WRITE16_HANDLER( tv_tcf_bankselect_w )
 {
 	static UINT32 bankaddress;
-	UINT8 *ROM = memory_region(space->machine, "user1");
+	UINT8 *ROM = space->machine->region("user1")->base();
 
 	/* bits 0, 1, 2 select the ROM bank */
 	bankaddress = (data & 0x07) * 0x40000;
@@ -446,7 +446,7 @@ static READ16_HANDLER( brasil_status_r )
 static WRITE16_HANDLER( brasil_status_w )
 {
 	static UINT32 bankaddress;
-	UINT8 *ROM = memory_region(space->machine, "user1");
+	UINT8 *ROM = space->machine->region("user1")->base();
 
 	switch(data & 3) //data & 7?
 	{

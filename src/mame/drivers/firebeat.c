@@ -1899,7 +1899,7 @@ static MACHINE_RESET( firebeat )
 {
 	void *cd;
 	int i;
-	UINT8 *sound = memory_region(machine, "ymz");
+	UINT8 *sound = machine->region("ymz")->base();
 
 	for (i=0; i < 0x200000; i++)
 	{
@@ -2179,7 +2179,7 @@ static void init_lights(running_machine *machine, write32_space_func out1, write
 
 static void init_firebeat(running_machine *machine)
 {
-	UINT8 *rom = memory_region(machine, "user2");
+	UINT8 *rom = machine->region("user2")->base();
 
 	atapi_init(machine);
 

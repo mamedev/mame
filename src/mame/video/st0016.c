@@ -191,8 +191,8 @@ WRITE8_HANDLER(st0016_vregs_w)
 		UINT32 srcadr=(st0016_vregs[0xa0]|(st0016_vregs[0xa1]<<8)|(st0016_vregs[0xa2]<<16))<<1;
 		UINT32 dstadr=(st0016_vregs[0xa3]|(st0016_vregs[0xa4]<<8)|(st0016_vregs[0xa5]<<16))<<1;
 		UINT32 length=((st0016_vregs[0xa6]|(st0016_vregs[0xa7]<<8)|((st0016_vregs[0xa8]&0x1f)<<16))+1)<<1;
-		UINT32 srclen = (memory_region_length(space->machine, "maincpu")-0x10000);
-		UINT8 *mem = memory_region(space->machine, "maincpu");
+		UINT32 srclen = (space->machine->region("maincpu")->bytes()-0x10000);
+		UINT8 *mem = space->machine->region("maincpu")->base();
 
 		srcadr += macs_cart_slot*0x400000;
 

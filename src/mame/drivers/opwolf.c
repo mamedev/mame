@@ -480,7 +480,7 @@ static void opwolf_msm5205_vck( device_t *device )
 	}
 	else
 	{
-		state->adpcm_data[chip] = memory_region(device->machine, "adpcm")[state->adpcm_pos[chip]];
+		state->adpcm_data[chip] = device->machine->region("adpcm")->base()[state->adpcm_pos[chip]];
 		state->adpcm_pos[chip] = (state->adpcm_pos[chip] + 1) & 0x7ffff;
 		msm5205_data_w(device, state->adpcm_data[chip] >> 4);
 	}
@@ -987,7 +987,7 @@ ROM_END
 static DRIVER_INIT( opwolf )
 {
 	opwolf_state *state = machine->driver_data<opwolf_state>();
-	UINT16* rom = (UINT16*)memory_region(machine, "maincpu");
+	UINT16* rom = (UINT16*)machine->region("maincpu")->base();
 
 	state->opwolf_region = rom[0x03fffe / 2] & 0xff;
 
@@ -997,14 +997,14 @@ static DRIVER_INIT( opwolf )
 	state->opwolf_gun_xoffs = 0xec - (rom[0x03ffb0 / 2] & 0xff);
 	state->opwolf_gun_yoffs = 0x1c - (rom[0x03ffae / 2] & 0xff);
 
-	memory_configure_bank(machine, "bank10", 0, 4, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank10", 0, 4, machine->region("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 
 static DRIVER_INIT( opwolfb )
 {
 	opwolf_state *state = machine->driver_data<opwolf_state>();
-	UINT16* rom = (UINT16*)memory_region(machine, "maincpu");
+	UINT16* rom = (UINT16*)machine->region("maincpu")->base();
 
 	state->opwolf_region = rom[0x03fffe / 2] & 0xff;
 
@@ -1012,7 +1012,7 @@ static DRIVER_INIT( opwolfb )
 	state->opwolf_gun_xoffs = -2;
 	state->opwolf_gun_yoffs = 17;
 
-	memory_configure_bank(machine, "bank10", 0, 4, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank10", 0, 4, machine->region("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 

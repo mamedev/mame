@@ -1827,7 +1827,7 @@ static DRIVER_INIT( getstarj )
 
 static DRIVER_INIT( gtstarb1 )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	getstar_id = GTSTARB1;
 	getstar_init(machine);

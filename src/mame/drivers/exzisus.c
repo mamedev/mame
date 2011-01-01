@@ -57,7 +57,7 @@ static UINT8 *exzisus_sharedram_ac;
 
 static WRITE8_HANDLER( exzisus_cpua_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "cpua");
+	UINT8 *RAM = space->machine->region("cpua")->base();
 	static int exzisus_cpua_bank = 0;
 
 	if ( (data & 0x0f) != exzisus_cpua_bank )
@@ -74,7 +74,7 @@ static WRITE8_HANDLER( exzisus_cpua_bankswitch_w )
 
 static WRITE8_HANDLER( exzisus_cpub_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "cpub");
+	UINT8 *RAM = space->machine->region("cpub")->base();
 	static int exzisus_cpub_bank = 0;
 
 	if ( (data & 0x0f) != exzisus_cpub_bank )
@@ -128,7 +128,7 @@ static WRITE8_HANDLER( exzisus_cpub_reset_w )
 // the RAM check to work
 static DRIVER_INIT( exzisus )
 {
-	UINT8 *RAM = memory_region(machine, "cpua");
+	UINT8 *RAM = machine->region("cpua")->base();
 
 	/* Fix WORK RAM error */
 	RAM[0x67fd] = 0x18;

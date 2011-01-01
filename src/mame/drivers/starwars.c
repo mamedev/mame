@@ -508,14 +508,14 @@ static DRIVER_INIT( starwars )
 	starwars_mproc_init(machine);
 
 	/* initialize banking */
-	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "maincpu") + 0x6000, 0x10000 - 0x6000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine->region("maincpu")->base() + 0x6000, 0x10000 - 0x6000);
 	memory_set_bank(machine, "bank1", 0);
 }
 
 
 static DRIVER_INIT( esb )
 {
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 	/* init the slapstic */
 	slapstic_init(machine, 101);

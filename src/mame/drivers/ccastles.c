@@ -192,7 +192,7 @@ static MACHINE_START( ccastles )
 	rectangle visarea;
 
 	/* initialize globals */
-	state->syncprom = memory_region(machine, "proms") + 0x000;
+	state->syncprom = machine->region("proms")->base() + 0x000;
 
 	/* find the start of VBLANK in the SYNC PROM */
 	for (state->vblank_start = 0; state->vblank_start < 256; state->vblank_start++)
@@ -217,7 +217,7 @@ static MACHINE_START( ccastles )
 	machine->primary_screen->configure(320, 256, visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
 
 	/* configure the ROM banking */
-	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "maincpu") + 0xa000, 0x6000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine->region("maincpu")->base() + 0xa000, 0x6000);
 
 	/* create a timer for IRQs and set up the first callback */
 	state->irq_timer = timer_alloc(machine, clock_irq, NULL);

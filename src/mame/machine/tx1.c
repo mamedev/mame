@@ -453,7 +453,7 @@ static void tx1_update_state(running_machine *machine)
 #define LLOEN(a)	!(a & 0x40)
 #define GO_EN(a)	!(a & 0x4000)
 
-	const UINT16 *prom = (UINT16*)memory_region(machine, "au_data") + (0x8000 >> 1);
+	const UINT16 *prom = (UINT16*)machine->region("au_data")->base() + (0x8000 >> 1);
 
 	for (;;)
 	{
@@ -511,7 +511,7 @@ static void tx1_update_state(running_machine *machine)
 					data = math.muxlatch;
 				else if (dsel == 1)
 				{
-					UINT16 *romdata = (UINT16*)memory_region(machine, "au_data");
+					UINT16 *romdata = (UINT16*)machine->region("au_data")->base();
 					UINT16 addr = get_tx1_datarom_addr();
 					data = romdata[addr];
 				}
@@ -687,7 +687,7 @@ READ16_HANDLER( tx1_math_r )
                 TODO make this constant somewhere
                 e.g. math.retval =  math.romptr[ get_tx1_datarom_addr() ];
             */
-			UINT16 *romdata = (UINT16*)memory_region(space->machine, "au_data");
+			UINT16 *romdata = (UINT16*)space->machine->region("au_data")->base();
 			UINT16 addr = get_tx1_datarom_addr();
 			math.retval = romdata[addr];
 		}
@@ -833,7 +833,7 @@ WRITE16_HANDLER( tx1_math_w )
 
 READ16_HANDLER( tx1_spcs_rom_r )
 {
-	math.cpulatch = *(UINT16*)((UINT8*)memory_region(space->machine, "math_cpu") + 0xfc000 + 0x1000 + offset*2);
+	math.cpulatch = *(UINT16*)((UINT8*)space->machine->region("math_cpu")->base() + 0xfc000 + 0x1000 + offset*2);
 
 	if (math.mux == TX1_SEL_ILDEN)
 	{
@@ -1010,7 +1010,7 @@ static void buggyboy_update_state(running_machine *machine)
 #define LLOEN(a)	!(a & 0x40)
 #define GO_EN(a)	!(a & 0x4000)
 
-	const UINT16 *prom = (UINT16*)memory_region(machine, "au_data") + (0x8000 >> 1);
+	const UINT16 *prom = (UINT16*)machine->region("au_data")->base() + (0x8000 >> 1);
 
 	for (;;)
 	{
@@ -1043,7 +1043,7 @@ static void buggyboy_update_state(running_machine *machine)
 
 			if (math.mux == BB_MUX_DPROE)
 			{
-				UINT16 *romdata = (UINT16*)memory_region(machine, "au_data");
+				UINT16 *romdata = (UINT16*)machine->region("au_data")->base();
 				UINT16 addr = get_bb_datarom_addr();
 				kick_sn74s516(machine, &romdata[addr], ins);
 			}
@@ -1158,7 +1158,7 @@ READ16_HANDLER( buggyboy_math_r )
 	/* /DPROE */
 	else if ((offset & 0xc00) == 0xc00)
 	{
-		UINT16 *romdata = (UINT16*)memory_region(space->machine, "au_data");
+		UINT16 *romdata = (UINT16*)space->machine->region("au_data")->base();
 		UINT16 addr = get_bb_datarom_addr();
 
 		math.retval = romdata[addr];
@@ -1289,7 +1289,7 @@ WRITE16_HANDLER( buggyboy_math_w )
 */
 READ16_HANDLER( buggyboy_spcs_rom_r )
 {
-	math.cpulatch = *(UINT16*)((UINT8*)memory_region(space->machine, "math_cpu") + 0xfc000 + 0x1000 + offset*2);
+	math.cpulatch = *(UINT16*)((UINT8*)space->machine->region("math_cpu")->base() + 0xfc000 + 0x1000 + offset*2);
 
 	if (math.mux == BB_MUX_ILDEN)
 	{

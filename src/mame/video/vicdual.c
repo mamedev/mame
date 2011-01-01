@@ -83,7 +83,7 @@ VIDEO_UPDATE( vicdual_bw )
 
 VIDEO_UPDATE( vicdual_color )
 {
-	UINT8 *color_prom = (UINT8 *)memory_region(screen->machine, "proms");
+	UINT8 *color_prom = (UINT8 *)screen->machine->region("proms")->base();
 	UINT8 x = 0;
 	UINT8 y = cliprect->min_y;
 	UINT8 video_data = 0;

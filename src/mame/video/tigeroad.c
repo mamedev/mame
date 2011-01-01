@@ -113,7 +113,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT8 *tilerom = memory_region(machine, "gfx4");
+	UINT8 *tilerom = machine->region("gfx4")->base();
 
 	int data = tilerom[tile_index];
 	int attr = tilerom[tile_index + 1];

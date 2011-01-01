@@ -878,8 +878,8 @@ ROM_END
 
 static DRIVER_INIT( looping )
 {
-	int length = memory_region_length(machine, "maincpu");
-	UINT8 *rom = memory_region(machine, "maincpu");
+	int length = machine->region("maincpu")->bytes();
+	UINT8 *rom = machine->region("maincpu")->base();
 	int i;
 
 	cop_io = auto_alloc_array(machine, UINT8, 0x08);

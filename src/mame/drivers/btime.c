@@ -224,12 +224,12 @@ static void btime_decrypt( address_space *space )
 	/* however if the previous instruction was JSR (which caused a write to */
 	/* the stack), fetch the address of the next instruction. */
 	addr1 = cpu_get_previouspc(space->cpu);
-	src1 = (addr1 < 0x9000) ? state->rambase : memory_region(space->machine, "maincpu");
+	src1 = (addr1 < 0x9000) ? state->rambase : space->machine->region("maincpu")->base();
 	if (decrypted[addr1] == 0x20)	/* JSR $xxxx */
 		addr = src1[addr1 + 1] + 256 * src1[addr1 + 2];
 
 	/* If the address of the next instruction is xxxx xxx1 xxxx x1xx, decode it. */
-	src = (addr < 0x9000) ? state->rambase : memory_region(space->machine, "maincpu");
+	src = (addr < 0x9000) ? state->rambase : space->machine->region("maincpu")->base();
 	if ((addr & 0x0104) == 0x0104)
 	{
 		/* 76543210 -> 65342710 bit rotation */
@@ -2067,7 +2067,7 @@ static void decrypt_C10707_cpu(running_machine *machine, const char *cputag)
 {
 	address_space *space = cputag_get_address_space(machine, cputag, ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x10000);
-	UINT8 *rom = memory_region(machine, cputag);
+	UINT8 *rom = machine->region(cputag)->base();
 	offs_t addr;
 
 	space->set_decrypted_region(0x0000, 0xffff, decrypt);
@@ -2082,7 +2082,7 @@ static void decrypt_C10707_cpu(running_machine *machine, const char *cputag)
 
 static READ8_HANDLER( wtennis_reset_hack_r )
 {
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	UINT8 *RAM = space->machine->region("maincpu")->base();
 
 	/* Otherwise the game goes into test mode and there is no way out that I
        can see.  I'm not sure how it can work, it probably somehow has to do
@@ -2096,7 +2096,7 @@ static READ8_HANDLER( wtennis_reset_hack_r )
 static void init_rom1(running_machine *machine)
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 	decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 	space->set_decrypted_region(0x0000, 0xffff, decrypted);
@@ -2117,7 +2117,7 @@ static DRIVER_INIT( btime )
 static DRIVER_INIT( zoar )
 {
 	btime_state *state = machine->driver_data<btime_state>();
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 	/* At location 0xD50A is what looks like an undocumented opcode. I tried
        implementing it given what opcode 0x23 should do, but it still didn't
@@ -2132,7 +2132,7 @@ static DRIVER_INIT( zoar )
 static DRIVER_INIT( tisland )
 {
 	btime_state *state = machine->driver_data<btime_state>();
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 	/* At location 0xa2b6 there's a strange RLA followed by a BPL that reads from an
     unmapped area that causes the game to fail in several circumstances.On the Cassette
@@ -2171,7 +2171,7 @@ static DRIVER_INIT( cookrace )
 	decrypt_C10707_cpu(machine, "maincpu");
 
 	memory_install_read_bank(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0x0200, 0x0fff, 0, 0, "bank10");
-	memory_set_bankptr(machine, "bank10", memory_region(machine, "audiocpu") + 0xe200);
+	memory_set_bankptr(machine, "bank10", machine->region("audiocpu")->base() + 0xe200);
 	state->audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }
 
@@ -2190,7 +2190,7 @@ static DRIVER_INIT( wtennis )
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc15f, 0xc15f, 0, 0, wtennis_reset_hack_r);
 
 	memory_install_read_bank(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0x0200, 0x0fff, 0, 0, "bank10");
-	memory_set_bankptr(machine, "bank10", memory_region(machine, "audiocpu") + 0xe200);
+	memory_set_bankptr(machine, "bank10", machine->region("audiocpu")->base() + 0xe200);
 	state->audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
 }
 

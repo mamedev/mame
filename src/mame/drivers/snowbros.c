@@ -396,13 +396,13 @@ static void sb3_play_music(running_machine *machine, int data)
 	{
 		case 0x23:
 		case 0x26:
-		snd = memory_region(machine, "oki");
+		snd = machine->region("oki")->base();
 		memcpy(snd+0x20000, snd+0x80000+0x00000, 0x20000);
 		sb3_music_is_playing = 1;
 		break;
 
 		case 0x24:
-		snd = memory_region(machine, "oki");
+		snd = machine->region("oki")->base();
 		memcpy(snd+0x20000, snd+0x80000+0x20000, 0x20000);
 		sb3_music_is_playing = 1;
 		break;
@@ -415,7 +415,7 @@ static void sb3_play_music(running_machine *machine, int data)
 		case 0x2b:
 		case 0x2c:
 		case 0x2d:
-		snd = memory_region(machine, "oki");
+		snd = machine->region("oki")->base();
 		memcpy(snd+0x20000, snd+0x80000+0x40000, 0x20000);
 		sb3_music_is_playing = 1;
 		break;
@@ -1423,7 +1423,7 @@ static const ym2151_interface ym2151_config =
 
 static MACHINE_RESET (semiprot)
 {
-	UINT16 *PROTDATA = (UINT16*)memory_region(machine, "user1");
+	UINT16 *PROTDATA = (UINT16*)machine->region("user1")->base();
 	int i;
 
 	for (i = 0;i < 0x200/2;i++)
@@ -1432,7 +1432,7 @@ static MACHINE_RESET (semiprot)
 
 static MACHINE_RESET (finalttr)
 {
-	UINT16 *PROTDATA = (UINT16*)memory_region(machine, "user1");
+	UINT16 *PROTDATA = (UINT16*)machine->region("user1")->base();
 	int i;
 
 	for (i = 0;i < 0x200/2;i++)
@@ -2249,7 +2249,7 @@ static READ16_HANDLER ( moremorp_0a_read )
 
 static DRIVER_INIT( moremorp )
 {
-//  UINT16 *PROTDATA = (UINT16*)memory_region(machine, "user1");
+//  UINT16 *PROTDATA = (UINT16*)machine->region("user1")->base();
 //  int i;
 
 //  for (i = 0;i < 0x200/2;i++)
@@ -2262,8 +2262,8 @@ static DRIVER_INIT( moremorp )
 
 static DRIVER_INIT( cookbib2 )
 {
-//  UINT16 *HCROM = (UINT16*)memory_region(machine, "maincpu");
-//  UINT16 *PROTDATA = (UINT16*)memory_region(machine, "user1");
+//  UINT16 *HCROM = (UINT16*)machine->region("maincpu")->base();
+//  UINT16 *PROTDATA = (UINT16*)machine->region("user1")->base();
 //  int i;
 //  hyperpac_ram[0xf000/2] = 0x46fc;
 //  hyperpac_ram[0xf002/2] = 0x2700;
@@ -2627,8 +2627,8 @@ static READ16_HANDLER ( _4in1_02_read )
 static DRIVER_INIT(4in1boot)
 {
 	UINT8 *buffer;
-	UINT8 *src = memory_region(machine, "maincpu");
-	int len = memory_region_length(machine, "maincpu");
+	UINT8 *src = machine->region("maincpu")->base();
+	int len = machine->region("maincpu")->bytes();
 
 	/* strange order */
 	buffer = auto_alloc_array(machine, UINT8, len);
@@ -2642,8 +2642,8 @@ static DRIVER_INIT(4in1boot)
 		auto_free(machine, buffer);
 	}
 
-	src = memory_region(machine, "soundcpu");
-	len = memory_region_length(machine, "soundcpu");
+	src = machine->region("soundcpu")->base();
+	len = machine->region("soundcpu")->bytes();
 
 	/* strange order */
 	buffer = auto_alloc_array(machine, UINT8, len);
@@ -2660,8 +2660,8 @@ static DRIVER_INIT(4in1boot)
 static DRIVER_INIT(snowbro3)
 {
 	UINT8 *buffer;
-	UINT8 *src = memory_region(machine, "maincpu");
-	int len = memory_region_length(machine, "maincpu");
+	UINT8 *src = machine->region("maincpu")->base();
+	int len = machine->region("maincpu")->bytes();
 
 	/* strange order */
 	buffer = auto_alloc_array(machine, UINT8, len);

@@ -353,7 +353,7 @@ static WRITE8_HANDLER( systeme_bank_w )
 
 	segae_set_vram_banks(data);
 
-	//memcpy(sms_rom+0x8000, memory_region(space->machine, "user1")+0x10000+rombank*0x4000, 0x4000);
+	//memcpy(sms_rom+0x8000, space->machine->region("user1")->base()+0x10000+rombank*0x4000, 0x4000);
 	memory_set_bank(space->machine, "bank1", rombank);
 
 }
@@ -390,7 +390,7 @@ static void init_ports_systeme(running_machine *machine)
 
 static void init_systeme_map(running_machine *machine)
 {
-	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x10000, 0x4000);
 
 	/* alternate way of accessing video ram */
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, segasyse_videoram_w);

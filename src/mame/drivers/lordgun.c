@@ -57,7 +57,7 @@ Notes:
 static DRIVER_INIT( lordgun )
 {
 	int i;
-	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
 
 	// Decryption
 
@@ -82,7 +82,7 @@ static DRIVER_INIT( lordgun )
 // From XingXing:
 static DRIVER_INIT( aliencha )
 {
-	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
 
 	// Protection
 
@@ -106,7 +106,7 @@ static DRIVER_INIT( aliencha )
 
 static DRIVER_INIT( alienchac )
 {
-	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
 
 	// Protection
 

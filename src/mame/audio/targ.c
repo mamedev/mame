@@ -115,7 +115,7 @@ WRITE8_HANDLER( targ_audio_2_w )
 	if ((data & 0x01) && !(port_2_last & 0x01))
 	{
 		device_t *samples = space->machine->device("samples");
-		UINT8 *prom = memory_region(space->machine, "targ");
+		UINT8 *prom = space->machine->region("targ")->base();
 
 		tone_pointer = (tone_pointer + 1) & 0x0f;
 

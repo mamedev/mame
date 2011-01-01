@@ -433,7 +433,7 @@ ROM_END
 /* FIXME: get rid of these two, probably something to do with irq3 and camera / printer devices */
 static DRIVER_INIT( npcartv1 )
 {
-	UINT16 *ROM = (UINT16 *)memory_region( machine, "maincpu" );
+	UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
 
 	ROM[0x1260/2] = 0x4e71;
 
@@ -443,7 +443,7 @@ static DRIVER_INIT( npcartv1 )
 
 static DRIVER_INIT( 98best44 )
 {
-	UINT16 *ROM = (UINT16 *)memory_region( machine, "maincpu" );
+	UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
 
 	ROM[0x1312/2] = 0x4e71;
 }

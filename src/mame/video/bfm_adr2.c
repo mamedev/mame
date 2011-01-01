@@ -186,7 +186,7 @@ VIDEO_RESET( adder2 )
 	adder2_data_to_sc2       = 0;
 
 	{
-		UINT8 *rom = memory_region(machine, "adder2");
+		UINT8 *rom = machine->region("adder2")->base();
 
 		memory_configure_bank(machine, "bank2", 0, 4, &rom[0x00000], 0x08000);
 
@@ -426,7 +426,7 @@ void adder2_decode_char_roms(running_machine *machine)
 {
 	UINT8 *p;
 
-	p = memory_region(machine, "gfx1");
+	p = machine->region("gfx1")->base();
 
 	if ( p )
 	{

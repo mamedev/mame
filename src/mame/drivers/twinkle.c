@@ -736,14 +736,14 @@ static WRITE16_HANDLER( twinkle_spu_ctrl_w )
 
 static READ16_HANDLER( twinkle_waveram_r )
 {
-	UINT16 *waveram = (UINT16 *)memory_region(space->machine, "rfsnd");
+	UINT16 *waveram = (UINT16 *)space->machine->region("rfsnd")->base();
 
 	return waveram[offset];
 }
 
 static WRITE16_HANDLER( twinkle_waveram_w )
 {
-	UINT16 *waveram = (UINT16 *)memory_region(space->machine, "rfsnd");
+	UINT16 *waveram = (UINT16 *)space->machine->region("rfsnd")->base();
 
 	COMBINE_DATA(&waveram[offset]);
 }

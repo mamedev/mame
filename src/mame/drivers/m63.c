@@ -417,7 +417,7 @@ static READ8_HANDLER( snddata_r )
 	switch (state->p2 & 0xf0)
 	{
 		case 0x60:	return soundlatch_r(space, 0); ;
-		case 0x70:	return memory_region(space->machine, "user1")[((state->p1 & 0x1f) << 8) | offset];
+		case 0x70:	return space->machine->region("user1")->base()[((state->p1 & 0x1f) << 8) | offset];
 	}
 	return 0xff;
 }
@@ -675,8 +675,8 @@ static SAMPLES_START( fghtbskt_sh_start )
 {
 	running_machine *machine = device->machine;
 	m63_state *state = machine->driver_data<m63_state>();
-	int i, len = memory_region_length(machine, "samples");
-	UINT8 *ROM = memory_region(machine, "samples");
+	int i, len = machine->region("samples")->bytes();
+	UINT8 *ROM = machine->region("samples")->base();
 
 	state->samplebuf = auto_alloc_array(machine, INT16, len);
 	state_save_register_global_pointer(machine, state->samplebuf, len);

@@ -175,7 +175,7 @@ WRITE8_HANDLER( c1943_d806_w )
 
 static TILE_GET_INFO( c1943_get_bg2_tile_info )
 {
-	UINT8 *tilerom = memory_region(machine, "gfx5") + 0x8000;
+	UINT8 *tilerom = machine->region("gfx5")->base() + 0x8000;
 
 	int offs = tile_index * 2;
 	int attr = tilerom[offs + 1];
@@ -188,7 +188,7 @@ static TILE_GET_INFO( c1943_get_bg2_tile_info )
 
 static TILE_GET_INFO( c1943_get_bg_tile_info )
 {
-	UINT8 *tilerom = memory_region(machine, "gfx5");
+	UINT8 *tilerom = machine->region("gfx5")->base();
 
 	int offs = tile_index * 2;
 	int attr = tilerom[offs + 1];

@@ -144,7 +144,7 @@ static UINT8 pio_dir[5], pio_latch[5];
 
 static void csplayh5_soundbank_w(running_machine *machine, int data)
 {
-	UINT8 *SNDROM = memory_region(machine, "audiocpu");
+	UINT8 *SNDROM = machine->region("audiocpu")->base();
 
 	memory_set_bankptr(machine, "bank1", &SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
 }
@@ -559,8 +559,8 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT( csplayh5 )
 {
-	UINT16 *MAINROM = (UINT16 *)memory_region(machine, "maincpu");
-	UINT8 *SNDROM = memory_region(machine, "audiocpu");
+	UINT16 *MAINROM = (UINT16 *)machine->region("maincpu")->base();
+	UINT8 *SNDROM = machine->region("audiocpu")->base();
 
 	// initialize sound rom bank
 	csplayh5_soundbank_w(machine, 0);

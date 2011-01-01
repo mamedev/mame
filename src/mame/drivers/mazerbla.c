@@ -316,7 +316,7 @@ static WRITE8_HANDLER( cfb_rom_bank_sel_w )	/* mazer blazer */
 	mazerbla_state *state = space->machine->driver_data<mazerbla_state>();
 	state->gfx_rom_bank = data;
 
-	memory_set_bankptr(space->machine,  "bank1", memory_region(space->machine, "sub2") + (state->gfx_rom_bank * 0x2000) + 0x10000);
+	memory_set_bankptr(space->machine,  "bank1", space->machine->region("sub2")->base() + (state->gfx_rom_bank * 0x2000) + 0x10000);
 }
 
 static WRITE8_HANDLER( cfb_rom_bank_sel_w_gg )	/* great guns */
@@ -324,7 +324,7 @@ static WRITE8_HANDLER( cfb_rom_bank_sel_w_gg )	/* great guns */
 	mazerbla_state *state = space->machine->driver_data<mazerbla_state>();
 	state->gfx_rom_bank = data >> 1;
 
-	memory_set_bankptr(space->machine,  "bank1", memory_region(space->machine, "sub2") + (state->gfx_rom_bank * 0x2000) + 0x10000);
+	memory_set_bankptr(space->machine,  "bank1", space->machine->region("sub2")->base() + (state->gfx_rom_bank * 0x2000) + 0x10000);
 }
 
 
@@ -371,7 +371,7 @@ static READ8_HANDLER( vcu_set_cmd_param_r )
 static READ8_HANDLER( vcu_set_gfx_addr_r )
 {
 	mazerbla_state *state = space->machine->driver_data<mazerbla_state>();
-	UINT8 * rom = memory_region(space->machine, "sub2") + (state->gfx_rom_bank * 0x2000) + 0x10000;
+	UINT8 * rom = space->machine->region("sub2")->base() + (state->gfx_rom_bank * 0x2000) + 0x10000;
 	int offs;
 	int x, y;
 	int bits = 0;
@@ -518,7 +518,7 @@ static READ8_HANDLER( vcu_set_gfx_addr_r )
 static READ8_HANDLER( vcu_set_clr_addr_r )
 {
 	mazerbla_state *state = space->machine->driver_data<mazerbla_state>();
-	UINT8 * rom = memory_region(space->machine, "sub2") + (state->gfx_rom_bank * 0x2000) + 0x10000;
+	UINT8 * rom = space->machine->region("sub2")->base() + (state->gfx_rom_bank * 0x2000) + 0x10000;
 	int offs;
 	int x, y;
 	int bits = 0;
@@ -1685,7 +1685,7 @@ static DRIVER_INIT( mazerbla )
 static DRIVER_INIT( greatgun )
 {
 	mazerbla_state *state = machine->driver_data<mazerbla_state>();
-	UINT8 *rom = memory_region(machine, "sub2");
+	UINT8 *rom = machine->region("sub2")->base();
 
 	state->game_id = GREATGUN;
 

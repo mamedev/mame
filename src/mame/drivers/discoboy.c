@@ -182,7 +182,7 @@ static VIDEO_UPDATE( discoboy )
 #ifdef UNUSED_FUNCTION
 void discoboy_setrombank( running_machine *machine, UINT8 data )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	data &= 0x2f;
 	memory_set_bankptr(space->machine, "bank1", &ROM[0x6000 + (data * 0x1000)] );
 }
@@ -536,7 +536,7 @@ ROM_END
 static DRIVER_INIT( discoboy )
 {
 	discoboy_state *state = machine->driver_data<discoboy_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	state->ram_1 = auto_alloc_array(machine, UINT8, 0x800);
 	state->ram_2 = auto_alloc_array(machine, UINT8, 0x800);

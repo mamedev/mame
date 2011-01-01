@@ -129,7 +129,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 VIDEO_UPDATE( strnskil )
 {
 	int row;
-	const UINT8 *usr1 = memory_region(screen->machine, "user1");
+	const UINT8 *usr1 = screen->machine->region("user1")->base();
 
 	for (row = 0; row < 32; row++)
 	{

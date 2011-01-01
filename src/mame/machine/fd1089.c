@@ -405,8 +405,8 @@ static void clear_decrypted(running_machine &machine)
 static void sys16_decrypt(running_machine *machine, const UINT8 *key,int cputype)
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
-	int size = memory_region_length(machine, "maincpu");
+	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
+	int size = machine->region("maincpu")->bytes();
 	int A;
 	decrypted = auto_alloc_array(machine, UINT16, size/2);
 
@@ -432,11 +432,11 @@ void *fd1089_get_decrypted_base(void)
 
 void fd1089a_decrypt(running_machine *machine)
 {
-	sys16_decrypt(machine, memory_region(machine, "fd1089a"), FD1089A);
+	sys16_decrypt(machine, machine->region("fd1089a")->base(), FD1089A);
 }
 
 void fd1089b_decrypt(running_machine *machine)
 {
-	sys16_decrypt(machine, memory_region(machine, "fd1089b"), FD1089B);
+	sys16_decrypt(machine, machine->region("fd1089b")->base(), FD1089B);
 }
 

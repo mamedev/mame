@@ -110,7 +110,7 @@ VIDEO_START( exerion )
 	UINT8 *gfx;
 
 	/* get pointers to the mixing and lookup PROMs */
-	state->background_mixer = memory_region(machine, "proms") + 0x320;
+	state->background_mixer = machine->region("proms")->base() + 0x320;
 
 	/* allocate memory for the decoded background graphics */
 	state->background_gfx[0] = auto_alloc_array(machine, UINT16, 256 * 256 * 4);
@@ -135,7 +135,7 @@ VIDEO_START( exerion )
      * Where AA,BB,CC,DD are the 2bpp data for the pixel,and a,b,c,d are the OR
      * of these two bits together.
      */
-	gfx = memory_region(machine, "gfx3");
+	gfx = machine->region("gfx3")->base();
 	for (i = 0; i < 4; i++)
 	{
 		int y;

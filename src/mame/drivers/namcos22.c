@@ -1962,9 +1962,9 @@ static NVRAM_HANDLER( namcos22 )
 		else
 		{
 			memset( namcos22_nvmem, 0x00, namcos22_nvmem_size );
-			if (memory_region_length(machine, "nvram") == namcos22_nvmem_size)
+			if (machine->region("nvram")->bytes() == namcos22_nvmem_size)
 			{
-				UINT8* nvram = memory_region(machine,"nvram");
+				UINT8* nvram = machine->region("nvram")->base();
 
 				for( i=0; i<namcos22_nvmem_size/4; i++ )
 				{
@@ -5840,7 +5840,7 @@ static DRIVER_INIT( airco22 )
 
 static DRIVER_INIT( propcycl )
 {
-   UINT32 *pROM = (UINT32 *)memory_region(machine, "maincpu");
+   UINT32 *pROM = (UINT32 *)machine->region("maincpu")->base();
 
 	/* patch out strange routine (uninitialized-eprom related?) */
 	pROM[0x1992C/4] = 0x4E754E75;
@@ -5921,7 +5921,7 @@ static DRIVER_INIT( raveracw )
 
 static DRIVER_INIT( cybrcomm )
 {
-	UINT32 *pROM = (UINT32 *)memory_region(machine, "maincpu");
+	UINT32 *pROM = (UINT32 *)machine->region("maincpu")->base();
 	pROM[0x18ade8/4] = 0x4e714e71;
 	pROM[0x18ae38/4] = 0x4e714e71;
 	pROM[0x18ae80/4] = 0x4e714e71;
@@ -5939,7 +5939,7 @@ static DRIVER_INIT( cybrcomm )
 static DRIVER_INIT( cybrcyc )
 {
 	/* patch DSP RAM test */
-	UINT32 *pROM = (UINT32 *)memory_region(machine, "maincpu");
+	UINT32 *pROM = (UINT32 *)machine->region("maincpu")->base();
 	pROM[0x355C/4] &= 0x0000ffff;
 	pROM[0x355C/4] |= 0x4e710000;
 

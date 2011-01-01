@@ -94,8 +94,8 @@ VIDEO_START( lethalj )
 	screenram = auto_alloc_array(machine, UINT16, BLITTER_DEST_WIDTH * BLITTER_DEST_HEIGHT);
 
 	/* predetermine blitter info */
-	blitter_base = (UINT16 *)memory_region(machine, "gfx1");
-	blitter_rows = memory_region_length(machine, "gfx1") / (2*BLITTER_SOURCE_WIDTH);
+	blitter_base = (UINT16 *)machine->region("gfx1")->base();
+	blitter_rows = machine->region("gfx1")->bytes() / (2*BLITTER_SOURCE_WIDTH);
 }
 
 

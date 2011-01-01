@@ -396,13 +396,13 @@ MACHINE_RESET( leland )
 	alternate_bank = 0;
 
 	/* initialize the master banks */
-	master_length = memory_region_length(machine, "master");
-	master_base = memory_region(machine, "master");
+	master_length = machine->region("master")->bytes();
+	master_base = machine->region("master")->base();
 	(*leland_update_master_bank)(machine);
 
 	/* initialize the slave banks */
-	slave_length = memory_region_length(machine, "slave");
-	slave_base = memory_region(machine, "slave");
+	slave_length = machine->region("slave")->bytes();
+	slave_base = machine->region("slave")->base();
 	if (slave_length > 0x10000)
 		memory_set_bankptr(machine, "bank3", &slave_base[0x10000]);
 }
@@ -425,8 +425,8 @@ MACHINE_RESET( ataxx )
 	timer_adjust_oneshot(master_int_timer, machine->primary_screen->time_until_pos(8), 8);
 
 	/* initialize the XROM */
-	xrom_length = memory_region_length(machine, "user1");
-	xrom_base = memory_region(machine, "user1");
+	xrom_length = machine->region("user1")->bytes();
+	xrom_base = machine->region("user1")->base();
 	xrom1_addr = 0;
 	xrom2_addr = 0;
 
@@ -440,13 +440,13 @@ MACHINE_RESET( ataxx )
 	master_bank = 0;
 
 	/* initialize the master banks */
-	master_length = memory_region_length(machine, "master");
-	master_base = memory_region(machine, "master");
+	master_length = machine->region("master")->bytes();
+	master_base = machine->region("master")->base();
 	ataxx_bankswitch(machine);
 
 	/* initialize the slave banks */
-	slave_length = memory_region_length(machine, "slave");
-	slave_base = memory_region(machine, "slave");
+	slave_length = machine->region("slave")->bytes();
+	slave_base = machine->region("slave")->base();
 	if (slave_length > 0x10000)
 		memory_set_bankptr(machine, "bank3", &slave_base[0x10000]);
 }
@@ -1444,8 +1444,8 @@ READ8_HANDLER( leland_raster_r )
 void leland_rotate_memory(running_machine *machine, const char *cpuname)
 {
 	int startaddr = 0x10000;
-	int banks = (memory_region_length(machine, cpuname) - startaddr) / 0x8000;
-	UINT8 *ram = memory_region(machine, cpuname);
+	int banks = (machine->region(cpuname)->bytes() - startaddr) / 0x8000;
+	UINT8 *ram = machine->region(cpuname)->base();
 	UINT8 temp[0x2000];
 	int i;
 

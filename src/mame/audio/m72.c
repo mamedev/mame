@@ -200,11 +200,11 @@ WRITE8_HANDLER( poundfor_sample_addr_w )
 
 READ8_HANDLER( m72_sample_r )
 {
-	return memory_region(space->machine, "samples")[sample_addr];
+	return space->machine->region("samples")->base()[sample_addr];
 }
 
 WRITE8_DEVICE_HANDLER( m72_sample_w )
 {
 	dac_signed_data_w(device, data);
-	sample_addr = (sample_addr + 1) & (memory_region_length(device->machine, "samples") - 1);
+	sample_addr = (sample_addr + 1) & (device->machine->region("samples")->bytes() - 1);
 }

@@ -450,7 +450,7 @@ static WRITE8_HANDLER( n7751_command_w )
     */
 	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 
-	int numroms = memory_region_length(space->machine, "n7751data") / 0x8000;
+	int numroms = space->machine->region("n7751data")->bytes() / 0x8000;
 	state->n7751_rom_address &= 0x3fff;
 	state->n7751_rom_address |= (data & 0x01) << 14;
 	if (!(data & 0x02) && numroms >= 1) state->n7751_rom_address |= 0x00000;
@@ -495,7 +495,7 @@ static READ8_HANDLER( n7751_rom_r )
 {
 	/* read from BUS */
 	segas1x_state *state = space->machine->driver_data<segas1x_state>();
-	return memory_region(space->machine, "n7751data")[state->n7751_rom_address];
+	return space->machine->region("n7751data")->base()[state->n7751_rom_address];
 }
 
 
@@ -970,11 +970,11 @@ static READ8_HANDLER( mcu_io_r )
 			return maincpu_byte_r(space->machine, 0x840001 ^ offset);
 
 		case 5:
-			return memory_region(space->machine, "maincpu")[0x00000 + offset];
+			return space->machine->region("maincpu")->base()[0x00000 + offset];
 		case 6:
-			return memory_region(space->machine, "maincpu")[0x10000 + offset];
+			return space->machine->region("maincpu")->base()[0x10000 + offset];
 		case 7:
-			return memory_region(space->machine, "maincpu")[0x20000 + offset];
+			return space->machine->region("maincpu")->base()[0x20000 + offset];
 
 		default:
 			logerror("%03X: MCU movx read mode %02X offset %04X\n",

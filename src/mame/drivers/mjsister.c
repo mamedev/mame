@@ -155,7 +155,7 @@ static VIDEO_UPDATE( mjsister )
 static TIMER_CALLBACK( dac_callback )
 {
 	mjsister_state *state = machine->driver_data<mjsister_state>();
-	UINT8 *DACROM = memory_region(machine, "samples");
+	UINT8 *DACROM = machine->region("samples")->base();
 
 	dac_data_w(state->dac, DACROM[(state->dac_bank * 0x10000 + state->dac_adr++) & 0x1ffff]);
 
@@ -447,7 +447,7 @@ static STATE_POSTLOAD( mjsister_redraw )
 static MACHINE_START( mjsister )
 {
 	mjsister_state *state = machine->driver_data<mjsister_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x8000);
 

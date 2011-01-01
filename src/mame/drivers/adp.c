@@ -223,7 +223,7 @@ static MACHINE_START( skattv )
 
 	// hack to handle acrt rom
 	{
-		UINT16 *rom = (UINT16*)memory_region(machine, "gfx1");
+		UINT16 *rom = (UINT16*)machine->region("gfx1")->base();
 		int i;
 
 		device_t *hd63484 = machine->device("hd63484");

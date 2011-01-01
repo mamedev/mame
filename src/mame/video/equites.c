@@ -335,7 +335,7 @@ Also, note that sprites are 30x30, not 32x32.
 static void splndrbt_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	equites_state *state = machine->driver_data<equites_state>();
-	const UINT8 * const xrom = memory_region(machine, "user2");
+	const UINT8 * const xrom = machine->region("user2")->base();
 	const UINT8 * const yrom = xrom + 0x100;
 	const gfx_element* const gfx = machine->gfx[2];
 	int offs;
@@ -413,7 +413,7 @@ static void splndrbt_copy_bg( running_machine *machine, bitmap_t *dst_bitmap, co
 	equites_state *state = machine->driver_data<equites_state>();
 	bitmap_t * const src_bitmap = tilemap_get_pixmap(state->bg_tilemap);
 	bitmap_t * const flags_bitmap = tilemap_get_flagsmap(state->bg_tilemap);
-	const UINT8 * const xrom = memory_region(machine, "user1");
+	const UINT8 * const xrom = machine->region("user1")->base();
 	const UINT8 * const yrom = xrom + 0x2000;
 	int scroll_x = state->splndrbt_bg_scrollx;
 	int scroll_y = state->splndrbt_bg_scrolly;

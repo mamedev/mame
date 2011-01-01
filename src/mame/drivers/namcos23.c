@@ -2627,14 +2627,14 @@ ADDRESS_MAP_END
 
 static DRIVER_INIT(ss23)
 {
-	ptrom  = (const UINT32 *)memory_region(machine, "pointrom");
-	tmlrom = (const UINT16 *)memory_region(machine, "textilemapl");
-	tmhrom = memory_region(machine, "textilemaph");
-	texrom = memory_region(machine, "textile");
+	ptrom  = (const UINT32 *)machine->region("pointrom")->base();
+	tmlrom = (const UINT16 *)machine->region("textilemapl")->base();
+	tmhrom = machine->region("textilemaph")->base();
+	texrom = machine->region("textile")->base();
 
-	tileid_mask = (memory_region_length(machine, "textilemapl")/2 - 1) & ~0xff; // Used for y masking
-	tile_mask = memory_region_length(machine, "textile")/256 - 1;
-	ptrom_limit = memory_region_length(machine, "pointrom")/4;
+	tileid_mask = (machine->region("textilemapl")->bytes()/2 - 1) & ~0xff; // Used for y masking
+	tile_mask = machine->region("textile")->bytes()/256 - 1;
+	ptrom_limit = machine->region("pointrom")->bytes()/4;
 
 	mi_rd = mi_wr = im_rd = im_wr = 0;
 	namcos23_jvssense = 1;

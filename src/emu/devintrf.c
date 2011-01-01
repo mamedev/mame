@@ -569,7 +569,7 @@ device_t::~device_t()
 //  info for a given region
 //-------------------------------------------------
 
-const region_info *device_t::subregion(const char *_tag) const
+const memory_region *device_t::subregion(const char *_tag) const
 {
 	// safety first
 	if (this == NULL)

@@ -81,7 +81,7 @@ static STREAM_UPDATE( engine_sound_update )
 	/* determine the volume */
 	slot = (state->sample_msb >> 3) & 7;
 	volume = volume_table[slot];
-	base = &memory_region(device->machine, "engine")[slot * 0x800];
+	base = &device->machine->region("engine")->base()[slot * 0x800];
 
 	/* fill in the sample */
 	while (samples--)

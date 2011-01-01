@@ -193,8 +193,8 @@ static DEVICE_START( wiping_sound )
 	state->num_voices = 8;
 	state->last_channel = state->channel_list + state->num_voices;
 
-	state->sound_rom = memory_region(machine, "samples");
-	state->sound_prom = memory_region(machine, "soundproms");
+	state->sound_rom = machine->region("samples")->base();
+	state->sound_prom = machine->region("soundproms")->base();
 
 	/* start with sound enabled, many games don't have a sound enable register */
 	state->sound_enable = 1;

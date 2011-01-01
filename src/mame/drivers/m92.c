@@ -221,7 +221,7 @@ static TIMER_CALLBACK( m92_scanline_interrupt );
 
 static void set_m92_bank(running_machine *machine)
 {
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 	memory_set_bankptr(machine, "bank1",&RAM[bankaddress]);
 }
 
@@ -275,14 +275,14 @@ static TIMER_CALLBACK( m92_scanline_interrupt )
 
 static READ16_HANDLER( m92_eeprom_r )
 {
-	UINT8 *RAM = memory_region(space->machine, "user1");
+	UINT8 *RAM = space->machine->region("user1")->base();
 //  logerror("%05x: EEPROM RE %04x\n",cpu_get_pc(space->cpu),offset);
 	return RAM[offset] | 0xff00;
 }
 
 static WRITE16_HANDLER( m92_eeprom_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "user1");
+	UINT8 *RAM = space->machine->region("user1")->base();
 //  logerror("%05x: EEPROM WR %04x\n",cpu_get_pc(space->cpu),offset);
 	if (ACCESSING_BITS_0_7)
 		RAM[offset] = data;
@@ -2071,7 +2071,7 @@ ROM_END
 
 static void init_m92(running_machine *machine, int hasbanks)
 {
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 
 	if (hasbanks)
 	{
@@ -2084,7 +2084,7 @@ static void init_m92(running_machine *machine, int hasbanks)
 		memory_set_bankptr(machine, "bank2", &RAM[0xc0000]);
 	}
 
-	RAM = memory_region(machine, "soundcpu");
+	RAM = machine->region("soundcpu")->base();
 
 	if (RAM)
 		memcpy(RAM + 0xffff0, RAM + 0x1fff0, 0x10); /* Sound cpu Start vector */
@@ -2165,7 +2165,7 @@ static DRIVER_INIT( lethalth )
 
 static DRIVER_INIT( nbbatman )
 {
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 
 	init_m92(machine, 1);
 
@@ -2195,7 +2195,7 @@ static DRIVER_INIT( dsoccr94j )
 
 static DRIVER_INIT( gunforc2 )
 {
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 	init_m92(machine, 1);
 	memcpy(RAM + 0x80000, RAM + 0x100000, 0x20000);
 }

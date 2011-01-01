@@ -574,7 +574,7 @@ static READ8_HANDLER( undoukai_mcu_status_r )
 static DRIVER_INIT( undoukai )
 {
 	fortyl_state *state = machine->driver_data<fortyl_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x2000);
 
 	state->pix_color[0] = 0x000;
@@ -586,14 +586,14 @@ static DRIVER_INIT( undoukai )
 static DRIVER_INIT( 40love )
 {
 	fortyl_state *state = machine->driver_data<fortyl_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x2000);
 
 	#if 0
 		/* character ROM hack
             to show a white line on the opponent side */
 
-		UINT8 *ROM = memory_region(machine, "gfx2");
+		UINT8 *ROM = machine->region("gfx2")->base();
 		int adr = 0x10 * 0x022b;
 		ROM[adr + 0x000a] = 0x00;
 		ROM[adr + 0x000b] = 0x00;

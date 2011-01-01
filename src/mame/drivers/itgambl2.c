@@ -74,7 +74,7 @@ static VIDEO_START( itgambl2 )
 static VIDEO_UPDATE( itgambl2 )
 {
 	int x,y,count;
-	const UINT8 *blit_ram = memory_region(screen->machine,"gfx1");
+	const UINT8 *blit_ram = screen->machine->region("gfx1")->base();
 
 	if(input_code_pressed(screen->machine, KEYCODE_Z))
 		test_x++;

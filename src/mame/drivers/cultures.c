@@ -43,7 +43,7 @@ public:
 static TILE_GET_INFO( get_bg1_tile_info )
 {
 	cultures_state *state = machine->driver_data<cultures_state>();
-	UINT8 *region = memory_region(machine, "gfx3") + 0x200000 + 0x80000 * state->bg1_bank;
+	UINT8 *region = machine->region("gfx3")->base() + 0x200000 + 0x80000 * state->bg1_bank;
 	int code = region[tile_index * 2] + (region[tile_index * 2 + 1] << 8);
 	SET_TILE_INFO(2, code, code >> 12, 0);
 }
@@ -51,7 +51,7 @@ static TILE_GET_INFO( get_bg1_tile_info )
 static TILE_GET_INFO( get_bg2_tile_info )
 {
 	cultures_state *state = machine->driver_data<cultures_state>();
-	UINT8 *region = memory_region(machine, "gfx2") + 0x200000 + 0x80000 * state->bg2_bank;
+	UINT8 *region = machine->region("gfx2")->base() + 0x200000 + 0x80000 * state->bg2_bank;
 	int code = region[tile_index * 2] + (region[tile_index * 2 + 1] << 8);
 	SET_TILE_INFO(1, code, code >> 12, 0);
 }
@@ -150,8 +150,8 @@ static WRITE8_HANDLER( misc_w )
 	if (state->old_bank != new_bank)
 	{
 		// oki banking
-		UINT8 *src = memory_region(space->machine, "oki") + 0x40000 + 0x20000 * new_bank;
-		UINT8 *dst = memory_region(space->machine, "oki") + 0x20000;
+		UINT8 *src = space->machine->region("oki")->base() + 0x40000 + 0x20000 * new_bank;
+		UINT8 *dst = space->machine->region("oki")->base() + 0x20000;
 		memcpy(dst, src, 0x20000);
 
 		state->old_bank = new_bank;
@@ -360,7 +360,7 @@ static INTERRUPT_GEN( cultures_interrupt )
 static MACHINE_START( cultures )
 {
 	cultures_state *state = machine->driver_data<cultures_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 16, &ROM[0x0000], 0x4000);
 

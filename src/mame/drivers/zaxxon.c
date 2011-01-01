@@ -1445,8 +1445,8 @@ static void zaxxonj_decode(running_machine *machine, const char *cputag)
 
 	int A;
 	address_space *space = cputag_get_address_space(machine, cputag, ADDRESS_SPACE_PROGRAM);
-	UINT8 *rom = memory_region(machine, cputag);
-	int size = memory_region_length(machine, cputag);
+	UINT8 *rom = machine->region(cputag)->base();
+	int size = machine->region(cputag)->bytes();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, size);
 
 	space->set_decrypted_region(0x0000, size - 1, decrypt);

@@ -56,7 +56,7 @@ static WRITE8_HANDLER( cashquiz_question_bank_low_w )
 		static const char * const bankname[] = { "bank1", "bank2", "bank3", "bank4", "bank5", "bank6", "bank7", "bank8" };
 		const char *bank = bankname[data & 7];
 		int bankaddr = question_addr_high | ((data - 0x60) * 0x100);
-		UINT8 *questions = memory_region(space->machine, "user1") + bankaddr;
+		UINT8 *questions = space->machine->region("user1")->base() + bankaddr;
 		memory_set_bankptr(space->machine, bank,questions);
 
 	}
@@ -565,7 +565,7 @@ ROM_END
 
 static DRIVER_INIT( merlinmm )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	int i;
 
 	/* decrypt program code */
@@ -579,12 +579,12 @@ static DRIVER_INIT( cashquiz )
 	int i;
 
 	/* decrypt program code */
-	ROM = memory_region(machine, "maincpu");
+	ROM = machine->region("maincpu")->base();
 	for( i = 0; i < 0x4000; i++ )
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 
 	/* decrypt questions */
-	ROM = memory_region(machine, "user1");
+	ROM = machine->region("user1")->base();
 	for( i = 0; i < 0x40000; i++ )
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 
@@ -603,14 +603,14 @@ static DRIVER_INIT( cashquiz )
 	memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5700, 0x57ff, 0, 0, "bank8");
 
 	// setup default banks
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1") + 0x100*0 );
-	memory_set_bankptr(machine, "bank2", memory_region(machine, "user1") + 0x100*1 );
-	memory_set_bankptr(machine, "bank3", memory_region(machine, "user1") + 0x100*2 );
-	memory_set_bankptr(machine, "bank4", memory_region(machine, "user1") + 0x100*3 );
-	memory_set_bankptr(machine, "bank5", memory_region(machine, "user1") + 0x100*4 );
-	memory_set_bankptr(machine, "bank6", memory_region(machine, "user1") + 0x100*5 );
-	memory_set_bankptr(machine, "bank7", memory_region(machine, "user1") + 0x100*6 );
-	memory_set_bankptr(machine, "bank8", memory_region(machine, "user1") + 0x100*7 );
+	memory_set_bankptr(machine, "bank1", machine->region("user1")->base() + 0x100*0 );
+	memory_set_bankptr(machine, "bank2", machine->region("user1")->base() + 0x100*1 );
+	memory_set_bankptr(machine, "bank3", machine->region("user1")->base() + 0x100*2 );
+	memory_set_bankptr(machine, "bank4", machine->region("user1")->base() + 0x100*3 );
+	memory_set_bankptr(machine, "bank5", machine->region("user1")->base() + 0x100*4 );
+	memory_set_bankptr(machine, "bank6", machine->region("user1")->base() + 0x100*5 );
+	memory_set_bankptr(machine, "bank7", machine->region("user1")->base() + 0x100*6 );
+	memory_set_bankptr(machine, "bank8", machine->region("user1")->base() + 0x100*7 );
 }
 
 

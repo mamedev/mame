@@ -331,7 +331,7 @@ static void tmaster_draw(running_machine *machine)
 {
 	int x,y,x0,x1,y0,y1,dx,dy,flipx,flipy,sx,sy,sw,sh, addr, mode, layer,buffer, color;
 
-	UINT8 *gfxdata	=	memory_region( machine, "blitter" ) + tmaster_gfx_offs;
+	UINT8 *gfxdata	=	machine->region( "blitter" )->base() + tmaster_gfx_offs;
 
 	UINT16 pen;
 
@@ -600,12 +600,12 @@ static WRITE16_HANDLER( galgames_palette_data_w )
 // Sound
 static READ16_HANDLER( galgames_okiram_r )
 {
-	return memory_region(space->machine, "oki")[offset] | 0xff00;
+	return space->machine->region("oki")->base()[offset] | 0xff00;
 }
 static WRITE16_HANDLER( galgames_okiram_w )
 {
 	if (ACCESSING_BITS_0_7)
-		memory_region(space->machine, "oki")[offset] = data & 0xff;
+		space->machine->region("oki")->base()[offset] = data & 0xff;
 }
 
 // Carts (preliminary, PIC communication is not implemented)
@@ -847,7 +847,7 @@ static MACHINE_START( tmaster )
 static MACHINE_RESET( tmaster )
 {
 	tmaster_gfx_offs = 0;
-	tmaster_gfx_size = memory_region_length(machine, "blitter");
+	tmaster_gfx_size = machine->region("blitter")->bytes();
 
 	tmaster_devices.duart68681 = machine->device( "duart68681" );
 }
@@ -1595,7 +1595,7 @@ ROM_END
 
 static DRIVER_INIT( tm4k )
 {
-	UINT16 *ROM = (UINT16 *)memory_region( machine, "maincpu" );
+	UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
 
 	// protection
 	ROM[0x834ce/2] = 0x4e75;
@@ -1616,7 +1616,7 @@ Protection resembles that of tm5k rather than tm4ka:
 
 static DRIVER_INIT( tm4ka )
 {
-	UINT16 *ROM = (UINT16 *)memory_region( machine, "maincpu" );
+	UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
 
 	// protection
 	ROM[0x83476/2] = 0x4e75;
@@ -1638,7 +1638,7 @@ Protection starts:
 
 static DRIVER_INIT( tm4kb )
 {
-	UINT16 *ROM = (UINT16 *)memory_region( machine, "maincpu" );
+	UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
 
 	// protection
 	ROM[0x82b7a/2] = 0x4e75;
@@ -1659,7 +1659,7 @@ Protection starts:
 
 static DRIVER_INIT( tm5k )
 {
-	UINT16 *ROM = (UINT16 *)memory_region( machine, "maincpu" );
+	UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
 
 	// protection
 	ROM[0x96002/2] = 0x4e75;
@@ -1682,7 +1682,7 @@ Protection starts:
 
 static DRIVER_INIT( tm5kca )
 {
-	UINT16 *ROM = (UINT16 *)memory_region( machine, "maincpu" );
+	UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
 
 	// protection
 	ROM[0x95ffe/2] = 0x4e75;
@@ -1694,7 +1694,7 @@ static DRIVER_INIT( tm5kca )
 
 static DRIVER_INIT( tm5ka )
 {
-	UINT16 *ROM = (UINT16 *)memory_region( machine, "maincpu" );
+	UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
 
 	// protection
 	ROM[0x96b30/2] = 0x4e75;
@@ -1715,7 +1715,7 @@ Protection starts:
 
 static DRIVER_INIT( tm7k )
 {
-	UINT16 *ROM = (UINT16 *)memory_region( machine, "maincpu" );
+	UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
 
 	// protection
 	ROM[0x81730/2] = 0x4e75;
@@ -1738,7 +1738,7 @@ Protection starts:
 
 static DRIVER_INIT( tm7ka )
 {
-	UINT16 *ROM = (UINT16 *)memory_region( machine, "maincpu" );
+	UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
 
 	// protection
 	ROM[0x81594/2] = 0x4e75;
@@ -1761,7 +1761,7 @@ Protection starts:
 
 static DRIVER_INIT( tm7keval ) /* kit came with a security key labeled A-21657-004, which is a TM5000 key */
 {
-	UINT16 *ROM = (UINT16 *)memory_region( machine, "maincpu" );
+	UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
 
 	// protection
 	ROM[0x8949e/2] = 0x4e75;
@@ -1784,7 +1784,7 @@ Protection starts:
 
 static DRIVER_INIT( tm8k )
 {
-	UINT16 *ROM = (UINT16 *)memory_region( machine, "maincpu" );
+	UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
 
 	// protection
 	ROM[0x78b70/2] = 0x4e75;
@@ -1807,7 +1807,7 @@ Protection starts:
 
 static DRIVER_INIT( galgames )
 {
-	UINT8 *ROM	=	memory_region(machine, "maincpu");
+	UINT8 *ROM	=	machine->region("maincpu")->base();
 	int cart;
 
 	// RAM bank at 0x000000-0x03ffff and 0x200000-0x23ffff
@@ -1829,9 +1829,9 @@ static DRIVER_INIT( galgames )
 
 	for (cart = 1; cart <= 4; cart++)
 	{
-		UINT8 *CART = memory_region(machine, "maincpu");
+		UINT8 *CART = machine->region("maincpu")->base();
 
-		if  (0x200000 * (cart+1) <= memory_region_length(machine, "maincpu"))
+		if  (0x200000 * (cart+1) <= machine->region("maincpu")->bytes())
 			CART += 0x200000 * cart;
 
 		memory_configure_bank(machine, GALGAMES_BANK_200000_R, GALGAMES_ROM0+cart, 1, CART,          0x40000);
@@ -1841,7 +1841,7 @@ static DRIVER_INIT( galgames )
 
 static DRIVER_INIT( galgame2 )
 {
-	UINT16 *ROM = (UINT16 *)memory_region( machine, "maincpu" );
+	UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
 
 	// Patch BIOS to see the game code as first cartridge (until the PIC therein is emulated)
 	ROM[0x118da/2] = 0x4a06;

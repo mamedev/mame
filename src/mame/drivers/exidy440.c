@@ -296,7 +296,7 @@ void exidy440_bank_select(running_machine *machine, UINT8 bank)
 
 	/* select the bank and update the bank pointer */
 	exidy440_bank = bank;
-	memory_set_bankptr(machine, "bank1", &memory_region(machine, "maincpu")[0x10000 + exidy440_bank * 0x4000]);
+	memory_set_bankptr(machine, "bank1", &machine->region("maincpu")->base()[0x10000 + exidy440_bank * 0x4000]);
 }
 
 
@@ -305,7 +305,7 @@ static WRITE8_HANDLER( bankram_w )
 	/* EEROM lives in the upper 8k of bank 15 */
 	if (exidy440_bank == 15 && offset >= 0x2000)
 	{
-		memory_region(space->machine, "maincpu")[0x10000 + 15 * 0x4000 + offset] = data;
+		space->machine->region("maincpu")->base()[0x10000 + 15 * 0x4000 + offset] = data;
 		logerror("W EEROM[%04X] = %02X\n", offset - 0x2000, data);
 	}
 
@@ -435,7 +435,7 @@ static WRITE8_HANDLER( topsecex_yscroll_w )
 static MACHINE_START( exidy440 )
 {
 	/* the EEROM lives in the uppermost 8k of the top bank */
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	machine->device<nvram_device>("nvram")->set_base(&rom[0x10000 + 15 * 0x4000 + 0x2000], 0x2000);
 }
 

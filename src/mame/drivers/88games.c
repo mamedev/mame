@@ -275,7 +275,7 @@ INPUT_PORTS_END
 static KONAMI_SETLINES_CALLBACK( k88games_banking )
 {
 	_88games_state *state = device->machine->driver_data<_88games_state>();
-	UINT8 *RAM = memory_region(device->machine, "maincpu");
+	UINT8 *RAM = device->machine->region("maincpu")->base();
 	int offs;
 
 	logerror("%04x: bank select %02x\n", cpu_get_pc(device), lines);
@@ -339,7 +339,7 @@ static MACHINE_RESET( 88games )
 	_88games_state *state = machine->driver_data<_88games_state>();
 
 	konami_configure_set_lines(machine->device("maincpu"), k88games_banking);
-	machine->generic.paletteram.u8 = &memory_region(machine, "maincpu")[0x20000];
+	machine->generic.paletteram.u8 = &machine->region("maincpu")->base()[0x20000];
 
 	state->videobank = 0;
 	state->zoomreadroms = 0;

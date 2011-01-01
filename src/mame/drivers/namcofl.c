@@ -197,11 +197,11 @@ static WRITE32_HANDLER( namcofl_sysreg_w )
 		if (data == 0)	// RAM at 00000000, ROM at 10000000
 		{
 			memory_set_bankptr(space->machine,  "bank1", namcofl_workram );
-			memory_set_bankptr(space->machine,  "bank2", memory_region(space->machine, "maincpu") );
+			memory_set_bankptr(space->machine,  "bank2", space->machine->region("maincpu")->base() );
 		}
 		else		// ROM at 00000000, RAM at 10000000
 		{
-			memory_set_bankptr(space->machine,  "bank1", memory_region(space->machine, "maincpu") );
+			memory_set_bankptr(space->machine,  "bank1", space->machine->region("maincpu")->base() );
 			memory_set_bankptr(space->machine,  "bank2", namcofl_workram );
 		}
 	}
@@ -580,7 +580,7 @@ static MACHINE_RESET( namcofl )
 	timer_set(machine, machine->primary_screen->time_until_pos(machine->primary_screen->visible_area().max_y + 3, 0), NULL, 0, network_interrupt_callback);
 	timer_set(machine, machine->primary_screen->time_until_pos(machine->primary_screen->visible_area().max_y + 1, 0), NULL, 0, vblank_interrupt_callback);
 
-	memory_set_bankptr(machine,  "bank1", memory_region(machine, "maincpu") );
+	memory_set_bankptr(machine,  "bank1", machine->region("maincpu")->base() );
 	memory_set_bankptr(machine,  "bank2", namcofl_workram );
 
 	memset(namcofl_workram, 0x00, 0x100000);
@@ -808,7 +808,7 @@ static void namcofl_common_init(running_machine *machine)
 {
 	namcofl_workram = auto_alloc_array(machine, UINT32, 0x100000/4);
 
-	memory_set_bankptr(machine,  "bank1", memory_region(machine, "maincpu") );
+	memory_set_bankptr(machine,  "bank1", machine->region("maincpu")->base() );
 	memory_set_bankptr(machine,  "bank2", namcofl_workram );
 }
 

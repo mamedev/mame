@@ -362,7 +362,7 @@ static const msm5232_interface msm5232_config =
 static MACHINE_START( buggychl )
 {
 	buggychl_state *state = machine->driver_data<buggychl_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 6, &ROM[0x10000], 0x2000);
 

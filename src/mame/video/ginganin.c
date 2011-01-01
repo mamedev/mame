@@ -76,7 +76,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT8 *gfx = memory_region(machine, "gfx5");
+	UINT8 *gfx = machine->region("gfx5")->base();
 	int code = gfx[2 * tile_index + 0] * 256 + gfx[2 * tile_index + 1];
 	SET_TILE_INFO(
 			BG_GFX,

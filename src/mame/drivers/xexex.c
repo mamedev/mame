@@ -464,7 +464,7 @@ static STATE_POSTLOAD( xexex_postload )
 static MACHINE_START( xexex )
 {
 	xexex_state *state = machine->driver_data<xexex_state>();
-	UINT8 *ROM = memory_region(machine, "audiocpu");
+	UINT8 *ROM = machine->region("audiocpu")->base();
 
 	memory_configure_bank(machine, "bank2", 0, 8, &ROM[0x10000], 0x4000);
 	memory_set_bank(machine, "bank2", 0);
@@ -694,8 +694,8 @@ static DRIVER_INIT( xexex )
 	if (!strcmp(machine->gamedrv->name, "xexex"))
 	{
 		// Invulnerability
-//      *(UINT16 *)(memory_region(machine, "maincpu") + 0x648d4) = 0x4a79;
-//      *(UINT16 *)(memory_region(machine, "maincpu") + 0x00008) = 0x5500;
+//      *(UINT16 *)(machine->region("maincpu")->base() + 0x648d4) = 0x4a79;
+//      *(UINT16 *)(machine->region("maincpu")->base() + 0x00008) = 0x5500;
 		state->strip_0x1a = 1;
 	}
 }

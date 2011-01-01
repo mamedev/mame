@@ -674,7 +674,7 @@ static MACHINE_RESET( itech8 )
 	/* make sure bank 0 is selected */
 	if (main_cpu_type == M6809 || main_cpu_type == HD6309)
 	{
-		memory_set_bankptr(machine, "bank1", &memory_region(machine, "maincpu")[0x4000]);
+		memory_set_bankptr(machine, "bank1", &machine->region("maincpu")->base()[0x4000]);
 		machine->device("maincpu")->reset();
 	}
 
@@ -722,7 +722,7 @@ static WRITE8_HANDLER( blitter_w )
 {
 	/* bit 0x20 on address 7 controls CPU banking */
 	if (offset / 2 == 7)
-		memory_set_bankptr(space->machine, "bank1", &memory_region(space->machine, "maincpu")[0x4000 + 0xc000 * ((data >> 5) & 1)]);
+		memory_set_bankptr(space->machine, "bank1", &space->machine->region("maincpu")->base()[0x4000 + 0xc000 * ((data >> 5) & 1)]);
 
 	/* the rest is handled by the video hardware */
 	itech8_blitter_w(space, offset, data);
@@ -732,7 +732,7 @@ static WRITE8_HANDLER( blitter_w )
 static WRITE8_HANDLER( rimrockn_bank_w )
 {
 	/* banking is controlled here instead of by the blitter output */
-	memory_set_bankptr(space->machine, "bank1", &memory_region(space->machine, "maincpu")[0x4000 + 0xc000 * (data & 3)]);
+	memory_set_bankptr(space->machine, "bank1", &space->machine->region("maincpu")->base()[0x4000 + 0xc000 * (data & 3)]);
 }
 
 

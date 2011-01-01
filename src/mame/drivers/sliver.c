@@ -278,7 +278,7 @@ static void blit_gfx(running_machine *machine)
 {
 	sliver_state *state = machine->driver_data<sliver_state>();
 	int tmpptr=0;
-	const UINT8 *rom = memory_region(machine, "user1");
+	const UINT8 *rom = machine->region("user1")->base();
 
 	while (tmpptr < state->fptr)
 	{
@@ -343,7 +343,7 @@ static void render_jpeg(running_machine *machine)
 		return;
 	}
 
-	rom = memory_region(machine, "user3");
+	rom = machine->region("user3")->base();
 	for (y = 0; y < state->jpeg_h; y++)
 	{
 		for (x = 0; x < state->jpeg_w; x++)
@@ -459,7 +459,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER(oki_setbank)
 {
-	UINT8 *sound = memory_region(space->machine, "oki");
+	UINT8 *sound = space->machine->region("oki")->base();
 	int bank=(data^0xff)&3; //xor or not ?
 	memcpy(sound+0x20000, sound+0x100000+0x20000*bank, 0x20000);
 }

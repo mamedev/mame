@@ -289,7 +289,7 @@ static const UINT8 lut_pos[0x20] = {
 static DRIVER_INIT( m79amb )
 {
 	m79amb_state *state = machine->driver_data<m79amb_state>();
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	int i, j;
 
 	/* PROM data is active low */

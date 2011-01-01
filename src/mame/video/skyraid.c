@@ -39,7 +39,7 @@ static void draw_text(running_machine *machine, bitmap_t* bitmap, const rectangl
 static void draw_terrain(running_machine *machine, bitmap_t* bitmap, const rectangle *cliprect)
 {
 	skyraid_state *state = machine->driver_data<skyraid_state>();
-	const UINT8* p = memory_region(machine, "user1");
+	const UINT8* p = machine->region("user1")->base();
 
 	int x;
 	int y;
@@ -119,7 +119,7 @@ static void draw_missiles(running_machine *machine, bitmap_t* bitmap, const rect
 
 static void draw_trapezoid(running_machine *machine, bitmap_t* dst, bitmap_t* src)
 {
-	const UINT8* p = memory_region(machine, "user2");
+	const UINT8* p = machine->region("user2")->base();
 
 	int x;
 	int y;

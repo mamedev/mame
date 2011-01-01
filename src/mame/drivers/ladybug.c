@@ -1064,8 +1064,8 @@ static DRIVER_INIT( dorodon )
 	offs_t i;
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x6000);
-	UINT8 *rom = memory_region(machine, "maincpu");
-	UINT8 *table = memory_region(machine, "user1");
+	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *table = machine->region("user1")->base();
 
 	space->set_decrypted_region(0x0000, 0x5fff, decrypted);
 

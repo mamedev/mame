@@ -121,7 +121,7 @@ PALETTE_INIT( galivan )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT8 *BGROM = memory_region(machine, "gfx4");
+	UINT8 *BGROM = machine->region("gfx4")->base();
 	int attr = BGROM[tile_index + 0x4000];
 	int code = BGROM[tile_index] | ((attr & 0x03) << 8);
 	SET_TILE_INFO(
@@ -146,7 +146,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 static TILE_GET_INFO( ninjemak_get_bg_tile_info )
 {
-	UINT8 *BGROM = memory_region(machine, "gfx4");
+	UINT8 *BGROM = machine->region("gfx4")->base();
 	int attr = BGROM[tile_index + 0x4000];
 	int code = BGROM[tile_index] | ((attr & 0x03) << 8);
 	SET_TILE_INFO(
@@ -341,7 +341,7 @@ WRITE8_HANDLER( ninjemak_scrolly_w )
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	galivan_state *state = machine->driver_data<galivan_state>();
-	const UINT8 *spritepalettebank = memory_region(machine, "user1");
+	const UINT8 *spritepalettebank = machine->region("user1")->base();
 	UINT8 *spriteram = state->spriteram;
 	int offs;
 

@@ -78,7 +78,7 @@ VIDEO_START( portrait )
 PALETTE_INIT( portrait )
 {
 	int i;
-	UINT8* lookup = memory_region(machine,"tileattr");
+	UINT8* lookup = machine->region("tileattr")->base();
 
 	/* allocate the colortable */
 	machine->colortable = colortable_alloc(machine, 0x40);

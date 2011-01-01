@@ -149,7 +149,7 @@ confirmed
 static void contcirc_draw_sprites_16x8( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int y_offs )
 {
 	taitoz_state *state = machine->driver_data<taitoz_state>();
-	UINT16 *spritemap = (UINT16 *)memory_region(machine, "user1");
+	UINT16 *spritemap = (UINT16 *)machine->region("user1")->base();
 	UINT16 *spriteram = state->spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
@@ -244,7 +244,7 @@ static void contcirc_draw_sprites_16x8( running_machine *machine, bitmap_t *bitm
 static void chasehq_draw_sprites_16x16( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int y_offs )
 {
 	taitoz_state *state = machine->driver_data<taitoz_state>();
-	UINT16 *spritemap = (UINT16 *)memory_region(machine, "user1");
+	UINT16 *spritemap = (UINT16 *)machine->region("user1")->base();
 	UINT16 *spriteram = state->spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
@@ -430,7 +430,7 @@ static void chasehq_draw_sprites_16x16( running_machine *machine, bitmap_t *bitm
 static void bshark_draw_sprites_16x8( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int y_offs )
 {
 	taitoz_state *state = machine->driver_data<taitoz_state>();
-	UINT16 *spritemap = (UINT16 *)memory_region(machine, "user1");
+	UINT16 *spritemap = (UINT16 *)machine->region("user1")->base();
 	UINT16 *spriteram = state->spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
@@ -526,7 +526,7 @@ static void bshark_draw_sprites_16x8( running_machine *machine, bitmap_t *bitmap
 static void sci_draw_sprites_16x8( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int y_offs )
 {
 	taitoz_state *state = machine->driver_data<taitoz_state>();
-	UINT16 *spritemap = (UINT16 *)memory_region(machine, "user1");
+	UINT16 *spritemap = (UINT16 *)machine->region("user1")->base();
 	UINT16 *spriteram = state->spriteram;
 	int offs, start_offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
@@ -631,7 +631,7 @@ static void sci_draw_sprites_16x8( running_machine *machine, bitmap_t *bitmap, c
 static void aquajack_draw_sprites_16x8(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int y_offs)
 {
 	taitoz_state *state = machine->driver_data<taitoz_state>();
-	UINT16 *spritemap = (UINT16 *)memory_region(machine, "user1");
+	UINT16 *spritemap = (UINT16 *)machine->region("user1")->base();
 	UINT16 *spriteram = state->spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
@@ -726,7 +726,7 @@ static void aquajack_draw_sprites_16x8(running_machine *machine, bitmap_t *bitma
 static void spacegun_draw_sprites_16x8(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int y_offs)
 {
 	taitoz_state *state = machine->driver_data<taitoz_state>();
-	UINT16 *spritemap = (UINT16 *)memory_region(machine, "user1");
+	UINT16 *spritemap = (UINT16 *)machine->region("user1")->base();
 	UINT16 *spriteram = state->spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;

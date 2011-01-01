@@ -143,8 +143,8 @@ static TILE_GET_INFO( get_bgtile_info )
 {
 	int code,attr;
 
-	code=memory_region(machine, "user1")[tile_index];
-	attr=memory_region(machine, "user2")[tile_index];
+	code=machine->region("user1")->base()[tile_index];
+	attr=machine->region("user2")->base()[tile_index];
 	code+=((attr&7)<<8);
 	SET_TILE_INFO(
 		1,
@@ -457,8 +457,8 @@ static DRIVER_INIT( panicr )
 	int size;
 	int i;
 
-	rom = memory_region(machine, "gfx1");
-	size = memory_region_length(machine, "gfx1");
+	rom = machine->region("gfx1")->base();
+	size = machine->region("gfx1")->bytes();
 
 	// text data lines
 	for (i = 0;i < size/2;i++)
@@ -480,8 +480,8 @@ static DRIVER_INIT( panicr )
 	}
 
 
-	rom = memory_region(machine, "gfx2");
-	size = memory_region_length(machine, "gfx2");
+	rom = machine->region("gfx2")->base();
+	size = machine->region("gfx2")->bytes();
 
 	// tiles data lines
 	for (i = 0;i < size/4;i++)
@@ -507,8 +507,8 @@ static DRIVER_INIT( panicr )
 	}
 
 
-	rom = memory_region(machine, "gfx3");
-	size = memory_region_length(machine, "gfx3");
+	rom = machine->region("gfx3")->base();
+	size = machine->region("gfx3")->bytes();
 
 	// sprites data lines
 	for (i = 0;i < size/2;i++)
@@ -533,8 +533,8 @@ static DRIVER_INIT( panicr )
 
 	//rearrange  bg tilemaps a bit....
 
-	rom = memory_region(machine, "user1");
-	size = memory_region_length(machine, "user1");
+	rom = machine->region("user1")->base();
+	size = machine->region("user1")->bytes();
 	memcpy(buf,rom, size);
 
 	{
@@ -546,8 +546,8 @@ static DRIVER_INIT( panicr )
 			}
 	}
 
-	rom = memory_region(machine, "user2");
-	size = memory_region_length(machine, "user2");
+	rom = machine->region("user2")->base();
+	size = machine->region("user2")->bytes();
 
 	memcpy(buf,rom, size);
 	{

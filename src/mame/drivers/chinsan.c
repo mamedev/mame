@@ -72,7 +72,7 @@ public:
 
 static PALETTE_INIT( chinsan )
 {
-	UINT8 *src = memory_region( machine, "color_proms" );
+	UINT8 *src = machine->region( "color_proms" )->base();
 	int i;
 
 	for (i = 0; i < 0x100; i++)
@@ -538,7 +538,7 @@ static void chin_adpcm_int( device_t *device )
 	}
 	else
 	{
-		UINT8 *ROM = memory_region(device->machine, "adpcm");
+		UINT8 *ROM = device->machine->region("adpcm")->base();
 
 		state->adpcm_data = ((state->trigger ? (ROM[state->adpcm_pos] & 0x0f) : (ROM[state->adpcm_pos] & 0xf0) >> 4));
 		msm5205_data_w(device, state->adpcm_data & 0xf);
@@ -568,7 +568,7 @@ static MACHINE_START( chinsan )
 {
 	chinsan_state *state = machine->driver_data<chinsan_state>();
 
-	memory_configure_bank(machine, "bank1", 0, 4, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 4, machine->region("maincpu")->base() + 0x10000, 0x4000);
 
 	state_save_register_global(machine, state->adpcm_idle);
 	state_save_register_global(machine, state->port_select);

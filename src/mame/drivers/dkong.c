@@ -424,7 +424,7 @@ static MACHINE_START( dkong2b )
 static MACHINE_START( s2650 )
 {
     dkong_state *state = machine->driver_data<dkong_state>();
-    UINT8   *p = memory_region(machine, "user1");
+    UINT8   *p = machine->region("user1")->base();
     const char *game_name = machine->gamedrv->name;
     int i;
 
@@ -487,7 +487,7 @@ static MACHINE_RESET( dkong )
 static MACHINE_RESET( strtheat )
 {
     dkong_state *state = machine->driver_data<dkong_state>();
-    UINT8 *ROM = memory_region(machine, "maincpu");
+    UINT8 *ROM = machine->region("maincpu")->base();
 
     MACHINE_RESET_CALL(dkong);
 
@@ -500,7 +500,7 @@ static MACHINE_RESET( strtheat )
 static MACHINE_RESET( drakton )
 {
     dkong_state *state = machine->driver_data<dkong_state>();
-    UINT8 *ROM = memory_region(machine, "maincpu");
+    UINT8 *ROM = machine->region("maincpu")->base();
 
     MACHINE_RESET_CALL(dkong);
 
@@ -1639,7 +1639,7 @@ static void braze_decrypt_rom(running_machine *machine, UINT8 *dest)
 	UINT32 mem;
 	UINT32 newmem;
 
-	ROM = memory_region(machine, "braze");
+	ROM = machine->region("braze")->base();
 
 	for (mem=0;mem<0x10000;mem++)
 	{
@@ -2987,7 +2987,7 @@ static void drakton_decrypt_rom(running_machine *machine, UINT8 mod, int offs, i
     UINT8 *ROM;
     int mem;
 
-    ROM = memory_region(machine, "maincpu");
+    ROM = machine->region("maincpu")->base();
 
     for (mem=0;mem<0x4000;mem++)
     {
@@ -3013,7 +3013,7 @@ static void drakton_decrypt_rom(running_machine *machine, UINT8 mod, int offs, i
 static DRIVER_INIT( herodk )
 {
     int A;
-    UINT8 *rom = memory_region(machine, "maincpu");
+    UINT8 *rom = machine->region("maincpu")->base();
 
     /* swap data lines D3 and D4 */
     for (A = 0;A < 0x8000;A++)

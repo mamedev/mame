@@ -275,7 +275,7 @@ static WRITE8_HANDLER( galpani2_coin_lockout_w )
 
 static WRITE8_DEVICE_HANDLER( galpani2_oki1_bank_w )
 {
-		UINT8 *ROM = memory_region(device->machine, "oki1");
+		UINT8 *ROM = device->machine->region("oki1")->base();
 		logerror("%s : %s bank %08X\n",cpuexec_describe_context(device->machine),device->tag(),data);
 		memcpy(ROM + 0x30000, ROM + 0x40000 + 0x10000 * (~data & 0xf), 0x10000);
 }
@@ -350,8 +350,8 @@ static UINT16 *galpani2_rombank;
 
 static READ16_HANDLER( galpani2_bankedrom_r )
 {
-	UINT16 *ROM = (UINT16 *) memory_region( space->machine, "user1" );
-	size_t    len = memory_region_length( space->machine, "user1" ) / 2;
+	UINT16 *ROM = (UINT16 *) space->machine->region( "user1" )->base();
+	size_t    len = space->machine->region( "user1" )->bytes() / 2;
 
 	offset += (0x800000/2) * (*galpani2_rombank & 0x0003);
 

@@ -59,7 +59,7 @@ static WRITE16_HANDLER( shangha3_prot_w )
 
 static READ16_HANDLER( heberpop_gfxrom_r )
 {
-	UINT8 *ROM = memory_region(space->machine, "gfx1");
+	UINT8 *ROM = space->machine->region("gfx1")->base();
 
 	return ROM[2*offset] | (ROM[2*offset+1] << 8);
 }

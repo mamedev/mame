@@ -61,7 +61,7 @@ static NVRAM_HANDLER( nbmj9195 )
 
 static WRITE8_HANDLER( nbmj9195_soundbank_w )
 {
-	UINT8 *SNDROM = memory_region(space->machine, "audiocpu");
+	UINT8 *SNDROM = space->machine->region("audiocpu")->base();
 
 	memory_set_bankptr(space->machine, "bank1", &SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
 }
@@ -510,7 +510,7 @@ static MACHINE_RESET( sailorws )
 static DRIVER_INIT( nbmj9195 )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8 *ROM = memory_region(machine, "audiocpu");
+	UINT8 *ROM = machine->region("audiocpu")->base();
 
 	// sound program patch
 	ROM[0x0213] = 0x00;			// DI -> NOP

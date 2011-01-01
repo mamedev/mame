@@ -865,7 +865,7 @@ static DRIVER_INIT( roldfrog )
 static DRIVER_INIT( rebus )
 {
 	splash_state *state = machine->driver_data<splash_state>();
-	UINT16 *ROM = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *ROM = (UINT16 *)machine->region("maincpu")->base();
 
 	state->bitmap_type = 1;
 	state->sprite_attr2_shift = 0;
@@ -895,7 +895,7 @@ static DRIVER_INIT( rebus )
 static DRIVER_INIT( funystrp )
 {
 	splash_state *state = machine->driver_data<splash_state>();
-	UINT16 *ROM = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *ROM = (UINT16 *)machine->region("maincpu")->base();
 
 	state->bitmap_type = 0;
 	state->sprite_attr2_shift = 0;

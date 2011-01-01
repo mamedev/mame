@@ -696,12 +696,12 @@ static READ32_HANDLER( capcom_kickharness_r )
 
 static WRITE32_HANDLER( bank_coh1000c_w )
 {
-	memory_set_bankptr( space->machine, "bank2", memory_region( space->machine, "user2" ) + 0x400000 + ( data * 0x400000 ) );
+	memory_set_bankptr( space->machine, "bank2", space->machine->region( "user2" )->base() + 0x400000 + ( data * 0x400000 ) );
 }
 
 static WRITE8_HANDLER( qsound_bankswitch_w )
 {
-	memory_set_bankptr( space->machine, "bank10", memory_region( space->machine, "audiocpu" ) + 0x10000 + ( ( data & 0x0f ) * 0x4000 ) );
+	memory_set_bankptr( space->machine, "bank10", space->machine->region( "audiocpu" )->base() + 0x10000 + ( ( data & 0x0f ) * 0x4000 ) );
 }
 
 static INTERRUPT_GEN( qsound_interrupt )
@@ -739,9 +739,9 @@ static DRIVER_INIT( coh1000c )
 
 static MACHINE_RESET( coh1000c )
 {
-	memory_set_bankptr( machine, "bank1", memory_region( machine, "user2" ) ); /* fixed game rom */
-	memory_set_bankptr( machine, "bank2", memory_region( machine, "user2" ) + 0x400000 ); /* banked game rom */
-	memory_set_bankptr( machine, "bank3", memory_region( machine, "user3" ) ); /* country rom */
+	memory_set_bankptr( machine, "bank1", machine->region( "user2" )->base() ); /* fixed game rom */
+	memory_set_bankptr( machine, "bank2", machine->region( "user2" )->base() + 0x400000 ); /* banked game rom */
+	memory_set_bankptr( machine, "bank3", machine->region( "user3" )->base() ); /* country rom */
 	zn_machine_init(machine);
 }
 
@@ -929,7 +929,7 @@ Notes:
 
 static WRITE32_HANDLER( bank_coh3002c_w )
 {
-	memory_set_bankptr( space->machine, "bank2", memory_region( space->machine, "user2" ) + 0x400000 + ( data * 0x400000 ) );
+	memory_set_bankptr( space->machine, "bank2", space->machine->region( "user2" )->base() + 0x400000 + ( data * 0x400000 ) );
 }
 
 static DRIVER_INIT( coh3002c )
@@ -947,9 +947,9 @@ static DRIVER_INIT( coh3002c )
 
 static MACHINE_RESET( coh3002c )
 {
-	memory_set_bankptr( machine, "bank1", memory_region( machine, "user2" ) ); /* fixed game rom */
-	memory_set_bankptr( machine, "bank2", memory_region( machine, "user2" ) + 0x400000 ); /* banked game rom */
-	memory_set_bankptr( machine, "bank3", memory_region( machine, "user3" ) ); /* country rom */
+	memory_set_bankptr( machine, "bank1", machine->region( "user2" )->base() ); /* fixed game rom */
+	memory_set_bankptr( machine, "bank2", machine->region( "user2" )->base() + 0x400000 ); /* banked game rom */
+	memory_set_bankptr( machine, "bank3", machine->region( "user3" )->base() ); /* country rom */
 	zn_machine_init(machine);
 }
 
@@ -1190,12 +1190,12 @@ static WRITE32_HANDLER( bank_coh1000t_w )
 	device_t *mb3773 = space->machine->device("mb3773");
 	mb3773_set_ck(mb3773, (data & 0x20) >> 5);
 	verboselog( space->machine, 1, "bank_coh1000t_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
-	memory_set_bankptr( space->machine, "bank1", memory_region( space->machine, "user2" ) + ( ( data & 3 ) * 0x800000 ) );
+	memory_set_bankptr( space->machine, "bank1", space->machine->region( "user2" )->base() + ( ( data & 3 ) * 0x800000 ) );
 }
 
 static WRITE8_HANDLER( fx1a_sound_bankswitch_w )
 {
-	memory_set_bankptr( space->machine, "bank10", memory_region( space->machine, "audiocpu" ) + 0x10000 + ( ( ( data - 1 ) & 0x07 ) * 0x4000 ) );
+	memory_set_bankptr( space->machine, "bank10", space->machine->region( "audiocpu" )->base() + 0x10000 + ( ( ( data - 1 ) & 0x07 ) * 0x4000 ) );
 }
 
 static READ32_HANDLER( taitofx1a_ymsound_r )
@@ -1235,7 +1235,7 @@ static DRIVER_INIT( coh1000ta )
 static MACHINE_RESET( coh1000ta )
 {
 	zn_state *state = machine->driver_data<zn_state>();
-	memory_set_bankptr( machine, "bank1", memory_region( machine, "user2" ) ); /* banked game rom */
+	memory_set_bankptr( machine, "bank1", machine->region( "user2" )->base() ); /* banked game rom */
 	memory_set_bankptr( machine, "bank2", state->taitofx1_eeprom1 );
 	zn_machine_init(machine);
 }
@@ -1330,7 +1330,7 @@ static MACHINE_RESET( coh1000tb )
 {
 	zn_state *state = machine->driver_data<zn_state>();
 
-	memory_set_bankptr( machine, "bank1", memory_region( machine, "user2" ) ); /* banked game rom */
+	memory_set_bankptr( machine, "bank1", machine->region( "user2" )->base() ); /* banked game rom */
 	memory_set_bankptr( machine, "bank2", state->taitofx1_eeprom1 );
 	memory_set_bankptr( machine, "bank3", state->taitofx1_eeprom2 );
 	zn_machine_init(machine);
@@ -1516,7 +1516,7 @@ static DRIVER_INIT( coh1000w )
 
 static MACHINE_RESET( coh1000w )
 {
-	memory_set_bankptr( machine, "bank1", memory_region( machine, "user2" ) ); /* fixed game rom */
+	memory_set_bankptr( machine, "bank1", machine->region( "user2" )->base() ); /* fixed game rom */
 	zn_machine_init(machine);
 
 	devtag_reset(machine, "ide");
@@ -1682,7 +1682,7 @@ static WRITE32_HANDLER( coh1002e_bank_w )
 {
 	znsecsel_w( space, offset, data, mem_mask );
 
-	memory_set_bankptr( space->machine, "bank1", memory_region( space->machine, "user2" ) + ( ( data & 3 ) * 0x800000 ) );
+	memory_set_bankptr( space->machine, "bank1", space->machine->region( "user2" )->base() + ( ( data & 3 ) * 0x800000 ) );
 }
 
 static WRITE32_HANDLER( coh1002e_latch_w )
@@ -1704,7 +1704,7 @@ static DRIVER_INIT( coh1002e )
 
 static MACHINE_RESET( coh1002e )
 {
-	memory_set_bankptr( machine, "bank1", memory_region( machine, "user2" ) ); /* banked game rom */
+	memory_set_bankptr( machine, "bank1", machine->region( "user2" )->base() ); /* banked game rom */
 	zn_machine_init(machine);
 }
 
@@ -1796,7 +1796,7 @@ static WRITE32_HANDLER( bam2_mcu_w )
 	{
 		if (ACCESSING_BITS_0_15)
 		{
-			memory_set_bankptr( space->machine, "bank2", memory_region( space->machine, "user2" ) + ( ( data & 0xf ) * 0x400000 ) );
+			memory_set_bankptr( space->machine, "bank2", space->machine->region( "user2" )->base() + ( ( data & 0xf ) * 0x400000 ) );
 		}
 		else if (ACCESSING_BITS_16_31)
 		{
@@ -1851,8 +1851,8 @@ static DRIVER_INIT( bam2 )
 
 static MACHINE_RESET( bam2 )
 {
-	memory_set_bankptr( machine, "bank1", memory_region( machine, "user2" ) ); /* fixed game rom */
-	memory_set_bankptr( machine, "bank2", memory_region( machine, "user2" ) + 0x400000 ); /* banked game rom */
+	memory_set_bankptr( machine, "bank1", machine->region( "user2" )->base() ); /* fixed game rom */
+	memory_set_bankptr( machine, "bank2", machine->region( "user2" )->base() + 0x400000 ); /* banked game rom */
 
 	zn_machine_init(machine);
 }
@@ -2189,7 +2189,7 @@ static DRIVER_INIT( coh1000a )
 
 static MACHINE_RESET( coh1000a )
 {
-	memory_set_bankptr( machine, "bank1", memory_region( machine, "user2" ) ); /* fixed game rom */
+	memory_set_bankptr( machine, "bank1", machine->region( "user2" )->base() ); /* fixed game rom */
 	zn_machine_init(machine);
 	if( ( !strcmp( machine->gamedrv->name, "jdredd" ) ) ||
 		( !strcmp( machine->gamedrv->name, "jdreddb" ) ) )
@@ -2331,7 +2331,7 @@ Notes:
 
 static WRITE32_HANDLER( coh1001l_bnk_w )
 {
-	memory_set_bankptr( space->machine, "bank1", memory_region( space->machine, "user2" ) + ( ( ( data >> 16 ) & 3 ) * 0x800000 ) );
+	memory_set_bankptr( space->machine, "bank1", space->machine->region( "user2" )->base() + ( ( ( data >> 16 ) & 3 ) * 0x800000 ) );
 }
 
 static DRIVER_INIT( coh1001l )
@@ -2344,7 +2344,7 @@ static DRIVER_INIT( coh1001l )
 
 static MACHINE_RESET( coh1001l )
 {
-	memory_set_bankptr( machine, "bank1", memory_region( machine, "user2" ) ); /* banked rom */
+	memory_set_bankptr( machine, "bank1", machine->region( "user2" )->base() ); /* banked rom */
 	zn_machine_init(machine);
 }
 
@@ -2373,7 +2373,7 @@ Key:    Mother    KN01
 
 static WRITE32_HANDLER( coh1002v_bnk_w )
 {
-	memory_set_bankptr( space->machine, "bank2", memory_region( space->machine, "user3" ) + ( data * 0x100000 ) );
+	memory_set_bankptr( space->machine, "bank2", space->machine->region( "user3" )->base() + ( data * 0x100000 ) );
 }
 
 static DRIVER_INIT( coh1002v )
@@ -2387,8 +2387,8 @@ static DRIVER_INIT( coh1002v )
 
 static MACHINE_RESET( coh1002v )
 {
-	memory_set_bankptr( machine, "bank1", memory_region( machine, "user2" ) ); /* fixed game rom */
-	memory_set_bankptr( machine, "bank2", memory_region( machine, "user3" ) ); /* banked rom */
+	memory_set_bankptr( machine, "bank1", machine->region( "user2" )->base() ); /* fixed game rom */
+	memory_set_bankptr( machine, "bank2", machine->region( "user3" )->base() ); /* banked rom */
 	zn_machine_init(machine);
 }
 
@@ -2557,7 +2557,7 @@ Notes:
 static WRITE32_HANDLER( coh1002m_bank_w )
 {
 	verboselog( space->machine, 1, "coh1002m_bank_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
-	memory_set_bankptr( space->machine, "bank1", memory_region( space->machine, "user2" ) + ((data>>16) * 0x800000) );
+	memory_set_bankptr( space->machine, "bank1", space->machine->region( "user2" )->base() + ((data>>16) * 0x800000) );
 }
 
 static READ32_HANDLER( cbaj_z80_r )
@@ -2589,7 +2589,7 @@ static DRIVER_INIT( coh1002m )
 
 static MACHINE_RESET( coh1002m )
 {
-	memory_set_bankptr( machine, "bank1", memory_region( machine, "user2" ) );
+	memory_set_bankptr( machine, "bank1", machine->region( "user2" )->base() );
 	zn_machine_init(machine);
 }
 

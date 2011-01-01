@@ -351,7 +351,7 @@ static DRIVER_INIT( konamigq )
 
 	psx_driver_init(machine);
 
-	state->p_n_pcmram = memory_region( machine, "shared" ) + 0x80000;
+	state->p_n_pcmram = machine->region( "shared" )->base() + 0x80000;
 }
 
 static void konamigq_exit(running_machine &machine)

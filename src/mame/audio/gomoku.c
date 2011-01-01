@@ -193,7 +193,7 @@ static DEVICE_START( gomoku_sound )
 	state->num_voices = MAX_VOICES;
 	state->last_channel = state->channel_list + state->num_voices;
 
-	state->sound_rom = memory_region(machine, "gomoku");
+	state->sound_rom = machine->region("gomoku")->base();
 
 	/* start with sound enabled, many games don't have a sound enable register */
 	state->sound_enable = 1;

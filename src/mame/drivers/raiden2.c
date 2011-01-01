@@ -2256,14 +2256,14 @@ ROM_END
 
 static DRIVER_INIT (raiden2)
 {
-	memory_configure_bank(machine, "mainbank", 0, 2, memory_region(machine, "mainprg"), 0x20000);
+	memory_configure_bank(machine, "mainbank", 0, 2, machine->region("mainprg")->base(), 0x20000);
 	raiden2_decrypt_sprites(machine);
 }
 
 static DRIVER_INIT (xsedae)
 {
 	/* doesn't have banking */
-	//memory_configure_bank(machine, "mainbank", 0, 2, memory_region(machine, "mainprg"), 0x20000);
+	//memory_configure_bank(machine, "mainbank", 0, 2, machine->region("mainprg")->base(), 0x20000);
 }
 
 /* GAME DRIVERS */

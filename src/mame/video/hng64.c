@@ -2064,11 +2064,11 @@ static void recoverPolygonBlock(running_machine* machine, const UINT16* packet, 
     //////////////////////////////////////////////*/
 
 	// 3d ROM Offset
-	UINT16* threeDRoms = (UINT16*)(memory_region(machine, "verts"));
+	UINT16* threeDRoms = (UINT16*)(machine->region("verts")->base());
 	UINT32  threeDOffset = (((UINT32)packet[2]) << 16) | ((UINT32)packet[3]);
 	UINT16* threeDPointer = &threeDRoms[threeDOffset * 3];
 
-	if (threeDOffset >= memory_region_length(machine, "verts"))
+	if (threeDOffset >= machine->region("verts")->bytes())
 	{
 		printf("Strange geometry packet: (ignoring)\n");
 		printPacket(packet, 1);
@@ -3023,7 +3023,7 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
 
 	UINT8 paletteEntry = 0;
 	float t_coord, s_coord;
-	const UINT8 *gfx = memory_region(machine, "textures");
+	const UINT8 *gfx = machine->region("textures")->base();
 	const UINT8 *textureOffset = &gfx[prOptions.texIndex * 1024 * 1024];
 
 	for (; x_start <= x_end; x_start++)

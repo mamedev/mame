@@ -633,8 +633,8 @@ static void optimise_sboxes(struct optimised_sbox* out, const struct sbox* in)
 static void cps2_decrypt(running_machine *machine, const UINT32 *master_key, UINT32 upper_limit)
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
-	int length = memory_region_length(machine, "maincpu");
+	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
+	int length = machine->region("maincpu")->bytes();
 	UINT16 *dec = auto_alloc_array(machine, UINT16, length/2);
 	int i;
 	UINT32 key1[4];

@@ -274,7 +274,7 @@ void williams_cvsd_init(running_machine *machine)
 	soundalt_cpu = NULL;
 
 	/* configure master CPU banks */
-	ROM = memory_region(machine, "cvsdcpu");
+	ROM = machine->region("cvsdcpu")->base();
 	for (bank = 0; bank < 16; bank++)
 	{
 		/*
@@ -306,7 +306,7 @@ void williams_narc_init(running_machine *machine)
 	soundalt_cpu = machine->device("narc2cpu");
 
 	/* configure master CPU banks */
-	ROM = memory_region(machine, "narc1cpu");
+	ROM = machine->region("narc1cpu")->base();
 	for (bank = 0; bank < 16; bank++)
 	{
 		/*
@@ -320,7 +320,7 @@ void williams_narc_init(running_machine *machine)
 	memory_set_bankptr(machine, "bank6", &ROM[0x10000 + 0x4000 + 0x8000 + 0x10000 + 0x20000 * 3]);
 
 	/* configure slave CPU banks */
-	ROM = memory_region(machine, "narc2cpu");
+	ROM = machine->region("narc2cpu")->base();
 	for (bank = 0; bank < 16; bank++)
 	{
 		/*
@@ -349,13 +349,13 @@ void williams_adpcm_init(running_machine *machine)
 	soundalt_cpu = NULL;
 
 	/* configure banks */
-	ROM = memory_region(machine, "adpcm");
+	ROM = machine->region("adpcm")->base();
 	memory_configure_bank(machine, "bank5", 0, 8, &ROM[0x10000], 0x8000);
 	memory_set_bankptr(machine, "bank6", &ROM[0x10000 + 0x4000 + 7 * 0x8000]);
 
 	/* expand ADPCM data */
 	/* it is assumed that U12 is loaded @ 0x00000 and U13 is loaded @ 0x40000 */
-	ROM = memory_region(machine, "oki");
+	ROM = machine->region("oki")->base();
 	memcpy(ROM + 0x1c0000, ROM + 0x080000, 0x20000);	/* expand individual banks */
 	memcpy(ROM + 0x180000, ROM + 0x0a0000, 0x20000);
 	memcpy(ROM + 0x140000, ROM + 0x0c0000, 0x20000);

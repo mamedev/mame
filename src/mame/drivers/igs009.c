@@ -738,8 +738,8 @@ ROM_END
 static DRIVER_INIT( jingbell )
 {
 	int i;
-	UINT8 *rom  = (UINT8 *)memory_region(machine, "maincpu");
-	size_t size = memory_region_length(machine, "maincpu");
+	UINT8 *rom  = (UINT8 *)machine->region("maincpu")->base();
+	size_t size = machine->region("maincpu")->bytes();
 
 	for (i=0; i<size; i++)
 	{

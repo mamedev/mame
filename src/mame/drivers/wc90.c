@@ -83,7 +83,7 @@ voice.ic82     CRC32 abc61f3d   SHA1 c6f123d16a26c4d77c635617dd97bb4b906c463a
 static WRITE8_HANDLER( wc90_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	UINT8 *RAM = space->machine->region("maincpu")->base();
 
 
 	bankaddress = 0x10000 + ( ( data & 0xf8 ) << 8 );
@@ -93,7 +93,7 @@ static WRITE8_HANDLER( wc90_bankswitch_w )
 static WRITE8_HANDLER( wc90_bankswitch1_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "sub");
+	UINT8 *RAM = space->machine->region("sub")->base();
 
 
 	bankaddress = 0x10000 + ( ( data & 0xf8 ) << 8 );

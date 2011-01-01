@@ -504,7 +504,7 @@ ROM_END
 
 static DRIVER_INIT( capbowl )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	/* configure ROM banks in 0x0000-0x3fff */
 	memory_configure_bank(machine, "bank1", 0, 6, &ROM[0x10000], 0x4000);

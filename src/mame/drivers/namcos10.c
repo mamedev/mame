@@ -318,8 +318,8 @@ static void memm_driver_init( running_machine *machine )
 
 static void memn_driver_init( running_machine *machine )
 {
-	UINT8 *BIOS = (UINT8 *)memory_region( machine, "user1" );
-	UINT8 *ROM = (UINT8 *)memory_region( machine, "user2" );
+	UINT8 *BIOS = (UINT8 *)machine->region( "user1" )->base();
+	UINT8 *ROM = (UINT8 *)machine->region( "user2" )->base();
 
 	memcpy32le( (UINT32 *)( BIOS + 0x0000000 ), ROM + 0x08000, 0x001c000 );
 	memcpy32le( (UINT32 *)( BIOS + 0x0020000 ), ROM + 0x24000, 0x03dffff );
@@ -330,8 +330,8 @@ static void memn_driver_init( running_machine *machine )
 static void decrypt_bios( running_machine *machine, int b15, int b14, int b13, int b12, int b11, int b10, int b9, int b8,
 	int b7, int b6, int b5, int b4, int b3, int b2, int b1, int b0 )
 {
-	UINT16 *BIOS = (UINT16 *)memory_region( machine, "user1" );
-	int len = memory_region_length( machine, "user1" ) / 2;
+	UINT16 *BIOS = (UINT16 *)machine->region( "user1" )->base();
+	int len = machine->region( "user1" )->bytes() / 2;
 	int i;
 
 	for( i = 0; i < len; i++ )

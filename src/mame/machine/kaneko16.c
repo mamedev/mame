@@ -1715,7 +1715,7 @@ static int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* d
 
 
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8* rom = memory_region(machine,"cpu1");
+	UINT8* rom = machine->region("cpu1")->base();
 	UINT8 numregions;
 	UINT16 length;
 	int local_counter=0;
@@ -2024,7 +2024,7 @@ static int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* d
 
 DRIVER_INIT(calc3_scantables)
 {
-	UINT8* rom = memory_region(machine,"cpu1");
+	UINT8* rom = machine->region("cpu1")->base();
 	UINT8 numregions;
 
 	int x;
@@ -2336,7 +2336,7 @@ static const UINT8 toybox_mcu_decryption_table_alt[0x100] = {
 DRIVER_INIT( decrypt_toybox_rom )
 {
 
-	UINT8 *src = (UINT8 *)memory_region(machine, "mcudata" );
+	UINT8 *src = (UINT8 *)machine->region("mcudata" )->base();
 
 	int i;
 
@@ -2363,7 +2363,7 @@ DRIVER_INIT( decrypt_toybox_rom )
 DRIVER_INIT( decrypt_toybox_rom_alt )
 {
 
-	UINT8 *src = (UINT8 *)memory_region(machine, "mcudata" );
+	UINT8 *src = (UINT8 *)machine->region("mcudata" )->base();
 
 	int i;
 
@@ -2375,7 +2375,7 @@ DRIVER_INIT( decrypt_toybox_rom_alt )
 
 void toxboy_handle_04_subcommand(running_machine* machine,UINT8 mcu_subcmd, UINT16*mcu_ram)
 {
-	UINT8 *src = (UINT8 *)memory_region(machine, "mcudata")+0x10000;
+	UINT8 *src = (UINT8 *)machine->region("mcudata")->base()+0x10000;
 	UINT8* dst = (UINT8 *)mcu_ram;
 
 	int offs = (mcu_subcmd&0x3f)*8;

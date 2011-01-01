@@ -166,7 +166,7 @@ VIDEO_START( m107 )
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
-	UINT8 *rom = memory_region(machine, "user1");
+	UINT8 *rom = machine->region("user1")->base();
 
 	for (offs = 0;offs < 0x800;offs += 4)
 	{

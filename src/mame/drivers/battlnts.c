@@ -221,7 +221,7 @@ static const k007420_interface bladestl_k007420_intf =
 static MACHINE_START( battlnts )
 {
 	battlnts_state *state = machine->driver_data<battlnts_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
 
@@ -402,7 +402,7 @@ static void shuffle( UINT8 *buf, int len )
 static DRIVER_INIT( rackemup )
 {
 	/* rearrange char ROM */
-	shuffle(memory_region(machine, "gfx1"), memory_region_length(machine, "gfx1"));
+	shuffle(machine->region("gfx1")->base(), machine->region("gfx1")->bytes());
 }
 
 

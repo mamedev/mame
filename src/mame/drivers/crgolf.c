@@ -56,7 +56,7 @@ static MACHINE_START( crgolf )
 	state->audiocpu = machine->device("audiocpu");
 
 	/* configure the banking */
-	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x2000);
+	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x10000, 0x2000);
 	memory_set_bank(machine, "bank1", 0);
 
 	/* register for save states */
@@ -197,7 +197,7 @@ static void vck_callback( device_t *device )
 	/* only play back if we have data remaining */
 	if (state->sample_count != 0xff)
 	{
-		UINT8 data = memory_region(device->machine, "adpcm")[state->sample_offset >> 1];
+		UINT8 data = device->machine->region("adpcm")->base()[state->sample_offset >> 1];
 
 		/* write the next nibble and advance */
 		msm5205_data_w(device, (data >> (4 * (~state->sample_offset & 1))) & 0x0f);

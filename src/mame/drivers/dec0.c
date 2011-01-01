@@ -2886,7 +2886,7 @@ static void dump_to_file(running_machine* machine, UINT8* ROM, int offset, int s
 
 static DRIVER_INIT( convert_robocop_gfx4_to_automat )
 {
-	UINT8* R = memory_region(machine,"gfx4");
+	UINT8* R = machine->region("gfx4")->base();
 	int i;
 
 	for (i=0;i<0x80000;i++)

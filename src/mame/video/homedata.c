@@ -41,7 +41,7 @@ static void mrokumei_handleblit( address_space *space, int rom_base )
 	int dest_addr;
 	int base_addr;
 	int opcode, data, num_tiles;
-	UINT8 *pBlitData = memory_region(space->machine, "user1") + rom_base;
+	UINT8 *pBlitData = space->machine->region("user1")->base() + rom_base;
 
 	dest_param = state->blitter_param[(state->blitter_param_count - 4) & 3] * 256 +
 		state->blitter_param[(state->blitter_param_count - 3) & 3];
@@ -127,7 +127,7 @@ static void reikaids_handleblit( address_space *space, int rom_base )
 	int flipx;
 	int source_addr, base_addr;
 	int dest_addr;
-	UINT8 *pBlitData = memory_region(space->machine, "user1") + rom_base;
+	UINT8 *pBlitData = space->machine->region("user1")->base() + rom_base;
 
 	int opcode, data, num_tiles;
 
@@ -225,7 +225,7 @@ static void pteacher_handleblit( address_space *space, int rom_base )
 	int source_addr;
 	int dest_addr, base_addr;
 	int opcode, data, num_tiles;
-	UINT8 *pBlitData = memory_region(space->machine, "user1") + rom_base;
+	UINT8 *pBlitData = space->machine->region("user1")->base() + rom_base;
 
 	dest_param = state->blitter_param[(state->blitter_param_count - 4) & 3] * 256 +
 		state->blitter_param[(state->blitter_param_count - 3) & 3];
@@ -826,7 +826,7 @@ WRITE8_HANDLER( reikaids_blitter_start_w )
 WRITE8_HANDLER( pteacher_blitter_start_w )
 {
 	homedata_state *state = space->machine->driver_data<homedata_state>();
-	pteacher_handleblit(space, (state->blitter_bank >> 5) * 0x10000 & (memory_region_length(space->machine, "user1") - 1));
+	pteacher_handleblit(space, (state->blitter_bank >> 5) * 0x10000 & (space->machine->region("user1")->bytes() - 1));
 }
 
 

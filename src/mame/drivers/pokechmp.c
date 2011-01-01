@@ -53,7 +53,7 @@ ClawGrip, Jul 2006
 
 static WRITE8_HANDLER( pokechmp_bank_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	UINT8 *RAM = space->machine->region("maincpu")->base();
 
 	if (data == 0x00)
 	{
@@ -263,7 +263,7 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT( pokechmp )
 {
-	memory_configure_bank(machine, "bank3", 0, 2, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank3", 0, 2, machine->region("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 

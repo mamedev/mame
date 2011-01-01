@@ -97,7 +97,7 @@ WRITE8_HANDLER( sspeedr_track_ice_w )
 
 static void draw_track(running_machine *machine, bitmap_t* bitmap)
 {
-	const UINT8* p = memory_region(machine, "gfx3");
+	const UINT8* p = machine->region("gfx3")->base();
 
 	int x;
 	int y;

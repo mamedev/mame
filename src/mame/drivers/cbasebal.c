@@ -246,7 +246,7 @@ static MACHINE_START( cbasebal )
 {
 	cbasebal_state *state = machine->driver_data<cbasebal_state>();
 
-	memory_configure_bank(machine, "bank1", 0, 32, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 32, machine->region("maincpu")->base() + 0x10000, 0x4000);
 
 	state_save_register_global(machine, state->rambank);
 	state_save_register_global(machine, state->tilebank);

@@ -123,14 +123,14 @@ static READ8_HANDLER( macs_input_r )
 
 static WRITE8_HANDLER( macs_rom_bank_w )
 {
-	memory_set_bankptr(space->machine,  "bank1", memory_region(space->machine, "maincpu") + (data* 0x4000) + 0x10000 + macs_cart_slot*0x400000 );
+	memory_set_bankptr(space->machine,  "bank1", space->machine->region("maincpu")->base() + (data* 0x4000) + 0x10000 + macs_cart_slot*0x400000 );
 
 	st0016_rom_bank=data;
 }
 
 static WRITE8_HANDLER( macs_output_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 
 	switch(offset)
 	{
@@ -661,11 +661,11 @@ static MACHINE_RESET(macs)
         730E: ED B0         ldir
         ...
 */
-		memcpy(macs_ram1 + 0x0e9f, memory_region(machine, "user1")+0x7327, 0xc7);
-		memcpy(macs_ram1 + 0x1e9f, memory_region(machine, "user1")+0x7327, 0xc7);
+		memcpy(macs_ram1 + 0x0e9f, machine->region("user1")->base()+0x7327, 0xc7);
+		memcpy(macs_ram1 + 0x1e9f, machine->region("user1")->base()+0x7327, 0xc7);
 
-		memcpy(macs_ram1 + 0x0800, memory_region(machine, "user1")+0x73fa, 0x507);
-		memcpy(macs_ram1 + 0x1800, memory_region(machine, "user1")+0x73fa, 0x507);
+		memcpy(macs_ram1 + 0x0800, machine->region("user1")->base()+0x73fa, 0x507);
+		memcpy(macs_ram1 + 0x1800, machine->region("user1")->base()+0x73fa, 0x507);
 
 #define MAKEJMP(n,m)	macs_ram2[(n) - 0xe800 + 0]=0xc3;\
 						macs_ram2[(n) - 0xe800 + 1]=(m)&0xff;\
@@ -701,10 +701,10 @@ static MACHINE_RESET(macs)
 		macs_ram1[0x1ff9]=0x07;
 		#endif
 
-		memory_set_bankptr(machine,  "bank1", memory_region(machine, "maincpu") + 0x10000 );
+		memory_set_bankptr(machine,  "bank1", machine->region("maincpu")->base() + 0x10000 );
 		memory_set_bankptr(machine,  "bank2", macs_ram1+0x800);
 		memory_set_bankptr(machine,  "bank3", macs_ram1+0x10000);
-		memory_set_bankptr(machine,  "bank4", memory_region(machine, "maincpu") );
+		memory_set_bankptr(machine,  "bank4", machine->region("maincpu")->base() );
 }
 
 static DRIVER_INIT(macs)

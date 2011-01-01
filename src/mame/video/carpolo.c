@@ -197,7 +197,7 @@ static void draw_alpha_line(running_machine *machine, bitmap_t *bitmap, const re
 
 static void remap_sprite_code(running_machine *machine, int bank, int code, int *remapped_code, int *flipy)
 {
-	UINT8* PROM = memory_region(machine, "user1");
+	UINT8* PROM = machine->region("user1")->base();
 
 	code = (bank << 4) | code;
 	*remapped_code = PROM[code] & 0x0f;

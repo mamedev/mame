@@ -511,7 +511,7 @@ static TIMER_CALLBACK( raster_interrupt_callback )
 static MACHINE_START( fuuki32 )
 {
 	fuuki32_state *state = machine->driver_data<fuuki32_state>();
-	UINT8 *ROM = memory_region(machine, "soundcpu");
+	UINT8 *ROM = machine->region("soundcpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 0x3e, &ROM[0x10000], 0x8000);
 

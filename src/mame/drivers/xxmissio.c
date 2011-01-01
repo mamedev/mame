@@ -79,7 +79,7 @@ static INTERRUPT_GEN( xxmissio_interrupt_s )
 
 static MACHINE_START( xxmissio )
 {
-	memory_configure_bank(machine, "bank1", 0, 8, memory_region(machine, "user1"), 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 8, machine->region("user1")->base(), 0x4000);
 	memory_set_bank(machine, "bank1", 0);
 }
 

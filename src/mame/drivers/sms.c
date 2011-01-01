@@ -516,7 +516,7 @@ ADDRESS_MAP_END
 
 static MACHINE_START( sms )
 {
-	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "questions"), 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 16, machine->region("questions")->base(), 0x4000);
 
 	state_save_register_global(machine, communication_port_status);
 	state_save_register_global_array(machine, communication_port);

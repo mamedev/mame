@@ -1180,7 +1180,7 @@ static DRIVER_INIT( fclown )
     /* Decrypting main program */
 
 	int x;
-	UINT8 *src = memory_region( machine, "maincpu" );
+	UINT8 *src = machine->region( "maincpu" )->base();
 
 	for (x = 0x0000; x < 0x10000; x++)
 	{
@@ -1190,8 +1190,8 @@ static DRIVER_INIT( fclown )
 
     /* Decrypting GFX by segments */
 
-	UINT8 *gfx1_src = memory_region( machine, "gfx1" );
-	UINT8 *gfx2_src = memory_region( machine, "gfx2" );
+	UINT8 *gfx1_src = machine->region( "gfx1" )->base();
+	UINT8 *gfx2_src = machine->region( "gfx2" )->base();
 
 	for (x = 0x2000; x < 0x3000; x++)
 	{
@@ -1211,7 +1211,7 @@ static DRIVER_INIT( fclown )
 
     /* Decrypting sound samples */
 
-	UINT8 *samples_src = memory_region( machine, "oki6295" );
+	UINT8 *samples_src = machine->region( "oki6295" )->base();
 
 	for (x = 0x0000; x < 0x10000; x++)
 	{

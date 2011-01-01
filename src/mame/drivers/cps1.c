@@ -352,7 +352,7 @@ static INTERRUPT_GEN( cps1_qsound_interrupt )
 
 static READ16_HANDLER( qsound_rom_r )
 {
-	UINT8 *rom = memory_region(space->machine, "user1");
+	UINT8 *rom = space->machine->region("user1")->base();
 
 	if (rom)
 		return rom[offset] | 0xff00;
@@ -395,7 +395,7 @@ static WRITE8_HANDLER( qsound_banksw_w )
 {
 	/* Z80 bank register for music note data. It's odd that it isn't encrypted though. */
 	int bank = data & 0x0f;
-	if ((0x10000 + (bank * 0x4000)) >= memory_region_length(space->machine, "audiocpu"))
+	if ((0x10000 + (bank * 0x4000)) >= space->machine->region("audiocpu")->bytes())
 	{
 		logerror("WARNING: Q sound bank overflow (%02x)\n", data);
 		bank = 0;
@@ -2953,13 +2953,13 @@ static MACHINE_START( common )
 static MACHINE_START( cps1 )
 {
 	MACHINE_START_CALL(common);
-	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine->region("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 static MACHINE_START( qsound )
 {
 	MACHINE_START_CALL(common);
-	memory_configure_bank(machine, "bank1", 0, 6, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 6, machine->region("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 static MACHINE_CONFIG_START( cps1_10MHz, cps_state )
@@ -9939,7 +9939,7 @@ static DRIVER_INIT( pang3n )
 
 static DRIVER_INIT( pang3 )
 {
-	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
 	int A, src, dst;
 
 	for (A = 0x80000; A < 0x100000; A += 2)
@@ -9970,8 +9970,8 @@ static READ16_HANDLER( sf2mdt_r )
 static DRIVER_INIT( sf2mdt )
 {
 	int i;
-	UINT32 gfx_size = memory_region_length( machine, "gfx" );
-	UINT8 *rom = memory_region( machine, "gfx" );
+	UINT32 gfx_size = machine->region( "gfx" )->bytes();
+	UINT8 *rom = machine->region( "gfx" )->base();
 	UINT8 tmp;
 
 	for( i = 0; i < gfx_size; i += 8 )

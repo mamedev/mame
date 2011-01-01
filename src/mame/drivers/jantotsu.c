@@ -301,7 +301,7 @@ static void jan_adpcm_int( device_t *device )
 	}
 	else
 	{
-		UINT8 *ROM = memory_region(device->machine, "adpcm");
+		UINT8 *ROM = device->machine->region("adpcm")->base();
 
 		state->adpcm_data = ((state->adpcm_trigger ? (ROM[state->adpcm_pos] & 0x0f) : (ROM[state->adpcm_pos] & 0xf0) >> 4));
 		msm5205_data_w(device, state->adpcm_data & 0xf);

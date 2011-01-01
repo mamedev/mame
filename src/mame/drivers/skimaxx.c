@@ -124,8 +124,8 @@ static READ32_HANDLER( skimaxx_blitter_r )
 
 static VIDEO_START( skimaxx )
 {
-	skimaxx_blitter_gfx = (UINT16 *) memory_region( machine, "blitter" );
-	skimaxx_blitter_gfx_len = memory_region_length( machine, "blitter" ) / 2;
+	skimaxx_blitter_gfx = (UINT16 *) machine->region( "blitter" )->base();
+	skimaxx_blitter_gfx_len = machine->region( "blitter" )->bytes() / 2;
 
 	bg_buffer = auto_alloc_array(machine, UINT32, 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 2);	// 2 buffers
 	skimaxx_bg_buffer_back  = bg_buffer + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 0;

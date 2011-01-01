@@ -91,7 +91,7 @@ static VIDEO_UPDATE( sstrngr2 )
 
 	get_pens(pens);
 
-	color_map_base = &memory_region(screen->machine, "proms")[state->flip_screen ? 0x0000 : 0x0200];
+	color_map_base = &screen->machine->region("proms")->base()[state->flip_screen ? 0x0000 : 0x0200];
 
 	for (offs = 0; offs < 0x2000; offs++)
 	{

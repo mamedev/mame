@@ -186,7 +186,7 @@ static const ym2203_interface ym2203_interface_2 =
 static MACHINE_START( labyrunr )
 {
 	labyrunr_state *state = machine->driver_data<labyrunr_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 6, &ROM[0x10000], 0x4000);
 

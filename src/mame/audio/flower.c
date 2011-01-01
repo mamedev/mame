@@ -185,8 +185,8 @@ static DEVICE_START( flower_sound )
 	state->num_voices = 8;
 	state->last_channel = state->channel_list + state->num_voices;
 
-	state->sound_rom1 = memory_region(machine, "sound1");
-	state->sound_rom2 = memory_region(machine, "sound2");
+	state->sound_rom1 = machine->region("sound1")->base();
+	state->sound_rom2 = machine->region("sound2")->base();
 
 	/* start with sound enabled, many games don't have a sound enable register */
 	state->sound_enable = 1;

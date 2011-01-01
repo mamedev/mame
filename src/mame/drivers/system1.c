@@ -355,12 +355,12 @@ static const UINT8 cc_ex[0x100] = {
 
 static MACHINE_START( system1 )
 {
-	UINT32 numbanks = (memory_region_length(machine, "maincpu") - 0x10000) / 0x4000;
+	UINT32 numbanks = (machine->region("maincpu")->bytes() - 0x10000) / 0x4000;
 
 	if (numbanks > 0)
-		memory_configure_bank(machine, "bank1", 0, numbanks, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+		memory_configure_bank(machine, "bank1", 0, numbanks, machine->region("maincpu")->base() + 0x10000, 0x4000);
 	else
-		memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, "maincpu") + 0x8000, 0);
+		memory_configure_bank(machine, "bank1", 0, 1, machine->region("maincpu")->base() + 0x8000, 0);
 	memory_set_bank(machine, "bank1", 0);
 
 	z80_set_cycle_tables(machine->device("maincpu"), cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex);
@@ -578,7 +578,7 @@ static READ8_HANDLER( mcu_io_r )
 			return space->machine->device<z80_device>("maincpu")->space(AS_PROGRAM)->read_byte(offset);
 
 		case 1:
-			return memory_region(space->machine, "maincpu")[offset + 0x10000];
+			return space->machine->region("maincpu")->base()[offset + 0x10000];
 
 		case 2:
 			return space->machine->device<z80_device>("maincpu")->space(AS_IO)->read_byte(offset);
@@ -4546,12 +4546,12 @@ static DRIVER_INIT( myherok )
 
 	/* additionally to the usual protection, all the program ROMs have data lines */
 	/* D0 and D1 swapped. */
-	rom = memory_region(machine, "maincpu");
+	rom = machine->region("maincpu")->base();
 	for (A = 0;A < 0xc000;A++)
 		rom[A] = (rom[A] & 0xfc) | ((rom[A] & 1) << 1) | ((rom[A] & 2) >> 1);
 
 	/* the tile gfx ROMs are mangled as well: */
-	rom = memory_region(machine, "tiles");
+	rom = machine->region("tiles")->base();
 
 	/* the first ROM has data lines D0 and D6 swapped. */
 	for (A = 0x0000;A < 0x4000;A++)
@@ -4586,7 +4586,7 @@ static DRIVER_INIT( myherok )
 static READ8_HANDLER( nob_start_r )
 {
 	/* in reality, it's likely some M1-dependent behavior */
-	return (cpu_get_pc(space->cpu) <= 0x0003) ? 0x80 : memory_region(space->machine, "maincpu")[1];
+	return (cpu_get_pc(space->cpu) <= 0x0003) ? 0x80 : space->machine->region("maincpu")->base()[1];
 }
 
 static DRIVER_INIT( nob )
@@ -4611,7 +4611,7 @@ static DRIVER_INIT( nobb )
 	/* Patch to get PRG ROMS ('T', 'R' and 'S) status as "GOOD" in the "test mode" */
 	/* not really needed */
 
-//  UINT8 *ROM = memory_region(machine, "maincpu");
+//  UINT8 *ROM = machine->region("maincpu")->base();
 
 //  ROM[0x3296] = 0x18;     // 'jr' instead of 'jr z' - 'T' (PRG Main ROM)
 //  ROM[0x32be] = 0x18;     // 'jr' instead of 'jr z' - 'R' (Banked ROM 1)
@@ -4624,7 +4624,7 @@ static DRIVER_INIT( nobb )
 
 	/* Patch to get sound in later levels(the program enters into a tight loop)*/
 	address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
-	UINT8 *ROM2 = memory_region(machine, "soundcpu");
+	UINT8 *ROM2 = machine->region("soundcpu")->base();
 
 	ROM2[0x02f9] = 0x28;//'jr z' instead of 'jr'
 
@@ -4640,7 +4640,7 @@ static DRIVER_INIT( nobb )
 static DRIVER_INIT( bootleg )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	space->set_decrypted_region(0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x10000);
+	space->set_decrypted_region(0x0000, 0x7fff, machine->region("maincpu")->base() + 0x10000);
 	DRIVER_INIT_CALL(bank00);
 }
 
@@ -4648,14 +4648,14 @@ static DRIVER_INIT( bootleg )
 static DRIVER_INIT( bootsys2 )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	space->set_decrypted_region(0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x20000);
-	memory_configure_bank_decrypted(machine, "bank1", 0, 4, memory_region(machine, "maincpu") + 0x30000, 0x4000);
+	space->set_decrypted_region(0x0000, 0x7fff, machine->region("maincpu")->base() + 0x20000);
+	memory_configure_bank_decrypted(machine, "bank1", 0, 4, machine->region("maincpu")->base() + 0x30000, 0x4000);
 	DRIVER_INIT_CALL(bank0c);
 }
 
 static DRIVER_INIT( choplift )
 {
-	UINT8 *mcurom = memory_region(machine, "mcu");
+	UINT8 *mcurom = machine->region("mcu")->base();
 
 	/* the ROM dump we have is bad; the following patches make it work */
 	mcurom[0x100] = 0x55;		/* D5 in current dump */

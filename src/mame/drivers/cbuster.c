@@ -519,7 +519,7 @@ ROM_END
 
 static DRIVER_INIT( twocrude )
 {
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 	UINT8 *PTR;
 	int i, j;
 
@@ -536,8 +536,8 @@ static DRIVER_INIT( twocrude )
 	}
 
 	/* Rearrange the 'extra' sprite bank to be in the same format as main sprites */
-	RAM = memory_region(machine, "gfx3") + 0x080000;
-	PTR = memory_region(machine, "gfx3") + 0x140000;
+	RAM = machine->region("gfx3")->base() + 0x080000;
+	PTR = machine->region("gfx3")->base() + 0x140000;
 	for (i = 0; i < 0x20000; i += 64)
 	{
 		for (j = 0; j < 16; j += 1)

@@ -109,7 +109,7 @@ public:
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	calorie_state *state = machine->driver_data<calorie_state>();
-	UINT8 *src = memory_region(machine, "user1");
+	UINT8 *src = machine->region("user1")->base();
 	int bg_base = (state->bg_bank & 0x0f) * 0x200;
 	int code  = src[bg_base + tile_index] | (((src[bg_base + tile_index + 0x100]) & 0x10) << 4);
 	int color = src[bg_base + tile_index + 0x100] & 0x0f;
@@ -551,7 +551,7 @@ static DRIVER_INIT( calorie )
 static DRIVER_INIT( calorieb )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	space->set_decrypted_region(0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x10000);
+	space->set_decrypted_region(0x0000, 0x7fff, machine->region("maincpu")->base() + 0x10000);
 }
 
 

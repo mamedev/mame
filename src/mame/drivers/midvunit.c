@@ -74,7 +74,7 @@ static MACHINE_RESET( midvunit )
 	dcs_reset_w(1);
 	dcs_reset_w(0);
 
-	memcpy(ram_base, memory_region(machine, "user1"), 0x20000*4);
+	memcpy(ram_base, machine->region("user1")->base(), 0x20000*4);
 	machine->device("maincpu")->reset();
 
 	timer[0] = machine->device<timer_device>("timer0");
@@ -87,7 +87,7 @@ static MACHINE_RESET( midvplus )
 	dcs_reset_w(1);
 	dcs_reset_w(0);
 
-	memcpy(ram_base, memory_region(machine, "user1"), 0x20000*4);
+	memcpy(ram_base, machine->region("user1")->base(), 0x20000*4);
 	machine->device("maincpu")->reset();
 
 	timer[0] = machine->device<timer_device>("timer0");

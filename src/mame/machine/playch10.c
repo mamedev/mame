@@ -79,7 +79,7 @@ MACHINE_RESET( pc10 )
 
 MACHINE_START( pc10 )
 {
-	vrom = memory_region(machine, "gfx2");
+	vrom = machine->region("gfx2")->base();
 
 	/* allocate 4K of nametable ram here */
 	/* move to individual boards as documentation of actual boards allows */
@@ -94,12 +94,12 @@ MACHINE_START( pc10 )
 
 	nvram_device *nvram = machine->device<nvram_device>("nvram");
 	if (nvram != NULL)
-		nvram->set_base(memory_region( machine, "cart" ) + 0x6000, 0x1000);
+		nvram->set_base(machine->region( "cart" )->base() + 0x6000, 0x1000);
 }
 
 MACHINE_START( playch10_hboard )
 {
-	vrom = memory_region(machine, "gfx2");
+	vrom = machine->region("gfx2")->base();
 
 	/* allocate 4K of nametable ram here */
 	/* move to individual boards as documentation of actual boards allows */
@@ -228,7 +228,7 @@ WRITE8_HANDLER( pc10_prot_w )
 		/* is the actual protection memory area                     */
 		/* setting the whole 0x2000 region every time is a waste    */
 		/* so we just set $ffff with the current value              */
-		memory_region(space->machine, "maincpu")[0xffff] = pc10_prot_r(space, 0);
+		space->machine->region("maincpu")->base()[0xffff] = pc10_prot_r(space, 0);
 	}
 }
 
@@ -401,7 +401,7 @@ static void pc10_set_videorom_bank( running_machine *machine, int first, int cou
 	/* yeah, this is probably a horrible assumption to make.*/
 	/* but the driver is 100% consistant */
 
-	len = memory_region_length(machine, "gfx2");
+	len = machine->region("gfx2")->bytes();
 	len /= 0x400;	// convert to KB
 	len /= size;	// convert to bank resolution
 	len--;			// convert to mask
@@ -578,7 +578,7 @@ static WRITE8_HANDLER( mmc1_rom_switch_w )
 			case 3:	/* program banking */
 				{
 					int bank = (mmc1_shiftreg & mmc1_rom_mask) * 0x4000;
-					UINT8 *prg = memory_region(space->machine, "cart");
+					UINT8 *prg = space->machine->region("cart")->base();
 
 					if (!size16k)
 					{
@@ -634,14 +634,14 @@ DRIVER_INIT( pcaboard )
 static WRITE8_HANDLER( bboard_rom_switch_w )
 {
 	int bankoffset = 0x10000 + ((data & 7) * 0x4000);
-	UINT8 *prg = memory_region(space->machine, "cart");
+	UINT8 *prg = space->machine->region("cart")->base();
 
 	memcpy(&prg[0x08000], &prg[bankoffset], 0x4000);
 }
 
 DRIVER_INIT( pcbboard )
 {
-	UINT8 *prg = memory_region(machine, "cart");
+	UINT8 *prg = machine->region("cart")->base();
 
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
@@ -687,7 +687,7 @@ DRIVER_INIT( pccboard )
 
 DRIVER_INIT( pcdboard )
 {
-	UINT8 *prg = memory_region(machine, "cart");
+	UINT8 *prg = machine->region("cart")->base();
 
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
@@ -760,7 +760,7 @@ static WRITE8_HANDLER( eboard_rom_switch_w )
 		case 0x2000: /* code bank switching */
 			{
 				int bankoffset = 0x10000 + (data & 0x0f) * 0x2000;
-				UINT8 *prg = memory_region(space->machine, "cart");
+				UINT8 *prg = space->machine->region("cart")->base();
 				memcpy(&prg[0x08000], &prg[bankoffset], 0x2000);
 			}
 		break;
@@ -798,7 +798,7 @@ static WRITE8_HANDLER( eboard_rom_switch_w )
 
 DRIVER_INIT( pceboard )
 {
-	UINT8 *prg = memory_region(machine, "cart");
+	UINT8 *prg = machine->region("cart")->base();
 
 	/* we have no vram, make sure switching games doesn't point to an old allocation */
 	vram = NULL;
@@ -825,7 +825,7 @@ DRIVER_INIT( pceboard )
 
 DRIVER_INIT( pcfboard )
 {
-	UINT8 *prg = memory_region(machine, "cart");
+	UINT8 *prg = machine->region("cart")->base();
 
 	/* we have no vram, make sure switching games doesn't point to an old allocation */
 	vram = NULL;
@@ -892,7 +892,7 @@ static WRITE8_HANDLER( gboard_rom_switch_w )
 			if (gboard_last_bank != (data & 0xc0))
 			{
 				int bank;
-				UINT8 *prg = memory_region(space->machine, "cart");
+				UINT8 *prg = space->machine->region("cart")->base();
 
 				/* reset the banks */
 				if (gboard_command & 0x40)
@@ -945,7 +945,7 @@ static WRITE8_HANDLER( gboard_rom_switch_w )
 
 					case 6: /* program banking */
 					{
-						UINT8 *prg = memory_region(space->machine, "cart");
+						UINT8 *prg = space->machine->region("cart")->base();
 						if (gboard_command & 0x40)
 						{
 							/* high bank */
@@ -970,7 +970,7 @@ static WRITE8_HANDLER( gboard_rom_switch_w )
 					case 7: /* program banking */
 						{
 							/* mid bank */
-							UINT8 *prg = memory_region(space->machine, "cart");
+							UINT8 *prg = space->machine->region("cart")->base();
 							gboard_banks[1] = data & 0x1f;
 							bank = gboard_banks[1] * 0x2000 + 0x10000;
 
@@ -1015,7 +1015,7 @@ static WRITE8_HANDLER( gboard_rom_switch_w )
 
 DRIVER_INIT( pcgboard )
 {
-	UINT8 *prg = memory_region(machine, "cart");
+	UINT8 *prg = machine->region("cart")->base();
 	vram = NULL;
 
 	/* We do manual banking, in case the code falls through */
@@ -1055,7 +1055,7 @@ DRIVER_INIT( pcgboard_type2 )
 static WRITE8_HANDLER( iboard_rom_switch_w )
 {
 	int bank = data & 7;
-	UINT8 *prg = memory_region(space->machine, "cart");
+	UINT8 *prg = space->machine->region("cart")->base();
 
 	if (data & 0x10)
 		pc10_set_mirroring(PPU_MIRROR_HIGH);
@@ -1067,7 +1067,7 @@ static WRITE8_HANDLER( iboard_rom_switch_w )
 
 DRIVER_INIT( pciboard )
 {
-	UINT8 *prg = memory_region(machine, "cart");
+	UINT8 *prg = machine->region("cart")->base();
 
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
@@ -1136,7 +1136,7 @@ static WRITE8_HANDLER( hboard_rom_switch_w )
 
 DRIVER_INIT( pchboard )
 {
-	UINT8 *prg = memory_region(machine, "cart");
+	UINT8 *prg = machine->region("cart")->base();
 	memcpy(&prg[0x08000], &prg[0x4c000], 0x4000);
 	memcpy(&prg[0x0c000], &prg[0x4c000], 0x4000);
 
@@ -1162,7 +1162,7 @@ DRIVER_INIT( pchboard )
 
 DRIVER_INIT( pckboard )
 {
-	UINT8 *prg = memory_region(machine, "cart");
+	UINT8 *prg = machine->region("cart")->base();
 
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */

@@ -119,8 +119,8 @@ static INT16 *samplebuf;
 static SAMPLES_START( pbillian_sh_start )
 {
 	running_machine *machine = device->machine;
-	UINT8 *src = memory_region(machine, "samples");
-	int i, len = memory_region_length(machine, "samples");
+	UINT8 *src = machine->region("samples")->base();
+	int i, len = machine->region("samples")->bytes();
 
 	/* convert 8-bit unsigned samples to 8-bit signed */
 	samplebuf = auto_alloc_array(machine, INT16, len);
@@ -542,7 +542,7 @@ static void machine_init_common(running_machine *machine)
 static MACHINE_START( superqix )
 {
 	/* configure the banks */
-	memory_configure_bank(machine, "bank1", 0, 4, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 4, machine->region("maincpu")->base() + 0x10000, 0x4000);
 
 	machine_init_common(machine);
 }
@@ -550,7 +550,7 @@ static MACHINE_START( superqix )
 static MACHINE_START( pbillian )
 {
 	/* configure the banks */
-	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine->region("maincpu")->base() + 0x10000, 0x4000);
 
 	machine_init_common(machine);
 }
@@ -1359,8 +1359,8 @@ static DRIVER_INIT( perestro )
 	int i,j;
 
 	/* decrypt program code; the address lines are shuffled around in a non-trivial way */
-	src = memory_region(machine, "maincpu");
-	len = memory_region_length(machine, "maincpu");
+	src = machine->region("maincpu")->base();
+	len = machine->region("maincpu")->bytes();
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);
@@ -1379,8 +1379,8 @@ static DRIVER_INIT( perestro )
 	}
 
 	/* decrypt gfx ROMs; simple bit swap on the address lines */
-	src = memory_region(machine, "gfx1");
-	len = memory_region_length(machine, "gfx1");
+	src = machine->region("gfx1")->base();
+	len = machine->region("gfx1")->bytes();
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);
@@ -1390,8 +1390,8 @@ static DRIVER_INIT( perestro )
 		}
 	}
 
-	src = memory_region(machine, "gfx2");
-	len = memory_region_length(machine, "gfx2");
+	src = machine->region("gfx2")->base();
+	len = machine->region("gfx2")->bytes();
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);
@@ -1401,8 +1401,8 @@ static DRIVER_INIT( perestro )
 		}
 	}
 
-	src = memory_region(machine, "gfx3");
-	len = memory_region_length(machine, "gfx3");
+	src = machine->region("gfx3")->base();
+	len = machine->region("gfx3")->bytes();
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);

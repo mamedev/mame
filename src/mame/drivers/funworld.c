@@ -810,7 +810,7 @@ static UINT8 funquiz_question_bank = 0x80;
 
 static READ8_HANDLER( questions_r )
 {
-	UINT8* quiz = memory_region(space->machine,"questions");
+	UINT8* quiz = space->machine->region("questions")->base();
 	int extraoffset = ((funquiz_question_bank & 0x1f) * 0x8000);
 
 	// if 0x80 is set, read the 2nd half of the question rom (contains header info)
@@ -4049,7 +4049,7 @@ static DRIVER_INIT( tabblue )
 *****************************************************************************************************/
 
 	int x, na, nb, nad, nbd;
-	UINT8 *src = memory_region( machine, "gfx1" );
+	UINT8 *src = machine->region( "gfx1" )->base();
 
 
 	for (x=0x0000; x < 0x10000; x++)
@@ -4079,7 +4079,7 @@ static DRIVER_INIT( magicd2a )
 
 ******************************************************************/
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	ROM[0xc1c6] = 0x92;
 }
@@ -4088,8 +4088,8 @@ static DRIVER_INIT( magicd2b )
 /*** same as blue TAB PCB, with the magicd2a patch ***/
 {
 	int x, na, nb, nad, nbd;
-	UINT8 *src = memory_region( machine, "gfx1" );
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *src = machine->region( "gfx1" )->base();
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	for (x=0x0000; x < 0x10000; x++)
 	{
@@ -4108,7 +4108,7 @@ static DRIVER_INIT( magicd2b )
 static DRIVER_INIT( soccernw )
 {
 /* temporary patch to avoid hardware errors for debug purposes */
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	ROM[0x80b2] = 0xa9;
 	ROM[0x80b3] = 0x00;
@@ -4143,16 +4143,16 @@ static DRIVER_INIT( saloon )
 
 *************************************************/
 {
-	UINT8 *rom = memory_region(machine, "maincpu");
-	int size = memory_region_length(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
+	int size = machine->region("maincpu")->bytes();
 	int start = 0x8000;
 
-	UINT8 *gfxrom = memory_region(machine, "gfx1");
-	int sizeg = memory_region_length(machine, "gfx1");
+	UINT8 *gfxrom = machine->region("gfx1")->base();
+	int sizeg = machine->region("gfx1")->bytes();
 	int startg = 0;
 
-	UINT8 *prom = memory_region(machine, "proms");
-	int sizep = memory_region_length(machine, "proms");
+	UINT8 *prom = machine->region("proms")->base();
+	int sizep = machine->region("proms")->bytes();
 	int startp = 0;
 
 	UINT8 *buffer;
@@ -4237,7 +4237,7 @@ static DRIVER_INIT( multiwin )
 
 ******************************************************/
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	int x;
@@ -4256,7 +4256,7 @@ static DRIVER_INIT( multiwin )
 		ROM[x+0x10000] = code;
 	}
 
-	space->set_decrypted_region(0x8000, 0xffff, memory_region(machine, "maincpu") + 0x18000);
+	space->set_decrypted_region(0x8000, 0xffff, machine->region("maincpu")->base() + 0x18000);
 }
 
 static DRIVER_INIT( royalcdc )
@@ -4270,7 +4270,7 @@ static DRIVER_INIT( royalcdc )
 
 ******************************************************/
 
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	int x;
@@ -4309,7 +4309,7 @@ static DRIVER_INIT( royalcdc )
 		ROM[x+0x10000] = code;
 	}
 
-	space->set_decrypted_region(0x6000, 0xffff, memory_region(machine, "maincpu") + 0x16000);
+	space->set_decrypted_region(0x6000, 0xffff, machine->region("maincpu")->base() + 0x16000);
 }
 
 

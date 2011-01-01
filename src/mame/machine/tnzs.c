@@ -543,7 +543,7 @@ DRIVER_INIT( tnzsb )
 DRIVER_INIT( kabukiz )
 {
 	tnzs_state *state = machine->driver_data<tnzs_state>();
-	UINT8 *SOUND = memory_region(machine, "audiocpu");
+	UINT8 *SOUND = machine->region("audiocpu")->base();
 	state->mcu_type = MCU_NONE_KABUKIZ;
 
 	memory_configure_bank(machine, "bank3", 0, 8, &SOUND[0x10000], 0x4000);
@@ -681,8 +681,8 @@ static STATE_POSTLOAD( tnzs_postload )
 MACHINE_START( tnzs )
 {
 	tnzs_state *state = machine->driver_data<tnzs_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
-	UINT8 *SUB = memory_region(machine, "sub");
+	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *SUB = machine->region("sub")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 	memory_configure_bank(machine, "bank2", 0, 4, &SUB[0x10000], 0x2000);
@@ -719,8 +719,8 @@ MACHINE_START( tnzs )
 MACHINE_START( jpopnics )
 {
 	tnzs_state *state = machine->driver_data<tnzs_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
-	UINT8 *SUB = memory_region(machine, "sub");
+	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *SUB = machine->region("sub")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 	memory_configure_bank(machine, "bank2", 0, 4, &SUB[0x10000], 0x2000);

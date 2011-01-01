@@ -202,7 +202,7 @@ static const k007232_interface k007232_interface_2 =
 static MACHINE_START( fastlane )
 {
 	fastlane_state *state = machine->driver_data<fastlane_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
 

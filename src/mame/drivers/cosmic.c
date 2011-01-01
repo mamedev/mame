@@ -1571,8 +1571,8 @@ static DRIVER_INIT( cosmicg )
 	cosmic_state *state = machine->driver_data<cosmic_state>();
 	offs_t offs, len;
 	UINT8 *rom;
-	len = memory_region_length(machine, "maincpu");
-	rom = memory_region(machine, "maincpu");
+	len = machine->region("maincpu")->bytes();
+	rom = machine->region("maincpu")->base();
 	for (offs = 0; offs < len; offs++)
 	{
 		UINT8 scrambled = rom[offs];

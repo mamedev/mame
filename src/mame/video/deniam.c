@@ -218,7 +218,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 {
 	deniam_state *state = machine->driver_data<deniam_state>();
 	int offs;
-	UINT8 *gfx = memory_region(machine, "gfx2");
+	UINT8 *gfx = machine->region("gfx2")->base();
 
 	for (offs = state->spriteram_size / 2 - 8; offs >= 0; offs -= 8)
 	{

@@ -1123,7 +1123,7 @@ static void halleys_decode_rgb(running_machine *machine, UINT32 *r, UINT32 *g, U
 	sram_189 = machine->generic.paletteram.u8;
 
 	// each of the three 32-byte 6330 PROM is wired to an RGB component output
-	prom_6330 = memory_region(machine, "proms");
+	prom_6330 = machine->region("proms")->base();
 
 	// latch1 holds 8 bits from the selected palette RAM address
 	latch1_273 = sram_189[addr];
@@ -2164,7 +2164,7 @@ static void init_common(running_machine *machine)
 
 
 	// decrypt main program ROM
-	rom = cpu1_base = memory_region(machine, "maincpu");
+	rom = cpu1_base = machine->region("maincpu")->base();
 	buf = gfx1_base;
 
 	for (i=0; i<0x10000; i++)
@@ -2177,7 +2177,7 @@ static void init_common(running_machine *machine)
 
 
 	// swap graphics ROM addresses and unpack each pixel
-	rom = memory_region(machine, "gfx1");
+	rom = machine->region("gfx1")->base();
 	buf = gfx_plane02;
 
 	for (i=0xffff; i>=0; i--)

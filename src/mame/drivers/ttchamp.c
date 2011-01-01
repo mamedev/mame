@@ -93,7 +93,7 @@ static WRITE16_HANDLER( paloff_w )
 static WRITE16_HANDLER( pcup_prgbank_w )
 {
     int bank;
-    UINT8 *ROM1 = memory_region(space->machine, "user1");
+    UINT8 *ROM1 = space->machine->region("user1")->base();
 
     if (ACCESSING_BITS_0_7)
     {
@@ -322,7 +322,7 @@ ROM_END
 
 static DRIVER_INIT (ttchamp)
 {
-	UINT8 *ROM1 = memory_region(machine, "user1");
+	UINT8 *ROM1 = machine->region("user1")->base();
 	memory_set_bankptr(machine, "bank1",&ROM1[0x120000]);
 	memory_set_bankptr(machine, "bank2",&ROM1[0x180000]);
 }

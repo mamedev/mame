@@ -1895,7 +1895,7 @@ ROM_END
 
 static void cninja_patch( running_machine *machine )
 {
-	UINT16 *RAM = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *RAM = (UINT16 *)machine->region("maincpu")->base();
 	int i;
 
 	for (i = 0; i < 0x80000 / 2; i++)
@@ -1934,8 +1934,8 @@ static DRIVER_INIT( stoneage )
 
 static DRIVER_INIT( mutantf )
 {
-	const UINT8 *src = memory_region(machine, "gfx2");
-	UINT8 *dst = memory_region(machine, "gfx1");
+	const UINT8 *src = machine->region("gfx2")->base();
+	UINT8 *dst = machine->region("gfx1")->base();
 
 	/* The 16x16 graphic has some 8x8 chars in it - decode them in GFX1 */
 	memcpy(dst + 0x50000, dst + 0x10000, 0x10000);

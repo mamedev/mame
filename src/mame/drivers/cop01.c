@@ -641,7 +641,7 @@ static DRIVER_INIT( mightguy )
 #if MIGHTGUY_HACK
 	/* This is a hack to fix the game code to get a fully working
        "Starting Area" fake Dip Switch */
-	UINT8 *RAM = (UINT8 *)memory_region(machine, "maincpu");
+	UINT8 *RAM = (UINT8 *)machine->region("maincpu")->base();
 	RAM[0x00e4] = 0x07;	// rlca
 	RAM[0x00e5] = 0x07;	// rlca
 	RAM[0x00e6] = 0x07;	// rlca

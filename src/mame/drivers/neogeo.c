@@ -713,7 +713,7 @@ static void set_main_cpu_vector_table_source( running_machine *machine, UINT8 da
 static void _set_main_cpu_bank_address( running_machine *machine )
 {
 	neogeo_state *state = machine->driver_data<neogeo_state>();
-	memory_set_bankptr(machine, NEOGEO_BANK_CARTRIDGE, &memory_region(machine, "maincpu")[state->main_cpu_bank_address]);
+	memory_set_bankptr(machine, NEOGEO_BANK_CARTRIDGE, &machine->region("maincpu")->base()[state->main_cpu_bank_address]);
 }
 
 
@@ -732,7 +732,7 @@ void neogeo_set_main_cpu_bank_address( address_space *space, UINT32 bank_address
 static WRITE16_HANDLER( main_cpu_bank_select_w )
 {
 	UINT32 bank_address;
-	UINT32 len = memory_region_length(space->machine, "maincpu");
+	UINT32 len = space->machine->region("maincpu")->bytes();
 
 	if ((len <= 0x100000) && (data & 0x07))
 		logerror("PC %06x: warning: bankswitch to %02x but no banks available\n", cpu_get_pc(space->cpu), data);
@@ -756,11 +756,11 @@ static void main_cpu_banking_init( running_machine *machine )
 	address_space *mainspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* create vector banks */
-	memory_configure_bank(machine, NEOGEO_BANK_VECTORS, 0, 1, memory_region(machine, "mainbios"), 0);
-	memory_configure_bank(machine, NEOGEO_BANK_VECTORS, 1, 1, memory_region(machine, "maincpu"), 0);
+	memory_configure_bank(machine, NEOGEO_BANK_VECTORS, 0, 1, machine->region("mainbios")->base(), 0);
+	memory_configure_bank(machine, NEOGEO_BANK_VECTORS, 1, 1, machine->region("maincpu")->base(), 0);
 
 	/* set initial main CPU bank */
-	if (memory_region_length(machine, "maincpu") > 0x100000)
+	if (machine->region("maincpu")->bytes() > 0x100000)
 		neogeo_set_main_cpu_bank_address(mainspace, 0x100000);
 	else
 		neogeo_set_main_cpu_bank_address(mainspace, 0x000000);
@@ -832,7 +832,7 @@ static void _set_audio_cpu_rom_source( address_space *space )
 {
 	neogeo_state *state = space->machine->driver_data<neogeo_state>();
 
-/*  if (!memory_region(machine, "audiobios"))   */
+/*  if (!machine->region("audiobios")->base())   */
 		state->audio_cpu_rom_source = 1;
 
 	memory_set_bank(space->machine, NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, state->audio_cpu_rom_source);
@@ -867,14 +867,14 @@ static void audio_cpu_banking_init( running_machine *machine )
 	UINT32 address_mask;
 
 	/* audio bios/cartridge selection */
-	if (memory_region(machine, "audiobios"))
-		memory_configure_bank(machine, NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, 0, 1, memory_region(machine, "audiobios"), 0);
-	memory_configure_bank(machine, NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, 1, 1, memory_region(machine, "audiocpu"), 0);
+	if (machine->region("audiobios")->base())
+		memory_configure_bank(machine, NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, 0, 1, machine->region("audiobios")->base(), 0);
+	memory_configure_bank(machine, NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, 1, 1, machine->region("audiocpu")->base(), 0);
 
 	/* audio banking */
-	address_mask = memory_region_length(machine, "audiocpu") - 0x10000 - 1;
+	address_mask = machine->region("audiocpu")->bytes() - 0x10000 - 1;
 
-	rgn = memory_region(machine, "audiocpu");
+	rgn = machine->region("audiocpu")->base();
 	for (region = 0; region < 4; region++)
 	{
 		for (bank = 0; bank < 0x100; bank++)
@@ -1059,7 +1059,7 @@ static MACHINE_START( neogeo )
 	neogeo_state *state = machine->driver_data<neogeo_state>();
 
 	/* set the BIOS bank */
-	memory_set_bankptr(machine, NEOGEO_BANK_BIOS, memory_region(machine, "mainbios"));
+	memory_set_bankptr(machine, NEOGEO_BANK_BIOS, machine->region("mainbios")->base());
 
 	/* set the initial main CPU bank */
 	main_cpu_banking_init(machine);

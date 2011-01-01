@@ -119,7 +119,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	const gfx_element *gfx = machine->gfx[0];
 	UINT32 *source = state->spriteram;
 	UINT32 *finish = state->spriteram + 0x1000 / 4;
-	UINT16 *redirect = (UINT16 *)memory_region(machine, "gfx3");
+	UINT16 *redirect = (UINT16 *)machine->region("gfx3")->base();
 
 	while (source < finish)
 	{
@@ -252,8 +252,8 @@ static READ32_HANDLER( dreamwld_protdata_r )
 {
 	dreamwld_state *state = space->machine->driver_data<dreamwld_state>();
 
-	UINT8 *protdata = memory_region(space->machine, "user1");
-	size_t protsize = memory_region_length(space->machine, "user1");
+	UINT8 *protdata = space->machine->region("user1")->base();
+	size_t protsize = space->machine->region("user1")->bytes();
 	UINT8 dat = protdata[(state->protindex++) % protsize];
 	return dat << 24;
 }
@@ -279,7 +279,7 @@ static void dreamwld_oki_setbank( running_machine *machine, UINT8 chip, UINT8 ba
 {
 	/* 0x30000-0x3ffff is banked.
         banks are at 0x30000,0x40000,0x50000 and 0x60000 in rom */
-	UINT8 *sound = memory_region(machine, chip ? "oki1" : "oki2");
+	UINT8 *sound = machine->region(chip ? "oki1" : "oki2")->base();
 	logerror("OKI%d: set bank %02x\n", chip, bank);
 	memcpy(sound + 0x30000, sound + 0xb0000 + 0x10000 * bank, 0x10000);
 }

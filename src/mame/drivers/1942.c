@@ -506,7 +506,7 @@ ROM_END
 
 static DRIVER_INIT( 1942 )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 3, &ROM[0x10000], 0x4000);
 }
 

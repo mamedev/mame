@@ -924,7 +924,7 @@ ROM_END
 static DRIVER_INIT( gsword )
 {
 #if 0
-	UINT8 *ROM2 = memory_region(machine, "sub");
+	UINT8 *ROM2 = machine->region("sub")->base();
 	ROM2[0x1da] = 0xc3; /* patch for rom self check */
 
 	ROM2[0x71e] = 0;    /* patch for sound protection or time out function */
@@ -939,7 +939,7 @@ static DRIVER_INIT( gsword )
 static DRIVER_INIT( gsword2 )
 {
 #if 0
-	UINT8 *ROM2 = memory_region(machine, "sub");
+	UINT8 *ROM2 = machine->region("sub")->base();
 
 	ROM2[0x1da] = 0xc3; /* patch for rom self check */
 	ROM2[0x726] = 0;    /* patch for sound protection or time out function */

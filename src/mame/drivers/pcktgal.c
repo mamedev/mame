@@ -23,7 +23,7 @@
 
 static WRITE8_HANDLER( pcktgal_bank_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	UINT8 *RAM = space->machine->region("maincpu")->base();
 
 	if (data & 1) { memory_set_bankptr(space->machine, "bank1", &RAM[0x4000]); }
 	else { memory_set_bankptr(space->machine, "bank1", &RAM[0x10000]); }
@@ -409,7 +409,7 @@ static DRIVER_INIT( deco222 )
 	int A;
 	address_space *space = cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x10000);
-	UINT8 *rom = memory_region(machine, "audiocpu");
+	UINT8 *rom = machine->region("audiocpu")->base();
 
 	space->set_decrypted_region(0x8000, 0xffff, decrypted);
 
@@ -417,17 +417,17 @@ static DRIVER_INIT( deco222 )
 	for (A = 0x8000;A < 0x18000;A++)
 		decrypted[A-0x8000] = (rom[A] & 0x9f) | ((rom[A] & 0x20) << 1) | ((rom[A] & 0x40) >> 1);
 
-	memory_configure_bank(machine, "bank3", 0, 2, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank3", 0, 2, machine->region("audiocpu")->base() + 0x10000, 0x4000);
 	memory_configure_bank_decrypted(machine, "bank3", 0, 2, &decrypted[0x8000], 0x4000);
 }
 
 static DRIVER_INIT( graphics )
 {
-	UINT8 *rom = memory_region(machine, "gfx1");
-	int len = memory_region_length(machine, "gfx1");
+	UINT8 *rom = machine->region("gfx1")->base();
+	int len = machine->region("gfx1")->bytes();
 	int i,j,temp[16];
 
-	memory_configure_bank(machine, "bank3", 0, 2, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank3", 0, 2, machine->region("audiocpu")->base() + 0x10000, 0x4000);
 
 	/* Tile graphics roms have some swapped lines, original version only */
 	for (i = 0x00000;i < len;i += 32)

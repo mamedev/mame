@@ -420,7 +420,7 @@ static WRITE32_HANDLER(PS7500_IO_w)
 
 static READ32_HANDLER(io_r)
 {
-	UINT16 *FLASH = (UINT16 *)memory_region(space->machine, "user2"); //16 bit - WORD access
+	UINT16 *FLASH = (UINT16 *)space->machine->region("user2")->base(); //16 bit - WORD access
 
 	int adr=flashAdr*0x200+(flashOffset);
 

@@ -466,7 +466,7 @@ static void draw_sprite(running_machine *machine)
 {
 	UINT32	XDOT;
 	UINT32	YDOT;
-	UINT8 * romCxx  = memory_region(machine, "user2")+0x00000;
+	UINT8 * romCxx  = machine->region("user2")->base()+0x00000;
 	UINT8 * romD10  = romCxx+0x10000;
 	UINT8 * romEF13 = romCxx+0x12000;
 	UINT8 * romHI2  = romCxx+0x14000;
@@ -615,8 +615,8 @@ VIDEO_UPDATE( tubep )
 	pen_t pen_base = 32; //change it later
 
 	UINT32 v;
-	UINT8 *text_gfx_base = memory_region(screen->machine, "gfx1");
-	UINT8 *romBxx = memory_region(screen->machine, "user1") + 0x2000*background_romsel;
+	UINT8 *text_gfx_base = screen->machine->region("gfx1")->base();
+	UINT8 *romBxx = screen->machine->region("user1")->base() + 0x2000*background_romsel;
 
 	/* logerror(" update: from DISP=%i y_min=%3i y_max=%3i\n", DISP_, cliprect->min_y, cliprect->max_y+1); */
 
@@ -768,8 +768,8 @@ VIDEO_UPDATE( rjammer )
 	int DISP_ = DISP^1;
 
 	UINT32 v;
-	UINT8 *text_gfx_base = memory_region(screen->machine, "gfx1");
-	UINT8 *rom13D  = memory_region(screen->machine, "user1");
+	UINT8 *text_gfx_base = screen->machine->region("gfx1")->base();
+	UINT8 *rom13D  = screen->machine->region("user1")->base();
 	UINT8 *rom11BD = rom13D+0x1000;
 	UINT8 *rom19C  = rom13D+0x5000;
 

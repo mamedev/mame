@@ -537,7 +537,7 @@ static DRIVER_INIT( baraduke )
 	int i;
 
 	/* unpack the third tile ROM */
-	rom = memory_region(machine, "gfx2") + 0x8000;
+	rom = machine->region("gfx2")->base() + 0x8000;
 	for (i = 0x2000;i < 0x4000;i++)
 	{
 		rom[i + 0x2000] = rom[i];

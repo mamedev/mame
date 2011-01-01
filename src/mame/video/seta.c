@@ -291,8 +291,8 @@ WRITE16_HANDLER( seta_vregs_w )
 
 				if (new_bank != state->samples_bank)
 				{
-					UINT8 *rom = memory_region(space->machine, "x1snd");
-					int samples_len = memory_region_length(space->machine, "x1snd");
+					UINT8 *rom = space->machine->region("x1snd")->base();
+					int samples_len = space->machine->region("x1snd")->bytes();
 					int addr;
 
 					state->samples_bank = new_bank;

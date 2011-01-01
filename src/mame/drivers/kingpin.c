@@ -178,7 +178,7 @@ static DRIVER_INIT( kingpin )
 	TMS9928A_configure(&tms9928a_interface);
 
 	/* Hacks to keep the emu a'runnin */
-	code_base = memory_region(machine, "maincpu");
+	code_base = machine->region("maincpu")->base();
 	code_base[0x17d4] = 0xc3;	/* Maybe sound related? */
 }
 

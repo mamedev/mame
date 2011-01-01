@@ -732,7 +732,7 @@ static UINT8 *decrypt_code(running_machine *machine)
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x10000);
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	int A;
 
 	space->set_decrypted_region(0x0000, 0xffff, decrypted);
@@ -747,7 +747,7 @@ static UINT8 *decrypt_code(running_machine *machine)
 static DRIVER_INIT( kchampvs )
 {
 	kchamp_state *state = machine->driver_data<kchamp_state>();
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	UINT8 *decrypted = decrypt_code(machine);
 	int A;
 

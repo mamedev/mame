@@ -1318,7 +1318,7 @@ static WRITE16_HANDLER( unknown_rgn2_w )
 static WRITE8_DEVICE_HANDLER( upd7759_control_w )
 {
 	segas1x_state *state = device->machine->driver_data<segas1x_state>();
-	int size = memory_region_length(device->machine, "soundcpu") - 0x10000;
+	int size = device->machine->region("soundcpu")->bytes() - 0x10000;
 	if (size > 0)
 	{
 		int bankoffs = 0;
@@ -1375,7 +1375,7 @@ static WRITE8_DEVICE_HANDLER( upd7759_control_w )
 				bankoffs += (data & 0x07) * 0x04000;
 				break;
 		}
-		memory_set_bankptr(device->machine, "bank1", memory_region(device->machine, "soundcpu") + 0x10000 + (bankoffs % size));
+		memory_set_bankptr(device->machine, "bank1", device->machine->region("soundcpu")->base() + 0x10000 + (bankoffs % size));
 	}
 }
 
@@ -6735,8 +6735,8 @@ static WRITE16_HANDLER( isgsm_cart_addr_low_w )
 // when reading from this port the data is xored by a fixed value depending on the cart
 static READ16_HANDLER( isgsm_cart_data_r )
 {
-	int size = memory_region_length(space->machine,"gamecart_rgn");
-	UINT8* rgn = memory_region(space->machine,"gamecart_rgn");
+	int size = space->machine->region("gamecart_rgn")->bytes();
+	UINT8* rgn = space->machine->region("gamecart_rgn")->base();
 
 	isgsm_cart_addr++;
 
@@ -6760,16 +6760,16 @@ static WRITE16_HANDLER( isgsm_data_w )
 
 	switch (isgsm_type&0x0f)
 	{
-		case 0x0: dest = memory_region(space->machine,"gfx2");
+		case 0x0: dest = space->machine->region("gfx2")->base();
 			break;
 
-		case 0x1: dest = memory_region(space->machine,"gfx1");
+		case 0x1: dest = space->machine->region("gfx1")->base();
 			break;
 
-		case 0x2: dest = memory_region(space->machine,"soundcpu");
+		case 0x2: dest = space->machine->region("soundcpu")->base();
 			break;
 
-		case 0x3: dest = memory_region(space->machine,"maincpu");
+		case 0x3: dest = space->machine->region("maincpu")->base();
 			break;
 
 		default: // no other cases?
@@ -6880,7 +6880,7 @@ static WRITE16_HANDLER( isgsm_data_w )
 
 			dest[isgsm_addr] = byte;
 
-			if (dest == memory_region(space->machine,"gfx1"))
+			if (dest == space->machine->region("gfx1")->base())
 			{
 
 				// we need to re-decode the tiles if writing to this area to keep MAME happy
@@ -6974,14 +6974,14 @@ static WRITE16_HANDLER( isgsm_main_bank_change_w )
 	// other values on real hw have strange results, change memory mapping etc??
 	if (data==1)
 	{
-		memory_set_bankptr(space->machine,ISGSM_MAIN_BANK, memory_region(space->machine, "maincpu"));
+		memory_set_bankptr(space->machine,ISGSM_MAIN_BANK, space->machine->region("maincpu")->base());
 	}
 }
 
 static MACHINE_START( isgsm )
 {
-	memory_set_bankptr(machine,ISGSM_CART_BANK, memory_region(machine, "gamecart_rgn"));
-	memory_set_bankptr(machine,ISGSM_MAIN_BANK, memory_region(machine, "bios"));
+	memory_set_bankptr(machine,ISGSM_CART_BANK, machine->region("gamecart_rgn")->base());
+	memory_set_bankptr(machine,ISGSM_MAIN_BANK, machine->region("bios")->base());
 }
 
 static ADDRESS_MAP_START( isgsm_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -7140,8 +7140,8 @@ static MACHINE_RESET( isgsm )
 	for (int i = 0; i < 16; i++)
 		segaic16_sprites_set_bank(machine, 0, i, i);
 
-	memory_set_bankptr(machine,ISGSM_CART_BANK, memory_region(machine, "gamecart_rgn"));
-	memory_set_bankptr(machine,ISGSM_MAIN_BANK, memory_region(machine, "bios"));
+	memory_set_bankptr(machine,ISGSM_CART_BANK, machine->region("gamecart_rgn")->base());
+	memory_set_bankptr(machine,ISGSM_MAIN_BANK, machine->region("bios")->base());
 	devtag_reset( machine, "maincpu" );
 }
 
@@ -7169,7 +7169,7 @@ DRIVER_INIT( isgsm )
 
 	// decrypt the bios...
 	UINT16* temp = (UINT16*)malloc(0x20000);
-	UINT16* rom = (UINT16*)memory_region(machine, "bios");
+	UINT16* rom = (UINT16*)machine->region("bios")->base();
 	int i;
 
 	for (i=0;i<0x10000;i++)
@@ -7186,7 +7186,7 @@ DRIVER_INIT( shinfz )
 	DRIVER_INIT_CALL( isgsm );
 
 	UINT16* temp = (UINT16*)malloc(0x200000);
-	UINT16* rom = (UINT16*)memory_region(machine, "gamecart_rgn");
+	UINT16* rom = (UINT16*)machine->region("gamecart_rgn")->base();
 	int i;
 
 	for (i=0;i<0x100000;i++)
@@ -7206,7 +7206,7 @@ DRIVER_INIT( tetrbx )
 	DRIVER_INIT_CALL( isgsm );
 
 	UINT16* temp = (UINT16*)malloc(0x80000);
-	UINT16* rom = (UINT16*)memory_region(machine, "gamecart_rgn");
+	UINT16* rom = (UINT16*)machine->region("gamecart_rgn")->base();
 	int i;
 
 	for (i=0;i<0x80000/2;i++)

@@ -540,7 +540,7 @@ static MACHINE_START( warriorb )
 {
 	warriorb_state *state = machine->driver_data<warriorb_state>();
 
-	memory_configure_bank(machine, "bank10", 0, 8, memory_region(machine, "audiocpu") + 0xc000, 0x4000);
+	memory_configure_bank(machine, "bank10", 0, 8, machine->region("audiocpu")->base() + 0xc000, 0x4000);
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");

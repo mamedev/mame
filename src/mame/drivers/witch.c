@@ -355,7 +355,7 @@ static WRITE8_HANDLER(write_a00x)
 
 			if(newbank != bank)
 			{
-				UINT8 *ROM = memory_region(space->machine, "maincpu");
+				UINT8 *ROM = space->machine->region("maincpu")->base();
 				bank = newbank;
 				ROM = &ROM[0x10000+0x8000 * newbank + UNBANKED_SIZE];
 				memory_set_bankptr(space->machine, "bank1",ROM);
@@ -394,7 +394,7 @@ static READ8_HANDLER(prot_read_700x)
 	case 0x25e:
 		return offset;//enough to pass...
   }
-  return memory_region(space->machine, "sub")[0x7000+offset];
+  return space->machine->region("sub")->base()[0x7000+offset];
 }
 
 /*
@@ -840,7 +840,7 @@ ROM_END
 
 static DRIVER_INIT(witch)
 {
-	UINT8 *ROM = (UINT8 *)memory_region(machine, "maincpu");
+	UINT8 *ROM = (UINT8 *)machine->region("maincpu")->base();
 	memory_set_bankptr(machine, "bank1", &ROM[0x10000+UNBANKED_SIZE]);
 
 	memory_install_read8_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0x7000, 0x700f, 0, 0, prot_read_700x);

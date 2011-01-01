@@ -937,8 +937,8 @@ static DRIVER_INIT( namcos11 )
 			if( namcos11_config_table[ n_game ].n_daughterboard != 0 )
 			{
 				int bank;
-				UINT32 len = memory_region_length( machine, "user2" );
-				UINT8 *rgn = memory_region( machine, "user2" );
+				UINT32 len = machine->region( "user2" )->bytes();
+				UINT8 *rgn = machine->region( "user2" )->base();
 
 				memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f000000, 0x1f0fffff, 0, 0, "bank1" );
 				memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f100000, 0x1f1fffff, 0, 0, "bank2" );

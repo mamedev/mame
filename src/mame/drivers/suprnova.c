@@ -457,7 +457,7 @@ static TIMER_DEVICE_CALLBACK( interrupt_callback )
 
 static MACHINE_RESET(skns)
 {
-	memory_set_bankptr(machine, "bank1",memory_region(machine, "user1"));
+	memory_set_bankptr(machine, "bank1",machine->region("user1")->base());
 }
 
 
@@ -747,7 +747,7 @@ static READ32_HANDLER( skns_msm6242_r )
 
 static WRITE32_HANDLER( skns_v3t_w )
 {
-	UINT8 *btiles = memory_region(space->machine, "gfx3");
+	UINT8 *btiles = space->machine->region("gfx3")->base();
 
 	COMBINE_DATA(&skns_v3t_ram[offset]);
 

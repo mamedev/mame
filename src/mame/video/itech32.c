@@ -222,8 +222,8 @@ VIDEO_START( itech32 )
 		videoplane[0][i] = videoplane[1][i] = 0xff;
 
 	/* fetch the GROM base */
-	grom_base = memory_region(machine, "gfx1");
-	grom_size = memory_region_length(machine, "gfx1");
+	grom_base = machine->region("gfx1")->base();
+	grom_size = machine->region("gfx1")->bytes();
 	grom_bank = 0;
 	grom_bank_mask = grom_size >> 24;
 	if (grom_bank_mask == 2)

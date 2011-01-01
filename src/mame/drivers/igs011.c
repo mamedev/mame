@@ -290,10 +290,10 @@ static WRITE16_HANDLER( igs011_blit_flags_w )
 	UINT8 trans_pen, clear_pen, pen_hi, *dest;
 	UINT8 pen = 0;
 
-	UINT8 *gfx		=	memory_region(space->machine, "blitter");
-	UINT8 *gfx2		=	memory_region(space->machine, "blitter_hi");
-	int gfx_size	=	memory_region_length(space->machine, "blitter");
-	int gfx2_size	=	memory_region_length(space->machine, "blitter_hi");
+	UINT8 *gfx		=	space->machine->region("blitter")->base();
+	UINT8 *gfx2		=	space->machine->region("blitter_hi")->base();
+	int gfx_size	=	space->machine->region("blitter")->bytes();
+	int gfx2_size	=	space->machine->region("blitter_hi")->bytes();
 
 	const rectangle &clip = space->machine->primary_screen->visible_area();
 
@@ -437,7 +437,7 @@ IGS_DIPS_R( 5 )
 static void wlcc_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
+	UINT16 *src = (UINT16 *) (machine->region("maincpu")->base());
 
 	int rom_size = 0x80000;
 
@@ -461,7 +461,7 @@ static void wlcc_decrypt(running_machine *machine)
 static void lhb_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
+	UINT16 *src = (UINT16 *) (machine->region("maincpu")->base());
 
 	int rom_size = 0x80000;
 
@@ -486,7 +486,7 @@ static void lhb_decrypt(running_machine *machine)
 static void drgnwrld_type3_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
+	UINT16 *src = (UINT16 *) (machine->region("maincpu")->base());
 
 	int rom_size = 0x80000;
 
@@ -514,7 +514,7 @@ static void drgnwrld_type3_decrypt(running_machine *machine)
 static void drgnwrld_type2_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
+	UINT16 *src = (UINT16 *) (machine->region("maincpu")->base());
 
 	int rom_size = 0x80000;
 
@@ -547,7 +547,7 @@ static void drgnwrld_type2_decrypt(running_machine *machine)
 static void drgnwrld_type1_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
+	UINT16 *src = (UINT16 *) (machine->region("maincpu")->base());
 
 	int rom_size = 0x80000;
 
@@ -577,7 +577,7 @@ static void lhb2_decrypt(running_machine *machine)
 {
 	int i,j;
 	int rom_size = 0x80000;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
+	UINT16 *src = (UINT16 *) (machine->region("maincpu")->base());
 	UINT16 *result_data = auto_alloc_array(machine, UINT16, rom_size/2);
 
 	for (i=0; i<rom_size/2; i++)
@@ -618,7 +618,7 @@ static void nkishusp_decrypt(running_machine *machine)
 
 	int i,j;
 	int rom_size = 0x80000;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
+	UINT16 *src = (UINT16 *) (machine->region("maincpu")->base());
 	UINT16 *result_data = auto_alloc_array(machine, UINT16, rom_size/2);
 
 	for (i=0; i<rom_size/2; i++)
@@ -648,7 +648,7 @@ static void nkishusp_decrypt(running_machine *machine)
 static void vbowlj_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
+	UINT16 *src = (UINT16 *) (machine->region("maincpu")->base());
 
 	int rom_size = 0x80000;
 
@@ -682,7 +682,7 @@ static void vbowlj_decrypt(running_machine *machine)
 static void dbc_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
+	UINT16 *src = (UINT16 *) (machine->region("maincpu")->base());
 
 	int rom_size = 0x80000;
 
@@ -732,7 +732,7 @@ static void dbc_decrypt(running_machine *machine)
 static void ryukobou_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) memory_region(machine, "maincpu");
+	UINT16 *src = (UINT16 *) machine->region("maincpu")->base();
 	int rom_size = 0x80000;
 
 	for (i=0; i<rom_size/2; i++)
@@ -764,7 +764,7 @@ static void lhb2_decrypt_gfx(running_machine *machine)
 {
 	int i;
 	unsigned rom_size = 0x200000;
-	UINT8 *src = (UINT8 *) (memory_region(machine, "blitter"));
+	UINT8 *src = (UINT8 *) (machine->region("blitter")->base());
 	UINT8 *result_data = auto_alloc_array(machine, UINT8, rom_size);
 
 	for (i=0; i<rom_size; i++)
@@ -779,7 +779,7 @@ static void drgnwrld_gfx_decrypt(running_machine *machine)
 {
 	int i;
 	unsigned rom_size = 0x400000;
-	UINT8 *src = (UINT8 *) (memory_region(machine, "blitter"));
+	UINT8 *src = (UINT8 *) (machine->region("blitter")->base());
 	UINT8 *result_data = auto_alloc_array(machine, UINT8, rom_size);
 
 	for (i=0; i<rom_size; i++)
@@ -895,7 +895,7 @@ static WRITE16_HANDLER( igs011_prot_addr_w )
 //  igs011_prot2 = 0x00;
 
 	address_space *sp = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8 *rom = memory_region(space->machine, "maincpu");
+	UINT8 *rom = space->machine->region("maincpu")->base();
 
 	// Plug previous address range with ROM access
 	memory_install_rom(sp, igs011_prot1_addr + 0, igs011_prot1_addr + 9, 0, 0, rom + igs011_prot1_addr);
@@ -1641,7 +1641,7 @@ static READ16_HANDLER( vbowl_igs003_r )
 // V0400O
 static DRIVER_INIT( drgnwrld )
 {
-//  UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
+//  UINT16 *rom = (UINT16 *) machine->region("maincpu")->base();
 
 	drgnwrld_type1_decrypt(machine);
 	drgnwrld_gfx_decrypt(machine);
@@ -1667,7 +1667,7 @@ static DRIVER_INIT( drgnwrld )
 
 static DRIVER_INIT( drgnwrldv30 )
 {
-//  UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
+//  UINT16 *rom = (UINT16 *) machine->region("maincpu")->base();
 
 	drgnwrld_type1_decrypt(machine);
 	drgnwrld_gfx_decrypt(machine);
@@ -1692,7 +1692,7 @@ static DRIVER_INIT( drgnwrldv30 )
 
 static DRIVER_INIT( drgnwrldv21 )
 {
-//  UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
+//  UINT16 *rom = (UINT16 *) machine->region("maincpu")->base();
 
 	drgnwrld_type2_decrypt(machine);
 	drgnwrld_gfx_decrypt(machine);
@@ -1722,7 +1722,7 @@ static DRIVER_INIT( drgnwrldv21 )
 
 static DRIVER_INIT( drgnwrldv21j )
 {
-//  UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
+//  UINT16 *rom = (UINT16 *) machine->region("maincpu")->base();
 
 	drgnwrld_type3_decrypt(machine);
 	drgnwrld_gfx_decrypt(machine);
@@ -1749,7 +1749,7 @@ static DRIVER_INIT( drgnwrldv21j )
 
 static DRIVER_INIT( drgnwrldv20j )
 {
-//  UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
+//  UINT16 *rom = (UINT16 *) machine->region("maincpu")->base();
 
 	drgnwrld_type3_decrypt(machine);
 	drgnwrld_gfx_decrypt(machine);
@@ -1787,7 +1787,7 @@ static DRIVER_INIT( drgnwrldv11h )
 
 static DRIVER_INIT( drgnwrldv10c )
 {
-//  UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
+//  UINT16 *rom = (UINT16 *) machine->region("maincpu")->base();
 
 	drgnwrld_type1_decrypt(machine);
 	drgnwrld_gfx_decrypt(machine);
@@ -1813,7 +1813,7 @@ static DRIVER_INIT( drgnwrldv10c )
 
 static DRIVER_INIT( lhb )
 {
-//  UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
+//  UINT16 *rom = (UINT16 *) machine->region("maincpu")->base();
 
 	lhb_decrypt(machine);
 
@@ -1823,7 +1823,7 @@ static DRIVER_INIT( lhb )
 
 static DRIVER_INIT( lhbv33c )
 {
-//  UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
+//  UINT16 *rom = (UINT16 *) machine->region("maincpu")->base();
 
 	lhb_decrypt(machine);
 
@@ -1833,7 +1833,7 @@ static DRIVER_INIT( lhbv33c )
 
 static DRIVER_INIT( dbc )
 {
-//  UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
+//  UINT16 *rom = (UINT16 *) machine->region("maincpu")->base();
 
 	dbc_decrypt(machine);
 
@@ -1862,7 +1862,7 @@ static DRIVER_INIT( dbc )
 
 static DRIVER_INIT( ryukobou )
 {
-//  UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
+//  UINT16 *rom = (UINT16 *) machine->region("maincpu")->base();
 
 	ryukobou_decrypt(machine);
 
@@ -1875,7 +1875,7 @@ static DRIVER_INIT( ryukobou )
 
 static DRIVER_INIT( xymg )
 {
-//  UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
+//  UINT16 *rom = (UINT16 *) machine->region("maincpu")->base();
 
 	lhb_decrypt(machine);
 /*
@@ -1909,7 +1909,7 @@ static DRIVER_INIT( xymg )
 
 static DRIVER_INIT( wlcc )
 {
-//  UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
+//  UINT16 *rom = (UINT16 *) machine->region("maincpu")->base();
 
 	wlcc_decrypt(machine);
 /*
@@ -1933,7 +1933,7 @@ static DRIVER_INIT( wlcc )
 
 static DRIVER_INIT( lhb2 )
 {
-	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
+	UINT16 *rom = (UINT16 *) machine->region("maincpu")->base();
 
 	lhb2_decrypt(machine);
 	lhb2_decrypt_gfx(machine);
@@ -1955,8 +1955,8 @@ static DRIVER_INIT( lhb2 )
 
 static DRIVER_INIT( vbowl )
 {
-	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
-	UINT8  *gfx = (UINT8 *)  memory_region(machine, "blitter");
+	UINT16 *rom = (UINT16 *) machine->region("maincpu")->base();
+	UINT8  *gfx = (UINT8 *)  machine->region("blitter")->base();
 	int i;
 
 	vbowlj_decrypt(machine);
@@ -1980,8 +1980,8 @@ static DRIVER_INIT( vbowl )
 
 static DRIVER_INIT( vbowlj )
 {
-	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
-	UINT8  *gfx = (UINT8 *)  memory_region(machine, "blitter");
+	UINT16 *rom = (UINT16 *) machine->region("maincpu")->base();
+	UINT8  *gfx = (UINT8 *)  machine->region("blitter")->base();
 	int i;
 
 	vbowlj_decrypt(machine);

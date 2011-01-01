@@ -1048,7 +1048,7 @@ static WRITE8_HANDLER( hotdogst_rombank_w )
 
 static WRITE8_HANDLER( hotdogst_okibank_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "oki");
+	UINT8 *RAM = space->machine->region("oki")->base();
 	int bank1 = (data >> 0) & 0x3;
 	int bank2 = (data >> 4) & 0x3;
 	memcpy(RAM + 0x20000 * 0, RAM + 0x40000 + 0x20000 * bank1, 0x20000);
@@ -1117,7 +1117,7 @@ static WRITE8_HANDLER( metmqstr_rombank_w )
 
 static WRITE8_HANDLER( metmqstr_okibank0_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "oki1");
+	UINT8 *ROM = space->machine->region("oki1")->base();
 	int bank1 = (data >> 0) & 0x7;
 	int bank2 = (data >> 4) & 0x7;
 	memcpy(ROM + 0x20000 * 0, ROM + 0x40000 + 0x20000 * bank1, 0x20000);
@@ -1126,7 +1126,7 @@ static WRITE8_HANDLER( metmqstr_okibank0_w )
 
 static WRITE8_HANDLER( metmqstr_okibank1_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "oki2");
+	UINT8 *ROM = space->machine->region("oki2")->base();
 	int bank1 = (data >> 0) & 0x7;
 	int bank2 = (data >> 4) & 0x7;
 	memcpy(ROM + 0x20000 * 0, ROM + 0x40000 + 0x20000 * bank1, 0x20000);
@@ -1211,7 +1211,7 @@ static WRITE8_HANDLER( sailormn_rombank_w )
 
 static WRITE8_HANDLER( sailormn_okibank0_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "oki1");
+	UINT8 *RAM = space->machine->region("oki1")->base();
 	int bank1 = (data >> 0) & 0xf;
 	int bank2 = (data >> 4) & 0xf;
 	memcpy(RAM + 0x20000 * 0, RAM + 0x40000 + 0x20000 * bank1, 0x20000);
@@ -1220,7 +1220,7 @@ static WRITE8_HANDLER( sailormn_okibank0_w )
 
 static WRITE8_HANDLER( sailormn_okibank1_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "oki2");
+	UINT8 *RAM = space->machine->region("oki2")->base();
 	int bank1 = (data >> 0) & 0xf;
 	int bank2 = (data >> 4) & 0xf;
 	memcpy(RAM + 0x20000 * 0, RAM + 0x40000 + 0x20000 * bank1, 0x20000);
@@ -2568,8 +2568,8 @@ MACHINE_CONFIG_END
 /* 4 bits -> 8 bits. Even and odd pixels are swapped */
 static void unpack_sprites(running_machine *machine)
 {
-	const UINT32 len	=	memory_region_length(machine, "sprites");
-	UINT8 *rgn			=	memory_region       (machine, "sprites");
+	const UINT32 len	=	machine->region("sprites")->bytes();
+	UINT8 *rgn			=	machine->region       ("sprites")->base();
 	UINT8 *src			=	rgn + len / 2 - 1;
 	UINT8 *dst			=	rgn + len - 1;
 
@@ -2585,8 +2585,8 @@ static void unpack_sprites(running_machine *machine)
 /* 4 bits -> 8 bits. Even and odd pixels and even and odd words, are swapped */
 static void ddonpach_unpack_sprites(running_machine *machine)
 {
-	const UINT32 len	=	memory_region_length(machine, "sprites");
-	UINT8 *rgn			=	memory_region       (machine, "sprites");
+	const UINT32 len	=	machine->region("sprites")->bytes();
+	UINT8 *rgn			=	machine->region       ("sprites")->base();
 	UINT8 *src			=	rgn + len / 2 - 1;
 	UINT8 *dst			=	rgn + len - 1;
 
@@ -2609,8 +2609,8 @@ static void ddonpach_unpack_sprites(running_machine *machine)
 /* 2 pages of 4 bits -> 8 bits */
 static void esprade_unpack_sprites(running_machine *machine)
 {
-	UINT8 *src		=	memory_region(machine, "sprites");
-	UINT8 *dst		=	src + memory_region_length(machine, "sprites");
+	UINT8 *src		=	machine->region("sprites")->base();
+	UINT8 *dst		=	src + machine->region("sprites")->bytes();
 
 	while(src < dst)
 	{
@@ -4330,8 +4330,8 @@ ROM_END
    Expand the 2 bit part into a 4 bit layout, so we can decode it */
 static void sailormn_unpack_tiles( running_machine *machine, const char *region )
 {
-	const UINT32 len	=	memory_region_length(machine, region);
-	UINT8 *rgn		=	memory_region(machine, region);
+	const UINT32 len	=	machine->region(region)->bytes();
+	UINT8 *rgn		=	machine->region(region)->base();
 	UINT8 *src		=	rgn + (len/4)*3 - 1;
 	UINT8 *dst		=	rgn + (len/4)*4 - 2;
 
@@ -4361,7 +4361,7 @@ static void init_cave(running_machine *machine)
 
 static DRIVER_INIT( agallet )
 {
-	UINT8 *ROM = memory_region(machine, "audiocpu");
+	UINT8 *ROM = machine->region("audiocpu")->base();
 	init_cave(machine);
 
 	memory_configure_bank(machine, "bank1", 0, 0x02, &ROM[0x00000], 0x4000);
@@ -4421,7 +4421,7 @@ static DRIVER_INIT( esprade )
 
 #if 0		//ROM PATCH
 	{
-		UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
+		UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
 		rom[0x118A/2] = 0x4e71;			//palette fix   118A: 5548              SUBQ.W  #2,A0       --> NOP
 	}
 #endif
@@ -4451,7 +4451,7 @@ static DRIVER_INIT( guwange )
 static DRIVER_INIT( hotdogst )
 {
 	cave_state *state = machine->driver_data<cave_state>();
-	UINT8 *ROM = memory_region(machine, "audiocpu");
+	UINT8 *ROM = machine->region("audiocpu")->base();
 
 	init_cave(machine);
 
@@ -4466,10 +4466,10 @@ static DRIVER_INIT( hotdogst )
 static DRIVER_INIT( mazinger )
 {
 	cave_state *state = machine->driver_data<cave_state>();
-	UINT8 *ROM = memory_region(machine, "audiocpu");
+	UINT8 *ROM = machine->region("audiocpu")->base();
 	UINT8 *buffer;
-	UINT8 *src = memory_region(machine, "sprites");
-	int len = memory_region_length(machine, "sprites");
+	UINT8 *src = machine->region("sprites")->base();
+	int len = machine->region("sprites")->bytes();
 
 	init_cave(machine);
 
@@ -4492,14 +4492,14 @@ static DRIVER_INIT( mazinger )
 	state->time_vblank_irq = 2100;
 
 	/* setup extra ROM */
-	memory_set_bankptr(machine, "bank1",memory_region(machine, "user1"));
+	memory_set_bankptr(machine, "bank1",machine->region("user1")->base());
 }
 
 
 static DRIVER_INIT( metmqstr )
 {
 	cave_state *state = machine->driver_data<cave_state>();
-	UINT8 *ROM = memory_region(machine, "audiocpu");
+	UINT8 *ROM = machine->region("audiocpu")->base();
 
 	init_cave(machine);
 
@@ -4516,10 +4516,10 @@ static DRIVER_INIT( metmqstr )
 static DRIVER_INIT( pwrinst2j )
 {
 	cave_state *state = machine->driver_data<cave_state>();
-	UINT8 *ROM = memory_region(machine, "audiocpu");
+	UINT8 *ROM = machine->region("audiocpu")->base();
 	UINT8 *buffer;
-	UINT8 *src = memory_region(machine, "sprites");
-	int len = memory_region_length(machine, "sprites");
+	UINT8 *src = machine->region("sprites")->base();
+	int len = machine->region("sprites")->bytes();
 	int i, j;
 
 	init_cave(machine);
@@ -4555,7 +4555,7 @@ static DRIVER_INIT( pwrinst2 )
 
 #if 1		//ROM PATCH
 	{
-		UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
+		UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
 		rom[0xd46c / 2] = 0xd482;			// kurara dash fix  0xd400 -> 0xd482
 	}
 #endif
@@ -4565,10 +4565,10 @@ static DRIVER_INIT( pwrinst2 )
 static DRIVER_INIT( sailormn )
 {
 	cave_state *state = machine->driver_data<cave_state>();
-	UINT8 *ROM = memory_region(machine, "audiocpu");
+	UINT8 *ROM = machine->region("audiocpu")->base();
 	UINT8 *buffer;
-	UINT8 *src = memory_region(machine, "sprites");
-	int len = memory_region_length(machine, "sprites");
+	UINT8 *src = machine->region("sprites")->base();
+	int len = machine->region("sprites")->bytes();
 
 	init_cave(machine);
 

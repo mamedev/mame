@@ -322,7 +322,7 @@ static WRITE8_HANDLER( thunderx_1f98_w )
 static WRITE8_HANDLER( scontra_bankswitch_w )
 {
 	thunderx_state *state = space->machine->driver_data<thunderx_state>();
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	UINT8 *RAM = space->machine->region("maincpu")->base();
 	int offs;
 
 //logerror("%04x: bank switch %02x\n",cpu_get_pc(space->cpu),data);
@@ -648,7 +648,7 @@ static MACHINE_START( scontra )
 static MACHINE_START( thunderx )
 {
 	thunderx_state *state = machine->driver_data<thunderx_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 12, &ROM[0x10000], 0x2000);
 	memory_configure_bank(machine, "bank1", 12, 4, &ROM[0x08000], 0x2000);

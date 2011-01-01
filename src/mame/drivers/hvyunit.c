@@ -195,7 +195,7 @@ static WRITE8_HANDLER( trigger_nmi_on_slave_cpu )
 
 static WRITE8_HANDLER( master_bankswitch_w )
 {
-	unsigned char *ROM = memory_region(space->machine, "master");
+	unsigned char *ROM = space->machine->region("master")->base();
 	int bank = data & 7;
 	ROM = &ROM[0x4000 * bank];
 	memory_set_bankptr(space->machine, "bank1", ROM);
@@ -261,7 +261,7 @@ static WRITE8_HANDLER( slave_bankswitch_w )
 {
 	hvyunit_state *state = space->machine->driver_data<hvyunit_state>();
 
-	unsigned char *ROM = memory_region(space->machine, "slave");
+	unsigned char *ROM = space->machine->region("slave")->base();
 	int bank = (data & 0x03);
 	state->port0_data = data;
 	ROM = &ROM[0x4000 * bank];
@@ -296,7 +296,7 @@ static WRITE8_HANDLER( coin_count_w )
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	unsigned char *ROM = memory_region(space->machine, "soundcpu");
+	unsigned char *ROM = space->machine->region("soundcpu")->base();
 	int bank = data & 0x3;
 	ROM = &ROM[0x4000 * bank];
 

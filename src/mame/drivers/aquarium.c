@@ -62,7 +62,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #if AQUARIUS_HACK
 static MACHINE_RESET( aquarium_hack )
 {
-	UINT16 *RAM = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *RAM = (UINT16 *)machine->region("maincpu")->base();
 	int data = input_port_read(machine, "FAKE");
 
 	/* Language : 0x0000 = Japanese - Other value = English */
@@ -279,13 +279,13 @@ static const gfx_layout tilelayout =
 
 static DRIVER_INIT( aquarium )
 {
-	UINT8 *Z80 = memory_region(machine, "audiocpu");
+	UINT8 *Z80 = machine->region("audiocpu")->base();
 
 	/* The BG tiles are 5bpp, this rearranges the data from
        the roms containing the 1bpp data so we can decode it
        correctly */
-	UINT8 *DAT2 = memory_region(machine, "gfx1") + 0x080000;
-	UINT8 *DAT = memory_region(machine, "user1");
+	UINT8 *DAT2 = machine->region("gfx1")->base() + 0x080000;
+	UINT8 *DAT = machine->region("user1")->base();
 	int len = 0x0200000;
 
 	for (len = 0; len < 0x020000; len++)
@@ -300,8 +300,8 @@ static DRIVER_INIT( aquarium )
 		DAT2[len * 4 + 2] |= (DAT[len] & 0x01) << 3;
 	}
 
-	DAT2 = memory_region(machine, "gfx4") + 0x080000;
-	DAT = memory_region(machine, "user2");
+	DAT2 = machine->region("gfx4")->base() + 0x080000;
+	DAT = machine->region("user2")->base();
 
 	for (len = 0; len < 0x020000; len++)
 	{

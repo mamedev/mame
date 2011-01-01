@@ -63,7 +63,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 	UINT16 *destline;
 	UINT8 *priline;
-	UINT8 *sprdata = memory_region(machine, "gfx1");
+	UINT8 *sprdata = machine->region("gfx1")->base();
 
 	int xstart, xend, xinc;
 	int ystart, yend, yinc;

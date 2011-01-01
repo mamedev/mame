@@ -56,7 +56,7 @@ static int rombank;
 
 static MACHINE_RESET( thedeep )
 {
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x10000 + 0 * 0x4000);
+	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000 + 0 * 0x4000);
 	thedeep_scroll[0] = 0;
 	thedeep_scroll[1] = 0;
 	thedeep_scroll[2] = 0;
@@ -89,7 +89,7 @@ static WRITE8_HANDLER( thedeep_protection_w )
 			int new_rombank = protection_command & 3;
 			if (rombank == new_rombank)	break;
 			rombank = new_rombank;
-			rom = memory_region(space->machine, "maincpu");
+			rom = space->machine->region("maincpu")->base();
 			memory_set_bankptr(space->machine, "bank1", rom + 0x10000 + rombank * 0x4000);
 			/* there's code which falls through from the fixed ROM to bank #1, I have to */
 			/* copy it there otherwise the CPU bank switching support will not catch it. */
@@ -119,7 +119,7 @@ static WRITE8_HANDLER( thedeep_protection_w )
 // d166-d174:   hl = (hl + 2*a)
 // d175-d181:   hl *= e (e must be non zero)
 // d182-d19a:   hl /= de
-				protection_data = memory_region(space->machine, "cpu3")[0x185+protection_index++];
+				protection_data = space->machine->region("cpu3")->base()[0x185+protection_index++];
 			else
 				protection_data = 0xc9;
 

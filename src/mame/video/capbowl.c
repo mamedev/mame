@@ -119,7 +119,7 @@ WRITE8_HANDLER( bowlrama_blitter_w )
 READ8_HANDLER( bowlrama_blitter_r )
 {
 	capbowl_state *state = space->machine->driver_data<capbowl_state>();
-	UINT8 data = memory_region(space->machine, "gfx1")[state->blitter_addr];
+	UINT8 data = space->machine->region("gfx1")->base()[state->blitter_addr];
 	UINT8 result = 0;
 
 	switch (offset)

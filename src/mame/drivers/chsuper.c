@@ -24,7 +24,7 @@ static VIDEO_START(chsuper)
 static VIDEO_UPDATE(chsuper)
 {
 	const gfx_element *gfx = screen->machine->gfx[0];
-	UINT8 *vram = memory_region(screen->machine, "vram");
+	UINT8 *vram = screen->machine->region("vram")->base();
 	int count = 0x0000;
 	int y,x;
 
@@ -86,7 +86,7 @@ static READ8_HANDLER( ff_r )
 
 static WRITE8_HANDLER( chsuper_vram_w )
 {
-	UINT8 *vram = memory_region(space->machine, "vram");
+	UINT8 *vram = space->machine->region("vram")->base();
 
 	vram[offset] = data;
 }
@@ -270,7 +270,7 @@ ROM_END
 static DRIVER_INIT( chsuper2 )
 {
 	UINT8 *buffer;
-	UINT8 *rom = memory_region(machine,"gfx1");
+	UINT8 *rom = machine->region("gfx1")->base();
 	int i;
 
 	chsuper_tilexor = 0x7f00;
@@ -294,7 +294,7 @@ static DRIVER_INIT( chsuper2 )
 static DRIVER_INIT( chsuper3 )
 {
 	UINT8 *buffer;
-	UINT8 *rom = memory_region(machine,"gfx1");
+	UINT8 *rom = machine->region("gfx1")->base();
 	int i;
 
 	chsuper_tilexor = 0x0e00;
@@ -318,7 +318,7 @@ static DRIVER_INIT( chsuper3 )
 static DRIVER_INIT( chmpnum )
 {
 	UINT8 *buffer;
-	UINT8 *rom = memory_region(machine,"gfx1");
+	UINT8 *rom = machine->region("gfx1")->base();
 	int i;
 
 	chsuper_tilexor = 0x1800;

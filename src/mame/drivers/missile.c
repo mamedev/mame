@@ -505,7 +505,7 @@ DIRECT_UPDATE_HANDLER( missile_direct_handler )
 static MACHINE_START( missile )
 {
 	/* initialize globals */
-	writeprom = memory_region(machine, "proms");
+	writeprom = machine->region("proms")->base();
 	flipscreen = 0;
 
 	/* set up an opcode base handler since we use mapped handlers for RAM */
@@ -777,7 +777,7 @@ static READ8_HANDLER( missile_r )
 
 	/* ROM */
 	else if (offset >= 0x5000)
-		result = memory_region(space->machine, "maincpu")[offset];
+		result = space->machine->region("maincpu")->base()[offset];
 
 	/* POKEY */
 	else if (offset < 0x4800)
@@ -1162,7 +1162,7 @@ ROM_END
 static DRIVER_INIT( suprmatk )
 {
 	int i;
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 	for (i = 0; i < 0x40; i++)
 	{

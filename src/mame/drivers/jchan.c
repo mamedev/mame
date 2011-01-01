@@ -383,8 +383,8 @@ static VIDEO_UPDATE(jchan)
 	bitmap_fill(sprite_bitmap_1, cliprect, 0x0000);
 	bitmap_fill(sprite_bitmap_2, cliprect, 0x0000);
 
-	skns_draw_sprites(screen->machine, sprite_bitmap_1, cliprect, jchan_sprite_ram32_1, 0x4000, memory_region(screen->machine,"gfx1"), memory_region_length (screen->machine, "gfx1"), jchan_sprite_regs32_1 );
-	skns_draw_sprites(screen->machine, sprite_bitmap_2, cliprect, jchan_sprite_ram32_2, 0x4000, memory_region(screen->machine,"gfx2"), memory_region_length (screen->machine, "gfx2"), jchan_sprite_regs32_2 );
+	skns_draw_sprites(screen->machine, sprite_bitmap_1, cliprect, jchan_sprite_ram32_1, 0x4000, screen->machine->region("gfx1")->base(), screen->machine->region ("gfx1")->bytes(), jchan_sprite_regs32_1 );
+	skns_draw_sprites(screen->machine, sprite_bitmap_2, cliprect, jchan_sprite_ram32_2, 0x4000, screen->machine->region("gfx2")->base(), screen->machine->region ("gfx2")->bytes(), jchan_sprite_regs32_2 );
 
 	// ignoring priority bits for now - might use alpha too, check 0x8000 of palette writes
 	for (y=0;y<240;y++)

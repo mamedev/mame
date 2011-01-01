@@ -201,7 +201,7 @@ static READ8_HANDLER( progolf_videoram_r )
 {
 	progolf_state *state = space->machine->driver_data<progolf_state>();
 	UINT8 *videoram = state->videoram;
-	UINT8 *gfx_rom = memory_region(space->machine, "gfx1");
+	UINT8 *gfx_rom = space->machine->region("gfx1")->base();
 
 	if (offset >= 0x0800)
 	{
@@ -530,7 +530,7 @@ static DRIVER_INIT( progolf )
 {
 	int A;
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	UINT8* decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 
 	space->set_decrypted_region(0x0000,0xffff, decrypted);
@@ -544,7 +544,7 @@ static DRIVER_INIT( progolfa )
 {
 	int A;
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	UINT8* decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 
 	space->set_decrypted_region(0x0000,0xffff, decrypted);

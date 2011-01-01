@@ -552,7 +552,7 @@ static DEVICE_START( common_sh_start )
 	/* if we have a 2151, install an externally driven DAC stream */
 	if (state->has_ym2151)
 	{
-		state->ext_base = memory_region(machine, "dac");
+		state->ext_base = machine->region("dac")->base();
 		state->extern_stream = stream_create(device, 0, 1, OUTPUT_RATE, NULL, leland_80186_extern_update);
 	}
 

@@ -1136,7 +1136,7 @@ static void lucky74_adpcm_int(device_t *device)
 		if (lucky74_adpcm_data == -1)
 		{
 			/* transferring 1st nibble */
-			lucky74_adpcm_data = memory_region(device->machine, "adpcm")[lucky74_adpcm_pos];
+			lucky74_adpcm_data = device->machine->region("adpcm")->base()[lucky74_adpcm_pos];
 			lucky74_adpcm_pos = (lucky74_adpcm_pos + 1) & 0xffff;
 			msm5205_data_w(device, lucky74_adpcm_data >> 4);
 

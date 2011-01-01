@@ -65,7 +65,7 @@ public:
 static TILE_GET_INFO( get_sb_tile_info )
 {
 	sbowling_state *state = machine->driver_data<sbowling_state>();
-	UINT8 *rom = memory_region(machine, "user1");
+	UINT8 *rom = machine->region("user1")->base();
 	int tileno = rom[tile_index + state->bgmap * 1024];
 
 	SET_TILE_INFO(0, tileno, 0, 0);

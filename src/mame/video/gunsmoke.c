@@ -108,7 +108,7 @@ WRITE8_HANDLER( gunsmoke_d806_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT8 *tilerom = memory_region(machine, "gfx4");
+	UINT8 *tilerom = machine->region("gfx4")->base();
 
 	int offs = tile_index * 2;
 	int attr = tilerom[offs + 1];

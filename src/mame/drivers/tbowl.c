@@ -37,7 +37,7 @@ note: check this, its borrowed from tecmo.c / wc90.c at the moment and could wel
 static WRITE8_HANDLER( tbowlb_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	UINT8 *RAM = space->machine->region("maincpu")->base();
 
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
@@ -47,7 +47,7 @@ static WRITE8_HANDLER( tbowlb_bankswitch_w )
 static WRITE8_HANDLER( tbowlc_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "sub");
+	UINT8 *RAM = space->machine->region("sub")->base();
 
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
@@ -168,7 +168,7 @@ static void tbowl_adpcm_int(device_t *device)
 {
 	int num = (strcmp(device->tag(), "msm1") == 0) ? 0 : 1;
 	if (adpcm_pos[num] >= adpcm_end[num] ||
-				adpcm_pos[num] >= memory_region_length(device->machine, "adpcm")/2)
+				adpcm_pos[num] >= device->machine->region("adpcm")->bytes()/2)
 		msm5205_reset_w(device,1);
 	else if (adpcm_data[num] != -1)
 	{
@@ -177,7 +177,7 @@ static void tbowl_adpcm_int(device_t *device)
 	}
 	else
 	{
-		UINT8 *ROM = memory_region(device->machine, "adpcm") + 0x10000 * num;
+		UINT8 *ROM = device->machine->region("adpcm")->base() + 0x10000 * num;
 
 		adpcm_data[num] = ROM[adpcm_pos[num]++];
 		msm5205_data_w(device,adpcm_data[num] >> 4);

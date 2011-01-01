@@ -430,14 +430,14 @@ static WRITE8_HANDLER( profpac_banksw_w )
 
 	/* set the main banking */
 	memory_install_read_bank(space, 0x4000, 0xbfff, 0, 0, "bank1");
-	memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "user1") + 0x8000 * bank);
+	memory_set_bankptr(space->machine, "bank1", space->machine->region("user1")->base() + 0x8000 * bank);
 
 	/* bank 0 reads video RAM in the 4000-7FFF range */
 	if (bank == 0)
 		memory_install_read8_handler(space, 0x4000, 0x7fff, 0, 0, profpac_videoram_r);
 
 	/* if we have a 640k EPROM board, map that on top of the 4000-7FFF range if specified */
-	if ((data & 0x80) && memory_region(space->machine, "user2") != NULL)
+	if ((data & 0x80) && space->machine->region("user2")->base() != NULL)
 	{
 		/* Note: There is a jumper which could change the base offset to 0xa8 instead */
 		bank = data - 0x80;
@@ -446,7 +446,7 @@ static WRITE8_HANDLER( profpac_banksw_w )
 		if (bank < 0x28)
 		{
 			memory_install_read_bank(space, 0x4000, 0x7fff, 0, 0, "bank2");
-			memory_set_bankptr(space->machine, "bank2", memory_region(space->machine, "user2") + 0x4000 * bank);
+			memory_set_bankptr(space->machine, "bank2", space->machine->region("user2")->base() + 0x4000 * bank);
 		}
 		else
 			memory_unmap_read(space, 0x4000, 0x7fff, 0, 0);

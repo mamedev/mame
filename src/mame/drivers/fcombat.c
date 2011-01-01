@@ -108,7 +108,7 @@ static READ8_HANDLER(e300_r)
 	int wx = (state->tx + state->fcombat_sh) / 16;
 	int wy = (state->ty * 2 + state->fcombat_sv) / 16;
 
-	return memory_region(space->machine, "user2")[wx * 32 * 16 + wy];
+	return space->machine->region("user2")->base()[wx * 32 * 16 + wy];
 }
 
 static WRITE8_HANDLER(ee00_w)
@@ -348,8 +348,8 @@ static DRIVER_INIT( fcombat )
 
 	/* make a temporary copy of the character data */
 	src = temp;
-	dst = memory_region(machine, "gfx1");
-	length = memory_region_length(machine, "gfx1");
+	dst = machine->region("gfx1")->base();
+	length = machine->region("gfx1")->bytes();
 	memcpy(src, dst, length);
 
 	/* decode the characters */
@@ -366,8 +366,8 @@ static DRIVER_INIT( fcombat )
 
 	/* make a temporary copy of the sprite data */
 	src = temp;
-	dst = memory_region(machine, "gfx2");
-	length = memory_region_length(machine, "gfx2");
+	dst = machine->region("gfx2")->base();
+	length = machine->region("gfx2")->bytes();
 	memcpy(src, dst, length);
 
 	/* decode the sprites */
@@ -387,8 +387,8 @@ static DRIVER_INIT( fcombat )
 
 	/* make a temporary copy of the character data */
 	src = temp;
-	dst = memory_region(machine, "gfx3");
-	length = memory_region_length(machine, "gfx3");
+	dst = machine->region("gfx3")->base();
+	length = machine->region("gfx3")->bytes();
 	memcpy(src, dst, length);
 
 	/* decode the characters */
@@ -406,8 +406,8 @@ static DRIVER_INIT( fcombat )
 	}
 
 	src = temp;
-	dst = memory_region(machine, "user1");
-	length = memory_region_length(machine, "user1");
+	dst = machine->region("user1")->base();
+	length = machine->region("user1")->bytes();
 	memcpy(src, dst, length);
 
 	for (oldaddr = 0; oldaddr < 32; oldaddr++)
@@ -418,8 +418,8 @@ static DRIVER_INIT( fcombat )
 
 
 	src = temp;
-	dst = memory_region(machine, "user2");
-	length = memory_region_length(machine, "user2");
+	dst = machine->region("user2")->base();
+	length = machine->region("user2")->bytes();
 	memcpy(src, dst, length);
 
 	for (oldaddr = 0; oldaddr < 32; oldaddr++)

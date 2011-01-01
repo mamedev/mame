@@ -182,7 +182,7 @@ static MC6845_UPDATE_ROW( update_row )
 	UINT32 tile_address;
 	UINT16 cell,palette;
 	UINT8 b0,b1;
-	const UINT8 *gfx = memory_region(device->machine, "gfx1");
+	const UINT8 *gfx = device->machine->region("gfx1")->base();
 
 	for(cx=0;cx<x_count;++cx)
 	{

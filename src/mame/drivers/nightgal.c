@@ -92,7 +92,7 @@ static VIDEO_UPDATE( nightgal )
 
 static UINT8 nightgal_gfx_nibble( running_machine *machine, int niboffset )
 {
-	UINT8 *blit_rom = memory_region(machine,"gfx1");
+	UINT8 *blit_rom = machine->region("gfx1")->base();
 
 	if (niboffset & 1)
 	{
@@ -1224,7 +1224,7 @@ ROM_END
 
 static DRIVER_INIT( royalqn )
 {
-	UINT8 *ROM = memory_region(machine, "sub");
+	UINT8 *ROM = machine->region("sub")->base();
 
 	/* patch open bus / protection */
 	ROM[0xc27e] = 0x02;
@@ -1233,7 +1233,7 @@ static DRIVER_INIT( royalqn )
 
 static DRIVER_INIT( ngalsumr )
 {
-	UINT8 *ROM = memory_region(machine, "sub");
+	UINT8 *ROM = machine->region("sub")->base();
 
 	/* patch protection */
 	ROM[0xd6ce] = 0x02;

@@ -453,9 +453,9 @@ ROM_END
 
 static DRIVER_INIT(chanbara )
 {
-	UINT8	*src = memory_region(machine, "gfx4");
-	UINT8	*dst = memory_region(machine, "gfx3") + 0x4000;
-	UINT8	*bg = memory_region(machine, "user1");
+	UINT8	*src = machine->region("gfx4")->base();
+	UINT8	*dst = machine->region("gfx3")->base() + 0x4000;
+	UINT8	*bg = machine->region("user1")->base();
 
 	int i;
 	for (i = 0; i < 0x1000; i++)

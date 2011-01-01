@@ -332,8 +332,8 @@ static DRIVER_INIT( carpolo )
 
 
 	/* invert gfx PROM since the bits are active LO */
-	ROM = memory_region(machine, "gfx2");
-	len = memory_region_length(machine, "gfx2");
+	ROM = machine->region("gfx2")->base();
+	len = machine->region("gfx2")->bytes();
 	for (i = 0;i < len; i++)
 		ROM[i] ^= 0x0f;
 }

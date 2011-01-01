@@ -432,7 +432,7 @@ UINT8 *device_image_interface::get_software_region(const char *tag)
 		return NULL;
 
 	sprintf( full_tag, "%s:%s", device().tag(), tag );
-	return memory_region( device().machine, full_tag );
+	return device().machine->region( full_tag )->base();
 }
 
 
@@ -445,7 +445,7 @@ UINT32 device_image_interface::get_software_region_length(const char *tag)
     char full_tag[256];
 
     sprintf( full_tag, "%s:%s", device().tag(), tag );
-    return memory_region_length( device().machine, full_tag );
+    return device().machine->region( full_tag )->bytes();
 }
 
 

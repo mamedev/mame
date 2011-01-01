@@ -161,7 +161,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( port_fetch_r )
 {
-	return memory_region(space->machine, "user1")[offset];
+	return space->machine->region("user1")->base()[offset];
 }
 
 static ADDRESS_MAP_START( lkage_io_map, ADDRESS_SPACE_IO, 8 )

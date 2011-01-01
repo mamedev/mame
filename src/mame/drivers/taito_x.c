@@ -399,7 +399,7 @@ static void reset_sound_region(running_machine *machine)
 {
 	seta_state *state = machine->driver_data<seta_state>();
 
-	memory_set_bankptr(machine,  "bank2", memory_region(machine, "audiocpu") + (state->taitox_banknum * 0x4000) + 0x10000 );
+	memory_set_bankptr(machine,  "bank2", machine->region("audiocpu")->base() + (state->taitox_banknum * 0x4000) + 0x10000 );
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )

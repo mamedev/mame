@@ -1275,9 +1275,9 @@ ROM_END
 
 static DRIVER_INIT( apache3 )
 {
-	UINT8 *dst = memory_region(machine, "gfx1");
-	UINT8 *src1 = memory_region(machine, "gfx2");
-	UINT8 *src2 = memory_region(machine, "gfx3");
+	UINT8 *dst = machine->region("gfx1")->base();
+	UINT8 *src1 = machine->region("gfx2")->base();
+	UINT8 *src2 = machine->region("gfx3")->base();
 	int i;
 
 	for (i=0; i<0x100000; i+=32) {
@@ -1290,10 +1290,10 @@ static DRIVER_INIT( apache3 )
 	}
 
 	// Copy sprite & palette data out of GFX rom area
-	tatsumi_rom_sprite_lookup1 = memory_region(machine, "gfx2");
-	tatsumi_rom_sprite_lookup2 = memory_region(machine, "gfx3");
-	tatsumi_rom_clut0 = memory_region(machine, "gfx2")+ 0x100000 - 0x800;
-	tatsumi_rom_clut1 = memory_region(machine, "gfx3")+ 0x100000 - 0x800;
+	tatsumi_rom_sprite_lookup1 = machine->region("gfx2")->base();
+	tatsumi_rom_sprite_lookup2 = machine->region("gfx3")->base();
+	tatsumi_rom_clut0 = machine->region("gfx2")->base()+ 0x100000 - 0x800;
+	tatsumi_rom_clut1 = machine->region("gfx3")->base()+ 0x100000 - 0x800;
 
 	tatsumi_reset(machine);
 
@@ -1302,9 +1302,9 @@ static DRIVER_INIT( apache3 )
 
 static DRIVER_INIT( roundup5 )
 {
-	UINT8 *dst = memory_region(machine, "gfx1");
-	UINT8 *src1 = memory_region(machine, "gfx2");
-	UINT8 *src2 = memory_region(machine, "gfx3");
+	UINT8 *dst = machine->region("gfx1")->base();
+	UINT8 *src1 = machine->region("gfx2")->base();
+	UINT8 *src2 = machine->region("gfx3")->base();
 	int i;
 
 	for (i=0; i<0xc0000; i+=32) {
@@ -1317,21 +1317,21 @@ static DRIVER_INIT( roundup5 )
 	}
 
 	// Copy sprite & palette data out of GFX rom area
-	tatsumi_rom_sprite_lookup1 = memory_region(machine, "gfx2");
-	tatsumi_rom_sprite_lookup2 = memory_region(machine, "gfx3");
-	tatsumi_rom_clut0 = memory_region(machine, "gfx2")+ 0xc0000 - 0x800;
-	tatsumi_rom_clut1 = memory_region(machine, "gfx3")+ 0xc0000 - 0x800;
+	tatsumi_rom_sprite_lookup1 = machine->region("gfx2")->base();
+	tatsumi_rom_sprite_lookup2 = machine->region("gfx3")->base();
+	tatsumi_rom_clut0 = machine->region("gfx2")->base()+ 0xc0000 - 0x800;
+	tatsumi_rom_clut1 = machine->region("gfx3")->base()+ 0xc0000 - 0x800;
 
 	tatsumi_reset(machine);
 }
 
 static DRIVER_INIT( cyclwarr )
 {
-	UINT8 *dst = memory_region(machine, "gfx1");
-	UINT8 *src1 = memory_region(machine, "gfx2");
-	int len1 = memory_region_length(machine, "gfx2");
-	UINT8 *src2 = memory_region(machine, "gfx3");
-	int len2 = memory_region_length(machine, "gfx3");
+	UINT8 *dst = machine->region("gfx1")->base();
+	UINT8 *src1 = machine->region("gfx2")->base();
+	int len1 = machine->region("gfx2")->bytes();
+	UINT8 *src2 = machine->region("gfx3")->base();
+	int len2 = machine->region("gfx3")->bytes();
 	int i;
 	for (i=0; i<len1; i+=32) {
 		memcpy(dst,src1,32);
@@ -1342,19 +1342,19 @@ static DRIVER_INIT( cyclwarr )
 		src2+=32;
 	}
 
-	dst = memory_region(machine, "maincpu");
+	dst = machine->region("maincpu")->base();
 	memcpy(cyclwarr_cpua_ram,dst,8);
 	memory_set_bankptr(machine, "bank1", dst);
 
-	dst = memory_region(machine, "sub");
+	dst = machine->region("sub")->base();
 	memcpy(cyclwarr_cpub_ram,dst,8);
 	memory_set_bankptr(machine, "bank2", dst);
 
 	// Copy sprite & palette data out of GFX rom area
-	tatsumi_rom_sprite_lookup1 = memory_region(machine, "gfx2");
-	tatsumi_rom_sprite_lookup2 = memory_region(machine, "gfx3");
-	tatsumi_rom_clut0 = memory_region(machine, "gfx2") + len1 - 0x1000;
-	tatsumi_rom_clut1 = memory_region(machine, "gfx3") + len2 - 0x1000;
+	tatsumi_rom_sprite_lookup1 = machine->region("gfx2")->base();
+	tatsumi_rom_sprite_lookup2 = machine->region("gfx3")->base();
+	tatsumi_rom_clut0 = machine->region("gfx2")->base() + len1 - 0x1000;
+	tatsumi_rom_clut1 = machine->region("gfx3")->base() + len2 - 0x1000;
 
 	tatsumi_reset(machine);
 }

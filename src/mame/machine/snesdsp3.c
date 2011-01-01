@@ -1099,7 +1099,7 @@ static void dsp3_register_save( running_machine *machine )
 static void dsp3_init( running_machine *machine )
 {
 	UINT32 i;
-	UINT8 *dspin = memory_region(machine, "addons");
+	UINT8 *dspin = machine->region("addons")->base();
 
 	dsp3_Reset();
 

@@ -69,7 +69,7 @@ static WRITE16_DEVICE_HANDLER( oki_banking )
 	{
 		int addr = 0x40000 * ((data & 3) - 1);
 
-		if (addr < memory_region_length(device->machine, "oki"))
+		if (addr < device->machine->region("oki")->bytes())
 			downcast<okim6295_device *>(device)->set_bank_base(addr);
 	}
 }

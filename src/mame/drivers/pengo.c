@@ -661,7 +661,7 @@ static DRIVER_INIT( penta )
 	};
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x8000);
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	int A;
 
 	space->set_decrypted_region(0x0000, 0x7fff, decrypt);

@@ -219,8 +219,8 @@ static INTERRUPT_GEN( statriv2_interrupt )
 
 static READ8_HANDLER( question_data_r )
 {
-	const UINT8 *qrom = memory_region(space->machine, "questions");
-	UINT32 qromsize = memory_region_length(space->machine, "questions");
+	const UINT8 *qrom = space->machine->region("questions")->base();
+	UINT32 qromsize = space->machine->region("questions")->bytes();
 	UINT32 address;
 
 	if (question_offset_high == 0xff)
@@ -1093,8 +1093,8 @@ static DRIVER_INIT( addr_lmhe )
     *                                                   *
     \***************************************************/
 
-	UINT8 *qrom = memory_region(machine, "questions");
-	UINT32 length = memory_region_length(machine, "questions");
+	UINT8 *qrom = machine->region("questions")->base();
+	UINT32 length = machine->region("questions")->bytes();
 	UINT32 address;
 
 	for (address = 0; address < length; address++)

@@ -550,8 +550,8 @@ static WRITE16_HANDLER( seta2_sound_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *ROM = memory_region( space->machine, "x1snd" );
-		int banks = (memory_region_length( space->machine, "x1snd" ) - 0x100000) / 0x20000;
+		UINT8 *ROM = space->machine->region( "x1snd" )->base();
+		int banks = (space->machine->region( "x1snd" )->bytes() - 0x100000) / 0x20000;
 		if (data >= banks)
 		{
 			logerror("CPU #0 PC %06X: invalid sound bank %04X\n",cpu_get_pc(space->cpu),data);
@@ -754,7 +754,7 @@ ADDRESS_MAP_END
 static READ16_HANDLER( pzlbowl_protection_r )
 {
 	UINT32 address = (space->read_word(0x20ba16) << 16) | space->read_word(0x20ba18);
-	return memory_region(space->machine, "maincpu")[address - 2];
+	return space->machine->region("maincpu")->base()[address - 2];
 }
 
 static READ16_HANDLER( pzlbowl_coins_r )
@@ -2816,8 +2816,8 @@ ROM_END
 
 static DRIVER_INIT( funcube2 )
 {
-	UINT32 *main_cpu = (UINT32 *) memory_region(machine, "maincpu");
-	UINT16 *sub_cpu  = (UINT16 *) memory_region(machine, "sub");
+	UINT32 *main_cpu = (UINT32 *) machine->region("maincpu")->base();
+	UINT16 *sub_cpu  = (UINT16 *) machine->region("sub")->base();
 
 	main_cpu[0x810/4] = 0xe0214e71;
 	main_cpu[0x814/4] = 0x4e71203c;
@@ -2836,8 +2836,8 @@ static DRIVER_INIT( funcube2 )
 // Note: same as funcube2
 static DRIVER_INIT( funcube4 )
 {
-	UINT32 *main_cpu = (UINT32 *) memory_region(machine, "maincpu");
-	UINT16 *sub_cpu  = (UINT16 *) memory_region(machine, "sub");
+	UINT32 *main_cpu = (UINT32 *) machine->region("maincpu")->base();
+	UINT16 *sub_cpu  = (UINT16 *) machine->region("sub")->base();
 
 	main_cpu[0x810/4] = 0xe0214e71;
 	main_cpu[0x814/4] = 0x4e71203c;

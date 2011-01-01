@@ -29,9 +29,9 @@ static WRITE8_HANDLER( srumbler_bankswitch_w )
       that as well to be 100% accurate.
      */
 	int i;
-	UINT8 *ROM = memory_region(space->machine, "user1");
-	UINT8 *prom1 = memory_region(space->machine, "proms") + (data & 0xf0);
-	UINT8 *prom2 = memory_region(space->machine, "proms") + 0x100 + ((data & 0x0f) << 4);
+	UINT8 *ROM = space->machine->region("user1")->base();
+	UINT8 *prom1 = space->machine->region("proms")->base() + (data & 0xf0);
+	UINT8 *prom2 = space->machine->region("proms")->base() + 0x100 + ((data & 0x0f) << 4);
 
 	for (i = 0x05;i < 0x10;i++)
 	{

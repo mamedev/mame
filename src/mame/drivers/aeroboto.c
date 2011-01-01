@@ -230,8 +230,8 @@ static MACHINE_START( formatz )
 {
 	aeroboto_state *state = machine->driver_data<aeroboto_state>();
 
-	state->stars_rom = memory_region(machine, "gfx2");
-	state->stars_length = memory_region_length(machine, "gfx2");
+	state->stars_rom = machine->region("gfx2")->base();
+	state->stars_length = machine->region("gfx2")->bytes();
 
 	state_save_register_global(machine, state->disable_irq);
 	state_save_register_global(machine, state->count);

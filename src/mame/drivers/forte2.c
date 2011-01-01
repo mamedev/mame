@@ -148,8 +148,8 @@ MACHINE_CONFIG_END
 static DRIVER_INIT(pesadelo)
 {
 	int i;
-	UINT8 *mem = memory_region(machine, "maincpu");
-	int memsize = memory_region_length(machine, "maincpu");
+	UINT8 *mem = machine->region("maincpu")->base();
+	int memsize = machine->region("maincpu")->bytes();
 	UINT8 *buf;
 
 	// data swap

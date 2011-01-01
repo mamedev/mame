@@ -184,18 +184,18 @@ TODO:
 
 static WRITE8_HANDLER( bankswitch1_w )
 {
-	UINT8 *base = memory_region(space->machine, "cpu1") + 0x10000;
+	UINT8 *base = space->machine->region("cpu1")->base() + 0x10000;
 
 	/* if the ROM expansion module is available, don't do anything. This avoids conflict */
 	/* with bankswitch1_ext_w() in wndrmomo */
-	if (memory_region(space->machine, "user1")) return;
+	if (space->machine->region("user1")->base()) return;
 
 	memory_set_bankptr(space->machine, "bank1",base + ((data & 0x03) * 0x2000));
 }
 
 static WRITE8_HANDLER( bankswitch1_ext_w )
 {
-	UINT8 *base = memory_region(space->machine, "user1");
+	UINT8 *base = space->machine->region("user1")->base();
 
 	if (base == 0) return;
 
@@ -204,7 +204,7 @@ static WRITE8_HANDLER( bankswitch1_ext_w )
 
 static WRITE8_HANDLER( bankswitch2_w )
 {
-	UINT8 *base = memory_region(space->machine, "cpu2") + 0x10000;
+	UINT8 *base = space->machine->region("cpu2")->base() + 0x10000;
 
 	memory_set_bankptr(space->machine, "bank2",base + ((data & 0x03) * 0x2000));
 }
@@ -296,7 +296,7 @@ static WRITE8_HANDLER( namcos86_led_w )
 static WRITE8_HANDLER( cus115_w )
 {
 	/* make sure the expansion board is present */
-	if (!memory_region(space->machine, "user1"))
+	if (!space->machine->region("user1")->base())
 	{
 		popmessage("expansion board not present");
 		return;
@@ -326,7 +326,7 @@ static WRITE8_HANDLER( cus115_w )
 
 static MACHINE_RESET( namco86 )
 {
-	UINT8 *base = memory_region(machine, "cpu1") + 0x10000;
+	UINT8 *base = machine->region("cpu1")->base() + 0x10000;
 
 	memory_set_bankptr(machine, "bank1",base);
 }
@@ -1479,8 +1479,8 @@ static DRIVER_INIT( namco86 )
 	UINT8 *buffer;
 
 	/* shuffle tile ROMs so regular gfx unpack routines can be used */
-	gfx = memory_region(machine, "gfx1");
-	size = memory_region_length(machine, "gfx1") * 2 / 3;
+	gfx = machine->region("gfx1")->base();
+	size = machine->region("gfx1")->bytes() * 2 / 3;
 	buffer = auto_alloc_array(machine, UINT8,  size );
 
 	{
@@ -1504,8 +1504,8 @@ static DRIVER_INIT( namco86 )
 		auto_free( machine, buffer );
 	}
 
-	gfx = memory_region(machine, "gfx2");
-	size = memory_region_length(machine, "gfx2") * 2 / 3;
+	gfx = machine->region("gfx2")->base();
+	size = machine->region("gfx2")->bytes() * 2 / 3;
 	buffer = auto_alloc_array(machine, UINT8,  size );
 
 	{

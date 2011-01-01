@@ -530,7 +530,7 @@ MACHINE_CONFIG_END
 static DRIVER_INIT(kinstb)
 {
 	INT32 i;
-	UINT8 *rom = memory_region(machine, "user3");
+	UINT8 *rom = machine->region("user3")->base();
 
 	for (i = 0; i < 0x400000; i++)
 	{
@@ -546,7 +546,7 @@ static DRIVER_INIT(kinstb)
 static DRIVER_INIT( ffight2b )
 {
 	INT32 i;
-	UINT8 *rom = memory_region(machine, "user3");
+	UINT8 *rom = machine->region("user3")->base();
 
 	for(i = 0; i < 0x200000; i++)
 	{
@@ -605,8 +605,8 @@ static const UINT8  address_substitution_high[] =
 static DRIVER_INIT( sblast2b )
 {
 	int i, cipherText, plainText, newAddress;
-	UINT8 *src = memory_region(machine, "user7");
-	UINT8 *dst = memory_region(machine, "user3");
+	UINT8 *src = machine->region("user7")->base();
+	UINT8 *dst = machine->region("user3")->base();
 
 	for (i =0; i < 0x80000 * 3; i++)
 	{
@@ -654,7 +654,7 @@ static DRIVER_INIT( sblast2b )
 static DRIVER_INIT( iron )
 {
 	INT32 i;
-	UINT8 *rom = memory_region(machine, "user3");
+	UINT8 *rom = machine->region("user3")->base();
 
 	for (i = 0; i < 0x140000; i++)
 	{
@@ -679,7 +679,7 @@ static DRIVER_INIT( iron )
 static DRIVER_INIT( endless )
 {
 	INT32 i;
-	UINT8 *rom = memory_region(machine, "user3");
+	UINT8 *rom = machine->region("user3")->base();
 
 	/* there is more to this, 0x800 based block swaps? */
 	for (i = 0; i < 0x200000; i++)
@@ -692,7 +692,7 @@ static DRIVER_INIT( endless )
 
 static DRIVER_INIT( denseib )
 {
-	UINT8 *rom = memory_region(machine, "user3");
+	UINT8 *rom = machine->region("user3")->base();
 	INT32 i;
 
 	for (i = 0; i < 0x200000; i++)

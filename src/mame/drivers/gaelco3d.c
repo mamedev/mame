@@ -202,7 +202,7 @@ static MACHINE_RESET( common )
 	framenum = 0;
 
 	/* boot the ADSP chip */
-	src = (UINT16 *)memory_region(machine, "user1");
+	src = (UINT16 *)machine->region("user1")->base();
 	for (i = 0; i < (src[3] & 0xff) * 8; i++)
 	{
 		UINT32 opcode = ((src[i*4+0] & 0xff) << 16) | ((src[i*4+1] & 0xff) << 8) | (src[i*4+2] & 0xff);
@@ -212,7 +212,7 @@ static MACHINE_RESET( common )
 	/* allocate a timer for feeding the autobuffer */
 	adsp_autobuffer_timer = machine->device<timer_device>("adsp_timer");
 
-	memory_configure_bank(machine, "bank1", 0, 256, memory_region(machine, "user1"), 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 256, machine->region("user1")->base(), 0x4000);
 	memory_set_bank(machine, "bank1", 0);
 
 	/* keep the TMS32031 halted until the code is ready to go */
@@ -1174,13 +1174,13 @@ static DRIVER_INIT( gaelco3d )
 	int x, y;
 
 	/* allocate memory */
-	gaelco3d_texture_size = memory_region_length(machine, "gfx1");
-	gaelco3d_texmask_size = memory_region_length(machine, "gfx2") * 8;
+	gaelco3d_texture_size = machine->region("gfx1")->bytes();
+	gaelco3d_texmask_size = machine->region("gfx2")->bytes() * 8;
 	gaelco3d_texture = auto_alloc_array(machine, UINT8, gaelco3d_texture_size);
 	gaelco3d_texmask = auto_alloc_array(machine, UINT8, gaelco3d_texmask_size);
 
 	/* first expand the pixel data */
-	src = memory_region(machine, "gfx1");
+	src = machine->region("gfx1")->base();
 	dst = gaelco3d_texture;
 	for (y = 0; y < gaelco3d_texture_size/4096; y += 2)
 		for (x = 0; x < 4096; x += 2)
@@ -1192,7 +1192,7 @@ static DRIVER_INIT( gaelco3d )
 		}
 
 	/* then expand the mask data */
-	src = memory_region(machine, "gfx2");
+	src = machine->region("gfx2")->base();
 	dst = gaelco3d_texmask;
 	for (y = 0; y < gaelco3d_texmask_size/4096; y++)
 		for (x = 0; x < 4096; x++)

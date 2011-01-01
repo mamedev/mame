@@ -482,11 +482,11 @@ void fd1094_init_debugging(running_machine *machine, const char *cpureg, const c
 	key_changed = changed;
 
 	/* set up the regions */
-	coderegion = (UINT16 *)memory_region(machine, cpureg);
-	coderegion_words = memory_region_length(machine, cpureg) / 2;
-	keyregion = (UINT8 *)memory_region(machine, keyreg);
-	keystatus = (UINT16 *)memory_region(machine, statreg);
-	keystatus_words = memory_region_length(machine, statreg) / 2;
+	coderegion = (UINT16 *)machine->region(cpureg)->base();
+	coderegion_words = machine->region(cpureg)->bytes() / 2;
+	keyregion = (UINT8 *)machine->region(keyreg)->base();
+	keystatus = (UINT16 *)machine->region(statreg)->base();
+	keystatus_words = machine->region(statreg)->bytes() / 2;
 	assert(coderegion_words == keystatus_words);
 
 	/* allocate memory for the ignore table */

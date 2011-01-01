@@ -7,7 +7,7 @@
 READ8_HANDLER( mmonkey_protection_r )
 {
 	btime_state *state = space->machine->driver_data<btime_state>();
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	UINT8 *RAM = space->machine->region("maincpu")->base();
 	int ret = 0;
 
 	if (offset == 0x0000)
@@ -25,7 +25,7 @@ READ8_HANDLER( mmonkey_protection_r )
 WRITE8_HANDLER( mmonkey_protection_w )
 {
 	btime_state *state = space->machine->driver_data<btime_state>();
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	UINT8 *RAM = space->machine->region("maincpu")->base();
 
 	if (offset == 0)
 	{

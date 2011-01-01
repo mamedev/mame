@@ -339,7 +339,7 @@ static WRITE16_HANDLER( bankselect_w )
 	COMBINE_DATA(&newword);
 	state->bankselect[offset] = newword;
 
-	base = &memory_region(space->machine, "maincpu")[bankoffset[(newword >> 10) & 0x3f]];
+	base = &space->machine->region("maincpu")->base()[bankoffset[(newword >> 10) & 0x3f]];
 	memcpy(offset ? state->rombank2 : state->rombank1, base, 0x2000);
 }
 
@@ -3080,7 +3080,7 @@ static DRIVER_INIT( paperboy )
 {
 	int i;
 	atarisy2_state *state = machine->driver_data<atarisy2_state>();
-	UINT8 *cpu1 = memory_region(machine, "maincpu");
+	UINT8 *cpu1 = machine->region("maincpu")->base();
 
 	slapstic_init(machine, 105);
 
@@ -3116,7 +3116,7 @@ static DRIVER_INIT( ssprint )
 {
 	atarisy2_state *state = machine->driver_data<atarisy2_state>();
 	int i;
-	UINT8 *cpu1 = memory_region(machine, "maincpu");
+	UINT8 *cpu1 = machine->region("maincpu")->base();
 
 	slapstic_init(machine, 108);
 
@@ -3133,7 +3133,7 @@ static DRIVER_INIT( csprint )
 {
 	int i;
 	atarisy2_state *state = machine->driver_data<atarisy2_state>();
-	UINT8 *cpu1 = memory_region(machine, "maincpu");
+	UINT8 *cpu1 = machine->region("maincpu")->base();
 
 	slapstic_init(machine, 109);
 

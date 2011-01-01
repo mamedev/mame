@@ -200,7 +200,7 @@ static VIDEO_UPDATE( rdx_v33 )
 		if(frame == 5)
 		{
 			int i,data;
-			static UINT8 *rom = memory_region(space->machine,"mainprg");
+			static UINT8 *rom = space->machine->region("mainprg")->base();
 
 			for(i=0;i<0x800;i+=2)
 			{
@@ -707,7 +707,7 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT(rdx_v33)
 {
-	memory_configure_bank(machine, "bank1", 0, 0x20, memory_region(machine, "mainprg"), 0x20000);
+	memory_configure_bank(machine, "bank1", 0, 0x20, machine->region("mainprg")->base(), 0x20000);
 
 	raiden2_decrypt_sprites(machine);
 
@@ -716,7 +716,7 @@ static DRIVER_INIT(rdx_v33)
 
 static DRIVER_INIT(nzerotea)
 {
-	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "mainprg"), 0x20000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine->region("mainprg")->base(), 0x20000);
 
 	raiden2_decrypt_sprites(machine);
 

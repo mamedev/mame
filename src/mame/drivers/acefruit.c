@@ -577,7 +577,7 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT( sidewndr )
 {
-	UINT8 *ROM = memory_region( machine, "maincpu" );
+	UINT8 *ROM = machine->region( "maincpu" )->base();
 	/* replace "ret nc" ( 0xd0 ) with "di" */
 	ROM[ 0 ] = 0xf3;
 	/* this is either a bad dump or the cpu core should set the carry flag on reset */

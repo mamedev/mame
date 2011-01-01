@@ -40,7 +40,7 @@ static TILEMAP_MAPPER( fix_scan )
 static TILE_GET_INFO( get_back_tile_info )
 {
 	liberate_state *state = machine->driver_data<liberate_state>();
-	const UINT8 *RAM = memory_region(machine, "user1");
+	const UINT8 *RAM = machine->region("user1")->base();
 	int tile, bank;
 
 	/* Convert tile index of 512x512 to paged format */

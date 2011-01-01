@@ -41,7 +41,7 @@ static UINT32 bankaddress;
 
 static void set_m90_bank(running_machine *machine)
 {
-	UINT8 *rom = memory_region(machine, "user1");
+	UINT8 *rom = machine->region("user1")->base();
 
 	if (!rom)
 		popmessage("bankswitch with no banked ROM!");
@@ -1216,7 +1216,7 @@ static DRIVER_INIT( quizf1 )
 
 static DRIVER_INIT( bomblord )
 {
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 
 	int i;
 	for (i=0; i<0x100000; i+=8)

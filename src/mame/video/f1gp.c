@@ -52,10 +52,10 @@ VIDEO_START( f1gp )
 
 	tilemap_set_transparent_pen(state->fg_tilemap, 0xff);
 
-	state->zoomdata = (UINT16 *)memory_region(machine, "gfx4");
+	state->zoomdata = (UINT16 *)machine->region("gfx4")->base();
 	gfx_element_set_source(machine->gfx[3], (UINT8 *)state->zoomdata);
 
-//  state_save_register_global_pointer(machine, state->zoomdata, memory_region_length(machine, "gfx4"));
+//  state_save_register_global_pointer(machine, state->zoomdata, machine->region("gfx4")->bytes());
 }
 
 
@@ -68,10 +68,10 @@ VIDEO_START( f1gpb )
 
 	tilemap_set_transparent_pen(state->fg_tilemap, 0xff);
 
-	state->zoomdata = (UINT16 *)memory_region(machine, "gfx4");
+	state->zoomdata = (UINT16 *)machine->region("gfx4")->base();
 	gfx_element_set_source(machine->gfx[3], (UINT8 *)state->zoomdata);
 
-//  state_save_register_global_pointer(machine, state->zoomdata, memory_region_length(machine, "gfx4"));
+//  state_save_register_global_pointer(machine, state->zoomdata, machine->region("gfx4")->bytes());
 }
 
 VIDEO_START( f1gp2 )

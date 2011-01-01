@@ -347,7 +347,7 @@ static MACHINE_RESET( ssv )
 	ssv_state *state = machine->driver_data<ssv_state>();
 	state->requested_int = 0;
 	cpu_set_irq_callback(machine->device("maincpu"), ssv_irq_callback);
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1"));
+	memory_set_bankptr(machine, "bank1", machine->region("user1")->base());
 }
 
 
@@ -542,8 +542,8 @@ static WRITE16_HANDLER( gdfs_blitram_w )
 			UINT32 dst	=	(gdfs_blitram[0xc4/2] + (gdfs_blitram[0xc6/2] << 16)) << 4;
 			UINT32 len	=	(gdfs_blitram[0xc8/2]) << 4;
 
-			UINT8 *rom	=	memory_region(space->machine, "gfx2");
-			size_t size	=	memory_region_length(space->machine, "gfx2");
+			UINT8 *rom	=	space->machine->region("gfx2")->base();
+			size_t size	=	space->machine->region("gfx2")->bytes();
 
 			if ( (src+len <= size) && (dst+len <= 4 * 0x100000) )
 			{
@@ -965,8 +965,8 @@ ADDRESS_MAP_END
 static READ16_HANDLER( eaglshot_gfxrom_r )
 {
 	ssv_state *state = space->machine->driver_data<ssv_state>();
-	UINT8 *rom	=	memory_region(space->machine, "gfx1");
-	size_t size	=	memory_region_length(space->machine, "gfx1");
+	UINT8 *rom	=	space->machine->region("gfx1")->base();
+	size_t size	=	space->machine->region("gfx1")->bytes();
 
 	offset = offset * 2 + state->gfxrom_select * 0x200000;
 
@@ -2654,7 +2654,7 @@ static DRIVER_INIT( meosism )			{	init_ssv(machine, 0);	}
 static DRIVER_INIT( mslider )			{	init_ssv(machine, 0);	}
 static DRIVER_INIT( ryorioh )			{	init_ssv(machine, 0);	}
 static DRIVER_INIT( srmp4 )			{	init_ssv(machine, 0);
-//  ((UINT16 *)memory_region(machine, "user1"))[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
+//  ((UINT16 *)machine->region("user1")->base())[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
 }
 static DRIVER_INIT( srmp7 )			{	init_ssv(machine, 0);	}
 static DRIVER_INIT( stmblade )		{	init_ssv(machine, 0);	}

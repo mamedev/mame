@@ -1868,7 +1868,7 @@ WRITE32_HANDLER( konamigx_type3_psac2_bank_w )
  static TILE_GET_INFO( get_gx_psac3_tile_info )
  {
 	int tileno, colour, flip;
-	UINT8 *tmap = memory_region(machine, "gfx4");
+	UINT8 *tmap = machine->region("gfx4")->base();
 
 	int base_index = tile_index;
 
@@ -1889,7 +1889,7 @@ WRITE32_HANDLER( konamigx_type3_psac2_bank_w )
  static TILE_GET_INFO( get_gx_psac3_alt_tile_info )
  {
 	int tileno, colour, flip;
-	UINT8 *tmap = memory_region(machine, "gfx4")+0x20000;
+	UINT8 *tmap = machine->region("gfx4")->base()+0x20000;
 
 	int base_index = tile_index;
 

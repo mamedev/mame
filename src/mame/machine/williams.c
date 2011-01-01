@@ -354,7 +354,7 @@ static MACHINE_START( williams_common )
 {
 	/* configure the memory bank */
 	memory_configure_bank(machine, "bank1", 0, 1, williams_videoram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "maincpu") + 0x10000, 0);
+	memory_configure_bank(machine, "bank1", 1, 1, machine->region("maincpu")->base() + 0x10000, 0);
 
 	state_save_register_global(machine, vram_bank);
 }
@@ -450,7 +450,7 @@ MACHINE_START( williams2 )
 {
 	/* configure memory banks */
 	memory_configure_bank(machine, "bank1", 0, 1, williams_videoram, 0);
-	memory_configure_bank(machine, "bank1", 1, 4, memory_region(machine, "maincpu") + 0x10000, 0x10000);
+	memory_configure_bank(machine, "bank1", 1, 4, machine->region("maincpu")->base() + 0x10000, 0x10000);
 
 	/* register for save states */
 	state_save_register_global(machine, vram_bank);
@@ -737,7 +737,7 @@ MACHINE_START( defender )
 	MACHINE_START_CALL(williams_common);
 
 	/* configure the banking and make sure it is reset to 0 */
-	memory_configure_bank(machine, "bank1", 0, 9, &memory_region(machine, "maincpu")[0x10000], 0x1000);
+	memory_configure_bank(machine, "bank1", 0, 9, &machine->region("maincpu")->base()[0x10000], 0x1000);
 
 	state_save_register_postload(machine, defender_postload, NULL);
 }
@@ -842,10 +842,10 @@ MACHINE_START( blaster )
 
 	/* banking is different for blaster */
 	memory_configure_bank(machine, "bank1", 0, 1, williams_videoram, 0);
-	memory_configure_bank(machine, "bank1", 1, 16, memory_region(machine, "maincpu") + 0x18000, 0x4000);
+	memory_configure_bank(machine, "bank1", 1, 16, machine->region("maincpu")->base() + 0x18000, 0x4000);
 
 	memory_configure_bank(machine, "bank2", 0, 1, williams_videoram + 0x4000, 0);
-	memory_configure_bank(machine, "bank2", 1, 16, memory_region(machine, "maincpu") + 0x10000, 0x0000);
+	memory_configure_bank(machine, "bank2", 1, 16, machine->region("maincpu")->base() + 0x10000, 0x0000);
 
 	state_save_register_global(machine, blaster_bank);
 }

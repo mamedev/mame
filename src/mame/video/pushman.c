@@ -15,7 +15,7 @@ static TILEMAP_MAPPER( background_scan_rows )
 
 static TILE_GET_INFO( get_back_tile_info )
 {
-	UINT8 *bg_map = memory_region(machine, "gfx4");
+	UINT8 *bg_map = machine->region("gfx4")->base();
 	int tile;
 
 	tile = bg_map[tile_index << 1] + (bg_map[(tile_index << 1) + 1] << 8);

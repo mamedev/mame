@@ -173,7 +173,7 @@ static CUSTOM_INPUT( teetert_input_r )
 
 static WRITE8_HANDLER( fax_bank_select_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	UINT8 *RAM = space->machine->region("maincpu")->base();
 
 	memory_set_bankptr(space->machine, "bank1", &RAM[0x10000 + (0x2000 * (data & 0x1f))]);
 	if ((data & 0x1f) > 0x17)
@@ -1419,7 +1419,7 @@ static DRIVER_INIT( phantoma )
 
 	/* the ROM is actually mapped high */
 	memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf800, 0xffff, 0, 0, "bank1");
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0xf800);
+	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0xf800);
 }
 
 

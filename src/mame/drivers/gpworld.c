@@ -108,7 +108,7 @@ static void gpworld_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 
 	int i;
 
-	UINT8 *GFX = memory_region(machine, "gfx2");
+	UINT8 *GFX = machine->region("gfx2")->base();
 
 	/* Heisted from Daphne which heisted it from MAME */
 	for (i = 0; i < 0x800; i += 8)

@@ -89,7 +89,7 @@ static TILEMAP_MAPPER( tilemap_scan )
 
 static TILE_GET_INFO( bg_get_tile_info )
 {
-	UINT8 *rom = memory_region(machine, "gfx4");
+	UINT8 *rom = machine->region("gfx4")->base();
 	_galaga_state *state =  machine->driver_data<_galaga_state>();
 
 	int code = rom[tile_index | (state->bg_select << 10)];

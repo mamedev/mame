@@ -427,8 +427,8 @@ class Processor
 				m_tmem = auto_alloc_array(m_machine, UINT8, 0x1000);
 				memset(m_tmem, 0, 0x1000);
 
-				UINT8 *normpoint = memory_region(m_machine, "normpoint");
-				UINT8 *normslope = memory_region(m_machine, "normslope");
+				UINT8 *normpoint = m_machine->region("normpoint")->base();
+				UINT8 *normslope = m_machine->region("normslope")->base();
 
 				for(INT32 i = 0; i < 64; i++)
 				{

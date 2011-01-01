@@ -587,7 +587,7 @@ static WRITE32_HANDLER( sysh1_char_w )
 	COMBINE_DATA(&h1_charram[offset]);
 
 	{
-		UINT8 *gfx = memory_region(space->machine, "ram_gfx");
+		UINT8 *gfx = space->machine->region("ram_gfx")->base();
 
 		gfx[offset*4+0] = (h1_charram[offset] & 0xff000000) >> 24;
 		gfx[offset*4+1] = (h1_charram[offset] & 0x00ff0000) >> 16;

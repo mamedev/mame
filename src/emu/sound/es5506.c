@@ -914,10 +914,10 @@ static void es5506_start_common(device_t *device, const void *config, device_typ
 	chip->stream = stream_create(device, 0, 2, device->clock() / (16*32), chip, es5506_update);
 
 	/* initialize the regions */
-	chip->region_base[0] = intf->region0 ? (UINT16 *)memory_region(device->machine, intf->region0) : NULL;
-	chip->region_base[1] = intf->region1 ? (UINT16 *)memory_region(device->machine, intf->region1) : NULL;
-	chip->region_base[2] = intf->region2 ? (UINT16 *)memory_region(device->machine, intf->region2) : NULL;
-	chip->region_base[3] = intf->region3 ? (UINT16 *)memory_region(device->machine, intf->region3) : NULL;
+	chip->region_base[0] = intf->region0 ? (UINT16 *)device->machine->region(intf->region0)->base() : NULL;
+	chip->region_base[1] = intf->region1 ? (UINT16 *)device->machine->region(intf->region1)->base() : NULL;
+	chip->region_base[2] = intf->region2 ? (UINT16 *)device->machine->region(intf->region2)->base() : NULL;
+	chip->region_base[3] = intf->region3 ? (UINT16 *)device->machine->region(intf->region3)->base() : NULL;
 
 	/* initialize the rest of the structure */
 	chip->device = device;

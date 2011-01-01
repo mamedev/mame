@@ -348,8 +348,8 @@ ROM_END
 
 static void compgolf_expand_bg(running_machine *machine)
 {
-	UINT8 *GFXDST = memory_region(machine, "gfx2");
-	UINT8 *GFXSRC = memory_region(machine, "gfx4");
+	UINT8 *GFXDST = machine->region("gfx2")->base();
+	UINT8 *GFXSRC = machine->region("gfx4")->base();
 
 	int x;
 
@@ -362,7 +362,7 @@ static void compgolf_expand_bg(running_machine *machine)
 
 static DRIVER_INIT( compgolf )
 {
-	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "user1"), 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine->region("user1")->base(), 0x4000);
 	compgolf_expand_bg(machine);
 }
 

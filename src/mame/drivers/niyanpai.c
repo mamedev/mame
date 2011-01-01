@@ -60,7 +60,7 @@ static int musobana_outcoin_flag;
 
 static void niyanpai_soundbank_w(running_machine *machine, int data)
 {
-	UINT8 *SNDROM = memory_region(machine, "audiocpu");
+	UINT8 *SNDROM = machine->region("audiocpu")->base();
 
 	memory_set_bankptr(machine, "bank1", &SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
 }
@@ -190,7 +190,7 @@ static MACHINE_RESET( niyanpai )
 
 static DRIVER_INIT( niyanpai )
 {
-	UINT8 *SNDROM = memory_region(machine, "audiocpu");
+	UINT8 *SNDROM = machine->region("audiocpu")->base();
 
 	// sound program patch
 	SNDROM[0x0213] = 0x00;			// DI -> NOP

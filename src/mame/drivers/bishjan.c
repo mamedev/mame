@@ -956,7 +956,7 @@ ROM_END
 
 static DRIVER_INIT(bishjan)
 {
-	UINT16 *rom = (UINT16*)memory_region(machine, "maincpu");
+	UINT16 *rom = (UINT16*)machine->region("maincpu")->base();
 
 	// check
 	rom[0x042EA/2] = 0x4008;
@@ -1014,7 +1014,7 @@ ROM_END
 
 static DRIVER_INIT(saklove)
 {
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 	// patch protection test (it always enters test mode on boot otherwise)
 	rom[0x0e029] = 0xeb;

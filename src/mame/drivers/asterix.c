@@ -468,8 +468,8 @@ ROM_END
 static DRIVER_INIT( asterix )
 {
 #if 0
-	*(UINT16 *)(memory_region(machine, "maincpu") + 0x07f34) = 0x602a;
-	*(UINT16 *)(memory_region(machine, "maincpu") + 0x00008) = 0x0400;
+	*(UINT16 *)(machine->region("maincpu")->base() + 0x07f34) = 0x602a;
+	*(UINT16 *)(machine->region("maincpu")->base() + 0x00008) = 0x0400;
 #endif
 }
 

@@ -620,7 +620,7 @@ ROM_END
 static DRIVER_INIT( skullxbo )
 {
 	atarijsa_init(machine, "FF5802", 0x0080);
-	memset(memory_region(machine, "gfx1") + 0x170000, 0, 0x20000);
+	memset(machine->region("gfx1")->base() + 0x170000, 0, 0x20000);
 }
 
 

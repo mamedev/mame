@@ -855,8 +855,8 @@ static MACHINE_START( darius )
 {
 	darius_state *state = machine->driver_data<darius_state>();
 
-	memory_configure_bank(machine, "bank1", 0, 4, memory_region(machine, "audiocpu") + 0x10000, 0x8000);
-	memory_configure_bank(machine, "bank1", 4, 1, memory_region(machine, "audiocpu"), 0x8000);
+	memory_configure_bank(machine, "bank1", 0, 4, machine->region("audiocpu")->base() + 0x10000, 0x8000);
+	memory_configure_bank(machine, "bank1", 4, 1, machine->region("audiocpu")->base(), 0x8000);
 	memory_set_bank(machine, "bank1", 4);
 
 	state->maincpu = machine->device("maincpu");
@@ -1289,7 +1289,7 @@ ROM_END
 static DRIVER_INIT( darius )
 {
 	/**** setup sound bank image ****/
-	UINT8 *RAM = memory_region(machine, "audiocpu");
+	UINT8 *RAM = machine->region("audiocpu")->base();
 	int  i;
 
 	for (i = 3; i >= 0; i--)

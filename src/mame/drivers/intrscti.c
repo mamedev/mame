@@ -120,7 +120,7 @@ ROM_END
 
 static DRIVER_INIT( intrscti )
 {
-	UINT8 *cpu = memory_region( machine, "maincpu" );
+	UINT8 *cpu = machine->region( "maincpu" )->base();
 	int i;
 	for (i=0x8000;i<0x8fff;i++)
 	{

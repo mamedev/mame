@@ -435,7 +435,7 @@ static READ16_HANDLER( megaplay_io_read )
 static READ8_HANDLER( bank_r )
 {
 	UINT32 fulladdress;
-	UINT8* bank = memory_region(space->machine, "mtbios");
+	UINT8* bank = space->machine->region("mtbios")->base();
 
 	fulladdress = mplay_bios.mp_bios_bank_addr + offset;
 
@@ -460,7 +460,7 @@ static READ8_HANDLER( bank_r )
 		}
 		else
 		{
-			return memory_region(space->machine, "maincpu")[fulladdress ^ 1];
+			return space->machine->region("maincpu")->base()[fulladdress ^ 1];
 		}
 	}
 	else if (fulladdress >= 0xa10000 && fulladdress <= 0xa1001f) // IO Acess
@@ -831,9 +831,9 @@ ROM_END
 
 static void mplay_start(running_machine *machine)
 {
-	UINT8 *src = memory_region(machine, "mtbios");
-	UINT8 *instruction_rom = memory_region(machine, "user1");
-	UINT8 *game_rom = memory_region(machine, "maincpu");
+	UINT8 *src = machine->region("mtbios")->base();
+	UINT8 *instruction_rom = machine->region("user1")->base();
+	UINT8 *game_rom = machine->region("maincpu")->base();
 	int offs;
 
 

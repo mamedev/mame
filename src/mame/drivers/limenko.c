@@ -338,8 +338,8 @@ static void draw_sprites(running_machine *machine, UINT32 *sprites, const rectan
 {
 	int i;
 
-	UINT8 *base_gfx	= memory_region(machine, "gfx1");
-	UINT8 *gfx_max	= base_gfx + memory_region_length(machine, "gfx1");
+	UINT8 *base_gfx	= machine->region("gfx1")->base();
+	UINT8 *gfx_max	= base_gfx + machine->region("gfx1")->bytes();
 
 	UINT8 *gfxdata;
 	gfx_element gfx;
@@ -1028,8 +1028,8 @@ static DRIVER_INIT( sb2003 )
 
 static DRIVER_INIT( spotty )
 {
-	UINT8 *dst    = memory_region(machine, "gfx1");
-	UINT8 *src    = memory_region(machine, "user2");
+	UINT8 *dst    = machine->region("gfx1")->base();
+	UINT8 *src    = machine->region("user2")->base();
 	int x;
 
 	/* expand 4bpp roms to 8bpp space */

@@ -260,9 +260,9 @@ static DRIVER_INIT( suprloco )
 	int i, j, k, color_source, color_dest;
 	UINT8 *source, *dest, *lookup;
 
-	source = memory_region(machine, "gfx1");
+	source = machine->region("gfx1")->base();
 	dest   = source + 0x6000;
-	lookup = memory_region(machine, "proms") + 0x0200;
+	lookup = machine->region("proms")->base() + 0x0200;
 
 	for (i = 0; i < 0x80; i++, lookup += 8)
 	{

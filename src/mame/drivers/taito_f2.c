@@ -3362,7 +3362,7 @@ static MACHINE_START( common )
 static MACHINE_START( f2 )
 {
 	MACHINE_START_CALL(common);
-	memory_configure_bank(machine, "bank2", 0, 8, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank2", 0, 8, machine->region("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 static MACHINE_CONFIG_START( taito_f2, taitof2_state )
@@ -5554,7 +5554,7 @@ static DRIVER_INIT( finalb )
 	int i;
 	UINT8 data;
 	UINT32 offset;
-	UINT8 *gfx = memory_region(machine, "gfx2");
+	UINT8 *gfx = machine->region("gfx2")->base();
 
 	offset = 0x100000;
 	for (i = 0x180000; i < 0x200000; i++)
@@ -5590,8 +5590,8 @@ static DRIVER_INIT( cameltry )
 static DRIVER_INIT( mjnquest )
 {
 	taitof2_state *state = machine->driver_data<taitof2_state>();
-	int i, len = memory_region_length(machine, "gfx2");
-	UINT8 *gfx = memory_region(machine, "gfx2");
+	int i, len = machine->region("gfx2")->bytes();
+	UINT8 *gfx = machine->region("gfx2")->base();
 
 	/* the bytes in each longword are in reversed order, put them in the
        order used by the other games. */

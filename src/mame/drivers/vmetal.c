@@ -84,7 +84,7 @@ static READ16_HANDLER ( varia_crom_read )
 	/* game reads the cgrom, result is 7772, verified to be correct on the real board */
 
 	metro_state *state = space->machine->driver_data<metro_state>();
-	UINT8 *cgrom = memory_region(space->machine, "gfx1");
+	UINT8 *cgrom = space->machine->region("gfx1")->base();
 	UINT16 retdat;
 
 	offset = offset << 1;

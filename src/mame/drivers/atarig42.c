@@ -727,7 +727,7 @@ static DRIVER_INIT( guardian )
 
 	/* it looks like they jsr to $80000 as some kind of protection */
 	/* put an RTS there so we don't die */
-	*(UINT16 *)&memory_region(machine, "maincpu")[0x80000] = 0x4E75;
+	*(UINT16 *)&machine->region("maincpu")->base()[0x80000] = 0x4E75;
 
 	address_space *main = machine->device<m68000_device>("maincpu")->space(AS_PROGRAM);
 	state->sloop_base = memory_install_readwrite16_handler(main, 0x000000, 0x07ffff, 0, 0, guardians_sloop_data_r, guardians_sloop_data_w);

@@ -560,7 +560,7 @@ static READ8_DEVICE_HANDLER( gfx_rom_r )
 
 	if (gfx_rom_ctrl_mode)
 	{
-		UINT8 *rom = memory_region(device->machine, "gfx1");
+		UINT8 *rom = device->machine->region("gfx1")->base();
 
 		ret = rom[gfx_rom_address];
 

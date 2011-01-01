@@ -408,7 +408,7 @@ static DRIVER_INIT( upscope )
 
 	/* set up memory */
 	memory_configure_bank(machine, "bank1", 0, 1, state->chip_ram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "user1"), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, machine->region("user1")->base(), 0);
 }
 
 

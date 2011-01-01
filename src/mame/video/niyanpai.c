@@ -89,7 +89,7 @@ WRITE16_HANDLER( niyanpai_palette_w )
 static int niyanpai_blitter_r(running_machine *machine, int vram, int offset)
 {
 	int ret;
-	UINT8 *GFXROM = memory_region(machine, "gfx1");
+	UINT8 *GFXROM = machine->region("gfx1")->base();
 
 	switch (offset)
 	{
@@ -197,7 +197,7 @@ static TIMER_CALLBACK( blitter_timer_callback )
 
 static void niyanpai_gfxdraw(running_machine *machine, int vram)
 {
-	UINT8 *GFX = memory_region(machine, "gfx1");
+	UINT8 *GFX = machine->region("gfx1")->base();
 	int width = machine->primary_screen->width();
 
 	int x, y;
@@ -244,7 +244,7 @@ static void niyanpai_gfxdraw(running_machine *machine, int vram)
 		skipy = -1;
 	}
 
-	gfxlen = memory_region_length(machine, "gfx1");
+	gfxlen = machine->region("gfx1")->bytes();
 	gfxaddr = ((blitter_src_addr[vram] + 2) & 0x00ffffff);
 
 	for (y = starty, ctry = sizey; ctry >= 0; y += skipy, ctry--)

@@ -328,7 +328,7 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 			}
 			else					// disable RAM access (reads go to BIOS ROM)
 			{
-				memory_set_bankptr(busdevice->machine, "bank1", memory_region(busdevice->machine, "bios") + 0x10000);
+				memory_set_bankptr(busdevice->machine, "bank1", busdevice->machine->region("bios")->base() + 0x10000);
 			}
 			break;
 		}
@@ -616,7 +616,7 @@ static const struct pit8253_config calchase_pit8254_config =
 
 static MACHINE_RESET(calchase)
 {
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "bios") + 0x10000);
+	memory_set_bankptr(machine, "bank1", machine->region("bios")->base() + 0x10000);
 }
 
 static void set_gate_a20(running_machine *machine, int a20)

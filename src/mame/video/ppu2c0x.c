@@ -291,7 +291,7 @@ void ppu2c0x_init_palette_rgb( running_machine *machine, int first_entry )
 
 	int R, G, B;
 
-	UINT8 *palette_data = memory_region(machine, "palette");
+	UINT8 *palette_data = machine->region("palette")->base();
 
 	/* Loop through the emphasis modes (8 total) */
 	for (color_emphasis = 0; color_emphasis < 8; color_emphasis++)

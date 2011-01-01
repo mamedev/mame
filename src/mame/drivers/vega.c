@@ -97,7 +97,7 @@ UINT8 ascii_to_bin( UINT8 ascii )
 DRIVER_INIT(vegaa)
 {
 	UINT8* buf = (UINT8*)malloc(0x10000);
-	UINT8* rom = memory_region(machine,"maincpu");
+	UINT8* rom = machine->region("maincpu")->base();
 	int i;
 	int count = 0;
 	// last 0xc bytes of file are just some settings, ignore

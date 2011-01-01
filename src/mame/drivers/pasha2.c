@@ -116,7 +116,7 @@ static WRITE16_HANDLER( pasha2_misc_w )
 					case 0xb000:
 					case 0xc000:
 					case 0xd000:
-						memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "user2") + 0x400 * (bank - 0x8000)); break;
+						memory_set_bankptr(space->machine, "bank1", space->machine->region("user2")->base() + 0x400 * (bank - 0x8000)); break;
 				}
 			}
 		}
@@ -473,7 +473,7 @@ static DRIVER_INIT( pasha2 )
 {
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x95744, 0x95747, 0, 0, pasha2_speedup_r );
 
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "user2"));
+	memory_set_bankptr(machine, "bank1", machine->region("user2")->base());
 }
 
 GAME( 1998, pasha2, 0, pasha2, pasha2, pasha2, ROT0, "Dong Sung", "Pasha Pasha 2", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

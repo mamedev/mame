@@ -172,7 +172,7 @@ WRITE8_HANDLER( starwars_adc_select_w )
 
 void starwars_mproc_init(running_machine *machine)
 {
-	UINT8 *src = memory_region(machine, "user2");
+	UINT8 *src = machine->region("user2")->base();
 	int cnt, val;
 
 	PROM_STR = auto_alloc_array(machine, UINT8, 1024);

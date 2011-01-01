@@ -83,7 +83,7 @@ static TILE_GET_INFO( get_tile_info )
 
 	if (input_code_pressed(machine, KEYCODE_X))
 	{
-		UINT8 *rom = memory_region(machine, "maincpu") + 0x10000 + 0x4000 * state->trombank;
+		UINT8 *rom = machine->region("maincpu")->base() + 0x10000 + 0x4000 * state->trombank;
 		code = rom[ 2 * tile_index + 0 ];
 		attr = rom[ 2 * tile_index + 1 ];
 	}
@@ -422,7 +422,7 @@ VIDEO_UPDATE( suna8 )
 	if (input_code_pressed(screen->machine, KEYCODE_Z) || input_code_pressed(screen->machine, KEYCODE_X))
 	{
 		suna8_state *state = screen->machine->driver_data<suna8_state>();
-		int max_tiles = memory_region_length(screen->machine, "gfx1") / (0x400 * 0x20);
+		int max_tiles = screen->machine->region("gfx1")->bytes() / (0x400 * 0x20);
 
 		if (input_code_pressed_once(screen->machine, KEYCODE_Q))	{ state->page--;	tilemap_mark_all_tiles_dirty_all(screen->machine);	}
 		if (input_code_pressed_once(screen->machine, KEYCODE_W))	{ state->page++;	tilemap_mark_all_tiles_dirty_all(screen->machine);	}

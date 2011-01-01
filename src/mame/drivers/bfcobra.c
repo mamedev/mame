@@ -385,14 +385,14 @@ INLINE UINT8* blitter_get_addr(running_machine *machine, UINT32 addr)
 	if (addr < 0x10000)
 	{
 		/* Is this region fixed? */
-		return (UINT8*)(memory_region(machine, "user1") + addr);
+		return (UINT8*)(machine->region("user1")->base() + addr);
 	}
 	else if(addr < 0x20000)
 	{
 		addr &= 0xffff;
 		addr += (bank_data[0] & 1) ? 0x10000 : 0;
 
-		return (UINT8*)(memory_region(machine, "user1") + addr + ((bank_data[0] >> 1) * 0x20000));
+		return (UINT8*)(machine->region("user1")->base() + addr + ((bank_data[0] >> 1) * 0x20000));
 	}
 	else if (addr >= 0x20000 && addr < 0x40000)
 	{
@@ -971,7 +971,7 @@ INLINE void z80_bank(running_machine *machine, int num, int data)
 	{
 		UINT32 offset = ((bank_data[0] >> 1) * 0x20000) + ((0x4000 * data) ^ ((bank_data[0] & 1) ? 0 : 0x10000));
 
-		memory_set_bankptr(machine, bank_names[num - 1], memory_region(machine, "user1") + offset);
+		memory_set_bankptr(machine, bank_names[num - 1], machine->region("user1")->base() + offset);
 	}
 	else if (data < 0x10)
 	{
@@ -1109,7 +1109,7 @@ static READ8_HANDLER( fddata_r )
 				}
 
 				fdc.offset = (BPT * fdc.track*2) + (fdc.side ? BPT : 0) + (BPS * (fdc.sector-1)) + fdc.byte_pos++;
-				val = *(memory_region(space->machine, "user2") + fdc.offset);
+				val = *(space->machine->region("user2")->base() + fdc.offset);
 
 				/* Move on to next sector? */
 				if (fdc.byte_pos == 1024)
@@ -1667,7 +1667,7 @@ static DRIVER_INIT( bfcobra )
 	UINT8 *tmp;
 
 	tmp = auto_alloc_array(machine, UINT8, 0x8000);
-	rom = memory_region(machine, "audiocpu") + 0x8000;
+	rom = machine->region("audiocpu")->base() + 0x8000;
 	memcpy(tmp, rom, 0x8000);
 
 	for (i = 0; i < 0x8000; i++)
@@ -1696,7 +1696,7 @@ static DRIVER_INIT( bfcobra )
 	bank_data[3] = 0;
 
 	/* Fixed 16kB ROM region */
-	memory_set_bankptr(machine, "bank4", memory_region(machine, "user1"));
+	memory_set_bankptr(machine, "bank4", machine->region("user1")->base());
 
 	/* TODO: Properly sort out the data ACIA */
 	data_r = 1;

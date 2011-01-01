@@ -389,7 +389,7 @@ static WRITE32_HANDLER( psikyosh_vidregs_w )
 static READ32_HANDLER( psh_sample_r ) /* Send sample data for test */
 {
 	psikyosh_state *state = space->machine->driver_data<psikyosh_state>();
-	UINT8 *ROM = memory_region(space->machine, "ymf");
+	UINT8 *ROM = space->machine->region("ymf")->base();
 
 	return ROM[state->sample_offs++] << 16;
 }
@@ -804,7 +804,7 @@ static MACHINE_START( psikyosh )
 
 	state->maincpu = machine->device("maincpu");
 
-	memory_configure_bank(machine, "bank2", 0, 0x1000, memory_region(machine, "gfx1"), 0x20000);
+	memory_configure_bank(machine, "bank2", 0, 0x1000, machine->region("gfx1")->base(), 0x20000);
 
 	state->sample_offs = 0;
 	state_save_register_global(machine, state->sample_offs);
@@ -1203,7 +1203,7 @@ static DRIVER_INIT( s1945ii )
 
 static DRIVER_INIT( daraku )
 {
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 	memory_set_bankptr(machine, "bank1", &RAM[0x100000]);
 	sh2drc_set_options(machine->device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 }
@@ -1215,14 +1215,14 @@ static DRIVER_INIT( sbomberb )
 
 static DRIVER_INIT( gunbird2 )
 {
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 	memory_set_bankptr(machine, "bank1", &RAM[0x100000]);
 	sh2drc_set_options(machine->device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 }
 
 static DRIVER_INIT( s1945iii )
 {
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 	memory_set_bankptr(machine, "bank1", &RAM[0x100000]);
 	sh2drc_set_options(machine->device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 }

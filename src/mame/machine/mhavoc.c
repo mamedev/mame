@@ -105,7 +105,7 @@ MACHINE_RESET( mhavoc )
 
 	memory_configure_bank(machine, "bank1", 0, 1, mhavoc_zram0, 0);
 	memory_configure_bank(machine, "bank1", 1, 1, mhavoc_zram1, 0);
-	memory_configure_bank(machine, "bank2", 0, 4, memory_region(machine, "alpha") + 0x10000, 0x2000);
+	memory_configure_bank(machine, "bank2", 0, 4, machine->region("alpha")->base() + 0x10000, 0x2000);
 
 	/* reset RAM/ROM banks to 0 */
 	mhavoc_ram_banksel_w(space, 0, 0);

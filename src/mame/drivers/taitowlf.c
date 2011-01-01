@@ -141,7 +141,7 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 			}
 			else					// disable RAM access (reads go to BIOS ROM)
 			{
-				memory_set_bankptr(busdevice->machine, "bank1", memory_region(busdevice->machine, "user1") + 0x30000);
+				memory_set_bankptr(busdevice->machine, "bank1", busdevice->machine->region("user1")->base() + 0x30000);
 			}
 			break;
 		}
@@ -546,7 +546,7 @@ static MACHINE_START(taitowlf)
 
 static MACHINE_RESET(taitowlf)
 {
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1") + 0x30000);
+	memory_set_bankptr(machine, "bank1", machine->region("user1")->base() + 0x30000);
 }
 
 

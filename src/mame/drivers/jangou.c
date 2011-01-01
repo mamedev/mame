@@ -154,7 +154,7 @@ w [$17]
 
 static UINT8 jangou_gfx_nibble( running_machine *machine, UINT16 niboffset )
 {
-	const UINT8 *const blit_rom = memory_region(machine, "gfx");
+	const UINT8 *const blit_rom = machine->region("gfx")->base();
 
 	if (niboffset & 1)
 		return (blit_rom[(niboffset >> 1) & 0xffff] & 0xf0) >> 4;
@@ -1368,7 +1368,7 @@ static DRIVER_INIT (luckygrl)
 {
 	// this is WRONG
 	int A;
-	UINT8 *ROM = memory_region(machine, "cpu0");
+	UINT8 *ROM = machine->region("cpu0")->base();
 
 	unsigned char patn1[32] = {
 		0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0,

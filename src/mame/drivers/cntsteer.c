@@ -1076,8 +1076,8 @@ ROM_END
 
 static void zerotrgt_rearrange_gfx( running_machine *machine, int romsize, int romarea )
 {
-	UINT8 *src = memory_region(machine, "gfx4");
-	UINT8 *dst = memory_region(machine, "gfx3");
+	UINT8 *src = machine->region("gfx4")->base();
+	UINT8 *dst = machine->region("gfx3")->base();
 	int rm;
 	int cnt1;
 
@@ -1096,7 +1096,7 @@ static void zerotrgt_rearrange_gfx( running_machine *machine, int romsize, int r
 #if 0
 static DRIVER_INIT( cntsteer )
 {
-	UINT8 *RAM = memory_region(machine, "subcpu");
+	UINT8 *RAM = machine->region("subcpu")->base();
 
 	RAM[0xc2cf] = 0x43; /* Patch out Cpu 1 ram test - it never ends..?! */
 	RAM[0xc2d0] = 0x43;

@@ -367,11 +367,11 @@ static MACHINE_RESET(model2o)
 
 static MACHINE_RESET(model2_scsp)
 {
-	memory_set_bankptr(machine, "bank4", memory_region(machine, "scsp") + 0x200000);
-	memory_set_bankptr(machine, "bank5", memory_region(machine, "scsp") + 0x600000);
+	memory_set_bankptr(machine, "bank4", machine->region("scsp")->base() + 0x200000);
+	memory_set_bankptr(machine, "bank5", machine->region("scsp")->base() + 0x600000);
 
 	// copy the 68k vector table into RAM
-	memcpy(model2_soundram, memory_region(machine, "audiocpu") + 0x80000, 16);
+	memcpy(model2_soundram, machine->region("audiocpu")->base() + 0x80000, 16);
 	machine->device("audiocpu")->reset();
 }
 
@@ -1171,7 +1171,7 @@ static int model2_maxxstate = 0;
 
 static READ32_HANDLER( maxx_r )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(space->machine, "maincpu");
+	UINT32 *ROM = (UINT32 *)space->machine->region("maincpu")->base();
 
 	if (offset <= 0x1f/4)
 	{
@@ -1863,9 +1863,9 @@ ADDRESS_MAP_END
 static WRITE16_HANDLER( model2snd_ctrl )
 {
 	// handle sample banking
-	if (memory_region_length(space->machine, "scsp") > 0x800000)
+	if (space->machine->region("scsp")->bytes() > 0x800000)
 	{
-		UINT8 *snd = memory_region(space->machine, "scsp");
+		UINT8 *snd = space->machine->region("scsp")->base();
 		if (data & 0x20)
 		{
 			memory_set_bankptr(space->machine, "bank4", snd + 0x200000);
@@ -4825,7 +4825,7 @@ static DRIVER_INIT( genprot )
 
 static DRIVER_INIT( pltkids )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(machine, "maincpu");
+	UINT32 *ROM = (UINT32 *)machine->region("maincpu")->base();
 
 	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	protstate = protpos = 0;
@@ -4836,7 +4836,7 @@ static DRIVER_INIT( pltkids )
 
 static DRIVER_INIT( zerogun )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(machine, "maincpu");
+	UINT32 *ROM = (UINT32 *)machine->region("maincpu")->base();
 
 	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	protstate = protpos = 0;
@@ -4879,7 +4879,7 @@ static WRITE32_HANDLER( jaleco_network_w )
 
 static DRIVER_INIT( sgt24h )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(machine, "maincpu");
+	UINT32 *ROM = (UINT32 *)machine->region("maincpu")->base();
 
 	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01a10000, 0x01a1ffff, 0, 0, jaleco_network_r, jaleco_network_w);
@@ -4900,7 +4900,7 @@ static DRIVER_INIT( overrev )
 
 static DRIVER_INIT( doa )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(machine, "maincpu");
+	UINT32 *ROM = (UINT32 *)machine->region("maincpu")->base();
 
 	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	protstate = protpos = 0;

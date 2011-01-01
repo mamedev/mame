@@ -83,7 +83,7 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
     the tiles in ROM B2.2B
 */
 	munchmo_state *state = machine->driver_data<munchmo_state>();
-	UINT8 *rom = memory_region(machine, "gfx2");
+	UINT8 *rom = machine->region("gfx2")->base();
 	const gfx_element *gfx = machine->gfx[1];
 	int offs;
 

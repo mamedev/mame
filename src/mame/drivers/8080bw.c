@@ -2163,8 +2163,8 @@ MACHINE_CONFIG_END
 /* decrypt function for vortex */
 static DRIVER_INIT( vortex )
 {
-	UINT8 *rom = memory_region(machine, "maincpu");
-	int length = memory_region_length(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
+	int length = machine->region("maincpu")->bytes();
 	UINT8 *buf1 = auto_alloc_array(machine, UINT8, length);
 	UINT32 x;
 	for (x = 0; x < length; x++)

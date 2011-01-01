@@ -27,7 +27,7 @@
 
 PALETTE_INIT( dcheese )
 {
-	const UINT16 *src = (UINT16 *)memory_region(machine, "user1");
+	const UINT16 *src = (UINT16 *)machine->region("user1")->base();
 	int i;
 
 	/* really 65536 colors, but they don't use the later ones so we can stay */
@@ -168,8 +168,8 @@ static void do_blit( running_machine *machine )
 	INT32 dxdy = (INT32)(((state->blitter_xparam[6] & 0x0fff) | ((state->blitter_xparam[7] & 0x0fff) << 12)) << 12) >> 12;
 	INT32 dydx = (INT32)(((state->blitter_yparam[4] & 0x0fff) | ((state->blitter_yparam[5] & 0x0fff) << 12)) << 12) >> 12;
 	INT32 dydy = (INT32)(((state->blitter_yparam[6] & 0x0fff) | ((state->blitter_yparam[7] & 0x0fff) << 12)) << 12) >> 12;
-	UINT8 *src = memory_region(machine, "gfx1");
-	UINT32 pagemask = (memory_region_length(machine, "gfx1") - 1) / 0x40000;
+	UINT8 *src = machine->region("gfx1")->base();
+	UINT32 pagemask = (machine->region("gfx1")->bytes() - 1) / 0x40000;
 	int xstart = state->blitter_xparam[14];
 	int xend = state->blitter_xparam[15] + 1;
 	int ystart = state->blitter_yparam[14];

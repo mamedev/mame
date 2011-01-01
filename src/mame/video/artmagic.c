@@ -58,8 +58,8 @@ INLINE UINT16 *address_to_vram(offs_t *address)
 
 VIDEO_START( artmagic )
 {
-	blitter_base = (UINT16 *)memory_region(machine, "gfx1");
-	blitter_mask = memory_region_length(machine, "gfx1")/2 - 1;
+	blitter_base = (UINT16 *)machine->region("gfx1")->base();
+	blitter_mask = machine->region("gfx1")->bytes()/2 - 1;
 
 	state_save_register_global_array(machine, artmagic_xor);
 	state_save_register_global(machine, artmagic_is_stoneball);

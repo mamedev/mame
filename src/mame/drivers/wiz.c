@@ -1031,8 +1031,8 @@ static DRIVER_INIT( stinger )
 		{ 5,7,3, 0x28 }
 	};
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8 *rom = memory_region(machine, "maincpu");
-	int size = memory_region_length(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
+	int size = machine->region("maincpu")->bytes();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, size);
 	int A;
 	const UINT8 *tbl;

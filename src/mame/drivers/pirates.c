@@ -343,11 +343,11 @@ static void pirates_decrypt_68k(running_machine *machine)
     UINT16 *buf, *rom;
     int i;
 
-    rom_size = memory_region_length(machine, "maincpu");
+    rom_size = machine->region("maincpu")->bytes();
 
     buf = auto_alloc_array(machine, UINT16, rom_size/2);
 
-    rom = (UINT16 *)memory_region(machine, "maincpu");
+    rom = (UINT16 *)machine->region("maincpu")->base();
     memcpy (buf, rom, rom_size);
 
     for (i=0; i<rom_size/2; i++)
@@ -372,11 +372,11 @@ static void pirates_decrypt_p(running_machine *machine)
     UINT8 *buf, *rom;
     int i;
 
-    rom_size = memory_region_length(machine, "gfx1");
+    rom_size = machine->region("gfx1")->bytes();
 
     buf = auto_alloc_array(machine, UINT8, rom_size);
 
-    rom = memory_region(machine, "gfx1");
+    rom = machine->region("gfx1")->base();
     memcpy (buf, rom, rom_size);
 
     for (i=0; i<rom_size/4; i++)
@@ -396,11 +396,11 @@ static void pirates_decrypt_s(running_machine *machine)
     UINT8 *buf, *rom;
     int i;
 
-    rom_size = memory_region_length(machine, "gfx2");
+    rom_size = machine->region("gfx2")->bytes();
 
     buf = auto_alloc_array(machine, UINT8, rom_size);
 
-    rom = memory_region(machine, "gfx2");
+    rom = machine->region("gfx2")->base();
     memcpy (buf, rom, rom_size);
 
     for (i=0; i<rom_size/4; i++)
@@ -421,11 +421,11 @@ static void pirates_decrypt_oki(running_machine *machine)
     UINT8 *buf, *rom;
     int i;
 
-    rom_size = memory_region_length(machine, "oki");
+    rom_size = machine->region("oki")->bytes();
 
     buf = auto_alloc_array(machine, UINT8, rom_size);
 
-    rom = memory_region(machine, "oki");
+    rom = machine->region("oki")->base();
     memcpy (buf, rom, rom_size);
 
     for (i=0; i<rom_size; i++)
@@ -439,7 +439,7 @@ static void pirates_decrypt_oki(running_machine *machine)
 
 static DRIVER_INIT( pirates )
 {
-	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
 
 	pirates_decrypt_68k(machine);
 	pirates_decrypt_p(machine);

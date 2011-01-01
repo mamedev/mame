@@ -215,7 +215,7 @@ static WRITE16_HANDLER ( ssmissin_sound_w )
 
 static WRITE8_HANDLER ( ssmissin_soundbank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "oki1");
+	UINT8 *rom = space->machine->region("oki1")->base();
 	int bank;
 
 	bank = data & 0x3;
@@ -277,14 +277,14 @@ static WRITE16_HANDLER( macross2_sound_command_w )
 
 static WRITE8_HANDLER( macross2_sound_bank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "audiocpu") + 0x10000;
+	UINT8 *rom = space->machine->region("audiocpu")->base() + 0x10000;
 
 	memory_set_bankptr(space->machine, "bank1",rom + (data & 0x07) * 0x4000);
 }
 
 static WRITE8_HANDLER( tharrier_oki6295_bankswitch_0_w )
 {
-	UINT8 *rom = memory_region(space->machine, "oki1");
+	UINT8 *rom = space->machine->region("oki1")->base();
 
 	data &= 3;
 	if (data != 3)
@@ -293,7 +293,7 @@ static WRITE8_HANDLER( tharrier_oki6295_bankswitch_0_w )
 
 static WRITE8_HANDLER( tharrier_oki6295_bankswitch_1_w )
 {
-	UINT8 *rom = memory_region(space->machine, "oki2");
+	UINT8 *rom = space->machine->region("oki2")->base();
 
 	data &= 3;
 	if (data != 3)
@@ -1072,7 +1072,7 @@ static WRITE8_HANDLER( okibank_w )
 
 static WRITE8_HANDLER( raphero_sound_rombank_w )
 {
-	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "audiocpu") + 0x10000 + (data & 0x07) * 0x4000);
+	memory_set_bankptr(space->machine, "bank1",space->machine->region("audiocpu")->base() + 0x10000 + (data & 0x07) * 0x4000);
 }
 
 static ADDRESS_MAP_START( raphero_sound_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -4433,16 +4433,16 @@ static void decode_gfx(running_machine *machine)
 
 
 	/* background */
-	rom = memory_region(machine, "gfx2");
-	len = memory_region_length(machine, "gfx2");
+	rom = machine->region("gfx2")->base();
+	len = machine->region("gfx2")->bytes();
 	for (A = 0;A < len;A++)
 	{
 		rom[A] = decode_byte( rom[A], decode_data_bg[bjtwin_address_map_bg0(A)]);
 	}
 
 	/* sprites */
-	rom = memory_region(machine, "gfx3");
-	len = memory_region_length(machine, "gfx3");
+	rom = machine->region("gfx3")->base();
+	len = machine->region("gfx3")->bytes();
 	for (A = 0;A < len;A += 2)
 	{
 		UINT16 tmp = decode_word( rom[A+1]*256 + rom[A], decode_data_sprite[bjtwin_address_map_sprites(A)]);
@@ -4471,8 +4471,8 @@ static void decode_tdragonb(running_machine *machine)
 		{0x7,0x6,0x5,0x3,0x4,0x2,0x1,0x0},
 	};
 
-	rom = memory_region(machine, "maincpu");
-	len = memory_region_length(machine, "maincpu");
+	rom = machine->region("maincpu")->base();
+	len = machine->region("maincpu")->bytes();
 	for (A = 0;A < len;A += 2)
 	{
 		int h = A+NATIVE_ENDIAN_VALUE_LE_BE(1,0), l = A+NATIVE_ENDIAN_VALUE_LE_BE(0,1);
@@ -4481,15 +4481,15 @@ static void decode_tdragonb(running_machine *machine)
 		rom[l] = tmp & 0xff;
 	}
 
-	rom = memory_region(machine, "gfx2");
-	len = memory_region_length(machine, "gfx2");
+	rom = machine->region("gfx2")->base();
+	len = machine->region("gfx2")->bytes();
 	for (A = 0;A < len;A++)
 	{
 		rom[A] = decode_byte( rom[A], decode_data_tdragonbgfx[0]);
 	}
 
-	rom = memory_region(machine, "gfx3");
-	len = memory_region_length(machine, "gfx3");
+	rom = machine->region("gfx3")->base();
+	len = machine->region("gfx3")->bytes();
 	for (A = 0;A < len;A++)
 	{
 		rom[A] = decode_byte( rom[A], decode_data_tdragonbgfx[0]);
@@ -4508,15 +4508,15 @@ static void decode_ssmissin(running_machine *machine)
 		{0x7,0x6,0x5,0x3,0x4,0x2,0x1,0x0},
 	};
 
-	rom = memory_region(machine, "gfx2");
-	len = memory_region_length(machine, "gfx2");
+	rom = machine->region("gfx2")->base();
+	len = machine->region("gfx2")->bytes();
 	for (A = 0;A < len;A++)
 	{
 		rom[A] = decode_byte( rom[A], decode_data_tdragonbgfx[0]);
 	}
 
-	rom = memory_region(machine, "gfx3");
-	len = memory_region_length(machine, "gfx3");
+	rom = machine->region("gfx3")->base();
+	len = machine->region("gfx3")->bytes();
 	for (A = 0;A < len;A++)
 	{
 		rom[A] = decode_byte( rom[A], decode_data_tdragonbgfx[0]);
@@ -4531,7 +4531,7 @@ static DRIVER_INIT( nmk )
 
 static DRIVER_INIT( hachamf )
 {
-	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
 
 	//rom[0x0006/2] = 0x7dc2;   /* replace reset vector with the "real" one */
 
@@ -4542,7 +4542,7 @@ static DRIVER_INIT( hachamf )
 
 static DRIVER_INIT( tdragonb )
 {
-	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
 
 	decode_tdragonb(machine);
 
@@ -4553,7 +4553,7 @@ static DRIVER_INIT( tdragonb )
 
 static DRIVER_INIT( tdragon )
 {
-	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
 
 	//rom[0x94b0/2] = 0; /* Patch out JMP to shared memory (protection) */
 	//rom[0x94b2/2] = 0x92f4;
@@ -4587,7 +4587,7 @@ static DRIVER_INIT( bjtwin )
  *  008F7E: 207C 000F 9000           movea.l #$f9000, A0
  */
 #if 0
-	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
 	rom[0x09172/2] = 0x6006;    /* patch checksum error */
 	rom[0x08f74/2] = 0x4e71;
 #endif
@@ -5000,8 +5000,8 @@ static void decryptcode( running_machine *machine, int a23, int a22, int a21, in
 	int a11, int a10, int a9, int a8, int a7, int a6, int a5, int a4, int a3, int a2, int a1, int a0 )
 {
 	int i;
-	UINT8 *RAM = memory_region( machine, "maincpu" );
-	size_t  size = memory_region_length( machine, "maincpu" );
+	UINT8 *RAM = machine->region( "maincpu" )->base();
+	size_t  size = machine->region( "maincpu" )->bytes();
 	UINT8 *buffer = auto_alloc_array(machine, UINT8,  size );
 
 	memcpy( buffer, RAM, size );

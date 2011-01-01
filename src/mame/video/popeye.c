@@ -139,7 +139,7 @@ PALETTE_INIT( popeyebl )
 static void set_background_palette(running_machine *machine,int bank)
 {
 	int i;
-	UINT8 *color_prom = memory_region(machine, "proms") + 16 * bank;
+	UINT8 *color_prom = machine->region("proms")->base() + 16 * bank;
 
 	for (i = 0;i < 16;i++)
 	{

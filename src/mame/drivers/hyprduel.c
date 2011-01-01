@@ -210,8 +210,8 @@ static TIMER_CALLBACK( magerror_irq_callback )
 static READ16_HANDLER( hyprduel_bankedrom_r )
 {
 	hyprduel_state *state = space->machine->driver_data<hyprduel_state>();
-	UINT8 *ROM = memory_region(space->machine, "gfx1");
-	size_t  len = memory_region_length(space->machine, "gfx1");
+	UINT8 *ROM = space->machine->region("gfx1")->base();
+	size_t  len = space->machine->region("gfx1")->bytes();
 
 	offset = offset * 2 + 0x10000 * (*state->rombank);
 
@@ -296,8 +296,8 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
 
 	if (offset == 0xc / 2)
 	{
-		UINT8 *src = memory_region(space->machine, "gfx1");
-		size_t  src_len = memory_region_length(space->machine, "gfx1");
+		UINT8 *src = space->machine->region("gfx1")->base();
+		size_t  src_len = space->machine->region("gfx1")->bytes();
 
 		UINT32 tmap = (state->blitter_regs[0x00 / 2] << 16) + state->blitter_regs[0x02 / 2];
 		UINT32 src_offs = (state->blitter_regs[0x04 / 2] << 16) + state->blitter_regs[0x06 / 2];

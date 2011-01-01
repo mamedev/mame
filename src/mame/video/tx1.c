@@ -258,7 +258,7 @@ static void tx1_draw_char(running_machine *machine, UINT8 *bitmap)
 	UINT8 *chars, *gfx2;
 
 	/* 2bpp characters */
-	chars = memory_region(machine, "char_tiles");
+	chars = machine->region("char_tiles")->base();
 	gfx2 = chars + 0x4000;
 
 	/* X scroll value is the last word in char RAM */
@@ -433,13 +433,13 @@ static void tx1_draw_road(running_machine *machine, UINT8 *bitmap)
 	UINT8	pix[2][4][3];
 
 	/* Road slice map ROMs */
-	const UINT8 *const gfx3 = memory_region(machine, "gfx3");
+	const UINT8 *const gfx3 = machine->region("gfx3")->base();
 	const UINT8 *const rom_a = gfx3;
 	const UINT8 *const rom_b = gfx3 + 0x2000;
 	const UINT8 *const rom_c = gfx3 + 0x4000;
 
 	/* Pixel data */
-	const UINT8 *const proms = memory_region(machine, "proms");
+	const UINT8 *const proms = machine->region("proms")->base();
 	const UINT8 *const prom_a = proms + 0x1100;
 	const UINT8 *const prom_b = proms + 0x1300;
 	const UINT8 *const prom_c = proms + 0x1500;
@@ -874,18 +874,18 @@ static void tx1_draw_objects(running_machine *machine, UINT8 *bitmap)
 	UINT32 offs;
 
 	/* The many lookup table ROMs */
-	const UINT8 *const ic48 = memory_region(machine, "user3");
+	const UINT8 *const ic48 = machine->region("user3")->base();
 	const UINT8 *const ic281 = ic48 + 0x2000;
 
-	const UINT8 *const proms = memory_region(machine, "proms");
+	const UINT8 *const proms = machine->region("proms")->base();
 	const UINT8 *const ic190 = proms + 0xc00;
 	const UINT8 *const ic162 = proms + 0xe00;
 	const UINT8 *const ic25  = proms + 0x1000;
 
-	const UINT8 *const ic106 = memory_region(machine, "obj_map");
+	const UINT8 *const ic106 = machine->region("obj_map")->base();
 	const UINT8 *const ic73  = ic106 + 0x4000;
 
-	const UINT8 *const pixdata_rgn = memory_region(machine, "obj_tiles");
+	const UINT8 *const pixdata_rgn = machine->region("obj_tiles")->base();
 
 	for (offs = 0x0; offs <= tx1_objram_size; offs += 8)
 	{
@@ -1143,7 +1143,7 @@ VIDEO_EOF( tx1 )
 static void tx1_combine_layers(running_machine *machine, bitmap_t *bitmap, int screen)
 {
 	int x, y;
-	UINT8 *chr_pal = memory_region(machine, "proms") + 0x900;
+	UINT8 *chr_pal = machine->region("proms")->base() + 0x900;
 
 	int x_offset = screen * 256;
 
@@ -1344,8 +1344,8 @@ static void buggyboy_draw_char(running_machine *machine, UINT8 *bitmap, int wide
 	UINT32 x_mask;
 
 	/* 2bpp characters */
-	chars = memory_region(machine, "char_tiles");
-	gfx2 = memory_region(machine, "char_tiles") + 0x4000;
+	chars = machine->region("char_tiles")->base();
+	gfx2 = machine->region("char_tiles")->base() + 0x4000;
 
 	/* X/Y scroll values are the last word in char RAM */
 	if (wide)
@@ -1576,8 +1576,8 @@ static void buggyboy_draw_road(running_machine *machine, UINT8 *bitmap)
 	UINT32 rva20_6;
 
 	/* ROM/PROM lookup tables */
-	const UINT8 *rcols = (UINT8*)(memory_region(machine, "proms") + 0x1500);
-	const UINT8 *rom   = memory_region(machine, "road");
+	const UINT8 *rcols = (UINT8*)(machine->region("proms")->base() + 0x1500);
+	const UINT8 *rom   = machine->region("road")->base();
 	const UINT8 *prom0 = rom + 0x4000;
 	const UINT8 *prom1 = rom + 0x4200;
 	const UINT8 *prom2 = rom + 0x4400;
@@ -2205,8 +2205,8 @@ static void buggybjr_draw_road(running_machine *machine, UINT8 *bitmap, int wide
 	UINT32 rva20_6;
 
 	/* ROM/PROM lookup tables */
-	const UINT8 *rcols = (UINT8*)(memory_region(machine, "proms") + 0x1500);
-	const UINT8 *rom   = memory_region(machine, "road");
+	const UINT8 *rcols = (UINT8*)(machine->region("proms")->base() + 0x1500);
+	const UINT8 *rom   = machine->region("road")->base();
 	const UINT8 *prom0 = rom + 0x4000;
 	const UINT8 *prom1 = rom + 0x4200;
 	const UINT8 *prom2 = rom + 0x4400;
@@ -2616,17 +2616,17 @@ static void buggyboy_draw_objs(running_machine *machine, UINT8 *bitmap, int wide
 	UINT32 x_stride;
 
 	/* The many lookup table ROMs */
-	const UINT8 *const bug13  = (UINT8*)memory_region(machine, "obj_luts");
+	const UINT8 *const bug13  = (UINT8*)machine->region("obj_luts")->base();
 	const UINT8 *const bug18s = bug13 + 0x2000;
-	const UINT8 *const bb8    = (UINT8*)memory_region(machine, "proms") + 0x1600;
+	const UINT8 *const bb8    = (UINT8*)machine->region("proms")->base() + 0x1600;
 
-	const UINT8 *const bug16s = (UINT8*)memory_region(machine, "obj_map");
+	const UINT8 *const bug16s = (UINT8*)machine->region("obj_map")->base();
 	const UINT8 *const bug17s = bug16s + 0x8000;
 
-	const UINT8 *const bb9o = (UINT8*)memory_region(machine, "proms") + 0x500;
+	const UINT8 *const bb9o = (UINT8*)machine->region("proms")->base() + 0x500;
 	const UINT8 *const bb9e = bb9o + 0x800;
 
-	const UINT8 *const pixdata_rgn = (UINT8*)memory_region(machine, "obj_tiles");
+	const UINT8 *const pixdata_rgn = (UINT8*)machine->region("obj_tiles")->base();
 
 	if (wide)
 	{
@@ -2974,7 +2974,7 @@ WRITE16_HANDLER( buggyboy_scolst_w )
 
 static void bb_combine_layers(running_machine *machine, bitmap_t *bitmap, int screen)
 {
-	UINT8 *chr_pal = memory_region(machine, "proms") + 0x400;
+	UINT8 *chr_pal = machine->region("proms")->base() + 0x400;
 	UINT32 bmp_stride;
 	UINT32 x_offset;
 	UINT32 y;

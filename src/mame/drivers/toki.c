@@ -72,7 +72,7 @@ static void toki_adpcm_int (device_t *device)
 static WRITE8_DEVICE_HANDLER( toki_adpcm_control_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(device->machine, "audiocpu");
+	UINT8 *RAM = device->machine->region("audiocpu")->base();
 
 
 	/* the code writes either 2 or 3 in the bottom two bits */
@@ -741,7 +741,7 @@ ROM_END
 
 static DRIVER_INIT( toki )
 {
-	UINT8 *ROM = memory_region(machine, "oki");
+	UINT8 *ROM = machine->region("oki")->base();
 	UINT8 *buffer = auto_alloc_array(machine, UINT8, 0x20000);
 	int i;
 
@@ -764,14 +764,14 @@ static DRIVER_INIT( tokib )
 	UINT8 *rom;
 
 	/* invert the sprite data in the ROMs */
-	len = memory_region_length(machine, "gfx2");
-	rom = memory_region(machine, "gfx2");
+	len = machine->region("gfx2")->bytes();
+	rom = machine->region("gfx2")->base();
 	for (i = 0; i < len; i++)
 		rom[i] ^= 0xff;
 
 	/* merge background tile graphics together */
-	len = memory_region_length(machine, "gfx3");
-	rom = memory_region(machine, "gfx3");
+	len = machine->region("gfx3")->bytes();
+	rom = machine->region("gfx3")->base();
 	for (offs = 0; offs < len; offs += 0x20000)
 	{
 		UINT8 *base = &rom[offs];
@@ -784,8 +784,8 @@ static DRIVER_INIT( tokib )
 			memcpy (&base[0x18000 + i * 0x800], &temp[0x1800 + i * 0x2000], 0x800);
 		}
 	}
-	len = memory_region_length(machine, "gfx4");
-	rom = memory_region(machine, "gfx4");
+	len = machine->region("gfx4")->bytes();
+	rom = machine->region("gfx4")->base();
 	for (offs = 0; offs < len; offs += 0x20000)
 	{
 		UINT8 *base = &rom[offs];
@@ -807,7 +807,7 @@ static DRIVER_INIT(jujub)
 	/* Program ROMs are bitswapped */
 	{
 		int i;
-		UINT16 *prgrom = (UINT16*)memory_region(machine, "maincpu");
+		UINT16 *prgrom = (UINT16*)machine->region("maincpu")->base();
 
 		for (i = 0; i < 0x60000/2; i++)
 		{
@@ -822,7 +822,7 @@ static DRIVER_INIT(jujub)
 	{
 		address_space *space = cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
 		UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x20000);
-		UINT8 *rom = memory_region(machine, "audiocpu");
+		UINT8 *rom = machine->region("audiocpu")->base();
 		int i;
 
 		memcpy(decrypt,rom,0x20000);
@@ -837,7 +837,7 @@ static DRIVER_INIT(jujub)
 	}
 
 	{
-		UINT8 *ROM = memory_region(machine, "oki");
+		UINT8 *ROM = machine->region("oki")->base();
 		UINT8 *buffer = auto_alloc_array(machine, UINT8, 0x20000);
 		int i;
 

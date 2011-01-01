@@ -154,7 +154,7 @@ static void plot_byte( running_machine *machine, bitmap_t *bitmap, UINT8 y, UINT
 static VIDEO_UPDATE( astinvad )
 {
 	astinvad_state *state = screen->machine->driver_data<astinvad_state>();
-	const UINT8 *color_prom = memory_region(screen->machine, "proms");
+	const UINT8 *color_prom = screen->machine->region("proms")->base();
 	UINT8 yoffs = state->flip_yoffs & state->screen_flip;
 	int x, y;
 
@@ -174,7 +174,7 @@ static VIDEO_UPDATE( astinvad )
 static VIDEO_UPDATE( spaceint )
 {
 	astinvad_state *state = screen->machine->driver_data<astinvad_state>();
-	const UINT8 *color_prom = memory_region(screen->machine, "proms");
+	const UINT8 *color_prom = screen->machine->region("proms")->base();
 	int offs;
 
 	for (offs = 0; offs < state->videoram_size; offs++)

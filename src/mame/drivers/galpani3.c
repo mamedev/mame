@@ -323,7 +323,7 @@ static VIDEO_UPDATE(galpani3)
 
 	bitmap_fill(sprite_bitmap_1, cliprect, 0x0000);
 
-	skns_draw_sprites(screen->machine, sprite_bitmap_1, cliprect, galpani3_spriteram32, screen->machine->generic.spriteram_size, memory_region(screen->machine,"gfx1"), memory_region_length (screen->machine, "gfx1"), galpani3_spc_regs );
+	skns_draw_sprites(screen->machine, sprite_bitmap_1, cliprect, galpani3_spriteram32, screen->machine->generic.spriteram_size, screen->machine->region("gfx1")->base(), screen->machine->region ("gfx1")->bytes(), galpani3_spc_regs );
 
 	// ignoring priority bits for now..
 	for (y=0;y<240;y++)
@@ -669,7 +669,7 @@ static WRITE16_HANDLER( galpani3_regs1_address_w )
 static WRITE16_HANDLER( galpani3_regs1_go_w )
 {
 	UINT32 address = galpani3_regs1_address_regs[1]| (galpani3_regs1_address_regs[0]<<16);
-	UINT8* rledata = memory_region(space->machine,"gfx2");
+	UINT8* rledata = space->machine->region("gfx2")->base();
 
 	printf("galpani3_regs1_go_w? %08x\n",address );
 	if ((data==0x2000) || (data==0x3000)) gp3_do_rle(address, galpani3_framebuffer1, rledata);
@@ -685,7 +685,7 @@ static WRITE16_HANDLER( galpani3_regs2_address_w )
 static WRITE16_HANDLER( galpani3_regs2_go_w )
 {
 	UINT32 address = galpani3_regs2_address_regs[1]| (galpani3_regs2_address_regs[0]<<16);
-	UINT8* rledata = memory_region(space->machine,"gfx2");
+	UINT8* rledata = space->machine->region("gfx2")->base();
 
 	printf("galpani3_regs2_go_w? %08x\n", address );
 
@@ -705,7 +705,7 @@ static WRITE16_HANDLER( galpani3_regs3_address_w )
 static WRITE16_HANDLER( galpani3_regs3_go_w )
 {
 	UINT32 address =  galpani3_regs3_address_regs[1]| (galpani3_regs3_address_regs[0]<<16);
-	UINT8* rledata = memory_region(space->machine,"gfx2");
+	UINT8* rledata = space->machine->region("gfx2")->base();
 
 	printf("galpani3_regs3_go_w? %08x\n",address );
 

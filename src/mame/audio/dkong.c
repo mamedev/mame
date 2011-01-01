@@ -1124,7 +1124,7 @@ static SOUND_START( dkong)
 {
 	dkong_state *state = machine->driver_data<dkong_state>();
 
-	state->snd_rom = memory_region(machine, "soundcpu");
+	state->snd_rom = machine->region("soundcpu")->base();
 }
 
 

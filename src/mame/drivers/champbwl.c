@@ -334,7 +334,7 @@ static const x1_010_interface champbwl_sound_intf =
 static MACHINE_START( champbwl )
 {
 	tnzs_state *state = machine->driver_data<tnzs_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	state->mcu = NULL;
 

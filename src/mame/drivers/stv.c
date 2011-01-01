@@ -2385,7 +2385,7 @@ DRIVER_INIT ( stv )
 #ifdef UNUSED_FUNCTION
 static void print_game_info(void)
 {
-	UINT8 *ROM = memory_region(machine, "user1");
+	UINT8 *ROM = machine->region("user1")->base();
 	static FILE *print_file = NULL;
 	UINT8 STR[0x100];
 	UINT32 src_i,dst_i;
@@ -4015,7 +4015,7 @@ by Sega titles,and this is a Sunsoft game)It's likely to be a left-over...
 
 static DRIVER_INIT( sanjeon )
 {
-	UINT8 *src    = memory_region       ( machine, "user1" );
+	UINT8 *src    = machine->region       ( "user1" )->base();
 	int x;
 
 	for (x=0;x<0x3000000;x++)

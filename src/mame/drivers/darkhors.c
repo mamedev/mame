@@ -920,8 +920,8 @@ ROM_END
 
 static DRIVER_INIT( darkhors )
 {
-	UINT32 *rom    = (UINT32 *) memory_region(machine, "maincpu");
-	UINT8  *eeprom = (UINT8 *)  memory_region(machine, "eeprom");
+	UINT32 *rom    = (UINT32 *) machine->region("maincpu")->base();
+	UINT8  *eeprom = (UINT8 *)  machine->region("eeprom")->base();
 	int i;
 
 #if 1

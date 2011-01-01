@@ -271,8 +271,8 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	static const int pri[] = { 0, 0xfc, 0xff, 0xff };
 	int offs;
 	UINT16 *spritelist = (UINT16 *)(state->spritebuf2 + 0x1800 / 4);
-	UINT8 *TILES = memory_region(machine, "spritelut");	// Sprites LUT
-	int TILES_LEN = memory_region_length(machine, "spritelut");
+	UINT8 *TILES = machine->region("spritelut")->base();	// Sprites LUT
+	int TILES_LEN = machine->region("spritelut")->bytes();
 
 	int width = machine->primary_screen->width();
 	int height = machine->primary_screen->height();
@@ -393,8 +393,8 @@ static void draw_sprites_bootleg( running_machine *machine, bitmap_t *bitmap, co
 //  UINT16 *spritelist  =   (UINT16 *)(machine->generic.spriteram.u32 + 0x1800/4);
 	UINT16 *spritelist = (UINT16 *)(state->spritebuf2 + 0x1800 / 4);
 
-	UINT8 *TILES = memory_region(machine, "spritelut");	// Sprites LUT
-	int TILES_LEN = memory_region_length(machine, "spritelut");
+	UINT8 *TILES = machine->region("spritelut")->base();	// Sprites LUT
+	int TILES_LEN = machine->region("spritelut")->bytes();
 
 	int width = machine->primary_screen->width();
 	int height = machine->primary_screen->height();

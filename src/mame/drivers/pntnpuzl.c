@@ -466,7 +466,7 @@ ROM_END
 
 static DRIVER_INIT(pip)
 {
-//  UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
+//  UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
 //  rom[0x2696/2] = 0x4e71;
 //  rom[0x26a0/2] = 0x4e71;
 }

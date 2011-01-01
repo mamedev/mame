@@ -671,7 +671,7 @@ static WRITE16_HANDLER( bank_w )
 	if(ACCESSING_BITS_0_7) {
 		switch(data & 0xf) {
 		case 0x1: // 100000-1fffff data roms banking
-			memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "maincpu") + 0x1000000 + 0x100000*((data >> 4) & 0xf));
+			memory_set_bankptr(space->machine, "bank1", space->machine->region("maincpu")->base() + 0x1000000 + 0x100000*((data >> 4) & 0xf));
 			logerror("BANK %x\n", 0x1000000 + 0x100000*((data >> 4) & 0xf));
 			break;
 		case 0x2: // 200000-2fffff data roms banking (unused, all known games have only one bank)
@@ -737,7 +737,7 @@ static INTERRUPT_GEN(model1_interrupt)
 
 static MACHINE_RESET(model1)
 {
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x1000000);
+	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x1000000);
 	irq_init(machine);
 	model1_tgp_reset(machine, !strcmp(machine->gamedrv->name, "swa") || !strcmp(machine->gamedrv->name, "wingwar") || !strcmp(machine->gamedrv->name, "wingwaru") || !strcmp(machine->gamedrv->name, "wingwarj"));
 	if (!strcmp(machine->gamedrv->name, "swa"))
@@ -756,7 +756,7 @@ static MACHINE_RESET(model1)
 
 static MACHINE_RESET(model1_vr)
 {
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x1000000);
+	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x1000000);
 	irq_init(machine);
 	model1_vr_tgp_reset(machine);
 	model1_sound_irq = 3;

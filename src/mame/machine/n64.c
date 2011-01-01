@@ -2032,8 +2032,8 @@ MACHINE_START( n64 )
 MACHINE_RESET( n64 )
 {
 	int i;
-	//UINT32 *pif_rom   = (UINT32*)memory_region(machine, "user1");
-	UINT32 *cart = (UINT32*)memory_region(machine, "user2");
+	//UINT32 *pif_rom   = (UINT32*)machine->region("user1")->base();
+	UINT32 *cart = (UINT32*)machine->region("user2")->base();
 	UINT64 boot_checksum;
 
 	mi_version = 0;

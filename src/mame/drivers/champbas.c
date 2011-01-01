@@ -1173,9 +1173,9 @@ ROM_END
 static DRIVER_INIT(champbas)
 {
 	// chars and sprites are mixed in the same ROMs, so rearrange them for easier decoding
-	UINT8 *rom1 = memory_region(machine, "gfx1");
-	UINT8 *rom2 = memory_region(machine, "gfx2");
-	int len = memory_region_length(machine, "gfx1");
+	UINT8 *rom1 = machine->region("gfx1")->base();
+	UINT8 *rom2 = machine->region("gfx2")->base();
+	int len = machine->region("gfx1")->bytes();
 	int i;
 
 	for (i = 0; i < len/2; ++i)
@@ -1190,8 +1190,8 @@ static DRIVER_INIT(champbas)
 static DRIVER_INIT( exctsccr )
 {
 	// chars and sprites are mixed in the same ROMs, so rearrange them for easier decoding
-	UINT8 *rom1 = memory_region(machine, "gfx1");
-	UINT8 *rom2 = memory_region(machine, "gfx2");
+	UINT8 *rom1 = machine->region("gfx1")->base();
+	UINT8 *rom2 = machine->region("gfx2")->base();
 	int i;
 
 	// planes 0,1

@@ -92,7 +92,7 @@ static WRITE8_HANDLER( skykid_irq_2_ctrl_w )
 static MACHINE_START( skykid )
 {
 	/* configure the banks */
-	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "maincpu") + 0x10000, 0x2000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine->region("maincpu")->base() + 0x10000, 0x2000);
 
 	state_save_register_global(machine, inputport_selected);
 }
@@ -623,7 +623,7 @@ static DRIVER_INIT( skykid )
 	int i;
 
 	/* unpack the third sprite ROM */
-	rom = memory_region(machine, "gfx3") + 0x4000;
+	rom = machine->region("gfx3")->base() + 0x4000;
 	for (i = 0;i < 0x2000;i++)
 	{
 		rom[i + 0x4000] = rom[i];		// sprite set #1, plane 3

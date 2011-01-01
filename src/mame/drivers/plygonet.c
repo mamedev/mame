@@ -140,7 +140,7 @@ static WRITE32_HANDLER( polygonet_eeprom_w )
 static READ32_HANDLER( ttl_rom_r )
 {
 	UINT32 *ROM;
-	ROM = (UINT32 *)memory_region(space->machine, "gfx1");
+	ROM = (UINT32 *)space->machine->region("gfx1")->base();
 
 	return ROM[offset];
 }
@@ -149,7 +149,7 @@ static READ32_HANDLER( ttl_rom_r )
 static READ32_HANDLER( psac_rom_r )
 {
 	UINT32 *ROM;
-	ROM = (UINT32 *)memory_region(space->machine, "gfx2");
+	ROM = (UINT32 *)space->machine->region("gfx2")->base();
 
 	return ROM[offset];
 }
@@ -563,7 +563,7 @@ ADDRESS_MAP_END
 static void reset_sound_region(running_machine *machine)
 {
 	polygonet_state *state = machine->driver_data<polygonet_state>();
-	memory_set_bankptr(machine, "bank2", memory_region(machine, "soundcpu") + 0x10000 + state->cur_sound_region*0x4000);
+	memory_set_bankptr(machine, "bank2", machine->region("soundcpu")->base() + 0x10000 + state->cur_sound_region*0x4000);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )

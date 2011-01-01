@@ -90,7 +90,7 @@ static WRITE8_HANDLER( iqblock_irqack_w )
 
 static READ8_HANDLER( extrarom_r )
 {
-	return memory_region(space->machine, "user1")[offset];
+	return space->machine->region("user1")->base()[offset];
 }
 
 
@@ -425,7 +425,7 @@ ROM_END
 
 static DRIVER_INIT( iqblock )
 {
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	int i;
 
 	/* decrypt the program ROM */
@@ -447,7 +447,7 @@ static DRIVER_INIT( iqblock )
 
 static DRIVER_INIT( grndtour )
 {
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	int i;
 
 	/* decrypt the program ROM */

@@ -477,7 +477,7 @@ ROM_END
 static DRIVER_INIT( wldarrow )
 {
 	offs_t i;
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 	for (i = 0; i < 0x3800; i++)
 		rom[i] ^= 0xff;

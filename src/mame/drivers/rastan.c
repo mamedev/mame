@@ -182,7 +182,7 @@ static void rastan_msm5205_vck( device_t *device )
 	}
 	else
 	{
-		state->adpcm_data = memory_region(device->machine, "adpcm")[state->adpcm_pos];
+		state->adpcm_data = device->machine->region("adpcm")->base()[state->adpcm_pos];
 		state->adpcm_pos = (state->adpcm_pos + 1) & 0xffff;
 		msm5205_data_w(device, state->adpcm_data >> 4);
 	}
@@ -365,7 +365,7 @@ static const msm5205_interface msm5205_config =
 static MACHINE_START( rastan )
 {
 	rastan_state *state = machine->driver_data<rastan_state>();
-	UINT8 *ROM = memory_region(machine, "audiocpu");
+	UINT8 *ROM = machine->region("audiocpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 1, &ROM[0x00000], 0x4000);
 	memory_configure_bank(machine, "bank1", 1, 3, &ROM[0x10000], 0x4000);

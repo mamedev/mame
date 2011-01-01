@@ -124,7 +124,7 @@ static WRITE8_HANDLER( pending_command_clear_w )
 
 static WRITE8_HANDLER( taotaido_sh_bankswitch_w )
 {
-	UINT8 *rom = memory_region(space->machine, "audiocpu") + 0x10000;
+	UINT8 *rom = space->machine->region("audiocpu")->base() + 0x10000;
 
 	memory_set_bankptr(space->machine, "bank1",rom + (data & 0x03) * 0x8000);
 }

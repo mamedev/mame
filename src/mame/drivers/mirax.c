@@ -471,8 +471,8 @@ ROM_END
 
 static DRIVER_INIT( mirax )
 {
-	UINT8 *DATA = memory_region(machine, "data_code");
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *DATA = machine->region("data_code")->base();
+	UINT8 *ROM = machine->region("maincpu")->base();
 	int i;
 
 	for(i=0x0000;i<0x4000;i++)

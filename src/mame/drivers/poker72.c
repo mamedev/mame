@@ -62,7 +62,7 @@ static WRITE8_HANDLER( poker72_paletteram_w )
 
 static WRITE8_HANDLER( output_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 
 	printf("%02x\n",data);
 
@@ -324,7 +324,7 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_RESET( poker72 )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	memory_set_bankptr(machine, "bank1", &ROM[0]);
 }
@@ -379,7 +379,7 @@ ROM_END
 
 static DRIVER_INIT( poker72 )
 {
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 	rom[0x4a9] = 0x28;
 }

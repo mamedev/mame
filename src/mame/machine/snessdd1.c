@@ -650,7 +650,7 @@ static void sdd1_mmio_write(address_space *space, UINT32 addr, UINT8 data)
 
 static UINT8 sdd1_read(running_machine* machine, UINT32 addr)
 {
-	unsigned char *ROM = memory_region(machine, "cart");
+	unsigned char *ROM = machine->region("cart")->base();
 
 	if(snes_sdd1.sdd1_enable & snes_sdd1.xfer_enable)
 	{

@@ -241,7 +241,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	skyfox_state *state = machine->driver_data<skyfox_state>();
-	UINT8 *RAM = memory_region(machine, "gfx2");
+	UINT8 *RAM = machine->region("gfx2")->base();
 	int x, y, i;
 
 	/* The foreground stars (sprites) move at twice this speed when

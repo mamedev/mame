@@ -457,7 +457,7 @@ static MACHINE_START( draco )
 	MACHINE_START_CALL( cidelsa );
 
 	/* setup COP402 memory banking */
-	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, COP402N_TAG), 0x400);
+	memory_configure_bank(machine, "bank1", 0, 2, machine->region(COP402N_TAG)->base(), 0x400);
 	memory_set_bank(machine, "bank1", 0);
 
 	/* register for state saving */

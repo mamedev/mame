@@ -295,7 +295,7 @@ enum wd1770_status
 
 static TIMER_CALLBACK( fdc_data_callback )
 {
-	UINT8* disk = (UINT8*)memory_region(machine, "user1");
+	UINT8* disk = (UINT8*)machine->region("user1")->base();
 	int more_data = 0;
 
 	/*

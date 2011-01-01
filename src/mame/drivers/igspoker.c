@@ -289,7 +289,7 @@ static CUSTOM_INPUT( hopper_r )
 
 static READ8_HANDLER( exp_rom_r )
 {
-	UINT8 *rom = memory_region(space->machine, "maincpu");
+	UINT8 *rom = space->machine->region("maincpu")->base();
 	return rom[offset+0x10000];
 }
 
@@ -1720,7 +1720,7 @@ ROM_END
 static DRIVER_INIT( cpoker )
 {
 	int A;
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 
 	for (A = 0;A < 0x10000;A++)
@@ -1734,7 +1734,7 @@ static DRIVER_INIT( cpoker )
 
 static DRIVER_INIT( cpokert )
 {
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	int i;
 
 	/* decrypt the program ROM */
@@ -1764,7 +1764,7 @@ static DRIVER_INIT( cpokert )
 static DRIVER_INIT( cska )
 {
 	int A;
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 
 	for (A = 0;A < 0x10000;A++)
@@ -1781,7 +1781,7 @@ static DRIVER_INIT( cska )
 static DRIVER_INIT( igs_ncs )
 {
 	int A;
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 
 	for (A = 0;A < 0x10000;A++)
@@ -1898,7 +1898,7 @@ Clocks
 
 static DRIVER_INIT( igs_ncs2 )
 {
-	UINT8 *src = (UINT8 *) (memory_region(machine, "maincpu"));
+	UINT8 *src = (UINT8 *) (machine->region("maincpu")->base());
 	int i;
 
 	for(i = 0; i < 0x10000; i++)
@@ -1975,8 +1975,8 @@ static DRIVER_INIT( chleague )
 	int length;
 	UINT8 *rom;
 
-	rom = memory_region(machine, "maincpu");
-	length = memory_region_length(machine, "maincpu");
+	rom = machine->region("maincpu")->base();
+	length = machine->region("maincpu")->bytes();
 	for (A = 0;A < length;A++)
 	{
 		if ((A & 0x09C0) == 0x0880) rom[A] ^= 0x20;
@@ -2039,8 +2039,8 @@ static DRIVER_INIT( number10 )
 	UINT8 *tmp;
 	UINT8 *rom;
 
-	rom = memory_region(machine, "maincpu");
-	length = memory_region_length(machine, "maincpu");
+	rom = machine->region("maincpu")->base();
+	length = machine->region("maincpu")->bytes();
 	for (A = 0;A < length;A++)
 	{
 		if ((A & 0x09C0) == 0x0880) rom[A] ^= 0x20;
@@ -2069,8 +2069,8 @@ static DRIVER_INIT( number10 )
 	rom[0xeed] = 0xc3;
 
 	/* Descramble graphic */
-	rom = memory_region(machine, "gfx1");
-	length = memory_region_length(machine, "gfx1");
+	rom = machine->region("gfx1")->base();
+	length = machine->region("gfx1")->bytes();
 	tmp = auto_alloc_array(machine, UINT8, length);
 	memcpy(tmp,rom,length);
 	for (A = 0;A < length;A++)
@@ -2118,7 +2118,7 @@ ROM_END
 static DRIVER_INIT( cpokerpk )
 {
 	int A;
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 	for (A=0x0714; A < 0xF000; A+=0x1000)
 		rom[A] ^= 0x20;
@@ -2172,7 +2172,7 @@ ROM_END
 static DRIVER_INIT( pktet346 )
 {
 	int A;
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 
 	for (A = 0;A < 0x10000;A++)

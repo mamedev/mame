@@ -1166,14 +1166,14 @@ static void ym3438_irq_handler(device_t *device, int state)
 static WRITE8_HANDLER( sound_bank_lo_w )
 {
 	sound_bank = (sound_bank & ~0x3f) | (data & 0x3f);
-	memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "soundcpu") + 0x100000 + 0x2000 * sound_bank);
+	memory_set_bankptr(space->machine, "bank1", space->machine->region("soundcpu")->base() + 0x100000 + 0x2000 * sound_bank);
 }
 
 
 static WRITE8_HANDLER( sound_bank_hi_w )
 {
 	sound_bank = (sound_bank & 0x3f) | ((data & 0x04) << 4) | ((data & 0x03) << 7);
-	memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "soundcpu") + 0x100000 + 0x2000 * sound_bank);
+	memory_set_bankptr(space->machine, "bank1", space->machine->region("soundcpu")->base() + 0x100000 + 0x2000 * sound_bank);
 }
 
 
@@ -4126,7 +4126,7 @@ static DRIVER_INIT( holo )
 static DRIVER_INIT( jpark )
 {
 	/* Temp. Patch until we emulate the 'Drive Board', thanks to Malice */
-	UINT16 *pROM = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *pROM = (UINT16 *)machine->region("maincpu")->base();
 
 	segas32_common_init(analog_custom_io_r, analog_custom_io_w);
 

@@ -591,8 +591,8 @@ static DRIVER_INIT( badlands )
 	badlands_state *state = machine->driver_data<badlands_state>();
 
 	/* initialize the audio system */
-	state->bank_base = &memory_region(machine, "audiocpu")[0x03000];
-	state->bank_source_data = &memory_region(machine, "audiocpu")[0x10000];
+	state->bank_base = &machine->region("audiocpu")->base()[0x03000];
+	state->bank_source_data = &machine->region("audiocpu")->base()[0x10000];
 }
 
 

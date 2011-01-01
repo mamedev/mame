@@ -372,7 +372,7 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 		cputag_set_input_line(space->machine, "maincpu", 1, HOLD_LINE);
 
 		{
-			UINT8 *rom = memory_region(space->machine, "gfx1");
+			UINT8 *rom = space->machine->region("gfx1")->base();
 
 			int width = space->machine->primary_screen->width();
 			int height = space->machine->primary_screen->height();
@@ -784,7 +784,7 @@ static MACHINE_START( wheelfir )
 		state->zoom_table[i]=-1;
 	}
 
-	UINT16 *ROM = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *ROM = (UINT16 *)machine->region("maincpu")->base();
 
 	for(int j=0;j<400;++j)
 	{
@@ -869,7 +869,7 @@ ROM_END
 
 static DRIVER_INIT(wheelfir)
 {
-	UINT16 *RAM = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *RAM = (UINT16 *)machine->region("maincpu")->base();
 	RAM[0xdd3da/2] = 0x4e71; //hack
 }
 

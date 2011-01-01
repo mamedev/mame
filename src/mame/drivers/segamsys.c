@@ -1608,13 +1608,13 @@ static WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
 			//printf("bank ram??\n");
 			break;
 		case 1:
-			memcpy(sms_rom+0x0000, memory_region(space->machine, "maincpu")+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x0000, space->machine->region("maincpu")->base()+bank*0x4000, 0x4000);
 			break;
 		case 2:
-			memcpy(sms_rom+0x4000, memory_region(space->machine, "maincpu")+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x4000, space->machine->region("maincpu")->base()+bank*0x4000, 0x4000);
 			break;
 		case 3:
-			memcpy(sms_rom+0x8000, memory_region(space->machine, "maincpu")+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x8000, space->machine->region("maincpu")->base()+bank*0x4000, 0x4000);
 			break;
 
 	}
@@ -1623,19 +1623,19 @@ static WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
 static WRITE8_HANDLER( codemasters_rom_bank_0000_w )
 {
 	int bank = data&0x1f;
-	memcpy(sms_rom+0x0000, memory_region(space->machine,"maincpu")+bank*0x4000, 0x4000);
+	memcpy(sms_rom+0x0000, space->machine->region("maincpu")->base()+bank*0x4000, 0x4000);
 }
 
 static WRITE8_HANDLER( codemasters_rom_bank_4000_w )
 {
 	int bank = data&0x1f;
-	memcpy(sms_rom+0x4000, memory_region(space->machine,"maincpu")+bank*0x4000, 0x4000);
+	memcpy(sms_rom+0x4000, space->machine->region("maincpu")->base()+bank*0x4000, 0x4000);
 }
 
 static WRITE8_HANDLER( codemasters_rom_bank_8000_w )
 {
 	int bank = data&0x1f;
-	memcpy(sms_rom+0x8000, memory_region(space->machine,"maincpu")+bank*0x4000, 0x4000);
+	memcpy(sms_rom+0x8000, space->machine->region("maincpu")->base()+bank*0x4000, 0x4000);
 }
 
 
@@ -1677,7 +1677,7 @@ void megatech_set_genz80_as_sms_standard_map(running_machine *machine, const cha
 	/* fixed rom bank area */
 	sms_rom = (UINT8 *)memory_install_rom(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0x0000, 0xbfff, 0, 0, NULL);
 
-	memcpy(sms_rom, memory_region(machine, "maincpu"), 0xc000);
+	memcpy(sms_rom, machine->region("maincpu")->base(), 0xc000);
 
 	if (mapper == MAPPER_STANDARD )
 	{

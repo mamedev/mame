@@ -4186,7 +4186,7 @@ static DRIVER_INIT( royale )
 {
     /* $60bb, NOPing the ORA #$F0 (after read the PIA1 port B */
 
-//  UINT8 *ROM = memory_region(machine, "maincpu");
+//  UINT8 *ROM = machine->region("maincpu")->base();
 
 //  ROM[0x60bb] = 0xea;
 //  ROM[0x60bc] = 0xea;
@@ -4216,8 +4216,8 @@ static DRIVER_INIT( flcnw )
 
     /* Attempt to decrypt the MCU program (we're sooo close!) */
 
-	UINT8 *ROM = memory_region(machine, "mcu");
-	int size = memory_region_length(machine, "mcu");
+	UINT8 *ROM = machine->region("mcu")->base();
+	int size = machine->region("mcu")->bytes();
 	int start = 0x0000;
 	int i;
 

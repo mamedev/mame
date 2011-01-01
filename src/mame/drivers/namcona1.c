@@ -1067,7 +1067,7 @@ MACHINE_CONFIG_END
 
 static void init_namcona1( running_machine *machine, int gametype )
 {
-	UINT16 *pMem = (UINT16 *)memory_region( machine, "maincpu" );
+	UINT16 *pMem = (UINT16 *)machine->region( "maincpu" )->base();
 
 	namcona1_gametype = gametype;
 	mpBank0 = &pMem[0x80000/2];

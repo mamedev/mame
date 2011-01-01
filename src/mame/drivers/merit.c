@@ -93,7 +93,7 @@ static MACHINE_START(merit)
 
 static READ8_HANDLER( questions_r )
 {
-	UINT8 *questions = memory_region(space->machine, "user1");
+	UINT8 *questions = space->machine->region("user1")->base();
 	int address;
 
 	switch(question_address >> 16)
@@ -211,9 +211,9 @@ static MC6845_UPDATE_ROW( update_row )
 	UINT16 x = 0;
 	int rlen;
 
-	gfx[0] = memory_region(device->machine, "gfx1");
-	gfx[1] = memory_region(device->machine, "gfx2");
-	rlen = memory_region_length(device->machine, "gfx2");
+	gfx[0] = device->machine->region("gfx1")->base();
+	gfx[1] = device->machine->region("gfx2")->base();
+	rlen = device->machine->region("gfx2")->bytes();
 
 	//ma = ma ^ 0x7ff;
 	for (cx = 0; cx < x_count; cx++)
@@ -1212,8 +1212,8 @@ void merit_state::dodge_nvram_init(nvram_device &nvram, void *base, size_t size)
 static MACHINE_START(casino5)
 {
 	MACHINE_START_CALL(merit);
-	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "maincpu") + 0x2000, 0x2000);
-	memory_configure_bank(machine, "bank2", 0, 2, memory_region(machine, "maincpu") + 0x6000, 0x2000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine->region("maincpu")->base() + 0x2000, 0x2000);
+	memory_configure_bank(machine, "bank2", 0, 2, machine->region("maincpu")->base() + 0x6000, 0x2000);
 	memory_set_bank(machine, "bank1", 0);
 	memory_set_bank(machine, "bank2", 0);
 }
@@ -2014,7 +2014,7 @@ static DRIVER_INIT( key_7 )
 
 static DRIVER_INIT( couple )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	#if 0 //quick rom compare test
 	{
@@ -2040,7 +2040,7 @@ static DRIVER_INIT( couple )
 static DRIVER_INIT( dtrvwz5 )
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	/* fill b000 - b0ff with ret 0xc9 */
 	for ( i = 0xb000; i < 0xb100; i++ )
 		ROM[i] = 0xc9;

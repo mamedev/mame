@@ -696,7 +696,7 @@ static void alg_init(running_machine *machine)
 
 	/* set up memory */
 	memory_configure_bank(machine, "bank1", 0, 1, state->chip_ram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "user1"), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, machine->region("user1")->base(), 0);
 }
 
 
@@ -709,8 +709,8 @@ static void alg_init(running_machine *machine)
 
 static DRIVER_INIT( palr1 )
 {
-	UINT32 length = memory_region_length(machine, "user2");
-	UINT8 *rom = memory_region(machine, "user2");
+	UINT32 length = machine->region("user2")->bytes();
+	UINT8 *rom = machine->region("user2")->base();
 	UINT8 *original = auto_alloc_array(machine, UINT8, length);
 	UINT32 srcaddr;
 
@@ -729,8 +729,8 @@ static DRIVER_INIT( palr1 )
 
 static DRIVER_INIT( palr3 )
 {
-	UINT32 length = memory_region_length(machine, "user2");
-	UINT8 *rom = memory_region(machine, "user2");
+	UINT32 length = machine->region("user2")->bytes();
+	UINT8 *rom = machine->region("user2")->base();
 	UINT8 *original = auto_alloc_array(machine, UINT8, length);
 	UINT32 srcaddr;
 
@@ -748,8 +748,8 @@ static DRIVER_INIT( palr3 )
 
 static DRIVER_INIT( palr6 )
 {
-	UINT32 length = memory_region_length(machine, "user2");
-	UINT8 *rom = memory_region(machine, "user2");
+	UINT32 length = machine->region("user2")->bytes();
+	UINT8 *rom = machine->region("user2")->base();
 	UINT8 *original = auto_alloc_array(machine, UINT8, length);
 	UINT32 srcaddr;
 
@@ -770,7 +770,7 @@ static DRIVER_INIT( palr6 )
 static DRIVER_INIT( aplatoon )
 {
 	/* NOT DONE TODO FIGURE OUT THE RIGHT ORDER!!!! */
-	UINT8 *rom = memory_region(machine, "user2");
+	UINT8 *rom = machine->region("user2")->base();
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x40000);
 	int i;
 

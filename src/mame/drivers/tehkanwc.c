@@ -195,7 +195,7 @@ static void tehkanwc_adpcm_int(device_t *device)
 {
 	static int toggle;
 
-	UINT8 *SAMPLES = memory_region(device->machine, "adpcm");
+	UINT8 *SAMPLES = device->machine->region("adpcm")->base();
 	int msm_data = SAMPLES[msm_data_offs & 0x7fff];
 
 	if (toggle == 0)
@@ -708,7 +708,7 @@ static DRIVER_INIT( teedoff )
         023A: 00          nop
     */
 
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	ROM[0x0238] = 0x00;
 	ROM[0x0239] = 0x00;

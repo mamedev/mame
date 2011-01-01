@@ -103,7 +103,7 @@ WRITE16_HANDLER( vga_port16le_03d0_w );
 */
 #if 0
         int i;
-        UINT8 *memory=memory_region(machine, "maincpu")+0xc0000;
+        UINT8 *memory=machine->region("maincpu")->base()+0xc0000;
         UINT8 chksum;
 
 		/* oak vga */

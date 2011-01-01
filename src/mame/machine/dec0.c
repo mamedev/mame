@@ -511,7 +511,7 @@ static WRITE16_HANDLER( robocop_68000_share_w )
 static void h6280_decrypt(running_machine *machine, const char *cputag)
 {
 	int i;
-	UINT8 *RAM = memory_region(machine, cputag);
+	UINT8 *RAM = machine->region(cputag)->base();
 
 	/* Read each byte, decrypt it */
 	for (i = 0x00000; i < 0x10000; i++)
@@ -520,7 +520,7 @@ static void h6280_decrypt(running_machine *machine, const char *cputag)
 
 DRIVER_INIT( hippodrm )
 {
-	UINT8 *RAM = memory_region(machine, "sub");
+	UINT8 *RAM = machine->region("sub")->base();
 
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x180000, 0x180fff, 0, 0, hippodrm_68000_share_r, hippodrm_68000_share_w);
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xffc800, 0xffcfff, 0, 0, sprite_mirror_w);
@@ -536,7 +536,7 @@ DRIVER_INIT( hippodrm )
 
 DRIVER_INIT( slyspy )
 {
-	UINT8 *RAM = memory_region(machine, "audiocpu");
+	UINT8 *RAM = machine->region("audiocpu")->base();
 
 	h6280_decrypt(machine, "audiocpu");
 
@@ -567,7 +567,7 @@ DRIVER_INIT( birdtry )
 
 	GAME=3;
 
-	src = memory_region(machine, "gfx4");
+	src = machine->region("gfx4")->base();
 
 	/* some parts of the graphic have bytes swapped */
 	for (k = 0;k < 0x70000;k += 0x20000)

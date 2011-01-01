@@ -79,7 +79,7 @@ void namcoc7x_sound_write16(UINT16 command, UINT32 offset)
 
 void namcoc7x_on_driver_init(running_machine *machine)
 {
-	UINT8 *pROM = (UINT8 *)memory_region(machine, "c7x");
+	UINT8 *pROM = (UINT8 *)machine->region("c7x")->base();
 	device_t *cpu;
 
 	// clear the two 16-bits magic values at the start of the rom

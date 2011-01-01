@@ -3343,21 +3343,21 @@ ROM_END
 */
 //static DRIVER_INIT( norautrh )
 //{
-//  UINT8 *ROM = memory_region(machine, "maincpu");
+//  UINT8 *ROM = machine->region("maincpu")->base();
 //  ROM[0x1110] = 0x00;
 //  ROM[0x1111] = 0x00;
 //}
 
 //static DRIVER_INIT( norautpn )
 //{
-//  UINT8 *ROM = memory_region(machine, "maincpu");
+//  UINT8 *ROM = machine->region("maincpu")->base();
 //  ROM[0x0827] = 0x00;
 //  ROM[0x0828] = 0x00;
 //}
 
 //static DRIVER_INIT( norautu )
 //{
-//  UINT8 *ROM = memory_region(machine, "maincpu");
+//  UINT8 *ROM = machine->region("maincpu")->base();
 //  ROM[0x083c] = 0x00;
 //  ROM[0x083d] = 0x00;
 //  ROM[0x083e] = 0x00;
@@ -3365,7 +3365,7 @@ ROM_END
 
 //static DRIVER_INIT( gtipoker )
 //{
-//  UINT8 *ROM = memory_region(machine, "maincpu");
+//  UINT8 *ROM = machine->region("maincpu")->base();
 //  ROM[0x0cc6] = 0x00;
 //  ROM[0x0cc7] = 0x00;
 //  ROM[0x0cc8] = 0x00;
@@ -3376,7 +3376,7 @@ ROM_END
 
 //static DRIVER_INIT( dphl )
 //{
-//  UINT8 *ROM = memory_region(machine, "maincpu");
+//  UINT8 *ROM = machine->region("maincpu")->base();
 //  ROM[0x1510] = 0x00;
 //  ROM[0x1511] = 0x00;
 //  ROM[0x1512] = 0x00;
@@ -3384,7 +3384,7 @@ ROM_END
 
 //static DRIVER_INIT( dphla )
 //{
-//  UINT8 *ROM = memory_region(machine, "maincpu");
+//  UINT8 *ROM = machine->region("maincpu")->base();
 //  ROM[0x0b09] = 0x00;
 //  ROM[0x0b0a] = 0x00;
 //  ROM[0x0b0b] = 0x00;
@@ -3394,9 +3394,9 @@ static DRIVER_INIT( enc )
 {
 /* Attempt to decrypt the program ROM */
 
-//  UINT8 *rom = memory_region(machine, "maincpu");
+//  UINT8 *rom = machine->region("maincpu")->base();
 //  UINT8 *buffer;
-//  int size = 0x2000; //memory_region_length(machine, "maincpu");
+//  int size = 0x2000; //machine->region("maincpu")->bytes();
 //  int start = 0;
 //  int i;
 
@@ -3433,7 +3433,7 @@ static DRIVER_INIT( deb )
 /* Just for debugging purposes */
 /*   Should be removed soon    */
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	ROM[0x02f7] = 0xca;
 	ROM[0x02f8] = 0x18;
 	ROM[0x206c] = 0xff;
@@ -3443,7 +3443,7 @@ static DRIVER_INIT( ssa )
 /* Passing the video PPI handshaking lines */
 /* Just for debugging purposes */
 {
-//  UINT8 *ROM = memory_region(machine, "maincpu");
+//  UINT8 *ROM = machine->region("maincpu")->base();
 
 //  ROM[0x073b] = 0x00;
 //  ROM[0x073c] = 0x00;

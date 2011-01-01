@@ -14,7 +14,7 @@ WRITE8_HANDLER( sichuan2_bankswitch_w )
 	shisen_state *state = space->machine->driver_data<shisen_state>();
 	int bankaddress;
 	int bank;
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	UINT8 *RAM = space->machine->region("maincpu")->base();
 
 	if (data & 0xc0) logerror("bank switch %02x\n",data);
 

@@ -174,7 +174,7 @@ static WRITE8_HANDLER(mcu_sim_w);
 
 static MACHINE_START( kangaroo )
 {
-	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "gfx1"), 0x2000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine->region("gfx1")->base(), 0x2000);
 }
 
 

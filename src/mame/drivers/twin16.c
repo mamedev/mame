@@ -98,7 +98,7 @@ static WRITE16_HANDLER( videoram16_w )
 
 static READ16_HANDLER( extra_rom_r )
 {
-	return ((UINT16 *)memory_region(space->machine, "gfx3"))[offset];
+	return ((UINT16 *)space->machine->region("gfx3")->base())[offset];
 }
 
 static READ16_HANDLER( twin16_gfx_rom1_r )
@@ -1307,7 +1307,7 @@ static void gfx_untangle( running_machine *machine )
 	int i;
 	UINT16 *temp = auto_alloc_array(machine, UINT16, 0x200000/2);
 
-	twin16_gfx_rom = (UINT16 *)memory_region(machine, "gfx2");
+	twin16_gfx_rom = (UINT16 *)machine->region("gfx2")->base();
 	memcpy( temp, twin16_gfx_rom, 0x200000 );
 
 	for( i=0; i<0x080000; i++ )

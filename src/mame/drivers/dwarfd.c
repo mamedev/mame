@@ -1141,8 +1141,8 @@ static DRIVER_INIT(dwarfd)
 	UINT8 *src, *dst;
 
 	/* expand gfx roms */
-	src = memory_region(machine, "gfx1");
-	dst = memory_region(machine, "gfx2");
+	src = machine->region("gfx1")->base();
+	dst = machine->region("gfx2")->base();
 
 	for (i = 0; i < 0x4000; i++)
 	{
@@ -1155,7 +1155,7 @@ static DRIVER_INIT(dwarfd)
 	}
 
 	/* use low bit as 'interpolation' bit */
-	src = memory_region(machine, "gfx2");
+	src = machine->region("gfx2")->base();
 	for (i = 0; i < 0x8000; i++)
 	{
 		if (src[i] & 0x10)
@@ -1189,12 +1189,12 @@ static DRIVER_INIT(qc)
 	DRIVER_INIT_CALL(dwarfd);
 
 	// hacks for program to proceed
-	memory_region(machine, "maincpu")[0x6564] = 0x00;
-	memory_region(machine, "maincpu")[0x6565] = 0x00;
+	machine->region("maincpu")->base()[0x6564] = 0x00;
+	machine->region("maincpu")->base()[0x6565] = 0x00;
 
-	memory_region(machine, "maincpu")[0x59b2] = 0x00;
-	memory_region(machine, "maincpu")[0x59b3] = 0x00;
-	memory_region(machine, "maincpu")[0x59b4] = 0x00;
+	machine->region("maincpu")->base()[0x59b2] = 0x00;
+	machine->region("maincpu")->base()[0x59b3] = 0x00;
+	machine->region("maincpu")->base()[0x59b4] = 0x00;
 
 }
 

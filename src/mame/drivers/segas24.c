@@ -426,7 +426,7 @@ static WRITE16_HANDLER( fdc_w )
 				break;
 			case 0x9:
 				logerror("Read multiple [%02x] %d..%d side %d track %d\n", data, fdc_sector, fdc_sector+fdc_data-1, data & 8 ? 1 : 0, fdc_phys_track);
-				fdc_pt = memory_region(space->machine, "floppy") + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
+				fdc_pt = space->machine->region("floppy")->base() + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
 				fdc_span = track_size;
 				fdc_status = 3;
 				fdc_drq = 1;
@@ -434,7 +434,7 @@ static WRITE16_HANDLER( fdc_w )
 				break;
 			case 0xb:
 				logerror("Write multiple [%02x] %d..%d side %d track %d\n", data, fdc_sector, fdc_sector+fdc_data-1, data & 8 ? 1 : 0, fdc_phys_track);
-				fdc_pt = memory_region(space->machine, "floppy") + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
+				fdc_pt = space->machine->region("floppy")->base() + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
 				fdc_span = track_size;
 				fdc_status = 3;
 				fdc_drq = 1;
@@ -710,7 +710,7 @@ static UINT8 curbank;
 
 static void reset_bank(running_machine *machine)
 {
-	if (memory_region(machine, "romboard"))
+	if (machine->region("romboard")->base())
 	{
 		memory_set_bank(machine, "bank1", curbank & 15);
 		memory_set_bank(machine, "bank2", curbank & 15);
@@ -1071,14 +1071,14 @@ static NVRAM_HANDLER(system24)
 	if(!track_size || !file)
 		return;
 	if(read_or_write)
-		mame_fwrite(file, memory_region(machine, "floppy"), 2*track_size);
+		mame_fwrite(file, machine->region("floppy")->base(), 2*track_size);
 	else
-		mame_fread(file, memory_region(machine, "floppy"), 2*track_size);
+		mame_fread(file, machine->region("floppy")->base(), 2*track_size);
 }
 
 static MACHINE_START( system24 )
 {
-	UINT8 *usr1 = memory_region(machine, "romboard");
+	UINT8 *usr1 = machine->region("romboard")->base();
 	if (usr1)
 	{
 		memory_configure_bank(machine, "bank1", 0, 16, usr1, 0x40000);

@@ -150,7 +150,7 @@ static MACHINE_START( ddragon )
 	ddragon_state *state = machine->driver_data<ddragon_state>();
 
 	/* configure banks */
-	memory_configure_bank(machine, "bank1", 0, 8, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 8, machine->region("maincpu")->base() + 0x10000, 0x4000);
 
 	state->maincpu = machine->device("maincpu");
 	state->sub_cpu = machine->device("sub");
@@ -479,7 +479,7 @@ static void dd_adpcm_int( device_t *device )
 	}
 	else
 	{
-		UINT8 *ROM = memory_region(device->machine, "adpcm") + 0x10000 * chip;
+		UINT8 *ROM = device->machine->region("adpcm")->base() + 0x10000 * chip;
 
 		state->adpcm_data[chip] = ROM[state->adpcm_pos[chip]++];
 		msm5205_data_w(device, state->adpcm_data[chip] >> 4);
@@ -2037,26 +2037,26 @@ static DRIVER_INIT( toffy )
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3808, 0x3808, 0, 0, toffy_bankswitch_w);
 
 	/* the program rom has a simple bitswap encryption */
-	rom = memory_region(machine, "maincpu");
-	length = memory_region_length(machine, "maincpu");
+	rom = machine->region("maincpu")->base();
+	length = machine->region("maincpu")->bytes();
 	for (i = 0; i < length; i++)
 		rom[i] = BITSWAP8(rom[i], 6,7,5,4,3,2,1,0);
 
 	/* and the fg gfx ... */
-	rom = memory_region(machine, "gfx1");
-	length = memory_region_length(machine, "gfx1");
+	rom = machine->region("gfx1")->base();
+	length = machine->region("gfx1")->bytes();
 	for (i = 0; i < length; i++)
 		rom[i] = BITSWAP8(rom[i], 7,6,5,3,4,2,1,0);
 
 	/* and the sprites gfx */
-	rom = memory_region(machine, "gfx2");
-	length = memory_region_length(machine, "gfx2");
+	rom = machine->region("gfx2")->base();
+	length = machine->region("gfx2")->bytes();
 	for (i = 0; i < length; i++)
 		rom[i] = BITSWAP8(rom[i], 7,6,5,4,3,2,0,1);
 
 	/* and the bg gfx */
-	rom = memory_region(machine, "gfx3");
-	length = memory_region_length(machine, "gfx3");
+	rom = machine->region("gfx3")->base();
+	length = machine->region("gfx3")->bytes();
 	for (i = 0; i < length / 2; i++)
 	{
 		rom[i + 0*length/2] = BITSWAP8(rom[i + 0*length/2], 7,6,1,4,3,2,5,0);
@@ -2072,8 +2072,8 @@ static DRIVER_INIT( ddragon6809 )
 	int i;
 	UINT8 *dst,*src;
 
-	src = memory_region(machine, "chars");
-	dst = memory_region(machine, "gfx1");
+	src = machine->region("chars")->base();
+	dst = machine->region("gfx1")->base();
 
 	for (i = 0; i < 0x8000; i++)
 	{

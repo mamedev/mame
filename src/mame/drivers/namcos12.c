@@ -1084,8 +1084,8 @@ static void namcos12_rom_read( running_machine *machine, UINT32 n_address, INT32
 		verboselog( machine, 1, "namcos12_rom_read( %08x, %08x ) game %08x\n", n_address, n_size, n_offset );
 	}
 
-	source = (UINT16 *) memory_region( machine, n_region );
-	n_romleft = ( memory_region_length( machine, n_region ) - n_offset ) / 4;
+	source = (UINT16 *) machine->region( n_region )->base();
+	n_romleft = ( machine->region( n_region )->bytes() - n_offset ) / 4;
 	if( n_size > n_romleft )
 	{
 		verboselog( machine, 1, "namcos12_rom_read dma truncated %d to %d passed end of rom\n", n_size, n_romleft );
@@ -1208,7 +1208,7 @@ static void system11gun_install( running_machine *machine )
 
 static WRITE32_HANDLER( kcoff_w )
 {
-	memory_set_bankptr( space->machine, "bank2", memory_region( space->machine, "user1" ) + 0x20280 );
+	memory_set_bankptr( space->machine, "bank2", space->machine->region( "user1" )->base() + 0x20280 );
 }
 
 static WRITE32_HANDLER( kcon_w )
@@ -1521,7 +1521,7 @@ static DRIVER_INIT( namcos12 )
 
 	psx_dma_install_read_handler( machine, 5, namcos12_rom_read );
 
-	memory_configure_bank(machine, "bank1", 0, memory_region_length( machine, "user2" ) / 0x200000, memory_region( machine, "user2" ), 0x200000 );
+	memory_configure_bank(machine, "bank1", 0, machine->region( "user2" )->bytes() / 0x200000, machine->region( "user2" )->base(), 0x200000 );
 
 	state->s12_porta = 0;
 	state->s12_rtcstate = 0;
@@ -1546,7 +1546,7 @@ static DRIVER_INIT( ptblank2 )
 	DRIVER_INIT_CALL(namcos12);
 
 	/* patch out wait for dma 5 to complete */
-	*( (UINT32 *)( memory_region( machine, "user1" ) + 0x331c4 ) ) = 0;
+	*( (UINT32 *)( machine->region( "user1" )->base() + 0x331c4 ) ) = 0;
 
 	system11gun_install(machine);
 }

@@ -386,7 +386,7 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 {
 	btime_state *state = machine->driver_data<btime_state>();
 	int i;
-	const UINT8 *gfx = memory_region(machine, "bg_map");
+	const UINT8 *gfx = machine->region("bg_map")->base();
 	int scroll = -(state->bnj_scroll2 | ((state->bnj_scroll1 & 0x03) << 8));
 
 	// One extra iteration for wrap around

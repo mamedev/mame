@@ -62,7 +62,7 @@ VIDEO_START( tail2nos )
 
 	tilemap_set_transparent_pen(state->bg_tilemap, 15);
 
-	state->zoomdata = (UINT16 *)memory_region(machine, "gfx3");
+	state->zoomdata = (UINT16 *)machine->region("gfx3")->base();
 
 	state_save_register_global_pointer(machine, state->zoomdata, 0x20000 / 2);
 	state_save_register_postload(machine, tail2nos_postload, NULL);

@@ -294,7 +294,7 @@ static READ8_HANDLER( mrokumei_sound_io_r )
 	if (state->sndbank & 4)
 		return(soundlatch_r(space, 0));
 	else
-		return memory_region(space->machine, "audiocpu")[0x10000 + offset + (state->sndbank & 1) * 0x10000];
+		return space->machine->region("audiocpu")->base()[0x10000 + offset + (state->sndbank & 1) * 0x10000];
 }
 
 static WRITE8_HANDLER( mrokumei_sound_bank_w )
@@ -529,7 +529,7 @@ static WRITE8_HANDLER( pteacher_upd7807_portc_w )
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	int last_bank = (memory_region_length(space->machine, "maincpu") - 0x10000) / 0x4000;
+	int last_bank = (space->machine->region("maincpu")->bytes() - 0x10000) / 0x4000;
 
 	/* last bank is fixed and is #0 for us, other banks start from #1 (hence data+1 below)*/
 	if (data < last_bank)
@@ -1169,10 +1169,10 @@ static MACHINE_START( homedata )
 static MACHINE_START( reikaids )
 {
 	homedata_state *state = machine->driver_data<homedata_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0xc000], 0x4000);
-	memory_configure_bank(machine, "bank2", 0, 4, memory_region(machine, "audiocpu"), 0x10000);
+	memory_configure_bank(machine, "bank2", 0, 4, machine->region("audiocpu")->base(), 0x10000);
 
 	MACHINE_START_CALL(homedata);
 
@@ -1186,10 +1186,10 @@ static MACHINE_START( reikaids )
 static MACHINE_START( pteacher )
 {
 	homedata_state *state = machine->driver_data<homedata_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0xc000], 0x4000);
-	memory_configure_bank(machine, "bank2", 0, 4, memory_region(machine, "audiocpu"), 0x10000);
+	memory_configure_bank(machine, "bank2", 0, 4, machine->region("audiocpu")->base(), 0x10000);
 
 	MACHINE_START_CALL(homedata);
 

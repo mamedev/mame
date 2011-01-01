@@ -114,7 +114,7 @@ static WRITE32_HANDLER( paletteram32_w )
 
 static void sndram_set_bank(running_machine *machine)
 {
-	sndram = memory_region(machine, "shared") + 0x80000 * sndram_bank;
+	sndram = machine->region("shared")->base() + 0x80000 * sndram_bank;
 }
 
 static WRITE32_HANDLER( sndram_bank_w )
@@ -203,7 +203,7 @@ static WRITE32_HANDLER( obj_ctrl_w )
 
 static READ32_HANDLER( obj_rom_r )
 {
-	UINT8 *mem8 = memory_region(space->machine, "gfx1");
+	UINT8 *mem8 = space->machine->region("gfx1")->base();
 	int bank = obj_regs[0x28/4] >> 16;
 
 	offset += bank * 0x200;
@@ -240,7 +240,7 @@ static WRITE32_HANDLER( v_ctrl_w )
 static READ32_HANDLER( v_rom_r )
 {
 	device_t *k056832 = space->machine->device("k056832");
-	UINT8 *mem8 = memory_region(space->machine, "gfx2");
+	UINT8 *mem8 = space->machine->region("gfx2")->base();
 	int bank = k056832_word_r(k056832, 0x34/2, 0xffff);
 
 	offset *= 2;

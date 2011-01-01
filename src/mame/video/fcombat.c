@@ -14,8 +14,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 	//palno = (tile_index - (tile_index / 32 * 16) * 32 * 16) / 32;
 
-	tileno = memory_region(machine, "user1")[tile_index];
-	palno = 0x18; //memory_region(machine, "user2")[tile_index] >> 3;
+	tileno = machine->region("user1")->base()[tile_index];
+	palno = 0x18; //machine->region("user2")->base()[tile_index] >> 3;
 	SET_TILE_INFO(2, tileno, palno, 0);
 }
 

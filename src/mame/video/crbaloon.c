@@ -105,7 +105,7 @@ static void draw_sprite_and_check_collision(running_machine *machine, bitmap_t *
 	UINT8 color = crbaloon_spriteram[0] >> 4;
 	UINT8 sy = crbaloon_spriteram[2] - 32;
 
-	UINT8 *gfx = memory_region(machine, "gfx2") + (code << 7);
+	UINT8 *gfx = machine->region("gfx2")->base() + (code << 7);
 
 
 	if (flip_screen_get(machine))

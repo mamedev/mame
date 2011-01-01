@@ -17,16 +17,16 @@ static SAMPLES_START( cclimber_sh_start )
 {
 	running_machine *machine = device->machine;
 	samplebuf = 0;
-	if (memory_region(machine, "samples"))
-		samplebuf = auto_alloc_array(machine, INT16, 2 * memory_region_length(machine, "samples"));
+	if (machine->region("samples")->base())
+		samplebuf = auto_alloc_array(machine, INT16, 2 * machine->region("samples")->bytes());
 }
 
 
 static void cclimber_play_sample(running_machine *machine, int start,int freq,int volume)
 {
 	int len;
-	int romlen = memory_region_length(machine, "samples");
-	const UINT8 *rom = memory_region(machine, "samples");
+	int romlen = machine->region("samples")->bytes();
+	const UINT8 *rom = machine->region("samples")->base();
 	device_t *samples = machine->device("samples");
 
 

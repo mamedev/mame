@@ -211,7 +211,7 @@ INPUT_PORTS_END
 
 static DRIVER_INIT( aristmk5 )
 {
-	UINT8 *SRAM = memory_region(machine, "sram");
+	UINT8 *SRAM = machine->region("sram")->base();
 	archimedes_driver_init(machine);
 
 	memory_configure_bank(machine, "sram_bank", 0, 4, &SRAM[0], 0x8000);
@@ -243,8 +243,8 @@ static MACHINE_RESET( aristmk5 )
 
 	/* load the roms according to what the operator wants */
 	{
-		UINT8 *ROM = memory_region(machine,"maincpu");
-		UINT8 *PRG = memory_region(machine,"prg_code");
+		UINT8 *ROM = machine->region("maincpu")->base();
+		UINT8 *PRG = machine->region("prg_code")->base();
 		int i;
 		UINT8 op_mode;
 

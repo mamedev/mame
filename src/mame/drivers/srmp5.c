@@ -258,7 +258,7 @@ static READ32_HANDLER(data_r)
 {
 	srmp5_state *state = space->machine->driver_data<srmp5_state>();
 	UINT32 data;
-	const UINT8 *usr = memory_region(space->machine, "user2");
+	const UINT8 *usr = space->machine->region("user2")->base();
 
 	data=((state->databank>>4)&0xf)*0x100000; //guess
 	data=usr[data+offset*2]+usr[data+offset*2+1]*256;

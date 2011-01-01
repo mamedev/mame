@@ -3328,7 +3328,7 @@ ROM_END
 
 static DRIVER_INIT( smoto16 )
 {
-	UINT8 *rom = memory_region( machine, "maincpu" );
+	UINT8 *rom = machine->region( "maincpu" )->base();
 	rom[0x12d0] = 0x20;	// "ERROR 951010"
 }
 
@@ -3564,7 +3564,7 @@ static void subsino_decrypt(running_machine* machine, void (*bitswaps)(UINT8* de
 {
 	int i;
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x10000);
-	UINT8* region = memory_region(machine,"maincpu");
+	UINT8* region = machine->region("maincpu")->base();
 
 	for (i=0;i<0x10000;i++)
 	{
@@ -3611,13 +3611,13 @@ static DRIVER_INIT( sharkpye )
 
 static DRIVER_INIT( smoto20 )
 {
-	UINT8 *rom = memory_region( machine, "maincpu" );
+	UINT8 *rom = machine->region( "maincpu" )->base();
 	rom[0x12e1] = 0x20;	// "ERROR 951010"
 }
 
 static DRIVER_INIT( tisub )
 {
-	UINT8 *rom = memory_region( machine, "maincpu" );
+	UINT8 *rom = machine->region( "maincpu" )->base();
 
 	DRIVER_INIT_CALL(victor5);
 
@@ -3632,7 +3632,7 @@ static DRIVER_INIT( tisub )
 
 static DRIVER_INIT( tisuba )
 {
-	UINT8 *rom = memory_region( machine, "maincpu" );
+	UINT8 *rom = machine->region( "maincpu" )->base();
 
 	DRIVER_INIT_CALL(victor5);
 
@@ -3647,7 +3647,7 @@ static DRIVER_INIT( tisuba )
 
 static DRIVER_INIT( stisub )
 {
-	UINT8 *rom = memory_region( machine, "maincpu" );
+	UINT8 *rom = machine->region( "maincpu" )->base();
 	rom[0x1005] = 0x1d; //patch protection check
 	rom[0x7ab] = 0x18; //patch "winning protection" check
 	rom[0x957] = 0x18; //patch "losing protection" check

@@ -1291,7 +1291,7 @@ static UINT64 expression_read_program_direct(address_space *_space, int opcode, 
 
 static UINT64 expression_read_memory_region(running_machine *machine, const char *rgntag, offs_t address, int size)
 {
-	const region_info *region = machine->region(rgntag);
+	const memory_region *region = machine->region(rgntag);
 	UINT64 result = ~(UINT64)0 >> (64 - 8*size);
 
 	/* make sure we get a valid base before proceeding */
@@ -1465,7 +1465,7 @@ static void expression_write_program_direct(address_space *_space, int opcode, o
 static void expression_write_memory_region(running_machine *machine, const char *rgntag, offs_t address, int size, UINT64 data)
 {
 	debugcpu_private *global = machine->debugcpu_data;
-	const region_info *region = machine->region(rgntag);
+	const memory_region *region = machine->region(rgntag);
 
 	/* make sure we get a valid base before proceeding */
 	if (region != NULL)
@@ -1574,7 +1574,7 @@ static expression_error::error_code expression_validate(void *param, const char 
 		case EXPSPACE_REGION:
 			if (name == NULL)
 				return expression_error::MISSING_MEMORY_NAME;
-			if (memory_region(machine, name) == NULL)
+			if (machine->region(name)->base() == NULL)
 				return expression_error::INVALID_MEMORY_NAME;
 			break;
 	}

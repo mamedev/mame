@@ -254,7 +254,7 @@ static DRIVER_INIT( wallc )
 	UINT8 c;
 	UINT32 i;
 
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	for (i=0; i<0x2000*2; i++)
 	{
@@ -269,7 +269,7 @@ static DRIVER_INIT( wallca )
 	UINT8 c;
 	UINT32 i;
 
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	for (i=0; i<0x4000; i++)
 	{

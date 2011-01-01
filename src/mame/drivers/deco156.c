@@ -671,8 +671,8 @@ ROM_END
 
 static void descramble_sound( running_machine *machine, const char *tag )
 {
-	UINT8 *rom = memory_region(machine, tag);
-	int length = memory_region_length(machine, tag);
+	UINT8 *rom = machine->region(tag)->base();
+	int length = machine->region(tag)->bytes();
 	UINT8 *buf1 = auto_alloc_array(machine, UINT8, length);
 	UINT32 x;
 

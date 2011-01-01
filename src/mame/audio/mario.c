@@ -416,7 +416,7 @@ static SOUND_START( mario )
 	mario_state	*state = machine->driver_data<mario_state>();
 	device_t *audiocpu = machine->device("audiocpu");
 #if USE_8039
-	UINT8 *SND = memory_region(machine, "audiocpu");
+	UINT8 *SND = machine->region("audiocpu")->base();
 
 	SND[0x1001] = 0x01;
 #endif
@@ -426,8 +426,8 @@ static SOUND_START( mario )
 	{
 		state->eabank = "bank1";
 		memory_install_read_bank(cpu_get_address_space(audiocpu, ADDRESS_SPACE_PROGRAM), 0x000, 0x7ff, 0, 0, "bank1");
-		memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, "audiocpu"), 0);
-	    memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "audiocpu") + 0x1000, 0x800);
+		memory_configure_bank(machine, "bank1", 0, 1, machine->region("audiocpu")->base(), 0);
+	    memory_configure_bank(machine, "bank1", 1, 1, machine->region("audiocpu")->base() + 0x1000, 0x800);
 	}
 
     state_save_register_global(machine, state->last);
@@ -482,8 +482,8 @@ static READ8_HANDLER( mario_sh_t1_r )
 
 static READ8_HANDLER( mario_sh_tune_r )
 {
-	UINT8 *SND = memory_region(space->machine, "audiocpu");
-	UINT16 mask = memory_region_length(space->machine, "audiocpu")-1;
+	UINT8 *SND = space->machine->region("audiocpu")->base();
+	UINT16 mask = space->machine->region("audiocpu")->bytes()-1;
 	UINT8 p2 = I8035_P2_R(space);
 
 	if ((p2 >> 7) & 1)

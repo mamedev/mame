@@ -132,8 +132,8 @@ static void copy_pixel( running_machine *machine, int x, int y, int pen )
 WRITE8_HANDLER( dynax_blitter_rev1_start_w )
 {
 	hnayayoi_state *state = space->machine->driver_data<hnayayoi_state>();
-	UINT8 *rom = memory_region(space->machine, "gfx1");
-	int romlen = memory_region_length(space->machine, "gfx1");
+	UINT8 *rom = space->machine->region("gfx1")->base();
+	int romlen = space->machine->region("gfx1")->bytes();
 	int sx = state->blit_dest & 0xff;
 	int sy = state->blit_dest >> 8;
 	int x, y;

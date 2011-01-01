@@ -1209,7 +1209,7 @@ static MACHINE_START( cps2 )
 	state_save_register_global(machine, state->scancount);
 
 	if (state->audiocpu != NULL)	// gigamn2 has no audiocpu
-		memory_configure_bank(machine, "bank1", 0, (QSOUND_SIZE - 0x10000) / 0x4000, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
+		memory_configure_bank(machine, "bank1", 0, (QSOUND_SIZE - 0x10000) / 0x4000, machine->region("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 
@@ -7938,8 +7938,8 @@ static DRIVER_INIT( gigamn2 )
 {
 	cps_state *state = machine->driver_data<cps_state>();
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
-	int length = memory_region_length(machine, "maincpu");
+	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
+	int length = machine->region("maincpu")->bytes();
 
 	DRIVER_INIT_CALL(cps2);
 

@@ -1304,7 +1304,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( ms32 )
 {
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu"));
+	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base());
 	memory_set_bank(machine, "bank4", 0);
 	memory_set_bank(machine, "bank5", 1);
 	irq_init(machine);
@@ -2143,8 +2143,8 @@ void ms32_rearrange_sprites(running_machine *machine, const char *region)
 
 	UINT8 *result_data;
 
-	source_data = memory_region       ( machine, region );
-	source_size = memory_region_length( machine, region );
+	source_data = machine->region       ( region )->base();
+	source_size = machine->region( region )->bytes();
 
 	result_data = auto_alloc_array(machine, UINT8, source_size);
 
@@ -2168,8 +2168,8 @@ void decrypt_ms32_tx(running_machine *machine, int addr_xor,int data_xor, const 
 
 	UINT8 *result_data;
 
-	source_data = memory_region       ( machine, region );
-	source_size = memory_region_length( machine, region );
+	source_data = machine->region       ( region )->base();
+	source_size = machine->region( region )->bytes();
 
 	result_data = auto_alloc_array(machine, UINT8, source_size);
 
@@ -2222,8 +2222,8 @@ void decrypt_ms32_bg(running_machine *machine, int addr_xor,int data_xor, const 
 
 	UINT8 *result_data;
 
-	source_data = memory_region       ( machine, region );
-	source_size = memory_region_length( machine, region );
+	source_data = machine->region       ( region )->base();
+	source_size = machine->region( region )->bytes();
 
 	result_data = auto_alloc_array(machine, UINT8, source_size);
 
@@ -2274,8 +2274,8 @@ void decrypt_ms32_bg(running_machine *machine, int addr_xor,int data_xor, const 
 static void configure_banks(running_machine *machine)
 {
 	state_save_register_global(machine, to_main);
-	memory_configure_bank(machine, "bank4", 0, 16, memory_region(machine, "audiocpu") + 0x14000, 0x4000);
-	memory_configure_bank(machine, "bank5", 0, 16, memory_region(machine, "audiocpu") + 0x14000, 0x4000);
+	memory_configure_bank(machine, "bank4", 0, 16, machine->region("audiocpu")->base() + 0x14000, 0x4000);
+	memory_configure_bank(machine, "bank5", 0, 16, machine->region("audiocpu")->base() + 0x14000, 0x4000);
 }
 
 static DRIVER_INIT( ms32_common )
@@ -2333,7 +2333,7 @@ static DRIVER_INIT (47pie2)
 static DRIVER_INIT (f1superb)
 {
 #if 0 // we shouldn't need this hack, something else is wrong, and the x offsets are never copied either, v70 problems??
-	UINT32 *pROM = (UINT32 *)memory_region(machine, "maincpu");
+	UINT32 *pROM = (UINT32 *)machine->region("maincpu")->base();
 	pROM[0x19d04/4]=0x167a021a; // bne->br  : sprite Y offset table is always copied to RAM
 #endif
 	DRIVER_INIT_CALL(ss92046_01);

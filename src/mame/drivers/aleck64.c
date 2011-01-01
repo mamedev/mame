@@ -603,7 +603,7 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT( aleck64 )
 {
-	UINT8 *rom = memory_region(machine, "user2");
+	UINT8 *rom = machine->region("user2")->base();
 
 	rom[0x67c] = 0;
 	rom[0x67d] = 0;

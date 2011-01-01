@@ -122,11 +122,11 @@ MACHINE_RESET( simpsons )
 	state->video_bank = 0;
 
 	/* init the default banks */
-	memory_configure_bank(machine, "bank1", 0, 64, memory_region(machine, "maincpu") + 0x10000, 0x2000);
+	memory_configure_bank(machine, "bank1", 0, 64, machine->region("maincpu")->base() + 0x10000, 0x2000);
 	memory_set_bank(machine, "bank1", 0);
 
-	memory_configure_bank(machine, "bank2", 0, 2, memory_region(machine, "audiocpu") + 0x10000, 0);
-	memory_configure_bank(machine, "bank2", 2, 6, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank2", 0, 2, machine->region("audiocpu")->base() + 0x10000, 0);
+	memory_configure_bank(machine, "bank2", 2, 6, machine->region("audiocpu")->base() + 0x10000, 0x4000);
 	memory_set_bank(machine, "bank2", 0);
 
 	simpsons_video_banking(machine, 0);

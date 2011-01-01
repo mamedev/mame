@@ -374,7 +374,7 @@ static MACHINE_START( malzak )
 {
 	malzak_state *state = machine->driver_data<malzak_state>();
 
-	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "user2"), 0x400);
+	memory_configure_bank(machine, "bank1", 0, 2, machine->region("user2")->base(), 0x400);
 
 	state->s2636_0 = machine->device("s2636_0");
 	state->s2636_1 = machine->device("s2636_1");

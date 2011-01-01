@@ -677,8 +677,8 @@ ROM_END
 
 static DRIVER_INIT( hnfubuki )
 {
-	UINT8 *rom = memory_region(machine, "gfx1");
-	int len = memory_region_length(machine, "gfx1");
+	UINT8 *rom = machine->region("gfx1")->base();
+	int len = machine->region("gfx1")->bytes();
 	int i, j;
 
 	/* interestingly, the blitter data has a slight encryption */

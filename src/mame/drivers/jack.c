@@ -114,7 +114,7 @@ static READ8_HANDLER( striv_question_r )
 	// Read the actual byte from question roms
 	else
 	{
-		UINT8 *ROM = memory_region(space->machine, "user1");
+		UINT8 *ROM = space->machine->region("user1")->base();
 		int real_address;
 
 		real_address = state->question_address | (offset & 0x3f0) | state->remap_address[offset & 0x0f];
@@ -1307,7 +1307,7 @@ static void treahunt_decode( running_machine *machine )
 {
 	int A;
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x4000);
 	int data;
 
@@ -1376,7 +1376,7 @@ static DRIVER_INIT( loverboy )
        the start of the game code.
 
        ToDo: Figure out what's really going on */
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	ROM[0x13] = 0x01;
 	ROM[0x12] = 0x9d;
 
@@ -1387,7 +1387,7 @@ static DRIVER_INIT( loverboy )
 static DRIVER_INIT( striv )
 {
 	jack_state *state = machine->driver_data<jack_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	UINT8 data;
 	int A;
 

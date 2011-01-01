@@ -154,7 +154,7 @@ static WRITE8_HANDLER( spool99_cram_w )
 
 static READ8_HANDLER( spool99_io_r )
 {
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 
 //  if(!(io_switch))
 	{
@@ -221,7 +221,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( vcarn_io_r )
 {
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 
 //  if(!(io_switch))
 	{
@@ -412,7 +412,7 @@ static DRIVER_INIT( spool99 )
 {
 	spool99_state *state = machine->driver_data<spool99_state>();
 
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 //  vram = auto_alloc_array(machine, UINT8, 0x2000);
 	memcpy(state->main, ROM, 0x100);
 }

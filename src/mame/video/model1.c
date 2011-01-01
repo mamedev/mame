@@ -1444,7 +1444,7 @@ VIDEO_START(model1)
 
 	sys24_tile_vh_start(machine, 0x3fff);
 
-	poly_rom = (UINT32 *)memory_region(machine, "user1");
+	poly_rom = (UINT32 *)machine->region("user1")->base();
 	poly_ram = auto_alloc_array_clear(machine, UINT32, 0x400000);
 	tgp_ram = auto_alloc_array_clear(machine, UINT16, 0x100000-0x40000);
 	pointdb = auto_alloc_array_clear(machine, struct point, 1000000*2);

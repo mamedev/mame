@@ -457,8 +457,8 @@ static READ32_HANDLER( irq_speedup_r_groundfx )
 static DRIVER_INIT( groundfx )
 {
 	UINT32 offset,i;
-	UINT8 *gfx = memory_region(machine, "gfx3");
-	int size=memory_region_length(machine, "gfx3");
+	UINT8 *gfx = machine->region("gfx3")->base();
+	int size=machine->region("gfx3")->bytes();
 	int data;
 
 	/* Speedup handlers */

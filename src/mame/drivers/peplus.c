@@ -260,7 +260,7 @@ static const mc6845_interface mc6845_intf =
 
 static void peplus_load_superdata(running_machine *machine, const char *bank_name)
 {
-    UINT8 *super_data = memory_region(machine, bank_name);
+    UINT8 *super_data = machine->region(bank_name)->base();
 
     /* Distribute Superboard Data */
     memcpy(s3000_ram, &super_data[0x3000], 0x1000);

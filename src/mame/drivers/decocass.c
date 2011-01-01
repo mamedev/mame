@@ -1325,7 +1325,7 @@ static DRIVER_INIT( decocass )
 {
 	decocass_state *state = machine->driver_data<decocass_state>();
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	int A;
 
 	/* allocate memory and mark all RAM regions with their decrypted pointers */
@@ -1349,8 +1349,8 @@ static DRIVER_INIT( decocass )
 static DRIVER_INIT( decocrom )
 {
 	decocass_state *state = machine->driver_data<decocass_state>();
-	int romlength = memory_region_length(machine, "user3");
-	UINT8 *rom = memory_region(machine, "user3");
+	int romlength = machine->region("user3")->bytes();
+	UINT8 *rom = machine->region("user3")->base();
 	int i;
 
 	state->decrypted2 = auto_alloc_array(machine, UINT8, romlength);
@@ -1366,7 +1366,7 @@ static DRIVER_INIT( decocrom )
 	memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0xafff, 0, 0, "bank1");
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0xafff, 0, 0, decocass_de0091_w);
 	memory_configure_bank(machine, "bank1", 0, 1, state->charram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "user3"), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, machine->region("user3")->base(), 0);
 	memory_configure_bank_decrypted(machine, "bank1", 0, 1, &state->decrypted[0x6000], 0);
 	memory_configure_bank_decrypted(machine, "bank1", 1, 1, state->decrypted2, 0);
 	memory_set_bank(machine, "bank1", 0);

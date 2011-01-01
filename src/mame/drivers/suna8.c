@@ -61,7 +61,7 @@ Notes:
 
 static DRIVER_INIT( hardhead )
 {
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	int i;
 
 	for (i = 0; i < 0x8000; i++)
@@ -76,15 +76,15 @@ static DRIVER_INIT( hardhead )
 			rom[i] = BITSWAP8(rom[i], 7,6,5,3,4,2,1,0) ^ 0x58;
 	}
 
-	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x10000, 0x4000);
 }
 
 /* Non encrypted bootleg */
 static DRIVER_INIT( hardhedb )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	space->set_decrypted_region(0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x48000);
-	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	space->set_decrypted_region(0x0000, 0x7fff, machine->region("maincpu")->base() + 0x48000);
+	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x10000, 0x4000);
 }
 
 /***************************************************************************
@@ -96,8 +96,8 @@ static DRIVER_INIT( hardhedb )
 static UINT8 *brickzn_decrypt(running_machine *machine)
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8	*RAM	=	memory_region(machine, "maincpu");
-	size_t	size	=	memory_region_length(machine, "maincpu");
+	UINT8	*RAM	=	machine->region("maincpu")->base();
+	size_t	size	=	machine->region("maincpu")->bytes();
 	UINT8   *decrypt = auto_alloc_array(machine, UINT8, size);
 	int i;
 
@@ -138,7 +138,7 @@ static UINT8 *brickzn_decrypt(running_machine *machine)
 
 static DRIVER_INIT( brickzn )
 {
-	UINT8	*RAM	=	memory_region(machine, "maincpu");
+	UINT8	*RAM	=	machine->region("maincpu")->base();
 	UINT8   *decrypt = brickzn_decrypt(machine);
 	int i;
 
@@ -163,13 +163,13 @@ static DRIVER_INIT( brickzn )
 	decrypt[0x24b5] = 0x00;	// HALT -> NOP
 	decrypt[0x2583] = 0x00;	// HALT -> NOP
 
-	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x10000, 0x4000);
 	memory_configure_bank_decrypted(machine, "bank1", 0, 16, decrypt + 0x10000, 0x4000);
 }
 
 static DRIVER_INIT( brickzn3 )
 {
-	UINT8	*RAM	=	memory_region(machine, "maincpu");
+	UINT8	*RAM	=	machine->region("maincpu")->base();
 	UINT8   *decrypt = brickzn_decrypt(machine);
 	int i;
 
@@ -194,7 +194,7 @@ static DRIVER_INIT( brickzn3 )
 	decrypt[0x2487] = 0x00;	// HALT -> NOP
 	decrypt[0x256c] = 0x00;	// HALT -> NOP
 
-	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x10000, 0x4000);
 	memory_configure_bank_decrypted(machine, "bank1", 0, 16, decrypt + 0x10000, 0x4000);
 }
 
@@ -206,8 +206,8 @@ static DRIVER_INIT( brickzn3 )
 static DRIVER_INIT( hardhea2 )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8	*RAM	=	memory_region(machine, "maincpu");
-	size_t	size	=	memory_region_length(machine, "maincpu");
+	UINT8	*RAM	=	machine->region("maincpu")->base();
+	size_t	size	=	machine->region("maincpu")->bytes();
 	UINT8   *decrypt =	auto_alloc_array(machine, UINT8, size);
 	UINT8 x;
 	int i;
@@ -281,7 +281,7 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
 			RAM[i] = BITSWAP8(RAM[i], 5,6,7,4,3,2,1,0) ^ 0x41;
 	}
 
-	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x10000, 0x4000);
 	memory_configure_bank(machine, "bank2", 0, 2, auto_alloc_array(machine, UINT8, 0x2000 * 2), 0x2000);
 }
 
@@ -293,8 +293,8 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
 static DRIVER_INIT( starfigh )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8	*RAM	=	memory_region(machine, "maincpu");
-	size_t	size	=	memory_region_length(machine, "maincpu");
+	UINT8	*RAM	=	machine->region("maincpu")->base();
+	size_t	size	=	machine->region("maincpu")->bytes();
 	UINT8   *decrypt =	auto_alloc_array(machine, UINT8, size);
 	UINT8 x;
 	int i;
@@ -350,7 +350,7 @@ static DRIVER_INIT( starfigh )
 			RAM[i] = BITSWAP8(RAM[i], 5,6,7,4,3,2,1,0) ^ 0x45;
 	}
 
-	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x10000, 0x4000);
 }
 
 
@@ -361,8 +361,8 @@ static DRIVER_INIT( starfigh )
 static DRIVER_INIT( sparkman )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8	*RAM	=	memory_region(machine, "maincpu");
-	size_t	size	=	memory_region_length(machine, "maincpu");
+	UINT8	*RAM	=	machine->region("maincpu")->base();
+	size_t	size	=	machine->region("maincpu")->bytes();
 	UINT8   *decrypt =	auto_alloc_array(machine, UINT8, size);
 	UINT8 x;
 	int i;
@@ -418,7 +418,7 @@ static DRIVER_INIT( sparkman )
 			RAM[i] = BITSWAP8(RAM[i], 5,6,7,4,3,2,1,0) ^ 0x44;
 	}
 
-	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x10000, 0x4000);
 }
 
 /***************************************************************************
@@ -2383,7 +2383,7 @@ ROM_END
 
 static DRIVER_INIT( suna8 )
 {
-	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x10000, 0x4000);
 }
 
 /* Working Games */

@@ -84,7 +84,7 @@ debug_view_memory_source::debug_view_memory_source(const char *name, address_spa
 {
 }
 
-debug_view_memory_source::debug_view_memory_source(const char *name, const region_info &region)
+debug_view_memory_source::debug_view_memory_source(const char *name, const memory_region &region)
 	: debug_view_source(name),
 	  m_space(NULL),
 	  m_memintf(NULL),
@@ -165,7 +165,7 @@ void debug_view_memory::enumerate_sources()
 		}
 
 	// then add all the memory regions
-	for (const region_info *region = m_machine.m_regionlist.first(); region != NULL; region = region->next())
+	for (const memory_region *region = m_machine.m_regionlist.first(); region != NULL; region = region->next())
 	{
 		name.printf("Region '%s'", region->name());
 		m_source_list.append(*auto_alloc(&m_machine, debug_view_memory_source(name, *region)));

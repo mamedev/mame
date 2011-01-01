@@ -222,7 +222,7 @@ static DEVICE_START( k053260 )
 
 	ic->mode = 0;
 
-	const region_info *region = (ic->intf->rgnoverride != NULL) ? device->machine->region(ic->intf->rgnoverride) : device->region();
+	const memory_region *region = (ic->intf->rgnoverride != NULL) ? device->machine->region(ic->intf->rgnoverride) : device->region();
 
 	ic->rom = *region;
 	ic->rom_size = region->bytes();

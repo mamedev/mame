@@ -943,7 +943,7 @@ static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 
 	memset(name,'\0',128);
 
-	realpic = memory_region(machine,"pic");
+	realpic = machine->region("pic")->base();
 
 	if (realpic)
 	{
@@ -1104,7 +1104,7 @@ static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 		}
 	}
 	// get des key
-	realpic = memory_region(machine,"pic");
+	realpic = machine->region("pic")->base();
 
 	if (realpic)
 	{
@@ -1787,18 +1787,18 @@ static DEVICE_START( naomibd )
 	switch (config->type)
 	{
 		case ROM_BOARD:
-			v->memory = (UINT8 *)memory_region(device->machine, config->regiontag);
-			v->protdata = (UINT8 *)memory_region(device->machine, "naomibd_prot");
+			v->memory = (UINT8 *)device->machine->region(config->regiontag)->base();
+			v->protdata = (UINT8 *)device->machine->region("naomibd_prot")->base();
 			break;
 
 		case AW_ROM_BOARD:
-			v->memory = (UINT8 *)memory_region(device->machine, config->regiontag);
+			v->memory = (UINT8 *)device->machine->region(config->regiontag)->base();
 			break;
 
 		case DIMM_BOARD:
 			v->memory = (UINT8 *)auto_alloc_array_clear(device->machine, UINT8, 0x40000000); // 0x40000000 is needed for some Chihiro sets, Naomi should be less, we should pass as device param
 			v->gdromchd = get_disk_handle(device->machine, config->gdromregiontag);
-			v->picdata = (UINT8 *)memory_region(device->machine, config->picregiontag);
+			v->picdata = (UINT8 *)device->machine->region(config->picregiontag)->base();
 			if (v->memory != NULL && v->gdromchd != NULL && v->picdata != NULL)
 				load_rom_gdrom(device->machine, v);
 			break;
@@ -1873,7 +1873,7 @@ static DEVICE_NVRAM( naomibd )
 		/*if (file)
             eeprom_load(file);
         else*/
-		games_contents = memory_region(device->machine, "naomibd_eeprom");
+		games_contents = device->machine->region("naomibd_eeprom")->base();
 
 		if (games_contents)
 		{

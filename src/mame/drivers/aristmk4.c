@@ -1168,7 +1168,7 @@ static PALETTE_INIT( aristmk4 )
 
 static DRIVER_INIT( aristmk4 )
 {
-	shapeRomPtr = (UINT8 *)memory_region(machine, "tile_gfx");
+	shapeRomPtr = (UINT8 *)machine->region("tile_gfx")->base();
     memcpy(shapeRom,shapeRomPtr,sizeof(shapeRom)); // back up
 }
 

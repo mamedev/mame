@@ -4305,11 +4305,11 @@ ROM_END
 
 static void expand_32x32x5bpp(running_machine *machine)
 {
-	UINT8 *src = memory_region( machine, "tiles" );
+	UINT8 *src = machine->region( "tiles" )->base();
 	gfx_layout glcopy;
 	glcopy = *(&pgm32_charlayout);
 
-	size_t  srcsize = memory_region_length( machine, "tiles" );
+	size_t  srcsize = machine->region( "tiles" )->bytes();
 	int cnt, pix;
 	size_t gfx2_size_needed = ((srcsize/5)*8)+0x1000;
 	UINT8 *dst = auto_alloc_array(machine, UINT8, gfx2_size_needed);
@@ -4348,8 +4348,8 @@ static void expand_32x32x5bpp(running_machine *machine)
 static void expand_colourdata( running_machine *machine )
 {
 	pgm_state *state = machine->driver_data<pgm_state>();
-	UINT8 *src = memory_region( machine, "sprcol" );
-	size_t srcsize = memory_region_length( machine, "sprcol" );
+	UINT8 *src = machine->region( "sprcol" )->base();
+	size_t srcsize = machine->region( "sprcol" )->bytes();
 	int cnt;
 	size_t needed = srcsize / 2 * 3;
 
@@ -4388,7 +4388,7 @@ static void pgm_basic_init_nobank( running_machine *machine )
 
 static void pgm_basic_init( running_machine *machine )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	memory_set_bankptr(machine, "bank1", &ROM[0x100000]);
 
 	pgm_basic_init_nobank(machine);
@@ -4446,7 +4446,7 @@ static void drgwld2_common_init(running_machine *machine)
 
 static DRIVER_INIT( drgw2 )
 {	/* incomplete? */
-	UINT16 *mem16 = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *mem16 = (UINT16 *)machine->region("maincpu")->base();
 	drgwld2_common_init(machine);
 	/* These ROM patches are not hacks, the protection device
        overlays the normal ROM code, this has been confirmed on a real PCB
@@ -4458,7 +4458,7 @@ static DRIVER_INIT( drgw2 )
 
 static DRIVER_INIT( dw2v100x )
 {
-	UINT16 *mem16 = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *mem16 = (UINT16 *)machine->region("maincpu")->base();
 	drgwld2_common_init(machine);
 
 	mem16[0x131084 / 2] = 0x4e93;
@@ -4468,7 +4468,7 @@ static DRIVER_INIT( dw2v100x )
 
 static DRIVER_INIT( drgw2c )
 {
-	UINT16 *mem16 = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *mem16 = (UINT16 *)machine->region("maincpu")->base();
 	drgwld2_common_init(machine);
 	/* These ROM patches are not hacks, the protection device
        overlays the normal ROM code, this has been confirmed on a real PCB
@@ -4480,7 +4480,7 @@ static DRIVER_INIT( drgw2c )
 
 static DRIVER_INIT( drgw2j )
 {
-	UINT16 *mem16 = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *mem16 = (UINT16 *)machine->region("maincpu")->base();
 	drgwld2_common_init(machine);
 	/* These ROM patches are not hacks, the protection device
        overlays the normal ROM code, this has been confirmed on a real PCB
@@ -4806,17 +4806,17 @@ static void IGS022_do_dma(running_machine* machine, UINT16 src, UINT16 dst, UINT
         };
         */
 		int x;
-		UINT16 *PROTROM = (UINT16*)memory_region(machine, "igs022data");
+		UINT16 *PROTROM = (UINT16*)machine->region("igs022data")->base();
 
 		for (x = 0; x < size; x++)
 		{
-			//UINT16 *RAMDUMP = (UINT16*)memory_region(space->machine, "user2");
+			//UINT16 *RAMDUMP = (UINT16*)space->machine->region("user2")->base();
 			//UINT16 dat = RAMDUMP[dst + x];
 
 			UINT16 dat2 = PROTROM[src + x];
 
 			UINT8 extraoffset = param&0xfe; // the lowest bit changed the table addressing in tests, see 'rawDataOdd' table instead.. it's still related to the main one, not identical
-			UINT8* dectable = (UINT8*)memory_region(machine, "igs022data");//rawDataEven; // the basic decryption table is at the start of the mcu data rom! at least in killbld
+			UINT8* dectable = (UINT8*)machine->region("igs022data")->base();//rawDataEven; // the basic decryption table is at the start of the mcu data rom! at least in killbld
 			UINT16 extraxor = ((dectable[((x*2)+0+extraoffset)&0xff]) << 8) | (dectable[((x*2)+1+extraoffset)&0xff] << 0);
 
 			dat2 = ((dat2 & 0x00ff)<<8) | ((dat2 & 0xff00)>>8);
@@ -4847,7 +4847,7 @@ static void IGS022_do_dma(running_machine* machine, UINT16 src, UINT16 dst, UINT
 	{
 		/* mode 5 seems to be a straight copy */
 		int x;
-		UINT16 *PROTROM = (UINT16*)memory_region(machine, "igs022data");
+		UINT16 *PROTROM = (UINT16*)machine->region("igs022data")->base();
 		for (x = 0; x < size; x++)
 		{
 			UINT16 dat = PROTROM[src + x];
@@ -4860,7 +4860,7 @@ static void IGS022_do_dma(running_machine* machine, UINT16 src, UINT16 dst, UINT
 	{
 		/* mode 6 seems to swap bytes and nibbles */
 		int x;
-		UINT16 *PROTROM = (UINT16*)memory_region(machine, "igs022data");
+		UINT16 *PROTROM = (UINT16*)machine->region("igs022data")->base();
 		for (x = 0; x < size; x++)
 		{
 			UINT16 dat = PROTROM[src + x];
@@ -4893,7 +4893,7 @@ static void IGS022_do_dma(running_machine* machine, UINT16 src, UINT16 dst, UINT
 static void IGS022_reset(running_machine* machine)
 {
 	int i;
-	UINT16 *PROTROM = (UINT16*)memory_region(machine, "igs022data");
+	UINT16 *PROTROM = (UINT16*)machine->region("igs022data")->base();
 	pgm_state *state = machine->driver_data<pgm_state>();
 	UINT16 tmp;
 
@@ -5234,7 +5234,7 @@ static DRIVER_INIT( drgw3 )
 
     {
         int x;
-        UINT16 *RAMDUMP = (UINT16*)memory_region(machine, "user2");
+        UINT16 *RAMDUMP = (UINT16*)machine->region("user2")->base();
         for (x=0;x<(0x4000/2);x++)
         {
             state->sharedprotram[x] = RAMDUMP[x];
@@ -5254,7 +5254,7 @@ static DRIVER_INIT( puzzli2 )
      an acts in a similar way to kov etc. */
 
 	pgm_state *state = machine->driver_data<pgm_state>();
-	UINT16 *mem16 = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *mem16 = (UINT16 *)machine->region("maincpu")->base();
 
 	pgm_basic_init(machine);
 	kovsh_latch_init(machine);
@@ -5300,7 +5300,7 @@ static DRIVER_INIT( puzzli2 )
 static DRIVER_INIT( dw2001 )
 {
 	//pgm_state *state = machine->driver_data<pgm_state>();
-	UINT16 *mem16 = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *mem16 = (UINT16 *)machine->region("maincpu")->base();
 
 	pgm_basic_init(machine);
 	kovsh_latch_init(machine);
@@ -5384,7 +5384,7 @@ static void olds_write_reg( running_machine *machine, UINT16 addr, UINT32 val )
 static MACHINE_RESET( olds )
 {
 	pgm_state *state = machine->driver_data<pgm_state>();
-	UINT16 *mem16 = (UINT16 *)memory_region(machine, "user2");
+	UINT16 *mem16 = (UINT16 *)machine->region("user2")->base();
 	int i;
 
 	MACHINE_RESET_CALL(pgm);
@@ -5516,7 +5516,7 @@ static DRIVER_INIT( olds )
 static void pgm_decode_kovlsqh2_tiles( running_machine *machine )
 {
 	int i, j;
-	UINT16 *src = (UINT16 *)(memory_region(machine, "tiles") + 0x400000);
+	UINT16 *src = (UINT16 *)(machine->region("tiles")->base() + 0x400000);
 	UINT16 *dst = auto_alloc_array(machine, UINT16, 0x800000);
 
 	for (i = 0; i < 0x800000 / 2; i++)
@@ -5551,7 +5551,7 @@ static void pgm_decode_kovlsqh2_sprites( running_machine *machine, UINT8 *src )
 static void pgm_decode_kovlsqh2_samples( running_machine *machine )
 {
 	int i;
-	UINT8 *src = (UINT8 *)(memory_region(machine, "ics") + 0x400000);
+	UINT8 *src = (UINT8 *)(machine->region("ics")->base() + 0x400000);
 
 	for (i = 0; i < 0x400000; i+=2) {
 		src[i + 0x000001] = src[i + 0x400001];
@@ -5563,7 +5563,7 @@ static void pgm_decode_kovlsqh2_samples( running_machine *machine )
 static void pgm_decode_kovqhsgs_program( running_machine *machine )
 {
 	int i;
-	UINT16 *src = (UINT16 *)(memory_region(machine, "maincpu") + 0x100000);
+	UINT16 *src = (UINT16 *)(machine->region("maincpu")->base() + 0x100000);
 	UINT16 *dst = auto_alloc_array(machine, UINT16, 0x400000);
 
 	for (i = 0; i < 0x400000 / 2; i++)
@@ -5581,7 +5581,7 @@ static void pgm_decode_kovqhsgs_program( running_machine *machine )
 static void pgm_decode_kovqhsgs2_program( running_machine *machine )
 {
 	int i;
-	UINT16 *src = (UINT16 *)(memory_region(machine, "maincpu") + 0x100000);
+	UINT16 *src = (UINT16 *)(machine->region("maincpu")->base() + 0x100000);
 	UINT16 *dst = auto_alloc_array(machine, UINT16, 0x400000);
 
 	for (i = 0; i < 0x400000 / 2; i++)
@@ -5602,14 +5602,14 @@ static DRIVER_INIT( kovlsqh2 )
 	pgm_decode_kovqhsgs2_program(machine);
 	pgm_decode_kovlsqh2_tiles(machine);
 
-	pgm_decode_kovlsqh2_sprites(machine, memory_region(machine, "sprcol") + 0x0000000);
-	pgm_decode_kovlsqh2_sprites(machine, memory_region(machine, "sprcol") + 0x0800000);
-	pgm_decode_kovlsqh2_sprites(machine, memory_region(machine, "sprcol") + 0x1000000);
-	pgm_decode_kovlsqh2_sprites(machine, memory_region(machine, "sprcol") + 0x1800000);
-	pgm_decode_kovlsqh2_sprites(machine, memory_region(machine, "sprcol") + 0x2000000);
-	pgm_decode_kovlsqh2_sprites(machine, memory_region(machine, "sprcol") + 0x2800000);
-	pgm_decode_kovlsqh2_sprites(machine, memory_region(machine, "sprmask") + 0x0000000);
-	pgm_decode_kovlsqh2_sprites(machine, memory_region(machine, "sprmask") + 0x0800000);
+	pgm_decode_kovlsqh2_sprites(machine, machine->region("sprcol")->base() + 0x0000000);
+	pgm_decode_kovlsqh2_sprites(machine, machine->region("sprcol")->base() + 0x0800000);
+	pgm_decode_kovlsqh2_sprites(machine, machine->region("sprcol")->base() + 0x1000000);
+	pgm_decode_kovlsqh2_sprites(machine, machine->region("sprcol")->base() + 0x1800000);
+	pgm_decode_kovlsqh2_sprites(machine, machine->region("sprcol")->base() + 0x2000000);
+	pgm_decode_kovlsqh2_sprites(machine, machine->region("sprcol")->base() + 0x2800000);
+	pgm_decode_kovlsqh2_sprites(machine, machine->region("sprmask")->base() + 0x0000000);
+	pgm_decode_kovlsqh2_sprites(machine, machine->region("sprmask")->base() + 0x0800000);
 
 	pgm_decode_kovlsqh2_samples(machine);
 	pgm_basic_init(machine);
@@ -5621,14 +5621,14 @@ static DRIVER_INIT( kovqhsgs )
 	pgm_decode_kovqhsgs_program(machine);
 	pgm_decode_kovlsqh2_tiles(machine);
 
-	pgm_decode_kovlsqh2_sprites(machine, memory_region(machine, "sprcol") + 0x0000000);
-	pgm_decode_kovlsqh2_sprites(machine, memory_region(machine, "sprcol") + 0x0800000);
-	pgm_decode_kovlsqh2_sprites(machine, memory_region(machine, "sprcol") + 0x1000000);
-	pgm_decode_kovlsqh2_sprites(machine, memory_region(machine, "sprcol") + 0x1800000);
-	pgm_decode_kovlsqh2_sprites(machine, memory_region(machine, "sprcol") + 0x2000000);
-	pgm_decode_kovlsqh2_sprites(machine, memory_region(machine, "sprcol") + 0x2800000);
-	pgm_decode_kovlsqh2_sprites(machine, memory_region(machine, "sprmask") + 0x0000000);
-	pgm_decode_kovlsqh2_sprites(machine, memory_region(machine, "sprmask") + 0x0800000);
+	pgm_decode_kovlsqh2_sprites(machine, machine->region("sprcol")->base() + 0x0000000);
+	pgm_decode_kovlsqh2_sprites(machine, machine->region("sprcol")->base() + 0x0800000);
+	pgm_decode_kovlsqh2_sprites(machine, machine->region("sprcol")->base() + 0x1000000);
+	pgm_decode_kovlsqh2_sprites(machine, machine->region("sprcol")->base() + 0x1800000);
+	pgm_decode_kovlsqh2_sprites(machine, machine->region("sprcol")->base() + 0x2000000);
+	pgm_decode_kovlsqh2_sprites(machine, machine->region("sprcol")->base() + 0x2800000);
+	pgm_decode_kovlsqh2_sprites(machine, machine->region("sprmask")->base() + 0x0000000);
+	pgm_decode_kovlsqh2_sprites(machine, machine->region("sprmask")->base() + 0x0800000);
 
 	pgm_decode_kovlsqh2_samples(machine);
 

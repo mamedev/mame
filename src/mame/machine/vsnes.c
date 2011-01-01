@@ -214,8 +214,8 @@ MACHINE_START( vsnes )
 
 	memory_install_readwrite8_handler(ppu1_space, 0x2000, 0x3eff, 0, 0, vsnes_nt0_r, vsnes_nt0_w);
 
-	vrom[0] = memory_region(machine, "gfx1");
-	vrom_size[0] = memory_region_length(machine, "gfx1");
+	vrom[0] = machine->region("gfx1")->base();
+	vrom_size[0] = machine->region("gfx1")->bytes();
 	vrom_banks = vrom_size[0] / 0x400;
 
 	/* establish chr banks */
@@ -238,10 +238,10 @@ MACHINE_START( vsnes )
 
 MACHINE_START( vsdual )
 {
-	vrom[0] = memory_region(machine, "gfx1");
-	vrom[1] = memory_region(machine, "gfx2");
-	vrom_size[0] = memory_region_length(machine, "gfx1");
-	vrom_size[1] = memory_region_length(machine, "gfx2");
+	vrom[0] = machine->region("gfx1")->base();
+	vrom[1] = machine->region("gfx2")->base();
+	vrom_size[0] = machine->region("gfx1")->bytes();
+	vrom_size[1] = machine->region("gfx2")->bytes();
 
 	/* establish nametable ram */
 	nt_ram[0] = auto_alloc_array(machine, UINT8, 0x1000);
@@ -429,7 +429,7 @@ static WRITE8_HANDLER( vskonami_rom_banking )
 		case 2: /* code bank 1 */
 		case 4: /* code bank 2 */
 		{
-			UINT8 *prg = memory_region(space->machine, "maincpu");
+			UINT8 *prg = space->machine->region("maincpu")->base();
 			memcpy(&prg[0x08000 + reg * 0x1000], &prg[bankoffset], 0x2000);
 		}
 		break;
@@ -448,7 +448,7 @@ DRIVER_INIT( vskonami )
 {
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
-	UINT8 *prg = memory_region(machine, "maincpu");
+	UINT8 *prg = machine->region("maincpu")->base();
 	memcpy(&prg[0x08000], &prg[0x18000], 0x8000);
 
 	/* banking is done with writes to the $8000-$ffff area */
@@ -464,7 +464,7 @@ static WRITE8_HANDLER( vsgshoe_gun_in0_w )
 	int addr;
 	if((data & 0x04) != old_bank)
 	{
-		UINT8 *prg = memory_region(space->machine, "maincpu");
+		UINT8 *prg = space->machine->region("maincpu")->base();
 		old_bank = data & 0x04;
 		addr = old_bank ? 0x12000: 0x10000;
 		memcpy(&prg[0x08000], &prg[addr], 0x2000);
@@ -476,7 +476,7 @@ static WRITE8_HANDLER( vsgshoe_gun_in0_w )
 DRIVER_INIT( vsgshoe )
 {
 	/* set up the default bank */
-	UINT8 *prg = memory_region(machine, "maincpu");
+	UINT8 *prg = machine->region("maincpu")->base();
 	memcpy (&prg[0x08000], &prg[0x12000], 0x2000);
 
 	/* vrom switching is enabled with bit 2 of $4016 */
@@ -574,7 +574,7 @@ static WRITE8_HANDLER( drmario_rom_banking )
 			case 3:	/* program banking */
 				{
 					int bank = (drmario_shiftreg & 0x03) * 0x4000;
-					UINT8 *prg = memory_region(space->machine, "maincpu");
+					UINT8 *prg = space->machine->region("maincpu")->base();
 
 					if (!size16k)
 					{
@@ -607,7 +607,7 @@ DRIVER_INIT( drmario )
 {
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
-	UINT8 *prg = memory_region(machine, "maincpu");
+	UINT8 *prg = machine->region("maincpu")->base();
 	memcpy(&prg[0x08000], &prg[0x10000], 0x4000);
 	memcpy(&prg[0x0c000], &prg[0x1c000], 0x4000);
 
@@ -624,7 +624,7 @@ DRIVER_INIT( drmario )
 static WRITE8_HANDLER( vsvram_rom_banking )
 {
 	int rombank = 0x10000 + (data & 7) * 0x4000;
-	UINT8 *prg = memory_region(space->machine, "maincpu");
+	UINT8 *prg = space->machine->region("maincpu")->base();
 
 	memcpy(&prg[0x08000], &prg[rombank], 0x4000);
 }
@@ -632,7 +632,7 @@ static WRITE8_HANDLER( vsvram_rom_banking )
 DRIVER_INIT( vsvram )
 {
 	/* when starting the game, the 1st 16k and the last 16k are loaded into the 2 banks */
-	UINT8 *prg = memory_region(machine, "maincpu");
+	UINT8 *prg = machine->region("maincpu")->base();
 	memcpy(&prg[0x08000], &prg[0x28000], 0x8000);
 
 	/* banking is done with writes to the $8000-$ffff area */
@@ -652,7 +652,7 @@ static int IRQ_enable, IRQ_count, IRQ_count_latch;
 
 static void mapper4_set_prg( running_machine *machine )
 {
-	UINT8 *prg = memory_region(machine, "maincpu");
+	UINT8 *prg = machine->region("maincpu")->base();
 	UINT8 prg_flip = (MMC3_cmd & 0x40) ? 2 : 0;
 
 	memcpy(&prg[0x8000], &prg[0x2000 * (MMC3_prg_bank[0 ^ prg_flip] & MMC3_prg_mask) + 0x10000], 0x2000);
@@ -784,9 +784,9 @@ static WRITE8_HANDLER( mapper4_w )
 
 DRIVER_INIT( MMC3 )
 {
-	UINT8 *prg = memory_region(machine, "maincpu");
+	UINT8 *prg = machine->region("maincpu")->base();
 	IRQ_enable = IRQ_count = IRQ_count_latch = 0;
-	int MMC3_prg_chunks = (memory_region_length(machine, "maincpu") - 0x10000) / 0x4000;
+	int MMC3_prg_chunks = (machine->region("maincpu")->bytes() - 0x10000) / 0x4000;
 
 	MMC3_prg_bank[0] = MMC3_prg_bank[2] = 0xfe;
 	MMC3_prg_bank[1] = MMC3_prg_bank[3] = 0xff;
@@ -962,7 +962,7 @@ static WRITE8_HANDLER( mapper68_rom_banking )
 
 		case 0x7000:
 		{
-			UINT8 *prg = memory_region(space->machine, "maincpu");
+			UINT8 *prg = space->machine->region("maincpu")->base();
 			memcpy(&prg[0x08000], &prg[0x10000 + data * 0x4000], 0x4000);
 		}
 		break;
@@ -977,7 +977,7 @@ DRIVER_INIT( platoon )
 	/* when starting a mapper 68 game  the first 16K ROM bank in the cart is loaded into $8000
     the LAST 16K ROM bank is loaded into $C000. The last 16K of ROM cannot be swapped. */
 
-	UINT8 *prg = memory_region(machine, "maincpu");
+	UINT8 *prg = machine->region("maincpu")->base();
 	memcpy(&prg[0x08000], &prg[0x10000], 0x4000);
 	memcpy(&prg[0x0c000], &prg[0x2c000], 0x4000);
 
@@ -1036,7 +1036,7 @@ static WRITE8_HANDLER( vsdual_vrom_banking )
 
 DRIVER_INIT( vsdual )
 {
-	UINT8 *prg = memory_region(machine, "maincpu");
+	UINT8 *prg = machine->region("maincpu")->base();
 
 	/* vrom switching is enabled with bit 2 of $4016 */
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4016, 0x4016, 0, 0, vsdual_vrom_banking);

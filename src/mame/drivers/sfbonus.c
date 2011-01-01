@@ -1085,7 +1085,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( sfbonus_bank_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 	UINT8 bank;
 
 	bank = data & 7;
@@ -1217,7 +1217,7 @@ GFXDECODE_END
 
 static MACHINE_RESET( sfbonus )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	memory_set_bankptr(machine, "bank1", &ROM[0]);
 }
@@ -1235,12 +1235,12 @@ static NVRAM_HANDLER( sfbonus )
 		}
 		else
 		{
-			UINT8* defaultram = memory_region(machine, "defaults");
+			UINT8* defaultram = machine->region("defaults")->base();
 			memset(nvram,0x00,nvram_size);
 
 			if (defaultram)
 				if ((defaultram[0x02]==0x00) && (defaultram[0x03]==0x00)) // hack! rom region optional regions get cleared with garbage if no rom is present, this is not good!
-					memcpy(nvram, memory_region(machine, "defaults"), memory_region_length(machine, "defaults"));
+					memcpy(nvram, machine->region("defaults")->base(), machine->region("defaults")->bytes());
 		}
 	}
 }
@@ -5465,7 +5465,7 @@ static DRIVER_INIT( sfbonus_common)
 	state_save_register_global_pointer(machine, sfbonus_reel4_ram , 0x0800);
 
 	// hack, because the debugger is broken
-	sfbonus_videoram = memory_region(machine, "debugram");
+	sfbonus_videoram = machine->region("debugram")->base();
 	if (!sfbonus_videoram)
 		sfbonus_videoram = auto_alloc_array(machine, UINT8, 0x10000);
 
@@ -5475,9 +5475,9 @@ static DRIVER_INIT( sfbonus_common)
 
 	// dummy.rom helper
 	{
-		UINT8 *ROM = memory_region(machine, "maincpu");
-		int length = memory_region_length(machine, "maincpu");
-		UINT8* ROM2 = memory_region(machine, "user1");
+		UINT8 *ROM = machine->region("maincpu")->base();
+		int length = machine->region("maincpu")->bytes();
+		UINT8* ROM2 = machine->region("user1")->base();
 
 		if (ROM2)
 		{
@@ -5527,9 +5527,9 @@ static void sfbonus_bitswap( running_machine* machine,
 {
 
 	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
-	for(i = 0; i < memory_region_length(machine, "maincpu"); i++)
+	for(i = 0; i < machine->region("maincpu")->bytes(); i++)
 	{
 		UINT8 x = ROM[i];
 

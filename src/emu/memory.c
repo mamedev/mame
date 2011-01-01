@@ -1935,7 +1935,7 @@ inline void address_space::adjust_addresses(offs_t &start, offs_t &end, offs_t &
 
 void address_space::prepare_map()
 {
-	const region_info *devregion = (m_spacenum == ADDRESS_SPACE_0) ? m_machine.region(m_device.tag()) : NULL;
+	const memory_region *devregion = (m_spacenum == ADDRESS_SPACE_0) ? m_machine.region(m_device.tag()) : NULL;
 	UINT32 devregionsize = (devregion != NULL) ? devregion->bytes() : 0;
 
 	// allocate the address map
@@ -1981,7 +1981,7 @@ void address_space::prepare_map()
 		// validate adjusted addresses against implicit regions
 		if (entry->m_region != NULL && entry->m_share == NULL && entry->m_baseptr == NULL)
 		{
-			const region_info *region = m_machine.region(entry->m_region);
+			const memory_region *region = m_machine.region(entry->m_region);
 			if (region == NULL)
 				fatalerror("Error: device '%s' %s space memory map entry %X-%X references non-existant region \"%s\"", m_device.tag(), m_name, entry->m_addrstart, entry->m_addrend, entry->m_region);
 
@@ -3020,7 +3020,7 @@ bool address_space::needs_backing_store(const address_map_entry *entry)
 		return true;
 
 	// if we're reading from RAM or from ROM outside of address space 0 or its region, then yes, we do need backing
-	const region_info *region = m_machine.region(m_device.tag());
+	const memory_region *region = m_machine.region(m_device.tag());
 	if (entry->m_read.m_type == AMH_RAM ||
 		(entry->m_read.m_type == AMH_ROM && (m_spacenum != ADDRESS_SPACE_0 || region == NULL || entry->m_addrstart >= region->bytes())))
 		return true;
@@ -4078,7 +4078,7 @@ memory_block::memory_block(address_space &space, offs_t bytestart, offs_t byteen
 	}
 
 	// register for saving, but only if we're not part of a memory region
-	const region_info *region;
+	const memory_region *region;
 	for (region = space.m_machine.m_regionlist.first(); region != NULL; region = region->next())
 		if (m_data >= region->base() && (m_data + (byteend - bytestart + 1)) < region->end())
 		{

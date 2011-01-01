@@ -252,13 +252,13 @@ int esripsys_draw(running_machine *machine, int l, int r, int fig, int attr, int
 
 		if (x_flip)
 		{
-			rom_l = memory_region(machine, "8bpp_r");
-			rom_r = memory_region(machine, "8bpp_l");
+			rom_l = machine->region("8bpp_r")->base();
+			rom_r = machine->region("8bpp_l")->base();
 		}
 		else
 		{
-			rom_l = memory_region(machine, "8bpp_l");
-			rom_r = memory_region(machine, "8bpp_r");
+			rom_l = machine->region("8bpp_l")->base();
+			rom_r = machine->region("8bpp_r")->base();
 		}
 
 		for (cnt = 0; cnt <= fig; cnt++)
@@ -321,7 +321,7 @@ int esripsys_draw(running_machine *machine, int l, int r, int fig, int attr, int
 	/* 4bpp case */
 	else
 	{
-		const UINT8* const rom = memory_region(machine, "4bpp");
+		const UINT8* const rom = machine->region("4bpp")->base();
 		int ptr = 0;
 		int cnt;
 		UINT32 lpos = l;

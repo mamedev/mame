@@ -26,7 +26,7 @@ Buccaneers has a 5.6888 Mhz and a 18.432 Mhz OSC
 static WRITE8_HANDLER( vigilant_bank_select_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	UINT8 *RAM = space->machine->region("maincpu")->base();
 
 	bankaddress = 0x10000 + (data & 0x07) * 0x4000;
 	memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);

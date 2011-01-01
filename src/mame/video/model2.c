@@ -2701,10 +2701,10 @@ VIDEO_START(model2)
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, model2_exit);
 
 	/* initialize the geometry engine */
-	geo_init( machine, (UINT32*)memory_region(machine, "user2") );
+	geo_init( machine, (UINT32*)machine->region("user2")->base() );
 
 	/* initialize the hardware rasterizer */
-	model2_3d_init( machine, (UINT16*)memory_region(machine, "user3") );
+	model2_3d_init( machine, (UINT16*)machine->region("user3")->base() );
 }
 
 static void convert_bitmap( running_machine *machine, bitmap_t *dst, bitmap_t *src, const rectangle *rect )

@@ -493,9 +493,9 @@ ROM_END
 static DRIVER_INIT( drill )
 {
 	// rearrange gfx roms to something we can decode, two of the roms form 4bpp of the graphics, the third forms another 2bpp but is in a different format
-	UINT32 *src = (UINT32*)memory_region( machine, "gfx2" );
-	UINT32 *dst = (UINT32*)memory_region( machine, "gfx1" );// + 0x400000;
-//  UINT8 *rom = memory_region( machine, "maincpu" );
+	UINT32 *src = (UINT32*)machine->region( "gfx2" )->base();
+	UINT32 *dst = (UINT32*)machine->region( "gfx1" )->base();// + 0x400000;
+//  UINT8 *rom = machine->region( "maincpu" )->base();
 	int i;
 
 	for (i = 0; i < 0x400000 / 4; i++)

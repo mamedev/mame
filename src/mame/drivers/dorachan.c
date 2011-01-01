@@ -87,7 +87,7 @@ static VIDEO_UPDATE( dorachan )
 
 	get_pens(pens);
 
-	color_map_base = memory_region(screen->machine, "proms");
+	color_map_base = screen->machine->region("proms")->base();
 
 	for (offs = 0; offs < state->videoram_size; offs++)
 	{

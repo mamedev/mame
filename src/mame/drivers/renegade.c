@@ -175,7 +175,7 @@ static DEVICE_START( renegade_adpcm )
 	struct renegade_adpcm_state *state = &renegade_adpcm;
 	state->playing = 0;
 	state->stream = stream_create(device, 0, 1, device->clock(), state, renegade_adpcm_callback);
-	state->base = memory_region(machine, "adpcm");
+	state->base = machine->region("adpcm")->base();
 	state->adpcm.reset();
 }
 
@@ -249,7 +249,7 @@ static const UINT8 kuniokun_xor_table[0x2a] =
 
 static void setbank(running_machine *machine)
 {
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 	memory_set_bankptr(machine, "bank1", &RAM[bank ? 0x10000 : 0x4000]);
 }
 

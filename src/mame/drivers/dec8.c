@@ -3423,7 +3423,7 @@ static DRIVER_INIT( deco222 )
 	UINT8 *rom;
 
 	/* bits 5 and 6 of the opcodes are swapped */
-	rom = memory_region(machine, "audiocpu");
+	rom = machine->region("audiocpu")->base();
 	decrypt = auto_alloc_array(machine, UINT8, 0x8000);
 
 	space->set_decrypted_region(0x8000, 0xffff, decrypt);
@@ -3437,8 +3437,8 @@ static DRIVER_INIT( deco222 )
 /* Below, I set up the correct number of banks depending on the "maincpu" region size */
 static DRIVER_INIT( ghostb )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
-	UINT8 *RAM = memory_region(machine, "proms");
+	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *RAM = machine->region("proms")->base();
 
 	/* Blank out unused garbage in colour prom to avoid colour overflow */
 	memset(RAM + 0x20, 0, 0xe0);
@@ -3449,8 +3449,8 @@ static DRIVER_INIT( ghostb )
 
 static DRIVER_INIT( meikyuh )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
-	UINT8 *RAM = memory_region(machine, "proms");
+	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *RAM = machine->region("proms")->base();
 
 	/* Blank out unused garbage in colour prom to avoid colour overflow */
 	memset(RAM + 0x20, 0, 0xe0);
@@ -3461,36 +3461,36 @@ static DRIVER_INIT( meikyuh )
 
 static DRIVER_INIT( cobracom )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL( dec8 );
 }
 
 static DRIVER_INIT( oscar )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL( deco222 );
 }
 
 static DRIVER_INIT( gondo )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 12, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL( dec8 );
 }
 
 static DRIVER_INIT( garyoret )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 16, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL( dec8 );
 }
 
 static DRIVER_INIT( csilver )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
-	UINT8 *RAM = memory_region(machine, "audiocpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *RAM = machine->region("audiocpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 14, &ROM[0x10000], 0x4000);
 	memory_configure_bank(machine, "bank3", 0, 2, &RAM[0x10000], 0x4000);
@@ -3499,21 +3499,21 @@ static DRIVER_INIT( csilver )
 
 static DRIVER_INIT( shackled )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 14, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL( dec8 );
 }
 
 static DRIVER_INIT( lastmisn )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL( dec8 );
 }
 
 static DRIVER_INIT( srdarwin )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 6, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL( deco222 );
 }

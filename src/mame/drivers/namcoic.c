@@ -1091,7 +1091,7 @@ roz_get_info( running_machine *machine, tile_data *tileinfo, int tile_index, int
 		break;
 	}
 	SET_TILE_INFO( mRozGfxBank,mangle,0/*color*/,0/*flag*/ );
-	tileinfo->mask_data = 32*tile + (UINT8 *)memory_region( machine, mRozMaskRegion );
+	tileinfo->mask_data = 32*tile + (UINT8 *)machine->region( mRozMaskRegion )->base();
 } /* roz_get_info */
 
 static
@@ -1601,7 +1601,7 @@ namco_road_set_transparent_color(pen_t pen)
 void
 namco_road_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
 {
-	const UINT8 *clut = (const UINT8 *)memory_region(machine, "user3");
+	const UINT8 *clut = (const UINT8 *)machine->region("user3")->base();
 	bitmap_t *pSourceBitmap;
 	unsigned yscroll;
 	int i;

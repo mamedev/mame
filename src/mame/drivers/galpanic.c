@@ -157,7 +157,7 @@ static WRITE16_HANDLER( galpanic_6295_bankswitch_w )
 
 	if (ACCESSING_BITS_8_15)
 	{
-		UINT8 *rom = memory_region(space->machine, "oki");
+		UINT8 *rom = space->machine->region("oki")->base();
 
 		memcpy(&rom[0x30000],&rom[0x40000 + ((data >> 8) & 0x0f) * 0x10000],0x10000);
 
@@ -170,7 +170,7 @@ static WRITE16_HANDLER( galpanica_6295_bankswitch_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		UINT8 *rom = memory_region(space->machine, "oki");
+		UINT8 *rom = space->machine->region("oki")->base();
 
 		memcpy(&rom[0x30000],&rom[0x40000 + ((data >> 8) & 0x0f) * 0x10000],0x10000);
 	}

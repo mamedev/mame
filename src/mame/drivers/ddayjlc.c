@@ -671,8 +671,8 @@ static DRIVER_INIT( ddayjlc )
 		UINT8 *src, *dst, *temp;
 		temp = auto_alloc_array(machine, UINT8, 0x10000);
 		src = temp;
-		dst = memory_region(machine, "gfx1");
-		length = memory_region_length(machine, "gfx1");
+		dst = machine->region("gfx1")->base();
+		length = machine->region("gfx1")->bytes();
 		memcpy(src, dst, length);
 		newadr = 0;
 		oldaddr = 0;
@@ -686,7 +686,7 @@ static DRIVER_INIT( ddayjlc )
 		auto_free(machine, temp);
 	}
 
-	memory_configure_bank(machine, "bank1", 0, 3, memory_region(machine, "user1"), 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 3, machine->region("user1")->base(), 0x4000);
 	memory_set_bank(machine, "bank1", 0);
 }
 

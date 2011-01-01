@@ -87,14 +87,14 @@ WRITE8_HANDLER( slapfight_port_07_w )
 
 WRITE8_HANDLER( slapfight_port_08_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	UINT8 *RAM = space->machine->region("maincpu")->base();
 
 	memory_set_bankptr(space->machine, "bank1",&RAM[0x10000]);
 }
 
 WRITE8_HANDLER( slapfight_port_09_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	UINT8 *RAM = space->machine->region("maincpu")->base();
 
 	memory_set_bankptr(space->machine, "bank1",&RAM[0x14000]);
 }

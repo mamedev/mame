@@ -115,7 +115,7 @@ device_t *_ConfigClass::alloc_device(running_machine &machine) const					\
 //**************************************************************************
 
 // forward references
-class region_info;
+class memory_region;
 class device_debug;
 class device_config;
 class device_config_interface;
@@ -408,7 +408,7 @@ public:
 	// owned object helpers
 	astring &subtag(astring &dest, const char *tag) const { return m_baseconfig.subtag(dest, tag); }
 	astring &siblingtag(astring &dest, const char *tag) const { return m_baseconfig.siblingtag(dest, tag); }
-	const region_info *subregion(const char *tag) const;
+	const memory_region *subregion(const char *tag) const;
 	device_t *subdevice(const char *tag) const;
 	device_t *siblingdevice(const char *tag) const;
 	template<class T> inline T *subdevice(const char *tag) { return downcast<T *>(subdevice(tag)); }
@@ -416,7 +416,7 @@ public:
 
 	// configuration helpers
 	const device_config &baseconfig() const { return m_baseconfig; }
-	const region_info *region() const { return m_region; }
+	const memory_region *region() const { return m_region; }
 
 	// state helpers
 	bool started() const { return m_started; }
@@ -484,7 +484,7 @@ protected:
 
 	bool					m_started;				// true if the start function has succeeded
 	UINT32					m_clock;				// device clock
-	const region_info *		m_region;				// our device-local region
+	const memory_region *		m_region;				// our device-local region
 
 	const device_config &	m_baseconfig;			// reference to our device_config
 	UINT32					m_unscaled_clock;		// unscaled clock

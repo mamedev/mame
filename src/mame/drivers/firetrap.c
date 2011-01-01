@@ -623,8 +623,8 @@ static INTERRUPT_GEN( bootleg )
 static MACHINE_START( firetrap )
 {
 	firetrap_state *state = machine->driver_data<firetrap_state>();
-	UINT8 *MAIN = memory_region(machine, "maincpu");
-	UINT8 *SOUND = memory_region(machine, "audiocpu");
+	UINT8 *MAIN = machine->region("maincpu")->base();
+	UINT8 *SOUND = machine->region("audiocpu")->base();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");

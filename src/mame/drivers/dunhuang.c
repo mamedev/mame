@@ -338,7 +338,7 @@ static WRITE8_HANDLER( dunhuang_block_h_w )
 
 	state->block_h = data;
 
-	tile_addr = memory_region(space->machine, "gfx2") + ((state->block_addr_hi << 8) + state->block_addr_lo) * 4;
+	tile_addr = space->machine->region("gfx2")->base() + ((state->block_addr_hi << 8) + state->block_addr_lo) * 4;
 
 	switch (state->block_dest)
 	{
@@ -765,7 +765,7 @@ static const ay8910_interface dunhuang_ay8910_interface =
 static MACHINE_START( dunhuang )
 {
 	dunhuang_state *state = machine->driver_data<dunhuang_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x8000);
 

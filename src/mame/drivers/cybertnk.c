@@ -282,7 +282,7 @@ static VIDEO_UPDATE( cybertnk )
 	/* non-tile based spriteram (BARE-BONES, looks pretty complex) */
 	if(1)
 	{
-		const UINT8 *blit_ram = memory_region(screen->machine,"spr_gfx");
+		const UINT8 *blit_ram = screen->machine->region("spr_gfx")->base();
 		int offs,x,y,z,xsize,ysize,yi,xi,col_bank,fx,zoom;
 		UINT32 spr_offs,spr_offs_helper;
 		int xf,yf,xz,yz;
@@ -415,7 +415,7 @@ static VIDEO_UPDATE( cybertnk )
 		{
 			int x,y,count;
 			static int test_x, test_y, start_offs,color_pen;
-			const UINT8 *blit_ram = memory_region(screen->machine,"spr_gfx");
+			const UINT8 *blit_ram = screen->machine->region("spr_gfx")->base();
 
 			if(input_code_pressed(screen->machine, KEYCODE_Z))
 			test_x++;
@@ -980,7 +980,7 @@ DRIVER_INIT( cybertnk )
 	UINT8* road_data;
 	int i;
 
-	road_data = memory_region(machine, "road_data");
+	road_data = machine->region("road_data")->base();
 	for (i=0;i < 0x40000;i++)
 	{
 		road_data[i] = BITSWAP8(road_data[i],3,2,1,0,7,6,5,4);

@@ -270,7 +270,7 @@ static void kfr_adpcm1_int(device_t *device)
 	}
 	else
 	{
-		UINT8 *ROM = memory_region(device->machine, "adpcm1");
+		UINT8 *ROM = device->machine->region("adpcm1")->base();
 
 		adpcm_data = ((trigger ? (ROM[adpcm_pos[0]] & 0x0f) : (ROM[adpcm_pos[0]] & 0xf0)>>4) );
 		msm5205_data_w(device->machine->device("adpcm1"),adpcm_data & 0xf);
@@ -296,7 +296,7 @@ static void kfr_adpcm2_int(device_t *device)
 	}
 	else
 	{
-		UINT8 *ROM = memory_region(device->machine, "adpcm2");
+		UINT8 *ROM = device->machine->region("adpcm2")->base();
 
 		adpcm_data = ((trigger ? (ROM[adpcm_pos[1]] & 0x0f) : (ROM[adpcm_pos[1]] & 0xf0)>>4) );
 		msm5205_data_w(device->machine->device("adpcm2"),adpcm_data & 0xf);

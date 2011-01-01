@@ -799,8 +799,8 @@ ADDRESS_MAP_END
 static void kaneko16_common_oki_bank_w( running_machine* machine, const char *bankname, const char* tag, int bank, size_t fixedsize, size_t bankedsize )
 {
 	UINT32 bankaddr;
-	UINT8* samples = memory_region(machine,tag);
-	size_t length = memory_region_length(machine,tag);
+	UINT8* samples = machine->region(tag)->base();
+	size_t length = machine->region(tag)->bytes();
 
 	bankaddr = fixedsize + (bankedsize * bank);
 
@@ -2236,8 +2236,8 @@ MACHINE_CONFIG_END
 */
 static void kaneko16_unscramble_tiles(running_machine *machine, const char *region)
 {
-	UINT8 *RAM	=	memory_region(machine, region);
-	int size			=	memory_region_length(machine, region);
+	UINT8 *RAM	=	machine->region(region)->base();
+	int size			=	machine->region(region)->bytes();
 	int i;
 
 	if (RAM == NULL)	return;
@@ -2262,11 +2262,11 @@ static void kaneko16_expand_sample_banks(running_machine *machine, const char *r
 	int bank;
 	UINT8 *src0;
 
-	if (memory_region_length(machine, region) < 0x40000 * 16)
+	if (machine->region(region)->bytes() < 0x40000 * 16)
 		fatalerror("gtmr SOUND1 region too small");
 
 	/* bank 0 maps to itself, so we just leave it alone */
-	src0 = memory_region(machine, region);
+	src0 = machine->region(region)->base();
 	for (bank = 15; bank > 0; bank--)
 	{
 		UINT8 *srcn = src0 + 0x10000 * (bank < 3 ? 3 : bank);

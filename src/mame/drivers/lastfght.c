@@ -121,7 +121,7 @@ static VIDEO_UPDATE( lastfght )
 	int x, y, count = 0;
 	static unsigned base = 0;
 	static int view_roms = 0;
-	UINT8 *gfxdata = memory_region(screen->machine, "gfx1");
+	UINT8 *gfxdata = screen->machine->region("gfx1")->base();
 	UINT8 data;
 
 	if (input_code_pressed_once(screen->machine, KEYCODE_ENTER))	view_roms ^= 1;
@@ -129,7 +129,7 @@ static VIDEO_UPDATE( lastfght )
 	{
 		if (input_code_pressed_once(screen->machine, KEYCODE_PGDN))	base += 512 * 256;
 		if (input_code_pressed_once(screen->machine, KEYCODE_PGUP))	base -= 512 * 256;
-		base %= memory_region_length(screen->machine, "gfx1");
+		base %= screen->machine->region("gfx1")->bytes();
 
 		count = base;
 
@@ -313,7 +313,7 @@ static WRITE16_HANDLER( lastfght_blit_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		int x, y, addr;
-		UINT8 *gfxdata = memory_region( space->machine, "gfx1" );
+		UINT8 *gfxdata = space->machine->region( "gfx1" )->base();
 		bitmap_t *dest = state->bitmap[state->dest];
 
 #if 0
@@ -615,7 +615,7 @@ ROM_END
 
 static DRIVER_INIT(lastfght)
 {
-	UINT16 *rom = (UINT16*)memory_region(machine, "maincpu");
+	UINT16 *rom = (UINT16*)machine->region("maincpu")->base();
 
 	// pass initial check (protection ? hw?)
 	rom[0x00354 / 2] = 0x403e;

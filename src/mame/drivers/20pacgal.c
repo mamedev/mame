@@ -147,7 +147,7 @@ static void set_bankptr(running_machine *machine)
 	_20pacgal_state *state =  machine->driver_data<_20pacgal_state>();
 	if (state->game_selected == 0)
 	{
-		UINT8 *rom = memory_region(machine, "maincpu");
+		UINT8 *rom = machine->region("maincpu")->base();
 		memory_set_bankptr(machine, "bank1", rom + 0x08000);
 	}
 	else

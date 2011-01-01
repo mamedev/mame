@@ -161,7 +161,7 @@ static void set_pens(running_machine *machine)
 static void compute_draw_order(running_machine *machine)
 {
 	int i;
-	UINT8 *color_prom = memory_region(machine, "proms");
+	UINT8 *color_prom = machine->region("proms")->base();
 
 	/* do a simple conversion of the PROM into layer priority order. Note that */
 	/* this is a simplification, which assumes the PROM encodes a sensible priority */
@@ -220,7 +220,7 @@ READ8_HANDLER( taitosj_gfxrom_r )
 	offs_t offs = taitosj_gfxpointer[0] | (taitosj_gfxpointer[1] << 8);
 
 	if (offs < 0x8000)
-		ret = memory_region(space->machine, "gfx1")[offs];
+		ret = space->machine->region("gfx1")->base()[offs];
 	else
 		ret = 0;
 

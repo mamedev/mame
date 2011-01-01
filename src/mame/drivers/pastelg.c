@@ -45,7 +45,7 @@ static DRIVER_INIT( pastelg )
 
 static READ8_HANDLER( pastelg_sndrom_r )
 {
-	UINT8 *ROM = memory_region(space->machine, "voice");
+	UINT8 *ROM = space->machine->region("voice")->base();
 
 	return ROM[pastelg_blitter_src_addr_r() & 0x7fff];
 }

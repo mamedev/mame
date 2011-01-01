@@ -114,7 +114,7 @@ static UINT8 char_offset; //helper to jump the decoding of the NULL chars.
 
 static READ32_HANDLER( twcup98_prot_r )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(space->machine, "user1");
+	UINT32 *ROM = (UINT32 *)space->machine->region("user1")->base();
 
 	if(a_bus[0] & 0x00010000)//protection calculation is activated
 	{
@@ -173,7 +173,7 @@ void install_twcup98_protection(running_machine *machine)
 
 static READ32_HANDLER( sss_prot_r )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(space->machine, "user1");
+	UINT32 *ROM = (UINT32 *)space->machine->region("user1")->base();
 
 	if(a_bus[0] & 0x00010000)//protection calculation is activated
 	{
@@ -238,7 +238,7 @@ void install_sss_protection(running_machine *machine)
 
 static READ32_HANDLER( rsgun_prot_r )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(space->machine, "user1");
+	UINT32 *ROM = (UINT32 *)space->machine->region("user1")->base();
 
 	if(a_bus[0] & 0x00010000)//protection calculation is activated
 	{
@@ -313,7 +313,7 @@ void install_rsgun_protection(running_machine *machine)
 
 static READ32_HANDLER( elandore_prot_r )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(space->machine, "user1");
+	UINT32 *ROM = (UINT32 *)space->machine->region("user1")->base();
 
 	if(a_bus[0] & 0x00010000)//protection calculation is activated
 	{
@@ -420,7 +420,7 @@ static const UINT32 vector_prot[] = { 0x0603B1B2,0x234 };
 
 static READ32_HANDLER( ffreveng_prot_r )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(space->machine, "user1");
+	UINT32 *ROM = (UINT32 *)space->machine->region("user1")->base();
 
 	if(a_bus[0] & 0x00010000)//protection calculation is activated
 	{
@@ -485,11 +485,11 @@ static READ32_HANDLER(astrass_prot_r)
 	if ( offset == 3 && ctrl_index != -1 )
 	{
 		UINT32 data = 0;
-		UINT32 *prot_data = (UINT32 *)memory_region(space->machine, "user2");
+		UINT32 *prot_data = (UINT32 *)space->machine->region("user2")->base();
 
 		data = prot_data[ctrl_index++];
 
-		if ( ctrl_index >= memory_region_length(space->machine, "user2")/4 )
+		if ( ctrl_index >= space->machine->region("user2")->bytes()/4 )
 		{
 			ctrl_index = -1;
 		}
@@ -531,7 +531,7 @@ static UINT16 decathlt_prottable2[128];
 
 static READ32_HANDLER( decathlt_prot_r )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(space->machine, "user1");
+	UINT32 *ROM = (UINT32 *)space->machine->region("user1")->base();
 
 	if (offset==2)
 	{

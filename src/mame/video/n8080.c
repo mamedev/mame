@@ -148,7 +148,7 @@ VIDEO_UPDATE( spacefev )
 	int y;
 
 	const UINT8* pRAM = state->videoram;
-	const UINT8* pPROM = memory_region(screen->machine, "proms");
+	const UINT8* pPROM = screen->machine->region("proms")->base();
 
 	for (y = 0; y < 256; y++)
 	{
@@ -214,7 +214,7 @@ VIDEO_UPDATE( sheriff )
 	n8080_state *state = screen->machine->driver_data<n8080_state>();
 	UINT8 mask = flip_screen_get(screen->machine) ? 0xff : 0x00;
 
-	const UINT8* pPROM = memory_region(screen->machine, "proms");
+	const UINT8* pPROM = screen->machine->region("proms")->base();
 
 	int x;
 	int y;

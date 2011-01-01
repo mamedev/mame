@@ -103,7 +103,7 @@ static TILEMAP_MAPPER( fg_scan )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	UINT8   *fgMap = memory_region(machine, "gfx5");
+	UINT8   *fgMap = machine->region("gfx5")->base();
 	int attr,tile_base;
 
 	attr = fgMap[0x8000+tile_index];
@@ -126,7 +126,7 @@ static TILEMAP_MAPPER( bg_scan )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT8   *bgMap = memory_region(machine, "gfx6");
+	UINT8   *bgMap = machine->region("gfx6")->base();
 	int attr,tile_bank,tile_base;
 
 	attr = bgMap[0x8000+tile_index];

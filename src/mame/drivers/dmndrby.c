@@ -319,7 +319,7 @@ static TILE_GET_INFO( get_dmndrby_tile_info )
 
 static VIDEO_START(dderby)
 {
-	racetrack_tilemap_rom = memory_region(machine,"user1");
+	racetrack_tilemap_rom = machine->region("user1")->base();
 	racetrack_tilemap = tilemap_create(machine,get_dmndrby_tile_info,tilemap_scan_rows,16,16, 16, 512);
 	tilemap_mark_all_tiles_dirty(racetrack_tilemap);
 
@@ -466,7 +466,7 @@ static PALETTE_INIT( dmnderby )
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
-	color_prom = memory_region(machine,"proms2");
+	color_prom = machine->region("proms2")->base();
 
 	/* normal tiles use colors 0-15 */
 	for (i = 0x000; i < 0x300; i++)

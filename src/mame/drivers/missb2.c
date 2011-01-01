@@ -55,7 +55,7 @@ static VIDEO_UPDATE( missb2 )
 
 	sx = 0;
 
-	prom = memory_region(screen->machine, "proms");
+	prom = screen->machine->region("proms")->base();
 	for (offs = 0; offs < state->objectram_size; offs += 4)
 	{
 		/* skip empty sprites */
@@ -461,8 +461,8 @@ ROM_END
 
 static void configure_banks( running_machine* machine )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
-	UINT8 *SLAVE = memory_region(machine, "slave");
+	UINT8 *ROM = machine->region("maincpu")->base();
+	UINT8 *SLAVE = machine->region("slave")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 

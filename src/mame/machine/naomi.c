@@ -66,9 +66,9 @@ static UINT8 asciihex_to_dec(UINT8 in)
 static void create_pic_from_retdat(running_machine* machine)
 {
 	{
-		UINT8* hexregion = memory_region(machine,"pichex");
-		UINT8* retregion = memory_region(machine,"picreturn");
-		UINT8* newregion = memory_region(machine,"pic");
+		UINT8* hexregion = machine->region("pichex")->base();
+		UINT8* retregion = machine->region("picreturn")->base();
+		UINT8* newregion = machine->region("pic")->base();
 		int outcount = 0;
 
 		if (hexregion && retregion && newregion)

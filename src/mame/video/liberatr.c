@@ -68,8 +68,8 @@ void liberatr_state::init_planet(planet &liberatr_planet, UINT8 *planet_rom)
 {
 	UINT16 longitude;
 
-	const UINT8 *latitude_scale = memory_region(machine, "user1");
-	const UINT8 *longitude_scale = memory_region(machine, "user2");
+	const UINT8 *latitude_scale = machine->region("user1")->base();
+	const UINT8 *longitude_scale = machine->region("user2")->base();
 
 	/* for each starting longitude */
 	for (longitude = 0; longitude < 0x100; longitude++)
@@ -212,8 +212,8 @@ void liberatr_state::init_planet(planet &liberatr_planet, UINT8 *planet_rom)
 void liberatr_state::video_start()
 {
 	// for each planet in the planet ROMs
-	init_planet(m_planets[0], &memory_region(machine, "gfx1")[0x2000]);
-	init_planet(m_planets[1], &memory_region(machine, "gfx1")[0x0000]);
+	init_planet(m_planets[0], &machine->region("gfx1")->base()[0x2000]);
+	init_planet(m_planets[1], &machine->region("gfx1")->base()[0x0000]);
 }
 
 

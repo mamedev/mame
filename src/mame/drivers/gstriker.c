@@ -219,7 +219,7 @@ static WRITE8_HANDLER( gs_sh_pending_command_clear_w )
 
 static WRITE8_HANDLER( gs_sh_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "audiocpu");
+	UINT8 *RAM = space->machine->region("audiocpu")->base();
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x8000;

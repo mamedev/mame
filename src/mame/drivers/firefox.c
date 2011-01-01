@@ -429,7 +429,7 @@ static void firq_gen(device_t *device, int state)
 
 static MACHINE_START( firefox )
 {
-	memory_configure_bank(machine, "bank1", 0, 32, memory_region(machine, "maincpu") + 0x10000, 0x1000);
+	memory_configure_bank(machine, "bank1", 0, 32, machine->region("maincpu")->base() + 0x10000, 0x1000);
 	nvram_1c = machine->device<x2212_device>("nvram_1c");
 	nvram_1d = machine->device<x2212_device>("nvram_1d");
 

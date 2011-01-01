@@ -101,7 +101,7 @@ VIDEO_START( gradius3 )
 
 READ16_HANDLER( gradius3_gfxrom_r )
 {
-	UINT8 *gfxdata = memory_region(space->machine, "gfx2");
+	UINT8 *gfxdata = space->machine->region("gfx2")->base();
 
 	return (gfxdata[2 * offset + 1] << 8) | gfxdata[2 * offset];
 }

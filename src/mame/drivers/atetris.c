@@ -494,7 +494,7 @@ ROM_END
 
 static DRIVER_INIT( atetris )
 {
-	UINT8 *rgn = memory_region(machine, "maincpu");
+	UINT8 *rgn = machine->region("maincpu")->base();
 	slapstic_init(machine, 101);
 	slapstic_source = &rgn[0x10000];
 	slapstic_base = &rgn[0x04000];

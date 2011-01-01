@@ -174,7 +174,7 @@ static READ16_HANDLER( button2_r )
 
 static WRITE8_HANDLER( sound2_bank_w )
 {
-	memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "audio2") + 0x8000 * (data + 1));
+	memory_set_bankptr(space->machine, "bank1", space->machine->region("audio2")->base() + 0x8000 * (data + 1));
 }
 
 

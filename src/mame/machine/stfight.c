@@ -50,7 +50,7 @@ static int stfight_coin_mech_query;
 DRIVER_INIT( empcity )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	int A;
 
 	decrypt = auto_alloc_array(machine, UINT8, 0x8000);
@@ -111,7 +111,7 @@ MACHINE_RESET( stfight )
 // - in fact I don't even know how/where it's switched in!
 static WRITE8_HANDLER( stfight_bank_w )
 {
-	UINT8   *ROM2 = memory_region(space->machine, "maincpu") + 0x10000;
+	UINT8   *ROM2 = space->machine->region("maincpu")->base() + 0x10000;
 
 	memory_set_bankptr(space->machine,  "bank1", &ROM2[data<<14] );
 }
@@ -199,7 +199,7 @@ static const int sampleLimits[] =
 
 void stfight_adpcm_int(device_t *device)
 {
-	UINT8 *SAMPLES = memory_region(device->machine, "adpcm");
+	UINT8 *SAMPLES = device->machine->region("adpcm")->base();
 	int adpcm_data = SAMPLES[adpcm_data_offs & 0x7fff];
 
     // finished playing sample?

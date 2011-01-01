@@ -422,7 +422,7 @@ static const ym2203_interface ym2203_config =
 static MACHINE_START( mexico86 )
 {
 	mexico86_state *state = machine->driver_data<mexico86_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 6, &ROM[0x10000], 0x4000);
 

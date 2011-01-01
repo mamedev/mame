@@ -209,68 +209,68 @@ static READ8_DEVICE_HANDLER( portC_r )
 
 static WRITE8_HANDLER( banksel_main_w )
 {
-	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "maincpu") + 0x8000);
+	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x8000);
 }
 static WRITE8_HANDLER( banksel_1_w )
 {
-	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "maincpu") + 0x10000);
+	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x10000);
 }
 static WRITE8_HANDLER( banksel_2_w )
 {
-	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "maincpu") + 0x18000);
+	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x18000);
 }
 static WRITE8_HANDLER( banksel_3_w )
 {
-	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "maincpu") + 0x20000);
+	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x20000);
 }
 static WRITE8_HANDLER( banksel_4_w )
 {
-	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "maincpu") + 0x28000);
+	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x28000);
 }
 static WRITE8_HANDLER( banksel_5_w )
 {
-	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "maincpu") + 0x30000);
+	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x30000);
 }
 
 static WRITE8_HANDLER( banksel_1_1_w )
 {
-	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "maincpu") + 0x10000);
+	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x10000);
 }
 static WRITE8_HANDLER( banksel_2_1_w )
 {
-	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "maincpu") + 0x14000);
+	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x14000);
 }
 static WRITE8_HANDLER( banksel_3_1_w )
 {
-	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "maincpu") + 0x18000);
+	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x18000);
 }
 static WRITE8_HANDLER( banksel_4_1_w )
 {
-	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "maincpu") + 0x1c000);
+	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x1c000);
 }
 static WRITE8_HANDLER( banksel_5_1_w )
 {
-	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "maincpu") + 0x20000);
+	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x20000);
 }
 static WRITE8_HANDLER( banksel_1_2_w )
 {
-	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "maincpu") + 0x12000);
+	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x12000);
 }
 static WRITE8_HANDLER( banksel_2_2_w )
 {
-	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "maincpu") + 0x16000);
+	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x16000);
 }
 static WRITE8_HANDLER( banksel_3_2_w )
 {
-	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "maincpu") + 0x1a000);
+	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x1a000);
 }
 static WRITE8_HANDLER( banksel_4_2_w )
 {
-	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "maincpu") + 0x1e000);
+	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x1e000);
 }
 static WRITE8_HANDLER( banksel_5_2_w )
 {
-	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "maincpu") + 0x22000);
+	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x22000);
 }
 
 static WRITE8_HANDLER(geimulti_bank_w)
@@ -298,36 +298,36 @@ static WRITE8_HANDLER(geimulti_bank_w)
 	}
 
 	if (bank != -1)
-		memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "bank") + bank*0x8000);
+		memory_set_bankptr(space->machine, "bank1", space->machine->region("bank")->base() + bank*0x8000);
 }
 
 static READ8_HANDLER(banksel_1_r)
 {
-	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "maincpu") + 0x10000);
+	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x10000);
 	return 0x03;
 };
 
 static READ8_HANDLER(banksel_2_r)
 {
-	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "maincpu") + 0x18000);
+	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x18000);
 	return 0x03;
 }
 
 static READ8_HANDLER(banksel_3_r)
 {
-	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "maincpu") + 0x20000);
+	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x20000);
 	return 0x03;
 }
 
 static READ8_HANDLER(banksel_4_r)
 {
-	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "maincpu") + 0x28000);
+	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x28000);
 	return 0x03;
 }
 
 static READ8_HANDLER(banksel_5_r)
 {
-	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "maincpu") + 0x30000);
+	memory_set_bankptr(space->machine, "bank1",space->machine->region("maincpu")->base() + 0x30000);
 	return 0x03;
 }
 
@@ -1808,12 +1808,12 @@ ROM_END
 
 static DRIVER_INIT( setbank )
 {
-	memory_set_bankptr(machine, "bank1",memory_region(machine, "maincpu") + 0x2000);
+	memory_set_bankptr(machine, "bank1",machine->region("maincpu")->base() + 0x2000);
 }
 
 static DRIVER_INIT( geimulti )
 {
-	memory_set_bankptr(machine, "bank1",memory_region(machine, "bank") + 0x0000);
+	memory_set_bankptr(machine, "bank1",machine->region("bank")->base() + 0x0000);
 }
 
 GAME( 1982, jokpoker, 0,        gselect,  gselect,  setbank, ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03B)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

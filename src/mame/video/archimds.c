@@ -43,7 +43,7 @@ VIDEO_UPDATE( archimds_vidc )
 		int count;
 		int x,y,xi;
 		UINT8 pen;
-		static UINT8 *vram = memory_region(screen->machine,"vram");
+		static UINT8 *vram = screen->machine->region("vram")->base();
 
 		count = (0);
 

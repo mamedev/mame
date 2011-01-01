@@ -44,7 +44,7 @@ paradise: I'm not sure it's working correctly:
 static WRITE8_HANDLER( paradise_rombank_w )
 {
 	int bank = data;
-	int bank_n = memory_region_length(space->machine, "maincpu") / 0x4000 - 1;
+	int bank_n = space->machine->region("maincpu")->bytes() / 0x4000 - 1;
 
 	if (bank >= bank_n)
 	{
@@ -544,8 +544,8 @@ GFXDECODE_END
 static MACHINE_START( paradise )
 {
 	paradise_state *state = machine->driver_data<paradise_state>();
-	int bank_n = memory_region_length(machine, "maincpu") / 0x4000 - 1;
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	int bank_n = machine->region("maincpu")->bytes() / 0x4000 - 1;
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 3, &ROM[0x00000], 0x4000);
 	memory_configure_bank(machine, "bank1", 3, bank_n - 3, &ROM[0x10000], 0x4000);

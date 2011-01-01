@@ -557,7 +557,7 @@ static WRITE32_HANDLER( comm1_w )
 static WRITE32_HANDLER( comm_rombank_w )
 {
 	int bank = data >> 24;
-	UINT8 *usr3 = memory_region(space->machine, "user3");
+	UINT8 *usr3 = space->machine->region("user3")->base();
 	if (usr3 != NULL)
 		memory_set_bank(space->machine, "bank1", bank & 0x7f);
 }
@@ -853,11 +853,11 @@ static MACHINE_START( hornet )
 
 static MACHINE_RESET( hornet )
 {
-	UINT8 *usr3 = memory_region(machine, "user3");
-	UINT8 *usr5 = memory_region(machine, "user5");
+	UINT8 *usr3 = machine->region("user3")->base();
+	UINT8 *usr5 = machine->region("user5")->base();
 	if (usr3 != NULL)
 	{
-		memory_configure_bank(machine, "bank1", 0, memory_region_length(machine, "user3") / 0x40000, usr3, 0x40000);
+		memory_configure_bank(machine, "bank1", 0, machine->region("user3")->bytes() / 0x40000, usr3, 0x40000);
 		memory_set_bank(machine, "bank1", 0);
 	}
 
@@ -975,12 +975,12 @@ MACHINE_CONFIG_END
 
 static MACHINE_RESET( hornet_2board )
 {
-	UINT8 *usr3 = memory_region(machine, "user3");
-	UINT8 *usr5 = memory_region(machine, "user5");
+	UINT8 *usr3 = machine->region("user3")->base();
+	UINT8 *usr5 = machine->region("user5")->base();
 
 	if (usr3 != NULL)
 	{
-		memory_configure_bank(machine, "bank1", 0, memory_region_length(machine, "user3") / 0x40000, usr3, 0x40000);
+		memory_configure_bank(machine, "bank1", 0, machine->region("user3")->bytes() / 0x40000, usr3, 0x40000);
 		memory_set_bank(machine, "bank1", 0);
 	}
 	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
@@ -1203,7 +1203,7 @@ static void jamma_jvs_cmd_exec(running_machine *machine)
 static DRIVER_INIT(hornet)
 {
 	init_konami_cgboard(machine, 1, CGBOARD_TYPE_HORNET);
-	set_cgboard_texture_bank(machine, 0, "bank5", memory_region(machine, "user5"));
+	set_cgboard_texture_bank(machine, 0, "bank5", machine->region("user5")->base());
 
 	led_reg0 = led_reg1 = 0x7f;
 
@@ -1213,8 +1213,8 @@ static DRIVER_INIT(hornet)
 static DRIVER_INIT(hornet_2board)
 {
 	init_konami_cgboard(machine, 2, CGBOARD_TYPE_HORNET);
-	set_cgboard_texture_bank(machine, 0, "bank5", memory_region(machine, "user5"));
-	set_cgboard_texture_bank(machine, 1, "bank6", memory_region(machine, "user5"));
+	set_cgboard_texture_bank(machine, 0, "bank5", machine->region("user5")->base());
+	set_cgboard_texture_bank(machine, 1, "bank6", machine->region("user5")->base());
 
 	led_reg0 = led_reg1 = 0x7f;
 

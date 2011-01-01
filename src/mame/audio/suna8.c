@@ -48,8 +48,8 @@ WRITE8_DEVICE_HANDLER( suna8_samples_number_w )
 SAMPLES_START( suna8_sh_start )
 {
 	running_machine *machine = device->machine;
-	int i, len = memory_region_length(machine, "samples");
-	UINT8 *ROM = memory_region(machine, "samples");
+	int i, len = machine->region("samples")->bytes();
+	UINT8 *ROM = machine->region("samples")->base();
 
 	samplebuf = auto_alloc_array(machine, INT16, len);
 

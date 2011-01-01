@@ -2352,7 +2352,7 @@ MACHINE_CONFIG_END
 
 static void decode_mooncrst(running_machine *machine, int length, UINT8 *dest)
 {
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	int offs;
 
 	for (offs = 0; offs < length; offs++)
@@ -2414,8 +2414,8 @@ static void decode_checkman(running_machine *machine)
 		{ 0,2,0,2 },
 		{ 1,4,1,4 }
 	};
-	UINT8 *rombase = memory_region(machine, "maincpu");
-	UINT32 romlength = memory_region_length(machine, "maincpu");
+	UINT8 *rombase = machine->region("maincpu")->base();
+	UINT32 romlength = machine->region("maincpu")->bytes();
 	UINT32 offs;
 
 	for (offs = 0; offs < romlength; offs++)
@@ -2431,8 +2431,8 @@ static void decode_checkman(running_machine *machine)
 
 static void decode_dingoe(running_machine *machine)
 {
-	UINT8 *rombase = memory_region(machine, "maincpu");
-	UINT32 romlength = memory_region_length(machine, "maincpu");
+	UINT8 *rombase = machine->region("maincpu")->base();
+	UINT32 romlength = machine->region("maincpu")->bytes();
 	UINT32 offs;
 
 	for (offs = 0; offs < romlength; offs++)
@@ -2454,7 +2454,7 @@ static void decode_dingoe(running_machine *machine)
 
 static void decode_frogger_sound(running_machine *machine)
 {
-	UINT8 *rombase = memory_region(machine, "audiocpu");
+	UINT8 *rombase = machine->region("audiocpu")->base();
 	UINT32 offs;
 
 	/* the first ROM of the sound CPU has data lines D0 and D1 swapped */
@@ -2465,7 +2465,7 @@ static void decode_frogger_sound(running_machine *machine)
 
 static void decode_frogger_gfx(running_machine *machine)
 {
-	UINT8 *rombase = memory_region(machine, "gfx1");
+	UINT8 *rombase = machine->region("gfx1")->base();
 	UINT32 offs;
 
 	/* the 2nd gfx ROM has data lines D0 and D1 swapped */
@@ -2476,8 +2476,8 @@ static void decode_frogger_gfx(running_machine *machine)
 
 static void decode_anteater_gfx(running_machine *machine)
 {
-	UINT32 romlength = memory_region_length(machine, "gfx1");
-	UINT8 *rombase = memory_region(machine, "gfx1");
+	UINT32 romlength = machine->region("gfx1")->bytes();
+	UINT8 *rombase = machine->region("gfx1")->base();
 	UINT8 *scratch = auto_alloc_array(machine, UINT8, romlength);
 	UINT32 offs;
 
@@ -2496,8 +2496,8 @@ static void decode_anteater_gfx(running_machine *machine)
 
 static void decode_losttomb_gfx(running_machine *machine)
 {
-	UINT32 romlength = memory_region_length(machine, "gfx1");
-	UINT8 *rombase = memory_region(machine, "gfx1");
+	UINT32 romlength = machine->region("gfx1")->bytes();
+	UINT8 *rombase = machine->region("gfx1")->base();
 	UINT8 *scratch = auto_alloc_array(machine, UINT8, romlength);
 	UINT32 offs;
 
@@ -2521,7 +2521,7 @@ static void decode_superbon(running_machine *machine)
 
 	/* Deryption worked out by hand by Chris Hardy. */
 
-	RAM = memory_region(machine, "maincpu");
+	RAM = machine->region("maincpu")->base();
 
 	for (i = 0;i < 0x1000;i++)
 	{
@@ -2627,7 +2627,7 @@ static DRIVER_INIT( gmgalax )
 
 	/* ROM is banked */
 	memory_install_read_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
-	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine->region("maincpu")->base() + 0x10000, 0x4000);
 
 	/* callback when the game select is toggled */
 	gmgalax_game_changed(machine->m_portlist.first()->fieldlist, NULL, 0, 0);
@@ -2684,7 +2684,7 @@ static DRIVER_INIT( mooncrst )
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
 
 	/* decrypt program code */
-	decode_mooncrst(machine, 0x8000, memory_region(machine, "maincpu"));
+	decode_mooncrst(machine, 0x8000, machine->region("maincpu")->base());
 }
 
 
@@ -2757,15 +2757,15 @@ void tenspot_set_game_bank(running_machine* machine, int bank, int from_game)
 	int x;
 
 	sprintf(tmp,"game_%d_cpu", bank);
-	srcregion = memory_region(machine,tmp);
-	dstregion = memory_region(machine,"maincpu");
+	srcregion = machine->region(tmp)->base();
+	dstregion = machine->region("maincpu")->base();
 	memcpy(dstregion, srcregion, 0x4000);
 
 	sprintf(tmp,"game_%d_temp", bank);
-	srcregion = memory_region(machine,tmp);
-	dstregion = memory_region(machine,"gfx1");
+	srcregion = machine->region(tmp)->base();
+	dstregion = machine->region("gfx1")->base();
 	memcpy(dstregion, srcregion, 0x2000);
-	dstregion = memory_region(machine,"gfx2");
+	dstregion = machine->region("gfx2")->base();
 	memcpy(dstregion, srcregion, 0x2000);
 
 	if (from_game)
@@ -2783,8 +2783,8 @@ void tenspot_set_game_bank(running_machine* machine, int bank, int from_game)
 	}
 
 	sprintf(tmp,"game_%d_prom", bank);
-	srcregion = memory_region(machine,tmp);
-	dstregion = memory_region(machine,"proms");
+	srcregion = machine->region(tmp)->base();
+	dstregion = machine->region("proms")->base();
 	memcpy(dstregion, srcregion, 0x20);
 
 	color_prom = dstregion;
@@ -2838,13 +2838,13 @@ static DRIVER_INIT( zigzag )
 	/* make ROMs 2 & 3 swappable */
 	memory_install_read_bank(space, 0x2000, 0x2fff, 0, 0, "bank1");
 	memory_install_read_bank(space, 0x3000, 0x3fff, 0, 0, "bank2");
-	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "maincpu") + 0x2000, 0x1000);
-	memory_configure_bank(machine, "bank2", 0, 2, memory_region(machine, "maincpu") + 0x2000, 0x1000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine->region("maincpu")->base() + 0x2000, 0x1000);
+	memory_configure_bank(machine, "bank2", 0, 2, machine->region("maincpu")->base() + 0x2000, 0x1000);
 
 	/* also re-install the fixed ROM area as a bank in order to inform the memory system that
        the fixed area only extends to 0x1fff */
 	memory_install_read_bank(space, 0x0000, 0x1fff, 0, 0, "bank3");
-	memory_set_bankptr(machine, "bank3", memory_region(machine, "maincpu") + 0x0000);
+	memory_set_bankptr(machine, "bank3", machine->region("maincpu")->base() + 0x0000);
 
 	/* handler for doing the swaps */
 	memory_install_write8_handler(space, 0x7002, 0x7002, 0, 0x07f8, zigzag_bankswap_w);
@@ -2954,7 +2954,7 @@ static DRIVER_INIT( skybase )
 	memory_install_ram(space, 0x8000, 0x87ff, 0, 0, NULL);
 
 	/* extend ROM */
-	memory_install_rom(space, 0x0000, 0x5fff, 0, 0, memory_region(machine, "maincpu"));
+	memory_install_rom(space, 0x0000, 0x5fff, 0, 0, machine->region("maincpu")->base());
 }
 
 
@@ -3013,7 +3013,7 @@ static DRIVER_INIT( scorpnmc )
 	memory_install_write8_handler(space, 0xb001, 0xb001, 0, 0x7f8, irq_enable_w);
 
 	/* extra ROM */
-	memory_install_rom(space, 0x5000, 0x67ff, 0, 0, memory_region(machine, "maincpu") + 0x5000);
+	memory_install_rom(space, 0x5000, 0x67ff, 0, 0, machine->region("maincpu")->base() + 0x5000);
 
 	/* install RAM at $4000-$4800 */
 	memory_install_ram(space, 0x4000, 0x47ff, 0, 0, NULL);
@@ -3037,7 +3037,7 @@ static DRIVER_INIT( thepitm )
 	memory_unmap_write(space, 0xb004, 0xb004, 0, 0x07f8);
 
 	/* extend ROM */
-	memory_install_rom(space, 0x0000, 0x47ff, 0, 0, memory_region(machine, "maincpu"));
+	memory_install_rom(space, 0x0000, 0x47ff, 0, 0, machine->region("maincpu")->base());
 }
 
 /*************************************
@@ -3094,7 +3094,7 @@ static DRIVER_INIT( sfx )
 
 	/* sound board has space for extra ROM */
 	memory_install_read_bank(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1");
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "audiocpu"));
+	memory_set_bankptr(machine, "bank1", machine->region("audiocpu")->base());
 }
 
 
@@ -3196,7 +3196,7 @@ static DRIVER_INIT( scorpion )
 
 	/* extra ROM */
 	memory_install_read_bank(space, 0x5800, 0x67ff, 0, 0, "bank1");
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x5800);
+	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x5800);
 
 	/* no background related */
 //  memory_nop_write(space, 0x6803, 0x6803, 0, 0);
@@ -3204,7 +3204,7 @@ static DRIVER_INIT( scorpion )
 	memory_install_read8_handler(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0x3000, 0x3000, 0, 0, scorpion_digitalker_intr_r);
 /*
 {
-    const UINT8 *rom = memory_region(machine, "speech");
+    const UINT8 *rom = machine->region("speech")->base();
     int i;
 
     for (i = 0; i < 0x2c; i++)

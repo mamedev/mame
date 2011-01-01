@@ -600,8 +600,8 @@ static const UINT8 deco74_swap_table[0x800] =
 
 static void deco_decrypt(running_machine *machine,const char *rgntag,const UINT8 *xor_table,const UINT16 *address_table,const UINT8 *swap_table,int remap_only)
 {
-	UINT16 *rom = (UINT16 *)memory_region(machine, rgntag);
-	int len = memory_region_length(machine, rgntag)/2;
+	UINT16 *rom = (UINT16 *)machine->region(rgntag)->base();
+	int len = machine->region(rgntag)->bytes()/2;
 	UINT16 *buffer = auto_alloc_array(machine, UINT16, len);
 	int i;
 

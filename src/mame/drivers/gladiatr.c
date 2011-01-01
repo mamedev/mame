@@ -194,7 +194,7 @@ TODO:
 /*Rom bankswitching*/
 static WRITE8_HANDLER( gladiatr_bankswitch_w )
 {
-	UINT8 *rom = memory_region(space->machine, "maincpu") + 0x10000;
+	UINT8 *rom = space->machine->region("maincpu")->base() + 0x10000;
 
 	memory_set_bankptr(space->machine, "bank1", rom + 0x6000 * (data & 0x01));
 }
@@ -256,7 +256,7 @@ static MACHINE_RESET( gladiator )
 	TAITO8741_start(&gladiator_8741interface);
 	/* 6809 bank memory set */
 	{
-		UINT8 *rom = memory_region(machine, "audiocpu") + 0x10000;
+		UINT8 *rom = machine->region("audiocpu")->base() + 0x10000;
 		memory_set_bankptr(machine, "bank2",rom);
 		machine->device("audiocpu")->reset();
 	}
@@ -279,7 +279,7 @@ static void gladiator_ym_irq(device_t *device, int irq)
 /*Sound Functions*/
 static WRITE8_DEVICE_HANDLER( glad_adpcm_w )
 {
-	UINT8 *rom = memory_region(device->machine, "audiocpu") + 0x10000;
+	UINT8 *rom = device->machine->region("audiocpu")->base() + 0x10000;
 
 	/* bit6 = bank offset */
 	memory_set_bankptr(device->machine, "bank2",rom + ((data & 0x40) ? 0xc000 : 0));
@@ -958,7 +958,7 @@ static DRIVER_INIT( gladiatr )
 	UINT8 *rom;
 	int i,j;
 
-	rom = memory_region(machine, "gfx2");
+	rom = machine->region("gfx2")->base();
 	// unpack 3bpp graphics
 	for (j = 3; j >= 0; j--)
 	{
@@ -972,7 +972,7 @@ static DRIVER_INIT( gladiatr )
 	swap_block(rom + 0x14000, rom + 0x18000, 0x4000);
 
 
-	rom = memory_region(machine, "gfx3");
+	rom = machine->region("gfx3")->base();
 	// unpack 3bpp graphics
 	for (j = 5; j >= 0; j--)
 	{
@@ -989,7 +989,7 @@ static DRIVER_INIT( gladiatr )
 	swap_block(rom + 0x24000, rom + 0x28000, 0x4000);
 
 	/* make sure bank is valid in cpu-reset */
-	rom = memory_region(machine, "audiocpu") + 0x10000;
+	rom = machine->region("audiocpu")->base() + 0x10000;
 	memory_set_bankptr(machine, "bank2",rom);
 }
 
@@ -1008,14 +1008,14 @@ static DRIVER_INIT(ppking)
 	UINT8 *rom;
 	int i,j;
 
-	rom = memory_region(machine, "gfx2");
+	rom = machine->region("gfx2")->base();
 	// unpack 3bpp graphics
 	for (i = 0; i < 0x2000; i++)
 	{
 		rom[i+0x2000] = rom[i] >> 4;
 	}
 
-	rom = memory_region(machine, "gfx3");
+	rom = machine->region("gfx3")->base();
 	// unpack 3bpp graphics
 	for (j = 1; j >= 0; j--)
 	{

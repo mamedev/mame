@@ -5608,7 +5608,7 @@ static PALETTE_INIT(cm)
 	for (i = 0; i < 0x100; i++)
 	{
 		UINT8 data;
-		UINT8*proms = memory_region(machine, "proms");
+		UINT8*proms = machine->region("proms")->base();
 
 		data = proms[0x000 + i] | (proms[0x100 + i] << 4);
 
@@ -5623,7 +5623,7 @@ static PALETTE_INIT(cmast91)
 	{
 		int r,g,b;
 
-		UINT8*proms = memory_region(machine, "proms");
+		UINT8*proms = machine->region("proms")->base();
 
 		b = proms[0x000 + i] << 4;
 		g = proms[0x100 + i] << 4;
@@ -5641,7 +5641,7 @@ static PALETTE_INIT(lucky8)
 	UINT8 data;
 	UINT8 *proms;
 
-	proms = memory_region(machine, "proms");
+	proms = machine->region("proms")->base();
 	for (i = 0; i < 0x100; i++)
 	{
 
@@ -5650,7 +5650,7 @@ static PALETTE_INIT(lucky8)
 		palette_set_color_rgb(machine, i, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 	}
 
-	proms = memory_region(machine, "proms2");
+	proms = machine->region("proms2")->base();
 	for (i=0; i < 0x20; i++)
 	{
 		data = proms[i];
@@ -5953,7 +5953,7 @@ static PALETTE_INIT(magical)
 	{
 		int r,g,b;
 
-		UINT8*proms = memory_region(machine, "proms");
+		UINT8*proms = machine->region("proms")->base();
 
 		b = proms[0x000 + i] << 4;
 		g = proms[0x100 + i] << 4;
@@ -7484,7 +7484,7 @@ YM2203
 static DRIVER_INIT(mtonic)
 {
 	int A;
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	for (A = 0;A < 0x8000;A++)
 	{
@@ -9272,7 +9272,7 @@ ROM_END
 static DRIVER_INIT(goldstar)
 {
 	int A;
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	for (A = 0;A < 0x10000;A++)
 	{
@@ -9357,8 +9357,8 @@ static UINT8 chry10_decrypt(UINT8 cipherText)
 
 static DRIVER_INIT( chry10 )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
-	int size = memory_region_length(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
+	int size = machine->region("maincpu")->bytes();
 	int start = 0;
 
 	int i;
@@ -9381,8 +9381,8 @@ static DRIVER_INIT( chry10 )
 
 static DRIVER_INIT( cb3 )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
-	int size = memory_region_length(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
+	int size = machine->region("maincpu")->bytes();
 	int start = 0;
 
 	int i;
@@ -9400,7 +9400,7 @@ static DRIVER_INIT( cb3 )
 static DRIVER_INIT( chrygld )
 {
 	int A;
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	do_blockswaps(machine, ROM);
 
 	// a data bitswap
@@ -9416,7 +9416,7 @@ static DRIVER_INIT( chrygld )
 
 static DRIVER_INIT(cm)
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 /*  forcing PPI mode 0 for all, and A, B & C as input.
     the mixed modes 2-0 are not working properly.
@@ -9427,7 +9427,7 @@ static DRIVER_INIT(cm)
 
 static DRIVER_INIT(cmv4)
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 /*  forcing PPI mode 0 for all, and A, B & C as input.
     the mixed modes 2-0 are not working properly.
@@ -9438,7 +9438,7 @@ static DRIVER_INIT(cmv4)
 
 static DRIVER_INIT(cmast91)
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 /*  forcing PPI mode 0 for all, and A, B & C as input.
     the mixed modes 2-0 are not working properly.
@@ -9449,7 +9449,7 @@ static DRIVER_INIT(cmast91)
 
 static DRIVER_INIT(lucky8a)
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	ROM[0x0010] = 0x21;
 }
@@ -9457,7 +9457,7 @@ static DRIVER_INIT(lucky8a)
 static DRIVER_INIT( nfb96sea )
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	for (i = 0;i < 0x10000;i++)
 	{
@@ -9490,7 +9490,7 @@ static READ8_HANDLER( fixedvala8_r )
 static DRIVER_INIT( schery97 )
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -9518,7 +9518,7 @@ static READ8_HANDLER( fixedval38_r )
 static DRIVER_INIT( schery97a )
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -9547,7 +9547,7 @@ static READ8_HANDLER( fixedvalea_r )
 static DRIVER_INIT( skill98 )
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -9574,7 +9574,7 @@ static READ8_HANDLER( fixedval68_r )
 static DRIVER_INIT( fb36xc1 )
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -9611,7 +9611,7 @@ static READ8_HANDLER( fixedvalaa_r )
 static DRIVER_INIT( fbse354 )
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -9643,7 +9643,7 @@ static READ8_HANDLER( fixedvalbe_r )
 static DRIVER_INIT( fbse362 )
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -9675,7 +9675,7 @@ static READ8_HANDLER( fixedval84_r )
 static DRIVER_INIT( rp35 )
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -9702,7 +9702,7 @@ static READ8_HANDLER( fixedvalb2_r )
 static DRIVER_INIT( rp36 )
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -9729,7 +9729,7 @@ static READ8_HANDLER( fixedval48_r )
 static DRIVER_INIT( rp36c3 )
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -9762,7 +9762,7 @@ static READ8_HANDLER( fixedval74_r )
 static DRIVER_INIT( po33 )
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -9790,7 +9790,7 @@ static READ8_HANDLER( fixedval58_r )
 static DRIVER_INIT( tc132axt )
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -9822,7 +9822,7 @@ static READ8_HANDLER( fixedvalc7_r )
 static DRIVER_INIT( match133 )
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -9845,7 +9845,7 @@ static DRIVER_INIT( match133 )
 static DRIVER_INIT(cherrys)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	unsigned char rawData[256] = {
 		0xCC, 0xCD, 0xCE, 0xCF, 0xC8, 0xC9, 0xCA, 0xCB, 0xC4, 0xC5, 0xC6, 0xC7,
@@ -9882,21 +9882,21 @@ static DRIVER_INIT(cherrys)
 /* todo: remove these patches! */
 static DRIVER_INIT( unkch1 )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	ROM[0x9d52] = 0x00;
 	ROM[0x9d53] = 0x00;
 }
 
 static DRIVER_INIT( unkch3 )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	ROM[0x9b86] = 0x00;
 	ROM[0x9b87] = 0x00;
 }
 
 static DRIVER_INIT( unkch4 )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	ROM[0x9a6e] = 0x00;
 	ROM[0x9a6f] = 0x00;
 }

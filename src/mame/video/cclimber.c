@@ -690,7 +690,7 @@ VIDEO_UPDATE( cclimber )
 VIDEO_UPDATE( yamato )
 {
 	int i;
-	UINT8 *sky_rom = memory_region(screen->machine, "user1") + 0x1200;
+	UINT8 *sky_rom = screen->machine->region("user1")->base() + 0x1200;
 
 	for (i = 0; i < 0x100; i++)
 	{

@@ -263,7 +263,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( bssoccer_pcm_1_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "pcm1");
+	UINT8 *RAM = space->machine->region("pcm1")->base();
 	int bank = data & 7;
 	if (bank & ~7)	logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", cpu_get_pc(space->cpu), data);
 	memory_set_bankptr(space->machine, "bank1", &RAM[bank * 0x10000 + 0x1000]);
@@ -271,7 +271,7 @@ static WRITE8_HANDLER( bssoccer_pcm_1_bankswitch_w )
 
 static WRITE8_HANDLER( bssoccer_pcm_2_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "pcm2");
+	UINT8 *RAM = space->machine->region("pcm2")->base();
 	int bank = data & 7;
 	if (bank & ~7)	logerror("CPU#3 PC %06X - ROM bank unknown bits: %02X\n", cpu_get_pc(space->cpu), data);
 	memory_set_bankptr(space->machine, "bank2", &RAM[bank * 0x10000 + 0x1000]);
@@ -325,7 +325,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( uballoon_pcm_1_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "pcm1");
+	UINT8 *RAM = space->machine->region("pcm1")->base();
 	int bank = data & 1;
 	if (bank & ~1)	logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", cpu_get_pc(space->cpu), data);
 	memory_set_bankptr(space->machine, "bank1", &RAM[bank * 0x10000 + 0x400]);
@@ -1095,7 +1095,7 @@ ROM_END
 
 static DRIVER_INIT( uballoon )
 {
-	UINT16 *RAM = (UINT16 *) memory_region(machine, "maincpu");
+	UINT16 *RAM = (UINT16 *) machine->region("maincpu")->base();
 
 	// Patch out the protection checks
 	RAM[0x0113c/2] = 0x4e71;	// bne $646

@@ -372,13 +372,13 @@ static READ8_HANDLER( m50458_r )
 {
 	if(m50458_rom_bank)
 	{
-		UINT8 *gfx_rom = memory_region(space->machine, "m50458_gfx");
+		UINT8 *gfx_rom = space->machine->region("m50458_gfx")->base();
 
 		return gfx_rom[offset & 0xfff];
 	}
 	else
 	{
-		UINT8 *gfx_ram = memory_region(space->machine, "m50458_vram");
+		UINT8 *gfx_ram = space->machine->region("m50458_vram")->base();
 
 		return gfx_ram[offset & 0xfff];
 	}
@@ -392,7 +392,7 @@ static WRITE8_HANDLER( m50458_w )
 		logerror("Warning: write to M50458 GFX ROM!\n");
 	else
 	{
-		UINT8 *gfx_ram = memory_region(space->machine, "m50458_vram");
+		UINT8 *gfx_ram = space->machine->region("m50458_vram")->base();
 
 		gfx_ram[offset & 0xfff] = data;
 	}
@@ -486,7 +486,7 @@ ADDRESS_MAP_END
 
 static MACHINE_START( nss )
 {
-	UINT8 *ROM = memory_region(machine, "bios");
+	UINT8 *ROM = machine->region("bios")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x8000);
 	memory_set_bank(machine, "bank1", 0);

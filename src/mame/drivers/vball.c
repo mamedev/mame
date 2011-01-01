@@ -161,7 +161,7 @@ static WRITE8_HANDLER( vball_irq_ack_w )
 */
 static WRITE8_HANDLER( vb_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	UINT8 *RAM = space->machine->region("maincpu")->base();
 	memory_set_bankptr(space->machine, "bank1", &RAM[0x10000 + (0x4000 * (data & 1))]);
 
 	if (vball_gfxset != ((data  & 0x20) ^ 0x20))

@@ -50,7 +50,7 @@ static void answer_bankswitch(running_machine *machine,UINT8 new_bank)
 {
 	if(bank!=new_bank)
 	{
-		UINT8 *ROM = memory_region(machine, "data");
+		UINT8 *ROM = machine->region("data")->base();
 		UINT32 bankaddress;
 
 		bank = new_bank;

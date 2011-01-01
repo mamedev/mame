@@ -194,7 +194,7 @@ static const k051960_interface blockhl_k051960_intf =
 static MACHINE_START( blockhl )
 {
 	blockhl_state *state = machine->driver_data<blockhl_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x2000);
 

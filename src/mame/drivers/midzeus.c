@@ -95,7 +95,7 @@ static MACHINE_START( midzeus )
 
 static MACHINE_RESET( midzeus )
 {
-	memcpy(ram_base, memory_region(machine, "user1"), 0x40000*4);
+	memcpy(ram_base, machine->region("user1")->base(), 0x40000*4);
 	*ram_base <<= 1;
 	machine->device("maincpu")->reset();
 
@@ -1421,7 +1421,7 @@ static DRIVER_INIT( crusnexo )
 {
 	dcs2_init(machine, 0, 0);
 	midway_ioasic_init(machine, MIDWAY_IOASIC_STANDARD, 472/* or 476,477,478,110 */, 99, NULL);
-	memory_configure_bank(machine, "bank1", 0, 3, memory_region(machine, "user2"), 0x400000*4);
+	memory_configure_bank(machine, "bank1", 0, 3, machine->region("user2")->base(), 0x400000*4);
 
 	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x9b0004, 0x9b0007, 0, 0, crusnexo_leds_r, crusnexo_leds_w);
 	memory_install_write32_handler    (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8d0009, 0x8d000a, 0, 0, keypad_select_w);
@@ -1432,7 +1432,7 @@ static DRIVER_INIT( thegrid )
 {
 	dcs2_init(machine, 0, 0);
 	midway_ioasic_init(machine, MIDWAY_IOASIC_STANDARD, 474/* or 491 */, 99, NULL);
-	memory_configure_bank(machine, "bank1", 0, 3, memory_region(machine, "user2"), 0x400000*4);
+	memory_configure_bank(machine, "bank1", 0, 3, machine->region("user2")->base(), 0x400000*4);
 }
 
 

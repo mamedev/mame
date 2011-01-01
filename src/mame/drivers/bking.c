@@ -65,7 +65,7 @@ static WRITE8_HANDLER( bking3_addr_h_w )
 static READ8_HANDLER( bking3_extrarom_r )
 {
 	bking_state *state = space->machine->driver_data<bking_state>();
-	UINT8 *rom = memory_region(space->machine, "user2");
+	UINT8 *rom = space->machine->region("user2")->base();
 	return rom[state->addr_h * 256 + state->addr_l];
 }
 

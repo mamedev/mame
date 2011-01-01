@@ -209,7 +209,7 @@ static void astrof_get_pens( running_machine *machine, pen_t *pens )
 	offs_t i;
 	UINT8 bank = (state->astrof_palette_bank ? 0x10 : 0x00);
 	UINT8 config = input_port_read_safe(machine, "FAKE", 0x00);
-	UINT8 *prom = memory_region(machine, "proms");
+	UINT8 *prom = machine->region("proms")->base();
 
 	/* a common wire hack to the pcb causes the prom halves to be inverted */
 	/* this results in e.g. astrof background being black */
@@ -243,7 +243,7 @@ static void astrof_get_pens( running_machine *machine, pen_t *pens )
 static void tomahawk_get_pens( running_machine *machine, pen_t *pens )
 {
 	offs_t i;
-	UINT8 *prom = memory_region(machine, "proms");
+	UINT8 *prom = machine->region("proms")->base();
 	UINT8 config = input_port_read_safe(machine, "FAKE", 0x00);
 
 	for (i = 0; i < TOMAHAWK_NUM_PENS; i++)
@@ -1297,8 +1297,8 @@ ROM_END
 static DRIVER_INIT( abattle )
 {
 	/* use the protection PROM to decrypt the ROMs */
-	UINT8 *rom = memory_region(machine, "maincpu");
-	UINT8 *prom = memory_region(machine, "user1");
+	UINT8 *rom = machine->region("maincpu")->base();
+	UINT8 *prom = machine->region("user1")->base();
 	int i;
 
 	for(i = 0xd000; i < 0x10000; i++)
@@ -1312,7 +1312,7 @@ static DRIVER_INIT( abattle )
 
 static DRIVER_INIT( afire )
 {
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	int i;
 
 	for(i = 0xd000; i < 0x10000; i++)
@@ -1326,7 +1326,7 @@ static DRIVER_INIT( afire )
 
 static DRIVER_INIT( sstarbtl )
 {
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	int i;
 
 	for(i = 0xd000; i < 0x10000; i++)

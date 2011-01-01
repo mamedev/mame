@@ -172,7 +172,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 	g_profiler.start(PROFILER_USER1);
 
-	gfx = memory_region(machine, "gfx2");
+	gfx = machine->region("gfx2")->base();
 	for (offs = 0; offs < state->spriteram_size; offs += 4)
 	{
 		int sx, sy, flipy, zoom, ch, x, px, y;

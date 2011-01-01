@@ -538,7 +538,7 @@ static DRIVER_INIT( jokrwild )
 *****************************************************************************/
 {
 	int i, offs;
-	UINT8 *srcp = memory_region( machine, "maincpu" );
+	UINT8 *srcp = machine->region( "maincpu" )->base();
 
 	for (i = 0x8000; i < 0x10000; i++)
 	{

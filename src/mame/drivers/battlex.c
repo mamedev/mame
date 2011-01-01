@@ -281,9 +281,9 @@ ROM_END
 
 static DRIVER_INIT( battlex )
 {
-	UINT8 *cold = memory_region(machine, "user1");
-	UINT8 *mskd = memory_region(machine, "user2");
-	UINT8 *dest = memory_region(machine, "gfx1");
+	UINT8 *cold = machine->region("user1")->base();
+	UINT8 *mskd = machine->region("user2")->base();
+	UINT8 *dest = machine->region("gfx1")->base();
 
 	int outcount;
 

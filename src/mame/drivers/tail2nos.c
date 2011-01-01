@@ -209,7 +209,7 @@ static const k051316_interface tail2nos_k051316_intf =
 static MACHINE_START( tail2nos )
 {
 	tail2nos_state *state = machine->driver_data<tail2nos_state>();
-	UINT8 *ROM = memory_region(machine, "audiocpu");
+	UINT8 *ROM = machine->region("audiocpu")->base();
 
 	memory_configure_bank(machine, "bank3", 0, 2, &ROM[0x10000], 0x8000);
 	memory_set_bank(machine, "bank3", 0);
@@ -228,8 +228,8 @@ static MACHINE_RESET( tail2nos )
 	tail2nos_state *state = machine->driver_data<tail2nos_state>();
 
 	/* point to the extra ROMs */
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1"));
-	memory_set_bankptr(machine, "bank2", memory_region(machine, "user2"));
+	memory_set_bankptr(machine, "bank1", machine->region("user1")->base());
+	memory_set_bankptr(machine, "bank2", machine->region("user2")->base());
 
 	state->charbank = 0;
 	state->charpalette = 0;

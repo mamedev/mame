@@ -286,7 +286,7 @@ static CPU_INIT( cquestsnd )
 	memset(cpustate, 0, sizeof(*cpustate));
 
 	cpustate->dac_w = _config->dac_w;
-	cpustate->sound_data = (UINT16*)memory_region(device->machine, _config->sound_data_region);
+	cpustate->sound_data = (UINT16*)device->machine->region(_config->sound_data_region)->base();
 
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);

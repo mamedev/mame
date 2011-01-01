@@ -287,7 +287,7 @@ static MACHINE_START( blktiger )
 	state->mcu = machine->device("mcu");
 
 	/* configure bankswitching */
-	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x10000, 0x4000);
 
 	state_save_register_global(machine, state->scroll_bank);
 	state_save_register_global(machine, state->screen_layout);
@@ -305,7 +305,7 @@ static MACHINE_RESET( blktiger )
 	blktiger_state *state = machine->driver_data<blktiger_state>();
 
 	/* configure bankswitching */
-	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x10000, 0x4000);
 
 	state->scroll_x[0] = 0;
 	state->scroll_x[1] = 0;

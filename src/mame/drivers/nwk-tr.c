@@ -716,7 +716,7 @@ MACHINE_CONFIG_END
 static DRIVER_INIT(nwktr)
 {
 	init_konami_cgboard(machine, 1, CGBOARD_TYPE_NWKTR);
-	set_cgboard_texture_bank(machine, 0, "bank5", memory_region(machine, "user5"));
+	set_cgboard_texture_bank(machine, 0, "bank5", machine->region("user5")->base());
 
 	sharc_dataram = auto_alloc_array(machine, UINT32, 0x100000/4);
 	led_reg0 = led_reg1 = 0x7f;

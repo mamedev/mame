@@ -1213,16 +1213,16 @@ static void konami_shuffle_8(UINT8 *buf,int len)
 /* helper function to join two 16-bit ROMs and form a 32-bit data stream */
 void konamid_rom_deinterleave_2(running_machine *machine, const char *mem_region)
 {
-	konami_shuffle_16((UINT16 *)memory_region(machine, mem_region),memory_region_length(machine, mem_region)/2);
+	konami_shuffle_16((UINT16 *)machine->region(mem_region)->base(),machine->region(mem_region)->bytes()/2);
 }
 
 /* hacked version of rom_deinterleave_2_half for Lethal Enforcers */
 void konamid_rom_deinterleave_2_half(running_machine *machine, const char *mem_region)
 {
-	UINT8 *rgn = memory_region(machine, mem_region);
+	UINT8 *rgn = machine->region(mem_region)->base();
 
-	konami_shuffle_16((UINT16 *)rgn,memory_region_length(machine, mem_region)/4);
-	konami_shuffle_16((UINT16 *)(rgn+memory_region_length(machine, mem_region)/2),memory_region_length(machine, mem_region)/4);
+	konami_shuffle_16((UINT16 *)rgn,machine->region(mem_region)->bytes()/4);
+	konami_shuffle_16((UINT16 *)(rgn+machine->region(mem_region)->bytes()/2),machine->region(mem_region)->bytes()/4);
 }
 
 /* helper function to join four 16-bit ROMs and form a 64-bit data stream */
@@ -1259,7 +1259,7 @@ static void deinterleave_gfx(running_machine *machine, const char *gfx_memory_re
 		konamid_rom_deinterleave_4(machine, gfx_memory_region);
 		break;
 	case KONAMI_ROM_SHUFFLE8:
-		konami_shuffle_8(memory_region(machine, gfx_memory_region), memory_region_length(machine, gfx_memory_region));
+		konami_shuffle_8(machine->region(gfx_memory_region)->base(), machine->region(gfx_memory_region)->bytes());
 		break;
 	}
 }
@@ -2227,11 +2227,11 @@ READ8_DEVICE_HANDLER( k052109_r )
 		k052109->callback(device->machine, 0, bank, &code, &color, &flags, &priority);
 
 		addr = (code << 5) + (offset & 0x1f);
-		addr &= memory_region_length(device->machine, k052109->memory_region) - 1;
+		addr &= device->machine->region(k052109->memory_region)->bytes() - 1;
 
 //      logerror("%04x: off = %04x sub = %02x (bnk = %x) adr = %06x\n", cpu_get_pc(space->cpu), offset, k052109->romsubbank, bank, addr);
 
-		return memory_region(device->machine, k052109->memory_region)[addr];
+		return device->machine->region(k052109->memory_region)->base()[addr];
 	}
 }
 
@@ -2696,13 +2696,13 @@ static DEVICE_START( k052109 )
 	switch (intf->plane_order)
 	{
 	case NORMAL_PLANE_ORDER:
-		total = memory_region_length(machine, intf->gfx_memory_region) / 32;
-		decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &charlayout, 4);
+		total = machine->region(intf->gfx_memory_region)->bytes() / 32;
+		decode_gfx(machine, intf->gfx_num, machine->region(intf->gfx_memory_region)->base(), total, &charlayout, 4);
 		break;
 
 	case GRADIUS3_PLANE_ORDER:
 		total = 0x1000;
-		decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &charlayout_gradius3, 4);
+		decode_gfx(machine, intf->gfx_num, machine->region(intf->gfx_memory_region)->base(), total, &charlayout_gradius3, 4);
 		break;
 
 	default:
@@ -2835,11 +2835,11 @@ static int k051960_fetchromdata( device_t *device, int byte )
 	k051960->callback(device->machine, &code, &color, &pri, &shadow);
 
 	addr = (code << 7) | (off1 << 2) | byte;
-	addr &= memory_region_length(device->machine, k051960->memory_region) - 1;
+	addr &= device->machine->region(k051960->memory_region)->bytes() - 1;
 
 //  popmessage("%s: addr %06x", cpuexec_describe_context(device->machine), addr);
 
-	return memory_region(device->machine, k051960->memory_region)[addr];
+	return device->machine->region(k051960->memory_region)->base()[addr];
 }
 
 READ8_DEVICE_HANDLER( k051960_r )
@@ -3248,18 +3248,18 @@ static DEVICE_START( k051960 )
 	switch (intf->plane_order)
 	{
 	case NORMAL_PLANE_ORDER:
-		total = memory_region_length(machine, intf->gfx_memory_region) / 128;
-		decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &spritelayout, 4);
+		total = machine->region(intf->gfx_memory_region)->bytes() / 128;
+		decode_gfx(machine, intf->gfx_num, machine->region(intf->gfx_memory_region)->base(), total, &spritelayout, 4);
 		break;
 
 	case REVERSE_PLANE_ORDER:
-		total = memory_region_length(machine, intf->gfx_memory_region) / 128;
-		decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &spritelayout_reverse, 4);
+		total = machine->region(intf->gfx_memory_region)->bytes() / 128;
+		decode_gfx(machine, intf->gfx_num, machine->region(intf->gfx_memory_region)->base(), total, &spritelayout_reverse, 4);
 		break;
 
 	case GRADIUS3_PLANE_ORDER:
 		total = 0x4000;
-		decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &spritelayout_gradius3, 4);
+		decode_gfx(machine, intf->gfx_num, machine->region(intf->gfx_memory_region)->base(), total, &spritelayout_gradius3, 4);
 		break;
 
 	default:
@@ -3430,11 +3430,11 @@ READ8_DEVICE_HANDLER( k053244_r )
 		addr = (k053244->rombank << 19) | ((k053244->regs[11] & 0x7) << 18)
 			| (k053244->regs[8] << 10) | (k053244->regs[9] << 2)
 			| ((offset & 3) ^ 1);
-		addr &= memory_region_length(machine, k053244->memory_region) - 1;
+		addr &= machine->region(k053244->memory_region)->bytes() - 1;
 
 		//  popmessage("%s: offset %02x addr %06x", cpuexec_describe_context(machine), offset & 3, addr);
 
-		return memory_region(machine, k053244->memory_region)[addr];
+		return machine->region(k053244->memory_region)->base()[addr];
 	}
 	else if (offset == 0x06)
 	{
@@ -4059,8 +4059,8 @@ static DEVICE_START( k05324x )
 	switch (intf->plane_order)
 	{
 	case NORMAL_PLANE_ORDER:
-		total = memory_region_length(machine, intf->gfx_memory_region) / 128;
-		decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &spritelayout, 4);
+		total = machine->region(intf->gfx_memory_region)->bytes() / 128;
+		decode_gfx(machine, intf->gfx_num, machine->region(intf->gfx_memory_region)->base(), total, &spritelayout, 4);
 		break;
 
 	default:
@@ -4284,9 +4284,9 @@ WRITE8_DEVICE_HANDLER( k053247_w )
 READ16_DEVICE_HANDLER( k055673_rom_word_r )	// 5bpp
 {
 	k053247_state *k053246 = k053247_get_safe_token(device);
-	UINT8 *ROM8 = (UINT8 *)memory_region(device->machine, k053246->memory_region);
-	UINT16 *ROM = (UINT16 *)memory_region(device->machine, k053246->memory_region);
-	int size4 = (memory_region_length(device->machine, k053246->memory_region) / (1024 * 1024)) / 5;
+	UINT8 *ROM8 = (UINT8 *)device->machine->region(k053246->memory_region)->base();
+	UINT16 *ROM = (UINT16 *)device->machine->region(k053246->memory_region)->base();
+	int size4 = (device->machine->region(k053246->memory_region)->bytes() / (1024 * 1024)) / 5;
 	int romofs;
 
 	size4 *= 4 * 1024 * 1024;	// get offset to 5th bit
@@ -4323,7 +4323,7 @@ READ16_DEVICE_HANDLER( k055673_rom_word_r )	// 5bpp
 READ16_DEVICE_HANDLER( k055673_GX6bpp_rom_word_r )
 {
 	k053247_state *k053246 = k053247_get_safe_token(device);
-	UINT16 *ROM = (UINT16 *)memory_region(device->machine, k053246->memory_region);
+	UINT16 *ROM = (UINT16 *)device->machine->region(k053246->memory_region)->base();
 	int romofs;
 
 	romofs = k053246->kx46_regs[6] << 16 | k053246->kx46_regs[7] << 8 | k053246->kx46_regs[4];
@@ -4363,10 +4363,10 @@ READ8_DEVICE_HANDLER( k053246_r )
 		int addr;
 
 		addr = (k053246->kx46_regs[6] << 17) | (k053246->kx46_regs[7] << 9) | (k053246->kx46_regs[4] << 1) | ((offset & 1) ^ 1);
-		addr &= memory_region_length(device->machine, k053246->memory_region) - 1;
+		addr &= device->machine->region(k053246->memory_region)->bytes() - 1;
 //      if (VERBOSE)
 //          popmessage("%04x: offset %02x addr %06x", cpu_get_pc(space->cpu), offset, addr);
-		return memory_region(device->machine, k053246->memory_region)[addr];
+		return device->machine->region(k053246->memory_region)->base()[addr];
 	}
 	else
 	{
@@ -4888,13 +4888,13 @@ static DEVICE_START( k053247 )
 	switch (intf->plane_order)
 	{
 	case NORMAL_PLANE_ORDER:
-		total = memory_region_length(machine, intf->gfx_memory_region) / 128;
-		decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &spritelayout, 4);
+		total = machine->region(intf->gfx_memory_region)->bytes() / 128;
+		decode_gfx(machine, intf->gfx_num, machine->region(intf->gfx_memory_region)->base(), total, &spritelayout, 4);
 		break;
 
 	case TASMAN_PLANE_ORDER:
-		total = memory_region_length(machine, intf->gfx_memory_region) / 128;
-		decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &tasman_16x16_layout, 4);
+		total = machine->region(intf->gfx_memory_region)->bytes() / 128;
+		decode_gfx(machine, intf->gfx_num, machine->region(intf->gfx_memory_region)->base(), total, &tasman_16x16_layout, 4);
 		break;
 
 	default:
@@ -4992,19 +4992,19 @@ static DEVICE_START( k055673 )
 
 	k053247->screen = machine->device<screen_device>(intf->screen);
 
-	K055673_rom = (UINT16 *)memory_region(machine, intf->gfx_memory_region);
+	K055673_rom = (UINT16 *)machine->region(intf->gfx_memory_region)->base();
 
 	/* decode the graphics */
 	switch (intf->plane_order)	/* layout would be more correct than plane_order, but we use k053247_interface */
 	{
 	case K055673_LAYOUT_GX:
-		size4 = (memory_region_length(machine, intf->gfx_memory_region) / (1024 * 1024)) / 5;
+		size4 = (machine->region(intf->gfx_memory_region)->bytes() / (1024 * 1024)) / 5;
 		size4 *= 4 * 1024 * 1024;
 		/* set the # of tiles based on the 4bpp section */
 		K055673_rom = auto_alloc_array(machine, UINT16, size4 * 5 / 2);
 		d = (UINT8 *)K055673_rom;
 		// now combine the graphics together to form 5bpp
-		s1 = memory_region(machine, intf->gfx_memory_region); // 4bpp area
+		s1 = machine->region(intf->gfx_memory_region)->base(); // 4bpp area
 		s2 = s1 + (size4);	 // 1bpp area
 		for (i = 0; i < size4; i+= 4)
 		{
@@ -5020,17 +5020,17 @@ static DEVICE_START( k055673 )
 		break;
 
 	case K055673_LAYOUT_RNG:
-		total = memory_region_length(machine, intf->gfx_memory_region) / (16 * 16 / 2);
+		total = machine->region(intf->gfx_memory_region)->bytes() / (16 * 16 / 2);
 		decode_gfx(machine, intf->gfx_num, (UINT8 *)K055673_rom, total, &spritelayout2, 4);
 		break;
 
 	case K055673_LAYOUT_LE2:
-		total = memory_region_length(machine, intf->gfx_memory_region) / (16 * 16);
+		total = machine->region(intf->gfx_memory_region)->bytes() / (16 * 16);
 		decode_gfx(machine, intf->gfx_num, (UINT8 *)K055673_rom, total, &spritelayout3, 4);
 		break;
 
 	case K055673_LAYOUT_GX6:
-		total = memory_region_length(machine, intf->gfx_memory_region) / (16 * 16 * 6 / 8);
+		total = machine->region(intf->gfx_memory_region)->bytes() / (16 * 16 * 6 / 8);
 		decode_gfx(machine, intf->gfx_num, (UINT8 *)K055673_rom, total, &spritelayout4, 4);
 		break;
 
@@ -5168,11 +5168,11 @@ READ8_DEVICE_HANDLER( k051316_rom_r )
 		int addr = offset + (k051316->ctrlram[0x0c] << 11) + (k051316->ctrlram[0x0d] << 19);
 		if (k051316->bpp <= 4)
 			addr /= 2;
-		addr &= memory_region_length(device->machine, k051316->memory_region) - 1;
+		addr &= device->machine->region(k051316->memory_region)->bytes() - 1;
 
 		//  popmessage("%s: offset %04x addr %04x", cpuexec_describe_context(device->machine), offset, addr);
 
-		return memory_region(device->machine, k051316->memory_region)[addr];
+		return device->machine->region(k051316->memory_region)->base()[addr];
 	}
 	else
 	{
@@ -5338,22 +5338,22 @@ static DEVICE_START( k051316 )
 	case -4:
 		total = 0x400;
 		is_tail2nos = 1;
-		decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &charlayout_tail2nos, 4);
+		decode_gfx(machine, intf->gfx_num, machine->region(intf->gfx_memory_region)->base(), total, &charlayout_tail2nos, 4);
 		break;
 
 	case 4:
-		total = memory_region_length(machine, intf->gfx_memory_region) / 128;
-		decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &charlayout4, 4);
+		total = machine->region(intf->gfx_memory_region)->bytes() / 128;
+		decode_gfx(machine, intf->gfx_num, machine->region(intf->gfx_memory_region)->base(), total, &charlayout4, 4);
 		break;
 
 	case 7:
-		total = memory_region_length(machine, intf->gfx_memory_region) / 256;
-		decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &charlayout7, 7);
+		total = machine->region(intf->gfx_memory_region)->bytes() / 256;
+		decode_gfx(machine, intf->gfx_num, machine->region(intf->gfx_memory_region)->base(), total, &charlayout7, 7);
 		break;
 
 	case 8:
-		total = memory_region_length(machine, intf->gfx_memory_region) / 256;
-		decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &charlayout8, 8);
+		total = machine->region(intf->gfx_memory_region)->bytes() / 256;
+		decode_gfx(machine, intf->gfx_num, machine->region(intf->gfx_memory_region)->base(), total, &charlayout8, 8);
 		break;
 
 	default:
@@ -6373,7 +6373,7 @@ static int k056832_rom_read_b( device_t *device, int offset, int blksize, int bl
 	UINT8 *rombase;
 	int base, ret;
 
-	rombase = (UINT8 *)memory_region(device->machine, k056832->memory_region);
+	rombase = (UINT8 *)device->machine->region(k056832->memory_region)->base();
 
 	if ((k056832->rom_half) && (zerosec))
 	{
@@ -6464,7 +6464,7 @@ READ16_DEVICE_HANDLER( k056832_rom_word_r )
 
 	if (!k056832->rombase)
 	{
-		k056832->rombase = memory_region(device->machine, k056832->memory_region);
+		k056832->rombase = device->machine->region(k056832->memory_region)->base();
 	}
 	rombase = (UINT8 *)k056832->rombase;
 
@@ -6490,7 +6490,7 @@ READ16_DEVICE_HANDLER( k056832_mw_rom_word_r )
 	int addr;
 
 	if (!k056832->rombase)
-		k056832->rombase = memory_region(device->machine, k056832->memory_region);
+		k056832->rombase = device->machine->region(k056832->memory_region)->base();
 
 	if (k056832->regsb[2] & 0x8)
 	{
@@ -6553,7 +6553,7 @@ READ16_DEVICE_HANDLER( k056832_bishi_rom_word_r )
 	int addr = 0x4000 * k056832->cur_gfx_banks + offset;
 
 	if (!k056832->rombase)
-		k056832->rombase = memory_region(device->machine, k056832->memory_region);
+		k056832->rombase = device->machine->region(k056832->memory_region)->base();
 
 	return k056832->rombase[addr + 2] | (k056832->rombase[addr] << 8);
 }
@@ -6564,7 +6564,7 @@ READ16_DEVICE_HANDLER( k056832_rom_word_8000_r )
 	int addr = 0x8000 * k056832->cur_gfx_banks + 2 * offset;
 
 	if (!k056832->rombase)
-		k056832->rombase = memory_region(device->machine, k056832->memory_region);
+		k056832->rombase = device->machine->region(k056832->memory_region)->base();
 
 	return k056832->rombase[addr + 2] | (k056832->rombase[addr] << 8);
 }
@@ -6575,7 +6575,7 @@ READ16_DEVICE_HANDLER( k056832_old_rom_word_r )
 	int addr = 0x2000 * k056832->cur_gfx_banks + 2 * offset;
 
 	if (!k056832->rombase)
-		k056832->rombase = memory_region(device->machine, k056832->memory_region);
+		k056832->rombase = device->machine->region(k056832->memory_region)->base();
 
 	return k056832->rombase[addr + 1] | (k056832->rombase[addr] << 8);
 }
@@ -7847,38 +7847,38 @@ static DEVICE_START( k056832 )
 	switch (intf->bpp)
 	{
 		case K056832_BPP_4:
-			total = memory_region_length(machine, intf->gfx_memory_region) / (i * 4);
-			decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &charlayout4, 4);
+			total = machine->region(intf->gfx_memory_region)->bytes() / (i * 4);
+			decode_gfx(machine, intf->gfx_num, machine->region(intf->gfx_memory_region)->base(), total, &charlayout4, 4);
 			break;
 
 		case K056832_BPP_5:
-			total = memory_region_length(machine, intf->gfx_memory_region) / (i * 5);
-			decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &charlayout5, 4);
+			total = machine->region(intf->gfx_memory_region)->bytes() / (i * 5);
+			decode_gfx(machine, intf->gfx_num, machine->region(intf->gfx_memory_region)->base(), total, &charlayout5, 4);
 			break;
 
 		case K056832_BPP_6:
-			total = memory_region_length(machine, intf->gfx_memory_region) / (i * 6);
-			decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &charlayout6, 4);
+			total = machine->region(intf->gfx_memory_region)->bytes() / (i * 6);
+			decode_gfx(machine, intf->gfx_num, machine->region(intf->gfx_memory_region)->base(), total, &charlayout6, 4);
 			break;
 
 		case K056832_BPP_8:
-			total = memory_region_length(machine, intf->gfx_memory_region) / (i * 8);
-			decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &charlayout8, 4);
+			total = machine->region(intf->gfx_memory_region)->bytes() / (i * 8);
+			decode_gfx(machine, intf->gfx_num, machine->region(intf->gfx_memory_region)->base(), total, &charlayout8, 4);
 			break;
 
 		case K056832_BPP_8LE:
-			total = memory_region_length(machine, intf->gfx_memory_region) / (i * 8);
-			decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &charlayout8le, 4);
+			total = machine->region(intf->gfx_memory_region)->bytes() / (i * 8);
+			decode_gfx(machine, intf->gfx_num, machine->region(intf->gfx_memory_region)->base(), total, &charlayout8le, 4);
 			break;
 
 		case K056832_BPP_8TASMAN:
-			total = memory_region_length(machine, intf->gfx_memory_region) / (i * 8);
-			decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &charlayout8_tasman, 4);
+			total = machine->region(intf->gfx_memory_region)->bytes() / (i * 8);
+			decode_gfx(machine, intf->gfx_num, machine->region(intf->gfx_memory_region)->base(), total, &charlayout8_tasman, 4);
 			break;
 
 		case K056832_BPP_4dj:
-			total = memory_region_length(machine, intf->gfx_memory_region) / (i * 4);
-			decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &charlayout4dj, 4);
+			total = machine->region(intf->gfx_memory_region)->bytes() / (i * 4);
+			decode_gfx(machine, intf->gfx_num, machine->region(intf->gfx_memory_region)->base(), total, &charlayout4dj, 4);
 			break;
 
 		default:
@@ -7894,8 +7894,8 @@ static DEVICE_START( k056832 )
 	k056832->gfxnum = intf->gfx_num;
 	k056832->callback = intf->callback;
 
-	k056832->rombase = memory_region(machine, intf->gfx_memory_region);
-	k056832->num_gfx_banks = memory_region_length(machine, intf->gfx_memory_region) / 0x2000;
+	k056832->rombase = machine->region(intf->gfx_memory_region)->base();
+	k056832->num_gfx_banks = machine->region(intf->gfx_memory_region)->bytes() / 0x2000;
 	k056832->djmain_hack = intf->djmain_hack;
 
 	k056832->cur_gfx_banks = 0;
@@ -8541,8 +8541,8 @@ static void k053250_unpack_pixels(running_machine *machine, const char *region)
 	UINT8 *src_ptr, *dst_ptr;
 	int hi_nibble, lo_nibble, offset;
 
-	dst_ptr = src_ptr = memory_region(machine, region);
-	offset = memory_region_length(machine, region) / 2 - 1;
+	dst_ptr = src_ptr = machine->region(region)->base();
+	offset = machine->region(region)->bytes() / 2 - 1;
 
 	do
 	{
@@ -8945,8 +8945,8 @@ static DEVICE_START( k053250 )
 	k053250_state *k053250 = k053250_get_safe_token(device);
 	const k053250_interface *intf = k053250_get_interface(device);
 
-	k053250->base = memory_region(device->machine, intf->gfx_memory_region);
-	k053250->rommask = memory_region_length(device->machine, intf->gfx_memory_region);
+	k053250->base = device->machine->region(intf->gfx_memory_region)->base();
+	k053250->rommask = device->machine->region(intf->gfx_memory_region)->bytes();
 
 	k053250->screen = device->machine->device<screen_device>(intf->screen);
 
@@ -9113,7 +9113,7 @@ READ32_DEVICE_HANDLER( k001006_r )
 		{
 			case 0x0b:		// CG Board ROM read
 			{
-				UINT16 *rom = (UINT16*)memory_region(device->machine, k001006->gfx_region);
+				UINT16 *rom = (UINT16*)device->machine->region(k001006->gfx_region)->base();
 				return rom[k001006->addr / 2] << 16;
 			}
 			case 0x0d:		// Palette RAM read
@@ -10089,7 +10089,7 @@ static DEVICE_START( k001005 )
 	height = k001005->screen->height();
 	k001005->zbuffer = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED32);
 
-	k001005->gfxrom = memory_region(device->machine, intf->gfx_memory_region);
+	k001005->gfxrom = device->machine->region(intf->gfx_memory_region)->base();
 
 	k001005->bitmap[0] = k001005->screen->alloc_compatible_bitmap();
 	k001005->bitmap[1] = k001005->screen->alloc_compatible_bitmap();

@@ -299,7 +299,7 @@ WRITE8_DEVICE_HANDLER( system1_videoram_bank_w )
 
 WRITE8_HANDLER( system1_paletteram_w )
 {
-	const UINT8 *color_prom = memory_region(space->machine, "palette");
+	const UINT8 *color_prom = space->machine->region("palette")->base();
 	int val,r,g,b;
 
 	/*
@@ -370,8 +370,8 @@ WRITE8_HANDLER( system1_paletteram_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int xoffset)
 {
-	UINT32 gfxbanks = memory_region_length(machine, "sprites") / 0x8000;
-	const UINT8 *gfxbase = memory_region(machine, "sprites");
+	UINT32 gfxbanks = machine->region("sprites")->bytes() / 0x8000;
+	const UINT8 *gfxbase = machine->region("sprites")->base();
 	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int flipscreen = flip_screen_get(machine);
 	int spritenum;
@@ -493,7 +493,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static void video_update_common(device_t *screen, bitmap_t *bitmap, const rectangle *cliprect, bitmap_t *fgpixmap, bitmap_t **bgpixmaps, const int *bgrowscroll, int bgyscroll, int spritexoffs)
 {
-	const UINT8 *lookup = memory_region(screen->machine, "proms");
+	const UINT8 *lookup = screen->machine->region("proms")->base();
 	int x, y;
 
 	/* first clear the sprite bitmap and draw sprites within this area */

@@ -94,7 +94,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( amspdwy_port_r )
 {
-	UINT8 *tracks = memory_region(space->machine, "maincpu") + 0x10000;
+	UINT8 *tracks = space->machine->region("maincpu")->base() + 0x10000;
 	return tracks[offset];
 }
 

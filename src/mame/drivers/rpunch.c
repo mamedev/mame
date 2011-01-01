@@ -138,7 +138,7 @@ static void ym2151_irq_gen(device_t *device, int state)
 
 static MACHINE_RESET( rpunch )
 {
-	UINT8 *snd = memory_region(machine, "upd");
+	UINT8 *snd = machine->region("upd")->base();
 	memcpy(snd, snd + 0x20000, 0x20000);
 }
 
@@ -202,7 +202,7 @@ static WRITE8_DEVICE_HANDLER( upd_control_w )
 {
 	if ((data & 1) != upd_rom_bank)
 	{
-		UINT8 *snd = memory_region(device->machine, "upd");
+		UINT8 *snd = device->machine->region("upd")->base();
 		upd_rom_bank = data & 1;
 		memcpy(snd, snd + 0x20000 * (upd_rom_bank + 1), 0x20000);
 	}

@@ -224,7 +224,7 @@ static void sdwx_decrypt(running_machine *machine)
 {
 
 	int i;
-	UINT16 *src = (UINT16 *) memory_region(machine, "user1");
+	UINT16 *src = (UINT16 *) machine->region("user1")->base();
 
 	int rom_size = 0x80000;
 
@@ -269,7 +269,7 @@ static void sdwx_gfx_decrypt(running_machine *machine)
 {
 	int i;
 	unsigned rom_size = 0x80000;
-	UINT8 *src = (UINT8 *) (memory_region(machine, "gfx1"));
+	UINT8 *src = (UINT8 *) (machine->region("gfx1")->base());
 	UINT8 *result_data = auto_alloc_array(machine, UINT8, rom_size);
 
 	for (i=0; i<rom_size; i++)

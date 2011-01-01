@@ -22,12 +22,12 @@ VIDEO_START( balsente )
 
 	/* reset the system */
 	state->palettebank_vis = 0;
-	state->sprite_bank[0] = memory_region(machine, "gfx1");
-	state->sprite_bank[1] = memory_region(machine, "gfx1") + 0x10000;
+	state->sprite_bank[0] = machine->region("gfx1")->base();
+	state->sprite_bank[1] = machine->region("gfx1")->base() + 0x10000;
 
 	/* determine sprite size */
-	state->sprite_data = memory_region(machine, "gfx1");
-	state->sprite_mask = memory_region_length(machine, "gfx1") - 1;
+	state->sprite_data = machine->region("gfx1")->base();
+	state->sprite_mask = machine->region("gfx1")->bytes() - 1;
 
 	/* register for saving */
 	state_save_register_global_array(machine, state->expanded_videoram);

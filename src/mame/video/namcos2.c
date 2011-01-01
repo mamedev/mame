@@ -443,7 +443,7 @@ READ16_HANDLER( namcos2_sprite_ram_r )
 
 VIDEO_START( namcos2 )
 {
-	namco_tilemap_init(machine,2,memory_region(machine, "gfx4"),TilemapCB);
+	namco_tilemap_init(machine,2,machine->region("gfx4")->base(),TilemapCB);
 	tilemap_roz = tilemap_create(machine, get_tile_info_roz,tilemap_scan_rows,8,8,256,256);
 	tilemap_set_transparent_pen(tilemap_roz,0xff);
 	DrawSpriteInit(machine);
@@ -492,7 +492,7 @@ VIDEO_UPDATE( namcos2_default )
 
 VIDEO_START( finallap )
 {
-	namco_tilemap_init(machine,2,memory_region(machine, "gfx4"),TilemapCB);
+	namco_tilemap_init(machine,2,machine->region("gfx4")->base(),TilemapCB);
 	DrawSpriteInit(machine);
 	namco_road_init(machine, 3);
 }
@@ -522,7 +522,7 @@ VIDEO_UPDATE( finallap )
 
 VIDEO_START( luckywld )
 {
-	namco_tilemap_init(machine,2,memory_region(machine, "gfx4"),TilemapCB);
+	namco_tilemap_init(machine,2,machine->region("gfx4")->base(),TilemapCB);
 	namco_obj_init( machine, 0, 0x0, NULL );
 	if( namcos2_gametype==NAMCOS2_LUCKY_AND_WILD )
 	{
@@ -563,7 +563,7 @@ VIDEO_UPDATE( luckywld )
 
 VIDEO_START( sgunner )
 {
-	namco_tilemap_init(machine,2,memory_region(machine, "gfx4"),TilemapCB);
+	namco_tilemap_init(machine,2,machine->region("gfx4")->base(),TilemapCB);
 	namco_obj_init( machine, 0, 0x0, NULL );
 }
 
@@ -589,7 +589,7 @@ VIDEO_UPDATE( sgunner )
 
 VIDEO_START( metlhawk )
 {
-	namco_tilemap_init(machine,2,memory_region(machine, "gfx4"),TilemapCB);
+	namco_tilemap_init(machine,2,machine->region("gfx4")->base(),TilemapCB);
 	namco_roz_init( machine, 1, "gfx5" );
 }
 

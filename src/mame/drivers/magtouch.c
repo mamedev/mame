@@ -186,7 +186,7 @@ static MACHINE_START( magtouch )
 
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, magtouch_set_keyb_int);
 
-	memory_configure_bank(machine, "rombank", 0, 0x80, memory_region(machine, "game_prg"), 0x8000 );
+	memory_configure_bank(machine, "rombank", 0, 0x80, machine->region("game_prg")->base(), 0x8000 );
 	memory_set_bank(machine, "rombank", 0);
 
 	microtouch_init(machine, magtouch_microtouch_tx_callback, NULL);

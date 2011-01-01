@@ -79,7 +79,7 @@ static INTERRUPT_GEN( srmp2_interrupt )
 
 static DRIVER_INIT( srmp2 )
 {
-	UINT16 *RAM = (UINT16 *) memory_region(machine, "maincpu");
+	UINT16 *RAM = (UINT16 *) machine->region("maincpu")->base();
 
 	/* Fix "ERROR BACK UP" and "ERROR IOX" */
 	RAM[0x20c80 / 2] = 0x4e75;								// RTS
@@ -87,7 +87,7 @@ static DRIVER_INIT( srmp2 )
 
 static DRIVER_INIT( srmp3 )
 {
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 
 	/* BANK ROM (0x08000 - 0x1ffff) Check skip [MAIN ROM side] */
 	RAM[0x00000 + 0x7b69] = 0x00;							// NOP
@@ -183,7 +183,7 @@ static WRITE16_DEVICE_HANDLER( srmp2_adpcm_code_w )
 */
 
 	srmp2_state *state = device->machine->driver_data<srmp2_state>();
-	UINT8 *ROM = memory_region(device->machine, "adpcm");
+	UINT8 *ROM = device->machine->region("adpcm")->base();
 
 	state->adpcm_sptr = (ROM[((state->adpcm_bank * 0x10000) + (data << 2) + 0)] << 8);
 	state->adpcm_eptr = (ROM[((state->adpcm_bank * 0x10000) + (data << 2) + 1)] << 8);
@@ -207,7 +207,7 @@ static WRITE8_DEVICE_HANDLER( srmp3_adpcm_code_w )
 */
 
 	srmp2_state *state = device->machine->driver_data<srmp2_state>();
-	UINT8 *ROM = memory_region(device->machine, "adpcm");
+	UINT8 *ROM = device->machine->region("adpcm")->base();
 
 	state->adpcm_sptr = (ROM[((state->adpcm_bank * 0x10000) + (data << 2) + 0)] << 8);
 	state->adpcm_eptr = (ROM[((state->adpcm_bank * 0x10000) + (data << 2) + 1)] << 8);
@@ -224,7 +224,7 @@ static WRITE8_DEVICE_HANDLER( srmp3_adpcm_code_w )
 static void srmp2_adpcm_int(device_t *device)
 {
 	srmp2_state *state = device->machine->driver_data<srmp2_state>();
-	UINT8 *ROM = memory_region(device->machine, "adpcm");
+	UINT8 *ROM = device->machine->region("adpcm")->base();
 
 	if (state->adpcm_sptr)
 	{
@@ -346,7 +346,7 @@ static WRITE8_HANDLER( srmp3_rombank_w )
 */
 
 	srmp2_state *state = space->machine->driver_data<srmp2_state>();
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 	int addr;
 
 	state->adpcm_bank = ((data & 0xe0) >> 5);

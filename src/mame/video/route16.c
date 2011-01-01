@@ -83,8 +83,8 @@ VIDEO_UPDATE( route16 )
 {
 	offs_t offs;
 
-	UINT8 *color_prom1 = &memory_region(screen->machine, "proms")[0x000];
-	UINT8 *color_prom2 = &memory_region(screen->machine, "proms")[0x100];
+	UINT8 *color_prom1 = &screen->machine->region("proms")->base()[0x000];
+	UINT8 *color_prom2 = &screen->machine->region("proms")->base()[0x100];
 
 	for (offs = 0; offs < route16_videoram_size; offs++)
 	{
@@ -139,8 +139,8 @@ static int video_update_stratvox_ttmahjng(running_machine *machine, bitmap_t *bi
 {
 	offs_t offs;
 
-	UINT8 *color_prom1 = &memory_region(machine, "proms")[0x000];
-	UINT8 *color_prom2 = &memory_region(machine, "proms")[0x100];
+	UINT8 *color_prom1 = &machine->region("proms")->base()[0x000];
+	UINT8 *color_prom2 = &machine->region("proms")->base()[0x100];
 
 	for (offs = 0; offs < route16_videoram_size; offs++)
 	{

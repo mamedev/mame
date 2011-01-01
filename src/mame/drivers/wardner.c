@@ -141,7 +141,7 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 		int bankaddress = 0;
 
 		address_space *mainspace;
-		UINT8 *RAM = memory_region(space->machine, "maincpu");
+		UINT8 *RAM = space->machine->region("maincpu")->base();
 
 		mainspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 		wardner_membank = data;

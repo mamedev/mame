@@ -594,11 +594,11 @@ static MACHINE_START( pipedrm )
 	state->subcpu = machine->device("sub");
 
 	/* initialize main Z80 bank */
-	memory_configure_bank(machine, "bank1", 0, 8, memory_region(machine, "maincpu") + 0x10000, 0x2000);
+	memory_configure_bank(machine, "bank1", 0, 8, machine->region("maincpu")->base() + 0x10000, 0x2000);
 	memory_set_bank(machine, "bank1", 0);
 
 	/* initialize sound bank */
-	memory_configure_bank(machine, "bank2", 0, 2, memory_region(machine, "sub") + 0x10000, 0x8000);
+	memory_configure_bank(machine, "bank2", 0, 2, machine->region("sub")->base() + 0x10000, 0x8000);
 	memory_set_bank(machine, "bank2", 0);
 
 	/* state save */

@@ -2974,9 +2974,9 @@ static DRIVER_INIT( captaven )
 
 static DRIVER_INIT( dragngun )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(machine, "maincpu");
-	const UINT8 *SRC_RAM = memory_region(machine, "gfx1");
-	UINT8 *DST_RAM = memory_region(machine, "gfx2");
+	UINT32 *ROM = (UINT32 *)machine->region("maincpu")->base();
+	const UINT8 *SRC_RAM = machine->region("gfx1")->base();
+	UINT8 *DST_RAM = machine->region("gfx2")->base();
 
 	deco74_decrypt_gfx(machine, "gfx1");
 	deco74_decrypt_gfx(machine, "gfx2");
@@ -2998,8 +2998,8 @@ static DRIVER_INIT( fghthist )
 
 static DRIVER_INIT( lockload )
 {
-	UINT8 *RAM = memory_region(machine, "maincpu");
-//  UINT32 *ROM = (UINT32 *)memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
+//  UINT32 *ROM = (UINT32 *)machine->region("maincpu")->base();
 
 	deco74_decrypt_gfx(machine, "gfx1");
 	deco74_decrypt_gfx(machine, "gfx2");
@@ -3015,7 +3015,7 @@ static DRIVER_INIT( lockload )
 
 static DRIVER_INIT( tattass )
 {
-	UINT8 *RAM = memory_region(machine, "gfx1");
+	UINT8 *RAM = machine->region("gfx1")->base();
 	UINT8 *tmp = auto_alloc_array(machine, UINT8, 0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
@@ -3023,7 +3023,7 @@ static DRIVER_INIT( tattass )
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
 	memcpy(RAM+0x100000,tmp,0x80000);
 
-	RAM = memory_region(machine, "gfx2");
+	RAM = machine->region("gfx2")->base();
 	memcpy(tmp,RAM+0x80000,0x80000);
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
 	memcpy(RAM+0x100000,tmp,0x80000);
@@ -3036,7 +3036,7 @@ static DRIVER_INIT( tattass )
 
 static DRIVER_INIT( nslasher )
 {
-	UINT8 *RAM = memory_region(machine, "gfx1");
+	UINT8 *RAM = machine->region("gfx1")->base();
 	UINT8 *tmp = auto_alloc_array(machine, UINT8, 0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
@@ -3044,7 +3044,7 @@ static DRIVER_INIT( nslasher )
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
 	memcpy(RAM+0x100000,tmp,0x80000);
 
-	RAM = memory_region(machine, "gfx2");
+	RAM = machine->region("gfx2")->base();
 	memcpy(tmp,RAM+0x80000,0x80000);
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
 	memcpy(RAM+0x100000,tmp,0x80000);

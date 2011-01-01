@@ -212,7 +212,7 @@ static VIDEO_UPDATE( jpmsys5v )
 
 static WRITE16_HANDLER( rombank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "maincpu");
+	UINT8 *rom = space->machine->region("maincpu")->base();
 	data &= 0x1f;
 	memory_set_bankptr(space->machine, "bank1", &rom[0x20000 + 0x20000 * data]);
 }
@@ -576,7 +576,7 @@ static ACIA6850_INTERFACE( acia2_if )
 
 static MACHINE_START( jpmsys5v )
 {
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu"));
+	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base());
 	touch_timer = timer_alloc(machine, touch_cb, NULL);
 }
 

@@ -173,9 +173,9 @@ MACHINE_RESET( balsente )
 	memset(state->noise_position, 0, sizeof(state->noise_position));
 
 	/* point the banks to bank 0 */
-	numbanks = (memory_region_length(machine, "maincpu") > 0x40000) ? 16 : 8;
-	memory_configure_bank(machine, "bank1", 0, numbanks, &memory_region(machine, "maincpu")[0x10000], 0x6000);
-	memory_configure_bank(machine, "bank2", 0, numbanks, &memory_region(machine, "maincpu")[0x12000], 0x6000);
+	numbanks = (machine->region("maincpu")->bytes() > 0x40000) ? 16 : 8;
+	memory_configure_bank(machine, "bank1", 0, numbanks, &machine->region("maincpu")->base()[0x10000], 0x6000);
+	memory_configure_bank(machine, "bank2", 0, numbanks, &machine->region("maincpu")->base()[0x12000], 0x6000);
 	memory_set_bank(space->machine, "bank1", 0);
 	memory_set_bank(space->machine, "bank2", 0);
 	machine->device("maincpu")->reset();
@@ -293,7 +293,7 @@ WRITE8_HANDLER( balsente_rombank2_select_w )
 	int bank = data & 7;
 
 	/* top bit controls which half of the ROMs to use (Name that Tune only) */
-	if (memory_region_length(space->machine, "maincpu") > 0x40000) bank |= (data >> 4) & 8;
+	if (space->machine->region("maincpu")->bytes() > 0x40000) bank |= (data >> 4) & 8;
 
 	/* when they set the AB bank, it appears as though the CD bank is reset */
 	if (data & 0x20)

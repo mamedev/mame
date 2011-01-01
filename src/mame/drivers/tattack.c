@@ -225,7 +225,7 @@ ROM_END
 static DRIVER_INIT(tattack)
 {
 
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 	rom[0x1b4]=0;
 	rom[0x1b5]=0;

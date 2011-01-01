@@ -395,7 +395,7 @@ static WRITE16_HANDLER( metro_soundstatus_w )
 static WRITE8_HANDLER( metro_sound_rombank_w )
 {
 	int bankaddress;
-	UINT8 *ROM = memory_region(space->machine, "audiocpu");
+	UINT8 *ROM = space->machine->region("audiocpu")->base();
 
 	bankaddress = 0x10000-0x4000 + ((data >> 4) & 0x03) * 0x4000;
 	if (bankaddress < 0x10000) bankaddress = 0x0000;
@@ -406,7 +406,7 @@ static WRITE8_HANDLER( metro_sound_rombank_w )
 static WRITE8_HANDLER( daitorid_sound_rombank_w )
 {
 	int bankaddress;
-	UINT8 *ROM = memory_region(space->machine, "audiocpu");
+	UINT8 *ROM = space->machine->region("audiocpu")->base();
 
 	bankaddress = 0x10000-0x4000 + ((data >> 4) & 0x07) * 0x4000;
 	if (bankaddress < 0x10000) bankaddress = 0x10000;
@@ -593,8 +593,8 @@ static WRITE16_HANDLER( metro_coin_lockout_4words_w )
 static READ16_HANDLER( metro_bankedrom_r )
 {
 	metro_state *state = space->machine->driver_data<metro_state>();
-	UINT8 *ROM = memory_region(space->machine, "gfx1");
-	size_t len = memory_region_length(space->machine, "gfx1");
+	UINT8 *ROM = space->machine->region("gfx1")->base();
+	size_t len = space->machine->region("gfx1")->bytes();
 
 	offset = offset * 2 + 0x10000 * (*state->rombank);
 
@@ -684,8 +684,8 @@ static WRITE16_HANDLER( metro_blitter_w )
 
 	if (offset == 0x0c / 2)
 	{
-		UINT8 *src     = memory_region(space->machine, "gfx1");
-		size_t src_len = memory_region_length(space->machine, "gfx1");
+		UINT8 *src     = space->machine->region("gfx1")->base();
+		size_t src_len = space->machine->region("gfx1")->bytes();
 
 		UINT32 tmap     = (state->blitter_regs[0x00 / 2] << 16) + state->blitter_regs[0x02 / 2];
 		UINT32 src_offs = (state->blitter_regs[0x04 / 2] << 16) + state->blitter_regs[0x06 / 2];
@@ -1699,7 +1699,7 @@ static WRITE16_HANDLER( blzntrnd_sound_w )
 
 static WRITE8_HANDLER( blzntrnd_sh_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "audiocpu");
+	UINT8 *RAM = space->machine->region("audiocpu")->base();
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x4000;
@@ -6072,8 +6072,8 @@ static DRIVER_INIT( balcube )
 {
 	metro_state *state = machine->driver_data<metro_state>();
 
-	const size_t len = memory_region_length(machine, "gfx1");
-	UINT8 *src       = memory_region(machine, "gfx1");
+	const size_t len = machine->region("gfx1")->bytes();
+	UINT8 *src       = machine->region("gfx1")->base();
 	UINT8 *end       = src + len;
 
 	while (src < end)
@@ -6093,7 +6093,7 @@ static DRIVER_INIT( balcube )
 
 static DRIVER_INIT( dharmak )
 {
-	UINT8 *src = memory_region( machine, "gfx1" );
+	UINT8 *src = machine->region( "gfx1" )->base();
 	int i;
 
 	for (i = 0; i < 0x200000; i += 4)

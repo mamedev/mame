@@ -63,8 +63,8 @@ static TILE_GET_INFO( get_bg2_tile_info )
 {
 	lwings_state *state = machine->driver_data<lwings_state>();
 	int code, color;
-	UINT8 *rom = memory_region(machine, "gfx5");
-	int mask = memory_region_length(machine, "gfx5") - 1;
+	UINT8 *rom = machine->region("gfx5")->base();
+	int mask = machine->region("gfx5")->bytes() - 1;
 
 	tile_index = (tile_index + state->bg2_image * 0x20) & mask;
 	code = rom[tile_index];

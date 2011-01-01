@@ -299,7 +299,7 @@ static SAMPLES_START( tmnt_decode_sample )
 	running_machine *machine = device->machine;
 	tmnt_state *state = machine->driver_data<tmnt_state>();
 	int i;
-	UINT8 *source = memory_region(machine, "title");
+	UINT8 *source = machine->region("title")->base();
 
 	state->sampledata = auto_alloc_array(machine, INT16, 0x40000);
 	state_save_register_global_pointer(machine, state->sampledata, 0x40000);
@@ -962,7 +962,7 @@ static WRITE16_HANDLER( tmnt2_1c0800_w )
 		CellSrc = state->tmnt2_1c0800[0x00] | (state->tmnt2_1c0800[0x01] << 16 );
 //        if (CellDest >= 0x180000 && CellDest < 0x183fe0) {
 		CellVar -= 0x104000;
-		src = (UINT16 *)(memory_region(space->machine, "maincpu") + CellSrc);
+		src = (UINT16 *)(space->machine->region("maincpu")->base() + CellSrc);
 
 		CellVar >>= 1;
 
@@ -2632,7 +2632,7 @@ static const k054539_interface k054539_config =
 static MACHINE_START( prmrsocr )
 {
 	MACHINE_START_CALL(common);
-	UINT8 *ROM = memory_region(machine, "audiocpu");
+	UINT8 *ROM = machine->region("audiocpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 }
 
@@ -4115,8 +4115,8 @@ static DRIVER_INIT( mia )
         be shuffled around because the ROMs are connected differently to the
         051962 custom IC.
     */
-	gfxdata = memory_region(machine, "gfx1");
-	len = memory_region_length(machine, "gfx1");
+	gfxdata = machine->region("gfx1")->base();
+	len = machine->region("gfx1")->bytes();
 	for (i = 0; i < len; i += 4)
 	{
 		for (j = 0; j < 4; j++)
@@ -4136,8 +4136,8 @@ static DRIVER_INIT( mia )
         be shuffled around because the ROMs are connected differently to the
         051937 custom IC.
     */
-	gfxdata = memory_region(machine, "gfx2");
-	len = memory_region_length(machine, "gfx2");
+	gfxdata = machine->region("gfx2")->base();
+	len = machine->region("gfx2")->bytes();
 	for (i = 0; i < len; i += 4)
 	{
 		for (j = 0; j < 4; j++)
@@ -4208,8 +4208,8 @@ static DRIVER_INIT( tmnt )
         be shuffled around because the ROMs are connected differently to the
         051962 custom IC.
     */
-	gfxdata = memory_region(machine, "gfx1");
-	len = memory_region_length(machine, "gfx1");
+	gfxdata = machine->region("gfx1")->base();
+	len = machine->region("gfx1")->bytes();
 	for (i = 0; i < len; i += 4)
 	{
 		for (j = 0; j < 4; j++)
@@ -4229,8 +4229,8 @@ static DRIVER_INIT( tmnt )
         be shuffled around because the ROMs are connected differently to the
         051937 custom IC.
     */
-	gfxdata = memory_region(machine, "gfx2");
-	len = memory_region_length(machine, "gfx2");
+	gfxdata = machine->region("gfx2")->base();
+	len = machine->region("gfx2")->bytes();
 	for (i = 0; i < len; i += 4)
 	{
 		for (j = 0; j < 4; j++)
@@ -4247,7 +4247,7 @@ static DRIVER_INIT( tmnt )
 
 	temp = auto_alloc_array(machine, UINT8, len);
 	memcpy(temp, gfxdata, len);
-	code_conv_table = &memory_region(machine, "proms")[0x0000];
+	code_conv_table = &machine->region("proms")->base()[0x0000];
 	for (A = 0; A < len / 4; A++)
 	{
 #define CA0 0

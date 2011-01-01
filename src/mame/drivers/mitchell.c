@@ -2102,14 +2102,14 @@ ROM_END
 static void bootleg_decode( running_machine *machine )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	space->set_decrypted_region(0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x50000);
-	memory_configure_bank_decrypted(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x60000, 0x4000);
+	space->set_decrypted_region(0x0000, 0x7fff, machine->region("maincpu")->base() + 0x50000);
+	memory_configure_bank_decrypted(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x60000, 0x4000);
 }
 
 
 static void configure_banks( running_machine *machine )
 {
-	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x10000, 0x4000);
 }
 
 
@@ -2158,7 +2158,7 @@ static DRIVER_INIT( spang )
 	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 3;
 	nvram_size = 0x80;
-	nvram = &memory_region(machine, "maincpu")[0xe000];	/* NVRAM */
+	nvram = &machine->region("maincpu")->base()[0xe000];	/* NVRAM */
 	spang_decode(machine);
 	configure_banks(machine);
 }
@@ -2168,7 +2168,7 @@ static DRIVER_INIT( spangbl )
 	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 3;
 	nvram_size = 0x80;
-	nvram = &memory_region(machine, "maincpu")[0xe000];	/* NVRAM */
+	nvram = &machine->region("maincpu")->base()[0xe000];	/* NVRAM */
 	bootleg_decode(machine);
 	configure_banks(machine);
 }
@@ -2178,7 +2178,7 @@ static DRIVER_INIT( spangj )
 	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 3;
 	nvram_size = 0x80;
-	nvram = &memory_region(machine, "maincpu")[0xe000];	/* NVRAM */
+	nvram = &machine->region("maincpu")->base()[0xe000];	/* NVRAM */
 	spangj_decode(machine);
 	configure_banks(machine);
 }
@@ -2187,7 +2187,7 @@ static DRIVER_INIT( sbbros )
 	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 3;
 	nvram_size = 0x80;
-	nvram = &memory_region(machine, "maincpu")[0xe000];	/* NVRAM */
+	nvram = &machine->region("maincpu")->base()[0xe000];	/* NVRAM */
 	sbbros_decode(machine);
 	configure_banks(machine);
 }
@@ -2252,7 +2252,7 @@ static DRIVER_INIT( block )
 	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 2;
 	nvram_size = 0x80;
-	nvram = &memory_region(machine, "maincpu")[0xff80];	/* NVRAM */
+	nvram = &machine->region("maincpu")->base()[0xff80];	/* NVRAM */
 	block_decode(machine);
 	configure_banks(machine);
 }
@@ -2261,7 +2261,7 @@ static DRIVER_INIT( blockbl )
 	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 2;
 	nvram_size = 0x80;
-	nvram = &memory_region(machine, "maincpu")[0xff80];	/* NVRAM */
+	nvram = &machine->region("maincpu")->base()[0xff80];	/* NVRAM */
 	bootleg_decode(machine);
 	configure_banks(machine);
 }
@@ -2269,9 +2269,9 @@ static DRIVER_INIT( blockbl )
 static DRIVER_INIT( mstworld )
 {
 	/* descramble the program rom .. */
-	int len = memory_region_length(machine, "maincpu");
+	int len = machine->region("maincpu")->bytes();
 	UINT8* source = auto_alloc_array(machine, UINT8, len);
-	UINT8* dst = memory_region(machine, "maincpu") ;
+	UINT8* dst = machine->region("maincpu")->base() ;
 	int x;
 
 	static const int tablebank[]=

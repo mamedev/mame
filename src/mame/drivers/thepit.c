@@ -1032,7 +1032,7 @@ static READ8_HANDLER( rtriv_question_r )
 	// Read the actual byte from question roms
 	else if((offset & 0xc00) == 0xc00)
 	{
-		UINT8 *ROM = memory_region(space->machine, "user1");
+		UINT8 *ROM = space->machine->region("user1")->base();
 		int real_address;
 
 		real_address = (0x8000 * question_rom) | question_address | (offset & 0x3f0) | remap_address[offset & 0x0f];

@@ -330,7 +330,7 @@ static WRITE32_HANDLER( ps4_vidregs_w )
 		if (ACCESSING_BITS_0_15)	// Bank
 		{
 //          memory_set_bank(space->machine, "bank2", state->vidregs[offset] & 0x1fff);  /* Bank comes from vidregs */
-			memory_set_bankptr(space->machine, "bank2", memory_region(space->machine, "gfx1") + 0x2000 * (state->vidregs[offset] & 0x1fff)); /* Bank comes from vidregs */		}
+			memory_set_bankptr(space->machine, "bank2", space->machine->region("gfx1")->base() + 0x2000 * (state->vidregs[offset] & 0x1fff)); /* Bank comes from vidregs */		}
 	}
 #endif
 }
@@ -339,7 +339,7 @@ static WRITE32_HANDLER( ps4_vidregs_w )
 static READ32_HANDLER( ps4_sample_r ) /* Send sample data for test */
 {
 	psikyo4_state *state = space->machine->driver_data<psikyo4_state>();
-	UINT8 *ROM = memory_region(space->machine, "ymf");
+	UINT8 *ROM = space->machine->region("ymf")->base();
 	return ROM[state->sample_offs++] << 16;
 }
 #endif
@@ -349,8 +349,8 @@ static READ32_HANDLER( ps4_sample_r ) /* Send sample data for test */
 static void set_hotgmck_pcm_bank( running_machine *machine, int n )
 {
 	psikyo4_state *state = machine->driver_data<psikyo4_state>();
-	UINT8 *ymf_pcmbank = memory_region(machine, "ymf") + 0x200000;
-	UINT8 *pcm_rom = memory_region(machine, "ymfsource");
+	UINT8 *ymf_pcmbank = machine->region("ymf")->base() + 0x200000;
+	UINT8 *pcm_rom = machine->region("ymfsource")->base();
 
 	memcpy(ymf_pcmbank + n * 0x100000, pcm_rom + PCM_BANK_NO(n) * 0x100000, 0x100000);
 }
@@ -705,7 +705,7 @@ static MACHINE_START( psikyo4 )
 
 #if ROMTEST
 //  FIXME: Too many banks! it cannot be handled in this way, currently
-//  memory_configure_bank(machine, "bank2", 0, 0x2000, memory_region(machine, "gfx1"), 0x2000);
+//  memory_configure_bank(machine, "bank2", 0, 0x2000, machine->region("gfx1")->base(), 0x2000);
 
 	state->sample_offs = 0;
 	state_save_register_global(machine, state->sample_offs);
@@ -1062,8 +1062,8 @@ static STATE_POSTLOAD( hotgmck_pcm_bank_postload )
 static void install_hotgmck_pcm_bank(running_machine *machine)
 {
 	psikyo4_state *state = machine->driver_data<psikyo4_state>();
-	UINT8 *ymf_pcm = memory_region(machine, "ymf");
-	UINT8 *pcm_rom = memory_region(machine, "ymfsource");
+	UINT8 *ymf_pcm = machine->region("ymf")->base();
+	UINT8 *pcm_rom = machine->region("ymfsource")->base();
 
 	memcpy(ymf_pcm, pcm_rom, 0x200000);
 
@@ -1078,7 +1078,7 @@ static void install_hotgmck_pcm_bank(running_machine *machine)
 
 static DRIVER_INIT( hotgmck )
 {
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 	memory_set_bankptr(machine, "bank1", &RAM[0x100000]);
 	install_hotgmck_pcm_bank(machine);	// Banked PCM ROM
 }

@@ -162,7 +162,7 @@ static MACHINE_START( jedi )
 	timer_adjust_oneshot(state->interrupt_timer, machine->primary_screen->time_until_pos(32), 32);
 
 	/* configure the banks */
-	memory_configure_bank(machine, "bank1", 0, 3, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 3, machine->region("maincpu")->base() + 0x10000, 0x4000);
 
 	/* set up save state */
 	state_save_register_global(machine, state->nvram_enabled);

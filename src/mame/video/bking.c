@@ -326,7 +326,7 @@ VIDEO_EOF( bking )
 
 	if (latch != 0)
 	{
-		const UINT8* MASK = memory_region(machine, "user1") + 8 * state->hit;
+		const UINT8* MASK = machine->region("user1")->base() + 8 * state->hit;
 
 		int x;
 		int y;

@@ -160,15 +160,15 @@ static INTERRUPT_GEN( ninjakd2_interrupt )
 static MACHINE_RESET( ninjakd2 )
 {
 	/* initialize main Z80 bank */
-	memory_configure_bank(machine, "bank1", 0, 8, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 8, machine->region("maincpu")->base() + 0x10000, 0x4000);
 	memory_set_bank(machine, "bank1", 0);
 }
 
 static void robokid_init_banks(running_machine *machine)
 {
 	/* initialize main Z80 bank */
-	memory_configure_bank(machine, "bank1", 0,  2, memory_region(machine, "maincpu"), 0x4000);
-	memory_configure_bank(machine, "bank1", 2, 14, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0,  2, machine->region("maincpu")->base(), 0x4000);
+	memory_configure_bank(machine, "bank1", 2, 14, machine->region("maincpu")->base() + 0x10000, 0x4000);
 	memory_set_bank(machine, "bank1", 0);
 }
 
@@ -212,8 +212,8 @@ static WRITE8_HANDLER( ninjakd2_soundreset_w )
 static SAMPLES_START( ninjakd2_init_samples )
 {
 	running_machine *machine = device->machine;
-	const UINT8* const rom = memory_region(machine, "pcm");
-	const int length = memory_region_length(machine, "pcm");
+	const UINT8* const rom = machine->region("pcm")->base();
+	const int length = machine->region("pcm")->bytes();
 	INT16* sampledata = auto_alloc_array(machine, INT16, length);
 
 	int i;
@@ -228,12 +228,12 @@ static SAMPLES_START( ninjakd2_init_samples )
 static WRITE8_HANDLER( ninjakd2_pcm_play_w )
 {
 	device_t *samples = space->machine->device("pcm");
-	const UINT8* const rom = memory_region(space->machine, "pcm");
+	const UINT8* const rom = space->machine->region("pcm")->base();
 
 	// only Ninja Kid II uses this
 	if (rom)
 	{
-		const int length = memory_region_length(space->machine, "pcm");
+		const int length = space->machine->region("pcm")->bytes();
 
 		const int start = data << 8;
 
@@ -1396,9 +1396,9 @@ by one place all the intervening bits.
 
 static void lineswap_gfx_roms(running_machine *machine, const char *region, const int bit)
 {
-	const int length = memory_region_length(machine, region);
+	const int length = machine->region(region)->bytes();
 
-	UINT8* const src = memory_region(machine, region);
+	UINT8* const src = machine->region(region)->base();
 
 	UINT8* const temp = auto_alloc_array(machine, UINT8, length);
 
@@ -1443,7 +1443,7 @@ static DRIVER_INIT( ninjakd2 )
 static DRIVER_INIT( bootleg )
 {
 	address_space *space = cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_PROGRAM);
-	space->set_decrypted_region(0x0000, 0x7fff, memory_region(machine, "soundcpu") + 0x10000);
+	space->set_decrypted_region(0x0000, 0x7fff, machine->region("soundcpu")->base() + 0x10000);
 
 	gfx_unscramble(machine);
 }

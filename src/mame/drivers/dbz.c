@@ -500,7 +500,7 @@ static DRIVER_INIT( dbz )
 {
 	UINT16 *ROM;
 
-	ROM = (UINT16 *)memory_region(machine, "maincpu");
+	ROM = (UINT16 *)machine->region("maincpu")->base();
 
 	// nop out dbz1's mask rom test
 	// tile ROM test

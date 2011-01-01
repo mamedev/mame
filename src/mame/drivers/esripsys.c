@@ -140,7 +140,7 @@ static READ8_HANDLER( g_status_r )
 static WRITE8_HANDLER( g_status_w )
 {
 	int bankaddress;
-	UINT8 *rom = memory_region(space->machine, "game_cpu");
+	UINT8 *rom = space->machine->region("game_cpu")->base();
 
 	g_status = data;
 
@@ -523,7 +523,7 @@ static WRITE8_HANDLER( s_200e_w )
 
 static WRITE8_HANDLER( s_200f_w )
 {
-	UINT8 *rom = memory_region(space->machine, "sound_data");
+	UINT8 *rom = space->machine->region("sound_data")->base();
 	int rombank = data & 0x20 ? 0x2000 : 0;
 
 	/* Bit 6 -> Reset latch U56A */
@@ -675,7 +675,7 @@ ADDRESS_MAP_END
 
 static DRIVER_INIT( esripsys )
 {
-	UINT8 *rom = memory_region(machine, "sound_data");
+	UINT8 *rom = machine->region("sound_data")->base();
 
 	fdt_a = auto_alloc_array(machine, UINT8, FDT_RAM_SIZE);
 	fdt_b = auto_alloc_array(machine, UINT8, FDT_RAM_SIZE);

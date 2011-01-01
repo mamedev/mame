@@ -509,7 +509,7 @@ static const k051960_interface spy_k051960_intf =
 static MACHINE_START( spy )
 {
 	spy_state *state = machine->driver_data<spy_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 12, &ROM[0x10000], 0x2000);
 

@@ -202,7 +202,7 @@ static WRITE32_HANDLER( policetr_bsmt2000_data_w )
 
 static READ32_HANDLER( bsmt2000_data_r )
 {
-	return memory_region(space->machine, "bsmt")[bsmt_data_bank * 0x10000 + bsmt_data_offset] << 8;
+	return space->machine->region("bsmt")->base()[bsmt_data_bank * 0x10000 + bsmt_data_offset] << 8;
 }
 
 

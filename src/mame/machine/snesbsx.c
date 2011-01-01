@@ -48,7 +48,7 @@ static struct _snes_bsx_state  bsx_state;
 static void bsx_update_memory_map(void)
 {
 	bsx_state.ram_source = BIT(bsx_state.cart_regs[0x01], 7) ? SNES_BSX_PRAM : SNES_BSX_FLASH;
-//  UINT8 *RAM = (bsx_state.cart_regs[0x01] & 0x80) == 0x00 ? memory_region(space->machine, "flash") : bsx_state.pram;
+//  UINT8 *RAM = (bsx_state.cart_regs[0x01] & 0x80) == 0x00 ? space->machine->region("flash")->base() : bsx_state.pram;
 
 	logerror("BSX: updated memory map, current RAM: %d", bsx_state.ram_source);
 	if (!BIT(bsx_state.cart_regs[0x02], 7))
@@ -149,7 +149,7 @@ static void bsx_init( running_machine *machine )
 #ifdef UNUSED_FUNCTION
 static READ8_HANDLER( bsx_flash_read )
 {
-	UINT8 *FLASH = memory_region(space->machine, "flash");
+	UINT8 *FLASH = space->machine->region("flash")->base();
 
 	if (offset == 0x0002)
 	{

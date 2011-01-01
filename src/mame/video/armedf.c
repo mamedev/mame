@@ -307,7 +307,7 @@ static void copy_textmap(running_machine *machine, int index)
 	*/
 
 	armedf_state *state = machine->driver_data<armedf_state>();
-	UINT8 * data = (UINT8 *)memory_region(machine, "gfx5");
+	UINT8 * data = (UINT8 *)machine->region("gfx5")->base();
 	
 	for(int i=0;i<0x400;++i)
 	{

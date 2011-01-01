@@ -132,7 +132,7 @@ static WRITE8_HANDLER( quizmstr_attr3_w )
 static READ8_HANDLER( question_r )
 {
 	int address;
-	UINT8 *questions = memory_region(space->machine, "user1");
+	UINT8 *questions = space->machine->region("user1")->base();
 
 	switch(question_adr[2])
 	{
@@ -1205,8 +1205,8 @@ ROM_END
 
 static DRIVER_INIT( coinmstr )
 {
-	UINT8 *rom = memory_region(machine, "user1");
-	int length = memory_region_length(machine, "user1");
+	UINT8 *rom = machine->region("user1")->base();
+	int length = machine->region("user1")->bytes();
 	UINT8 *buf = auto_alloc_array(machine, UINT8, length);
 	int i;
 

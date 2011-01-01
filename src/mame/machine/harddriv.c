@@ -59,8 +59,8 @@ MACHINE_START( harddriv )
 	atarigen_init(machine);
 
 	/* predetermine memory regions */
-	state->sim_memory = (UINT16 *)memory_region(machine, "user1");
-	state->sim_memory_size = memory_region_length(machine, "user1") / 2;
+	state->sim_memory = (UINT16 *)machine->region("user1")->base();
+	state->sim_memory_size = machine->region("user1")->bytes() / 2;
 	state->adsp_pgm_memory_word = (UINT16 *)((UINT8 *)state->adsp_pgm_memory + 1);
 }
 

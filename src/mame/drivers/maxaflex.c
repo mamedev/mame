@@ -441,7 +441,7 @@ ROM_END
 
 static DRIVER_INIT( a600xl )
 {
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	memcpy( rom + 0x5000, rom + 0xd000, 0x800 );
 }
 

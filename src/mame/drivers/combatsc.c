@@ -683,7 +683,7 @@ static const ym2203_interface ym2203_config =
 static MACHINE_START( combatsc )
 {
 	combatsc_state *state = machine->driver_data<combatsc_state>();
-	UINT8 *MEM = memory_region(machine, "maincpu") + 0x38000;
+	UINT8 *MEM = machine->region("maincpu")->base() + 0x38000;
 
 	state->io_ram  = MEM + 0x0000;
 	state->page[0] = MEM + 0x4000;
@@ -695,7 +695,7 @@ static MACHINE_START( combatsc )
 	state->k007121_1 = machine->device("k007121_1");
 	state->k007121_2 = machine->device("k007121_2");
 
-	memory_configure_bank(machine, "bank1", 0, 10, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 10, machine->region("maincpu")->base() + 0x10000, 0x4000);
 
 	state_save_register_global(machine, state->priority);
 	state_save_register_global(machine, state->vreg);

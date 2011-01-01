@@ -7855,8 +7855,8 @@ static DRIVER_INIT( kof2002b )
 	kof2002_decrypt_68k(machine);
 	neo_pcm2_swap(machine, 0);
 	neogeo_cmc50_m1_decrypt(machine);
-	kof2002b_gfx_decrypt(machine, memory_region(machine, "sprites"),0x4000000);
-	kof2002b_gfx_decrypt(machine, memory_region(machine, "fixed"),0x20000);
+	kof2002b_gfx_decrypt(machine, machine->region("sprites")->base(),0x4000000);
+	kof2002b_gfx_decrypt(machine, machine->region("fixed")->base(),0x20000);
 }
 
 static DRIVER_INIT( kf2k2pls )
@@ -7959,7 +7959,7 @@ static DRIVER_INIT( mslug5 )
 static TIMER_CALLBACK( ms5pcb_bios_timer_callback )
 {
 	int harddip3 = input_port_read(machine, "HARDDIP") & 1;
-	memory_set_bankptr(machine, NEOGEO_BANK_BIOS, memory_region(machine, "mainbios") + 0x20000 + harddip3 * 0x20000);
+	memory_set_bankptr(machine, NEOGEO_BANK_BIOS, machine->region("mainbios")->base() + 0x20000 + harddip3 * 0x20000);
 }
 
 static DRIVER_INIT( ms5pcb )
@@ -7996,7 +7996,7 @@ static DRIVER_INIT( ms5plus )
 static TIMER_CALLBACK( svcpcb_bios_timer_callback )
 {
 	int harddip3 = input_port_read(machine, "HARDDIP") & 1;
-	memory_set_bankptr(machine, NEOGEO_BANK_BIOS, memory_region(machine, "mainbios") + 0x20000 + harddip3 * 0x20000);
+	memory_set_bankptr(machine, NEOGEO_BANK_BIOS, machine->region("mainbios")->base() + 0x20000 + harddip3 * 0x20000);
 }
 
 static DRIVER_INIT( svcpcb )
@@ -8099,7 +8099,7 @@ static DRIVER_INIT( kf2k3pcb )
        incorrect */
 	{
 		int i;
-		UINT8* rom = memory_region(machine, "audiocpu");
+		UINT8* rom = machine->region("audiocpu")->base();
 		for (i = 0; i < 0x90000; i++)
 		{
 			rom[i] = BITSWAP8(rom[i], 5, 6, 1, 4, 3, 0, 7, 2);

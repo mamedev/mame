@@ -149,7 +149,7 @@ static TILEMAP_MAPPER( sidearms_tilemap_scan )
 VIDEO_START( sidearms )
 {
 	sidearms_state *state = machine->driver_data<sidearms_state>();
-	state->tilerom = memory_region(machine, "gfx4");
+	state->tilerom = machine->region("gfx4")->base();
 
 	if (!state->gameid)
 	{
@@ -232,7 +232,7 @@ static void sidearms_draw_starfield( running_machine *machine, bitmap_t *bitmap 
 	_vcount_191 = state->vcount_191;
 	_hcount_191 = state->hcount_191 & 0xff;
 
-	sf_rom = memory_region(machine, "user1");
+	sf_rom = machine->region("user1")->base();
 
 #if 0 // old loop (for reference; easier to read)
 	if (!flipon)

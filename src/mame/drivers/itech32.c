@@ -656,7 +656,7 @@ static READ32_HANDLER( gtclass_prot_result_r )
 
 static WRITE8_HANDLER( sound_bank_w )
 {
-	memory_set_bankptr(space->machine, "bank1", &memory_region(space->machine, "soundcpu")[0x10000 + data * 0x4000]);
+	memory_set_bankptr(space->machine, "bank1", &space->machine->region("soundcpu")->base()[0x10000 + data * 0x4000]);
 }
 
 

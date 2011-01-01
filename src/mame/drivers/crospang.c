@@ -588,8 +588,8 @@ ROM_END
 
 static void tumblepb_gfx1_rearrange(running_machine *machine)
 {
-	UINT8 *rom = memory_region(machine, "gfx1");
-	int len = memory_region_length(machine, "gfx1");
+	UINT8 *rom = machine->region("gfx1")->base();
+	int len = machine->region("gfx1")->bytes();
 	int i;
 
 	/* gfx data is in the wrong order */

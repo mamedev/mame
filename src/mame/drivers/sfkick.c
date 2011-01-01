@@ -91,7 +91,7 @@ static void sfkick_remap_banks(running_machine *machine)
 	{
 		case 0: /* bios */
 		{
-			UINT8 *mem = memory_region(machine, "bios");
+			UINT8 *mem = machine->region("bios")->base();
 			memory_set_bankptr(machine,"bank1", mem);
 			memory_set_bankptr(machine,"bank2", mem+0x2000);
 		}
@@ -99,7 +99,7 @@ static void sfkick_remap_banks(running_machine *machine)
 
 		case 1: /* ext rom */
 		{
-			UINT8 *mem = memory_region(machine, "extrom");
+			UINT8 *mem = machine->region("extrom")->base();
 			memory_set_bankptr(machine,"bank1", mem+0x4000);
 			memory_set_bankptr(machine,"bank2", mem+0x6000);
 		}
@@ -107,7 +107,7 @@ static void sfkick_remap_banks(running_machine *machine)
 
 		case 2: /* banked */
 		{
-			UINT8 *mem = memory_region(machine, "banked");
+			UINT8 *mem = machine->region("banked")->base();
 			memory_set_bankptr(machine,"bank1", mem+0x2000*sfkick_bank[0]);
 			memory_set_bankptr(machine,"bank2", mem+0x2000*sfkick_bank[1]);
 		}
@@ -115,7 +115,7 @@ static void sfkick_remap_banks(running_machine *machine)
 
 		case 3: /* unknown */
 		{
-			UINT8 *mem = memory_region(machine, "banked");
+			UINT8 *mem = machine->region("banked")->base();
 			memory_set_bankptr(machine,"bank1", mem+0x18000);
 			memory_set_bankptr(machine,"bank2", mem+0x18000);
 		}
@@ -127,7 +127,7 @@ static void sfkick_remap_banks(running_machine *machine)
 	{
 		case 0: /* bios - upper part */
 		{
-			UINT8 *mem = memory_region(machine, "bios");
+			UINT8 *mem = machine->region("bios")->base();
 			memory_set_bankptr(machine,"bank3", mem+0x4000);
 			memory_set_bankptr(machine,"bank4", mem+0x6000);
 		}
@@ -136,7 +136,7 @@ static void sfkick_remap_banks(running_machine *machine)
 		case 1:  /* unknown */
 		case 3:
 		{
-			UINT8 *mem = memory_region(machine, "banked");
+			UINT8 *mem = machine->region("banked")->base();
 			memory_set_bankptr(machine,"bank3", mem+0x18000);
 			memory_set_bankptr(machine,"bank4", mem+0x18000);
 		}
@@ -144,7 +144,7 @@ static void sfkick_remap_banks(running_machine *machine)
 
 		case 2: /* banked */
 		{
-			UINT8 *mem = memory_region(machine, "banked");
+			UINT8 *mem = machine->region("banked")->base();
 			memory_set_bankptr(machine,"bank3", mem+0x2000*sfkick_bank[2]);
 			memory_set_bankptr(machine,"bank4", mem+0x2000*sfkick_bank[3]);
 		}
@@ -156,7 +156,7 @@ static void sfkick_remap_banks(running_machine *machine)
 	{
 		case 0: /* cartridge */
 		{
-			UINT8 *mem = memory_region(machine, "cartridge");
+			UINT8 *mem = machine->region("cartridge")->base();
 			memory_set_bankptr(machine,"bank5", mem+0x4000);
 			memory_set_bankptr(machine,"bank6", mem+0x6000);
 		}
@@ -165,7 +165,7 @@ static void sfkick_remap_banks(running_machine *machine)
 		case 1: /* unknown */
 		case 3:
 		{
-			UINT8 *mem = memory_region(machine, "banked");
+			UINT8 *mem = machine->region("banked")->base();
 			memory_set_bankptr(machine,"bank5", mem+0x18000);
 			memory_set_bankptr(machine,"bank6", mem+0x18000);
 		}
@@ -173,7 +173,7 @@ static void sfkick_remap_banks(running_machine *machine)
 
 		case 2: /* banked */
 		{
-			UINT8 *mem = memory_region(machine, "banked");
+			UINT8 *mem = machine->region("banked")->base();
 			memory_set_bankptr(machine,"bank5", mem+0x2000*sfkick_bank[4]);
 			memory_set_bankptr(machine,"bank6", mem+0x2000*sfkick_bank[5]);
 		}
@@ -186,7 +186,7 @@ static void sfkick_remap_banks(running_machine *machine)
 		case 0: /* unknown */
 		case 1:
 		{
-			UINT8 *mem = memory_region(machine, "banked");
+			UINT8 *mem = machine->region("banked")->base();
 			memory_set_bankptr(machine,"bank7", mem+0x18000);
 			memory_set_bankptr(machine,"bank8", mem+0x18000);
 		}
@@ -194,7 +194,7 @@ static void sfkick_remap_banks(running_machine *machine)
 
 		case 2: /* banked */
 		{
-			UINT8 *mem = memory_region(machine, "banked");
+			UINT8 *mem = machine->region("banked")->base();
 			memory_set_bankptr(machine,"bank7", mem+0x2000*sfkick_bank[6]);
 			memory_set_bankptr(machine,"bank8", mem+0x2000*sfkick_bank[7]);
 		}

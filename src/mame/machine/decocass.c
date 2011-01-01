@@ -296,7 +296,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_3_inv_2_r )
 	{
 		offs_t promaddr;
 		UINT8 save;
-		UINT8 *prom = memory_region(space->machine, "dongle");
+		UINT8 *prom = space->machine->region("dongle")->base();
 
 		if (state->firsttime)
 		{
@@ -376,7 +376,7 @@ static READ8_HANDLER( decocass_type1_pass_136_r )
 	{
 		offs_t promaddr;
 		UINT8 save;
-		UINT8 *prom = memory_region(space->machine, "dongle");
+		UINT8 *prom = space->machine->region("dongle")->base();
 
 		if (state->firsttime)
 		{
@@ -456,7 +456,7 @@ static READ8_HANDLER( decocass_type1_latch_27_pass_3_inv_2_r )
 	{
 		offs_t promaddr;
 		UINT8 save;
-		UINT8 *prom = memory_region(space->machine, "dongle");
+		UINT8 *prom = space->machine->region("dongle")->base();
 
 		if (state->firsttime)
 		{
@@ -536,7 +536,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_5_inv_2_r )
 	{
 		offs_t promaddr;
 		UINT8 save;
-		UINT8 *prom = memory_region(space->machine, "dongle");
+		UINT8 *prom = space->machine->region("dongle")->base();
 
 		if (state->firsttime)
 		{
@@ -618,7 +618,7 @@ static READ8_HANDLER( decocass_type1_latch_16_pass_3_inv_1_r )
 	{
 		offs_t promaddr;
 		UINT8 save;
-		UINT8 *prom = memory_region(space->machine, "dongle");
+		UINT8 *prom = space->machine->region("dongle")->base();
 
 		if (state->firsttime)
 		{
@@ -686,7 +686,7 @@ static READ8_HANDLER( decocass_type2_r )
 	{
 		if (1 == (offset & 1))
 		{
-			UINT8 *prom = memory_region(space->machine, "dongle");
+			UINT8 *prom = space->machine->region("dongle")->base();
 			data = prom[256 * state->type2_d2_latch + state->type2_promaddr];
 			LOG(3,("%10s 6502-PC: %04x decocass_type2_r(%02x): $%02x <- prom[%03x]\n", attotime_string(timer_get_time(space->machine), 6), cpu_get_previouspc(space->cpu), offset, data, 256 * state->type2_d2_latch + state->type2_promaddr));
 		}
@@ -768,7 +768,7 @@ static READ8_HANDLER( decocass_type3_r )
 	{
 		if (1 == state->type3_pal_19)
 		{
-			UINT8 *prom = memory_region(space->machine, "dongle");
+			UINT8 *prom = space->machine->region("dongle")->base();
 			data = prom[state->type3_ctrs];
 			LOG(3,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x <- prom[$%03x]\n", attotime_string(timer_get_time(space->machine), 6), cpu_get_previouspc(space->cpu), offset, data, state->type3_ctrs));
 			if (++state->type3_ctrs == 4096)
@@ -1009,7 +1009,7 @@ static READ8_HANDLER( decocass_type4_r )
 	{
 		if (state->type4_latch)
 		{
-			UINT8 *prom = memory_region(space->machine, "dongle");
+			UINT8 *prom = space->machine->region("dongle")->base();
 
 			data = prom[state->type4_ctrs];
 			LOG(3,("%10s 6502-PC: %04x decocass_type4_r(%02x): $%02x '%c' <- PROM[%04x]\n", attotime_string(timer_get_time(space->machine), 6), cpu_get_previouspc(space->cpu), offset, data, (data >= 32) ? data : '.', state->type4_ctrs));
@@ -1669,7 +1669,7 @@ MACHINE_RESET( cflyball )
 MACHINE_RESET( czeroize )
 {
 	decocass_state *state = machine->driver_data<decocass_state>();
-	UINT8 *mem = memory_region(machine, "dongle");
+	UINT8 *mem = machine->region("dongle")->base();
 	decocass_reset_common(machine);
 	LOG(0,("dongle type #3 (PAL)\n"));
 	state->dongle_r = decocass_type3_r;

@@ -261,7 +261,7 @@ static INTERRUPT_GEN( m72_mcu_int )
 static READ8_HANDLER(m72_mcu_sample_r )
 {
 	UINT8 sample;
-	sample = memory_region(space->machine, "samples")[mcu_sample_addr++];
+	sample = space->machine->region("samples")->base()[mcu_sample_addr++];
 	return sample;
 }
 
@@ -344,7 +344,7 @@ INLINE DRIVER_INIT( m72_8751 )
      * prefetching on the V30.
      */
 	{
-		UINT8 *rom=memory_region(machine, "mcu");
+		UINT8 *rom=machine->region("mcu")->base();
 
 		rom[0x12d+5] += 1; printf(" 5: %d\n", rom[0x12d+5]);
 		rom[0x12d+8] += 5;  printf(" 8: %d\n", rom[0x12d+8]);
@@ -384,8 +384,8 @@ the NMI handler in the other games.
 #if 0
 static int find_sample(int num)
 {
-	UINT8 *rom = memory_region(machine, "samples");
-	int len = memory_region_length(machine, "samples");
+	UINT8 *rom = machine->region("samples")->base();
+	int len = machine->region("samples")->bytes();
 	int addr = 0;
 
 	while (num--)

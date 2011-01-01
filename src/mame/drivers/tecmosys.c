@@ -524,14 +524,14 @@ GFXDECODE_END
 
 static WRITE8_HANDLER( deroon_bankswitch_w )
 {
-	memory_set_bankptr(space->machine,  "bank1", memory_region(space->machine, "audiocpu") + ((data-2) & 0x0f) * 0x4000 + 0x10000 );
+	memory_set_bankptr(space->machine,  "bank1", space->machine->region("audiocpu")->base() + ((data-2) & 0x0f) * 0x4000 + 0x10000 );
 }
 
 static WRITE8_HANDLER( tecmosys_oki_bank_w )
 {
 	UINT8 upperbank = (data & 0x30) >> 4;
 	UINT8 lowerbank = (data & 0x03) >> 0;
-	UINT8* region = memory_region(space->machine, "oki");
+	UINT8* region = space->machine->region("oki")->base();
 
 	memcpy( region+0x00000, region+0x80000 + lowerbank * 0x20000, 0x20000  );
 	memcpy( region+0x20000, region+0x80000 + upperbank * 0x20000, 0x20000  );
@@ -583,7 +583,7 @@ static VIDEO_START(deroon)
 
 static void tecmosys_render_sprites_to_bitmap(running_machine *machine, bitmap_t *bitmap, UINT16 extrax, UINT16 extray )
 {
-	UINT8 *gfxsrc    = memory_region       ( machine, "gfx1" );
+	UINT8 *gfxsrc    = machine->region       ( "gfx1" )->base();
 	int i;
 
 	/* render sprites (with priority information) to temp bitmap */
@@ -1056,8 +1056,8 @@ ROM_END
 
 static void tecmosys_decramble(running_machine *machine)
 {
-	UINT8 *gfxsrc    = memory_region       ( machine, "gfx1" );
-	size_t  srcsize = memory_region_length( machine, "gfx1" );
+	UINT8 *gfxsrc    = machine->region       ( "gfx1" )->base();
+	size_t  srcsize = machine->region( "gfx1" )->bytes();
 	int i;
 
 	for (i=0; i < srcsize; i+=4)

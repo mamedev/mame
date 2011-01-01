@@ -134,8 +134,8 @@ static DRIVER_INIT( shangkid )
 	shangkid_gfx_type = 1;
 
 	/* set up banking */
-	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "maincpu") + 0x8000, 0x8000);
-	memory_configure_bank(machine, "bank2", 0, 2, memory_region(machine, "audiocpu") + 0x0000, 0x10000);
+	memory_configure_bank(machine, "bank1", 0, 2, machine->region("maincpu")->base() + 0x8000, 0x8000);
+	memory_configure_bank(machine, "bank2", 0, 2, machine->region("audiocpu")->base() + 0x0000, 0x10000);
 }
 
 /***************************************************************************************/

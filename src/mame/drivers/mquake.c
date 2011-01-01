@@ -95,7 +95,7 @@ static WRITE8_DEVICE_HANDLER( mquake_es5503_w )
 			// if not writing a "halt", set the bank
 			if (!(data & 1))
 			{
-				es5503_set_base(device, memory_region(device->machine, "ensoniq") + ((data>>4)*0x10000));
+				es5503_set_base(device, device->machine->region("ensoniq")->base() + ((data>>4)*0x10000));
 			}
 		}
 	}
@@ -320,7 +320,7 @@ static const es5503_interface es5503_intf =
 static MACHINE_RESET(mquake)
 {
 	/* set ES5503 wave memory (this is banked in 64k increments) */
-	es5503_set_base(machine->device("ensoniq"), memory_region(machine, "ensoniq"));
+	es5503_set_base(machine->device("ensoniq"), machine->region("ensoniq")->base());
 
 	MACHINE_RESET_CALL(amiga);
 }
@@ -461,7 +461,7 @@ static DRIVER_INIT(mquake)
 
 	/* set up memory */
 	memory_configure_bank(machine, "bank1", 0, 1, state->chip_ram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "user1"), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, machine->region("user1")->base(), 0);
 }
 
 

@@ -74,7 +74,7 @@ static DEVICE_START( mjkjidai_adpcm )
 
 	state->playing = 0;
 	state->stream = stream_create(device, 0, 1, device->clock(), state, mjkjidai_adpcm_callback);
-	state->base = memory_region(machine, "adpcm");
+	state->base = machine->region("adpcm")->base();
 	state->adpcm.reset();
 }
 

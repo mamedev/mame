@@ -68,8 +68,8 @@ PALETTE_INIT( zaxxon )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	const UINT8 *source = memory_region(machine, "tilemap_dat");
-	int size = memory_region_length(machine, "tilemap_dat") / 2;
+	const UINT8 *source = machine->region("tilemap_dat")->base();
+	int size = machine->region("tilemap_dat")->bytes() / 2;
 	int eff_index = tile_index & (size - 1);
 	int code = source[eff_index] + 256 * (source[eff_index + size] & 3);
 	int color = source[eff_index + size] >> 4;

@@ -1413,7 +1413,7 @@ static DRIVER_INIT( trackfld )
 static DRIVER_INIT( atlantol )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	UINT8 *decrypt;
 	int A;
 
@@ -1442,7 +1442,7 @@ static DRIVER_INIT( atlantol )
 
 static DRIVER_INIT( mastkin )
 {
-	UINT8 *prom = memory_region(machine, "proms");
+	UINT8 *prom = machine->region("proms")->base();
 	int i;
 
 	/* build a fake palette so the screen won't be all black */
@@ -1463,14 +1463,14 @@ static DRIVER_INIT( mastkin )
 
 static DRIVER_INIT( wizzquiz )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu") + 0xe000;
+	UINT8 *ROM = machine->region("maincpu")->base() + 0xe000;
 	int i;
 
 	/* decrypt program rom */
 	for (i = 0; i < 0x2000; i++)
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 
-	ROM = memory_region(machine, "user1");
+	ROM = machine->region("user1")->base();
 
 	/* decrypt questions roms */
 	for (i = 0; i < 0x40000; i++)

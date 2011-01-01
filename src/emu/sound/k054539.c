@@ -457,7 +457,7 @@ static void k054539_init_chip(device_t *device, k054539_state *info)
 	info->cur_ptr = 0;
 	memset(info->ram, 0, 0x4000*2+device->clock()/50*2);
 
-	const region_info *region = (info->intf->rgnoverride != NULL) ? device->machine->region(info->intf->rgnoverride) : device->region();
+	const memory_region *region = (info->intf->rgnoverride != NULL) ? device->machine->region(info->intf->rgnoverride) : device->region();
 	info->rom = *region;
 	info->rom_size = region->bytes();
 	info->rom_mask = 0xffffffffU;

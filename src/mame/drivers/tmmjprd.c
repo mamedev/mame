@@ -264,7 +264,7 @@ static void ttmjprd_draw_tilemap(running_machine *machine, bitmap_t *bitmap, con
 
 static VIDEO_UPDATE( tmmjprd )
 {
-	UINT8* gfxroms = memory_region(screen->machine,"gfx2");
+	UINT8* gfxroms = screen->machine->region("gfx2")->base();
 	device_t *left_screen  = screen->machine->device("lscreen");
 	device_t *right_screen = screen->machine->device("rscreen");
 
@@ -354,7 +354,7 @@ static TIMER_CALLBACK( tmmjprd_blit_done )
 
 static void tmmjprd_do_blit(running_machine *machine)
 {
-	UINT8 *blt_data = memory_region(machine, "gfx1");
+	UINT8 *blt_data = machine->region("gfx1")->base();
 	int blt_source = (tmmjprd_blitterregs[0]&0x000fffff)>>0;
 	int blt_column = (tmmjprd_blitterregs[1]&0x00ff0000)>>16;
 	int blt_line   = (tmmjprd_blitterregs[1]&0x000000ff);

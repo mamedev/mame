@@ -353,7 +353,7 @@ static UINT32 *rom_base;
 
 static MACHINE_RESET( cojag )
 {
-	UINT8 *rom = memory_region(machine, "user2");
+	UINT8 *rom = machine->region("user2")->base();
 
 	/* 68020 only: copy the interrupt vectors into RAM */
 	if (!cojag_is_r3000)
@@ -435,7 +435,7 @@ static WRITE32_HANDLER( misc_control_w )
 	}
 
 	/* adjust banking */
-	if (memory_region(space->machine, "user2"))
+	if (space->machine->region("user2")->base())
 	{
 		memory_set_bank(space->machine, "bank2", (data >> 1) & 7);
 		memory_set_bank(space->machine, "bank9", (data >> 1) & 7);
@@ -501,7 +501,7 @@ static WRITE32_HANDLER( latch_w )
 	logerror("%08X:latch_w(%X)\n", cpu_get_previouspc(space->cpu), data);
 
 	/* adjust banking */
-	if (memory_region(space->machine, "user2"))
+	if (space->machine->region("user2")->base())
 	{
 		if (cojag_is_r3000)
 			memory_set_bank(space->machine, "bank1", data & 1);

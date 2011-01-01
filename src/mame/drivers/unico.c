@@ -98,7 +98,7 @@ static WRITE16_HANDLER( zeropnt_sound_bank_w )
            contains garbage. Indeed, only banks 0&1 are used */
 
 		int bank = (data >> 8 ) & 1;
-		UINT8 *dst	= memory_region(space->machine, "oki");
+		UINT8 *dst	= space->machine->region("oki")->base();
 		UINT8 *src	= dst + 0x80000 + 0x20000 + 0x20000 * bank;
 		memcpy(dst + 0x20000, src, 0x20000);
 
@@ -194,7 +194,7 @@ static WRITE32_HANDLER( zeropnt2_sound_bank_w )
 	if (ACCESSING_BITS_24_31)
 	{
 		int bank = ((data >> 24) & 3) % 4;
-		UINT8 *dst	= memory_region(space->machine, "oki1");
+		UINT8 *dst	= space->machine->region("oki1")->base();
 		UINT8 *src	= dst + 0x80000 + 0x20000 + 0x20000 * bank;
 		memcpy(dst + 0x20000, src, 0x20000);
 	}

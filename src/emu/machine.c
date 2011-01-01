@@ -616,15 +616,15 @@ void running_machine::resume()
 //  region_alloc - allocates memory for a region
 //-------------------------------------------------
 
-region_info *running_machine::region_alloc(const char *name, UINT32 length, UINT32 flags)
+memory_region *running_machine::region_alloc(const char *name, UINT32 length, UINT32 flags)
 {
     // make sure we don't have a region of the same name; also find the end of the list
-    region_info *info = m_regionlist.find(name);
+    memory_region *info = m_regionlist.find(name);
     if (info != NULL)
 		fatalerror("region_alloc called with duplicate region name \"%s\"\n", name);
 
 	// allocate the region
-	return m_regionlist.append(name, auto_alloc(this, region_info(*this, name, length, flags)));
+	return m_regionlist.append(name, auto_alloc(this, memory_region(*this, name, length, flags)));
 }
 
 
@@ -898,10 +898,10 @@ void running_machine::logfile_callback(running_machine &machine, const char *buf
 ***************************************************************************/
 
 //-------------------------------------------------
-//  region_info - constructor
+//  memory_region - constructor
 //-------------------------------------------------
 
-region_info::region_info(running_machine &machine, const char *name, UINT32 length, UINT32 flags)
+memory_region::memory_region(running_machine &machine, const char *name, UINT32 length, UINT32 flags)
 	: m_machine(machine),
 	  m_next(NULL),
 	  m_name(name),
@@ -913,10 +913,10 @@ region_info::region_info(running_machine &machine, const char *name, UINT32 leng
 
 
 //-------------------------------------------------
-//  ~region_info - destructor
+//  ~memory_region - destructor
 //-------------------------------------------------
 
-region_info::~region_info()
+memory_region::~memory_region()
 {
 	auto_free(&m_machine, m_base.v);
 }
@@ -1188,7 +1188,7 @@ void driver_device::device_start()
 
 	// call palette_init if present
 	if (m_config.m_palette_init != NULL)
-		(*m_config.m_palette_init)(&m_machine, memory_region(machine, "proms"));
+		(*m_config.m_palette_init)(&m_machine, machine->region("proms")->base());
 
 	// start the various pieces
 	driver_start();

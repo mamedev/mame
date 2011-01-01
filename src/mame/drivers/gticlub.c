@@ -1184,14 +1184,14 @@ static DRIVER_INIT(gticlub)
 	sharc_dataram_0 = auto_alloc_array(machine, UINT32, 0x100000/4);
 	gticlub_led_reg0 = gticlub_led_reg1 = 0x7f;
 
-	K001005_preprocess_texture_data(memory_region(machine, "gfx1"), memory_region_length(machine, "gfx1"), 1);
+	K001005_preprocess_texture_data(machine->region("gfx1")->base(), machine->region("gfx1")->bytes(), 1);
 }
 
 static DRIVER_INIT(hangplt)
 {
 	init_konami_cgboard(machine, 2, CGBOARD_TYPE_HANGPLT);
-	set_cgboard_texture_bank(machine, 0, "bank5", memory_region(machine, "user5"));
-	set_cgboard_texture_bank(machine, 1, "bank6", memory_region(machine, "user5"));
+	set_cgboard_texture_bank(machine, 0, "bank5", machine->region("user5")->base());
+	set_cgboard_texture_bank(machine, 1, "bank6", machine->region("user5")->base());
 
 	sharc_dataram_0 = auto_alloc_array(machine, UINT32, 0x100000/4);
 	sharc_dataram_1 = auto_alloc_array(machine, UINT32, 0x100000/4);

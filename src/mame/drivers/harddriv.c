@@ -3921,7 +3921,7 @@ static void init_ds3(running_machine *machine)
 static void init_dsk(running_machine *machine)
 {
 	harddriv_state *state = machine->driver_data<harddriv_state>();
-	UINT8 *usr3 = memory_region(machine, "user3");
+	UINT8 *usr3 = machine->region("user3")->base();
 
 	/* install ASIC61 */
 	memory_install_readwrite16_handler(cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM), 0x85c000, 0x85c7ff, 0, 0, hd68k_dsk_dsp32_r, hd68k_dsk_dsp32_w);
@@ -3955,7 +3955,7 @@ static void init_dsk(running_machine *machine)
 static void init_dsk2(running_machine *machine)
 {
 	harddriv_state *state = machine->driver_data<harddriv_state>();
-	UINT8 *usr3 = memory_region(machine, "user3");
+	UINT8 *usr3 = machine->region("user3")->base();
 
 	/* install ASIC65 */
 	memory_install_write16_handler(cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM), 0x824000, 0x824003, 0, 0, asic65_data_w);

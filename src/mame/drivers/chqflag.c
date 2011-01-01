@@ -46,7 +46,7 @@ static WRITE8_HANDLER( chqflag_bankswitch_w )
 {
 	chqflag_state *state = space->machine->driver_data<chqflag_state>();
 	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	UINT8 *RAM = space->machine->region("maincpu")->base();
 
 	/* bits 0-4 = ROM bank # (0x00-0x11) */
 	bankaddress = 0x10000 + (data & 0x1f) * 0x4000;
@@ -355,7 +355,7 @@ static const k051316_interface chqflag_k051316_intf_2 =
 static MACHINE_START( chqflag )
 {
 	chqflag_state *state = machine->driver_data<chqflag_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x2000);
 

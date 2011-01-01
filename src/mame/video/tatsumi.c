@@ -980,7 +980,7 @@ static void draw_bg(running_machine *machine, bitmap_t *dst, tilemap_t *src, con
         Each tile (0x4000 of them) has a lookup table in ROM to build an individual 3-bit palette
         from sets of 8 bit palettes!
     */
-	const UINT8* tile_cluts = memory_region(machine, "gfx4");
+	const UINT8* tile_cluts = machine->region("gfx4")->base();
 	const bitmap_t *src_bitmap = tilemap_get_pixmap(src);
 	int src_y_mask=ysize-1;
 	int src_x_mask=xsize-1;
@@ -1014,7 +1014,7 @@ static void draw_bg(running_machine *machine, bitmap_t *dst, tilemap_t *src, con
 static void draw_ground(running_machine *machine, bitmap_t *dst, const rectangle *cliprect)
 {
 	int x, y;
-	const UINT8 *lut = memory_region(machine, "proms");
+	const UINT8 *lut = machine->region("proms")->base();
 
 	UINT16 gva = 0x180; // TODO
 	UINT8 sky_val = apache3_rotate_ctrl[1] & 0xff;

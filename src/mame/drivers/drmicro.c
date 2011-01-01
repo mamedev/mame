@@ -46,7 +46,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 static void pcm_w(device_t *device)
 {
 	drmicro_state *state = device->machine->driver_data<drmicro_state>();
-	UINT8 *PCM = memory_region(device->machine, "adpcm");
+	UINT8 *PCM = device->machine->region("adpcm")->base();
 
 	int data = PCM[state->pcm_adr / 2];
 

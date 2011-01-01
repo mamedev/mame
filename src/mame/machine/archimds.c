@@ -119,7 +119,7 @@ static TIMER_CALLBACK( vidc_vblank )
 static TIMER_CALLBACK( vidc_video_tick )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	static UINT8 *vram = memory_region(machine,"vram");
+	static UINT8 *vram = machine->region("vram")->base();
 	UINT32 size;
 
 	size = vidc_vidend-vidc_vidstart+0x10;
@@ -257,7 +257,7 @@ READ32_HANDLER(archimedes_memc_logical_r)
 	{
 		UINT32 *rom;
 
-		rom = (UINT32 *)memory_region(space->machine, "maincpu");
+		rom = (UINT32 *)space->machine->region("maincpu")->base();
 
 		return rom[offset & 0x1fffff];
 	}

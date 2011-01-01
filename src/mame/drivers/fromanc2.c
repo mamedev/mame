@@ -536,9 +536,9 @@ static MACHINE_START( fromanc2 )
 {
 	fromanc2_state *state = machine->driver_data<fromanc2_state>();
 
-	memory_configure_bank(machine, "bank1", 0, 4, memory_region(machine, "sub"), 0x4000);
-	memory_configure_bank(machine, "bank2", 0, 1, memory_region(machine, "sub") + 0x08000, 0x4000);
-	memory_configure_bank(machine, "bank2", 1, 3, memory_region(machine, "sub") + 0x14000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 4, machine->region("sub")->base(), 0x4000);
+	memory_configure_bank(machine, "bank2", 0, 1, machine->region("sub")->base() + 0x08000, 0x4000);
+	memory_configure_bank(machine, "bank2", 1, 3, machine->region("sub")->base() + 0x14000, 0x4000);
 
 	MACHINE_START_CALL(fromanc4);
 

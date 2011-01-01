@@ -69,7 +69,7 @@ static WRITE8_HANDLER( sc0_cram )
 
 static WRITE8_HANDLER( d9final_bank_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 	UINT32 bankaddress;
 
 	bankaddress = 0x10000+(0x4000 * (data & 0x7));
@@ -250,7 +250,7 @@ GFXDECODE_END
 
 static MACHINE_RESET( d9final )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	memory_set_bankptr(machine, "bank1", &ROM[0x10000]);
 }

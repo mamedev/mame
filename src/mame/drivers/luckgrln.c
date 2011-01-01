@@ -844,7 +844,7 @@ static DRIVER_INIT( luckgrln )
 {
 	int i;
 	UINT8 x,v;
-	UINT8* rom = memory_region(machine,"rom_data");
+	UINT8* rom = machine->region("rom_data")->base();
 
 	for (i=0;i<0x20000;i++)
 	{

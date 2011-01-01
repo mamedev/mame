@@ -307,7 +307,7 @@ static VIDEO_UPDATE(go2000)
 static MACHINE_START( go2000 )
 {
 	go2000_state *state = machine->driver_data<go2000_state>();
-	UINT8 *SOUND = memory_region(machine, "soundcpu");
+	UINT8 *SOUND = machine->region("soundcpu")->base();
 	int i;
 
 	for (i = 0; i < 8; i++)

@@ -2990,9 +2990,9 @@ static MACHINE_START( bshark )
 
 static MACHINE_START( taitoz )
 {
-	int banks = (memory_region_length(machine, "audiocpu") - 0xc000) / 0x4000;
+	int banks = (machine->region("audiocpu")->bytes() - 0xc000) / 0x4000;
 
-	memory_configure_bank(machine, "bank10", 0, banks, memory_region(machine, "audiocpu") + 0xc000, 0x4000);
+	memory_configure_bank(machine, "bank10", 0, banks, machine->region("audiocpu")->base() + 0xc000, 0x4000);
 
 	state_save_register_postload(machine, taitoz_postload, NULL);
 

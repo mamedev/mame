@@ -65,7 +65,7 @@ static void pzlestar_map_banks(running_machine *machine)
 		case 2:
 			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1");
 			memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0);
-			memory_set_bankptr(machine, "bank1", memory_region(machine, "user1")+ 0x10000);
+			memory_set_bankptr(machine, "bank1", machine->region("user1")->base()+ 0x10000);
 			break;
 		case 1:
 		case 3:
@@ -87,12 +87,12 @@ static void pzlestar_map_banks(running_machine *machine)
 		case 2:
 			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, "bank2");
 			memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0);
-			memory_set_bankptr(machine, "bank2", memory_region(machine, "user1")+ 0x18000);
+			memory_set_bankptr(machine, "bank2", machine->region("user1")->base()+ 0x18000);
 			break;
 		case 3:
 			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, "bank2");
 			memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0);
-			memory_set_bankptr(machine, "bank2", memory_region(machine, "user1")+ 0x20000 + (pzlestar_rom_bank*0x8000) + 0x4000);
+			memory_set_bankptr(machine, "bank2", machine->region("user1")->base()+ 0x20000 + (pzlestar_rom_bank*0x8000) + 0x4000);
 			break;
 		case 1:
 			memory_unmap_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0);
@@ -113,7 +113,7 @@ static void pzlestar_map_banks(running_machine *machine)
 		case 3:
 			memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, "bank3");
 			memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0);
-			memory_set_bankptr(machine, "bank3", memory_region(machine, "user1")+ 0x20000 + (pzlestar_rom_bank*0x8000));
+			memory_set_bankptr(machine, "bank3", machine->region("user1")->base()+ 0x20000 + (pzlestar_rom_bank*0x8000));
 			break;
 		case 1:
 		case 2:
@@ -183,18 +183,18 @@ static void sexyboom_map_bank(running_machine *machine, int bank)
 		else
 		{
 			// rom 0
-			memory_set_bankptr(machine, read_bank_name, memory_region(machine, "user1")+0x4000*banknum);
+			memory_set_bankptr(machine, read_bank_name, machine->region("user1")->base()+0x4000*banknum);
 			memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), bank*0x4000, (bank+1)*0x4000 - 1, 0, 0);
 		}
 	}
 	else if (banktype == 0x82)
 	{
-		memory_set_bankptr(machine, read_bank_name, memory_region(machine, "user1")+0x20000+banknum*0x4000);
+		memory_set_bankptr(machine, read_bank_name, machine->region("user1")->base()+0x20000+banknum*0x4000);
 		memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), bank*0x4000, (bank+1)*0x4000 - 1, 0, 0);
 	}
 	else if (banktype == 0x80)
 	{
-		memory_set_bankptr(machine, read_bank_name, memory_region(machine, "user1")+0x120000+banknum*0x4000);
+		memory_set_bankptr(machine, read_bank_name, machine->region("user1")->base()+0x120000+banknum*0x4000);
 		memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), bank*0x4000, (bank+1)*0x4000 - 1, 0, 0);
 	}
 	else

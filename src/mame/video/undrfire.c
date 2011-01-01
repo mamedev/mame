@@ -78,7 +78,7 @@ Heavy use is made of sprite zooming.
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,const int *primasks,int x_offs,int y_offs)
 {
 	UINT32 *spriteram32 = machine->generic.spriteram.u32;
-	UINT16 *spritemap = (UINT16 *)memory_region(machine, "user1");
+	UINT16 *spritemap = (UINT16 *)machine->region("user1")->base();
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, dblsize, curx, cury;
 	int sprites_flipscreen = 0;
@@ -221,8 +221,8 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 static void draw_sprites_cbombers(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,const int *primasks,int x_offs,int y_offs)
 {
 	UINT32 *spriteram32 = machine->generic.spriteram.u32;
-	UINT16 *spritemap = (UINT16 *)memory_region(machine, "user1");
-	UINT8 *spritemapHibit = (UINT8 *)memory_region(machine, "user2");
+	UINT16 *spritemap = (UINT16 *)machine->region("user1")->base();
+	UINT8 *spritemapHibit = (UINT8 *)machine->region("user2")->base();
 
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, dblsize, curx, cury;

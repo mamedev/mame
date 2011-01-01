@@ -183,7 +183,7 @@ static READ8_HANDLER( quizpun2_protection_r )
 
 		case STATE_EEPROM_R:		// EEPROM read
 		{
-			UINT8 *eeprom = memory_region(space->machine, "eeprom");
+			UINT8 *eeprom = space->machine->region("eeprom")->base();
 			ret = eeprom[prot.addr];
 			break;
 		}
@@ -208,7 +208,7 @@ static WRITE8_HANDLER( quizpun2_protection_w )
 	{
 		case STATE_EEPROM_W:
 		{
-			UINT8 *eeprom = memory_region(space->machine, "eeprom");
+			UINT8 *eeprom = space->machine->region("eeprom")->base();
 			eeprom[prot.addr] = data;
 			prot.addr++;
 			if ((prot.addr % 8) == 0)
@@ -275,7 +275,7 @@ static WRITE8_HANDLER( quizpun2_protection_w )
 
 static WRITE8_HANDLER( quizpun2_rombank_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	UINT8 *ROM = space->machine->region("maincpu")->base();
 	memory_set_bankptr(space->machine,  "bank1", &ROM[ 0x10000 + 0x2000 * (data & 0x1f) ] );
 }
 

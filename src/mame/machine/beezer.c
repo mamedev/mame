@@ -116,7 +116,7 @@ WRITE8_HANDLER( beezer_bankswitch_w )
 	}
 	else
 	{
-		UINT8 *rom = memory_region(space->machine, "maincpu") + 0x10000;
+		UINT8 *rom = space->machine->region("maincpu")->base() + 0x10000;
 		memory_install_ram(space, 0xc000, 0xcfff, 0, 0, rom + (data & 0x07) * 0x2000 + ((data & 0x08) ? 0x1000: 0));
 	}
 }

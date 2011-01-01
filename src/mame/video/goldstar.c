@@ -423,7 +423,7 @@ VIDEO_UPDATE( goldstar )
 
 	if (state->cm_enable_reg &0x04)
 	{
-		if (memory_region(screen->machine,"user1"))
+		if (screen->machine->region("user1")->base())
 		{
 			const gfx_element *gfx = screen->machine->gfx[2];
 			int girlyscroll = (INT8)((state->cm_girl_scroll & 0xf0));

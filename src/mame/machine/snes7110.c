@@ -274,7 +274,7 @@ static void SPC7110Decomp_write(SPC7110Decomp *thisptr, UINT8 data)
 
 static UINT8 SPC7110Decomp_dataread(SPC7110Decomp *thisptr)
 {
-	UINT8 *ROM = memory_region(thisptr->machine, "cart");
+	UINT8 *ROM = thisptr->machine->region("cart")->base();
 	UINT32 size = thisptr->rom_size - 0x100000;
 	while(thisptr->decomp_offset >= size)
 	{
@@ -1069,7 +1069,7 @@ static void spc7110_update_time(running_machine *machine, UINT8 offset)
 static UINT8 spc7110_mmio_read(address_space *space, UINT32 addr)
 {
 	running_machine *machine = space->machine;
-	UINT8 *ROM = memory_region(machine, "cart");
+	UINT8 *ROM = machine->region("cart")->base();
 
 	addr &= 0xffff;
 
@@ -1255,7 +1255,7 @@ static UINT8 spc7110_mmio_read(address_space *space, UINT32 addr)
 
 static void spc7110_mmio_write(running_machine *machine, UINT32 addr, UINT8 data)
 {
-	UINT8 *ROM = memory_region(machine, "cart");
+	UINT8 *ROM = machine->region("cart")->base();
 
 	addr &= 0xffff;
 
@@ -1641,7 +1641,7 @@ static void spc7110_mmio_write(running_machine *machine, UINT32 addr, UINT8 data
 
 static UINT8 spc7110_bank7_read(address_space *space, UINT32 offset)
 {
-	UINT8 *ROM = memory_region(space->machine, "cart");
+	UINT8 *ROM = space->machine->region("cart")->base();
 	UINT32 addr = offset & 0x0fffff;
 
 	switch (offset & 0xf00000)

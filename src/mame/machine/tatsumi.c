@@ -301,7 +301,7 @@ WRITE16_HANDLER(cyclwarr_control_w)
 
 READ16_HANDLER( tatsumi_v30_68000_r )
 {
-	const UINT16* rom=(UINT16*)memory_region(space->machine, "sub");
+	const UINT16* rom=(UINT16*)space->machine->region("sub")->base();
 
 logerror("%05X:68000_r(%04X),cw=%04X\n", cpu_get_pc(space->cpu), offset*2, tatsumi_control_word);
 	/* Read from 68k RAM */
@@ -310,7 +310,7 @@ logerror("%05X:68000_r(%04X),cw=%04X\n", cpu_get_pc(space->cpu), offset*2, tatsu
 		// hack to make roundup 5 boot
 		if (cpu_get_pc(space->cpu)==0xec575)
 		{
-			UINT8 *dst = memory_region(space->machine, "maincpu");
+			UINT8 *dst = space->machine->region("maincpu")->base();
 			dst[BYTE_XOR_LE(0xec57a)]=0x46;
 			dst[BYTE_XOR_LE(0xec57b)]=0x46;
 

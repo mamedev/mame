@@ -6785,9 +6785,9 @@ static const UINT32 dirtypig_key = 0xc194f;
 
 static DRIVER_INIT( atomiswave )
 {
-	UINT64 *ROM = (UINT64 *)memory_region(machine, "awflash");
+	UINT64 *ROM = (UINT64 *)machine->region("awflash")->base();
 #if 0
-	UINT8 *dcdata = (UINT8 *)memory_region(machine, "user1");
+	UINT8 *dcdata = (UINT8 *)machine->region("user1")->base();
 	FILE *f;
 
 	f = fopen("aw.bin", "wb");
@@ -6804,8 +6804,8 @@ static DRIVER_INIT( atomiswave )
 static DRIVER_INIT(DRIVER)	\
 {	\
 	int i;	\
-	UINT16 *src = (UINT16 *)(memory_region(machine, "user1"));	\
-	int rom_size = memory_region_length(machine, "user1");	\
+	UINT16 *src = (UINT16 *)(machine->region("user1")->base());	\
+	int rom_size = machine->region("user1")->bytes();	\
 	for(i=0; i<rom_size/2; i++)	\
 	{	\
 		src[i] = atomiswave_decrypt(src[i], i*2, DRIVER##_key);	\

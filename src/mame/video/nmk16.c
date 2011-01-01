@@ -660,7 +660,7 @@ VIDEO_UPDATE( gunnail )
 
 VIDEO_UPDATE( bioship )
 {
-	UINT16 *tilerom = (UINT16 *)memory_region(screen->machine, "gfx5");
+	UINT16 *tilerom = (UINT16 *)screen->machine->region("gfx5")->base();
 	int scrollx=-(bioship_scroll[1] + bioship_scroll[0]*256);
 	int scrolly=-(bioship_scroll[3] + bioship_scroll[2]*256);
 

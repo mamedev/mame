@@ -443,7 +443,7 @@ WRITE32_HANDLER( micro3d_mac2_w )
 		case 0x08:
 		{
 			int i;
-			const UINT16 *rom = (UINT16*)memory_region(space->machine, "vertex");
+			const UINT16 *rom = (UINT16*)space->machine->region("vertex")->base();
 
 			for (i = 0; i <= cnt; ++i)
 			{
@@ -482,7 +482,7 @@ WRITE32_HANDLER( micro3d_mac2_w )
 		case 0x0c:
 		{
 			int i;
-			const UINT16 *rom = (UINT16*)memory_region(space->machine, "vertex");
+			const UINT16 *rom = (UINT16*)space->machine->region("vertex")->base();
 
 			for (i = 0; i <= cnt; ++i)
 			{
@@ -515,7 +515,7 @@ WRITE32_HANDLER( micro3d_mac2_w )
 		case 0x0f:
 		{
 			int i;
-			const UINT16 *rom = (UINT16*)memory_region(space->machine, "vertex");
+			const UINT16 *rom = (UINT16*)space->machine->region("vertex")->base();
 
 			for (i = 0; i <= cnt; ++i, vtx_addr += 4)
 			{

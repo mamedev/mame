@@ -10,8 +10,8 @@
 #include "includes/exedexes.h"
 
 
-#define TileMap(offs) (memory_region(machine, "gfx5")[offs])
-#define BackTileMap(offs) (memory_region(machine, "gfx5")[offs+0x4000])
+#define TileMap(offs) (machine->region("gfx5")->base()[offs])
+#define BackTileMap(offs) (machine->region("gfx5")->base()[offs+0x4000])
 
 
 /***************************************************************************
@@ -132,7 +132,7 @@ WRITE8_HANDLER( exedexes_gfxctrl_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT8 *tilerom = memory_region(machine, "gfx5");
+	UINT8 *tilerom = machine->region("gfx5")->base();
 
 	int attr = tilerom[tile_index];
 	int code = attr & 0x3f;
@@ -144,7 +144,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int code = memory_region(machine, "gfx5")[tile_index];
+	int code = machine->region("gfx5")->base()[tile_index];
 
 	SET_TILE_INFO(2, code, 0, 0);
 }

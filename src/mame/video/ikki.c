@@ -128,7 +128,7 @@ VIDEO_UPDATE( ikki )
 {
 	ikki_state *state = screen->machine->driver_data<ikki_state>();
 	offs_t offs;
-	UINT8 *VIDEOATTR = memory_region(screen->machine, "user1");
+	UINT8 *VIDEOATTR = screen->machine->region("user1")->base();
 
 	/* draw bg layer */
 

@@ -262,9 +262,9 @@ static WRITE32_HANDLER( Banksw_w )
 
 	state->Bank = (data >> 1) & 7;
 	if (state->Bank <= 2)
-		memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "user1") + state->Bank * 0x1000000);
+		memory_set_bankptr(space->machine, "bank1", space->machine->region("user1")->base() + state->Bank * 0x1000000);
 	else
-		memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "user2"));
+		memory_set_bankptr(space->machine, "bank1", space->machine->region("user2")->base());
 }
 
 static TIMER_CALLBACK( Timercb )
@@ -349,7 +349,7 @@ static READ32_HANDLER( FlashCmd_r )
 	{
 		if (state->Bank <= 2)
 		{
-			UINT32 *ptr = (UINT32*)(memory_region(space->machine, "user1") + state->Bank * 0x1000000);
+			UINT32 *ptr = (UINT32*)(space->machine->region("user1")->base() + state->Bank * 0x1000000);
 			return ptr[0];
 		}
 		else
@@ -553,9 +553,9 @@ static STATE_POSTLOAD( crystal_banksw_postload )
 	crystal_state *state = machine->driver_data<crystal_state>();
 
 	if (state->Bank <= 2)
-		memory_set_bankptr(machine, "bank1", memory_region(machine, "user1") + state->Bank * 0x1000000);
+		memory_set_bankptr(machine, "bank1", machine->region("user1")->base() + state->Bank * 0x1000000);
 	else
-		memory_set_bankptr(machine, "bank1", memory_region(machine, "user2"));
+		memory_set_bankptr(machine, "bank1", machine->region("user2")->base());
 }
 
 static MACHINE_START( crystal )
@@ -599,7 +599,7 @@ static MACHINE_RESET( crystal )
 	state->IntHigh = 0;
 	cpu_set_irq_callback(machine->device("maincpu"), icallback);
 	state->Bank = 0;
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1") + 0);
+	memory_set_bankptr(machine, "bank1", machine->region("user1")->base() + 0);
 	state->FlashCmd = 0xff;
 	state->OldPort4 = 0;
 
@@ -928,7 +928,7 @@ ROM_END
 
 static DRIVER_INIT(crysking)
 {
-	UINT16 *Rom = (UINT16*) memory_region(machine, "user1");
+	UINT16 *Rom = (UINT16*) machine->region("user1")->base();
 
 	//patch the data feed by the protection
 
@@ -947,7 +947,7 @@ static DRIVER_INIT(crysking)
 
 static DRIVER_INIT(evosocc)
 {
-	UINT16 *Rom = (UINT16*) memory_region(machine, "user1");
+	UINT16 *Rom = (UINT16*) machine->region("user1")->base();
 	Rom += 0x1000000 * 2 / 2;
 
 	Rom[WORD_XOR_LE(0x97388E/2)] = 0x90FC;	//PUSH R2..R7
@@ -965,7 +965,7 @@ static DRIVER_INIT(evosocc)
 
 static DRIVER_INIT(topbladv)
 {
-	UINT16 *Rom = (UINT16*) memory_region(machine, "user1");
+	UINT16 *Rom = (UINT16*) machine->region("user1")->base();
 
 	Rom[WORD_XOR_LE(0x12d7a/2)] = 0x90FC;	//PUSH R7-R6-R5-R4-R3-R2
 	Rom[WORD_XOR_LE(0x12d7c/2)] = 0x9001;	//PUSH R0
@@ -983,7 +983,7 @@ static DRIVER_INIT(topbladv)
 
 static DRIVER_INIT(officeye)
 {
-	UINT16 *Rom = (UINT16*) memory_region(machine, "user1");
+	UINT16 *Rom = (UINT16*) machine->region("user1")->base();
 
 	Rom[WORD_XOR_LE(0x9c9e/2)] = 0x901C;	//PUSH R4-R3-R2
 	Rom[WORD_XOR_LE(0x9ca0/2)] = 0x9001;	//PUSH R0

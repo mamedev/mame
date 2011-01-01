@@ -335,7 +335,7 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT( cabaret )
 {
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	int i;
 
 	/* decrypt the program ROM */

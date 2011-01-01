@@ -108,7 +108,7 @@ WRITE8_HANDLER(pitnrun_color_select_w)
 static void pitnrun_spotlights(running_machine *machine)
 {
 	int x,y,i,b,datapix;
-	UINT8 *ROM = memory_region(machine, "user1");
+	UINT8 *ROM = machine->region("user1")->base();
 	for(i=0;i<4;i++)
 	 for(y=0;y<128;y++)
 	  for(x=0;x<16;x++)
@@ -223,19 +223,19 @@ VIDEO_UPDATE( pitnrun )
 #ifdef MAME_DEBUG
 	if (input_code_pressed_once(screen->machine, KEYCODE_Q))
 	{
-		UINT8 *ROM = memory_region(screen->machine, "maincpu");
+		UINT8 *ROM = screen->machine->region("maincpu")->base();
 		ROM[0x84f6]=0; /* lap 0 - normal */
 	}
 
 	if (input_code_pressed_once(screen->machine, KEYCODE_W))
 	{
-		UINT8 *ROM = memory_region(screen->machine, "maincpu");
+		UINT8 *ROM = screen->machine->region("maincpu")->base();
 		ROM[0x84f6]=6; /* lap 6 = spotlight */
 	}
 
 	if (input_code_pressed_once(screen->machine, KEYCODE_E))
 	{
-		UINT8 *ROM = memory_region(screen->machine, "maincpu");
+		UINT8 *ROM = screen->machine->region("maincpu")->base();
 		ROM[0x84f6]=2; /* lap 3 (trial 2)= lightnings */
 		ROM[0x8102]=1;
 	}

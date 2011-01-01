@@ -203,7 +203,7 @@ GFXDECODE_END
 static MACHINE_START( funybubl )
 {
 	funybubl_state *state = machine->driver_data<funybubl_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	state->audiocpu = machine->device("audiocpu");
 

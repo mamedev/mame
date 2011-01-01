@@ -658,9 +658,9 @@ static UINT32 cps3_mask(UINT32 address, UINT32 key1, UINT32 key2)
 static void cps3_decrypt_bios(running_machine *machine)
 {
 	int i;
-	UINT32 *coderegion = (UINT32*)memory_region(machine, "user1");
+	UINT32 *coderegion = (UINT32*)machine->region("user1")->base();
 
-	decrypted_bios = (UINT32*)memory_region(machine, "user1");
+	decrypted_bios = (UINT32*)machine->region("user1")->base();
 
 	for (i=0;i<0x80000;i+=4)
 	{
@@ -690,8 +690,8 @@ static void cps3_decrypt_bios(running_machine *machine)
 static DRIVER_INIT( cps3 )
 {
 	// cache pointers to regions
-	cps3_user4region = memory_region(machine,"user4");
-	cps3_user5region = memory_region(machine,"user5");
+	cps3_user4region = machine->region("user4")->base();
+	cps3_user5region = machine->region("user5")->base();
 
 	if (!cps3_user4region) cps3_user4region = auto_alloc_array(machine, UINT8, USER4REGION_LENGTH);
 	if (!cps3_user5region) cps3_user5region = auto_alloc_array(machine, UINT8, USER5REGION_LENGTH);
@@ -3361,7 +3361,7 @@ ROM_END
 
     DEVELOPMENT VERSION add 0x70 mask!
 
-    UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
+    UINT32 *rom =  (UINT32*)machine->region ( "user1" )->base();
     rom[0x1fec8/4]^=0x00000001; // region hack (clear jpn)
 
     rom[0x1fec8/4]^=0x00000004; // region
@@ -3386,7 +3386,7 @@ ROM_END
 
     DEVELOPMENT VERSION add 0x70 mask!
 
-    UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
+    UINT32 *rom =  (UINT32*)machine->region ( "user1" )->base();
     rom[0x1fec8/4]^=0x00000001; // region (clear jpn)
     rom[0x1fec8/4]^=0x00000002; // region
     rom[0x1fec8/4]^=0x00000070; // DEV mode
@@ -3407,7 +3407,7 @@ ROM_END
     OCEANIA 7
     ASIA NCD 8
 
-    UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
+    UINT32 *rom =  (UINT32*)machine->region ( "user1" )->base();
     rom[0x1fed8/4]^=0x00000001; // clear region to 0 (invalid)
     rom[0x1fed8/4]^=0x00000008; // region 8 - ASIA NO CD - doesn't actually skip the CD
                                 // test on startup, only during game, must be another flag
@@ -3432,7 +3432,7 @@ ROM_END
 
     // bios rom also lists korea, but game rom does not.
 
-    UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
+    UINT32 *rom =  (UINT32*)machine->region ( "user1" )->base();
     rom[0x1fec8/4]^=0x00000001; // region (clear region)
     rom[0x1fec8/4]^=0x00000008; // region
     rom[0x1fecc/4]^=0x01000000; // nocd - this ONLY skips the cd check in the bios test
@@ -3454,7 +3454,7 @@ ROM_END
     OCEANIA 7
     ASIA 8
 
-    UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
+    UINT32 *rom =  (UINT32*)machine->region ( "user1" )->base();
     rom[0x1fec8/4]^=0x00000001; // region (clear region)
     rom[0x1fec8/4]^=0x00000008; // region
     rom[0x1fecc/4]^=0x01000000; // nocd - this ONLY skips the cd check in the bios test
@@ -3476,7 +3476,7 @@ ROM_END
     BRAZIL 6
     OCEANIA 7
 
-    UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
+    UINT32 *rom =  (UINT32*)machine->region ( "user1" )->base();
     rom[0x1fec8/4]^=0x00000004; // region (clear region)
     rom[0x1fec8/4]^=0x00000001; // region
     rom[0x1fecc/4]^=0x01000000; // nocd

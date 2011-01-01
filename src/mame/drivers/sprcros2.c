@@ -66,7 +66,7 @@ Notes:
 static WRITE8_HANDLER( sprcros2_m_port7_w )
 {
 	sprcros2_state *state = space->machine->driver_data<sprcros2_state>();
-	UINT8 *RAM = memory_region(space->machine, "master");
+	UINT8 *RAM = space->machine->region("master")->base();
 
 	//76543210
 	//x------- unused
@@ -88,7 +88,7 @@ static WRITE8_HANDLER( sprcros2_m_port7_w )
 static WRITE8_HANDLER( sprcros2_s_port3_w )
 {
 	sprcros2_state *state = space->machine->driver_data<sprcros2_state>();
-	UINT8 *RAM = memory_region(space->machine, "slave");
+	UINT8 *RAM = space->machine->region("slave")->base();
 
 	//76543210
 	//xxxx---- unused

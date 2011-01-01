@@ -1872,7 +1872,7 @@ DRIVER_INIT( snes )
 	UINT16 total_blocks, read_blocks;
 	UINT8 *rom;
 
-	rom = memory_region(machine, "user3");
+	rom = machine->region("user3")->base();
 	snes_ram = auto_alloc_array_clear(machine, UINT8, 0x1400000);
 
 	/* all NSS games seem to use MODE 20 */
@@ -1881,7 +1881,7 @@ DRIVER_INIT( snes )
 	state->has_addon_chip = HAS_NONE;
 
 	/* Find the number of blocks in this ROM */
-	total_blocks = (memory_region_length(machine, "user3") / 0x8000);
+	total_blocks = (machine->region("user3")->bytes() / 0x8000);
 	read_blocks = 0;
 
 	/* Loading all the data blocks from cart, we only partially cover banks 0x00 to 0x7f. Therefore, we
@@ -1938,7 +1938,7 @@ DRIVER_INIT( snes_hirom )
 	UINT16 total_blocks, read_blocks;
 	UINT8  *rom;
 
-	rom = memory_region(machine, "user3");
+	rom = machine->region("user3")->base();
 	snes_ram = auto_alloc_array(machine, UINT8, 0x1400000);
 	memset(snes_ram, 0, 0x1400000);
 
@@ -1947,7 +1947,7 @@ DRIVER_INIT( snes_hirom )
 	state->has_addon_chip = HAS_NONE;
 
 	/* Find the number of blocks in this ROM */
-	total_blocks = (memory_region_length(machine, "user3") / 0x10000);
+	total_blocks = (machine->region("user3")->bytes() / 0x10000);
 	read_blocks = 0;
 
 	/* See above for details about the way we fill banks 0x00 to 0x7f */

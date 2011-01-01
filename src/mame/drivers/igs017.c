@@ -144,8 +144,8 @@ static int sprites_gfx_size;
 // This routine expands each word into three bytes.
 static void expand_sprites(running_machine *machine)
 {
-	UINT8 *rom	=	memory_region(machine, "sprites");
-	int size	=	memory_region_length(machine, "sprites");
+	UINT8 *rom	=	machine->region("sprites")->base();
+	int size	=	machine->region("sprites")->bytes();
 	int i;
 
 	sprites_gfx_size	=	size / 2 * 3;
@@ -341,8 +341,8 @@ static VIDEO_UPDATE( igs017 )
 
 static void decrypt_program_rom(running_machine *machine, int mask, int a7, int a6, int a5, int a4, int a3, int a2, int a1, int a0)
 {
-	int length = memory_region_length(machine, "maincpu");
-	UINT8 *rom = memory_region(machine, "maincpu");
+	int length = machine->region("maincpu")->bytes();
+	UINT8 *rom = machine->region("maincpu")->base();
 	UINT8 *tmp = auto_alloc_array(machine, UINT8, length);
 	int i;
 
@@ -394,7 +394,7 @@ static void decrypt_program_rom(running_machine *machine, int mask, int a7, int 
 
 static void iqblocka_patch_rom(running_machine *machine)
 {
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 //  rom[0x7b64] = 0xc9;
 
@@ -435,8 +435,8 @@ static DRIVER_INIT( iqblockf )
 
 static void tjsb_decrypt_sprites(running_machine *machine)
 {
-	int length = memory_region_length(machine, "sprites");
-	UINT8 *rom = memory_region(machine, "sprites");
+	int length = machine->region("sprites")->bytes();
+	UINT8 *rom = machine->region("sprites")->base();
 	UINT8 *tmp = auto_alloc_array(machine, UINT8, length);
 	int i;
 
@@ -465,7 +465,7 @@ static void tjsb_decrypt_sprites(running_machine *machine)
 
 static void tjsb_patch_rom(running_machine *machine)
 {
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	rom[0x011df] = 0x18;
 }
 
@@ -483,7 +483,7 @@ static DRIVER_INIT( tjsb )
 static void mgcs_decrypt_program_rom(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *src = (UINT16 *)machine->region("maincpu")->base();
 
 	int rom_size = 0x80000;
 
@@ -532,8 +532,8 @@ static void mgcs_decrypt_program_rom(running_machine *machine)
 
 static void mgcs_decrypt_tiles(running_machine *machine)
 {
-	int length = memory_region_length(machine, "tilemaps");
-	UINT8 *rom = memory_region(machine, "tilemaps");
+	int length = machine->region("tilemaps")->bytes();
+	UINT8 *rom = machine->region("tilemaps")->base();
 	UINT8 *tmp = auto_alloc_array(machine, UINT8, length);
 	int i;
 
@@ -549,8 +549,8 @@ static void mgcs_decrypt_tiles(running_machine *machine)
 
 static void mgcs_flip_sprites(running_machine *machine)
 {
-	int length = memory_region_length(machine, "sprites");
-	UINT8 *rom = memory_region(machine, "sprites");
+	int length = machine->region("sprites")->bytes();
+	UINT8 *rom = machine->region("sprites")->base();
 	int i;
 
 	for (i = 0;i < length;i+=2)
@@ -570,7 +570,7 @@ static void mgcs_flip_sprites(running_machine *machine)
 
 static void mgcs_patch_rom(running_machine *machine)
 {
-	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
 
 	rom[0x4e036/2] = 0x6006;
 
@@ -596,7 +596,7 @@ static DRIVER_INIT( mgcs )
 // decryption is incomplete, the first part of code doesn't seem right.
 static DRIVER_INIT( tarzan )
 {
-	UINT16 *ROM = (UINT16 *)memory_region(machine,"maincpu");
+	UINT16 *ROM = (UINT16 *)machine->region("maincpu")->base();
 	int i;
 	int size = 0x40000;
 
@@ -622,7 +622,7 @@ static DRIVER_INIT( tarzan )
 // by iq_132
 static DRIVER_INIT( tarzana )
 {
-	UINT8 *ROM = memory_region(machine,"maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	int i;
 	int size = 0x80000;
 
@@ -644,7 +644,7 @@ static DRIVER_INIT( tarzana )
 // decryption is incomplete, the first part of code doesn't seem right.
 static DRIVER_INIT( starzan )
 {
-	UINT8 *ROM = memory_region(machine,"maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	int i;
 	int size = 0x040000;
 
@@ -699,7 +699,7 @@ static DRIVER_INIT( starzan )
 static DRIVER_INIT( sdmg2 )
 {
 	int i;
-	UINT16 *src = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *src = (UINT16 *)machine->region("maincpu")->base();
 
 	int rom_size = 0x80000;
 
@@ -756,7 +756,7 @@ static DRIVER_INIT( sdmg2 )
 static DRIVER_INIT( mgdh )
 {
 	int i;
-	UINT16 *src = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *src = (UINT16 *)machine->region("maincpu")->base();
 
 	int rom_size = 0x80000;
 
@@ -793,7 +793,7 @@ static DRIVER_INIT( mgdh )
 static DRIVER_INIT( lhzb2 )
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
+	UINT16 *src = (UINT16 *) (machine->region("maincpu")->base());
 
 	int rom_size = 0x80000;
 
@@ -883,7 +883,7 @@ static DRIVER_INIT( lhzb2 )
 static DRIVER_INIT( lhzb2a )
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
+	UINT16 *src = (UINT16 *) (machine->region("maincpu")->base());
 
 	int rom_size = 0x80000;
 
@@ -945,7 +945,7 @@ static DRIVER_INIT( lhzb2a )
 static DRIVER_INIT( slqz2 )
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
+	UINT16 *src = (UINT16 *) (machine->region("maincpu")->base());
 
 	int rom_size = 0x80000;
 

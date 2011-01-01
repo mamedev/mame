@@ -66,7 +66,7 @@ spriteram is being tested, take no notice of that.]
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const int *primasks, int y_offs )
 {
 	othunder_state *state = machine->driver_data<othunder_state>();
-	UINT16 *spritemap = (UINT16 *)memory_region(machine, "user1");
+	UINT16 *spritemap = (UINT16 *)machine->region("user1")->base();
 	UINT16 tile_mask = (machine->gfx[0]->total_elements) - 1;
 	UINT16 *spriteram16 = state->spriteram;
 	int offs, data, tilenum, color, flipx, flipy;

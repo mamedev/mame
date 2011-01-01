@@ -2921,7 +2921,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( sub_bankswitch_w )
 {
-	UINT8 *rom = memory_region(space->machine, "sub");
+	UINT8 *rom = space->machine->region("sub")->base();
 	int bank = data >> 4;
 
 	memory_set_bankptr(space->machine, "bank1", &rom[bank * 0x4000 + 0xc000]);
@@ -9914,7 +9914,7 @@ static DRIVER_INIT( arbalest )
 
 static DRIVER_INIT( metafox )
 {
-	UINT16 *RAM = (UINT16 *) memory_region(machine, "maincpu");
+	UINT16 *RAM = (UINT16 *) machine->region("maincpu")->base();
 
 	/* This game uses the 21c000-21ffff area for protection? */
 //  memory_nop_readwrite(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x21c000, 0x21ffff, 0, 0);
@@ -9937,7 +9937,7 @@ static DRIVER_INIT ( blandia )
 	rom_size = 0x80000;
 	buf = auto_alloc_array(machine, UINT8, rom_size);
 
-	rom = memory_region(machine, "gfx2") + 0x40000;
+	rom = machine->region("gfx2")->base() + 0x40000;
 
 	for (rpos = 0; rpos < rom_size/2; rpos++) {
 		buf[rpos+0x40000] = rom[rpos*2];
@@ -9946,7 +9946,7 @@ static DRIVER_INIT ( blandia )
 
 	memcpy( rom, buf, rom_size );
 
-	rom = memory_region(machine, "gfx3") + 0x40000;
+	rom = machine->region("gfx3")->base() + 0x40000;
 
 	for (rpos = 0; rpos < rom_size/2; rpos++) {
 		buf[rpos+0x40000] = rom[rpos*2];
@@ -9974,7 +9974,7 @@ static DRIVER_INIT( zombraid )
 
 static DRIVER_INIT( kiwame )
 {
-	UINT16 *RAM = (UINT16 *) memory_region(machine, "maincpu");
+	UINT16 *RAM = (UINT16 *) machine->region("maincpu")->base();
 
 	/* WARNING: This game writes to the interrupt vector
        table. Lev 1 routine address is stored at $100 */
@@ -9996,8 +9996,8 @@ static DRIVER_INIT( wiggie )
 	UINT8 temp[16];
 	int i,j;
 
-	src = memory_region(machine, "maincpu");
-	len = memory_region_length(machine, "maincpu");
+	src = machine->region("maincpu")->base();
+	len = machine->region("maincpu")->bytes();
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);
@@ -10027,7 +10027,7 @@ static DRIVER_INIT( wiggie )
 static DRIVER_INIT( crazyfgt )
 {
 	seta_state *state = machine->driver_data<seta_state>();
-	UINT16 *RAM = (UINT16 *) memory_region(machine, "maincpu");
+	UINT16 *RAM = (UINT16 *) machine->region("maincpu")->base();
 
 	// protection check at boot
 	RAM[0x1078/2] = 0x4e71;
@@ -10045,7 +10045,7 @@ static DRIVER_INIT( crazyfgt )
 static DRIVER_INIT( inttoote )
 {
 	seta_state *state = machine->driver_data<seta_state>();
-	UINT16 *ROM = (UINT16 *)memory_region( machine, "maincpu" );
+	UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
 
 	// missing / unused video regs
 	state->vregs = auto_alloc_array_clear(machine, UINT16, 3);
@@ -10060,7 +10060,7 @@ static DRIVER_INIT( inttoote )
 static DRIVER_INIT( inttootea )
 {
 	seta_state *state = machine->driver_data<seta_state>();
-	//UINT16 *ROM = (UINT16 *)memory_region( machine, "maincpu" );
+	//UINT16 *ROM = (UINT16 *)machine->region( "maincpu" )->base();
 
 	// missing / unused video regs
 	state->vregs = auto_alloc_array_clear(machine, UINT16, 3);

@@ -368,7 +368,7 @@ send data to them, although obviously there's no response. */
 	// init rom bank ////////////////////////////////////////////////////////
 
 	{
-		UINT8 *rom = memory_region(machine, "maincpu");
+		UINT8 *rom = machine->region("maincpu")->base();
 
 		memory_configure_bank(machine, "bank1", 0, 1, &rom[0x10000], 0);
 		memory_configure_bank(machine, "bank1", 1, 3, &rom[0x02000], 0x02000);
@@ -1430,7 +1430,7 @@ static void decode_mainrom(running_machine *machine, const char *rom_region)
 {
 	UINT8 *tmp, *rom;
 
-	rom = memory_region(machine, rom_region);
+	rom = machine->region(rom_region)->base();
 
 	tmp = auto_alloc_array(machine, UINT8, 0x10000);
 	{
@@ -2257,7 +2257,7 @@ static void sc2_common_init(running_machine *machine, int decrypt)
 
 	if (decrypt) decode_mainrom(machine, "maincpu");		  // decode main rom
 
-	rom = memory_region(machine, "maincpu");
+	rom = machine->region("maincpu")->base();
 	if ( rom )
 	{
 		memcpy(&rom[0x10000], &rom[0x00000], 0x2000);
@@ -2270,7 +2270,7 @@ static void adder2_common_init(running_machine *machine)
 {
 	UINT8 *pal;
 
-	pal = memory_region(machine, "proms");
+	pal = machine->region("proms")->base();
 	if ( pal )
 	{
 		memcpy(key, pal, 8);

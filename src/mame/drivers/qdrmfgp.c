@@ -127,7 +127,7 @@ static WRITE16_HANDLER( gp2_control_w )
 static READ16_HANDLER( v_rom_r )
 {
 	device_t *k056832 = space->machine->device("k056832");
-	UINT8 *mem8 = memory_region(space->machine, "gfx1");
+	UINT8 *mem8 = space->machine->region("gfx1")->base();
 	int bank = k056832_word_r(k056832, 0x34/2, 0xffff);
 
 	offset += bank * 0x800 * 4;
@@ -623,7 +623,7 @@ static MACHINE_START( qdrmfgp2 )
 
 static MACHINE_RESET( qdrmfgp )
 {
-	sndram = memory_region(machine, "konami") + 0x100000;
+	sndram = machine->region("konami")->base() + 0x100000;
 
 	/* reset the IDE controller */
 	gp2_irq_control = 0;

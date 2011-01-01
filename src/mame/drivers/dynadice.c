@@ -293,10 +293,10 @@ ROM_END
 static DRIVER_INIT( dynadice )
 {
 	int i, j;
-	UINT8 *usr1 = memory_region(machine, "user1");
-	UINT8 *cpu2 = memory_region(machine, "audiocpu");
-	UINT8 *gfx1 = memory_region(machine, "gfx1");
-	UINT8 *gfx2 = memory_region(machine, "gfx2");
+	UINT8 *usr1 = machine->region("user1")->base();
+	UINT8 *cpu2 = machine->region("audiocpu")->base();
+	UINT8 *gfx1 = machine->region("gfx1")->base();
+	UINT8 *gfx2 = machine->region("gfx2")->base();
 
 	cpu2[0x0b] = 0x23;	/* bug in game code  Dec HL -> Inc HL*/
 

@@ -462,8 +462,8 @@ VIDEO_START( magerror_14220 )
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	hyprduel_state *state = machine->driver_data<hyprduel_state>();
-	UINT8 *base_gfx	=	memory_region(machine, "gfx1");
-	UINT8 *gfx_max	=	base_gfx + memory_region_length(machine, "gfx1");
+	UINT8 *base_gfx	=	machine->region("gfx1")->base();
+	UINT8 *gfx_max	=	base_gfx + machine->region("gfx1")->bytes();
 
 	int max_x = machine->primary_screen->width();
 	int max_y = machine->primary_screen->height();

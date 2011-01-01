@@ -279,7 +279,7 @@ static READ8_HANDLER(unk_f700_r)
 
 static WRITE8_HANDLER(unk_f710_w)
 {
-	memory_set_bankptr(space->machine, "bank1" ,&memory_region(space->machine, "maincpu")[0x10000 + ((data&0x80)?0x4000:0x0000)]);
+	memory_set_bankptr(space->machine, "bank1" ,&space->machine->region("maincpu")->base()[0x10000 + ((data&0x80)?0x4000:0x0000)]);
 }
 
 static READ8_HANDLER(unk_f721_r)
@@ -527,11 +527,11 @@ static INTERRUPT_GEN( timer_irq )
 
 static MACHINE_START(jwildb52)
 {
-	memory_set_bankptr(machine, "bank1", &memory_region(machine, "maincpu")[0x10000 + 0x0000]);
+	memory_set_bankptr(machine, "bank1", &machine->region("maincpu")->base()[0x10000 + 0x0000]);
 
-	memory_set_bankptr(machine, "bank2", &memory_region(machine, "maincpu")[0x10000 + 0xf800]);
+	memory_set_bankptr(machine, "bank2", &machine->region("maincpu")->base()[0x10000 + 0xf800]);
 
-	memory_set_bankptr(machine, "bank3", &memory_region(machine, "maincpu")[0x10000 + 0x8000]);
+	memory_set_bankptr(machine, "bank3", &machine->region("maincpu")->base()[0x10000 + 0x8000]);
 
 /*
 
@@ -545,7 +545,7 @@ static MACHINE_START(jwildb52)
 */
 
 	{
-		UINT16 *rom = (UINT16*)memory_region(machine, "gfx1");
+		UINT16 *rom = (UINT16*)machine->region("gfx1")->base();
 		int i;
 
 		device_t *hd63484 = machine->device("hd63484");

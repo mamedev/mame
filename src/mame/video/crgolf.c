@@ -53,7 +53,7 @@ READ8_HANDLER( crgolf_videoram_r )
 static void get_pens( running_machine *machine, pen_t *pens )
 {
 	offs_t offs;
-	const UINT8 *prom = memory_region(machine, "proms");
+	const UINT8 *prom = machine->region("proms")->base();
 
 	for (offs = 0; offs < NUM_PENS; offs++)
 	{

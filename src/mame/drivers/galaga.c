@@ -814,7 +814,7 @@ static const namco_51xx_interface namco_51xx_intf =
 
 static READ8_DEVICE_HANDLER( namco_52xx_rom_r )
 {
-	UINT32 length = memory_region_length(device->machine, "52xx");
+	UINT32 length = device->machine->region("52xx")->bytes();
 //printf("ROM read %04X\n", offset);
 	if (!(offset & 0x1000))
 		offset = (offset & 0xfff) | 0x0000;
@@ -824,7 +824,7 @@ static READ8_DEVICE_HANDLER( namco_52xx_rom_r )
 		offset = (offset & 0xfff) | 0x2000;
 	else if (!(offset & 0x8000))
 		offset = (offset & 0xfff) | 0x3000;
-	return (offset < length) ? memory_region(device->machine, "52xx")[offset] : 0xff;
+	return (offset < length) ? device->machine->region("52xx")->base()[offset] : 0xff;
 }
 
 static READ8_DEVICE_HANDLER( namco_52xx_si_r )
@@ -3190,8 +3190,8 @@ ROM_END
 static DRIVER_INIT (galaga)
 {
 	/* swap bytes for flipped character so we can decode them together with normal characters */
-	UINT8 *rom = memory_region(machine, "gfx1");
-	int i, len = memory_region_length(machine, "gfx1");
+	UINT8 *rom = machine->region("gfx1")->base();
+	int i, len = machine->region("gfx1")->bytes();
 
 	for (i = 0;i < len;i++)
 	{
@@ -3218,7 +3218,7 @@ static DRIVER_INIT( xevious )
 	UINT8 *rom;
 	int i;
 
-	rom = memory_region(machine, "gfx3") + 0x5000;
+	rom = machine->region("gfx3")->base() + 0x5000;
 	for (i = 0;i < 0x2000;i++)
 		rom[i + 0x2000] = rom[i] >> 4;
 }
@@ -3230,14 +3230,14 @@ static DRIVER_INIT( xevios )
 
 
 	/* convert one of the sprite ROMs to the format used by Xevious */
-	rom = memory_region(machine, "gfx3");
+	rom = machine->region("gfx3")->base();
 	for (A = 0x5000;A < 0x7000;A++)
 	{
 		rom[A] = BITSWAP8(rom[A],1,3,5,7,0,2,4,6);
 	}
 
 	/* convert one of tile map ROMs to the format used by Xevious */
-	rom = memory_region(machine, "gfx4");
+	rom = machine->region("gfx4")->base();
 	for (A = 0x0000;A < 0x1000;A++)
 	{
 		rom[A] = BITSWAP8(rom[A],3,7,5,1,2,6,4,0);

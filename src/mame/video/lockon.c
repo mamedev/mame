@@ -174,7 +174,7 @@ static void scene_draw( running_machine *machine )
 	UINT32 y;
 
 	/* 3bpp characters */
-	const UINT8 *const gfx1 = memory_region(machine, "gfx2");
+	const UINT8 *const gfx1 = machine->region("gfx2")->base();
 	const UINT8 *const gfx2 = gfx1 + 0x10000;
 	const UINT8 *const gfx3 = gfx1 + 0x20000;
 	const UINT8 *const clut = gfx1 + 0x30000;
@@ -311,7 +311,7 @@ static void ground_draw( running_machine *machine )
 	lockon_state *state = machine->driver_data<lockon_state>();
 
 	/* ROM pointers */
-	const UINT8 *const gfx_rom  = memory_region(machine, "gfx4");
+	const UINT8 *const gfx_rom  = machine->region("gfx4")->base();
 	const UINT8 *const lut_rom  = gfx_rom + 0x30000 + ((state->ground_ctrl >> 2) & 0x3 ? 0x10000 : 0);
 	const UINT8 *const clut_rom = gfx_rom + 0x50000;
 
@@ -438,10 +438,10 @@ static void objects_draw( running_machine *machine )
 	UINT32 offs;
 	lockon_state *state = machine->driver_data<lockon_state>();
 
-	const UINT8  *const romlut = memory_region(machine, "user1");
-	const UINT16 *const chklut = (UINT16*)memory_region(machine, "user2");
-	const UINT8  *const gfxrom = memory_region(machine, "gfx5");
-	const UINT8  *const sproms = memory_region(machine, "proms") + 0x800;
+	const UINT8  *const romlut = machine->region("user1")->base();
+	const UINT16 *const chklut = (UINT16*)machine->region("user2")->base();
+	const UINT8  *const gfxrom = machine->region("gfx5")->base();
+	const UINT8  *const sproms = machine->region("proms")->base() + 0x800;
 
 	for (offs = 0; offs < state->objectram_size; offs += 4)
 	{
@@ -806,7 +806,7 @@ static void rotate_draw( running_machine *machine, bitmap_t *bitmap, const recta
 static void hud_draw( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	lockon_state *state = machine->driver_data<lockon_state>();
-	UINT8	*tile_rom = memory_region(machine, "gfx3");
+	UINT8	*tile_rom = machine->region("gfx3")->base();
 	UINT32 offs;
 
 	for (offs = 0x0; offs <= state->hudram_size; offs += 2)

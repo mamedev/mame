@@ -182,7 +182,7 @@ static WRITE8_HANDLER(photon2_membank_w)
 		logerror( "Unknown banking write: %02X\n", data);
 	}
 
-	memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "maincpu") + 0x4000*bank );
+	memory_set_bankptr(space->machine, "bank1", space->machine->region("maincpu")->base() + 0x4000*bank );
 }
 
 static READ8_HANDLER(photon2_fe_r)
@@ -293,7 +293,7 @@ static INTERRUPT_GEN( spec_interrupt_hack )
 
 static MACHINE_RESET( photon2 )
 {
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu"));
+	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base());
 }
 
 static MACHINE_CONFIG_START( photon2, driver_device )

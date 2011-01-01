@@ -251,7 +251,7 @@ static READ8_HANDLER( rom_bank_select_r )
 static WRITE8_HANDLER( rom_bank_select_w )
 {
 	suprgolf_state *state = space->machine->driver_data<suprgolf_state>();
-	UINT8 *region_base = memory_region(space->machine, "user1");
+	UINT8 *region_base = space->machine->region("user1")->base();
 
 	state->rom_bank = data;
 
@@ -266,7 +266,7 @@ static WRITE8_HANDLER( rom_bank_select_w )
 
 static WRITE8_HANDLER( rom2_bank_select_w )
 {
-	UINT8 *region_base = memory_region(space->machine, "user2");
+	UINT8 *region_base = space->machine->region("user2")->base();
 	mame_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,cpu_get_previouspc(space->cpu));
 
 	memory_set_bankptr(space->machine, "bank1", region_base + (data&0x0f ) * 0x4000);
@@ -582,7 +582,7 @@ ROM_END
 
 static DRIVER_INIT( suprgolf )
 {
-	UINT8 *ROM = memory_region(machine, "user2");
+	UINT8 *ROM = machine->region("user2")->base();
 
 	ROM[0x74f4-0x4000] = 0x00;
 	ROM[0x74f5-0x4000] = 0x00;

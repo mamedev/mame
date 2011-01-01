@@ -743,7 +743,7 @@ static const msm5205_interface msm5205_config =
 static MACHINE_START( lwings )
 {
 	lwings_state *state = machine->driver_data<lwings_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
 

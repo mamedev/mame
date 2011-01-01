@@ -620,7 +620,7 @@ ROM_END
 static DRIVER_INIT( skyskipr )
 {
 	UINT8 *buffer;
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	int len = 0x10000;
 
 	/* decrypt the program ROMs */
@@ -641,7 +641,7 @@ static DRIVER_INIT( skyskipr )
 static DRIVER_INIT( popeye )
 {
 	UINT8 *buffer;
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	int len = 0x10000;
 
 	/* decrypt the program ROMs */

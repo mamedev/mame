@@ -160,7 +160,7 @@ static READ8_HANDLER( marinedt_obj1_x_r )
 	//----xxxx x pos in tile ram
 
 	marinedt_state *state = space->machine->driver_data<marinedt_state>();
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	UINT8 *RAM = space->machine->region("maincpu")->base();
 
 	if (RAM[0x430e])
 		--state->cx;

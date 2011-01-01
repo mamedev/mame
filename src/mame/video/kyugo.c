@@ -47,7 +47,7 @@ VIDEO_START( kyugo )
 {
 	kyugo_state *state = machine->driver_data<kyugo_state>();
 
-	state->color_codes = memory_region(machine, "proms") + 0x300;
+	state->color_codes = machine->region("proms")->base() + 0x300;
 
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);

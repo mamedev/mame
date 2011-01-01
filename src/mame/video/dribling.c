@@ -17,7 +17,7 @@
 
 PALETTE_INIT( dribling )
 {
-	const UINT8 *prom = memory_region(machine, "proms") + 0x400;
+	const UINT8 *prom = machine->region("proms")->base() + 0x400;
 	int i;
 
 	for (i = 0; i < 256; i++)
@@ -61,8 +61,8 @@ WRITE8_HANDLER( dribling_colorram_w )
 VIDEO_UPDATE( dribling )
 {
 	dribling_state *state = screen->machine->driver_data<dribling_state>();
-	UINT8 *prombase = memory_region(screen->machine, "proms");
-	UINT8 *gfxbase = memory_region(screen->machine, "gfx1");
+	UINT8 *prombase = screen->machine->region("proms")->base();
+	UINT8 *gfxbase = screen->machine->region("gfx1")->base();
 	int x, y;
 
 	/* loop over rows */

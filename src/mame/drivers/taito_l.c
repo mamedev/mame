@@ -176,7 +176,7 @@ static void machine_reset(running_machine *machine)
 	}
 
 	state->cur_rombank = state->cur_rombank2 = 0;
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x10000);
+	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x10000);
 
 	gfx_element_set_source(machine->gfx[2], state->rambanks);
 
@@ -384,7 +384,7 @@ static WRITE8_HANDLER( rombankswitch_w )
 
 		//logerror("robs %d, %02x (%04x)\n", offset, data, cpu_get_pc(space->cpu));
 		state->cur_rombank = data;
-		memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "maincpu") + 0x10000 + 0x2000 * state->cur_rombank);
+		memory_set_bankptr(space->machine, "bank1", space->machine->region("maincpu")->base() + 0x10000 + 0x2000 * state->cur_rombank);
 	}
 }
 
@@ -405,7 +405,7 @@ static WRITE8_HANDLER( rombank2switch_w )
 		//logerror("robs2 %02x (%04x)\n", data, cpu_get_pc(space->cpu));
 
 		state->cur_rombank2 = data;
-		memory_set_bankptr(space->machine, "bank6", memory_region(space->machine, "slave") + 0x10000 + 0x4000 * state->cur_rombank2);
+		memory_set_bankptr(space->machine, "bank6", space->machine->region("slave")->base() + 0x10000 + 0x4000 * state->cur_rombank2);
 	}
 }
 
@@ -625,7 +625,7 @@ static void champwr_msm5205_vck( device_t *device )
 	}
 	else
 	{
-		state->adpcm_data = memory_region(device->machine, "adpcm")[state->adpcm_pos];
+		state->adpcm_data = device->machine->region("adpcm")->base()[state->adpcm_pos];
 		state->adpcm_pos = (state->adpcm_pos + 1) & 0x1ffff;
 		msm5205_data_w(device, state->adpcm_data >> 4);
 	}
@@ -775,7 +775,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "audiocpu");
+	UINT8 *RAM = space->machine->region("audiocpu")->base();
 	int banknum = (data - 1) & 3;
 
 	memory_set_bankptr (space->machine, "bank7", &RAM [0x10000 + (banknum * 0x4000)]);
@@ -1953,7 +1953,7 @@ static WRITE8_DEVICE_HANDLER( portA_w )
 	if (state->cur_bank != (data & 0x03))
 	{
 		int bankaddress;
-		UINT8 *RAM = memory_region(device->machine, "audiocpu");
+		UINT8 *RAM = device->machine->region("audiocpu")->base();
 
 		state->cur_bank = data & 0x03;
 		bankaddress = 0x10000 + (state->cur_bank - 1) * 0x4000;
@@ -2888,7 +2888,7 @@ static DRIVER_INIT( plottinga )
 				v |= 1 << (7 - j);
 		tab[i] = v;
 	}
-	p = memory_region(machine, "maincpu");
+	p = machine->region("maincpu")->base();
 	for (i = 0; i < 0x20000; i++)
 	{
 		*p = tab[*p];
@@ -2898,7 +2898,7 @@ static DRIVER_INIT( plottinga )
 
 static DRIVER_INIT( evilston )
 {
-	UINT8 *ROM = memory_region(machine, "audiocpu");
+	UINT8 *ROM = machine->region("audiocpu")->base();
 	ROM[0x72] = 0x45;	/* reti -> retn  ('dead' loop @ $1104 )*/
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa7fe, 0xa7fe, 0, 0, evilston_snd_w);
 }

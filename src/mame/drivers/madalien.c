@@ -29,7 +29,7 @@ static INPUT_CHANGED( coin_inserted )
 
 INLINE UINT8 shift_common(running_machine *machine, UINT8 hi, UINT8 lo)
 {
-	const UINT8 *table = memory_region(machine, "user2");
+	const UINT8 *table = machine->region("user2")->base();
 
 	return table[((hi & 0x07) << 8) | lo];
 }

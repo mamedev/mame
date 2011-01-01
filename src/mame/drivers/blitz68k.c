@@ -256,7 +256,7 @@ static UINT16 *blit_romaddr,*blit_attr1_ram,*blit_dst_ram_loword,*blit_attr2_ram
 
 static WRITE16_HANDLER( blit_copy_w )
 {
-	UINT8 *blit_rom = memory_region(space->machine, "blitter");
+	UINT8 *blit_rom = space->machine->region("blitter")->base();
 	UINT32 blit_dst_xpos;
 	UINT32 blit_dst_ypos;
 	int x,y,x_size,y_size;
@@ -444,8 +444,8 @@ static WRITE8_HANDLER( blit_flags_w )
 
 static WRITE8_HANDLER( blit_draw_w )
 {
-	UINT8 *blit_rom  = memory_region(space->machine, "blitter");
-	int blit_romsize = memory_region_length(space->machine, "blitter");
+	UINT8 *blit_rom  = space->machine->region("blitter")->base();
+	int blit_romsize = space->machine->region("blitter")->bytes();
 	UINT32 blit_dst_xpos;
 	UINT32 blit_dst_ypos;
 	int x, y, x_size, y_size;
@@ -2668,7 +2668,7 @@ ROM_END
 
 static DRIVER_INIT( bankrob )
 {
-	UINT16 *ROM = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *ROM = (UINT16 *)machine->region("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0xb5e0/2] = 0x6028;
@@ -2683,7 +2683,7 @@ static DRIVER_INIT( bankrob )
 
 static DRIVER_INIT( bankroba )
 {
-	UINT16 *ROM = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *ROM = (UINT16 *)machine->region("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0x11e4e/2] = 0x6028;
@@ -2698,7 +2698,7 @@ static DRIVER_INIT( bankroba )
 
 static DRIVER_INIT( cjffruit )
 {
-	UINT16 *ROM = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *ROM = (UINT16 *)machine->region("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0xf564/2] = 0x6028;
@@ -2709,7 +2709,7 @@ static DRIVER_INIT( cjffruit )
 
 static DRIVER_INIT( deucesw2 )
 {
-	UINT16 *ROM = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *ROM = (UINT16 *)machine->region("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0x8fe4/2] = 0x6020;
@@ -2720,7 +2720,7 @@ static DRIVER_INIT( deucesw2 )
 
 static DRIVER_INIT( dualgame )
 {
-	UINT16 *ROM = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *ROM = (UINT16 *)machine->region("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0xa518/2] = 0x6024;
@@ -2731,7 +2731,7 @@ static DRIVER_INIT( dualgame )
 
 static DRIVER_INIT( hermit )
 {
-	UINT16 *ROM = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *ROM = (UINT16 *)machine->region("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0xdeba/2] = 0x602e;
@@ -2748,7 +2748,7 @@ static DRIVER_INIT( hermit )
 
 static DRIVER_INIT( maxidbl )
 {
-	UINT16 *ROM = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *ROM = (UINT16 *)machine->region("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0xb384/2] = 0x6036;
@@ -2759,7 +2759,7 @@ static DRIVER_INIT( maxidbl )
 
 static DRIVER_INIT( megadblj )
 {
-	UINT16 *ROM = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *ROM = (UINT16 *)machine->region("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0xe21c/2] = 0x6040;
@@ -2770,7 +2770,7 @@ static DRIVER_INIT( megadblj )
 
 static DRIVER_INIT( megadble )
 {
-	UINT16 *ROM = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *ROM = (UINT16 *)machine->region("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0xcfc2/2] = 0x4e71;

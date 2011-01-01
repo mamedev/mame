@@ -6458,7 +6458,7 @@ static void stv_dump_ram()
 	fp=fopen("68k.dmp", "w+b");
 	if (fp)
 	{
-		fwrite(memory_region(machine, REGION_CPU3), 0x100000, 1, fp);
+		fwrite(machine->region(REGION_CPU3)->base(), 0x100000, 1, fp);
 		fclose(fp);
 	}
 }

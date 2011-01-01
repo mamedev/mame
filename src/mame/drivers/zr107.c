@@ -839,7 +839,7 @@ static void init_zr107(running_machine *machine)
 	led_reg0 = led_reg1 = 0x7f;
 	ccu_vcth = ccu_vctl = 0;
 
-	K001005_preprocess_texture_data(memory_region(machine, "gfx1"), memory_region_length(machine, "gfx1"), 0);
+	K001005_preprocess_texture_data(machine->region("gfx1")->base(), machine->region("gfx1")->bytes(), 0);
 }
 
 static DRIVER_INIT(zr107)

@@ -324,7 +324,7 @@ static MACHINE_RESET( vfive )
 static MACHINE_RESET( bgaregga )
 {
 	toaplan2_state *state = machine->driver_data<toaplan2_state>();
-	UINT8 *Z80 = (UINT8 *)memory_region(machine, "audiocpu");
+	UINT8 *Z80 = (UINT8 *)machine->region("audiocpu")->base();
 
 	// Set Z80 bank switch - default bank is 2
 	state->current_bank = 4;
@@ -400,7 +400,7 @@ static DRIVER_INIT( fixeight )
 static DRIVER_INIT( fixeighb )
 {
 	toaplan2_state *state = machine->driver_data<toaplan2_state>();
-	UINT16 *bgdata = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *bgdata = (UINT16 *)machine->region("maincpu")->base();
 
 	memory_set_bankptr(machine, "bank1", &bgdata[0x40000]); /* $80000 - $fffff */
 	state->sub_cpu_type = CPU_2_NONE;
@@ -413,7 +413,7 @@ static DRIVER_INIT( pipibibi )
 	toaplan2_state *state = machine->driver_data<toaplan2_state>();
 	int A;
 	int oldword, newword;
-	UINT16 *pipibibi_68k_rom = (UINT16 *)(memory_region(machine, "maincpu"));
+	UINT16 *pipibibi_68k_rom = (UINT16 *)(machine->region("maincpu")->base());
 
 	/* unscramble the 68K ROM data. */
 
@@ -1037,7 +1037,7 @@ static WRITE16_DEVICE_HANDLER( fixeighb_oki_bankswitch_w )
 		data &= 7;
 		if (data <= 4)
 		{
-			UINT8 *fixeighb_oki = memory_region(device->machine, "oki");
+			UINT8 *fixeighb_oki = device->machine->region("oki")->base();
 			memcpy(&fixeighb_oki[0x30000], &fixeighb_oki[(data * 0x10000) + 0x40000], 0x10000);
 		}
 	}
@@ -1171,7 +1171,7 @@ static WRITE16_HANDLER( batrider_z80_busreq_w )
 
 static READ16_HANDLER( raizing_z80rom_r )
 {
-	UINT8 *Z80_ROM_test = (UINT8 *)memory_region(space->machine, "audiocpu");
+	UINT8 *Z80_ROM_test = (UINT8 *)space->machine->region("audiocpu")->base();
 
 	if (offset < 0x8000)
 		return Z80_ROM_test[offset] & 0xff;

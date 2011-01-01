@@ -1499,9 +1499,9 @@ static void *atapi_get_device(running_machine *machine)
 static void security_cart_init( running_machine *machine, int cart, const char *eeprom_region, const char *ds2401_region )
 {
 	ksys573_state *state = machine->driver_data<ksys573_state>();
-	UINT8 *eeprom_rom = memory_region( machine, eeprom_region );
-	int eeprom_length = memory_region_length( machine, eeprom_region );
-	UINT8 *ds2401_rom = memory_region( machine, ds2401_region );
+	UINT8 *eeprom_rom = machine->region( eeprom_region )->base();
+	int eeprom_length = machine->region( eeprom_region )->bytes();
+	UINT8 *ds2401_rom = machine->region( ds2401_region )->base();
 
 	if( eeprom_rom != NULL )
 	{

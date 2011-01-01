@@ -58,7 +58,7 @@ static int adpcm_data;
 static WRITE8_HANDLER( tecmo_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	UINT8 *RAM = space->machine->region("maincpu")->base();
 
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
@@ -87,7 +87,7 @@ static WRITE8_DEVICE_HANDLER( tecmo_adpcm_vol_w )
 static void tecmo_adpcm_int(device_t *device)
 {
 	if (adpcm_pos >= adpcm_end ||
-				adpcm_pos >= memory_region_length(device->machine, "adpcm"))
+				adpcm_pos >= device->machine->region("adpcm")->bytes())
 		msm5205_reset_w(device,1);
 	else if (adpcm_data != -1)
 	{
@@ -96,7 +96,7 @@ static void tecmo_adpcm_int(device_t *device)
 	}
 	else
 	{
-		UINT8 *ROM = memory_region(device->machine, "adpcm");
+		UINT8 *ROM = device->machine->region("adpcm")->base();
 
 		adpcm_data = ROM[adpcm_pos++];
 		msm5205_data_w(device,adpcm_data >> 4);

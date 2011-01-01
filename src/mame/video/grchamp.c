@@ -248,7 +248,7 @@ static void draw_objects(running_machine *machine, grchamp_state *state, int y, 
 
 
 */
-	const UINT8 *prom = memory_region(machine, "proms") + 0x20;
+	const UINT8 *prom = machine->region("proms")->base() + 0x20;
 	const gfx_element *gfx;
 	int change = (state->cpu0_out[0] & 0x20) << 3;
 	int num;
@@ -367,9 +367,9 @@ VIDEO_UPDATE( grchamp )
 	};
 
 	grchamp_state *state = screen->machine->driver_data<grchamp_state>();
-	const UINT8 *amedata = memory_region(screen->machine, "gfx5");
-	const UINT8 *headdata = memory_region(screen->machine, "gfx6");
-	const UINT8 *pldata = memory_region(screen->machine, "gfx7");
+	const UINT8 *amedata = screen->machine->region("gfx5")->base();
+	const UINT8 *headdata = screen->machine->region("gfx6")->base();
+	const UINT8 *pldata = screen->machine->region("gfx7")->base();
 	bitmap_t *lpixmap = tilemap_get_pixmap(state->left_tilemap);
 	bitmap_t *rpixmap = tilemap_get_pixmap(state->right_tilemap);
 	bitmap_t *cpixmap = tilemap_get_pixmap(state->center_tilemap);

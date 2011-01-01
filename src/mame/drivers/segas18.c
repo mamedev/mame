@@ -429,7 +429,7 @@ static WRITE16_HANDLER( rom_5987_bank_w )
 	/* sprite banking */
 	else
 	{
-		int maxbanks = memory_region_length(space->machine, "gfx2") / 0x40000;
+		int maxbanks = space->machine->region("gfx2")->bytes() / 0x40000;
 		if (data >= maxbanks)
 			data = 255;
 		segaic16_sprites_set_bank(space->machine, 0, (offset - 8) * 2 + 0, data * 2 + 0);
@@ -587,7 +587,7 @@ static WRITE16_HANDLER( wwally_custom_io_w )
 
 static WRITE8_HANDLER( soundbank_w )
 {
-	memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "soundcpu") + 0x10000 + 0x2000 * data);
+	memory_set_bankptr(space->machine, "bank1", space->machine->region("soundcpu")->base() + 0x10000 + 0x2000 * data);
 }
 
 

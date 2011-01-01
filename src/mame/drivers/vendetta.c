@@ -455,7 +455,7 @@ static const k053247_interface esckids_k053246_intf =
 static MACHINE_START( vendetta )
 {
 	vendetta_state *state = machine->driver_data<vendetta_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 28, &ROM[0x10000], 0x2000);
 	memory_set_bank(machine, "bank1", 0);

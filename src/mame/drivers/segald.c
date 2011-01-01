@@ -596,7 +596,7 @@ ROM_END
 
 static DRIVER_INIT( astron )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x8000], 0x4000);
 }
 

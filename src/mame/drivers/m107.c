@@ -50,7 +50,7 @@ static WRITE16_HANDLER( bankswitch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *RAM = memory_region(space->machine, "maincpu");
+		UINT8 *RAM = space->machine->region("maincpu")->base();
 		memory_set_bankptr(space->machine, "bank1",&RAM[0x100000 + ((data&0x7)*0x10000)]);
 	}
 }
@@ -1012,12 +1012,12 @@ ROM_END
 
 static DRIVER_INIT( firebarr )
 {
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 
 	memcpy(RAM + 0xffff0, RAM + 0x7fff0, 0x10); /* Start vector */
 	memory_set_bankptr(machine, "bank1", &RAM[0xa0000]); /* Initial bank */
 
-	RAM = memory_region(machine, "soundcpu");
+	RAM = machine->region("soundcpu")->base();
 	memcpy(RAM + 0xffff0,RAM + 0x1fff0, 0x10); /* Sound cpu Start vector */
 
 	m107_irq_vectorbase = 0x20;
@@ -1026,12 +1026,12 @@ static DRIVER_INIT( firebarr )
 
 static DRIVER_INIT( dsoccr94 )
 {
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 
 	memcpy(RAM + 0xffff0, RAM + 0x7fff0, 0x10); /* Start vector */
 	memory_set_bankptr(machine, "bank1", &RAM[0xa0000]); /* Initial bank */
 
-	RAM = memory_region(machine, "soundcpu");
+	RAM = machine->region("soundcpu")->base();
 	memcpy(RAM + 0xffff0, RAM + 0x1fff0, 0x10); /* Sound cpu Start vector */
 
 	m107_irq_vectorbase = 0x80;
@@ -1040,12 +1040,12 @@ static DRIVER_INIT( dsoccr94 )
 
 static DRIVER_INIT( wpksoc )
 {
-	UINT8 *RAM = memory_region(machine, "maincpu");
+	UINT8 *RAM = machine->region("maincpu")->base();
 
 	memcpy(RAM + 0xffff0, RAM + 0x7fff0, 0x10); /* Start vector */
 	memory_set_bankptr(machine, "bank1", &RAM[0xa0000]); /* Initial bank */
 
-	RAM = memory_region(machine, "soundcpu");
+	RAM = machine->region("soundcpu")->base();
 	memcpy(RAM + 0xffff0, RAM + 0x1fff0, 0x10); /* Sound cpu Start vector */
 
 

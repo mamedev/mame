@@ -875,7 +875,7 @@ ADDRESS_MAP_END
 static READ16_HANDLER( dsp_rom_r )
 {
 	taitojc_state *state = space->machine->driver_data<taitojc_state>();
-	UINT16 *rom = (UINT16*)memory_region(space->machine, "gfx2");
+	UINT16 *rom = (UINT16*)space->machine->region("gfx2")->base();
 	UINT16 data = rom[state->dsp_rom_pos++];
 
 	//mame_printf_debug("dsp_rom_r:  %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(space->cpu));

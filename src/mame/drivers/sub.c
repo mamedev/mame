@@ -381,7 +381,7 @@ GFXDECODE_END
 static PALETTE_INIT( sub )
 {
 	int i;
-	UINT8* lookup = memory_region(machine,"proms2");
+	UINT8* lookup = machine->region("proms2")->base();
 
 	/* allocate the colortable */
 	machine->colortable = colortable_alloc(machine, 0x100);

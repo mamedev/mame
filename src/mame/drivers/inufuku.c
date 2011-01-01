@@ -317,7 +317,7 @@ static const ym2610_interface ym2610_config =
 static MACHINE_START( inufuku )
 {
 	inufuku_state *state = machine->driver_data<inufuku_state>();
-	UINT8 *ROM = memory_region(machine, "audiocpu");
+	UINT8 *ROM = machine->region("audiocpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x8000);
 	memory_set_bank(machine, "bank1", 0);

@@ -603,7 +603,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( magicard )
 {
-	UINT16 *src    = (UINT16*)memory_region( machine, "maincpu" );
+	UINT16 *src    = (UINT16*)machine->region( "maincpu" )->base();
 	UINT16 *dst    = magicram;
 	memcpy (dst, src, 0x80000);
 	machine->device("maincpu")->reset();

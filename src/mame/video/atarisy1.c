@@ -646,7 +646,7 @@ static int get_bank(running_machine *machine, UINT8 prom1, UINT8 prom2, int bpp)
 		return state->bank_gfx[bpp - 4][bank_index];
 
 	/* if the bank is out of range, call it 0 */
-	const region_info *tiles = machine->region("tiles");
+	const memory_region *tiles = machine->region("tiles");
 	if (0x80000 * (bank_index - 1) >= tiles->bytes())
 		return 0;
 

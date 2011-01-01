@@ -234,7 +234,7 @@ INPUT_PORTS_END
 
 static READ8_HANDLER( megatech_instr_r )
 {
-	UINT8* instr = memory_region(space->machine, "mtbios") + 0x8000;
+	UINT8* instr = space->machine->region("mtbios")->base() + 0x8000;
 
 	return instr[offset / 2];
 //  else
@@ -276,9 +276,9 @@ static void megatech_select_game(running_machine *machine, int gameno)
 	devtag_reset(machine, "ymsnd");
 
 	sprintf(tempname, "game%d", gameno);
-	game_region = memory_region(machine, tempname);
+	game_region = machine->region(tempname)->base();
 	sprintf(tempname, "inst%d", gameno);
-	bios_region = memory_region(machine, tempname);
+	bios_region = machine->region(tempname)->base();
 
 	megadriv_stop_scanline_timer();// stop the scanline timer for the genesis vdp... it can be restarted in video eof when needed
 	segae_md_sms_stop_scanline_timer();// stop the scanline timer for the sms vdp
@@ -287,8 +287,8 @@ static void megatech_select_game(running_machine *machine, int gameno)
 	/* if the regions exist we're fine */
 	if (game_region && bios_region)
 	{
-		memcpy(memory_region(machine, "mtbios")+0x8000, bios_region, 0x8000);
-		memcpy(memory_region(machine, "maincpu"), game_region, 0x300000);
+		memcpy(machine->region("mtbios")->base()+0x8000, bios_region, 0x8000);
+		memcpy(machine->region("maincpu")->base(), game_region, 0x300000);
 
 		// I store an extra byte at the end of the instruction rom region when loading
 		// to indicate if the current cart is an SMS cart.. the original hardware
@@ -324,8 +324,8 @@ static void megatech_select_game(running_machine *machine, int gameno)
 	//  cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_RESET, ASSERT_LINE);
 
 		/* no cart.. */
-		memset(memory_region(machine, "mtbios") + 0x8000, 0x00, 0x8000);
-		memset(memory_region(machine, "maincpu"), 0x00, 0x300000);
+		memset(machine->region("mtbios")->base() + 0x8000, 0x00, 0x8000);
+		memset(machine->region("maincpu")->base(), 0x00, 0x300000);
 	}
 
 	return;
@@ -349,21 +349,21 @@ static WRITE8_HANDLER( megatech_cart_select_w )
     if (mtech_bios.mtech_bios.mt_cart_select_reg == 2)
     {
         printf("game 2 selected\n");
-        memcpy(memory_region(space->machine, "mtbios") + 0x8000, memory_region(space->machine, "inst0"), 0x8000);
+        memcpy(space->machine->region("mtbios")->base() + 0x8000, space->machine->region("inst0")->base(), 0x8000);
     }
 //  else if (mtech_bios.mt_cart_select_reg == 0)
 //  {
 //      printf("game 0 selected\n");
-//      memcpy(memory_region(space->machine, "mtbios") + 0x8000, memory_region(space->machine, "inst2"), 0x8000);
+//      memcpy(space->machine->region("mtbios")->base() + 0x8000, space->machine->region("inst2")->base(), 0x8000);
 //  }
     else if (mtech_bios.mt_cart_select_reg == 6)
     {
         printf("game 6 selected\n");
-        memcpy(memory_region(space->machine, "mtbios") + 0x8000, memory_region(space->machine, "user6"), 0x8000);
+        memcpy(space->machine->region("mtbios")->base() + 0x8000, space->machine->region("user6")->base(), 0x8000);
     }
     else
     {
-        memset(memory_region(space->machine, "mtbios" )+ 0x8000, 0x00, 0x8000);
+        memset(space->machine->region("mtbios" )->base()+ 0x8000, 0x00, 0x8000);
     }
 */
 

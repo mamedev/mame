@@ -333,7 +333,7 @@ static void dsp1_set_dr( UINT8 iDr )
 static void dsp1_init( running_machine *machine )
 {
 	UINT32 i;
-	UINT8 *dspin = memory_region(machine, "addons");
+	UINT8 *dspin = machine->region("addons")->base();
 
 	dsp1_state.Sr = DRC|RQM;
 	dsp1_state.SrLowByteAccess = FALSE;

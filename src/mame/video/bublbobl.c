@@ -32,7 +32,7 @@ VIDEO_UPDATE( bublbobl )
 
 	sx = 0;
 
-	prom = memory_region(screen->machine, "proms");
+	prom = screen->machine->region("proms")->base();
 	for (offs = 0; offs < state->objectram_size; offs += 4)
 	{
 		/* skip empty sprites */

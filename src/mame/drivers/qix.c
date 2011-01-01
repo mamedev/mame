@@ -1278,8 +1278,8 @@ static DRIVER_INIT( kram3 )
      ********************************/
 
 	i = 0;
-	//patch = memory_region(machine, "user1");
-	rom = memory_region(machine, "maincpu");
+	//patch = machine->region("user1")->base();
+	rom = machine->region("maincpu")->base();
 	decrypted = auto_alloc_array(machine, UINT8, 0x6000);
 
 	mainspace->set_decrypted_region(0xa000, 0xffff, decrypted);
@@ -1291,8 +1291,8 @@ static DRIVER_INIT( kram3 )
 	}
 
 	i = 0;
-	//patch = memory_region(machine, "user2");
-	rom = memory_region(machine, "videocpu");
+	//patch = machine->region("user2")->base();
+	rom = machine->region("videocpu")->base();
 	decrypted = auto_alloc_array(machine, UINT8, 0x6000);
 
 	videospace->set_decrypted_region(0xa000, 0xffff, decrypted);
@@ -1308,8 +1308,8 @@ static DRIVER_INIT( kram3 )
 static DRIVER_INIT( zookeep )
 {
 	/* configure the banking */
-	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, "videocpu") + 0xa000, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "videocpu") + 0x10000, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, machine->region("videocpu")->base() + 0xa000, 0);
+	memory_configure_bank(machine, "bank1", 1, 1, machine->region("videocpu")->base() + 0x10000, 0);
 	memory_set_bank(machine, "bank1", 0);
 }
 

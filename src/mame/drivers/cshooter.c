@@ -232,7 +232,7 @@ static WRITE8_HANDLER ( cshooter_c700_w )
 
 static WRITE8_HANDLER ( bank_w )
 {
-	memory_set_bankptr(space->machine, "bank1",&memory_region(space->machine, "user1")[0x4000*((data>>4)&3)]);
+	memory_set_bankptr(space->machine, "bank1",&space->machine->region("user1")->base()[0x4000*((data>>4)&3)]);
 }
 
 
@@ -651,19 +651,19 @@ ROM_END
 static DRIVER_INIT( cshooter )
 {
 	/* temp so it boots */
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 	rom[0xa2] = 0x00;
 	rom[0xa3] = 0x00;
 	rom[0xa4] = 0x00;
-	memory_set_bankptr(machine, "bank1",&memory_region(machine, "user1")[0]);
+	memory_set_bankptr(machine, "bank1",&machine->region("user1")->base()[0]);
 }
 
 static DRIVER_INIT( cshootere )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int A;
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x8000);
 
 	space->set_decrypted_region(0x0000, 0x7fff, decrypt);
@@ -693,7 +693,7 @@ static DRIVER_INIT( cshootere )
 			rom[A] = BITSWAP8(rom[A],7,6,1,4,3,2,5,0);
 	}
 
-	memory_set_bankptr(machine, "bank1",&memory_region(machine, "user1")[0]);
+	memory_set_bankptr(machine, "bank1",&machine->region("user1")->base()[0]);
 	seibu_sound_decrypt(machine,"audiocpu",0x2000);
 }
 

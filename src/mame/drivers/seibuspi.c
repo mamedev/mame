@@ -1009,8 +1009,8 @@ static READ8_HANDLER( z80_coin_r )
 
 static READ32_HANDLER( soundrom_r )
 {
-	UINT8 *sound = (UINT8*)memory_region(space->machine, "user2");
-	UINT16 *sound16 = (UINT16*)memory_region(space->machine, "user2");
+	UINT8 *sound = (UINT8*)space->machine->region("user2")->base();
+	UINT16 *sound16 = (UINT16*)space->machine->region("user2")->base();
 
 	if (mem_mask == 0x000000ff)
 	{
@@ -1821,9 +1821,9 @@ static MACHINE_START( spi )
 static MACHINE_RESET( spi )
 {
 	int i;
-	UINT8 *sound = memory_region(machine, "ymf");
+	UINT8 *sound = machine->region("ymf")->base();
 
-	UINT8 *rombase = memory_region(machine, "user1");
+	UINT8 *rombase = machine->region("user1")->base();
 	UINT8 flash_data = rombase[0x1ffffc];
 
 	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_RESET, ASSERT_LINE );
@@ -1905,7 +1905,7 @@ static MACHINE_START( sxx2f )
 
 static MACHINE_RESET( sxx2f )
 {
-	UINT8 *rom = memory_region(machine, "soundcpu");
+	UINT8 *rom = machine->region("soundcpu")->base();
 
 	memory_set_bankptr(machine, "bank4", z80_rom);
 	memory_set_bankptr(machine, "bank5", z80_rom);
@@ -2082,9 +2082,9 @@ static void init_spi(running_machine *machine)
 	flash[0] = machine->device<intel_e28f008sa_device>("flash0");
 	flash[1] = machine->device<intel_e28f008sa_device>("flash1");
 
-	seibuspi_text_decrypt(memory_region(machine, "gfx1"));
-	seibuspi_bg_decrypt(memory_region(machine, "gfx2"), memory_region_length(machine, "gfx2"));
-	seibuspi_sprite_decrypt(memory_region(machine, "gfx3"), 0x400000);
+	seibuspi_text_decrypt(machine->region("gfx1")->base());
+	seibuspi_bg_decrypt(machine->region("gfx2")->base(), machine->region("gfx2")->bytes());
+	seibuspi_sprite_decrypt(machine->region("gfx3")->base(), 0x400000);
 }
 
 static DRIVER_INIT( rdft )
@@ -2145,9 +2145,9 @@ static void init_rf2(running_machine *machine)
 	flash[1] = machine->device<intel_e28f008sa_device>("flash1");
 
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0282AC, 0x0282AF, 0, 0, rf2_speedup_r );
-	seibuspi_rise10_text_decrypt(memory_region(machine, "gfx1"));
-	seibuspi_rise10_bg_decrypt(memory_region(machine, "gfx2"), memory_region_length(machine, "gfx2"));
-	seibuspi_rise10_sprite_decrypt(memory_region(machine, "gfx3"), 0x600000);
+	seibuspi_rise10_text_decrypt(machine->region("gfx1")->base());
+	seibuspi_rise10_bg_decrypt(machine->region("gfx2")->base(), machine->region("gfx2")->bytes());
+	seibuspi_rise10_sprite_decrypt(machine->region("gfx3")->base(), 0x600000);
 
 	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x560, 0x563, 0, 0, sprite_dma_start_w);
 }
@@ -2169,9 +2169,9 @@ static void init_rfjet(running_machine *machine)
 	flash[1] = machine->device<intel_e28f008sa_device>("flash1");
 
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x002894c, 0x002894f, 0, 0, rfjet_speedup_r );
-	seibuspi_rise11_text_decrypt(memory_region(machine, "gfx1"));
-	seibuspi_rise11_bg_decrypt(memory_region(machine, "gfx2"), memory_region_length(machine, "gfx2"));
-	seibuspi_rise11_sprite_decrypt_rfjet(memory_region(machine, "gfx3"), 0x800000);
+	seibuspi_rise11_text_decrypt(machine->region("gfx1")->base());
+	seibuspi_rise11_bg_decrypt(machine->region("gfx2")->base(), machine->region("gfx2")->bytes());
+	seibuspi_rise11_sprite_decrypt_rfjet(machine->region("gfx3")->base(), 0x800000);
 
 	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x560, 0x563, 0, 0, sprite_dma_start_w);
 }
@@ -2236,11 +2236,11 @@ MACHINE_CONFIG_END
 static DRIVER_INIT( sys386f2 )
 {
 	int i, j;
-	UINT16 *src = (UINT16 *)memory_region(machine, "gfx3");
+	UINT16 *src = (UINT16 *)machine->region("gfx3")->base();
 	UINT16 tmp[0x40 / 2], Offset;
 
 	// sprite_reorder() only
-	for(i = 0; i < memory_region_length(machine, "gfx3") / 0x40; i++)
+	for(i = 0; i < machine->region("gfx3")->bytes() / 0x40; i++)
 	{
 		memcpy(tmp, src, 0x40);
 

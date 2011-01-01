@@ -142,7 +142,7 @@ static WRITE8_HANDLER( imago_sprites_bank_w )
 
 static WRITE8_HANDLER( imago_sprites_dma_w )
 {
-	UINT8 *rom = (UINT8 *)memory_region(space->machine, "gfx2");
+	UINT8 *rom = (UINT8 *)space->machine->region("gfx2")->base();
 	UINT8 sprites_data;
 
 	sprites_data = rom[imago_sprites_address + 0x2000*0 + imago_sprites_bank * 0x1000];

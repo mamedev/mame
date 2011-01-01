@@ -340,7 +340,7 @@ ROM_END
 
 static DRIVER_INIT( citycon )
 {
-	UINT8 *rom = memory_region(machine, "gfx1");
+	UINT8 *rom = machine->region("gfx1")->base();
 	int i;
 
 	/*

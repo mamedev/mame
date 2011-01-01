@@ -169,7 +169,7 @@ static READ8_HANDLER( speech_p1_r )
 
 static READ8_HANDLER( speech_rom_r )
 {
-	return memory_region(space->machine, "speech")[0x100 * (speech_p2 & 0x3f) + offset];
+	return space->machine->region("speech")->base()[0x100 * (speech_p2 & 0x3f) + offset];
 }
 
 static WRITE8_HANDLER( speech_p1_w )

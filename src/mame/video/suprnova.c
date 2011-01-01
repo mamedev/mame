@@ -1181,7 +1181,7 @@ VIDEO_UPDATE(skns)
 	}
 
 	bitmap_fill(sprite_bitmap, cliprect, 0x0000);
-	skns_draw_sprites(screen->machine, sprite_bitmap, cliprect, screen->machine->generic.spriteram.u32, screen->machine->generic.spriteram_size, memory_region(screen->machine,"gfx1"), memory_region_length (screen->machine, "gfx1"), skns_spc_regs );
+	skns_draw_sprites(screen->machine, sprite_bitmap, cliprect, screen->machine->generic.spriteram.u32, screen->machine->generic.spriteram_size, screen->machine->region("gfx1")->base(), screen->machine->region ("gfx1")->bytes(), skns_spc_regs );
 
 
 	return 0;

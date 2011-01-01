@@ -308,7 +308,7 @@ static WRITE8_HANDLER( igs_irqack_w )
 
 static READ8_HANDLER( expram_r )
 {
-	UINT8 *rom = memory_region(space->machine, "gfx3");
+	UINT8 *rom = space->machine->region("gfx3")->base();
 
 	offset += exp_bank * 0x8000;
 //  logerror("PC %06X: %04x = %02x\n",cpu_get_pc(space->cpu),offset,rom[offset]);
@@ -502,7 +502,7 @@ static DRIVER_INIT( jackie )
 {
 
 	int A;
-	UINT8 *rom = memory_region(machine, "maincpu");
+	UINT8 *rom = machine->region("maincpu")->base();
 
 	for (A = 0;A < 0xf000;A++)
 	{

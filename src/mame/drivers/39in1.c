@@ -1565,7 +1565,7 @@ static void pxa255_start(running_machine* machine)
 
 static MACHINE_START(39in1)
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 	int i;
 
 	for (i = 0; i < 0x80000; i += 2)

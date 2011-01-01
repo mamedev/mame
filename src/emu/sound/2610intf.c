@@ -166,8 +166,8 @@ static DEVICE_START( ym2610 )
 	pcmbufa  = *device->region();
 	pcmsizea = device->region()->bytes();
 	name.printf("%s.deltat", device->tag());
-	pcmbufb  = (void *)(memory_region(device->machine, name));
-	pcmsizeb = memory_region_length(device->machine, name);
+	pcmbufb  = (void *)(device->machine->region(name)->base());
+	pcmsizeb = device->machine->region(name)->bytes();
 	if (pcmbufb == NULL || pcmsizeb == 0)
 	{
 		pcmbufb = pcmbufa;

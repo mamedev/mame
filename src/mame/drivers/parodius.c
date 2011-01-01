@@ -258,7 +258,7 @@ static const k05324x_interface parodius_k05324x_intf =
 static MACHINE_START( parodius )
 {
 	parodius_state *state = machine->driver_data<parodius_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 14, &ROM[0x10000], 0x4000);
 	memory_configure_bank(machine, "bank1", 14, 2, &ROM[0x08000], 0x4000);

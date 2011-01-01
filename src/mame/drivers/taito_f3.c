@@ -129,7 +129,7 @@ static WRITE32_HANDLER( f3_sound_reset_1_w )
 static WRITE32_HANDLER( f3_sound_bankswitch_w )
 {
 	if (f3_game==KIRAMEKI) {
-		UINT16 *rom = (UINT16 *)memory_region(space->machine, "audiocpu");
+		UINT16 *rom = (UINT16 *)space->machine->region("audiocpu")->base();
 		UINT32 idx;
 
 		idx = (offset << 1) & 0x1e;
@@ -3470,8 +3470,8 @@ static void tile_decode(running_machine *machine)
 {
 	UINT8 lsb,msb;
 	UINT32 offset,i;
-	UINT8 *gfx = memory_region(machine, "gfx2");
-	int size=memory_region_length(machine, "gfx2");
+	UINT8 *gfx = machine->region("gfx2")->base();
+	int size=machine->region("gfx2")->bytes();
 	int data;
 
 	/* Setup ROM formats:
@@ -3503,8 +3503,8 @@ static void tile_decode(running_machine *machine)
 		offset+=4;
 	}
 
-	gfx = memory_region(machine, "gfx1");
-	size=memory_region_length(machine, "gfx1");
+	gfx = machine->region("gfx1")->base();
+	size=machine->region("gfx1")->bytes();
 
 	offset = size/2;
 	for (i = size/2+size/4; i<size; i++)
@@ -3576,7 +3576,7 @@ static DRIVER_INIT( trstaroj )
 
 static DRIVER_INIT( scfinals )
 {
-	UINT32 *RAM = (UINT32 *)memory_region(machine, "maincpu");
+	UINT32 *RAM = (UINT32 *)machine->region("maincpu")->base();
 
 	/* Doesn't boot without this - eprom related? */
     RAM[0x5af0/4]=0x4e710000|(RAM[0x5af0/4]&0xffff);
@@ -3654,7 +3654,7 @@ static WRITE32_HANDLER( bubsympb_oki_w )
 	//if (mem_mask==0x000000ff) downcast<okim6295_device *>(device)->write(0,data&0xff);
 	if (ACCESSING_BITS_16_23)
 	{
-		UINT8 *snd = memory_region(space->machine, "oki");
+		UINT8 *snd = space->machine->region("oki")->base();
 		int bank = (data & 0x000f0000) >> 16;
 		// almost certainly wrong
 		memcpy(snd+0x30000, snd+0x80000+0x30000+bank*0x10000, 0x10000);
@@ -3674,7 +3674,7 @@ static DRIVER_INIT( bubsympb )
 	/* expand gfx rom */
 	{
 		int i;
-		UINT8 *gfx = memory_region(machine, "gfx2");
+		UINT8 *gfx = machine->region("gfx2")->base();
 
 		for (i=0x200000;i<0x400000; i+=4)
 		{
@@ -3721,7 +3721,7 @@ static DRIVER_INIT( landmakr )
 
 static DRIVER_INIT( landmkrp )
 {
-	UINT32 *RAM = (UINT32 *)memory_region(machine, "maincpu");
+	UINT32 *RAM = (UINT32 *)machine->region("maincpu")->base();
 
 	/* For some reason the least significant byte in the last 2 long words of
     ROM is swapped.  As the roms have been verified ok, I assume this is some
@@ -3764,7 +3764,7 @@ static DRIVER_INIT( pbobbl2p )
 	// which eventually causes the game to crash
 	//  -- protection check?? or some kind of checksum fail?
 
-	UINT32 *ROM = (UINT32 *)memory_region(machine, "maincpu");
+	UINT32 *ROM = (UINT32 *)machine->region("maincpu")->base();
 
 	/* protection? */
     ROM[0x40090/4]=0x00004e71|(ROM[0x40090/4]&0xffff0000);

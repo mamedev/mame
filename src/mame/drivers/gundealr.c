@@ -447,7 +447,7 @@ GFXDECODE_END
 static MACHINE_START( gundealr )
 {
 	gundealr_state *state = machine->driver_data<gundealr_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = machine->region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 

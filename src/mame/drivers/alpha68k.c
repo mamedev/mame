@@ -1895,7 +1895,7 @@ static MACHINE_RESET( common )
 static MACHINE_START( alpha68k_V )
 {
 	alpha68k_state *state = machine->driver_data<alpha68k_state>();
-	UINT8 *ROM = memory_region(machine, "audiocpu");
+	UINT8 *ROM = machine->region("audiocpu")->base();
 
 	memory_configure_bank(machine, "bank7", 0, 32, &ROM[0x10000], 0x4000);
 
@@ -1931,7 +1931,7 @@ static MACHINE_RESET( alpha68k_II )
 static MACHINE_START( alpha68k_II )
 {
 	alpha68k_state *state = machine->driver_data<alpha68k_state>();
-	UINT8 *ROM = memory_region(machine, "audiocpu");
+	UINT8 *ROM = machine->region("audiocpu")->base();
 
 	memory_configure_bank(machine, "bank7", 0, 28, &ROM[0x10000], 0x4000);
 
@@ -3152,7 +3152,7 @@ static DRIVER_INIT( btlfieldb )
 static DRIVER_INIT( skysoldr )
 {
 	alpha68k_state *state = machine->driver_data<alpha68k_state>();
-	memory_set_bankptr(machine, "bank8", (memory_region(machine, "user1")) + 0x40000);
+	memory_set_bankptr(machine, "bank8", (machine->region("user1")->base()) + 0x40000);
 	state->invert_controls = 0;
 	state->microcontroller_id = 0;
 	state->coin_id = 0x22 | (0x22 << 8);
@@ -3171,7 +3171,7 @@ static DRIVER_INIT( goldmedl )
 static DRIVER_INIT( goldmedla )
 {
 	alpha68k_state *state = machine->driver_data<alpha68k_state>();
-	memory_set_bankptr(machine, "bank8", memory_region(machine, "maincpu") + 0x20000);
+	memory_set_bankptr(machine, "bank8", machine->region("maincpu")->base() + 0x20000);
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8803; //Guess - routine to handle coinage is the same as in 'goldmedl'
 	state->coin_id = 0x23 | (0x24 << 8);
@@ -3199,7 +3199,7 @@ static DRIVER_INIT( skyadvntu )
 static DRIVER_INIT( gangwarsu )
 {
 	alpha68k_state *state = machine->driver_data<alpha68k_state>();
-	memory_set_bankptr(machine, "bank8", memory_region(machine, "user1"));
+	memory_set_bankptr(machine, "bank8", machine->region("user1")->base());
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8512;
 	state->coin_id = 0x23 | (0x24 << 8);
@@ -3209,7 +3209,7 @@ static DRIVER_INIT( gangwarsu )
 static DRIVER_INIT( gangwars )
 {
 	alpha68k_state *state = machine->driver_data<alpha68k_state>();
-	memory_set_bankptr(machine, "bank8", memory_region(machine, "user1"));
+	memory_set_bankptr(machine, "bank8", machine->region("user1")->base());
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8512;
 	state->coin_id = 0x23 | (0x24 << 8);
@@ -3219,7 +3219,7 @@ static DRIVER_INIT( gangwars )
 static DRIVER_INIT( sbasebal )
 {
 	alpha68k_state *state = machine->driver_data<alpha68k_state>();
-	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
+	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
 
 	/* Patch protection check, it does a divide by zero because the MCU is trying to
        calculate the ball speed when a strike is scored, notice that current emulation

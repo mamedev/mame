@@ -655,7 +655,7 @@ static DEVICE_START( snk6502_sound )
 	snk6502_sound_state *state = get_safe_token(device);
 
 	state->samples = device->machine->device("samples");
-	state->ROM = memory_region(device->machine, "snk6502");
+	state->ROM = device->machine->region("snk6502")->base();
 
 	// adjusted
 	snk6502_set_music_freq(device->machine, 43000);

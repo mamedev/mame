@@ -318,7 +318,7 @@ READ8_HANDLER( xevious_bb_r )
 {
 	_galaga_state *state =  space->machine->driver_data<_galaga_state>();
 
-	UINT8 *rom2a = memory_region(space->machine, "gfx4");
+	UINT8 *rom2a = space->machine->region("gfx4")->base();
 	UINT8 *rom2b = rom2a+0x1000;
 	UINT8 *rom2c = rom2a+0x3000;
 	int adr_2b,adr_2c;

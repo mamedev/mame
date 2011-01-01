@@ -1015,8 +1015,8 @@ ROM_END
 
 static DRIVER_INIT( simpl156 )
 {
-	UINT8 *rom = memory_region(machine, "okimusic");
-	int length = memory_region_length(machine, "okimusic");
+	UINT8 *rom = machine->region("okimusic")->base();
+	int length = machine->region("okimusic")->bytes();
 	UINT8 *buf1 = auto_alloc_array(machine, UINT8, length);
 
 	UINT32 x;

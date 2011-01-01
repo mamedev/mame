@@ -33,7 +33,7 @@ Sound: AY-3-8912
 
 static WRITE8_HANDLER( usgames_rombank_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	UINT8 *RAM = space->machine->region("maincpu")->base();
 
 //  logerror ("BANK WRITE? -%02x-\n",data);
 //popmessage("%02x",data);

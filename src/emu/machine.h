@@ -208,7 +208,7 @@ typedef struct _generic_audio_private generic_audio_private;
 
 
 // template specializations
-typedef tagged_list<region_info> region_list;
+typedef tagged_list<memory_region> region_list;
 
 
 // legacy callback functions
@@ -218,24 +218,24 @@ typedef UINT32 (*video_update_func)(screen_device *screen, bitmap_t *bitmap, con
 
 
 
-// ======================> region_info
+// ======================> memory_region
 
 // memory region object; should eventually be renamed memory_region
-class region_info
+class memory_region
 {
-	DISABLE_COPYING(region_info);
+	DISABLE_COPYING(memory_region);
 
 	friend class running_machine;
 	template<class T> friend class tagged_list;
-	friend resource_pool_object<region_info>::~resource_pool_object();
+	friend resource_pool_object<memory_region>::~resource_pool_object();
 
 	// construction/destruction
-	region_info(running_machine &machine, const char *name, UINT32 length, UINT32 flags);
-	~region_info();
+	memory_region(running_machine &machine, const char *name, UINT32 length, UINT32 flags);
+	~memory_region();
 
 public:
 	// getters
-	region_info *next() const { return m_next; }
+	memory_region *next() const { return m_next; }
 	UINT8 *base() const { return (this != NULL) ? m_base.u8 : NULL; }
 	UINT8 *end() const { return (this != NULL) ? m_base.u8 + m_length : NULL; }
 	UINT32 bytes() const { return (this != NULL) ? m_length : 0; }
@@ -267,7 +267,7 @@ public:
 private:
 	// internal data
 	running_machine &		m_machine;
-	region_info *			m_next;
+	memory_region *			m_next;
 	astring					m_name;
 	generic_ptr				m_base;
 	UINT32					m_length;
@@ -346,7 +346,7 @@ public:
 	inline device_t *device(const char *tag);
 	template<class T> inline T *device(const char *tag) { return downcast<T *>(device(tag)); }
 	inline const input_port_config *port(const char *tag);
-	inline const region_info *region(const char *tag);
+	inline const memory_region *region(const char *tag);
 
 	// configuration helpers
 	UINT32 total_colors() const { return m_config.m_total_colors; }
@@ -386,7 +386,7 @@ public:
 	void current_datetime(system_time &systime);
 
 	// regions
-	region_info *region_alloc(const char *name, UINT32 length, UINT32 flags);
+	memory_region *region_alloc(const char *name, UINT32 length, UINT32 flags);
 	void region_free(const char *name);
 
 	// managers
@@ -663,21 +663,9 @@ inline const input_port_config *running_machine::port(const char *tag)
 	return m_portlist.find(tag);
 }
 
-inline const region_info *running_machine::region(const char *tag)
+inline const memory_region *running_machine::region(const char *tag)
 {
 	return m_regionlist.find(tag);
-}
-
-inline UINT8 *memory_region(running_machine *machine, const char *name)
-{
-	const region_info *region = machine->region(name);
-	return (region != NULL) ? region->base() : NULL;
-}
-
-inline UINT32 memory_region_length(running_machine *machine, const char *name)
-{
-	const region_info *region = machine->region(name);
-	return (region != NULL) ? region->bytes() : 0;
 }
 
 

@@ -749,13 +749,13 @@ ROM_END
 
 static DRIVER_INIT( angelkds )
 {
-	UINT8 *RAM = memory_region(machine, "user1");
+	UINT8 *RAM = machine->region("user1")->base();
 	memory_configure_bank(machine, "bank1", 0, 8, &RAM[0x0000], 0x4000);
 }
 
 static DRIVER_INIT( spcpostn )
 {
-	UINT8 *RAM = memory_region(machine, "user1");
+	UINT8 *RAM = machine->region("user1")->base();
 
 	sega_317_0005_decode(machine, "maincpu");
 	memory_configure_bank(machine, "bank1", 0, 10, &RAM[0x0000], 0x4000);

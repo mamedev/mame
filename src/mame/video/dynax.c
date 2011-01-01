@@ -379,8 +379,8 @@ static int blitter_drawgfx( running_machine *machine, int layer, int mask, const
 {
 	dynax_state *state = machine->driver_data<dynax_state>();
 	UINT8 cmd;
-	UINT8 *ROM = memory_region(machine, gfx);
-	size_t ROM_size = memory_region_length(machine, gfx);
+	UINT8 *ROM = machine->region(gfx)->base();
+	size_t ROM_size = machine->region(gfx)->bytes();
 
 	int sx;
 
@@ -1236,8 +1236,8 @@ static int debug_viewer( running_machine *machine, bitmap_t *bitmap, const recta
 	if (toggle)
 	{
 		dynax_state *state = machine->driver_data<dynax_state>();
-		UINT8 *RAM = memory_region( machine, "gfx1" );
-		size_t size = memory_region_length( machine, "gfx1" );
+		UINT8 *RAM = machine->region( "gfx1" )->base();
+		size_t size = machine->region( "gfx1" )->bytes();
 		static int i = 0, c = 0, r = 0;
 
 		if (input_code_pressed_once(machine, KEYCODE_I))	c = (c - 1) & 0x1f;
