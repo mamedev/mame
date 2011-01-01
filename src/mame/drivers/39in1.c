@@ -1433,7 +1433,7 @@ static WRITE32_HANDLER( cpld_w )
 	if (cpu_get_pc(space->cpu) == 0x2874)
 	{
 		state->state = 2;
-		state->magic = space->read_byte(0x2d4ff0);
+		state->magic = space->read_byte(0xa02d4ff0);
 	}
 	else if (offset == 0xa)
 	{
