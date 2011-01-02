@@ -1105,8 +1105,8 @@ static char* handle_param(char* s, UINT32 param)
 			break;
 
 		case PARAM_SFREG:
-			d8 = FETCHD();
-			s += sprintf( s, "%s", nec_sfreg[d8 & 0xff] );
+			i8 = FETCHD();
+			s += sprintf( s, "%s", nec_sfreg[i8] );
 			break;
 
 		case PARAM_1:
