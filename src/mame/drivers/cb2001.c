@@ -49,13 +49,13 @@ this seems more like 8-bit hardware, maybe it should be v25, not v35...
 
 static const UINT8 cb2001_decryption_table[256] = {
 	0xe8,xxxx,xxxx,xxxx,0x80,0xe4,0x12,0x2f, 0x3c,xxxx,xxxx,0x23,xxxx,xxxx,xxxx,0x5f, /* 00 */
-//    ----                ---- **** pppp pppp  pppp           pppp                pppp
+//    ssss                ---- **** pppp pppp  ssss           pppp                pppp
 	0x86,xxxx,xxxx,0x27,0x1c,xxxx,xxxx,xxxx, 0x32,0x40,0xa0,0xd3,0x3a,0x14,0x89,0x1f, /* 10 */
 //    wwww           **** pppp                 pppp pppp pppp pppp pppp pppp pppp pppp
 	xxxx,0x8e,xxxx,0x0f,xxxx,0x49,0xb5,xxxx, 0x56,xxxx,xxxx,0x75,0x33,0xb6,xxxx,0x39, /* 20 */
-//         !!!!      pppp      pppp pppp       pppp           pppp pppp pppp      ****
+//         !!!!      pppp      pppp pppp       pppp           ssss pppp pppp      ****
 	0x89,xxxx,xxxx,xxxx,xxxx,0x22,0x5b,xxxx, xxxx,xxxx,0x74,xxxx,xxxx,0xa6,xxxx,0x74, /* 30 */
-//    wwww                     **** pppp                 debu           pppp      pppp
+//    wwww                     **** pppp                 debu           pppp      ssss
 	xxxx,0xea,xxxx,xxxx,0xd0,0xb0,0x5e,xxxx, xxxx,0xa2,xxxx,xxxx,0xa3,xxxx,xxxx,0xb3, /* 40 */
 //         !!!!           **** pppp pppp            pppp           pppp           pppp
 	0x13,xxxx,0x2c,xxxx,0x9d,xxxx,0x42,0xc0, 0x04,xxxx,0xb7,xxxx,0xeb,0xab,xxxx,xxxx, /* 50 */
@@ -63,26 +63,28 @@ static const UINT8 cb2001_decryption_table[256] = {
 	xxxx,xxxx,xxxx,xxxx,0x0a,xxxx,xxxx,xxxx, 0xa1,0xa5,xxxx,xxxx,xxxx,0xbb,0xba,xxxx, /* 60 */
 //                        pppp                 pppp pppp                pppp pppp
 	0xc3,0x53,0x02,0x58,xxxx,xxxx,0x24,xxxx, 0x72,xxxx,0xf3,xxxx,xxxx,0x43,xxxx,0x34, /* 70 */
-//    pppp pppp pppp pppp           pppp       pppp      pppp           pppp      ****
+//    ssss pppp pppp ssss           pppp       ssss      pppp           ssss      ****
 	0x26,xxxx,0xd1,xxxx,xxxx,0x3d,0xfb,0xf6, xxxx,xxxx,0x59,xxxx,0x73,xxxx,0x2a,xxxx, /* 80 */
 //    pppp      rrrr           pppp **** pppp            pppp      pppp      pppp
 	xxxx,0x3d,0xe9,xxxx,xxxx,0xbe,0xf9,xxxx, xxxx,xxxx,0x57,xxxx,0xb9,xxxx,0xbf,xxxx, /* 90 */
-//         wwww pppp           pppp ****                 pppp      pppp      pppp
+//         wwww pppp           pppp ****                 pppp      ssss      pppp
 	0xc1,xxxx,0xe6,0x06,0xaa,0x9c,0xad,0xb8, 0x4e,xxxx,0x8d,0x50,0x51,0xa4,xxxx,0x1a, /* A0 */
-//    ****      pppp pppp pppp **** pppp !!!!  pppp      pppp pppp pppp pppp      pppp
+//    ****      pppp pppp pppp **** pppp !!!!  pppp      ssss ssss pppp pppp      pppp
 	0xac,xxxx,0xb4,xxxx,xxxx,0x83,xxxx,xxxx, xxxx,0x05,0x03,xxxx,0x1e,0x43,0x07,0xcf, /* B0 */
 //    pppp      pppp           pppp                 pppp pppp      pppp **** pppp pppp
 	0xcb,0xec,0xee,xxxx,xxxx,0xe2,0x87,xxxx, xxxx,xxxx,0x76,0x61,0x48,xxxx,0x2e,xxxx, /* C0 */
-//    pppp pppp pppp           pppp pppp                 pppp **** ****      pppp
+//    pppp pppp pppp           ssss pppp                 pppp **** ****      pppp
 	xxxx,0xf2,0x46,xxxx,0x60,xxxx,0x4f,0x47, 0x88,xxxx,xxxx,0xff,xxxx,0xfa,0xc7,0x8b, /* D0 */
 //         ???? pppp      ****      pppp pppp  pppp           pppp      **** !!!! pppp
 	0x8a,0xb1,xxxx,0xc6,xxxx,0x5a,xxxx,0xb2, 0x9a,0x52,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* E0 */
-//    pppp gggg      !!!!      ****      pppp  pppp ****
-	xxxx,0xae,0xfe,xxxx,xxxx,xxxx,xxxx,0x2a, xxxx,xxxx,0x04,xxxx,0x81,xxxx,xxxx,xxxx, /* F0 */
+//    ssss gggg      !!!!      ****      pppp  pppp ****
+	xxxx,0xae,0xfe,xxxx,xxxx,xxxx,xxxx,0x3a, xxxx,xxxx,0x04,xxxx,0x81,xxxx,xxxx,xxxx, /* F0 */
 //         ???? pppp                     ****            wwww      pppp
 };
 
 /* robiza's notes:
+
+f7 -> 3a very probable, but 1c -> 3a
 
 e0022 a5         push psw ?
 e0023 d4         push r ?
