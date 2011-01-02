@@ -29,6 +29,12 @@
 
 #define SNES_LAYER_DEBUG  0
 
+#define SNES_DSP1B_OFFSET (0x0000)
+#define SNES_DSP1_OFFSET  (0x3000)
+#define SNES_DSP2_OFFSET  (0x6000)
+#define SNES_DSP3_OFFSET  (0x9000)
+#define SNES_DSP4_OFFSET  (0xc000)
+
 /* Debug definitions */
 #ifdef MAME_DEBUG
 /* #define SNES_DBG_GENERAL*/		/* Display general debug info */

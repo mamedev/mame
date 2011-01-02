@@ -1234,6 +1234,19 @@ $(CPUOBJ)/v810/v810.o:	$(CPUSRC)/v810/v810.c \
 						$(CPUSRC)/v810/v810.h
 
 
+#-------------------------------------------------
+# NEC uPD7725
+#-------------------------------------------------
+
+ifneq ($(filter UPD7725,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/upd7725
+CPUOBJS += $(CPUOBJ)/upd7725/upd7725.o
+DASMOBJS += $(CPUOBJ)/upd7725/dasm7725.o
+endif
+
+$(CPUOBJ)/upd7725/upd7725.o:	$(CPUSRC)/upd7725/upd7725.c \
+								$(CPUSRC)/upd7725/upd7725.h
+
 
 #-------------------------------------------------
 # NEC uPD7810 series

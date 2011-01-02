@@ -123,6 +123,7 @@ CPUS += SCMP
 CPUS += MN10200
 CPUS += COSMAC
 CPUS += PPS4
+CPUS += UPD7725
 
 
 #-------------------------------------------------
