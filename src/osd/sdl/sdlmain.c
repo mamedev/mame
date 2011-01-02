@@ -624,7 +624,10 @@ void sdl_osd_interface::init(running_machine &machine)
 	/* now setup watchdog */
 
 	int watchdog_timeout = options_get_int(machine.options(), SDLOPTION_WATCHDOG);
-	if (watchdog_timeout != 0)
+	int str = options_get_int(machine.options(), OPTION_SECONDS_TO_RUN);
+
+	/* only enable watchdog if seconds_to_run is enabled *and* relatively short (time taken from ui.c) */
+	if ((watchdog_timeout != 0) && (str > 0) && (str < 60*5 ))
 	{
 		m_watchdog = auto_alloc(&machine, watchdog);
 		m_watchdog->setTimeout(watchdog_timeout);
