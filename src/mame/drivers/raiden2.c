@@ -230,7 +230,7 @@ WRITE16_MEMBER(raiden2_state::cop_dma_trigger_w)
 {
 	//  logerror("COP DMA mode=%x adr=%x size=%x vals=%x %x %x\n", cop_dma_mode, cop_dma_src[cop_dma_mode], cop_dma_size[cop_dma_mode], cop_dma_v1[cop_dma_mode], cop_dma_v2[cop_dma_mode], cop_dma_dst[cop_dma_mode]);
 
-	//printf("%08x %08x %08x %02x\n",cop_dma_src[cop_dma_mode] << 6,cop_dma_dst[cop_dma_mode] << 6,cop_dma_size[cop_dma_mode] << 5,cop_dma_mode);
+	// printf("%08x %08x %08x %02x\n",cop_dma_src[cop_dma_mode] << 6,cop_dma_dst[cop_dma_mode] << 6,cop_dma_size[cop_dma_mode] << 5,cop_dma_mode);
 
 	switch(cop_dma_mode) {
 	case 0x14: {
@@ -304,7 +304,7 @@ WRITE16_MEMBER(raiden2_state::cop_dma_trigger_w)
 
 		for (i=address;i<address+length;i+=4)
 		{
-			space.write_dword(i, (cop_dma_v1) | (cop_dma_v2 << 16)); //TODO: fill value
+			space.write_dword(i, (cop_dma_v1) | (cop_dma_v2 << 16));
 		}
 	}
 	}
@@ -466,7 +466,7 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 
 		// raidndx only
 	case 0x7e05:
-		space.write_dword(0x470, (space.read_dword(cop_regs[4]) & 0x30) << 10);
+		space.write_dword(0x470, (space.read_dword(cop_regs[4]) & 0x30) << 6);
 		// Actually, wherever the bank selection actually is
 		// And probably 8 bytes too, but they zero all the rest
 		break;
@@ -649,8 +649,15 @@ WRITE16_MEMBER(raiden2_state::tile_bank_01_w)
 	}
 }
 
+READ16_MEMBER(raiden2_state::cop_tile_bank_2_r)
+{
+	return cop_bank;
+}
+
 WRITE16_MEMBER(raiden2_state::cop_tile_bank_2_w)
 {
+	COMBINE_DATA(&cop_bank);
+
 	if(ACCESSING_BITS_8_15) {
 		int new_bank = 4 | (data >> 14);
 		if(new_bank != fg_bank) {
@@ -659,6 +666,25 @@ WRITE16_MEMBER(raiden2_state::cop_tile_bank_2_w)
 		}
 	}
 }
+
+WRITE16_MEMBER(raiden2_state::raidendx_cop_bank_2_w)
+{
+	COMBINE_DATA(&cop_bank);
+
+	if(ACCESSING_BITS_8_15) {
+		int new_bank = 4 | ((cop_bank >> 10) & 3);
+		if(new_bank != fg_bank) {
+			fg_bank = new_bank;
+			tilemap_mark_all_tiles_dirty(foreground_layer);
+		}
+
+		/* probably bit 3 is from 6c9 */
+		/* TODO: this doesn't work! */
+		memory_set_bank(space.machine, "mainbank", 8 | (cop_bank & 0x7000) >> 12);
+	}
+}
+
+
 
 /* TILEMAP RELATED (move to video file) */
 
@@ -1005,7 +1031,7 @@ static ADDRESS_MAP_START( raiden2_cop_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_st
 	AM_RANGE(0x0043a, 0x0043b) AM_WRITE(cop_pgm_mask_w)
 	AM_RANGE(0x0043c, 0x0043d) AM_WRITE(cop_pgm_trigger_w)
 	AM_RANGE(0x00444, 0x00445) AM_WRITE(cop_scale_w)
-	AM_RANGE(0x00470, 0x00471) AM_READNOP AM_WRITE(cop_tile_bank_2_w)
+	AM_RANGE(0x00470, 0x00471) AM_READWRITE(cop_tile_bank_2_r,cop_tile_bank_2_w)
 
 	AM_RANGE(0x00476, 0x00477) AM_WRITE(cop_dma_adr_rel_w)
 	AM_RANGE(0x00478, 0x00479) AM_WRITE(cop_dma_src_w)
@@ -1070,6 +1096,7 @@ static ADDRESS_MAP_START( raiden2_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state 
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( raidendx_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state )
+	AM_RANGE(0x00470, 0x00471) AM_READWRITE(cop_tile_bank_2_r,raidendx_cop_bank_2_w)
 	AM_RANGE(0x004d0, 0x004d7) AM_RAM //???
 	AM_RANGE(0x0062c, 0x0062d) AM_WRITE(tilemap_enable_w)
 	AM_RANGE(0x00610, 0x0061b) AM_WRITE(tile_scroll_w)
