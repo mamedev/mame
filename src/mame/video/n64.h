@@ -40,7 +40,7 @@
 #define FORMAT_IA				3
 #define FORMAT_I				4
 
-#if LSB_FIRST
+#ifdef LSB_FIRST
 #define BYTE_XOR_DWORD_SWAP 7
 #define WORD_XOR_DWORD_SWAP 3
 #else
