@@ -69,8 +69,11 @@
 #define SDLOPTION_PRESCALE				"prescale"
 
 #define SDLOPTION_SCALEMODE				"scalemode"
+
 #define SDLOPTION_MULTITHREADING		"multithreading"
+#define SDLOPTION_BENCH					"bench"
 #define SDLOPTION_NUMPROCESSORS			"numprocessors"
+
 #define SDLOPTION_WAITVSYNC				"waitvsync"
 #define SDLOPTION_KEYMAP				"keymap"
 #define SDLOPTION_KEYMAP_FILE			"keymap_file"
