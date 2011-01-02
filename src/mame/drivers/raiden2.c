@@ -544,7 +544,7 @@ void raiden2_state::draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 		ytlim += 1;
 		xtlim += 1;
 
-		sx += 32;
+		//sx += 32;
 
 		xstep = 16;
 		ystep = 16;
@@ -1487,6 +1487,8 @@ static MACHINE_CONFIG_START( raiden2, raiden2_state )
 
 	SEIBU2_RAIDEN2_SOUND_SYSTEM_CPU(14318180/4)
 
+	MCFG_QUANTUM_TIME(HZ(6000))
+
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
@@ -1517,6 +1519,8 @@ static MACHINE_CONFIG_DERIVED( xsedae, raiden2 )
 
 	MCFG_MACHINE_RESET(xsedae)
 
+	MCFG_QUANTUM_TIME(HZ(600))
+
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MCFG_SCREEN_MODIFY("screen")
@@ -1528,8 +1532,9 @@ static MACHINE_CONFIG_DERIVED( raidendx, raiden2 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(raidendx_mem)
 
-	MCFG_MACHINE_RESET(raidendx)
+	MCFG_QUANTUM_TIME(HZ(6000))
 
+	MCFG_MACHINE_RESET(raidendx)
 MACHINE_CONFIG_END
 
 
@@ -1543,6 +1548,8 @@ static MACHINE_CONFIG_START( zeroteam, raiden2_state )
 	MCFG_MACHINE_RESET(zeroteam)
 
 	SEIBU_NEWZEROTEAM_SOUND_SYSTEM_CPU(14318180/4)
+
+	MCFG_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
