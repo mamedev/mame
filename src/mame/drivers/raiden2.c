@@ -466,7 +466,7 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 
 		// raidndx only
 	case 0x7e05:
-		space.write_dword(0x470, space.read_dword(cop_regs[3]));
+		space.write_dword(0x470, (space.read_dword(cop_regs[4]) & 0x30) << 10);
 		// Actually, wherever the bank selection actually is
 		// And probably 8 bytes too, but they zero all the rest
 		break;
@@ -1012,8 +1012,8 @@ static ADDRESS_MAP_START( raiden2_cop_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_st
 	AM_RANGE(0x0047a, 0x0047b) AM_WRITE(cop_dma_size_w)
 	AM_RANGE(0x0047c, 0x0047d) AM_WRITE(cop_dma_dst_w)
 	AM_RANGE(0x0047e, 0x0047f) AM_WRITE(cop_dma_mode_w)
-	AM_RANGE(0x004a0, 0x004a7) AM_READWRITE(cop_reg_high_r, cop_reg_high_w)
-	AM_RANGE(0x004c0, 0x004c7) AM_READWRITE(cop_reg_low_r, cop_reg_low_w)
+	AM_RANGE(0x004a0, 0x004a9) AM_READWRITE(cop_reg_high_r, cop_reg_high_w)
+	AM_RANGE(0x004c0, 0x004c9) AM_READWRITE(cop_reg_low_r, cop_reg_low_w)
 	AM_RANGE(0x00500, 0x00505) AM_WRITE(cop_cmd_w)
 	AM_RANGE(0x00580, 0x00581) AM_READ(cop_collision_status_r)
 	AM_RANGE(0x00590, 0x00599) AM_READ(cop_itoa_digits_r)
@@ -1070,9 +1070,10 @@ static ADDRESS_MAP_START( raiden2_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state 
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( raidendx_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state )
+	AM_RANGE(0x004d0, 0x004d7) AM_RAM //???
 	AM_RANGE(0x0062c, 0x0062d) AM_WRITE(tilemap_enable_w)
 	AM_RANGE(0x00610, 0x0061b) AM_WRITE(tile_scroll_w)
-	AM_RANGE(0x006ca, 0x006cb) AM_WRITENOP
+//	AM_RANGE(0x006ca, 0x006cb) AM_WRITENOP
 	AM_IMPORT_FROM( raiden2_mem )
 ADDRESS_MAP_END
 
@@ -1598,7 +1599,7 @@ ROM_START( raiden2 )
 	ROM_REGION( 0x40000, "user2", 0 )	/* COPX */
 	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Soldered MASK ROM */
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "snd",  0x000000, 0x08000, CRC(f51a28f9) SHA1(7ae2e2ba0c8159a544a8fd2bb0c2c694ba849302) )
 	ROM_CONTINUE(0x10000,0x8000)
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
@@ -1651,7 +1652,7 @@ ROM_START( raiden2a )
 	ROM_REGION( 0x40000, "user2", 0 )	/* COPX */
 	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Soldered MASK ROM */
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu5.u1110",  0x000000, 0x08000, CRC(8f130589) SHA1(e58c8beaf9f27f063ffbcb0ab4600123c25ce6f3) )
 	ROM_CONTINUE(0x10000,0x8000)
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
@@ -1721,7 +1722,7 @@ ROM_START( raiden2b )
 	ROM_REGION( 0x40000, "user2", 0 )	/* COPX */
 	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Soldered MASK ROM */
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu5.u1110",  0x000000, 0x08000, CRC(8f130589) SHA1(e58c8beaf9f27f063ffbcb0ab4600123c25ce6f3) )
 	ROM_CONTINUE(0x10000,0x8000)
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
@@ -1756,7 +1757,7 @@ ROM_START( raiden2c )
 	ROM_REGION( 0x40000, "user2", 0 )	/* COPX */
 	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Soldered MASK ROM */
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu5",  0x000000, 0x08000, CRC(5db9f922) SHA1(8257aab98657fe44df19d2a48d85fcf65b3d98c6) )
 	ROM_CONTINUE(0x10000,0x8000)
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
@@ -1809,7 +1810,7 @@ ROM_START( raiden2d )
 	ROM_REGION( 0x40000, "user2", 0 )	/* COPX */
 	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Soldered MASK ROM */
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "r2_snd.bin", 0x000000, 0x08000, CRC(6bad0a3e) SHA1(eb7ae42353e1984cd60b569c26cdbc3b025a7da6) )
 	ROM_CONTINUE(0x10000,0x8000)
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
@@ -1917,7 +1918,7 @@ ROM_START( raidndx )
 	ROM_REGION( 0x40000, "user2", 0 )	/* COPX */
 	ROM_LOAD( "copx-d2.6s",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "dx_5.5b",  0x000000, 0x08000,  CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
 	ROM_CONTINUE(0x10000,0x8000)
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
@@ -1952,7 +1953,7 @@ ROM_START( raidndxa1 )
 	ROM_REGION( 0x40000, "user2", 0 )	/* COPX */
 	ROM_LOAD( "copx-d2.6s",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "dx_5.5b",  0x000000, 0x08000,  CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
 	ROM_CONTINUE(0x10000,0x8000)
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
@@ -1987,7 +1988,7 @@ ROM_START( raidndxa2 )
 	ROM_REGION( 0x40000, "user2", 0 )	/* COPX */
 	ROM_LOAD( "copx-d2.6s",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "dx_5.5b",  0x000000, 0x08000,  CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
 	ROM_CONTINUE(0x10000,0x8000)
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
@@ -2022,7 +2023,7 @@ ROM_START( raidndxj )
 	ROM_REGION( 0x40000, "user2", 0 )	/* COPX */
 	ROM_LOAD( "copx-d2.6s",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "dx_5.5b",  0x000000, 0x08000,  CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
 	ROM_CONTINUE(0x10000,0x8000)
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
@@ -2057,7 +2058,7 @@ ROM_START( raidndxu )
 	ROM_REGION( 0x40000, "user2", 0 )	/* COPX */
 	ROM_LOAD( "copx-d2.6s",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "dx_5.5b",  0x000000, 0x08000,  CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
 	ROM_CONTINUE(0x10000,0x8000)
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
@@ -2092,7 +2093,7 @@ ROM_START( raidndxg )
 	ROM_REGION( 0x40000, "user2", 0 )	/* COPX */
 	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "5.u1110", 0x000000, 0x08000, CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
 	ROM_CONTINUE(0x10000,0x8000)
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
@@ -2130,7 +2131,7 @@ ROM_START( zeroteam )
 	ROM_REGION( 0x40000, "user2", 0 )	/* COPX */
 	ROM_LOAD( "copx-d2",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "sound",  0x000000, 0x08000, CRC(7ec1fbc3) SHA1(48299d6530f641b18764cc49e283c347d0918a47) ) // 5.5c
 	ROM_CONTINUE(0x10000,0x8000)
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
@@ -2161,7 +2162,7 @@ ROM_START( zeroteama )
 	ROM_REGION( 0x40000, "user2", 0 )	/* COPX */
 	ROM_LOAD( "copx-d2",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "5.bin",  0x000000, 0x08000, CRC(efc484ca) SHA1(c34b8e3e7f4c2967bc6414348993478ed637d338) )
 	ROM_CONTINUE(0x10000,0x8000)
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
@@ -2192,7 +2193,7 @@ ROM_START( zeroteams )
 	ROM_REGION( 0x40000, "user2", 0 )	/* COPX */
 	ROM_LOAD( "copx-d2",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "5_sel.bin",  0x000000, 0x08000, CRC(ed91046c) SHA1(de815c999aeeb814d3f091d5a9ac34ea9a388ddb) )
 	ROM_CONTINUE(0x10000,0x8000)
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
@@ -2224,7 +2225,7 @@ ROM_START( zeroteamb )
 	ROM_REGION( 0x40000, "user2", 0 )	/* COPX */
 	ROM_LOAD( "copx-d2",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "sound",  0x000000, 0x08000, CRC(7ec1fbc3) SHA1(48299d6530f641b18764cc49e283c347d0918a47) ) // 5.5c
 	ROM_CONTINUE(0x10000,0x8000)
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
@@ -2255,7 +2256,7 @@ ROM_START( zeroteamc )
 	ROM_REGION( 0x40000, "user2", 0 )	/* COPX */
 	ROM_LOAD( "copx-d2",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "5.bin",  0x000000, 0x08000, CRC(efc484ca) SHA1(c34b8e3e7f4c2967bc6414348993478ed637d338) )
 	ROM_CONTINUE(0x10000,0x8000)
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
@@ -2323,7 +2324,7 @@ ROM_START( xsedae )
 	ROM_REGION( 0x40000, "user2", ROMREGION_ERASEFF )	/* COPX */
 	/* Not populated */
 
-	ROM_REGION( 0x30000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x30000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "8.u1110",  0x000000, 0x08000, CRC(2dc2f81a) SHA1(0f6605042e0e295b4256b43dbdf5d53daebe1a9a) )
 	ROM_CONTINUE(0x10000,0x8000)
 	ROM_CONTINUE(0x20000,0x10000) // TODO

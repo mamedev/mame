@@ -76,7 +76,7 @@ public:
 	UINT8 prg_bank;
 
 	UINT16 scrollvals[6];
-	UINT32 cop_regs[4], cop_itoa;
+	UINT32 cop_regs[8], cop_itoa;
 	UINT16 cop_status, cop_scale, cop_itoa_digit_count, cop_angle, cop_dist;
 	UINT8 cop_itoa_digits[10];
 	UINT16 cop_dma_mode, cop_dma_src[0x200], cop_dma_dst[0x200], cop_dma_size[0x200], cop_dma_v1[0x200], cop_dma_v2[0x200], cop_dma_adr_rel;
