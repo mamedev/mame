@@ -463,7 +463,7 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 		break;
 
 	default:
-		printf("pcall %04x (%04x:%04x) [%x %x %x %x]\n", data, rps(space.machine), rpc(space.machine), cop_regs[0], cop_regs[1], cop_regs[2], cop_regs[3]);
+		logerror("pcall %04x (%04x:%04x) [%x %x %x %x]\n", data, rps(space.machine), rpc(space.machine), cop_regs[0], cop_regs[1], cop_regs[2], cop_regs[3]);
 	}
 }
 
@@ -894,6 +894,18 @@ static MACHINE_RESET(raiden2)
 	//cop_init();
 }
 
+static MACHINE_RESET(raidendx)
+{
+	raiden2_state *state = machine->driver_data<raiden2_state>();
+	state->common_reset();
+	sprcpt_init();
+	MACHINE_RESET_CALL(seibu_sound);
+
+	memory_set_bank(machine, "mainbank", 8);
+
+	//cop_init();
+}
+
 static MACHINE_RESET(zeroteam)
 {
 	raiden2_state *state = machine->driver_data<raiden2_state>();
@@ -953,8 +965,15 @@ WRITE16_MEMBER(raiden2_state::raiden2_bank_w)
 	}
 }
 
+READ16_MEMBER(raiden2_state::cop_collision_status_r)
+{
+	return 3;
+}
+
 /* MEMORY MAPS */
 static ADDRESS_MAP_START( raiden2_cop_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state )
+//	AM_RANGE(0x0041c, 0x0041d) AM_WRITENOP
+//	AM_RANGE(0x0041e, 0x0041f) AM_WRITENOP
 	AM_RANGE(0x00420, 0x00421) AM_WRITE(cop_itoa_low_w)
 	AM_RANGE(0x00422, 0x00423) AM_WRITE(cop_itoa_high_w)
 	AM_RANGE(0x00424, 0x00425) AM_WRITE(cop_itoa_digit_count_w)
@@ -966,7 +985,7 @@ static ADDRESS_MAP_START( raiden2_cop_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_st
 	AM_RANGE(0x0043a, 0x0043b) AM_WRITE(cop_pgm_mask_w)
 	AM_RANGE(0x0043c, 0x0043d) AM_WRITE(cop_pgm_trigger_w)
 	AM_RANGE(0x00444, 0x00445) AM_WRITE(cop_scale_w)
-	AM_RANGE(0x00470, 0x00471) AM_WRITE(cop_tile_bank_2_w)
+	AM_RANGE(0x00470, 0x00471) AM_READNOP AM_WRITE(cop_tile_bank_2_w)
 
 	AM_RANGE(0x00476, 0x00477) AM_WRITE(cop_dma_adr_rel_w)
 	AM_RANGE(0x00478, 0x00479) AM_WRITE(cop_dma_src_w)
@@ -976,6 +995,7 @@ static ADDRESS_MAP_START( raiden2_cop_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_st
 	AM_RANGE(0x004a0, 0x004a7) AM_READWRITE(cop_reg_high_r, cop_reg_high_w)
 	AM_RANGE(0x004c0, 0x004c7) AM_READWRITE(cop_reg_low_r, cop_reg_low_w)
 	AM_RANGE(0x00500, 0x00505) AM_WRITE(cop_cmd_w)
+	AM_RANGE(0x00580, 0x00581) AM_READ(cop_collision_status_r)
 	AM_RANGE(0x00590, 0x00599) AM_READ(cop_itoa_digits_r)
 	AM_RANGE(0x005b0, 0x005b1) AM_READ(cop_status_r)
 	AM_RANGE(0x005b2, 0x005b3) AM_READ(cop_dist_r)
@@ -983,6 +1003,7 @@ static ADDRESS_MAP_START( raiden2_cop_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_st
 
 	AM_RANGE(0x0061c, 0x0061d) AM_WRITE(tilemap_enable_w)
 	AM_RANGE(0x00620, 0x0062b) AM_WRITE(tile_scroll_w)
+//	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP
 	AM_RANGE(0x006a0, 0x006a3) AM_WRITE(sprcpt_val_1_w)
 	AM_RANGE(0x006a4, 0x006a7) AM_WRITE(sprcpt_data_3_w)
 	AM_RANGE(0x006a8, 0x006ab) AM_WRITE(sprcpt_data_4_w)
@@ -994,6 +1015,8 @@ static ADDRESS_MAP_START( raiden2_cop_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_st
 	AM_RANGE(0x006ca, 0x006cb) AM_WRITE(raiden2_bank_w)
 	AM_RANGE(0x006cc, 0x006cd) AM_WRITE(tile_bank_01_w)
 	AM_RANGE(0x006ce, 0x006cf) AM_WRITE(sprcpt_flags_2_w)
+//	AM_RANGE(0x006d8, 0x006d9) AM_WRITENOP
+//	AM_RANGE(0x006da, 0x006db) AM_WRITENOP
 	AM_RANGE(0x006fc, 0x006fd) AM_WRITE(cop_dma_trigger_w)
 ADDRESS_MAP_END
 
@@ -1022,6 +1045,13 @@ static ADDRESS_MAP_START( raiden2_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state 
 
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("mainbank")
 	AM_RANGE(0x40000, 0xfffff) AM_ROM AM_REGION("mainprg", 0x40000)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( raidendx_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state )
+	AM_RANGE(0x0062c, 0x0062d) AM_WRITE(tilemap_enable_w)
+	AM_RANGE(0x00610, 0x0061b) AM_WRITE(tile_scroll_w)
+	AM_RANGE(0x006ca, 0x006cb) AM_WRITENOP
+	AM_IMPORT_FROM( raiden2_mem )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( zeroteam_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state )
@@ -1470,6 +1500,15 @@ static MACHINE_CONFIG_DERIVED( xsedae, raiden2 )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
 
 MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( raidendx, raiden2 )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(raidendx_mem)
+
+	MCFG_MACHINE_RESET(raidendx)
+
+MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_START( zeroteam, raiden2_state )
 
@@ -2292,6 +2331,12 @@ static DRIVER_INIT (raiden2)
 	raiden2_decrypt_sprites(machine);
 }
 
+static DRIVER_INIT (raidendx)
+{
+	memory_configure_bank(machine, "mainbank", 0, 0x10, machine->region("mainprg")->base(), 0x20000);
+	raiden2_decrypt_sprites(machine);
+}
+
 static DRIVER_INIT (xsedae)
 {
 	/* doesn't have banking */
@@ -2309,12 +2354,12 @@ GAME( 1993, raiden2d, raiden2, raiden2,  raiden2,  raiden2,  ROT270, "Seibu Kaih
 GAME( 1993, raiden2e, raiden2, raiden2,  raiden2,  raiden2,  ROT270, "Seibu Kaihatsu",                         "Raiden II (set 6)",                GAME_NOT_WORKING) // rev 4
 GAME( 1993, raiden2f, raiden2, raiden2,  raiden2,  raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden II (set 7, US Fabtek)",     GAME_NOT_WORKING) //  ^
 
-GAME( 1994, raidndx,  0,       raiden2,  raidendx, raiden2,  ROT270, "Seibu Kaihatsu",                         "Raiden DX (UK)",                   GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME( 1994, raidndxa1,raidndx, raiden2,  raidendx, raiden2,  ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden DX (Asia set 1)",           GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME( 1994, raidndxa2,raidndx, raiden2,  raidendx, raiden2,  ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden DX (Asia set 2)",           GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME( 1994, raidndxj, raidndx, raiden2,  raidendx, raiden2,  ROT270, "Seibu Kaihatsu",                         "Raiden DX (Japan)",                GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME( 1994, raidndxu, raidndx, raiden2,  raidendx, raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden DX (US)",                   GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME( 1994, raidndxg, raidndx, raiden2,  raidendx, raiden2,  ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden DX (Germany)",              GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1994, raidndx,  0,       raidendx,  raidendx, raidendx,  ROT270, "Seibu Kaihatsu",                         "Raiden DX (UK)",                   GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1994, raidndxa1,raidndx, raidendx,  raidendx, raidendx,  ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden DX (Asia set 1)",           GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1994, raidndxa2,raidndx, raidendx,  raidendx, raidendx,  ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden DX (Asia set 2)",           GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1994, raidndxj, raidndx, raidendx,  raidendx, raidendx,  ROT270, "Seibu Kaihatsu",                         "Raiden DX (Japan)",                GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1994, raidndxu, raidndx, raidendx,  raidendx, raidendx,  ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden DX (US)",                   GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1994, raidndxg, raidndx, raidendx,  raidendx, raidendx,  ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden DX (Germany)",              GAME_NOT_WORKING|GAME_NO_SOUND)
 
 GAME( 1993, zeroteam, 0,       zeroteam, zeroteam,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 1)", GAME_NOT_WORKING)
 GAME( 1993, zeroteama,zeroteam,zeroteam, zeroteam,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 2)", GAME_NOT_WORKING)
