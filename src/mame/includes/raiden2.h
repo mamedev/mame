@@ -14,6 +14,7 @@ public:
 	DECLARE_WRITE16_MEMBER( cop_dma_src_w );
 	DECLARE_WRITE16_MEMBER( cop_dma_size_w );
 	DECLARE_WRITE16_MEMBER( cop_dma_dst_w );
+	DECLARE_READ16_MEMBER( cop_dma_mode_r );
 	DECLARE_WRITE16_MEMBER( cop_dma_mode_w );
 	DECLARE_READ16_MEMBER ( cop_reg_high_r );
 	DECLARE_WRITE16_MEMBER( cop_reg_high_w );
@@ -69,15 +70,13 @@ public:
 	DECLARE_READ16_MEMBER( raiden2_sound_comms_r );
 	DECLARE_WRITE16_MEMBER( raiden2_sound_comms_w );
 
-	DECLARE_WRITE16_MEMBER( test_w );
-
 	void common_reset();
 
 	tilemap_t *background_layer,*midground_layer,*foreground_layer,*text_layer;
 	UINT16 *back_data,*fore_data,*mid_data, *text_data, *sprites;
 	int bg_bank, fg_bank, mid_bank;
 	UINT16 raiden2_tilemap_enable;
-	UINT8 prg_bank;
+	UINT8 prg_bank,prot_data;
 	UINT16 cop_bank;
 
 	UINT16 scrollvals[6];
