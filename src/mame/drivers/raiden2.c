@@ -900,6 +900,7 @@ static MACHINE_RESET(raiden2)
 
 	memory_set_bank(machine, "mainbank", 1);
 
+	state->prg_bank = 0;
 	//cop_init();
 }
 
@@ -911,6 +912,8 @@ static MACHINE_RESET(raidendx)
 	MACHINE_RESET_CALL(seibu_sound);
 
 	memory_set_bank(machine, "mainbank", 8);
+
+	state->prg_bank = 0x08;
 
 	//cop_init();
 }
@@ -926,6 +929,7 @@ static MACHINE_RESET(zeroteam)
 
 	memory_set_bank(machine, "mainbank", 1);
 
+	state->prg_bank = 0;
 	//cop_init();
 }
 
@@ -971,12 +975,19 @@ WRITE16_MEMBER(raiden2_state::raiden2_bank_w)
 	if(ACCESSING_BITS_8_15) {
 		logerror("select bank %d %04x\n", (data >> 15) & 1, data);
 		memory_set_bank(space.machine, "mainbank", !((data >> 15) & 1));
+		prg_bank = ((data >> 15) & 1);
 	}
 }
 
 READ16_MEMBER(raiden2_state::cop_collision_status_r)
 {
 	return 3;
+}
+
+/* TODO: Probably all of the gfx banking routes here! */
+READ16_MEMBER(raiden2_state::raiden2_bank_r)
+{
+	return 0xbfff | (prg_bank << 14);
 }
 
 /* MEMORY MAPS */
@@ -1027,6 +1038,8 @@ static ADDRESS_MAP_START( raiden2_cop_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_st
 //	AM_RANGE(0x006d8, 0x006d9) AM_WRITENOP
 //	AM_RANGE(0x006da, 0x006db) AM_WRITENOP
 	AM_RANGE(0x006fc, 0x006fd) AM_WRITE(cop_dma_trigger_w)
+
+	AM_RANGE(0x00762, 0x00763) AM_READ(raiden2_bank_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( raiden2_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state )

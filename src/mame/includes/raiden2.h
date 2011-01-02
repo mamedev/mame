@@ -32,6 +32,7 @@ public:
 	DECLARE_READ16_MEMBER ( cop_angle_r );
 	DECLARE_WRITE16_MEMBER( cop_angle_compare_w );
 	DECLARE_WRITE16_MEMBER( cop_angle_mod_val_w );
+	DECLARE_READ16_MEMBER ( raiden2_bank_r );
 
 	DECLARE_WRITE16_MEMBER ( cop_dma_trigger_w );
 	DECLARE_WRITE16_MEMBER ( raiden2_bank_w );
@@ -72,6 +73,7 @@ public:
 	UINT16 *back_data,*fore_data,*mid_data, *text_data, *sprites;
 	int bg_bank, fg_bank, mid_bank;
 	UINT16 raiden2_tilemap_enable;
+	UINT8 prg_bank;
 
 	UINT16 scrollvals[6];
 	UINT32 cop_regs[4], cop_itoa;
