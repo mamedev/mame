@@ -551,6 +551,7 @@ INLINE void set_cop0_reg(int idx, UINT64 val)
 			break;
 
 		case COP0_Compare:
+			mips3.core.compare_armed = 1;
 			CAUSE &= ~0x8000;
 			mips3.core.cpr[0][idx] = val & 0xffffffff;
 			mips3com_update_cycle_counting(&mips3.core);
