@@ -53,6 +53,8 @@
 #include <X11/Xutil.h>
 #endif
 
+#include "watchdog.h"
+
 //============================================================
 //  OPTIONS
 //============================================================
@@ -85,6 +87,7 @@ static const options_entry mame_sdl_options[] =
 	// debugging options
 	{ NULL,                                   NULL,       OPTION_HEADER,     "DEBUGGING OPTIONS" },
 	{ SDLOPTION_OSLOG,                        "0",        OPTION_BOOLEAN,    "output error.log data to the system debugger" },
+	{ SDLOPTION_WATCHDOG ";wdog",             "0",        0,                 "force the program to terminate if no updates within specified number of seconds" },
 
 	// performance options
 	{ NULL,                                   NULL,       OPTION_HEADER,     "PERFORMANCE OPTIONS" },
@@ -369,6 +372,7 @@ static void output_oslog(running_machine &machine, const char *buffer)
 
 sdl_osd_interface::sdl_osd_interface()
 {
+	m_watchdog = NULL;
 }
 
 
@@ -616,6 +620,15 @@ void sdl_osd_interface::init(running_machine &machine)
 
 	if (options_get_bool(machine.options(), SDLOPTION_OSLOG))
 		machine.add_logerror_callback(output_oslog);
+
+	/* now setup watchdog */
+
+	int watchdog_timeout = options_get_int(machine.options(), SDLOPTION_WATCHDOG);
+	if (watchdog_timeout != 0)
+	{
+		m_watchdog = auto_alloc(&machine, watchdog);
+		m_watchdog->setTimeout(watchdog_timeout);
+	}
 
 #if (SDL_VERSION_ATLEAST(1,3,0))
 	SDL_EventState(SDL_TEXTINPUT, SDL_TRUE);

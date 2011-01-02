@@ -282,7 +282,8 @@ OSDOBJS = \
 	$(SDLOBJ)/video.o \
 	$(SDLOBJ)/drawsdl.o \
 	$(SDLOBJ)/window.o \
-	$(SDLOBJ)/output.o
+	$(SDLOBJ)/output.o \
+	$(SDLOBJ)/watchdog.o
 
 # Add SDL1.3 support
 ifdef SDL_INSTALL_ROOT

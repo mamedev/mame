@@ -333,6 +333,9 @@ void sdl_osd_interface::update(bool skip_redraw)
 {
 	sdl_window_info *window;
 
+	if (m_watchdog != NULL)
+		m_watchdog->reset();
+
 	// if we're not skipping this redraw, update all windows
 	if (!skip_redraw)
 	{

@@ -221,3 +221,11 @@ int osd_thread_cpu_affinity(osd_thread *thread, UINT32 mask)
 	return TRUE;
 }
 
+//============================================================
+//  osd_process_kill
+//============================================================
+
+void osd_process_kill(void)
+{
+	TerminateProcess(GetCurrentProcess(), -1);
+}

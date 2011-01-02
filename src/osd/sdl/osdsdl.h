@@ -3,6 +3,8 @@
 
 #include <SDL/SDL.h>
 
+#include "watchdog.h"
+
 //============================================================
 //  Temporary SDL 1.3 defines
 //============================================================
@@ -74,6 +76,7 @@
 #define SDLOPTION_KEYMAP_FILE			"keymap_file"
 #define SDLOPTION_UIMODEKEY				"uimodekey"
 #define SDLOPTION_OSLOG					"oslog"
+#define SDLOPTION_WATCHDOG				"watchdog"
 
 #define SDLOPTION_SIXAXIS				"sixaxis"
 #define SDLOPTION_JOYINDEX				"joy_idx"
@@ -162,6 +165,9 @@ public:
 
 private:
 	static void osd_exit(running_machine &machine);
+
+	watchdog *m_watchdog;
+
 };
 
 
