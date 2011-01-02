@@ -198,12 +198,12 @@ WRITE16_MEMBER(raiden2_state::cop_dma_adr_rel_w)
 
 WRITE16_MEMBER(raiden2_state::cop_dma_v1_w)
 {
-	COMBINE_DATA(&cop_dma_v1[cop_dma_mode]);
+	COMBINE_DATA(&cop_dma_v1);
 }
 
 WRITE16_MEMBER(raiden2_state::cop_dma_v2_w)
 {
-	COMBINE_DATA(&cop_dma_v2[cop_dma_mode]);
+	COMBINE_DATA(&cop_dma_v2);
 }
 
 WRITE16_MEMBER(raiden2_state::cop_dma_dst_w)
@@ -304,7 +304,7 @@ WRITE16_MEMBER(raiden2_state::cop_dma_trigger_w)
 
 		for (i=address;i<address+length;i+=4)
 		{
-			space.write_dword(i, 0x0000); //TODO: fill value
+			space.write_dword(i, (cop_dma_v1) | (cop_dma_v2 << 16)); //TODO: fill value
 		}
 	}
 	}

@@ -67,6 +67,9 @@ public:
 	DECLARE_READ16_MEMBER( raiden2_sound_comms_r );
 	DECLARE_WRITE16_MEMBER( raiden2_sound_comms_w );
 
+	DECLARE_WRITE16_MEMBER( test_w );
+
+
 	void common_reset();
 
 	tilemap_t *background_layer,*midground_layer,*foreground_layer,*text_layer;
@@ -79,7 +82,7 @@ public:
 	UINT32 cop_regs[8], cop_itoa;
 	UINT16 cop_status, cop_scale, cop_itoa_digit_count, cop_angle, cop_dist;
 	UINT8 cop_itoa_digits[10];
-	UINT16 cop_dma_mode, cop_dma_src[0x200], cop_dma_dst[0x200], cop_dma_size[0x200], cop_dma_v1[0x200], cop_dma_v2[0x200], cop_dma_adr_rel;
+	UINT16 cop_dma_mode, cop_dma_src[0x200], cop_dma_dst[0x200], cop_dma_size[0x200], cop_dma_v1, cop_dma_v2, cop_dma_adr_rel;
 	UINT16 sprites_cur_start;
 
 	UINT16 cop_func_trigger[0x100/8];		/* function trigger */
