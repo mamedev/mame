@@ -11,9 +11,9 @@ public:
 	DECLARE_WRITE16_MEMBER( cop_dma_v2_w );
 	DECLARE_WRITE16_MEMBER( cop_scale_w );
 	DECLARE_WRITE16_MEMBER( cop_dma_adr_rel_w );
-	DECLARE_WRITE16_MEMBER( cop_dma_adr_w );
+	DECLARE_WRITE16_MEMBER( cop_dma_src_w );
 	DECLARE_WRITE16_MEMBER( cop_dma_size_w );
-	DECLARE_WRITE16_MEMBER( cop_dma_v3_w );
+	DECLARE_WRITE16_MEMBER( cop_dma_dst_w );
 	DECLARE_WRITE16_MEMBER( cop_dma_mode_w );
 	DECLARE_READ16_MEMBER ( cop_reg_high_r );
 	DECLARE_WRITE16_MEMBER( cop_reg_high_w );
@@ -26,9 +26,12 @@ public:
 	DECLARE_WRITE16_MEMBER( cop_pgm_trigger_w );
 	DECLARE_WRITE16_MEMBER( cop_cmd_w );
 	DECLARE_READ16_MEMBER ( cop_itoa_digits_r );
+	DECLARE_READ16_MEMBER ( cop_collision_status_r );
 	DECLARE_READ16_MEMBER ( cop_status_r );
 	DECLARE_READ16_MEMBER ( cop_dist_r );
 	DECLARE_READ16_MEMBER ( cop_angle_r );
+	DECLARE_WRITE16_MEMBER( cop_angle_compare_w );
+	DECLARE_WRITE16_MEMBER( cop_angle_mod_val_w );
 
 	DECLARE_WRITE16_MEMBER ( cop_dma_trigger_w );
 	DECLARE_WRITE16_MEMBER ( raiden2_bank_w );
@@ -66,7 +69,7 @@ public:
 	void common_reset();
 
 	tilemap_t *background_layer,*midground_layer,*foreground_layer,*text_layer;
-	UINT16 *back_data,*fore_data,*mid_data, *text_data;
+	UINT16 *back_data,*fore_data,*mid_data, *text_data, *sprites;
 	int bg_bank, fg_bank, mid_bank;
 	UINT16 raiden2_tilemap_enable;
 
@@ -74,14 +77,16 @@ public:
 	UINT32 cop_regs[4], cop_itoa;
 	UINT16 cop_status, cop_scale, cop_itoa_digit_count, cop_angle, cop_dist;
 	UINT8 cop_itoa_digits[10];
-	UINT16 cop_dma_mode, cop_dma_adr, cop_dma_size, cop_dma_v1, cop_dma_v2, cop_dma_v3,cop_dma_adr_rel;
-	UINT16 sprites[0x800], sprites_cur_start;
+	UINT16 cop_dma_mode, cop_dma_src[0x200], cop_dma_dst[0x200], cop_dma_size[0x200], cop_dma_v1[0x200], cop_dma_v2[0x200], cop_dma_adr_rel;
+	UINT16 sprites_cur_start;
 
 	UINT16 cop_func_trigger[0x100/8];		/* function trigger */
 	UINT16 cop_func_value[0x100/8];			/* function value (?) */
 	UINT16 cop_func_mask[0x100/8];			/* function mask (?) */
 	UINT16 cop_program[0x100];				/* program "code" */
 	UINT16 cop_latch_addr, cop_latch_trigger, cop_latch_value, cop_latch_mask;
+	INT8 cop_angle_compare;
+	UINT8 cop_angle_mod_val;
 
 	void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect ,int pri_mask );
 };

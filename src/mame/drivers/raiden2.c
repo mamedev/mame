@@ -198,17 +198,17 @@ WRITE16_MEMBER(raiden2_state::cop_dma_adr_rel_w)
 
 WRITE16_MEMBER(raiden2_state::cop_dma_v1_w)
 {
-	COMBINE_DATA(&cop_dma_v1);
+	COMBINE_DATA(&cop_dma_v1[cop_dma_mode]);
 }
 
 WRITE16_MEMBER(raiden2_state::cop_dma_v2_w)
 {
-	COMBINE_DATA(&cop_dma_v2);
+	COMBINE_DATA(&cop_dma_v2[cop_dma_mode]);
 }
 
-WRITE16_MEMBER(raiden2_state::cop_dma_v3_w)
+WRITE16_MEMBER(raiden2_state::cop_dma_dst_w)
 {
-	COMBINE_DATA(&cop_dma_v3);
+	COMBINE_DATA(&cop_dma_dst[cop_dma_mode]);
 }
 
 WRITE16_MEMBER(raiden2_state::cop_dma_mode_w)
@@ -216,38 +216,51 @@ WRITE16_MEMBER(raiden2_state::cop_dma_mode_w)
 	COMBINE_DATA(&cop_dma_mode);
 }
 
-WRITE16_MEMBER(raiden2_state::cop_dma_adr_w)
+WRITE16_MEMBER(raiden2_state::cop_dma_src_w)
 {
-	COMBINE_DATA(&cop_dma_adr);
+	COMBINE_DATA(&cop_dma_src[cop_dma_mode]);
 }
 
 WRITE16_MEMBER(raiden2_state::cop_dma_size_w)
 {
-	COMBINE_DATA(&cop_dma_size);
+	COMBINE_DATA(&cop_dma_size[cop_dma_mode]);
 }
 
 WRITE16_MEMBER(raiden2_state::cop_dma_trigger_w)
 {
-	//  logerror("COP DMA mode=%x adr=%x size=%x vals=%x %x %x\n", cop_dma_mode, cop_dma_adr, cop_dma_size, cop_dma_v1, cop_dma_v2, cop_dma_v3);
+	//  logerror("COP DMA mode=%x adr=%x size=%x vals=%x %x %x\n", cop_dma_mode, cop_dma_src[cop_dma_mode], cop_dma_size[cop_dma_mode], cop_dma_v1[cop_dma_mode], cop_dma_v2[cop_dma_mode], cop_dma_dst[cop_dma_mode]);
+
+	//printf("%08x %08x %08x %02x\n",cop_dma_src[cop_dma_mode] << 6,cop_dma_dst[cop_dma_mode] << 6,cop_dma_size[cop_dma_mode] << 5,cop_dma_mode);
 
 	switch(cop_dma_mode) {
 	case 0x14: {
+		/* TODO: this transfers the whole VRAM, not only spriteram!
+		   For whatever reason, this stopped working as soon as I've implemented DMA slot concept.
+		   Raiden 2 uses this DMA with cop_dma_dst == 0xfffe, effectively changing the order of the uploaded VRAMs.
+		   Also the size is used for doing a sprite limit trickery.
+		*/
+		static int rsize = ((0x80 - cop_dma_size[cop_dma_mode]) & 0x7f) +1;
+
+		sprites_cur_start = 0x1000 - (rsize << 5);
+		#if 0
 		int rsize = 32*(0x7f-cop_dma_size);
 		int radr = 64*cop_dma_adr - rsize;
 		for(int i=0; i<rsize; i+=2)
 			sprites[i/2] = space.read_word(radr+i);
 		sprites_cur_start = rsize;
+		#endif
 		break;
 	}
 	case 0x82: {
 		UINT32 src,dst,size;
 		int i;
 
-		src = (cop_dma_adr << 6) + (cop_dma_adr_rel * 0x400);
-		dst = (cop_dma_v3 << 6);
-		size = ((cop_dma_size << 5) - (cop_dma_v3 << 6) + 0x20)/2;
+		src = (cop_dma_src[cop_dma_mode] << 6) + (cop_dma_adr_rel * 0x400);
+		dst = (cop_dma_dst[cop_dma_mode] << 6);
+		size = ((cop_dma_size[cop_dma_mode] << 5) - (cop_dma_dst[cop_dma_mode] << 6) + 0x20)/2;
 
 		//printf("%08x %08x %08x\n",src,dst,size);
+		/* TODO: palette brightness */
 
 		for(i = 0;i < size;i++)
 		{
@@ -262,9 +275,9 @@ WRITE16_MEMBER(raiden2_state::cop_dma_trigger_w)
 		UINT32 src,dst,size;
 		int i;
 
-		src = (cop_dma_adr << 6);
-		dst = (cop_dma_v3 << 6);
-		size = ((cop_dma_size << 5) - (cop_dma_v3 << 6) + 0x20)/2;
+		src = (cop_dma_src[cop_dma_mode] << 6);
+		dst = (cop_dma_dst[cop_dma_mode] << 6);
+		size = ((cop_dma_size[cop_dma_mode] << 5) - (cop_dma_dst[cop_dma_mode] << 6) + 0x20)/2;
 
 //      printf("%08x %08x %08x\n",src,dst,size);
 
@@ -276,6 +289,23 @@ WRITE16_MEMBER(raiden2_state::cop_dma_trigger_w)
 		}
 
 		break;
+	}
+	case 0x118:
+	case 0x11f: {
+		UINT32 length, address;
+		int i;
+		if(cop_dma_dst[cop_dma_mode] != 0x0000) // Invalid?
+			return;
+
+		address = (cop_dma_src[cop_dma_mode] << 6);
+		length = (cop_dma_size[cop_dma_mode]+1) << 5;
+
+		//printf("%08x %08x\n",address,length);
+
+		for (i=address;i<address+length;i+=4)
+		{
+			space.write_dword(i, 0x0000); //TODO: fill value
+		}
 	}
 	}
 }
@@ -433,7 +463,7 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 		break;
 
 	default:
-		logerror("pcall %04x (%04x:%04x) [%x %x %x %x]\n", data, rps(space.machine), rpc(space.machine), cop_regs[0], cop_regs[1], cop_regs[2], cop_regs[3]);
+		printf("pcall %04x (%04x:%04x) [%x %x %x %x]\n", data, rps(space.machine), rpc(space.machine), cop_regs[0], cop_regs[1], cop_regs[2], cop_regs[3]);
 	}
 }
 
@@ -454,7 +484,7 @@ static void combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_mask)
 
 void raiden2_state::draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect ,int pri_mask )
 {
-	const UINT16 *source = sprites + sprites_cur_start/2 - 4;
+	UINT16 *source = sprites + sprites_cur_start/2 - 4;
 
 	const gfx_element *gfx = machine->gfx[2];
 
@@ -602,7 +632,7 @@ WRITE16_MEMBER(raiden2_state::tile_bank_01_w)
 			tilemap_mark_all_tiles_dirty(background_layer);
 		}
 
-		new_bank = 2 | ((data >> 1) & 1);
+		new_bank = 1 | (data & 2);
 		if(new_bank != mid_bank) {
 			mid_bank = new_bank;
 			tilemap_mark_all_tiles_dirty(midground_layer);
@@ -939,9 +969,9 @@ static ADDRESS_MAP_START( raiden2_cop_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_st
 	AM_RANGE(0x00470, 0x00471) AM_WRITE(cop_tile_bank_2_w)
 
 	AM_RANGE(0x00476, 0x00477) AM_WRITE(cop_dma_adr_rel_w)
-	AM_RANGE(0x00478, 0x00479) AM_WRITE(cop_dma_adr_w)
+	AM_RANGE(0x00478, 0x00479) AM_WRITE(cop_dma_src_w)
 	AM_RANGE(0x0047a, 0x0047b) AM_WRITE(cop_dma_size_w)
-	AM_RANGE(0x0047c, 0x0047d) AM_WRITE(cop_dma_v3_w)
+	AM_RANGE(0x0047c, 0x0047d) AM_WRITE(cop_dma_dst_w)
 	AM_RANGE(0x0047e, 0x0047f) AM_WRITE(cop_dma_mode_w)
 	AM_RANGE(0x004a0, 0x004a7) AM_READWRITE(cop_reg_high_r, cop_reg_high_w)
 	AM_RANGE(0x004c0, 0x004c7) AM_READWRITE(cop_reg_low_r, cop_reg_low_w)
@@ -978,8 +1008,9 @@ static ADDRESS_MAP_START( raiden2_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state 
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("CONTROLS")
 	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
 
-	AM_RANGE(0x00800, 0x0cfff) AM_RAM
+	AM_RANGE(0x00800, 0x0bfff) AM_RAM
 
+	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_BASE(sprites)
 	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_BASE(back_data)
 	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(fore_data)
     AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(raiden2_midground_w)  AM_BASE(mid_data)
@@ -1007,13 +1038,13 @@ static ADDRESS_MAP_START( zeroteam_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("CONTROLS")
 	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
 
+	AM_RANGE(0x00800, 0x0b7ff) AM_RAM
 	AM_RANGE(0x0b800, 0x0bfff) AM_RAM_WRITE(raiden2_background_w) AM_BASE(back_data)
 	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(fore_data)
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(raiden2_midground_w) AM_BASE(mid_data)
     AM_RANGE(0x0d000, 0x0dfff) AM_RAM_WRITE(raiden2_text_w) AM_BASE(text_data)
 	AM_RANGE(0x0e000, 0x0efff) AM_RAM AM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-
-	AM_RANGE(0x00800, 0x0ffff) AM_RAM
+	AM_RANGE(0x0f000, 0x0ffff) AM_RAM AM_BASE(sprites)
 	AM_RANGE(0x10000, 0x1ffff) AM_RAM
 
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("mainbank")
@@ -1034,13 +1065,14 @@ static ADDRESS_MAP_START( xsedae_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("CONTROLS")
 	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
 
+	AM_RANGE(0x00800, 0x0b7ff) AM_RAM
 	AM_RANGE(0x0b800, 0x0bfff) AM_RAM_WRITE(raiden2_background_w) AM_BASE(back_data)
 	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(fore_data)
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(raiden2_midground_w) AM_BASE(mid_data)
     AM_RANGE(0x0d000, 0x0dfff) AM_RAM_WRITE(raiden2_text_w) AM_BASE(text_data)
 	AM_RANGE(0x0e000, 0x0efff) AM_RAM AM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x0f000, 0x0ffff) AM_RAM AM_BASE(sprites)
 
-	AM_RANGE(0x00800, 0x0ffff) AM_RAM
 	AM_RANGE(0x10000, 0x1ffff) AM_RAM
 
 	AM_RANGE(0x20000, 0xfffff) AM_ROM AM_REGION("mainprg", 0x20000)
@@ -1402,7 +1434,6 @@ static MACHINE_CONFIG_START( raiden2, raiden2_state )
 
 	SEIBU2_RAIDEN2_SOUND_SYSTEM_CPU(14318180/4)
 
-
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
@@ -1433,6 +1464,8 @@ static MACHINE_CONFIG_DERIVED( xsedae, raiden2 )
 
 	MCFG_MACHINE_RESET(xsedae)
 
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
 
@@ -1448,7 +1481,6 @@ static MACHINE_CONFIG_START( zeroteam, raiden2_state )
 	MCFG_MACHINE_RESET(zeroteam)
 
 	SEIBU_NEWZEROTEAM_SOUND_SYSTEM_CPU(14318180/4)
-
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
