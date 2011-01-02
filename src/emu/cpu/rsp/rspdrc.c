@@ -3272,13 +3272,34 @@ INLINE void cfunc_rsp_vrsql(void *param)
 	int sel = EL & 7;
 	INT32 shifter = 0;
 
-	INT32 rec = (INT16)(VREG_S(VS2REG, sel));
-	INT32 datainput = (rec < 0) ? (-rec) : rec;
+	INT32 rec = ((UINT16)(VREG_S(VS2REG, sel)) | ((UINT32)(rsp->reciprocal_high) & 0xffff0000));
+
+	INT32 datainput = rec;
+
+	if (rec < 0)
+	{
+		if (rsp->dp_allowed)
+		{
+			if (rec < -32768)//VDIV.C,208
+			{
+				datainput = ~datainput;
+			}
+			else
+			{
+				datainput = -datainput;
+			}
+		}
+		else
+		{
+			datainput = -datainput;
+		}
+	}
+
 	if (datainput)
 	{
 		for (i = 0; i < 32; i++)
 		{
-			if (datainput & (1 << ((~i) & 0x1f)))//т.ж.что 31 - i
+			if (datainput & (1 << ((~i) & 0x1f)))
 			{
 				shifter = i;
 				break;
@@ -3287,7 +3308,14 @@ INLINE void cfunc_rsp_vrsql(void *param)
 	}
 	else
 	{
-		shifter = 0x10;
+		if (rsp->dp_allowed)
+		{
+			shifter = 0;
+		}
+		else
+		{
+			shifter = 0x10;
+		}
 	}
 
 	INT32 address = ((datainput << shifter) & 0x7fc00000) >> 22;
