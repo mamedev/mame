@@ -109,7 +109,7 @@ struct _texture_info
 
 	copy_info			*copyinfo;
 	Uint32				sdl_access;
-	Uint32				sdl_blendmode;
+	SDL_BlendMode		sdl_blendmode;
 	quad_setup_data		setup;
 	int					is_rotated;
 
@@ -310,7 +310,7 @@ INLINE HashT texture_compute_hash(const render_texinfo *texture, UINT32 flags)
 	return (HashT)texture->base ^ (flags & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK));
 }
 
-INLINE Uint32 map_blendmode(int blendmode)
+INLINE SDL_BlendMode map_blendmode(int blendmode)
 {
 	switch (blendmode)
 	{
@@ -377,11 +377,11 @@ INLINE void render_quad(sdl_info *sdl, texture_info *texture, render_primitive *
 		texture->copyinfo->time -= osd_ticks();
 		if ((PRIMFLAG_GET_SCREENTEX(prim->flags)) && video_config.filter)
 		{
-			SDL_SetTextureScaleMode(texture->texture_id,  SDL_TEXTURESCALEMODE_BEST);
+			SDL_SetTextureScaleMode(texture->texture_id,  SDL_SCALEMODE_BEST);
 		}
 		else
 		{
-			SDL_SetTextureScaleMode(texture->texture_id,  SDL_TEXTURESCALEMODE_NONE);
+			SDL_SetTextureScaleMode(texture->texture_id,  SDL_SCALEMODE_NONE);
 		}
 		SDL_SetTextureBlendMode(texture_id, texture->sdl_blendmode);
 		set_coloralphamode(texture_id, &prim->color);

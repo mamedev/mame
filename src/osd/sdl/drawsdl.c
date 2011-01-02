@@ -74,18 +74,18 @@ struct _sdl_info
 
 struct _sdl_scale_mode
 {
-	const char *name;
-	int		is_scale;			/* Scale mode?           */
-	int		is_yuv;				/* Yuv mode?             */
-	int		mult_w;				/* Width multiplier      */
-	int		mult_h;				/* Height multiplier     */
+	const char 		*name;
+	int				is_scale;			/* Scale mode?           */
+	int				is_yuv;				/* Yuv mode?             */
+	int				mult_w;				/* Width multiplier      */
+	int				mult_h;				/* Height multiplier     */
 #if (!SDL_VERSION_ATLEAST(1,3,0))
-	int		extra_flags;		/* Texture/surface flags */
+	int				extra_flags;		/* Texture/surface flags */
 #else
-	int		sdl_scale_mode;		/* sdl 1.3 scale mode    */
+	SDL_ScaleMode	sdl_scale_mode;		/* sdl 1.3 scale mode    */
 #endif
-	int		pixel_format;		/* Pixel/Overlay format  */
-	void    (*yuv_blit)(UINT16 *bitmap, sdl_info *sdl, UINT8 *ptr, int pitch);
+	int				pixel_format;		/* Pixel/Overlay format  */
+	void    		(*yuv_blit)(UINT16 *bitmap, sdl_info *sdl, UINT8 *ptr, int pitch);
 };
 
 //============================================================
@@ -145,13 +145,13 @@ static const sdl_scale_mode scale_modes[] =
 #else
 static const sdl_scale_mode scale_modes[] =
 {
-		{ "none",    0, 0, 0, 0, SDL_TEXTURESCALEMODE_NONE, 0, 0 },
-		{ "hwblit",  1, 0, 1, 1, SDL_TEXTURESCALEMODE_FAST, 0, 0 },
-		{ "hwbest",  1, 0, 1, 1, SDL_TEXTURESCALEMODE_BEST, 0, 0 },
-		{ "yv12",    1, 1, 1, 1, SDL_TEXTURESCALEMODE_NONE, SDL_PIXELFORMAT_YV12, yuv_RGB_to_YV12 },
-		{ "yv12x2",  1, 1, 2, 2, SDL_TEXTURESCALEMODE_NONE, SDL_PIXELFORMAT_YV12, yuv_RGB_to_YV12X2 },
-		{ "yuy2",    1, 1, 1, 1, SDL_TEXTURESCALEMODE_NONE, SDL_PIXELFORMAT_YUY2, yuv_RGB_to_YUY2 },
-		{ "yuy2x2",  1, 1, 2, 1, SDL_TEXTURESCALEMODE_NONE, SDL_PIXELFORMAT_YUY2, yuv_RGB_to_YUY2X2 },
+		{ "none",    0, 0, 0, 0, SDL_SCALEMODE_NONE, 0, 0 },
+		{ "hwblit",  1, 0, 1, 1, SDL_SCALEMODE_FAST, 0, 0 },
+		{ "hwbest",  1, 0, 1, 1, SDL_SCALEMODE_BEST, 0, 0 },
+		{ "yv12",    1, 1, 1, 1, SDL_SCALEMODE_NONE, SDL_PIXELFORMAT_YV12, yuv_RGB_to_YV12 },
+		{ "yv12x2",  1, 1, 2, 2, SDL_SCALEMODE_NONE, SDL_PIXELFORMAT_YV12, yuv_RGB_to_YV12X2 },
+		{ "yuy2",    1, 1, 1, 1, SDL_SCALEMODE_NONE, SDL_PIXELFORMAT_YUY2, yuv_RGB_to_YUY2 },
+		{ "yuy2x2",  1, 1, 2, 1, SDL_SCALEMODE_NONE, SDL_PIXELFORMAT_YUY2, yuv_RGB_to_YUY2X2 },
 		{ NULL }
 };
 #endif
