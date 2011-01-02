@@ -17,6 +17,7 @@
 
 #ifdef SDLMAME_MACOSX
 #include <mach/mach.h>
+#include <signal.h>
 #endif
 
 // standard C headers
