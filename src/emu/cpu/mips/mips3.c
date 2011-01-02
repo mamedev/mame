@@ -182,6 +182,7 @@ void mips3drc_add_hotspot(device_t *device, offs_t pc, UINT32 opcode, UINT32 cyc
 
 INLINE void generate_exception(int exception, int backup)
 {
+	UINT32 offset = 0x180;
 /*
     useful for catching exceptions:
 
@@ -195,6 +196,13 @@ INLINE void generate_exception(int exception, int backup)
 	/* back up if necessary */
 	if (backup)
 		mips3.core.pc = mips3.ppc;
+
+	/* translate our fake fill exceptions into real exceptions */
+	if (exception == EXCEPTION_TLBLOAD_FILL || exception == EXCEPTION_TLBSTORE_FILL)
+	{
+		offset = 0;
+		exception = (exception - EXCEPTION_TLBLOAD_FILL) + EXCEPTION_TLBLOAD;
+	}
 
 	/* set the exception PC */
 	mips3.core.cpr[0][COP0_EPC] = mips3.core.pc;
@@ -225,11 +233,9 @@ INLINE void generate_exception(int exception, int backup)
 	/* most exceptions go to offset 0x180, except for TLB stuff */
 	if (exception >= EXCEPTION_TLBMOD && exception <= EXCEPTION_TLBSTORE)
 	{
-		mips3.core.pc += 0x00;
 		mame_printf_debug("TLB miss @ %08X\n", (UINT32)mips3.core.cpr[0][COP0_BadVAddr]);
 	}
-	else
-		mips3.core.pc += 0x180;
+	mips3.core.pc += offset;
 
 /*
     useful for tracking interrupts
@@ -243,8 +249,11 @@ INLINE void generate_exception(int exception, int backup)
 static void generate_tlb_exception(int exception, offs_t address)
 {
 	mips3.core.cpr[0][COP0_BadVAddr] = address;
-	mips3.core.cpr[0][COP0_Context] = (mips3.core.cpr[0][COP0_Context] & 0xff800000) | ((address >> 9) & 0x007ffff0);
-	mips3.core.cpr[0][COP0_EntryHi] = (address & 0xffffe000) | (mips3.core.cpr[0][COP0_EntryHi] & 0xff);
+	if(exception == EXCEPTION_TLBLOAD || exception == EXCEPTION_TLBSTORE || exception == EXCEPTION_TLBLOAD_FILL || exception == EXCEPTION_TLBSTORE_FILL)
+	{
+		mips3.core.cpr[0][COP0_Context] = (mips3.core.cpr[0][COP0_Context] & 0xff800000) | ((address >> 9) & 0x007ffff0);
+		mips3.core.cpr[0][COP0_EntryHi] = (address & 0xffffe000) | (mips3.core.cpr[0][COP0_EntryHi] & 0xff);
+	}
 	generate_exception(exception, 1);
 }
 
@@ -324,28 +333,26 @@ CPU_DISASSEMBLE( mips3 )
     TLB HANDLING
 ***************************************************************************/
 
-static int update_pcbase(void)
-{
-	UINT32 entry = mips3.tlb_table[mips3.core.pc >> 12];
-	if (entry == 0xffffffff)
-	{
-		generate_tlb_exception(EXCEPTION_TLBLOAD, mips3.core.pc);
-		return 0;
-	}
-	mips3.pcbase = entry & ~0xfff;
-	return 1;
-}
-
-
 INLINE int RBYTE(offs_t address, UINT32 *result)
 {
 	UINT32 tlbval = mips3.tlb_table[address >> 12];
-	if (tlbval == 0xffffffff)
+	if (tlbval & VTLB_READ_ALLOWED)
 	{
-		generate_tlb_exception(EXCEPTION_TLBLOAD, address);
+		*result = (*mips3.core.memory.read_byte)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff));
+	}
+	else
+	{
+		if(tlbval & VTLB_FLAG_FIXED)
+		{
+			generate_tlb_exception(EXCEPTION_TLBLOAD, address);
+		}
+		else
+		{
+			generate_tlb_exception(EXCEPTION_TLBLOAD_FILL, address);
+		}
+		*result = 0;
 		return 0;
 	}
-	*result = (*mips3.core.memory.read_byte)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff));
 	return 1;
 }
 
@@ -353,12 +360,23 @@ INLINE int RBYTE(offs_t address, UINT32 *result)
 INLINE int RHALF(offs_t address, UINT32 *result)
 {
 	UINT32 tlbval = mips3.tlb_table[address >> 12];
-	if (tlbval == 0xffffffff)
+	if (tlbval & VTLB_READ_ALLOWED)
 	{
-		generate_tlb_exception(EXCEPTION_TLBLOAD, address);
+		*result = (*mips3.core.memory.read_word)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff));
+	}
+	else
+	{
+		if(tlbval & VTLB_FLAG_FIXED)
+		{
+			generate_tlb_exception(EXCEPTION_TLBLOAD, address);
+		}
+		else
+		{
+			generate_tlb_exception(EXCEPTION_TLBLOAD_FILL, address);
+		}
+		*result = 0;
 		return 0;
 	}
-	*result = (*mips3.core.memory.read_word)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff));
 	return 1;
 }
 
@@ -366,12 +384,23 @@ INLINE int RHALF(offs_t address, UINT32 *result)
 INLINE int RWORD(offs_t address, UINT32 *result)
 {
 	UINT32 tlbval = mips3.tlb_table[address >> 12];
-	if (tlbval == 0xffffffff)
+	if (tlbval & VTLB_READ_ALLOWED)
 	{
-		generate_tlb_exception(EXCEPTION_TLBLOAD, address);
+		*result = (*mips3.core.memory.read_dword)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff));
+	}
+	else
+	{
+		if(tlbval & VTLB_FLAG_FIXED)
+		{
+			generate_tlb_exception(EXCEPTION_TLBLOAD, address);
+		}
+		else
+		{
+			generate_tlb_exception(EXCEPTION_TLBLOAD_FILL, address);
+		}
+		*result = 0;
 		return 0;
 	}
-	*result = (*mips3.core.memory.read_dword)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff));
 	return 1;
 }
 
@@ -379,12 +408,23 @@ INLINE int RWORD(offs_t address, UINT32 *result)
 INLINE int RWORD_MASKED(offs_t address, UINT32 *result, UINT32 mem_mask)
 {
 	UINT32 tlbval = mips3.tlb_table[address >> 12];
-	if (tlbval == 0xffffffff)
+	if (tlbval & VTLB_READ_ALLOWED)
 	{
-		generate_tlb_exception(EXCEPTION_TLBLOAD, address);
+		*result = (*mips3.core.memory.read_dword_masked)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff), mem_mask);
+	}
+	else
+	{
+		if(tlbval & VTLB_FLAG_FIXED)
+		{
+			generate_tlb_exception(EXCEPTION_TLBLOAD, address);
+		}
+		else
+		{
+			generate_tlb_exception(EXCEPTION_TLBLOAD_FILL, address);
+		}
+		*result = 0;
 		return 0;
 	}
-	*result = (*mips3.core.memory.read_dword_masked)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff), mem_mask);
 	return 1;
 }
 
@@ -392,12 +432,23 @@ INLINE int RWORD_MASKED(offs_t address, UINT32 *result, UINT32 mem_mask)
 INLINE int RDOUBLE(offs_t address, UINT64 *result)
 {
 	UINT32 tlbval = mips3.tlb_table[address >> 12];
-	if (tlbval == 0xffffffff)
+	if (tlbval & VTLB_READ_ALLOWED)
 	{
-		generate_tlb_exception(EXCEPTION_TLBLOAD, address);
+		*result = (*mips3.core.memory.read_qword)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff));
+	}
+	else
+	{
+		if(tlbval & VTLB_FLAG_FIXED)
+		{
+			generate_tlb_exception(EXCEPTION_TLBLOAD, address);
+		}
+		else
+		{
+			generate_tlb_exception(EXCEPTION_TLBLOAD_FILL, address);
+		}
+		*result = 0;
 		return 0;
 	}
-	*result = (*mips3.core.memory.read_qword)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff));
 	return 1;
 }
 
@@ -405,12 +456,23 @@ INLINE int RDOUBLE(offs_t address, UINT64 *result)
 INLINE int RDOUBLE_MASKED(offs_t address, UINT64 *result, UINT64 mem_mask)
 {
 	UINT32 tlbval = mips3.tlb_table[address >> 12];
-	if (tlbval == 0xffffffff)
+	if (tlbval & VTLB_READ_ALLOWED)
 	{
-		generate_tlb_exception(EXCEPTION_TLBLOAD, address);
+		*result = (*mips3.core.memory.read_qword_masked)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff), mem_mask);
+	}
+	else
+	{
+		if(tlbval & VTLB_FLAG_FIXED)
+		{
+			generate_tlb_exception(EXCEPTION_TLBLOAD, address);
+		}
+		else
+		{
+			generate_tlb_exception(EXCEPTION_TLBLOAD_FILL, address);
+		}
+		*result = 0;
 		return 0;
 	}
-	*result = (*mips3.core.memory.read_qword_masked)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff), mem_mask);
 	return 1;
 }
 
@@ -419,9 +481,24 @@ INLINE void WBYTE(offs_t address, UINT8 data)
 {
 	UINT32 tlbval = mips3.tlb_table[address >> 12];
 	if (tlbval & VTLB_WRITE_ALLOWED)
+	{
 		(*mips3.core.memory.write_byte)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff), data);
+	}
 	else
-		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
+	{
+		if(tlbval & VTLB_READ_ALLOWED)
+		{
+			generate_tlb_exception(EXCEPTION_TLBMOD, address);
+		}
+		else if(tlbval & VTLB_FLAG_FIXED)
+		{
+			generate_tlb_exception(EXCEPTION_TLBSTORE, address);
+		}
+		else
+		{
+			generate_tlb_exception(EXCEPTION_TLBSTORE_FILL, address);
+		}
+	}
 }
 
 
@@ -429,9 +506,24 @@ INLINE void WHALF(offs_t address, UINT16 data)
 {
 	UINT32 tlbval = mips3.tlb_table[address >> 12];
 	if (tlbval & VTLB_WRITE_ALLOWED)
+	{
 		(*mips3.core.memory.write_word)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff), data);
+	}
 	else
-		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
+	{
+		if(tlbval & VTLB_READ_ALLOWED)
+		{
+			generate_tlb_exception(EXCEPTION_TLBMOD, address);
+		}
+		else if(tlbval & VTLB_FLAG_FIXED)
+		{
+			generate_tlb_exception(EXCEPTION_TLBSTORE, address);
+		}
+		else
+		{
+			generate_tlb_exception(EXCEPTION_TLBSTORE_FILL, address);
+		}
+	}
 }
 
 
@@ -439,9 +531,24 @@ INLINE void WWORD(offs_t address, UINT32 data)
 {
 	UINT32 tlbval = mips3.tlb_table[address >> 12];
 	if (tlbval & VTLB_WRITE_ALLOWED)
+	{
 		(*mips3.core.memory.write_dword)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff), data);
+	}
 	else
-		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
+	{
+		if(tlbval & VTLB_READ_ALLOWED)
+		{
+			generate_tlb_exception(EXCEPTION_TLBMOD, address);
+		}
+		else if(tlbval & VTLB_FLAG_FIXED)
+		{
+			generate_tlb_exception(EXCEPTION_TLBSTORE, address);
+		}
+		else
+		{
+			generate_tlb_exception(EXCEPTION_TLBSTORE_FILL, address);
+		}
+	}
 }
 
 
@@ -449,19 +556,50 @@ INLINE void WWORD_MASKED(offs_t address, UINT32 data, UINT32 mem_mask)
 {
 	UINT32 tlbval = mips3.tlb_table[address >> 12];
 	if (tlbval & VTLB_WRITE_ALLOWED)
+	{
 		(*mips3.core.memory.write_dword_masked)(mips3.core.program, (tlbval & ~0xfff) | (address & 0xfff), data, mem_mask);
+	}
 	else
-		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
+	{
+		if(tlbval & VTLB_READ_ALLOWED)
+		{
+			generate_tlb_exception(EXCEPTION_TLBMOD, address);
+		}
+		else if(tlbval & VTLB_FLAG_FIXED)
+		{
+			generate_tlb_exception(EXCEPTION_TLBSTORE, address);
+		}
+		else
+		{
+			generate_tlb_exception(EXCEPTION_TLBSTORE_FILL, address);
+		}
+	}
 }
 
 
 INLINE void WDOUBLE(offs_t address, UINT64 data)
 {
 	UINT32 tlbval = mips3.tlb_table[address >> 12];
+	//printf("%08x: %08x\n", (UINT32)address, (UINT32)tlbval);
 	if (tlbval & VTLB_WRITE_ALLOWED)
+	{
 		(*mips3.core.memory.write_qword)(mips3.core.program, (tlbval & ~0xfff)  | (address & 0xfff), data);
+	}
 	else
-		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
+	{
+		if(tlbval & VTLB_READ_ALLOWED)
+		{
+			generate_tlb_exception(EXCEPTION_TLBMOD, address);
+		}
+		else if(tlbval & VTLB_FLAG_FIXED)
+		{
+			generate_tlb_exception(EXCEPTION_TLBSTORE, address);
+		}
+		else
+		{
+			generate_tlb_exception(EXCEPTION_TLBSTORE_FILL, address);
+		}
+	}
 }
 
 
@@ -469,9 +607,24 @@ INLINE void WDOUBLE_MASKED(offs_t address, UINT64 data, UINT64 mem_mask)
 {
 	UINT32 tlbval = mips3.tlb_table[address >> 12];
 	if (tlbval & VTLB_WRITE_ALLOWED)
+	{
 		(*mips3.core.memory.write_qword_masked)(mips3.core.program, (tlbval & ~0xfff)  | (address & 0xfff), data, mem_mask);
+	}
 	else
-		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
+	{
+		if(tlbval & VTLB_READ_ALLOWED)
+		{
+			generate_tlb_exception(EXCEPTION_TLBMOD, address);
+		}
+		else if(tlbval & VTLB_FLAG_FIXED)
+		{
+			generate_tlb_exception(EXCEPTION_TLBSTORE, address);
+		}
+		else
+		{
+			generate_tlb_exception(EXCEPTION_TLBSTORE_FILL, address);
+		}
+	}
 }
 
 
@@ -1702,17 +1855,15 @@ CPU_EXECUTE( mips3 )
 		UINT64 temp64 = 0;
 		UINT32 temp;
 
-		/* see if we crossed a page boundary */
-		if ((mips3.core.pc ^ mips3.ppc) & 0xfffff000)
-			if (!update_pcbase())
-				continue;
-
 		/* debugging */
 		mips3.ppc = mips3.core.pc;
 		debugger_instruction_hook(device, mips3.core.pc);
 
 		/* instruction fetch */
-		op = ROPCODE(mips3.pcbase | (mips3.core.pc & 0xfff));
+		if(!RWORD(mips3.core.pc, &op))
+		{
+			continue;
+		}
 
 		/* adjust for next PC */
 		if (mips3.nextpc != ~0)
