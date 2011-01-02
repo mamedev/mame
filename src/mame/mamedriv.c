@@ -4404,6 +4404,8 @@ DokiDoki Penguin Land *not confirmed
 	/* Model 2C-CRX (TGPx4, SCSP sound board) */
 	DRIVER( skisuprg )	/* 1996.12 Sega Ski Super G */
 	DRIVER( stcc )		/* 1996.09 Sega Touring Car Championship */
+	DRIVER( stcca )		/* 1996.09 Sega Touring Car Championship */
+	DRIVER( stccb )		/* 1996.09 Sega Touring Car Championship */
 	DRIVER( waverunr )	/* 1996.10 Wave Runner */
 	DRIVER( hotd )		/* 1997.03 The House of the Dead */
 	DRIVER( topskatr )	/* 1997.05 Top Skater */
