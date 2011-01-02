@@ -78,7 +78,7 @@ static const UINT8 cb2001_decryption_table[256] = {
 //         pppp pppp      ****      pppp pppp  pppp           ssss      **** ssss pppp
 	0x8a,0xb1,xxxx,0xc6,xxxx,0x5a,xxxx,0xb2, 0x9a,0x52,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* E0 */
 //    ssss gggg      ssss      ****      pppp  pppp ****
-	xxxx,0xae,0xfe,xxxx,xxxx,xxxx,xxxx,0x3a, xxxx,xxxx,0x04,xxxx,0x81,xxxx,xxxx,xxxx, /* F0 */
+	xxxx,0xae,0xfe,xxxx,xxxx,xxxx,xxxx,0x3a, xxxx,xxxx,0x34,xxxx,0x81,xxxx,xxxx,xxxx, /* F0 */
 //         pppp ssss                     ppp?            wwww      pppp
 };
 
@@ -323,61 +323,63 @@ static VIDEO_UPDATE(cb2001)
 	count = 0x0000;
 
 	// render bg as 8x8 tilemaps
-	if (!(other1 & 0x04))
+	if (other1 & 0x02)
 	{
-		for (y=0;y<32;y++)
+		if (!(other1 & 0x04))
 		{
-			for (x=0;x<64;x++)
+			for (y=0;y<32;y++)
 			{
-				int tile;
-				int colour;
+				for (x=0;x<64;x++)
+				{
+					int tile;
+					int colour;
 
-				tile = (cb2001_vram_bg[count] & 0x0fff);
-				colour = (cb2001_vram_bg[count] & 0xf000)>>12;
-				tile += cb2001_videobank*0x2000;
+					tile = (cb2001_vram_bg[count] & 0x0fff);
+					colour = (cb2001_vram_bg[count] & 0xf000)>>12;
+					tile += cb2001_videobank*0x2000;
 
 
-				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,colour,0,0,x*8,y*8);
+					drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,colour,0,0,x*8,y*8);
 
-				count++;
+					count++;
+				}
 			}
 		}
-	}
-	else
-	{
-		int i;
-
-		for (i= 0;i < 64;i++)
+		else
 		{
-			UINT16 scroll;
+			int i;
 
-			scroll = cb2001_vram_bg[0xa00/2 + i/2];
-			if (i&1)
-				scroll >>=8;
-			scroll &=0xff;
+			for (i= 0;i < 64;i++)
+			{
+				UINT16 scroll;
 
-			tilemap_set_scrolly(reel2_tilemap, i, scroll);
+				scroll = cb2001_vram_bg[0xa00/2 + i/2];
+				if (i&1)
+					scroll >>=8;
+				scroll &=0xff;
 
-			scroll = cb2001_vram_bg[0x800/2 + i/2];
-			if (i&1)
-				scroll >>=8;
-			scroll &=0xff;
+				tilemap_set_scrolly(reel2_tilemap, i, scroll);
 
-			tilemap_set_scrolly(reel1_tilemap, i, scroll);
+				scroll = cb2001_vram_bg[0x800/2 + i/2];
+				if (i&1)
+					scroll >>=8;
+				scroll &=0xff;
 
-			scroll = cb2001_vram_bg[0xc00/2 + i/2];
-			if (i&1)
-				scroll >>=8;
-			scroll &=0xff;
+				tilemap_set_scrolly(reel1_tilemap, i, scroll);
 
-			tilemap_set_scrolly(reel3_tilemap, i, scroll);
+				scroll = cb2001_vram_bg[0xc00/2 + i/2];
+				if (i&1)
+					scroll >>=8;
+				scroll &=0xff;
 
+				tilemap_set_scrolly(reel3_tilemap, i, scroll);
+
+			}
+
+			tilemap_draw(bitmap, &visible1, reel1_tilemap, 0, 0);
+			tilemap_draw(bitmap, &visible2, reel2_tilemap, 0, 0);
+			tilemap_draw(bitmap, &visible3, reel3_tilemap, 0, 0);
 		}
-
-
-		tilemap_draw(bitmap, &visible1, reel1_tilemap, 0, 0);
-		tilemap_draw(bitmap, &visible2, reel2_tilemap, 0, 0);
-		tilemap_draw(bitmap, &visible3, reel3_tilemap, 0, 0);
 	}
 
 	count = 0x0000;
@@ -393,7 +395,7 @@ static VIDEO_UPDATE(cb2001)
 			colour = (cb2001_vram_fg[count] & 0xf000)>>12;
 			tile += cb2001_videobank*0x2000;
 			
-			if (other2 & 0x3)
+			if (other2 & 0x4)
 			{
 				tile += 0x1000;
 			}
@@ -866,6 +868,7 @@ ROM_END
 
 GAME( 2001, cb2001,    0,      cb2001,      cb2001,   0, ROT0,  "Dyna", "Cherry Bonus 2001", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2001, scherrym,  0,      cb2001,      cb2001,   0, ROT0,  "Dyna", "Super Cherry Master", GAME_NOT_WORKING|GAME_NO_SOUND ) // 2001 version? (we have bootlegs running on z80 hw of a 1996 version)
+
 
 
 
