@@ -317,6 +317,11 @@ void upd7725_device::exec_op(UINT32 opcode) {
     Flag flag;
     bool c=0;
 
+	flag.c = 0;
+	flag.s1 = 0;
+	flag.ov0 = 0;
+	flag.ov1 = 0;
+
     switch(pselect) {
       case 0: p = dataRAM[regs.dp]; break;
       case 1: p = regs.idb; break;
