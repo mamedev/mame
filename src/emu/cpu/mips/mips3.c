@@ -101,6 +101,7 @@ typedef struct
 	int			interrupt_cycles;
 	UINT32		ll_value;
 	UINT64		lld_value;
+	UINT32		badcop_value;
 	const vtlb_entry *tlb_table;
 
 	/* endian-dependent load/store */
@@ -200,6 +201,12 @@ INLINE void generate_exception(int exception, int backup)
 
 	/* put the cause in the low 8 bits and clear the branch delay flag */
 	CAUSE = (CAUSE & ~0x800000ff) | (exception << 2);
+
+	/* set the appropriate bits for coprocessor exceptions */
+	if(exception == EXCEPTION_BADCOP)
+	{
+		CAUSE |= mips3.badcop_value << 28;
+	}
 
 	/* if we were in a branch delay slot, adjust */
 	if (mips3.nextpc != ~0)
@@ -585,7 +592,10 @@ INLINE void set_cop0_creg(int idx, UINT64 val)
 INLINE void handle_cop0(UINT32 op)
 {
 	if ((SR & SR_KSU_MASK) != SR_KSU_KERNEL && !(SR & SR_COP0))
+	{
+		mips3.badcop_value = 0;
 		generate_exception(EXCEPTION_BADCOP, 1);
+	}
 
 	switch (RSREG)
 	{
@@ -721,7 +731,10 @@ INLINE void handle_cop1_fr0(UINT32 op)
 	/* note: additional condition codes available on R5000 only */
 
 	if (!(SR & SR_COP1))
+	{
+		mips3.badcop_value = 1;
 		generate_exception(EXCEPTION_BADCOP, 1);
+	}
 
 	switch (RSREG)
 	{
@@ -1077,7 +1090,10 @@ INLINE void handle_cop1_fr1(UINT32 op)
 	/* note: additional condition codes available on R5000 only */
 
 	if (!(SR & SR_COP1))
+	{
+		mips3.badcop_value = 1;
 		generate_exception(EXCEPTION_BADCOP, 1);
+	}
 
 	switch (RSREG)
 	{
@@ -1437,7 +1453,10 @@ INLINE void handle_cop1x_fr0(UINT32 op)
 	UINT32 temp;
 
 	if (!(SR & SR_COP1))
+	{
+		mips3.badcop_value = 1;
 		generate_exception(EXCEPTION_BADCOP, 1);
+	}
 
 	switch (op & 0x3f)
 	{
@@ -1513,7 +1532,10 @@ INLINE void handle_cop1x_fr1(UINT32 op)
 	UINT32 temp;
 
 	if (!(SR & SR_COP1))
+	{
+		mips3.badcop_value = 1;
 		generate_exception(EXCEPTION_BADCOP, 1);
+	}
 
 	switch (op & 0x3f)
 	{
@@ -1611,7 +1633,10 @@ INLINE void set_cop2_creg(int idx, UINT64 val)
 INLINE void handle_cop2(UINT32 op)
 {
 	if (!(SR & SR_COP2))
+	{
+		mips3.badcop_value = 2;
 		generate_exception(EXCEPTION_BADCOP, 1);
+	}
 
 	switch (RSREG)
 	{
