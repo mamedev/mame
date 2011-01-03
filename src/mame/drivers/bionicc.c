@@ -591,4 +591,5 @@ ROM_END
 GAME( 1987, bionicc,  0,       bionicc, bionicc, 0, ROT0, "Capcom", "Bionic Commando (Euro)", GAME_SUPPORTS_SAVE )
 GAME( 1987, bionicc1, bionicc, bionicc, bionicc, 0, ROT0, "Capcom", "Bionic Commando (US set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1987, bionicc2, bionicc, bionicc, bionicc, 0, ROT0, "Capcom", "Bionic Commando (US set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1987, topsecrt, bionicc, bionicc, bionicc, 0, ROT0, "Capcom", "Top Secret (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, topsecrt, bionicc, bionicc, bionicc, 0, ROT0, "Capcom", "Top Secret (Japan, old revision)", GAME_SUPPORTS_SAVE )
+// there's also an undumped JP new revision on which there are no extra lives after 1 million points, plus other bug-fixes / changes
