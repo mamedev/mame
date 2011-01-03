@@ -2262,7 +2262,9 @@ static UINT8 stv_vdp2_is_rotation_applied(void)
 		 RP.dxst == _FIXED_0 &&
 		 RP.dyst == _FIXED_1 &&
 		 RP.dx == _FIXED_1 &&
-		 RP.dy == _FIXED_0 )
+		 RP.dy == _FIXED_0 &&
+		 RP.kx == _FIXED_1 &&
+		 RP.ky == _FIXED_1 )
 	{
 		return 0;
 	}
