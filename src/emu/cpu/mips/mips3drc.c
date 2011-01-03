@@ -1104,6 +1104,11 @@ static void static_generate_tlb_mismatch(mips3_state *mips3)
 	UML_EXH(block, mips3->impstate->exception[EXCEPTION_TLBLOAD_FILL], IREG(0));	// exh     exception[TLBLOAD_FILL],i0
 	UML_LABEL(block, 1);														// 1:
 	save_fast_iregs(mips3, block);
+
+	// the saved PC may be set 1 instruction back with the low bit set to indicate
+	// a delay slot; in this path we want the original instruction address, so recover it
+	UML_ADD(block, IREG(0), MEM(&mips3->pc), IMM(3));								// add     i0,<pc>,3
+	UML_AND(block, MEM(&mips3->pc), IREG(0), IMM(~3));								// and     <pc>,i0,~3
 	UML_EXIT(block, IMM(EXECUTE_MISSING_CODE));										// exit    EXECUTE_MISSING_CODE
 
 	drcuml_block_end(block);

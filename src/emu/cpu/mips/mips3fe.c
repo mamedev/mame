@@ -44,6 +44,7 @@ int mips3fe_describe(void *param, opcode_desc *desc, const opcode_desc *prev)
 	UINT32 op, opswitch;
 
 	/* compute the physical PC */
+	assert((desc->physpc & 3) == 0);
 	if (!mips3com_translate_address(mips, ADDRESS_SPACE_PROGRAM, TRANSLATE_FETCH, &desc->physpc))
 	{
 		/* uh-oh: a page fault; leave the description empty and just if this is the first instruction, leave it empty and */
@@ -53,6 +54,7 @@ int mips3fe_describe(void *param, opcode_desc *desc, const opcode_desc *prev)
 	}
 
 	/* fetch the opcode */
+	assert((desc->physpc & 3) == 0);
 	op = desc->opptr.l[0] = mips->direct->read_decrypted_dword(desc->physpc);
 
 	/* all instructions are 4 bytes and default to a single cycle each */
