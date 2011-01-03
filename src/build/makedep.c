@@ -187,6 +187,12 @@ int main(int argc, char *argv[])
 			}
 		}
 
+		/* ignore -include which is used by sdlmame to include sdlprefix.h before all other includes */
+		else if (strcmp(arg,"-include") == 0)
+		{
+			argnum++;
+		}
+
 		/* other parameter */
 		else if (arg[0] != '-' && unadorned == 0)
 		{
