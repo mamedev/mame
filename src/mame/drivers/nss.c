@@ -295,7 +295,6 @@ Contra III   CONTRA_III_1   TC574000   CONTRA_III_0   TC574000    GAME1_NSSU    
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/upd7725/upd7725.h"
 #include "includes/snes.h"
 
 static ADDRESS_MAP_START( snes_map, ADDRESS_SPACE_PROGRAM, 8)
@@ -484,14 +483,6 @@ static ADDRESS_MAP_START( bios_io_map, ADDRESS_SPACE_IO, 8 )
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dsp_prg_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("dspprg", 0)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( dsp_data_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_REGION("dspdata", 0)
-ADDRESS_MAP_END
-
 static MACHINE_START( nss )
 {
 	UINT8 *ROM = machine->region("bios")->base();
@@ -657,10 +648,6 @@ static MACHINE_CONFIG_START( snes, snes_state )
 	MCFG_CPU_ADD("soundcpu", SPC700, 2048000/2)	/* 2.048 Mhz, but internal divider */
 	MCFG_CPU_PROGRAM_MAP(spc_mem)
 
-	MCFG_CPU_ADD("dsp", UPD7725, 8000000)
-	MCFG_CPU_PROGRAM_MAP(dsp_prg_map)
-	MCFG_CPU_DATA_MAP(dsp_data_map)
-
 //	MCFG_QUANTUM_TIME(HZ(24000))
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -704,7 +691,7 @@ MACHINE_CONFIG_END
 #define NSS_BIOS \
 	ROM_REGION(0x100,           "user5", 0)		/* IPL ROM */ \
 	ROM_LOAD("spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) ) \
-	ROM_REGION(0x10000,           "addons", ROMREGION_ERASE00)		/* add-on chip ROMs (DSP1 could be needed if we dump smk). the second 0x800 host DSP3 ROM in MESS */\
+	ROM_REGION(0x10000,           "addons", ROMREGION_ERASE00)		/* add-on chip ROMs (DSP1 will be needed if we dump the NSS version of Super Mario Kart)*/\
 	ROM_LOAD( "dsp1b.bin", SNES_DSP1B_OFFSET, 0x002800, CRC(453557e0) SHA1(3a218b0e4572a8eba6d0121b17fdac9529609220) ) \
 	ROM_REGION(0x20000,         "bios",  0)		/* Bios CPU (what is it?) */ \
 	ROM_LOAD("nss-c.dat"  , 0x10000, 0x8000, CRC(a8e202b3) SHA1(b7afcfe4f5cf15df53452dc04be81929ced1efb2) )	/* bios */ \

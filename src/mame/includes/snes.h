@@ -6,6 +6,7 @@
 #include "streams.h"
 #include "cpu/spc700/spc700.h"
 #include "cpu/g65816/g65816.h"
+#include "cpu/upd7725/upd7725.h"
 #include "audio/snes_snd.h"
 
 /*
@@ -469,6 +470,7 @@ public:
 	spc700_device *soundcpu;
 	snes_sound_device *spc700;
 	cpu_device *superfx;
+	upd7725_device *upd7725;
 };
 
 /* Special chips, checked at init and used in memory handlers */
