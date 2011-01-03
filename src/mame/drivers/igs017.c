@@ -15,7 +15,7 @@ Year + Game                     PCB        CPU    Sound         Custom          
 96  Shu Zi Le Yuan              NO-0131-4  Z180   M6295 YM2413  IGS017 8255           Battery
 97  Mj Super Da Man Guan II     NO-0147-6  68000  M6295         IGS031 8255           Battery
 97  Mj Tian Jiang Shen Bing     NO-0157-2  Z180   M6295 YM2413  IGS017 IGS025         Battery
-97  Mj Man Guan Da Heng         NO-0252    68000  M6295         IGS031 IGS025         Battery
+97  Mj Man Guan Da Heng         NO-0252    68000  M6295         IGS031 IGS025 IGS???* Battery
 98  Mj Long Hu Zheng Ba 2       NO-0206    68000  M6295         IGS031 IGS025 IGS022* Battery
 98  Mj Shuang Long Qiang Zhu 2  NO-0207    68000  M6295         IGS031 IGS025 IGS022  Battery
 98  Mj Man Guan Cai Shen        NO-0192-1  68000  M6295         IGS017 IGS025 IGS029  Battery
@@ -23,19 +23,20 @@ Year + Game                     PCB        CPU    Sound         Custom          
 99? Tarzan (V109C)?             NO-0228?   Z180   M6295         IGS031 IGS025 IGS029  Battery
 00? Super Tarzan (V100I)        NO-0230-1  Z180   M6295         IGS031 IGS025         Battery
 -------------------------------------------------------------------------------------------------------------
-                                                                                    * not preset in one set
+                                                                                    * not present in one set
 To Do:
 
 - Protection emulation, instead of patching the roms.
 - NVRAM.
 - tjsb: finish sprites decryption (data lines scrambling), protection, inputs.
 - iqblockf: protection.
-- mgcs, mgdh, sdmg2: implement joystick inputs
+- mgcs: implement joystick inputs
 
 Notes:
 
 - iqblocka: keep start or test pressed during boot to enter test mode A or B.
 - mgcs: press service + stats during test mode for sound test.
+- mgdh: press A + B during test mode for sound test (B1+B2+B3 when using a joystick).
 - mgdh: test mode is accessed by keeping test pressed during boot (as usual), but pressing F2+F3 in MAME
   does not actually work. It does work if F2 is pressed in the debug window at boot, and held while closing it.
 
@@ -751,9 +752,9 @@ static DRIVER_INIT( sdmg2 )
 }
 
 
-// mgdh
+// mgdh, mgdha
 
-static DRIVER_INIT( mgdh )
+static DRIVER_INIT( mgdha )
 {
 	int i;
 	UINT16 *src = (UINT16 *)machine->region("maincpu")->base();
@@ -785,6 +786,16 @@ static DRIVER_INIT( mgdh )
 	}
 
 	mgcs_flip_sprites(machine);
+}
+
+static DRIVER_INIT( mgdh )
+{
+	DRIVER_INIT_CALL( mgdha );
+
+	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
+
+	// additional protection
+	rom[0x4ad50/2] = 0x4e71;
 }
 
 
@@ -1336,7 +1347,7 @@ static ADDRESS_MAP_START( sdmg2, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-// mgdh
+// mgdh, mgdha
 
 static READ8_HANDLER( mgdh_keys_r )
 {
@@ -1352,7 +1363,7 @@ static READ8_HANDLER( mgdh_keys_r )
 	return 0xff;
 }
 
-static WRITE16_HANDLER( mgdh_magic_w )
+static WRITE16_HANDLER( mgdha_magic_w )
 {
 	COMBINE_DATA(&igs_magic[offset]);
 
@@ -1395,11 +1406,22 @@ static WRITE16_HANDLER( mgdh_magic_w )
 			break;
 
 		default:
+/*
+			04aba0: warning, writing to igs_magic 08 = d0
+			04abb0: warning, writing to igs_magic 09 = 76
+			04abc0: warning, writing to igs_magic 0a = 97
+			04abd0: warning, writing to igs_magic 0b = bf
+			04abe0: warning, writing to igs_magic 0c = ff
+			04abf0: warning, writing to igs_magic 04 = 3f
+			04ac00: warning, writing to igs_magic 05 = 82
+			04ac10: warning, writing to igs_magic 06 = ff
+			04ac20: warning, writing to igs_magic 07 = 3f
+*/
 			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", cpu_get_pc(space->cpu), igs_magic[0], data);
 	}
 }
 
-static READ16_HANDLER( mgdh_magic_r )
+static READ16_HANDLER( mgdha_magic_r )
 {
 	switch(igs_magic[0])
 	{
@@ -1426,13 +1448,14 @@ static READ16_HANDLER( mgdh_magic_r )
 	return 0xffff;
 }
 
-static ADDRESS_MAP_START( mgdh_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( mgdha_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
-	AM_RANGE(0x876000, 0x876003) AM_WRITE( mgdh_magic_w )
-	AM_RANGE(0x876002, 0x876003) AM_READ ( mgdh_magic_r )
+	AM_RANGE(0x876000, 0x876003) AM_WRITE( mgdha_magic_w )
+	AM_RANGE(0x876002, 0x876003) AM_READ ( mgdha_magic_r )
 	AM_RANGE(0xa02000, 0xa02fff) AM_READWRITE( spriteram_lsb_r, spriteram_lsb_w ) AM_BASE_GENERIC( spriteram )
 	AM_RANGE(0xa03000, 0xa037ff) AM_RAM_WRITE( sdmg2_paletteram_xRRRRRGGGGGBBBBB_w ) AM_BASE_GENERIC( paletteram )
+//	AM_RANGE(0xa04014, 0xa04015) // written with FF at boot
 	AM_RANGE(0xa04020, 0xa04027) AM_DEVREAD8( "ppi8255", ppi8255_r, 0x00ff )
 	AM_RANGE(0xa04024, 0xa04025) AM_WRITE( video_disable_lsb_w )
 	AM_RANGE(0xa04028, 0xa04029) AM_WRITE( irq2_enable_w )
@@ -2175,7 +2198,7 @@ static MACHINE_CONFIG_START( sdmg2, driver_device )
 MACHINE_CONFIG_END
 
 
-//mgdh
+// mgdh
 
 static INTERRUPT_GEN( mgdh_interrupt )
 {
@@ -2202,9 +2225,9 @@ static const ppi8255_interface mgdh_ppi8255_intf =
 	DEVCB_NULL					// Port C write
 };
 
-static MACHINE_CONFIG_START( mgdh, driver_device )
+static MACHINE_CONFIG_START( mgdha, driver_device )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
-	MCFG_CPU_PROGRAM_MAP(mgdh_map)
+	MCFG_CPU_PROGRAM_MAP(mgdha_map)
 	MCFG_CPU_VBLANK_INT_HACK(mgdh_interrupt,2)
 
 	MCFG_MACHINE_RESET(mgcs)
@@ -2626,7 +2649,7 @@ ROM_END
 /***************************************************************************
 
 Mahjong Man Guan Da Heng (V123T1)
-IGS
+(c) 1997 IGS
 
 PCB Layout
 ----------
@@ -2663,7 +2686,7 @@ Notes:
 
 ***************************************************************************/
 
-ROM_START( mgdh )
+ROM_START( mgdha )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "flash.u19", 0x00000, 0x80000, CRC(ff3aed2c) SHA1(829140e6fc7e4dfc039b0e7b647ce26d59b23b3d) )
 
@@ -2675,6 +2698,31 @@ ROM_START( mgdh )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "s1002.u22", 0x00000, 0x80000, CRC(ac6b55f2) SHA1(7ff91fd1107272ad6bce071dc9ae2f374ebf5e3e) )
+ROM_END
+
+/***************************************************************************
+
+Mahjong Man Guan Da Heng (V125T1)
+(c) 1997 IGS
+
+No hardware info, no sprites rom for this set.
+It has additional protection.
+
+***************************************************************************/
+
+ROM_START( mgdh )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "igs_f4bd.125", 0x00000, 0x80000, CRC(8bb0b870) SHA1(f0313f0b8b7575f4fff1feb99d48699d50556ef5) )
+
+	ROM_REGION( 0x400000, "sprites", 0 )
+	// not in this set
+	ROM_LOAD( "m1001.u4", 0x000000, 0x400000, CRC(0cfb60d6) SHA1(e099aca730e7fd91a72915c27e569ad3d21f0d8f) )	// FIXED BITS (xxxxxxx0xxxxxxxx)
+
+	ROM_REGION( 0x20000, "tilemaps", 0 )
+	ROM_LOAD( "igs_512e.u6", 0x00000, 0x20000, CRC(db50f8fc) SHA1(e2ce4a42f5bdc0b4b7988ad9e8d14661f17c3d51) )	// == text.u6
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "ig2_8836.u14", 0x00000, 0x80000, CRC(ac1f4da8) SHA1(789a2e0b58750292909dabca42c7e5ad72af3db5) )
 ROM_END
 
 /***************************************************************************
@@ -2794,7 +2842,8 @@ GAME( 1996,  iqblocka, iqblock, iqblocka, iqblocka, iqblocka, ROT0, "IGS",      
 GAME( 1996,  iqblockf, iqblock, iqblocka, iqblocka, iqblockf, ROT0, "IGS",              "Shu Zi Le Yuan (V113FR)",                     GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 GAME( 1997,  tjsb,     0,       iqblocka, iqblocka, tjsb,     ROT0, "IGS",              "Mahjong Tian Jiang Shen Bing",                GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 GAME( 1997,  sdmg2,    0,       sdmg2,    sdmg2,    sdmg2,    ROT0, "IGS",              "Mahjong Super Da Man Guan II (China, V754C)", 0 )
-GAME( 1997,  mgdh,     0,       mgdh,     mgdh ,    mgdh,     ROT0, "IGS",              "Mahjong Man Guan Da Heng (Taiwan, V123T1)",   0 )
+GAME( 1997,  mgdh,     0,       mgdha,    mgdh,     mgdh,     ROT0, "IGS",              "Mahjong Man Guan Da Heng (Taiwan, V125T1)",   0 )
+GAME( 1997,  mgdha,    mgdh,    mgdha,    mgdh ,    mgdha,    ROT0, "IGS",              "Mahjong Man Guan Da Heng (Taiwan, V123T1)",   0 )
 GAME( 1998,  mgcs,     0,       mgcs,     mgcs,     mgcs,     ROT0, "IGS",              "Mahjong Man Guan Cai Shen (V103CS)",          GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 GAME( 1998,  lhzb2,    0,       sdmg2,    sdmg2,    lhzb2,    ROT0, "IGS",              "Mahjong Long Hu Zheng Ba 2 (set 1)",          GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 GAME( 1998,  lhzb2a,   lhzb2,   sdmg2,    sdmg2,    lhzb2a,   ROT0, "IGS",              "Mahjong Long Hu Zheng Ba 2 (set 2)",          GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )

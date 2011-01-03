@@ -8547,6 +8547,7 @@ Other Sun games
 	DRIVER( tjsb )		/* (c) 1997 */
 	DRIVER( sdmg2 )		/* (c) 1997 */
 	DRIVER( mgdh )		/* (c) 1997 */
+	DRIVER( mgdha )		/* (c) 1997 */
 	DRIVER( mgcs )		/* (c) 1998 */
 	DRIVER( lhzb2 )		/* (c) 1998 */
 	DRIVER( lhzb2a )	/* (c) 1998 */
