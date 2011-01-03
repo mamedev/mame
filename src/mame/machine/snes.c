@@ -1697,8 +1697,9 @@ static void snes_init_ram( running_machine *machine )
 			}
 			else
 			{
-				logerror("SNES: We have a DSP, but the machine driver is missing the uPD7725!\n");
-			}
+				logerror("SNES: Game uses a DSP, but the machine driver is missing the uPD7725!\n");
+				state->has_addon_chip = HAS_NONE;	// prevent crash trying to access NULL device
+			}   							
 			break;
 
 		case HAS_RTC:
