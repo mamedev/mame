@@ -152,6 +152,7 @@ TODO:
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/namcoio.h"
+#include "machine/namco62.h"
 #include "sound/namco.h"
 #include "sound/samples.h"
 #include "includes/gaplus.h"
@@ -210,6 +211,21 @@ static WRITE8_HANDLER( gaplus_freset_w )
 	namcoio_set_reset_line(io58xx, bit ? CLEAR_LINE : ASSERT_LINE);
 	namcoio_set_reset_line(io56xx, bit ? CLEAR_LINE : ASSERT_LINE);
 }
+
+static const namco_62xx_interface namco_62xx_intf =
+{
+	{	/* port read handlers */
+		//DEVCB_INPUT_PORT("IN0L"),
+		//DEVCB_INPUT_PORT("IN0H"),
+		//DEVCB_INPUT_PORT("IN1L"),
+		//DEVCB_INPUT_PORT("IN1H")
+	},
+	{	/* port write handlers */
+		//DEVCB_HANDLER(out_0),
+		//DEVCB_HANDLER(out_1)
+	}
+};
+
 
 static MACHINE_RESET( gaplus )
 {
@@ -543,6 +559,8 @@ static MACHINE_CONFIG_START( gaplus, driver_device )
 	MCFG_NAMCO56XX_ADD("56xx", intf0_lamps)
 	MCFG_NAMCO58XX_ADD("58xx", intf1)
 
+	MCFG_NAMCO_62XX_ADD("62xx", 24576000/6/2, namco_62xx_intf)	/* totally made up - TODO: fix */
+	
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.606060)

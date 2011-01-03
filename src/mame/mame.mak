@@ -964,6 +964,7 @@ $(MAMEOBJ)/namco.a: \
 	$(MACHINE)/namco50.o \
 	$(MACHINE)/namco51.o \
 	$(MACHINE)/namco53.o \
+	$(MACHINE)/namco62.o \
 	$(AUDIO)/namco52.o \
 	$(AUDIO)/namco54.o \
 	$(AUDIO)/namcoc7x.o \
