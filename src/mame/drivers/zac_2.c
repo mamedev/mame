@@ -910,7 +910,7 @@ GAME(1982,	socrking,	0,			zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Soccer King
 GAME(1982,	socrkngi,	socrking,	zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Soccer Kings (Italian speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1982,	socrkngg,	socrking,	zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Soccer Kings (German speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1987,	spookyp,	0,			zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Spooky",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1987,	spookyi,	spooky,		zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Spooky (Italian speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1987,	spookyi,	spookyp,		zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Spooky (Italian speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1987,	strsphnx,	0,			zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Star's Phoenix (Italian speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1983,	tmachzac,	0,			zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Time Machine (Zaccaria)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1983,	tmacgzac,	tmachzac,	zac_2,	zac_2,	zac_2,	ROT0,	"Zaccaria",				"Time Machine (Zaccaria German speech)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
