@@ -9519,6 +9519,7 @@ Other Sun games
 	DRIVER( saklove )	/* (c) 1998 Subsino */
 	DRIVER( bishjan )	/* (c) 1999 Subsino */
 	DRIVER( lastfght )	/* (c) 2000 Subsino */
+	DRIVER( xplan )		/* (c) 2006 Subsino */
 
 	DRIVER( sliver )	/* (c) 1996 Hollow Corp */
 	DRIVER( intrscti )	/* ???? */
@@ -10629,7 +10630,7 @@ Other Sun games
 	DRIVER( hercules )
 	/*
 		Atari Generation/System 3
-	*/	
+	*/
 	DRIVER( roadrunr )
 
 	// bingo.c
@@ -10750,7 +10751,7 @@ Other Sun games
 	DRIVER( mdntmrdr )
 	DRIVER( blbeauty )
 	DRIVER( suprbowl )
-	
+
 	/*
 		Bally Kiss 8035 prototype
 	*/
@@ -10779,10 +10780,10 @@ Other Sun games
 	DRIVER( strngsci )
 	DRIVER( trucksp3 )
 	DRIVER( trucksp2 )
-	
+
 	/*
 		Bally MPU AS-2518-133
-	*/	
+	*/
 	DRIVER( babypac  )
 	DRIVER( babypacn )
 	DRIVER( granny   )
@@ -10794,7 +10795,7 @@ Other Sun games
 	DRIVER( eballdp2 )
 	DRIVER( eballdp3 )
 	DRIVER( eballdp4 )
-	
+
 	// capcom.c
 	DRIVER( abv106 )
 	DRIVER( abv106r )
@@ -11197,7 +11198,7 @@ Other Sun games
 	// play_1.c
 	DRIVER( bigtown )
 	DRIVER( chance )
-	DRIVER( lastlap )	
+	DRIVER( lastlap )
 	DRIVER( spcgambl )
 	DRIVER( party )
 
@@ -11208,7 +11209,7 @@ Other Sun games
 	DRIVER( evlfight )
 	DRIVER( attack )
 	DRIVER( blkfever )
-	DRIVER( cerberup )	
+	DRIVER( cerberup )
 	DRIVER( madrace )
 
 
@@ -11721,7 +11722,7 @@ Other Sun games
 	DRIVER( tfa_13 )
 	DRIVER( dd_p7 )
 	DRIVER( dd_p06 )
-	DRIVER( fh_l9 )	
+	DRIVER( fh_l9 )
 	DRIVER( fh_l9b )
 	DRIVER( fh_905h )
 	DRIVER( fh_l3 )
@@ -11865,7 +11866,7 @@ Other Sun games
 	DRIVER( nf_23 )
 	DRIVER( nf_23f )
 	DRIVER( nf_22 )
-	DRIVER( nf_20 )	
+	DRIVER( nf_20 )
 	DRIVER( rs_l6 )
 	DRIVER( rs_la5 )
 	DRIVER( rs_lx5 )
@@ -11962,5 +11963,5 @@ Other Sun games
 	DRIVER( skijump )
 	DRIVER( spacecty )
 	DRIVER( strike )
-	
+
 #endif	/* DRIVER_RECURSIVE */

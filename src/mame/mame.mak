@@ -1254,6 +1254,7 @@ $(MAMEOBJ)/subsino.a: \
 	$(DRIVERS)/bishjan.o \
 	$(DRIVERS)/lastfght.o \
 	$(DRIVERS)/subsino.o \
+	$(DRIVERS)/xplan.o \
 
 $(MAMEOBJ)/sun.a: \
 	$(DRIVERS)/arabian.o $(VIDEO)/arabian.o \
