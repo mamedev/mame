@@ -4,9 +4,36 @@
 
     Universal machine language-based MIPS III/IV emulator.
 
+****************************************************************************
+
     Copyright Aaron Giles
-    Released for general non-commercial use under the MAME license
-    Visit http://mamedev.org for licensing and usage restrictions.
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
 
 ****************************************************************************
 
@@ -159,7 +186,7 @@ struct _mips3imp_state
 	/* core state */
 	drccache *			cache;						/* pointer to the DRC code cache */
 	drcuml_state *		drcuml;						/* DRC UML generator state */
-	drcfe_state *		drcfe;						/* pointer to the DRC front-end state */
+	mips3_frontend *	drcfe;						/* pointer to the DRC front-end state */
 	UINT32				drcoptions;					/* configurable DRC options */
 
 	/* internal stuff */
@@ -360,13 +387,6 @@ INLINE void save_fast_iregs(mips3_state *mips3, drcuml_block *block)
 
 static void mips3_init(mips3_flavor flavor, int bigendian, legacy_cpu_device *device, device_irq_callback irqcallback)
 {
-	drcfe_config feconfig =
-	{
-		COMPILE_BACKWARDS_BYTES,	/* code window start offset = startpc - window_start */
-		COMPILE_FORWARDS_BYTES,		/* code window end offset = startpc + window_end */
-		COMPILE_MAX_SEQUENCE,		/* maximum instructions to include in a sequence */
-		mips3fe_describe			/* callback to describe a single instruction */
-	};
 	mips3_state *mips3;
 	drccache *cache;
 	drcbe_info beinfo;
@@ -445,9 +465,7 @@ static void mips3_init(mips3_flavor flavor, int bigendian, legacy_cpu_device *de
 	drcuml_symbol_add(mips3->impstate->drcuml, &mips3->impstate->fpmode, sizeof(mips3->impstate->fpmode), "fpmode");
 
 	/* initialize the front-end helper */
-	if (SINGLE_INSTRUCTION_MODE)
-		feconfig.max_sequence = 1;
-	mips3->impstate->drcfe = drcfe_init(device, &feconfig, mips3);
+	mips3->impstate->drcfe = auto_alloc(device->machine, mips3_frontend(*mips3, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE));
 
 	/* allocate memory for cache-local state and initialize it */
 	memcpy(mips3->impstate->fpmode, fpmode_source, sizeof(fpmode_source));
@@ -546,7 +564,7 @@ static CPU_EXIT( mips3 )
 	mips3com_exit(mips3);
 
 	/* clean up the DRC */
-	drcfe_exit(mips3->impstate->drcfe);
+	auto_free(device->machine, mips3->impstate->drcfe);
 	drcuml_free(mips3->impstate->drcuml);
 	drccache_free(mips3->impstate->cache);
 }
@@ -745,7 +763,7 @@ static void code_compile_block(mips3_state *mips3, UINT8 mode, offs_t pc)
 	g_profiler.start(PROFILER_DRC_COMPILE);
 
 	/* get a description of this sequence */
-	desclist = drcfe_describe_code(mips3->impstate->drcfe, pc);
+	desclist = mips3->impstate->drcfe->describe_code(pc);
 	if (LOG_UML || LOG_NATIVE)
 		log_opcode_desc(drcuml, desclist, 0);
 
@@ -757,7 +775,7 @@ static void code_compile_block(mips3_state *mips3, UINT8 mode, offs_t pc)
 	block = drcuml_block_begin(drcuml, 4096, &errorbuf);
 
 	/* loop until we get through all instruction sequences */
-	for (seqhead = desclist; seqhead != NULL; seqhead = seqlast->next)
+	for (seqhead = desclist; seqhead != NULL; seqhead = seqlast->next())
 	{
 		const opcode_desc *curdesc;
 		UINT32 nextpc;
@@ -767,7 +785,7 @@ static void code_compile_block(mips3_state *mips3, UINT8 mode, offs_t pc)
 			UML_COMMENT(block, "-------------------------");						// comment
 
 		/* determine the last instruction in this sequence */
-		for (seqlast = seqhead; seqlast != NULL; seqlast = seqlast->next)
+		for (seqlast = seqhead; seqlast != NULL; seqlast = seqlast->next())
 			if (seqlast->flags & OPFLAG_END_SEQUENCE)
 				break;
 		assert(seqlast != NULL);
@@ -802,7 +820,7 @@ static void code_compile_block(mips3_state *mips3, UINT8 mode, offs_t pc)
 			UML_LABEL(block, seqhead->pc | 0x80000000);								// label   seqhead->pc | 0x80000000
 
 		/* iterate over instructions in the sequence and compile them */
-		for (curdesc = seqhead; curdesc != seqlast->next; curdesc = curdesc->next)
+		for (curdesc = seqhead; curdesc != seqlast->next(); curdesc = curdesc->next())
 			generate_sequence_instruction(mips3, block, &compiler, curdesc);
 
 		/* if we need to return to the start, do it */
@@ -820,7 +838,7 @@ static void code_compile_block(mips3_state *mips3, UINT8 mode, offs_t pc)
 		if (seqlast->flags & OPFLAG_CAN_CHANGE_MODES)
 			UML_HASHJMP(block, MEM(&mips3->impstate->mode), IMM(nextpc), mips3->impstate->nocode);
 																					// hashjmp <mode>,nextpc,nocode
-		else if (seqlast->next == NULL || seqlast->next->pc != nextpc)
+		else if (seqlast->next() == NULL || seqlast->next()->pc != nextpc)
 			UML_HASHJMP(block, IMM(mips3->impstate->mode), IMM(nextpc), mips3->impstate->nocode);
 																					// hashjmp <mode>,nextpc,nocode
 	}
@@ -1521,7 +1539,7 @@ static void generate_checksum_block(mips3_state *mips3, drcuml_block *block, com
 		UML_COMMENT(block, "[Validation for %08X]", seqhead->pc);					// comment
 
 	/* loose verify or single instruction: just compare and fail */
-	if (!(mips3->impstate->drcoptions & MIPS3DRC_STRICT_VERIFY) || seqhead->next == NULL)
+	if (!(mips3->impstate->drcoptions & MIPS3DRC_STRICT_VERIFY) || seqhead->next() == NULL)
 	{
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
@@ -1536,7 +1554,7 @@ static void generate_checksum_block(mips3_state *mips3, drcuml_block *block, com
 	else
 	{
 #if 0
-		for (curdesc = seqhead->next; curdesc != seqlast->next; curdesc = curdesc->next)
+		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
 				void *base = mips3->direct->read_decrypted_ptr(seqhead->physpc);
@@ -1549,7 +1567,7 @@ static void generate_checksum_block(mips3_state *mips3, drcuml_block *block, com
 		void *base = mips3->direct->read_decrypted_ptr(seqhead->physpc);
 		UML_LOAD(block, IREG(0), base, IMM(0), DWORD);								// load    i0,base,0,dword
 		sum += seqhead->opptr.l[0];
-		for (curdesc = seqhead->next; curdesc != seqlast->next; curdesc = curdesc->next)
+		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
 				base = mips3->direct->read_decrypted_ptr(curdesc->physpc);
@@ -1557,12 +1575,12 @@ static void generate_checksum_block(mips3_state *mips3, drcuml_block *block, com
 				UML_ADD(block, IREG(0), IREG(0), IREG(1));							// add     i0,i0,i1
 				sum += curdesc->opptr.l[0];
 
-				if (curdesc->delay != NULL && (curdesc == seqlast || (curdesc->next != NULL && curdesc->next->physpc != curdesc->delay->physpc)))
+				if (curdesc->delay.first() != NULL && (curdesc == seqlast || (curdesc->next() != NULL && curdesc->next()->physpc != curdesc->delay.first()->physpc)))
 				{
-					base = mips3->direct->read_decrypted_ptr(curdesc->delay->physpc);
+					base = mips3->direct->read_decrypted_ptr(curdesc->delay.first()->physpc);
 					UML_LOAD(block, IREG(1), base, IMM(0), DWORD);					// load    i1,base,dword
 					UML_ADD(block, IREG(0), IREG(0), IREG(1));						// add     i0,i0,i1
-					sum += curdesc->delay->opptr.l[0];
+					sum += curdesc->delay.first()->opptr.l[0];
 				}
 			}
 		UML_CMP(block, IREG(0), IMM(sum));											// cmp     i0,sum
@@ -1710,8 +1728,8 @@ static void generate_delay_slot_and_branch(mips3_state *mips3, drcuml_block *blo
 		UML_DMOV(block, R64(linkreg), IMM((INT32)(desc->pc + 8)));					// dmov    <linkreg>,desc->pc + 8
 
 	/* compile the delay slot using temporary compiler state */
-	assert(desc->delay != NULL);
-	generate_sequence_instruction(mips3, block, &compiler_temp, desc->delay);		// <next instruction>
+	assert(desc->delay.first() != NULL);
+	generate_sequence_instruction(mips3, block, &compiler_temp, desc->delay.first());		// <next instruction>
 
 	/* update the cycles and jump through the hash table to the target */
 	if (desc->targetpc != BRANCH_TARGET_DYNAMIC)
@@ -3648,7 +3666,7 @@ static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, i
 		drcuml_log_printf(drcuml, "\nDescriptor list @ %08X\n", desclist->pc);
 
 	/* output each descriptor */
-	for ( ; desclist != NULL; desclist = desclist->next)
+	for ( ; desclist != NULL; desclist = desclist->next())
 	{
 		char buffer[100];
 
@@ -3669,8 +3687,8 @@ static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, i
 		drcuml_log_printf(drcuml, "\n");
 
 		/* if we have a delay slot, output it recursively */
-		if (desclist->delay != NULL)
-			log_opcode_desc(drcuml, desclist->delay, indent + 1);
+		if (desclist->delay.first() != NULL)
+			log_opcode_desc(drcuml, desclist->delay.first(), indent + 1);
 
 		/* at the end of a sequence add a dividing line */
 		if (desclist->flags & OPFLAG_END_SEQUENCE)

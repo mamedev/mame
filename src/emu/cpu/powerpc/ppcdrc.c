@@ -165,7 +165,7 @@ struct _ppcimp_state
 	/* core state */
 	drccache *			cache;						/* pointer to the DRC code cache */
 	drcuml_state *		drcuml;						/* DRC UML generator state */
-	drcfe_state *		drcfe;						/* pointer to the DRC front-end state */
+	ppc_frontend *		drcfe;						/* pointer to the DRC front-end state */
 	UINT32				drcoptions;					/* configurable DRC options */
 
 	/* parameters for subroutines */
@@ -548,13 +548,6 @@ INLINE UINT32 compute_spr(UINT32 spr)
 
 static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, legacy_cpu_device *device, device_irq_callback irqcallback)
 {
-	drcfe_config feconfig =
-	{
-		COMPILE_BACKWARDS_BYTES,	/* code window start offset = startpc - window_start */
-		COMPILE_FORWARDS_BYTES,		/* code window end offset = startpc + window_end */
-		COMPILE_MAX_SEQUENCE,		/* maximum instructions to include in a sequence */
-		ppcfe_describe				/* callback to describe a single instruction */
-	};
 	powerpc_state *ppc;
 	drcbe_info beinfo;
 	UINT32 flags = 0;
@@ -633,9 +626,7 @@ static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, legacy
 	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->impstate->fcmp_cr_table, sizeof(ppc->impstate->fcmp_cr_table), "fcmp_cr_table");
 
 	/* initialize the front-end helper */
-	if (SINGLE_INSTRUCTION_MODE)
-		feconfig.max_sequence = 1;
-	ppc->impstate->drcfe = drcfe_init(device, &feconfig, ppc);
+	ppc->impstate->drcfe = auto_alloc(device->machine, ppc_frontend(*ppc, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE));
 
 	/* initialize the implementation state tables */
 	memcpy(ppc->impstate->fpmode, fpmode_source, sizeof(fpmode_source));
@@ -738,7 +729,7 @@ static CPU_EXIT( ppcdrc )
 	ppccom_exit(ppc);
 
 	/* clean up the DRC */
-	drcfe_exit(ppc->impstate->drcfe);
+	auto_free(device->machine, ppc->impstate->drcfe);
 	drcuml_free(ppc->impstate->drcuml);
 	drccache_free(ppc->impstate->cache);
 }
@@ -950,7 +941,7 @@ static void code_compile_block(powerpc_state *ppc, UINT8 mode, offs_t pc)
 	g_profiler.start(PROFILER_DRC_COMPILE);
 
 	/* get a description of this sequence */
-	desclist = drcfe_describe_code(ppc->impstate->drcfe, pc);
+	desclist = ppc->impstate->drcfe->describe_code(pc);
 	if (LOG_UML || LOG_NATIVE)
 		log_opcode_desc(drcuml, desclist, 0);
 
@@ -962,7 +953,7 @@ static void code_compile_block(powerpc_state *ppc, UINT8 mode, offs_t pc)
 	block = drcuml_block_begin(drcuml, 4096, &errorbuf);
 
 	/* loop until we get through all instruction sequences */
-	for (seqhead = desclist; seqhead != NULL; seqhead = seqlast->next)
+	for (seqhead = desclist; seqhead != NULL; seqhead = seqlast->next())
 	{
 		const opcode_desc *curdesc;
 		UINT32 nextpc;
@@ -972,7 +963,7 @@ static void code_compile_block(powerpc_state *ppc, UINT8 mode, offs_t pc)
 			UML_COMMENT(block, "-------------------------");								// comment
 
 		/* determine the last instruction in this sequence */
-		for (seqlast = seqhead; seqlast != NULL; seqlast = seqlast->next)
+		for (seqlast = seqhead; seqlast != NULL; seqlast = seqlast->next())
 			if (seqlast->flags & OPFLAG_END_SEQUENCE)
 				break;
 		assert(seqlast != NULL);
@@ -1007,7 +998,7 @@ static void code_compile_block(powerpc_state *ppc, UINT8 mode, offs_t pc)
 			UML_LABEL(block, seqhead->pc | 0x80000000);										// label   seqhead->pc | 0x80000000
 
 		/* iterate over instructions in the sequence and compile them */
-		for (curdesc = seqhead; curdesc != seqlast->next; curdesc = curdesc->next)
+		for (curdesc = seqhead; curdesc != seqlast->next(); curdesc = curdesc->next())
 			generate_sequence_instruction(ppc, block, &compiler, curdesc);					// <instruction>
 
 		/* if we need to return to the start, do it */
@@ -1024,7 +1015,7 @@ static void code_compile_block(powerpc_state *ppc, UINT8 mode, offs_t pc)
 		/* if the last instruction can change modes, use a variable mode; otherwise, assume the same mode */
 		if (seqlast->flags & OPFLAG_CAN_CHANGE_MODES)
 			UML_HASHJMP(block, MEM(&ppc->impstate->mode), IMM(nextpc), ppc->impstate->nocode);// hashjmp <mode>,nextpc,nocode
-		else if (seqlast->next == NULL || seqlast->next->pc != nextpc)
+		else if (seqlast->next() == NULL || seqlast->next()->pc != nextpc)
 			UML_HASHJMP(block, IMM(ppc->impstate->mode), IMM(nextpc), ppc->impstate->nocode);// hashjmp <mode>,nextpc,nocode
 	}
 
@@ -2093,7 +2084,7 @@ static void generate_checksum_block(powerpc_state *ppc, drcuml_block *block, com
 		UML_COMMENT(block, "[Validation for %08X]", seqhead->pc);							// comment
 
 	/* loose verify or single instruction: just compare and fail */
-	if (!(ppc->impstate->drcoptions & PPCDRC_STRICT_VERIFY) || seqhead->next == NULL)
+	if (!(ppc->impstate->drcoptions & PPCDRC_STRICT_VERIFY) || seqhead->next() == NULL)
 	{
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
@@ -2108,7 +2099,7 @@ static void generate_checksum_block(powerpc_state *ppc, drcuml_block *block, com
 	else
 	{
 #if 0
-		for (curdesc = seqhead->next; curdesc != seqlast->next; curdesc = curdesc->next)
+		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
 				void *base = ppc->direct->read_decrypted_ptr(seqhead->physpc, ppc->codexor);
@@ -2121,7 +2112,7 @@ static void generate_checksum_block(powerpc_state *ppc, drcuml_block *block, com
 		void *base = ppc->direct->read_decrypted_ptr(seqhead->physpc, ppc->codexor);
 		UML_LOAD(block, IREG(0), base, IMM(0), DWORD);										// load    i0,base,dword
 		sum += seqhead->opptr.l[0];
-		for (curdesc = seqhead->next; curdesc != seqlast->next; curdesc = curdesc->next)
+		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
 				base = ppc->direct->read_decrypted_ptr(curdesc->physpc, ppc->codexor);
@@ -4240,7 +4231,7 @@ static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, i
 		drcuml_log_printf(drcuml, "\nDescriptor list @ %08X\n", desclist->pc);
 
 	/* output each descriptor */
-	for ( ; desclist != NULL; desclist = desclist->next)
+	for ( ; desclist != NULL; desclist = desclist->next())
 	{
 		char buffer[100];
 
@@ -4263,8 +4254,8 @@ static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, i
 		drcuml_log_printf(drcuml, "\n");
 
 		/* if we have a delay slot, output it recursively */
-		if (desclist->delay != NULL)
-			log_opcode_desc(drcuml, desclist->delay, indent + 1);
+		if (desclist->delay.first() != NULL)
+			log_opcode_desc(drcuml, desclist->delay.first(), indent + 1);
 
 		/* at the end of a sequence add a dividing line */
 		if (desclist->flags & OPFLAG_END_SEQUENCE)

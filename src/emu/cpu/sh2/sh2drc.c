@@ -674,13 +674,6 @@ static void cfunc_SUBV(void *param)
 
 static CPU_INIT( sh2 )
 {
-	drcfe_config feconfig =
-	{
-		COMPILE_BACKWARDS_BYTES,	/* code window start offset = startpc - window_start */
-		COMPILE_FORWARDS_BYTES,		/* code window end offset = startpc + window_end */
-		COMPILE_MAX_SEQUENCE,		/* maximum instructions to include in a sequence */
-		sh2_describe			/* callback to describe a single instruction */
-	};
 	sh2_state *sh2 = get_safe_token(device);
 	drccache *cache;
 	drcbe_info beinfo;
@@ -733,9 +726,7 @@ static CPU_INIT( sh2 )
 	drcuml_symbol_add(sh2->drcuml, &sh2->mach, sizeof(sh2->macl), "mach");
 
 	/* initialize the front-end helper */
-	if (SINGLE_INSTRUCTION_MODE)
-		feconfig.max_sequence = 1;
-	sh2->drcfe = drcfe_init(device, &feconfig, sh2);
+	sh2->drcfe = auto_alloc(device->machine, sh2_frontend(*sh2, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE));
 
 	/* compute the register parameters */
 	for (regnum = 0; regnum < 16; regnum++)
@@ -779,7 +770,7 @@ static CPU_EXIT( sh2 )
 	sh2_state *sh2 = get_safe_token(device);
 
 	/* clean up the DRC */
-	drcfe_exit(sh2->drcfe);
+	auto_free(device->machine, sh2->drcfe);
 	drcuml_free(sh2->drcuml);
 	drccache_free(sh2->cache);
 }
@@ -941,7 +932,7 @@ static void code_compile_block(sh2_state *sh2, UINT8 mode, offs_t pc)
 	g_profiler.start(PROFILER_DRC_COMPILE);
 
 	/* get a description of this sequence */
-	desclist = drcfe_describe_code(sh2->drcfe, pc);
+	desclist = sh2->drcfe->describe_code(pc);
 	if (LOG_UML || LOG_NATIVE)
 		log_opcode_desc(drcuml, desclist, 0);
 
@@ -953,7 +944,7 @@ static void code_compile_block(sh2_state *sh2, UINT8 mode, offs_t pc)
 	block = drcuml_block_begin(drcuml, 4096, &errorbuf);
 
 	/* loop until we get through all instruction sequences */
-	for (seqhead = desclist; seqhead != NULL; seqhead = seqlast->next)
+	for (seqhead = desclist; seqhead != NULL; seqhead = seqlast->next())
 	{
 		const opcode_desc *curdesc;
 		UINT32 nextpc;
@@ -963,7 +954,7 @@ static void code_compile_block(sh2_state *sh2, UINT8 mode, offs_t pc)
 			UML_COMMENT(block, "-------------------------");						// comment
 
 		/* determine the last instruction in this sequence */
-		for (seqlast = seqhead; seqlast != NULL; seqlast = seqlast->next)
+		for (seqlast = seqhead; seqlast != NULL; seqlast = seqlast->next())
 			if (seqlast->flags & OPFLAG_END_SEQUENCE)
 				break;
 		assert(seqlast != NULL);
@@ -1000,7 +991,7 @@ static void code_compile_block(sh2_state *sh2, UINT8 mode, offs_t pc)
 		}
 
 		/* iterate over instructions in the sequence and compile them */
-		for (curdesc = seqhead; curdesc != seqlast->next; curdesc = curdesc->next)
+		for (curdesc = seqhead; curdesc != seqlast->next(); curdesc = curdesc->next())
 		{
 			generate_sequence_instruction(sh2, block, &compiler, curdesc, 0xffffffff);
 		}
@@ -1020,7 +1011,7 @@ static void code_compile_block(sh2_state *sh2, UINT8 mode, offs_t pc)
 		generate_update_cycles(sh2, block, &compiler, IMM(nextpc), TRUE);				// <subtract cycles>
 
 		/* SH2 has no modes */
-		if (seqlast->next == NULL || seqlast->next->pc != nextpc)
+		if (seqlast->next() == NULL || seqlast->next()->pc != nextpc)
 		{
 			UML_HASHJMP(block, IMM(0), IMM(nextpc), sh2->nocode);
 		}
@@ -1390,7 +1381,7 @@ static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, i
 		drcuml_log_printf(drcuml, "\nDescriptor list @ %08X\n", desclist->pc);
 
 	/* output each descriptor */
-	for ( ; desclist != NULL; desclist = desclist->next)
+	for ( ; desclist != NULL; desclist = desclist->next())
 	{
 		char buffer[100];
 
@@ -1411,8 +1402,8 @@ static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, i
 		drcuml_log_printf(drcuml, "\n");
 
 		/* if we have a delay slot, output it recursively */
-		if (desclist->delay != NULL)
-			log_opcode_desc(drcuml, desclist->delay, indent + 1);
+		if (desclist->delay.first() != NULL)
+			log_opcode_desc(drcuml, desclist->delay.first(), indent + 1);
 
 		/* at the end of a sequence add a dividing line */
 		if (desclist->flags & OPFLAG_END_SEQUENCE)
@@ -1524,7 +1515,7 @@ static void generate_checksum_block(sh2_state *sh2, drcuml_block *block, compile
 		UML_COMMENT(block, "[Validation for %08X]", seqhead->pc);					// comment
 
 	/* loose verify or single instruction: just compare and fail */
-	if (!(sh2->drcoptions & SH2DRC_STRICT_VERIFY) || seqhead->next == NULL)
+	if (!(sh2->drcoptions & SH2DRC_STRICT_VERIFY) || seqhead->next() == NULL)
 	{
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
@@ -1539,7 +1530,7 @@ static void generate_checksum_block(sh2_state *sh2, drcuml_block *block, compile
 	else
 	{
 #if 0
-		for (curdesc = seqhead->next; curdesc != seqlast->next; curdesc = curdesc->next)
+		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
 				base = sh2->direct->read_decrypted_ptr(curdesc->physpc, SH2_CODE_XOR(0));
@@ -1552,7 +1543,7 @@ static void generate_checksum_block(sh2_state *sh2, drcuml_block *block, compile
 		void *base = sh2->direct->read_decrypted_ptr(seqhead->physpc, SH2_CODE_XOR(0));
 		UML_LOAD(block, IREG(0), base, IMM(0), WORD);								// load    i0,base,word
 		sum += seqhead->opptr.w[0];
-		for (curdesc = seqhead->next; curdesc != seqlast->next; curdesc = curdesc->next)
+		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
 				base = sh2->direct->read_decrypted_ptr(curdesc->physpc, SH2_CODE_XOR(0));
@@ -1662,7 +1653,7 @@ static void generate_delay_slot(sh2_state *sh2, drcuml_block *block, compiler_st
 
 	/* compile the delay slot using temporary compiler state */
 	assert(desc->delay != NULL);
-	generate_sequence_instruction(sh2, block, &compiler_temp, desc->delay, ovrpc);				// <next instruction>
+	generate_sequence_instruction(sh2, block, &compiler_temp, desc->delay.first(), ovrpc);				// <next instruction>
 
 	/* update the label */
 	compiler->labelnum = compiler_temp.labelnum;

@@ -106,7 +106,7 @@ struct _rspimp_state
 	/* core state */
 	drccache *			cache;						/* pointer to the DRC code cache */
 	drcuml_state *		drcuml;						/* DRC UML generator state */
-	drcfe_state *		drcfe;						/* pointer to the DRC front-end state */
+	rsp_frontend *		drcfe;						/* pointer to the DRC front-end state */
 	UINT32				drcoptions;					/* configurable DRC options */
 
 	/* internal stuff */
@@ -603,13 +603,6 @@ static void rspcom_init(rsp_state *rsp, legacy_cpu_device *device, device_irq_ca
 
 static CPU_INIT( rsp )
 {
-	drcfe_config feconfig =
-	{
-		COMPILE_BACKWARDS_BYTES,	/* code window start offset = startpc - window_start */
-		COMPILE_FORWARDS_BYTES,		/* code window end offset = startpc + window_end */
-		COMPILE_MAX_SEQUENCE,		/* maximum instructions to include in a sequence */
-		rspfe_describe				/* callback to describe a single instruction */
-	};
 	rsp_state *rsp;
 	drccache *cache;
 	UINT32 flags = 0;
@@ -669,11 +662,7 @@ static CPU_INIT( rsp )
 	drcuml_symbol_add(rsp->impstate->drcuml, &rsp->impstate->numcycles, sizeof(rsp->impstate->numcycles), "numcycles");
 
 	/* initialize the front-end helper */
-	if (SINGLE_INSTRUCTION_MODE)
-	{
-		feconfig.max_sequence = 1;
-	}
-	rsp->impstate->drcfe = drcfe_init(device, &feconfig, rsp);
+	rsp->impstate->drcfe = auto_alloc(device->machine, rsp_frontend(*rsp, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE));
 
 	/* compute the register parameters */
 	for (regnum = 0; regnum < 32; regnum++)
@@ -721,7 +710,7 @@ static CPU_EXIT( rsp )
 	rsp_state *rsp = get_safe_token(device);
 
 	/* clean up the DRC */
-	drcfe_exit(rsp->impstate->drcfe);
+	auto_free(device->machine, rsp->impstate->drcfe);
 	drcuml_free(rsp->impstate->drcuml);
 	drccache_free(rsp->impstate->cache);
 }
@@ -3479,7 +3468,7 @@ static void code_compile_block(rsp_state *rsp, offs_t pc)
 	g_profiler.start(PROFILER_DRC_COMPILE);
 
 	/* get a description of this sequence */
-	desclist = drcfe_describe_code(rsp->impstate->drcfe, pc);
+	desclist = rsp->impstate->drcfe->describe_code(pc);
 
 	/* if we get an error back, flush the cache and try again */
 	if (setjmp(errorbuf) != 0)
@@ -3491,7 +3480,7 @@ static void code_compile_block(rsp_state *rsp, offs_t pc)
 	block = drcuml_block_begin(drcuml, 8192, &errorbuf);
 
 	/* loop until we get through all instruction sequences */
-	for (seqhead = desclist; seqhead != NULL; seqhead = seqlast->next)
+	for (seqhead = desclist; seqhead != NULL; seqhead = seqlast->next())
 	{
 		const opcode_desc *curdesc;
 		UINT32 nextpc;
@@ -3501,7 +3490,7 @@ static void code_compile_block(rsp_state *rsp, offs_t pc)
 			UML_COMMENT(block, "-------------------------");						// comment
 
 		/* determine the last instruction in this sequence */
-		for (seqlast = seqhead; seqlast != NULL; seqlast = seqlast->next)
+		for (seqlast = seqhead; seqlast != NULL; seqlast = seqlast->next())
 			if (seqlast->flags & OPFLAG_END_SEQUENCE)
 				break;
 		assert(seqlast != NULL);
@@ -3536,7 +3525,7 @@ static void code_compile_block(rsp_state *rsp, offs_t pc)
 			UML_LABEL(block, seqhead->pc | 0x80000000);								// label   seqhead->pc
 
 		/* iterate over instructions in the sequence and compile them */
-		for (curdesc = seqhead; curdesc != seqlast->next; curdesc = curdesc->next)
+		for (curdesc = seqhead; curdesc != seqlast->next(); curdesc = curdesc->next())
 			generate_sequence_instruction(rsp, block, &compiler, curdesc);
 
 		/* if we need to return to the start, do it */
@@ -3551,7 +3540,7 @@ static void code_compile_block(rsp_state *rsp, offs_t pc)
 		generate_update_cycles(rsp, block, &compiler, IMM(nextpc), TRUE);			// <subtract cycles>
 
 		/* if the last instruction can change modes, use a variable mode; otherwise, assume the same mode */
-		if (seqlast->next == NULL || seqlast->next->pc != nextpc)
+		if (seqlast->next() == NULL || seqlast->next()->pc != nextpc)
 			UML_HASHJMP(block, IMM(0), IMM(nextpc), rsp->impstate->nocode);			// hashjmp <mode>,nextpc,nocode
 	}
 
@@ -3800,7 +3789,7 @@ static void generate_checksum_block(rsp_state *rsp, drcuml_block *block, compile
 		UML_COMMENT(block, "[Validation for %08X]", seqhead->pc | 0x1000);					// comment
 	}
 	/* loose verify or single instruction: just compare and fail */
-	if (!(rsp->impstate->drcoptions & RSPDRC_STRICT_VERIFY) || seqhead->next == NULL)
+	if (!(rsp->impstate->drcoptions & RSPDRC_STRICT_VERIFY) || seqhead->next() == NULL)
 	{
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
@@ -3818,7 +3807,7 @@ static void generate_checksum_block(rsp_state *rsp, drcuml_block *block, compile
 		void *base = rsp->direct->read_decrypted_ptr(seqhead->physpc | 0x1000);
 		UML_LOAD(block, IREG(0), base, IMM(0), DWORD);								// load    i0,base,0,dword
 		sum += seqhead->opptr.l[0];
-		for (curdesc = seqhead->next; curdesc != seqlast->next; curdesc = curdesc->next)
+		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
 				base = rsp->direct->read_decrypted_ptr(curdesc->physpc | 0x1000);
@@ -3910,7 +3899,7 @@ static void generate_delay_slot_and_branch(rsp_state *rsp, drcuml_block *block, 
 
 	/* compile the delay slot using temporary compiler state */
 	assert(desc->delay != NULL);
-	generate_sequence_instruction(rsp, block, &compiler_temp, desc->delay);		// <next instruction>
+	generate_sequence_instruction(rsp, block, &compiler_temp, desc->delay.first());		// <next instruction>
 
 	/* update the cycles and jump through the hash table to the target */
 	if (desc->targetpc != BRANCH_TARGET_DYNAMIC)
