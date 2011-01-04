@@ -5895,7 +5895,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			case 0x0: if ( pri <= STV_VDP2_SPCCN ) alpha_enabled = 1; break;
 			case 0x1: if ( pri == STV_VDP2_SPCCN ) alpha_enabled = 1; break;
 			case 0x2: if ( pri >= STV_VDP2_SPCCN ) alpha_enabled = 1; break;
-			case 0x3: /* MSBON */ break;
+			case 0x3: alpha_enabled = 2; sprite_shadow = 0; break;
 		}
 	}
 	else
@@ -6055,6 +6055,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 						};
 
 						ccr = sprite_ccr[ (pix >> sprite_ccrr_shift) & sprite_ccrr_mask ];
+						if ( alpha_enabled == 2 )
+						{
+							if ( ( pix & 0x8000 ) == 0 )
+							{
+								ccr = 0;
+							}
+						}
 
 						if ( pix & sprite_shadow )
 						{
@@ -6199,6 +6206,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 					if ( alpha_enabled )
 						ccr = sprite_ccr[ (pix >> sprite_ccrr_shift) & sprite_ccrr_mask ];
+
+					if ( alpha_enabled == 2 )
+					{
+						if ( ( pix & 0x8000 ) == 0 )
+						{
+							ccr = 0;
+						}
+					}
 
 					if ( pix & sprite_shadow )
 					{
