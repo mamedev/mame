@@ -322,7 +322,7 @@ DISCRETE_RESET(dss_counter)
 
 
 	if (!context->is_7492 && (DSS_COUNTER__MAX < DSS_COUNTER__MIN))
-		fatalerror("MAX < MIN in NODE_%02d", NODE_INDEX(node->block->node));
+		fatalerror("MAX < MIN in NODE_%02d", node->index());
 
 	context->out_type    = context->clock_type & DISC_OUT_MASK;
 	context->clock_type &= DISC_CLK_MASK;
@@ -532,7 +532,7 @@ DISCRETE_RESET(dss_lfsr)
 	context->out_lfsr_reg = (info->flags & DISC_LFSR_FLAG_OUTPUT_SR_SN1) ? 1 : 0;
 
 	if ((info->clock_type < DISC_CLK_ON_F_EDGE) || (info->clock_type > DISC_CLK_IS_FREQ))
-		discrete_log(node->info, "Invalid clock type passed in NODE_%d\n", NODE_BLOCKINDEX(node));
+		discrete_log(node->info, "Invalid clock type passed in NODE_%d\n", node->index());
 
 	context->last = (DSS_COUNTER__CLOCK != 0);
 	if (info->clock_type == DISC_CLK_IS_FREQ) context->t_clock = 1.0 / DSS_LFSR_NOISE__CLOCK;
@@ -1698,7 +1698,7 @@ DISCRETE_RESET(dss_squarewave2)
 #define DSS_INVERTER_OSC__C			DISCRETE_INPUT(4)
 #define DSS_INVERTER_OSC__R2		DISCRETE_INPUT(5)
 
-INLINE double dss_inverter_tftab(const node_description *node, double x)
+INLINE double dss_inverter_tftab(node_description *node, double x)
 {
 	DISCRETE_DECLARE_CONTEXT(dss_inverter_osc)
 	DISCRETE_DECLARE_INFO(discrete_inverter_osc_desc)
@@ -1710,7 +1710,7 @@ INLINE double dss_inverter_tftab(const node_description *node, double x)
 		return info->vB;
 }
 
-INLINE double dss_inverter_tf(const node_description *node, double x)
+INLINE double dss_inverter_tf(node_description *node, double x)
 {
 	DISCRETE_DECLARE_CONTEXT(dss_inverter_osc)
 	DISCRETE_DECLARE_INFO(discrete_inverter_osc_desc)
@@ -1760,7 +1760,7 @@ DISCRETE_STEP(dss_inverter_osc)
 			vG2 = dss_inverter_tf(node,vG3);
 			break;
 		default:
-			fatalerror("DISCRETE_INVERTER_OSC - Wrong type on NODE_%02d", NODE_BLOCKINDEX(node));
+			fatalerror("DISCRETE_INVERTER_OSC - Wrong type on NODE_%02d", node->index());
 	}
 
 	clamped = 0;
@@ -1826,7 +1826,7 @@ DISCRETE_STEP(dss_inverter_osc)
 			diff = diff - diff * exp(-node->info->sample_time/(context->c * rMix));
 			break;
 		default:
-			fatalerror("DISCRETE_INVERTER_OSC - Wrong type on NODE_%02d", NODE_BLOCKINDEX(node));
+			fatalerror("DISCRETE_INVERTER_OSC - Wrong type on NODE_%02d", node->index());
 	}
 	context->v_cap   += diff;
 	context->v_g2_old = vG2;

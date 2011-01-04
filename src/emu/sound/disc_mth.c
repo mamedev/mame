@@ -472,7 +472,7 @@ DISCRETE_RESET(dst_diode_mix)
 
 	int		addr;
 
-	context->size = node->active_inputs - DST_DIODE_MIX_INP_OFFSET;
+	context->size = node->active_inputs() - DST_DIODE_MIX_INP_OFFSET;
 	assert(context->size <= 8);
 
 	for (addr = 0; addr < context->size; addr++)
@@ -512,7 +512,7 @@ DISCRETE_STEP(dst_divide)
 		if(DST_DIVIDE__DIV == 0)
 		{
 			node->output[0 ]= DBL_MAX;	/* Max out but don't break */
-			discrete_log(node->info, "dst_divider_step() - Divide by Zero attempted in NODE_%02d.\n",NODE_BLOCKINDEX(node));
+			discrete_log(node->info, "dst_divider_step() - Divide by Zero attempted in NODE_%02d.\n",node->index());
 		}
 		else
 		{
@@ -1338,7 +1338,7 @@ DISCRETE_RESET(dst_mixer)
 			context->c_bit_flag |= 1 << bit;
 	}
 
-	context->size = node->active_inputs - 1;
+	context->size = node->active_inputs() - 1;
 
 	/*
      * THERE IS NO ERROR CHECKING!!!!!!!!!
@@ -1447,7 +1447,7 @@ DISCRETE_STEP(dst_multiplex)
 	else
 	{
 		/* Bad address.  We will leave the output alone. */
-		discrete_log(node->info, "NODE_%02d - Address = %d. Out of bounds\n", NODE_BLOCKINDEX(node), addr);
+		discrete_log(node->info, "NODE_%02d - Address = %d. Out of bounds\n", node->index(), addr);
 	}
 }
 
@@ -1455,7 +1455,7 @@ DISCRETE_RESET(dst_multiplex)
 {
 	DISCRETE_DECLARE_CONTEXT(dst_size)
 
-	context->size = node->active_inputs - 1;
+	context->size = node->active_inputs() - 1;
 
 	DISCRETE_STEP_CALL(dst_multiplex);
 }
@@ -1751,7 +1751,7 @@ DISCRETE_STEP(dst_transform)
 	double	number1,top;
 	int		trans_stack_ptr = 0;
 
-	const char *fPTR = (const char *)node->custom;
+	const char *fPTR = (const char *)node->custom_data();
 
 	top = HUGE_VAL;
 
@@ -1832,9 +1832,9 @@ DISCRETE_STEP(dst_transform)
 				top = (int)number1 ^ (int)top;
 				break;
 			default:
-				discrete_log(node->info, "dst_transform_step - Invalid function type/variable passed: %s",(const char *)node->custom);
+				discrete_log(node->info, "dst_transform_step - Invalid function type/variable passed: %s",(const char *)node->custom_data());
 				/* that is enough to fatalerror */
-				fatalerror("dst_transform_step - Invalid function type/variable passed: %s", (const char *)node->custom);
+				fatalerror("dst_transform_step - Invalid function type/variable passed: %s", (const char *)node->custom_data());
 				break;
 		}
 	}

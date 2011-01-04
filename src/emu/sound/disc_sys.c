@@ -39,33 +39,31 @@ struct dso_wavlog_context
 static void task_check(discrete_task *task, discrete_task *dest_task)
 {
 	int inputnum;
-	const linked_list_entry *node_entry;
-	const linked_list_entry *step_entry;
 
 	/* Determine, which nodes in the task are referenced by nodes in dest_task
      * and add them to the list of nodes to be buffered for further processing
      */
-	for (node_entry = task->list; node_entry != NULL; node_entry = node_entry->next)
+	for_each(node_description *, node_entry, &task->list)
 	{
-		const node_description *task_node = (node_description *) node_entry->ptr;
+		node_description *task_node = node_entry.item();
 
-		for (step_entry = dest_task->list; step_entry != NULL; step_entry = step_entry->next)
+		for_each(node_description *, step_entry, &dest_task->list)
 		{
-			node_description *dest_node = (node_description *) step_entry->ptr;
+			node_description *dest_node = step_entry.item();
 
 			/* loop over all active inputs */
-			for (inputnum = 0; inputnum < dest_node->active_inputs; inputnum++)
+			for (inputnum = 0; inputnum < dest_node->active_inputs(); inputnum++)
 			{
-				int inputnode = dest_node->block->input_node[inputnum];
+				int inputnode = dest_node->input_node(inputnum);
 				if IS_VALUE_A_NODE(inputnode)
 				{
-					if (NODE_DEFAULT_NODE(task_node->block->node) == NODE_DEFAULT_NODE(inputnode))
+					if (NODE_DEFAULT_NODE(task_node->block_node()) == NODE_DEFAULT_NODE(inputnode))
 					{
 						discrete_source_node *source;
 						int i, found = -1;
 
 						for (i = 0; i < task->numbuffered; i++)
-							if (task->nodes[i]->block->node == inputnode)
+							if (task->nodes[i]->block_node() == inputnode)
 							{
 								found = i;
 								break;
@@ -83,13 +81,11 @@ static void task_check(discrete_task *task, discrete_task *dest_task)
 							i = task->numbuffered;
 							task->numbuffered++;
 						}
-						discrete_log(task_node->info, "dso_task_start - buffering %d(%d) in task %p group %d referenced by %d group %d", NODE_INDEX(inputnode), NODE_CHILD_NODE_NUM(inputnode), task, task->task_group, NODE_BLOCKINDEX(dest_node), dest_task->task_group);
+						discrete_log(task_node->info, "dso_task_start - buffering %d(%d) in task %p group %d referenced by %d group %d", NODE_INDEX(inputnode), NODE_CHILD_NODE_NUM(inputnode), task, task->task_group, dest_node->index(), dest_task->task_group);
 
 						/* register into source list */
 						source = auto_alloc(dest_node->info->device->machine, discrete_source_node);
-						linked_list_add(dest_node->info,
-								&dest_task->source_list,
-								source);
+						dest_task->source_list.add_tail(source);
 						source->task = task;
 						source->output_node = i;
 
@@ -109,19 +105,15 @@ DISCRETE_START( dso_task_start )
 {
 	DISCRETE_DECLARE_TASK
 
-	const linked_list_entry *task_entry;
-
 	task->task_group = (int) DISCRETE_INPUT(0);
 
 	if (task->task_group < 0 || task->task_group >= DISCRETE_MAX_TASK_GROUPS)
 		fatalerror("discrete_dso_task: illegal task_group %d", task->task_group);
 
-	for (task_entry = node->info->task_list; task_entry != NULL; task_entry = task_entry->next)
+	for_each(discrete_task *, dest_task, &node->info->task_list)
 	{
-		discrete_task *dest_task = (discrete_task *) task_entry->ptr;
-
-		if (task->task_group > dest_task->task_group)
-			task_check(dest_task, task);
+		if (task->task_group > dest_task.item()->task_group)
+			task_check(dest_task.item(), task);
 	}
 
 }
@@ -140,13 +132,10 @@ DISCRETE_STEP( dso_task_start )
 {
 	DISCRETE_DECLARE_TASK
 
-	const linked_list_entry *entry;
-
 	/* update source node buffer */
-	for (entry = task->source_list; entry != NULL; entry = entry->next)
+	for_each(discrete_source_node *, sn, &task->source_list)
 	{
-		discrete_source_node *sn = (discrete_source_node *) entry->ptr;
-		sn->buffer = *sn->ptr++;
+		sn.item()->buffer = *sn.item()->ptr++;
 	}
 }
 
@@ -179,7 +168,7 @@ DISCRETE_START( dso_csvlog )
 
 	int log_num, node_num;
 
-	log_num = node_module_index(node);
+	log_num = node->same_module_index(node->info->node_list);
 	context->sample_num = 0;
 
 	sprintf(context->name, "discrete_%s_%d.csv", node->info->device->tag(), log_num);
@@ -190,9 +179,9 @@ DISCRETE_START( dso_csvlog )
 	fprintf(context->csv_file, "\"Sample Rate\", %d\n", node->info->sample_rate);
 	fprintf(context->csv_file, "\n");
 	fprintf(context->csv_file, "\"Sample\"");
-	for (node_num = 0; node_num < node->active_inputs; node_num++)
+	for (node_num = 0; node_num < node->active_inputs(); node_num++)
 	{
-		fprintf(context->csv_file, ", \"NODE_%2d\"", NODE_INDEX(node->block->input_node[node_num]));
+		fprintf(context->csv_file, ", \"NODE_%2d\"", NODE_INDEX(node->input_node(node_num)));
 	}
 	fprintf(context->csv_file, "\n");
 }
@@ -214,7 +203,7 @@ DISCRETE_STEP( dso_csvlog )
 
 	/* Dump any csv logs */
 	fprintf(context->csv_file, "%" I64FMT "d", ++context->sample_num);
-	for (nodenum = 0; nodenum < node->active_inputs; nodenum++)
+	for (nodenum = 0; nodenum < node->active_inputs(); nodenum++)
 	{
 		fprintf(context->csv_file, ", %f", *node->input[nodenum]);
 	}
@@ -227,9 +216,9 @@ DISCRETE_START( dso_wavlog )
 
 	int log_num;
 
-	log_num = node_module_index(node);
+	log_num = node->same_module_index(node->info->node_list);
 	sprintf(context->name, "discrete_%s_%d.wav", node->info->device->tag(), log_num);
-	context->wavfile = wav_open(context->name, node->info->sample_rate, node->active_inputs/2);
+	context->wavfile = wav_open(context->name, node->info->sample_rate, node->active_inputs()/2);
 }
 
 DISCRETE_STOP( dso_wavlog )
@@ -253,7 +242,7 @@ DISCRETE_STEP( dso_wavlog )
 	val = DISCRETE_INPUT(0) * DISCRETE_INPUT(1);
 	val = (val < -32768) ? -32768 : (val > 32767) ? 32767 : val;
 	wave_data_l = (INT16)val;
-	if (node->active_inputs == 2)
+	if (node->active_inputs() == 2)
 	{
 		/* DISCRETE_WAVLOG1 */
 		wav_add_data_16(context->wavfile, &wave_data_l, 1);

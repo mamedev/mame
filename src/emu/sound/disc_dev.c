@@ -398,7 +398,7 @@ DISCRETE_RESET(dsd_555_astbl)
 
 	node_description *v_charge_node;
 
-	context->use_ctrlv   = (node->input_is_node >> 4) & 1;
+	context->use_ctrlv   = (node->input_is_node() >> 4) & 1;
 	context->output_type = info->options & DISC_555_OUT_MASK;
 
 	/* Use the defaults or supplied values. */
@@ -431,7 +431,7 @@ DISCRETE_RESET(dsd_555_astbl)
 
 	/* optimization if none of the values are nodes */
 	context->has_rc_nodes = 0;
-	if (node->input_is_node & DSD_555_ASTBL_RC_MASK)
+	if (node->input_is_node() & DSD_555_ASTBL_RC_MASK)
 		context->has_rc_nodes = 1;
 	else
 	{
@@ -618,7 +618,7 @@ DISCRETE_RESET(dsd_555_mstbl)
 	context->output_type = info->options & DISC_555_OUT_MASK;
 	if ((context->output_type == DISC_555_OUT_COUNT_F) || (context->output_type == DISC_555_OUT_COUNT_R))
 	{
-		discrete_log(node->info, "Invalid Output type in NODE_%d.\n", NODE_BLOCKINDEX(node));
+		discrete_log(node->info, "Invalid Output type in NODE_%d.\n", node->index());
 		context->output_type = DISC_555_OUT_SQW;
 	}
 
@@ -649,7 +649,7 @@ DISCRETE_RESET(dsd_555_mstbl)
 
 	/* optimization if none of the values are nodes */
 	context->has_rc_nodes = 0;
-	if (node->input_is_node & DSD_555_MSTBL_RC_MASK)
+	if (node->input_is_node() & DSD_555_MSTBL_RC_MASK)
 		context->has_rc_nodes = 1;
 	else
 		context->exp_charge = RC_CHARGE_EXP(DSD_555_MSTBL__R * DSD_555_MSTBL__C);
@@ -1047,7 +1047,7 @@ DISCRETE_RESET(dsd_555_cc)
 
 	/* optimization if none of the values are nodes */
 	context->has_rc_nodes = 0;
-	if (node->input_is_node & DSD_555_CC_RC_MASK)
+	if (node->input_is_node() & DSD_555_CC_RC_MASK)
 		context->has_rc_nodes = 1;
 	else
 	{
@@ -1433,7 +1433,7 @@ DISCRETE_RESET(dsd_555_vco1)
 
 	/* There is no charge on the cap so the 555 goes high at init. */
 	context->flip_flop     = 1;
-	context->ctrlv_is_node = (node->input_is_node >> 2) & 1;
+	context->ctrlv_is_node = (node->input_is_node() >> 2) & 1;
 	context->v_out_high    = (info->v_out_high == DEFAULT_555_HIGH) ? info->v_pos - 1.2 : info->v_out_high;
 
 	/* Calculate 555 thresholds.
@@ -1668,15 +1668,15 @@ DISCRETE_RESET(dsd_566)
 	context->fake_ac =  (int)DSD_566__OPTIONS & DISC_566_OUT_AC;
 
 	if (DSD_566__VNEG >= DSD_566__VPOS)
-		fatalerror("[v_neg >= v_pos] in NODE_%d!\n", NODE_BLOCKINDEX(node));
+		fatalerror("[v_neg >= v_pos] in NODE_%d!\n", node->index());
 
 	v_float = DSD_566__VPOS - DSD_566__VNEG;
 	v_int = (int)v_float;
 	if ( v_float < 10 || v_float > 15 )
-		fatalerror("v_neg and/or v_pos out of range in NODE_%d\n", NODE_BLOCKINDEX(node));
+		fatalerror("v_neg and/or v_pos out of range in NODE_%d\n", node->index());
 	if ( v_float != v_int )
 		/* fatal for now. */
-		fatalerror("Power should be integer in NODE_%d\n", NODE_BLOCKINDEX(node));
+		fatalerror("Power should be integer in NODE_%d\n", node->index());
 
 	context->flip_flop   = 0;
 	context->cap_voltage = 0;

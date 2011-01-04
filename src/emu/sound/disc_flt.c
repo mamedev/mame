@@ -179,7 +179,7 @@ DISCRETE_RESET(dst_crfilter)
 {
 	DISCRETE_DECLARE_CONTEXT(dst_rcfilter)
 
-	context->has_rc_nodes = node->input_is_node & 0x6;
+	context->has_rc_nodes = node->input_is_node() & 0x6;
 	context->rc = DST_CRFILTER__R * DST_CRFILTER__C;
 	context->exponent = RC_CHARGE_EXP(context->rc);
 	context->vCap = 0;
@@ -872,17 +872,17 @@ DISCRETE_RESET( dst_rcdisc4)
 	/* some error checking. */
 	if (DST_RCDISC4__R1 <= 0 || DST_RCDISC4__R2 <= 0 || DST_RCDISC4__C1 <= 0 || (DST_RCDISC4__R3 <= 0 &&  context->type == 1))
 	{
-		discrete_log(node->info, "Invalid component values in NODE_%d.\n", NODE_BLOCKINDEX(node));
+		discrete_log(node->info, "Invalid component values in NODE_%d.\n", node->index());
 		return;
 	}
 	if (DST_RCDISC4__VP < 3)
 	{
-		discrete_log(node->info, "vP must be >= 3V in NODE_%d.\n", NODE_BLOCKINDEX(node));
+		discrete_log(node->info, "vP must be >= 3V in NODE_%d.\n", node->index());
 		return;
 	}
 	if (DST_RCDISC4__TYPE < 1 || DST_RCDISC4__TYPE > 3)
 	{
-		discrete_log(node->info, "Invalid circuit type in NODE_%d.\n", NODE_BLOCKINDEX(node));
+		discrete_log(node->info, "Invalid circuit type in NODE_%d.\n", node->index());
 		return;
 	}
 
@@ -1138,7 +1138,7 @@ DISCRETE_RESET(dst_rcfilter)
 {
 	DISCRETE_DECLARE_CONTEXT(dst_rcfilter)
 
-	context->has_rc_nodes = node->input_is_node & 0x6;
+	context->has_rc_nodes = node->input_is_node() & 0x6;
 	context->rc = DST_RCFILTER__R * DST_RCFILTER__C;
 	context->exponent = RC_CHARGE_EXP(context->rc);
 	context->vCap   = 0;

@@ -172,9 +172,9 @@ DISCRETE_RESET(dss_adjustment)
 
 	double min, max;
 
-	context->port = node->info->device->machine->m_portlist.find((const char *)node->custom);
+	context->port = node->info->device->machine->m_portlist.find((const char *)node->custom_data());
 	if (context->port == NULL)
-		fatalerror("DISCRETE_ADJUSTMENT - NODE_%d has invalid tag", NODE_BLOCKINDEX(node));
+		fatalerror("DISCRETE_ADJUSTMENT - NODE_%d has invalid tag", node->index());
 
 	context->lastpval = 0x7fffffff;
 	context->pmin     = DSS_ADJUSTMENT__PMIN;
@@ -312,7 +312,7 @@ DISCRETE_START(dss_input_stream)
 	context->ptr = NULL;
 	//context->data = 0;
 
-	if (node->block->type == DSS_INPUT_BUFFER)
+	if (node->block_type() == DSS_INPUT_BUFFER)
 	{
 		context->is_buffered = TRUE;
 		context->buffer_stream = stream_create(node->info->device, 0, 1, node->info->sample_rate, (void *) node, buffer_stream_update);
