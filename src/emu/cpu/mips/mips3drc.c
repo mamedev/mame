@@ -1556,6 +1556,14 @@ static void generate_checksum_block(mips3_state *mips3, drcuml_block *block, com
 				UML_LOAD(block, IREG(1), base, IMM(0), DWORD);						// load    i1,base,dword
 				UML_ADD(block, IREG(0), IREG(0), IREG(1));							// add     i0,i0,i1
 				sum += curdesc->opptr.l[0];
+
+				if (curdesc->delay != NULL && (curdesc == seqlast || (curdesc->next != NULL && curdesc->next->physpc != curdesc->delay->physpc)))
+				{
+					base = mips3->direct->read_decrypted_ptr(curdesc->delay->physpc);
+					UML_LOAD(block, IREG(1), base, IMM(0), DWORD);					// load    i1,base,dword
+					UML_ADD(block, IREG(0), IREG(0), IREG(1));						// add     i0,i0,i1
+					sum += curdesc->delay->opptr.l[0];
+				}
 			}
 		UML_CMP(block, IREG(0), IMM(sum));											// cmp     i0,sum
 		UML_EXHc(block, IF_NE, mips3->impstate->nocode, IMM(epc(seqhead)));			// exne    nocode,seqhead->pc
