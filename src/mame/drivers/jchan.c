@@ -612,26 +612,26 @@ static INPUT_PORTS_START( jchan )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")		/* provided by the MCU - $200098.b <- $300200 */
-	PORT_SERVICE( 0x0100, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Flip_Screen ) )
+	PORT_SERVICE_DIPLOC(  0x0100, IP_ACTIVE_LOW, "SW1:1" )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Flip_Screen ) )		PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, "Sound" )
+	PORT_DIPNAME( 0x0800, 0x0800, "Sound" )				PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Mono ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( Stereo ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Free_Play ) )		PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x0000, "Blood Mode" )
+	PORT_DIPNAME( 0x2000, 0x0000, "Blood Mode" )			PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( High ) )
-	PORT_DIPNAME( 0x4000, 0x4000, "Special Prize Available" )    /* impacts $200008.l many times -> see high-score tables - WTF is it ? */
+	PORT_DIPNAME( 0x4000, 0x4000, "Special Prize Available" )	PORT_DIPLOCATION("SW1:7")	/* impacts $200008.l many times -> see high-score tables - WTF is it ? */
 	PORT_DIPSETTING(      0x4000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x8000, 0x8000, "Buttons Layout" )             /* impacts $200116.l once! -> impacts reading of controls at 0x00021e2a */
+	PORT_DIPNAME( 0x8000, 0x8000, "Buttons Layout" )		PORT_DIPLOCATION("SW1:8")	/* impacts $200116.l once! -> impacts reading of controls at 0x00021e2a */
 	PORT_DIPSETTING(      0x8000, "3+1" )
 	PORT_DIPSETTING(      0x0000, "2+2" )
 INPUT_PORTS_END
