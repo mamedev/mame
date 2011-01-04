@@ -1329,6 +1329,10 @@ static LRESULT CALLBACK debugwin_view_proc(HWND wnd, UINT message, WPARAM wparam
 		}
 
 		// keydown: handle debugger keys
+		case WM_SYSKEYDOWN:
+			if (wparam != VK_F10)
+				return DefWindowProc(wnd, message, wparam, lparam);
+			// (fall through)
 		case WM_KEYDOWN:
 		{
 			if ((*info->owner->handle_key)(info->owner, wparam, lparam))
@@ -1496,6 +1500,10 @@ static LRESULT CALLBACK debugwin_edit_proc(HWND wnd, UINT message, WPARAM wparam
 	switch (message)
 	{
 		// key down: handle navigation in the attached view
+		case WM_SYSKEYDOWN:
+			if (wparam != VK_F10)
+				return CallWindowProc(info->original_editproc, wnd, message, wparam, lparam);
+			// (fall through)
 		case WM_KEYDOWN:
 			switch (wparam)
 			{
