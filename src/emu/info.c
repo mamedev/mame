@@ -1068,6 +1068,8 @@ static void print_game_info(FILE *out, const game_driver *game)
 		fprintf(out, " isbios=\"yes\"");
 	if (game->flags & GAME_NO_STANDALONE)
 		fprintf(out, " runnable=\"no\"");
+	if (game->flags & GAME_MECHANICAL)
+		fprintf(out, " ismechanical=\"yes\"");
 
 	/* display clone information */
 	clone_of = driver_get_clone(game);
@@ -1133,6 +1135,7 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 		"\t\t<!ATTLIST " XML_TOP " name CDATA #REQUIRED>\n"
 		"\t\t<!ATTLIST " XML_TOP " sourcefile CDATA #IMPLIED>\n"
 		"\t\t<!ATTLIST " XML_TOP " isbios (yes|no) \"no\">\n"
+		"\t\t<!ATTLIST " XML_TOP " ismechanical (yes|no) \"no\">\n"
 		"\t\t<!ATTLIST " XML_TOP " runnable (yes|no) \"yes\">\n"
 		"\t\t<!ATTLIST " XML_TOP " cloneof CDATA #IMPLIED>\n"
 		"\t\t<!ATTLIST " XML_TOP " romof CDATA #IMPLIED>\n"
