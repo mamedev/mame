@@ -1839,4 +1839,4 @@ GAME( 1983, profpac,  0,    profpac,  profpac,  profpac,  ROT0,   "Bally Midway"
 
 /* 91465 CPU board + 91699 game board + 91466 RAM board + 91488 pattern board + 91467 memory board */
 GAME( 1982, demndrgn, 0,    demndrgn, demndrgn, demndrgn, ROT0,   "Bally Midway", "Demons & Dragons (prototype)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAMEL(1983, tenpindx, 0,    tenpindx, tenpindx, tenpindx, ROT0,   "Bally Midway", "Ten Pin Deluxe", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_tenpindx )
+GAMEL(1983, tenpindx, 0,    tenpindx, tenpindx, tenpindx, ROT0,   "Bally Midway", "Ten Pin Deluxe", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_MECHANICAL, layout_tenpindx )

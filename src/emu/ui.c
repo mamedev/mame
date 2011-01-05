@@ -307,7 +307,7 @@ int ui_display_startup_screens(running_machine *machine, int first_time, int sho
 					ui_set_handler(handler_messagebox_ok, 0);
 					if (machine->gamedrv->flags & (GAME_WRONG_COLORS | GAME_IMPERFECT_COLORS | GAME_REQUIRES_ARTWORK | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NO_SOUND))
 						messagebox_backcolor = UI_YELLOW_COLOR;
-					if (machine->gamedrv->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION))
+					if (machine->gamedrv->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_MECHANICAL))
 						messagebox_backcolor = UI_RED_COLOR;
 				}
 				break;
@@ -976,7 +976,7 @@ static astring &warnings_string(running_machine *machine, astring &string)
 			foundworking = FALSE;
 			for (i = 0; drivers[i] != NULL; i++)
 				if (drivers[i] == maindrv || driver_get_clone(drivers[i]) == maindrv)
-					if ((drivers[i]->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION)) == 0)
+					if ((drivers[i]->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_MECHANICAL)) == 0)
 					{
 						/* this one works, add a header and display the name of the clone */
 						if (!foundworking)
