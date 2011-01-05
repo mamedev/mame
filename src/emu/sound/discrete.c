@@ -83,8 +83,8 @@
 
 static void init_nodes(discrete_info *info, const linked_list_entry *block_list, device_t *device);
 static node_description *discrete_find_node(const discrete_info *info, int node);
-static DEVICE_RESET( discrete );
-static STREAM_UPDATE( discrete_stream_update );
+//static DEVICE_RESET( discrete );
+//static STREAM_UPDATE( discrete_stream_update );
 static STREAM_UPDATE( buffer_stream_update );
 
 static int profiling = 0;
@@ -455,7 +455,7 @@ static void discrete_sanity_check(const discrete_info *info)
  *  Master discrete system start
  *
  *************************************/
-
+#if 0
 static DEVICE_START( discrete )
 {
 	linked_list_entry **intf;
@@ -526,7 +526,7 @@ static DEVICE_START( discrete )
 	}
 
 }
-
+#endif
 
 
 /*************************************
@@ -577,6 +577,7 @@ static void display_profiling(const discrete_info *info)
 	printf("Average samples/stream_update: %8.2f\n", (double) info->total_samples / (double) info->total_stream_updates);
 }
 
+#if 0
 static DEVICE_STOP( discrete )
 {
 	discrete_info *info = get_safe_token(device);
@@ -604,7 +605,7 @@ static DEVICE_STOP( discrete )
 		info->disclogfile = NULL;
 	}
 }
-
+#endif
 
 
 /*************************************
@@ -612,7 +613,7 @@ static DEVICE_STOP( discrete )
  *  Master reset of all nodes
  *
  *************************************/
-
+#if 0
 static DEVICE_RESET( discrete )
 {
 	const discrete_info *info = get_safe_token(device);
@@ -631,6 +632,7 @@ static DEVICE_RESET( discrete )
 			(*node.item()->step)(node.item());
 	}
 }
+#endif
 
 /*************************************
  *
@@ -697,7 +699,7 @@ static STREAM_UPDATE( buffer_stream_update )
 	  *(ptr++) = data;
 }
 
-
+#if 0
 static STREAM_UPDATE( discrete_stream_update )
 {
 	discrete_info *info = (discrete_info *)param;
@@ -756,7 +758,7 @@ static STREAM_UPDATE( discrete_stream_update )
 	}
 
 }
-
+#endif
 
 
 /*************************************
@@ -1007,6 +1009,7 @@ int node_description::same_module_index(const node_list_t &list)
 	return -1;
 }
 
+#if 0
 /**************************************************************************
  * Generic get_info
  **************************************************************************/
@@ -1034,4 +1037,364 @@ DEVICE_GET_INFO( discrete )
 
 
 DEFINE_LEGACY_SOUND_DEVICE(DISCRETE, discrete);
+#endif
 
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+const device_type DISCRETE = discrete_device_config::static_alloc_device_config;
+
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+#if 0
+//-------------------------------------------------
+//  static_set_type - configuration helper to set
+//  the chip type
+//-------------------------------------------------
+
+void discrete_device_config::static_set_type(device_config *device, int type)
+{
+	discrete_device_config *asc = downcast<discrete_device_config *>(device);
+	asc->m_type = type;
+}
+
+//-------------------------------------------------
+//  static_set_type - configuration helper to set
+//  the IRQ callback
+//-------------------------------------------------
+
+
+void discrete_device_config::static_set_irqf(device_config *device, void (*irqf)(device_t *device, int state))
+{
+	discrete_device_config *asc = downcast<discrete_device_config *>(device);
+	asc->m_irq_func = irqf;
+}
+#endif
+
+//-------------------------------------------------
+//  discrete_device_config - constructor
+//-------------------------------------------------
+
+discrete_device_config::discrete_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, static_alloc_device_config, "DISCRETE", tag, owner, clock),
+	  device_config_sound_interface(mconfig, *this)
+{
+}
+
+
+//-------------------------------------------------
+//  static_alloc_device_config - allocate a new
+//  configuration object
+//-------------------------------------------------
+
+device_config *discrete_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+{
+	return global_alloc(discrete_device_config(mconfig, tag, owner, clock));
+}
+
+
+//-------------------------------------------------
+//  alloc_device - allocate a new device object
+//-------------------------------------------------
+
+device_t *discrete_device_config::alloc_device(running_machine &machine) const
+{
+	return auto_alloc(&machine, discrete_device(machine, *this));
+}
+
+
+//-------------------------------------------------
+//  discrete_device - constructor
+//-------------------------------------------------
+
+discrete_device::discrete_device(running_machine &_machine, const discrete_device_config &config)
+	: device_t(_machine, config),
+	  device_sound_interface(_machine, config, *this),
+	  m_config(config)
+{
+	//memset(&m_info, 0, sizeof(m_info));
+
+}
+
+discrete_device::~discrete_device(void)
+{
+	discrete_info *info = &m_info;
+
+	osd_work_queue_free(info->queue);
+
+	if (profiling)
+	{
+		display_profiling(info);
+	}
+
+	/* Process nodes which have a stop func */
+
+	for_each(node_description *, node, &info->node_list)
+	{
+		if (node.item()->module->stop)
+			(*node.item()->module->stop)(node.item());
+	}
+
+	if (DISCRETE_DEBUGLOG)
+	{
+		/* close the debug log */
+	    if (info->disclogfile)
+	    	fclose(info->disclogfile);
+		info->disclogfile = NULL;
+	}
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void discrete_device::device_start()
+{
+	// create the stream
+	//m_stream = stream_create(this, 0, 2, 22257, this, static_stream_generate);
+
+	linked_list_entry **intf;
+	const discrete_sound_block *intf_start = (discrete_sound_block *) baseconfig().static_config();
+	discrete_info *info = &m_info;
+	char name[32];
+
+	info->device = this;
+
+	/* If a clock is specified we will use it, otherwise run at the audio sample rate. */
+	if (this->clock())
+		info->sample_rate = this->clock();
+	else
+		info->sample_rate = this->machine->sample_rate;
+	info->sample_time = 1.0 / info->sample_rate;
+	info->neg_sample_time = - info->sample_time;
+
+	info->total_samples = 0;
+	info->total_stream_updates = 0;
+
+	/* create the logfile */
+	sprintf(name, "discrete%s.log", this->tag());
+	if (DISCRETE_DEBUGLOG)
+		info->disclogfile = fopen(name, "w");
+
+	/* enable profiling */
+	if (getenv("DISCRETE_PROFILING"))
+		profiling = atoi(getenv("DISCRETE_PROFILING"));
+
+	/* Build the final block list */
+	info->block_list = NULL;
+	intf = &info->block_list;
+	discrete_build_list(info, intf_start, &intf);
+
+	/* first pass through the nodes: sanity check, fill in the indexed_nodes, and make a total count */
+	discrete_sanity_check(info);
+
+	/* Start with empty lists */
+	info->node_list.reset();
+	info->output_list.reset();
+	info->input_list.reset();
+
+	/* allocate memory to hold pointers to nodes by index */
+	info->indexed_node = auto_alloc_array_clear(this->machine, node_description *, DISCRETE_MAX_NODES);
+
+	/* initialize the node data */
+	init_nodes(info, info->block_list, this);
+
+	/* now go back and find pointers to all input nodes */
+	for_each(node_description *, node, &info->node_list)
+	{
+		node.item()->find_input_nodes();
+	}
+
+	/* initialize the stream(s) */
+	info->discrete_stream = stream_create(this,info->input_list.count(), info->output_list.count(), info->sample_rate, this, static_stream_generate);
+
+	/* allocate a queue */
+
+	info->queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_MULTI | WORK_QUEUE_FLAG_HIGH_FREQ);
+
+	/* Process nodes which have a start func */
+
+	for_each(node_description *, node, &info->node_list)
+	{
+		if (node.item()->module->start)
+			(*node.item()->module->start)(node.item());
+	}
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void discrete_device::device_reset()
+{
+
+	const discrete_info *info = &m_info;
+	stream_update(info->discrete_stream);
+
+	/* loop over all nodes */
+	for_each (node_description *, node, &info->node_list)
+	{
+		node.item()->output[0] = 0;
+
+		/* if the node has a reset function, call it */
+		if (node.item()->module->reset)
+			(*node.item()->module->reset)(node.item());
+
+		/* otherwise, just step it */
+		else if (node.item()->step)
+			(*node.item()->step)(node.item());
+	}
+}
+
+//-------------------------------------------------
+//  stream_generate - handle update requests for
+//  our sound stream
+//-------------------------------------------------
+
+STREAM_UPDATE( discrete_device::static_stream_generate )
+{
+	reinterpret_cast<discrete_device *>(param)->stream_generate(inputs, outputs, samples);
+}
+
+void discrete_device::stream_generate(stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	discrete_info *info = &m_info;
+	int outputnum;
+	//, task_group;
+
+	if (samples == 0)
+		return;
+	/* Setup any output streams */
+	outputnum = 0;
+	for_each(node_description *, node, &info->output_list)
+	{
+		node.item()->context = (void *) outputs[outputnum];
+		outputnum++;
+	}
+
+	/* Setup any input streams */
+	for_each(node_description *, node, &info->input_list)
+	{
+		struct dss_input_context *context = (struct dss_input_context *) node.item()->context;
+		context->ptr = (stream_sample_t *) inputs[context->stream_in_number];
+	}
+
+	/* Setup tasks */
+	for_each(discrete_task *, task, &info->task_list)
+	{
+		int					i;
+
+		task.item()->samples = samples;
+		/* unlock the thread */
+		task.item()->unlock();
+
+		/* set up task buffers */
+		for (i = 0; i < task.item()->numbuffered; i++)
+			task.item()->ptr[i] = task.item()->node_buf[i];
+
+		/* initialize sources */
+		for_each(discrete_source_node *, sn, &task.item()->source_list)
+		{
+			sn.item()->ptr = sn.item()->task->node_buf[sn.item()->output_node];
+		}
+	}
+
+	for_each(discrete_task *, task, &info->task_list)
+	{
+		/* Fire a work item for each task */
+		osd_work_item_queue(info->queue, task_callback, (void *) &info->task_list, WORK_ITEM_FLAG_AUTO_RELEASE);
+	}
+	osd_work_queue_wait(info->queue, osd_ticks_per_second()*10);
+
+	if (profiling)
+	{
+		info->total_samples += samples;
+		info->total_stream_updates++;
+	}
+}
+
+//-------------------------------------------------
+//  read - read from the chip's registers and internal RAM
+//-------------------------------------------------
+
+READ8_MEMBER( discrete_device::read )
+{
+	discrete_info    *info = &m_info;
+	node_description *node = discrete_find_node(info, offset);
+
+	UINT8 data = 0;
+
+	/* Read the node input value if allowed */
+	if (node)
+	{
+		/* Bring the system up to now */
+		stream_update(info->discrete_stream);
+
+		data = (UINT8) node->output[NODE_CHILD_NODE_NUM(offset)];
+	}
+	else
+		fatalerror("discrete_sound_r read from non-existent NODE_%02d\n", offset-NODE_00);
+
+    return data;
+}
+
+//-------------------------------------------------
+//  write - write to the chip's registers and internal RAM
+//-------------------------------------------------
+
+WRITE8_MEMBER( discrete_device::write )
+{
+	discrete_info    *info = &m_info;
+	node_description *node = discrete_find_node(info, offset);
+
+	/* Update the node input value if it's a proper input node */
+	if (node)
+	{
+		struct dss_input_context *context = (struct dss_input_context *)node->context;
+		UINT8 new_data    = 0;
+
+		switch (node->module->type)
+		{
+			case DSS_INPUT_DATA:
+			case DSS_INPUT_BUFFER:
+				new_data = data;
+				break;
+			case DSS_INPUT_LOGIC:
+			case DSS_INPUT_PULSE:
+				new_data = data ? 1 : 0;
+				break;
+			case DSS_INPUT_NOT:
+				new_data = data ? 0 : 1;
+				break;
+		}
+
+		if (context->data != new_data)
+		{
+			if (context->is_buffered)
+			{
+				/* Bring the system up to now */
+				stream_update(context->buffer_stream);
+
+				context->data = new_data;
+			}
+			else
+			{
+				/* Bring the system up to now */
+				stream_update(info->discrete_stream);
+
+				context->data = new_data;
+
+				/* Update the node output here so we don't have to do it each step */
+				node->output[0] = new_data * context->gain + context->offset;
+			}
+		}
+	}
+	else
+	{
+		discrete_log(info, "discrete_sound_w write to non-existent NODE_%02d\n", offset-NODE_00);
+	}
+}

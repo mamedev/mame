@@ -3,7 +3,7 @@
 #ifndef __DISCRETE_H__
 #define __DISCRETE_H__
 
-#include "devlegcy.h"
+//#include "devlegcy.h"
 #include "machine/rescap.h"
 
 /***********************************************************************
@@ -3469,8 +3469,6 @@
 #include "streams.h"
 #include "wavwrite.h"
 
-
-
 /*************************************
  *
  *  macros
@@ -4777,6 +4775,98 @@ enum
 WRITE8_DEVICE_HANDLER( discrete_sound_w );
 READ8_DEVICE_HANDLER( discrete_sound_r );
 
-DECLARE_LEGACY_SOUND_DEVICE(DISCRETE, discrete);
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+//FIXME: Later
+#if 0
+#define MCFG_DISCRETE_ADD(_tag, _clock, _type, _irqf) \
+	MCFG_DEVICE_ADD(_tag, ASC, _clock) \
+	MCFG_DISCRETE_TYPE(_type) \
+	MCFG_IRQ_FUNC(_irqf)
+
+#define MCFG_DISCRETE_REPLACE(_tag, _clock, _type, _irqf) \
+	MCFG_DEVICE_REPLACE(_tag, ASC, _clock) \
+	MCFG_DISCRETE_TYPE(_type) \
+	MCFG_IRQ_FUNC(_irqf)
+
+#define MCFG_DISCRETE_TYPE(_type) \
+	DISCRETE_device_config::static_set_type(device, _type); \
+
+#define MCFG_IRQ_FUNC(_irqf) \
+	DISCRETE_device_config::static_set_irqf(device, _irqf); \
+
+#endif
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> discrete_device_config
+
+class discrete_device_config :	public device_config, public device_config_sound_interface
+{
+	friend class discrete_device;
+
+	// construction/destruction
+	discrete_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+	// allocators
+	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+	virtual device_t *alloc_device(running_machine &machine) const;
+
+	// inline configuration helpers
+	//static void static_set_type(device_config *device, int type);
+	//static void static_set_irqf(device_config *device, void (*irqf)(device_t *device, int state));
+
+protected:
+	// inline data
+};
+
+
+
+// ======================> discrete_device
+
+class discrete_device : public device_t, public device_sound_interface
+{
+	friend class discrete_device_config;
+
+	// construction/destruction
+	discrete_device(running_machine &_machine, const discrete_device_config &config);
+
+public:
+	DECLARE_READ8_MEMBER(read);
+	DECLARE_WRITE8_MEMBER(write);
+	//sound_stream *m_stream;
+	virtual ~discrete_device(void);
+
+protected:
+
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+
+	// internal callbacks
+	static STREAM_UPDATE( static_stream_generate );
+	virtual void stream_generate(stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
+	// internal state
+	const discrete_device_config &m_config;
+
+	/* all for now */
+	discrete_info m_info;
+
+private:
+
+
+};
+
+
+// device type definition
+extern const device_type DISCRETE;
+
+
+//DECLARE_LEGACY_SOUND_DEVICE(DISCRETE, discrete);
 
 #endif /* __DISCRETE_H__ */
