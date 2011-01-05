@@ -2737,7 +2737,7 @@ GAME( 1990, slikshot,  0,        slikshot_hi,       slikshot, slikshot, ROT90,  
 GAME( 1990, slikshot17,slikshot, slikshot_hi,       slikshot, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.7)", 0 )
 GAME( 1990, slikshot16,slikshot, slikshot_hi,       slikshot, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.6)", 0 )
 GAME( 1990, dynobop,   0,        slikshot_hi,       dynobop,  slikshot, ROT90,  "Grand Products/Incredible Technologies", "Dyno Bop", 0 )
-GAME( 1990, sstrike,   0,        sstrike,           sstrike,  sstrike,  ROT270, "Strata/Incredible Technologies", "Super Strike Bowling", 0 )
+GAME( 1990, sstrike,   0,        sstrike,           sstrike,  sstrike,  ROT270, "Strata/Incredible Technologies", "Super Strike Bowling", GAME_MECHANICAL )
 GAME( 1991, pokrdice,  0,        slikshot_lo_noz80, pokrdice, 0,        ROT90,  "Strata/Incredible Technologies", "Poker Dice", 0 )
 
 /* Hot Shots Tennis-style PCB */

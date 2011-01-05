@@ -388,4 +388,4 @@ ROM_START( kungfur )
 	ROM_LOAD( "kr6.bin",   0x00000, 0x10000, CRC(9ea75d4a) SHA1(57445ccb961acb11a25cdac81f2e543d92bcb7f9) )
 ROM_END
 
-GAME( 1987, kungfur,  0,       kungfur,  kungfur,  0, ROT0, "Namco", "Kung Fu Roushi", GAME_NOT_WORKING )
+GAME( 1987, kungfur,  0,       kungfur,  kungfur,  0, ROT0, "Namco", "Kung Fu Roushi", GAME_NOT_WORKING | GAME MECHANICAL)
