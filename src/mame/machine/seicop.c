@@ -2643,7 +2643,7 @@ static WRITE16_HANDLER( generic_cop_w )
                 0x87 is used by Denjin Makai
 
                 TODO:
-                - Denjin Makai triggers mode 4
+                - Denjin Makai mode 4 is totally guessworked.
                 - SD Gundam doesn't fade colors correctly, it should have the text layer / sprites with normal gradient and the rest dimmed in most cases,
                   presumably bad RAM table or bad algorythm
                 */
@@ -2679,13 +2679,35 @@ static WRITE16_HANDLER( generic_cop_w )
 						r = fade_table[r|(pal_brightness_val ^ 0x1f)];
 						pal_val |= ((r + rt) & 0x1f);
 					}
-					else if(pal_brightness_mode == 4) //Denjin Makai, TODO
+					else if(pal_brightness_mode == 4) //Denjin Makai
 					{
-						pal_val = space->read_word(src + (cop_dma_fade_table * 0x400));
+						bt =(space->read_word(src + (cop_dma_fade_table * 0x400)) & 0x7c00) >> 10;
+						b = (space->read_word(src) & 0x7c00) >> 10;
+						gt =(space->read_word(src + (cop_dma_fade_table * 0x400)) & 0x03e0) >> 5;
+						g = (space->read_word(src) & 0x03e0) >> 5;
+						rt =(space->read_word(src + (cop_dma_fade_table * 0x400)) & 0x001f) >> 0;
+						r = (space->read_word(src) & 0x001f) >> 0;
+
+						if(pal_brightness_val == 0x10)
+							pal_val = bt << 10 | gt << 5 | rt << 0;
+						else if(pal_brightness_val == 0xff) // TODO: might be the back plane or it still doesn't do any mod, needs PCB tests
+							pal_val = 0;
+						else
+						{
+							bt = fade_table[bt<<5|((pal_brightness_val*2) ^ 0)];
+							b =  fade_table[b<<5|((pal_brightness_val*2) ^ 0x1f)];
+							pal_val = ((b + bt) & 0x1f) << 10;
+							gt = fade_table[gt<<5|((pal_brightness_val*2) ^ 0)];
+							g =  fade_table[g<<5|((pal_brightness_val*2) ^ 0x1f)];
+							pal_val |= ((g + gt) & 0x1f) << 5;
+							rt = fade_table[rt<<5|((pal_brightness_val*2) ^ 0)];
+							r =  fade_table[r<<5|((pal_brightness_val*2) ^ 0x1f)];
+							pal_val |= ((r + rt) & 0x1f);
+						}
 					}
 					else
 					{
-						printf("Warning: palette DMA used with mode %02x!",pal_brightness_mode);
+						printf("Warning: palette DMA used with mode %02x!\n",pal_brightness_mode);
 						pal_val = space->read_word(src);
 					}
 
