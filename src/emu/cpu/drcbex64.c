@@ -276,6 +276,7 @@ struct _drcbe_state
 
 	x86code *				debug_cpu_instruction_hook;/* debugger callback */
 	x86code *				debug_log_hashjmp;		/* hashjmp debugging */
+	x86code *				debug_log_hashjmp_fail;	/* hashjmp debugging */
 	x86code *				drcmap_get_value;		/* map lookup helper */
 	data_accessors			accessors[ADDRESS_SPACES];	/* memory accessors */
 	address_space *	space[ADDRESS_SPACES];	/* address spaces */
@@ -316,7 +317,8 @@ static void drcbex64_get_info(drcbe_state *state, drcbe_info *info);
 
 /* private helper functions */
 static void fixup_label(void *parameter, drccodeptr labelcodeptr);
-static void debug_log_hashjmp(int mode, offs_t pc);
+static void debug_log_hashjmp(offs_t pc, int mode);
+static void debug_log_hashjmp_fail();
 
 
 
@@ -731,7 +733,10 @@ static drcbe_state *drcbex64_alloc(drcuml_state *drcuml, drccache *cache, device
 	/* get pointers to C functions we need to call */
 	drcbe->debug_cpu_instruction_hook = (x86code *)debugger_instruction_hook;
 	if (LOG_HASHJMPS)
+	{
 		drcbe->debug_log_hashjmp = (x86code *)debug_log_hashjmp;
+		drcbe->debug_log_hashjmp_fail = (x86code *)debug_log_hashjmp_fail;
+	}
 	drcbe->drcmap_get_value = (x86code *)drcmap_get_value;
 
 	/* allocate hash tables */
@@ -2983,9 +2988,20 @@ static void fixup_exception(drccodeptr *codeptr, void *param1, void *param2, voi
     logging of hashjmps
 -------------------------------------------------*/
 
-static void debug_log_hashjmp(int mode, offs_t pc)
+static void debug_log_hashjmp(offs_t pc, int mode)
 {
 	printf("mode=%d PC=%08X\n", mode, pc);
+}
+
+
+/*-------------------------------------------------
+    debug_log_hashjmp - callback to handle
+    logging of hashjmps
+-------------------------------------------------*/
+
+static void debug_log_hashjmp_fail()
+{
+	printf("  (FAIL)\n");
 }
 
 
@@ -3249,6 +3265,9 @@ static x86code *op_hashjmp(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 	}
 
 	/* in all cases, if there is no code, we return here to generate the exception */
+	if (LOG_HASHJMPS)
+		emit_smart_call_m64(drcbe, &dst, &drcbe->debug_log_hashjmp_fail);
+
 	emit_mov_m32_p32(drcbe, &dst, MABS(drcbe, &drcbe->state.exp), &pcp);				// mov   [exp],param
 	emit_sub_r64_imm(&dst, REG_RSP, 8);													// sub   rsp,8
 	emit_call_m64(&dst, MABS(drcbe, exp.value));										// call  [exp]

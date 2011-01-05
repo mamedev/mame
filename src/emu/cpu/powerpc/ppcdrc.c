@@ -937,7 +937,7 @@ static void code_compile_block(powerpc_state *ppc, UINT8 mode, offs_t pc)
 	int override = FALSE;
 	drcuml_block *block;
 	jmp_buf errorbuf;
-
+logerror("Compile %08X\n", pc);
 	g_profiler.start(PROFILER_DRC_COMPILE);
 
 	/* get a description of this sequence */
@@ -1224,7 +1224,7 @@ static void static_generate_tlb_mismatch(powerpc_state *ppc)
 	drcuml_state *drcuml = ppc->impstate->drcuml;
 	drcuml_block *block;
 	jmp_buf errorbuf;
-	int isi, label = 1;
+	int isi, exit, label = 1;
 
 	/* if we get an error back, we're screwed */
 	if (setjmp(errorbuf) != 0)
@@ -1242,13 +1242,18 @@ static void static_generate_tlb_mismatch(powerpc_state *ppc)
 	alloc_handle(drcuml, &ppc->impstate->tlb_mismatch, "tlb_mismatch");
 	UML_HANDLE(block, ppc->impstate->tlb_mismatch);											// handle  tlb_mismatch
 	UML_RECOVER(block, IREG(0), MAPVAR_PC);													// recover i0,PC
+	UML_SHR(block, IREG(1), IREG(0), IMM(12));												// shr     i1,i0,12
+	UML_LOAD(block, IREG(2), (void *)vtlb_table(ppc->vtlb), IREG(1), DWORD);				// load    i2,[vtlb],i1,dword
 	UML_MOV(block, MEM(&ppc->param0), IREG(0));												// mov     [param0],i0
 	UML_MOV(block, MEM(&ppc->param1), IMM(TRANSLATE_FETCH));								// mov     [param1],TRANSLATE_FETCH
 	UML_CALLC(block, ppccom_tlb_fill, ppc);													// callc   tlbfill,ppc
-	UML_SHR(block, IREG(1), IREG(0), IMM(12));												// shr     i1,i0,12
 	UML_LOAD(block, IREG(1), (void *)vtlb_table(ppc->vtlb), IREG(1), DWORD);				// load    i1,[vtlb],i1,dword
 	UML_TEST(block, IREG(1), IMM(VTLB_FETCH_ALLOWED));										// test    i1,VTLB_FETCH_ALLOWED
 	UML_JMPc(block, IF_Z, isi = label++);													// jmp     isi,z
+	UML_CMP(block, IREG(2), IMM(0));														// cmp     i2,0
+	UML_JMPc(block, IF_NZ, exit = label++);													// jmp     exit,nz
+	UML_HASHJMP(block, MEM(&ppc->impstate->mode), IREG(0), ppc->impstate->nocode);			// hashjmp <mode>,i0,nocode
+	UML_LABEL(block, exit);																// exit:
 	UML_MOV(block, MEM(&ppc->pc), IREG(0));													// mov     <pc>,i0
 	save_fast_iregs(ppc, block);															// <save fastregs>
 	UML_EXIT(block, IMM(EXECUTE_MISSING_CODE));												// exit    EXECUTE_MISSING_CODE
