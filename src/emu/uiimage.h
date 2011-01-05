@@ -24,4 +24,8 @@ void ui_image_menu_file_manager(running_machine *machine, ui_menu *menu, void *p
 
 void ui_image_menu_image_info(running_machine *machine, ui_menu *menu, void *parameter, void *state);
 
+void ui_mess_menu_bitbanger_control(running_machine *machine, ui_menu *menu, void *parameter, void *state);
+
+void ui_mess_menu_tape_control(running_machine *machine, ui_menu *menu, void *parameter, void *state);
+
 #endif	/* __UIIMAGE_H__ */

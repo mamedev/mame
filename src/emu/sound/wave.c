@@ -15,16 +15,13 @@
 
 #include "emu.h"
 #include "streams.h"
-#ifdef MESS
-#include "devices/cassette.h"
-#endif
+#include "imagedev/cassette.h"
 #include "wave.h"
 
 #define ALWAYS_PLAY_SOUND	0
 
 static STREAM_UPDATE( wave_sound_update )
 {
-#ifdef MESS
 	device_image_interface *image = (device_image_interface *)param;
 	int speakers = speaker_output_count(image->device().machine->config);
 	cassette_image *cassette;
@@ -62,7 +59,6 @@ static STREAM_UPDATE( wave_sound_update )
 		if (speakers > 1)
 			memset(right_buffer, 0, sizeof(*right_buffer) * samples);
 	}
-#endif
 }
 
 
@@ -74,9 +70,7 @@ static DEVICE_START( wave )
 	assert( device != NULL );
 	assert( device->baseconfig().static_config() != NULL );
 	int speakers = speaker_output_count(device->machine->config);
-#ifdef MESS
 	image = dynamic_cast<device_image_interface *>(device->machine->device( (const char *)device->baseconfig().static_config()));
-#endif
 	if (speakers > 1)
 		stream_create(device, 0, 2, device->machine->sample_rate, (void *)image, wave_sound_update);
 	else

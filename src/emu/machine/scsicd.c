@@ -8,9 +8,7 @@
 #include "scsidev.h"
 #include "cdrom.h"
 #include "sound/cdda.h"
-#ifdef MESS
-#include "devices/chd_cd.h"
-#endif
+#include "imagedev/chd_cd.h"
 #include "scsicd.h"
 
 typedef struct

@@ -7,10 +7,7 @@
 #include "emu.h"
 #include "idectrl.h"
 #include "debugger.h"
-
-#ifdef MESS
-#include "devices/harddriv.h"
-#endif
+#include "imagedev/harddriv.h"
 
 /***************************************************************************
     DEBUGGING

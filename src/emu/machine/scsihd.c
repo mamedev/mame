@@ -7,10 +7,7 @@
 #include "emu.h"
 #include "scsidev.h"
 #include "harddisk.h"
-
-#ifdef MESS
-#include "devices/harddriv.h"
-#endif
+#include "imagedev/harddriv.h"
 #include "scsihd.h"
 
 typedef struct

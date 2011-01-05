@@ -19,12 +19,9 @@
 #include "uimenu.h"
 #include "audit.h"
 #include "crsshair.h"
-
-#ifdef MESS
-#include "uimess.h"
-#endif /* MESS */
-
 #include <ctype.h>
+#include "imagedev/cassette.h"
+#include "imagedev/bitbngr.h"
 
 
 
@@ -1549,10 +1546,14 @@ static void menu_main_populate(running_machine *machine, ui_menu *menu, void *st
 
 		/* add file manager menu */
 		ui_menu_item_append(menu, "File Manager", NULL, 0, (void*)ui_image_menu_file_manager);
-	#ifdef MESS
-		/* add MESS-specific menus */
-		ui_mess_main_menu_populate(machine, menu);
-	#endif /* MESS */
+		
+		/* add tape control menu */
+		if (machine->m_devicelist.first(CASSETTE))
+			ui_menu_item_append(menu, "Tape Control", NULL, 0, (void*)ui_mess_menu_tape_control);
+
+		/* add bitbanger control menu */
+		if (machine->m_devicelist.first(BITBANGER))
+			ui_menu_item_append(menu, "Bitbanger Control", NULL, 0, (void*)ui_mess_menu_bitbanger_control);
 	}
 	/* add keyboard mode menu */
 	if (input_machine_has_keyboard(machine) && inputx_can_post(machine))

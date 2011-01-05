@@ -22,9 +22,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#ifdef MESS
-#include "devices/chd_cd.h"
-#endif
+#include "imagedev/chd_cd.h"
 #include "cdrom.h"
 #include "stvcd.h"
 

@@ -271,9 +271,7 @@ a tilemap-like structure, from which data is copied)
 #include "cpu/sh2/sh2.h"
 #include "cpu/sh2/sh2comn.h"
 #include "sound/cdda.h"
-#ifdef MESS
-#include "devices/chd_cd.h"
-#endif
+#include "imagedev/chd_cd.h"
 #include "sound/rf5c68.h"
 
 #define MEGADRIV_VDP_VRAM(address) megadrive_vdp_vram[(address)&0x7fff]
