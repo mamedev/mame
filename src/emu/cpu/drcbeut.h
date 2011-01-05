@@ -38,7 +38,7 @@ typedef struct _drcmap_state drcmap_state;
 typedef struct _drchash_state drchash_state;
 struct _drchash_state
 {
-	drccache *		cache;				/* cache where allocations come from */
+	drc_cache *		cache;				/* cache where allocations come from */
 	int				modes;				/* number of modes supported */
 
 	drccodeptr		nocodeptr;			/* pointer to code which will handle missing entries */
@@ -65,7 +65,7 @@ struct _drchash_state
 /* ----- hash table management ----- */
 
 /* allocate memory in the cache for the hash table tracker (it auto-frees with the cache) */
-drchash_state *drchash_alloc(drccache *cache, int modes, int addrbits, int ignorebits);
+drchash_state *drchash_alloc(drc_cache *cache, int modes, int addrbits, int ignorebits);
 
 /* flush existing hash tables and create new ones */
 int drchash_reset(drchash_state *drchash);
@@ -87,7 +87,7 @@ int drchash_set_codeptr(drchash_state *drchash, UINT32 mode, UINT32 pc, drccodep
 /* ----- code map management ----- */
 
 /* allocate memory in the cache for the code mapper (it auto-frees with the cache) */
-drcmap_state *drcmap_alloc(drccache *cache, UINT64 uniquevalue);
+drcmap_state *drcmap_alloc(drc_cache *cache, UINT64 uniquevalue);
 
 /* note the beginning of a block */
 void drcmap_block_begin(drcmap_state *drcmap, drcuml_block *block);
@@ -109,7 +109,7 @@ UINT32 drcmap_get_last_value(drcmap_state *drcmap, UINT32 mapvar);
 /* ----- label management ----- */
 
 /* allocate a label list within the cache (it auto-frees with the cache) */
-drclabel_list *drclabel_list_alloc(drccache *cache);
+drclabel_list *drclabel_list_alloc(drc_cache *cache);
 
 /* note the beginning of a block */
 void drclabel_block_begin(drclabel_list *drcmap, drcuml_block *block);

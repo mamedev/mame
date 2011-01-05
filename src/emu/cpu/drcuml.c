@@ -136,7 +136,7 @@ struct _drcuml_symbol
 struct _drcuml_state
 {
 	device_t *	device;				/* CPU device we are associated with */
-	drccache *				cache;				/* pointer to the codegen cache */
+	drc_cache *				cache;				/* pointer to the codegen cache */
 	drcuml_block *			blocklist;			/* list of active blocks */
 	const drcbe_interface *	beintf;				/* backend interface pointer */
 	drcbe_state *			bestate;			/* pointer to the back-end state */
@@ -538,13 +538,13 @@ INLINE void convert_to_mov_param(drcuml_instruction *inst, int pnum)
     generator and initialize the back-end
 -------------------------------------------------*/
 
-drcuml_state *drcuml_alloc(device_t *device, drccache *cache, UINT32 flags, int modes, int addrbits, int ignorebits)
+drcuml_state *drcuml_alloc(device_t *device, drc_cache *cache, UINT32 flags, int modes, int addrbits, int ignorebits)
 {
 	drcuml_state *drcuml;
 	int opnum;
 
 	/* allocate state */
-	drcuml = (drcuml_state *)drccache_memory_alloc(cache, sizeof(*drcuml));
+	drcuml = (drcuml_state *)cache->alloc(sizeof(*drcuml));
 	if (drcuml == NULL)
 		return NULL;
 	memset(drcuml, 0, sizeof(*drcuml));
@@ -597,7 +597,7 @@ void drcuml_reset(drcuml_state *drcuml)
 	jmp_buf errorbuf;
 
 	/* flush the cache */
-	drccache_flush(drcuml->cache);
+	drcuml->cache->flush();
 
 	/* if we error here, we are screwed */
 	if (setjmp(errorbuf) != 0)
@@ -946,16 +946,16 @@ drcuml_codehandle *drcuml_handle_alloc(drcuml_state *drcuml, const char *name)
 	char *string;
 
 	/* allocate space for a copy of the string */
-	string = (char *)drccache_memory_alloc(drcuml->cache, strlen(name) + 1);
+	string = (char *)drcuml->cache->alloc(strlen(name) + 1);
 	if (string == NULL)
 		return NULL;
 	strcpy(string, name);
 
 	/* allocate a new handle info */
-	handle = (drcuml_codehandle *)drccache_memory_alloc_near(drcuml->cache, sizeof(*handle));
+	handle = (drcuml_codehandle *)drcuml->cache->alloc_near(sizeof(*handle));
 	if (handle == NULL)
 	{
-		drccache_memory_free(drcuml->cache, string, strlen(name) + 1);
+		drcuml->cache->dealloc(string, strlen(name) + 1);
 		return NULL;
 	}
 	memset(handle, 0, sizeof(*handle));
@@ -1113,7 +1113,7 @@ void drcuml_add_comment(drcuml_block *block, const char *format, ...)
 	va_end(va);
 
 	/* allocate space in the cache to hold the comment */
-	comment = (char *)drccache_memory_alloc_temporary(block->drcuml->cache, strlen(buffer) + 1);
+	comment = (char *)block->drcuml->cache->alloc_temporary(strlen(buffer) + 1);
 	if (comment == NULL)
 		return;
 	strcpy(comment, buffer);
@@ -1263,8 +1263,8 @@ void drcuml_disasm(const drcuml_instruction *inst, char *buffer, drcuml_state *d
 				}
 
 				/* cache memory */
-				else if (drcuml != NULL && drccache_contains_pointer(drcuml->cache, (void *)(FPTR)param->value))
-					dest += sprintf(dest, "[+$%X]", (UINT32)(FPTR)((drccodeptr)(FPTR)param->value - drccache_near(drcuml->cache)));
+				else if (drcuml != NULL && drcuml->cache->contains_pointer((void *)(FPTR)param->value))
+					dest += sprintf(dest, "[+$%X]", (UINT32)(FPTR)((drccodeptr)(FPTR)param->value - drcuml->cache->near()));
 
 				/* general memory */
 				else
@@ -2181,7 +2181,7 @@ static void bevalidate_execute(drcuml_state *drcuml, drcuml_codehandle **handles
 	int numparams;
 
 	/* allocate memory for parameters */
-	parammem = (UINT64 *)drccache_memory_alloc_near(drcuml->cache, sizeof(UINT64) * (ARRAY_LENGTH(test->param) + 1));
+	parammem = (UINT64 *)drcuml->cache->alloc_near(sizeof(UINT64) * (ARRAY_LENGTH(test->param) + 1));
 
 	/* flush the cache */
 	drcuml_reset(drcuml);
@@ -2237,7 +2237,7 @@ static void bevalidate_execute(drcuml_state *drcuml, drcuml_codehandle **handles
 	bevalidate_verify_state(drcuml, &istate, &fstate, test, *(UINT32 *)&parammem[ARRAY_LENGTH(test->param)], params, &testinst, handles[1]->code, handles[2]->code, flagmask);
 
 	/* free memory */
-	drccache_memory_free(drcuml->cache, parammem, sizeof(UINT64) * (ARRAY_LENGTH(test->param) + 1));
+	drcuml->cache->dealloc(parammem, sizeof(UINT64) * (ARRAY_LENGTH(test->param) + 1));
 }
 
 

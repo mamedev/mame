@@ -675,18 +675,16 @@ static void cfunc_SUBV(void *param)
 static CPU_INIT( sh2 )
 {
 	sh2_state *sh2 = get_safe_token(device);
-	drccache *cache;
+	drc_cache *cache;
 	drcbe_info beinfo;
 	UINT32 flags = 0;
 	int regnum;
 
 	/* allocate enough space for the cache and the core */
-	cache = drccache_alloc(CACHE_SIZE + sizeof(sh2_state));
-	if (cache == NULL)
-		fatalerror("Unable to allocate cache of size %d", (UINT32)(CACHE_SIZE + sizeof(sh2_state)));
+	cache = auto_alloc(device->machine, drc_cache(CACHE_SIZE + sizeof(sh2_state)));
 
 	/* allocate the core memory */
-	*(sh2_state **)device->token() = sh2 = (sh2_state *)drccache_memory_alloc_near(cache, sizeof(sh2_state));
+	*(sh2_state **)device->token() = sh2 = (sh2_state *)cache->alloc_near(sizeof(sh2_state));
 	memset(sh2, 0, sizeof(sh2_state));
 
 	/* initialize the common core parts */
@@ -772,7 +770,7 @@ static CPU_EXIT( sh2 )
 	/* clean up the DRC */
 	auto_free(device->machine, sh2->drcfe);
 	drcuml_free(sh2->drcuml);
-	drccache_free(sh2->cache);
+	auto_free(device->machine, sh2->cache);
 }
 
 

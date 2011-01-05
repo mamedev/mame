@@ -39,7 +39,7 @@ struct _drcmap_entry
 /* structure describing the state of the code map */
 struct _drcmap_state
 {
-	drccache *			cache;				/* pointer to the cache */
+	drc_cache *			cache;				/* pointer to the cache */
 	UINT64				uniquevalue;		/* unique value used to find the table */
 	drcmap_entry *		head;				/* head of the live list */
 	drcmap_entry **		tailptr;			/* pointer to tail of the live list */
@@ -61,7 +61,7 @@ struct _drclabel
 /* structure holding a live list of labels */
 struct _drclabel_list
 {
-	drccache *			cache;				/* pointer to the cache */
+	drc_cache *			cache;				/* pointer to the cache */
 	drclabel *			head;				/* head of the live list */
 };
 
@@ -87,13 +87,13 @@ static void label_oob_callback(drccodeptr *codeptr, void *param1, void *param2, 
     with the cache)
 -------------------------------------------------*/
 
-drchash_state *drchash_alloc(drccache *cache, int modes, int addrbits, int ignorebits)
+drchash_state *drchash_alloc(drc_cache *cache, int modes, int addrbits, int ignorebits)
 {
 	int effaddrbits = addrbits - ignorebits;
 	drchash_state *drchash;
 
 	/* allocate permanent state from the cache */
-	drchash = (drchash_state *)drccache_memory_alloc(cache, sizeof(*drchash) + modes * sizeof(drchash->base[0]));
+	drchash = (drchash_state *)cache->alloc(sizeof(*drchash) + modes * sizeof(drchash->base[0]));
 	if (drchash == NULL)
 		return NULL;
 	memset(drchash, 0, sizeof(*drchash) + modes * sizeof(drchash->base[0]));
@@ -128,7 +128,7 @@ int drchash_reset(drchash_state *drchash)
 	int modenum, entry;
 
 	/* allocate an empty l2 hash table */
-	drchash->emptyl2 = (drccodeptr *)drccache_memory_alloc_temporary(drchash->cache, sizeof(drccodeptr) << drchash->l2bits);
+	drchash->emptyl2 = (drccodeptr *)drchash->cache->alloc_temporary(sizeof(drccodeptr) << drchash->l2bits);
 	if (drchash->emptyl2 == NULL)
 		return FALSE;
 
@@ -137,7 +137,7 @@ int drchash_reset(drchash_state *drchash)
 		drchash->emptyl2[entry] = drchash->nocodeptr;
 
 	/* allocate an empty l1 hash table */
-	drchash->emptyl1 = (drccodeptr **)drccache_memory_alloc_temporary(drchash->cache, sizeof(drccodeptr *) << drchash->l1bits);
+	drchash->emptyl1 = (drccodeptr **)drchash->cache->alloc_temporary(sizeof(drccodeptr *) << drchash->l1bits);
 	if (drchash->emptyl1 == NULL)
 		return FALSE;
 
@@ -246,7 +246,7 @@ int drchash_set_codeptr(drchash_state *drchash, UINT32 mode, UINT32 pc, drccodep
 	/* copy-on-write for the l1 hash table */
 	if (drchash->base[mode] == drchash->emptyl1)
 	{
-		drccodeptr **newtable = (drccodeptr **)drccache_memory_alloc_temporary(drchash->cache, sizeof(drccodeptr *) << drchash->l1bits);
+		drccodeptr **newtable = (drccodeptr **)drchash->cache->alloc_temporary(sizeof(drccodeptr *) << drchash->l1bits);
 		if (newtable == NULL)
 			return FALSE;
 		memcpy(newtable, drchash->emptyl1, sizeof(drccodeptr *) << drchash->l1bits);
@@ -256,7 +256,7 @@ int drchash_set_codeptr(drchash_state *drchash, UINT32 mode, UINT32 pc, drccodep
 	/* copy-on-write for the l2 hash table */
 	if (drchash->base[mode][l1] == drchash->emptyl2)
 	{
-		drccodeptr *newtable = (drccodeptr *)drccache_memory_alloc_temporary(drchash->cache, sizeof(drccodeptr) << drchash->l2bits);
+		drccodeptr *newtable = (drccodeptr *)drchash->cache->alloc_temporary(sizeof(drccodeptr) << drchash->l2bits);
 		if (newtable == NULL)
 			return FALSE;
 		memcpy(newtable, drchash->emptyl2, sizeof(drccodeptr) << drchash->l2bits);
@@ -280,12 +280,12 @@ int drchash_set_codeptr(drchash_state *drchash, UINT32 mode, UINT32 pc, drccodep
     cache)
 -------------------------------------------------*/
 
-drcmap_state *drcmap_alloc(drccache *cache, UINT64 uniquevalue)
+drcmap_state *drcmap_alloc(drc_cache *cache, UINT64 uniquevalue)
 {
 	drcmap_state *drcmap;
 
 	/* allocate permanent state from the cache */
-	drcmap = (drcmap_state *)drccache_memory_alloc(cache, sizeof(*drcmap));
+	drcmap = (drcmap_state *)cache->alloc(sizeof(*drcmap));
 	if (drcmap == NULL)
 		return NULL;
 	memset(drcmap, 0, sizeof(*drcmap));
@@ -310,7 +310,7 @@ void drcmap_block_begin(drcmap_state *drcmap, drcuml_block *block)
 	{
 		drcmap_entry *entry = drcmap->head;
 		drcmap->head = entry->next;
-		drccache_memory_free(drcmap->cache, entry, sizeof(*entry));
+		drcmap->cache->dealloc(entry, sizeof(*entry));
 	}
 
 	/* reset the tailptr and count */
@@ -340,7 +340,7 @@ void drcmap_block_end(drcmap_state *drcmap, drcuml_block *block)
 		return;
 
 	/* begin "code generation" aligned to an 8-byte boundary */
-	top = drccache_begin_codegen(drcmap->cache, sizeof(UINT64) + sizeof(UINT32) + 2 * sizeof(UINT32) * drcmap->numvalues);
+	top = drcmap->cache->begin_codegen(sizeof(UINT64) + sizeof(UINT32) + 2 * sizeof(UINT32) * drcmap->numvalues);
 	if (top == NULL)
 		drcuml_block_abort(block);
 	dest = (UINT32 *)(((FPTR)*top + 7) & ~7);
@@ -408,7 +408,7 @@ void drcmap_block_end(drcmap_state *drcmap, drcuml_block *block)
 
 	/* complete codegen */
 	*top = (drccodeptr)dest;
-	drccache_end_codegen(drcmap->cache);
+	drcmap->cache->end_codegen();
 }
 
 
@@ -428,7 +428,7 @@ void drcmap_set_value(drcmap_state *drcmap, drccodeptr codebase, UINT32 mapvar, 
 		return;
 
 	/* allocate a new entry and fill it in */
-	entry = (drcmap_entry *)drccache_memory_alloc(drcmap->cache, sizeof(*entry));
+	entry = (drcmap_entry *)drcmap->cache->alloc(sizeof(*entry));
 	entry->next = NULL;
 	entry->codeptr = codebase;
 	entry->mapvar = mapvar - DRCUML_MAPVAR_M0;
@@ -453,7 +453,7 @@ void drcmap_set_value(drcmap_state *drcmap, drccodeptr codebase, UINT32 mapvar, 
 
 UINT32 drcmap_get_value(drcmap_state *drcmap, drccodeptr codebase, UINT32 mapvar)
 {
-	UINT64 *endscan = (UINT64 *)drccache_top(drcmap->cache);
+	UINT64 *endscan = (UINT64 *)drcmap->cache->top();
 	UINT32 varmask = 0x10 << mapvar;
 	drccodeptr curcode;
 	UINT32 result = 0;
@@ -538,12 +538,12 @@ UINT32 drcmap_get_last_value(drcmap_state *drcmap, UINT32 mapvar)
     cache)
 -------------------------------------------------*/
 
-drclabel_list *drclabel_list_alloc(drccache *cache)
+drclabel_list *drclabel_list_alloc(drc_cache *cache)
 {
 	drclabel_list *list;
 
 	/* allocate permanent state from the cache */
-	list = (drclabel_list *)drccache_memory_alloc(cache, sizeof(*list));
+	list = (drclabel_list *)cache->alloc(sizeof(*list));
 	if (list == NULL)
 		return NULL;
 	memset(list, 0, sizeof(*list));
@@ -590,7 +590,7 @@ drccodeptr drclabel_get_codeptr(drclabel_list *list, drcuml_codelabel label, drc
 
 	/* if no code pointer, request an OOB callback */
 	if (curlabel->codeptr == NULL && fixup != NULL)
-		drccache_request_oob_codegen(list->cache, label_oob_callback, curlabel, (void *)fixup, param);
+		list->cache->request_oob_codegen(label_oob_callback, curlabel, (void *)fixup, param);
 
 	return curlabel->codeptr;
 }
@@ -634,7 +634,7 @@ static void label_list_reset(drclabel_list *list, int fatal_on_leftovers)
 			fatalerror("Label %08X never defined!", label->label);
 
 		/* free the label */
-		drccache_memory_free(list->cache, label, sizeof(*label));
+		list->cache->dealloc(label, sizeof(*label));
 	}
 }
 
@@ -656,7 +656,7 @@ static drclabel *label_find_or_allocate(drclabel_list *list, drcuml_codelabel la
 	/* if none found, allocate */
 	if (curlabel == NULL)
 	{
-		curlabel = (drclabel *)drccache_memory_alloc(list->cache, sizeof(*curlabel));
+		curlabel = (drclabel *)list->cache->alloc(sizeof(*curlabel));
 		curlabel->next = list->head;
 		curlabel->label = label;
 		curlabel->codeptr = NULL;

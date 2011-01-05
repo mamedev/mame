@@ -184,7 +184,7 @@ struct _compiler_state
 struct _mips3imp_state
 {
 	/* core state */
-	drccache *			cache;						/* pointer to the DRC code cache */
+	drc_cache *			cache;						/* pointer to the DRC code cache */
 	drcuml_state *		drcuml;						/* DRC UML generator state */
 	mips3_frontend *	drcfe;						/* pointer to the DRC front-end state */
 	UINT32				drcoptions;					/* configurable DRC options */
@@ -388,25 +388,25 @@ INLINE void save_fast_iregs(mips3_state *mips3, drcuml_block *block)
 static void mips3_init(mips3_flavor flavor, int bigendian, legacy_cpu_device *device, device_irq_callback irqcallback)
 {
 	mips3_state *mips3;
-	drccache *cache;
+	drc_cache *cache;
 	drcbe_info beinfo;
 	UINT32 flags = 0;
 	int regnum;
 
 	/* allocate enough space for the cache and the core */
-	cache = (drccache *)drccache_alloc(CACHE_SIZE + sizeof(*mips3));
+	cache = auto_alloc(device->machine, drc_cache(CACHE_SIZE + sizeof(*mips3)));
 	if (cache == NULL)
 		fatalerror("Unable to allocate cache of size %d", (UINT32)(CACHE_SIZE + sizeof(*mips3)));
 
 	/* allocate the core memory */
-	*(mips3_state **)device->token() = mips3 = (mips3_state *)drccache_memory_alloc_near(cache, sizeof(*mips3));
+	*(mips3_state **)device->token() = mips3 = (mips3_state *)cache->alloc_near(sizeof(*mips3));
 	memset(mips3, 0, sizeof(*mips3));
 
 	/* initialize the core */
 	mips3com_init(mips3, flavor, bigendian, device, irqcallback);
 
 	/* allocate the implementation-specific state from the full cache */
-	mips3->impstate = (mips3imp_state *)drccache_memory_alloc_near(cache, sizeof(*mips3->impstate));
+	mips3->impstate = (mips3imp_state *)cache->alloc_near(sizeof(*mips3->impstate));
 	memset(mips3->impstate, 0, sizeof(*mips3->impstate));
 	mips3->impstate->cache = cache;
 
@@ -566,7 +566,7 @@ static CPU_EXIT( mips3 )
 	/* clean up the DRC */
 	auto_free(device->machine, mips3->impstate->drcfe);
 	drcuml_free(mips3->impstate->drcuml);
-	drccache_free(mips3->impstate->cache);
+	auto_free(device->machine, mips3->impstate->cache);
 }
 
 

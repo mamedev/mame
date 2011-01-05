@@ -215,7 +215,7 @@ struct _drcbe_state
 	device_t *	device;					/* CPU device we are associated with */
 	address_space *	space[ADDRESS_SPACES];	/* pointers to CPU's address space */
 	drcuml_state *			drcuml;					/* pointer back to our owner */
-	drccache *				cache;					/* pointer to the cache */
+	drc_cache *				cache;					/* pointer to the cache */
 	drcuml_machine_state	state;					/* state of the machine */
 	drchash_state *			hash;					/* hash table state */
 	drcmap_state *			map;					/* code map */
@@ -254,7 +254,7 @@ union _drcbec_instruction
 ***************************************************************************/
 
 /* primary back-end callbacks */
-static drcbe_state *drcbec_alloc(drcuml_state *drcuml, drccache *cache, device_t *device, UINT32 flags, int modes, int addrbits, int ignorebits);
+static drcbe_state *drcbec_alloc(drcuml_state *drcuml, drc_cache *cache, device_t *device, UINT32 flags, int modes, int addrbits, int ignorebits);
 static void drcbec_free(drcbe_state *drcbe);
 static void drcbec_reset(drcbe_state *drcbe);
 static int drcbec_execute(drcbe_state *state, drcuml_codehandle *entry);
@@ -340,12 +340,12 @@ extern const drcbe_interface drcbe_c_be_interface =
     state
 -------------------------------------------------*/
 
-static drcbe_state *drcbec_alloc(drcuml_state *drcuml, drccache *cache, device_t *device, UINT32 flags, int modes, int addrbits, int ignorebits)
+static drcbe_state *drcbec_alloc(drcuml_state *drcuml, drc_cache *cache, device_t *device, UINT32 flags, int modes, int addrbits, int ignorebits)
 {
 	int spacenum;
 
 	/* allocate space in the cache for our state */
-	drcbe_state *drcbe = (drcbe_state *)drccache_memory_alloc(cache, sizeof(*drcbe));
+	drcbe_state *drcbe = (drcbe_state *)cache->alloc(sizeof(*drcbe));
 	if (drcbe == NULL)
 		return NULL;
 	memset(drcbe, 0, sizeof(*drcbe));
@@ -414,7 +414,7 @@ static void drcbec_generate(drcbe_state *drcbe, drcuml_block *block, const drcum
 	drcmap_block_begin(drcbe->map, block);
 
 	/* begin codegen; fail if we can't */
-	cachetop = drccache_begin_codegen(drcbe->cache, numinst * sizeof(drcbec_instruction) * 4);
+	cachetop = drcbe->cache->begin_codegen(numinst * sizeof(drcbec_instruction) * 4);
 	if (cachetop == NULL)
 		drcuml_block_abort(block);
 
@@ -559,7 +559,7 @@ static void drcbec_generate(drcbe_state *drcbe, drcuml_block *block, const drcum
 
 	/* complete codegen */
 	*cachetop = (drccodeptr)dst;
-	drccache_end_codegen(drcbe->cache);
+	drcbe->cache->end_codegen();
 
 	/* tell all of our utility objects that the block is finished */
 	drchash_block_end(drcbe->hash, block);

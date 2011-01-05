@@ -154,7 +154,7 @@ typedef struct
 	void	(*ftcsr_read_callback)(UINT32 data);
 
 #ifdef USE_SH2DRC
-	drccache *			cache;			    	/* pointer to the DRC code cache */
+	drc_cache *			cache;			    	/* pointer to the DRC code cache */
 	drcuml_state *		drcuml;					/* DRC UML generator state */
 	sh2_frontend *		drcfe;					/* pointer to the DRC front-end state */
 	UINT32				drcoptions;			/* configurable DRC options */

@@ -156,7 +156,7 @@ struct _drcbe_state
 {
 	device_t *	device;					/* CPU device we are associated with */
 	drcuml_state *			drcuml;					/* pointer back to our owner */
-	drccache *				cache;					/* pointer to the cache */
+	drc_cache *				cache;					/* pointer to the cache */
 	drcuml_machine_state	state;					/* state of the machine */
 	drchash_state *			hash;					/* hash table state */
 	drcmap_state *			map;					/* code map */
@@ -201,7 +201,7 @@ struct _drcbe_state
 ***************************************************************************/
 
 /* primary back-end callbacks */
-static drcbe_state *drcbex86_alloc(drcuml_state *drcuml, drccache *cache, device_t *device, UINT32 flags, int modes, int addrbits, int ignorebits);
+static drcbe_state *drcbex86_alloc(drcuml_state *drcuml, drc_cache *cache, device_t *device, UINT32 flags, int modes, int addrbits, int ignorebits);
 static void drcbex86_free(drcbe_state *drcbe);
 static void drcbex86_reset(drcbe_state *drcbe);
 static int drcbex86_execute(drcbe_state *drcbe, drcuml_codehandle *entry);
@@ -614,13 +614,13 @@ INLINE void track_resolve_link(drcbe_state *drcbe, x86code **destptr, const emit
     state
 -------------------------------------------------*/
 
-static drcbe_state *drcbex86_alloc(drcuml_state *drcuml, drccache *cache, device_t *device, UINT32 flags, int modes, int addrbits, int ignorebits)
+static drcbe_state *drcbex86_alloc(drcuml_state *drcuml, drc_cache *cache, device_t *device, UINT32 flags, int modes, int addrbits, int ignorebits)
 {
 	int opnum, regnum, entry, spacenum;
 	drcbe_state *drcbe;
 
 	/* allocate space in the cache for our state */
-	drcbe = (drcbe_state *)drccache_memory_alloc(cache, sizeof(*drcbe));
+	drcbe = (drcbe_state *)cache->alloc(sizeof(*drcbe));
 	if (drcbe == NULL)
 		return NULL;
 	memset(drcbe, 0, sizeof(*drcbe));
@@ -722,7 +722,7 @@ static void drcbex86_reset(drcbe_state *drcbe)
 		x86log_printf(drcbe->log, "\n\n===========\nCACHE RESET\n===========\n\n");
 
 	/* generate a little bit of glue code to set up the environment */
-	dst = (x86code **)drccache_begin_codegen(drcbe->cache, 500);
+	dst = (x86code **)drcbe->cache->begin_codegen(500);
 	if (dst == NULL)
 		fatalerror("Out of cache space after a reset!");
 
@@ -850,7 +850,7 @@ static void drcbex86_reset(drcbe_state *drcbe)
 		x86log_disasm_code_range(drcbe->log, "restore", drcbe->restore, *dst);
 
 	/* finish up codegen */
-	drccache_end_codegen(drcbe->cache);
+	drcbe->cache->end_codegen();
 	drcbe->logged_common = TRUE;
 
 	/* reset our hash tables */
@@ -890,7 +890,7 @@ static void drcbex86_generate(drcbe_state *drcbe, drcuml_block *block, const drc
 	drcmap_block_begin(drcbe->map, block);
 
 	/* begin codegen; fail if we can't */
-	cachetop = drccache_begin_codegen(drcbe->cache, numinst * 8 * 4);
+	cachetop = drcbe->cache->begin_codegen(numinst * 8 * 4);
 	if (cachetop == NULL)
 		drcuml_block_abort(block);
 
@@ -930,11 +930,11 @@ static void drcbex86_generate(drcbe_state *drcbe, drcuml_block *block, const drc
 
 	/* complete codegen */
 	*cachetop = (drccodeptr)dst;
-	drccache_end_codegen(drcbe->cache);
+	drcbe->cache->end_codegen();
 
 	/* log it */
 	if (drcbe->log != NULL)
-		x86log_disasm_code_range(drcbe->log, (blockname == NULL) ? "Unknown block" : blockname, base, drccache_top(drcbe->cache));
+		x86log_disasm_code_range(drcbe->log, (blockname == NULL) ? "Unknown block" : blockname, base, drcbe->cache->top());
 
 	/* tell all of our utility objects that the block is finished */
 	drchash_block_end(drcbe->hash, block);
@@ -3546,7 +3546,7 @@ static x86code *op_exh(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 	else
 	{
 		emit_jcc(&dst, X86_CONDITION(inst->condition), 0);								// jcc   exception
-		drccache_request_oob_codegen(drcbe->cache, fixup_exception, drcbe, dst, (void *)inst);
+		drcbe->cache->request_oob_codegen(fixup_exception, drcbe, dst, (void *)inst);
 	}
 	return dst;
 }

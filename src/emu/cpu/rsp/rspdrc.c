@@ -104,7 +104,7 @@ struct _compiler_state
 struct _rspimp_state
 {
 	/* core state */
-	drccache *			cache;						/* pointer to the DRC code cache */
+	drc_cache *			cache;						/* pointer to the DRC code cache */
 	drcuml_state *		drcuml;						/* DRC UML generator state */
 	rsp_frontend *		drcfe;						/* pointer to the DRC front-end state */
 	UINT32				drcoptions;					/* configurable DRC options */
@@ -604,26 +604,22 @@ static void rspcom_init(rsp_state *rsp, legacy_cpu_device *device, device_irq_ca
 static CPU_INIT( rsp )
 {
 	rsp_state *rsp;
-	drccache *cache;
+	drc_cache *cache;
 	UINT32 flags = 0;
 	int regnum;
 	//int elnum;
 
 	/* allocate enough space for the cache and the core */
-	cache = (drccache *)drccache_alloc(CACHE_SIZE + sizeof(*rsp));
-	if (cache == NULL)
-	{
-		fatalerror("Unable to allocate cache of size %d", (UINT32)(CACHE_SIZE + sizeof(*rsp)));
-	}
+	cache = auto_alloc(device->machine, drc_cache(CACHE_SIZE + sizeof(*rsp)));
 
 	/* allocate the core memory */
-	*(rsp_state **)device->token() = rsp = (rsp_state *)drccache_memory_alloc_near(cache, sizeof(*rsp));
+	*(rsp_state **)device->token() = rsp = (rsp_state *)cache->alloc_near(sizeof(*rsp));
 	memset(rsp, 0, sizeof(*rsp));
 
 	rspcom_init(rsp, device, irqcallback);
 
 	/* allocate the implementation-specific state from the full cache */
-	rsp->impstate = (rspimp_state *)drccache_memory_alloc_near(cache, sizeof(*rsp->impstate));
+	rsp->impstate = (rspimp_state *)cache->alloc_near(sizeof(*rsp->impstate));
 	memset(rsp->impstate, 0, sizeof(*rsp->impstate));
 	rsp->impstate->cache = cache;
 
@@ -712,7 +708,7 @@ static CPU_EXIT( rsp )
 	/* clean up the DRC */
 	auto_free(device->machine, rsp->impstate->drcfe);
 	drcuml_free(rsp->impstate->drcuml);
-	drccache_free(rsp->impstate->cache);
+	auto_free(device->machine, rsp->impstate->cache);
 }
 
 

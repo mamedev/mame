@@ -163,7 +163,7 @@ struct _compiler_state
 struct _ppcimp_state
 {
 	/* core state */
-	drccache *			cache;						/* pointer to the DRC code cache */
+	drc_cache *			cache;						/* pointer to the DRC code cache */
 	drcuml_state *		drcuml;						/* DRC UML generator state */
 	ppc_frontend *		drcfe;						/* pointer to the DRC front-end state */
 	UINT32				drcoptions;					/* configurable DRC options */
@@ -551,23 +551,21 @@ static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, legacy
 	powerpc_state *ppc;
 	drcbe_info beinfo;
 	UINT32 flags = 0;
-	drccache *cache;
+	drc_cache *cache;
 	int regnum;
 
 	/* allocate enough space for the cache and the core */
-	cache = drccache_alloc(CACHE_SIZE + sizeof(*ppc));
-	if (cache == NULL)
-		fatalerror("Unable to allocate cache of size %d", (UINT32)(CACHE_SIZE + sizeof(*ppc)));
+	cache = auto_alloc(device->machine, drc_cache(CACHE_SIZE + sizeof(*ppc)));
 
 	/* allocate the core from the near cache */
-	*(powerpc_state **)device->token() = ppc = (powerpc_state *)drccache_memory_alloc_near(cache, sizeof(*ppc));
+	*(powerpc_state **)device->token() = ppc = (powerpc_state *)cache->alloc_near(sizeof(*ppc));
 	memset(ppc, 0, sizeof(*ppc));
 
 	/* initialize the core */
 	ppccom_init(ppc, flavor, cap, tb_divisor, device, irqcallback);
 
 	/* allocate the implementation-specific state from the full cache */
-	ppc->impstate = (ppcimp_state *)drccache_memory_alloc_near(cache, sizeof(*ppc->impstate));
+	ppc->impstate = (ppcimp_state *)cache->alloc_near(sizeof(*ppc->impstate));
 	memset(ppc->impstate, 0, sizeof(*ppc->impstate));
 	ppc->impstate->cache = cache;
 
@@ -731,7 +729,7 @@ static CPU_EXIT( ppcdrc )
 	/* clean up the DRC */
 	auto_free(device->machine, ppc->impstate->drcfe);
 	drcuml_free(ppc->impstate->drcuml);
-	drccache_free(ppc->impstate->cache);
+	auto_free(device->machine, ppc->impstate->cache);
 }
 
 
