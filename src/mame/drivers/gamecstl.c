@@ -548,7 +548,7 @@ static GFXDECODE_START( CGA )
 GFXDECODE_END
 
 #define AT_KEYB_HELPER(bit, text, key1) \
-	PORT_BIT( bit, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(text) PORT_CODE(key1)
+	PORT_BIT( bit, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(text) PORT_CODE(key1)
 
 static INPUT_PORTS_START(gamecstl)
 	PORT_START("pc_keyboard_0")

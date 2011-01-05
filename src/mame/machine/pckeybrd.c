@@ -304,12 +304,10 @@ static const extended_keyboard_code at_keyboard_extended_codes_set_2_3[]=
 
 static void at_keyboard_queue_insert(UINT8 data);
 
-#ifdef MESS
 static int at_keyboard_queue_size(void);
 static int at_keyboard_queue_chars(const unicode_char *text, size_t text_len);
 static int at_keyboard_accept_char(unicode_char ch);
 static int at_keyboard_charqueue_empty(void);
-#endif
 
 
 
@@ -341,11 +339,9 @@ void at_keyboard_init(running_machine *machine, AT_KEYBOARD_TYPE type)
 		keyboard.ports[i] = machine->port(buf);
 	}
 
-#ifdef MESS
 	inputx_setup_natural_keyboard(at_keyboard_queue_chars,
 		at_keyboard_accept_char,
 		at_keyboard_charqueue_empty);
-#endif
 }
 
 
@@ -384,7 +380,6 @@ static void at_keyboard_queue_insert(UINT8 data)
 }
 
 
-#ifdef MESS
 static int at_keyboard_queue_size(void)
 {
 	int queue_size;
@@ -393,7 +388,6 @@ static int at_keyboard_queue_size(void)
 		queue_size += sizeof(keyboard.queue) / sizeof(keyboard.queue[0]);
 	return queue_size;
 }
-#endif
 
 
 /* add a list of codes to the keyboard buffer */
@@ -828,7 +822,6 @@ void at_keyboard_write(running_machine *machine, UINT8 data)
 	}
 }
 
-#ifdef MESS
 /***************************************************************************
   unicode_char_to_at_keycode
 ***************************************************************************/
@@ -1254,7 +1247,6 @@ static int at_keyboard_charqueue_empty(void)
 {
 	return at_keyboard_queue_size() == 0;
 }
-#endif /* MESS */
 
 
 

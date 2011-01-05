@@ -377,7 +377,7 @@ static ADDRESS_MAP_START( photoply_io, ADDRESS_SPACE_IO, 32 )
 ADDRESS_MAP_END
 
 #define AT_KEYB_HELPER(bit, text, key1) \
-	PORT_BIT( bit, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(text) PORT_CODE(key1)
+	PORT_BIT( bit, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(text) PORT_CODE(key1)
 
 static INPUT_PORTS_START( photoply )
 	PORT_START("pc_keyboard_0")
