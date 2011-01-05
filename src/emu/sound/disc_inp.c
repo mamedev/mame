@@ -242,7 +242,7 @@ DISCRETE_START(dss_input_stream)
 {
 	DISCRETE_DECLARE_CONTEXT(dss_input)
 
-	assert(DSS_INPUT_STREAM__STREAM < linked_list_count(node->info->input_list));
+	//assert(DSS_INPUT_STREAM__STREAM < node->info->input_list.count());
 
 	context->is_stream = TRUE;
 	/* Stream out number is set during start */

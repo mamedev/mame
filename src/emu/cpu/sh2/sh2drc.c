@@ -1652,7 +1652,7 @@ static void generate_delay_slot(sh2_state *sh2, drcuml_block *block, compiler_st
 	compiler_state compiler_temp = *compiler;
 
 	/* compile the delay slot using temporary compiler state */
-	assert(desc->delay != NULL);
+	assert(desc->delay.first() != NULL);
 	generate_sequence_instruction(sh2, block, &compiler_temp, desc->delay.first(), ovrpc);				// <next instruction>
 
 	/* update the label */

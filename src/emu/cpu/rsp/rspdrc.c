@@ -3898,7 +3898,7 @@ static void generate_delay_slot_and_branch(rsp_state *rsp, drcuml_block *block, 
 	}
 
 	/* compile the delay slot using temporary compiler state */
-	assert(desc->delay != NULL);
+	assert(desc->delay.first() != NULL);
 	generate_sequence_instruction(rsp, block, &compiler_temp, desc->delay.first());		// <next instruction>
 
 	/* update the cycles and jump through the hash table to the target */
