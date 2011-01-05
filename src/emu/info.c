@@ -10,6 +10,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "machine/ram.h"
 #include "sound/samples.h"
 #include "info.h"
 #include "xmlfile.h"
@@ -990,6 +991,47 @@ static void print_game_software_list(FILE *out, const game_driver *game, const m
 	}
 }
 
+/* device iteration helpers */
+#define ram_first(config)				(config).m_devicelist.first(RAM)
+#define ram_next(previous)				((previous)->typenext())
+
+/*-------------------------------------------------
+    print_game_ramoptions - prints out all RAM
+    options for this system
+-------------------------------------------------*/
+static void print_game_ramoptions(FILE *out, const game_driver *game, const machine_config &config)
+{
+	const device_config *device;
+
+	for (device = ram_first(config); device != NULL; device = ram_next(device))
+	{
+		ram_config *ram = (ram_config *)downcast<const legacy_device_config_base *>(device)->inline_config();
+		fprintf(out, "\t\t<ramoption default=\"1\">%u</ramoption>\n",  ram_parse_string(ram->default_size));
+		if (ram->extra_options != NULL)
+		{
+			int j;
+			int size = strlen(ram->extra_options);
+			char * const s = mame_strdup(ram->extra_options);
+			char * const e = s + size;
+			char *p = s;
+			for (j=0;j<size;j++) {
+				if (p[j]==',') p[j]=0;
+			}
+			/* try to parse each option */
+			while(p <= e)
+			{
+				fprintf(out, "\t\t<ramoption>%u</ramoption>\n",  ram_parse_string(p));
+				p += strlen(p);
+				if (p == e)
+					break;
+				p += 1;
+			}
+
+			osd_free(s);
+		}
+	}
+}
+
 /*-------------------------------------------------
     print_game_info - print the XML information
     for one particular game driver
@@ -1064,11 +1106,8 @@ static void print_game_info(FILE *out, const game_driver *game)
 	print_game_adjusters(out, game, portlist);
 	print_game_driver(out, game, config);
 	print_game_images( out, game, config );
-	print_game_software_list( out, game, config );
-#ifdef MESS
-	print_mess_game_xml(out, game, config);
-#endif /* MESS */
-
+	print_game_software_list( out, game, config );	
+	print_game_ramoptions( out, game, config );
 	/* close the topmost tag */
 	fprintf(out, "\t</" XML_TOP ">\n");
 }
@@ -1090,11 +1129,7 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 		"\t<!ATTLIST " XML_ROOT " build CDATA #IMPLIED>\n"
 		"\t<!ATTLIST " XML_ROOT " debug (yes|no) \"no\">\n"
 		"\t<!ATTLIST " XML_ROOT " mameconfig CDATA #REQUIRED>\n"
-#ifdef MESS
 		"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer, biosset*, rom*, disk*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, category*, adjuster*, driver?, device*, ramoption*, softwarelist*)>\n"
-#else
-		"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer, biosset*, rom*, disk*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, category*, adjuster*, driver?, device*, softwarelist*)>\n"
-#endif
 		"\t\t<!ATTLIST " XML_TOP " name CDATA #REQUIRED>\n"
 		"\t\t<!ATTLIST " XML_TOP " sourcefile CDATA #IMPLIED>\n"
 		"\t\t<!ATTLIST " XML_TOP " isbios (yes|no) \"no\">\n"
@@ -1213,10 +1248,8 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 		"\t\t<!ELEMENT softwarelist EMPTY>\n"
 		"\t\t\t<!ATTLIST softwarelist name CDATA #REQUIRED>\n"
 		"\t\t\t<!ATTLIST softwarelist status (original|compatible) #REQUIRED>\n"
-#ifdef MESS
 		"\t\t<!ELEMENT ramoption (#PCDATA)>\n"
 		"\t\t\t<!ATTLIST ramoption default CDATA #IMPLIED>\n"
-#endif
 		"]>\n\n"
 		"<" XML_ROOT " build=\"%s\" debug=\""
 #ifdef MAME_DEBUG

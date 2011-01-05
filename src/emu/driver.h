@@ -115,7 +115,41 @@ extern const game_driver GAME_NAME(NAME) =	\
 	&LAYOUT[0]								\
 };
 
+#define CONS(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,INIT,COMPANY,FULLNAME,FLAGS)	\
+extern const game_driver GAME_NAME(NAME) =	\
+{											\
+	__FILE__,								\
+	#PARENT,								\
+	#NAME,									\
+	FULLNAME,								\
+	#YEAR,									\
+	COMPANY,								\
+	MACHINE_CONFIG_NAME(MACHINE),			\
+	INPUT_PORTS_NAME(INPUT),				\
+	DRIVER_INIT_NAME(INIT),					\
+	ROM_NAME(NAME),							\
+	#COMPAT,								\
+	ROT0|(FLAGS),							\
+	NULL									\
+};
 
+#define COMP(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,INIT,COMPANY,FULLNAME,FLAGS)	\
+extern const game_driver GAME_NAME(NAME) =	\
+{											\
+	__FILE__,								\
+	#PARENT,								\
+	#NAME,									\
+	FULLNAME,								\
+	#YEAR,									\
+	COMPANY,								\
+	MACHINE_CONFIG_NAME(MACHINE),			\
+	INPUT_PORTS_NAME(INPUT),				\
+	DRIVER_INIT_NAME(INIT),					\
+	ROM_NAME(NAME),							\
+	#COMPAT,								\
+	ROT0|(FLAGS),				\
+	NULL									\
+};
 
 /***************************************************************************
     GLOBAL VARIABLES
