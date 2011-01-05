@@ -26,6 +26,8 @@ int read_sfr(v25_state_t *nec_state, unsigned o)
 			logerror("%06x: Read from special function register %02x\n",PC(nec_state),o);
 			return 0;
 	}
+
+	return 0;
 }
 
 void write_sfr(v25_state_t *nec_state, unsigned o, unsigned d)
