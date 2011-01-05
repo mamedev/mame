@@ -1353,10 +1353,45 @@ Other Protections?
 Denjin Makai seems to rely on a byteswapped mirror to write the palette.
 Various other ports go through the COP area, and get mapped to inputs / sounds / video registers, this adds to
 the confusion and makes it less clear what is / isn't protection related
-Raiden 2 / Zero Team banking doesn't make much sense, a bank address has been found through testing on real
-hardware, but the game never writes directly to it.
 
- */
+=================================================================================================================
+
+DMA mode partial documentation:
+0x476
+???? ???? ???? ???? SRC table value used for palette DMAs, val << 10
+
+0x478
+xxxx xxxx xxxx xxxx SRC address register, val << 6
+
+0x47a
+xxxx xxxx xxxx xxxx length register, val << 5
+
+0x47c
+xxxx xxxx xxxx xxxx DST address register, val << 6
+
+0x47e
+---- ---x ---x ---- DMA mode (00: DMA, work RAM to work RAM 01: DMA, work RAM to private buffers / 10 <unknown> / 11: fill work RAM)
+---- ---- x--- ---- palette DMA mode (used for brightness effects)
+---- ---- ---- x--- Transfer type (0: word 1:dword)
+---- ---- ---- -xxx Channel #
+
+- channels 0x4 and 0x5 are always used to transfer respectively the VRAM and the palette data to the private buffers.
+  It isn't know at current stage if it's just a design choice or they are dedicated DMAs.
+
+- Some games (Heated Barrel start-up menu, Olympic Soccer '92 OBJ test) sets up the layer clearance in the midst of the
+  frame interval. It might indicate that it delays those DMAs inside the buffers at vblank time.
+
+- Raiden 2 / Raiden DX sets 0x14 with DST = 0xfffe and size as a sprite limit behaviour. The former is probably used to change the
+  order of the loaded tables (they are the only known cases where spriteram is smallest address-wise).
+
+- Reading here is probably used for DMA status of the individual channels or just for read-back of the register, but nothing seems to rely
+  on it so far so nothing is really known about it.
+
+0x6fc
+???? ???? ???? ???? triggers DMA loaded in registers, value looks meaningless
+
+*/
+
 #include "emu.h"
 #include "audio/seibu.h"
 #include "includes/legionna.h"
