@@ -217,7 +217,7 @@ drccodeptr *drc_cache::begin_codegen(UINT32 reserve_bytes)
 {
 	// can't restart in the middle of codegen
 	assert(m_codegen == NULL);
-	assert(m_ooblist == NULL);
+	assert(m_ooblist.first() == NULL);
 
 	// if still no space, we just fail
 	drccodeptr ptr = m_top;
