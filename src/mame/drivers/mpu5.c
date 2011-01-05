@@ -65,4 +65,4 @@ ROM_START( m_honmon )
 ROM_END
 
 
-GAME( 199?, m_honmon,    0,         mpu5,     mpu5,    0, ROT0,  "Vivid", "Honey Money", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME( 199?, m_honmon,    0,         mpu5,     mpu5,    0, ROT0,  "Vivid", "Honey Money", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )

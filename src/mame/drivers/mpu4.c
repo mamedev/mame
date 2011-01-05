@@ -1958,16 +1958,16 @@ ROM_START( mpu4met0 )
 ROM_END
 
 //    year, name,    parent,  machine,  input,       init,    monitor, company,         fullname,                                    flags
-GAME( 198?, m_oldtmr,0,       mpu4dutch,mpu4,		 0,        ROT0,   "Barcrest",		"Old Timer",														GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME( 198?, m_ccelbr,0,       mpu4mod2, mpu4,		 m_ccelbr, ROT0,   "Barcrest",		"Club Celebration",													GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
-GAMEL(198?, m_gmball,0,		  mod4yam,  gamball,     m_gmball, ROT0,   "Barcrest",      "Gamball",															GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK,layout_gamball )
+GAME( 198?, m_oldtmr,        0, mpu4dutch,  mpu4,       0,          ROT0, "Barcrest","Old Timer",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 198?, m_ccelbr,        0, mpu4mod2,   mpu4,	m_ccelbr,   ROT0, "Barcrest","Club Celebration",GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAMEL(198?, m_gmball,        0, mod4yam,    gamball,    m_gmball,   ROT0, "Barcrest","Gamball",GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_gamball )
 
 //SWP
-GAMEL(1989?, connect4,  0,        mpu4mod2, connect4, connect4, ROT0, "Dolbeck Systems","Connect 4",														GAME_IMPERFECT_GRAPHICS|GAME_REQUIRES_ARTWORK,layout_connect4 )
+GAMEL(1989?,connect4,        0, mpu4mod2,   connect4,   connect4,   ROT0, "Dolbeck Systems","Connect 4",GAME_IMPERFECT_GRAPHICS|GAME_REQUIRES_ARTWORK,layout_connect4 )
 
 //Diagnostic ROMs
-GAME( 198?,  mpu4utst,  0,        mpu4mod2, mpu4,     0,        ROT0, "Barcrest",		"MPU4 Unit Test (Program 4)",										0 )
-GAME( 198?,  mpu4tst2,  0,        mpu4mod2, mpu4,     0,        ROT0, "Barcrest",		"MPU4 Unit Test (Program 2)",										0 )
-GAME( 198?,  mpu4met0,  0,        mpu4mod2, mpu4,     0,        ROT0, "Barcrest",		"MPU4 Meter Clear ROM",												0 )
+GAME( 198?, mpu4utst,        0, mpu4mod2,   mpu4,       0,          ROT0, "Barcrest","MPU4 Unit Test (Program 4)",GAME_MECHANICAL )
+GAME( 198?, mpu4tst2,        0, mpu4mod2,   mpu4,       0,          ROT0, "Barcrest","MPU4 Unit Test (Program 2)",GAME_MECHANICAL )
+GAME( 198?, mpu4met0,        0, mpu4mod2,   mpu4,       0,          ROT0, "Barcrest","MPU4 Meter Clear ROM",GAME_MECHANICAL )
 
 #include "drivers/mpu4drvr.c"

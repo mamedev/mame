@@ -822,4 +822,4 @@ ROM_START( m_sptlgt )
 	ROM_LOAD( "sa2-412.bin",0x0000, 0x10000,  CRC(17531aad) SHA1(decec517b89be9019913be59c5fC2aa2ee6e3f8f))
 ROM_END
 
-GAME( 199?, m_sptlgt,0,  m1,m1,0, ROT0, "Maygay Machines Ltd.", "Spotlight",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME( 199?, m_sptlgt,0,  m1,m1,0, ROT0, "Maygay Machines Ltd.", "Spotlight",GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )

@@ -898,6 +898,7 @@ static astring &warnings_string(running_machine *machine, astring &string)
 {
 #define WARNING_FLAGS (	GAME_NOT_WORKING | \
 						GAME_UNEMULATED_PROTECTION | \
+						GAME_MECHANICAL | \
 						GAME_WRONG_COLORS | \
 						GAME_IMPERFECT_COLORS | \
 						GAME_REQUIRES_ARTWORK | \
@@ -905,6 +906,7 @@ static astring &warnings_string(running_machine *machine, astring &string)
 						GAME_IMPERFECT_SOUND |  \
 						GAME_IMPERFECT_GRAPHICS | \
 						GAME_NO_COCKTAIL)
+
 	int i;
 
 	string.reset();
@@ -946,8 +948,8 @@ static astring &warnings_string(running_machine *machine, astring &string)
 		if (machine->gamedrv->flags & GAME_REQUIRES_ARTWORK)
 			string.cat("The game requires external artwork files\n");
 
-		/* if there's a NOT WORKING or UNEMULATED PROTECTION warning, make it stronger */
-		if (machine->gamedrv->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION))
+		/* if there's a NOT WORKING, UNEMULATED PROTECTION or GAME MECHANICAL warning, make it stronger */
+		if (machine->gamedrv->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_MECHANICAL))
 		{
 			const game_driver *maindrv;
 			const game_driver *clone_of;
@@ -957,8 +959,11 @@ static astring &warnings_string(running_machine *machine, astring &string)
 			if (machine->gamedrv->flags & GAME_UNEMULATED_PROTECTION)
 				string.cat("The game has protection which isn't fully emulated.\n");
 			if (machine->gamedrv->flags & GAME_NOT_WORKING)
-				string.cat("THIS " CAPGAMENOUN " DOESN'T WORK. The emulation for this game is not yet complete. "
-									 "There is nothing you can do to fix this problem except wait for the developers to improve the emulation.\n");
+				string.cat("\nTHIS " CAPGAMENOUN " DOESN'T WORK. The emulation for this game is not yet complete. "
+					 "There is nothing you can do to fix this problem except wait for the developers to improve the emulation.\n");
+			if (machine->gamedrv->flags & GAME_MECHANICAL)
+				string.cat("\nCertain elements of this " GAMENOUN " cannot be emulated as it requires actual physical interaction or consists of mechanical devices. "
+					 "It is not possible to fully play this " GAMENOUN ".\n");
 
 			/* find the parent of this driver */
 			clone_of = driver_get_clone(machine->gamedrv);

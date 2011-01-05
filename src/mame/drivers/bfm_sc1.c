@@ -1403,9 +1403,9 @@ static DRIVER_INIT(clatt)
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-GAME( 1988, m_lotsse, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM/ELAM",    "Lotus SE (Dutch)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-GAME( 1988, m_roulet, 0,        scorpion1,	 scorpion1,  rou029,	0,       "BFM/ELAM",    "Roulette (Dutch, Game Card 39-360-129?)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-GAME( 1990, m_clattr, 0,        scorpion1_nec_uk,clatt,	     clatt,	0,       "BFM",         "Club attraction (UK, Game Card 39-370-196)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+GAME( 1988, m_lotsse, 0,        scorpion1,	 scorpion1,  lotse,	0,       "BFM/ELAM",    "Lotus SE (Dutch)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1988, m_roulet, 0,        scorpion1,	 scorpion1,  rou029,	0,       "BFM/ELAM",    "Roulette (Dutch, Game Card 39-360-129?)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
+GAME( 1990, m_clattr, 0,        scorpion1_nec_uk,clatt,	     clatt,	0,       "BFM",         "Club attraction (UK, Game Card 39-370-196)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL )
 
 //Adder
 GAME( 1996, m_tppokr, 0,        scorpion1_adder2,toppoker,   toppoker,	0,       "BFM/ELAM",    "Toppoker (Dutch, Game Card 95-750-899)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
