@@ -14,6 +14,7 @@ VIDEO_START( legionna );
 VIDEO_START( cupsoc );
 VIDEO_START( denjinmk );
 VIDEO_START( grainbow );
+VIDEO_START( godzilla );
 VIDEO_UPDATE( legionna );
 VIDEO_UPDATE( godzilla );
 VIDEO_UPDATE( grainbow );

@@ -1495,6 +1495,7 @@ static WRITE16_HANDLER( seibu_common_video_regs_w )
 		case (0x026/2): { legionna_scrollram16[3] = seibu_vregs[offset]; break; }
 		case (0x028/2): { legionna_scrollram16[4] = seibu_vregs[offset]; break; }
 		case (0x02a/2): { legionna_scrollram16[5] = seibu_vregs[offset]; break; }
+		default: { logerror("seibu_common_video_regs_w unhandled offset %02x %04x\n",offset,data); break; }
 	}
 }
 

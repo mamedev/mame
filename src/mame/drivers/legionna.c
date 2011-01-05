@@ -1153,7 +1153,7 @@ static MACHINE_CONFIG_START( godzilla, driver_device )
 	MCFG_GFXDECODE(heatbrl)
 	MCFG_PALETTE_LENGTH(128*16)
 
-	MCFG_VIDEO_START(legionna)
+	MCFG_VIDEO_START(godzilla)
 	MCFG_VIDEO_UPDATE(godzilla)
 
 	/* sound hardware */

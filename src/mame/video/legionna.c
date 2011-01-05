@@ -12,6 +12,8 @@ UINT16 *legionna_back_data,*legionna_fore_data,*legionna_mid_data,*legionna_scro
 static tilemap_t *background_layer,*foreground_layer,*midground_layer,*text_layer;
 UINT16 legionna_layer_disable;
 int legionna_sprite_xoffs,legionna_sprite_yoffs;
+static int legionna_has_extended_banking;
+static int legionna_has_extended_priority;
 
 /******************************************************************************/
 
@@ -148,6 +150,9 @@ VIDEO_START( legionna )
 	legionna_sprite_xoffs = 0;
 	legionna_sprite_yoffs = 0;
 
+	legionna_has_extended_banking = 0;
+	legionna_has_extended_priority = 0;
+
 	tilemap_set_transparent_pen(background_layer,15);
 	tilemap_set_transparent_pen(midground_layer,15);
 	tilemap_set_transparent_pen(foreground_layer,15);
@@ -164,6 +169,9 @@ VIDEO_START( denjinmk )
 	legionna_scrollram16 = auto_alloc_array(machine, UINT16, 0x60/2);
 	legionna_sprite_xoffs = 0;
 	legionna_sprite_yoffs = 0;
+
+	legionna_has_extended_banking = 1;
+	legionna_has_extended_priority = 0;
 
 	tilemap_set_transparent_pen(background_layer,15);
 	tilemap_set_transparent_pen(midground_layer,15);
@@ -182,6 +190,9 @@ VIDEO_START( cupsoc )
 	legionna_sprite_xoffs = 0;
 	legionna_sprite_yoffs = 0;
 
+	legionna_has_extended_banking = 0;
+	legionna_has_extended_priority = 1;
+
 	tilemap_set_transparent_pen(background_layer,15);
 	tilemap_set_transparent_pen(midground_layer,15);
 	tilemap_set_transparent_pen(foreground_layer,15);
@@ -193,7 +204,19 @@ VIDEO_START(grainbow)
 	VIDEO_START_CALL(legionna);
 	legionna_sprite_xoffs = legionna_sprite_yoffs = 16;
 
+	legionna_has_extended_banking = 0;
+	legionna_has_extended_priority = 1;
 }
+
+VIDEO_START(godzilla)
+{
+	VIDEO_START_CALL(legionna);
+
+	legionna_has_extended_banking = 1;
+	legionna_has_extended_priority = 0;
+
+}
+
 /*************************************************************************
 
     Legionnaire Spriteram (similar to Dcon)
@@ -207,7 +230,7 @@ VIDEO_START(grainbow)
     +0   ..x..... ........  Flip y ???
     +0   ...xxx.. ........  Width: do this many tiles horizontally
     +0   ......xx x.......  Height: do this many tiles vertically
-    +0   ........ .x......  Tile bank,used in Denjin Makai
+    +0   ........ .x......  Tile bank,used in Denjin Makai / extra Priority in Grainbow (to external pin?) 
     +0   ........ ..xxxxxx  Color bank
 
     +1   xx...... ........  Priority? (1=high?)
@@ -227,27 +250,76 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	int dx,dy,ax,ay;
 	int pri_mask;
 
-	for (offs = 0;offs < 0x400-4;offs += 4)
+	for (offs = 0;offs < 0x400;offs += 4)
 	{
 		UINT16 data = spriteram16[offs];
 		if (!(data &0x8000)) continue;
 
-		cur_pri = (spriteram16[offs+1] & 0xc000) >> 14;
 		pri_mask = 0;
 
-		switch (cur_pri)
+		if (legionna_has_extended_priority)
 		{
-			case 0:	pri_mask = 0xfffc; break; //?
-			case 1:	pri_mask = 0xfffc; break; //?
-			case 2:	pri_mask = 0xfffc; break; // player sprites in legionnaire
-			case 3: pri_mask = 0xfffe; break; // stuff that goes behind the playfield (barriers on train level in legionnaire)
+
+			cur_pri = (spriteram16[offs+1] & 0xc000) >> 14;
+			
+			if(data & 0x0040)
+			{
+				cur_pri |= 0x4; // definitely seems to be needed by grainbow
+			}
+
+			//
+			// -4 behind bg? (mask sprites)
+			// -32 behind mid
+			// -256 behind tx
+			// 0    above all
+			
+			// is the low bit REALLY priority?
+
+			switch (cur_pri)
+			{
+				case 0:	pri_mask = -256; break; // gumdam swamp monster l2
+				case 1:	pri_mask = -256; break; // cupsoc
+				case 2:	pri_mask = -4; break; // masking effect for gundam l2 monster
+				case 3: pri_mask = -4; break; // cupsoc (not sure what..)
+				case 4: pri_mask = -32; break; // gundam level 2/3 player
+				//case 5: pri_mask = 0; break;
+				case 6: pri_mask = 0; break; // insert coin in gundam
+				//case 7: pri_mask = 0; break;
+			
+				default: printf("unhandled pri %d\n",cur_pri); pri_mask=0;
+			}
+
+		}
+		else
+		{
+			cur_pri = (spriteram16[offs+1] & 0xc000) >> 14;
+
+			switch (cur_pri)
+			{
+				case 0:	pri_mask = 0xfffc; break; //?
+				case 1:	pri_mask = 0xfffc; break; //?
+				case 2:	pri_mask = 0xfffc; break; // player sprites in legionnaire
+				case 3: pri_mask = 0xfffe; break; // stuff that goes behind the playfield (barriers on train level in legionnaire)
+			}
+
 		}
 
 		sprite = spriteram16[offs+1];
 
 		sprite &= 0x3fff;
-		if(data & 0x0040) sprite |= 0x4000;//tile banking,used in Denjin Makai
-		if(spriteram16[offs+3] & 0x8000) sprite |= 0x8000;//tile banking?,used in Denjin Makai
+		
+		if (legionna_has_extended_banking)
+		{
+			if(data & 0x0040)
+			{
+				sprite |= 0x4000;//tile banking,used in Denjin Makai
+			}
+			if(spriteram16[offs+3] & 0x8000)
+			{
+				sprite |= 0x8000;//tile banking?,used in Denjin Makai
+			}
+		}
+
 
 		y = spriteram16[offs+3];
 		x = spriteram16[offs+2];
@@ -362,6 +434,7 @@ VIDEO_UPDATE( legionna )
 	return 0;
 }
 
+
 VIDEO_UPDATE( godzilla )
 {
 //  tilemap_set_scrollx( text_layer, 0, 0 );
@@ -406,16 +479,16 @@ VIDEO_UPDATE( grainbow )
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
 	if(!(legionna_layer_disable & 1))
-		tilemap_draw(bitmap,cliprect,background_layer,0,0);
+		tilemap_draw(bitmap,cliprect,background_layer,0,1);
 
 	if(!(legionna_layer_disable & 2))
-		tilemap_draw(bitmap,cliprect,midground_layer,0,0);
+		tilemap_draw(bitmap,cliprect,midground_layer,0,2);
 
 	if(!(legionna_layer_disable & 4))
-		tilemap_draw(bitmap,cliprect,foreground_layer,0,1);
+		tilemap_draw(bitmap,cliprect,foreground_layer,0,4);
 
 	if(!(legionna_layer_disable & 8))
-		tilemap_draw(bitmap,cliprect,text_layer,0,2);
+		tilemap_draw(bitmap,cliprect,text_layer,0,8);
 
 	draw_sprites(screen->machine,bitmap,cliprect);
 
