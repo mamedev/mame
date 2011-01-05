@@ -1725,9 +1725,7 @@ static void menu_input_specific_populate(running_machine *machine, ui_menu *menu
 
 			/* add if we match the group and we have a valid name */
 			if (name != NULL && input_condition_true(machine, &field->condition) &&
-#ifdef MESS
 				(field->category == 0 || input_category_active(machine, field->category)) &&
-#endif /* MESS */
 				((field->type == IPT_OTHER && field->name != NULL) || input_type_group(machine, field->type, field->player) != IPG_INVALID))
 			{
 				input_seq_type seqtype;
