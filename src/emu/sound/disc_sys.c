@@ -74,17 +74,17 @@ static void task_check(discrete_task *task, discrete_task *dest_task)
 							if (task->numbuffered >= DISCRETE_MAX_TASK_OUTPUTS)
 								fatalerror("dso_task_start - Number of maximum buffered nodes exceeded");
 
-							task->node_buf[task->numbuffered] = auto_alloc_array(task_node->info->device->machine, double,
-									((task_node->info->sample_rate + STREAMS_UPDATE_FREQUENCY) / STREAMS_UPDATE_FREQUENCY));
+							task->node_buf[task->numbuffered] = auto_alloc_array(task_node->device->machine, double,
+									((task_node->sample_rate() + STREAMS_UPDATE_FREQUENCY) / STREAMS_UPDATE_FREQUENCY));
 							task->source[task->numbuffered] = (double *) dest_node->input[inputnum];
-							task->nodes[task->numbuffered] = discrete_find_node(task_node->info, inputnode);
+							task->nodes[task->numbuffered] = task_node->device->discrete_find_node(inputnode);
 							i = task->numbuffered;
 							task->numbuffered++;
 						}
-						discrete_log(task_node->info, "dso_task_start - buffering %d(%d) in task %p group %d referenced by %d group %d", NODE_INDEX(inputnode), NODE_CHILD_NODE_NUM(inputnode), task, task->task_group, dest_node->index(), dest_task->task_group);
+						task_node->device->discrete_log("dso_task_start - buffering %d(%d) in task %p group %d referenced by %d group %d", NODE_INDEX(inputnode), NODE_CHILD_NODE_NUM(inputnode), task, task->task_group, dest_node->index(), dest_task->task_group);
 
 						/* register into source list */
-						source = auto_alloc(dest_node->info->device->machine, discrete_source_node);
+						source = auto_alloc(dest_node->device->machine, discrete_source_node);
 						dest_task->source_list.add_tail(source);
 						source->task = task;
 						source->output_node = i;
@@ -110,7 +110,7 @@ DISCRETE_START( dso_task_start )
 	if (task->task_group < 0 || task->task_group >= DISCRETE_MAX_TASK_GROUPS)
 		fatalerror("discrete_dso_task: illegal task_group %d", task->task_group);
 
-	for_each(discrete_task *, dest_task, &node->info->task_list)
+	for_each(discrete_task *, dest_task, &node->device->task_list)
 	{
 		if (task->task_group > dest_task.item()->task_group)
 			task_check(dest_task.item(), task);
@@ -168,15 +168,15 @@ DISCRETE_START( dso_csvlog )
 
 	int log_num, node_num;
 
-	log_num = node->same_module_index(node->info->node_list);
+	log_num = node->device->same_module_index(*node);
 	context->sample_num = 0;
 
-	sprintf(context->name, "discrete_%s_%d.csv", node->info->device->tag(), log_num);
+	sprintf(context->name, "discrete_%s_%d.csv", node->device->tag(), log_num);
 	context->csv_file = fopen(context->name, "w");
 	/* Output some header info */
 	fprintf(context->csv_file, "\"MAME Discrete System Node Log\"\n");
 	fprintf(context->csv_file, "\"Log Version\", 1.0\n");
-	fprintf(context->csv_file, "\"Sample Rate\", %d\n", node->info->sample_rate);
+	fprintf(context->csv_file, "\"Sample Rate\", %d\n", node->sample_rate());
 	fprintf(context->csv_file, "\n");
 	fprintf(context->csv_file, "\"Sample\"");
 	for (node_num = 0; node_num < node->active_inputs(); node_num++)
@@ -216,9 +216,9 @@ DISCRETE_START( dso_wavlog )
 
 	int log_num;
 
-	log_num = node->same_module_index(node->info->node_list);
-	sprintf(context->name, "discrete_%s_%d.wav", node->info->device->tag(), log_num);
-	context->wavfile = wav_open(context->name, node->info->sample_rate, node->active_inputs()/2);
+	log_num = node->device->same_module_index(*node);
+	sprintf(context->name, "discrete_%s_%d.wav", node->device->tag(), log_num);
+	context->wavfile = wav_open(context->name, node->sample_rate(), node->active_inputs()/2);
 }
 
 DISCRETE_STOP( dso_wavlog )

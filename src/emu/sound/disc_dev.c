@@ -244,7 +244,7 @@ DISCRETE_STEP(dsd_555_astbl)
      * dt = R*C(log(1/(1-(Vc/Vr))))
      */
 
-	dt = node->info->sample_time;
+	dt = node->sample_time();
 
 	/* Sometimes a switching network is used to setup the capacitance.
      * These may select no capacitor, causing oscillation to stop.
@@ -349,7 +349,7 @@ DISCRETE_STEP(dsd_555_astbl)
 	}
 
 	/* Convert last switch time to a ratio */
-	x_time = x_time / node->info->sample_time;
+	x_time = x_time / node->sample_time();
 
 	switch (context->output_type)
 	{
@@ -405,7 +405,7 @@ DISCRETE_RESET(dsd_555_astbl)
 	context->v_out_high = (info->v_out_high == DEFAULT_555_HIGH) ? info->v_pos - 1.2 : info->v_out_high;
 
 	/* setup v_charge or node */
-	v_charge_node = discrete_find_node(node->info, info->v_charge);
+	v_charge_node = node->device->discrete_find_node(info->v_charge);
 	if (v_charge_node)
 		context->v_charge_node = &(v_charge_node->output[NODE_CHILD_NODE_NUM(info->v_charge)]);
 	else
@@ -499,7 +499,7 @@ DISCRETE_STEP(dsd_555_mstbl)
 		return;
 	}
 
-	dt = node->info->sample_time;
+	dt = node->sample_time();
 	flip_flop = context->flip_flop;
 	trigger_type = info->options;
 	v_cap = context->cap_voltage;
@@ -574,7 +574,7 @@ DISCRETE_STEP(dsd_555_mstbl)
 			if (UNEXPECTED((v_cap >= context->threshold) && !trigger))
 			{
 				dt = DSD_555_MSTBL__R * DSD_555_MSTBL__C  * log(1.0 / (1.0 - ((v_cap - context->threshold) / v_diff)));
-				x_time = 1.0 - dt / node->info->sample_time;
+				x_time = 1.0 - dt / node->sample_time();
 				v_cap  = 0;
 				flip_flop = 0;
 				context->flip_flop = 0;
@@ -618,7 +618,7 @@ DISCRETE_RESET(dsd_555_mstbl)
 	context->output_type = info->options & DISC_555_OUT_MASK;
 	if ((context->output_type == DISC_555_OUT_COUNT_F) || (context->output_type == DISC_555_OUT_COUNT_R))
 	{
-		discrete_log(node->info, "Invalid Output type in NODE_%d.\n", node->index());
+		node->device->discrete_log("Invalid Output type in NODE_%d.\n", node->index());
 		context->output_type = DISC_555_OUT_SQW;
 	}
 
@@ -727,7 +727,7 @@ DISCRETE_STEP(dsd_555_cc)
 		return;
 	}
 
-	dt    = node->info->sample_time;	/* Change in time */
+	dt    = node->sample_time();	/* Change in time */
 	v_cap = context->cap_voltage;	/* Set to voltage before change */
 	v_vcharge_limit = DSD_555_CC__VIN + info->v_cc_junction;	/* the max v_cap can be and still be charged by i */
 	/* Calculate charging current */
@@ -974,7 +974,7 @@ DISCRETE_STEP(dsd_555_cc)
 	context->cap_voltage = v_cap;
 
 	/* Convert last switch time to a ratio */
-	x_time = x_time / node->info->sample_time;
+	x_time = x_time / node->sample_time();
 
 	switch (context->output_type)
 	{
@@ -1256,7 +1256,7 @@ DISCRETE_STEP(dsd_555_vco1)
 	double	v_cap;			/* Current voltage on capacitor, before dt */
 	double	v_cap_next = 0;	/* Voltage on capacitor, after dt */
 
-	dt    = node->info->sample_time;	/* Change in time */
+	dt    = node->sample_time();	/* Change in time */
 	v_cap = context->cap_voltage;
 
 	/* Check: if the Control Voltage node is connected. */
@@ -1360,7 +1360,7 @@ DISCRETE_STEP(dsd_555_vco1)
 	context->cap_voltage = v_cap_next;
 
 	/* Convert last switch time to a ratio.  No x_time in reset. */
-	x_time = x_time / node->info->sample_time;
+	x_time = x_time / node->sample_time();
 	if (!DSD_555_VCO1__RESET) x_time = 0;
 
 	switch (context->output_type)
@@ -1546,7 +1546,7 @@ DISCRETE_STEP(dsd_566)
 	double	v_cap;			/* Current voltage on capacitor, before dt */
 	int		count_f = 0, count_r = 0;
 
-	dt    = node->info->sample_time;	/* Change in time */
+	dt    = node->sample_time();	/* Change in time */
 	v_cap = context->cap_voltage;	/* Set to voltage before change */
 
 	/* Calculate charging current if it is in range */
@@ -1619,7 +1619,7 @@ DISCRETE_STEP(dsd_566)
 	context->cap_voltage = v_cap;
 
 	/* Convert last switch time to a ratio */
-	x_time /= node->info->sample_time;
+	x_time /= node->sample_time();
 
 	switch (context->out_type)
 	{
@@ -1766,7 +1766,7 @@ DISCRETE_STEP(dsd_ls624)
 	double	freq, t1;
 	double	v_freq_2, v_freq_3, v_freq_4;
 	double	t_used = context->t_used;
-	double	dt = node->info->sample_time;;
+	double	dt = node->sample_time();;
 	double	v_freq = DSD_LS624__VMOD;
 	double	v_rng = DSD_LS624__VRNG;
 	int		count_f = 0, count_r = 0;
@@ -1815,7 +1815,7 @@ DISCRETE_STEP(dsd_ls624)
 	freq *= CAP_U(0.1) / DSD_LS624__C;
 
 	t1 = 0.5 / freq ;
-	t_used += node->info->sample_time;
+	t_used += node->sample_time();
 	do
 	{
 		dt = 0;
@@ -1829,8 +1829,8 @@ DISCRETE_STEP(dsd_ls624)
 			else
 				count_f++;
 			/* fix up any frequency increase change errors */
-			while(t_used > node->info->sample_time)
-				t_used -= node->info->sample_time;
+			while(t_used > node->sample_time())
+				t_used -= node->sample_time();
 			x_time = t_used;
 			dt = t_used;
 		}
@@ -1839,7 +1839,7 @@ DISCRETE_STEP(dsd_ls624)
 	context->t_used = t_used;
 
 	/* Convert last switch time to a ratio */
-	x_time = x_time / node->info->sample_time;
+	x_time = x_time / node->sample_time();
 
 	switch (context->out_type)
 	{

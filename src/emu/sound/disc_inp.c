@@ -112,7 +112,7 @@ DISCRETE_RESET(dss_adjustment)
 
 	double min, max;
 
-	context->port = node->info->device->machine->m_portlist.find((const char *)node->custom_data());
+	context->port = node->device->machine->m_portlist.find((const char *)node->custom_data());
 	if (context->port == NULL)
 		fatalerror("DISCRETE_ADJUSTMENT - NODE_%d has invalid tag", node->index());
 
@@ -242,7 +242,7 @@ DISCRETE_START(dss_input_stream)
 {
 	DISCRETE_DECLARE_CONTEXT(dss_input)
 
-	//assert(DSS_INPUT_STREAM__STREAM < node->info->input_list.count());
+	assert(DSS_INPUT_STREAM__STREAM < node->info->m_input_list.count());
 
 	context->is_stream = TRUE;
 	/* Stream out number is set during start */
@@ -252,12 +252,12 @@ DISCRETE_START(dss_input_stream)
 	context->ptr = NULL;
 	//context->data = 0;
 
-	if (node->block_type() == DSS_INPUT_BUFFER)
+	if (node->module->type == DSS_INPUT_BUFFER)
 	{
 		context->is_buffered = TRUE;
-		context->buffer_stream = stream_create(node->info->device, 0, 1, node->info->sample_rate, (void *) node, buffer_stream_update);
+		context->buffer_stream = stream_create(node->device, 0, 1, node->sample_rate(), (void *) node, buffer_stream_update);
 
-		stream_set_input(node->info->discrete_stream, context->stream_in_number,
+		stream_set_input(node->device->discrete_stream, context->stream_in_number,
 			context->buffer_stream, 0, 1.0);
 	}
 	else

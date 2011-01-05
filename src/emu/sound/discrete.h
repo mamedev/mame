@@ -3477,13 +3477,13 @@
  *************************************/
 
 /* calculate charge exponent using discrete sample time */
-#define RC_CHARGE_EXP(rc)						(1.0 - exp((node)->info->neg_sample_time / (rc)))
+#define RC_CHARGE_EXP(rc)						(1.0 - exp(-(node)->sample_time() / (rc)))
 /* calculate charge exponent using given sample time */
 #define RC_CHARGE_EXP_DT(rc, dt)				(1.0 - exp(-(dt) / (rc)))
 #define RC_CHARGE_NEG_EXP_DT(rc, dt)			(1.0 - exp((dt) / (rc)))
 
 /* calculate discharge exponent using discrete sample time */
-#define RC_DISCHARGE_EXP(rc)					(exp((node)->info->neg_sample_time / (rc)))
+#define RC_DISCHARGE_EXP(rc)					(exp(-(node)->sample_time() / (rc)))
 /* calculate discharge exponent using given sample time */
 #define RC_DISCHARGE_EXP_DT(rc, dt)				(exp(-(dt) / (rc)))
 #define RC_DISCHARGE_NEG_EXP_DT(rc, dt)			(exp((dt) / (rc)))
@@ -3868,72 +3868,12 @@ struct _discrete_sound_block
 };
 typedef struct _discrete_sound_block discrete_sound_block;
 
-/*************************************
- *
- *  Internal structure of a node
- *
- *************************************/
-
 typedef struct _discrete_module discrete_module;
-typedef struct _discrete_info discrete_info;
 
 
 class node_description;
 typedef linked_list_t<node_description *> node_list_t;
 
-
-class node_description
-{
-public:
-	node_description(const discrete_info * info, const discrete_module *module, const discrete_sound_block *block);
-
-	~node_description(void);
-
-	/* Return the node index, i.e. X from NODE(X) */
-	int index(void);
-	/* Return the node number, i.e. NODE(X) */
-	inline int block_node(void) { return m_block->node;  }
-	/* Return the node type */
-	inline int block_type(void) { return m_block->type; }
-	/* Custom function specific initialisation data */
-	inline const void *custom_data(void) { return m_custom; }
-
-	void find_input_nodes(void);
-	void save_state(device_t *device);
-
-	inline int input_node(int inputnum) { return m_block->input_node[inputnum]; }
-
-	/* FIXME: this is used by csv and wav logs - going forward, ids should be explicitly passed */
-	int same_module_index(const node_list_t &list);
-
-	/* The node's last output value */
-	double				output[DISCRETE_MAX_OUTPUTS];
-
-	/* Called to execute one time delta of output update */
-	DISCRETE_FUNC((*step));
-
-	/* Contextual information specific to this node type */
-	void *				context;
-
-	const double *		input[DISCRETE_MAX_INPUTS];			/* Addresses of Input values */
-	/* Number of active inputs on this node type */
-	inline int			active_inputs(void) { return m_active_inputs; }
-	/* Bit Flags.  1 in bit location means input_is_node */
-	inline int			input_is_node(void) { return m_input_is_node; };
-
-	const discrete_module *module;							/* Node's module info */
-	const discrete_info *info;								/* Points to the parent */
-
-	osd_ticks_t			run_time;
-protected:
-private:
-	const discrete_sound_block *m_block;						/* Points to the node's setup block. */
-	int					m_active_inputs;						/* Number of active inputs on this node type */
-	/* Custom function specific initialisation data */
-	const void *		m_custom;
-	int					m_input_is_node;
-
-};
 
 
 /*************************************
@@ -4017,48 +3957,6 @@ struct _discrete_source_node
 	int					output_node;
 	double				buffer;
 };
-
-struct _discrete_info
-{
-	device_t *device;
-
-	/* emulation info */
-	int					sample_rate;
-	double				sample_time;
-	double				neg_sample_time;
-
-	/* internal node tracking */
-	node_description **indexed_node;
-
-	/* list of all nodes */
-	node_list_t			 node_list;		/* node_description * */
-
-	/* list of discrete blocks after prescan (IMPORT, DELETE, REPLACE) */
-	linked_list_entry	 *block_list;		/* discrete_sound_block * */
-
-	/* tasks */
-	task_list_t			 task_list;		/* discrete_task_context * */
-
-	/* the input streams */
-	node_list_t			 input_list;
-
-	/* output node tracking */
-	node_list_t			 output_list;
-
-	/* the output stream */
-	sound_stream		*discrete_stream;
-
-	/* debugging statistics */
-	FILE				*disclogfile;
-
-	/* parallel tasks */
-	osd_work_queue		*queue;
-
-	/* profiling */
-	UINT64				total_samples;
-	UINT64				total_stream_updates;
-};
-
 
 /*************************************
  *
@@ -4566,8 +4464,6 @@ enum
  *
  *************************************/
 
-#define MCFG_SOUND_CONFIG_DISCRETE(name) MCFG_SOUND_CONFIG(name##_discrete_interface)
-
 #define DISCRETE_SOUND_EXTERN(name) extern const discrete_sound_block name##_discrete_interface[]
 #define DISCRETE_SOUND_START(name) const discrete_sound_block name##_discrete_interface[] = {
 
@@ -4798,6 +4694,8 @@ READ8_DEVICE_HANDLER( discrete_sound_r );
 
 #endif
 
+#define MCFG_SOUND_CONFIG_DISCRETE(name) MCFG_SOUND_CONFIG(name##_discrete_interface)
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -4831,6 +4729,7 @@ protected:
 class discrete_device : public device_t, public device_sound_interface
 {
 	friend class discrete_device_config;
+	friend class node_description;
 
 	// construction/destruction
 	discrete_device(running_machine &_machine, const discrete_device_config &config);
@@ -4840,6 +4739,18 @@ public:
 	DECLARE_WRITE8_MEMBER(write);
 	//sound_stream *m_stream;
 	virtual ~discrete_device(void);
+
+	/* --------------------------------- */
+	void CLIB_DECL ATTR_PRINTF(2,3) discrete_log(const char *text, ...) const;
+	node_description *discrete_find_node(int node);
+	/* FIXME: this is used by csv and wav logs - going forward, identifiers should be explicitly passed */
+	int same_module_index(node_description &node);
+
+
+	/* the output stream */
+	sound_stream		*discrete_stream;
+	/* tasks */
+	task_list_t			 task_list;		/* discrete_task_context * */
 
 protected:
 
@@ -4854,11 +4765,43 @@ protected:
 	// internal state
 	const discrete_device_config &m_config;
 
-	/* all for now */
-	discrete_info m_info;
+	/* --------------------------------- */
+
+	void discrete_build_list(const discrete_sound_block *intf, linked_list_entry ***current);
+	void discrete_sanity_check(void);
+	void display_profiling(void);
+	void init_nodes(const linked_list_entry *block_list);
+
+	/* emulation info */
+	int					m_sample_rate;
+	double				m_sample_time;
+	double				m_neg_sample_time;
 
 private:
+	/* internal node tracking */
+	node_description 	**m_indexed_node;
 
+	/* list of all nodes */
+	node_list_t			 m_node_list;		/* node_description * */
+
+	/* list of discrete blocks after prescan (IMPORT, DELETE, REPLACE) */
+	linked_list_entry	 *m_block_list;		/* discrete_sound_block * */
+
+	/* the input streams */
+	node_list_t			 m_input_list;
+
+	/* output node tracking */
+	node_list_t			 m_output_list;
+
+	/* debugging statistics */
+	FILE				*m_disclogfile;
+
+	/* parallel tasks */
+	osd_work_queue		*m_queue;
+
+	/* profiling */
+	UINT64				m_total_samples;
+	UINT64				m_total_stream_updates;
 
 };
 
@@ -4866,7 +4809,62 @@ private:
 // device type definition
 extern const device_type DISCRETE;
 
+/*************************************
+ *
+ *  Internal structure of a node
+ *
+ *************************************/
 
-//DECLARE_LEGACY_SOUND_DEVICE(DISCRETE, discrete);
+class node_description
+{
+public:
+	node_description(discrete_device * pdev, const discrete_module *module, const discrete_sound_block *block);
+
+	~node_description(void);
+
+	/* Return the node index, i.e. X from NODE(X) */
+	int index(void);
+	/* Return the node number, i.e. NODE(X) */
+	inline int block_node(void) { return m_block->node;  }
+	/* Custom function specific initialisation data */
+	inline const void *custom_data(void) { return m_custom; }
+
+	void find_input_nodes(void);
+	void save_state(device_t *device);
+
+	inline int input_node(int inputnum) { return m_block->input_node[inputnum]; }
+
+	/* The node's last output value */
+	double				output[DISCRETE_MAX_OUTPUTS];
+
+	/* Called to execute one time delta of output update */
+	DISCRETE_FUNC((*step));
+
+	/* Contextual information specific to this node type */
+	void *				context;
+
+	const double *		input[DISCRETE_MAX_INPUTS];			/* Addresses of Input values */
+	/* Number of active inputs on this node type */
+	inline int			active_inputs(void) { return m_active_inputs; }
+	/* Bit Flags.  1 in bit location means input_is_node */
+	inline int			input_is_node(void) { return m_input_is_node; };
+
+	inline double		sample_time(void) { return device->m_sample_time; }
+	inline int			sample_rate(void) { return device->m_sample_rate; }
+
+	discrete_device *device;							/* Points to the parent */
+	const discrete_module *module;							/* Node's module info */
+
+	osd_ticks_t			run_time;
+protected:
+private:
+	const discrete_sound_block *m_block;						/* Points to the node's setup block. */
+	int					m_active_inputs;						/* Number of active inputs on this node type */
+	/* Custom function specific initialisation data */
+	const void *		m_custom;
+	int					m_input_is_node;
+
+};
+
 
 #endif /* __DISCRETE_H__ */

@@ -291,7 +291,7 @@ DISCRETE_STEP(copsnrob_custom_noise)
 	int		last_noise1_bit = (low_byte >> 4) & 0x01;
 	int		last_noise2_bit = (low_byte >> 5) & 0x01;
 
-	t_used += node->info->sample_time;
+	t_used += node->sample_time();
 
 	/* This clock will never run faster then the sample rate,
      * so we do not bother to check.
@@ -316,7 +316,7 @@ DISCRETE_STEP(copsnrob_custom_noise)
 			context->high_byte = high_byte;
 
 			/* Convert last switch time to a ratio */
-			x_time = t_used / node->info->sample_time;
+			x_time = t_used / node->sample_time();
 			/* use x_time if bit changed */
 			new_noise_bit = (low_byte >> 4) & 0x01;
 			if (last_noise1_bit != new_noise_bit)
@@ -431,7 +431,7 @@ DISCRETE_STEP(copsnrob_zings_555_monostable)
 			/* discharge the overshoot */
 			v_cap = v_threshold;
 			v_cap -= v_cap * RC_CHARGE_EXP_DT(rc, x_time);
-			x_time /= node->info->sample_time;
+			x_time /= node->sample_time();
 		}
 	}
 	else
