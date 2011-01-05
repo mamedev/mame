@@ -144,16 +144,19 @@ int z80_daisy_chain::update_irq_state()
 
 int z80_daisy_chain::call_ack_device()
 {
+	int vector = 0;
+
 	// loop over all devices; dev[0] is the highest priority
 	for (daisy_entry *daisy = m_daisy_list; daisy != NULL; daisy = daisy->m_next)
 	{
 		// if this device is asserting the INT line, that's the one we want
 		int state = daisy->m_interface->z80daisy_irq_state();
+		vector = daisy->m_interface->z80daisy_irq_ack();
 		if (state & Z80_DAISY_INT)
-			return daisy->m_interface->z80daisy_irq_ack();
+			return vector;
 	}
 	logerror("z80daisy_call_ack_device: failed to find an device to ack!\n");
-	return 0;
+	return vector;
 }
 
 

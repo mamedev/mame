@@ -3679,7 +3679,7 @@ static void set_irq_line(z80_state *z80, int irqline, int state)
 		/* update the IRQ state via the daisy chain */
 		z80->irq_state = state;
 		if (z80->daisy.present())
-			z80->irq_state = z80->daisy.update_irq_state();
+			z80->irq_state = ( z80->daisy.update_irq_state() == ASSERT_LINE ) ? ASSERT_LINE : z80->irq_state;
 
 		/* the main execute loop will take the interrupt */
 	}
