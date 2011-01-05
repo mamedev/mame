@@ -2392,8 +2392,7 @@ ROM_START( rushhero )
 
 	/* PSAC2 tiles */
 	ROM_REGION( 0x200000, "gfx3", 0 )
-	ROM_LOAD("605a24.22h", 0x000000, 1024*1024, BAD_DUMP CRC(e5ba1bb7) SHA1(d677e03b418a8bde7a4e4932fd452924768e7d72)) //half size, missing title screen gfxs
-	ROM_RELOAD(0x100000,0x100000)
+	ROM_LOAD("605a24.22h", 0x000000, 2*1024*1024, CRC(73f06065) SHA1(8ca6747204a4c2cf59f19bcc9fce280e796e4a6e))
 
 	/* sound data */
 	ROM_REGION( 0x400000, "shared", 0 )
