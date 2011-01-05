@@ -109,14 +109,14 @@ Notes:
   she wears a bikini. If the "nudity" switch is on, after 6000 points she's
   topless and every 10000 points she's nude.
 
-- The only difference between 'warpwarr' and 'warpwar2' is the copyright
+- The only difference between 'warpwarpr' and 'warpwarpr2' is the copyright
   string on the first screen (when the scores are displayed) :
-  * 'warpwarr' : "(c) 1981 ROCK-OLA MFG.CORP."  (text stored at 0x33ff to 0x3417)
-  * 'warpwar2' : "(c) 1981 ROCK-OLA MFG.CO."    (text stored at 0x33ff to 0x3415)
+  * 'warpwarpr' : "(c) 1981 ROCK-OLA MFG.CORP."  (text stored at 0x33ff to 0x3417)
+  * 'warpwarp2' : "(c) 1981 ROCK-OLA MFG.CO."    (text stored at 0x33ff to 0x3415)
   Note that the checksum at 0x37ff (used for checking ROM at 0x3000 to 0x37ff)
   is different of course.
 
-- warpwarr doesn't have an explicit Namco copyright notice, but in the default
+- warpwarpr doesn't have an explicit Namco copyright notice, but in the default
   high score table the names are NNN AAA MMM CCC OOO. warpwarp doesn't have an
   high score table at all.
 
@@ -686,7 +686,7 @@ static INPUT_PORTS_START( warpwarp )
 INPUT_PORTS_END
 
 /* has High Score Initials dip switch instead of rack test */
-static INPUT_PORTS_START( warpwarr )
+static INPUT_PORTS_START( warpwarpr )
 	PORT_INCLUDE( warpwarp )
 
 	PORT_MODIFY("DSW1")
@@ -1003,5 +1003,5 @@ GAMEL(1980, sos,      0,        navarone, sos,      sos,      ROT90, "Namco", "S
 GAME( 1979, bombbee,    0,        bombbee,  bombbee,  bombbee,  ROT90, "Namco", "Bomb Bee", 0 )
 GAME( 1979, cutieq,     0,        bombbee,  cutieq,   bombbee,  ROT90, "Namco", "Cutie Q", 0 )
 GAME( 1981, warpwarp,   0,        warpwarp, warpwarp, warpwarp, ROT90, "Namco", "Warp & Warp", 0 )
-GAME( 1981, warpwarpr,  warpwarp, warpwarp, warpwarr, warpwarp, ROT90, "Namco (Rock-Ola license)", "Warp Warp (Rock-Ola set 1)", 0 )
-GAME( 1981, warpwarpr2, warpwarp, warpwarp, warpwarr, warpwarp, ROT90, "Namco (Rock-Ola license)", "Warp Warp (Rock-Ola set 2)", 0 )
+GAME( 1981, warpwarpr,  warpwarp, warpwarp, warpwarpr,warpwarp, ROT90, "Namco (Rock-Ola license)", "Warp Warp (Rock-Ola set 1)", 0 )
+GAME( 1981, warpwarpr2, warpwarp, warpwarp, warpwarpr,warpwarp, ROT90, "Namco (Rock-Ola license)", "Warp Warp (Rock-Ola set 2)", 0 )
