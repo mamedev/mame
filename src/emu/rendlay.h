@@ -318,5 +318,8 @@ extern const char layout_hoffe457[];	// horizontal 4:3 with FF,E4,57 color overl
 extern const char layout_hoffff20[];	// horizontal 4:3 with FF,FF,20 color overlay
 extern const char layout_voffff20[];	// vertical 4:3 with FF,FF,20 color overlay
 
+// LCD screen layouts
+extern const char layout_lcd[];			// generic 1:1 lcd screen layout
+extern const char layout_lcd_rot[];		// same, for use with ROT90 or ROT270
 
 #endif	// __RENDLAY_H__

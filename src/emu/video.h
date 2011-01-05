@@ -55,7 +55,7 @@
 const int FRAMESKIP_LEVELS = 12;
 const int MAX_FRAMESKIP = FRAMESKIP_LEVELS - 2;
 
-
+#define LCD_FRAMES_PER_SECOND	30
 
 //**************************************************************************
 //  TYPE DEFINITIONS

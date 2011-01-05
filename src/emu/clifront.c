@@ -23,8 +23,9 @@
 
 #include <new>
 #include <ctype.h>
-
-
+#ifdef MESS
+#include "mess.h"
+#endif
 
 
 /***************************************************************************

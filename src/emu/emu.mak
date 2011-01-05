@@ -312,5 +312,7 @@ $(EMUOBJ)/rendlay.o:	$(EMULAYOUT)/dualhovu.lh \
 						$(EMULAYOUT)/hoffe457.lh \
 						$(EMULAYOUT)/hoffff20.lh \
 						$(EMULAYOUT)/voffff20.lh \
+						$(EMULAYOUT)/lcd.lh \
+						$(EMULAYOUT)/lcd_rot.lh \
 
 $(EMUOBJ)/video.o:		$(EMULAYOUT)/snap.lh

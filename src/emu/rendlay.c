@@ -113,6 +113,9 @@
 #include "voffff20.lh"
 #include "hoffff20.lh"
 
+// LCD screen layouts
+#include "lcd.lh"
+#include "lcd_rot.lh"
 
 
 //**************************************************************************
