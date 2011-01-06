@@ -177,130 +177,239 @@ INLINE void linked_list_add(const discrete_device *info, linked_list_entry **lis
  *
  *************************************/
 
+#define  DECL_CLASS_STRE(_name) 						\
+class _name ## _node: public discrete_legacy_node		\
+{														\
+public:													\
+	_name ## _node (discrete_device * pdev, const discrete_module *xmodule, const discrete_sound_block *block) \
+	 : discrete_legacy_node::discrete_legacy_node(pdev, xmodule, block) {  } \
+														\
+}
+
+#define DECL_CLASS_STEP(_name)	DECL_CLASS_STRE(_name)
+
+DECL_CLASS_STRE(dso_output);
+DECL_CLASS_STEP(dso_csvlog);
+DECL_CLASS_STEP(dso_wavlog);
+
+DECL_CLASS_STRE(dso_task_start);
+DECL_CLASS_STRE(dso_task_end);
+
+DECL_CLASS_STRE(dss_adjustment);
+
+/* from disc_wav.c */
+/* Generic modules */
+DECL_CLASS_STRE(dss_counter);
+DECL_CLASS_STRE(dss_lfsr);
+DECL_CLASS_STRE(dss_noise);
+DECL_CLASS_STRE(dss_note);
+DECL_CLASS_STRE(dss_sawtoothwave);
+DECL_CLASS_STRE(dss_sinewave);
+DECL_CLASS_STRE(dss_squarewave);
+DECL_CLASS_STRE(dss_squarewfix);
+DECL_CLASS_STRE(dss_squarewave2);
+DECL_CLASS_STRE(dss_trianglewave);
+/* Component specific modules */
+DECL_CLASS_STRE(dss_inverter_osc);
+DECL_CLASS_STRE(dss_op_amp_osc);
+DECL_CLASS_STRE(dss_schmitt_osc);
+/* Not yet implemented */
+DECL_CLASS_STRE(dss_adsrenv);
+
+/* from disc_mth.c */
+/* Generic modules */
+DECL_CLASS_STEP(dst_adder);
+DECL_CLASS_STEP(dst_clamp);
+DECL_CLASS_STEP(dst_divide);
+DECL_CLASS_STEP(dst_gain);
+DECL_CLASS_STEP(dst_logic_inv);
+DECL_CLASS_STRE(dst_bits_decode);
+DECL_CLASS_STEP(dst_logic_and);
+DECL_CLASS_STEP(dst_logic_nand);
+DECL_CLASS_STEP(dst_logic_or);
+DECL_CLASS_STEP(dst_logic_nor);
+DECL_CLASS_STEP(dst_logic_xor);
+DECL_CLASS_STEP(dst_logic_nxor);
+DECL_CLASS_STRE(dst_logic_shift);
+DECL_CLASS_STEP(dst_lookup_table);
+DECL_CLASS_STRE(dst_multiplex);
+DECL_CLASS_STRE(dst_oneshot);
+DECL_CLASS_STRE(dst_ramp);
+DECL_CLASS_STRE(dst_samphold);
+DECL_CLASS_STEP(dst_switch);
+DECL_CLASS_STEP(dst_aswitch);
+DECL_CLASS_STEP(dst_transform);
+/* Component specific */
+DECL_CLASS_STRE(dst_comp_adder);
+DECL_CLASS_STRE(dst_dac_r1);
+DECL_CLASS_STRE(dst_diode_mix);
+DECL_CLASS_STRE(dst_integrate);
+DECL_CLASS_STRE(dst_mixer);
+DECL_CLASS_STRE(dst_op_amp);
+DECL_CLASS_STRE(dst_op_amp_1sht);
+DECL_CLASS_STRE(dst_tvca_op_amp);
+DECL_CLASS_STEP(dst_xtime_buffer);
+DECL_CLASS_STEP(dst_xtime_and);
+DECL_CLASS_STEP(dst_xtime_or);
+DECL_CLASS_STEP(dst_xtime_xor);
+
+/* from disc_flt.c */
+/* Generic modules */
+DECL_CLASS_STRE(dst_filter1);
+DECL_CLASS_STRE(dst_filter2);
+/* Component specific modules */
+DECL_CLASS_STRE(dst_sallen_key);
+DECL_CLASS_STRE(dst_crfilter);
+DECL_CLASS_STRE(dst_op_amp_filt);
+DECL_CLASS_STRE(dst_rc_circuit_1);
+DECL_CLASS_STRE(dst_rcdisc);
+DECL_CLASS_STRE(dst_rcdisc2);
+DECL_CLASS_STRE(dst_rcdisc3);
+DECL_CLASS_STRE(dst_rcdisc4);
+DECL_CLASS_STRE(dst_rcdisc5);
+DECL_CLASS_STRE(dst_rcintegrate);
+DECL_CLASS_STRE(dst_rcdisc_mod);
+DECL_CLASS_STRE(dst_rcfilter);
+DECL_CLASS_STRE(dst_rcfilter_sw);
+
+/* from disc_dev.c */
+/* generic modules */
+/* Component specific modules */
+DECL_CLASS_STRE(dsd_555_astbl);
+DECL_CLASS_STRE(dsd_555_mstbl);
+DECL_CLASS_STRE(dsd_555_cc);
+DECL_CLASS_STRE(dsd_555_vco1);
+DECL_CLASS_STRE(dsd_566);
+DECL_CLASS_STRE(dsd_ls624);
+/* must be the last one */
 
 
-#define MOD_ENTRY(_type, _name, _num_output, _contextsize, _reset, _step, _start, _stop) \
-		{ new discrete_node_factory<discrete_legacy_node>,  _type, _name, _num_output, _contextsize, _reset, _step, _start, _stop }
+
+#define MOD_ENTRY(_class, _type, _num_output, _contextsize, _reset, _step, _start, _stop) \
+		{ new discrete_node_factory< _class ## _node >,  _type, # _type , _num_output, _contextsize, _reset, _step, _start, _stop }
+
+#define MOD_ENTRY_LEG(_type, _num_output, _contextsize, _reset, _step, _start, _stop) \
+		{ new discrete_node_factory< discrete_legacy_node >,  _type, # _type , _num_output, _contextsize, _reset, _step, _start, _stop }
 
 static const discrete_module module_list[] =
 {
-	MOD_ENTRY( DSO_OUTPUT      ,"DSO_OUTPUT"      , 0 ,0                                      ,dso_output_reset      ,dso_output_step      ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DSO_CSVLOG      ,"DSO_CSVLOG"      , 0 ,sizeof(struct dso_csvlog_context)      ,NULL                  ,dso_csvlog_step      ,dso_csvlog_start      ,dso_csvlog_stop      ),
-	MOD_ENTRY( DSO_WAVELOG     ,"DSO_WAVELOG"     , 0 ,sizeof(struct dso_wavlog_context)      ,NULL                  ,dso_wavlog_step      ,dso_wavlog_start      ,dso_wavlog_stop     ),
-	MOD_ENTRY( DSO_IMPORT      ,"DSO_IMPORT"      , 0 ,0                                      ,NULL                  ,NULL                 ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dso_output,	DSO_OUTPUT      , 0 ,0                                      ,dso_output_reset      ,dso_output_step      ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dso_csvlog,	DSO_CSVLOG      , 0 ,sizeof(struct dso_csvlog_context)      ,NULL                  ,dso_csvlog_step      ,dso_csvlog_start      ,dso_csvlog_stop      ),
+	MOD_ENTRY(dso_wavlog,	DSO_WAVELOG     , 0 ,sizeof(struct dso_wavlog_context)      ,NULL                  ,dso_wavlog_step      ,dso_wavlog_start      ,dso_wavlog_stop     ),
+	MOD_ENTRY_LEG( 		 	DSO_IMPORT      , 0 ,0                                      ,NULL                  ,NULL                 ,NULL                  ,NULL                 ),
 
 	/* parallel modules */
-	MOD_ENTRY( DSO_TASK_START  ,"DSO_TASK_START"  , 0 ,0                                      ,dso_task_reset        ,dso_task_start_step  ,dso_task_start_start  ,NULL                 ),
-	MOD_ENTRY( DSO_TASK_END    ,"DSO_TASK_END"    , 0 ,0                                      ,dso_task_reset        ,dso_task_end_step    ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DSO_TASK_SYNC   ,"DSO_TASK_SYNC"   , 0 ,0                                      ,NULL                  ,NULL                 ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dso_task_start,	DSO_TASK_START  , 0 ,0                                      ,dso_task_reset        ,dso_task_start_step  ,dso_task_start_start  ,NULL                 ),
+	MOD_ENTRY(dso_task_end,     DSO_TASK_END    , 0 ,0                                      ,dso_task_reset        ,dso_task_end_step    ,NULL                  ,NULL                 ),
+	MOD_ENTRY_LEG(				DSO_TASK_SYNC   , 0 ,0                                      ,NULL                  ,NULL                 ,NULL                  ,NULL                 ),
 
 	/* nop */
-	MOD_ENTRY( DSS_NOP         ,"DSS_NOP"         , 0 ,0                                      ,NULL                  ,NULL                 ,NULL                  ,NULL                 ),
+	MOD_ENTRY_LEG(				DSS_NOP         , 0 ,0                                      ,NULL                  ,NULL                 ,NULL                  ,NULL                 ),
 
 	/* from disc_inp.c */
-	MOD_ENTRY( DSS_ADJUSTMENT  ,"DSS_ADJUSTMENT"  , 1 ,sizeof(struct dss_adjustment_context)  ,dss_adjustment_reset  ,dss_adjustment_step  ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DSS_CONSTANT    ,"DSS_CONSTANT"    , 1 ,0                                      ,dss_constant_reset    ,NULL                 ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DSS_INPUT_DATA  ,"DSS_INPUT_DATA"  , 1 ,sizeof(struct dss_input_context)       ,dss_input_reset       ,NULL                 ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DSS_INPUT_LOGIC ,"DSS_INPUT_LOGIC" , 1 ,sizeof(struct dss_input_context)       ,dss_input_reset       ,NULL                 ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DSS_INPUT_NOT   ,"DSS_INPUT_NOT"   , 1 ,sizeof(struct dss_input_context)       ,dss_input_reset       ,NULL                 ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DSS_INPUT_PULSE ,"DSS_INPUT_PULSE" , 1 ,sizeof(struct dss_input_context)       ,dss_input_reset       ,dss_input_pulse_step ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DSS_INPUT_STREAM,"DSS_INPUT_STREAM", 1 ,sizeof(struct dss_input_context)       ,dss_input_stream_reset,dss_input_stream_step,dss_input_stream_start,NULL                 ),
-	MOD_ENTRY( DSS_INPUT_BUFFER,"DSS_INPUT_BUFFER", 1 ,sizeof(struct dss_input_context)       ,dss_input_stream_reset,dss_input_stream_step,dss_input_stream_start,NULL                 ),
+	MOD_ENTRY(dss_adjustment,	DSS_ADJUSTMENT  , 1 ,sizeof(struct dss_adjustment_context)  ,dss_adjustment_reset  ,dss_adjustment_step  ,NULL                  ,NULL                 ),
+	MOD_ENTRY_LEG(				DSS_CONSTANT    , 1 ,0                                      ,dss_constant_reset    ,NULL                 ,NULL                  ,NULL                 ),
+	MOD_ENTRY_LEG(				DSS_INPUT_DATA  , 1 ,sizeof(struct dss_input_context)       ,dss_input_reset       ,NULL                 ,NULL                  ,NULL                 ),
+	MOD_ENTRY_LEG(				DSS_INPUT_LOGIC , 1 ,sizeof(struct dss_input_context)       ,dss_input_reset       ,NULL                 ,NULL                  ,NULL                 ),
+	MOD_ENTRY_LEG(				DSS_INPUT_NOT   , 1 ,sizeof(struct dss_input_context)       ,dss_input_reset       ,NULL                 ,NULL                  ,NULL                 ),
+	MOD_ENTRY_LEG(				DSS_INPUT_PULSE , 1 ,sizeof(struct dss_input_context)       ,dss_input_reset       ,dss_input_pulse_step ,NULL                  ,NULL                 ),
+	MOD_ENTRY_LEG(				DSS_INPUT_STREAM, 1 ,sizeof(struct dss_input_context)       ,dss_input_stream_reset,dss_input_stream_step,dss_input_stream_start,NULL                 ),
+	MOD_ENTRY_LEG(				DSS_INPUT_BUFFER, 1 ,sizeof(struct dss_input_context)       ,dss_input_stream_reset,dss_input_stream_step,dss_input_stream_start,NULL                 ),
 
 	/* from disc_wav.c */
 	/* Generic modules */
-	MOD_ENTRY( DSS_COUNTER     ,"DSS_COUNTER"     , 1 ,sizeof(struct dss_counter_context)     ,dss_counter_reset     ,dss_counter_step     ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DSS_LFSR_NOISE  ,"DSS_LFSR_NOISE"  , 2 ,sizeof(struct dss_lfsr_context)        ,dss_lfsr_reset        ,dss_lfsr_step        ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DSS_NOISE       ,"DSS_NOISE"       , 1 ,sizeof(struct dss_noise_context)       ,dss_noise_reset       ,dss_noise_step       ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DSS_NOTE        ,"DSS_NOTE"        , 1 ,sizeof(struct dss_note_context)        ,dss_note_reset        ,dss_note_step        ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DSS_SAWTOOTHWAVE,"DSS_SAWTOOTHWAVE", 1 ,sizeof(struct dss_sawtoothwave_context),dss_sawtoothwave_reset,dss_sawtoothwave_step,NULL                  ,NULL                 ),
-	MOD_ENTRY( DSS_SINEWAVE    ,"DSS_SINEWAVE"    , 1 ,sizeof(struct dss_sinewave_context)    ,dss_sinewave_reset    ,dss_sinewave_step    ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DSS_SQUAREWAVE  ,"DSS_SQUAREWAVE"  , 1 ,sizeof(struct dss_squarewave_context)  ,dss_squarewave_reset  ,dss_squarewave_step  ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DSS_SQUAREWFIX  ,"DSS_SQUAREWFIX"  , 1 ,sizeof(struct dss_squarewfix_context)  ,dss_squarewfix_reset  ,dss_squarewfix_step  ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DSS_SQUAREWAVE2 ,"DSS_SQUAREWAVE2" , 1 ,sizeof(struct dss_squarewave_context)  ,dss_squarewave2_reset ,dss_squarewave2_step ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DSS_TRIANGLEWAVE,"DSS_TRIANGLEWAVE", 1 ,sizeof(struct dss_trianglewave_context),dss_trianglewave_reset,dss_trianglewave_step,NULL                  ,NULL                 ),
+	MOD_ENTRY(dss_counter,		DSS_COUNTER     , 1 ,sizeof(struct dss_counter_context)     ,dss_counter_reset     ,dss_counter_step     ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dss_lfsr,			DSS_LFSR_NOISE  , 2 ,sizeof(struct dss_lfsr_context)        ,dss_lfsr_reset        ,dss_lfsr_step        ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dss_noise,		DSS_NOISE       , 1 ,sizeof(struct dss_noise_context)       ,dss_noise_reset       ,dss_noise_step       ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dss_note,			DSS_NOTE        , 1 ,sizeof(struct dss_note_context)        ,dss_note_reset        ,dss_note_step        ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dss_sawtoothwave,	DSS_SAWTOOTHWAVE, 1 ,sizeof(struct dss_sawtoothwave_context),dss_sawtoothwave_reset,dss_sawtoothwave_step,NULL                  ,NULL                 ),
+	MOD_ENTRY(dss_sinewave,		DSS_SINEWAVE    , 1 ,sizeof(struct dss_sinewave_context)    ,dss_sinewave_reset    ,dss_sinewave_step    ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dss_squarewave,	DSS_SQUAREWAVE  , 1 ,sizeof(struct dss_squarewave_context)  ,dss_squarewave_reset  ,dss_squarewave_step  ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dss_squarewfix,	DSS_SQUAREWFIX  , 1 ,sizeof(struct dss_squarewfix_context)  ,dss_squarewfix_reset  ,dss_squarewfix_step  ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dss_squarewave2,	DSS_SQUAREWAVE2 , 1 ,sizeof(struct dss_squarewave_context)  ,dss_squarewave2_reset ,dss_squarewave2_step ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dss_trianglewave,	DSS_TRIANGLEWAVE, 1 ,sizeof(struct dss_trianglewave_context),dss_trianglewave_reset,dss_trianglewave_step,NULL                  ,NULL                 ),
 	/* Component specific modules */
-	MOD_ENTRY( DSS_INVERTER_OSC ,"DSS_INVERTER_OSC" , 1 ,sizeof(struct dss_inverter_osc_context) ,dss_inverter_osc_reset ,dss_inverter_osc_step ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DSS_OP_AMP_OSC  ,"DSS_OP_AMP_OSC"  , 1 ,sizeof(struct dss_op_amp_osc_context)  ,dss_op_amp_osc_reset  ,dss_op_amp_osc_step  ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DSS_SCHMITT_OSC ,"DSS_SCHMITT_OSC" , 1 ,sizeof(struct dss_schmitt_osc_context) ,dss_schmitt_osc_reset ,dss_schmitt_osc_step ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dss_inverter_osc, DSS_INVERTER_OSC , 1 ,sizeof(struct dss_inverter_osc_context) ,dss_inverter_osc_reset ,dss_inverter_osc_step ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dss_op_amp_osc,	DSS_OP_AMP_OSC  , 1 ,sizeof(struct dss_op_amp_osc_context)  ,dss_op_amp_osc_reset  ,dss_op_amp_osc_step  ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dss_schmitt_osc,	DSS_SCHMITT_OSC , 1 ,sizeof(struct dss_schmitt_osc_context) ,dss_schmitt_osc_reset ,dss_schmitt_osc_step ,NULL                  ,NULL                 ),
 	/* Not yet implemented */
-	MOD_ENTRY( DSS_ADSR        ,"DSS_ADSR"        , 1 ,sizeof(struct dss_adsr_context)        ,dss_adsrenv_reset     ,dss_adsrenv_step     ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dss_adsrenv,		DSS_ADSR        , 1 ,sizeof(struct dss_adsr_context)        ,dss_adsrenv_reset     ,dss_adsrenv_step     ,NULL                  ,NULL                 ),
 
 	/* from disc_mth.c */
 	/* Generic modules */
-	MOD_ENTRY( DST_ADDER       ,"DST_ADDER"       , 1 ,0                                      ,NULL                  ,dst_adder_step       ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_CLAMP       ,"DST_CLAMP"       , 1 ,0                                      ,NULL                  ,dst_clamp_step       ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_DIVIDE      ,"DST_DIVIDE"      , 1 ,0                                      ,NULL                  ,dst_divide_step      ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_GAIN        ,"DST_GAIN"        , 1 ,0                                      ,NULL                  ,dst_gain_step        ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_LOGIC_INV   ,"DST_LOGIC_INV"   , 1 ,0                                      ,NULL                  ,dst_logic_inv_step   ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_BITS_DECODE ,"DST_BITS_DECODE" , 8 ,sizeof(struct dst_bits_decode_context) ,dst_bits_decode_reset ,dst_bits_decode_step ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_LOGIC_AND   ,"DST_LOGIC_AND"   , 1 ,0                                      ,NULL                  ,dst_logic_and_step   ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_LOGIC_NAND  ,"DST_LOGIC_NAND"  , 1 ,0                                      ,NULL                  ,dst_logic_nand_step  ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_LOGIC_OR    ,"DST_LOGIC_OR"    , 1 ,0                                      ,NULL                  ,dst_logic_or_step    ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_LOGIC_NOR   ,"DST_LOGIC_NOR"   , 1 ,0                                      ,NULL                  ,dst_logic_nor_step   ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_LOGIC_XOR   ,"DST_LOGIC_XOR"   , 1 ,0                                      ,NULL                  ,dst_logic_xor_step   ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_LOGIC_NXOR  ,"DST_LOGIC_NXOR"  , 1 ,0                                      ,NULL                  ,dst_logic_nxor_step  ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_LOGIC_DFF   ,"DST_LOGIC_DFF"   , 1 ,sizeof(struct dst_flipflop_context)    ,dst_logic_ff_reset    ,dst_logic_dff_step   ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_LOGIC_JKFF  ,"DST_LOGIC_JKFF"  , 1 ,sizeof(struct dst_flipflop_context)    ,dst_logic_ff_reset    ,dst_logic_jkff_step  ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_LOGIC_SHIFT ,"DST_LOGIC_SHIFT" , 1 ,sizeof(struct dst_shift_context)       ,dst_logic_shift_reset ,dst_logic_shift_step ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_LOOKUP_TABLE,"DST_LOOKUP_TABLE", 1 ,0                                      ,NULL                  ,dst_lookup_table_step,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_MULTIPLEX   ,"DST_MULTIPLEX"   , 1 ,sizeof(struct dst_size_context)        ,dst_multiplex_reset   ,dst_multiplex_step   ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_ONESHOT     ,"DST_ONESHOT"     , 1 ,sizeof(struct dst_oneshot_context)     ,dst_oneshot_reset     ,dst_oneshot_step     ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_RAMP        ,"DST_RAMP"        , 1 ,sizeof(struct dst_ramp_context)        ,dst_ramp_reset        ,dst_ramp_step        ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_SAMPHOLD    ,"DST_SAMPHOLD"    , 1 ,sizeof(struct dst_samphold_context)    ,dst_samphold_reset    ,dst_samphold_step    ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_SWITCH      ,"DST_SWITCH"      , 1 ,0                                      ,NULL                  ,dst_switch_step      ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_ASWITCH     ,"DST_ASWITCH"     , 1 ,0                                      ,NULL                  ,dst_aswitch_step     ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_TRANSFORM   ,"DST_TRANSFORM"   , 1 ,0                                      ,NULL                  ,dst_transform_step   ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_adder, 		DST_ADDER       , 1 ,0                                      ,NULL                  ,dst_adder_step       ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_clamp,		DST_CLAMP       , 1 ,0                                      ,NULL                  ,dst_clamp_step       ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_divide,		DST_DIVIDE      , 1 ,0                                      ,NULL                  ,dst_divide_step      ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_gain,			DST_GAIN        , 1 ,0                                      ,NULL                  ,dst_gain_step        ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_logic_inv,	DST_LOGIC_INV   , 1 ,0                                      ,NULL                  ,dst_logic_inv_step   ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_bits_decode,	DST_BITS_DECODE , 8 ,sizeof(struct dst_bits_decode_context) ,dst_bits_decode_reset ,dst_bits_decode_step ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_logic_and,	DST_LOGIC_AND   , 1 ,0                                      ,NULL                  ,dst_logic_and_step   ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_logic_nand,	DST_LOGIC_NAND  , 1 ,0                                      ,NULL                  ,dst_logic_nand_step  ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_logic_or,		DST_LOGIC_OR    , 1 ,0                                      ,NULL                  ,dst_logic_or_step    ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_logic_nor,	DST_LOGIC_NOR   , 1 ,0                                      ,NULL                  ,dst_logic_nor_step   ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_logic_xor,	DST_LOGIC_XOR   , 1 ,0                                      ,NULL                  ,dst_logic_xor_step   ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_logic_nxor,	DST_LOGIC_NXOR  , 1 ,0                                      ,NULL                  ,dst_logic_nxor_step  ,NULL                  ,NULL                 ),
+	MOD_ENTRY_LEG(				DST_LOGIC_DFF   , 1 ,sizeof(struct dst_flipflop_context)    ,dst_logic_ff_reset    ,dst_logic_dff_step   ,NULL                  ,NULL                 ),
+	MOD_ENTRY_LEG(				DST_LOGIC_JKFF  , 1 ,sizeof(struct dst_flipflop_context)    ,dst_logic_ff_reset    ,dst_logic_jkff_step  ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_logic_shift,	DST_LOGIC_SHIFT , 1 ,sizeof(struct dst_shift_context)       ,dst_logic_shift_reset ,dst_logic_shift_step ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_lookup_table, DST_LOOKUP_TABLE, 1 ,0                                      ,NULL                  ,dst_lookup_table_step,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_multiplex,	DST_MULTIPLEX   , 1 ,sizeof(struct dst_size_context)        ,dst_multiplex_reset   ,dst_multiplex_step   ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_oneshot,		DST_ONESHOT     , 1 ,sizeof(struct dst_oneshot_context)     ,dst_oneshot_reset     ,dst_oneshot_step     ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_ramp,			DST_RAMP        , 1 ,sizeof(struct dst_ramp_context)        ,dst_ramp_reset        ,dst_ramp_step        ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_samphold,		DST_SAMPHOLD    , 1 ,sizeof(struct dst_samphold_context)    ,dst_samphold_reset    ,dst_samphold_step    ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_switch,		DST_SWITCH      , 1 ,0                                      ,NULL                  ,dst_switch_step      ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_aswitch,		DST_ASWITCH     , 1 ,0                                      ,NULL                  ,dst_aswitch_step     ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_transform,	DST_TRANSFORM   , 1 ,0                                      ,NULL                  ,dst_transform_step   ,NULL                  ,NULL                 ),
 	/* Component specific */
-	MOD_ENTRY( DST_COMP_ADDER  ,"DST_COMP_ADDER"  , 1 ,sizeof(struct dst_comp_adder_context)  ,dst_comp_adder_reset  ,dst_comp_adder_step  ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_DAC_R1      ,"DST_DAC_R1"      , 1 ,sizeof(struct dst_dac_r1_context)      ,dst_dac_r1_reset      ,dst_dac_r1_step      ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_DIODE_MIX   ,"DST_DIODE_MIX"   , 1 ,sizeof(struct dst_diode_mix_context)   ,dst_diode_mix_reset   ,dst_diode_mix_step   ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_INTEGRATE   ,"DST_INTEGRATE"   , 1 ,sizeof(struct dst_integrate_context)   ,dst_integrate_reset   ,dst_integrate_step   ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_MIXER       ,"DST_MIXER"       , 1 ,sizeof(struct dst_mixer_context)       ,dst_mixer_reset       ,dst_mixer_step       ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_OP_AMP      ,"DST_OP_AMP"      , 1 ,sizeof(struct dst_op_amp_context)      ,dst_op_amp_reset      ,dst_op_amp_step      ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_OP_AMP_1SHT ,"DST_OP_AMP_1SHT" , 1 ,sizeof(struct dst_op_amp_1sht_context) ,dst_op_amp_1sht_reset ,dst_op_amp_1sht_step ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_TVCA_OP_AMP ,"DST_TVCA_OP_AMP" , 1 ,sizeof(struct dst_tvca_op_amp_context) ,dst_tvca_op_amp_reset ,dst_tvca_op_amp_step ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_VCA         ,"DST_VCA"         , 1 ,0                                      ,NULL                  ,NULL                 ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_XTIME_BUFFER,"DST_XTIME_BUFFER", 1 ,0                                      ,NULL                  ,dst_xtime_buffer_step,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_XTIME_AND   ,"DST_XTIME_AND"   , 1 ,0                                      ,NULL                  ,dst_xtime_and_step   ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_XTIME_OR    ,"DST_XTIME_OR"    , 1 ,0                                      ,NULL                  ,dst_xtime_or_step    ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_XTIME_XOR   ,"DST_XTIME_XOR"   , 1 ,0                                      ,NULL                  ,dst_xtime_xor_step   ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_comp_adder,	DST_COMP_ADDER  , 1 ,sizeof(struct dst_comp_adder_context)  ,dst_comp_adder_reset  ,dst_comp_adder_step  ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_dac_r1,		DST_DAC_R1      , 1 ,sizeof(struct dst_dac_r1_context)      ,dst_dac_r1_reset      ,dst_dac_r1_step      ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_diode_mix,	DST_DIODE_MIX   , 1 ,sizeof(struct dst_diode_mix_context)   ,dst_diode_mix_reset   ,dst_diode_mix_step   ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_integrate,	DST_INTEGRATE   , 1 ,sizeof(struct dst_integrate_context)   ,dst_integrate_reset   ,dst_integrate_step   ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_mixer,		DST_MIXER       , 1 ,sizeof(struct dst_mixer_context)       ,dst_mixer_reset       ,dst_mixer_step       ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_op_amp,		DST_OP_AMP      , 1 ,sizeof(struct dst_op_amp_context)      ,dst_op_amp_reset      ,dst_op_amp_step      ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_op_amp_1sht,	DST_OP_AMP_1SHT , 1 ,sizeof(struct dst_op_amp_1sht_context) ,dst_op_amp_1sht_reset ,dst_op_amp_1sht_step ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_tvca_op_amp,	DST_TVCA_OP_AMP , 1 ,sizeof(struct dst_tvca_op_amp_context) ,dst_tvca_op_amp_reset ,dst_tvca_op_amp_step ,NULL                  ,NULL                 ),
+	MOD_ENTRY_LEG(				DST_VCA         , 1 ,0                                      ,NULL                  ,NULL                 ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_xtime_buffer,	DST_XTIME_BUFFER, 1 ,0                                      ,NULL                  ,dst_xtime_buffer_step,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_xtime_and,	DST_XTIME_AND   , 1 ,0                                      ,NULL                  ,dst_xtime_and_step   ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_xtime_or,		DST_XTIME_OR    , 1 ,0                                      ,NULL                  ,dst_xtime_or_step    ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_xtime_xor,	DST_XTIME_XOR   , 1 ,0                                      ,NULL                  ,dst_xtime_xor_step   ,NULL                  ,NULL                 ),
 
 	/* from disc_flt.c */
 	/* Generic modules */
-	MOD_ENTRY( DST_FILTER1     ,"DST_FILTER1"     , 1 ,sizeof(struct dst_filter1_context)     ,dst_filter1_reset     ,dst_filter1_step     ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_FILTER2     ,"DST_FILTER2"     , 1 ,sizeof(struct dst_filter2_context)     ,dst_filter2_reset     ,dst_filter2_step     ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_filter1,		DST_FILTER1     , 1 ,sizeof(struct dst_filter1_context)     ,dst_filter1_reset     ,dst_filter1_step     ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_filter2,		DST_FILTER2     , 1 ,sizeof(struct dst_filter2_context)     ,dst_filter2_reset     ,dst_filter2_step     ,NULL                  ,NULL                 ),
 	/* Component specific modules */
-	MOD_ENTRY( DST_SALLEN_KEY  ,"DST_SALLEN_KEY"  , 1 ,sizeof(struct dst_filter2_context)     ,dst_sallen_key_reset  ,dst_sallen_key_step  ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_CRFILTER    ,"DST_CRFILTER"    , 1 ,sizeof(struct dst_rcfilter_context)    ,dst_crfilter_reset    ,dst_crfilter_step    ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_OP_AMP_FILT ,"DST_OP_AMP_FILT" , 1 ,sizeof(struct dst_op_amp_filt_context) ,dst_op_amp_filt_reset ,dst_op_amp_filt_step ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_RC_CIRCUIT_1,"DST_RC_CIRCUIT_1", 1 ,sizeof(struct dst_rc_circuit_1_context),dst_rc_circuit_1_reset,dst_rc_circuit_1_step,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_RCDISC      ,"DST_RCDISC"      , 1 ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc_reset      ,dst_rcdisc_step      ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_RCDISC2     ,"DST_RCDISC2"     , 1 ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc2_reset     ,dst_rcdisc2_step     ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_RCDISC3     ,"DST_RCDISC3"     , 1 ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc3_reset     ,dst_rcdisc3_step     ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_RCDISC4     ,"DST_RCDISC4"     , 1 ,sizeof(struct dst_rcdisc4_context)     ,dst_rcdisc4_reset     ,dst_rcdisc4_step     ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_RCDISC5     ,"DST_RCDISC5"     , 1 ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc5_reset     ,dst_rcdisc5_step     ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_RCINTEGRATE ,"DST_RCINTEGRATE" , 1 ,sizeof(struct dst_rcintegrate_context) ,dst_rcintegrate_reset ,dst_rcintegrate_step ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_RCDISC_MOD  ,"DST_RCDISC_MOD"  , 1 ,sizeof(struct dst_rcdisc_mod_context)  ,dst_rcdisc_mod_reset  ,dst_rcdisc_mod_step  ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_RCFILTER    ,"DST_RCFILTER"    , 1 ,sizeof(struct dst_rcfilter_context)    ,dst_rcfilter_reset    ,dst_rcfilter_step    ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_RCFILTER_SW ,"DST_RCFILTER_SW" , 1 ,sizeof(struct dst_rcfilter_sw_context) ,dst_rcfilter_sw_reset ,dst_rcfilter_sw_step ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_sallen_key,	DST_SALLEN_KEY  , 1 ,sizeof(struct dst_filter2_context)     ,dst_sallen_key_reset  ,dst_sallen_key_step  ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_crfilter,		DST_CRFILTER    , 1 ,sizeof(struct dst_rcfilter_context)    ,dst_crfilter_reset    ,dst_crfilter_step    ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_op_amp_filt,	DST_OP_AMP_FILT , 1 ,sizeof(struct dst_op_amp_filt_context) ,dst_op_amp_filt_reset ,dst_op_amp_filt_step ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_rc_circuit_1,	DST_RC_CIRCUIT_1, 1 ,sizeof(struct dst_rc_circuit_1_context),dst_rc_circuit_1_reset,dst_rc_circuit_1_step,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_rcdisc,		DST_RCDISC      , 1 ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc_reset      ,dst_rcdisc_step      ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_rcdisc2,		DST_RCDISC2     , 1 ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc2_reset     ,dst_rcdisc2_step     ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_rcdisc3,		DST_RCDISC3     , 1 ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc3_reset     ,dst_rcdisc3_step     ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_rcdisc4,		DST_RCDISC4     , 1 ,sizeof(struct dst_rcdisc4_context)     ,dst_rcdisc4_reset     ,dst_rcdisc4_step     ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_rcdisc5,		DST_RCDISC5     , 1 ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc5_reset     ,dst_rcdisc5_step     ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_rcintegrate,	DST_RCINTEGRATE , 1 ,sizeof(struct dst_rcintegrate_context) ,dst_rcintegrate_reset ,dst_rcintegrate_step ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_rcdisc_mod,	DST_RCDISC_MOD  , 1 ,sizeof(struct dst_rcdisc_mod_context)  ,dst_rcdisc_mod_reset  ,dst_rcdisc_mod_step  ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_rcfilter,		DST_RCFILTER    , 1 ,sizeof(struct dst_rcfilter_context)    ,dst_rcfilter_reset    ,dst_rcfilter_step    ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dst_rcfilter_sw,	 DST_RCFILTER_SW , 1 ,sizeof(struct dst_rcfilter_sw_context) ,dst_rcfilter_sw_reset ,dst_rcfilter_sw_step ,NULL                  ,NULL                 ),
 	/* For testing - seem to be buggered.  Use versions not ending in N. */
-	MOD_ENTRY( DST_RCFILTERN   ,"DST_RCFILTERN"   , 1 ,sizeof(struct dst_filter1_context)     ,dst_rcfilterN_reset   ,dst_filter1_step     ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_RCDISCN     ,"DST_RCDISCN"     , 1 ,sizeof(struct dst_filter1_context)     ,dst_rcdiscN_reset     ,dst_rcdiscN_step     ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DST_RCDISC2N    ,"DST_RCDISC2N"    , 1 ,sizeof(struct dst_rcdisc2_context)     ,dst_rcdisc2N_reset    ,dst_rcdisc2N_step    ,NULL                  ,NULL                 ),
+	MOD_ENTRY_LEG(				DST_RCFILTERN   , 1 ,sizeof(struct dst_filter1_context)     ,dst_rcfilterN_reset   ,dst_filter1_step     ,NULL                  ,NULL                 ),
+	MOD_ENTRY_LEG(				DST_RCDISCN     , 1 ,sizeof(struct dst_filter1_context)     ,dst_rcdiscN_reset     ,dst_rcdiscN_step     ,NULL                  ,NULL                 ),
+	MOD_ENTRY_LEG(				DST_RCDISC2N    , 1 ,sizeof(struct dst_rcdisc2_context)     ,dst_rcdisc2N_reset    ,dst_rcdisc2N_step    ,NULL                  ,NULL                 ),
 
 	/* from disc_dev.c */
 	/* generic modules */
-	MOD_ENTRY( DST_CUSTOM      ,"DST_CUSTOM"      , 8 ,0                                      ,NULL                  ,NULL                 ,NULL                  ,NULL                 ),
+	MOD_ENTRY_LEG(				DST_CUSTOM      , 8 ,0                                      ,NULL                  ,NULL                 ,NULL                  ,NULL                 ),
 	/* Component specific modules */
-	MOD_ENTRY( DSD_555_ASTBL   ,"DSD_555_ASTBL"   , 1 ,sizeof(struct dsd_555_astbl_context)   ,dsd_555_astbl_reset   ,dsd_555_astbl_step   ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DSD_555_MSTBL   ,"DSD_555_MSTBL"   , 1 ,sizeof(struct dsd_555_mstbl_context)   ,dsd_555_mstbl_reset   ,dsd_555_mstbl_step   ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DSD_555_CC      ,"DSD_555_CC"      , 1 ,sizeof(struct dsd_555_cc_context)      ,dsd_555_cc_reset      ,dsd_555_cc_step      ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DSD_555_VCO1    ,"DSD_555_VCO1"    , 1 ,sizeof(struct dsd_555_vco1_context)    ,dsd_555_vco1_reset    ,dsd_555_vco1_step    ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DSD_566         ,"DSD_566"         , 1 ,sizeof(struct dsd_566_context)         ,dsd_566_reset         ,dsd_566_step         ,NULL                  ,NULL                 ),
-	MOD_ENTRY( DSD_LS624       ,"DSD_LS624"       , 1 ,sizeof(struct dsd_ls624_context)       ,dsd_ls624_reset       ,dsd_ls624_step       ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dsd_555_astbl,	DSD_555_ASTBL   , 1 ,sizeof(struct dsd_555_astbl_context)   ,dsd_555_astbl_reset   ,dsd_555_astbl_step   ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dsd_555_mstbl,	DSD_555_MSTBL   , 1 ,sizeof(struct dsd_555_mstbl_context)   ,dsd_555_mstbl_reset   ,dsd_555_mstbl_step   ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dsd_555_cc,		DSD_555_CC      , 1 ,sizeof(struct dsd_555_cc_context)      ,dsd_555_cc_reset      ,dsd_555_cc_step      ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dsd_555_vco1,		DSD_555_VCO1    , 1 ,sizeof(struct dsd_555_vco1_context)    ,dsd_555_vco1_reset    ,dsd_555_vco1_step    ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dsd_566,			DSD_566         , 1 ,sizeof(struct dsd_566_context)         ,dsd_566_reset         ,dsd_566_step         ,NULL                  ,NULL                 ),
+	MOD_ENTRY(dsd_ls624,		DSD_LS624       , 1 ,sizeof(struct dsd_ls624_context)       ,dsd_ls624_reset       ,dsd_ls624_step       ,NULL                  ,NULL                 ),
 	/* must be the last one */
-	MOD_ENTRY( DSS_NULL        ,"DSS_NULL"        , 0 ,0                                      ,NULL                  ,NULL                 ,NULL                  ,NULL                 )
+	MOD_ENTRY_LEG(				DSS_NULL        , 0 ,0                                      ,NULL                  ,NULL                 ,NULL                  ,NULL                 )
 };
 
 INLINE void step_nodes_in_list(node_list_t &list)
