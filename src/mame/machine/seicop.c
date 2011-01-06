@@ -1355,6 +1355,7 @@ Various other ports go through the COP area, and get mapped to inputs / sounds /
 the confusion and makes it less clear what is / isn't protection related
 
 =================================================================================================================
+Seibu COP memory map
 
 DMA mode partial documentation:
 0x476
@@ -1389,6 +1390,10 @@ xxxx xxxx xxxx xxxx DST address register, val << 6
 
 0x6fc
 ???? ???? ???? ???? triggers DMA loaded in registers, value looks meaningless
+
+Miscellaneous registers:
+0x470
+???? ???? ???? ???? External pin register, used by some games for prg/gfx banking (per-game specific)
 
 */
 
@@ -2209,9 +2214,6 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x05a/2): pal_brightness_val = data & 0xff; break;
 		case (0x05c/2): pal_brightness_mode = data & 0xff; break;
 
-		case (0x280/2):
-			break;
-
 		/* DMA / layer clearing */
 
 		/* used in palette DMAs, for fading effects */
@@ -2255,8 +2257,8 @@ static WRITE16_HANDLER( generic_cop_w )
 
 		case (0x044/2):
 		{
-			/*TODO: this appears to control sine cosine maths, but all games here doesn't seem to like current implementation ... */
-			cop_scale = 2;
+			/*TODO: this appears to control trigonometry maths, but all games here doesn't seem to like current implementation ... */
+			cop_scale = 1;
 			if(data == 4)
 				cop_scale = 0;
 			break;
@@ -2850,31 +2852,32 @@ static WRITE16_HANDLER( generic_cop_w )
 
 READ16_HANDLER( heatbrl_mcu_r )
 {
-	switch (offset)
+	if(offset >= 0x3c0/2 && offset <= 0x3df/2)
+		return seibu_main_word_r(space,(offset >> 1) & 7,0xffff);
+
+	if(offset >= 0x340/2 && offset <= 0x34f/2)
 	{
-		default:
-			return generic_cop_r(space, offset, mem_mask);
+		static const char *const portnames[] = { "DSW1", "PLAYERS12", "PLAYERS34", "SYSTEM" };
 
-		/*********************************************************************
-        700-7ff - Non-protection reads
-        *********************************************************************/
-
-		/* Seibu Sound System */
-		case (0x3c8/2):	return seibu_main_word_r(space,2,0xffff);
-		case (0x3cc/2):	return seibu_main_word_r(space,3,0xffff);
-		case (0x3d4/2): return seibu_main_word_r(space,5,0xffff);
-
-		/* Inputs */
-		case (0x340/2): return input_port_read(space->machine, "DSW1");
-		case (0x344/2):	return input_port_read(space->machine, "PLAYERS12");
-		case (0x348/2): return input_port_read(space->machine, "PLAYERS34");
-		case (0x34c/2): return input_port_read(space->machine, "SYSTEM");
+		return input_port_read(space->machine, portnames[(offset >> 1) & 3]);
 	}
+
+	return generic_cop_r(space, offset, mem_mask);
 }
 
 WRITE16_HANDLER( heatbrl_mcu_w )
 {
 	COMBINE_DATA(&cop_mcu_ram[offset]);
+
+	/* external pin register, used for banking */
+	if(offset == 0x070/2)
+	{
+		heatbrl_setgfxbank( cop_mcu_ram[offset] );
+		return;
+	}
+
+	if(offset == 0x200/2) //irq ack / sprite buffering?
+		return;
 
 	if(offset >= 0x240/2 && offset <= 0x28f/2)
 	{
@@ -2882,28 +2885,14 @@ WRITE16_HANDLER( heatbrl_mcu_w )
 		return;
 	}
 
-	switch (offset)
+	if(offset >= 0x3c0/2 && offset <= 0x3df/2)
 	{
-		default:
-			generic_cop_w(space, offset, data, mem_mask);
-			break;
-
-		/*********************************************************************
-        400-5ff -  Protection writes
-        *********************************************************************/
-
-		/* Odd, this is a video register */
-		case (0x070/2): { heatbrl_setgfxbank( cop_mcu_ram[offset] ); break; }
-
-		/*********************************************************************
-        700-7ff - Output (Seibu Sound System)
-        *********************************************************************/
-
-		case (0x3c0/2):	{ seibu_main_word_w(space,0,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x3c4/2):	{ seibu_main_word_w(space,1,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x3d0/2):	{ seibu_main_word_w(space,4,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x3d8/2):	{ seibu_main_word_w(space,6,cop_mcu_ram[offset],0x00ff); break; }
+		seibu_main_word_w(space,(offset >> 1) & 7,cop_mcu_ram[offset],0x00ff);
+		return;
 	}
+
+	generic_cop_w(space, offset, data, mem_mask);
+
 }
 
 
@@ -2913,32 +2902,30 @@ WRITE16_HANDLER( heatbrl_mcu_w )
 
 READ16_HANDLER( cupsoc_mcu_r )
 {
-	switch (offset)
+	if(offset >= 0x300/2 && offset <= 0x31f/2)
+		return seibu_main_word_r(space,(offset >> 1) & 7,0xffff);
+
+	if(offset >= 0x340/2 && offset <= 0x34f/2)
 	{
-		default:
-			return generic_cop_r(space, offset, mem_mask);
+		static const char *const portnames[] = { "DSW1", "PLAYERS12", "PLAYERS34", "SYSTEM" };
 
-		//case (0x07e/2):
-		//case (0x1b0/2):
-		//case (0x1b4/2):
-		//  return cop_mcu_ram[offset];
-
-		case (0x340/2): return input_port_read(space->machine, "DSW1");
-		case (0x344/2): return input_port_read(space->machine, "PLAYERS12");
-		case (0x348/2): return input_port_read(space->machine, "PLAYERS34");
-		case (0x34c/2): return input_port_read(space->machine, "SYSTEM");
-		case (0x354/2): return 0xffff;
-		case (0x35c/2): return input_port_read(space->machine, "DSW2");
-
-		case (0x308/2):	return seibu_main_word_r(space,2,0xffff);
-		case (0x30c/2): return seibu_main_word_r(space,3,0xffff);
-		case (0x314/2): return seibu_main_word_r(space,5,0xffff);
+		return input_port_read(space->machine, portnames[(offset >> 1) & 3]);
 	}
+
+	if(offset == 0x35c/2)
+	{
+		return input_port_read(space->machine, "DSW2");
+	}
+
+	return generic_cop_r(space, offset, mem_mask);
 }
 
 WRITE16_HANDLER( cupsoc_mcu_w )
 {
 	COMBINE_DATA(&cop_mcu_ram[offset]);
+
+	if(offset == 0x280/2) //irq ack / sprite buffering?
+		return;
 
 	if(offset >= 0x200/2 && offset <= 0x24f/2)
 	{
@@ -2946,51 +2933,41 @@ WRITE16_HANDLER( cupsoc_mcu_w )
 		return;
 	}
 
-	switch (offset)
+	if(offset >= 0x300/2 && offset <= 0x31f/2)
 	{
-		default:
-			generic_cop_w(space, offset, data, mem_mask);
-			break;
-
-		/*********************************************************************
-        400-5ff -  Protection writes
-        *********************************************************************/
-
-		case (0x300/2):	{ seibu_main_word_w(space,0,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x304/2):	{ seibu_main_word_w(space,1,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x310/2):	{ seibu_main_word_w(space,4,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x318/2):	{ seibu_main_word_w(space,6,cop_mcu_ram[offset],0x00ff); break; }
+		seibu_main_word_w(space,(offset >> 1) & 7,cop_mcu_ram[offset],0x00ff);
+		return;
 	}
+
+	generic_cop_w(space, offset, data, mem_mask);
 }
 
 READ16_HANDLER( cupsocs_mcu_r )
 {
-	switch (offset)
+	if(offset >= 0x340/2 && offset <= 0x35f/2)
+		return seibu_main_word_r(space,(offset >> 1) & 7,0xffff);
+
+	if(offset >= 0x300/2 && offset <= 0x30f/2)
 	{
-		default:
-			return generic_cop_r(space, offset, mem_mask);
+		static const char *const portnames[] = { "DSW1", "PLAYERS12", "PLAYERS34", "SYSTEM" };
 
-		//case (0x07e/2):
-		//case (0x1b0/2):
-		//case (0x1b4/2):
-		//  return cop_mcu_ram[offset];
-
-		case (0x300/2): return input_port_read(space->machine, "DSW1");
-		case (0x304/2): return input_port_read(space->machine, "PLAYERS12");
-		case (0x308/2): return input_port_read(space->machine, "PLAYERS34");
-		case (0x30c/2): return input_port_read(space->machine, "SYSTEM");
-		case (0x314/2): return 0xffff;
-		case (0x31c/2): return input_port_read(space->machine, "DSW2");
-
-		case (0x348/2):	return seibu_main_word_r(space,2,0xffff);
-		case (0x34c/2): return seibu_main_word_r(space,3,0xffff);
-		case (0x354/2): return seibu_main_word_r(space,5,0xffff);
+		return input_port_read(space->machine, portnames[(offset >> 1) & 3]);
 	}
+
+	if(offset == 0x31c/2)
+	{
+		return input_port_read(space->machine, "DSW2");
+	}
+
+	return generic_cop_r(space, offset, mem_mask);
 }
 
 WRITE16_HANDLER( cupsocs_mcu_w )
 {
 	COMBINE_DATA(&cop_mcu_ram[offset]);
+
+	if(offset == 0x280/2) //irq ack / sprite buffering?
+		return;
 
 	if(offset >= 0x240/2 && offset <= 0x27f/2)
 	{
@@ -2998,28 +2975,19 @@ WRITE16_HANDLER( cupsocs_mcu_w )
 		return;
 	}
 
-
 	if(offset >= 0x200/2 && offset <= 0x20f/2)
 	{
 		seibu_common_video_regs_w(space,(offset-0x200/2)+(0x40/2),cop_mcu_ram[offset],mem_mask);
 		return;
 	}
 
-	switch (offset)
+	if(offset >= 0x340/2 && offset <= 0x35f/2)
 	{
-		default:
-			generic_cop_w(space, offset, data, mem_mask);
-			break;
-
-		/*********************************************************************
-        400-5ff -  Protection writes
-        *********************************************************************/
-
-		case (0x340/2):	{ seibu_main_word_w(space,0,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x344/2):	{ seibu_main_word_w(space,1,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x350/2):	{ seibu_main_word_w(space,4,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x358/2):	{ seibu_main_word_w(space,6,cop_mcu_ram[offset],0x00ff); break; }
+		seibu_main_word_w(space,(offset >> 1) & 7,cop_mcu_ram[offset],0x00ff);
+		return;
 	}
+
+	generic_cop_w(space, offset, data, mem_mask);
 }
 
 /**********************************************************************************************
@@ -3028,27 +2996,31 @@ WRITE16_HANDLER( cupsocs_mcu_w )
 
 READ16_HANDLER( godzilla_mcu_r )
 {
-	switch (offset)
+	if(offset >= 0x300/2 && offset <= 0x31f/2)
+		return seibu_main_word_r(space,(offset >> 1) & 7,0xffff);
+
+	if(offset >= 0x340/2 && offset <= 0x34f/2)
 	{
-		default:
-			return generic_cop_r(space, offset, mem_mask);
+		static const char *const portnames[] = { "DSW1", "PLAYERS12", "PLAYERS34", "SYSTEM" };
 
-		/* Non-protection reads */
-		case (0x308/2):	return seibu_main_word_r(space,2,0xffff);
-		case (0x30c/2):	return seibu_main_word_r(space,3,0xffff);
-		case (0x314/2):	return seibu_main_word_r(space,5,0xffff);
-
-		/* Inputs */
-		case (0x340/2): return input_port_read(space->machine, "DSW1");
-		case (0x344/2): return input_port_read(space->machine, "PLAYERS12");
-		case (0x348/2): return input_port_read(space->machine, "PLAYERS34");
-		case (0x34c/2): return input_port_read(space->machine, "SYSTEM");
+		return input_port_read(space->machine, portnames[(offset >> 1) & 3]);
 	}
+
+	return generic_cop_r(space, offset, mem_mask);
 }
 
 WRITE16_HANDLER( godzilla_mcu_w )
 {
 	COMBINE_DATA(&cop_mcu_ram[offset]);
+
+	if(offset == 0x070/2)
+	{
+		denjinmk_setgfxbank(cop_mcu_ram[offset]);
+		return;
+	}
+
+	if(offset == 0x280/2) //irq ack / sprite buffering?
+		return;
 
 	if(offset >= 0x200/2 && offset <= 0x24f/2)
 	{
@@ -3056,20 +3028,13 @@ WRITE16_HANDLER( godzilla_mcu_w )
 		return;
 	}
 
-	switch (offset)
+	if(offset >= 0x300/2 && offset <= 0x31f/2)
 	{
-		default:
-			generic_cop_w(space, offset, data, mem_mask);
-			break;
-
-		case (0x070/2): { denjinmk_setgfxbank(cop_mcu_ram[offset]); break; }
-
-
-		case (0x300/2):	{ seibu_main_word_w(space,0,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x304/2):	{ seibu_main_word_w(space,1,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x310/2):	{ seibu_main_word_w(space,4,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x318/2):	{ seibu_main_word_w(space,6,cop_mcu_ram[offset],0x00ff); break; }
+		seibu_main_word_w(space,(offset >> 1) & 7,cop_mcu_ram[offset],0x00ff);
+		return;
 	}
+
+	generic_cop_w(space, offset, data, mem_mask);
 }
 
 /**********************************************************************************************
@@ -3078,29 +3043,36 @@ WRITE16_HANDLER( godzilla_mcu_w )
 
 READ16_HANDLER( denjinmk_mcu_r )
 {
-	switch (offset)
+	if(offset >= 0x300/2 && offset <= 0x31f/2)
+		return seibu_main_word_r(space,(offset >> 1) & 7,0xffff);
+
+	if(offset >= 0x340/2 && offset <= 0x34f/2)
 	{
-		default:
-			return generic_cop_r(space, offset, mem_mask);
+		static const char *const portnames[] = { "DSW1", "PLAYERS12", "PLAYERS34", "SYSTEM" };
 
-		/* Non-protection reads */
-
-		case (0x308/2):	return seibu_main_word_r(space,2,0xffff);
-		case (0x30c/2):	return seibu_main_word_r(space,3,0xffff);
-		case (0x314/2): return seibu_main_word_r(space,5,0xffff);
-
-		/* Inputs */
-		case (0x340/2): return input_port_read(space->machine, "DSW1");
-		case (0x344/2):	return input_port_read(space->machine, "PLAYERS12");
-		case (0x348/2): return input_port_read(space->machine, "PLAYERS34");
-		case (0x34c/2): return input_port_read(space->machine, "SYSTEM");
-		case (0x35c/2): return input_port_read(space->machine, "DSW2");
+		return input_port_read(space->machine, portnames[(offset >> 1) & 3]);
 	}
+
+	if(offset == 0x35c/2)
+	{
+		return input_port_read(space->machine, "DSW2");
+	}
+
+	return generic_cop_r(space, offset, mem_mask);
 }
 
 WRITE16_HANDLER( denjinmk_mcu_w )
 {
 	COMBINE_DATA(&cop_mcu_ram[offset]);
+
+	if(offset == 0x280/2) //irq ack / sprite buffering?
+		return;
+
+	if(offset == 0x070/2)
+	{
+		denjinmk_setgfxbank(cop_mcu_ram[offset]);
+		return;
+	}
 
 	if(offset >= 0x200/2 && offset <= 0x24f/2)
 	{
@@ -3108,46 +3080,37 @@ WRITE16_HANDLER( denjinmk_mcu_w )
 		return;
 	}
 
-	switch (offset)
+	if(offset >= 0x300/2 && offset <= 0x31f/2)
 	{
-		default:
-			generic_cop_w(space, offset, data, mem_mask);
-			break;
-
-		case (0x070/2): { denjinmk_setgfxbank(cop_mcu_ram[offset]); break; }
-
-		case (0x300/2):	{ seibu_main_word_w(space,0,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x304/2):	{ seibu_main_word_w(space,1,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x310/2):	{ seibu_main_word_w(space,4,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x318/2):	{ seibu_main_word_w(space,6,cop_mcu_ram[offset],0x00ff); break; }
-
+		seibu_main_word_w(space,(offset >> 1) & 7,cop_mcu_ram[offset],0x00ff);
+		return;
 	}
+
+	generic_cop_w(space, offset, data, mem_mask);
 }
 
 /**********************************************************************************************
-  SD Gundam Rainbow Trout
+  SD Gundam Sangokushi Rainbow Tairiku Senki
 **********************************************************************************************/
 
 READ16_HANDLER( grainbow_mcu_r )
 {
-	switch (offset)
+	if(offset >= 0x300/2 && offset <= 0x31f/2)
+		return seibu_main_word_r(space,(offset >> 1) & 7,0xffff);
+
+	if(offset >= 0x340/2 && offset <= 0x34f/2)
 	{
-		default:
-			return generic_cop_r(space, offset, mem_mask);
+		static const char *const portnames[] = { "DSW1", "PLAYERS12", "PLAYERS34", "SYSTEM" };
 
-
-		/* Non-protection reads */
-		case (0x308/2): return seibu_main_word_r(space,2,0xffff);
-		case (0x30c/2): return seibu_main_word_r(space,3,0xffff);
-		case (0x314/2): return seibu_main_word_r(space,5,0xffff);
-
-		/* Inputs */
-		case (0x340/2): return input_port_read(space->machine, "DSW1");
-		case (0x344/2):	return input_port_read(space->machine, "PLAYERS12");
-		case (0x348/2): return input_port_read(space->machine, "PLAYERS34");
-		case (0x34c/2): return input_port_read(space->machine, "SYSTEM");
-		case (0x35c/2): return input_port_read(space->machine, "DSW2");
+		return input_port_read(space->machine, portnames[(offset >> 1) & 3]);
 	}
+
+	if(offset == 0x35c/2)
+	{
+		return input_port_read(space->machine, "DSW2");
+	}
+
+	return generic_cop_r(space, offset, mem_mask);
 }
 
 
@@ -3155,23 +3118,22 @@ WRITE16_HANDLER( grainbow_mcu_w )
 {
 	COMBINE_DATA(&cop_mcu_ram[offset]);
 
+	if(offset == 0x280/2) //irq ack / sprite buffering?
+		return;
+
 	if(offset >= 0x200/2 && offset <= 0x24f/2)
 	{
 		seibu_common_video_regs_w(space,offset-0x200/2,cop_mcu_ram[offset],mem_mask);
 		return;
 	}
 
-	switch (offset)
+	if(offset >= 0x300/2 && offset <= 0x31f/2)
 	{
-		default:
-			generic_cop_w(space, offset, data, mem_mask);
-			break;
-
-		case (0x300/2):	{ seibu_main_word_w(space,0,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x304/2):	{ seibu_main_word_w(space,1,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x310/2):	{ seibu_main_word_w(space,4,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x318/2):	{ seibu_main_word_w(space,6,cop_mcu_ram[offset],0x00ff); break; }
+		seibu_main_word_w(space,(offset >> 1) & 7,cop_mcu_ram[offset],0x00ff);
+		return;
 	}
+
+	generic_cop_w(space, offset, data, mem_mask);
 }
 
 /**********************************************************************************************
@@ -3181,37 +3143,28 @@ WRITE16_HANDLER( grainbow_mcu_w )
 
 READ16_HANDLER( legionna_mcu_r )
 {
-	switch (offset)
+	if(offset >= 0x300/2 && offset <= 0x31f/2)
+		return seibu_main_word_r(space,(offset >> 1) & 7,0xffff);
+
+	if(offset >= 0x340/2 && offset <= 0x34f/2)
 	{
-		default:
-			return generic_cop_r(space, offset, mem_mask);
+		static const char *const portnames[] = { "DSW1", "PLAYERS12", "UNK", "SYSTEM" };
 
-		/*********************************************************************
-        400-5ff -  Protection reads
-        *********************************************************************/
-
-		/*********************************************************************
-        700-7ff - Non-protection reads
-        *********************************************************************/
-
-		/* Seibu Sound System */
-		case (0x308/2):	return seibu_main_word_r(space,2,0xffff);
-		case (0x30c/2):	return seibu_main_word_r(space,3,0xffff);
-		case (0x314/2): return seibu_main_word_r(space,5,0xffff);
-
-		/* Inputs */
-		case (0x340/2): return input_port_read(space->machine, "DSW1");
-		case (0x344/2):	return input_port_read(space->machine, "PLAYERS12");
-		case (0x348/2):	return input_port_read(space->machine, "COIN");
-		case (0x34c/2):	return input_port_read(space->machine, "SYSTEM");
-
+		return input_port_read(space->machine, portnames[(offset >> 1) & 3]);
 	}
-}
 
+	return generic_cop_r(space, offset, mem_mask);
+}
 
 WRITE16_HANDLER( legionna_mcu_w )
 {
 	COMBINE_DATA(&cop_mcu_ram[offset]);
+
+	if(offset == 0x070/2) //external pin: puts bit 13 high, delay, reads 0x748, writes bit 13 low
+		return;
+
+	if(offset == 0x280/2) //irq ack / sprite buffering?
+		return;
 
 	if(offset >= 0x200/2 && offset <= 0x24f/2)
 	{
@@ -3219,20 +3172,12 @@ WRITE16_HANDLER( legionna_mcu_w )
 		return;
 	}
 
-	switch (offset)
+	if(offset >= 0x300/2 && offset <= 0x31f/2)
 	{
-		default:
-			generic_cop_w(space, offset, data, mem_mask);
-			break;
-
-		/*********************************************************************
-        700-7ff - Output (Seibu Sound System)
-        *********************************************************************/
-
-		case (0x300/2):	{ seibu_main_word_w(space,0,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x304/2):	{ seibu_main_word_w(space,1,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x310/2):	{ seibu_main_word_w(space,4,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x318/2):	{ seibu_main_word_w(space,6,cop_mcu_ram[offset],0x00ff); break; }
+		seibu_main_word_w(space,(offset >> 1) & 7,cop_mcu_ram[offset],0x00ff);
+		return;
 	}
+
+	generic_cop_w(space, offset, data, mem_mask);
 }
 
