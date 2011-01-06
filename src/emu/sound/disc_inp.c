@@ -242,7 +242,7 @@ DISCRETE_START(dss_input_stream)
 {
 	DISCRETE_DECLARE_CONTEXT(dss_input)
 
-	assert(DSS_INPUT_STREAM__STREAM < node->info->m_input_list.count());
+	assert(DSS_INPUT_STREAM__STREAM < node->device->m_input_list.count());
 
 	context->is_stream = TRUE;
 	/* Stream out number is set during start */
@@ -250,7 +250,6 @@ DISCRETE_START(dss_input_stream)
 	context->gain = DSS_INPUT_STREAM__GAIN;
 	context->offset = DSS_INPUT_STREAM__OFFSET;
 	context->ptr = NULL;
-	//context->data = 0;
 
 	if (node->module->type == DSS_INPUT_BUFFER)
 	{
