@@ -1,6 +1,6 @@
 /*********************************************************************
 
-    Code to interface the MESS image code with MAME's CHD-CD core.
+    Code to interface the image code with CHD-CD core.
 
     Based on harddriv.c by Raphael Nabet 2003
 
@@ -52,11 +52,11 @@ static const char *chd_get_error_string(int chderr)
 }
 
 
-static OPTION_GUIDE_START(mess_cd_option_guide)
+static OPTION_GUIDE_START(cd_option_guide)
 	OPTION_INT('K', "hunksize",			"Hunk Bytes")
 OPTION_GUIDE_END
 
-static const char mess_cd_option_spec[] =
+static const char cd_option_spec[] =
 	"K512/1024/2048/[4096]";
 
 
@@ -112,12 +112,12 @@ static DEVICE_IMAGE_UNLOAD(cdrom)
 
 /*************************************
  *
- *  Get the MESS/MAME cdrom handle (from the src/cdrom.c core)
- *  after an image has been opened with the mess_cd core
+ *  Get the cdrom handle (from the src/cdrom.c core)
+ *  after an image has been opened with the cd core
  *
  *************************************/
 
-cdrom_file *mess_cd_get_cdrom_file(device_t *image)
+cdrom_file *cd_get_cdrom_file(device_t *image)
 {
 	dev_cdrom_t	*cdrom = get_safe_token( image );
 
@@ -166,8 +166,8 @@ DEVICE_GET_INFO(cdrom)
 		case DEVINFO_FCT_IMAGE_LOAD:				info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(cdrom); break;
 		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(cdrom); break;
 		case DEVINFO_FCT_IMAGE_SOFTLIST_LOAD:		info->f = (genf *) DEVICE_IMAGE_SOFTLIST_LOAD_NAME(cdrom);	break;
-		case DEVINFO_PTR_IMAGE_CREATE_OPTGUIDE:		info->p = (void *) mess_cd_option_guide; break;
-		case DEVINFO_PTR_IMAGE_CREATE_OPTSPEC+0:	info->p = (void *) mess_cd_option_spec; break;
+		case DEVINFO_PTR_IMAGE_CREATE_OPTGUIDE:		info->p = (void *) cd_option_guide; break;
+		case DEVINFO_PTR_IMAGE_CREATE_OPTSPEC+0:	info->p = (void *) cd_option_spec; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:						strcpy(info->s, "Cdrom"); break;
@@ -175,7 +175,7 @@ DEVICE_GET_INFO(cdrom)
 		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__); break;
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:		strcpy(info->s, "chd"); break;
 		case DEVINFO_STR_IMAGE_CREATE_OPTNAME+0:	strcpy(info->s, "chdcd"); break;
-		case DEVINFO_STR_IMAGE_CREATE_OPTDESC+0:	strcpy(info->s, "MAME/MESS CHD CD-ROM drive"); break;
+		case DEVINFO_STR_IMAGE_CREATE_OPTDESC+0:	strcpy(info->s, "CHD CD-ROM drive"); break;
 		case DEVINFO_STR_IMAGE_CREATE_OPTEXTS+0:	strcpy(info->s, "chd"); break;
 
 		case DEVINFO_STR_IMAGE_INTERFACE:

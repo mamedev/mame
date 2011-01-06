@@ -2,7 +2,7 @@
 
     cassette.c
 
-    MESS interface to the cassette image abstraction code
+    Interface to the cassette image abstraction code
 
 *********************************************************************/
 

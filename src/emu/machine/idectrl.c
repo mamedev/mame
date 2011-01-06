@@ -1914,11 +1914,11 @@ static DEVICE_RESET( ide_controller )
 #ifdef MESS
 	if (!ide->disk)
 	{
-		ide->handle = mess_hd_get_chd_file( device->machine->device( "harddisk" ) );	// should be config->master
+		ide->handle = hd_get_chd_file( device->machine->device( "harddisk" ) );	// should be config->master
 
 		if (ide->handle)
 		{
-			ide->disk = mess_hd_get_hard_disk_file( device->machine->device( "harddisk" ) );	// should be config->master
+			ide->disk = hd_get_hard_disk_file( device->machine->device( "harddisk" ) );	// should be config->master
 
 			if (ide->disk != NULL)
 			{

@@ -1,9 +1,9 @@
 /*********************************************************************
 
-    Code to interface the MESS image code with MAME's harddisk core.
+    Code to interface the image code with harddisk core.
 
     We do not support diff files as it will involve some changes in
-    the MESS image code.  Additionally, the need for diff files comes
+    the image code.  Additionally, the need for diff files comes
     from MAME's need for "cannonical" hard drive images.
 
     Raphael Nabet 2003
@@ -55,7 +55,7 @@ static const char *chd_get_error_string(int chderr)
 
 
 
-static OPTION_GUIDE_START(mess_hd_option_guide)
+static OPTION_GUIDE_START(hd_option_guide)
 	OPTION_INT('C', "cylinders",		"Cylinders")
 	OPTION_INT('H', "heads",			"Heads")
 	OPTION_INT('S', "sectors",			"Sectors")
@@ -63,7 +63,7 @@ static OPTION_GUIDE_START(mess_hd_option_guide)
 	OPTION_INT('K', "hunksize",			"Hunk Bytes")
 OPTION_GUIDE_END
 
-static const char *mess_hd_option_spec =
+static const char *hd_option_spec =
 	"C1-[512]-1024;H1/2/[4]/8;S1-[16]-64;L128/256/[512]/1024;K512/1024/2048/[4096]";
 
 
@@ -87,14 +87,14 @@ INLINE dev_harddisk_t *get_safe_token(device_t *device)
 
 /*************************************
  *
- *  DEVICE_IMAGE_LOAD(mess_hd)
- *  DEVICE_IMAGE_CREATE(mess_hd)
+ *  DEVICE_IMAGE_LOAD(hd)
+ *  DEVICE_IMAGE_CREATE(hd)
  *
  *  Device load and create
  *
  *************************************/
 
-static int internal_load_mess_hd(device_image_interface &image, const char *metadata)
+static int internal_load_hd(device_image_interface &image, const char *metadata)
 {
 	dev_harddisk_t	*harddisk = get_safe_token( &image.device() );
 	chd_error		err = (chd_error)0;
@@ -146,12 +146,12 @@ done:
 
 
 
-static DEVICE_IMAGE_LOAD( mess_hd )
+static DEVICE_IMAGE_LOAD( hd )
 {
 	dev_harddisk_t	*harddisk = get_safe_token( image );
 	int our_result;
 
-	our_result = internal_load_mess_hd(image, NULL);
+	our_result = internal_load_hd(image, NULL);
 
 	/* Check if there is an image_load callback defined */
 	if ( harddisk->config && harddisk->config->device_image_load )
@@ -163,7 +163,7 @@ static DEVICE_IMAGE_LOAD( mess_hd )
 }
 
 
-static DEVICE_IMAGE_CREATE( mess_hd )
+static DEVICE_IMAGE_CREATE( hd )
 {
 	int err;
 	char metadata[256];
@@ -184,7 +184,7 @@ static DEVICE_IMAGE_CREATE( mess_hd )
 		goto error;
 
 	sprintf(metadata, HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, sectorsize);
-	return internal_load_mess_hd(image, metadata);
+	return internal_load_hd(image, metadata);
 
 error:
 	return IMAGE_INIT_FAIL;
@@ -194,13 +194,13 @@ error:
 
 /*************************************
  *
- *  DEVICE_IMAGE_UNLOAD(mess_hd)
+ *  DEVICE_IMAGE_UNLOAD(hd)
  *
  *  Device unload
  *
  *************************************/
 
-static DEVICE_IMAGE_UNLOAD( mess_hd )
+static DEVICE_IMAGE_UNLOAD( hd )
 {
 	dev_harddisk_t	*harddisk = get_safe_token( image );
 
@@ -226,12 +226,12 @@ static DEVICE_IMAGE_UNLOAD( mess_hd )
 
 /*************************************
  *
- *  Get the MESS/MAME hard disk handle (from the src/harddisk.c core)
- *  after an image has been opened with the mess_hd core
+ *  Get the hard disk handle (from the src/harddisk.c core)
+ *  after an image has been opened with the hd core
  *
  *************************************/
 
-hard_disk_file *mess_hd_get_hard_disk_file(device_t *device)
+hard_disk_file *hd_get_hard_disk_file(device_t *device)
 {
 	dev_harddisk_t	*harddisk = get_safe_token( device );
 
@@ -241,19 +241,19 @@ hard_disk_file *mess_hd_get_hard_disk_file(device_t *device)
 
 /*************************************
  *
- *  Get the MESS/MAME CHD file (from the src/chd.c core)
- *  after an image has been opened with the mess_hd core
+ *  Get the CHD file (from the src/chd.c core)
+ *  after an image has been opened with the hd core
  *
  *************************************/
 
-chd_file *mess_hd_get_chd_file(device_t *device)
+chd_file *hd_get_chd_file(device_t *device)
 {
 	chd_file *result = NULL;
 	hard_disk_file *hd_file;
 
 	if (device)
 	{
-		hd_file = mess_hd_get_hard_disk_file(device);
+		hd_file = hd_get_hard_disk_file(device);
 		if (hd_file)
 			result = hard_disk_get_chd(hd_file);
 	}
@@ -262,10 +262,10 @@ chd_file *mess_hd_get_chd_file(device_t *device)
 
 
 /*-------------------------------------------------
-    DEVICE_START(mess_hd)
+    DEVICE_START(hd)
 -------------------------------------------------*/
 
-static DEVICE_START(mess_hd)
+static DEVICE_START(hd)
 {
 	dev_harddisk_t	*harddisk = get_safe_token( device );
 
@@ -276,10 +276,10 @@ static DEVICE_START(mess_hd)
 
 
 /*-------------------------------------------------
-    DEVICE_GET_INFO(mess_hd)
+    DEVICE_GET_INFO(hd)
 -------------------------------------------------*/
 
-DEVICE_GET_INFO(mess_hd)
+DEVICE_GET_INFO(hd)
 {
 	switch( state )
 	{
@@ -293,12 +293,12 @@ DEVICE_GET_INFO(mess_hd)
 		case DEVINFO_INT_IMAGE_CREATE_OPTCOUNT:		info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(mess_hd); break;
-		case DEVINFO_FCT_IMAGE_LOAD:				info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(mess_hd); break;
-		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(mess_hd); break;
-		case DEVINFO_FCT_IMAGE_CREATE:				info->f = (genf *) DEVICE_IMAGE_CREATE_NAME(mess_hd); break;
-		case DEVINFO_PTR_IMAGE_CREATE_OPTGUIDE:		info->p = (void *) mess_hd_option_guide; break;
-		case DEVINFO_PTR_IMAGE_CREATE_OPTSPEC+0:	info->p = (void *) mess_hd_option_spec; break;
+		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(hd); break;
+		case DEVINFO_FCT_IMAGE_LOAD:				info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(hd); break;
+		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(hd); break;
+		case DEVINFO_FCT_IMAGE_CREATE:				info->f = (genf *) DEVICE_IMAGE_CREATE_NAME(hd); break;
+		case DEVINFO_PTR_IMAGE_CREATE_OPTGUIDE:		info->p = (void *) hd_option_guide; break;
+		case DEVINFO_PTR_IMAGE_CREATE_OPTSPEC+0:	info->p = (void *) hd_option_spec; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:						strcpy(info->s, "Harddisk"); break;
@@ -306,13 +306,13 @@ DEVICE_GET_INFO(mess_hd)
 		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__); break;
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:		strcpy(info->s, "chd,hd"); break;
 		case DEVINFO_STR_IMAGE_CREATE_OPTNAME+0:	strcpy(info->s, "chd"); break;
-		case DEVINFO_STR_IMAGE_CREATE_OPTDESC+0:	strcpy(info->s, "MAME/MESS CHD Hard drive"); break;
+		case DEVINFO_STR_IMAGE_CREATE_OPTDESC+0:	strcpy(info->s, "CHD Hard drive"); break;
 		case DEVINFO_STR_IMAGE_CREATE_OPTEXTS+0:	strcpy(info->s, "chd,hd"); break;
 	}
 }
 
 
-static DEVICE_START(mess_ide)
+static DEVICE_START(ide)
 {
 	/* old code from idedrive.c */
 #ifdef UNUSED_FUNCTION
@@ -333,7 +333,7 @@ static DEVICE_START(mess_ide)
 }
 
 
-static DEVICE_IMAGE_LOAD(mess_ide)
+static DEVICE_IMAGE_LOAD(ide)
 {
 	/* old code from idedrive.c */
 #ifdef UNUSED_FUNCTION
@@ -351,15 +351,15 @@ static DEVICE_IMAGE_LOAD(mess_ide)
 
 	/* configure IDE */
 	/* FIXME IDE */
-	/* ide_controller_init_custom(which_bus, intf, mess_hd_get_chd_file(image)); */
+	/* ide_controller_init_custom(which_bus, intf, hd_get_chd_file(image)); */
 	/* ide_controller_reset(which_bus); */
 	return IMAGE_INIT_PASS;
 #endif
-	return device_load_mess_hd( image );
+	return device_load_hd( image );
 }
 
 
-static DEVICE_IMAGE_UNLOAD(mess_ide)
+static DEVICE_IMAGE_UNLOAD(ide)
 {
 	/* old code from idedrive.c */
 #ifdef UNUSED_FUNCTION
@@ -378,27 +378,27 @@ static DEVICE_IMAGE_UNLOAD(mess_ide)
 	/* ide_controller_init_custom(which_bus, intf, NULL); */
 	/* ide_controller_reset(which_bus); */
 #endif
-	device_unload_mess_hd( image );
+	device_unload_hd( image );
 }
 
 
-DEVICE_GET_INFO(mess_ide)
+DEVICE_GET_INFO(ide)
 {
 	switch( state )
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(mess_ide); break;
-		case DEVINFO_FCT_IMAGE_LOAD:				info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(mess_ide); break;
-		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(mess_ide); break;
+		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(ide); break;
+		case DEVINFO_FCT_IMAGE_LOAD:				info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(ide); break;
+		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(ide); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:						strcpy(info->s, "IDE harddisk"); break;
 		case DEVINFO_STR_IMAGE_INSTANCE_NAME:		strcpy(info->s, "ideharddrive"); break;
 		case DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME:	strcpy(info->s, "idehd"); break;
 
-		default:									DEVICE_GET_INFO_CALL( mess_hd ); break;
+		default:									DEVICE_GET_INFO_CALL( hd ); break;
 	}
 }
 
-DEFINE_LEGACY_IMAGE_DEVICE(HARDDISK, mess_hd);
-DEFINE_LEGACY_IMAGE_DEVICE(IDE_HARDDISK, mess_ide);
+DEFINE_LEGACY_IMAGE_DEVICE(HARDDISK, hd);
+DEFINE_LEGACY_IMAGE_DEVICE(IDE_HARDDISK, ide);

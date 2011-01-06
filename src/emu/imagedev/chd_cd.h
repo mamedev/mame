@@ -2,12 +2,12 @@
 
     chd_cd.h
 
-    MESS interface to the MAME CHD CDROM code
+    Interface to the CHD CDROM code
 
 *********************************************************************/
 
-#ifndef MESS_CD_H
-#define MESS_CD_H
+#ifndef CHD_CD_H
+#define CHD_CD_H
 
 #include "cdrom.h"
 
@@ -27,7 +27,7 @@ struct cdrom_config_t
 DECLARE_LEGACY_IMAGE_DEVICE(CDROM, cdrom);
 
 
-cdrom_file *mess_cd_get_cdrom_file(device_t *device);
+cdrom_file *cd_get_cdrom_file(device_t *device);
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
@@ -40,4 +40,4 @@ cdrom_file *mess_cd_get_cdrom_file(device_t *device);
 #define MCFG_CDROM_INTERFACE(_interface)							\
 	MCFG_DEVICE_CONFIG_DATAPTR(cdrom_config, interface, _interface )
 
-#endif /* MESS_CD_H */
+#endif /* CHD_CD_H */

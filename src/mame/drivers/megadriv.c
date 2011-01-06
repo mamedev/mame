@@ -5136,7 +5136,7 @@ static MACHINE_RESET( segacd )
 		device = machine->device("cdrom");
 		if ( device )
 		{
-			segacd.cd = mess_cd_get_cdrom_file(device);
+			segacd.cd = cd_get_cdrom_file(device);
 			if ( segacd.cd )
 			{
 				segacd.toc = cdrom_get_toc( segacd.cd );
