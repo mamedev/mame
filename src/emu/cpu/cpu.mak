@@ -1784,3 +1784,16 @@ endif
 
 $(CPUOBJ)/pps4/pps4.o:	$(CPUSRC)/pps4/pps4.c \
 							$(CPUSRC)/pps4/pps4.h
+
+#-------------------------------------------------
+# Hitachi HD61700
+#-------------------------------------------------
+
+ifneq ($(filter HD61700,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/hd61700
+CPUOBJS += $(CPUOBJ)/hd61700/hd61700.o
+DASMOBJS += $(CPUOBJ)/hd61700/hd61700d.o
+endif
+
+$(CPUOBJ)/hd61700/hd61700.o:	$(CPUSRC)/hd61700/hd61700.c \
+								$(CPUSRC)/hd61700/hd61700.h
