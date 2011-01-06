@@ -21,251 +21,172 @@
 #define LOG_RECOVER			(0)
 
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-/* structure holding information about a single label */
-typedef struct _drcmap_entry drcmap_entry;
-struct _drcmap_entry
-{
-	drcmap_entry *		next;				/* pointer to next map entry */
-	drccodeptr			codeptr;			/* pointer to the relevant code */
-	UINT32				mapvar;				/* map variable id */
-	UINT32				newval;				/* value of the variable starting at codeptr */
-};
-
-
-/* structure describing the state of the code map */
-struct _drcmap_state
-{
-	drc_cache *			cache;				/* pointer to the cache */
-	UINT64				uniquevalue;		/* unique value used to find the table */
-	drcmap_entry *		head;				/* head of the live list */
-	drcmap_entry **		tailptr;			/* pointer to tail of the live list */
-	UINT32				numvalues;			/* number of values  in the list */
-	UINT32				mapvalue[DRCUML_MAPVAR_END - DRCUML_MAPVAR_M0]; /* array of current values */
-};
-
-
-/* structure holding information about a single label */
-typedef struct _drclabel drclabel;
-struct _drclabel
-{
-	drclabel *			next;				/* pointer to next label */
-	drcuml_codelabel	label;				/* the label specified */
-	drccodeptr			codeptr;			/* pointer to the relevant code */
-};
-
-
-/* structure holding a live list of labels */
-struct _drclabel_list
-{
-	drc_cache *			cache;				/* pointer to the cache */
-	drclabel *			head;				/* head of the live list */
-};
-
-
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-static void label_list_reset(drclabel_list *list, int fatal_on_leftovers);
-static drclabel *label_find_or_allocate(drclabel_list *list, drcuml_codelabel label);
-static void label_oob_callback(drccodeptr *codeptr, void *param1, void *param2, void *param3);
-
-
 
 /***************************************************************************
     HASH TABLE MANAGEMENT
 ***************************************************************************/
 
-/*-------------------------------------------------
-    drchash_alloc - allocate memory in the cache
-    for the hash table tracker (it auto-frees
-    with the cache)
--------------------------------------------------*/
+//-------------------------------------------------
+//  drc_hash_table - constructor
+//-------------------------------------------------
 
-drchash_state *drchash_alloc(drc_cache *cache, int modes, int addrbits, int ignorebits)
+drc_hash_table::drc_hash_table(drc_cache &cache, UINT32 modes, UINT8 addrbits, UINT8 ignorebits)
+	: m_cache(cache),
+	  m_modes(modes),
+	  m_nocodeptr(NULL),
+	  m_l1bits((addrbits - ignorebits) / 2),
+	  m_l2bits((addrbits - ignorebits) - m_l1bits),
+	  m_l1shift(ignorebits + m_l2bits),
+	  m_l2shift(ignorebits),
+	  m_l1mask((1 << m_l1bits) - 1),
+	  m_l2mask((1 << m_l2bits) - 1),
+	  m_base(reinterpret_cast<drccodeptr ***>(cache.alloc(modes * sizeof(**m_base)))),
+	  m_emptyl1(NULL),
+	  m_emptyl2(NULL)
 {
-	int effaddrbits = addrbits - ignorebits;
-	drchash_state *drchash;
-
-	/* allocate permanent state from the cache */
-	drchash = (drchash_state *)cache->alloc(sizeof(*drchash) + modes * sizeof(drchash->base[0]));
-	if (drchash == NULL)
-		return NULL;
-	memset(drchash, 0, sizeof(*drchash) + modes * sizeof(drchash->base[0]));
-
-	/* copy in parameters */
-	drchash->cache = cache;
-	drchash->modes = modes;
-
-	/* compute the sizes of the tables */
-	drchash->l1bits = effaddrbits / 2;
-	drchash->l2bits = effaddrbits - drchash->l1bits;
-	drchash->l1shift = ignorebits + drchash->l2bits;
-	drchash->l2shift = ignorebits;
-	drchash->l1mask = (1 << drchash->l1bits) - 1;
-	drchash->l2mask = (1 << drchash->l2bits) - 1;
-
-	/* reset the hash table, which allocates any subsequent tables */
-	if (!drchash_reset(drchash))
-		return NULL;
-
-	return drchash;
+	reset();
 }
 
 
-/*-------------------------------------------------
-    drchash_reset - flush existing hash tables and
-    create new ones
--------------------------------------------------*/
+//-------------------------------------------------
+//  reset - flush existing hash tables and create
+//  new ones
+//-------------------------------------------------
 
-int drchash_reset(drchash_state *drchash)
+bool drc_hash_table::reset()
 {
-	int modenum, entry;
+	// allocate an empty l2 hash table
+	m_emptyl2 = (drccodeptr *)m_cache.alloc_temporary(sizeof(drccodeptr) << m_l2bits);
+	if (m_emptyl2 == NULL)
+		return false;
 
-	/* allocate an empty l2 hash table */
-	drchash->emptyl2 = (drccodeptr *)drchash->cache->alloc_temporary(sizeof(drccodeptr) << drchash->l2bits);
-	if (drchash->emptyl2 == NULL)
-		return FALSE;
+	// populate it with pointers to the recompile_exit code
+	for (int entry = 0; entry < (1 << m_l2bits); entry++)
+		m_emptyl2[entry] = m_nocodeptr;
 
-	/* populate it with pointers to the recompile_exit code */
-	for (entry = 0; entry < (1 << drchash->l2bits); entry++)
-		drchash->emptyl2[entry] = drchash->nocodeptr;
+	// allocate an empty l1 hash table
+	m_emptyl1 = (drccodeptr **)m_cache.alloc_temporary(sizeof(drccodeptr *) << m_l1bits);
+	if (m_emptyl1 == NULL)
+		return false;
 
-	/* allocate an empty l1 hash table */
-	drchash->emptyl1 = (drccodeptr **)drchash->cache->alloc_temporary(sizeof(drccodeptr *) << drchash->l1bits);
-	if (drchash->emptyl1 == NULL)
-		return FALSE;
+	// populate it with pointers to the empty l2 table
+	for (int entry = 0; entry < (1 << m_l1bits); entry++)
+		m_emptyl1[entry] = m_emptyl2;
 
-	/* populate it with pointers to the empty l2 table */
-	for (entry = 0; entry < (1 << drchash->l1bits); entry++)
-		drchash->emptyl1[entry] = drchash->emptyl2;
+	// reset the hash tables
+	for (int modenum = 0; modenum < m_modes; modenum++)
+		m_base[modenum] = m_emptyl1;
 
-	/* reset the hash tables */
-	for (modenum = 0; modenum < drchash->modes; modenum++)
-		drchash->base[modenum] = drchash->emptyl1;
-
-	return TRUE;
+	return true;
 }
 
 
-/*-------------------------------------------------
-    drchash_block_begin - note the beginning of a
-    block
--------------------------------------------------*/
+//-------------------------------------------------
+//  block_begin - note the beginning of a block
+//-------------------------------------------------
 
-void drchash_block_begin(drchash_state *drchash, drcuml_block *block, const drcuml_instruction *instlist, UINT32 numinst)
+void drc_hash_table::block_begin(drcuml_block &block, const drcuml_instruction *instlist, UINT32 numinst)
 {
-	int inum;
-
-	/* before generating code, pre-allocate any hash entries; we do this by setting dummy hash values */
-	for (inum = 0; inum < numinst; inum++)
+	// before generating code, pre-allocate any hash entries; we do this by setting dummy hash values
+	for (int inum = 0; inum < numinst; inum++)
 	{
-		const drcuml_instruction *inst = &instlist[inum];
+		const drcuml_instruction &inst = instlist[inum];
 
-		/* if the opcode is a hash, verify that it makes sense and then set a NULL entry */
-		if (inst->opcode == DRCUML_OP_HASH)
+		// if the opcode is a hash, verify that it makes sense and then set a NULL entry
+		if (inst.opcode == DRCUML_OP_HASH)
 		{
-			assert(inst->numparams == 2);
-			assert(inst->param[0].type == DRCUML_PTYPE_IMMEDIATE);
-			assert(inst->param[1].type == DRCUML_PTYPE_IMMEDIATE);
+			assert(inst.numparams == 2);
+			assert(inst.param[0].type == DRCUML_PTYPE_IMMEDIATE);
+			assert(inst.param[1].type == DRCUML_PTYPE_IMMEDIATE);
 
-			/* if we fail to allocate, we must abort the block */
-			if (!drchash_set_codeptr(drchash, inst->param[0].value, inst->param[1].value, NULL))
-				drcuml_block_abort(block);
+			// if we fail to allocate, we must abort the block
+			if (!set_codeptr(inst.param[0].value, inst.param[1].value, NULL))
+				drcuml_block_abort(&block);
 		}
 
-		/* if the opcode is a hashjmp to a fixed location, make sure we preallocate the tables */
-		if (inst->opcode == DRCUML_OP_HASHJMP && inst->param[0].type == DRCUML_PTYPE_IMMEDIATE && inst->param[1].type == DRCUML_PTYPE_IMMEDIATE)
+		// if the opcode is a hashjmp to a fixed location, make sure we preallocate the tables
+		if (inst.opcode == DRCUML_OP_HASHJMP && inst.param[0].type == DRCUML_PTYPE_IMMEDIATE && inst.param[1].type == DRCUML_PTYPE_IMMEDIATE)
 		{
-			/* if we fail to allocate, we must abort the block */
-			drccodeptr code = drchash_get_codeptr(drchash, inst->param[0].value, inst->param[1].value);
-			if (!drchash_set_codeptr(drchash, inst->param[0].value, inst->param[1].value, code))
-				drcuml_block_abort(block);
+			// if we fail to allocate, we must abort the block
+			drccodeptr code = get_codeptr(inst.param[0].value, inst.param[1].value);
+			if (!set_codeptr(inst.param[0].value, inst.param[1].value, code))
+				drcuml_block_abort(&block);
 		}
 	}
 }
 
 
-/*-------------------------------------------------
-    drchash_block_end - note the end of a block
--------------------------------------------------*/
+//-------------------------------------------------
+//  block_end - note the end of a block
+//-------------------------------------------------
 
-void drchash_block_end(drchash_state *drchash, drcuml_block *block)
+void drc_hash_table::block_end(drcuml_block &block)
 {
-	/* nothing to do here, yet */
+	// nothing to do here, yet
 }
 
 
-/*-------------------------------------------------
-    drchash_set_default_codeptr - change the
-    default codeptr
--------------------------------------------------*/
+//-------------------------------------------------
+//  set_default_codeptr - change the default 
+//  codeptr
+//-------------------------------------------------
 
-void drchash_set_default_codeptr(drchash_state *drchash, drccodeptr nocodeptr)
+void drc_hash_table::set_default_codeptr(drccodeptr nocodeptr)
 {
-	drccodeptr old = drchash->nocodeptr;
-	int modenum, l1entry, l2entry;
-
-	/* nothing to do if the same */
+	// nothing to do if the same
+	drccodeptr old = m_nocodeptr;
 	if (old == nocodeptr)
 		return;
-	drchash->nocodeptr = nocodeptr;
+	m_nocodeptr = nocodeptr;
 
-	/* update the empty L2 table first */
-	for (l2entry = 0; l2entry < (1 << drchash->l2bits); l2entry++)
-		drchash->emptyl2[l2entry] = nocodeptr;
+	// update the empty L2 table first
+	for (int l2entry = 0; l2entry < (1 << m_l2bits); l2entry++)
+		m_emptyl2[l2entry] = nocodeptr;
 
-	/* now scan all existing hashtables for entries */
-	for (modenum = 0; modenum < drchash->modes; modenum++)
-		if (drchash->base[modenum] != drchash->emptyl1)
-			for (l1entry = 0; l1entry < (1 << drchash->l1bits); l1entry++)
-				if (drchash->base[modenum][l1entry] != drchash->emptyl2)
-					for (l2entry = 0; l2entry < (1 << drchash->l2bits); l2entry++)
-						if (drchash->base[modenum][l1entry][l2entry] == old)
-							drchash->base[modenum][l1entry][l2entry] = nocodeptr;
+	// now scan all existing hashtables for entries
+	for (int modenum = 0; modenum < m_modes; modenum++)
+		if (m_base[modenum] != m_emptyl1)
+			for (int l1entry = 0; l1entry < (1 << m_l1bits); l1entry++)
+				if (m_base[modenum][l1entry] != m_emptyl2)
+					for (int l2entry = 0; l2entry < (1 << m_l2bits); l2entry++)
+						if (m_base[modenum][l1entry][l2entry] == old)
+							m_base[modenum][l1entry][l2entry] = nocodeptr;
 }
 
 
-/*-------------------------------------------------
-    drchash_set_codeptr - set the codeptr for the
-    given mode/pc
--------------------------------------------------*/
+//-------------------------------------------------
+//  set_codeptr - set the codeptr for the given 
+//  mode/pc
+//-------------------------------------------------
 
-int drchash_set_codeptr(drchash_state *drchash, UINT32 mode, UINT32 pc, drccodeptr code)
+bool drc_hash_table::set_codeptr(UINT32 mode, UINT32 pc, drccodeptr code)
 {
-	UINT32 l1 = (pc >> drchash->l1shift) & drchash->l1mask;
-	UINT32 l2 = (pc >> drchash->l2shift) & drchash->l2mask;
-
-	assert(mode < drchash->modes);
-
-	/* copy-on-write for the l1 hash table */
-	if (drchash->base[mode] == drchash->emptyl1)
+	// copy-on-write for the l1 hash table
+	assert(mode < m_modes);
+	if (m_base[mode] == m_emptyl1)
 	{
-		drccodeptr **newtable = (drccodeptr **)drchash->cache->alloc_temporary(sizeof(drccodeptr *) << drchash->l1bits);
+		drccodeptr **newtable = (drccodeptr **)m_cache.alloc_temporary(sizeof(drccodeptr *) << m_l1bits);
 		if (newtable == NULL)
-			return FALSE;
-		memcpy(newtable, drchash->emptyl1, sizeof(drccodeptr *) << drchash->l1bits);
-		drchash->base[mode] = newtable;
+			return false;
+		memcpy(newtable, m_emptyl1, sizeof(drccodeptr *) << m_l1bits);
+		m_base[mode] = newtable;
 	}
 
-	/* copy-on-write for the l2 hash table */
-	if (drchash->base[mode][l1] == drchash->emptyl2)
+	// copy-on-write for the l2 hash table
+	UINT32 l1 = (pc >> m_l1shift) & m_l1mask;
+	if (m_base[mode][l1] == m_emptyl2)
 	{
-		drccodeptr *newtable = (drccodeptr *)drchash->cache->alloc_temporary(sizeof(drccodeptr) << drchash->l2bits);
+		drccodeptr *newtable = (drccodeptr *)m_cache.alloc_temporary(sizeof(drccodeptr) << m_l2bits);
 		if (newtable == NULL)
-			return FALSE;
-		memcpy(newtable, drchash->emptyl2, sizeof(drccodeptr) << drchash->l2bits);
-		drchash->base[mode][l1] = newtable;
+			return false;
+		memcpy(newtable, m_emptyl2, sizeof(drccodeptr) << m_l2bits);
+		m_base[mode][l1] = newtable;
 	}
 
-	/* set the new entry */
-	drchash->base[mode][l1][l2] = code;
-	return TRUE;
+	// set the new entry
+	UINT32 l2 = (pc >> m_l2shift) & m_l2mask;
+	m_base[mode][l1][l2] = code;
+	return true;
 }
 
 
@@ -274,118 +195,103 @@ int drchash_set_codeptr(drchash_state *drchash, UINT32 mode, UINT32 pc, drccodep
     CODE MAP MANAGEMENT
 ***************************************************************************/
 
-/*-------------------------------------------------
-    drcmap_alloc - allocate memory in the cache
-    for the code mapper (it auto-frees with the
-    cache)
--------------------------------------------------*/
+//-------------------------------------------------
+//  drc_map_variables - constructor
+//-------------------------------------------------
 
-drcmap_state *drcmap_alloc(drc_cache *cache, UINT64 uniquevalue)
+drc_map_variables::drc_map_variables(drc_cache &cache, UINT64 uniquevalue)
+	: m_cache(cache),
+	  m_uniquevalue(uniquevalue)
 {
-	drcmap_state *drcmap;
-
-	/* allocate permanent state from the cache */
-	drcmap = (drcmap_state *)cache->alloc(sizeof(*drcmap));
-	if (drcmap == NULL)
-		return NULL;
-	memset(drcmap, 0, sizeof(*drcmap));
-
-	/* remember the cache */
-	drcmap->cache = cache;
-	drcmap->tailptr = &drcmap->head;
-
-	return drcmap;
+	memset(m_mapvalue, 0, sizeof(m_mapvalue));
 }
 
 
-/*-------------------------------------------------
-    drcmap_block_begin - note the beginning of a
-    block
--------------------------------------------------*/
+//-------------------------------------------------
+//  ~drc_map_variables - destructor
+//-------------------------------------------------
 
-void drcmap_block_begin(drcmap_state *drcmap, drcuml_block *block)
+drc_map_variables::~drc_map_variables()
 {
-	/* release any remaining live entries */
-	while (drcmap->head != NULL)
-	{
-		drcmap_entry *entry = drcmap->head;
-		drcmap->head = entry->next;
-		drcmap->cache->dealloc(entry, sizeof(*entry));
-	}
-
-	/* reset the tailptr and count */
-	drcmap->tailptr = &drcmap->head;
-	drcmap->numvalues = 0;
-
-	/* reset the variable values */
-	memset(drcmap->mapvalue, 0, sizeof(drcmap->mapvalue));
+	// must detach all items from the entry list so that the list object
+	// doesn't try to free them on exit
+	m_entry_list.detach_all();
 }
 
 
-/*-------------------------------------------------
-    drcmap_block_end - note the end of a block
--------------------------------------------------*/
+//-------------------------------------------------
+//  block_begin - note the beginning of a block
+//-------------------------------------------------
 
-void drcmap_block_end(drcmap_state *drcmap, drcuml_block *block)
+void drc_map_variables::block_begin(drcuml_block &block)
 {
-	UINT32 curvalue[DRCUML_MAPVAR_END - DRCUML_MAPVAR_M0] = { 0 };
-	UINT8 changed[DRCUML_MAPVAR_END - DRCUML_MAPVAR_M0] = { 0 };
-	drcmap_entry *entry;
-	drccodeptr lastptr;
-	drccodeptr *top;
-	UINT32 *dest;
+	// release any remaining live entries
+	map_entry *entry;
+	while ((entry = m_entry_list.detach_head()) != NULL)
+		m_cache.dealloc(entry, sizeof(*entry));
 
-	/* only process if we have data */
-	if (drcmap->head == NULL)
+	// reset the variable values
+	memset(m_mapvalue, 0, sizeof(m_mapvalue));
+}
+
+
+//-------------------------------------------------
+//  block_end - note the end of a block
+//-------------------------------------------------
+
+void drc_map_variables::block_end(drcuml_block &block)
+{
+	// only process if we have data
+	if (m_entry_list.first() == NULL)
 		return;
 
-	/* begin "code generation" aligned to an 8-byte boundary */
-	top = drcmap->cache->begin_codegen(sizeof(UINT64) + sizeof(UINT32) + 2 * sizeof(UINT32) * drcmap->numvalues);
+	// begin "code generation" aligned to an 8-byte boundary
+	drccodeptr *top = m_cache.begin_codegen(sizeof(UINT64) + sizeof(UINT32) + 2 * sizeof(UINT32) * m_entry_list.count());
 	if (top == NULL)
-		drcuml_block_abort(block);
-	dest = (UINT32 *)(((FPTR)*top + 7) & ~7);
+		drcuml_block_abort(&block);
+	UINT32 *dest = (UINT32 *)(((FPTR)*top + 7) & ~7);
 
-	/* store the cookie first */
-	*(UINT64 *)dest = drcmap->uniquevalue;
+	// store the cookie first
+	*(UINT64 *)dest = m_uniquevalue;
 	dest += 2;
 
-	/* get the pointer to the first item and store an initial backwards offset */
-	lastptr = drcmap->head->codeptr;
+	// get the pointer to the first item and store an initial backwards offset
+	drccodeptr lastptr = m_entry_list.first()->m_codeptr;
 	*dest = (drccodeptr)dest - lastptr;
 	dest++;
 
-	/* now iterate over entries and store them */
-	for (entry = drcmap->head; entry != NULL; entry = entry->next)
+	// now iterate over entries and store them
+	UINT32 curvalue[DRCUML_MAPVAR_END - DRCUML_MAPVAR_M0] = { 0 };
+	bool changed[DRCUML_MAPVAR_END - DRCUML_MAPVAR_M0] = { false };
+	for (map_entry *entry = m_entry_list.first(); entry != NULL; entry = entry->next())
 	{
-		/* update the current value of the variable and detect changes */
-		if (curvalue[entry->mapvar] != entry->newval)
+		// update the current value of the variable and detect changes
+		if (curvalue[entry->m_mapvar] != entry->m_newval)
 		{
-			curvalue[entry->mapvar] = entry->newval;
-			changed[entry->mapvar] = TRUE;
+			curvalue[entry->m_mapvar] = entry->m_newval;
+			changed[entry->m_mapvar] = true;
 		}
 
-		/* if the next code pointer is different, or if we're at the end, flush changes */
-		if (entry->next == NULL || entry->next->codeptr != entry->codeptr)
+		// if the next code pointer is different, or if we're at the end, flush changes
+		if (entry->next() == NULL || entry->next()->m_codeptr != entry->m_codeptr)
 		{
-			UINT32 codedelta = entry->codeptr - lastptr;
+			// build a mask of changed variables
+			int numchanged = 0;
 			UINT32 varmask = 0;
-			int numchanged;
-			int varnum;
-
-			/* build a mask of changed variables */
-			for (numchanged = varnum = 0; varnum < ARRAY_LENGTH(changed); varnum++)
+			for (int varnum = 0; varnum < ARRAY_LENGTH(changed); varnum++)
 				if (changed[varnum])
 				{
-					changed[varnum] = FALSE;
+					changed[varnum] = false;
 					varmask |= 1 << varnum;
 					numchanged++;
 				}
 
-			/* if nothing really changed, skip it */
+			// if nothing really changed, skip it
 			if (numchanged == 0)
 				continue;
 
-			/* first word is a code delta plus mask of changed variables */
+			// first word is a code delta plus mask of changed variables
+			UINT32 codedelta = entry->m_codeptr - lastptr;
 			while (codedelta > 0xffff)
 			{
 				*dest++ = 0xffff << 16;
@@ -393,120 +299,107 @@ void drcmap_block_end(drcmap_state *drcmap, drcuml_block *block)
 			}
 			*dest++ = (codedelta << 16) | (varmask << 4) | numchanged;
 
-			/* now output updated variable values */
-			for (varnum = 0; varnum < ARRAY_LENGTH(changed); varnum++)
+			// now output updated variable values
+			for (int varnum = 0; varnum < ARRAY_LENGTH(changed); varnum++)
 				if ((varmask >> varnum) & 1)
 					*dest++ = curvalue[varnum];
 
-			/* remember our lastptr */
-			lastptr = entry->codeptr;
+			// remember our lastptr
+			lastptr = entry->m_codeptr;
 		}
 	}
 
-	/* add a terminator */
+	// add a terminator
 	*dest++ = 0;
 
-	/* complete codegen */
+	// complete codegen
 	*top = (drccodeptr)dest;
-	drcmap->cache->end_codegen();
+	m_cache.end_codegen();
 }
 
 
-/*-------------------------------------------------
-    drcmap_set_value - set a map value for the
-    given code pointer
--------------------------------------------------*/
+//-------------------------------------------------
+//  set_value - set a map value for the given 
+//  code pointer
+//-------------------------------------------------
 
-void drcmap_set_value(drcmap_state *drcmap, drccodeptr codebase, UINT32 mapvar, UINT32 newvalue)
+void drc_map_variables::set_value(drccodeptr codebase, UINT32 mapvar, UINT32 newvalue)
 {
-	drcmap_entry *entry;
-
 	assert(mapvar >= DRCUML_MAPVAR_M0 && mapvar < DRCUML_MAPVAR_END);
 
-	/* if this value isn't different, skip it */
-	if (drcmap->mapvalue[mapvar - DRCUML_MAPVAR_M0] == newvalue)
+	// if this value isn't different, skip it
+	if (m_mapvalue[mapvar - DRCUML_MAPVAR_M0] == newvalue)
 		return;
 
-	/* allocate a new entry and fill it in */
-	entry = (drcmap_entry *)drcmap->cache->alloc(sizeof(*entry));
-	entry->next = NULL;
-	entry->codeptr = codebase;
-	entry->mapvar = mapvar - DRCUML_MAPVAR_M0;
-	entry->newval = newvalue;
+	// allocate a new entry and fill it in
+	map_entry *entry = (map_entry *)m_cache.alloc(sizeof(*entry));
+	entry->m_next = NULL;
+	entry->m_codeptr = codebase;
+	entry->m_mapvar = mapvar - DRCUML_MAPVAR_M0;
+	entry->m_newval = newvalue;
 
-	/* hook us into the end of the list */
-	*drcmap->tailptr = entry;
-	drcmap->tailptr = &entry->next;
+	// hook us into the end of the list
+	m_entry_list.append(*entry);
 
-	/* update our state in the table as well */
-	drcmap->mapvalue[mapvar - DRCUML_MAPVAR_M0] = newvalue;
-
-	/* and increment the count */
-	drcmap->numvalues++;
+	// update our state in the table as well
+	m_mapvalue[mapvar - DRCUML_MAPVAR_M0] = newvalue;
 }
 
 
-/*-------------------------------------------------
-    drcmap_get_value - return a map value for the
-    given code pointer
--------------------------------------------------*/
+//-------------------------------------------------
+//  get_value - return a map value for the given 
+//  code pointer
+//-------------------------------------------------
 
-UINT32 drcmap_get_value(drcmap_state *drcmap, drccodeptr codebase, UINT32 mapvar)
+UINT32 drc_map_variables::get_value(drccodeptr codebase, UINT32 mapvar) const
 {
-	UINT64 *endscan = (UINT64 *)drcmap->cache->top();
-	UINT32 varmask = 0x10 << mapvar;
-	drccodeptr curcode;
-	UINT32 result = 0;
-	UINT64 *curscan;
-	UINT32 *data;
-
 	assert(mapvar >= DRCUML_MAPVAR_M0 && mapvar < DRCUML_MAPVAR_END);
 	mapvar -= DRCUML_MAPVAR_M0;
 
-	/* get an aligned pointer to start scanning */
-	curscan = (UINT64 *)(((FPTR)codebase | 7) + 1);
+	// get an aligned pointer to start scanning
+	UINT64 *curscan = (UINT64 *)(((FPTR)codebase | 7) + 1);
+	UINT64 *endscan = (UINT64 *)m_cache.top();
 
-	/* look for the signature */
-	while (curscan < endscan && *curscan++ != drcmap->uniquevalue) ;
+	// look for the signature
+	while (curscan < endscan && *curscan++ != m_uniquevalue) ;
 	if (curscan >= endscan)
 		return 0;
 
-	/* switch to 32-bit pointers for processing the rest */
-	data = (UINT32 *)curscan;
+	// switch to 32-bit pointers for processing the rest
+	UINT32 *data = (UINT32 *)curscan;
 
-	/* first get the 32-bit starting offset to the code */
-	curcode = (drccodeptr)data - *data;
+	// first get the 32-bit starting offset to the code
+	drccodeptr curcode = (drccodeptr)data - *data;
 	data++;
 
-	/* now loop until we advance past our target */
-	while (TRUE)
+	// now loop until we advance past our target
+	UINT32 varmask = 0x10 << mapvar;
+	UINT32 result = 0;
+	while (true)
 	{
+		// a 0 is a terminator
 		UINT32 controlword = *data++;
-
-		/* a 0 is a terminator */
 		if (controlword == 0)
 			break;
 
-		/* update the codeptr; if this puts us past the end, we're done */
+		// update the codeptr; if this puts us past the end, we're done
 		curcode += (controlword >> 16) & 0xffff;
 		if (curcode > codebase)
 			break;
 
-		/* if our mapvar has changed, process this word */
+		// if our mapvar has changed, process this word
 		if ((controlword & varmask) != 0)
 		{
+			// count how many words precede the one we care about
 			int dataoffs = 0;
-			UINT32 skipmask;
-
-			/* count how many words precede the one we care about */
-			for (skipmask = (controlword & (varmask - 1)) >> 4; skipmask != 0; skipmask = skipmask & (skipmask - 1))
+			for (UINT32 skipmask = (controlword & (varmask - 1)) >> 4; skipmask != 0; skipmask = skipmask & (skipmask - 1))
 				dataoffs++;
 
-			/* fetch the one we want */
+			// fetch the one we want
 			result = data[dataoffs];
 		}
 
-		/* low 4 bits contain the total number of words of data */
+		// low 4 bits contain the total number of words of data
 		data += controlword & 0x0f;
 	}
 	if (LOG_RECOVER)
@@ -514,16 +407,22 @@ UINT32 drcmap_get_value(drcmap_state *drcmap, drccodeptr codebase, UINT32 mapvar
 	return result;
 }
 
+UINT32 drc_map_variables::static_get_value(drc_map_variables &map, drccodeptr codebase, UINT32 mapvar)
+{
+	return map.get_value(codebase, mapvar);
+}
 
-/*-------------------------------------------------
-    drcmap_get_last_value - return the most
-    recently set map value
--------------------------------------------------*/
 
-UINT32 drcmap_get_last_value(drcmap_state *drcmap, UINT32 mapvar)
+
+//-------------------------------------------------
+//  get_last_value - return the most recently set 
+//  map value
+//-------------------------------------------------
+
+UINT32 drc_map_variables::get_last_value(UINT32 mapvar)
 {
 	assert(mapvar >= DRCUML_MAPVAR_M0 && mapvar < DRCUML_MAPVAR_END);
-	return drcmap->mapvalue[mapvar - DRCUML_MAPVAR_M0];
+	return m_mapvalue[mapvar - DRCUML_MAPVAR_M0];
 }
 
 
@@ -532,150 +431,136 @@ UINT32 drcmap_get_last_value(drcmap_state *drcmap, UINT32 mapvar)
     LABEL MANAGEMENT
 ***************************************************************************/
 
-/*-------------------------------------------------
-    drclabel_list_alloc - allocate a label
-    list within the cache (it auto-frees with the
-    cache)
--------------------------------------------------*/
+//-------------------------------------------------
+//  drc_label_list - constructor
+//-------------------------------------------------
 
-drclabel_list *drclabel_list_alloc(drc_cache *cache)
+drc_label_list::drc_label_list(drc_cache &cache)
+	: m_cache(cache)
 {
-	drclabel_list *list;
-
-	/* allocate permanent state from the cache */
-	list = (drclabel_list *)cache->alloc(sizeof(*list));
-	if (list == NULL)
-		return NULL;
-	memset(list, 0, sizeof(*list));
-
-	/* remember the cache */
-	list->cache = cache;
-
-	return list;
 }
 
 
-/*-------------------------------------------------
-    drclabel_block_begin - note the beginning of
-    a block
--------------------------------------------------*/
+//-------------------------------------------------
+//  ~drc_label_list - destructor
+//-------------------------------------------------
 
-void drclabel_block_begin(drclabel_list *list, drcuml_block *block)
+drc_label_list::~drc_label_list()
 {
-	/* make sure the label list is clear, but don't fatalerror */
-	label_list_reset(list, FALSE);
+	// must detach all items from the entry list so that the list object
+	// doesn't try to free them on exit
+	m_list.detach_all();
 }
 
 
-/*-------------------------------------------------
-    drclabel_block_end - note the end of a block
--------------------------------------------------*/
+//-------------------------------------------------
+//  block_begin - note the beginning of a block
+//-------------------------------------------------
 
-void drclabel_block_end(drclabel_list *list, drcuml_block *block)
+void drc_label_list::block_begin(drcuml_block &block)
 {
-	/* make sure the label list is clear, and fatalerror if we missed anything */
-	label_list_reset(list, TRUE);
+	// make sure the label list is clear, but don't fatalerror
+	reset(false);
 }
 
 
-/*-------------------------------------------------
-    drclabel_get_codeptr - find or allocate a new
-    label; returns NULL and requests an OOB
-    callback if undefined
--------------------------------------------------*/
+//-------------------------------------------------
+//  block_end - note the end of a block
+//-------------------------------------------------
 
-drccodeptr drclabel_get_codeptr(drclabel_list *list, drcuml_codelabel label, drclabel_fixup_func fixup, void *param)
+void drc_label_list::block_end(drcuml_block &block)
 {
-	drclabel *curlabel = label_find_or_allocate(list, label);
-
-	/* if no code pointer, request an OOB callback */
-	if (curlabel->codeptr == NULL && fixup != NULL)
-		list->cache->request_oob_codegen(label_oob_callback, curlabel, (void *)fixup, param);
-
-	return curlabel->codeptr;
+	// make sure the label list is clear, and fatalerror if we missed anything
+	reset(true);
 }
 
 
-/*-------------------------------------------------
-    drclabel_set_codeptr - set the pointer to a new
-    label
--------------------------------------------------*/
+//-------------------------------------------------
+//  get_codeptr - find or allocate a new label; 
+//  returns NULL and requests an OOB callback if 
+//  undefined
+//-------------------------------------------------
 
-void drclabel_set_codeptr(drclabel_list *list, drcuml_codelabel label, drccodeptr codeptr)
+drccodeptr drc_label_list::get_codeptr(drcuml_codelabel label, fixup_func fixup, void *param)
 {
-	/* set the code pointer */
-	drclabel *curlabel = label_find_or_allocate(list, label);
-	assert(curlabel->codeptr == NULL);
-	curlabel->codeptr = codeptr;
+	label_entry *curlabel = find_or_allocate(label);
+
+	// if no code pointer, request an OOB callback
+	if (curlabel->m_codeptr == NULL && fixup != NULL)
+		m_cache.request_oob_codegen(oob_callback, curlabel, (void *)fixup, param);
+
+	return curlabel->m_codeptr;
 }
 
 
+//-------------------------------------------------
+//  set_codeptr - set the pointer to a new label
+//-------------------------------------------------
 
-/***************************************************************************
-    LABEL MANAGEMENT
-***************************************************************************/
-
-/*-------------------------------------------------
-    label_list_reset - reset a label
-    list (add all entries to the free list)
--------------------------------------------------*/
-
-static void label_list_reset(drclabel_list *list, int fatal_on_leftovers)
+void drc_label_list::set_codeptr(drcuml_codelabel label, drccodeptr codeptr)
 {
-	/* loop until out of labels */
-	while (list->head != NULL)
+	// set the code pointer
+	label_entry *curlabel = find_or_allocate(label);
+	assert(curlabel->m_codeptr == NULL);
+	curlabel->m_codeptr = codeptr;
+}
+
+
+//-------------------------------------------------
+//  reset - reset a label list (add all entries to 
+//  the free list)
+//-------------------------------------------------
+
+void drc_label_list::reset(bool fatal_on_leftovers)
+{
+	// loop until out of labels
+	label_entry *curlabel;
+	while ((curlabel = m_list.detach_head()) != NULL)
 	{
-		/* remove from the list */
-		drclabel *label = list->head;
-		list->head = label->next;
+		// fatal if we were a leftover
+		if (fatal_on_leftovers && curlabel->m_codeptr == NULL)
+			fatalerror("Label %08X never defined!", curlabel->m_label);
 
-		/* fatal if we were a leftover */
-		if (fatal_on_leftovers && label->codeptr == NULL)
-			fatalerror("Label %08X never defined!", label->label);
-
-		/* free the label */
-		list->cache->dealloc(label, sizeof(*label));
+		// free the label
+		m_cache.dealloc(curlabel, sizeof(*curlabel));
 	}
 }
 
 
-/*-------------------------------------------------
-    label_find_or_allocate - look up a label and
-    allocate a new one if not found
--------------------------------------------------*/
+//-------------------------------------------------
+//  find_or_allocate - look up a label and 
+//  allocate a new one if not found
+//-------------------------------------------------
 
-static drclabel *label_find_or_allocate(drclabel_list *list, drcuml_codelabel label)
+drc_label_list::label_entry *drc_label_list::find_or_allocate(drcuml_codelabel label)
 {
-	drclabel *curlabel;
-
-	/* find the label, or else allocate a new one */
-	for (curlabel = list->head; curlabel != NULL; curlabel = curlabel->next)
-		if (curlabel->label == label)
+	// find the label, or else allocate a new one
+	label_entry *curlabel;
+	for (curlabel = m_list.first(); curlabel != NULL; curlabel = curlabel->next())
+		if (curlabel->m_label == label)
 			break;
 
-	/* if none found, allocate */
+	// if none found, allocate
 	if (curlabel == NULL)
 	{
-		curlabel = (drclabel *)list->cache->alloc(sizeof(*curlabel));
-		curlabel->next = list->head;
-		curlabel->label = label;
-		curlabel->codeptr = NULL;
-		list->head = curlabel;
+		curlabel = (label_entry *)m_cache.alloc(sizeof(*curlabel));
+		curlabel->m_label = label;
+		curlabel->m_codeptr = NULL;
+		m_list.append(*curlabel);
 	}
-
 	return curlabel;
 }
 
 
-/*-------------------------------------------------
-    label_oob_callback - out-of-band codegen
-    callback for labels
--------------------------------------------------*/
+//-------------------------------------------------
+//  oob_callback - out-of-band codegen callback 
+//  for labels
+//-------------------------------------------------
 
-static void label_oob_callback(drccodeptr *codeptr, void *param1, void *param2, void *param3)
+void drc_label_list::oob_callback(drccodeptr *codeptr, void *param1, void *param2, void *param3)
 {
-	drclabel *label = (drclabel *)param1;
-	drclabel_fixup_func callback = (drclabel_fixup_func)param2;
+	label_entry *label = (label_entry *)param1;
+	fixup_func callback = (fixup_func)param2;
 
-	(*callback)(param3, label->codeptr);
+	(*callback)(param3, label->m_codeptr);
 }

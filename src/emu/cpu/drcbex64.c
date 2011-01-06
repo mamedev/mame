@@ -266,9 +266,9 @@ struct _drcbe_state
 	drcuml_state *			drcuml;					/* pointer back to our owner */
 	drc_cache *				cache;					/* pointer to the cache */
 	drcuml_machine_state	state;					/* state of the machine */
-	drchash_state *			hash;					/* hash table state */
-	drcmap_state *			map;					/* code map */
-	drclabel_list *			labels;                 /* label list */
+	drc_hash_table *		hash;					/* hash table state */
+	drc_map_variables *		map;					/* code map */
+	drc_label_list *		labels;                 /* label list */
 
 	x86_entry_point_func	entry;					/* entry point */
 	x86code *				exit;					/* exit point */
@@ -737,22 +737,16 @@ static drcbe_state *drcbex64_alloc(drcuml_state *drcuml, drc_cache *cache, devic
 		drcbe->debug_log_hashjmp = (x86code *)debug_log_hashjmp;
 		drcbe->debug_log_hashjmp_fail = (x86code *)debug_log_hashjmp_fail;
 	}
-	drcbe->drcmap_get_value = (x86code *)drcmap_get_value;
+	drcbe->drcmap_get_value = (x86code *)&drc_map_variables::static_get_value;
 
 	/* allocate hash tables */
-	drcbe->hash = drchash_alloc(cache, modes, addrbits, ignorebits);
-	if (drcbe->hash == NULL)
-		return NULL;
+	drcbe->hash = auto_alloc(device->machine, drc_hash_table(*cache, modes, addrbits, ignorebits));
 
 	/* allocate code map */
-	drcbe->map = drcmap_alloc(cache, 0);
-	if (drcbe->map == NULL)
-		return NULL;
+	drcbe->map = auto_alloc(device->machine, drc_map_variables(*cache, 0));
 
 	/* allocate a label tracker */
-	drcbe->labels = drclabel_list_alloc(cache);
-	if (drcbe->labels == NULL)
-		return NULL;
+	drcbe->labels = auto_alloc(device->machine, drc_label_list(*cache));
 
 	/* build the opcode table (static but it doesn't hurt to regenerate it) */
 	for (opnum = 0; opnum < ARRAY_LENGTH(opcode_table_source); opnum++)
@@ -877,8 +871,8 @@ static void drcbex64_reset(drcbe_state *drcbe)
 	drcbe->cache->end_codegen();
 
 	/* reset our hash tables */
-	drchash_reset(drcbe->hash);
-	drchash_set_default_codeptr(drcbe->hash, drcbe->nocode);
+	drcbe->hash->reset();
+	drcbe->hash->set_default_codeptr(drcbe->nocode);
 }
 
 
@@ -908,9 +902,9 @@ static void drcbex64_generate(drcbe_state *drcbe, drcuml_block *block, const drc
 	int inum;
 
 	/* tell all of our utility objects that a block is beginning */
-	drchash_block_begin(drcbe->hash, block, instlist, numinst);
-	drclabel_block_begin(drcbe->labels, block);
-	drcmap_block_begin(drcbe->map, block);
+	drcbe->hash->block_begin(*block, instlist, numinst);
+	drcbe->labels->block_begin(*block);
+	drcbe->map->block_begin(*block);
 
 	/* begin codegen; fail if we can't */
 	cachetop = drcbe->cache->begin_codegen(numinst * 8 * 4);
@@ -960,9 +954,9 @@ static void drcbex64_generate(drcbe_state *drcbe, drcuml_block *block, const drc
 		x86log_disasm_code_range(drcbe->log, (blockname == NULL) ? "Unknown block" : blockname, base, drcbe->cache->top());
 
 	/* tell all of our utility objects that the block is finished */
-	drchash_block_end(drcbe->hash, block);
-	drclabel_block_end(drcbe->labels, block);
-	drcmap_block_end(drcbe->map, block);
+	drcbe->hash->block_end(*block);
+	drcbe->labels->block_end(*block);
+	drcbe->map->block_end(*block);
 }
 
 
@@ -973,7 +967,7 @@ static void drcbex64_generate(drcbe_state *drcbe, drcuml_block *block, const drc
 
 static int drcbex64_hash_exists(drcbe_state *drcbe, UINT32 mode, UINT32 pc)
 {
-	return drchash_code_exists(drcbe->hash, mode, pc);
+	return drcbe->hash->code_exists(mode, pc);
 }
 
 
@@ -3049,7 +3043,7 @@ static x86code *op_hash(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	assert(inst->param[1].type == DRCUML_PTYPE_IMMEDIATE);
 
 	/* register the current pointer for the mode/PC */
-	drchash_set_codeptr(drcbe->hash, inst->param[0].value, inst->param[1].value, dst);
+	drcbe->hash->set_codeptr(inst->param[0].value, inst->param[1].value, dst);
 	return dst;
 }
 
@@ -3066,7 +3060,7 @@ static x86code *op_label(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	assert(inst->param[0].type == DRCUML_PTYPE_IMMEDIATE);
 
 	/* register the current pointer for the label */
-	drclabel_set_codeptr(drcbe->labels, inst->param[0].value, dst);
+	drcbe->labels->set_codeptr(inst->param[0].value, dst);
 	return dst;
 }
 
@@ -3100,7 +3094,7 @@ static x86code *op_mapvar(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 	assert(inst->param[1].type == DRCUML_PTYPE_IMMEDIATE);
 
 	/* set the value of the specified mapvar */
-	drcmap_set_value(drcbe->map, dst, inst->param[0].value, inst->param[1].value);
+	drcbe->map->set_value(dst, inst->param[0].value, inst->param[1].value);
 	return dst;
 }
 
@@ -3212,14 +3206,14 @@ static x86code *op_hashjmp(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 	emit_mov_r64_m64(&dst, REG_RSP, MABS(drcbe, &drcbe->hashstacksave));				// mov   rsp,[hashstacksave]
 
 	/* fixed mode cases */
-	if (modep.type == DRCUML_PTYPE_IMMEDIATE && drcbe->hash->base[modep.value] != drcbe->hash->emptyl1)
+	if (modep.type == DRCUML_PTYPE_IMMEDIATE && drcbe->hash->is_mode_populated(modep.value))
 	{
 		/* a straight immediate jump is direct, though we need the PC in EAX in case of failure */
 		if (pcp.type == DRCUML_PTYPE_IMMEDIATE)
 		{
-			UINT32 l1val = (pcp.value >> drcbe->hash->l1shift) & drcbe->hash->l1mask;
-			UINT32 l2val = (pcp.value >> drcbe->hash->l2shift) & drcbe->hash->l2mask;
-			emit_call_m64(&dst, MABS(drcbe, &drcbe->hash->base[modep.value][l1val][l2val]));
+			UINT32 l1val = (pcp.value >> drcbe->hash->l1shift()) & drcbe->hash->l1mask();
+			UINT32 l2val = (pcp.value >> drcbe->hash->l2shift()) & drcbe->hash->l2mask();
+			emit_call_m64(&dst, MABS(drcbe, &drcbe->hash->base()[modep.value][l1val][l2val]));
 																						// call  hash[modep][l1val][l2val]
 		}
 
@@ -3228,11 +3222,11 @@ static x86code *op_hashjmp(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 		{
 			emit_mov_r32_p32(drcbe, &dst, REG_EAX, &pcp);								// mov   eax,pcp
 			emit_mov_r32_r32(&dst, REG_EDX, REG_EAX);									// mov   edx,eax
-			emit_shr_r32_imm(&dst, REG_EDX, drcbe->hash->l1shift);						// shr   edx,l1shift
-			emit_and_r32_imm(&dst, REG_EAX, drcbe->hash->l2mask << drcbe->hash->l2shift);// and  eax,l2mask << l2shift
-			emit_mov_r64_m64(&dst, REG_RDX, MBISD(REG_RBP, REG_RDX, 8, offset_from_rbp(drcbe, (FPTR)&drcbe->hash->base[modep.value][0])));
+			emit_shr_r32_imm(&dst, REG_EDX, drcbe->hash->l1shift());					// shr   edx,l1shift
+			emit_and_r32_imm(&dst, REG_EAX, drcbe->hash->l2mask() << drcbe->hash->l2shift());// and  eax,l2mask << l2shift
+			emit_mov_r64_m64(&dst, REG_RDX, MBISD(REG_RBP, REG_RDX, 8, offset_from_rbp(drcbe, (FPTR)&drcbe->hash->base()[modep.value][0])));
 																						// mov   rdx,hash[modep+edx*8]
-			emit_call_m64(&dst, MBISD(REG_RDX, REG_RAX, 8 >> drcbe->hash->l2shift, 0));	// call  [rdx+rax*shift]
+			emit_call_m64(&dst, MBISD(REG_RDX, REG_RAX, 8 >> drcbe->hash->l2shift(), 0));// call  [rdx+rax*shift]
 		}
 	}
 	else
@@ -3240,14 +3234,14 @@ static x86code *op_hashjmp(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 		/* variable mode */
 		int modereg = param_select_register(REG_ECX, &modep, NULL);
 		emit_mov_r32_p32(drcbe, &dst, modereg, &modep);									// mov   modereg,modep
-		emit_mov_r64_m64(&dst, REG_RCX, MBISD(REG_RBP, modereg, 8, offset_from_rbp(drcbe, (FPTR)&drcbe->hash->base[0])));
+		emit_mov_r64_m64(&dst, REG_RCX, MBISD(REG_RBP, modereg, 8, offset_from_rbp(drcbe, (FPTR)drcbe->hash->base())));
 																						// mov   rcx,hash[modereg*8]
 
 		/* fixed PC */
 		if (pcp.type == DRCUML_PTYPE_IMMEDIATE)
 		{
-			UINT32 l1val = (pcp.value >> drcbe->hash->l1shift) & drcbe->hash->l1mask;
-			UINT32 l2val = (pcp.value >> drcbe->hash->l2shift) & drcbe->hash->l2mask;
+			UINT32 l1val = (pcp.value >> drcbe->hash->l1shift()) & drcbe->hash->l1mask();
+			UINT32 l2val = (pcp.value >> drcbe->hash->l2shift()) & drcbe->hash->l2mask();
 			emit_mov_r64_m64(&dst, REG_RDX, MBD(REG_RCX, l1val*8));						// mov   rdx,[rcx+l1val*8]
 			emit_call_m64(&dst, MBD(REG_RDX, l2val*8));									// call  [l2val*8]
 		}
@@ -3257,10 +3251,10 @@ static x86code *op_hashjmp(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 		{
 			emit_mov_r32_p32(drcbe, &dst, REG_EAX, &pcp);								// mov   eax,pcp
 			emit_mov_r32_r32(&dst, REG_EDX, REG_EAX);									// mov   edx,eax
-			emit_shr_r32_imm(&dst, REG_EDX, drcbe->hash->l1shift);						// shr   edx,l1shift
+			emit_shr_r32_imm(&dst, REG_EDX, drcbe->hash->l1shift());						// shr   edx,l1shift
 			emit_mov_r64_m64(&dst, REG_RDX, MBISD(REG_RCX, REG_RDX, 8, 0));				// mov   rdx,[rcx+rdx*8]
-			emit_and_r32_imm(&dst, REG_EAX, drcbe->hash->l2mask << drcbe->hash->l2shift);// and  eax,l2mask << l2shift
-			emit_call_m64(&dst, MBISD(REG_RDX, REG_RAX, 8 >> drcbe->hash->l2shift, 0));	// call  [rdx+rax*shift]
+			emit_and_r32_imm(&dst, REG_EAX, drcbe->hash->l2mask() << drcbe->hash->l2shift());// and  eax,l2mask << l2shift
+			emit_call_m64(&dst, MBISD(REG_RDX, REG_RAX, 8 >> drcbe->hash->l2shift(), 0));	// call  [rdx+rax*shift]
 		}
 	}
 
@@ -3294,7 +3288,7 @@ static x86code *op_jmp(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 	param_normalize_1(drcbe, inst, &labelp, PTYPE_I);
 
 	/* look up the jump target and jump there */
-	jmptarget = (x86code *)drclabel_get_codeptr(drcbe->labels, labelp.value, fixup_label, dst);
+	jmptarget = (x86code *)drcbe->labels->get_codeptr(labelp.value, fixup_label, dst);
 	if (jmptarget == NULL)
 		jmptarget = dst + 0x7ffffff0;
 	if (inst->condition == DRCUML_COND_ALWAYS)

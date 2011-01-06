@@ -22,134 +22,138 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-/* callback function for forward-referenced labels */
-typedef void (*drclabel_fixup_func)(void *parameter, drccodeptr labelcodeptr);
+// ======================> drc_hash_table
 
-
-/* opaque structure representing a managed list of labels */
-typedef struct _drclabel_list drclabel_list;
-
-
-/* opaque structure representing a managed code map */
-typedef struct _drcmap_state drcmap_state;
-
-
-/* information about the hash tables used by the UML and backend */
-typedef struct _drchash_state drchash_state;
-struct _drchash_state
+// common hash table management
+class drc_hash_table
 {
-	drc_cache *		cache;				/* cache where allocations come from */
-	int				modes;				/* number of modes supported */
+public:
+	// construction/destruction
+	drc_hash_table(drc_cache &cache, UINT32 modes, UINT8 addrbits, UINT8 ignorebits);
+	
+	// getters
+	drccodeptr ***base() const { return m_base; }
+	UINT8 l1bits() const { return m_l1bits; }
+	UINT8 l2bits() const { return m_l2bits; }
+	UINT8 l1shift() const { return m_l1shift; }
+	UINT8 l2shift() const { return m_l2shift; }
+	offs_t l1mask() const { return m_l1mask; }
+	offs_t l2mask() const { return m_l2mask; }
+	bool is_mode_populated(UINT32 mode) const { return m_base[mode] != m_emptyl1; }
+	
+	// set up and configuration
+	bool reset();
+	void set_default_codeptr(drccodeptr code);
 
-	drccodeptr		nocodeptr;			/* pointer to code which will handle missing entries */
+	// block begin/end
+	void block_begin(drcuml_block &block, const drcuml_instruction *instlist, UINT32 numinst);
+	void block_end(drcuml_block &block);
 
-	UINT8			l1bits;				/* bits worth of entries in l1 hash tables */
-	UINT8			l1shift;			/* shift to apply to the PC to get the l1 hash entry */
-	offs_t			l1mask;				/* mask to apply after shifting */
-	UINT8			l2bits;				/* bits worth of entries in l2 hash tables */
-	UINT8			l2shift;			/* shift to apply to the PC to get the l2 hash entry */
-	offs_t			l2mask;				/* mask to apply after shifting */
+	// code pointer access
+	bool set_codeptr(UINT32 mode, UINT32 pc, drccodeptr code);
+	drccodeptr get_codeptr(UINT32 mode, UINT32 pc) { assert(mode < m_modes); return m_base[mode][(pc >> m_l1shift) & m_l1mask][(pc >> m_l2shift) & m_l2mask]; }
+	bool code_exists(UINT32 mode, UINT32 pc) { return get_codeptr(mode, pc) != m_nocodeptr; }
 
-	drccodeptr **	emptyl1;			/* pointer to empty l1 hash table */
-	drccodeptr *	emptyl2;			/* pointer to empty l2 hash table */
+private:
+	// internal state
+	drc_cache &		m_cache;				// cache where allocations come from
+	UINT32			m_modes;				// number of modes supported
 
-	drccodeptr **	base[1];			/* pointer to the l1 table for each mode */
+	drccodeptr		m_nocodeptr;			// pointer to code which will handle missing entries
+
+	UINT8			m_l1bits;				// bits worth of entries in l1 hash tables
+	UINT8			m_l2bits;				// bits worth of entries in l2 hash tables
+	UINT8			m_l1shift;				// shift to apply to the PC to get the l1 hash entry
+	UINT8			m_l2shift;				// shift to apply to the PC to get the l2 hash entry
+	offs_t			m_l1mask;				// mask to apply after shifting
+	offs_t			m_l2mask;				// mask to apply after shifting
+
+	drccodeptr ***	m_base;					// pointer to the l1 table for each mode
+	drccodeptr **	m_emptyl1;				// pointer to empty l1 hash table
+	drccodeptr *	m_emptyl2;				// pointer to empty l2 hash table
 };
 
 
+// ======================> drc_map_variables
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-/* ----- hash table management ----- */
-
-/* allocate memory in the cache for the hash table tracker (it auto-frees with the cache) */
-drchash_state *drchash_alloc(drc_cache *cache, int modes, int addrbits, int ignorebits);
-
-/* flush existing hash tables and create new ones */
-int drchash_reset(drchash_state *drchash);
-
-/* note the beginning of a block */
-void drchash_block_begin(drchash_state *drchash, drcuml_block *block, const drcuml_instruction *instlist, UINT32 numinst);
-
-/* note the end of a block */
-void drchash_block_end(drchash_state *drchash, drcuml_block *block);
-
-/* set the default codeptr for any empty hash entries (defaults to NULL) */
-void drchash_set_default_codeptr(drchash_state *drchash, drccodeptr code);
-
-/* set the codeptr for the given mode/pc */
-int drchash_set_codeptr(drchash_state *drchash, UINT32 mode, UINT32 pc, drccodeptr code);
-
-
-
-/* ----- code map management ----- */
-
-/* allocate memory in the cache for the code mapper (it auto-frees with the cache) */
-drcmap_state *drcmap_alloc(drc_cache *cache, UINT64 uniquevalue);
-
-/* note the beginning of a block */
-void drcmap_block_begin(drcmap_state *drcmap, drcuml_block *block);
-
-/* note the end of a block */
-void drcmap_block_end(drcmap_state *drcmap, drcuml_block *block);
-
-/* set a map value for the given code pointer */
-void drcmap_set_value(drcmap_state *drcmap, drccodeptr codebase, UINT32 mapvar, UINT32 newvalue);
-
-/* return a map value for the given code pointer */
-UINT32 drcmap_get_value(drcmap_state *drcmap, drccodeptr codebase, UINT32 mapvar);
-
-/* return the most recently set map value */
-UINT32 drcmap_get_last_value(drcmap_state *drcmap, UINT32 mapvar);
-
-
-
-/* ----- label management ----- */
-
-/* allocate a label list within the cache (it auto-frees with the cache) */
-drclabel_list *drclabel_list_alloc(drc_cache *cache);
-
-/* note the beginning of a block */
-void drclabel_block_begin(drclabel_list *drcmap, drcuml_block *block);
-
-/* note the end of a block */
-void drclabel_block_end(drclabel_list *drcmap, drcuml_block *block);
-
-/* find or allocate a new label; returns NULL and requests an OOB callback if undefined */
-drccodeptr drclabel_get_codeptr(drclabel_list *list, drcuml_codelabel label, drclabel_fixup_func fixup, void *param);
-
-/* set the pointer to a new label */
-void drclabel_set_codeptr(drclabel_list *list, drcuml_codelabel label, drccodeptr codeptr);
-
-
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    drchash_get_codeptr - return the codeptr
-    allocated for the given mode/pc
--------------------------------------------------*/
-
-INLINE drccodeptr drchash_get_codeptr(drchash_state *drchash, UINT32 mode, UINT32 pc)
+// common map variable management
+class drc_map_variables
 {
-	assert(mode < drchash->modes);
-	return drchash->base[mode][(pc >> drchash->l1shift) & drchash->l1mask][(pc >> drchash->l2shift) & drchash->l2mask];
-}
+public:
+	// construction/destruction
+	drc_map_variables(drc_cache &cache, UINT64 uniquevalue);
+	~drc_map_variables();
+
+	// block begin/end
+	void block_begin(drcuml_block &block);
+	void block_end(drcuml_block &block);
+
+	// get/set values
+	void set_value(drccodeptr codebase, UINT32 mapvar, UINT32 newvalue);
+	UINT32 get_value(drccodeptr codebase, UINT32 mapvar) const;
+	UINT32 get_last_value(UINT32 mapvar);
+
+	// static accessors to be called directly by generated code
+	static UINT32 static_get_value(drc_map_variables &map, drccodeptr codebase, UINT32 mapvar);
+
+private:
+	// internal state
+	drc_cache &			m_cache;			// pointer to the cache
+	UINT64				m_uniquevalue;		// unique value used to find the table
+	UINT32				m_mapvalue[DRCUML_MAPVAR_END - DRCUML_MAPVAR_M0]; // array of current values
+
+	// list of entries
+	struct map_entry
+	{
+		map_entry *next() const { return m_next; }
+		map_entry *		m_next;				// pointer to next map entry
+		drccodeptr		m_codeptr;			// pointer to the relevant code
+		UINT32			m_mapvar;			// map variable id
+		UINT32			m_newval;			// value of the variable starting at codeptr
+	};
+	simple_list<map_entry> m_entry_list;	// list of entries
+};
 
 
-/*-------------------------------------------------
-    drchash_code_exists - return TRUE if there is
-    a matching hash entry for the given mode/pc
--------------------------------------------------*/
+// ======================> drc_label_list
 
-INLINE int drchash_code_exists(drchash_state *drchash, UINT32 mode, UINT32 pc)
+// structure holding a live list of labels
+class drc_label_list
 {
-	return (drchash_get_codeptr(drchash, mode, pc) != drchash->nocodeptr);
-}
+	// callback function for forward-referenced labels
+	typedef void (*fixup_func)(void *parameter, drccodeptr labelcodeptr);
+
+public:
+	// construction/destruction
+	drc_label_list(drc_cache &cache);
+	~drc_label_list();
+
+	// block begin/end
+	void block_begin(drcuml_block &block);
+	void block_end(drcuml_block &block);
+
+	// get/set values
+	drccodeptr get_codeptr(drcuml_codelabel label, fixup_func fixup, void *param);
+	void set_codeptr(drcuml_codelabel label, drccodeptr codeptr);
+
+private:
+	struct label_entry
+	{
+		label_entry *next() const { return m_next; }
+		label_entry *		m_next;			// pointer to next label
+		drcuml_codelabel	m_label;		// the label specified
+		drccodeptr			m_codeptr;		// pointer to the relevant code
+	};
+
+	// internal helpers
+	void reset(bool fatal_on_leftovers);
+	label_entry *find_or_allocate(drcuml_codelabel label);
+	static void oob_callback(drccodeptr *codeptr, void *param1, void *param2, void *param3);
+
+	// internal state
+	drc_cache &			m_cache;			// pointer to the cache
+	simple_list<label_entry> m_list;		// head of the live list
+};
 
 
 #endif /* __DRCBEUT_H__ */

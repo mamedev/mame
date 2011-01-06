@@ -217,9 +217,9 @@ struct _drcbe_state
 	drcuml_state *			drcuml;					/* pointer back to our owner */
 	drc_cache *				cache;					/* pointer to the cache */
 	drcuml_machine_state	state;					/* state of the machine */
-	drchash_state *			hash;					/* hash table state */
-	drcmap_state *			map;					/* code map */
-	drclabel_list *			labels;                 /* label list */
+	drc_hash_table *		hash;					/* hash table state */
+	drc_map_variables *		map;					/* code map */
+	drc_label_list *		labels;                 /* label list */
 };
 
 
@@ -358,19 +358,13 @@ static drcbe_state *drcbec_alloc(drcuml_state *drcuml, drc_cache *cache, device_
 	drcbe->cache = cache;
 
 	/* allocate hash tables */
-	drcbe->hash = drchash_alloc(cache, modes, addrbits, ignorebits);
-	if (drcbe->hash == NULL)
-		return NULL;
+	drcbe->hash = auto_alloc(device->machine, drc_hash_table(*cache, modes, addrbits, ignorebits));
 
 	/* allocate code map */
-	drcbe->map = drcmap_alloc(cache, 0);
-	if (drcbe->map == NULL)
-		return NULL;
+	drcbe->map = auto_alloc(device->machine, drc_map_variables(*cache, 0));
 
 	/* allocate a label tracker */
-	drcbe->labels = drclabel_list_alloc(cache);
-	if (drcbe->labels == NULL)
-		return NULL;
+	drcbe->labels = auto_alloc(device->machine, drc_label_list(*cache));
 
 	return drcbe;
 }
@@ -392,8 +386,8 @@ static void drcbec_free(drcbe_state *drcbe)
 static void drcbec_reset(drcbe_state *drcbe)
 {
 	/* reset our hash tables */
-	drchash_reset(drcbe->hash);
-	drchash_set_default_codeptr(drcbe->hash, NULL);
+	drcbe->hash->reset();
+	drcbe->hash->set_default_codeptr(NULL);
 }
 
 
@@ -409,9 +403,9 @@ static void drcbec_generate(drcbe_state *drcbe, drcuml_block *block, const drcum
 	int inum;
 
 	/* tell all of our utility objects that a block is beginning */
-	drchash_block_begin(drcbe->hash, block, instlist, numinst);
-	drclabel_block_begin(drcbe->labels, block);
-	drcmap_block_begin(drcbe->map, block);
+	drcbe->hash->block_begin(*block, instlist, numinst);
+	drcbe->labels->block_begin(*block);
+	drcbe->map->block_begin(*block);
 
 	/* begin codegen; fail if we can't */
 	cachetop = drcbe->cache->begin_codegen(numinst * sizeof(drcbec_instruction) * 4);
@@ -445,14 +439,14 @@ static void drcbec_generate(drcbe_state *drcbe, drcuml_block *block, const drcum
 			/* when we hit a HASH opcode, register the current pointer for the mode/PC */
 			case DRCUML_OP_HASH:
 				/* we already verified the parameter count and types above */
-				drchash_set_codeptr(drcbe->hash, inst->param[0].value, inst->param[1].value, (drccodeptr)dst);
+				drcbe->hash->set_codeptr(inst->param[0].value, inst->param[1].value, (drccodeptr)dst);
 				break;
 
 			/* when we hit a LABEL opcode, register the current pointer for the label */
 			case DRCUML_OP_LABEL:
 				assert(inst->numparams == 1);
 				assert(inst->param[0].type == DRCUML_PTYPE_IMMEDIATE);
-				drclabel_set_codeptr(drcbe->labels, inst->param[0].value, (drccodeptr)dst);
+				drcbe->labels->set_codeptr(inst->param[0].value, (drccodeptr)dst);
 				break;
 
 			/* ignore COMMENT and NOP opcodes */
@@ -465,7 +459,7 @@ static void drcbec_generate(drcbe_state *drcbe, drcuml_block *block, const drcum
 				assert(inst->numparams == 2);
 				assert(inst->param[0].type == DRCUML_PTYPE_MAPVAR);
 				assert(inst->param[1].type == DRCUML_PTYPE_IMMEDIATE);
-				drcmap_set_value(drcbe->map, (drccodeptr)dst, inst->param[0].value, inst->param[1].value);
+				drcbe->map->set_value((drccodeptr)dst, inst->param[0].value, inst->param[1].value);
 				break;
 
 			/* JMP instructions need to resolve their labels */
@@ -473,7 +467,7 @@ static void drcbec_generate(drcbe_state *drcbe, drcuml_block *block, const drcum
 				assert(inst->numparams == 1);
 				assert(inst->param[0].type == DRCUML_PTYPE_IMMEDIATE);
 				(dst++)->i = MAKE_OPCODE_FULL(opcode, inst->size, inst->condition, inst->flags, 1);
-				dst->inst = (drcbec_instruction *)drclabel_get_codeptr(drcbe->labels, inst->param[0].value, fixup_label, dst);
+				dst->inst = (drcbec_instruction *)drcbe->labels->get_codeptr(inst->param[0].value, fixup_label, dst);
 				dst++;
 				break;
 
@@ -562,9 +556,9 @@ static void drcbec_generate(drcbe_state *drcbe, drcuml_block *block, const drcum
 	drcbe->cache->end_codegen();
 
 	/* tell all of our utility objects that the block is finished */
-	drchash_block_end(drcbe->hash, block);
-	drclabel_block_end(drcbe->labels, block);
-	drcmap_block_end(drcbe->map, block);
+	drcbe->hash->block_end(*block);
+	drcbe->labels->block_end(*block);
+	drcbe->map->block_end(*block);
 }
 
 
@@ -575,7 +569,7 @@ static void drcbec_generate(drcbe_state *drcbe, drcuml_block *block, const drcum
 
 static int drcbec_hash_exists(drcbe_state *state, UINT32 mode, UINT32 pc)
 {
-	return drchash_code_exists(state->hash, mode, pc);
+	return state->hash->code_exists(mode, pc);
 }
 
 
@@ -641,7 +635,7 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_HASHJMP, 4, 0):	/* HASHJMP mode,pc,handle         */
 				sp = 0;
-				newinst = (const drcbec_instruction *)drchash_get_codeptr(drcbe->hash, PARAM0, PARAM1);
+				newinst = (const drcbec_instruction *)drcbe->hash->get_codeptr(PARAM0, PARAM1);
 				if (newinst == NULL)
 				{
 					assert(sp < ARRAY_LENGTH(callstack));
@@ -722,7 +716,7 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_RECOVER, 4, 0):	/* RECOVER dst,mapvar             */
 				assert(sp > 0);
-				PARAM0 = drcmap_get_value(drcbe->map, (drccodeptr)callstack[0], PARAM1);
+				PARAM0 = drcbe->map->get_value((drccodeptr)callstack[0], PARAM1);
 				break;
 
 
@@ -2189,7 +2183,7 @@ static void output_parameter(drcbe_state *drcbe, drcbec_instruction **dstptr, vo
 	{
 		/* convert mapvars to immediates */
 		case DRCUML_PTYPE_MAPVAR:
-			temp_param.value = drcmap_get_last_value(drcbe->map, param->value);
+			temp_param.value = drcbe->map->get_last_value(param->value);
 			param = &temp_param;
 			/* fall through to immediate case */
 
