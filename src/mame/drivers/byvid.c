@@ -70,22 +70,6 @@ ROM_START(babypac)
 	ROM_LOAD( "891-u29.764", 0xe000, 0x2000, CRC(0b57fd5d) SHA1(43a03e6d16c87c3305adb04722484f992f23a1bd))
 ROM_END
 
-ROM_START(babypacn)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "pacmann.u2", 0x1000, 0x0800, CRC(734710cb) SHA1(040943be6e1f3a750f3b2c705833699ec5845a80))
-	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "891-u6.732", 0x1800, 0x0800, CRC(6136d636) SHA1(c01a0a2fcad3bdabd649128e012ab558b1c90cd3) )
-	ROM_CONTINUE( 0x5800, 0x0800)
-	ROM_RELOAD( 0xf000, 0x1000)
-	ROM_REGION(0x10000, "videocpu", 0)
-	ROM_LOAD( "babyvidn.u9", 0x8000, 0x2000, CRC(e937eb02) SHA1(391c4e2c2cd22bb06e2b4a4cef1ddc08040b8c43))
-	ROM_LOAD( "891-u10.764", 0xa000, 0x2000, CRC(28f4df8b) SHA1(bd6a3598c2c90b5a3a59327616d2f5b9940d98bc))
-	ROM_LOAD( "891-u11.764", 0xc000, 0x2000, CRC(0a5967a4) SHA1(26d56ddea3f39d41e382449007bf7ba113c0285f))
-	ROM_LOAD( "891-u12.764", 0xe000, 0x2000, CRC(58cfe542) SHA1(e024d14019866bd460d1da6b901f9b786a76a181))
-	ROM_REGION(0x10000, "soundcpu", 0)
-	ROM_LOAD( "891-u29.764", 0xe000, 0x2000, CRC(0b57fd5d) SHA1(43a03e6d16c87c3305adb04722484f992f23a1bd))
-ROM_END
-
 /*-----------------------------------------------------------------
 / Granny and the Gators (Video/Pinball Combo) - (BY35-???: 01/84)
 /----------------------------------------------------------------*/
@@ -108,5 +92,4 @@ ROM_START(granny)
 ROM_END
 	
 GAME( 1982, babypac, 0, 		by133, by133, by133, ROT0, "Bally","Baby Pacman (Video/Pinball Combo)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 2006, babypacn,babypac, 	by133, by133, by133, ROT0, "Bally / Oliver","Baby Pacman (Video/Pinball Combo, home roms)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME( 1984, granny,  0, 		by133, by133, by133, ROT0, "Bally","Granny and the Gators (Video/Pinball Combo)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

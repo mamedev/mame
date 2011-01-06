@@ -54,12 +54,12 @@ ROM_END
 /*-------------------------------------------------------------------
 / The Atarians (working bootleg)
 /-------------------------------------------------------------------*/
-ROM_START(atarianb)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("atarianb.e00", 0x7000, 0x0800, CRC(74fc86e4) SHA1(135d75e5c03feae0929fa84caa3c802353cdd94e))
-	ROM_LOAD("atarian.e0", 0x7800, 0x0800, CRC(45cb0427) SHA1(e286930ca36bdd0f79acefd142d2a5431fa8005b))
-	ROM_RELOAD(0xf800, 0x0800)
-ROM_END
+//ROM_START(atarianb)
+//	ROM_REGION(0x10000, "maincpu", 0)
+//	ROM_LOAD("atarianb.e00", 0x7000, 0x0800, CRC(74fc86e4) SHA1(135d75e5c03feae0929fa84caa3c802353cdd94e))
+//	ROM_LOAD("atarian.e0", 0x7800, 0x0800, CRC(45cb0427) SHA1(e286930ca36bdd0f79acefd142d2a5431fa8005b))
+//	ROM_RELOAD(0xf800, 0x0800)
+//ROM_END
 
 /*-------------------------------------------------------------------
 / Time 2000 (06/1977)
@@ -98,7 +98,7 @@ ROM_START(spcrider)
 ROM_END
 
 GAME( 1976, atarians, 0, 		atari_s1, atari_s1, atari_s1, ROT0, "Atari","The Atarians", 	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 2002, atarianb, atarians,	atari_s1, atari_s1, atari_s1, ROT0, "Atari / Gaston","The Atarians (working bootleg)", 	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+//GAME( 2002, atarianb, atarians,	atari_s1, atari_s1, atari_s1, ROT0, "Atari / Gaston","The Atarians (working bootleg)", 	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME( 1977, time2000, 0, 		atari_s1, atari_s1, atari_s1, ROT0, "Atari","Time 2000", 		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME( 1977, aavenger, 0, 		atari_s1, atari_s1, atari_s1, ROT0, "Atari","Airborne Avenger", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME( 1978, midearth, 0, 		atari_s1, atari_s1, atari_s1, ROT0, "Atari","Middle Earth", 	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

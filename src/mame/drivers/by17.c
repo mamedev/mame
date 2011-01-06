@@ -110,17 +110,6 @@ ROM_START(matahari)
 ROM_END
 
 /*--------------------------------
-/ Mata Hari (New game rules)
-/-------------------------------*/
-ROM_START(matatest)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "matat0n.u2", 0x1000, 0x0800, CRC(64a6bb3c) SHA1(ced5fcd18009106ac3c7b42e36cdc10ce410eeeb))
-	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "ptestn.u6", 0x1800, 0x0800, CRC(ccb213ec) SHA1(8defbe8e11a75d26daf1351f439dd409f1efc608) )
-	ROM_CONTINUE( 0x5800, 0x0800)
-	ROM_RELOAD( 0xf000, 0x1000)
-ROM_END
-/*--------------------------------
 / Night Rider
 /-------------------------------*/
 ROM_START(nightrdr)
@@ -160,7 +149,6 @@ GAME( 1977, eightbll, 0, 		by17, by17, by17, ROT0, "Bally","Eight Ball", GAME_NO
 GAME( 1977, evelknie, 0, 		by17, by17, by17, ROT0, "Bally","Evel Knievel", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME( 1977, freedom,  0, 		by17, by17, by17, ROT0, "Bally","Freedom", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME( 1978, matahari, 0, 		by17, by17, by17, ROT0, "Bally","Mata Hari", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 2005, matatest, matahari, by17, by17, by17, ROT0, "Bally / Oliver","Mata Hari (New game rules)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME( 1977, nightrdr, 0, 		by17, by17, by17, ROT0, "Bally","Night Rider", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME( 1978, pwerplay, 0, 		by17, by17, by17, ROT0, "Bally","Power Play (Pinball)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME( 1978, stk_sprs, 0, 		by17, by17, by17, ROT0, "Bally","Strikes and Spares", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

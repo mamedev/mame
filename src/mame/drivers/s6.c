@@ -180,25 +180,6 @@ ROM_START(frpwr_l2)
 	ROM_RELOAD( 0xd000, 0x1000)
 ROM_END
 
-ROM_START(frpwr_b6)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("f6p7ic14.732", 0x6000, 0x1000, CRC(e3ecd6f8) SHA1(6fb7cf515804c5c552ef2b9868c561540adb70b4))
-	ROM_RELOAD( 0xe000, 0x1000)
-	ROM_LOAD("f6p7ic17.716", 0x7800, 0x0800, CRC(8731ba39) SHA1(3adfde92fc27cc0bb1a21e287773a74365e68214))
-	ROM_RELOAD( 0xf800, 0x0800)
-	ROM_LOAD("f6p7ic20.716", 0x7000, 0x0800, CRC(5f373730) SHA1(57262ed3d05cee100cd091fc068f09f63218d7e4))
-	ROM_RELOAD( 0xf000, 0x0800)
-	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("sound3.716", 0x7800, 0x0800, CRC(55a10d13) SHA1(521d4cdfb0ed8178b3594cedceae93b772a951a4))
-	ROM_RELOAD( 0xf800, 0x0800)
-	ROM_LOAD("v_ic7.532", 0x3000, 0x1000, CRC(94c5c0a7) SHA1(ff7c618d1666c1d5c3319fdd72c1af2846659290))
-	ROM_RELOAD( 0xb000, 0x1000)
-	ROM_LOAD("v_ic5.532", 0x4000, 0x1000, CRC(1737fdd2) SHA1(6307e0ae715e97294ee8aaaeb2e2bebb0cb590c2))
-	ROM_RELOAD( 0xc000, 0x1000)
-	ROM_LOAD("v_ic6.532", 0x5000, 0x1000, CRC(e56f7aa2) SHA1(cb922c3f4d91285dda4ccae880c2d798a82fd51b))
-	ROM_RELOAD( 0xd000, 0x1000)
-ROM_END
-
 /*--------------------------
 / Gorgar - Sys.6 (Game #496)
 /-------------------------*/
@@ -362,7 +343,6 @@ GAME(1979,	blkou_f1,		blkou_l1,	williams_s6,	williams_s6,	williams_s6,	ROT0,	"Wi
 GAME(1980,	frpwr_l6,		0,			williams_s6,	williams_s6,	williams_s6,	ROT0,	"Williams",				"Firepower (L-6)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1980,	frpwr_t6,		frpwr_l6,	williams_s6,	williams_s6,	williams_s6,	ROT0,	"Williams",				"Firepower (T-6)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1980,	frpwr_l2,		frpwr_l6,	williams_s6,	williams_s6,	williams_s6,	ROT0,	"Williams",				"Firepower (L-2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(2003,	frpwr_b6,		frpwr_l6,	williams_s6,	williams_s6,	williams_s6,	ROT0,	"Williams / Oliver",	"Firepower (Sys.6 7-digit conversion)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1979,	grgar_l1,		0,			williams_s6,	williams_s6,	williams_s6,	ROT0,	"Williams",				"Gorgar (L-1)",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1979,	grgar_t1,		grgar_l1,	williams_s6,	williams_s6,	williams_s6,	ROT0,	"Williams",				"Gorgar (T-1)",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1979,	lzbal_l2,		0,			williams_s6,	williams_s6,	williams_s6,	ROT0,	"Williams",				"Laser Ball (L-2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

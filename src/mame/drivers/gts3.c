@@ -906,24 +906,6 @@ ROM_START(snspare1)
 	ROM_LOAD("arom1.bin", 0x00000, 0x80000, CRC(e248574a) SHA1(d2bdc2b9a330bb81556d25d464f617e0934995eb))
 ROM_END
 
-/*-------------------------------------------------------------------
-/ machinaZOIS by www.aksioma.org (Shaq Attaq conversion)
-/-------------------------------------------------------------------*/
-ROM_START(mac_zois)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("gprom.bin", 0x0000, 0x10000, CRC(7a967fd1) SHA1(c06e2aad9452150d92cfd3ba37b8e4a932cf4324))
-	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_REGION(0x80000, "user1", 0)
-	ROM_LOAD("dsprommz.bin", 0x00000, 0x80000, CRC(3b63f9c6) SHA1(b06ea3b8f7d3c4b22a8bbc687698654366c35f22))
-	ROM_REGION(0x10000, "cpu4", 0)
-	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(16a03261) SHA1(25f5a3d32d2ec80766381106445fd624360fea78))
-	ROM_REGION(0x100000, "sound1", 0)
-	ROM_LOAD("arom1mz.bin", 0x00000, 0x80000, CRC(68ceeb43) SHA1(debe5a0683b1806c9813ba89a6438afb3eecb188))
-	ROM_LOAD("arom2mz.bin", 0x80000, 0x40000, CRC(7dabc8ca) SHA1(ca6dc59891222f8534b0a2de8cd29c52e5b33efc))
-	ROM_RELOAD(0x80000+0x40000, 0x40000)
-	ROM_REGION(0x10000, "cpu3", 0)
-	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(e81e2928) SHA1(4bfe57efa99bb762e4de6c7e88e79b8c5ff57626))
-ROM_END
 
 GAME(1996,	barbwire,	0,			gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Barb Wire",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1990,	bellring,	0,			gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Bell Ringer",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
@@ -948,7 +930,6 @@ GAME(1992,	opthund,	0,			gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Operation Thund
 GAME(1994,	rescu911,	0,			gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Rescue 911 (rev.1)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1995,	shaqattq,	0,			gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Shaq Attaq (rev.5)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1995,	shaqatt2,	shaqattq,	gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Shaq Attaq (rev.2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(2003,	mac_zois,	shaqattq,	gts3,	gts3,	gts3,	ROT0,	"Aksioma",				"machinaZOIS Virtual Training Center",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1990,	silvslug,	0,			gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Silver Slugger",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1995,	stargatp,	0,			gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Stargate (Pinball)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1995,	stargat1,	stargatp,	gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Stargate (rev.1)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

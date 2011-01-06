@@ -157,15 +157,6 @@ ROM_START(galaxy)
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
 
-ROM_START(galaxyb)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "cpu_u1b.716", 0x1000, 0x0800, CRC(53f7c0c9) SHA1(c3ee8bbdd1eca7a044c7abf4e0ba6059f523c323))
-	ROM_LOAD( "cpu_u5b.716", 0x1800, 0x0800, CRC(1b1cd31b) SHA1(65a6a58d2c509419fce3142a9ae88d8ea7d25f1c))
-	ROM_LOAD( "cpu_u2b.716", 0x5000, 0x0800, CRC(f0b4e60b) SHA1(e1628ec94585fbf4935e824721472cc9c91bbf89))
-	ROM_LOAD( "cpu_u6b.716", 0x5800, 0x0800, CRC(be4eacc1) SHA1(3d95e8e859312ef0a7ed52356dabe35ed0bebdef))
-	ROM_RELOAD( 0xf800, 0x0800)
-ROM_END
-
 /*--------------------------------
 / Hypnox
 /-------------------------------*/
@@ -221,15 +212,6 @@ ROM_START(meteorp)
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
 
-ROM_START(meteorb)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "cpu_u1.716", 0x1000, 0x0800, CRC(e0fd8452) SHA1(a13215378a678e26a565742d81fdadd2e161ba7a))
-	ROM_LOAD( "cpu_u5b.716", 0x1800, 0x0800, CRC(fe374449) SHA1(6ed39ae54a65a37d1d9bff52a12c5e9caee90cf1))
-	ROM_LOAD( "cpu_u2b.716", 0x5000, 0x0800, CRC(62cd0484) SHA1(754bb6a7c3c6024b642dba4bc148ed110ab14295))
-	ROM_LOAD( "cpu_u6b.716", 0x5800, 0x0800, CRC(10cb5d60) SHA1(1d3da195fbe06b49d08e4ce2ebc5d9d811126aa6))
-	ROM_RELOAD( 0xf800, 0x0800)
-ROM_END
-
 /*--------------------------------
 / Nine Ball
 /-------------------------------*/
@@ -242,11 +224,6 @@ ROM_START(nineball)
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
 
-ROM_START(ninebalb)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("nineball.256", 0x0000, 0x8000, CRC(06cb8a63) SHA1(c901bba0b41b45c5cfa6d04181f1e035beab5a08))
-	ROM_RELOAD(0x8000, 0x8000)
-ROM_END
 /*--------------------------------
 / Orbitor 1
 /-------------------------------*/
@@ -313,15 +290,6 @@ ROM_START(stargzr)
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
 
-ROM_START(stargzrb)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "cpu_u1.716", 0x1000, 0x0800, CRC(83606fd4) SHA1(7f6448bc0dabe50de40fd47a7242c1be4a93e84d))
-	ROM_LOAD( "cpu_u5b.716", 0x1800, 0x0800, CRC(29682d85) SHA1(3f449270cd4098a7ed1ee9c0d801110b1b653913))
-	ROM_LOAD( "cpu_u2b.716", 0x5000, 0x0800, CRC(360427cc) SHA1(ad76124b7fd088a5e2d24cf369c1620cdcc80309))
-	ROM_LOAD( "cpu_u6b.716", 0x5800, 0x0800, CRC(b68b11c5) SHA1(1af6aca8ecf70d2adf588a1e856f753193c05abd))
-	ROM_RELOAD( 0xf800, 0x0800)
-ROM_END
-
 /*--------------------------------
 / Viper
 /-------------------------------*/
@@ -380,20 +348,16 @@ GAME(1982,	dragfist,	0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern",				"Drago
 GAME(1980,	flight2k,	0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern",				"Flight 2000",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1981,	freefall,	0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern",				"Freefall",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1980,	galaxy,		0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern",				"Galaxy",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(2004,	galaxyb,	galaxy,		st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern / Oliver",		"Galaxy (7-digit bootleg)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1981,	ironmaid,	0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern",				"Iron Maiden",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1984,	lazrlord,	0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern",				"Lazer Lord",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1981,	lightnin,	0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern",				"Lightning",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1979,	meteorp,	0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern",				"Meteor (Pinball)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(2003,	meteorb,	meteorp,	st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern / Oliver",		"Meteor (7-digit conversion)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1980,	nineball,	0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern",				"Nine Ball",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(2007,	ninebalb,	nineball,	st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern / Oliver",		"Nine Ball (modified rules rev. 85)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1982,	orbitor1,	0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern",				"Orbitor 1",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1980,	quicksil,	0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern",				"Quicksilver",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1980,	seawitch,	0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern",				"Seawitch",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1981,	splitsec,	0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern",				"Split Second",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1980,	stargzr,	0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern",				"Stargazer",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(2006,	stargzrb,	stargzr,	st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern / Oliver",		"Stargazer (modified rules rev.9)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1981,	viperp,		0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern",				"Viper (Pinball)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1985,	gamatron,	flight2k,	st_mp200,	st_mp200,	st_mp200,	ROT0,	"Pinstar",				"Gamatron",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1978,	blkshpsq,	0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Astro",				"Black Sheep Squadron",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
