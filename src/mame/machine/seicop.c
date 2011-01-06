@@ -1541,6 +1541,8 @@ static WRITE16_HANDLER( seibu_common_video_regs_w )
 
 
 /*
+"The angle of ASM snippets"
+
 player-1 priorities list:
 1086d8: show this sprite (bit 15)
 1086dc: lives (BCD,bits 3,2,1,0)
@@ -1626,6 +1628,25 @@ x/y check [2]
 [...]
 //then reads at $580
 
+sine cosine has a weird math problem, it needs that the amp is multiplied by two when the direction is TOTALLY left or TOTALLY up.
+No known explaination to this so far ...
+
+003306: move.w  #$8100, ($100,A0)
+00330C: move.w  #$8900, ($100,A0)
+003312: cmpi.w  #$80, ($36,A1) ;checks if angle is equal to 0x80 (left direction of objects)
+003318: bne     $332a
+00331C: move.l  ($14,A1), D0 ;divide by two if so
+003320: asr.l   #1, D0
+003322: move.l  D0, ($14,A1)
+003326: bra     $333e
+00332A: cmpi.w  #$c0, ($36,A1) ;checks if angle is equal to 0xc0 (up direction of objects)
+003330: bne     $333e
+003334: move.l  ($10,A1), D0 ;divide by two if so
+003338: asr.l   #1, D0
+00333A: move.l  D0, ($10,A1)
+00333E: movem.l (A7)+, D0/A0-A1
+003342: rts
+
 */
 
 /********************************************************************************************
@@ -1666,55 +1687,11 @@ WRITE16_HANDLER( copdxbl_0_w )
 
 	switch(offset)
 	{
-
 		default:
 		{
 			logerror("%06x: COPX unhandled write data %04x at offset %04x\n", cpu_get_pc(space->cpu), data, offset*2);
 			break;
 		}
-
-		/*********************************************************************
-        400-5ff -  Protection writes
-        *********************************************************************/
-
-		#if 0
-		case (0x4a0/2):
-		case (0x4a2/2):
-		case (0x4a4/2):
-		case (0x4a6/2):
-		case (0x4a8/2):
-		case (0x4aa/2):
-		case (0x4ac/2):
-		case (0x4ae/2):
-		case (0x4c0/2):
-		case (0x4c2/2):
-		case (0x4c4/2):
-		case (0x4c6/2):
-		case (0x4c8/2):
-		case (0x4ca/2):
-		case (0x4cc/2):
-		case (0x4ce/2):
-			//cop_reg_w(cop_mcu_ram[offset],offset & 0x000f, (offset < (0x4b0/2)) ? 1 : 0);
-			break;
-		/*layer clearance,but the bootleg doesn't send values,so this function
-          is an original left-over.*/
-		case (0x478/2):
-		{
-			/*
-    AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(legionna_background_w) AM_BASE(&legionna_back_data)
-    AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(legionna_foreground_w) AM_BASE(&legionna_fore_data)
-    AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(legionna_midground_w) AM_BASE(&legionna_mid_data)
-    AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(legionna_text_w) AM_BASE(&legionna_textram)
-            */
-			break;
-		}
-		case (0x500/2):
-		{
-			//cop_fct = cop_mcu_ram[offset];
-			//cop_run();
-			break;
-		}
-		#endif
 
 		/*TODO: kludge on x-axis.*/
 		case (0x660/2): { legionna_scrollram16[0] = cop_mcu_ram[offset] - 0x1f0; break; }
@@ -1734,219 +1711,6 @@ WRITE16_HANDLER( copdxbl_0_w )
 		}
 	}
 }
-
-// this still probably contains some useful information, but we should handle
-// things as generically as possible
-#ifdef UNUSED_FUNCTION
-/********************************************************************************************
-
-  COPX-D2 simulation
-    - Raiden 2
-    - Zero Team
-
- *******************************************************************************************/
-
-
-/* Raiden 2 COP2 handling.  Note, some important details about table upload in here that the
-   other simulations are missing */
-
-//  COPX functions, terribly incomplete
-
-typedef struct _cop_state cop_state;
-struct _cop_state
-{
-	UINT16		offset;						/* last write offset */
-	UINT16		ram[0x200/2];				/* RAM from 0x400-0x5ff */
-
-	UINT32		reg[4];						/* registers */
-
-	UINT16		func_trigger[0x100/8];		/* function trigger */
-	UINT16		func_value[0x100/8];		/* function value (?) */
-	UINT16		func_mask[0x100/8];			/* function mask (?) */
-	UINT16		program[0x100];				/* program "code" */
-};
-
-static cop_state cop_data;
-
-
-#define VERBOSE 1
-#define COP_LOG(x)	do { if (VERBOSE) logerror x; } while (0)
-
-
-
-INLINE UINT16 cop_ram_r(cop_state *cop, UINT16 offset)
-{
-	return cop->ram[(offset - 0x400) / 2];
-}
-
-INLINE void cop_ram_w(cop_state *cop, UINT16 offset, UINT16 data)
-{
-	cop->ram[(offset - 0x400) / 2] = data;
-}
-
-INLINE UINT32 r32(offs_t address)
-{
-	return	(space->read_word(address + 0) << 0) |
-			(space->read_word(address + 2) << 16);
-}
-
-INLINE void w32(offs_t address, UINT32 data)
-{
-	space->write_word(address + 0, data >> 0);
-	space->write_word(address + 2, data >> 16);
-}
-
-
-void cop_init(void)
-{
-	memset(&cop_data, 0, sizeof(cop_data));
-}
-
-WRITE16_HANDLER( raiden2_cop2_w )
-{
-	cop_state *cop = &cop_data;
-	UINT32 temp32;
-	UINT8 regnum;
-	int func;
-
-	/* all COP data writes are word-length (?) */
-	data = COMBINE_DATA(&cop->ram[offset]);
-
-	/* handle writes */
-	switch (offset + (0x400/2))
-	{
-		/* ----- BCD conversion ----- */
-
-		case 0x420/2:		/* LSW of number */
-		case 0x422/2:		/* MSW of number */
-			temp32 = cop_ram_r(cop, 0x420) | (cop_ram_r(cop, 0x422) << 16);
-			cop_ram_w(cop, 0x590, ((temp32 / 1) % 10) + (((temp32 / 10) % 10) << 8) + 0x3030);
-			cop_ram_w(cop, 0x592, ((temp32 / 100) % 10) + (((temp32 / 1000) % 10) << 8) + 0x3030);
-			cop_ram_w(cop, 0x594, ((temp32 / 10000) % 10) + (((temp32 / 100000) % 10) << 8) + 0x3030);
-			cop_ram_w(cop, 0x596, ((temp32 / 1000000) % 10) + (((temp32 / 10000000) % 10) << 8) + 0x3030);
-			cop_ram_w(cop, 0x598, ((temp32 / 100000000) % 10) + (((temp32 / 1000000000) % 10) << 8) + 0x3030);
-			break;
-
-		/* ----- program upload registers ----- */
-
-		case 0x432/2:		/* COP program data */
-			COP_LOG(("%05X:COP Prog Data = %04X\n", cpu_get_pc(space->cpu), data));
-			cop->program[cop_ram_r(cop, 0x434)] = data;
-			break;
-
-		case 0x434/2:		/* COP program address */
-			COP_LOG(("%05X:COP Prog Addr = %04X\n", cpu_get_pc(space->cpu), data));
-			assert((data & ~0xff) == 0);
-			temp32 = (data & 0xff) / 8;
-			cop->func_value[temp32] = cop_ram_r(cop, 0x438);
-			cop->func_mask[temp32] = cop_ram_r(cop, 0x43a);
-			cop->func_trigger[temp32] = cop_ram_r(cop, 0x43c);
-
-			break;
-
-		case 0x438/2:		/* COP program entry value (0,4,5,6,7,8,9,F) */
-			COP_LOG(("%05X:COP Prog Val  = %04X\n", cpu_get_pc(space->cpu), data));
-			break;
-
-		case 0x43a/2:		/* COP program entry mask */
-			COP_LOG(("%05X:COP Prog Mask = %04X\n", cpu_get_pc(space->cpu), data));
-			break;
-
-		case 0x43c/2:		/* COP program trigger value */
-			COP_LOG(("%05X:COP Prog Trig = %04X\n", cpu_get_pc(space->cpu), data));
-			break;
-
-		/* ----- ???? ----- */
-
-		case 0x47a/2:		/* clear RAM */
-			if (cop_ram_r(cop, 0x47e) == 0x118)
-			{
-				UINT32 addr = cop_ram_r(cop, 0x478) << 6;
-				int count = (cop_ram_r(cop, 0x47a) + 1) << 5;
-				COP_LOG(("%05X:COP RAM clear from %05X to %05X\n", cpu_get_pc(space->cpu), addr, addr + count));
-				while (count--)
-					space->write_byte(addr++, 0);
-			}
-			else
-			{
-				COP_LOG(("%05X:COP Unknown RAM clear(%04X) = %04X\n", cpu_get_pc(space->cpu), cop_ram_r(cop, 0x47e), data));
-			}
-			break;
-
-		/* ----- program data registers ----- */
-
-		case 0x4a0/2:		/* COP register high word */
-		case 0x4a2/2:		/* COP register high word */
-		case 0x4a4/2:		/* COP register high word */
-		case 0x4a6/2:		/* COP register high word */
-			regnum = (offset) % 4;
-			COP_LOG(("%05X:COP RegHi(%d) = %04X\n", cpu_get_pc(space->cpu), regnum, data));
-			cop->reg[regnum] = (cop->reg[regnum] & 0x0000ffff) | (data << 16);
-			break;
-
-		case 0x4c0/2:		/* COP register low word */
-		case 0x4c2/2:		/* COP register low word */
-		case 0x4c4/2:		/* COP register low word */
-		case 0x4c6/2:		/* COP register low word */
-			regnum = (offset) % 4;
-			COP_LOG(("%05X:COP RegLo(%d) = %04X\n", cpu_get_pc(space->cpu), regnum, data));
-			cop->reg[regnum] = (cop->reg[regnum] & 0xffff0000) | data;
-			break;
-
-		/* ----- program trigger register ----- */
-
-		case 0x500/2:		/* COP trigger */
-			COP_LOG(("%05X:COP Trigger = %04X\n", cpu_get_pc(space->cpu), data));
-			for (func = 0; func < ARRAY_LENGTH(cop->func_trigger); func++)
-				if (cop->func_trigger[func] == data)
-				{
-					int offs;
-
-					COP_LOG(("  Execute:"));
-					for (offs = 0; offs < 8; offs++)
-					{
-						if (cop->program[func * 8 + offs] == 0)
-							break;
-						COP_LOG((" %04X", cop->program[func * 8 + offs]));
-					}
-					COP_LOG(("\n"));
-
-					/* special cases for now */
-					if (data == 0x5205 || data == 0x5a05)
-					{
-						COP_LOG(("  Copy 32 bits from %05X to %05X\n", cop->reg[0], cop->reg[1]));
-						w32(cop->reg[1], r32(cop->reg[0]));
-					}
-					else if (data == 0xf205)
-					{
-						COP_LOG(("  Copy 32 bits from %05X to %05X\n", cop->reg[0] + 4, cop->reg[1]));
-						w32(cop->reg[2], r32(cop->reg[0] + 4));
-					}
-					break;
-				}
-			logerror("%05X:COP Warning - can't find command - func != ARRAY_LENGTH(cop->func_trigger)\n",  cpu_get_pc(space->cpu));
-			break;
-
-		/* ----- other stuff ----- */
-
-		default:		/* unknown */
-			COP_LOG(("%05X:COP Unknown(%04X) = %04X\n", cpu_get_pc(space->cpu), offset*2 + 0x400, data));
-			break;
-	}
-}
-
-
-READ16_HANDLER( raiden2_cop2_r )
-{
-	cop_state *cop = &cop_data;
-	COP_LOG(("%05X:COP Read(%04X) = %04X\n", cpu_get_pc(space->cpu), offset*2 + 0x400, cop->ram[offset]));
-	return cop->ram[offset];
-}
-#endif
-
-
-
-
 
 /* Generic COP functions
   -- the game specific handlers fall through to these if there
@@ -2374,24 +2138,32 @@ static WRITE16_HANDLER( generic_cop_w )
 			}
 
 			/* SINE math - 0x8100 */
-			/* FIXME: going up is slower than going down */
 			/* FIXME: cop scale is unreliable */
 			if(COP_CMD(0xb9a,0xb88,0x888,0x000,0x000,0x000,0x000,0x000,7,0xfdfb))
 			{
-				double angle = (space->read_word(cop_register[0]+(0x34^2)) & 0xff) * M_PI / 128;
+				int raw_angle = (space->read_word(cop_register[0]+(0x34^2)) & 0xff);
+				double angle = raw_angle * M_PI / 128;
 				double amp = 65536*(space->read_word(cop_register[0]+(0x36^2)) & 0xff);
+
+				/* TODO: up direction, why? */
+				if(raw_angle == 0xc0)
+					amp*=2;
 
 				space->write_dword(cop_register[0] + 16, int(amp*sin(angle)) >> (5-cop_scale));
 				return;
 			}
 
 			/* COSINE math - 0x8900 */
-			/* FIXME: going left is slower than going right */
 			/* FIXME: cop scale is unreliable */
 			if(COP_CMD(0xb9a,0xb8a,0x88a,0x000,0x000,0x000,0x000,0x000,7,0xfdfb))
 			{
-				double angle = (space->read_word(cop_register[0]+(0x34^2)) & 0xff) * M_PI / 128;
+				int raw_angle = (space->read_word(cop_register[0]+(0x34^2)) & 0xff);
+				double angle = raw_angle * M_PI / 128;
 				double amp = 65536*(space->read_word(cop_register[0]+(0x36^2)) & 0xff);
+
+				/* TODO: left direction, why? */
+				if(raw_angle == 0x80)
+					amp*=2;
 
 				space->write_dword(cop_register[0] + 20, int(amp*cos(angle)) >> (5-cop_scale));
 				return;
@@ -2402,6 +2174,7 @@ static WRITE16_HANDLER( generic_cop_w )
 			{
 				int dx = space->read_dword(cop_register[1]+4) - space->read_dword(cop_register[0]+4);
 				int dy = space->read_dword(cop_register[1]+8) - space->read_dword(cop_register[0]+8);
+
 				if(!dy) {
 					cop_status |= 0x8000;
 					cop_angle = 0;
@@ -2410,12 +2183,8 @@ static WRITE16_HANDLER( generic_cop_w )
 					if(dy<0)
 						cop_angle += 0x80;
 				}
-				dx = dx >> 16;
-				dy = dy >> 16;
-				cop_dist = sqrt((double)(dx*dx+dy*dy));
 
 				space->write_byte(cop_register[0]+(0x34^3), cop_angle);
-				space->write_word(cop_register[0]+(0x38^2), cop_dist);
 				return;
 			}
 
@@ -2432,16 +2201,25 @@ static WRITE16_HANDLER( generic_cop_w )
 					if(dy<0)
 						cop_angle += 0x80;
 				}
+
+				/* is this the only difference? no, that's not it, check Legionnaire */
+				//if(0)
+					space->write_byte(cop_register[0]+(0x34^3), cop_angle);
+				return;
+			}
+
+			//07 | 4 | 007f | 3bb0 | f9c b9c b9c b9c b9c b9c b9c 99c
+			//(grainbow) | 4 | 007f | 3bb0 | f9c b9c b9c b9c b9c b9c b9c 99c
+			if(COP_CMD(0xf9c,0xb9c,0xb9c,0xb9c,0xb9c,0xb9c,0xb9c,0x99c,4,0x007f))
+			{
+				int dx = space->read_dword(cop_register[1]+4) - space->read_dword(cop_register[0]+4);
+				int dy = space->read_dword(cop_register[1]+8) - space->read_dword(cop_register[0]+8);
+
 				dx = dx >> 16;
 				dy = dy >> 16;
 				cop_dist = sqrt((double)(dx*dx+dy*dy));
 
-				/* is this the only difference? no, that's not it, check Legionnaire */
-				//if(0)
-				{
-					space->write_byte(cop_register[0]+(0x34^3), cop_angle);
-					space->write_word(cop_register[0]+(0x38^2), cop_dist);
-				}
+				space->write_word(cop_register[0]+(0x38^2), cop_dist);
 				return;
 			}
 

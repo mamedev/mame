@@ -436,15 +436,23 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 	}
 
 	case 0x8100: { // 8100 0007 fdfb 0080 - 0b9a 0b88 0888 0000 0000 0000 0000 0000
-		double angle = (space.read_word(cop_regs[0]+0x34) & 0xff) * M_PI / 128;
+		int raw_angle = (space.read_word(cop_regs[0]+0x34) & 0xff);
+		double angle = raw_angle * M_PI / 128;
 		double amp = 65536*(space.read_word(cop_regs[0]+0x36) & 0xff);
+		/* TODO: up direction, why? (check machine/seicop.c) */
+		if(raw_angle == 0xc0)
+			amp*=2;
 		space.write_dword(cop_regs[0] + 16, int(amp*sin(angle)) >> (5-cop_scale));
 		break;
 	}
 
 	case 0x8900: { // 8900 0007 fdfb 0088 - 0b9a 0b8a 088a 0000 0000 0000 0000 0000
-		double angle = (space.read_word(cop_regs[0]+0x34) & 0xff) * M_PI / 128;
+		int raw_angle = (space.read_word(cop_regs[0]+0x34) & 0xff);
+		double angle = raw_angle * M_PI / 128;
 		double amp = 65536*(space.read_word(cop_regs[0]+0x36) & 0xff);
+		/* TODO: left direction, why? (check machine/seicop.c) */
+		if(raw_angle == 0x80)
+			amp*=2;
 		space.write_dword(cop_regs[0] + 20, int(amp*cos(angle)) >> (5-cop_scale));
 		break;
 	}
@@ -1015,6 +1023,7 @@ static ADDRESS_MAP_START( raiden2_cop_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_st
 	AM_RANGE(0x0043a, 0x0043b) AM_WRITE(cop_pgm_mask_w)
 	AM_RANGE(0x0043c, 0x0043d) AM_WRITE(cop_pgm_trigger_w)
 	AM_RANGE(0x00444, 0x00445) AM_WRITE(cop_scale_w)
+	AM_RANGE(0x00450, 0x00459) AM_WRITENOP //sort-DMA params
 	AM_RANGE(0x00470, 0x00471) AM_READWRITE(cop_tile_bank_2_r,cop_tile_bank_2_w)
 
 	AM_RANGE(0x00476, 0x00477) AM_WRITE(cop_dma_adr_rel_w)
@@ -1048,6 +1057,7 @@ static ADDRESS_MAP_START( raiden2_cop_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_st
 //	AM_RANGE(0x006d8, 0x006d9) AM_WRITENOP
 //	AM_RANGE(0x006da, 0x006db) AM_WRITENOP
 	AM_RANGE(0x006fc, 0x006fd) AM_WRITE(cop_dma_trigger_w)
+	AM_RANGE(0x006fe, 0x006ff) AM_WRITENOP // sort-DMA trigger
 
 	AM_RANGE(0x00762, 0x00763) AM_READ(raiden2_bank_r)
 ADDRESS_MAP_END
@@ -1093,6 +1103,8 @@ static ADDRESS_MAP_START( zeroteam_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state
 
 	AM_RANGE(0x00470, 0x00471) AM_WRITENOP
 	AM_RANGE(0x006cc, 0x006cd) AM_WRITENOP
+
+	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // irq ack / sprite buffering?
 
 	AM_IMPORT_FROM( raiden2_cop_mem )
 
@@ -1521,8 +1533,6 @@ static MACHINE_CONFIG_START( raiden2, raiden2_state )
 
 	SEIBU2_RAIDEN2_SOUND_SYSTEM_CPU(14318180/4)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
-
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
@@ -1553,8 +1563,6 @@ static MACHINE_CONFIG_DERIVED( xsedae, raiden2 )
 
 	MCFG_MACHINE_RESET(xsedae)
 
-	MCFG_QUANTUM_TIME(HZ(600))
-
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MCFG_SCREEN_MODIFY("screen")
@@ -1565,8 +1573,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( raidendx, raiden2 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(raidendx_mem)
-
-	MCFG_QUANTUM_TIME(HZ(6000))
 
 	MCFG_MACHINE_RESET(raidendx)
 MACHINE_CONFIG_END
@@ -1582,8 +1588,6 @@ static MACHINE_CONFIG_START( zeroteam, raiden2_state )
 	MCFG_MACHINE_RESET(zeroteam)
 
 	SEIBU_NEWZEROTEAM_SOUND_SYSTEM_CPU(14318180/4)
-
-	MCFG_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
