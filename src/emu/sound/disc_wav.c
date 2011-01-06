@@ -1041,7 +1041,7 @@ DISCRETE_RESET(dss_op_amp_osc)
 	const double *r_info_ptr;
 	const double **r_context_ptr;
 	int loop;
-	node_description *r_node;
+	discrete_base_node *r_node;
 
 	double i1 = 0;	/* inverting input current */
 	double i2 = 0;	/* non-inverting input current */
@@ -1698,7 +1698,7 @@ DISCRETE_RESET(dss_squarewave2)
 #define DSS_INVERTER_OSC__C			DISCRETE_INPUT(4)
 #define DSS_INVERTER_OSC__R2		DISCRETE_INPUT(5)
 
-INLINE double dss_inverter_tftab(node_description *node, double x)
+INLINE double dss_inverter_tftab(discrete_base_node *node, double x)
 {
 	DISCRETE_DECLARE_CONTEXT(dss_inverter_osc)
 	DISCRETE_DECLARE_INFO(discrete_inverter_osc_desc)
@@ -1710,7 +1710,7 @@ INLINE double dss_inverter_tftab(node_description *node, double x)
 		return info->vB;
 }
 
-INLINE double dss_inverter_tf(node_description *node, double x)
+INLINE double dss_inverter_tf(discrete_base_node *node, double x)
 {
 	DISCRETE_DECLARE_CONTEXT(dss_inverter_osc)
 	DISCRETE_DECLARE_INFO(discrete_inverter_osc_desc)

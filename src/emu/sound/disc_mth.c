@@ -1315,7 +1315,7 @@ DISCRETE_RESET(dst_mixer)
 	DISCRETE_DECLARE_CONTEXT(dst_mixer)
 	DISCRETE_DECLARE_INFO(discrete_mixer_desc)
 
-	node_description *r_node;
+	discrete_base_node *r_node;
 
 	int		bit;
 	double	rTemp = 0;

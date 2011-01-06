@@ -3,7 +3,6 @@
 #ifndef __DISCRETE_H__
 #define __DISCRETE_H__
 
-//#include "devlegcy.h"
 #include "machine/rescap.h"
 
 /***********************************************************************
@@ -3501,7 +3500,7 @@
 #define DISCRETE_START_NAME( _func )			_func ## _start
 #define DISCRETE_STOP_NAME( _func ) 			_func ## _stop
 
-#define DISCRETE_FUNC(_func)					void _func (node_description *node)
+#define DISCRETE_FUNC(_func)					void _func (discrete_base_node *node)
 
 #define DISCRETE_STEP(_func)					static DISCRETE_FUNC(DISCRETE_STEP_NAME(_func))
 #define DISCRETE_RESET(_func)					static DISCRETE_FUNC(DISCRETE_RESET_NAME(_func))
@@ -3517,7 +3516,7 @@
 #define DISCRETE_DECLARE_INFO(_name)			const _name *info = (const  _name *)node->custom_data();
 
 #define DISCRETE_CUSTOM_MODULE(_basename, _context_type) \
-	{ DST_CUSTOM, "CUSTOM", 1, sizeof(_context_type), DISCRETE_RESET_NAME(_basename), DISCRETE_STEP_NAME(_basename) }
+	{ new discrete_node_factory<discrete_legacy_node>, DST_CUSTOM, "CUSTOM", 1, sizeof(_context_type), DISCRETE_RESET_NAME(_basename), DISCRETE_STEP_NAME(_basename) }
 
 #define DISCRETE_INPUT(_num)					(*(node->input[_num]))
 
@@ -3871,8 +3870,9 @@ typedef struct _discrete_sound_block discrete_sound_block;
 typedef struct _discrete_module discrete_module;
 
 
-class node_description;
-typedef linked_list_t<node_description *> node_list_t;
+class discrete_base_node;
+class discrete_device;
+typedef linked_list_t<discrete_base_node *> node_list_t;
 
 
 
@@ -3882,8 +3882,21 @@ typedef linked_list_t<node_description *> node_list_t;
  *
  *************************************/
 
+class discrete_node_base_factory      // Each class which can have run time specified object creation
+{                       // has an equivalent factory class that provides a Create virtual
+                        // function override
+
+
+public:
+    virtual discrete_base_node *Create(discrete_device * pdev, const discrete_module *xmodule, const discrete_sound_block *block) = 0;
+    virtual ~discrete_node_base_factory() {}
+};
+
+
+
 struct _discrete_module
 {
+	discrete_node_base_factory	*factory;
 	int				type;
 	const char *	name;
 	int				num_output;				/* Total number of output nodes, i.e. Master node + 1 */
@@ -3913,7 +3926,7 @@ class discrete_task
 {
 public:
 	discrete_task(void)
-	: numbuffered(0), task_group(0), m_threadid(-1)
+: numbuffered(0), task_group(0), m_threadid(-1)
 	{
 		source_list.reset();
 		list.reset();
@@ -3935,7 +3948,7 @@ public:
 	const double			*source[DISCRETE_MAX_TASK_OUTPUTS];
 
 	double					*node_buf[DISCRETE_MAX_TASK_OUTPUTS];
-	node_description		*nodes[DISCRETE_MAX_TASK_OUTPUTS];
+	discrete_base_node		*nodes[DISCRETE_MAX_TASK_OUTPUTS];
 
 	inline bool lock_threadid(INT32 threadid)
 	{
@@ -4729,7 +4742,7 @@ protected:
 class discrete_device : public device_t, public device_sound_interface
 {
 	friend class discrete_device_config;
-	friend class node_description;
+	friend class discrete_base_node;
 
 	// construction/destruction
 	discrete_device(running_machine &_machine, const discrete_device_config &config);
@@ -4742,9 +4755,9 @@ public:
 
 	/* --------------------------------- */
 	void CLIB_DECL ATTR_PRINTF(2,3) discrete_log(const char *text, ...) const;
-	node_description *discrete_find_node(int node);
+	discrete_base_node *discrete_find_node(int node);
 	/* FIXME: this is used by csv and wav logs - going forward, identifiers should be explicitly passed */
-	int same_module_index(node_description &node);
+	int same_module_index(discrete_base_node &node);
 
 
 	/* the output stream */
@@ -4779,7 +4792,7 @@ protected:
 
 private:
 	/* internal node tracking */
-	node_description 	**m_indexed_node;
+	discrete_base_node 	**m_indexed_node;
 
 	/* list of all nodes */
 	node_list_t			 m_node_list;		/* node_description * */
@@ -4815,12 +4828,19 @@ extern const device_type DISCRETE;
  *
  *************************************/
 
-class node_description
+class discrete_base_node
 {
 public:
-	node_description(discrete_device * pdev, const discrete_module *module, const discrete_sound_block *block);
+	discrete_base_node(discrete_device * pdev, const discrete_module *module, const discrete_sound_block *block);
 
-	~node_description(void);
+	~discrete_base_node(void);
+
+	virtual void step(void) = 0;
+	virtual void reset(void) { }
+	virtual void start(void) { }
+	virtual void stop(void) { }
+
+	virtual bool is_stepping(void) = 0;
 
 	/* Return the node index, i.e. X from NODE(X) */
 	int index(void);
@@ -4836,9 +4856,6 @@ public:
 
 	/* The node's last output value */
 	double				output[DISCRETE_MAX_OUTPUTS];
-
-	/* Called to execute one time delta of output update */
-	DISCRETE_FUNC((*step));
 
 	/* Contextual information specific to this node type */
 	void *				context;
@@ -4866,5 +4883,33 @@ private:
 
 };
 
+template <class C>
+class discrete_node_factory : public discrete_node_base_factory
+{
+	discrete_base_node *Create(discrete_device * pdev, const discrete_module *xmodule, const discrete_sound_block *block);
+};
+
+template <class C>
+discrete_base_node * discrete_node_factory<C>::Create(discrete_device * pdev, const discrete_module *xmodule, const discrete_sound_block *block)
+{
+    return auto_alloc_clear(pdev->machine, C(pdev, xmodule, block));
+}
+
+class discrete_legacy_node : public discrete_base_node
+{
+public:
+
+	discrete_legacy_node(discrete_device * pdev, const discrete_module *xmodule, const discrete_sound_block *block)
+	 : discrete_base_node::discrete_base_node(pdev, xmodule, block), m_step(module->step) {  }
+
+	void step(void)  { /* if (m_step != NULL) */ m_step(this); }
+	virtual void reset(void) { if (module->reset != NULL) module->reset(this); }
+	virtual void start(void) { if (module->start != NULL) module->start(this);}
+	virtual void stop(void)  { if (module->stop != NULL) module->stop(this); }
+
+	virtual bool is_stepping(void) { return (m_step != NULL); }
+protected:
+	DISCRETE_FUNC((*m_step));
+};
 
 #endif /* __DISCRETE_H__ */

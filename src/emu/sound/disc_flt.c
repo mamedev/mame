@@ -111,6 +111,7 @@ struct dst_rcfilter_context
 	double	rc;
 	double	exponent;
 	UINT8	has_rc_nodes;
+	UINT8	is_fast;
 };
 
 struct dst_rcfilter_sw_context
@@ -202,7 +203,7 @@ DISCRETE_RESET(dst_crfilter)
 #define DST_FILTER1__FREQ	DISCRETE_INPUT(2)
 #define DST_FILTER1__TYPE	DISCRETE_INPUT(3)
 
-static void calculate_filter1_coefficients(node_description *node, double fc, double type,
+static void calculate_filter1_coefficients(discrete_base_node *node, double fc, double type,
 										   double *a1, double *b0, double *b1)
 {
 	double den, w, two_over_T;
@@ -272,7 +273,7 @@ DISCRETE_RESET(dst_filter1)
 #define DST_FILTER2__DAMP	DISCRETE_INPUT(3)
 #define DST_FILTER2__TYPE	DISCRETE_INPUT(4)
 
-static void calculate_filter2_coefficients(node_description *node,
+static void calculate_filter2_coefficients(discrete_base_node *node,
 		                                   double fc, double d, double type,
 										   double *a1, double *a2,
 										   double *b0, double *b1, double *b2)
@@ -1109,30 +1110,29 @@ DISCRETE_STEP(dst_rcfilter)
 {
 	DISCRETE_DECLARE_CONTEXT(dst_rcfilter)
 
-	if (UNEXPECTED(context->has_rc_nodes))
+	if (EXPECTED(context->is_fast))
+		node->output[0] += ((DST_RCFILTER__VIN - node->output[0]) * context->exponent);
+	else
 	{
-		double rc = DST_RCFILTER__R * DST_RCFILTER__C;
-		if (rc != context->rc)
+		if (UNEXPECTED(context->has_rc_nodes))
 		{
-			context->rc = rc;
-			context->exponent = RC_CHARGE_EXP(rc);
+			double rc = DST_RCFILTER__R * DST_RCFILTER__C;
+			if (rc != context->rc)
+			{
+				context->rc = rc;
+				context->exponent = RC_CHARGE_EXP(rc);
+			}
 		}
+
+		/************************************************************************/
+		/* Next Value = PREV + (INPUT_VALUE - PREV)*(1-(EXP(-TIMEDELTA/RC)))    */
+		/************************************************************************/
+
+		context->vCap += ((DST_RCFILTER__VIN - node->output[0]) * context->exponent);
+		node->output[0] = context->vCap + DST_RCFILTER__VREF;
 	}
-
-	/************************************************************************/
-	/* Next Value = PREV + (INPUT_VALUE - PREV)*(1-(EXP(-TIMEDELTA/RC)))    */
-	/************************************************************************/
-
-	context->vCap += ((DST_RCFILTER__VIN - node->output[0]) * context->exponent);
-	node->output[0] = context->vCap + DST_RCFILTER__VREF;
 }
 
-DISCRETE_STEP(dst_rcfilter_fast)
-{
-	DISCRETE_DECLARE_CONTEXT(dst_rcfilter)
-
-	node->output[0] += ((DST_RCFILTER__VIN - node->output[0]) * context->exponent);
-}
 
 DISCRETE_RESET(dst_rcfilter)
 {
@@ -1143,8 +1143,11 @@ DISCRETE_RESET(dst_rcfilter)
 	context->exponent = RC_CHARGE_EXP(context->rc);
 	context->vCap   = 0;
 	node->output[0] = 0;
+	/* FIXME --> we really need another class here */
 	if (!context->has_rc_nodes && DST_RCFILTER__VREF == 0)
-		node->step = DISCRETE_STEP_NAME(dst_rcfilter_fast);
+		context->is_fast = 1;
+	else
+		context->is_fast = 0;
 }
 
 /************************************************************************

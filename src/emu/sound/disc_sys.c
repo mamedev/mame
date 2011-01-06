@@ -43,13 +43,13 @@ static void task_check(discrete_task *task, discrete_task *dest_task)
 	/* Determine, which nodes in the task are referenced by nodes in dest_task
      * and add them to the list of nodes to be buffered for further processing
      */
-	for_each(node_description *, node_entry, &task->list)
+	for_each(discrete_base_node *, node_entry, &task->list)
 	{
-		node_description *task_node = node_entry.item();
+		discrete_base_node *task_node = node_entry.item();
 
-		for_each(node_description *, step_entry, &dest_task->list)
+		for_each(discrete_base_node *, step_entry, &dest_task->list)
 		{
-			node_description *dest_node = step_entry.item();
+			discrete_base_node *dest_node = step_entry.item();
 
 			/* loop over all active inputs */
 			for (inputnum = 0; inputnum < dest_node->active_inputs(); inputnum++)

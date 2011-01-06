@@ -396,7 +396,7 @@ DISCRETE_RESET(dsd_555_astbl)
 	DISCRETE_DECLARE_CONTEXT(dsd_555_astbl)
 	DISCRETE_DECLARE_INFO(discrete_555_desc)
 
-	node_description *v_charge_node;
+	discrete_base_node *v_charge_node;
 
 	context->use_ctrlv   = (node->input_is_node() >> 4) & 1;
 	context->output_type = info->options & DISC_555_OUT_MASK;
