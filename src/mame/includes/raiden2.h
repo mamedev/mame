@@ -61,11 +61,6 @@ public:
 	DECLARE_WRITE16_MEMBER( mcu_prog_w );
 	DECLARE_WRITE16_MEMBER( mcu_prog_w2 );
 	DECLARE_WRITE16_MEMBER( mcu_prog_offs_w );
-	DECLARE_READ16_MEMBER( rdx_v33_system_r );
-	DECLARE_READ16_MEMBER( r2_playerin_r );
-	DECLARE_READ16_MEMBER( rdx_v33_unknown_r );
-	DECLARE_READ16_MEMBER( rdx_v33_unknown2_r );
-	DECLARE_READ16_MEMBER( nzerotea_unknown_r );
 
 	DECLARE_READ16_MEMBER( raiden2_sound_comms_r );
 	DECLARE_WRITE16_MEMBER( raiden2_sound_comms_w );
@@ -101,3 +96,4 @@ public:
 /*----------- defined in machine/r2crypt.c -----------*/
 
 void raiden2_decrypt_sprites(running_machine *machine);
+void zeroteam_decrypt_sprites(running_machine *machine);

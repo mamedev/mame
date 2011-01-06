@@ -277,5 +277,8 @@ void raiden2_decrypt_sprites(running_machine *machine)
   }
 }
 
-
+void zeroteam_decrypt_sprites(running_machine *machine)
+{
+	// TODO!
+}
 

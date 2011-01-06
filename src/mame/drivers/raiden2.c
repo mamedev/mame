@@ -6,12 +6,6 @@
   value of 0x80 puts 0x00000-0x1ffff at 0x20000 - 0x3ffff
   value of 0x00 puts 0x20000-0x3ffff at 0x20000 - 0x3ffff
 
- TODO (xsedae):
- - sprite DMA params doesn't quite work well with this and zeroteam (hardcode src to 0xf000 and size to 0x800).
- - sprite ROMs are badly dumped (half size);
- - sprite X kludge needs to be removed somehow;
- - apparently the only real usage of the sprite protection in xsedae is on the field map (sprite goes in the wrong direction);
-
 */
 
 /*
@@ -101,7 +95,7 @@ Games on this PCB / Similar PCBs
  Zero Team
  X Se Dae Quiz
 
- + varients
+ + variants
 
 Some of these games were also released on updated PCBs
 which usually featured vastly inferior sound hardware
@@ -978,25 +972,12 @@ static MACHINE_RESET(xsedae)
 
 READ16_MEMBER(raiden2_state::raiden2_sound_comms_r)
 {
-	switch(offset)
-	{
-		case (0x008/2):	return seibu_main_word_r(&space,2,0xffff);
-		case (0x00c/2):	return seibu_main_word_r(&space,3,0xffff);
-		case (0x014/2): return seibu_main_word_r(&space,5,0xffff);
-	}
-
-	return 0xffff;
+	return seibu_main_word_r(&space,(offset >> 1) & 7,0xffff);
 }
 
 WRITE16_MEMBER(raiden2_state::raiden2_sound_comms_w)
 {
-	switch(offset)
-	{
-		case (0x000/2):	{ seibu_main_word_w(&space,0,data,0x00ff); break; }
-		case (0x004/2):	{ seibu_main_word_w(&space,1,data,0x00ff); break; }
-		case (0x010/2):	{ seibu_main_word_w(&space,4,data,0x00ff); break; }
-		case (0x018/2):	{ seibu_main_word_w(&space,6,data,0x00ff); break; }
-	}
+	seibu_main_word_w(&space,(offset >> 1) & 7,data,0x00ff);
 }
 
 WRITE16_MEMBER(raiden2_state::raiden2_bank_w)
@@ -1161,33 +1142,6 @@ static ADDRESS_MAP_START( xsedae_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state )
 
 	AM_RANGE(0x20000, 0xfffff) AM_ROM AM_REGION("mainprg", 0x20000)
 ADDRESS_MAP_END
-
-
-READ16_MEMBER(raiden2_state::rdx_v33_system_r )
-{
-	return input_port_read(space.machine, "SYSTEM");
-}
-
-
-READ16_MEMBER(raiden2_state::r2_playerin_r )
-{
-	return input_port_read(space.machine, "INPUT");
-}
-
-READ16_MEMBER(raiden2_state::rdx_v33_unknown_r )
-{
-	return 0x0000;
-}
-
-READ16_MEMBER(raiden2_state::rdx_v33_unknown2_r )
-{
-	return 0x0000;
-}
-
-READ16_MEMBER(raiden2_state::nzerotea_unknown_r )
-{
-	return 0xffff;
-}
 
 
 /* INPUT PORTS */
@@ -2453,6 +2407,12 @@ static DRIVER_INIT (xsedae)
 	//memory_configure_bank(machine, "mainbank", 0, 2, machine->region("mainprg")->base(), 0x20000);
 }
 
+static DRIVER_INIT (zeroteam)
+{
+	memory_configure_bank(machine, "mainbank", 0, 2, machine->region("mainprg")->base(), 0x20000);
+	zeroteam_decrypt_sprites(machine);
+}
+
 /* GAME DRIVERS */
 
 // rev numbers at end of the line just indicate which sets are the same code revisions (just a region byte change), they don't reflect the actual order of release
@@ -2471,10 +2431,10 @@ GAME( 1994, raidndxj, raidndx, raidendx,  raidendx, raidendx,  ROT270, "Seibu Ka
 GAME( 1994, raidndxu, raidndx, raidendx,  raidendx, raidendx,  ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden DX (US)",                   GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME( 1994, raidndxg, raidndx, raidendx,  raidendx, raidendx,  ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden DX (Germany)",              GAME_NOT_WORKING|GAME_NO_SOUND)
 
-GAME( 1993, zeroteam, 0,       zeroteam, zeroteam,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 1)", GAME_NOT_WORKING)
-GAME( 1993, zeroteama,zeroteam,zeroteam, zeroteam,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 2)", GAME_NOT_WORKING)
-GAME( 1993, zeroteamb,zeroteam,zeroteam, zeroteam,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 3)", GAME_NOT_WORKING)
-GAME( 1993, zeroteamc,zeroteam,zeroteam, zeroteam,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 4)", GAME_NOT_WORKING)
-GAME( 1993, zeroteams,zeroteam,zeroteam, zeroteam,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team Selection", GAME_NOT_WORKING)
+GAME( 1993, zeroteam, 0,       zeroteam, zeroteam,  zeroteam,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 1)", GAME_NOT_WORKING)
+GAME( 1993, zeroteama,zeroteam,zeroteam, zeroteam,  zeroteam,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 2)", GAME_NOT_WORKING)
+GAME( 1993, zeroteamb,zeroteam,zeroteam, zeroteam,  zeroteam,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 3)", GAME_NOT_WORKING)
+GAME( 1993, zeroteamc,zeroteam,zeroteam, zeroteam,  zeroteam,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 4)", GAME_NOT_WORKING)
+GAME( 1993, zeroteams,zeroteam,zeroteam, zeroteam,  zeroteam,  ROT0,   "Seibu Kaihatsu", "Zero Team Selection", GAME_NOT_WORKING)
 
 GAME( 1995, xsedae,   0,       xsedae,   xsedae,  xsedae,   ROT0,   "Dream Island",   "X Se Dae Quiz", GAME_NOT_WORKING)
