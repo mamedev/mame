@@ -148,13 +148,6 @@ static TILE_GET_INFO( get_sc3_tile_info )
 
 static VIDEO_START(mil4000)
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	int i;
-
-	// game doesn't clear the palette, so to avoid seeing mame defaults we clear it
-	for (i=0;i<0x800;i++)
-		palette_set_color(space->machine, i, MAKE_RGB(0, 0, 0));
-
 	sc0_tilemap = tilemap_create(machine, get_sc0_tile_info,tilemap_scan_rows,8,8,64,64);
 	sc1_tilemap = tilemap_create(machine, get_sc1_tile_info,tilemap_scan_rows,8,8,64,64);
 	sc2_tilemap = tilemap_create(machine, get_sc2_tile_info,tilemap_scan_rows,8,8,64,64);
@@ -360,6 +353,8 @@ static MACHINE_CONFIG_START( mil4000, driver_device )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 
 	MCFG_PALETTE_LENGTH(0x800)
+	MCFG_PALETTE_INIT(all_black)
+
 	MCFG_GFXDECODE(mil4000)
 	MCFG_VIDEO_START(mil4000)
 	MCFG_VIDEO_UPDATE(mil4000)
