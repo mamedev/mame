@@ -639,7 +639,7 @@ WRITE16_MEMBER(raiden2_state::tile_bank_01_w)
 {
 	if(ACCESSING_BITS_0_7) {
 		int new_bank;
-		new_bank = 0 | (data & 1);
+		new_bank = 0 | ((data & 1)<<1);
 		if(new_bank != bg_bank) {
 			bg_bank = new_bank;
 			tilemap_mark_all_tiles_dirty(background_layer);
@@ -1002,11 +1002,6 @@ READ16_MEMBER(raiden2_state::cop_collision_status_r)
 	return 3;
 }
 
-READ16_MEMBER(raiden2_state::sprite_prot_dst1_r)
-{
-	return dst1;
-}
-
 WRITE16_MEMBER(raiden2_state::sprite_prot_x_w)
 {
 	sprite_prot_x = data;
@@ -1036,6 +1031,11 @@ WRITE16_MEMBER(raiden2_state::sprite_prot_src_w)
 	dx = space.read_dword(src+0x08) - (sprite_prot_x << 16);
 	dy = space.read_dword(src+0x04) - (sprite_prot_y << 16);
 	printf("[%08x] %08x %08x %04x %04x\n",src,dx,dy,dst1,dst2);
+}
+
+READ16_MEMBER(raiden2_state::sprite_prot_dst1_r)
+{
+	return dst1;
 }
 
 READ16_MEMBER(raiden2_state::sprite_prot_dst2_r)
