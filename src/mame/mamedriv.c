@@ -8293,7 +8293,7 @@ Other Sun games
 	/* Zilec games */
 	DRIVER( blueprnt )	/* (c) 1982 Bally Midway (Zilec in ROM 3U, and the programmer names) */
 	DRIVER( blueprntj )	/* (c) 1982 Jaleco (Zilec in ROM 3U, and the programmer names) */
-	DRIVER( saturn )	/* (c) 1983 Jaleco (Zilec in ROM R6, and the programmer names) */
+	DRIVER( saturnzi )	/* (c) 1983 Jaleco (Zilec in ROM R6, and the programmer names) */
 
 	/* Fuuki FG-2 games */
 	DRIVER( gogomile )	/* (c) 1995 */
@@ -8466,7 +8466,7 @@ Other Sun games
 	/* Sigma games */
 	DRIVER( nyny )		/* (c) 1980 Sigma Ent. Inc. */
 	DRIVER( nynyg )		/* (c) 1980 Sigma Ent. Inc. + Gottlieb */
-	DRIVER( arcadia )	/* (c) 1982 Sigma Ent. Inc. */
+	DRIVER( warcadia )	/* (c) 1982 Sigma Ent. Inc. */
 	DRIVER( r2dtank )	/* (c) 1980 Sigma Ent. Inc. */
 	DRIVER( spiders )	/* (c) 1981 Sigma Ent. Inc. */
 	DRIVER( spiders2 )	/* (c) 1981 Sigma Ent. Inc. */
@@ -8823,7 +8823,7 @@ Other Sun games
 	/* Other Amiga-based games */
 	DRIVER( upscope )	/* (c) 1986 Grand products */
 
-	DRIVER( cd32 )		/* (c) 1993 */
+	DRIVER( cd32bios )	/* (c) 1993 */
 	DRIVER( cndypuzl )	/* (c) 1995 */
 	DRIVER( haremchl )	/* (c) 1995 */
 	DRIVER( lsrquiz )	/* (c) 1995 */
@@ -10697,7 +10697,7 @@ Other Sun games
 	DRIVER( spaceinv )
 	DRIVER( speakesy )
 	DRIVER( speakes4 )
-	DRIVER( spectrum )
+	DRIVER( spectrm  )
 	DRIVER( spectru4 )
 	DRIVER( spyhuntr )
 	DRIVER( startrep )
@@ -11055,7 +11055,7 @@ Other Sun games
 	DRIVER( triplay )
 	DRIVER( diamondp )
 	DRIVER( excalibr )
-	DRIVER( genesis )
+	DRIVER( genesisp )
 	DRIVER( goldwing )
 	DRIVER( hlywoodh )
 	DRIVER( hotshots )
@@ -11402,7 +11402,7 @@ Other Sun games
 	DRIVER( dragfist )
 	DRIVER( flight2k )
 	DRIVER( freefall )
-	DRIVER( galaxy )
+	DRIVER( galaxypi )
 	DRIVER( ironmaid )
 	DRIVER( lazrlord )
 	DRIVER( lightnin )

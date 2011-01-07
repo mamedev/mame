@@ -813,7 +813,7 @@ ROM_START( nynyg )
 ROM_END
 
 
-ROM_START( arcadia )
+ROM_START( warcadia )
 	ROM_REGION(0x10000, "maincpu", 0)	/* main CPU */
 	ROM_LOAD( "ar-01",        0xa800, 0x0800, CRC(7b7e8f27) SHA1(2bb1d07d87ad5b952de9460c840d7e8b59ed1b4a) )
 	ROM_LOAD( "ar-02",        0xb000, 0x0800, CRC(81d9e172) SHA1(4279582f1edf54f0974fa277565d8ade6d9faa50) )
@@ -842,4 +842,4 @@ ROM_END
 
 GAME( 1980, nyny,    0,    nyny, nyny, 0, ROT270, "Sigma Enterprises Inc.", "New York! New York!", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1980, nynyg,   nyny, nyny, nyny, 0, ROT270, "Sigma Enterprises Inc. (Gottlieb license)", "New York! New York! (Gottlieb)", GAME_IMPERFECT_SOUND  | GAME_SUPPORTS_SAVE )
-GAME( 1980, arcadia, nyny, nyny, nyny, 0, ROT270, "Sigma Enterprises Inc.", "Waga Seishun no Arcadia", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, warcadia,nyny, nyny, nyny, 0, ROT270, "Sigma Enterprises Inc.", "Waga Seishun no Arcadia", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

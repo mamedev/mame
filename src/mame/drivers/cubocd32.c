@@ -1099,7 +1099,7 @@ MACHINE_CONFIG_END
 	ROM_LOAD16_WORD_BIOS(0, "391640-03.u6a", 0x000000, 0x100000, CRC(d3837ae4) SHA1(06807db3181637455f4d46582d9972afec8956d9) ) \
 
 
-ROM_START( cd32 )
+ROM_START( cd32bios )
 	CD32_BIOS
 ROM_END
 
@@ -1340,7 +1340,7 @@ static DRIVER_INIT(mgprem11)
 /***************************************************************************************************/
 
 /* BIOS */
-GAME( 1993, cd32,     0,    cd32, cd32,     cd32,     ROT0, "Commodore", "Amiga CD32 Bios", GAME_IS_BIOS_ROOT )
+GAME( 1993, cd32bios, 0,    cd32, cd32,     cd32,     ROT0, "Commodore", "Amiga CD32 Bios", GAME_IS_BIOS_ROOT )
 
 GAME( 1995, cndypuzl, cd32, cd32, cndypuzl, cndypuzl, ROT0, "CD Express", "Candy Puzzle (v1.0)",       GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1995, haremchl, cd32, cd32, haremchl, haremchl, ROT0, "CD Express", "Harem Challenge",           GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )

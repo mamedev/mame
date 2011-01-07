@@ -793,7 +793,7 @@ ROM_END
 /*--------------------------------
 / Spectrum
 /-------------------------------*/
-ROM_START(spectrum)
+ROM_START(spectrm)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "868-00_2.732", 0x1000, 0x0800, NO_DUMP)
 	ROM_CONTINUE( 0x5000, 0x0800)
@@ -1306,8 +1306,8 @@ GAME( 1986, spacehaw, cybrnaut,	by35, by35, by35, ROT0, "Nuova Bell Games","Spac
 GAME( 1980, spaceinv, 0, 		by35, by35, by35, ROT0, "Bally","Space Invaders", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME( 1982, speakesy, 0, 		by35, by35, by35, ROT0, "Bally","Speakeasy", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME( 1982, speakes4, speakesy, by35, by35, by35, ROT0, "Bally","Speakeasy 4 Player", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1982, spectrum, 0,		by35, by35, by35, ROT0, "Bally","Spectrum", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1982, spectru4, spectrum,	by35, by35, by35, ROT0, "Bally","Spectrum (ver 4)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1982, spectrm,  0,		by35, by35, by35, ROT0, "Bally","Spectrum", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1982, spectru4, spectrm,	by35, by35, by35, ROT0, "Bally","Spectrum (ver 4)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME( 1984, spyhuntr, 0, 		by35, by35, by35, ROT0, "Bally","Spy Hunter (Pinball)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME( 1979, startrep, 0, 		by35, by35, by35, ROT0, "Bally","Star Trek (Pinball)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME( 1979, sst, 	  0, 		by35, by35, by35, ROT0, "Bally","Supersonic", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

@@ -148,7 +148,7 @@ ROM_END
 /*--------------------------------
 / Galaxy
 /-------------------------------*/
-ROM_START(galaxy)
+ROM_START(galaxypi)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "cpu_u1.716", 0x1000, 0x0800, CRC(35656b67) SHA1(e1ad9456c561d19220f8607576cb505588512179))
 	ROM_LOAD( "cpu_u5.716", 0x1800, 0x0800, CRC(12be0601) SHA1(d651b834348c071dda660f37b4e359bf01cbd8d3))
@@ -347,7 +347,7 @@ GAME(1980,	cheetah,	0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern",				"Cheeta
 GAME(1982,	dragfist,	0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern",				"Dragonfist",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1980,	flight2k,	0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern",				"Flight 2000",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1981,	freefall,	0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern",				"Freefall",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1980,	galaxy,		0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern",				"Galaxy",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1980,	galaxypi,	0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern",				"Galaxy",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1981,	ironmaid,	0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern",				"Iron Maiden",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1984,	lazrlord,	0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern",				"Lazer Lord",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1981,	lightnin,	0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern",				"Lightning",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

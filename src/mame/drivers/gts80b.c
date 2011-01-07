@@ -274,7 +274,7 @@ ROM_END
 /*-------------------------------------------------------------------
 / Genesis (#705)
 /-------------------------------------------------------------------*/
-ROM_START(genesis)
+ROM_START(genesisp)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("prom2.cpu", 0x1000, 0x0800, CRC(ac9f3a0f) SHA1(0e44888dc046121794e824d128628f991245c1cb))
 	ROM_RELOAD(0x5000, 0x0800)
@@ -600,7 +600,7 @@ GAME(1985,	bountyh,	0,		gts80b_s,	gts80b,	gts80b,	ROT0,	"Gottlieb",				"Bounty H
 GAME(1985,	triplay,	0,		gts80b_s,	gts80b,	gts80b,	ROT0,	"Gottlieb",				"Triple Play",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1988,	diamondp,	0,		gts80b_s2,	gts80b,	gts80b,	ROT0,	"Gottlieb",				"Diamond Lady",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1988,	excalibr,	0,		gts80b_s3,	gts80b,	gts80b,	ROT0,	"Gottlieb",				"Excalibur",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1986,	genesis,	0,		gts80b_s1,	gts80b,	gts80b,	ROT0,	"Gottlieb",				"Genesis",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1986,	genesisp,	0,		gts80b_s1,	gts80b,	gts80b,	ROT0,	"Gottlieb",				"Genesis",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1986,	goldwing,	0,		gts80b_s1,	gts80b,	gts80b,	ROT0,	"Gottlieb",				"Gold Wings",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1986,	hlywoodh,	0,		gts80b_s1,	gts80b,	gts80b,	ROT0,	"Gottlieb",				"Hollywood Heat",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1989,	hotshots,	0,		gts80b_s2,	gts80b,	gts80b,	ROT0,	"Gottlieb",				"Hot Shots",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
