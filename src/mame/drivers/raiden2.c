@@ -403,6 +403,7 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 	case 0x138e: { // 130e 0005 bf7f 0010 - 0984 0aa4 0d82 0aa2 039b 0b9a 0b9a 0a9a
 		int dx = space.read_dword(cop_regs[1]+4) - space.read_dword(cop_regs[0]+4);
 		int dy = space.read_dword(cop_regs[1]+8) - space.read_dword(cop_regs[0]+8);
+
 		if(!dy) {
 			cop_status |= 0x8000;
 			cop_angle = 0;
@@ -548,8 +549,6 @@ void raiden2_state::draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 
 		ytlim += 1;
 		xtlim += 1;
-
-		//sx += 32;
 
 		xstep = 16;
 		ystep = 16;
@@ -1008,10 +1007,31 @@ READ16_MEMBER(raiden2_state::raiden2_bank_r)
 	return 0xbfff | (prg_bank << 14);
 }
 
+WRITE16_MEMBER(raiden2_state::sprite_prot_x_w)
+{
+	sprite_prot_x = data;
+	popmessage("%04x %04x",sprite_prot_x,sprite_prot_y);
+}
+
+WRITE16_MEMBER(raiden2_state::sprite_prot_y_w)
+{
+	sprite_prot_y = data;
+	popmessage("%04x %04x",sprite_prot_x,sprite_prot_y);
+}
+
+WRITE16_MEMBER(raiden2_state::sprite_prot_src_w)
+{
+	int dx = space.read_dword(data+0x08) - (sprite_prot_x << 16);
+	int dy = space.read_dword(data+0x04) - (sprite_prot_y << 16);
+
+	printf("[%04x] %08x %08x\n",data,dx,dy);
+}
+
+
 /* MEMORY MAPS */
 static ADDRESS_MAP_START( raiden2_cop_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state )
-//	AM_RANGE(0x0041c, 0x0041d) AM_WRITENOP
-//	AM_RANGE(0x0041e, 0x0041f) AM_WRITENOP
+//	AM_RANGE(0x0041c, 0x0041d) AM_WRITENOP // angle compare (for 0x6200 COP macro)
+//	AM_RANGE(0x0041e, 0x0041f) AM_WRITENOP // angle mod value (for 0x6200 COP macro)
 	AM_RANGE(0x00420, 0x00421) AM_WRITE(cop_itoa_low_w)
 	AM_RANGE(0x00422, 0x00423) AM_WRITE(cop_itoa_high_w)
 	AM_RANGE(0x00424, 0x00425) AM_WRITE(cop_itoa_digit_count_w)
@@ -1023,7 +1043,9 @@ static ADDRESS_MAP_START( raiden2_cop_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_st
 	AM_RANGE(0x0043a, 0x0043b) AM_WRITE(cop_pgm_mask_w)
 	AM_RANGE(0x0043c, 0x0043d) AM_WRITE(cop_pgm_trigger_w)
 	AM_RANGE(0x00444, 0x00445) AM_WRITE(cop_scale_w)
-	AM_RANGE(0x00450, 0x00459) AM_WRITENOP //sort-DMA params
+	AM_RANGE(0x00450, 0x00459) AM_WRITENOP //sort-DMA params, Zero Team uses it
+	AM_RANGE(0x0045a, 0x0045b) AM_WRITENOP //palette DMA brightness val, used by X Se Dae / Zero Team
+	AM_RANGE(0x0045c, 0x0045d) AM_WRITENOP //palette DMA brightness mode, used by X Se Dae / Zero Team (sets to 5)
 	AM_RANGE(0x00470, 0x00471) AM_READWRITE(cop_tile_bank_2_r,cop_tile_bank_2_w)
 
 	AM_RANGE(0x00476, 0x00477) AM_WRITE(cop_dma_adr_rel_w)
@@ -1035,6 +1057,7 @@ static ADDRESS_MAP_START( raiden2_cop_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_st
 	AM_RANGE(0x004c0, 0x004c9) AM_READWRITE(cop_reg_low_r, cop_reg_low_w)
 	AM_RANGE(0x00500, 0x00505) AM_WRITE(cop_cmd_w)
 	AM_RANGE(0x00580, 0x00581) AM_READ(cop_collision_status_r)
+//	AM_RANGE(0x00588, 0x00589) AM_READ(cop_collision_status2_r) // used by Zero Team (only this, why?)
 	AM_RANGE(0x00590, 0x00599) AM_READ(cop_itoa_digits_r)
 	AM_RANGE(0x005b0, 0x005b1) AM_READ(cop_status_r)
 	AM_RANGE(0x005b2, 0x005b3) AM_READ(cop_dist_r)
@@ -1042,7 +1065,6 @@ static ADDRESS_MAP_START( raiden2_cop_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_st
 
 	AM_RANGE(0x0061c, 0x0061d) AM_WRITE(tilemap_enable_w)
 	AM_RANGE(0x00620, 0x0062b) AM_WRITE(tile_scroll_w)
-//	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP
 	AM_RANGE(0x006a0, 0x006a3) AM_WRITE(sprcpt_val_1_w)
 	AM_RANGE(0x006a4, 0x006a7) AM_WRITE(sprcpt_data_3_w)
 	AM_RANGE(0x006a8, 0x006ab) AM_WRITE(sprcpt_data_4_w)
@@ -1054,8 +1076,9 @@ static ADDRESS_MAP_START( raiden2_cop_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_st
 	AM_RANGE(0x006ca, 0x006cb) AM_WRITE(raiden2_bank_w)
 	AM_RANGE(0x006cc, 0x006cd) AM_WRITE(tile_bank_01_w)
 	AM_RANGE(0x006ce, 0x006cf) AM_WRITE(sprcpt_flags_2_w)
-//	AM_RANGE(0x006d8, 0x006d9) AM_WRITENOP
-//	AM_RANGE(0x006da, 0x006db) AM_WRITENOP
+	AM_RANGE(0x006d8, 0x006d9) AM_WRITE(sprite_prot_x_w)
+	AM_RANGE(0x006da, 0x006db) AM_WRITE(sprite_prot_y_w)
+	AM_RANGE(0x006de, 0x006df) AM_WRITE(sprite_prot_src_w)
 	AM_RANGE(0x006fc, 0x006fd) AM_WRITE(cop_dma_trigger_w)
 	AM_RANGE(0x006fe, 0x006ff) AM_WRITENOP // sort-DMA trigger
 
@@ -1064,6 +1087,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( raiden2_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM
+
+	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP //irq ack / sprite buffering?
 
 	AM_IMPORT_FROM( raiden2_cop_mem )
 
@@ -1134,12 +1159,15 @@ static ADDRESS_MAP_START( xsedae_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x00470, 0x00471) AM_WRITENOP
 	AM_RANGE(0x006cc, 0x006cd) AM_WRITENOP
 
+	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP //irq ack / sprite buffering?
+
 	AM_IMPORT_FROM( raiden2_cop_mem )
 
 	AM_RANGE(0x00700, 0x0071f) AM_READWRITE(raiden2_sound_comms_r,raiden2_sound_comms_w)
 
 	AM_RANGE(0x00740, 0x00741) AM_READ_PORT("DSW")
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("P1_P2")
+	AM_RANGE(0x00748, 0x00749) AM_READ_PORT("P3_P4")
 	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
 
 	AM_RANGE(0x00800, 0x0b7ff) AM_RAM
@@ -1416,6 +1444,9 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( xsedae )
 	PORT_INCLUDE( raiden2 )
+
+	PORT_START("P3_P4")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x0001, 0x0001, "DSW0" )

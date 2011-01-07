@@ -89,6 +89,12 @@ public:
 	INT8 cop_angle_compare;
 	UINT8 cop_angle_mod_val;
 
+	DECLARE_WRITE16_MEMBER( sprite_prot_x_w );
+	DECLARE_WRITE16_MEMBER( sprite_prot_y_w );
+	DECLARE_WRITE16_MEMBER( sprite_prot_src_w );
+
+	UINT16 sprite_prot_x,sprite_prot_y;
+
 	void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect ,int pri_mask );
 };
 
