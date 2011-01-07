@@ -738,6 +738,7 @@ static TILE_GET_INFO( get_text_tile_info )
 
 /* VIDEO START (move to video file) */
 
+
 static VIDEO_START( raiden2 )
 {
 	raiden2_state *state = machine->driver_data<raiden2_state>();
@@ -1001,10 +1002,9 @@ READ16_MEMBER(raiden2_state::cop_collision_status_r)
 	return 3;
 }
 
-/* TODO: Probably all of the gfx banking routes here! */
-READ16_MEMBER(raiden2_state::raiden2_bank_r)
+READ16_MEMBER(raiden2_state::sprite_prot_dst1_r)
 {
-	return 0xbfff | (prg_bank << 14);
+	return dst1;
 }
 
 WRITE16_MEMBER(raiden2_state::sprite_prot_x_w)
@@ -1019,14 +1019,39 @@ WRITE16_MEMBER(raiden2_state::sprite_prot_y_w)
 	popmessage("%04x %04x",sprite_prot_x,sprite_prot_y);
 }
 
-WRITE16_MEMBER(raiden2_state::sprite_prot_src_w)
+WRITE16_MEMBER(raiden2_state::sprite_prot_src_seg_w)
 {
-	int dx = space.read_dword(data+0x08) - (sprite_prot_x << 16);
-	int dy = space.read_dword(data+0x04) - (sprite_prot_y << 16);
-
-	printf("[%04x] %08x %08x\n",data,dx,dy);
+	sprite_prot_src_addr[0] = data;
 }
 
+WRITE16_MEMBER(raiden2_state::sprite_prot_src_w)
+{
+	int dx;
+	int dy;
+	UINT32 src;
+
+	sprite_prot_src_addr[1] = data;
+	src = (sprite_prot_src_addr[0]<<4)+sprite_prot_src_addr[1];
+
+	dx = space.read_dword(src+0x08) - (sprite_prot_x << 16);
+	dy = space.read_dword(src+0x04) - (sprite_prot_y << 16);
+	printf("[%08x] %08x %08x %04x %04x\n",src,dx,dy,dst1,dst2);
+}
+
+READ16_MEMBER(raiden2_state::sprite_prot_dst2_r)
+{
+	return dst2;
+}
+
+WRITE16_MEMBER(raiden2_state::sprite_prot_dst1_w)
+{
+	dst1 = data;
+}
+
+WRITE16_MEMBER(raiden2_state::sprite_prot_dst2_w)
+{
+	dst2 = data;
+}
 
 /* MEMORY MAPS */
 static ADDRESS_MAP_START( raiden2_cop_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state )
@@ -1073,16 +1098,19 @@ static ADDRESS_MAP_START( raiden2_cop_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_st
 	AM_RANGE(0x006b4, 0x006b7) AM_WRITE(sprcpt_data_2_w)
 	AM_RANGE(0x006b8, 0x006bb) AM_WRITE(sprcpt_val_2_w)
 	AM_RANGE(0x006bc, 0x006bf) AM_WRITE(sprcpt_adr_w)
+	AM_RANGE(0x006c2, 0x006c3) AM_WRITE(sprite_prot_src_seg_w)
+	AM_RANGE(0x006c6, 0x006c7) AM_WRITE(sprite_prot_dst1_w)
 	AM_RANGE(0x006ca, 0x006cb) AM_WRITE(raiden2_bank_w)
 	AM_RANGE(0x006cc, 0x006cd) AM_WRITE(tile_bank_01_w)
 	AM_RANGE(0x006ce, 0x006cf) AM_WRITE(sprcpt_flags_2_w)
 	AM_RANGE(0x006d8, 0x006d9) AM_WRITE(sprite_prot_x_w)
 	AM_RANGE(0x006da, 0x006db) AM_WRITE(sprite_prot_y_w)
+	AM_RANGE(0x006dc, 0x006dd) AM_READ(sprite_prot_dst2_r) AM_WRITE(sprite_prot_dst2_w)
 	AM_RANGE(0x006de, 0x006df) AM_WRITE(sprite_prot_src_w)
 	AM_RANGE(0x006fc, 0x006fd) AM_WRITE(cop_dma_trigger_w)
 	AM_RANGE(0x006fe, 0x006ff) AM_WRITENOP // sort-DMA trigger
 
-	AM_RANGE(0x00762, 0x00763) AM_READ(raiden2_bank_r)
+	AM_RANGE(0x00762, 0x00763) AM_READ(sprite_prot_dst1_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( raiden2_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state )
