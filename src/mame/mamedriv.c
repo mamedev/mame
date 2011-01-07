@@ -9501,6 +9501,7 @@ Other Sun games
 	DRIVER( mirax )		/* (c) 1985 Current Technologies */
 	DRIVER( miraxa )	/* (c) 1985 Current Technologies */
 
+	/* Subsino */
 	DRIVER( victor5 )	/* (c) 1990 Subsino */
 	DRIVER( victor21 )	/* (c) 1990 Subsino */
 	DRIVER( crsbingo )	/* (c) 1991 Subsino */

@@ -2561,7 +2561,6 @@ src/mame/drivers/xain.c svneol=native#text/plain
 src/mame/drivers/xexex.c svneol=native#text/plain
 src/mame/drivers/xmen.c svneol=native#text/plain
 src/mame/drivers/xorworld.c svneol=native#text/plain
-src/mame/drivers/xplan.c svneol=native#text/plain
 src/mame/drivers/xtheball.c svneol=native#text/plain
 src/mame/drivers/xtom3d.c svneol=native#text/plain
 src/mame/drivers/xxmissio.c svneol=native#text/plain
