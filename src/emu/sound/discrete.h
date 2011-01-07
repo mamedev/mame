@@ -4833,7 +4833,7 @@ class discrete_base_node
 public:
 	discrete_base_node(discrete_device * pdev, const discrete_module *module, const discrete_sound_block *block);
 
-	~discrete_base_node(void);
+	virtual ~discrete_base_node(void);
 
 	virtual void step(void) = 0;
 	virtual void reset(void) { }
