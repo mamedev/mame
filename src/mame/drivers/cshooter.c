@@ -90,9 +90,11 @@ Stephh's notes (based on the game Z80 code and some tests) :
 
 static UINT8* cshooter_txram;
 static tilemap_t *cshooter_txtilemap;
-static int coin_stat=0;
 
 static UINT8 *mainram;
+
+#if 0
+static int coin_stat=0;
 
 static void ar_coin_hack(running_machine *machine)
 {
@@ -115,6 +117,7 @@ static void ar_coin_hack(running_machine *machine)
 		coin_stat=0;
 	}
 }
+#endif
 
 static TILE_GET_INFO( get_cstx_tile_info )
 {
@@ -201,9 +204,8 @@ static INTERRUPT_GEN( cshooter_interrupt )
 	else
       cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x10);
 
-	if(mainram!=NULL)
-		ar_coin_hack(device->machine);
-
+//	if(mainram!=NULL)
+//		ar_coin_hack(device->machine);
 }
 
 
@@ -212,6 +214,11 @@ static int cshooter_counter;
 static MACHINE_RESET( cshooter )
 {
 	cshooter_counter = 0;
+}
+
+static MACHINE_RESET( airraid )
+{
+	MACHINE_RESET_CALL(seibu_sound);
 }
 
 static READ8_HANDLER ( cshooter_coin_r )
@@ -275,11 +282,21 @@ static ADDRESS_MAP_START( cshooter_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
+static READ8_HANDLER( seibu_sound_comms_r )
+{
+	return seibu_main_word_r(space,offset,0x00ff);
+}
+
+static WRITE8_HANDLER( seibu_sound_comms_w )
+{
+	seibu_main_word_w(space,offset,data,0x00ff);
+}
+
 static ADDRESS_MAP_START( airraid_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xb000, 0xb0ff) AM_RAM			// sound related ?
-	AM_RANGE(0xb100, 0xb1ff) AM_RAM//ROMBANK("bank1")           // sound related ?
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1") AM_WRITENOP // rld result write-back
+//	AM_RANGE(0xb000, 0xb0ff) AM_RAM
+//	AM_RANGE(0xb100, 0xb1ff) AM_RAM//ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
@@ -292,8 +309,8 @@ static ADDRESS_MAP_START( airraid_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_txram_w) AM_BASE(&cshooter_txram)
 	AM_RANGE(0xd800, 0xdbff) AM_WRITE(pal2_w) AM_READ(pal_r) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xdc11, 0xdc11) AM_WRITE(bank_w)
-	AM_RANGE(0xdc00, 0xddff) AM_RAM
-	AM_RANGE(0xde00, 0xdeff) AM_RAM
+	AM_RANGE(0xdc00, 0xdc1f) AM_RAM //video registers
+	AM_RANGE(0xde00, 0xde0f) AM_READWRITE(seibu_sound_comms_r,seibu_sound_comms_w)
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_BASE(&mainram)
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 ADDRESS_MAP_END
@@ -307,14 +324,6 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc800, 0xc801) AM_WRITENOP // AM_DEVWRITE("ym2", ym2203_w) ?
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_map2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x4001) AM_WRITENOP // AM_DEVWRITE("ym1", ym2203_w) ?
-	AM_RANGE(0x4008, 0x4009) AM_WRITENOP // AM_DEVWRITE("ym2", ym2203_w) ?
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
-ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( cshooter )
@@ -398,6 +407,14 @@ static INPUT_PORTS_START( cshooter )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( airraid )
+	PORT_INCLUDE( cshooter )
+
+	PORT_MODIFY("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
 
 static const gfx_layout cshooter_charlayout =
 {
@@ -450,10 +467,9 @@ static MACHINE_CONFIG_START( airraid, driver_device )
 	MCFG_CPU_PROGRAM_MAP(airraid_map)
 	MCFG_CPU_VBLANK_INT_HACK(cshooter_interrupt,2)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4)		 /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sound_map2)
+	SEIBU2_AIRRAID_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4)		 /* verified on pcb */
 
-	MCFG_MACHINE_RESET(cshooter)
+	MCFG_MACHINE_RESET(airraid)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -470,7 +486,7 @@ static MACHINE_CONFIG_START( airraid, driver_device )
 	MCFG_VIDEO_UPDATE(cshooter)
 
 	/* sound hardware */
-	/* YM2151 and ym3931 seibu custom cpu running at XTAL_14_31818MHz/4 */
+	SEIBU_AIRRAID_SOUND_SYSTEM_YM2151_INTERFACE(XTAL_14_31818MHz/4)
 MACHINE_CONFIG_END
 
 
@@ -591,6 +607,7 @@ ROM_START( cshootere )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	// Sub/Sound CPU?
 	ROM_LOAD( "5.6f",  0x00000, 0x02000, CRC(30be398c) SHA1(6c61200ee8888d6270c8cec50423b3b5602c2027) )	// 5.g6
+	ROM_LOAD( "4.7f",  0x08000, 0x08000, CRC(3cd715b4) SHA1(da735fb5d262908ddf7ed7dacdea68899f1723ff) )	// 4.g8
 
 	ROM_REGION( 0x02000, "gfx1",  ROMREGION_INVERT )	// TX Layer
 	ROM_LOAD( "3.f11",  0x00000, 0x02000, CRC(704c26d7) SHA1(e5964f409cbc2c4752e3969f3e84ace08d5ad9cb) )	// only 1 byte difference with R3, bad dump?
@@ -601,8 +618,7 @@ ROM_START( cshootere )
 	ROM_REGION( 0x10000, "user1", 0 )	// Sprites & Backgrounds ?
 	ROM_LOAD( "2.k20",  0x00000, 0x10000, CRC(5812fe72) SHA1(3b28bff6b62a411d2195bb228952db62ad32ef3d) )
 
-	ROM_REGION( 0x08000, "user2", 0 )	// ?? sound ??
-	ROM_LOAD( "4.7f",  0x00000, 0x08000, CRC(3cd715b4) SHA1(da735fb5d262908ddf7ed7dacdea68899f1723ff) )	// 4.g8
+	ROM_REGION( 0x40000, "oki", ROMREGION_ERASEFF )
 ROM_END
 
 /*
@@ -633,6 +649,7 @@ ROM_START( airraid )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	// Sub/Sound CPU?
 	ROM_LOAD( "5.6f",  0x00000, 0x02000, CRC(30be398c) SHA1(6c61200ee8888d6270c8cec50423b3b5602c2027) )
+	ROM_LOAD( "4.7f",  0x08000, 0x08000, CRC(3cd715b4) SHA1(da735fb5d262908ddf7ed7dacdea68899f1723ff) )
 
 	ROM_REGION( 0x02000, "gfx1", ROMREGION_INVERT )	// TX Layer
 	ROM_LOAD( "3.13e",  0x00000, 0x02000, CRC(672ec0e8) SHA1(a11cd90d6494251ceee3bc7c72f4e7b1580b77e2) )
@@ -643,8 +660,7 @@ ROM_START( airraid )
 	ROM_REGION( 0x10000, "user1", 0 )	// bg maps
 	ROM_LOAD( "2.19j",  0x00000, 0x10000, CRC(842ae6c2) SHA1(0468445e4ab6f42bac786f9a258df3972fd1fde9) )
 
-	ROM_REGION( 0x08000, "user2", 0 )	// ?? sound ??
-	ROM_LOAD( "4.7f",  0x00000, 0x08000, CRC(3cd715b4) SHA1(da735fb5d262908ddf7ed7dacdea68899f1723ff) )
+	ROM_REGION( 0x40000, "oki", ROMREGION_ERASEFF )
 ROM_END
 
 
@@ -700,6 +716,6 @@ static DRIVER_INIT( cshootere )
 
 
 GAME( 1987, cshooter,  0,       cshooter, cshooter, cshooter,  ROT270, "Seibu Kaihatsu (Taito license)",  "Cross Shooter (not encrypted)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1987, cshootere, cshooter, airraid, cshooter, cshootere, ROT270, "Seibu Kaihatsu (J.K.H. license)", "Cross Shooter (encrypted)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1987, airraid,   cshooter, airraid, cshooter, cshootere, ROT270, "Seibu Kaihatsu",                  "Air Raid (encrypted)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1987, cshootere, cshooter, airraid, airraid, cshootere, ROT270, "Seibu Kaihatsu (J.K.H. license)", "Cross Shooter (encrypted)", GAME_NOT_WORKING )
+GAME( 1987, airraid,   cshooter, airraid, airraid, cshootere, ROT270, "Seibu Kaihatsu",                  "Air Raid (encrypted)", GAME_NOT_WORKING )
 
