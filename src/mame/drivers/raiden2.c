@@ -381,6 +381,25 @@ WRITE16_MEMBER(raiden2_state::cop_reg_low_w)
 	cop_regs[offset] = (cop_regs[offset] & ~UINT32(mem_mask)) | (data & mem_mask);
 }
 
+UINT8 raiden2_state::cop_calculate_collsion_detection(running_machine *machine)
+{
+	static UINT8 res;
+
+	res = 3;
+
+	/* outbound X check */
+	if(cop_collision_info[0].max_x >= cop_collision_info[1].min_x && cop_collision_info[0].min_x <= cop_collision_info[1].max_x)
+		res &= ~1;
+
+	/* outbound Y check */
+	if(cop_collision_info[0].max_y >= cop_collision_info[1].min_y && cop_collision_info[0].min_y <= cop_collision_info[1].max_y)
+		res &= ~2;
+
+	/* TODO: special collision detection for Zero Team */
+
+	return res;
+}
+
 WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 {
 	cop_status &= 0x7fff;
@@ -475,6 +494,42 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 		space.write_dword(0x470, (space.read_dword(cop_regs[4]) & 0x30) << 6);
 		// Actually, wherever the bank selection actually is
 		// And probably 8 bytes too, but they zero all the rest
+		break;
+
+	case 0xa100:
+		cop_collision_info[0].y = (space.read_dword(cop_regs[0]+4));
+		cop_collision_info[0].x = (space.read_dword(cop_regs[0]+8));
+		break;
+
+	case 0xa900:
+		cop_collision_info[1].y = (space.read_dword(cop_regs[1]+4));
+		cop_collision_info[1].x = (space.read_dword(cop_regs[1]+8));
+		break;
+
+	case 0xb100:
+		/* Take hitbox param, TODO */
+		cop_collision_info[0].hitbox = space.read_word(cop_regs[2]);
+
+		cop_collision_info[0].min_x = cop_collision_info[0].x + (0 << 16);
+		cop_collision_info[0].min_y = cop_collision_info[0].y + (0 << 16);
+		cop_collision_info[0].max_x = cop_collision_info[0].x + (0x10 << 16);
+		cop_collision_info[0].max_y = cop_collision_info[0].y + (0x10 << 16);
+
+		/* do the math */
+		cop_hit_status = cop_calculate_collsion_detection(space.machine);
+		break;
+
+	case 0xb900:
+		/* Take hitbox param, TODO */
+		cop_collision_info[1].hitbox = space.read_word(cop_regs[3]);
+
+		cop_collision_info[1].min_x = cop_collision_info[1].x + (0 << 16);
+		cop_collision_info[1].min_y = cop_collision_info[1].y + (0 << 16);
+		cop_collision_info[1].max_x = cop_collision_info[1].x + (0x10 << 16);
+		cop_collision_info[1].max_y = cop_collision_info[1].y + (0x10 << 16);
+
+		/* do the math */
+		cop_hit_status = cop_calculate_collsion_detection(space.machine);
 		break;
 
 	default:
@@ -999,7 +1054,7 @@ WRITE16_MEMBER(raiden2_state::raiden2_bank_w)
 
 READ16_MEMBER(raiden2_state::cop_collision_status_r)
 {
-	return 3;
+	return cop_hit_status;
 }
 
 WRITE16_MEMBER(raiden2_state::sprite_prot_x_w)

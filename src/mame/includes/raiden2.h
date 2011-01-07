@@ -100,7 +100,18 @@ public:
 	UINT16 sprite_prot_x,sprite_prot_y,dst1,dst2;
 	UINT16 sprite_prot_src_addr[2];
 
+	struct
+	{
+		int x,y;
+		int min_x,min_y,max_x,max_y;
+		UINT16 hitbox;
+	}cop_collision_info[2];
+
+	UINT16 cop_hit_status;
+
 	void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect ,int pri_mask );
+	UINT8 cop_calculate_collsion_detection(running_machine *machine);
+
 };
 
 
