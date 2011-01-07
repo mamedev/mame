@@ -1270,6 +1270,13 @@ WRITE8_DEVICE_HANDLER( sp0256_ALD_w )
 	return;
 }
 
+READ_LINE_DEVICE_HANDLER( sp0256_sby_r )
+{
+	sp0256_state *sp = get_safe_token(device);
+
+	return sp->sby_line;
+}
+
 READ16_DEVICE_HANDLER( spb640_r )
 {
 	sp0256_state *sp = get_safe_token(device);

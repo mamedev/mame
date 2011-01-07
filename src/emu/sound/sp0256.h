@@ -62,6 +62,7 @@ struct _sp0256_interface
 void sp0256_bitrevbuff(UINT8 *buffer, unsigned int start, unsigned int length);
 
 WRITE8_DEVICE_HANDLER( sp0256_ALD_w );
+READ_LINE_DEVICE_HANDLER( sp0256_sby_r );
 
 READ16_DEVICE_HANDLER( spb640_r );
 WRITE16_DEVICE_HANDLER( spb640_w );
