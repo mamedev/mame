@@ -4900,7 +4900,7 @@ class discrete_legacy_node : public discrete_base_node
 public:
 
 	discrete_legacy_node(discrete_device * pdev, const discrete_module *xmodule, const discrete_sound_block *block)
-	 : discrete_base_node::discrete_base_node(pdev, xmodule, block), m_step(module->step) {  }
+	 : discrete_base_node(pdev, xmodule, block), m_step(module->step) {  }
 
 	void step(void)  { /* if (m_step != NULL) */ m_step(this); }
 	virtual void reset(void) { if (module->reset != NULL) module->reset(this); }

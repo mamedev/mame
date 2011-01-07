@@ -171,9 +171,9 @@ typedef enum {
 #define CLKR(v20o,v30o,v33o,v20e,v30e,v33e,vall,addr) { const UINT32 ocount=(v20o<<16)|(v30o<<8)|v33o, ecount=(v20e<<16)|(v30e<<8)|v33e; if (ModRM >=0xc0) nec_state->icount-=vall; else nec_state->icount-=(addr&1)?((ocount>>nec_state->chip_type)&0x7f):((ecount>>nec_state->chip_type)&0x7f); }
 
 /************************************************************************/
-#define CompressFlags() (WORD)(CF | 0x02 | (PF << 2) | (AF << 4) | (ZF << 6) \
-				| (SF << 7) | (nec_state->TF << 8) | (nec_state->IF << 9) \
-				| (nec_state->DF << 10) | (OF << 11) | (nec_state->MF << 15))
+#define CompressFlags() (WORD)(int(CF) | 0x02 | (int(PF) << 2) | (int(AF) << 4) | (int(ZF) << 6) \
+				| (int(SF) << 7) | (nec_state->TF << 8) | (nec_state->IF << 9) \
+				| (nec_state->DF << 10) | (int(OF) << 11) | (nec_state->MF << 15))
 
 #define ExpandFlags(f) \
 { \

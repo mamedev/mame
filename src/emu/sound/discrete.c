@@ -182,7 +182,7 @@ class _name ## _node: public discrete_legacy_node		\
 {														\
 public:													\
 	_name ## _node (discrete_device * pdev, const discrete_module *xmodule, const discrete_sound_block *block) \
-	 : discrete_legacy_node::discrete_legacy_node(pdev, xmodule, block) {  } \
+	 : discrete_legacy_node(pdev, xmodule, block) {  } \
 														\
 }
 
