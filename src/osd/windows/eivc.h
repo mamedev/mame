@@ -47,12 +47,12 @@
 #if (_MSC_VER >= 1400)
 #include <intrin.h>
 #else
-long __cdecl _InterlockedIncrement(long volatile *);
-long __cdecl _InterlockedDecrement(long volatile *);
-long _InterlockedExchange(long volatile *, long);
-long _InterlockedCompareExchange (long volatile *, long, long);
-long _InterlockedExchangeAdd(long volatile *, long);
-unsigned char _BitScanReverse(unsigned long *Index, unsigned long Mask);
+extern "C" long __cdecl _InterlockedIncrement(long volatile *);
+extern "C" long __cdecl _InterlockedDecrement(long volatile *);
+extern "C" long _InterlockedExchange(long volatile *, long);
+extern "C" long _InterlockedCompareExchange (long volatile *, long, long);
+extern "C" long _InterlockedExchangeAdd(long volatile *, long);
+extern "C" unsigned char _BitScanReverse(unsigned long *Index, unsigned long Mask);
 #endif
 
 #pragma intrinsic(_InterlockedIncrement)

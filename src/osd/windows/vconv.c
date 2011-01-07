@@ -288,7 +288,7 @@ static void build_command_line(int argc, char *argv[])
 	else if (!strcmp(argv[1], "ar"))
 	{
 		transtable = ar_translate;
-		executable = "lib.exe";
+		executable = "link.exe";
 		dst += sprintf(dst, "link /lib /nologo ");
 		outstring = "/out:";
 		output_is_first = 1;

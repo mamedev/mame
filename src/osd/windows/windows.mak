@@ -107,8 +107,7 @@ endif
 
 ifdef MSVC_BUILD
 
-VCONV = $(WINOBJ)/vconv$(EXE)
-VCONVPREFIX = $(subst /,\,$(VCONV))
+OSPREBUILD = $(VCONV_TARGET)
 
 # append a 'v' prefix if nothing specified
 ifndef PREFIX
@@ -116,10 +115,10 @@ PREFIX = v
 endif
 
 # replace the various compilers with vconv.exe prefixes
-CC = @$(VCONVPREFIX) gcc -I.
-LD = @$(VCONVPREFIX) ld /profile
-AR = @$(VCONVPREFIX) ar
-RC = @$(VCONVPREFIX) windres
+CC = @$(VCONV) gcc -I.
+LD = @$(VCONV) ld /profile
+AR = @$(VCONV) ar
+RC = @$(VCONV) windres
 
 # make sure we use the multithreaded runtime
 ifdef DEBUG
@@ -156,26 +155,14 @@ CPPONLYFLAGS += /wd4800
 # disable better packing warning
 CPPONLYFLAGS += /wd4371
 
+# disable macro redefinition warning
+CCOMFLAGS += /wd4005
+
 # explicitly set the entry point for UNICODE builds
 LDFLAGS += /ENTRY:wmainCRTStartup
 
 # add some VC++-specific defines
 DEFS += -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE -DXML_STATIC -Dsnprintf=_snprintf
-
-# make msvcprep into a pre-build step
-OSPREBUILD = $(VCONV)
-
-ifneq ($(CROSS_BUILD),1)
-# add VCONV to the build tools
-BUILD += $(VCONV)
-
-$(VCONV): $(WINOBJ)/vconv.o
-	@echo Linking $@...
-	@link.exe /nologo $^ version.lib /out:$@
-
-$(WINOBJ)/vconv.o: $(WINSRC)/vconv.c
-	@echo Compiling $<...
-	@cl.exe /nologo /O1 -D_CRT_SECURE_NO_DEPRECATE -c $< /Fo$@
 
 OSDCLEAN = msvcclean
 
@@ -186,7 +173,28 @@ msvcclean:
 	$(RM) *.exp
 
 endif
+
+
+#-------------------------------------------------
+# build VCONV
+#-------------------------------------------------
+
+VCONV_TARGET = $(BUILDOUT)/vconv$(BUILD_EXE)
+VCONV = $(subst /,\,$(VCONV_TARGET))
+
+ifneq ($(CROSS_BUILD),1)
+BUILD += \
+	$(VCONV_TARGET)
 endif
+
+$(VCONV_TARGET): $(WINOBJ)/vconv.o
+	@echo Linking $@...
+	@gcc.exe -static-libgcc $^ $(LIBS) -lversion -o $@
+
+$(WINOBJ)/vconv.o: $(WINSRC)/vconv.c
+	@echo Compiling $<...
+	@gcc.exe -O3 -c $< -o $@
+
 
 
 #-------------------------------------------------
