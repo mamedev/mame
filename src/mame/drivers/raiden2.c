@@ -759,31 +759,31 @@ static VIDEO_UPDATE ( raiden2 )
 	raiden2_state *state = screen->machine->driver_data<raiden2_state>();
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
-	if (!input_code_pressed(screen->machine, KEYCODE_Q))
+	//if (!input_code_pressed(screen->machine, KEYCODE_Q))
 	{
 		if (!(state->raiden2_tilemap_enable & 1))
 			tilemap_draw(bitmap, cliprect, state->background_layer, 0, 0);
 	}
 
-	if (!input_code_pressed(screen->machine, KEYCODE_W))
+	//if (!input_code_pressed(screen->machine, KEYCODE_W))
 	{
 		if (!(state->raiden2_tilemap_enable & 2))
 			tilemap_draw(bitmap, cliprect, state->midground_layer, 0, 0);
 	}
 
-	if (!input_code_pressed(screen->machine, KEYCODE_E))
+	//if (!input_code_pressed(screen->machine, KEYCODE_E))
 	{
 		if (!(state->raiden2_tilemap_enable & 4))
 			tilemap_draw(bitmap, cliprect, state->foreground_layer, 0, 0);
 	}
 
-	if (!input_code_pressed(screen->machine, KEYCODE_S))
+	//if (!input_code_pressed(screen->machine, KEYCODE_S))
 	{
 		//if (!(raiden2_tilemap_enable & 0x10))
 			state->draw_sprites(screen->machine, bitmap, cliprect, 0);
 	}
 
-	if (!input_code_pressed(screen->machine, KEYCODE_A))
+	//if (!input_code_pressed(screen->machine, KEYCODE_A))
 	{
 		if (!(state->raiden2_tilemap_enable & 8))
 			tilemap_draw(bitmap, cliprect, state->text_layer, 0, 0);
@@ -1028,9 +1028,12 @@ WRITE16_MEMBER(raiden2_state::sprite_prot_src_w)
 	sprite_prot_src_addr[1] = data;
 	src = (sprite_prot_src_addr[0]<<4)+sprite_prot_src_addr[1];
 
-	dx = space.read_dword(src+0x08) - (sprite_prot_x << 16);
-	dy = space.read_dword(src+0x04) - (sprite_prot_y << 16);
-	printf("[%08x] %08x %08x %04x %04x\n",src,dx,dy,dst1,dst2);
+	dx = ((space.read_dword(src+0x08) >> 16) - (sprite_prot_x)) & 0xffff;
+	dy = ((space.read_dword(src+0x04) >> 16) - (sprite_prot_y)) & 0xffff;
+
+	space.write_word(src,(dx < 0x140 && dy < 256) ? 0x0001 : 0x0000);
+
+	//printf("[%08x] %08x %08x %04x %04x\n",src,dx,dy,dst1,dst2);
 }
 
 READ16_MEMBER(raiden2_state::sprite_prot_dst1_r)
