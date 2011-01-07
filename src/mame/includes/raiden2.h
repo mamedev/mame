@@ -33,7 +33,6 @@ public:
 	DECLARE_READ16_MEMBER ( cop_angle_r );
 	DECLARE_WRITE16_MEMBER( cop_angle_compare_w );
 	DECLARE_WRITE16_MEMBER( cop_angle_mod_val_w );
-	DECLARE_READ16_MEMBER ( raiden2_bank_r );
 
 	DECLARE_WRITE16_MEMBER ( cop_dma_trigger_w );
 	DECLARE_WRITE16_MEMBER ( raiden2_bank_w );
@@ -93,6 +92,7 @@ public:
 	DECLARE_WRITE16_MEMBER( sprite_prot_y_w );
 	DECLARE_WRITE16_MEMBER( sprite_prot_src_seg_w );
 	DECLARE_WRITE16_MEMBER( sprite_prot_src_w );
+	DECLARE_READ16_MEMBER ( sprite_prot_dst1_r );
 	DECLARE_READ16_MEMBER( sprite_prot_dst2_r );
 	DECLARE_WRITE16_MEMBER( sprite_prot_dst1_w );
 	DECLARE_WRITE16_MEMBER( sprite_prot_dst2_w );
