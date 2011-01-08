@@ -1,14 +1,23 @@
 /***************************************************************************
 
-Multipede (c) 1980-2 Infogrames / 199x CosmoDog
+Centipede, Millipede, Missile Command, Let's Go Bowling
+(c) 1980-2 Infogrames / 2002 CosmoDog
 
 preliminary driver by Angelo Salese
+
+Earlier revisions of this cabinet did not include the bowling game.
 
 TODO:
 - program banking;
 - finish video emulation;
 - inputs;
 - sound;
+
+Probably on the CPLD (CY39100V208B) - Quoted from Cosmodog's website:
+ "Instead, we used a programmable chip that we could reconfigure very
+ quickly while the game is running. So, during that 1/8th of a second
+ or so when the screen goes black while it switches games, it's actually
+ reloading the hardware with a whole new design to run the next game."
 
 ============================================================================
 
@@ -325,4 +334,4 @@ ROM_START( cmmb162 )
 	ROM_REGION( 0x1000, "gfx", ROMREGION_ERASE00 )
 ROM_END
 
-GAME( 199?, cmmb162,  0,       cmmb,  cmmb,  0, ROT270, "Infogrames / Cosmodog", "Multipede (V1.00)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, cmmb162,  0,       cmmb,  cmmb,  0, ROT270, "Infogrames / Cosmodog", "Centipede/Millipede/Missile Command/Let's Go Bowling (rev 1.62)", GAME_NO_SOUND|GAME_NOT_WORKING )
