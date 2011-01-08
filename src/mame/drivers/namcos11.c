@@ -26,10 +26,10 @@ tekken2a   Tekken 2 Ver.B (TES2/VER.B)             COH-100             "        
 tekken2b   Tekken 2 (TES2/VER.A)                   COH-100             "                        "                       "        "
 souledge   Soul Edge Ver. II (SO4/VER.C)           COH-100 / COH-110   SYSTEM11 MOTHER PCB      SYSTEM11 ROM8 PCB       C409     6
 souledga   Soul Edge Ver. II (SO3/VER.C)           COH-100 / COH-110   "                        "                       "        "
-souledgb   Soul Edge (SO3/VER.A)                   COH-100 / COH-110   "                        "                       "        "
-souledgc   Soul Edge (SO1/VER.A)                   COH-100 / COH-110   "                        "                       "        "
+souledge1  Soul Edge (SO3/VER.A)                   COH-100 / COH-110   "                        "                       "        "
+souledge1j Soul Edge (SO1/VER.A)                   COH-100 / COH-110   "                        "                       "        "
 dunkmnia   Dunk Mania (DM2/VER.C)                  COH-100 / COH-110   SYSTEM11 MOTHER PCB      SYSTEM11 ROM8 PCB       C410     5
-dunkmnic   Dunk Mania (DM1/VER.C)                  COH-100 / COH-110   SYSTEM11 MOTHER PCB      SYSTEM11 ROM8 PCB       C410     5
+dunkmniaj  Dunk Mania (DM1/VER.C)                  COH-100 / COH-110   SYSTEM11 MOTHER PCB      SYSTEM11 ROM8 PCB       C410     5
 xevi3dg    Xevious 3D/G (XV31/VER.A)               COH-100 / COH-110   SYSTEM11 MOTHER PCB      SYSTEM11 ROM8 PCB       C430     5
 primglex   Prime Goal EX (PG1/VER.A)               COH-100 / COH-110   SYSTEM11 MOTHER PCB      SYSTEM11 ROM8 PCB       C411     6
 danceyes   Dancing Eyes (DC1/VER.A)                COH-100 / COH-110   SYSTEM11 MOTHER PCB      SYSTEM11 ROM8 PCB       C431     5
@@ -895,11 +895,11 @@ static const struct
 	{ "tekken2a", keycus_c406_r, 32 },
 	{ "tekken2b", keycus_c406_r, 32 },
 	{ "souledge", keycus_c409_r, 32 },
-	{ "souledga", keycus_c409_r, 32 },
-	{ "souledgb", keycus_c409_r, 32 },
-	{ "souledgc", keycus_c409_r, 32 },
+	{ "souledgea", keycus_c409_r, 32 },
+	{ "souledge1", keycus_c409_r, 32 },
+	{ "souledge1j", keycus_c409_r, 32 },
 	{ "dunkmnia", keycus_c410_r, 32 },
-	{ "dunkmnic", keycus_c410_r, 32 },
+	{ "dunkmniaj", keycus_c410_r, 32 },
 	{ "xevi3dg",  keycus_c430_r, 32 },
 	{ "primglex", keycus_c411_r, 32 },
 	{ "danceyes", keycus_c431_r, 32 },
