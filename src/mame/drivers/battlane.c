@@ -296,11 +296,11 @@ static MACHINE_RESET( battlane )
 static MACHINE_CONFIG_START( battlane, battlane_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 1250000)        /* 1.25 MHz ? */
+	MCFG_CPU_ADD("maincpu", M6809, 1500000)        /* 1.5 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(battlane_map)
 	MCFG_CPU_VBLANK_INT("screen", battlane_cpu1_interrupt)
 
-	MCFG_CPU_ADD("sub", M6809, 1250000)        /* 1.25 MHz ? */
+	MCFG_CPU_ADD("sub", M6809, 1500000)        /* 1.5 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(battlane_map)
 
 	MCFG_QUANTUM_TIME(HZ(6000))
