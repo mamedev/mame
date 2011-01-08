@@ -9288,13 +9288,13 @@ ROM_START( 32x_bios )
 	ROM_LOAD( "32x_s_bios.bin", 0x000000,  0x000400, CRC(bfda1fe5) SHA1(4103668c1bbd66c5e24558e73d4f3f92061a109a) )
 ROM_END
 
-ROM_START( segacd )
+ROM_START( segacdbi )
 	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "segacd_model2_bios_2_11_u.bin", 0x000000,  0x020000, CRC(2e49d72c) SHA1(328a3228c29fba244b9db2055adc1ec4f7a87e6b) )
 ROM_END
 
 /* some games use the 32x and SegaCD together to give better quality FMV */
-ROM_START( 32x_scd )
+ROM_START( 32x_scdb )
 	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
 
 	ROM_REGION16_BE( 0x400000, "gamecart", 0 ) /* 68000 Code */
@@ -9329,8 +9329,8 @@ ROM_END
 
 #ifndef MESS
 GAME( 1994, 32x_bios,    0,        genesis_32x,        megadriv,    _32x,    ROT0,   "Sega", "32X Bios", GAME_NOT_WORKING )
-GAME( 1994, segacd,      0,        genesis_scd,        megadriv,    megadriv,ROT0,   "Sega", "Sega-CD Model 2 BIOS V2.11 (U)", GAME_NOT_WORKING )
-GAME( 1994, 32x_scd,     0,        genesis_32x_scd,    megadriv,    _32x,    ROT0,   "Sega", "Sega-CD Model 2 BIOS V2.11 (U) (with 32X)", GAME_NOT_WORKING )
+GAME( 1994, segacdbi,    0,        genesis_scd,        megadriv,    megadriv,ROT0,   "Sega", "Sega-CD Model 2 BIOS V2.11 (U)", GAME_NOT_WORKING )
+GAME( 1994, 32x_scdb,    0,        genesis_32x_scd,    megadriv,    _32x,    ROT0,   "Sega", "Sega-CD Model 2 BIOS V2.11 (U) (with 32X)", GAME_NOT_WORKING )
 GAME( 1994, g_virr,      0,        megdsvp,            megadriv,   megadriv, ROT0,   "Sega", "Virtua Racing (U) [!]", 0 )
 GAME( 1994, g_virrj,     g_virr,   megdsvp,            megadriv,   megadrij, ROT0,   "Sega", "Virtua Racing (J) [!]", 0 )
 GAME( 1994, g_virre,     g_virr,   megdsvppal,         megadriv,   megadrie, ROT0,   "Sega", "Virtua Racing (E) [!]", 0 )
