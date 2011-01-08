@@ -5800,6 +5800,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( salmndr2 )	/* 1996.01 GX521 (Japan) */
 	DRIVER( salmndr2a )	/* 1996.?? GX521 (Asia) */
 	DRIVER( sexyparo )	/* 1996.02 GX533 (Japan) */
+	DRIVER( sexyparoa )	/* 1996.02 GX533 (Asia) */
 	DRIVER( daiskiss )	/* 1996.03 GX535 (Japan) */
 	DRIVER( tokkae )	/* 1996.10 GX615 (Japan) */
 	DRIVER( winspike )	/* 1997.?? GX705 (Europe) */
