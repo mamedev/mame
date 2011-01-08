@@ -5,7 +5,7 @@
                                        driver by   Luca Elia (l.elia@tin.it)
 
 CPU:    68000
-GFX:    ASTRO V0x (x = 1,2,5 or 6)
+GFX:    ASTRO V0x (x = 1,2,5,6 or 7)
 SOUND:  OKI M6295 (AD-65)
 OTHER:  EEPROM, Battery
 
@@ -20,6 +20,7 @@ Year + Game          PCB ID         CPU                Video      Chips         
 03  Speed Drop       None           JX-1689HP          ASTRO V05  pLSI1016-60LJ
 05? Zoo              M1.1           ASTRO V102PX-005?  ASTRO V06  ASTRO F02 2005-02-18                    Encrypted
 05? Win Win Bingo    M1.2           ASTRO V102PX-006?  ASTRO V06  ASTRO F02 2005-09-17                    Encrypted
+07? Western Venture  CS350P032      ASTRO V102?        ASTRO V07  ASTRO F01 2007-06-03                    Encrypted
 -------------------------------------------------------------------------------------------------------------------
 
 To do:
@@ -791,6 +792,46 @@ ROM_END
 
 /***************************************************************************
 
+Western Venture
+(c) ASTRO
+
+ASTRO V07 0709
+ASTRO F01 2007-06-03
+ASTRO ??? (V102?)
+AD-65?
+93C46 EEPROM
+
+XTAL 24 MHz (near F01)
+XTAL 18.432 MHz (near empty 44 pin PLCC socket and RS232?)
+
+Push Button
+
+ROM types:
+
+EV29001TSC-70R
+MX29F1610MC-10
+
+***************************************************************************/
+
+ROM_START( westvent )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "1_w.v.aa.02.d.bin", 0x00000, 0x20000, CRC(5e208192) SHA1(5a35a419fe95513b68423d4eb6c77fdd375667f3) )	// good?
+	ROM_LOAD16_BYTE( "2_w.v.aa.02.d.bin", 0x00001, 0x20000, BAD_DUMP CRC(f56d3ead) SHA1(2cf8960eab221cfce1c7ac6a20d002c4b05d8cc6) )	// FIXED BITS (xxxxxx0xxxxxxxxx)
+
+	ROM_REGION( 0x600000, "sprites", 0 )
+	ROM_LOAD( "top.bin",    0x000000, 0x200000, CRC(75bbaae0) SHA1(ef35775dd481ff343df1ee071ccd52b024d084b7) )
+	ROM_LOAD( "bottom.bin", 0x200000, 0x200000, CRC(e2dd58d5) SHA1(9ab881cfb2ee6cbc48aa28ba28529adb00803e44) )
+	ROM_LOAD( "middle.bin", 0x400000, 0x200000, CRC(7348fd37) SHA1(b5ec0994afb5bceae5627c37f1b35c7abcfd2f0a) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5.bin", 0x00000, 0x80000, CRC(92dc09d1) SHA1(6b448b3372e78047d054c5e42fcfcff7f75ff9b9) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "at93c46.bin", 0x00, 0x80, CRC(fd961d46) SHA1(e238da65e8769575f17b4464fb00f5c4813bafab) )
+ROM_END
+
+/***************************************************************************
+
 Win Win Bingo
 
 ASTRO M1.2 PCB:
@@ -989,10 +1030,11 @@ static DRIVER_INIT( showhanc )
 #endif
 }
 
-GAME( 2000,  showhand,  0,        showhand, showhand, showhand, ROT0, "Astro Corp.", "Show Hand (Italy)",     GAME_SUPPORTS_SAVE )
-GAME( 2000,  showhanc,  showhand, showhanc, showhanc, showhanc, ROT0, "Astro Corp.", "Wang Pai Dui Jue",      GAME_SUPPORTS_SAVE )
-GAME( 2002,  skilldrp,  0,        skilldrp, skilldrp, 0,        ROT0, "Astro Corp.", "Skill Drop Georgia",    GAME_SUPPORTS_SAVE )
-GAME( 2003,  speeddrp,  0,        speeddrp, skilldrp, 0,        ROT0, "Astro Corp.", "Speed Drop",            GAME_SUPPORTS_SAVE )
-GAME( 2005?, winbingo,  0,        showhand, showhand, 0,        ROT0, "Astro Corp.", "Win Win Bingo (set 1)", GAME_NOT_WORKING )
-GAME( 2005?, winbingoa, winbingo, showhand, showhand, 0,        ROT0, "Astro Corp.", "Win Win Bingo (set 2)", GAME_NOT_WORKING )
-GAME( 2005?, zoo,       0,        showhand, showhand, 0,        ROT0, "Astro Corp.", "Zoo",                   GAME_NOT_WORKING )
+GAME( 2000,  showhand,  0,        showhand, showhand, showhand, ROT0, "Astro Corp.", "Show Hand (Italy)",               GAME_SUPPORTS_SAVE )
+GAME( 2000,  showhanc,  showhand, showhanc, showhanc, showhanc, ROT0, "Astro Corp.", "Wang Pai Dui Jue (China)",        GAME_SUPPORTS_SAVE )
+GAME( 2002,  skilldrp,  0,        skilldrp, skilldrp, 0,        ROT0, "Astro Corp.", "Skill Drop Georgia (Ver. G1.0S)", GAME_SUPPORTS_SAVE )
+GAME( 2003,  speeddrp,  0,        speeddrp, skilldrp, 0,        ROT0, "Astro Corp.", "Speed Drop (Ver. 1.06)",          GAME_SUPPORTS_SAVE )
+GAME( 2005?, winbingo,  0,        showhand, showhand, 0,        ROT0, "Astro Corp.", "Win Win Bingo (set 1)",           GAME_NOT_WORKING )
+GAME( 2005?, winbingoa, winbingo, showhand, showhand, 0,        ROT0, "Astro Corp.", "Win Win Bingo (set 2)",           GAME_NOT_WORKING )
+GAME( 2005?, zoo,       0,        showhand, showhand, 0,        ROT0, "Astro Corp.", "Zoo (Ver. ZO.02.D)",              GAME_NOT_WORKING )
+GAME( 2007?, westvent,  0,        showhand, showhand, 0,        ROT0, "Astro Corp.", "Western Venture (Ver. AA.02.D)",  GAME_NOT_WORKING )

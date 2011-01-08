@@ -9821,6 +9821,7 @@ Other Sun games
 	DRIVER( winbingo )	/* (c) 2005? Astro Corp. */
 	DRIVER( winbingoa )	/* (c) 2005? Astro Corp. */
 	DRIVER( zoo )		/* (c) 2005? Astro Corp. */
+	DRIVER( westvent )	/* (c) 2007? Astro Corp. */
 
 	/* Dyna */
 	DRIVER( ncb3 )		/* (c) 199? Dyna Electronics */
