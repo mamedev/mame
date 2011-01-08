@@ -128,7 +128,7 @@ ROM_START(pomp_l1)
 	ROM_LOAD("b_ic20.716", 0x7000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
 	ROM_RELOAD( 0xf000, 0x0800)
 	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("sound.716", 0x7800, 0x0800, CRC(db085cbb) SHA1(9a57abbad183ba16b3dba16d16923c3bfc46a0c3))
+	ROM_LOAD("soundx.716", 0x7800, 0x0800, CRC(539d64fb) SHA1(ff0d09c8d7c65e1072691b5b9e4fcaa3f38d67e8))
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
 
@@ -144,7 +144,7 @@ ROM_START(arist_l1)
 	ROM_LOAD("b_ic20.716", 0x7000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
 	ROM_RELOAD( 0xf000, 0x0800)
 	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("sound.716", 0x7800, 0x0800, CRC(db085cbb) SHA1(9a57abbad183ba16b3dba16d16923c3bfc46a0c3))
+	ROM_LOAD("soundx.716", 0x7800, 0x0800, CRC(539d64fb) SHA1(ff0d09c8d7c65e1072691b5b9e4fcaa3f38d67e8))
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
 
@@ -176,7 +176,23 @@ ROM_START(taurs_l1)
 	ROM_LOAD("b_ic20.716", 0x7000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
 	ROM_RELOAD( 0xf000, 0x0800)
 	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("sound1.716", 0x7800, 0x0800, CRC(f4190ca3) SHA1(ee234fb5c894fca5876ee6dc7ea8e89e7e0aec9c))
+	ROM_LOAD("soundx.716", 0x7800, 0x0800, CRC(539d64fb) SHA1(ff0d09c8d7c65e1072691b5b9e4fcaa3f38d67e8))
+	ROM_RELOAD( 0xf800, 0x0800)
+ROM_END
+
+/*----------------------------
+/ King Tut
+/----------------------------*/
+ROM_START(kingt_l1)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("gamerom.716", 0x6000, 0x0800, CRC(54d3280a) SHA1(ca74636e35d2c3e0b3133f89b1ff1233d5d72a5c))
+	ROM_RELOAD( 0xe000, 0x0800)
+	ROM_LOAD("b_ic17.716", 0x7800, 0x0800, CRC(cfc2518a) SHA1(5e99e40dcb7e178137db8d7d7d6da82ba87130fa))
+	ROM_RELOAD( 0xf800, 0x0800)
+	ROM_LOAD("b_ic20.716", 0x7000, 0x0800, CRC(c6f8e3b1) SHA1(cb78d42e1265162132a1ab2320148b6857106b0e))
+	ROM_RELOAD( 0xf000, 0x0800)
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("soundx.716", 0x7800, 0x0800, CRC(539d64fb) SHA1(ff0d09c8d7c65e1072691b5b9e4fcaa3f38d67e8))
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
 
@@ -227,10 +243,11 @@ GAME(1979,	flash_t1,		flash_l1,	williams_s4,	williams_s4,	williams_s4,	ROT0,	"Wi
 GAME(1978,	phnix_l1,		0,			williams_s4,	williams_s4,	williams_s4,	ROT0,	"Williams",				"Phoenix (L-1)",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1978,	pkrno_l1,		0,			williams_s4,	williams_s4,	williams_s4,	ROT0,	"Williams",				"Pokerino (L-1)",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1979,	stlwr_l2,		0,			williams_s4,	williams_s4,	williams_s4,	ROT0,	"Williams",				"Stellar Wars (L-2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-//GAME(1978,	pomp_l1,		0,			williams_s4,	williams_s4,	williams_s4,	ROT0,	"Williams",				"Pompeii (Shuffle) (L-1)",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-//GAME(1978,	arist_l1,		0,			williams_s4,	williams_s4,	williams_s4,	ROT0,	"Williams",				"Aristocrat (Shuffle) (L-1)",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1978,	pomp_l1,		0,			williams_s4,	williams_s4,	williams_s4,	ROT0,	"Williams",				"Pompeii (Shuffle) (L-1)",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1978,	arist_l1,		0,			williams_s4,	williams_s4,	williams_s4,	ROT0,	"Williams",				"Aristocrat (Shuffle) (L-1)",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1978,	topaz_l1,		0,			williams_s4,	williams_s4,	williams_s4,	ROT0,	"Williams",				"Topaz (Shuffle) (L-1)",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1979,	taurs_l1,		0,			williams_s4,	williams_s4,	williams_s4,	ROT0,	"Williams",				"Taurus (Shuffle) (L-1)",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1979,	kingt_l1,		0,			williams_s4,	williams_s4,	williams_s4,	ROT0,	"Williams",				"King Tut (Shuffle) (L-1)",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1980,	omni_l1,		0,			williams_s4,	williams_s4,	williams_s4,	ROT0,	"Williams",				"Omni (Shuffle) (L-1)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1983,	bstrk_l1,		0,			williams_s4,	williams_s4,	williams_s4,	ROT0,	"Williams",				"Big Strike (Shuffle) (L-1)",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1983,	tstrk_l1,		0,			williams_s4,	williams_s4,	williams_s4,	ROT0,	"Williams",				"Triple Strike (Shuffle) (L-1)",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
