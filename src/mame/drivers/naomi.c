@@ -171,8 +171,58 @@ Naomi 2 / GD-ROM             |           |              |
 
 NAOMI ROM cart usage
 -------------------------
-There are 4 known types of carts manufactured by Sega: 171-7919A, 171-7978B, 171-8132B, 171-8346C
+There are 5 known types of carts manufactured by Sega: 171-7885A, 171-7919A, 171-7978B, 171-8132B, 171-8346C
 There are also 2 types of carts manufactured by Namco: MASK-B, MASK-C
+
+837-14124  171-7885A (C) Sega 1998
+|------------------------------------------------------------|
+|                                          ----CN2----       -|
+|                                                      JP2    |
+|                                               IC44          |
+|                                                             |
+|                OSC1                                  IC22   |
+|                     IC41     IC42                           | male side
+|                                               IC45          |
+|                                                             |
+|                JP3                                          |
+|                   IC37                                      |
+|        ----CN3----                       ----CN1----        |
+|-------------------------------------------------------------|
+
+ |------------------------------------------------------------|
+|-       ----CN2----                                          |
+|                                                             |
+|IC11S IC10S IC9S IC8S IC7S IC6S IC5S IC4S IC3S IC2S IC1S     |
+|ROM11 ROM10 ROM9 ROM8 ROM7 ROM6 ROM5 ROM4 ROM3 ROM2 ROM1     |
+|                                                             |
+| IC21S IC20S IC19S IC18S IC17S IC16S IC15S IC14S IC13S IC12S | female side
+| ROM21 ROM20 ROM19 ROM18 ROM17 ROM16 ROM15 ROM14 ROM13 ROM12 |
+|                                                             |
+|                                                             |
+|                                                             |
+|        ----CN1----                       ----CN3----        |
+|-------------------------------------------------------------|
+Notes:
+      OSC1  - oscillator 28.000MHz
+      JP2   - JUMPER unknown function
+      JP3   - JUMPER unknown function
+ IC1S-IC21S - FlashROM (SOP56), either 32Mb or 64Mb. Not all positions are populated
+      IC37  - FlashROM (SOIC8) Xicor X76F100 Secure SerialFlash
+      IC41  - Sega 315-6206 Altera MAX EPM7064S (QFP100)
+      IC42  - SEGA 315-5581 (QFP100). Probably some kind of FPGA or CPLD. Usually different per game
+              On the end of the number, -JPN means it requires Japanese BIOS, -COM will run with any BIOS
+ IC44-IC45  - SRAM (SOJ28) 32kx8, either IDT71256 or CY7C199
+   CN1/2/3  - connectors joining to main board
+
+Games known to use this PCB include....
+                                     Sticker    EPROM   MASKROMs    X76F100  EPM7064S  FPGA
+Game                                 on cart    IC22#   # of SOP56  IC37#    IC41#     IC42#         Notes
+-------------------------------------------------------------------------------------------------------------------------
+Inu No Osanpo / Dog Walking (Rev A)  840-0073C  22294A  16 (64Mb)   present  present   317-0316-JPN
+Soul Surfer (Rev A)                  840-0095C  ?       21 (???Mb)  ?        ?         ?
+The King of Route 66 (Rev A)         840-0087C  23819A  20 (64Mb)   present  present   not present
+
+
 
 837-13668  171-7919A (C) Sega 1998
 |---------------------------------------------------------|
@@ -195,7 +245,7 @@ Notes:
   IC1-IC21S - MaskROM (SOP44), either 32Mb or 64Mb. Not all positions are populated
       IC22  - EPROM (DIP42), either 27C160 or 27C322
       JP1   - JUMPER Sets the size of the EPROM. 1-2 = 32M, 2-3 = 16M
-      IC37  - FLASHROM (SOIC8) Xicor X76F100 Secure SerialFlash
+      IC37  - FlashROM (SOIC8) Xicor X76F100 Secure SerialFlash
       IC41  - Sega 315-6213 Xilinx XC9536 (PLCC44)
       IC42  - SEGA 315-5581 (QFP100). Probably some kind of FPGA or CPLD. Usually different per game
               On the end of the number, -JPN means it requires Japanese BIOS, -COM will run with any BIOS
@@ -203,46 +253,48 @@ Notes:
    CN1/2/3  - connectors joining to main board
 
 Games known to use this PCB include....
-                                        Sticker    EPROM        # of SOP44
-Game                                    on cart    IC22#        MASKROMs   IC41#     IC42#          Notes
---------------------------------------------------------------------------------------------------------------------------
-18 Wheeler Deluxe (Rev A)               840-0023C  22285A       20 (64Mb)  315-6213  317-0273-COM
-Airline Pilots (Rev A)                  840-0005C  21739A       11 (64Mb)  315-6213  317-0251-COM
-Airline Pilots Deluxe (Rev B)           ?          21787B       11 (64Mb)  315-6213  317-0251-COM   2 know BIOS 21801 (USA), 21802 (EXP)
-Cosmic Smash                            840-0044C  23428         8 (64Mb)  315-6213  317-0289-COM   joystick + 2 buttons
-Cosmic Smash (Rev A)                    840-0044C  23428A        8 (64Mb)  315-6213  317-0289-COM   joystick + 2 buttons
-Crazy Taxi                              840-0002C  21684        13 (64Mb)  315-6213  317-0248-COM
-Dead Or Alive 2                         841-0003C  22121        21 (64Mb)  315-6213  317-5048-COM   joystick + 3 buttons
-Dead Or Alive 2 Millenium               841-0003C  DOA2 Ver.M   21 (64Mb)  315-6213  317-5048-COM   joystick + 3 buttons
-Death Crimson OX                        841-0016C  23524        10 (64Mb)  315-6213  317-5066-COM
-Dengen Tenshi Taisen Janshi Shangri-La  841-0004C  22060        12 (64Mb)  315-6213  317-5050-JPN
-Derby Owners Club (Rev B)               840-0016C  22099B       14 (64Mb)  315-6213  317-0262-JPN   touch panel + 2 buttons + card reader
-Derby Owners Club 2000 Ver.2 (Rev A)    840-0052C  22284A       16 (64Mb)  315-6213  not populated
-Dynamite Baseball '99 / World Series'99 840-0019C  22141B       19 (64Mb)  315-6213  317-0269-JPN   requires special panel (joystick + 2 buttons + bat controller for each player)
-Dynamite Baseball Naomi                 840-0001C  21575        21 (64Mb)  315-6213  317-0246-JPN   requires special panel (joystick + 2 buttons + bat controller for each player)
-Ferrari F355 Challenge                  834-13842  21902        21 (64Mb)  315-6213  317-0254-COM
-Ferrari F355 Challenge 2 Twin           840-0042C  23399        21 (64Mb)  315-6213  317-0287-COM   2 know BIOS 22850 (USA), 22851 (EXP)
-Ferrari F355 Challenge Twin             834-13950  22848        21 (64Mb)  315-6213  317-0267-COM   2 know BIOS 22850 (USA), 22851 (EXP)
-Giant Gram Pro Wrestle 2                840-0007C  21820         9 (64Mb)  315-6213  317-0253-JPN   joystick + 3 buttons
-Guilty Gear X                           841-0013C  23356        14 (64Mb)  315-6213  317-5063-COM
-Gun Spike / Cannon Spike                841-0012C  23210        12 (64Mb)  315-6213  317-5060-COM
-Heavy Metal Geo Matrix                  HMG016007  23716A       11 (64Mb)  315-6213  317-5071-COM   joystick + 2 buttons
-Idol Janshi Suchie-Pai 3                841-0002C  21979        14 (64Mb)  315-6213  317-5047-JPN   requires special I/O board and mahjong panel
-Jumbo! Safari (Rev A)                   840-0013C  22826A        8 (64Mb)  315-6213  317-0264-COM
-OutTrigger                              840-0017C  22163        19 (64Mb)  315-6213  317-0266-COM   requires analog controllers/special panel
-Power Stone                             841-0001C  21597         8 (64Mb)  315-6213  317-5046-COM   joystick + 3 buttons
-Power Stone 2                           841-0008C  23127         9 (64Mb)  315-6213  317-5054-COM   joystick + 3 buttons
-Samba de Amigo                          840-0020C  22966B       16 (64Mb)  315-6213  317-0270-COM   will boot but requires special controller to play it
-Sega Marine Fishing                     840-0027C  22221        10 (64Mb)  315-6213  not populated  ROM 3&4 not populated. Requires special I/O board and fishing controller
-Sega Strike Fighter (Rev A)             840-0035C  23323A       20 (64Mb)  315-6213  317-0281-COM
-Slashout                                840-0041C  23341        17 (64Mb)  315-6213  317-0286-COM   joystick + 4 buttons
-Spawn                                   841-0005C  22977B       10 (64Mb)  315-6213  317-5051-COM   joystick + 4 buttons
-The Typing of the Dead                  840-0026C  23021A       20 (64Mb)  315-6213  not populated
-Toy Fighter / Waffupu                   840-0011C  22035        10 (64Mb)  315-6212  317-0257-COM   joystick + 3 buttons
-Virtua NBA                              840-0021C  23073        21 (64Mb)  315-6213  not populated
-Virtua Striker 2 2000 (Rev C)           840-0010C  21929C       14 (64Mb)  315-6213  317-0258-COM   joystick + 3 buttons (+1x 32Mb)
-Virtua Tennis / Power Smash             840-0015C  22927        11 (64Mb)  315-6213  317-0263-COM
-Zombie Revenge                          840-0003C  21707        19 (64Mb)  315-6213  317-0249-COM   joystick + 3 buttons
+                                                Sticker    EPROM   MASKROMs    X76F100  XC9536    315-5581
+Game                                            on cart    IC22#   # of SOP44  IC37#    IC41#     IC42#          Notes
+-------------------------------------------------------------------------------------------------------------------------
+18 Wheeler Deluxe (Rev A)                       840-0023C  22285A  20 (64Mb)   ?        315-6213  317-0273-COM
+Airline Pilots (Rev A)                          840-0005C  21739A  11 (64Mb)   ?        315-6213  317-0251-COM
+Airline Pilots Deluxe (Rev B)                   ?          21787B  11 (64Mb)   present  315-6213  317-0251-COM   2 know BIOS 21801 (USA), 21802 (EXP)
+Cosmic Smash                                    840-0044C  23428    8 (64Mb)   ?        315-6213  317-0289-COM   joystick + 2 buttons
+Cosmic Smash (Rev A)                            840-0044C  23428A   8 (64Mb)   ?        315-6213  317-0289-COM   joystick + 2 buttons
+Crazy Taxi                                      840-0002C  21684   13 (64Mb)   ?        315-6213  317-0248-COM
+Dead Or Alive 2                                 841-0003C  22121   21 (64Mb)   present  315-6213  317-5048-COM   joystick + 3 buttons
+Dead Or Alive 2 Millenium                       841-0003C  DOA2 M  21 (64Mb)   present  315-6213  317-5048-COM   joystick + 3 buttons
+Death Crimson OX                                841-0016C  23524   10 (64Mb)   ?        315-6213  317-5066-COM
+Dengen Tenshi Taisen Janshi Shangri-La          841-0004C  22060   12 (64Mb)   ?        315-6213  317-5050-JPN
+Derby Owners Club (Rev B)                       840-0016C  22099B  14 (64Mb)   ?        315-6213  317-0262-JPN   touch panel + 2 buttons + card reader
+Derby Owners Club 2000 Ver.2 (Rev A)            840-0052C  22284A  16 (64Mb)   present  315-6213  not present
+Dynamite Baseball '99 / World Series'99 (Rev B) 840-0019C  22141B  19 (64Mb)   ?        315-6213  317-0269-JPN   requires special panel (joystick + 2 buttons + bat controller for each player)
+Dynamite Baseball Naomi                         840-0001C  21575   21 (64Mb)   ?        315-6213  317-0246-JPN   requires special panel (joystick + 2 buttons + bat controller for each player)
+Ferrari F355 Challenge                          834-13842  21902   21 (64Mb)   ?        315-6213  317-0254-COM
+Ferrari F355 Challenge 2 Twin                   840-0042C  23399   21 (64Mb)   ?        315-6213  317-0287-COM   2 know BIOS 22850 (USA), 22851 (EXP)
+Ferrari F355 Challenge Twin                     834-13950  22848   21 (64Mb)   ?        315-6213  317-0267-COM   2 know BIOS 22850 (USA), 22851 (EXP)
+Giant Gram Pro Wrestle 2                        840-0007C  21820    9 (64Mb)   ?        315-6213  317-0253-JPN   joystick + 3 buttons
+Guilty Gear X                                   841-0013C  23356   14 (64Mb)   ?        315-6213  317-5063-COM
+Gun Spike / Cannon Spike                        841-0012C  23210   12 (64Mb)   ?        315-6213  317-5060-COM
+Heavy Metal Geo Matrix (Rev A)                  HMG016007  23716A  11 (64Mb)   ?        315-6213  317-5071-COM   joystick + 2 buttons
+Idol Janshi Suchie-Pai 3                        841-0002C  21979   14 (64Mb)   ?        315-6213  317-5047-JPN   requires special I/O board and mahjong panel
+Jambo! Safari (Rev A)                           840-0013C  22826A   8 (64Mb)   ?        315-6213  317-0264-COM
+OutTrigger                                      840-0017C  22163   19 (64Mb)   ?        315-6213  317-0266-COM   requires analog controllers/special panel
+Power Stone                                     841-0001C  21597    8 (64Mb)   ?        315-6213  317-5046-COM   joystick + 3 buttons
+Power Stone 2                                   841-0008C  23127    9 (64Mb)   ?        315-6213  317-5054-COM   joystick + 3 buttons
+Puyo Puyo Da!                                   841-0006C  22206   20 (64Mb)   ?        ?         ?
+Samba de Amigo (Rev B)                          840-0020C  22966B  16 (64Mb)   ?        315-6213  317-0270-COM   will boot but requires special controller to play it
+Sega Marine Fishing                             840-0027C  22221   10 (64Mb)   ?        315-6213  not present    ROM 3&4 not present. Requires special I/O board and fishing controller
+Sega Strike Fighter (Rev A)                     840-0035C  23323A  20 (64Mb)   ?        315-6213  317-0281-COM
+Slashout                                        840-0041C  23341   17 (64Mb)   ?        315-6213  317-0286-COM   joystick + 4 buttons
+Spawn (Rev B)                                   841-0005C  22977B  10 (64Mb)   ?        315-6213  317-5051-COM   joystick + 4 buttons
+The Typing of the Dead (Rev A)                  840-0026C  23021A  20 (64Mb)   ?        315-6213  not present
+Toy Fighter / Waffupu                           840-0011C  22035   10 (64Mb)   ?        315-6212  317-0257-COM   joystick + 3 buttons
+Virtua NBA                                      840-0021C  23073   21 (64Mb)   ?        315-6213  not present
+Virtua NBA (original)                           840-0021C  23073   21 (64Mb)   ?        315-6213  not present
+Virtua Striker 2 Ver. 2000 (Rev C)              840-0010C  21929C  14 (64Mb)   ?        315-6213  317-0258-COM   joystick + 3 buttons (+1x 32Mb)
+Virtua Tennis / Power Smash                     840-0015C  22927   11 (64Mb)   ?        315-6213  317-0263-COM
+Zombie Revenge                                  840-0003C  21707   19 (64Mb)   ?        315-6213  317-0249-COM   joystick + 3 buttons
 
 
 
@@ -288,18 +340,18 @@ IC17S-IC38S - MaskROM (SOP44), either 32Mb or 64Mb. Not all positions are popula
    CN1/2/3  - connectors joining to main board
 
 Games known to use this PCB include....
-                                        Sticker    EPROM   # of SOP44
-Game                                    on cart    IC11#   MASKROMs   IC1#      label IC1#    Notes
+                                        Sticker    EPROM   MASKROMs   25LC040   A54SX32
+Game                                    on cart    IC11#   # of SOP44 IC13S#    IC1#          Notes
 ---------------------------------------------------------------------------------------------------------------------
-Giant Gram 2000                         840-0039C  23377   20 (64Mb)  A54SX32   317-0296-COM
-Kick '4' Cash                           840-0140C  24212   16 (64Mb)  A54SX32A  317-0397-COM
-Marvel Vs. Capcom 2                     841-0007C  23085A  14 (64Mb)  A54SX32   317-5058-COM  +2x 32Mb (full cart #:841-0007C-03)
-Quiz Ah Megamisama                      840-0030C  23227   16 (64Mb)  A54SX32   317-0280-JPN
-Shootout Pool                           840-0098C  23844    4 (64mb)  A54SX32   317-0336-COM
-Shootout Pool - Shootout Pool Prize     840-0128C  24065    4 (64mb)  A54SX32   317-0367-COM
-Virtua Fighter 4 Evolution              840-0106B  23934   20 (64Mb)  A54SX32   317-0339-COM
-Virtua Tennis 2 / Power Smash 2         840-0084C  22327   18 (64Mb)  A54SX32   317-0320-COM
-Virtua Tennis 2 / Power Smash 2 (Rev A) 840-0084C  22327A  18 (64Mb)  A54SX32   317-0320-COM
+Giant Gram 2000                         840-0039C  23377   20 (64Mb)  present   317-0296-COM
+Kick '4' Cash                           840-0140C  24212   16 (64Mb)  present   317-0397-COM  the FPGA is A54Sx32A
+Marvel Vs. Capcom 2 (Rev A)             841-0007C  23085A  14 (64Mb)  present   317-5058-COM  +2x 32Mb (full cart #:841-0007C-03)
+Quiz Ah Megamisama                      840-0030C  23227   16 (64Mb)  present   317-0280-JPN
+Shootout Pool                           840-0098C  23844    4 (64mb)  present   317-0336-COM
+Shootout Pool - Shootout Pool Prize     840-0128C  24065    4 (64mb)  present   317-0367-COM
+Shootout Pool Medal                     ?          24148    4 (64Mb)  ?         ? 
+Virtua Fighter 4 Evolution              840-0106B  23934   20 (64Mb)  present   317-0339-COM
+Virtua Tennis 2 / Power Smash 2 (Rev A) 840-0084C  22327A  18 (64Mb)  present   317-0320-COM
 
 
 
@@ -333,25 +385,24 @@ Notes:
    CN1/2/3  - connectors joining to main board
 
    Games known to use this PCB include....
-                                        Sticker    EPROM   # of SOP44
-Game                                    on cart    IC22#   MASKROMs    IC27#      IC41#     IC42#         Notes
------------------------------------------------------------------------------------------------------------------------
-Capcom Vs. SNK Millennium Fight 2000    841-0011C  23511A   7 (128Mb)  315-6219   315-6213  317-5059-COM  (000804)
-Capcom Vs. SNK Millennium Fight 2000    841-0011C  23511C   7 (128Mb)  315-6319   315-6213  317-5059-COM  (000904)
-Derby Owners Club 2                     840-0083C  22306B  11 (128Mb)  315-6319A  315-6213  not populated
-Derby Owners Club World Edition (Rev C) 840-0088C  22336C   7 (128Mb)  315-6319A  315-6213  not populated
-Derby Owners Club World Edition (Rev D) 840-0088C  22336D   7 (128Mb)  315-6319A  315-6213  not populated  2 MaskROM are different from Rev C
-Giga Wing 2                             841-0014C  22270    5 (128Mb)  315-6319A  315-6213  317-5064-COM
-Mobile Suit Gundam: Fed. VS Zeon (cart) 841-0017C  23638   10 (128Mb)  ?          ?         ?
-Moero Justice Gakuen / Project Justice  841-0015C  23548A  11 (128Mb)  315-6319A  315-6213  317-5065-COM
-Samba de Amigo Ver.2000                 840-0047C  23600    ? (128Mb)  315-6319A  315-6213  317-0295-COM
-The King of Route 66 (Rev A)            840-0087C  23819A   ? (128Mb)  ?          ?         ?
-Virtua Striker 3 (Rev B)                840-0061C  23663B  11 (128Mb)  ?          315-6213  ?
-Virtua Striker 3 (Rev C)                840-0061C  23663C  11 (128Mb)  ?          315-6213  ?
-Wave Runner GP                          840-0064C  24059    6 (128Mb)  315-6319A  315-6213  not populated
-Wild Riders                             840-0046C  23622   10 (128Mb)  315-6319A  315-6213  317-0301-COM
-WWF Royal Rumble                        840-0040C  22261    8 (128Mb)  315-6319   315-6213  317-0285-COM
-Zero Gunner 2                           841-0020C  23689    5 (128Mb)  315-6319A  315-6213  317-5073-COM
+                                                Sticker    EPROM   MASKROMs    XC9536     315-6213  315-5581
+Game                                            on cart    IC22#   # of SOP44  IC27#      IC41#     IC42#         Notes
+----------------------------------------------------------------------------------------------------------------------------
+Capcom Vs. SNK Millennium Fight 2000 (Rev A)    841-0011C  23511A   7 (128Mb)  315-6219   present   317-5059-COM  (000804)
+Capcom Vs. SNK Millennium Fight 2000 (Rev C)    841-0011C  23511C   7 (128Mb)  315-6319   present   317-5059-COM  (000904)
+Derby Owners Club II                            840-0083C  22306B  11 (128Mb)  315-6319A  present   not present
+Derby Owners Club World Edition (Rev C)         840-0088C  22336C   7 (128Mb)  315-6319A  present   not present
+Derby Owners Club World Edition (Rev D)         840-0088C  22336D   7 (128Mb)  315-6319A  present   not present   2 MaskROM are different from Rev C
+Giga Wing 2                                     841-0014C  22270    5 (128Mb)  315-6319A  present   317-5064-COM
+Mobile Suit Gundam: Fed. VS Zeon (cart)         841-0017C  23638   10 (128Mb)  ?          ?         ?
+Moero Justice Gakuen / Project Justice (Rev A)  841-0015C  23548A  11 (128Mb)  315-6319A  present   317-5065-COM
+Samba de Amigo Ver.2000                         840-0047C  23600    ? (128Mb)  315-6319A  present   317-0295-COM
+Virtua Striker 3 (Rev B)                        840-0061C  23663B  11 (128Mb)  ?          present   ?
+Virtua Striker 3 (Rev C)                        840-0061C  23663C  11 (128Mb)  ?          present   ?
+Wave Runner GP                                  840-0064C  24059    6 (128Mb)  315-6319A  present   not present
+Wild Riders                                     840-0046C  23622   10 (128Mb)  315-6319A  present   317-0301-COM
+WWF Royal Rumble                                840-0040C  22261    8 (128Mb)  315-6319   present   317-0285-COM
+Zero Gunner 2                                   841-0020C  23689    5 (128Mb)  315-6319A  present   317-5073-COM
 
 
 
@@ -388,11 +439,12 @@ Notes:
       CN4   - 6 legs connector for ISP programming
 
    Games known to use this PCB include....
-                          Sticker    EPROM        # of SOP56
-Game                      on cart    IC7#         FLASHROMs   IC2#    IC3#          IC4#    Notes
------------------------------------------------------------------------------------------------------------------------
-Touch De Zunou (Rev A)    840-0166C  unpopulated   2 (512Mb)  XC3S50  317-0435-JPN  XCF01S  IC4# is marked "18"
-Mamonoro                  841-0060C  unpopulated   4 (512Mb)  XC3S50  317-5132-JPN  XCF01S  IC2# is labeled "VER.2"
+                                   Sticker    EPROM        FLASHROMs   XC3S50   PIC16C621A    XCF01S  
+Game                               on cart    IC7#         # of SOP56  IC2#     IC3#          IC4#     Notes
+----------------------------------------------------------------------------------------------------------------------------
+Dynamite Deka EX / Asian Dynamite  840-0175C  ?            ?           ?        ?             ? 
+Mamonoro                           841-0060C  not present  4 (512Mb)   present  317-5132-JPN  present  IC2# is labeled "VER.2"
+Touch De Zunou (Rev A)             840-0166C  not present  2 (512Mb)   present  317-0435-JPN  present  IC4# is marked "18"
 
 
 
@@ -410,8 +462,8 @@ MASK B-F2X (C) Namco 2000
 |                                                                                       |
 |3                                            OSC1                                      |
 |                                                                                       |
-|2       FLASH FLASH FLASH FLASH                    NAOD                                |
-|         FL3   FL2   FL1   FL0                     EC1B                                |
+|2       FLASH FLASH FLASH       FLASH              NAOD                                |
+|         FL3   FL2   FL1        FL0                EC1B                                |
 |1 J J J                          X76F  NAOD                    SEGA                    |
 |  P P P                          100   EC2A                  315-5881                  |
 |  3 2 1                                                                                |
@@ -428,21 +480,68 @@ Notes:
          1H - NAODEC2A (QFP100) Altera MAX EPM7064S. Silkscreened NAODEC2A
          1M - SEGA 315-5581 (QFP100). Probably some kind of FPGA or CPLD. Usually different per game
               On the end of the number, -JPN means it requires Japanese BIOS, -COM will run with any BIOS
-2B,2C,2D,2F - DA28F640J5 FlashROM (SSOP56), 64Mb. Not all positions are populated. Silkscreened VOYAGER64
-              Looks like the equivalent of IC11/22 on Sega carts
+2B,2C,2D,2F - DA28F640J5 FlashROM (SSOP56), either 32Mb or 64Mb. Not all positions are populated.
+              Silkscreened VOYAGER64. Looks like the equivalent of IC11/22 on Sega carts
          2K - NAODEC1B (QFP100) Altera MAX EPM7064S. Silkscreened NAODEC1A
          3J - oscillator 28.000MHz
 4B-4N,6B-6P - MASKROM (TSOP48), 128Mb. Not all positions are populated. Silkscreened MASK128MT
       4P,5P - SRAM (SOJ28) 32kx8, ISSI IS61C256AH-15J
    CN1/2/3  - connectors joining to main board
 
+   Games known to use this PCB include....
+								   Sticker   FL0-FL3   FLASHROMs   X76F100      EPM7064   EPM7064   315-5581      Game
+ Game                              on cart   FLASHROM  # of SOP48  IC @ 1F      IC @ 1H   IC @ 2K   IC @ 1M       code       Notes
+-----------------------------------------------------------------------------------------------------------------------------------------------
+Gun Survivor 2: Biohazard Code V.  25709801  1 (64Mb)  14 (128Mb)  ?            NAODEC2A  NAODEC1A  317-5075-COM  
+/Shin Nihon Prowrestling                                                                                                     FL0 & FL1 have pin55 raised from PCB.
+\Toukon Retsuden 4 Arcade Edition  25349801  2 (64Mb)  15 (128Mb)  not present  NAODEC2A  NAODEC1B  317-5040-COM  TRF1Ver.A  They are connected togheter and go to pin89 on 2K.
+World Kicks                        25209801  2 (32Mb)  10 (128Mb)  ?            NAODEC2A  NAODEC1A  317-5040-COM  WK3 Ver.A  317-5040-COM must be checked.
+
+
+
+MASK C (C) Namco 2000
+|-------------------------------------------------------------------------------------|
+|                                                               ----CN2----            -|
+|                                                                                       |
+|7        LED1  LED2                                                                    |
+|                                                                                       |
+|6        MA21  MA20  MA19  MA18  MA17  MA16  MA15  MA14  MA13  MA12  MA11              |
+|                                                                                       |
+|5                                                                     I     I          |
+|                                                                      S     S          |
+|4        MA10  MA9   MA8   MA7   MA6   MA5   MA4   MA3   MA2   MA1    S     S          | male side
+|                                                                      I     I          |
+|3                                     JP1    NAOD                                      |
+|                                             EC3                                       |
+|2       FLASH FLASH FLASH      FLASH  OSC1                                             |
+|         FL3   FL2   FL1       FL0                                                     |
+|1                                X76F                          SEGA                    |
+|                                 100                         315-5881                  |
+|                                                                                       |
+|    A     B     C     D     E     F     H     J     K     L     M     N     P   R   S  |
+|             ----CN3----                                       ----CN1----             |
+|---------------------------------------------------------------------------------------|
+Notes:
+      The female side of the cart PCB only has traces
+
+        JP1 - JUMPER silkscreened OPEN
+         1F - FLASHROM (SOIC8) Xicor X76F100 Secure SerialFlash. Silkscreened X76F100
+         2H - oscillator 28.000MHz
+         3J - NAODEC3 (QFP100) Cypres CY37128. Silkscreened NAODEC3
+         1M - SEGA 315-5581 (QFP100). Probably some kind of FPGA or CPLD. Usually different per game
+              On the end of the number, -JPN means it requires Japanese BIOS, -COM will run with any BIOS
+2B,2C,2D,2F - DA28F640J5 FlashROM (SSOP56), either 32Mb or 64Mb. Not all positions are populated.
+              Silkscreened VOYAGER64. Looks like the equivalent of IC11/22 on Sega carts
+4B-4M,6B-6N - MASKROM (TSOP48), 128Mb. Not all positions are populated. Silkscreened MASK128MT
+      4N,4P - SRAM (SOJ28) 32kx8, ISSI IS61C256AH-15J
+   CN1/2/3  - connectors joining to main board
 
    Games known to use this PCB include....
-                                   Sticker   FL0-FL3    # of SOP48  IC @ 1F        IC @ 1M
- Game                              on cart   FLASHROM   FLASHROMs   X76F100        315-5581      Notes
----------------------------------------------------------------------------------------------------------------------------------------
-/Shin Nihon Prowrestling                                                                         FL0 & FL1 have pin55 raised from PCB.
-\Toukon Retsuden 4 Arcade Edition  25349801   2 (64Mb)  15 (128Mb)  not populated  317-5040-com  They are connected togheter and go to pin89 on 2K.
+			   Sticker   FL0-FL3   FLASHROMs   X76F100  CY37128  315-5581      Game
+ Game          on cart   FLASHROM  # of SOP48  IC @ 1F  IC @ 3J  IC @ 1M       code        Notes
+--------------------------------------------------------------------------------------------------------------------
+Ninja Assault  25469801  3 (64Mb)   9 (128Mb)  present  NAODEC3  317-5068-COM  NJA3 Ver.A
+
 
 
 
@@ -4911,7 +5010,7 @@ GAME( 1998, naomi,    0,        naomi,    naomi,    naomi, ROT0, "Sega",        
 /* 0001C */ GAME( 1998, dybbnao,  naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Dynamite Baseball NAOMI (JPN)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0002C */ GAME( 1999, crzytaxi, naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Crazy Taxi (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0003C */ GAME( 1999, zombrvn,  naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Zombie Revenge (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0007C */ GAME( 1999, ggram2,   naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Giant Gram (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0007C */ GAME( 1999, ggram2,   naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Giant Gram 2 (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 00??C */ GAME( 1999, ringout,  naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Ringout 4x4", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0010C */ GAME( 1999, vs2_2k,   naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Virtua Striker 2 Ver. 2000 (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0011C */ GAME( 1999, toyfight, naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Toy Fighter", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
@@ -4929,7 +5028,7 @@ GAME( 1998, naomi,    0,        naomi,    naomi,    naomi, ROT0, "Sega",        
 /* 0027C */ GAME( 2000, smarinef, naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Sega Marine Fishing", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0030C */ GAME( 2000, qmegamis, naomi,    naomi,    naomi,    qmegamis, ROT0, "Sega",  "Quiz Ah Megamisama (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 003?C */ GAME( 2000, vonot,    naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Virtual On Oratorio Tangram M.S.B.S. ver5.66 2000 Edition", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 003?C */ GAME( 2000, derbyo2k, naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Derby Owners Club 2000", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 003?C */ GAME( 2000, derbyo2k, naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Derby Owners Club 2000 (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0035B */ GAME( 2000, sstrkfgt, naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Sega Strike Fighter (Rev A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0037C */ GAME( 2000, 18wheelr, naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "18 Wheeler (JPN)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0039C */ GAME( 2000, gram2000, naomi,    naomi,    naomi,    gram2000, ROT0, "Sega",  "Giant Gram 2000 (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
@@ -4941,8 +5040,8 @@ GAME( 1998, naomi,    0,        naomi,    naomi,    naomi, ROT0, "Sega",        
 /* 0044C */ GAME( 2001, csmasho,  csmash,   naomi,    naomi,    naomi,    ROT0, "Sega",  "Cosmic Smash (JPN, USA, EXP, KOR, AUS) (original)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0064C */ GAME( 2001, wrungp,   naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Wave Runner GP", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 00??C */ GAME( 2001, inunoos,  naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Inu no Osanpo", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0083C */ GAME( 2001, derbyoc2, naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Derby Owners Club II (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0084C */ GAME( 2001, vtenis2c, naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Power Smash 2 / Virtua Tennis 2 (cartridge)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0083C */ GAME( 2001, derbyoc2, naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Derby Owners Club II (JPN, USA, EXP, KOR, AUS) (Rev B)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0084C */ GAME( 2001, vtenis2c, naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Power Smash 2 / Virtua Tennis 2 (cartridge) (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0088C */ GAME( 2001, derbyocw, naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Derby Owners Club World Edition (JPN, USA, EXP, KOR, AUS) (Rev D)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0088C */ GAME( 2001, drbyocwc, derbyocw, naomi,    naomi,    naomi,    ROT0, "Sega",  "Derby Owners Club World Edition (JPN, USA, EXP, KOR, AUS) (Rev C)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0098C */ GAME( 2001, shootopl, naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Shootout Pool", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
@@ -4956,7 +5055,7 @@ GAME( 1998, naomi,    0,        naomi,    naomi,    naomi, ROT0, "Sega",        
 /* 0003C */ GAME( 1999, doa2,     naomi,    naomi,    naomi,    naomi,    ROT0, "Tecmo",           "Dead or Alive 2 (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0003C */ GAME( 2000, doa2m,    doa2,     naomi,    naomi,    naomi,    ROT0, "Tecmo",           "Dead or Alive 2 Millennium (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0004C */ GAME( 1999, shangril, naomi,    naomi,    naomi_mp, naomi_mp, ROT0, "Marvelous Ent.",  "Dengen Tenshi Taisen Janshi Shangri-la (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0005C */ GAME( 1999, spawn,    naomi,    naomi,    naomi,    naomi,    ROT0, "Capcom",          "Spawn (JPN, USA, EUR, ASI, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0005C */ GAME( 1999, spawn,    naomi,    naomi,    naomi,    naomi,    ROT0, "Capcom",          "Spawn (JPN, USA, EUR, ASI, AUS) (Rev B)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0006C */ GAME( 1999, puyoda,   naomi,    naomi,    naomi,    naomi,    ROT0, "Compile",         "Puyo Puyo Da!", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0007C */ GAME( 2000, mvsc2,    naomi,    naomi,    naomi,    mvsc2,    ROT0, "Capcom",          "Marvel vs. Capcom 2 (JPN, USA, EUR, ASI, AUS) (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0008C */ GAME( 2000, pstone2,  naomi,    naomi,    naomi,    naomi,    ROT0, "Capcom",          "Power Stone 2 (JPN, USA, EUR, ASI, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
@@ -6314,7 +6413,7 @@ ROM_START( kingrt66 )
 	NAOMI_DEFAULT_EEPROM
 
 	ROM_REGION( 0xa800000, "user1", ROMREGION_ERASEFF)
-        ROM_LOAD( "epr-23819.ic22", 0x0000000, 0x400000, CRC(92f11b29) SHA1(b33f7eefb849754cfe194be1d48d770ed77ff69a) )
+        ROM_LOAD( "epr-23819a.ic22", 0x0000000, 0x400000, CRC(92f11b29) SHA1(b33f7eefb849754cfe194be1d48d770ed77ff69a) )
 	ROM_RELOAD( 0x400000, 0x400000)
         ROM_LOAD( "mpr-23799.ic1",  0x0800000, 0x800000, CRC(03da8f81) SHA1(01f9b33ffc485d8ccb2630c8cc1fcc0d90da171d) )
         ROM_LOAD( "mpr-23800.ic2",  0x1000000, 0x800000, CRC(1bbbf549) SHA1(0c5269f3e8a88298408bb612dc8da4d545ce329e) )
@@ -6651,11 +6750,11 @@ GAME( 2001, naomi2,   0,        naomi,    naomi,    0, ROT0, "Sega",            
 /* 840-xxxxx (Sega games)*/
 /* Complete Dumps */
 /* 0046C */ GAME( 2001, wldrider, naomi2,  naomi,    naomi,    0,  ROT0,  "Sega",          "Wild Riders (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0061C */ GAME( 2001, vstrik3c, naomi2,  naomi,    naomi,    0,  ROT0,  "Sega",          "Virtua Striker 3 (Cart, rev. C) (USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0061C */ GAME( 2001, vstrik3cb,vstrik3c,naomi,    naomi,    0,  ROT0,  "Sega",          "Virtua Striker 3 (Cart, rev. B) (USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0061C */ GAME( 2001, vstrik3c, naomi2,  naomi,    naomi,    0,  ROT0,  "Sega",          "Virtua Striker 3 (Cart, Rev C) (USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0061C */ GAME( 2001, vstrik3cb,vstrik3c,naomi,    naomi,    0,  ROT0,  "Sega",          "Virtua Striker 3 (Cart, Rev B) (USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0080C */ GAME( 2001, vf4cart,  naomi2,  naomi,    naomi,    0,  ROT0,  "Sega",          "Virtua Fighter 4 (Cartridge)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0106C */ GAME( 2001, vf4evoct, naomi2,  naomi,    naomi,    vf4evoct,  ROT0,  "Sega",          "Virtua Fighter 4 Evolution (Cartridge)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 01??C */ GAME( 2002, kingrt66, naomi2,  naomi,    naomi,    0,  ROT0, "Sega",  "King of Route 66", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0106C */ GAME( 2001, vf4evoct, naomi2,  naomi,    naomi,    vf4evoct,  ROT0,  "Sega",   "Virtua Fighter 4 Evolution (Cartridge)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 01??C */ GAME( 2002, kingrt66, naomi2,  naomi,    naomi,    0,  ROT0,  "Sega",  		"King of Route 66 (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0139C */ GAME( 2002, clubkrte, naomi2,  naomi,    naomi,    0,  ROT0,  "Sega",          "Club Kart: European Session", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 
 /* GDS-xxxx (Sega first party games) */
