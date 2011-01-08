@@ -2441,6 +2441,44 @@ ROM_START( zeroteamc )
 ROM_END
 
 /*
+"Zero Team Suicide Revival Kit"
+
+As the name implies, this is used to give life again to a dead ZT PCB.
+*/
+
+ROM_START( zeroteamsr )
+	ROM_REGION( 0x200000, "mainprg", 0 ) /* v30 main cpu */
+	ROM_LOAD32_BYTE("zteam1.u24",   0x000000, 0x40000, CRC(c531e009) SHA1(731881fca3dc0a8269ecdd295ba7119d93c892e7) )
+	ROM_LOAD32_BYTE("zteam3.u23",   0x000002, 0x40000, CRC(1f988808) SHA1(b1fcb8c96e57c4942bc032d42408d7289c6a3681) )
+	ROM_LOAD32_BYTE("zteam2.u25",   0x000001, 0x40000, CRC(b7234b93) SHA1(35bc093e8ad4bce1d2130a392ed1b9487a5642a1) )
+	ROM_LOAD32_BYTE("zteam4.u26",   0x000003, 0x40000, CRC(c2d26708) SHA1(d65191b40f5dd7cdbbc004e2de10134db6092fd1) )
+
+	ROM_REGION( 0x40000, "user2", 0 )	/* COPX */
+	ROM_LOAD( "copx-d2",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
+
+	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
+	ROM_LOAD( "sound",  0x000000, 0x08000, CRC(7ec1fbc3) SHA1(48299d6530f641b18764cc49e283c347d0918a47) ) // 5.5c
+	ROM_CONTINUE(0x10000,0x8000)
+	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+
+	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
+	ROM_LOAD16_BYTE( "7.5s",	0x000000,	0x010000,	CRC(9f6aa0f0) SHA1(1caad7092c07723d12a07aa363ae2aa69cb6be0d) )
+	ROM_LOAD16_BYTE( "8.5r",	0x000001,	0x010000,	CRC(68f7dddc) SHA1(6938fa974c6ef028751982fdabd6a3820b0d30a8) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
+	ROM_LOAD( "back-1",   0x000000, 0x100000, CRC(8b7f9219) SHA1(3412b6f8a4fe245e521ddcf185a53f2f4520eb57) )
+	ROM_LOAD( "back-2",   0x100000, 0x080000, CRC(ce61c952) SHA1(52a843c8ba428b121fab933dd3b313b2894d80ac) )
+
+	ROM_REGION( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) (diff encrypt to raiden2? ) */
+	ROM_LOAD32_WORD( "obj-1",  0x000000, 0x200000, CRC(45be8029) SHA1(adc164f9dede9a86b96a4d709e9cba7d2ad0e564) )
+	ROM_LOAD32_WORD( "obj-2",  0x000002, 0x200000, CRC(cb61c19d) SHA1(151a2ce9c32f3321a974819e9b165dddc31c8153) )
+
+	ROM_REGION( 0x100000, "oki", 0 )	/* ADPCM samples */
+	ROM_LOAD( "6.pcm", 0x00000, 0x40000,  CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) ) // 6.4a
+ROM_END
+
+
+/*
 
 X Se Dae Quiz
 Seibu/Dream Island, 1995
@@ -2546,17 +2584,18 @@ GAME( 1993, raiden2d, raiden2, raiden2,  raiden2,  raiden2,  ROT270, "Seibu Kaih
 GAME( 1993, raiden2e, raiden2, raiden2,  raiden2,  raiden2,  ROT270, "Seibu Kaihatsu",                         "Raiden II (set 6)",                GAME_NOT_WORKING) // rev 4
 GAME( 1993, raiden2f, raiden2, raiden2,  raiden2,  raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden II (set 7, US Fabtek)",     GAME_NOT_WORKING) //  ^
 
-GAME( 1994, raidndx,  0,       raidendx,  raidendx, raidendx,  ROT270, "Seibu Kaihatsu",                         "Raiden DX (UK)",                   GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME( 1994, raidndxa1,raidndx, raidendx,  raidendx, raidendx,  ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden DX (Asia set 1)",           GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME( 1994, raidndxa2,raidndx, raidendx,  raidendx, raidendx,  ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden DX (Asia set 2)",           GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME( 1994, raidndxj, raidndx, raidendx,  raidendx, raidendx,  ROT270, "Seibu Kaihatsu",                         "Raiden DX (Japan)",                GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME( 1994, raidndxu, raidndx, raidendx,  raidendx, raidendx,  ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden DX (US)",                   GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME( 1994, raidndxg, raidndx, raidendx,  raidendx, raidendx,  ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden DX (Germany)",              GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1994, raidndx,  0,       raidendx,  raidendx, raidendx,  ROT270, "Seibu Kaihatsu",                         "Raiden DX (UK)",                   GAME_NOT_WORKING)
+GAME( 1994, raidndxa1,raidndx, raidendx,  raidendx, raidendx,  ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden DX (Asia set 1)",           GAME_NOT_WORKING)
+GAME( 1994, raidndxa2,raidndx, raidendx,  raidendx, raidendx,  ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden DX (Asia set 2)",           GAME_NOT_WORKING)
+GAME( 1994, raidndxj, raidndx, raidendx,  raidendx, raidendx,  ROT270, "Seibu Kaihatsu",                         "Raiden DX (Japan)",                GAME_NOT_WORKING)
+GAME( 1994, raidndxu, raidndx, raidendx,  raidendx, raidendx,  ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden DX (US)",                   GAME_NOT_WORKING)
+GAME( 1994, raidndxg, raidndx, raidendx,  raidendx, raidendx,  ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden DX (Germany)",              GAME_NOT_WORKING)
 
 GAME( 1993, zeroteam, 0,       zeroteam, zeroteam,  zeroteam,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 1)", GAME_NOT_WORKING)
 GAME( 1993, zeroteama,zeroteam,zeroteam, zeroteam,  zeroteam,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 2)", GAME_NOT_WORKING)
 GAME( 1993, zeroteamb,zeroteam,zeroteam, zeroteam,  zeroteam,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 3)", GAME_NOT_WORKING)
 GAME( 1993, zeroteamc,zeroteam,zeroteam, zeroteam,  zeroteam,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 4)", GAME_NOT_WORKING)
 GAME( 1993, zeroteams,zeroteam,zeroteam, zeroteam,  zeroteam,  ROT0,   "Seibu Kaihatsu", "Zero Team Selection", GAME_NOT_WORKING)
+GAME( 1993, zeroteamsr,zeroteam,zeroteam, zeroteam,  zeroteam,  ROT0,  "Seibu Kaihatsu", "Zero Team Suicide Revival Kit", GAME_NOT_WORKING)
 
 GAME( 1995, xsedae,   0,       xsedae,   xsedae,  xsedae,   ROT0,   "Dream Island",   "X Se Dae Quiz", GAME_NOT_WORKING)

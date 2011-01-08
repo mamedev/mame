@@ -7413,11 +7413,12 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( zeroteamb )	/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( zeroteamc )	/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( zeroteams )	/* (c) 1993 Seibu Kaihatsu */
-	DRIVER( nzerotea )	/* (c) 1993 Seibu Kaihatsu */
+	DRIVER( zeroteamsr )/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( xsedae )	/* (c) 1995 Dream Island */
 
 	/* Newer V33 PCB with COP3 protection */
 	DRIVER( r2dx_v33 )	/* (c) 1996 Seibu Kaihatsu */
+	DRIVER( nzerotea )	/* (c) 1997 Seibu Kaihatsu */
 
 	/* Seibu SPI System games */
 
