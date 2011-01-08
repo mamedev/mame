@@ -124,7 +124,7 @@ CPUS += MN10200
 CPUS += COSMAC
 CPUS += PPS4
 CPUS += UPD7725
-
+CPUS += HD61700
 
 #-------------------------------------------------
 # specify available sound cores; some of these are

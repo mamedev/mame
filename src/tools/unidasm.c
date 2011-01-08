@@ -104,6 +104,7 @@ CPU_DISASSEMBLE( cquestlin );
 CPU_DISASSEMBLE( dsp32c );
 CPU_DISASSEMBLE( dsp56k );
 CPU_DISASSEMBLE( hyperstone_generic );
+CPU_DISASSEMBLE( hd61700 );
 CPU_DISASSEMBLE( esrip );
 CPU_DISASSEMBLE( f8 );
 CPU_DISASSEMBLE( g65816_generic );
@@ -227,6 +228,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "dsp32c",		_32le,  0, CPU_DISASSEMBLE_NAME(dsp32c) },
 	{ "dsp56k",		_16le, -1, CPU_DISASSEMBLE_NAME(dsp56k) },
 	{ "hyperstone",	_16be,  0, CPU_DISASSEMBLE_NAME(hyperstone_generic) },
+	{ "hd61700",	_8bit,  0, CPU_DISASSEMBLE_NAME(hd61700) },
 	{ "esrip",		_64be,  0, CPU_DISASSEMBLE_NAME(esrip) },
 	{ "f8",			_8bit,  0, CPU_DISASSEMBLE_NAME(f8) },
 	{ "g65816",		_8bit,  0, CPU_DISASSEMBLE_NAME(g65816_generic) },
