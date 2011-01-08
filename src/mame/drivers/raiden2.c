@@ -311,7 +311,7 @@ WRITE16_MEMBER(raiden2_state::cop_itoa_low_w)
 {
 	cop_itoa = (cop_itoa & ~UINT32(mem_mask)) | (data & mem_mask);
 
-	int digits = cop_itoa_digit_count;
+	int digits = 1 << cop_itoa_digit_count*2;
 	UINT32 val = cop_itoa;
 
 	if(digits > 9)
@@ -975,6 +975,7 @@ void raiden2_state::common_reset()
 	bg_bank=0;
 	fg_bank=6;
 	mid_bank=1;
+	cop_itoa_digit_count = 4; //TODO: Raiden 2 never inits the BCD register, value here is a guess (8 digits, as WR is 10.000.000 + a)
 }
 
 static MACHINE_RESET(raiden2)
