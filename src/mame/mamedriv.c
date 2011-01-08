@@ -9208,6 +9208,7 @@ Other Sun games
 	DRIVER( nhidctch )	/* (c) 1999 Eolith */
 	DRIVER( landbrk )	/* (c) 1999 Eolith */
 	DRIVER( landbrka )	/* (c) 1999 Eolith */
+	DRIVER( penfan )	/* (c) 1999 Eolith */
 	DRIVER( raccoon )	/* (c) 1999 Eolith */
 	DRIVER( fort2b )	/* (c) 2001 Eolith */
 	DRIVER( fort2ba )	/* (c) 2001 Eolith */
