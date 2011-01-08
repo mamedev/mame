@@ -236,8 +236,12 @@ SOUNDS += S2636
 # the list of drivers
 #-------------------------------------------------
 
-DRVLIBS = \
-	$(MAMEOBJ)/mamedriv.o \
+ifeq ($(TARGET),mame)
+DRVLIBS += \
+	$(MAMEOBJ)/mamedriv.o
+endif
+
+DRVLIBS += \
 	$(MAMEOBJ)/alba.a \
 	$(MAMEOBJ)/alliedl.a \
 	$(MAMEOBJ)/alpha.a \
