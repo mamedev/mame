@@ -1131,7 +1131,7 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 		"\t<!ATTLIST " XML_ROOT " build CDATA #IMPLIED>\n"
 		"\t<!ATTLIST " XML_ROOT " debug (yes|no) \"no\">\n"
 		"\t<!ATTLIST " XML_ROOT " mameconfig CDATA #REQUIRED>\n"
-		"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer, biosset*, rom*, disk*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, category*, adjuster*, driver?, device*, ramoption*, softwarelist*)>\n"
+		"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer, biosset*, rom*, disk*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, category*, adjuster*, driver?, device*, softwarelist*, ramoption*)>\n"
 		"\t\t<!ATTLIST " XML_TOP " name CDATA #REQUIRED>\n"
 		"\t\t<!ATTLIST " XML_TOP " sourcefile CDATA #IMPLIED>\n"
 		"\t\t<!ATTLIST " XML_TOP " isbios (yes|no) \"no\">\n"
