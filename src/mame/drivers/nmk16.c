@@ -6309,8 +6309,8 @@ ROM_START( bjtwinp )
 	ROM_LOAD( "top.ic30",       0x0c0000, 0x80000, CRC(ab50531d) SHA1(918987f01a8b1b007721d2b365e2b2fc536bd676) )
 
 	ROM_REGION( 0x140000, "oki2", 0 ) /* OKIM6295 samples */
-	ROM_LOAD( "bottom.ic27",    0x040000, 0x80000, CRC(6ebeb9e4) SHA1(b547b2fbcc0a35d6183dd4f19684b04839690a2b) ) /* all banked */
-	ROM_LOAD( "top.ic27",       0x0c0000, 0x80000, CRC(adb2f256) SHA1(ab7bb6683799203d0f46705f2fd241c6de914e77) )
+	ROM_LOAD( "top.ic27",       0x040000, 0x80000, CRC(adb2f256) SHA1(ab7bb6683799203d0f46705f2fd241c6de914e77) ) /* all banked */
+	ROM_LOAD( "bottom.ic27",    0x0c0000, 0x80000, CRC(6ebeb9e4) SHA1(b547b2fbcc0a35d6183dd4f19684b04839690a2b) )
 ROM_END
 
 ROM_START( nouryoku )
