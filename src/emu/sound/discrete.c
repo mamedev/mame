@@ -412,7 +412,7 @@ static const discrete_module module_list[] =
 	MOD_ENTRY_LEG(				DSS_NULL        , 0 ,0                                      ,NULL                  ,NULL                 ,NULL                  ,NULL                 )
 };
 
-INLINE void step_nodes_in_list(node_list_t &list)
+inline void discrete_device::step_nodes_in_list(node_list_t &list)
 {
 
 	if (EXPECTED(!profiling))
@@ -603,7 +603,7 @@ void discrete_device::display_profiling(void)
 	for_each(discrete_base_node *, node, &m_node_list)
 	{
 		if (node.item()->run_time > tresh)
-			printf("%3d: %20s %8.2f %10.2f\n", node.item()->index(), node.item()->module->name, (float) node.item()->run_time / (float) total * 100.0, ((float) node.item()->run_time) / (float) m_total_samples);
+			printf("%3d: %20s %8.2f %10.2f\n", node.item()->index(), node.item()->module_name(), (float) node.item()->run_time / (float) total * 100.0, ((float) node.item()->run_time) / (float) m_total_samples);
 	}
 
 	/* Task information */
@@ -661,7 +661,7 @@ static void *task_callback(void *param, int threadid)
 				while (samples > 0)
 				{
 					/* step */
-					step_nodes_in_list(task.item()->list);
+					task.item()-> device->step_nodes_in_list(task.item()->list);
 					samples--;
 				}
 				if (task.item()->samples == 0)
@@ -719,7 +719,7 @@ void discrete_device::init_nodes(const linked_list_entry *block_list)
 		/* make sure we have one simple task
          * No need to create a node since there are no dependencies.
          */
-		task = auto_alloc_clear(machine, discrete_task);
+		task = auto_alloc_clear(machine, discrete_task(this));
 		task_list.add_tail(task);
 	}
 
@@ -761,7 +761,7 @@ void discrete_device::init_nodes(const linked_list_entry *block_list)
 				case DSO_TASK_START:
 					if (task != NULL)
 						fatalerror("init_nodes() - Nested DISCRETE_START_TASK.");
-					task = auto_alloc_clear(machine, discrete_task);
+					task = auto_alloc_clear(machine, discrete_task(this));
 					node->context = task;
 					break;
 
@@ -804,7 +804,7 @@ void discrete_device::init_nodes(const linked_list_entry *block_list)
 
 		/* our running order just follows the order specified */
 		/* does the node step ? */
-		if (node->module->step != NULL)
+		if (node->is_stepping())
 		{
 			/* do we belong to a task? */
 			if (task == NULL)
@@ -841,8 +841,8 @@ void discrete_device::init_nodes(const linked_list_entry *block_list)
 discrete_base_node::discrete_base_node(discrete_device * pdev, const discrete_module *xmodule, const discrete_sound_block *xblock) :
 	context(NULL),
 	device(pdev),
-	module(xmodule),
 	run_time(0),
+	m_module(xmodule),
 	m_block(xblock)
 {
 	output[0] = 0.0;
@@ -853,7 +853,7 @@ discrete_base_node::discrete_base_node(discrete_device * pdev, const discrete_mo
 	if (m_block->type == DST_CUSTOM)
 	{
 		const discrete_custom_info *custom = (const discrete_custom_info *)m_custom;
-		module = &custom->module;
+		m_module = &custom->module;
 		m_custom = custom->custom;
 	}
 
@@ -861,14 +861,14 @@ discrete_base_node::discrete_base_node(discrete_device * pdev, const discrete_mo
 	//step = module->step;
 
 	/* allocate memory if necessary */
-	if (module->contextsize)
-		context =  global_alloc_array(UINT8, module->contextsize);
+	if (m_module->contextsize)
+		context =  global_alloc_array(UINT8, m_module->contextsize);
 
 }
 
 discrete_base_node::~discrete_base_node(void)
 {
-	if (module->contextsize)
+	if (m_module->contextsize)
 		global_free(context);
 }
 
@@ -895,11 +895,11 @@ void discrete_base_node::find_input_nodes(void)
 		/* if this input is node-based, find the node in the indexed list */
 		if IS_VALUE_A_NODE(inputnode)
 		{
-			const discrete_base_node *node_ref = device->m_indexed_node[NODE_INDEX(inputnode)];
+			discrete_base_node *node_ref = device->m_indexed_node[NODE_INDEX(inputnode)];
 			if (!node_ref)
 				fatalerror("discrete_start - NODE_%02d referenced a non existent node NODE_%02d", index(), NODE_INDEX(inputnode));
 
-			if ((NODE_CHILD_NODE_NUM(inputnode) >= node_ref->module->num_output) && (node_ref->module->type != DST_CUSTOM))
+			if ((NODE_CHILD_NODE_NUM(inputnode) >= node_ref->num_output()) && (node_ref->module_type() != DST_CUSTOM))
 				fatalerror("discrete_start - NODE_%02d referenced non existent output %d on node NODE_%02d", index(), NODE_CHILD_NODE_NUM(inputnode), NODE_INDEX(inputnode));
 
 			input[inputnum] = &(node_ref->output[NODE_CHILD_NODE_NUM(inputnode)]);	/* Link referenced node out to input */
@@ -936,7 +936,7 @@ int discrete_device::same_module_index(discrete_base_node &node)
 	{
 		if (n.item() == &node)
 			return index;
-		if (n.item()->module->type == node.module->type)
+		if (n.item()->module_type() == node.module_type())
 			index++;
 	}
 	return -1;
@@ -1065,8 +1065,7 @@ discrete_device::~discrete_device(void)
 
 	for_each(discrete_base_node *, node, &m_node_list)
 	{
-		if (node.item()->module->stop)
-			(*node.item()->module->stop)(node.item());
+		node.item()->stop();
 	}
 
 	if (DISCRETE_DEBUGLOG)
@@ -1147,8 +1146,7 @@ void discrete_device::device_start()
 
 	for_each(discrete_base_node *, node, &m_node_list)
 	{
-		if (node.item()->module->start)
-			(*node.item()->module->start)(node.item());
+		node.item()->start();
 	}
 }
 
@@ -1167,13 +1165,7 @@ void discrete_device::device_reset()
 	{
 		node.item()->output[0] = 0;
 
-		/* if the node has a reset function, call it */
-		if (node.item()->module->reset)
-			(*node.item()->module->reset)(node.item());
-
-		/* otherwise, just step it */
-		else
-			node.item()->step();
+		node.item()->reset();
 	}
 }
 
@@ -1281,7 +1273,7 @@ WRITE8_MEMBER( discrete_device::write )
 		struct dss_input_context *context = (struct dss_input_context *)node->context;
 		UINT8 new_data    = 0;
 
-		switch (node->module->type)
+		switch (node->module_type())
 		{
 			case DSS_INPUT_DATA:
 			case DSS_INPUT_BUFFER:

@@ -3925,8 +3925,8 @@ typedef linked_list_t<discrete_source_node *> source_node_list_t;
 class discrete_task
 {
 public:
-	discrete_task(void)
-: numbuffered(0), task_group(0), m_threadid(-1)
+	discrete_task(discrete_device *pdev)
+: device(pdev), numbuffered(0), task_group(0), m_threadid(-1)
 	{
 		source_list.reset();
 		list.reset();
@@ -3934,6 +3934,7 @@ public:
 
 	~discrete_task(void) { }
 
+	discrete_device			*device;
 	//const linked_list_entry *list;
 	node_list_t 			list;
 
@@ -4758,12 +4759,17 @@ public:
 	discrete_base_node *discrete_find_node(int node);
 	/* FIXME: this is used by csv and wav logs - going forward, identifiers should be explicitly passed */
 	int same_module_index(discrete_base_node &node);
+	inline void step_nodes_in_list(node_list_t &list);
 
 
+	/* FIXME: theses should be protected */
 	/* the output stream */
 	sound_stream		*discrete_stream;
 	/* tasks */
 	task_list_t			 task_list;		/* discrete_task_context * */
+	/* the input streams */
+	node_list_t			 m_input_list;
+
 
 protected:
 
@@ -4800,9 +4806,6 @@ private:
 	/* list of discrete blocks after prescan (IMPORT, DELETE, REPLACE) */
 	linked_list_entry	 *m_block_list;		/* discrete_sound_block * */
 
-	/* the input streams */
-	node_list_t			 m_input_list;
-
 	/* output node tracking */
 	node_list_t			 m_output_list;
 
@@ -4830,6 +4833,8 @@ extern const device_type DISCRETE;
 
 class discrete_base_node
 {
+	friend class discrete_device;
+
 public:
 	discrete_base_node(discrete_device * pdev, const discrete_module *module, const discrete_sound_block *block);
 
@@ -4869,11 +4874,16 @@ public:
 	inline double		sample_time(void) { return device->m_sample_time; }
 	inline int			sample_rate(void) { return device->m_sample_rate; }
 
+	inline int			num_output(void) { return m_module->num_output; }
+	const char *		module_name(void) { return m_module->name; }
+	inline int			module_type(void) { return m_module->type; }
+
 	discrete_device *device;							/* Points to the parent */
-	const discrete_module *module;							/* Node's module info */
 
 	osd_ticks_t			run_time;
+
 protected:
+	const discrete_module *m_module;							/* Node's module info */
 private:
 	const discrete_sound_block *m_block;						/* Points to the node's setup block. */
 	int					m_active_inputs;						/* Number of active inputs on this node type */
@@ -4900,12 +4910,12 @@ class discrete_legacy_node : public discrete_base_node
 public:
 
 	discrete_legacy_node(discrete_device * pdev, const discrete_module *xmodule, const discrete_sound_block *block)
-	 : discrete_base_node(pdev, xmodule, block), m_step(module->step) {  }
+	 : discrete_base_node(pdev, xmodule, block), m_step(m_module->step) {  }
 
 	void step(void)  { /* if (m_step != NULL) */ m_step(this); }
-	virtual void reset(void) { if (module->reset != NULL) module->reset(this); }
-	virtual void start(void) { if (module->start != NULL) module->start(this);}
-	virtual void stop(void)  { if (module->stop != NULL) module->stop(this); }
+	virtual void reset(void) { if (m_module->reset != NULL) { m_module->reset(this);} else if (m_step != NULL) m_step(this); }
+	virtual void start(void) { if (m_module->start != NULL) m_module->start(this);}
+	virtual void stop(void)  { if (m_module->stop != NULL) m_module->stop(this); }
 
 	virtual bool is_stepping(void) { return (m_step != NULL); }
 protected:

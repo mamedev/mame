@@ -175,7 +175,7 @@ DISCRETE_RESET(dss_input)
 	context->gain = DSS_INPUT__GAIN;
 	context->offset = DSS_INPUT__OFFSET;
 
-	switch (node->module->type)
+	switch (node->module_type())
 	{
 		case DSS_INPUT_DATA:
 			context->data = DSS_INPUT__INIT;
@@ -242,7 +242,7 @@ DISCRETE_START(dss_input_stream)
 {
 	DISCRETE_DECLARE_CONTEXT(dss_input)
 
-//	assert(DSS_INPUT_STREAM__STREAM < node->device->m_input_list.count());
+	assert(DSS_INPUT_STREAM__STREAM < node->device->m_input_list.count());
 
 	context->is_stream = TRUE;
 	/* Stream out number is set during start */
@@ -251,7 +251,7 @@ DISCRETE_START(dss_input_stream)
 	context->offset = DSS_INPUT_STREAM__OFFSET;
 	context->ptr = NULL;
 
-	if (node->module->type == DSS_INPUT_BUFFER)
+	if (node->module_type() == DSS_INPUT_BUFFER)
 	{
 		context->is_buffered = TRUE;
 		context->buffer_stream = stream_create(node->device, 0, 1, node->sample_rate(), (void *) node, buffer_stream_update);
