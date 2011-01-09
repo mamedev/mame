@@ -441,7 +441,7 @@ WRITE8_DEVICE_HANDLER( bb_ym2_b_w )
 
 	state->ym2_outputb = data ^ 0xff;
 
-	if (!strcmp(device->machine->gamedrv->name, "buggybjr"))
+	if (!strcmp(device->machine->gamedrv->name, "buggyboyjr"))
 	{
 		coin_counter_w(device->machine, 0, data & 0x01);
 		coin_counter_w(device->machine, 1, data & 0x02);
@@ -485,7 +485,7 @@ static STREAM_UPDATE( buggyboy_stream_update )
 	step_0 = state->pit8253.counts[0].val ? (BUGGYBOY_PIT_CLOCK / state->pit8253.counts[0].val) * state->freq_to_step : 0;
 	step_1 = state->pit8253.counts[1].val ? (BUGGYBOY_PIT_CLOCK / state->pit8253.counts[1].val) * state->freq_to_step : 0;
 
-	if (!strcmp(device->machine->gamedrv->name, "buggybjr"))
+	if (!strcmp(device->machine->gamedrv->name, "buggyboyjr"))
 		gain0 = BIT(state->ym2_outputb, 3) ? 1.0 : 2.0;
 	else
 		gain0 = BIT(state->ym1_outputa, 3) ? 1.0 : 2.0;
