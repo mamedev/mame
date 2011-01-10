@@ -5415,6 +5415,19 @@ static STATE_POSTLOAD( stv_vdp2_state_save_postload )
 		stv_vdp2_vram_decode[offset*4+1] = (data & 0x00ff0000) >> 16;
 		stv_vdp2_vram_decode[offset*4+2] = (data & 0x0000ff00) >> 8;
 		stv_vdp2_vram_decode[offset*4+3] = (data & 0x000000ff) >> 0;
+
+		gfx_element_mark_dirty(machine->gfx[0], offset/8);
+		gfx_element_mark_dirty(machine->gfx[1], offset/8);
+		gfx_element_mark_dirty(machine->gfx[2], offset/8);
+		gfx_element_mark_dirty(machine->gfx[3], offset/8);
+
+		/* 8-bit tiles overlap, so this affects the previous one as well */
+		if (offset/8 != 0)
+		{
+			gfx_element_mark_dirty(machine->gfx[2], offset/8 - 1);
+			gfx_element_mark_dirty(machine->gfx[3], offset/8 - 1);
+		}
+
 	}
 
 	memset( &stv_rbg_cache_data, 0, sizeof(stv_rbg_cache_data));
