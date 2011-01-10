@@ -697,6 +697,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 				const char *str_name = NULL;
 				const char *str_sha1 = NULL;
 				const char *str_status = NULL;
+				const char *str_writeable = NULL;
 
 				for ( ; attributes[0]; attributes += 2 )
 				{
@@ -705,7 +706,9 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					if ( !strcmp( attributes[0], "sha1" ) )
 						str_sha1 = attributes[1];
 					if ( !strcmp( attributes[0], "status" ) )
-						str_status = attributes[1];						
+						str_status = attributes[1];
+					if ( !strcmp( attributes[0], "writeable" ) )
+						str_writeable = attributes[1];
 				}
 				if ( swlist->softinfo )
 				{
@@ -715,6 +718,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 						char *hashdata = (char *)pool_malloc_lib( swlist->pool, sizeof(char) * ( strlen(str_sha1) + 7 + 4 ) );
 						int baddump = ( str_status && !strcmp(str_status, "baddump") ) ? 1 : 0;
 						int nodump = ( str_status && !strcmp(str_status, "nodump" ) ) ? 1 : 0;
+						int writeable = ( str_writeable && !strcmp(str_writeable, "yes" ) ) ? 1 : 0;
 
 						if ( !s_name || !hashdata )
 							return;
@@ -722,7 +726,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 						strcpy( s_name, str_name );
 						sprintf( hashdata, "s:%s#%s", str_sha1, ( nodump ? NO_DUMP : ( baddump ? BAD_DUMP : "" ) ) );
 
-						add_rom_entry( swlist, s_name, hashdata, 0, 0, ROMENTRYTYPE_ROM | DISK_READONLY );
+						add_rom_entry( swlist, s_name, hashdata, 0, 0, ROMENTRYTYPE_ROM | (writeable ? DISK_READWRITE : DISK_READONLY ) );
 					}
 				}
 			}
