@@ -4414,6 +4414,7 @@ src/osd/sdl/sdlos_unix.c svneol=native#text/plain
 src/osd/sdl/sdlos_win32.c svneol=native#text/plain
 src/osd/sdl/sdlprefix.h svneol=native#text/plain
 src/osd/sdl/sdlptty_macosx.c svneol=native#text/plain
+src/osd/sdl/sdlptty_os2.c svneol=native#text/plain
 src/osd/sdl/sdlptty_unix.c svneol=native#text/plain
 src/osd/sdl/sdlptty_win32.c svneol=native#text/plain
 src/osd/sdl/sdlsocket.c svneol=native#text/plain

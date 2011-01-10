@@ -51,7 +51,7 @@
 #include "xmlfile.h"
 #include <ctype.h>
 #include <zlib.h>
-#ifdef SDLMAME_FREEBSD
+#if defined(SDLMAME_FREEBSD) || defined(SDLMAME_OS2)
 # undef tolower
 #endif
 
