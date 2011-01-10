@@ -2601,7 +2601,7 @@ ROM_START( gpgolf )
 
 	ROM_REGION( 0xc0000, "grom", 0 )
 	ROM_LOAD( "grom00.bin", 0x00000, 0x40000, CRC(c3a7b54b) SHA1(414d693bc5337d578d2630817dd647cf7e5cbcf7) )
-	ROM_LOAD( "grom01.bin", 0x40000, 0x40000, BAD_DUMP CRC(2c834cf9) SHA1(49eb070ca4439d4fcd2d8a2db62d3c99b824bf99) ) /* Self test checksum reports BAD */
+	ROM_LOAD( "grom01.bin", 0x40000, 0x40000, CRC(b7fe172d) SHA1(1ad0f3ce0f240ac1a23c0c5bdd9f99ec81bc14f1) )
 	ROM_LOAD( "grom02.bin", 0x80000, 0x40000, CRC(aebe6c45) SHA1(15e64fcb36cb1064988ee5cd45699d501a6e7f01) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
