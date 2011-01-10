@@ -456,7 +456,7 @@ static void audit_one_disk(core_options *options, const rom_entry *rom, const ga
 	record->exphash = ROM_GETHASHDATA(rom);
 
 	/* open the disk */
-	err = open_disk_image_options(options, gamedrv, rom, &source_file, &source);
+	err = open_disk_image_options(options, gamedrv, rom, &source_file, &source, NULL);
 
 	/* if we failed, report the error */
 	if (err != CHDERR_NONE)

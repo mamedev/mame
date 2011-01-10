@@ -530,6 +530,35 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					/* Missing dataarea name or size */
 				}
 			}
+			else if (!strcmp(tagname, "diskarea"))
+			{
+				const char *str_name = NULL;
+
+				for ( ; attributes[0]; attributes += 2 )
+				{
+					if ( !strcmp( attributes[0], "name" ) )
+						str_name = attributes[1];
+				}
+				if ( str_name )
+				{
+					if ( swlist->softinfo )
+					{
+						char *s = (char *)pool_malloc_lib(swlist->pool, ( strlen( str_name ) + 1 ) * sizeof(char) );
+
+						if ( !s )
+							return;
+
+						strcpy( s, str_name );
+
+						/* ROM_REGION( length, "name", flags ) */
+						add_rom_entry( swlist, s, NULL, 0, 1, ROMENTRYTYPE_REGION | ROMREGION_DATATYPEDISK);
+					}
+				}
+				else
+				{
+					/* Missing dataarea name or size */
+				}
+			}			
 			else if ( !strcmp(tagname, "feature") )
 			{
 				const char *str_feature_name = NULL;
@@ -660,6 +689,41 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 				else
 				{
 					/* Missing name, size, crc, sha1, or offset */
+				}
+			}
+			else
+			if (!strcmp(tagname, "disk"))
+			{
+				const char *str_name = NULL;
+				const char *str_sha1 = NULL;
+				const char *str_status = NULL;
+
+				for ( ; attributes[0]; attributes += 2 )
+				{
+					if ( !strcmp( attributes[0], "name" ) )
+						str_name = attributes[1];
+					if ( !strcmp( attributes[0], "sha1" ) )
+						str_sha1 = attributes[1];
+					if ( !strcmp( attributes[0], "status" ) )
+						str_status = attributes[1];						
+				}
+				if ( swlist->softinfo )
+				{
+					if ( str_name && str_sha1 )
+					{
+						char *s_name = (char *)pool_malloc_lib(swlist->pool, ( strlen( str_name ) + 1 ) * sizeof(char) );
+						char *hashdata = (char *)pool_malloc_lib( swlist->pool, sizeof(char) * ( strlen(str_sha1) + 7 + 4 ) );
+						int baddump = ( str_status && !strcmp(str_status, "baddump") ) ? 1 : 0;
+						int nodump = ( str_status && !strcmp(str_status, "nodump" ) ) ? 1 : 0;
+
+						if ( !s_name || !hashdata )
+							return;
+
+						strcpy( s_name, str_name );
+						sprintf( hashdata, "s:%s#%s", str_sha1, ( nodump ? NO_DUMP : ( baddump ? BAD_DUMP : "" ) ) );
+
+						add_rom_entry( swlist, s_name, hashdata, 0, 0, ROMENTRYTYPE_ROM | DISK_READONLY );
+					}
 				}
 			}
 			else

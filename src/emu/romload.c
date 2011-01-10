@@ -949,9 +949,9 @@ static void process_rom_entries(rom_load_data *romdata, const char *regiontag, c
     up the parent and loading by checksum
 -------------------------------------------------*/
 
-chd_error open_disk_image(const game_driver *gamedrv, const rom_entry *romp, mame_file **image_file, chd_file **image_chd)
+chd_error open_disk_image(const game_driver *gamedrv, const rom_entry *romp, mame_file **image_file, chd_file **image_chd,const char *locationtag)
 {
-	return open_disk_image_options(mame_options(), gamedrv, romp, image_file, image_chd);
+	return open_disk_image_options(mame_options(), gamedrv, romp, image_file, image_chd, locationtag);
 }
 
 
@@ -961,7 +961,7 @@ chd_error open_disk_image(const game_driver *gamedrv, const rom_entry *romp, mam
     checksum
 -------------------------------------------------*/
 
-chd_error open_disk_image_options(core_options *options, const game_driver *gamedrv, const rom_entry *romp, mame_file **image_file, chd_file **image_chd)
+chd_error open_disk_image_options(core_options *options, const game_driver *gamedrv, const rom_entry *romp, mame_file **image_file, chd_file **image_chd,const char *locationtag)
 {
 	const game_driver *drv, *searchdrv;
 	const rom_entry *region, *rom;
@@ -983,6 +983,12 @@ chd_error open_disk_image_options(core_options *options, const game_driver *game
 	if (filerr != FILERR_NONE)
 	{
 		astring fname(ROM_GETNAME(romp), ".chd");
+		filerr = mame_fopen_options(options, SEARCHPATH_IMAGE, fname, OPEN_FLAG_READ, image_file);
+	}
+
+	if (filerr != FILERR_NONE && locationtag!=NULL)
+	{
+		astring fname(locationtag, PATH_SEPARATOR, ROM_GETNAME(romp), ".chd");
 		filerr = mame_fopen_options(options, SEARCHPATH_IMAGE, fname, OPEN_FLAG_READ, image_file);
 	}
 
@@ -1101,7 +1107,7 @@ done:
     for a region
 -------------------------------------------------*/
 
-static void process_disk_entries(rom_load_data *romdata, const char *regiontag, const rom_entry *romp)
+static void process_disk_entries(rom_load_data *romdata, const char *regiontag, const rom_entry *romp, const char *locationtag)
 {
 	/* loop until we hit the end of this region */
 	for ( ; !ROMENTRY_ISREGIONEND(romp); romp++)
@@ -1122,7 +1128,7 @@ static void process_disk_entries(rom_load_data *romdata, const char *regiontag, 
 
 			/* first open the source drive */
 			LOG(("Opening disk image: %s\n", filename.cstr()));
-			err = open_disk_image(romdata->machine->gamedrv, romp, &chd.origfile, &chd.origchd);
+			err = open_disk_image(romdata->machine->gamedrv, romp, &chd.origfile, &chd.origchd, locationtag);
 			if (err != CHDERR_NONE)
 			{
 				if (err == CHDERR_FILE_NOT_FOUND)
@@ -1283,7 +1289,7 @@ void load_software_part_region(device_t *device, char *swlist, char *swname, rom
 		if (ROMREGION_ISROMDATA(region))
 			process_rom_entries(romdata, locationtag, region + 1);
 		else if (ROMREGION_ISDISKDATA(region))
-			process_disk_entries(romdata, locationtag, region + 1);
+			process_disk_entries(romdata, core_strdup(regiontag.cstr()), region + 1, locationtag);
 	}
 
 	/* now go back and post-process all the regions */
@@ -1346,7 +1352,7 @@ static void process_region_list(rom_load_data *romdata)
 				process_rom_entries(romdata, ROMREGION_ISLOADBYNAME(region) ? ROMREGION_GETTAG(region) : NULL, region + 1);
 			}
 			else if (ROMREGION_ISDISKDATA(region))
-				process_disk_entries(romdata, ROMREGION_GETTAG(region), region + 1);
+				process_disk_entries(romdata, ROMREGION_GETTAG(region), region + 1, NULL);
 		}
 
 	/* now go back and post-process all the regions */

@@ -313,10 +313,10 @@ astring &rom_region_name(astring &result, const game_driver *drv, const rom_sour
 /* ----- disk handling ----- */
 
 /* open a disk image, searching up the parent and loading by checksum */
-chd_error open_disk_image(const game_driver *gamedrv, const rom_entry *romp, mame_file **image_file, chd_file **image_chd);
+chd_error open_disk_image(const game_driver *gamedrv, const rom_entry *romp, mame_file **image_file, chd_file **image_chd,const char *locationtag);
 
 /* open a disk image, searching up the parent and loading by checksum */
-chd_error open_disk_image_options(core_options *options, const game_driver *gamedrv, const rom_entry *romp, mame_file **image_file, chd_file **image_chd);
+chd_error open_disk_image_options(core_options *options, const game_driver *gamedrv, const rom_entry *romp, mame_file **image_file, chd_file **image_chd,const char *locationtag);
 
 /* return a pointer to the CHD file associated with the given region */
 chd_file *get_disk_handle(running_machine *machine, const char *region);

@@ -79,10 +79,16 @@ static DEVICE_IMAGE_LOAD(cdrom)
 	dev_cdrom_t	*cdrom = get_safe_token(&image.device());
 	chd_error	err = (chd_error)0;
 	chd_file	*chd = NULL;
+	astring tempstring;	
 
-	err = chd_open_file( image.image_core_file(), CHD_OPEN_READ, NULL, &chd );	/* CDs are never writeable */
-	if ( err )
-		goto error;
+	if (image.software_entry() == NULL)
+	{
+		err = chd_open_file( image.image_core_file(), CHD_OPEN_READ, NULL, &chd );	/* CDs are never writeable */
+		if ( err )
+			goto error;
+	} else {
+		chd  = get_disk_handle(image.device().machine, image.device().subtag(tempstring,"cdrom"));
+	}
 
 	/* open the CHD file */
 	cdrom->cdrom_handle = cdrom_open( chd );
@@ -141,7 +147,8 @@ static DEVICE_START(cdrom)
 -------------------------------------------------*/
 static DEVICE_IMAGE_SOFTLIST_LOAD(cdrom)
 {
-	return image.load_software(swlist, swname, start_entry);
+	load_software_part_region( &image.device(), swlist, swname, start_entry );
+	return TRUE;	
 }
 
 /*-------------------------------------------------
