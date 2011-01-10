@@ -336,7 +336,7 @@ int dasm_arg(char *buffer, UINT8 op, UINT16 pc, int arg, const UINT8 *oprom, int
 				int tmp = oprom[POS];
 				if (tmp&0x80)		tmp = 0x80 - tmp;
 
-				buffer += sprintf( buffer, "0x%04x", (pc + tmp) & 0xffff );
+				buffer += sprintf( buffer, "0x%04x", (pc + tmp + EXT_ROM) & 0xffff );
 				INC_POS;
 			}
 			break;

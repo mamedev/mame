@@ -1134,19 +1134,19 @@ void hd61700_cpu_device::execute_run()
 						UINT8 tmp;
 						UINT16 res;
 
-						do
+						for(;;)
 						{
 							tmp = mem_readbyte(REG_UA>>4, REG_IX);
 							mem_writebyte(REG_UA>>6, REG_IZ, tmp);
 
 							res = tmp - arg;
-							if (REG_IX == REG_IY)
+							if (REG_IX == REG_IY || !res)
 								break;
 
 							REG_IX += ((op&1) ? -1 : +1);
 							REG_IZ += ((op&1) ? -1 : +1);
 							m_icount -= 6;
-						} while(res);
+						}
 
 						CLEAR_FLAGS;
 						CHECK_FLAG_Z(res & 0xff);
@@ -1163,16 +1163,16 @@ void hd61700_cpu_device::execute_run()
 						UINT8 arg = read_op();
 						UINT16 res;
 
-						do
+						for(;;)
 						{
 							res = mem_readbyte(REG_UA>>4, REG_IX) - arg;
 
-							if (REG_IX == REG_IY)
+							if (REG_IX == REG_IY || !res)
 								break;
 
 							REG_IX += ((op&1) ? -1 : +1);
 							m_icount -= 6;
-						} while(res);
+						}
 
 						CLEAR_FLAGS;
 						CHECK_FLAG_Z(res & 0xff);
@@ -2349,16 +2349,16 @@ void hd61700_cpu_device::execute_run()
 						UINT8 arg = read_op();
 						UINT16 res;
 
-						do
+						for(;;)
 						{
 							res = mem_readbyte(REG_UA>>4, REG_IX) - READ_REG(arg);
 
-							if (REG_IX == REG_IY)
+							if (REG_IX == REG_IY || !res)
 								break;
 
 							REG_IX += ((op&1) ? -1 : +1);
 							m_icount -= 6;
-						} while(res);
+						}
 
 						CLEAR_FLAGS;
 						CHECK_FLAG_Z(res & 0xff);
