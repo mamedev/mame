@@ -1720,9 +1720,9 @@ static READ32_HANDLER( mrkicker_speedup_r )
 	UINT32 pc = cpu_get_pc(space->cpu);
 	if(pc == 0x469de || pc == 0x46a36)
 	{
-		if(irq_active(space))
-			cpu_spinuntil_int(space->cpu);
-		else
+//		if(irq_active(space))
+//			cpu_spinuntil_int(space->cpu);
+//		else
 			cpu_eat_cycles(space->cpu, 50);
 	}
 
