@@ -21,6 +21,7 @@ typedef struct
 	UINT32 cur_subblock;
 	UINT32 play_err_flag;
 	cdrom_file *cdrom;
+	bool is_file;
 } SCSICd;
 
 static void phys_frame_to_msf(int phys_frame, int *m, int *s, int *f)
@@ -689,28 +690,29 @@ static void scsicd_alloc_instance( SCSIInstance *scsiInstance, const char *diskr
 	state_save_register_item( machine, "scsicd", diskregion, 0, our_this->cur_subblock );
 	state_save_register_item( machine, "scsicd", diskregion, 0, our_this->play_err_flag );
 
-#ifdef MESS
-	/* TODO: get rid of this ifdef MESS section */
-	our_this->cdrom = cd_get_cdrom_file( machine->device( diskregion ) );
-#else
-	our_this->cdrom = cdrom_open(get_disk_handle( machine, diskregion ));
+	if (machine->device( diskregion )) {
+		our_this->is_file = TRUE;
+		our_this->cdrom = cd_get_cdrom_file( machine->device( diskregion ) );
+	} else {
+		our_this->is_file = FALSE;
+		our_this->cdrom = cdrom_open(get_disk_handle( machine, diskregion ));
+	}
 
 	if (!our_this->cdrom)
 	{
 		logerror("SCSICD: no CD found!\n");
 	}
-#endif
 }
 
 static void scsicd_delete_instance( SCSIInstance *scsiInstance )
 {
-#ifndef MESS
 	SCSICd *our_this = (SCSICd *)SCSIThis( &SCSIClassCDROM, scsiInstance );
-	if( our_this->cdrom )
-	{
-		cdrom_close( our_this->cdrom );
+	if (!our_this->is_file) {
+		if( our_this->cdrom )
+		{
+			cdrom_close( our_this->cdrom );
+		}
 	}
-#endif
 }
 
 static void scsicd_get_device( SCSIInstance *scsiInstance, cdrom_file **cdrom )
