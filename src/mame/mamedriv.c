@@ -7804,13 +7804,15 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( surfplnt40 )	/* (c) 1997 - Ref 970514 */
 	DRIVER( radikalb )	/* (c) 1998 - Ref ??? */
 
+	/* SH-4 hardware */
+	DRIVER( atvtrack )	/* (c) 2002 - Ref 020419 */
+
 	/*
     Remaining Gaelco Games:
     =======================
     1999: Rolling Extreme
     2000: Football Power
     2001: Smashing Drive
-    2002: ATV Track
     */
 
 	/* Galeco PC based games */
