@@ -10,6 +10,22 @@
  * timing value should move to separate array
  */
 
+/* 
+	PHS - 2010-12-29
+	
+	Moved several instruction stubs so that they are compiled separately for 
+	the 8086 and 80186. The instructions affected are :
+	
+	_pop_ss, _es, _cs, _ss, _ds, _mov_sregw and _sti
+	
+	This is because they call the next instruction directly as it cannot be
+	interrupted. If they are not compiled separately when executing on an 
+	80186, the wrong set of instructions are used (the 8086 set). This has
+	the serious effect of ignoring the next instruction, as invalid, *IF* 
+	it is an 80186 specific instruction.
+
+*/
+
 #undef ICOUNT
 
 #define ICOUNT cpustate->icount
@@ -821,20 +837,6 @@ static void PREFIX86(_push_ss)(i8086_state *cpustate)    /* Opcode 0x16 */
 	ICOUNT -= timing.push_seg;
 }
 
-static void PREFIX86(_pop_ss)(i8086_state *cpustate)    /* Opcode 0x17 */
-{
-#ifdef I80286
-	UINT16 tmp;
-	POP(tmp);
-	i80286_data_descriptor(cpustate, SS, tmp);
-#else
-	POP(cpustate->sregs[SS]);
-	cpustate->base[SS] = SegBase(SS);
-#endif
-	ICOUNT -= timing.pop_seg;
-	PREFIX(_instruction)[FETCHOP](cpustate); /* no interrupt before next instruction */
-}
-
 static void PREFIX86(_sbb_br8)(i8086_state *cpustate)    /* Opcode 0x18 */
 {
     DEF_br8(dst,src);
@@ -956,14 +958,6 @@ static void PREFIX86(_and_axd16)(i8086_state *cpustate)    /* Opcode 0x25 */
 	cpustate->regs.w[AX]=dst;
 }
 
-static void PREFIX86(_es)(i8086_state *cpustate)    /* Opcode 0x26 */
-{
-	cpustate->seg_prefix = TRUE;
-	cpustate->prefix_seg = ES;
-	ICOUNT -= timing.override;
-	PREFIX(_instruction)[FETCHOP](cpustate);
-}
-
 static void PREFIX86(_daa)(i8086_state *cpustate)    /* Opcode 0x27 */
 {
 	if (AF || ((cpustate->regs.b[AL] & 0xf) > 9))
@@ -1030,14 +1024,6 @@ static void PREFIX86(_sub_axd16)(i8086_state *cpustate)    /* Opcode 0x2d */
 	ICOUNT -= timing.alu_ri16;
     SUBW(dst,src);
 	cpustate->regs.w[AX]=dst;
-}
-
-static void PREFIX86(_cs)(i8086_state *cpustate)    /* Opcode 0x2e */
-{
-    cpustate->seg_prefix = TRUE;
-	cpustate->prefix_seg = CS;
-	ICOUNT -= timing.override;
-	PREFIX(_instruction)[FETCHOP](cpustate);
 }
 
 static void PREFIX86(_das)(i8086_state *cpustate)    /* Opcode 0x2f */
@@ -1109,14 +1095,6 @@ static void PREFIX86(_xor_axd16)(i8086_state *cpustate)    /* Opcode 0x35 */
 	cpustate->regs.w[AX]=dst;
 }
 
-static void PREFIX86(_ss)(i8086_state *cpustate)    /* Opcode 0x36 */
-{
-	cpustate->seg_prefix = TRUE;
-	cpustate->prefix_seg = SS;
-	ICOUNT -= timing.override;
-	PREFIX(_instruction)[FETCHOP](cpustate);
-}
-
 static void PREFIX86(_aaa)(i8086_state *cpustate)    /* Opcode 0x37 */
 {
 	UINT8 ALcarry=1;
@@ -1178,14 +1156,6 @@ static void PREFIX86(_cmp_axd16)(i8086_state *cpustate)    /* Opcode 0x3d */
     DEF_axd16(dst,src);
 	ICOUNT -= timing.alu_ri16;
     SUBW(dst,src);
-}
-
-static void PREFIX86(_ds)(i8086_state *cpustate)    /* Opcode 0x3e */
-{
-	cpustate->seg_prefix = TRUE;
-	cpustate->prefix_seg = DS;
-	ICOUNT -= timing.override;
-	PREFIX(_instruction)[FETCHOP](cpustate);
 }
 
 static void PREFIX86(_aas)(i8086_state *cpustate)    /* Opcode 0x3f */
@@ -1878,50 +1848,6 @@ static void PREFIX86(_lea)(i8086_state *cpustate)    /* Opcode 0x8d */
 	ICOUNT -= timing.lea;
 	(void)(*GetEA[ModRM])(cpustate);
 	RegWord(ModRM)=cpustate->eo;	/* HJB 12/13/98 effective offset (no segment part) */
-}
-
-static void PREFIX86(_mov_sregw)(i8086_state *cpustate)    /* Opcode 0x8e */
-{
-	unsigned ModRM = FETCH;
-    WORD src = GetRMWord(ModRM);
-
-	ICOUNT -= (ModRM >= 0xc0) ? timing.mov_sr : timing.mov_sm;
-#ifdef I80286
-    switch (ModRM & 0x38)
-    {
-    case 0x00:  /* mov es,ew */
-		i80286_data_descriptor(cpustate,ES,src);
-		break;
-    case 0x18:  /* mov ds,ew */
-		i80286_data_descriptor(cpustate,DS,src);
-		break;
-    case 0x10:  /* mov ss,ew */
-		i80286_data_descriptor(cpustate,SS,src);
-		PREFIX(_instruction)[FETCHOP](cpustate);
-		break;
-    case 0x08:  /* mov cs,ew */
-		break;  /* doesn't do a jump far */
-    }
-#else
-    switch (ModRM & 0x38)
-    {
-    case 0x00:  /* mov es,ew */
-		cpustate->sregs[ES] = src;
-		cpustate->base[ES] = SegBase(ES);
-		break;
-    case 0x18:  /* mov ds,ew */
-		cpustate->sregs[DS] = src;
-		cpustate->base[DS] = SegBase(DS);
-		break;
-    case 0x10:  /* mov ss,ew */
-		cpustate->sregs[SS] = src;
-		cpustate->base[SS] = SegBase(SS); /* no interrupt allowed before next instr */
-		PREFIX(_instruction)[FETCHOP](cpustate);
-		break;
-    case 0x08:  /* mov cs,ew */
-		break;  /* doesn't do a jump far */
-    }
-#endif
 }
 
 static void PREFIX86(_popw)(i8086_state *cpustate)    /* Opcode 0x8f */
@@ -2722,6 +2648,96 @@ static void PREFIX86(_lock)(i8086_state *cpustate)    /* Opcode 0xf0 */
 }
 #endif
 
+static void PREFIX(_pop_ss)(i8086_state *cpustate)    /* Opcode 0x17 */
+{
+#ifdef I80286
+	UINT16 tmp;
+	POP(tmp);
+	i80286_data_descriptor(cpustate, SS, tmp);
+#else
+	POP(cpustate->sregs[SS]);
+	cpustate->base[SS] = SegBase(SS);
+#endif
+	ICOUNT -= timing.pop_seg;
+	PREFIX(_instruction)[FETCHOP](cpustate); /* no interrupt before next instruction */
+}
+
+static void PREFIX(_es)(i8086_state *cpustate)    /* Opcode 0x26 */
+{
+	cpustate->seg_prefix = TRUE;
+	cpustate->prefix_seg = ES;
+	ICOUNT -= timing.override;
+	PREFIX(_instruction)[FETCHOP](cpustate);
+}
+
+static void PREFIX(_cs)(i8086_state *cpustate)    /* Opcode 0x2e */
+{
+    cpustate->seg_prefix = TRUE;
+	cpustate->prefix_seg = CS;
+	ICOUNT -= timing.override;
+	PREFIX(_instruction)[FETCHOP](cpustate);
+}
+
+static void PREFIX(_ss)(i8086_state *cpustate)    /* Opcode 0x36 */
+{
+	cpustate->seg_prefix = TRUE;
+	cpustate->prefix_seg = SS;
+	ICOUNT -= timing.override;
+	PREFIX(_instruction)[FETCHOP](cpustate);
+}
+
+static void PREFIX(_ds)(i8086_state *cpustate)    /* Opcode 0x3e */
+{
+	cpustate->seg_prefix = TRUE;
+	cpustate->prefix_seg = DS;
+	ICOUNT -= timing.override;
+	PREFIX(_instruction)[FETCHOP](cpustate);
+}
+
+static void PREFIX(_mov_sregw)(i8086_state *cpustate)    /* Opcode 0x8e */
+{
+	unsigned ModRM = FETCH;
+    WORD src = GetRMWord(ModRM);
+
+	ICOUNT -= (ModRM >= 0xc0) ? timing.mov_sr : timing.mov_sm;
+#ifdef I80286
+    switch (ModRM & 0x38)
+    {
+    case 0x00:  /* mov es,ew */
+		i80286_data_descriptor(cpustate,ES,src);
+		break;
+    case 0x18:  /* mov ds,ew */
+		i80286_data_descriptor(cpustate,DS,src);
+		break;
+    case 0x10:  /* mov ss,ew */
+		i80286_data_descriptor(cpustate,SS,src);
+		PREFIX(_instruction)[FETCHOP](cpustate);
+		break;
+    case 0x08:  /* mov cs,ew */
+		break;  /* doesn't do a jump far */
+    }
+#else
+    switch (ModRM & 0x38)
+    {
+    case 0x00:  /* mov es,ew */
+		cpustate->sregs[ES] = src;
+		cpustate->base[ES] = SegBase(ES);
+		break;
+    case 0x18:  /* mov ds,ew */
+		cpustate->sregs[DS] = src;
+		cpustate->base[DS] = SegBase(DS);
+		break;
+    case 0x10:  /* mov ss,ew */
+		cpustate->sregs[SS] = src;
+		cpustate->base[SS] = SegBase(SS); /* no interrupt allowed before next instr */
+		PREFIX(_instruction)[FETCHOP](cpustate);
+		break;
+    case 0x08:  /* mov cs,ew */
+		break;  /* doesn't do a jump far */
+    }
+#endif
+}
+
 static void PREFIX(_repne)(i8086_state *cpustate)    /* Opcode 0xf2 */
 {
 	 PREFIX(rep)(cpustate, 0);
@@ -2730,6 +2746,17 @@ static void PREFIX(_repne)(i8086_state *cpustate)    /* Opcode 0xf2 */
 static void PREFIX(_repe)(i8086_state *cpustate)    /* Opcode 0xf3 */
 {
 	PREFIX(rep)(cpustate, 1);
+}
+
+static void PREFIX(_sti)(i8086_state *cpustate)    /* Opcode 0xfb */
+{
+	ICOUNT -= timing.flag_ops;
+	SetIF(1);
+	PREFIX(_instruction)[FETCHOP](cpustate); /* no interrupt before next instruction */
+
+	/* if an interrupt is pending, signal an interrupt */
+	if (cpustate->irq_state)
+		PREFIX86(_interrupt)(cpustate, (UINT32)-1);
 }
 
 #ifndef I80186
@@ -3020,17 +3047,6 @@ static void PREFIX86(_cli)(i8086_state *cpustate)    /* Opcode 0xfa */
 {
 	ICOUNT -= timing.flag_ops;
 	SetIF(0);
-}
-
-static void PREFIX86(_sti)(i8086_state *cpustate)    /* Opcode 0xfb */
-{
-	ICOUNT -= timing.flag_ops;
-	SetIF(1);
-	PREFIX(_instruction)[FETCHOP](cpustate); /* no interrupt before next instruction */
-
-	/* if an interrupt is pending, signal an interrupt */
-	if (cpustate->irq_state)
-		PREFIX(_interrupt)(cpustate, (UINT32)-1);
 }
 
 static void PREFIX86(_cld)(i8086_state *cpustate)    /* Opcode 0xfc */

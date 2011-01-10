@@ -23,5 +23,12 @@ static void PREFIX186(_outsb)(i8086_state *cpustate);
 static void PREFIX186(_outsw)(i8086_state *cpustate);
 
 /* changed instructions */
+static void PREFIX(_pop_ss)(i8086_state *cpustate);
+static void PREFIX(_es)(i8086_state *cpustate);
+static void PREFIX(_cs)(i8086_state *cpustate);
+static void PREFIX(_ss)(i8086_state *cpustate);
+static void PREFIX(_ds)(i8086_state *cpustate);
+static void PREFIX(_mov_sregw)(i8086_state *cpustate);
 static void PREFIX186(_repne)(i8086_state *cpustate);
 static void PREFIX186(_repe)(i8086_state *cpustate);
+static void PREFIX186(_sti)(i8086_state *cpustate);
