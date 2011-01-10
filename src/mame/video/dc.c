@@ -152,7 +152,7 @@ static void render_to_accumulation_buffer(running_machine *machine,bitmap_t *bit
 
 typedef struct texinfo {
 	UINT32 address, vqbase;
-	int textured, sizex, sizey, sizes, pf, palette, mode, mipmapped, blend_mode, filter_mode, flip_u, flip_v;
+	int textured, sizex, sizey, stride, sizes, pf, palette, mode, mipmapped, blend_mode, filter_mode, flip_u, flip_v;
 
 	UINT32 (*r)(struct texinfo *t, float x, float y);
 	UINT32 (*blend)(UINT32 s, UINT32 d);
@@ -435,7 +435,7 @@ INLINE UINT32 tex_r_yuv_n(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int addrp = t->address + (t->sizex*yt + (xt & ~1))*2;
+	int addrp = t->address + (t->stride*yt + (xt & ~1))*2;
 	UINT16 c1 = *(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp));
 	UINT16 c2 = *(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp+2));
 	return cv_yuv(c1, c2, xt);
@@ -445,7 +445,7 @@ INLINE UINT32 tex_r_1555_n(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int addrp = t->address + (t->sizex*yt + xt)*2;
+	int addrp = t->address + (t->stride*yt + xt)*2;
 	return cv_1555z(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
 }
 
@@ -470,7 +470,7 @@ INLINE UINT32 tex_r_565_n(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int addrp = t->address + (t->sizex*yt + xt)*2;
+	int addrp = t->address + (t->stride*yt + xt)*2;
 	return cv_565z(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
 }
 
@@ -495,7 +495,7 @@ INLINE UINT32 tex_r_4444_n(texinfo *t, float x, float y)
 {
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int addrp = t->address + (t->sizex*yt + xt)*2;
+	int addrp = t->address + (t->stride*yt + xt)*2;
 	return cv_4444z(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
 }
 
@@ -691,7 +691,6 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 	t->pf          = sa->pixelformat;
 	t->palette	   = 0;
 
-
 	t->mode = (sa->vqcompressed<<1);
 
 	// scanorder is ignored for palettized textures (palettized textures are ALWAYS twiddled)
@@ -705,24 +704,8 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 		t->mode |= sa->scanorder;
 	}
 
-	/* When scan order is 0 stride select is ignored */
-	/* When scan order is 1 mipmap is ignored */
-	if (t->mode&1)
-	{
-		/* scan order is 1 (non-twiddled tezture), use stride select if specified*/
-		t->mode |= (sa->strideselect<<2);
-
-		/* scan order is 1 (non-twiddled tezture), ignore mipmaps */
-		t->mipmapped  = 0;
-	}
-	else
-	{
-		/* scan order is 0 (twiddled tezture), ignore stride select*/
-		//t->mode += (sa->strideselect<<2);
-
-		/* scan order is 0 (twiddled tezture), use mipmap if specified */
-		t->mipmapped  = sa->mipmapped;
-	}
+	/* When scan order is 1 (non-twiddled) mipmap is ignored */
+	t->mipmapped  = t->mode & 1 ? 0 : sa->mipmapped;
 
 	// Mipmapped textures are always square, ignore v size
 	if (t->mipmapped)
@@ -737,7 +720,10 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 	t->sizex = 1 << (3+((t->sizes >> 3) & 7));
 	t->sizey = 1 << (3+(t->sizes & 7));
 
-
+	
+	/* Stride select is used only in the non-twiddled case */
+	t->stride = (t->mode & 1) && sa->strideselect ? t->sizex : (pvrta_regs[TEXT_CONTROL] & 0x1f) << 5;
+	
 
 	t->blend_mode  = sa->blend_mode;
 	t->filter_mode = sa->filtermode;
@@ -750,7 +736,7 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 	t->vqbase = t->address;
 	t->blend = sa->use_alpha ? blend_functions[t->blend_mode] : bl10;
 
-	//  fprintf(stderr, "tex %d %d %d %d\n", t->pf, t->mode, pvrta_regs[PAL_RAM_CTRL], t->mipmapped);
+	//	fprintf(stderr, "tex %d %d %d %d\n", t->pf, t->mode, pvrta_regs[PAL_RAM_CTRL], t->mipmapped);
 
 	switch(t->pf) {
 	case 0: // 1555
