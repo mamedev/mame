@@ -1,7 +1,7 @@
 /***************************************************************************
 
-Centipede, Millipede, Missile Command, Let's Go Bowling
-(c) 1980-2 Infogrames / 2002 CosmoDog
+Centipede, Millipede, Missile Command, Let's Go Bowling "Multipede"
+(c) 1980-2 / 2002 - Infogrames / CosmoDog
 
 preliminary driver by Angelo Salese
 
@@ -12,6 +12,8 @@ TODO:
 - finish video emulation;
 - inputs;
 - sound;
+- change the CPU when a G658C02 core will be available;
+- driver probably needs rewriting, at least the i/o part;
 
 Probably on the CPLD (CY39100V208B) - Quoted from Cosmodog's website:
  "Instead, we used a programmable chip that we could reconfigure very
@@ -37,7 +39,7 @@ CYC1399
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
+#include "cpu/g65816/g65816.h"
 
 
 class cmmb_state : public driver_device
@@ -162,6 +164,7 @@ static READ8_HANDLER( kludge_r )
 
 /* overlap empty addresses */
 static ADDRESS_MAP_START( cmmb_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM /* zero page address */
 //  AM_RANGE(0x13c0, 0x13ff) AM_RAM //spriteram
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_MEMBER(cmmb_state, videoram)
@@ -295,7 +298,7 @@ static MACHINE_RESET( cmmb )
 static MACHINE_CONFIG_START( cmmb, cmmb_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M65C02,8000000/2) // unknown clock
+	MCFG_CPU_ADD("maincpu",G65816,8000000/2) // G658C02 (a G65816 with 64k of address line space), unknown clock
 	MCFG_CPU_PROGRAM_MAP(cmmb_map)
 	MCFG_CPU_VBLANK_INT("screen",cmmb_irq)
 
@@ -334,4 +337,4 @@ ROM_START( cmmb162 )
 	ROM_REGION( 0x1000, "gfx", ROMREGION_ERASE00 )
 ROM_END
 
-GAME( 2002, cmmb162,  0,       cmmb,  cmmb,  0, ROT270, "Infogrames / Cosmodog", "Centipede/Millipede/Missile Command/Let's Go Bowling (rev 1.62)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, cmmb162,  0,       cmmb,  cmmb,  0, ROT270, "Infogrames / Cosmodog", "Multipede (rev 1.62)", GAME_NO_SOUND|GAME_NOT_WORKING )
