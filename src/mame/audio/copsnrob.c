@@ -276,6 +276,8 @@ struct copsnrob_custom_noise_context
 	double	t1;
 };
 
+DISCRETE_CLASS_STEP_RESET(copsnrob_custom_noise, sizeof(struct copsnrob_custom_noise_context), 2);
+
 #define COPSNROB_CUSTOM_NOISE_HIGH	4.2
 
 DISCRETE_STEP(copsnrob_custom_noise)
@@ -291,7 +293,7 @@ DISCRETE_STEP(copsnrob_custom_noise)
 	int		last_noise1_bit = (low_byte >> 4) & 0x01;
 	int		last_noise2_bit = (low_byte >> 5) & 0x01;
 
-	t_used += node->sample_time();
+	t_used += this->sample_time();
 
 	/* This clock will never run faster then the sample rate,
      * so we do not bother to check.
@@ -316,18 +318,18 @@ DISCRETE_STEP(copsnrob_custom_noise)
 			context->high_byte = high_byte;
 
 			/* Convert last switch time to a ratio */
-			x_time = t_used / node->sample_time();
+			x_time = t_used / this->sample_time();
 			/* use x_time if bit changed */
 			new_noise_bit = (low_byte >> 4) & 0x01;
 			if (last_noise1_bit != new_noise_bit)
 			{
-				node->output[0] = COPSNROB_CUSTOM_NOISE_HIGH * (new_noise_bit ? x_time : (1.0 - x_time));
+				this->output[0] = COPSNROB_CUSTOM_NOISE_HIGH * (new_noise_bit ? x_time : (1.0 - x_time));
 				context->noise1_had_xtime = 1;
 			}
 			new_noise_bit = (low_byte >> 5) & 0x01;
 			if (last_noise2_bit != new_noise_bit)
 			{
-				node->output[1] = COPSNROB_CUSTOM_NOISE_HIGH * (new_noise_bit ? x_time : (1.0 - x_time));
+				this->output[1] = COPSNROB_CUSTOM_NOISE_HIGH * (new_noise_bit ? x_time : (1.0 - x_time));
 				context->noise2_had_xtime = 1;
 			}
 		}
@@ -337,12 +339,12 @@ DISCRETE_STEP(copsnrob_custom_noise)
 		/* see if we need to move from x_time state to full state */
 		if (context->noise1_had_xtime)
 		{
-			node->output[0] = COPSNROB_CUSTOM_NOISE_HIGH * last_noise1_bit;
+			this->output[0] = COPSNROB_CUSTOM_NOISE_HIGH * last_noise1_bit;
 			context->noise1_had_xtime = 0;
 		}
 		if (context->noise2_had_xtime)
 		{
-			node->output[1] = COPSNROB_CUSTOM_NOISE_HIGH * last_noise2_bit;
+			this->output[1] = COPSNROB_CUSTOM_NOISE_HIGH * last_noise2_bit;
 			context->noise2_had_xtime = 0;
 		}
 	}
@@ -363,11 +365,6 @@ DISCRETE_RESET(copsnrob_custom_noise)
 	context->t_used = 0;
 }
 
-static const discrete_custom_info copsnrob_custom_noise =
-{
-	DISCRETE_CUSTOM_MODULE( copsnrob_custom_noise, struct copsnrob_custom_noise_context),
-	NULL
-};
 /************************************************
  * CUSTOM_NOISE Definition End
  ************************************************/
@@ -388,6 +385,8 @@ struct copsnrob_zings_555_monostable_context
 	double	v_cap;
 	int		flip_flop;
 };
+
+DISCRETE_CLASS_STEP_RESET(copsnrob_zings_555_monostable, sizeof(struct copsnrob_zings_555_monostable_context), 1);
 
 DISCRETE_STEP(copsnrob_zings_555_monostable)
 {
@@ -431,7 +430,7 @@ DISCRETE_STEP(copsnrob_zings_555_monostable)
 			/* discharge the overshoot */
 			v_cap = v_threshold;
 			v_cap -= v_cap * RC_CHARGE_EXP_DT(rc, x_time);
-			x_time /= node->sample_time();
+			x_time /= this->sample_time();
 		}
 	}
 	else
@@ -448,11 +447,11 @@ DISCRETE_STEP(copsnrob_zings_555_monostable)
 	context->v_cap = v_cap;
 
 	if (x_time > 0)
-		node->output[0] = v_out_high * x_time;
+		this->output[0] = v_out_high * x_time;
 	else if (flip_flop)
-		node->output[0] = v_out_high;
+		this->output[0] = v_out_high;
 	else
-		node->output[0] = 0;
+		this->output[0] = 0;
 }
 
 DISCRETE_RESET(copsnrob_zings_555_monostable)
@@ -460,17 +459,12 @@ DISCRETE_RESET(copsnrob_zings_555_monostable)
 	DISCRETE_DECLARE_CONTEXT(copsnrob_zings_555_monostable)
 
 	context->rc = COPSNROB_CUSTOM_ZINGS_555_MONOSTABLE__R * COPSNROB_CUSTOM_ZINGS_555_MONOSTABLE__C;
-	context->exponent = RC_CHARGE_EXP(context->rc);
+	context->exponent = RC_CHARGE_EXP_CLASS(context->rc);
 	context->v_cap = 0;
 	context->flip_flop = 0;
-	node->output[0] = 0;
+	this->output[0] = 0;
 }
 
-static const discrete_custom_info copsnrob_zings_555_monostable =
-{
-	DISCRETE_CUSTOM_MODULE( copsnrob_zings_555_monostable, struct copsnrob_zings_555_monostable_context),
-	NULL
-};
 /************************************************
  * CUSTOM_ZINGS_555_MONOSTABLE Definition End
  ************************************************/
@@ -499,6 +493,8 @@ struct copsnrob_zings_555_astable_context
 	int		flip_flop;
 };
 
+DISCRETE_CLASS_STEP_RESET(copsnrob_zings_555_astable, sizeof(struct copsnrob_zings_555_astable_context), 1);
+
 DISCRETE_STEP(copsnrob_zings_555_astable)
 {
 	DISCRETE_DECLARE_CONTEXT(copsnrob_zings_555_astable)
@@ -506,7 +502,7 @@ DISCRETE_STEP(copsnrob_zings_555_astable)
 	double	v_trigger, v_threshold;
 	double	v1 = COPSNROB_CUSTOM_ZINGS_555_ASTABLE__RESET;
 	double	v_cap1 = context->v_cap1;
-	double	v_cap2 = node->output[0];
+	double	v_cap2 = this->output[0];
 	double	dt = 0;
 	int		reset_active = (v1 < 0.7) ? 1 : 0;
 	int 	flip_flop = context->flip_flop;
@@ -539,9 +535,9 @@ DISCRETE_STEP(copsnrob_zings_555_astable)
 			v_cap2 -= v_cap2 * context->exponent2;
 			/* Optimization - close enough to 0 to be 0 */
 			if (v_cap2 < 0.000001)
-				node->output[0] = 0;
+				this->output[0] = 0;
 			else
-				node->output[0] = v_cap2;
+				this->output[0] = v_cap2;
 		}
 		return;
 	}
@@ -588,9 +584,9 @@ DISCRETE_STEP(copsnrob_zings_555_astable)
 		}
 	}
 	if (v_cap2 > 0)
-		node->output[0] = v_cap2;
+		this->output[0] = v_cap2;
 	else
-		node->output[0] = 0;
+		this->output[0] = 0;
 }
 
 DISCRETE_RESET(copsnrob_zings_555_astable)
@@ -599,18 +595,14 @@ DISCRETE_RESET(copsnrob_zings_555_astable)
 
 	context->r_total_cv = RES_3_PARALLEL(COPSNROB_CUSTOM_ZINGS_555_ASTABLE__R1, RES_K(10), RES_K(5));
 	context->r2c2 = COPSNROB_CUSTOM_ZINGS_555_ASTABLE__R2 * COPSNROB_CUSTOM_ZINGS_555_ASTABLE__C2;
-	context->exponent1 = RC_CHARGE_EXP(COPSNROB_CUSTOM_ZINGS_555_ASTABLE__R1 * COPSNROB_CUSTOM_ZINGS_555_ASTABLE__C1);
-	context->exponent2 = RC_CHARGE_EXP(context->r2c2);
+	context->exponent1 = RC_CHARGE_EXP_CLASS(COPSNROB_CUSTOM_ZINGS_555_ASTABLE__R1 * COPSNROB_CUSTOM_ZINGS_555_ASTABLE__C1);
+	context->exponent2 = RC_CHARGE_EXP_CLASS(context->r2c2);
 	context->v_cap1 = 0;
 	context->flip_flop = 0;
-	node->output[0] = 0;		/* charge on C2 */
+	this->output[0] = 0;		/* charge on C2 */
 }
 
-static const discrete_custom_info copsnrob_zings_555_astable =
-{
-	DISCRETE_CUSTOM_MODULE( copsnrob_zings_555_astable, struct copsnrob_zings_555_astable_context),
-	NULL
-};
+
 /************************************************
  * CUSTOM_ZINGS_555_ASTABLE Definition End
  ************************************************/
@@ -653,9 +645,9 @@ DISCRETE_SOUND_START(copsnrob)
 	/************************************************
      * CRASH
      ************************************************/
-	DISCRETE_CUSTOM1(COPSNROB_NOISE_1,						/* IC J2, pin 10 */
+	DISCRETE_CUSTOM1(COPSNROB_NOISE_1,	copsnrob_custom_noise,					/* IC J2, pin 10 */
 		COPSNROB_2V,										/* CLK */
-		&copsnrob_custom_noise)
+		NULL)
 	/* COPSNROB_NOISE_2 derived from sub out of above custom module - IC J2, pin 11 */
 	/* We use the measured 555 timer frequency (IC M3) for speed */
 	DISCRETE_COUNTER(NODE_40,								/* IC L2 */
@@ -679,16 +671,16 @@ DISCRETE_SOUND_START(copsnrob)
 	/************************************************
      * FZ (Fires, Zings)
      ************************************************/
-	DISCRETE_CUSTOM3(NODE_60,							/* IC D3, pin 5 */
+	DISCRETE_CUSTOM3(NODE_60, copsnrob_zings_555_monostable,							/* IC D3, pin 5 */
 		/* We can ignore R47 & R48 */
 		COPSNROB_ZINGS_INV,								/* IC D3, pin 6 */
 		COPSNROB_R38, COPSNROB_C19,
-		&copsnrob_zings_555_monostable)
-	DISCRETE_CUSTOM5(NODE_61,							/* IC D3, pin 8 & 12 */
+		NULL)
+	DISCRETE_CUSTOM5(NODE_61, copsnrob_zings_555_astable,							/* IC D3, pin 8 & 12 */
 		NODE_60,										/* IC D3, pin 10 */
 		COPSNROB_R36, COPSNROB_R37,
 		COPSNROB_C3, COPSNROB_C13,
-		&copsnrob_zings_555_astable)
+		NULL)
 	/* FIX - do a better implemetation of IC L4 */
 	DISCRETE_CRFILTER_VREF(NODE_62,						/* IC L4, pin 9 */
 		NODE_61,										/* IN0 */

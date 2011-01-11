@@ -237,6 +237,8 @@ struct bzone_custom_filter_context
 
 #define CD4066_R_ON		270
 
+DISCRETE_CLASS_STEP_RESET(bzone_custom_filter, sizeof(struct bzone_custom_filter_context), 1);
+
 DISCRETE_STEP(bzone_custom_filter)
 {
 	DISCRETE_DECLARE_CONTEXT(bzone_custom_filter)
@@ -251,7 +253,7 @@ DISCRETE_STEP(bzone_custom_filter)
 	if (v > context->v_p) v = context->v_p;
 	if (v < 0) v = 0;
 
-	node->output[0] += (v - node->output[0]) * context->exponent;
+	this->output[0] += (v - this->output[0]) * context->exponent;
 }
 
 DISCRETE_RESET(bzone_custom_filter)
@@ -264,16 +266,9 @@ DISCRETE_RESET(bzone_custom_filter)
 	context->gain[1] = BZONE_CUSTOM_FILTER__R5 / context->gain[1] + 1;
 	context->v_in1_gain = RES_VOLTAGE_DIVIDER(BZONE_CUSTOM_FILTER__R3, BZONE_CUSTOM_FILTER__R4);
 	context->v_p = BZONE_CUSTOM_FILTER__VP - OP_AMP_VP_RAIL_OFFSET;
-	context->exponent = RC_CHARGE_EXP(BZONE_CUSTOM_FILTER__R5 * BZONE_CUSTOM_FILTER__C);;
-	node->output[0] = 0;
+	context->exponent = RC_CHARGE_EXP_CLASS(BZONE_CUSTOM_FILTER__R5 * BZONE_CUSTOM_FILTER__C);;
+	this->output[0] = 0;
 }
-
-static const discrete_custom_info bzone_custom_filter =
-{
-	DISCRETE_CUSTOM_MODULE( bzone_custom_filter, struct bzone_custom_filter_context),
-	NULL
-};
-
 
 /*************************************
  *
@@ -319,12 +314,12 @@ static DISCRETE_SOUND_START(bzone)
 	DISCRETE_RC_CIRCUIT_1(NODE_40,					/* IC J3, pin 9 */
 		BZ_INP_SHELL, NODE_31,						/* INP0, INP1 */
 		BZ_R14 + BZ_R15, BZ_C9)
-	DISCRETE_CUSTOM9(BZ_SHELL_SND,					/* IC K5, pin 1 */
+	DISCRETE_CUSTOM9(BZ_SHELL_SND, bzone_custom_filter,					/* IC K5, pin 1 */
 		BZ_INP_EXPLOLS, NODE_40,					/* IN0, IN1 */
 		BZ_R12, BZ_R13, BZ_R14, BZ_R15, BZ_R32,
 		BZ_C21,
 		22,											/* B+ of op-amp */
-		&bzone_custom_filter)
+		NULL)
 
 	/************************************************/
 	/* Explosion                                    */
@@ -333,12 +328,12 @@ static DISCRETE_SOUND_START(bzone)
 	DISCRETE_RC_CIRCUIT_1(NODE_50,					/* IC J3, pin 3 */
 		BZ_INP_EXPLO, NODE_34,						/* INP0, INP1 */
 		BZ_R17 + BZ_R16, BZ_C14)
-	DISCRETE_CUSTOM9(BZ_EXPLOSION_SND,				/* IC K5, pin 1 */
+	DISCRETE_CUSTOM9(BZ_EXPLOSION_SND, bzone_custom_filter,				/* IC K5, pin 1 */
 		BZ_INP_EXPLOLS, NODE_50,					/* IN0, IN1 */
 		BZ_R19, BZ_R18, BZ_R17, BZ_R16, BZ_R33,
 		BZ_C22,
 		22,											/* B+ of op-amp */
-		&bzone_custom_filter)
+		NULL)
 	/************************************************/
 	/* Engine                                       */
 	/************************************************/

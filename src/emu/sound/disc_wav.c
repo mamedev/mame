@@ -1,7 +1,6 @@
 /************************************************************************
  *
  *  MAME - Discrete sound system emulation library
- *
  *  Written by Keith Wilkins (mame@esplexo.co.uk)
  *
  *  (c) K.Wilkins 2000
@@ -23,147 +22,10 @@
  *
  ************************************************************************/
 
-struct dss_adsr_context
-{
-	double phase;
-};
 
-struct dss_counter_context
-{
-	int		clock_type;
-	int		out_type;
-	int		is_7492;
-	int		last_clock;
-	UINT32	last_count;
-	UINT32	last;		/* Last clock state */
-	UINT32	min;
-	UINT32	max;
-	UINT32	diff;
-	double	t_left;		/* time unused during last sample in seconds */
-};
 
-#define DSS_INV_TAB_SIZE	500
 
-struct dss_inverter_osc_context
-{
-	double	v_cap;
-	double  v_g2_old;
-	double	w;
-	double  wc;
-	double	rp;
-	double  r1;
-	double  r2;
-	double  c;
-	double	tf_a;
-	double	tf_b;
-	double  tf_tab[DSS_INV_TAB_SIZE];
-};
 
-struct dss_lfsr_context
-{
-	unsigned int	lfsr_reg;
-	int				last;		/* Last clock state */
-	double			t_clock;	/* fixed counter clock in seconds */
-	double			t_left;		/* time unused during last sample in seconds */
-	double			sample_step;
-	double			t;
-	UINT8			reset_on_high;
-	UINT8			invert_output;
-	UINT8			out_is_f0;
-	UINT8			out_lfsr_reg;
-};
-
-struct dss_noise_context
-{
-	double phase;
-};
-
-struct dss_note_context
-{
-	int		clock_type;
-	int		out_type;
-	int		last;		/* Last clock state */
-	double	t_clock;	/* fixed counter clock in seconds */
-	double	t_left;		/* time unused during last sample in seconds */
-	int		max1;		/* Max 1 Count stored as int for easy use. */
-	int		max2;		/* Max 2 Count stored as int for easy use. */
-	int		count1;		/* current count1 */
-	int		count2;		/* current count2 */
-};
-
-struct dss_op_amp_osc_context
-{
-	const double *r1;		/* pointers to resistor values */
-	const double *r2;
-	const double *r3;
-	const double *r4;
-	const double *r5;
-	const double *r6;
-	const double *r7;
-	const double *r8;
-	int		type;
-	UINT8	flip_flop;		/* flip/flop output state */
-	UINT8	flip_flop_xor;	/* flip_flop ^ flip_flop_xor, 0 = discharge, 1 = charge */
-	UINT8	output_type;
-	UINT8	has_enable;
-	double	v_out_high;
-	double	threshold_low;	/* falling threshold */
-	double	threshold_high;	/* rising threshold */
-	double	v_cap;			/* current capacitor voltage */
-	double	r_total;		/* all input resistors in parallel */
-	double	i_fixed;		/* fixed current at the input */
-	double	i_enable;		/* fixed current at the input if enabled */
-	double	temp1;			/* Multi purpose */
-	double	temp2;			/* Multi purpose */
-	double	temp3;			/* Multi purpose */
-	double	is_linear_charge;
-	double	charge_rc[2];
-	double	charge_exp[2];
-	double	charge_v[2];
-};
-
-struct dss_sawtoothwave_context
-{
-	double	phase;
-	int		type;
-};
-
-struct dss_schmitt_osc_context
-{
-	double	ration_in;			/* ratio of total charging voltage that comes from the input */
-	double	ratio_feedback;	/* ratio of total charging voltage that comes from the feedback */
-	double	v_cap;				/* current capacitor voltage */
-	double	rc;					/* r*c */
-	double	exponent;
-	int		state;				/* state of the output */
-	int		enable_type;
-	UINT8	input_is_voltage;
-};
-
-struct dss_sinewave_context
-{
-	double phase;
-};
-
-struct dss_squarewave_context
-{
-	double phase;
-	double trigger;
-};
-
-struct dss_squarewfix_context
-{
-	int		flip_flop;
-	double	sample_step;
-	double	t_left;
-	double	t_off;
-	double	t_on;
-};
-
-struct dss_trianglewave_context
-{
-	double phase;
-};
 
 
 /************************************************************************
@@ -207,10 +69,10 @@ DISCRETE_STEP(dss_counter)
 	if (UNEXPECTED(context->clock_type == DISC_CLK_IS_FREQ))
 	{
 		/* We need to keep clocking the internal clock even if disabled. */
-		cycles = (context->t_left + node->sample_time()) * ds_clock;
+		cycles = (context->t_left + this->sample_time()) * ds_clock;
 		inc    = (int)cycles;
 		context->t_left = (cycles - inc) / ds_clock;
-		if (inc) x_time = context->t_left / node->sample_time();
+		if (inc) x_time = context->t_left / this->sample_time();
 	}
 	else
 	{
@@ -224,7 +86,7 @@ DISCRETE_STEP(dss_counter)
 	if (UNEXPECTED(DSS_COUNTER__RESET))
 	{
 		context->last_count = (int)DSS_COUNTER__INIT;
-		node->output[0] = (int)DSS_COUNTER__INIT;
+		this->output[0] = (int)DSS_COUNTER__INIT;
 		return;
 	}
 
@@ -276,7 +138,7 @@ DISCRETE_STEP(dss_counter)
 		}
 
 		context->last_count = count;
-		node->output[0] = context->is_7492 ? disc_7492_count[count] : count;
+		this->output[0] = context->is_7492 ? disc_7492_count[count] : count;
 
 		if (UNEXPECTED(count != last_count))
 		{
@@ -284,15 +146,15 @@ DISCRETE_STEP(dss_counter)
 			switch (context->out_type)
 			{
 				case DISC_OUT_HAS_XTIME:
-					node->output[0] += x_time;
+					this->output[0] += x_time;
 					break;
 				case DISC_OUT_IS_ENERGY:
 					if (x_time == 0) x_time = 1.0;
-					node->output[0] = last_count;
+					this->output[0] = last_count;
 					if (count > last_count)
-						node->output[0] += (count - last_count) * x_time;
+						this->output[0] += (count - last_count) * x_time;
 					else
-						node->output[0] -= (last_count - count) * x_time;
+						this->output[0] -= (last_count - count) * x_time;
 					break;
 			}
 		}
@@ -322,7 +184,7 @@ DISCRETE_RESET(dss_counter)
 
 
 	if (!context->is_7492 && (DSS_COUNTER__MAX < DSS_COUNTER__MIN))
-		fatalerror("MAX < MIN in NODE_%02d", node->index());
+		fatalerror("MAX < MIN in NODE_%02d", this->index());
 
 	context->out_type    = context->clock_type & DISC_OUT_MASK;
 	context->clock_type &= DISC_CLK_MASK;
@@ -330,7 +192,7 @@ DISCRETE_RESET(dss_counter)
 	context->t_left = 0;
 	context->last_count = 0;
 	context->last_clock = 0;
-	node->output[0] = DSS_COUNTER__INIT; /* count starts at reset value */
+	this->output[0] = DSS_COUNTER__INIT; /* count starts at reset value */
 }
 
 
@@ -417,12 +279,10 @@ INLINE int dss_lfsr_function(discrete_device *dev, int myfunc, int in0, int in1,
 	return retval;
 }
 
-/* reset prototype so that it can be used in init function */
-DISCRETE_RESET(dss_lfsr);
 
-DISCRETE_STEP(dss_lfsr)
+DISCRETE_STEP(dss_lfsr_noise)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_lfsr)
+	DISCRETE_DECLARE_CONTEXT(dss_lfsr_noise)
 	DISCRETE_DECLARE_INFO(discrete_lfsr_desc)
 
 	double cycles;
@@ -432,7 +292,7 @@ DISCRETE_STEP(dss_lfsr)
 	if (info->clock_type == DISC_CLK_IS_FREQ)
 	{
 		/* We need to keep clocking the internal clock even if disabled. */
-		cycles = (context->t_left + node->sample_time()) / context->t_clock;
+		cycles = (context->t_left + this->sample_time()) / context->t_clock;
 		inc    = (int)cycles;
 		context->t_left = (cycles - inc) * context->t_clock;
 	}
@@ -440,7 +300,7 @@ DISCRETE_STEP(dss_lfsr)
 	/* Reset everything if necessary */
 	if(((DSS_LFSR_NOISE__RESET == 0) ? 0 : 1) == context->reset_on_high)
 	{
-		DISCRETE_RESET_CALL(dss_lfsr);
+		this->reset();
 		return;
 	}
 
@@ -476,52 +336,52 @@ DISCRETE_STEP(dss_lfsr)
 			fbresult = (context->lfsr_reg >> info->bitlength) & 0x01;
 
 			/* Stage 2 feedback combine fbresultNew with infeed bit */
-			fbresult = dss_lfsr_function(node->device, info->feedback_function1, fbresult, noise_feed, 0x01);
+			fbresult = dss_lfsr_function(this->device, info->feedback_function1, fbresult, noise_feed, 0x01);
 
 			/* Stage 3 first we setup where the bit is going to be shifted into */
 			fbresult = fbresult * info->feedback_function2_mask;
 			/* Then we left shift the register, */
 			context->lfsr_reg = context->lfsr_reg << 1;
 			/* Now move the fbresult into the shift register and mask it to the bitlength */
-			context->lfsr_reg = dss_lfsr_function(node->device, info->feedback_function2, fbresult, context->lfsr_reg, (1 << info->bitlength) - 1 );
+			context->lfsr_reg = dss_lfsr_function(this->device, info->feedback_function2, fbresult, context->lfsr_reg, (1 << info->bitlength) - 1 );
 
 			/* Now get and store the new feedback result */
 			/* Fetch the feedback bits */
 			fb0 = (context->lfsr_reg >> info->feedback_bitsel0) & 0x01;
 			fb1 = (context->lfsr_reg >> info->feedback_bitsel1) & 0x01;
 			/* Now do the combo on them */
-			fbresult = dss_lfsr_function(node->device, info->feedback_function0, fb0, fb1, 0x01);
-			context->lfsr_reg = dss_lfsr_function(node->device, DISC_LFSR_REPLACE, context->lfsr_reg, fbresult << info->bitlength, (2 << info->bitlength) - 1);
+			fbresult = dss_lfsr_function(this->device, info->feedback_function0, fb0, fb1, 0x01);
+			context->lfsr_reg = dss_lfsr_function(this->device, DISC_LFSR_REPLACE, context->lfsr_reg, fbresult << info->bitlength, (2 << info->bitlength) - 1);
 
 		}
 		/* Now select the output bit */
 		if (context->out_is_f0)
-			node->output[0] = fbresult & 0x01;
+			this->output[0] = fbresult & 0x01;
 		else
-			node->output[0] = (context->lfsr_reg >> info->output_bit) & 0x01;
+			this->output[0] = (context->lfsr_reg >> info->output_bit) & 0x01;
 
 		/* Final inversion if required */
-		if (context->invert_output) node->output[0] = node->output[0] ? 0 : 1;
+		if (context->invert_output) this->output[0] = this->output[0] ? 0 : 1;
 
 		/* Gain stage */
-		node->output[0] = node->output[0] ? DSS_LFSR_NOISE__AMP / 2 : -DSS_LFSR_NOISE__AMP / 2;
+		this->output[0] = this->output[0] ? DSS_LFSR_NOISE__AMP / 2 : -DSS_LFSR_NOISE__AMP / 2;
 		/* Bias input as required */
-		node->output[0] = node->output[0] + DSS_LFSR_NOISE__BIAS;
+		this->output[0] = this->output[0] + DSS_LFSR_NOISE__BIAS;
 
 		/* output the lfsr reg ?*/
 		if (context->out_lfsr_reg)
-			node->output[1] = (double) context->lfsr_reg;
+			this->output[1] = (double) context->lfsr_reg;
 
 	}
 	if(!DSS_LFSR_NOISE__ENABLE)
 	{
-		node->output[0] = 0;
+		this->output[0] = 0;
 	}
 }
 
-DISCRETE_RESET(dss_lfsr)
+DISCRETE_RESET(dss_lfsr_noise)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_lfsr)
+	DISCRETE_DECLARE_CONTEXT(dss_lfsr_noise)
 	DISCRETE_DECLARE_INFO(discrete_lfsr_desc)
 
 	int    fb0 , fb1, fbresult;
@@ -532,7 +392,7 @@ DISCRETE_RESET(dss_lfsr)
 	context->out_lfsr_reg = (info->flags & DISC_LFSR_FLAG_OUTPUT_SR_SN1) ? 1 : 0;
 
 	if ((info->clock_type < DISC_CLK_ON_F_EDGE) || (info->clock_type > DISC_CLK_IS_FREQ))
-		node->device->discrete_log("Invalid clock type passed in NODE_%d\n", node->index());
+		this->device->discrete_log("Invalid clock type passed in NODE_%d\n", this->index());
 
 	context->last = (DSS_COUNTER__CLOCK != 0);
 	if (info->clock_type == DISC_CLK_IS_FREQ) context->t_clock = 1.0 / DSS_LFSR_NOISE__CLOCK;
@@ -545,19 +405,19 @@ DISCRETE_RESET(dss_lfsr)
 	fb0 = (context->lfsr_reg >> info->feedback_bitsel0) & 0x01;
 	fb1=(context->lfsr_reg >> info->feedback_bitsel1) & 0x01;
 	/* Now do the combo on them */
-	fbresult = dss_lfsr_function(node->device, info->feedback_function0, fb0, fb1, 0x01);
-	context->lfsr_reg=dss_lfsr_function(node->device, DISC_LFSR_REPLACE, context->lfsr_reg, fbresult << info->bitlength, (2<< info->bitlength ) - 1);
+	fbresult = dss_lfsr_function(this->device, info->feedback_function0, fb0, fb1, 0x01);
+	context->lfsr_reg=dss_lfsr_function(this->device, DISC_LFSR_REPLACE, context->lfsr_reg, fbresult << info->bitlength, (2<< info->bitlength ) - 1);
 
 	/* Now select and setup the output bit */
-	node->output[0] = (context->lfsr_reg >> info->output_bit) & 0x01;
+	this->output[0] = (context->lfsr_reg >> info->output_bit) & 0x01;
 
 	/* Final inversion if required */
-	if(info->flags & DISC_LFSR_FLAG_OUT_INVERT) node->output[0] = node->output[0] ? 0 : 1;
+	if(info->flags & DISC_LFSR_FLAG_OUT_INVERT) this->output[0] = this->output[0] ? 0 : 1;
 
 	/* Gain stage */
-	node->output[0] = node->output[0] ? DSS_LFSR_NOISE__AMP / 2 : -DSS_LFSR_NOISE__AMP / 2;
+	this->output[0] = this->output[0] ? DSS_LFSR_NOISE__AMP / 2 : -DSS_LFSR_NOISE__AMP / 2;
 	/* Bias input as required */
-	node->output[0] = node->output[0] + DSS_LFSR_NOISE__BIAS;
+	this->output[0] = this->output[0] + DSS_LFSR_NOISE__BIAS;
 }
 
 
@@ -586,22 +446,22 @@ DISCRETE_STEP(dss_noise)
 		if(context->phase > (2.0 * M_PI))
 		{
 			/* GCC's rand returns a RAND_MAX value of 0x7fff */
-			int newval = (node->device->machine->rand() & 0x7fff) - 16384;
+			int newval = (this->device->machine->rand() & 0x7fff) - 16384;
 
 			/* make sure the peak to peak values are the amplitude */
-			node->output[0] = DSS_NOISE__AMP / 2;
+			this->output[0] = DSS_NOISE__AMP / 2;
 			if (newval > 0)
-				node->output[0] *= ((double)newval / 16383);
+				this->output[0] *= ((double)newval / 16383);
 			else
-				node->output[0] *= ((double)newval / 16384);
+				this->output[0] *= ((double)newval / 16384);
 
 			/* Add DC Bias component */
-			node->output[0] += DSS_NOISE__BIAS;
+			this->output[0] += DSS_NOISE__BIAS;
 		}
 	}
 	else
 	{
-		node->output[0] = 0;
+		this->output[0] = 0;
 	}
 
 	/* Keep the new phasor in the 2Pi range.*/
@@ -609,7 +469,7 @@ DISCRETE_STEP(dss_noise)
 
 	/* The enable input only curtails output, phase rotation still occurs. */
 	/* We allow the phase to exceed 2Pi here, so we can tell when to sample the noise. */
-	context->phase += ((2.0 * M_PI * DSS_NOISE__FREQ) / node->sample_rate());
+	context->phase += ((2.0 * M_PI * DSS_NOISE__FREQ) / this->sample_rate());
 }
 
 
@@ -618,7 +478,7 @@ DISCRETE_RESET(dss_noise)
 	DISCRETE_DECLARE_CONTEXT(dss_noise)
 
 	context->phase=0;
-	DISCRETE_STEP_CALL( dss_noise );
+	this->step();
 }
 
 
@@ -653,10 +513,10 @@ DISCRETE_STEP(dss_note)
 	if (context->clock_type == DISC_CLK_IS_FREQ)
 	{
 		/* We need to keep clocking the internal clock even if disabled. */
-		cycles = (context->t_left + node->sample_time()) / context->t_clock;
+		cycles = (context->t_left + this->sample_time()) / context->t_clock;
 		inc    = (int)cycles;
 		context->t_left = (cycles - inc) * context->t_clock;
-		if (inc) x_time = context->t_left / node->sample_time();
+		if (inc) x_time = context->t_left / this->sample_time();
 	}
 	else
 	{
@@ -708,7 +568,7 @@ DISCRETE_STEP(dss_note)
 			}
 		}
 
-		node->output[0] = context->count2;
+		this->output[0] = context->count2;
 		if (context->count2 != last_count2)
 		{
 			/* the x_time is only output if the output changed. */
@@ -716,20 +576,20 @@ DISCRETE_STEP(dss_note)
 			{
 				case DISC_OUT_IS_ENERGY:
 					if (x_time == 0) x_time = 1.0;
-					node->output[0] = last_count2;
+					this->output[0] = last_count2;
 					if (context->count2 > last_count2)
-						node->output[0] += (context->count2 - last_count2) * x_time;
+						this->output[0] += (context->count2 - last_count2) * x_time;
 					else
-						node->output[0] -= (last_count2 - context->count2) * x_time;
+						this->output[0] -= (last_count2 - context->count2) * x_time;
 					break;
 				case DISC_OUT_HAS_XTIME:
-					node->output[0] += x_time;
+					this->output[0] += x_time;
 					break;
 			}
 		}
 	}
 	else
-		node->output[0] = 0;
+		this->output[0] = 0;
 }
 
 DISCRETE_RESET(dss_note)
@@ -747,7 +607,7 @@ DISCRETE_RESET(dss_note)
 	context->count2 = 0;
 	context->max1   = (int)DSS_NOTE__MAX1;
 	context->max2   = (int)DSS_NOTE__MAX2;
-	node->output[0] = 0;
+	this->output[0] = 0;
 }
 
 /************************************************************************
@@ -791,7 +651,7 @@ DISCRETE_STEP(dss_op_amp_osc)
 	int count_f = 0;
 	int count_r = 0;
 
-	dt = node->sample_time();	/* Change in time */
+	dt = this->sample_time();	/* Change in time */
 	v_cap = context->v_cap;	/* Set to voltage before change */
 
 	/* work out the charge currents/voltages. */
@@ -895,7 +755,7 @@ DISCRETE_STEP(dss_op_amp_osc)
 	if (!enable)
 	{
 		/* we will just output 0 for oscillators that have no real enable. */
-		node->output[0] = 0;
+		this->output[0] = 0;
 		return;
 	}
 
@@ -1000,32 +860,32 @@ DISCRETE_STEP(dss_op_amp_osc)
 		v_cap = 0;
 	context->v_cap = v_cap;
 
-	x_time = dt / node->sample_time();
+	x_time = dt / this->sample_time();
 
 	switch (context->output_type)
 	{
 		case DISC_OP_AMP_OSCILLATOR_OUT_CAP:
-			node->output[0] = v_cap;
+			this->output[0] = v_cap;
 			break;
 		case DISC_OP_AMP_OSCILLATOR_OUT_ENERGY:
 			if (x_time == 0) x_time = 1.0;
-			node->output[0]  = context->v_out_high * (flip_flop ? x_time : (1.0 - x_time));
+			this->output[0]  = context->v_out_high * (flip_flop ? x_time : (1.0 - x_time));
 			break;
 		case DISC_OP_AMP_OSCILLATOR_OUT_SQW:
 			if (count_f + count_r >= 2)
 				/* force at least 1 toggle */
-				node->output[0] = context->flip_flop ? 0 : context->v_out_high;
+				this->output[0] = context->flip_flop ? 0 : context->v_out_high;
 			else
-				node->output[0] = flip_flop * context->v_out_high;
+				this->output[0] = flip_flop * context->v_out_high;
 			break;
 		case DISC_OP_AMP_OSCILLATOR_OUT_COUNT_F_X:
-			node->output[0] = count_f ? count_f + x_time : count_f;
+			this->output[0] = count_f ? count_f + x_time : count_f;
 			break;
 		case DISC_OP_AMP_OSCILLATOR_OUT_COUNT_R_X:
-			node->output[0] =  count_r ? count_r + x_time : count_r;
+			this->output[0] =  count_r ? count_r + x_time : count_r;
 			break;
 		case DISC_OP_AMP_OSCILLATOR_OUT_LOGIC_X:
-			node->output[0] = context->flip_flop + x_time;
+			this->output[0] = context->flip_flop + x_time;
 			break;
 	}
 	context->flip_flop = flip_flop;
@@ -1053,7 +913,7 @@ DISCRETE_RESET(dss_op_amp_osc)
 	{
 		if IS_VALUE_A_NODE(*r_info_ptr)
 		{
-			r_node = node->device->discrete_find_node(*r_info_ptr);
+			r_node = this->device->discrete_find_node(*r_info_ptr);
 			*r_context_ptr = &(r_node->output[NODE_CHILD_NODE_NUM((int)*r_info_ptr)]);
 		}
 		else
@@ -1138,8 +998,8 @@ DISCRETE_RESET(dss_op_amp_osc)
 
 			context->charge_rc[0] *= info->c;
 			context->charge_rc[1] *= info->c;
-			context->charge_exp[0] = RC_CHARGE_EXP(context->charge_rc[0]);
-			context->charge_exp[1] = RC_CHARGE_EXP(context->charge_rc[1]);
+			context->charge_exp[0] = RC_CHARGE_EXP_CLASS(context->charge_rc[0]);
+			context->charge_exp[1] = RC_CHARGE_EXP_CLASS(context->charge_rc[1]);
 			context->threshold_low  = (info->vP - OP_AMP_NORTON_VBE) / info->r4;
 			context->threshold_high = context->threshold_low + (info->vP - 2 * OP_AMP_NORTON_VBE) / info->r3;;
 			context->threshold_low  = context->threshold_low * info->r2 + OP_AMP_NORTON_VBE;
@@ -1216,7 +1076,7 @@ DISCRETE_RESET(dss_op_amp_osc)
 	context->v_out_high = info->vP - ((context->type & DISC_OP_AMP_IS_NORTON) ? OP_AMP_NORTON_VBE : OP_AMP_VP_RAIL_OFFSET);
 	context->v_cap      = 0;
 
-	DISCRETE_STEP_CALL(dss_op_amp_osc);
+	this->step();
 }
 
 
@@ -1245,14 +1105,14 @@ DISCRETE_STEP(dss_sawtoothwave)
 
 	if(DSS_SAWTOOTHWAVE__ENABLE)
 	{
-		node->output[0]  = (context->type == 0) ? context->phase * (DSS_SAWTOOTHWAVE__AMP / (2.0 * M_PI)) : DSS_SAWTOOTHWAVE__AMP - (context->phase * (DSS_SAWTOOTHWAVE__AMP / (2.0 * M_PI)));
-		node->output[0] -= DSS_SAWTOOTHWAVE__AMP / 2.0;
+		this->output[0]  = (context->type == 0) ? context->phase * (DSS_SAWTOOTHWAVE__AMP / (2.0 * M_PI)) : DSS_SAWTOOTHWAVE__AMP - (context->phase * (DSS_SAWTOOTHWAVE__AMP / (2.0 * M_PI)));
+		this->output[0] -= DSS_SAWTOOTHWAVE__AMP / 2.0;
 		/* Add DC Bias component */
-		node->output[0] = node->output[0] + DSS_SAWTOOTHWAVE__BIAS;
+		this->output[0] = this->output[0] + DSS_SAWTOOTHWAVE__BIAS;
 	}
 	else
 	{
-		node->output[0] = 0;
+		this->output[0] = 0;
 	}
 
 	/* Work out the phase step based on phase/freq & sample rate */
@@ -1262,7 +1122,7 @@ DISCRETE_STEP(dss_sawtoothwave)
 	/*                    boils out to                           */
 	/*     phase step = (2Pi*output freq)/sample freq)           */
 	/* Also keep the new phasor in the 2Pi range.                */
-	context->phase = fmod((context->phase + ((2.0 * M_PI * DSS_SAWTOOTHWAVE__FREQ) / node->sample_rate())), 2.0 * M_PI);
+	context->phase = fmod((context->phase + ((2.0 * M_PI * DSS_SAWTOOTHWAVE__FREQ) / this->sample_rate())), 2.0 * M_PI);
 }
 
 DISCRETE_RESET(dss_sawtoothwave)
@@ -1280,7 +1140,7 @@ DISCRETE_RESET(dss_sawtoothwave)
 	context->type = (DSS_SAWTOOTHWAVE__GRAD) ? 1 : 0;
 
 	/* Step the node to set the output */
-	DISCRETE_STEP_CALL(dss_sawtoothwave);
+	this->step();
 }
 
 
@@ -1359,19 +1219,19 @@ DISCRETE_STEP(dss_schmitt_osc)
 	switch (context->enable_type)
 	{
 		case DISC_SCHMITT_OSC_ENAB_IS_AND:
-			node->output[0] = DSS_SCHMITT_OSC__ENABLE && context->state;
+			this->output[0] = DSS_SCHMITT_OSC__ENABLE && context->state;
 			break;
 		case DISC_SCHMITT_OSC_ENAB_IS_NAND:
-			node->output[0] = !(DSS_SCHMITT_OSC__ENABLE && context->state);
+			this->output[0] = !(DSS_SCHMITT_OSC__ENABLE && context->state);
 			break;
 		case DISC_SCHMITT_OSC_ENAB_IS_OR:
-			node->output[0] = DSS_SCHMITT_OSC__ENABLE || context->state;
+			this->output[0] = DSS_SCHMITT_OSC__ENABLE || context->state;
 			break;
 		case DISC_SCHMITT_OSC_ENAB_IS_NOR:
-			node->output[0] = !(DSS_SCHMITT_OSC__ENABLE || context->state);
+			this->output[0] = !(DSS_SCHMITT_OSC__ENABLE || context->state);
 			break;
 	}
-	node->output[0] *= DSS_SCHMITT_OSC__AMP;
+	this->output[0] *= DSS_SCHMITT_OSC__AMP;
 }
 
 DISCRETE_RESET(dss_schmitt_osc)
@@ -1393,13 +1253,13 @@ DISCRETE_RESET(dss_schmitt_osc)
      * So use this for the RC charge constant. */
 	rSource     = 1.0 / ((1.0 / info->rIn) + (1.0 / info->rFeedback));
 	context->rc = rSource * info->c;
-	context->exponent = RC_CHARGE_EXP(context->rc);
+	context->exponent = RC_CHARGE_EXP_CLASS(context->rc);
 
 	/* Cap is at 0V on power up.  Causing output to be high. */
 	context->v_cap = 0;
 	context->state = 1;
 
-	node->output[0] = info->options ? 0 : DSS_SCHMITT_OSC__AMP;
+	this->output[0] = info->options ? 0 : DSS_SCHMITT_OSC__AMP;
 }
 
 
@@ -1427,13 +1287,13 @@ DISCRETE_STEP(dss_sinewave)
 	/* Set the output */
 	if(DSS_SINEWAVE__ENABLE)
 	{
-		node->output[0] = (DSS_SINEWAVE__AMPL / 2.0) * sin(context->phase);
+		this->output[0] = (DSS_SINEWAVE__AMPL / 2.0) * sin(context->phase);
 		/* Add DC Bias component */
-		node->output[0] = node->output[0] + DSS_SINEWAVE__BIAS;
+		this->output[0] = this->output[0] + DSS_SINEWAVE__BIAS;
 	}
 	else
 	{
-		node->output[0] = 0;
+		this->output[0] = 0;
 	}
 
 	/* Work out the phase step based on phase/freq & sample rate */
@@ -1443,7 +1303,7 @@ DISCRETE_STEP(dss_sinewave)
 	/*                    boils out to                           */
 	/*     phase step = (2Pi*output freq)/sample freq)           */
 	/* Also keep the new phasor in the 2Pi range.                */
-	context->phase=fmod((context->phase + ((2.0 * M_PI * DSS_SINEWAVE__FREQ) / node->sample_rate())), 2.0 * M_PI);
+	context->phase=fmod((context->phase + ((2.0 * M_PI * DSS_SINEWAVE__FREQ) / this->sample_rate())), 2.0 * M_PI);
 }
 
 DISCRETE_RESET(dss_sinewave)
@@ -1457,7 +1317,7 @@ DISCRETE_RESET(dss_sinewave)
 	/* Make sure its always mod 2Pi */
 	context->phase = fmod(start, 2.0 * M_PI);
 	/* Step the output to make it correct */
-	DISCRETE_STEP_CALL(dss_sinewave);
+	this->step();
 }
 
 
@@ -1491,16 +1351,16 @@ DISCRETE_STEP(dss_squarewave)
 	if(DSS_SQUAREWAVE__ENABLE)
 	{
 		if(context->phase>context->trigger)
-			node->output[0] = DSS_SQUAREWAVE__AMP /2.0;
+			this->output[0] = DSS_SQUAREWAVE__AMP /2.0;
 		else
-			node->output[0] =- DSS_SQUAREWAVE__AMP / 2.0;
+			this->output[0] =- DSS_SQUAREWAVE__AMP / 2.0;
 
 		/* Add DC Bias component */
-		node->output[0] = node->output[0] + DSS_SQUAREWAVE__BIAS;
+		this->output[0] = this->output[0] + DSS_SQUAREWAVE__BIAS;
 	}
 	else
 	{
-		node->output[0] = 0;
+		this->output[0] = 0;
 	}
 
 	/* Work out the phase step based on phase/freq & sample rate */
@@ -1510,7 +1370,7 @@ DISCRETE_STEP(dss_squarewave)
 	/*                    boils out to                           */
 	/*     phase step = (2Pi*output freq)/sample freq)           */
 	/* Also keep the new phasor in the 2Pi range.                */
-	context->phase=fmod(context->phase + ((2.0 * M_PI * DSS_SQUAREWAVE__FREQ) / node->sample_rate()), 2.0 * M_PI);
+	context->phase=fmod(context->phase + ((2.0 * M_PI * DSS_SQUAREWAVE__FREQ) / this->sample_rate()), 2.0 * M_PI);
 }
 
 DISCRETE_RESET(dss_squarewave)
@@ -1525,7 +1385,7 @@ DISCRETE_RESET(dss_squarewave)
 	context->phase = fmod(start, 2.0 * M_PI);
 
 	/* Step the output */
-	DISCRETE_STEP_CALL(dss_squarewave);
+	this->step();
 }
 
 /************************************************************************
@@ -1568,11 +1428,11 @@ DISCRETE_STEP(dss_squarewfix)
 		context->t_on   = context->t_off * (DSS_SQUAREWFIX__DUTY / 100.0);
 		context->t_off -= context->t_on;
 
-		node->output[0] = (context->flip_flop ? DSS_SQUAREWFIX__AMP / 2.0 : -(DSS_SQUAREWFIX__AMP / 2.0)) + DSS_SQUAREWFIX__BIAS;
+		this->output[0] = (context->flip_flop ? DSS_SQUAREWFIX__AMP / 2.0 : -(DSS_SQUAREWFIX__AMP / 2.0)) + DSS_SQUAREWFIX__BIAS;
 	}
 	else
 	{
-		node->output[0]=0;
+		this->output[0]=0;
 	}
 }
 
@@ -1580,7 +1440,7 @@ DISCRETE_RESET(dss_squarewfix)
 {
 	DISCRETE_DECLARE_CONTEXT(dss_squarewfix)
 
-	context->sample_step = 1.0 / node->sample_rate();
+	context->sample_step = 1.0 / this->sample_rate();
 	context->flip_flop   = 1;
 
 	/* Do the intial time shift and convert freq to off/on times */
@@ -1602,7 +1462,7 @@ DISCRETE_RESET(dss_squarewfix)
 	}
 
 	/* Step the output */
-	DISCRETE_STEP_CALL(dss_squarewfix);
+	this->step();
 }
 
 
@@ -1643,21 +1503,21 @@ DISCRETE_STEP(dss_squarewave2)
 		/*     phase step = 2Pi/(output period/sample period)        */
 		/*                    boils out to                           */
 		/*     phase step = 2Pi/(output period*sample freq)          */
-		newphase = context->phase + ((2.0 * M_PI) / ((DSS_SQUAREWAVE2__T_OFF + DSS_SQUAREWAVE2__T_ON) * node->sample_rate()));
+		newphase = context->phase + ((2.0 * M_PI) / ((DSS_SQUAREWAVE2__T_OFF + DSS_SQUAREWAVE2__T_ON) * this->sample_rate()));
 		/* Keep the new phasor in the 2Pi range.*/
 		context->phase = fmod(newphase, 2.0 * M_PI);
 
 		if(context->phase>context->trigger)
-			node->output[0] = DSS_SQUAREWAVE2__AMP / 2.0;
+			this->output[0] = DSS_SQUAREWAVE2__AMP / 2.0;
 		else
-			node->output[0] = -DSS_SQUAREWAVE2__AMP / 2.0;
+			this->output[0] = -DSS_SQUAREWAVE2__AMP / 2.0;
 
 		/* Add DC Bias component */
-		node->output[0] = node->output[0] + DSS_SQUAREWAVE2__BIAS;
+		this->output[0] = this->output[0] + DSS_SQUAREWAVE2__BIAS;
 	}
 	else
 	{
-		node->output[0] = 0;
+		this->output[0] = 0;
 	}
 }
 
@@ -1677,7 +1537,7 @@ DISCRETE_RESET(dss_squarewave2)
 	context->phase = fmod(start, 2.0 * M_PI);
 
 	/* Step the output */
-	DISCRETE_STEP_CALL(dss_squarewave2);
+	this->step();
 }
 
 /************************************************************************
@@ -1698,34 +1558,33 @@ DISCRETE_RESET(dss_squarewave2)
 #define DSS_INVERTER_OSC__C			DISCRETE_INPUT(4)
 #define DSS_INVERTER_OSC__R2		DISCRETE_INPUT(5)
 
-INLINE double dss_inverter_tftab(discrete_base_node *node, double x)
+
+/* FIXME: Make the following two static members of dss_inverter_osc */
+inline double DISCRETE_CLASS_FUNC(dss_inverter_osc, tftab)(double x)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_inverter_osc)
 	DISCRETE_DECLARE_INFO(discrete_inverter_osc_desc)
 
 	x = x / info->vB;
 	if (x > 0)
-		return info->vB * exp(-context->tf_a * pow(x, context->tf_b));
+		return info->vB * exp(-mc_tf_a * pow(x, mc_tf_b));
 	else
 		return info->vB;
 }
 
-INLINE double dss_inverter_tf(discrete_base_node *node, double x)
+inline double DISCRETE_CLASS_FUNC(dss_inverter_osc, tf)(double x)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_inverter_osc)
 	DISCRETE_DECLARE_INFO(discrete_inverter_osc_desc)
 
 	if (x < 0.0)
 		return info->vB;
 	else if (x <= info->vB)
-		return context->tf_tab[(int)((double)(DSS_INV_TAB_SIZE - 1) * x / info->vB)];
+		return mc_tf_tab[(int)((double)(DSS_INV_TAB_SIZE - 1) * x / info->vB)];
 	else
-		return context->tf_tab[DSS_INV_TAB_SIZE - 1];
+		return mc_tf_tab[DSS_INV_TAB_SIZE - 1];
 }
 
 DISCRETE_STEP(dss_inverter_osc)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_inverter_osc)
 	DISCRETE_DECLARE_INFO(discrete_inverter_osc_desc)
 
 	double diff, vG1, vG2, vG3, vI;
@@ -1733,34 +1592,34 @@ DISCRETE_STEP(dss_inverter_osc)
 	int	clamped;
 
 	/* Get new state */
-	vI = context->v_cap + context->v_g2_old;
+	vI = mc_v_cap + mc_v_g2_old;
 	switch (info->options & DISC_OSC_INVERTER_TYPE_MASK)
 	{
 		case DISC_OSC_INVERTER_IS_TYPE1:
 		case DISC_OSC_INVERTER_IS_TYPE3:
-			vG1 = dss_inverter_tf(node, vI);
-			vG2 = dss_inverter_tf(node, vG1);
-			vG3 = dss_inverter_tf(node, vG2);
+			vG1 = this->tf(vI);
+			vG2 = this->tf(vG1);
+			vG3 = this->tf(vG2);
 			break;
 		case DISC_OSC_INVERTER_IS_TYPE2:
 			vG1 = 0;
-			vG3 = dss_inverter_tf(node, vI);
-			vG2 = dss_inverter_tf(node, vG3);
+			vG3 = this->tf(vI);
+			vG2 = this->tf(vG3);
 			break;
 		case DISC_OSC_INVERTER_IS_TYPE4:
 			vI  = MIN(DSS_INVERTER_OSC__ENABLE, vI + 0.7);
 			vG1 = 0;
-			vG3 = dss_inverter_tf(node, vI);
-			vG2 = dss_inverter_tf(node, vG3);
+			vG3 = this->tf(vI);
+			vG2 = this->tf(vG3);
 			break;
 		case DISC_OSC_INVERTER_IS_TYPE5:
 			vI  = MAX(DSS_INVERTER_OSC__ENABLE, vI - 0.7);
 			vG1 = 0;
-			vG3 = dss_inverter_tf(node,vI);
-			vG2 = dss_inverter_tf(node,vG3);
+			vG3 = this->tf(vI);
+			vG2 = this->tf(vG3);
 			break;
 		default:
-			fatalerror("DISCRETE_INVERTER_OSC - Wrong type on NODE_%02d", node->index());
+			fatalerror("DISCRETE_INVERTER_OSC - Wrong type on NODE_%02d", this->index());
 	}
 
 	clamped = 0;
@@ -1785,83 +1644,82 @@ DISCRETE_STEP(dss_inverter_osc)
 		case DISC_OSC_INVERTER_IS_TYPE3:
 			if (clamped)
 			{
-				double ratio = context->rp / (context->rp + context->r1);
+				double ratio = mc_rp / (mc_rp + mc_r1);
 				diff = vG3 * (ratio)
-				     - (context->v_cap + vG2)
+				     - (mc_v_cap + vG2)
 				     + vI * (1.0 - ratio);
-				diff = diff - diff * context->wc;
+				diff = diff - diff * mc_wc;
 			}
 			else
 			{
-				diff = vG3 - (context->v_cap + vG2);
-				diff = diff - diff * context->w;
+				diff = vG3 - (mc_v_cap + vG2);
+				diff = diff - diff * mc_w;
 			}
 			break;
 		case DISC_OSC_INVERTER_IS_TYPE4:
 			/*  FIXME handle r2 = 0  */
-			rMix = (context->r1 * context->r2) / (context->r1 + context->r2);
-			vMix = rMix* ((vG3 - vG2) / context->r1 + (DSS_INVERTER_OSC__MOD-vG2) / context->r2);
+			rMix = (mc_r1 * mc_r2) / (mc_r1 + mc_r2);
+			vMix = rMix* ((vG3 - vG2) / mc_r1 + (DSS_INVERTER_OSC__MOD-vG2) / mc_r2);
 			if (vMix < (vI-vG2-0.7))
 			{
-				rMix = 1.0 / rMix + 1.0 / context->rp;
+				rMix = 1.0 / rMix + 1.0 / mc_rp;
 				rMix = 1.0 / rMix;
-				vMix = rMix* ( (vG3-vG2) / context->r1 + (DSS_INVERTER_OSC__MOD-vG2) / context->r2
-						+ (vI - 0.7 - vG2) / context->rp);
+				vMix = rMix* ( (vG3-vG2) / mc_r1 + (DSS_INVERTER_OSC__MOD-vG2) / mc_r2
+						+ (vI - 0.7 - vG2) / mc_rp);
 			}
-			diff = vMix - context->v_cap;
-			diff = diff - diff * exp(-node->sample_time() / (context->c * rMix));
+			diff = vMix - mc_v_cap;
+			diff = diff - diff * exp(-this->sample_time() / (mc_c * rMix));
 			break;
 		case DISC_OSC_INVERTER_IS_TYPE5:
 			/*  FIXME handle r2 = 0  */
-			rMix = (context->r1 * context->r2) / (context->r1 + context->r2);
-			vMix = rMix* ((vG3 - vG2) / context->r1 + (DSS_INVERTER_OSC__MOD - vG2) / context->r2);
+			rMix = (mc_r1 * mc_r2) / (mc_r1 + mc_r2);
+			vMix = rMix* ((vG3 - vG2) / mc_r1 + (DSS_INVERTER_OSC__MOD - vG2) / mc_r2);
 			if (vMix > (vI -vG2 + 0.7))
 			{
-				rMix = 1.0 / rMix + 1.0 / context->rp;
+				rMix = 1.0 / rMix + 1.0 / mc_rp;
 				rMix = 1.0 / rMix;
-				vMix = rMix * ( (vG3 - vG2) / context->r1 + (DSS_INVERTER_OSC__MOD - vG2) / context->r2
-						+ (vI + 0.7 - vG2) / context->rp);
+				vMix = rMix * ( (vG3 - vG2) / mc_r1 + (DSS_INVERTER_OSC__MOD - vG2) / mc_r2
+						+ (vI + 0.7 - vG2) / mc_rp);
 			}
-			diff = vMix - context->v_cap;
-			diff = diff - diff * exp(-node->sample_time()/(context->c * rMix));
+			diff = vMix - mc_v_cap;
+			diff = diff - diff * exp(-this->sample_time()/(mc_c * rMix));
 			break;
 		default:
-			fatalerror("DISCRETE_INVERTER_OSC - Wrong type on NODE_%02d", node->index());
+			fatalerror("DISCRETE_INVERTER_OSC - Wrong type on NODE_%02d", this->index());
 	}
-	context->v_cap   += diff;
-	context->v_g2_old = vG2;
+	mc_v_cap   += diff;
+	mc_v_g2_old = vG2;
 	if ((info->options & DISC_OSC_INVERTER_TYPE_MASK) == DISC_OSC_INVERTER_IS_TYPE3)
-		node->output[0] = vG1;
+		this->output[0] = vG1;
 	else
-		node->output[0] = vG3;
+		this->output[0] = vG3;
 	if (info->options & DISC_OSC_INVERTER_OUT_IS_LOGIC)
-		node->output[0] = (node->output[0] > info->vInFall);
+		this->output[0] = (this->output[0] > info->vInFall);
 }
 
 DISCRETE_RESET(dss_inverter_osc)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_inverter_osc)
 	DISCRETE_DECLARE_INFO(discrete_inverter_osc_desc)
 
 	int i;
 
 	/* exponent */
-	context->w  = exp(-node->sample_time() / (DSS_INVERTER_OSC__RC * DSS_INVERTER_OSC__C));
-	context->wc = exp(-node->sample_time() / ((DSS_INVERTER_OSC__RC * DSS_INVERTER_OSC__RP) / (DSS_INVERTER_OSC__RP + DSS_INVERTER_OSC__RC) * DSS_INVERTER_OSC__C));
-	node->output[0]   = 0;
-	context->v_cap    = 0;
-	context->v_g2_old = 0;
-	context->rp   = DSS_INVERTER_OSC__RP;
-	context->r1   = DSS_INVERTER_OSC__RC;
-	context->r2   = DSS_INVERTER_OSC__R2;
-	context->c    = DSS_INVERTER_OSC__C;
-	context->tf_b = (log(0.0 - log(info->vOutLow/info->vB)) - log(0.0 - log((info->vOutHigh/info->vB))) ) / log(info->vInRise / info->vInFall);
-	context->tf_a = log(0.0 - log(info->vOutLow/info->vB)) - context->tf_b * log(info->vInRise/info->vB);
-	context->tf_a = exp(context->tf_a);
+	mc_w  = exp(-this->sample_time() / (DSS_INVERTER_OSC__RC * DSS_INVERTER_OSC__C));
+	mc_wc = exp(-this->sample_time() / ((DSS_INVERTER_OSC__RC * DSS_INVERTER_OSC__RP) / (DSS_INVERTER_OSC__RP + DSS_INVERTER_OSC__RC) * DSS_INVERTER_OSC__C));
+	this->output[0]   = 0;
+	mc_v_cap    = 0;
+	mc_v_g2_old = 0;
+	mc_rp   = DSS_INVERTER_OSC__RP;
+	mc_r1   = DSS_INVERTER_OSC__RC;
+	mc_r2   = DSS_INVERTER_OSC__R2;
+	mc_c    = DSS_INVERTER_OSC__C;
+	mc_tf_b = (log(0.0 - log(info->vOutLow/info->vB)) - log(0.0 - log((info->vOutHigh/info->vB))) ) / log(info->vInRise / info->vInFall);
+	mc_tf_a = log(0.0 - log(info->vOutLow/info->vB)) - mc_tf_b * log(info->vInRise/info->vB);
+	mc_tf_a = exp(mc_tf_a);
 
 	for (i = 0; i < DSS_INV_TAB_SIZE; i++)
 	{
-		context->tf_tab[i] = dss_inverter_tftab(node, (double)i / (double)(DSS_INV_TAB_SIZE - 1) * info->vB);
+		mc_tf_tab[i] = this->tftab((double)i / (double)(DSS_INV_TAB_SIZE - 1) * info->vB);
 	}
 }
 
@@ -1888,15 +1746,15 @@ DISCRETE_STEP(dss_trianglewave)
 
 	if(DSS_TRIANGLEWAVE__ENABLE)
 	{
-		node->output[0] = context->phase < M_PI ? (DSS_TRIANGLEWAVE__AMP * (context->phase / (M_PI / 2.0) - 1.0)) / 2.0 :
+		this->output[0] = context->phase < M_PI ? (DSS_TRIANGLEWAVE__AMP * (context->phase / (M_PI / 2.0) - 1.0)) / 2.0 :
 									(DSS_TRIANGLEWAVE__AMP * (3.0 - context->phase / (M_PI / 2.0))) / 2.0 ;
 
 		/* Add DC Bias component */
-		node->output[0] = node->output[0] + DSS_TRIANGLEWAVE__BIAS;
+		this->output[0] = this->output[0] + DSS_TRIANGLEWAVE__BIAS;
 	}
 	else
 	{
-		node->output[0] = 0;
+		this->output[0] = 0;
 	}
 
 	/* Work out the phase step based on phase/freq & sample rate */
@@ -1906,7 +1764,7 @@ DISCRETE_STEP(dss_trianglewave)
 	/*                    boils out to                           */
 	/*     phase step = (2Pi*output freq)/sample freq)           */
 	/* Also keep the new phasor in the 2Pi range.                */
-	context->phase=fmod((context->phase + ((2.0 * M_PI * DSS_TRIANGLEWAVE__FREQ) / node->sample_rate())), 2.0 * M_PI);
+	context->phase=fmod((context->phase + ((2.0 * M_PI * DSS_TRIANGLEWAVE__FREQ) / this->sample_rate())), 2.0 * M_PI);
 }
 
 DISCRETE_RESET(dss_trianglewave)
@@ -1921,7 +1779,7 @@ DISCRETE_RESET(dss_trianglewave)
 	context->phase=fmod(start, 2.0 * M_PI);
 
 	/* Step to set the output */
-	DISCRETE_STEP_CALL(dss_trianglewave);
+	this->step();
 }
 
 
@@ -1940,16 +1798,16 @@ DISCRETE_STEP(dss_adsrenv)
 {
 	if(DSS_ADSR__ENABLE)
 	{
-		node->output[0] = 0;
+		this->output[0] = 0;
 	}
 	else
 	{
-		node->output[0] = 0;
+		this->output[0] = 0;
 	}
 }
 
 
 DISCRETE_RESET(dss_adsrenv)
 {
-	DISCRETE_STEP_CALL(dss_adsrenv);
+	this->step();
 }

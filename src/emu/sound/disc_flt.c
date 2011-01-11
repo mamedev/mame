@@ -27,118 +27,6 @@
  *
  ************************************************************************/
 
-struct dst_filter1_context
-{
-	double x1;		/* x[k-1], previous input value */
-	double y1;		/* y[k-1], previous output value */
-	double a1;		/* digital filter coefficients, denominator */
-	double b0, b1;		/* digital filter coefficients, numerator */
-};
-
-struct dst_filter2_context
-{
-	double x1, x2;		/* x[k-1], x[k-2], previous 2 input values */
-	double y1, y2;		/* y[k-1], y[k-2], previous 2 output values */
-	double a1, a2;		/* digital filter coefficients, denominator */
-	double b0, b1, b2;	/* digital filter coefficients, numerator */
-};
-
-struct dst_op_amp_filt_context
-{
-	int		type;		/* What kind of filter */
-	int		is_norton;	/* 1 = Norton op-amps */
-	double	vRef;
-	double	vP;
-	double	vN;
-	double	rTotal;		/* All input resistance in parallel. */
-	double	iFixed;		/* Current supplied by r3 & r4 if used. */
-	double	exponentC1;
-	double	exponentC2;
-	double	exponentC3;
-	double	rRatio;		/* divide ratio of resistance network */
-	double	vC1;		/* Charge on C1 */
-	double	vC1b;		/* Charge on C1, part of C1 charge if needed */
-	double	vC2;		/* Charge on C2 */
-	double	vC3;		/* Charge on C2 */
-	double	gain;		/* Gain of the filter */
-	double  x1, x2;		/* x[k-1], x[k-2], previous 2 input values */
-	double  y1, y2;		/* y[k-1], y[k-2], previous 2 output values */
-	double  a1,a2;		/* digital filter coefficients, denominator */
-	double  b0,b1,b2;	/* digital filter coefficients, numerator */
-};
-
-struct dst_rc_circuit_1_context
-{
-	double v_cap;
-	double v_charge_1_2;
-	double v_drop;
-	double exp_1;
-	double exp_1_2;
-	double exp_2;
-};
-
-struct dst_rcdisc_context
-{
-	int state;
-	double t;           /* time */
-	double exponent0;
-	double exponent1;
-	double v_cap;		/* rcdisc5 */
-	double v_diode;		/* rcdisc3 */
-};
-
-struct dst_rcdisc_mod_context
-{
-	double	v_cap;
-	double	exp_low[2];
-	double	exp_high[4];
-	double	gain[2];
-	double	vd_gain[4];
-};
-
-struct dst_rcdisc4_context
-{
-	int		type;
-	double	max_out;
-	double	vC1;
-	double	v[2];
-	double	exp[2];
-};
-
-struct dst_rcfilter_context
-{
-	double	vCap;
-	double	rc;
-	double	exponent;
-	UINT8	has_rc_nodes;
-	UINT8	is_fast;
-};
-
-struct dst_rcfilter_sw_context
-{
-	double	vCap[4];
-	double	exp[4];
-	double  exp0;	/* fast case bit 0 */
-	double  exp1;	/* fast case bit 1 */
-	double  factor; /* fast case */
-	double  f1[16];
-	double  f2[16];
-};
-
-struct dst_rcintegrate_context
-{
-	int		type;
-	double	gain_r1_r2;
-	double	f;				/* r2,r3 gain */
-	double	vCap;
-	double	vCE;
-	double	exponent0;
-	double	exponent1;
-	double	exp_exponent0;
-	double	exp_exponent1;
-	double	c_exp0;
-	double	c_exp1;
-};
 
 /************************************************************************
  *
@@ -166,13 +54,13 @@ DISCRETE_STEP(dst_crfilter)
 		if (rc != context->rc)
 		{
 			context->rc = rc;
-			context->exponent = RC_CHARGE_EXP(rc);
+			context->exponent = RC_CHARGE_EXP_CLASS(rc);
 		}
 	}
 
 	double v_out = DST_CRFILTER__IN - context->vCap;
 	double v_diff = v_out - DST_CRFILTER__VREF;
-	node->output[0] = v_out;
+	this->output[0] = v_out;
 	context->vCap += v_diff * context->exponent;
 }
 
@@ -180,11 +68,11 @@ DISCRETE_RESET(dst_crfilter)
 {
 	DISCRETE_DECLARE_CONTEXT(dst_rcfilter)
 
-	context->has_rc_nodes = node->input_is_node() & 0x6;
+	context->has_rc_nodes = this->input_is_node() & 0x6;
 	context->rc = DST_CRFILTER__R * DST_CRFILTER__C;
-	context->exponent = RC_CHARGE_EXP(context->rc);
+	context->exponent = RC_CHARGE_EXP_CLASS(context->rc);
 	context->vCap = 0;
-	node->output[0] = DST_CRFILTER__IN;
+	this->output[0] = DST_CRFILTER__IN;
 }
 
 
@@ -241,18 +129,18 @@ DISCRETE_STEP(dst_filter1)
 		gain = 0.0;
 	}
 
-	node->output[0] = -context->a1*context->y1 + context->b0*gain*DST_FILTER1__IN + context->b1*context->x1;
+	this->output[0] = -context->a1*context->y1 + context->b0*gain*DST_FILTER1__IN + context->b1*context->x1;
 
 	context->x1 = gain*DST_FILTER1__IN;
-	context->y1 = node->output[0];
+	context->y1 = this->output[0];
 }
 
 DISCRETE_RESET(dst_filter1)
 {
 	DISCRETE_DECLARE_CONTEXT(dst_filter1)
 
-	calculate_filter1_coefficients(node, DST_FILTER1__FREQ, DST_FILTER1__TYPE, &context->a1, &context->b0, &context->b1);
-	node->output[0] = 0;
+	calculate_filter1_coefficients(this, DST_FILTER1__FREQ, DST_FILTER1__TYPE, &context->a1, &context->b0, &context->b1);
+	this->output[0] = 0;
 }
 
 
@@ -327,23 +215,23 @@ DISCRETE_STEP(dst_filter2)
 		gain = 0.0;
 	}
 
-	node->output[0] = -context->a1 * context->y1 - context->a2 * context->y2 +
+	this->output[0] = -context->a1 * context->y1 - context->a2 * context->y2 +
 					context->b0 * gain * DST_FILTER2__IN + context->b1 * context->x1 + context->b2 * context->x2;
 
 	context->x2 = context->x1;
 	context->x1 = gain * DST_FILTER2__IN;
 	context->y2 = context->y1;
-	context->y1 = node->output[0];
+	context->y1 = this->output[0];
 }
 
 DISCRETE_RESET(dst_filter2)
 {
 	DISCRETE_DECLARE_CONTEXT(dst_filter2)
 
-	calculate_filter2_coefficients(node, DST_FILTER2__FREQ, DST_FILTER2__DAMP, DST_FILTER2__TYPE,
+	calculate_filter2_coefficients(this, DST_FILTER2__FREQ, DST_FILTER2__DAMP, DST_FILTER2__TYPE,
 								   &context->a1, &context->a2,
 								   &context->b0, &context->b1, &context->b2);
-	node->output[0] = 0;
+	this->output[0] = 0;
 }
 
 
@@ -405,46 +293,46 @@ DISCRETE_STEP(dst_op_amp_filt)
 		{
 			case DISC_OP_AMP_FILTER_IS_LOW_PASS_1:
 				context->vC1 += (v - context->vC1) * context->exponentC1;
-				node->output[0] = context->vC1 * context->gain + info->vRef;
+				this->output[0] = context->vC1 * context->gain + info->vRef;
 				break;
 
 			case DISC_OP_AMP_FILTER_IS_LOW_PASS_1_A:
 				context->vC1 += (v - context->vC1) * context->exponentC1;
-				node->output[0] = context->vC1 * context->gain + DST_OP_AMP_FILT__INP2;
+				this->output[0] = context->vC1 * context->gain + DST_OP_AMP_FILT__INP2;
 				break;
 
 			case DISC_OP_AMP_FILTER_IS_HIGH_PASS_1:
-				node->output[0] = (v - context->vC1) * context->gain + info->vRef;
+				this->output[0] = (v - context->vC1) * context->gain + info->vRef;
 				context->vC1 += (v - context->vC1) * context->exponentC1;
 				break;
 
 			case DISC_OP_AMP_FILTER_IS_BAND_PASS_1:
-				node->output[0] = (v - context->vC2);
+				this->output[0] = (v - context->vC2);
 				context->vC2 += (v - context->vC2) * context->exponentC2;
-				context->vC1 += (node->output[0] - context->vC1) * context->exponentC1;
-				node->output[0] = context->vC1 * context->gain + info->vRef;
+				context->vC1 += (this->output[0] - context->vC1) * context->exponentC1;
+				this->output[0] = context->vC1 * context->gain + info->vRef;
 				break;
 
 			case DISC_OP_AMP_FILTER_IS_BAND_PASS_0 | DISC_OP_AMP_IS_NORTON:
 				context->vC1 += (v - context->vC1) * context->exponentC1;
 				context->vC2 += (context->vC1 - context->vC2) * context->exponentC2;
 				v = context->vC2;
-				node->output[0] = v - context->vC3;
+				this->output[0] = v - context->vC3;
 				context->vC3 += (v - context->vC3) * context->exponentC3;
-				i = node->output[0] / context->rTotal;
-				node->output[0] = (context->iFixed - i) * info->rF;
+				i = this->output[0] / context->rTotal;
+				this->output[0] = (context->iFixed - i) * info->rF;
 				break;
 
 			case DISC_OP_AMP_FILTER_IS_HIGH_PASS_0 | DISC_OP_AMP_IS_NORTON:
-				node->output[0] = v - context->vC1;
+				this->output[0] = v - context->vC1;
 				context->vC1 += (v - context->vC1) * context->exponentC1;
-				i = node->output[0] / context->rTotal;
-				node->output[0] = (context->iFixed - i) * info->rF;
+				i = this->output[0] / context->rTotal;
+				this->output[0] = (context->iFixed - i) * info->rF;
 				break;
 
 			case DISC_OP_AMP_FILTER_IS_BAND_PASS_1M:
 			case DISC_OP_AMP_FILTER_IS_BAND_PASS_1M | DISC_OP_AMP_IS_NORTON:
-				node->output[0] = -context->a1 * context->y1 - context->a2 * context->y2 +
+				this->output[0] = -context->a1 * context->y1 - context->a2 * context->y2 +
 								context->b0 * v + context->b1 * context->x1 + context->b2 * context->x2 +
 								context->vRef;
 				context->x2 = context->x1;
@@ -456,12 +344,12 @@ DISCRETE_STEP(dst_op_amp_filt)
 		/* Clip the output to the voltage rails.
          * This way we get the original distortion in all it's glory.
          */
-		if (node->output[0] > context->vP) node->output[0] = context->vP;
-		if (node->output[0] < context->vN) node->output[0] = context->vN;
-		context->y1 = node->output[0] - context->vRef;
+		if (this->output[0] > context->vP) this->output[0] = context->vP;
+		if (this->output[0] < context->vN) this->output[0] = context->vN;
+		context->y1 = this->output[0] - context->vRef;
 	}
 	else
-		node->output[0] = 0;
+		this->output[0] = 0;
 
 }
 
@@ -511,16 +399,16 @@ DISCRETE_RESET(dst_op_amp_filt)
 	{
 		case DISC_OP_AMP_FILTER_IS_LOW_PASS_1:
 		case DISC_OP_AMP_FILTER_IS_LOW_PASS_1_A:
-			context->exponentC1 = RC_CHARGE_EXP(info->rF * info->c1);
+			context->exponentC1 = RC_CHARGE_EXP_CLASS(info->rF * info->c1);
 			context->exponentC2 =  0;
 			break;
 		case DISC_OP_AMP_FILTER_IS_HIGH_PASS_1:
-			context->exponentC1 = RC_CHARGE_EXP(context->rTotal * info->c1);
+			context->exponentC1 = RC_CHARGE_EXP_CLASS(context->rTotal * info->c1);
 			context->exponentC2 =  0;
 			break;
 		case DISC_OP_AMP_FILTER_IS_BAND_PASS_1:
-			context->exponentC1 = RC_CHARGE_EXP(info->rF * info->c1);
-			context->exponentC2 = RC_CHARGE_EXP(context->rTotal * info->c2);
+			context->exponentC1 = RC_CHARGE_EXP_CLASS(info->rF * info->c1);
+			context->exponentC2 = RC_CHARGE_EXP_CLASS(context->rTotal * info->c2);
 			break;
 		case DISC_OP_AMP_FILTER_IS_BAND_PASS_1M | DISC_OP_AMP_IS_NORTON:
 			if (info->r2 == 0)
@@ -533,7 +421,7 @@ DISCRETE_RESET(dst_op_amp_filt)
 			double d  = (info->c1 + info->c2) / sqrt(info->rF / context->rTotal * info->c1 * info->c2);
 			double gain = -info->rF / context->rTotal * info->c2 / (info->c1 + info->c2);
 
-			calculate_filter2_coefficients(node, fc, d, DISC_FILTER_BANDPASS,
+			calculate_filter2_coefficients(this, fc, d, DISC_FILTER_BANDPASS,
 										   &context->a1, &context->a2,
 										   &context->b0, &context->b1, &context->b2);
 			context->b0 *= gain;
@@ -548,12 +436,12 @@ DISCRETE_RESET(dst_op_amp_filt)
 			break;
 		}
 		case DISC_OP_AMP_FILTER_IS_BAND_PASS_0 | DISC_OP_AMP_IS_NORTON:
-			context->exponentC1 = RC_CHARGE_EXP(RES_2_PARALLEL(info->r1, info->r2 + info->r3 + info->r4) * info->c1);
-			context->exponentC2 = RC_CHARGE_EXP(RES_2_PARALLEL(info->r1 + info->r2, info->r3 + info->r4) * info->c2);
-			context->exponentC3 = RC_CHARGE_EXP((info->r1 + info->r2 + info->r3 + info->r4) * info->c3);
+			context->exponentC1 = RC_CHARGE_EXP_CLASS(RES_2_PARALLEL(info->r1, info->r2 + info->r3 + info->r4) * info->c1);
+			context->exponentC2 = RC_CHARGE_EXP_CLASS(RES_2_PARALLEL(info->r1 + info->r2, info->r3 + info->r4) * info->c2);
+			context->exponentC3 = RC_CHARGE_EXP_CLASS((info->r1 + info->r2 + info->r3 + info->r4) * info->c3);
 			break;
 		case DISC_OP_AMP_FILTER_IS_HIGH_PASS_0 | DISC_OP_AMP_IS_NORTON:
-			context->exponentC1 = RC_CHARGE_EXP(info->r1 * info->c1);
+			context->exponentC1 = RC_CHARGE_EXP_CLASS(info->r1 * info->c1);
 			break;
 	}
 
@@ -563,7 +451,7 @@ DISCRETE_RESET(dst_op_amp_filt)
 	context->vC2 = 0;
 	context->vC3 = 0;
 
-	node->output[0] = info->vRef;
+	this->output[0] = info->vRef;
 }
 
 
@@ -587,12 +475,12 @@ DISCRETE_STEP( dst_rc_circuit_1 )
 		if (DST_RC_CIRCUIT_1__IN1 == 0)
 			/* cap is floating and does not change charge */
 			/* output is pulled to ground */
-			node->output[0] = 0;
+			this->output[0] = 0;
 		else
 		{
 			/* cap is discharged */
 			context->v_cap -= context->v_cap * context->exp_2;
-			node->output[0] = context->v_cap * context->v_drop;
+			this->output[0] = context->v_cap * context->v_drop;
 		}
 	else
 		if (DST_RC_CIRCUIT_1__IN1 == 0)
@@ -600,13 +488,13 @@ DISCRETE_STEP( dst_rc_circuit_1 )
 			/* cap is charged */
 			context->v_cap += (5.0 - context->v_cap) * context->exp_1;
 			/* output is pulled to ground */
-			node->output[0] = 0;
+			this->output[0] = 0;
 		}
 		else
 		{
 			/* cap is charged slightly less */
 			context->v_cap += (context->v_charge_1_2 - context->v_cap) * context->exp_1_2;
-			node->output[0] = context->v_cap * context->v_drop;
+			this->output[0] = context->v_cap * context->v_drop;
 		}
 }
 
@@ -621,14 +509,14 @@ DISCRETE_RESET( dst_rc_circuit_1 )
 
 	/* precalculate charging exponents */
 	/* discharge cap - in1 = 0, in2 = 1*/
-	context->exp_2 = RC_CHARGE_EXP((CD4066_R_ON + DST_RC_CIRCUIT_1__R) * DST_RC_CIRCUIT_1__C);
+	context->exp_2 = RC_CHARGE_EXP_CLASS((CD4066_R_ON + DST_RC_CIRCUIT_1__R) * DST_RC_CIRCUIT_1__C);
 	/* charge cap - in1 = 1, in2 = 0 */
-	context->exp_1 = RC_CHARGE_EXP(CD4066_R_ON * DST_RC_CIRCUIT_1__C);
+	context->exp_1 = RC_CHARGE_EXP_CLASS(CD4066_R_ON * DST_RC_CIRCUIT_1__C);
 	/* charge cap - in1 = 1, in2 = 1 */
-	context->exp_1_2 = RC_CHARGE_EXP(RES_2_PARALLEL(CD4066_R_ON, CD4066_R_ON + DST_RC_CIRCUIT_1__R) * DST_RC_CIRCUIT_1__C);
+	context->exp_1_2 = RC_CHARGE_EXP_CLASS(RES_2_PARALLEL(CD4066_R_ON, CD4066_R_ON + DST_RC_CIRCUIT_1__R) * DST_RC_CIRCUIT_1__C);
 
 	/* starts at 0 until cap starts charging */
-	node->output[0] = 0;
+	this->output[0] = 0;
 }
 
 /************************************************************************
@@ -659,14 +547,14 @@ DISCRETE_STEP(dst_rcdisc)
 				context->state = 1;
 				context->t = 0;
 			}
-			node->output[0] = 0;
+			this->output[0] = 0;
 			break;
 
 		case 1:
 			if (DST_RCDISC__ENABLE)
 			{
-				node->output[0] = DST_RCDISC__IN * exp(context->t / context->exponent0);
-				context->t += node->sample_time();
+				this->output[0] = DST_RCDISC__IN * exp(context->t / context->exponent0);
+				context->t += this->sample_time();
 			} else
 			{
 				context->state = 0;
@@ -678,7 +566,7 @@ DISCRETE_RESET(dst_rcdisc)
 {
 	DISCRETE_DECLARE_CONTEXT(dst_rcdisc)
 
-	node->output[0] = 0;
+	this->output[0] = 0;
 
 	context->state = 0;
 	context->t = 0;
@@ -715,21 +603,21 @@ DISCRETE_STEP(dst_rcdisc2)
 	/* Works differently to other as we are always on, no enable */
 	/* exponential based in difference between input/output   */
 
-	diff = ((DST_RCDISC2__ENABLE == 0) ? DST_RCDISC2__IN0 : DST_RCDISC2__IN1) - node->output[0];
+	diff = ((DST_RCDISC2__ENABLE == 0) ? DST_RCDISC2__IN0 : DST_RCDISC2__IN1) - this->output[0];
 	diff = diff - (diff * ((DST_RCDISC2__ENABLE == 0) ? context->exponent0 : context->exponent1));
-	node->output[0] += diff;
+	this->output[0] += diff;
 }
 
 DISCRETE_RESET(dst_rcdisc2)
 {
 	DISCRETE_DECLARE_CONTEXT(dst_rcdisc)
 
-	node->output[0] = 0;
+	this->output[0] = 0;
 
 	context->state = 0;
 	context->t = 0;
-	context->exponent0 = RC_DISCHARGE_EXP(DST_RCDISC2__R0 * DST_RCDISC2__C);
-	context->exponent1 = RC_DISCHARGE_EXP(DST_RCDISC2__R1 * DST_RCDISC2__C);
+	context->exponent0 = RC_DISCHARGE_EXP_CLASS(DST_RCDISC2__R0 * DST_RCDISC2__C);
+	context->exponent1 = RC_DISCHARGE_EXP_CLASS(DST_RCDISC2__R1 * DST_RCDISC2__C);
 }
 
 /************************************************************************
@@ -762,7 +650,7 @@ DISCRETE_STEP(dst_rcdisc3)
 
 	if(DST_RCDISC3__ENABLE)
 	{
-		diff = DST_RCDISC3__IN - node->output[0];
+		diff = DST_RCDISC3__IN - this->output[0];
 		if (context->v_diode > 0)
 		{
 			if (diff > 0)
@@ -793,11 +681,11 @@ DISCRETE_STEP(dst_rcdisc3)
 				diff = diff * context->exponent0;
 			}
 		}
-		node->output[0] += diff;
+		this->output[0] += diff;
 	}
 	else
 	{
-		node->output[0] = 0;
+		this->output[0] = 0;
 	}
 }
 
@@ -805,13 +693,13 @@ DISCRETE_RESET(dst_rcdisc3)
 {
 	DISCRETE_DECLARE_CONTEXT(dst_rcdisc)
 
-	node->output[0] = 0;
+	this->output[0] = 0;
 
 	context->state = 0;
 	context->t = 0;
 	context->v_diode = DST_RCDISC3__DJV;
-	context->exponent0 = RC_CHARGE_EXP(DST_RCDISC3__R1 * DST_RCDISC3__C);
-	context->exponent1 = RC_CHARGE_EXP(RES_2_PARALLEL(DST_RCDISC3__R1, DST_RCDISC3__R2) * DST_RCDISC3__C);
+	context->exponent0 = RC_CHARGE_EXP_CLASS(DST_RCDISC3__R1 * DST_RCDISC3__C);
+	context->exponent1 = RC_CHARGE_EXP_CLASS(RES_2_PARALLEL(DST_RCDISC3__R1, DST_RCDISC3__R2) * DST_RCDISC3__C);
 }
 
 
@@ -845,7 +733,7 @@ DISCRETE_STEP(dst_rcdisc4)
 
 	if (DST_RCDISC4__ENABLE == 0)
 	{
-		node->output[0] = 0;
+		this->output[0] = 0;
 		return;
 	}
 
@@ -854,13 +742,13 @@ DISCRETE_STEP(dst_rcdisc4)
 		case 1:
 		case 3:
 			context->vC1 += ((context->v[inp1] - context->vC1) * context->exp[inp1]);
-			node->output[0] = context->vC1;
+			this->output[0] = context->vC1;
 			break;
 	}
 
 	/* clip output */
-	if (node->output[0] > context->max_out) node->output[0] = context->max_out;
-	if (node->output[0] < 0) node->output[0] = 0;
+	if (this->output[0] > context->max_out) this->output[0] = context->max_out;
+	if (this->output[0] < 0) this->output[0] = 0;
 }
 
 DISCRETE_RESET( dst_rcdisc4)
@@ -873,17 +761,17 @@ DISCRETE_RESET( dst_rcdisc4)
 	/* some error checking. */
 	if (DST_RCDISC4__R1 <= 0 || DST_RCDISC4__R2 <= 0 || DST_RCDISC4__C1 <= 0 || (DST_RCDISC4__R3 <= 0 &&  context->type == 1))
 	{
-		node->device->discrete_log("Invalid component values in NODE_%d.\n", node->index());
+		this->device->discrete_log("Invalid component values in NODE_%d.\n", this->index());
 		return;
 	}
 	if (DST_RCDISC4__VP < 3)
 	{
-		node->device->discrete_log("vP must be >= 3V in NODE_%d.\n", node->index());
+		this->device->discrete_log("vP must be >= 3V in NODE_%d.\n", this->index());
 		return;
 	}
 	if (DST_RCDISC4__TYPE < 1 || DST_RCDISC4__TYPE > 3)
 	{
-		node->device->discrete_log("Invalid circuit type in NODE_%d.\n", node->index());
+		this->device->discrete_log("Invalid circuit type in NODE_%d.\n", this->index());
 		return;
 	}
 
@@ -907,14 +795,14 @@ DISCRETE_RESET( dst_rcdisc4)
 			i  = v / rT;
 			context->v[1] = i * r + .5;
 			rT = RES_2_PARALLEL(DST_RCDISC4__R2, r);
-			context->exp[1] = RC_CHARGE_EXP(rT * DST_RCDISC4__C1);
+			context->exp[1] = RC_CHARGE_EXP_CLASS(rT * DST_RCDISC4__C1);
 
 			/* When the input is 0, R1 is out of circuit. */
 			rT = DST_RCDISC4__R2 + DST_RCDISC4__R3;
 			i  = v / rT;
 			context->v[0] = i * DST_RCDISC4__R3 + .5;
 			rT = RES_2_PARALLEL(DST_RCDISC4__R2, DST_RCDISC4__R3);
-			context->exp[0] = RC_CHARGE_EXP(rT * DST_RCDISC4__C1);
+			context->exp[0] = RC_CHARGE_EXP_CLASS(rT * DST_RCDISC4__C1);
 			break;
 
 		case 3:
@@ -925,11 +813,11 @@ DISCRETE_RESET( dst_rcdisc4)
 			r = 500.0 + DST_RCDISC4__R1;
 			context->v[1] = RES_VOLTAGE_DIVIDER(r, DST_RCDISC4__R2) * (5.0 - 0.5);
 			rT = RES_2_PARALLEL(r, DST_RCDISC4__R2);
-			context->exp[1] = RC_CHARGE_EXP(rT * DST_RCDISC4__C1);
+			context->exp[1] = RC_CHARGE_EXP_CLASS(rT * DST_RCDISC4__C1);
 
 			/* When the input is 0, R1 is out of circuit. */
 			context->v[0] = 0;
-			context->exp[0] = RC_CHARGE_EXP(DST_RCDISC4__R2 * DST_RCDISC4__C1);
+			context->exp[0] = RC_CHARGE_EXP_CLASS(DST_RCDISC4__R2 * DST_RCDISC4__C1);
 			break;
 	}
 }
@@ -969,14 +857,14 @@ DISCRETE_STEP( dst_rcdisc5)
 			diff = diff * context->exponent0;
 
 		context->v_cap += diff;
-		node->output[0] = context->v_cap;
+		this->output[0] = context->v_cap;
 	}
 	else
 	{
 		if(diff > 0)
 			context->v_cap = u;
 
-		node->output[0] = 0;
+		this->output[0] = 0;
 	}
 }
 
@@ -984,12 +872,12 @@ DISCRETE_RESET( dst_rcdisc5)
 {
 	DISCRETE_DECLARE_CONTEXT(dst_rcdisc)
 
-	node->output[0] = 0;
+	this->output[0] = 0;
 
 	context->state = 0;
 	context->t = 0;
 	context->v_cap = 0;
-	context->exponent0 = RC_CHARGE_EXP(DST_RCDISC5__R * DST_RCDISC5__C);
+	context->exponent0 = RC_CHARGE_EXP_CLASS(DST_RCDISC5__R * DST_RCDISC5__C);
 }
 
 
@@ -1040,14 +928,14 @@ DISCRETE_STEP(dst_rcdisc_mod)
 		diff  = u + 0.6 - v_cap;
 		diff -= diff * context->exp_low[mod1_state];
 		v_cap += diff;
-		node->output[0] = mod2_state ? 0 : -0.6;
+		this->output[0] = mod2_state ? 0 : -0.6;
 	}
 	else
 	{
 		diff  -= diff * context->exp_high[mod_state];
 		v_cap += diff;
 		/* neglecting current through R3 drawn by next8 node */
-		node->output[0] = mod2_state ? 0: (u - v_cap) * context->gain[mod1_state];
+		this->output[0] = mod2_state ? 0: (u - v_cap) * context->gain[mod1_state];
 	}
 	context->v_cap = v_cap;
 }
@@ -1062,32 +950,32 @@ DISCRETE_RESET(dst_rcdisc_mod)
 	/* DST_RCDISC_MOD__IN1 <= 0.5 */
 	rc[0] = DST_RCDISC_MOD__R1 + DST_RCDISC_MOD__R2;
 	if (rc[0] < 1) rc[0] = 1;
-	context->exp_low[0]  = RC_DISCHARGE_EXP(DST_RCDISC_MOD__C * rc[0]);
+	context->exp_low[0]  = RC_DISCHARGE_EXP_CLASS(DST_RCDISC_MOD__C * rc[0]);
 	context->gain[0]     = RES_VOLTAGE_DIVIDER(rc[0], DST_RCDISC_MOD__R4);
 	/* DST_RCDISC_MOD__IN1 > 0.5 */
 	rc[1] = DST_RCDISC_MOD__R2;
 	if (rc[1] < 1) rc[1] = 1;
-	context->exp_low[1]  = RC_DISCHARGE_EXP(DST_RCDISC_MOD__C * rc[1]);
+	context->exp_low[1]  = RC_DISCHARGE_EXP_CLASS(DST_RCDISC_MOD__C * rc[1]);
 	context->gain[1]     = RES_VOLTAGE_DIVIDER(rc[1], DST_RCDISC_MOD__R4);
 	/* DST_RCDISC_MOD__IN2 <= 0.6 */
 	rc2[0] = DST_RCDISC_MOD__R4;
 	/* DST_RCDISC_MOD__IN2 > 0.6 */
 	rc2[1] = RES_2_PARALLEL(DST_RCDISC_MOD__R3, DST_RCDISC_MOD__R4);
 	/* DST_RCDISC_MOD__IN1 <= 0.5 && DST_RCDISC_MOD__IN2 <= 0.6 */
-	context->exp_high[0] = RC_DISCHARGE_EXP(DST_RCDISC_MOD__C * (rc[0] + rc2[0]));
+	context->exp_high[0] = RC_DISCHARGE_EXP_CLASS(DST_RCDISC_MOD__C * (rc[0] + rc2[0]));
 	context->vd_gain[0]  = RES_VOLTAGE_DIVIDER(rc[0], rc2[0]);
 	/* DST_RCDISC_MOD__IN1 > 0.5  && DST_RCDISC_MOD__IN2 <= 0.6 */
-	context->exp_high[1] = RC_DISCHARGE_EXP(DST_RCDISC_MOD__C * (rc[1] + rc2[0]));
+	context->exp_high[1] = RC_DISCHARGE_EXP_CLASS(DST_RCDISC_MOD__C * (rc[1] + rc2[0]));
 	context->vd_gain[1]  = RES_VOLTAGE_DIVIDER(rc[1], rc2[0]);
 	/* DST_RCDISC_MOD__IN1 <= 0.5 && DST_RCDISC_MOD__IN2 > 0.6 */
-	context->exp_high[2] = RC_DISCHARGE_EXP(DST_RCDISC_MOD__C * (rc[0] + rc2[1]));
+	context->exp_high[2] = RC_DISCHARGE_EXP_CLASS(DST_RCDISC_MOD__C * (rc[0] + rc2[1]));
 	context->vd_gain[2]  = RES_VOLTAGE_DIVIDER(rc[0], rc2[1]);
 	/* DST_RCDISC_MOD__IN1 > 0.5  && DST_RCDISC_MOD__IN2 > 0.6 */
-	context->exp_high[3] = RC_DISCHARGE_EXP(DST_RCDISC_MOD__C * (rc[1] + rc2[1]));
+	context->exp_high[3] = RC_DISCHARGE_EXP_CLASS(DST_RCDISC_MOD__C * (rc[1] + rc2[1]));
 	context->vd_gain[3]  = RES_VOLTAGE_DIVIDER(rc[1], rc2[1]);
 
 	context->v_cap  = 0;
-	node->output[0] = 0;
+	this->output[0] = 0;
 }
 
 /************************************************************************
@@ -1111,7 +999,7 @@ DISCRETE_STEP(dst_rcfilter)
 	DISCRETE_DECLARE_CONTEXT(dst_rcfilter)
 
 	if (EXPECTED(context->is_fast))
-		node->output[0] += ((DST_RCFILTER__VIN - node->output[0]) * context->exponent);
+		this->output[0] += ((DST_RCFILTER__VIN - this->output[0]) * context->exponent);
 	else
 	{
 		if (UNEXPECTED(context->has_rc_nodes))
@@ -1120,7 +1008,7 @@ DISCRETE_STEP(dst_rcfilter)
 			if (rc != context->rc)
 			{
 				context->rc = rc;
-				context->exponent = RC_CHARGE_EXP(rc);
+				context->exponent = RC_CHARGE_EXP_CLASS(rc);
 			}
 		}
 
@@ -1128,8 +1016,8 @@ DISCRETE_STEP(dst_rcfilter)
 		/* Next Value = PREV + (INPUT_VALUE - PREV)*(1-(EXP(-TIMEDELTA/RC)))    */
 		/************************************************************************/
 
-		context->vCap += ((DST_RCFILTER__VIN - node->output[0]) * context->exponent);
-		node->output[0] = context->vCap + DST_RCFILTER__VREF;
+		context->vCap += ((DST_RCFILTER__VIN - this->output[0]) * context->exponent);
+		this->output[0] = context->vCap + DST_RCFILTER__VREF;
 	}
 }
 
@@ -1138,11 +1026,11 @@ DISCRETE_RESET(dst_rcfilter)
 {
 	DISCRETE_DECLARE_CONTEXT(dst_rcfilter)
 
-	context->has_rc_nodes = node->input_is_node() & 0x6;
+	context->has_rc_nodes = this->input_is_node() & 0x6;
 	context->rc = DST_RCFILTER__R * DST_RCFILTER__C;
-	context->exponent = RC_CHARGE_EXP(context->rc);
+	context->exponent = RC_CHARGE_EXP_CLASS(context->rc);
 	context->vCap   = 0;
-	node->output[0] = 0;
+	this->output[0] = 0;
 	/* FIXME --> we really need another class here */
 	if (!context->has_rc_nodes && DST_RCFILTER__VREF == 0)
 		context->is_fast = 1;
@@ -1192,15 +1080,15 @@ DISCRETE_STEP(dst_rcfilter_sw)
 		switch (bits)
 		{
 		case 0:
-			node->output[0] = vIn;
+			this->output[0] = vIn;
 			break;
 		case 1:
 			context->vCap[0] += (vIn - context->vCap[0]) * context->exp0;
-			node->output[0] = context->vCap[0] + (vIn - context->vCap[0]) * context->factor;
+			this->output[0] = context->vCap[0] + (vIn - context->vCap[0]) * context->factor;
 			break;
 		case 2:
 			context->vCap[1] += (vIn - context->vCap[1]) * context->exp1;
-			node->output[0] = context->vCap[1] + (vIn - context->vCap[1]) * context->factor;
+			this->output[0] = context->vCap[1] + (vIn - context->vCap[1]) * context->factor;
 			break;
 		default:
 			for (i = 0; i < 4; i++)
@@ -1208,17 +1096,17 @@ DISCRETE_STEP(dst_rcfilter_sw)
 				if (( bits & (1 << i)) != 0)
 					us += context->vCap[i];
 			}
-			node->output[0] = context->f1[bits] * vIn + context->f2[bits]  * us;
+			this->output[0] = context->f1[bits] * vIn + context->f2[bits]  * us;
 			for (i = 0; i < 4; i++)
 			{
 				if (( bits & (1 << i)) != 0)
-					context->vCap[i] += (node->output[0] - context->vCap[i]) * context->exp[i];
+					context->vCap[i] += (this->output[0] - context->vCap[i]) * context->exp[i];
 			}
 		}
 	}
 	else
 	{
-		node->output[0] = 0;
+		this->output[0] = 0;
 	}
 }
 
@@ -1231,7 +1119,7 @@ DISCRETE_RESET(dst_rcfilter_sw)
 	for (i = 0; i < 4; i++)
 	{
 		context->vCap[i] = 0;
-		context->exp[i] = RC_CHARGE_EXP( CD4066_ON_RES * DST_RCFILTER_SW__C(i));
+		context->exp[i] = RC_CHARGE_EXP_CLASS( CD4066_ON_RES * DST_RCFILTER_SW__C(i));
 	}
 
 	for (bits=0; bits < 15; bits++)
@@ -1249,11 +1137,11 @@ DISCRETE_RESET(dst_rcfilter_sw)
 
 
 	/* fast cases */
-	context->exp0 = RC_CHARGE_EXP((CD4066_ON_RES + DST_RCFILTER_SW__R) * DST_RCFILTER_SW__C(0));
-	context->exp1 = RC_CHARGE_EXP((CD4066_ON_RES + DST_RCFILTER_SW__R) * DST_RCFILTER_SW__C(1));
+	context->exp0 = RC_CHARGE_EXP_CLASS((CD4066_ON_RES + DST_RCFILTER_SW__R) * DST_RCFILTER_SW__C(0));
+	context->exp1 = RC_CHARGE_EXP_CLASS((CD4066_ON_RES + DST_RCFILTER_SW__R) * DST_RCFILTER_SW__C(1));
 	context->factor = RES_VOLTAGE_DIVIDER(DST_RCFILTER_SW__R, CD4066_ON_RES);
 
-	node->output[0] = 0;
+	this->output[0] = 0;
 }
 
 
@@ -1345,13 +1233,13 @@ DISCRETE_STEP( dst_rcintegrate)
 	switch (context->type)
 	{
 		case DISC_RC_INTEGRATE_TYPE1:
-			node->output[0] = context->vCap;
+			this->output[0] = context->vCap;
 			break;
 		case DISC_RC_INTEGRATE_TYPE2:
-			node->output[0] = vE;
+			this->output[0] = vE;
 			break;
 		case DISC_RC_INTEGRATE_TYPE3:
-			node->output[0] = MAX(0, vP - iQ * DST_RCINTEGRATE__R3);
+			this->output[0] = MAX(0, vP - iQ * DST_RCINTEGRATE__R3);
 			break;
 	}
 }
@@ -1360,7 +1248,7 @@ DISCRETE_RESET(dst_rcintegrate)
 	DISCRETE_DECLARE_CONTEXT(dst_rcintegrate)
 
 	double r;
-	double dt = node->sample_time();
+	double dt = this->sample_time();
 
 	context->type = DST_RCINTEGRATE__TYPE;
 
@@ -1380,7 +1268,7 @@ DISCRETE_RESET(dst_rcintegrate)
 	context->c_exp0 =  DST_RCINTEGRATE__C / context->exponent0 * context->exp_exponent0;
 	context->c_exp1 =  DST_RCINTEGRATE__C / context->exponent1 * context->exp_exponent1;
 
-	node->output[0] = 0;
+	this->output[0] = 0;
 }
 
 /************************************************************************
@@ -1410,13 +1298,13 @@ DISCRETE_STEP(dst_sallen_key)
 		gain = 0.0;
 	}
 
-	node->output[0] = -context->a1 * context->y1 - context->a2 * context->y2 +
+	this->output[0] = -context->a1 * context->y1 - context->a2 * context->y2 +
 					context->b0 * gain * DST_SALLEN_KEY__INP0 + context->b1 * context->x1 + context->b2 * context->x2;
 
 	context->x2 = context->x1;
 	context->x1 = gain * DST_SALLEN_KEY__INP0;
 	context->y2 = context->y1;
-	context->y1 = node->output[0];
+	context->y1 = this->output[0];
 }
 
 DISCRETE_RESET(dst_sallen_key)
@@ -1436,10 +1324,10 @@ DISCRETE_RESET(dst_sallen_key)
 			fatalerror("Unknown sallen key filter type");
 	}
 
-	calculate_filter2_coefficients(node, freq, 1.0 / q, DISC_FILTER_LOWPASS,
+	calculate_filter2_coefficients(this, freq, 1.0 / q, DISC_FILTER_LOWPASS,
 								   &context->a1, &context->a2,
 								   &context->b0, &context->b1, &context->b2);
-	node->output[0] = 0;
+	this->output[0] = 0;
 }
 
 
@@ -1461,6 +1349,7 @@ DISCRETE_RESET(dst_sallen_key)
 #define DST_RCFILTERN__R		DISCRETE_INPUT(2)
 #define DST_RCFILTERN__C		DISCRETE_INPUT(3)
 
+#if 0
 DISCRETE_RESET(dst_rcfilterN)
 {
 #if 0
@@ -1469,14 +1358,14 @@ DISCRETE_RESET(dst_rcfilterN)
 /* !!!!!!!!!!!!!! CAN'T CHEAT LIKE THIS !!!!!!!!!!!!!!!! */
 /* Put this stuff in a context */
 
-	node->input[2] = f;
-	node->input[3] = DISC_FILTER_LOWPASS;
+	this->input[2] = f;
+	this->input[3] = DISC_FILTER_LOWPASS;
 
 	/* Use first order filter */
 	dst_filter1_reset(node);
 #endif
 }
-
+#endif
 
 /************************************************************************
  *
@@ -1502,8 +1391,8 @@ DISCRETE_RESET(dst_rcdiscN)
 /* !!!!!!!!!!!!!! CAN'T CHEAT LIKE THIS !!!!!!!!!!!!!!!! */
 /* Put this stuff in a context */
 
-	node->input[2] = f;
-	node->input[3] = DISC_FILTER_LOWPASS;
+	this->input[2] = f;
+	this->input[3] = DISC_FILTER_LOWPASS;
 
 	/* Use first order filter */
 	dst_filter1_reset(node);
@@ -1524,12 +1413,12 @@ DISCRETE_STEP(dst_rcdiscN)
 	/* A rise in the input signal results in an instant charge, */
 	/* else discharge through the RC to zero */
 	if (gain* DST_RCDISCN__IN > context->x1)
-		node->output[0] = gain* DST_RCDISCN__IN;
+		this->output[0] = gain* DST_RCDISCN__IN;
 	else
-		node->output[0] = -context->a1*context->y1;
+		this->output[0] = -context->a1*context->y1;
 
 	context->x1 = gain* DST_RCDISCN__IN;
-	context->y1 = node->output[0];
+	context->y1 = this->output[0];
 }
 
 
@@ -1546,20 +1435,13 @@ DISCRETE_STEP(dst_rcdiscN)
  * input[5]    - Capacitor Value (initialization only)
  *
  ************************************************************************/
-#define DST_RCDISC2N__ENABLE		DISCRETE_INPUT(0)
+#define DST_RCDISC2N__ENABLE	DISCRETE_INPUT(0)
 #define DST_RCDISC2N__IN0		DISCRETE_INPUT(1)
 #define DST_RCDISC2N__R0		DISCRETE_INPUT(2)
 #define DST_RCDISC2N__IN1		DISCRETE_INPUT(3)
 #define DST_RCDISC2N__R1		DISCRETE_INPUT(4)
 #define DST_RCDISC2N__C			DISCRETE_INPUT(5)
 
-struct dst_rcdisc2_context
-{
-	double x1;			/* x[k-1], last input value */
-	double y1;			/* y[k-1], last output value */
-	double a1_0, b0_0, b1_0;	/* digital filter coefficients, filter #1 */
-	double a1_1, b0_1, b1_1;	/* digital filter coefficients, filter #2 */
-};
 
 DISCRETE_STEP(dst_rcdisc2N)
 {
@@ -1568,12 +1450,12 @@ DISCRETE_STEP(dst_rcdisc2N)
 	double input = ((DST_RCDISC2N__ENABLE == 0) ? DST_RCDISC2N__IN0 : DST_RCDISC2N__IN1);
 
 	if (DST_RCDISC2N__ENABLE == 0)
-		node->output[0] = -context->a1_0*context->y1 + context->b0_0*input + context->b1_0*context->x1;
+		this->output[0] = -context->a1_0*context->y1 + context->b0_0*input + context->b1_0*context->x1;
 	else
-		node->output[0] = -context->a1_1*context->y1 + context->b0_1*input + context->b1_1*context->x1;
+		this->output[0] = -context->a1_1*context->y1 + context->b0_1*input + context->b1_1*context->x1;
 
 	context->x1 = input;
-	context->y1 = node->output[0];
+	context->y1 = this->output[0];
 }
 
 DISCRETE_RESET(dst_rcdisc2N)
@@ -1584,9 +1466,9 @@ DISCRETE_RESET(dst_rcdisc2N)
 	f1 = 1.0 / (2 * M_PI * DST_RCDISC2N__R0 * DST_RCDISC2N__C);
 	f2 = 1.0 / (2 * M_PI * DST_RCDISC2N__R1 * DST_RCDISC2N__C);
 
-	calculate_filter1_coefficients(node, f1, DISC_FILTER_LOWPASS, &context->a1_0, &context->b0_0, &context->b1_0);
-	calculate_filter1_coefficients(node, f2, DISC_FILTER_LOWPASS, &context->a1_1, &context->b0_1, &context->b1_1);
+	calculate_filter1_coefficients(this, f1, DISC_FILTER_LOWPASS, &context->a1_0, &context->b0_0, &context->b1_0);
+	calculate_filter1_coefficients(this, f2, DISC_FILTER_LOWPASS, &context->a1_1, &context->b0_1, &context->b1_1);
 
 	/* Initialize the object */
-	node->output[0] = 0;
+	this->output[0] = 0;
 }

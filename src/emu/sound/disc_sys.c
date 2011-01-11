@@ -16,18 +16,7 @@
  *
  ************************************************************************/
 
-struct dso_csvlog_context
-{
-	FILE *csv_file;
-	INT64 sample_num;
-	char name[32];
-};
 
-struct dso_wavlog_context
-{
-	wav_file *wavfile;
-	char name[32];
-};
 
 
 /*************************************
@@ -99,7 +88,9 @@ static void task_check(discrete_task *task, discrete_task *dest_task)
 	}
 }
 
-#define DISCRETE_DECLARE_TASK	discrete_task *task = (discrete_task *) node->context;
+/* fixme: remove abusing the context */
+
+#define DISCRETE_DECLARE_TASK	discrete_task *task = (discrete_task *) this->context;
 
 DISCRETE_START( dso_task_start )
 {
@@ -110,12 +101,21 @@ DISCRETE_START( dso_task_start )
 	if (task->task_group < 0 || task->task_group >= DISCRETE_MAX_TASK_GROUPS)
 		fatalerror("discrete_dso_task: illegal task_group %d", task->task_group);
 
-	for_each(discrete_task *, dest_task, &node->device->task_list)
+	for_each(discrete_task *, dest_task, &device->task_list)
 	{
 		if (task->task_group > dest_task.item()->task_group)
 			task_check(dest_task.item(), task);
 	}
 
+}
+
+DISCRETE_IS_STEPPING( dso_task_start )
+{
+	return true;
+}
+
+DISCRETE_STOP( dso_task_start )
+{
 }
 
 DISCRETE_STEP( dso_task_end )
@@ -126,6 +126,11 @@ DISCRETE_STEP( dso_task_end )
 
 	for (i = 0; i < task->numbuffered; i++)
 		*(task->ptr[i]++) = *task->source[i];
+}
+
+DISCRETE_RESET( dso_task_end )
+{
+	/* nothing to do - just avoid being stepped */
 }
 
 DISCRETE_STEP( dso_task_start )
@@ -140,14 +145,14 @@ DISCRETE_STEP( dso_task_start )
 }
 
 
-DISCRETE_RESET( dso_task )
+DISCRETE_RESET( dso_task_start )
 {
 	/* nothing to do - just avoid being stepped */
 }
 
 DISCRETE_STEP( dso_output )
 {
-	stream_sample_t **output = (stream_sample_t **) &node->context;
+	stream_sample_t **output = (stream_sample_t **) &this->context;
 	double val;
 
 	/* Add gain to the output and put into the buffers */
@@ -168,20 +173,20 @@ DISCRETE_START( dso_csvlog )
 
 	int log_num, node_num;
 
-	log_num = node->device->same_module_index(*node);
+	log_num = device->same_module_index(*this);
 	context->sample_num = 0;
 
-	sprintf(context->name, "discrete_%s_%d.csv", node->device->tag(), log_num);
+	sprintf(context->name, "discrete_%s_%d.csv", device->tag(), log_num);
 	context->csv_file = fopen(context->name, "w");
 	/* Output some header info */
 	fprintf(context->csv_file, "\"MAME Discrete System Node Log\"\n");
 	fprintf(context->csv_file, "\"Log Version\", 1.0\n");
-	fprintf(context->csv_file, "\"Sample Rate\", %d\n", node->sample_rate());
+	fprintf(context->csv_file, "\"Sample Rate\", %d\n", this->sample_rate());
 	fprintf(context->csv_file, "\n");
 	fprintf(context->csv_file, "\"Sample\"");
-	for (node_num = 0; node_num < node->active_inputs(); node_num++)
+	for (node_num = 0; node_num < this->active_inputs(); node_num++)
 	{
-		fprintf(context->csv_file, ", \"NODE_%2d\"", NODE_INDEX(node->input_node(node_num)));
+		fprintf(context->csv_file, ", \"NODE_%2d\"", NODE_INDEX(this->input_node(node_num)));
 	}
 	fprintf(context->csv_file, "\n");
 }
@@ -203,11 +208,21 @@ DISCRETE_STEP( dso_csvlog )
 
 	/* Dump any csv logs */
 	fprintf(context->csv_file, "%" I64FMT "d", ++context->sample_num);
-	for (nodenum = 0; nodenum < node->active_inputs(); nodenum++)
+	for (nodenum = 0; nodenum < this->active_inputs(); nodenum++)
 	{
-		fprintf(context->csv_file, ", %f", *node->input[nodenum]);
+		fprintf(context->csv_file, ", %f", *this->input[nodenum]);
 	}
 	fprintf(context->csv_file, "\n");
+}
+
+DISCRETE_RESET( dso_csvlog )
+{
+	this->step();
+}
+
+DISCRETE_IS_STEPPING( dso_csvlog )
+{
+	return true;
 }
 
 DISCRETE_START( dso_wavlog )
@@ -216,9 +231,9 @@ DISCRETE_START( dso_wavlog )
 
 	int log_num;
 
-	log_num = node->device->same_module_index(*node);
-	sprintf(context->name, "discrete_%s_%d.wav", node->device->tag(), log_num);
-	context->wavfile = wav_open(context->name, node->sample_rate(), node->active_inputs()/2);
+	log_num = device->same_module_index(*this);
+	sprintf(context->name, "discrete_%s_%d.wav", device->tag(), log_num);
+	context->wavfile = wav_open(context->name, sample_rate(), active_inputs()/2);
 }
 
 DISCRETE_STOP( dso_wavlog )
@@ -242,7 +257,7 @@ DISCRETE_STEP( dso_wavlog )
 	val = DISCRETE_INPUT(0) * DISCRETE_INPUT(1);
 	val = (val < -32768) ? -32768 : (val > 32767) ? 32767 : val;
 	wave_data_l = (INT16)val;
-	if (node->active_inputs() == 2)
+	if (this->active_inputs() == 2)
 	{
 		/* DISCRETE_WAVLOG1 */
 		wav_add_data_16(context->wavfile, &wave_data_l, 1);
@@ -256,4 +271,14 @@ DISCRETE_STEP( dso_wavlog )
 
 		wav_add_data_16lr(context->wavfile, &wave_data_l, &wave_data_r, 1);
 	}
+}
+
+DISCRETE_RESET( dso_wavlog )
+{
+	this->step();
+}
+
+DISCRETE_IS_STEPPING( dso_wavlog )
+{
+	return true;
 }

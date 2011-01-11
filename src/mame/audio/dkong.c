@@ -302,6 +302,8 @@ struct dkong_custom_mixer_context
 	double exp[2];
 };
 
+DISCRETE_CLASS_STEP_RESET(dkong_custom_mixer, sizeof(struct dkong_custom_mixer_context), 1);
+
 DISCRETE_STEP( dkong_custom_mixer )
 {
 	DISCRETE_DECLARE_CONTEXT(dkong_custom_mixer)
@@ -316,7 +318,7 @@ DISCRETE_STEP( dkong_custom_mixer )
 	i_total += DKONG_CUSTOM_IN2 / DKONG_CUSTOM_R3;
 	/* charge cap */
 	/* node->output is cap voltage, (i_total * context->r_total[in_1]) is current charge voltage */
-	node->output[0] += (i_total * context->r_total[in_1] - node->output[0]) * context->exp[in_1];
+	this->output[0] += (i_total * context->r_total[in_1] - this->output[0]) * context->exp[in_1];
 }
 
 #define	NE555_CV_R		RES_2_PARALLEL(RES_K(5), RES_K(10))
@@ -336,17 +338,12 @@ DISCRETE_RESET( dkong_custom_mixer )
 	context->r_total[0] = RES_2_PARALLEL(context->r_in[0] + DKONG_CUSTOM_R4, NE555_CV_R);
 	context->r_total[1] = RES_2_PARALLEL((context->r_in[1] + DKONG_CUSTOM_R4), NE555_CV_R);
 	/* precalculate charging exponents */
-	context->exp[0] = RC_CHARGE_EXP(context->r_total[0] * DKONG_CUSTOM_C);
-	context->exp[1] = RC_CHARGE_EXP(context->r_total[1] * DKONG_CUSTOM_C);
+	context->exp[0] = RC_CHARGE_EXP_CLASS(context->r_total[0] * DKONG_CUSTOM_C);
+	context->exp[1] = RC_CHARGE_EXP_CLASS(context->r_total[1] * DKONG_CUSTOM_C);
 
-	node->output[0] = 0;
+	this->output[0] = 0;
 }
 
-static const discrete_custom_info dkong_custom_mixer_info =
-{
-	DISCRETE_CUSTOM_MODULE( dkong_custom_mixer, struct dkong_custom_mixer_context),
-	NULL
-};
 #endif
 
 static DISCRETE_SOUND_START(dkong2b)
@@ -394,8 +391,8 @@ static DISCRETE_SOUND_START(dkong2b)
 
 #if DK_USE_CUSTOM
 	/* custom mixer for 555 CV voltage */
-	DISCRETE_CUSTOM8(NODE_28, DS_SOUND1_INV, NODE_25,
-				DK_R32, DK_R50, DK_R51, DK_R49, DK_C24, DK_SUP_V, &dkong_custom_mixer_info)
+	DISCRETE_CUSTOM8(NODE_28, dkong_custom_mixer, DS_SOUND1_INV, NODE_25,
+				DK_R32, DK_R50, DK_R51, DK_R49, DK_C24, DK_SUP_V, NULL)
 #else
 	DISCRETE_LOGIC_INVERT(DS_SOUND1,1,DS_SOUND1_INV)
 	DISCRETE_MULTIPLY(NODE_24,1,DS_SOUND1,DK_SUP_V)
@@ -426,8 +423,8 @@ static DISCRETE_SOUND_START(dkong2b)
 
 #if DK_USE_CUSTOM
 	/* custom mixer for 555 CV voltage */
-	DISCRETE_CUSTOM8(NODE_54, DS_SOUND0_INV, NODE_51,
-				DK_R36, DK_R45, DK_R46, DK_R44, DK_C29, DK_SUP_V, &dkong_custom_mixer_info)
+	DISCRETE_CUSTOM8(NODE_54, dkong_custom_mixer, DS_SOUND0_INV, NODE_51,
+				DK_R36, DK_R45, DK_R46, DK_R44, DK_C29, DK_SUP_V, NULL)
 #else
 	DISCRETE_LOGIC_INVERT(DS_SOUND0,1,DS_SOUND0_INV)
 	DISCRETE_MULTIPLY(NODE_50,1,DS_SOUND0,DK_SUP_V)
