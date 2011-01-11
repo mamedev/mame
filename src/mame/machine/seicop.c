@@ -1722,7 +1722,7 @@ static UINT16 cop_status,cop_dist,cop_angle;
 static UINT16 cop_hit_status;
 static UINT32 cop_hit_val_x,cop_hit_val_y;
 static UINT32 cop_sort_lookup,cop_sort_ram_addr,cop_sort_param;
-static UINT8 cop_angle_compare;
+static INT8 cop_angle_compare;
 static UINT8 cop_angle_mod_val;
 static struct
 {
@@ -1907,7 +1907,7 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x000/2):
 		case (0x002/2):
 			cop_sprite_dma_param = (cop_mcu_ram[0x000/2]) | (cop_mcu_ram[0x002/2] << 16);
-			popmessage("%08x",cop_sprite_dma_param & 0xffffffc0);
+			//popmessage("%08x",cop_sprite_dma_param & 0xffffffc0);
 			break;
 
 		case (0x00c/2): { cop_sprite_dma_size = cop_mcu_ram[offset]; break; }
@@ -2318,8 +2318,8 @@ static WRITE16_HANDLER( generic_cop_w )
 				abs_y = space->read_word(cop_register[0] + 4) - cop_sprite_dma_abs_y;
 				rel_xy = space->read_word(cop_sprite_dma_src + 4 + offs);
 
-				if(rel_xy & 0x0706)
-					printf("sprite rel_xy = %04x\n",rel_xy);
+				//if(rel_xy & 0x0706)
+				//	printf("sprite rel_xy = %04x\n",rel_xy);
 
 				if(rel_xy & 1)
 					space->write_word(cop_register[4] + offs + 4,0xc0 + abs_x - (rel_xy & 0xf8));
@@ -2368,51 +2368,66 @@ static WRITE16_HANDLER( generic_cop_w )
 			//(cupsoc)   | 8 | f3e7 | 6200 | 3a0 3a6 380 aa0 2a6
 			if(COP_CMD(0x3a0,0x3a6,0x380,0xaa0,0x2a6,0x000,0x000,0x000,8,0xf3e7))
 			{
-				//space->write_byte(cop_register[0]+(0x34^3), test ^ 0x80);
+				static INT8 cur_angle;
+
+				cur_angle = space->read_byte(cop_register[1] + (0xc ^ 3));
+				space->write_byte(cop_register[1] + (0^3),space->read_byte(cop_register[1] + (0^3)) & 0xfb); //correct?
+
+				if(cur_angle >= cop_angle_compare)
+				{
+					cur_angle -= cop_angle_mod_val;
+					if(cur_angle <= cop_angle_compare)
+					{
+						cur_angle = cop_angle_compare;
+						space->write_byte(cop_register[1] + (0^3),space->read_byte(cop_register[1] + (0^3)) | 2);
+					}
+				}
+				else if(cur_angle <= cop_angle_compare)
+				{
+					cur_angle += cop_angle_mod_val;
+					if(cur_angle >= cop_angle_compare)
+					{
+						cur_angle = cop_angle_compare;
+						space->write_byte(cop_register[1] + (0^3),space->read_byte(cop_register[1] + (0^3)) | 2);
+					}
+				}
+
+				space->write_byte(cop_register[1] + (0xc ^ 3),cur_angle);
+				return;
 			}
 
 			//(grainbow) | 8 | f3e7 | 6200 | 380 39a 380 a80 29a
 			/* search direction, used on SD Gundam homing weapon */
-			/* FIXME: the "modifier" is actually a bit-wise register! */
+			/* FIXME: still doesn't work ... */
 			if(COP_CMD(0x380,0x39a,0x380,0xa80,0x29a,0x000,0x000,0x000,8,0xf3e7))
 			{
-				static UINT8 cur_angle;
-				int comp1,comp2;
+				static INT8 cur_angle;
 
-				cur_angle = (space->read_word(cop_register[0]+(0x34^2)) & 0xff);
+				cur_angle = space->read_byte(cop_register[0] + (0x34 ^ 3));
+				//space->write_byte(cop_register[0] + (0^3),space->read_byte(cop_register[0] + (0^3)) & 0xfb); //correct?
 
-				comp1 = (cur_angle - cop_angle_compare) & 0xff;
-				comp2 = (cop_angle_compare - cur_angle) & 0xff;
-
-				//popmessage("(%02x %02x) %02x",cur_angle,cop_angle_compare,cop_angle_mod_val);
-
-				//printf("%02x %02x %d %d",cur_angle,cop_angle_compare,comp1,comp2);
-
-				if(comp1 < comp2)
+				if(cur_angle >= cop_angle_compare)
 				{
-					if(comp1 < cop_angle_mod_val)
+					cur_angle -= cop_angle_mod_val;
+
+					if(cur_angle <= cop_angle_compare)
+					{
 						cur_angle = cop_angle_compare;
-					else
-						cur_angle -= (cop_angle_mod_val + 1);
-
-					//printf(" < %02x %02x\n",cur_angle,cop_angle_compare);
+						//space->write_byte(cop_register[0] + (0^3),space->read_byte(cop_register[0] + (0^3)) | 2);
+					}
 				}
-				else if(comp1 > comp2)
+				else if(cur_angle <= cop_angle_compare)
 				{
-					if(comp2 < cop_angle_mod_val)
+					cur_angle += cop_angle_mod_val;
+
+					if(cur_angle >= cop_angle_compare)
+					{
 						cur_angle = cop_angle_compare;
-					else
-						cur_angle += (cop_angle_mod_val + 1);
-
-					//printf(" > %02x %02x\n",cur_angle,cop_angle_compare);
-				}
-				else if(cur_angle != cop_angle_compare)
-				{
-					cur_angle += (cop_angle_mod_val + 1); // TODO: what happens if the two values are equal (like 0xff - 0x7f / 0x7f - 0xff)?
-					//printf(" == %02x %02x\n",cur_angle,cop_angle_compare);
+						//space->write_byte(cop_register[0] + (0^3),space->read_byte(cop_register[0] + (0^3)) | 2);
+					}
 				}
 
-				space->write_word(cop_register[0]+(0x34^2),cur_angle & 0xff);
+				space->write_byte(cop_register[0] + (0x34 ^ 3),cur_angle);
 				return;
 			}
 
