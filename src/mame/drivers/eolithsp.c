@@ -20,8 +20,8 @@ static int eolith_scanline = 0;
 void eolith_speedup_read(address_space *space)
 {
 	/* for debug */
-//  if ((cpu_get_pc(space->cpu)!=eolith_speedup_address) && (eolith_vblank!=1) )
-//      printf("%s:eolith speedup_read data %02x\n",cpuexec_describe_context(space->machine), eolith_vblank);
+  //if ((cpu_get_pc(space->cpu)!=eolith_speedup_address) && (eolith_vblank!=1) )
+  //    printf("%s:eolith speedup_read data %02x\n",cpuexec_describe_context(space->machine), eolith_vblank);
 
 	if (cpu_get_pc(space->cpu)==eolith_speedup_address && eolith_vblank==0 && eolith_scanline < eolith_speedup_resume_scanline)
 	{
@@ -50,6 +50,7 @@ static const struct
 	{ "hidctch3", 0x4001f6a0, 239 },
 	{ "fort2b",   0x000081e0, 239 },
 	{ "fort2ba",  0x000081e0, 239 },
+	{ "penfan",   0x4001FA66, 239 },
 	/* eolith16.c */
 	{ "klondkp",  0x0001a046, 239 },
 	/* vegaeo.c */
