@@ -1178,13 +1178,22 @@ void cheat_manager::reload()
 	for (bool gotone = m_machine.m_devicelist.first(image); gotone; gotone = image->next(image))
 		if (image->exists())
 		{
-			UINT32 crc = image->crc();
-			if (crc != 0)
+			// if we are loading through software lists, try to load shortname.xml
+			if (image->software_entry() != NULL)
 			{
-				astring filename;
-				filename.printf("%08X", crc);
-				load_cheats(filename);
+				load_cheats(image->basename());
 				break;
+			}
+			else
+			{
+				UINT32 crc = image->crc();
+				if (crc != 0)
+				{
+					astring filename;
+					filename.printf("%08X", crc);
+					load_cheats(filename);
+					break;
+				}
 			}
 		}
 
