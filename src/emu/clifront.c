@@ -902,7 +902,7 @@ static int info_listsoftware(core_options *options, const char *gamename)
 								list_idx++;
 								software_list_parse( list, NULL, NULL );
 
-								fprintf(out, "\t<softwarelist name=\"%s\" description=\"%s\">\n", swlist->list_name[i], software_list_get_description(list) );
+								fprintf(out, "\t<softwarelist name=\"%s\" description=\"%s\">\n", swlist->list_name[i], xml_normalize_string(software_list_get_description(list)) );
 
 								for ( software_info *swinfo = software_list_find( list, "*", NULL ); swinfo != NULL; swinfo = software_list_find( list, "*", swinfo ) )
 								{
