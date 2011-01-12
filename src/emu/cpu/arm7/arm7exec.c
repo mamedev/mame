@@ -57,7 +57,10 @@
             INT32 offs;
 
             pc = R15;
-	    raddr = pc & (~1);
+
+			// "In Thumb state, bit [0] is undefined and must be ignored. Bits [31:1] contain the PC."
+			raddr = pc & (~1);
+
 	    if ( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	    {
 	    	raddr = arm7_tlb_translate(cpustate, raddr, ARM7_TLB_ABORT_P);
@@ -1169,12 +1172,17 @@
         }
         else
         {
+			UINT32 raddr;
 
             /* load 32 bit instruction */
             pc = GET_PC;
+
+			// "In ARM state, bits [1:0] of r15 are undefined and must be ignored. Bits [31:2] contain the PC."
+			raddr = pc & (~3);
+
 	    if ( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	    {
-	    	pc = arm7_tlb_translate(cpustate, pc, ARM7_TLB_ABORT_P);
+	    	raddr = arm7_tlb_translate(cpustate, raddr, ARM7_TLB_ABORT_P);
 	    	if (cpustate->pendingAbtP != 0)
 	    	{
 	    		goto skip_exec;
@@ -1191,7 +1199,7 @@
 			}
 #endif
 
-            insn = cpustate->direct->read_decrypted_dword(pc);
+            insn = cpustate->direct->read_decrypted_dword(raddr);
 
             /* process condition codes for this instruction */
             switch (insn >> INSN_COND_SHIFT)
