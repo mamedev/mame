@@ -58,6 +58,8 @@ typedef struct _software_list software_list;
 software_list *software_list_open(core_options *options, const char *listname, int is_preload, void (*error_proc)(const char *message));
 void software_list_close(software_list *swlist);
 software_info *software_list_find(software_list *swlist, const char *look_for, software_info *prev);
+const char *software_list_get_description(software_list *swlist);
+void software_list_parse(software_list *swlist, void (*error_proc)(const char *message), void *param);
 
 software_part *software_find_part(software_info *sw, const char *partname, const char *interface_);
 software_part *software_part_next(software_part *part);

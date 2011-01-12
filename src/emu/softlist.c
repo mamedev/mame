@@ -558,7 +558,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 				{
 					/* Missing dataarea name or size */
 				}
-			}			
+			}
 			else if ( !strcmp(tagname, "feature") )
 			{
 				const char *str_feature_name = NULL;
@@ -806,7 +806,7 @@ static void data_handler(void *data, const XML_Char *s, int len)
     software_list_parse
 -------------------------------------------------*/
 
-static void software_list_parse(software_list *swlist,
+void software_list_parse(software_list *swlist,
 	void (*error_proc)(const char *message),
 	void *param)
 {
@@ -916,6 +916,16 @@ void software_list_close(software_list *swlist)
 	if (swlist->file)
 		mame_fclose(swlist->file);
 	pool_free_lib(swlist->pool);
+}
+
+
+/*-------------------------------------------------
+ software_list_get_description
+ -------------------------------------------------*/
+
+const char *software_list_get_description(software_list *swlist)
+{
+	return swlist->description;
 }
 
 

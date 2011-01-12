@@ -822,10 +822,12 @@ static int info_listsoftware(core_options *options, const char *gamename)
 			"\t\t\t<!ELEMENT description (#PCDATA)>\n"
 			"\t\t\t<!ELEMENT year (#PCDATA)>\n"
 			"\t\t\t<!ELEMENT publisher (#PCDATA)>\n"
-			"\t\t\t<!ELEMENT part (dataarea*)>\n"
+			"\t\t\t<!ELEMENT part (feature*, dataarea*, diskarea*, dipswitch*)>\n"
 			"\t\t\t\t<!ATTLIST part name CDATA #REQUIRED>\n"
 			"\t\t\t\t<!ATTLIST part interface CDATA #REQUIRED>\n"
-			"\t\t\t\t<!ATTLIST part feature CDATA #IMPLIED>\n"
+			"\t\t\t\t<!ELEMENT feature EMPTY>\n"
+			"\t\t\t\t\t<!ATTLIST feature name CDATA #REQUIRED>\n"
+			"\t\t\t\t\t<!ATTLIST feature value CDATA #IMPLIED>\n"
 			"\t\t\t\t<!ELEMENT dataarea (rom*)>\n"
 			"\t\t\t\t\t<!ATTLIST dataarea name CDATA #REQUIRED>\n"
 			"\t\t\t\t\t<!ATTLIST dataarea size CDATA #REQUIRED>\n"
@@ -838,8 +840,29 @@ static int info_listsoftware(core_options *options, const char *gamename)
 			"\t\t\t\t\t\t<!ATTLIST rom md5 CDATA #IMPLIED>\n"
 			"\t\t\t\t\t\t<!ATTLIST rom sha1 CDATA #IMPLIED>\n"
 			"\t\t\t\t\t\t<!ATTLIST rom offset CDATA #IMPLIED>\n"
+			"\t\t\t\t\t\t<!ATTLIST rom value CDATA #IMPLIED>\n"
 			"\t\t\t\t\t\t<!ATTLIST rom status (baddump|nodump|good) \"good\">\n"
-			"\t\t\t\t\t\t<!ATTLIST rom loadflag (load16_byte|load16_word|load16_word_swap|load32_byte|load32_word|load32_word_swap|load32_dword|load64_word|load64_word_swap|reload) #IMPLIED>\n"
+			"\t\t\t\t\t\t<!ATTLIST rom loadflag (load16_byte|load16_word|load16_word_swap|load32_byte|load32_word|load32_word_swap|load32_dword|load64_word|load64_word_swap|reload|fill|continue) #IMPLIED>\n"
+			"\t\t\t\t<!ELEMENT diskarea (disk*)>\n"
+			"\t\t\t\t\t<!ATTLIST diskarea name CDATA #REQUIRED>\n"
+			"\t\t\t\t\t<!ELEMENT disk EMPTY>\n"
+			"\t\t\t\t\t\t<!ATTLIST disk name CDATA #IMPLIED>\n"
+			"\t\t\t\t\t\t<!ATTLIST disk md5 CDATA #IMPLIED>\n"
+			"\t\t\t\t\t\t<!ATTLIST disk sha1 CDATA #IMPLIED>\n"
+			"\t\t\t\t\t\t<!ATTLIST disk status (baddump|nodump|good) \"good\">\n"
+			"\t\t\t\t\t\t<!ATTLIST disk writeable (yes|no) \"no\">\n"
+#if 0
+			// we still do not store the dipswitch values in softlist, so it cannot be output here
+			// TODO: add parsing dipsw in softlist.c and then add output here!
+			"\t\t\t\t<!ELEMENT dipswitch (dipvalue*)>\n"
+			"\t\t\t\t\t<!ATTLIST dipswitch name CDATA #REQUIRED>\n"
+			"\t\t\t\t\t<!ATTLIST dipswitch tag CDATA #REQUIRED>\n"
+			"\t\t\t\t\t<!ATTLIST dipswitch mask CDATA #REQUIRED>\n"
+			"\t\t\t\t\t<!ELEMENT dipvalue EMPTY>\n"
+			"\t\t\t\t\t\t<!ATTLIST dipvalue name CDATA #REQUIRED>\n"
+			"\t\t\t\t\t\t<!ATTLIST dipvalue value CDATA #REQUIRED>\n"
+			"\t\t\t\t\t\t<!ATTLIST dipvalue default (yes|no) \"no\">\n"
+#endif
 			"]>\n\n"
 			"<softwarelists>\n"
 	);
@@ -877,8 +900,9 @@ static int info_listsoftware(core_options *options, const char *gamename)
 							{
 								lists[list_idx] = core_strdup( swlist->list_name[i] );
 								list_idx++;
+								software_list_parse( list, NULL, NULL );
 
-								fprintf(out, "\t<softwarelist name=\"%s\">\n", swlist->list_name[i] );
+								fprintf(out, "\t<softwarelist name=\"%s\" description=\"%s\">\n", swlist->list_name[i], software_list_get_description(list) );
 
 								for ( software_info *swinfo = software_list_find( list, "*", NULL ); swinfo != NULL; swinfo = software_list_find( list, "*", swinfo ) )
 								{
@@ -899,20 +923,38 @@ static int info_listsoftware(core_options *options, const char *gamename)
 										fprintf( out, "\t\t\t<part name=\"%s\"", part->name );
 										if ( part->interface_ )
 											fprintf( out, " interface=\"%s\"", part->interface_ );
-//                                          if ( part->feature )
-//                                              fprintf( out, " features=\"%s\"", part->feature );
+
 										fprintf( out, ">\n");
+
+										if ( part->featurelist )
+										{
+											feature_list *list = part->featurelist;
+
+											while( list )
+											{
+												fprintf( out, "\t\t\t\t<feature name=\"%s\" value=\"%s\" />\n", list->name, list->value );
+												list = list->next;
+											}
+										}
 
 										/* TODO: display rom region information */
 										for ( const rom_entry *region = part->romdata; region; region = rom_next_region( region ) )
 										{
-											fprintf( out, "\t\t\t\t<dataarea name=\"%s\" size=\"%x\">\n", ROMREGION_GETTAG(region), ROMREGION_GETLENGTH(region) );
+											int is_disk = ROMREGION_ISDISKDATA(region);
+
+											if (!is_disk)
+												fprintf( out, "\t\t\t\t<dataarea name=\"%s\" size=\"%d\">\n", ROMREGION_GETTAG(region), ROMREGION_GETLENGTH(region) );
+											else
+												fprintf( out, "\t\t\t\t<diskarea name=\"%s\">\n", ROMREGION_GETTAG(region) );
 
 											for ( const rom_entry *rom = rom_first_file( region ); rom && !ROMENTRY_ISREGIONEND(rom); rom++ )
 											{
 												if ( ROMENTRY_ISFILE(rom) )
 												{
-													fprintf( out, "\t\t\t\t\t<rom name=\"%s\" size=\"%d\"", xml_normalize_string(ROM_GETNAME(rom)), rom_file_size(rom) );
+													if (!is_disk)
+														fprintf( out, "\t\t\t\t\t<rom name=\"%s\" size=\"%d\"", xml_normalize_string(ROM_GETNAME(rom)), rom_file_size(rom) );
+													else
+														fprintf( out, "\t\t\t\t\t<disk name=\"%s\"", xml_normalize_string(ROM_GETNAME(rom)) );
 
 													/* dump checksum information only if there is a known dump */
 													if (!hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_NO_DUMP))
@@ -926,22 +968,39 @@ static int info_listsoftware(core_options *options, const char *gamename)
 																fprintf(out, " %s=\"%s\"", hash_function_name(1 << hashtype), checksum);
 													}
 
-													fprintf( out, " offset=\"%x\"", ROM_GETOFFSET(rom) );
+													if (!is_disk)
+														fprintf( out, " offset=\"0x%x\"", ROM_GETOFFSET(rom) );
 
 													if ( hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_BAD_DUMP) )
 														fprintf( out, " status=\"baddump\"" );
 													if ( hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_NO_DUMP) )
 														fprintf( out, " status=\"nodump\"" );
 
+													if (is_disk)
+														fprintf( out, " writable=\"%s\"", (ROM_GETFLAGS(rom) & DISK_READONLYMASK) ? "no" : "yes");
+
+													// TODO: add remaining flags (load16_byte|load16_word|load16_word_swap|load32_byte|load32_word|load32_word_swap|load32_dword|load64_word|load64_word_swap)
+
 													fprintf( out, "/>\n" );
 												}
 												else if ( ROMENTRY_ISRELOAD(rom) )
 												{
-													fprintf( out, "\t\t\t\t\t<rom size=\"%d\" offset=\"%x\" loadflag=\"reload\" />\n", ROM_GETLENGTH(rom), ROM_GETOFFSET(rom) );
+													fprintf( out, "\t\t\t\t\t<rom size=\"%d\" offset=\"0x%x\" loadflag=\"reload\" />\n", ROM_GETLENGTH(rom), ROM_GETOFFSET(rom) );
+												}
+												else if ( ROMENTRY_ISCONTINUE(rom) )
+												{
+													fprintf( out, "\t\t\t\t\t<rom size=\"%d\" offset=\"0x%x\" loadflag=\"continue\" />\n", ROM_GETLENGTH(rom), ROM_GETOFFSET(rom) );
+												}
+												else if ( ROMENTRY_ISFILL(rom) )
+												{
+													fprintf( out, "\t\t\t\t\t<rom size=\"%d\" offset=\"0x%x\" loadflag=\"fill\" />\n", ROM_GETLENGTH(rom), ROM_GETOFFSET(rom) );
 												}
 											}
 
-											fprintf( out, "\t\t\t\t</dataarea>\n" );
+											if (!is_disk)
+												fprintf( out, "\t\t\t\t</dataarea>\n" );
+											else
+												fprintf( out, "\t\t\t\t</diskarea>\n" );
 										}
 
 										fprintf( out, "\t\t\t</part>\n" );
