@@ -979,7 +979,35 @@ static int info_listsoftware(core_options *options, const char *gamename)
 													if (is_disk)
 														fprintf( out, " writable=\"%s\"", (ROM_GETFLAGS(rom) & DISK_READONLYMASK) ? "no" : "yes");
 
-													// TODO: add remaining flags (load16_byte|load16_word|load16_word_swap|load32_byte|load32_word|load32_word_swap|load32_dword|load64_word|load64_word_swap)
+													if ((ROM_GETFLAGS(rom) & ROM_SKIPMASK) == ROM_SKIP(1))
+														fprintf( out, " loadflag=\"load16_byte\"" );
+
+													if ((ROM_GETFLAGS(rom) & ROM_SKIPMASK) == ROM_SKIP(3))
+														fprintf( out, " loadflag=\"load32_byte\"" );
+
+													if (((ROM_GETFLAGS(rom) & ROM_SKIPMASK) == ROM_SKIP(2)) && ((ROM_GETFLAGS(rom) & ROM_GROUPMASK) == ROM_GROUPWORD))
+													{
+														if (!(ROM_GETFLAGS(rom) & ROM_REVERSEMASK))
+															fprintf( out, " loadflag=\"load32_word\"" );
+														else
+															fprintf( out, " loadflag=\"load32_word_swap\"" );
+													}
+
+													if (((ROM_GETFLAGS(rom) & ROM_SKIPMASK) == ROM_SKIP(6)) && ((ROM_GETFLAGS(rom) & ROM_GROUPMASK) == ROM_GROUPWORD))
+													{
+														if (!(ROM_GETFLAGS(rom) & ROM_REVERSEMASK))
+															fprintf( out, " loadflag=\"load64_word\"" );
+														else
+															fprintf( out, " loadflag=\"load64_word_swap\"" );
+													}
+
+													if (((ROM_GETFLAGS(rom) & ROM_SKIPMASK) == ROM_NOSKIP) && ((ROM_GETFLAGS(rom) & ROM_GROUPMASK) == ROM_GROUPWORD))
+													{
+														if (!(ROM_GETFLAGS(rom) & ROM_REVERSEMASK))
+															fprintf( out, " loadflag=\"load32_dword\"" );
+														else
+															fprintf( out, " loadflag=\"load16_word_swap\"" );
+													}
 
 													fprintf( out, "/>\n" );
 												}
