@@ -1115,67 +1115,70 @@ file_error video_manager::mame_fopen_next(const char *pathoption, const char *ex
 	astring snapdev("%d_");
 	int pos = snapstr.find(0, snapdev);
 
-	// if more %d are found, revert to default and ignore them all
-	if (snapstr.find(pos + 3, snapdev) != -1)
-		snapstr.cpy("%g/%i");
-	// else if there is a single %d, try to create the correct snapname
-	else if (pos != -1)
+	if (pos != -1)
 	{
-		int name_found = 0;
-
-		// find length of the device name
-		int end1 = snapstr.find(pos + 3, "/");
-		int end2 = snapstr.find(pos + 3, "%");
-		int end = -1;
-
-		if ((end1 != -1) && (end2 != -1))
-			end = MIN(end1, end2);
-		else if (end1 != -1)
-			end = end1;
-		else if (end2 != -1)
-			end = end2;
+		// if more %d are found, revert to default and ignore them all
+		if (snapstr.find(pos + 3, snapdev) != -1)
+			snapstr.cpy("%g/%i");
+		// else if there is a single %d, try to create the correct snapname
 		else
-			end = snapstr.len();
-
-		if (end - pos < 3)
-			fatalerror("Something very wrong is going on!!!");
-
-		// copy the device name to an astring
-		astring snapdevname;
-		snapdevname.cpysubstr(snapstr, pos + 3, end - pos - 3);
-		//printf("check template: %s\n", snapdevname.cstr());
-
-		// verify that there is such a device for this system
-		device_image_interface *image = NULL;
-		for (bool gotone = m_machine.m_devicelist.first(image); gotone; gotone = image->next(image))
 		{
-			// get the device name
-			astring tempdevname(image->image_config().brief_instance_name());
-			//printf("check device: %s\n", tempdevname.cstr());
+			int name_found = 0;
 
-			if (snapdevname.cmp(tempdevname) == 0)
+			// find length of the device name
+			int end1 = snapstr.find(pos + 3, "/");
+			int end2 = snapstr.find(pos + 3, "%");
+			int end = -1;
+
+			if ((end1 != -1) && (end2 != -1))
+				end = MIN(end1, end2);
+			else if (end1 != -1)
+				end = end1;
+			else if (end2 != -1)
+				end = end2;
+			else
+				end = snapstr.len();
+
+			if (end - pos < 3)
+				fatalerror("Something very wrong is going on!!!");
+
+			// copy the device name to an astring
+			astring snapdevname;
+			snapdevname.cpysubstr(snapstr, pos + 3, end - pos - 3);
+			//printf("check template: %s\n", snapdevname.cstr());
+
+			// verify that there is such a device for this system
+			device_image_interface *image = NULL;
+			for (bool gotone = m_machine.m_devicelist.first(image); gotone; gotone = image->next(image))
 			{
-				// verify that such a device has an image mounted
-				if (image->basename() != NULL)
+				// get the device name
+				astring tempdevname(image->image_config().brief_instance_name());
+				//printf("check device: %s\n", tempdevname.cstr());
+
+				if (snapdevname.cmp(tempdevname) == 0)
 				{
-					astring filename(image->basename());
+					// verify that such a device has an image mounted
+					if (image->basename() != NULL)
+					{
+						astring filename(image->basename());
 
-					// strip extension
-					filename.substr(0, filename.rchr(0, '.'));
+						// strip extension
+						filename.substr(0, filename.rchr(0, '.'));
 
-					// setup snapname and remove the %d_
-					snapstr.replace(0, snapdevname, filename);
-					snapstr.del(pos, 3);
-					//printf("check image: %s\n", filename.cstr());
+						// setup snapname and remove the %d_
+						snapstr.replace(0, snapdevname, filename);
+						snapstr.del(pos, 3);
+						//printf("check image: %s\n", filename.cstr());
 
-					name_found = 1;
+						name_found = 1;
+					}
 				}
 			}
-		}
 
-		// or fallback to default
-		if (name_found == 0)
-			snapstr.cpy("%g/%i");
+			// or fallback to default
+			if (name_found == 0)
+				snapstr.cpy("%g/%i");
+		}
 	}
 
 	// add our own extension
