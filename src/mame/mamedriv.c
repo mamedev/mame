@@ -2958,7 +2958,8 @@ V-V                           TP-027
 	DRIVER( ddsomh )	/* 23/02/1996 (c) 1996 (Hispanic) */
 	DRIVER( ddsomb )	/* 23/02/1996 (c) 1996 (Brazil) */
 	DRIVER( sfa2 )		/* 06/03/1996 (c) 1996 (Euro) */
-	DRIVER( sfa2u )		/* 06/03/1996 (c) 1996 (USA) */
+	DRIVER( sfa2u )		/* 30/04/1996 (c) 1996 (USA) */
+	DRIVER( sfa2ur1 )	/* 06/03/1996 (c) 1996 (USA) */
 	DRIVER( sfz2j )		/* 27/02/1996 (c) 1996 (Japan) */
 	DRIVER( sfz2a )		/* 27/02/1996 (c) 1996 (Asia) */
 	DRIVER( sfz2b )		/* 31/05/1996 (c) 1996 (Brazil) */
