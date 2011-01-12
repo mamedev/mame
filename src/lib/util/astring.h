@@ -387,7 +387,7 @@ public:
 	int find(int start, const char *search) const { return astring_findc(this, start, search); }
 
 	int replace(int start, const astring &search, const astring &replace) { return astring_replace(this, start, &search, &replace); }
-	int replacec(int start, const char *search, const char *replace) { return astring_replacec(this, start, search, replace); }
+	int replace(int start, const char *search, const char *replace) { return astring_replacec(this, start, search, replace); }
 
 	astring &delchr(int ch) { return *astring_delchr(this, ch); }
 	astring &replacechr(int ch, int newch) { return *astring_replacechr(this, ch, newch); }
