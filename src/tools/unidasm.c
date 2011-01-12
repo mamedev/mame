@@ -97,6 +97,7 @@ CPU_DISASSEMBLE( ccpu );
 CPU_DISASSEMBLE( cop410 );
 CPU_DISASSEMBLE( cop420 );
 CPU_DISASSEMBLE( cop444 );
+CPU_DISASSEMBLE( cosmac );
 CPU_DISASSEMBLE( cp1610 );
 CPU_DISASSEMBLE( cquestsnd );
 CPU_DISASSEMBLE( cquestrot );
@@ -221,6 +222,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "cop410",		_8bit,  0, CPU_DISASSEMBLE_NAME(cop410) },
 	{ "cop420",		_8bit,  0, CPU_DISASSEMBLE_NAME(cop420) },
 	{ "cop444",		_8bit,  0, CPU_DISASSEMBLE_NAME(cop444) },
+	{ "cosmac",		_8bit,  0, CPU_DISASSEMBLE_NAME(cosmac) },
 	{ "cp1610",		_16be, -1, CPU_DISASSEMBLE_NAME(cp1610) },
 	{ "cquestsnd",	_64be, -3, CPU_DISASSEMBLE_NAME(cquestsnd) },
 	{ "cquestrot",	_64be, -3, CPU_DISASSEMBLE_NAME(cquestrot) },
