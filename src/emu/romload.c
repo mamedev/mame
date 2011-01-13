@@ -76,6 +76,40 @@ struct _romload_private
 
 static void rom_exit(running_machine &machine);
 
+/***************************************************************************
+    HELPERS (also used by devimage.c)
+ ***************************************************************************/
+
+file_error common_process_file_options(core_options *options, const char *location, const char *ext, const rom_entry *romp, mame_file **image_file)
+{
+	if (location != NULL)
+	{
+		astring fname(location, PATH_SEPARATOR, ROM_GETNAME(romp));
+		fname.cat(ext);
+		return mame_fopen_options(options, SEARCHPATH_IMAGE, fname, OPEN_FLAG_READ, image_file);
+	}
+	else
+	{
+		astring fname(ROM_GETNAME(romp));
+		fname.cat(ext);
+		return mame_fopen_options(options, SEARCHPATH_IMAGE, fname, OPEN_FLAG_READ, image_file);
+	}
+
+	return FILERR_NOT_FOUND;
+}
+
+file_error common_process_file(const char *location, bool has_crc, UINT32 crc, const rom_entry *romp, mame_file **image_file)
+{
+	file_error filerr;
+	astring fname(location, PATH_SEPARATOR, ROM_GETNAME(romp));
+
+	if (has_crc)
+		filerr = mame_fopen_crc(SEARCHPATH_ROM, fname, crc, OPEN_FLAG_READ, image_file);
+	else
+		filerr = mame_fopen(SEARCHPATH_ROM, fname, OPEN_FLAG_READ, image_file);
+
+	return filerr;
+}
 
 
 /***************************************************************************
@@ -619,26 +653,33 @@ static int open_rom_file(rom_load_data *romdata, const char *regiontag, const ro
 		crc = (crcbytes[0] << 24) | (crcbytes[1] << 16) | (crcbytes[2] << 8) | crcbytes[3];
 
 	/* attempt reading up the chain through the parents. It automatically also
-       attempts any kind of load by checksum supported by the archives. */
+     attempts any kind of load by checksum supported by the archives. */
 	romdata->file = NULL;
 	for (drv = romdata->machine->gamedrv; romdata->file == NULL && drv != NULL; drv = driver_get_clone(drv))
 		if (drv->name != NULL && *drv->name != 0)
-		{
-			astring fname(drv->name, PATH_SEPARATOR, ROM_GETNAME(romp));
-			if (has_crc)
-				filerr = mame_fopen_crc(SEARCHPATH_ROM, fname, crc, OPEN_FLAG_READ, &romdata->file);
-			else
-				filerr = mame_fopen(SEARCHPATH_ROM, fname, OPEN_FLAG_READ, &romdata->file);
-		}
+			filerr = common_process_file(drv->name, has_crc, crc, romp, &romdata->file);
 
 	/* if the region is load by name, load the ROM from there */
 	if (romdata->file == NULL && regiontag != NULL)
 	{
-		astring fname(regiontag, PATH_SEPARATOR, ROM_GETNAME(romp));
-		if (has_crc)
-			filerr = mame_fopen_crc(SEARCHPATH_ROM, fname, crc, OPEN_FLAG_READ, &romdata->file);
-		else
-			filerr = mame_fopen(SEARCHPATH_ROM, fname, OPEN_FLAG_READ, &romdata->file);
+		// check if locationtag actually contains two locations separated by '%'
+		// (i.e. check if we are dealing with a clone in softwarelist)
+		astring tag1(regiontag), tag2;
+		int separator = tag1.chr(0, '%');
+		if (separator != -1)
+		{
+			// we are loading a clone through softlists, split the second location
+			tag2.cpysubstr(tag1, separator + 1, tag1.len() - separator + 1);
+			tag1.del(separator, tag1.len() - separator);
+		}
+
+		if (tag2.chr(0, '%') != -1)
+			fatalerror("More than two regiontags concatenated!\n");
+
+		// try to load from the available location(s)
+		filerr = common_process_file(tag1.cstr(), has_crc, crc, romp, &romdata->file);
+		if ((romdata->file == NULL) && (tag2.cstr() != NULL))
+			filerr = common_process_file(tag2.cstr(), has_crc, crc, romp, &romdata->file);
 	}
 
 	/* update counters */
@@ -949,7 +990,7 @@ static void process_rom_entries(rom_load_data *romdata, const char *regiontag, c
     up the parent and loading by checksum
 -------------------------------------------------*/
 
-chd_error open_disk_image(const game_driver *gamedrv, const rom_entry *romp, mame_file **image_file, chd_file **image_chd,const char *locationtag)
+chd_error open_disk_image(const game_driver *gamedrv, const rom_entry *romp, mame_file **image_file, chd_file **image_chd, const char *locationtag)
 {
 	return open_disk_image_options(mame_options(), gamedrv, romp, image_file, image_chd, locationtag);
 }
@@ -961,7 +1002,7 @@ chd_error open_disk_image(const game_driver *gamedrv, const rom_entry *romp, mam
     checksum
 -------------------------------------------------*/
 
-chd_error open_disk_image_options(core_options *options, const game_driver *gamedrv, const rom_entry *romp, mame_file **image_file, chd_file **image_chd,const char *locationtag)
+chd_error open_disk_image_options(core_options *options, const game_driver *gamedrv, const rom_entry *romp, mame_file **image_file, chd_file **image_chd, const char *locationtag)
 {
 	const game_driver *drv, *searchdrv;
 	const rom_entry *region, *rom;
@@ -975,22 +1016,13 @@ chd_error open_disk_image_options(core_options *options, const game_driver *game
 	/* attempt to open the properly named file, scanning up through parent directories */
 	filerr = FILERR_NOT_FOUND;
 	for (searchdrv = gamedrv; searchdrv != NULL && filerr != FILERR_NONE; searchdrv = driver_get_clone(searchdrv))
-	{
-		astring fname(searchdrv->name, PATH_SEPARATOR, ROM_GETNAME(romp), ".chd");
-		filerr = mame_fopen_options(options, SEARCHPATH_IMAGE, fname, OPEN_FLAG_READ, image_file);
-	}
+		filerr = common_process_file_options(options, searchdrv->name, ".chd", romp, image_file);
 
 	if (filerr != FILERR_NONE)
-	{
-		astring fname(ROM_GETNAME(romp), ".chd");
-		filerr = mame_fopen_options(options, SEARCHPATH_IMAGE, fname, OPEN_FLAG_READ, image_file);
-	}
+		filerr = common_process_file_options(options, NULL, ".chd", romp, image_file);
 
-	if (filerr != FILERR_NONE && locationtag!=NULL)
-	{
-		astring fname(locationtag, PATH_SEPARATOR, ROM_GETNAME(romp), ".chd");
-		filerr = mame_fopen_options(options, SEARCHPATH_IMAGE, fname, OPEN_FLAG_READ, image_file);
-	}
+	if (filerr != FILERR_NONE && locationtag != NULL)
+		filerr = common_process_file_options(options, locationtag, ".chd", romp, image_file);
 
 	/* did the file open succeed? */
 	if (filerr == FILERR_NONE)
@@ -1024,16 +1056,10 @@ chd_error open_disk_image_options(core_options *options, const game_driver *game
 							/* attempt to open the properly named file, scanning up through parent directories */
 							filerr = FILERR_NOT_FOUND;
 							for (searchdrv = drv; searchdrv != NULL && filerr != FILERR_NONE; searchdrv = driver_get_clone(searchdrv))
-							{
-								astring fname(searchdrv->name, PATH_SEPARATOR, ROM_GETNAME(rom), ".chd");
-								filerr = mame_fopen_options(options, SEARCHPATH_IMAGE, fname, OPEN_FLAG_READ, image_file);
-							}
+								filerr = common_process_file_options(options, searchdrv->name, ".chd", rom, image_file);
 
 							if (filerr != FILERR_NONE)
-							{
-								astring fname(ROM_GETNAME(rom), ".chd");
-								filerr = mame_fopen_options(options, SEARCHPATH_IMAGE, fname, OPEN_FLAG_READ, image_file);
-							}
+								filerr = common_process_file_options(options, NULL, ".chd", rom, image_file);
 
 							/* did the file open succeed? */
 							if (filerr == FILERR_NONE)
@@ -1224,6 +1250,24 @@ static UINT32 normalize_flags_for_device(running_machine *machine, UINT32 startf
 
 
 /*-------------------------------------------------
+    software_get_clone - retrive name string of the
+    parent software, if any
+ -------------------------------------------------*/
+
+const char *software_get_clone(char *swlist, const char *swname)
+{
+	software_list *software_list_ptr = software_list_open(mame_options(), swlist, FALSE, NULL);
+
+	if (software_list_ptr)
+	{
+		software_info *tmp = software_list_find(software_list_ptr, swname, NULL);
+		return tmp->parentname;
+	}
+
+	return NULL;
+}
+
+/*-------------------------------------------------
     load_software_part_region - load a software part
 
     This is used by MESS when loading a piece of
@@ -1234,13 +1278,40 @@ static UINT32 normalize_flags_for_device(running_machine *machine, UINT32 startf
 
 void load_software_part_region(device_t *device, char *swlist, char *swname, rom_entry *start_region)
 {
-	astring locationtag(swlist, PATH_SEPARATOR, swname);
+	astring locationtag, breakstr("%");
 	rom_load_data *romdata = device->machine->romload_data;
 	const rom_entry *region;
 	astring regiontag;
 
+	// attempt reading up the chain through the parents and create a locationtag astring in the format
+	// " swlist PATHSEPARATOR clonename % swlist PATHSEPARATOR parentname "
+	// open_rom_file contains the code to split the two paths and to separately try to load roms from there
+
+	software_list *software_list_ptr = software_list_open(mame_options(), swlist, FALSE, NULL);
+	if (software_list_ptr)
+	{
+		for (software_info *swinfo = software_list_find(software_list_ptr, swname, NULL); swinfo != NULL; )
+		{
+			if (swinfo != NULL)
+			{
+				astring tmp(swlist, PATH_SEPARATOR, swinfo->shortname);
+				locationtag.cat(tmp);
+				locationtag.cat(breakstr);
+				// printf("%s\n", locationtag.cstr());
+			}
+			const char *parentname = software_get_clone(swlist, swinfo->shortname);
+			if (parentname != NULL)
+				swinfo = software_list_find(software_list_ptr, parentname, NULL);
+			else
+				swinfo = NULL;
+		}
+		// strip the final '%'
+		locationtag.del(locationtag.len() - 1, 1);
+		software_list_close(software_list_ptr);
+	}
+
 	/* Make sure we are passed a device */
-	assert(device!=NULL);
+	assert(device != NULL);
 
 	romdata->errorstring.reset();
 

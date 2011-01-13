@@ -300,6 +300,7 @@ void legacy_image_device_base::determine_open_plan(int is_create, UINT32 *open_p
 -------------------------------------------------*/
 bool legacy_image_device_base::load_software(char *swlist, char *swname, rom_entry *start)
 {
+	astring locationtag, breakstr("%");
 	const rom_entry *region;
 	astring regiontag;
 	bool retVal = FALSE;
@@ -320,17 +321,64 @@ bool legacy_image_device_base::load_software(char *swlist, char *swname, rom_ent
 				if (has_crc)
 					crc = (crcbytes[0] << 24) | (crcbytes[1] << 16) | (crcbytes[2] << 8) | crcbytes[3];
 
-				astring fname(swlist, PATH_SEPARATOR, swname, PATH_SEPARATOR, ROM_GETNAME(romp));
-				if (has_crc)
-					filerr = mame_fopen_crc(SEARCHPATH_ROM, fname, crc, OPEN_FLAG_READ, &m_mame_file);
-				else
-					filerr = mame_fopen(SEARCHPATH_ROM, fname, OPEN_FLAG_READ, &m_mame_file);
-
+#if 1
+				astring tmp(swlist, PATH_SEPARATOR, swname);
+				locationtag.cpy(tmp);
+				filerr = common_process_file(locationtag.cstr(), has_crc, crc, romp, &m_mame_file);
 				if (filerr == FILERR_NONE)
 				{
 					m_file = mame_core_file(m_mame_file);
 					retVal = TRUE;
 				}
+
+#else
+				// attempt reading up the chain through the parents and create a locationtag astring in the format
+				// " swlist PATHSEPARATOR clonename % swlist PATHSEPARATOR parentname "
+				// below, we have the code to split the two paths and to separately try to load roms from there
+
+				software_list *software_list_ptr = software_list_open(mame_options(), swlist, FALSE, NULL);
+				if (software_list_ptr)
+				{
+					for (software_info *swinfo = software_list_find(software_list_ptr, swname, NULL); swinfo != NULL; )
+					{
+						if (swinfo != NULL)
+						{
+							astring tmp(swlist, PATH_SEPARATOR, swinfo->shortname);
+							locationtag.cat(tmp);
+							locationtag.cat(breakstr);
+							// printf("%s\n", locationtag.cstr());
+						}
+						const char *parentname = software_get_clone(swlist, swinfo->shortname);
+						if (parentname != NULL)
+							swinfo = software_list_find(software_list_ptr, parentname, NULL);
+						else
+							swinfo = NULL;
+					}
+					// strip the final '%'
+					locationtag.del(locationtag.len() - 1, 1);
+					software_list_close(software_list_ptr);
+				}
+
+				// check if locationtag actually contains two locations separated by '%'
+				// (i.e. check if we are dealing with a clone in softwarelist)
+				astring tag1(locationtag), tag2;
+				int separator = tag1.chr(0, '%');
+				if (separator != -1)
+				{
+					// we are loading a clone through softlists, split the second location
+					tag2.cpysubstr(tag1, separator + 1, tag1.len() - separator + 1);
+					tag1.del(separator, tag1.len() - separator);
+				}
+
+				if (tag2.chr(0, '%') != -1)
+					fatalerror("More than two regiontags concatenated!\n");
+
+				// try to load from the available location(s)
+				filerr = common_process_file(tag1.cstr(), has_crc, crc, romp, &m_mame_file);
+				if ((romdata->file == NULL) && (tag2.cstr() != NULL))
+					filerr = common_process_file(tag2.cstr(), has_crc, crc, romp, &m_mame_file);
+#endif
+
 				break; // load first item for start
 			}
 			romp++;	/* something else; skip */
