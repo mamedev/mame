@@ -287,7 +287,7 @@ VIDEO_START( gdfs )
     1c0072-73   ---- ---- ---- ----     ?
     1c0074-75   ---- ---- ---- ----     ?
             -e-- ---- ---- ---- y sprite inversion
-            ---c ---- ---- ---- x sprite inversion?
+            ---c ---- ---- ---- x sprite inversion
             ---- ba98 ---- ---- ?                           0101 for all games
             ---- ---- -6-- ---- y tilemap inversion?
             ---- ---- ---4 ---- x tilemap inversion?
@@ -305,11 +305,11 @@ VIDEO_START( gdfs )
 
     dynagear:   002b 002c 00d4 01c6 - 0001 0012 0102 0106
             02fd 0000 0500 0000 - 0015 5940
-            ????      ????  (flip)
+            03ed      5558  (flip)
 
     eaglshot:   0021 002a 00ca 01c6 - 0001 0016 00f6 0106
             0301 0000 0500 d000 - 0015 5940
-            ????      ????  (flip)
+            03f1      5560 d00f  (flip)
 
     gdfs:       002b 002c 00d5 01c6 - 0001 0012 0102 0106
             03ec 0711 0500 0000 - 00d5 5950
@@ -325,7 +325,7 @@ VIDEO_START( gdfs )
 
     janjans1:   0021 0023 00cb 01c6 - 0001 000f 00fe 0106
             0300 0000 0500 c000 - 0015 5140
-            0300            (flip)
+            0300      0500  (flip)
 
     keithlcy:   002b 0025 00cd 01c6 - 0001 0013 0101 0106
             0300 0711 0500 0000 - 0015 5940
@@ -700,6 +700,16 @@ static void draw_row(running_machine *machine, bitmap_t *bitmap, const rectangle
 			code	+=	state->tile_code[(attr & 0x3c00)>>10];
 			flipy	=	(attr & 0x4000);
 			flipx	=	(attr & 0x8000);
+
+			if ((ssv_scroll[0x74/2] & 0x1000) && ((ssv_scroll[0x74/2] & 0x2000) == 0))
+			{
+				if (flipx == 0) flipx = 1; else flipx = 0;
+			}
+			if ((ssv_scroll[0x74/2] & 0x4000) && ((ssv_scroll[0x74/2] & 0x2000) == 0))
+			{
+				if (flipy == 0) flipy = 1; else flipy = 0;
+			}
+
 			color	=	attr;
 
 			/* Select 256 or 64 color tiles */
@@ -856,6 +866,16 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				code	+=	state->tile_code[(attr & 0x3c00)>>10];
 				flipy	=	(attr & 0x4000);
 				flipx	=	(attr & 0x8000);
+
+				if ((ssv_scroll[0x74/2] & 0x1000) && ((ssv_scroll[0x74/2] & 0x2000) == 0))
+				{
+					if (flipx == 0) flipx = 1; else flipx = 0;
+				}
+				if ((ssv_scroll[0x74/2] & 0x4000) && ((ssv_scroll[0x74/2] & 0x2000) == 0))
+				{
+					if (flipy == 0) flipy = 1; else flipy = 0;
+				}
+
 				color	=	attr;
 
 				/* Select 256 or 64 color tiles */
@@ -880,7 +900,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				sx	=	(sx & 0x1ff) - (sx & 0x200);
 				sy	=	(sy & 0x1ff) - (sy & 0x200);
 
-				sprites_offsx = -((ssv_scroll[0x7a/2] & 0x0800) >> 8);
+				sprites_offsx =      ((ssv_scroll[0x74/2] & 0x7f) - (ssv_scroll[0x74/2] & 0x80)) - ((ssv_scroll[0x7a/2] & 0x0800) >> 8);
 
 				sprites_offsy = (-1)*((ssv_scroll[0x70/2] & 0x1ff) - (ssv_scroll[0x70/2] & 0x200)
 								 + ssv_scroll[0x6a/2] + 1) - (((ssv_scroll[0x7a/2] ^ 0x0800) & 0x0800) >> 8);
@@ -892,6 +912,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 						sy += 0x00;			// srmp7, twineag2, ultrax
 					else
 						sy -= 0x10;			// vasara
+				}
+
+				if (ssv_scroll[0x74/2] & 0x1000)
+				{
+					sx = -sx + 0x100; // -0x20 for eaglshot
 				}
 
 				// sprites can use x and y coordinates relative to a side, the other side or the center
@@ -1069,6 +1094,18 @@ static void gdfs_draw_zooming_sprites(running_machine *machine, bitmap_t *bitmap
 
 			flipx	=	(attr & 0x8000);
 			flipy	=	(attr & 0x4000);
+
+/*
+			if ((ssv_scroll[0x74/2] & 0x1000) && ((ssv_scroll[0x74/2] & 0x2000) == 0))
+			{
+				if (flipx == 0) flipx = 1; else flipx = 0;
+			}
+			if ((ssv_scroll[0x74/2] & 0x4000) && ((ssv_scroll[0x74/2] & 0x2000) == 0))
+			{
+				if (flipy == 0) flipy = 1; else flipy = 0;
+			}
+*/
+
 			color	=	(attr & 0x0400) ? attr : attr * 4;
 
 			/* Single-sprite tile size */
