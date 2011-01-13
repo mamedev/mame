@@ -9953,7 +9953,6 @@ Other Sun games
 	DRIVER( ladylinr )	/* (c) 198? TAB Austria */
 	DRIVER( kkojnoli )	/* 198? south korean hack */
 	DRIVER( wcat3 )
-	DRIVER( mtonic )	/* 198? (c) Tonic */
 	DRIVER( magodds )	/* 198? (c) Micro Manufacturing Ltd. */
 	DRIVER( magoddsa )	/* 198? (c) Micro Manufacturing Ltd. */
 	DRIVER( magoddsb )	/* 198? (c) Micro Manufacturing Ltd. */
