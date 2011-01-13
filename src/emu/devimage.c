@@ -321,17 +321,6 @@ bool legacy_image_device_base::load_software(char *swlist, char *swname, rom_ent
 				if (has_crc)
 					crc = (crcbytes[0] << 24) | (crcbytes[1] << 16) | (crcbytes[2] << 8) | crcbytes[3];
 
-#if 1
-				astring tmp(swlist, PATH_SEPARATOR, swname);
-				locationtag.cpy(tmp);
-				filerr = common_process_file(locationtag.cstr(), has_crc, crc, romp, &m_mame_file);
-				if (filerr == FILERR_NONE)
-				{
-					m_file = mame_core_file(m_mame_file);
-					retVal = TRUE;
-				}
-
-#else
 				// attempt reading up the chain through the parents and create a locationtag astring in the format
 				// " swlist PATHSEPARATOR clonename % swlist PATHSEPARATOR parentname "
 				// below, we have the code to split the two paths and to separately try to load roms from there
@@ -375,10 +364,16 @@ bool legacy_image_device_base::load_software(char *swlist, char *swname, rom_ent
 
 				// try to load from the available location(s)
 				filerr = common_process_file(tag1.cstr(), has_crc, crc, romp, &m_mame_file);
-				if ((romdata->file == NULL) && (tag2.cstr() != NULL))
+				if ((m_mame_file == NULL) && (tag2.cstr() != NULL))
 					filerr = common_process_file(tag2.cstr(), has_crc, crc, romp, &m_mame_file);
-#endif
 
+				if (filerr == FILERR_NONE)
+				{
+					m_file = mame_core_file(m_mame_file);
+					retVal = TRUE;
+				}
+				
+				
 				break; // load first item for start
 			}
 			romp++;	/* something else; skip */
