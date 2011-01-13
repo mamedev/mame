@@ -810,10 +810,10 @@ static void data_handler(void *data, const XML_Char *s, int len)
 static int software_list_get_count(software_list *swlist)
 {
 	int count = 0;
-	
+
 	for (software_info *swinfo = software_list_find(swlist, "*", NULL); swinfo != NULL; swinfo = software_list_find(swlist, "*", swinfo))
 		count++;
-	
+
 	return count;
 }
 
@@ -955,12 +955,12 @@ INLINE software_info *software_list_find_by_number(software_list *swlist, int nu
 	int length = swlist->list_entries;
 	if (number > length)
 		return NULL;
-	
+
 	software_info *cur_info = software_list_find(swlist, "*", NULL);
-	
-	for (int count = 0; count < number; count++) 
+
+	for (int count = 0; count < number; count++)
 		cur_info = software_list_find(swlist, "*", cur_info);
-	
+
 	return cur_info;
 }
 
@@ -973,17 +973,17 @@ static int softlist_penalty_compare(const char *source, const char *target)
 {
 	int gaps = 1;
 	int last = TRUE;
-	
+
 	/* scan the strings */
 	for ( ; *source && *target; target++)
 	{
 		/* do a case insensitive match */
 		int match = (tolower((UINT8)*source) == tolower((UINT8)*target));
-		
+
 		/* if we matched, advance the source */
 		if (match)
 			source++;
-		
+
 		/* if the match state changed, count gaps */
 		if (match != last)
 		{
@@ -992,15 +992,15 @@ static int softlist_penalty_compare(const char *source, const char *target)
 				gaps++;
 		}
 	}
-	
+
 	/* penalty if short string does not completely fit in */
 	for ( ; *source; source++)
 		gaps++;
-	
+
 	/* if we matched perfectly, gaps == 0 */
 	if (gaps == 1 && *source == 0 && *target == 0)
 		gaps = 0;
-	
+
 	return gaps;
 }
 
@@ -1009,20 +1009,20 @@ static int softlist_penalty_compare(const char *source, const char *target)
  software_list_find_approx_matches
  -------------------------------------------------*/
 
-void software_list_find_approx_matches(software_list *swlist, const char *name, int matches, software_info **list)
+void software_list_find_approx_matches(software_list *swlist, const char *name, int matches, software_info **list, const char* interface)
 {
 #undef rand
-	
+
 	int matchnum;
 	int *penalty;
-	
+
 	/* if no name, return */
 	if (name == NULL || name[0] == 0)
 		return;
 
 	/* allocate some temp memory */
 	penalty = global_alloc_array(int, matches);
-	
+
 	/* initialize everyone's states */
 	for (matchnum = 0; matchnum < matches; matchnum++)
 	{
@@ -1034,30 +1034,35 @@ void software_list_find_approx_matches(software_list *swlist, const char *name, 
 	{
 		int curpenalty, tmp;
 		software_info *candidate = swinfo;
-		
-		/* pick the best match between driver name and description */
-		curpenalty = softlist_penalty_compare(name, candidate->longname);
-		tmp = softlist_penalty_compare(name, candidate->shortname);
-		curpenalty = MIN(curpenalty, tmp);
-		
-		/* insert into the sorted table of matches */
-		for (matchnum = matches - 1; matchnum >= 0; matchnum--)
+
+		software_part *part = software_find_part(swinfo, NULL, NULL);
+		if (!strcmp(interface, part->interface_))
 		{
-			/* stop if we're worse than the current entry */
-			if (curpenalty >= penalty[matchnum])
-				break;
-			
-			/* as long as this isn't the last entry, bump this one down */
-			if (matchnum < matches - 1)
+
+			/* pick the best match between driver name and description */
+			curpenalty = softlist_penalty_compare(name, candidate->longname);
+			tmp = softlist_penalty_compare(name, candidate->shortname);
+			curpenalty = MIN(curpenalty, tmp);
+
+			/* insert into the sorted table of matches */
+			for (matchnum = matches - 1; matchnum >= 0; matchnum--)
 			{
-				penalty[matchnum + 1] = penalty[matchnum];
-				list[matchnum + 1] = list[matchnum];
+				/* stop if we're worse than the current entry */
+				if (curpenalty >= penalty[matchnum])
+					break;
+
+				/* as long as this isn't the last entry, bump this one down */
+				if (matchnum < matches - 1)
+				{
+					penalty[matchnum + 1] = penalty[matchnum];
+					list[matchnum + 1] = list[matchnum];
+				}
+				list[matchnum] = candidate;
+				penalty[matchnum] = curpenalty;
 			}
-			list[matchnum] = candidate;
-			penalty[matchnum] = curpenalty;
 		}
 	}
-	
+
 	/* free our temp memory */
 	global_free(penalty);
 }
@@ -1070,6 +1075,9 @@ void software_list_find_approx_matches(software_list *swlist, const char *name, 
 software_info *software_list_find(software_list *swlist, const char *look_for, software_info *prev)
 {
 	if (swlist == NULL)
+		return NULL;
+
+	if (look_for == NULL)
 		return NULL;
 
 	/* If we haven't read in the xml file yet, then do it now */
@@ -1296,44 +1304,51 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 		}
 	}
 
+	// if no match has been found, we suggest similar shortnames
 	if (software_info_ptr == NULL)
 	{
-
-		mame_printf_error("\n\"%s\" approximately matches the following\n"
-				"supported software items (best match first):\n\n", swname_bckp);
+		// check if there is at least a software list
+		if (image->device().machine->m_devicelist.first(SOFTWARE_LIST))
+		{
+			mame_printf_error("\n\"%s\" approximately matches the following\n"
+							  "supported software items (best match first):\n\n", swname_bckp);
+		}
 
 		for (device_t *swlists = image->device().machine->m_devicelist.first(SOFTWARE_LIST); swlists != NULL; swlists = swlists->typenext())
 		{
 			software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(&swlists->baseconfig())->inline_config();
-			
+
 			for (int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++)
 			{
 				if (swlist->list_name[i] && *swlist->list_name[i] && (swlist->list_type == SOFTWARE_LIST_ORIGINAL_SYSTEM))
 				{
 					software_list *list = software_list_open(image->device().machine->options(), swlist->list_name[i], FALSE, NULL);
-					
+
 					if (list)
 					{
 						software_info *matches[5] = { 0 };
 						int softnum;
-			
-						software_list_parse(list, list->error_proc, NULL);
-						mame_printf_error("* Software list \"%s\" matches: \n", software_list_get_description(list));
-						/* get the top 5 approximate matches */
-						software_list_find_approx_matches(list, swname_bckp, ARRAY_LENGTH(matches), matches);
-			
-						/* print them out */
-						for (softnum = 0; softnum < ARRAY_LENGTH(matches); softnum++)
-							if (matches[softnum] != NULL)
-								mame_printf_error("%-18s%s\n", matches[softnum]->shortname, matches[softnum]->longname);
 
-						mame_printf_error("\n");
+						software_list_parse(list, list->error_proc, NULL);
+						// get the top 5 approximate matches for the selected device interface (i.e. only carts for cartslot, etc.)
+						software_list_find_approx_matches(list, swname_bckp, ARRAY_LENGTH(matches), matches, image->image_config().image_interface());
+
+						if (matches[0] != 0)
+						{
+							mame_printf_error("* Software list \"%s\" matches: \n", software_list_get_description(list));
+
+							// print them out
+							for (softnum = 0; softnum < ARRAY_LENGTH(matches); softnum++)
+								if (matches[softnum] != NULL)
+									mame_printf_error("%-18s%s\n", matches[softnum]->shortname, matches[softnum]->longname);
+
+							mame_printf_error("\n");
+						}
 					}
 					software_list_close(list);
 				}
 			}
 		}
-		
 	}
 
 	if ( software_part_ptr )
