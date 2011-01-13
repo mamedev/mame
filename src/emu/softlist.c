@@ -1057,6 +1057,9 @@ void software_list_find_approx_matches(software_list *swlist, const char *name, 
 			penalty[matchnum] = curpenalty;
 		}
 	}
+	
+	/* free our temp memory */
+	global_free(penalty);
 }
 
 
