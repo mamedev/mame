@@ -2143,6 +2143,7 @@ const game_driver * const drivers[] =
 	DRIVER( mjnquest )	/* 1991.05 C77 (c) 1990 Taito Corporation (Japan) */
 	DRIVER( mjnquestb )	/* 1991.05 C77 (c) 1990 Taito Corporation (Japan) */
 	DRIVER( footchmp )	/* 1991.?? C80 (c) 1990 Taito Corporation Japan (World) */
+	DRIVER( footchmpbl )/* bootleg */
 	DRIVER( hthero )	/* 1991.03 C80 (c) 1990 Taito Corporation (Japan) */
 	DRIVER( euroch92 )	/* 1991.??     (c) 1992 Taito Corporation Japan (World) */
 	DRIVER( koshien )	/* 1991.04 C81 (c) 1990 Taito Corporation (Japan) */

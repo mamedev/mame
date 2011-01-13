@@ -2127,6 +2127,64 @@ static INPUT_PORTS_START( hthero )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( footchmpbl )
+	PORT_START("IN0")
+	TAITO_JOY_UDLR_2_BUTTONS_START( 1 )
+
+	PORT_START("IN1")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // doesn't boot otherwise?
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE3 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_TILT )
+
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x01, 0x00, "Game Over Type" )	// 2p simultaneous play
+	PORT_DIPSETTING(    0x01, "Both Teams' Games Over" )
+	PORT_DIPSETTING(    0x00, "Losing Team's Game is Over" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	TAITO_COINAGE_WORLD
+
+	PORT_START("DSWB")
+	TAITO_DIFFICULTY
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Game_Time ) )
+	PORT_DIPSETTING(    0x00, "1.5 Minutes" )
+	PORT_DIPSETTING(    0x0c, " 2  Minutes" )
+	PORT_DIPSETTING(    0x04, "2.5 Minutes" )
+	PORT_DIPSETTING(    0x08, " 3  Minutes" )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x30, "2 Players" )
+	PORT_DIPSETTING(    0x20, "4 Players / 4 Coin Slots" )	// Push Player button A to start
+	PORT_DIPSETTING(    0x10, "4 Players / 2 cabinets combined" )
+	PORT_DIPSETTING(    0x00, "4 Players / 2 Coin Slots" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "Game Version" )	// Not used for Hat Trick Hero / Euro Champ '92
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x80, "European" )
+
+	PORT_START("IN3")
+	TAITO_JOY_UDLR_2_BUTTONS_START( 3 )
+
+	PORT_START("IN4")
+	TAITO_JOY_UDLR_2_BUTTONS_START( 4 )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( ninjak )
 	PORT_START("IN0")
 	TAITO_JOY_UDLR_2_BUTTONS_START( 1 )
@@ -3134,6 +3192,25 @@ static GFXDECODE_START( deadconx )
 	GFXDECODE_ENTRY( "gfx1", 0, deadconx_charlayout,  0, 256 )	/* sprites & playfield */
 GFXDECODE_END
 
+static const gfx_layout footchmpbl_tilelayout =
+{
+	16,16,	/* 16*16 sprites */
+	RGN_FRAC(1,4),
+	4,	/* 4 bits per pixel */
+	{ RGN_FRAC(0,4), RGN_FRAC(1,4),RGN_FRAC(2,4),RGN_FRAC(3,4) },
+	{ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 },
+	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16, 8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	16*16	/* every sprite takes 128 consecutive bytes */
+};
+
+
+static GFXDECODE_START( footchmpbl )
+	GFXDECODE_ENTRY( "gfx2", 0, footchmpbl_tilelayout,  0, 256 )	/* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx1", 0, footchmpbl_tilelayout,  0, 256 )	/* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx3", 0, footchmpbl_tilelayout,  0, 256 )	// gets wiped out by the dynamic decode atm
+	GFXDECODE_ENTRY( "gfx3", 0, footchmpbl_tilelayout,  0, 256 )	// bootleg should clearly use this instead of the uploaded tiles
+GFXDECODE_END
+
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irq_handler( device_t *device, int irq )
@@ -3622,6 +3699,12 @@ static MACHINE_CONFIG_DERIVED( footchmp, taito_f2 )
 
 	MCFG_TC0480SCP_ADD("tc0480scp", footchmp_tc0480scp_intf)
 	MCFG_TC0360PRI_ADD("tc0360pri")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( footchmpbl, footchmp )
+
+	/* video hardware */
+	MCFG_GFXDECODE(footchmpbl)
 MACHINE_CONFIG_END
 
 
@@ -4961,6 +5044,42 @@ ROM_START( euroch92 )
 	/* no Delta-T samples */
 ROM_END
 
+ROM_START( footchmpbl )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
+	ROM_LOAD16_BYTE( "cpu7.rom10", 0x00000, 0x40000, CRC(b2297030) SHA1(1ae3c9395a108c9f4b65173365a7b8934af4230c) )
+	ROM_LOAD16_BYTE( "cpu8.rom11", 0x00001, 0x40000, CRC(741dacac) SHA1(f9b385da715b47bf88d5b0eaffebedacfc3e7913) )
+
+	// there is twice as much data here as the original sets because the 2nd half of the roms contain flipped
+	// versions of the tiles!
+	ROM_REGION( 0x200000, "gfx1", 0 )	/* SCR */
+	ROM_LOAD( "bk4.rom9", 0x000000, 0x80000, CRC(264e6ec0) SHA1(1907dab063b16f5c9de753b2d9a916f1c7d32079) )
+	ROM_LOAD( "bk3.rom8", 0x080000, 0x80000, CRC(380b2565) SHA1(9d83d402a138786bad61d62722953dfdb98a80de) )
+	ROM_LOAD( "bk2.rom7", 0x100000, 0x80000, CRC(79ce5b01) SHA1(454a9b8ca5178418c7e0976efb78cb883c553476) )
+	ROM_LOAD( "bk1.rom6", 0x180000, 0x80000, CRC(6e4757c7) SHA1(a412bdb09440f80e0e323c297a79b143a9bdb7f2) )
+
+ 	ROM_REGION( 0x200000, "gfx2", 0 )	/* OBJ */
+	ROM_LOAD( "ob17.rom1",  0x000000, 0x80000, CRC(a4891065) SHA1(69469e4c68ff72d3e50e3e74f5ca7b55e3a0bd6f) )
+	ROM_LOAD( "ob16.rom2",  0x080000, 0x80000, CRC(3b65028b) SHA1(b2bb123b067b40ddacd90f82e42dff775e7e66c7) )
+	ROM_LOAD( "ob15.rom3",  0x100000, 0x80000, CRC(dbd07328) SHA1(9d658f0a0ad119ae76a6c4749651440642ee671c) )
+	ROM_LOAD( "ob14.rom4",  0x180000, 0x80000, CRC(28fcaefa) SHA1(f92a19dc24d5faac57a5934e7001e5b0bf9d847c) )
+
+	// ?? more gfx? - should it ignore the uploaded text data and use these?
+	ROM_REGION( 0x40000, "gfx3", 0 )	/* SCR */
+	ROM_LOAD( "bk33.rom16", 0x000000, 0x10000, CRC(07a371fe) SHA1(27e7ba4ed7f0868206c9d7ca653322ca73929567) )
+	ROM_LOAD( "bk32.rom15", 0x010000, 0x10000, CRC(89020973) SHA1(30174e504734a851a016acf0746d726981edb8f1) )
+	ROM_LOAD( "bk31.rom14", 0x020000, 0x10000, CRC(02a0de4f) SHA1(7446d75608126e3d5693913e5dcb5636ae1e5500) )
+	ROM_LOAD( "bk30.rom13", 0x030000, 0x10000, CRC(71cbe2b2) SHA1(2bbd19f0d4fb0adce29a66bf27e081b86853431a) )
+
+	// sound hw is clearly different too, the sound program only contains 0x800 worth of code at 0x7800!
+	ROM_REGION( 0x1c000, "audiocpu", 0 )
+	ROM_LOAD( "so7.rom12", 0x00000, 0x07800, CRC(5bf4ca7a) SHA1(dd8b9008eaeef2792cc07828d10b44d9b3e10508) )
+	ROM_CONTINUE(          0x00000, 0x00800 )
+
+	ROM_REGION( 0x100000, "ymsnd", 0 )     /* samples (oki?) */
+	ROM_LOAD( "so3.rom5", 0x000000, 0x80000, CRC(f00fca27) SHA1(9a3c8f99c35604a3df43cc8ff55f50407a358cd7) )
+ROM_END
+
+
 ROM_START( koshien )	/* Ah Eikou no Koshien */
 	ROM_REGION( 0x100000, "maincpu", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "c81-11.bin", 0x000000, 0x020000, CRC(b44ea8c9) SHA1(f1d19f531b7a653f1c4244d612a339d95ce8cc7c) )
@@ -5632,57 +5751,86 @@ static DRIVER_INIT( driveout )
 GAME( 1988, finalb,     0,        finalb,    finalb,    finalb,   ROT0,   "Taito Corporation Japan",   "Final Blow (World)", GAME_SUPPORTS_SAVE )
 GAME( 1988, finalbj,    finalb,   finalb,    finalbj,   finalb,   ROT0,   "Taito Corporation",         "Final Blow (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1988, finalbu,    finalb,   finalb,    finalbj,   finalb,   ROT0,   "Taito America Corporation", "Final Blow (US)", GAME_SUPPORTS_SAVE )
+
 GAME( 1989, dondokod,   0,        dondokod,  dondokod,  0,        ROT0,   "Taito Corporation Japan",   "Don Doko Don (World)", GAME_SUPPORTS_SAVE )
 GAME( 1989, dondokodu,  dondokod, dondokod,  dondokodu, 0,        ROT0,   "Taito America Corporation", "Don Doko Don (US)", GAME_SUPPORTS_SAVE )
 GAME( 1989, dondokodj,  dondokod, dondokod,  dondokodj, 0,        ROT0,   "Taito Corporation",         "Don Doko Don (Japan)", GAME_SUPPORTS_SAVE )
+
 GAME( 1989, megablst,   0,        megab,     megab,     0,        ROT0,   "Taito Corporation Japan",   "Mega Blast (World)", GAME_SUPPORTS_SAVE )
 GAME( 1989, megablstu,  megablst, megab,     megabu,    0,        ROT0,   "Taito America Corporation", "Mega Blast (US)", GAME_SUPPORTS_SAVE )
 GAME( 1989, megablstj,  megablst, megab,     megabj,    0,        ROT0,   "Taito Corporation",         "Mega Blast (Japan)", GAME_SUPPORTS_SAVE )
+
 GAME( 1990, thundfox,   0,        thundfox,  thundfox,  0,        ROT0,   "Taito Corporation Japan",   "Thunder Fox (World)", GAME_SUPPORTS_SAVE )
 GAME( 1990, thundfoxu,  thundfox, thundfox,  thundfoxu, 0,        ROT0,   "Taito America Corporation", "Thunder Fox (US)", GAME_SUPPORTS_SAVE )
 GAME( 1990, thundfoxj,  thundfox, thundfox,  thundfoxj, 0,        ROT0,   "Taito Corporation",         "Thunder Fox (Japan)", GAME_SUPPORTS_SAVE )
+
 GAME( 1989, cameltry,   0,        cameltry,  cameltry,  cameltry, ROT0,   "Taito America Corporation", "Cameltry (US, YM2610)", GAME_SUPPORTS_SAVE )
 GAME( 1989, cameltryj,  cameltry, cameltry,  cameltryj, cameltry, ROT0,   "Taito Corporation",         "Cameltry (Japan, YM2610)", GAME_SUPPORTS_SAVE )
 GAME( 1989, cameltrya,  cameltry, cameltrya, cameltry,  cameltry, ROT0,   "Taito America Corporation", "Cameltry (World, YM2203 + M6295)", GAME_SUPPORTS_SAVE )
 GAME( 1989, cameltryau, cameltry, cameltrya, cameltry,  cameltry, ROT0,   "Taito America Corporation", "Cameltry (US, YM2203 + M6295)", GAME_SUPPORTS_SAVE )
+
 GAME( 1990, qtorimon,   0,        qtorimon,  qtorimon,  0,        ROT0,   "Taito Corporation",         "Quiz Torimonochou (Japan)", GAME_SUPPORTS_SAVE )
+
 GAME( 1990, liquidk,    0,        liquidk,   liquidk,   0,        ROT0,   "Taito Corporation Japan",   "Liquid Kids (World)", GAME_SUPPORTS_SAVE )
 GAME( 1990, liquidku,   liquidk,  liquidk,   liquidku,  0,        ROT0,   "Taito America Corporation", "Liquid Kids (US)", GAME_SUPPORTS_SAVE )
+
 GAME( 1990, mizubaku,   liquidk,  liquidk,   mizubaku,  0,        ROT0,   "Taito Corporation",         "Mizubaku Daibouken (Japan)", GAME_SUPPORTS_SAVE )
+
 GAME( 1990, quizhq,     0,        quizhq,    quizhq,    0,        ROT0,   "Taito Corporation",         "Quiz H.Q. (Japan)", GAME_SUPPORTS_SAVE )
+
 GAME( 1990, ssi,        0,        ssi,       ssi,       0,        ROT270, "Taito Corporation Japan",   "Super Space Invaders '91 (World, Rev 1)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ssia,       ssi,      ssi,       ssi,       0,        ROT270, "Taito Corporation Japan",   "Super Space Invaders '91 (World)", GAME_SUPPORTS_SAVE )
 GAME( 1990, majest12,   ssi,      ssi,       majest12,  0,        ROT270, "Taito Corporation",         "Majestic Twelve - The Space Invaders Part IV (Japan)", GAME_SUPPORTS_SAVE )
+
 GAME( 1990, gunfront,   0,        gunfront,  gunfront,  0,        ROT270, "Taito Corporation Japan",   "Gun & Frontier (World)", GAME_SUPPORTS_SAVE )
 GAME( 1990, gunfrontj,  gunfront, gunfront,  gunfrontj, 0,        ROT270, "Taito Corporation",         "Gun Frontier (Japan)", GAME_SUPPORTS_SAVE )
+
 GAME( 1990, growl,      0,        growl,     growl,     0,        ROT0,   "Taito Corporation Japan",   "Growl (World)", GAME_SUPPORTS_SAVE )
 GAME( 1990, growlu,     growl,    growl,     growlu,    0,        ROT0,   "Taito America Corporation", "Growl (US)", GAME_SUPPORTS_SAVE )
 GAME( 1990, runark,     growl,    growl,     runark,    0,        ROT0,   "Taito Corporation",         "Runark (Japan)", GAME_SUPPORTS_SAVE )
+
 GAME( 1990, mjnquest,   0,        mjnquest,  mjnquest,  mjnquest, ROT0,   "Taito Corporation",         "Mahjong Quest (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1990, mjnquestb,  mjnquest, mjnquest,  mjnquest,  mjnquest, ROT0,   "Taito Corporation",         "Mahjong Quest (No Nudity)", GAME_SUPPORTS_SAVE )
+
 GAME( 1990, footchmp,   0,        footchmp,  footchmp,  0,        ROT0,   "Taito Corporation Japan",   "Football Champ (World)", GAME_SUPPORTS_SAVE )
 GAME( 1990, hthero,     footchmp, hthero,    hthero,    0,        ROT0,   "Taito Corporation",         "Hat Trick Hero (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1992, euroch92,   footchmp, footchmp,  footchmp,  0,        ROT0,   "Taito Corporation Japan",   "Euro Champ '92 (World)", GAME_SUPPORTS_SAVE )
+GAME( 1992, footchmpbl, footchmp, footchmpbl,footchmpbl,0,        ROT0,   "bootleg",                   "Football Champ (World) (bootleg)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING ) // very different hw register etc.
+
 GAME( 1990, koshien,    0,        koshien,   koshien,   0,        ROT0,   "Taito Corporation",         "Ah Eikou no Koshien (Japan)", GAME_SUPPORTS_SAVE )
+
 GAME( 1990, yuyugogo,   0,        yuyugogo,  yuyugogo,  0,        ROT0,   "Taito Corporation",         "Yuuyu no Quiz de GO!GO! (Japan)", GAME_SUPPORTS_SAVE )
+
 GAME( 1990, ninjak,     0,        ninjak,    ninjak,    0,        ROT0,   "Taito Corporation Japan",   "The Ninja Kids (World)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ninjakj,    ninjak,   ninjak,    ninjakj,   0,        ROT0,   "Taito Corporation",         "The Ninja Kids (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ninjaku,    ninjak,   ninjak,    ninjaku,   0,        ROT0,   "Taito America Corporation", "The Ninja Kids (US)", GAME_SUPPORTS_SAVE )
+
 GAME( 1991, solfigtr,   0,        solfigtr,  solfigtr,  0,        ROT0,   "Taito Corporation Japan",   "Solitary Fighter (World)", GAME_SUPPORTS_SAVE )
+
 GAME( 1991, qzquest,    0,        qzquest ,  qzquest,   0,        ROT0,   "Taito Corporation",         "Quiz Quest - Hime to Yuusha no Monogatari (Japan)", GAME_SUPPORTS_SAVE )
+
 GAME( 1991, pulirula,   0,        pulirula,  pulirula,  0,        ROT0,   "Taito Corporation Japan",   "PuLiRuLa (World)", GAME_SUPPORTS_SAVE )
 GAME( 1991, pulirulaj,  pulirula, pulirula,  pulirulaj, 0,        ROT0,   "Taito Corporation",         "PuLiRuLa (Japan)", GAME_SUPPORTS_SAVE )
+
 GAME( 1991, metalb,     0,        metalb,    metalb,    0,        ROT0,   "Taito Corporation Japan",   "Metal Black (World)", GAME_SUPPORTS_SAVE )
 GAME( 1991, metalbj,    metalb,   metalb,    metalbj,   0,        ROT0,   "Taito Corporation",         "Metal Black (Japan)", GAME_SUPPORTS_SAVE )
+
 GAME( 1991, qzchikyu,   0,        qzchikyu,  qzchikyu,  0,        ROT0,   "Taito Corporation",         "Quiz Chikyu Bouei Gun (Japan)", GAME_SUPPORTS_SAVE )
+
 GAME( 1992, yesnoj,     0,        yesnoj,    yesnoj,    0,        ROT0,   "Taito Corporation",         "Yes/No Sinri Tokimeki Chart", GAME_SUPPORTS_SAVE )
+
 GAME( 1992, deadconx,   0,        deadconx,  deadconx,  0,        ROT0,   "Taito Corporation Japan",   "Dead Connection (World)", GAME_SUPPORTS_SAVE )
 GAME( 1992, deadconxj,  deadconx, deadconxj, deadconxj, 0,        ROT0,   "Taito Corporation",         "Dead Connection (Japan)", GAME_SUPPORTS_SAVE )
+
 GAME( 1992, dinorex,    0,        dinorex,   dinorex,   0,        ROT0,   "Taito Corporation Japan",   "Dino Rex (World)", GAME_SUPPORTS_SAVE )
 GAME( 1992, dinorexj,   dinorex,  dinorex,   dinorexj,  0,        ROT0,   "Taito Corporation",         "Dino Rex (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1992, dinorexu,   dinorex,  dinorex,   dinorex,   0,        ROT0,   "Taito America Corporation", "Dino Rex (US)", GAME_SUPPORTS_SAVE )
+
 GAME( 1992, qjinsei,    0,        qjinsei,   qjinsei,   0,        ROT0,   "Taito Corporation",         "Quiz Jinsei Gekijoh (Japan)", GAME_SUPPORTS_SAVE )
+
 GAME( 1993, qcrayon,    0,        qcrayon,   qcrayon,   0,        ROT0,   "Taito Corporation",         "Quiz Crayon Shinchan (Japan)", GAME_SUPPORTS_SAVE )
+
 GAME( 1993, qcrayon2,   0,        qcrayon2,  qcrayon2,  0,        ROT0,   "Taito Corporation",         "Crayon Shinchan Orato Asobo (Japan)", GAME_SUPPORTS_SAVE )
+
 GAME( 1991, driftout,   0,        driftout,  driftout,  0,        ROT270, "Visco",                     "Drift Out (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1991, driveout,   driftout, driveout,  driftout,  driveout, ROT270, "bootleg",                   "Drive Out", GAME_SUPPORTS_SAVE )
+GAME( 1991, driveout,   driftout, driveout,  driftout,  driveout, ROT270, "bootleg",                   "Drive Out (bootleg)", GAME_SUPPORTS_SAVE )
