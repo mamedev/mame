@@ -662,24 +662,61 @@ static int open_rom_file(rom_load_data *romdata, const char *regiontag, const ro
 	/* if the region is load by name, load the ROM from there */
 	if (romdata->file == NULL && regiontag != NULL)
 	{
-		// check if locationtag actually contains two locations separated by '%'
-		// (i.e. check if we are dealing with a clone in softwarelist)
-		astring tag1(regiontag), tag2;
-		int separator = tag1.chr(0, '%');
-		if (separator != -1)
+		// check if we are dealing with softwarelists. if so, locationtag
+		// is actually a concatenation of: listname + setname + parentname
+		// separated by '%' (parentname being present only for clones)
+		astring tag1(regiontag), tag2, tag3, tag4, tag5;
+		bool is_list = FALSE;
+
+		int separator1 = tag1.chr(0, '%');
+		if (separator1 != -1)
 		{
-			// we are loading a clone through softlists, split the second location
-			tag2.cpysubstr(tag1, separator + 1, tag1.len() - separator + 1);
-			tag1.del(separator, tag1.len() - separator);
+			is_list = TRUE;
+
+			// we are loading through softlists, split the listname from the regiontag
+			tag4.cpysubstr(tag1, separator1 + 1, tag1.len() - separator1 + 1);
+			tag1.del(separator1, tag1.len() - separator1);
+			tag1.cat(PATH_SEPARATOR);
+
+			// check if we are loading a clone (if this is the case also tag1 have a separator '%')
+			int separator2 = tag4.chr(0, '%');
+			if (separator2 != -1)
+			{
+				// we are loading a clone through softlists, split the setname from the parentname
+				tag5.cpysubstr(tag4, separator2 + 1, tag4.len() - separator2 + 1);
+				tag4.del(separator2, tag4.len() - separator2);
+			}
+
+			// prepare locations where we have to load from: list/parentname & list/clonename
+			astring swlist(tag1.cstr());
+			tag2.cpy(swlist.cat(tag4));
+			swlist.cpy(tag1);
+			tag3.cpy(swlist.cat(tag5));
 		}
 
-		if (tag2.chr(0, '%') != -1)
-			fatalerror("More than two regiontags concatenated!\n");
+		if (tag5.chr(0, '%') != -1)
+			fatalerror("We do not support clones of clones!\n");
 
-		// try to load from the available location(s)
-		filerr = common_process_file(tag1.cstr(), has_crc, crc, romp, &romdata->file);
-		if ((romdata->file == NULL) && (tag2.cstr() != NULL))
-			filerr = common_process_file(tag2.cstr(), has_crc, crc, romp, &romdata->file);
+		// try to load from the available location(s):
+		// - if we are not using lists, we have regiontag only;
+		// - if we are using lists, we have: list/clonename, list/parentname, clonename, parentname
+		if (!is_list)
+			filerr = common_process_file(tag1.cstr(), has_crc, crc, romp, &romdata->file);
+		else
+		{
+			// try to load from list/setname
+			if ((romdata->file == NULL) && (tag2.cstr() != NULL))
+				filerr = common_process_file(tag2.cstr(), has_crc, crc, romp, &romdata->file);
+			// try to load from list/parentname
+			if ((romdata->file == NULL) && (tag3.cstr() != NULL))
+				filerr = common_process_file(tag3.cstr(), has_crc, crc, romp, &romdata->file);
+			// try to load from setname
+			if ((romdata->file == NULL) && (tag4.cstr() != NULL))
+				filerr = common_process_file(tag4.cstr(), has_crc, crc, romp, &romdata->file);
+			// try to load from parentname
+			if ((romdata->file == NULL) && (tag5.cstr() != NULL))
+				filerr = common_process_file(tag5.cstr(), has_crc, crc, romp, &romdata->file);
+		}
 	}
 
 	/* update counters */
@@ -1278,23 +1315,25 @@ const char *software_get_clone(char *swlist, const char *swname)
 
 void load_software_part_region(device_t *device, char *swlist, char *swname, rom_entry *start_region)
 {
-	astring locationtag, breakstr("%");
+	astring locationtag(swlist), breakstr("%");
 	rom_load_data *romdata = device->machine->romload_data;
 	const rom_entry *region;
 	astring regiontag;
 
 	// attempt reading up the chain through the parents and create a locationtag astring in the format
-	// " swlist PATHSEPARATOR clonename % swlist PATHSEPARATOR parentname "
-	// open_rom_file contains the code to split the two paths and to separately try to load roms from there
+	// " swlist % clonename % parentname "
+	// open_rom_file contains the code to split the elements and to create paths to load from
 
 	software_list *software_list_ptr = software_list_open(mame_options(), swlist, FALSE, NULL);
 	if (software_list_ptr)
 	{
+		locationtag.cat(breakstr);
+
 		for (software_info *swinfo = software_list_find(software_list_ptr, swname, NULL); swinfo != NULL; )
 		{
 			if (swinfo != NULL)
 			{
-				astring tmp(swlist, PATH_SEPARATOR, swinfo->shortname);
+				astring tmp(swinfo->shortname);
 				locationtag.cat(tmp);
 				locationtag.cat(breakstr);
 				// printf("%s\n", locationtag.cstr());

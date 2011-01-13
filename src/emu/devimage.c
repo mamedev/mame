@@ -315,15 +315,15 @@ bool legacy_image_device_base::load_software(char *swlist, char *swname, rom_ent
 			{
 				UINT32 crc = 0;
 				UINT8 crcbytes[4];
-				file_error filerr;
+				file_error filerr = FILERR_NOT_FOUND;
 
 				bool has_crc = hash_data_extract_binary_checksum(ROM_GETHASHDATA(romp), HASH_CRC, crcbytes);
 				if (has_crc)
 					crc = (crcbytes[0] << 24) | (crcbytes[1] << 16) | (crcbytes[2] << 8) | crcbytes[3];
 
 				// attempt reading up the chain through the parents and create a locationtag astring in the format
-				// " swlist PATHSEPARATOR clonename % swlist PATHSEPARATOR parentname "
-				// below, we have the code to split the two paths and to separately try to load roms from there
+				// " swlist % clonename % parentname "
+				// below, we have the code to split the elements and to create paths to load from
 
 				software_list *software_list_ptr = software_list_open(mame_options(), swlist, FALSE, NULL);
 				if (software_list_ptr)
@@ -332,10 +332,10 @@ bool legacy_image_device_base::load_software(char *swlist, char *swname, rom_ent
 					{
 						if (swinfo != NULL)
 						{
-							astring tmp(swlist, PATH_SEPARATOR, swinfo->shortname);
+							astring tmp(swinfo->shortname);
 							locationtag.cat(tmp);
 							locationtag.cat(breakstr);
-							// printf("%s\n", locationtag.cstr());
+							//printf("%s\n", locationtag.cstr());
 						}
 						const char *parentname = software_get_clone(swlist, swinfo->shortname);
 						if (parentname != NULL)
@@ -350,30 +350,48 @@ bool legacy_image_device_base::load_software(char *swlist, char *swname, rom_ent
 
 				// check if locationtag actually contains two locations separated by '%'
 				// (i.e. check if we are dealing with a clone in softwarelist)
-				astring tag1(locationtag), tag2;
-				int separator = tag1.chr(0, '%');
+				astring tag2, tag3, tag4(locationtag), tag5;
+				int separator = tag4.chr(0, '%');
 				if (separator != -1)
 				{
-					// we are loading a clone through softlists, split the second location
-					tag2.cpysubstr(tag1, separator + 1, tag1.len() - separator + 1);
-					tag1.del(separator, tag1.len() - separator);
+					// we are loading a clone through softlists, split the setname from the parentname
+					tag5.cpysubstr(tag4, separator + 1, tag4.len() - separator + 1);
+					tag4.del(separator, tag4.len() - separator);
 				}
 
-				if (tag2.chr(0, '%') != -1)
-					fatalerror("More than two regiontags concatenated!\n");
+				// prepare locations where we have to load from: list/parentname & list/clonename
+				astring tag1(swlist);
+				tag1.cat(PATH_SEPARATOR);
+				tag2.cpy(tag1.cat(tag4));
+				tag1.cpy(swlist);
+				tag1.cat(PATH_SEPARATOR);
+				tag3.cpy(tag1.cat(tag5));
 
-				// try to load from the available location(s)
-				filerr = common_process_file(tag1.cstr(), has_crc, crc, romp, &m_mame_file);
+				if (tag5.chr(0, '%') != -1)
+					fatalerror("We do not support clones of clones!\n");
+
+				// try to load from the available location(s):
+				// - if we are not using lists, we have regiontag only;
+				// - if we are using lists, we have: list/clonename, list/parentname, clonename, parentname
+				// try to load from list/setname
 				if ((m_mame_file == NULL) && (tag2.cstr() != NULL))
 					filerr = common_process_file(tag2.cstr(), has_crc, crc, romp, &m_mame_file);
+				// try to load from list/parentname
+				if ((m_mame_file == NULL) && (tag3.cstr() != NULL))
+					filerr = common_process_file(tag3.cstr(), has_crc, crc, romp, &m_mame_file);
+				// try to load from setname
+				if ((m_mame_file == NULL) && (tag4.cstr() != NULL))
+					filerr = common_process_file(tag4.cstr(), has_crc, crc, romp, &m_mame_file);
+				// try to load from parentname
+				if ((m_mame_file == NULL) && (tag5.cstr() != NULL))
+					filerr = common_process_file(tag5.cstr(), has_crc, crc, romp, &m_mame_file);
 
 				if (filerr == FILERR_NONE)
 				{
 					m_file = mame_core_file(m_mame_file);
 					retVal = TRUE;
 				}
-				
-				
+
 				break; // load first item for start
 			}
 			romp++;	/* something else; skip */
