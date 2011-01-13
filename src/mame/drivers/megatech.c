@@ -671,7 +671,22 @@ ROM_START( mt_shnbi ) /* Shinobi */
 	MEGATECH_GAME08("game0", "inst0")
 ROM_END
 
-/* Game 10 - AFterburner (SMS) */
+/* Game 09 - Fantasy Zone (SMS) */
+// note, dump was bad, but the good (uniquely identifiable) parts matched the 'fantasy zone (world) (v1.2).bin' SMS rom
+// so I'm using that until it gets verified.
+#define MEGATECH_GAME09(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD( "mpr-10118.ic1", 0x000000, 0x020000, CRC(65d7e4e0) SHA1(0278cd120dc3a7707eda9314c46c7f27f9e8fdda) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_SMS ) \
+	ROM_LOAD( "epr-12368-09.bin", 0x000000, 0x08000, CRC(373d2a70) SHA1(c39dd1003d71a417b12a359126bfef64c7a2fd00) ) \
+
+ROM_START( mt_fz ) /* Fantasy Zone */
+	MEGATECH_BIOS
+	MEGATECH_GAME09("game0", "inst0")
+ROM_END
+
+
+/* Game 10 - Afterburner (SMS) */
 #define MEGATECH_GAME10(GAME_REGION, INSTRUCTION_REGION) \
 	ROM_REGION( 0x300000, GAME_REGION, 0 ) \
 	ROM_LOAD( "mp11271.ic1", 0x000000, 0x080000, CRC(1C951F8E) SHA1(51531DF038783C84640A0CAB93122E0B59E3B69A) ) \
@@ -1177,7 +1192,7 @@ ROM_END
 /* 06 */ GAME( 1987, mt_orun,  megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Out Run (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! */
 /* 07 */ GAME( 1987, mt_asyn,  megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Alien Syndrome (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! */
 /* 08 */ GAME( 1987, mt_shnbi, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Shinobi (Mega-Tech, SMS based)", GAME_NOT_WORKING) /* sms */
-/* 09 */ // unknown
+/* 09 */ GAME( 1987, mt_fz,    megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Fantasy Zone (Mega-Tech, SMS based)", GAME_NOT_WORKING) /* sms */
 /* 10 */ GAME( 1987, mt_aftrb, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "After Burner (Mega-Tech, SMS based)", GAME_NOT_WORKING) /* sms */
 /* 11 */ GAME( 1989, mt_tfor2, megatech, megatech, megatech, mtnew, ROT0, "Tecno Soft / Sega",     "Thunder Force II MD (Mega-Tech)", GAME_NOT_WORKING )
 /* 12 */ // unknown
