@@ -349,6 +349,10 @@ bool legacy_image_device_base::load_internal(const char *path, bool is_create, i
     int i;
 	bool softload = FALSE;
 
+	// if the path contains no period, we are using softlists, so we won't create an image
+	astring pathstr(path);
+	bool filename_has_period = (pathstr.rchr(0, '.') != -1) ? TRUE : FALSE;
+
     /* first unload the image */
     unload();
 
@@ -364,8 +368,10 @@ bool legacy_image_device_base::load_internal(const char *path, bool is_create, i
         goto done;
 
 	/* Check if there's a software list defined for this device and use that if we're not creating an image */
-	softload = load_software_part( this, path, &m_software_info_ptr, &m_software_part_ptr, &m_full_software_name );
-	if (is_create || (!softload  && m_software_info_ptr==NULL))
+	if (!filename_has_period)
+		softload = load_software_part( this, path, &m_software_info_ptr, &m_software_part_ptr, &m_full_software_name );
+
+	if (is_create || filename_has_period)
 	{
 		/* determine open plan */
 		determine_open_plan(is_create, open_plan);
