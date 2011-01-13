@@ -9954,8 +9954,11 @@ Other Sun games
 	DRIVER( kkojnoli )	/* 198? south korean hack */
 	DRIVER( wcat3 )
 	DRIVER( mtonic )	/* 198? (c) Tonic */
-	DRIVER( magical )	/* 198? (c) Micro Manufacturing Ltd. */
-	DRIVER( magicala )	/* 198? (c) Micro Manufacturing Ltd. */
+	DRIVER( magodds )	/* 198? (c) Micro Manufacturing Ltd. */
+	DRIVER( magoddsa )	/* 198? (c) Micro Manufacturing Ltd. */
+	DRIVER( magoddsb )	/* 198? (c) Micro Manufacturing Ltd. */
+	DRIVER( magoddsc )	/* 198? (c) Micro Manufacturing Ltd. */
+	DRIVER( magoddsd )	/* 198? (c) Micro Manufacturing Ltd. */
 
 	DRIVER( sfbonus )	/* (c) 2003 Amcoe - Skill Fruit Bonus */
 	DRIVER( sfbonusd1 )	/* (c) 2003 Amcoe */
