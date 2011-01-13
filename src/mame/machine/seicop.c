@@ -2107,10 +2107,18 @@ static WRITE16_HANDLER( generic_cop_w )
 			cop_status &= 0x7fff;
 
 			/*
-            endianess changes:
-            dword no change
-            word Add / Subtract two
-            byte ?
+            Macro notes:
+            - endianess changes from/to Raiden 2:
+              dword ^= 0
+              word ^= 2
+              byte ^= 3
+            - some macro commands here have a commented algorythm, it's how Seibu Cup Bootleg version handles maths inside the 14/15 roms.
+			  The ROMs map tables in the following arrangement:
+			  0x00000 - 0x1ffff Sine math results
+			  0x20000 - 0x3ffff Cosine math results
+			  0x40000 - 0x7ffff Division math results
+			  0x80000 - 0xfffff Pythagorean theorem, hypotenuse length math results
+			  Surprisingly atan maths are nowhere to be found from the roms.
             */
 
 			/* "automatic" movement */
@@ -2139,6 +2147,17 @@ static WRITE16_HANDLER( generic_cop_w )
 
 			/* SINE math - 0x8100 */
 			/* FIXME: cop scale is unreliable */
+			/*
+				 00000-0ffff:
+				   amp = x/256
+				   ang = x & 255
+				   s = sin(ang*2*pi/256)
+				   val = trunc(s*amp)
+				   if(s<0)
+				     val--
+				   if(s == 192)
+				     val = -2*amp
+			*/
 			if(COP_CMD(0xb9a,0xb88,0x888,0x000,0x000,0x000,0x000,0x000,7,0xfdfb))
 			{
 				int raw_angle = (space->read_word(cop_register[0]+(0x34^2)) & 0xff);
@@ -2155,6 +2174,17 @@ static WRITE16_HANDLER( generic_cop_w )
 
 			/* COSINE math - 0x8900 */
 			/* FIXME: cop scale is unreliable */
+			/*
+			 10000-1ffff:
+			   amp = x/256
+			   ang = x & 255
+			   s = cos(ang*2*pi/256)
+			   val = trunc(s*amp)
+			   if(s<0)
+			     val--
+			   if(s == 128)
+			     val = -2*amp
+			*/
 			if(COP_CMD(0xb9a,0xb8a,0x88a,0x000,0x000,0x000,0x000,0x000,7,0xfdfb))
 			{
 				int raw_angle = (space->read_word(cop_register[0]+(0x34^2)) & 0xff);
@@ -2188,6 +2218,7 @@ static WRITE16_HANDLER( generic_cop_w )
 				return;
 			}
 
+			/* Pythagorean theorem, hypotenuse direction - 130e / 138e */
 			//(heatbrl)  | 5 | bf7f | 138e | 984 aa4 d82 aa2 39b b9a b9a b9a
 			if(COP_CMD(0x984,0xaa4,0xd82,0xaa2,0x39b,0xb9a,0xb9a,0xb9a,5,0xbf7f))
 			{
@@ -2202,14 +2233,21 @@ static WRITE16_HANDLER( generic_cop_w )
 						cop_angle += 0x80;
 				}
 
-				/* is this the only difference? no, that's not it, check Legionnaire */
+				/* TODO: bit 7 of macro command says if we have to write on work RAM */
 				//if(0)
 					space->write_byte(cop_register[0]+(0x34^3), cop_angle);
 				return;
 			}
 
+			/* Pythagorean theorem, hypotenuse length - 0x3bb0 */
 			//07 | 4 | 007f | 3bb0 | f9c b9c b9c b9c b9c b9c b9c 99c
 			//(grainbow) | 4 | 007f | 3bb0 | f9c b9c b9c b9c b9c b9c b9c 99c
+			/*
+			 40000-7ffff:
+			   v1 = (x / 32768)*64
+			   v2 = (x & 255)*32767/255
+			   val = sqrt(v1*v1+v2*v2) (unsigned)
+			*/
 			if(COP_CMD(0xf9c,0xb9c,0xb9c,0xb9c,0xb9c,0xb9c,0xb9c,0x99c,4,0x007f))
 			{
 				int dx = space->read_dword(cop_register[1]+4) - space->read_dword(cop_register[0]+4);
@@ -2219,11 +2257,22 @@ static WRITE16_HANDLER( generic_cop_w )
 				dy = dy >> 16;
 				cop_dist = sqrt((double)(dx*dx+dy*dy));
 
+				/* TODO: bit 7 of macro command says if we have to write on work RAM */
 				space->write_word(cop_register[0]+(0x38^2), cop_dist);
 				return;
 			}
 
-			/* Division - 0x42c2 - */
+			/* Division - 0x42c2 */
+			/*
+			 20000-2ffff:
+			   v1 = x / 1024
+			   v2 = x & 1023
+			   val = !v1 ? 32767 : trunc(v2/v1+0.5)
+			 30000-3ffff:
+			   v1 = x / 1024
+			   v2 = (x & 1023)*32
+			   val = !v1 ? 32767 : trunc(v2/v1+0.5)
+			*/
 			if(COP_CMD(0xf9a,0xb9a,0xb9c,0xb9c,0xb9c,0x29c,0x000,0x000,5,0xfcdd))
 			{
 				int div = space->read_word(cop_register[0]+(0x36^2));
