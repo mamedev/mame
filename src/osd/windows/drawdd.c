@@ -605,15 +605,9 @@ static int ddraw_create_surfaces(win_window_info *window)
 	if (dd->membuffer == NULL)
 		goto error;
 
-#ifdef MESS
-	// create a clipper for all modes, since MESS has dialogs
-	if (create_clipper(window))
-		goto error;
-#else
 	// create a clipper for windowed mode
 	if (!window->fullscreen && create_clipper(window))
 		goto error;
-#endif
 
 	// full screen mode: set the gamma
 	if (window->fullscreen)

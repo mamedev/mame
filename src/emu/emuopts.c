@@ -160,9 +160,6 @@ const options_entry mame_core_options[] =
 	{ "skip_gameinfo",               "0",         OPTION_BOOLEAN,    "skip displaying the information screen at startup" },
 	{ "uifont",						 "default",   0,                 "specify a font to use" },
 	{ "ramsize;ram",				 NULL,	   	  0,				 "size of RAM (if supported by driver)" },
-#ifdef MESS	
-	{ "newui;nu",                    "0",		  OPTION_BOOLEAN,	 "use the new MESS UI" },
-#endif
 
 	/* image device options */
 	{ OPTION_ADDED_DEVICE_OPTIONS,	 "0",		  OPTION_BOOLEAN | OPTION_INTERNAL,	"image device-specific options have been added" },

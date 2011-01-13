@@ -50,7 +50,7 @@
 //  PARAMETERS
 //============================================================
 
-#ifndef MESS
+#ifndef MENU_BAR
 #define HAS_WINDOW_MENU			FALSE
 #else
 #define HAS_WINDOW_MENU			TRUE
@@ -165,9 +165,7 @@ int winwindow_ui_is_paused(running_machine *machine);
 void winwindow_ui_exec_on_main_thread(void (*func)(void *), void *param);
 void winwindow_dispatch_message(running_machine *machine, MSG *message);
 
-#if HAS_WINDOW_MENU
-int win_create_menu(running_machine *machine, HMENU *menus);
-#endif
+extern int win_create_menu(running_machine *machine, HMENU *menus);
 
 
 

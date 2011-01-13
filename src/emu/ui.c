@@ -1180,22 +1180,6 @@ static UINT32 handler_messagebox_anykey(running_machine *machine, render_contain
 	return state;
 }
 
-
-/*-------------------------------------------------
-    ui_use_newui - determines if "newui" is in use
--------------------------------------------------*/
-
-int ui_use_newui( void )
-{
-	#ifdef MESS
-	#if (defined(WIN32) || defined(_MSC_VER)) && !defined(SDLMAME_WIN32)
-		if (options_get_bool(mame_options(), "newui"))
-			return TRUE;
-	#endif
-	#endif
-	return FALSE;
-}
-
 /*-------------------------------------------------
     process_natural_keyboard - processes any
     natural keyboard input
@@ -1373,12 +1357,11 @@ static UINT32 handler_ingame(running_machine *machine, render_container *contain
 
 	if (ui_disabled) return ui_disabled;
 
-	/* if the user pressed ESC, stop the emulation (except in MESS with newui, where ESC toggles the menubar) */
-	if (ui_input_pressed(machine, IPT_UI_CANCEL) && !ui_use_newui())
+	if (ui_input_pressed(machine, IPT_UI_CANCEL))
 		machine->schedule_exit();
 
 	/* turn on menus if requested */
-	if (ui_input_pressed(machine, IPT_UI_CONFIGURE) && !ui_use_newui())
+	if (ui_input_pressed(machine, IPT_UI_CONFIGURE))
 		return ui_set_handler(ui_menu_ui_handler, 0);
 
 	/* if the on-screen display isn't up and the user has toggled it, turn it on */

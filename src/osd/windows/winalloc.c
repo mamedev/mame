@@ -582,12 +582,7 @@ static void global_init(void)
 	InitializeCriticalSection(&memory_lock);
 
 	// determine if we enabled by default
-#ifdef MESS
-	{
-		extern BOOL win_is_gui_application(void);
-		use_malloc_tracking = !win_is_gui_application();
-	}
-#elif defined(WINUI)
+#if defined(WINUI)
 	use_malloc_tracking = FALSE;
 #else
 	use_malloc_tracking = TRUE;

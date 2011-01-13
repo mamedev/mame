@@ -69,10 +69,6 @@
 #include "config.h"
 #include "winutf8.h"
 
-#ifdef MESS
-#include "menu.h"
-#endif /* MESS */
-
 extern int drawnone_init(win_draw_callbacks *callbacks);
 extern int drawgdi_init(win_draw_callbacks *callbacks);
 extern int drawdd_init(win_draw_callbacks *callbacks);
@@ -834,8 +830,9 @@ static void create_window_class(void)
 		// initialize the description of the window class
 		wc.lpszClassName	= TEXT("MAME");
 		wc.hInstance		= GetModuleHandle(NULL);
-#ifdef MESS
-		wc.lpfnWndProc		= win_mess_window_proc;
+#ifdef MENU_BAR
+		LRESULT CALLBACK winwindow_video_window_proc_ui(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
+		wc.lpfnWndProc		= winwindow_video_window_proc_ui;
 #else
 		wc.lpfnWndProc		= winwindow_video_window_proc;
 #endif

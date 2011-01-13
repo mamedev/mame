@@ -181,8 +181,6 @@ const slider_state *ui_get_slider_list(void);
 /* paste */
 void ui_paste(running_machine *machine);
 
-int ui_use_newui(void);
-
 /* returns whether the natural keyboard is active */
 int ui_get_use_natural_keyboard(running_machine *machine);
 

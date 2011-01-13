@@ -67,11 +67,6 @@
 #include "strconv.h"
 #include "config.h"
 
-#ifdef MESS
-#include "menu.h"
-#endif
-
-
 //============================================================
 //  GLOBAL VARIABLES
 //============================================================
@@ -371,12 +366,6 @@ static void check_osd_inputs(running_machine *machine)
 	// check for toggling fullscreen mode
 	if (ui_input_pressed(machine, IPT_OSD_1))
 		winwindow_toggle_full_screen();
-
-#ifdef MESS
-	// check for toggling menu bar (only if ui is active)
-	if (ui_input_pressed(machine, IPT_OSD_2) && machine->ui_active)
-		win_toggle_menubar();
-#endif
 }
 
 

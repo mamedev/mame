@@ -773,21 +773,6 @@ void windows_osd_interface::customize_input_type_list(input_type_desc *typelist)
 				typedesc->name = "Toggle Fullscreen";
 				input_seq_set_2(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_LALT, KEYCODE_ENTER);
 				break;
-
-			case IPT_OSD_2:
-				if (ui_use_newui())
-				{
-					typedesc->token = "TOGGLE_MENUBAR";
-					typedesc->name = "Toggle Menu Bar";
-					input_seq_set_1(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_ESC);
-				}
-				break;
-
-#ifdef MESS
-			case IPT_UI_THROTTLE:
-				input_seq_set_1(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F10);
-				break;
-#endif
 		}
 }
 
