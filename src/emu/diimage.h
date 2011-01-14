@@ -253,6 +253,7 @@ public:
 	const char* extrainfo() { return m_extrainfo; }
 
 	const software_info *software_entry() { return m_software_info_ptr; }
+	const software_part *part_entry() { return m_software_part_ptr; }
 
 	virtual void set_working_directory(const char *working_directory) { m_working_directory = working_directory; }
 	virtual const char * working_directory();

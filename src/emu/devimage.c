@@ -431,12 +431,19 @@ bool legacy_image_device_base::load_internal(const char *path, bool is_create, i
 
     /* record the filename */
     m_err = set_image_filename(path);
+
     if (m_err)
         goto done;
 
 	/* Check if there's a software list defined for this device and use that if we're not creating an image */
 	if (!filename_has_period)
+	{
 		softload = load_software_part( this, path, &m_software_info_ptr, &m_software_part_ptr, &m_full_software_name );
+		// if we had launched from softlist with a specified part, e.g. "shortname:part"
+		// we would have recorded the wrong name, so record it again based on software_info
+		if (m_software_info_ptr->shortname != NULL)
+			m_err = set_image_filename(m_software_info_ptr->shortname);
+	}
 
 	if (is_create || filename_has_period)
 	{

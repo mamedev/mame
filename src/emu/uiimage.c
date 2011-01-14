@@ -903,7 +903,7 @@ static void menu_file_manager_populate(running_machine *machine, ui_menu *menu, 
 {
 	char buffer[2048];
 	device_image_interface *image = NULL;
-	const char *entry_basename;
+	astring tmp_name;
 
 	/* cycle through all devices for this system */
 	for (bool gotone = machine->m_devicelist.first(image); gotone; gotone = image->next(image))
@@ -914,10 +914,27 @@ static void menu_file_manager_populate(running_machine *machine, ui_menu *menu, 
 			image->image_config().devconfig().name());
 
 		/* get the base name */
-		entry_basename = image->basename();
+		if (image->basename() != NULL)
+		{
+			tmp_name.cpy(image->basename());
+
+			/* the image has been loaded through softlist, also show the loaded part */
+			if (image->part_entry() != NULL)
+			{
+				const software_part *tmp = image->part_entry();
+				if (tmp->name != NULL)
+				{
+					tmp_name.cat(" (");
+					tmp_name.cat(tmp->name);
+					tmp_name.cat(")");
+				}
+			}
+		}
+		else
+			tmp_name.cpy("---");
 
 		/* record the menu item */
-		ui_menu_item_append(menu, buffer, (entry_basename != NULL) ? entry_basename : "---", 0, (void *) image);
+		ui_menu_item_append(menu, buffer, tmp_name.cstr(), 0, (void *) image);
 	}
 
 	/* set up custom render proc */
