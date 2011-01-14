@@ -227,6 +227,7 @@ void image_device_init(running_machine *machine)
 				/* retrieve image error message */
 				astring image_err = astring(image->error());
 				astring image_basename(image_name);
+
 				/* unload all images */
 				image_unload_all(*machine);
 
@@ -267,14 +268,12 @@ void image_postdevice_init(running_machine *machine)
 			{
 				/* retrieve image error message */
 				astring image_err = astring(image->error());
-				const char *image_basename_str = image->basename();
 
 				/* unload all images */
 				image_unload_all(*machine);
 
-				fatalerror_exitcode(machine, MAMERR_DEVICE, "Device %s load (%s) failed: %s",
+				fatalerror_exitcode(machine, MAMERR_DEVICE, "Device %s load failed: %s",
 					image->image_config().devconfig().name(),
-					image_basename_str,
 					image_err.cstr());
 			}
 	}
