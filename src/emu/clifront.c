@@ -808,65 +808,66 @@ static int info_listsoftware(core_options *options, const char *gamename)
 
 	lists = global_alloc_array( char *, nr_lists );
 
-	fprintf( out,
-			"<?xml version=\"1.0\"?>\n"
-			"<!DOCTYPE softwarelist [\n"
-			"<!ELEMENT softwarelists (softwarelist*)>\n"
-			"\t<!ELEMENT softwarelist (software+)>\n"
-			"\t\t<!ATTLIST softwarelist name CDATA #REQUIRED>\n"
-			"\t\t<!ATTLIST softwarelist description CDATA #IMPLIED>\n"
-			"\t\t<!ELEMENT software (description, year?, publisher, part*)>\n"
-			"\t\t\t<!ATTLIST software name CDATA #REQUIRED>\n"
-			"\t\t\t<!ATTLIST software cloneof CDATA #IMPLIED>\n"
-			"\t\t\t<!ATTLIST software supported (yes|partial|no) \"yes\">\n"
-			"\t\t\t<!ELEMENT description (#PCDATA)>\n"
-			"\t\t\t<!ELEMENT year (#PCDATA)>\n"
-			"\t\t\t<!ELEMENT publisher (#PCDATA)>\n"
-			"\t\t\t<!ELEMENT part (feature*, dataarea*, diskarea*, dipswitch*)>\n"
-			"\t\t\t\t<!ATTLIST part name CDATA #REQUIRED>\n"
-			"\t\t\t\t<!ATTLIST part interface CDATA #REQUIRED>\n"
-			"\t\t\t\t<!ELEMENT feature EMPTY>\n"
-			"\t\t\t\t\t<!ATTLIST feature name CDATA #REQUIRED>\n"
-			"\t\t\t\t\t<!ATTLIST feature value CDATA #IMPLIED>\n"
-			"\t\t\t\t<!ELEMENT dataarea (rom*)>\n"
-			"\t\t\t\t\t<!ATTLIST dataarea name CDATA #REQUIRED>\n"
-			"\t\t\t\t\t<!ATTLIST dataarea size CDATA #REQUIRED>\n"
-			"\t\t\t\t\t<!ATTLIST dataarea databits (8|16|32|64) \"8\">\n"
-			"\t\t\t\t\t<!ATTLIST dataarea endian (big|little) \"little\">\n"
-			"\t\t\t\t\t<!ELEMENT rom EMPTY>\n"
-			"\t\t\t\t\t\t<!ATTLIST rom name CDATA #IMPLIED>\n"
-			"\t\t\t\t\t\t<!ATTLIST rom size CDATA #REQUIRED>\n"
-			"\t\t\t\t\t\t<!ATTLIST rom crc CDATA #IMPLIED>\n"
-			"\t\t\t\t\t\t<!ATTLIST rom md5 CDATA #IMPLIED>\n"
-			"\t\t\t\t\t\t<!ATTLIST rom sha1 CDATA #IMPLIED>\n"
-			"\t\t\t\t\t\t<!ATTLIST rom offset CDATA #IMPLIED>\n"
-			"\t\t\t\t\t\t<!ATTLIST rom value CDATA #IMPLIED>\n"
-			"\t\t\t\t\t\t<!ATTLIST rom status (baddump|nodump|good) \"good\">\n"
-			"\t\t\t\t\t\t<!ATTLIST rom loadflag (load16_byte|load16_word|load16_word_swap|load32_byte|load32_word|load32_word_swap|load32_dword|load64_word|load64_word_swap|reload|fill|continue) #IMPLIED>\n"
-			"\t\t\t\t<!ELEMENT diskarea (disk*)>\n"
-			"\t\t\t\t\t<!ATTLIST diskarea name CDATA #REQUIRED>\n"
-			"\t\t\t\t\t<!ELEMENT disk EMPTY>\n"
-			"\t\t\t\t\t\t<!ATTLIST disk name CDATA #REQUIRED>\n"
-			"\t\t\t\t\t\t<!ATTLIST disk md5 CDATA #IMPLIED>\n"
-			"\t\t\t\t\t\t<!ATTLIST disk sha1 CDATA #IMPLIED>\n"
-			"\t\t\t\t\t\t<!ATTLIST disk status (baddump|nodump|good) \"good\">\n"
-			"\t\t\t\t\t\t<!ATTLIST disk writeable (yes|no) \"no\">\n"
-#if 0
-			// we still do not store the dipswitch values in softlist, so it cannot be output here
-			// TODO: add parsing dipsw in softlist.c and then add output here!
-			"\t\t\t\t<!ELEMENT dipswitch (dipvalue*)>\n"
-			"\t\t\t\t\t<!ATTLIST dipswitch name CDATA #REQUIRED>\n"
-			"\t\t\t\t\t<!ATTLIST dipswitch tag CDATA #REQUIRED>\n"
-			"\t\t\t\t\t<!ATTLIST dipswitch mask CDATA #REQUIRED>\n"
-			"\t\t\t\t\t<!ELEMENT dipvalue EMPTY>\n"
-			"\t\t\t\t\t\t<!ATTLIST dipvalue name CDATA #REQUIRED>\n"
-			"\t\t\t\t\t\t<!ATTLIST dipvalue value CDATA #REQUIRED>\n"
-			"\t\t\t\t\t\t<!ATTLIST dipvalue default (yes|no) \"no\">\n"
-#endif
-			"]>\n\n"
-			"<softwarelists>\n"
-	);
-
+	if (nr_lists)
+	{
+		fprintf( out,
+				"<?xml version=\"1.0\"?>\n"
+				"<!DOCTYPE softwarelist [\n"
+				"<!ELEMENT softwarelists (softwarelist*)>\n"
+				"\t<!ELEMENT softwarelist (software+)>\n"
+				"\t\t<!ATTLIST softwarelist name CDATA #REQUIRED>\n"
+				"\t\t<!ATTLIST softwarelist description CDATA #IMPLIED>\n"
+				"\t\t<!ELEMENT software (description, year?, publisher, part*)>\n"
+				"\t\t\t<!ATTLIST software name CDATA #REQUIRED>\n"
+				"\t\t\t<!ATTLIST software cloneof CDATA #IMPLIED>\n"
+				"\t\t\t<!ATTLIST software supported (yes|partial|no) \"yes\">\n"
+				"\t\t\t<!ELEMENT description (#PCDATA)>\n"
+				"\t\t\t<!ELEMENT year (#PCDATA)>\n"
+				"\t\t\t<!ELEMENT publisher (#PCDATA)>\n"
+				"\t\t\t<!ELEMENT part (feature*, dataarea*, diskarea*, dipswitch*)>\n"
+				"\t\t\t\t<!ATTLIST part name CDATA #REQUIRED>\n"
+				"\t\t\t\t<!ATTLIST part interface CDATA #REQUIRED>\n"
+				"\t\t\t\t<!ELEMENT feature EMPTY>\n"
+				"\t\t\t\t\t<!ATTLIST feature name CDATA #REQUIRED>\n"
+				"\t\t\t\t\t<!ATTLIST feature value CDATA #IMPLIED>\n"
+				"\t\t\t\t<!ELEMENT dataarea (rom*)>\n"
+				"\t\t\t\t\t<!ATTLIST dataarea name CDATA #REQUIRED>\n"
+				"\t\t\t\t\t<!ATTLIST dataarea size CDATA #REQUIRED>\n"
+				"\t\t\t\t\t<!ATTLIST dataarea databits (8|16|32|64) \"8\">\n"
+				"\t\t\t\t\t<!ATTLIST dataarea endian (big|little) \"little\">\n"
+				"\t\t\t\t\t<!ELEMENT rom EMPTY>\n"
+				"\t\t\t\t\t\t<!ATTLIST rom name CDATA #IMPLIED>\n"
+				"\t\t\t\t\t\t<!ATTLIST rom size CDATA #REQUIRED>\n"
+				"\t\t\t\t\t\t<!ATTLIST rom crc CDATA #IMPLIED>\n"
+				"\t\t\t\t\t\t<!ATTLIST rom md5 CDATA #IMPLIED>\n"
+				"\t\t\t\t\t\t<!ATTLIST rom sha1 CDATA #IMPLIED>\n"
+				"\t\t\t\t\t\t<!ATTLIST rom offset CDATA #IMPLIED>\n"
+				"\t\t\t\t\t\t<!ATTLIST rom value CDATA #IMPLIED>\n"
+				"\t\t\t\t\t\t<!ATTLIST rom status (baddump|nodump|good) \"good\">\n"
+				"\t\t\t\t\t\t<!ATTLIST rom loadflag (load16_byte|load16_word|load16_word_swap|load32_byte|load32_word|load32_word_swap|load32_dword|load64_word|load64_word_swap|reload|fill|continue) #IMPLIED>\n"
+				"\t\t\t\t<!ELEMENT diskarea (disk*)>\n"
+				"\t\t\t\t\t<!ATTLIST diskarea name CDATA #REQUIRED>\n"
+				"\t\t\t\t\t<!ELEMENT disk EMPTY>\n"
+				"\t\t\t\t\t\t<!ATTLIST disk name CDATA #REQUIRED>\n"
+				"\t\t\t\t\t\t<!ATTLIST disk md5 CDATA #IMPLIED>\n"
+				"\t\t\t\t\t\t<!ATTLIST disk sha1 CDATA #IMPLIED>\n"
+				"\t\t\t\t\t\t<!ATTLIST disk status (baddump|nodump|good) \"good\">\n"
+				"\t\t\t\t\t\t<!ATTLIST disk writeable (yes|no) \"no\">\n"
+				// we still do not store the dipswitch values in softlist, so there is no output here
+				// TODO: add parsing dipsw in softlist.c and then add output here!
+				"\t\t\t\t<!ELEMENT dipswitch (dipvalue*)>\n"
+				"\t\t\t\t\t<!ATTLIST dipswitch name CDATA #REQUIRED>\n"
+				"\t\t\t\t\t<!ATTLIST dipswitch tag CDATA #REQUIRED>\n"
+				"\t\t\t\t\t<!ATTLIST dipswitch mask CDATA #REQUIRED>\n"
+				"\t\t\t\t\t<!ELEMENT dipvalue EMPTY>\n"
+				"\t\t\t\t\t\t<!ATTLIST dipvalue name CDATA #REQUIRED>\n"
+				"\t\t\t\t\t\t<!ATTLIST dipvalue value CDATA #REQUIRED>\n"
+				"\t\t\t\t\t\t<!ATTLIST dipvalue default (yes|no) \"no\">\n"
+				"]>\n\n"
+				"<softwarelists>\n"
+				);
+	}
+	
 	for ( int drvindex = 0; drivers[drvindex] != NULL; drvindex++ )
 	{
 		if ( mame_strwildcmp( gamename, drivers[drvindex]->name ) == 0 )
@@ -1048,7 +1049,10 @@ static int info_listsoftware(core_options *options, const char *gamename)
 		}
 	}
 
-	fprintf( out, "</softwarelists>\n" );
+	if (nr_lists)
+		fprintf( out, "</softwarelists>\n" );
+	else
+		fprintf( out, "No software lists found for this system\n" );
 
 	global_free( lists );
 
