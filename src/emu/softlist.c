@@ -1326,7 +1326,7 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 
 					if (list)
 					{
-						software_info *matches[5] = { 0 };
+						software_info *matches[10] = { 0 };
 						int softnum;
 
 						software_list_parse(list, list->error_proc, NULL);

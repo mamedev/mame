@@ -97,7 +97,7 @@ static const options_entry cli_options[] =
 	{ "romident",                 "0",        OPTION_COMMAND,    "compare files with known MAME roms" },
 	{ "listdevices;ld",           "0",        OPTION_COMMAND,    "list available devices" },
 	{ "listmedia;lm",             "0",        OPTION_COMMAND,    "list available media for the system" },
-	{ "listsoftware",             "0",        OPTION_COMMAND,    "list known software for the system" },
+	{ "listsoftware;lsoft",       "0",        OPTION_COMMAND,    "list known software for the system" },
 
 	{ NULL }
 };
