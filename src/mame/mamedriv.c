@@ -10935,6 +10935,7 @@ Other Sun games
 
 	// gts1.c
 	DRIVER( gts1 )
+	DRIVER( gts1s )
 	DRIVER( astannie )
 	DRIVER( buckrgrs )
 	DRIVER( charlies )

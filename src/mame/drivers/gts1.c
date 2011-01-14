@@ -47,6 +47,12 @@ ROM_START( gts1 )
 	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e))
 ROM_END
 
+ROM_START( gts1s )
+    ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("u5_cf.bin", 0x0000, 0x0800, CRC(e0d4b405) SHA1(17aadd79c0dcbb336aadd5d203bc6ca866492345))
+	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e))
+ROM_END
+
 /*-------------------------------------------------------------------
 / Asteroid Annie and the Aliens (12/1980)
 /-------------------------------------------------------------------*/
@@ -285,6 +291,9 @@ ROM_START(sys1test)
 ROM_END
 
 GAME(1977,	gts1,		0,		gts1,	gts1,	gts1,	ROT0,	"Gottlieb",		"System 1",								GAME_IS_BIOS_ROOT)
+
+//Exact same roms as gts1 with added hardware we'll likely need roms for to emulate properly
+GAME(1979,	gts1s,		gts1,		gts1,	gts1,	gts1,	ROT0,	"Gottlieb",		"System 1 with sound board",						GAME_IS_BIOS_ROOT)
                                                                                	
 GAME(1980,	astannie,	gts1s,		gts1,	gts1,	gts1,	ROT0,	"Gottlieb",		"Asteroid Annie and the Aliens",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1980,	buckrgrs,	gts1s,		gts1,	gts1,	gts1,	ROT0,	"Gottlieb",		"Buck Rogers",							GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
