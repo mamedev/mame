@@ -117,9 +117,9 @@ static UINT8 h8_get_ccr(h83xx_state *h8)
 
 static char *h8_get_ccr_str(h83xx_state *h8)
 {
-	static char res[8];
+	static char res[10];
 
-	memset(res, 0, 8);
+	memset(res, 0, sizeof(res));
 	if(h8->h8iflag) strcat(res, "I"); else strcat(res, "i");
 	if(h8->h8uiflag)strcat(res, "U"); else strcat(res, "u");
 	if(h8->h8hflag) strcat(res, "H"); else strcat(res, "h");
