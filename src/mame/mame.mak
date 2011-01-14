@@ -1136,6 +1136,8 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/kopunch.o $(VIDEO)/kopunch.o \
 	$(DRIVERS)/megadriv.o \
 	$(DRIVERS)/megadrvb.o \
+	$(MACHINE)/megadriv.o \
+	$(MACHINE)/md_pcb.o	\
 	$(DRIVERS)/megaplay.o \
 	$(DRIVERS)/megatech.o \
 	$(DRIVERS)/model1.o $(MACHINE)/model1.o $(VIDEO)/model1.o \

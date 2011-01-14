@@ -2,6 +2,7 @@
 #define MASTER_CLOCK_PAL  53203424
 #define SEGACD_CLOCK      12500000
 
+#include "imagedev/cartslot.h"
 
 extern DRIVER_INIT( megadriv_c2 );
 extern DRIVER_INIT( megadrie );
@@ -112,3 +113,15 @@ struct _mtech_bios	/* once all the regs are saved in this structure, it would be
 	int mt_bank_partial;
 	int mt_bank_addr;
 };
+
+/*----------- defined in machine/megadriv.c -----------*/
+
+MACHINE_RESET( md_mappers );
+
+MACHINE_CONFIG_EXTERN( genesis_cartslot );
+MACHINE_CONFIG_EXTERN( _32x_cartslot );
+MACHINE_CONFIG_EXTERN( pico_cartslot );
+
+WRITE16_HANDLER( jcart_ctrl_w );
+READ16_HANDLER( jcart_ctrl_r );
+
