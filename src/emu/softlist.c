@@ -819,6 +819,44 @@ static int software_list_get_count(software_list *swlist)
 
 
 /*-------------------------------------------------
+    software_get_clone - retrive name string of the
+    parent software, if any
+ -------------------------------------------------*/
+
+const char *software_get_clone(char *swlist, const char *swname)
+{
+	software_list *software_list_ptr = software_list_open(mame_options(), swlist, FALSE, NULL);
+	
+	if (software_list_ptr)
+	{
+		software_info *tmp = software_list_find(software_list_ptr, swname, NULL);
+		return tmp->parentname;
+	}
+	
+	return NULL;
+}
+
+
+/*-------------------------------------------------
+    software_get_support - retrive support state of
+    the software
+ -------------------------------------------------*/
+
+UINT32 software_get_support(char *swlist, const char *swname)
+{
+	software_list *software_list_ptr = software_list_open(mame_options(), swlist, FALSE, NULL);
+	
+	if (software_list_ptr)
+	{
+		software_info *tmp = software_list_find(software_list_ptr, swname, NULL);
+		return tmp->supported;
+	}
+	
+	return 0;
+}
+
+
+/*-------------------------------------------------
     software_list_parse
 -------------------------------------------------*/
 

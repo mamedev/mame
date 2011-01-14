@@ -282,7 +282,7 @@ int rom_load_warnings(running_machine *machine);
 
 file_error common_process_file_options(core_options *options, const char *location, const char *ext, const rom_entry *romp, mame_file **image_file);
 file_error common_process_file(const char *location, bool has_crc, UINT32 crc, const rom_entry *romp, mame_file **image_file);
-const char *software_get_clone(char *swlist, const char *swname);
+
 
 /* ----- ROM iteration ----- */
 

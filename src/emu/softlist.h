@@ -64,6 +64,9 @@ void software_list_parse(software_list *swlist, void (*error_proc)(const char *m
 software_part *software_find_part(software_info *sw, const char *partname, const char *interface_);
 software_part *software_part_next(software_part *part);
 
+/* helpers */
+const char *software_get_clone(char *swlist, const char *swname);
+UINT32 software_get_support(char *swlist, const char *swname);
 
 bool load_software_part(device_image_interface *image, const char *path, software_info **sw_info, software_part **sw_part, char **full_sw_name);
 

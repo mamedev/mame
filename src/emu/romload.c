@@ -1287,24 +1287,6 @@ static UINT32 normalize_flags_for_device(running_machine *machine, UINT32 startf
 
 
 /*-------------------------------------------------
-    software_get_clone - retrive name string of the
-    parent software, if any
- -------------------------------------------------*/
-
-const char *software_get_clone(char *swlist, const char *swname)
-{
-	software_list *software_list_ptr = software_list_open(mame_options(), swlist, FALSE, NULL);
-
-	if (software_list_ptr)
-	{
-		software_info *tmp = software_list_find(software_list_ptr, swname, NULL);
-		return tmp->parentname;
-	}
-
-	return NULL;
-}
-
-/*-------------------------------------------------
     load_software_part_region - load a software part
 
     This is used by MESS when loading a piece of
@@ -1354,6 +1336,17 @@ void load_software_part_region(device_t *device, char *swlist, char *swname, rom
 
 	romdata->errorstring.reset();
 
+	if (software_get_support(swlist, swname) == SOFTWARE_SUPPORTED_PARTIAL)
+	{
+		romdata->errorstring.catprintf("WARNING: support for software %s (in list %s) is only partial\n", swname, swlist);
+		romdata->warnings++;
+	}
+	if (software_get_support(swlist, swname) == SOFTWARE_SUPPORTED_NO)
+	{
+		romdata->errorstring.catprintf("WARNING: support for software %s (in list %s) is only preliminary\n", swname, swlist);
+		romdata->warnings++;
+	}
+	
 	/* loop until we hit the end */
 	for (region = start_region; region != NULL; region = rom_next_region(region))
 	{
