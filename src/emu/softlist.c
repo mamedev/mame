@@ -1382,8 +1382,8 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 
 							mame_printf_error("\n");
 						}
+						software_list_close(list);
 					}
-					software_list_close(list);
 				}
 			}
 		}
@@ -1641,7 +1641,6 @@ struct _software_part_state
 
 static void ui_mess_menu_populate_software_parts(running_machine *machine, ui_menu *menu, const char *swlist, const char *swinfo, const char *interface)
 {
-	//questo dovrebbe generare la lista di parts
 	software_list *list = software_list_open(machine->options(), swlist, FALSE, NULL);
 
 	if (list)
@@ -1694,7 +1693,7 @@ void ui_mess_menu_software_parts(running_machine *machine, ui_menu *menu, void *
 		astring temp_name(sw_state->short_name);
 		temp_name.cat(":");
 		temp_name.cat(entry->part_name);
-		printf("%s\n", temp_name.cstr());
+		//printf("%s\n", temp_name.cstr());
 
 		sw_state->image->load(temp_name.cstr());
 	}
@@ -1784,6 +1783,7 @@ void ui_mess_menu_software_list(running_machine *machine, ui_menu *menu, void *p
 			else
 				popmessage("No matching device found for interface '%s'!", entry->interface);
 		}
+		software_list_close(tmp_list);
 	}
 }
 
