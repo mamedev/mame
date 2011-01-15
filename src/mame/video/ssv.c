@@ -898,12 +898,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				sx	=	(sx & 0x1ff) - (sx & 0x200);
 				sy	=	(sy & 0x1ff) - (sy & 0x200);
 
-				sprites_offsx =   ((ssv_scroll[0x74/2] & 0x7f) - (ssv_scroll[0x74/2] & 0x80)) +
-							(((ssv_scroll[0x74/2] & 0x1000) && ((ssv_scroll[0x74/2] & 0x2000) == 0))
-								? ((ssv_scroll[0x7a/2] & 0x0800) >> 8) : -((ssv_scroll[0x7a/2] & 0x0800) >> 8)) - 0;
+				sprites_offsx =  ((ssv_scroll[0x74/2] & 0x7f) - (ssv_scroll[0x74/2] & 0x80)) - 0;
 
-				sprites_offsy = (-1)*((ssv_scroll[0x70/2] & 0x1ff) - (ssv_scroll[0x70/2] & 0x200) + ssv_scroll[0x6a/2] + 1) -
-								(((ssv_scroll[0x7a/2] ^ 0x0800) & 0x0800) >> 8) - 0;
+				sprites_offsy = -((ssv_scroll[0x70/2] & 0x1ff) - (ssv_scroll[0x70/2] & 0x200) + ssv_scroll[0x6a/2] + 1);
 
 				if (ssv_scroll[0x74/2] & 0x4000) // flipscreen y
 				{
@@ -925,14 +922,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				{
 					// dynagear, drifto94, eaglshot, keithlcy, mslider, srmp4, stmblade, twineag2, ultrax
 
-					sx	=	sprites_offsx + sx - (xnum - 1) * 8;
+					sx	=	sprites_offsx + sx - (xnum * 8)    ;
 					sy	=	sprites_offsy - sy - (ynum * 8) / 2;
 				}
 				else
 				{
 					// hypreact, hypreac2, janjans1, meosism, ryorioh, survarts, sxyreact, sxyreac2, vasara, vasara2
 					sx	=	sprites_offsx + sx; // not necessary for meosism
-					sy	=	sprites_offsy - sy - (ynum - 1) * 8;
+					sy	=	sprites_offsy - sy - (ynum * 8);
 				}
 
 				// srmp7
