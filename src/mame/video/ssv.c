@@ -784,7 +784,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		tilemaps_offsy = ((s2[3] & 0x1ff) - (s2[3] & 0x200));
 
 		/* Every single sprite is offset by x & yoffs, and additionally
-        by one of the 8 x & y offsets in the 1c0040-1c005f area   */
+		by one of the 8 x & y offsets in the 1c0040-1c005f area   */
 
 		xoffs	+=		ssv_scroll[((mode & 0x00e0) >> 4) + 0x40/2];
 		yoffs	+=		ssv_scroll[((mode & 0x00e0) >> 4) + 0x42/2];
@@ -829,7 +829,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				scroll	=	s2[ 0 ];	// scroll index
 
 				if (ssv_scroll[0x76/2] & 0x1000)
-					sy -= 0x20;						// kludge for eaglshot
+					sy -= 0x20;						// eaglshot
 				else
 				{
 					if (ssv_scroll[0x7a/2] & 0x0800)
@@ -900,53 +900,46 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				sx	=	(sx & 0x1ff) - (sx & 0x200);
 				sy	=	(sy & 0x1ff) - (sy & 0x200);
 
-				sprites_offsx =      ((ssv_scroll[0x74/2] & 0x7f) - (ssv_scroll[0x74/2] & 0x80)) - ((ssv_scroll[0x7a/2] & 0x0800) >> 8);
+				sprites_offsx =   ((ssv_scroll[0x74/2] & 0x7f) - (ssv_scroll[0x74/2] & 0x80)) +
+							(((ssv_scroll[0x74/2] & 0x1000) && ((ssv_scroll[0x74/2] & 0x2000) == 0))
+								? ((ssv_scroll[0x7a/2] & 0x0800) >> 8) : -((ssv_scroll[0x7a/2] & 0x0800) >> 8)) - 0;
 
-				sprites_offsy = (-1)*((ssv_scroll[0x70/2] & 0x1ff) - (ssv_scroll[0x70/2] & 0x200)
-								 + ssv_scroll[0x6a/2] + 1) - (((ssv_scroll[0x7a/2] ^ 0x0800) & 0x0800) >> 8);
+				sprites_offsy = (-1)*((ssv_scroll[0x70/2] & 0x1ff) - (ssv_scroll[0x70/2] & 0x200) + ssv_scroll[0x6a/2] + 1) -
+								(((ssv_scroll[0x7a/2] ^ 0x0800) & 0x0800) >> 8) - 0;
 
-				if (ssv_scroll[0x74/2] & 0x4000)	// srmp7, twineag2, ultrax, vasara
+				if (ssv_scroll[0x74/2] & 0x4000) // flipscreen y
 				{
 					sy = -sy;
 					if (ssv_scroll[0x74/2] & 0x8000)
-						sy += 0x00;			// srmp7, twineag2, ultrax
+						sy += 0x00;			// 
 					else
-						sy -= 0x10;			// vasara
+						sy -= 0x10;			// vasara (hack)
 				}
 
-				if (ssv_scroll[0x74/2] & 0x1000)
+				if (ssv_scroll[0x74/2] & 0x1000) // flipscreen x
 				{
-					sx = -sx + 0x100; // -0x20 for eaglshot
+					sx = -sx + 0x100;
 				}
 
-				// sprites can use x and y coordinates relative to a side, the other side or the center
-				// for now we use a kludge
+				// sprites can be relative to a side, the other side or the center
 
-				if (ssv_scroll[0x74/2] & 0x8000)
+				if (ssv_scroll[0x7a/2] & 0x0800)
 				{
-					if (ssv_scroll[0x76/2] & 0x4000) {					// twineag2, ultrax
-						sx	=	sprites_offsx + sx - (xnum - 1) * 8;
-						sy	=	sprites_offsy - sy - (ynum * 8) / 2;
-					} else {									// srmp7
-						sx	=	sprites_offsx + sx;
-						sy	=	sprites_offsy - sy;
-					}
-				}
-				else if (ssv_scroll[0x76/2] & 0x1000)					// eaglshot
-				{
+					// dynagear, drifto94, eaglshot, keithlcy, mslider, srmp4, stmblade, twineag2, ultrax
+
 					sx	=	sprites_offsx + sx - (xnum - 1) * 8;
 					sy	=	sprites_offsy - sy - (ynum * 8) / 2;
 				}
-				else if (ssv_scroll[0x70/2] == 0x02fd)					// dynagear
+				else
 				{
-					sx	=	sprites_offsx + sx;
-					sy	=	sprites_offsy - sy - (ynum * 8) / 2;
-				}
-				else											// other games
-				{
-					sx	=	sprites_offsx + sx;
+					// hypreact, hypreac2, janjans1, meosism, ryorioh, survarts, sxyreact, sxyreac2, vasara, vasara2
+					sx	=	sprites_offsx + sx; // not necessary for meosism
 					sy	=	sprites_offsy - sy - (ynum - 1) * 8;
 				}
+
+				// srmp7
+				// sx	=	sprites_offsx + sx;
+				// sy	=	sprites_offsy - sy + 8;
 
 				/* Sprite code masking */
 				if (xnum == 2 && ynum == 4) // needed by hypreact
