@@ -441,7 +441,7 @@ bool legacy_image_device_base::load_internal(const char *path, bool is_create, i
 		softload = load_software_part( this, path, &m_software_info_ptr, &m_software_part_ptr, &m_full_software_name );
 		// if we had launched from softlist with a specified part, e.g. "shortname:part"
 		// we would have recorded the wrong name, so record it again based on software_info
-		if (m_software_info_ptr->shortname != NULL)
+		if (m_software_info_ptr && m_software_info_ptr->shortname)
 			m_err = set_image_filename(m_software_info_ptr->shortname);
 	}
 
