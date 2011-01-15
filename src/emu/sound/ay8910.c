@@ -477,7 +477,7 @@ static void ay8910_write_reg(ay8910_context *psg, int r, int v)
 		case AY_ECOARSE:
 			#ifdef MAME_DEBUG
 			if ( (v & 0x0f) > 0)
-				popmessage("Write to ECoarse register detected - please inform www.mametesters.org");
+				popmessage("ECoarse");
 			#endif
 			/* No action required */
 			break;
@@ -501,7 +501,7 @@ static void ay8910_write_reg(ay8910_context *psg, int r, int v)
 		case AY_ESHAPE:
 			#ifdef MAME_DEBUG
 			if ( (v & 0x0f) > 0)
-				popmessage("Write to EShape register detected - please inform www.mametesters.org");
+				popmessage("EShape");
 			#endif
 			psg->attack = (psg->regs[AY_ESHAPE] & 0x04) ? psg->env_step_mask : 0x00;
 			if ((psg->regs[AY_ESHAPE] & 0x08) == 0)
