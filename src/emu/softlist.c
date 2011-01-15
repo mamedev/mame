@@ -831,6 +831,7 @@ const char *software_get_clone(char *swlist, const char *swname)
 	if (software_list_ptr)
 	{
 		software_info *tmp = software_list_find(software_list_ptr, swname, NULL);
+		software_list_close(software_list_ptr);
 		return tmp->parentname;
 	}
 
@@ -850,6 +851,7 @@ UINT32 software_get_support(char *swlist, const char *swname)
 	if (software_list_ptr)
 	{
 		software_info *tmp = software_list_find(software_list_ptr, swname, NULL);
+		software_list_close(software_list_ptr);
 		return tmp->supported;
 	}
 
