@@ -1729,7 +1729,21 @@ void m68040_fpu_op1(m68ki_cpu_core *m68k)
 		{
 			switch (mode)
 			{
-				case 3:	// (An)+
+			case 2: // (An)
+				addr = REG_A[reg];
+
+				if (m68k->fpu_just_reset)
+				{
+					m68ki_write_32(m68k, addr, 0);
+				}
+				else
+				{
+					// we normally generate an IDLE frame
+					perform_fsave(m68k, addr, 1);
+				}
+				break;
+
+			case 3:	// (An)+
 		    			addr = EA_AY_PI_32(m68k);
 
 					if (m68k->fpu_just_reset)
