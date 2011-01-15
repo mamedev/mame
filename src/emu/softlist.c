@@ -11,6 +11,7 @@
 #include "pool.h"
 #include "expat.h"
 #include "emuopts.h"
+#include "hash.h"
 #include "softlist.h"
 
 #include <ctype.h>
@@ -1133,6 +1134,58 @@ software_info *software_list_find(software_list *swlist, const char *look_for, s
 
 
 /*-------------------------------------------------
+    software_find_romdata (for validation purposes)
+ -------------------------------------------------*/
+
+static struct rom_entry *software_find_romdata(software_part *swpart, const char *dataname)
+{
+	struct rom_entry *data = swpart ? swpart->romdata : NULL;
+
+	/* If no dataname supplied, then we just return the first entry */
+	if (data)
+	{
+		while(data && data->_name)
+		{
+			if (dataname)
+			{
+				if (!strcmp(dataname, data->_name))
+				{
+					break;
+				}
+			}
+			/* No specific dataname supplied, return the first rom_entry */
+			else
+				break;
+
+			data++;
+		}
+	}
+
+	if (!data->_name)
+		data = NULL;
+
+	return data;
+}
+
+
+/*-------------------------------------------------
+    software_romdata_next (for validation purposes)
+ -------------------------------------------------*/
+
+static struct rom_entry *software_romdata_next(struct rom_entry *romdata)
+{
+	if (romdata && romdata->_name)
+	{
+		romdata++;
+	}
+	else
+		romdata = NULL;
+
+	return romdata;
+}
+
+
+/*-------------------------------------------------
     software_find_part
 -------------------------------------------------*/
 
@@ -1541,13 +1594,28 @@ static DEVICE_VALIDITY_CHECK( software_list )
 				{
 					is_clone = 1;
 
+					if (strcmp(swinfo->parentname, swinfo->shortname) == 0)
+					{
+						mame_printf_error("%s: %s is set as a clone of itself\n", swlist->list_name[i], swinfo->shortname);
+						error = TRUE;
+						break;
+					}
+
 					/* make sure the parent exists */
 					software_info *swinfo2 = software_list_find(list, swinfo->parentname, NULL );
 
-					if ( !swinfo2 )
+					if (!swinfo2)
 					{
-						mame_printf_error("%s: parent '%s' software for '%s' not found\n", swlist->list_name[i], swinfo->parentname, swinfo->shortname );
+						mame_printf_error("%s: parent '%s' software for '%s' not found\n", swlist->list_name[i], swinfo->parentname, swinfo->shortname);
 						error = TRUE;
+					}
+					else
+					{
+						if (swinfo2->parentname != NULL)
+						{
+							mame_printf_error("%s: %s is a clone of a clone\n", swlist->list_name[i], swinfo->shortname);
+							error = TRUE;
+						}
 					}
 				}
 
@@ -1568,7 +1636,46 @@ static DEVICE_VALIDITY_CHECK( software_list )
 						break;
 					}
 
-				// TODO: shall we verify that all parts have some dataarea? and what about checking that a shortname is really present?
+				for (software_part *swpart = software_find_part(swinfo, NULL, NULL); swpart != NULL; swpart = software_part_next(swpart))
+				{
+					if (swpart->interface_ == NULL)
+					{
+						mame_printf_error("%s: %s has a part (%s) without interface\n", swlist->list_name[i], swinfo->shortname, swpart->name);
+						error = TRUE;
+					}
+
+					if (software_find_romdata(swpart, NULL) == NULL)
+					{
+						mame_printf_error("%s: %s has a part (%s) with no data\n", swlist->list_name[i], swinfo->shortname, swpart->name);
+						error = TRUE;
+					}
+
+					for (struct rom_entry *swdata = software_find_romdata(swpart, NULL); swdata != NULL;  swdata = software_romdata_next(swdata))
+					{
+						struct rom_entry *data = swdata;
+
+						if (data->_name && data->_hashdata)
+						{
+							const char *s;
+
+							/* make sure it's all lowercase */
+							for (s = data->_name; *s; s++)
+								if (tolower((UINT8)*s) != *s)
+								{
+									mame_printf_error("%s: %s has upper case ROM name %s\n", swlist->list_name[i], swinfo->shortname, data->_name);
+									error = TRUE;
+									break;
+								}
+
+							/* make sure the hash is valid */
+							if (!hash_verify_string(data->_hashdata))
+							{
+								mame_printf_error("%s: %s has rom '%s' with an invalid hash string '%s'\n", swlist->list_name[i], swinfo->shortname, data->_name, data->_hashdata);
+								error = TRUE;
+							}
+						}
+					}
+				}
 			}
 
 			software_list_close(list);
