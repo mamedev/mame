@@ -549,7 +549,39 @@ ROM_START( podrace )
 	ROM_LOAD("mpr-23117.ic68" , 0xf800000, 0x0800000, NO_DUMP )
 ROM_END
 
+ROM_START( braveff )
+	ROM_REGION( 0x200000, "maincpu", 0)
+	HIKARU_BIOS
+
+	ROM_REGION( 0x2000000, "user1", 0)
+	ROM_LOAD32_WORD( "epr-21994.ic29", 0x000000, 0x200000, CRC(31b0a754) SHA1(b49c998a15fbc790b780ed6665a56681d4edd369) ) 
+	ROM_LOAD32_WORD( "epr-21995.ic30", 0x000002, 0x200000, CRC(bcccb56b) SHA1(6e7a69934e5b47495ae8e90c57759573bc519d24) ) 
+	ROM_LOAD32_WORD( "epr-21996.ic31", 0x400000, 0x200000, CRC(a8f88e17) SHA1(dbbd2a73335c740bcf2ff9680c575841af29b340) ) 
+	ROM_LOAD32_WORD( "epr-21997.ic32", 0x400002, 0x200000, CRC(4b24fa1b) SHA1(53c330f7e7ce8cb67f67db3ee9068a77aeb33747) ) 
+	ROM_LOAD32_WORD( "epr-21998.ic33", 0x800000, 0x200000, CRC(bd1df696) SHA1(fd937894763fab5cb50f33c40f8047e0d3adc93b) ) 
+	ROM_LOAD32_WORD( "epr-21999.ic34", 0x800002, 0x200000, CRC(9425eee0) SHA1(0f6a23163022bbd7ec54dd638094f3e317a87919) ) 
+	/* ic35 unpopulated */
+	/* ic36 unpopulated */
+
+	/* ROM board using 64M SOP44 MASKROM */
+	ROM_REGION( 0x10000000, "user2", ROMREGION_ERASE00)
+ROM_END
+
+ROM_START( sgnascar )
+	ROM_REGION( 0x200000, "maincpu", 0)
+	HIKARU_BIOS
+
+	ROM_REGION( 0x2000000, "user1", 0)
+	ROM_LOAD32_WORD( "epr-23485a.ic35", 0x000000, 0x400000, CRC(1072f531) SHA1(ca07a8bfb7247e4aec57e18cb091d24dcef666c1) ) 
+	ROM_LOAD32_WORD( "epr-23486a.ic36", 0x000002, 0x400000, CRC(02d4aab6) SHA1(b1b0e07dc71dc124177e27dfd8b459444e8ae4d3) ) 
+
+	/* ROM board using 64M SOP44 MASKROM */
+	ROM_REGION( 0x10000000, "user2", ROMREGION_ERASE00)
+ROM_END
+
 GAME( 2000, hikaru,   0,        hikaru,   hikaru,   0, ROT0, "Sega",            "Hikaru Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
+GAME( 1999, braveff,  hikaru,   hikaru,   hikaru,   0, ROT0, "Sega",            "Brave Fire Fighters", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 GAME( 2000, airtrix,  hikaru,   hikaru,   hikaru,   0, ROT0, "Sega",            "Air Trix", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2000, sgnascar, hikaru,   hikaru,   hikaru,   0, ROT0, "Sega / Electronic Arts", "NASCAR Racing", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2001, pharrier, hikaru,   hikaru,   hikaru,   0, ROT0, "Sega",            "Planet Harriers", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2001, podrace,  hikaru,   hikaru,   hikaru,   0, ROT0, "Sega",            "Star Wars Pod Racer", GAME_NO_SOUND|GAME_NOT_WORKING )

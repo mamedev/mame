@@ -4888,9 +4888,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	/* Hikaru */
 	DRIVER( hikaru )	/* BIOS (c)2000 */
-						/* 1999.06 Syouboushi Brave Fire Fighters */
+	DRIVER( braveff )	/* 1999.06 Syouboushi Brave Fire Fighters */
 	DRIVER( podrace )	/* 2000.06 Star Wars: Racer Arcade */
-						/* 2000.09 Nascar Arcade */
+	DRIVER( sgnascar )  /* 2000.09 Nascar Arcade */
 	DRIVER( pharrier )	/* 2000.12 Planet Harriers */
 	DRIVER( airtrix )	/* 2001.02 Air Trix */
 						/* 2001.10 Dennou Senki Virtual-On Force */
