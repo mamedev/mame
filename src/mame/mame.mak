@@ -1997,8 +1997,6 @@ $(DRIVERS)/wecleman.o:	$(LAYOUT)/wecleman.lh
 
 $(DRIVERS)/zac2650.o:	$(LAYOUT)/tinv2650.lh
 
-$(DRIVERS)/peyper.o:	$(LAYOUT)/peyper.lh
-
 $(MAMEOBJ)/mamedriv.o:	$(LAYOUT)/pinball.lh
 
 #-------------------------------------------------

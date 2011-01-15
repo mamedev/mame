@@ -1,155 +1,14 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
-#include "peyper.lh"
+
+extern const char layout_pinball[];
 
 class peyper_state : public driver_device
 {
 public:
 	peyper_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
-	
-	UINT8 irq_state;
-	
-	UINT8 display_block;
-	UINT8 display[16];
 };
-static READ8_HANDLER(sw_r) {
-	return 0xff;
-}
-
-static WRITE8_HANDLER(col_w) {	
-	peyper_state *state = space->machine->driver_data<peyper_state>();
-	if (data==0x90) state->display_block = 0;
-}
-static const UINT8 hex_to_7seg[16] = 
-	{0x3F, 0x06, 0x5B, 0x4F, 
-	 0x66, 0x6D, 0x7D, 0x07, 
-	 0x7F, 0x6F, 0x00, 0x00, 
-	 0x00, 0x00, 0x00, 0x00 };
-	 
-static WRITE8_HANDLER(disp_w) {	
-	peyper_state *state = space->machine->driver_data<peyper_state>();
-	state->display[state->display_block] = data;
-	
-	UINT8 a = data & 0x0f;
-	UINT8 b = data >> 4;
-	UINT8 hex_a = hex_to_7seg[a];
-	UINT8 hex_b = hex_to_7seg[b];
-/*	
-0 -> XA0 DPL25,DPL27
-1 -> XA1 DPL26,DPL28
-2 -> DPL23,DPL5 
-3 -> DPL22,DPL4 
-4 -> DPL21,DPL3 
-5 -> DPL20,DPL2 
-6 -> DPL19,DPL1 
-7 -> DPL30,DPL33
-*/
-	switch(state->display_block) {
-		case 0 : 				
-				output_set_indexed_value("dpl_",25,hex_a);
-				output_set_indexed_value("dpl_",27,hex_b);
-				break;
-		case 1 : 				
-				output_set_indexed_value("dpl_",26,hex_a);
-				output_set_indexed_value("dpl_",28,hex_b);
-				break;
-		case 2 : 				
-				output_set_indexed_value("dpl_",23,hex_a);
-				output_set_indexed_value("dpl_",5,hex_b);
-				break;
-		case 3 : 				
-				output_set_indexed_value("dpl_",22,hex_a);
-				output_set_indexed_value("dpl_",4,hex_b);
-				break;
-		case 4 : 				
-				output_set_indexed_value("dpl_",21,hex_a);
-				output_set_indexed_value("dpl_",3,hex_b);
-				break;
-		case 5 : 				
-				output_set_indexed_value("dpl_",20,hex_a);
-				output_set_indexed_value("dpl_",2,hex_b);
-				break;
-		case 6 : 				
-				output_set_indexed_value("dpl_",19,hex_a);
-				output_set_indexed_value("dpl_",1,hex_b);
-				break;
-		case 7 : 				
-				output_set_indexed_value("dpl_",30,hex_a);
-				output_set_indexed_value("dpl_",33,hex_b);
-				break;	
-/*
-8 ->  XB0
-9 ->  XB1
-10 -> DPL11,DPL17
-11 -> DPL10,DPL16
-12 -> DPL09,DPL15
-13 -> DPL08,DPL14
-14 -> DPL07,DPL13
-15 -> DPL31,DPL32
-*/
-		case 8 : 				
-				/*
-				if (BIT(a,3)) logerror("TILT\n");
-				if (BIT(a,2)) logerror("ONC\n");
-				if (BIT(a,1)) logerror("GAME OVER\n");
-				if (BIT(a,0)) logerror("BALL IN PLAY\n");*/
-				output_set_indexed_value("led_",1,BIT(b,0)); // PLAYER 1
-				output_set_indexed_value("led_",2,BIT(b,1)); // PLAYER 2
-				output_set_indexed_value("led_",3,BIT(b,2)); // PLAYER 3
-				output_set_indexed_value("led_",4,BIT(b,3)); // PLAYER 4				
-				break;	
-		case 9 :
-				if (!BIT(b,0)) output_set_indexed_value("dpl_",6,hex_to_7seg[0]);
-				if (!BIT(b,1)) output_set_indexed_value("dpl_",12,hex_to_7seg[0]);
-				if (!BIT(b,2)) output_set_indexed_value("dpl_",24,hex_to_7seg[0]);
-				if (!BIT(b,3)) output_set_indexed_value("dpl_",18,hex_to_7seg[0]);
-				output_set_indexed_value("dpl_",29,hex_a);		
-				break;	
-		case 10 : 				
-				output_set_indexed_value("dpl_",11,hex_a);
-				output_set_indexed_value("dpl_",17,hex_b);
-				break;	
-		case 11 : 				
-				output_set_indexed_value("dpl_",10,hex_a);
-				output_set_indexed_value("dpl_",16,hex_b);
-				break;	
-		case 12 : 				
-				output_set_indexed_value("dpl_",9,hex_a);
-				output_set_indexed_value("dpl_",15,hex_b);
-				break;	
-		case 13 : 				
-				output_set_indexed_value("dpl_",8,hex_a);
-				output_set_indexed_value("dpl_",14,hex_b);
-				break;	
-		case 14 : 				
-				output_set_indexed_value("dpl_",7,hex_a);
-				output_set_indexed_value("dpl_",13,hex_b);
-				break;	
-		case 15 : 				
-				output_set_indexed_value("dpl_",31,hex_a);
-				output_set_indexed_value("dpl_",32,hex_b);
-				break;	
-
-	}
-	
-	state->display_block++;
-	state->display_block&=0x0f;
-}
-
-static WRITE8_HANDLER(lamp_w) {
-	//logerror("lamp_w %02x\n",data);
-	//logerror("[%d]= %02x\n",4+offset/4,data);
-}
-
-static WRITE8_HANDLER(lamp7_w) {
-	//logerror("[7]= %02x\n",data);
-}
-
-static WRITE8_HANDLER(sol_w) {
-	//logerror("sol_w %02x\n",data);
-}
 
 static ADDRESS_MAP_START( peyper_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -160,121 +19,17 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( peyper_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(sw_r,disp_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(col_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ay8910_0", ay8910_address_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("ay8910_0", ay8910_data_w) 
-	AM_RANGE(0x08, 0x08) AM_DEVWRITE("ay8910_1", ay8910_address_w)
-	AM_RANGE(0x0a, 0x0a) AM_DEVWRITE("ay8910_1", ay8910_data_w) 
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(sol_w)
-	AM_RANGE(0x10, 0x18) AM_WRITE(lamp_w)
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSW0")
-	AM_RANGE(0x24, 0x24) AM_READ_PORT("DSW1")	
-	AM_RANGE(0x28, 0x28) AM_READ_PORT("SW0")
-	AM_RANGE(0x2c, 0x2c) AM_WRITE(lamp7_w)
-
 ADDRESS_MAP_END
    	
 static INPUT_PORTS_START( peyper )
-	PORT_START("SW0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) // N.C.
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED ) // N.C.
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) // Reset
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT ) // Tilt
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )  // Start game
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) // Small coin
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) // Medium coin
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 ) // Big coin
-	PORT_START("DSW0")
-	PORT_DIPNAME( 0x80, 0x00, "Extra Ball"  ) // Bola Extra
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) ) 
-	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) ) 
-	PORT_DIPNAME( 0x40, 0x00, "Premio Loteria" ) // Premio Loteria	
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x00, "Reclamo" ) // Reclamo
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x18, 0x00, "Partidas/Moneda" ) // Partidas/Moneda
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Bolas Partida" ) // Bolas Partida
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPSETTING(    0x04, "3" )
-	PORT_DIPNAME( 0x03, 0x00, "Premios / Puntos" ) // Premios / Puntos
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) )		
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x80, 0x00, "NC" ) // N.C.
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) ) 
-	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) ) 
-	PORT_DIPNAME( 0x40, 0x00, "NC" ) //  N.C.	
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x00, "NC" ) //  N.C.
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x10, 0x00, "NC" ) //  N.C.
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "NC" ) //  N.C.
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Visualizac. H. Funcion" ) // Visualizac. H. Funcion
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x00, "Visualizac. Monederos" ) // Visualizac. Monederos
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x01, 0x00, "Visualizac. Partidas" ) // Visualizac. Partidas
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )		
 INPUT_PORTS_END
 
 static MACHINE_RESET( peyper )
 {
-	peyper_state *state = machine->driver_data<peyper_state>();
-	state->irq_state = 0;
 }
 
 static DRIVER_INIT( peyper )
 {
-}
-
-static WRITE8_HANDLER(ay8910_0_porta_w)	{ } //logerror("[0]= %02x\n",data); }
-static WRITE8_HANDLER(ay8910_0_portb_w)	{ } //logerror("[1]= %02x\n",data); }
-static WRITE8_HANDLER(ay8910_1_porta_w)	{ } //logerror("[2]= %02x\n",data); }
-static WRITE8_HANDLER(ay8910_1_portb_w)	{ } //logerror("[3]= %02x\n",data); }
-
-static const ay8910_interface peyper_0_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, ay8910_0_porta_w),
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, ay8910_0_portb_w)
-};
-
-static const ay8910_interface peyper_1_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, ay8910_1_porta_w),
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, ay8910_1_portb_w)
-};
-
-INTERRUPT_GEN( peyper_irq )
-{
-	peyper_state *state = device->machine->driver_data<peyper_state>();
-	cpu_set_input_line(device, 0, state->irq_state ? HOLD_LINE : CLEAR_LINE);
-	state->irq_state ^= 1;
 }
 
 static MACHINE_CONFIG_START( peyper, peyper_state )
@@ -282,22 +37,11 @@ static MACHINE_CONFIG_START( peyper, peyper_state )
 	MCFG_CPU_ADD("maincpu", Z80, 2500000)
 	MCFG_CPU_PROGRAM_MAP(peyper_map)
 	MCFG_CPU_IO_MAP(peyper_io)
-	MCFG_CPU_PERIODIC_INT(peyper_irq, 1250 * 2)
 	
 	MCFG_MACHINE_RESET( peyper )
 	
-//	MCFG_NVRAM_HANDLER(generic_1fill)
-	
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910_0", AY8910, 2500000)
-	MCFG_SOUND_CONFIG(peyper_0_ay8910_interface)
-	MCFG_SOUND_ADD("ay8910_1", AY8910, 2500000)
-	MCFG_SOUND_CONFIG(peyper_1_ay8910_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_peyper)
+	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
