@@ -87,7 +87,7 @@ ROM_START(motrshow)
 	ROM_LOAD("snd_ic36.rom", 0x8000, 0x8000, CRC(4f42be6e) SHA1(684e988f413cd21c785ad5d60ef5eaddddaf72ab))
 ROM_END
 
-ROM_START(motrshwa)
+ROM_START(motrshowa)
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD16_BYTE("cpuic13a.rom", 0x000000, 0x8000, CRC(2dbdd9d4) SHA1(b404814a4e83ead6da3c57818ae97f23d380f9da))
 	ROM_LOAD16_BYTE("cpuic14b.rom", 0x000001, 0x8000, CRC(0bd98fec) SHA1(b90a7e997db59740398003ba94a69118b1ee70af))
@@ -163,6 +163,6 @@ ROM_END
 
 GAME(1988,	dakar,		0,			mrgame,	mrgame,	mrgame,	ROT0,	"Mr Game",		"Dakar",						GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1988,	motrshow,	0,			mrgame,	mrgame,	mrgame,	ROT0,	"Mr Game",		"Motor Show",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1988,	motrshwa,	motrshow,	mrgame,	mrgame,	mrgame,	ROT0,	"Mr Game",		"Motor Show (alternate set)",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1988,	motrshowa,	motrshow,		mrgame,	mrgame,	mrgame,	ROT0,	"Mr Game",		"Motor Show (alternate set)",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1990,	macattck,	0,			mrgame,	mrgame,	mrgame,	ROT0,	"Mr Game",		"Mac Attack",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1990,	wcup90,		0,			mrgame,	mrgame,	mrgame,	ROT0,	"Mr Game",		"World Cup 90",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

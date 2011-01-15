@@ -89,7 +89,7 @@ ROM_START(blckhole)
 	ROM_LOAD("668-s2.snd", 0x7800, 0x0800, CRC(d63da498) SHA1(84dd87783f47fbf64b1830284c168501f9b455e2))
 ROM_END
 
-ROM_START(blkhole2)
+ROM_START(blckhole2)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
 	ROM_RELOAD(0x6000, 0x1000)
@@ -109,7 +109,7 @@ ROM_START(blkhole2)
 	ROM_LOAD("668-s2.snd", 0x7800, 0x0800, CRC(d63da498) SHA1(84dd87783f47fbf64b1830284c168501f9b455e2))
 ROM_END
 
-ROM_START(blkholea)
+ROM_START(blckholea)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
 	ROM_RELOAD(0x6000, 0x1000)
@@ -691,8 +691,8 @@ ROM_START(s80tst)
 ROM_END
 
 /* disp2 */GAME(1981,	blckhole,	0,		gts80_ss,	gts80,	gts80,	ROT0,	"Gottlieb",		"Black Hole (Rev. 4)",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-/* disp2 */GAME(1981,	blkhole2,	blckhole,	gts80_ss,	gts80,	gts80,	ROT0,	"Gottlieb",		"Black Hole (Rev. 2)",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-/* disp2 */GAME(1981,	blkholea,	0,			gts80_s,	gts80,	gts80,	ROT0,	"Gottlieb",		"Black Hole (Sound Only)",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+/* disp2 */GAME(1981,	blckhole2,	blckhole,	gts80_ss,	gts80,	gts80,	ROT0,	"Gottlieb",		"Black Hole (Rev. 2)",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+/* disp2 */GAME(1981,	blckholea,	0,			gts80_s,	gts80,	gts80,	ROT0,	"Gottlieb",		"Black Hole (Sound Only)",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 /* disp1 */GAME(1980,	circusp,	0,		gts80_s,	gts80,	gts80,	ROT0,	"Gottlieb",		"Circus",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 /* disp1 */GAME(1980,	cntforce,	0,		gts80_s,	gts80,	gts80,	ROT0,	"Gottlieb",		"Counterforce",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 /* disp2 */GAME(1981,	eclipse,	0,		gts80_s,	gts80,	gts80,	ROT0,	"Gottlieb",		"Eclipse",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

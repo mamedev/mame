@@ -498,7 +498,7 @@ ROM_START(sprbreak)
 	ROM_LOAD("yrom2.snd",0xc000,0x2000, CRC(0fb0128e) SHA1(3bdc5ed11b8e062f71f2a78b955830bd985e80a3))
 ROM_END
 
-ROM_START(sprbrks)
+ROM_START(sprbreaks)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("prom2.rv2", 0x1000, 0x0800, CRC(911cd14f) SHA1(2bc3ff6a3889da69b97f8ec318f93208e3d42cfe))
 	ROM_RELOAD(0x5000, 0x0800)
@@ -534,7 +534,7 @@ ROM_START(tagteamp)
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
 
-ROM_START(tagteam2)
+ROM_START(tagteamp2)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("prom2a.cpu", 0x1000, 0x0800, CRC(6d56b636) SHA1(8f50f2742be727835e7343307787b4b5daa1623a))
 	ROM_RELOAD(0x5000, 0x0800)
@@ -611,8 +611,8 @@ GAME(1988,	robowars,	0,		gts80b_s2,	gts80b,	gts80b,	ROT0,	"Gottlieb",				"Robo-W
 GAME(1985,	rock,		0,		gts80b_s1,	gts80b,	gts80b,	ROT0,	"Gottlieb",				"Rock",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1986,	rock_enc,	rock,		gts80b_s1,	gts80b,	gts80b,	ROT0,	"Gottlieb",				"Rock Encore",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1987,	sprbreak,	0,		gts80b_s1,	gts80b,	gts80b,	ROT0,	"Gottlieb",				"Spring Break",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(19??,	sprbrks,	sprbreak,gts80b_s1,	gts80b,	gts80b,	ROT0,	"Gottlieb",				"Spring Break (single ball game)",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(19??,	sprbreaks,	sprbreak,gts80b_s1,	gts80b,	gts80b,	ROT0,	"Gottlieb",				"Spring Break (single ball game)",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1985,	tagteamp,	0,		gts80b_s,	gts80b,	gts80b,	ROT0,	"Gottlieb",				"Tag-Team Wrestling",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1985,	tagteam2,	tagteamp,	gts80b_s,	gts80b,	gts80b,	ROT0,	"Gottlieb",				"Tag-Team Wrestling (rev.2)",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1985,	tagteamp2,	tagteamp,	gts80b_s,	gts80b,	gts80b,	ROT0,	"Gottlieb",				"Tag-Team Wrestling (rev.2)",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1988,	txsector,	0,		gts80b_s2,	gts80b,	gts80b,	ROT0,	"Gottlieb",				"TX-Sector",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1987,	victoryp,	0,		gts80b_s2,	gts80b,	gts80b,	ROT0,	"Gottlieb",				"Victory (Pinball)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

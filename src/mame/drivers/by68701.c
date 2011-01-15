@@ -44,7 +44,7 @@ MACHINE_CONFIG_END
 /*------------------
 / Flash Gordon
 /------------------*/
-ROM_START(flashgdp)
+ROM_START(flashgdnp1)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "fg68701.bin", 0xf800, 0x0800, CRC(e52da294) SHA1(0191ae821fbeae40192d858ca7f2dccda84de73f))
 	ROM_LOAD( "xxx-xx.u10", 0xc000, 0x1000, NO_DUMP)
@@ -55,7 +55,7 @@ ROM_START(flashgdp)
 	ROM_LOAD("834-18_5.532", 0xf000, 0x1000, CRC(8799e80e) SHA1(f255b4e7964967c82cfc2de20ebe4b8d501e3cb0))
 ROM_END
 
-ROM_START(flashgp2)
+ROM_START(flashgdnp2)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "fg6801.bin", 0xf800, 0x0800, CRC(8af7bf77) SHA1(fd65578b2340eb207b2e197765e6721473340565) BAD_DUMP)
 	ROM_LOAD( "xxx-xx2.u10", 0xc000, 0x1000, CRC(0fff825c) SHA1(3c567aa8ec04a8ff9a09b530b6d324fdbe363ab6))
@@ -69,7 +69,7 @@ ROM_END
 /*------------------
 / Eight Ball Deluxe
 /------------------*/
-ROM_START(eballdp1)
+ROM_START(eballdlxp1)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "ebd68701.1", 0xf800, 0x0800, CRC(2c693091) SHA1(93ae424d6a43424e8ea023ef555f6a4fcd06b32f))
 	ROM_LOAD( "720-61.u10", 0xd000, 0x1000, CRC(ac646e58) SHA1(85694264a739118ed249d97c04fe8e9f6edfdd33))
@@ -82,7 +82,7 @@ ROM_START(eballdp1)
 	ROM_RELOAD(0xe800, 0x0800)
 	ROM_LOAD("838-16_5.532", 0xf000, 0x1000, CRC(63d92025) SHA1(2f8e8435326a39064b99b9971b0d8944586571fb))
 ROM_END
-ROM_START(eballdp2)
+ROM_START(eballdlxp2)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "ebd68701.1", 0xf800, 0x0800, CRC(2c693091) SHA1(93ae424d6a43424e8ea023ef555f6a4fcd06b32f))
 	ROM_LOAD( "720-56.u10", 0xd000, 0x1000, CRC(65a3a02b) SHA1(6fa8667509d314f521dce63d9f1b7fc132d85a1f))
@@ -95,7 +95,7 @@ ROM_START(eballdp2)
 	ROM_RELOAD(0xe800, 0x0800)
 	ROM_LOAD("838-16_5.532", 0xf000, 0x1000, CRC(63d92025) SHA1(2f8e8435326a39064b99b9971b0d8944586571fb))
 ROM_END
-ROM_START(eballdp3)
+ROM_START(eballdlxp3)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "ebd68701.1", 0xf800, 0x0800, CRC(2c693091) SHA1(93ae424d6a43424e8ea023ef555f6a4fcd06b32f))
 	ROM_LOAD( "720-xx.u10", 0xd000, 0x1000, CRC(6da34581) SHA1(6e005ceda9a4a23603d5243dfca85ccd3f0e425a))
@@ -108,7 +108,7 @@ ROM_START(eballdp3)
 	ROM_RELOAD(0xe800, 0x0800)
 	ROM_LOAD("838-16_5.532", 0xf000, 0x1000, CRC(63d92025) SHA1(2f8e8435326a39064b99b9971b0d8944586571fb))
 ROM_END
-ROM_START(eballdp4)
+ROM_START(eballdlxp4)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "ebd68701.1", 0xf800, 0x0800, CRC(2c693091) SHA1(93ae424d6a43424e8ea023ef555f6a4fcd06b32f))
 	ROM_LOAD( "720-54.u10", 0xd000, 0x1000, CRC(9facc547) SHA1(a10d7747918b3a1d87bd9caa19e87739631a7566))
@@ -121,9 +121,9 @@ ROM_START(eballdp4)
 	ROM_LOAD("838-16_5.532", 0xf000, 0x1000, CRC(63d92025) SHA1(2f8e8435326a39064b99b9971b0d8944586571fb))
 ROM_END
 
-GAME(1981,	flashgdp,	flashgdn,	by68701,	by68701,	by68701,	ROT0,	"Bally",	"Flash Gordon (prototype rev. 1)",		 GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1981,	flashgp2,	flashgdn,	by68701,	by68701,	by68701,	ROT0,	"Bally",	"Flash Gordon (prototype rev. 2)",		 GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1981,	eballdp1,	eballdlx,	by68701,	by68701,	by68701,	ROT0,	"Bally",	"Eight Ball Deluxe (prototype rev. 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1981,	eballdp2,	eballdlx,	by68701,	by68701,	by68701,	ROT0,	"Bally",	"Eight Ball Deluxe (prototype rev. 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1981,	eballdp3,	eballdlx,	by68701,	by68701,	by68701,	ROT0,	"Bally",	"Eight Ball Deluxe (prototype rev. 3)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1981,	eballdp4,	eballdlx,	by68701,	by68701,	by68701,	ROT0,	"Bally",	"Eight Ball Deluxe (prototype rev. 4)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1981,	flashgdnp1,	flashgdn,	by68701,	by68701,	by68701,	ROT0,	"Bally",	"Flash Gordon (prototype rev. 1)",		 GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1981,	flashgdnp2,	flashgdn,	by68701,	by68701,	by68701,	ROT0,	"Bally",	"Flash Gordon (prototype rev. 2)",		 GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1981,	eballdlxp1,	eballdlx,	by68701,	by68701,	by68701,	ROT0,	"Bally",	"Eight Ball Deluxe (prototype rev. 1)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1981,	eballdlxp2,	eballdlx,	by68701,	by68701,	by68701,	ROT0,	"Bally",	"Eight Ball Deluxe (prototype rev. 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1981,	eballdlxp3,	eballdlx,	by68701,	by68701,	by68701,	ROT0,	"Bally",	"Eight Ball Deluxe (prototype rev. 3)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1981,	eballdlxp4,	eballdlx,	by68701,	by68701,	by68701,	ROT0,	"Bally",	"Eight Ball Deluxe (prototype rev. 4)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

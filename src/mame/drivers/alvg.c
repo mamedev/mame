@@ -89,7 +89,7 @@ ROM_START(wrldtour)
 	ROM_COPY("gfx3",0x108000,0x0000,0x8000)
 ROM_END
 
-ROM_START(wrldtou2) 
+ROM_START(wrldtour2) 
 	ROM_REGION(0x10000, "maincpu", 0) 
 	ROM_LOAD("cpu02b.512", 0x0000, 0x10000, CRC(1658bf40) SHA1(7af9eedab4e7d0cedaf8bfdbc1f27b989a7171cd))
 	ROM_REGION(0x10000, "cpu2", 0) 
@@ -236,7 +236,7 @@ ROM_END
 
 GAME(1991,	agsoccer,	0,			alvg,	alvg,	alvg,	ROT0,	"Alvin G",				"A.G. Soccer Ball",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1992,	wrldtour,	0,			alvg,	alvg,	alvg,	ROT0,	"Alvin G",				"Al's Garage Band Goes On A World Tour",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1992,	wrldtou2,	wrldtour,	alvg,	alvg,	alvg,	ROT0,	"Alvin G",				"Al's Garage Band Goes On A World Tour R02b",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1992,	wrldtour2,	wrldtour,	alvg,	alvg,	alvg,	ROT0,	"Alvin G",				"Al's Garage Band Goes On A World Tour R02b",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1993,	usafootb,	0,			alvg,	alvg,	alvg,	ROT0,	"Alvin G",				"U.S.A. Football",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1993,	mystcast,	0,			alvg,	alvg,	alvg,	ROT0,	"Alvin G",				"Mystery Castle",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1993,	pstlpkr,	0,			alvg,	alvg,	alvg,	ROT0,	"Alvin G",				"Pistol Poker",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

@@ -60,7 +60,7 @@ ROM_START(cavnegro)
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
 
-ROM_START(cavnegr1)
+ROM_START(cavnegro1)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "cn1.bin", 0x0000, 0x0800, CRC(6b414089) SHA1(5f6042cc85a9319b3e34bdf39fd1f7feb5db0ec2))
 	ROM_LOAD( "cn2.bin", 0x0800, 0x0800, CRC(9641f2e5) SHA1(4d7e522bd1d691901868abd191010b62a9032fda))
@@ -72,7 +72,7 @@ ROM_START(cavnegr1)
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
 
-ROM_START(cavnegr2)
+ROM_START(cavnegro2)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "cn1.bin", 0x0000, 0x0800, CRC(6b414089) SHA1(5f6042cc85a9319b3e34bdf39fd1f7feb5db0ec2))
 	ROM_LOAD( "cn2.bin", 0x0800, 0x0800, CRC(9641f2e5) SHA1(4d7e522bd1d691901868abd191010b62a9032fda))
@@ -152,7 +152,7 @@ ROM_END
 /*--------------------------------
 / Gemini 2000
 /-------------------------------*/
-ROM_START(geminip)
+ROM_START(gemini2k)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "gemini1.bin", 0x0000, 0x0800, CRC(4f952799) SHA1(8433850945d020253090d829a70fba1c9f9eaa5c))
 	ROM_LOAD( "gemini2.bin", 0x0800, 0x0800, CRC(8903ee53) SHA1(81f0c02872327b2b589001265f2761666bf45ba2))
@@ -164,7 +164,7 @@ ROM_START(geminip)
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
 
-ROM_START(gemini1)
+ROM_START(gemini2k1)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "gemini1a.bin", 0x0000, 0x0800, CRC(947017c5) SHA1(81456bc0f09e2d3418941b3d254ba1d4999a2fea))
 	ROM_LOAD( "gemini2.bin", 0x0800, 0x0800, CRC(8903ee53) SHA1(81f0c02872327b2b589001265f2761666bf45ba2))
@@ -421,7 +421,7 @@ ROM_START(sshuttle)
 	ROM_RELOAD( 0xf000, 0x1000)
 ROM_END
 
-ROM_START(sshuttl1)
+ROM_START(sshuttle1)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "sshtl1.bin", 0x0000, 0x0800, CRC(ab67ed50) SHA1(0f627b007d74b81aba6b4ad0f4cf6782e42e24c9))
 	ROM_LOAD( "sshtl2.bin", 0x0800, 0x0800, CRC(ed5130a4) SHA1(3e99c151d6649c4b19d59ab2128ee3160c6462a9))
@@ -601,14 +601,14 @@ ROM_END
 
 GAME(198?,	taitest,	0,			taito,	taito,	taito,	ROT0,	"Taito",	"Taito Test Fixture",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1981,	cavnegro,	0,			taito,	taito,	taito,	ROT0,	"Taito",	"Cavaleiro Negro",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1981,	cavnegr1,	cavnegro,	taito,	taito,	taito,	ROT0,	"Taito",	"Cavaleiro Negro (alternate set 1)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1981,	cavnegr2,	cavnegro,	taito,	taito,	taito,	ROT0,	"Taito",	"Cavaleiro Negro (alternate set 2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1981,	cavnegro1,	cavnegro,	taito,	taito,	taito,	ROT0,	"Taito",	"Cavaleiro Negro (alternate set 1)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1981,	cavnegro2,	cavnegro,	taito,	taito,	taito,	ROT0,	"Taito",	"Cavaleiro Negro (alternate set 2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1981,	cosmic,		0,			taito,	taito,	taito,	ROT0,	"Taito",	"Cosmic",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1980,	drakor,		0,			taito,	taito,	taito,	ROT0,	"Taito",	"Drakor",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1981,	fireact,	0,			taito,	taito,	taito,	ROT0,	"Taito",	"Fire Action",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(198?,	fireactd,	0,			taito,	taito,	taito,	ROT0,	"Taito",	"Fire Action Deluxe",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1982,	geminip,	0,			taito,	taito,	taito,	ROT0,	"Taito",	"Gemini 2000",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1982,	gemini1,	geminip,	taito,	taito,	taito,	ROT0,	"Taito",	"Gemini 2000 (alternate set)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1982,	gemini2k,	0,			taito,	taito,	taito,	ROT0,	"Taito",	"Gemini 2000",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1982,	gemini2k1,	gemini2k,	taito,	taito,	taito,	ROT0,	"Taito",	"Gemini 2000 (alternate set)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1982,	gork,		0,			taito,	taito,	taito,	ROT0,	"Taito",	"Gork",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1982,	hawkman,	0,			taito,	taito,	taito,	ROT0,	"Taito",	"Hawkman",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1982,	hawkman1,	hawkman,	taito,	taito,	taito,	ROT0,	"Taito",	"Hawkman (alternate set)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
@@ -625,7 +625,7 @@ GAME(1982,	sharkt,		0,			taito,	taito,	taito,	ROT0,	"Taito",	"Shark (Taito)",			
 GAME(1979,	shock,		0,			taito,	taito,	taito,	ROT0,	"Taito",	"Shock",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1982,	snake,		0,			taito,	taito,	taito,	ROT0,	"Taito",	"Snake Machine",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1985,	sshuttle,	0,			taito,	taito,	taito,	ROT0,	"Taito",	"Space Shuttle (Taito)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1985,	sshuttl1,	sshuttle,	taito,	taito,	taito,	ROT0,	"Taito",	"Space Shuttle (Taito) (alternate set)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1985,	sshuttle1,	sshuttle,	taito,	taito,	taito,	ROT0,	"Taito",	"Space Shuttle (Taito) (alternate set)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1982,	stest,		0,			taito,	taito,	taito,	ROT0,	"Taito",	"Speed Test",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1981,	sureshop,	0,			taito,	taito,	taito,	ROT0,	"Taito",	"Sure Shot (Pinball)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1982,	titan,		0,			taito,	taito,	taito,	ROT0,	"Taito",	"Titan",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

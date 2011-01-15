@@ -52,7 +52,7 @@ ROM_START(pentacup)
 	ROM_RELOAD(0xfc00, 0x0400)
 ROM_END
 
-ROM_START(pentacp2)
+ROM_START(pentacup2)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("micro_1.bin", 0x0000, 0x0800, CRC(4d6dc218) SHA1(745c553f3a42124f925ca8f2e52fd08d05999594))
 	ROM_LOAD("micro_2.bin", 0x0800, 0x0800, CRC(33cd226d) SHA1(d1dff8445a0f35da09d560a16038c969845ff21f))
@@ -61,5 +61,5 @@ ROM_START(pentacp2)
 ROM_END
 
 GAME(1978,	pentacup,0,		micropin,	micropin,	micropin,	ROT0,	"Micropin",			"Pentacup (rev. 1)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1980,	pentacp2,pentacup,micropin,	micropin,	micropin,	ROT0,	"Micropin",			"Pentacup (rev. 2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1980,	pentacup2,pentacup,micropin,	micropin,	micropin,	ROT0,	"Micropin",			"Pentacup (rev. 2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 

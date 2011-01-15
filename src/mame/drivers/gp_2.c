@@ -67,7 +67,7 @@ ROM_START(andromep)
 	ROM_RELOAD(0xf800, 0x0800)
 ROM_END
 
-ROM_START(andromea)
+ROM_START(andromepa)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "850.a", 0x0000, 0x1000, CRC(67ed03ee) SHA1(efe7c495766ffb73545a77ab24f02925ac0395f1))
 	ROM_LOAD( "850b.rom", 0x1000, 0x1000, CRC(fc1829a5) SHA1(9761543d17c0a5c08b0fec45c35648ce769a3463))
@@ -234,7 +234,7 @@ ROM_END
 
 GAME(1984,	agent777,	0,			gp_2,	gp_2,	gp_2,	ROT0,	"Game Plan",	"Agents 777",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1985,	andromep,	0,			gp_2,	gp_2,	gp_2,	ROT0,	"Game Plan",	"Andromeda",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1985,	andromea,	andromep,	gp_2,	gp_2,	gp_2,	ROT0,	"Game Plan",	"Andromeda (alternate set)",GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1985,	andromepa,	andromep,	gp_2,	gp_2,	gp_2,	ROT0,	"Game Plan",	"Andromeda (alternate set)",GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1984,	attila,		0,			gp_2,	gp_2,	gp_2,	ROT0,	"Game Plan",	"Attila The Hun",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1985,	cpthook,	0,			gp_2,	gp_2,	gp_2,	ROT0,	"Game Plan",	"Captain Hook",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1985,	cyclopes,	0,			gp_2,	gp_2,	gp_2,	ROT0,	"Game Plan",	"Cyclopes",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

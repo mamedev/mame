@@ -193,5 +193,5 @@ GAME(1981,	locomotp,	0,		zac_1,	zac_1,	zac_1,	ROT0,	"Zaccaria",				"Locomotion",
 GAME(1979,	strapids,	0,		zac_1,	zac_1,	zac_1,	ROT0,	"Zaccaria",				"Shooting the Rapids",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1980,	sshtlzac,	0,		zac_1,	zac_1,	zac_1,	ROT0,	"Zaccaria",				"Space Shuttle (Zaccaria)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1980,	stargod,	0,		zac_1,	zac_1,	zac_1,	ROT0,	"Zaccaria",				"Star God",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1980,	stargoda,	stargod,zac_1,	zac_1,	zac_1,	ROT0,	"Zaccaria",				"Star God (alternate sound)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1980,	stargoda,	stargod,	zac_1,	zac_1,	zac_1,	ROT0,	"Zaccaria",				"Star God (alternate sound)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1978,	wsports,	0,		zac_1,	zac_1,	zac_1,	ROT0,	"Zaccaria",				"Winter Sports",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

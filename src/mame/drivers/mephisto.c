@@ -40,7 +40,7 @@ MACHINE_CONFIG_END
 /*-------------------------------------------------------------------
 / Mephisto
 /-------------------------------------------------------------------*/
-ROM_START(mephisto)
+ROM_START(mephistp)
 	ROM_REGION(0x1000000, "maincpu", 0)
 	ROM_LOAD("cpu_ver1.2", 0x00000, 0x8000, CRC(845c8eb4) SHA1(2a705629990950d4e2d3a66a95e9516cf112cc88))
 	ROM_RELOAD(0x08000, 0x8000)
@@ -58,7 +58,7 @@ ROM_START(mephisto)
 	ROM_LOAD("ic19_f", 0x38000, 0x8000, CRC(cc4bb629) SHA1(db46be2a8034bbd106b7dd80f50988c339684b5e))
 ROM_END
 
-ROM_START(mephist1)
+ROM_START(mephistp1)
 	ROM_REGION(0x1000000, "maincpu", 0)
 	ROM_LOAD("cpu_ver1.1", 0x00000, 0x8000, CRC(ce584902) SHA1(dd05d008bbd9b6588cb204e8d901537ffe7ddd43))
 	ROM_RELOAD(0x08000, 0x8000)
@@ -76,5 +76,5 @@ ROM_START(mephist1)
 	ROM_LOAD("ic19_f", 0x38000, 0x8000, CRC(cc4bb629) SHA1(db46be2a8034bbd106b7dd80f50988c339684b5e))
 ROM_END
 
-GAME(1986,	mephisto,	0,		 mephisto,	mephisto,	mephisto,	ROT0,	"Stargame",			"Mephisto (rev. 1.2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1986,	mephist1,	mephisto,mephisto,	mephisto,	mephisto,	ROT0,	"Stargame",			"Mephisto (rev. 1.1)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1986,	mephistp,	0,		 mephisto,	mephisto,	mephisto,	ROT0,	"Stargame",			"Mephisto (rev. 1.2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1986,	mephistp1,	mephisto,mephisto,	mephisto,	mephisto,	ROT0,	"Stargame",			"Mephisto (rev. 1.1)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
