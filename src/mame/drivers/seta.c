@@ -80,7 +80,7 @@ PO-122-A (SZR-001)      95 Zombie Raid                          American Sammy
     doesn't behave *exactly* the same as the original seta hw
 (6) To enter test mode press 9 (open door), then F2 (turn function key), then E (bet 3-4).
 (7) Bad tilemaps colors in demo mode are real game bug. Fade-in and fade-out "bad" colors are also right.
-    Bad sprites priorities are real game bugs.
+    Bad sprites priorities are real game bugs. The bad-looking colors in Jurane stage are right.
 
 Notes:
 - The NEC D4701 used by Caliber 50 is a mouse interface IC (uPD4701c).
@@ -1812,7 +1812,7 @@ static ADDRESS_MAP_START( blandia_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)				// DSW
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM								// (rezon,jjsquawk)
 	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_BASE_SIZE_MEMBER(seta_state, paletteram, paletteram_size)	// Palette
-	AM_RANGE(0x703c00, 0x7047ff) AM_RAM								// 2nd palette (?), written in the stage with the tilemap blending (?) effect, or just mirror
+	AM_RANGE(0x703c00, 0x7047ff) AM_RAM AM_BASE_SIZE_MEMBER(seta_state, paletteram2, paletteram2_size)	// 2nd Palette for the palette offset effect
 /**/AM_RANGE(0x800000, 0x800607) AM_RAM AM_BASE_MEMBER(seta_state, spriteram)		// Sprites Y
 	AM_RANGE(0x880000, 0x880001) AM_RAM								// ? 0xc000
 	AM_RANGE(0x900000, 0x903fff) AM_RAM AM_BASE_MEMBER(seta_state, spriteram2)		// Sprites Code + X + Attr
@@ -1846,7 +1846,7 @@ static ADDRESS_MAP_START( blandiap_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)				// DSW
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM								// (rezon,jjsquawk)
 	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_BASE_SIZE_MEMBER(seta_state, paletteram, paletteram_size)	// Palette
-	AM_RANGE(0x703c00, 0x7047ff) AM_RAM								// 2nd palette (?), written in the stage with the tilemap blending (?) effect, or just mirror
+	AM_RANGE(0x703c00, 0x7047ff) AM_RAM AM_BASE_SIZE_MEMBER(seta_state, paletteram2, paletteram2_size)	// 2nd Palette for the palette offset effect
 	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_BASE_MEMBER(seta_state, vram_0)	// VRAM 0&1
 	AM_RANGE(0x804000, 0x80ffff) AM_RAM								// (jjsquawk)
 	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_BASE_MEMBER(seta_state, vram_2)	// VRAM 2&3
@@ -7193,7 +7193,7 @@ static MACHINE_CONFIG_START( blandia, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
 	MCFG_GFXDECODE(blandia)
-	MCFG_PALETTE_LENGTH(16*32+64*32*4)	/* sprites, layer1, layer2 */
+	MCFG_PALETTE_LENGTH((16*32+64*32*4)*2)	/* sprites, layer1, layer2, palette effect */
 
 	MCFG_PALETTE_INIT(blandia)				/* layers 1&2 are 6 planes deep */
 	MCFG_VIDEO_START(seta_2_layers)
@@ -7225,7 +7225,7 @@ static MACHINE_CONFIG_START( blandiap, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
 	MCFG_GFXDECODE(blandia)
-	MCFG_PALETTE_LENGTH(16*32+64*32*4)	/* sprites, layer1, layer2 */
+	MCFG_PALETTE_LENGTH((16*32+64*32*4)*2)	/* sprites, layer1, layer2, palette effect */
 
 	MCFG_PALETTE_INIT(blandia)				/* layers 1&2 are 6 planes deep */
 	MCFG_VIDEO_START(seta_2_layers)

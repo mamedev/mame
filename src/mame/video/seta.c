@@ -565,9 +565,10 @@ PALETTE_INIT( blandia )
 	int color, pen;
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x600);
+	machine->colortable = colortable_alloc(machine, 0x600*2);
 
 	for (color = 0; color < 0x20; color++)
+	{
 		for (pen = 0; pen < 0x40; pen++)
 		{
 			// layer 2-3
@@ -578,6 +579,14 @@ PALETTE_INIT( blandia )
 			colortable_entry_set_value(machine->colortable, 0x0a00 + ((color << 6) | pen), 0x400 + ((color << 4) | (pen & 0x0f)));
 			colortable_entry_set_value(machine->colortable, 0x1a00 + ((color << 6) | pen), 0x400 + pen);
 		}
+	}
+	
+	// setup the colortable for the effect palette.
+	// what are used for palette from 0x800 to 0xBFF?
+	for(int i = 0; i < 0x2200; i++)
+	{
+		colortable_entry_set_value(machine->colortable, 0x2200 + i, 0x600 + (i & 0x1ff));
+	}
 }
 
 
@@ -705,6 +714,21 @@ static void set_pens(running_machine *machine)
 		else
 			palette_set_color(machine, i, color);
 	}
+	
+	if(state->paletteram2 != NULL)
+	{	
+		for (i = 0; i < state->paletteram2_size / 2; i++)
+		{
+			UINT16 data = state->paletteram2[i];
+
+			rgb_t color = MAKE_RGB(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+
+			if (machine->colortable != NULL)
+				colortable_palette_set_color(machine->colortable, i + state->paletteram_size / 2, color);
+			else
+				palette_set_color(machine, i + state->paletteram_size / 2, color);
+		}
+	}
 }
 
 
@@ -737,7 +761,7 @@ static void usclssic_set_pens(running_machine *machine)
 ***************************************************************************/
 
 
-static void draw_sprites_map(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites_map(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	seta_state *state = machine->driver_data<seta_state>();
 	UINT16 *spriteram16 = state->spriteram;
@@ -842,7 +866,7 @@ twineagl:   000 027 00 0f   (test mode)
 
 
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	seta_state *state = machine->driver_data<seta_state>();
 	UINT16 *spriteram16 = state->spriteram;
@@ -901,7 +925,51 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 }
 
+static void draw_tilemap_palette_effect(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, tilemap_t *tilemap, int scrollx, int scrolly, int gfxnum, int flipscreen)
+{
+	int y;
+	const gfx_element *gfx_tilemap = machine->gfx[gfxnum];
+	const bitmap_t *src_bitmap = tilemap_get_pixmap(tilemap);
+	int width_mask, height_mask;
+	int opaque_mask = gfx_tilemap->color_granularity - 1;
+	int pixel_effect_mask = gfx_tilemap->color_base + (gfx_tilemap->total_colors - 1) * gfx_tilemap->color_granularity;
+	int p;
+	
+	width_mask = src_bitmap->width - 1;
+	height_mask = src_bitmap->height - 1;
+	
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	{
+		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
 
+		int x;
+		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+		{
+			if(!flipscreen)
+			{
+				p = *BITMAP_ADDR16(src_bitmap, (y + scrolly) & height_mask, (x + scrollx) & width_mask);
+			}
+			else
+			{
+				p = *BITMAP_ADDR16(src_bitmap, (y - scrolly - 256) & height_mask, (x - scrollx - 512) & width_mask);
+			}
+		
+			// draw not transparent pixels
+			if(p & opaque_mask)
+			{
+				// pixels with the last color are not drawn and the 2nd palette is added to the current bitmap color
+				if((p & pixel_effect_mask) == pixel_effect_mask)
+				{
+					dest[x] = machine->total_colors() / 2 + dest[x];
+				}
+				else
+				{
+					dest[x] = machine->pens[p];
+				}
+			}
+		}
+	}
+}
 
 
 
@@ -928,14 +996,13 @@ static VIDEO_UPDATE( seta_layers )
 {
 	seta_state *state = screen->machine->driver_data<seta_state>();
 	int layers_ctrl = -1;
-	int enab_0, enab_1, x_0, x_1, y_0, y_1;
+	int enab_0, enab_1, x_0, x_1=0, y_0, y_1=0;
 
 	int order	=	0;
 	int flip	=	(state->spriteram[ 0x600/2 ] & 0x40) >> 6;
 
 	const rectangle &visarea = screen->visible_area();
 	int vis_dimy = visarea.max_y - visarea.min_y + 1;
-
 
 	// check tilemaps color modes
 
@@ -1043,13 +1110,25 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 		if (order & 2)	// layer-sprite priority?
 		{
 			if (layers_ctrl & 8)	draw_sprites(screen->machine,bitmap,cliprect);
+			
+			if(order & 4)
+			{
+				popmessage("Missing palette effect. Contact MAMETesters.");
+			}
+				
 			if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->tilemap_0, 0, 0);
 			if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->tilemap_1, 0, 0);
 		}
 		else
 		{
+			if(order & 4)
+			{
+				popmessage("Missing palette effect. Contact MAMETesters.");
+			}
+				
 			if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->tilemap_0,  0, 0);
 			if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->tilemap_1,  0, 0);
+			
 			if (layers_ctrl & 8)	draw_sprites(screen->machine, bitmap,cliprect);
 		}
 	}
@@ -1062,20 +1141,58 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 		{
 			if (layers_ctrl & 8)	draw_sprites(screen->machine, bitmap,cliprect);
 
-			if (state->tilemap_2)
+			if((order & 4) && state->paletteram2 != NULL)
 			{
-				if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->tilemap_2, 0, 0);
-				if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->tilemap_3, 0, 0);
+				if(tilemap_get_enable(state->tilemap_2))
+				{
+					draw_tilemap_palette_effect(screen->machine, bitmap, cliprect, state->tilemap_2, x_1, y_1, 2 + ((state->vctrl_2[ 4/2 ] & 0x10) >> state->color_mode_shift), flip);
+				}
+				else
+				{
+					draw_tilemap_palette_effect(screen->machine, bitmap, cliprect, state->tilemap_3, x_1, y_1, 2 + ((state->vctrl_2[ 4/2 ] & 0x10) >> state->color_mode_shift), flip);
+				}
+			}
+			else
+			{
+				if(order & 4)
+				{
+					popmessage("Missing palette effect. Contact MAMETesters.");
+				}
+				
+				if (state->tilemap_2)
+				{
+					if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->tilemap_2, 0, 0);
+					if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->tilemap_3, 0, 0);
+				}
 			}
 		}
 		else
 		{
-			if (state->tilemap_2)
+			if((order & 4) && state->paletteram2 != NULL)
 			{
-				if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->tilemap_2, 0, 0);
-				if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->tilemap_3, 0, 0);
+				if(tilemap_get_enable(state->tilemap_2))
+				{
+					draw_tilemap_palette_effect(screen->machine, bitmap, cliprect, state->tilemap_2, x_1, y_1, 2 + ((state->vctrl_2[ 4/2 ] & 0x10) >> state->color_mode_shift), flip);
+				}
+				else
+				{
+					draw_tilemap_palette_effect(screen->machine, bitmap, cliprect, state->tilemap_3, x_1, y_1, 2 + ((state->vctrl_2[ 4/2 ] & 0x10) >> state->color_mode_shift), flip);
+				}
 			}
+			else
+			{
+				if(order & 4)
+				{
+					popmessage("Missing palette effect. Contact MAMETesters.");
+				}
 
+				if (state->tilemap_2)
+				{
+					if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->tilemap_2, 0, 0);
+					if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->tilemap_3, 0, 0);
+				}
+			}
+				
 			if (layers_ctrl & 8)	draw_sprites(screen->machine, bitmap,cliprect);
 		}
 	}

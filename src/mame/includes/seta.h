@@ -41,6 +41,8 @@ public:
 	UINT16 *spriteram2;
 	UINT16 *paletteram;
 	size_t paletteram_size;
+	UINT16 *paletteram2;
+	size_t paletteram2_size;
 
 	int tiles_offset;
 	tilemap_t *tilemap_0;
