@@ -153,7 +153,7 @@ WRITE8_HANDLER( lrescue_sh_port_2_w )
 	speaker_level_w(state->speaker, (data & 0x08) ? 1 : 0);		/* Bitstream tunes - endlevel and bonus1 */
 
 	if (rising_bits & 0x10) sample_start(state->samples, 3, 6, 0);		/* Shooting Star and Rescue Ship sounds */
-	if (~data & 0x10 && state->port_2_last_extra & 0x10) sample_stop (state->samples, 3);	/* This makes the rescue ship sound beep on and off */
+	if ((~data & 0x10) && (state->port_2_last_extra & 0x10)) sample_stop (state->samples, 3);	/* This makes the rescue ship sound beep on and off */
 
 	state->c8080bw_flip_screen = data & 0x20;
 

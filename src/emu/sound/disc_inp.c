@@ -55,17 +55,15 @@ WRITE8_DEVICE_HANDLER(discrete_sound_w)
 
 DISCRETE_STEP(dss_adjustment)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_adjustment)
-
-	INT32  rawportval = input_port_read_direct(context->port);
+	INT32  rawportval = input_port_read_direct(m_port);
 
 	/* only recompute if the value changed from last time */
-	if (UNEXPECTED(rawportval != context->lastpval))
+	if (UNEXPECTED(rawportval != m_lastpval))
 	{
-		double portval   = (double)(rawportval - context->pmin) * context->pscale;
-		double scaledval = portval * context->scale + context->min;
+		double portval   = (double)(rawportval - m_pmin) * m_pscale;
+		double scaledval = portval * m_scale + m_min;
 
-		context->lastpval = rawportval;
+		m_lastpval = rawportval;
 		if (DSS_ADJUSTMENT__LOG == 0)
 			this->output[0] = scaledval;
 		else
@@ -75,23 +73,21 @@ DISCRETE_STEP(dss_adjustment)
 
 DISCRETE_RESET(dss_adjustment)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_adjustment)
-
 	double min, max;
 
-	context->port = device->machine->m_portlist.find((const char *)this->custom_data());
-	if (context->port == NULL)
+	m_port = device->machine->m_portlist.find((const char *)this->custom_data());
+	if (m_port == NULL)
 		fatalerror("DISCRETE_ADJUSTMENT - NODE_%d has invalid tag", this->index());
 
-	context->lastpval = 0x7fffffff;
-	context->pmin     = DSS_ADJUSTMENT__PMIN;
-	context->pscale   = 1.0 / (double)(DSS_ADJUSTMENT__PMAX - DSS_ADJUSTMENT__PMIN);
+	m_lastpval = 0x7fffffff;
+	m_pmin     = DSS_ADJUSTMENT__PMIN;
+	m_pscale   = 1.0 / (double)(DSS_ADJUSTMENT__PMAX - DSS_ADJUSTMENT__PMIN);
 
 	/* linear scale */
 	if (DSS_ADJUSTMENT__LOG == 0)
 	{
-		context->min   = DSS_ADJUSTMENT__MIN;
-		context->scale = DSS_ADJUSTMENT__MAX - DSS_ADJUSTMENT__MIN;
+		m_min   = DSS_ADJUSTMENT__MIN;
+		m_scale = DSS_ADJUSTMENT__MAX - DSS_ADJUSTMENT__MIN;
 	}
 
 	/* logarithmic scale */
@@ -100,8 +96,8 @@ DISCRETE_RESET(dss_adjustment)
 		/* force minimum and maximum to be > 0 */
 		min = (DSS_ADJUSTMENT__MIN > 0) ? DSS_ADJUSTMENT__MIN : 1;
 		max = (DSS_ADJUSTMENT__MAX > 0) ? DSS_ADJUSTMENT__MAX : 1;
-		context->min   = log10(min);
-		context->scale = log10(max) - log10(min);
+		m_min   = log10(min);
+		m_scale = log10(max) - log10(min);
 	}
 
 	this->step();
@@ -133,69 +129,116 @@ DISCRETE_RESET(dss_constant)
  * input[3]    - Current data value
  *
  ************************************************************************/
-DISCRETE_RESET(dss_input_pulse)
-{
-	DISCRETE_DECLARE_CONTEXT(dss_input)
-
-	context->is_buffered = FALSE;
-	context->is_stream = FALSE;
-	context->gain = DSS_INPUT__GAIN;
-	context->offset = DSS_INPUT__OFFSET;
-
-	context->data = (DSS_INPUT__INIT == 0) ? 0 : 1;
-	this->output[0] = context->data * context->gain + context->offset;
-}
 
 DISCRETE_RESET(dss_input_data)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_input)
+	m_gain = DSS_INPUT__GAIN;
+	m_offset = DSS_INPUT__OFFSET;
 
-	context->is_buffered = FALSE;
-	context->is_stream = FALSE;
-	context->gain = DSS_INPUT__GAIN;
-	context->offset = DSS_INPUT__OFFSET;
+	m_data = DSS_INPUT__INIT;
+	this->output[0] = m_data * m_gain + m_offset;
+}
 
-	context->data = DSS_INPUT__INIT;
-	this->output[0] = context->data * context->gain + context->offset;
+void DISCRETE_CLASS_FUNC(dss_input_data, input_write)(int sub_node, UINT8 data )
+{
+	UINT8 new_data    = 0;
+
+	new_data = data;
+
+	if (m_data != new_data)
+	{
+		/* Bring the system up to now */
+		device->update();
+
+		m_data = new_data;
+
+		/* Update the node output here so we don't have to do it each step */
+		this->output[0] = m_data * m_gain + m_offset;
+	}
 }
 
 DISCRETE_RESET(dss_input_logic)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_input)
+	m_gain = DSS_INPUT__GAIN;
+	m_offset = DSS_INPUT__OFFSET;
 
-	context->is_buffered = FALSE;
-	context->is_stream = FALSE;
-	context->gain = DSS_INPUT__GAIN;
-	context->offset = DSS_INPUT__OFFSET;
+	m_data = (DSS_INPUT__INIT == 0) ? 0 : 1;
+	this->output[0] = m_data * m_gain + m_offset;
+}
 
-	context->data = (DSS_INPUT__INIT == 0) ? 0 : 1;
-	this->output[0] = context->data * context->gain + context->offset;
+void DISCRETE_CLASS_FUNC(dss_input_logic, input_write)(int sub_node, UINT8 data )
+{
+	UINT8 new_data    = 0;
+
+	new_data =  data ? 1 : 0;
+
+	if (m_data != new_data)
+	{
+		/* Bring the system up to now */
+		device->update();
+
+		m_data = new_data;
+
+		/* Update the node output here so we don't have to do it each step */
+		this->output[0] = m_data * m_gain + m_offset;
+	}
 }
 
 DISCRETE_RESET(dss_input_not)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_input)
+	m_gain = DSS_INPUT__GAIN;
+	m_offset = DSS_INPUT__OFFSET;
 
-	context->is_buffered = FALSE;
-	context->is_stream = FALSE;
-	context->gain = DSS_INPUT__GAIN;
-	context->offset = DSS_INPUT__OFFSET;
+	m_data = (DSS_INPUT__INIT == 0) ? 1 : 0;
+	this->output[0] = m_data * m_gain + m_offset;
+}
 
-	context->data = (DSS_INPUT__INIT == 0) ? 1 : 0;
-	this->output[0] = context->data * context->gain + context->offset;
+void DISCRETE_CLASS_FUNC(dss_input_not, input_write)(int sub_node, UINT8 data )
+{
+	UINT8 new_data    = 0;
+
+	new_data = data ? 0 : 1;
+
+	if (m_data != new_data)
+	{
+		/* Bring the system up to now */
+		device->update();
+
+		m_data = new_data;
+
+		/* Update the node output here so we don't have to do it each step */
+		this->output[0] = m_data * m_gain + m_offset;
+	}
 }
 
 DISCRETE_STEP(dss_input_pulse)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_input)
-
 	/* Set a valid output */
-	this->output[0] = context->data;
+	this->output[0] = m_data;
 	/* Reset the input to default for the next cycle */
 	/* node order is now important */
-	context->data = DSS_INPUT__INIT;
+	m_data = DSS_INPUT__INIT;
 }
 
+DISCRETE_RESET(dss_input_pulse)
+{
+	m_data = (DSS_INPUT__INIT == 0) ? 0 : 1;
+	this->output[0] = m_data;
+}
+
+void DISCRETE_CLASS_FUNC(dss_input_pulse, input_write)(int sub_node, UINT8 data )
+{
+	UINT8 new_data    = 0;
+
+	new_data =  data ? 1 : 0;
+
+	if (m_data != new_data)
+	{
+		/* Bring the system up to now */
+		device->update();
+		m_data = new_data;
+	}
+}
 
 /************************************************************************
  *
@@ -210,15 +253,26 @@ DISCRETE_STEP(dss_input_pulse)
 #define DSS_INPUT_STREAM__GAIN		DISCRETE_INPUT(1)
 #define DSS_INPUT_STREAM__OFFSET	DISCRETE_INPUT(2)
 
+STREAM_UPDATE( discrete_dss_input_stream_node::static_stream_generate )
+{
+	reinterpret_cast<discrete_dss_input_stream_node *>(param)->stream_generate(inputs, outputs, samples);
+}
+
+void discrete_dss_input_stream_node::stream_generate(stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	stream_sample_t *ptr = outputs[0];
+	int samplenum = samples;
+
+	while (samplenum-- > 0)
+	  *(ptr++) = m_data;
+}
 DISCRETE_STEP(dss_input_stream)
 {
 	/* the context pointer is set to point to the current input stream data in discrete_stream_update */
-	DISCRETE_DECLARE_CONTEXT(dss_input)
-
-	if (EXPECTED(context->ptr))
+	if (EXPECTED(m_ptr))
 	{
-		this->output[0] = (*context->ptr) * context->gain + context->offset;
-		context->ptr++;
+		this->output[0] = (*m_ptr) * m_gain + m_offset;
+		m_ptr++;
 	}
 	else
 		this->output[0] = 0;
@@ -226,47 +280,61 @@ DISCRETE_STEP(dss_input_stream)
 
 DISCRETE_RESET(dss_input_stream)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_input)
+	m_ptr = NULL;
+	m_data = 0;
+}
 
-	context->ptr = NULL;
-	context->data = 0;
+void DISCRETE_CLASS_FUNC(dss_input_stream, input_write)(int sub_node, UINT8 data )
+{
+	UINT8 new_data    = 0;
+
+	new_data =  data;
+
+	if (m_data != new_data)
+	{
+		if (m_is_buffered)
+		{
+			/* Bring the system up to now */
+			stream_update(m_buffer_stream);
+
+			m_data = new_data;
+		}
+		else
+		{
+			/* Bring the system up to now */
+			device->update();
+
+			m_data = new_data;
+
+			/* Update the node output here so we don't have to do it each step */
+			this->output[0] = new_data * m_gain + m_offset;
+		}
+	}
 }
 
 DISCRETE_START(dss_input_stream)
 {
 	discrete_base_node::start();
 
-	DISCRETE_DECLARE_CONTEXT(dss_input)
+	assert(DSS_INPUT_STREAM__STREAM < this->device->m_input_stream_list.count());
 
-	assert(DSS_INPUT_STREAM__STREAM < this->device->m_input_list.count());
-
-	context->is_stream = TRUE;
 	/* Stream out number is set during start */
-	context->stream_in_number = DSS_INPUT_STREAM__STREAM;
-	context->gain = DSS_INPUT_STREAM__GAIN;
-	context->offset = DSS_INPUT_STREAM__OFFSET;
-	context->ptr = NULL;
+	m_stream_in_number = DSS_INPUT_STREAM__STREAM;
+	m_gain = DSS_INPUT_STREAM__GAIN;
+	m_offset = DSS_INPUT_STREAM__OFFSET;
+	m_ptr = NULL;
 
-	if (this->module_type() == DSS_INPUT_BUFFER)
+	m_is_buffered = is_buffered();
+	if (m_is_buffered)
 	{
-		context->is_buffered = TRUE;
-		context->buffer_stream = stream_create(this->device, 0, 1, this->sample_rate(), (void *) this, buffer_stream_update);
+		m_buffer_stream = stream_create(this->device, 0, 1, this->sample_rate(), this, static_stream_generate);
 
-		stream_set_input(this->device->discrete_stream, context->stream_in_number,
-			context->buffer_stream, 0, 1.0);
+		stream_set_input(device->m_stream, m_stream_in_number,
+			m_buffer_stream, 0, 1.0);
 	}
 	else
 	{
-		context->is_buffered = FALSE;
-		context->buffer_stream = NULL;
+		m_buffer_stream = NULL;
 	}
 }
 
-DISCRETE_STOP(dss_input_stream)
-{
-}
-
-DISCRETE_IS_STEPPING(dss_input_stream)
-{
-	return true;
-}

@@ -56,23 +56,21 @@ static const int disc_7492_count[6] = {0x00, 0x01, 0x02, 0x04, 0x05, 0x06};
 
 DISCRETE_STEP(dss_counter)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_counter)
-
 	double	cycles;
 	double	ds_clock;
 	int		clock = 0, inc = 0;
-	UINT32	last_count = context->last_count;	/* it is different then output in 7492 */
+	UINT32	last_count = m_last_count;	/* it is different then output in 7492 */
 	double	x_time = 0;
 	UINT32	count = last_count;
 
 	ds_clock = DSS_COUNTER__CLOCK;
-	if (UNEXPECTED(context->clock_type == DISC_CLK_IS_FREQ))
+	if (UNEXPECTED(m_clock_type == DISC_CLK_IS_FREQ))
 	{
 		/* We need to keep clocking the internal clock even if disabled. */
-		cycles = (context->t_left + this->sample_time()) * ds_clock;
+		cycles = (m_t_left + this->sample_time()) * ds_clock;
 		inc    = (int)cycles;
-		context->t_left = (cycles - inc) / ds_clock;
-		if (inc) x_time = context->t_left / this->sample_time();
+		m_t_left = (cycles - inc) / ds_clock;
+		if (inc) x_time = m_t_left / this->sample_time();
 	}
 	else
 	{
@@ -85,7 +83,7 @@ DISCRETE_STEP(dss_counter)
 	/* If reset enabled then set output to the reset value.  No x_time in reset. */
 	if (UNEXPECTED(DSS_COUNTER__RESET))
 	{
-		context->last_count = (int)DSS_COUNTER__INIT;
+		m_last_count = (int)DSS_COUNTER__INIT;
 		this->output[0] = (int)DSS_COUNTER__INIT;
 		return;
 	}
@@ -96,16 +94,16 @@ DISCRETE_STEP(dss_counter)
      */
 	if (EXPECTED(DSS_COUNTER__ENABLE))
 	{
-		switch (context->clock_type)
+		switch (m_clock_type)
 		{
 			case DISC_CLK_ON_F_EDGE:
 			case DISC_CLK_ON_R_EDGE:
 				/* See if the clock has toggled to the proper edge */
 				clock = (clock != 0);
-				if (context->last_clock != clock)
+				if (m_last_clock != clock)
 				{
-					context->last_clock = clock;
-					if (context->clock_type == clock)
+					m_last_clock = clock;
+					if (m_clock_type == clock)
 					{
 						/* Toggled */
 						inc = 1;
@@ -123,27 +121,27 @@ DISCRETE_STEP(dss_counter)
 		if (DSS_COUNTER__DIR)
 		{
 			count += inc;
-			while (count > context->max)
+			while (count > m_max)
 			{
-				count -= context->diff;
+				count -= m_diff;
 			}
 		}
 		else
 		{
 			count -= inc;
-			while (count < context->min)
+			while (count < m_min)
 			{
-				count += context->diff;
+				count += m_diff;
 			}
 		}
 
-		context->last_count = count;
-		this->output[0] = context->is_7492 ? disc_7492_count[count] : count;
+		m_last_count = count;
+		this->output[0] = m_is_7492 ? disc_7492_count[count] : count;
 
 		if (UNEXPECTED(count != last_count))
 		{
 			/* the x_time is only output if the output changed. */
-			switch (context->out_type)
+			switch (m_out_type)
 			{
 				case DISC_OUT_HAS_XTIME:
 					this->output[0] += x_time;
@@ -163,35 +161,34 @@ DISCRETE_STEP(dss_counter)
 
 DISCRETE_RESET(dss_counter)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_counter)
 
 	if ((int)DSS_COUNTER__CLOCK_TYPE & DISC_COUNTER_IS_7492)
 	{
-		context->is_7492    = 1;
-		context->clock_type = DSS_7492__CLOCK_TYPE;
-		context->max = 5;
-		context->min = 0;
-		context->diff = 6;
+		m_is_7492    = 1;
+		m_clock_type = DSS_7492__CLOCK_TYPE;
+		m_max = 5;
+		m_min = 0;
+		m_diff = 6;
 	}
 	else
 	{
-		context->is_7492    = 0;
-		context->clock_type = DSS_COUNTER__CLOCK_TYPE;
-		context->max = DSS_COUNTER__MAX;
-		context->min = DSS_COUNTER__MIN;
-		context->diff = context->max - context->min + 1;
+		m_is_7492    = 0;
+		m_clock_type = DSS_COUNTER__CLOCK_TYPE;
+		m_max = DSS_COUNTER__MAX;
+		m_min = DSS_COUNTER__MIN;
+		m_diff = m_max - m_min + 1;
 	}
 
 
-	if (!context->is_7492 && (DSS_COUNTER__MAX < DSS_COUNTER__MIN))
+	if (!m_is_7492 && (DSS_COUNTER__MAX < DSS_COUNTER__MIN))
 		fatalerror("MAX < MIN in NODE_%02d", this->index());
 
-	context->out_type    = context->clock_type & DISC_OUT_MASK;
-	context->clock_type &= DISC_CLK_MASK;
+	m_out_type    = m_clock_type & DISC_OUT_MASK;
+	m_clock_type &= DISC_CLK_MASK;
 
-	context->t_left = 0;
-	context->last_count = 0;
-	context->last_clock = 0;
+	m_t_left = 0;
+	m_last_count = 0;
+	m_last_clock = 0;
 	this->output[0] = DSS_COUNTER__INIT; /* count starts at reset value */
 }
 
@@ -282,7 +279,6 @@ INLINE int dss_lfsr_function(discrete_device *dev, int myfunc, int in0, int in1,
 
 DISCRETE_STEP(dss_lfsr_noise)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_lfsr_noise)
 	DISCRETE_DECLARE_INFO(discrete_lfsr_desc)
 
 	double cycles;
@@ -292,13 +288,13 @@ DISCRETE_STEP(dss_lfsr_noise)
 	if (info->clock_type == DISC_CLK_IS_FREQ)
 	{
 		/* We need to keep clocking the internal clock even if disabled. */
-		cycles = (context->t_left + this->sample_time()) / context->t_clock;
+		cycles = (m_t_left + this->sample_time()) / m_t_clock;
 		inc    = (int)cycles;
-		context->t_left = (cycles - inc) * context->t_clock;
+		m_t_left = (cycles - inc) * m_t_clock;
 	}
 
 	/* Reset everything if necessary */
-	if(((DSS_LFSR_NOISE__RESET == 0) ? 0 : 1) == context->reset_on_high)
+	if(((DSS_LFSR_NOISE__RESET == 0) ? 0 : 1) == m_reset_on_high)
 	{
 		this->reset();
 		return;
@@ -310,9 +306,9 @@ DISCRETE_STEP(dss_lfsr_noise)
 		case DISC_CLK_ON_R_EDGE:
 			/* See if the clock has toggled to the proper edge */
 			clock = (DSS_LFSR_NOISE__CLOCK != 0);
-			if (context->last != clock)
+			if (m_last != clock)
 			{
-				context->last = clock;
+				m_last = clock;
 				if (info->clock_type == clock)
 				{
 					/* Toggled */
@@ -333,7 +329,7 @@ DISCRETE_STEP(dss_lfsr_noise)
 		for (clock = 0; clock < inc; clock++)
 		{
 			/* Fetch the last feedback result */
-			fbresult = (context->lfsr_reg >> info->bitlength) & 0x01;
+			fbresult = (m_lfsr_reg >> info->bitlength) & 0x01;
 
 			/* Stage 2 feedback combine fbresultNew with infeed bit */
 			fbresult = dss_lfsr_function(this->device, info->feedback_function1, fbresult, noise_feed, 0x01);
@@ -341,27 +337,27 @@ DISCRETE_STEP(dss_lfsr_noise)
 			/* Stage 3 first we setup where the bit is going to be shifted into */
 			fbresult = fbresult * info->feedback_function2_mask;
 			/* Then we left shift the register, */
-			context->lfsr_reg = context->lfsr_reg << 1;
+			m_lfsr_reg = m_lfsr_reg << 1;
 			/* Now move the fbresult into the shift register and mask it to the bitlength */
-			context->lfsr_reg = dss_lfsr_function(this->device, info->feedback_function2, fbresult, context->lfsr_reg, (1 << info->bitlength) - 1 );
+			m_lfsr_reg = dss_lfsr_function(this->device, info->feedback_function2, fbresult, m_lfsr_reg, (1 << info->bitlength) - 1 );
 
 			/* Now get and store the new feedback result */
 			/* Fetch the feedback bits */
-			fb0 = (context->lfsr_reg >> info->feedback_bitsel0) & 0x01;
-			fb1 = (context->lfsr_reg >> info->feedback_bitsel1) & 0x01;
+			fb0 = (m_lfsr_reg >> info->feedback_bitsel0) & 0x01;
+			fb1 = (m_lfsr_reg >> info->feedback_bitsel1) & 0x01;
 			/* Now do the combo on them */
 			fbresult = dss_lfsr_function(this->device, info->feedback_function0, fb0, fb1, 0x01);
-			context->lfsr_reg = dss_lfsr_function(this->device, DISC_LFSR_REPLACE, context->lfsr_reg, fbresult << info->bitlength, (2 << info->bitlength) - 1);
+			m_lfsr_reg = dss_lfsr_function(this->device, DISC_LFSR_REPLACE, m_lfsr_reg, fbresult << info->bitlength, (2 << info->bitlength) - 1);
 
 		}
 		/* Now select the output bit */
-		if (context->out_is_f0)
+		if (m_out_is_f0)
 			this->output[0] = fbresult & 0x01;
 		else
-			this->output[0] = (context->lfsr_reg >> info->output_bit) & 0x01;
+			this->output[0] = (m_lfsr_reg >> info->output_bit) & 0x01;
 
 		/* Final inversion if required */
-		if (context->invert_output) this->output[0] = this->output[0] ? 0 : 1;
+		if (m_invert_output) this->output[0] = this->output[0] ? 0 : 1;
 
 		/* Gain stage */
 		this->output[0] = this->output[0] ? DSS_LFSR_NOISE__AMP / 2 : -DSS_LFSR_NOISE__AMP / 2;
@@ -369,8 +365,8 @@ DISCRETE_STEP(dss_lfsr_noise)
 		this->output[0] = this->output[0] + DSS_LFSR_NOISE__BIAS;
 
 		/* output the lfsr reg ?*/
-		if (context->out_lfsr_reg)
-			this->output[1] = (double) context->lfsr_reg;
+		if (m_out_lfsr_reg)
+			this->output[1] = (double) m_lfsr_reg;
 
 	}
 	if(!DSS_LFSR_NOISE__ENABLE)
@@ -381,35 +377,34 @@ DISCRETE_STEP(dss_lfsr_noise)
 
 DISCRETE_RESET(dss_lfsr_noise)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_lfsr_noise)
 	DISCRETE_DECLARE_INFO(discrete_lfsr_desc)
 
 	int    fb0 , fb1, fbresult;
 
-	context->reset_on_high = (info->flags & DISC_LFSR_FLAG_RESET_TYPE_H) ? 1 : 0;
-	context->invert_output = info->flags & DISC_LFSR_FLAG_OUT_INVERT;
-	context->out_is_f0 = (info->flags & DISC_LFSR_FLAG_OUTPUT_F0) ? 1 : 0;
-	context->out_lfsr_reg = (info->flags & DISC_LFSR_FLAG_OUTPUT_SR_SN1) ? 1 : 0;
+	m_reset_on_high = (info->flags & DISC_LFSR_FLAG_RESET_TYPE_H) ? 1 : 0;
+	m_invert_output = info->flags & DISC_LFSR_FLAG_OUT_INVERT;
+	m_out_is_f0 = (info->flags & DISC_LFSR_FLAG_OUTPUT_F0) ? 1 : 0;
+	m_out_lfsr_reg = (info->flags & DISC_LFSR_FLAG_OUTPUT_SR_SN1) ? 1 : 0;
 
 	if ((info->clock_type < DISC_CLK_ON_F_EDGE) || (info->clock_type > DISC_CLK_IS_FREQ))
 		this->device->discrete_log("Invalid clock type passed in NODE_%d\n", this->index());
 
-	context->last = (DSS_COUNTER__CLOCK != 0);
-	if (info->clock_type == DISC_CLK_IS_FREQ) context->t_clock = 1.0 / DSS_LFSR_NOISE__CLOCK;
-	context->t_left = 0;
+	m_last = (DSS_COUNTER__CLOCK != 0);
+	if (info->clock_type == DISC_CLK_IS_FREQ) m_t_clock = 1.0 / DSS_LFSR_NOISE__CLOCK;
+	m_t_left = 0;
 
-	context->lfsr_reg = info->reset_value;
+	m_lfsr_reg = info->reset_value;
 
 	/* Now get and store the new feedback result */
 	/* Fetch the feedback bits */
-	fb0 = (context->lfsr_reg >> info->feedback_bitsel0) & 0x01;
-	fb1=(context->lfsr_reg >> info->feedback_bitsel1) & 0x01;
+	fb0 = (m_lfsr_reg >> info->feedback_bitsel0) & 0x01;
+	fb1=(m_lfsr_reg >> info->feedback_bitsel1) & 0x01;
 	/* Now do the combo on them */
 	fbresult = dss_lfsr_function(this->device, info->feedback_function0, fb0, fb1, 0x01);
-	context->lfsr_reg=dss_lfsr_function(this->device, DISC_LFSR_REPLACE, context->lfsr_reg, fbresult << info->bitlength, (2<< info->bitlength ) - 1);
+	m_lfsr_reg=dss_lfsr_function(this->device, DISC_LFSR_REPLACE, m_lfsr_reg, fbresult << info->bitlength, (2<< info->bitlength ) - 1);
 
 	/* Now select and setup the output bit */
-	this->output[0] = (context->lfsr_reg >> info->output_bit) & 0x01;
+	this->output[0] = (m_lfsr_reg >> info->output_bit) & 0x01;
 
 	/* Final inversion if required */
 	if(info->flags & DISC_LFSR_FLAG_OUT_INVERT) this->output[0] = this->output[0] ? 0 : 1;
@@ -438,12 +433,10 @@ DISCRETE_RESET(dss_lfsr_noise)
 
 DISCRETE_STEP(dss_noise)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_noise)
-
 	if(DSS_NOISE__ENABLE)
 	{
 		/* Only sample noise on rollover to next cycle */
-		if(context->phase > (2.0 * M_PI))
+		if(m_phase > (2.0 * M_PI))
 		{
 			/* GCC's rand returns a RAND_MAX value of 0x7fff */
 			int newval = (this->device->machine->rand() & 0x7fff) - 16384;
@@ -465,19 +458,17 @@ DISCRETE_STEP(dss_noise)
 	}
 
 	/* Keep the new phasor in the 2Pi range.*/
-	context->phase = fmod(context->phase, 2.0 * M_PI);
+	m_phase = fmod(m_phase, 2.0 * M_PI);
 
 	/* The enable input only curtails output, phase rotation still occurs. */
 	/* We allow the phase to exceed 2Pi here, so we can tell when to sample the noise. */
-	context->phase += ((2.0 * M_PI * DSS_NOISE__FREQ) / this->sample_rate());
+	m_phase += ((2.0 * M_PI * DSS_NOISE__FREQ) / this->sample_rate());
 }
 
 
 DISCRETE_RESET(dss_noise)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_noise)
-
-	context->phase=0;
+	m_phase=0;
 	this->step();
 }
 
@@ -504,19 +495,17 @@ DISCRETE_RESET(dss_noise)
 
 DISCRETE_STEP(dss_note)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_note)
-
 	double	cycles;
 	int		clock  = 0, last_count2, inc = 0;
 	double	x_time = 0;
 
-	if (context->clock_type == DISC_CLK_IS_FREQ)
+	if (m_clock_type == DISC_CLK_IS_FREQ)
 	{
 		/* We need to keep clocking the internal clock even if disabled. */
-		cycles = (context->t_left + this->sample_time()) / context->t_clock;
+		cycles = (m_t_left + this->sample_time()) / m_t_clock;
 		inc    = (int)cycles;
-		context->t_left = (cycles - inc) * context->t_clock;
-		if (inc) x_time = context->t_left / this->sample_time();
+		m_t_left = (cycles - inc) * m_t_clock;
+		if (inc) x_time = m_t_left / this->sample_time();
 	}
 	else
 	{
@@ -527,18 +516,18 @@ DISCRETE_STEP(dss_note)
 
 	if (DSS_NOTE__ENABLE)
 	{
-		last_count2 = context->count2;
+		last_count2 = m_count2;
 
-		switch (context->clock_type)
+		switch (m_clock_type)
 		{
 			case DISC_CLK_ON_F_EDGE:
 			case DISC_CLK_ON_R_EDGE:
 				/* See if the clock has toggled to the proper edge */
 				clock = (clock != 0);
-				if (context->last != clock)
+				if (m_last != clock)
 				{
-					context->last = clock;
-					if (context->clock_type == clock)
+					m_last = clock;
+					if (m_clock_type == clock)
 					{
 						/* Toggled */
 						inc = 1;
@@ -557,30 +546,30 @@ DISCRETE_STEP(dss_note)
 		{
 			for (clock = 0; clock < inc; clock++)
 			{
-				context->count1++;
-				if (context->count1 > context->max1)
+				m_count1++;
+				if (m_count1 > m_max1)
 				{
 					/* Max 1 count reached.  Load Data into counter. */
-					context->count1  = (int)DSS_NOTE__DATA;
-					context->count2 += 1;
-					if (context->count2 > context->max2) context->count2 = 0;
+					m_count1  = (int)DSS_NOTE__DATA;
+					m_count2 += 1;
+					if (m_count2 > m_max2) m_count2 = 0;
 				}
 			}
 		}
 
-		this->output[0] = context->count2;
-		if (context->count2 != last_count2)
+		this->output[0] = m_count2;
+		if (m_count2 != last_count2)
 		{
 			/* the x_time is only output if the output changed. */
-			switch (context->out_type)
+			switch (m_out_type)
 			{
 				case DISC_OUT_IS_ENERGY:
 					if (x_time == 0) x_time = 1.0;
 					this->output[0] = last_count2;
-					if (context->count2 > last_count2)
-						this->output[0] += (context->count2 - last_count2) * x_time;
+					if (m_count2 > last_count2)
+						this->output[0] += (m_count2 - last_count2) * x_time;
 					else
-						this->output[0] -= (last_count2 - context->count2) * x_time;
+						this->output[0] -= (last_count2 - m_count2) * x_time;
 					break;
 				case DISC_OUT_HAS_XTIME:
 					this->output[0] += x_time;
@@ -594,19 +583,17 @@ DISCRETE_STEP(dss_note)
 
 DISCRETE_RESET(dss_note)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_note)
+	m_clock_type = (int)DSS_NOTE__CLOCK_TYPE & DISC_CLK_MASK;
+	m_out_type   = (int)DSS_NOTE__CLOCK_TYPE & DISC_OUT_MASK;
 
-	context->clock_type = (int)DSS_NOTE__CLOCK_TYPE & DISC_CLK_MASK;
-	context->out_type   = (int)DSS_NOTE__CLOCK_TYPE & DISC_OUT_MASK;
+	m_last    = (DSS_NOTE__CLOCK != 0);
+	m_t_left  = 0;
+	m_t_clock = 1.0 / DSS_NOTE__CLOCK;
 
-	context->last    = (DSS_NOTE__CLOCK != 0);
-	context->t_left  = 0;
-	context->t_clock = 1.0 / DSS_NOTE__CLOCK;
-
-	context->count1 = (int)DSS_NOTE__DATA;
-	context->count2 = 0;
-	context->max1   = (int)DSS_NOTE__MAX1;
-	context->max2   = (int)DSS_NOTE__MAX2;
+	m_count1 = (int)DSS_NOTE__DATA;
+	m_count2 = 0;
+	m_max1   = (int)DSS_NOTE__MAX1;
+	m_max2   = (int)DSS_NOTE__MAX2;
 	this->output[0] = 0;
 }
 
@@ -629,11 +616,10 @@ DISCRETE_RESET(dss_note)
 /* The inputs on a norton op-amp are (info->vP - OP_AMP_NORTON_VBE) */
 /* which is the same as the output high voltage.  We will define them */
 /* the same to save a calculation step */
-#define DSS_OP_AMP_OSC_NORTON_VP_IN		context->v_out_high
+#define DSS_OP_AMP_OSC_NORTON_VP_IN		m_v_out_high
 
 DISCRETE_STEP(dss_op_amp_osc)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_op_amp_osc)
 	DISCRETE_DECLARE_INFO(discrete_op_amp_osc_info)
 
 	double i = 0;				/* Charging current created by vIn */
@@ -647,22 +633,22 @@ DISCRETE_STEP(dss_op_amp_osc)
 	UINT8 force_charge = 0;
 	UINT8 enable = DSS_OP_AMP_OSC__ENABLE;
 	UINT8 update_exponent = 0;
-	UINT8 flip_flop = context->flip_flop;
+	UINT8 flip_flop = m_flip_flop;
 	int count_f = 0;
 	int count_r = 0;
 
 	dt = this->sample_time();	/* Change in time */
-	v_cap = context->v_cap;	/* Set to voltage before change */
+	v_cap = m_v_cap;	/* Set to voltage before change */
 
 	/* work out the charge currents/voltages. */
-	switch (context->type)
+	switch (m_type)
 	{
 		case DISC_OP_AMP_OSCILLATOR_VCO_1:
 			/* Work out the charge rates. */
 			/* i is not a current.  It is being used as a temp variable. */
-			i = DSS_OP_AMP_OSC__VMOD1 * context->temp1;
+			i = DSS_OP_AMP_OSC__VMOD1 * m_temp1;
 			charge[0] = (DSS_OP_AMP_OSC__VMOD1 - i) / info->r1;
-			charge[1] = (i - (DSS_OP_AMP_OSC__VMOD1 * context->temp2)) / context->temp3;
+			charge[1] = (i - (DSS_OP_AMP_OSC__VMOD1 * m_temp2)) / m_temp3;
 			break;
 
 		case DISC_OP_AMP_OSCILLATOR_1 | DISC_OP_AMP_IS_NORTON:
@@ -670,21 +656,21 @@ DISCRETE_STEP(dss_op_amp_osc)
 			/* resistors can be nodes, so everything needs updating */
 			double i1, i2;
 			/* add in enable current if using real enable */
-			if (context->has_enable)
+			if (m_has_enable)
 			{
 				if (enable)
-					i = context->i_enable;
+					i = m_i_enable;
 				enable = 1;
 			}
 			/* Work out the charge rates. */
-			charge[0] = DSS_OP_AMP_OSC_NORTON_VP_IN / *context->r1 - i;
-			charge[1] = (context->v_out_high - OP_AMP_NORTON_VBE) / *context->r2 - charge[0];
+			charge[0] = DSS_OP_AMP_OSC_NORTON_VP_IN / *m_r1 - i;
+			charge[1] = (m_v_out_high - OP_AMP_NORTON_VBE) / *m_r2 - charge[0];
 			/* Work out the Inverting Schmitt thresholds. */
-			i1 = DSS_OP_AMP_OSC_NORTON_VP_IN / *context->r5;
-			i2 = (0.0 - OP_AMP_NORTON_VBE) / *context->r4;
-			context->threshold_low  = (i1 + i2) * *context->r3 + OP_AMP_NORTON_VBE;
-			i2 = (context->v_out_high - OP_AMP_NORTON_VBE) / *context->r4;
-			context->threshold_high = (i1 + i2) * *context->r3 + OP_AMP_NORTON_VBE;
+			i1 = DSS_OP_AMP_OSC_NORTON_VP_IN / *m_r5;
+			i2 = (0.0 - OP_AMP_NORTON_VBE) / *m_r4;
+			m_threshold_low  = (i1 + i2) * *m_r3 + OP_AMP_NORTON_VBE;
+			i2 = (m_v_out_high - OP_AMP_NORTON_VBE) / *m_r4;
+			m_threshold_high = (i1 + i2) * *m_r3 + OP_AMP_NORTON_VBE;
 			break;
 		}
 
@@ -698,11 +684,11 @@ DISCRETE_STEP(dss_op_amp_osc)
 			else
 			{
 				/* we need to mix any bias and all modulation voltages together. */
-				i  = context->i_fixed;
+				i  = m_i_fixed;
 				i += DSS_OP_AMP_OSC__VMOD1 / info->r7;
 				if (info->r8 != 0)
 					i += DSS_OP_AMP_OSC__VMOD2 / info->r8;
-				v  = i * context->r_total;
+				v  = i * m_r_total;
 			}
 
 			/* Work out the charge rates. */
@@ -718,8 +704,8 @@ DISCRETE_STEP(dss_op_amp_osc)
 		case DISC_OP_AMP_OSCILLATOR_VCO_2 | DISC_OP_AMP_IS_NORTON:
 			/* Work out the charge rates. */
 			i = DSS_OP_AMP_OSC__VMOD1 / info->r1;
-			charge[0] = i - context->temp1;
-			charge[1] = context->temp2 - i;
+			charge[0] = i - m_temp1;
+			charge[1] = m_temp2 - i;
 			/* if the negative pin current is less then the positive pin current, */
 			/* then the osc is disabled and the cap keeps charging */
 			if (charge[0] < 0)
@@ -731,12 +717,12 @@ DISCRETE_STEP(dss_op_amp_osc)
 
 		case DISC_OP_AMP_OSCILLATOR_VCO_3 | DISC_OP_AMP_IS_NORTON:
 			/* start with fixed bias */
-			charge[0] = context->i_fixed;
+			charge[0] = m_i_fixed;
 			/* add in enable current if using real enable */
-			if (context->has_enable)
+			if (m_has_enable)
 			{
 				if (enable)
-					charge[0] -= context->i_enable;
+					charge[0] -= m_i_enable;
 				enable = 1;
 			}
 			/* we need to mix any bias and all modulation voltages together. */
@@ -748,7 +734,7 @@ DISCRETE_STEP(dss_op_amp_osc)
 				v = DSS_OP_AMP_OSC__VMOD2 - OP_AMP_NORTON_VBE;
 				charge[0] += v / info->r6;
 			}
-			charge[1] = context->temp1 - charge[0];
+			charge[1] = m_temp1 - charge[0];
 			break;
 	}
 
@@ -762,9 +748,9 @@ DISCRETE_STEP(dss_op_amp_osc)
 	/* Keep looping until all toggling in time sample is used up. */
 	do
 	{
-		if (context->is_linear_charge)
+		if (m_is_linear_charge)
 		{
-			if ((flip_flop ^ context->flip_flop_xor) || force_charge)
+			if ((flip_flop ^ m_flip_flop_xor) || force_charge)
 			{
 				/* Charging */
 				/* iC=C*dv/dt  works out to dv=iC*dt/C */
@@ -772,9 +758,9 @@ DISCRETE_STEP(dss_op_amp_osc)
 				dt = 0;
 
 				/* has it charged past upper limit? */
-				if (v_cap_next > context->threshold_high)
+				if (v_cap_next > m_threshold_high)
 				{
-					flip_flop = context->flip_flop_xor;
+					flip_flop = m_flip_flop_xor;
 					if (flip_flop)
 						count_r++;
 					else
@@ -782,15 +768,15 @@ DISCRETE_STEP(dss_op_amp_osc)
 					if (force_charge)
 					{
 						/* we need to keep charging the cap to the max thereby disabling the circuit */
-						if (v_cap_next > context->v_out_high)
-							v_cap_next = context->v_out_high;
+						if (v_cap_next > m_v_out_high)
+							v_cap_next = m_v_out_high;
 					}
 					else
 					{
 						/* calculate the overshoot time */
-						dt = info->c * (v_cap_next - context->threshold_high) / charge[1];
+						dt = info->c * (v_cap_next - m_threshold_high) / charge[1];
 						x_time = dt;
-						v_cap_next = context->threshold_high;
+						v_cap_next = m_threshold_high;
 					}
 				}
 			}
@@ -801,38 +787,38 @@ DISCRETE_STEP(dss_op_amp_osc)
 				dt     = 0;
 
 				/* has it discharged past lower limit? */
-				if (v_cap_next < context->threshold_low)
+				if (v_cap_next < m_threshold_low)
 				{
-					flip_flop = !context->flip_flop_xor;
+					flip_flop = !m_flip_flop_xor;
 					if (flip_flop)
 						count_r++;
 					else
 						count_f++;
 					/* calculate the overshoot time */
-					dt = info->c * (context->threshold_low - v_cap_next) / charge[0];
+					dt = info->c * (m_threshold_low - v_cap_next) / charge[0];
 					x_time = dt;
-					v_cap_next = context->threshold_low;
+					v_cap_next = m_threshold_low;
 				}
 			}
 		}
 		else	/* non-linear charge */
 		{
 			if (update_exponent)
-				exponent = RC_CHARGE_EXP_DT(context->charge_rc[flip_flop], dt);
+				exponent = RC_CHARGE_EXP_DT(m_charge_rc[flip_flop], dt);
 			else
-				exponent = context->charge_exp[flip_flop];
+				exponent = m_charge_exp[flip_flop];
 
-			v_cap_next = v_cap + ((context->charge_v[flip_flop] - v_cap) * exponent);
+			v_cap_next = v_cap + ((m_charge_v[flip_flop] - v_cap) * exponent);
 			dt = 0;
 
 			if (flip_flop)
 			{
 				/* Has it charged past upper limit? */
-				if (v_cap_next > context->threshold_high)
+				if (v_cap_next > m_threshold_high)
 				{
-					dt = context->charge_rc[1]  * log(1.0 / (1.0 - ((v_cap_next - context->threshold_high) / (context->v_out_high - v_cap))));
+					dt = m_charge_rc[1]  * log(1.0 / (1.0 - ((v_cap_next - m_threshold_high) / (m_v_out_high - v_cap))));
 					x_time = dt;
-					v_cap_next = context->threshold_high;
+					v_cap_next = m_threshold_high;
 					flip_flop = 0;
 					count_f++;
 					update_exponent = 1;
@@ -841,11 +827,11 @@ DISCRETE_STEP(dss_op_amp_osc)
 			else
 			{
 				/* has it discharged past lower limit? */
-				if (v_cap_next < context->threshold_low)
+				if (v_cap_next < m_threshold_low)
 				{
-					dt = context->charge_rc[0] * log(1.0 / (1.0 - ((context->threshold_low - v_cap_next) / v_cap)));
+					dt = m_charge_rc[0] * log(1.0 / (1.0 - ((m_threshold_low - v_cap_next) / v_cap)));
 					x_time = dt;
-					v_cap_next = context->threshold_low;
+					v_cap_next = m_threshold_low;
 					flip_flop = 1;
 					count_r++;
 					update_exponent = 1;
@@ -854,29 +840,29 @@ DISCRETE_STEP(dss_op_amp_osc)
 		}
 		v_cap = v_cap_next;
 	} while(dt);
-	if (v_cap > context->v_out_high)
-		v_cap = context->v_out_high;
+	if (v_cap > m_v_out_high)
+		v_cap = m_v_out_high;
 	if (v_cap < 0)
 		v_cap = 0;
-	context->v_cap = v_cap;
+	m_v_cap = v_cap;
 
 	x_time = dt / this->sample_time();
 
-	switch (context->output_type)
+	switch (m_output_type)
 	{
 		case DISC_OP_AMP_OSCILLATOR_OUT_CAP:
 			this->output[0] = v_cap;
 			break;
 		case DISC_OP_AMP_OSCILLATOR_OUT_ENERGY:
 			if (x_time == 0) x_time = 1.0;
-			this->output[0]  = context->v_out_high * (flip_flop ? x_time : (1.0 - x_time));
+			this->output[0]  = m_v_out_high * (flip_flop ? x_time : (1.0 - x_time));
 			break;
 		case DISC_OP_AMP_OSCILLATOR_OUT_SQW:
 			if (count_f + count_r >= 2)
 				/* force at least 1 toggle */
-				this->output[0] = context->flip_flop ? 0 : context->v_out_high;
+				this->output[0] = m_flip_flop ? 0 : m_v_out_high;
 			else
-				this->output[0] = flip_flop * context->v_out_high;
+				this->output[0] = flip_flop * m_v_out_high;
 			break;
 		case DISC_OP_AMP_OSCILLATOR_OUT_COUNT_F_X:
 			this->output[0] = count_f ? count_f + x_time : count_f;
@@ -885,17 +871,16 @@ DISCRETE_STEP(dss_op_amp_osc)
 			this->output[0] =  count_r ? count_r + x_time : count_r;
 			break;
 		case DISC_OP_AMP_OSCILLATOR_OUT_LOGIC_X:
-			this->output[0] = context->flip_flop + x_time;
+			this->output[0] = m_flip_flop + x_time;
 			break;
 	}
-	context->flip_flop = flip_flop;
+	m_flip_flop = flip_flop;
 }
 
 #define DIODE_DROP	0.7
 
 DISCRETE_RESET(dss_op_amp_osc)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_op_amp_osc)
 	DISCRETE_DECLARE_INFO(discrete_op_amp_osc_info)
 
 	const double *r_info_ptr;
@@ -908,7 +893,7 @@ DISCRETE_RESET(dss_op_amp_osc)
 
 	/* link to resistor static or node values */
 	r_info_ptr    = &info->r1;
-	r_context_ptr = &context->r1;
+	r_context_ptr = &m_r1;
 	for (loop = 0; loop < 8; loop ++)
 	{
 		if IS_VALUE_A_NODE(*r_info_ptr)
@@ -922,159 +907,159 @@ DISCRETE_RESET(dss_op_amp_osc)
 		r_context_ptr++;
 	}
 
-	context->is_linear_charge = 1;
-	context->output_type = info->type & DISC_OP_AMP_OSCILLATOR_OUT_MASK;
-	context->type        = info->type & DISC_OP_AMP_OSCILLATOR_TYPE_MASK;
-	context->charge_rc[0] = 0;
-	context->charge_rc[1] = 0;
-	context->charge_v[0] = 0;
-	context->charge_v[1] = 0;
-	context->i_fixed = 0;
-	context->has_enable = 0;
+	m_is_linear_charge = 1;
+	m_output_type = info->type & DISC_OP_AMP_OSCILLATOR_OUT_MASK;
+	m_type        = info->type & DISC_OP_AMP_OSCILLATOR_TYPE_MASK;
+	m_charge_rc[0] = 0;
+	m_charge_rc[1] = 0;
+	m_charge_v[0] = 0;
+	m_charge_v[1] = 0;
+	m_i_fixed = 0;
+	m_has_enable = 0;
 
-	switch (context->type)
+	switch (m_type)
 	{
 		case DISC_OP_AMP_OSCILLATOR_VCO_1:
 			/* The charge rates vary depending on vMod so they are not precalculated. */
 			/* Charges while FlipFlop High */
-			context->flip_flop_xor = 0;
+			m_flip_flop_xor = 0;
 			/* Work out the Non-inverting Schmitt thresholds. */
-			context->temp1 = (info->vP / 2) / info->r4;
-			context->temp2 = (info->vP - OP_AMP_VP_RAIL_OFFSET) / info->r3;
-			context->temp3 = 1.0 / (1.0 / info->r3 + 1.0 / info->r4);
-			context->threshold_low  =  context->temp1 * context->temp3;
-			context->threshold_high = (context->temp1 + context->temp2) * context->temp3;
+			m_temp1 = (info->vP / 2) / info->r4;
+			m_temp2 = (info->vP - OP_AMP_VP_RAIL_OFFSET) / info->r3;
+			m_temp3 = 1.0 / (1.0 / info->r3 + 1.0 / info->r4);
+			m_threshold_low  =  m_temp1 * m_temp3;
+			m_threshold_high = (m_temp1 + m_temp2) * m_temp3;
 			/* There is no charge on the cap so the schmitt goes high at init. */
-			context->flip_flop = 1;
+			m_flip_flop = 1;
 			/* Setup some commonly used stuff */
-			context->temp1 = info->r5 / (info->r2 + info->r5);			/* voltage ratio across r5 */
-			context->temp2 = info->r6 / (info->r1 + info->r6);			/* voltage ratio across r6 */
-			context->temp3 = 1.0 / (1.0 / info->r1 + 1.0 / info->r6);	/* input resistance when r6 switched in */
+			m_temp1 = info->r5 / (info->r2 + info->r5);			/* voltage ratio across r5 */
+			m_temp2 = info->r6 / (info->r1 + info->r6);			/* voltage ratio across r6 */
+			m_temp3 = 1.0 / (1.0 / info->r1 + 1.0 / info->r6);	/* input resistance when r6 switched in */
 			break;
 
 		case DISC_OP_AMP_OSCILLATOR_1 | DISC_OP_AMP_IS_NORTON:
 			/* Charges while FlipFlop High */
-			context->flip_flop_xor = 0;
+			m_flip_flop_xor = 0;
 			/* There is no charge on the cap so the schmitt inverter goes high at init. */
-			context->flip_flop = 1;
+			m_flip_flop = 1;
 			/* setup current if using real enable */
 			if (info->r6 > 0)
 			{
-				context->has_enable = 1;
-				context->i_enable = (info->vP - OP_AMP_NORTON_VBE) / (info->r6 + RES_K(1));
+				m_has_enable = 1;
+				m_i_enable = (info->vP - OP_AMP_NORTON_VBE) / (info->r6 + RES_K(1));
 			}
 			break;
 
 		case DISC_OP_AMP_OSCILLATOR_2 | DISC_OP_AMP_IS_NORTON:
-			context->is_linear_charge = 0;
+			m_is_linear_charge = 0;
 			/* First calculate the parallel charge resistors and volatges. */
 			/* We can cheat and just calcuate the charges in the working area. */
 			/* The thresholds are well past the effect of the voltage drop */
 			/* and the component tolerances far exceed the .5V charge difference */
 			if (info->r1 != 0)
 			{
-				context->charge_rc[0] = 1.0 / info->r1;
-				context->charge_rc[1] = 1.0 / info->r1;
-				context->charge_v[1] = (info->vP - OP_AMP_NORTON_VBE) / info->r1;
+				m_charge_rc[0] = 1.0 / info->r1;
+				m_charge_rc[1] = 1.0 / info->r1;
+				m_charge_v[1] = (info->vP - OP_AMP_NORTON_VBE) / info->r1;
 			}
 			if (info->r5 != 0)
 			{
-				context->charge_rc[0] += 1.0 / info->r5;
-				context->charge_v[0] = DIODE_DROP / info->r5;
+				m_charge_rc[0] += 1.0 / info->r5;
+				m_charge_v[0] = DIODE_DROP / info->r5;
 			}
 			if (info->r6 != 0)
 			{
-				context->charge_rc[1] += 1.0 / info->r6;
-				context->charge_v[1] += (info->vP - OP_AMP_NORTON_VBE - DIODE_DROP) / info->r6;
+				m_charge_rc[1] += 1.0 / info->r6;
+				m_charge_v[1] += (info->vP - OP_AMP_NORTON_VBE - DIODE_DROP) / info->r6;
 			}
-			context->charge_rc[0] += 1.0 / info->r2;
-			context->charge_rc[0] = 1.0 / context->charge_rc[0];
-			context->charge_v[0] += OP_AMP_NORTON_VBE / info->r2;
-			context->charge_v[0] *= context->charge_rc[0];
-			context->charge_rc[1] += 1.0 / info->r2;
-			context->charge_rc[1] = 1.0 / context->charge_rc[1];
-			context->charge_v[1] += OP_AMP_NORTON_VBE / info->r2;
-			context->charge_v[1] *= context->charge_rc[1];
+			m_charge_rc[0] += 1.0 / info->r2;
+			m_charge_rc[0] = 1.0 / m_charge_rc[0];
+			m_charge_v[0] += OP_AMP_NORTON_VBE / info->r2;
+			m_charge_v[0] *= m_charge_rc[0];
+			m_charge_rc[1] += 1.0 / info->r2;
+			m_charge_rc[1] = 1.0 / m_charge_rc[1];
+			m_charge_v[1] += OP_AMP_NORTON_VBE / info->r2;
+			m_charge_v[1] *= m_charge_rc[1];
 
-			context->charge_rc[0] *= info->c;
-			context->charge_rc[1] *= info->c;
-			context->charge_exp[0] = RC_CHARGE_EXP_CLASS(context->charge_rc[0]);
-			context->charge_exp[1] = RC_CHARGE_EXP_CLASS(context->charge_rc[1]);
-			context->threshold_low  = (info->vP - OP_AMP_NORTON_VBE) / info->r4;
-			context->threshold_high = context->threshold_low + (info->vP - 2 * OP_AMP_NORTON_VBE) / info->r3;;
-			context->threshold_low  = context->threshold_low * info->r2 + OP_AMP_NORTON_VBE;
-			context->threshold_high = context->threshold_high * info->r2 + OP_AMP_NORTON_VBE;
+			m_charge_rc[0] *= info->c;
+			m_charge_rc[1] *= info->c;
+			m_charge_exp[0] = RC_CHARGE_EXP_CLASS(m_charge_rc[0]);
+			m_charge_exp[1] = RC_CHARGE_EXP_CLASS(m_charge_rc[1]);
+			m_threshold_low  = (info->vP - OP_AMP_NORTON_VBE) / info->r4;
+			m_threshold_high = m_threshold_low + (info->vP - 2 * OP_AMP_NORTON_VBE) / info->r3;;
+			m_threshold_low  = m_threshold_low * info->r2 + OP_AMP_NORTON_VBE;
+			m_threshold_high = m_threshold_high * info->r2 + OP_AMP_NORTON_VBE;
 
 			/* There is no charge on the cap so the schmitt inverter goes high at init. */
-			context->flip_flop = 1;
+			m_flip_flop = 1;
 			break;
 
 		case DISC_OP_AMP_OSCILLATOR_VCO_1 | DISC_OP_AMP_IS_NORTON:
 			/* Charges while FlipFlop Low */
-			context->flip_flop_xor = 1;
+			m_flip_flop_xor = 1;
 			/* There is no charge on the cap so the schmitt goes low at init. */
-			context->flip_flop = 0;
+			m_flip_flop = 0;
 			/* The charge rates vary depending on vMod so they are not precalculated. */
 			/* But we can precalculate the fixed currents. */
-			if (info->r6 != 0) context->i_fixed += info->vP / info->r6;
-			context->i_fixed += OP_AMP_NORTON_VBE / info->r1;
-			context->i_fixed += OP_AMP_NORTON_VBE / info->r2;
+			if (info->r6 != 0) m_i_fixed += info->vP / info->r6;
+			m_i_fixed += OP_AMP_NORTON_VBE / info->r1;
+			m_i_fixed += OP_AMP_NORTON_VBE / info->r2;
 			/* Work out the input resistance to be used later to calculate the Millman voltage. */
-			context->r_total = 1.0 / info->r1 + 1.0 / info->r2 + 1.0 / info->r7;
-			if (info->r6) context->r_total += 1.0 / info->r6;
-			if (info->r8) context->r_total += 1.0 / info->r8;
-			context->r_total = 1.0 / context->r_total;
+			m_r_total = 1.0 / info->r1 + 1.0 / info->r2 + 1.0 / info->r7;
+			if (info->r6) m_r_total += 1.0 / info->r6;
+			if (info->r8) m_r_total += 1.0 / info->r8;
+			m_r_total = 1.0 / m_r_total;
 			/* Work out the Non-inverting Schmitt thresholds. */
 			i1 = (info->vP - OP_AMP_NORTON_VBE) / info->r5;
 			i2 = (info->vP - OP_AMP_NORTON_VBE - OP_AMP_NORTON_VBE) / info->r4;
-			context->threshold_low = (i1 - i2) * info->r3 + OP_AMP_NORTON_VBE;
+			m_threshold_low = (i1 - i2) * info->r3 + OP_AMP_NORTON_VBE;
 			i2 = (0.0 - OP_AMP_NORTON_VBE) / info->r4;
-			context->threshold_high = (i1 - i2) * info->r3 + OP_AMP_NORTON_VBE;
+			m_threshold_high = (i1 - i2) * info->r3 + OP_AMP_NORTON_VBE;
 			break;
 
 		case DISC_OP_AMP_OSCILLATOR_VCO_2 | DISC_OP_AMP_IS_NORTON:
 			/* Charges while FlipFlop High */
-			context->flip_flop_xor = 0;
+			m_flip_flop_xor = 0;
 			/* There is no charge on the cap so the schmitt inverter goes high at init. */
-			context->flip_flop = 1;
+			m_flip_flop = 1;
 			/* Work out the charge rates. */
-			context->temp1 = (info->vP - OP_AMP_NORTON_VBE) / info->r2;
-			context->temp2 = (info->vP - OP_AMP_NORTON_VBE) * (1.0 / info->r2 + 1.0 / info->r6);
+			m_temp1 = (info->vP - OP_AMP_NORTON_VBE) / info->r2;
+			m_temp2 = (info->vP - OP_AMP_NORTON_VBE) * (1.0 / info->r2 + 1.0 / info->r6);
 			/* Work out the Inverting Schmitt thresholds. */
 			i1 = (info->vP - OP_AMP_NORTON_VBE) / info->r5;
 			i2 = (0.0 - OP_AMP_NORTON_VBE) / info->r4;
-			context->threshold_low = (i1 + i2) * info->r3 + OP_AMP_NORTON_VBE;
+			m_threshold_low = (i1 + i2) * info->r3 + OP_AMP_NORTON_VBE;
 			i2 = (info->vP - OP_AMP_NORTON_VBE - OP_AMP_NORTON_VBE) / info->r4;
-			context->threshold_high = (i1 + i2) * info->r3 + OP_AMP_NORTON_VBE;
+			m_threshold_high = (i1 + i2) * info->r3 + OP_AMP_NORTON_VBE;
 			break;
 
 		case DISC_OP_AMP_OSCILLATOR_VCO_3 | DISC_OP_AMP_IS_NORTON:
 			/* Charges while FlipFlop High */
-			context->flip_flop_xor = 0;
+			m_flip_flop_xor = 0;
 			/* There is no charge on the cap so the schmitt inverter goes high at init. */
-			context->flip_flop = 1;
+			m_flip_flop = 1;
 			/* setup current if using real enable */
 			if (info->r8 > 0)
 			{
-				context->has_enable = 1;
-				context->i_enable = (info->vP - OP_AMP_NORTON_VBE) / (info->r8 + RES_K(1));
+				m_has_enable = 1;
+				m_i_enable = (info->vP - OP_AMP_NORTON_VBE) / (info->r8 + RES_K(1));
 			}
 			/* Work out the charge rates. */
 			/* The charge rates vary depending on vMod so they are not precalculated. */
 			/* But we can precalculate the fixed currents. */
-			if (info->r7 != 0) context->i_fixed = (info->vP - OP_AMP_NORTON_VBE) / info->r7;
-			context->temp1 = (info->vP - OP_AMP_NORTON_VBE - OP_AMP_NORTON_VBE) / info->r2;
+			if (info->r7 != 0) m_i_fixed = (info->vP - OP_AMP_NORTON_VBE) / info->r7;
+			m_temp1 = (info->vP - OP_AMP_NORTON_VBE - OP_AMP_NORTON_VBE) / info->r2;
 			/* Work out the Inverting Schmitt thresholds. */
 			i1 = (info->vP - OP_AMP_NORTON_VBE) / info->r5;
 			i2 = (0.0 - OP_AMP_NORTON_VBE) / info->r4;
-			context->threshold_low = (i1 + i2) * info->r3 + OP_AMP_NORTON_VBE;
+			m_threshold_low = (i1 + i2) * info->r3 + OP_AMP_NORTON_VBE;
 			i2 = (info->vP - OP_AMP_NORTON_VBE - OP_AMP_NORTON_VBE) / info->r4;
-			context->threshold_high = (i1 + i2) * info->r3 + OP_AMP_NORTON_VBE;
+			m_threshold_high = (i1 + i2) * info->r3 + OP_AMP_NORTON_VBE;
 			break;
 	}
 
-	context->v_out_high = info->vP - ((context->type & DISC_OP_AMP_IS_NORTON) ? OP_AMP_NORTON_VBE : OP_AMP_VP_RAIL_OFFSET);
-	context->v_cap      = 0;
+	m_v_out_high = info->vP - ((m_type & DISC_OP_AMP_IS_NORTON) ? OP_AMP_NORTON_VBE : OP_AMP_VP_RAIL_OFFSET);
+	m_v_cap      = 0;
 
 	this->step();
 }
@@ -1101,11 +1086,9 @@ DISCRETE_RESET(dss_op_amp_osc)
 
 DISCRETE_STEP(dss_sawtoothwave)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_sawtoothwave)
-
 	if(DSS_SAWTOOTHWAVE__ENABLE)
 	{
-		this->output[0]  = (context->type == 0) ? context->phase * (DSS_SAWTOOTHWAVE__AMP / (2.0 * M_PI)) : DSS_SAWTOOTHWAVE__AMP - (context->phase * (DSS_SAWTOOTHWAVE__AMP / (2.0 * M_PI)));
+		this->output[0]  = (m_type == 0) ? m_phase * (DSS_SAWTOOTHWAVE__AMP / (2.0 * M_PI)) : DSS_SAWTOOTHWAVE__AMP - (m_phase * (DSS_SAWTOOTHWAVE__AMP / (2.0 * M_PI)));
 		this->output[0] -= DSS_SAWTOOTHWAVE__AMP / 2.0;
 		/* Add DC Bias component */
 		this->output[0] = this->output[0] + DSS_SAWTOOTHWAVE__BIAS;
@@ -1122,22 +1105,20 @@ DISCRETE_STEP(dss_sawtoothwave)
 	/*                    boils out to                           */
 	/*     phase step = (2Pi*output freq)/sample freq)           */
 	/* Also keep the new phasor in the 2Pi range.                */
-	context->phase = fmod((context->phase + ((2.0 * M_PI * DSS_SAWTOOTHWAVE__FREQ) / this->sample_rate())), 2.0 * M_PI);
+	m_phase = fmod((m_phase + ((2.0 * M_PI * DSS_SAWTOOTHWAVE__FREQ) / this->sample_rate())), 2.0 * M_PI);
 }
 
 DISCRETE_RESET(dss_sawtoothwave)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_sawtoothwave)
-
 	double start;
 
 	/* Establish starting phase, convert from degrees to radians */
 	start = (DSS_SAWTOOTHWAVE__PHASE / 360.0) * (2.0 * M_PI);
 	/* Make sure its always mod 2Pi */
-	context->phase = fmod(start, 2.0 * M_PI);
+	m_phase = fmod(start, 2.0 * M_PI);
 
 	/* Invert gradient depending on sawtooth type /|/|/|/|/| or |\|\|\|\|\ */
-	context->type = (DSS_SAWTOOTHWAVE__GRAD) ? 1 : 0;
+	m_type = (DSS_SAWTOOTHWAVE__GRAD) ? 1 : 0;
 
 	/* Step the node to set the output */
 	this->step();
@@ -1162,14 +1143,13 @@ DISCRETE_RESET(dss_sawtoothwave)
 
 DISCRETE_STEP(dss_schmitt_osc)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_schmitt_osc)
 	DISCRETE_DECLARE_INFO(discrete_schmitt_osc_desc)
 
 	double supply, v_cap, new_vCap, t, exponent;
 
 	/* We will always oscillate.  The enable just affects the output. */
-	v_cap    = context->v_cap;
-	exponent = context->exponent;
+	v_cap    = m_v_cap;
+	exponent = m_exponent;
 
 	/* Keep looping until all toggling in time sample is used up. */
 	do
@@ -1181,21 +1161,21 @@ DISCRETE_STEP(dss_schmitt_osc)
          * use vGate as its voltage.  Note that ration_in is just the ratio of the total
          * voltage and needs to be multipled by the input voltage.  ratio_feedback has
          * already been multiplied by vGate to save time because that voltage never changes. */
-		supply   = context->input_is_voltage ? context->ration_in * DSS_SCHMITT_OSC__VIN : (DSS_SCHMITT_OSC__VIN ? context->ration_in * info->vGate : 0);
-		supply  += (context->state ? context->ratio_feedback : 0);
+		supply   = m_input_is_voltage ? m_ration_in * DSS_SCHMITT_OSC__VIN : (DSS_SCHMITT_OSC__VIN ? m_ration_in * info->vGate : 0);
+		supply  += (m_state ? m_ratio_feedback : 0);
 		new_vCap = v_cap + ((supply - v_cap) * exponent);
-		if (context->state)
+		if (m_state)
 		{
 			/* Charging */
 			/* has it charged past upper limit? */
 			if (new_vCap > info->trshRise)
 			{
 				/* calculate the overshoot time */
-				t = context->rc * log(1.0 / (1.0 - ((new_vCap - info->trshRise) / (info->vGate - v_cap))));
+				t = m_rc * log(1.0 / (1.0 - ((new_vCap - info->trshRise) / (info->vGate - v_cap))));
 				/* calculate new exponent because of reduced time */
-				exponent = RC_CHARGE_EXP_DT(context->rc, t);
+				exponent = RC_CHARGE_EXP_DT(m_rc, t);
 				v_cap    = new_vCap = info->trshRise;
-				context->state = 0;
+				m_state = 0;
 			}
 		}
 		else
@@ -1205,30 +1185,30 @@ DISCRETE_STEP(dss_schmitt_osc)
 			if (new_vCap < info->trshFall)
 			{
 				/* calculate the overshoot time */
-				t = context->rc * log(1.0 / (1.0 - ((info->trshFall - new_vCap) / v_cap)));
+				t = m_rc * log(1.0 / (1.0 - ((info->trshFall - new_vCap) / v_cap)));
 				/* calculate new exponent because of reduced time */
-				exponent = RC_CHARGE_EXP_DT(context->rc, t);
+				exponent = RC_CHARGE_EXP_DT(m_rc, t);
 				v_cap    = new_vCap = info->trshFall;
-				context->state = 1;
+				m_state = 1;
 			}
 		}
 	} while(t);
 
-	context->v_cap = new_vCap;
+	m_v_cap = new_vCap;
 
-	switch (context->enable_type)
+	switch (m_enable_type)
 	{
 		case DISC_SCHMITT_OSC_ENAB_IS_AND:
-			this->output[0] = DSS_SCHMITT_OSC__ENABLE && context->state;
+			this->output[0] = DSS_SCHMITT_OSC__ENABLE && m_state;
 			break;
 		case DISC_SCHMITT_OSC_ENAB_IS_NAND:
-			this->output[0] = !(DSS_SCHMITT_OSC__ENABLE && context->state);
+			this->output[0] = !(DSS_SCHMITT_OSC__ENABLE && m_state);
 			break;
 		case DISC_SCHMITT_OSC_ENAB_IS_OR:
-			this->output[0] = DSS_SCHMITT_OSC__ENABLE || context->state;
+			this->output[0] = DSS_SCHMITT_OSC__ENABLE || m_state;
 			break;
 		case DISC_SCHMITT_OSC_ENAB_IS_NOR:
-			this->output[0] = !(DSS_SCHMITT_OSC__ENABLE || context->state);
+			this->output[0] = !(DSS_SCHMITT_OSC__ENABLE || m_state);
 			break;
 	}
 	this->output[0] *= DSS_SCHMITT_OSC__AMP;
@@ -1236,28 +1216,27 @@ DISCRETE_STEP(dss_schmitt_osc)
 
 DISCRETE_RESET(dss_schmitt_osc)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_schmitt_osc)
 	DISCRETE_DECLARE_INFO(discrete_schmitt_osc_desc)
 
 	double rSource;
 
-	context->enable_type      =  info->options & DISC_SCHMITT_OSC_ENAB_MASK;
-	context->input_is_voltage = (info->options & DISC_SCHMITT_OSC_IN_IS_VOLTAGE) ? 1 : 0;
+	m_enable_type      =  info->options & DISC_SCHMITT_OSC_ENAB_MASK;
+	m_input_is_voltage = (info->options & DISC_SCHMITT_OSC_IN_IS_VOLTAGE) ? 1 : 0;
 
 	/* The 2 resistors make a voltage divider, so their ratios add together
      * to make the charging voltage. */
-	context->ration_in      = info->rFeedback / (info->rIn + info->rFeedback);
-	context->ratio_feedback = info->rIn / (info->rIn + info->rFeedback) * info->vGate;
+	m_ration_in      = info->rFeedback / (info->rIn + info->rFeedback);
+	m_ratio_feedback = info->rIn / (info->rIn + info->rFeedback) * info->vGate;
 
 	/* The voltage source resistance works out to the 2 resistors in parallel.
      * So use this for the RC charge constant. */
 	rSource     = 1.0 / ((1.0 / info->rIn) + (1.0 / info->rFeedback));
-	context->rc = rSource * info->c;
-	context->exponent = RC_CHARGE_EXP_CLASS(context->rc);
+	m_rc = rSource * info->c;
+	m_exponent = RC_CHARGE_EXP_CLASS(m_rc);
 
 	/* Cap is at 0V on power up.  Causing output to be high. */
-	context->v_cap = 0;
-	context->state = 1;
+	m_v_cap = 0;
+	m_state = 1;
 
 	this->output[0] = info->options ? 0 : DSS_SCHMITT_OSC__AMP;
 }
@@ -1282,12 +1261,10 @@ DISCRETE_RESET(dss_schmitt_osc)
 
 DISCRETE_STEP(dss_sinewave)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_sinewave)
-
 	/* Set the output */
 	if(DSS_SINEWAVE__ENABLE)
 	{
-		this->output[0] = (DSS_SINEWAVE__AMPL / 2.0) * sin(context->phase);
+		this->output[0] = (DSS_SINEWAVE__AMPL / 2.0) * sin(m_phase);
 		/* Add DC Bias component */
 		this->output[0] = this->output[0] + DSS_SINEWAVE__BIAS;
 	}
@@ -1303,19 +1280,17 @@ DISCRETE_STEP(dss_sinewave)
 	/*                    boils out to                           */
 	/*     phase step = (2Pi*output freq)/sample freq)           */
 	/* Also keep the new phasor in the 2Pi range.                */
-	context->phase=fmod((context->phase + ((2.0 * M_PI * DSS_SINEWAVE__FREQ) / this->sample_rate())), 2.0 * M_PI);
+	m_phase=fmod((m_phase + ((2.0 * M_PI * DSS_SINEWAVE__FREQ) / this->sample_rate())), 2.0 * M_PI);
 }
 
 DISCRETE_RESET(dss_sinewave)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_sinewave)
-
 	double start;
 
 	/* Establish starting phase, convert from degrees to radians */
 	start = (DSS_SINEWAVE__PHASE / 360.0) * (2.0 * M_PI);
 	/* Make sure its always mod 2Pi */
-	context->phase = fmod(start, 2.0 * M_PI);
+	m_phase = fmod(start, 2.0 * M_PI);
 	/* Step the output to make it correct */
 	this->step();
 }
@@ -1342,15 +1317,13 @@ DISCRETE_RESET(dss_sinewave)
 
 DISCRETE_STEP(dss_squarewave)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_squarewave)
-
 	/* Establish trigger phase from duty */
-	context->trigger=((100-DSS_SQUAREWAVE__DUTY)/100)*(2.0*M_PI);
+	m_trigger=((100-DSS_SQUAREWAVE__DUTY)/100)*(2.0*M_PI);
 
 	/* Set the output */
 	if(DSS_SQUAREWAVE__ENABLE)
 	{
-		if(context->phase>context->trigger)
+		if(m_phase>m_trigger)
 			this->output[0] = DSS_SQUAREWAVE__AMP /2.0;
 		else
 			this->output[0] =- DSS_SQUAREWAVE__AMP / 2.0;
@@ -1370,19 +1343,17 @@ DISCRETE_STEP(dss_squarewave)
 	/*                    boils out to                           */
 	/*     phase step = (2Pi*output freq)/sample freq)           */
 	/* Also keep the new phasor in the 2Pi range.                */
-	context->phase=fmod(context->phase + ((2.0 * M_PI * DSS_SQUAREWAVE__FREQ) / this->sample_rate()), 2.0 * M_PI);
+	m_phase=fmod(m_phase + ((2.0 * M_PI * DSS_SQUAREWAVE__FREQ) / this->sample_rate()), 2.0 * M_PI);
 }
 
 DISCRETE_RESET(dss_squarewave)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_squarewave)
-
 	double start;
 
 	/* Establish starting phase, convert from degrees to radians */
 	start = (DSS_SQUAREWAVE__PHASE / 360.0) * (2.0 * M_PI);
 	/* Make sure its always mod 2Pi */
-	context->phase = fmod(start, 2.0 * M_PI);
+	m_phase = fmod(start, 2.0 * M_PI);
 
 	/* Step the output */
 	this->step();
@@ -1409,26 +1380,24 @@ DISCRETE_RESET(dss_squarewave)
 
 DISCRETE_STEP(dss_squarewfix)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_squarewfix)
-
-	context->t_left -= context->sample_step;
+	m_t_left -= m_sample_step;
 
 	/* The enable input only curtails output, phase rotation still occurs */
-	while (context->t_left <= 0)
+	while (m_t_left <= 0)
 	{
-		context->flip_flop = context->flip_flop ? 0 : 1;
-		context->t_left   += context->flip_flop ? context->t_on : context->t_off;
+		m_flip_flop = m_flip_flop ? 0 : 1;
+		m_t_left   += m_flip_flop ? m_t_on : m_t_off;
 	}
 
 	if(DSS_SQUAREWFIX__ENABLE)
 	{
 		/* Add gain and DC Bias component */
 
-		context->t_off  = 1.0 / DSS_SQUAREWFIX__FREQ;	/* cycle time */
-		context->t_on   = context->t_off * (DSS_SQUAREWFIX__DUTY / 100.0);
-		context->t_off -= context->t_on;
+		m_t_off  = 1.0 / DSS_SQUAREWFIX__FREQ;	/* cycle time */
+		m_t_on   = m_t_off * (DSS_SQUAREWFIX__DUTY / 100.0);
+		m_t_off -= m_t_on;
 
-		this->output[0] = (context->flip_flop ? DSS_SQUAREWFIX__AMP / 2.0 : -(DSS_SQUAREWFIX__AMP / 2.0)) + DSS_SQUAREWFIX__BIAS;
+		this->output[0] = (m_flip_flop ? DSS_SQUAREWFIX__AMP / 2.0 : -(DSS_SQUAREWFIX__AMP / 2.0)) + DSS_SQUAREWFIX__BIAS;
 	}
 	else
 	{
@@ -1438,27 +1407,25 @@ DISCRETE_STEP(dss_squarewfix)
 
 DISCRETE_RESET(dss_squarewfix)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_squarewfix)
-
-	context->sample_step = 1.0 / this->sample_rate();
-	context->flip_flop   = 1;
+	m_sample_step = 1.0 / this->sample_rate();
+	m_flip_flop   = 1;
 
 	/* Do the intial time shift and convert freq to off/on times */
-	context->t_off   = 1.0 / DSS_SQUAREWFIX__FREQ;	/* cycle time */
-	context->t_left  = DSS_SQUAREWFIX__PHASE / 360.0;	/* convert start phase to % */
-	context->t_left  = context->t_left - (int)context->t_left;	/* keep % between 0 & 1 */
-	context->t_left  = (context->t_left < 0) ? 1.0 + context->t_left : context->t_left;	/* if - then flip to + phase */
-	context->t_left *= context->t_off;
-	context->t_on    = context->t_off * (DSS_SQUAREWFIX__DUTY / 100.0);
-	context->t_off  -= context->t_on;
+	m_t_off   = 1.0 / DSS_SQUAREWFIX__FREQ;	/* cycle time */
+	m_t_left  = DSS_SQUAREWFIX__PHASE / 360.0;	/* convert start phase to % */
+	m_t_left  = m_t_left - (int)m_t_left;	/* keep % between 0 & 1 */
+	m_t_left  = (m_t_left < 0) ? 1.0 + m_t_left : m_t_left;	/* if - then flip to + phase */
+	m_t_left *= m_t_off;
+	m_t_on    = m_t_off * (DSS_SQUAREWFIX__DUTY / 100.0);
+	m_t_off  -= m_t_on;
 
-	context->t_left = -context->t_left;
+	m_t_left = -m_t_left;
 
 	/* toggle output and work out intial time shift */
-	while (context->t_left <= 0)
+	while (m_t_left <= 0)
 	{
-		context->flip_flop = context->flip_flop ? 0 : 1;
-		context->t_left   += context->flip_flop ? context->t_on : context->t_off;
+		m_flip_flop = m_flip_flop ? 0 : 1;
+		m_t_left   += m_flip_flop ? m_t_on : m_t_off;
 	}
 
 	/* Step the output */
@@ -1487,14 +1454,12 @@ DISCRETE_RESET(dss_squarewfix)
 
 DISCRETE_STEP(dss_squarewave2)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_squarewave)
-
 	double newphase;
 
 	if(DSS_SQUAREWAVE2__ENABLE)
 	{
 		/* Establish trigger phase from time periods */
-		context->trigger = (DSS_SQUAREWAVE2__T_OFF / (DSS_SQUAREWAVE2__T_OFF + DSS_SQUAREWAVE2__T_ON)) * (2.0 * M_PI);
+		m_trigger = (DSS_SQUAREWAVE2__T_OFF / (DSS_SQUAREWAVE2__T_OFF + DSS_SQUAREWAVE2__T_ON)) * (2.0 * M_PI);
 
 		/* Work out the phase step based on phase/freq & sample rate */
 		/* The enable input only curtails output, phase rotation     */
@@ -1503,11 +1468,11 @@ DISCRETE_STEP(dss_squarewave2)
 		/*     phase step = 2Pi/(output period/sample period)        */
 		/*                    boils out to                           */
 		/*     phase step = 2Pi/(output period*sample freq)          */
-		newphase = context->phase + ((2.0 * M_PI) / ((DSS_SQUAREWAVE2__T_OFF + DSS_SQUAREWAVE2__T_ON) * this->sample_rate()));
+		newphase = m_phase + ((2.0 * M_PI) / ((DSS_SQUAREWAVE2__T_OFF + DSS_SQUAREWAVE2__T_ON) * this->sample_rate()));
 		/* Keep the new phasor in the 2Pi range.*/
-		context->phase = fmod(newphase, 2.0 * M_PI);
+		m_phase = fmod(newphase, 2.0 * M_PI);
 
-		if(context->phase>context->trigger)
+		if(m_phase>m_trigger)
 			this->output[0] = DSS_SQUAREWAVE2__AMP / 2.0;
 		else
 			this->output[0] = -DSS_SQUAREWAVE2__AMP / 2.0;
@@ -1523,8 +1488,6 @@ DISCRETE_STEP(dss_squarewave2)
 
 DISCRETE_RESET(dss_squarewave2)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_squarewave)
-
 	double start;
 
 	/* Establish starting phase, convert from degrees to radians */
@@ -1534,7 +1497,7 @@ DISCRETE_RESET(dss_squarewave2)
 	else
 		start = 0.0;
 	/* Make sure its always mod 2Pi */
-	context->phase = fmod(start, 2.0 * M_PI);
+	m_phase = fmod(start, 2.0 * M_PI);
 
 	/* Step the output */
 	this->step();
@@ -1586,7 +1549,6 @@ inline double DISCRETE_CLASS_FUNC(dss_inverter_osc, tf)(double x)
 DISCRETE_STEP(dss_inverter_osc)
 {
 	DISCRETE_DECLARE_INFO(discrete_inverter_osc_desc)
-
 	double diff, vG1, vG2, vG3, vI;
 	double vMix, rMix;
 	int	clamped;
@@ -1742,12 +1704,10 @@ DISCRETE_RESET(dss_inverter_osc)
 
 DISCRETE_STEP(dss_trianglewave)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_trianglewave)
-
 	if(DSS_TRIANGLEWAVE__ENABLE)
 	{
-		this->output[0] = context->phase < M_PI ? (DSS_TRIANGLEWAVE__AMP * (context->phase / (M_PI / 2.0) - 1.0)) / 2.0 :
-									(DSS_TRIANGLEWAVE__AMP * (3.0 - context->phase / (M_PI / 2.0))) / 2.0 ;
+		this->output[0] = m_phase < M_PI ? (DSS_TRIANGLEWAVE__AMP * (m_phase / (M_PI / 2.0) - 1.0)) / 2.0 :
+									(DSS_TRIANGLEWAVE__AMP * (3.0 - m_phase / (M_PI / 2.0))) / 2.0 ;
 
 		/* Add DC Bias component */
 		this->output[0] = this->output[0] + DSS_TRIANGLEWAVE__BIAS;
@@ -1764,19 +1724,17 @@ DISCRETE_STEP(dss_trianglewave)
 	/*                    boils out to                           */
 	/*     phase step = (2Pi*output freq)/sample freq)           */
 	/* Also keep the new phasor in the 2Pi range.                */
-	context->phase=fmod((context->phase + ((2.0 * M_PI * DSS_TRIANGLEWAVE__FREQ) / this->sample_rate())), 2.0 * M_PI);
+	m_phase=fmod((m_phase + ((2.0 * M_PI * DSS_TRIANGLEWAVE__FREQ) / this->sample_rate())), 2.0 * M_PI);
 }
 
 DISCRETE_RESET(dss_trianglewave)
 {
-	DISCRETE_DECLARE_CONTEXT(dss_trianglewave)
-
 	double start;
 
 	/* Establish starting phase, convert from degrees to radians */
 	start = (DSS_TRIANGLEWAVE__PHASE / 360.0) * (2.0 * M_PI);
 	/* Make sure its always mod 2Pi */
-	context->phase=fmod(start, 2.0 * M_PI);
+	m_phase=fmod(start, 2.0 * M_PI);
 
 	/* Step to set the output */
 	this->step();

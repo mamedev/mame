@@ -265,30 +265,25 @@ static const discrete_555_cc_desc copsnrob_motor01_555cc =
  ************************************************/
 #define COPSNROB_CUSTOM_NOISE__FREQ		DISCRETE_INPUT(0)
 
-struct copsnrob_custom_noise_context
-{
-	int		flip_flop;
-	int		noise1_had_xtime;
-	int		noise2_had_xtime;
-	UINT8	high_byte;
-	UINT8	low_byte;
-	double	t_used;
-	double	t1;
-};
-
-DISCRETE_CLASS_STEP_RESET(copsnrob_custom_noise, sizeof(struct copsnrob_custom_noise_context), 2);
+DISCRETE_CLASS_STEP_RESETA(copsnrob_custom_noise, 2,
+	int		m_flip_flop;
+	int		m_noise1_had_xtime;
+	int		m_noise2_had_xtime;
+	UINT8	m_high_byte;
+	UINT8	m_low_byte;
+	double	m_t_used;
+	double	m_t1;
+);
 
 #define COPSNROB_CUSTOM_NOISE_HIGH	4.2
 
 DISCRETE_STEP(copsnrob_custom_noise)
 {
-	DISCRETE_DECLARE_CONTEXT(copsnrob_custom_noise)
-
-	double	t_used = context->t_used;
-	double	t1 = context->t1;
+	double	t_used = m_t_used;
+	double	t1 = m_t1;
 	double	x_time = 0;
-	UINT8	low_byte = context->low_byte;
-	UINT8	high_byte = context->high_byte;
+	UINT8	low_byte = m_low_byte;
+	UINT8	high_byte = m_high_byte;
 	UINT8	xnor_out;							/* IC F2, pin 2 */
 	int		last_noise1_bit = (low_byte >> 4) & 0x01;
 	int		last_noise2_bit = (low_byte >> 5) & 0x01;
@@ -302,9 +297,9 @@ DISCRETE_STEP(copsnrob_custom_noise)
 	{
 		/* calculate the overshoot time */
 		t_used -= t1;
-		context->flip_flop ^= 1;
+		m_flip_flop ^= 1;
 		/* clocks on low to high */
-		if (context->flip_flop)
+		if (m_flip_flop)
 		{
 			int new_noise_bit;
 
@@ -314,8 +309,8 @@ DISCRETE_STEP(copsnrob_custom_noise)
 			high_byte = (high_byte << 1) | xnor_out;
 			if (high_byte == 0xff)		/* IC H1, pin 8 */
 				high_byte = 0;
-			context->low_byte = low_byte;
-			context->high_byte = high_byte;
+			m_low_byte = low_byte;
+			m_high_byte = high_byte;
 
 			/* Convert last switch time to a ratio */
 			x_time = t_used / this->sample_time();
@@ -324,45 +319,43 @@ DISCRETE_STEP(copsnrob_custom_noise)
 			if (last_noise1_bit != new_noise_bit)
 			{
 				this->output[0] = COPSNROB_CUSTOM_NOISE_HIGH * (new_noise_bit ? x_time : (1.0 - x_time));
-				context->noise1_had_xtime = 1;
+				m_noise1_had_xtime = 1;
 			}
 			new_noise_bit = (low_byte >> 5) & 0x01;
 			if (last_noise2_bit != new_noise_bit)
 			{
 				this->output[1] = COPSNROB_CUSTOM_NOISE_HIGH * (new_noise_bit ? x_time : (1.0 - x_time));
-				context->noise2_had_xtime = 1;
+				m_noise2_had_xtime = 1;
 			}
 		}
 	}
 	else
 	{
 		/* see if we need to move from x_time state to full state */
-		if (context->noise1_had_xtime)
+		if (m_noise1_had_xtime)
 		{
 			this->output[0] = COPSNROB_CUSTOM_NOISE_HIGH * last_noise1_bit;
-			context->noise1_had_xtime = 0;
+			m_noise1_had_xtime = 0;
 		}
-		if (context->noise2_had_xtime)
+		if (m_noise2_had_xtime)
 		{
 			this->output[1] = COPSNROB_CUSTOM_NOISE_HIGH * last_noise2_bit;
-			context->noise2_had_xtime = 0;
+			m_noise2_had_xtime = 0;
 		}
 	}
 
-	context->t_used = t_used;
+	m_t_used = t_used;
 }
 
 DISCRETE_RESET(copsnrob_custom_noise)
 {
-	DISCRETE_DECLARE_CONTEXT(copsnrob_custom_noise)
-
-	context->t1 = 0.5 / COPSNROB_CUSTOM_NOISE__FREQ ;
-	context->flip_flop = 0;
-	context->low_byte = 0;
-	context->high_byte = 0;
-	context->noise1_had_xtime = 0;
-	context->noise2_had_xtime = 0;
-	context->t_used = 0;
+	m_t1 = 0.5 / COPSNROB_CUSTOM_NOISE__FREQ ;
+	m_flip_flop = 0;
+	m_low_byte = 0;
+	m_high_byte = 0;
+	m_noise1_had_xtime = 0;
+	m_noise2_had_xtime = 0;
+	m_t_used = 0;
 }
 
 /************************************************
@@ -378,26 +371,21 @@ DISCRETE_RESET(copsnrob_custom_noise)
 #define COPSNROB_CUSTOM_ZINGS_555_MONOSTABLE__R		DISCRETE_INPUT(1)
 #define COPSNROB_CUSTOM_ZINGS_555_MONOSTABLE__C		DISCRETE_INPUT(2)
 
-struct copsnrob_zings_555_monostable_context
-{
-	double	rc;
-	double	exponent;
-	double	v_cap;
-	int		flip_flop;
-};
-
-DISCRETE_CLASS_STEP_RESET(copsnrob_zings_555_monostable, sizeof(struct copsnrob_zings_555_monostable_context), 1);
+DISCRETE_CLASS_STEP_RESETA(copsnrob_zings_555_monostable, 1,
+	double	m_rc;
+	double	m_exponent;
+	double	m_v_cap;
+	int		m_flip_flop;
+);
 
 DISCRETE_STEP(copsnrob_zings_555_monostable)
 {
-	DISCRETE_DECLARE_CONTEXT(copsnrob_zings_555_monostable)
-
 	const double v_threshold = 5.0 * 2 / 3;
 	const double v_out_high = 5.0 - 0.5;	/* light load */
 
 	int		ff_set = COPSNROB_CUSTOM_ZINGS_555_MONOSTABLE__TRIG < (5.0 / 3) ? 1 : 0;
-	int 	flip_flop = context->flip_flop;
-	double	v_cap = context->v_cap;
+	int 	flip_flop = m_flip_flop;
+	double	v_cap = m_v_cap;
 	double	x_time = 0;
 
 	/* From testing a real IC */
@@ -409,7 +397,7 @@ DISCRETE_STEP(copsnrob_zings_555_monostable)
 	if (ff_set)
 	{
 		flip_flop = 1;
-		context->flip_flop = flip_flop;
+		m_flip_flop = flip_flop;
 	}
 
 	if (flip_flop)
@@ -417,14 +405,14 @@ DISCRETE_STEP(copsnrob_zings_555_monostable)
 		double	v_diff = v_out_high - v_cap;
 
 		/* charge */
-		v_cap += v_diff * context->exponent;
+		v_cap += v_diff * m_exponent;
 		/* no state change if trigger is low */
 		if (!ff_set && (v_cap > v_threshold))
 		{
-			double rc = context->rc;
+			double rc = m_rc;
 
 			flip_flop = 0;
-			context->flip_flop = flip_flop;
+			m_flip_flop = flip_flop;
 			/* calculate overshoot */
 			x_time = rc * log(1.0 / (1.0 - ((v_cap - v_threshold) / v_diff)));
 			/* discharge the overshoot */
@@ -439,12 +427,12 @@ DISCRETE_STEP(copsnrob_zings_555_monostable)
 		if (v_cap == 0)
 			return;
 		/* discharge */
-		v_cap -= v_cap * context->exponent;
+		v_cap -= v_cap * m_exponent;
 		/* Optimization - close enough to 0 to be 0 */
 		if (v_cap < 0.000001)
 			v_cap = 0;
 	}
-	context->v_cap = v_cap;
+	m_v_cap = v_cap;
 
 	if (x_time > 0)
 		this->output[0] = v_out_high * x_time;
@@ -456,12 +444,10 @@ DISCRETE_STEP(copsnrob_zings_555_monostable)
 
 DISCRETE_RESET(copsnrob_zings_555_monostable)
 {
-	DISCRETE_DECLARE_CONTEXT(copsnrob_zings_555_monostable)
-
-	context->rc = COPSNROB_CUSTOM_ZINGS_555_MONOSTABLE__R * COPSNROB_CUSTOM_ZINGS_555_MONOSTABLE__C;
-	context->exponent = RC_CHARGE_EXP_CLASS(context->rc);
-	context->v_cap = 0;
-	context->flip_flop = 0;
+	m_rc = COPSNROB_CUSTOM_ZINGS_555_MONOSTABLE__R * COPSNROB_CUSTOM_ZINGS_555_MONOSTABLE__C;
+	m_exponent = RC_CHARGE_EXP_CLASS(m_rc);
+	m_v_cap = 0;
+	m_flip_flop = 0;
 	this->output[0] = 0;
 }
 
@@ -482,37 +468,32 @@ DISCRETE_RESET(copsnrob_zings_555_monostable)
 
 #define COPSNROB_CUSTOM_ZINGS_555_ASTABLE__HIGH		4.5
 
-struct copsnrob_zings_555_astable_context
-{
-	double	r2c2;
-	double	r_total_cv;
-	double	exponent1;
-	double	exponent2;
-	double	v_cap1;
-	double	v_cap2;
-	int		flip_flop;
-};
-
-DISCRETE_CLASS_STEP_RESET(copsnrob_zings_555_astable, sizeof(struct copsnrob_zings_555_astable_context), 1);
+DISCRETE_CLASS_STEP_RESETA(copsnrob_zings_555_astable, 1,
+	double	m_r2c2;
+	double	m_r_total_cv;
+	double	m_exponent1;
+	double	m_exponent2;
+	double	m_v_cap1;
+	double	m_v_cap2;
+	int		m_flip_flop;
+);
 
 DISCRETE_STEP(copsnrob_zings_555_astable)
 {
-	DISCRETE_DECLARE_CONTEXT(copsnrob_zings_555_astable)
-
 	double	v_trigger, v_threshold;
 	double	v1 = COPSNROB_CUSTOM_ZINGS_555_ASTABLE__RESET;
-	double	v_cap1 = context->v_cap1;
+	double	v_cap1 = m_v_cap1;
 	double	v_cap2 = this->output[0];
 	double	dt = 0;
 	int		reset_active = (v1 < 0.7) ? 1 : 0;
-	int 	flip_flop = context->flip_flop;
+	int 	flip_flop = m_flip_flop;
 
 	/* calculate voltage at CV pin */
 	/* start by adding currents */
 	double v_cv = 5.0 / RES_K(5);
 	v_cv += v1 / COPSNROB_CUSTOM_ZINGS_555_ASTABLE__R1;
 	/* convert to voltage */
-	v_cv *= context->r_total_cv;
+	v_cv *= m_r_total_cv;
 
 	/* The reset voltage also charges the CV cap */
 	double v_diff1 = v_cv - v_cap1;
@@ -520,19 +501,19 @@ DISCRETE_STEP(copsnrob_zings_555_astable)
 	if (fabs(v_diff1) < 0.000001)
 		v_cap1 = v_cv;
 	else
-		v_cap1 += v_diff1 * context->exponent1;
-	context->v_cap1 = v_cap1;
+		v_cap1 += v_diff1 * m_exponent1;
+	m_v_cap1 = v_cap1;
 
 	if (reset_active)
 	{
 		if (flip_flop)
-			context->flip_flop = 0;
+			m_flip_flop = 0;
 		/* we still need to discharge C2 */
 		/* Optimization - only discharge if needed */
 		if (v_cap2 != 0)
 		{
 			/* discharge */
-			v_cap2 -= v_cap2 * context->exponent2;
+			v_cap2 -= v_cap2 * m_exponent2;
 			/* Optimization - close enough to 0 to be 0 */
 			if (v_cap2 < 0.000001)
 				this->output[0] = 0;
@@ -553,12 +534,12 @@ DISCRETE_STEP(copsnrob_zings_555_astable)
 	{
 		/* charge */
 		double v_diff2 = COPSNROB_CUSTOM_ZINGS_555_ASTABLE__HIGH - v_cap2;
-		v_cap2 += v_diff2 * context->exponent2;
+		v_cap2 += v_diff2 * m_exponent2;
 		if (v_cap2 > v_threshold)
 		{
-			double r2c2 = context->r2c2;
+			double r2c2 = m_r2c2;
 
-			context->flip_flop = 0;
+			m_flip_flop = 0;
 			/* calculate overshoot */
 			dt = r2c2 * log(1.0 / (1.0 - ((v_cap2 - v_threshold) / v_diff2)));
 			/* discharge the overshoot */
@@ -570,12 +551,12 @@ DISCRETE_STEP(copsnrob_zings_555_astable)
 	{
 		/* discharge */
 		double v_diff2 = v_cap2;
-		v_cap2 -= v_diff2 * context->exponent2;
+		v_cap2 -= v_diff2 * m_exponent2;
 		if (v_cap2 < v_trigger)
 		{
-			double r2c2 = context->r2c2;
+			double r2c2 = m_r2c2;
 
-			context->flip_flop = 1;
+			m_flip_flop = 1;
 			/* calculate overshoot */
 			dt = r2c2 * log(1.0 / (1.0 - ((v_trigger - v_cap2) / v_diff2)));
 			/* charge the overshoot */
@@ -591,14 +572,12 @@ DISCRETE_STEP(copsnrob_zings_555_astable)
 
 DISCRETE_RESET(copsnrob_zings_555_astable)
 {
-	DISCRETE_DECLARE_CONTEXT(copsnrob_zings_555_astable)
-
-	context->r_total_cv = RES_3_PARALLEL(COPSNROB_CUSTOM_ZINGS_555_ASTABLE__R1, RES_K(10), RES_K(5));
-	context->r2c2 = COPSNROB_CUSTOM_ZINGS_555_ASTABLE__R2 * COPSNROB_CUSTOM_ZINGS_555_ASTABLE__C2;
-	context->exponent1 = RC_CHARGE_EXP_CLASS(COPSNROB_CUSTOM_ZINGS_555_ASTABLE__R1 * COPSNROB_CUSTOM_ZINGS_555_ASTABLE__C1);
-	context->exponent2 = RC_CHARGE_EXP_CLASS(context->r2c2);
-	context->v_cap1 = 0;
-	context->flip_flop = 0;
+	m_r_total_cv = RES_3_PARALLEL(COPSNROB_CUSTOM_ZINGS_555_ASTABLE__R1, RES_K(10), RES_K(5));
+	m_r2c2 = COPSNROB_CUSTOM_ZINGS_555_ASTABLE__R2 * COPSNROB_CUSTOM_ZINGS_555_ASTABLE__C2;
+	m_exponent1 = RC_CHARGE_EXP_CLASS(COPSNROB_CUSTOM_ZINGS_555_ASTABLE__R1 * COPSNROB_CUSTOM_ZINGS_555_ASTABLE__C1);
+	m_exponent2 = RC_CHARGE_EXP_CLASS(m_r2c2);
+	m_v_cap1 = 0;
+	m_flip_flop = 0;
 	this->output[0] = 0;		/* charge on C2 */
 }
 

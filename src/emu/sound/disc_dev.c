@@ -57,34 +57,33 @@
 
 DISCRETE_STEP(dsd_555_astbl)
 {
-	DISCRETE_DECLARE_CONTEXT(dsd_555_astbl)
 	DISCRETE_DECLARE_INFO(discrete_555_desc)
 
 	int		count_f = 0;
 	int		count_r = 0;
 	double	dt;								/* change in time */
 	double	x_time  = 0;					/* time since change happened */
-	double	v_cap   = context->cap_voltage;	/* Current voltage on capacitor, before dt */
+	double	v_cap   = m_cap_voltage;	/* Current voltage on capacitor, before dt */
 	double	v_cap_next = 0;					/* Voltage on capacitor, after dt */
 	double	v_charge, exponent = 0;
-	UINT8	flip_flop = context->flip_flop;
+	UINT8	flip_flop = m_flip_flop;
 	UINT8	update_exponent = 0;
 
 	/* put commonly used stuff in local variables for speed */
-	double	threshold = context->threshold;
-	double	trigger   = context->trigger;
+	double	threshold = m_threshold;
+	double	trigger   = m_trigger;
 
 	if(DSD_555_ASTBL__RESET)
 	{
 		/* We are in RESET */
 		this->output[0]      = 0;
-		context->flip_flop   = 1;
-		context->cap_voltage = 0;
+		m_flip_flop   = 1;
+		m_cap_voltage = 0;
 		return;
 	}
 
 	/* Check: if the Control Voltage node is connected. */
-	if (context->use_ctrlv)
+	if (m_use_ctrlv)
 	{
 		/* If CV is less then .25V, the circuit will oscillate way out of range.
          * So we will just ignore it when it happens. */
@@ -107,13 +106,13 @@ DISCRETE_STEP(dsd_555_astbl)
 	}
 
 	/* get the v_charge and update each step if it is a node */
-	if (context->v_charge_node != NULL)
+	if (m_v_charge_node != NULL)
 	{
-		v_charge = *context->v_charge_node;
+		v_charge = *m_v_charge_node;
 		if (info->options & DISC_555_ASTABLE_HAS_FAST_CHARGE_DIODE) v_charge -= 0.5;
 	}
 	else
-		v_charge = context->v_charge;
+		v_charge = m_v_charge;
 
 
 	/* Calculate future capacitor voltage.
@@ -145,22 +144,22 @@ DISCRETE_STEP(dsd_555_astbl)
 		/* The voltage goes high because the cap circuit is open. */
 		v_cap_next = v_charge;
 		v_cap      = v_charge;
-		context->cap_voltage = 0;
+		m_cap_voltage = 0;
 	}
 	else
 	{
 		/* Update charge contstants and exponents if nodes changed */
-		if (context->has_rc_nodes && (DSD_555_ASTBL__R1 != context->last_r1 || DSD_555_ASTBL__C != context->last_c || DSD_555_ASTBL__R2 != context->last_r2))
+		if (m_has_rc_nodes && (DSD_555_ASTBL__R1 != m_last_r1 || DSD_555_ASTBL__C != m_last_c || DSD_555_ASTBL__R2 != m_last_r2))
 		{
-			context->t_rc_bleed  = DSD_555_ASTBL_T_RC_BLEED;
-			context->t_rc_charge = DSD_555_ASTBL_T_RC_CHARGE;
-			context->t_rc_discharge = DSD_555_ASTBL_T_RC_DISCHARGE;
-			context->exp_bleed  = RC_CHARGE_EXP_CLASS(context->t_rc_bleed);
-			context->exp_charge = RC_CHARGE_EXP_CLASS(context->t_rc_charge);
-			context->exp_discharge = RC_CHARGE_EXP_CLASS(context->t_rc_discharge);
-			context->last_r1 = DSD_555_ASTBL__R1;
-			context->last_r2 = DSD_555_ASTBL__R2;
-			context->last_c  = DSD_555_ASTBL__C;
+			m_t_rc_bleed  = DSD_555_ASTBL_T_RC_BLEED;
+			m_t_rc_charge = DSD_555_ASTBL_T_RC_CHARGE;
+			m_t_rc_discharge = DSD_555_ASTBL_T_RC_DISCHARGE;
+			m_exp_bleed  = RC_CHARGE_EXP_CLASS(m_t_rc_bleed);
+			m_exp_charge = RC_CHARGE_EXP_CLASS(m_t_rc_charge);
+			m_exp_discharge = RC_CHARGE_EXP_CLASS(m_t_rc_discharge);
+			m_last_r1 = DSD_555_ASTBL__R1;
+			m_last_r2 = DSD_555_ASTBL__R2;
+			m_last_c  = DSD_555_ASTBL__C;
 		}
 		/* Keep looping until all toggling in time sample is used up. */
 		do
@@ -172,9 +171,9 @@ DISCRETE_STEP(dsd_555_astbl)
 					/* Oscillation disabled because there is no longer any charge resistor. */
 					/* Bleed the cap due to circuit losses. */
 					if (update_exponent)
-						exponent = RC_CHARGE_EXP_DT(context->t_rc_bleed, dt);
+						exponent = RC_CHARGE_EXP_DT(m_t_rc_bleed, dt);
 					else
-						exponent = context->exp_bleed;
+						exponent = m_exp_bleed;
 					v_cap_next = v_cap - (v_cap * exponent);
 					dt = 0;
 				}
@@ -182,9 +181,9 @@ DISCRETE_STEP(dsd_555_astbl)
 				{
 					/* Charging */
 					if (update_exponent)
-						exponent = RC_CHARGE_EXP_DT(context->t_rc_charge, dt);
+						exponent = RC_CHARGE_EXP_DT(m_t_rc_charge, dt);
 					else
-						exponent = context->exp_charge;
+						exponent = m_exp_charge;
 					v_cap_next = v_cap + ((v_charge - v_cap) * exponent);
 					dt = 0;
 
@@ -192,7 +191,7 @@ DISCRETE_STEP(dsd_555_astbl)
 					if (v_cap_next >= threshold)
 					{
 						/* calculate the overshoot time */
-						dt     = context->t_rc_charge  * log(1.0 / (1.0 - ((v_cap_next - threshold) / (v_charge - v_cap))));
+						dt     = m_t_rc_charge  * log(1.0 / (1.0 - ((v_cap_next - threshold) / (v_charge - v_cap))));
 						x_time = dt;
 						v_cap_next  = threshold;
 						flip_flop = 0;
@@ -207,9 +206,9 @@ DISCRETE_STEP(dsd_555_astbl)
 				if(DSD_555_ASTBL__R2 != 0)
 				{
 					if (update_exponent)
-						exponent = RC_CHARGE_EXP_DT(context->t_rc_discharge, dt);
+						exponent = RC_CHARGE_EXP_DT(m_t_rc_discharge, dt);
 					else
-						exponent = context->exp_discharge;
+						exponent = m_exp_discharge;
 					v_cap_next = v_cap - (v_cap * exponent);
 					dt = 0;
 				}
@@ -224,7 +223,7 @@ DISCRETE_STEP(dsd_555_astbl)
 				{
 					/* calculate the overshoot time */
 					if (v_cap_next < trigger)
-						dt = context->t_rc_discharge  * log(1.0 / (1.0 - ((trigger - v_cap_next) / v_cap)));
+						dt = m_t_rc_discharge  * log(1.0 / (1.0 - ((trigger - v_cap_next) / v_cap)));
 					x_time = dt;
 					v_cap_next  = trigger;
 					flip_flop = 1;
@@ -235,32 +234,32 @@ DISCRETE_STEP(dsd_555_astbl)
 			v_cap = v_cap_next;
 		} while(dt);
 
-		context->cap_voltage = v_cap;
+		m_cap_voltage = v_cap;
 	}
 
 	/* Convert last switch time to a ratio */
 	x_time = x_time / this->sample_time();
 
-	switch (context->output_type)
+	switch (m_output_type)
 	{
 		case DISC_555_OUT_SQW:
 			if (count_f + count_r >= 2)
 				/* force at least 1 toggle */
-				this->output[0] = context->flip_flop ? 0 : context->v_out_high;
+				this->output[0] = m_flip_flop ? 0 : m_v_out_high;
 			else
-				this->output[0] = flip_flop * context->v_out_high;
-			this->output[0] += context->ac_shift;
+				this->output[0] = flip_flop * m_v_out_high;
+			this->output[0] += m_ac_shift;
 			break;
 		case DISC_555_OUT_CAP:
 			this->output[0] = v_cap;
 			/* Fake it to AC if needed */
-			if (context->output_is_ac)
+			if (m_output_is_ac)
 				this->output[0] -= threshold * 3.0 /4.0;
 			break;
 		case DISC_555_OUT_ENERGY:
 			if (x_time == 0) x_time = 1.0;
-			this->output[0]  = context->v_out_high * (flip_flop ? x_time : (1.0 - x_time));
-			this->output[0] += context->ac_shift;
+			this->output[0]  = m_v_out_high * (flip_flop ? x_time : (1.0 - x_time));
+			this->output[0] += m_ac_shift;
 			break;
 		case DISC_555_OUT_LOGIC_X:
 			this->output[0] = flip_flop + x_time;
@@ -278,67 +277,66 @@ DISCRETE_STEP(dsd_555_astbl)
 			this->output[0] = count_r;
 			break;
 	}
-	context->flip_flop = flip_flop;
+	m_flip_flop = flip_flop;
 }
 
 DISCRETE_RESET(dsd_555_astbl)
 {
-	DISCRETE_DECLARE_CONTEXT(dsd_555_astbl)
 	DISCRETE_DECLARE_INFO(discrete_555_desc)
 
 	discrete_base_node *v_charge_node;
 
-	context->use_ctrlv   = (this->input_is_node() >> 4) & 1;
-	context->output_type = info->options & DISC_555_OUT_MASK;
+	m_use_ctrlv   = (this->input_is_node() >> 4) & 1;
+	m_output_type = info->options & DISC_555_OUT_MASK;
 
 	/* Use the defaults or supplied values. */
-	context->v_out_high = (info->v_out_high == DEFAULT_555_HIGH) ? info->v_pos - 1.2 : info->v_out_high;
+	m_v_out_high = (info->v_out_high == DEFAULT_555_HIGH) ? info->v_pos - 1.2 : info->v_out_high;
 
 	/* setup v_charge or node */
 	v_charge_node = this->device->discrete_find_node(info->v_charge);
 	if (v_charge_node)
-		context->v_charge_node = &(v_charge_node->output[NODE_CHILD_NODE_NUM(info->v_charge)]);
+		m_v_charge_node = &(v_charge_node->output[NODE_CHILD_NODE_NUM(info->v_charge)]);
 	else
 	{
-		context->v_charge   = (info->v_charge == DEFAULT_555_CHARGE) ? info->v_pos : info->v_charge;
-		context->v_charge_node = NULL;
+		m_v_charge   = (info->v_charge == DEFAULT_555_CHARGE) ? info->v_pos : info->v_charge;
+		m_v_charge_node = NULL;
 
-		if (info->options & DISC_555_ASTABLE_HAS_FAST_CHARGE_DIODE) context->v_charge -= 0.5;
+		if (info->options & DISC_555_ASTABLE_HAS_FAST_CHARGE_DIODE) m_v_charge -= 0.5;
 	}
 
-	if ((DSD_555_ASTBL__CTRLV != -1) && !context->use_ctrlv)
+	if ((DSD_555_ASTBL__CTRLV != -1) && !m_use_ctrlv)
 	{
 		/* Setup based on supplied Control Voltage static value */
-		context->threshold = DSD_555_ASTBL__CTRLV;
-		context->trigger   = DSD_555_ASTBL__CTRLV / 2.0;
+		m_threshold = DSD_555_ASTBL__CTRLV;
+		m_trigger   = DSD_555_ASTBL__CTRLV / 2.0;
 	}
 	else
 	{
 		/* Setup based on v_pos power source */
-		context->threshold = info->v_pos * 2.0 / 3.0;
-		context->trigger   = info->v_pos / 3.0;
+		m_threshold = info->v_pos * 2.0 / 3.0;
+		m_trigger   = info->v_pos / 3.0;
 	}
 
 	/* optimization if none of the values are nodes */
-	context->has_rc_nodes = 0;
+	m_has_rc_nodes = 0;
 	if (this->input_is_node() & DSD_555_ASTBL_RC_MASK)
-		context->has_rc_nodes = 1;
+		m_has_rc_nodes = 1;
 	else
 	{
-		context->t_rc_bleed  = DSD_555_ASTBL_T_RC_BLEED;
-		context->exp_bleed   = RC_CHARGE_EXP_CLASS(context->t_rc_bleed);
-		context->t_rc_charge = DSD_555_ASTBL_T_RC_CHARGE;
-		context->exp_charge  = RC_CHARGE_EXP_CLASS(context->t_rc_charge);
-		context->t_rc_discharge = DSD_555_ASTBL_T_RC_DISCHARGE;
-		context->exp_discharge  = RC_CHARGE_EXP_CLASS(context->t_rc_discharge);
+		m_t_rc_bleed  = DSD_555_ASTBL_T_RC_BLEED;
+		m_exp_bleed   = RC_CHARGE_EXP_CLASS(m_t_rc_bleed);
+		m_t_rc_charge = DSD_555_ASTBL_T_RC_CHARGE;
+		m_exp_charge  = RC_CHARGE_EXP_CLASS(m_t_rc_charge);
+		m_t_rc_discharge = DSD_555_ASTBL_T_RC_DISCHARGE;
+		m_exp_discharge  = RC_CHARGE_EXP_CLASS(m_t_rc_discharge);
 	}
 
-	context->output_is_ac = info->options & DISC_555_OUT_AC;
+	m_output_is_ac = info->options & DISC_555_OUT_AC;
 	/* Calculate DC shift needed to make squarewave waveform AC */
-	context->ac_shift = context->output_is_ac ? -context->v_out_high / 2.0 : 0;
+	m_ac_shift = m_output_is_ac ? -m_v_out_high / 2.0 : 0;
 
-	context->flip_flop = 1;
-	context->cap_voltage = 0;
+	m_flip_flop = 1;
+	m_cap_voltage = 0;
 
 	/* Step to set the output */
 	this->step();
@@ -368,7 +366,6 @@ DISCRETE_RESET(dsd_555_astbl)
 
 DISCRETE_STEP(dsd_555_mstbl)
 {
-	DISCRETE_DECLARE_CONTEXT(dsd_555_mstbl)
 	DISCRETE_DECLARE_INFO(discrete_555_desc)
 
 	double v_cap;			/* Current voltage on capacitor, before dt */
@@ -377,22 +374,22 @@ DISCRETE_STEP(dsd_555_mstbl)
 	double out = 0;
 	int trigger = 0;
 	int trigger_type;
-	int update_exponent = context->has_rc_nodes;
+	int update_exponent = m_has_rc_nodes;
 	int flip_flop;
 
 	if(UNEXPECTED(DSD_555_MSTBL__RESET))
 	{
 		/* We are in RESET */
 		this->output[0]     = 0;
-		context->flip_flop  = 0;
-		context->cap_voltage = 0;
+		m_flip_flop  = 0;
+		m_cap_voltage = 0;
 		return;
 	}
 
 	dt = this->sample_time();
-	flip_flop = context->flip_flop;
+	flip_flop = m_flip_flop;
 	trigger_type = info->options;
-	v_cap = context->cap_voltage;
+	v_cap = m_cap_voltage;
 
 	switch (trigger_type & DSD_555_TRIGGER_TYPE_MASK)
 	{
@@ -402,7 +399,7 @@ DISCRETE_STEP(dsd_555_mstbl)
 				x_time = 1.0 - DSD_555_MSTBL__TRIGGER;
 			break;
 		case DISC_555_TRIGGER_IS_VOLTAGE:
-			trigger = (int)(DSD_555_MSTBL__TRIGGER < context->trigger);
+			trigger = (int)(DSD_555_MSTBL__TRIGGER < m_trigger);
 			break;
 		case DISC_555_TRIGGER_IS_COUNT:
 			trigger = (int)DSD_555_MSTBL__TRIGGER;
@@ -420,13 +417,13 @@ DISCRETE_STEP(dsd_555_mstbl)
 	x_time = 0;
 
 	if ((trigger_type & DISC_555_TRIGGER_DISCHARGES_CAP) && trigger)
-		context->cap_voltage = 0;
+		m_cap_voltage = 0;
 
 	/* Wait for trigger */
 	if (UNEXPECTED(!flip_flop && trigger))
 	{
 		flip_flop = 1;
-		context->flip_flop = 1;
+		m_flip_flop = 1;
 	}
 
 	if (flip_flop)
@@ -439,44 +436,44 @@ DISCRETE_STEP(dsd_555_mstbl)
 			/* The trigger voltage goes high because the cap circuit is open.
              * and the cap discharges */
 			v_cap = info->v_pos;	/* needed for cap output type */
-			context->cap_voltage = 0;
+			m_cap_voltage = 0;
 
 			if (!trigger)
 			{
 				flip_flop = 0;
-				context->flip_flop = 0;
+				m_flip_flop = 0;
 			}
 		}
 		else
 		{
 			/* Charging */
-			double v_diff = context->v_charge - v_cap;
+			double v_diff = m_v_charge - v_cap;
 
 			if (UNEXPECTED(update_exponent))
 				exponent = RC_CHARGE_EXP_DT(DSD_555_MSTBL__R * DSD_555_MSTBL__C, dt);
 			else
-				exponent = context->exp_charge;
+				exponent = m_exp_charge;
 			v_cap += v_diff * exponent;
 
 			/* Has it charged past upper limit? */
 			/* If trigger is still enabled, then we keep charging,
              * regardless of threshold. */
-			if (UNEXPECTED((v_cap >= context->threshold) && !trigger))
+			if (UNEXPECTED((v_cap >= m_threshold) && !trigger))
 			{
-				dt = DSD_555_MSTBL__R * DSD_555_MSTBL__C  * log(1.0 / (1.0 - ((v_cap - context->threshold) / v_diff)));
+				dt = DSD_555_MSTBL__R * DSD_555_MSTBL__C  * log(1.0 / (1.0 - ((v_cap - m_threshold) / v_diff)));
 				x_time = 1.0 - dt / this->sample_time();
 				v_cap  = 0;
 				flip_flop = 0;
-				context->flip_flop = 0;
+				m_flip_flop = 0;
 			}
-			context->cap_voltage = v_cap;
+			m_cap_voltage = v_cap;
 		}
 	}
 
-	switch (context->output_type)
+	switch (m_output_type)
 	{
 		case DISC_555_OUT_SQW:
-			out = flip_flop * context->v_out_high - context->ac_shift;
+			out = flip_flop * m_v_out_high - m_ac_shift;
 			break;
 		case DISC_555_OUT_CAP:
 			if (x_time > 0)
@@ -484,17 +481,17 @@ DISCRETE_STEP(dsd_555_mstbl)
 			else
 				out = v_cap;
 
-			out -= context->ac_shift;
+			out -= m_ac_shift;
 			break;
 		case DISC_555_OUT_ENERGY:
 			if (x_time > 0)
-				out = context->v_out_high * x_time;
+				out = m_v_out_high * x_time;
 			else if (flip_flop)
-				out = context->v_out_high;
+				out = m_v_out_high;
 			else
 				out = 0;
 
-			out -= context->ac_shift;
+			out -= m_ac_shift;
 			break;
 	}
 	this->output[0] = out;
@@ -502,47 +499,46 @@ DISCRETE_STEP(dsd_555_mstbl)
 
 DISCRETE_RESET(dsd_555_mstbl)
 {
-	DISCRETE_DECLARE_CONTEXT(dsd_555_mstbl)
 	DISCRETE_DECLARE_INFO(discrete_555_desc)
 
-	context->output_type = info->options & DISC_555_OUT_MASK;
-	if ((context->output_type == DISC_555_OUT_COUNT_F) || (context->output_type == DISC_555_OUT_COUNT_R))
+	m_output_type = info->options & DISC_555_OUT_MASK;
+	if ((m_output_type == DISC_555_OUT_COUNT_F) || (m_output_type == DISC_555_OUT_COUNT_R))
 	{
 		this->device->discrete_log("Invalid Output type in NODE_%d.\n", this->index());
-		context->output_type = DISC_555_OUT_SQW;
+		m_output_type = DISC_555_OUT_SQW;
 	}
 
 	/* Use the defaults or supplied values. */
-	context->v_out_high = (info->v_out_high == DEFAULT_555_HIGH) ? info->v_pos - 1.2 : info->v_out_high;
-	context->v_charge   = (info->v_charge   == DEFAULT_555_CHARGE) ? info->v_pos : info->v_charge;
+	m_v_out_high = (info->v_out_high == DEFAULT_555_HIGH) ? info->v_pos - 1.2 : info->v_out_high;
+	m_v_charge   = (info->v_charge   == DEFAULT_555_CHARGE) ? info->v_pos : info->v_charge;
 
 	/* Setup based on v_pos power source */
-	context->threshold = info->v_pos * 2.0 / 3.0;
-	context->trigger   = info->v_pos / 3.0;
+	m_threshold = info->v_pos * 2.0 / 3.0;
+	m_trigger   = info->v_pos / 3.0;
 
 	/* Calculate DC shift needed to make waveform AC */
 	if (info->options & DISC_555_OUT_AC)
 	{
-		if (context->output_type == DISC_555_OUT_CAP)
-			context->ac_shift = context->threshold * 3.0 /4.0;
+		if (m_output_type == DISC_555_OUT_CAP)
+			m_ac_shift = m_threshold * 3.0 /4.0;
 		else
-			context->ac_shift = context->v_out_high / 2.0;
+			m_ac_shift = m_v_out_high / 2.0;
 	}
 	else
-		context->ac_shift = 0;
+		m_ac_shift = 0;
 
-	context->trig_is_logic       = (info->options & DISC_555_TRIGGER_IS_VOLTAGE) ? 0: 1;
-	context->trig_discharges_cap = (info->options & DISC_555_TRIGGER_DISCHARGES_CAP) ? 1: 0;
+	m_trig_is_logic       = (info->options & DISC_555_TRIGGER_IS_VOLTAGE) ? 0: 1;
+	m_trig_discharges_cap = (info->options & DISC_555_TRIGGER_DISCHARGES_CAP) ? 1: 0;
 
-	context->flip_flop   = 0;
-	context->cap_voltage = 0;
+	m_flip_flop   = 0;
+	m_cap_voltage = 0;
 
 	/* optimization if none of the values are nodes */
-	context->has_rc_nodes = 0;
+	m_has_rc_nodes = 0;
 	if (this->input_is_node() & DSD_555_MSTBL_RC_MASK)
-		context->has_rc_nodes = 1;
+		m_has_rc_nodes = 1;
 	else
-		context->exp_charge = RC_CHARGE_EXP_CLASS(DSD_555_MSTBL__R * DSD_555_MSTBL__C);
+		m_exp_charge = RC_CHARGE_EXP_CLASS(DSD_555_MSTBL__R * DSD_555_MSTBL__C);
 
 	this->output[0] = 0;
 }
@@ -585,7 +581,6 @@ DISCRETE_RESET(dsd_555_mstbl)
 
 DISCRETE_STEP(dsd_555_cc)
 {
-	DISCRETE_DECLARE_CONTEXT(dsd_555_cc)
 	DISCRETE_DECLARE_INFO(discrete_555_cc_desc)
 
 	int		count_f  = 0;
@@ -605,23 +600,23 @@ DISCRETE_STEP(dsd_555_cc)
 	double	r_temp;				/* play thing */
 	double	exponent;
 	UINT8	update_exponent, update_t_rc;
-	UINT8	flip_flop = context->flip_flop;
+	UINT8	flip_flop = m_flip_flop;
 
 
 	if (UNEXPECTED(DSD_555_CC__RESET))
 	{
 		/* We are in RESET */
 		this->output[0]      = 0;
-		context->flip_flop   = 1;
-		context->cap_voltage = 0;
+		m_flip_flop   = 1;
+		m_cap_voltage = 0;
 		return;
 	}
 
 	dt    = this->sample_time();	/* Change in time */
-	v_cap = context->cap_voltage;	/* Set to voltage before change */
+	v_cap = m_cap_voltage;	/* Set to voltage before change */
 	v_vcharge_limit = DSD_555_CC__VIN + info->v_cc_junction;	/* the max v_cap can be and still be charged by i */
 	/* Calculate charging current */
-	i = (context->v_cc_source - v_vcharge_limit) / DSD_555_CC__R;
+	i = (m_v_cc_source - v_vcharge_limit) / DSD_555_CC__R;
 	if ( i < 0) i = 0;
 
 	if (info->options & DISCRETE_555_CC_TO_CAP)
@@ -630,7 +625,7 @@ DISCRETE_STEP(dsd_555_cc)
 	}
 	else
 	{
-		switch (context->type)	/* see dsd_555_cc_reset for descriptions */
+		switch (m_type)	/* see dsd_555_cc_reset for descriptions */
 		{
 			case 1:
 				r_discharge = DSD_555_CC__RDIS;
@@ -671,11 +666,11 @@ DISCRETE_STEP(dsd_555_cc)
 	}
 
 	/* Keep looping until all toggling in time sample is used up. */
-	update_t_rc = context->has_rc_nodes;
+	update_t_rc = m_has_rc_nodes;
 	update_exponent = update_t_rc;
 	do
 	{
-		if (context->type <= 1)
+		if (m_type <= 1)
 		{
 			/* Standard constant current charge */
 			if (flip_flop)
@@ -691,7 +686,7 @@ DISCRETE_STEP(dsd_555_cc)
 						exponent = RC_CHARGE_EXP_DT(t_rc, dt);
 					}
 					else
-						exponent = context->exp_bleed;
+						exponent = m_exp_bleed;
 					v_cap_next = v_cap - (v_cap * exponent);
 					dt = 0;
 				}
@@ -709,12 +704,12 @@ DISCRETE_STEP(dsd_555_cc)
 					dt = 0;
 
 					/* has it charged past upper limit? */
-					if (v_cap_next >= context->threshold)
+					if (v_cap_next >= m_threshold)
 					{
 						/* calculate the overshoot time */
-						dt     = DSD_555_CC__C * (v_cap_next - context->threshold) / i;
+						dt     = DSD_555_CC__C * (v_cap_next - m_threshold) / i;
 						x_time = dt;
-						v_cap_next = context->threshold;
+						v_cap_next = m_threshold;
 						flip_flop = 0;
 						count_f++;
 						update_exponent = 1;
@@ -727,11 +722,11 @@ DISCRETE_STEP(dsd_555_cc)
 				if (update_t_rc)
 					t_rc = DSD_555_CC_T_RC_DISCHARGE_01;
 				else
-					t_rc = context->t_rc_discharge_01;
+					t_rc = m_t_rc_discharge_01;
 				if (update_exponent)
 					exponent = RC_CHARGE_EXP_DT(t_rc, dt);
 				else
-					exponent = context->exp_discharge_01;
+					exponent = m_exp_discharge_01;
 
 				if (info->options & DISCRETE_555_CC_TO_CAP)
 				{
@@ -749,11 +744,11 @@ DISCRETE_STEP(dsd_555_cc)
 
 				dt = 0;
 				/* has it discharged past lower limit? */
-				if (v_cap_next <= context->trigger)
+				if (v_cap_next <= m_trigger)
 				{
-					dt     = t_rc  * log(1.0 / (1.0 - ((context->trigger - v_cap_next) / v_cap)));
+					dt     = t_rc  * log(1.0 / (1.0 - ((m_trigger - v_cap_next) / v_cap)));
 					x_time = dt;
-					v_cap_next  = context->trigger;
+					v_cap_next  = m_trigger;
 					flip_flop = 1;
 					count_r++;
 					update_exponent = 1;
@@ -762,7 +757,7 @@ DISCRETE_STEP(dsd_555_cc)
 			else	/* Immediate discharge. No change in dt. */
 			{
 				x_time = dt;
-				v_cap_next = context->trigger;
+				v_cap_next = m_trigger;
 				flip_flop = 1;
 				count_r++;
 			}
@@ -780,11 +775,11 @@ DISCRETE_STEP(dsd_555_cc)
 					if (update_t_rc)
 						t_rc = DSD_555_CC_T_RC_DISCHARGE_NO_I;
 					else
-						t_rc = context->t_rc_discharge_no_i;
+						t_rc = m_t_rc_discharge_no_i;
 					if (update_exponent)
 						exponent = RC_CHARGE_EXP_DT(t_rc, dt);
 					else
-						exponent = context->exp_discharge_no_i;
+						exponent = m_exp_discharge_no_i;
 
 					v_cap_next = v_cap - (v_cap * exponent);
 					dt = 0;
@@ -796,27 +791,27 @@ DISCRETE_STEP(dsd_555_cc)
                      * then only the bias voltage will charge the cap. */
 					v = v_bias;
 					if (v_cap < v_vcharge_limit) v += vi;
-					else if (context->type <= 3) v = v_vcharge_limit;
+					else if (m_type <= 3) v = v_vcharge_limit;
 
 					if (update_t_rc)
 						t_rc = DSD_555_CC_T_RC_CHARGE;
 					else
-						t_rc = context->t_rc_charge;
+						t_rc = m_t_rc_charge;
 					if (update_exponent)
 						exponent = RC_CHARGE_EXP_DT(t_rc, dt);
 					else
-						exponent = context->exp_charge;
+						exponent = m_exp_charge;
 
 					v_cap_next = v_cap + ((v - v_cap) * exponent);
 					dt         = 0;
 
 					/* has it charged past upper limit? */
-					if (v_cap_next >= context->threshold)
+					if (v_cap_next >= m_threshold)
 					{
 						/* calculate the overshoot time */
-						dt     = t_rc  * log(1.0 / (1.0 - ((v_cap_next - context->threshold) / (v - v_cap))));
+						dt     = t_rc  * log(1.0 / (1.0 - ((v_cap_next - m_threshold) / (v - v_cap))));
 						x_time = dt;
-						v_cap_next = context->threshold;
+						v_cap_next = m_threshold;
 						flip_flop = 0;
 						count_f++;
 						update_exponent = 1;
@@ -829,22 +824,22 @@ DISCRETE_STEP(dsd_555_cc)
 				if (update_t_rc)
 					t_rc = DSD_555_CC_T_RC_DISCHARGE;
 				else
-					t_rc = context->t_rc_discharge;
+					t_rc = m_t_rc_discharge;
 				if (update_exponent)
 					exponent = RC_CHARGE_EXP_DT(t_rc, dt);
 				else
-					exponent = context->exp_discharge;
+					exponent = m_exp_discharge;
 
 				v_cap_next = v_cap - (v_cap * exponent);
 				dt = 0;
 
 				/* has it discharged past lower limit? */
-				if (v_cap_next <= context->trigger)
+				if (v_cap_next <= m_trigger)
 				{
 					/* calculate the overshoot time */
-					dt     = t_rc  * log(1.0 / (1.0 - ((context->trigger - v_cap_next) / v_cap)));
+					dt     = t_rc  * log(1.0 / (1.0 - ((m_trigger - v_cap_next) / v_cap)));
 					x_time = dt;
-					v_cap_next = context->trigger;
+					v_cap_next = m_trigger;
 					flip_flop = 1;
 					count_r++;
 					update_exponent = 1;
@@ -853,7 +848,7 @@ DISCRETE_STEP(dsd_555_cc)
 			else	/* Immediate discharge. No change in dt. */
 			{
 				x_time = dt;
-				v_cap_next = context->trigger;
+				v_cap_next = m_trigger;
 				flip_flop = 1;
 				count_r++;
 			}
@@ -861,29 +856,29 @@ DISCRETE_STEP(dsd_555_cc)
 		v_cap = v_cap_next;
 	} while(dt);
 
-	context->cap_voltage = v_cap;
+	m_cap_voltage = v_cap;
 
 	/* Convert last switch time to a ratio */
 	x_time = x_time / this->sample_time();
 
-	switch (context->output_type)
+	switch (m_output_type)
 	{
 		case DISC_555_OUT_SQW:
 			if (count_f + count_r >= 2)
 				/* force at least 1 toggle */
-				this->output[0] = context->flip_flop ? 0 : context->v_out_high;
+				this->output[0] = m_flip_flop ? 0 : m_v_out_high;
 			else
-				this->output[0] = flip_flop * context->v_out_high;
+				this->output[0] = flip_flop * m_v_out_high;
 			/* Fake it to AC if needed */
-			this->output[0] += context->ac_shift;
+			this->output[0] += m_ac_shift;
 			break;
 		case DISC_555_OUT_CAP:
-			this->output[0] = v_cap + context->ac_shift;
+			this->output[0] = v_cap + m_ac_shift;
 			break;
 		case DISC_555_OUT_ENERGY:
 			if (x_time == 0) x_time = 1.0;
-			this->output[0]  = context->v_out_high * (flip_flop ? x_time : (1.0 - x_time));
-			this->output[0] += context->ac_shift;
+			this->output[0]  = m_v_out_high * (flip_flop ? x_time : (1.0 - x_time));
+			this->output[0] += m_ac_shift;
 			break;
 		case DISC_555_OUT_LOGIC_X:
 			this->output[0] = flip_flop + x_time;
@@ -901,47 +896,46 @@ DISCRETE_STEP(dsd_555_cc)
 			this->output[0] = count_r;
 			break;
 	}
-	context->flip_flop = flip_flop;
+	m_flip_flop = flip_flop;
 }
 
 DISCRETE_RESET(dsd_555_cc)
 {
-	DISCRETE_DECLARE_CONTEXT(dsd_555_cc)
 	DISCRETE_DECLARE_INFO(discrete_555_cc_desc)
 
 	double	r_temp, r_discharge = 0, r_charge = 0;
 
-	context->flip_flop   = 1;
-	context->cap_voltage = 0;
+	m_flip_flop   = 1;
+	m_cap_voltage = 0;
 
-	context->output_type = info->options & DISC_555_OUT_MASK;
+	m_output_type = info->options & DISC_555_OUT_MASK;
 
 	/* Use the defaults or supplied values. */
-	context->v_out_high  = (info->v_out_high  == DEFAULT_555_HIGH) ? info->v_pos - 1.2 : info->v_out_high;
-	context->v_cc_source = (info->v_cc_source == DEFAULT_555_CC_SOURCE) ? info->v_pos : info->v_cc_source;
+	m_v_out_high  = (info->v_out_high  == DEFAULT_555_HIGH) ? info->v_pos - 1.2 : info->v_out_high;
+	m_v_cc_source = (info->v_cc_source == DEFAULT_555_CC_SOURCE) ? info->v_pos : info->v_cc_source;
 
 	/* Setup based on v_pos power source */
-	context->threshold = info->v_pos * 2.0 / 3.0;
-	context->trigger   = info->v_pos / 3.0;
+	m_threshold = info->v_pos * 2.0 / 3.0;
+	m_trigger   = info->v_pos / 3.0;
 
-	context->output_is_ac = info->options & DISC_555_OUT_AC;
+	m_output_is_ac = info->options & DISC_555_OUT_AC;
 	/* Calculate DC shift needed to make squarewave waveform AC */
-	context->ac_shift     = context->output_is_ac ? -context->v_out_high / 2.0 : 0;
+	m_ac_shift     = m_output_is_ac ? -m_v_out_high / 2.0 : 0;
 
 	/* There are 8 different types of basic oscillators
      * depending on the resistors used.  We will determine
      * the type of circuit at reset, because the ciruit type
      * is constant.  See Below.
      */
-	context->type = (DSD_555_CC__RDIS > 0) | ((DSD_555_CC__RGND  > 0) << 1) | ((DSD_555_CC__RBIAS  > 0) << 2);
+	m_type = (DSD_555_CC__RDIS > 0) | ((DSD_555_CC__RGND  > 0) << 1) | ((DSD_555_CC__RBIAS  > 0) << 2);
 
 	/* optimization if none of the values are nodes */
-	context->has_rc_nodes = 0;
+	m_has_rc_nodes = 0;
 	if (this->input_is_node() & DSD_555_CC_RC_MASK)
-		context->has_rc_nodes = 1;
+		m_has_rc_nodes = 1;
 	else
 	{
-		switch (context->type)	/* see dsd_555_cc_reset for descriptions */
+		switch (m_type)	/* see dsd_555_cc_reset for descriptions */
 		{
 			case 1:
 				r_discharge = DSD_555_CC__RDIS;
@@ -969,15 +963,15 @@ DISCRETE_RESET(dsd_555_cc)
 				break;
 		}
 
-		context->exp_bleed  = RC_CHARGE_EXP_CLASS(DSD_555_CC_T_RC_BLEED);
-		context->t_rc_discharge_01 = DSD_555_CC_T_RC_DISCHARGE_01;
-		context->exp_discharge_01  = RC_CHARGE_EXP_CLASS(context->t_rc_discharge_01);
-		context->t_rc_discharge_no_i = DSD_555_CC_T_RC_DISCHARGE_NO_I;
-		context->exp_discharge_no_i  = RC_CHARGE_EXP_CLASS(context->t_rc_discharge_no_i);
-		context->t_rc_charge = DSD_555_CC_T_RC_CHARGE;
-		context->exp_charge  = RC_CHARGE_EXP_CLASS(context->t_rc_charge);
-		context->t_rc_discharge = DSD_555_CC_T_RC_DISCHARGE;
-		context->exp_discharge  = RC_CHARGE_EXP_CLASS(context->t_rc_discharge);
+		m_exp_bleed  = RC_CHARGE_EXP_CLASS(DSD_555_CC_T_RC_BLEED);
+		m_t_rc_discharge_01 = DSD_555_CC_T_RC_DISCHARGE_01;
+		m_exp_discharge_01  = RC_CHARGE_EXP_CLASS(m_t_rc_discharge_01);
+		m_t_rc_discharge_no_i = DSD_555_CC_T_RC_DISCHARGE_NO_I;
+		m_exp_discharge_no_i  = RC_CHARGE_EXP_CLASS(m_t_rc_discharge_no_i);
+		m_t_rc_charge = DSD_555_CC_T_RC_CHARGE;
+		m_exp_charge  = RC_CHARGE_EXP_CLASS(m_t_rc_charge);
+		m_t_rc_discharge = DSD_555_CC_T_RC_DISCHARGE;
+		m_exp_discharge  = RC_CHARGE_EXP_CLASS(m_t_rc_discharge);
 	}
 
 	/* Step to set the output */
@@ -1136,7 +1130,6 @@ DISCRETE_RESET(dsd_555_cc)
 
 DISCRETE_STEP(dsd_555_vco1)
 {
-	DISCRETE_DECLARE_CONTEXT(dsd_555_vco1)
 	DISCRETE_DECLARE_INFO(discrete_555_vco1_desc)
 
 	int		count_f = 0;
@@ -1147,29 +1140,29 @@ DISCRETE_STEP(dsd_555_vco1)
 	double	v_cap_next = 0;	/* Voltage on capacitor, after dt */
 
 	dt    = this->sample_time();	/* Change in time */
-	v_cap = context->cap_voltage;
+	v_cap = m_cap_voltage;
 
 	/* Check: if the Control Voltage node is connected. */
-	if (context->ctrlv_is_node && DSD_555_VCO1__RESET)	/* reset active low */
+	if (m_ctrlv_is_node && DSD_555_VCO1__RESET)	/* reset active low */
 	{
 		/* If CV is less then .25V, the circuit will oscillate way out of range.
          * So we will just ignore it when it happens. */
 		if (DSD_555_VCO1__VIN2 < .25) return;
 		/* If it is a node then calculate thresholds based on Control Voltage */
-		context->threshold = DSD_555_VCO1__VIN2;
-		context->trigger   = DSD_555_VCO1__VIN2 / 2.0;
+		m_threshold = DSD_555_VCO1__VIN2;
+		m_trigger   = DSD_555_VCO1__VIN2 / 2.0;
 		/* Since the thresholds may have changed we need to update the FF */
-		if (v_cap >= context->threshold)
+		if (v_cap >= m_threshold)
 		{
 			x_time = dt;
-			context->flip_flop = 0;
+			m_flip_flop = 0;
 			count_f++;
 		}
 		else
-		if (v_cap <= context->trigger)
+		if (v_cap <= m_trigger)
 		{
 			x_time = dt;
-			context->flip_flop = 1;
+			m_flip_flop = 1;
 			count_r++;
 		}
 	}
@@ -1177,29 +1170,29 @@ DISCRETE_STEP(dsd_555_vco1)
 	/* Keep looping until all toggling in time sample is used up. */
 	do
 	{
-		if (context->flip_flop)
+		if (m_flip_flop)
 		{
 			/* if we are in reset then toggle f/f and discharge */
 			if (!DSD_555_VCO1__RESET)	/* reset active low */
 			{
-				context->flip_flop = 0;
+				m_flip_flop = 0;
 				count_f++;
 			}
 			else
 			{
 				/* Charging */
 				/* iC=C*dv/dt  works out to dv=iC*dt/C */
-				v_cap_next = v_cap + (context->i_charge * dt / info->c);
+				v_cap_next = v_cap + (m_i_charge * dt / info->c);
 				dt         = 0;
 
 				/* has it charged past upper limit? */
-				if (v_cap_next >= context->threshold)
+				if (v_cap_next >= m_threshold)
 				{
 					/* calculate the overshoot time */
-					dt     = info->c * (v_cap_next - context->threshold) / context->i_charge;
-					v_cap  = context->threshold;
+					dt     = info->c * (v_cap_next - m_threshold) / m_i_charge;
+					v_cap  = m_threshold;
 					x_time = dt;
-					context->flip_flop = 0;
+					m_flip_flop = 0;
 					count_f++;
 				}
 			}
@@ -1208,7 +1201,7 @@ DISCRETE_STEP(dsd_555_vco1)
 		{
 			/* Discharging */
 			/* iC=C*dv/dt  works out to dv=iC*dt/C */
-			v_cap_next = v_cap - (context->i_discharge * dt / info->c);
+			v_cap_next = v_cap - (m_i_discharge * dt / info->c);
 
 			/* if we are in reset, then the cap can discharge to 0 */
 			if (!DSD_555_VCO1__RESET)	/* reset active low */
@@ -1220,12 +1213,12 @@ DISCRETE_STEP(dsd_555_vco1)
 			{
 				/* if we are out of reset and the cap voltage is less then
                  * the lower threshold, toggle f/f and start charging */
-				if (v_cap <= context->trigger)
+				if (v_cap <= m_trigger)
 				{
-					if (context->flip_flop == 0)
+					if (m_flip_flop == 0)
 					{
 						/* don't need to track x_time here */
-						context->flip_flop = 1;
+						m_flip_flop = 1;
 						count_r++;
 					}
 				}
@@ -1233,13 +1226,13 @@ DISCRETE_STEP(dsd_555_vco1)
 				{
 					dt = 0;
 					/* has it discharged past lower limit? */
-					if (v_cap_next <= context->trigger)
+					if (v_cap_next <= m_trigger)
 					{
 						/* calculate the overshoot time */
-						dt     = info->c * (v_cap_next - context->trigger) / context->i_discharge;
-						v_cap  = context->trigger;
+						dt     = info->c * (v_cap_next - m_trigger) / m_i_discharge;
+						v_cap  = m_trigger;
 						x_time = dt;
-						context->flip_flop = 1;
+						m_flip_flop = 1;
 						count_r++;
 					}
 				}
@@ -1247,30 +1240,30 @@ DISCRETE_STEP(dsd_555_vco1)
 		}
 	} while(dt);
 
-	context->cap_voltage = v_cap_next;
+	m_cap_voltage = v_cap_next;
 
 	/* Convert last switch time to a ratio.  No x_time in reset. */
 	x_time = x_time / this->sample_time();
 	if (!DSD_555_VCO1__RESET) x_time = 0;
 
-	switch (context->output_type)
+	switch (m_output_type)
 	{
 		case DISC_555_OUT_SQW:
-			this->output[0] = context->flip_flop * context->v_out_high + context->ac_shift;
+			this->output[0] = m_flip_flop * m_v_out_high + m_ac_shift;
 			break;
 		case DISC_555_OUT_CAP:
 			this->output[0] = v_cap_next;
 			/* Fake it to AC if needed */
-			if (context->output_is_ac)
-				this->output[0] -= context->threshold * 3.0 /4.0;
+			if (m_output_is_ac)
+				this->output[0] -= m_threshold * 3.0 /4.0;
 			break;
 		case DISC_555_OUT_ENERGY:
 			if (x_time == 0) x_time = 1.0;
-			this->output[0]  = context->v_out_high * (context->flip_flop ? x_time : (1.0 - x_time));
-			this->output[0] += context->ac_shift;
+			this->output[0]  = m_v_out_high * (m_flip_flop ? x_time : (1.0 - x_time));
+			this->output[0] += m_ac_shift;
 			break;
 		case DISC_555_OUT_LOGIC_X:
-			this->output[0] = context->flip_flop + x_time;
+			this->output[0] = m_flip_flop + x_time;
 			break;
 		case DISC_555_OUT_COUNT_F_X:
 			this->output[0] = count_f ? count_f + x_time : count_f;
@@ -1289,13 +1282,12 @@ DISCRETE_STEP(dsd_555_vco1)
 
 DISCRETE_RESET(dsd_555_vco1)
 {
-	DISCRETE_DECLARE_CONTEXT(dsd_555_vco1)
 	DISCRETE_DECLARE_INFO(discrete_555_vco1_desc)
 
 	double v_ratio_r3, v_ratio_r4_1, r_in_1;
 
-	context->output_type  = info->options & DISC_555_OUT_MASK;
-	context->output_is_ac = info->options & DISC_555_OUT_AC;
+	m_output_type  = info->options & DISC_555_OUT_MASK;
+	m_output_is_ac = info->options & DISC_555_OUT_AC;
 
 	/* Setup op-amp parameters */
 
@@ -1313,38 +1305,38 @@ DISCRETE_RESET(dsd_555_vco1)
 
 	/* Now that we know the voltages entering the op amp and the resistance for the
      * FF states, we can predetermine the ratios for the charge/discharge currents. */
-	context->i_discharge = (1 - v_ratio_r3) / info->r1;
-	context->i_charge    = (v_ratio_r3 - v_ratio_r4_1) / r_in_1;
+	m_i_discharge = (1 - v_ratio_r3) / info->r1;
+	m_i_charge    = (v_ratio_r3 - v_ratio_r4_1) / r_in_1;
 
 	/* the cap starts off discharged */
-	context->cap_voltage = 0;
+	m_cap_voltage = 0;
 
 	/* Setup 555 parameters */
 
 	/* There is no charge on the cap so the 555 goes high at init. */
-	context->flip_flop     = 1;
-	context->ctrlv_is_node = (this->input_is_node() >> 2) & 1;
-	context->v_out_high    = (info->v_out_high == DEFAULT_555_HIGH) ? info->v_pos - 1.2 : info->v_out_high;
+	m_flip_flop     = 1;
+	m_ctrlv_is_node = (this->input_is_node() >> 2) & 1;
+	m_v_out_high    = (info->v_out_high == DEFAULT_555_HIGH) ? info->v_pos - 1.2 : info->v_out_high;
 
 	/* Calculate 555 thresholds.
      * If the Control Voltage is a node, then the thresholds will be calculated each step.
      * If the Control Voltage is a fixed voltage, then the thresholds will be calculated
      * from that.  Otherwise we will use thresholds based on v_pos. */
-	if (!context->ctrlv_is_node && (DSD_555_VCO1__VIN2 != -1))
+	if (!m_ctrlv_is_node && (DSD_555_VCO1__VIN2 != -1))
 	{
 		/* Setup based on supplied Control Voltage static value */
-		context->threshold = DSD_555_VCO1__VIN2;
-		context->trigger   = DSD_555_VCO1__VIN2 / 2.0;
+		m_threshold = DSD_555_VCO1__VIN2;
+		m_trigger   = DSD_555_VCO1__VIN2 / 2.0;
 	}
 	else
 	{
 		/* Setup based on v_pos power source */
-		context->threshold = info->v_pos * 2.0 / 3.0;
-		context->trigger   = info->v_pos / 3.0;
+		m_threshold = info->v_pos * 2.0 / 3.0;
+		m_trigger   = info->v_pos / 3.0;
 	}
 
 	/* Calculate DC shift needed to make squarewave waveform AC */
-	context->ac_shift = context->output_is_ac ? -context->v_out_high / 2.0 : 0;
+	m_ac_shift = m_output_is_ac ? -m_v_out_high / 2.0 : 0;
 }
 
 
@@ -1427,8 +1419,6 @@ static const struct
 
 DISCRETE_STEP(dsd_566)
 {
-	DISCRETE_DECLARE_CONTEXT(dsd_566)
-
 	double	i = 0;			/* Charging current created by vIn */
 	double	i_rise;			/* non-linear rise charge current */
 	double	dt;				/* change in time */
@@ -1437,20 +1427,20 @@ DISCRETE_STEP(dsd_566)
 	int		count_f = 0, count_r = 0;
 
 	dt    = this->sample_time();	/* Change in time */
-	v_cap = context->cap_voltage;	/* Set to voltage before change */
+	v_cap = m_cap_voltage;	/* Set to voltage before change */
 
 	/* Calculate charging current if it is in range */
-	if (EXPECTED(DSD_566__VMOD > context->v_osc_stop))
+	if (EXPECTED(DSD_566__VMOD > m_v_osc_stop))
 	{
 		double v_charge = DSD_566__VCHARGE - DSD_566__VMOD - 0.1;
 		if (v_charge > 0)
 		{
 			i = (v_charge * .95) / DSD_566__R;
-			if (DSD_566__VMOD < context->v_osc_stable)
+			if (DSD_566__VMOD < m_v_osc_stable)
 			{
 				/* no where near correct calculation of non linear range */
-				i_rise = ((DSD_566__VCHARGE - context->v_osc_stable - 0.1) * .95) / DSD_566__R;
-				i_rise *= 1.0 - (context->v_osc_stable - DSD_566__VMOD) / (context->v_osc_stable - context->v_osc_stop);
+				i_rise = ((DSD_566__VCHARGE - m_v_osc_stable - 0.1) * .95) / DSD_566__R;
+				i_rise *= 1.0 - (m_v_osc_stable - DSD_566__VMOD) / (m_v_osc_stable - m_v_osc_stop);
 			}
 			else
 				i_rise = i;
@@ -1463,19 +1453,19 @@ DISCRETE_STEP(dsd_566)
 	/* Keep looping until all toggling in this time sample is used up. */
 	do
 	{
-		if (context->flip_flop)
+		if (m_flip_flop)
 		{
 			/* Discharging */
 			v_cap -= i * dt / DSD_566__C;
 			dt     = 0;
 
 			/* has it discharged past lower limit? */
-			if (UNEXPECTED(v_cap < context->threshold_low))
+			if (UNEXPECTED(v_cap < m_threshold_low))
 			{
 				/* calculate the overshoot time */
-				dt = DSD_566__C * (context->threshold_low - v_cap) / i;
-				v_cap = context->threshold_low;
-				context->flip_flop = 0;
+				dt = DSD_566__C * (m_threshold_low - v_cap) / i;
+				v_cap = m_threshold_low;
+				m_flip_flop = 0;
 				count_f++;
 				x_time = dt;
 			}
@@ -1494,43 +1484,43 @@ DISCRETE_STEP(dsd_566)
 			if (UNEXPECTED(v_cap > DSD_566__VMOD)) v_cap = DSD_566__VMOD;
 
 			/* has it charged past upper limit? */
-			if (UNEXPECTED(v_cap > context->threshold_high))
+			if (UNEXPECTED(v_cap > m_threshold_high))
 			{
 				/* calculate the overshoot time */
-				dt = DSD_566__C * (v_cap - context->threshold_high) / i;
-				v_cap = context->threshold_high;
-				context->flip_flop = 1;
+				dt = DSD_566__C * (v_cap - m_threshold_high) / i;
+				v_cap = m_threshold_high;
+				m_flip_flop = 1;
 				count_r++;
 				x_time = dt;
 			}
 		}
 	} while(dt);
 
-	context->cap_voltage = v_cap;
+	m_cap_voltage = v_cap;
 
 	/* Convert last switch time to a ratio */
 	x_time /= this->sample_time();
 
-	switch (context->out_type)
+	switch (m_out_type)
 	{
 		case DISC_566_OUT_SQUARE:
-			this->output[0] = context->flip_flop ? context->v_sqr_high : context->v_sqr_low;
-			if (context->fake_ac)
-				this->output[0] += context->ac_shift;
+			this->output[0] = m_flip_flop ? m_v_sqr_high : m_v_sqr_low;
+			if (m_fake_ac)
+				this->output[0] += m_ac_shift;
 			break;
 		case DISC_566_OUT_ENERGY:
 			if (x_time == 0) x_time = 1.0;
-			this->output[0]  = context->v_sqr_low + context->v_sqr_diff * (context->flip_flop ? x_time : (1.0 - x_time));
-			if (context->fake_ac)
-				this->output[0] += context->ac_shift;
+			this->output[0]  = m_v_sqr_low + m_v_sqr_diff * (m_flip_flop ? x_time : (1.0 - x_time));
+			if (m_fake_ac)
+				this->output[0] += m_ac_shift;
 			break;
 		case DISC_566_OUT_LOGIC:
-				this->output[0] = context->flip_flop;
+				this->output[0] = m_flip_flop;
 			break;
 		case DISC_566_OUT_TRIANGLE:
 			this->output[0] = v_cap;
-			if (context->fake_ac)
-				this->output[0] += context->ac_shift;
+			if (m_fake_ac)
+				this->output[0] += m_ac_shift;
 			break;
 		case DISC_566_OUT_COUNT_F_X:
 			this->output[0] = count_f ? count_f + x_time : count_f;
@@ -1549,13 +1539,11 @@ DISCRETE_STEP(dsd_566)
 
 DISCRETE_RESET(dsd_566)
 {
-	DISCRETE_DECLARE_CONTEXT(dsd_566)
-
 	int		v_int;
 	double	v_float;
 
-	context->out_type = (int)DSD_566__OPTIONS & DISC_566_OUT_MASK;
-	context->fake_ac =  (int)DSD_566__OPTIONS & DISC_566_OUT_AC;
+	m_out_type = (int)DSD_566__OPTIONS & DISC_566_OUT_MASK;
+	m_fake_ac =  (int)DSD_566__OPTIONS & DISC_566_OUT_AC;
 
 	if (DSD_566__VNEG >= DSD_566__VPOS)
 		fatalerror("[v_neg >= v_pos] in NODE_%d!\n", this->index());
@@ -1568,25 +1556,25 @@ DISCRETE_RESET(dsd_566)
 		/* fatal for now. */
 		fatalerror("Power should be integer in NODE_%d\n", this->index());
 
-	context->flip_flop   = 0;
-	context->cap_voltage = 0;
+	m_flip_flop   = 0;
+	m_cap_voltage = 0;
 
 	v_int -= 10;
-	context->threshold_high = ne566.c_high[v_int] + DSD_566__VNEG;
-	context->threshold_low  = ne566.c_low[v_int] + DSD_566__VNEG;
-	context->v_sqr_high     = DSD_566__VPOS - 1;
-	context->v_sqr_low      = ne566.sqr_low[v_int] + DSD_566__VNEG;
-	context->v_sqr_diff     = context->v_sqr_high - context->v_sqr_low;
-	context->v_osc_stable	= ne566.osc_stable[v_int] + DSD_566__VNEG;
-	context->v_osc_stop		= ne566.osc_stop[v_int] + DSD_566__VNEG;
+	m_threshold_high = ne566.c_high[v_int] + DSD_566__VNEG;
+	m_threshold_low  = ne566.c_low[v_int] + DSD_566__VNEG;
+	m_v_sqr_high     = DSD_566__VPOS - 1;
+	m_v_sqr_low      = ne566.sqr_low[v_int] + DSD_566__VNEG;
+	m_v_sqr_diff     = m_v_sqr_high - m_v_sqr_low;
+	m_v_osc_stable	= ne566.osc_stable[v_int] + DSD_566__VNEG;
+	m_v_osc_stop		= ne566.osc_stop[v_int] + DSD_566__VNEG;
 
-	context->ac_shift = 0;
-	if (context->fake_ac)
+	m_ac_shift = 0;
+	if (m_fake_ac)
 	{
-		if (context->out_type == DISC_566_OUT_TRIANGLE)
-			context->ac_shift = (context->threshold_high - context->threshold_low) / 2 - context->threshold_high;
+		if (m_out_type == DISC_566_OUT_TRIANGLE)
+			m_ac_shift = (m_threshold_high - m_threshold_low) / 2 - m_threshold_high;
 		else
-			context->ac_shift = context->v_sqr_diff / 2 - context->v_sqr_high;
+			m_ac_shift = m_v_sqr_diff / 2 - m_v_sqr_high;
 	}
 
 	/* Step the output */
@@ -1650,12 +1638,10 @@ DISCRETE_RESET(dsd_566)
 
 DISCRETE_STEP(dsd_ls624)
 {
-	DISCRETE_DECLARE_CONTEXT(dsd_ls624)
-
 	double	x_time = 0;
 	double	freq, t1;
 	double	v_freq_2, v_freq_3, v_freq_4;
-	double	t_used = context->t_used;
+	double	t_used = m_t_used;
 	double	dt = this->sample_time();;
 	double	v_freq = DSD_LS624__VMOD;
 	double	v_rng = DSD_LS624__VRNG;
@@ -1677,14 +1663,14 @@ DISCRETE_STEP(dsd_ls624)
 		return;
 
 	/* scale due to input resistance */
-	v_freq *= context->v_freq_scale;
-	v_rng *= context->v_rng_scale;
+	v_freq *= m_v_freq_scale;
+	v_rng *= m_v_rng_scale;
 
 	/* apply cap if needed */
-	if (context->has_freq_in_cap)
+	if (m_has_freq_in_cap)
 	{
-		context->v_cap_freq_in += (v_freq - context->v_cap_freq_in) * context->exponent;
-		v_freq = context->v_cap_freq_in;
+		m_v_cap_freq_in += (v_freq - m_v_cap_freq_in) * m_exponent;
+		v_freq = m_v_cap_freq_in;
 	}
 
 	/* Polyfunctional3D_model created by zunzun.com using sum of squared absolute error */
@@ -1713,8 +1699,8 @@ DISCRETE_STEP(dsd_ls624)
 		{
 			/* calculate the overshoot time */
 			t_used -= t1;
-			context->flip_flop ^= 1;
-			if (context->flip_flop)
+			m_flip_flop ^= 1;
+			if (m_flip_flop)
 				count_r++;
 			else
 				count_f++;
@@ -1726,15 +1712,15 @@ DISCRETE_STEP(dsd_ls624)
 		}
 	}while(dt);
 
-	context->t_used = t_used;
+	m_t_used = t_used;
 
 	/* Convert last switch time to a ratio */
 	x_time = x_time / this->sample_time();
 
-	switch (context->out_type)
+	switch (m_out_type)
 	{
 		case DISC_LS624_OUT_LOGIC_X:
-				this->output[0] = context->flip_flop  + x_time;
+				this->output[0] = m_flip_flop  + x_time;
 			break;
 		case DISC_LS624_OUT_COUNT_F_X:
 			this->output[0] = count_f ? count_f + x_time : count_f;
@@ -1750,35 +1736,33 @@ DISCRETE_STEP(dsd_ls624)
 			break;
 		case DISC_LS624_OUT_ENERGY:
 			if (x_time == 0) x_time = 1.0;
-			this->output[0] = LS624_OUT_HIGH * (context->flip_flop ? x_time : (1.0 - x_time));
+			this->output[0] = LS624_OUT_HIGH * (m_flip_flop ? x_time : (1.0 - x_time));
 			break;
 		case DISC_LS624_OUT_LOGIC:
-				this->output[0] = context->flip_flop;
+				this->output[0] = m_flip_flop;
 			break;
 		case DISC_LS624_OUT_SQUARE:
-			this->output[0] = context->flip_flop ? LS624_OUT_HIGH : 0;
+			this->output[0] = m_flip_flop ? LS624_OUT_HIGH : 0;
 			break;
 	}
 }
 
 DISCRETE_RESET(dsd_ls624)
 {
-	struct dsd_ls624_context *context = (struct dsd_ls624_context *)this->context;
+	m_out_type = (int)DSD_LS624__OUTTYPE;
 
-	context->out_type = (int)DSD_LS624__OUTTYPE;
-
-	context->flip_flop = 0;
-	context->t_used = 0;
-	context->v_freq_scale = LS624_IN_R / (DSD_LS624__R_FREQ_IN + LS624_IN_R);
-	context->v_rng_scale = LS624_IN_R / (DSD_LS624__R_RNG_IN + LS624_IN_R);
+	m_flip_flop = 0;
+	m_t_used = 0;
+	m_v_freq_scale = LS624_IN_R / (DSD_LS624__R_FREQ_IN + LS624_IN_R);
+	m_v_rng_scale = LS624_IN_R / (DSD_LS624__R_RNG_IN + LS624_IN_R);
 	if (DSD_LS624__C_FREQ_IN > 0)
 	{
-		context->has_freq_in_cap = 1;
-		context->exponent = RC_CHARGE_EXP_CLASS(RES_2_PARALLEL(DSD_LS624__R_FREQ_IN, LS624_IN_R) * DSD_LS624__C_FREQ_IN);
-		context->v_cap_freq_in = 0;
+		m_has_freq_in_cap = 1;
+		m_exponent = RC_CHARGE_EXP_CLASS(RES_2_PARALLEL(DSD_LS624__R_FREQ_IN, LS624_IN_R) * DSD_LS624__C_FREQ_IN);
+		m_v_cap_freq_in = 0;
 	}
 	else
-		context->has_freq_in_cap = 0;
+		m_has_freq_in_cap = 0;
 
 	this->output[0] = 0;
 }
