@@ -898,7 +898,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				sx	=	(sx & 0x1ff) - (sx & 0x200);
 				sy	=	(sy & 0x1ff) - (sy & 0x200);
 
-				sprites_offsx =  ((ssv_scroll[0x74/2] & 0x7f) - (ssv_scroll[0x74/2] & 0x80)) - 0;
+				sprites_offsx =  ((ssv_scroll[0x74/2] & 0x7f) - (ssv_scroll[0x74/2] & 0x80));
 
 				sprites_offsy = -((ssv_scroll[0x70/2] & 0x1ff) - (ssv_scroll[0x70/2] & 0x200) + ssv_scroll[0x6a/2] + 1);
 
@@ -918,23 +918,26 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 				// sprites can be relative to a side, the other side or the center
 
-				if (ssv_scroll[0x7a/2] & 0x0800)
+				if (ssv_scroll[0x7a/2] == 0x7140)
+				{
+					// srmp7
+					sx	=	sprites_offsx + sx;
+					sy	=	sprites_offsy - sy;
+				}
+				else if (ssv_scroll[0x7a/2] & 0x0800)
 				{
 					// dynagear, drifto94, eaglshot, keithlcy, mslider, srmp4, stmblade, twineag2, ultrax
-
 					sx	=	sprites_offsx + sx - (xnum * 8)    ;
 					sy	=	sprites_offsy - sy - (ynum * 8) / 2;
 				}
 				else
 				{
 					// hypreact, hypreac2, janjans1, meosism, ryorioh, survarts, sxyreact, sxyreac2, vasara, vasara2
-					sx	=	sprites_offsx + sx; // not necessary for meosism
+					sx	=	sprites_offsx + sx;
 					sy	=	sprites_offsy - sy - (ynum * 8);
 				}
 
-				// srmp7
-				// sx	=	sprites_offsx + sx;
-				// sy	=	sprites_offsy - sy + 8;
+
 
 				/* Sprite code masking */
 				if (xnum == 2 && ynum == 4) // needed by hypreact
