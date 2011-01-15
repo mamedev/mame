@@ -141,47 +141,40 @@ static const discrete_mixer_desc skyraid_mixer =
 #define SKYRAID_MISSLE_CUSTOM_R3		DISCRETE_INPUT(3)
 #define SKYRAID_MISSLE_CUSTOM_C			DISCRETE_INPUT(4)
 
-struct skyraid_missle_custom_charge_context
-{
-	double v_charge[2];
-	double v_cap;
-	double exp[2];
-};
-
-DISCRETE_CLASS_STEP_RESET(skyraid_missle_custom_charge, sizeof(struct skyraid_missle_custom_charge_context), 2);
+DISCRETE_CLASS_STEP_RESETA(skyraid_missle_custom_charge, 2,
+		double m_v_charge[2];
+		double m_v_cap;
+		double m_exp[2];
+);
 
 /* the high charge is clamped by the diode to 0.7V above the 5V line */
 #define SKYRAID_MISSLE_CHARGE_PLUS	(5.0 + 0.7)
 
 DISCRETE_STEP( skyraid_missle_custom_charge )
 {
-	DISCRETE_DECLARE_CONTEXT(skyraid_missle_custom_charge)
-
 	int in_1 = (SKYRAID_MISSLE_CUSTOM_IN1 == 0) ? 0 : 1;
 
 	/* charge/discharge cap */
-	context->v_cap += (context->v_charge[in_1] - context->v_cap) * context->exp[in_1];
+	m_v_cap += (m_v_charge[in_1] - m_v_cap) * m_exp[in_1];
 
-	this->output[0] = SKYRAID_MISSLE_CHARGE_PLUS - context->v_cap;
+	this->output[0] = SKYRAID_MISSLE_CHARGE_PLUS - m_v_cap;
 }
 
 DISCRETE_RESET( skyraid_missle_custom_charge )
 {
-	DISCRETE_DECLARE_CONTEXT(skyraid_missle_custom_charge)
-
 	/* everything is based on the input to the O.C. inverter */
 
 	/* the charging voltage across the cap */
-	context->v_charge[0] = 0;
-	context->v_charge[1] = SKYRAID_MISSLE_CHARGE_PLUS * RES_VOLTAGE_DIVIDER(SKYRAID_MISSLE_CUSTOM_R1 + SKYRAID_MISSLE_CUSTOM_R2, SKYRAID_MISSLE_CUSTOM_R3);
-	context->v_charge[1] = SKYRAID_MISSLE_CHARGE_PLUS - context->v_charge[1];
-	context->v_cap = 0;
+	m_v_charge[0] = 0;
+	m_v_charge[1] = SKYRAID_MISSLE_CHARGE_PLUS * RES_VOLTAGE_DIVIDER(SKYRAID_MISSLE_CUSTOM_R1 + SKYRAID_MISSLE_CUSTOM_R2, SKYRAID_MISSLE_CUSTOM_R3);
+	m_v_charge[1] = SKYRAID_MISSLE_CHARGE_PLUS - m_v_charge[1];
+	m_v_cap = 0;
 
 	/* precalculate charging exponents */
 	/* discharge cap */
-	context->exp[0] = RC_CHARGE_EXP_CLASS(SKYRAID_MISSLE_CUSTOM_R2 * SKYRAID_MISSLE_CUSTOM_C);
+	m_exp[0] = RC_CHARGE_EXP_CLASS(SKYRAID_MISSLE_CUSTOM_R2 * SKYRAID_MISSLE_CUSTOM_C);
 	/* charge cap */
-	context->exp[1] = RC_CHARGE_EXP_CLASS(RES_2_PARALLEL(SKYRAID_MISSLE_CUSTOM_R1 + SKYRAID_MISSLE_CUSTOM_R2, SKYRAID_MISSLE_CUSTOM_R3) * SKYRAID_MISSLE_CUSTOM_C);
+	m_exp[1] = RC_CHARGE_EXP_CLASS(RES_2_PARALLEL(SKYRAID_MISSLE_CUSTOM_R1 + SKYRAID_MISSLE_CUSTOM_R2, SKYRAID_MISSLE_CUSTOM_R3) * SKYRAID_MISSLE_CUSTOM_C);
 
 	/* starts at full voltage until cap starts charging */
 	this->output[0] = SKYRAID_MISSLE_CHARGE_PLUS;
