@@ -128,37 +128,17 @@ Notes:
 
 To Do:
 
-- all games :   CRT controller (resolution+visible area+flip screen?)
-
-- dynagear  :   visible area may be incorrect
-
 - hypreac2  :   communication with other units
-                tilemap sprites use the yoffset specified in the sprites-list?
-                (see the 8 pixel gap between the backgrounds and the black rows)
 
 - janjans2  :   Coin inputs don't register in the input test
 
 - jsk       :   Coin inputs don't register in the input test
 
-- keithlcy  :   Backgrounds are offset by $20 pixels, so they're kludged to work; there is a
-                x&y offsets in the sprite list but in a same frame there are sprite with yoffset = 0
-                and sprite with a yoffset = $7c but for all sprite the offset must be the same ($20)
-
 - mslider   :   Coin inputs don't register in the input test
 
-- srmp4     :   Backgrounds are offset by $60 pixels, so they're kludged to work
-                Coin inputs don't register in the input test
+- srmp4     :   Coin inputs don't register in the input test
 
 - srmp7     :   Needs interrupts by the sound chip (not properly hooked up yet). Kludged to work.
-
-- stmblade  :   There is a rogue "tilemap" sprite that pops up at level 2 and stays
-                there till the end of the game (a piece of sky to the left of the screen).
-                It seems that the x&y offsets in the sprite list should be apllied
-                to it (-$200,-$200) to move it off screen. But currently those offsets
-                are ignored for "tilemap" sprites. This may be related to the kludge for srmp4
-                and to the kludge for keithlcy;
-
-- ultrax    :   Backgrounds are offset by $10 pixels, so they're kludged to work
 
 Notes:
 
