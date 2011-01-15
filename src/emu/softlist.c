@@ -827,15 +827,15 @@ static int software_list_get_count(software_list *swlist)
 const char *software_get_clone(char *swlist, const char *swname)
 {
 	software_list *software_list_ptr = software_list_open(mame_options(), swlist, FALSE, NULL);
-
+	const char *retval = NULL;
 	if (software_list_ptr)
 	{
 		software_info *tmp = software_list_find(software_list_ptr, swname, NULL);
-		software_list_close(software_list_ptr);
-		return tmp->parentname;
+		retval = core_strdup(tmp->parentname);
+		software_list_close(software_list_ptr);		
 	}
 
-	return NULL;
+	return retval;
 }
 
 
@@ -847,15 +847,16 @@ const char *software_get_clone(char *swlist, const char *swname)
 UINT32 software_get_support(char *swlist, const char *swname)
 {
 	software_list *software_list_ptr = software_list_open(mame_options(), swlist, FALSE, NULL);
+	UINT32 retval = 0;
 
 	if (software_list_ptr)
 	{
 		software_info *tmp = software_list_find(software_list_ptr, swname, NULL);
-		software_list_close(software_list_ptr);
-		return tmp->supported;
+		retval = tmp->supported;
+		software_list_close(software_list_ptr);		
 	}
 
-	return 0;
+	return retval;
 }
 
 
