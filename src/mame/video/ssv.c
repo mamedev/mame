@@ -275,27 +275,25 @@ VIDEO_START( gdfs )
     (resolution, visible area, flipping etc.)
 
     1c0060-61   ---- ---- ---- ---- ?                           21 or 2b    for all games
-    1c0062-63   fedc ba98 7654 3210     x start visible area
-    1c0064-65   fedc ba98 7654 3210     x end visible area
-    1c0066-67   ---- ---- ---- ----     ?                           1c6     for all games
-    1c0068-69   ---- ---- ---- ----     ?                           1       for all games
-    1c006a-6b   fedc ba98 7654 3210     y start visible area
-    1c006c-6d   fedc ba98 7654 3210     y end visible area
-    1c006e-6f   ---- ---- ---- ----     ?                           106     for all games
-    1c0070-71   ---- ---- ---- ---- ?
-            ---- --98 7654 3210     y global tilemap offset
-    1c0072-73   ---- ---- ---- ----     ?
-    1c0074-75   ---- ---- ---- ----     ?
-            -e-- ---- ---- ---- y sprite inversion
-            ---c ---- ---- ---- x sprite inversion
-            ---- ba98 ---- ---- ?                           0101 for all games
-            ---- ---- -6-- ---- y tilemap inversion?
-            ---- ---- ---4 ---- x tilemap inversion?
-    1c0076-77   -e-- ---- ---- ----     global/local sprites coordinates
-            ---- ---- -6-- ----     shadow (2bits - 4bits)
-    1c0078-79   ---- ---- ---- ----     ?
-    1c007a-7b   ---- ---- ---- ----     ?
-            ---- -a-- ---- ----     left-right up-down inversion
+    1c0062-63   fedc ba98 7654 3210 x start visible area
+    1c0064-65   fedc ba98 7654 3210 x end visible area
+    1c0066-67   ---- ---- ---- ---- ?                           1c6     for all games
+    1c0068-69   ---- ---- ---- ---- ?                           1       for all games
+    1c006a-6b   fedc ba98 7654 3210 y start visible area
+    1c006c-6d   fedc ba98 7654 3210 y end visible area
+    1c006e-6f   ---- ---- ---- ---- ?                           106     for all games
+    1c0070-71   fedc ba98 7654 3210 signed y global tilemap x offset               
+    1c0072-73   ---- ---- ---- ---- ?
+    1c0074-75   ---- ---- ---- ---- ?
+                -e-- ---- ---- ---- y flipscreen
+                ---c ---- ---- ---- x flipscreen
+                ---- ba98 ---- ---- ?                           0101 for all games
+                ---- ---- 7654 3210 signed global tilemap x offset
+    1c0076-77   -e-- ---- ---- ---- global/local sprites coordinates
+                ---- ---- -6-- ---- shadow (2bits - 4bits)
+    1c0078-79   ---- ---- ---- ---- ?
+    1c007a-7b   ---- ---- ---- ---- ?
+                ---- b--- ---- ---- sprite coordinate mode
 
             1c0060-7f:
 
