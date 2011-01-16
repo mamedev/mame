@@ -90,6 +90,7 @@ struct sh4_ddt_dma
 
 typedef void (*sh4_ftcsr_callback)(UINT32);
 
+DECLARE_LEGACY_CPU_DEVICE(SH3, sh3);
 DECLARE_LEGACY_CPU_DEVICE(SH4, sh4);
 
 WRITE32_HANDLER( sh4_internal_w );

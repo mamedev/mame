@@ -3296,6 +3296,19 @@ static CPU_RESET( sh4 )
 	sh4->sleep_mode = 0;
 
 	sh4->sh4_mmu_enabled = 0;
+
+	sh4->cpu_type = CPU_TYPE_SH4;
+}
+
+/*-------------------------------------------------
+    sh3_reset - reset the processor
+-------------------------------------------------*/
+
+static CPU_RESET( sh3 )
+{
+	sh4_state *sh4 = get_safe_token(device);
+	CPU_RESET_CALL(sh4);
+	sh4->cpu_type = CPU_TYPE_SH3;
 }
 
 /* Execute cycles - returns number of cycles actually run */
@@ -3820,6 +3833,22 @@ CPU_GET_INFO( sh4 )
 	}
 }
 
+CPU_GET_INFO( sh3 )
+{
+	switch (state)
+	{
+	/* --- the following bits of info are returned as pointers to data or functions --- */
+	case CPUINFO_FCT_RESET:						info->reset = CPU_RESET_NAME(sh3);				break;
+
+	/* --- the following bits of info are returned as NULL-terminated strings --- */
+	case DEVINFO_STR_NAME:						strcpy(info->s, "SH-3");				break;
+	case DEVINFO_STR_FAMILY:					strcpy(info->s, "Hitachi SH7700");		break;
+
+	default:									CPU_GET_INFO_CALL(sh4);					break;
+	}
+}
+
+DEFINE_LEGACY_CPU_DEVICE(SH3, sh3);
 DEFINE_LEGACY_CPU_DEVICE(SH4, sh4);
 
 #endif	// USE_SH4DRC

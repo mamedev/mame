@@ -110,9 +110,10 @@ typedef struct
 	UINT32 sh4_tlb_data[64];
 	UINT8 sh4_mmu_enabled;
 
+	int cpu_type;
+
 #ifdef USE_SH4DRC
 	int	icount;
-	int cpu_type;
 
 	int pcfsel;	    			// last pcflush entry set
 	int maxpcfsel;				// highest valid pcflush entry
