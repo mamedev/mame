@@ -262,7 +262,6 @@ To Do / Unknowns:
 #include "includes/toaplan2.h"
 #include "rendlay.h"
 
-#define USE_ENCRYPTED_V25S
 
 
 static MACHINE_RESET(batsugun);
