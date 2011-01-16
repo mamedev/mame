@@ -2664,7 +2664,7 @@ void hd61700_cpu_device::execute_run()
 						REG_UA = REG_IA = 0;
 						REG_IX = REG_IY = REG_IZ = 0;
 						REG_PE = 0;
-						REG_IE = (REG_IE&0x0c) | ((REG_IB>1) & 0x10);
+						REG_IE = (REG_IE&0x0c) | ((REG_IB>>1) & 0x10);
 						REG_IB &= 0xe3;
 						if (m_flags & FLAG_SW)
 							m_flags |= FLAG_APO;
