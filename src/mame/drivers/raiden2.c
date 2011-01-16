@@ -407,16 +407,16 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 	switch(data) {
 	case 0x0205:   // 0205 0006 ffeb 0000 - 0188 0282 0082 0b8e 098e 0000 0000 0000
 		space.write_dword(cop_regs[0] + 4 + offset*4, space.read_dword(cop_regs[0] + 4 + offset*4) + space.read_dword(cop_regs[0] + 16 + offset*4));
+		space.write_word(cop_regs[0] + 0x1c + offset*4, space.read_word(cop_regs[0] + 0x1c + offset*4) + space.read_word(cop_regs[0] + 16 + offset*4));
 		break;
 
 	case 0x0904: { /* X Se Dae and Zero Team uses this variant */
 		space.write_dword(cop_regs[0] + 16 + offset*4, space.read_dword(cop_regs[0] + 16 + offset*4) - space.read_dword(cop_regs[0] + 0x28 + offset*4));
 		break;
 	}
-	case 0x0905: {
+	case 0x0905: // 194 288 088
 		space.write_dword(cop_regs[0] + 16 + offset*4, space.read_dword(cop_regs[0] + 16 + offset*4) + space.read_dword(cop_regs[0] + 0x28 + offset*4));
 		break;
-	}
 
 	case 0x130e:
 	case 0x138e: { // 130e 0005 bf7f 0010 - 0984 0aa4 0d82 0aa2 039b 0b9a 0b9a 0a9a
