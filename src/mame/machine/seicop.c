@@ -41,8 +41,13 @@
 
   this simulation is incomplete
 
-  to do:
-  clean it up, consolidate code, make it work!
+  COP TODO list:
+  - collision detection, hitbox parameter is a complete mystery;
+  - collision detection, unknown usage of reads at 0x582-0x588;
+  - The RNG relies on the master CPU clock cycles, but without accurate waitstate support is
+    basically impossible to have a 1:1 matchup. Seibu Cup Soccer Selection for instance should show the
+    first match as Germany vs. USA at twilight, right now is Spain vs. Brazil at sunset.
+  - (MANY other things that needs to be listed here)
 
   Protection information
 
@@ -1424,6 +1429,7 @@ static UINT16 cop_dma_fade_table;
 static UINT16 cop_dma_trigger = 0;
 static UINT16 cop_scale;
 
+static UINT8 cop_rng_max_value;
 
 static UINT16 copd2_offs = 0;
 
@@ -1541,7 +1547,7 @@ static WRITE16_HANDLER( seibu_common_video_regs_w )
 
 
 /*
-"The angle of ASM snippets"
+"The area of ASM snippets"
 
 player-1 priorities list:
 1086d8: show this sprite (bit 15)
@@ -1839,7 +1845,11 @@ static READ16_HANDLER( generic_cop_r )
 
 	switch (offset)
 	{
-		/* DMA mode register readback */
+		/* RNG max value readback, trusted */
+		case 0x02c/2:
+			return retvalue;
+
+		/* DMA mode register readback, trusted */
 		case 0x07e/2:
 			return retvalue;
 
@@ -1868,9 +1878,12 @@ static READ16_HANDLER( generic_cop_r )
 		case 0x198/2:
 			return retvalue;
 
-		/* needed by Godzilla for selecting a character ... rng? PIT? */
+		/* RNG, trusted */
+		case 0x1a0/2:
+		case 0x1a2/2:
 		case 0x1a4/2:
-			return space->machine->rand();
+		case 0x1a6/2:
+			return space->machine->firstcpu->total_cycles() % (cop_rng_max_value+1);
 
 		case 0x1b0/2:
 			return cop_status;
@@ -2018,6 +2031,9 @@ static WRITE16_HANDLER( generic_cop_w )
 
 			break;
 		}
+
+		/* max possible value returned by the RNG at 0x5a*, trusted */
+		case (0x02c/2): cop_rng_max_value = cop_mcu_ram[0x2c/2] & 0xff; break;
 
 		case (0x044/2):
 		{
