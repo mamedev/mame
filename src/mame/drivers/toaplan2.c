@@ -261,7 +261,9 @@ To Do / Unknowns:
 #include "sound/ymz280b.h"
 #include "includes/toaplan2.h"
 #include "rendlay.h"
+/*
 #define USE_ENCRYPTED_V25S
+*/
 
 static MACHINE_RESET(batsugun);
 static READ16_HANDLER( batsugun_share_r );
