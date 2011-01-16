@@ -265,10 +265,6 @@ To Do / Unknowns:
 static MACHINE_RESET(batsugun);
 static READ16_HANDLER( batsugun_share_r );
 static WRITE16_HANDLER( batsugun_share_w );
-#ifdef USE_ENCRYPTED_V25S
-static READ16_HANDLER( batsugun_share2_r );
-static WRITE16_HANDLER( batsugun_share2_w );
-#endif
 
 /***************************************************************************
   Initialisation handlers
@@ -626,9 +622,9 @@ static WRITE16_HANDLER( toaplan2_v25_coin_word_w )
 		toaplan2_coin_w(space, offset, data & 0x0f);
 
 		#ifdef USE_ENCRYPTED_V25S
-		/* only the ram-based V25 based games access the following bits */
-		//cpu_set_input_line(state->sub_cpu, INPUT_LINE_RESET, (data & 0x0020) ? CLEAR_LINE : ASSERT_LINE );
-		cpu_set_input_line(state->sub_cpu, INPUT_LINE_HALT,  (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE);
+		/* not sure which of these is really RESET - runs fine with either */
+		// cpu_set_input_line(state->sub_cpu, INPUT_LINE_RESET, (data & 0x0020) ? CLEAR_LINE : ASSERT_LINE );
+		cpu_set_input_line(state->sub_cpu, INPUT_LINE_RESET,  (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE);
 		#endif
 
 	}
@@ -1390,10 +1386,7 @@ static ADDRESS_MAP_START( dogyuun_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200018, 0x200019) AM_READ_PORT("SYS")
 	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_v25_coin_word_w)
 #ifdef USE_ENCRYPTED_V25S
-	//AM_RANGE(0x21e000, 0x21fbff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE_MEMBER(toaplan2_state, shared_ram16)   /* $21f000 status port */
-	//AM_RANGE(0x21fc00, 0x21ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE_MEMBER(toaplan2_state, V25_shared_ram)    /* 16-bit on 68000 side, 8-bit on V25 side */
-	AM_RANGE(0x210000, 0x21efff) AM_READWRITE( batsugun_share2_r, batsugun_share2_w )
-	AM_RANGE(0x21f000, 0x21ffff) AM_READWRITE( batsugun_share_r, batsugun_share_w )
+	AM_RANGE(0x210000, 0x21ffff) AM_READWRITE( batsugun_share_r, batsugun_share_w )
 #else
 	AM_RANGE(0x21e000, 0x21efff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE_MEMBER(toaplan2_state, shared_ram16)
 	AM_RANGE(0x21f000, 0x21f001) AM_READWRITE(toaplan2_snd_cpu_r, dogyuun_snd_cpu_w)	/* V25 status/command port */
@@ -1516,8 +1509,16 @@ ADDRESS_MAP_END
 // guess, could be wrong
 WRITE16_HANDLER( fixeight_subcpu_ctrl )
 {
+	printf("fixeight_subcpu_ctrl %04x\n",data);
+
+	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+
 	/* 0x18 used */
-	cpu_set_input_line(sub_cpu, INPUT_LINE_HALT,  (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE);
+	#ifdef USE_ENCRYPTED_V25S
+	/* not sure which of these is really RESET - runs fine with either */
+	// cpu_set_input_line(state->sub_cpu, INPUT_LINE_RESET, (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE );
+	cpu_set_input_line(state->sub_cpu, INPUT_LINE_RESET,  (data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
+	#endif
 }
 #endif
 
@@ -1531,10 +1532,7 @@ static ADDRESS_MAP_START( fixeight_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("SYS")
 	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_coin_word_w)	/* Coin count/lock */
 #ifdef USE_ENCRYPTED_V25S
-	//AM_RANGE(0x28e000, 0x28fbff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE_MEMBER(toaplan2_state, shared_ram16)   /* $28f000 status port */
-	//AM_RANGE(0x28fc00, 0x28ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE_MEMBER(toaplan2_state, V25_shared_ram)    /* 16-bit on 68000 side, 8-bit on V25 side */
-	AM_RANGE(0x280000, 0x28efff) AM_READWRITE( batsugun_share2_r, batsugun_share2_w )
-	AM_RANGE(0x28f000, 0x28ffff) AM_READWRITE( batsugun_share_r, batsugun_share_w )
+	AM_RANGE(0x280000, 0x28ffff) AM_READWRITE( batsugun_share_r, batsugun_share_w )
 	AM_RANGE(0x700000, 0x700001) AM_WRITE(fixeight_subcpu_ctrl) // guess!!!
 #else
 	AM_RANGE(0x280000, 0x28dfff) AM_RAM							/* part of shared ram ? */
@@ -1587,10 +1585,7 @@ static ADDRESS_MAP_START( vfive_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200018, 0x200019) AM_READ_PORT("SYS")
 	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_v25_coin_word_w)	/* Coin count/lock */
 #ifdef USE_ENCRYPTED_V25S
-	//AM_RANGE(0x21e000, 0x21fbff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE_MEMBER(toaplan2_state, shared_ram16)   /* $21f000 status port */
-	//AM_RANGE(0x21fc00, 0x21ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE_MEMBER(toaplan2_state, V25_shared_ram)    /* 16-bit on 68000 side, 8-bit on V25 side */
-	AM_RANGE(0x210000, 0x21efff) AM_READWRITE( batsugun_share2_r, batsugun_share2_w )
-	AM_RANGE(0x21f000, 0x21ffff) AM_READWRITE( batsugun_share_r, batsugun_share_w )
+	AM_RANGE(0x210000, 0x21ffff) AM_READWRITE( batsugun_share_r, batsugun_share_w )
 #else
 	AM_RANGE(0x21e000, 0x21efff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE_MEMBER(toaplan2_state, shared_ram16)
 	AM_RANGE(0x21f000, 0x21f001) AM_READWRITE(toaplan2_snd_cpu_r, vfive_snd_cpu_w)	/* V25 Command/Status port */
@@ -1630,35 +1625,6 @@ static WRITE16_HANDLER( batsugun_share_w )
 		state->batsugun_share[offset] = data;
 	}
 }
-
-#ifdef USE_ENCRYPTED_V25S
-/* To be removed... */
-static READ16_HANDLER( batsugun_share2_r )
-{
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
-
-	return batsugun_share2[offset] | batsugun_share2[offset]<<8;
-}
-
-static WRITE16_HANDLER( batsugun_share2_w )
-{
-#if 0
-	if (ACCESSING_BITS_8_15)
-	{
-		toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
-
-		state->batsugun_share2[offset] = data >> 8;
-	}
-#endif
-
-	if (ACCESSING_BITS_0_7)
-	{
-		toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
-
-		state->batsugun_share2[offset] = data;
-	}
-}
-#endif
 
 static ADDRESS_MAP_START( batsugun_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
@@ -1942,6 +1908,11 @@ static ADDRESS_MAP_START( V25_rambased_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x80000, 0x87fff) AM_RAM AM_MIRROR(0x78000) AM_BASE_MEMBER(toaplan2_state, batsugun_share)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( V25_rambased_nooki_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x00000, 0x00001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
+	//AM_RANGE(0x00004, 0x00004) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE(0x80000, 0x87fff) AM_RAM AM_MIRROR(0x78000) AM_BASE_MEMBER(toaplan2_state, batsugun_share)
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( V25_rambased_port, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(V25_PORT_P0, V25_PORT_P0) AM_READ(v25_dswb_read)
@@ -3945,7 +3916,7 @@ static MACHINE_CONFIG_START( vfive, toaplan2_state )
 	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_20MHz/2)	/* Verified on pcb, NEC V25 type Toaplan mark scratched out */
-	MCFG_CPU_PROGRAM_MAP(V25_rambased_mem)
+	MCFG_CPU_PROGRAM_MAP(V25_rambased_nooki_mem)
 	MCFG_CPU_CONFIG(ts007spy_vfive_config)
 
 	MCFG_MACHINE_RESET(vfive)
