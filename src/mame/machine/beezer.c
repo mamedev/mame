@@ -4,7 +4,9 @@
 #include "includes/beezer.h"
 
 static int pbus;
+static int banklatch;
 
+static READ8_DEVICE_HANDLER( b_via_0_pa_r );
 static READ8_DEVICE_HANDLER( b_via_0_pb_r );
 static WRITE8_DEVICE_HANDLER( b_via_0_pa_w );
 static WRITE8_DEVICE_HANDLER( b_via_0_pb_w );
@@ -38,12 +40,11 @@ static WRITE8_DEVICE_HANDLER( b_via_1_pb_w );
 	/IRQ: to main m6809 cpu
 	/RES: from main reset generator/watchdog/button
 	
-	TODO: add XYZ inputs to port A read
 	TODO: figure out what TDISP is, may need to trace pcb
 	*/
 const via6522_interface b_via_0_interface =
 {
-	/*inputs : A/B         */ DEVCB_NULL, DEVCB_HANDLER(b_via_0_pb_r),
+	/*inputs : A/B         */ DEVCB_HANDLER(b_via_0_pa_r), DEVCB_HANDLER(b_via_0_pb_r),
 	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER("via6522_1", via6522_device, read_ca2), DEVCB_LINE(b_via_0_ca2_r), DEVCB_DEVICE_LINE_MEMBER("via6522_1", via6522_device, read_ca1),
 	/*outputs: A/B         */ DEVCB_HANDLER(b_via_0_pa_w), DEVCB_HANDLER(b_via_0_pb_w),
 	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_LINE(b_via_0_ca2_w), DEVCB_DEVICE_LINE_MEMBER("via6522_1", via6522_device, write_ca1),
@@ -90,6 +91,11 @@ static READ_LINE_DEVICE_HANDLER( b_via_0_ca2_r )
 static WRITE_LINE_DEVICE_HANDLER( b_via_0_ca2_w )
 {
 	// TODO: TDISP on schematic; what is this?
+}
+
+static READ8_DEVICE_HANDLER( b_via_0_pa_r )
+{
+	return (banklatch&0x38)<<2; // return X,Y,Z bits
 }
 
 static READ8_DEVICE_HANDLER( b_via_0_pb_r )
@@ -152,11 +158,12 @@ static WRITE8_DEVICE_HANDLER( b_via_1_pb_w )
 DRIVER_INIT( beezer )
 {
 	pbus = 0;
+	banklatch = 0;
 }
 
 WRITE8_HANDLER( beezer_bankswitch_w )
 {
-	// TODO: latch X,Y,Z bits (bits 3,4,5 of write to here) for use by via 0
+	banklatch = data&0x3f; // latched 'x,y,z' plus bank bits in ls174 @ 4H
 	if ((data & 0x07) == 0)
 	{
 		via6522_device *via_0 = space->machine->device<via6522_device>("via6522_0");
