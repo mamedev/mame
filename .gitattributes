@@ -325,7 +325,6 @@ src/emu/cpu/nec/nec.c svneol=native#text/plain
 src/emu/cpu/nec/nec.h svneol=native#text/plain
 src/emu/cpu/nec/necdasm.c svneol=native#text/plain
 src/emu/cpu/nec/necea.h svneol=native#text/plain
-src/emu/cpu/nec/nechost.h svneol=native#text/plain
 src/emu/cpu/nec/necinstr.c svneol=native#text/plain
 src/emu/cpu/nec/necinstr.h svneol=native#text/plain
 src/emu/cpu/nec/necmacro.h svneol=native#text/plain
