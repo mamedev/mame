@@ -100,5 +100,19 @@ void sh4_set_irln_input(device_t *device, int value);
 void sh4_set_ftcsr_callback(device_t *device, sh4_ftcsr_callback callback);
 void sh4_dma_ddt(device_t *device, struct sh4_ddt_dma *s);
 
+/***************************************************************************
+    COMPILER-SPECIFIC OPTIONS
+***************************************************************************/
+
+#define SH4DRC_STRICT_VERIFY   	0x0001			/* verify all instructions */
+#define SH4DRC_FLUSH_PC			0x0002			/* flush the PC value before each memory access */
+#define SH4DRC_STRICT_PCREL		0x0004			/* do actual loads on MOVLI/MOVWI instead of collapsing to immediates */
+
+#define SH4DRC_COMPATIBLE_OPTIONS	(SH4DRC_STRICT_VERIFY | SH4DRC_FLUSH_PC | SH4DRC_STRICT_PCREL)
+#define SH4DRC_FASTEST_OPTIONS	(0)
+
+void sh4drc_set_options(device_t *device, UINT32 options);
+void sh4drc_add_pcflush(device_t *device, offs_t address);
+
 #endif /* __SH4_H__ */
 

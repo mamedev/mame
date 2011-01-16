@@ -30,13 +30,6 @@ static const UINT16 tcnt[] = { TCNT0, TCNT1, TCNT2 };
 static const UINT16 tcor[] = { TCOR0, TCOR1, TCOR2 };
 static const UINT16 tcr[] = { TCR0, TCR1, TCR2 };
 
-INLINE sh4_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == SH4);
-	return (sh4_state *)downcast<legacy_cpu_device *>(device)->token();
-}
-
 void sh4_change_register_bank(sh4_state *sh4, int to)
 {
 int s;
@@ -1311,6 +1304,63 @@ void sh4_dma_ddt(device_t *device, struct sh4_ddt_dma *s)
 				}
 			}
 		}
+	}
+}
+
+UINT32 sh4_getsqremap(sh4_state *sh4, UINT32 address)
+{
+	if (!sh4->sh4_mmu_enabled)
+		return address;
+	else
+	{
+		int i;
+		UINT32 topaddr = address&0xfff00000;
+
+		for (i=0;i<64;i++)
+		{
+			UINT32 topcmp = sh4->sh4_tlb_address[i]&0xfff00000;
+			if (topcmp==topaddr)
+				return (address&0x000fffff) | ((sh4->sh4_tlb_data[i])&0xfff00000);
+		}
+
+	}
+
+	return address;
+}
+
+READ64_HANDLER( sh4_tlb_r )
+{
+	sh4_state *sh4 = get_safe_token(space->cpu);
+
+	int offs = offset*8;
+
+	if (offs >= 0x01000000)
+	{
+		UINT8 i = (offs>>8)&63;
+		return sh4->sh4_tlb_data[i];
+	}
+	else
+	{
+		UINT8 i = (offs>>8)&63;
+		return sh4->sh4_tlb_address[i];
+	}
+}
+
+WRITE64_HANDLER( sh4_tlb_w )
+{
+	sh4_state *sh4 = get_safe_token(space->cpu);
+
+	int offs = offset*8;
+
+	if (offs >= 0x01000000)
+	{
+		UINT8 i = (offs>>8)&63;
+		sh4->sh4_tlb_data[i]  = data&0xffffffff;
+	}
+	else
+	{
+		UINT8 i = (offs>>8)&63;
+		sh4->sh4_tlb_address[i] = data&0xffffffff;
 	}
 }
 

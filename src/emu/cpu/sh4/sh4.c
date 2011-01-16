@@ -28,14 +28,9 @@
 #include "sh4regs.h"
 #include "sh4comn.h"
 
-CPU_DISASSEMBLE( sh4 );
+#ifndef USE_SH4DRC
 
-INLINE sh4_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == SH4);
-	return (sh4_state *)downcast<legacy_cpu_device *>(device)->token();
-}
+CPU_DISASSEMBLE( sh4 );
 
 /* Called for unimplemented opcodes */
 static void TODO(sh4_state *sh4)
@@ -2079,27 +2074,6 @@ INLINE void LDCSPC(sh4_state *sh4, UINT32 m)
 	sh4->spc = sh4->r[m];
 }
 
-static UINT32 sh4_getsqremap(sh4_state *sh4, UINT32 address)
-{
-	if (!sh4->sh4_mmu_enabled)
-		return address;
-	else
-	{
-		int i;
-		UINT32 topaddr = address&0xfff00000;
-
-		for (i=0;i<64;i++)
-		{
-			UINT32 topcmp = sh4->sh4_tlb_address[i]&0xfff00000;
-			if (topcmp==topaddr)
-				return (address&0x000fffff) | ((sh4->sh4_tlb_data[i])&0xfff00000);
-		}
-
-	}
-
-	return address;
-}
-
 /*  PREF     @Rn */
 INLINE void PREFM(sh4_state *sh4, UINT32 n)
 {
@@ -3622,43 +3596,6 @@ static ADDRESS_MAP_START( sh4_internal_map, ADDRESS_SPACE_PROGRAM, 64 )
 ADDRESS_MAP_END
 #endif
 
-
-static READ64_HANDLER( sh4_tlb_r )
-{
-	sh4_state *sh4 = get_safe_token(space->cpu);
-
-	int offs = offset*8;
-
-	if (offs >= 0x01000000)
-	{
-		UINT8 i = (offs>>8)&63;
-		return sh4->sh4_tlb_data[i];
-	}
-	else
-	{
-		UINT8 i = (offs>>8)&63;
-		return sh4->sh4_tlb_address[i];
-	}
-}
-
-static WRITE64_HANDLER( sh4_tlb_w )
-{
-	sh4_state *sh4 = get_safe_token(space->cpu);
-
-	int offs = offset*8;
-
-	if (offs >= 0x01000000)
-	{
-		UINT8 i = (offs>>8)&63;
-		sh4->sh4_tlb_data[i]  = data&0xffffffff;
-	}
-	else
-	{
-		UINT8 i = (offs>>8)&63;
-		sh4->sh4_tlb_address[i] = data&0xffffffff;
-	}
-}
-
 /*When OC index mode is on (CCR.OIX = 1)*/
 static ADDRESS_MAP_START( sh4_internal_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x1C000000, 0x1C000FFF) AM_RAM AM_MIRROR(0x01FFF000)
@@ -3884,3 +3821,5 @@ CPU_GET_INFO( sh4 )
 }
 
 DEFINE_LEGACY_CPU_DEVICE(SH4, sh4);
+
+#endif	// USE_SH4DRC
