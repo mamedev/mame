@@ -20,7 +20,8 @@
  *   TODO:
  *    - Interrupt mode 0 should be able to execute arbitrary opcodes
  *    - If LD A,I or LD A,R is interrupted, P/V flag gets reset, even if IFF2
- *      was set before this instruction
+ *      was set before this instruction (implemented, but not enabled: we need
+ *      document Z80 types first, see below)
  *    - Ideally, the tiny differences between Z80 types should be supported,
  *      currently known differences:
  *       - LD A,I/R P/V flag reset glitch is fixed on CMOS Z80
@@ -122,7 +123,12 @@
 #include "z80.h"
 #include "z80daisy.h"
 
-#define VERBOSE 0
+#define VERBOSE				0
+
+/* On an NMOS Z80, if LD A,I or LD A,R is interrupted, P/V flag gets reset,
+   even if IFF2 was set before this instruction. This issue was fixed on
+   the CMOS Z80, so until knowing (most) Z80 types on hardware, it's disabled */
+#define HAS_LDAIR_QUIRK		0
 
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
@@ -147,6 +153,7 @@ struct _z80_state
 	UINT8			irq_state;			/* irq line state */
 	UINT8			nsc800_irq_state[4];/* state of NSC800 restart interrupts A, B, C */
 	UINT8			after_ei;			/* are we in the EI shadow? */
+	UINT8			after_ldair;		/* same, but for LD A,I or LD A,R */
 	UINT32			ea;
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
@@ -800,6 +807,7 @@ INLINE UINT32 ARG16(z80_state *z80)
 #define LD_A_R(Z) do {											\
 	(Z)->A = ((Z)->r & 0x7f) | (Z)->r2;							\
 	(Z)->F = ((Z)->F & CF) | SZ[(Z)->A] | ((Z)->iff2 << 2);		\
+	(Z)->after_ldair = TRUE;									\
 } while (0)
 
 /***************************************************************
@@ -815,6 +823,7 @@ INLINE UINT32 ARG16(z80_state *z80)
 #define LD_A_I(Z) do {											\
 	(Z)->A = (Z)->i;											\
 	(Z)->F = ((Z)->F & CF) | SZ[(Z)->A] | ((Z)->iff2 << 2);		\
+	(Z)->after_ldair = TRUE;									\
 } while (0)
 
 /***************************************************************
@@ -3437,6 +3446,7 @@ static CPU_INIT( z80 )
 	state_save_register_device_item(device, 0, z80->nmi_pending);
 	state_save_register_device_item(device, 0, z80->irq_state);
 	state_save_register_device_item(device, 0, z80->after_ei);
+	state_save_register_device_item(device, 0, z80->after_ldair);
 
 	/* Reset registers to their initial values */
 	z80->PRVPC = 0;
@@ -3464,6 +3474,7 @@ static CPU_INIT( z80 )
 	z80->nmi_pending = 0;
 	z80->irq_state = 0;
 	z80->after_ei = 0;
+	z80->after_ldair = 0;
 	z80->ea = 0;
 
 	if (device->baseconfig().static_config() != NULL)
@@ -3543,6 +3554,7 @@ static CPU_RESET( z80 )
 	z80->nmi_pending = FALSE;
 	z80->irq_state = CLEAR_LINE;
 	z80->after_ei = FALSE;
+	z80->after_ldair = FALSE;
 	z80->iff1 = 0;
 	z80->iff2 = 0;
 
@@ -3582,6 +3594,12 @@ static CPU_EXECUTE( z80 )
 		z80->PRVPC = -1;			/* there isn't a valid previous program counter */
 		LEAVE_HALT(z80);			/* Check if processor was halted */
 
+#if HAS_LDAIR_QUIRK
+		/* reset parity flag after LD A,I or LD A,R */
+		if (z80->after_ldair) z80->F &= ~PF;
+#endif
+		z80->after_ldair = FALSE;
+
 		z80->iff1 = 0;
 		PUSH(z80, pc);
 		z80->PCD = 0x0066;
@@ -3594,8 +3612,15 @@ static CPU_EXECUTE( z80 )
 	{
 		/* check for IRQs before each instruction */
 		if (z80->irq_state != CLEAR_LINE && z80->iff1 && !z80->after_ei)
+		{
+#if HAS_LDAIR_QUIRK
+			/* reset parity flag after LD A,I or LD A,R */
+			if (z80->after_ldair) z80->F &= ~PF;
+#endif
 			take_interrupt(z80);
+		}
 		z80->after_ei = FALSE;
+		z80->after_ldair = FALSE;
 
 		z80->PRVPC = z80->PCD;
 		debugger_instruction_hook(device, z80->PCD);
