@@ -346,7 +346,7 @@ void upd7725_device::exec_op(UINT32 opcode) {
       case  9: r = q + 1; p = 1; break;             //INC
       case 10: r = ~q; break;                       //CMP
       case 11: r = (q >> 1) | (q & 0x8000); break;  //SHR1 (ASR)
-      case 12: r = (q << 1) | c; break;             //SHL1 (ROL)
+      case 12: r = (q << 1) | (c ? 1 : 0); break;             //SHL1 (ROL)
       case 13: r = (q << 2) | 3; break;             //SHL2
       case 14: r = (q << 4) | 15; break;            //SHL4
       case 15: r = (q << 8) | (q >> 8); break;      //XCHG

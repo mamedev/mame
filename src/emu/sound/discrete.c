@@ -301,7 +301,7 @@ void discrete_task::check(discrete_task *dest_task)
 					{
 						input_buffer source;
 						int i, found = -1;
-						output_buffer *pbuf;
+						output_buffer *pbuf = NULL;
 
 						for (i = 0; i < m_buffers.count(); i++)
 //							if (m_buffers[i].node->block_node() == inputnode_num)
