@@ -284,8 +284,6 @@ DISCRETE_RESET(dsd_555_astbl)
 {
 	DISCRETE_DECLARE_INFO(discrete_555_desc)
 
-	discrete_base_node *v_charge_node;
-
 	m_use_ctrlv   = (this->input_is_node() >> 4) & 1;
 	m_output_type = info->options & DISC_555_OUT_MASK;
 
@@ -293,13 +291,10 @@ DISCRETE_RESET(dsd_555_astbl)
 	m_v_out_high = (info->v_out_high == DEFAULT_555_HIGH) ? info->v_pos - 1.2 : info->v_out_high;
 
 	/* setup v_charge or node */
-	v_charge_node = this->device->discrete_find_node(info->v_charge);
-	if (v_charge_node)
-		m_v_charge_node = &(v_charge_node->output[NODE_CHILD_NODE_NUM(info->v_charge)]);
-	else
+	m_v_charge_node = m_device->node_output_ptr(info->v_charge);
+	if (m_v_charge_node == NULL)
 	{
 		m_v_charge   = (info->v_charge == DEFAULT_555_CHARGE) ? info->v_pos : info->v_charge;
-		m_v_charge_node = NULL;
 
 		if (info->options & DISC_555_ASTABLE_HAS_FAST_CHARGE_DIODE) m_v_charge -= 0.5;
 	}
@@ -504,7 +499,7 @@ DISCRETE_RESET(dsd_555_mstbl)
 	m_output_type = info->options & DISC_555_OUT_MASK;
 	if ((m_output_type == DISC_555_OUT_COUNT_F) || (m_output_type == DISC_555_OUT_COUNT_R))
 	{
-		this->device->discrete_log("Invalid Output type in NODE_%d.\n", this->index());
+		m_device->discrete_log("Invalid Output type in NODE_%d.\n", this->index());
 		m_output_type = DISC_555_OUT_SQW;
 	}
 

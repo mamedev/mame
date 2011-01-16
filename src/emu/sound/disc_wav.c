@@ -332,22 +332,22 @@ DISCRETE_STEP(dss_lfsr_noise)
 			fbresult = (m_lfsr_reg >> info->bitlength) & 0x01;
 
 			/* Stage 2 feedback combine fbresultNew with infeed bit */
-			fbresult = dss_lfsr_function(this->device, info->feedback_function1, fbresult, noise_feed, 0x01);
+			fbresult = dss_lfsr_function(m_device, info->feedback_function1, fbresult, noise_feed, 0x01);
 
 			/* Stage 3 first we setup where the bit is going to be shifted into */
 			fbresult = fbresult * info->feedback_function2_mask;
 			/* Then we left shift the register, */
 			m_lfsr_reg = m_lfsr_reg << 1;
 			/* Now move the fbresult into the shift register and mask it to the bitlength */
-			m_lfsr_reg = dss_lfsr_function(this->device, info->feedback_function2, fbresult, m_lfsr_reg, (1 << info->bitlength) - 1 );
+			m_lfsr_reg = dss_lfsr_function(m_device, info->feedback_function2, fbresult, m_lfsr_reg, (1 << info->bitlength) - 1 );
 
 			/* Now get and store the new feedback result */
 			/* Fetch the feedback bits */
 			fb0 = (m_lfsr_reg >> info->feedback_bitsel0) & 0x01;
 			fb1 = (m_lfsr_reg >> info->feedback_bitsel1) & 0x01;
 			/* Now do the combo on them */
-			fbresult = dss_lfsr_function(this->device, info->feedback_function0, fb0, fb1, 0x01);
-			m_lfsr_reg = dss_lfsr_function(this->device, DISC_LFSR_REPLACE, m_lfsr_reg, fbresult << info->bitlength, (2 << info->bitlength) - 1);
+			fbresult = dss_lfsr_function(m_device, info->feedback_function0, fb0, fb1, 0x01);
+			m_lfsr_reg = dss_lfsr_function(m_device, DISC_LFSR_REPLACE, m_lfsr_reg, fbresult << info->bitlength, (2 << info->bitlength) - 1);
 
 		}
 		/* Now select the output bit */
@@ -387,7 +387,7 @@ DISCRETE_RESET(dss_lfsr_noise)
 	m_out_lfsr_reg = (info->flags & DISC_LFSR_FLAG_OUTPUT_SR_SN1) ? 1 : 0;
 
 	if ((info->clock_type < DISC_CLK_ON_F_EDGE) || (info->clock_type > DISC_CLK_IS_FREQ))
-		this->device->discrete_log("Invalid clock type passed in NODE_%d\n", this->index());
+		m_device->discrete_log("Invalid clock type passed in NODE_%d\n", this->index());
 
 	m_last = (DSS_COUNTER__CLOCK != 0);
 	if (info->clock_type == DISC_CLK_IS_FREQ) m_t_clock = 1.0 / DSS_LFSR_NOISE__CLOCK;
@@ -400,8 +400,8 @@ DISCRETE_RESET(dss_lfsr_noise)
 	fb0 = (m_lfsr_reg >> info->feedback_bitsel0) & 0x01;
 	fb1=(m_lfsr_reg >> info->feedback_bitsel1) & 0x01;
 	/* Now do the combo on them */
-	fbresult = dss_lfsr_function(this->device, info->feedback_function0, fb0, fb1, 0x01);
-	m_lfsr_reg=dss_lfsr_function(this->device, DISC_LFSR_REPLACE, m_lfsr_reg, fbresult << info->bitlength, (2<< info->bitlength ) - 1);
+	fbresult = dss_lfsr_function(m_device, info->feedback_function0, fb0, fb1, 0x01);
+	m_lfsr_reg=dss_lfsr_function(m_device, DISC_LFSR_REPLACE, m_lfsr_reg, fbresult << info->bitlength, (2<< info->bitlength ) - 1);
 
 	/* Now select and setup the output bit */
 	this->output[0] = (m_lfsr_reg >> info->output_bit) & 0x01;
@@ -439,7 +439,7 @@ DISCRETE_STEP(dss_noise)
 		if(m_phase > (2.0 * M_PI))
 		{
 			/* GCC's rand returns a RAND_MAX value of 0x7fff */
-			int newval = (this->device->machine->rand() & 0x7fff) - 16384;
+			int newval = (m_device->machine->rand() & 0x7fff) - 16384;
 
 			/* make sure the peak to peak values are the amplitude */
 			this->output[0] = DSS_NOISE__AMP / 2;
@@ -663,14 +663,14 @@ DISCRETE_STEP(dss_op_amp_osc)
 				enable = 1;
 			}
 			/* Work out the charge rates. */
-			charge[0] = DSS_OP_AMP_OSC_NORTON_VP_IN / *m_r1 - i;
-			charge[1] = (m_v_out_high - OP_AMP_NORTON_VBE) / *m_r2 - charge[0];
+			charge[0] = DSS_OP_AMP_OSC_NORTON_VP_IN / *m_r[1-1] - i;
+			charge[1] = (m_v_out_high - OP_AMP_NORTON_VBE) / *m_r[2-1] - charge[0];
 			/* Work out the Inverting Schmitt thresholds. */
-			i1 = DSS_OP_AMP_OSC_NORTON_VP_IN / *m_r5;
-			i2 = (0.0 - OP_AMP_NORTON_VBE) / *m_r4;
-			m_threshold_low  = (i1 + i2) * *m_r3 + OP_AMP_NORTON_VBE;
-			i2 = (m_v_out_high - OP_AMP_NORTON_VBE) / *m_r4;
-			m_threshold_high = (i1 + i2) * *m_r3 + OP_AMP_NORTON_VBE;
+			i1 = DSS_OP_AMP_OSC_NORTON_VP_IN / *m_r[5-1];
+			i2 = (0.0 - OP_AMP_NORTON_VBE) / *m_r[4-1];
+			m_threshold_low  = (i1 + i2) * *m_r[3-1] + OP_AMP_NORTON_VBE;
+			i2 = (m_v_out_high - OP_AMP_NORTON_VBE) / *m_r[4-1];
+			m_threshold_high = (i1 + i2) * *m_r[3-1] + OP_AMP_NORTON_VBE;
 			break;
 		}
 
@@ -884,27 +884,19 @@ DISCRETE_RESET(dss_op_amp_osc)
 	DISCRETE_DECLARE_INFO(discrete_op_amp_osc_info)
 
 	const double *r_info_ptr;
-	const double **r_context_ptr;
 	int loop;
-	discrete_base_node *r_node;
 
 	double i1 = 0;	/* inverting input current */
 	double i2 = 0;	/* non-inverting input current */
 
 	/* link to resistor static or node values */
 	r_info_ptr    = &info->r1;
-	r_context_ptr = &m_r1;
 	for (loop = 0; loop < 8; loop ++)
 	{
-		if IS_VALUE_A_NODE(*r_info_ptr)
-		{
-			r_node = this->device->discrete_find_node(*r_info_ptr);
-			*r_context_ptr = &(r_node->output[NODE_CHILD_NODE_NUM((int)*r_info_ptr)]);
-		}
-		else
-			*r_context_ptr = r_info_ptr;
+		m_r[loop] = m_device->node_output_ptr(*r_info_ptr);
+		if (m_r[loop] == NULL)
+			m_r[loop] = r_info_ptr;
 		r_info_ptr++;
-		r_context_ptr++;
 	}
 
 	m_is_linear_charge = 1;

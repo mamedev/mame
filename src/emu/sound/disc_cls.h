@@ -20,22 +20,13 @@
 
 #define DISCRETE_CLASS_NAME(_name) discrete_ ## _name ## _node
 
-#if 0
-#define DISCRETE_CLASS_CONSTRUCTOR(_name, _base, _ctxsize)				\
-		DISCRETE_CLASS_NAME(_name)(discrete_device * pdev, const discrete_sound_block *block) \
-		 : DISCRETE_CLASS_NAME(_base)(pdev, block) { m_context_size = _ctxsize; }
-#else
-#define DISCRETE_CLASS_CONSTRUCTOR(_name, _base)				\
-		DISCRETE_CLASS_NAME(_name)() \
+#define DISCRETE_CLASS_CONSTRUCTOR(_name, _base)						\
+		DISCRETE_CLASS_NAME(_name)() 									\
 		 : DISCRETE_CLASS_NAME(_base)() { }
-#endif
-#if 1
+
 #define DISCRETE_CLASS_DESTRUCTOR(_name)								\
 	public:																\
 		virtual ~ DISCRETE_CLASS_NAME(_name)(void) { }
-#else
-#define DISCRETE_CLASS_DESTRUCTOR(_name)
-#endif
 
 #define  DISCRETE_CLASS_STEP_RESETA(_name, _maxout, _priv)				\
 class DISCRETE_CLASS_NAME(_name): public discrete_base_node, public discrete_step_interface			\
@@ -50,7 +41,7 @@ private:																\
 	_priv																\
 }
 
-#define DISCRETE_CLASS_STEPA(_name, _maxout, _priv)	 				\
+#define DISCRETE_CLASS_STEPA(_name, _maxout, _priv)	 					\
 class DISCRETE_CLASS_NAME(_name): public discrete_base_node, public discrete_step_interface				\
 {																		\
 public:																	\
@@ -63,7 +54,7 @@ private:																\
 	_priv																\
 }
 
-#define  DISCRETE_CLASS_RESET(_name, _maxout) 				\
+#define  DISCRETE_CLASS_RESET(_name, _maxout) 							\
 class DISCRETE_CLASS_NAME(_name): public discrete_base_node				\
 {																		\
 public:																	\
@@ -103,12 +94,6 @@ public:
 	int max_output(void) { return 0; }
 	DISCRETE_CLASS_DESTRUCTOR(unimplemented)
 };
-
-struct dst_size_context
-{
-//	int size;
-};
-
 
 /*************************************
  *

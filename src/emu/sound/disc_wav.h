@@ -120,14 +120,7 @@ private:
 };
 
 DISCRETE_CLASS_STEP_RESETA(dss_op_amp_osc, 1,
-	const double *m_r1;		/* pointers to resistor values */
-	const double *m_r2;
-	const double *m_r3;
-	const double *m_r4;
-	const double *m_r5;
-	const double *m_r6;
-	const double *m_r7;
-	const double *m_r8;
+	const double *m_r[8];		/* pointers to resistor values */
 	int			m_type;
 	UINT8		m_flip_flop;		/* flip/flop output state */
 	UINT8		m_flip_flop_xor;	/* flip_flop ^ flip_flop_xor, 0 = discharge, 1 = charge */

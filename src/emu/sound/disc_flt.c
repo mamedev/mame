@@ -110,7 +110,8 @@ static void calculate_filter1_coefficients(discrete_base_node *node, double fc, 
 	}
 	else
 	{
-		node->device->discrete_log("calculate_filter1_coefficients() - Invalid filter type for 1st order filter.");
+		/* FIXME: reenable */
+		//node->m_device->discrete_log("calculate_filter1_coefficients() - Invalid filter type for 1st order filter.");
 	}
 }
 
@@ -191,7 +192,8 @@ static void calculate_filter2_coefficients(discrete_base_node *node,
 	}
 	else
 	{
-		node->device->discrete_log("calculate_filter2_coefficients() - Invalid filter type for 2nd order filter.");
+		/* FIXME: reenable */
+		//node->device->discrete_log("calculate_filter2_coefficients() - Invalid filter type for 2nd order filter.");
 	}
 }
 
@@ -723,17 +725,17 @@ DISCRETE_RESET( dst_rcdisc4)
 	/* some error checking. */
 	if (DST_RCDISC4__R1 <= 0 || DST_RCDISC4__R2 <= 0 || DST_RCDISC4__C1 <= 0 || (DST_RCDISC4__R3 <= 0 &&  m_type == 1))
 	{
-		this->device->discrete_log("Invalid component values in NODE_%d.\n", this->index());
+		m_device->discrete_log("Invalid component values in NODE_%d.\n", this->index());
 		return;
 	}
 	if (DST_RCDISC4__VP < 3)
 	{
-		this->device->discrete_log("vP must be >= 3V in NODE_%d.\n", this->index());
+		m_device->discrete_log("vP must be >= 3V in NODE_%d.\n", this->index());
 		return;
 	}
 	if (DST_RCDISC4__TYPE < 1 || DST_RCDISC4__TYPE > 3)
 	{
-		this->device->discrete_log("Invalid circuit type in NODE_%d.\n", this->index());
+		m_device->discrete_log("Invalid circuit type in NODE_%d.\n", this->index());
 		return;
 	}
 
@@ -1296,8 +1298,8 @@ DISCRETE_RESET(dst_rcfilterN)
 /* !!!!!!!!!!!!!! CAN'T CHEAT LIKE THIS !!!!!!!!!!!!!!!! */
 /* Put this stuff in a context */
 
-	this->input[2] = f;
-	this->input[3] = DISC_FILTER_LOWPASS;
+	this->m_input[2] = f;
+	this->m_input[3] = DISC_FILTER_LOWPASS;
 
 	/* Use first order filter */
 	dst_filter1_reset(node);
@@ -1329,8 +1331,8 @@ DISCRETE_RESET(dst_rcdiscN)
 /* !!!!!!!!!!!!!! CAN'T CHEAT LIKE THIS !!!!!!!!!!!!!!!! */
 /* Put this stuff in a context */
 
-	this->input[2] = f;
-	this->input[3] = DISC_FILTER_LOWPASS;
+	this->m_input[2] = f;
+	this->m_input[3] = DISC_FILTER_LOWPASS;
 
 	/* Use first order filter */
 	dst_filter1_reset(node);

@@ -3508,7 +3508,7 @@
 #define DISCRETE_DECLARE_CONTEXT(_name)	struct _name##_context *context = (struct _name##_context *)this->m_context;
 #define DISCRETE_DECLARE_INFO(_name)		const _name *info = (const  _name *)this->custom_data();
 
-#define DISCRETE_INPUT(_num)					(*(this->input[_num]))
+#define DISCRETE_INPUT(_num)					(*(this->m_input[_num]))
 
 /*************************************
  *
@@ -3750,94 +3750,84 @@ enum
  *
  *************************************/
 
-typedef struct _linked_list_entry	linked_list_entry;
-struct _linked_list_entry
-{
-	linked_list_entry	*next;
-	const void			*ptr;
-};
+#define for_each(_T, _e, _l) for (_T _e = (_l)->begin_ptr() ;  _e <= (_l)->end_ptr(); _e++)
 
-template<class T> class enumerator_t
-{
-public:
-	enumerator_t(linked_list_entry *first, resource_pool &pool = global_resource_pool) : m_cur(first) { }
-	virtual ~enumerator_t() {  }
+/*
+ * add and delete may be slow - the focus is on access!
+ */
 
-	//inline void set_first(linked_list_entry *first) { m_cur = first; }
-	inline T item(void) { return (T) m_cur->ptr; }
-	inline void next(void) { m_cur = m_cur->next; }
-	inline bool has_item(void) { return (m_cur != NULL); }
-protected:
-private:
-	linked_list_entry *m_cur;
-};
-
-#define for_each(_T, _e, _l) for (enumerator_t<_T> _e = (_l)->enumerator() ;  _e.has_item(); _e.next())
-
-template<class T> class linked_list_t
+template<class T> class dynamic_array_t
 {
 public:
-	linked_list_t() { m_first = NULL; m_last = NULL; }
-	~linked_list_t() { reset(); }
+	dynamic_array_t(int initial) {
+		m_count = 0;
+		m_allocated = initial;
+		m_arr = global_alloc_array_clear(T, m_allocated);
+	}
+	dynamic_array_t()  {
+		m_count = 0;
+		m_allocated = 16;
+		m_arr = global_alloc_array_clear(T, m_allocated);
+	}
+	~dynamic_array_t() {
+		global_free(m_arr);
+	}
+	T& operator [] (unsigned int index) const // get array item
+	{
+		return m_arr[index];
+	}
 
-	void add_tail(T object)
+	dynamic_array_t(const dynamic_array_t &a)  // copy constructor
 	{
-		linked_list_entry *n = global_alloc(linked_list_entry);
-		n->ptr = (void *) object;
-		n->next = NULL;
-		if (m_last == NULL)
-		{
-			m_last = n;
-			m_first = n;
-		}
-		else
-		{
-			m_last->next = n;
-			m_last = n;
-		}
+		m_allocated = a.count();
+		if (m_allocated < 16)
+			m_allocated = 16;
+		m_count = a.count();
+		m_arr = global_alloc_array_clear(T, m_allocated);
+		for (int i=0; i < m_count; i++)
+			m_arr[i] = a[i];
 	}
-	void add_head(T object)
+	dynamic_array_t& operator = (const dynamic_array_t &a) // assignment operator
 	{
-		linked_list_entry *n = global_alloc(linked_list_entry);
-		n->ptr = (void *) object;
-		n->next = NULL;
-		if (m_last == NULL)
-		{
-			m_last = n;
-			m_first = n;
-		}
-		else
-		{
-			n->next = m_first;
-			m_first = n;
-		}
+	    if (this == &a) return *this;
+		m_allocated = a.count();
+		if (m_allocated < 16)
+			m_allocated = 16;
+		m_count = a.count();
+		m_arr = global_alloc_array_clear(T, m_allocated);
+		for (int i=0; i < m_count; i++)
+			m_arr[i] = a[i];
+	    return *this;
 	}
-	void reset(void)
+
+	inline void add(T object)
 	{
-		linked_list_entry *e = m_first;
-		while (e != NULL)
+		if (m_count >= m_allocated)
 		{
-			linked_list_entry *o = e;
-			e = e->next;
-			global_free(o);
+			m_allocated *= 2;
+			T *newarr = global_alloc_array_clear(T, m_allocated);
+			for (int i=0; i < m_count; i++)
+				newarr[i] = m_arr[i];
+			global_free(m_arr);
+			m_arr = newarr;
 		}
-		m_first = NULL; m_last = NULL;
+		m_arr[m_count] = object;
+		m_count++;
 	}
-	inline int count(void) const
+	inline void delete(int index)
 	{
-		int cnt = 0;
-		linked_list_entry *e = m_first;
-		while (e != NULL)
-		{
-			e = e->next;
-			cnt++;
-		}
-		return cnt;
+		for (int i=index+1; i < m_count; i++)
+			m_arr[i-1] = m_arr[i];
+		m_count--;
 	}
-	inline enumerator_t<T> enumerator(void) const { enumerator_t<T> r(m_first); return r; }
+	inline void clear(void) { m_count = 0; 	}
+	inline int count(void) const { return m_count; }
+	inline T *begin_ptr(void) const { return m_arr; }
+	inline T *end_ptr(void) const { return m_arr + (m_count - 1); }
 private:
-	linked_list_entry *m_first;
-	linked_list_entry *m_last;
+	T	*m_arr;
+	int	m_count;
+	int m_allocated;
 };
 
 /*************************************
@@ -4241,9 +4231,9 @@ class discrete_task;
 class discrete_base_node;
 class discrete_dss_input_stream_node;
 class discrete_device;
-typedef linked_list_t<discrete_base_node *> node_list_t;
-typedef linked_list_t<discrete_dss_input_stream_node *> input_stream_node_list_t;
-typedef linked_list_t<discrete_task *> task_list_t;
+typedef dynamic_array_t<discrete_base_node *> node_list_t;
+typedef dynamic_array_t<discrete_dss_input_stream_node *> istream_node_list_t;
+typedef dynamic_array_t<discrete_task *> task_list_t;
 
 
 /*************************************
@@ -4272,6 +4262,7 @@ struct _discrete_sound_block
 	const char *	name;							/* Node Name */
 	const char *    mod_name;						/* Module / class name */
 };
+typedef dynamic_array_t<const discrete_sound_block *> sound_block_list_t;
 
 /*************************************
  *
@@ -4288,7 +4279,7 @@ public:
 	osd_ticks_t			run_time;
 	discrete_base_node *	self;
 };
-typedef linked_list_t<discrete_step_interface *> node_step_list_t;
+typedef dynamic_array_t<discrete_step_interface *> node_step_list_t;
 
 class discrete_input_interface
 {
@@ -4361,7 +4352,7 @@ protected:
 };
 
 class discrete_output_interface;
-typedef linked_list_t<discrete_output_interface *> node_output_list_t;
+typedef dynamic_array_t<discrete_output_interface *> node_output_list_t;
 
 
 // ======================> discrete_device
@@ -4370,6 +4361,7 @@ class discrete_device : public device_t, public device_sound_interface
 {
 	friend class discrete_device_config;
 	friend class discrete_base_node;
+	friend class discrete_task;
 	friend class discrete_dss_input_stream_node;
 
 	// construction/destruction
@@ -4378,23 +4370,21 @@ class discrete_device : public device_t, public device_sound_interface
 public:
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
-	//sound_stream *m_stream;
 	virtual ~discrete_device(void);
 
 	/* --------------------------------- */
+
 	void CLIB_DECL ATTR_PRINTF(2,3) discrete_log(const char *text, ...) const;
-	discrete_base_node *discrete_find_node(int node);
+	const double *node_output_ptr(int onode);
+
 	/* FIXME: this is used by csv and wav logs - going forward, identifiers should be explicitly passed */
-	int same_module_index(discrete_base_node &node);
+	int same_module_index(const discrete_base_node &node);
+
 	inline int profiling(void) { return m_profiling; }
-	void update(void) { stream_update(m_stream); }
+
+	void update(void) const { stream_update(m_stream); }
 
 	/* FIXME: theses should be protected */
-	/* tasks */
-	task_list_t				 	task_list;		/* discrete_task_context * */
-	/* the input streams */
-	input_stream_node_list_t	m_input_stream_list;
-
 
 protected:
 
@@ -4405,6 +4395,8 @@ protected:
 	// internal callbacks
 	static STREAM_UPDATE( static_stream_generate );
 	virtual void stream_generate(stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
+	const discrete_base_node *discrete_find_node(int node);
 
 	// internal state
 	const discrete_device_config &m_config;
@@ -4421,34 +4413,36 @@ protected:
 
 
 private:
-	void discrete_build_list(const discrete_sound_block *intf, linked_list_entry ***current);
-	void discrete_sanity_check(void);
+	void discrete_build_list(const discrete_sound_block *intf, sound_block_list_t &block_list);
+	void discrete_sanity_check(const sound_block_list_t &block_list);
 	void display_profiling(void);
-	void init_nodes(const linked_list_entry *block_list);
+	void init_nodes(const sound_block_list_t &block_list);
 
 	/* internal node tracking */
-	discrete_base_node 	**m_indexed_node;
+	discrete_base_node **	m_indexed_node;
 
 	/* list of all nodes */
-	node_list_t			 m_node_list;		/* node_description * */
+	node_list_t			 	m_node_list;		/* node_description * */
 
-	/* list of discrete blocks after prescan (IMPORT, DELETE, REPLACE) */
-	linked_list_entry	 *m_block_list;		/* discrete_sound_block * */
+	/* tasks */
+	task_list_t				task_list;		/* discrete_task_context * */
+
+	/* the input streams */
+	istream_node_list_t		m_input_stream_list;
 
 	/* output node tracking */
-	node_output_list_t	 m_output_list;
+	node_output_list_t	 	m_output_list;
 
 	/* debugging statistics */
-	FILE				*m_disclogfile;
+	FILE *					m_disclogfile;
 
 	/* parallel tasks */
-	osd_work_queue		*m_queue;
+	osd_work_queue *		m_queue;
 
 	/* profiling */
-	int 				m_profiling;
-	UINT64				m_total_samples;
-	UINT64				m_total_stream_updates;
-
+	int 					m_profiling;
+	UINT64					m_total_samples;
+	UINT64					m_total_stream_updates;
 };
 
 // device type definition
@@ -4469,63 +4463,66 @@ class discrete_base_node
 public:
 
 	virtual void reset(void) { }
-	virtual void start(void);
+	virtual void start(void) { }
 	virtual void stop(void) { }
+	virtual void save_state(void);
 
-	inline bool interface(discrete_step_interface *&intf) { intf = m_step_intf; return (intf != NULL); }
-	inline bool interface(discrete_input_interface *&intf) { intf = m_input_intf; return (intf != NULL); }
-	inline bool interface(discrete_output_interface *&intf) { intf = m_output_intf; return (intf != NULL); }
+	inline bool interface(discrete_step_interface *&intf) const { intf = m_step_intf; return (intf != NULL); }
+	inline bool interface(discrete_input_interface *&intf) const { intf = m_input_intf; return (intf != NULL); }
+	inline bool interface(discrete_output_interface *&intf) const { intf = m_output_intf; return (intf != NULL); }
 
 	virtual int max_output(void) { return 1; };
 
 	/* Return the node index, i.e. X from NODE(X) */
-	int index(void);
+	inline int index(void) { return NODE_INDEX(m_block->node); }
+
 	/* Return the node number, i.e. NODE(X) */
-	inline int block_node(void) { return m_block->node;  }
+	inline int block_node(void) const { return m_block->node;  }
+
 	/* Custom function specific initialisation data */
 	inline const void *custom_data(void) { return m_custom; }
 
-	void find_input_nodes(void);
-	void save_state(device_t *device);
-
 	inline int input_node(int inputnum) { return m_block->input_node[inputnum]; }
-
-	/* The node's last output value */
-	double				output[DISCRETE_MAX_OUTPUTS];
-
-	const double *		input[DISCRETE_MAX_INPUTS];			/* Addresses of Input values */
 
 	/* Number of active inputs on this node type */
 	inline int			active_inputs(void) { return m_active_inputs; }
 	/* Bit Flags.  1 in bit location means input_is_node */
 	inline int			input_is_node(void) { return m_input_is_node; };
 
-	inline double		sample_time(void) { return device->m_sample_time; }
-	inline int			sample_rate(void) { return device->m_sample_rate; }
+	inline double		sample_time(void) { return m_device->m_sample_time; }
+	inline int			sample_rate(void) { return m_device->m_sample_rate; }
 
 	const char *		module_name(void) { return m_block->mod_name; }
-	inline int			module_type(void) { return m_block->type; }
-
-	discrete_device *device;							/* Points to the parent */
+	inline int			module_type(void) const { return m_block->type; }
 
 protected:
 
 	discrete_base_node();
 	virtual ~discrete_base_node();
 
-
 	/* finish node setup after allocation is complete */
 	void init(discrete_device * pdev, const discrete_sound_block *block);
 
+	void resolve_input_nodes(void);
+
+	discrete_device *			m_device;								/* Points to the parent */
+
+
+	double				output[DISCRETE_MAX_OUTPUTS];					/* The node's last output value */
+
+	const double *		m_input[DISCRETE_MAX_INPUTS];					/* Addresses of Input values */
+
 private:
-	const discrete_sound_block *m_block;						/* Points to the node's setup block. */
-	int					m_active_inputs;						/* Number of active inputs on this node type */
-	/* Custom function specific initialisation data */
-	const void *		m_custom;
-	int					m_input_is_node;
-	discrete_step_interface *m_step_intf;
-	discrete_input_interface *m_input_intf;
-	discrete_output_interface *m_output_intf;
+
+	const discrete_sound_block *	m_block;							/* Points to the node's setup block. */
+	int								m_active_inputs;					/* Number of active inputs on this node type */
+
+	const void *					m_custom;							/* Custom function specific initialisation data */
+	int								m_input_is_node;
+
+	discrete_step_interface *		m_step_intf;
+	discrete_input_interface *		m_input_intf;
+	discrete_output_interface *		m_output_intf;
 };
 
 class discrete_node_base_factory

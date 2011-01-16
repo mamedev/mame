@@ -75,7 +75,7 @@ DISCRETE_RESET(dss_adjustment)
 {
 	double min, max;
 
-	m_port = device->machine->m_portlist.find((const char *)this->custom_data());
+	m_port = m_device->machine->m_portlist.find((const char *)this->custom_data());
 	if (m_port == NULL)
 		fatalerror("DISCRETE_ADJUSTMENT - NODE_%d has invalid tag", this->index());
 
@@ -148,7 +148,7 @@ void DISCRETE_CLASS_FUNC(dss_input_data, input_write)(int sub_node, UINT8 data )
 	if (m_data != new_data)
 	{
 		/* Bring the system up to now */
-		device->update();
+		m_device->update();
 
 		m_data = new_data;
 
@@ -175,7 +175,7 @@ void DISCRETE_CLASS_FUNC(dss_input_logic, input_write)(int sub_node, UINT8 data 
 	if (m_data != new_data)
 	{
 		/* Bring the system up to now */
-		device->update();
+		m_device->update();
 
 		m_data = new_data;
 
@@ -202,7 +202,7 @@ void DISCRETE_CLASS_FUNC(dss_input_not, input_write)(int sub_node, UINT8 data )
 	if (m_data != new_data)
 	{
 		/* Bring the system up to now */
-		device->update();
+		m_device->update();
 
 		m_data = new_data;
 
@@ -235,7 +235,7 @@ void DISCRETE_CLASS_FUNC(dss_input_pulse, input_write)(int sub_node, UINT8 data 
 	if (m_data != new_data)
 	{
 		/* Bring the system up to now */
-		device->update();
+		m_device->update();
 		m_data = new_data;
 	}
 }
@@ -302,7 +302,7 @@ void DISCRETE_CLASS_FUNC(dss_input_stream, input_write)(int sub_node, UINT8 data
 		else
 		{
 			/* Bring the system up to now */
-			device->update();
+			m_device->update();
 
 			m_data = new_data;
 
@@ -316,7 +316,7 @@ DISCRETE_START(dss_input_stream)
 {
 	discrete_base_node::start();
 
-	assert(DSS_INPUT_STREAM__STREAM < this->device->m_input_stream_list.count());
+	assert(DSS_INPUT_STREAM__STREAM < m_device->m_input_stream_list.count());
 
 	/* Stream out number is set during start */
 	m_stream_in_number = DSS_INPUT_STREAM__STREAM;
@@ -327,9 +327,9 @@ DISCRETE_START(dss_input_stream)
 	m_is_buffered = is_buffered();
 	if (m_is_buffered)
 	{
-		m_buffer_stream = stream_create(this->device, 0, 1, this->sample_rate(), this, static_stream_generate);
+		m_buffer_stream = stream_create(m_device, 0, 1, this->sample_rate(), this, static_stream_generate);
 
-		stream_set_input(device->m_stream, m_stream_in_number,
+		stream_set_input(m_device->m_stream, m_stream_in_number,
 			m_buffer_stream, 0, 1.0);
 	}
 	else

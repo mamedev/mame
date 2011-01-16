@@ -233,11 +233,11 @@ DISCRETE_RESET(dst_dac_r1)
 	if (ladderLength < 2 && info->rBias == 0 && info->rGnd == 0)
 	{
 		/* You need at least 2 resistors for a ladder */
-		this->device->discrete_log("dst_dac_r1_reset - Ladder length too small");
+		m_device->discrete_log("dst_dac_r1_reset - Ladder length too small");
 	}
 	if (ladderLength > DISC_LADDER_MAXRES )
 	{
-		this->device->discrete_log("dst_dac_r1_reset - Ladder length exceeds DISC_LADDER_MAXRES");
+		m_device->discrete_log("dst_dac_r1_reset - Ladder length exceeds DISC_LADDER_MAXRES");
 	}
 
 	/*
@@ -363,7 +363,7 @@ DISCRETE_STEP(dst_divide)
 		if(DST_DIVIDE__DIV == 0)
 		{
 			this->output[0 ]= DBL_MAX;	/* Max out but don't break */
-			this->device->discrete_log("dst_divider_step() - Divide by Zero attempted in NODE_%02d.\n",this->index());
+			m_device->discrete_log("dst_divider_step() - Divide by Zero attempted in NODE_%02d.\n",this->index());
 		}
 		else
 		{
@@ -1152,8 +1152,6 @@ DISCRETE_RESET(dst_mixer)
 {
 	DISCRETE_DECLARE_INFO(discrete_mixer_desc)
 
-	discrete_base_node *r_node;
-
 	int		bit;
 	double	rTemp = 0;
 
@@ -1161,14 +1159,11 @@ DISCRETE_RESET(dst_mixer)
 	m_r_node_bit_flag = 0;
 	for (bit = 0; bit < 8; bit++)
 	{
-		r_node = this->device->discrete_find_node(info->r_node[bit]);
-		if (r_node != NULL)
+		m_r_node[bit] = m_device->node_output_ptr(info->r_node[bit]);
+		if (m_r_node[bit] != NULL)
 		{
-			m_r_node[bit] = &(r_node->output[NODE_CHILD_NODE_NUM(info->r_node[bit])]);
 			m_r_node_bit_flag |= 1 << bit;
 		}
-		else
-			m_r_node[bit] = NULL;
 
 		/* flag any caps */
 		if (info->c[bit] != 0)
@@ -1282,7 +1277,7 @@ DISCRETE_STEP(dst_multiplex)
 	else
 	{
 		/* Bad address.  We will leave the output alone. */
-		this->device->discrete_log("NODE_%02d - Address = %d. Out of bounds\n", this->index(), addr);
+		m_device->discrete_log("NODE_%02d - Address = %d. Out of bounds\n", this->index(), addr);
 	}
 }
 
@@ -1469,7 +1464,7 @@ DISCRETE_STEP(dst_samphold)
 			if (DST_SAMPHOLD__CLOCK == 0) this->output[0] = DST_SAMPHOLD__IN0;
 			break;
 		default:
-			this->device->discrete_log("dst_samphold_step - Invalid clocktype passed");
+			m_device->discrete_log("dst_samphold_step - Invalid clocktype passed");
 			break;
 	}
 	/* Save the last value */
@@ -1653,7 +1648,7 @@ DISCRETE_STEP(dst_transform)
 				top = (int)number1 ^ (int)top;
 				break;
 			default:
-				this->device->discrete_log("dst_transform_step - Invalid function type/variable passed: %s",(const char *)this->custom_data());
+				m_device->discrete_log("dst_transform_step - Invalid function type/variable passed: %s",(const char *)this->custom_data());
 				/* that is enough to fatalerror */
 				fatalerror("dst_transform_step - Invalid function type/variable passed: %s", (const char *)this->custom_data());
 				break;
