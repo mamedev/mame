@@ -3756,7 +3756,7 @@ enum
  * add and delete may be slow - the focus is on access!
  */
 
-template<class T> class dynamic_array_t
+template<class T> struct dynamic_array_t
 {
 public:
 	dynamic_array_t(int initial) {
@@ -3800,7 +3800,7 @@ public:
 	    return *this;
 	}
 
-	inline void add(T object)
+	inline T* add(T object)
 	{
 		if (m_count >= m_allocated)
 		{
@@ -3813,6 +3813,7 @@ public:
 		}
 		m_arr[m_count] = object;
 		m_count++;
+		return &m_arr[m_count-1];
 	}
 	inline void delete(int index)
 	{
@@ -4467,11 +4468,11 @@ public:
 	virtual void stop(void) { }
 	virtual void save_state(void);
 
+	virtual int max_output(void) { return 1; };
+
 	inline bool interface(discrete_step_interface *&intf) const { intf = m_step_intf; return (intf != NULL); }
 	inline bool interface(discrete_input_interface *&intf) const { intf = m_input_intf; return (intf != NULL); }
 	inline bool interface(discrete_output_interface *&intf) const { intf = m_output_intf; return (intf != NULL); }
-
-	virtual int max_output(void) { return 1; };
 
 	/* Return the node index, i.e. X from NODE(X) */
 	inline int index(void) { return NODE_INDEX(m_block->node); }

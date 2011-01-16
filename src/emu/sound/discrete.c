@@ -65,7 +65,7 @@
  *
  *************************************/
 
-#define DISCRETE_DEBUGLOG			(1)
+#define DISCRETE_DEBUGLOG			(0)
 
 
 /*************************************
@@ -84,12 +84,18 @@
 
 typedef struct
 {
-	const discrete_task	*task;
-	const double		*ptr;
-	int					output_node;
-	double				buffer;
-} discrete_source_node;
-typedef dynamic_array_t<discrete_source_node *> source_node_list_t;
+	double						*node_buf;
+	const double				*source;
+	volatile double				*ptr;
+	int							node_num;
+} output_buffer;
+
+typedef struct
+{
+	volatile const double		*ptr;				/* pointer into linked_outbuf.nodebuf */
+	output_buffer *				linked_outbuf;		/* what output are we connected to ? */
+	double						buffer;				/* input[] will point here */
+} input_buffer;
 
 class discrete_task
 {
@@ -106,23 +112,22 @@ public:
 	}
 	inline void unlock(void) { m_threadid = -1; }
 
-	discrete_device			*device;
 	//const linked_list_entry *list;
 	node_step_list_t 		step_list;
 
 	/* list of source nodes */
-	source_node_list_t		source_list;		/* discrete_source_node */
+	dynamic_array_t<input_buffer> source_list;		/* discrete_source_node */
 
 	int						task_group;
 
-	double					*m_ptr[DISCRETE_MAX_TASK_OUTPUTS];
 
 protected:
-	discrete_task(discrete_device *pdev)
-	: device(pdev), task_group(0), m_threadid(-1), m_numbuffered(0)
+	discrete_task(discrete_device &pdev)
+	: task_group(0), m_device(pdev), m_threadid(-1)
 	{
 		source_list.clear();
 		step_list.clear();
+		m_buffers.clear();
 	}
 
 	static void *task_callback(void *param, int threadid);
@@ -131,15 +136,13 @@ protected:
 	void check(discrete_task *dest_task);
 	void prepare_for_queue(int samples);
 
-	double					*m_node_buf[DISCRETE_MAX_TASK_OUTPUTS];
+	dynamic_array_t<output_buffer> 		m_buffers;
+	discrete_device	&					m_device;
 
 private:
 	volatile INT32			m_threadid;
-	int 					m_numbuffered;
 	volatile int			m_samples;
 
-	const double			*m_source[DISCRETE_MAX_TASK_OUTPUTS];
-	const discrete_base_node		*m_nodes[DISCRETE_MAX_TASK_OUTPUTS];
 };
 
 
@@ -173,12 +176,12 @@ private:
 inline void discrete_task::step_nodes(void)
 {
 
-	for_each(discrete_source_node **, sn, &source_list)
+	for_each(input_buffer *, sn, &source_list)
 	{
-		(*sn)->buffer = *(*sn)->ptr++;
+		sn->buffer = *sn->ptr++;
 	}
 
-	if (EXPECTED(!device->profiling()))
+	if (EXPECTED(!m_device.profiling()))
 	{
 		for_each(discrete_step_interface **, entry, &step_list)
 		{
@@ -201,8 +204,9 @@ inline void discrete_task::step_nodes(void)
 		}
 	}
 
-	for (int i = 0; i < m_numbuffered; i++)
-		*(m_ptr[i]++) = *m_source[i];
+	/* buffer the outputs */
+	for_each(output_buffer *, outbuf, &m_buffers)
+		*(outbuf->ptr++) = *outbuf->source;
 }
 
 void *discrete_task::task_callback(void *param, int threadid)
@@ -230,11 +234,11 @@ bool discrete_task::process(void)
 	int samples = MIN(m_samples, MAX_SAMPLES_PER_TASK_SLICE);
 
 	/* check dependencies */
-	for_each(discrete_source_node **, sn, &source_list)
+	for_each(input_buffer *, sn, &source_list)
 	{
 		int avail;
 
-		avail = (*sn)->task->m_ptr[(*sn)->output_node] - (*sn)->ptr;
+		avail = sn->linked_outbuf->ptr - sn->ptr;
 		assert_always(avail >= 0, "task_callback: available samples are negative");
 		if (avail < samples)
 			samples = avail;
@@ -260,13 +264,13 @@ void discrete_task::prepare_for_queue(int samples)
 {
 	m_samples = samples;
 	/* set up task buffers */
-	for (int i = 0; i < m_numbuffered; i++)
-		m_ptr[i] = m_node_buf[i];
+	for_each(output_buffer *, ob, &m_buffers)
+		ob->ptr = ob->node_buf;
 
 	/* initialize sources */
-	for_each(discrete_source_node **, sn, &source_list)
+	for_each(input_buffer *, sn, &source_list)
 	{
-		(*sn)->ptr = (*sn)->task->m_node_buf[(*sn)->output_node];
+		sn->ptr = sn->linked_outbuf->node_buf;
 	}
 }
 
@@ -289,43 +293,51 @@ void discrete_task::check(discrete_task *dest_task)
 			/* loop over all active inputs */
 			for (inputnum = 0; inputnum < dest_node->active_inputs(); inputnum++)
 			{
-				int inputnode = dest_node->input_node(inputnum);
-				if IS_VALUE_A_NODE(inputnode)
+				int inputnode_num = dest_node->input_node(inputnum);
+				if IS_VALUE_A_NODE(inputnode_num)
 				{
-					if (NODE_DEFAULT_NODE(task_node->block_node()) == NODE_DEFAULT_NODE(inputnode))
+					/* Fixme: sub nodes ! */
+					if (NODE_DEFAULT_NODE(task_node->block_node()) == NODE_DEFAULT_NODE(inputnode_num))
 					{
-						discrete_source_node *source;
+						input_buffer source;
 						int i, found = -1;
+						output_buffer *pbuf;
 
-						for (i = 0; i < m_numbuffered; i++)
-							if (m_nodes[i]->block_node() == inputnode)
+						for (i = 0; i < m_buffers.count(); i++)
+//							if (m_buffers[i].node->block_node() == inputnode_num)
+							if (m_buffers[i].node_num == inputnode_num)
 							{
 								found = i;
+								pbuf = &m_buffers[i];
 								break;
 							}
 
 						if (found<0)
 						{
-							if (m_numbuffered >= DISCRETE_MAX_TASK_OUTPUTS)
-								fatalerror("dso_task_start - Number of maximum buffered nodes exceeded");
+							output_buffer buf;
 
-							m_node_buf[m_numbuffered] = auto_alloc_array(device->machine, double,
+							buf.node_buf = auto_alloc_array(m_device.machine, double,
 									((task_node->sample_rate() + STREAMS_UPDATE_FREQUENCY) / STREAMS_UPDATE_FREQUENCY));
-							m_source[m_numbuffered] = (double *) dest_node->m_input[inputnum];
-							m_nodes[m_numbuffered] = device->discrete_find_node(inputnode);
-							i = m_numbuffered;
-							m_numbuffered++;
+							buf.ptr = buf.node_buf;
+							buf.source = dest_node->m_input[inputnum];
+							buf.node_num = inputnode_num;
+							//buf.node = device->discrete_find_node(inputnode);
+							i = m_buffers.count();
+							pbuf = m_buffers.add(buf);
 						}
-						device->discrete_log("dso_task_start - buffering %d(%d) in task %p group %d referenced by %d group %d", NODE_INDEX(inputnode), NODE_CHILD_NODE_NUM(inputnode), this, task_group, dest_node->index(), dest_task->task_group);
+						m_device.discrete_log("dso_task_start - buffering %d(%d) in task %p group %d referenced by %d group %d", NODE_INDEX(inputnode_num), NODE_CHILD_NODE_NUM(inputnode_num), this, task_group, dest_node->index(), dest_task->task_group);
 
 						/* register into source list */
-						source = auto_alloc(device->machine, discrete_source_node);
+						//source = auto_alloc(device->machine, discrete_source_node);
+						//source.task = this;
+						//source.output_node = i;
+						source.linked_outbuf = pbuf;
+						source.buffer = 0.0; /* please compiler */
+						source.ptr = NULL;
 						dest_task->source_list.add(source);
-						source->task = this;
-						source->output_node = i;
 
 						/* point the input to a buffered location */
-						dest_node->m_input[inputnum] = &source->buffer;
+						dest_node->m_input[inputnum] = &dest_task->source_list[dest_task->source_list.count()-1].buffer; // was copied!   &source.buffer;
 
 					}
 				}
@@ -353,7 +365,7 @@ discrete_base_node::~discrete_base_node(void)
 	/* currently noting */
 }
 
-void discrete_base_node::init(discrete_device * pdev, const discrete_sound_block *xblock)
+void discrete_base_node::init(discrete_device *pdev, const discrete_sound_block *xblock)
 {
 	m_device = pdev;
 	m_block = xblock;
@@ -674,7 +686,7 @@ void discrete_device::init_nodes(const sound_block_list_t &block_list)
 		/* make sure we have one simple task
          * No need to create a node since there are no dependencies.
          */
-		task = auto_alloc_clear(machine, discrete_task(this));
+		task = auto_alloc_clear(machine, discrete_task(*this));
 		task_list.add(task);
 	}
 
@@ -706,7 +718,7 @@ void discrete_device::init_nodes(const sound_block_list_t &block_list)
 				case DSO_TASK_START:
 					if (task != NULL)
 						fatalerror("init_nodes() - Nested DISCRETE_START_TASK.");
-					task = auto_alloc_clear(machine, discrete_task(this));
+					task = auto_alloc_clear(machine, discrete_task(*this));
 					task->task_group = block->initial[0];
 					if (task->task_group < 0 || task->task_group >= DISCRETE_MAX_TASK_GROUPS)
 						fatalerror("discrete_dso_task: illegal task_group %d", task->task_group);
