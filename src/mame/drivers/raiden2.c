@@ -158,6 +158,55 @@ WRITE16_MEMBER(raiden2_state::cop_pgm_data_w)
 	cop_func_trigger[idx] = cop_latch_trigger;
 	cop_func_value[idx]   = cop_latch_value;
 	cop_func_mask[idx]    = cop_latch_mask;
+
+	if(data) {
+		int off = data & 31;
+		int reg = (data >> 5) & 3;
+		int op = (data >> 7) & 31;
+
+		logerror("COPDIS: %04x %x %04x %02x %03x %02x.%x.%02x ", cop_latch_trigger, cop_latch_value, cop_latch_mask, cop_latch_addr, data, op, reg, off);
+
+		off *= 2;
+
+		switch(op) {
+		case 0x01:
+			if(off)
+				logerror("write32 %x(r%x)\n", off, reg);
+			else
+				logerror("write32 (r%x)\n", reg);
+			break;
+		case 0x03:
+			if(off)
+				logerror("read32 %x(r%x)\n", off, reg);
+			else
+				logerror("read32 (r%x)\n", reg);
+			break;
+		case 0x05:
+			if(off)
+				logerror("add32 %x(r%x)\n", off, reg);
+			else
+				logerror("add32 (r%x)\n", reg);
+			break;
+		case 0x13:
+			if(off)
+				logerror("write16h %x(r%x)\n", off, reg);
+			else
+				logerror("write16h (r%x)\n", reg);
+			break;
+		case 0x15:
+			logerror("sub %x(r%x)\n", off, reg);
+			break;
+		case 0x17:
+			if(off)
+				logerror("add16h %x(r%x)\n", off, reg);
+			else
+				logerror("add16h (r%x)\n", reg);
+			break;
+		default:
+			logerror("?\n");
+			break;
+		}
+	}       
 }
 
 WRITE16_MEMBER(raiden2_state::cop_pgm_addr_w)
