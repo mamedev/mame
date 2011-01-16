@@ -72,7 +72,7 @@ file_error sdl_read_ptty(osd_file *file, void *buffer, UINT64 offset, UINT32 cou
 
 file_error sdl_write_ptty(osd_file *file, const void *buffer, UINT64 offset, UINT32 count, UINT32 *actual)
 {
-	UINT32 result;
+	ssize_t result;
 	result = write(file->handle, buffer, count);
 
 	if (result < 0)
