@@ -82,7 +82,7 @@ static void rom_exit(running_machine &machine);
 
 file_error common_process_file_options(core_options *options, const char *location, const char *ext, const rom_entry *romp, mame_file **image_file)
 {
-	if (location != NULL)
+	if (location != NULL && strcmp(location, "") != 0)
 	{
 		astring fname(location, PATH_SEPARATOR, ROM_GETNAME(romp));
 		fname.cat(ext);
@@ -667,6 +667,7 @@ static int open_rom_file(rom_load_data *romdata, const char *regiontag, const ro
 		// separated by '%' (parentname being present only for clones)
 		astring tag1(regiontag), tag2, tag3, tag4, tag5;
 		bool is_list = FALSE;
+		bool has_parent = FALSE;
 
 		int separator1 = tag1.chr(0, '%');
 		if (separator1 != -1)
@@ -682,6 +683,8 @@ static int open_rom_file(rom_load_data *romdata, const char *regiontag, const ro
 			int separator2 = tag4.chr(0, '%');
 			if (separator2 != -1)
 			{
+				has_parent = TRUE;
+				
 				// we are loading a clone through softlists, split the setname from the parentname
 				tag5.cpysubstr(tag4, separator2 + 1, tag4.len() - separator2 + 1);
 				tag4.del(separator2, tag4.len() - separator2);
@@ -690,8 +693,11 @@ static int open_rom_file(rom_load_data *romdata, const char *regiontag, const ro
 			// prepare locations where we have to load from: list/parentname & list/clonename
 			astring swlist(tag1.cstr());
 			tag2.cpy(swlist.cat(tag4));
-			swlist.cpy(tag1);
-			tag3.cpy(swlist.cat(tag5));
+			if (has_parent)
+			{
+				swlist.cpy(tag1);
+				tag3.cpy(swlist.cat(tag5));
+			}
 		}
 
 		if (tag5.chr(0, '%') != -1)
@@ -708,13 +714,13 @@ static int open_rom_file(rom_load_data *romdata, const char *regiontag, const ro
 			if ((romdata->file == NULL) && (tag2.cstr() != NULL))
 				filerr = common_process_file(tag2.cstr(), has_crc, crc, romp, &romdata->file);
 			// try to load from list/parentname
-			if ((romdata->file == NULL) && (tag3.cstr() != NULL))
+			if ((romdata->file == NULL) && has_parent && (tag3.cstr() != NULL))
 				filerr = common_process_file(tag3.cstr(), has_crc, crc, romp, &romdata->file);
 			// try to load from setname
 			if ((romdata->file == NULL) && (tag4.cstr() != NULL))
 				filerr = common_process_file(tag4.cstr(), has_crc, crc, romp, &romdata->file);
 			// try to load from parentname
-			if ((romdata->file == NULL) && (tag5.cstr() != NULL))
+			if ((romdata->file == NULL) && has_parent && (tag5.cstr() != NULL))
 				filerr = common_process_file(tag5.cstr(), has_crc, crc, romp, &romdata->file);
 		}
 	}
@@ -1058,8 +1064,77 @@ chd_error open_disk_image_options(core_options *options, const game_driver *game
 	if (filerr != FILERR_NONE)
 		filerr = common_process_file_options(options, NULL, ".chd", romp, image_file);
 
+	/* look for the disk in the locationtag too */
 	if (filerr != FILERR_NONE && locationtag != NULL)
-		filerr = common_process_file_options(options, locationtag, ".chd", romp, image_file);
+	{
+		// check if we are dealing with softwarelists. if so, locationtag
+		// is actually a concatenation of: listname + setname + parentname
+		// separated by '%' (parentname being present only for clones)
+		astring tag1(locationtag), tag2, tag3, tag4, tag5;
+		bool is_list = FALSE;
+		bool has_parent = FALSE;
+		
+		int separator1 = tag1.chr(0, '%');
+		if (separator1 != -1)
+		{
+			is_list = TRUE;
+			
+			// we are loading through softlists, split the listname from the regiontag
+			tag4.cpysubstr(tag1, separator1 + 1, tag1.len() - separator1 + 1);
+			tag1.del(separator1, tag1.len() - separator1);
+			tag1.cat(PATH_SEPARATOR);
+			
+			// check if we are loading a clone (if this is the case also tag1 have a separator '%')
+			int separator2 = tag4.chr(0, '%');
+			if (separator2 != -1)
+			{
+				has_parent = TRUE;
+
+				// we are loading a clone through softlists, split the setname from the parentname
+				tag5.cpysubstr(tag4, separator2 + 1, tag4.len() - separator2 + 1);
+				tag4.del(separator2, tag4.len() - separator2);
+			}
+			
+			// prepare locations where we have to load from: list/parentname (if any) & list/clonename
+			astring swlist(tag1.cstr());
+			tag2.cpy(swlist.cat(tag4));
+			if (has_parent)
+			{
+				swlist.cpy(tag1);
+				tag3.cpy(swlist.cat(tag5));
+			}
+		}
+		
+		if (tag5.chr(0, '%') != -1)
+			fatalerror("We do not support clones of clones!\n");
+		
+		// try to load from the available location(s):
+		// - if we are not using lists, we have locationtag only;
+		// - if we are using lists, we have: list/clonename, list/parentname, clonename, parentname
+		if (!is_list)
+			filerr = common_process_file_options(options, locationtag, ".chd", romp, image_file);
+		else
+		{
+			// try to load from list/setname
+			if ((filerr != FILERR_NONE) && (tag2.cstr() != NULL))
+				filerr = common_process_file_options(options, tag2.cstr(), ".chd", romp, image_file);
+			// try to load from list/parentname (if any)
+			if ((filerr != FILERR_NONE) && has_parent && (tag3.cstr() != NULL))
+				filerr = common_process_file_options(options, tag3.cstr(), ".chd", romp, image_file);
+			// try to load from setname
+			if ((filerr != FILERR_NONE) && (tag4.cstr() != NULL))
+				filerr = common_process_file_options(options, tag4.cstr(), ".chd", romp, image_file);
+			// try to load from parentname (if any)
+			if ((filerr != FILERR_NONE) && has_parent && (tag5.cstr() != NULL))
+				filerr = common_process_file_options(options, tag5.cstr(), ".chd", romp, image_file);
+			// only for CHD we also try to load from list/
+			if ((filerr != FILERR_NONE) && (tag1.cstr() != NULL))
+			{
+				tag1.del(tag1.len() - 1, 1);	// remove the PATH_SEPARATOR
+				filerr = common_process_file_options(options, tag1.cstr(), ".chd", romp, image_file);
+			}
+		}
+	}
 
 	/* did the file open succeed? */
 	if (filerr == FILERR_NONE)
