@@ -3,9 +3,9 @@
 #include "includes/toaplan2.h"
 
 /****************************************************************************
-  The Toaplan 2 hardware with V25+ secondary CPU controls the sound through
-  to a YM2151 and OKI M6295 on some boards. Here we just interperet some of
-  commands sent to the V25+, directly onto the OKI M6295
+  The Toaplan 2 hardware with V25 secondary CPU controls the sound through
+  to a YM2151 and OKI M6295 on some boards. Here we just interpret some of
+  commands sent to the V25, directly onto the OKI M6295
 
   These tables convert commands sent from the main CPU, into sample numbers
   played back by the sound processor.
@@ -14,20 +14,6 @@
   scope of this playback file. Time would be better spent elsewhere.
 ****************************************************************************/
 
-
-static const UINT8 batsugun_cmd_snd[64] =
-{
-/* Sound Command 13 (0x0d) is a megamix of OKI sound effects */
-/* Sound Command 20 (0x14) repeats the initial crash part of the sample 4 times */
-/*00*/  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-/*08*/  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-/*10*/  0x00, 0x00, 0x00, 0x12, 0x12, 0x10, 0x0e, 0x0f,
-/*18*/  0x0d, 0x00, 0x11, 0x00, 0x00, 0x00, 0x00, 0x00,
-/*20*/  0x00, 0x00, 0x00, 0x13, 0x14, 0x17, 0x15, 0x16,
-/*28*/  0x18, 0x19, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-/*30*/  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1a,
-/*38*/  0x0e, 0x0f, 0x1b, 0x00, 0x00, 0x00, 0x00, 0x00
-};
 
 static const UINT8 kbash_cmd_snd[128] =
 {
@@ -131,20 +117,5 @@ void fixeight_okisnd_w(device_t *device, int data)
 	else if ((data > 0) && (data < 128))
 	{
 		play_oki_sound(oki, fixeight_cmd_snd[data], data);
-	}
-}
-
-void batsugun_okisnd_w(device_t *device, int data)
-{
-//  popmessage("Writing %04x to Sound CPU",data);
-
-	okim6295_device *oki = downcast<okim6295_device *>(device);
-	if (data == 0)
-	{
-		oki->write_command(0x78);		/* Stop playing effects */
-	}
-	else if ((data > 0) && (data < 64))
-	{
-		play_oki_sound(oki, batsugun_cmd_snd[data], data);
 	}
 }

@@ -689,7 +689,7 @@ static INTERRUPT_GEN( bomblord_interrupt )
 /* Basic hardware -- no decryption table is setup for CPU */
 static MACHINE_CONFIG_START( m90, driver_device )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V35,XTAL_32MHz/2/2) /* verified clock on cpu is 16Mhz but probably divided internally by 2 */
+	MCFG_CPU_ADD("maincpu", V35,XTAL_32MHz/2)
 	MCFG_CPU_PROGRAM_MAP(m90_main_cpu_map)
 	MCFG_CPU_IO_MAP(m90_main_cpu_io_map)
 	MCFG_CPU_VBLANK_INT("screen", m90_interrupt)
@@ -775,7 +775,7 @@ static const nec_config dynablaster_config ={	dynablaster_decryption_table, };
 static MACHINE_CONFIG_START( bbmanw, driver_device )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V35,XTAL_32MHz/2/2) /* verified clock on cpu is 16Mhz but probably divided internally by 2 */
+	MCFG_CPU_ADD("maincpu", V35,XTAL_32MHz/2)
 	MCFG_CPU_CONFIG(dynablaster_config)
 	MCFG_CPU_PROGRAM_MAP(m90_main_cpu_map)
 	MCFG_CPU_IO_MAP(m90_main_cpu_io_map)

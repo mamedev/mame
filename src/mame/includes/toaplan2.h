@@ -78,7 +78,6 @@ public:
 void dogyuun_okisnd_w(device_t *device, int data);
 void kbash_okisnd_w(device_t *device, int data);
 void fixeight_okisnd_w(device_t *device, int data);
-void batsugun_okisnd_w(device_t *device, int data);
 
 
 /*----------- defined in video/toaplan2.c -----------*/
@@ -110,8 +109,4 @@ WRITE16_HANDLER( raizing_tx_gfxram16_w );
 
 WRITE16_HANDLER( batrider_objectbank_w );
 WRITE16_HANDLER( batrider_textdata_decode );
-
-
-
-
 

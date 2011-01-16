@@ -1,5 +1,3 @@
-#define NEC_NMI_INT_VECTOR	2
-
 /* Cpu types, steps of 8 to help the cycle count calculation */
 #define V33_TYPE 0
 #define V30_TYPE 8
@@ -9,6 +7,57 @@
 #define FALSE 0
 #define TRUE 1
 #endif
+
+/* interrupt vectors */
+enum
+{
+	NEC_DIVIDE_VECTOR	= 0,
+	NEC_TRAP_VECTOR		= 1,
+	NEC_NMI_VECTOR		= 2,
+	NEC_BRKV_VECTOR		= 4,
+	NEC_CHKIND_VECTOR	= 5,
+	NEC_IBRK_VECTOR		= 19,
+	NEC_INTTU0_VECTOR	= 28,
+	NEC_INTTU1_VECTOR	= 29,
+	NEC_INTTU2_VECTOR	= 30,
+	NEC_INTD0_VECTOR	= 20,
+	NEC_INTD1_VECTOR	= 21,
+	NEC_INTP0_VECTOR	= 24,
+	NEC_INTP1_VECTOR	= 25,
+	NEC_INTP2_VECTOR	= 26,
+	NEC_INTSER0_VECTOR	= 12,
+	NEC_INTSR0_VECTOR	= 13,
+	NEC_INTST0_VECTOR	= 14,
+	NEC_INTSER1_VECTOR	= 16,
+	NEC_INTSR1_VECTOR	= 17,
+	NEC_INTST1_VECTOR	= 18,
+	NEC_INTTB_VECTOR	= 31
+};
+
+/* interrupt sources */
+typedef enum
+{
+	BRK		= 0,
+	INT_IRQ	= 1,
+	NMI_IRQ	= 1 << 1,
+	INTTU0	= 1 << 2,
+	INTTU1	= 1 << 3,
+	INTTU2	= 1 << 4,
+	INTD0	= 1 << 5,
+	INTD1	= 1 << 6,
+	INTP0	= 1 << 7,
+	INTP1	= 1 << 8,
+	INTP2	= 1 << 9,
+	INTSER0	= 1 << 10,
+	INTSR0	= 1 << 11,
+	INTST0	= 1 << 12,
+	INTSER1	= 1 << 13,
+	INTSR1	= 1 << 14,
+	INTST1	= 1 << 15,
+	INTTB	= 1 << 16,
+	BRKN	= 1 << 17,
+	BRKS	= 1 << 18
+} INTSOURCES;
 
 /* internal RAM and register banks */
 typedef union
@@ -25,20 +74,33 @@ struct _v25_state_t
 
 	UINT16	ip;
 
+	/* PSW flags */
 	INT32	SignVal;
 	UINT32	AuxVal, OverVal, ZeroVal, CarryVal, ParityVal;	/* 0 or non-0 valued flags */
 	UINT8	IBRK, F0, F1, TF, IF, DF, MF;	/* 0 or 1 valued flags */
-	UINT8	RB;	/* current register bank */
-	UINT32	int_vector;
+	UINT8	RBW, RBB;	/* current register bank base, preshifted for word and byte registers */
+
+	/* interrupt related */
 	UINT32	pending_irq;
+	UINT32	unmasked_irq;
+	UINT32	bankswitch_irq;
+	UINT8	priority_inttu, priority_intd, priority_intp, priority_ints0, priority_ints1;
+	UINT8	IRQS, ISPR;
 	UINT32	nmi_state;
 	UINT32	irq_state;
 	UINT32	poll_state;
 	UINT32	mode_state;
+	UINT32	intp_state[3];
 	UINT8	no_interrupt;
 
-	/* special function registers */
-	UINT8	PRC, IDB;
+	/* timer related */
+	UINT16	TM0, MD0, TM1, MD1;
+	UINT8	TMC0, TMC1;
+	emu_timer *timers[4];
+
+	/* system control */
+	UINT8	RAMEN, TB, PCK;	/* PRC register */
+	UINT32	IDB;
 
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
@@ -59,11 +121,17 @@ struct _v25_state_t
 	UINT8	seg_prefix;		/* prefix segment indicator */
 };
 
+enum {
+	VECTOR_PC = 0x02/2,
+	PSW_SAVE  = 0x04/2,
+	PC_SAVE   = 0x06/2
+};
+
 typedef enum {
 	DS1 = 0x0E/2,
 	PS  = 0x0C/2,
 	SS  = 0x0A/2,
-	DS0 = 0x08/2,
+	DS0 = 0x08/2
 } SREGS;
 
 typedef enum {
@@ -74,7 +142,7 @@ typedef enum {
 	SP = 0x16/2,
 	BP = 0x14/2,
 	IX = 0x12/2,
-	IY = 0x10/2,
+	IY = 0x10/2
 } WREGS;
 
 typedef enum {
@@ -85,51 +153,16 @@ typedef enum {
    DL = NATIVE_ENDIAN_VALUE_LE_BE(0x1A, 0x1B),
    DH = NATIVE_ENDIAN_VALUE_LE_BE(0x1B, 0x1A),
    BL = NATIVE_ENDIAN_VALUE_LE_BE(0x18, 0x19),
-   BH = NATIVE_ENDIAN_VALUE_LE_BE(0x19, 0x18),
+   BH = NATIVE_ENDIAN_VALUE_LE_BE(0x19, 0x18)
 } BREGS;
 
-#define Sreg(x)			nec_state->ram.w[(nec_state->RB << 4) + (x)]
-#define Wreg(x)			nec_state->ram.w[(nec_state->RB << 4) + (x)]
-#define Breg(x)			nec_state->ram.b[(nec_state->RB << 5) + (x)]
+#define SetRB(x)		do { nec_state->RBW = (x) << 4; nec_state->RBB = (x) << 5; } while (0)
+
+#define Sreg(x)			nec_state->ram.w[nec_state->RBW + (x)]
+#define Wreg(x)			nec_state->ram.w[nec_state->RBW + (x)]
+#define Breg(x)			nec_state->ram.b[nec_state->RBB + (x)]
 
 #define PC(n)		((Sreg(PS)<<4)+(n)->ip)
-
-/* parameter x = result, y = source 1, z = source 2 */
-
-#define SetTF(x)		(nec_state->TF = (x))
-#define SetIF(x)		(nec_state->IF = (x))
-#define SetDF(x)		(nec_state->DF = (x))
-#define SetMD(x)		(nec_state->MF = (x))	/* OB [19.07.99] Mode Flag V30 */
-
-#define SetCFB(x)		(nec_state->CarryVal = (x) & 0x100)
-#define SetCFW(x)		(nec_state->CarryVal = (x) & 0x10000)
-#define SetAF(x,y,z)	(nec_state->AuxVal = ((x) ^ ((y) ^ (z))) & 0x10)
-#define SetSF(x)		(nec_state->SignVal = (x))
-#define SetZF(x)		(nec_state->ZeroVal = (x))
-#define SetPF(x)		(nec_state->ParityVal = (x))
-
-#define SetSZPF_Byte(x) (nec_state->SignVal=nec_state->ZeroVal=nec_state->ParityVal=(INT8)(x))
-#define SetSZPF_Word(x) (nec_state->SignVal=nec_state->ZeroVal=nec_state->ParityVal=(INT16)(x))
-
-#define SetOFW_Add(x,y,z)	(nec_state->OverVal = ((x) ^ (y)) & ((x) ^ (z)) & 0x8000)
-#define SetOFB_Add(x,y,z)	(nec_state->OverVal = ((x) ^ (y)) & ((x) ^ (z)) & 0x80)
-#define SetOFW_Sub(x,y,z)	(nec_state->OverVal = ((z) ^ (y)) & ((z) ^ (x)) & 0x8000)
-#define SetOFB_Sub(x,y,z)	(nec_state->OverVal = ((z) ^ (y)) & ((z) ^ (x)) & 0x80)
-
-#define ADDB { UINT32 res=dst+src; SetCFB(res); SetOFB_Add(res,src,dst); SetAF(res,src,dst); SetSZPF_Byte(res); dst=(BYTE)res; }
-#define ADDW { UINT32 res=dst+src; SetCFW(res); SetOFW_Add(res,src,dst); SetAF(res,src,dst); SetSZPF_Word(res); dst=(WORD)res; }
-
-#define SUBB { UINT32 res=dst-src; SetCFB(res); SetOFB_Sub(res,src,dst); SetAF(res,src,dst); SetSZPF_Byte(res); dst=(BYTE)res; }
-#define SUBW { UINT32 res=dst-src; SetCFW(res); SetOFW_Sub(res,src,dst); SetAF(res,src,dst); SetSZPF_Word(res); dst=(WORD)res; }
-
-#define ORB dst|=src; nec_state->CarryVal=nec_state->OverVal=nec_state->AuxVal=0; SetSZPF_Byte(dst)
-#define ORW dst|=src; nec_state->CarryVal=nec_state->OverVal=nec_state->AuxVal=0; SetSZPF_Word(dst)
-
-#define ANDB dst&=src; nec_state->CarryVal=nec_state->OverVal=nec_state->AuxVal=0; SetSZPF_Byte(dst)
-#define ANDW dst&=src; nec_state->CarryVal=nec_state->OverVal=nec_state->AuxVal=0; SetSZPF_Word(dst)
-
-#define XORB dst^=src; nec_state->CarryVal=nec_state->OverVal=nec_state->AuxVal=0; SetSZPF_Byte(dst)
-#define XORW dst^=src; nec_state->CarryVal=nec_state->OverVal=nec_state->AuxVal=0; SetSZPF_Word(dst)
 
 #define CF		(nec_state->CarryVal!=0)
 #define SF		(nec_state->SignVal<0)
@@ -137,13 +170,14 @@ typedef enum {
 #define PF		parity_table[(BYTE)nec_state->ParityVal]
 #define AF		(nec_state->AuxVal!=0)
 #define OF		(nec_state->OverVal!=0)
+#define RB		(nec_state->RBW >> 4)
 
 /************************************************************************/
 
-int v25_read_byte(v25_state_t *nec_state, unsigned a);
-int v25_read_word(v25_state_t *nec_state, unsigned a);
-void v25_write_byte(v25_state_t *nec_state, unsigned a, unsigned d);
-void v25_write_word(v25_state_t *nec_state, unsigned a, unsigned d);
+UINT8 v25_read_byte(v25_state_t *nec_state, unsigned a);
+UINT16 v25_read_word(v25_state_t *nec_state, unsigned a);
+void v25_write_byte(v25_state_t *nec_state, unsigned a, UINT8 d);
+void v25_write_word(v25_state_t *nec_state, unsigned a, UINT16 d);
 
 #define read_mem_byte(a)			v25_read_byte(nec_state,(a))
 #define read_mem_word(a)			v25_read_word(nec_state,(a))
@@ -202,7 +236,7 @@ void v25_write_word(v25_state_t *nec_state, unsigned a, unsigned d);
 /************************************************************************/
 #define CompressFlags() (WORD)(CF | (nec_state->IBRK << 1) | (PF << 2) | (nec_state->F0 << 3) | (AF << 4) \
 				| (nec_state->F1 << 5) | (ZF << 6) | (SF << 7) | (nec_state->TF << 8) | (nec_state->IF << 9) \
-				| (nec_state->DF << 10) | (OF << 11) | (nec_state->RB << 12) | (nec_state->MF << 15))
+				| (nec_state->DF << 10) | (OF << 11) | (RB << 12) | (nec_state->MF << 15))
 
 #define ExpandFlags(f) \
 { \
@@ -218,237 +252,6 @@ void v25_write_word(v25_state_t *nec_state, unsigned a, unsigned d);
 	nec_state->IF = ((f) & 0x0200) == 0x0200; \
 	nec_state->DF = ((f) & 0x0400) == 0x0400; \
 	nec_state->OverVal = (f) & 0x0800; \
-	/* RB only changes on interrupts, so skip it */ \
+	/* RB only changes on BRKCS/RETRBI/TSKSW, so skip it */ \
 	nec_state->MF = ((f) & 0x8000) == 0x8000; \
-}
-
-#define IncWordReg(Reg) 					\
-	unsigned tmp = (unsigned)Wreg(Reg); \
-	unsigned tmp1 = tmp+1;					\
-	nec_state->OverVal = (tmp == 0x7fff);			\
-	SetAF(tmp1,tmp,1);						\
-	SetSZPF_Word(tmp1); 					\
-	Wreg(Reg)=tmp1
-
-#define DecWordReg(Reg) 					\
-	unsigned tmp = (unsigned)Wreg(Reg); \
-    unsigned tmp1 = tmp-1;					\
-	nec_state->OverVal = (tmp == 0x8000);			\
-    SetAF(tmp1,tmp,1);						\
-    SetSZPF_Word(tmp1); 					\
-	Wreg(Reg)=tmp1
-
-#define JMP(flag)							\
-	int tmp;								\
-	EMPTY_PREFETCH();						\
-	tmp = (int)((INT8)FETCH());				\
-	if (flag)								\
-	{										\
-		static const UINT8 table[3]={3,10,10};	\
-		nec_state->ip = (WORD)(nec_state->ip+tmp);			\
-		nec_state->icount-=table[nec_state->chip_type/8];	\
-		CHANGE_PC;							\
-		return;								\
-	}
-
-#define ADJ4(param1,param2)					\
-	if (AF || ((Breg(AL) & 0xf) > 9))	\
-	{										\
-		UINT16 tmp;							\
-		tmp = Breg(AL) + param1;		\
-		Breg(AL) = tmp;					\
-		nec_state->AuxVal = 1;						\
-		nec_state->CarryVal |= tmp & 0x100;			\
-	}										\
-	if (CF || (Breg(AL)>0x9f))			\
-	{										\
-		Breg(AL) += param2;				\
-		nec_state->CarryVal = 1;						\
-	}										\
-	SetSZPF_Byte(Breg(AL))
-
-#define ADJB(param1,param2)					\
-	if (AF || ((Breg(AL) & 0xf) > 9))	\
-    {										\
-		Breg(AL) += param1;				\
-		Breg(AH) += param2;				\
-		nec_state->AuxVal = 1;						\
-		nec_state->CarryVal = 1;						\
-    }										\
-	else									\
-	{										\
-		nec_state->AuxVal = 0;						\
-		nec_state->CarryVal = 0;						\
-    }										\
-	Breg(AL) &= 0x0F
-
-#define BITOP_BYTE							\
-	ModRM = FETCH();							\
-	if (ModRM >= 0xc0) {					\
-		tmp=Breg(Mod_RM.RM.b[ModRM]);	\
-	}										\
-	else {									\
-		(*GetEA[ModRM])(nec_state);					\
-		tmp=read_mem_byte(EA);					\
-    }
-
-#define BITOP_WORD							\
-	ModRM = FETCH();							\
-	if (ModRM >= 0xc0) {					\
-		tmp=Wreg(Mod_RM.RM.w[ModRM]);	\
-	}										\
-	else {									\
-		(*GetEA[ModRM])(nec_state);					\
-		tmp=read_mem_word(EA);					\
-    }
-
-#define BIT_NOT								\
-	if (tmp & (1<<tmp2))					\
-		tmp &= ~(1<<tmp2);					\
-	else									\
-		tmp |= (1<<tmp2)
-
-#define XchgAWReg(Reg)						\
-    WORD tmp;								\
-	tmp = Wreg(Reg);					\
-	Wreg(Reg) = Wreg(AW);			\
-	Wreg(AW) = tmp
-
-#define ROL_BYTE nec_state->CarryVal = dst & 0x80; dst = (dst << 1)+CF
-#define ROL_WORD nec_state->CarryVal = dst & 0x8000; dst = (dst << 1)+CF
-#define ROR_BYTE nec_state->CarryVal = dst & 0x1; dst = (dst >> 1)+(CF<<7)
-#define ROR_WORD nec_state->CarryVal = dst & 0x1; dst = (dst >> 1)+(CF<<15)
-#define ROLC_BYTE dst = (dst << 1) + CF; SetCFB(dst)
-#define ROLC_WORD dst = (dst << 1) + CF; SetCFW(dst)
-#define RORC_BYTE dst = (CF<<8)+dst; nec_state->CarryVal = dst & 0x01; dst >>= 1
-#define RORC_WORD dst = (CF<<16)+dst; nec_state->CarryVal = dst & 0x01; dst >>= 1
-#define SHL_BYTE(c) nec_state->icount-=c; dst <<= c;	SetCFB(dst); SetSZPF_Byte(dst);	PutbackRMByte(ModRM,(BYTE)dst)
-#define SHL_WORD(c) nec_state->icount-=c; dst <<= c;	SetCFW(dst); SetSZPF_Word(dst);	PutbackRMWord(ModRM,(WORD)dst)
-#define SHR_BYTE(c) nec_state->icount-=c; dst >>= c-1; nec_state->CarryVal = dst & 0x1; dst >>= 1; SetSZPF_Byte(dst); PutbackRMByte(ModRM,(BYTE)dst)
-#define SHR_WORD(c) nec_state->icount-=c; dst >>= c-1; nec_state->CarryVal = dst & 0x1; dst >>= 1; SetSZPF_Word(dst); PutbackRMWord(ModRM,(WORD)dst)
-#define SHRA_BYTE(c) nec_state->icount-=c; dst = ((INT8)dst) >> (c-1);	nec_state->CarryVal = dst & 0x1;	dst = ((INT8)((BYTE)dst)) >> 1; SetSZPF_Byte(dst); PutbackRMByte(ModRM,(BYTE)dst)
-#define SHRA_WORD(c) nec_state->icount-=c; dst = ((INT16)dst) >> (c-1);	nec_state->CarryVal = dst & 0x1;	dst = ((INT16)((WORD)dst)) >> 1; SetSZPF_Word(dst); PutbackRMWord(ModRM,(WORD)dst)
-
-#define DIVUB												\
-	uresult = Wreg(AW);									\
-	uresult2 = uresult % tmp;								\
-	if ((uresult /= tmp) > 0xff) {							\
-		nec_interrupt(nec_state, 0,0); break;							\
-	} else {												\
-		Breg(AL) = uresult;								\
-		Breg(AH) = uresult2;							\
-	}
-
-#define DIVB												\
-	result = (INT16)Wreg(AW);							\
-	result2 = result % (INT16)((INT8)tmp);					\
-	if ((result /= (INT16)((INT8)tmp)) > 0xff) {			\
-		nec_interrupt(nec_state, 0,0); break;							\
-	} else {												\
-		Breg(AL) = result;								\
-		Breg(AH) = result2;								\
-	}
-
-#define DIVUW												\
-	uresult = (((UINT32)Wreg(DW)) << 16) | Wreg(AW);\
-	uresult2 = uresult % tmp;								\
-	if ((uresult /= tmp) > 0xffff) {						\
-		nec_interrupt(nec_state, 0,0); break;							\
-	} else {												\
-		Wreg(AW)=uresult;								\
-		Wreg(DW)=uresult2;								\
-	}
-
-#define DIVW												\
-	result = ((UINT32)Wreg(DW) << 16) + Wreg(AW);	\
-	result2 = result % (INT32)((INT16)tmp);					\
-	if ((result /= (INT32)((INT16)tmp)) > 0xffff) {			\
-		nec_interrupt(nec_state, 0,0); break;							\
-	} else {												\
-		Wreg(AW)=result;								\
-		Wreg(DW)=result2;								\
-	}
-
-#define ADD4S {												\
-	int i,v1,v2,result;										\
-	int count = (Breg(CL)+1)/2;							\
-	unsigned di = Wreg(IY);								\
-	unsigned si = Wreg(IX);								\
-	static const UINT8 table[3]={18,19,19};					\
-	if (nec_state->seg_prefix) logerror("%06x: Warning: seg_prefix defined for add4s\n",PC(nec_state));	\
-	nec_state->ZeroVal = nec_state->CarryVal = 0;								\
-	for (i=0;i<count;i++) {									\
-		nec_state->icount-=table[nec_state->chip_type/8];					\
-		tmp = GetMemB(DS0, si);								\
-		tmp2 = GetMemB(DS1, di);							\
-		v1 = (tmp>>4)*10 + (tmp&0xf);						\
-		v2 = (tmp2>>4)*10 + (tmp2&0xf);						\
-		result = v1+v2+nec_state->CarryVal;							\
-		nec_state->CarryVal = result > 99 ? 1 : 0;					\
-		result = result % 100;								\
-		v1 = ((result/10)<<4) | (result % 10);				\
-		PutMemB(DS1, di,v1);								\
-		if (v1) nec_state->ZeroVal = 1;								\
-		si++;												\
-		di++;												\
-	}														\
-}
-
-#define SUB4S {												\
-	int count = (Breg(CL)+1)/2;							\
-	int i,v1,v2,result;										\
-    unsigned di = Wreg(IY);								\
-	unsigned si = Wreg(IX);								\
-	static const UINT8 table[3]={18,19,19};					\
-	if (nec_state->seg_prefix) logerror("%06x: Warning: seg_prefix defined for sub4s\n",PC(nec_state));	\
-	nec_state->ZeroVal = nec_state->CarryVal = 0;								\
-	for (i=0;i<count;i++) {									\
-		nec_state->icount-=table[nec_state->chip_type/8];					\
-		tmp = GetMemB(DS1, di);								\
-		tmp2 = GetMemB(DS0, si);							\
-		v1 = (tmp>>4)*10 + (tmp&0xf);						\
-		v2 = (tmp2>>4)*10 + (tmp2&0xf);						\
-		if (v1 < (v2+nec_state->CarryVal)) {							\
-			v1+=100;										\
-			result = v1-(v2+nec_state->CarryVal);					\
-			nec_state->CarryVal = 1;									\
-		} else {											\
-			result = v1-(v2+nec_state->CarryVal);					\
-			nec_state->CarryVal = 0;									\
-		}													\
-		v1 = ((result/10)<<4) | (result % 10);				\
-		PutMemB(DS1, di,v1);								\
-		if (v1) nec_state->ZeroVal = 1;								\
-		si++;												\
-		di++;												\
-	}														\
-}
-
-#define CMP4S {												\
-	int count = (Breg(CL)+1)/2;							\
-	int i,v1,v2,result;										\
-    unsigned di = Wreg(IY);								\
-	unsigned si = Wreg(IX);								\
-	static const UINT8 table[3]={14,19,19};					\
-	if (nec_state->seg_prefix) logerror("%06x: Warning: seg_prefix defined for cmp4s\n",PC(nec_state));	\
-	nec_state->ZeroVal = nec_state->CarryVal = 0;								\
-	for (i=0;i<count;i++) {									\
-		nec_state->icount-=table[nec_state->chip_type/8];					\
-		tmp = GetMemB(DS1, di);								\
-		tmp2 = GetMemB(DS0, si);							\
-		v1 = (tmp>>4)*10 + (tmp&0xf);						\
-		v2 = (tmp2>>4)*10 + (tmp2&0xf);						\
-		if (v1 < (v2+nec_state->CarryVal)) {							\
-			v1+=100;										\
-			result = v1-(v2+nec_state->CarryVal);					\
-			nec_state->CarryVal = 1;									\
-		} else {											\
-			result = v1-(v2+nec_state->CarryVal);					\
-			nec_state->CarryVal = 0;									\
-		}													\
-		v1 = ((result/10)<<4) | (result % 10);				\
-		if (v1) nec_state->ZeroVal = 1;								\
-		si++;												\
-		di++;												\
-	}														\
 }

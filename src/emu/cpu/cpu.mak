@@ -1166,6 +1166,7 @@ $(CPUOBJ)/nec/nec.o:	$(CPUSRC)/nec/nec.c \
 						$(CPUSRC)/nec/necea.h \
 						$(CPUSRC)/nec/necinstr.c \
 						$(CPUSRC)/nec/necinstr.h \
+						$(CPUSRC)/nec/necmacro.h \
 						$(CPUSRC)/nec/necmodrm.h \
 						$(CPUSRC)/nec/necpriv.h
 
@@ -1175,6 +1176,7 @@ $(CPUOBJ)/nec/v25.o:	$(CPUSRC)/nec/v25.c \
 						$(CPUSRC)/nec/necinstr.c \
 						$(CPUSRC)/nec/v25instr.c \
 						$(CPUSRC)/nec/v25instr.h \
+						$(CPUSRC)/nec/necmacro.h \
 						$(CPUSRC)/nec/necmodrm.h \
 						$(CPUSRC)/nec/v25priv.h
 

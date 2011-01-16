@@ -114,8 +114,6 @@ typedef UINT32 DWORD;
 #include "nec.h"
 #include "necpriv.h"
 
-#define PC(n)		((Sreg(PS)<<4)+(n)->ip)
-
 extern int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, const nec_config *config);
 
 INLINE nec_state_t *get_safe_token(device_t *device)
@@ -126,12 +124,6 @@ INLINE nec_state_t *get_safe_token(device_t *device)
 		   device->type() == V33);
 	return (nec_state_t *)downcast<legacy_cpu_device *>(device)->token();
 }
-
-/* The interrupt number of a pending external interrupt pending NMI is 2.   */
-/* For INTR interrupts, the level is caught on the bus during an INTA cycle */
-
-#define INT_IRQ 0x01
-#define NMI_IRQ 0x02
 
 INLINE void prefetch(nec_state_t *nec_state)
 {
@@ -186,6 +178,7 @@ INLINE UINT16 fetchword(nec_state_t *nec_state)
 }
 
 #include "necinstr.h"
+#include "necmacro.h"
 #include "necea.h"
 #include "necmodrm.h"
 
@@ -204,11 +197,8 @@ static UINT8 fetchop(nec_state_t *nec_state)
 static CPU_RESET( nec )
 {
 	nec_state_t *nec_state = get_safe_token(device);
-	unsigned int i,j,c;
-    static const BREGS reg_name[8]={ AL, CL, DL, BL, AH, CH, DH, BH };
 
 	memset( &nec_state->regs.w, 0, sizeof(nec_state->regs.w));
-	memset( &nec_state->sregs, 0, sizeof(nec_state->sregs));
 
 	nec_state->ip = 0;
 	nec_state->TF = 0;
@@ -216,44 +206,22 @@ static CPU_RESET( nec )
 	nec_state->DF = 0;
 	nec_state->MF = 1;
 	nec_state->SignVal = 0;
-	nec_state->int_vector = 0;
+	nec_state->AuxVal = 0;
+	nec_state->OverVal = 0;
+	nec_state->ZeroVal = 1;
+	nec_state->CarryVal = 0;
+	nec_state->ParityVal = 1;
 	nec_state->pending_irq = 0;
 	nec_state->nmi_state = 0;
 	nec_state->irq_state = 0;
-	nec_state->poll_state = 0;
-	nec_state->AuxVal = 0;
-	nec_state->OverVal = 0;
-	nec_state->ZeroVal = 0;
-	nec_state->CarryVal = 0;
-	nec_state->ParityVal = 0;
-
+	nec_state->poll_state = 1;
 
 	Sreg(PS) = 0xffff;
+	Sreg(SS) = 0;
+	Sreg(DS0) = 0;
+	Sreg(DS1) = 0;
 
 	CHANGE_PC;
-
-    for (i = 0;i < 256; i++)
-    {
-		for (j = i, c = 0; j > 0; j >>= 1)
-			if (j & 1) c++;
-		parity_table[i] = !(c & 1);
-    }
-
-	nec_state->ZeroVal = nec_state->ParityVal = 1;
-
-    for (i = 0; i < 256; i++)
-    {
-		Mod_RM.reg.b[i] = reg_name[(i & 0x38) >> 3];
-		Mod_RM.reg.w[i] = (WREGS) ( (i & 0x38) >> 3) ;
-    }
-
-    for (i = 0xc0; i < 0x100; i++)
-    {
-		Mod_RM.RM.w[i] = (WREGS)( i & 7 );
-		Mod_RM.RM.b[i] = (BREGS)reg_name[i & 7];
-    }
-
-	nec_state->poll_state = 1;
 }
 
 static CPU_EXIT( nec )
@@ -261,20 +229,15 @@ static CPU_EXIT( nec )
 
 }
 
-static void nec_interrupt(nec_state_t *nec_state, unsigned int_num, ATTR_UNUSED unsigned mode)
+static void nec_interrupt(nec_state_t *nec_state, unsigned int_num, INTSOURCES source)
 {
     UINT32 dest_seg, dest_off;
 
     i_pushf(nec_state);
 	nec_state->TF = nec_state->IF = 0;
 
-	if (int_num == -1)
-	{
+	if (source == INT_IRQ)	/* get vector */
 		int_num = (*nec_state->irq_callback)(nec_state->device, 0);
-
-		nec_state->irq_state = CLEAR_LINE;
-		nec_state->pending_irq &= ~INT_IRQ;
-	}
 
     dest_off = read_mem_word(int_num*4);
     dest_seg = read_mem_word(int_num*4+2);
@@ -289,21 +252,23 @@ static void nec_interrupt(nec_state_t *nec_state, unsigned int_num, ATTR_UNUSED 
 static void nec_trap(nec_state_t *nec_state)
 {
 	nec_instruction[fetchop(nec_state)](nec_state);
-	nec_interrupt(nec_state, 1,0);
+	nec_interrupt(nec_state, NEC_TRAP_VECTOR, BRK);
 }
 
 static void external_int(nec_state_t *nec_state)
 {
-	if( nec_state->pending_irq & NMI_IRQ )
+	if (nec_state->pending_irq & NMI_IRQ)
 	{
-		nec_interrupt(nec_state, NEC_NMI_INT_VECTOR,0);
+		nec_interrupt(nec_state, NEC_NMI_VECTOR, NMI_IRQ);
 		nec_state->pending_irq &= ~NMI_IRQ;
 	}
-	else if( nec_state->pending_irq )
+	else if (nec_state->pending_irq)
 	{
 		/* the actual vector is retrieved after pushing flags */
 		/* and clearing the IF */
-		nec_interrupt(nec_state, (UINT32)-1,0);
+		nec_interrupt(nec_state, (UINT32)-1, INT_IRQ);
+		nec_state->irq_state = CLEAR_LINE;
+		nec_state->pending_irq &= ~INT_IRQ;
 	}
 }
 
@@ -317,34 +282,25 @@ static void external_int(nec_state_t *nec_state)
 
 static void set_irq_line(nec_state_t *nec_state, int irqline, int state)
 {
-	if (irqline == INPUT_LINE_NMI)
+	switch (irqline)
 	{
-		if( nec_state->nmi_state == state ) return;
-	    nec_state->nmi_state = state;
-		if (state != CLEAR_LINE)
-		{
-			nec_state->pending_irq |= NMI_IRQ;
-		}
-	}
-	else
-	{
-		nec_state->irq_state = state;
-		if (state == CLEAR_LINE)
-		{
-	//      if (!nec_state->IF)  NS010718 fix interrupt request loss
+		case 0:
+			nec_state->irq_state = state;
+			if (state == CLEAR_LINE)
 				nec_state->pending_irq &= ~INT_IRQ;
-		}
-		else
-		{
-	//      if (nec_state->IF)   NS010718 fix interrupt request loss
+			else
 				nec_state->pending_irq |= INT_IRQ;
-		}
+			break;
+		case INPUT_LINE_NMI:
+			if (nec_state->nmi_state == state) return;
+		    nec_state->nmi_state = state;
+			if (state != CLEAR_LINE)
+				nec_state->pending_irq |= NMI_IRQ;
+			break;
+		case NEC_INPUT_LINE_POLL:
+			nec_state->poll_state = state;
+			break;
 	}
-}
-
-static void set_poll_line(nec_state_t *nec_state, int state)
-{
-	nec_state->poll_state = state;
 }
 
 static CPU_DISASSEMBLE( nec )
@@ -356,6 +312,32 @@ static void nec_init(legacy_cpu_device *device, device_irq_callback irqcallback,
 {
 	nec_state_t *nec_state = get_safe_token(device);
 
+	unsigned int i, j, c;
+
+	static const WREGS wreg_name[8]={ AW, CW, DW, BW, SP, BP, IX, IY };
+	static const BREGS breg_name[8]={ AL, CL, DL, BL, AH, CH, DH, BH };
+
+	for (i = 0; i < 256; i++)
+	{
+		for (j = i, c = 0; j > 0; j >>= 1)
+			if (j & 1) c++;
+		parity_table[i] = !(c & 1);
+	}
+
+	for (i = 0; i < 256; i++)
+	{
+		Mod_RM.reg.b[i] = breg_name[(i & 0x38) >> 3];
+		Mod_RM.reg.w[i] = wreg_name[(i & 0x38) >> 3];
+	}
+
+	for (i = 0xc0; i < 0x100; i++)
+	{
+		Mod_RM.RM.w[i] = wreg_name[i & 7];
+		Mod_RM.RM.b[i] = breg_name[i & 7];
+	}
+
+	memset(nec_state, 0, sizeof(nec_state));
+
 	state_save_register_device_item_array(device, 0, nec_state->regs.w);
 	state_save_register_device_item_array(device, 0, nec_state->sregs);
 
@@ -365,16 +347,15 @@ static void nec_init(legacy_cpu_device *device, device_irq_callback irqcallback,
 	state_save_register_device_item(device, 0, nec_state->DF);
 	state_save_register_device_item(device, 0, nec_state->MF);
 	state_save_register_device_item(device, 0, nec_state->SignVal);
-	state_save_register_device_item(device, 0, nec_state->int_vector);
-	state_save_register_device_item(device, 0, nec_state->pending_irq);
-	state_save_register_device_item(device, 0, nec_state->nmi_state);
-	state_save_register_device_item(device, 0, nec_state->irq_state);
-	state_save_register_device_item(device, 0, nec_state->poll_state);
 	state_save_register_device_item(device, 0, nec_state->AuxVal);
 	state_save_register_device_item(device, 0, nec_state->OverVal);
 	state_save_register_device_item(device, 0, nec_state->ZeroVal);
 	state_save_register_device_item(device, 0, nec_state->CarryVal);
 	state_save_register_device_item(device, 0, nec_state->ParityVal);
+	state_save_register_device_item(device, 0, nec_state->pending_irq);
+	state_save_register_device_item(device, 0, nec_state->nmi_state);
+	state_save_register_device_item(device, 0, nec_state->irq_state);
+	state_save_register_device_item(device, 0, nec_state->poll_state);
 
 	nec_state->irq_callback = irqcallback;
 	nec_state->device = device;
@@ -463,9 +444,9 @@ static CPU_SET_INFO( nec )
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + 0:					set_irq_line(nec_state, 0, info->i);				break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		set_irq_line(nec_state, INPUT_LINE_NMI, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + NEC_INPUT_LINE_POLL:	set_poll_line(nec_state, info->i);					break;
+		case CPUINFO_INT_INPUT_STATE + 0:					set_irq_line(nec_state, 0, info->i);					break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		set_irq_line(nec_state, INPUT_LINE_NMI, info->i);		break;
+		case CPUINFO_INT_INPUT_STATE + NEC_INPUT_LINE_POLL:	set_irq_line(nec_state, NEC_INPUT_LINE_POLL, info->i);	break;
 
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + NEC_PC:
@@ -493,7 +474,7 @@ static CPU_SET_INFO( nec )
 			break;
 		case CPUINFO_INT_REGISTER + NEC_SP:				Wreg(SP) = info->i;					break;
 		case CPUINFO_INT_REGISTER + NEC_FLAGS:			ExpandFlags(info->i);					break;
-        case CPUINFO_INT_REGISTER + NEC_AW:				Wreg(AW) = info->i;					break;
+		case CPUINFO_INT_REGISTER + NEC_AW:				Wreg(AW) = info->i;					break;
 		case CPUINFO_INT_REGISTER + NEC_CW:				Wreg(CW) = info->i;					break;
 		case CPUINFO_INT_REGISTER + NEC_DW:				Wreg(DW) = info->i;					break;
 		case CPUINFO_INT_REGISTER + NEC_BW:				Wreg(BW) = info->i;					break;
@@ -504,7 +485,6 @@ static CPU_SET_INFO( nec )
 		case CPUINFO_INT_REGISTER + NEC_CS:				Sreg(PS) = info->i;					break;
 		case CPUINFO_INT_REGISTER + NEC_SS:				Sreg(SS) = info->i;					break;
 		case CPUINFO_INT_REGISTER + NEC_DS:				Sreg(DS0) = info->i;					break;
-		case CPUINFO_INT_REGISTER + NEC_VECTOR:			nec_state->int_vector = info->i;					break;
 	}
 }
 
@@ -534,8 +514,8 @@ static CPU_GET_INFO( nec )
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 80;							break;
 
 		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 16;					break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 20;					break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 20;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM:	info->i = 0;					break;
 		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
 		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
 		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:	info->i = 0;					break;
@@ -555,7 +535,7 @@ static CPU_GET_INFO( nec )
 		case CPUINFO_INT_SP:							info->i = (Sreg(SS)<<4) + Wreg(SP); break;
 		case CPUINFO_INT_REGISTER + NEC_SP:				info->i = Wreg(SP);					break;
 		case CPUINFO_INT_REGISTER + NEC_FLAGS:			info->i = CompressFlags();				break;
-        case CPUINFO_INT_REGISTER + NEC_AW:				info->i = Wreg(AW);					break;
+		case CPUINFO_INT_REGISTER + NEC_AW:				info->i = Wreg(AW);					break;
 		case CPUINFO_INT_REGISTER + NEC_CW:				info->i = Wreg(CW);					break;
 		case CPUINFO_INT_REGISTER + NEC_DW:				info->i = Wreg(DW);					break;
 		case CPUINFO_INT_REGISTER + NEC_BW:				info->i = Wreg(BW);					break;
@@ -566,7 +546,6 @@ static CPU_GET_INFO( nec )
 		case CPUINFO_INT_REGISTER + NEC_CS:				info->i = Sreg(PS);					break;
 		case CPUINFO_INT_REGISTER + NEC_SS:				info->i = Sreg(SS);					break;
 		case CPUINFO_INT_REGISTER + NEC_DS:				info->i = Sreg(DS0);					break;
-		case CPUINFO_INT_REGISTER + NEC_VECTOR:			info->i = nec_state->int_vector;					break;
 		case CPUINFO_INT_REGISTER + NEC_PENDING:		info->i = nec_state->pending_irq;				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
@@ -582,9 +561,9 @@ static CPU_GET_INFO( nec )
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "NEC");					break;
 		case DEVINFO_STR_FAMILY:					strcpy(info->s, "NEC V-Series");		break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.5");					break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "2.0");					break;
 		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "NEC emulator v1.5 by Bryan McPhail"); break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Bryan McPhail (V25/V35 support added by Alex W. Jackson)"); break;
 
 		case CPUINFO_STR_FLAGS:
             flags = CompressFlags();
@@ -622,7 +601,6 @@ static CPU_GET_INFO( nec )
         case CPUINFO_STR_REGISTER + NEC_CS:				sprintf(info->s, "PS:%04X", Sreg(PS)); break;
         case CPUINFO_STR_REGISTER + NEC_SS:				sprintf(info->s, "SS:%04X", Sreg(SS)); break;
         case CPUINFO_STR_REGISTER + NEC_DS:				sprintf(info->s, "DS0:%04X", Sreg(DS0)); break;
-        case CPUINFO_STR_REGISTER + NEC_VECTOR:			sprintf(info->s, "V:%02X", nec_state->int_vector); break;
 	}
 }
 

@@ -824,7 +824,7 @@ static MACHINE_CONFIG_START( firebarr, driver_device )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 
-	MCFG_CPU_ADD("soundcpu", V35, 14318000/2)
+	MCFG_CPU_ADD("soundcpu", V35, 14318000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_CONFIG(firebarr_config)
 

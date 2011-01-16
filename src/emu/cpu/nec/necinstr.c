@@ -43,7 +43,6 @@ OP( 0x0f, i_pre_nec  ) { UINT32 ModRM, tmp, tmp2;
 		case 0x2a : ModRM = FETCH(); tmp = GetRMByte(ModRM); tmp2 = (Breg(AL) & 0xf)<<4; Breg(AL) = (Breg(AL) & 0xf0) | (tmp&0xf); tmp = tmp2 | (tmp>>4);	PutbackRMByte(ModRM,tmp); CLKM(17,17,13,32,32,19); break;
 		case 0x31 : ModRM = FETCH(); ModRM=0; logerror("%06x: Unimplemented bitfield INS\n",PC(nec_state)); break;
 		case 0x33 : ModRM = FETCH(); ModRM=0; logerror("%06x: Unimplemented bitfield EXT\n",PC(nec_state)); break;
-		case 0x92 : CLK(2); break; /* V25/35 FINT */
 		case 0xe0 : ModRM = FETCH(); ModRM=0; logerror("%06x: V33 unimplemented BRKXA (break to expansion address)\n",PC(nec_state)); break;
 		case 0xf0 : ModRM = FETCH(); ModRM=0; logerror("%06x: V33 unimplemented RETXA (return from expansion address)\n",PC(nec_state)); break;
 		case 0xff : ModRM = FETCH(); ModRM=0; logerror("%06x: unimplemented BRKEM (break to 8080 emulation mode)\n",PC(nec_state)); break;
@@ -172,7 +171,7 @@ OP( 0x62, i_chkind  ) {
 	high= GetnextRMWord;
 	tmp= RegWord(ModRM);
 	if (tmp<low || tmp>high) {
-		nec_interrupt(nec_state, 5,0);
+		nec_interrupt(nec_state, NEC_CHKIND_VECTOR, BRK);
 	}
 	nec_state->icount-=20;
 	logerror("%06x: bound %04x high %04x low %04x tmp\n",PC(nec_state),high,low,tmp);
@@ -463,9 +462,9 @@ OP( 0xc9, i_leave ) {
 }
 OP( 0xca, i_retf_d16  ) { UINT32 count = FETCH(); count += FETCH() << 8; POP(nec_state->ip); POP(Sreg(PS)); Wreg(SP)+=count; CHANGE_PC; CLKS(32,32,16); }
 OP( 0xcb, i_retf      ) { POP(nec_state->ip); POP(Sreg(PS)); CHANGE_PC; CLKS(29,29,16); }
-OP( 0xcc, i_int3      ) { nec_interrupt(nec_state, 3,0); CLKS(50,50,24); }
-OP( 0xcd, i_int       ) { nec_interrupt(nec_state, FETCH(),0); CLKS(50,50,24); }
-OP( 0xce, i_into      ) { if (OF) { nec_interrupt(nec_state, 4,0); CLKS(52,52,26); } else CLK(3); }
+OP( 0xcc, i_int3      ) { nec_interrupt(nec_state, 3, BRK); CLKS(50,50,24); }
+OP( 0xcd, i_int       ) { nec_interrupt(nec_state, FETCH(), BRK); CLKS(50,50,24); }
+OP( 0xce, i_into      ) { if (OF) { nec_interrupt(nec_state, NEC_BRKV_VECTOR, BRK); CLKS(52,52,26); } else CLK(3); }
 OP( 0xcf, i_iret      ) { POP(nec_state->ip); POP(Sreg(PS)); i_popf(nec_state); CHANGE_PC; CLKS(39,39,19); }
 
 OP( 0xd0, i_rotshft_b ) {
@@ -620,8 +619,8 @@ OP( 0xf6, i_f6pre ) { UINT32 tmp; UINT32 uresult,uresult2; INT32 result,result2;
 		case 0x18: nec_state->CarryVal=(tmp!=0); tmp=(~tmp)+1; SetSZPF_Byte(tmp); PutbackRMByte(ModRM,tmp&0xff); nec_state->icount-=(ModRM >=0xc0 )?2:16; break; /* NEG */
 		case 0x20: uresult = Breg(AL)*tmp; Wreg(AW)=(WORD)uresult; nec_state->CarryVal=nec_state->OverVal=(Breg(AH)!=0); nec_state->icount-=(ModRM >=0xc0 )?30:36; break; /* MULU */
 		case 0x28: result = (INT16)((INT8)Breg(AL))*(INT16)((INT8)tmp); Wreg(AW)=(WORD)result; nec_state->CarryVal=nec_state->OverVal=(Breg(AH)!=0); nec_state->icount-=(ModRM >=0xc0 )?30:36; break; /* MUL */
-		case 0x30: if (tmp) { DIVUB; } else nec_interrupt(nec_state, 0,0); nec_state->icount-=(ModRM >=0xc0 )?43:53; break;
-		case 0x38: if (tmp) { DIVB;  } else nec_interrupt(nec_state, 0,0); nec_state->icount-=(ModRM >=0xc0 )?43:53; break;
+		case 0x30: if (tmp) { DIVUB; } else nec_interrupt(nec_state, NEC_DIVIDE_VECTOR, BRK); nec_state->icount-=(ModRM >=0xc0 )?43:53; break;
+		case 0x38: if (tmp) { DIVB;  } else nec_interrupt(nec_state, NEC_DIVIDE_VECTOR, BRK); nec_state->icount-=(ModRM >=0xc0 )?43:53; break;
 	}
 }
 
@@ -634,8 +633,8 @@ OP( 0xf7, i_f7pre   ) { UINT32 tmp,tmp2; UINT32 uresult,uresult2; INT32 result,r
 		case 0x18: nec_state->CarryVal=(tmp!=0); tmp=(~tmp)+1; SetSZPF_Word(tmp); PutbackRMWord(ModRM,tmp&0xffff); nec_state->icount-=(ModRM >=0xc0 )?2:16; break; /* NEG */
 		case 0x20: uresult = Wreg(AW)*tmp; Wreg(AW)=uresult&0xffff; Wreg(DW)=((UINT32)uresult)>>16; nec_state->CarryVal=nec_state->OverVal=(Wreg(DW)!=0); nec_state->icount-=(ModRM >=0xc0 )?30:36; break; /* MULU */
 		case 0x28: result = (INT32)((INT16)Wreg(AW))*(INT32)((INT16)tmp); Wreg(AW)=result&0xffff; Wreg(DW)=result>>16; nec_state->CarryVal=nec_state->OverVal=(Wreg(DW)!=0); nec_state->icount-=(ModRM >=0xc0 )?30:36; break; /* MUL */
-		case 0x30: if (tmp) { DIVUW; } else nec_interrupt(nec_state, 0,0); nec_state->icount-=(ModRM >=0xc0 )?43:53; break;
-		case 0x38: if (tmp) { DIVW;  } else nec_interrupt(nec_state, 0,0); nec_state->icount-=(ModRM >=0xc0 )?43:53; break;
+		case 0x30: if (tmp) { DIVUW; } else nec_interrupt(nec_state, NEC_DIVIDE_VECTOR, BRK); nec_state->icount-=(ModRM >=0xc0 )?43:53; break;
+		case 0x38: if (tmp) { DIVW;  } else nec_interrupt(nec_state, NEC_DIVIDE_VECTOR, BRK); nec_state->icount-=(ModRM >=0xc0 )?43:53; break;
 	}
 }
 
