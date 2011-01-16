@@ -16,6 +16,31 @@ static READ8_DEVICE_HANDLER( b_via_1_pb_r );
 static WRITE8_DEVICE_HANDLER( b_via_1_pa_w );
 static WRITE8_DEVICE_HANDLER( b_via_1_pb_w );
 
+
+/* VIA 0 (aka "PPCNP74", U6 @1C on schematics)
+	enabled at CE00-CFFF of main m6809 cpu when bankswitch is set to 0
+	port A:
+		bit 7: input, X from banking latch (d3 of banking register)
+		bit 6: input, Y from banking latch (d4 of banking register)
+		bit 5: input, Z from banking latch (d5 of banking register)
+		bit 4: N/C
+		bit 3: output, /RESET for audio subcpu
+		bit 2: output, /ENABLE for LS139@2H for reading control and dipswitch inputs to pbus
+		bit 1: output, MSb of selector for inputs to pbus
+		bit 0: output, LSb of "
+	port B:
+		bits 7-0: input/output: pbus
+	port C:
+		CA1: N/C
+		CA2: input? "TDISP" (not sure what this is)
+		CB1: ASH1 to via 1
+		CB2: ASH2 to via 1
+	/IRQ: to main m6809 cpu
+	/RES: from main reset generator/watchdog/button
+	
+	TODO: add XYZ inputs to port A read
+	TODO: figure out what TDISP is, may need to trace pcb
+	*/
 const via6522_interface b_via_0_interface =
 {
 	/*inputs : A/B         */ DEVCB_NULL, DEVCB_HANDLER(b_via_0_pb_r),
@@ -25,6 +50,29 @@ const via6522_interface b_via_0_interface =
 	/*irq                  */ DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)
 };
 
+/* VIA 1 (U18 @3C on schematics)
+	port A:
+		bits 7-0: input/output: pbus
+	port B:
+		bit 7: output?: TIMER1 OUT (used to gate NOISE (see below) to clock channel 1 of 6840, plus acts as channel 0 by itself)
+		bit 6: input: NOISE (from mn5837 14-bit LFSR, which also connects to clock above)
+		bit 5: N/C
+		bit 4: input: FMSEL1 (does not appear elsewhere on schematics! what does this do? needs tracing)
+		bit 3: input: FMSEL0 (does not appear elsewhere on schematics! what does this do? needs tracing)
+		bit 2: input: AM (does not appear elsewhere on schematics! what does this do? needs tracing)
+		bit 1: input: FM or AM (does not appear elsewhere on schematics! what does this do? needs tracing)
+		bit 0: input: DMOD DISABLE (does not appear elsewhere on schematics! what does this do? needs tracing)
+	port C:
+		CA1: AHS2 from via 0 (are these two switched?)
+		CA2: AHS1 from via 0 "
+		CB1: ??put: DMOD CLR (does not appear elsewhere on schematics! what does this do? needs tracing)
+		CB2: ??put: DMOD DATA (does not appear elsewhere on schematics! what does this do? needs tracing)
+	/IRQ: to audio/sub m6809 cpu
+	/RES: from audio reset bit of via 0
+	
+	TODO: the entirety of port B, much needs tracing
+	TODO: ports CB1 and CB2, need tracing; ports CA1 and CA2 could use verify as well
+	*/
 const via6522_interface b_via_1_interface =
 {
 	/*inputs : A/B         */ DEVCB_HANDLER(b_via_1_pa_r), DEVCB_HANDLER(b_via_1_pb_r),
@@ -36,11 +84,12 @@ const via6522_interface b_via_1_interface =
 
 static READ_LINE_DEVICE_HANDLER( b_via_0_ca2_r )
 {
-	return 0;
+	return 0; // TODO: TDISP on schematic; what is this?
 }
 
 static WRITE_LINE_DEVICE_HANDLER( b_via_0_ca2_w )
 {
+	// TODO: TDISP on schematic; what is this?
 }
 
 static READ8_DEVICE_HANDLER( b_via_0_pb_r )
@@ -69,7 +118,7 @@ static WRITE8_DEVICE_HANDLER( b_via_0_pa_w )
 			pbus = input_port_read(device->machine, "DSWB");
 			break;
 		case 3:
-			pbus = 0xff;
+			pbus = 0xff; // Technically DSWA, however it isn't populated on the board and is pulled to 0xFF with resistor pack
 			break;
 		}
 	}
@@ -87,7 +136,7 @@ static READ8_DEVICE_HANDLER( b_via_1_pa_r )
 
 static READ8_DEVICE_HANDLER( b_via_1_pb_r )
 {
-	return 0xff;
+	return 0xff; // TODO: sound readbacks go here
 }
 
 static WRITE8_DEVICE_HANDLER( b_via_1_pa_w )
@@ -97,6 +146,7 @@ static WRITE8_DEVICE_HANDLER( b_via_1_pa_w )
 
 static WRITE8_DEVICE_HANDLER( b_via_1_pb_w )
 {
+	// TODO: sound controls go here
 }
 
 DRIVER_INIT( beezer )
@@ -106,6 +156,7 @@ DRIVER_INIT( beezer )
 
 WRITE8_HANDLER( beezer_bankswitch_w )
 {
+	// TODO: latch X,Y,Z bits (bits 3,4,5 of write to here) for use by via 0
 	if ((data & 0x07) == 0)
 	{
 		via6522_device *via_0 = space->machine->device<via6522_device>("via6522_0");
