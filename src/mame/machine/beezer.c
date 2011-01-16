@@ -11,7 +11,6 @@ static READ8_DEVICE_HANDLER( b_via_0_pb_r );
 static WRITE8_DEVICE_HANDLER( b_via_0_pa_w );
 static WRITE8_DEVICE_HANDLER( b_via_0_pb_w );
 static READ_LINE_DEVICE_HANDLER( b_via_0_ca2_r );
-static WRITE_LINE_DEVICE_HANDLER( b_via_0_ca2_w );
 
 static READ8_DEVICE_HANDLER( b_via_1_pa_r );
 static READ8_DEVICE_HANDLER( b_via_1_pb_r );
@@ -34,20 +33,20 @@ static WRITE8_DEVICE_HANDLER( b_via_1_pb_w );
 		bits 7-0: input/output: pbus
 	port C:
 		CA1: N/C
-		CA2: input? "TDISP" (not sure what this is)
+		CA2: input: "TDISP" (one of the higher bits in the video line counter, a mirror of the D5 bit from beezer_line_r), done in /video/beezer.c
 		CB1: ASH1 to via 1
 		CB2: ASH2 to via 1
 	/IRQ: to main m6809 cpu
 	/RES: from main reset generator/watchdog/button
 	
-	TODO: figure out what TDISP is, may need to trace pcb
+	TODO: find a better way to attach ca2 read to beezer_line_r 
 	*/
 const via6522_interface b_via_0_interface =
 {
 	/*inputs : A/B         */ DEVCB_HANDLER(b_via_0_pa_r), DEVCB_HANDLER(b_via_0_pb_r),
 	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER("via6522_1", via6522_device, read_ca2), DEVCB_LINE(b_via_0_ca2_r), DEVCB_DEVICE_LINE_MEMBER("via6522_1", via6522_device, read_ca1),
 	/*outputs: A/B         */ DEVCB_HANDLER(b_via_0_pa_w), DEVCB_HANDLER(b_via_0_pb_w),
-	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_LINE(b_via_0_ca2_w), DEVCB_DEVICE_LINE_MEMBER("via6522_1", via6522_device, write_ca1),
+	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER("via6522_1", via6522_device, write_ca1),
 	/*irq                  */ DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)
 };
 
@@ -85,12 +84,8 @@ const via6522_interface b_via_1_interface =
 
 static READ_LINE_DEVICE_HANDLER( b_via_0_ca2_r )
 {
-	return 0; // TODO: TDISP on schematic; what is this?
-}
+	return 0; // TODO: TDISP on schematic, same as D5 bit of scanline count from 74LS161 counter at 7A
 
-static WRITE_LINE_DEVICE_HANDLER( b_via_0_ca2_w )
-{
-	// TODO: TDISP on schematic; what is this?
 }
 
 static READ8_DEVICE_HANDLER( b_via_0_pa_r )
@@ -124,7 +119,7 @@ static WRITE8_DEVICE_HANDLER( b_via_0_pa_w )
 			pbus = input_port_read(device->machine, "DSWB");
 			break;
 		case 3:
-			pbus = 0xff; // Technically DSWA, however it isn't populated on the board and is pulled to 0xFF with resistor pack
+			pbus = input_port_read(device->machine, "DSWA"); // Technically DSWA isn't populated on the board and is pulled to 0xFF with resistor pack, but there IS a DSWA port in the driver so we may as well use it.
 			break;
 		}
 	}

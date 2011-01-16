@@ -17,7 +17,8 @@
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE_MEMBER(beezer_state, videoram)
 	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xd000, 0xffff) AM_ROM AM_WRITE(beezer_bankswitch_w)
+	AM_RANGE(0xd000, 0xdfff) AM_ROM AM_WRITE(beezer_bankswitch_w) // ROM at G1, bankswitch
+	AM_RANGE(0xe000, 0xffff) AM_ROM // ROMS at G3, G5
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -98,6 +99,8 @@ static MACHINE_CONFIG_START( beezer, beezer_state )
 
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	//MCFG_SOUND_ADD("custom", BEEZER, 0)
+	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* via */
 	MCFG_VIA6522_ADD("via6522_0", 0, b_via_0_interface)
