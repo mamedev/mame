@@ -111,7 +111,7 @@ file_error sdl_read_socket(osd_file *file, void *buffer, UINT64 offset, UINT32 c
 file_error sdl_write_socket(osd_file *file, const void *buffer, UINT64 offset, UINT32 count, UINT32 *actual)
 {
 #ifndef SDLMAME_WIN32
-	UINT32 result;
+	ssize_t result;
 
 	result = write(file->handle, buffer, count);
 
