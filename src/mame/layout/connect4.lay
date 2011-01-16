@@ -313,7 +313,7 @@
 		<backdrop name="lamp16" element="bluepiece" state="0">
 			<bounds x="0" y="14" width="7" height="7"/>
 		</backdrop>
-		<backdrop name="lamp17" element="redpiece" state="0">
+		<backdrop name="lamp17" element="bluepiece" state="0">
 			<bounds x="8" y="14" width="7" height="7"/>
 		</backdrop>
 		<backdrop name="lamp18" element="bluepiece" state="0">

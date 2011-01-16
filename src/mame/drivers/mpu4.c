@@ -18,46 +18,8 @@
   30-01-2007: J Wallace: Characteriser rewritten to run the 'extra' data needed by some games.
   24-01-2007: J Wallace: With thanks to Canonman and HIGHWAYMAN/System 80, I was able to confirm a seemingly
               ghastly misuse of a PIA is actually on the real hardware. This fixes the meters.
-  30-12-2006: J Wallace: Fixed init routines, state saving is theoretically supported.
-  23-09-2006: Converted 7Segment code to cleaner version, but have yet to add new 16k EPROM, as
-              the original image was purported to come from a Barcrest BBS service, and is probably
-              more 'official'.
-  07-09-2006: It appears that the video firmware is intended to be a 16k EPROM, not 64k as dumped.
-              In fact, the current dump is just the code repeated 4 times, when nothing earlier than
-              0xC000 is ever called. Presumably, the ROM is loaded into C000, and the remainder of the
-              'ROM' space is in fact the extra 32k of RAM apparently needed to hold the video board data.
-              For now, we'll continue to use the old dump, as I am unsure as to how to map this in MAME.
-              Changed Turn Over's name, it's either 12 Pound or 20 Pound Turn Over, depending on settings.
 
-              At this stage, I cannot see how to progress any further with the emulation, so I have transferred
-              a non-AWP version of this driver to MAME for further study.
-
-  06-09-2006: Connect 4 added - VFD is currently reversed, although it looks to me like
-              that's the correct behaviour, and that my 'correction' for Old Timer was wrong.
-              AY sound does work, but is horrendous - presumably there's a filter on the
-              sound that I haven't spotted. Trackball is apparently connected to AUX1, via
-              Schmitt triggers - I wish I had a clue what this meant (El Condor).
-
-  05-09-2006: And the award for most bone-headed bug goes to.. me! the 6840 handler wasn't
-              resetting the clocks after timeout, so the wave frequencies were way off.
-              Machines now hang on reset due to a lack of reel support.
-              CHR decoding now included, but still requires knowledge of the data table
-              location - this should be present in the ROMs somewhere.
-
-  11-08-2006: It appears that the PIA IRQ's are not connected after all - but even
-              disabling these won't get around the PTM issues.
-              It also looks like the video card CHR is just a word-based version
-              of the original, byte-based chip, meaning that should be fairly simple
-              to emulate too, when the time comes.
-
-  08-07-2006: Revised mapping of peripherals, and found method of calculating CHR
-              values - although their use is still unknown.
-
-  11-05-2006: El Condor, working from schematics and photos at present
-  28-04-2006: El Condor
-  20-05-2004: Re-Animator
-
-  See http://agemame.mameworld.info/techinfo/mpu4.php for Information.
+See http://agemame.mameworld.info/techinfo/mpu4.php for Information.
 
 --- Board Setup ---
 
@@ -77,12 +39,6 @@ One of the advantages of the hardware setup was that the developer could change 
 up to a point, adding extra lamp support, different amounts of RAM, and (in many cases) an OKI MSM6376 or Yamaha synth chip
 and related PIA and PTM for improved audio (This was eventually made the only way to generate sound in MOD4 of the hardware,
 when the AY8913 was removed from the main board)
-
-Everything here is preliminary...  the boards are quite fussy with regards their self tests
-and the timing may have to be perfect for them to function correctly.  (as the comms are
-timer driven, the video is capable of various raster effects etc.)
-
-Datasheets are available for the main components, The AGEMAME site mirrors a few of the harder-to-find ones.
 
 --- Preliminary MPU4 Memorymap  ---
 
@@ -248,7 +204,6 @@ TODO: - Fix lamp timing, MAME doesn't update fast enough to see everything
 #include "machine/6840ptm.h"
 #include "machine/nvram.h"
 
-#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 #include "sound/okim6376.h"
@@ -292,9 +247,10 @@ static int IC23GB;
 static int IC23GA;
 static int prot_col;
 static int lamp_col;
+static int reel_flag;
 static int ic23_active;
 static int led_extend;
-static int serial_card_connected;
+static int link7a_connected;
 static int multiplex_smooth;
 static emu_timer *ic24_timer;
 static TIMER_CALLBACK( ic24_timeout );
@@ -460,7 +416,7 @@ static WRITE_LINE_DEVICE_HANDLER( cpu0_irq )
 	device_t *pia6 = device->machine->device("pia_ic6");
 	device_t *pia7 = device->machine->device("pia_ic7");
 	device_t *pia8 = device->machine->device("pia_ic8");
-	device_t *ptm6840 = device->machine->device("6840ptm");
+	device_t *ptm2 = device->machine->device("ptm_ic2");
 
 	/* The PIA and PTM IRQ lines are all connected to a common PCB track, leading directly to the 6809 IRQ line. */
 	int combined_state = pia6821_get_irq_a(pia3) | pia6821_get_irq_b(pia3) |
@@ -469,9 +425,9 @@ static WRITE_LINE_DEVICE_HANDLER( cpu0_irq )
 						 pia6821_get_irq_a(pia6) | pia6821_get_irq_b(pia6) |
 						 pia6821_get_irq_a(pia7) | pia6821_get_irq_b(pia7) |
 						 pia6821_get_irq_a(pia8) | pia6821_get_irq_b(pia8) |
-						 ptm6840_get_irq(ptm6840);
+						 ptm6840_get_irq(ptm2);
 
-	if (!serial_card_connected)
+	if (!link7a_connected)
 	{
 		cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 		LOG(("6809 int%d \n", combined_state));
@@ -483,10 +439,11 @@ static WRITE_LINE_DEVICE_HANDLER( cpu0_irq )
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( cpu0_irq_m6840 )
+/*static WRITE_LINE_DEVICE_HANDLER( cpu0_irq_m6840 )
 {
-	cpu0_irq(device->machine->device("pia_ic3"), state);
-}
+//	cpu0_irq(device->machine->device("pia_ic3"), state);
+	cpu0_irq(device->machine->device("6840ptm"), state);
+}*/
 
 
 /* Bankswitching */
@@ -538,7 +495,7 @@ static const ptm6840_interface ptm_ic2_intf =
 	{ DEVCB_HANDLER(ic2_o1_callback),
 	  DEVCB_HANDLER(ic2_o2_callback),
 	  DEVCB_HANDLER(ic2_o3_callback) },
-	DEVCB_LINE(cpu0_irq_m6840)
+	DEVCB_LINE(cpu0_irq)//_m6840)
 };
 
 
@@ -710,6 +667,7 @@ static READ8_DEVICE_HANDLER( pia_ic4_portb_r )
 	if ( signal_50hz )			ic4_input_b |=  0x04; /* 50 Hz */
 	else	                    ic4_input_b &= ~0x04;
 
+	ic4_input_b |= 0x02; //By triggering the overcurrent circuit here, we can make the MPU4 lamp test pass.
 	#ifdef UNUSED_FUNCTION
 	if ( lamp_overcurrent  ) ic4_input_b |= 0x02;
 	if ( lamp_undercurrent ) ic4_input_b |= 0x01;
@@ -728,7 +686,11 @@ static WRITE_LINE_DEVICE_HANDLER( pia_ic4_ca2_w )
 	ic23_update();
 }
 
-
+static WRITE_LINE_DEVICE_HANDLER( pia_ic4_cb2_w )
+{
+	LOG_IC3(("%s: IC4 PIA Write CA (input MUX strobe /LED B), %02X\n", cpuexec_describe_context(device->machine),state));
+	reel_flag=state;
+}
 static const pia6821_interface pia_ic4_intf =
 {
 	DEVCB_NULL,		/* port A in */
@@ -740,7 +702,7 @@ static const pia6821_interface pia_ic4_intf =
 	DEVCB_HANDLER(pia_ic4_porta_w),		/* port A out */
 	DEVCB_NULL,		/* port B out */
 	DEVCB_LINE(pia_ic4_ca2_w),		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_LINE(pia_ic4_cb2_w),		/* line CB2 out */
 	DEVCB_LINE(cpu0_irq),		/* IRQA */
 	DEVCB_LINE(cpu0_irq)		/* IRQB */
 };
@@ -869,7 +831,7 @@ static WRITE8_DEVICE_HANDLER( pia_ic6_portb_w )
 	stepper_update(0, data & 0x0F );
 	stepper_update(1, (data>>4) & 0x0F );
 
-/*  if ( pia6821_get_output_cb2(1)) */
+	if (reel_flag)
 	{
 		if ( stepper_optic_state(0) ) optic_pattern |=  0x01;
 		else                          optic_pattern &= ~0x01;
@@ -941,7 +903,7 @@ static WRITE8_DEVICE_HANDLER( pia_ic7_porta_w )
 	stepper_update(2, data & 0x0F );
 	stepper_update(3, (data >> 4)& 0x0F );
 
-/*  if ( pia6821_get_output_cb2(1)) */
+	if (reel_flag)
 	{
 		if ( stepper_optic_state(2) ) optic_pattern |=  0x04;
 		else                          optic_pattern &= ~0x04;
@@ -1542,7 +1504,7 @@ static MACHINE_START( mpu4mod2 )
 {
 	mpu4_config_common(machine);
 
-	serial_card_connected=0;
+	link7a_connected=0;
 	mod_number=2;
 
 	/* setup 8 mechanical meters */
@@ -1562,7 +1524,7 @@ static MACHINE_START( mpu4dutch )
 {
 	mpu4_config_common(machine);
 
-	serial_card_connected=0;
+	link7a_connected=0;
 
 // setup 8 mechanical meters ////////////////////////////////////////////
 	Mechmtr_init(8);
@@ -1581,7 +1543,7 @@ static MACHINE_START( mpu4mod4 )
 {
 	mpu4_config_common(machine);
 
-	serial_card_connected=0;
+	link7a_connected=0;
 	mod_number=4;
 
 // setup 8 mechanical meters ////////////////////////////////////////////
@@ -1756,9 +1718,9 @@ static ADDRESS_MAP_START( mod2_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x0850, 0x0850) AM_READWRITE(bankswitch_r,bankswitch_w)	/* write bank (rom page select) */
 
-/*  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE(68681_duart_r,68681_duart_w) */
+/*  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE(68681_duart_r,68681_duart_w) */ //Runs hoppers 
 
-	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("6840ptm", ptm6840_read, ptm6840_write) /* 6840PTM */
+	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("ptm_ic2", ptm6840_read, ptm6840_write)/* PTM6840 IC2 */
 
 	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_r, pia6821_w)		/* PIA6821 IC3 */
 	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_r, pia6821_w)		/* PIA6821 IC4 */
@@ -1779,9 +1741,9 @@ static ADDRESS_MAP_START( mod4_yam_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x0880, 0x0881) AM_DEVWRITE( "ym2413", ym2413_w )
 
-//  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE(68681_duart_r,68681_duart_w)
+/*  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE(68681_duart_r,68681_duart_w) */ //Runs hoppers
 
-	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("6840ptm", ptm6840_read, ptm6840_write) /* 6840PTM */
+	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("ptm_ic2", ptm6840_read, ptm6840_write)/* PTM6840 IC2 */
 
 	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_r, pia6821_w)		/* PIA6821 IC3 */
 	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_r, pia6821_w)		/* PIA6821 IC4 */
@@ -1800,13 +1762,13 @@ static ADDRESS_MAP_START( mod4_oki_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x0850, 0x0850) AM_WRITE(bankswitch_w)	// write bank (rom page select)
 
-	AM_RANGE(0x0880, 0x0883) AM_DEVREADWRITE("pia_gamebd", pia6821_r,pia6821_w)      // PIA6821 on game board
+	AM_RANGE(0x0880, 0x0883) AM_DEVREADWRITE("pia_gamebd", pia6821_r,pia6821_w)      // PIA6821 on sampled sound board
 
-//  AM_RANGE(0x08c0, 0x08c7) AM_DEVREADWRITE("??", ptm6840_read, ptm6840_write)  // 6840PTM on game board
+//  AM_RANGE(0x08c0, 0x08c7) AM_DEVREADWRITE("??", ptm6840_read, ptm6840_write)  // 6840PTM on sampled sound board
 
-//  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE(68681_duart_r,68681_duart_w)
+//  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE(68681_duart_r,68681_duart_w) //Runs hoppers
 
-	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("6840ptm", ptm6840_read, ptm6840_write) /* 6840PTM */
+	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("ptm_ic2", ptm6840_read, ptm6840_write)/* PTM6840 IC2 */
 
 	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_r, pia6821_w)		/* PIA6821 IC3 */
 	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_r, pia6821_w)		/* PIA6821 IC4 */
@@ -1831,9 +1793,9 @@ static ADDRESS_MAP_START( dutch_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 
 //  AM_RANGE(0x08c0, 0x08c7) AM_DEVREADWRITE("??", ptm6840_read, ptm6840_write)  // 6840PTM on game board
 
-//  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE(68681_duart_r,68681_duart_w)
+//  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE(68681_duart_r,68681_duart_w) //Runs hoppers
 
-	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("6840ptm", ptm6840_read, ptm6840_write) /* 6840PTM */
+	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("ptm_ic2", ptm6840_read, ptm6840_write)/* PTM6840 IC2 */
 
 	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_r, pia6821_w)		/* PIA6821 IC3 */
 	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_r, pia6821_w)		/* PIA6821 IC4 */
@@ -1867,7 +1829,7 @@ static MACHINE_CONFIG_START( mpu4mod2, driver_device )
 	MCFG_TIMER_ADD_PERIODIC("50hz",gen_50hz, HZ(100))
 
 	/* 6840 PTM */
-	MCFG_PTM6840_ADD("6840ptm", ptm_ic2_intf)
+	MCFG_PTM6840_ADD("ptm_ic2", ptm_ic2_intf)
 
 	MCFG_PIA6821_ADD("pia_ic3", pia_ic3_intf)
 	MCFG_PIA6821_ADD("pia_ic4", pia_ic4_intf)

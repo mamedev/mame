@@ -1,8 +1,5 @@
 /***********************************************************************************************************
-Barcrest MPU4 highly preliminary driver by J.Wallace, and Anonymous.
-
-Any MAME-approved games should go here.
-
+Barcrest MPU4 Extension driver by J.Wallace, and Anonymous.
 
 --- Board Setup ---
 For the Barcrest MPU4 Video system, the GAME CARD (cartridge) contains the MPU4 video bios in the usual ROM
@@ -163,6 +160,10 @@ IRQ line connected to CPU
 -----------+---+-----------------+--------------------------------------------------------------------------
  C000-FFFF | R | D D D D D D D D | ROM
 -----------+---+-----------------+--------------------------------------------------------------------------
+Everything here is preliminary...  the boards are quite fussy with regards their self tests
+and the timing may have to be perfect for them to function correctly.  (as the comms are
+timer driven, the video is capable of various raster effects etc.)
+
 TODO:
       - Correctly implement characteriser protection for each game.
       - Hook up trackball control for The Crystal Maze and The Mating Game - done, but game response is v. slow
@@ -1888,7 +1889,7 @@ static MACHINE_START( mpu4_vid )
 	mpu4_config_common(machine);
 
 	/* setup communications */
-	serial_card_connected = 1;
+	link7a_connected = 1;
 
 	/* setup 8 mechanical meters */
 	Mechmtr_init(8);
@@ -1946,8 +1947,8 @@ static ADDRESS_MAP_START( mpu4_6809_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE("acia6850_0", acia6850_stat_r, acia6850_ctrl_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("acia6850_0", acia6850_data_r, acia6850_data_w)
-	AM_RANGE(0x0880, 0x0881) AM_NOP /* Could be a UART datalogger is here. */
-	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("6840ptm", ptm6840_read, ptm6840_write)
+	AM_RANGE(0x0880, 0x0881) AM_NOP //Read/write here
+	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("ptm_ic2", ptm6840_read, ptm6840_write)
 	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_r, pia6821_w)
 	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_r, pia6821_w)
 	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE("pia_ic5", pia6821_r, pia6821_w)
@@ -2113,9 +2114,9 @@ static ADDRESS_MAP_START( dealem_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 
-/*  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE(68681_duart_r,68681_duart_w) */
+/*  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE(68681_duart_r,68681_duart_w) */ //Runs hoppers
 
-	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("6840ptm", ptm6840_read, ptm6840_write) /* 6840PTM */
+	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("ptm_ic2", ptm6840_read, ptm6840_write)/* PTM6840 IC2 */
 
 	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_r, pia6821_w)		/* PIA6821 IC3 */
 	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_r, pia6821_w)		/* PIA6821 IC4 */
@@ -2239,7 +2240,7 @@ static MACHINE_CONFIG_START( mpu4_vid, driver_device )
 	MCFG_NVRAM_ADD_0FILL("nvram")				/* confirm */
 
 	/* 6840 PTM */
-	MCFG_PTM6840_ADD("6840ptm", ptm_ic2_intf)
+	MCFG_PTM6840_ADD("ptm_ic2", ptm_ic2_intf)
 
 	MCFG_PIA6821_ADD("pia_ic3", pia_ic3_intf)
 	MCFG_PIA6821_ADD("pia_ic4", pia_ic4_intf)
@@ -2313,7 +2314,7 @@ static MACHINE_CONFIG_START( dealem, driver_device )
 
 	MCFG_TIMER_ADD_PERIODIC("50hz",gen_50hz, HZ(100))
 
-	MCFG_PTM6840_ADD("6840ptm", ptm_ic2_intf)
+	MCFG_PTM6840_ADD("ptm_ic2", ptm_ic2_intf)
 
 	MCFG_PIA6821_ADD("pia_ic3", pia_ic3_intf)
 	MCFG_PIA6821_ADD("pia_ic4", pia_ic4_intf)
@@ -3155,7 +3156,7 @@ GAME( 1993,  crmazed,   crmaze,   crmaze,   crmaze,   crmaze,   ROT0, "Barcrest"
 GAME( 1993,  crmazea,   crmaze,   crmaze,   crmaze,   crmazea,  ROT0, "Barcrest",		"The Crystal Maze (v0.1, AMLD)",									GAME_NOT_WORKING )//SWP 0.9
 
 GAME( 1993,  crmaze2,   bctvidbs, crmaze,   crmaze,   crmaze2,  ROT0, "Barcrest",		"The New Crystal Maze Featuring Ocean Zone (v2.2)",					GAME_NOT_WORKING )//SWP 1.0
-GAME( 1993,  crmaze2d,  crmaze2,  crmaze,   crmaze,   crmaze2,  ROT0, "Barcrest",		"The New Crystal Maze Featuring Ocean Zone (v2.2d)",				GAME_NOT_WORKING )//SWP 1.0D
+GAME( 1993,  crmaze2d,  crmaze2,  crmaze,   crmaze,   crmaze2,  ROT0, "Barcrest",		"The New Crystal Maze Featuring Ocean Zone (v2.2, Datapak)",				GAME_NOT_WORKING )//SWP 1.0D
 GAME( 1993,  crmaze2a,  crmaze2,  crmaze,   crmaze,   0,        ROT0, "Barcrest",		"The New Crystal Maze Featuring Ocean Zone (v0.1, AMLD)",			GAME_NOT_WORKING )//SWP 1.0 /* unprotected? bootleg? */
 
 GAME( 1994,  crmaze3,   bctvidbs, crmaze,   crmaze,   crmaze3,  ROT0, "Barcrest",		"The Crystal Maze Team Challenge (v0.9)",							GAME_NOT_WORKING )//SWP 0.7
