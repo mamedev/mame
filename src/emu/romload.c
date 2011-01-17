@@ -349,9 +349,9 @@ static void determine_bios_rom(rom_load_data *romdata)
 
 				/* Allow '-bios n' to still be used */
 				sprintf(bios_number, "%d", bios_flags - 1);
-				if (strcmp(bios_number, specbios) == 0 || strcmp(biosname, specbios) == 0)
+				if (mame_stricmp(bios_number, specbios) == 0 || mame_stricmp(biosname, specbios) == 0)
 					romdata->system_bios = bios_flags;
-				if (defaultname != NULL && strcmp(biosname, defaultname) == 0)
+				if (defaultname != NULL && mame_stricmp(biosname, defaultname) == 0)
 					default_no = bios_flags;
 				bios_count++;
 			}
