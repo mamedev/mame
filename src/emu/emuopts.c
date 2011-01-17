@@ -256,7 +256,7 @@ void image_add_device_options(core_options *opts, const game_driver *driver)
 		/* add the option */
 		memset(entry, 0, sizeof(entry));
 		entry[0].name = dev_full_name;
-		options_add_entries(opts, entry);
+		options_add_entries(opts, entry, TRUE);
 
 		index++;
 	}

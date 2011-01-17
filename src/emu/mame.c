@@ -214,6 +214,10 @@ int mame_execute(osd_interface &osd, core_options *options)
 		global_free(machine);
 		global_free(config);
 		global_machine = NULL;
+		if (firstrun) {
+			// clear flag for added devices
+			options_set_bool(options, OPTION_ADDED_DEVICE_OPTIONS, FALSE, OPTION_PRIORITY_CMDLINE);
+		}
 
 		// reset the options
 		mame_opts = NULL;
@@ -565,7 +569,7 @@ static int parse_ini_file(core_options *options, const char *name, int priority)
 	mame_file *file;
 
 	/* update game name so depending callback options could be added */
-	if (priority==OPTION_PRIORITY_DRIVER_INI) {
+	if (priority==OPTION_PRIORITY_DRIVER_INI || priority==OPTION_PRIORITY_SOURCE_INI) {
 		options_force_option_callback(options, OPTION_GAMENAME, name, priority);
 	}
 

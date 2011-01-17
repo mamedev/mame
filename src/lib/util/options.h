@@ -151,6 +151,9 @@ int options_equal(core_options *opts1, core_options *opts2);
 /* add a set of entries to an options collection */
 int options_add_entries(core_options *opts, const options_entry *entrylist);
 
+/* add a set of entries to an options collection, and force recreation if true */
+int options_add_entries(core_options *opts, const options_entry *entrylist, int force);
+
 /* set the default value for a particular option entry */
 int options_set_option_default_value(core_options *opts, const char *name, const char *defvalue);
 

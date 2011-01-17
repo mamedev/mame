@@ -309,7 +309,7 @@ int options_equal(core_options *opts1, core_options *opts2)
     current options sets
 -------------------------------------------------*/
 
-int options_add_entries(core_options *opts, const options_entry *entrylist)
+int options_add_entries(core_options *opts, const options_entry *entrylist, int force)
 {
 	/* loop over entries until we hit a NULL name */
 	for ( ; entrylist->name != NULL || (entrylist->flags & OPTION_HEADER); entrylist++)
@@ -333,7 +333,7 @@ int options_add_entries(core_options *opts, const options_entry *entrylist)
 				match = find_entry_data(opts, astring_c(data->links[i].name), FALSE);
 
 		/* if so, throw away this entry and replace the data */
-		if (match != NULL)
+		if ((force == FALSE) && (match != NULL))
 		{
 			/* free what we've allocated so far */
 			for (i = 0; i < ARRAY_LENGTH(data->links); i++)
@@ -384,6 +384,10 @@ int options_add_entries(core_options *opts, const options_entry *entrylist)
 	return TRUE;
 }
 
+int options_add_entries(core_options *opts, const options_entry *entrylist)
+{
+	return options_add_entries(opts,entrylist,FALSE);
+}
 
 /*-------------------------------------------------
     options_set_option_default_value - change the
