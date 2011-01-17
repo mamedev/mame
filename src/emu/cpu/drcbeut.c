@@ -40,6 +40,8 @@
 #include "emu.h"
 #include "drcbeut.h"
 
+using namespace uml;
+
 
 //**************************************************************************
 //  DEBUGGING
@@ -112,32 +114,30 @@ bool drc_hash_table::reset()
 //  block_begin - note the beginning of a block
 //-------------------------------------------------
 
-void drc_hash_table::block_begin(drcuml_block &block, const drcuml_instruction *instlist, UINT32 numinst)
+void drc_hash_table::block_begin(drcuml_block &block, const uml::instruction *instlist, UINT32 numinst)
 {
 	// before generating code, pre-allocate any hash entries; we do this by setting dummy hash values
 	for (int inum = 0; inum < numinst; inum++)
 	{
-		const drcuml_instruction &inst = instlist[inum];
+		const uml::instruction &inst = instlist[inum];
 
 		// if the opcode is a hash, verify that it makes sense and then set a NULL entry
-		if (inst.opcode == DRCUML_OP_HASH)
+		if (inst.opcode() == OP_HASH)
 		{
-			assert(inst.numparams == 2);
-			assert(inst.param[0].type == DRCUML_PTYPE_IMMEDIATE);
-			assert(inst.param[1].type == DRCUML_PTYPE_IMMEDIATE);
+			assert(inst.numparams() == 2);
 
 			// if we fail to allocate, we must abort the block
-			if (!set_codeptr(inst.param[0].value, inst.param[1].value, NULL))
-				drcuml_block_abort(&block);
+			if (!set_codeptr(inst.param(0).immediate(), inst.param(1).immediate(), NULL))
+				block.abort();
 		}
 
 		// if the opcode is a hashjmp to a fixed location, make sure we preallocate the tables
-		if (inst.opcode == DRCUML_OP_HASHJMP && inst.param[0].type == DRCUML_PTYPE_IMMEDIATE && inst.param[1].type == DRCUML_PTYPE_IMMEDIATE)
+		if (inst.opcode() == OP_HASHJMP && inst.param(0).is_immediate() && inst.param(1).is_immediate())
 		{
 			// if we fail to allocate, we must abort the block
-			drccodeptr code = get_codeptr(inst.param[0].value, inst.param[1].value);
-			if (!set_codeptr(inst.param[0].value, inst.param[1].value, code))
-				drcuml_block_abort(&block);
+			drccodeptr code = get_codeptr(inst.param(0).immediate(), inst.param(1).immediate());
+			if (!set_codeptr(inst.param(0).immediate(), inst.param(1).immediate(), code))
+				block.abort();
 		}
 	}
 }
@@ -275,7 +275,7 @@ void drc_map_variables::block_end(drcuml_block &block)
 	// begin "code generation" aligned to an 8-byte boundary
 	drccodeptr *top = m_cache.begin_codegen(sizeof(UINT64) + sizeof(UINT32) + 2 * sizeof(UINT32) * m_entry_list.count());
 	if (top == NULL)
-		drcuml_block_abort(&block);
+		block.abort();
 	UINT32 *dest = (UINT32 *)(((FPTR)*top + 7) & ~7);
 
 	// store the cookie first
@@ -288,8 +288,8 @@ void drc_map_variables::block_end(drcuml_block &block)
 	dest++;
 
 	// now iterate over entries and store them
-	UINT32 curvalue[DRCUML_MAPVAR_END - DRCUML_MAPVAR_M0] = { 0 };
-	bool changed[DRCUML_MAPVAR_END - DRCUML_MAPVAR_M0] = { false };
+	UINT32 curvalue[MAPVAR_COUNT] = { 0 };
+	bool changed[MAPVAR_COUNT] = { false };
 	for (map_entry *entry = m_entry_list.first(); entry != NULL; entry = entry->next())
 	{
 		// update the current value of the variable and detect changes
@@ -352,24 +352,24 @@ void drc_map_variables::block_end(drcuml_block &block)
 
 void drc_map_variables::set_value(drccodeptr codebase, UINT32 mapvar, UINT32 newvalue)
 {
-	assert(mapvar >= DRCUML_MAPVAR_M0 && mapvar < DRCUML_MAPVAR_END);
+	assert(mapvar >= MAPVAR_M0 && mapvar < MAPVAR_END);
 
 	// if this value isn't different, skip it
-	if (m_mapvalue[mapvar - DRCUML_MAPVAR_M0] == newvalue)
+	if (m_mapvalue[mapvar - MAPVAR_M0] == newvalue)
 		return;
 
 	// allocate a new entry and fill it in
 	map_entry *entry = (map_entry *)m_cache.alloc(sizeof(*entry));
 	entry->m_next = NULL;
 	entry->m_codeptr = codebase;
-	entry->m_mapvar = mapvar - DRCUML_MAPVAR_M0;
+	entry->m_mapvar = mapvar - MAPVAR_M0;
 	entry->m_newval = newvalue;
 
 	// hook us into the end of the list
 	m_entry_list.append(*entry);
 
 	// update our state in the table as well
-	m_mapvalue[mapvar - DRCUML_MAPVAR_M0] = newvalue;
+	m_mapvalue[mapvar - MAPVAR_M0] = newvalue;
 }
 
 
@@ -380,8 +380,8 @@ void drc_map_variables::set_value(drccodeptr codebase, UINT32 mapvar, UINT32 new
 
 UINT32 drc_map_variables::get_value(drccodeptr codebase, UINT32 mapvar) const
 {
-	assert(mapvar >= DRCUML_MAPVAR_M0 && mapvar < DRCUML_MAPVAR_END);
-	mapvar -= DRCUML_MAPVAR_M0;
+	assert(mapvar >= MAPVAR_M0 && mapvar < MAPVAR_END);
+	mapvar -= MAPVAR_M0;
 
 	// get an aligned pointer to start scanning
 	UINT64 *curscan = (UINT64 *)(((FPTR)codebase | 7) + 1);
@@ -448,8 +448,8 @@ UINT32 drc_map_variables::static_get_value(drc_map_variables &map, drccodeptr co
 
 UINT32 drc_map_variables::get_last_value(UINT32 mapvar)
 {
-	assert(mapvar >= DRCUML_MAPVAR_M0 && mapvar < DRCUML_MAPVAR_END);
-	return m_mapvalue[mapvar - DRCUML_MAPVAR_M0];
+	assert(mapvar >= MAPVAR_M0 && mapvar < MAPVAR_END);
+	return m_mapvalue[mapvar - MAPVAR_M0];
 }
 
 
@@ -508,7 +508,7 @@ void drc_label_list::block_end(drcuml_block &block)
 //  undefined
 //-------------------------------------------------
 
-drccodeptr drc_label_list::get_codeptr(drcuml_codelabel label, fixup_func fixup, void *param)
+drccodeptr drc_label_list::get_codeptr(uml::code_label label, fixup_func fixup, void *param)
 {
 	label_entry *curlabel = find_or_allocate(label);
 
@@ -524,7 +524,7 @@ drccodeptr drc_label_list::get_codeptr(drcuml_codelabel label, fixup_func fixup,
 //  set_codeptr - set the pointer to a new label
 //-------------------------------------------------
 
-void drc_label_list::set_codeptr(drcuml_codelabel label, drccodeptr codeptr)
+void drc_label_list::set_codeptr(uml::code_label label, drccodeptr codeptr)
 {
 	// set the code pointer
 	label_entry *curlabel = find_or_allocate(label);
@@ -546,7 +546,7 @@ void drc_label_list::reset(bool fatal_on_leftovers)
 	{
 		// fatal if we were a leftover
 		if (fatal_on_leftovers && curlabel->m_codeptr == NULL)
-			fatalerror("Label %08X never defined!", curlabel->m_label);
+			fatalerror("Label %08X never defined!", curlabel->m_label.label());
 
 		// free the label
 		m_cache.dealloc(curlabel, sizeof(*curlabel));
@@ -559,7 +559,7 @@ void drc_label_list::reset(bool fatal_on_leftovers)
 //  allocate a new one if not found
 //-------------------------------------------------
 
-drc_label_list::label_entry *drc_label_list::find_or_allocate(drcuml_codelabel label)
+drc_label_list::label_entry *drc_label_list::find_or_allocate(uml::code_label label)
 {
 	// find the label, or else allocate a new one
 	label_entry *curlabel;

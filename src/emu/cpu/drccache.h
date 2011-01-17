@@ -49,8 +49,8 @@
 //**************************************************************************
 
 // ensure that a given pointer is within the cache boundaries
-#define assert_in_cache(c,p)		assert((c)->contains_pointer(p))
-#define assert_in_near_cache(c,p)	assert((c)->contains_near_pointer(p))
+#define assert_in_cache(c,p)		assert((c).contains_pointer(p))
+#define assert_in_near_cache(c,p)	assert((c).contains_near_pointer(p))
 
 
 
@@ -60,6 +60,16 @@
 
 // generic code pointer
 typedef UINT8 *drccodeptr;
+
+
+// helper template for oob codegen
+template<class T, void (T::*func)(drccodeptr *codeptr, void *param1, void *param2)>
+void oob_func_stub(drccodeptr *codeptr, void *param1, void *param2, void *param3)
+{
+	T *target = reinterpret_cast<T *>(param3);
+	(target->*func)(codeptr, param1, param2);
+}
+
 
 // drc_cache
 class drc_cache

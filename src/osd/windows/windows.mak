@@ -137,7 +137,7 @@ endif
 # disable warnings and link against bufferoverflowu for 64-bit targets
 ifeq ($(PTR64),1)
 CCOMFLAGS += /wd4267
-LIBS += -lbufferoverflowu
+#LIBS += -lbufferoverflowu
 endif
 
 # enable exception handling for C++
