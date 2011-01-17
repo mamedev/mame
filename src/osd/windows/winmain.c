@@ -256,13 +256,6 @@ static HANDLE watchdog_thread;
 
 static running_machine *g_current_machine;
 
-
-#ifndef MESS
-static const TCHAR helpfile[] = TEXT("docs\\windows.txt");
-#else
-static const TCHAR helpfile[] = TEXT("mess.chm");
-#endif
-
 //static HANDLE mm_task = NULL;
 //static DWORD task_index = 0;
 static int timeresult;
