@@ -1025,8 +1025,8 @@ static WRITE8_HANDLER( heiankyo_io_w )
 
 	if (offset & 0x02)
 	{
-		vicdual_palette_bank_w(space, 0, data & 0x03);
-		/* heiankyo_audio_2_w(0, data & 0xfc); */
+		vicdual_palette_bank_w(space, 0, data >> 6);
+		/* heiankyo_audio_2_w(0, data & 0x3f); */
 	}
 
 	if (offset & 0x08)  assert_coin_status();
