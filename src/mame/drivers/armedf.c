@@ -233,6 +233,12 @@ static WRITE16_HANDLER( sound_command_w )
 		soundlatch_w(space, 0, ((data & 0x7f) << 1) | 1);
 }
 
+static READ8_HANDLER( soundlatch_clear_r )
+{
+	soundlatch_clear_w(space, 0, 0);
+	return 0;
+}
+
 #ifdef UNUSED_FUNCTION
 static WRITE16_HANDLER( legion_command_c )
 {
@@ -436,13 +442,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( terrafb_extraz80_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
-
-
-static READ8_HANDLER( soundlatch_clear_r )
-{
-	soundlatch_clear_w(space, 0, 0);
-	return 0;
-}
 
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -794,14 +793,14 @@ static MACHINE_RESET( armedf )
 static MACHINE_CONFIG_START( terraf, armedf_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	// 8mhz?
 	MCFG_CPU_PROGRAM_MAP(terraf_map)
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3072000)	/* 3.072 MHz???? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		// 4mhz?
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,128)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_8MHz/2/512)	// ?
 
 	MCFG_MACHINE_START(armedf)
 	MCFG_MACHINE_RESET(armedf)
@@ -810,7 +809,7 @@ static MACHINE_CONFIG_START( terraf, armedf_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
+	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
@@ -825,32 +824,32 @@ static MACHINE_CONFIG_START( terraf, armedf_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("dac1", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("dac2", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( terrafb, armedf_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	// 8mhz?
 	MCFG_CPU_PROGRAM_MAP(terrafb_map)
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3072000)	/* 3.072 MHz???? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		// 4mhz?
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,128)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_8MHz/2/512)	// ?
 
-	MCFG_CPU_ADD("extra", Z80, 3072000)	/* 3.072 MHz???? */
+	MCFG_CPU_ADD("extra", Z80, XTAL_8MHz/2)			// 4mhz?
 	MCFG_CPU_PROGRAM_MAP(terrafb_extraz80_map)
 	MCFG_CPU_IO_MAP(terrafb_extraz80_portmap)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,128)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_8MHz/2/512)	// ?
 
 	MCFG_MACHINE_START(armedf)
 	MCFG_MACHINE_RESET(armedf)
@@ -859,7 +858,7 @@ static MACHINE_CONFIG_START( terrafb, armedf_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
+	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
@@ -874,27 +873,27 @@ static MACHINE_CONFIG_START( terrafb, armedf_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("dac1", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("dac2", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( kodure, armedf_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	// 8mhz?
 	MCFG_CPU_PROGRAM_MAP(kodure_map)
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3072000) /* 3.072 MHz???? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		// 4mhz?
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,128)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_8MHz/2/512)	// ?
 
 	MCFG_MACHINE_START(armedf)
 	MCFG_MACHINE_RESET(armedf)
@@ -918,7 +917,7 @@ static MACHINE_CONFIG_START( kodure, armedf_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("dac1", DAC, 0)
@@ -931,14 +930,14 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( armedf, armedf_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	// 8mhz?
 	MCFG_CPU_PROGRAM_MAP(armedf_map)
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3072000)	/* 3.072 MHz???? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		// 4mhz?
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,128)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_8MHz/2/512)	// ?
 
 	MCFG_MACHINE_START(armedf)
 	MCFG_MACHINE_RESET(armedf)
@@ -947,7 +946,7 @@ static MACHINE_CONFIG_START( armedf, armedf_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
+	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
@@ -962,27 +961,27 @@ static MACHINE_CONFIG_START( armedf, armedf_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("dac1", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("dac2", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( cclimbr2, armedf_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	// 8mhz?
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_map)
 	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3072000)		/* 3.072 MHz???? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		// 4mhz?
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_soundmap)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,128)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_8MHz/2/512)	// ?
 
 	MCFG_MACHINE_START(armedf)
 	MCFG_MACHINE_RESET(armedf)
@@ -1006,7 +1005,7 @@ static MACHINE_CONFIG_START( cclimbr2, armedf_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("dac1", DAC, 0)
@@ -1019,14 +1018,14 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( legion, armedf_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	// 8mhz?
 	MCFG_CPU_PROGRAM_MAP(legion_map)
 	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3072000)	/* 3.072 MHz???? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		// 4mhz?
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_soundmap)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,128)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_8MHz/2/512)	// ?
 
 	MCFG_MACHINE_START(armedf)
 	MCFG_MACHINE_RESET(armedf)
@@ -1050,7 +1049,7 @@ static MACHINE_CONFIG_START( legion, armedf_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("dac1", DAC, 0)
@@ -1063,14 +1062,14 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( legiono, armedf_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	// 8mhz?
 	MCFG_CPU_PROGRAM_MAP(legiono_map)
 	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3072000)	/* 3.072 MHz???? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		// 4mhz?
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_soundmap)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,128)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_8MHz/2/512)	// ?
 
 	MCFG_MACHINE_START(armedf)
 	MCFG_MACHINE_RESET(armedf)
@@ -1094,7 +1093,7 @@ static MACHINE_CONFIG_START( legiono, armedf_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("dac1", DAC, 0)

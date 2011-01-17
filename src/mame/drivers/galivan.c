@@ -36,14 +36,13 @@ Takahiro Nogi (nogi@kt.rim.or.jp) 1999/12/17 -
 
 static WRITE8_HANDLER( galivan_sound_command_w )
 {
-	soundlatch_w(space, offset, (data << 1) | 1);
+	soundlatch_w(space,0,((data & 0x7f) << 1) | 1);
 }
 
-static READ8_HANDLER( galivan_sound_command_r )
+static READ8_HANDLER( soundlatch_clear_r )
 {
-	int data = soundlatch_r(space, offset);
 	soundlatch_clear_w(space, 0, 0);
-	return data;
+	return 0;
 }
 
 static READ8_HANDLER( IO_port_c0_r )
@@ -139,8 +138,8 @@ static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym3526_w)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac1", dac_w)
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac2", dac_w)
-/*  AM_RANGE(0x04, 0x04) AM_READNOP    value read and *discarded*    */
-	AM_RANGE(0x06, 0x06) AM_READ(galivan_sound_command_r)
+	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_clear_r)
+	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 
@@ -232,6 +231,9 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( dangar )
 	PORT_INCLUDE( galivan )
+
+	PORT_MODIFY("SYSTEM")
+	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 
 	PORT_MODIFY("DSW1")
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW1:7")
@@ -456,15 +458,15 @@ static MACHINE_RESET( ninjemak )
 static MACHINE_CONFIG_START( galivan, galivan_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)		/* 6 MHz? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)		/* 6 MHz? */
 	MCFG_CPU_PROGRAM_MAP(galivan_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)		/* 4 MHz? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		/* 4 MHz? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 7250)  /* timed interrupt, ?? Hz */
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_8MHz/2/512)	// ?
 
 	MCFG_MACHINE_START(galivan)
 	MCFG_MACHINE_RESET(galivan)
@@ -487,7 +489,7 @@ static MACHINE_CONFIG_START( galivan, galivan_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, 8000000/2)
+	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_8MHz/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("dac1", DAC, 0)
@@ -500,15 +502,15 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( ninjemak, galivan_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)		/* 6 MHz? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)		/* 6 MHz? */
 	MCFG_CPU_PROGRAM_MAP(ninjemak_map)
 	MCFG_CPU_IO_MAP(ninjemak_io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)		/* 4 MHz? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		/* 4 MHz? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 7250)	/* timed interrupt, ?? Hz */
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_8MHz/2/512)	// ?
 
 	MCFG_MACHINE_START(ninjemak)
 	MCFG_MACHINE_RESET(ninjemak)
@@ -530,7 +532,7 @@ static MACHINE_CONFIG_START( ninjemak, galivan_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM3526, 8000000/2)
+	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_8MHz/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("dac1", DAC, 0)

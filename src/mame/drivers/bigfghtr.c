@@ -481,6 +481,12 @@ static READ16_HANDLER( latch_r )
 	return 0;
 }
 
+static READ8_HANDLER( soundlatch_clear_r )
+{
+	soundlatch_clear_w(space, 0, 0);
+	return 0;
+}
+
 static ADDRESS_MAP_START( mainmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0805ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
@@ -511,12 +517,6 @@ static ADDRESS_MAP_START( soundmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xf7ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
-
-static READ8_HANDLER( soundlatch_clear_r )
-{
-	soundlatch_clear_w(space, 0, 0);
-	return 0;
-}
 
 static ADDRESS_MAP_START( soundport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -680,15 +680,15 @@ static MACHINE_RESET( bigfghtr )
 
 static MACHINE_CONFIG_START( bigfghtr, bigfghtr_state )
 
-	MCFG_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	// verified
 	MCFG_CPU_PROGRAM_MAP(mainmem)
 
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3072000)	/* 3.072 MHz???? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		// 4mhz?
 	MCFG_CPU_PROGRAM_MAP(soundmem)
 	MCFG_CPU_IO_MAP(soundport)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,128)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_8MHz/2/512)	// ?
 
 	MCFG_MACHINE_START(bigfghtr)
 	MCFG_MACHINE_RESET(bigfghtr	)
@@ -712,7 +712,7 @@ static MACHINE_CONFIG_START( bigfghtr, bigfghtr_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("dac1", DAC, 0)
