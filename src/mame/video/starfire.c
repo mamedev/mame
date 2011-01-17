@@ -7,20 +7,7 @@
 #include "emu.h"
 #include "includes/starfire.h"
 
-
-#define	NUM_PENS	(0x40)
-
-
-UINT8 *starfire_videoram;
-UINT8 *starfire_colorram;
-
-/* local allocated storage */
-static UINT8 starfire_vidctrl;
-static UINT8 starfire_vidctrl1;
-static UINT8 starfire_color;
-static UINT16 starfire_colors[NUM_PENS];
-
-
+static TIMER_CALLBACK( starfire_scanline_callback );
 
 /*************************************
  *
@@ -30,31 +17,18 @@ static UINT16 starfire_colors[NUM_PENS];
 
 VIDEO_START( starfire )
 {
-	/* register for state saving */
-	state_save_register_global(machine, starfire_vidctrl);
-	state_save_register_global(machine, starfire_vidctrl1);
-	state_save_register_global(machine, starfire_color);
-	state_save_register_global_array(machine, starfire_colors);
+	starfire_state *state = machine->driver_data<starfire_state>();
+
+	state->starfire_screen = machine->primary_screen->alloc_compatible_bitmap();
+	state->scanline_timer = timer_alloc(machine, starfire_scanline_callback, NULL);
+	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->time_until_pos(STARFIRE_VBEND), STARFIRE_VBEND);
+
+    /* register for state saving */
+	state_save_register_global(machine, state->starfire_vidctrl);
+	state_save_register_global(machine, state->starfire_vidctrl1);
+	state_save_register_global(machine, state->starfire_color);
+	state_save_register_global_array(machine, state->starfire_colors);
 }
-
-
-
-/*************************************
- *
- *  Video control writes
- *
- *************************************/
-
-WRITE8_HANDLER( starfire_vidctrl_w )
-{
-    starfire_vidctrl = data;
-}
-
-WRITE8_HANDLER( starfire_vidctrl1_w )
-{
-    starfire_vidctrl1 = data;
-}
-
 
 
 /*************************************
@@ -65,25 +39,27 @@ WRITE8_HANDLER( starfire_vidctrl1_w )
 
 WRITE8_HANDLER( starfire_colorram_w )
 {
-	/* handle writes to the pseudo-color RAM */
+	starfire_state *state = space->machine->driver_data<starfire_state>();
+    
+    /* handle writes to the pseudo-color RAM */
 	if ((offset & 0xe0) == 0)
 	{
 		int palette_index = (offset & 0x1f) | ((offset & 0x200) >> 4);
 
 		/* set RAM regardless */
-		starfire_colorram[offset & ~0x100] = data;
-		starfire_colorram[offset |  0x100] = data;
-
-		starfire_color = data & 0x1f;
+		int cl = (state->starfire_vidctrl1 & 0x80) ? state->starfire_color : (data & 0x1f);
+		int cr = (data >> 5) | ((offset & 0x100) >> 5);
+        cr |= (state->starfire_vidctrl1 & 0x80) ? (state->starfire_color & 0x10) : (data & 0x10);
+		
+		state->starfire_colorram[offset & ~0x100] = cl;
+        state->starfire_colorram[offset |  0x100] = cr;
+		
+		state->starfire_color = cl;
 
 		/* don't modify the palette unless the TRANS bit is set */
-		if (starfire_vidctrl1 & 0x40)
+		if (state->starfire_vidctrl1 & 0x40)
 		{
-			space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
-
-			starfire_colors[palette_index] = ((((data << 1) & 0x06) | ((offset >> 8) & 0x01)) << 6) |
-											 (((data >> 5) & 0x07) << 3) |
-											 ((data >> 2) & 0x07);
+			state->starfire_colors[palette_index] = ((cl & 0x3) << 7) | ((cr & 0xf) << 3) | ((cl & 0x1c) >> 2);
 		}
 	}
 
@@ -91,12 +67,33 @@ WRITE8_HANDLER( starfire_colorram_w )
 	else
 	{
 		/* set RAM based on CDRM */
-		starfire_colorram[offset] = (starfire_vidctrl1 & 0x80) ? starfire_color : (data & 0x1f);
-		starfire_color = data & 0x1f;
+		state->starfire_colorram[offset] = (state->starfire_vidctrl1 & 0x80) ? state->starfire_color : (data & 0x1f);
+		state->starfire_color = (state->starfire_vidctrl1 & 0x80) ? state->starfire_color : (data & 0x1f);
 	}
 }
 
+READ8_HANDLER( starfire_colorram_r )
+{
+	starfire_state *state = space->machine->driver_data<starfire_state>();
 
+	/* handle writes to the pseudo-color RAM, which also happen on reads */
+	if ((offset & 0xe0) == 0)
+	{
+		int palette_index = (offset & 0x1f) | ((offset & 0x200) >> 4);
+        int cl = state->starfire_colorram[offset & ~0x100];
+        int cr = state->starfire_colorram[offset |  0x100];
+
+		/* don't modify the palette unless the TRANS bit is set */
+		if (state->starfire_vidctrl1 & 0x40)
+		{
+			state->starfire_colors[palette_index] = ((cl & 0x3) << 7) | ((cr & 0xf) << 3) | ((cl & 0x1c) >> 2);
+		}
+
+		return cl | ((cr & 0x7) << 5);
+	}
+
+	return state->starfire_colorram[offset];
+}
 
 /*************************************
  *
@@ -109,21 +106,22 @@ WRITE8_HANDLER( starfire_videoram_w )
 	int sh, lr, dm, ds, mask, d0, dalu;
 	int offset1 = offset & 0x1fff;
 	int offset2 = (offset + 0x100) & 0x1fff;
+	starfire_state *state = space->machine->driver_data<starfire_state>();
 
 	/* PROT */
-	if (!(offset & 0xe0) && !(starfire_vidctrl1 & 0x20))
+	if (!(offset & 0xe0) && !(state->starfire_vidctrl1 & 0x20))
 		return;
 
 	/* selector 6A */
 	if (offset & 0x2000)
 	{
-		sh = (starfire_vidctrl >> 1) & 0x07;
-		lr = starfire_vidctrl & 0x01;
+		sh = (state->starfire_vidctrl >> 1) & 0x07;
+		lr = state->starfire_vidctrl & 0x01;
 	}
 	else
 	{
-		sh = (starfire_vidctrl >> 5) & 0x07;
-		lr = (starfire_vidctrl >> 4) & 0x01;
+		sh = (state->starfire_vidctrl >> 5) & 0x07;
+		lr = (state->starfire_vidctrl >> 4) & 0x01;
 	}
 
 	/* mirror bits 5B/5C/5D/5E */
@@ -139,18 +137,18 @@ WRITE8_HANDLER( starfire_videoram_w )
 	/* ROLL */
 	if ((offset & 0x1f00) == 0x1f00)
 	{
-		if (starfire_vidctrl1 & 0x10)
+		if (state->starfire_vidctrl1 & 0x10)
 			mask &= 0x00ff;
 		else
 			mask &= 0xff00;
 	}
 
 	/* ALU 8B/8D */
-	d0 = (starfire_videoram[offset1] << 8) | starfire_videoram[offset2];
+	d0 = (state->starfire_videoram[offset1] << 8) | state->starfire_videoram[offset2];
 	dalu = d0 & ~mask;
 	d0 &= mask;
 	ds &= mask;
-	switch (~starfire_vidctrl1 & 15)
+	switch (~state->starfire_vidctrl1 & 15)
 	{
 		case 0:		dalu |= ds ^ mask;				break;
 		case 1:		dalu |= (ds | d0) ^ mask;		break;
@@ -171,16 +169,16 @@ WRITE8_HANDLER( starfire_videoram_w )
 	}
 
 	/* final output */
-	starfire_videoram[offset1] = dalu >> 8;
-	starfire_videoram[offset2] = dalu;
+	state->starfire_videoram[offset1] = dalu >> 8;
+	state->starfire_videoram[offset2] = dalu;
 
 	/* color output */
-	if (!(offset & 0x2000) && !(starfire_vidctrl1 & 0x80))
+	if (!(offset & 0x2000) && !(state->starfire_vidctrl1 & 0x80))
 	{
 		if (mask & 0xff00)
-			starfire_colorram[offset1] = starfire_color;
+			state->starfire_colorram[offset1] = state->starfire_color;
 		if (mask & 0x00ff)
-			starfire_colorram[offset2] = starfire_color;
+			state->starfire_colorram[offset2] = state->starfire_color;
 	}
 }
 
@@ -189,12 +187,13 @@ READ8_HANDLER( starfire_videoram_r )
 	int sh, mask, d0;
 	int offset1 = offset & 0x1fff;
 	int offset2 = (offset + 0x100) & 0x1fff;
-
+    starfire_state *state = space->machine->driver_data<starfire_state>();
+    
 	/* selector 6A */
 	if (offset & 0x2000)
-		sh = (starfire_vidctrl >> 1) & 0x07;
+		sh = (state->starfire_vidctrl >> 1) & 0x07;
 	else
-		sh = (starfire_vidctrl >> 5) & 0x07;
+		sh = (state->starfire_vidctrl >> 5) & 0x07;
 
 	/* shifters 6D/6E */
 	mask = 0xff00 >> sh;
@@ -202,14 +201,14 @@ READ8_HANDLER( starfire_videoram_r )
 	/* ROLL */
 	if ((offset & 0x1f00) == 0x1f00)
 	{
-		if (starfire_vidctrl1 & 0x10)
+		if (state->starfire_vidctrl1 & 0x10)
 			mask &= 0x00ff;
 		else
 			mask &= 0xff00;
 	}
 
 	/* munge the results */
-	d0 = (starfire_videoram[offset1] & (mask >> 8)) | (starfire_videoram[offset2] & mask);
+	d0 = (state->starfire_videoram[offset1] & (mask >> 8)) | (state->starfire_videoram[offset2] & mask);
 	d0 = (d0 << sh) | (d0 >> (8 - sh));
 	return d0 & 0xff;
 }
@@ -222,49 +221,57 @@ READ8_HANDLER( starfire_videoram_r )
  *
  *************************************/
 
-static void get_pens(pen_t *pens)
+static void get_pens(running_machine *machine, pen_t *pens)
 {
 	offs_t offs;
+    starfire_state *state = machine->driver_data<starfire_state>();
 
-	for (offs = 0; offs < NUM_PENS; offs++)
+	for (offs = 0; offs < STARFIRE_NUM_PENS; offs++)
 	{
-		UINT16 color = starfire_colors[offs];
+		UINT16 color = state->starfire_colors[offs];
 
 		pens[offs] = MAKE_RGB(pal3bit(color >> 6), pal3bit(color >> 3), pal3bit(color >> 0));
 	}
 }
 
-
-VIDEO_UPDATE( starfire )
+static TIMER_CALLBACK( starfire_scanline_callback )
 {
-	pen_t pens[NUM_PENS];
+    starfire_state *state = machine->driver_data<starfire_state>();
+    pen_t pens[STARFIRE_NUM_PENS];
+	int y = param;
 
-	UINT8 *pix = &starfire_videoram[cliprect->min_y - 32];
-	UINT8 *col = &starfire_colorram[cliprect->min_y - 32];
-	int x, y;
+	get_pens(machine, pens);
 
-	get_pens(pens);
+	UINT8 *pix = &state->starfire_videoram[y];
+	UINT8 *col = &state->starfire_colorram[y];
 
-	for (x = 0; x < 256; x += 8)
+	for (int x = 0; x < 256; x += 8)
 	{
-		for (y = cliprect->min_y; y <= cliprect->max_y ; y++)
-		{
-			int data = pix[y];
-			int color = col[y];
+		int data = pix[0];
+		int color = col[0];
 
-			*BITMAP_ADDR32(bitmap, y, x + 0) = pens[color | ((data >> 2) & 0x20)];
-			*BITMAP_ADDR32(bitmap, y, x + 1) = pens[color | ((data >> 1) & 0x20)];
-			*BITMAP_ADDR32(bitmap, y, x + 2) = pens[color | ((data >> 0) & 0x20)];
-			*BITMAP_ADDR32(bitmap, y, x + 3) = pens[color | ((data << 1) & 0x20)];
-			*BITMAP_ADDR32(bitmap, y, x + 4) = pens[color | ((data << 2) & 0x20)];
-			*BITMAP_ADDR32(bitmap, y, x + 5) = pens[color | ((data << 3) & 0x20)];
-			*BITMAP_ADDR32(bitmap, y, x + 6) = pens[color | ((data << 4) & 0x20)];
-			*BITMAP_ADDR32(bitmap, y, x + 7) = pens[color | ((data << 5) & 0x20)];
-		}
+		*BITMAP_ADDR32(state->starfire_screen, y, x + 0) = pens[color | ((data >> 2) & 0x20)];
+		*BITMAP_ADDR32(state->starfire_screen, y, x + 1) = pens[color | ((data >> 1) & 0x20)];
+		*BITMAP_ADDR32(state->starfire_screen, y, x + 2) = pens[color | ((data >> 0) & 0x20)];
+		*BITMAP_ADDR32(state->starfire_screen, y, x + 3) = pens[color | ((data << 1) & 0x20)];
+		*BITMAP_ADDR32(state->starfire_screen, y, x + 4) = pens[color | ((data << 2) & 0x20)];
+		*BITMAP_ADDR32(state->starfire_screen, y, x + 5) = pens[color | ((data << 3) & 0x20)];
+		*BITMAP_ADDR32(state->starfire_screen, y, x + 6) = pens[color | ((data << 4) & 0x20)];
+		*BITMAP_ADDR32(state->starfire_screen, y, x + 7) = pens[color | ((data << 5) & 0x20)];
 
 		pix += 256;
 		col += 256;
 	}
+
+	y++;
+	if (y >= STARFIRE_VBSTART) y = STARFIRE_VBEND;
+	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->time_until_pos(y), y);
+}
+
+VIDEO_UPDATE( starfire )
+{
+	starfire_state *state = screen->machine->driver_data<starfire_state>();
+    copybitmap(bitmap, state->starfire_screen, 0, 0, 0, 0, cliprect);
 
 	return 0;
 }
