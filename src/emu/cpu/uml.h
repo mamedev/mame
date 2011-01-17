@@ -637,6 +637,9 @@ namespace uml
 	inline parameter vreg(int n) { return parameter::make_vreg(REG_V0 + n); }
 	inline parameter mapvar(int n) { return parameter::make_mapvar(MAPVAR_M0 + n); }
 
+	// global inline functions to define memory parameters
+	inline parameter mem(const void *ptr) { return parameter::make_memory(ptr); }
+
 	// global register objects for direct access
 	const parameter I0(parameter::make_ireg(REG_I0 + 0));
 	const parameter I1(parameter::make_ireg(REG_I0 + 1));

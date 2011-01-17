@@ -52,8 +52,8 @@ extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
 ***************************************************************************/
 
 /* map variables */
-#define MAPVAR_PC						MVAR(0)
-#define MAPVAR_CYCLES					MVAR(1)
+#define MAPVAR_PC						M0
+#define MAPVAR_CYCLES					M1
 
 /* size of the execution code cache */
 #define CACHE_SIZE						(32 * 1024 * 1024)
@@ -281,7 +281,7 @@ INLINE void load_fast_iregs(rsp_state *rsp, drcuml_block *block)
 
 	for (regnum = 0; regnum < ARRAY_LENGTH(rsp->impstate->regmap); regnum++)
 		if (rsp->impstate->regmap[regnum].is_int_register())
-			UML_MOV(block, IREG(rsp->impstate->regmap[regnum].ireg() - REG_I0), MEM(&rsp->r[regnum]));
+			UML_MOV(block, ireg(rsp->impstate->regmap[regnum].ireg() - REG_I0), mem(&rsp->r[regnum]));
 }
 
 
@@ -296,7 +296,7 @@ INLINE void save_fast_iregs(rsp_state *rsp, drcuml_block *block)
 
 	for (regnum = 0; regnum < ARRAY_LENGTH(rsp->impstate->regmap); regnum++)
 		if (rsp->impstate->regmap[regnum].is_int_register())
-			UML_MOV(block, MEM(&rsp->r[regnum]), IREG(rsp->impstate->regmap[regnum].ireg() - REG_I0));
+			UML_MOV(block, mem(&rsp->r[regnum]), ireg(rsp->impstate->regmap[regnum].ireg() - REG_I0));
 }
 
 /***************************************************************************
@@ -667,23 +667,23 @@ static CPU_INIT( rsp )
 	rsp->impstate->drcuml->get_backend_info(beinfo);
 	if (beinfo.direct_iregs > 2)
 	{
-		rsp->impstate->regmap[30] = IREG(2);
+		rsp->impstate->regmap[30] = I2;
 	}
 	if (beinfo.direct_iregs > 3)
 	{
-		rsp->impstate->regmap[31] = IREG(3);
+		rsp->impstate->regmap[31] = I3;
 	}
 	if (beinfo.direct_iregs > 4)
 	{
-		rsp->impstate->regmap[2] = IREG(4);
+		rsp->impstate->regmap[2] = I4;
 	}
 	if (beinfo.direct_iregs > 5)
 	{
-		rsp->impstate->regmap[3] = IREG(5);
+		rsp->impstate->regmap[3] = I5;
 	}
 	if (beinfo.direct_iregs > 6)
 	{
-		rsp->impstate->regmap[4] = IREG(6);
+		rsp->impstate->regmap[4] = I6;
 	}
 	*/
 
@@ -1110,52 +1110,52 @@ static int generate_lwc2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 	switch ((op >> 11) & 0x1f)
 	{
 		case 0x00:		/* LBV */
-			//UML_ADD(block, IREG(0), R32(RSREG), IMM(offset));
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			//UML_ADD(block, I0, R32(RSREG), offset);
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_lbv, rsp);
 			return TRUE;
 		case 0x01:		/* LSV */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_lsv, rsp);
 			return TRUE;
 		case 0x02:		/* LLV */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_llv, rsp);
 			return TRUE;
 		case 0x03:		/* LDV */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_ldv, rsp);
 			return TRUE;
 		case 0x04:		/* LQV */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_lqv, rsp);
 			return TRUE;
 		case 0x05:		/* LRV */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_lrv, rsp);
 			return TRUE;
 		case 0x06:		/* LPV */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_lpv, rsp);
 			return TRUE;
 		case 0x07:		/* LUV */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_luv, rsp);
 			return TRUE;
 		case 0x08:		/* LHV */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_lhv, rsp);
 			return TRUE;
 		case 0x09:		/* LFV */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_lfv, rsp);
 			return TRUE;
 		case 0x0a:		/* LWV */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_lwv, rsp);
 			return TRUE;
 		case 0x0b:		/* LTV */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_ltv, rsp);
 			return TRUE;
 
@@ -1597,51 +1597,51 @@ static int generate_swc2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 	switch ((op >> 11) & 0x1f)
 	{
 		case 0x00:		/* SBV */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_sbv, rsp);
 			return TRUE;
 		case 0x01:		/* SSV */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_ssv, rsp);
 			return TRUE;
 		case 0x02:		/* SLV */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_slv, rsp);
 			return TRUE;
 		case 0x03:		/* SDV */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_sdv, rsp);
 			return TRUE;
 		case 0x04:		/* SQV */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_sqv, rsp);
 			return TRUE;
 		case 0x05:		/* SRV */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_srv, rsp);
 			return TRUE;
 		case 0x06:		/* SPV */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_spv, rsp);
 			return TRUE;
 		case 0x07:		/* SUV */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_suv, rsp);
 			return TRUE;
 		case 0x08:		/* SHV */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_shv, rsp);
 			return TRUE;
 		case 0x09:		/* SFV */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_sfv, rsp);
 			return TRUE;
 		case 0x0a:		/* SWV */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_swv, rsp);
 			return TRUE;
 		case 0x0b:		/* STV */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_stv, rsp);
 			return TRUE;
 
@@ -3502,7 +3502,7 @@ static void code_compile_block(rsp_state *rsp, offs_t pc)
 				else
 				{
 					UML_LABEL(block, seqhead->pc | 0x80000000);								// label   seqhead->pc
-					UML_HASHJMP(block, IMM(0), IMM(seqhead->pc), *rsp->impstate->nocode);
+					UML_HASHJMP(block, 0, seqhead->pc, *rsp->impstate->nocode);
 																							// hashjmp <0>,seqhead->pc,nocode
 					continue;
 				}
@@ -3528,11 +3528,11 @@ static void code_compile_block(rsp_state *rsp, offs_t pc)
 					nextpc = seqlast->pc + (seqlast->skipslots + 1) * 4;
 
 				/* count off cycles and go there */
-				generate_update_cycles(rsp, block, &compiler, IMM(nextpc), TRUE);			// <subtract cycles>
+				generate_update_cycles(rsp, block, &compiler, nextpc, TRUE);			// <subtract cycles>
 
 				/* if the last instruction can change modes, use a variable mode; otherwise, assume the same mode */
 				if (seqlast->next() == NULL || seqlast->next()->pc != nextpc)
-					UML_HASHJMP(block, IMM(0), IMM(nextpc), *rsp->impstate->nocode);			// hashjmp <mode>,nextpc,nocode
+					UML_HASHJMP(block, 0, nextpc, *rsp->impstate->nocode);			// hashjmp <mode>,nextpc,nocode
 			}
 
 			/* end the sequence */
@@ -3603,7 +3603,7 @@ static void static_generate_entry_point(rsp_state *rsp)
 	load_fast_iregs(rsp, block);
 
 	/* generate a hash jump via the current mode and PC */
-	UML_HASHJMP(block, IMM(0), MEM(&rsp->pc), *rsp->impstate->nocode);
+	UML_HASHJMP(block, 0, mem(&rsp->pc), *rsp->impstate->nocode);
 																					// hashjmp <mode>,<pc>,nocode
 	block->end();
 }
@@ -3625,10 +3625,10 @@ static void static_generate_nocode_handler(rsp_state *rsp)
 	/* generate a hash jump via the current mode and PC */
 	alloc_handle(drcuml, &rsp->impstate->nocode, "nocode");
 	UML_HANDLE(block, *rsp->impstate->nocode);										// handle  nocode
-	UML_GETEXP(block, IREG(0));														// getexp  i0
-	UML_MOV(block, MEM(&rsp->pc), IREG(0));											// mov     [pc],i0
+	UML_GETEXP(block, I0);														// getexp  i0
+	UML_MOV(block, mem(&rsp->pc), I0);											// mov     [pc],i0
 	save_fast_iregs(rsp, block);
-	UML_EXIT(block, IMM(EXECUTE_MISSING_CODE));										// exit    EXECUTE_MISSING_CODE
+	UML_EXIT(block, EXECUTE_MISSING_CODE);										// exit    EXECUTE_MISSING_CODE
 
 	block->end();
 }
@@ -3650,10 +3650,10 @@ static void static_generate_out_of_cycles(rsp_state *rsp)
 	/* generate a hash jump via the current mode and PC */
 	alloc_handle(drcuml, &rsp->impstate->out_of_cycles, "out_of_cycles");
 	UML_HANDLE(block, *rsp->impstate->out_of_cycles);								// handle  out_of_cycles
-	UML_GETEXP(block, IREG(0));														// getexp  i0
-	UML_MOV(block, MEM(&rsp->pc), IREG(0));											// mov     <pc>,i0
+	UML_GETEXP(block, I0);														// getexp  i0
+	UML_MOV(block, mem(&rsp->pc), I0);											// mov     <pc>,i0
 	save_fast_iregs(rsp, block);
-	UML_EXIT(block, IMM(EXECUTE_OUT_OF_CYCLES));									// exit    EXECUTE_OUT_OF_CYCLES
+	UML_EXIT(block, EXECUTE_OUT_OF_CYCLES);									// exit    EXECUTE_OUT_OF_CYCLES
 
 	block->end();
 }
@@ -3682,20 +3682,20 @@ static void static_generate_memory_accessor(rsp_state *rsp, int size, int iswrit
 	{
 		if (size == 1)
 		{
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IREG(0));				// mov     [arg0],i0 ; address
-			UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(1));				// mov     [arg1],i1 ; data
+			UML_MOV(block, mem(&rsp->impstate->arg0), I0);				// mov     [arg0],i0 ; address
+			UML_MOV(block, mem(&rsp->impstate->arg1), I1);				// mov     [arg1],i1 ; data
 			UML_CALLC(block, cfunc_write8, rsp);							// callc   cfunc_write8
 		}
 		else if (size == 2)
 		{
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IREG(0));				// mov     [arg0],i0 ; address
-			UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(1));				// mov     [arg1],i1 ; data
+			UML_MOV(block, mem(&rsp->impstate->arg0), I0);				// mov     [arg0],i0 ; address
+			UML_MOV(block, mem(&rsp->impstate->arg1), I1);				// mov     [arg1],i1 ; data
 			UML_CALLC(block, cfunc_write16, rsp);							// callc   cfunc_write16
 		}
 		else if (size == 4)
 		{
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IREG(0));				// mov     [arg0],i0 ; address
-			UML_MOV(block, MEM(&rsp->impstate->arg1), IREG(1));				// mov     [arg1],i1 ; data
+			UML_MOV(block, mem(&rsp->impstate->arg0), I0);				// mov     [arg0],i0 ; address
+			UML_MOV(block, mem(&rsp->impstate->arg1), I1);				// mov     [arg1],i1 ; data
 			UML_CALLC(block, cfunc_write32, rsp);							// callc   cfunc_write32
 		}
 	}
@@ -3703,21 +3703,21 @@ static void static_generate_memory_accessor(rsp_state *rsp, int size, int iswrit
 	{
 		if (size == 1)
 		{
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IREG(0));			// mov     [arg0],i0 ; address
+			UML_MOV(block, mem(&rsp->impstate->arg0), I0);			// mov     [arg0],i0 ; address
 			UML_CALLC(block, cfunc_read8, rsp);							// callc   cfunc_printf_debug
-			UML_MOV(block, IREG(0), MEM(&rsp->impstate->arg0));			// mov     i0,[arg0],i0 ; result
+			UML_MOV(block, I0, mem(&rsp->impstate->arg0));			// mov     i0,[arg0],i0 ; result
 		}
 		else if (size == 2)
 		{
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IREG(0));			// mov     [arg0],i0 ; address
+			UML_MOV(block, mem(&rsp->impstate->arg0), I0);			// mov     [arg0],i0 ; address
 			UML_CALLC(block, cfunc_read16, rsp);						// callc   cfunc_read16
-			UML_MOV(block, IREG(0), MEM(&rsp->impstate->arg0));			// mov     i0,[arg0],i0 ; result
+			UML_MOV(block, I0, mem(&rsp->impstate->arg0));			// mov     i0,[arg0],i0 ; result
 		}
 		else if (size == 4)
 		{
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IREG(0));			// mov     [arg0],i0 ; address
+			UML_MOV(block, mem(&rsp->impstate->arg0), I0);			// mov     [arg0],i0 ; address
 			UML_CALLC(block, cfunc_read32, rsp);						// callc   cfunc_read32
-			UML_MOV(block, IREG(0), MEM(&rsp->impstate->arg0));			// mov     i0,[arg0],i0 ; result
+			UML_MOV(block, I0, mem(&rsp->impstate->arg0));			// mov     i0,[arg0],i0 ; result
 		}
 	}
 	UML_RET(block);
@@ -3741,9 +3741,9 @@ static void generate_update_cycles(rsp_state *rsp, drcuml_block *block, compiler
 	/* account for cycles */
 	if (compiler->cycles > 0)
 	{
-		UML_SUB(block, MEM(&rsp->icount), MEM(&rsp->icount), MAPVAR_CYCLES);		// sub     icount,icount,cycles
+		UML_SUB(block, mem(&rsp->icount), mem(&rsp->icount), MAPVAR_CYCLES);		// sub     icount,icount,cycles
 		UML_MAPVAR(block, MAPVAR_CYCLES, 0);										// mapvar  cycles,0
-		UML_EXHc(block, IF_S, *rsp->impstate->out_of_cycles, param);
+		UML_EXHc(block, COND_S, *rsp->impstate->out_of_cycles, param);
 	}
 	compiler->cycles = 0;
 }
@@ -3766,9 +3766,9 @@ static void generate_checksum_block(rsp_state *rsp, drcuml_block *block, compile
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
 			void *base = rsp->direct->read_decrypted_ptr(seqhead->physpc | 0x1000);
-			UML_LOAD(block, IREG(0), base, IMM(0), SIZE_DWORD, SCALE_x4);							// load    i0,base,0,dword
-			UML_CMP(block, IREG(0), IMM(seqhead->opptr.l[0]));						// cmp     i0,opptr[0]
-			UML_EXHc(block, IF_NE, *rsp->impstate->nocode, IMM(epc(seqhead)));		// exne    nocode,seqhead->pc
+			UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);							// load    i0,base,0,dword
+			UML_CMP(block, I0, seqhead->opptr.l[0]);						// cmp     i0,opptr[0]
+			UML_EXHc(block, COND_NE, *rsp->impstate->nocode, epc(seqhead));		// exne    nocode,seqhead->pc
 		}
 	}
 
@@ -3777,18 +3777,18 @@ static void generate_checksum_block(rsp_state *rsp, drcuml_block *block, compile
 	{
 		UINT32 sum = 0;
 		void *base = rsp->direct->read_decrypted_ptr(seqhead->physpc | 0x1000);
-		UML_LOAD(block, IREG(0), base, IMM(0), SIZE_DWORD, SCALE_x4);								// load    i0,base,0,dword
+		UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);								// load    i0,base,0,dword
 		sum += seqhead->opptr.l[0];
 		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
 				base = rsp->direct->read_decrypted_ptr(curdesc->physpc | 0x1000);
-				UML_LOAD(block, IREG(1), base, IMM(0), SIZE_DWORD, SCALE_x4);						// load    i1,base,dword
-				UML_ADD(block, IREG(0), IREG(0), IREG(1));							// add     i0,i0,i1
+				UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);						// load    i1,base,dword
+				UML_ADD(block, I0, I0, I1);							// add     i0,i0,i1
 				sum += curdesc->opptr.l[0];
 			}
-		UML_CMP(block, IREG(0), IMM(sum));											// cmp     i0,sum
-		UML_EXHc(block, IF_NE, *rsp->impstate->nocode, IMM(epc(seqhead)));			// exne    nocode,seqhead->pc
+		UML_CMP(block, I0, sum);											// cmp     i0,sum
+		UML_EXHc(block, COND_NE, *rsp->impstate->nocode, epc(seqhead));			// exne    nocode,seqhead->pc
 	}
 }
 
@@ -3819,18 +3819,18 @@ static void generate_sequence_instruction(rsp_state *rsp, drcuml_block *block, c
 	/* if we are debugging, call the debugger */
 	if ((rsp->device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
-		UML_MOV(block, MEM(&rsp->pc), IMM(desc->pc));								// mov     [pc],desc->pc
+		UML_MOV(block, mem(&rsp->pc), desc->pc);								// mov     [pc],desc->pc
 		save_fast_iregs(rsp, block);
-		UML_DEBUG(block, IMM(desc->pc));											// debug   desc->pc
+		UML_DEBUG(block, desc->pc);											// debug   desc->pc
 	}
 
 	/* if we hit an unmapped address, fatal error */
 #if 0
 	if (desc->flags & OPFLAG_COMPILER_UNMAPPED)
 	{
-		UML_MOV(block, MEM(&rsp->pc), IMM(desc->pc));							   // mov     [pc],desc->pc
+		UML_MOV(block, mem(&rsp->pc), desc->pc);							   // mov     [pc],desc->pc
 		save_fast_iregs(rsp, block);
-		UML_EXIT(block, IMM(EXECUTE_UNMAPPED_CODE));								// exit EXECUTE_UNMAPPED_CODE
+		UML_EXIT(block, EXECUTE_UNMAPPED_CODE);								// exit EXECUTE_UNMAPPED_CODE
 	}
 #endif
 
@@ -3840,8 +3840,8 @@ static void generate_sequence_instruction(rsp_state *rsp, drcuml_block *block, c
 		/* compile the instruction */
 		if (!generate_opcode(rsp, block, compiler, desc))
 		{
-			UML_MOV(block, MEM(&rsp->pc), IMM(desc->pc));							// mov     [pc],desc->pc
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->pc), desc->pc);							// mov     [pc],desc->pc
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_unimplemented, rsp);								// callc   cfunc_unimplemented
 		}
 	}
@@ -3859,14 +3859,14 @@ static void generate_delay_slot_and_branch(rsp_state *rsp, drcuml_block *block, 
 	/* fetch the target register if dynamic, in case it is modified by the delay slot */
 	if (desc->targetpc == BRANCH_TARGET_DYNAMIC)
 	{
-		UML_AND(block, MEM(&rsp->impstate->jmpdest), R32(RSREG), IMM(0x00000fff));
-		UML_OR(block, MEM(&rsp->impstate->jmpdest), MEM(&rsp->impstate->jmpdest), IMM(0x1000));
+		UML_AND(block, mem(&rsp->impstate->jmpdest), R32(RSREG), 0x00000fff);
+		UML_OR(block, mem(&rsp->impstate->jmpdest), mem(&rsp->impstate->jmpdest), 0x1000);
 	}
 
 	/* set the link if needed -- before the delay slot */
 	if (linkreg != 0)
 	{
-		UML_MOV(block, R32(linkreg), IMM((INT32)(desc->pc + 8)));					// mov    <linkreg>,desc->pc + 8
+		UML_MOV(block, R32(linkreg), (INT32)(desc->pc + 8));					// mov    <linkreg>,desc->pc + 8
 	}
 
 	/* compile the delay slot using temporary compiler state */
@@ -3876,22 +3876,22 @@ static void generate_delay_slot_and_branch(rsp_state *rsp, drcuml_block *block, 
 	/* update the cycles and jump through the hash table to the target */
 	if (desc->targetpc != BRANCH_TARGET_DYNAMIC)
 	{
-		generate_update_cycles(rsp, block, &compiler_temp, IMM(desc->targetpc), TRUE);	// <subtract cycles>
+		generate_update_cycles(rsp, block, &compiler_temp, desc->targetpc, TRUE);	// <subtract cycles>
 		if (desc->flags & OPFLAG_INTRABLOCK_BRANCH)
 		{
 			UML_JMP(block, desc->targetpc | 0x80000000);							// jmp     desc->targetpc
 		}
 		else
 		{
-			UML_HASHJMP(block, IMM(0), IMM(desc->targetpc), *rsp->impstate->nocode);
+			UML_HASHJMP(block, 0, desc->targetpc, *rsp->impstate->nocode);
 																					// hashjmp <mode>,desc->targetpc,nocode
 		}
 	}
 	else
 	{
-		generate_update_cycles(rsp, block, &compiler_temp, MEM(&rsp->impstate->jmpdest), TRUE);
+		generate_update_cycles(rsp, block, &compiler_temp, mem(&rsp->impstate->jmpdest), TRUE);
 																					// <subtract cycles>
-		UML_HASHJMP(block, IMM(0), MEM(&rsp->impstate->jmpdest), *rsp->impstate->nocode);
+		UML_HASHJMP(block, 0, mem(&rsp->impstate->jmpdest), *rsp->impstate->nocode);
 																					// hashjmp <mode>,<rsreg>,nocode
 	}
 
@@ -3921,197 +3921,197 @@ static int generate_vector_opcode(rsp_state *rsp, drcuml_block *block, compiler_
 	switch (op & 0x3f)
 	{
 		case 0x00:		/* VMULF */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vmulf, rsp);
 			return TRUE;
 
 		case 0x01:		/* VMULU */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vmulu, rsp);
 			return TRUE;
 
 		case 0x04:		/* VMUDL */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vmudl, rsp);
 			return TRUE;
 
 		case 0x05:		/* VMUDM */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vmudm, rsp);
 			return TRUE;
 
 		case 0x06:		/* VMUDN */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vmudn, rsp);
 			return TRUE;
 
 		case 0x07:		/* VMUDH */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vmudh, rsp);
 			return TRUE;
 
 		case 0x08:		/* VMACF */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vmacf, rsp);
 			return TRUE;
 
 		case 0x09:		/* VMACU */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vmacu, rsp);
 			return TRUE;
 
 		case 0x0c:		/* VMADL */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vmadl, rsp);
 			return TRUE;
 
 		case 0x0d:		/* VMADM */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vmadm, rsp);
 			return TRUE;
 
 		case 0x0e:		/* VMADN */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vmadn, rsp);
 			return TRUE;
 
 		case 0x0f:		/* VMADH */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vmadh, rsp);
 			return TRUE;
 
 		case 0x10:		/* VADD */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vadd, rsp);
 			return TRUE;
 
 		case 0x11:		/* VSUB */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vsub, rsp);
 			return TRUE;
 
 		case 0x13:		/* VABS */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vabs, rsp);
 			return TRUE;
 
 		case 0x14:		/* VADDC */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vaddc, rsp);
 			return TRUE;
 
 		case 0x15:		/* VSUBC */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vsubc, rsp);
 			return TRUE;
 
 		case 0x1d:		/* VSAW */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vsaw, rsp);
 			return TRUE;
 
 		case 0x20:		/* VLT */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vlt, rsp);
 			return TRUE;
 
 		case 0x21:		/* VEQ */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_veq, rsp);
 			return TRUE;
 
 		case 0x22:		/* VNE */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vne, rsp);
 			return TRUE;
 
 		case 0x23:		/* VGE */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vge, rsp);
 			return TRUE;
 
 		case 0x24:		/* VCL */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vcl, rsp);
 			return TRUE;
 
 		case 0x25:		/* VCH */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vch, rsp);
 			return TRUE;
 
 		case 0x26:		/* VCR */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vcr, rsp);
 			return TRUE;
 
 		case 0x27:		/* VMRG */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vmrg, rsp);
 			return TRUE;
 
 		case 0x28:		/* VAND */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vand, rsp);
 			return TRUE;
 
 		case 0x29:		/* VNAND */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vnand, rsp);
 			return TRUE;
 
 		case 0x2a:		/* VOR */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vor, rsp);
 			return TRUE;
 
 		case 0x2b:		/* VNOR */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vnor, rsp);
 			return TRUE;
 
 		case 0x2c:		/* VXOR */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vxor, rsp);
 			return TRUE;
 
 		case 0x2d:		/* VNXOR */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vnxor, rsp);
 			return TRUE;
 
 		case 0x30:		/* VRCP */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vrcp, rsp);
 			return TRUE;
 
 		case 0x31:		/* VRCPL */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vrcpl, rsp);
 			return TRUE;
 
 		case 0x32:		/* VRCPH */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vrcph, rsp);
 			return TRUE;
 
 		case 0x33:		/* VMOV */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vmov, rsp);
 			return TRUE;
 
 		case 0x35:		/* VRSQL */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vrsql, rsp);
 			return TRUE;
 
 		case 0x36:		/* VRSQH */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vrsqh, rsp);
 			return TRUE;
 
 		default:
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_unimplemented_opcode, rsp);
 			return FALSE;
 	}
@@ -4146,14 +4146,14 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 
 		case 0x04:	/* BEQ - MIPS I */
 			UML_CMP(block, R32(RSREG), R32(RTREG));								// cmp    <rsreg>,<rtreg>
-			UML_JMPc(block, IF_NE, skip = compiler->labelnum++);				// jmp    skip,NE
+			UML_JMPc(block, COND_NE, skip = compiler->labelnum++);				// jmp    skip,NE
 			generate_delay_slot_and_branch(rsp, block, compiler, desc, 0);		// <next instruction + hashjmp>
 			UML_LABEL(block, skip);												// skip:
 			return TRUE;
 
 		case 0x05:	/* BNE - MIPS I */
 			UML_CMP(block, R32(RSREG), R32(RTREG));								// dcmp    <rsreg>,<rtreg>
-			UML_JMPc(block, IF_E, skip = compiler->labelnum++);						// jmp     skip,E
+			UML_JMPc(block, COND_E, skip = compiler->labelnum++);						// jmp     skip,E
 			generate_delay_slot_and_branch(rsp, block, compiler, desc, 0);		// <next instruction + hashjmp>
 			UML_LABEL(block, skip);												// skip:
 			return TRUE;
@@ -4161,8 +4161,8 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 		case 0x06:	/* BLEZ - MIPS I */
 			if (RSREG != 0)
 			{
-				UML_CMP(block, R32(RSREG), IMM(0));								// dcmp    <rsreg>,0
-				UML_JMPc(block, IF_G, skip = compiler->labelnum++);					// jmp     skip,G
+				UML_CMP(block, R32(RSREG), 0);								// dcmp    <rsreg>,0
+				UML_JMPc(block, COND_G, skip = compiler->labelnum++);					// jmp     skip,G
 				generate_delay_slot_and_branch(rsp, block, compiler, desc, 0);	// <next instruction + hashjmp>
 				UML_LABEL(block, skip);											// skip:
 			}
@@ -4171,8 +4171,8 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 			return TRUE;
 
 		case 0x07:	/* BGTZ - MIPS I */
-			UML_CMP(block, R32(RSREG), IMM(0));									// dcmp    <rsreg>,0
-			UML_JMPc(block, IF_LE, skip = compiler->labelnum++);					// jmp     skip,LE
+			UML_CMP(block, R32(RSREG), 0);									// dcmp    <rsreg>,0
+			UML_JMPc(block, COND_LE, skip = compiler->labelnum++);					// jmp     skip,LE
 			generate_delay_slot_and_branch(rsp, block, compiler, desc, 0);		// <next instruction + hashjmp>
 			UML_LABEL(block, skip);												// skip:
 			return TRUE;
@@ -4182,94 +4182,94 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 
 		case 0x0f:	/* LUI - MIPS I */
 			if (RTREG != 0)
-				UML_MOV(block, R32(RTREG), IMM(SIMMVAL << 16));					// dmov    <rtreg>,SIMMVAL << 16
+				UML_MOV(block, R32(RTREG), SIMMVAL << 16);					// dmov    <rtreg>,SIMMVAL << 16
 			return TRUE;
 
 		case 0x08:	/* ADDI - MIPS I */
 		case 0x09:	/* ADDIU - MIPS I */
 			if (RTREG != 0)
 			{
-				UML_ADD(block, R32(RTREG), R32(RSREG), IMM(SIMMVAL));				// add     i0,<rsreg>,SIMMVAL,V
+				UML_ADD(block, R32(RTREG), R32(RSREG), SIMMVAL);				// add     i0,<rsreg>,SIMMVAL,V
 			}
 			return TRUE;
 
 		case 0x0a:	/* SLTI - MIPS I */
 			if (RTREG != 0)
 			{
-				UML_CMP(block, R32(RSREG), IMM(SIMMVAL));							// dcmp    <rsreg>,SIMMVAL
-				UML_SETc(block, IF_L, R32(RTREG));									// dset    <rtreg>,l
+				UML_CMP(block, R32(RSREG), SIMMVAL);							// dcmp    <rsreg>,SIMMVAL
+				UML_SETc(block, COND_L, R32(RTREG));									// dset    <rtreg>,l
 			}
 			return TRUE;
 
 		case 0x0b:	/* SLTIU - MIPS I */
 			if (RTREG != 0)
 			{
-				UML_CMP(block, R32(RSREG), IMM(SIMMVAL));							// dcmp    <rsreg>,SIMMVAL
-				UML_SETc(block, IF_B, R32(RTREG));									// dset    <rtreg>,b
+				UML_CMP(block, R32(RSREG), SIMMVAL);							// dcmp    <rsreg>,SIMMVAL
+				UML_SETc(block, COND_B, R32(RTREG));									// dset    <rtreg>,b
 			}
 			return TRUE;
 
 
 		case 0x0c:	/* ANDI - MIPS I */
 			if (RTREG != 0)
-				UML_AND(block, R32(RTREG), R32(RSREG), IMM(UIMMVAL));				// dand    <rtreg>,<rsreg>,UIMMVAL
+				UML_AND(block, R32(RTREG), R32(RSREG), UIMMVAL);				// dand    <rtreg>,<rsreg>,UIMMVAL
 			return TRUE;
 
 		case 0x0d:	/* ORI - MIPS I */
 			if (RTREG != 0)
-				UML_OR(block, R32(RTREG), R32(RSREG), IMM(UIMMVAL));				// dor     <rtreg>,<rsreg>,UIMMVAL
+				UML_OR(block, R32(RTREG), R32(RSREG), UIMMVAL);				// dor     <rtreg>,<rsreg>,UIMMVAL
 			return TRUE;
 
 		case 0x0e:	/* XORI - MIPS I */
 			if (RTREG != 0)
-				UML_XOR(block, R32(RTREG), R32(RSREG), IMM(UIMMVAL));				// dxor    <rtreg>,<rsreg>,UIMMVAL
+				UML_XOR(block, R32(RTREG), R32(RSREG), UIMMVAL);				// dxor    <rtreg>,<rsreg>,UIMMVAL
 			return TRUE;
 
 		/* ----- memory load operations ----- */
 
 		case 0x20:	/* LB - MIPS I */
-			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
+			UML_ADD(block, I0, R32(RSREG), SIMMVAL);						// add     i0,<rsreg>,SIMMVAL
 			UML_CALLH(block, *rsp->impstate->read8);									// callh   read8
 			if (RTREG != 0)
-				UML_SEXT(block, R32(RTREG), IREG(0), SIZE_BYTE);						// dsext   <rtreg>,i0,byte
+				UML_SEXT(block, R32(RTREG), I0, SIZE_BYTE);						// dsext   <rtreg>,i0,byte
 			if (!in_delay_slot)
-				generate_update_cycles(rsp, block, compiler, IMM(desc->pc + 4), TRUE);
+				generate_update_cycles(rsp, block, compiler, desc->pc + 4, TRUE);
 			return TRUE;
 
 		case 0x21:	/* LH - MIPS I */
-			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
+			UML_ADD(block, I0, R32(RSREG), SIMMVAL);						// add     i0,<rsreg>,SIMMVAL
 			UML_CALLH(block, *rsp->impstate->read16);								// callh   read16
 			if (RTREG != 0)
-				UML_SEXT(block, R32(RTREG), IREG(0), SIZE_WORD);						// dsext   <rtreg>,i0,word
+				UML_SEXT(block, R32(RTREG), I0, SIZE_WORD);						// dsext   <rtreg>,i0,word
 			if (!in_delay_slot)
-				generate_update_cycles(rsp, block, compiler, IMM(desc->pc + 4), TRUE);
+				generate_update_cycles(rsp, block, compiler, desc->pc + 4, TRUE);
 			return TRUE;
 
 		case 0x23:	/* LW - MIPS I */
-			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
+			UML_ADD(block, I0, R32(RSREG), SIMMVAL);						// add     i0,<rsreg>,SIMMVAL
 			UML_CALLH(block, *rsp->impstate->read32);								// callh   read32
 			if (RTREG != 0)
-				UML_MOV(block, R32(RTREG), IREG(0));
+				UML_MOV(block, R32(RTREG), I0);
 			if (!in_delay_slot)
-				generate_update_cycles(rsp, block, compiler, IMM(desc->pc + 4), TRUE);
+				generate_update_cycles(rsp, block, compiler, desc->pc + 4, TRUE);
 			return TRUE;
 
 		case 0x24:	/* LBU - MIPS I */
-			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
+			UML_ADD(block, I0, R32(RSREG), SIMMVAL);						// add     i0,<rsreg>,SIMMVAL
 			UML_CALLH(block, *rsp->impstate->read8);									// callh   read8
 			if (RTREG != 0)
-				UML_AND(block, R32(RTREG), IREG(0), IMM(0xff));					// dand    <rtreg>,i0,0xff
+				UML_AND(block, R32(RTREG), I0, 0xff);					// dand    <rtreg>,i0,0xff
 			if (!in_delay_slot)
-				generate_update_cycles(rsp, block, compiler, IMM(desc->pc + 4), TRUE);
+				generate_update_cycles(rsp, block, compiler, desc->pc + 4, TRUE);
 			return TRUE;
 
 		case 0x25:	/* LHU - MIPS I */
-			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
+			UML_ADD(block, I0, R32(RSREG), SIMMVAL);						// add     i0,<rsreg>,SIMMVAL
 			UML_CALLH(block, *rsp->impstate->read16);								// callh   read16
 			if (RTREG != 0)
-				UML_AND(block, R32(RTREG), IREG(0), IMM(0xffff));					// dand    <rtreg>,i0,0xffff
+				UML_AND(block, R32(RTREG), I0, 0xffff);					// dand    <rtreg>,i0,0xffff
 			if (!in_delay_slot)
-				generate_update_cycles(rsp, block, compiler, IMM(desc->pc + 4), TRUE);
+				generate_update_cycles(rsp, block, compiler, desc->pc + 4, TRUE);
 			return TRUE;
 
 		case 0x32:	/* LWC2 - MIPS I */
@@ -4279,32 +4279,32 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 		/* ----- memory store operations ----- */
 
 		case 0x28:	/* SB - MIPS I */
-			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
-			UML_MOV(block, IREG(1), R32(RTREG));									// mov     i1,<rtreg>
+			UML_ADD(block, I0, R32(RSREG), SIMMVAL);						// add     i0,<rsreg>,SIMMVAL
+			UML_MOV(block, I1, R32(RTREG));									// mov     i1,<rtreg>
 			UML_CALLH(block, *rsp->impstate->write8);								// callh   write8
 			if (!in_delay_slot)
-				generate_update_cycles(rsp, block, compiler, IMM(desc->pc + 4), TRUE);
+				generate_update_cycles(rsp, block, compiler, desc->pc + 4, TRUE);
 			return TRUE;
 
 		case 0x29:	/* SH - MIPS I */
-			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
-			UML_MOV(block, IREG(1), R32(RTREG));									// mov     i1,<rtreg>
+			UML_ADD(block, I0, R32(RSREG), SIMMVAL);						// add     i0,<rsreg>,SIMMVAL
+			UML_MOV(block, I1, R32(RTREG));									// mov     i1,<rtreg>
 			UML_CALLH(block, *rsp->impstate->write16);								// callh   write16
 			if (!in_delay_slot)
-				generate_update_cycles(rsp, block, compiler, IMM(desc->pc + 4), TRUE);
+				generate_update_cycles(rsp, block, compiler, desc->pc + 4, TRUE);
 			return TRUE;
 
 		case 0x2b:	/* SW - MIPS I */
-			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
-			UML_MOV(block, IREG(1), R32(RTREG));									// mov     i1,<rtreg>
+			UML_ADD(block, I0, R32(RSREG), SIMMVAL);						// add     i0,<rsreg>,SIMMVAL
+			UML_MOV(block, I1, R32(RTREG));									// mov     i1,<rtreg>
 			UML_CALLH(block, *rsp->impstate->write32);								// callh   write32
 			if (!in_delay_slot)
-				generate_update_cycles(rsp, block, compiler, IMM(desc->pc + 4), TRUE);
+				generate_update_cycles(rsp, block, compiler, desc->pc + 4, TRUE);
 			return TRUE;
 
 		case 0x3a:	/* SWC2 - MIPS I */
 			return generate_swc2(rsp, block, compiler, desc);
-			//UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));     // mov     [arg0],desc->opptr.l
+			//UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);     // mov     [arg0],desc->opptr.l
 			//UML_CALLC(block, cfunc_swc2, rsp);                                        // callc   cfunc_mfc2
 			//return TRUE;
 
@@ -4315,7 +4315,7 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 
 		case 0x12:	/* COP2 - MIPS I */
 			return generate_cop2(rsp, block, compiler, desc);
-			//UML_EXH(block, rsp->impstate->exception[EXCEPTION_INVALIDOP], IMM(0));// exh     invalidop,0
+			//UML_EXH(block, rsp->impstate->exception[EXCEPTION_INVALIDOP], 0);// exh     invalidop,0
 			//return TRUE;
 
 
@@ -4346,21 +4346,21 @@ static int generate_special(rsp_state *rsp, drcuml_block *block, compiler_state 
 		case 0x00:	/* SLL - MIPS I */
 			if (RDREG != 0)
 			{
-				UML_SHL(block, R32(RDREG), R32(RTREG), IMM(SHIFT));
+				UML_SHL(block, R32(RDREG), R32(RTREG), SHIFT);
 			}
 			return TRUE;
 
 		case 0x02:	/* SRL - MIPS I */
 			if (RDREG != 0)
 			{
-				UML_SHR(block, R32(RDREG), R32(RTREG), IMM(SHIFT));
+				UML_SHR(block, R32(RDREG), R32(RTREG), SHIFT);
 			}
 			return TRUE;
 
 		case 0x03:	/* SRA - MIPS I */
 			if (RDREG != 0)
 			{
-				UML_SAR(block, R32(RDREG), R32(RTREG), IMM(SHIFT));
+				UML_SAR(block, R32(RDREG), R32(RTREG), SHIFT);
 			}
 			return TRUE;
 
@@ -4429,8 +4429,8 @@ static int generate_special(rsp_state *rsp, drcuml_block *block, compiler_state 
 		case 0x27:	/* NOR - MIPS I */
 			if (RDREG != 0)
 			{
-				UML_OR(block, IREG(0), R32(RSREG), R32(RTREG));					// dor      i0,<rsreg>,<rtreg>
-				UML_XOR(block, R32(RDREG), IREG(0), IMM((UINT64)~0));				// dxor     <rdreg>,i0,~0
+				UML_OR(block, I0, R32(RSREG), R32(RTREG));					// dor      i0,<rsreg>,<rtreg>
+				UML_XOR(block, R32(RDREG), I0, (UINT64)~0);				// dxor     <rdreg>,i0,~0
 			}
 			return TRUE;
 
@@ -4441,7 +4441,7 @@ static int generate_special(rsp_state *rsp, drcuml_block *block, compiler_state 
 			if (RDREG != 0)
 			{
 				UML_CMP(block, R32(RSREG), R32(RTREG));							// dcmp    <rsreg>,<rtreg>
-				UML_SETc(block, IF_L, R32(RDREG));									// dset    <rdreg>,l
+				UML_SETc(block, COND_L, R32(RDREG));									// dset    <rdreg>,l
 			}
 			return TRUE;
 
@@ -4449,7 +4449,7 @@ static int generate_special(rsp_state *rsp, drcuml_block *block, compiler_state 
 			if (RDREG != 0)
 			{
 				UML_CMP(block, R32(RSREG), R32(RTREG));							// dcmp    <rsreg>,<rtreg>
-				UML_SETc(block, IF_B, R32(RDREG));									// dset    <rdreg>,b
+				UML_SETc(block, COND_B, R32(RDREG));									// dset    <rdreg>,b
 			}
 			return TRUE;
 
@@ -4468,11 +4468,11 @@ static int generate_special(rsp_state *rsp, drcuml_block *block, compiler_state 
 		/* ----- system calls ----- */
 
 		case 0x0d:	/* BREAK - MIPS I */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(3));					// mov     [arg0],3
+			UML_MOV(block, mem(&rsp->impstate->arg0), 3);					// mov     [arg0],3
 			UML_CALLC(block, cfunc_sp_set_status_cb, rsp);						// callc   cfunc_sp_set_status_cb
-			UML_MOV(block, MEM(&rsp->icount), IMM(0));						// mov icount, #0
+			UML_MOV(block, mem(&rsp->icount), 0);						// mov icount, #0
 
-			UML_EXIT(block, IMM(EXECUTE_OUT_OF_CYCLES));
+			UML_EXIT(block, EXECUTE_OUT_OF_CYCLES);
 			return TRUE;
 	}
 	return FALSE;
@@ -4497,8 +4497,8 @@ static int generate_regimm(rsp_state *rsp, drcuml_block *block, compiler_state *
 		case 0x10:	/* BLTZAL */
 			if (RSREG != 0)
 			{
-				UML_CMP(block, R32(RSREG), IMM(0));								// dcmp    <rsreg>,0
-				UML_JMPc(block, IF_GE, skip = compiler->labelnum++);				// jmp     skip,GE
+				UML_CMP(block, R32(RSREG), 0);								// dcmp    <rsreg>,0
+				UML_JMPc(block, COND_GE, skip = compiler->labelnum++);				// jmp     skip,GE
 				generate_delay_slot_and_branch(rsp, block, compiler, desc, (opswitch & 0x10) ? 31 : 0);
 																					// <next instruction + hashjmp>
 				UML_LABEL(block, skip);											// skip:
@@ -4509,8 +4509,8 @@ static int generate_regimm(rsp_state *rsp, drcuml_block *block, compiler_state *
 		case 0x11:	/* BGEZAL */
 			if (RSREG != 0)
 			{
-				UML_CMP(block, R32(RSREG), IMM(0));								// dcmp    <rsreg>,0
-				UML_JMPc(block, IF_L, skip = compiler->labelnum++);					// jmp     skip,L
+				UML_CMP(block, R32(RSREG), 0);								// dcmp    <rsreg>,0
+				UML_JMPc(block, COND_L, skip = compiler->labelnum++);					// jmp     skip,L
 				generate_delay_slot_and_branch(rsp, block, compiler, desc, (opswitch & 0x10) ? 31 : 0);
 																					// <next instruction + hashjmp>
 				UML_LABEL(block, skip);											// skip:
@@ -4538,28 +4538,28 @@ static int generate_cop2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 		case 0x00:	/* MFCz */
 			if (RTREG != 0)
 			{
-				UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));	// mov     [arg0],desc->opptr.l
+				UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);	// mov     [arg0],desc->opptr.l
 				UML_CALLC(block, cfunc_mfc2, rsp);									// callc   cfunc_mfc2
-				//UML_SEXT(block, R32(RTREG), IREG(0), DWORD);                      // dsext   <rtreg>,i0,dword
+				//UML_SEXT(block, R32(RTREG), I0, DWORD);                      // dsext   <rtreg>,i0,dword
 			}
 			return TRUE;
 
 		case 0x02:	/* CFCz */
 			if (RTREG != 0)
 			{
-				UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));	// mov     [arg0],desc->opptr.l
+				UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);	// mov     [arg0],desc->opptr.l
 				UML_CALLC(block, cfunc_cfc2, rsp);									// callc   cfunc_cfc2
-				//UML_SEXT(block, R32(RTREG), IREG(0), DWORD);                      // dsext   <rtreg>,i0,dword
+				//UML_SEXT(block, R32(RTREG), I0, DWORD);                      // dsext   <rtreg>,i0,dword
 			}
 			return TRUE;
 
 		case 0x04:	/* MTCz */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_mtc2, rsp);										// callc   cfunc_mtc2
 			return TRUE;
 
 		case 0x06:	/* CTCz */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));		// mov     [arg0],desc->opptr.l
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);		// mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_ctc2, rsp);										// callc   cfunc_ctc2
 			return TRUE;
 
@@ -4584,15 +4584,15 @@ static int generate_cop0(rsp_state *rsp, drcuml_block *block, compiler_state *co
 		case 0x00:	/* MFCz */
 			if (RTREG != 0)
 			{
-				UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(RDREG));				// mov     [arg0],<rdreg>
-				UML_MOV(block, MEM(&rsp->impstate->arg1), IMM(RTREG));				// mov     [arg1],<rtreg>
+				UML_MOV(block, mem(&rsp->impstate->arg0), RDREG);				// mov     [arg0],<rdreg>
+				UML_MOV(block, mem(&rsp->impstate->arg1), RTREG);				// mov     [arg1],<rtreg>
 				UML_CALLC(block, cfunc_get_cop0_reg, rsp);							// callc   cfunc_get_cop0_reg
 			}
 			return TRUE;
 
 		case 0x04:	/* MTCz */
-			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(RDREG));					// mov     [arg0],<rdreg>
-			UML_MOV(block, MEM(&rsp->impstate->arg1), R32(RTREG));					// mov     [arg1],rtreg
+			UML_MOV(block, mem(&rsp->impstate->arg0), RDREG);					// mov     [arg0],<rdreg>
+			UML_MOV(block, mem(&rsp->impstate->arg1), R32(RTREG));					// mov     [arg1],rtreg
 			UML_CALLC(block, cfunc_set_cop0_reg, rsp);								// callc   cfunc_set_cop0_reg
 			return TRUE;
 	}

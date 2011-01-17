@@ -20,50 +20,6 @@
 
 
 /***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-/* shorthand for conditions */
-#define IF_Z		uml::COND_Z
-#define IF_NZ		uml::COND_NZ
-#define IF_S		uml::COND_S
-#define IF_NS		uml::COND_NS
-#define IF_C		uml::COND_C
-#define IF_NC		uml::COND_NC
-#define IF_V		uml::COND_V
-#define IF_NV		uml::COND_NV
-#define IF_U		uml::COND_U
-#define IF_NU		uml::COND_NU
-#define IF_E		uml::COND_E
-#define IF_NE		uml::COND_NE
-#define IF_A		uml::COND_A
-#define IF_AE		uml::COND_AE
-#define IF_B		uml::COND_B
-#define IF_BE		uml::COND_BE
-#define IF_G		uml::COND_G
-#define IF_GE		uml::COND_GE
-#define IF_L		uml::COND_L
-#define IF_LE		uml::COND_LE
-#define IF_ALWAYS	uml::COND_ALWAYS
-
-
-
-/***************************************************************************
-    MACROS
-***************************************************************************/
-
-/* macros for wrapping parameters */
-#define NONE				uml::parameter()
-#define IMM(x)				(x)
-#define IREG(x)				uml::ireg(x)
-#define FREG(x)				uml::freg(x)
-#define VREG(x)				uml::vreg(x)
-#define MVAR(x)				uml::mapvar(x)
-#define MEM(x)				uml::parameter::make_memory((void *)(x))
-
-
-
-/***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
