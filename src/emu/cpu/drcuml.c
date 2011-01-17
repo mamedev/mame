@@ -110,9 +110,11 @@ drcbe_interface::drcbe_interface(drcuml_state &drcuml, drc_cache &cache, device_
 	: m_drcuml(drcuml),
 	  m_cache(cache),
 	  m_device(device),
-	  m_state(*(drcuml_machine_state *)cache.alloc_near(sizeof(m_state)))
+	  m_state(*(drcuml_machine_state *)cache.alloc_near(sizeof(m_state))),
+	  m_accessors((data_accessors *)cache.alloc_near(sizeof(*m_accessors) * ADDRESS_SPACES))
 {
 	// reset the machine state
+	memset(m_accessors, 0, sizeof(*m_accessors) * ADDRESS_SPACES);
 	memset(&m_state, 0, sizeof(m_state));
 
 	// find the spaces and fetch memory accessors

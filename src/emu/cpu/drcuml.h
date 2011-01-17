@@ -185,8 +185,8 @@ protected:
 	drc_cache &				m_cache;			// pointer to the cache
 	device_t &				m_device;			// CPU device we are associated with
 	address_space *			m_space[ADDRESS_SPACES];// pointers to CPU's address space
-	data_accessors			m_accessors[ADDRESS_SPACES];// memory accessors
 	drcuml_machine_state &	m_state;			// state of the machine (in near cache)
+	data_accessors *		m_accessors;		// memory accessors (in near cache)
 };
 
 
