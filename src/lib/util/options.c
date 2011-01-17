@@ -733,6 +733,33 @@ const char *options_get_string(core_options *opts, const char *name)
 
 
 /*-------------------------------------------------
+    options_get_string_priority - return data 
+    formatted as a string if priority is equal
+	or better
+-------------------------------------------------*/
+
+const char *options_get_string_priority(core_options *opts, const char *name, int priority)
+{
+	options_data *data = find_entry_data(opts, name, FALSE);
+	const char *value = "";
+
+	/* error if not found */
+	if (data == NULL)
+		message(opts, OPTMSG_ERROR, "Unexpected option %s queried\n", name);
+
+	/* copy if non-NULL */
+	else {	
+		if (data->priority!=OPTION_PRIORITY_DEFAULT) {
+			if (priority > data->priority) return value;	
+		}
+		value = astring_c(data->data);
+	}
+
+	return value;
+}
+
+
+/*-------------------------------------------------
     options_get_bool - return data formatted as
     a boolean
 -------------------------------------------------*/
@@ -1078,11 +1105,11 @@ static void update_data(core_options *opts, options_data *data, const char *newd
 			}
 			break;
 	}
-
+	
 	/* ignore if we don't have priority */
-	if (priority < data->priority)
+	if (priority < data->priority) {	
 		return;
-
+	}
 	/* allocate a copy of the data */
 	astring_cpych(data->data, datastart, dataend + 1 - datastart);
 	data->priority = priority;

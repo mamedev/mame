@@ -193,6 +193,9 @@ void options_output_help(core_options *opts, void (*output)(const char *s));
 /* read an option as a string */
 const char *options_get_string(core_options *opts, const char *name);
 
+/* read an option as a string with priority */
+const char *options_get_string_priority(core_options *opts, const char *name, int priority);
+
 /* read an option as a boolean */
 int options_get_bool(core_options *opts, const char *name);
 
