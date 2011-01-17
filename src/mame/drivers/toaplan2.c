@@ -987,6 +987,7 @@ static WRITE16_HANDLER( V25_sharedram_w )
 }
 #endif
 
+#ifndef USE_ENCRYPTED_V25S
 static READ16_HANDLER( kbash_snd_cpu_r )
 {
 /*  Knuckle Bash's  68000 reads secondary CPU status via an I/O port.
@@ -1005,7 +1006,7 @@ static WRITE16_HANDLER( kbash_snd_cpu_w )
 	}
 	logerror("PC:%06x Writing Sound command (%04x) to the NEC V25 secondary CPU\n",cpu_get_previouspc(space->cpu),data);
 }
-
+#endif
 
 static WRITE16_DEVICE_HANDLER( oki_bankswitch_w )
 {
@@ -1407,11 +1408,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kbash_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
+#ifdef USE_ENCRYPTED_V25S
+	AM_RANGE(0x200000, 0x200fff) AM_READWRITE( batsugun_share_r, batsugun_share_w )
+#else
 	AM_RANGE(0x200000, 0x200001) AM_READWRITE(kbash_snd_cpu_r, kbash_snd_cpu_w)	/* Sound number to play */
 	AM_RANGE(0x200002, 0x200003) AM_WRITENOP					/* Control info to V25 */
 	AM_RANGE(0x200004, 0x200005) AM_READ_PORT("DSWA")
 	AM_RANGE(0x200006, 0x200007) AM_READ_PORT("DSWB")
 	AM_RANGE(0x200008, 0x200009) AM_READ_PORT("JMPR")
+#endif
 	AM_RANGE(0x208010, 0x208011) AM_READ_PORT("IN1")
 	AM_RANGE(0x208014, 0x208015) AM_READ_PORT("IN2")
 	AM_RANGE(0x208018, 0x208019) AM_READ_PORT("SYS")
@@ -1876,48 +1881,33 @@ ADDRESS_MAP_END
 #endif
 
 
-/* this seems to be the map for the ROM based game, Knuckle Bash */
 static ADDRESS_MAP_START( V25_kbash_mem, ADDRESS_SPACE_PROGRAM, 8 )
-//  AM_RANGE(0x00000, 0x03fff) AM_ROM
-//  AM_RANGE(0x00000, 0x007ff) AM_RAM                           /* External shared RAM (Banked) */
+	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_BASE_MEMBER(toaplan2_state, batsugun_share) /* 2KB shared with M68K */
 	AM_RANGE(0x04000, 0x04001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x04002, 0x04002) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-//  AM_RANGE(0x04004, 0x04004) AM_DEVWRITE("oki", oki_bankswitch_w)
-	AM_RANGE(0x04008, 0x04008) AM_READ_PORT("IN1")
-	AM_RANGE(0x0400a, 0x0400a) AM_READ_PORT("IN2")
-	AM_RANGE(0x0400c, 0x0400c) AM_READ_PORT("SYS")
-	AM_RANGE(0x0400e, 0x0400e) AM_WRITE(toaplan2_coin_w)
-	AM_RANGE(0x0fe00, 0x0ffff) AM_RAM							/* Internal 512 bytes of RAM */
-//  AM_RANGE(0x80000, 0x87fff) AM_RAM AM_BASE(&V25_sharedram)   /* External shared RAM (ROM for KBASH) */
-
-    AM_RANGE(0xa0000, 0xa7fff) AM_ROM AM_SHARE("share10")
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_SHARE("share10") AM_REGION("mcu", 0)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( V25_kbash_port, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0060, 0x0060) AM_READ_PORT("DSWA")	/* Directly mapped I/O ports */
-	AM_RANGE(0x0061, 0x0061) AM_READ_PORT("DSWA")	/* Directly mapped I/O ports */
-	AM_RANGE(0x0062, 0x0062) AM_READ_PORT("JMPR")	/* Directly mapped I/O ports */
+	AM_RANGE(0x80000, 0x87fff) AM_MIRROR(0x78000) AM_ROM AM_REGION("audiocpu", 0)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( V25_rambased_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x00001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x00004, 0x00004) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0x80000, 0x87fff) AM_RAM AM_MIRROR(0x78000) AM_BASE_MEMBER(toaplan2_state, batsugun_share)
+	AM_RANGE(0x80000, 0x87fff) AM_MIRROR(0x78000) AM_RAM AM_BASE_MEMBER(toaplan2_state, batsugun_share)
 ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( V25_rambased_nooki_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x00001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	//AM_RANGE(0x00004, 0x00004) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0x80000, 0x87fff) AM_RAM AM_MIRROR(0x78000) AM_BASE_MEMBER(toaplan2_state, batsugun_share)
+	AM_RANGE(0x80000, 0x87fff) AM_MIRROR(0x78000) AM_RAM AM_BASE_MEMBER(toaplan2_state, batsugun_share)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( V25_rambased_port, ADDRESS_SPACE_IO, 8 )
+
+static ADDRESS_MAP_START( V25_port, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(V25_PORT_PT, V25_PORT_PT) AM_READ(v25_dswa_read)
 	AM_RANGE(V25_PORT_P0, V25_PORT_P0) AM_READ(v25_dswb_read)
 	AM_RANGE(V25_PORT_P1, V25_PORT_P1) AM_READ(v25_jmpr_read)
-	AM_RANGE(V25_PORT_PT, V25_PORT_PT) AM_READ(v25_dswa_read)
+	AM_RANGE(V25_PORT_P2, V25_PORT_P2) AM_WRITENOP	/* bit 0 is FAULT according to kbash schematics */
 ADDRESS_MAP_END
 
 /*****************************************************************************
@@ -3498,51 +3488,41 @@ MACHINE_CONFIG_END
   - they seem to have mostly mapped extra opcodes for common ones, eg. mov
 */
 static const UINT8 ts004dash_decryption_table[256] = {
-	0x00,0x56,0x75,0x88,0x8c,0x06,0x06,0x72, 0x08,0x09,0x36,0x0b,0x0c,0x0d,0x8c,0xe9, /* 00 */
-	     /*r*//*r*//*r*//*r*//*r*/     /*r*/           /*x*/               /*r*//*r*/
-	0x10,0x11,0x03,0x13,0xeb,0x15,0x16,0x0f, 0xa4,0x19,0x75,0xf3,0x4f,0x1d,0x8e,0xfe, /* 10 */
-	          /*r*/     /*r*/          /*r*/ /*r*/     /*r*//*r*//*r*/     /*x*//*r*/
-	0x20,0xe8,0xb1,0x8d,0x36,0xb5,0x43,0x73, 0x28,0x5b,0x2a,0x2b,0x2c,0x8a,0x2e,0x80, /* 20 */
-	     /*r*//*r*//*r*//*x*//*r*//*r*//*r*/      /*r*/               /*r*/     /*r*/
-	0x30,0x31,0x32,0x33,0x8d,0x3e,0x36,0xfb, 0xc3,0x39,0x3a,0x3b,0x8a,0xe8,0x0f,0x81, /* 30 */
-	                    /*r*//*r*/     /*r*/ /*r*/               /*r*//*r*//*r*//*r*/
-	0x40,0xd0,0x42,0xeb,0x44,0xb8,0x46,0x47, 0x48,0xa2,0x4a,0x4b,0xab,0x4d,0x80,0x4f, /* 40 */
-	     /*r*/     /*r*/     /*x*/                /*?*/          /*r*/     /*r*/
-	0x50,0x51,0x52,0xbd,0xb0,0x55,0x56,0x57, 0xfe,0x59,0xc3,0x5b,0x8a,0x5d,0x5e,0x75, /* 50 */
-	               /*r*//*r*/                /*r*/     /*r*/     /*r*/          /*r*/
-	0x60,0xb3,0x62,0x0a,0x64,0x65,0x66,0x67, 0x75,0x69,0xfe,0x6b,0x6c,0x6d,0x88,0x6f, /* 60 */
-	     /*r*//*?*//*r*/                     /*r*/     /*r*/               /*r*/
-	0x3e,0x71,0x8c,0x33,0x74,0x75,0x76,0x77, 0xb9,0x1e,0x7a,0xa2,0x7c,0x7d,0xbe,0x7f, /* 70 */
-	/*r*/     /*r*//*r*/                     /*r*//*r*/     /*r*/          /*r*/
-	0x81,0x3a,0xf6,0x88,0x84,0x85,0x86,0x8a, 0x32,0x80,0x0f,0x8b,0x48,0x8d,0x8e,0x72, /* 80 */
-	/*r*//*r*//*r*//*r*/               /*r*/ /*r*//*r*//*r*/     /*x*/          /*r*/
-	0x90,0x91,0xc0,0x93,0xe8,0xb4,0x74,0xbc, 0x98,0x99,0x0a,0xf3,0x75,0xc6,0x9e,0xe8, /* 90 */
-	          /*r*/     /*r*//*r*//*r*//*x*/           /*r*//*r*//*r*//*x*/     /*r*/
-	0x26,0xa1,0xfc,0x8c,0xa4,0xa5,0xc3,0xa7, 0xa8,0x83,0xa4,0xbf,0x26,0xad,0xae,0xfe, /* a0 */
-	/*r*/     /*?*//*r*/          /*r*/           /*r*//*r*//*r*//*r*/          /*r*/
-	0xe2,0xb1,0xb2,0x88,0xb4,0xb5,0x0f,0xb7, 0xb8,0xb9,0xba,0xbb,0x07,0x8a,0x8a,0x33, /* b0 */
-	/*r*/          /*r*/          /*r*/           /*?*/          /*r*//*r*//*r*//*x*/
+	0x00,0x56,0x75,0x88,0x8c,0x06,0x58,0x72, 0x83,0x86,0x36,0x0b,0x5f,0xd3,0x8c,0xe9, /* 00 */
+	     /*r*//*r*//*r*//*r*//*r*//*a*//*r*/ /*a*//*a*//*x*/     /*a*//*a*//*r*//*r*/
+	0x10,0x11,0x03,0x13,0xeb,0x15,0x16,0x0f, 0xa4,0xbd,0x75,0xf3,0x4f,0x1d,0x8e,0xfe, /* 10 */
+	          /*r*/     /*r*/          /*r*/ /*r*//*a*//*r*//*r*//*r*/     /*x*//*r*/
+	0x87,0xe8,0xb1,0x8d,0x36,0xb5,0x43,0x73, 0x28,0x5b,0x2a,0x2b,0x24,0x8a,0x03,0x80, /* 20 */
+	/*a*//*r*//*r*//*r*//*x*//*r*//*r*//*r*/      /*r*/          /*a*//*r*//*a*//*r*/
+	0x86,0x8b,0xd1,0x3e,0x8d,0x3e,0x58,0xfb, 0xc3,0x79,0xbd,0x3b,0x8a,0xe8,0x0f,0x81, /* 30 */
+	/*a*//*a*//*a*//*a*//*r*//*r*//*a*//*r*/ /*r*//*a*//*a*/     /*r*//*r*//*r*//*r*/
+	0x40,0xd0,0x8b,0xeb,0xff,0xb8,0x46,0x8b, 0x48,0xa2,0x4a,0x4b,0xab,0x4d,0x80,0x59, /* 40 */
+	     /*r*//*a*//*r*//*a*//*x*/     /*a*/      /*a*/          /*r*/     /*r*//*a*/
+	0x50,0x72,0xb5,0xbd,0xb0,0x88,0x50,0x0f, 0xfe,0x59,0xc3,0x5b,0x8a,0x5d,0x5e,0x75, /* 50 */
+	     /*a*//*a*//*r*//*r*//*a*//*a*//*a*/ /*r*/     /*r*/     /*r*/          /*r*/
+	0x60,0xb3,0x74,0x0a,0x68,0x24,0x66,0x67, 0x75,0x47,0xfe,0x6b,0x6c,0xc3,0x88,0xd2, /* 60 */
+	     /*r*//*a*//*r*//*a*//*a*/           /*r*//*a*//*r*/          /*a*//*r*//*a*/
+	0x3e,0x71,0x8c,0x33,0x0f,0x75,0x8b,0x77, 0xb9,0x1e,0xff,0xa2,0x3e,0x7d,0xbe,0x57, /* 70 */
+	/*r*/     /*r*//*r*//*a*/     /*a*/      /*r*//*r*//*a*//*r*//*a*/     /*r*//*a*/
+	0x81,0x3a,0xf6,0x88,0xeb,0x85,0x89,0x8a, 0x32,0x80,0x0f,0xb1,0x48,0xc3,0x68,0x72, /* 80 */
+	/*r*//*r*//*r*//*r*//*a*/     /*a*//*r*/ /*r*//*r*//*r*//*a*//*x*//*a*//*a*//*r*/
+	0x53,0x91,0xc0,0x93,0xe8,0xb4,0x74,0xbc, 0x98,0x58,0x0a,0xf3,0x75,0xc6,0x9e,0xe8, /* 90 */
+	/*a*/     /*r*/     /*r*//*r*//*r*//*x*/      /*a*//*r*//*r*//*r*//*x*/     /*r*/
+	0x26,0x50,0xfc,0x8c,0xa4,0xb1,0xc3,0xa7, 0xeb,0x83,0xa4,0xbf,0x26,0xad,0x46,0xfe, /* a0 */
+	/*r*//*a*//*a*//*r*/     /*a*//*r*/      /*a*//*r*//*r*//*r*//*r*/     /*a*//*r*/
+	0xe2,0x89,0xb2,0x88,0x03,0xb5,0x0f,0xb7, 0xb8,0xb9,0xba,0x0f,0x07,0x8a,0x8a,0x33, /* b0 */
+	/*r*//*a*/     /*r*//*a*/     /*r*/           /*?*/     /*a*//*r*//*r*//*r*//*x*/
 	0xfe,0xc1,0xb1,0xa0,0x45,0x36,0xc6,0x5e, 0x8a,0xc9,0xc6,0xea,0x3c,0xcd,0x1e,0xe8, /* c0 */
 	/*r*/     /*r*//*r*//*r*//*r*/     /*r*/ /*r*/     /*x*//*x*//*r*/     /*r*//*r*/
-	0xd0,0xd1,0x55,0xf6,0xd4,0xd5,0x5d,0xd7, 0xbb,0x8d,0xf6,0xdb,0xdc,0x88,0xde,0xdf, /* d0 */
-	          /*r*//*r*/          /*r*/      /*x*//*r*//*r*/          /*r*/
-	0x51,0xe1,0x74,0xbd,0x32,0xe5,0xe6,0xe7, 0x53,0xc7,0xab,0x36,0xec,0xed,0x33,0xef, /* e0 */
-	/*r*/     /*r*//*r*//*r*/                /*r*//*x*//*r*//*r*/          /*r*/
-	0x2e,0xf1,0x88,0x59,0xf4,0xf5,0xf6,0x8e, 0x8a,0x8a,0x36,0xfb,0x0f,0xfd,0xfe,0x2e, /* f0 */
-	/*r*/     /*r*//*r*/               /*x*/ /*r*//*r*//*x*/     /*r*/          /*r*/
+	0xd0,0xeb,0x55,0xf6,0x8a,0xb0,0x5d,0xd7, 0xbb,0x8d,0xf6,0xd0,0xdc,0x88,0xde,0xdf, /* d0 */
+	     /*a*//*r*//*r*//*a*//*a*//*r*/      /*x*//*r*//*r*//*a*/     /*r*/
+	0x51,0x51,0x74,0xbd,0x32,0xe5,0xe6,0xd2, 0x53,0xc7,0xab,0x36,0xec,0xe9,0x33,0xef, /* e0 */
+	/*r*//*a*//*r*//*r*//*r*/          /*a*/ /*r*//*x*//*r*//*r*/     /*a*//*r*/
+	0x2e,0xf1,0x88,0x59,0x74,0x74,0xf6,0x8e, 0x8a,0x8a,0x36,0x08,0x0f,0x45,0xfe,0x2e, /* f0 */
+	/*r*/     /*r*//*r*//*a*//*a*/     /*x*/ /*r*//*r*//*x*//*a*//*r*//*a*/     /*r*/
 };
 
 static const nec_config ts004dash_config ={ ts004dash_decryption_table, };
-
-static MACHINE_RESET(kbash)
-{
-#ifndef USE_ENCRYPTED_V25S
-	toaplan2_state *state = machine->driver_data<toaplan2_state>();
-
-	cpu_set_input_line(state->sub_cpu, INPUT_LINE_HALT, ASSERT_LINE);
-#endif
-}
-
 
 
 static MACHINE_CONFIG_START( kbash, toaplan2_state )
@@ -3553,13 +3533,10 @@ static MACHINE_CONFIG_START( kbash, toaplan2_state )
 	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
 	/* ROM based v25 */
-	MCFG_CPU_ADD("mcu", V25, XTAL_16MHz)			/* NEC V25 type Toaplan marked CPU ??? */
+	MCFG_CPU_ADD("audiocpu", V25, XTAL_16MHz)			/* NEC V25 type Toaplan marked CPU ??? */
 	MCFG_CPU_PROGRAM_MAP(V25_kbash_mem)
-	MCFG_CPU_IO_MAP(V25_kbash_port)
+	MCFG_CPU_IO_MAP(V25_port)
 	MCFG_CPU_CONFIG(ts004dash_config)
-
-
-	MCFG_MACHINE_RESET(kbash)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3979,7 +3956,7 @@ static MACHINE_CONFIG_START( batsugun, toaplan2_state )
 
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_32MHz/2)			/* NEC V25 type Toaplan marked CPU ??? */
 	MCFG_CPU_PROGRAM_MAP(V25_rambased_mem)
-	MCFG_CPU_IO_MAP(V25_rambased_port)
+	MCFG_CPU_IO_MAP(V25_port)
 
 	MCFG_QUANTUM_TIME(HZ(6000))
 
@@ -4420,7 +4397,7 @@ ROM_START( kbash )
 	/* Secondary CPU is a Toaplan marked chip, (TS-004-Dash  TOA PLAN) */
 	/* It's a NEC V25 (PLCC94) (encrypted) */
 
-	ROM_REGION( 0x8000, "mcu", 0 )			/* Sound CPU code */
+	ROM_REGION( 0x8000, "audiocpu", 0 )			/* Sound CPU code */
 	ROM_LOAD( "kbash02.bin", 0x0000, 0x8000, CRC(4cd882a1) SHA1(7199a5c384918f775f0815e09c46b2a58141814a) )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )
@@ -4495,7 +4472,8 @@ ROM_END
 
 ROM_START( truxton2 )
 	ROM_REGION( 0x080000, "maincpu", 0 )			/* Main 68K code */
-	ROM_LOAD16_WORD_SWAP( "tp024_1.bin", 0x000000, 0x080000, CRC(eb26f0e5) SHA1(4fb1e8f6d7d62138b408db932c15dd7dc8d4c367) )
+	/* program ROM is byte swapped ! */
+	ROM_LOAD16_WORD( "tp024_1.bin", 0x000000, 0x080000, CRC(f5cfe6ee) SHA1(30979888a4cd6500244117748f28386a7e20a169) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "tp024_4.bin", 0x000000, 0x100000, CRC(805c449e) SHA1(fdf985344145bd320b88b9b0c25e73066c9b2ada) )
@@ -5454,4 +5432,5 @@ GAME( 1999, bkraidu,  0,        bbakradu, bbakraid, bbakradu, ROT270, "Eighting"
 GAME( 1999, bkraiduj, bkraidu,  bbakradu, bbakraid, bbakradu, ROT270, "Eighting", "Battle Bakraid - Unlimited Version (Japan) (Tue Jun 8 1999)", GAME_SUPPORTS_SAVE )
 // older revision of the code
 GAME( 1999, bkraidj,  bkraidu,  bbakraid, bbakraid, bbakraid, ROT270, "Eighting", "Battle Bakraid (Japan) (Wed Apr 7 1999)", GAME_SUPPORTS_SAVE )
+
 
