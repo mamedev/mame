@@ -2151,6 +2151,25 @@ static INPUT_PORTS_START( dogyuun )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
 
 	PORT_MODIFY("JMPR")
+#ifdef USE_ENCRYPTED_V25S
+	PORT_DIPNAME( 0x00f0,	0x0030, "Territory" )
+	PORT_DIPSETTING(		0x0030, DEF_STR( Europe ) )
+	PORT_DIPSETTING(		0x0010, DEF_STR( USA ) )
+//  PORT_DIPSETTING(        0x0070, DEF_STR( USA ) )
+	PORT_DIPSETTING(		0x0020, "USA (Atari Games Corp license)" )
+//  PORT_DIPSETTING(        0x00c0, "USA (Atari Games Corp license)" )
+	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
+	PORT_DIPSETTING(		0x00f0, "Japan (Taito Corp license)" )
+	PORT_DIPSETTING(		0x0080, "South East Asia (Charterfield license)" )
+//  PORT_DIPSETTING(        0x00d0, "South East Asia (Charterfield license)" )
+	PORT_DIPSETTING(		0x0050, "Korea (Unite Trading license)" )
+//  PORT_DIPSETTING(        0x00a0, "Korea (Unite Trading license)" )
+	PORT_DIPSETTING(		0x0040, "Hong Kong (Charterfield license)" )
+//  PORT_DIPSETTING(        0x0090, "Hong Kong (Charterfield license)" )
+	PORT_DIPSETTING(		0x0060, "Taiwan" )
+//  PORT_DIPSETTING(        0x00b0, "Taiwan" )
+	//PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Sound ready */
+#else
 	PORT_DIPNAME( 0x000f,	0x0003, "Territory" )
 	PORT_DIPSETTING(		0x0003, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x0001, DEF_STR( USA ) )
@@ -2168,6 +2187,7 @@ static INPUT_PORTS_START( dogyuun )
 	PORT_DIPSETTING(		0x0006, "Taiwan" )
 //  PORT_DIPSETTING(        0x000b, "Taiwan" )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Sound ready */
+#endif	
 INPUT_PORTS_END
 
 
@@ -2175,6 +2195,25 @@ static INPUT_PORTS_START( dogyuunk )
 	PORT_INCLUDE( dogyuun )
 
 	PORT_MODIFY("JMPR")
+#ifdef USE_ENCRYPTED_V25S
+	PORT_DIPNAME( 0x00f0,	0x0050, "Territory" )
+	PORT_DIPSETTING(		0x0030, DEF_STR( Europe ) )
+	PORT_DIPSETTING(		0x0010, DEF_STR( USA ) )
+//  PORT_DIPSETTING(        0x0070, DEF_STR( USA ) )
+	PORT_DIPSETTING(		0x0020, "USA (Atari Games Corp license)" )
+//  PORT_DIPSETTING(        0x00c0, "USA (Atari Games Corp license)" )
+	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
+	PORT_DIPSETTING(		0x00f0, "Japan (Taito Corp license)" )
+	PORT_DIPSETTING(		0x0080, "South East Asia (Charterfield license)" )
+//  PORT_DIPSETTING(        0x00d0, "South East Asia (Charterfield license)" )
+	PORT_DIPSETTING(		0x0050, "Korea (Unite Trading license)" )
+//  PORT_DIPSETTING(        0x00a0, "Korea (Unite Trading license)" )
+	PORT_DIPSETTING(		0x0040, "Hong Kong (Charterfield license)" )
+//  PORT_DIPSETTING(        0x0090, "Hong Kong (Charterfield license)" )
+	PORT_DIPSETTING(		0x0060, "Taiwan" )
+//  PORT_DIPSETTING(        0x00b0, "Taiwan" )
+	//PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Sound ready */
+#else
 	PORT_DIPNAME( 0x000f,	0x0005, "Territory" )
 	PORT_DIPSETTING(		0x0003, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x0001, DEF_STR( USA ) )
@@ -2192,12 +2231,29 @@ static INPUT_PORTS_START( dogyuunk )
 	PORT_DIPSETTING(		0x0006, "Taiwan" )
 //  PORT_DIPSETTING(        0x000b, "Taiwan" )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Sound ready */
+#endif
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dogyuunt )
 	PORT_INCLUDE( dogyuun )
 
 	PORT_MODIFY("JMPR")
+#ifdef USE_ENCRYPTED_V25S
+	PORT_DIPNAME( 0x00f0,	0x0000, "Territory" )
+	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
+	PORT_DIPSETTING(		0x0010, DEF_STR( USA ) )
+	PORT_DIPSETTING(		0x0020, DEF_STR( Europe ) )
+	PORT_DIPSETTING(		0x0030, "Hong Kong" )
+	PORT_DIPSETTING(		0x0040, "Korea" )
+	PORT_DIPSETTING(		0x0050, "Taiwan" )
+	PORT_DIPSETTING(		0x0060, "South East Asia (Charterfield license)" )
+	PORT_DIPSETTING(		0x0070, "USA (Romstar license)" )
+	PORT_DIPSETTING(		0x0080, "Hong Kong and China (Honest Trading Co. license)" )
+	PORT_DIPSETTING(		0x0090, "Korea (JC Trading Corp. license)" )
+	PORT_DIPSETTING(		0x00a0, "USA (Fabtek license)" )
+	PORT_DIPSETTING(		0x00f0, "Japan (Taito Corp license)" )
+//	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Sound ready */
+#else
 	PORT_DIPNAME( 0x000f,	0x0000, "Territory" )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
 	PORT_DIPSETTING(		0x0001, DEF_STR( USA ) )
@@ -2212,6 +2268,7 @@ static INPUT_PORTS_START( dogyuunt )
 	PORT_DIPSETTING(		0x000a, "USA (Fabtek license)" )
 	PORT_DIPSETTING(		0x000f, "Japan (Taito Corp license)" )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Sound ready */
+#endif
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kbash )
@@ -2251,6 +2308,17 @@ static INPUT_PORTS_START( kbash )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
 
 	PORT_MODIFY("JMPR")
+#ifdef USE_ENCRYPTED_V25S
+	PORT_DIPNAME( 0x00f0,	0x0020, "Territory" )
+	PORT_DIPSETTING(		0x00a0, DEF_STR( Europe ) )
+	PORT_DIPSETTING(		0x0020, "Europe, USA (Atari license)" )
+	PORT_DIPSETTING(		0x0090, DEF_STR( USA ) )
+	PORT_DIPSETTING(		0x0010, "USA, Europe (Atari license)" )
+	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
+	PORT_DIPSETTING(		0x0060, "South East Asia" )	/*Service Mode lists European Coinage */
+	PORT_DIPSETTING(		0x0030, "Korea" )
+	PORT_DIPSETTING(		0x0040, "Hong Kong" )
+#else
 	PORT_DIPNAME( 0x000f,	0x0002, "Territory" )
 	PORT_DIPSETTING(		0x000a, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x0002, "Europe, USA (Atari license)" )
@@ -2260,6 +2328,7 @@ static INPUT_PORTS_START( kbash )
 	PORT_DIPSETTING(		0x0006, "South East Asia" )	/*Service Mode lists European Coinage */
 	PORT_DIPSETTING(		0x0003, "Korea" )
 	PORT_DIPSETTING(		0x0004, "Hong Kong" )
+#endif
 INPUT_PORTS_END
 
 

@@ -230,7 +230,7 @@ const UINT8 dynablaster_decryption_table[256] = {
 //    therefore it seems to be 0x2b (SUB)
 // NS010718  0xa0 was 0x00 (ADDB), verified to be 0x22 (ANDB)
 
-
+/* note: mysticrib sound is identical revision to bbmanw sound code */
 const UINT8 mysticri_decryption_table[256] = {
 	xxxx,0x57,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, 0xbf,0x43,xxxx,xxxx,xxxx,xxxx,0xfc,xxxx, /* 00 */
 	xxxx,xxxx,xxxx,xxxx,xxxx,0x52,0xa3,0x26, xxxx,0xc7,xxxx,0x0f,xxxx,0x0c,xxxx,xxxx, /* 10 */
@@ -240,7 +240,7 @@ const UINT8 mysticri_decryption_table[256] = {
 	0xb5,0x1f,xxxx,0xaa,xxxx,0xfb,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,0x38,xxxx,xxxx,xxxx, /* 50 */
 	0x2c,xxxx,xxxx,0xc6,xxxx,xxxx,0xb1,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0xa2,xxxx, /* 60 */
 	0xe9,0xe8,xxxx,xxxx,0x86,xxxx,0x8b,xxxx, xxxx,xxxx,xxxx,xxxx,0x5b,0x72,xxxx,xxxx, /* 70 */
-	xxxx,xxxx,0x5d,0x0a,xxxx,xxxx,0x89,xxxx, 0xb0,0x88,xxxx,xxxx,xxxx,0x87,0x75,0xbd, /* 80 */
+	xxxx,xxxx,0x5d,0x0a,xxxx,xxxx,0x89,xxxx, 0xb0,0x88,xxxx,0xb7,xxxx,0x87,0x75,0xbd, /* 80 */
 	xxxx,0x51,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,0x5a,0x58,xxxx,xxxx,0x56, /* 90 */
 	xxxx,0x8a,xxxx,0x55,xxxx,xxxx,xxxx,0xb4, 0x08,xxxx,0xf6,xxxx,xxxx,0x9d,xxxx,0xbc, /* A0 */
 	0x0b,xxxx,xxxx,0x5e,xxxx,xxxx,xxxx,0x22, 0x36,xxxx,0x1e,xxxx,0xb6,0xba,0x23,xxxx, /* B0 */
@@ -252,7 +252,8 @@ const UINT8 mysticri_decryption_table[256] = {
 };
 // 0xd5 (0x18) opcode is right but arguments could be swapped
 // 0x4e (0x2b) not sure, could be 0x1b
-
+// 0x8b (0xb3) needed by mysticrib
+// 0xb9 (PC=0x134e) in mysticrib, needed by reading Irem GA20 status after it (currently reads to an unmapped area).
 
 const UINT8 majtitl2_decryption_table[256] = {
 	0x87,xxxx,0x78,0xaa,xxxx,xxxx,xxxx,0x2c, 0x32,0x0a,0x0f,xxxx,0x5e,xxxx,0xc6,0x8a, /* 00 */
