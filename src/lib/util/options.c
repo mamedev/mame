@@ -250,6 +250,23 @@ void options_revert(core_options *opts, int priority)
 		}
 }
 
+/*-------------------------------------------------
+    options_revert_driver_only - revert options 
+    that are marked as driver only and are under
+	priority level
+-------------------------------------------------*/
+
+void options_revert_driver_only(core_options *opts, int priority)
+{
+	options_data *data;
+
+	/* iterate over options and revert to defaults if below the given priority */
+	for (data = opts->datalist; data != NULL; data = data->next)
+		if ((data->flags & OPTION_DRIVER_ONLY) && (data->priority < priority)) {
+			astring_cpy(data->data, data->defdata);
+			data->priority = OPTION_PRIORITY_DEFAULT;
+		}
+}
 
 /*-------------------------------------------------
     options_copy - copy options from one core_options

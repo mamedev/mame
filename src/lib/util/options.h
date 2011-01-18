@@ -60,6 +60,7 @@
 #define OPTION_HEADER				0x0008			/* text-only header */
 #define OPTION_INTERNAL				0x0010			/* option is internal-only */
 #define OPTION_REPEATS				0x0020			/* unadorned option repeats */
+#define OPTION_DRIVER_ONLY			0x0040			/* remove value if found in lower levels */
 
 /* option priorities */
 #define OPTION_PRIORITY_DEFAULT		0				/* defaults are at 0 priority */
@@ -137,6 +138,9 @@ void options_set_output_callback(core_options *opts, options_message msgtype, vo
 
 /* revert options at or below a certain priority back to their defaults */
 void options_revert(core_options *opts, int priority);
+
+/* revert options that are marked as driver only */
+void options_revert_driver_only(core_options *opts, int priority);
 
 /* copy one collection of options into another */
 int options_copy(core_options *dest_opts, core_options *src_opts);
