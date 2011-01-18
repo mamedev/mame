@@ -127,29 +127,19 @@ int cli_execute(int argc, char **argv, osd_interface &osd, const options_entry *
 		/* initialize the options manager and add the CLI-specific options */
 		options = mame_options_init(osd_options);
 		options_add_entries(options, cli_options);
-
-		/* parse the command line first; if we fail here, we're screwed */
-		if (options_parse_command_line(options, argc, argv, OPTION_PRIORITY_CMDLINE))
+		
+		gamename_option = "";
+		for (int arg = 1; arg < argc; arg++)
 		{
-			result = MAMERR_INVALID_CONFIG;
-			goto error;
+			if ((argv[arg][0] != '-')) {
+				gamename_option = argv[arg];
+				break;
+			}
 		}
 
-		/* parse the simple commmands before we go any further */
-		core_filename_extract_base(&exename, argv[0], TRUE);
-		result = execute_simple_commands(options, exename);
-		if (result != -1)
-			goto error;
-
 		/* find out what game we might be referring to */
-		gamename_option = options_get_string(options, OPTION_GAMENAME);
 		core_filename_extract_base(&gamename, gamename_option, TRUE);
 		driver = driver_get_name(gamename);
-
-		/* execute any commands specified */
-		result = execute_commands(options, exename, driver);
-		if (result != -1)
-			goto error;
 
 		/* if we don't have a valid driver selected, offer some suggestions */
 		if (strlen(gamename_option) > 0 && driver == NULL)
@@ -171,6 +161,24 @@ int cli_execute(int argc, char **argv, osd_interface &osd, const options_entry *
 			result = MAMERR_NO_SUCH_GAME;
 			goto error;
 		}
+
+		/* parse the command line first; if we fail here, we're screwed */
+		if (options_parse_command_line(options, argc, argv, OPTION_PRIORITY_CMDLINE))
+		{
+			result = MAMERR_INVALID_CONFIG;
+			goto error;
+		}
+
+		/* parse the simple commmands before we go any further */
+		core_filename_extract_base(&exename, argv[0], TRUE);
+		result = execute_simple_commands(options, exename);
+		if (result != -1)
+			goto error;
+
+		/* execute any commands specified */
+		result = execute_commands(options, exename, driver);
+		if (result != -1)
+			goto error;
 
 		/* run the game */
 		result = mame_execute(osd, options);
