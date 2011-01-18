@@ -1257,7 +1257,6 @@ software_part *software_part_next(software_part *part)
 	return part;
 }
 
-
 /*-------------------------------------------------
     load_software_part
 
@@ -1516,6 +1515,28 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 }
 
 
+/*-------------------------------------------------
+    software_part_get_feature
+ -------------------------------------------------*/
+
+const char *software_part_get_feature(software_part *part, const char *feature_name)
+{
+	feature_list *feature;
+	
+	if (part == NULL)
+		return NULL;
+	
+	for (feature = part->featurelist; feature; feature = feature->next)
+	{
+		if (!strcmp(feature->name, feature_name))
+			return feature->value;
+	}
+	
+	return NULL;
+	
+}
+
+
 /***************************************************************************
     DEVICE INTERFACE
 ***************************************************************************/
@@ -1764,9 +1785,18 @@ static void ui_mess_menu_populate_software_parts(running_machine *machine, ui_me
 				if (strcmp(interface, swpart->interface_) == 0)
 				{
 					software_part_state *entry = (software_part_state *) ui_menu_pool_alloc(menu, sizeof(*entry));
-					entry->part_name = ui_menu_pool_strdup(menu, swpart->name);
+					// check if the available parts have specific part_id to be displayed (e.g. "Map Disc", "Bonus Disc", etc.)
+					// if not, we simply display "part_name"; if yes we display "part_name (part_id)"
+					astring menu_part_name(swpart->name);
+					if (software_part_get_feature(swpart, "part_id") != NULL)
+					{
+						menu_part_name.cat(" (");
+						menu_part_name.cat(software_part_get_feature(swpart, "part_id"));
+						menu_part_name.cat(")");
+					}
+					entry->part_name = ui_menu_pool_strdup(menu, swpart->name);	// part_name is later used to build up the filename to load, so we use swpart->name!
 					entry->interface = ui_menu_pool_strdup(menu, swpart->interface_);
-					ui_menu_item_append(menu, info->shortname, swpart->name, 0, entry);
+					ui_menu_item_append(menu, info->shortname, menu_part_name.cstr(), 0, entry);
 				}
 			}
 		}

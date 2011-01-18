@@ -918,7 +918,7 @@ static void menu_file_manager_populate(running_machine *machine, ui_menu *menu, 
 		{
 			tmp_name.cpy(image->basename());
 
-			/* the image has been loaded through softlist, also show the loaded part */
+			/* if the image has been loaded through softlist, also show the loaded part */
 			if (image->part_entry() != NULL)
 			{
 				const software_part *tmp = image->part_entry();
@@ -926,6 +926,12 @@ static void menu_file_manager_populate(running_machine *machine, ui_menu *menu, 
 				{
 					tmp_name.cat(" (");
 					tmp_name.cat(tmp->name);
+					/* also check if this part has a specific part_id (e.g. "Map Disc", "Bonus Disc", etc.), and in case display it */
+					if (image->get_feature("part_id") != NULL)
+					{
+						tmp_name.cat(": ");
+						tmp_name.cat(image->get_feature("part_id"));
+					}
 					tmp_name.cat(")");
 				}
 			}
