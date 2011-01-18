@@ -75,7 +75,7 @@ static STREAM_UPDATE( SEGAPCM_update )
 				/* apply panning and advance */
 				outputs[0][i] += v * voll;
 				outputs[1][i] += v * volr;
-				addr += delta;
+				addr = (addr + delta) & 0xffffff;
 			}
 
 			/* store back the updated address and info */
