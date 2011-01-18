@@ -55,14 +55,15 @@ Glitch list!
         - Eeprom load/save not yet implemented - when done, MT2EEP should
           be removed from the ROM definition.
 
+    LeagueMan:
+        Raster effects don't work properly (not even cpu time per line?).
+
+	(0.141 update: at least following two seems fixed from a lot of time ... -AS)
     Perfect Soliders:
         Shortly into the fight, the sound CPU enters a tight loop, continuously
         writing to the status port and with interrupts disabled. I don't see how
         it is supposed to get out of that loop. Maybe it's not supposed to enter
         it at all?
-
-    LeagueMan:
-        Raster effects don't work properly (not even cpu time per line?).
 
     Dream Soccer 94:
         Slight priority problems when goal scoring animation is played
@@ -371,6 +372,12 @@ static WRITE16_HANDLER( m92_sound_status_w )
 	cputag_set_input_line_and_vector(space->machine, "maincpu", 0, HOLD_LINE, M92_IRQ_3);
 }
 
+
+static WRITE16_HANDLER( m92_sound_reset_w )
+{
+	cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_RESET, (data) ? CLEAR_LINE : ASSERT_LINE);
+}
+
 /*****************************************************************************/
 
 /* appears to be an earlier board */
@@ -412,7 +419,7 @@ static ADDRESS_MAP_START( m92_portmap, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x88, 0x8f) AM_WRITE(m92_pf2_control_w)
 	AM_RANGE(0x90, 0x97) AM_WRITE(m92_pf3_control_w)
 	AM_RANGE(0x98, 0x9f) AM_WRITE(m92_master_control_w)
-//  AM_RANGE(0xc0, 0xc1) AM_WRITE(m92_unknown_w)    // sound related?
+	AM_RANGE(0xc0, 0xc1) AM_WRITE(m92_sound_reset_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -2233,8 +2240,8 @@ GAME( 1993, inthuntu, inthunt,  inthunt,       inthunt,  inthunt,  ROT0,   "Irem
 GAME( 1993, kaiteids, inthunt,  inthunt,       inthunt,  kaiteids, ROT0,   "Irem",         "Kaitei Daisensou (Japan)", 0 )
 GAME( 1993, nbbatman, 0,        nbbatman,      nbbatman, nbbatman, ROT0,   "Irem America", "Ninja Baseball Batman (US)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, leaguemn, nbbatman, nbbatman,      nbbatman, nbbatman, ROT0,   "Irem",         "Yakyuu Kakutou League-Man (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, ssoldier, 0,        psoldier,      psoldier, ssoldier, ROT0,   "Irem America", "Superior Soldiers (US)", GAME_IMPERFECT_SOUND )
-GAME( 1993, psoldier, ssoldier, psoldier,      psoldier, psoldier, ROT0,   "Irem",         "Perfect Soldiers (Japan)", GAME_IMPERFECT_SOUND )
+GAME( 1993, ssoldier, 0,        psoldier,      psoldier, ssoldier, ROT0,   "Irem America", "Superior Soldiers (US)", 0 )
+GAME( 1993, psoldier, ssoldier, psoldier,      psoldier, psoldier, ROT0,   "Irem",         "Perfect Soldiers (Japan)", 0 )
 GAME( 1994, dsoccr94j,dsoccr94, dsoccr94j,     dsoccr94j,dsoccr94j,ROT0,   "Irem",         "Dream Soccer '94 (Japan)", 0 )
 GAME( 1994, gunforc2, 0,        gunforc2,      gunforc2, gunforc2, ROT0,   "Irem",         "Gunforce 2 (US)", 0 )
 GAME( 1994, geostorm, gunforc2, gunforc2,      gunforc2, gunforc2, ROT0,   "Irem",         "Geostorm (Japan)", 0 )
