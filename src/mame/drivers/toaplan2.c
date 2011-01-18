@@ -3443,6 +3443,7 @@ static MACHINE_CONFIG_START( dogyuun, toaplan2_state )
 
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_25MHz/2)			/* NEC V25 type Toaplan marked CPU ??? */
 	MCFG_CPU_PROGRAM_MAP(V25_rambased_mem)
+	MCFG_CPU_IO_MAP(V25_port)
 	MCFG_CPU_CONFIG(ts002mach_config)
 
 	MCFG_MACHINE_RESET(dogyuun)
