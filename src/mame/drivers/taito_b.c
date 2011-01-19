@@ -3738,6 +3738,7 @@ ROM_START( silentdj )
 ROM_END
 
 ROM_START( silentdu )
+// Dumped from an original Taito PCB (ET910000B)
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "east-12-1.ic32", 0x00000, 0x20000, CRC(5883d362) SHA1(21c3af053fa92c26f119466ecd655697cc72ff3a) )
 	ROM_LOAD16_BYTE( "east-14-1.ic10", 0x00001, 0x20000, CRC(3267bcd5) SHA1(358a717d0cdd22d84eb0d928c36e4e72a40c2882) )
@@ -3866,4 +3867,4 @@ GAME( 1994, spacedxo, spacedx, spacedxo, spacedxo, taito_b, ROT0,   "Taito Corpo
     in that it has a punching pad that player needs to punch to hit
     the enemy.
 */
-GAME(  1990, sbm,      0,       sbm,      sbm,      taito_b, ROT0,   "Taito Corporation", "Sonic Blast Man (Japan)", GAME_SUPPORTS_SAVE )
+GAME(  1990, sbm,      0,       sbm,      sbm,      taito_b, ROT0,   "Taito Corporation", "Sonic Blast Man (Japan)", GAME_SUPPORTS_SAVE | GAME_MECHANICAL )

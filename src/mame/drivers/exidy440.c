@@ -17,6 +17,23 @@
         * Showdown
         * Yukon
 
+
+440 System
+
+Name                 Year  CPU    board/rom numbers
+
+Crossbow             1983  6809   77-0019, 77-0022
+Cheyenne             1984  6809
+Combat               1985  6809
+Chiller              1986  6809
+Clay Pigeon          1986  6809
+Crackshot            1986  6809
+Hit 'n Miss          1986  6809
+Top Secret           1986  6809
+Showdown             1988  6809
+Who Dunnit           1988  6809
+
+
 ****************************************************************************
 
     Memory map

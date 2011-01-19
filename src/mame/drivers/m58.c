@@ -220,6 +220,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( 10yard )
+// Dumped from an original Irem M52 board. Serial no. 307761/License Seal 09461.
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "yf-a-3p-b",    0x0000, 0x2000, CRC(2e205ec2) SHA1(fcfa08f45423b35f2c99d4e6b5474ab1b3a84fec) )
 	ROM_LOAD( "yf-a-3n-b",    0x2000, 0x2000, CRC(82fcd980) SHA1(7846705b29961cb95ee1571ee7e16baceea522d4) )

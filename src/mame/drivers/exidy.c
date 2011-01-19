@@ -16,6 +16,22 @@
     Known bugs:
         * none at this time
 
+
+'Universal' Game Board V2 (xxL logic, xxA audio)
+
+Name                 Year  CPU    board/rom numbers
+
+Side Track           1979  6502   STL, STA
+Targ                 1980  6502   HRL, HRA
+Spectar              1980  6502   SPL, SPA
+Mouse Trap           1981  6502   MTL, MTA
+Venture              1981  6502   VEL, VEA
+Teeter Torture       1982  6502   Prototype
+Pepper II            1982  6502   77-0008,77-0007 PTL, PTA
+Hard Hat             1982  6502   HHL, HHA
+Fax                  1982  6502   FXL, FLA
+
+
 ****************************************************************************
 
     Exidy memory map
