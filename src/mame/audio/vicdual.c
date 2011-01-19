@@ -245,16 +245,16 @@ static const discrete_mixer_desc headon_crash_mixer =
 	0, 1
 };
 
-static const discrete_inverter_osc_desc headon_inverter_osc_1 =
+static const discrete_dss_inverter_osc_node::description headon_inverter_osc_1 =
 {
 	DEFAULT_CD40XX_VALUES(12),
-	DISC_OSC_INVERTER_IS_TYPE4
+	discrete_dss_inverter_osc_node::IS_TYPE4
 };
 
-static const discrete_inverter_osc_desc headon_inverter_osc_2 =
+static const discrete_dss_inverter_osc_node::description headon_inverter_osc_2 =
 {
 	DEFAULT_CD40XX_VALUES(12),
-	DISC_OSC_INVERTER_IS_TYPE5 | DISC_OSC_INVERTER_OUT_IS_LOGIC
+	discrete_dss_inverter_osc_node::IS_TYPE5 | discrete_dss_inverter_osc_node::OUT_IS_LOGIC
 };
 
 static const discrete_555_desc headon_555_bonus =

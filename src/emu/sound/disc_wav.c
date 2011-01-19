@@ -1506,18 +1506,15 @@ DISCRETE_RESET(dss_squarewave2)
  * input4    - Desc
  *
  ************************************************************************/
-#define DSS_INVERTER_OSC__ENABLE	DISCRETE_INPUT(0)
-#define DSS_INVERTER_OSC__MOD		DISCRETE_INPUT(1)
-#define DSS_INVERTER_OSC__RC		DISCRETE_INPUT(2)
-#define DSS_INVERTER_OSC__RP		DISCRETE_INPUT(3)
-#define DSS_INVERTER_OSC__C			DISCRETE_INPUT(4)
-#define DSS_INVERTER_OSC__R2		DISCRETE_INPUT(5)
 
+/*
+ * Taken from the transfer characteristerics diagram in CD4049UB datasheet (TI)
+ * There is no default trigger point and vI-vO is a continuous function
+ */
 
-/* FIXME: Make the following two static members of dss_inverter_osc */
 inline double DISCRETE_CLASS_FUNC(dss_inverter_osc, tftab)(double x)
 {
-	DISCRETE_DECLARE_INFO(discrete_inverter_osc_desc)
+	DISCRETE_DECLARE_INFO(description)
 
 	x = x / info->vB;
 	if (x > 0)
@@ -1528,7 +1525,7 @@ inline double DISCRETE_CLASS_FUNC(dss_inverter_osc, tftab)(double x)
 
 inline double DISCRETE_CLASS_FUNC(dss_inverter_osc, tf)(double x)
 {
-	DISCRETE_DECLARE_INFO(discrete_inverter_osc_desc)
+	DISCRETE_DECLARE_INFO(description)
 
 	if (x < 0.0)
 		return info->vB;
@@ -1540,34 +1537,34 @@ inline double DISCRETE_CLASS_FUNC(dss_inverter_osc, tf)(double x)
 
 DISCRETE_STEP(dss_inverter_osc)
 {
-	DISCRETE_DECLARE_INFO(discrete_inverter_osc_desc)
+	DISCRETE_DECLARE_INFO(description)
 	double diff, vG1, vG2, vG3, vI;
 	double vMix, rMix;
 	int	clamped;
 
 	/* Get new state */
 	vI = mc_v_cap + mc_v_g2_old;
-	switch (info->options & DISC_OSC_INVERTER_TYPE_MASK)
+	switch (info->options & TYPE_MASK)
 	{
-		case DISC_OSC_INVERTER_IS_TYPE1:
-		case DISC_OSC_INVERTER_IS_TYPE3:
+		case IS_TYPE1:
+		case IS_TYPE3:
 			vG1 = this->tf(vI);
 			vG2 = this->tf(vG1);
 			vG3 = this->tf(vG2);
 			break;
-		case DISC_OSC_INVERTER_IS_TYPE2:
+		case IS_TYPE2:
 			vG1 = 0;
 			vG3 = this->tf(vI);
 			vG2 = this->tf(vG3);
 			break;
-		case DISC_OSC_INVERTER_IS_TYPE4:
-			vI  = MIN(DSS_INVERTER_OSC__ENABLE, vI + 0.7);
+		case IS_TYPE4:
+			vI  = MIN(I_ENABLE(), vI + 0.7);
 			vG1 = 0;
 			vG3 = this->tf(vI);
 			vG2 = this->tf(vG3);
 			break;
-		case DISC_OSC_INVERTER_IS_TYPE5:
-			vI  = MAX(DSS_INVERTER_OSC__ENABLE, vI - 0.7);
+		case IS_TYPE5:
+			vI  = MAX(I_ENABLE(), vI - 0.7);
 			vG1 = 0;
 			vG3 = this->tf(vI);
 			vG2 = this->tf(vG3);
@@ -1591,11 +1588,11 @@ DISCRETE_STEP(dss_inverter_osc)
 		}
 	}
 
-	switch (info->options & DISC_OSC_INVERTER_TYPE_MASK)
+	switch (info->options & TYPE_MASK)
 	{
-		case DISC_OSC_INVERTER_IS_TYPE1:
-		case DISC_OSC_INVERTER_IS_TYPE2:
-		case DISC_OSC_INVERTER_IS_TYPE3:
+		case IS_TYPE1:
+		case IS_TYPE2:
+		case IS_TYPE3:
 			if (clamped)
 			{
 				double ratio = mc_rp / (mc_rp + mc_r1);
@@ -1610,29 +1607,29 @@ DISCRETE_STEP(dss_inverter_osc)
 				diff = diff - diff * mc_w;
 			}
 			break;
-		case DISC_OSC_INVERTER_IS_TYPE4:
+		case IS_TYPE4:
 			/*  FIXME handle r2 = 0  */
 			rMix = (mc_r1 * mc_r2) / (mc_r1 + mc_r2);
-			vMix = rMix* ((vG3 - vG2) / mc_r1 + (DSS_INVERTER_OSC__MOD-vG2) / mc_r2);
+			vMix = rMix* ((vG3 - vG2) / mc_r1 + (I_MOD() -vG2) / mc_r2);
 			if (vMix < (vI-vG2-0.7))
 			{
 				rMix = 1.0 / rMix + 1.0 / mc_rp;
 				rMix = 1.0 / rMix;
-				vMix = rMix* ( (vG3-vG2) / mc_r1 + (DSS_INVERTER_OSC__MOD-vG2) / mc_r2
+				vMix = rMix* ( (vG3-vG2) / mc_r1 + (I_MOD() - vG2) / mc_r2
 						+ (vI - 0.7 - vG2) / mc_rp);
 			}
 			diff = vMix - mc_v_cap;
 			diff = diff - diff * exp(-this->sample_time() / (mc_c * rMix));
 			break;
-		case DISC_OSC_INVERTER_IS_TYPE5:
+		case IS_TYPE5:
 			/*  FIXME handle r2 = 0  */
 			rMix = (mc_r1 * mc_r2) / (mc_r1 + mc_r2);
-			vMix = rMix* ((vG3 - vG2) / mc_r1 + (DSS_INVERTER_OSC__MOD - vG2) / mc_r2);
+			vMix = rMix* ((vG3 - vG2) / mc_r1 + (I_MOD() - vG2) / mc_r2);
 			if (vMix > (vI -vG2 + 0.7))
 			{
 				rMix = 1.0 / rMix + 1.0 / mc_rp;
 				rMix = 1.0 / rMix;
-				vMix = rMix * ( (vG3 - vG2) / mc_r1 + (DSS_INVERTER_OSC__MOD - vG2) / mc_r2
+				vMix = rMix * ( (vG3 - vG2) / mc_r1 + (I_MOD() - vG2) / mc_r2
 						+ (vI + 0.7 - vG2) / mc_rp);
 			}
 			diff = vMix - mc_v_cap;
@@ -1643,30 +1640,30 @@ DISCRETE_STEP(dss_inverter_osc)
 	}
 	mc_v_cap   += diff;
 	mc_v_g2_old = vG2;
-	if ((info->options & DISC_OSC_INVERTER_TYPE_MASK) == DISC_OSC_INVERTER_IS_TYPE3)
+	if ((info->options & TYPE_MASK) == IS_TYPE3)
 		this->output[0] = vG1;
 	else
 		this->output[0] = vG3;
-	if (info->options & DISC_OSC_INVERTER_OUT_IS_LOGIC)
+	if (info->options & OUT_IS_LOGIC)
 		this->output[0] = (this->output[0] > info->vInFall);
 }
 
 DISCRETE_RESET(dss_inverter_osc)
 {
-	DISCRETE_DECLARE_INFO(discrete_inverter_osc_desc)
+	DISCRETE_DECLARE_INFO(description)
 
 	int i;
 
 	/* exponent */
-	mc_w  = exp(-this->sample_time() / (DSS_INVERTER_OSC__RC * DSS_INVERTER_OSC__C));
-	mc_wc = exp(-this->sample_time() / ((DSS_INVERTER_OSC__RC * DSS_INVERTER_OSC__RP) / (DSS_INVERTER_OSC__RP + DSS_INVERTER_OSC__RC) * DSS_INVERTER_OSC__C));
+	mc_w  = exp(-this->sample_time() / (I_RC() * I_C()));
+	mc_wc = exp(-this->sample_time() / ((I_RC() * I_RP()) / (I_RP() + I_RC()) * I_C()));
 	this->output[0]   = 0;
 	mc_v_cap    = 0;
 	mc_v_g2_old = 0;
-	mc_rp   = DSS_INVERTER_OSC__RP;
-	mc_r1   = DSS_INVERTER_OSC__RC;
-	mc_r2   = DSS_INVERTER_OSC__R2;
-	mc_c    = DSS_INVERTER_OSC__C;
+	mc_rp   = I_RP();
+	mc_r1   = I_RC();
+	mc_r2   = I_R2();
+	mc_c    = I_C();
 	mc_tf_b = (log(0.0 - log(info->vOutLow/info->vB)) - log(0.0 - log((info->vOutHigh/info->vB))) ) / log(info->vInRise / info->vInFall);
 	mc_tf_a = log(0.0 - log(info->vOutLow/info->vB)) - mc_tf_b * log(info->vInRise/info->vB);
 	mc_tf_a = exp(mc_tf_a);

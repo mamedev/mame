@@ -3503,7 +3503,8 @@
 #define DISCRETE_STOP(_class)					void DISCRETE_CLASS_FUNC(_class, stop)(void)
 #define DISCRETE_DECLARE_INFO(_name)			const _name *info = (const  _name *)this->custom_data();
 
-#define DISCRETE_INPUT(_num)					(*(this->m_input[_num]))
+//#define DISCRETE_INPUT(_num)					(*(this->m_input[_num]))
+#define DISCRETE_INPUT(_num)					(input(_num))
 
 /*************************************
  *
@@ -4072,33 +4073,6 @@ struct _discrete_adsr
 };
 
 
-// Taken from the transfer characteristerics diagram in CD4049UB datasheet (TI)
-// There is no default trigger point and vI-vO is a continuous function
-
-#define DEFAULT_CD40XX_VALUES(_vB)	(_vB),(_vB)*0.02,(_vB)*0.98,(_vB)/5.0*1.5,(_vB)/5.0*3.5, 0.1
-
-#define DISC_OSC_INVERTER_IS_TYPE1			0x00
-#define DISC_OSC_INVERTER_IS_TYPE2			0x01
-#define DISC_OSC_INVERTER_IS_TYPE3			0x02
-#define DISC_OSC_INVERTER_IS_TYPE4			0x03
-#define DISC_OSC_INVERTER_IS_TYPE5			0x04
-#define DISC_OSC_INVERTER_TYPE_MASK			0x0F
-
-#define DISC_OSC_INVERTER_OUT_IS_LOGIC		0x10
-
-typedef struct _discrete_inverter_osc_desc discrete_inverter_osc_desc;
-struct _discrete_inverter_osc_desc
-{
-	double	vB;
-	double	vOutLow;
-	double	vOutHigh;
-	double	vInFall;	// voltage that triggers the gate input to go low (0V) on fall
-	double	vInRise;	// voltage that triggers the gate input to go high (vGate) on rise
-	double	clamp;		// voltage is clamped to -clamp ... vb+clamp if clamp>= 0;
-	int		options;	// bitmaped options
-};
-
-
 /*************************************
  *
  *  The node numbers themselves
@@ -4467,6 +4441,9 @@ public:
 	inline bool interface(discrete_input_interface *&intf) const { intf = m_input_intf; return (intf != NULL); }
 	inline bool interface(discrete_output_interface *&intf) const { intf = m_output_intf; return (intf != NULL); }
 
+	/* get the input from node #n */
+	inline double input(int n) { return *(m_input[n]); }
+
 	/* Return the node index, i.e. X from NODE(X) */
 	inline int index(void) { return NODE_INDEX(m_block->node); }
 
@@ -4499,12 +4476,9 @@ protected:
 
 	void resolve_input_nodes(void);
 
-	discrete_device *			m_device;								/* Points to the parent */
-
-
 	double				output[DISCRETE_MAX_OUTPUTS];					/* The node's last output value */
-
 	const double *		m_input[DISCRETE_MAX_INPUTS];					/* Addresses of Input values */
+	discrete_device *			m_device;								/* Points to the parent */
 
 private:
 

@@ -21,6 +21,8 @@
 
 #define DISCRETE_CLASS_NAME(_name) discrete_ ## _name ## _node
 
+#define DISCRETE_CLASS_INPUT(_name, _num)	inline double _name (void) { return *(m_input[_num]); }
+
 #define DISCRETE_CLASS_CONSTRUCTOR(_name, _base)						\
 	public:																\
 		DISCRETE_CLASS_NAME(_name)() 									\

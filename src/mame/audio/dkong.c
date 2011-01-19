@@ -237,16 +237,16 @@ static const discrete_555_desc dkong_555_vco_desc =
 	DK_SUP_V - 0.5
 };
 
-static const discrete_inverter_osc_desc dkong_inverter_osc_desc_jump =
+static const discrete_dss_inverter_osc_node::description dkong_inverter_osc_desc_jump =
 {
 	DEFAULT_CD40XX_VALUES(DK_SUP_V),
-	DISC_OSC_INVERTER_IS_TYPE1
+	discrete_dss_inverter_osc_node::IS_TYPE1
 };
 
-static const discrete_inverter_osc_desc dkong_inverter_osc_desc_walk =
+static const discrete_dss_inverter_osc_node::description dkong_inverter_osc_desc_walk =
 {
 	DEFAULT_CD40XX_VALUES(DK_SUP_V),
-	DISC_OSC_INVERTER_IS_TYPE2
+	discrete_dss_inverter_osc_node::IS_TYPE2
 };
 
 static const discrete_op_amp_filt_info dkong_sallen_key_info =
@@ -607,14 +607,14 @@ static const discrete_mixer_desc radarscp_mixer_desc_7 =
 
 #define radarscp_555_vco_desc  dkong_555_vco_desc
 
-static const discrete_inverter_osc_desc radarscp_inverter_osc_desc_0 =
+static const discrete_dss_inverter_osc_node::description radarscp_inverter_osc_desc_0 =
 	{DEFAULT_CD40XX_VALUES(DK_SUP_V),
-	DISC_OSC_INVERTER_IS_TYPE2
+	discrete_dss_inverter_osc_node::IS_TYPE2
 	};
 
-static const discrete_inverter_osc_desc radarscp_inverter_osc_desc_7 =
+static const discrete_dss_inverter_osc_node::description radarscp_inverter_osc_desc_7 =
 	{DEFAULT_CD40XX_VALUES(DK_SUP_V),
-	DISC_OSC_INVERTER_IS_TYPE3
+	discrete_dss_inverter_osc_node::IS_TYPE3
 	};
 
 static DISCRETE_SOUND_START(radarscp)

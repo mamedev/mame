@@ -92,21 +92,49 @@ DISCRETE_CLASS_STEP_RESET(dss_squarewave2, 1,
 DISCRETE_CLASS_STEP_RESET(dss_trianglewave, 1,
 	double			m_phase;
 );
+
 /* Component specific modules */
 
 #define DSS_INV_TAB_SIZE	500
+#define DEFAULT_CD40XX_VALUES(_vB)	(_vB),(_vB)*0.02,(_vB)*0.98,(_vB)/5.0*1.5,(_vB)/5.0*3.5, 0.1
 
 class DISCRETE_CLASS_NAME(dss_inverter_osc): public discrete_base_node, public discrete_step_interface
 {
 	DISCRETE_CLASS_CONSTRUCTOR(dss_inverter_osc, base)
 	DISCRETE_CLASS_DESTRUCTOR(dss_inverter_osc)
 public:
+	typedef struct
+	{
+		double	vB;
+		double	vOutLow;
+		double	vOutHigh;
+		double	vInFall;	// voltage that triggers the gate input to go low (0V) on fall
+		double	vInRise;	// voltage that triggers the gate input to go high (vGate) on rise
+		double	clamp;		// voltage is clamped to -clamp ... vb+clamp if clamp>= 0;
+		int		options;	// bitmaped options
+	} description;
+	enum {
+		IS_TYPE1 = 0x00,
+		IS_TYPE2 = 0x01,
+		IS_TYPE3 = 0x02,
+		IS_TYPE4 = 0x03,
+		IS_TYPE5 = 0x04,
+		TYPE_MASK = 0x0f,
+		OUT_IS_LOGIC = 0x10
+	};
 	void step(void);
 	void reset(void);
 protected:
 	inline double tftab(double x);
 	inline double tf(double x);
 private:
+	DISCRETE_CLASS_INPUT(I_ENABLE, 	0);
+	DISCRETE_CLASS_INPUT(I_MOD, 	1);
+	DISCRETE_CLASS_INPUT(I_RC, 		2);
+	DISCRETE_CLASS_INPUT(I_RP, 		3);
+	DISCRETE_CLASS_INPUT(I_C, 		4);
+	DISCRETE_CLASS_INPUT(I_R2, 		5);
+
 	double			mc_v_cap;
 	double			mc_v_g2_old;
 	double			mc_w;

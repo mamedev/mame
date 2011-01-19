@@ -1383,14 +1383,14 @@ DISCRETE_STEP(dst_rcdiscN)
 
 DISCRETE_STEP(dst_rcdisc2N)
 {
-	double input = ((DST_RCDISC2N__ENABLE == 0) ? DST_RCDISC2N__IN0 : DST_RCDISC2N__IN1);
+	double inp = ((DST_RCDISC2N__ENABLE == 0) ? DST_RCDISC2N__IN0 : DST_RCDISC2N__IN1);
 
 	if (DST_RCDISC2N__ENABLE == 0)
-		this->output[0] = -m_fc0.a1*m_y1 + m_fc0.b0*input + m_fc0.b1 * m_x1;
+		this->output[0] = -m_fc0.a1*m_y1 + m_fc0.b0*inp + m_fc0.b1 * m_x1;
 	else
-		this->output[0] = -m_fc1.a1*m_y1 + m_fc1.b0*input + m_fc1.b1*m_x1;
+		this->output[0] = -m_fc1.a1*m_y1 + m_fc1.b0*inp + m_fc1.b1*m_x1;
 
-	m_x1 = input;
+	m_x1 = inp;
 	m_y1 = this->output[0];
 }
 
