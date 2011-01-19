@@ -2645,6 +2645,7 @@ V-V                           TP-027
 	DRIVER( 1943 )		/*  6/1987 (c) 1987 (Euro) */
 	DRIVER( 1943u )		/*  6/1987 (c) 1987 (US) */
 	DRIVER( 1943j )		/*  6/1987 (c) 1987 (Japan) */
+	DRIVER( 1943b )		/* bootleg */
 	DRIVER( blktiger )	/*  8/1987 (c) 1987 (US) */
 	DRIVER( blktigerb1 )/* bootleg */
 	DRIVER( blktigerb2 )/* bootleg */
@@ -6388,6 +6389,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 				/* 136084 - Marble Man (proto) */
 	DRIVER( batman )	/* 136085           (c) 1991 */
 	DRIVER( roadriot )	/* 136089           (c) 1991 */
+	DRIVER( roadrioto )	/* 136089           (c) 1991 */
 	DRIVER( offtwall )	/* 136090           (c) 1991 */
 	DRIVER( offtwallc )	/* 136090           (c) 1991 */
 	DRIVER( guardian )	/* 136092           (c) 1992 */

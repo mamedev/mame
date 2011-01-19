@@ -533,6 +533,59 @@ ROM_START( 1943kai )
 	ROM_LOAD( "bm6.4b",    0x0b00, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )	/* video timing (not used) */
 ROM_END
 
+
+ROM_START( 1943b )
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + 128k for the banked ROMs images */
+	ROM_LOAD( "1.12d",     0x00000, 0x08000, CRC(9a2d70ab) SHA1(6f84e906656f132ffcb63022f6d067580d261431) ) // protection patched out, disclaimer patched out
+	ROM_LOAD( "bmj02.13d", 0x10000, 0x10000, CRC(af971575) SHA1(af1d8ce73e8671b7b41248ce6486c9b5aaf6a233) )
+	ROM_LOAD( "bmj03.14d", 0x20000, 0x10000, CRC(300ec713) SHA1(f66d2356b413a418c887b4085a5315475c7a8bba) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "bm04.5h", 0x00000, 0x8000, CRC(ee2bd2d7) SHA1(4d2d019a9f8452fbbb247e893280568a2e86073e) )
+
+	ROM_REGION( 0x8000, "gfx1", 0 ) // logo replaced
+	ROM_LOAD( "4.5h", 0x00000, 0x8000, CRC(0aba2096) SHA1(4833ad9f747b529ce92c4993388ab3516f8df4ed) )	/* characters */
+
+	ROM_REGION( 0x40000, "gfx2", 0 ) // same data, double size roms
+	ROM_LOAD( "15.12f", 0x00000, 0x10000, CRC(622b4fba) SHA1(181d7b0a1ca0cfcc3bd71f0b97dc80f7ff27a9c6) )	/* bg tiles */
+	ROM_LOAD( "16.14f", 0x10000, 0x10000, CRC(25471a8d) SHA1(a3930dea9b64e84ade78dae4a631ebb7e9741954) )
+	ROM_LOAD( "17.12j", 0x20000, 0x10000, CRC(9da79653) SHA1(b9852c476110db3f654152ca85265d184a1a816e) )
+	ROM_LOAD( "18.14j", 0x30000, 0x10000, CRC(1f3aced8) SHA1(14ae016279628732b397db9a526bfda7ede0be5a) )
+
+	ROM_REGION( 0x10000, "gfx3", 0 ) // same
+	ROM_LOAD( "bm24.14k", 0x00000, 0x8000, CRC(11134036) SHA1(88da112ab9fc7e0d8f0e901f273715b950ae588c) )	/* fg tiles */
+	ROM_LOAD( "bm25.14l", 0x08000, 0x8000, CRC(092cf9c1) SHA1(19fe3c714b1d52cbb21dea25cdee5af841f525db) )
+
+	ROM_REGION( 0x40000, "gfx4", 0 ) // same
+	ROM_LOAD( "bm06.10a", 0x00000, 0x8000, CRC(97acc8af) SHA1(c9fa07cb61f6905408b355edabfe453fb652ff0d) )	/* sprites */
+	ROM_LOAD( "bm07.11a", 0x08000, 0x8000, CRC(d78f7197) SHA1(6367c7e80e80d4a0d33d7840b5c843c63c80123e) )
+	ROM_LOAD( "bm08.12a", 0x10000, 0x8000, CRC(1a626608) SHA1(755c27a07728fd686168e9d9e4dee3d8f274892a) )
+	ROM_LOAD( "bm09.14a", 0x18000, 0x8000, CRC(92408400) SHA1(3ab299bad1ba115efead53ebd92254abe7a092ba) )
+	ROM_LOAD( "bm10.10c", 0x20000, 0x8000, CRC(8438a44a) SHA1(873629b00cf3f6d8976a7fdafe63cd16e47b7491) )
+	ROM_LOAD( "bm11.11c", 0x28000, 0x8000, CRC(6c69351d) SHA1(c213d5c3e76a5749bc32539604716dcef6dcb694) )
+	ROM_LOAD( "bm12.12c", 0x30000, 0x8000, CRC(5e7efdb7) SHA1(fef271a38dc1a9e45a0c6e27e28e713c77c8f8c9) )
+	ROM_LOAD( "bm13.14c", 0x38000, 0x8000, CRC(1143829a) SHA1(2b3a65e354a205c05a87f783e9938b64bc62396f) )
+
+	ROM_REGION( 0x10000, "gfx5", 0 )	/* tilemaps */
+	ROM_LOAD( "bm14.5f", 0x0000, 0x8000, CRC(4d3c6401) SHA1(ce4f6dbf8fa030ad45cbb5afd58df27fed2d4618) )	/* front background */ 
+	ROM_LOAD( "bm23.8k", 0x8000, 0x8000, CRC(a52aecbd) SHA1(45b0283d84d394c16c35802463ca95d70d1062d4) )	/* back background */
+
+	ROM_REGION( 0x0c00, "proms", 0 )
+	ROM_LOAD( "bm1.12a",  0x0000, 0x0100, CRC(74421f18) SHA1(5b8b59f6f4e5ad358611de50608f47f41a5b0e51) )	/* red component */
+	ROM_LOAD( "bm2.13a",  0x0100, 0x0100, CRC(ac27541f) SHA1(1796c4c9041dfe28e6319576f21df1dbcb8d12bf) )	/* green component */
+	ROM_LOAD( "bm3.14a",  0x0200, 0x0100, CRC(251fb6ff) SHA1(d1118159b3d429d841e4efa938728ebedadd7ec5) )	/* blue component */
+	ROM_LOAD( "bm5.7f",   0x0300, 0x0100, CRC(206713d0) SHA1(fa609f6d675af18c379838583505724d28bcff0e) )	/* char lookup table */
+	ROM_LOAD( "bm10.7l",  0x0400, 0x0100, CRC(33c2491c) SHA1(13da924e4b182759c4aae49034f3a7cbe556ea65) )	/* foreground lookup table */
+	ROM_LOAD( "bm9.6l",   0x0500, 0x0100, CRC(aeea4af7) SHA1(98f4570ee061e9aa58d8ed2d2f8ae59ce2ec5795) )	/* foreground palette bank */
+	ROM_LOAD( "bm12.12m", 0x0600, 0x0100, CRC(c18aa136) SHA1(684f04d9a5b94ae1db5fb95763e65271f4cf8e01) )	/* background lookup table */
+	ROM_LOAD( "bm11.12l", 0x0700, 0x0100, CRC(405aae37) SHA1(94a06f81b775c4e49d57d42fc064d3072a253bbd) )	/* background palette bank */
+	ROM_LOAD( "bm8.8c",   0x0800, 0x0100, CRC(c2010a9e) SHA1(be9852500209066e2f0ff2770e0c217d1636a0b5) )	/* sprite lookup table */
+	ROM_LOAD( "bm7.7c",   0x0900, 0x0100, CRC(b56f30c3) SHA1(9f5e6db464d21457a33ec8bdfdff069632b791db) )	/* sprite palette bank */
+	ROM_LOAD( "bm4.12c",  0x0a00, 0x0100, CRC(91a8a2e1) SHA1(9583c87eff876f04bc2ccf7218cd8081f1bcdb94) )	/* priority encoder / palette selector (not used) */
+	ROM_LOAD( "bm6.4b",   0x0b00, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )	/* video timing (not used) */
+ROM_END
+
+
 static DRIVER_INIT( 1943 )
 {
 	UINT8 *ROM = machine->region("maincpu")->base();
@@ -542,8 +595,20 @@ static DRIVER_INIT( 1943 )
 	memory_configure_bank(machine, "bank4", 0, 29, &ROM[0x13000], 0x1000);
 }
 
+static READ8_HANDLER( _1943b_c007_r ) { return 0; }
+
+static DRIVER_INIT( 1943b )
+{
+	DRIVER_INIT_CALL( 1943 );
+	//it expects 0x00 to be returned from the protection reads because the protection has been patched out.
+	//AM_RANGE(0xc007, 0xc007) AM_READ(c1943_protection_r)
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc007, 0xc007, 0, 0, _1943b_c007_r);
+
+}
+
 /* Game Drivers */
 GAME( 1987, 1943,     0,     1943,   1943,  1943, ROT270,  "Capcom",  "1943: The Battle of Midway (Euro)", GAME_SUPPORTS_SAVE )
 GAME( 1987, 1943u,    1943,  1943,   1943,  1943, ROT270,  "Capcom",  "1943: The Battle of Midway (US)", GAME_SUPPORTS_SAVE )
 GAME( 1987, 1943j,    1943,  1943,   1943,  1943, ROT270,  "Capcom",  "1943: Midway Kaisen (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, 1943b,    1943,  1943,   1943,  1943b,ROT270,  "bootleg", "1943: Battle of Midway (bootleg, hack of Japan set)", GAME_SUPPORTS_SAVE )
 GAME( 1987, 1943kai,  0,     1943,   1943,  1943, ROT270,  "Capcom",  "1943 Kai: Midway Kaisen (Japan)", GAME_SUPPORTS_SAVE )
