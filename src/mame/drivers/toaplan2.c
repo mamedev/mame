@@ -609,32 +609,8 @@ static WRITE16_HANDLER( toaplan2_coin_word_w )
 	}
 }
 
+
 static WRITE16_HANDLER( toaplan2_v25_coin_word_w )
-{
-	logerror("toaplan2_v25_coin_word_w %04x\n",data);
-
-	if (ACCESSING_BITS_0_7)
-	{
-		#ifdef USE_ENCRYPTED_V25S
-		toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
-		#endif
-
-		toaplan2_coin_w(space, offset, data & 0x0f);
-
-		#ifdef USE_ENCRYPTED_V25S
-		/* not sure which of these is really RESET - runs fine with either */
-		// cpu_set_input_line(state->sub_cpu, INPUT_LINE_RESET, (data & 0x0020) ? CLEAR_LINE : ASSERT_LINE );
-		cpu_set_input_line(state->sub_cpu, INPUT_LINE_RESET,  (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE);
-		#endif
-
-	}
-	if (ACCESSING_BITS_8_15 && (data & 0xff00) )
-	{
-		logerror("Writing unknown upper MSB command (%04x) to coin control\n",data & 0xff00);
-	}
-}
-
-static WRITE16_HANDLER( toaplan2_v25_batsugun_coin_word_w )
 {
 	logerror("toaplan2_v25_coin_word_w %04x\n",data);
 
@@ -862,36 +838,6 @@ static WRITE16_HANDLER( shared_ram_w )
 	}
 }
 
-static READ16_HANDLER( toaplan2_snd_cpu_r )
-{
-/*** Status port includes NEC V25 CPU POST codes. ************
- *** This is actually a part of the 68000/V25 Shared RAM */
-
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
-	int response = 0xffff;
-
-	/* Provide successful POST responses */
-	if (state->mcu_data == 0xffaa)						/* Dogyuun */
-	{
-		response = 0xffaa;
-		state->mcu_data = 0xffff;
-	}
-
-	logerror("PC:%06x reading status %08x from the NEC V25 secondary CPU port\n",cpu_get_previouspc(space->cpu),response);
-	return response;
-}
-
-static WRITE16_HANDLER( dogyuun_snd_cpu_w )
-{
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
-
-	if (ACCESSING_BITS_0_7)
-	{
-		state->mcu_data = data;
-		dogyuun_okisnd_w(space->machine->device("oki"), data);
-	}
-	logerror("PC:%06x Writing command (%04x) to the NEC V25 secondary CPU port\n", cpu_get_previouspc(space->cpu), state->mcu_data);
-}
 
 
 static READ16_HANDLER( fixeight_sec_cpu_r )
@@ -958,16 +904,7 @@ static WRITE16_HANDLER( fixeight_sec_cpu_w )
 	logerror("PC:%06x Writing command (%04x) to the NEC V25 secondary CPU port\n", cpu_get_previouspc(space->cpu), state->mcu_data);
 }
 
-static WRITE16_HANDLER( vfive_snd_cpu_w )
-{
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
 
-	if (ACCESSING_BITS_0_7)
-	{
-		state->mcu_data = data;
-	}
-	logerror("PC:%06x Writing command (%04x) to the NEC V25 secondary CPU port\n", cpu_get_previouspc(space->cpu), state->mcu_data);
-}
 
 static READ16_HANDLER( V25_sharedram_r )
 {
@@ -1386,16 +1323,7 @@ static ADDRESS_MAP_START( dogyuun_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200014, 0x200015) AM_READ_PORT("IN2")
 	AM_RANGE(0x200018, 0x200019) AM_READ_PORT("SYS")
 	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_v25_coin_word_w)
-#ifdef USE_ENCRYPTED_V25S
 	AM_RANGE(0x210000, 0x21ffff) AM_READWRITE( batsugun_share_r, batsugun_share_w )
-#else
-	AM_RANGE(0x21e000, 0x21efff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE_MEMBER(toaplan2_state, shared_ram16)
-	AM_RANGE(0x21f000, 0x21f001) AM_READWRITE(toaplan2_snd_cpu_r, dogyuun_snd_cpu_w)	/* V25 status/command port */
-	AM_RANGE(0x21f004, 0x21f005) AM_READ_PORT("DSWA")
-	AM_RANGE(0x21f006, 0x21f007) AM_READ_PORT("DSWB")
-	AM_RANGE(0x21f008, 0x21f009) AM_READ_PORT("JMPR")
-	AM_RANGE(0x21fc00, 0x21ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE_MEMBER(toaplan2_state, V25_shared_ram)	/* 16-bit on 68000 side, 8-bit on V25 side */
-#endif
 	/***** The following locations in 0x30000x are for video controller 1 ******/
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
@@ -1589,16 +1517,7 @@ static ADDRESS_MAP_START( vfive_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200014, 0x200015) AM_READ_PORT("IN2")
 	AM_RANGE(0x200018, 0x200019) AM_READ_PORT("SYS")
 	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_v25_coin_word_w)	/* Coin count/lock */
-#ifdef USE_ENCRYPTED_V25S
 	AM_RANGE(0x210000, 0x21ffff) AM_READWRITE( batsugun_share_r, batsugun_share_w )
-#else
-	AM_RANGE(0x21e000, 0x21efff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE_MEMBER(toaplan2_state, shared_ram16)
-	AM_RANGE(0x21f000, 0x21f001) AM_READWRITE(toaplan2_snd_cpu_r, vfive_snd_cpu_w)	/* V25 Command/Status port */
-	AM_RANGE(0x21f004, 0x21f005) AM_READ_PORT("DSWA")
-	AM_RANGE(0x21f006, 0x21f007) AM_READ_PORT("DSWB")
-	AM_RANGE(0x21f008, 0x21f009) AM_READ_PORT("JMPR")
-	AM_RANGE(0x21fc00, 0x21ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE_MEMBER(toaplan2_state, V25_shared_ram)	/* 16-bit on 68000 side, 8-bit on V25 side */
-#endif
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x700000, 0x700001) AM_READ(video_count_r)
@@ -1637,7 +1556,7 @@ static ADDRESS_MAP_START( batsugun_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("IN1")
 	AM_RANGE(0x200014, 0x200015) AM_READ_PORT("IN2")
 	AM_RANGE(0x200018, 0x200019) AM_READ_PORT("SYS")
-	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_v25_batsugun_coin_word_w)	/* Coin count/lock + v25 reset/hold control lines? */
+	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_v25_coin_word_w)	/* Coin count/lock + v25 reset/hold control lines? */
 	AM_RANGE(0x210000, 0x21ffff) AM_READWRITE( batsugun_share_r, batsugun_share_w )
 
 	/***** The following in 0x30000x are for video controller 1 ******/
@@ -2151,7 +2070,6 @@ static INPUT_PORTS_START( dogyuun )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
 
 	PORT_MODIFY("JMPR")
-#ifdef USE_ENCRYPTED_V25S
 	PORT_DIPNAME( 0x00f0,	0x0030, "Territory" )
 	PORT_DIPSETTING(		0x0030, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x0010, DEF_STR( USA ) )
@@ -2169,25 +2087,6 @@ static INPUT_PORTS_START( dogyuun )
 	PORT_DIPSETTING(		0x0060, "Taiwan" )
 //  PORT_DIPSETTING(        0x00b0, "Taiwan" )
 	//PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Sound ready */
-#else
-	PORT_DIPNAME( 0x000f,	0x0003, "Territory" )
-	PORT_DIPSETTING(		0x0003, DEF_STR( Europe ) )
-	PORT_DIPSETTING(		0x0001, DEF_STR( USA ) )
-//  PORT_DIPSETTING(        0x0007, DEF_STR( USA ) )
-	PORT_DIPSETTING(		0x0002, "USA (Atari Games Corp license)" )
-//  PORT_DIPSETTING(        0x000c, "USA (Atari Games Corp license)" )
-	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
-	PORT_DIPSETTING(		0x000f, "Japan (Taito Corp license)" )
-	PORT_DIPSETTING(		0x0008, "South East Asia (Charterfield license)" )
-//  PORT_DIPSETTING(        0x000d, "South East Asia (Charterfield license)" )
-	PORT_DIPSETTING(		0x0005, "Korea (Unite Trading license)" )
-//  PORT_DIPSETTING(        0x000a, "Korea (Unite Trading license)" )
-	PORT_DIPSETTING(		0x0004, "Hong Kong (Charterfield license)" )
-//  PORT_DIPSETTING(        0x0009, "Hong Kong (Charterfield license)" )
-	PORT_DIPSETTING(		0x0006, "Taiwan" )
-//  PORT_DIPSETTING(        0x000b, "Taiwan" )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Sound ready */
-#endif	
 INPUT_PORTS_END
 
 
@@ -2195,7 +2094,6 @@ static INPUT_PORTS_START( dogyuunk )
 	PORT_INCLUDE( dogyuun )
 
 	PORT_MODIFY("JMPR")
-#ifdef USE_ENCRYPTED_V25S
 	PORT_DIPNAME( 0x00f0,	0x0050, "Territory" )
 	PORT_DIPSETTING(		0x0030, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x0010, DEF_STR( USA ) )
@@ -2213,32 +2111,12 @@ static INPUT_PORTS_START( dogyuunk )
 	PORT_DIPSETTING(		0x0060, "Taiwan" )
 //  PORT_DIPSETTING(        0x00b0, "Taiwan" )
 	//PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Sound ready */
-#else
-	PORT_DIPNAME( 0x000f,	0x0005, "Territory" )
-	PORT_DIPSETTING(		0x0003, DEF_STR( Europe ) )
-	PORT_DIPSETTING(		0x0001, DEF_STR( USA ) )
-//  PORT_DIPSETTING(        0x0007, DEF_STR( USA ) )
-	PORT_DIPSETTING(		0x0002, "USA (Atari Games Corp license)" )
-//  PORT_DIPSETTING(        0x000c, "USA (Atari Games Corp license)" )
-	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
-	PORT_DIPSETTING(		0x000f, "Japan (Taito Corp license)" )
-	PORT_DIPSETTING(		0x0008, "South East Asia (Charterfield license)" )
-//  PORT_DIPSETTING(        0x000d, "South East Asia (Charterfield license)" )
-	PORT_DIPSETTING(		0x0005, "Korea (Unite Trading license)" )
-//  PORT_DIPSETTING(        0x000a, "Korea (Unite Trading license)" )
-	PORT_DIPSETTING(		0x0004, "Hong Kong (Charterfield license)" )
-//  PORT_DIPSETTING(        0x0009, "Hong Kong (Charterfield license)" )
-	PORT_DIPSETTING(		0x0006, "Taiwan" )
-//  PORT_DIPSETTING(        0x000b, "Taiwan" )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Sound ready */
-#endif
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dogyuunt )
 	PORT_INCLUDE( dogyuun )
 
 	PORT_MODIFY("JMPR")
-#ifdef USE_ENCRYPTED_V25S
 	PORT_DIPNAME( 0x00f0,	0x0000, "Territory" )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
 	PORT_DIPSETTING(		0x0010, DEF_STR( USA ) )
@@ -2252,23 +2130,6 @@ static INPUT_PORTS_START( dogyuunt )
 	PORT_DIPSETTING(		0x0090, "Korea (JC Trading Corp. license)" )
 	PORT_DIPSETTING(		0x00a0, "USA (Fabtek license)" )
 	PORT_DIPSETTING(		0x00f0, "Japan (Taito Corp license)" )
-//	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Sound ready */
-#else
-	PORT_DIPNAME( 0x000f,	0x0000, "Territory" )
-	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
-	PORT_DIPSETTING(		0x0001, DEF_STR( USA ) )
-	PORT_DIPSETTING(		0x0002, DEF_STR( Europe ) )
-	PORT_DIPSETTING(		0x0003, "Hong Kong" )
-	PORT_DIPSETTING(		0x0004, "Korea" )
-	PORT_DIPSETTING(		0x0005, "Taiwan" )
-	PORT_DIPSETTING(		0x0006, "South East Asia (Charterfield license)" )
-	PORT_DIPSETTING(		0x0007, "USA (Romstar license)" )
-	PORT_DIPSETTING(		0x0008, "Hong Kong and China (Honest Trading Co. license)" )
-	PORT_DIPSETTING(		0x0009, "Korea (JC Trading Corp. license)" )
-	PORT_DIPSETTING(		0x000a, "USA (Fabtek license)" )
-	PORT_DIPSETTING(		0x000f, "Japan (Taito Corp license)" )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Sound ready */
-#endif
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kbash )
@@ -2490,16 +2351,6 @@ static INPUT_PORTS_START( fixeight )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_COIN3 )
 	PORT_SERVICE_NO_TOGGLE(0x0004, IP_ACTIVE_HIGH)	/* Service input is a push-button marked 'Test SW' */
 
-#if 0
-	PORT_START("FAKE")		/* Fake input, to display message */
-	PORT_DIPNAME( 0x0000,	0x0000, "    Press service button" )
-	PORT_DIPSETTING(		0x0000, "" )
-	PORT_DIPNAME( 0x0000,	0x0000, "  for game keeping options" )
-	PORT_DIPSETTING(		0x0000, "" )
-	PORT_DIPNAME( 0x0000,	0x0000, "" )
-	PORT_DIPSETTING(		0x0000, "" )
-#endif
-
 	PORT_MODIFY("DSWA")
 	PORT_DIPNAME( 0x0001,	0x0000, "Maximum Players" )		PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(		0x0000, "2" )
@@ -2591,24 +2442,23 @@ static INPUT_PORTS_START( grindstm )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
 
 	PORT_MODIFY("JMPR")
-	PORT_DIPNAME( 0x000f,	0x0009, "Territory" )
-	PORT_DIPSETTING(		0x0009, DEF_STR( Europe ) )
-//  PORT_DIPSETTING(        0x0008, DEF_STR( Europe ) )
-	PORT_DIPSETTING(		0x000d, DEF_STR( USA ) )
-//  PORT_DIPSETTING(        0x000b, DEF_STR( USA ) )
-	PORT_DIPSETTING(		0x000c, "USA (American Sammy Corporation license)" )
-//  PORT_DIPSETTING(        0x000a, "USA (American Sammy Corporation license)" )
-	PORT_DIPSETTING(		0x0007, "South East Asia" )
-	PORT_DIPSETTING(		0x0006, "South East Asia (Charterfield license)" )
-//  PORT_DIPSETTING(        0x000f, "Korea" )
-//  PORT_DIPSETTING(        0x000e, "Korea" )
-	PORT_DIPSETTING(		0x0001, "Korea" )
+	PORT_DIPNAME( 0x00f0,	0x0090, "Territory" )
+	PORT_DIPSETTING(		0x0090, DEF_STR( Europe ) )
+//  PORT_DIPSETTING(        0x0080, DEF_STR( Europe ) )
+	PORT_DIPSETTING(		0x00d0, DEF_STR( USA ) )
+//  PORT_DIPSETTING(        0x00b0, DEF_STR( USA ) )
+	PORT_DIPSETTING(		0x00c0, "USA (American Sammy Corporation license)" )
+//  PORT_DIPSETTING(        0x00a0, "USA (American Sammy Corporation license)" )
+	PORT_DIPSETTING(		0x0070, "South East Asia" )
+	PORT_DIPSETTING(		0x0060, "South East Asia (Charterfield license)" )
+//  PORT_DIPSETTING(        0x00f0, "Korea" )
+//  PORT_DIPSETTING(        0x00e0, "Korea" )
+	PORT_DIPSETTING(		0x0010, "Korea" )
 	PORT_DIPSETTING(		0x0000, "Korea (Unite Trading license)" )
-	PORT_DIPSETTING(		0x0003, "Hong Kong" )
-	PORT_DIPSETTING(		0x0002, "Hong Kong (Charterfield license)" )
-	PORT_DIPSETTING(		0x0005, "Taiwan" )
-	PORT_DIPSETTING(		0x0004, "Taiwan (Anomoto International Inc license)" )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* bit 0x10 sound ready */
+	PORT_DIPSETTING(		0x0030, "Hong Kong" )
+	PORT_DIPSETTING(		0x0020, "Hong Kong (Charterfield license)" )
+	PORT_DIPSETTING(		0x0050, "Taiwan" )
+	PORT_DIPSETTING(		0x0040, "Taiwan (Anomoto International Inc license)" )
 INPUT_PORTS_END
 
 
@@ -2617,8 +2467,7 @@ static INPUT_PORTS_START( vfive )
 
 	PORT_MODIFY("JMPR")		/* (6) Territory Jumper block */
 	/* Territory is forced to Japan in this set. */
-	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* bit 0x10 sound ready */
+	PORT_BIT( 0x00f0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -3936,6 +3785,7 @@ static MACHINE_CONFIG_START( vfive, toaplan2_state )
 
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_20MHz/2)	/* Verified on pcb, NEC V25 type Toaplan mark scratched out */
 	MCFG_CPU_PROGRAM_MAP(V25_rambased_nooki_mem)
+	MCFG_CPU_IO_MAP(V25_port)
 	MCFG_CPU_CONFIG(ts002mach_config)
 
 	MCFG_MACHINE_RESET(vfive)
