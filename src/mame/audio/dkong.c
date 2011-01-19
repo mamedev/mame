@@ -294,7 +294,7 @@ static const discrete_op_amp_filt_info dkong_sallen_key_info =
 #define DKONG_CUSTOM_C			DISCRETE_INPUT(6)
 #define DKONG_CUSTOM_V			DISCRETE_INPUT(7)
 
-DISCRETE_CLASS_STEP_RESETA(dkong_custom_mixer, 1,
+DISCRETE_CLASS_STEP_RESET(dkong_custom_mixer, 1,
 	double m_i_in1[2];
 	double m_r_in[2];
 	double m_r_total[2];
@@ -331,8 +331,8 @@ DISCRETE_RESET( dkong_custom_mixer )
 	m_r_total[0] = RES_2_PARALLEL(m_r_in[0] + DKONG_CUSTOM_R4, NE555_CV_R);
 	m_r_total[1] = RES_2_PARALLEL((m_r_in[1] + DKONG_CUSTOM_R4), NE555_CV_R);
 	/* precalculate charging exponents */
-	m_exp[0] = RC_CHARGE_EXP_CLASS(m_r_total[0] * DKONG_CUSTOM_C);
-	m_exp[1] = RC_CHARGE_EXP_CLASS(m_r_total[1] * DKONG_CUSTOM_C);
+	m_exp[0] = RC_CHARGE_EXP(m_r_total[0] * DKONG_CUSTOM_C);
+	m_exp[1] = RC_CHARGE_EXP(m_r_total[1] * DKONG_CUSTOM_C);
 
 	this->output[0] = 0;
 }

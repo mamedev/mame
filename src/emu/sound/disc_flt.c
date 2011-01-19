@@ -52,7 +52,7 @@ DISCRETE_STEP(dst_crfilter)
 		if (rc != m_rc)
 		{
 			m_rc = rc;
-			m_exponent = RC_CHARGE_EXP_CLASS(rc);
+			m_exponent = RC_CHARGE_EXP(rc);
 		}
 	}
 
@@ -66,7 +66,7 @@ DISCRETE_RESET(dst_crfilter)
 {
 	m_has_rc_nodes = this->input_is_node() & 0x6;
 	m_rc = DST_CRFILTER__R * DST_CRFILTER__C;
-	m_exponent = RC_CHARGE_EXP_CLASS(m_rc);
+	m_exponent = RC_CHARGE_EXP(m_rc);
 	m_vCap = 0;
 	this->output[0] = DST_CRFILTER__IN;
 }
@@ -385,16 +385,16 @@ DISCRETE_RESET(dst_op_amp_filt)
 	{
 		case DISC_OP_AMP_FILTER_IS_LOW_PASS_1:
 		case DISC_OP_AMP_FILTER_IS_LOW_PASS_1_A:
-			m_exponentC1 = RC_CHARGE_EXP_CLASS(info->rF * info->c1);
+			m_exponentC1 = RC_CHARGE_EXP(info->rF * info->c1);
 			m_exponentC2 =  0;
 			break;
 		case DISC_OP_AMP_FILTER_IS_HIGH_PASS_1:
-			m_exponentC1 = RC_CHARGE_EXP_CLASS(m_rTotal * info->c1);
+			m_exponentC1 = RC_CHARGE_EXP(m_rTotal * info->c1);
 			m_exponentC2 =  0;
 			break;
 		case DISC_OP_AMP_FILTER_IS_BAND_PASS_1:
-			m_exponentC1 = RC_CHARGE_EXP_CLASS(info->rF * info->c1);
-			m_exponentC2 = RC_CHARGE_EXP_CLASS(m_rTotal * info->c2);
+			m_exponentC1 = RC_CHARGE_EXP(info->rF * info->c1);
+			m_exponentC2 = RC_CHARGE_EXP(m_rTotal * info->c2);
 			break;
 		case DISC_OP_AMP_FILTER_IS_BAND_PASS_1M | DISC_OP_AMP_IS_NORTON:
 			if (info->r2 == 0)
@@ -420,12 +420,12 @@ DISCRETE_RESET(dst_op_amp_filt)
 			break;
 		}
 		case DISC_OP_AMP_FILTER_IS_BAND_PASS_0 | DISC_OP_AMP_IS_NORTON:
-			m_exponentC1 = RC_CHARGE_EXP_CLASS(RES_2_PARALLEL(info->r1, info->r2 + info->r3 + info->r4) * info->c1);
-			m_exponentC2 = RC_CHARGE_EXP_CLASS(RES_2_PARALLEL(info->r1 + info->r2, info->r3 + info->r4) * info->c2);
-			m_exponentC3 = RC_CHARGE_EXP_CLASS((info->r1 + info->r2 + info->r3 + info->r4) * info->c3);
+			m_exponentC1 = RC_CHARGE_EXP(RES_2_PARALLEL(info->r1, info->r2 + info->r3 + info->r4) * info->c1);
+			m_exponentC2 = RC_CHARGE_EXP(RES_2_PARALLEL(info->r1 + info->r2, info->r3 + info->r4) * info->c2);
+			m_exponentC3 = RC_CHARGE_EXP((info->r1 + info->r2 + info->r3 + info->r4) * info->c3);
 			break;
 		case DISC_OP_AMP_FILTER_IS_HIGH_PASS_0 | DISC_OP_AMP_IS_NORTON:
-			m_exponentC1 = RC_CHARGE_EXP_CLASS(info->r1 * info->c1);
+			m_exponentC1 = RC_CHARGE_EXP(info->r1 * info->c1);
 			break;
 	}
 
@@ -489,11 +489,11 @@ DISCRETE_RESET( dst_rc_circuit_1 )
 
 	/* precalculate charging exponents */
 	/* discharge cap - in1 = 0, in2 = 1*/
-	m_exp_2 = RC_CHARGE_EXP_CLASS((CD4066_R_ON + DST_RC_CIRCUIT_1__R) * DST_RC_CIRCUIT_1__C);
+	m_exp_2 = RC_CHARGE_EXP((CD4066_R_ON + DST_RC_CIRCUIT_1__R) * DST_RC_CIRCUIT_1__C);
 	/* charge cap - in1 = 1, in2 = 0 */
-	m_exp_1 = RC_CHARGE_EXP_CLASS(CD4066_R_ON * DST_RC_CIRCUIT_1__C);
+	m_exp_1 = RC_CHARGE_EXP(CD4066_R_ON * DST_RC_CIRCUIT_1__C);
 	/* charge cap - in1 = 1, in2 = 1 */
-	m_exp_1_2 = RC_CHARGE_EXP_CLASS(RES_2_PARALLEL(CD4066_R_ON, CD4066_R_ON + DST_RC_CIRCUIT_1__R) * DST_RC_CIRCUIT_1__C);
+	m_exp_1_2 = RC_CHARGE_EXP(RES_2_PARALLEL(CD4066_R_ON, CD4066_R_ON + DST_RC_CIRCUIT_1__R) * DST_RC_CIRCUIT_1__C);
 
 	/* starts at 0 until cap starts charging */
 	this->output[0] = 0;
@@ -588,8 +588,8 @@ DISCRETE_RESET(dst_rcdisc2)
 
 	m_state = 0;
 	m_t = 0;
-	m_exponent0 = RC_DISCHARGE_EXP_CLASS(DST_RCDISC2__R0 * DST_RCDISC2__C);
-	m_exponent1 = RC_DISCHARGE_EXP_CLASS(DST_RCDISC2__R1 * DST_RCDISC2__C);
+	m_exponent0 = RC_DISCHARGE_EXP(DST_RCDISC2__R0 * DST_RCDISC2__C);
+	m_exponent1 = RC_DISCHARGE_EXP(DST_RCDISC2__R1 * DST_RCDISC2__C);
 }
 
 /************************************************************************
@@ -666,8 +666,8 @@ DISCRETE_RESET(dst_rcdisc3)
 	m_state = 0;
 	m_t = 0;
 	m_v_diode = DST_RCDISC3__DJV;
-	m_exponent0 = RC_CHARGE_EXP_CLASS(DST_RCDISC3__R1 * DST_RCDISC3__C);
-	m_exponent1 = RC_CHARGE_EXP_CLASS(RES_2_PARALLEL(DST_RCDISC3__R1, DST_RCDISC3__R2) * DST_RCDISC3__C);
+	m_exponent0 = RC_CHARGE_EXP(DST_RCDISC3__R1 * DST_RCDISC3__C);
+	m_exponent1 = RC_CHARGE_EXP(RES_2_PARALLEL(DST_RCDISC3__R1, DST_RCDISC3__R2) * DST_RCDISC3__C);
 }
 
 
@@ -759,14 +759,14 @@ DISCRETE_RESET( dst_rcdisc4)
 			i  = v / rT;
 			m_v[1] = i * r + .5;
 			rT = RES_2_PARALLEL(DST_RCDISC4__R2, r);
-			m_exp[1] = RC_CHARGE_EXP_CLASS(rT * DST_RCDISC4__C1);
+			m_exp[1] = RC_CHARGE_EXP(rT * DST_RCDISC4__C1);
 
 			/* When the input is 0, R1 is out of circuit. */
 			rT = DST_RCDISC4__R2 + DST_RCDISC4__R3;
 			i  = v / rT;
 			m_v[0] = i * DST_RCDISC4__R3 + .5;
 			rT = RES_2_PARALLEL(DST_RCDISC4__R2, DST_RCDISC4__R3);
-			m_exp[0] = RC_CHARGE_EXP_CLASS(rT * DST_RCDISC4__C1);
+			m_exp[0] = RC_CHARGE_EXP(rT * DST_RCDISC4__C1);
 			break;
 
 		case 3:
@@ -777,11 +777,11 @@ DISCRETE_RESET( dst_rcdisc4)
 			r = 500.0 + DST_RCDISC4__R1;
 			m_v[1] = RES_VOLTAGE_DIVIDER(r, DST_RCDISC4__R2) * (5.0 - 0.5);
 			rT = RES_2_PARALLEL(r, DST_RCDISC4__R2);
-			m_exp[1] = RC_CHARGE_EXP_CLASS(rT * DST_RCDISC4__C1);
+			m_exp[1] = RC_CHARGE_EXP(rT * DST_RCDISC4__C1);
 
 			/* When the input is 0, R1 is out of circuit. */
 			m_v[0] = 0;
-			m_exp[0] = RC_CHARGE_EXP_CLASS(DST_RCDISC4__R2 * DST_RCDISC4__C1);
+			m_exp[0] = RC_CHARGE_EXP(DST_RCDISC4__R2 * DST_RCDISC4__C1);
 			break;
 	}
 }
@@ -837,7 +837,7 @@ DISCRETE_RESET( dst_rcdisc5)
 	m_state = 0;
 	m_t = 0;
 	m_v_cap = 0;
-	m_exponent0 = RC_CHARGE_EXP_CLASS(DST_RCDISC5__R * DST_RCDISC5__C);
+	m_exponent0 = RC_CHARGE_EXP(DST_RCDISC5__R * DST_RCDISC5__C);
 }
 
 
@@ -906,28 +906,28 @@ DISCRETE_RESET(dst_rcdisc_mod)
 	/* DST_RCDISC_MOD__IN1 <= 0.5 */
 	rc[0] = DST_RCDISC_MOD__R1 + DST_RCDISC_MOD__R2;
 	if (rc[0] < 1) rc[0] = 1;
-	m_exp_low[0]  = RC_DISCHARGE_EXP_CLASS(DST_RCDISC_MOD__C * rc[0]);
+	m_exp_low[0]  = RC_DISCHARGE_EXP(DST_RCDISC_MOD__C * rc[0]);
 	m_gain[0]     = RES_VOLTAGE_DIVIDER(rc[0], DST_RCDISC_MOD__R4);
 	/* DST_RCDISC_MOD__IN1 > 0.5 */
 	rc[1] = DST_RCDISC_MOD__R2;
 	if (rc[1] < 1) rc[1] = 1;
-	m_exp_low[1]  = RC_DISCHARGE_EXP_CLASS(DST_RCDISC_MOD__C * rc[1]);
+	m_exp_low[1]  = RC_DISCHARGE_EXP(DST_RCDISC_MOD__C * rc[1]);
 	m_gain[1]     = RES_VOLTAGE_DIVIDER(rc[1], DST_RCDISC_MOD__R4);
 	/* DST_RCDISC_MOD__IN2 <= 0.6 */
 	rc2[0] = DST_RCDISC_MOD__R4;
 	/* DST_RCDISC_MOD__IN2 > 0.6 */
 	rc2[1] = RES_2_PARALLEL(DST_RCDISC_MOD__R3, DST_RCDISC_MOD__R4);
 	/* DST_RCDISC_MOD__IN1 <= 0.5 && DST_RCDISC_MOD__IN2 <= 0.6 */
-	m_exp_high[0] = RC_DISCHARGE_EXP_CLASS(DST_RCDISC_MOD__C * (rc[0] + rc2[0]));
+	m_exp_high[0] = RC_DISCHARGE_EXP(DST_RCDISC_MOD__C * (rc[0] + rc2[0]));
 	m_vd_gain[0]  = RES_VOLTAGE_DIVIDER(rc[0], rc2[0]);
 	/* DST_RCDISC_MOD__IN1 > 0.5  && DST_RCDISC_MOD__IN2 <= 0.6 */
-	m_exp_high[1] = RC_DISCHARGE_EXP_CLASS(DST_RCDISC_MOD__C * (rc[1] + rc2[0]));
+	m_exp_high[1] = RC_DISCHARGE_EXP(DST_RCDISC_MOD__C * (rc[1] + rc2[0]));
 	m_vd_gain[1]  = RES_VOLTAGE_DIVIDER(rc[1], rc2[0]);
 	/* DST_RCDISC_MOD__IN1 <= 0.5 && DST_RCDISC_MOD__IN2 > 0.6 */
-	m_exp_high[2] = RC_DISCHARGE_EXP_CLASS(DST_RCDISC_MOD__C * (rc[0] + rc2[1]));
+	m_exp_high[2] = RC_DISCHARGE_EXP(DST_RCDISC_MOD__C * (rc[0] + rc2[1]));
 	m_vd_gain[2]  = RES_VOLTAGE_DIVIDER(rc[0], rc2[1]);
 	/* DST_RCDISC_MOD__IN1 > 0.5  && DST_RCDISC_MOD__IN2 > 0.6 */
-	m_exp_high[3] = RC_DISCHARGE_EXP_CLASS(DST_RCDISC_MOD__C * (rc[1] + rc2[1]));
+	m_exp_high[3] = RC_DISCHARGE_EXP(DST_RCDISC_MOD__C * (rc[1] + rc2[1]));
 	m_vd_gain[3]  = RES_VOLTAGE_DIVIDER(rc[1], rc2[1]);
 
 	m_v_cap  = 0;
@@ -962,7 +962,7 @@ DISCRETE_STEP(dst_rcfilter)
 			if (rc != m_rc)
 			{
 				m_rc = rc;
-				m_exponent = RC_CHARGE_EXP_CLASS(rc);
+				m_exponent = RC_CHARGE_EXP(rc);
 			}
 		}
 
@@ -980,7 +980,7 @@ DISCRETE_RESET(dst_rcfilter)
 {
 	m_has_rc_nodes = this->input_is_node() & 0x6;
 	m_rc = DST_RCFILTER__R * DST_RCFILTER__C;
-	m_exponent = RC_CHARGE_EXP_CLASS(m_rc);
+	m_exponent = RC_CHARGE_EXP(m_rc);
 	m_vCap   = 0;
 	this->output[0] = 0;
 	/* FIXME --> we really need another class here */
@@ -1067,7 +1067,7 @@ DISCRETE_RESET(dst_rcfilter_sw)
 	for (i = 0; i < 4; i++)
 	{
 		m_vCap[i] = 0;
-		m_exp[i] = RC_CHARGE_EXP_CLASS( CD4066_ON_RES * DST_RCFILTER_SW__C(i));
+		m_exp[i] = RC_CHARGE_EXP( CD4066_ON_RES * DST_RCFILTER_SW__C(i));
 	}
 
 	for (bits=0; bits < 15; bits++)
@@ -1085,8 +1085,8 @@ DISCRETE_RESET(dst_rcfilter_sw)
 
 
 	/* fast cases */
-	m_exp0 = RC_CHARGE_EXP_CLASS((CD4066_ON_RES + DST_RCFILTER_SW__R) * DST_RCFILTER_SW__C(0));
-	m_exp1 = RC_CHARGE_EXP_CLASS((CD4066_ON_RES + DST_RCFILTER_SW__R) * DST_RCFILTER_SW__C(1));
+	m_exp0 = RC_CHARGE_EXP((CD4066_ON_RES + DST_RCFILTER_SW__R) * DST_RCFILTER_SW__C(0));
+	m_exp1 = RC_CHARGE_EXP((CD4066_ON_RES + DST_RCFILTER_SW__R) * DST_RCFILTER_SW__C(1));
 	m_factor = RES_VOLTAGE_DIVIDER(DST_RCFILTER_SW__R, CD4066_ON_RES);
 
 	this->output[0] = 0;

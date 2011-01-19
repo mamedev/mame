@@ -141,7 +141,7 @@ static const discrete_mixer_desc skyraid_mixer =
 #define SKYRAID_MISSLE_CUSTOM_R3		DISCRETE_INPUT(3)
 #define SKYRAID_MISSLE_CUSTOM_C			DISCRETE_INPUT(4)
 
-DISCRETE_CLASS_STEP_RESETA(skyraid_missle_custom_charge, 2,
+DISCRETE_CLASS_STEP_RESET(skyraid_missle_custom_charge, 2,
 		double m_v_charge[2];
 		double m_v_cap;
 		double m_exp[2];
@@ -172,9 +172,9 @@ DISCRETE_RESET( skyraid_missle_custom_charge )
 
 	/* precalculate charging exponents */
 	/* discharge cap */
-	m_exp[0] = RC_CHARGE_EXP_CLASS(SKYRAID_MISSLE_CUSTOM_R2 * SKYRAID_MISSLE_CUSTOM_C);
+	m_exp[0] = RC_CHARGE_EXP(SKYRAID_MISSLE_CUSTOM_R2 * SKYRAID_MISSLE_CUSTOM_C);
 	/* charge cap */
-	m_exp[1] = RC_CHARGE_EXP_CLASS(RES_2_PARALLEL(SKYRAID_MISSLE_CUSTOM_R1 + SKYRAID_MISSLE_CUSTOM_R2, SKYRAID_MISSLE_CUSTOM_R3) * SKYRAID_MISSLE_CUSTOM_C);
+	m_exp[1] = RC_CHARGE_EXP(RES_2_PARALLEL(SKYRAID_MISSLE_CUSTOM_R1 + SKYRAID_MISSLE_CUSTOM_R2, SKYRAID_MISSLE_CUSTOM_R3) * SKYRAID_MISSLE_CUSTOM_C);
 
 	/* starts at full voltage until cap starts charging */
 	this->output[0] = SKYRAID_MISSLE_CHARGE_PLUS;

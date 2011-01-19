@@ -3476,15 +3476,13 @@
  *************************************/
 
 /* calculate charge exponent using discrete sample time */
-#define RC_CHARGE_EXP(rc)						(1.0 - exp(-(node)->sample_time() / (rc)))
-#define RC_CHARGE_EXP_CLASS(rc)					(1.0 - exp(-this->sample_time() / (rc)))
+#define RC_CHARGE_EXP(rc)						(1.0 - exp(-this->sample_time() / (rc)))
 /* calculate charge exponent using given sample time */
 #define RC_CHARGE_EXP_DT(rc, dt)				(1.0 - exp(-(dt) / (rc)))
 #define RC_CHARGE_NEG_EXP_DT(rc, dt)			(1.0 - exp((dt) / (rc)))
 
 /* calculate discharge exponent using discrete sample time */
-#define RC_DISCHARGE_EXP(rc)					(exp(-(node)->sample_time() / (rc)))
-#define RC_DISCHARGE_EXP_CLASS(rc)				(exp(-this->sample_time() / (rc)))
+#define RC_DISCHARGE_EXP(rc)					(exp(-this->sample_time() / (rc)))
 /* calculate discharge exponent using given sample time */
 #define RC_DISCHARGE_EXP_DT(rc, dt)				(exp(-(dt) / (rc)))
 #define RC_DISCHARGE_NEG_EXP_DT(rc, dt)			(exp((dt) / (rc)))
@@ -3499,14 +3497,11 @@
 
 #define DISCRETE_CLASS_FUNC(_class, _func)		DISCRETE_CLASS_NAME(_class) :: _func
 
-#define DISCRETE_STEP(_class)				void DISCRETE_CLASS_FUNC(_class, step)(void)
-#define DISCRETE_RESET(_class)			void DISCRETE_CLASS_FUNC(_class, reset)(void)
-#define DISCRETE_START(_class)			void DISCRETE_CLASS_FUNC(_class, start)(void)
-#define DISCRETE_STOP(_class)				void DISCRETE_CLASS_FUNC(_class, stop)(void)
-#define DISCRETE_IS_STEPPING(_class)		bool DISCRETE_CLASS_FUNC(_class, is_stepping)(void)
-
-#define DISCRETE_DECLARE_CONTEXT(_name)	struct _name##_context *context = (struct _name##_context *)this->m_context;
-#define DISCRETE_DECLARE_INFO(_name)		const _name *info = (const  _name *)this->custom_data();
+#define DISCRETE_STEP(_class)					void DISCRETE_CLASS_FUNC(_class, step)(void)
+#define DISCRETE_RESET(_class)					void DISCRETE_CLASS_FUNC(_class, reset)(void)
+#define DISCRETE_START(_class)					void DISCRETE_CLASS_FUNC(_class, start)(void)
+#define DISCRETE_STOP(_class)					void DISCRETE_CLASS_FUNC(_class, stop)(void)
+#define DISCRETE_DECLARE_INFO(_name)			const _name *info = (const  _name *)this->custom_data();
 
 #define DISCRETE_INPUT(_num)					(*(this->m_input[_num]))
 
@@ -3519,7 +3514,7 @@
 #define DISCRETE_MAX_NODES					300
 #define DISCRETE_MAX_INPUTS					10
 #define DISCRETE_MAX_OUTPUTS				8
-#define DISCRETE_MAX_TASK_OUTPUTS			8
+
 #define DISCRETE_MAX_TASK_GROUPS			10
 
 
@@ -4162,8 +4157,6 @@ enum {
 #else
 #error "DISCRETE_MAX_OUTPUTS != 8"
 #endif
-
-//#define NODE_BLOCKINDEX(_node)	NODE_INDEX((_node)->block->node)
 
 #define NODE_RELATIVE(_x, _y) (NODE(NODE_INDEX(_x) + (_y)))
 

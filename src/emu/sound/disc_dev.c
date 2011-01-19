@@ -154,9 +154,9 @@ DISCRETE_STEP(dsd_555_astbl)
 			m_t_rc_bleed  = DSD_555_ASTBL_T_RC_BLEED;
 			m_t_rc_charge = DSD_555_ASTBL_T_RC_CHARGE;
 			m_t_rc_discharge = DSD_555_ASTBL_T_RC_DISCHARGE;
-			m_exp_bleed  = RC_CHARGE_EXP_CLASS(m_t_rc_bleed);
-			m_exp_charge = RC_CHARGE_EXP_CLASS(m_t_rc_charge);
-			m_exp_discharge = RC_CHARGE_EXP_CLASS(m_t_rc_discharge);
+			m_exp_bleed  = RC_CHARGE_EXP(m_t_rc_bleed);
+			m_exp_charge = RC_CHARGE_EXP(m_t_rc_charge);
+			m_exp_discharge = RC_CHARGE_EXP(m_t_rc_discharge);
 			m_last_r1 = DSD_555_ASTBL__R1;
 			m_last_r2 = DSD_555_ASTBL__R2;
 			m_last_c  = DSD_555_ASTBL__C;
@@ -319,11 +319,11 @@ DISCRETE_RESET(dsd_555_astbl)
 	else
 	{
 		m_t_rc_bleed  = DSD_555_ASTBL_T_RC_BLEED;
-		m_exp_bleed   = RC_CHARGE_EXP_CLASS(m_t_rc_bleed);
+		m_exp_bleed   = RC_CHARGE_EXP(m_t_rc_bleed);
 		m_t_rc_charge = DSD_555_ASTBL_T_RC_CHARGE;
-		m_exp_charge  = RC_CHARGE_EXP_CLASS(m_t_rc_charge);
+		m_exp_charge  = RC_CHARGE_EXP(m_t_rc_charge);
 		m_t_rc_discharge = DSD_555_ASTBL_T_RC_DISCHARGE;
-		m_exp_discharge  = RC_CHARGE_EXP_CLASS(m_t_rc_discharge);
+		m_exp_discharge  = RC_CHARGE_EXP(m_t_rc_discharge);
 	}
 
 	m_output_is_ac = info->options & DISC_555_OUT_AC;
@@ -533,7 +533,7 @@ DISCRETE_RESET(dsd_555_mstbl)
 	if (this->input_is_node() & DSD_555_MSTBL_RC_MASK)
 		m_has_rc_nodes = 1;
 	else
-		m_exp_charge = RC_CHARGE_EXP_CLASS(DSD_555_MSTBL__R * DSD_555_MSTBL__C);
+		m_exp_charge = RC_CHARGE_EXP(DSD_555_MSTBL__R * DSD_555_MSTBL__C);
 
 	this->output[0] = 0;
 }
@@ -958,15 +958,15 @@ DISCRETE_RESET(dsd_555_cc)
 				break;
 		}
 
-		m_exp_bleed  = RC_CHARGE_EXP_CLASS(DSD_555_CC_T_RC_BLEED);
+		m_exp_bleed  = RC_CHARGE_EXP(DSD_555_CC_T_RC_BLEED);
 		m_t_rc_discharge_01 = DSD_555_CC_T_RC_DISCHARGE_01;
-		m_exp_discharge_01  = RC_CHARGE_EXP_CLASS(m_t_rc_discharge_01);
+		m_exp_discharge_01  = RC_CHARGE_EXP(m_t_rc_discharge_01);
 		m_t_rc_discharge_no_i = DSD_555_CC_T_RC_DISCHARGE_NO_I;
-		m_exp_discharge_no_i  = RC_CHARGE_EXP_CLASS(m_t_rc_discharge_no_i);
+		m_exp_discharge_no_i  = RC_CHARGE_EXP(m_t_rc_discharge_no_i);
 		m_t_rc_charge = DSD_555_CC_T_RC_CHARGE;
-		m_exp_charge  = RC_CHARGE_EXP_CLASS(m_t_rc_charge);
+		m_exp_charge  = RC_CHARGE_EXP(m_t_rc_charge);
 		m_t_rc_discharge = DSD_555_CC_T_RC_DISCHARGE;
-		m_exp_discharge  = RC_CHARGE_EXP_CLASS(m_t_rc_discharge);
+		m_exp_discharge  = RC_CHARGE_EXP(m_t_rc_discharge);
 	}
 
 	/* Step to set the output */
@@ -1753,7 +1753,7 @@ DISCRETE_RESET(dsd_ls624)
 	if (DSD_LS624__C_FREQ_IN > 0)
 	{
 		m_has_freq_in_cap = 1;
-		m_exponent = RC_CHARGE_EXP_CLASS(RES_2_PARALLEL(DSD_LS624__R_FREQ_IN, LS624_IN_R) * DSD_LS624__C_FREQ_IN);
+		m_exponent = RC_CHARGE_EXP(RES_2_PARALLEL(DSD_LS624__R_FREQ_IN, LS624_IN_R) * DSD_LS624__C_FREQ_IN);
 		m_v_cap_freq_in = 0;
 	}
 	else

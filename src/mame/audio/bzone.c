@@ -229,7 +229,7 @@ static const discrete_mixer_desc bzone_final_mixer_desc =
 
 #define CD4066_R_ON		270
 
-DISCRETE_CLASS_STEP_RESETA(bzone_custom_filter, 1,
+DISCRETE_CLASS_STEP_RESET(bzone_custom_filter, 1,
 	double	m_v_in1_gain;
 	double	m_v_p;
 	double	m_exponent;
@@ -259,7 +259,7 @@ DISCRETE_RESET(bzone_custom_filter)
 	m_gain[1] = BZONE_CUSTOM_FILTER__R5 / m_gain[1] + 1;
 	m_v_in1_gain = RES_VOLTAGE_DIVIDER(BZONE_CUSTOM_FILTER__R3, BZONE_CUSTOM_FILTER__R4);
 	m_v_p = BZONE_CUSTOM_FILTER__VP - OP_AMP_VP_RAIL_OFFSET;
-	m_exponent = RC_CHARGE_EXP_CLASS(BZONE_CUSTOM_FILTER__R5 * BZONE_CUSTOM_FILTER__C);;
+	m_exponent = RC_CHARGE_EXP(BZONE_CUSTOM_FILTER__R5 * BZONE_CUSTOM_FILTER__C);;
 	this->output[0] = 0;
 }
 

@@ -975,8 +975,8 @@ DISCRETE_RESET(dss_op_amp_osc)
 
 			m_charge_rc[0] *= info->c;
 			m_charge_rc[1] *= info->c;
-			m_charge_exp[0] = RC_CHARGE_EXP_CLASS(m_charge_rc[0]);
-			m_charge_exp[1] = RC_CHARGE_EXP_CLASS(m_charge_rc[1]);
+			m_charge_exp[0] = RC_CHARGE_EXP(m_charge_rc[0]);
+			m_charge_exp[1] = RC_CHARGE_EXP(m_charge_rc[1]);
 			m_threshold_low  = (info->vP - OP_AMP_NORTON_VBE) / info->r4;
 			m_threshold_high = m_threshold_low + (info->vP - 2 * OP_AMP_NORTON_VBE) / info->r3;;
 			m_threshold_low  = m_threshold_low * info->r2 + OP_AMP_NORTON_VBE;
@@ -1224,7 +1224,7 @@ DISCRETE_RESET(dss_schmitt_osc)
      * So use this for the RC charge constant. */
 	rSource     = 1.0 / ((1.0 / info->rIn) + (1.0 / info->rFeedback));
 	m_rc = rSource * info->c;
-	m_exponent = RC_CHARGE_EXP_CLASS(m_rc);
+	m_exponent = RC_CHARGE_EXP(m_rc);
 
 	/* Cap is at 0V on power up.  Causing output to be high. */
 	m_v_cap = 0;

@@ -265,7 +265,7 @@ static const discrete_555_cc_desc copsnrob_motor01_555cc =
  ************************************************/
 #define COPSNROB_CUSTOM_NOISE__FREQ		DISCRETE_INPUT(0)
 
-DISCRETE_CLASS_STEP_RESETA(copsnrob_custom_noise, 2,
+DISCRETE_CLASS_STEP_RESET(copsnrob_custom_noise, 2,
 	int		m_flip_flop;
 	int		m_noise1_had_xtime;
 	int		m_noise2_had_xtime;
@@ -371,7 +371,7 @@ DISCRETE_RESET(copsnrob_custom_noise)
 #define COPSNROB_CUSTOM_ZINGS_555_MONOSTABLE__R		DISCRETE_INPUT(1)
 #define COPSNROB_CUSTOM_ZINGS_555_MONOSTABLE__C		DISCRETE_INPUT(2)
 
-DISCRETE_CLASS_STEP_RESETA(copsnrob_zings_555_monostable, 1,
+DISCRETE_CLASS_STEP_RESET(copsnrob_zings_555_monostable, 1,
 	double	m_rc;
 	double	m_exponent;
 	double	m_v_cap;
@@ -445,7 +445,7 @@ DISCRETE_STEP(copsnrob_zings_555_monostable)
 DISCRETE_RESET(copsnrob_zings_555_monostable)
 {
 	m_rc = COPSNROB_CUSTOM_ZINGS_555_MONOSTABLE__R * COPSNROB_CUSTOM_ZINGS_555_MONOSTABLE__C;
-	m_exponent = RC_CHARGE_EXP_CLASS(m_rc);
+	m_exponent = RC_CHARGE_EXP(m_rc);
 	m_v_cap = 0;
 	m_flip_flop = 0;
 	this->output[0] = 0;
@@ -468,7 +468,7 @@ DISCRETE_RESET(copsnrob_zings_555_monostable)
 
 #define COPSNROB_CUSTOM_ZINGS_555_ASTABLE__HIGH		4.5
 
-DISCRETE_CLASS_STEP_RESETA(copsnrob_zings_555_astable, 1,
+DISCRETE_CLASS_STEP_RESET(copsnrob_zings_555_astable, 1,
 	double	m_r2c2;
 	double	m_r_total_cv;
 	double	m_exponent1;
@@ -574,8 +574,8 @@ DISCRETE_RESET(copsnrob_zings_555_astable)
 {
 	m_r_total_cv = RES_3_PARALLEL(COPSNROB_CUSTOM_ZINGS_555_ASTABLE__R1, RES_K(10), RES_K(5));
 	m_r2c2 = COPSNROB_CUSTOM_ZINGS_555_ASTABLE__R2 * COPSNROB_CUSTOM_ZINGS_555_ASTABLE__C2;
-	m_exponent1 = RC_CHARGE_EXP_CLASS(COPSNROB_CUSTOM_ZINGS_555_ASTABLE__R1 * COPSNROB_CUSTOM_ZINGS_555_ASTABLE__C1);
-	m_exponent2 = RC_CHARGE_EXP_CLASS(m_r2c2);
+	m_exponent1 = RC_CHARGE_EXP(COPSNROB_CUSTOM_ZINGS_555_ASTABLE__R1 * COPSNROB_CUSTOM_ZINGS_555_ASTABLE__C1);
+	m_exponent2 = RC_CHARGE_EXP(m_r2c2);
 	m_v_cap1 = 0;
 	m_flip_flop = 0;
 	this->output[0] = 0;		/* charge on C2 */
