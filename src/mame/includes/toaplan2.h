@@ -8,10 +8,10 @@
 #define CPU_2_HD647180	0xa5
 #define CPU_2_V25		0xff
 
-/* vdp related */
+// we encode priority with colour in the tilemaps, so need a larger palette
+#define T2PALETTE_LENGTH 0x10000
 
-// mixing debug, render each VDP to it's own screen - be sure to recompile both driver and video after changing
-//#define DUAL_SCREEN_VDPS
+/* vdp related */
 
 #include "video/gp9001.h"
 
@@ -36,9 +36,7 @@ public:
 	UINT16 *V25_shared_ram;			/* Really 8bit RAM connected to Z180 */
 #endif
 	UINT8* batsugun_share;
-#ifdef USE_ENCRYPTED_V25S
-	UINT8* batsugun_share2;
-#endif
+
 
 	int sub_cpu_type;
 	device_t *sub_cpu;
@@ -75,10 +73,7 @@ public:
 
 /*----------- defined in audio/toaplan2.c -----------*/
 
-void dogyuun_okisnd_w(device_t *device, int data);
-void kbash_okisnd_w(device_t *device, int data);
 void fixeight_okisnd_w(device_t *device, int data);
-
 
 /*----------- defined in video/toaplan2.c -----------*/
 

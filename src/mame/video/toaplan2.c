@@ -469,21 +469,6 @@ VIDEO_UPDATE( toaplan2 )
 		}
 	}
 
-	/* debug code, render 2nd VDP to 2nd screen if they exist for test */
-#ifdef DUAL_SCREEN_VDPS
-	if (state->vdp1)
-	{
-		device_t *screen2 = screen->machine->device("screen2");
-
-		if (screen == screen2)
-		{
-			bitmap_fill(bitmap,cliprect,0);
-			bitmap_fill(state->custom_priority_bitmap, cliprect, 0);
-			state->vdp1->gp9001_render_vdp(screen->machine, bitmap, cliprect);
-		}
-	}
-#endif
-
 	return 0;
 }
 
@@ -534,23 +519,13 @@ VIDEO_UPDATE( batrider )
 
 VIDEO_UPDATE( dogyuun )
 {
-#ifdef DUAL_SCREEN_VDPS
-	VIDEO_UPDATE_CALL( toaplan2 );
-#else
 	VIDEO_UPDATE_CALL( toaplan2_dual );
-#endif
-
 	return 0;
 }
 
 VIDEO_UPDATE( batsugun )
 {
-#ifdef DUAL_SCREEN_VDPS
-	VIDEO_UPDATE_CALL( toaplan2 );
-#else
 	VIDEO_UPDATE_CALL( toaplan2_mixed );
-#endif
-
 	return 0;
 }
 

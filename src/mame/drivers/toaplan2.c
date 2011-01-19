@@ -205,19 +205,16 @@ Game status:
 
 Teki Paki                      Working, but no sound. Missing sound MCU dump. Chip is protected. It's a QFP80 Hitachi HD647180.
 Ghox                           Working, but no sound. Missing sound MCU dump. It's a QFP80 Hitachi HD647180.
-Dogyuun                        Working, Sound transitions are incorrect between levels (decryption error?)
-Knuckle Bash                   Working, but sound FX only (missing music). MCU type is a NEC V25. Chip is a PLCC94 stamped 'TS-004-DASH'.
-                                        Some PCBs use another version stamped 'NITRO' which is the same chip type.
+Dogyuun                        Working, MCU type is a NEC V25. Chip is a PLCC94 stamped 'TS-002-MACH'.*
+Knuckle Bash                   Working, MCU type is a NEC V25. Chip is a PLCC94 stamped 'TS-004-DASH'.*
 Truxton 2                      Working.
 Pipi & Bibis                   Working.
 Whoopee                        Working, but no sound. Missing sound MCU dump. It's a Hitachi HD647180.
 Pipi & Bibis (Ryouta Kikaku)   Working.
 FixEight                       Not working properly. Missing background GFX, and sound FX only (missing music). Both controlled by PLCC94 NEC V25 MCU stamped 'TS-001-TURBO'
 FixEight bootleg               Working. One unknown ROM (same as pipibibi one). Region hardcoded to Korea (@ $4d8)
-Grind Stormer                  Working, Sound transitions are incorrect between levels (decryption error?)
-VFive                          Working, Sound transitions are incorrect between levels (decryption error?)
-Batsugun                       Working.
-Batsugun Sp'                   Working.
+Grind Stormer / VFive          Working, MCU type is a NEC V25. Chip is a PLCC94 stamped 'TS-004-SPY'.*
+Batsugun / Batsugun Sp'        Working, MCU type is a NEC V25. Chip is a PLCC94 stamped 'TS-004-SPY'.*
 Snow Bros. 2                   Working.
 Mahou Daisakusen               Working.
 Shippu Mahou Daisakusen        Working.
@@ -225,6 +222,9 @@ Battle Garegga                 Working.
 Armed Police Batrider          Working.
 Battle Bakraid                 Working.
 
+
+* Some PCBs use another version stamped 'NITRO' which is the same chip type. MACH, DASH and SPY seem to be the same chip (same encryption table)
+  Batsugun has the CPU hooked up in non-encrypted mode.
 
 Notes:
     See Input Port definition header below, for instructions
@@ -414,7 +414,7 @@ static DRIVER_INIT( vfive )
 	register_state_save(machine);
 }
 
-static DRIVER_INIT( pipibibi )
+static DRIVER_INIT( pipibibsbl )
 {
 	toaplan2_state *state = machine->driver_data<toaplan2_state>();
 	int A;
@@ -937,26 +937,6 @@ static WRITE16_HANDLER( V25_sharedram_w )
 }
 #endif
 
-#ifndef USE_ENCRYPTED_V25S
-static READ16_HANDLER( kbash_snd_cpu_r )
-{
-/*  Knuckle Bash's  68000 reads secondary CPU status via an I/O port.
-    If a value of 2 is read, then secondary CPU is busy.
-    Secondary CPU must report 0xff when no longer busy, to signify that it
-    has passed POST.
-*/
-	return 0xff;
-}
-
-static WRITE16_HANDLER( kbash_snd_cpu_w )
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		kbash_okisnd_w(space->machine->device("oki"), data);
-	}
-	logerror("PC:%06x Writing Sound command (%04x) to the NEC V25 secondary CPU\n",cpu_get_previouspc(space->cpu),data);
-}
-#endif
 
 static WRITE16_DEVICE_HANDLER( oki_bankswitch_w )
 {
@@ -1349,15 +1329,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kbash_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
-#ifdef USE_ENCRYPTED_V25S
 	AM_RANGE(0x200000, 0x200fff) AM_READWRITE( batsugun_share_r, batsugun_share_w )
-#else
-	AM_RANGE(0x200000, 0x200001) AM_READWRITE(kbash_snd_cpu_r, kbash_snd_cpu_w)	/* Sound number to play */
-	AM_RANGE(0x200002, 0x200003) AM_WRITENOP					/* Control info to V25 */
-	AM_RANGE(0x200004, 0x200005) AM_READ_PORT("DSWA")
-	AM_RANGE(0x200006, 0x200007) AM_READ_PORT("DSWB")
-	AM_RANGE(0x200008, 0x200009) AM_READ_PORT("JMPR")
-#endif
 	AM_RANGE(0x208010, 0x208011) AM_READ_PORT("IN1")
 	AM_RANGE(0x208014, 0x208015) AM_READ_PORT("IN2")
 	AM_RANGE(0x208018, 0x208019) AM_READ_PORT("SYS")
@@ -2183,7 +2155,6 @@ static INPUT_PORTS_START( kbash )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
 
 	PORT_MODIFY("JMPR")
-#ifdef USE_ENCRYPTED_V25S
 	PORT_DIPNAME( 0x00f0,	0x0020, "Territory" )
 	PORT_DIPSETTING(		0x00a0, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x0020, "Europe, USA (Atari license)" )
@@ -2193,17 +2164,6 @@ static INPUT_PORTS_START( kbash )
 	PORT_DIPSETTING(		0x0060, "South East Asia" )	/*Service Mode lists European Coinage */
 	PORT_DIPSETTING(		0x0030, "Korea" )
 	PORT_DIPSETTING(		0x0040, "Hong Kong" )
-#else
-	PORT_DIPNAME( 0x000f,	0x0002, "Territory" )
-	PORT_DIPSETTING(		0x000a, DEF_STR( Europe ) )
-	PORT_DIPSETTING(		0x0002, "Europe, USA (Atari license)" )
-	PORT_DIPSETTING(		0x0009, DEF_STR( USA ) )
-	PORT_DIPSETTING(		0x0001, "USA, Europe (Atari license)" )
-	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
-	PORT_DIPSETTING(		0x0006, "South East Asia" )	/*Service Mode lists European Coinage */
-	PORT_DIPSETTING(		0x0003, "Korea" )
-	PORT_DIPSETTING(		0x0004, "Hong Kong" )
-#endif
 INPUT_PORTS_END
 
 
@@ -2321,7 +2281,7 @@ static INPUT_PORTS_START( whoopee )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( pipibibi )
+static INPUT_PORTS_START( pipibibsbl )
 	PORT_INCLUDE(pipibibs)
 
 	PORT_MODIFY("VBL")
@@ -3193,7 +3153,7 @@ static GFXDECODE_START( toaplan2 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0, 0x1000 )
 GFXDECODE_END
 
-static GFXDECODE_START( 2 )
+static GFXDECODE_START( t2dualvdp )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,   0, 0x1000 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0, 0x1000 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   0, 0x1000 )
@@ -3267,7 +3227,7 @@ static MACHINE_CONFIG_START( tekipaki, toaplan2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MCFG_GFXDECODE(toaplan2)
-	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
 
 
 	MCFG_DEVICE_ADD_VDP0
@@ -3310,7 +3270,7 @@ static MACHINE_CONFIG_START( ghox, toaplan2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MCFG_GFXDECODE(toaplan2)
-	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 
@@ -3329,7 +3289,7 @@ MACHINE_CONFIG_END
 those 3 games have been seen with the NITRO905 chip, other alias are
 ts002mach for dogyuun, ts004dash for kbash and ts007spy for vfive */
 
-static const UINT8 ts002mach_decryption_table[256] = {
+static const UINT8 nitro_decryption_table[256] = {
 	0x1b,0x56,0x75,0x88,0x8c,0x06,0x58,0x72, 0x83,0x86,0x36,0x1a,0x5f,0xd3,0x8c,0xe9, /* 00 */
 	/* *//* *//* *//* *//* *//* *//* *//* */ /* *//* *//* *//* *//* *//* *//* *//* */
 	0x22,0x0f,0x03,0x2a,0xeb,0x2a,0xf9,0x0f, 0xa4,0xbd,0x75,0xf3,0x4f,0x53,0x8e,0xfe, /* 10 */
@@ -3375,7 +3335,7 @@ a4849 cd
 
 */
 
-static const nec_config ts002mach_config ={ ts002mach_decryption_table, };
+static const nec_config nitro_config ={ nitro_decryption_table, };
 
 static MACHINE_CONFIG_START( dogyuun, toaplan2_state )
 
@@ -3387,7 +3347,7 @@ static MACHINE_CONFIG_START( dogyuun, toaplan2_state )
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_25MHz/2)			/* NEC V25 type Toaplan marked CPU ??? */
 	MCFG_CPU_PROGRAM_MAP(V25_rambased_mem)
 	MCFG_CPU_IO_MAP(V25_port_abswap)
-	MCFG_CPU_CONFIG(ts002mach_config)
+	MCFG_CPU_CONFIG(nitro_config)
 
 	MCFG_MACHINE_RESET(dogyuun)
 
@@ -3400,18 +3360,8 @@ static MACHINE_CONFIG_START( dogyuun, toaplan2_state )
 	MCFG_SCREEN_SIZE(432, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
-#ifdef DUAL_SCREEN_VDPS
-	MCFG_SCREEN_ADD("screen2", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(432, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
-#endif
-
-	MCFG_GFXDECODE(2)
-	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_GFXDECODE(t2dualvdp)
+	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_DEVICE_ADD_VDP1
@@ -3424,10 +3374,10 @@ static MACHINE_CONFIG_START( dogyuun, toaplan2_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	MCFG_OKIM6295_ADD("oki", XTAL_25MHz/24, OKIM6295_PIN7_HIGH) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( kbash, toaplan2_state )
@@ -3441,7 +3391,7 @@ static MACHINE_CONFIG_START( kbash, toaplan2_state )
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_16MHz)			/* NEC V25 type Toaplan marked CPU ??? */
 	MCFG_CPU_PROGRAM_MAP(V25_kbash_mem)
 	MCFG_CPU_IO_MAP(V25_port)
-	MCFG_CPU_CONFIG(ts002mach_config)
+	MCFG_CPU_CONFIG(nitro_config)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3453,7 +3403,7 @@ static MACHINE_CONFIG_START( kbash, toaplan2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MCFG_GFXDECODE(toaplan2)
-	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 
@@ -3465,10 +3415,10 @@ static MACHINE_CONFIG_START( kbash, toaplan2_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	MCFG_OKIM6295_ADD("oki", XTAL_32MHz/32, OKIM6295_PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 
@@ -3491,7 +3441,7 @@ static MACHINE_CONFIG_START( kbash2, toaplan2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MCFG_GFXDECODE(toaplan2)
-	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 
@@ -3529,7 +3479,7 @@ static MACHINE_CONFIG_START( truxton2, toaplan2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MCFG_GFXDECODE(truxton2)
-	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 
@@ -3572,7 +3522,7 @@ static MACHINE_CONFIG_START( pipibibs, toaplan2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MCFG_GFXDECODE(toaplan2)
-	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 
@@ -3613,7 +3563,7 @@ static MACHINE_CONFIG_START( whoopee, toaplan2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MCFG_GFXDECODE(toaplan2)
-	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 
@@ -3654,7 +3604,7 @@ static MACHINE_CONFIG_START( pipibibi_bootleg, toaplan2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MCFG_GFXDECODE(toaplan2)
-	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 
@@ -3737,7 +3687,7 @@ static MACHINE_CONFIG_START( fixeight, toaplan2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MCFG_GFXDECODE(truxton2)
-	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 
@@ -3775,7 +3725,7 @@ static MACHINE_CONFIG_START( fixeighb, toaplan2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MCFG_GFXDECODE(fixeighb)
-	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 
@@ -3800,7 +3750,7 @@ static MACHINE_CONFIG_START( vfive, toaplan2_state )
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_20MHz/2)	/* Verified on pcb, NEC V25 type Toaplan mark scratched out */
 	MCFG_CPU_PROGRAM_MAP(V25_rambased_nooki_mem)
 	MCFG_CPU_IO_MAP(V25_port)
-	MCFG_CPU_CONFIG(ts002mach_config)
+	MCFG_CPU_CONFIG(nitro_config)
 
 	MCFG_MACHINE_RESET(vfive)
 
@@ -3816,7 +3766,7 @@ static MACHINE_CONFIG_START( vfive, toaplan2_state )
 	MCFG_DEVICE_ADD_VDP0
 
 	MCFG_GFXDECODE(toaplan2)
-	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
 
 	MCFG_VIDEO_START(toaplan2)
 	MCFG_VIDEO_EOF(toaplan2)
@@ -3862,18 +3812,8 @@ static MACHINE_CONFIG_START( batsugun, toaplan2_state )
 	MCFG_SCREEN_SIZE(432, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
-#ifdef DUAL_SCREEN_VDPS
-	MCFG_SCREEN_ADD("screen2", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(432, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
-#endif
-
-	MCFG_GFXDECODE(2)
-	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_GFXDECODE(t2dualvdp)
+	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_DEVICE_ADD_VDP1
@@ -3886,10 +3826,10 @@ static MACHINE_CONFIG_START( batsugun, toaplan2_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	MCFG_OKIM6295_ADD("oki", XTAL_32MHz/8, OKIM6295_PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 
@@ -3912,7 +3852,7 @@ static MACHINE_CONFIG_START( snowbro2, toaplan2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MCFG_GFXDECODE(toaplan2)
-	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 
@@ -3955,7 +3895,7 @@ static MACHINE_CONFIG_START( mahoudai, toaplan2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MCFG_GFXDECODE(raizing)
-	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 
@@ -4000,7 +3940,7 @@ static MACHINE_CONFIG_START( shippumd, toaplan2_state )
 	MCFG_DEVICE_ADD_VDP0
 
 	MCFG_GFXDECODE(raizing)
-	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
 
 	MCFG_VIDEO_START(bgaregga)
 	MCFG_VIDEO_EOF(toaplan2)
@@ -4052,7 +3992,7 @@ static MACHINE_CONFIG_START( bgaregga, toaplan2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MCFG_GFXDECODE(raizing)
-	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 
@@ -4098,7 +4038,7 @@ static MACHINE_CONFIG_START( batrider, toaplan2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MCFG_GFXDECODE(batrider)
-	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 
@@ -4147,7 +4087,7 @@ static MACHINE_CONFIG_START( bbakraid, toaplan2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MCFG_GFXDECODE(batrider)
-	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 
@@ -4415,7 +4355,7 @@ ROM_START( whoopee )
 ROM_END
 
 
-ROM_START( pipibibi )
+ROM_START( pipibibsbl )
 	ROM_REGION( 0x040000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_BYTE( "ppbb06.bin", 0x000000, 0x020000, CRC(14c92515) SHA1(2d7f7c89272bb2a8115f163ad651bef3bca5107e) )
 	ROM_LOAD16_BYTE( "ppbb05.bin", 0x000001, 0x020000, CRC(3d51133c) SHA1(d7bd94ad11e9aeb5a5165c5ac6f71950849bcd2f) )
@@ -5265,27 +5205,27 @@ GAME( 1991, tekipaki, 0,        tekipaki, tekipaki, T2_Z180,  ROT0,   "Toaplan",
 GAME( 1991, ghox,     0,        ghox,     ghox,     T2_Z180,  ROT270, "Toaplan", "Ghox (Spinner with Up/Down Axis)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1991, ghoxj,    ghox,     ghox,     ghox,     T2_Z180,  ROT270, "Toaplan", "Ghox (8-Way Joystick)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 
-GAME( 1992, dogyuun,  0,        dogyuun,  dogyuun,  T2_V25,   ROT270, "Toaplan", "Dogyuun", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1992, dogyuunk, dogyuun,  dogyuun,  dogyuunk, T2_V25,   ROT270, "Toaplan", "Dogyuun (Unite Trading license)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1992, dogyuunt, dogyuun,  dogyuun,  dogyuunt, T2_V25,   ROT270, "Toaplan", "Dogyuun (test location version)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1992, dogyuun,  0,        dogyuun,  dogyuun,  T2_V25,   ROT270, "Toaplan", "Dogyuun", GAME_SUPPORTS_SAVE )
+GAME( 1992, dogyuunk, dogyuun,  dogyuun,  dogyuunk, T2_V25,   ROT270, "Toaplan", "Dogyuun (Unite Trading license)", GAME_SUPPORTS_SAVE )
+GAME( 1992, dogyuunt, dogyuun,  dogyuun,  dogyuunt, T2_V25,   ROT270, "Toaplan", "Dogyuun (test location version)", GAME_SUPPORTS_SAVE )
 
-GAME( 1993, kbash,    0,        kbash,    kbash,    T2_V25,   ROT0,   "Toaplan", "Knuckle Bash", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1993, kbash,    0,        kbash,    kbash,    T2_V25,   ROT0,   "Toaplan", "Knuckle Bash", GAME_SUPPORTS_SAVE )
 
 GAME( 1999, kbash2,   0,        kbash2,   kbash2,   T2_noZ80, ROT0,   "bootleg", "Knuckle Bash 2 (bootleg)", GAME_SUPPORTS_SAVE )
 
 GAME( 1992, truxton2, 0,        truxton2, truxton2, T2_noZ80, ROT270, "Toaplan", "Truxton II / Tatsujin Oh", GAME_SUPPORTS_SAVE )
 
-GAME( 1991, pipibibs, 0,        pipibibs, pipibibs, T2_Z80,   ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Z80 sound cpu, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1991, pipibibsa,pipibibs, pipibibs, pipibibs, T2_Z80,   ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Z80 sound cpu, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1991, whoopee,  pipibibs, whoopee,  whoopee,  T2_Z180,  ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Whoopee!! board)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // original Whoopee!! boards have a HD647180 instead of Z80
-GAME( 1991, pipibibi, pipibibs, pipibibi_bootleg, pipibibi, pipibibi, ROT0,   "bootleg? (Ryouta Kikaku)", "Pipi & Bibis / Whoopee!! (bootleg?)", GAME_SUPPORTS_SAVE )
+GAME( 1991, pipibibs,  0,        pipibibs, pipibibs, T2_Z80,   ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Z80 sound cpu, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1991, pipibibsa, pipibibs, pipibibs, pipibibs, T2_Z80,   ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Z80 sound cpu, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1991, whoopee,   pipibibs, whoopee,  whoopee,  T2_Z180,  ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Whoopee!! board)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // original Whoopee!! boards have a HD647180 instead of Z80
+GAME( 1991, pipibibsbl,pipibibs, pipibibi_bootleg, pipibibsbl, pipibibsbl, ROT0,   "bootleg (Ryouta Kikaku)", "Pipi & Bibis / Whoopee!! (bootleg)", GAME_SUPPORTS_SAVE )
 
 GAME( 1992, fixeight, 0,        fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1992, fixeightb,fixeight, fixeighb, fixeighb, fixeighb, ROT270, "bootleg", "FixEight (bootleg)", GAME_SUPPORTS_SAVE )
 
-GAME( 1992, grindstm, vfive,    vfive,    grindstm, vfive,    ROT270, "Toaplan", "Grind Stormer", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1992, grindstma,vfive,    vfive,    grindstm, vfive,    ROT270, "Toaplan", "Grind Stormer (older set)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1993, vfive,    0,        vfive,    vfive,    vfive,    ROT270, "Toaplan", "V-Five (Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1992, grindstm, vfive,    vfive,    grindstm, vfive,    ROT270, "Toaplan", "Grind Stormer", GAME_SUPPORTS_SAVE )
+GAME( 1992, grindstma,vfive,    vfive,    grindstm, vfive,    ROT270, "Toaplan", "Grind Stormer (older set)", GAME_SUPPORTS_SAVE )
+GAME( 1993, vfive,    0,        vfive,    vfive,    vfive,    ROT270, "Toaplan", "V-Five (Japan)", GAME_SUPPORTS_SAVE )
 
 GAME( 1993, batsugun,  0,        batsugun, batsugun, T2_V25,   ROT270, "Toaplan", "Batsugun", GAME_SUPPORTS_SAVE )
 GAME( 1993, batsuguna, batsugun, batsugun, batsugun, T2_V25,   ROT270, "Toaplan", "Batsugun (older set)", GAME_SUPPORTS_SAVE )

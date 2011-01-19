@@ -2381,7 +2381,7 @@ const game_driver * const drivers[] =
 	DRIVER( pipibibs )	/* TP-025 */
 	DRIVER( pipibibsa )	/* TP-025 */
 	DRIVER( whoopee )	/* TP-025 */
-	DRIVER( pipibibi )	/* (c) 1991 Ryouta Kikaku (bootleg?) */
+	DRIVER( pipbibsbl )	/* (c) 1991 Ryouta Kikaku (bootleg) */
 	DRIVER( fixeight )	/* TP-026 (c) 1992 + Taito license */
 	DRIVER( fixeightb )	/* bootleg */
 	DRIVER( vfive )		/* TP-027 (c) 1993 Toaplan (Japan) */
