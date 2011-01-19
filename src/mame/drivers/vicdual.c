@@ -2169,10 +2169,6 @@ MACHINE_CONFIG_END
  *
  *  N-Sub
  *
- *  the colors are wrong because it has
- *  a different resistor network than the
- *  other games.
- *
  *************************************/
 
 static READ8_HANDLER( nsub_io_r )

@@ -13,9 +13,6 @@
           due to testing an out-of-bounds value
         * abcop doesn't like IC41/IC108 (divide chips) in self-test
           due to testing an out-of-bounds value
-        * smgp sound communication is messed up, causing incorrect
-          voice samples to be played; this game seems to need VERY
-          tight synchronization between the 68000 and Z80
 
 
 Sega X-Board System Overview
