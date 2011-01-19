@@ -88,20 +88,17 @@ VIDEO_START( toaplan2 )
 
 	/* our current VDP implementation needs this bitmap to work with */
 	state->custom_priority_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED8);
-	state->displog = 0; // debug flag
 
 	if (state->vdp0 != NULL)
 	{
 		state->secondary_render_bitmap = NULL;
 		state->vdp0->custom_priority_bitmap = state->custom_priority_bitmap;
-		state->vdp0->displog = &state->displog;
 	}
 
 	if (state->vdp1 != NULL)
 	{
 		state->secondary_render_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 		state->vdp1->custom_priority_bitmap = state->custom_priority_bitmap;
-		state->vdp1->displog = &state->displog;
 	}
 
 	state->display_tx = 1;
@@ -129,15 +126,19 @@ VIDEO_START( fixeighb )
 	VIDEO_START_CALL( truxton2 );
 
 	/* This bootleg has additional layer offsets on the VDP */
-	state->vdp0->bg.extra_xoffset=-26;
-	state->vdp0->fg.extra_xoffset=-22;
-	state->vdp0->top.extra_xoffset=-18;
-	state->vdp0->sp_extra_xoffset=8;
+	state->vdp0->bg.extra_xoffset.normal  = -0x1d6  -26;
+	state->vdp0->bg.extra_yoffset.normal  = -0x1ef  -15;
 
-	state->vdp0->bg.extra_yoffset=-15;
-	state->vdp0->fg.extra_yoffset=-15;
-	state->vdp0->top.extra_yoffset=-15;
-	state->vdp0->sp_extra_yoffset=8;
+	state->vdp0->fg.extra_xoffset.normal  = -0x1d8  -22;
+	state->vdp0->fg.extra_yoffset.normal  = -0x1ef  -15;
+
+	state->vdp0->top.extra_xoffset.normal = -0x1da  -18;
+	state->vdp0->top.extra_yoffset.normal = -0x1ef  -15;
+
+	state->vdp0->sp.extra_xoffset.normal  = 8;//-0x1cc  -64;
+	state->vdp0->sp.extra_yoffset.normal  = 8;//-0x1ef  -128;
+
+	state->vdp0->init_scroll_regs();
 
 	tilemap_set_scrolldx(state->tx_tilemap, 0, 0);
 }
@@ -158,7 +159,7 @@ VIDEO_START( batrider )
 	toaplan2_state *state = machine->driver_data<toaplan2_state>();
 	VIDEO_START_CALL( toaplan2 );
 
-	state->vdp0->spriteram16_n = state->vdp0->spriteram16_new;
+	state->vdp0->sp.use_sprite_buffer = 0; // disable buffering on this game
 
 	/* Create the Text tilemap for this game */
 	state->tx_gfxram16 = auto_alloc_array_clear(machine, UINT16, RAIZING_TX_GFXRAM_SIZE/2);
@@ -335,16 +336,12 @@ VIDEO_UPDATE( toaplan2_dual )
 
 	if (state->vdp1)
 	{
-		gp9001_log_vram(state->vdp1, screen->machine);
-
 		bitmap_fill(bitmap,cliprect,0);
 		bitmap_fill(state->custom_priority_bitmap, cliprect, 0);
 		state->vdp1->gp9001_render_vdp(screen->machine, bitmap, cliprect);
 	}
 	if (state->vdp0)
 	{
-		gp9001_log_vram(state->vdp0, screen->machine);
-
 	//  bitmap_fill(bitmap,cliprect,0);
 		bitmap_fill(state->custom_priority_bitmap, cliprect, 0);
 		state->vdp0->gp9001_render_vdp(screen->machine, bitmap, cliprect);
@@ -365,16 +362,12 @@ VIDEO_UPDATE( toaplan2_mixed )
 
 	if (state->vdp0)
 	{
-		gp9001_log_vram(state->vdp0, screen->machine);
-
 		bitmap_fill(bitmap,cliprect,0);
 		bitmap_fill(state->custom_priority_bitmap, cliprect, 0);
 		state->vdp0->gp9001_render_vdp(screen->machine, bitmap, cliprect);
 	}
 	if (state->vdp1)
 	{
-		gp9001_log_vram(state->vdp1, screen->machine);
-
 		bitmap_fill(state->secondary_render_bitmap,cliprect,0);
 		bitmap_fill(state->custom_priority_bitmap, cliprect, 0);
 		state->vdp1->gp9001_render_vdp(screen->machine, state->secondary_render_bitmap, cliprect);
@@ -468,8 +461,6 @@ VIDEO_UPDATE( toaplan2 )
 	{
 		device_t *screen1  = screen->machine->device("screen");
 
-		gp9001_log_vram(state->vdp0, screen->machine);
-
 		if (screen == screen1)
 		{
 			bitmap_fill(bitmap,cliprect,0);
@@ -483,8 +474,6 @@ VIDEO_UPDATE( toaplan2 )
 	if (state->vdp1)
 	{
 		device_t *screen2 = screen->machine->device("screen2");
-
-		gp9001_log_vram(state->vdp1, screen->machine);
 
 		if (screen == screen2)
 		{

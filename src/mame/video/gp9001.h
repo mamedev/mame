@@ -16,17 +16,35 @@ protected:
 	UINT8						m_gfxregion;
 };
 
+struct gp9001layeroffsets
+{
+	int normal;
+	int flipped;
+};
+
 struct gp9001layer
 {
-	UINT8 flip;
+	UINT16 flip;
 	UINT16 scrollx;
 	UINT16 scrolly;
-	tilemap_t *tmap;
 
-	// offset kludges, needed by fixeight bootleg
-	int extra_xoffset;
-	int extra_yoffset;
+	gp9001layeroffsets extra_xoffset;
+	gp9001layeroffsets extra_yoffset;
+
+	UINT16* vram16; // vram for this layer
 };
+
+struct gp9001tilemaplayer : gp9001layer
+{
+	tilemap_t *tmap;
+};
+
+struct gp9001spritelayer : gp9001layer
+{
+	bool use_sprite_buffer;
+	UINT16 *vram16_buffer; // vram buffer for this layer
+};
+
 
 class gp9001vdp_device : public device_t,
 						  public device_memory_interface
@@ -35,31 +53,12 @@ class gp9001vdp_device : public device_t,
 	gp9001vdp_device(running_machine &_machine, const gp9001vdp_device_config &config);
 public:
 	UINT16 gp9001_voffs;
-	UINT16 *bgvideoram16;
-	UINT16 *fgvideoram16;
-	UINT16 *topvideoram16;
-
-	UINT16 *spriteram16_now;	/* Sprites to draw this frame */
-	UINT16 *spriteram16_new;	/* Sprites to add to next frame */
-	UINT16 *spriteram16_n;
-
 	UINT16 gp9001_scroll_reg;
 
-	UINT16 sprite_scrollx;
-	UINT16 sprite_scrolly;
-	int sp_extra_xoffset;
-	int sp_extra_yoffset;
-	UINT16 sprite_flip;
-
-	gp9001layer bg, top, fg;
+	gp9001tilemaplayer bg, top, fg;
+	gp9001spritelayer sp;
 
 	int	   tile_region; // we also use this to figure out which vdp we're using in some debug logging features
-
-	// debug
-	int display_bg;
-	int display_fg;
-	int display_top;
-	int display_sp;
 
 	// technically this is just rom banking, allowing the chip to see more graphic ROM, however it's easier to handle it
 	// in the chip implementation than externally for now (which would require dynamic decoding of the entire charsets every
@@ -74,10 +73,9 @@ public:
 	void gp9001_render_vdp(running_machine* machine, bitmap_t* bitmap, const rectangle* cliprect);
 	void gp9001_video_eof(void);
 	void create_tilemaps(int region);
-
+	void init_scroll_regs(void);
 
 	bitmap_t *custom_priority_bitmap;
-	int *displog;
 
 protected:
 	virtual void device_start();
@@ -120,6 +118,3 @@ WRITE16_DEVICE_HANDLER( pipibibi_bootleg_videoram16_w  );
 READ16_DEVICE_HANDLER ( pipibibi_bootleg_spriteram16_r );
 WRITE16_DEVICE_HANDLER( pipibibi_bootleg_spriteram16_w );
 WRITE16_DEVICE_HANDLER( pipibibi_bootleg_scroll_w );
-
-void gp9001_log_vram(gp9001vdp_device* vdp, running_machine *machine);
-

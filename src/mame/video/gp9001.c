@@ -6,9 +6,11 @@
   which use one or more Toaplan L7A0498 GP9001 graphic controllers.
 
   The simpler hardware of these games use one GP9001 controller.
-  Next we have games that use two GP9001 controllers, whose priority
-  schemes between the two controllers is unknown at this time, and
-  may be game dependant.
+  
+  Next we have games that use two GP9001 controllers, the mixing of
+  the VDPs depends on a PAL on the motherboard.
+  (mixing handled in toaplan2.c)
+
   Finally we have games using one GP9001 controller and an additional
   text tile layer, which has highest priority. This text tile layer
   appears to have line-scroll support. Some of these games copy the
@@ -33,9 +35,6 @@
         in from the left)
     -  Teki Paki tests video RAM from address 0 past SpriteRAM to $37ff.
         This seems to be a bug in Teki Paki's vram test routine !
-    -  Batsugun, relationship between the two video controllers (priority
-        wise) is wrong and unknown.
-
 
 
 
@@ -155,52 +154,52 @@ Pipi & Bibis     | Fix Eight        | V-Five           | Snow Bros. 2     |
 static WRITE16_DEVICE_HANDLER( gp9001_bg_tmap_w )
 {
 	gp9001vdp_device *vdp = (gp9001vdp_device*)device;
-	COMBINE_DATA(&vdp->bgvideoram16[offset]);
+	COMBINE_DATA(&vdp->bg.vram16[offset]);
 	tilemap_mark_tile_dirty(vdp->bg.tmap,offset/2);
 }
 
 static WRITE16_DEVICE_HANDLER( gp9001_fg_tmap_w )
 {
 	gp9001vdp_device *vdp = (gp9001vdp_device*)device;
-	COMBINE_DATA(&vdp->fgvideoram16[offset]);
+	COMBINE_DATA(&vdp->fg.vram16[offset]);
 	tilemap_mark_tile_dirty(vdp->fg.tmap,offset/2);
 }
 
 static WRITE16_DEVICE_HANDLER( gp9001_top_tmap_w )
 {
 	gp9001vdp_device *vdp = (gp9001vdp_device*)device;
-	COMBINE_DATA(&vdp->topvideoram16[offset]);
+	COMBINE_DATA(&vdp->top.vram16[offset]);
 	tilemap_mark_tile_dirty(vdp->top.tmap,offset/2);
 }
 
 static READ16_DEVICE_HANDLER( gp9001_bg_tmap_r )
 {
 	gp9001vdp_device *vdp = (gp9001vdp_device*)device;
-	return vdp->bgvideoram16[offset];
+	return vdp->bg.vram16[offset];
 }
 
 static READ16_DEVICE_HANDLER( gp9001_fg_tmap_r )
 {
 	gp9001vdp_device *vdp = (gp9001vdp_device*)device;
-	return vdp->fgvideoram16[offset];
+	return vdp->fg.vram16[offset];
 }
 
 static READ16_DEVICE_HANDLER( gp9001_top_tmap_r )
 {
 	gp9001vdp_device *vdp = (gp9001vdp_device*)device;
-	return vdp->topvideoram16[offset];
+	return vdp->top.vram16[offset];
 }
 
 static READ16_DEVICE_HANDLER( gp9001_spram_r )
 {
 	gp9001vdp_device *vdp = (gp9001vdp_device*)device;
-	return vdp->spriteram16_new[offset];
+	return vdp->sp.vram16[offset];
 }
 
 static WRITE16_DEVICE_HANDLER( gp9001_spram_w )
 {
 	gp9001vdp_device *vdp = (gp9001vdp_device*)device;
-	COMBINE_DATA(&vdp->spriteram16_new[offset]);
+	COMBINE_DATA(&vdp->sp.vram16[offset]);
 }
 
 static ADDRESS_MAP_START( gp9001vdp_map, 0, 16 )
@@ -263,9 +262,9 @@ static TILE_GET_INFO_DEVICE( get_top0_tile_info )
 
 	gp9001vdp_device *vdp = (gp9001vdp_device*)device;
 
-	attrib = vdp->topvideoram16[2*tile_index];
+	attrib = vdp->top.vram16[2*tile_index];
 
-	tile_number = vdp->topvideoram16[2*tile_index+1];
+	tile_number = vdp->top.vram16[2*tile_index+1];
 
 	if (vdp->gp9001_gfxrom_is_banked)
 	{
@@ -289,9 +288,9 @@ static TILE_GET_INFO_DEVICE( get_fg0_tile_info )
 
 	gp9001vdp_device *vdp = (gp9001vdp_device*)device;
 
-	attrib = vdp->fgvideoram16[2*tile_index];
+	attrib = vdp->fg.vram16[2*tile_index];
 
-	tile_number = vdp->fgvideoram16[2*tile_index+1];
+	tile_number = vdp->fg.vram16[2*tile_index+1];
 
 
 	if (vdp->gp9001_gfxrom_is_banked)
@@ -313,9 +312,9 @@ static TILE_GET_INFO_DEVICE( get_bg0_tile_info )
 	int color, tile_number, attrib;
 	gp9001vdp_device *vdp = (gp9001vdp_device*)device;
 
-	attrib = vdp->bgvideoram16[2*tile_index];
+	attrib = vdp->bg.vram16[2*tile_index];
 
-	tile_number = vdp->bgvideoram16[2*tile_index+1];
+	tile_number = vdp->bg.vram16[2*tile_index+1];
 
 	if (vdp->gp9001_gfxrom_is_banked)
 	{
@@ -347,22 +346,20 @@ void gp9001vdp_device::create_tilemaps(int region)
 
 void gp9001vdp_device::device_start()
 {
-	topvideoram16 = auto_alloc_array_clear(machine, UINT16, GP9001_TOP_VRAM_SIZE/2);
-	fgvideoram16 = auto_alloc_array_clear(machine, UINT16, GP9001_FG_VRAM_SIZE/2);
-	bgvideoram16 = auto_alloc_array_clear(machine, UINT16, GP9001_BG_VRAM_SIZE/2);
+	top.vram16 = auto_alloc_array_clear(machine, UINT16, GP9001_TOP_VRAM_SIZE/2);
+	fg.vram16 = auto_alloc_array_clear(machine, UINT16, GP9001_FG_VRAM_SIZE/2);
+	bg.vram16 = auto_alloc_array_clear(machine, UINT16, GP9001_BG_VRAM_SIZE/2);
 
-	spriteram16_new = auto_alloc_array_clear(machine, UINT16, GP9001_SPRITERAM_SIZE/2);
-	spriteram16_now = auto_alloc_array_clear(machine, UINT16, GP9001_SPRITERAM_SIZE/2);
-
-	spriteram16_n = spriteram16_now;
+	sp.vram16 = auto_alloc_array_clear(machine, UINT16, GP9001_SPRITERAM_SIZE/2);
+	sp.vram16_buffer = auto_alloc_array_clear(machine, UINT16, GP9001_SPRITERAM_SIZE/2);
 
 	create_tilemaps(m_gfxregion);
 
-	state_save_register_device_item_pointer(this, 0, spriteram16_new, GP9001_SPRITERAM_SIZE/2);
-	state_save_register_device_item_pointer(this, 0, spriteram16_now, GP9001_SPRITERAM_SIZE/2);
-	state_save_register_device_item_pointer(this, 0, topvideoram16, GP9001_TOP_VRAM_SIZE/2);
-	state_save_register_device_item_pointer(this, 0, fgvideoram16, GP9001_FG_VRAM_SIZE/2);
-	state_save_register_device_item_pointer(this, 0, bgvideoram16, GP9001_BG_VRAM_SIZE/2);
+	state_save_register_device_item_pointer(this, 0, sp.vram16, GP9001_SPRITERAM_SIZE/2);
+	state_save_register_device_item_pointer(this, 0, sp.vram16_buffer, GP9001_SPRITERAM_SIZE/2);
+	state_save_register_device_item_pointer(this, 0, top.vram16, GP9001_TOP_VRAM_SIZE/2);
+	state_save_register_device_item_pointer(this, 0, fg.vram16, GP9001_FG_VRAM_SIZE/2);
+	state_save_register_device_item_pointer(this, 0, bg.vram16, GP9001_BG_VRAM_SIZE/2);
 
 	state_save_register_device_item(this,0, gp9001_scroll_reg);
 	state_save_register_device_item(this,0, gp9001_voffs);
@@ -372,26 +369,39 @@ void gp9001vdp_device::device_start()
 	state_save_register_device_item(this,0, fg.scrolly);
 	state_save_register_device_item(this,0, top.scrollx);
 	state_save_register_device_item(this,0, top.scrolly);
-	state_save_register_device_item(this,0, sprite_scrollx);
-	state_save_register_device_item(this,0, sprite_scrolly);
+	state_save_register_device_item(this,0, sp.scrollx);
+	state_save_register_device_item(this,0, sp.scrolly);
 	state_save_register_device_item(this,0, bg.flip);
 	state_save_register_device_item(this,0, fg.flip);
 	state_save_register_device_item(this,0, top.flip);
-	state_save_register_device_item(this,0, sprite_flip);
+	state_save_register_device_item(this,0, sp.flip);
 
 	gp9001_gfxrom_is_banked = 0;
 	gp9001_gfxrom_bank_dirty = 0;
 	state_save_register_device_item_array(this,0,gp9001_gfxrom_bank);
 
-	bg.extra_xoffset=0;
-	fg.extra_xoffset=0;
-	top.extra_xoffset=0;
-	sp_extra_xoffset=0;
+	// default layer offsets used by all original games
+	bg.extra_xoffset.normal  = -0x1d6;
+	bg.extra_xoffset.flipped = -0x229;
+	bg.extra_yoffset.normal  = -0x1ef;
+	bg.extra_yoffset.flipped = -0x210;
 
-	bg.extra_yoffset=0;
-	fg.extra_yoffset=0;
-	top.extra_yoffset=0;
-	sp_extra_yoffset=0;
+	fg.extra_xoffset.normal  = -0x1d8;
+	fg.extra_xoffset.flipped = -0x227;
+	fg.extra_yoffset.normal  = -0x1ef;
+	fg.extra_yoffset.flipped = -0x210;
+
+	top.extra_xoffset.normal = -0x1da;
+	top.extra_xoffset.flipped= -0x225;
+	top.extra_yoffset.normal = -0x1ef;
+	top.extra_yoffset.flipped= -0x210;
+
+	sp.extra_xoffset.normal  = -0x1cc;
+	sp.extra_xoffset.flipped = -0x17b;
+	sp.extra_yoffset.normal  = -0x1ef;
+	sp.extra_yoffset.flipped = -0x108;
+
+	sp.use_sprite_buffer = 1;
 }
 
 void gp9001vdp_device::device_reset()
@@ -401,18 +411,14 @@ void gp9001vdp_device::device_reset()
 	bg.scrollx = bg.scrolly = 0;
 	fg.scrollx = fg.scrolly = 0;
 	top.scrollx = top.scrolly = 0;
-	sprite_scrollx = sprite_scrolly = 0;
+	sp.scrollx = sp.scrolly = 0;
 
 	bg.flip = 0;
 	fg.flip = 0;
 	top.flip = 0;
-	sprite_flip = 0;
+	sp.flip = 0;
 
-	/* debug */
-	display_bg = 1;
-	display_fg = 1;
-	display_top = 1;
-	display_sp = 1;
+	init_scroll_regs();
 }
 
 
@@ -478,44 +484,81 @@ static WRITE16_DEVICE_HANDLER( gp9001_scroll_reg_select_w )
 	}
 }
 
-static void gp9001_set_scrollx_reg(gp9001layer* layer, UINT16 data, UINT16 mem_mask, int xoffs_flip, int xoffs_normal, int flip)
+static void gp9001_set_scrollx_and_flip_reg(gp9001tilemaplayer* layer, UINT16 data, UINT16 mem_mask, int flip)
 {
 	COMBINE_DATA(&layer->scrollx);
 
 	if (flip)
 	{
 		layer->flip |= TILEMAP_FLIPX;
-		layer->scrollx -= xoffs_flip;
-		tilemap_set_scrollx(layer->tmap,0,-(layer->scrollx+layer->extra_xoffset));
+		tilemap_set_scrollx(layer->tmap,0,-(layer->scrollx+layer->extra_xoffset.flipped));
 	}
 	else
 	{
 		layer->flip &= (~TILEMAP_FLIPX);
-		layer->scrollx -= xoffs_normal;
-		tilemap_set_scrollx(layer->tmap,0,layer->scrollx+layer->extra_xoffset);
+		tilemap_set_scrollx(layer->tmap,0,layer->scrollx+layer->extra_xoffset.normal);
 	}
 	tilemap_set_flip(layer->tmap,layer->flip);
 }
 
-static void gp9001_set_scrolly_reg(gp9001layer* layer, UINT16 data, UINT16 mem_mask, int yoffs_flip, int yoffs_normal, int flip)
+static void gp9001_set_scrolly_and_flip_reg(gp9001tilemaplayer* layer, UINT16 data, UINT16 mem_mask, int flip)
 {
 	COMBINE_DATA(&layer->scrolly);
 
 	if (flip)
 	{
 		layer->flip |= TILEMAP_FLIPY;
-		layer->scrolly -= yoffs_flip;
-		tilemap_set_scrolly(layer->tmap,0,-(layer->scrolly+layer->extra_yoffset));
+		tilemap_set_scrolly(layer->tmap,0,-(layer->scrolly+layer->extra_yoffset.flipped));
 
 	}
 	else
 	{
 		layer->flip &= (~TILEMAP_FLIPY);
-		layer->scrolly -= yoffs_normal;
-		tilemap_set_scrolly(layer->tmap,0,layer->scrolly+layer->extra_yoffset);
+		tilemap_set_scrolly(layer->tmap,0,layer->scrolly+layer->extra_yoffset.normal);
 	}
 
 	tilemap_set_flip(layer->tmap,layer->flip);
+}
+
+static void gp9001_set_sprite_scrollx_and_flip_reg(gp9001spritelayer* layer, UINT16 data, UINT16 mem_mask, int flip)
+{
+	if (flip)
+	{
+		data += layer->extra_xoffset.flipped;
+		COMBINE_DATA(&layer->scrollx);
+		if (layer->scrollx & 0x8000) layer->scrollx |= 0xfe00;
+		else layer->scrollx &= 0x1ff;
+		layer->flip |= GP9001_SPRITE_FLIPX;
+	}
+	else
+	{
+		data += layer->extra_xoffset.normal;
+		COMBINE_DATA(&layer->scrollx);
+
+		if (layer->scrollx & 0x8000) layer->scrollx |= 0xfe00;
+		else layer->scrollx &= 0x1ff;
+		layer->flip &= (~GP9001_SPRITE_FLIPX);
+	}
+}
+
+static void gp9001_set_sprite_scrolly_and_flip_reg(gp9001spritelayer* layer, UINT16 data, UINT16 mem_mask, int flip)
+{
+	if (flip)
+	{
+		data += layer->extra_yoffset.flipped;
+		COMBINE_DATA(&layer->scrolly);
+		if (layer->scrolly & 0x8000) layer->scrolly |= 0xfe00;
+		else layer->scrolly &= 0x1ff;
+		layer->flip |= GP9001_SPRITE_FLIPY;
+	}
+	else
+	{
+		data += layer->extra_yoffset.normal;
+		COMBINE_DATA(&layer->scrolly);
+		if (layer->scrolly & 0x8000) layer->scrolly |= 0xfe00;
+		else layer->scrolly &= 0x1ff;
+		layer->flip &= (~GP9001_SPRITE_FLIPY);
+	}
 }
 
 static void gp9001_scroll_reg_data_w(gp9001vdp_device *vdp, offs_t offset, UINT16 data, UINT16 mem_mask)
@@ -532,54 +575,17 @@ static void gp9001_scroll_reg_data_w(gp9001vdp_device *vdp, offs_t offset, UINT1
 
 	switch(vdp->gp9001_scroll_reg&0x7f)
 	{
-		case 0x00: gp9001_set_scrollx_reg(&vdp->bg, data, mem_mask, 0x229, 0x1d6, flip); break;
-		case 0x01: gp9001_set_scrolly_reg(&vdp->bg, data, mem_mask, 0x210, 0x1ef, flip); break;					
+		case 0x00: gp9001_set_scrollx_and_flip_reg(&vdp->bg, data, mem_mask, flip); break;
+		case 0x01: gp9001_set_scrolly_and_flip_reg(&vdp->bg, data, mem_mask, flip); break;					
 
-		case 0x02: gp9001_set_scrollx_reg(&vdp->fg, data, mem_mask, 0x227, 0x1d8, flip); break;
-		case 0x03: gp9001_set_scrolly_reg(&vdp->fg, data, mem_mask, 0x210, 0x1ef, flip); break;					
+		case 0x02: gp9001_set_scrollx_and_flip_reg(&vdp->fg, data, mem_mask, flip); break;
+		case 0x03: gp9001_set_scrolly_and_flip_reg(&vdp->fg, data, mem_mask, flip); break;					
 
-		case 0x04: gp9001_set_scrollx_reg(&vdp->top,data, mem_mask, 0x225, 0x1da, flip); break;
-		case 0x05: gp9001_set_scrolly_reg(&vdp->top,data, mem_mask, 0x210, 0x1ef, flip); break;					
+		case 0x04: gp9001_set_scrollx_and_flip_reg(&vdp->top,data, mem_mask, flip); break;
+		case 0x05: gp9001_set_scrolly_and_flip_reg(&vdp->top,data, mem_mask, flip); break;					
 
-		case 0x06:  
-					if (flip)
-					{
-						data -= 0x17b;
-						COMBINE_DATA(&vdp->sprite_scrollx);
-						if (vdp->sprite_scrollx & 0x8000) vdp->sprite_scrollx |= 0xfffffe00;
-						else vdp->sprite_scrollx &= 0x1ff;
-						vdp->sprite_flip |= GP9001_SPRITE_FLIPX;
-					}
-					else
-					{
-						data -= 0x1cc;
-						COMBINE_DATA(&vdp->sprite_scrollx);
-
-						if (vdp->sprite_scrollx & 0x8000) vdp->sprite_scrollx |= 0xfffffe00;
-						else vdp->sprite_scrollx &= 0x1ff;
-						vdp->sprite_flip &= (~GP9001_SPRITE_FLIPX);
-					}
-						
-					break;
-		case 0x07:	
-					if (flip)
-					{
-						data -= 0x108;			/* 108h */
-						COMBINE_DATA(&vdp->sprite_scrolly);
-						if (vdp->sprite_scrolly & 0x8000) vdp->sprite_scrolly |= 0xfffffe00;
-						else vdp->sprite_scrolly &= 0x1ff;
-						vdp->sprite_flip |= GP9001_SPRITE_FLIPY;
-					}
-					else
-					{
-						data -= 0x1ef;      /* 1F7h */
-						COMBINE_DATA(&vdp->sprite_scrolly);
-						if (vdp->sprite_scrolly & 0x8000) vdp->sprite_scrolly |= 0xfffffe00;
-						else vdp->sprite_scrolly &= 0x1ff;
-						vdp->sprite_flip &= (~GP9001_SPRITE_FLIPY);
-					}
-					break;
-		
+		case 0x06: gp9001_set_sprite_scrollx_and_flip_reg(&vdp->sp, data,mem_mask,flip); break;
+		case 0x07: gp9001_set_sprite_scrolly_and_flip_reg(&vdp->sp, data,mem_mask,flip); break;
 
 
 		case 0x0e:	/******* Initialise video controller register ? *******/
@@ -604,6 +610,19 @@ static void gp9001_scroll_reg_data_w(gp9001vdp_device *vdp, offs_t offset, UINT1
 					break;
 	}
 }
+
+void gp9001vdp_device::init_scroll_regs()
+{
+	gp9001_set_scrollx_and_flip_reg(&bg, 0, 0xffff, 0);
+	gp9001_set_scrolly_and_flip_reg(&bg, 0, 0xffff, 0);					
+	gp9001_set_scrollx_and_flip_reg(&fg, 0, 0xffff, 0);
+	gp9001_set_scrolly_and_flip_reg(&fg, 0, 0xffff, 0);					
+	gp9001_set_scrollx_and_flip_reg(&top,0, 0xffff, 0);
+	gp9001_set_scrolly_and_flip_reg(&top,0, 0xffff, 0);					
+	gp9001_set_sprite_scrollx_and_flip_reg(&sp, 0,0xffff,0);
+	gp9001_set_sprite_scrolly_and_flip_reg(&sp, 0,0xffff,0);
+}
+
 
 static WRITE16_DEVICE_HANDLER( gp9001_scroll_reg_devvdata_w )
 {
@@ -766,204 +785,6 @@ WRITE16_DEVICE_HANDLER( pipibibi_bootleg_spriteram16_w )
 	gp9001_videoram16_w(vdp, 0, data, mem_mask);
 }
 
-
-
-void gp9001_log_vram(gp9001vdp_device* vdp, running_machine *machine)
-{
-
-#ifdef MAME_DEBUG
-	offs_t sprite_voffs, tile_voffs;
-
-	if ( input_code_pressed(machine, KEYCODE_M) )
-	{
-		UINT16 *source_now0 = 0;
-		UINT16 *source_new0 = 0;
-		UINT16 *source_now1 = 0;
-		UINT16 *source_new1 = 0;
-
-		int schar[2],sattr[2],sxpos[2],sypos[2];
-
-		logerror("Scrolls   BG-X  BG-Y   FG-X  FG-Y   TOP-X  TOP-Y   Sprite-X  Sprite-Y\n");
-
-		if (vdp->tile_region == 0)
-		{
-			source_now0  = (UINT16 *)(vdp->spriteram16_now);
-			source_new0  = (UINT16 *)(vdp->spriteram16_new);
-			logerror("---0-->   %04x  %04x   %04x  %04x    %04x  %04x       %04x    %04x\n", vdp->bg.scrollx,vdp->bg.scrolly,vdp->fg.scrollx,vdp->fg.scrolly,vdp->top.scrollx,vdp->top.scrolly,vdp->sprite_scrollx, vdp->sprite_scrolly);
-		}
-
-		if (vdp->tile_region == 2)
-		{
-			source_now1  = (UINT16 *)(vdp->spriteram16_now);
-			source_new1  = (UINT16 *)(vdp->spriteram16_new);
-
-			logerror("Scrolls   BG-X  BG-Y   FG-X  FG-Y   TOP-X  TOP-Y   Sprite-X  Sprite-Y\n");
-			logerror("---1-->   %04x  %04x   %04x  %04x    %04x  %04x       %04x    %04x\n", vdp->bg.scrollx,vdp->bg.scrolly,vdp->fg.scrollx,vdp->fg.scrolly,vdp->top.scrollx,vdp->top.scrolly,vdp->sprite_scrollx, vdp->sprite_scrolly);
-		}
-
-
-		for ( sprite_voffs = 0; sprite_voffs < (GP9001_SPRITERAM_SIZE/2); sprite_voffs += 4 )
-		{
-			if (vdp->tile_region == 0)
-			{
-				sattr[0] = source_now0[sprite_voffs];
-				schar[0] = source_now0[sprite_voffs + 1];
-				sxpos[0] = source_now0[sprite_voffs + 2];
-				sypos[0] = source_now0[sprite_voffs + 3];
-				sattr[1] = source_new0[sprite_voffs];
-				schar[1] = source_new0[sprite_voffs + 1];
-				sxpos[1] = source_new0[sprite_voffs + 2];
-				sypos[1] = source_new0[sprite_voffs + 3];
-				logerror("SPoffs    Sprt Attr Xpos Ypos     Sprt Attr Xpos Ypos\n");
-				logerror("0:%03x now:%04x %04x %04x %04x new:%04x %04x %04x %04x\n",sprite_voffs,
-													schar[0], sattr[0],sxpos[0], sypos[0],
-													schar[1], sattr[1],sxpos[1], sypos[1]);
-			}
-
-			if (vdp->tile_region == 2)
-			{
-				sattr[0] = source_now1[sprite_voffs];
-				schar[0] = source_now1[sprite_voffs + 1];
-				sxpos[0] = source_now1[sprite_voffs + 2];
-				sypos[0] = source_now1[sprite_voffs + 3];
-				sattr[1] = source_new1[sprite_voffs];
-				schar[1] = source_new1[sprite_voffs + 1];
-				sxpos[1] = source_new1[sprite_voffs + 2];
-				sypos[1] = source_new1[sprite_voffs + 3];
-				logerror("1:%03x now:%04x %04x %04x %04x new:%04x %04x %04x %04x\n",sprite_voffs,
-												schar[0], sattr[0],sxpos[0], sypos[0],
-												schar[1], sattr[1],sxpos[1], sypos[1]);
-			}
-		}
-	}
-
-	if ( input_code_pressed(machine, KEYCODE_N) )
-	{
-		int tchar[2], tattr[2];
-		logerror("Scrolls   BG-X  BG-Y   FG-X  FG-Y   TOP-X  TOP-Y   Sprite-X  Sprite-Y\n");
-
-		if (vdp->tile_region == 0)
-		{
-			logerror("---0-->   %04x  %04x   %04x  %04x    %04x  %04x       %04x    %04x\n", vdp->bg.scrollx,vdp->bg.scrolly,vdp->fg.scrollx,vdp->fg.scrolly,vdp->top.scrollx,vdp->top.scrolly,vdp->sprite_scrollx, vdp->sprite_scrolly);
-		}
-		if (vdp->tile_region == 2)
-		{
-			logerror("---1-->   %04x  %04x   %04x  %04x    %04x  %04x       %04x    %04x\n", vdp->bg.scrollx,vdp->bg.scrolly,vdp->fg.scrollx,vdp->fg.scrolly,vdp->top.scrollx,vdp->top.scrolly,vdp->sprite_scrollx, vdp->sprite_scrolly);
-		}
-
-
-		for ( tile_voffs = 0; tile_voffs < (GP9001_TOP_VRAM_SIZE/2); tile_voffs += 2 )
-		{
-			if (vdp->tile_region == 0)
-			{
-				tchar[0] = vdp->topvideoram16[tile_voffs + 1];
-				tattr[0] = vdp->topvideoram16[tile_voffs];
-				logerror("TOPoffs:%04x   Tile0:%04x  Attr0:%04x\n", tile_voffs, tchar[0], tattr[0]);
-			}
-
-			if (vdp->tile_region == 2)
-			{
-				tchar[1] = vdp->topvideoram16[tile_voffs + 1];
-				tattr[1] = vdp->topvideoram16[tile_voffs];
-				logerror("TOPoffs:%04x   Tile0:%04x  Attr0:%04x\n", tile_voffs, tchar[1], tattr[1]);
-			}
-
-		}
-	}
-	if ( input_code_pressed(machine, KEYCODE_B) )
-	{
-		int tchar[2], tattr[2];
-		logerror("Scrolls   BG-X  BG-Y   FG-X  FG-Y   TOP-X  TOP-Y   Sprite-X  Sprite-Y\n");
-
-		if (vdp->tile_region == 0)
-		{
-			logerror("---0-->   %04x  %04x   %04x  %04x    %04x  %04x       %04x    %04x\n", vdp->bg.scrollx,vdp->bg.scrolly,vdp->fg.scrollx,vdp->fg.scrolly,vdp->top.scrollx,vdp->top.scrolly,vdp->sprite_scrollx, vdp->sprite_scrolly);
-		}
-
-		if (vdp->tile_region == 2)
-		{
-			logerror("---1-->   %04x  %04x   %04x  %04x    %04x  %04x       %04x    %04x\n", vdp->bg.scrollx,vdp->bg.scrolly,vdp->fg.scrollx,vdp->fg.scrolly,vdp->top.scrollx,vdp->top.scrolly,vdp->sprite_scrollx, vdp->sprite_scrolly);
-		}
-
-
-		for ( tile_voffs = 0; tile_voffs < (GP9001_FG_VRAM_SIZE/2); tile_voffs += 2 )
-		{
-			if (vdp->tile_region == 0)
-			{
-				tchar[0] = vdp->fgvideoram16[tile_voffs + 1];
-				tattr[0] = vdp->fgvideoram16[tile_voffs];
-				logerror("FGoffs:%04x   Tile0:%04x  Attr0:%04x\n", tile_voffs, tchar[0], tattr[0]);
-			}
-
-
-			if (vdp->tile_region == 2)
-			{
-				tchar[1] = vdp->fgvideoram16[tile_voffs + 1];
-				tattr[1] = vdp->fgvideoram16[tile_voffs];
-				logerror("FGoffs:%04x   Tile0:%04x  Attr0:%04x \n", tile_voffs, tchar[1], tattr[1]);
-			}
-		}
-	}
-	if ( input_code_pressed(machine, KEYCODE_V) )
-	{
-		int tchar[2], tattr[2];
-		logerror("Scrolls   BG-X  BG-Y   FG-X  FG-Y   TOP-X  TOP-Y   Sprite-X  Sprite-Y\n");
-
-		if (vdp->tile_region == 0)
-		{
-			logerror("---0-->   %04x  %04x   %04x  %04x    %04x  %04x       %04x    %04x\n", vdp->bg.scrollx,vdp->bg.scrolly,vdp->fg.scrollx,vdp->fg.scrolly,vdp->top.scrollx,vdp->top.scrolly,vdp->sprite_scrollx, vdp->sprite_scrolly);
-		}
-
-		if (vdp->tile_region == 2)
-		{
-			logerror("---1-->   %04x  %04x   %04x  %04x    %04x  %04x       %04x    %04x\n", vdp->bg.scrollx,vdp->bg.scrolly,vdp->fg.scrollx,vdp->fg.scrolly,vdp->top.scrollx,vdp->top.scrolly,vdp->sprite_scrollx, vdp->sprite_scrolly);
-		}
-
-		for ( tile_voffs = 0; tile_voffs < (GP9001_BG_VRAM_SIZE/2); tile_voffs += 2 )
-		{
-			if (vdp->tile_region == 0)
-			{
-				tchar[0] = vdp->bgvideoram16[tile_voffs + 1];
-				tattr[0] = vdp->bgvideoram16[tile_voffs];
-				logerror("BGoffs:%04x   Tile0:%04x  Attr0:%04x\n", tile_voffs, tchar[0], tattr[0]);
-			}
-
-			if (vdp->tile_region == 2)
-			{
-				tchar[1] = vdp->bgvideoram16[tile_voffs + 1];
-				tattr[1] = vdp->bgvideoram16[tile_voffs];
-				logerror("BGoffs:%04x   Tile0:%04x  Attr0:%04x\n", tile_voffs, tchar[1], tattr[1]);
-			}
-		}
-	}
-
-	if ( input_code_pressed_once(machine, KEYCODE_C) )
-		logerror("Mark here\n");
-
-	if ( input_code_pressed_once(machine, KEYCODE_E) )
-	{
-		*vdp->displog += 1;
-		*vdp->displog &= 1;
-	}
-	if (*vdp->displog)
-	{
-		logerror("Scrolls   BG-X  BG-Y   FG-X  FG-Y   TOP-X  TOP-Y   Sprite-X  Sprite-Y\n");
-
-		if (vdp->tile_region == 0)
-		{
-			logerror("---0-->   %04x  %04x   %04x  %04x    %04x  %04x       %04x    %04x\n", vdp->bg.scrollx,vdp->bg.scrolly,vdp->fg.scrollx,vdp->fg.scrolly,vdp->top.scrollx,vdp->top.scrolly,vdp->sprite_scrollx, vdp->sprite_scrolly);
-		}
-
-		if (vdp->tile_region == 2)
-		{
-			logerror("---1-->   %04x  %04x   %04x  %04x    %04x  %04x       %04x    %04x\n", vdp->bg.scrollx,vdp->bg.scrolly,vdp->fg.scrollx,vdp->fg.scrolly,vdp->top.scrollx,vdp->top.scrolly,vdp->sprite_scrollx, vdp->sprite_scrolly);
-		}
-	}
-#endif
-}
-
-
-
 /***************************************************************************
     Sprite Handlers
 ***************************************************************************/
@@ -974,11 +795,14 @@ void gp9001vdp_device::draw_sprites( running_machine *machine, bitmap_t *bitmap,
 
 	int offs, old_x, old_y;
 
+	UINT16 *source;
+	
+	if (sp.use_sprite_buffer) source=(UINT16 *)(sp.vram16_buffer);
+	else source=(UINT16 *)(sp.vram16);
 
-	UINT16 *source = (UINT16 *)(spriteram16_n);
+	old_x = (-(sp.scrollx)) & 0x1ff;
+	old_y = (-(sp.scrolly)) & 0x1ff;
 
-	old_x = (-(sprite_scrollx+sp_extra_xoffset)) & 0x1ff;
-	old_y = (-(sprite_scrolly+sp_extra_yoffset)) & 0x1ff;
 
 	for (offs = 0; offs < (GP9001_SPRITERAM_SIZE/2); offs += 4)
 	{
@@ -1011,8 +835,9 @@ void gp9001vdp_device::draw_sprites( running_machine *machine, bitmap_t *bitmap,
 			/***** find position to display sprite *****/
 			if (!(attrib & 0x4000))
 			{
-				sx_base = ((source[offs + 2] >> 7) - (sprite_scrollx+sp_extra_xoffset)) & 0x1ff;
-				sy_base = ((source[offs + 3] >> 7) - (sprite_scrolly+sp_extra_yoffset)) & 0x1ff;
+				sx_base = ((source[offs + 2] >> 7) - (sp.scrollx)) & 0x1ff;
+				sy_base = ((source[offs + 3] >> 7) - (sp.scrolly)) & 0x1ff;
+
 			} else {
 				sx_base = (old_x + (source[offs + 2] >> 7)) & 0x1ff;
 				sy_base = (old_y + (source[offs + 3] >> 7)) & 0x1ff;
@@ -1046,17 +871,17 @@ void gp9001vdp_device::draw_sprites( running_machine *machine, bitmap_t *bitmap,
 			}
 
 			/***** Flip the sprite layer in any active X or Y flip *****/
-			if (sprite_flip)
+			if (sp.flip)
 			{
-				if (sprite_flip & GP9001_SPRITE_FLIPX)
+				if (sp.flip & GP9001_SPRITE_FLIPX)
 					sx_base = 320 - sx_base;
-				if (sprite_flip & GP9001_SPRITE_FLIPY)
+				if (sp.flip & GP9001_SPRITE_FLIPY)
 					sy_base = 240 - sy_base;
 			}
 
 			/***** Cancel flip, if it, and sprite layer flip are active *****/
-			flipx = (flipx ^ (sprite_flip & GP9001_SPRITE_FLIPX));
-			flipy = (flipy ^ (sprite_flip & GP9001_SPRITE_FLIPY));
+			flipx = (flipx ^ (sp.flip & GP9001_SPRITE_FLIPX));
+			flipy = (flipy ^ (sp.flip & GP9001_SPRITE_FLIPY));
 
 			/***** Draw the complete sprites using the dimension info *****/
 			for (dim_y = 0; dim_y < sprite_sizey; dim_y += 8)
@@ -1229,7 +1054,7 @@ void gp9001vdp_device::gp9001_render_vdp(running_machine* machine, bitmap_t* bit
 void gp9001vdp_device::gp9001_video_eof(void)
 {
 	/** Shift sprite RAM buffers  ***  Used to fix sprite lag **/
-	memcpy(spriteram16_now,spriteram16_new,GP9001_SPRITERAM_SIZE);
+	if (sp.use_sprite_buffer) memcpy(sp.vram16_buffer,sp.vram16,GP9001_SPRITERAM_SIZE);
 }
 
 
