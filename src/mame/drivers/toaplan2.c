@@ -558,11 +558,16 @@ static READ16_HANDLER( video_count_r )
 
 	vpos = (vpos + 15) % 262;
 
-	if ((hpos > 325) && (hpos < 380))
+	bool hblank, vblank;
+
+	hblank = (hpos > 325) && (hpos < 380);
+	vblank = (vpos >= 247) && (vpos <= 250);
+
+	if (hblank)
 		state->video_status &= ~0x8000;
-	if ((vpos >= 247) && (vpos <= 250))
+	if (vblank)
 		state->video_status &= ~0x4000;
-	if (vpos >= 245)
+	if (vblank || hblank) // ?? Dogyuun is too slow if this is wrong
 		state->video_status &= ~0x0100;
 	if (vpos < 256)
 		state->video_status |= (vpos & 0xff);
@@ -5251,9 +5256,9 @@ GAME( 1991, tekipaki, 0,        tekipaki, tekipaki, T2_Z180,  ROT0,   "Toaplan",
 GAME( 1991, ghox,     0,        ghox,     ghox,     T2_Z180,  ROT270, "Toaplan", "Ghox (Spinner with Up/Down Axis)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1991, ghoxj,    ghox,     ghox,     ghox,     T2_Z180,  ROT270, "Toaplan", "Ghox (8-Way Joystick)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 
-GAME( 1992, dogyuun,  0,        dogyuun,  dogyuun,  T2_V25,   ROT270, "Toaplan", "Dogyuun", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1992, dogyuunk, dogyuun,  dogyuun,  dogyuunk, T2_V25,   ROT270, "Toaplan", "Dogyuun (Unite Trading license)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1992, dogyuunt, dogyuun,  dogyuun,  dogyuunt, T2_V25,   ROT270, "Toaplan", "Dogyuun (test location version)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1992, dogyuun,  0,        dogyuun,  dogyuun,  T2_V25,   ROT270, "Toaplan", "Dogyuun", GAME_SUPPORTS_SAVE )
+GAME( 1992, dogyuunk, dogyuun,  dogyuun,  dogyuunk, T2_V25,   ROT270, "Toaplan", "Dogyuun (Unite Trading license)", GAME_SUPPORTS_SAVE )
+GAME( 1992, dogyuunt, dogyuun,  dogyuun,  dogyuunt, T2_V25,   ROT270, "Toaplan", "Dogyuun (test location version)", GAME_SUPPORTS_SAVE )
 
 GAME( 1993, kbash,    0,        kbash,    kbash,    T2_V25,   ROT0,   "Toaplan", "Knuckle Bash", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
@@ -5269,9 +5274,9 @@ GAME( 1991, pipibibi, pipibibs, pipibibi_bootleg, pipibibi, pipibibi, ROT0,   "b
 GAME( 1992, fixeight, 0,        fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1992, fixeightb,fixeight, fixeighb, fixeighb, fixeighb, ROT270, "bootleg", "FixEight (bootleg)", GAME_SUPPORTS_SAVE )
 
-GAME( 1992, grindstm, vfive,    vfive,    grindstm, T2_V25,   ROT270, "Toaplan", "Grind Stormer", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1992, grindstma,vfive,    vfive,    grindstm, T2_V25,   ROT270, "Toaplan", "Grind Stormer (older set)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1993, vfive,    0,        vfive,    vfive,    T2_V25,   ROT270, "Toaplan", "V-Five (Japan)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1992, grindstm, vfive,    vfive,    grindstm, T2_V25,   ROT270, "Toaplan", "Grind Stormer", GAME_SUPPORTS_SAVE )
+GAME( 1992, grindstma,vfive,    vfive,    grindstm, T2_V25,   ROT270, "Toaplan", "Grind Stormer (older set)", GAME_SUPPORTS_SAVE )
+GAME( 1993, vfive,    0,        vfive,    vfive,    T2_V25,   ROT270, "Toaplan", "V-Five (Japan)", GAME_SUPPORTS_SAVE )
 
 GAME( 1993, batsugun,  0,        batsugun, batsugun, T2_V25,   ROT270, "Toaplan", "Batsugun", GAME_SUPPORTS_SAVE )
 GAME( 1993, batsuguna, batsugun, batsugun, batsugun, T2_V25,   ROT270, "Toaplan", "Batsugun (older set)", GAME_SUPPORTS_SAVE )
