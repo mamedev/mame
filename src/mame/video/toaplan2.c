@@ -129,15 +129,15 @@ VIDEO_START( fixeighb )
 	VIDEO_START_CALL( truxton2 );
 
 	/* This bootleg has additional layer offsets on the VDP */
-	state->vdp0->extra_xoffset[0]=-26;
-	state->vdp0->extra_xoffset[1]=-22;
-	state->vdp0->extra_xoffset[2]=-18;
-	state->vdp0->extra_xoffset[3]=8;
+	state->vdp0->bg.extra_xoffset=-26;
+	state->vdp0->fg.extra_xoffset=-22;
+	state->vdp0->top.extra_xoffset=-18;
+	state->vdp0->sp_extra_xoffset=8;
 
-	state->vdp0->extra_yoffset[0]=-15;
-	state->vdp0->extra_yoffset[1]=-15;
-	state->vdp0->extra_yoffset[2]=-15;
-	state->vdp0->extra_yoffset[3]=8;
+	state->vdp0->bg.extra_yoffset=-15;
+	state->vdp0->fg.extra_yoffset=-15;
+	state->vdp0->top.extra_yoffset=-15;
+	state->vdp0->sp_extra_yoffset=8;
 
 	tilemap_set_scrolldx(state->tx_tilemap, 0, 0);
 }

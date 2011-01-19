@@ -16,6 +16,18 @@ protected:
 	UINT8						m_gfxregion;
 };
 
+struct gp9001layer
+{
+	UINT8 flip;
+	UINT16 scrollx;
+	UINT16 scrolly;
+	tilemap_t *tmap;
+
+	// offset kludges, needed by fixeight bootleg
+	int extra_xoffset;
+	int extra_yoffset;
+};
+
 class gp9001vdp_device : public device_t,
 						  public device_memory_interface
 {
@@ -32,22 +44,16 @@ public:
 	UINT16 *spriteram16_n;
 
 	UINT16 gp9001_scroll_reg;
-	UINT16 bg_scrollx;
-	UINT16 bg_scrolly;
-	UINT16 fg_scrollx;
-	UINT16 fg_scrolly;
-	UINT16 top_scrollx;
-	UINT16 top_scrolly;
+
 	UINT16 sprite_scrollx;
 	UINT16 sprite_scrolly;
+	int sp_extra_xoffset;
+	int sp_extra_yoffset;
+	UINT16 sprite_flip;
 
-	UINT8 bg_flip;
-	UINT8 fg_flip;
-	UINT8 top_flip;
-	UINT8 sprite_flip;
+	gp9001layer bg, top, fg;
 
 	int	   tile_region; // we also use this to figure out which vdp we're using in some debug logging features
-	tilemap_t *top_tilemap, *fg_tilemap, *bg_tilemap;
 
 	// debug
 	int display_bg;
@@ -69,9 +75,6 @@ public:
 	void gp9001_video_eof(void);
 	void create_tilemaps(int region);
 
-	// offset kludges, needed by fixeight bootleg
-	int extra_xoffset[4];
-	int extra_yoffset[4];
 
 	bitmap_t *custom_priority_bitmap;
 	int *displog;
