@@ -205,7 +205,7 @@ Game status:
 
 Teki Paki                      Working, but no sound. Missing sound MCU dump. Chip is protected. It's a QFP80 Hitachi HD647180.
 Ghox                           Working, but no sound. Missing sound MCU dump. It's a QFP80 Hitachi HD647180.
-Dogyuun                        Working, no sound. MCU type is a NEC V25. Chip is a PLCC94 stamped 'TS-002-MACH'.
+Dogyuun                        Working, Sound transitions are incorrect between levels (decryption error?)
 Knuckle Bash                   Working, but sound FX only (missing music). MCU type is a NEC V25. Chip is a PLCC94 stamped 'TS-004-DASH'.
                                         Some PCBs use another version stamped 'NITRO' which is the same chip type.
 Truxton 2                      Working.
@@ -214,10 +214,10 @@ Whoopee                        Working, but no sound. Missing sound MCU dump. It
 Pipi & Bibis (Ryouta Kikaku)   Working.
 FixEight                       Not working properly. Missing background GFX, and sound FX only (missing music). Both controlled by PLCC94 NEC V25 MCU stamped 'TS-001-TURBO'
 FixEight bootleg               Working. One unknown ROM (same as pipibibi one). Region hardcoded to Korea (@ $4d8)
-Grind Stormer                  Working, but no sound. MCU type is a NEC V25. Chip is a PLCC94 stamped 'TS-007-SPY'.
-VFive                          Working, but no sound. MCU type is a NEC V25. Chip is a PLCC94 stamped 'TS-007-SPY'.
-Batsugun                       Working. MCU type is a NEC V25. Chip is a PLCC94 stamped 'TS-007-SPY'.
-Batsugun Sp'                   Working. MCU type is a NEC V25. Chip is a PLCC94 stamped 'TS-007-SPY'.
+Grind Stormer                  Working, Sound transitions are incorrect between levels (decryption error?)
+VFive                          Working, Sound transitions are incorrect between levels (decryption error?)
+Batsugun                       Working.
+Batsugun Sp'                   Working.
 Snow Bros. 2                   Working.
 Mahou Daisakusen               Working.
 Shippu Mahou Daisakusen        Working.
@@ -365,10 +365,8 @@ static DRIVER_INIT( T2_V25 )
 	toaplan2_state *state = machine->driver_data<toaplan2_state>();
 
 	state->sub_cpu_type = CPU_2_V25;
-	if (machine->device("mcu") != NULL)
-		state->sub_cpu = machine->device("mcu");
-	else if (machine->device("audiocpu") != NULL)
-		state->sub_cpu = machine->device("audiocpu");
+	state->sub_cpu = machine->device("audiocpu");
+	state->v25_reset_line = 0x20;
 	register_state_save(machine);
 }
 
@@ -387,8 +385,10 @@ static DRIVER_INIT( fixeight )
 
 	state->sub_cpu_type = CPU_2_V25;
 	state->sub_cpu = machine->device("audiocpu");
-
+	state->v25_reset_line = 0x08;
+#ifndef USE_ENCRYPTED_V25S
 	memory_install_ram(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x28f002, 0x28fbff, 0, 0, NULL);
+#endif
 
 	register_state_save(machine);
 }
@@ -401,6 +401,16 @@ static DRIVER_INIT( fixeighb )
 	memory_set_bankptr(machine, "bank1", &bgdata[0x40000]); /* $80000 - $fffff */
 	state->sub_cpu_type = CPU_2_NONE;
 	state->sub_cpu = NULL;
+	register_state_save(machine);
+}
+
+static DRIVER_INIT( vfive )
+{
+	toaplan2_state *state = machine->driver_data<toaplan2_state>();
+
+	state->sub_cpu_type = CPU_2_V25;
+	state->sub_cpu = machine->device("audiocpu");
+	state->v25_reset_line = 0x10;
 	register_state_save(machine);
 }
 
@@ -625,9 +635,7 @@ static WRITE16_HANDLER( toaplan2_v25_coin_word_w )
 
 		toaplan2_coin_w(space, offset, data & 0x0f);
 
-		/* not sure which of these is really RESET - runs fine with either */
-		// cpu_set_input_line(state->sub_cpu, INPUT_LINE_RESET, (data & 0x0020) ? CLEAR_LINE : ASSERT_LINE );
-		cpu_set_input_line(state->sub_cpu, INPUT_LINE_RESET,  (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE);
+		cpu_set_input_line(state->sub_cpu, INPUT_LINE_RESET,  (data & state->v25_reset_line) ? CLEAR_LINE : ASSERT_LINE);
 	}
 	if (ACCESSING_BITS_8_15 && (data & 0xff00) )
 	{
@@ -1444,19 +1452,13 @@ static ADDRESS_MAP_START( pipibibi_bootleg_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 #ifdef USE_ENCRYPTED_V25S
-// guess, could be wrong
 WRITE16_HANDLER( fixeight_subcpu_ctrl )
 {
 	printf("fixeight_subcpu_ctrl %04x\n",data);
 
 	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
 
-	/* 0x18 used */
-	#ifdef USE_ENCRYPTED_V25S
-	/* not sure which of these is really RESET - runs fine with either */
-	// cpu_set_input_line(state->sub_cpu, INPUT_LINE_RESET, (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE );
-	cpu_set_input_line(state->sub_cpu, INPUT_LINE_RESET,  (data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
-	#endif
+	cpu_set_input_line(state->sub_cpu, INPUT_LINE_RESET,  (data & state->v25_reset_line) ? CLEAR_LINE : ASSERT_LINE);
 }
 #endif
 
@@ -1830,6 +1832,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( V25_port, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(V25_PORT_PT, V25_PORT_PT) AM_READ(v25_dswa_read)
 	AM_RANGE(V25_PORT_P0, V25_PORT_P0) AM_READ(v25_dswb_read)
+	AM_RANGE(V25_PORT_P1, V25_PORT_P1) AM_READ(v25_jmpr_read)
+	AM_RANGE(V25_PORT_P2, V25_PORT_P2) AM_WRITENOP	/* bit 0 is FAULT according to kbash schematics */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( V25_port_abswap, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(V25_PORT_PT, V25_PORT_PT) AM_READ(v25_dswb_read)
+	AM_RANGE(V25_PORT_P0, V25_PORT_P0) AM_READ(v25_dswa_read)
 	AM_RANGE(V25_PORT_P1, V25_PORT_P1) AM_READ(v25_jmpr_read)
 	AM_RANGE(V25_PORT_P2, V25_PORT_P2) AM_WRITENOP	/* bit 0 is FAULT according to kbash schematics */
 ADDRESS_MAP_END
@@ -3377,7 +3386,7 @@ static MACHINE_CONFIG_START( dogyuun, toaplan2_state )
 
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_25MHz/2)			/* NEC V25 type Toaplan marked CPU ??? */
 	MCFG_CPU_PROGRAM_MAP(V25_rambased_mem)
-	MCFG_CPU_IO_MAP(V25_port)
+	MCFG_CPU_IO_MAP(V25_port_abswap)
 	MCFG_CPU_CONFIG(ts002mach_config)
 
 	MCFG_MACHINE_RESET(dogyuun)
@@ -3710,8 +3719,8 @@ static MACHINE_CONFIG_START( fixeight, toaplan2_state )
 
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_16MHz)			/* NEC V25 type Toaplan marked CPU ??? */
 	MCFG_CPU_PROGRAM_MAP(V25_rambased_mem)
+//	IO map must be different - has eeprom but no dips or jumpers */
 	MCFG_CPU_CONFIG(ts001turbo_config)
-	//MCFG_CPU_IO_MAP(V25_port)
 
 	MCFG_MACHINE_RESET(batsugun)
 //  MCFG_MACHINE_RESET(toaplan2)
@@ -5256,9 +5265,9 @@ GAME( 1991, tekipaki, 0,        tekipaki, tekipaki, T2_Z180,  ROT0,   "Toaplan",
 GAME( 1991, ghox,     0,        ghox,     ghox,     T2_Z180,  ROT270, "Toaplan", "Ghox (Spinner with Up/Down Axis)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1991, ghoxj,    ghox,     ghox,     ghox,     T2_Z180,  ROT270, "Toaplan", "Ghox (8-Way Joystick)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 
-GAME( 1992, dogyuun,  0,        dogyuun,  dogyuun,  T2_V25,   ROT270, "Toaplan", "Dogyuun", GAME_SUPPORTS_SAVE )
-GAME( 1992, dogyuunk, dogyuun,  dogyuun,  dogyuunk, T2_V25,   ROT270, "Toaplan", "Dogyuun (Unite Trading license)", GAME_SUPPORTS_SAVE )
-GAME( 1992, dogyuunt, dogyuun,  dogyuun,  dogyuunt, T2_V25,   ROT270, "Toaplan", "Dogyuun (test location version)", GAME_SUPPORTS_SAVE )
+GAME( 1992, dogyuun,  0,        dogyuun,  dogyuun,  T2_V25,   ROT270, "Toaplan", "Dogyuun", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1992, dogyuunk, dogyuun,  dogyuun,  dogyuunk, T2_V25,   ROT270, "Toaplan", "Dogyuun (Unite Trading license)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1992, dogyuunt, dogyuun,  dogyuun,  dogyuunt, T2_V25,   ROT270, "Toaplan", "Dogyuun (test location version)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
 GAME( 1993, kbash,    0,        kbash,    kbash,    T2_V25,   ROT0,   "Toaplan", "Knuckle Bash", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
@@ -5274,9 +5283,9 @@ GAME( 1991, pipibibi, pipibibs, pipibibi_bootleg, pipibibi, pipibibi, ROT0,   "b
 GAME( 1992, fixeight, 0,        fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1992, fixeightb,fixeight, fixeighb, fixeighb, fixeighb, ROT270, "bootleg", "FixEight (bootleg)", GAME_SUPPORTS_SAVE )
 
-GAME( 1992, grindstm, vfive,    vfive,    grindstm, T2_V25,   ROT270, "Toaplan", "Grind Stormer", GAME_SUPPORTS_SAVE )
-GAME( 1992, grindstma,vfive,    vfive,    grindstm, T2_V25,   ROT270, "Toaplan", "Grind Stormer (older set)", GAME_SUPPORTS_SAVE )
-GAME( 1993, vfive,    0,        vfive,    vfive,    T2_V25,   ROT270, "Toaplan", "V-Five (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992, grindstm, vfive,    vfive,    grindstm, vfive,    ROT270, "Toaplan", "Grind Stormer", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1992, grindstma,vfive,    vfive,    grindstm, vfive,    ROT270, "Toaplan", "Grind Stormer (older set)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1993, vfive,    0,        vfive,    vfive,    vfive,    ROT270, "Toaplan", "V-Five (Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
 GAME( 1993, batsugun,  0,        batsugun, batsugun, T2_V25,   ROT270, "Toaplan", "Batsugun", GAME_SUPPORTS_SAVE )
 GAME( 1993, batsuguna, batsugun, batsugun, batsugun, T2_V25,   ROT270, "Toaplan", "Batsugun (older set)", GAME_SUPPORTS_SAVE )

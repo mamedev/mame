@@ -1,6 +1,6 @@
 /**************** Machine stuff ******************/
 //#define USE_HD64x180          /* Define if CPU support is available */
-//#define USE_ENCRYPTED_V25S    /* Define to enable V25 even on games where it is encrypted */
+#define USE_ENCRYPTED_V25S    /* Define to enable V25 even on games where it is encrypted */
 
 /* sub cpu */
 #define CPU_2_NONE		0x00
@@ -47,8 +47,8 @@ public:
 	UINT16 video_status;
 	INT8 old_p1_paddle_h;		/* For Ghox */
 	INT8 old_p2_paddle_h;
+	UINT8 v25_reset_line;		/* 0x20 for dogyuun/batsugun, 0x10 for vfive, 0x08 for fixeight */
 	INT8 current_bank;			/* Z80 bank used in Battle Garegga and Batrider */
-
 	int sndirq_line;		/* IRQ4 for batrider, IRQ2 for bbakraid */
 	UINT16 z80_busreq;
 	int unlimited_ver;
