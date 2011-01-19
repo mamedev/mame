@@ -35,21 +35,39 @@ static STREAM_UPDATE( SEGAPCM_update )
 	memset(outputs[0], 0, samples*sizeof(*outputs[0]));
 	memset(outputs[1], 0, samples*sizeof(*outputs[1]));
 
+	// reg		function
+	// ------------------------------------------------
+	// 0x00		?
+	// 0x01		?
+	// 0x02		volume left
+	// 0x03		volume right
+	// 0x04		loop address (08-15)
+	// 0x05		loop address (16-23)
+	// 0x06		end address
+	// 0x07		address delta
+	// 0x80		?
+	// 0x81		?
+	// 0x82		?
+	// 0x83		?
+	// 0x84		current address (08-15), 00-07 is internal?
+	// 0x85		current address (16-23)
+	// 0x86		bit 0: channel disable?
+	//			bit 1: loop disable
+	//			other bits: bank
+	// 0x87		?
+
 	/* loop over channels */
 	for (ch = 0; ch < 16; ch++)
+	{
+		UINT8 *regs = spcm->ram+8*ch;
 
 		/* only process active channels */
-		if (!(spcm->ram[0x86+8*ch] & 1))
+		if (!(regs[0x86]&1))
 		{
-			UINT8 *base = spcm->ram+8*ch;
-			UINT8 flags = base[0x86];
-			const UINT8 *rom = spcm->rom + ((flags & spcm->bankmask) << spcm->bankshift);
-			UINT32 addr = (base[5] << 16) | (base[4] << 8) | spcm->low[ch];
-			UINT16 loop = (base[0x85] << 8) | base[0x84];
-			UINT8 end = base[6] + 1;
-			UINT8 delta = base[7];
-			UINT8 voll = base[2];
-			UINT8 volr = base[3];
+			const UINT8 *rom = spcm->rom + ((regs[0x86] & spcm->bankmask) << spcm->bankshift);
+			UINT32 addr = (regs[0x85] << 16) | (regs[0x84] << 8) | spcm->low[ch];
+			UINT32 loop = (regs[0x05] << 16) | (regs[0x04] << 8);
+			UINT8 end = regs[6] + 1;
 			int i;
 
 			/* loop over samples on this channel */
@@ -60,30 +78,29 @@ static STREAM_UPDATE( SEGAPCM_update )
 				/* handle looping if we've hit the end */
 				if ((addr >> 16) == end)
 				{
-					if (!(flags & 2))
-						addr = loop << 8;
-					else
+					if (regs[0x86] & 2)
 					{
-						flags |= 1;
+						regs[0x86] |= 1;
 						break;
 					}
+					else addr = loop;
 				}
 
 				/* fetch the sample */
 				v = rom[(addr >> 8) & rgnmask] - 0x80;
 
 				/* apply panning and advance */
-				outputs[0][i] += v * voll;
-				outputs[1][i] += v * volr;
-				addr = (addr + delta) & 0xffffff;
+				outputs[0][i] += v * regs[2];
+				outputs[1][i] += v * regs[3];
+				addr = (addr + regs[7]) & 0xffffff;
 			}
 
-			/* store back the updated address and info */
-			base[0x86] = flags;
-			base[4] = addr >> 8;
-			base[5] = addr >> 16;
-			spcm->low[ch] = flags & 1 ? 0 : addr;
+			/* store back the updated address */
+			regs[0x84] = addr >> 8;
+			regs[0x85] = addr >> 16;
+			spcm->low[ch] = regs[0x86] & 1 ? 0 : addr;
 		}
+	}
 }
 
 static DEVICE_START( segapcm )
