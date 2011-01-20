@@ -166,6 +166,16 @@ static void write_sfr(v25_state_t *nec_state, unsigned o, UINT8 d)
 
 	switch(o)
 	{
+		case 0x00: /* P0 */
+			nec_state->io->write_byte(V25_PORT_P0, d);
+			break;
+		case 0x08: /* P1 */
+			/* only the upper four bits of P1 can be used as output */
+			nec_state->io->write_byte(V25_PORT_P1, d & 0xF0);
+			break;
+		case 0x10: /* P2 */
+			nec_state->io->write_byte(V25_PORT_P2, d);
+			break;
 		case 0x4C: /* EXIC0 */
 			write_irqcontrol(nec_state, INTP0, d);
 			nec_state->priority_intp = d & 0x7;

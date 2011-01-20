@@ -17,10 +17,10 @@
 
     Interrupt macro service function not implemented.
 
-    Port implementation is incomplete: only input works
-    for now, and mode control registers are ignored.
+    Port implementation is incomplete: mode control registers are ignored.
 
-    Timer implementation is crude and incomplete.
+    Timer implementation is incomplete: polling is not implemented
+    (reading any of the registers just returns the last value written)
 
     Serial interface and DMA functions not implemented.
     Note that these functions differ considerably between
