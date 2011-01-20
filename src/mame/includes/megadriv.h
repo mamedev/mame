@@ -116,11 +116,10 @@ struct _mtech_bios	/* once all the regs are saved in this structure, it would be
 
 /*----------- defined in machine/megadriv.c -----------*/
 
-MACHINE_RESET( md_mappers );
-
 MACHINE_CONFIG_EXTERN( genesis_cartslot );
 MACHINE_CONFIG_EXTERN( _32x_cartslot );
 MACHINE_CONFIG_EXTERN( pico_cartslot );
+MACHINE_START( md_sram );
 
 WRITE16_HANDLER( jcart_ctrl_w );
 READ16_HANDLER( jcart_ctrl_r );

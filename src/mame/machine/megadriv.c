@@ -610,25 +610,13 @@ static WRITE16_HANDLER( genesis_TMSS_bank_w )
  *
  *************************************/
 
-static void alloc_sram(running_machine *machine)
-{
-	genesis_sram = auto_alloc_array(machine, UINT16, (genesis_sram_end - genesis_sram_start + 1) / sizeof(UINT16));
-	device_image_interface *image = dynamic_cast<device_image_interface *>(machine->device("cart"));
-	image->battery_load(genesis_sram, genesis_sram_end - genesis_sram_start + 1, 0xff); // Dino Dini's Soccer needs backup RAM to be 1fill
-	memcpy(megadriv_backupram, genesis_sram, genesis_sram_end - genesis_sram_start + 1);
-}
-
 static READ16_HANDLER( genesis_sram_read )
 {
 	UINT8 *ROM;
 	int rom_offset;
 
 	if (genesis_sram_active)
-	{
-		if (genesis_sram == NULL)
-			alloc_sram(space->machine);
 		return genesis_sram[offset];
-	}
 	else
 	{
 		ROM = space->machine->region("maincpu")->base();
@@ -642,8 +630,6 @@ static WRITE16_HANDLER( genesis_sram_write )
 {
 	if (genesis_sram_active)
 	{
-		if (genesis_sram == NULL)
-			alloc_sram(space->machine);
 		if (!genesis_sram_readonly)
 			genesis_sram[offset] = data;
 	}
@@ -651,6 +637,13 @@ static WRITE16_HANDLER( genesis_sram_write )
 
 static void install_sram_rw_handlers(running_machine *machine)
 {
+	device_image_interface *image = dynamic_cast<device_image_interface *>(machine->device("cart"));
+
+	mame_printf_debug("Allocing %d bytes for sram\n", genesis_sram_end - genesis_sram_start + 1);
+	genesis_sram = auto_alloc_array(machine, UINT16, (genesis_sram_end - genesis_sram_start + 1) / sizeof(UINT16));
+	image->battery_load(genesis_sram, genesis_sram_end - genesis_sram_start + 1, 0xff); // Dino Dini's Soccer needs backup RAM to be 1fill
+	memcpy(megadriv_backupram, genesis_sram, genesis_sram_end - genesis_sram_start + 1);
+
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), genesis_sram_start & 0x3fffff, genesis_sram_end & 0x3fffff, 0, 0, genesis_sram_read);
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), genesis_sram_start & 0x3fffff, genesis_sram_end & 0x3fffff, 0, 0, genesis_sram_write);
 	sram_handlers_installed = 1;
@@ -755,6 +748,20 @@ static WRITE16_HANDLER( codemasters_eeprom_w )
 //  i2cmem_sda_write(space->machine->device("i2cmem"), i2c_clk);
 //  i2cmem_scl_write(space->machine->device("i2cmem"), i2c_mem);
 }
+
+static READ16_HANDLER( sega_6658a_reg_r )
+{
+	return genesis_sram_active;
+}
+
+static WRITE16_HANDLER( sega_6658a_reg_w )
+{
+	if (data == 1)
+		genesis_sram_active = 1;
+	if (data == 0)
+		genesis_sram_active = 0;
+}
+
 
 /*************************************
  *
@@ -1018,12 +1025,6 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 }
 
 
-MACHINE_RESET( md_mappers )
-{
-	setup_megadriv_custom_mappers(machine);
-}
-
-
 /*************************************
  *
  *  Cart handling
@@ -1143,6 +1144,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 	has_serial_eeprom = 0;
 	cart_type = STANDARD;
 
+	/* non-softlist loading */
 	if (image.software_entry() == NULL)
 	{
 		rawROM = image.device().machine->region("maincpu")->base();
@@ -1481,6 +1483,8 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 
 		if (sram_detected)
 		  logerror("SRAM detected from header: starting location %X - SRAM Length %X\n", genesis_sram_start, genesis_sram_end - genesis_sram_start + 1);
+
+		setup_megadriv_custom_mappers(image.device().machine);
 	}
 	else /* Handle pcb with the softlist info */
 	{
@@ -1493,6 +1497,8 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 
 		genesis_last_loaded_image_length = length;
 		megadriv_backupram = NULL;
+		genesis_sram = NULL;
+
 		if ((pcb_name = image.get_feature("pcb")) == NULL)
 		  pcb_id = STD_ROM;
 		else
@@ -1510,42 +1516,54 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 			genesis_sram_end = genesis_sram_start + 0x3fff;
 			sram_detected = 1;
 			megadriv_backupram = (UINT16*) (ROM + (genesis_sram_start & 0x3fffff));
+			genesis_sram_active = 1;
 			break;
 		  case SEGA_6658A:
 			genesis_sram_start = 0x200000;
 			genesis_sram_end = genesis_sram_start + 0x3ff;
 			sram_detected = 1;
 			megadriv_backupram = (UINT16*) (ROM + (genesis_sram_start & 0x3fffff));
+			memory_install_read16_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa130f0, 0xa130f1, 0, 0, sega_6658a_reg_r);
+			memory_install_write16_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa130f0, 0xa130f1, 0, 0, sega_6658a_reg_w);
 			break;
 
 			/* Codemasters PCB (J-Carts) */
 		  case CM_JCART:
-			memory_install_read16_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x38FFFE, 0x38FFFF, 0, 0, jcart_ctrl_r);
-			memory_install_write16_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x38FFFE, 0x38FFFF, 0, 0, jcart_ctrl_w);
+			memory_install_read16_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x38fffe, 0x38ffff, 0, 0, jcart_ctrl_r);
+			memory_install_write16_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x38fffe, 0x38ffff, 0, 0, jcart_ctrl_w);
 			break;
 		  case CM_JCART_SEPROM:
-			memory_install_read16_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x38FFFE, 0x38FFFF, 0, 0, jcart_ctrl_r);
-			memory_install_write16_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x38FFFE, 0x38FFFF, 0, 0, jcart_ctrl_w);
+			memory_install_read16_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x38fffe, 0x38ffff, 0, 0, jcart_ctrl_r);
+			memory_install_write16_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x38fffe, 0x38ffff, 0, 0, jcart_ctrl_w);
 			/* TODO add SEPROM part */
 			break;
 		}
+
+		if (sram_detected)
+			install_sram_rw_handlers(image.device().machine);
 	}
 
 	return IMAGE_INIT_PASS;
 }
 
-/******* Image unloading (with SRAM saving) *******/
+/******* SRAM saving *******/
 
-static DEVICE_IMAGE_UNLOAD( genesis_cart )
+static void genesis_machine_stop(running_machine &machine)
 {
-	/* Write out the battery file if necessary */
-	if (genesis_sram != NULL)
-	{
-		image.battery_save(genesis_sram, genesis_sram_end - genesis_sram_start + 1);
-		free(genesis_sram);
-	}
+	device_image_interface *image = dynamic_cast<device_image_interface *>(machine.device("cart"));
+
+ 	/* Write out the battery file if necessary */
+ 	if (genesis_sram != NULL)
+ 	{
+		mame_printf_debug("Saving sram\n");
+		image->battery_save(genesis_sram, genesis_sram_end - genesis_sram_start + 1);
+ 	}
 }
 
+MACHINE_START( md_sram )
+{
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, genesis_machine_stop);
+}
 
 /******* 32X image loading *******/
 
@@ -1601,7 +1619,6 @@ MACHINE_CONFIG_FRAGMENT( genesis_cartslot )
 	MCFG_CARTSLOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("megadriv_cart")
 	MCFG_CARTSLOT_LOAD(genesis_cart)
-	MCFG_CARTSLOT_UNLOAD(genesis_cart)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","megadriv")
 MACHINE_CONFIG_END
 
@@ -1620,6 +1637,5 @@ MACHINE_CONFIG_FRAGMENT( pico_cartslot )
 	MCFG_CARTSLOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("pico_cart")
 	MCFG_CARTSLOT_LOAD(genesis_cart)
-	MCFG_CARTSLOT_UNLOAD(genesis_cart)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pico")
 MACHINE_CONFIG_END

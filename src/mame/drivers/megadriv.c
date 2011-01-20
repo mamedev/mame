@@ -9584,12 +9584,12 @@ INPUT_PORTS_END
 static MACHINE_START( ms_megadriv )
 {
 	mess_init_6buttons_pad(machine);
+	MACHINE_START_CALL( md_sram );
 }
 
 static MACHINE_RESET( ms_megadriv )
 {
 	MACHINE_RESET_CALL( megadriv );
-	MACHINE_RESET_CALL( md_mappers );
 }
 
 static MACHINE_CONFIG_DERIVED( ms_megadriv, megadriv )
