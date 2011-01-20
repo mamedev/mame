@@ -604,7 +604,7 @@ ROM_START( roadriot )
 	ROM_LOAD( "136089-1051.12e",  0x60000, 0x20000, CRC(bffd01c8) SHA1(f6de000f61ea0c1ddb31ee5301506e5e966638c2) )
 
 	ROM_REGION( 0x1000, "eeprom", 0 )
-	ROM_LOAD( "roadriot-eeprom.bin", 0x0000, 0x1000, CRC(833d0d53) SHA1(239f791a29ed61317d639fab699752094984078e) )
+	ROM_LOAD( "roadriot.nv", 0x0000, 0x1000, CRC(d7f73bad) SHA1(017cccde835ca2e03f606de74bea233e4c5a8533) )
 
 	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
 	ROM_LOAD( "136089-1001.bin",  0x0000, 0x0200, CRC(5836cb5a) SHA1(2c797f6a1227d6e1fd7a12f99f0254072c8c266e) )
@@ -662,7 +662,7 @@ ROM_START( roadrioto )
 	ROM_LOAD( "136089-1051.12e",  0x60000, 0x20000, CRC(bffd01c8) SHA1(f6de000f61ea0c1ddb31ee5301506e5e966638c2) )
 
 	ROM_REGION( 0x1000, "eeprom", 0 )
-	ROM_LOAD( "roadriot-eeprom.bin", 0x0000, 0x1000, CRC(833d0d53) SHA1(239f791a29ed61317d639fab699752094984078e) )
+	ROM_LOAD( "roadriot.nv", 0x0000, 0x1000, CRC(d7f73bad) SHA1(017cccde835ca2e03f606de74bea233e4c5a8533) )
 
 	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
 	ROM_LOAD( "136089-1001.bin",  0x0000, 0x0200, CRC(5836cb5a) SHA1(2c797f6a1227d6e1fd7a12f99f0254072c8c266e) )
