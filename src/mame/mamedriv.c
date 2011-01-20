@@ -261,6 +261,7 @@ const game_driver * const drivers[] =
 	DRIVER( scramble )	/* GX387 (c) 1981 Konami */
 	DRIVER( scrambles )	/* GX387 (c) 1981 Stern */
 	DRIVER( scramblebf )/* bootleg */
+	DRIVER( scramblebb )/* bootleg? */
 	DRIVER( scramblb )	/* bootleg */
 	DRIVER( scramb2 )	/* bootleg */
 	DRIVER( explorer )	/* bootleg */
