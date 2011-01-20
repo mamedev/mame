@@ -9843,6 +9843,8 @@ Other Sun games
 	DRIVER( cb3 )		/* (c) 199? Dyna Electronics */
 	DRIVER( cb3b )		/* (c) 199? Dyna Electronics */
 	DRIVER( cb3c )		/* (c) 199? Dyna Electronics */
+	DRIVER( cb3d )		/* (c) 199? Dyna Electronics */
+	DRIVER( chryangl )	/* (c) 199? Dyna Electronics */
 	DRIVER( cmv801 )	/* (c) 198? Corsica */
 	DRIVER( cmv4 )		/* (c) 1992 Dyna Electronics */
 	DRIVER( cmv4a )		/* (c) 1992 Dyna Electronics */

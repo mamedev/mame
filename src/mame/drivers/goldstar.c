@@ -6799,6 +6799,29 @@ ROM_START( cb3c )
 	ROM_LOAD( "82s147.u2",      0x00000, 0x0200, CRC(5c8f2b8f) SHA1(67d2121e75813dd85d83858c5fc5ec6ad9cc2a7d) )
 ROM_END
 
+// set marked 'pignapoke'
+ROM_START( cb3d )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "0.14b", 0x00000, 0x10000, CRC(4f8be0f9) SHA1(0201bf0c1dca1570d2ccc862f10a19e0e261f7ab) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "5.7h", 0x00000, 0x10000, CRC(50701ce1) SHA1(3af3f124e28fda2bb3ba4f2c78fcd21c725d7ebc) )
+	ROM_LOAD( "6.9h", 0x10000, 0x10000, CRC(baf1c9a2) SHA1(f75a64fa64d102a0e75919c76db638f6c34ecc9e) )
+	ROM_LOAD( "7.10h",0x20000, 0x10000, CRC(87c944c4) SHA1(754b410dbcef07967f7cfdc3923df20394909e49) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1.1h", 0x00000, 0x02000, CRC(7cc6d26b) SHA1(de33e8985affce7bd3ead89463117c9aaa93d5e4) )
+	ROM_LOAD( "2.3h", 0x02000, 0x02000, CRC(e73ea4e3) SHA1(c9fd56461f6986d6bc170403d298fcc408a524e9) )
+	ROM_LOAD( "3.4h", 0x04000, 0x02000, CRC(91162010) SHA1(3acc21e7074602b247f2f392eb181802092d2f21) )
+	ROM_LOAD( "4.5h", 0x06000, 0x02000, CRC(cbcc6bfb) SHA1(5bafc934fef1f50d8c182c39d3a7ce795c89d175) )
+
+	ROM_REGION( 0x0200, "proms2", 0 )
+	ROM_LOAD( "dm74s288.13d",   0x00000, 0x0020, CRC(77a85e21) SHA1(3b41e0ab7cc55c5d78914d23e8289383f5bd5654) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD16_BYTE( "n82s129.13g",    0x001, 0x0100, CRC(59ac98e4) SHA1(5fc0f1a48c49c956cdb8826e20663dc57a9175e4) )
+	ROM_LOAD16_BYTE( "n82s129.14g",    0x000, 0x0100, CRC(0d8f35bd) SHA1(0c2a0145cdaaf9beabdce241731a36b0c65f18a2) )
+ROM_END
 
 ROM_START( cmv801 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -7385,7 +7408,31 @@ ROM_START( cmasterf )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
 
+ROM_START( chryangl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "8.u6",  0x0000, 0x10000, CRC(331961e4) SHA1(50c7e0e983aed1f199f238442bb8fafce1849f84) )
 
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "7.e1",  0x00000,  0x8000, CRC(f8e523ba) SHA1(bfbe1803f0f3c3426a4cc252257c8a4dd83a70ac) )
+	ROM_LOAD( "6.e2",  0x08000,  0x8000, CRC(0d3b322a) SHA1(64b6bd387a78f51f83002c67d857b157a4651279) )
+	ROM_LOAD( "5.e3",  0x10000,  0x8000, CRC(da87dbeb) SHA1(3656b569d08540171003820ec86944d2a7a55b3b) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1.f3",  0x0000,  0x2000, CRC(7cc6d26b) SHA1(de33e8985affce7bd3ead89463117c9aaa93d5e4) )
+	ROM_LOAD( "2.f2",  0x2000,  0x2000, CRC(e73ea4e3) SHA1(c9fd56461f6986d6bc170403d298fcc408a524e9) )
+	ROM_LOAD( "3.h3",  0x4000,  0x2000, CRC(91162010) SHA1(3acc21e7074602b247f2f392eb181802092d2f21) )
+	ROM_LOAD( "4.h2",  0x6000,  0x2000, CRC(cbcc6bfb) SHA1(5bafc934fef1f50d8c182c39d3a7ce795c89d175) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+	// nothing
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129a.c15", 0x0000, 0x0100, CRC(6144d7fc) SHA1(4563ea31864d8732e3a4b0270449a0a79db334a2) )
+	ROM_LOAD( "82s129a.c16", 0x0100, 0x0100, CRC(0893e05d) SHA1(fabd58d498f5efdddae4c7142915cb7b092d6804) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129a.e9", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
 
 ROM_START( tonypok )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -7421,19 +7468,24 @@ ROM_START( tonypok )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
 
-// the program roms on these seem scrambled somehow, and there are no gfx roms dumped
+// the program roms on these seem scrambled somehow
 ROM_START( jkrmast )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "jokermaster.rom",  0x0000, 0x10000, CRC(73caf824) SHA1(b7a7bb6190465f7c3b40f2ef97f4f6beeb89ec41) )
+	ROM_LOAD( "pid-515.u5",  0x0000, 0x10000, CRC(73caf824) SHA1(b7a7bb6190465f7c3b40f2ef97f4f6beeb89ec41) )
 
-	// unknown # of roms / sizes
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "gfx_roms", 0x00000,  0x8000, NO_DUMP )
-	ROM_REGION( 0x20000, "gfx2", ROMREGION_ERASE00 )
+	ROM_LOAD( "2000a.u41", 0x00000,  0x20000, CRC(cb8b1563) SHA1(c8c3ae646a9f3a7482d83566e4b3e18441c5d67f) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "2000b.u48", 0x00000,  0x20000, CRC(e7b406ec) SHA1(c0a10cf8bf5467ecfe3c90e6897db3ab9aae0127) )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
+	ROM_LOAD( "n82s129.u28",  0x0000, 0x0100, CRC(cfb152cf) SHA1(3166b9b21be4ce1d3b6fc8974c149b4ead03abac) )
+	ROM_LOAD( "n82s147a.u13", 0x0100, 0x0200, CRC(da92f0ae) SHA1(1269a2029e689a5f111c57e80825b3756b50521e) )
+
 	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "proms", 0x00000,  0x200, NO_DUMP )
+
+
 	ROM_REGION( 0x100, "proms2", ROMREGION_ERASE00 )
 ROM_END
 
@@ -10225,9 +10277,16 @@ GAME(  199?, cb3a,      ncb3,     ncb3,     cb3a,     0,         ROT0, "Dyna",  
 GAME(  199?, cb3,       ncb3,     ncb3,     ncb3,     cb3,       ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, encrypted)",      0 )
 GAME(  199?, cb3b,      ncb3,     cherrys,  ncb3,     cherrys,   ROT0, "Dyna",              "Cherry Bonus III (alt)",           0 )
 GAME(  199?, cb3c,      ncb3,     cb3c,     chrygld,  cb3,       ROT0, "bootleg",           "Cherry Bonus III (alt, set 2)", GAME_NOT_WORKING)
+GAME(  199?, cb3d,      ncb3,     ncb3,     ncb3,     0,         ROT0, "bootleg",           "Cherry Bonus III (set 3)", GAME_NOT_WORKING) // fix prom decode
+
+// looks like a hack of Cherry Bonus 3
+GAME(  199?, chryangl,  ncb3,     cm,       cmasterb, cmv4,      ROT0, "<unknown>",              "Cherry Angel",         GAME_NOT_WORKING )
+
 
 // cherry master hardware has a rather different mem map, but is basically the same
 GAME(  198?, cmv801,    0,        cm,       cmv801,   cm,        ROT0, "Corsica",           "Cherry Master (Corsica, ver.8.01)",           0 ) /* says ED-96 where the manufacturer is on some games.. */
+
+
 
 // most of these are almost certainly bootlegs, with added features, hacked payouts etc. identifying which are
 // the original, unmodified dyna versions is almost impossible due to lack of documentation from back in the day,
@@ -10247,7 +10306,7 @@ GAME(  1991, cmasterf,  cmaster,  cm,       cmasterb, cmv4,      ROT0, "Dyna",  
 
 
 GAME(  1991, tonypok,   0,        cm,       cmv801,   tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",   0 )
-GAME(  199?, jkrmast,   0,        pkrmast,  cmasterb, cmv4,      ROT0, "<unknown>",         "Joker Master",                                GAME_NOT_WORKING ) // incomplete dump + encrypted?
+GAME(  199?, jkrmast,   0,        pkrmast,  cmasterb, cmv4,      ROT0, "<unknown>",         "Joker Master",                                GAME_NOT_WORKING ) // encrypted?
 GAME(  199?, pkrmast,   jkrmast,  pkrmast,  cmasterb, cmv4,      ROT0, "<unknown>",         "Poker Master (set 1)",                        GAME_NOT_WORKING ) // incomplete dump + encrypted?
 GAME(  199?, pkrmasta,  jkrmast,  pkrmast,  cmasterb, cmv4,      ROT0, "<unknown>",         "Poker Master (set 2)",                        GAME_NOT_WORKING ) // incomplete dump + encrypted?
 
