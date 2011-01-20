@@ -101,7 +101,6 @@ UINT32 *	policetr_rambase;
 /* local variables */
 static UINT32 control_data;
 
-static UINT32 bsmt_reg;
 static UINT32 bsmt_data_bank;
 static UINT32 bsmt_data_offset;
 
@@ -164,9 +163,8 @@ static WRITE32_HANDLER( control_w )
 	/* toggling BSMT off then on causes a reset */
 	if (!(old & 0x80000000) && (control_data & 0x80000000))
 	{
-		device_t *device = space->machine->device("bsmt");
-		bsmt2000_data_w(device, bsmt_data_bank, 0, 0xffff);
-		device->reset();
+		bsmt2000_device *bsmt = space->machine->device<bsmt2000_device>("bsmt");
+		bsmt->reset();
 	}
 
 	/* log any unknown bits */
@@ -182,10 +180,10 @@ static WRITE32_HANDLER( control_w )
  *
  *************************************/
 
-static WRITE32_DEVICE_HANDLER( policetr_bsmt2000_reg_w )
+static WRITE32_HANDLER( policetr_bsmt2000_reg_w )
 {
 	if (control_data & 0x80000000)
-		bsmt2000_data_w(device, bsmt_reg, data & 0xffff, mem_mask & 0xffff);
+		space->machine->device<bsmt2000_device>("bsmt")->write_data(data);
 	else
 		COMBINE_DATA(&bsmt_data_offset);
 }
@@ -193,10 +191,14 @@ static WRITE32_DEVICE_HANDLER( policetr_bsmt2000_reg_w )
 
 static WRITE32_HANDLER( policetr_bsmt2000_data_w )
 {
-	if (control_data & 0x80000000)
-		COMBINE_DATA(&bsmt_reg);
-	else
-		COMBINE_DATA(&bsmt_data_bank);
+	space->machine->device<bsmt2000_device>("bsmt")->write_reg(data);
+	COMBINE_DATA(&bsmt_data_bank);
+}
+
+
+static CUSTOM_INPUT( bsmt_status_r )
+{
+	return field->port->machine->device<bsmt2000_device>("bsmt")->read_status();
 }
 
 
@@ -271,7 +273,7 @@ static ADDRESS_MAP_START( policetr_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00400000, 0x00400003) AM_READ(policetr_video_r)
 	AM_RANGE(0x00500000, 0x00500003) AM_WRITENOP		// copies ROM here at startup, plus checksum
 	AM_RANGE(0x00600000, 0x00600003) AM_READ(bsmt2000_data_r)
-	AM_RANGE(0x00700000, 0x00700003) AM_DEVWRITE("bsmt", policetr_bsmt2000_reg_w)
+	AM_RANGE(0x00700000, 0x00700003) AM_WRITE(policetr_bsmt2000_reg_w)
 	AM_RANGE(0x00800000, 0x00800003) AM_WRITE(policetr_bsmt2000_data_w)
 	AM_RANGE(0x00900000, 0x00900003) AM_WRITE(policetr_palette_offset_w)
 	AM_RANGE(0x00920000, 0x00920003) AM_WRITE(policetr_palette_data_w)
@@ -292,7 +294,7 @@ static ADDRESS_MAP_START( sshooter_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00400000, 0x00400003) AM_READ(policetr_video_r)
 	AM_RANGE(0x00500000, 0x00500003) AM_WRITENOP		// copies ROM here at startup, plus checksum
 	AM_RANGE(0x00600000, 0x00600003) AM_READ(bsmt2000_data_r)
-	AM_RANGE(0x00700000, 0x00700003) AM_DEVWRITE("bsmt", policetr_bsmt2000_reg_w)
+	AM_RANGE(0x00700000, 0x00700003) AM_WRITE(policetr_bsmt2000_reg_w)
 	AM_RANGE(0x00800000, 0x0080000f) AM_WRITE(policetr_video_w)
 	AM_RANGE(0x00a00000, 0x00a00003) AM_WRITE(control_w)
 	AM_RANGE(0x00a00000, 0x00a00003) AM_READ_PORT("IN0")
@@ -337,7 +339,7 @@ static INPUT_PORTS_START( policetr )
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x00200000, IP_ACTIVE_LOW )		/* Not actually a dipswitch */
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(bsmt_status_r, NULL)
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -452,7 +454,7 @@ static MACHINE_CONFIG_START( policetr, driver_device )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("bsmt", BSMT2000, MASTER_CLOCK/2)
+	MCFG_BSMT2000_ADD("bsmt", MASTER_CLOCK/2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -486,7 +488,7 @@ ROM_START( policetr ) /* Rev 0.3 PCB , with all chips dated 04/01/97 */
 	ROM_LOAD32_BYTE( "pt-u111.bin", 0x00002, 0x20000, CRC(fb5ce933) SHA1(4a07ac3e2d86262061092f112cab89f8660dce3d) )
 	ROM_LOAD32_BYTE( "pt-u110.bin", 0x00003, 0x20000, CRC(40bd6f60) SHA1(156000d3c439eab45962f0a2681bd806a17f47ee) )
 
-	ROM_REGION( 0x600000, "bsmt", 0 )
+	ROM_REGION( 0x1000000, "bsmt", 0 )
 	ROM_LOAD( "pt-u160.bin", 0x000000, 0x100000, CRC(f267f813) SHA1(ae58507947fe2e9701b5df46565fd9908e2f9d77) )
 	ROM_RELOAD(              0x3f8000, 0x100000 )
 	ROM_LOAD( "pt-u162.bin", 0x100000, 0x100000, CRC(75fe850e) SHA1(ab8cf24ae6e5cf80f6a9a34e46f2b1596879643b) )
@@ -507,7 +509,7 @@ ROM_START( policetr11 ) /* Rev 0.3 PCB with all chips dated 01/06/97 */
 	ROM_LOAD32_BYTE( "pt-u111.v11", 0x00002, 0x20000, CRC(da6c45a7) SHA1(471bd372d2ad5bcb29af19dae09f3cfab4b010fd) )
 	ROM_LOAD32_BYTE( "pt-u110.v11", 0x00003, 0x20000, CRC(f1c8a8c0) SHA1(8a2d1ada002be6f2a3c2d21d193e7cde6531545a) )
 
-	ROM_REGION( 0x600000, "bsmt", 0 )
+	ROM_REGION( 0x1000000, "bsmt", 0 )
 	ROM_LOAD( "pt-u160.bin", 0x000000, 0x100000, CRC(f267f813) SHA1(ae58507947fe2e9701b5df46565fd9908e2f9d77) )
 	ROM_RELOAD(              0x3f8000, 0x100000 )
 	ROM_LOAD( "pt-u162.bin", 0x100000, 0x100000, CRC(75fe850e) SHA1(ab8cf24ae6e5cf80f6a9a34e46f2b1596879643b) )
@@ -533,7 +535,7 @@ ROM_START( policetr10 ) /* Rev 0.2 PCB with all chips dated 10/07/96 */
 	ROM_LOAD32_BYTE( "pt-u111.v10", 0x00002, 0x20000, CRC(61f79667) SHA1(25298cd8706b5c59f7c9e0f8d44db0df73c23403) )
 	ROM_LOAD32_BYTE( "pt-u110.v10", 0x00003, 0x20000, CRC(5c3c1548) SHA1(aab977274ecff7cb5fd540a3d0da7940e9707906) )
 
-	ROM_REGION( 0x600000, "bsmt", 0 )
+	ROM_REGION( 0x1000000, "bsmt", 0 )
 	/* Same data as the other sets, but split in 4 meg roms */
 	ROM_LOAD( "pt-u160.v10", 0x000000, 0x080000, CRC(cd374405) SHA1(e53689d4344c78c3faac22747ada28bc3add8c56) )
 	ROM_RELOAD(              0x3f8000, 0x080000 )
@@ -569,7 +571,7 @@ Note: With this version, the program roms are twice the size of those found on a
 	ROM_LOAD32_BYTE( "pt-av13.u111", 0x00002, 0x40000, CRC(8c4f3a64) SHA1(4953e6fc26bae7d6e7c7230f4ca76e3f5032af14) ) /* Checksum printed on label  F343 */
 	ROM_LOAD32_BYTE( "pt-av13.u110", 0x00003, 0x40000, CRC(738a8277) SHA1(423a9bcecb82959f38ae79a0728d72eb13ed93b3) ) /* Checksum printed on label  050C */
 
-	ROM_REGION( 0x600000, "bsmt", 0 )
+	ROM_REGION( 0x1000000, "bsmt", 0 )
 	ROM_LOAD( "pt-u160.bin", 0x000000, 0x100000, CRC(f267f813) SHA1(ae58507947fe2e9701b5df46565fd9908e2f9d77) )
 	ROM_RELOAD(              0x3f8000, 0x100000 )
 	ROM_LOAD( "pt-u162.bin", 0x100000, 0x100000, CRC(75fe850e) SHA1(ab8cf24ae6e5cf80f6a9a34e46f2b1596879643b) )
@@ -597,7 +599,7 @@ Note: If you set the dipswitch to service mode and reset the game within Mame. A
 	ROM_LOAD32_BYTE( "ptb-u111.v13", 0x00002, 0x20000, CRC(39e96d6a) SHA1(efe6ffe70432b94c98f3d7247408a6d2f6f9e33d) ) /* Checksum printed on label  E5F1 */
 	ROM_LOAD32_BYTE( "ptb-u110.v13", 0x00003, 0x20000, CRC(d7e6f4cb) SHA1(9dffe4937bc5cf47d870f06ae0dced362cd2dd66) ) /* Checksum printed on label  556D */
 
-	ROM_REGION( 0x600000, "bsmt", 0 )
+	ROM_REGION( 0x1000000, "bsmt", 0 )
 	ROM_LOAD( "pt-u160.bin", 0x000000, 0x100000, CRC(f267f813) SHA1(ae58507947fe2e9701b5df46565fd9908e2f9d77) )
 	ROM_RELOAD(              0x3f8000, 0x100000 )
 	ROM_LOAD( "pt-u162.bin", 0x100000, 0x100000, CRC(75fe850e) SHA1(ab8cf24ae6e5cf80f6a9a34e46f2b1596879643b) )
@@ -622,7 +624,7 @@ ROM_START( sshooter ) /* Rev 0.5B PCB , unknown program rom date */
 	ROM_LOAD32_BYTE( "ss-u111.v17", 0x00002, 0x40000, CRC(4240fa2f) SHA1(54223207c1e228d6b836918601c0f65c2692e5bc) ) // 1:3
 	ROM_LOAD32_BYTE( "ss-u110.v17", 0x00003, 0x40000, CRC(8ae744ce) SHA1(659cd27865cf5507aae6b064c5bc24b927cf5f5a) ) // 1:4
 
-	ROM_REGION( 0x600000, "bsmt", 0 ) /* Sound v1.2 */
+	ROM_REGION( 0x1000000, "bsmt", 0 ) /* Sound v1.2 */
 	ROM_LOAD( "ss-u160.bin", 0x000000, 0x100000, CRC(1c603d42) SHA1(880992871be52129684052d542946de0cc32ba9a) ) // 1:1
 	ROM_RELOAD(              0x3f8000, 0x100000 )
 	ROM_LOAD( "ss-u162.bin", 0x100000, 0x100000, CRC(40ef448a) SHA1(c96f7b169be2576e9f3783af84c07259efefb812) ) // 2:1
@@ -647,7 +649,7 @@ ROM_START( sshooter12 ) /* Rev 0.5B PCB , program roms dated 04/17/98 */
 	ROM_LOAD32_BYTE( "ss-u111.v12", 0x00002, 0x40000, CRC(0b291731) SHA1(bd04f0b1b52198344df625fcddfc6c6ccb0bd923) ) // 1:3
 	ROM_LOAD32_BYTE( "ss-u110.v12", 0x00003, 0x40000, CRC(76841008) SHA1(ccbb88c8d63bf929814144a9d8757c9c7048fdef) ) // 1:4
 
-	ROM_REGION( 0x600000, "bsmt", 0 ) /* Sound v1.2 */
+	ROM_REGION( 0x1000000, "bsmt", 0 ) /* Sound v1.2 */
 	ROM_LOAD( "ss-u160.bin", 0x000000, 0x100000, CRC(1c603d42) SHA1(880992871be52129684052d542946de0cc32ba9a) ) // 1:1
 	ROM_RELOAD(              0x3f8000, 0x100000 )
 	ROM_LOAD( "ss-u162.bin", 0x100000, 0x100000, CRC(40ef448a) SHA1(c96f7b169be2576e9f3783af84c07259efefb812) ) // 2:1
@@ -672,7 +674,7 @@ ROM_START( sshooter11 ) /* Rev 0.5B PCB , program roms dated 04/03/98 */
 	ROM_LOAD32_BYTE( "ss-u111.v11", 0x00002, 0x40000, CRC(ec209b5f) SHA1(1408b509853b325e865d0b23d237bca321e73f60) ) // 1:3
 	ROM_LOAD32_BYTE( "ss-u110.v11", 0x00003, 0x40000, CRC(0f1de201) SHA1(5001de3349357545a6a45102340caf0008b50d7b) ) // 1:4
 
-	ROM_REGION( 0x600000, "bsmt", 0 ) /* Sound v1.2 */
+	ROM_REGION( 0x1000000, "bsmt", 0 ) /* Sound v1.2 */
 	ROM_LOAD( "ss-u160.bin", 0x000000, 0x100000, CRC(1c603d42) SHA1(880992871be52129684052d542946de0cc32ba9a) ) // 1:1
 	ROM_RELOAD(              0x3f8000, 0x100000 )
 	ROM_LOAD( "ss-u162.bin", 0x100000, 0x100000, CRC(40ef448a) SHA1(c96f7b169be2576e9f3783af84c07259efefb812) ) // 2:1

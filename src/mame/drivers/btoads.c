@@ -158,15 +158,16 @@ static WRITE8_HANDLER( sound_int_state_w )
 
 static READ8_HANDLER( bsmt_ready_r )
 {
-	return 0x80;
+	bsmt2000_device *bsmt = space->machine->device<bsmt2000_device>("bsmt");
+	return bsmt->read_status() << 7;
 }
 
 
-static WRITE8_DEVICE_HANDLER( bsmt2000_port_w )
+static WRITE8_HANDLER( bsmt2000_port_w )
 {
-	UINT16 reg = offset >> 8;
-	UINT16 val = ((offset & 0xff) << 8) | data;
-	bsmt2000_data_w(device, reg, val, 0xffff);
+	bsmt2000_device *bsmt = space->machine->device<bsmt2000_device>("bsmt");
+	bsmt->write_reg(offset >> 8);
+	bsmt->write_data(((offset & 0xff) << 8) | data);
 }
 
 
@@ -219,7 +220,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_DEVWRITE("bsmt", bsmt2000_port_w)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(bsmt2000_port_w)
 	AM_RANGE(0x8000, 0x8000) AM_READWRITE(sound_data_r, sound_data_w)
 	AM_RANGE(0x8002, 0x8002) AM_WRITE(sound_int_state_w)
 	AM_RANGE(0x8004, 0x8004) AM_READ(sound_data_ready_r)
@@ -359,7 +360,7 @@ static MACHINE_CONFIG_START( btoads, driver_device )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("bsmt", BSMT2000, SOUND_CLOCK)
+	MCFG_BSMT2000_ADD("bsmt", SOUND_CLOCK)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -380,7 +381,7 @@ ROM_START( btoads )
 	ROM_LOAD32_WORD( "btc0-p0.u120", 0x000000, 0x400000, CRC(0dfd1e35) SHA1(733a0a4235bebd598c600f187ed2628f28cf9bd0) )
 	ROM_LOAD32_WORD( "btc0-p1.u121", 0x000002, 0x400000, CRC(df7487e1) SHA1(67151b900767bb2653b5261a98c81ff8827222c3) )
 
-	ROM_REGION( 0x200000, "bsmt", 0 )	/* BSMT data, M27C160 rom */
+	ROM_REGION( 0x1000000, "bsmt", 0 )	/* BSMT data, M27C160 rom */
 	ROM_LOAD( "btc0-s.u109", 0x00000, 0x200000, CRC(d9612ddb) SHA1(f186dfb013e81abf81ba8ac5dc7eb731c1ad82b6) )
 
 	ROM_REGION( 0x080a, "plds", 0 )

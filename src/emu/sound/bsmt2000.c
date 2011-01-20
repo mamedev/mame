@@ -2,9 +2,40 @@
 
     bsmt2000.c
 
-    BSMT2000 sound emulator.
+    BSMT2000 device emulator.
+
+****************************************************************************
 
     Copyright Aaron Giles
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+****************************************************************************
 
     Chip is actually a TMS320C15 DSP with embedded mask rom
     Trivia: BSMT stands for "Brian Schmidt's Mouse Trap"
@@ -16,486 +47,372 @@
 #include "bsmt2000.h"
 
 
-/***************************************************************************
-    DEBUGGING/OPTIONS
-***************************************************************************/
 
-#define LOG_COMMANDS			0
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
 
-/* NOTE: the original chip did not support interpolation, but it sounds */
-/* nicer if you enable it. For accuracy's sake, we leave it off by default. */
-#define ENABLE_INTERPOLATION	0
+// devices
+const device_type BSMT2000 = bsmt2000_device_config::static_alloc_device_config;
 
 
-
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-#define MAX_VOICES				(12+1)
-#define ADPCM_VOICE				12
+// program map for the DSP (points to internal ROM)
+static ADDRESS_MAP_START( tms_program_map, ADDRESS_SPACE_PROGRAM, 16 )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x000, 0xfff) AM_ROM
+ADDRESS_MAP_END
 
 
+// I/O map for the DSP
+static ADDRESS_MAP_START( tms_io_map, ADDRESS_SPACE_IO, 16 )
+	AM_RANGE(0, 0) AM_DEVREADWRITE_MODERN(DEVICE_SELF_OWNER, bsmt2000_device, tms_register_r, tms_rom_addr_w)
+	AM_RANGE(1, 1) AM_DEVREADWRITE_MODERN(DEVICE_SELF_OWNER, bsmt2000_device, tms_data_r, tms_rom_bank_w)
+	AM_RANGE(2, 2) AM_DEVREAD_MODERN(DEVICE_SELF_OWNER, bsmt2000_device, tms_rom_r)
+	AM_RANGE(3, 3) AM_DEVWRITE_MODERN(DEVICE_SELF_OWNER, bsmt2000_device, tms_left_w)
+	AM_RANGE(7, 7) AM_DEVWRITE_MODERN(DEVICE_SELF_OWNER, bsmt2000_device, tms_right_w)
+	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_DEVREAD_MODERN(DEVICE_SELF_OWNER, bsmt2000_device, tms_write_pending_r)
+ADDRESS_MAP_END
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
 
-/* struct describing a single playing voice */
-typedef struct _bsmt2000_voice bsmt2000_voice;
-struct _bsmt2000_voice
+// machine fragment
+static MACHINE_CONFIG_FRAGMENT( bsmt2000 )
+	MCFG_CPU_ADD("bsmt2000", TMS32015, DERIVED_CLOCK(1,1))
+	MCFG_CPU_PROGRAM_MAP(tms_program_map)
+	// data map is internal to the CPU
+	MCFG_CPU_IO_MAP(tms_io_map)
+MACHINE_CONFIG_END
+
+
+// default address map for the external memory interface
+// the BSMT can address a full 32 bits but typically only 24 are used
+static ADDRESS_MAP_START( bsmt2000, 0, 8 )
+	AM_RANGE(0x00000, 0xffffff) AM_ROM
+ADDRESS_MAP_END
+
+
+// ROM definition for the BSMT2000 program ROM
+ROM_START( bsmt2000 )
+	ROM_REGION( 0x2000, "bsmt2000", ROMREGION_LOADBYNAME )
+	ROM_LOAD16_WORD_SWAP( "bsmt2000.bin", 0x0000, 0x2000, CRC(c2a265af) SHA1(6ec9eb038fb8eb842c5482aebe1d149daf49f2e6) )
+ROM_END
+
+
+
+
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  bsmt2000_device_config - constructor
+//-------------------------------------------------
+
+bsmt2000_device_config::bsmt2000_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, static_alloc_device_config, "BSMT2000", tag, owner, clock),
+	  device_config_sound_interface(mconfig, *this),
+	  device_config_memory_interface(mconfig, *this),
+	  m_space_config("samples", ENDIANNESS_LITTLE, 8, 32, 0, NULL, *ADDRESS_MAP_NAME(bsmt2000)),
+	  m_ready_callback(NULL)
 {
-	UINT16		pos;					/* current position */
-	UINT16		rate;					/* stepping value */
-	UINT16		loopend;				/* loop end value */
-	UINT16		loopstart;				/* loop start value */
-	UINT16		bank;					/* bank number */
-	UINT16		leftvol;				/* left volume */
-	UINT16		rightvol;				/* right volume */
-	UINT16		fraction;				/* current fractional position */
-};
+}
 
-typedef struct _bsmt2000_chip bsmt2000_chip;
-struct _bsmt2000_chip
+
+//-------------------------------------------------
+//  static_alloc_device_config - allocate a new
+//  configuration object
+//-------------------------------------------------
+
+device_config *bsmt2000_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
-	sound_stream *stream;				/* which stream are we using */
-	UINT8		last_register;			/* last register address written */
-
-	INT8 *		region_base;			/* pointer to the base of the region */
-	int			total_banks;			/* number of total banks in the region */
-
-	bsmt2000_voice voice[MAX_VOICES];	/* the voices */
-	UINT16 *	regmap[128];			/* mapping of registers to voice params */
-	UINT8		mode;					/* current mode */
-
-	UINT32		clock;					/* original clock on the chip */
-	UINT8		stereo;					/* stereo output? */
-	UINT8		voices;					/* number of voices */
-	UINT8		adpcm;					/* adpcm enabled? */
-
-	INT32		adpcm_current;			/* current ADPCM sample */
-	INT32		adpcm_delta_n;			/* current ADPCM scale factor */
-};
+	return global_alloc(bsmt2000_device_config(mconfig, tag, owner, clock));
+}
 
 
+//-------------------------------------------------
+//  alloc_device - allocate a new device object
+//-------------------------------------------------
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-/* core implementation */
-static STREAM_UPDATE( bsmt2000_update );
-
-/* local functions */
-static void set_mode(bsmt2000_chip *chip);
-static void set_regmap(bsmt2000_chip *chip, UINT8 posbase, UINT8 ratebase, UINT8 endbase, UINT8 loopbase, UINT8 bankbase, UINT8 rvolbase, UINT8 lvolbase);
-
-
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-INLINE bsmt2000_chip *get_safe_token(device_t *device)
+device_t *bsmt2000_device_config::alloc_device(running_machine &machine) const
 {
-	assert(device != NULL);
-	assert(device->type() == BSMT2000);
-	return (bsmt2000_chip *)downcast<legacy_device_base *>(device)->token();
+	return auto_alloc(&machine, bsmt2000_device(machine, *this));
+}
+
+
+//-------------------------------------------------
+//  static_set_pin7 - configuration helper to set
+//  the pin 7 state
+//-------------------------------------------------
+
+void bsmt2000_device_config::static_set_ready_callback(device_config *device, ready_callback callback)
+{
+	bsmt2000_device_config *bsmt = downcast<bsmt2000_device_config *>(device);
+	bsmt->m_ready_callback = callback;
+}
+
+
+//-------------------------------------------------
+//  rom_region - return a pointer to the device's
+//  internal ROM region
+//-------------------------------------------------
+
+const rom_entry *bsmt2000_device_config::rom_region() const
+{
+	return ROM_NAME( bsmt2000 );
+}
+
+
+//-------------------------------------------------
+//  machine_config_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor bsmt2000_device_config::machine_config_additions() const
+{
+	return MACHINE_CONFIG_NAME( bsmt2000 );
+}
+
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+const address_space_config *bsmt2000_device_config::memory_space_config(int spacenum) const
+{
+	return (spacenum == 0) ? &m_space_config : NULL;
 }
 
 
 
-/***************************************************************************
-    CORE IMPLEMENTATION
-***************************************************************************/
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
 
-/*-------------------------------------------------
-    bsmt2000_postload - save-state load callback
--------------------------------------------------*/
+//-------------------------------------------------
+//  bsmt2000_device - constructor
+//-------------------------------------------------
 
-static STATE_POSTLOAD( bsmt2000_postload )
+bsmt2000_device::bsmt2000_device(running_machine &_machine, const bsmt2000_device_config &config)
+	: device_t(_machine, config),
+	  device_sound_interface(_machine, config, *this),
+	  device_memory_interface(_machine, config, *this),
+	  m_config(config),
+	  m_stream(NULL),
+	  m_direct(NULL),
+	  m_cpu(NULL),
+	  m_register_select(0),
+	  m_write_data(0),
+	  m_rom_address(0),
+	  m_rom_bank(0),
+	  m_left_data(0),
+	  m_right_data(0),
+	  m_write_pending(false)
 {
-	bsmt2000_chip *chip = (bsmt2000_chip*)param;
-	set_mode(chip);
 }
 
 
-/*-------------------------------------------------
-    DEVICE_START( bsmt2000 ) - initialization callback
--------------------------------------------------*/
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
 
-static DEVICE_START( bsmt2000 )
+void bsmt2000_device::device_start()
 {
-	bsmt2000_chip *chip = get_safe_token(device);
-	int voicenum;
+	// find our CPU
+	m_cpu = subdevice<tms32015_device>("bsmt2000");
 
-	/* create a stream at a nominal sample rate (real one specified later) */
-	chip->stream = stream_create(device, 0, 2, device->clock() / 1000, chip, bsmt2000_update);
-	chip->clock = device->clock();
+	// find our direct access
+	m_direct = &space()->direct();
 
-	/* initialize the regions */
-	chip->region_base = *device->region();
-	chip->total_banks = device->region()->bytes() / 0x10000;
-
-	/* register chip-wide data for save states */
-	state_save_register_postload(device->machine, bsmt2000_postload, chip);
-	state_save_register_device_item(device, 0, chip->last_register);
-	state_save_register_device_item(device, 0, chip->mode);
-	state_save_register_device_item(device, 0, chip->stereo);
-	state_save_register_device_item(device, 0, chip->voices);
-	state_save_register_device_item(device, 0, chip->adpcm);
-	state_save_register_device_item(device, 0, chip->adpcm_current);
-	state_save_register_device_item(device, 0, chip->adpcm_delta_n);
-
-	/* register voice-specific data for save states */
-	for (voicenum = 0; voicenum < MAX_VOICES; voicenum++)
-	{
-		bsmt2000_voice *voice = &chip->voice[voicenum];
-
-		state_save_register_device_item(device, voicenum, voice->pos);
-		state_save_register_device_item(device, voicenum, voice->rate);
-		state_save_register_device_item(device, voicenum, voice->loopend);
-		state_save_register_device_item(device, voicenum, voice->loopstart);
-		state_save_register_device_item(device, voicenum, voice->bank);
-		state_save_register_device_item(device, voicenum, voice->leftvol);
-		state_save_register_device_item(device, voicenum, voice->rightvol);
-		state_save_register_device_item(device, voicenum, voice->fraction);
-	}
+	// create the stream; BSMT typically runs at 24MHz and writes to a DAC, so
+	// in theory we should generate a 24MHz stream, but that's certainly overkill
+	// internally at 24MHz the max output sample rate is 32kHz
+	// divided by 128 gives us 6x the max output rate which is plenty for oversampling
+	m_stream = stream_create(this, 0, 2, clock() / 128, this, stream_update_stub<bsmt2000_device, &bsmt2000_device::stream_generate>);
 }
 
 
-/*-------------------------------------------------
-    DEVICE_RESET( bsmt2000 ) - chip reset callback
--------------------------------------------------*/
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
 
-static DEVICE_RESET( bsmt2000 )
+void bsmt2000_device::device_reset()
 {
-	bsmt2000_chip *chip = get_safe_token(device);
-	int voicenum;
-
-	/* reset all the voice data */
-	for (voicenum = 0; voicenum < MAX_VOICES; voicenum++)
-	{
-		bsmt2000_voice *voice = &chip->voice[voicenum];
-		memset(voice, 0, sizeof(*voice));
-		voice->leftvol = 0x7fff;
-		voice->rightvol = 0x7fff;
-	}
-
-	/* recompute the mode - this comes from the address of the last register accessed */
-	chip->mode = chip->last_register;
-	set_mode(chip);
+	device_timer_call_after_resynch(*this, TIMER_ID_RESET);
 }
 
 
-/*-------------------------------------------------
-    bsmt2000_update - update callback for
-    sample generation
--------------------------------------------------*/
+//-------------------------------------------------
+//  device_timer - handle deferred writes and
+//  resets as a timer callback
+//-------------------------------------------------
 
-static STREAM_UPDATE( bsmt2000_update )
+void bsmt2000_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	stream_sample_t *left = outputs[0];
-	stream_sample_t *right = outputs[1];
-	bsmt2000_chip *chip = (bsmt2000_chip *)param;
-	bsmt2000_voice *voice;
-	int samp, voicenum;
-
-	/* clear out the accumulator */
-	memset(left, 0, samples * sizeof(left[0]));
-	memset(right, 0, samples * sizeof(right[0]));
-
-	/* loop over voices */
-	for (voicenum = 0; voicenum < chip->voices; voicenum++)
+	switch (id)
 	{
-		voice = &chip->voice[voicenum];
-
-		/* compute the region base */
-		if (voice->bank < chip->total_banks)
-		{
-			INT8 *base = &chip->region_base[voice->bank * 0x10000];
-			UINT32 rate = voice->rate;
-			INT32 rvol = voice->rightvol;
-			INT32 lvol = chip->stereo ? voice->leftvol : rvol;
-			UINT16 pos = voice->pos;
-			UINT16 frac = voice->fraction;
-
-			/* loop while we still have samples to generate */
-			for (samp = 0; samp < samples; samp++)
-			{
-#if ENABLE_INTERPOLATION
-				INT32 sample = (base[pos] * (0x800 - frac) + (base[pos + 1] * frac)) >> 11;
-#else
-				INT32 sample = base[pos];
-#endif
-				/* apply volumes and add */
-				left[samp] += sample * lvol;
-				right[samp] += sample * rvol;
-
-				/* update position */
-				frac += rate;
-				pos += frac >> 11;
-				frac &= 0x7ff;
-
-				/* check for loop end */
-				if (pos >= voice->loopend)
-					pos += voice->loopstart - voice->loopend;
-			}
-
-			/* update the position */
-			voice->pos = pos;
-			voice->fraction = frac;
-		}
-	}
-
-	/* compressed voice (11-voice model only) */
-	voice = &chip->voice[ADPCM_VOICE];
-	if (chip->adpcm && voice->bank < chip->total_banks && voice->rate)
-	{
-		INT8 *base = &chip->region_base[voice->bank * 0x10000];
-		INT32 rvol = voice->rightvol;
-		INT32 lvol = chip->stereo ? voice->leftvol : rvol;
-		UINT32 pos = voice->pos;
-		UINT32 frac = voice->fraction;
-
-		/* loop while we still have samples to generate */
-		for (samp = 0; samp < samples && pos < voice->loopend; samp++)
-		{
-			/* apply volumes and add */
-			left[samp] += (chip->adpcm_current * lvol) >> 8;
-			right[samp] += (chip->adpcm_current * rvol) >> 8;
-
-			/* update position */
-			frac++;
-			if (frac == 6)
-			{
-				pos++;
-				frac = 0;
-			}
-
-			/* every 3 samples, we update the ADPCM state */
-			if (frac == 1 || frac == 4)
-			{
-				static const UINT8 delta_tab[] = { 58,58,58,58,77,102,128,154 };
-				int nibble = base[pos] >> ((frac == 1) ? 4 : 0);
-				int value = (INT8)(nibble << 4) >> 4;
-				int delta;
-
-				/* compute the delta for this sample */
-				delta = chip->adpcm_delta_n * value;
-				if (value > 0)
-					delta += chip->adpcm_delta_n >> 1;
-				else
-					delta -= chip->adpcm_delta_n >> 1;
-
-				/* add and clamp against the sample */
-				chip->adpcm_current += delta;
-				if (chip->adpcm_current >= 32767)
-					chip->adpcm_current = 32767;
-				else if (chip->adpcm_current <= -32768)
-					chip->adpcm_current = -32768;
-
-				/* adjust the delta multiplier */
-				chip->adpcm_delta_n = (chip->adpcm_delta_n * delta_tab[abs(value)]) >> 6;
-				if (chip->adpcm_delta_n > 2000)
-					chip->adpcm_delta_n = 2000;
-				else if (chip->adpcm_delta_n < 1)
-					chip->adpcm_delta_n = 1;
-			}
-		}
-
-		/* update the position */
-		voice->pos = pos;
-		voice->fraction = frac;
-
-		/* "rate" is a control register; clear it to 0 when done */
-		if (pos >= voice->loopend)
-			voice->rate = 0;
-	}
-
-	/* reduce the overall gain */
-	for (samp = 0; samp < samples; samp++)
-	{
-		left[samp] >>= 9;
-		right[samp] >>= 9;
-	}
-}
-
-
-
-/***************************************************************************
-    READ/WRITE ACCESS
-***************************************************************************/
-
-/*-------------------------------------------------
-    bsmt2000_reg_write - handle a register write
--------------------------------------------------*/
-
-WRITE16_DEVICE_HANDLER( bsmt2000_data_w )
-{
-	bsmt2000_chip *chip = get_safe_token(device);
-
-	if (LOG_COMMANDS) mame_printf_debug("BSMT write: reg %02X = %04X\n", offset, data);
-
-	/* remember the last write */
-	chip->last_register = offset;
-
-	/* update the register */
-	if (offset < 0x80 && chip->regmap[offset] != NULL)
-	{
-		UINT16 *dest = chip->regmap[offset];
-
-		/* force an update, then write the data */
-		stream_update(chip->stream);
-		*dest = data;
-
-		/* special case: reset ADPCM parameters when writing to the ADPCM position */
-		if (dest == &chip->voice[ADPCM_VOICE].rate)
-		{
-			chip->adpcm_current = 0;
-			chip->adpcm_delta_n = 10;
-		}
-	}
-}
-
-
-
-/***************************************************************************
-    LOCAL FUNCTIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    set_mode - set the mode after reset
--------------------------------------------------*/
-
-static void set_mode(bsmt2000_chip *chip)
-{
-	int sample_rate;
-
-	/* force an update */
-	stream_update(chip->stream);
-
-	switch (chip->mode)
-	{
-		/* mode 0: 24kHz, 12 channel PCM, 1 channel ADPCM, mono */
-		default:
-		case 0:
-			sample_rate = chip->clock / 1000;
-			chip->stereo = FALSE;
-			chip->voices = 12;
-			chip->adpcm = TRUE;
-			set_regmap(chip, 0x00, 0x18, 0x24, 0x30, 0x3c, 0x48, 0);
+		// deferred reset
+		case TIMER_ID_RESET:
+			stream_update(m_stream);
+			m_cpu->reset();
 			break;
-
-		/* mode 1: 24kHz, 11 channel PCM, 1 channel ADPCM, stereo */
-		case 1:
-			sample_rate = chip->clock / 1000;
-			chip->stereo = TRUE;
-			chip->voices = 11;
-			chip->adpcm = TRUE;
-			set_regmap(chip, 0x00, 0x16, 0x21, 0x2c, 0x37, 0x42, 0x4d);
+	
+		// deferred register write
+		case TIMER_ID_REG_WRITE:
+			m_register_select = param & 0xffff;
 			break;
-
-		/* mode 5: 24kHz, 12 channel PCM, stereo */
-		case 5:
-			sample_rate = chip->clock / 1000;
-			chip->stereo = TRUE;
-			chip->voices = 12;
-			chip->adpcm = FALSE;
-			set_regmap(chip, 0x00, 0x18, 0x24, 0x30, 0x3c, 0x54, 0x60);
-			break;
-
-		/* mode 6: 34kHz, 8 channel PCM, stereo */
-		case 6:
-			sample_rate = chip->clock / 706;
-			chip->stereo = TRUE;
-			chip->voices = 8;
-			chip->adpcm = FALSE;
-			set_regmap(chip, 0x00, 0x10, 0x18, 0x20, 0x28, 0x38, 0x40);
-			break;
-
-		/* mode 7: 32kHz, 9 channel PCM, stereo */
-		case 7:
-			sample_rate = chip->clock / 750;
-			chip->stereo = TRUE;
-			chip->voices = 9;
-			chip->adpcm = FALSE;
-			set_regmap(chip, 0x00, 0x12, 0x1b, 0x24, 0x2d, 0x3f, 0x48);
+		
+		// deferred data write
+		case TIMER_ID_DATA_WRITE:
+			m_write_data = param & 0xffff;
+			if (m_write_pending) logerror("BSMT2000: Missed data\n");
+			m_write_pending = true;
 			break;
 	}
-
-	/* update the sample rate */
-	stream_set_sample_rate(chip->stream, sample_rate);
 }
 
 
-/*-------------------------------------------------
-    set_regmap - initialize the register mapping
--------------------------------------------------*/
+//-------------------------------------------------
+//  stream_generate - handle update requests for
+//  our sound stream
+//-------------------------------------------------
 
-static void set_regmap(bsmt2000_chip *chip, UINT8 posbase, UINT8 ratebase, UINT8 endbase, UINT8 loopbase, UINT8 bankbase, UINT8 rvolbase, UINT8 lvolbase)
+void bsmt2000_device::stream_generate(stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	int voice;
-
-	/* reset the map */
-	memset(chip->regmap, 0, sizeof(chip->regmap));
-
-	/* iterate over voices */
-	for (voice = 0; voice < chip->voices; voice++)
+	// just fill with current left/right values
+	for (int samp = 0; samp < samples; samp++)
 	{
-		chip->regmap[posbase + voice] = &chip->voice[voice].pos;
-		chip->regmap[ratebase + voice] = &chip->voice[voice].rate;
-		chip->regmap[endbase + voice] = &chip->voice[voice].loopend;
-		chip->regmap[loopbase + voice] = &chip->voice[voice].loopstart;
-		chip->regmap[bankbase + voice] = &chip->voice[voice].bank;
-		chip->regmap[rvolbase + voice] = &chip->voice[voice].rightvol;
-		if (chip->stereo)
-			chip->regmap[lvolbase + voice] = &chip->voice[voice].leftvol;
-	}
-
-	/* set the ADPCM register */
-	if (chip->adpcm)
-	{
-		chip->regmap[0x6d] = &chip->voice[ADPCM_VOICE].loopend;
-		chip->regmap[0x6f] = &chip->voice[ADPCM_VOICE].bank;
-		chip->regmap[0x73] = &chip->voice[ADPCM_VOICE].rate;
-		chip->regmap[0x74] = &chip->voice[ADPCM_VOICE].rightvol;
-		chip->regmap[0x75] = &chip->voice[ADPCM_VOICE].pos;
-		if (chip->stereo)
-			chip->regmap[0x76] = &chip->voice[ADPCM_VOICE].leftvol;
+		outputs[0][samp] = m_left_data * 16;
+		outputs[1][samp] = m_right_data * 16;
 	}
 }
 
 
+//-------------------------------------------------
+//  read_status - return the write pending status
+//-------------------------------------------------
 
-/***************************************************************************
-    GET/SET INFO CALLBACKS
-***************************************************************************/
-
-/*-------------------------------------------------
-    DEVICE_GET_INFO( bsmt2000 ) - callback for
-    retrieving chip information
--------------------------------------------------*/
-
-DEVICE_GET_INFO( bsmt2000 )
+UINT16 bsmt2000_device::read_status()
 {
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(bsmt2000_chip);					break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( bsmt2000 );			break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( bsmt2000 );			break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "BSMT2000");						break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Data East Wavetable");				break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");								break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);							break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
-	}
+	return m_write_pending ? 0 : 1;
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(BSMT2000, bsmt2000);
+//-------------------------------------------------
+//  write_reg - handle writes to the BSMT2000 
+//  register select interface
+//-------------------------------------------------
+
+void bsmt2000_device::write_reg(UINT16 data)
+{
+	device_timer_call_after_resynch(*this, TIMER_ID_REG_WRITE, data);
+}
+
+
+//-------------------------------------------------
+//  write_data - handle writes to the BSMT2000 
+//  data port
+//-------------------------------------------------
+
+void bsmt2000_device::write_data(UINT16 data)
+{
+	device_timer_call_after_resynch(*this, TIMER_ID_DATA_WRITE, data);
+	
+	// boost the interleave on a write so that the caller detects the status more accurately
+	m_machine.scheduler().boost_interleave(ATTOTIME_IN_USEC(1), ATTOTIME_IN_USEC(10));
+}
+
+
+//-------------------------------------------------
+//  tms_register_r - return the value written to
+//  the register select port
+//-------------------------------------------------
+
+READ16_MEMBER( bsmt2000_device::tms_register_r )
+{
+	return m_register_select;
+}
+
+
+//-------------------------------------------------
+//  tms_data_r - return the value written to the 
+//  data port
+//-------------------------------------------------
+
+READ16_MEMBER( bsmt2000_device::tms_data_r )
+{
+	// also implicitly clear the write pending flag
+	m_write_pending = false;
+	if (m_config.m_ready_callback != NULL)
+		(*m_config.m_ready_callback)(*this);
+	return m_write_data;
+}
+
+
+//-------------------------------------------------
+//  tms_rom_r - read a byte from the currently
+//  selected ROM bank and address
+//-------------------------------------------------
+
+READ16_MEMBER( bsmt2000_device::tms_rom_r )
+{
+	// underlying logic assumes this is a sign-extended value
+	return (INT8)m_direct->read_raw_byte((m_rom_bank << 16) + m_rom_address);
+}
+
+
+//-------------------------------------------------
+//  tms_rom_addr_w - selects which byte within the
+//  current ROM bank to access
+//-------------------------------------------------
+
+WRITE16_MEMBER( bsmt2000_device::tms_rom_addr_w )
+{
+	m_rom_address = data;
+}
+
+
+//-------------------------------------------------
+//  tms_rom_bank_w - selects which bank of ROM to
+//  access
+//-------------------------------------------------
+
+WRITE16_MEMBER( bsmt2000_device::tms_rom_bank_w )
+{
+	m_rom_bank = data;
+}
+
+
+//-------------------------------------------------
+//  tms_left_w - handle writes to the left channel 
+//  DAC
+//-------------------------------------------------
+
+WRITE16_MEMBER( bsmt2000_device::tms_left_w )
+{
+	stream_update(m_stream);
+	m_left_data = data;
+}
+
+
+//-------------------------------------------------
+//  tms_right_w - handle writes to the right 
+//  channel DAC
+//-------------------------------------------------
+
+WRITE16_MEMBER( bsmt2000_device::tms_right_w )
+{
+	stream_update(m_stream);
+	m_right_data = data;
+}
+
+
+//-------------------------------------------------
+//  tms_write_pending_r - return whether a write
+//  is pending; this data is fed into the BIO line
+//  on the TMS32015
+//-------------------------------------------------
+
+READ16_MEMBER( bsmt2000_device::tms_write_pending_r )
+{
+	return m_write_pending ? 1 : 0;
+}

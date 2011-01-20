@@ -965,15 +965,23 @@ static WRITE8_HANDLER(deco32_bsmt0_w)
 	bsmt_latch = data;
 }
 
-static WRITE8_DEVICE_HANDLER(deco32_bsmt1_w)
+static void bsmt_ready_callback(bsmt2000_device &device)
 {
-	bsmt2000_data_w(device, offset^ 0xff, ((bsmt_latch << 8) | data), 0xffff);
-	cputag_set_input_line(device->machine, "audiocpu", M6809_IRQ_LINE, HOLD_LINE); /* BSMT is ready */
+	cputag_set_input_line(device.machine, "audiocpu", M6809_IRQ_LINE, ASSERT_LINE); /* BSMT is ready */
+}
+
+static WRITE8_HANDLER(deco32_bsmt1_w)
+{
+	bsmt2000_device *bsmt = space->machine->device<bsmt2000_device>("bsmt");
+	bsmt->write_reg(offset ^ 0xff);
+	bsmt->write_data((bsmt_latch << 8) | data);
+	cputag_set_input_line(space->machine, "audiocpu", M6809_IRQ_LINE, CLEAR_LINE); /* BSMT is not ready */
 }
 
 static READ8_HANDLER(deco32_bsmt_status_r)
 {
-	return 0x80;
+	bsmt2000_device *bsmt = space->machine->device<bsmt2000_device>("bsmt");
+	return bsmt->read_status() << 7;
 }
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -993,7 +1001,7 @@ static ADDRESS_MAP_START( tattass_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2002, 0x2003) AM_READ(soundlatch_r)
 	AM_RANGE(0x2006, 0x2007) AM_READ(deco32_bsmt_status_r)
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(deco32_bsmt0_w)
-	AM_RANGE(0xa000, 0xa0ff) AM_DEVWRITE("bsmt", deco32_bsmt1_w)
+	AM_RANGE(0xa000, 0xa0ff) AM_WRITE(deco32_bsmt1_w)
 	AM_RANGE(0x2000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1925,7 +1933,8 @@ static MACHINE_CONFIG_START( tattass, driver_device )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("bsmt", BSMT2000, 24000000)
+	MCFG_BSMT2000_ADD("bsmt", 24000000)
+	MCFG_BSMT2000_READY_CALLBACK(bsmt_ready_callback)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -2781,7 +2790,7 @@ ROM_START( tattass )
 	ROM_LOAD32_BYTE( "ob2_c2.b3",  0x600000, 0x80000,  CRC(90fe5f4f) SHA1(2149e9eae152556c632ebd4d0b2de49e40916a77) )
 	ROM_LOAD32_BYTE( "ob2_c3.b3",  0x600002, 0x80000,  CRC(e3517e6e) SHA1(68ac60570423d8f0d7cff3db1901c9c050d0be91) )
 
-	ROM_REGION(0x200000, "bsmt", 0 )
+	ROM_REGION(0x1000000, "bsmt", 0 )
 	ROM_LOAD( "u17.snd",  0x000000, 0x80000,  CRC(b945c18d) SHA1(6556bbb4a7057df3680132f24687fa944006c784) )
 	ROM_LOAD( "u21.snd",  0x080000, 0x80000,  CRC(10b2110c) SHA1(83e5938ed22da2874022e1dc8df76c72d95c448d) )
 	ROM_LOAD( "u36.snd",  0x100000, 0x80000,  CRC(3b73abe2) SHA1(195096e2302e84123b23b4ccd982fb3ab9afe42c) )
@@ -2854,7 +2863,7 @@ ROM_START( tattassa )
 	ROM_LOAD32_BYTE( "ob2_c2.b3",  0x600000, 0x80000,  CRC(90fe5f4f) SHA1(2149e9eae152556c632ebd4d0b2de49e40916a77) )
 	ROM_LOAD32_BYTE( "ob2_c3.b3",  0x600002, 0x80000,  CRC(e3517e6e) SHA1(68ac60570423d8f0d7cff3db1901c9c050d0be91) )
 
-	ROM_REGION(0x200000, "bsmt", 0 )
+	ROM_REGION(0x1000000, "bsmt", 0 )
 	ROM_LOAD( "u17.snd",  0x000000, 0x80000,  CRC(b945c18d) SHA1(6556bbb4a7057df3680132f24687fa944006c784) )
 	ROM_LOAD( "u21.snd",  0x080000, 0x80000,  CRC(10b2110c) SHA1(83e5938ed22da2874022e1dc8df76c72d95c448d) )
 	ROM_LOAD( "u36.snd",  0x100000, 0x80000,  CRC(3b73abe2) SHA1(195096e2302e84123b23b4ccd982fb3ab9afe42c) )
