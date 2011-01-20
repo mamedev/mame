@@ -9572,11 +9572,12 @@ Other Sun games
 	DRIVER( witchcdb )	/* 1991, Unknown */
 	DRIVER( witchcdc )	/* 1991, Unknown */
 	DRIVER( witchcdd )	/* 1991, Unknown */
-	DRIVER( witchcde )	/* 1994, Unknown */
 	DRIVER( witchcdf )	/* (c) 1991, PlayMan */
 	DRIVER( witchcdg )	/* (c) 199?, Falcon */
 	DRIVER( witchcdh )	/* (c) 1991, TV Game Elektronik - Proma */
 	DRIVER( witchgme )	/* (c) 1991 Video Klein */
+	DRIVER( witchjol )	/* 1994, Unknown */
+	DRIVER( wldwitch )	/* 1994, Video Klein */
 	DRIVER( falcnwld )	/* 1991, TVG */
 	DRIVER( falcnwlda )	/* (c) 1990, Video Klein */
 	DRIVER( falcnwldb )	/* (c) 1983, Falcon */
