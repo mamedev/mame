@@ -22,6 +22,18 @@ enum
 									/* it is usuali to use PULSE_LINE state         */
 };
 
+enum
+{
+	M6801_MODE_0 = 0,
+	M6801_MODE_1,
+	M6801_MODE_2,
+	M6801_MODE_3,
+	M6801_MODE_4,
+	M6801_MODE_5,
+	M6801_MODE_6,
+	M6801_MODE_7
+};
+
 /* By default, on a port write port bits which are not set as output in the DDR */
 /* are set to the value returned by a read from the same port. If you need to */
 /* know the DDR for e.g. port 1, do m6803_internal_registers_r(M6801_DDR1) */

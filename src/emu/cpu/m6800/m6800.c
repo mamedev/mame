@@ -53,20 +53,29 @@ TODO:
 
 /*
 
-    Chip                RAM     NVRAM   ROM     SCI
-    -----------------------------------------------
-    MC6800              -       -       -       no
-    MC6801              128     64      2K      yes
-    MC68701             128     64      -       yes
-    MC6803              128     64      -       yes
-    MC6802              128     32      -       no
-    MC6802NS            128     -       -       no
-    MC6808              -       -       -       no
+    Chip                RAM     NVRAM   ROM     SCI		r15-f	ports
+    -----------------------------------------------------------------
+    MC6800              -       -       -       no		no		4
+    MC6802              128     32      -       no		no		4
+    MC6802NS            128     -       -       no		no		4
+    MC6808              -       -       -       no		no		4
+    
+	MC6801              128     64      2K      yes		no		4
+    MC68701             128     64      -       yes		no		4
+    MC6803              128     64      -       yes		no		4
 
-    HD6301              128     -       4K      yes
-    HD63701             192     -       4K      yes
-    HD6303              128     -       -       yes
-    HD6801              128     64      2K      yes
+	MC6801U4			192		32		4K		yes		yes		4
+	MC6803U4			192		32		-		yes		yes		4
+
+    HD6801              128     64      2K      yes		no		4
+	HD6301V             128     -       4K      yes		no		4
+    HD63701V            192     -       4K      yes		no		4
+    HD6303R             128     -       -       yes		no		4
+
+	HD6301X				192		-		4K		yes		yes		6
+	HD6301Y             256     -       16K     yes		yes		6
+	HD6303X             192     -       -       yes		yes		6
+    HD6303Y             256     -       -       yes		yes		6
 
     NSC8105
     MS2010-A
@@ -142,14 +151,14 @@ struct _m6800_state
 
 	int		clock;
 	UINT8	trcsr, rmcr, rdr, tdr, rsr, tsr;
-	int		rxbits, txbits, txstate, trcsr_read, tx;
+	int		rxbits, txbits, txstate, trcsr_read_tdre, trcsr_read_orfe, trcsr_read_rdrf, tx;
+	int		port2_written;
 
 	int		icount;
 	int		latch09;
 
 	PAIR	timer_over;
-	emu_timer *m6800_rx_timer;
-	emu_timer *m6800_tx_timer;
+	emu_timer *sci_timer;
 	PAIR ea;		/* effective address */
 
 };
@@ -271,14 +280,14 @@ static UINT32 timer_next;
 #define M6800_TRCSR_RDRF		0x80 // Receive Data Register Full
 #define M6800_TRCSR_ORFE		0x40 // Over Run Framing Error
 #define M6800_TRCSR_TDRE		0x20 // Transmit Data Register Empty
-#define M6800_TRCSR_RIE		0x10 // Receive Interrupt Enable
+#define M6800_TRCSR_RIE			0x10 // Receive Interrupt Enable
 #define M6800_TRCSR_RE			0x08 // Receive Enable
-#define M6800_TRCSR_TIE		0x04 // Transmit Interrupt Enable
+#define M6800_TRCSR_TIE			0x04 // Transmit Interrupt Enable
 #define M6800_TRCSR_TE			0x02 // Transmit Enable
 #define M6800_TRCSR_WU			0x01 // Wake Up
 
-#define M6800_PORT2_IO4		0x10
-#define M6800_PORT2_IO3		0x08
+#define M6800_PORT2_IO4			0x10
+#define M6800_PORT2_IO3			0x08
 
 static const int M6800_RMCR_SS[] = { 16, 128, 1024, 4096 };
 
@@ -587,6 +596,7 @@ static void m6800_check_irq2(m6800_state *cpustate)
 			 ((cpustate->trcsr & (M6800_TRCSR_RIE|M6800_TRCSR_ORFE)) == (M6800_TRCSR_RIE|M6800_TRCSR_ORFE)) ||
 			 ((cpustate->trcsr & (M6800_TRCSR_TIE|M6800_TRCSR_TDRE)) == (M6800_TRCSR_TIE|M6800_TRCSR_TDRE)))
 	{
+		//logerror("M6800 '%s' SCI interrupt\n", cpustate->device->tag());
 		TAKE_SCI;
 	}
 }
@@ -665,31 +675,66 @@ INLINE void increment_counter(m6800_state *cpustate, int amount)
 		check_timer_event(cpustate);
 }
 
+INLINE void set_rmcr(m6800_state *cpustate, UINT8 data)
+{
+	if (cpustate->rmcr == data) return;
+
+	cpustate->rmcr = data;
+
+	switch ((cpustate->rmcr & M6800_RMCR_CC_MASK) >> 2)
+	{
+	case 0:
+	case 3: // not implemented
+		timer_enable(cpustate->sci_timer, 0);
+		break;
+
+	case 1:
+	case 2:
+		{
+			int divisor = M6800_RMCR_SS[cpustate->rmcr & M6800_RMCR_SS_MASK];
+
+			timer_adjust_periodic(cpustate->sci_timer, ATTOTIME_IN_HZ(cpustate->clock / divisor), 0, ATTOTIME_IN_HZ(cpustate->clock / divisor));
+		}
+		break;
+	}
+}
+
+INLINE void write_port2(m6800_state *cpustate)
+{
+	if (!cpustate->port2_written) return;
+
+	UINT8 data = cpustate->port2_data;
+	UINT8 ddr = cpustate->port2_ddr & 0x1f;
+
+	if ((ddr != 0x1f) && ddr)
+	{
+		data = (cpustate->port2_data & ddr)	| (ddr ^ 0xff);
+	}
+
+	if (cpustate->trcsr & M6800_TRCSR_TE)
+	{
+		data = (data & 0xef) | (cpustate->tx << 4);
+	}
+
+	data &= 0x1f;
+
+	cpustate->io->write_byte(M6803_PORT2, data);
+}
+
 /* include the opcode prototypes and function pointer tables */
 #include "6800tbl.c"
 
 /* include the opcode functions */
 #include "6800ops.c"
 
-static void m6800_tx(m6800_state *cpustate, int value)
-{
-	cpustate->port2_data = (cpustate->port2_data & 0xef) | (value << 4);
-
-	if(cpustate->port2_ddr == 0xff)
-		cpustate->io->write_byte(M6803_PORT2,cpustate->port2_data);
-	else
-		cpustate->io->write_byte(M6803_PORT2,(cpustate->port2_data & cpustate->port2_ddr)
-			| (cpustate->io->read_byte(M6803_PORT2) & (cpustate->port2_ddr ^ 0xff)));
-}
-
 static int m6800_rx(m6800_state *cpustate)
 {
 	return (cpustate->io->read_byte(M6803_PORT2) & M6800_PORT2_IO3) >> 3;
 }
 
-static TIMER_CALLBACK(m6800_tx_tick)
+static void serial_transmit(m6800_state *cpustate)
 {
-    m6800_state *cpustate = (m6800_state *)ptr;
+	//logerror("M6800 '%s' Tx Tick\n", cpustate->device->tag());
 
 	if (cpustate->trcsr & M6800_TRCSR_TE)
 	{
@@ -732,6 +777,8 @@ static TIMER_CALLBACK(m6800_tx_tick)
 					cpustate->tx = 0;
 
 					cpustate->txbits++;
+					
+					//logerror("M6800 '%s' Transmit START Data %02x\n", cpustate->device->tag(), cpustate->tsr);
 				}
 				break;
 
@@ -742,6 +789,8 @@ static TIMER_CALLBACK(m6800_tx_tick)
 				CHECK_IRQ_LINES(cpustate);
 
 				cpustate->txbits = M6800_SERIAL_START;
+
+				//logerror("M6800 '%s' Transmit STOP\n", cpustate->device->tag());
 				break;
 
 			default:
@@ -751,45 +800,52 @@ static TIMER_CALLBACK(m6800_tx_tick)
 				// shift transmit register
 				cpustate->tsr >>= 1;
 
+				//logerror("M6800 '%s' Transmit Bit %u: %u\n", cpustate->device->tag(), cpustate->txbits, cpustate->tx);
+
 				cpustate->txbits++;
 				break;
 			}
 			break;
 		}
-	}
 
-	m6800_tx(cpustate, cpustate->tx);
+		cpustate->port2_written = 1;
+		write_port2(cpustate);
+	}
 }
 
-static TIMER_CALLBACK(m6800_rx_tick)
+static void serial_receive(m6800_state *cpustate)
 {
-    m6800_state *cpustate = (m6800_state *)ptr;
-
+	//logerror("M6800 '%s' Rx Tick TRCSR %02x bits %u check %02x\n", cpustate->device->tag(), cpustate->trcsr, cpustate->rxbits, cpustate->trcsr & M6800_TRCSR_RE);
+	
 	if (cpustate->trcsr & M6800_TRCSR_RE)
 	{
 		if (cpustate->trcsr & M6800_TRCSR_WU)
 		{
 			// wait for 10 bits of '1'
-
 			if (m6800_rx(cpustate) == 1)
 			{
 				cpustate->rxbits++;
 
+				//logerror("M6800 '%s' Received WAKE UP bit %u\n", cpustate->device->tag(), cpustate->rxbits);
+
 				if (cpustate->rxbits == 10)
 				{
+					//logerror("M6800 '%s' Receiver Wake Up\n", cpustate->device->tag());
+
 					cpustate->trcsr &= ~M6800_TRCSR_WU;
 					cpustate->rxbits = M6800_SERIAL_START;
 				}
 			}
 			else
 			{
+				//logerror("M6800 '%s' Receiver Wake Up interrupted\n", cpustate->device->tag());
+
 				cpustate->rxbits = M6800_SERIAL_START;
 			}
 		}
 		else
 		{
 			// receive data
-
 			switch (cpustate->rxbits)
 			{
 			case M6800_SERIAL_START:
@@ -797,17 +853,22 @@ static TIMER_CALLBACK(m6800_rx_tick)
 				{
 					// start bit found
 					cpustate->rxbits++;
+				
+					//logerror("M6800 '%s' Received START bit\n", cpustate->device->tag());
 				}
 				break;
 
 			case M6800_SERIAL_STOP:
 				if (m6800_rx(cpustate) == 1)
 				{
+					//logerror("M6800 '%s' Received STOP bit\n", cpustate->device->tag());
+
 					if (cpustate->trcsr & M6800_TRCSR_RDRF)
 					{
 						// overrun error
-
 						cpustate->trcsr |= M6800_TRCSR_ORFE;
+
+						//logerror("M6800 '%s' Receive Overrun Error\n", cpustate->device->tag());
 
 						CHECK_IRQ_LINES(cpustate);
 					}
@@ -817,6 +878,8 @@ static TIMER_CALLBACK(m6800_rx_tick)
 						{
 							// transfer data into receive register
 							cpustate->rdr = cpustate->rsr;
+			
+							//logerror("M6800 '%s' Receive Data Register: %02x\n", cpustate->device->tag(), cpustate->rdr);
 
 							// set RDRF flag
 							cpustate->trcsr |= M6800_TRCSR_RDRF;
@@ -828,7 +891,6 @@ static TIMER_CALLBACK(m6800_rx_tick)
 				else
 				{
 					// framing error
-
 					if (!(cpustate->trcsr & M6800_TRCSR_ORFE))
 					{
 						// transfer unframed data into receive register
@@ -837,6 +899,8 @@ static TIMER_CALLBACK(m6800_rx_tick)
 
 					cpustate->trcsr |= M6800_TRCSR_ORFE;
 					cpustate->trcsr &= ~M6800_TRCSR_RDRF;
+
+					//logerror("M6800 '%s' Receive Framing Error\n", cpustate->device->tag());
 
 					CHECK_IRQ_LINES(cpustate);
 				}
@@ -851,11 +915,21 @@ static TIMER_CALLBACK(m6800_rx_tick)
 				// receive bit into register
 				cpustate->rsr |= (m6800_rx(cpustate) << 7);
 
+				//logerror("M6800 '%s' Received DATA bit %u: %u\n", cpustate->device->tag(), cpustate->rxbits, BIT(cpustate->rsr, 7));
+
 				cpustate->rxbits++;
 				break;
 			}
 		}
 	}
+}
+
+static TIMER_CALLBACK( sci_tick )
+{
+    m6800_state *cpustate = (m6800_state *)ptr;
+
+	serial_transmit(cpustate);
+	serial_receive(cpustate);
 }
 
 /****************************************************************************
@@ -883,6 +957,7 @@ static void state_register(m6800_state *cpustate, const char *type)
 	state_save_register_device_item(cpustate->device, 0, cpustate->port2_data);
 	state_save_register_device_item(cpustate->device, 0, cpustate->port3_data);
 	state_save_register_device_item(cpustate->device, 0, cpustate->port4_data);
+	state_save_register_device_item(cpustate->device, 0, cpustate->port2_written);
 	state_save_register_device_item(cpustate->device, 0, cpustate->tcsr);
 	state_save_register_device_item(cpustate->device, 0, cpustate->pending_tcsr);
 	state_save_register_device_item(cpustate->device, 0, cpustate->irq2);
@@ -903,7 +978,9 @@ static void state_register(m6800_state *cpustate, const char *type)
 	state_save_register_device_item(cpustate->device, 0, cpustate->rxbits);
 	state_save_register_device_item(cpustate->device, 0, cpustate->txbits);
 	state_save_register_device_item(cpustate->device, 0, cpustate->txstate);
-	state_save_register_device_item(cpustate->device, 0, cpustate->trcsr_read);
+	state_save_register_device_item(cpustate->device, 0, cpustate->trcsr_read_tdre);
+	state_save_register_device_item(cpustate->device, 0, cpustate->trcsr_read_orfe);
+	state_save_register_device_item(cpustate->device, 0, cpustate->trcsr_read_rdrf);
 	state_save_register_device_item(cpustate->device, 0, cpustate->tx);
 }
 
@@ -940,6 +1017,7 @@ static CPU_RESET( m6800 )
 
 	cpustate->port1_ddr = 0x00;
 	cpustate->port2_ddr = 0x00;
+	cpustate->port2_written = 0;
 	/* TODO: on reset port 2 should be read to determine the operating mode (bits 0-2) */
 	cpustate->tcsr = 0x00;
 	cpustate->pending_tcsr = 0x00;
@@ -950,12 +1028,15 @@ static CPU_RESET( m6800 )
 	cpustate->ram_ctrl |= 0x40;
 
 	cpustate->trcsr = M6800_TRCSR_TDRE;
-	cpustate->rmcr = 0;
-	if (cpustate->m6800_rx_timer) timer_enable(cpustate->m6800_rx_timer, 0);
-	if (cpustate->m6800_tx_timer) timer_enable(cpustate->m6800_tx_timer, 0);
+
 	cpustate->txstate = M6800_TX_STATE_INIT;
 	cpustate->txbits = cpustate->rxbits = 0;
-	cpustate->trcsr_read = 0;
+	cpustate->tx = 1;
+	cpustate->trcsr_read_tdre = 0;
+	cpustate->trcsr_read_orfe = 0;
+	cpustate->trcsr_read_rdrf = 0;
+
+	set_rmcr(cpustate, 0);
 
 	cpustate->cc = 0xc0;
 }
@@ -1046,8 +1127,7 @@ static CPU_INIT( m6801 )
 	cpustate->io = device->space(AS_IO);
 
 	cpustate->clock = device->clock() / 4;
-	cpustate->m6800_rx_timer = timer_alloc(device->machine, m6800_rx_tick, cpustate);
-	cpustate->m6800_tx_timer = timer_alloc(device->machine, m6800_tx_tick, cpustate);
+	cpustate->sci_timer = timer_alloc(device->machine, sci_tick, cpustate);
 
 	state_register(cpustate, "m6801");
 }
@@ -1090,8 +1170,7 @@ static CPU_INIT( m6803 )
 	cpustate->io = device->space(AS_IO);
 
 	cpustate->clock = device->clock() / 4;
-	cpustate->m6800_rx_timer = timer_alloc(device->machine, m6800_rx_tick, cpustate);
-	cpustate->m6800_tx_timer = timer_alloc(device->machine, m6800_tx_tick, cpustate);
+	cpustate->sci_timer = timer_alloc(device->machine, sci_tick, cpustate);
 
 	state_register(cpustate, "m6803");
 }
@@ -1145,8 +1224,7 @@ static CPU_INIT( hd63701 )
 	cpustate->io = device->space(AS_IO);
 
 	cpustate->clock = device->clock() / 4;
-	cpustate->m6800_rx_timer = timer_alloc(device->machine, m6800_rx_tick, cpustate);
-	cpustate->m6800_tx_timer = timer_alloc(device->machine, m6800_tx_tick, cpustate);
+	cpustate->sci_timer = timer_alloc(device->machine, sci_tick, cpustate);
 
 	state_register(cpustate, "hd63701");
 }
@@ -1209,20 +1287,32 @@ static READ8_HANDLER( m6803_internal_registers_r )
 		case 0x01:
 			return cpustate->port2_ddr;
 		case 0x02:
-			return (cpustate->io->read_byte(M6803_PORT1) & (cpustate->port1_ddr ^ 0xff))
+			if(cpustate->port1_ddr == 0xff)
+				return cpustate->port1_data;
+			else
+				return (cpustate->io->read_byte(M6803_PORT1) & (cpustate->port1_ddr ^ 0xff))
 					| (cpustate->port1_data & cpustate->port1_ddr);
 		case 0x03:
-			return (cpustate->io->read_byte(M6803_PORT2) & (cpustate->port2_ddr ^ 0xff))
+			if(cpustate->port2_ddr == 0xff)
+				return cpustate->port2_data;
+			else
+				return (cpustate->io->read_byte(M6803_PORT2) & (cpustate->port2_ddr ^ 0xff))
 					| (cpustate->port2_data & cpustate->port2_ddr);
 		case 0x04:
 			return cpustate->port3_ddr;
 		case 0x05:
 			return cpustate->port4_ddr;
 		case 0x06:
-			return (cpustate->io->read_byte(M6803_PORT3) & (cpustate->port3_ddr ^ 0xff))
+			if(cpustate->port3_ddr == 0xff)
+				return cpustate->port3_data;
+			else
+				return (cpustate->io->read_byte(M6803_PORT3) & (cpustate->port3_ddr ^ 0xff))
 					| (cpustate->port3_data & cpustate->port3_ddr);
 		case 0x07:
-			return (cpustate->io->read_byte(M6803_PORT4) & (cpustate->port4_ddr ^ 0xff))
+			if(cpustate->port4_ddr == 0xff)
+				return cpustate->port4_data;
+			else
+				return (cpustate->io->read_byte(M6803_PORT4) & (cpustate->port4_ddr ^ 0xff))
 					| (cpustate->port4_data & cpustate->port4_ddr);
 		case 0x08:
 			cpustate->pending_tcsr = 0;
@@ -1265,13 +1355,30 @@ static READ8_HANDLER( m6803_internal_registers_r )
 		case 0x10:
 			return cpustate->rmcr;
 		case 0x11:
-			cpustate->trcsr_read = 1;
+			if (cpustate->trcsr & M6800_TRCSR_TDRE)
+			{
+				cpustate->trcsr_read_tdre = 1;
+			}
+			if (cpustate->trcsr & M6800_TRCSR_ORFE)
+			{
+				cpustate->trcsr_read_orfe = 1;
+			}
+			if (cpustate->trcsr & M6800_TRCSR_RDRF)
+			{
+				cpustate->trcsr_read_rdrf = 1;
+			}
 			return cpustate->trcsr;
 		case 0x12:
-			if (cpustate->trcsr_read)
+			if (cpustate->trcsr_read_orfe)
 			{
-				cpustate->trcsr_read = 0;
-				cpustate->trcsr = cpustate->trcsr & 0x3f;
+				cpustate->trcsr_read_orfe = 0;
+				cpustate->trcsr &= ~M6800_TRCSR_ORFE;
+			}
+			if (cpustate->trcsr_read_rdrf)
+			{
+				//logerror("M6801 '%s' Clear RDRF\n", space->cpu->tag());
+				cpustate->trcsr_read_rdrf = 0;
+				cpustate->trcsr &= ~M6800_TRCSR_RDRF;
 			}
 			return cpustate->rdr;
 		case 0x13:
@@ -1308,7 +1415,7 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 				cpustate->port1_ddr = data;
 				if(cpustate->port1_ddr == 0xff)
 					cpustate->io->write_byte(M6803_PORT1,cpustate->port1_data);
-				else
+				else if (cpustate->port1_ddr)
 					cpustate->io->write_byte(M6803_PORT1,(cpustate->port1_data & cpustate->port1_ddr)
 						| (cpustate->io->read_byte(M6803_PORT1) & (cpustate->port1_ddr ^ 0xff)));
 			}
@@ -1317,11 +1424,7 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 			if (cpustate->port2_ddr != data)
 			{
 				cpustate->port2_ddr = data;
-				if(cpustate->port2_ddr == 0xff)
-					cpustate->io->write_byte(M6803_PORT2,cpustate->port2_data);
-				else
-					cpustate->io->write_byte(M6803_PORT2,(cpustate->port2_data & cpustate->port2_ddr)
-						| (cpustate->io->read_byte(M6803_PORT2) & (cpustate->port2_ddr ^ 0xff)));
+				write_port2(cpustate);
 
 				if (cpustate->port2_ddr & 2)
 					logerror("CPU '%s' PC %04x: warning - port 2 bit 1 set as output (OLVL) - not supported\n",space->cpu->tag(),cpu_get_pc(space->cpu));
@@ -1331,24 +1434,14 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 			cpustate->port1_data = data;
 			if(cpustate->port1_ddr == 0xff)
 				cpustate->io->write_byte(M6803_PORT1,cpustate->port1_data);
-			else
+			else if (cpustate->port1_ddr)
 				cpustate->io->write_byte(M6803_PORT1,(cpustate->port1_data & cpustate->port1_ddr)
 					| (cpustate->io->read_byte(M6803_PORT1) & (cpustate->port1_ddr ^ 0xff)));
 			break;
 		case 0x03:
-			if (cpustate->trcsr & M6800_TRCSR_TE)
-			{
-				cpustate->port2_data = (data & 0xef) | (cpustate->tx << 4);
-			}
-			else
-			{
-				cpustate->port2_data = data;
-			}
-			if(cpustate->port2_ddr == 0xff)
-				cpustate->io->write_byte(M6803_PORT2,cpustate->port2_data);
-			else
-				cpustate->io->write_byte(M6803_PORT2,(cpustate->port2_data & cpustate->port2_ddr)
-					| (cpustate->io->read_byte(M6803_PORT2) & (cpustate->port2_ddr ^ 0xff)));
+			cpustate->port2_data = data;
+			cpustate->port2_written = 1;
+			write_port2(cpustate);
 			break;
 		case 0x04:
 			if (cpustate->port3_ddr != data)
@@ -1356,7 +1449,7 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 				cpustate->port3_ddr = data;
 				if(cpustate->port3_ddr == 0xff)
 					cpustate->io->write_byte(M6803_PORT3,cpustate->port3_data);
-				else
+				else if (cpustate->port3_ddr)
 					cpustate->io->write_byte(M6803_PORT3,(cpustate->port3_data & cpustate->port3_ddr)
 						| (cpustate->io->read_byte(M6803_PORT3) & (cpustate->port3_ddr ^ 0xff)));
 			}
@@ -1367,7 +1460,7 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 				cpustate->port4_ddr = data;
 				if(cpustate->port4_ddr == 0xff)
 					cpustate->io->write_byte(M6803_PORT4,cpustate->port4_data);
-				else
+				else if (cpustate->port4_ddr)
 					cpustate->io->write_byte(M6803_PORT4,(cpustate->port4_data & cpustate->port4_ddr)
 						| (cpustate->io->read_byte(M6803_PORT4) & (cpustate->port4_ddr ^ 0xff)));
 			}
@@ -1376,7 +1469,7 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 			cpustate->port3_data = data;
 			if(cpustate->port3_ddr == 0xff)
 				cpustate->io->write_byte(M6803_PORT3,cpustate->port3_data);
-			else
+			else if (cpustate->port3_ddr)
 				cpustate->io->write_byte(M6803_PORT3,(cpustate->port3_data & cpustate->port3_ddr)
 					| (cpustate->io->read_byte(M6803_PORT3) & (cpustate->port3_ddr ^ 0xff)));
 			break;
@@ -1384,7 +1477,7 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 			cpustate->port4_data = data;
 			if(cpustate->port4_ddr == 0xff)
 				cpustate->io->write_byte(M6803_PORT4,cpustate->port4_data);
-			else
+			else if (cpustate->port4_ddr)
 				cpustate->io->write_byte(M6803_PORT4,(cpustate->port4_data & cpustate->port4_ddr)
 					| (cpustate->io->read_byte(M6803_PORT4) & (cpustate->port4_ddr ^ 0xff)));
 			break;
@@ -1429,38 +1522,28 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 			logerror("CPU '%s' PC %04x: warning - write %02x to unsupported internal register %02x\n",space->cpu->tag(),cpu_get_pc(space->cpu),data,offset);
 			break;
 		case 0x10:
-			cpustate->rmcr = data & 0x0f;
-
-			switch ((cpustate->rmcr & M6800_RMCR_CC_MASK) >> 2)
-			{
-			case 0:
-			case 3: // not implemented
-				timer_enable(cpustate->m6800_rx_timer, 0);
-				timer_enable(cpustate->m6800_tx_timer, 0);
-				break;
-
-			case 1:
-			case 2:
-				{
-					int divisor = M6800_RMCR_SS[cpustate->rmcr & M6800_RMCR_SS_MASK];
-
-					timer_adjust_periodic(cpustate->m6800_rx_timer, attotime_zero, 0, ATTOTIME_IN_HZ(cpustate->clock / divisor));
-					timer_adjust_periodic(cpustate->m6800_tx_timer, attotime_zero, 0, ATTOTIME_IN_HZ(cpustate->clock / divisor));
-				}
-				break;
-			}
+			set_rmcr(cpustate, data);
 			break;
 		case 0x11:
 			if ((data & M6800_TRCSR_TE) && !(cpustate->trcsr & M6800_TRCSR_TE))
 			{
 				cpustate->txstate = M6800_TX_STATE_INIT;
+				cpustate->txbits = 0;
+				cpustate->tx = 1;
 			}
+			
+			if ((data & M6800_TRCSR_RE) && !(cpustate->trcsr & M6800_TRCSR_RE))
+			{
+				cpustate->rxbits = 0;
+			}
+
 			cpustate->trcsr = (cpustate->trcsr & 0xe0) | (data & 0x1f);
 			break;
 		case 0x13:
-			if (cpustate->trcsr_read)
+			//logerror("M6800 '%s' Transmit Data Register: %02x\n", space->cpu->tag(), data);
+			if (cpustate->trcsr_read_tdre)
 			{
-				cpustate->trcsr_read = 0;
+				cpustate->trcsr_read_tdre = 0;
 				cpustate->trcsr &= ~M6800_TRCSR_TDRE;
 			}
 			cpustate->tdr = data;
