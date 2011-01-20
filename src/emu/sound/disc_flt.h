@@ -128,6 +128,7 @@ DISCRETE_CLASS_STEP_RESET(dst_rcintegrate, 1,
 	double			m_exp_exponent1;
 	double			m_c_exp0;
 	double			m_c_exp1;
+	double 			m_EM_IC_0_7;
 );
 
 DISCRETE_CLASS_STEP_RESET(dst_rcdisc_mod, 1,

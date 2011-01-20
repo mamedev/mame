@@ -1538,125 +1538,105 @@ DISCRETE_STEP(dst_aswitch)
  * input[4]    - Channel4 input value
  *
  ************************************************************************/
-#define DST_TRANSFORM__IN0		DISCRETE_INPUT(0)
-#define DST_TRANSFORM__IN1		DISCRETE_INPUT(1)
-#define DST_TRANSFORM__IN2		DISCRETE_INPUT(2)
-#define DST_TRANSFORM__IN3		DISCRETE_INPUT(3)
-#define DST_TRANSFORM__IN4		DISCRETE_INPUT(4)
-
 #define MAX_TRANS_STACK	16
 
-INLINE double dst_transform_pop(double *stack, int *pointer)
-{
-	//decrement THEN read
-	assert(*pointer > 0);
-	(*pointer)--;
-	return stack[*pointer];
-}
-
-INLINE void dst_transform_push(double *stack, int *pointer, double value)
-{
-	//Store THEN increment
-	assert(*pointer < MAX_TRANS_STACK);
-	stack[(*pointer)++] = value;
-}
+struct double_stack {
+public:
+	double_stack() : p(&stk[0])  { }
+	inline void push(double v)
+	{
+		//Store THEN increment
+		assert(p <= &stk[MAX_TRANS_STACK-1]);
+		*p++ = v;
+	}
+	inline double pop(void)
+	{
+		//decrement THEN read
+		assert(p > &stk[0]);
+		p--;
+		return *p;
+	}
+private:
+	double stk[MAX_TRANS_STACK];
+	double *p;
+};
 
 DISCRETE_STEP(dst_transform)
 {
-	double	trans_stack[MAX_TRANS_STACK];
-	double	number1,top;
-	int		trans_stack_ptr = 0;
+	double_stack	stack;
+	double  top;
 
-	const char *fPTR = (const char *)this->custom_data();
+	enum token *fPTR = &precomp[0];
 
 	top = HUGE_VAL;
+
+	while(*fPTR != TOK_END)
+	{
+		switch (*fPTR++)
+		{
+			case TOK_MULT: 		top = stack.pop() * top;					break;
+			case TOK_DIV:		top = stack.pop() / top;					break;
+			case TOK_ADD:		top = stack.pop() + top;					break;
+			case TOK_MINUS:		top = stack.pop() - top;					break;
+			case TOK_0:			stack.push(top); top = I_IN0();				break;
+			case TOK_1:			stack.push(top); top = I_IN1();				break;
+			case TOK_2:			stack.push(top); top = I_IN2();				break;
+			case TOK_3:			stack.push(top); top = I_IN3();				break;
+			case TOK_4:			stack.push(top); top = I_IN4();				break;
+			case TOK_DUP:		stack.push(top);							break;
+			case TOK_ABS:		top = fabs(top);							break;	/* absolute value */
+			case TOK_NEG:		top = -top;									break;	/* * -1 */
+			case TOK_NOT:		top = !top;									break;	/* Logical NOT of Last Value */
+			case TOK_EQUAL:		top = (int)stack.pop() == (int)top;			break;	/* Logical = */
+			case TOK_GREATER:	top = (stack.pop() > top);					break;	/* Logical > */
+			case TOK_LESS:		top = (stack.pop() < top);					break;	/* Logical < */
+			case TOK_AND:		top = (int)stack.pop() & (int)top;			break;	/* Bitwise AND */
+			case TOK_OR:		top = (int)stack.pop() | (int)top;			break;	/* Bitwise OR */
+			case TOK_XOR:		top = (int)stack.pop() ^ (int)top;			break;	/* Bitwise XOR */
+			case TOK_END:		break; /* please compiler */
+		}
+	}
+	this->output[0] = top;
+}
+
+DISCRETE_RESET(dst_transform)
+{
+	const char *fPTR = (const char *)this->custom_data();
+	enum token *p = &precomp[0];
 
 	while(*fPTR != 0)
 	{
 		switch (*fPTR++)
 		{
-			case '*':
-				number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
-				top = number1 * top;
-				break;
-			case '/':
-				number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
-				top = number1 / top;
-				break;
-			case '+':
-				number1=dst_transform_pop(trans_stack, &trans_stack_ptr);
-				top = number1 + top;
-				break;
-			case '-':
-				number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
-				top = number1 - top;
-				break;
-			case '0':
-				dst_transform_push(trans_stack, &trans_stack_ptr, top);
-				top = DST_TRANSFORM__IN0;
-				break;
-			case '1':
-				dst_transform_push(trans_stack, &trans_stack_ptr, top);
-				top = DST_TRANSFORM__IN1;
-				break;
-			case '2':
-				dst_transform_push(trans_stack, &trans_stack_ptr, top);
-				top = DST_TRANSFORM__IN2;
-				break;
-			case '3':
-				dst_transform_push(trans_stack, &trans_stack_ptr, top);
-				top = DST_TRANSFORM__IN3;
-				break;
-			case '4':
-				dst_transform_push(trans_stack, &trans_stack_ptr, top);
-				top = DST_TRANSFORM__IN4;
-				break;
-			case 'P':
-				dst_transform_push(trans_stack, &trans_stack_ptr, top);
-				break;
-			case 'a':	/* absolute value */
-				top = fabs(top);
-				break;
-			case 'i':	/* * -1 */
-				top = -top;
-				break;
-			case '!':	/* Logical NOT of Last Value */
-				top = !top;
-				break;
-			case '=':	/* Logical = */
-				number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
-				top = (int)number1 == (int)top;
-				break;
-			case '>':	/* Logical > */
-				number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
-				top = number1 > top;
-				break;
-			case '<':	/* Logical < */
-				number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
-				top = number1 < top;
-				break;
-			case '&':	/* Bitwise AND */
-				number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
-				top = (int)number1 & (int)top;
-				break;
-			case '|':	/* Bitwise OR */
-				number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
-				top = (int)number1 | (int)top;
-				break;
-			case '^':	/* Bitwise XOR */
-				number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
-				top = (int)number1 ^ (int)top;
-				break;
+			case '*':	*p = TOK_MULT;		break;
+			case '/':	*p = TOK_DIV;		break;
+			case '+':	*p = TOK_ADD;		break;
+			case '-':	*p = TOK_MINUS;		break;
+			case '0':	*p = TOK_0;			break;
+			case '1':	*p = TOK_1;			break;
+			case '2':	*p = TOK_2;			break;
+			case '3':	*p = TOK_3;			break;
+			case '4':	*p = TOK_4;			break;
+			case 'P':	*p = TOK_DUP;		break;
+			case 'a':	*p = TOK_ABS;		break; /* absolute value */
+			case 'i':	*p = TOK_NEG; 		break; /* * -1 */
+			case '!':	*p = TOK_NOT;		break; /* Logical NOT of Last Value */
+			case '=':	*p = TOK_EQUAL;		break; /* Logical = */
+			case '>':	*p = TOK_GREATER;	break; /* Logical > */
+			case '<':	*p = TOK_LESS;		break; /* Logical < */
+			case '&':	*p = TOK_AND;		break; /* Bitwise AND */
+			case '|':	*p = TOK_OR;		break; /* Bitwise OR */
+			case '^':	*p = TOK_XOR;		break; /* Bitwise XOR */
 			default:
 				m_device->discrete_log("dst_transform_step - Invalid function type/variable passed: %s",(const char *)this->custom_data());
 				/* that is enough to fatalerror */
 				fatalerror("dst_transform_step - Invalid function type/variable passed: %s", (const char *)this->custom_data());
 				break;
 		}
+		p++;
 	}
-	this->output[0] = top;
+	*p = TOK_END;
 }
-
 
 /************************************************************************
  *

@@ -97,7 +97,45 @@ DISCRETE_CLASS_STEP(dst_switch, 1, /* no context */ );
 
 DISCRETE_CLASS_STEP(dst_aswitch, 1, /* no context */ );
 
-DISCRETE_CLASS_STEP(dst_transform, 1, /* no context */ );
+DISCRETE_CLASS_STEP(, 1, /* no context */ );
+class DISCRETE_CLASS_NAME(dst_transform): public discrete_base_node, public discrete_step_interface
+{
+	DISCRETE_CLASS_CONSTRUCTOR(dst_transform, base)
+	DISCRETE_CLASS_DESTRUCTOR(dst_transform)
+public:
+	enum token {
+		TOK_END = 0,
+		TOK_MULT,
+		TOK_DIV,
+		TOK_ADD,
+		TOK_MINUS,
+		TOK_0,
+		TOK_1,
+		TOK_2,
+		TOK_3,
+		TOK_4,
+		TOK_DUP,
+		TOK_ABS,		 /* absolute value */
+		TOK_NEG, 		 /* * -1 */
+		TOK_NOT,		 /* Logical NOT of Last Value */
+		TOK_EQUAL,		 /* Logical = */
+		TOK_GREATER,	 /* Logical > */
+		TOK_LESS,		 /* Logical < */
+		TOK_AND,		 /* Bitwise AND */
+		TOK_OR,		 	 /* Bitwise OR */
+		TOK_XOR			 /* Bitwise XOR */
+	};
+	void step(void);
+	void reset(void);
+protected:
+private:
+	DISCRETE_CLASS_INPUT(I_IN0, 	0);
+	DISCRETE_CLASS_INPUT(I_IN1, 	1);
+	DISCRETE_CLASS_INPUT(I_IN2,		2);
+	DISCRETE_CLASS_INPUT(I_IN3,		3);
+	DISCRETE_CLASS_INPUT(I_IN4,		4);
+	enum token precomp[32];
+};
 
 /* Component specific */
 

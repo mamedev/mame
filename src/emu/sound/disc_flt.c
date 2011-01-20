@@ -1164,8 +1164,14 @@ DISCRETE_STEP( dst_rcintegrate)
 
 	u = DST_RCINTEGRATE__IN1;
 	if (u > 0.7 + vE)
+	{
 		vE = u - 0.7;
-	iQc = EM_IC(u - vE);
+		//iQc = EM_IC(u - vE);
+		iQc = m_EM_IC_0_7;
+	}
+	else
+		iQc = EM_IC(u - vE);
+
 	m_vCE = MIN(vP - 0.1, vP - RG * iQc);
 
 	/* Avoid oscillations
@@ -1212,6 +1218,8 @@ DISCRETE_RESET(dst_rcintegrate)
 	m_exp_exponent1 = exp(dt / m_exponent1);
 	m_c_exp0 =  DST_RCINTEGRATE__C / m_exponent0 * m_exp_exponent0;
 	m_c_exp1 =  DST_RCINTEGRATE__C / m_exponent1 * m_exp_exponent1;
+
+	m_EM_IC_0_7 = EM_IC(0.7);
 
 	this->output[0] = 0;
 }
