@@ -9923,6 +9923,7 @@ Other Sun games
 	DRIVER( lucky8a )	/* (c) 1989 Wing Co. Ltd */
 	DRIVER( lucky8b )	/* (c) 1989 Wing Co. Ltd */
 	DRIVER( luckgrln )	/* (c) 1991 Wing Co. Ltd */
+	DRIVER( luckylad )	/* (c) 1985 Wing Co. Ltd */
 
 	DRIVER( skill98 )	/* (c) 1998 Amcoe */
 	DRIVER( match98 )	/* (c) 1998 Amcoe */
