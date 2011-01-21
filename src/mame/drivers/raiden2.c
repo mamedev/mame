@@ -164,16 +164,32 @@ WRITE16_MEMBER(raiden2_state::cop_pgm_data_w)
 		int reg = (data >> 5) & 3;
 		int op = (data >> 7) & 31;
 
-		logerror("COPDIS: %04x %x %04x %02x %03x %02x.%x.%02x ", cop_latch_trigger, cop_latch_value, cop_latch_mask, cop_latch_addr, data, op, reg, off);
+		logerror("COPDIS: %04x s=%02x f1=%x l=%x f2=%02x %x %04x %02x %03x %02x.%x.%02x ", cop_latch_trigger,  (cop_latch_trigger >> 11) << 3, (cop_latch_trigger >> 10) & 1, ((cop_latch_trigger >> 7) & 7)+1, cop_latch_trigger & 0x7f, cop_latch_value, cop_latch_mask, cop_latch_addr, data, op, reg, off);
 
 		off *= 2;
+
+		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 00 188 03.0.08 read32 10(r0)
+		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 01 282 05.0.02 add32 4(r0)
+		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 02 082 01.0.02 write32 4(r0)
+		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 03 b8e 17.0.0e add16h 1c(r0)
+		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 04 98e 13.0.0e write16h 1c(r0)
+
+		// 188 182 082 b8e 98e -> 04  = 04+04    1ch = 1c+04
+		// 188 188 082 b8e 98e -> 04  = 04+10    1ch = 1c+10
+		// 188 18e 082 b8e 98e -> 04  = 04+1c    1ch = 1c+1c
+		// 188 282 082 b8e 98e -> 04  = 04+10    1ch = 1c+10
+		// 188 288 082 b8e 98e -> 04  = 10+10    1ch = 1c+10
+		// 188 28e 082 b8e 98e -> 04  = 1c+10    1ch = 1c+10
+		// 188 282 282 282 082 -> 04  = 04+04+10 10h = 04+10
+		// 188 188 188 188 082 -> 04h = 04+10    04l = 04+10+10
+		// 188 188 188 188 082 -> 04  = 04+10    04l = 04+10+10  10h = 04+10 (same, but trigger = 020b)
 
 		switch(op) {
 		case 0x01:
 			if(off)
-				logerror("write32 %x(r%x)\n", off, reg);
+				logerror("addmem32 %x(r%x)\n", off, reg);
 			else
-				logerror("write32 (r%x)\n", reg);
+				logerror("addmem32 (r%x)\n", reg);
 			break;
 		case 0x03:
 			if(off)
@@ -194,13 +210,17 @@ WRITE16_MEMBER(raiden2_state::cop_pgm_data_w)
 				logerror("write16h (r%x)\n", reg);
 			break;
 		case 0x15:
-			logerror("sub %x(r%x)\n", off, reg);
+			if(off)
+				logerror("sub32 %x(r%x)\n", off, reg);
+			else
+				logerror("sub32 (r%x)\n", reg);
+			break;
 			break;
 		case 0x17:
 			if(off)
-				logerror("add16h %x(r%x)\n", off, reg);
+				logerror("addmem16 %x(r%x)\n", off, reg);
 			else
-				logerror("add16h (r%x)\n", reg);
+				logerror("addmem16 (r%x)\n", reg);
 			break;
 		default:
 			logerror("?\n");
@@ -527,14 +547,17 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 	}
 
 	case 0x5205:   // 5205 0006 fff7 0050 - 0180 02e0 03a0 00a0 03a0 0000 0000 0000
+		//		fprintf(stderr, "sprcpt 5205 %04x %04x %04x %08x %08x\n", cop_regs[0], cop_regs[1], cop_regs[3], space.read_dword(cop_regs[0]), space.read_dword(cop_regs[3]));
 		space.write_dword(cop_regs[1], space.read_dword(cop_regs[0]));
 		break;
 
 	case 0x5a05:   // 5a05 0006 fff7 0058 - 0180 02e0 03a0 00a0 03a0 0000 0000 0000
+		//		fprintf(stderr, "sprcpt 5a05 %04x %04x %04x %08x %08x\n", cop_regs[0], cop_regs[1], cop_regs[3], space.read_dword(cop_regs[0]), space.read_dword(cop_regs[3]));
 		space.write_dword(cop_regs[1], space.read_dword(cop_regs[0]));
 		break;
 
 	case 0xf205:   // f205 0006 fff7 00f0 - 0182 02e0 03c0 00c0 03c0 0000 0000 0000
+		//		fprintf(stderr, "sprcpt f205 %04x %04x %04x %08x %08x\n", cop_regs[0]+4, cop_regs[1], cop_regs[3], space.read_dword(cop_regs[0]+4), space.read_dword(cop_regs[3]));
 		space.write_dword(cop_regs[2], space.read_dword(cop_regs[0]+4));
 		break;
 
