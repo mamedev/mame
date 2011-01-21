@@ -139,8 +139,8 @@ device_t *bsmt2000_device_config::alloc_device(running_machine &machine) const
 
 
 //-------------------------------------------------
-//  static_set_pin7 - configuration helper to set
-//  the pin 7 state
+//  static_set_ready_callback - configuration 
+//  helper to set the ready callback
 //-------------------------------------------------
 
 void bsmt2000_device_config::static_set_ready_callback(device_config *device, ready_callback callback)
@@ -228,6 +228,15 @@ void bsmt2000_device::device_start()
 	// internally at 24MHz the max output sample rate is 32kHz
 	// divided by 128 gives us 6x the max output rate which is plenty for oversampling
 	m_stream = stream_create(this, 0, 2, clock() / 128, this, stream_update_stub<bsmt2000_device, &bsmt2000_device::stream_generate>);
+	
+	// register for save states
+	state_save_register_device_item(this, 0, m_register_select);
+	state_save_register_device_item(this, 0, m_write_data);
+	state_save_register_device_item(this, 0, m_rom_address);
+	state_save_register_device_item(this, 0, m_rom_bank);
+	state_save_register_device_item(this, 0, m_left_data);
+	state_save_register_device_item(this, 0, m_right_data);
+	state_save_register_device_item(this, 0, m_write_pending);
 }
 
 
