@@ -588,7 +588,7 @@ static int parse_ini_file(core_options *options, const char *name, int priority)
 
 	/* parse the file and close it */
 	mame_printf_verbose("Parsing %s.ini\n", name);
-	options_parse_ini_file(options, mame_core_file(file), priority);
+	options_parse_ini_file(options, mame_core_file(file), priority, OPTION_PRIORITY_DRIVER_INI);
 	mame_fclose(file);
 	return TRUE;
 }

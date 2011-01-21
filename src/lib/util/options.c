@@ -544,7 +544,7 @@ int options_force_option_callback(core_options *opts, const char *optionname, co
     of entries in an INI file
 -------------------------------------------------*/
 
-int options_parse_ini_file(core_options *opts, core_file *inifile, int priority)
+int options_parse_ini_file(core_options *opts, core_file *inifile, int priority, int ignoreprio)
 {
 	char buffer[4096];
 
@@ -594,7 +594,7 @@ int options_parse_ini_file(core_options *opts, core_file *inifile, int priority)
 		data = find_entry_data(opts, optionname, FALSE);
 		if (data == NULL)
 		{
-			message(opts, OPTMSG_WARNING, "Warning: unknown option in INI: %s\n", optionname);
+			if (priority >= ignoreprio) message(opts, OPTMSG_WARNING, "Warning: unknown option in INI: %s\n", optionname);
 			continue;
 		}
 		if ((data->flags & (OPTION_DEPRECATED | OPTION_INTERNAL)) != 0)

@@ -175,7 +175,7 @@ int options_parse_command_line(core_options *opts, int argc, char **argv, int pr
 int options_force_option_callback(core_options *opts, const char *optionname, const char *newval, int priority);
 
 /* parse option data from an INI file */
-int options_parse_ini_file(core_options *opts, core_file *inifile, int priority);
+int options_parse_ini_file(core_options *opts, core_file *inifile, int priority, int ignoreprio);
 
 
 
