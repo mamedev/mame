@@ -427,6 +427,7 @@ static DEVICE_RESET( common_sh_reset )
 	state->sh6840_volume[0] = 0;
 	state->sh6840_volume[1] = 0;
 	state->sh6840_volume[2] = 0;
+	state->sh6840_volume[3] = 0;
 	state->sh6840_clock_count = 0;
 	state->sh6840_noiselatch1 = 0;
 	state->sh6840_noiselatch3 = 0;
