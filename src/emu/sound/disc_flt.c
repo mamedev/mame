@@ -58,7 +58,7 @@ DISCRETE_STEP(dst_crfilter)
 
 	double v_out = DST_CRFILTER__IN - m_vCap;
 	double v_diff = v_out - DST_CRFILTER__VREF;
-	this->output[0] = v_out;
+	set_output(0,  v_out);
 	m_vCap += v_diff * m_exponent;
 }
 
@@ -68,7 +68,7 @@ DISCRETE_RESET(dst_crfilter)
 	m_rc = DST_CRFILTER__R * DST_CRFILTER__C;
 	m_exponent = RC_CHARGE_EXP(m_rc);
 	m_vCap = 0;
-	this->output[0] = DST_CRFILTER__IN;
+	set_output(0,  DST_CRFILTER__IN);
 }
 
 
@@ -118,22 +118,24 @@ static void calculate_filter1_coefficients(discrete_base_node *node, double fc, 
 DISCRETE_STEP(dst_filter1)
 {
 	double gain = 1.0;
+	double v_out;
 
 	if (DST_FILTER1__ENABLE == 0.0)
 	{
 		gain = 0.0;
 	}
 
-	this->output[0] = -m_fc.a1*m_fc.y1 + m_fc.b0*gain*DST_FILTER1__IN + m_fc.b1*m_fc.x1;
+	v_out = -m_fc.a1*m_fc.y1 + m_fc.b0*gain*DST_FILTER1__IN + m_fc.b1*m_fc.x1;
 
 	m_fc.x1 = gain*DST_FILTER1__IN;
-	m_fc.y1 = this->output[0];
+	m_fc.y1 = v_out;
+	set_output(0, v_out);
 }
 
 DISCRETE_RESET(dst_filter1)
 {
 	calculate_filter1_coefficients(this, DST_FILTER1__FREQ, DST_FILTER1__TYPE, m_fc);
-	this->output[0] = 0;
+	set_output(0,  0);
 }
 
 
@@ -200,26 +202,28 @@ static void calculate_filter2_coefficients(discrete_base_node *node,
 DISCRETE_STEP(dst_filter2)
 {
 	double gain = 1.0;
+	double v_out;
 
 	if (DST_FILTER2__ENABLE == 0.0)
 	{
 		gain = 0.0;
 	}
 
-	this->output[0] = -m_fc.a1 * m_fc.y1 - m_fc.a2 * m_fc.y2 +
+	v_out = -m_fc.a1 * m_fc.y1 - m_fc.a2 * m_fc.y2 +
 					m_fc.b0 * gain * DST_FILTER2__IN + m_fc.b1 * m_fc.x1 + m_fc.b2 * m_fc.x2;
 
 	m_fc.x2 = m_fc.x1;
 	m_fc.x1 = gain * DST_FILTER2__IN;
 	m_fc.y2 = m_fc.y1;
-	m_fc.y1 = this->output[0];
+	m_fc.y1 = v_out;
+	set_output(0, v_out);
 }
 
 DISCRETE_RESET(dst_filter2)
 {
 	calculate_filter2_coefficients(this, DST_FILTER2__FREQ, DST_FILTER2__DAMP, DST_FILTER2__TYPE,
 								   m_fc);
-	this->output[0] = 0;
+	set_output(0,  0);
 }
 
 
@@ -244,6 +248,7 @@ DISCRETE_RESET(dst_filter2)
 DISCRETE_STEP(dst_op_amp_filt)
 {
 	DISCRETE_DECLARE_INFO(discrete_op_amp_filt_info)
+	double v_out = 0;
 
 	double i, v = 0;
 
@@ -280,46 +285,46 @@ DISCRETE_STEP(dst_op_amp_filt)
 		{
 			case DISC_OP_AMP_FILTER_IS_LOW_PASS_1:
 				m_vC1 += (v - m_vC1) * m_exponentC1;
-				this->output[0] = m_vC1 * m_gain + info->vRef;
+				v_out = m_vC1 * m_gain + info->vRef;
 				break;
 
 			case DISC_OP_AMP_FILTER_IS_LOW_PASS_1_A:
 				m_vC1 += (v - m_vC1) * m_exponentC1;
-				this->output[0] = m_vC1 * m_gain + DST_OP_AMP_FILT__INP2;
+				v_out = m_vC1 * m_gain + DST_OP_AMP_FILT__INP2;
 				break;
 
 			case DISC_OP_AMP_FILTER_IS_HIGH_PASS_1:
-				this->output[0] = (v - m_vC1) * m_gain + info->vRef;
+				v_out = (v - m_vC1) * m_gain + info->vRef;
 				m_vC1 += (v - m_vC1) * m_exponentC1;
 				break;
 
 			case DISC_OP_AMP_FILTER_IS_BAND_PASS_1:
-				this->output[0] = (v - m_vC2);
+				v_out = (v - m_vC2);
 				m_vC2 += (v - m_vC2) * m_exponentC2;
-				m_vC1 += (this->output[0] - m_vC1) * m_exponentC1;
-				this->output[0] = m_vC1 * m_gain + info->vRef;
+				m_vC1 += (v_out - m_vC1) * m_exponentC1;
+				v_out = m_vC1 * m_gain + info->vRef;
 				break;
 
 			case DISC_OP_AMP_FILTER_IS_BAND_PASS_0 | DISC_OP_AMP_IS_NORTON:
 				m_vC1 += (v - m_vC1) * m_exponentC1;
 				m_vC2 += (m_vC1 - m_vC2) * m_exponentC2;
 				v = m_vC2;
-				this->output[0] = v - m_vC3;
+				v_out = v - m_vC3;
 				m_vC3 += (v - m_vC3) * m_exponentC3;
-				i = this->output[0] / m_rTotal;
-				this->output[0] = (m_iFixed - i) * info->rF;
+				i = v_out / m_rTotal;
+				v_out = (m_iFixed - i) * info->rF;
 				break;
 
 			case DISC_OP_AMP_FILTER_IS_HIGH_PASS_0 | DISC_OP_AMP_IS_NORTON:
-				this->output[0] = v - m_vC1;
+				v_out = v - m_vC1;
 				m_vC1 += (v - m_vC1) * m_exponentC1;
-				i = this->output[0] / m_rTotal;
-				this->output[0] = (m_iFixed - i) * info->rF;
+				i = v_out / m_rTotal;
+				v_out = (m_iFixed - i) * info->rF;
 				break;
 
 			case DISC_OP_AMP_FILTER_IS_BAND_PASS_1M:
 			case DISC_OP_AMP_FILTER_IS_BAND_PASS_1M | DISC_OP_AMP_IS_NORTON:
-				this->output[0] = -m_fc.a1 * m_fc.y1 - m_fc.a2 * m_fc.y2 +
+				v_out = -m_fc.a1 * m_fc.y1 - m_fc.a2 * m_fc.y2 +
 								m_fc.b0 * v + m_fc.b1 * m_fc.x1 + m_fc.b2 * m_fc.x2 +
 								m_vRef;
 				m_fc.x2 = m_fc.x1;
@@ -331,12 +336,13 @@ DISCRETE_STEP(dst_op_amp_filt)
 		/* Clip the output to the voltage rails.
          * This way we get the original distortion in all it's glory.
          */
-		if (this->output[0] > m_vP) this->output[0] = m_vP;
-		if (this->output[0] < m_vN) this->output[0] = m_vN;
-		m_fc.y1 = this->output[0] - m_vRef;
+		if (v_out > m_vP) v_out = m_vP;
+		if (v_out < m_vN) v_out = m_vN;
+		m_fc.y1 = v_out - m_vRef;
+		set_output(0, v_out);
 	}
 	else
-		this->output[0] = 0;
+		set_output(0, 0);
 
 }
 
@@ -435,7 +441,7 @@ DISCRETE_RESET(dst_op_amp_filt)
 	m_vC2 = 0;
 	m_vC3 = 0;
 
-	this->output[0] = info->vRef;
+	set_output(0,  info->vRef);
 }
 
 
@@ -457,12 +463,12 @@ DISCRETE_STEP( dst_rc_circuit_1 )
 		if (DST_RC_CIRCUIT_1__IN1 == 0)
 			/* cap is floating and does not change charge */
 			/* output is pulled to ground */
-			this->output[0] = 0;
+			set_output(0,  0);
 		else
 		{
 			/* cap is discharged */
 			m_v_cap -= m_v_cap * m_exp_2;
-			this->output[0] = m_v_cap * m_v_drop;
+			set_output(0,  m_v_cap * m_v_drop);
 		}
 	else
 		if (DST_RC_CIRCUIT_1__IN1 == 0)
@@ -470,13 +476,13 @@ DISCRETE_STEP( dst_rc_circuit_1 )
 			/* cap is charged */
 			m_v_cap += (5.0 - m_v_cap) * m_exp_1;
 			/* output is pulled to ground */
-			this->output[0] = 0;
+			set_output(0,  0);
 		}
 		else
 		{
 			/* cap is charged slightly less */
 			m_v_cap += (m_v_charge_1_2 - m_v_cap) * m_exp_1_2;
-			this->output[0] = m_v_cap * m_v_drop;
+			set_output(0,  m_v_cap * m_v_drop);
 		}
 }
 
@@ -496,7 +502,7 @@ DISCRETE_RESET( dst_rc_circuit_1 )
 	m_exp_1_2 = RC_CHARGE_EXP(RES_2_PARALLEL(CD4066_R_ON, CD4066_R_ON + DST_RC_CIRCUIT_1__R) * DST_RC_CIRCUIT_1__C);
 
 	/* starts at 0 until cap starts charging */
-	this->output[0] = 0;
+	set_output(0,  0);
 }
 
 /************************************************************************
@@ -525,13 +531,13 @@ DISCRETE_STEP(dst_rcdisc)
 				m_state = 1;
 				m_t = 0;
 			}
-			this->output[0] = 0;
+			set_output(0,  0);
 			break;
 
 		case 1:
 			if (DST_RCDISC__ENABLE)
 			{
-				this->output[0] = DST_RCDISC__IN * exp(m_t / m_exponent0);
+				set_output(0,  DST_RCDISC__IN * exp(m_t / m_exponent0));
 				m_t += this->sample_time();
 			} else
 			{
@@ -542,7 +548,7 @@ DISCRETE_STEP(dst_rcdisc)
 
 DISCRETE_RESET(dst_rcdisc)
 {
-	this->output[0] = 0;
+	set_output(0,  0);
 
 	m_state = 0;
 	m_t = 0;
@@ -577,14 +583,15 @@ DISCRETE_STEP(dst_rcdisc2)
 	/* Works differently to other as we are always on, no enable */
 	/* exponential based in difference between input/output   */
 
-	diff = ((DST_RCDISC2__ENABLE == 0) ? DST_RCDISC2__IN0 : DST_RCDISC2__IN1) - this->output[0];
+	diff = ((DST_RCDISC2__ENABLE == 0) ? DST_RCDISC2__IN0 : DST_RCDISC2__IN1) - m_v_out;
 	diff = diff - (diff * ((DST_RCDISC2__ENABLE == 0) ? m_exponent0 : m_exponent1));
-	this->output[0] += diff;
+	m_v_out += diff;
+	set_output(0, m_v_out);
 }
 
 DISCRETE_RESET(dst_rcdisc2)
 {
-	this->output[0] = 0;
+	m_v_out = 0;
 
 	m_state = 0;
 	m_t = 0;
@@ -620,7 +627,7 @@ DISCRETE_STEP(dst_rcdisc3)
 
 	if(DST_RCDISC3__ENABLE)
 	{
-		diff = DST_RCDISC3__IN - this->output[0];
+		diff = DST_RCDISC3__IN - m_v_out;
 		if (m_v_diode > 0)
 		{
 			if (diff > 0)
@@ -651,17 +658,18 @@ DISCRETE_STEP(dst_rcdisc3)
 				diff = diff * m_exponent0;
 			}
 		}
-		this->output[0] += diff;
+		m_v_out += diff;
+		set_output(0, m_v_out);
 	}
 	else
 	{
-		this->output[0] = 0;
+		set_output(0, 0);
 	}
 }
 
 DISCRETE_RESET(dst_rcdisc3)
 {
-	this->output[0] = 0;
+	m_v_out = 0;
 
 	m_state = 0;
 	m_t = 0;
@@ -696,10 +704,11 @@ DISCRETE_RESET(dst_rcdisc3)
 DISCRETE_STEP(dst_rcdisc4)
 {
 	int inp1 = (DST_RCDISC4__IN == 0) ? 0 : 1;
+	double v_out = 0;
 
 	if (DST_RCDISC4__ENABLE == 0)
 	{
-		this->output[0] = 0;
+		set_output(0, 0);
 		return;
 	}
 
@@ -708,13 +717,14 @@ DISCRETE_STEP(dst_rcdisc4)
 		case 1:
 		case 3:
 			m_vC1 += ((m_v[inp1] - m_vC1) * m_exp[inp1]);
-			this->output[0] = m_vC1;
+			v_out = m_vC1;
 			break;
 	}
 
 	/* clip output */
-	if (this->output[0] > m_max_out) this->output[0] = m_max_out;
-	if (this->output[0] < 0) this->output[0] = 0;
+	if (v_out > m_max_out) v_out = m_max_out;
+	if (v_out < 0) v_out = 0;
+	set_output(0, v_out);
 }
 
 DISCRETE_RESET( dst_rcdisc4)
@@ -819,20 +829,20 @@ DISCRETE_STEP( dst_rcdisc5)
 			diff = diff * m_exponent0;
 
 		m_v_cap += diff;
-		this->output[0] = m_v_cap;
+		set_output(0,  m_v_cap);
 	}
 	else
 	{
 		if(diff > 0)
 			m_v_cap = u;
 
-		this->output[0] = 0;
+		set_output(0,  0);
 	}
 }
 
 DISCRETE_RESET( dst_rcdisc5)
 {
-	this->output[0] = 0;
+	set_output(0,  0);
 
 	m_state = 0;
 	m_t = 0;
@@ -886,14 +896,14 @@ DISCRETE_STEP(dst_rcdisc_mod)
 		diff  = u + 0.6 - v_cap;
 		diff -= diff * m_exp_low[mod1_state];
 		v_cap += diff;
-		this->output[0] = mod2_state ? 0 : -0.6;
+		set_output(0,  mod2_state ? 0 : -0.6);
 	}
 	else
 	{
 		diff  -= diff * m_exp_high[mod_state];
 		v_cap += diff;
 		/* neglecting current through R3 drawn by next8 node */
-		this->output[0] = mod2_state ? 0: (u - v_cap) * m_gain[mod1_state];
+		set_output(0,  mod2_state ? 0: (u - v_cap) * m_gain[mod1_state]);
 	}
 	m_v_cap = v_cap;
 }
@@ -931,7 +941,7 @@ DISCRETE_RESET(dst_rcdisc_mod)
 	m_vd_gain[3]  = RES_VOLTAGE_DIVIDER(rc[1], rc2[1]);
 
 	m_v_cap  = 0;
-	this->output[0] = 0;
+	set_output(0,  0);
 }
 
 /************************************************************************
@@ -953,7 +963,7 @@ DISCRETE_RESET(dst_rcdisc_mod)
 DISCRETE_STEP(dst_rcfilter)
 {
 	if (EXPECTED(m_is_fast))
-		this->output[0] += ((DST_RCFILTER__VIN - this->output[0]) * m_exponent);
+		m_v_out += ((DST_RCFILTER__VIN - m_v_out) * m_exponent);
 	else
 	{
 		if (UNEXPECTED(m_has_rc_nodes))
@@ -970,8 +980,9 @@ DISCRETE_STEP(dst_rcfilter)
 		/* Next Value = PREV + (INPUT_VALUE - PREV)*(1-(EXP(-TIMEDELTA/RC)))    */
 		/************************************************************************/
 
-		m_vCap += ((DST_RCFILTER__VIN - this->output[0]) * m_exponent);
-		this->output[0] = m_vCap + DST_RCFILTER__VREF;
+		m_vCap += ((DST_RCFILTER__VIN - m_v_out) * m_exponent);
+		m_v_out = m_vCap + DST_RCFILTER__VREF;
+		set_output(0,  m_v_out);
 	}
 }
 
@@ -982,7 +993,7 @@ DISCRETE_RESET(dst_rcfilter)
 	m_rc = DST_RCFILTER__R * DST_RCFILTER__C;
 	m_exponent = RC_CHARGE_EXP(m_rc);
 	m_vCap   = 0;
-	this->output[0] = 0;
+	m_v_out = 0;
 	/* FIXME --> we really need another class here */
 	if (!m_has_rc_nodes && DST_RCFILTER__VREF == 0)
 		m_is_fast = 1;
@@ -1024,21 +1035,22 @@ DISCRETE_STEP(dst_rcfilter_sw)
 	int bits = (int)DST_RCFILTER_SW__SWITCH;
 	double us = 0;
 	double vIn = DST_RCFILTER_SW__VIN;
+	double v_out;
 
 	if (EXPECTED(DST_RCFILTER_SW__ENABLE))
 	{
 		switch (bits)
 		{
 		case 0:
-			this->output[0] = vIn;
+			v_out = vIn;
 			break;
 		case 1:
 			m_vCap[0] += (vIn - m_vCap[0]) * m_exp0;
-			this->output[0] = m_vCap[0] + (vIn - m_vCap[0]) * m_factor;
+			v_out = m_vCap[0] + (vIn - m_vCap[0]) * m_factor;
 			break;
 		case 2:
 			m_vCap[1] += (vIn - m_vCap[1]) * m_exp1;
-			this->output[0] = m_vCap[1] + (vIn - m_vCap[1]) * m_factor;
+			v_out = m_vCap[1] + (vIn - m_vCap[1]) * m_factor;
 			break;
 		default:
 			for (i = 0; i < 4; i++)
@@ -1046,17 +1058,18 @@ DISCRETE_STEP(dst_rcfilter_sw)
 				if (( bits & (1 << i)) != 0)
 					us += m_vCap[i];
 			}
-			this->output[0] = m_f1[bits] * vIn + m_f2[bits]  * us;
+			v_out = m_f1[bits] * vIn + m_f2[bits]  * us;
 			for (i = 0; i < 4; i++)
 			{
 				if (( bits & (1 << i)) != 0)
-					m_vCap[i] += (this->output[0] - m_vCap[i]) * m_exp[i];
+					m_vCap[i] += (v_out - m_vCap[i]) * m_exp[i];
 			}
 		}
+		set_output(0, v_out);
 	}
 	else
 	{
-		this->output[0] = 0;
+		set_output(0, 0);
 	}
 }
 
@@ -1089,7 +1102,7 @@ DISCRETE_RESET(dst_rcfilter_sw)
 	m_exp1 = RC_CHARGE_EXP((CD4066_ON_RES + DST_RCFILTER_SW__R) * DST_RCFILTER_SW__C(1));
 	m_factor = RES_VOLTAGE_DIVIDER(DST_RCFILTER_SW__R, CD4066_ON_RES);
 
-	this->output[0] = 0;
+	set_output(0,  0);
 }
 
 
@@ -1185,13 +1198,13 @@ DISCRETE_STEP( dst_rcintegrate)
 	switch (m_type)
 	{
 		case DISC_RC_INTEGRATE_TYPE1:
-			this->output[0] = m_vCap;
+			set_output(0,  m_vCap);
 			break;
 		case DISC_RC_INTEGRATE_TYPE2:
-			this->output[0] = vE;
+			set_output(0,  vE);
 			break;
 		case DISC_RC_INTEGRATE_TYPE3:
-			this->output[0] = MAX(0, vP - iQ * DST_RCINTEGRATE__R3);
+			set_output(0,  MAX(0, vP - iQ * DST_RCINTEGRATE__R3));
 			break;
 	}
 }
@@ -1221,7 +1234,7 @@ DISCRETE_RESET(dst_rcintegrate)
 
 	m_EM_IC_0_7 = EM_IC(0.7);
 
-	this->output[0] = 0;
+	set_output(0,  0);
 }
 
 /************************************************************************
@@ -1243,19 +1256,21 @@ DISCRETE_RESET(dst_rcintegrate)
 DISCRETE_STEP(dst_sallen_key)
 {
 	double gain = 1.0;
+	double v_out;
 
 	if (DST_SALLEN_KEY__ENABLE == 0.0)
 	{
 		gain = 0.0;
 	}
 
-	this->output[0] = -m_fc.a1 * m_fc.y1 - m_fc.a2 * m_fc.y2 +
+	v_out = -m_fc.a1 * m_fc.y1 - m_fc.a2 * m_fc.y2 +
 					m_fc.b0 * gain * DST_SALLEN_KEY__INP0 + m_fc.b1 * m_fc.x1 + m_fc.b2 * m_fc.x2;
 
 	m_fc.x2 = m_fc.x1;
 	m_fc.x1 = gain * DST_SALLEN_KEY__INP0;
 	m_fc.y2 = m_fc.y1;
-	m_fc.y1 = this->output[0];
+	m_fc.y1 = v_out;
+	set_output(0, v_out);
 }
 
 DISCRETE_RESET(dst_sallen_key)
@@ -1275,7 +1290,7 @@ DISCRETE_RESET(dst_sallen_key)
 	}
 
 	calculate_filter2_coefficients(this, freq, 1.0 / q, DISC_FILTER_LOWPASS, m_fc);
-	this->output[0] = 0;
+	set_output(0,  0);
 }
 
 
@@ -1350,6 +1365,7 @@ DISCRETE_RESET(dst_rcdiscN)
 DISCRETE_STEP(dst_rcdiscN)
 {
 	double gain = 1.0;
+	double v_out;
 
 	if (DST_RCDISCN__ENABLE == 0.0)
 	{
@@ -1359,12 +1375,13 @@ DISCRETE_STEP(dst_rcdiscN)
 	/* A rise in the input signal results in an instant charge, */
 	/* else discharge through the RC to zero */
 	if (gain* DST_RCDISCN__IN > m_x1)
-		this->output[0] = gain* DST_RCDISCN__IN;
+		v_out = gain* DST_RCDISCN__IN;
 	else
-		this->output[0] = -m_a1*m_y1;
+		v_out = -m_a1*m_y1;
 
 	m_x1 = gain* DST_RCDISCN__IN;
-	m_y1 = this->output[0];
+	m_y1 = v_out;
+	set_output(0, v_out);
 }
 
 
@@ -1392,14 +1409,16 @@ DISCRETE_STEP(dst_rcdiscN)
 DISCRETE_STEP(dst_rcdisc2N)
 {
 	double inp = ((DST_RCDISC2N__ENABLE == 0) ? DST_RCDISC2N__IN0 : DST_RCDISC2N__IN1);
+	double v_out;
 
 	if (DST_RCDISC2N__ENABLE == 0)
-		this->output[0] = -m_fc0.a1*m_y1 + m_fc0.b0*inp + m_fc0.b1 * m_x1;
+		v_out = -m_fc0.a1*m_y1 + m_fc0.b0*inp + m_fc0.b1 * m_x1;
 	else
-		this->output[0] = -m_fc1.a1*m_y1 + m_fc1.b0*inp + m_fc1.b1*m_x1;
+		v_out = -m_fc1.a1*m_y1 + m_fc1.b0*inp + m_fc1.b1*m_x1;
 
 	m_x1 = inp;
-	m_y1 = this->output[0];
+	m_y1 = v_out;
+	set_output(0, v_out);
 }
 
 DISCRETE_RESET(dst_rcdisc2N)
@@ -1413,5 +1432,5 @@ DISCRETE_RESET(dst_rcdisc2N)
 	calculate_filter1_coefficients(this, f2, DISC_FILTER_LOWPASS, m_fc1);
 
 	/* Initialize the object */
-	this->output[0] = 0;
+	set_output(0,  0);
 }

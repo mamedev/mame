@@ -234,6 +234,7 @@ DISCRETE_CLASS_STEP_RESET(bzone_custom_filter, 1,
 	double	m_v_p;
 	double	m_exponent;
 	double	m_gain[2];
+	double  m_out_v;
 );
 
 DISCRETE_STEP(bzone_custom_filter)
@@ -248,7 +249,8 @@ DISCRETE_STEP(bzone_custom_filter)
 	if (v > m_v_p) v = m_v_p;
 	if (v < 0) v = 0;
 
-	this->output[0] += (v - this->output[0]) * m_exponent;
+	m_out_v += (v - m_out_v) * m_exponent;
+	set_output(0, m_out_v);
 }
 
 DISCRETE_RESET(bzone_custom_filter)
@@ -260,7 +262,7 @@ DISCRETE_RESET(bzone_custom_filter)
 	m_v_in1_gain = RES_VOLTAGE_DIVIDER(BZONE_CUSTOM_FILTER__R3, BZONE_CUSTOM_FILTER__R4);
 	m_v_p = BZONE_CUSTOM_FILTER__VP - OP_AMP_VP_RAIL_OFFSET;
 	m_exponent = RC_CHARGE_EXP(BZONE_CUSTOM_FILTER__R5 * BZONE_CUSTOM_FILTER__C);;
-	this->output[0] = 0;
+	m_out_v = 0.0;
 }
 
 /*************************************

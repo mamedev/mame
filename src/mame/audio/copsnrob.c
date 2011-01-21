@@ -318,13 +318,13 @@ DISCRETE_STEP(copsnrob_custom_noise)
 			new_noise_bit = (low_byte >> 4) & 0x01;
 			if (last_noise1_bit != new_noise_bit)
 			{
-				this->output[0] = COPSNROB_CUSTOM_NOISE_HIGH * (new_noise_bit ? x_time : (1.0 - x_time));
+				set_output(0,  COPSNROB_CUSTOM_NOISE_HIGH * (new_noise_bit ? x_time : (1.0 - x_time)));
 				m_noise1_had_xtime = 1;
 			}
 			new_noise_bit = (low_byte >> 5) & 0x01;
 			if (last_noise2_bit != new_noise_bit)
 			{
-				this->output[1] = COPSNROB_CUSTOM_NOISE_HIGH * (new_noise_bit ? x_time : (1.0 - x_time));
+				set_output(1, COPSNROB_CUSTOM_NOISE_HIGH * (new_noise_bit ? x_time : (1.0 - x_time)));
 				m_noise2_had_xtime = 1;
 			}
 		}
@@ -334,12 +334,12 @@ DISCRETE_STEP(copsnrob_custom_noise)
 		/* see if we need to move from x_time state to full state */
 		if (m_noise1_had_xtime)
 		{
-			this->output[0] = COPSNROB_CUSTOM_NOISE_HIGH * last_noise1_bit;
+			set_output(0, COPSNROB_CUSTOM_NOISE_HIGH * last_noise1_bit);
 			m_noise1_had_xtime = 0;
 		}
 		if (m_noise2_had_xtime)
 		{
-			this->output[1] = COPSNROB_CUSTOM_NOISE_HIGH * last_noise2_bit;
+			set_output(1, COPSNROB_CUSTOM_NOISE_HIGH * last_noise2_bit);
 			m_noise2_had_xtime = 0;
 		}
 	}
@@ -435,11 +435,11 @@ DISCRETE_STEP(copsnrob_zings_555_monostable)
 	m_v_cap = v_cap;
 
 	if (x_time > 0)
-		this->output[0] = v_out_high * x_time;
+		set_output(0, v_out_high * x_time);
 	else if (flip_flop)
-		this->output[0] = v_out_high;
+		set_output(0, v_out_high);
 	else
-		this->output[0] = 0;
+		set_output(0, 0.0);
 }
 
 DISCRETE_RESET(copsnrob_zings_555_monostable)
@@ -448,7 +448,7 @@ DISCRETE_RESET(copsnrob_zings_555_monostable)
 	m_exponent = RC_CHARGE_EXP(m_rc);
 	m_v_cap = 0;
 	m_flip_flop = 0;
-	this->output[0] = 0;
+	set_output(0, 0.0);
 }
 
 /************************************************
@@ -483,7 +483,7 @@ DISCRETE_STEP(copsnrob_zings_555_astable)
 	double	v_trigger, v_threshold;
 	double	v1 = COPSNROB_CUSTOM_ZINGS_555_ASTABLE__RESET;
 	double	v_cap1 = m_v_cap1;
-	double	v_cap2 = this->output[0];
+	double	v_cap2 = m_v_cap2;
 	double	dt = 0;
 	int		reset_active = (v1 < 0.7) ? 1 : 0;
 	int 	flip_flop = m_flip_flop;
@@ -516,9 +516,9 @@ DISCRETE_STEP(copsnrob_zings_555_astable)
 			v_cap2 -= v_cap2 * m_exponent2;
 			/* Optimization - close enough to 0 to be 0 */
 			if (v_cap2 < 0.000001)
-				this->output[0] = 0;
+				set_output(0, 0.0);
 			else
-				this->output[0] = v_cap2;
+				set_output(0, v_cap2);
 		}
 		return;
 	}
@@ -565,9 +565,10 @@ DISCRETE_STEP(copsnrob_zings_555_astable)
 		}
 	}
 	if (v_cap2 > 0)
-		this->output[0] = v_cap2;
+		m_v_cap2 = v_cap2;
 	else
-		this->output[0] = 0;
+		m_v_cap2 = 0.0;
+	set_output(0, m_v_cap2);
 }
 
 DISCRETE_RESET(copsnrob_zings_555_astable)
@@ -578,7 +579,7 @@ DISCRETE_RESET(copsnrob_zings_555_astable)
 	m_exponent2 = RC_CHARGE_EXP(m_r2c2);
 	m_v_cap1 = 0;
 	m_flip_flop = 0;
-	this->output[0] = 0;		/* charge on C2 */
+	m_v_cap2 = 0.0;		/* charge on C2 */
 }
 
 

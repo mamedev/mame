@@ -356,7 +356,7 @@ discrete_base_node::discrete_base_node() :
 	m_step_intf(NULL),
 	m_input_intf(NULL)
 {
-	output[0] = 0.0;
+	m_output[0] = 0.0;
 }
 
 
@@ -387,7 +387,7 @@ void discrete_base_node::init(discrete_device *pdev, const discrete_sound_block 
 void discrete_base_node::save_state(void)
 {
 	if (m_block->node != NODE_SPECIAL)
-		state_save_register_device_item_array(m_device, m_block->node, output);
+		state_save_register_device_item_array(m_device, m_block->node, m_output);
 }
 
 const discrete_base_node *discrete_device::discrete_find_node(int node)
@@ -415,7 +415,7 @@ void discrete_base_node::resolve_input_nodes(void)
 			if ((NODE_CHILD_NODE_NUM(inputnode) >= node_ref->max_output()) /*&& (node_ref->module_type() != DST_CUSTOM)*/)
 				fatalerror("discrete_start - NODE_%02d referenced non existent output %d on node NODE_%02d", index(), NODE_CHILD_NODE_NUM(inputnode), NODE_INDEX(inputnode));
 
-			m_input[inputnum] = &(node_ref->output[NODE_CHILD_NODE_NUM(inputnode)]);	/* Link referenced node out to input */
+			m_input[inputnum] = &(node_ref->m_output[NODE_CHILD_NODE_NUM(inputnode)]);	/* Link referenced node out to input */
 			m_input_is_node |= 1 << inputnum;			/* Bit flag if input is node */
 		}
 		else
@@ -447,7 +447,7 @@ const double *discrete_device::node_output_ptr(int onode)
 
 	if (node != NULL)
 	{
-		return &(node->output[NODE_CHILD_NODE_NUM(onode)]);
+		return &(node->m_output[NODE_CHILD_NODE_NUM(onode)]);
 	}
 	else
 		return NULL;
@@ -1001,7 +1001,7 @@ void discrete_device::device_reset()
 	for_each (discrete_base_node **, node, &m_node_list)
 	{
 		/* Fimxe : node_level */
-		(*node)->output[0] = 0;
+		(*node)->m_output[0] = 0;
 
 		(*node)->reset();
 	}
@@ -1077,7 +1077,7 @@ READ8_MEMBER( discrete_device::read )
 		/* Bring the system up to now */
 		stream_update(m_stream);
 
-		data = (UINT8) node->output[NODE_CHILD_NODE_NUM(offset)];
+		data = (UINT8) node->m_output[NODE_CHILD_NODE_NUM(offset)];
 	}
 	else
 		fatalerror("discrete_sound_r read from non-existent NODE_%02d\n", offset-NODE_00);

@@ -4290,7 +4290,6 @@ READ8_DEVICE_HANDLER( discrete_sound_r );
 #define MCFG_DISCRETE_INTF(_intf) \
 	discrete_device_config::static_set_intf(device, (const discrete_sound_block *)&(_intf##_discrete_interface)); \
 
-
 #define MCFG_SOUND_CONFIG_DISCRETE(name) MCFG_SOUND_CONFIG(name##_discrete_interface)
 
 //**************************************************************************
@@ -4441,8 +4440,11 @@ public:
 	inline bool interface(discrete_input_interface *&intf) const { intf = m_input_intf; return (intf != NULL); }
 	inline bool interface(discrete_output_interface *&intf) const { intf = m_output_intf; return (intf != NULL); }
 
-	/* get the input from node #n */
+	/* get the input value from node #n */
 	inline double input(int n) { return *(m_input[n]); }
+
+	/* set an output */
+	inline void set_output(int n, double val) { m_output[n] = val; }
 
 	/* Return the node index, i.e. X from NODE(X) */
 	inline int index(void) { return NODE_INDEX(m_block->node); }
@@ -4476,9 +4478,9 @@ protected:
 
 	void resolve_input_nodes(void);
 
-	double				output[DISCRETE_MAX_OUTPUTS];					/* The node's last output value */
-	const double *		m_input[DISCRETE_MAX_INPUTS];					/* Addresses of Input values */
-	discrete_device *			m_device;								/* Points to the parent */
+	double							m_output[DISCRETE_MAX_OUTPUTS];		/* The node's last output value */
+	const double *					m_input[DISCRETE_MAX_INPUTS];		/* Addresses of Input values */
+	discrete_device *				m_device;							/* Points to the parent */
 
 private:
 

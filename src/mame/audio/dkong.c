@@ -299,6 +299,7 @@ DISCRETE_CLASS_STEP_RESET(dkong_custom_mixer, 1,
 	double m_r_in[2];
 	double m_r_total[2];
 	double m_exp[2];
+	double m_out_v;
 );
 
 DISCRETE_STEP( dkong_custom_mixer )
@@ -313,7 +314,8 @@ DISCRETE_STEP( dkong_custom_mixer )
 	i_total += DKONG_CUSTOM_IN2 / DKONG_CUSTOM_R3;
 	/* charge cap */
 	/* node->output is cap voltage, (i_total * m_r_total[in_1]) is current charge voltage */
-	this->output[0] += (i_total * m_r_total[in_1] - this->output[0]) * m_exp[in_1];
+	m_out_v += (i_total * m_r_total[in_1] - m_out_v) * m_exp[in_1];
+	set_output(0, m_out_v);
 }
 
 #define	NE555_CV_R		RES_2_PARALLEL(RES_K(5), RES_K(10))
@@ -334,7 +336,7 @@ DISCRETE_RESET( dkong_custom_mixer )
 	m_exp[0] = RC_CHARGE_EXP(m_r_total[0] * DKONG_CUSTOM_C);
 	m_exp[1] = RC_CHARGE_EXP(m_r_total[1] * DKONG_CUSTOM_C);
 
-	this->output[0] = 0;
+	m_out_v = 0;
 }
 
 #endif

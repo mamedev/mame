@@ -157,7 +157,7 @@ DISCRETE_STEP( skyraid_missle_custom_charge )
 	/* charge/discharge cap */
 	m_v_cap += (m_v_charge[in_1] - m_v_cap) * m_exp[in_1];
 
-	this->output[0] = SKYRAID_MISSLE_CHARGE_PLUS - m_v_cap;
+	set_output(0,  SKYRAID_MISSLE_CHARGE_PLUS - m_v_cap);
 }
 
 DISCRETE_RESET( skyraid_missle_custom_charge )
@@ -177,7 +177,7 @@ DISCRETE_RESET( skyraid_missle_custom_charge )
 	m_exp[1] = RC_CHARGE_EXP(RES_2_PARALLEL(SKYRAID_MISSLE_CUSTOM_R1 + SKYRAID_MISSLE_CUSTOM_R2, SKYRAID_MISSLE_CUSTOM_R3) * SKYRAID_MISSLE_CUSTOM_C);
 
 	/* starts at full voltage until cap starts charging */
-	this->output[0] = SKYRAID_MISSLE_CHARGE_PLUS;
+	set_output(0,  SKYRAID_MISSLE_CHARGE_PLUS);
 }
 
 

@@ -56,6 +56,7 @@ DISCRETE_CLASS_STEP_RESET(dst_logic_dff, 1,
 );
 
 DISCRETE_CLASS_STEP_RESET(dst_logic_jkff, 1,
+	double 			m_v_out;
 	int 			m_last_clk;
 );
 
@@ -83,6 +84,7 @@ DISCRETE_CLASS_STEP_RESET(dst_oneshot, 1,
 );
 
 DISCRETE_CLASS_STEP_RESET(dst_ramp, 1,
+	double			m_v_out;
 	double			m_step;
 	int				m_dir;					/* 1 if End is higher then Start */
 	int				m_last_en;				/* Keep track of the last enable value */
@@ -144,6 +146,7 @@ DISCRETE_CLASS_STEP_RESET(dst_comp_adder, 1,
 );
 
 DISCRETE_CLASS_STEP_RESET(dst_dac_r1, 1,
+	double			m_v_out;
 	double			m_exponent;
 	double			m_last_v;
 	double			m_v_step[256];
@@ -156,6 +159,7 @@ DISCRETE_CLASS_STEP_RESET(dst_diode_mix, 1,
 );
 
 DISCRETE_CLASS_STEP_RESET(dst_integrate, 1,
+	double			m_v_out;
 	double			m_change;
 	double			m_v_max_in;				/* v1 - norton VBE */
 	double			m_v_max_in_d;			/* v1 - norton VBE - diode drop */
@@ -191,6 +195,7 @@ DISCRETE_CLASS_STEP_RESET(dst_op_amp, 1,
 );
 
 DISCRETE_CLASS_STEP_RESET(dst_op_amp_1sht, 1,
+	double			m_v_out;
 	double			m_i_fixed;
 	double			m_v_max;
 	double			m_r34ratio;

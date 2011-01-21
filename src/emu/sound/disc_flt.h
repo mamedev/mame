@@ -88,6 +88,7 @@ DISCRETE_CLASS_STEP_RESET(dst_rcdisc, 1,
 
 DISCRETE_CLASS_STEP_RESET(dst_rcdisc2, 1,
 	int 			m_state;
+	double			m_v_out;
 	double			m_t;           			/* time */
 	double 			m_exponent0;
 	double 			m_exponent1;
@@ -95,6 +96,7 @@ DISCRETE_CLASS_STEP_RESET(dst_rcdisc2, 1,
 
 DISCRETE_CLASS_STEP_RESET(dst_rcdisc3, 1,
 	int 			m_state;
+	double			m_v_out;
 	double			m_t;          			/* time */
 	double 			m_exponent0;
 	double 			m_exponent1;
@@ -140,6 +142,7 @@ DISCRETE_CLASS_STEP_RESET(dst_rcdisc_mod, 1,
 );
 
 DISCRETE_CLASS_STEP_RESET(dst_rcfilter, 1,
+	double			m_v_out;
 	double			m_vCap;
 	double			m_rc;
 	double			m_exponent;

@@ -72,11 +72,11 @@ DISCRETE_STEP(dst_adder)
 {
 	if(DST_ADDER__ENABLE)
 	{
-		this->output[0] = DST_ADDER__IN0 + DST_ADDER__IN1 + DST_ADDER__IN2 + DST_ADDER__IN3;
+		set_output(0,  DST_ADDER__IN0 + DST_ADDER__IN1 + DST_ADDER__IN2 + DST_ADDER__IN3);
 	}
 	else
 	{
-		this->output[0]=0;
+		set_output(0, 0);
 	}
 }
 
@@ -99,7 +99,7 @@ DISCRETE_STEP(dst_comp_adder)
 
 	select = (int)DST_COMP_ADDER__SELECT;
 	assert(select < 256);
-	this->output[0] = m_total[select];
+	set_output(0,  m_total[select]);
 }
 
 DISCRETE_RESET(dst_comp_adder)
@@ -137,7 +137,7 @@ DISCRETE_RESET(dst_comp_adder)
 				break;
 		}
 	}
-	this->output[0] = m_total[0];
+	set_output(0,  m_total[0]);
 }
 
 /************************************************************************
@@ -155,9 +155,12 @@ DISCRETE_RESET(dst_comp_adder)
 
 DISCRETE_STEP(dst_clamp)
 {
-	if (DST_CLAMP__IN < DST_CLAMP__MIN) this->output[0] = DST_CLAMP__MIN;
-	else if (DST_CLAMP__IN > DST_CLAMP__MAX) this->output[0] = DST_CLAMP__MAX;
-	else this->output[0]= DST_CLAMP__IN;
+	if (DST_CLAMP__IN < DST_CLAMP__MIN)
+		set_output(0,  DST_CLAMP__MIN);
+	else if (DST_CLAMP__IN > DST_CLAMP__MAX)
+		set_output(0,  DST_CLAMP__MAX);
+	else
+		set_output(0, DST_CLAMP__IN);
 }
 
 
@@ -191,19 +194,19 @@ DISCRETE_STEP(dst_dac_r1)
 	/* Filter if needed, else just output voltage */
 	if (m_has_c_filter)
 	{
-		double out = this->output[0];
-		double v_diff = v - out;
+		double v_diff = v - m_v_out;
 		/* optimization - if charged close enough to voltage */
 		if (fabs(v_diff) < 0.000001)
-			this->output[0] = v;
+			m_v_out = v;
 		else
 		{
-			out += v_diff * m_exponent;
-			this->output[0] = out;
+			m_v_out += v_diff * m_exponent;
 		}
 	}
 	else
-		this->output[0] = v;
+		m_v_out = v;
+
+	set_output(0, m_v_out);
 }
 
 DISCRETE_RESET(dst_dac_r1)
@@ -254,7 +257,7 @@ DISCRETE_RESET(dst_dac_r1)
 	if (info->rGnd > 0)  r_total += 1.0 / info->rGnd;
 	r_total = 1.0 / r_total;
 
-	this->output[0] = 0;
+	m_v_out = 0;
 
 	if (info->cFilter > 0)
 	{
@@ -314,7 +317,7 @@ DISCRETE_STEP(dst_diode_mix)
 		if (val > max) max = val;
 	}
 	if (max < 0) max = 0;
-	this->output[0] = max;
+	set_output(0,  max);
 }
 
 DISCRETE_RESET(dst_diode_mix)
@@ -362,17 +365,17 @@ DISCRETE_STEP(dst_divide)
 	{
 		if(DST_DIVIDE__DIV == 0)
 		{
-			this->output[0 ]= DBL_MAX;	/* Max out but don't break */
+			set_output(0, DBL_MAX);	/* Max out but don't break */
 			m_device->discrete_log("dst_divider_step() - Divide by Zero attempted in NODE_%02d.\n",this->index());
 		}
 		else
 		{
-			this->output[0]= DST_DIVIDE__IN / DST_DIVIDE__DIV;
+			 set_output(0, DST_DIVIDE__IN / DST_DIVIDE__DIV);
 		}
 	}
 	else
 	{
-		this->output[0]=0;
+		set_output(0, 0);
 	}
 }
 
@@ -392,7 +395,7 @@ DISCRETE_STEP(dst_divide)
 
 DISCRETE_STEP(dst_gain)
 {
-		this->output[0]  = DST_GAIN__IN * DST_GAIN__GAIN + DST_GAIN__OFFSET;
+		set_output(0, DST_GAIN__IN * DST_GAIN__GAIN + DST_GAIN__OFFSET);
 }
 
 
@@ -460,17 +463,18 @@ DISCRETE_STEP(dst_integrate)
 				/* This forces the cap to completely charge,
                  * and the output to go to it's max value.
                  */
-				this->output[0] = m_v_max_out;
+				m_v_out = m_v_max_out;
+				set_output(0, m_v_out);
 				return;
 			}
-			this->output[0] -= m_change;
+			m_v_out -= m_change;
 			break;
 
 		case DISC_INTEGRATE_OP_AMP_1 | DISC_OP_AMP_IS_NORTON:
 			i_neg = m_v_max_in / info->r1;
 			i_pos = (DST_INTEGRATE__TRG0 - OP_AMP_NORTON_VBE) / info->r2;
 			if (i_pos < 0) i_pos = 0;
-			this->output[0] += (i_pos - i_neg) / this->sample_rate() / info->c;
+			m_v_out += (i_pos - i_neg) / this->sample_rate() / info->c;
 			break;
 
 		case DISC_INTEGRATE_OP_AMP_2 | DISC_OP_AMP_IS_NORTON:
@@ -479,13 +483,15 @@ DISCRETE_STEP(dst_integrate)
 			i_neg  = dst_trigger_function(trig0, trig1, 0, info->f0) ? m_v_max_in_d / info->r1 : 0;
 			i_pos  = dst_trigger_function(trig0, trig1, 0, info->f1) ? m_v_max_in / info->r2 : 0;
 			i_pos += dst_trigger_function(trig0, trig1, 0, info->f2) ? m_v_max_in_d / info->r3 : 0;
-			this->output[0] += (i_pos - i_neg) / this->sample_rate() / info->c;
+			m_v_out += (i_pos - i_neg) / this->sample_rate() / info->c;
 			break;
 	}
 
 	/* Clip the output. */
-	if (this->output[0] < 0) this->output[0] = 0;
-	if (this->output[0] > m_v_max_out) this->output[0] = m_v_max_out;
+	if (m_v_out < 0) m_v_out = 0;
+	if (m_v_out > m_v_max_out) m_v_out = m_v_max_out;
+
+	set_output(0, m_v_out);
 }
 
 DISCRETE_RESET(dst_integrate)
@@ -509,7 +515,8 @@ DISCRETE_RESET(dst_integrate)
 		i = v / info->r1;
 		m_change = i / this->sample_rate() / info->c;
 	}
-	this->output[0] = 0;
+	m_v_out = 0;
+	set_output(0, m_v_out);
 }
 
 
@@ -525,7 +532,7 @@ DISCRETE_RESET(dst_integrate)
 
 DISCRETE_STEP(dst_logic_inv)
 {
-	this->output[0] = DST_LOGIC_INV__IN ? 0.0 : 1.0;
+	set_output(0,  DST_LOGIC_INV__IN ? 0.0 : 1.0);
 }
 
 /************************************************************************
@@ -584,7 +591,7 @@ DISCRETE_STEP(dst_bits_decode)
 				else
 					out *= new_bit;
 			}
-			this->output[i] = out;
+			set_output(i, out);
 			if (has_x_time && bit_changed)
 				/* set */
 				m_last_had_x_time |= 1 << (i + from);
@@ -627,7 +634,7 @@ DISCRETE_RESET(dst_bits_decode)
 
 DISCRETE_STEP(dst_logic_and)
 {
-	this->output[0] = (DST_LOGIC_AND__IN0 && DST_LOGIC_AND__IN1 && DST_LOGIC_AND__IN2 && DST_LOGIC_AND__IN3)? 1.0 : 0.0;
+	set_output(0,  (DST_LOGIC_AND__IN0 && DST_LOGIC_AND__IN1 && DST_LOGIC_AND__IN2 && DST_LOGIC_AND__IN3)? 1.0 : 0.0);
 }
 
 /************************************************************************
@@ -647,7 +654,7 @@ DISCRETE_STEP(dst_logic_and)
 
 DISCRETE_STEP(dst_logic_nand)
 {
-	this->output[0]= (DST_LOGIC_NAND__IN0 && DST_LOGIC_NAND__IN1 && DST_LOGIC_NAND__IN2 && DST_LOGIC_NAND__IN3)? 0.0 : 1.0;
+	set_output(0, (DST_LOGIC_NAND__IN0 && DST_LOGIC_NAND__IN1 && DST_LOGIC_NAND__IN2 && DST_LOGIC_NAND__IN3)? 0.0 : 1.0);
 }
 
 /************************************************************************
@@ -667,7 +674,7 @@ DISCRETE_STEP(dst_logic_nand)
 
 DISCRETE_STEP(dst_logic_or)
 {
-	this->output[0] = (DST_LOGIC_OR__IN0 || DST_LOGIC_OR__IN1 || DST_LOGIC_OR__IN2 || DST_LOGIC_OR__IN3) ? 1.0 : 0.0;
+	set_output(0,  (DST_LOGIC_OR__IN0 || DST_LOGIC_OR__IN1 || DST_LOGIC_OR__IN2 || DST_LOGIC_OR__IN3) ? 1.0 : 0.0);
 }
 
 /************************************************************************
@@ -687,7 +694,7 @@ DISCRETE_STEP(dst_logic_or)
 
 DISCRETE_STEP(dst_logic_nor)
 {
-	this->output[0] = (DST_LOGIC_NOR__IN0 || DST_LOGIC_NOR__IN1 || DST_LOGIC_NOR__IN2 || DST_LOGIC_NOR__IN3) ? 0.0 : 1.0;
+	set_output(0,  (DST_LOGIC_NOR__IN0 || DST_LOGIC_NOR__IN1 || DST_LOGIC_NOR__IN2 || DST_LOGIC_NOR__IN3) ? 0.0 : 1.0);
 }
 
 /************************************************************************
@@ -703,7 +710,7 @@ DISCRETE_STEP(dst_logic_nor)
 
 DISCRETE_STEP(dst_logic_xor)
 {
-	this->output[0] = ((DST_LOGIC_XOR__IN0 && !DST_LOGIC_XOR__IN1) || (!DST_LOGIC_XOR__IN0 && DST_LOGIC_XOR__IN1)) ? 1.0 : 0.0;
+	set_output(0,  ((DST_LOGIC_XOR__IN0 && !DST_LOGIC_XOR__IN1) || (!DST_LOGIC_XOR__IN0 && DST_LOGIC_XOR__IN1)) ? 1.0 : 0.0);
 }
 
 /************************************************************************
@@ -719,7 +726,7 @@ DISCRETE_STEP(dst_logic_xor)
 
 DISCRETE_STEP(dst_logic_nxor)
 {
-	this->output[0] = ((DST_LOGIC_XNOR__IN0 && !DST_LOGIC_XNOR__IN1) || (!DST_LOGIC_XNOR__IN0 && DST_LOGIC_XNOR__IN1)) ? 0.0 : 1.0;
+	set_output(0,  ((DST_LOGIC_XNOR__IN0 && !DST_LOGIC_XNOR__IN1) || (!DST_LOGIC_XNOR__IN0 && DST_LOGIC_XNOR__IN1)) ? 0.0 : 1.0);
 }
 
 
@@ -743,18 +750,18 @@ DISCRETE_STEP(dst_logic_dff)
 	int clk = (int)DST_LOGIC_DFF__CLOCK;
 
 	if (DST_LOGIC_DFF__RESET)
-		this->output[0] = 0;
+		set_output(0,  0);
 	else if (DST_LOGIC_DFF__SET)
-		this->output[0] = 1;
+		set_output(0,  1);
 	else if (!m_last_clk && clk)	/* low to high */
-		this->output[0] = DST_LOGIC_DFF__DATA;
+		set_output(0,  DST_LOGIC_DFF__DATA);
 	m_last_clk = clk;
 }
 
 DISCRETE_RESET(dst_logic_dff)
 {
 	m_last_clk = 0;
-	this->output[0]   = 0;
+	set_output(0,  0);
 }
 
 
@@ -782,9 +789,9 @@ DISCRETE_STEP(dst_logic_jkff)
 	int k   = (int)DST_LOGIC_JKFF__K;
 
 	if (DST_LOGIC_JKFF__RESET)
-		this->output[0] = 0;
+		m_v_out = 0;
 	else if (DST_LOGIC_JKFF__SET)
-		this->output[0] = 1;
+		m_v_out = 1;
 	else if (m_last_clk && !clk)	/* high to low */
 	{
 		if (!j)
@@ -792,25 +799,27 @@ DISCRETE_STEP(dst_logic_jkff)
 			/* J=0, K=0 - Hold */
 			if (k)
 				/* J=0, K=1 - Reset */
-				this->output[0] = 0;
+				m_v_out = 0;
 		}
 		else
 		{
 			if (!k)
 				/* J=1, K=0 - Set */
-				this->output[0] = 1;
+				m_v_out = 1;
 			else
 				/* J=1, K=1 - Toggle */
-				this->output[0] = !(int)this->output[0];
+				m_v_out = !(int)m_v_out;
 		}
 	}
 	m_last_clk = clk;
+	set_output(0, m_v_out);
 }
 
 DISCRETE_RESET(dst_logic_jkff)
 {
 	m_last_clk = 0;
-	this->output[0]   = 0;
+	m_v_out = 0;
+	set_output(0, m_v_out);
 }
 
 /************************************************************************
@@ -848,7 +857,7 @@ DISCRETE_STEP(dst_logic_shift)
 	if(((DST_LOGIC_SHIFT__RESET == 0) ? 0 : 1) == m_reset_on_high)
 	{
 		m_shift_data = 0;
-		this->output[0] = 0;
+		set_output(0,  0);
 		return;
 	}
 
@@ -895,7 +904,7 @@ DISCRETE_STEP(dst_logic_shift)
 		m_shift_data &= m_bit_mask;
 	}
 
-	this->output[0] = m_shift_data;
+	set_output(0,  m_shift_data);
 }
 
 DISCRETE_RESET(dst_logic_shift)
@@ -908,7 +917,7 @@ DISCRETE_RESET(dst_logic_shift)
 	m_t_left  = 0;
 	m_last = 0;
 	m_shift_data   = 0;
-	this->output[0]  = 0;
+	set_output(0, 0);
 }
 
 /************************************************************************
@@ -932,9 +941,9 @@ DISCRETE_STEP(dst_lookup_table)
 	int	addr = DST_LOOKUP_TABLE__IN;
 
 	if (addr < 0 || addr >= DST_LOOKUP_TABLE__SIZE)
-		this->output[0] = 0;
+		set_output(0,  0);
 	else
-		this->output[0] = info[addr];
+		set_output(0,  info[addr]);
 }
 
 
@@ -1139,11 +1148,11 @@ DISCRETE_STEP(dst_mixer)
 			m_v_cap_amp += (v - m_v_cap_amp) * m_exponent_c_amp;
 			v -= m_v_cap_amp;
 		}
-		this->output[0] = v * info->gain;
+		set_output(0,  v * info->gain);
 	}
 	else
 	{
-		this->output[0] = 0;
+		set_output(0,  0);
 	}
 }
 
@@ -1247,7 +1256,7 @@ DISCRETE_RESET(dst_mixer)
 
 	if (m_type == DISC_MIXER_IS_OP_AMP_WITH_RI) m_gain = info->rF / info->rI;
 
-	this->output[0] = 0;
+	set_output(0,  0);
 }
 
 
@@ -1272,7 +1281,7 @@ DISCRETE_STEP(dst_multiplex)
 	addr = DST_MULTIPLEX__ADDR;	/* FP to INT */
 	if ((addr >= 0) && (addr < m_size))
 	{
-		this->output[0] = DST_MULTIPLEX__INP(addr);
+		set_output(0,  DST_MULTIPLEX__INP(addr));
 	}
 	else
 	{
@@ -1317,7 +1326,7 @@ DISCRETE_STEP(dst_oneshot)
 	if (UNEXPECTED(DST_ONESHOT__RESET))
 	{
 		/* Hold in Reset */
-		this->output[0] = 0;
+		set_output(0, 0);
 		m_state  = 0;
 	}
 	else
@@ -1335,7 +1344,7 @@ DISCRETE_STEP(dst_oneshot)
 				{
 					/* We have first trigger */
 					m_state     = 1;
-					this->output[0]    = (m_type & DISC_OUT_ACTIVE_LOW) ? 0 : DST_ONESHOT__AMP;
+					set_output(0, (m_type & DISC_OUT_ACTIVE_LOW) ? 0 : DST_ONESHOT__AMP);
 					m_countdown = DST_ONESHOT__WIDTH;
 				}
 				else
@@ -1356,7 +1365,7 @@ DISCRETE_STEP(dst_oneshot)
 			m_countdown -= this->sample_time();
 			if(m_countdown <= 0.0)
 			{
-				this->output[0]    = (m_type & DISC_OUT_ACTIVE_LOW) ? DST_ONESHOT__AMP : 0;
+				set_output(0, (m_type & DISC_OUT_ACTIVE_LOW) ? DST_ONESHOT__AMP : 0);
 				m_countdown = 0;
 				m_state     = 0;
 			}
@@ -1373,7 +1382,7 @@ DISCRETE_RESET(dst_oneshot)
 	m_last_trig = 0;
 	m_type = DST_ONESHOT__TYPE;
 
-	this->output[0] = (m_type & DISC_OUT_ACTIVE_LOW) ? DST_ONESHOT__AMP : 0;
+	set_output(0,  (m_type & DISC_OUT_ACTIVE_LOW) ? DST_ONESHOT__AMP : 0);
 }
 
 
@@ -1403,27 +1412,29 @@ DISCRETE_STEP(dst_ramp)
 		if (!m_last_en)
 		{
 			m_last_en = 1;
-			this->output[0]  = DST_RAMP__START;
+			m_v_out = DST_RAMP__START;
 		}
-		if(m_dir ? DST_RAMP__DIR : !DST_RAMP__DIR) this->output[0]+=m_step;
-		else this->output[0] -= m_step;
+		if(m_dir ? DST_RAMP__DIR : !DST_RAMP__DIR) m_v_out += m_step;
+		else m_v_out -= m_step;
 		/* Clamp to min/max */
-		if(m_dir ? (this->output[0] < DST_RAMP__START)
-				: (this->output[0] > DST_RAMP__START)) this->output[0] = DST_RAMP__START;
-		if(m_dir ? (this->output[0] > DST_RAMP__END)
-				: (this->output[0] < DST_RAMP__END)) this->output[0] = DST_RAMP__END;
+		if(m_dir ? (m_v_out < DST_RAMP__START)
+				: (m_v_out > DST_RAMP__START)) m_v_out = DST_RAMP__START;
+		if(m_dir ? (m_v_out > DST_RAMP__END)
+				: (m_v_out < DST_RAMP__END)) m_v_out = DST_RAMP__END;
 	}
 	else
 	{
 		m_last_en = 0;
 		/* Disabled so clamp to output */
-		this->output[0] = DST_RAMP__CLAMP;
+		m_v_out = DST_RAMP__CLAMP;
 	}
+
+	set_output(0, m_v_out);
 }
 
 DISCRETE_RESET(dst_ramp)
 {
-	this->output[0]  = DST_RAMP__CLAMP;
+	m_v_out = DST_RAMP__CLAMP;
 	m_step    = DST_RAMP__GRAD / this->sample_rate();
 	m_dir     = ((DST_RAMP__END - DST_RAMP__START) == abs(DST_RAMP__END - DST_RAMP__START));
 	m_last_en = 0;
@@ -1449,19 +1460,19 @@ DISCRETE_STEP(dst_samphold)
 	{
 		case DISC_SAMPHOLD_REDGE:
 			/* Clock the whole time the input is rising */
-			if (DST_SAMPHOLD__CLOCK > m_last_input) this->output[0] = DST_SAMPHOLD__IN0;
+			if (DST_SAMPHOLD__CLOCK > m_last_input) set_output(0,  DST_SAMPHOLD__IN0);
 			break;
 		case DISC_SAMPHOLD_FEDGE:
 			/* Clock the whole time the input is falling */
-			if(DST_SAMPHOLD__CLOCK < m_last_input) this->output[0] = DST_SAMPHOLD__IN0;
+			if(DST_SAMPHOLD__CLOCK < m_last_input) set_output(0,  DST_SAMPHOLD__IN0);
 			break;
 		case DISC_SAMPHOLD_HLATCH:
 			/* Output follows input if clock != 0 */
-			if( DST_SAMPHOLD__CLOCK) this->output[0] = DST_SAMPHOLD__IN0;
+			if( DST_SAMPHOLD__CLOCK) set_output(0,  DST_SAMPHOLD__IN0);
 			break;
 		case DISC_SAMPHOLD_LLATCH:
 			/* Output follows input if clock == 0 */
-			if (DST_SAMPHOLD__CLOCK == 0) this->output[0] = DST_SAMPHOLD__IN0;
+			if (DST_SAMPHOLD__CLOCK == 0) set_output(0,  DST_SAMPHOLD__IN0);
 			break;
 		default:
 			m_device->discrete_log("dst_samphold_step - Invalid clocktype passed");
@@ -1473,7 +1484,7 @@ DISCRETE_STEP(dst_samphold)
 
 DISCRETE_RESET(dst_samphold)
 {
-	this->output[0]     =  0;
+	set_output(0, 0);
 	m_last_input = -1;
 	/* Only stored in here to speed up and save casting in the step function */
 	m_clocktype = (int)DST_SAMPHOLD__TYPE;
@@ -1500,11 +1511,11 @@ DISCRETE_STEP(dst_switch)
 {
 	if(DST_SWITCH__ENABLE)
 	{
-		this->output[0] = DST_SWITCH__SWITCH ? DST_SWITCH__IN1 : DST_SWITCH__IN0;
+		set_output(0,  DST_SWITCH__SWITCH ? DST_SWITCH__IN1 : DST_SWITCH__IN0);
 	}
 	else
 	{
-		this->output[0] = 0;
+		set_output(0,  0);
 	}
 }
 
@@ -1524,7 +1535,7 @@ DISCRETE_STEP(dst_switch)
 
 DISCRETE_STEP(dst_aswitch)
 {
-	this->output[0] = DST_ASWITCH__CTRL > DST_ASWITCH__THRESHOLD ? DST_ASWITCH__IN : 0;
+	set_output(0,  DST_ASWITCH__CTRL > DST_ASWITCH__THRESHOLD ? DST_ASWITCH__IN : 0);
 }
 
 /************************************************************************
@@ -1596,7 +1607,7 @@ DISCRETE_STEP(dst_transform)
 			case TOK_END:		break; /* please compiler */
 		}
 	}
-	this->output[0] = top;
+	set_output(0,  top);
 }
 
 DISCRETE_RESET(dst_transform)
@@ -1661,6 +1672,7 @@ DISCRETE_STEP(dst_op_amp)
 	double i_pos = 0;
 	double i_neg = 0;
 	double i    = 0;
+	double v_out;
 
 	if (DST_OP_AMP__ENABLE)
 	{
@@ -1694,30 +1706,32 @@ DISCRETE_STEP(dst_op_amp)
 					else
 						/* linear charge */
 						m_v_cap += i / m_exponent;
-					this->output[0] = m_v_cap;
+					v_out = m_v_cap;
 				}
 				else
 					if (m_has_r4)
-						this->output[0] = i * info->r4;
+						v_out = i * info->r4;
 					else
 						/* output just swings to rail when there is no r4 */
 						if (i > 0)
-							this->output[0] = m_v_max;
+							v_out = m_v_max;
 						else
-							this->output[0] = 0;
+							v_out = 0;
 
 				/* clamp output */
-				if (this->output[0] > m_v_max) this->output[0] = m_v_max;
-				else if (this->output[0] < info->vN) this->output[0] = info->vN;
-				m_v_cap = this->output[0];
+				if (v_out > m_v_max) v_out = m_v_max;
+				else if (v_out < info->vN) v_out = info->vN;
+				m_v_cap = v_out;
+
+				set_output(0, v_out);
 				break;
 
 			default:
-				this->output[0] = 0;
+				set_output(0, 0);
 		}
 	}
 	else
-		this->output[0] = 0;
+		set_output(0, 0);
 }
 
 DISCRETE_RESET(dst_op_amp)
@@ -1773,7 +1787,7 @@ DISCRETE_STEP(dst_op_amp_1sht)
 
 	/* update trigger circuit */
 	i_pos  = (DST_OP_AMP_1SHT__TRIGGER - m_v_cap2) / info->r2;
-	i_pos += this->output[0] / info->r5;
+	i_pos += m_v_out / info->r5;
 	m_v_cap2 += (DST_OP_AMP_1SHT__TRIGGER - m_v_cap2) * m_exponent2;
 
 	/* calculate currents and output */
@@ -1781,13 +1795,13 @@ DISCRETE_STEP(dst_op_amp_1sht)
 	if (i_neg < 0) i_neg = 0;
 	i_neg += m_i_fixed;
 
-	if (i_pos > i_neg) this->output[0] = m_v_max;
-	else this->output[0] = info->vN;
+	if (i_pos > i_neg) m_v_out = m_v_max;
+	else m_v_out = info->vN;
 
 	/* update c1 */
 	/* rough value of voltage at anode of diode if discharging */
-	v = this->output[0] + 0.6;
-	if (m_v_cap1 > this->output[0])
+	v = m_v_out + 0.6;
+	if (m_v_cap1 > m_v_out)
 	{
 		/* discharge */
 		if (m_v_cap1 > v)
@@ -1795,11 +1809,13 @@ DISCRETE_STEP(dst_op_amp_1sht)
 			m_v_cap1 = v;
 		else
 			/* discharge through r4 */
-			m_v_cap1 += (this->output[0] - m_v_cap1) * m_exponent1d;
+			m_v_cap1 += (m_v_out - m_v_cap1) * m_exponent1d;
 	}
 	else
 		/* charge */
-		m_v_cap1 += ((this->output[0] - OP_AMP_NORTON_VBE) * m_r34ratio + OP_AMP_NORTON_VBE - m_v_cap1) * m_exponent1c;
+		m_v_cap1 += ((m_v_out - OP_AMP_NORTON_VBE) * m_r34ratio + OP_AMP_NORTON_VBE - m_v_cap1) * m_exponent1c;
+
+	set_output(0, m_v_out);
 }
 
 DISCRETE_RESET(dst_op_amp_1sht)
@@ -1846,6 +1862,8 @@ DISCRETE_STEP(dst_tvca_op_amp)
 	double	i_neg = 0;	/* current into - input */
 	double	i_pos = 0;	/* current into + input */
 	double	i_out = 0;	/* current at output */
+
+	double 	v_out;
 
 	trig0 = (int)DST_TVCA_OP_AMP__TRG0;
 	trig1 = (int)DST_TVCA_OP_AMP__TRG1;
@@ -1924,15 +1942,17 @@ DISCRETE_STEP(dst_tvca_op_amp)
 			m_v_cap4 += i_out / m_exponent4;
 		if (m_v_cap4 < 0)
 			m_v_cap4 = 0;
-		this->output[0] = m_v_cap4;
+		v_out = m_v_cap4;
 	}
 	else
-		this->output[0] = i_out * info->r4;
+		v_out = i_out * info->r4;
 
 
 
 	/* Clip the output if needed. */
-	if (this->output[0] > m_v_out_max) this->output[0] = m_v_out_max;
+	if (v_out > m_v_out_max) v_out = m_v_out_max;
+
+	set_output(0, v_out);
 }
 
 DISCRETE_RESET(dst_tvca_op_amp)
@@ -2036,13 +2056,13 @@ DISCRETE_STEP(dst_xtime_buffer)
 		{
 			double diff = out_high - out_low;
 			diff = out ? diff * x_time : diff * (1.0 - x_time);
-			this->output[0] = out_low + diff;
+			set_output(0,  out_low + diff);
 		}
 		else
-			this->output[0] = out ? out_high : out_low;
+			set_output(0,  out ? out_high : out_low);
 	}
 	else
-		this->output[0] = out + x_time;
+		set_output(0,  out + x_time);
 }
 
 
@@ -2256,13 +2276,13 @@ DISCRETE_STEP(dst_xtime_and)
 		{
 			double diff = out_high - out_low;
 			diff = out ? diff * x_time : diff * (1.0 - x_time);
-			this->output[0] = out_low + diff;
+			set_output(0,  out_low + diff);
 		}
 		else
-			this->output[0] = out ? out_high : out_low;
+			set_output(0,  out ? out_high : out_low);
 	}
 	else
-		this->output[0] = out + x_time;
+		set_output(0,  out + x_time);
 }
 
 
@@ -2481,13 +2501,13 @@ DISCRETE_STEP(dst_xtime_or)
 		{
 			double diff = out_high - out_low;
 			diff = out ? diff * x_time : diff * (1.0 - x_time);
-			this->output[0] = out_low + diff;
+			set_output(0,  out_low + diff);
 		}
 		else
-			this->output[0] = out ? out_high : out_low;
+			set_output(0,  out ? out_high : out_low);
 	}
 	else
-		this->output[0] = out + x_time;
+		set_output(0,  out + x_time);
 }
 
 
@@ -2742,11 +2762,11 @@ DISCRETE_STEP(dst_xtime_xor)
 		{
 			double diff = out_high - out_low;
 			diff = out ? diff * x_time : diff * (1.0 - x_time);
-			this->output[0] = out_low + diff;
+			set_output(0,  out_low + diff);
 		}
 		else
-			this->output[0] = out ? out_high : out_low;
+			set_output(0,  out ? out_high : out_low);
 	}
 	else
-		this->output[0] = out + x_time;
+		set_output(0,  out + x_time);
 }
