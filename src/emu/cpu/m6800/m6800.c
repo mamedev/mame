@@ -118,8 +118,9 @@ struct _m6800_state
 	UINT8	wai_state;		/* WAI opcode state ,(or sleep opcode state) */
 	UINT8	nmi_state;		/* NMI line state */
 	UINT8	nmi_pending;	/* NMI pending */
-	UINT8	irq_state[2];	/* IRQ line state [IRQ1,TIN] */
+	UINT8	irq_state[3];	/* IRQ line state [IRQ1,TIN,SC1] */
 	UINT8	ic_eddge;		/* InputCapture eddge , b.0=fall,b.1=raise */
+	int		sc1_state;
 
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
@@ -141,6 +142,7 @@ struct _m6800_state
 	UINT8	port2_data;
 	UINT8	port3_data;
 	UINT8	port4_data;
+	UINT8	p3csr;			// Port 3 Control/Status Register
 	UINT8	tcsr;			/* Timer Control and Status Register */
 	UINT8	pending_tcsr;	/* pending IRQ flag for clear IRQflag process */
 	UINT8	irq2;			/* IRQ2 flags */
@@ -148,6 +150,8 @@ struct _m6800_state
 	PAIR	counter;		/* free running counter */
 	PAIR	output_compare;	/* output compare       */
 	UINT16	input_capture;	/* input capture        */
+	int		p3csr_is3_flag_read;
+	int		port3_latched;
 
 	int		clock;
 	UINT8	trcsr, rmcr, rdr, tdr, rsr, tsr;
@@ -161,6 +165,7 @@ struct _m6800_state
 	emu_timer *sci_timer;
 	PAIR ea;		/* effective address */
 
+	devcb_resolved_write_line	out_sc2_func;
 };
 
 INLINE m6800_state *get_safe_token(device_t *device)
@@ -268,6 +273,44 @@ static UINT32 timer_next;
 	SET_TIMER_EVENT;							\
 }
 
+// I/O registers
+
+enum
+{
+	IO_P1DDR = 0,
+	IO_P2DDR,
+	IO_P1DATA,
+	IO_P2DATA,
+	IO_P3DDR,
+	IO_P4DDR,
+	IO_P3DATA,
+	IO_P4DATA,
+	IO_TCSR,
+	IO_CH,
+	IO_CL,
+	IO_OCRH,
+	IO_OCRL,
+	IO_ICRH,
+	IO_ICRL,
+	IO_P3CSR,
+	IO_RMCR,
+	IO_TRCSR,
+	IO_RDR,
+	IO_TDR,
+	IO_RCR,
+	IO_CAAH,
+	IO_CAAL,
+	IO_TCR1,
+	IO_TCR2,
+	IO_TSR,
+	IO_OCR2H,
+	IO_OCR2L,
+	IO_OCR3H,
+	IO_OCR3L,
+	IO_ICR2H,
+	IO_ICR2L
+};
+
 // serial I/O
 
 #define M6800_RMCR_SS_MASK		0x03 // Speed Select
@@ -288,6 +331,11 @@ static UINT32 timer_next;
 
 #define M6800_PORT2_IO4			0x10
 #define M6800_PORT2_IO3			0x08
+
+#define M6801_P3CSR_LE			0x08
+#define M6801_P3CSR_OSS			0x10
+#define M6801_P3CSR_IS3_ENABLE	0x40
+#define M6801_P3CSR_IS3_FLAG	0x80
 
 static const int M6800_RMCR_SS[] = { 16, 128, 1024, 4096 };
 
@@ -605,6 +653,8 @@ static void m6800_check_irq2(m6800_state *cpustate)
 /* check the IRQ lines for pending interrupts */
 INLINE void CHECK_IRQ_LINES(m6800_state *cpustate)
 {
+	// TODO: IS3 interrupt
+
 	if (cpustate->nmi_pending)
 	{
 		if(cpustate->wai_state & M6800_SLP)
@@ -958,6 +1008,9 @@ static void state_register(m6800_state *cpustate, const char *type)
 	state_save_register_device_item(cpustate->device, 0, cpustate->port3_data);
 	state_save_register_device_item(cpustate->device, 0, cpustate->port4_data);
 	state_save_register_device_item(cpustate->device, 0, cpustate->port2_written);
+	state_save_register_device_item(cpustate->device, 0, cpustate->port3_latched);
+	state_save_register_device_item(cpustate->device, 0, cpustate->p3csr);
+	state_save_register_device_item(cpustate->device, 0, cpustate->p3csr_is3_flag_read);
 	state_save_register_device_item(cpustate->device, 0, cpustate->tcsr);
 	state_save_register_device_item(cpustate->device, 0, cpustate->pending_tcsr);
 	state_save_register_device_item(cpustate->device, 0, cpustate->irq2);
@@ -1011,13 +1064,18 @@ static CPU_RESET( m6800 )
 	cpustate->wai_state = 0;
 	cpustate->nmi_state = 0;
 	cpustate->nmi_pending = 0;
+	cpustate->sc1_state = 0;
 	cpustate->irq_state[M6800_IRQ_LINE] = 0;
 	cpustate->irq_state[M6800_TIN_LINE] = 0;
 	cpustate->ic_eddge = 0;
 
 	cpustate->port1_ddr = 0x00;
 	cpustate->port2_ddr = 0x00;
+	cpustate->port3_ddr = 0x00;
+	cpustate->p3csr = 0x00;
+	cpustate->p3csr_is3_flag_read = 0;
 	cpustate->port2_written = 0;
+	cpustate->port3_latched = 0;
 	/* TODO: on reset port 2 should be read to determine the operating mode (bits 0-2) */
 	cpustate->tcsr = 0x00;
 	cpustate->pending_tcsr = 0x00;
@@ -1052,16 +1110,32 @@ static CPU_EXIT( m6800 )
 
 static void set_irq_line(m6800_state *cpustate, int irqline, int state)
 {
-	if (irqline == INPUT_LINE_NMI)
+	switch (irqline)
 	{
+	case INPUT_LINE_NMI:
 		if (!cpustate->nmi_state && state != CLEAR_LINE)
 			cpustate->nmi_pending = TRUE;
 		cpustate->nmi_state = state;
-	}
-	else
-	{
-		//int eddge;
+		break;
 
+	case M6800_SC1_LINE:
+		if (!cpustate->port3_latched && (cpustate->p3csr & M6801_P3CSR_LE))
+		{
+			if (!cpustate->sc1_state && state)
+			{
+				// latch input data to port 3
+				cpustate->port3_data = (cpustate->io->read_byte(M6803_PORT3) & (cpustate->port3_ddr ^ 0xff)) | (cpustate->port3_data & cpustate->port3_ddr);
+				cpustate->port3_latched = 1;
+				//logerror("M6801 '%s' Latched Port 3 Data: %02x\n", cpustate->device->tag(), cpustate->port3_data);
+
+				// set IS3 flag bit
+				cpustate->p3csr |= M6801_P3CSR_IS3_FLAG;
+			}
+		}
+		cpustate->sc1_state = state;
+		break;
+
+	default:
 		LOG(("M6800 '%s' set_irq_line %d,%d\n", cpustate->device->tag(), irqline, state));
 		cpustate->irq_state[irqline] = state;
 
@@ -1130,6 +1204,13 @@ static CPU_INIT( m6801 )
 	cpustate->sci_timer = timer_alloc(device->machine, sci_tick, cpustate);
 
 	state_register(cpustate, "m6801");
+
+	if (device->baseconfig().static_config() != NULL)
+	{
+		m6801_interface *intf = (m6801_interface *) device->baseconfig().static_config();
+
+		devcb_resolve_write_line(&cpustate->out_sc2_func, &intf->out_sc2_func, device);
+	}
 }
 
 /****************************************************************************
@@ -1175,11 +1256,11 @@ static CPU_INIT( m6803 )
 	state_register(cpustate, "m6803");
 }
 
-static READ8_HANDLER( m6803_internal_registers_r );
-static WRITE8_HANDLER( m6803_internal_registers_w );
+static READ8_HANDLER( m6801_io_r );
+static WRITE8_HANDLER( m6801_io_w );
 
 static ADDRESS_MAP_START(m6803_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE(m6803_internal_registers_r, m6803_internal_registers_w)
+	AM_RANGE(0x0000, 0x001f) AM_READWRITE(m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0020, 0x007f) AM_NOP        /* unused */
 	AM_RANGE(0x0080, 0x00ff) AM_RAM        /* 6803 internal RAM */
 ADDRESS_MAP_END
@@ -1243,17 +1324,17 @@ static void hd63701_trap_pc(m6800_state *cpustate)
 }
 #endif
 
-static READ8_HANDLER( m6803_internal_registers_r );
-static WRITE8_HANDLER( m6803_internal_registers_w );
+static READ8_HANDLER( m6801_io_r );
+static WRITE8_HANDLER( m6801_io_w );
 
 READ8_HANDLER( hd63701_internal_registers_r )
 {
-	return m6803_internal_registers_r(space, offset);
+	return m6801_io_r(space, offset);
 }
 
 WRITE8_HANDLER( hd63701_internal_registers_w )
 {
-	m6803_internal_registers_w(space, offset,data);
+	m6801_io_w(space, offset,data);
 }
 
 /****************************************************************************
@@ -1276,296 +1357,439 @@ static CPU_INIT( nsc8105 )
 	state_register(cpustate, "nsc8105");
 }
 
-static READ8_HANDLER( m6803_internal_registers_r )
+INLINE void set_os3(m6800_state *cpustate, int state)
 {
-	m6800_state *cpustate = get_safe_token(space->cpu);
+	//logerror("M6801 '%s' OS3: %u\n", cpustate->device->tag(), state);
 
-	switch (offset)
-	{
-		case 0x00:
-			return cpustate->port1_ddr;
-		case 0x01:
-			return cpustate->port2_ddr;
-		case 0x02:
-			if(cpustate->port1_ddr == 0xff)
-				return cpustate->port1_data;
-			else
-				return (cpustate->io->read_byte(M6803_PORT1) & (cpustate->port1_ddr ^ 0xff))
-					| (cpustate->port1_data & cpustate->port1_ddr);
-		case 0x03:
-			if(cpustate->port2_ddr == 0xff)
-				return cpustate->port2_data;
-			else
-				return (cpustate->io->read_byte(M6803_PORT2) & (cpustate->port2_ddr ^ 0xff))
-					| (cpustate->port2_data & cpustate->port2_ddr);
-		case 0x04:
-			return cpustate->port3_ddr;
-		case 0x05:
-			return cpustate->port4_ddr;
-		case 0x06:
-			if(cpustate->port3_ddr == 0xff)
-				return cpustate->port3_data;
-			else
-				return (cpustate->io->read_byte(M6803_PORT3) & (cpustate->port3_ddr ^ 0xff))
-					| (cpustate->port3_data & cpustate->port3_ddr);
-		case 0x07:
-			if(cpustate->port4_ddr == 0xff)
-				return cpustate->port4_data;
-			else
-				return (cpustate->io->read_byte(M6803_PORT4) & (cpustate->port4_ddr ^ 0xff))
-					| (cpustate->port4_data & cpustate->port4_ddr);
-		case 0x08:
-			cpustate->pending_tcsr = 0;
-			return cpustate->tcsr;
-		case 0x09:
-			if(!(cpustate->pending_tcsr&TCSR_TOF))
-			{
-				cpustate->tcsr &= ~TCSR_TOF;
-				MODIFIED_tcsr;
-			}
-			return cpustate->counter.b.h;
-		case 0x0a:
-			return cpustate->counter.b.l;
-		case 0x0b:
-			if(!(cpustate->pending_tcsr&TCSR_OCF))
-			{
-				cpustate->tcsr &= ~TCSR_OCF;
-				MODIFIED_tcsr;
-			}
-			return cpustate->output_compare.b.h;
-		case 0x0c:
-			if(!(cpustate->pending_tcsr&TCSR_OCF))
-			{
-				cpustate->tcsr &= ~TCSR_OCF;
-				MODIFIED_tcsr;
-			}
-			return cpustate->output_compare.b.l;
-		case 0x0d:
-			if(!(cpustate->pending_tcsr&TCSR_ICF))
-			{
-				cpustate->tcsr &= ~TCSR_ICF;
-				MODIFIED_tcsr;
-			}
-			return (cpustate->input_capture >> 0) & 0xff;
-		case 0x0e:
-			return (cpustate->input_capture >> 8) & 0xff;
-		case 0x0f:
-			logerror("CPU '%s' PC %04x: warning - read from unsupported register %02x\n",space->cpu->tag(),cpu_get_pc(space->cpu),offset);
-			return 0;
-		case 0x10:
-			return cpustate->rmcr;
-		case 0x11:
-			if (cpustate->trcsr & M6800_TRCSR_TDRE)
-			{
-				cpustate->trcsr_read_tdre = 1;
-			}
-			if (cpustate->trcsr & M6800_TRCSR_ORFE)
-			{
-				cpustate->trcsr_read_orfe = 1;
-			}
-			if (cpustate->trcsr & M6800_TRCSR_RDRF)
-			{
-				cpustate->trcsr_read_rdrf = 1;
-			}
-			return cpustate->trcsr;
-		case 0x12:
-			if (cpustate->trcsr_read_orfe)
-			{
-				cpustate->trcsr_read_orfe = 0;
-				cpustate->trcsr &= ~M6800_TRCSR_ORFE;
-			}
-			if (cpustate->trcsr_read_rdrf)
-			{
-				//logerror("M6801 '%s' Clear RDRF\n", space->cpu->tag());
-				cpustate->trcsr_read_rdrf = 0;
-				cpustate->trcsr &= ~M6800_TRCSR_RDRF;
-			}
-			return cpustate->rdr;
-		case 0x13:
-			return cpustate->tdr;
-		case 0x14:
-			logerror("CPU '%s' PC %04x: read RAM control register\n",space->cpu->tag(),cpu_get_pc(space->cpu));
-			return cpustate->ram_ctrl;
-		case 0x15:
-		case 0x16:
-		case 0x17:
-		case 0x18:
-		case 0x19:
-		case 0x1a:
-		case 0x1b:
-		case 0x1c:
-		case 0x1d:
-		case 0x1e:
-		case 0x1f:
-		default:
-			logerror("CPU '%s' PC %04x: warning - read from reserved internal register %02x\n",space->cpu->tag(),cpu_get_pc(space->cpu),offset);
-			return 0;
-	}
+	devcb_call_write_line(&cpustate->out_sc2_func, state);
 }
 
-static WRITE8_HANDLER( m6803_internal_registers_w )
+static READ8_HANDLER( m6801_io_r )
+{
+	m6800_state *cpustate = get_safe_token(space->cpu);
+
+	UINT8 data = 0;
+
+	switch (offset)
+	{
+	case IO_P1DDR:
+		data = cpustate->port1_ddr;
+		break;
+
+	case IO_P2DDR:
+		data = cpustate->port2_ddr;
+		break;
+
+	case IO_P1DATA:
+		if(cpustate->port1_ddr == 0xff)
+			data = cpustate->port1_data;
+		else
+			data = (cpustate->io->read_byte(M6803_PORT1) & (cpustate->port1_ddr ^ 0xff))
+				| (cpustate->port1_data & cpustate->port1_ddr);
+		break;
+		
+	case IO_P2DATA:
+		if(cpustate->port2_ddr == 0xff)
+			data = cpustate->port2_data;
+		else
+			data = (cpustate->io->read_byte(M6803_PORT2) & (cpustate->port2_ddr ^ 0xff))
+				| (cpustate->port2_data & cpustate->port2_ddr);
+		break;
+		
+	case IO_P3DDR:
+		logerror("M6801 '%s' Port 3 DDR is a write-only register\n", space->cpu->tag());
+		break;
+
+	case IO_P4DDR:
+		data = cpustate->port4_ddr;
+		break;
+
+	case IO_P3DATA:
+		if (cpustate->p3csr_is3_flag_read)
+		{
+			//logerror("M6801 '%s' Cleared IS3\n", space->cpu->tag());
+			cpustate->p3csr &= ~M6801_P3CSR_IS3_FLAG;
+			cpustate->p3csr_is3_flag_read = 0;
+		}
+
+		if (!(cpustate->p3csr & M6801_P3CSR_OSS))
+		{
+			set_os3(cpustate, ASSERT_LINE);
+		}
+
+		if ((cpustate->p3csr & M6801_P3CSR_LE) || (cpustate->port3_ddr == 0xff))
+			data = cpustate->port3_data;
+		else
+			data = (cpustate->io->read_byte(M6803_PORT3) & (cpustate->port3_ddr ^ 0xff))
+				| (cpustate->port3_data & cpustate->port3_ddr);
+
+		cpustate->port3_latched = 0;
+
+		if (!(cpustate->p3csr & M6801_P3CSR_OSS))
+		{
+			set_os3(cpustate, CLEAR_LINE);
+		}
+		break;
+
+	case IO_P4DATA:
+		if(cpustate->port4_ddr == 0xff)
+			data = cpustate->port4_data;
+		else
+			data = (cpustate->io->read_byte(M6803_PORT4) & (cpustate->port4_ddr ^ 0xff))
+				| (cpustate->port4_data & cpustate->port4_ddr);
+		break;
+
+	case IO_TCSR:
+		cpustate->pending_tcsr = 0;
+		data = cpustate->tcsr;
+		break;
+
+	case IO_CH:
+		if(!(cpustate->pending_tcsr&TCSR_TOF))
+		{
+			cpustate->tcsr &= ~TCSR_TOF;
+			MODIFIED_tcsr;
+		}
+		data = cpustate->counter.b.h;
+		break;
+
+	case IO_CL:
+		data = cpustate->counter.b.l;
+
+	case IO_OCRH:
+		if(!(cpustate->pending_tcsr&TCSR_OCF))
+		{
+			cpustate->tcsr &= ~TCSR_OCF;
+			MODIFIED_tcsr;
+		}
+		data = cpustate->output_compare.b.h;
+		break;
+
+	case IO_OCRL:
+		if(!(cpustate->pending_tcsr&TCSR_OCF))
+		{
+			cpustate->tcsr &= ~TCSR_OCF;
+			MODIFIED_tcsr;
+		}
+		data = cpustate->output_compare.b.l;
+		break;
+
+	case IO_ICRH:
+		if(!(cpustate->pending_tcsr&TCSR_ICF))
+		{
+			cpustate->tcsr &= ~TCSR_ICF;
+			MODIFIED_tcsr;
+		}
+		data = (cpustate->input_capture >> 0) & 0xff;
+		break;
+
+	case IO_ICRL:
+		data = (cpustate->input_capture >> 8) & 0xff;
+		break;
+
+	case IO_P3CSR:
+		if (cpustate->p3csr & M6801_P3CSR_IS3_FLAG)
+		{
+			cpustate->p3csr_is3_flag_read = 1;
+		}
+
+		data = cpustate->p3csr;
+		break;
+
+	case IO_RMCR:
+		data = cpustate->rmcr;
+		break;
+
+	case IO_TRCSR:
+		if (cpustate->trcsr & M6800_TRCSR_TDRE)
+		{
+			cpustate->trcsr_read_tdre = 1;
+		}
+			
+		if (cpustate->trcsr & M6800_TRCSR_ORFE)
+		{
+			cpustate->trcsr_read_orfe = 1;
+		}
+			
+		if (cpustate->trcsr & M6800_TRCSR_RDRF)
+		{
+			cpustate->trcsr_read_rdrf = 1;
+		}
+
+		data = cpustate->trcsr;
+		break;
+
+	case IO_RDR:
+		if (cpustate->trcsr_read_orfe)
+		{
+			//logerror("M6801 '%s' Cleared ORFE\n", space->cpu->tag());
+			cpustate->trcsr_read_orfe = 0;
+			cpustate->trcsr &= ~M6800_TRCSR_ORFE;
+		}
+
+		if (cpustate->trcsr_read_rdrf)
+		{
+			//logerror("M6801 '%s' Cleared RDRF\n", space->cpu->tag());
+			cpustate->trcsr_read_rdrf = 0;
+			cpustate->trcsr &= ~M6800_TRCSR_RDRF;
+		}
+
+		data = cpustate->rdr;
+		break;
+
+	case IO_TDR:
+		data = cpustate->tdr;
+		break;
+
+	case IO_RCR:
+		data = cpustate->ram_ctrl;
+		break;
+
+	case IO_CAAH:
+	case IO_CAAL:
+	case IO_TCR1:
+	case IO_TCR2:
+	case IO_TSR:
+	case IO_OCR2H:
+	case IO_OCR2L:
+	case IO_OCR3H:
+	case IO_OCR3L:
+	case IO_ICR2H:
+	case IO_ICR2L:
+	default:
+		logerror("M6801 '%s' PC %04x: warning - read from reserved internal register %02x\n",space->cpu->tag(),cpu_get_pc(space->cpu),offset);
+	}
+
+	return data;
+}
+
+static WRITE8_HANDLER( m6801_io_w )
 {
 	m6800_state *cpustate = get_safe_token(space->cpu);
 
 	switch (offset)
 	{
-		case 0x00:
-			if (cpustate->port1_ddr != data)
-			{
-				cpustate->port1_ddr = data;
-				if(cpustate->port1_ddr == 0xff)
-					cpustate->io->write_byte(M6803_PORT1,cpustate->port1_data);
-				else if (cpustate->port1_ddr)
-					cpustate->io->write_byte(M6803_PORT1,(cpustate->port1_data & cpustate->port1_ddr)
-						| (cpustate->io->read_byte(M6803_PORT1) & (cpustate->port1_ddr ^ 0xff)));
-			}
-			break;
-		case 0x01:
-			if (cpustate->port2_ddr != data)
-			{
-				cpustate->port2_ddr = data;
-				write_port2(cpustate);
+	case IO_P1DDR:
+		//logerror("M6801 '%s' Port 1 Data Direction Register: %02x\n", space->cpu->tag(), data);
 
-				if (cpustate->port2_ddr & 2)
-					logerror("CPU '%s' PC %04x: warning - port 2 bit 1 set as output (OLVL) - not supported\n",space->cpu->tag(),cpu_get_pc(space->cpu));
-			}
-			break;
-		case 0x02:
-			cpustate->port1_data = data;
+		if (cpustate->port1_ddr != data)
+		{
+			cpustate->port1_ddr = data;
 			if(cpustate->port1_ddr == 0xff)
 				cpustate->io->write_byte(M6803_PORT1,cpustate->port1_data);
-			else if (cpustate->port1_ddr)
-				cpustate->io->write_byte(M6803_PORT1,(cpustate->port1_data & cpustate->port1_ddr)
-					| (cpustate->io->read_byte(M6803_PORT1) & (cpustate->port1_ddr ^ 0xff)));
-			break;
-		case 0x03:
-			cpustate->port2_data = data;
-			cpustate->port2_written = 1;
+			else
+				cpustate->io->write_byte(M6803_PORT1,(cpustate->port1_data & cpustate->port1_ddr) | (cpustate->port1_ddr ^ 0xff));
+		}
+		break;
+
+	case IO_P2DDR:
+		//logerror("M6801 '%s' Port 2 Data Direction Register: %02x\n", space->cpu->tag(), data);
+
+		if (cpustate->port2_ddr != data)
+		{
+			cpustate->port2_ddr = data;
 			write_port2(cpustate);
-			break;
-		case 0x04:
-			if (cpustate->port3_ddr != data)
-			{
-				cpustate->port3_ddr = data;
-				if(cpustate->port3_ddr == 0xff)
-					cpustate->io->write_byte(M6803_PORT3,cpustate->port3_data);
-				else if (cpustate->port3_ddr)
-					cpustate->io->write_byte(M6803_PORT3,(cpustate->port3_data & cpustate->port3_ddr)
-						| (cpustate->io->read_byte(M6803_PORT3) & (cpustate->port3_ddr ^ 0xff)));
-			}
-			break;
-		case 0x05:
-			if (cpustate->port4_ddr != data)
-			{
-				cpustate->port4_ddr = data;
-				if(cpustate->port4_ddr == 0xff)
-					cpustate->io->write_byte(M6803_PORT4,cpustate->port4_data);
-				else if (cpustate->port4_ddr)
-					cpustate->io->write_byte(M6803_PORT4,(cpustate->port4_data & cpustate->port4_ddr)
-						| (cpustate->io->read_byte(M6803_PORT4) & (cpustate->port4_ddr ^ 0xff)));
-			}
-			break;
-		case 0x06:
-			cpustate->port3_data = data;
+
+			if (cpustate->port2_ddr & 2)
+				logerror("CPU '%s' PC %04x: warning - port 2 bit 1 set as output (OLVL) - not supported\n",space->cpu->tag(),cpu_get_pc(space->cpu));
+		}
+		break;
+
+	case IO_P1DATA:
+		//logerror("M6801 '%s' Port 1 Data Register: %02x\n", space->cpu->tag(), data);
+
+		cpustate->port1_data = data;
+		if(cpustate->port1_ddr == 0xff)
+			cpustate->io->write_byte(M6803_PORT1,cpustate->port1_data);
+		else
+			cpustate->io->write_byte(M6803_PORT1,(cpustate->port1_data & cpustate->port1_ddr) | (cpustate->port1_ddr ^ 0xff));
+		break;
+
+	case IO_P2DATA:
+		//logerror("M6801 '%s' Port 2 Data Register: %02x\n", space->cpu->tag(), data);
+
+		cpustate->port2_data = data;
+		cpustate->port2_written = 1;
+		write_port2(cpustate);
+		break;
+
+	case IO_P3DDR:
+		//logerror("M6801 '%s' Port 3 Data Direction Register: %02x\n", space->cpu->tag(), data);
+
+		if (cpustate->port3_ddr != data)
+		{
+			cpustate->port3_ddr = data;
 			if(cpustate->port3_ddr == 0xff)
 				cpustate->io->write_byte(M6803_PORT3,cpustate->port3_data);
-			else if (cpustate->port3_ddr)
-				cpustate->io->write_byte(M6803_PORT3,(cpustate->port3_data & cpustate->port3_ddr)
-					| (cpustate->io->read_byte(M6803_PORT3) & (cpustate->port3_ddr ^ 0xff)));
-			break;
-		case 0x07:
-			cpustate->port4_data = data;
+			else
+				cpustate->io->write_byte(M6803_PORT3,(cpustate->port3_data & cpustate->port3_ddr) | (cpustate->port3_ddr ^ 0xff));
+		}
+		break;
+
+	case IO_P4DDR:
+		//logerror("M6801 '%s' Port 4 Data Direction Register: %02x\n", space->cpu->tag(), data);
+
+		if (cpustate->port4_ddr != data)
+		{
+			cpustate->port4_ddr = data;
 			if(cpustate->port4_ddr == 0xff)
 				cpustate->io->write_byte(M6803_PORT4,cpustate->port4_data);
-			else if (cpustate->port4_ddr)
-				cpustate->io->write_byte(M6803_PORT4,(cpustate->port4_data & cpustate->port4_ddr)
-					| (cpustate->io->read_byte(M6803_PORT4) & (cpustate->port4_ddr ^ 0xff)));
-			break;
-		case 0x08:
-			cpustate->tcsr = data;
-			cpustate->pending_tcsr &= cpustate->tcsr;
-			MODIFIED_tcsr;
-			if( !(CC & 0x10) )
-				m6800_check_irq2(cpustate);
-			break;
-		case 0x09:
-			cpustate->latch09 = data & 0xff;	/* 6301 only */
-			CT  = 0xfff8;
-			TOH = CTH;
-			MODIFIED_counters;
-			break;
-		case 0x0a:	/* 6301 only */
-			CT = (cpustate->latch09 << 8) | (data & 0xff);
-			TOH = CTH;
-			MODIFIED_counters;
-			break;
-		case 0x0b:
-			if( cpustate->output_compare.b.h != data)
-			{
-				cpustate->output_compare.b.h = data;
-				MODIFIED_counters;
-			}
-			break;
-		case 0x0c:
-			if( cpustate->output_compare.b.l != data)
-			{
-				cpustate->output_compare.b.l = data;
-				MODIFIED_counters;
-			}
-			break;
-		case 0x0d:
-		case 0x0e:
-		case 0x12:
-			logerror("CPU '%s' PC %04x: warning - write %02x to read only internal register %02x\n",space->cpu->tag(),cpu_get_pc(space->cpu),data,offset);
-			break;
-		case 0x0f:
-			logerror("CPU '%s' PC %04x: warning - write %02x to unsupported internal register %02x\n",space->cpu->tag(),cpu_get_pc(space->cpu),data,offset);
-			break;
-		case 0x10:
-			set_rmcr(cpustate, data);
-			break;
-		case 0x11:
-			if ((data & M6800_TRCSR_TE) && !(cpustate->trcsr & M6800_TRCSR_TE))
-			{
-				cpustate->txstate = M6800_TX_STATE_INIT;
-				cpustate->txbits = 0;
-				cpustate->tx = 1;
-			}
-			
-			if ((data & M6800_TRCSR_RE) && !(cpustate->trcsr & M6800_TRCSR_RE))
-			{
-				cpustate->rxbits = 0;
-			}
+			else
+				cpustate->io->write_byte(M6803_PORT4,(cpustate->port4_data & cpustate->port4_ddr) | (cpustate->port4_ddr ^ 0xff));
+		}
+		break;
 
-			cpustate->trcsr = (cpustate->trcsr & 0xe0) | (data & 0x1f);
-			break;
-		case 0x13:
-			//logerror("M6800 '%s' Transmit Data Register: %02x\n", space->cpu->tag(), data);
-			if (cpustate->trcsr_read_tdre)
-			{
-				cpustate->trcsr_read_tdre = 0;
-				cpustate->trcsr &= ~M6800_TRCSR_TDRE;
-			}
-			cpustate->tdr = data;
-			break;
-		case 0x14:
-			logerror("CPU '%s' PC %04x: write %02x to RAM control register\n",space->cpu->tag(),cpu_get_pc(space->cpu),data);
-			cpustate->ram_ctrl = data;
-			break;
-		case 0x15:
-		case 0x16:
-		case 0x17:
-		case 0x18:
-		case 0x19:
-		case 0x1a:
-		case 0x1b:
-		case 0x1c:
-		case 0x1d:
-		case 0x1e:
-		case 0x1f:
-		default:
-			logerror("CPU '%s' PC %04x: warning - write %02x to reserved internal register %02x\n",space->cpu->tag(),cpu_get_pc(space->cpu),data,offset);
-			break;
+	case IO_P3DATA:
+		//logerror("M6801 '%s' Port 3 Data Register: %02x\n", space->cpu->tag(), data);
+
+		if (cpustate->p3csr_is3_flag_read)
+		{
+			//logerror("M6801 '%s' Cleared IS3\n", space->cpu->tag());
+			cpustate->p3csr &= ~M6801_P3CSR_IS3_FLAG;
+			cpustate->p3csr_is3_flag_read = 0;
+		}
+
+		if (cpustate->p3csr & M6801_P3CSR_OSS)
+		{
+			set_os3(cpustate, ASSERT_LINE);
+		}
+
+		cpustate->port3_data = data;
+		if(cpustate->port3_ddr == 0xff)
+			cpustate->io->write_byte(M6803_PORT3,cpustate->port3_data);
+		else
+			cpustate->io->write_byte(M6803_PORT3,(cpustate->port3_data & cpustate->port3_ddr) | (cpustate->port3_ddr ^ 0xff));
+
+		if (cpustate->p3csr & M6801_P3CSR_OSS)
+		{
+			set_os3(cpustate, CLEAR_LINE);
+		}
+		break;
+
+	case IO_P4DATA:
+		//logerror("M6801 '%s' Port 4 Data Register: %02x\n", space->cpu->tag(), data);
+
+		cpustate->port4_data = data;
+		if(cpustate->port4_ddr == 0xff)
+			cpustate->io->write_byte(M6803_PORT4,cpustate->port4_data);
+		else
+			cpustate->io->write_byte(M6803_PORT4,(cpustate->port4_data & cpustate->port4_ddr) | (cpustate->port4_ddr ^ 0xff));
+		break;
+
+	case IO_TCSR:
+		//logerror("M6801 '%s' Timer Control and Status Register: %02x\n", space->cpu->tag(), data);
+
+		cpustate->tcsr = data;
+		cpustate->pending_tcsr &= cpustate->tcsr;
+		MODIFIED_tcsr;
+		if( !(CC & 0x10) )
+			m6800_check_irq2(cpustate);
+		break;
+
+	case IO_CH:
+		//logerror("M6801 '%s' Counter High Register: %02x\n", space->cpu->tag(), data);
+
+		cpustate->latch09 = data & 0xff;	/* 6301 only */
+		CT  = 0xfff8;
+		TOH = CTH;
+		MODIFIED_counters;
+		break;
+
+	case IO_CL:	/* 6301 only */
+		//logerror("M6801 '%s' Counter Low Register: %02x\n", space->cpu->tag(), data);
+
+		CT = (cpustate->latch09 << 8) | (data & 0xff);
+		TOH = CTH;
+		MODIFIED_counters;
+		break;
+
+	case IO_OCRH:
+		//logerror("M6801 '%s' Output Compare High Register: %02x\n", space->cpu->tag(), data);
+
+		if( cpustate->output_compare.b.h != data)
+		{
+			cpustate->output_compare.b.h = data;
+			MODIFIED_counters;
+		}
+		break;
+
+	case IO_OCRL:
+		//logerror("M6801 '%s' Output Compare Low Register: %02x\n", space->cpu->tag(), data);
+
+		if( cpustate->output_compare.b.l != data)
+		{
+			cpustate->output_compare.b.l = data;
+			MODIFIED_counters;
+		}
+		break;
+
+	case IO_ICRH:
+	case IO_ICRL:
+	case IO_RDR:
+		//logerror("CPU '%s' PC %04x: warning - write %02x to read only internal register %02x\n",space->cpu->tag(),cpu_get_pc(space->cpu),data,offset);
+		break;
+
+	case IO_P3CSR:
+		//logerror("M6801 '%s' Port 3 Control and Status Register: %02x\n", space->cpu->tag(), data);
+
+		cpustate->p3csr = data;
+		break;
+
+	case IO_RMCR:
+		//logerror("M6801 '%s' Rate and Mode Control Register: %02x\n", space->cpu->tag(), data);
+
+		set_rmcr(cpustate, data);
+		break;
+
+	case IO_TRCSR:
+		//logerror("M6801 '%s' Transmit/Receive Control and Status Register: %02x\n", space->cpu->tag(), data);
+
+		if ((data & M6800_TRCSR_TE) && !(cpustate->trcsr & M6800_TRCSR_TE))
+		{
+			cpustate->txstate = M6800_TX_STATE_INIT;
+			cpustate->txbits = 0;
+			cpustate->tx = 1;
+		}
+			
+		if ((data & M6800_TRCSR_RE) && !(cpustate->trcsr & M6800_TRCSR_RE))
+		{
+			cpustate->rxbits = 0;
+		}
+
+		cpustate->trcsr = (cpustate->trcsr & 0xe0) | (data & 0x1f);
+		break;
+
+	case IO_TDR:
+		//logerror("M6800 '%s' Transmit Data Register: %02x\n", space->cpu->tag(), data);
+
+		if (cpustate->trcsr_read_tdre)
+		{
+			cpustate->trcsr_read_tdre = 0;
+			cpustate->trcsr &= ~M6800_TRCSR_TDRE;
+		}
+		cpustate->tdr = data;
+		break;
+
+	case IO_RCR:
+		//logerror("M6801 '%s' RAM Control Register: %02x\n", space->cpu->tag(), data);
+
+		cpustate->ram_ctrl = data;
+		break;
+
+	case IO_CAAH:
+	case IO_CAAL:
+	case IO_TCR1:
+	case IO_TCR2:
+	case IO_TSR:
+	case IO_OCR2H:
+	case IO_OCR2L:
+	case IO_OCR3H:
+	case IO_OCR3L:
+	case IO_ICR2H:
+	case IO_ICR2L:
+	default:
+		logerror("M6801 '%s' PC %04x: warning - write %02x to reserved internal register %02x\n",space->cpu->tag(),cpu_get_pc(space->cpu),data,offset);
+		break;
 	}
 }
 
@@ -1583,6 +1807,7 @@ static CPU_SET_INFO( m6800 )
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 		case CPUINFO_INT_INPUT_STATE + M6800_IRQ_LINE:	set_irq_line(cpustate, M6800_IRQ_LINE, info->i);	break;
 		case CPUINFO_INT_INPUT_STATE + M6800_TIN_LINE:	set_irq_line(cpustate, M6800_TIN_LINE, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + M6800_SC1_LINE:	set_irq_line(cpustate, M6800_SC1_LINE, info->i);	break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	set_irq_line(cpustate, INPUT_LINE_NMI, info->i);	break;
 
 		case CPUINFO_INT_PC:							PC = info->i;								break;
@@ -1631,6 +1856,7 @@ CPU_GET_INFO( m6800 )
 
 		case CPUINFO_INT_INPUT_STATE + M6800_IRQ_LINE:	info->i = cpustate->irq_state[M6800_IRQ_LINE]; break;
 		case CPUINFO_INT_INPUT_STATE + M6800_TIN_LINE:	info->i = cpustate->irq_state[M6800_TIN_LINE]; break;
+		case CPUINFO_INT_INPUT_STATE + M6800_SC1_LINE:	info->i = cpustate->irq_state[M6800_SC1_LINE]; break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = cpustate->nmi_state;				break;
 
 		case CPUINFO_INT_PREVIOUSPC:					info->i = cpustate->ppc.w.l;				break;

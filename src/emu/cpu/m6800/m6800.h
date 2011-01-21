@@ -6,6 +6,14 @@
 #define __M6800_H__
 
 
+typedef struct _m6801_interface m6801_interface;
+struct _m6801_interface
+{
+	devcb_write_line		out_sc2_func;
+};
+#define M6801_INTERFACE(name) const m6801_interface (name) =
+
+
 enum
 {
 	M6800_PC=1, M6800_S, M6800_A, M6800_B, M6800_X, M6800_CC,
@@ -15,11 +23,12 @@ enum
 enum
 {
 	M6800_IRQ_LINE = 0,				/* IRQ line number */
-	M6800_TIN_LINE					/* P20/Tin Input Capture line (eddge sense)     */
+	M6800_TIN_LINE,					/* P20/Tin Input Capture line (eddge sense)     */
 									/* Active eddge is selecrable by internal reg.  */
 									/* raise eddge : CLEAR_LINE  -> ASSERT_LINE     */
 									/* fall  eddge : ASSERT_LINE -> CLEAR_LINE      */
 									/* it is usuali to use PULSE_LINE state         */
+	M6800_SC1_LINE
 };
 
 enum
