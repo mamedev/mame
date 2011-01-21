@@ -5109,6 +5109,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( compgolfo )	/* (c) 1985 Data East Corporation (Japan) */
 	DRIVER( cntsteer )	/* (c) 1985 Data East Corporation */
 	DRIVER( zerotrgt )	/* (c) 1985 Data East Corporation */
+	DRIVER( zerotrgta )	/* (c) 1985 Data East Corporation */
 	DRIVER( gekitsui )	/* (c) 1985 Data East Corporation (Japan) */
 	DRIVER( tryout )	/* (c) 1985 Data East Corporation (Japan) */
 	DRIVER( firetrap )	/* (c) 1986 Data East USA (US) */
