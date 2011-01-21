@@ -23,6 +23,7 @@
 static WRITE8_HANDLER( mouser_nmi_enable_w )
 {
 	mouser_state *state = space->machine->driver_data<mouser_state>();
+	//logerror("nmi_enable %02x\n", data);
 	state->nmi_enable = data;
 }
 
@@ -39,14 +40,30 @@ static INTERRUPT_GEN( mouser_nmi_interrupt )
 static WRITE8_HANDLER( mouser_sound_interrupt_w )
 {
 	mouser_state *state = space->machine->driver_data<mouser_state>();
+	//logerror("int %02x\n", data);
 	state->sound_byte = data;
-	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	cpu_set_input_line(state->audiocpu, 0, ASSERT_LINE);
 }
 
 static READ8_HANDLER( mouser_sound_byte_r )
 {
 	mouser_state *state = space->machine->driver_data<mouser_state>();
+	//logerror("sound r\n");
+	cpu_set_input_line(state->audiocpu, 0, CLEAR_LINE);
 	return state->sound_byte;
+}
+
+static WRITE8_HANDLER( mouser_sound_nmi_clear_w )
+{
+	mouser_state *state = space->machine->driver_data<mouser_state>();
+	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+static INTERRUPT_GEN( mouser_sound_nmi_assert )
+{
+	mouser_state *state = device->machine->driver_data<mouser_state>();
+	if (BIT(state->nmi_enable, 0))
+		cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static ADDRESS_MAP_START( mouser_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -69,7 +86,7 @@ static ADDRESS_MAP_START( mouser_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_READ(mouser_sound_byte_r)
-	AM_RANGE(0x4000, 0x4000) AM_WRITENOP	/* watchdog? */
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(mouser_sound_nmi_clear_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mouser_sound_io_map, ADDRESS_SPACE_IO, 8 )
@@ -200,7 +217,7 @@ static MACHINE_CONFIG_START( mouser, mouser_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* ??? */
 	MCFG_CPU_PROGRAM_MAP(mouser_sound_map)
 	MCFG_CPU_IO_MAP(mouser_sound_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(nmi_line_pulse,4) /* ??? This controls the sound tempo */
+	MCFG_CPU_VBLANK_INT_HACK(mouser_sound_nmi_assert, 4) /* ??? This controls the sound tempo */
 
 	MCFG_MACHINE_START(mouser)
 	MCFG_MACHINE_RESET(mouser)
