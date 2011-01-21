@@ -1800,10 +1800,30 @@ static ADDRESS_MAP_START( V25_rambased_nooki_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x80000, 0x87fff) AM_MIRROR(0x78000) AM_RAM AM_BASE_MEMBER(toaplan2_state, batsugun_share)
 ADDRESS_MAP_END
 
+READ8_DEVICE_HANDLER( fixeight_eeprom_r )
+{
+	int bit = eeprom_read_bit(device);
+	
+	return bit<<7; 
+}
+
+static WRITE8_DEVICE_HANDLER(fixeight_eeprom_w )
+{
+		// latch the bit
+		eeprom_write_bit(device, data & 0x0040);
+
+		// reset line asserted: reset.
+		eeprom_set_cs_line(device, (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE);
+
+		// clock line asserted: write latch or select next bit to read
+		eeprom_set_clock_line(device, (data & 0x0020) ? ASSERT_LINE : CLEAR_LINE);
+}
+
 
 static ADDRESS_MAP_START( V25_fixeight_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000a, 0x0000b) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x0000c, 0x0000c) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE(0x00f00, 0x00f00) AM_DEVREADWRITE("eeprom", fixeight_eeprom_r, fixeight_eeprom_w)	
 	AM_RANGE(0x80000, 0x87fff) AM_MIRROR(0x78000) AM_RAM AM_BASE_MEMBER(toaplan2_state, batsugun_share)
 ADDRESS_MAP_END
 
@@ -3684,6 +3704,8 @@ static MACHINE_CONFIG_START( fixeight, toaplan2_state )
 
 	//  MCFG_NVRAM_HANDLER(fixeight)        /* See 37B6 code */
 
+	MCFG_EEPROM_93C46_ADD("eeprom")
+
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
@@ -4396,9 +4418,9 @@ ROM_START( fixeight )
 	ROM_REGION( 0x40000, "oki", 0 )			/* ADPCM Samples */
 	ROM_LOAD( "tp-026-2", 0x00000, 0x40000, CRC(85063f1f) SHA1(1bf4d77494de421c98f6273b9876e60d827a6826) )
 
-	ROM_REGION( 0x80, "user1", 0 )
+	ROM_REGION( 0x80, "eeprom", 0 )
 	/* Serial EEPROM (93C45) connected to Secondary CPU */
-	ROM_LOAD( "93c45.u21", 0x00, 0x80, CRC(40d75df0) SHA1(a22f1cc74ce9bc9bfe53f48f6a43ab60e921052b) )
+	ROM_LOAD16_WORD_SWAP( "93c45.u21", 0x00, 0x80, CRC(40d75df0) SHA1(a22f1cc74ce9bc9bfe53f48f6a43ab60e921052b) )
 ROM_END
 
 
@@ -5270,6 +5292,7 @@ GAME( 1999, bkraidu,  0,        bbakradu, bbakraid, bbakradu, ROT270, "Eighting"
 GAME( 1999, bkraiduj, bkraidu,  bbakradu, bbakraid, bbakradu, ROT270, "Eighting", "Battle Bakraid - Unlimited Version (Japan) (Tue Jun 8 1999)", GAME_SUPPORTS_SAVE )
 // older revision of the code
 GAME( 1999, bkraidj,  bkraidu,  bbakraid, bbakraid, bbakraid, ROT270, "Eighting", "Battle Bakraid (Japan) (Wed Apr 7 1999)", GAME_SUPPORTS_SAVE )
+
 
 
 
