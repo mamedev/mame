@@ -1823,8 +1823,11 @@ static WRITE8_DEVICE_HANDLER(fixeight_eeprom_w )
 static ADDRESS_MAP_START( V25_fixeight_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000a, 0x0000b) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x0000c, 0x0000c) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0x00f00, 0x00f00) AM_DEVREADWRITE("eeprom", fixeight_eeprom_r, fixeight_eeprom_w)	
 	AM_RANGE(0x80000, 0x87fff) AM_MIRROR(0x78000) AM_RAM AM_BASE_MEMBER(toaplan2_state, batsugun_share)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( V25_fixeight_port, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(V25_PORT_P0, V25_PORT_P0) AM_DEVREADWRITE("eeprom", fixeight_eeprom_r, fixeight_eeprom_w)	
 ADDRESS_MAP_END
 
 
@@ -3698,6 +3701,7 @@ static MACHINE_CONFIG_START( fixeight, toaplan2_state )
 	MCFG_CPU_PROGRAM_MAP(V25_fixeight_mem)
 //	IO map must be different - has eeprom but no dips or jumpers */
 	MCFG_CPU_CONFIG(ts001turbo_config)
+	MCFG_CPU_IO_MAP(V25_fixeight_port)
 
 	MCFG_MACHINE_RESET(batsugun)
 //  MCFG_MACHINE_RESET(toaplan2)
