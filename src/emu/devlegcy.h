@@ -509,6 +509,9 @@ class legacy_sound_device_base :	public legacy_device_base,
 protected:
 	// construction/destruction
 	legacy_sound_device_base(running_machine &machine, const device_config &config);
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 };
 
 

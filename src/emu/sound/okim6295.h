@@ -133,9 +133,8 @@ protected:
 	virtual void device_post_load();
 	virtual void device_clock_changed();
 
-	// internal callbacks
-	static STREAM_UPDATE( static_stream_generate );
-	virtual void stream_generate(stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	// sound interface overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 	// a single voice
 	class okim_voice

@@ -291,6 +291,17 @@ legacy_sound_device_base::legacy_sound_device_base(running_machine &machine, con
 }
 
 
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void legacy_sound_device_base::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// should never get here
+	fatalerror("legacy_sound_device_base::sound_stream_update called; not applicable to legacy sound devices\n");
+}
+
+
 
 //**************************************************************************
 //  LEGACY MEMORY DEVICE CONFIGURATION

@@ -190,6 +190,17 @@ device_sound_interface::~device_sound_interface()
 
 
 //-------------------------------------------------
+//  sound_stream_update - provide data for the
+//  given sound stream
+//-------------------------------------------------
+
+void device_sound_interface::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	fatalerror("device_sound_interface::sound_stream_update - this method should have been overridden");
+}
+
+
+//-------------------------------------------------
 //  interface_pre_start - make sure all our input
 //  devices are started
 //-------------------------------------------------

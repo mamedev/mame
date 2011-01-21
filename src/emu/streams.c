@@ -335,6 +335,21 @@ void streams_update(running_machine *machine)
     stream_create - create a new stream
 -------------------------------------------------*/
 
+/* create a new stream */
+static STREAM_UPDATE( device_stream_update_stub )
+{
+	device_sound_interface *sound = reinterpret_cast<device_sound_interface *>(param);
+	sound->sound_stream_update(*stream, inputs, outputs, samples);
+}
+
+sound_stream *stream_create(device_t &device, int inputs, int outputs, int sample_rate)
+{
+	device_sound_interface *sound;
+	if (device.interface(sound))
+		return stream_create(&device, inputs, outputs, sample_rate, sound, device_stream_update_stub);
+	fatalerror("Modern stream_create() called for device with no sound interface");
+}
+
 sound_stream *stream_create(device_t *device, int inputs, int outputs, int sample_rate, void *param, stream_update_func callback)
 {
 	running_machine *machine = device->machine;
@@ -873,7 +888,7 @@ static void generate_samples(sound_stream *stream, int samples)
 
 	/* run the callback */
 	VPRINTF(("  callback(%p, %d)\n", stream, samples));
-	(*stream->callback)(stream->device, stream->param, stream->input_array, stream->output_array, samples);
+	(*stream->callback)(stream->device, stream, stream->param, stream->input_array, stream->output_array, samples);
 	VPRINTF(("  callback done\n"));
 }
 

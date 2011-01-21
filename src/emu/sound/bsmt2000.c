@@ -227,7 +227,7 @@ void bsmt2000_device::device_start()
 	// in theory we should generate a 24MHz stream, but that's certainly overkill
 	// internally at 24MHz the max output sample rate is 32kHz
 	// divided by 128 gives us 6x the max output rate which is plenty for oversampling
-	m_stream = stream_create(this, 0, 2, clock() / 128, this, stream_update_stub<bsmt2000_device, &bsmt2000_device::stream_generate>);
+	m_stream = stream_create(*this, 0, 2, clock() / 128);
 	
 	// register for save states
 	state_save_register_device_item(this, 0, m_register_select);
@@ -285,7 +285,7 @@ void bsmt2000_device::device_timer(emu_timer &timer, device_timer_id id, int par
 //  our sound stream
 //-------------------------------------------------
 
-void bsmt2000_device::stream_generate(stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void bsmt2000_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	// just fill with current left/right values
 	for (int samp = 0; samp < samples; samp++)

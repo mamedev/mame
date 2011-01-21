@@ -142,6 +142,9 @@ public:
 	// configuration access
 	const device_config_sound_interface &sound_config() const { return m_sound_config; }
 
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
 protected:
 	// optional operation overrides
 	virtual void interface_pre_start();
