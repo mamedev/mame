@@ -962,7 +962,7 @@ void discrete_device::device_start()
 	}
 
 	/* initialize the stream(s) */
-	m_stream = stream_create(this,m_input_stream_list.count(), m_output_list.count(), m_sample_rate, this, static_stream_generate);
+	m_stream = stream_create(*this,m_input_stream_list.count(), m_output_list.count(), m_sample_rate);
 
 	/* allocate a queue */
 
@@ -1008,16 +1008,11 @@ void discrete_device::device_reset()
 }
 
 //-------------------------------------------------
-//  stream_generate - handle update requests for
+//  stream_update - handle update requests for
 //  our sound stream
 //-------------------------------------------------
 
-STREAM_UPDATE( discrete_device::static_stream_generate )
-{
-	reinterpret_cast<discrete_device *>(param)->stream_generate(inputs, outputs, samples);
-}
-
-void discrete_device::stream_generate(stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void discrete_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	int outputnum;
 	//, task_group;
