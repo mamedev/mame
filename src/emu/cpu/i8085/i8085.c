@@ -404,7 +404,7 @@ static void check_for_interrupts(i8085_state *cpustate)
 
 		/* push the PC and jump to $0024 */
 		M_PUSH(PC);
-		cpustate->IM &= ~IM_IE;
+		set_inte(cpustate, 0);
 		cpustate->PC.w.l = ADDR_TRAP;
 		cpustate->icount -= 11;
 	}
@@ -422,7 +422,7 @@ static void check_for_interrupts(i8085_state *cpustate)
 
 		/* push the PC and jump to $003C */
 		M_PUSH(PC);
-		cpustate->IM &= ~IM_IE;
+		set_inte(cpustate, 0);
 		cpustate->PC.w.l = ADDR_RST75;
 		cpustate->icount -= 11;
 	}
@@ -437,7 +437,7 @@ static void check_for_interrupts(i8085_state *cpustate)
 
 		/* push the PC and jump to $0034 */
 		M_PUSH(PC);
-		cpustate->IM &= ~IM_IE;
+		set_inte(cpustate, 0);
 		cpustate->PC.w.l = ADDR_RST65;
 		cpustate->icount -= 11;
 	}
@@ -452,7 +452,7 @@ static void check_for_interrupts(i8085_state *cpustate)
 
 		/* push the PC and jump to $002C */
 		M_PUSH(PC);
-		cpustate->IM &= ~IM_IE;
+		set_inte(cpustate, 0);
 		cpustate->PC.w.l = ADDR_RST55;
 		cpustate->icount -= 11;
 	}
@@ -468,7 +468,7 @@ static void check_for_interrupts(i8085_state *cpustate)
 			vector = (*cpustate->irq_callback)(cpustate->device, I8085_INTR_LINE);
 
 		/* use the resulting vector as an opcode to execute */
-		cpustate->IM &= ~IM_IE;
+		set_inte(cpustate, 0);
 		switch (vector & 0xff0000)
 		{
 			case 0xcd0000:	/* CALL nnnn */
@@ -1258,7 +1258,7 @@ CPU_GET_INFO( i8080 )
 		case CPUINFO_INT_INPUT_LINES:					info->i = 1;							break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
-		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(i8080);						break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(i8080);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "8080");				break;
@@ -1282,7 +1282,7 @@ CPU_GET_INFO( i8080a )
 		case CPUINFO_INT_INPUT_LINES:					info->i = 1;							break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
-		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(i8080);						break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(i8080);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "8080A");				break;
