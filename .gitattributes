@@ -1321,6 +1321,7 @@ src/mame/audio/atarijsa.c svneol=native#text/plain
 src/mame/audio/atarijsa.h svneol=native#text/plain
 src/mame/audio/avalnche.c svneol=native#text/plain
 src/mame/audio/aztarac.c svneol=native#text/plain
+src/mame/audio/beezer.c svneol=native#text/plain
 src/mame/audio/blockade.c svneol=native#text/plain
 src/mame/audio/bsktball.c svneol=native#text/plain
 src/mame/audio/bzone.c svneol=native#text/plain

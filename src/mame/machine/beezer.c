@@ -3,6 +3,9 @@
 #include "machine/6522via.h"
 #include "includes/beezer.h"
 
+extern const via6522_interface b_via_0_interface;
+extern const via6522_interface b_via_1_interface;
+
 static int pbus;
 static int banklatch;
 
@@ -54,14 +57,14 @@ const via6522_interface b_via_0_interface =
 	port A:
 		bits 7-0: input/output: pbus
 	port B:
-		bit 7: output?: TIMER1 OUT (used to gate NOISE (see below) to clock channel 1 of 6840, plus acts as channel 0 by itself)
+		bit 7: output: TIMER1 OUT (used to gate NOISE (see below) to clock channel 1 of 6840, plus acts as channel 0 by itself)
 		bit 6: input: NOISE (from mn5837 14-bit LFSR, which also connects to clock above)
-		bit 5: N/C
-		bit 4: input: FMSEL1 (does not appear elsewhere on schematics! what does this do? needs tracing)
-		bit 3: input: FMSEL0 (does not appear elsewhere on schematics! what does this do? needs tracing)
-		bit 2: input: AM (does not appear elsewhere on schematics! what does this do? needs tracing)
-		bit 1: input: FM or AM (does not appear elsewhere on schematics! what does this do? needs tracing)
-		bit 0: input: DMOD DISABLE (does not appear elsewhere on schematics! what does this do? needs tracing)
+		bit 5: output?: N/C
+		bit 4: output?: FMSEL1 (does not appear elsewhere on schematics! what does this do? needs tracing)
+		bit 3: output?: FMSEL0 (does not appear elsewhere on schematics! what does this do? needs tracing)
+		bit 2: output?: AM (does not appear elsewhere on schematics! what does this do? needs tracing)
+		bit 1: output: FM or AM (appears to control some sort of suppression or filtering change of the post-DAC amplifier when enabled, only during the TIMER1 OUT time-slot of the multiplexer, see page 1B 3-3 of schematics)
+		bit 0: output?: DMOD DISABLE (does not appear elsewhere on schematics! what does this do? needs tracing)
 	port C:
 		CA1: AHS2 from via 0 (are these two switched?)
 		CA2: AHS1 from via 0 "
@@ -137,7 +140,7 @@ static READ8_DEVICE_HANDLER( b_via_1_pa_r )
 
 static READ8_DEVICE_HANDLER( b_via_1_pb_r )
 {
-	return 0xff; // TODO: sound readbacks go here
+	return 0x1F | (device->machine->rand()&0x40); // bit 6 is NOISE input from MM5837 17-bit LFSR
 }
 
 static WRITE8_DEVICE_HANDLER( b_via_1_pa_w )

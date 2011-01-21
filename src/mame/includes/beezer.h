@@ -10,12 +10,19 @@ public:
 
 /*----------- defined in machine/beezer.c -----------*/
 
-extern const via6522_interface b_via_0_interface;
-extern const via6522_interface b_via_1_interface;
+//extern const via6522_interface b_via_0_interface;
+//extern const via6522_interface b_via_1_interface;
 
 DRIVER_INIT( beezer );
 WRITE8_HANDLER( beezer_bankswitch_w );
 
+/*----------- defined in audio/beezer.c -----------*/
+
+DECLARE_LEGACY_SOUND_DEVICE(BEEZER, beezer_sound);
+
+READ8_DEVICE_HANDLER( beezer_sh6840_r );
+WRITE8_DEVICE_HANDLER( beezer_sh6840_w );
+WRITE8_DEVICE_HANDLER( beezer_sfxctrl_w );
 
 /*----------- defined in video/beezer.c -----------*/
 
