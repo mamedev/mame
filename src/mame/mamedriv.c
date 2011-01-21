@@ -11022,7 +11022,7 @@ Other Sun games
 	// gts80.c
 	DRIVER( blckhole )
 	DRIVER( blckhole2 )
-	DRIVER( blckholea )
+	DRIVER( blckhols )
 	DRIVER( circusp )
 	DRIVER( cntforce )
 	DRIVER( eclipse )
