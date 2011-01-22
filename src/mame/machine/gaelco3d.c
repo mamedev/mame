@@ -34,7 +34,12 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#ifdef _MSC_VER
+#include <io.h>
+#define	S_IRWXU	(_S_IREAD | _S_IWRITE | _S_IEXEC)
+#else
 #include <unistd.h>
+#endif
 #include <errno.h>
 #ifdef SHARED_MEM_DRIVER
 #include <sys/mman.h>

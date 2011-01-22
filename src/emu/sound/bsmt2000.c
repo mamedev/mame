@@ -218,7 +218,7 @@ bsmt2000_device::bsmt2000_device(running_machine &_machine, const bsmt2000_devic
 void bsmt2000_device::device_start()
 {
 	// find our CPU
-	m_cpu = subdevice<tms32015_device>("bsmt2000");
+	m_cpu = downcast<tms32015_device*>(subdevice("bsmt2000"));
 
 	// find our direct access
 	m_direct = &space()->direct();
