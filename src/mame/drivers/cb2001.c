@@ -44,6 +44,7 @@ this seems more like 8-bit hardware, maybe it should be v25, not v35...
 #include "cpu/nec/nec.h"
 #include "sound/ay8910.h"
 #include "machine/8255ppi.h"
+#include "deprecat.h"
 
 #define xxxx 0x90 /* Unknown */
 
@@ -51,7 +52,7 @@ static const UINT8 cb2001_decryption_table[256] = {
 	0xe8,xxxx,xxxx,xxxx,0x80,0xe4,0x12,0x2f, 0x3c,xxxx,xxxx,0x23,xxxx,xxxx,xxxx,0x5f, /* 00 */
 //    ssss                ---- **** pppp pppp  ssss           pppp                pppp
 	0x86,xxxx,xxxx,0x27,0x1c,xxxx,xxxx,xxxx, 0x32,0x40,0xa0,0xd3,0x3a,0x14,0x89,0x1f, /* 10 */
-//    wwww           **** pppp                 pppp pppp pppp pppp ppp? pppp pppp ssss
+//    rrrr           **** pppp                 pppp pppp pppp pppp ppp? pppp pppp ssss
 	xxxx,0x8e,xxxx,0x0f,xxxx,0x49,0xb5,xxxx, 0x56,xxxx,xxxx,0x75,0x33,0xb6,xxxx,0x39, /* 20 */
 //         ssss      ssss      pppp pppp       pppp           ssss pppp pppp      ****
 	0x89,xxxx,xxxx,xxxx,xxxx,0x22,0x5b,xxxx, xxxx,xxxx,0x74,xxxx,xxxx,0xa6,xxxx,0x74, /* 30 */
@@ -717,7 +718,10 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( vblank_irq )
 {
-	cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x60/4);
+	if (cpu_getiloops(device) == 0)
+		cpu_set_input_line(device, NEC_INPUT_LINE_INTP0, ASSERT_LINE);
+	else
+		cpu_set_input_line(device, NEC_INPUT_LINE_INTP0, CLEAR_LINE);
 }
 
 static const gfx_layout cb2001_layout =
@@ -813,7 +817,7 @@ static MACHINE_CONFIG_START( cb2001, driver_device )
 	MCFG_CPU_CONFIG(cb2001_config)
 	MCFG_CPU_PROGRAM_MAP(cb2001_map)
 	MCFG_CPU_IO_MAP(cb2001_io)
-	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
+	MCFG_CPU_VBLANK_INT_HACK(vblank_irq, 2)
 
 	MCFG_PPI8255_ADD( "ppi8255_0", cb2001_ppi8255_intf[0] )
 	MCFG_PPI8255_ADD( "ppi8255_1", cb2001_ppi8255_intf[1] )
@@ -868,6 +872,10 @@ ROM_END
 
 GAME( 2001, cb2001,    0,      cb2001,      cb2001,   0, ROT0,  "Dyna", "Cherry Bonus 2001", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2001, scherrym,  0,      cb2001,      cb2001,   0, ROT0,  "Dyna", "Super Cherry Master", GAME_NOT_WORKING|GAME_NO_SOUND ) // 2001 version? (we have bootlegs running on z80 hw of a 1996 version)
+
+
+
+
 
 
 
