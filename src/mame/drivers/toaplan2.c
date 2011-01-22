@@ -1823,7 +1823,6 @@ static WRITE8_DEVICE_HANDLER(fixeight_eeprom_w )
 static ADDRESS_MAP_START( V25_fixeight_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000a, 0x0000b) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x0000c, 0x0000c) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0x00e00, 0x7ffff) AM_RAM
 	AM_RANGE(0x80000, 0x87fff) AM_MIRROR(0x78000) AM_RAM AM_BASE_MEMBER(toaplan2_state, batsugun_share)
 ADDRESS_MAP_END
 
