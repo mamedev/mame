@@ -2384,7 +2384,20 @@ const game_driver * const drivers[] =
 	DRIVER( whoopee )	/* TP-025 */
 	DRIVER( pipibibsbl )/* (c) 1991 Ryouta Kikaku (bootleg) */
 	DRIVER( fixeight )	/* TP-026 (c) 1992 + Taito license */
-	DRIVER( fixeightb )	/* bootleg */
+	DRIVER( fixeightt )
+	DRIVER( fixeightkt )
+	DRIVER( fixeightk )
+	DRIVER( fixeightht )
+	DRIVER( fixeighth )
+	DRIVER( fixeighttwt )
+	DRIVER( fixeighttw )
+	DRIVER( fixeightat )
+	DRIVER( fixeighta )
+	DRIVER( fixeightu )
+	DRIVER( fixeightut )
+	DRIVER( fixeightj )
+	DRIVER( fixeightjt )
+	DRIVER( fixeightbl )	/* bootleg */
 	DRIVER( vfive )		/* TP-027 (c) 1993 Toaplan (Japan) */
 	DRIVER( grindstm )	/* TP-027 (c) 1993 Toaplan + Unite Trading license (Korea) */
 	DRIVER( grindstma )	/* TP-027 (c) 1993 Toaplan + Unite Trading license (Korea) */

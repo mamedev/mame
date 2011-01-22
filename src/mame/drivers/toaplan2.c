@@ -386,9 +386,6 @@ static DRIVER_INIT( fixeight )
 	state->sub_cpu_type = CPU_2_V25;
 	state->sub_cpu = machine->device("audiocpu");
 	state->v25_reset_line = 0x08;
-#ifndef USE_ENCRYPTED_V25S
-	memory_install_ram(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x28f002, 0x28fbff, 0, 0, NULL);
-#endif
 
 	register_state_save(machine);
 }
@@ -813,130 +810,6 @@ static WRITE16_HANDLER( ghox_shared_ram_w )
 		state->shared_ram16[offset] = data & 0xff;
 	}
 }
-
-#ifndef USE_ENCRYPTED_V25S
-static READ16_HANDLER( shared_ram_r )
-{
-/*  Other games using a NEC V25 secondary CPU, have shared memory between
-    the 68000 and the V25 CPU. The 68000 reads the status of the V25
-    via a location of the shared memory.
-*/
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
-
-	return state->shared_ram16[offset] & 0xff;
-}
-
-static WRITE16_HANDLER( shared_ram_w )
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
-
-		data &= 0xff;
-		switch (offset * 2)
-		{
-			case 0x6e8:
-			case 0x9e8:
-			case 0x9f0:
-			case 0xcf0:
-			case 0xcf8:
-			case 0xff8: state->shared_ram16[offset + 1] = data; /* Dogyuun */
-						state->shared_ram16[offset + 2] = data; /* FixEight */
-						logerror("PC:%08x Writing (%04x) to shared RAM at %04x\n",cpu_get_previouspc(space->cpu),data,(offset*2));
-						if (data == 0x81) data = 0x0001;
-						break;
-			default:	break;
-		}
-		state->shared_ram16[offset] = data;
-	}
-}
-
-
-
-static READ16_HANDLER( fixeight_sec_cpu_r )
-{
-/*** Status port includes NEC V25 CPU POST codes. ************
- *** This is actually a part of the 68000/V25 Shared RAM */
-
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
-	int response = 0xffff;
-
-	if ((state->mcu_data & 0xffff) == 0x0faa)
-	{
-		state->mcu_data = 0xffff;
-		response = 0xffaa;
-	}
-	if ((state->mcu_data & 0xffff) == 0xff00)
-	{
-		state->mcu_data = 0x0faa;
-		response = 0xffaa;		/* Second CPU passed POST response */
-	}
-	if ((state->mcu_data & 0xff00) == 0x0000)
-	{
-		response = state->mcu_data;	/* Return the shared RAM data during POST */
-	}
-	logerror("PC:%06x reading status %08x from the NEC V25 secondary CPU port\n",cpu_get_previouspc(space->cpu),response);
-	return response;
-}
-
-static WRITE16_HANDLER( fixeight_sec_cpu_w )
-{
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
-
-	if (ACCESSING_BITS_0_7)
-	{
-		if (state->mcu_data & 0xff00)
-		{
-			state->mcu_data = (state->mcu_data & 0xff00) | (data & 0xff);
-			fixeight_okisnd_w(space->machine->device("oki"), data);
-		}
-		else if (state->mcu_data == 0xff00)
-		{
-#if 0		/* check the 37B6 code */
-			/* copy nvram data to shared ram after post is complete */
-			fixeight_sharedram[0] = fixeight_nvram[0];	/* Dip Switch A */
-			fixeight_sharedram[1] = fixeight_nvram[1];	/* Dip Switch B */
-			fixeight_sharedram[2] = fixeight_nvram[2];	/* Territory */
-#endif
-			/* Hack Alert ! Fixeight does not have any DSW. The main CPU has a */
-			/* game keeping service mode. It writes/reads the settings to/from */
-			/* these shared RAM locations. The secondary CPU reads/writes them */
-			/* from/to nvram to store the settings (a 93C45 EEPROM) */
-			//memory_install_ram(space, 0x28f002, 0x28fbff, 0, 0, NULL);
-			memory_install_read_port(space, 0x28f004, 0x28f005, 0, 0, "DSWA");	/* Dip Switch A - Wrong !!! */
-			memory_install_read_port(space, 0x28f006, 0x28f007, 0, 0, "DSWB");	/* Dip Switch B - Wrong !!! */
-			memory_install_read_port(space, 0x28f008, 0x28f009, 0, 0, "JMPR");	/* Territory Jumper block - Wrong !!! */
-
-			state->mcu_data = data;
-		}
-		else
-		{
-			state->mcu_data = data;
-		}
-	}
-	logerror("PC:%06x Writing command (%04x) to the NEC V25 secondary CPU port\n", cpu_get_previouspc(space->cpu), state->mcu_data);
-}
-
-
-
-static READ16_HANDLER( V25_sharedram_r )
-{
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
-
-	return state->V25_shared_ram[offset] & 0xff;
-}
-
-static WRITE16_HANDLER( V25_sharedram_w )
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
-
-		state->V25_shared_ram[offset] = data & 0xff;
-	}
-}
-#endif
-
 
 static WRITE16_DEVICE_HANDLER( oki_bankswitch_w )
 {
@@ -1423,7 +1296,7 @@ static ADDRESS_MAP_START( pipibibi_bootleg_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x19c034, 0x19c035) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
 
-#ifdef USE_ENCRYPTED_V25S
+
 WRITE16_HANDLER( fixeight_subcpu_ctrl )
 {
 	printf("fixeight_subcpu_ctrl %04x\n",data);
@@ -1432,7 +1305,7 @@ WRITE16_HANDLER( fixeight_subcpu_ctrl )
 
 	cpu_set_input_line(state->sub_cpu, INPUT_LINE_RESET,  (data & state->v25_reset_line) ? CLEAR_LINE : ASSERT_LINE);
 }
-#endif
+
 
 /* this one is rather different to the other v25 based ones, shared ram is moved for example */
 static ADDRESS_MAP_START( fixeight_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1443,20 +1316,8 @@ static ADDRESS_MAP_START( fixeight_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200008, 0x200009) AM_READ_PORT("IN3")
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("SYS")
 	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_coin_word_w)	/* Coin count/lock */
-#ifdef USE_ENCRYPTED_V25S
 	AM_RANGE(0x280000, 0x28ffff) AM_READWRITE( batsugun_share_r, batsugun_share_w )
 	AM_RANGE(0x700000, 0x700001) AM_WRITE(fixeight_subcpu_ctrl) // guess!!!
-#else
-	AM_RANGE(0x280000, 0x28dfff) AM_RAM							/* part of shared ram ? */
-	AM_RANGE(0x28e000, 0x28efff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE_MEMBER(toaplan2_state, shared_ram16)
-	AM_RANGE(0x28f000, 0x28f001) AM_READWRITE(fixeight_sec_cpu_r, fixeight_sec_cpu_w)	/* V25 Command/Status port */
-	//AM_RANGE(0x28f002, 0x28f003) AM_READONLY             /* part of shared ram */
-	//AM_RANGE(0x28f004, 0x28f005) AM_READ_PORT("DSWA") /* Dip Switch A - Wrong !!! */
-	//AM_RANGE(0x28f006, 0x28f007) AM_READ_PORT("DSWB") /* Dip Switch B - Wrong !!! */
-	//AM_RANGE(0x28f008, 0x28f009) AM_READ_PORT("JMPR") /* Territory Jumper block - Wrong !!! */
-	//AM_RANGE(0x28f00a, 0x28fbff) AM_READONLY             /* part of shared ram */
-	AM_RANGE(0x28fc00, 0x28ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE_MEMBER(toaplan2_state, V25_shared_ram)	/* 16-bit on 68000 side, 8-bit on V25 side */
-#endif
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500000, 0x501fff) AM_READWRITE(toaplan2_txvideoram16_r, toaplan2_txvideoram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16, tx_vram_size)
@@ -1819,8 +1680,36 @@ static WRITE8_DEVICE_HANDLER(fixeight_eeprom_w )
 		eeprom_set_clock_line(device, (data & 0x0020) ? ASSERT_LINE : CLEAR_LINE);
 }
 
+static READ8_HANDLER( fixeight_region_r )
+{
+	// this must match the eeprom!
+	// however there is no valid value that makes the dumped eeprom boot
+	// this makes me wonder if there are decryption errors, therefore
+	// this code, and the default eeproms use should be considered subject
+	// to change
+	
+	if (!strcmp(space->machine->gamedrv->name,"fixeightkt"))	return 0x00;
+	if (!strcmp(space->machine->gamedrv->name,"fixeightk"))	return 0x01;
+	if (!strcmp(space->machine->gamedrv->name,"fixeightht"))	return 0x02;
+	if (!strcmp(space->machine->gamedrv->name,"fixeighth"))	return 0x03;
+	if (!strcmp(space->machine->gamedrv->name,"fixeighttwt"))	return 0x04;
+	if (!strcmp(space->machine->gamedrv->name,"fixeighttw"))	return 0x05;
+	if (!strcmp(space->machine->gamedrv->name,"fixeightat"))	return 0x06;
+	if (!strcmp(space->machine->gamedrv->name,"fixeighta"))	return 0x07;
+	if (!strcmp(space->machine->gamedrv->name,"fixeightt"))	return 0x08;
+	if (!strcmp(space->machine->gamedrv->name,"fixeight9"))	return 0x09;
+	if (!strcmp(space->machine->gamedrv->name,"fixeighta"))	return 0x0a;
+	if (!strcmp(space->machine->gamedrv->name,"fixeightu"))	return 0x0b;
+//	if (!strcmp(space->machine->gamedrv->name,"fixeightc"))	return 0x0c; // invalid
+//	if (!strcmp(space->machine->gamedrv->name,"fixeightd"))	return 0x0d; // invalid
+	if (!strcmp(space->machine->gamedrv->name,"fixeightj"))	return 0x0e;
+	if (!strcmp(space->machine->gamedrv->name,"fixeightjt"))	return 0x0f;
+
+	return 0x00;
+}
 
 static ADDRESS_MAP_START( V25_fixeight_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x00004, 0x00004) AM_READ(fixeight_region_r)
 	AM_RANGE(0x0000a, 0x0000b) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x0000c, 0x0000c) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x80000, 0x87fff) AM_MIRROR(0x78000) AM_RAM AM_BASE_MEMBER(toaplan2_state, batsugun_share)
@@ -4408,23 +4297,102 @@ ROM_START( pipibibsbl )
 ROM_END
 
 
-ROM_START( fixeight )
-	ROM_REGION( 0x080000, "maincpu", 0 )			/* Main 68K code */
-	ROM_LOAD16_WORD_SWAP( "tp-026-1", 0x000000, 0x080000, CRC(f7b1746a) SHA1(0bbea6f111b818bc9b9b2060af4fe900f37cf7f9) )
+#define ROMS_FIXEIGHT \
+	ROM_REGION( 0x080000, "maincpu", 0 ) \
+	ROM_LOAD16_WORD_SWAP( "tp-026-1", 0x000000, 0x080000, CRC(f7b1746a) SHA1(0bbea6f111b818bc9b9b2060af4fe900f37cf7f9) ) \
+	ROM_REGION( 0x400000, "gfx1", 0 ) \
+	ROM_LOAD( "tp-026-3", 0x000000, 0x200000, CRC(e5578d98) SHA1(280d2b716d955e767d311fc9596823852435b6d7) ) \
+	ROM_LOAD( "tp-026-4", 0x200000, 0x200000, CRC(b760cb53) SHA1(bc9c5e49e45cdda0f774be0038aa4deb21d4d285) ) \
+	ROM_REGION( 0x40000, "oki", 0 )	\
+	ROM_LOAD( "tp-026-2", 0x00000, 0x40000, CRC(85063f1f) SHA1(1bf4d77494de421c98f6273b9876e60d827a6826) ) \
+	ROM_REGION( 0x80, "eepromdumped", 0 ) \
+	ROM_LOAD16_WORD_SWAP( "93c45.u21", 0x00, 0x80, CRC(40d75df0) SHA1(a22f1cc74ce9bc9bfe53f48f6a43ab60e921052b) )\
 
-	/* Secondary CPU is a Toaplan marked chip, (TS-001-Turbo  TOA PLAN) */
-	/* It's a NEC V25 (PLCC94) (encrypted program uploaded by main CPU) */
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
-	ROM_LOAD( "tp-026-3", 0x000000, 0x200000, CRC(e5578d98) SHA1(280d2b716d955e767d311fc9596823852435b6d7) )
-	ROM_LOAD( "tp-026-4", 0x200000, 0x200000, CRC(b760cb53) SHA1(bc9c5e49e45cdda0f774be0038aa4deb21d4d285) )
 
-	ROM_REGION( 0x40000, "oki", 0 )			/* ADPCM Samples */
-	ROM_LOAD( "tp-026-2", 0x00000, 0x40000, CRC(85063f1f) SHA1(1bf4d77494de421c98f6273b9876e60d827a6826) )
-
+ROM_START( fixeightkt )
+	ROMS_FIXEIGHT
 	ROM_REGION( 0x80, "eeprom", 0 )
-	/* Serial EEPROM (93C45) connected to Secondary CPU */
-	ROM_LOAD16_WORD_SWAP( "93c45.u21", 0x00, 0x80, CRC(40d75df0) SHA1(a22f1cc74ce9bc9bfe53f48f6a43ab60e921052b) )
+	ROM_LOAD( "fixeightkt.nv", 0x00, 0x80, CRC(08fa73ba) SHA1(b7761d3dd3f4485e55c8ef2cf1a840ca771ee2fc) )
+ROM_END
+
+
+ROM_START( fixeightk )
+	ROMS_FIXEIGHT
+	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_LOAD( "fixeightk.nv", 0x00, 0x80, CRC(cac91c6f) SHA1(55b284f081753d60abff63493094322756b7f0c5) )
+ROM_END
+
+ROM_START( fixeightht )
+	ROMS_FIXEIGHT
+	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_LOAD( "fixeightht.nv", 0x00, 0x80, CRC(57edaa51) SHA1(b8d50e82590b8cbbbcafec5f9cfbc91e4c286db5) )
+ROM_END
+
+ROM_START( fixeighth )
+	ROMS_FIXEIGHT
+	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_LOAD( "fixeighth.nv", 0x00, 0x80, CRC(95dec584) SHA1(1c309074b51da5a5263dee00403296946e41067b) )
+ROM_END
+
+ROM_START( fixeighttwt )
+	ROMS_FIXEIGHT
+	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_LOAD( "fixeighttwt.nv", 0x00, 0x80, CRC(b6d5c06c) SHA1(7fda380ac6835a983c57d093ccad7bd76893c9ba))
+ROM_END
+
+ROM_START( fixeighttw )
+	ROMS_FIXEIGHT
+	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_LOAD( "fixeighttw.nv", 0x00, 0x80, CRC(74e6afb9) SHA1(87bdc95eb0d2d54375de2c622557d503e14154be))
+ROM_END
+
+ROM_START( fixeightat )
+	ROMS_FIXEIGHT
+	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_LOAD( "fixeightat.nv", 0x00, 0x80,CRC(e9c21987) SHA1(7f699e38deb84902ed62b857a3d2b4e3ea1475bb) )
+ROM_END
+
+ROM_START( fixeighta )
+	ROMS_FIXEIGHT
+	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_LOAD( "fixeighta.nv", 0x00, 0x80, CRC(2bf17652) SHA1(4ec6f188e63610d258cd6b2432d2200d61d80bed))
+ROM_END
+
+ROM_START( fixeightt )
+	ROMS_FIXEIGHT
+	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_LOAD( "fixeightt.nv", 0x00, 0x80, CRC(afd41257) SHA1(d10eddd54456d6047cc6e0e4a4b6a45aa68cf7b1) )
+ROM_END
+
+ROM_START( fixeight )
+	ROMS_FIXEIGHT
+	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_LOAD( "fixeight.nv", 0x00, 0x80, CRC(6de77d82) SHA1(9665c0fbea397deb22919f3b62f172da5698d55e) )
+ROM_END
+
+ROM_START( fixeightut )
+	ROMS_FIXEIGHT
+	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_LOAD( "fixeightut.nv", 0x00, 0x80, CRC(f0c3cbbc) SHA1(027efac0974fddbabb31fedf6c95a92c4e132a28) )
+ROM_END
+
+ROM_START( fixeightu )
+	ROMS_FIXEIGHT
+	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_LOAD( "fixeightu.nv", 0x00, 0x80, CRC(32f0a469) SHA1(ad033cc3445aff6e85ee26329ec01acf80596085) )
+ROM_END
+
+ROM_START( fixeightj )
+	ROMS_FIXEIGHT
+	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_LOAD( "fixeightj.nv", 0x00, 0x80, CRC(4eec786a) SHA1(1eed6879d997796ca295e553fd7e35dd1ea71559) )
+ROM_END
+
+ROM_START( fixeightjt )
+	ROMS_FIXEIGHT
+	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_LOAD( "fixeightjt.nv", 0x00, 0x80, CRC(8cdf17bf) SHA1(bdf923df411b49fe2d2f0ce17d698862c9c67fbe) )
 ROM_END
 
 
@@ -4464,7 +4432,7 @@ Notes:
 */
 
 
-ROM_START( fixeightb )
+ROM_START( fixeightbl )
 	ROM_REGION( 0x100000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_BYTE( "3.bin", 0x000000, 0x80000, CRC(cc77d4b4) SHA1(4d3376cbae13d90c6314d8bb9236c2183fc6253c) )
 	ROM_LOAD16_BYTE( "2.bin", 0x000001, 0x80000, CRC(ed715488) SHA1(37be9bc8ff6b54a1f660d89469c6c2da6301e9cd) )
@@ -5253,8 +5221,25 @@ GAME( 1991, pipibibsa, pipibibs, pipibibs, pipibibs, T2_Z80,   ROT0,   "Toaplan"
 GAME( 1991, whoopee,   pipibibs, whoopee,  whoopee,  T2_Z180,  ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Whoopee!! board)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // original Whoopee!! boards have a HD647180 instead of Z80
 GAME( 1991, pipibibsbl,pipibibs, pipibibi_bootleg, pipibibsbl, pipibibsbl, ROT0,   "bootleg (Ryouta Kikaku)", "Pipi & Bibis / Whoopee!! (bootleg)", GAME_SUPPORTS_SAVE )
 
-GAME( 1992, fixeight, 0,        fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1992, fixeightb,fixeight, fixeighb, fixeighb, fixeighb, ROT270, "bootleg", "FixEight (bootleg)", GAME_SUPPORTS_SAVE )
+
+// region is in eeprom (and also requires correct return value from a v25 mapped address??)
+// todo: something could be wrong here, because the _dumped_ eeprom doesn't work..
+GAME( 1992, fixeight,   0,        fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight (Europe)",  GAME_SUPPORTS_SAVE )
+GAME( 1992, fixeightt,  fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight (Europe, Taito license)",  GAME_SUPPORTS_SAVE )
+GAME( 1992, fixeightkt, fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight (Korea, Taito license)",  GAME_SUPPORTS_SAVE )
+GAME( 1992, fixeightk,  fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight (Korea)",  GAME_SUPPORTS_SAVE )
+GAME( 1992, fixeightht, fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight (Hong Kong, Taito license)",  GAME_SUPPORTS_SAVE )
+GAME( 1992, fixeighth,  fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight (Hong Kong)",  GAME_SUPPORTS_SAVE )
+GAME( 1992, fixeighttwt,fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight (Taiwan, Taito license)",  GAME_SUPPORTS_SAVE )
+GAME( 1992, fixeighttw, fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight (Taiwan)",  GAME_SUPPORTS_SAVE )
+GAME( 1992, fixeightat, fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight (Southeast Asia, Taito license)",  GAME_SUPPORTS_SAVE )
+GAME( 1992, fixeighta,  fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight (Southeast Asia)",  GAME_SUPPORTS_SAVE )
+GAME( 1992, fixeightu,  fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight (USA)",  GAME_SUPPORTS_SAVE )
+GAME( 1992, fixeightut, fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight (USA, Taito license)",  GAME_SUPPORTS_SAVE )
+GAME( 1992, fixeightj,  fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight (Japan)",  GAME_SUPPORTS_SAVE )
+GAME( 1992, fixeightjt, fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight (Japan, Taito license)",  GAME_SUPPORTS_SAVE )
+
+GAME( 1992, fixeightbl, fixeight, fixeighb, fixeighb, fixeighb, ROT270, "bootleg", "FixEight (Korea, bootleg)", GAME_SUPPORTS_SAVE )
 
 GAME( 1992, grindstm, vfive,    vfive,    grindstm, vfive,    ROT270, "Toaplan", "Grind Stormer", GAME_SUPPORTS_SAVE )
 GAME( 1992, grindstma,vfive,    vfive,    grindstm, vfive,    ROT270, "Toaplan", "Grind Stormer (older set)", GAME_SUPPORTS_SAVE )
@@ -5296,6 +5281,7 @@ GAME( 1999, bkraidu,  0,        bbakradu, bbakraid, bbakradu, ROT270, "Eighting"
 GAME( 1999, bkraiduj, bkraidu,  bbakradu, bbakraid, bbakradu, ROT270, "Eighting", "Battle Bakraid - Unlimited Version (Japan) (Tue Jun 8 1999)", GAME_SUPPORTS_SAVE )
 // older revision of the code
 GAME( 1999, bkraidj,  bkraidu,  bbakraid, bbakraid, bbakraid, ROT270, "Eighting", "Battle Bakraid (Japan) (Wed Apr 7 1999)", GAME_SUPPORTS_SAVE )
+
 
 
 
