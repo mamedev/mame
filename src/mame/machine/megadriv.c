@@ -58,51 +58,13 @@
 /* where a fresh copy of rom is stashed for reset and banking setup */
 #define VIRGIN_COPY_GEN 0xd00000
 
-enum t_cart_type
-{
-	STANDARD = 0,
-	SSF2,					/* Super Street Fighter 2 */
-	LIONK3,					/* Lion King 3 */
-	SKINGKONG,				/* Super King Kong 99 */
-	SDK99,					/* Super Donkey Kong 99 */
-	REDCLIFF,				/* Romance of the Three Kingdoms - Battle of Red Cliffs, already decoded from .mdx format */
-	REDCL_EN,				/* The encoded version... */
-	RADICA,					/* Radica TV games.. these probably should be a seperate driver since they are a seperate 'console' */
-	KOF99,					/* King of Fighters '99 */
-	SOULBLAD,				/* Soul Blade */
-	MJLOVER,				/* Mahjong Lover */
-	SQUIRRELK,				/* Squirrel King */
-	SMOUSE,					/* Smart Mouse */
-	SMB,					/* Super Mario Bros. */
-	SMB2,					/* Super Mario Bros. 2 */
-	KAIJU,					/* Pokemon Stadium */
-	CHINFIGHT3,				/* Chinese Fighters 3 */
-	LIONK2,					/* Lion King 2 */
-	BUGSLIFE,				/* A Bug's Life */
-	ELFWOR,					/* Elf Wor */
-	ROCKMANX3,				/* Rockman X3 */
-	SBUBBOB,				/* Super Bubble Bobble */
-	KOF98,					/* King of Fighters '98 */
-	REALTEC,				/* Whac a Critter/Mallet legend, Defend the Earth, Funnyworld/Ballonboy */
-	MC_SUP19IN1,			/* Super 19 in 1 */
-	MC_SUP15IN1,			/* Super 15 in 1 */
-	MC_12IN1,				/* 12 in 1 and a few more multicarts */
-	TOPFIGHTER,				/* Top Fighter 2000 MK VIII */
-	NBA_JAM,				/* NBA Jam */
-	NBA_JAM_TE,				/* NBA Jam TE / NFL Quarterback Club */
-	NFL_QB_96,				/* NFL Quarterback Club '96 */
-	C_SLAM,					/* College Slam / Frank Thomas Big Hurt Baseball */
-	EA_NHLPA,				/* NHLPA Hockey 93 / Rings of Power */
-	WBOY_V,					/* Wonder Boy V / Evander Holyfield's Boxing / Greatest Heavyweights of the Ring / Sports Talk Baseball / Megaman */
-	CODE_MASTERS			/* Micro Machines 2 / Military / 96 / Brian Lara Cricket */
-};
-static enum t_cart_type cart_type;
-
 
 // later, this has to be moved to the driver class
 typedef struct _megadriv_cart  megadriv_cart;
 struct _megadriv_cart
 {
+	int type;
+
 	// SRAM related
 	UINT16 *sram;
 	int last_loaded_image_length;
@@ -230,8 +192,7 @@ static READ16_HANDLER( l3alt_prot_r )
 			break;
 
 		default:
-
-			printf("protection read, unknown offset\n");
+			logerror("protection read, unknown offset\n");
 			break;
 	}
 
@@ -253,7 +214,7 @@ static WRITE16_HANDLER( l3alt_prot_w )
 			md_cart.l3alt_pcmd = data;
 			break;
 		default:
-			printf("protection write, unknown offst\n");
+			logerror("protection write, unknown offst\n");
 			break;
 	}
 }
@@ -273,7 +234,7 @@ static WRITE16_HANDLER( l3alt_bank_w )
 		break;
 
 		default:
-		printf("unk bank w\n");
+		logerror("unk bank w\n");
 		break;
 
 	}
@@ -542,9 +503,9 @@ static READ16_HANDLER( kof99_A13000_r )
  *************************************/
 static READ16_HANDLER( radica_bank_select )
 {
-	int bank = offset&0x3f;
+	int bank = offset & 0x3f;
 	UINT8 *ROM = space->machine->region("maincpu")->base();
-	memcpy(ROM, ROM +  (bank * 0x10000) + 0x400000, 0x400000);
+	memcpy(ROM, ROM +  (bank * 0x10000) + VIRGIN_COPY_GEN, 0x400000);
 	return 0;
 }
 
@@ -935,16 +896,12 @@ static WRITE16_HANDLER( sega_6658a_reg_w )
  *
  *************************************/
 
-
 static void setup_megadriv_custom_mappers(running_machine *machine)
 {
-	static int relocate = VIRGIN_COPY_GEN;
-	unsigned char *ROM;
 	UINT32 mirroraddr;
+	UINT8 *ROM = machine->region("maincpu")->base();
 
-	ROM = machine->region("maincpu")->base();
-
-	if (cart_type == SSF2)
+	if (md_cart.type == SSF2)
 	{
 		memcpy(&ROM[0x800000], &ROM[VIRGIN_COPY_GEN + 0x400000], 0x100000);
 		memcpy(&ROM[0x400000], &ROM[VIRGIN_COPY_GEN], 0x400000);
@@ -953,7 +910,7 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa130f0, 0xa130ff, 0, 0, genesis_ssf2_bank_w);
 	}
 
-	if (cart_type == LIONK3 || cart_type == SKINGKONG)
+	if (md_cart.type == LIONK3 || md_cart.type == SKINGKONG)
 	{
 		md_cart.l3alt_pdat = md_cart.l3alt_pcmd = 0;
 		memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN], 0x200000); /* default rom */
@@ -963,7 +920,7 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x700000, 0x7fffff, 0, 0, l3alt_bank_w);
 	}
 
-	if (cart_type == SDK99)
+	if (md_cart.type == SDK99)
 	{
 		md_cart.l3alt_pdat = md_cart.l3alt_pcmd = 0;
 
@@ -974,13 +931,13 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x700000, 0x7fffff, 0, 0, l3alt_bank_w);
 	}
 
-	if (cart_type == REDCLIFF)
+	if (md_cart.type == REDCLIFF)
 	{
 		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400001, 0, 0, redclif_prot2_r);
 		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400004, 0x400005, 0, 0, redclif_prot_r);
 	}
 
-	if (cart_type == REDCL_EN)
+	if (md_cart.type == REDCL_EN)
 	{
 		int x;
 
@@ -995,7 +952,7 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400004, 0x400005, 0, 0, redclif_prot_r);
 	}
 
-	if (cart_type == RADICA)
+	if (md_cart.type == RADICA)
 	{
 		memcpy(&ROM[0x400000], &ROM[VIRGIN_COPY_GEN], 0x400000); // keep a copy for later banking.. making use of huge ROM_REGION allocated to genesis driver
 		memcpy(&ROM[0x800000], &ROM[VIRGIN_COPY_GEN], 0x400000); // wraparound banking (from hazemd code)
@@ -1003,7 +960,7 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa1307f, 0, 0, radica_bank_select);
 	}
 
-	if (cart_type == KOF99)
+	if (md_cart.type == KOF99)
 	{
 		//memcpy(&ROM[0x000000],&ROM[VIRGIN_COPY_GEN],0x300000);
 		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa13001, 0, 0, kof99_A13000_r);
@@ -1011,42 +968,42 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa1303e, 0xa1303f, 0, 0, kof99_00A1303E_r);
 	}
 
-	if (cart_type == SOULBLAD)
+	if (md_cart.type == SOULBLAD)
 	{
 		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400002, 0x400003, 0, 0, soulb_400002_r);
 		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400004, 0x400005, 0, 0, soulb_400004_r);
 		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400006, 0x400007, 0, 0, soulb_400006_r);
 	}
 
-	if (cart_type == MJLOVER)
+	if (md_cart.type == MJLOVER)
 	{
 		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400001, 0, 0, mjlovr_prot_1_r);
 		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x401000, 0x401001, 0, 0, mjlovr_prot_2_r);
 	}
 
-	if (cart_type == SQUIRRELK)
+	if (md_cart.type == SQUIRRELK)
 	{
 		md_cart.squirrel_king_extra = 0;
 		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400007, 0, 0, squirrel_king_extra_r);
 		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400007, 0, 0, squirrel_king_extra_w);
 	}
 
-	if (cart_type == SMOUSE)
+	if (md_cart.type == SMOUSE)
 	{
 		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400007, 0, 0, smous_prot_r);
 	}
 
-	if (cart_type == SMB)
+	if (md_cart.type == SMB)
 	{
 		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa13001, 0, 0, smbro_prot_r);
 	}
 
-	if (cart_type == SMB2)
+	if (md_cart.type == SMB2)
 	{
 		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa13001, 0, 0, smb2_extra_r);
 	}
 
-	if (cart_type == KAIJU)
+	if (md_cart.type == KAIJU)
 	{
 		memcpy(&ROM[0x400000], &ROM[VIRGIN_COPY_GEN], 0x200000);
 		memcpy(&ROM[0x600000], &ROM[VIRGIN_COPY_GEN], 0x200000);
@@ -1055,7 +1012,7 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x700000, 0x7fffff, 0, 0, kaiju_bank_w);
 	}
 
-	if (cart_type == CHINFIGHT3)
+	if (md_cart.type == CHINFIGHT3)
 	{
 		memcpy(&ROM[0x400000], &ROM[VIRGIN_COPY_GEN], 0x200000);
 		memcpy(&ROM[0x600000], &ROM[VIRGIN_COPY_GEN], 0x200000);
@@ -1065,7 +1022,7 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x600000, 0x6fffff, 0, 0, chifi3_bank_w);
 	}
 
-	if (cart_type == LIONK2)
+	if (md_cart.type == LIONK2)
 	{
 		md_cart.lion2_prot1_data = md_cart.lion2_prot2_data = 0;
 
@@ -1075,12 +1032,12 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400004, 0x400005, 0, 0, lion2_prot2_w);
 	}
 
-	if (cart_type == BUGSLIFE)
+	if (md_cart.type == BUGSLIFE)
 	{
 		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa13001, 0, 0, bugl_extra_r);
 	}
 
-	if (cart_type == ELFWOR)
+	if (md_cart.type == ELFWOR)
 	{
 	/* It return (0x55 @ 0x400000 OR 0xc9 @ 0x400004) AND (0x0f @ 0x400002 OR 0x18 @ 0x400006). It is probably best to add handlers for all 4 addresses. */
 
@@ -1090,18 +1047,18 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400006, 0x400007, 0, 0, elfwor_400006_r);
 	}
 
-	if (cart_type == ROCKMANX3)
+	if (md_cart.type == ROCKMANX3)
 	{
 		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa13001, 0, 0, rx3_extra_r);
 	}
 
-	if (cart_type == SBUBBOB)
+	if (md_cart.type == SBUBBOB)
 	{
 		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400001, 0, 0, sbub_extra1_r);
 		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400002, 0x400003, 0, 0, sbub_extra2_r);
 	}
 
-	if (cart_type == KOF98)
+	if (md_cart.type == KOF98)
 	{
 		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x480000, 0x480001, 0, 0, kof98_aa_r);
 		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4800e0, 0x4800e1, 0, 0, kof98_aa_r);
@@ -1112,17 +1069,17 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4f8820, 0x4f8821, 0, 0, kof98_00_r);
 	}
 
-	if (cart_type == REALTEC)
+	if (md_cart.type == REALTEC)
 	{
 		/* Realtec mapper!*/
 		md_cart.realtec_bank_addr = md_cart.realtec_bank_size = 0;
 		md_cart.realtec_old_bank_addr = -1;
 
-		memcpy(&ROM[0x400000], &ROM[relocate], 0x80000);
+		memcpy(&ROM[0x400000], &ROM[VIRGIN_COPY_GEN], 0x80000);
 
 		for (mirroraddr = 0; mirroraddr < 0x400000; mirroraddr += 0x2000)
 		{
-			memcpy(ROM + mirroraddr, ROM + relocate + 0x7e000, 0x002000); /* copy last 8kb across the whole rom region */
+			memcpy(ROM + mirroraddr, ROM + VIRGIN_COPY_GEN + 0x7e000, 0x002000); /* copy last 8kb across the whole rom region */
 		}
 
 		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400001, 0, 0, realtec_400000_w);
@@ -1130,25 +1087,25 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x404000, 0x404001, 0, 0, realtec_404000_w);
 	}
 
-	if (cart_type == MC_SUP19IN1)
+	if (md_cart.type == MC_SUP19IN1)
 	{
 		memcpy(&ROM[0x400000], &ROM[VIRGIN_COPY_GEN], 0x400000); // allow hard reset to menu
 		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa13039, 0, 0, s19in1_bank);
 	}
 
-	if (cart_type == MC_SUP15IN1)
+	if (md_cart.type == MC_SUP15IN1)
 	{
 		memcpy(&ROM[0x400000], &ROM[VIRGIN_COPY_GEN], 0x200000); // allow hard reset to menu
 		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa13039, 0, 0, s19in1_bank);
 	}
 
-	if (cart_type == MC_12IN1)
+	if (md_cart.type == MC_12IN1)
 	{
 		memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN], 0x400000);  /* default rom */
 		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa1303f, 0, 0, mc_12in1_bank_w);
 	}
 
-	if (cart_type == TOPFIGHTER)
+	if (md_cart.type == TOPFIGHTER)
 	{
 		memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN], 0x400000);  /* default rom */
 
@@ -1163,32 +1120,92 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x700000, 0x7fffff, 0, 0, topfig_bank_w );
 	}
 
+	if (md_cart.type == POKEMON)
+	{
+		/*todo: emulate protection instead
+         0DD19E:47F8
+         0DD1A0:FFF0
+         0DD1A2:4E63
+         0DD46E:4EF8
+         0DD470:0300
+         0DD49C:6002
+         */
+
+		/*
+
+         you need to return 1 @ 0xa13002 and 0???1f @ 0xa1303E (it does word reads).
+
+         */
+		UINT16 *ROM16 = (UINT16 *)machine->region("maincpu")->base();
+
+		ROM16[0x0dd19e/2] = 0x47F8;
+		ROM16[0x0dd1a0/2] = 0xFFF0;
+		ROM16[0x0dd1a2/2] = 0x4E63;
+		ROM16[0x0dd46e/2] = 0x4EF8;
+		ROM16[0x0dd470/2] = 0x0300;
+		ROM16[0x0dd49c/2] = 0x6002;
+	}
+
+	if (md_cart.type == POKEMON2)
+	{
+		/*todo: emulate protection instead
+         006036:E000
+         002540:6026
+         001ED0:6026
+         002476:6022
+
+         */
+		UINT16 *ROM16 = (UINT16 *)machine->region("maincpu")->base();
+
+		ROM16[0x06036/2] = 0xE000;
+		ROM16[0x02540/2] = 0x6026;
+		ROM16[0x01ED0/2] = 0x6026;
+		ROM16[0x02476/2] = 0x6022;
+
+		ROM16[0x7E300/2] = 0x60FE;
+	}
+
+	if (md_cart.type == MULAN)
+	{
+		/*todo: emulate protection instead
+         006036:E000
+         +more?
+
+         */
+		//  ROM[0x01ED0/2] = 0xE000;
+		//  ROM[0x02540/2] = 0xE000;
+
+		UINT16 *ROM16 = (UINT16 *)machine->region("maincpu")->base();
+
+		ROM16[0x06036/2] = 0xE000;
+	}
+
 	/* install i2c handlers */
-	if (cart_type == NBA_JAM)
+	if (md_cart.type == NBA_JAM)
 	{
 		md_cart.has_serial_eeprom = 1;
 		memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x200001, 0, 0, nba_jam_eeprom_r, nba_jam_eeprom_w);
 	}
 
-	if (cart_type == WBOY_V)
+	if (md_cart.type == WBOY_V)
 	{
 		md_cart.has_serial_eeprom = 1;
 		memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x200001, 0, 0, wboy_v_eeprom_r, wboy_v_eeprom_w);
 	}
 
-	if (cart_type == NBA_JAM_TE || cart_type == NFL_QB_96 || cart_type == C_SLAM) // same handling but different sizes
+	if (md_cart.type == NBA_JAM_TE || md_cart.type == NFL_QB_96 || md_cart.type == C_SLAM) // same handling but different sizes
 	{
 		md_cart.has_serial_eeprom = 1;
 		memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x200001, 0, 0, nba_jam_te_eeprom_r, nba_jam_te_eeprom_w);
 	}
 
-	if (cart_type == EA_NHLPA)
+	if (md_cart.type == EA_NHLPA)
 	{
 		md_cart.has_serial_eeprom = 1;
 		memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x200001, 0, 0, ea_nhlpa_eeprom_r, ea_nhlpa_eeprom_w);
 	}
 
-	if (cart_type == CODE_MASTERS)
+	if (md_cart.type == CODE_MASTERS || md_cart.type == CM_JCART_SEPROM)
 	{
 		md_cart.has_serial_eeprom = 1;
 		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x300000, 0x300001, 0, 0, codemasters_eeprom_w);
@@ -1355,7 +1372,7 @@ static int megadrive_load_nonlist(device_image_interface &image)
 		}
 #endif
 		md_cart.last_loaded_image_length = length - 512;
-		memcpy(&ROM[VIRGIN_COPY_GEN], &ROM[0x000000], MAX_MD_CART_SIZE);  /* store a copy of data for MACHINE_RESET processing */
+		memcpy(&ROM[VIRGIN_COPY_GEN], &ROM[0x000000], MAX_MD_CART_SIZE);  /* store a copy of data */
 
 		relocate = 0;
 
@@ -1391,7 +1408,7 @@ static int megadrive_load_nonlist(device_image_interface &image)
 		}
 #endif
 		md_cart.last_loaded_image_length = length;
-		memcpy(&ROM[VIRGIN_COPY_GEN], &ROM[0x000000], MAX_MD_CART_SIZE);  /* store a copy of data for MACHINE_RESET processing */
+		memcpy(&ROM[VIRGIN_COPY_GEN], &ROM[0x000000], MAX_MD_CART_SIZE);  /* store a copy of data */
 		relocate = 0;
 
 	}
@@ -1414,13 +1431,13 @@ static int megadrive_load_nonlist(device_image_interface &image)
 #endif
 		}
 
-		memcpy(&ROM[VIRGIN_COPY_GEN], &ROM[0x000000], MAX_MD_CART_SIZE);  /* store a copy of data for MACHINE_RESET processing */
+		memcpy(&ROM[VIRGIN_COPY_GEN], &ROM[0x000000], MAX_MD_CART_SIZE);  /* store a copy of data */
 	}
 
-	// STEP 2: determine the cart type (to deal with pirate mappers)
+	// STEP 2: determine the cart type (to deal with pirate mappers & eeprom)
 
 	/* Default cartridge type */
-	cart_type = STANDARD;
+	md_cart.type = SEGA_STD;
 
 	/* Detect carts which need additional handlers */
 	{
@@ -1451,151 +1468,151 @@ static int megadrive_load_nonlist(device_image_interface &image)
 		{
 			case 0x80000:
 			    if (!allendianmemcmp(&ROM[0x08c8], &smouse_sig[0], sizeof(smouse_sig)))
-					cart_type = SMOUSE;
+					md_cart.type = SMOUSE;
 
 			    if (!allendianmemcmp((char *)&ROM[0x7e30e], "SEGA", 4) ||
 					!allendianmemcmp((char *)&ROM[0x7e100], "SEGA", 4) ||
 					!allendianmemcmp((char *)&ROM[0x7e1e6], "SEGA", 4))
-					cart_type = REALTEC;
+					md_cart.type = REALTEC;
 
 			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-50396", 10)) // NHLPA Hockey 93
-					cart_type = EA_NHLPA;
+					md_cart.type = EA_NHLPA;
 
 			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM MK-1215", 10)) // Evander Holyfield
-					cart_type = WBOY_V;
+					md_cart.type = WBOY_V;
 
 			    break;
 
 			case 0xc0000:
 
 			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM G-4060 ", 8)) // Wonder Boy V
-					cart_type = WBOY_V;
+					md_cart.type = WBOY_V;
 
 			    break;
 
 			case 0x100000:
 			    if (!allendianmemcmp(&ROM[0x01b24], &mjlover_sig[0], sizeof(mjlover_sig)))
-					cart_type = MJLOVER;
+					md_cart.type = MJLOVER;
 
 			    if (!allendianmemcmp(&ROM[0x03b4], &squir_sig[0], sizeof(squir_sig)))
-					cart_type = SQUIRRELK;
+					md_cart.type = SQUIRRELK;
 
 			    if (!allendianmemcmp(&ROM[0xee0d0], &bugsl_sig[0], sizeof(bugsl_sig)))
-					cart_type = BUGSLIFE;
+					md_cart.type = BUGSLIFE;
 
 			    if (!allendianmemcmp((char *)&ROM[0x0172], "GAME : ELF WOR", 14))
-					cart_type = ELFWOR;
+					md_cart.type = ELFWOR;
 
 			    if (!allendianmemcmp(&ROM[0x123e4], &sbub_sig[0], sizeof(sbub_sig)))
-					cart_type = SBUBBOB;
+					md_cart.type = SBUBBOB;
 
 			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-50176", 10)) // Rings of Power
-					cart_type = EA_NHLPA;
+					md_cart.type = EA_NHLPA;
 
 			    if (!allendianmemcmp((char *)&ROM[0x0180], "MK 00001211-00", 14)) // Sports Talk Baseball
-					cart_type = WBOY_V;
+					md_cart.type = WBOY_V;
 
 			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-120096-", 12)) // Micro Machines 2
-					cart_type = CODE_MASTERS;
+					md_cart.type = CODE_MASTERS;
 
 			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-120146-", 12)) // Brian Lara Cricket 96 / Shane Wayne Cricket 96
-					cart_type = CODE_MASTERS;
+					md_cart.type = CODE_MASTERS;
 
 			    if (!allendianmemcmp((char *)&ROM[0x0190], "OJKRPTBVFCA     ", 0x10)) // Micro Machines '96 / Military TODO: better way to recognize these?
-					cart_type = CODE_MASTERS;
+					md_cart.type = CODE_MASTERS;
 			    break;
 
 			case 0x200000:
 			    if (!allendianmemcmp(&ROM[0x18c6], &lk3_sig[0], sizeof(lk3_sig)))
-					cart_type = LIONK3;
+					md_cart.type = LIONK3;
 
 			    if (!allendianmemcmp(&ROM[0x220], &sdk_sig[0], sizeof(sdk_sig)))
-					cart_type = SKINGKONG;
+					md_cart.type = SKINGKONG;
 
 			    if (!allendianmemcmp(&ROM[0xce560], &redcliff_sig[0], sizeof(redcliff_sig)))
-					cart_type = REDCLIFF;
+					md_cart.type = REDCLIFF;
 
 			    if (!allendianmemcmp(&ROM[0xc8cb0], &smb_sig[0], sizeof(smb_sig)))
-					cart_type = SMB;
+					md_cart.type = SMB;
 
 			    if (!allendianmemcmp(&ROM[0xf24d6], &smb2_sig[0], sizeof(smb2_sig)))
-					cart_type = SMB2;
+					md_cart.type = SMB2;
 
 			    if (!allendianmemcmp(&ROM[0x674e], &kaiju_sig[0], sizeof(kaiju_sig)))
-					cart_type = KAIJU;
+					md_cart.type = KAIJU;
 
 			    if (!allendianmemcmp(&ROM[0x1780], &chifi3_sig[0], sizeof(chifi3_sig)))
-					cart_type = CHINFIGHT3;
+					md_cart.type = CHINFIGHT3;
 
 			    if (!allendianmemcmp(&ROM[0x03c2], &lionk2_sig[0], sizeof(lionk2_sig)))
-					cart_type = LIONK2;
+					md_cart.type = LIONK2;
 
 			    if (!allendianmemcmp(&ROM[0xc8b90], &rx3_sig[0], sizeof(rx3_sig)))
-					cart_type = ROCKMANX3;
+					md_cart.type = ROCKMANX3;
 
 			    if (!allendianmemcmp(&ROM[0x56ae2], &kof98_sig[0], sizeof(kof98_sig)))
-					cart_type = KOF98;
+					md_cart.type = KOF98;
 
 			    if (!allendianmemcmp(&ROM[0x17bb2], &s15in1_sig[0], sizeof(s15in1_sig)))
-					cart_type = MC_SUP15IN1;
+					md_cart.type = MC_SUP15IN1;
 
 			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-081326 ", 12)) // NBA Jam
-					cart_type = NBA_JAM;
+					md_cart.type = NBA_JAM;
 
 			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM MK-1228", 10)) // Greatest Heavyweight of the Ring
-					cart_type = WBOY_V;
+					md_cart.type = WBOY_V;
 
 			    if ((!allendianmemcmp((char *)&ROM[0x0180], "GM T-12046", 10)) || // Mega Man
 					(!allendianmemcmp((char *)&ROM[0x0180], "GM T-12053", 10) && !allendianmemcmp(&ROM[0x18e], &rockman_sig[0], sizeof(rockman_sig)))) // / Rock Man (EEPROM version)
-					cart_type = WBOY_V;
+					md_cart.type = WBOY_V;
 
 			    break;
 
 			case 0x200005:
 			    if (!allendianmemcmp(&ROM[0xce564], &redcl_en_sig[0], sizeof(redcliff_sig)))
-					cart_type = REDCL_EN;
+					md_cart.type = REDCL_EN;
 			    break;
 
 			case 0x300000:
 			    if (!allendianmemcmp(&ROM[0x220], &sdk_sig[0], sizeof(sdk_sig)))
-					cart_type = SDK99;
+					md_cart.type = SDK99;
 
 			    if (!allendianmemcmp(&ROM[0x1fd0d2], &kof99_sig[0], sizeof(kof99_sig)))
-					cart_type = KOF99;
+					md_cart.type = KOF99;
 
 			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-81406", 10)) // NBA Jam TE
-					cart_type = NBA_JAM_TE;
+					md_cart.type = NBA_JAM_TE;
 
 			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-081276 ", 12)) // NFL Quarterback Club
-					cart_type = NBA_JAM_TE;
+					md_cart.type = NBA_JAM_TE;
 
 			    break;
 
 			case 0x400000:
 			    if (!allendianmemcmp(&ROM[0x3c031c], &radica_sig[0], sizeof(radica_sig)) ||
 					!allendianmemcmp(&ROM[0x3f031c], &radica_sig[0], sizeof(radica_sig))) // ssf+gng + radica vol1
-					cart_type = RADICA;
+					md_cart.type = RADICA;
 
 			    if (!allendianmemcmp(&ROM[0x028460], &soulb_sig[0], sizeof(soulb_sig)))
-					cart_type = SOULBLAD;
+					md_cart.type = SOULBLAD;
 
 			    if (!allendianmemcmp(&ROM[0x1e700], &s19in1_sig[0], sizeof(s19in1_sig)))
-					cart_type = MC_SUP19IN1;
+					md_cart.type = MC_SUP19IN1;
 
 			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-081586-", 12)) // NFL Quarterback Club 96
-					cart_type = NFL_QB_96;
+					md_cart.type = NFL_QB_96;
 
 			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-081576 ", 12)) // College Slam
-					cart_type = C_SLAM;
+					md_cart.type = C_SLAM;
 
 			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-81476", 10)) // Big Hurt Baseball
-					cart_type = C_SLAM;
+					md_cart.type = C_SLAM;
 
 			    break;
 
 			case 0x500000:
 			    if (!allendianmemcmp((char *)&ROM[0x0120], "SUPER STREET FIGHTER2 ", 22))
-					cart_type = SSF2;
+					md_cart.type = SSF2;
 			    break;
 
 			default:
@@ -1603,7 +1620,7 @@ static int megadrive_load_nonlist(device_image_interface &image)
 		}
 	}
 
-	logerror("cart type: %d\n", cart_type);
+	logerror("cart type: %d\n", md_cart.type);
 
 	// STEP 3: install memory handlers for this type of cart
 	setup_megadriv_custom_mappers(image.device().machine);
@@ -1682,13 +1699,9 @@ static int megadrive_load_nonlist(device_image_interface &image)
 
 static int megadrive_load_list(device_image_interface &image)
 {
-	unsigned char *ROM;
-	int length;
-	int	pcb_id;
+	UINT8 *ROM = image.device().machine->region("maincpu")->base();
+	UINT32 length = image.get_software_region_length("rom");
 	const char	*pcb_name;
-
-	length = image.get_software_region_length("rom");
-	ROM = image.device().machine->region("maincpu")->base();
 	memcpy(ROM, image.get_software_region("rom"), length);
 
 	md_cart.last_loaded_image_length = length;
@@ -1701,26 +1714,28 @@ static int megadrive_load_list(device_image_interface &image)
 	md_cart.sram_readonly = 0;
 	md_cart.sram_active = 0;
 
-	if ((pcb_name = image.get_feature("pcb")) == NULL)
-		pcb_id = STD_ROM;
+	if ((pcb_name = image.get_feature("pcb_type")) == NULL)
+		md_cart.type = SEGA_STD;
 	else
-		pcb_id = md_get_pcb_id(pcb_name);
+		md_cart.type = md_get_pcb_id(pcb_name);
 
-	switch (pcb_id)
+	memcpy(&ROM[VIRGIN_COPY_GEN], &ROM[0x000000], MAX_MD_CART_SIZE);  /* store a copy of data */
+	setup_megadriv_custom_mappers(image.device().machine);
+
+	switch (md_cart.type)
 	{
 			/* Sega PCB */
-		case SEGA_6584A:
+		case SEGA_EEPROM: // still used by Game Toshokan, to be fixed
 			fatalerror("Need Serial EEPROM emulation");
 			break;
-		case SEGA_5921:
-		case SEGA_6278A:
+		case SEGA_SRAM:
 			md_cart.sram_start = 0x200000;
 			md_cart.sram_end = md_cart.sram_start + 0x3fff;
 			md_cart.sram_detected = 1;
 			megadriv_backupram = (UINT16*) (ROM + (md_cart.sram_start & 0x3fffff));
 			md_cart.sram_active = 1;
 			break;
-		case SEGA_6658A:
+		case SEGA_FRAM:
 			md_cart.sram_start = 0x200000;
 			md_cart.sram_end = md_cart.sram_start + 0x3ff;
 			md_cart.sram_detected = 1;
@@ -1728,8 +1743,7 @@ static int megadrive_load_list(device_image_interface &image)
 			memory_install_read16_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa130f0, 0xa130f1, 0, 0, sega_6658a_reg_r);
 			memory_install_write16_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa130f0, 0xa130f1, 0, 0, sega_6658a_reg_w);
 			break;
-
-			/* Codemasters PCB (J-Carts) */
+		/* Codemasters PCB (J-Carts) */
 		case CM_JCART:
 			memory_install_read16_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x38fffe, 0x38ffff, 0, 0, jcart_ctrl_r);
 			memory_install_write16_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x38fffe, 0x38ffff, 0, 0, jcart_ctrl_w);
@@ -1737,7 +1751,6 @@ static int megadrive_load_list(device_image_interface &image)
 		case CM_JCART_SEPROM:
 			memory_install_read16_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x38fffe, 0x38ffff, 0, 0, jcart_ctrl_r);
 			memory_install_write16_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x38fffe, 0x38ffff, 0, 0, jcart_ctrl_w);
-			/* TODO add SEPROM part */
 			break;
 	}
 
@@ -1749,7 +1762,7 @@ static int megadrive_load_list(device_image_interface &image)
 
 static DEVICE_IMAGE_LOAD( genesis_cart )
 {
-	cart_type = STANDARD;
+	md_cart.type = SEGA_STD;
 
 	if (image.software_entry() == NULL)
 		return megadrive_load_nonlist(image);
@@ -1817,7 +1830,7 @@ static DEVICE_IMAGE_LOAD( _32x_cart )
 
 	auto_free(image.device().machine, temp_copy);
 
-	cart_type = NBA_JAM_TE;
+	md_cart.type = NBA_JAM_TE;
 
 	return IMAGE_INIT_PASS;
 }

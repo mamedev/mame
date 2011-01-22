@@ -17,34 +17,50 @@ struct _md_pcb
 // Here, we take the feature attribute from .xml (i.e. the PCB name) and we assign a unique ID to it
 static const md_pcb pcb_list[] =
 {
-	/* Standard Sega PCB (one rom) */
-	{"171-5703", STD_ROM},
-	{"171-5927", STD_ROM},
-	{"171-5978B", STD_ROM},
-	{"171-5978BA", STD_ROM},
-	{"171-6329A", STD_ROM},
+	{"SEGA-EEPROM", SEGA_EEPROM},
+	{"SEGA-SRAM", SEGA_SRAM},
+	{"SEGA-FRAM", SEGA_FRAM},
 
-	/* Sega PCB with two roms */
-	{"171-5841", STD_ROM},
+	{"CM-JCART", CM_JCART},
+	{"CM-JCART-SEPROM", CM_JCART_SEPROM},
+	{"CM-SEPROM", CODE_MASTERS},
 
-	/* Sega PCB with Serial EEPROM */
-	{"171-5878", SEGA_5878},
-	{"171-6584A", SEGA_6584A},
+	{"SSF2", SSF2},
+	{"NBAJAM", NBA_JAM},
+	{"NBAJAMTE", NBA_JAM_TE},
+	{"NFLQB96", NFL_QB_96},
+	{"CSLAM", C_SLAM},
+	{"NHLPA", EA_NHLPA},
+	{"WBOY5", WBOY_V},
 
-	/* Sega PCB with sram */
-	{"171-5921", SEGA_5921},
-	{"171-6278A", SEGA_6278A},
-
-	/* Sega PCB with fram */
-	{"171-6658A", SEGA_6658A},
-
-	/* Namcot PCB (blob epoxy chip) */
-	{"837-8861", STD_ROM},
-
-	/* Codemasters PCB */
-	{"SRJCV1-2", CM_JCART},
-	{"SRJCV2-1", CM_JCART_SEPROM},
-	{"SRJCV2-2", CM_JCART_SEPROM}
+	{"LIONK3", LIONK3},
+	{"SDK99", SDK99},
+	{"SKINGKONG", SKINGKONG},
+	{"REDCLIFF", REDCL_EN},
+	{"RADICA", RADICA},
+	{"KOF98", KOF98},
+	{"KOF99", KOF99},
+	{"SOULBLAD", SOULBLAD},
+	{"MJLOVER", MJLOVER},
+	{"SQUIRRELK", SQUIRRELK},
+	{"SMOUSE", SMOUSE},
+	{"SMB", SMB},
+	{"SMB2", SMB2},
+	{"KAIJU", KAIJU},
+	{"CHINFIGHT3", CHINFIGHT3},
+	{"LIONK2", LIONK2},
+	{"BUGSLIFE", BUGSLIFE},
+	{"ELFWOR", ELFWOR},
+	{"ROCKMANX3", ROCKMANX3},
+	{"SBUBBOB", SBUBBOB},
+	{"REALTEC", REALTEC},
+	{"MC_SUP19IN1", MC_SUP19IN1},
+	{"MC_SUP15IN1", MC_SUP15IN1},
+	{"MC_12IN1", MC_12IN1},
+	{"TOPFIGHTER", TOPFIGHTER},
+	{"POKEMON", POKEMON},
+	{"POKEMON2", POKEMON},
+	{"MULAN", MULAN}
 };
 
 int md_get_pcb_id(const char *pcb)
@@ -57,5 +73,5 @@ int md_get_pcb_id(const char *pcb)
 			return pcb_list[i].pcb_id;
 	}
 
-	return STD_ROM;
+	return SEGA_STD;
 }
