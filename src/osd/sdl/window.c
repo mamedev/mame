@@ -949,6 +949,7 @@ static void pick_best_mode(sdl_window_info *window, int *fswidth, int *fsheight)
 void sdlwindow_video_window_update(running_machine *machine, sdl_window_info *window)
 {
 
+	osd_ticks_t		event_wait_ticks;
 	ASSERT_MAIN_THREAD();
 
 	// adjust the cursor state
@@ -977,8 +978,12 @@ void sdlwindow_video_window_update(running_machine *machine, sdl_window_info *wi
 			}
 		}
 
-		// only render if we have been signalled
-		if (osd_event_wait(window->rendered_event, 0))
+		if (video_config.waitvsync && video_config.syncrefresh)
+			event_wait_ticks = osd_ticks_per_second(); // block at most a second
+		else
+			event_wait_ticks = 0;
+
+		if (osd_event_wait(window->rendered_event, event_wait_ticks))
 		{
 			worker_param wp;
 			render_primitive_list *primlist;

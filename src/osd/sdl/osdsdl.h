@@ -75,6 +75,7 @@
 #define SDLOPTION_NUMPROCESSORS			"numprocessors"
 
 #define SDLOPTION_WAITVSYNC				"waitvsync"
+#define SDLOPTION_SYNCREFRESH			"syncrefresh"
 #define SDLOPTION_KEYMAP				"keymap"
 #define SDLOPTION_KEYMAP_FILE			"keymap_file"
 #define SDLOPTION_UIMODEKEY				"uimodekey"

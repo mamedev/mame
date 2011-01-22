@@ -681,6 +681,12 @@ static void extract_video_config(running_machine *machine)
 	video_config.centerh       = options_get_bool(machine->options(), SDLOPTION_CENTERH);
 	video_config.centerv       = options_get_bool(machine->options(), SDLOPTION_CENTERV);
 	video_config.waitvsync     = options_get_bool(machine->options(), SDLOPTION_WAITVSYNC);
+	video_config.syncrefresh   = options_get_bool(machine->options(), SDLOPTION_SYNCREFRESH);
+	if (!video_config.waitvsync && video_config.syncrefresh)
+	{
+		mame_printf_warning("-syncrefresh specified without -waitsync. Reverting to -nosyncrefresh\n");
+		video_config.syncrefresh = 0;
+	}
 
 	if (USE_OPENGL || SDL_VERSION_ATLEAST(1,3,0))
 	{
