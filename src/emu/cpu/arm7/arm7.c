@@ -77,27 +77,34 @@ INLINE arm_state *get_safe_token(device_t *device)
 
 void set_cpsr( arm_state *cpustate, UINT32 val)
 {
-	if ((val & 0x10) != (ARM7REG(eCPSR) & 0x10))
+	if (cpustate->archFlags & eARM_ARCHFLAGS_MODE26)
 	{
-		if (val & 0x10)
+		if ((val & 0x10) != (ARM7REG(eCPSR) & 0x10))
 		{
-			// 26 -> 32
-			val = (val & 0x0FFFFF3F) | (R15 & 0xF0000000) /* N Z C V */ | ((R15 & 0x0C000000) >> (26 - 6)) /* I F */;
-			R15 = R15 & 0x03FFFFFC;
+			if (val & 0x10)
+			{
+				// 26 -> 32
+				val = (val & 0x0FFFFF3F) | (R15 & 0xF0000000) /* N Z C V */ | ((R15 & 0x0C000000) >> (26 - 6)) /* I F */;
+				R15 = R15 & 0x03FFFFFC;
+			}
+			else
+			{
+				// 32 -> 26
+				R15 = (R15 & 0x03FFFFFC) /* PC */ | (val & 0xF0000000) /* N Z C V */ | ((val & 0x000000C0) << (26 - 6)) /* I F */ | (val & 0x00000003) /* M1 M0 */;
+			}
 		}
 		else
 		{
-			// 32 -> 26
-			R15 = (R15 & 0x03FFFFFC) /* PC */ | (val & 0xF0000000) /* N Z C V */ | ((val & 0x000000C0) << (26 - 6)) /* I F */ | (val & 0x00000003) /* M1 M0 */;
+			if (!(val & 0x10))
+			{
+				// mirror bits in pc
+				R15 = (R15 & 0x03FFFFFF) | (val & 0xF0000000) /* N Z C V */ | ((val & 0x000000C0) << (26 - 6)) /* I F */;
+			}
 		}
 	}
 	else
 	{
-		if (!(val & 0x10))
-		{
-			// mirror bits in pc
-			R15 = (R15 & 0x03FFFFFF) | (val & 0xF0000000) /* N Z C V */ | ((val & 0x000000C0) << (26 - 6)) /* I F */;
-		}
+		val |= 0x10; // force valid mode
 	}
 	ARM7REG(eCPSR) = val;
 }
@@ -360,7 +367,7 @@ static CPU_RESET( arm7500 )
 	arm7_core_reset(device);
 
 	cpustate->archRev = 3;	// ARMv3
-	cpustate->archFlags = 0;
+	cpustate->archFlags = eARM_ARCHFLAGS_MODE26;
 }
 
 static CPU_RESET( arm9 )

@@ -243,12 +243,15 @@ INLINE UINT8 arm7_cpu_read8(arm_state *cpustate, offs_t addr)
 //  - HandleALUAddFlags = HandleThumbALUAddFlags except for PC incr
 //  - HandleALUSubFlags = HandleThumbALUSubFlags except for PC incr
 
+#define IsNeg(i) ((i) >> 31)
+#define IsPos(i) ((~(i)) >> 31)
+
 /* Set NZCV flags for ADDS / SUBS */
 #define HandleALUAddFlags(rd, rn, op2)                                                \
   if (insn & INSN_S)                                                                  \
     SET_CPSR(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                       \
               | (((!SIGN_BITS_DIFFER(rn, op2)) && SIGN_BITS_DIFFER(rn, rd)) << V_BIT) \
-              | (((~(rn)) < (op2)) << C_BIT)                                          \
+              | (((IsNeg(rn) & IsNeg(op2)) | (IsNeg(rn) & IsPos(rd)) | (IsNeg(op2) & IsPos(rd))) ? C_MASK : 0) \
               | HandleALUNZFlags(rd)));                                               \
   R15 += 4;
 
@@ -258,9 +261,6 @@ INLINE UINT8 arm7_cpu_read8(arm_state *cpustate, offs_t addr)
               | (((~(rn)) < (op2)) << C_BIT)                                                      \
               | HandleALUNZFlags(rd)));                                                           \
   R15 += 2;
-
-#define IsNeg(i) ((i) >> 31)
-#define IsPos(i) ((~(i)) >> 31)
 
 #define HandleALUSubFlags(rd, rn, op2)                                                                         \
   if (insn & INSN_S)                                                                                           \
