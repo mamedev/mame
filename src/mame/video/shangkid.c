@@ -64,7 +64,8 @@ WRITE8_HANDLER( shangkid_videoram_w )
 	tilemap_mark_tile_dirty( background, offset&0x7ff );
 }
 
-static void draw_sprite(running_machine *machine, const UINT8 *source, bitmap_t *bitmap, const rectangle *cliprect ){
+static void draw_sprite(running_machine *machine, const UINT8 *source, bitmap_t *bitmap, const rectangle *cliprect)
+{
 	const gfx_element *gfx;
 	int transparent_pen;
 	int bank_index;
@@ -111,8 +112,14 @@ static void draw_sprite(running_machine *machine, const UINT8 *source, bitmap_t 
 	}
 	else
 	{
+	
 		/* Chinese Hero */
 		color >>= 1;
+		
+		// It's needed in level 7 to hide "bogus" sprites. Is it a sprite disable flag or an end sprite list flag?
+		if(color == 0)
+			return;
+		
 		switch( bank>>2 )
 		{
 		case 0x0: bank_index = 0; break;
@@ -125,6 +132,7 @@ static void draw_sprite(running_machine *machine, const UINT8 *source, bitmap_t 
 		}
 
 		if( bank&0x01 ) tile += 0x40;
+		
 		transparent_pen = 7;
 	}
 
@@ -152,11 +160,22 @@ static void draw_sprite(running_machine *machine, const UINT8 *source, bitmap_t 
 				xflip,yflip,
 				sx,sy,
 				(width<<16)/16, (height<<16)/16,transparent_pen );
+				
+			// wrap around y
+			drawgfxzoom_transpen(
+				bitmap,
+				cliprect,
+				gfx,
+				tile+c*8+r,
+				color,
+				xflip,yflip,
+				sx,sy+256,
+				(width<<16)/16, (height<<16)/16,transparent_pen );
 		}
 	}
 }
 
-static void shangkid_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void shangkid_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	const UINT8 *source, *finish;
 
