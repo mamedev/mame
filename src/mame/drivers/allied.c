@@ -12,7 +12,6 @@ public:
 
 static ADDRESS_MAP_START( allied_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM 
 	AM_RANGE(0x1400, 0x1fff) AM_ROM 
 ADDRESS_MAP_END
@@ -30,7 +29,7 @@ static DRIVER_INIT( allied )
 
 static MACHINE_CONFIG_START( allied, allied_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 3572549/4)
+	MCFG_CPU_ADD("maincpu", M6504, 3572549/4)
 	MCFG_CPU_PROGRAM_MAP(allied_map)
 	
 	MCFG_MACHINE_RESET( allied )

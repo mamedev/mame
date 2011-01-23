@@ -66,7 +66,7 @@ struct _m6502_interface
 };
 
 DECLARE_LEGACY_CPU_DEVICE(M6502, m6502);
-
+DECLARE_LEGACY_CPU_DEVICE(M6504, m6504);
 extern CPU_DISASSEMBLE( m6502 );
 
 /****************************************************************************

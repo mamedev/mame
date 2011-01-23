@@ -765,6 +765,21 @@ CPU_GET_INFO( m6502 )
 	}
 }
 
+/**************************************************************************
+ * CPU-specific set_info
+ **************************************************************************/
+
+CPU_GET_INFO( m6504 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "M6504");				break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 13;					break;
+
+		default:										CPU_GET_INFO_CALL(m6502);			break;
+	}
+}
 
 /**************************************************************************
  * CPU-specific set_info
@@ -970,6 +985,7 @@ CPU_GET_INFO( deco16 )
 }
 
 DEFINE_LEGACY_CPU_DEVICE(M6502, m6502);
+DEFINE_LEGACY_CPU_DEVICE(M6504, m6504);
 DEFINE_LEGACY_CPU_DEVICE(M6510, m6510);
 DEFINE_LEGACY_CPU_DEVICE(M6510T, m6510t);
 DEFINE_LEGACY_CPU_DEVICE(M7501, m7501);
