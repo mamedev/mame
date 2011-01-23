@@ -2428,7 +2428,7 @@ static void input_port_update_hook(running_machine *machine, const input_port_co
 		keybuf = get_buffer(machine);
 
 		/* is the key down right now? */
-		if (keybuf->status_keydown && (keybuf->begin_pos != keybuf->end_pos))
+		if (keybuf && keybuf->status_keydown && (keybuf->begin_pos != keybuf->end_pos))
 		{
 			/* identify the character that is down right now, and its component codes */
 			ch = keybuf->buffer[keybuf->begin_pos];
