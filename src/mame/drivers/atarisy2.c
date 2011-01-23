@@ -431,56 +431,56 @@ static READ8_HANDLER( leta_r )
 	static const char *const letanames[] = { "LETA0", "LETA1", "LETA2", "LETA3" };
 	atarisy2_state *state = space->machine->driver_data<atarisy2_state>();
 
-    if (state->pedal_count == -1)   /* 720 */
+    if (offset <= 1 && state->pedal_count == -1)   /* 720 */
 	{
 		switch (input_port_read(space->machine, "SELECT"))
 		{
 			case 0:	/* Real */
 				break;
 
-			case 1:	/* Joystick */
-				/* special thanks to MAME Analog+ for the mapping code */
-				if (offset <= 1)
+			case 1:	/* Fake Joystick */
+			/* special thanks to MAME Analog+ for the mapping code */
+			{
+				static double last_angle;
+				static int rotations;
+
+				int analogx = input_port_read(space->machine, "FAKE_JOY_X") - 128;
+				int analogy = input_port_read(space->machine, "FAKE_JOY_Y") - 128;
+				double angle;
+
+				/* if the joystick is centered, leave the rest of this alone */
+				angle = last_angle;
+				if (analogx < -32 || analogx > 32 || analogy < -32 || analogy > 32)
+					angle = atan2((double)analogx, (double)analogy) * 360 / (2 * M_PI);
+
+				/* detect when we pass the 0 point in either direction */
+				if (last_angle < -90 && angle > 90)
+					rotations--;
+				else if (last_angle > 90 && angle < -90)
+					rotations++;
+				last_angle = angle;
+
+				/* make offset 0 return 0xff when the controller blocks one of two gaps */
+				/* this is not accurate, as a counter should count up/down 2 counts as it passes through each gap */
+				/* this is close enough to pass the service mode controller test the first couple of trys. */
+				if (offset == 0)
 				{
-					static double last_angle;
-					static int rotations;
-
-					int analogx = input_port_read(space->machine, "FAKE_JOY_X") - 128;
-					int analogy = input_port_read(space->machine, "FAKE_JOY_Y") - 128;
-					double angle;
-
-					/* if the joystick is centered, leave the rest of this alone */
-					angle = last_angle;
-					if (analogx < -32 || analogx > 32 || analogy < -32 || analogy > 32)
-						angle = atan2((double)analogx, (double)analogy) * 360 / (2 * M_PI);
-
-					/* detect when we pass the 0 point in either direction */
-					if (last_angle < -90 && angle > 90)
-						rotations--;
-					else if (last_angle > 90 && angle < -90)
-						rotations++;
-					last_angle = angle;
-
-					/* offset 0 returns 0xff when the controller blocks one of two gaps */
-					if ((offset) == 0)
-					{
-						/* original controller had two gaps 10 degrees apart, each 2.5 degrees wide */
-						/* we fake it a little to make it possible to hit the zeroed state with a digital controller */
-						return (angle >= -5.0 && angle <= 5.0) ? 0xff : 0x00;
-						/* proper angles */
-						// return ((angle >= -12.5 && angle <= -7.5) || (angle >= 7.5 && angle <= 12.5)) ? 0xff : 0x00;
-					}
-
-					/* offset 1 returns dial value; 144 units = 1 full rotation */
-					else
-					{
-						/* take the rotations * 144 plus the current angle */
-						return (rotations * 144 + (int)(angle * 144.0 / 360.0)) & 0xff;
-					}
+					/* original controller had two gaps 10 degrees apart, each 2.5 degrees wide */
+					/* we fake it a little to make it possible to hit the zeroed state with a digital controller */
+					return (angle >= -5.0 && angle <= 5.0) ? 0xff : 0x00;
+					/* proper angles */
+					// return ((angle >= -12.5 && angle <= -7.5) || (angle >= 7.5 && angle <= 12.5)) ? 0xff : 0x00;
 				}
-				return 0xff;
 
-			case 2:	/* Spinner */
+				/* offset 1 returns dial value; 144 units = 1 full rotation */
+				else
+				{
+					/* take the rotations * 144 plus the current angle */
+					return (rotations * 144 + (int)(angle * 144.0 / 360.0)) & 0xff;
+				}
+			}
+
+			case 2:	/* Fake Spinner */
 			{
 				static UINT32 last_rotate_count;
 				static INT32  pos;					/* track fake position of spinner */
@@ -553,17 +553,11 @@ static READ8_HANDLER( leta_r )
 					}
 				}
 
-				switch (offset)
-				{
-					case 0:
-						return center_count & 0xff;
-
-					case 1:
-						return rotate_count & 0xff;
-
-					default:
-						return 0xff;
-				}
+				if (offset == 0)
+					return center_count & 0xff;
+				else
+					/* offset == 1 */
+					return rotate_count & 0xff;
 		 	}
 
 			default:
