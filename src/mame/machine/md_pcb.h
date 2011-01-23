@@ -36,7 +36,7 @@ enum
 	SKINGKONG,                   /* Super King Kong 99 */
 	SDK99,                       /* Super Donkey Kong 99 */
 	MJLOVER,                     /* Mahjong Lover */
-	MULAN                        /* Hua Mu Lan - Mulan */
+	MULAN,                       /* Hua Mu Lan - Mulan */
 	POKEMON,                     /* Pocket Monster */
 	POKEMON2,                    /* Pocket Monster 2 */
 	KAIJU,                       /* Pokemon Stadium */
@@ -51,7 +51,7 @@ enum
 	SOULBLAD,                    /* Soul Blade */
 	SQUIRRELK,                   /* Squirrel King */
 	SBUBBOB,                     /* Super Bubble Bobble */
-	TOPFIGHTER,                  /* Top Fighter 2000 MK VIII */
+	TOPFIGHTER                   /* Top Fighter 2000 MK VIII */
 };
 
 int md_get_pcb_id(const char *pcb);
