@@ -602,7 +602,7 @@ static READ16_HANDLER( bugl_extra_r )
 
 /*************************************
  *  Linghuan Daoshi Super Magician
- *  (previously known as Elf Wor)
+ *  (internal game name Elf Wor)
  *************************************/
 static READ16_HANDLER( elfwor_400000_r )
 {
@@ -762,17 +762,19 @@ static WRITE16_HANDLER( genesis_sram_write )
 	}
 }
 
-static void install_sram_rw_handlers(running_machine *machine)
+static void install_sram_rw_handlers(running_machine *machine, bool mask_addr)
 {
 	device_image_interface *image = dynamic_cast<device_image_interface *>(machine->device("cart"));
+	// if sram_start/end come from the cart header, they might be incorrect! from softlist, they are fine.
+	UINT32 mask = mask_addr ? 0x3fffff : 0xffffff;
 
 	mame_printf_debug("Allocing %d bytes for sram\n", md_cart.sram_end - md_cart.sram_start + 1);
 	md_cart.sram = auto_alloc_array(machine, UINT16, (md_cart.sram_end - md_cart.sram_start + 1) / sizeof(UINT16));
 	image->battery_load(md_cart.sram, md_cart.sram_end - md_cart.sram_start + 1, 0xff); // Dino Dini's Soccer needs backup RAM to be 1fill
 	memcpy(megadriv_backupram, md_cart.sram, md_cart.sram_end - md_cart.sram_start + 1);
 
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), md_cart.sram_start & 0x3fffff, md_cart.sram_end & 0x3fffff, 0, 0, genesis_sram_read);
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), md_cart.sram_start & 0x3fffff, md_cart.sram_end & 0x3fffff, 0, 0, genesis_sram_write);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), md_cart.sram_start & mask, md_cart.sram_end & mask, 0, 0, genesis_sram_read);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), md_cart.sram_start & mask, md_cart.sram_end & mask, 0, 0, genesis_sram_write);
 	md_cart.sram_handlers_installed = 1;
 }
 
@@ -780,13 +782,25 @@ static WRITE16_HANDLER( genesis_sram_toggle )
 {
 
 	/* unsure if this is actually supposed to toggle or just switch on?
-    * Yet to encounter game that utilizes
-    */
+    Yet to encounter game that utilizes */
 	md_cart.sram_active = (data & 1) ? 1 : 0;
 	md_cart.sram_readonly = (data & 2) ? 1 : 0;
 
 	if (md_cart.sram_active && !md_cart.sram_handlers_installed)
-		install_sram_rw_handlers (space->machine);
+		install_sram_rw_handlers (space->machine, TRUE);
+}
+
+static READ16_HANDLER( sega_6658a_reg_r )
+{
+	return md_cart.sram_active;
+}
+
+static WRITE16_HANDLER( sega_6658a_reg_w )
+{
+	if (data == 1)
+		md_cart.sram_active = 1;
+	if (data == 0)
+		md_cart.sram_active = 0;
 }
 
 /*************************************
@@ -876,20 +890,6 @@ static WRITE16_HANDLER( codemasters_eeprom_w )
 //  i2cmem_scl_write(space->machine->device("i2cmem"), md_cart.i2c_mem);
 }
 
-static READ16_HANDLER( sega_6658a_reg_r )
-{
-	return md_cart.sram_active;
-}
-
-static WRITE16_HANDLER( sega_6658a_reg_w )
-{
-	if (data == 1)
-		md_cart.sram_active = 1;
-	if (data == 0)
-		md_cart.sram_active = 0;
-}
-
-
 /*************************************
  *
  *  Machine driver reset
@@ -901,224 +901,204 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 	UINT32 mirroraddr;
 	UINT8 *ROM = machine->region("maincpu")->base();
 
-	if (md_cart.type == SSF2)
+	switch (md_cart.type)
 	{
-		memcpy(&ROM[0x800000], &ROM[VIRGIN_COPY_GEN + 0x400000], 0x100000);
-		memcpy(&ROM[0x400000], &ROM[VIRGIN_COPY_GEN], 0x400000);
-		memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN], 0x400000);
+		case CM_JCART:
+		case CM_JCART_SEPROM:
+			/* Codemasters PCB (J-Carts) */
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x38fffe, 0x38ffff, 0, 0, jcart_ctrl_r);
+			memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x38fffe, 0x38ffff, 0, 0, jcart_ctrl_w);
+			break;
 
-		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa130f0, 0xa130ff, 0, 0, genesis_ssf2_bank_w);
+		case SSF2:
+			memcpy(&ROM[0x800000], &ROM[VIRGIN_COPY_GEN + 0x400000], 0x100000);
+			memcpy(&ROM[0x400000], &ROM[VIRGIN_COPY_GEN], 0x400000);
+			memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN], 0x400000);
+
+			memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa130f0, 0xa130ff, 0, 0, genesis_ssf2_bank_w);
+			break;
+
+		case LIONK3:
+		case SKINGKONG:
+			md_cart.l3alt_pdat = md_cart.l3alt_pcmd = 0;
+			memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN], 0x200000); /* default rom */
+			memcpy(&ROM[0x200000], &ROM[VIRGIN_COPY_GEN], 0x200000); /* default rom */
+
+			memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x600000, 0x6fffff, 0, 0, l3alt_prot_r, l3alt_prot_w);
+			memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x700000, 0x7fffff, 0, 0, l3alt_bank_w);
+			break;
+
+		case SDK99:
+			md_cart.l3alt_pdat = md_cart.l3alt_pcmd = 0;
+
+			memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN], 0x300000); /* default rom */
+			memcpy(&ROM[0x300000], &ROM[VIRGIN_COPY_GEN], 0x100000); /* default rom */
+
+			memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x600000, 0x6fffff, 0, 0, l3alt_prot_r, l3alt_prot_w);
+			memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x700000, 0x7fffff, 0, 0, l3alt_bank_w);
+			break;
+
+		case REDCLIFF:
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400001, 0, 0, redclif_prot2_r);
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400004, 0x400005, 0, 0, redclif_prot_r);
+			break;
+
+		case REDCL_EN:
+			for (int x = VIRGIN_COPY_GEN; x < VIRGIN_COPY_GEN + 0x200005; x++)
+				ROM[x] ^= 0x40;
+			memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN + 4], 0x200000); /* default rom */
+
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400001, 0, 0, redclif_prot2_r);
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400004, 0x400005, 0, 0, redclif_prot_r);
+			break;
+
+		case RADICA:
+			memcpy(&ROM[0x400000], &ROM[VIRGIN_COPY_GEN], 0x400000); // keep a copy for later banking.. making use of huge ROM_REGION allocated to genesis driver
+			memcpy(&ROM[0x800000], &ROM[VIRGIN_COPY_GEN], 0x400000); // wraparound banking (from hazemd code)
+			memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN], 0x400000);
+
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa1307f, 0, 0, radica_bank_select);
+			break;
+
+		case KOF99:
+			//memcpy(&ROM[0x000000],&ROM[VIRGIN_COPY_GEN],0x300000);
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa13001, 0, 0, kof99_A13000_r);
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa13002, 0xa13003, 0, 0, kof99_A13002_r);
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa1303e, 0xa1303f, 0, 0, kof99_00A1303E_r);
+			break;
+
+		case SOULBLAD:
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400002, 0x400003, 0, 0, soulb_400002_r);
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400004, 0x400005, 0, 0, soulb_400004_r);
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400006, 0x400007, 0, 0, soulb_400006_r);
+			break;
+
+		case MJLOVER:
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400001, 0, 0, mjlovr_prot_1_r);
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x401000, 0x401001, 0, 0, mjlovr_prot_2_r);
+			break;
+
+		case SQUIRRELK:
+			md_cart.squirrel_king_extra = 0;
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400007, 0, 0, squirrel_king_extra_r);
+			memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400007, 0, 0, squirrel_king_extra_w);
+			break;
+
+		case SMOUSE:
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400007, 0, 0, smous_prot_r);
+			break;
+
+		case SMB:
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa13001, 0, 0, smbro_prot_r);
+			break;
+
+		case SMB2:
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa13001, 0, 0, smb2_extra_r);
+			break;
+
+		case KAIJU:
+			memcpy(&ROM[0x400000], &ROM[VIRGIN_COPY_GEN], 0x200000);
+			memcpy(&ROM[0x600000], &ROM[VIRGIN_COPY_GEN], 0x200000);
+			memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN], 0x200000);
+
+			memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x700000, 0x7fffff, 0, 0, kaiju_bank_w);
+			break;
+
+		case CHINFIGHT3:
+			memcpy(&ROM[0x400000], &ROM[VIRGIN_COPY_GEN], 0x200000);
+			memcpy(&ROM[0x600000], &ROM[VIRGIN_COPY_GEN], 0x200000);
+			memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN], 0x200000);
+
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x4fffff, 0, 0, chifi3_prot_r);
+			memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x600000, 0x6fffff, 0, 0, chifi3_bank_w);
+			break;
+
+		case LIONK2:
+			md_cart.lion2_prot1_data = md_cart.lion2_prot2_data = 0;
+
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400002, 0x400003, 0, 0, lion2_prot1_r);
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400006, 0x400007, 0, 0, lion2_prot2_r);
+			memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400001, 0, 0, lion2_prot1_w);
+			memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400004, 0x400005, 0, 0, lion2_prot2_w);
+			break;
+
+		case BUGSLIFE:
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa13001, 0, 0, bugl_extra_r);
+			break;
+
+		case ELFWOR:
+			/* It return (0x55 @ 0x400000 OR 0xc9 @ 0x400004) AND (0x0f @ 0x400002 OR 0x18 @ 0x400006). It is probably best to add handlers for all 4 addresses. */
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400001, 0, 0, elfwor_400000_r);
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400002, 0x400003, 0, 0, elfwor_400002_r);
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400004, 0x400005, 0, 0, elfwor_400004_r);
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400006, 0x400007, 0, 0, elfwor_400006_r);
+			break;
+
+		case ROCKMANX3:
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa13001, 0, 0, rx3_extra_r);
+			break;
+
+		case SBUBBOB:
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400001, 0, 0, sbub_extra1_r);
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400002, 0x400003, 0, 0, sbub_extra2_r);
+			break;
+
+		case KOF98:
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x480000, 0x480001, 0, 0, kof98_aa_r);
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4800e0, 0x4800e1, 0, 0, kof98_aa_r);
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4824a0, 0x4824a1, 0, 0, kof98_aa_r);
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x488880, 0x488881, 0, 0, kof98_aa_r);
+
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4a8820, 0x4a8821, 0, 0, kof98_0a_r);
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4f8820, 0x4f8821, 0, 0, kof98_00_r);
+			break;
+
+		case REALTEC:
+			/* Realtec mapper!*/
+			md_cart.realtec_bank_addr = md_cart.realtec_bank_size = 0;
+			md_cart.realtec_old_bank_addr = -1;
+
+			memcpy(&ROM[0x400000], &ROM[VIRGIN_COPY_GEN], 0x80000);
+
+			for (mirroraddr = 0; mirroraddr < 0x400000; mirroraddr += 0x2000)
+				memcpy(ROM + mirroraddr, ROM + VIRGIN_COPY_GEN + 0x7e000, 0x002000); /* copy last 8kb across the whole rom region */
+
+			memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400001, 0, 0, realtec_400000_w);
+			memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x402000, 0x402001, 0, 0, realtec_402000_w);
+			memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x404000, 0x404001, 0, 0, realtec_404000_w);
+			break;
+
+		case MC_SUP19IN1:
+			memcpy(&ROM[0x400000], &ROM[VIRGIN_COPY_GEN], 0x400000); // allow hard reset to menu
+			memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa13039, 0, 0, s19in1_bank);
+			break;
+
+		case MC_SUP15IN1:
+			memcpy(&ROM[0x400000], &ROM[VIRGIN_COPY_GEN], 0x200000); // allow hard reset to menu
+			memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa13039, 0, 0, s19in1_bank);
+			break;
+
+		case MC_12IN1:
+			memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN], 0x400000);  /* default rom */
+			memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa1303f, 0, 0, mc_12in1_bank_w);
+			break;
+
+		case TOPFIGHTER:
+			memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN], 0x400000);  /* default rom */
+
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6f5344, 0x6f5345, 0, 0, topfig_6F5344_r );
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6bd294, 0x6bd295, 0, 0, topfig_6BD294_r );
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x645b44, 0x645b45, 0, 0, topfig_645B44_r );
+
+			/* readd */
+			//memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x689b80, 0x689b81, 0, 0, MWA16_NOP);
+			//memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6d8b02, 0x6d8b03, 0, 0, MWA16_NOP);
+
+			memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x700000, 0x7fffff, 0, 0, topfig_bank_w );
+			break;
 	}
 
-	if (md_cart.type == LIONK3 || md_cart.type == SKINGKONG)
-	{
-		md_cart.l3alt_pdat = md_cart.l3alt_pcmd = 0;
-		memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN], 0x200000); /* default rom */
-		memcpy(&ROM[0x200000], &ROM[VIRGIN_COPY_GEN], 0x200000); /* default rom */
-
-		memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x600000, 0x6fffff, 0, 0, l3alt_prot_r, l3alt_prot_w);
-		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x700000, 0x7fffff, 0, 0, l3alt_bank_w);
-	}
-
-	if (md_cart.type == SDK99)
-	{
-		md_cart.l3alt_pdat = md_cart.l3alt_pcmd = 0;
-
-		memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN], 0x300000); /* default rom */
-		memcpy(&ROM[0x300000], &ROM[VIRGIN_COPY_GEN], 0x100000); /* default rom */
-
-		memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x600000, 0x6fffff, 0, 0, l3alt_prot_r, l3alt_prot_w);
-		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x700000, 0x7fffff, 0, 0, l3alt_bank_w);
-	}
-
-	if (md_cart.type == REDCLIFF)
-	{
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400001, 0, 0, redclif_prot2_r);
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400004, 0x400005, 0, 0, redclif_prot_r);
-	}
-
-	if (md_cart.type == REDCL_EN)
-	{
-		int x;
-
-		for (x = VIRGIN_COPY_GEN; x < VIRGIN_COPY_GEN + 0x200005; x++)
-		{
-			ROM[x] ^= 0x40;
-		}
-
-		memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN + 4], 0x200000); /* default rom */
-
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400001, 0, 0, redclif_prot2_r);
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400004, 0x400005, 0, 0, redclif_prot_r);
-	}
-
-	if (md_cart.type == RADICA)
-	{
-		memcpy(&ROM[0x400000], &ROM[VIRGIN_COPY_GEN], 0x400000); // keep a copy for later banking.. making use of huge ROM_REGION allocated to genesis driver
-		memcpy(&ROM[0x800000], &ROM[VIRGIN_COPY_GEN], 0x400000); // wraparound banking (from hazemd code)
-		memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN], 0x400000);
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa1307f, 0, 0, radica_bank_select);
-	}
-
-	if (md_cart.type == KOF99)
-	{
-		//memcpy(&ROM[0x000000],&ROM[VIRGIN_COPY_GEN],0x300000);
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa13001, 0, 0, kof99_A13000_r);
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa13002, 0xa13003, 0, 0, kof99_A13002_r);
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa1303e, 0xa1303f, 0, 0, kof99_00A1303E_r);
-	}
-
-	if (md_cart.type == SOULBLAD)
-	{
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400002, 0x400003, 0, 0, soulb_400002_r);
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400004, 0x400005, 0, 0, soulb_400004_r);
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400006, 0x400007, 0, 0, soulb_400006_r);
-	}
-
-	if (md_cart.type == MJLOVER)
-	{
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400001, 0, 0, mjlovr_prot_1_r);
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x401000, 0x401001, 0, 0, mjlovr_prot_2_r);
-	}
-
-	if (md_cart.type == SQUIRRELK)
-	{
-		md_cart.squirrel_king_extra = 0;
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400007, 0, 0, squirrel_king_extra_r);
-		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400007, 0, 0, squirrel_king_extra_w);
-	}
-
-	if (md_cart.type == SMOUSE)
-	{
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400007, 0, 0, smous_prot_r);
-	}
-
-	if (md_cart.type == SMB)
-	{
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa13001, 0, 0, smbro_prot_r);
-	}
-
-	if (md_cart.type == SMB2)
-	{
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa13001, 0, 0, smb2_extra_r);
-	}
-
-	if (md_cart.type == KAIJU)
-	{
-		memcpy(&ROM[0x400000], &ROM[VIRGIN_COPY_GEN], 0x200000);
-		memcpy(&ROM[0x600000], &ROM[VIRGIN_COPY_GEN], 0x200000);
-		memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN], 0x200000);
-
-		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x700000, 0x7fffff, 0, 0, kaiju_bank_w);
-	}
-
-	if (md_cart.type == CHINFIGHT3)
-	{
-		memcpy(&ROM[0x400000], &ROM[VIRGIN_COPY_GEN], 0x200000);
-		memcpy(&ROM[0x600000], &ROM[VIRGIN_COPY_GEN], 0x200000);
-		memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN], 0x200000);
-
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x4fffff, 0, 0, chifi3_prot_r);
-		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x600000, 0x6fffff, 0, 0, chifi3_bank_w);
-	}
-
-	if (md_cart.type == LIONK2)
-	{
-		md_cart.lion2_prot1_data = md_cart.lion2_prot2_data = 0;
-
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400002, 0x400003, 0, 0, lion2_prot1_r);
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400006, 0x400007, 0, 0, lion2_prot2_r);
-		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400001, 0, 0, lion2_prot1_w);
-		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400004, 0x400005, 0, 0, lion2_prot2_w);
-	}
-
-	if (md_cart.type == BUGSLIFE)
-	{
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa13001, 0, 0, bugl_extra_r);
-	}
-
-	if (md_cart.type == ELFWOR)
-	{
-	/* It return (0x55 @ 0x400000 OR 0xc9 @ 0x400004) AND (0x0f @ 0x400002 OR 0x18 @ 0x400006). It is probably best to add handlers for all 4 addresses. */
-
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400001, 0, 0, elfwor_400000_r);
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400002, 0x400003, 0, 0, elfwor_400002_r);
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400004, 0x400005, 0, 0, elfwor_400004_r);
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400006, 0x400007, 0, 0, elfwor_400006_r);
-	}
-
-	if (md_cart.type == ROCKMANX3)
-	{
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa13001, 0, 0, rx3_extra_r);
-	}
-
-	if (md_cart.type == SBUBBOB)
-	{
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400001, 0, 0, sbub_extra1_r);
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400002, 0x400003, 0, 0, sbub_extra2_r);
-	}
-
-	if (md_cart.type == KOF98)
-	{
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x480000, 0x480001, 0, 0, kof98_aa_r);
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4800e0, 0x4800e1, 0, 0, kof98_aa_r);
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4824a0, 0x4824a1, 0, 0, kof98_aa_r);
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x488880, 0x488881, 0, 0, kof98_aa_r);
-
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4a8820, 0x4a8821, 0, 0, kof98_0a_r);
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4f8820, 0x4f8821, 0, 0, kof98_00_r);
-	}
-
-	if (md_cart.type == REALTEC)
-	{
-		/* Realtec mapper!*/
-		md_cart.realtec_bank_addr = md_cart.realtec_bank_size = 0;
-		md_cart.realtec_old_bank_addr = -1;
-
-		memcpy(&ROM[0x400000], &ROM[VIRGIN_COPY_GEN], 0x80000);
-
-		for (mirroraddr = 0; mirroraddr < 0x400000; mirroraddr += 0x2000)
-		{
-			memcpy(ROM + mirroraddr, ROM + VIRGIN_COPY_GEN + 0x7e000, 0x002000); /* copy last 8kb across the whole rom region */
-		}
-
-		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400001, 0, 0, realtec_400000_w);
-		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x402000, 0x402001, 0, 0, realtec_402000_w);
-		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x404000, 0x404001, 0, 0, realtec_404000_w);
-	}
-
-	if (md_cart.type == MC_SUP19IN1)
-	{
-		memcpy(&ROM[0x400000], &ROM[VIRGIN_COPY_GEN], 0x400000); // allow hard reset to menu
-		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa13039, 0, 0, s19in1_bank);
-	}
-
-	if (md_cart.type == MC_SUP15IN1)
-	{
-		memcpy(&ROM[0x400000], &ROM[VIRGIN_COPY_GEN], 0x200000); // allow hard reset to menu
-		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa13039, 0, 0, s19in1_bank);
-	}
-
-	if (md_cart.type == MC_12IN1)
-	{
-		memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN], 0x400000);  /* default rom */
-		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa1303f, 0, 0, mc_12in1_bank_w);
-	}
-
-	if (md_cart.type == TOPFIGHTER)
-	{
-		memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN], 0x400000);  /* default rom */
-
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6f5344, 0x6f5345, 0, 0, topfig_6F5344_r );
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6bd294, 0x6bd295, 0, 0, topfig_6BD294_r );
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x645b44, 0x645b45, 0, 0, topfig_645B44_r );
-
-		/* readd */
-		//memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x689b80, 0x689b81, 0, 0, MWA16_NOP);
-		//memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6d8b02, 0x6d8b03, 0, 0, MWA16_NOP);
-
-		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x700000, 0x7fffff, 0, 0, topfig_bank_w );
-	}
+	/* games whose protection gets patched out */
 
 	if (md_cart.type == POKEMON)
 	{
@@ -1180,44 +1160,147 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 		ROM16[0x06036/2] = 0xE000;
 	}
 
-	/* install i2c handlers */
-	if (md_cart.type == NBA_JAM)
-	{
-		md_cart.has_serial_eeprom = 1;
-		memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x200001, 0, 0, nba_jam_eeprom_r, nba_jam_eeprom_w);
-	}
-
-	if (md_cart.type == WBOY_V)
-	{
-		md_cart.has_serial_eeprom = 1;
-		memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x200001, 0, 0, wboy_v_eeprom_r, wboy_v_eeprom_w);
-	}
-
-	if (md_cart.type == NBA_JAM_TE || md_cart.type == NFL_QB_96 || md_cart.type == C_SLAM) // same handling but different sizes
-	{
-		md_cart.has_serial_eeprom = 1;
-		memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x200001, 0, 0, nba_jam_te_eeprom_r, nba_jam_te_eeprom_w);
-	}
-
-	if (md_cart.type == EA_NHLPA)
-	{
-		md_cart.has_serial_eeprom = 1;
-		memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x200001, 0, 0, ea_nhlpa_eeprom_r, ea_nhlpa_eeprom_w);
-	}
-
-	if (md_cart.type == CODE_MASTERS || md_cart.type == CM_JCART_SEPROM)
-	{
-		md_cart.has_serial_eeprom = 1;
-		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x300000, 0x300001, 0, 0, codemasters_eeprom_w);
-		memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x380000, 0x380001, 0, 0, codemasters_eeprom_r);
-
-		// TODO: J-Cart device
-	}
-
 	/* install NOP handler for TMSS */
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa14000, 0xa14003, 0, 0, genesis_TMSS_bank_w);
 }
 
+static void setup_megadriv_sram(running_machine *machine)
+{
+	UINT8 *ROM = machine->region("maincpu")->base();
+	megadriv_backupram = NULL;
+	md_cart.sram = NULL;
+	md_cart.sram_start = md_cart.sram_end = 0;
+	md_cart.has_serial_eeprom = 0;
+	md_cart.sram_detected = 0;
+	md_cart.sram_handlers_installed = 0;
+	md_cart.sram_readonly = 0;
+	md_cart.sram_active = 0;
+
+	/* install SRAM & i2c handlers for the specific type of cart */
+	switch (md_cart.type)
+	{
+		case SEGA_SRAM:
+			md_cart.sram_start = 0x200000;
+			md_cart.sram_end = md_cart.sram_start + 0x3fff;
+			md_cart.sram_detected = 1;
+			md_cart.sram_active = 1;
+			megadriv_backupram = (UINT16*) (ROM + md_cart.sram_start);
+			break;
+
+		case BEGGAR:
+			md_cart.sram_start = 0x400000;
+			md_cart.sram_end = md_cart.sram_start + 0xffff;
+			md_cart.sram_detected = 1;
+			md_cart.sram_active = 1;
+			megadriv_backupram = (UINT16*) (ROM + md_cart.sram_start);
+			break;
+
+		case SEGA_FRAM:
+			md_cart.sram_start = 0x200000;
+			md_cart.sram_end = md_cart.sram_start + 0x3ff;
+			md_cart.sram_detected = 1;
+			megadriv_backupram = (UINT16*) (ROM + md_cart.sram_start);
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa130f0, 0xa130f1, 0, 0, sega_6658a_reg_r);
+			memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa130f0, 0xa130f1, 0, 0, sega_6658a_reg_w);
+			break;
+
+		case SEGA_EEPROM:
+			md_cart.has_serial_eeprom = 1;
+			memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x200001, 0, 0, wboy_v_eeprom_r, wboy_v_eeprom_w);
+			break;
+
+		case NBA_JAM:
+			md_cart.has_serial_eeprom = 1;
+			memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x200001, 0, 0, nba_jam_eeprom_r, nba_jam_eeprom_w);
+			break;
+
+		case NBA_JAM_TE:
+		case NFL_QB_96:
+		case C_SLAM: // same handling but different sizes
+			md_cart.has_serial_eeprom = 1;
+			memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x200001, 0, 0, nba_jam_te_eeprom_r, nba_jam_te_eeprom_w);
+			break;
+
+		case EA_NHLPA:
+			md_cart.has_serial_eeprom = 1;
+			memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x200001, 0, 0, ea_nhlpa_eeprom_r, ea_nhlpa_eeprom_w);
+			break;
+
+		case CODE_MASTERS:
+		case CM_JCART_SEPROM:
+			md_cart.has_serial_eeprom = 1;
+			memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x300000, 0x300001, 0, 0, codemasters_eeprom_w);
+			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x380000, 0x380001, 0, 0, codemasters_eeprom_r);
+			break;
+	}
+
+	if (md_cart.sram_detected)
+	{
+		//printf("res: start %x, end %x, det %d, active %d\n", md_cart.sram_start, md_cart.sram_end, md_cart.sram_detected, md_cart.sram_active);
+
+		if (md_cart.sram_active)
+			install_sram_rw_handlers(machine, FALSE);
+	}
+
+	// If the cart is not of a special type, we check the header. Unfortunately, there are ROMs without correct info in the header,
+	// hence we do the mapping anyway, but we activate SRAM later only if the game will access it.
+	if (!md_cart.sram_detected && !md_cart.has_serial_eeprom)
+	{
+		/* check if cart has battery save */
+		if (ROM[0x1b1] == 'R' && ROM[0x1b0] == 'A')
+		{
+			/* SRAM info found in header */
+			md_cart.sram_start = (ROM[0x1b5] << 24 | ROM[0x1b4] << 16 | ROM[0x1b7] << 8 | ROM[0x1b6]);
+			md_cart.sram_end = (ROM[0x1b9] << 24 | ROM[0x1b8] << 16 | ROM[0x1bb] << 8 | ROM[0x1ba]);
+
+			if ((md_cart.sram_start > md_cart.sram_end) || ((md_cart.sram_end - md_cart.sram_start) >= 0x10000))	// we assume at most 64k of SRAM (HazeMD uses at most 64k). is this correct?
+				md_cart.sram_end = md_cart.sram_start + 0x0FFFF;
+
+			/* for some games using serial EEPROM, difference between SRAM
+             end to start is 0 or 1. Currently EEPROM is not emulated. */
+			if ((md_cart.sram_end - md_cart.sram_start) < 2)
+				md_cart.has_serial_eeprom = 1;
+			else
+				md_cart.sram_detected = 1;
+		}
+		else
+		{
+			/* set default SRAM positions, with size = 64k */
+			md_cart.sram_start = 0x200000;
+			md_cart.sram_end = md_cart.sram_start + 0xffff;
+		}
+
+		if (md_cart.sram_start & 1)
+			md_cart.sram_start -= 1;
+
+		if (!(md_cart.sram_end & 1))
+			md_cart.sram_end += 1;
+
+		/* calculate backup RAM location */
+		megadriv_backupram = (UINT16*) (ROM + (md_cart.sram_start & 0x3fffff));
+
+		if (md_cart.sram_detected)
+			logerror("SRAM detected from header: starting location %X - SRAM Length %X\n", md_cart.sram_start, md_cart.sram_end - md_cart.sram_start + 1);
+
+		/* Enable SRAM handlers only if the game does not use EEPROM. */
+		if (!md_cart.has_serial_eeprom)
+		{
+			/* Info from DGen: If SRAM does not overlap main ROM, set it active by
+             default since a few games can't manage to properly switch it on/off. */
+			if (md_cart.last_loaded_image_length <= md_cart.sram_start)
+				md_cart.sram_active = 1;
+
+			memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa130f0, 0xa130f1, 0, 0, genesis_sram_toggle);
+			//printf("res: start %x, end %x, det %d, active %d\n", md_cart.sram_start, md_cart.sram_end, md_cart.sram_detected, md_cart.sram_active);
+
+			/* Sonic 1 included in Sonic Classics doesn't have SRAM and
+             does lots of ROM access at this range, then only install read/
+             write handlers if SRAM is active to not slow down emulation. */
+			if (md_cart.sram_active)
+				install_sram_rw_handlers(machine, TRUE);
+		}
+	}
+}
 
 /*************************************
  *
@@ -1479,14 +1562,14 @@ static int megadrive_load_nonlist(device_image_interface &image)
 					md_cart.type = EA_NHLPA;
 
 			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM MK-1215", 10)) // Evander Holyfield
-					md_cart.type = WBOY_V;
+					md_cart.type = SEGA_EEPROM;
 
 			    break;
 
 			case 0xc0000:
 
 			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM G-4060 ", 8)) // Wonder Boy V
-					md_cart.type = WBOY_V;
+					md_cart.type = SEGA_EEPROM;
 
 			    break;
 
@@ -1510,7 +1593,7 @@ static int megadrive_load_nonlist(device_image_interface &image)
 					md_cart.type = EA_NHLPA;
 
 			    if (!allendianmemcmp((char *)&ROM[0x0180], "MK 00001211-00", 14)) // Sports Talk Baseball
-					md_cart.type = WBOY_V;
+					md_cart.type = SEGA_EEPROM;
 
 			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM T-120096-", 12)) // Micro Machines 2
 					md_cart.type = CODE_MASTERS;
@@ -1560,11 +1643,11 @@ static int megadrive_load_nonlist(device_image_interface &image)
 					md_cart.type = NBA_JAM;
 
 			    if (!allendianmemcmp((char *)&ROM[0x0180], "GM MK-1228", 10)) // Greatest Heavyweight of the Ring
-					md_cart.type = WBOY_V;
+					md_cart.type = SEGA_EEPROM;
 
 			    if ((!allendianmemcmp((char *)&ROM[0x0180], "GM T-12046", 10)) || // Mega Man
 					(!allendianmemcmp((char *)&ROM[0x0180], "GM T-12053", 10) && !allendianmemcmp(&ROM[0x18e], &rockman_sig[0], sizeof(rockman_sig)))) // / Rock Man (EEPROM version)
-					md_cart.type = WBOY_V;
+					md_cart.type = SEGA_EEPROM;
 
 			    break;
 
@@ -1620,75 +1703,6 @@ static int megadrive_load_nonlist(device_image_interface &image)
 		}
 	}
 
-	logerror("cart type: %d\n", md_cart.type);
-
-	// STEP 3: install memory handlers for this type of cart
-	setup_megadriv_custom_mappers(image.device().machine);
-
-	// STEP 4: take care of SRAM.
-	// We check the header, but there are ROMs without correct info in the header
-	// The solution adopted is do the mapping anyway, then active SRAM later if the game will access it.
-	md_cart.sram = NULL;
-	md_cart.sram_start = md_cart.sram_end = 0;
-	md_cart.has_serial_eeprom = 0;
-	md_cart.sram_detected = 0;
-	md_cart.sram_handlers_installed = 0;
-	md_cart.sram_readonly = 0;
-	md_cart.sram_active = 0;
-
-	/* check if cart has battery save */
-	if (ROM[0x1b1] == 'R' && ROM[0x1b0] == 'A')
-	{
-		/* SRAM info found in header */
-		md_cart.sram_start = (ROM[0x1b5] << 24 | ROM[0x1b4] << 16 | ROM[0x1b7] << 8 | ROM[0x1b6]);
-		md_cart.sram_end = (ROM[0x1b9] << 24 | ROM[0x1b8] << 16 | ROM[0x1bb] << 8 | ROM[0x1ba]);
-
-		if ((md_cart.sram_start > md_cart.sram_end) || ((md_cart.sram_end - md_cart.sram_start) >= 0x10000))	// we assume at most 64k of SRAM (HazeMD uses at most 64k). is this correct?
-			md_cart.sram_end = md_cart.sram_start + 0x0FFFF;
-
-		/* for some games using serial EEPROM, difference between SRAM
-         end to start is 0 or 1. Currently EEPROM is not emulated. */
-		if ((md_cart.sram_end - md_cart.sram_start) < 2)
-			md_cart.has_serial_eeprom = 1;
-		else
-			md_cart.sram_detected = 1;
-	}
-	else
-	{
-		/* set default SRAM positions, with size = 64k */
-		md_cart.sram_start = 0x200000;
-		md_cart.sram_end = md_cart.sram_start + 0xffff;
-	}
-
-	if (md_cart.sram_start & 1)
-		md_cart.sram_start -= 1;
-
-	if (!(md_cart.sram_end & 1))
-		md_cart.sram_end += 1;
-
-	/* calculate backup RAM location */
-	megadriv_backupram = (UINT16*) (ROM + (md_cart.sram_start & 0x3fffff));
-
-	if (md_cart.sram_detected)
-		logerror("SRAM detected from header: starting location %X - SRAM Length %X\n", md_cart.sram_start, md_cart.sram_end - md_cart.sram_start + 1);
-
-	/* Enable SRAM handlers only if the game does not use EEPROM. */
-	if (!md_cart.has_serial_eeprom)
-	{
-		/* Info from DGen: If SRAM does not overlap main ROM, set it active by
-         default since a few games can't manage to properly switch it on/off. */
-		if (md_cart.last_loaded_image_length <= md_cart.sram_start)
-			md_cart.sram_active = 1;
-
-		memory_install_write16_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa130f0, 0xa130f1, 0, 0, genesis_sram_toggle);
-
-		/* Sonic 1 included in Sonic Classics doesn't have SRAM and
-         does lots of ROM access at this range, then only install read/
-         write handlers if SRAM is active to not slow down emulation. */
-		if (md_cart.sram_active)
-			install_sram_rw_handlers(image.device().machine);
-	}
-
 	return IMAGE_INIT_PASS;
 }
 
@@ -1705,14 +1719,6 @@ static int megadrive_load_list(device_image_interface &image)
 	memcpy(ROM, image.get_software_region("rom"), length);
 
 	md_cart.last_loaded_image_length = length;
-	megadriv_backupram = NULL;
-	md_cart.sram = NULL;
-	md_cart.sram_start = md_cart.sram_end = 0;
-	md_cart.has_serial_eeprom = 0;
-	md_cart.sram_detected = 0;
-	md_cart.sram_handlers_installed = 0;
-	md_cart.sram_readonly = 0;
-	md_cart.sram_active = 0;
 
 	if ((pcb_name = image.get_feature("pcb_type")) == NULL)
 		md_cart.type = SEGA_STD;
@@ -1720,42 +1726,6 @@ static int megadrive_load_list(device_image_interface &image)
 		md_cart.type = md_get_pcb_id(pcb_name);
 
 	memcpy(&ROM[VIRGIN_COPY_GEN], &ROM[0x000000], MAX_MD_CART_SIZE);  /* store a copy of data */
-	setup_megadriv_custom_mappers(image.device().machine);
-
-	switch (md_cart.type)
-	{
-			/* Sega PCB */
-		case SEGA_EEPROM: // still used by Game Toshokan, to be fixed
-			fatalerror("Need Serial EEPROM emulation");
-			break;
-		case SEGA_SRAM:
-			md_cart.sram_start = 0x200000;
-			md_cart.sram_end = md_cart.sram_start + 0x3fff;
-			md_cart.sram_detected = 1;
-			megadriv_backupram = (UINT16*) (ROM + (md_cart.sram_start & 0x3fffff));
-			md_cart.sram_active = 1;
-			break;
-		case SEGA_FRAM:
-			md_cart.sram_start = 0x200000;
-			md_cart.sram_end = md_cart.sram_start + 0x3ff;
-			md_cart.sram_detected = 1;
-			megadriv_backupram = (UINT16*) (ROM + (md_cart.sram_start & 0x3fffff));
-			memory_install_read16_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa130f0, 0xa130f1, 0, 0, sega_6658a_reg_r);
-			memory_install_write16_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa130f0, 0xa130f1, 0, 0, sega_6658a_reg_w);
-			break;
-		/* Codemasters PCB (J-Carts) */
-		case CM_JCART:
-			memory_install_read16_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x38fffe, 0x38ffff, 0, 0, jcart_ctrl_r);
-			memory_install_write16_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x38fffe, 0x38ffff, 0, 0, jcart_ctrl_w);
-			break;
-		case CM_JCART_SEPROM:
-			memory_install_read16_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x38fffe, 0x38ffff, 0, 0, jcart_ctrl_r);
-			memory_install_write16_handler(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x38fffe, 0x38ffff, 0, 0, jcart_ctrl_w);
-			break;
-	}
-
-	if (md_cart.sram_detected)
-		install_sram_rw_handlers(image.device().machine);
 
 	return IMAGE_INIT_PASS;
 }
@@ -1763,11 +1733,30 @@ static int megadrive_load_list(device_image_interface &image)
 static DEVICE_IMAGE_LOAD( genesis_cart )
 {
 	md_cart.type = SEGA_STD;
+	int res;
 
+	// STEP 1: load the file image and keep a copy for later banking
+	// STEP 2: identify the cart type
+	// The two steps are carried out differently if we are loading from a list or not
 	if (image.software_entry() == NULL)
-		return megadrive_load_nonlist(image);
+		res = megadrive_load_nonlist(image);
 	else
-		return megadrive_load_list(image);
+		res = megadrive_load_list(image);
+
+	logerror("cart type: %d\n", md_cart.type);
+
+	if (res == IMAGE_INIT_PASS)
+	{
+		// STEP 3: install memory handlers for this type of cart
+		setup_megadriv_custom_mappers(image.device().machine);
+
+		// STEP 4: take care of SRAM.
+		setup_megadriv_sram(image.device().machine);
+
+		return IMAGE_INIT_PASS;
+	}
+	else
+		return IMAGE_INIT_FAIL;
 }
 
 /******* SRAM saving *******/

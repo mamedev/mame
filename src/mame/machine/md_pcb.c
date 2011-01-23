@@ -26,12 +26,14 @@ static const md_pcb pcb_list[] =
 	{"CM-SEPROM", CODE_MASTERS},
 
 	{"SSF2", SSF2},
+	{"GAMEKANDUME", GAME_KANDUME},
+	{"BEGGAR", BEGGAR},
+
 	{"NBAJAM", NBA_JAM},
 	{"NBAJAMTE", NBA_JAM_TE},
 	{"NFLQB96", NFL_QB_96},
 	{"CSLAM", C_SLAM},
 	{"NHLPA", EA_NHLPA},
-	{"WBOY5", WBOY_V},
 
 	{"LIONK3", LIONK3},
 	{"SDK99", SDK99},
