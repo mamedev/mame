@@ -4335,7 +4335,25 @@ ROM_END
 	ROM_REGION( 0x80, "eepromdumped", 0 ) \
 	ROM_LOAD16_WORD_SWAP( "93c45.u21", 0x00, 0x80, CRC(40d75df0) SHA1(a22f1cc74ce9bc9bfe53f48f6a43ab60e921052b) )\
 
-
+// eeprom dumped can't be accepted by the code, but the values can't be a simple bad dump (not fixed bits and the values are present three times)
+// robiza's note: probably between sound cpu and EEPROM there's something that modify the values (PAL?)
+// we can get the eeprom with a value in [00004] address (1XXX dcba) -> then we need a different value in [00004] address (0XXX XXXX)
+// dcba = 0 -> korea
+// dcba = 1 -> korea (taito license)
+// dcba = 2 -> hong kong
+// dcba = 3 -> hong kong (taito license)
+// dcba = 4 -> taiwan
+// dcba = 5 -> taiwan (taito license)
+// dcba = 6 -> south east asia
+// dcba = 7 -> south east asia (taito license)
+// dcba = 8 -> europe
+// dcba = 9 -> europe (taito license)
+// dcba = a -> u.s.a.
+// dcba = b -> u.s.a. (taito license)
+// dcba = c -> NO COUNTRY
+// dcba = d -> NO COUNTRY (taito license)
+// dcba = e -> japan
+// dcba = f -> japan (taito license)
 
 ROM_START( fixeightkt )
 	ROMS_FIXEIGHT
@@ -4389,37 +4407,37 @@ ROM_END
 ROM_START( fixeightt )
 	ROMS_FIXEIGHT
 	ROM_REGION( 0x80, "eeprom", 0 )
-	ROM_LOAD( "fixeightt.nv", 0x00, 0x80, CRC(afd41257) SHA1(d10eddd54456d6047cc6e0e4a4b6a45aa68cf7b1) )
+	ROM_LOAD( "fixeightt.nv", 0x00, 0x80, CRC(c0da4a05) SHA1(3686161244e3e8be0e2fdb5fc5c24e39a7aeba85) )
 ROM_END
 
 ROM_START( fixeight )
 	ROMS_FIXEIGHT
 	ROM_REGION( 0x80, "eeprom", 0 )
-	ROM_LOAD( "fixeight.nv", 0x00, 0x80, CRC(6de77d82) SHA1(9665c0fbea397deb22919f3b62f172da5698d55e) )
+	ROM_LOAD( "fixeight.nv", 0x00, 0x80, CRC(02e925d0) SHA1(5839d10aceff84916ea99e9c6afcdc90eef7468b) )
 ROM_END
 
 ROM_START( fixeightut )
 	ROMS_FIXEIGHT
 	ROM_REGION( 0x80, "eeprom", 0 )
-	ROM_LOAD( "fixeightut.nv", 0x00, 0x80, CRC(f0c3cbbc) SHA1(027efac0974fddbabb31fedf6c95a92c4e132a28) )
+	ROM_LOAD( "fixeightut.nv", 0x00, 0x80, CRC(9fcd93ee) SHA1(4f2750f09d9b8ff358a2fd6c7a4a8ba6de67017a) )
 ROM_END
 
 ROM_START( fixeightu )
 	ROMS_FIXEIGHT
 	ROM_REGION( 0x80, "eeprom", 0 )
-	ROM_LOAD( "fixeightu.nv", 0x00, 0x80, CRC(32f0a469) SHA1(ad033cc3445aff6e85ee26329ec01acf80596085) )
+	ROM_LOAD( "fixeightu.nv", 0x00, 0x80, CRC(5dfefc3b) SHA1(5203525c58e2ae10575af2e277a5696bd64c5b60) )
 ROM_END
 
 ROM_START( fixeightj )
 	ROMS_FIXEIGHT
 	ROM_REGION( 0x80, "eeprom", 0 )
-	ROM_LOAD( "fixeightj.nv", 0x00, 0x80, CRC(4eec786a) SHA1(1eed6879d997796ca295e553fd7e35dd1ea71559) )
+	ROM_LOAD( "fixeightj.nv", 0x00, 0x80, CRC(21e22038) SHA1(29fb10061e62799bb5e4171e144daac49f0cdf06) )
 ROM_END
 
 ROM_START( fixeightjt )
 	ROMS_FIXEIGHT
 	ROM_REGION( 0x80, "eeprom", 0 )
-	ROM_LOAD( "fixeightjt.nv", 0x00, 0x80, CRC(8cdf17bf) SHA1(bdf923df411b49fe2d2f0ce17d698862c9c67fbe) )
+	ROM_LOAD( "fixeightjt.nv", 0x00, 0x80, CRC(e3d14fed) SHA1(ee4982ef195240c5eaa5005ca1d591901fb01b47) )
 ROM_END
 
 
