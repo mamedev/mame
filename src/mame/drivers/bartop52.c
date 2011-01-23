@@ -5,10 +5,10 @@
     Based on Atari 400/800 MESS Driver by Juergen Buchmueller
 
     Hardware was based on Atari 5200 game console with additional coin and timer hardware.
-    System was intented to run in barroms and taverns. Software was based on Atari 5200
+    System was intented to run in barrooms and taverns. Software was based on Atari 5200
     Realsports cartridges.
 
-    Barrom Baseball is modified version of Realsports Baseball.
+    Barroom Baseball is modified version of Realsports Baseball.
 
     Coins and timer were handled by Bartop system bios. Since bios dump is not available,
     regular Atari 5200 bios is used and game is marked as not working. Game cart is also
@@ -142,4 +142,4 @@ ROM_START(barbball)
 	ROM_LOAD( "5200.rom",     0xf800, 0x0800, BAD_DUMP CRC(4248d3e3) SHA1(6ad7a1e8c9fad486fbec9498cb48bf5bc3adc530) )
 ROM_END
 
-GAME( 1983, barbball, 0, a5200, bartop52, 0, ROT0, "Atari", "Barrom Baseball (prototype)", GAME_NOT_WORKING )
+GAME( 1983, barbball, 0, a5200, bartop52, 0, ROT0, "Atari", "Barroom Baseball (prototype)", GAME_NOT_WORKING )
