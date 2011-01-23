@@ -980,11 +980,11 @@ static INPUT_PORTS_START( 720 )
 	PORT_MODIFY("ADC1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	/* 720 uses a special controller to contol the player rotation.
+	/* 720 uses a special controller to control the player rotation.
 	 * It uses 1 disc with 72 teeth for the rotation and another disc
 	 * with 2 teeth for the alignment of the joystick to the top position.
 	 * The following graph shows how the Center and Rotate disc align.
-	 * The numbers show how the optical count vatries from center.
+	 * The numbers show how the optical count varies from center.
 	 *
 	 *   _____2  1________1  2_____
 	 *        |__|        |__|          Center disc - 2 teeth.  Shown lined up with Rotate disc
