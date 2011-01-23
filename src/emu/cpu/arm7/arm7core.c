@@ -343,7 +343,8 @@ static UINT32 decodeShift(arm_state *cpustate, UINT32 insn, UINT32 *pCarry)
     UINT32 t  = (insn & INSN_OP2_SHIFT_TYPE) >> INSN_OP2_SHIFT_TYPE_SHIFT;
 
     if ((insn & INSN_OP2_RM) == 0xf) {
-        rm += 8;
+        // "If a register is used to specify the shift amount the PC will be 12 bytes ahead." (instead of 8)
+        rm += t & 1 ? 12 : 8;
     }
 
     /* All shift types ending in 1 are Rk, not #k */

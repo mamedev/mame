@@ -580,6 +580,13 @@
                                 case 0x2: /* MOV */
                                     switch ((insn & THUMB_HIREG_H) >> THUMB_HIREG_H_SHIFT)
                                     {
+                                        case 0x0:       // MOV Rd, Rs (undefined)
+                                            // "The action of H1 = 0, H2 = 0 for Op = 00 (ADD), Op = 01 (CMP) and Op = 10 (MOV) is undefined, and should not be used."
+                                            rs = (insn & THUMB_HIREG_RS) >> THUMB_HIREG_RS_SHIFT;
+                                            rd = insn & THUMB_HIREG_RD;
+                                            SET_REGISTER(cpustate, rd, GET_REGISTER(cpustate, rs));
+                                            R15 += 2;
+                                            break;
                                         case 0x1:       // MOV Rd, Hs
                                             rs = (insn & THUMB_HIREG_RS) >> THUMB_HIREG_RS_SHIFT;
                                             rd = insn & THUMB_HIREG_RD;

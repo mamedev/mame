@@ -939,6 +939,11 @@ static UINT32 thumb_disasm( char *pBuf, UINT32 pc, UINT16 opcode )
 							case 0x2: /* MOV */
 								switch( ( opcode & THUMB_HIREG_H ) >> THUMB_HIREG_H_SHIFT )
 								{
+									case 0x0:
+										rs = ( opcode & THUMB_HIREG_RS ) >> THUMB_HIREG_RS_SHIFT;
+										rd = opcode & THUMB_HIREG_RD;
+										pBuf += sprintf( pBuf, "MOV R%d, R%d", rd, rs );
+										break;
 									case 0x1:
 										rs = ( opcode & THUMB_HIREG_RS ) >> THUMB_HIREG_RS_SHIFT;
 										rd = opcode & THUMB_HIREG_RD;
