@@ -1546,7 +1546,7 @@ static void menu_main_populate(running_machine *machine, ui_menu *menu, void *st
 
 		/* add file manager menu */
 		ui_menu_item_append(menu, "File Manager", NULL, 0, (void*)ui_image_menu_file_manager);
-		
+
 		/* add tape control menu */
 		if (machine->m_devicelist.first(CASSETTE))
 			ui_menu_item_append(menu, "Tape Control", NULL, 0, (void*)ui_mess_menu_tape_control);
@@ -2327,7 +2327,7 @@ static void menu_analog_populate(running_machine *machine, ui_menu *menu)
 	/* loop over input ports and add the items */
 	for (port = machine->m_portlist.first(); port != NULL; port = port->next())
 		for (field = port->fieldlist; field != NULL; field = field->next)
-			if (input_type_is_analog(field->type))
+			if (input_type_is_analog(field->type) && input_condition_true(machine, &field->condition))
 			{
 				input_field_user_settings settings;
 				int use_autocenter = FALSE;

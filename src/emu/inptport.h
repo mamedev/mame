@@ -759,7 +759,7 @@ public:
 };
 
 
-/* heaeder at the front of INP files */
+/* header at the front of INP files */
 typedef struct _inp_header inp_header;
 struct _inp_header
 {

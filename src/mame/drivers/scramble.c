@@ -471,7 +471,7 @@ static INPUT_PORTS_START( triplep )
 INPUT_PORTS_END
 
 
-/* ckongs coinage DIPs are spread accross two input ports */
+/* ckongs coinage DIPs are spread across two input ports */
 static CUSTOM_INPUT( ckongs_coinage_r )
 {
 	int bit_mask = (FPTR)param;
