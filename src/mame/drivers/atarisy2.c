@@ -436,56 +436,49 @@ static READ8_HANDLER( leta_r )
 		switch (input_port_read(space->machine, "SELECT"))
 		{
 			case 0:	/* Real */
-				return input_port_read(space->machine, letanames[offset]);
+				break;
 
 			case 1:	/* Joystick */
 				/* special thanks to MAME Analog+ for the mapping code */
-				switch (offset)
+				if (offset <= 1)
 				{
-					case 0:
-					case 1:
+					static double last_angle;
+					static int rotations;
+
+					int analogx = input_port_read(space->machine, "FAKE_JOY_X") - 128;
+					int analogy = input_port_read(space->machine, "FAKE_JOY_Y") - 128;
+					double angle;
+
+					/* if the joystick is centered, leave the rest of this alone */
+					angle = last_angle;
+					if (analogx < -32 || analogx > 32 || analogy < -32 || analogy > 32)
+						angle = atan2((double)analogx, (double)analogy) * 360 / (2 * M_PI);
+
+					/* detect when we pass the 0 point in either direction */
+					if (last_angle < -90 && angle > 90)
+						rotations--;
+					else if (last_angle > 90 && angle < -90)
+						rotations++;
+					last_angle = angle;
+
+					/* offset 0 returns 0xff when the controller blocks one of two gaps */
+					if ((offset) == 0)
 					{
-						static double last_angle;
-						static int rotations;
-
-						int analogx = input_port_read(space->machine, "FAKE_JOY_X") - 128;
-						int analogy = input_port_read(space->machine, "FAKE_JOY_Y") - 128;
-						double angle;
-
-						/* if the joystick is centered, leave the rest of this alone */
-						angle = last_angle;
-						if (analogx < -32 || analogx > 32 || analogy < -32 || analogy > 32)
-							angle = atan2((double)analogx, (double)analogy) * 360 / (2 * M_PI);
-
-						/* detect when we pass the 0 point in either direction */
-						if (last_angle < -90 && angle > 90)
-							rotations--;
-						else if (last_angle > 90 && angle < -90)
-							rotations++;
-						last_angle = angle;
-
-						/* offset 0 returns 0xff when the controller blocks one of two gaps */
-						if ((offset) == 0)
-						{
-							/* original controller had two gaps 10 degrees apart, each 2.5 degrees wide */
-							/* we fake it a little to make it possible to hit the zeroed state with a digital controller */
-							return (angle >= -5.0 && angle <= 5.0) ? 0xff : 0x00;
-							/* proper angles */
-							// return ((angle >= -12.5 && angle <= -7.5) || (angle >= 7.5 && angle <= 12.5)) ? 0xff : 0x00;
-						}
-
-						/* offset 1 returns dial value; 144 units = 1 full rotation */
-						else
-						{
-							/* take the rotations * 144 plus the current angle */
-							return (rotations * 144 + (int)(angle * 144.0 / 360.0)) & 0xff;
-						}
+						/* original controller had two gaps 10 degrees apart, each 2.5 degrees wide */
+						/* we fake it a little to make it possible to hit the zeroed state with a digital controller */
+						return (angle >= -5.0 && angle <= 5.0) ? 0xff : 0x00;
+						/* proper angles */
+						// return ((angle >= -12.5 && angle <= -7.5) || (angle >= 7.5 && angle <= 12.5)) ? 0xff : 0x00;
 					}
 
-					case 2:
-					case 3:
-						return 0xff;
+					/* offset 1 returns dial value; 144 units = 1 full rotation */
+					else
+					{
+						/* take the rotations * 144 plus the current angle */
+						return (rotations * 144 + (int)(angle * 144.0 / 360.0)) & 0xff;
+					}
 				}
+				return 0xff;
 
 			case 2:	/* Spinner */
 			{
@@ -520,7 +513,7 @@ static READ8_HANDLER( leta_r )
 
 					last_rotate_count = rotate_count;
 
-					/* you may not like this, but it is the only way to accurately fake the center count */
+					/* you may not like this, but it is the easiest way to accurately fake the center count */
 					/* diff is never a big number anyways */
 					if (diff < 0)
 					{
