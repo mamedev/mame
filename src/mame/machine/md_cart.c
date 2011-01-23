@@ -56,15 +56,15 @@
 enum
 {
     SEGA_STD = 0,
-	
+
     SEGA_SRAM, SEGA_FRAM,
-	
+
 	CM_JCART, CM_JCART_SEPROM,   /* Codemasters PCB (J-Carts and SEPROM) */
-	
+
 	SSF2,                        /* Super Street Fighter 2 */
 	GAME_KANDUME,                /* Game no Kandume Otokuyou */
 	BEGGAR,                      /* Xin Qigai Wangzi uses different sram start address and has no valid header */
-	
+
 	// EEPROM
 	SEGA_EEPROM,                 /* Wonder Boy V / Evander Holyfield's Boxing / Greatest Heavyweights of the Ring / Sports Talk Baseball / Megaman */
 	NBA_JAM,                     /* NBA Jam */
@@ -73,7 +73,7 @@ enum
 	C_SLAM,                      /* College Slam / Frank Thomas Big Hurt Baseball */
 	EA_NHLPA,                    /* NHLPA Hockey 93 / Rings of Power */
 	CODE_MASTERS,                /* Micro Machines 2 / Military / 96 / Brian Lara Cricket 96 */
-	
+
 	MC_SUP19IN1,                 /* Super 19 in 1 */
 	MC_SUP15IN1,                 /* Super 15 in 1 */
 	MC_12IN1,                    /* 12 in 1 and a few more multicarts */
@@ -118,21 +118,21 @@ static const md_pcb pcb_list[] =
 	{"SEGA-EEPROM", SEGA_EEPROM},
 	{"SEGA-SRAM", SEGA_SRAM},
 	{"SEGA-FRAM", SEGA_FRAM},
-	
+
 	{"CM-JCART", CM_JCART},
 	{"CM-JCART-SEPROM", CM_JCART_SEPROM},
 	{"CM-SEPROM", CODE_MASTERS},
-	
+
 	{"SSF2", SSF2},
 	{"GAMEKANDUME", GAME_KANDUME},
 	{"BEGGAR", BEGGAR},
-	
+
 	{"NBAJAM", NBA_JAM},
 	{"NBAJAMTE", NBA_JAM_TE},
 	{"NFLQB96", NFL_QB_96},
 	{"CSLAM", C_SLAM},
 	{"NHLPA", EA_NHLPA},
-	
+
 	{"LIONK3", LIONK3},
 	{"SDK99", SDK99},
 	{"SKINGKONG", SKINGKONG},
@@ -166,13 +166,13 @@ static const md_pcb pcb_list[] =
 static int md_get_pcb_id(const char *pcb)
 {
 	int	i;
-	
+
 	for (i = 0; i < ARRAY_LENGTH(pcb_list); i++)
 	{
 		if (!mame_stricmp(pcb_list[i].pcb_name, pcb))
 			return pcb_list[i].pcb_id;
 	}
-	
+
 	return SEGA_STD;
 }
 
@@ -910,7 +910,7 @@ static WRITE16_HANDLER( genesis_sram_toggle )
 	md_cart.sram_readonly = (data & 2) ? 1 : 0;
 
 	if (md_cart.sram_active && !md_cart.sram_handlers_installed)
-		install_sram_rw_handlers (space->machine, TRUE);
+		install_sram_rw_handlers(space->machine, TRUE);
 }
 
 static READ16_HANDLER( sega_6658a_reg_r )
@@ -1306,8 +1306,13 @@ static void setup_megadriv_sram(running_machine *machine)
 			md_cart.sram_start = 0x200000;
 			md_cart.sram_end = md_cart.sram_start + 0x3fff;
 			md_cart.sram_detected = 1;
-			md_cart.sram_active = 1;
 			megadriv_backupram = (UINT16*) (ROM + md_cart.sram_start);
+			memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa130f0, 0xa130f1, 0, 0, genesis_sram_toggle);
+			if (md_cart.last_loaded_image_length <= md_cart.sram_start)
+			{
+				md_cart.sram_active = 1;
+				install_sram_rw_handlers(machine, FALSE);
+			}
 			break;
 
 		case BEGGAR:
@@ -1316,6 +1321,7 @@ static void setup_megadriv_sram(running_machine *machine)
 			md_cart.sram_detected = 1;
 			md_cart.sram_active = 1;
 			megadriv_backupram = (UINT16*) (ROM + md_cart.sram_start);
+			install_sram_rw_handlers(machine, FALSE);
 			break;
 
 		case SEGA_FRAM:
@@ -1325,6 +1331,7 @@ static void setup_megadriv_sram(running_machine *machine)
 			megadriv_backupram = (UINT16*) (ROM + md_cart.sram_start);
 			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa130f0, 0xa130f1, 0, 0, sega_6658a_reg_r);
 			memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa130f0, 0xa130f1, 0, 0, sega_6658a_reg_w);
+			install_sram_rw_handlers(machine, FALSE);
 			break;
 
 		case SEGA_EEPROM:
@@ -1355,14 +1362,6 @@ static void setup_megadriv_sram(running_machine *machine)
 			memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x300000, 0x300001, 0, 0, codemasters_eeprom_w);
 			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x380000, 0x380001, 0, 0, codemasters_eeprom_r);
 			break;
-	}
-
-	if (md_cart.sram_detected)
-	{
-		//printf("res: start %x, end %x, det %d, active %d\n", md_cart.sram_start, md_cart.sram_end, md_cart.sram_detected, md_cart.sram_active);
-
-		if (md_cart.sram_active)
-			install_sram_rw_handlers(machine, FALSE);
 	}
 
 	// If the cart is not of a special type, we check the header. Unfortunately, there are ROMs without correct info in the header,
