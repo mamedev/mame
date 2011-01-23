@@ -1130,7 +1130,7 @@ static int info_listmedia(core_options *options, const char *gamename)
 	const char *shortname;
 	char paren_shortname[16];
 
-	printf(" SYSTEM      DEVICE NAME (brief)   IMAGE FILE EXTENSIONS SUPPORTED    \n");
+	printf(" SYSTEM      MEDIA NAME (brief)   IMAGE FILE EXTENSIONS SUPPORTED     \n");
 	printf("----------  --------------------  ------------------------------------\n");
 
 	/* iterate over drivers */
