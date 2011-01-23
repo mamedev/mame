@@ -471,6 +471,7 @@ public:
 	snes_sound_device *spc700;
 	cpu_device *superfx;
 	upd7725_device *upd7725;
+	upd96050_device *upd96050;
 };
 
 /* Special chips, checked at init and used in memory handlers */

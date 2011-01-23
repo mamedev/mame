@@ -2,7 +2,7 @@
 
     upd7725.h
 
-    Core implementation for the portable NEC uPD7725 emulator
+    Core implementation for the portable NEC uPD7725/uPD96050 emulator
 
 ****************************************************************************/
 
@@ -15,14 +15,19 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> upd7725_device_config
+class necdsp_device;
+class upd7725_device;
+class upd96050_device;
 
-class upd7725_device_config :	public cpu_device_config
+// ======================> necdsp_device_config
+
+class necdsp_device_config :	public cpu_device_config
 {
-	friend class upd7725_device;
+	friend class necdsp_device;
 
+protected:
 	// construction/destruction
-	upd7725_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+	necdsp_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock, UINT32 abits, UINT32 dbits, const char *name);
 
 public:
 	// allocators
@@ -46,14 +51,41 @@ protected:
 	const address_space_config m_program_config, m_data_config;
 };
 
-// ======================> upd7725_device
-
-class upd7725_device : public cpu_device
+class upd7725_device_config :	public necdsp_device_config
 {
-	friend class upd7725_device_config;
+	friend class upd7725_device;
 
 	// construction/destruction
-	upd7725_device(running_machine &_machine, const upd7725_device_config &config);
+	upd7725_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+	// allocators
+	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+	virtual device_t *alloc_device(running_machine &machine) const;
+};
+
+class upd96050_device_config :	public necdsp_device_config
+{
+	friend class upd96050_device;
+
+	// construction/destruction
+	upd96050_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+	// allocators
+	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+	virtual device_t *alloc_device(running_machine &machine) const;
+};
+
+// ======================> necdsp_device
+
+class necdsp_device : public cpu_device
+{
+	friend class necdsp_device_config;
+
+protected:
+	// construction/destruction
+	necdsp_device(running_machine &_machine, const necdsp_device_config &config);
 
 public:
 	UINT8 snesdsp_read(bool mode);
@@ -74,6 +106,8 @@ protected:
 
 	// device_disasm_interface overrides
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+	UINT16 dataRAM[2048];
 
 private:
 	struct Flag
@@ -114,10 +148,11 @@ private:
 
 	struct Regs 
 	{
-		UINT16 pc;        //program counter
-		UINT16 stack[4];  //LIFO
-		UINT16 rp;        //ROM pointer
-		UINT8  dp;        //data pointer
+		UINT16 pc;			//program counter
+		UINT16 stack[16];	//LIFO
+		UINT16 rp;			//ROM pointer
+		UINT16 dp;			//data pointer
+		UINT8  sp;			//stack pointer
 		INT16  k;
 		INT16  l;
 		INT16  m;
@@ -130,8 +165,8 @@ private:
 		UINT16 trb;       //temporary register
 		Status sr;        //status register
 		UINT16 dr;        //data register
-		bool siack;
-		bool soack;
+		UINT16 si;
+		UINT16 so;
 		UINT16 idb;
 	} regs;
 
@@ -143,16 +178,35 @@ private:
   void stack_push();
   void stack_pull();
 
-  UINT16 dataRAM[256];
-
   int m_icount;
 
   address_space *m_program, *m_data;
   direct_read_data *m_direct;
 };
 
+class upd7725_device : public necdsp_device
+{
+	friend class upd7725_device_config;
+
+	// construction/destruction
+	upd7725_device(running_machine &_machine, const upd7725_device_config &config);
+};
+
+class upd96050_device : public necdsp_device
+{
+	friend class upd96050_device_config;
+
+	// construction/destruction
+	upd96050_device(running_machine &_machine, const upd96050_device_config &config);
+
+public:
+	UINT16 dataram_r(UINT16 addr) { return dataRAM[addr]; }
+	void dataram_w(UINT16 addr, UINT16 data) { dataRAM[addr] = data; }
+};
+
 // device type definition
 extern const device_type UPD7725;
+extern const device_type UPD96050;
 
 //**************************************************************************
 //  ENUMERATIONS
@@ -173,7 +227,13 @@ enum
 	UPD7725_FLAGA,
 	UPD7725_FLAGB,
 	UPD7725_SR,
-	UPD7725_DR
+	UPD7725_DR,
+	UPD7725_SP,
+	UPD7725_TR,
+	UPD7725_TRB,
+	UPD7725_SI,
+	UPD7725_SO,
+	UPD7725_IDB
 };
 
 #endif // UPD7725

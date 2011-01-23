@@ -149,6 +149,7 @@ CPU_DISASSEMBLE( upd7725 )
 	  UINT16 na  = (opcode >>  2) & 0x7ff;  //next address
 
     switch(brch) {
+      case 0x000: strcat(output, "jmpso "); break;
       case 0x080: strcat(output, "jnca "); break;
       case 0x082: strcat(output, "jca "); break;
       case 0x084: strcat(output, "jncb "); break;
@@ -183,8 +184,10 @@ CPU_DISASSEMBLE( upd7725 )
       case 0x0ba: strcat(output, "jsoak "); break;
       case 0x0bc: strcat(output, "jnrqm "); break;
       case 0x0be: strcat(output, "jrqm "); break;
-      case 0x100: strcat(output, "jmp "); break;
-      case 0x140: strcat(output, "call "); break;
+      case 0x100: strcat(output, "ljmp "); break;
+      case 0x101: strcat(output, "hjmp "); break;
+      case 0x140: strcat(output, "lcall "); break;
+      case 0x141: strcat(output, "hcall "); break;
       default:    strcat(output, "??????  "); break;
     }
 
