@@ -62,6 +62,7 @@ static void romident(core_options *options, const char *filename, romident_statu
 static void identify_file(core_options *options, const char *name, romident_status *status);
 static void identify_data(core_options *options, const char *name, const UINT8 *data, int length, romident_status *status);
 static void match_roms(core_options *options, const char *hash, int length, int *found);
+static void display_suggestions(const char *gamename);
 
 
 
@@ -108,6 +109,21 @@ static const options_entry cli_options[] =
     CORE IMPLEMENTATION
 ***************************************************************************/
 
+static void display_suggestions(const char *gamename)
+{
+	const game_driver *matches[10];
+	int drvnum;
+
+	/* get the top 10 approximate matches */
+	driver_list_get_approx_matches(drivers, gamename, ARRAY_LENGTH(matches), matches);
+
+	/* print them out */
+	fprintf(stderr, "\n\"%s\" approximately matches the following\n"
+			"supported " GAMESNOUN " (best match first):\n\n", gamename);
+	for (drvnum = 0; drvnum < ARRAY_LENGTH(matches); drvnum++)
+		if (matches[drvnum] != NULL)
+			fprintf(stderr, "%-18s%s\n", matches[drvnum]->name, matches[drvnum]->description);
+}
 /*-------------------------------------------------
     cli_execute - execute a game via the standard
     command line interface
@@ -129,7 +145,7 @@ int cli_execute(int argc, char **argv, osd_interface &osd, const options_entry *
 		options_add_entries(options, cli_options);
 
 		/* parse the command line first; if we fail here, we're screwed */
-		if (options_parse_command_line(options, argc, argv, OPTION_PRIORITY_CMDLINE))
+		if (options_parse_command_line(options, argc, argv, OPTION_PRIORITY_CMDLINE, FALSE))
 		{
 			result = MAMERR_INVALID_CONFIG;
 			goto error;
@@ -154,23 +170,18 @@ int cli_execute(int argc, char **argv, osd_interface &osd, const options_entry *
 		/* if we don't have a valid driver selected, offer some suggestions */
 		if (strlen(gamename_option) > 0 && driver == NULL)
 		{
-			const game_driver *matches[10];
-			int drvnum;
-
-			/* get the top 10 approximate matches */
-			driver_list_get_approx_matches(drivers, gamename_option, ARRAY_LENGTH(matches), matches);
-
-			/* print them out */
-			fprintf(stderr, "\n\"%s\" approximately matches the following\n"
-					"supported " GAMESNOUN " (best match first):\n\n", gamename_option);
-			for (drvnum = 0; drvnum < ARRAY_LENGTH(matches); drvnum++)
-				if (matches[drvnum] != NULL)
-					fprintf(stderr, "%-18s%s\n", matches[drvnum]->name, matches[drvnum]->description);
-
+			display_suggestions(gamename_option);
 			/* exit with an error */
 			result = MAMERR_NO_SUCH_GAME;
 			goto error;
 		}
+		/* parse the command line first; if we fail here, we're screwed */
+		if (options_parse_command_line(options, argc, argv, OPTION_PRIORITY_CMDLINE, TRUE))
+		{
+			result = MAMERR_INVALID_CONFIG;
+			goto error;
+		}
+		
 
 		/* run the game */
 		result = mame_execute(osd, options);
@@ -318,10 +329,14 @@ static int execute_commands(core_options *options, const char *exename, const ga
 		if (options_get_bool(options, info_commands[i].option))
 		{
 			const char *gamename = options_get_string(options, OPTION_GAMENAME);
-
 			/* parse any relevant INI files before proceeding */
 			mame_parse_ini_files(options, driver);
-			return (*info_commands[i].function)(options, (gamename[0] == 0) ? "*" : gamename);
+			int retVal = (*info_commands[i].function)(options, (gamename[0] == 0) ? "*" : gamename);
+			if ( retVal == MAMERR_NO_SUCH_GAME) {
+				display_suggestions(gamename);
+				return MAMERR_NO_SUCH_GAME;
+			}
+			return retVal;
 		}
 
 	return -1;

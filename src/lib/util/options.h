@@ -169,7 +169,7 @@ int options_set_option_callback(core_options *opts, const char *name, void (*cal
 /* ----- option data extraction ----- */
 
 /* parse option data from a command line */
-int options_parse_command_line(core_options *opts, int argc, char **argv, int priority);
+int options_parse_command_line(core_options *opts, int argc, char **argv, int priority, int show_error);
 
 /*  set option value and execute callback call */
 int options_force_option_callback(core_options *opts, const char *optionname, const char *newval, int priority);

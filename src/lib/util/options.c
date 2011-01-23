@@ -456,11 +456,32 @@ int options_set_option_callback(core_options *opts, const char *name, void (*cal
     of command line arguments
 -------------------------------------------------*/
 
-int options_parse_command_line(core_options *opts, int argc, char **argv, int priority)
+int options_parse_command_line(core_options *opts, int argc, char **argv, int priority, int show_error)
 {
 	int unadorned_index = 0;
 	int arg;
+	for (arg = 1; arg < argc; arg++)
+	{
+		const char *optionname;
+		options_data *data;
+		int is_unadorned;
 
+		/* determine the entry name to search for */
+		is_unadorned = (argv[arg][0] != '-');
+		if (!is_unadorned)
+			optionname = &argv[arg][1];
+		else
+			optionname = OPTION_UNADORNED(unadorned_index);
+
+		/* find our entry */
+		data = find_entry_data(opts, optionname, TRUE);
+		if (data == NULL) continue;		
+		if ((data->flags & OPTION_COMMAND) != 0) {
+			// in case of any command force show error to TRUE
+			show_error = TRUE;
+			break;
+		}
+	}	
 	/* loop over commands, looking for options */
 	for (arg = 1; arg < argc; arg++)
 	{
@@ -479,6 +500,7 @@ int options_parse_command_line(core_options *opts, int argc, char **argv, int pr
 		data = find_entry_data(opts, optionname, TRUE);
 		if (data == NULL)
 		{
+			if (!show_error) continue;
 			message(opts, OPTMSG_ERROR, "Error: unknown option: %s\n", argv[arg]);
 			return 1;
 		}
