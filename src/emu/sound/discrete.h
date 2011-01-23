@@ -4193,7 +4193,7 @@ typedef enum
  *
  *************************************/
 
-typedef struct _discrete_sound_block discrete_sound_block;
+typedef struct _discrete_sound_block discrete_block;
 class discrete_node_base_factory;
 class discrete_task;
 class discrete_base_node;
@@ -4230,7 +4230,7 @@ struct _discrete_sound_block
 	const char *	name;							/* Node Name */
 	const char *    mod_name;						/* Module / class name */
 };
-typedef dynamic_array_t<const discrete_sound_block *> sound_block_list_t;
+typedef dynamic_array_t<const discrete_block *> sound_block_list_t;
 
 /*************************************
  *
@@ -4257,12 +4257,12 @@ public:
 	virtual void input_write(int sub_node, UINT8 data ) = 0;
 };
 
-class discrete_output_interface
+class discrete_sound_output_interface
 {
 public:
-	virtual ~discrete_output_interface() { }
+	virtual ~discrete_sound_output_interface() { }
 
-	virtual void set_output(stream_sample_t *ptr) = 0;
+	virtual void set_output_ptr(stream_sample_t *ptr) = 0;
 };
 
 
@@ -4288,7 +4288,7 @@ READ8_DEVICE_HANDLER( discrete_sound_r );
 	MCFG_DISCRETE_INTF(_intf)
 
 #define MCFG_DISCRETE_INTF(_intf) \
-	discrete_device_config::static_set_intf(device, (const discrete_sound_block *)&(_intf##_discrete_interface)); \
+	discrete_device_config::static_set_intf(device, (const discrete_block *)&(_intf##_discrete_interface)); \
 
 #define MCFG_SOUND_CONFIG_DISCRETE(name) MCFG_SOUND_CONFIG(name##_discrete_interface)
 
@@ -4298,39 +4298,40 @@ READ8_DEVICE_HANDLER( discrete_sound_r );
 
 // ======================> discrete_device_config
 
-class discrete_device_config :	public device_config, public device_config_sound_interface
+class discrete_device_config :	public device_config
 {
 	friend class discrete_device;
 
+protected:
 	// construction/destruction
-	discrete_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+	discrete_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock);
 
 public:
 	// allocators
 	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
 	virtual device_t *alloc_device(running_machine &machine) const;
 
 	// inline configuration helpers
-	static void static_set_intf(device_config *device, const discrete_sound_block *intf);
+	static void static_set_intf(device_config *device, const discrete_block *intf);
 
 protected:
-	const discrete_sound_block *m_intf;
+	const discrete_block *m_intf;
 	// inline data
 };
 
-class discrete_output_interface;
-typedef dynamic_array_t<discrete_output_interface *> node_output_list_t;
+class discrete_sound_output_interface;
+typedef dynamic_array_t<discrete_sound_output_interface *> node_output_list_t;
 
 
 // ======================> discrete_device
 
-class discrete_device : public device_t, public device_sound_interface
+class discrete_device : public device_t
 {
 	friend class discrete_device_config;
-	friend class discrete_base_node;
-	friend class discrete_task;
-	friend class discrete_dss_input_stream_node;
+	//friend class discrete_base_node;
 
+protected:
 	// construction/destruction
 	discrete_device(running_machine &_machine, const discrete_device_config &config);
 
@@ -4341,17 +4342,29 @@ public:
 
 	/* --------------------------------- */
 
+	virtual void update_to_current_time(void) const {  }
+
+	/* process a number of samples */
+	void process(int samples);
+
+	/* access to the discrete_logging facility */
 	void CLIB_DECL ATTR_PRINTF(2,3) discrete_log(const char *text, ...) const;
+
+	/* get pointer to a info struct node ref */
 	const double *node_output_ptr(int onode);
 
 	/* FIXME: this is used by csv and wav logs - going forward, identifiers should be explicitly passed */
 	int same_module_index(const discrete_base_node &node);
 
+	/* get node */
+	discrete_base_node *discrete_find_node(int node);
+
+	/* are we profiling */
 	inline int profiling(void) { return m_profiling; }
 
-	void update(void) const { stream_update(m_stream); }
+	inline int sample_rate(void) { return m_sample_rate; }
+	inline double sample_time(void) { return m_sample_time; }
 
-	/* FIXME: theses should be protected */
 
 protected:
 
@@ -4359,27 +4372,21 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
-	// sound interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-
-	const discrete_base_node *discrete_find_node(int node);
-
 	// internal state
 	const discrete_device_config &m_config;
 
 	/* --------------------------------- */
-
-	/* the output stream */
-	sound_stream		*m_stream;
 
 	/* emulation info */
 	int					m_sample_rate;
 	double				m_sample_time;
 	double				m_neg_sample_time;
 
+	/* list of all nodes */
+	node_list_t			 	m_node_list;		/* node_description * */
 
 private:
-	void discrete_build_list(const discrete_sound_block *intf, sound_block_list_t &block_list);
+	void discrete_build_list(const discrete_block *intf, sound_block_list_t &block_list);
 	void discrete_sanity_check(const sound_block_list_t &block_list);
 	void display_profiling(void);
 	void init_nodes(const sound_block_list_t &block_list);
@@ -4387,17 +4394,8 @@ private:
 	/* internal node tracking */
 	discrete_base_node **	m_indexed_node;
 
-	/* list of all nodes */
-	node_list_t			 	m_node_list;		/* node_description * */
-
 	/* tasks */
 	task_list_t				task_list;		/* discrete_task_context * */
-
-	/* the input streams */
-	istream_node_list_t		m_input_stream_list;
-
-	/* output node tracking */
-	node_output_list_t	 	m_output_list;
 
 	/* debugging statistics */
 	FILE *					m_disclogfile;
@@ -4409,6 +4407,62 @@ private:
 	int 					m_profiling;
 	UINT64					m_total_samples;
 	UINT64					m_total_stream_updates;
+};
+
+// ======================> discrete_sound_device_config
+
+class discrete_sound_device_config :	public discrete_device_config,
+										public device_config_sound_interface
+{
+	friend class discrete_sound_device;
+	// construction/destruction
+	discrete_sound_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+	// allocators
+	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+	virtual device_t *alloc_device(running_machine &machine) const;
+
+};
+
+// ======================> discrete_sound_device
+
+class discrete_sound_device : 	public discrete_device,
+								public device_sound_interface
+{
+	friend class discrete_sound_device_config;
+
+	// construction/destruction
+	discrete_sound_device(running_machine &_machine, const discrete_sound_device_config &config);
+
+public:
+	virtual ~discrete_sound_device(void) { };
+
+	/* --------------------------------- */
+
+	virtual void update_to_current_time(void) const { stream_update(m_stream); }
+
+	sound_stream *get_stream(void) { return m_stream; }
+protected:
+
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+
+	// sound interface overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
+	// internal state
+	//const discrete_device_config &m_config;
+
+private:
+	/* the output stream */
+	sound_stream		*m_stream;
+
+	/* the input streams */
+	istream_node_list_t		m_input_stream_list;
+	/* output node tracking */
+	node_output_list_t	 	m_output_list;
 };
 
 // device type definition
@@ -4437,7 +4491,7 @@ public:
 
 	inline bool interface(discrete_step_interface *&intf) const { intf = m_step_intf; return (intf != NULL); }
 	inline bool interface(discrete_input_interface *&intf) const { intf = m_input_intf; return (intf != NULL); }
-	inline bool interface(discrete_output_interface *&intf) const { intf = m_output_intf; return (intf != NULL); }
+	inline bool interface(discrete_sound_output_interface *&intf) const { intf = m_output_intf; return (intf != NULL); }
 
 	/* get the input value from node #n */
 	inline double input(int n) { return *(m_input[n]); }
@@ -4459,10 +4513,10 @@ public:
 	/* Number of active inputs on this node type */
 	inline int			active_inputs(void) { return m_active_inputs; }
 	/* Bit Flags.  1 in bit location means input_is_node */
-	inline int			input_is_node(void) { return m_input_is_node; };
+	inline int			input_is_node(void) { return m_input_is_node; }
 
-	inline double		sample_time(void) { return m_device->m_sample_time; }
-	inline int			sample_rate(void) { return m_device->m_sample_rate; }
+	inline double		sample_time(void) { return m_device->sample_time(); }
+	inline int			sample_rate(void) { return m_device->sample_rate(); }
 
 	const char *		module_name(void) { return m_block->mod_name; }
 	inline int			module_type(void) const { return m_block->type; }
@@ -4473,7 +4527,7 @@ protected:
 	virtual ~discrete_base_node();
 
 	/* finish node setup after allocation is complete */
-	void init(discrete_device * pdev, const discrete_sound_block *block);
+	void init(discrete_device * pdev, const discrete_block *block);
 
 	void resolve_input_nodes(void);
 
@@ -4483,7 +4537,7 @@ protected:
 
 private:
 
-	const discrete_sound_block *	m_block;							/* Points to the node's setup block. */
+	const discrete_block *	m_block;							/* Points to the node's setup block. */
 	int								m_active_inputs;					/* Number of active inputs on this node type */
 
 	const void *					m_custom;							/* Custom function specific initialisation data */
@@ -4491,24 +4545,24 @@ private:
 
 	discrete_step_interface *		m_step_intf;
 	discrete_input_interface *		m_input_intf;
-	discrete_output_interface *		m_output_intf;
+	discrete_sound_output_interface *		m_output_intf;
 };
 
 class discrete_node_base_factory
 {
 public:
-    virtual discrete_base_node *Create(discrete_device * pdev, const discrete_sound_block *block) = 0;
+    virtual discrete_base_node *Create(discrete_device * pdev, const discrete_block *block) = 0;
     virtual ~discrete_node_base_factory() {}
 };
 
 template <class C>
 class discrete_node_factory : public discrete_node_base_factory
 {
-	discrete_base_node *Create(discrete_device * pdev, const discrete_sound_block *block);
+	discrete_base_node *Create(discrete_device * pdev, const discrete_block *block);
 };
 
 template <class C>
-discrete_base_node * discrete_node_factory<C>::Create(discrete_device * pdev, const discrete_sound_block *block)
+discrete_base_node * discrete_node_factory<C>::Create(discrete_device * pdev, const discrete_block *block)
 {
 	discrete_base_node *r = auto_alloc_clear(pdev->machine, C);
 
@@ -4531,8 +4585,8 @@ discrete_base_node * discrete_node_factory<C>::Create(discrete_device * pdev, co
  *
  *************************************/
 
-#define DISCRETE_SOUND_EXTERN(name) extern const discrete_sound_block name##_discrete_interface[]
-#define DISCRETE_SOUND_START(name) const discrete_sound_block name##_discrete_interface[] = {
+#define DISCRETE_SOUND_EXTERN(name) extern const discrete_block name##_discrete_interface[]
+#define DISCRETE_SOUND_START(name) const discrete_block name##_discrete_interface[] = {
 
 #define DSC_SND_ENTRY(_nod, _class, _dss, _num, _iact, _iinit, _custom, _name) { _nod,  new discrete_node_factory< DISCRETE_CLASS_NAME(_class) >, _dss, _num, _iact, _iinit, _custom, _name, # _class }
 

@@ -40,7 +40,7 @@ class DISCRETE_CLASS_NAME(_name): public discrete_base_node, public discrete_ste
 public:																	\
 	void step(void);													\
 	void reset(void);													\
-	int max_output(void) { return _maxout; }							\
+	int max_output(void) { return _maxout; }					\
 private:																\
 	_priv																\
 }
@@ -53,7 +53,7 @@ class DISCRETE_CLASS_NAME(_name): public discrete_base_node, public discrete_ste
 public:																	\
 	void step(void);													\
 	void reset(void)			{ this->step(); }						\
-	int max_output(void) { return _maxout; }							\
+	int max_output(void) { return _maxout; }					\
 private:																\
 	_priv																\
 }
@@ -65,7 +65,7 @@ class DISCRETE_CLASS_NAME(_name): public discrete_base_node				\
 	DISCRETE_CLASS_DESTRUCTOR(_name)									\
 public:																	\
 	void reset(void);													\
-	int max_output(void) { return _maxout; }							\
+	int max_output(void) { return _maxout; }					\
 }
 
 #define  DISCRETE_CLASS(_name, _maxout, _priv) 						\
@@ -78,7 +78,7 @@ public:																	\
 	void reset(void);													\
 	void start(void);													\
 	void stop(void);													\
-	int max_output(void) { return _maxout; }							\
+	int max_output(void) { return _maxout; }					\
 private:																\
 	_priv																\
 }
@@ -105,7 +105,9 @@ public:
  *
  *************************************/
 
-class DISCRETE_CLASS_NAME(dso_output): public discrete_base_node, public discrete_output_interface, public discrete_step_interface
+class DISCRETE_CLASS_NAME(dso_output): 	public discrete_base_node,
+										public discrete_sound_output_interface,
+										public discrete_step_interface
 {
 	DISCRETE_CLASS_CONSTRUCTOR(dso_output, base)
 	DISCRETE_CLASS_DESTRUCTOR(dso_output)
@@ -117,7 +119,7 @@ public:
 		*m_ptr++ = val;
 	}
 	int max_output(void) { return 0; }
-	void set_output(stream_sample_t *ptr) { m_ptr = ptr; }
+	void set_output_ptr(stream_sample_t *ptr) { m_ptr = ptr; }
 private:
 	stream_sample_t		*m_ptr;
 };
@@ -220,6 +222,10 @@ public:
 	void start(void);
 	void input_write(int sub_node, UINT8 data );
 	virtual bool is_buffered(void) { return false; }
+
+	/* This is called by discrete_sound_device */
+	void stream_start(void);
+
 //protected:
 	UINT32				m_stream_in_number;
 	stream_sample_t		*m_ptr;			/* current in ptr for stream */
