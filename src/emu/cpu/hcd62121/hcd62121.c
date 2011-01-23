@@ -113,7 +113,7 @@ INLINE void write_reg( hcd62121_state *cpustate, int size, UINT8 op1 )
 }
 
 
-INLINE void read_regreg( hcd62121_state *cpustate, int size, UINT8 op1, UINT8 op2 )
+INLINE void read_regreg( hcd62121_state *cpustate, int size, UINT8 op1, UINT8 op2, bool op_is_logical )
 {
 	int i;
 
@@ -122,12 +122,14 @@ INLINE void read_regreg( hcd62121_state *cpustate, int size, UINT8 op1, UINT8 op
 
 	if ( op1 & 0x80 )
 	{
+		/* Second operand is an immediate value */
 		cpustate->temp2[0] = op2;
 		for ( i = 1; i < size; i++ )
-			cpustate->temp2[i] = 0;
+			cpustate->temp2[i] = op_is_logical ? op2 : 0;
 	}
 	else
 	{
+		/* Second operand is a register */
 		for ( i = 0; i < size; i++ )
 			cpustate->temp2[i] = cpustate->reg[ (op2 + i) & 0x7f ];
 	}
@@ -377,11 +379,16 @@ static CPU_SET_INFO( hcd62121 )
 	case CPUINFO_INT_INPUT_STATE + 1:
 												break;
 
-	case CPUINFO_INT_SP:						cpustate->sp = info->i;							break;
-	case CPUINFO_INT_PC:						cpustate->ip = info->i;							break;
+	case CPUINFO_INT_SP:							cpustate->sp = info->i;							break;
+	case CPUINFO_INT_PC:							cpustate->ip = info->i;							break;
 
-	case CPUINFO_INT_REGISTER + HCD62121_IP:	cpustate->ip = info->i;							break;
-	case CPUINFO_INT_REGISTER + HCD62121_SP:	cpustate->sp = info->i;							break;
+	case CPUINFO_INT_REGISTER + HCD62121_IP:		cpustate->ip = info->i;							break;
+	case CPUINFO_INT_REGISTER + HCD62121_SP:		cpustate->sp = info->i;							break;
+	case CPUINFO_INT_REGISTER + HCD62121_LAR:		cpustate->lar = info->i;						break;
+	case CPUINFO_INT_REGISTER + HCD62121_CS:		cpustate->cseg = info->i;						break;
+	case CPUINFO_INT_REGISTER + HCD62121_DS:		cpustate->dseg = info->i;						break;
+	case CPUINFO_INT_REGISTER + HCD62121_SS:		cpustate->sseg = info->i;						break;
+	case CPUINFO_INT_REGISTER + HCD62121_DSIZE:		cpustate->dsize = info->i;						break;
 //  case CPUINFO_INT_REGISTER + HCD62121_R00:   break;
 //  case CPUINFO_INT_REGISTER + HCD62121_R02:   break;
 	}

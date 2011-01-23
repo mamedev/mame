@@ -43,9 +43,9 @@ typedef struct
 static const hcd62121_dasm hcd62121_ops[256] =
 {
 	/* 0x00 */
-	{ "shlb",  _REG,   _4 }, { "shlw",  _REG,   _4 }, { "shlq",  _REG,   _4 }, { "shlt",  _REG,   _4 },
+	{ "un00?", 0,       0 }, { "un01?", 0,       0 }, { "un02?", 0,       0 }, { "un03?", 0,       0 },
 	{ "mskb",  _REGREG, 0 }, { "mskw",  _REGREG, 0 }, { "mskq",  _REGREG, 0 }, { "mskt",  _REGREG, 0 },
-	{ "shrb",  _REG,   _4 }, { "shrw",  _REG,   _4 }, { "shrq",  _REG,   _4 }, { "shrt",  _REG,   _4 },
+	{ "sh?b",  _REG,   _4 }, { "sh?w",  _REG,   _4 }, { "sh?q",  _REG,   _4 }, { "sh?t",  _REG,   _4 },
 	{ "tstb",  _REGREG, 0 }, { "tstw",  _REGREG, 0 }, { "tstq",  _REGREG, 0 }, { "tstt",  _REGREG, 0 },
 	{ "xorb",  _REGREG, 0 }, { "xorw",  _REGREG, 0 }, { "xorq",  _REGREG, 0 }, { "xort",  _REGREG, 0 },
 	{ "cmpb",  _REGREG, 0 }, { "cmpw",  _REGREG, 0 }, { "cmpq",  _REGREG, 0 }, { "cmpt",  _REGREG, 0 },
@@ -113,7 +113,7 @@ static const hcd62121_dasm hcd62121_ops[256] =
 	{ "movb",   _DS, _REG }, { "movb",   _DS,  _I8 }, { "movw",  _LAR, _REG }, { "movw?",  _LAR, _I16 },
 
 	/* 0xe0 */
-	{ "unE0?",  _I8,    0 }, { "unE1?",  _I8,    0 }, { "in",    _REG,  _KI }, { "movb",  _REG, _DSZ },
+	{ "in0",   _REG,    0 }, { "unE1?",  _I8,    0 }, { "in",    _REG,  _KI }, { "movb",  _REG, _DSZ },
 	{ "movb",  _REG,   _F }, { "movb",  _REG, _TIM }, { "unE6?",  _I8,    0 }, { "unE7?",  _I8,    0 },
 	{ "movw",  _REG, _LAR }, { "movw?", _REG, _LAR }, { "movw",  _REG,  _PC }, { "movw",  _REG,  _SP },
 	{ "unEC?",    0,    0 }, { "movb",  _REG,  _DS }, { "movb",  _REG,  _CS }, { "movb",  _REG,  _SS },
@@ -134,7 +134,11 @@ CPU_DISASSEMBLE( hcd62121 )
 
 	inst = &hcd62121_ops[op];
 
-	buffer += sprintf(buffer,"%-8s", inst->str);
+	/* Special case for nibble shift instruction */
+	if ( inst->arg2 == _4 )
+		buffer += sprintf(buffer,"sh%c%c    ", ( oprom[pos] & 0x80 ) ? 'l' : 'r', inst->str[3]);
+	else
+		buffer += sprintf(buffer,"%-8s", inst->str);
 
 	switch( inst->arg1 )
 	{
@@ -233,7 +237,7 @@ CPU_DISASSEMBLE( hcd62121 )
 	case _ILR:
 		op1 = oprom[pos++];
 		op2 = oprom[pos++];
-		if ( op1 & 0x80 )
+		if ( ( op1 & 0x80 ) || ( op2 & 0x80 ) )
 		{
 			/* (lar),reg */
 			 buffer += sprintf( buffer, "(%slar%s),r%02x", (op1 & 0x20) ? ( (op1 & 0x40) ? "--" : "++" ) : "", (op1 & 0x20) ? "" : ( (op1 & 0x40) ? "--" : "++" ), op2 & 0x7f );

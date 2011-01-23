@@ -26,6 +26,8 @@ enum
 	HCD62121_KOH,
 	/* Input ports */
 	HCD62121_KI,
+	/* Other I/O ports */
+	HCD62121_IN0
 };
 
 

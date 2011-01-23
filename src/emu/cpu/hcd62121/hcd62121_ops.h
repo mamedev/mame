@@ -98,6 +98,34 @@
 				cpustate->f |= _FLAG_ZH;										\
 		}
 
+#define HCD62121_XOR															\
+		{																		\
+			int i;																\
+			UINT8 is_zero = 1;													\
+																				\
+			for ( i = 0; i < size; i++ )										\
+			{																	\
+				cpustate->temp1[i] = cpustate->temp1[i] ^ cpustate->temp2[i];	\
+				if ( cpustate->temp1[i] )										\
+					is_zero = 0;												\
+			}																	\
+																				\
+			if ( is_zero )														\
+				cpustate->f |= _FLAG_Z;											\
+			else																\
+				cpustate->f &= ~_FLAG_Z;										\
+																				\
+			if ( cpustate->temp1[0] & 0x0f )									\
+				cpustate->f &= ~_FLAG_ZL;										\
+			else																\
+				cpustate->f |= _FLAG_ZL;										\
+																				\
+			if ( cpustate->temp1[0] & 0xf0 )									\
+				cpustate->f &= ~_FLAG_ZH;										\
+			else																\
+				cpustate->f |= _FLAG_ZH;										\
+		}
+
 #define HCD62121_ADD																	\
 		{																				\
 			int i;																		\
@@ -263,16 +291,16 @@ case 0x07:		/* mskt r1,r2 */
 		UINT8 reg1 = read_op( cpustate );
 		UINT8 reg2 = read_op( cpustate );
 
-		read_regreg( cpustate, size, reg1, reg2 );
+		read_regreg( cpustate, size, reg1, reg2, false );
 
 		HCD62121_MSK;
 	}
 	break;
 
-case 0x08:		/* shrb r1 */
-case 0x09:		/* shrb r1 */
-case 0x0A:		/* shrq r1 */
-case 0x0B:		/* shrt r1 */
+case 0x08:		/* shb r1,4 */
+case 0x09:		/* shw r1,4 */
+case 0x0A:		/* shq r1,4 */
+case 0x0B:		/* sht r1,4 */
 	/* Shift is a nibble shift! */
 	{
 		int i;
@@ -284,8 +312,16 @@ case 0x0B:		/* shrt r1 */
 
 		for ( i = 0; i < size; i++ )
 		{
-			d1 = ( cpustate->temp1[i] & 0x0f ) << 4;
-			cpustate->temp1[i] = ( cpustate->temp1[i] >> 4 ) | d2;
+			if ( reg1 & 0x80 )
+			{
+				d1 = ( cpustate->temp1[i] & 0x0f ) << 4;
+				cpustate->temp1[i] = ( cpustate->temp1[i] >> 4 ) | d2;
+			}
+			else
+			{
+				d1 = ( cpustate->temp1[i] & 0xf0 ) >> 4;
+				cpustate->temp1[i] = ( cpustate->temp1[i] << 4 ) | d2;
+			}
 			d2 = d1;
 		}
 
@@ -302,9 +338,26 @@ case 0x0F:		/* testt r1,r2 */
 		UINT8 reg1 = read_op( cpustate );
 		UINT8 reg2 = read_op( cpustate );
 
-		read_regreg( cpustate, size, reg1, reg2 );
+		read_regreg( cpustate, size, reg1, reg2, false );
 
 		HCD62121_AND;
+	}
+	break;
+
+case 0x10:		/* xorb r1,r2 */
+case 0x11:		/* xorw r1,r2 */
+case 0x12:		/* xorq r1,r2 */
+case 0x13:		/* xort r1,r2 */
+	{
+		int size = datasize( cpustate, op );
+		UINT8 reg1 = read_op( cpustate );
+		UINT8 reg2 = read_op( cpustate );
+
+		read_regreg( cpustate, size, reg1, reg2, false );
+
+		HCD62121_XOR;
+
+		write_regreg( cpustate, size, reg1, reg2 );
 	}
 	break;
 
@@ -317,7 +370,7 @@ case 0x17:		/* cmpt r1,r2 */
 		UINT8 reg1 = read_op( cpustate );
 		UINT8 reg2 = read_op( cpustate );
 
-		read_regreg( cpustate, size, reg1, reg2 );
+		read_regreg( cpustate, size, reg1, reg2, false );
 
 		HCD62121_SUB;
 	}
@@ -333,7 +386,7 @@ case 0x1B:		/* movt r1,r2 */
 		UINT8 reg1 = read_op( cpustate );
 		UINT8 reg2 = read_op( cpustate );
 
-		read_regreg( cpustate, size, reg1, reg2 );
+		read_regreg( cpustate, size, reg1, reg2, false );
 
 		for ( i = 0; i < size; i++ )
 			cpustate->temp1[i] = cpustate->temp2[i];
@@ -351,7 +404,7 @@ case 0x1F:		/* imskt r1,r2 */
 		UINT8 reg1 = read_op( cpustate );
 		UINT8 reg2 = read_op( cpustate );
 
-		read_regreg( cpustate, size, reg1, reg2 );
+		read_regreg( cpustate, size, reg1, reg2, false );
 
 		HCD62121_IMSK;
 	}
@@ -382,15 +435,15 @@ case 0x23:		/* shrt r1 */
 	break;
 
 case 0x24:		/* orb r1,r2 */
-case 0x25:		/* orb r1,r2 */
-case 0x26:		/* orb r1,r2 */
-case 0x27:		/* orb r1,r2 */
+case 0x25:		/* orw r1,r2 */
+case 0x26:		/* orq r1,r2 */
+case 0x27:		/* ort r1,r2 */
 	{
 		int size = datasize( cpustate, op );
 		UINT8 reg1 = read_op( cpustate );
 		UINT8 reg2 = read_op( cpustate );
 
-		read_regreg( cpustate, size, reg1, reg2 );
+		read_regreg( cpustate, size, reg1, reg2, false );
 
 		HCD62121_OR;
 
@@ -431,7 +484,7 @@ case 0x2F:		/* andt r1,r2 */
 		UINT8 reg1 = read_op( cpustate );
 		UINT8 reg2 = read_op( cpustate );
 
-		read_regreg( cpustate, size, reg1, reg2 );
+		read_regreg( cpustate, size, reg1, reg2, true );
 
 		HCD62121_AND;
 
@@ -448,7 +501,7 @@ case 0x37:		/* subt r1,r2 */
 		UINT8 reg1 = read_op( cpustate );
 		UINT8 reg2 = read_op( cpustate );
 
-		read_regreg( cpustate, size, reg1, reg2 );
+		read_regreg( cpustate, size, reg1, reg2, false );
 
 		HCD62121_SUB;
 
@@ -465,7 +518,7 @@ case 0x3B:		/* adbt r1,r2 */
 		UINT8 reg1 = read_op( cpustate );
 		UINT8 reg2 = read_op( cpustate );
 
-		read_regreg( cpustate, size, reg1, reg2 );
+		read_regreg( cpustate, size, reg1, reg2, false );
 
 		HCD62121_ADDB;
 
@@ -482,7 +535,7 @@ case 0x3F:		/* addt r1,r2 */
 		UINT8 reg1 = read_op( cpustate );
 		UINT8 reg2 = read_op( cpustate );
 
-		read_regreg( cpustate, size, reg1, reg2 );
+		read_regreg( cpustate, size, reg1, reg2, false );
 
 		HCD62121_ADD;
 
@@ -787,7 +840,7 @@ case 0xC7:		/* movt (lar),r1 / r1,(lar) */
 			break;
 		}
 
-		if ( reg1 & 0x80 )
+		if ( ( reg1 & 0x80 ) || ( reg2 & 0x80 ) )
 		{
 			/* (lar) <- r1 */
 			for ( i = 0; i < size; i++ )
@@ -895,19 +948,17 @@ case 0xDE:		/* movw lar,reg */
 	}
 	break;
 
-case 0xE0:		/* ld0,b? reg (in?) */
-	logerror( "%02x:%04x: unimplemented instruction %02x encountered\n", cpustate->cseg, cpustate->ip-1, op );
+case 0xE0:		/* in0 reg */
 	{
 		UINT8 reg1 = read_op( cpustate );
 
-		/* This is incorrect. _Something_ gets stored to the register */
-		/* This is to hack around the testb instruction at 001039. */
-		cpustate->reg[ reg1 & 0x7f ] = 0x10;
+		cpustate->reg[ reg1 & 0x7f ] = io_readbyte( cpustate, HCD62121_IN0 );
 	}
 	break;
 
 case 0xE1:		/* unk_E1 reg/i8 (in?) */
 	logerror( "%02x:%04x: unimplemented instruction %02x encountered\n", cpustate->cseg, cpustate->ip-1, op );
+	read_op( cpustate );
 	break;
 
 case 0xE2:		/* in kb, reg */
