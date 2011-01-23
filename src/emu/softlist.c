@@ -1413,7 +1413,7 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 
 			for (int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++)
 			{
-				if (swlist->list_name[i] && *swlist->list_name[i] && (swlist->list_type == SOFTWARE_LIST_ORIGINAL_SYSTEM))
+				if (swlist->list_name[i] && *swlist->list_name[i])
 				{
 					software_list *list = software_list_open(image->device().machine->options(), swlist->list_name[i], FALSE, NULL);
 
@@ -1428,7 +1428,10 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 
 						if (matches[0] != 0)
 						{
-							mame_printf_error("* Software list \"%s\" matches: \n", software_list_get_description(list));
+							if (swlist->list_type == SOFTWARE_LIST_ORIGINAL_SYSTEM)
+								mame_printf_error("* Software list \"%s\" (%s) matches: \n", swlist->list_name[i], software_list_get_description(list));
+							else
+								mame_printf_error("* Compatible software list \"%s\" (%s) matches: \n", swlist->list_name[i], software_list_get_description(list));
 
 							// print them out
 							for (softnum = 0; softnum < ARRAY_LENGTH(matches); softnum++)
