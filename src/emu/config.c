@@ -28,8 +28,8 @@ struct _config_type
 {
 	struct _config_type *	next;				/* next in line */
 	const char *			name;				/* node name */
-	config_callback_func			load;				/* load callback */
-	config_callback_func			save;				/* save callback */
+	config_callback_func	load;				/* load callback */
+	config_callback_func	save;				/* save callback */
 };
 
 

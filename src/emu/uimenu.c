@@ -109,8 +109,8 @@ struct _ui_menu_pool
 typedef struct _ui_menu_item ui_menu_item;
 struct _ui_menu_item
 {
-	const char *			text;
-	const char *			subtext;
+	const char *		text;
+	const char *		subtext;
 	UINT32				flags;
 	void *				ref;
 };
@@ -122,7 +122,7 @@ struct _ui_menu
 	render_container *	container;			/* render_container we render to */
 	ui_menu_handler_func handler;			/* handler callback */
 	void *				parameter;			/* parameter */
-	ui_menu_event		event;				/* the UI event that occurred */
+	ui_menu_event		menu_event;				/* the UI menu_event that occurred */
 	ui_menu *			parent;				/* pointer to parent menu */
 	void *				state;				/* menu-specific state */
 	ui_menu_destroy_state_func destroy_state; /* destroy state callback */
@@ -362,9 +362,9 @@ INLINE int item_is_selectable(const ui_menu_item *item)
 
 INLINE int exclusive_input_pressed(ui_menu *menu, int key, int repeat)
 {
-	if (menu->event.iptkey == IPT_INVALID && ui_input_pressed_repeat(menu->machine, key, repeat))
+	if (menu->menu_event.iptkey == IPT_INVALID && ui_input_pressed_repeat(menu->machine, key, repeat))
 	{
-		menu->event.iptkey = key;
+		menu->menu_event.iptkey = key;
 		return TRUE;
 	}
 	return FALSE;
@@ -587,8 +587,8 @@ void ui_menu_item_append(ui_menu *menu, const char *text, const char *subtext, U
 
 const ui_menu_event *ui_menu_process(running_machine *machine, ui_menu *menu, UINT32 flags)
 {
-	/* reset the event */
-	menu->event.iptkey = IPT_INVALID;
+	/* reset the menu_event */
+	menu->menu_event.iptkey = IPT_INVALID;
 
 	/* first make sure our selection is valid */
 	ui_menu_validate_selection(menu, 1);
@@ -605,16 +605,16 @@ const ui_menu_event *ui_menu_process(running_machine *machine, ui_menu *menu, UI
 		/* read events */
 		ui_menu_handle_events(menu);
 
-		/* handle the keys if we don't already have an event */
-		if (menu->event.iptkey == IPT_INVALID)
+		/* handle the keys if we don't already have an menu_event */
+		if (menu->menu_event.iptkey == IPT_INVALID)
 			ui_menu_handle_keys(menu, flags);
 	}
 
-	/* update the selected item in the event */
-	if (menu->event.iptkey != IPT_INVALID && menu->selected >= 0 && menu->selected < menu->numitems)
+	/* update the selected item in the menu_event */
+	if (menu->menu_event.iptkey != IPT_INVALID && menu->selected >= 0 && menu->selected < menu->numitems)
 	{
-		menu->event.itemref = menu->item[menu->selected].ref;
-		return &menu->event;
+		menu->menu_event.itemref = menu->item[menu->selected].ref;
+		return &menu->menu_event;
 	}
 	return NULL;
 }
@@ -1085,12 +1085,12 @@ static void ui_menu_draw_text_box(ui_menu *menu)
 static void ui_menu_handle_events(ui_menu *menu)
 {
 	int stop = FALSE;
-	ui_event event;
+	ui_event menu_event;
 
 	/* loop while we have interesting events */
-	while (ui_input_pop_event(menu->machine, &event) && !stop)
+	while (ui_input_pop_event(menu->machine, &menu_event) && !stop)
 	{
-		switch (event.event_type)
+		switch (menu_event.event_type)
 		{
 			/* if we are hovering over a valid item, select it with a single click */
 			case UI_EVENT_MOUSE_DOWN:
@@ -1113,12 +1113,12 @@ static void ui_menu_handle_events(ui_menu *menu)
 				if (menu->hover >= 0 && menu->hover < menu->numitems)
 				{
 					menu->selected = menu->hover;
-					if (event.event_type == UI_EVENT_MOUSE_DOUBLE_CLICK)
+					if (menu_event.event_type == UI_EVENT_MOUSE_DOUBLE_CLICK)
 					{
-						menu->event.iptkey = IPT_UI_SELECT;
+						menu->menu_event.iptkey = IPT_UI_SELECT;
 						if (menu->selected == menu->numitems - 1)
 						{
-							menu->event.iptkey = IPT_UI_CANCEL;
+							menu->menu_event.iptkey = IPT_UI_CANCEL;
 							ui_menu_stack_pop(menu->machine);
 						}
 					}
@@ -1128,8 +1128,8 @@ static void ui_menu_handle_events(ui_menu *menu)
 
 			/* translate CHAR events into specials */
 			case UI_EVENT_CHAR:
-				menu->event.iptkey = IPT_SPECIAL;
-				menu->event.unichar = event.ch;
+				menu->menu_event.iptkey = IPT_SPECIAL;
+				menu->menu_event.unichar = menu_event.ch;
 				stop = TRUE;
 				break;
 
@@ -1162,7 +1162,7 @@ static void ui_menu_handle_keys(ui_menu *menu, UINT32 flags)
 	{
 		if (menu->selected == menu->numitems - 1)
 		{
-			menu->event.iptkey = IPT_UI_CANCEL;
+			menu->menu_event.iptkey = IPT_UI_CANCEL;
 			ui_menu_stack_pop(menu->machine);
 		}
 		return;
@@ -1244,7 +1244,7 @@ static void ui_menu_handle_keys(ui_menu *menu, UINT32 flags)
 		menu->machine->cheat().set_enable(!menu->machine->cheat().enabled());
 
 	/* see if any other UI keys are pressed */
-	if (menu->event.iptkey == IPT_INVALID)
+	if (menu->menu_event.iptkey == IPT_INVALID)
 		for (code = __ipt_ui_start; code <= __ipt_ui_end; code++)
 		{
 			if (code == IPT_UI_CONFIGURE || (code == IPT_UI_LEFT && ignoreleft) || (code == IPT_UI_RIGHT && ignoreright) || (code == IPT_UI_PAUSE && ignorepause))
@@ -1451,16 +1451,16 @@ int ui_menu_is_force_game_select(void)
 
 static void menu_main(running_machine *machine, ui_menu *menu, void *parameter, void *state)
 {
-	const ui_menu_event *event;
+	const ui_menu_event *menu_event;
 
 	/* if the menu isn't built, populate now */
 	if (!ui_menu_populated(menu))
 		menu_main_populate(machine, menu, state);
 
 	/* process the menu */
-	event = ui_menu_process(machine, menu, 0);
-	if (event != NULL && event->iptkey == IPT_UI_SELECT)
-		ui_menu_stack_push(ui_menu_alloc(machine, menu->container, (ui_menu_handler_func)event->itemref, NULL));
+	menu_event = ui_menu_process(machine, menu, 0);
+	if (menu_event != NULL && menu_event->iptkey == IPT_UI_SELECT)
+		ui_menu_stack_push(ui_menu_alloc(machine, menu->container, (ui_menu_handler_func)menu_event->itemref, NULL));
 }
 
 
@@ -1470,7 +1470,7 @@ static void menu_main(running_machine *machine, ui_menu *menu, void *parameter, 
 
 static void ui_menu_keyboard_mode(running_machine *machine, ui_menu *menu, void *parameter, void *state)
 {
-	const ui_menu_event *event;
+	const ui_menu_event *menu_event;
 	int natural = ui_get_use_natural_keyboard(machine);
 
 	/* if the menu isn't built, populate now */
@@ -1480,11 +1480,11 @@ static void ui_menu_keyboard_mode(running_machine *machine, ui_menu *menu, void 
 	}
 
 	/* process the menu */
-	event = ui_menu_process(machine, menu, 0);
+	menu_event = ui_menu_process(machine, menu, 0);
 
-	if (event != NULL)
+	if (menu_event != NULL)
 	{
-		if (event->iptkey == IPT_UI_LEFT || event->iptkey == IPT_UI_RIGHT) {
+		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT) {
 			ui_set_use_natural_keyboard(machine, natural ^ TRUE);
 			ui_menu_reset(menu, UI_MENU_RESET_REMEMBER_REF);
 		}
@@ -1589,16 +1589,16 @@ static void menu_main_populate(running_machine *machine, ui_menu *menu, void *st
 
 static void menu_input_groups(running_machine *machine, ui_menu *menu, void *parameter, void *state)
 {
-	const ui_menu_event *event;
+	const ui_menu_event *menu_event;
 
 	/* if the menu isn't built, populate now */
 	if (!ui_menu_populated(menu))
 		menu_input_groups_populate(machine, menu, state);
 
 	/* process the menu */
-	event = ui_menu_process(machine, menu, 0);
-	if (event != NULL && event->iptkey == IPT_UI_SELECT)
-		ui_menu_stack_push(ui_menu_alloc(machine, menu->container, menu_input_general, event->itemref));
+	menu_event = ui_menu_process(machine, menu, 0);
+	if (menu_event != NULL && menu_event->iptkey == IPT_UI_SELECT)
+		ui_menu_stack_push(ui_menu_alloc(machine, menu->container, menu_input_general, menu_event->itemref));
 }
 
 
@@ -1774,7 +1774,7 @@ static void menu_input_common(running_machine *machine, ui_menu *menu, void *par
 {
 	input_item_data *seqchangeditem = NULL;
 	input_menu_state *menustate;
-	const ui_menu_event *event;
+	const ui_menu_event *menu_event;
 	int invalidate = FALSE;
 
 	/* if no state, allocate now */
@@ -1792,7 +1792,7 @@ static void menu_input_common(running_machine *machine, ui_menu *menu, void *par
 	}
 
 	/* process the menu */
-	event = ui_menu_process(machine, menu, (menustate->pollingitem != NULL) ? UI_MENU_PROCESS_NOKEYS : 0);
+	menu_event = ui_menu_process(machine, menu, (menustate->pollingitem != NULL) ? UI_MENU_PROCESS_NOKEYS : 0);
 
 	/* if we are polling, handle as a special case */
 	if (menustate->pollingitem != NULL)
@@ -1820,10 +1820,10 @@ static void menu_input_common(running_machine *machine, ui_menu *menu, void *par
 	}
 
 	/* otherwise, handle the events */
-	else if (event != NULL && event->itemref != NULL)
+	else if (menu_event != NULL && menu_event->itemref != NULL)
 	{
-		input_item_data *item = (input_item_data *)event->itemref;
-		switch (event->iptkey)
+		input_item_data *item = (input_item_data *)menu_event->itemref;
+		switch (menu_event->iptkey)
 		{
 			/* an item was selected: begin polling */
 			case IPT_UI_SELECT:
@@ -2003,7 +2003,7 @@ static void menu_settings_categories(running_machine *machine, ui_menu *menu, vo
 static void menu_settings_common(running_machine *machine, ui_menu *menu, void *state, UINT32 type)
 {
 	settings_menu_state *menustate;
-	const ui_menu_event *event;
+	const ui_menu_event *menu_event;
 
 	/* if no state, allocate now */
 	if (state == NULL)
@@ -2015,16 +2015,16 @@ static void menu_settings_common(running_machine *machine, ui_menu *menu, void *
 		menu_settings_populate(machine, menu, menustate, type);
 
 	/* process the menu */
-	event = ui_menu_process(machine, menu, 0);
+	menu_event = ui_menu_process(machine, menu, 0);
 
 	/* handle events */
-	if (event != NULL && event->itemref != NULL)
+	if (menu_event != NULL && menu_event->itemref != NULL)
 	{
-		const input_field_config *field = (const input_field_config *)event->itemref;
+		const input_field_config *field = (const input_field_config *)menu_event->itemref;
 		input_field_user_settings settings;
 		int changed = FALSE;
 
-		switch (event->iptkey)
+		switch (menu_event->iptkey)
 		{
 			/* if selected, reset to default value */
 			case IPT_UI_SELECT:
@@ -2250,22 +2250,22 @@ static void menu_settings_custom_render_one(render_container *container, float x
 
 static void menu_analog(running_machine *machine, ui_menu *menu, void *parameter, void *state)
 {
-	const ui_menu_event *event;
+	const ui_menu_event *menu_event;
 
 	/* if the menu isn't built, populate now */
 	if (!ui_menu_populated(menu))
 		menu_analog_populate(machine, menu);
 
 	/* process the menu */
-	event = ui_menu_process(machine, menu, UI_MENU_PROCESS_LR_REPEAT);
+	menu_event = ui_menu_process(machine, menu, UI_MENU_PROCESS_LR_REPEAT);
 
 	/* handle events */
-	if (event != NULL && event->itemref != NULL)
+	if (menu_event != NULL && menu_event->itemref != NULL)
 	{
-		analog_item_data *data = (analog_item_data *)event->itemref;
+		analog_item_data *data = (analog_item_data *)menu_event->itemref;
 		int newval = data->cur;
 
-		switch (event->iptkey)
+		switch (menu_event->iptkey)
 		{
 			/* if selected, reset to default value */
 			case IPT_UI_SELECT:
@@ -2522,17 +2522,17 @@ static void menu_game_info(running_machine *machine, ui_menu *menu, void *parame
 
 static void menu_cheat(running_machine *machine, ui_menu *menu, void *parameter, void *state)
 {
-	const ui_menu_event *event;
+	const ui_menu_event *menu_event;
 
 	/* if the menu isn't built, populate now */
 	if (!ui_menu_populated(menu))
 		menu_cheat_populate(machine, menu);
 
 	/* process the menu */
-	event = ui_menu_process(machine, menu, UI_MENU_PROCESS_LR_REPEAT);
+	menu_event = ui_menu_process(machine, menu, UI_MENU_PROCESS_LR_REPEAT);
 
 	/* handle events */
-	if (event != NULL && event->itemref != NULL)
+	if (menu_event != NULL && menu_event->itemref != NULL)
 	{
 		bool changed = false;
 
@@ -2540,7 +2540,7 @@ static void menu_cheat(running_machine *machine, ui_menu *menu, void *parameter,
 		popmessage(NULL);
 
 		/* handle reset all + reset all cheats for reload all option */
-		if ((FPTR)event->itemref < 3 && event->iptkey == IPT_UI_SELECT)
+		if ((FPTR)menu_event->itemref < 3 && menu_event->iptkey == IPT_UI_SELECT)
 		{
 			for (cheat_entry *curcheat = machine->cheat().first(); curcheat != NULL; curcheat = curcheat->next())
 				if (curcheat->select_default_state())
@@ -2549,11 +2549,11 @@ static void menu_cheat(running_machine *machine, ui_menu *menu, void *parameter,
 
 
 		/* handle individual cheats */
-		else if ((FPTR)event->itemref > 2)
+		else if ((FPTR)menu_event->itemref > 2)
 		{
-			cheat_entry *curcheat = reinterpret_cast<cheat_entry *>(event->itemref);
+			cheat_entry *curcheat = reinterpret_cast<cheat_entry *>(menu_event->itemref);
 			const char *string;
-			switch (event->iptkey)
+			switch (menu_event->iptkey)
 			{
 				/* if selected, activate a oneshot */
 				case IPT_UI_SELECT:
@@ -2587,7 +2587,7 @@ static void menu_cheat(running_machine *machine, ui_menu *menu, void *parameter,
 		}
 
 		/* handle reload all  */
-		if ((FPTR)event->itemref == 2 && event->iptkey == IPT_UI_SELECT)
+		if ((FPTR)menu_event->itemref == 2 && menu_event->iptkey == IPT_UI_SELECT)
 		{
 			/* re-init cheat engine and thus reload cheats/cheats have already been turned off by here */
 			machine->cheat().reload();
@@ -2638,7 +2638,7 @@ static void menu_cheat_populate(running_machine *machine, ui_menu *menu)
 
 static void menu_memory_card(running_machine *machine, ui_menu *menu, void *parameter, void *state)
 {
-	const ui_menu_event *event;
+	const ui_menu_event *menu_event;
 	int *cardnum;
 
 	/* if no state, allocate some */
@@ -2651,15 +2651,15 @@ static void menu_memory_card(running_machine *machine, ui_menu *menu, void *para
 		menu_memory_card_populate(machine, menu, *cardnum);
 
 	/* process the menu */
-	event = ui_menu_process(machine, menu, UI_MENU_PROCESS_LR_REPEAT);
+	menu_event = ui_menu_process(machine, menu, UI_MENU_PROCESS_LR_REPEAT);
 
 	/* if something was selected, act on it */
-	if (event != NULL && event->itemref != NULL)
+	if (menu_event != NULL && menu_event->itemref != NULL)
 	{
-		FPTR item = (FPTR)event->itemref;
+		FPTR item = (FPTR)menu_event->itemref;
 
 		/* select executes actions on some of the items */
-		if (event->iptkey == IPT_UI_SELECT)
+		if (menu_event->iptkey == IPT_UI_SELECT)
 		{
 			switch (item)
 			{
@@ -2693,7 +2693,7 @@ static void menu_memory_card(running_machine *machine, ui_menu *menu, void *para
 		/* the select item has extra keys */
 		else if (item == MEMCARD_ITEM_SELECT)
 		{
-			switch (event->iptkey)
+			switch (menu_event->iptkey)
 			{
 				/* left decrements the card number */
 				case IPT_UI_LEFT:
@@ -2745,7 +2745,7 @@ static void menu_memory_card_populate(running_machine *machine, ui_menu *menu, i
 static void menu_sliders(running_machine *machine, ui_menu *menu, void *parameter, void *state)
 {
 	int menuless_mode = (parameter != NULL);
-	const ui_menu_event *event;
+	const ui_menu_event *menu_event;
 	UINT8 *hidden = (UINT8 *)state;
 
 	/* if no state, allocate some */
@@ -2759,17 +2759,17 @@ static void menu_sliders(running_machine *machine, ui_menu *menu, void *paramete
 		menu_sliders_populate(machine, menu, menuless_mode);
 
 	/* process the menu */
-	event = ui_menu_process(machine, menu, UI_MENU_PROCESS_LR_REPEAT | (*hidden ? UI_MENU_PROCESS_CUSTOM_ONLY : 0));
-	if (event != NULL)
+	menu_event = ui_menu_process(machine, menu, UI_MENU_PROCESS_LR_REPEAT | (*hidden ? UI_MENU_PROCESS_CUSTOM_ONLY : 0));
+	if (menu_event != NULL)
 	{
 		/* handle keys if there is a valid item selected */
-		if (event->itemref != NULL)
+		if (menu_event->itemref != NULL)
 		{
-			const slider_state *slider = (const slider_state *)event->itemref;
+			const slider_state *slider = (const slider_state *)menu_event->itemref;
 			INT32 curvalue = (*slider->update)(machine, slider->arg, NULL, SLIDER_NOCHANGE);
 			INT32 increment = 0;
 
-			switch (event->iptkey)
+			switch (menu_event->iptkey)
 			{
 				/* toggle visibility */
 				case IPT_UI_ON_SCREEN_DISPLAY:
@@ -2830,14 +2830,14 @@ static void menu_sliders(running_machine *machine, ui_menu *menu, void *paramete
 		else if (*hidden)
 		{
 			/* if we got here via up or page up, select the previous item */
-			if (event->iptkey == IPT_UI_UP || event->iptkey == IPT_UI_PAGE_UP)
+			if (menu_event->iptkey == IPT_UI_UP || menu_event->iptkey == IPT_UI_PAGE_UP)
 			{
 				menu->selected = (menu->selected + menu->numitems - 1) % menu->numitems;
 				ui_menu_validate_selection(menu, -1);
 			}
 
 			/* otherwise select the next item */
-			else if (event->iptkey == IPT_UI_DOWN || event->iptkey == IPT_UI_PAGE_DOWN)
+			else if (menu_event->iptkey == IPT_UI_DOWN || menu_event->iptkey == IPT_UI_PAGE_DOWN)
 			{
 				menu->selected = (menu->selected + 1) % menu->numitems;
 				ui_menu_validate_selection(menu, 1);
@@ -2954,16 +2954,16 @@ static void menu_sliders_custom_render(running_machine *machine, ui_menu *menu, 
 
 static void menu_video_targets(running_machine *machine, ui_menu *menu, void *parameter, void *state)
 {
-	const ui_menu_event *event;
+	const ui_menu_event *menu_event;
 
 	/* if the menu isn't built, populate now */
 	if (!ui_menu_populated(menu))
 		menu_video_targets_populate(machine, menu);
 
 	/* process the menu */
-	event = ui_menu_process(machine, menu, 0);
-	if (event != NULL && event->iptkey == IPT_UI_SELECT)
-		ui_menu_stack_push(ui_menu_alloc(machine, menu->container, menu_video_options, event->itemref));
+	menu_event = ui_menu_process(machine, menu, 0);
+	if (menu_event != NULL && menu_event->iptkey == IPT_UI_SELECT)
+		ui_menu_stack_push(ui_menu_alloc(machine, menu->container, menu_video_options, menu_event->itemref));
 }
 
 
@@ -3001,7 +3001,7 @@ static void menu_video_targets_populate(running_machine *machine, ui_menu *menu)
 static void menu_video_options(running_machine *machine, ui_menu *menu, void *parameter, void *state)
 {
 	render_target *target = (parameter != NULL) ? (render_target *)parameter : machine->render().first_target();
-	const ui_menu_event *event;
+	const ui_menu_event *menu_event;
 	int changed = FALSE;
 
 	/* if the menu isn't built, populate now */
@@ -3009,16 +3009,16 @@ static void menu_video_options(running_machine *machine, ui_menu *menu, void *pa
 		menu_video_options_populate(machine, menu, target);
 
 	/* process the menu */
-	event = ui_menu_process(machine, menu, 0);
-	if (event != NULL && event->itemref != NULL)
+	menu_event = ui_menu_process(machine, menu, 0);
+	if (menu_event != NULL && menu_event->itemref != NULL)
 	{
-		switch ((FPTR)event->itemref)
+		switch ((FPTR)menu_event->itemref)
 		{
 			/* rotate adds rotation depending on the direction */
 			case VIDEO_ITEM_ROTATE:
-				if (event->iptkey == IPT_UI_LEFT || event->iptkey == IPT_UI_RIGHT)
+				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 				{
-					int delta = (event->iptkey == IPT_UI_LEFT) ? ROT270 : ROT90;
+					int delta = (menu_event->iptkey == IPT_UI_LEFT) ? ROT270 : ROT90;
 					target->set_orientation(orientation_add(delta, target->orientation()));
 					if (target->is_ui_target())
 					{
@@ -3033,7 +3033,7 @@ static void menu_video_options(running_machine *machine, ui_menu *menu, void *pa
 
 			/* layer config bitmasks handle left/right keys the same (toggle) */
 			case VIDEO_ITEM_BACKDROPS:
-				if (event->iptkey == IPT_UI_LEFT || event->iptkey == IPT_UI_RIGHT)
+				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 				{
 					target->set_backdrops_enabled(!target->backdrops_enabled());
 					changed = TRUE;
@@ -3041,7 +3041,7 @@ static void menu_video_options(running_machine *machine, ui_menu *menu, void *pa
 				break;
 
 			case VIDEO_ITEM_OVERLAYS:
-				if (event->iptkey == IPT_UI_LEFT || event->iptkey == IPT_UI_RIGHT)
+				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 				{
 					target->set_overlays_enabled(!target->overlays_enabled());
 					changed = TRUE;
@@ -3049,7 +3049,7 @@ static void menu_video_options(running_machine *machine, ui_menu *menu, void *pa
 				break;
 
 			case VIDEO_ITEM_BEZELS:
-				if (event->iptkey == IPT_UI_LEFT || event->iptkey == IPT_UI_RIGHT)
+				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 				{
 					target->set_bezels_enabled(!target->bezels_enabled());
 					changed = TRUE;
@@ -3057,7 +3057,7 @@ static void menu_video_options(running_machine *machine, ui_menu *menu, void *pa
 				break;
 
 			case VIDEO_ITEM_ZOOM:
-				if (event->iptkey == IPT_UI_LEFT || event->iptkey == IPT_UI_RIGHT)
+				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 				{
 					target->set_zoom_to_screen(!target->zoom_to_screen());
 					changed = TRUE;
@@ -3066,9 +3066,9 @@ static void menu_video_options(running_machine *machine, ui_menu *menu, void *pa
 
 			/* anything else is a view item */
 			default:
-				if (event->iptkey == IPT_UI_SELECT && (int)(FPTR)event->itemref >= VIDEO_ITEM_VIEW)
+				if (menu_event->iptkey == IPT_UI_SELECT && (int)(FPTR)menu_event->itemref >= VIDEO_ITEM_VIEW)
 				{
-					target->set_view((FPTR)event->itemref - VIDEO_ITEM_VIEW);
+					target->set_view((FPTR)menu_event->itemref - VIDEO_ITEM_VIEW);
 					changed = TRUE;
 				}
 				break;
@@ -3143,20 +3143,20 @@ static void menu_video_options_populate(running_machine *machine, ui_menu *menu,
 
 static void menu_crosshair(running_machine *machine, ui_menu *menu, void *parameter, void *state)
 {
-	const ui_menu_event *event;
+	const ui_menu_event *menu_event;
 
 	/* if the menu isn't built, populate now */
 	if (!ui_menu_populated(menu))
 		menu_crosshair_populate(machine, menu);
 
 	/* process the menu */
-	event = ui_menu_process(machine, menu, UI_MENU_PROCESS_LR_REPEAT);
+	menu_event = ui_menu_process(machine, menu, UI_MENU_PROCESS_LR_REPEAT);
 
 	/* handle events */
-	if (event != NULL && event->itemref != NULL)
+	if (menu_event != NULL && menu_event->itemref != NULL)
 	{
 		crosshair_user_settings settings;
-		crosshair_item_data *data = (crosshair_item_data *)event->itemref;
+		crosshair_item_data *data = (crosshair_item_data *)menu_event->itemref;
 		int changed = FALSE;
 		//int set_def = FALSE;
 		int newval = data->cur;
@@ -3164,7 +3164,7 @@ static void menu_crosshair(running_machine *machine, ui_menu *menu, void *parame
 		/* retreive the user settings */
 		crosshair_get_user_settings(machine, data->player, &settings);
 
-		switch (event->iptkey)
+		switch (menu_event->iptkey)
 		{
 			/* if selected, reset to default value */
 			case IPT_UI_SELECT:
@@ -3211,18 +3211,18 @@ static void menu_crosshair(running_machine *machine, ui_menu *menu, void *parame
 		/* crosshair graphic name */
 		if (data->type == CROSSHAIR_ITEM_PIC)
 		{
-			if (event->iptkey == IPT_UI_SELECT)
+			if (menu_event->iptkey == IPT_UI_SELECT)
 			{
 				/* clear the name string to reset to default crosshair */
 				settings.name[0] = 0;
 				changed = TRUE;
 			}
-			else if (event->iptkey == IPT_UI_LEFT)
+			else if (menu_event->iptkey == IPT_UI_LEFT)
 			{
 				strcpy(settings.name, data->last_name);
 				changed = TRUE;
 			}
-			else if (event->iptkey == IPT_UI_RIGHT)
+			else if (menu_event->iptkey == IPT_UI_RIGHT)
 			{
 				strcpy(settings.name, data->next_name);
 				changed = TRUE;
@@ -3424,7 +3424,7 @@ static void menu_quit_game(running_machine *machine, ui_menu *menu, void *parame
 static void menu_select_game(running_machine *machine, ui_menu *menu, void *parameter, void *state)
 {
 	select_game_state *menustate;
-	const ui_menu_event *event;
+	const ui_menu_event *menu_event;
 
 	/* if no state, allocate some */
 	if (state == NULL)
@@ -3443,17 +3443,17 @@ static void menu_select_game(running_machine *machine, ui_menu *menu, void *para
 	ui_input_pressed(machine, IPT_UI_PAUSE);
 
 	/* process the menu */
-	event = ui_menu_process(machine, menu, 0);
-	if (event != NULL && event->itemref != NULL)
+	menu_event = ui_menu_process(machine, menu, 0);
+	if (menu_event != NULL && menu_event->itemref != NULL)
 	{
-		/* reset the error on any future event */
+		/* reset the error on any future menu_event */
 		if (menustate->error)
 			menustate->error = FALSE;
 
 		/* handle selections */
-		else if (event->iptkey == IPT_UI_SELECT)
+		else if (menu_event->iptkey == IPT_UI_SELECT)
 		{
-			const game_driver *driver = (const game_driver *)event->itemref;
+			const game_driver *driver = (const game_driver *)menu_event->itemref;
 
 			/* special case for configure inputs */
 			if ((FPTR)driver == 1)
@@ -3489,19 +3489,19 @@ static void menu_select_game(running_machine *machine, ui_menu *menu, void *para
 		}
 
 		/* escape pressed with non-empty text clears the text */
-		else if (event->iptkey == IPT_UI_CANCEL && menustate->search[0] != 0)
+		else if (menu_event->iptkey == IPT_UI_CANCEL && menustate->search[0] != 0)
 		{
 			/* since we have already been popped, we must recreate ourself from scratch */
 			ui_menu_stack_push(ui_menu_alloc(menu->machine, menu->container, menu_select_game, NULL));
 		}
 
 		/* typed characters append to the buffer */
-		else if (event->iptkey == IPT_SPECIAL)
+		else if (menu_event->iptkey == IPT_SPECIAL)
 		{
 			int buflen = strlen(menustate->search);
 
 			/* if it's a backspace and we can handle it, do so */
-			if ((event->unichar == 8 || event->unichar == 0x7f) && buflen > 0)
+			if ((menu_event->unichar == 8 || menu_event->unichar == 0x7f) && buflen > 0)
 			{
 				*(char *)utf8_previous_char(&menustate->search[buflen]) = 0;
 				menustate->rerandomize = TRUE;
@@ -3509,9 +3509,9 @@ static void menu_select_game(running_machine *machine, ui_menu *menu, void *para
 			}
 
 			/* if it's any other key and we're not maxed out, update */
-			else if (event->unichar >= ' ' && event->unichar < 0x7f)
+			else if (menu_event->unichar >= ' ' && menu_event->unichar < 0x7f)
 			{
-				buflen += utf8_from_uchar(&menustate->search[buflen], ARRAY_LENGTH(menustate->search) - buflen, event->unichar);
+				buflen += utf8_from_uchar(&menustate->search[buflen], ARRAY_LENGTH(menustate->search) - buflen, menu_event->unichar);
 				menustate->search[buflen] = 0;
 				ui_menu_reset(menu, UI_MENU_RESET_SELECT_FIRST);
 			}
