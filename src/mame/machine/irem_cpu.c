@@ -232,8 +232,8 @@ const UINT8 dynablaster_decryption_table[256] = {
 
 /* note: mysticrib sound is identical revision to bbmanw sound code */
 const UINT8 mysticri_decryption_table[256] = {
-	xxxx,0x57,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, 0xbf,0x43,xxxx,xxxx,0xcd,xxxx,0xfc,xxxx, /* 00 */
-	                                                             /*?*/
+	xxxx,0x57,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, 0xbf,0x43,xxxx,xxxx,0xb3,xxxx,0xfc,xxxx, /* 00 */
+	                                                             /*r*/
 	xxxx,xxxx,xxxx,xxxx,xxxx,0x52,0xa3,0x26, xxxx,0xc7,xxxx,0x0f,xxxx,0x0c,xxxx,xxxx, /* 10 */
 	xxxx,xxxx,0xff,xxxx,xxxx,0x02,xxxx,xxxx, 0x2e,xxxx,0x5f,xxxx,xxxx,xxxx,0x73,0x50, /* 20 */
 	0xb2,0x3a,xxxx,xxxx,0xbb,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 30 */
@@ -246,10 +246,10 @@ const UINT8 mysticri_decryption_table[256] = {
 	                                   /*?*/
 	xxxx,0x8a,xxxx,0x55,xxxx,xxxx,xxxx,0xb4, 0x08,xxxx,0xf6,xxxx,xxxx,0x9d,xxxx,0xbc, /* A0 */
 	0x0b,0x00,xxxx,0x5e,xxxx,xxxx,xxxx,0x22, 0x36,0x4b,0x1e,xxxx,0xb6,0xba,0x23,xxxx, /* B0 */
-	     /*p*/                                    /*r*/
+	     /*r*/                                    /*r*/
 	0x20,xxxx,xxxx,xxxx,0x59,0x53,xxxx,0x04, 0x81,xxxx,xxxx,0xf3,xxxx,xxxx,0x3b,0x06, /* C0 */
 	0xe2,0x79,0x83,0x9c,xxxx,0x18,0x80,xxxx, 0xc3,xxxx,xxxx,xxxx,0x32,xxxx,0xcf,xxxx, /* D0 */
-	/*!*/
+	/*r*/
 	0xeb,xxxx,xxxx,0x33,xxxx,0xfa,xxxx,xxxx, 0xd2,xxxx,0x24,xxxx,0x74,0x41,0xb8,xxxx, /* E0 */
 	0x34,xxxx,0xd0,0x07,xxxx,xxxx,xxxx,xxxx, xxxx,0x46,xxxx,0xea,0xfe,0x78,xxxx,xxxx, /* F0 */
 	/*r*/               /*?*/

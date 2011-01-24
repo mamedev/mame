@@ -2224,7 +2224,7 @@ GAME( 1992, mysticri, 0,        mysticri,      mysticri, mysticri, ROT0,   "Irem
 GAME( 1992, gunhohki, mysticri, mysticri,      mysticri, mysticri, ROT0,   "Irem",         "Gun Hohki (Japan)", 0 )
 // cheaply produced Korean board, has original chips, but lacks any proper labels - uses older revision sound program that doesn't work in MAME right now
 // main code is also significantly different to the supported original set, so it might just be a legitimate early revision on a cheap board
-GAME( 1992, mysticrib,mysticri, mysticri,      mysticri, mysticri, ROT0,   "Irem",         "Mystic Riders (bootleg?)", GAME_IMPERFECT_SOUND )
+GAME( 1992, mysticrib,mysticri, mysticri,      mysticri, mysticri, ROT0,   "Irem",         "Mystic Riders (bootleg?)", 0)
 GAME( 1992, majtitl2, 0,        majtitl2,      majtitl2, majtitl2, ROT0,   "Irem",         "Major Title 2 (World)", 0 )
 GAME( 1992, majtitl2j,majtitl2, majtitl2,      majtitl2, majtitl2, ROT0,   "Irem",         "Major Title 2 (Japan)", 0 )
 GAME( 1992, skingame, majtitl2, majtitl2,      majtitl2, majtitl2, ROT0,   "Irem America", "The Irem Skins Game (US set 1)", 0 )
