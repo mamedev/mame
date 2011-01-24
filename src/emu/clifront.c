@@ -440,8 +440,16 @@ int cli_info_listsource(core_options *options, const char *gamename)
 
 int cli_info_listclones(core_options *options, const char *gamename)
 {
-	int drvindex, count = 0;
+	int drvindex, count = 0, drvcnt = 0;
 
+	for (drvindex = 0; drivers[drvindex] != NULL; drvindex++)
+	{
+		if (mame_strwildcmp(gamename, drivers[drvindex]->name) == 0)
+		{
+			drvcnt++;
+		}
+	}
+	if (drvcnt==0) return MAMERR_NO_SUCH_GAME;
 	/* iterate over drivers */
 	for (drvindex = 0; drivers[drvindex] != NULL; drvindex++)
 	{
@@ -461,8 +469,7 @@ int cli_info_listclones(core_options *options, const char *gamename)
 			}
 	}
 
-	/* return an error if none found */
-	return (count > 0) ? MAMERR_NONE : MAMERR_NO_SUCH_GAME;
+	return MAMERR_NONE;
 }
 
 
