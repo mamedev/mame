@@ -461,6 +461,21 @@ $(CPUOBJ)/h83002/h8periph.o:	$(CPUSRC)/h83002/h8periph.c \
 								$(CPUSRC)/h83002/h8priv.h
 
 #-------------------------------------------------
+# Hitachi HCD62121
+#-------------------------------------------------
+
+ifneq ($(filter HCD62121,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/hcd62121
+CPUOBJS += $(CPUOBJ)/hcd62121/hcd62121.o
+DASMOBJS += $(CPUOBJ)/hcd62121/hcd62121d.o
+endif
+
+$(CPUOBJ)/hcd62121/hcd62121.o:	$(CPUSRC)/hcd62121/hcd62121.c \
+							$(CPUSRC)/hcd62121/hcd62121.h \
+							$(CPUSRC)/hcd62121/hcd62121_ops.h
+
+
+#-------------------------------------------------
 # Hitachi SH1/SH2
 #-------------------------------------------------
 
