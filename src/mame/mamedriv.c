@@ -10242,7 +10242,8 @@ Other Sun games
 	DRIVER( kimbldhl )	/* (c) 198?, Kimble Ireland */
 	DRIVER( gtipoker )	/* (c) 1983 GTI Inc */
 	DRIVER( smshilo )	/* (c) 1983 SMS Manufacturing Corp. */
-	DRIVER( drhl )		/* (c) Drew, Inc. */
+	DRIVER( drhl )		/* (c) 1986 Drew, Inc. */
+	DRIVER( drhla )		/* (c) 1986 Drew, Inc. */
 	DRIVER( tpoker2 )	/* (c) 1993 Micro Manufacturing, Inc. */
 	DRIVER( ssjkrpkr )	/* (c) 1982 Southern Systems & Assembly, Ltd. */
 	DRIVER( fastdrwp )	/* Stern? */

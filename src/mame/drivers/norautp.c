@@ -39,7 +39,8 @@
    * Kimble Double HI-LO,                 198?,  Kimble Ireland.
    * GTI Poker,                           1983,  GTI Inc.
    * HI-LO Double Up Joker Poker,         1983,  SMS Manufacturing Corp.
-   * DRHL Poker (v.2.89),                 1986,  Drews Inc.
+   * Drews Revenge (v.2.89, set 1),       1986,  Drews Inc.
+   * Drews Revenge (v.2.89, set 2),       1986,  Drews Inc.
    * Turbo Poker 2,                       1993,  Micro Manufacturing, Inc.
    * Southern Systems Joker Poker,        1982,  Southern Systems & Assembly, Ltd.
    * Fast Draw (poker conversion kit)?,   198?,  Stern Electronics?
@@ -515,6 +516,12 @@
 
   - Added Southern Systems Joker Poker. Based on 8080 CPU.
   - Added some technical notes.
+
+
+  [2011-01-24]
+
+  - Changed DRHL description to "Drews Revenge (v.2.89, set 1)"
+  - Added Drews Revenge (v.2.89, set 2). Based on 8080 CPU.
 
 
   TODO:
@@ -3035,7 +3042,7 @@ ROM_END
 /*
 
   DRHL
-  poker looking board
+  Drews Revenge (poker)
 
   .u26  2732  stickered DRHL V2.89 U-26
   .u19  2732  stickered DRHL V2.89 U-19
@@ -3063,6 +3070,24 @@ ROM_START( drhl )
 	ROM_REGION( 0x0200,  "plds", 0 )	/* possible bad dump. fusemap's 1st half is all 1's and 2nd half 0's */
 	ROM_LOAD( "drhl_ampal16l8pc.u51",  0x0000, 0x0104, CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e) )
 ROM_END
+
+ROM_START( drhla )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dspd_j_v.2.89.u12", 0x0000, 0x1000, CRC(8ac3bcfa) SHA1(9cc7c4529e18e4b3f7dabd65388604631bda2cc4) )
+	ROM_LOAD( "dspd_j_v.2.89.u18", 0x1000, 0x1000, CRC(79b4c7af) SHA1(76abe5def47aaca17e5ec40f50841a12a1d8773b) )
+	ROM_LOAD( "dspd_j_v.2.89.u19", 0x2000, 0x1000, CRC(6cce9025) SHA1(57d2e22df5be96082c13a3c1bcd1bc11849a6997) )
+	ROM_LOAD( "dspd_j_v.2.89.u26", 0x3000, 0x1000, CRC(85be4d99) SHA1(96f067a5a3db6415929e71f3cf3c39614187ccec) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_LOAD( "drews.u31",  0x0000, 0x1000, CRC(bbc7c970) SHA1(9268a430764a5ea8ba7cd18944ec254a44d9dff2) )
+
+	ROM_REGION( 0x0800,  "dallas", 0 )	/* it's in fact NVRAM, but double sized... */
+	ROM_LOAD( "ds1220ab.u33",  0x0000, 0x0800, CRC(f357d314) SHA1(72791b2effd3ec2e98b735c9b215fc9abe3f5aea) )
+
+	ROM_REGION( 0x0200,  "plds", 0 )	/* this one is unprotected and seems ok */
+	ROM_LOAD( "pal16l8a.u51",  0x0000, 0x0104, CRC(4c98193f) SHA1(b6bdb6eef0d962a3aa4df0e23a8937a7e3210062) )
+ROM_END
+
 
 /*
 
@@ -3499,7 +3524,8 @@ GAME(  1983, dphljp,   0,       dphl,     norautp,  0,   ROT0, "<unknown>",     
 GAME(  198?, kimbldhl, 0,       kimbldhl, norautp,  0,   ROT0, "Kimble Ireland",              "Kimble Double HI-LO",              GAME_NOT_WORKING )
 GAME(  1983, gtipoker, 0,       dphl,     norautp,  0,   ROT0, "GTI Inc",                     "GTI Poker",                        GAME_NOT_WORKING )
 GAME(  1983, smshilo,  0,       dphla,    norautp,  0,   ROT0, "SMS Manufacturing Corp.",     "HI-LO Double Up Joker Poker",      GAME_NOT_WORKING )
-GAME(  1986, drhl,     0,       drhl,     norautp,  0,   ROT0, "Drews Inc.",                  "DRHL Poker (v.2.89)",              GAME_NOT_WORKING )
+GAME(  1986, drhl,     0,       drhl,     norautp,  0,   ROT0, "Drews Inc.",                  "Drews Revenge (v.2.89, set 1)",    GAME_NOT_WORKING )
+GAME(  1986, drhla,    0,       drhl,     norautp,  0,   ROT0, "Drews Inc.",                  "Drews Revenge (v.2.89, set 2)",    GAME_NOT_WORKING )
 GAME(  1982, ssjkrpkr, 0,       ssjkrpkr, norautp,  ssa, ROT0, "Southern Systems & Assembly", "Southern Systems Joker Poker",     GAME_NOT_WORKING )
 
 /* The following one also has a custom 68705 MCU */
