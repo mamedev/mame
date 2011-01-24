@@ -714,7 +714,7 @@ void discrete_device::init_nodes(const sound_block_list_t &block_list)
 					break;
 
 				/* Wavelog Node for debugging */
-				case DSO_WAVELOG:
+				case DSO_WAVLOG:
 					break;
 
 				/* Task processing */

@@ -982,8 +982,8 @@ DISCRETE_STEP(dst_rcfilter)
 
 		m_vCap += ((DST_RCFILTER__VIN - m_v_out) * m_exponent);
 		m_v_out = m_vCap + DST_RCFILTER__VREF;
-		set_output(0,  m_v_out);
 	}
+	set_output(0,  m_v_out);
 }
 
 
