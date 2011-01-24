@@ -1153,7 +1153,7 @@
                 case 0xf: /* BL */
                     if (insn & THUMB_BLOP_LO)
                     {
-                        addr = GET_REGISTER(cpustate, 14);
+                        addr = GET_REGISTER(cpustate, 14) & ~1;
                         addr += (insn & THUMB_BLOP_OFFS) << 1;
                         SET_REGISTER(cpustate, 14, (R15 + 2) | 1);
                         R15 = addr;
