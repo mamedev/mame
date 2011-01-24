@@ -1827,12 +1827,12 @@ static UINT8 cop_calculate_collsion_detection(running_machine *machine)
 		res &= ~2;
 
 	/* TODO: Legionnaire does collision detection via the other two regs,
-	         for now just implement a version that allows the player to spam flying kicks and hit everything else on the screen ;-) */
+             for now just implement a version that allows the player to spam flying kicks and hit everything else on the screen ;-) */
 	cop_hit_val_x = (res & 1) ? cop_collision_info[0].max_x - cop_collision_info[1].min_x : 0;
 	cop_hit_val_y = (res & 2) ? cop_collision_info[0].max_y - cop_collision_info[1].min_y : 0;
 
 	//if(res == 0)
-	//	printf("0:%08x %08x 1:%08x %08x\n",cop_collision_info[0].min_x,cop_collision_info[0].min_y,cop_collision_info[1].min_x,cop_collision_info[1].min_y);
+	//  printf("0:%08x %08x 1:%08x %08x\n",cop_collision_info[0].min_x,cop_collision_info[0].min_y,cop_collision_info[1].min_x,cop_collision_info[1].min_y);
 
 	return res;
 }
@@ -2129,12 +2129,12 @@ static WRITE16_HANDLER( generic_cop_w )
               word ^= 2
               byte ^= 3
             - some macro commands here have a commented algorythm, it's how Seibu Cup Bootleg version handles maths inside the 14/15 roms.
-			  The ROMs map tables in the following arrangement:
-			  0x00000 - 0x1ffff Sine math results
-			  0x20000 - 0x3ffff Cosine math results
-			  0x40000 - 0x7ffff Division math results
-			  0x80000 - 0xfffff Pythagorean theorem, hypotenuse length math results
-			  Surprisingly atan maths are nowhere to be found from the roms.
+              The ROMs map tables in the following arrangement:
+              0x00000 - 0x1ffff Sine math results
+              0x20000 - 0x3ffff Cosine math results
+              0x40000 - 0x7ffff Division math results
+              0x80000 - 0xfffff Pythagorean theorem, hypotenuse length math results
+              Surprisingly atan maths are nowhere to be found from the roms.
             */
 
 			/* "automatic" movement */
@@ -2164,16 +2164,16 @@ static WRITE16_HANDLER( generic_cop_w )
 			/* SINE math - 0x8100 */
 			/* FIXME: cop scale is unreliable */
 			/*
-				 00000-0ffff:
-				   amp = x/256
-				   ang = x & 255
-				   s = sin(ang*2*pi/256)
-				   val = trunc(s*amp)
-				   if(s<0)
-				     val--
-				   if(s == 192)
-				     val = -2*amp
-			*/
+                 00000-0ffff:
+                   amp = x/256
+                   ang = x & 255
+                   s = sin(ang*2*pi/256)
+                   val = trunc(s*amp)
+                   if(s<0)
+                     val--
+                   if(s == 192)
+                     val = -2*amp
+            */
 			if(COP_CMD(0xb9a,0xb88,0x888,0x000,0x000,0x000,0x000,0x000,7,0xfdfb))
 			{
 				int raw_angle = (space->read_word(cop_register[0]+(0x34^2)) & 0xff);
@@ -2191,16 +2191,16 @@ static WRITE16_HANDLER( generic_cop_w )
 			/* COSINE math - 0x8900 */
 			/* FIXME: cop scale is unreliable */
 			/*
-			 10000-1ffff:
-			   amp = x/256
-			   ang = x & 255
-			   s = cos(ang*2*pi/256)
-			   val = trunc(s*amp)
-			   if(s<0)
-			     val--
-			   if(s == 128)
-			     val = -2*amp
-			*/
+             10000-1ffff:
+               amp = x/256
+               ang = x & 255
+               s = cos(ang*2*pi/256)
+               val = trunc(s*amp)
+               if(s<0)
+                 val--
+               if(s == 128)
+                 val = -2*amp
+            */
 			if(COP_CMD(0xb9a,0xb8a,0x88a,0x000,0x000,0x000,0x000,0x000,7,0xfdfb))
 			{
 				int raw_angle = (space->read_word(cop_register[0]+(0x34^2)) & 0xff);
@@ -2259,11 +2259,11 @@ static WRITE16_HANDLER( generic_cop_w )
 			//07 | 4 | 007f | 3bb0 | f9c b9c b9c b9c b9c b9c b9c 99c
 			//(grainbow) | 4 | 007f | 3bb0 | f9c b9c b9c b9c b9c b9c b9c 99c
 			/*
-			 40000-7ffff:
-			   v1 = (x / 32768)*64
-			   v2 = (x & 255)*32767/255
-			   val = sqrt(v1*v1+v2*v2) (unsigned)
-			*/
+             40000-7ffff:
+               v1 = (x / 32768)*64
+               v2 = (x & 255)*32767/255
+               val = sqrt(v1*v1+v2*v2) (unsigned)
+            */
 			if(COP_CMD(0xf9c,0xb9c,0xb9c,0xb9c,0xb9c,0xb9c,0xb9c,0x99c,4,0x007f))
 			{
 				int dx = space->read_dword(cop_register[1]+4) - space->read_dword(cop_register[0]+4);
@@ -2280,15 +2280,15 @@ static WRITE16_HANDLER( generic_cop_w )
 
 			/* Division - 0x42c2 */
 			/*
-			 20000-2ffff:
-			   v1 = x / 1024
-			   v2 = x & 1023
-			   val = !v1 ? 32767 : trunc(v2/v1+0.5)
-			 30000-3ffff:
-			   v1 = x / 1024
-			   v2 = (x & 1023)*32
-			   val = !v1 ? 32767 : trunc(v2/v1+0.5)
-			*/
+             20000-2ffff:
+               v1 = x / 1024
+               v2 = x & 1023
+               val = !v1 ? 32767 : trunc(v2/v1+0.5)
+             30000-3ffff:
+               v1 = x / 1024
+               v2 = (x & 1023)*32
+               val = !v1 ? 32767 : trunc(v2/v1+0.5)
+            */
 			if(COP_CMD(0xf9a,0xb9a,0xb9c,0xb9c,0xb9c,0x29c,0x000,0x000,5,0xfcdd))
 			{
 				int div = space->read_word(cop_register[0]+(0x36^2));
@@ -2309,7 +2309,7 @@ static WRITE16_HANDLER( generic_cop_w )
                 int hitbox_param1 = space->read_dword(cop_register[2]);
                 int hitbox_param2 = space->read_dword(cop_register[3]);
 
-				TODO: we are ignoring the u1 / u2 params for now
+                TODO: we are ignoring the u1 / u2 params for now
             */
 
 			if(COP_CMD(0xb80,0xb82,0xb84,0xb86,0x000,0x000,0x000,0x000,u1,u2))
@@ -2384,7 +2384,7 @@ static WRITE16_HANDLER( generic_cop_w )
 				rel_xy = space->read_word(cop_sprite_dma_src + 4 + offs);
 
 				//if(rel_xy & 0x0706)
-				//	printf("sprite rel_xy = %04x\n",rel_xy);
+				//  printf("sprite rel_xy = %04x\n",rel_xy);
 
 				if(rel_xy & 1)
 					space->write_word(cop_register[4] + offs + 4,0xc0 + abs_x - (rel_xy & 0xf8));

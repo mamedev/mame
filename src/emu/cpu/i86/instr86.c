@@ -10,19 +10,19 @@
  * timing value should move to separate array
  */
 
-/* 
-	PHS - 2010-12-29
-	
-	Moved several instruction stubs so that they are compiled separately for 
-	the 8086 and 80186. The instructions affected are :
-	
-	_pop_ss, _es, _cs, _ss, _ds, _mov_sregw and _sti
-	
-	This is because they call the next instruction directly as it cannot be
-	interrupted. If they are not compiled separately when executing on an 
-	80186, the wrong set of instructions are used (the 8086 set). This has
-	the serious effect of ignoring the next instruction, as invalid, *IF* 
-	it is an 80186 specific instruction.
+/*
+    PHS - 2010-12-29
+
+    Moved several instruction stubs so that they are compiled separately for
+    the 8086 and 80186. The instructions affected are :
+
+    _pop_ss, _es, _cs, _ss, _ds, _mov_sregw and _sti
+
+    This is because they call the next instruction directly as it cannot be
+    interrupted. If they are not compiled separately when executing on an
+    80186, the wrong set of instructions are used (the 8086 set). This has
+    the serious effect of ignoring the next instruction, as invalid, *IF*
+    it is an 80186 specific instruction.
 
 */
 

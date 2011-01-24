@@ -10650,21 +10650,21 @@ Other Sun games
 	DRIVER(	dinoeggs )
 
 	/*
-		Atari Generation/System 1
-	*/
+        Atari Generation/System 1
+    */
 	DRIVER( atarians )
 	DRIVER( time2000 )
 	DRIVER( aavenger )
 	DRIVER( midearth )
 	DRIVER( spcrider )
 	/*
-		Atari Generation/System 2
-	*/
+        Atari Generation/System 2
+    */
 	DRIVER( supermap )
 	DRIVER( hercules )
 	/*
-		Atari Generation/System 3
-	*/
+        Atari Generation/System 3
+    */
 	DRIVER( roadrunr )
 
 	// bingo.c
@@ -10673,8 +10673,8 @@ Other Sun games
 	DRIVER( goldgam2 )
 
 	/*
-		Bally MPU AS-2518-17
-	*/
+        Bally MPU AS-2518-17
+    */
 	DRIVER( blackjck )
 	DRIVER( bowarrow )
 	DRIVER( eightbll )
@@ -10686,8 +10686,8 @@ Other Sun games
 	DRIVER( stk_sprs )
 
 	/*
-		Bally MPU AS-2518-35
-	*/
+        Bally MPU AS-2518-35
+    */
 	DRIVER( bullseye )
 	DRIVER( blakpyra )
 	DRIVER( bmx      )
@@ -10713,7 +10713,7 @@ Other Sun games
 	DRIVER( hglbtrtr )
 	DRIVER( hotdoggn )
 	DRIVER( kosteel  )
-	DRIVER( kiss 	 )
+	DRIVER( kiss	 )
 	DRIVER( lostwrlp )
 	DRIVER( medusa   )
 	DRIVER( m_mpac   )
@@ -10748,7 +10748,7 @@ Other Sun games
 	DRIVER( worlddef )
 	DRIVER( darkshad )
 	DRIVER( skflight )
-	DRIVER( cobrap 	 )
+	DRIVER( cobrap	 )
 	DRIVER( futrquen )
 	DRIVER( f1gpp    )
 	DRIVER( toppin   )
@@ -10760,13 +10760,13 @@ Other Sun games
 	DRIVER( suprbowl )
 
 	/*
-		Bally Kiss 8035 prototype
-	*/
+        Bally Kiss 8035 prototype
+    */
 	DRIVER( kissp	 )
 
 	/*
-		Bally MPU A084-91786-AH06 (6803)
-	*/
+        Bally MPU A084-91786-AH06 (6803)
+    */
 	DRIVER( atlantip )
 	DRIVER( beatclck )
 	DRIVER( blackblt )
@@ -10789,8 +10789,8 @@ Other Sun games
 	DRIVER( trucksp2 )
 
 	/*
-		Bally MPU AS-2518-133
-	*/
+        Bally MPU AS-2518-133
+    */
 	DRIVER( babypac  )
 	DRIVER( granny   )
 

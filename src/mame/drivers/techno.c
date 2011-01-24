@@ -1,5 +1,5 @@
 /*
-	Technoplay "2-2C 8008 LS" (68000 CPU)
+    Technoplay "2-2C 8008 LS" (68000 CPU)
 */
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
@@ -17,7 +17,7 @@ public:
 static ADDRESS_MAP_START( techno_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
-   	
+
 static INPUT_PORTS_START( techno )
 INPUT_PORTS_END
 
@@ -33,9 +33,9 @@ static MACHINE_CONFIG_START( techno, techno_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(techno_map)
-	
+
 	MCFG_MACHINE_RESET( techno )
-	
+
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END

@@ -2,34 +2,34 @@
 
     Gaelco 3D serial hardware
 
-	Couriersud, early 2010
+    Couriersud, early 2010
 
-	Not all lines are fully understood. There is some handshaking going
-	on on send which is not fully understood. Those wishing to have a look
-	at this:
+    Not all lines are fully understood. There is some handshaking going
+    on on send which is not fully understood. Those wishing to have a look
+    at this:
 
-	Serial send:          0x1fca (radikalb, 68020) 1866e (surfplnt)
-	Serial receive:       0x1908 (radikalb, 68020) 185ae
+    Serial send:          0x1fca (radikalb, 68020) 1866e (surfplnt)
+    Serial receive:       0x1908 (radikalb, 68020) 185ae
 
-	The receive is interrupt driven (interrupt 6) and the send is
-	initiated out of the normal program loop. There is the chance
-	of race conditions in mame.
+    The receive is interrupt driven (interrupt 6) and the send is
+    initiated out of the normal program loop. There is the chance
+    of race conditions in mame.
 
-	To run two instances of radikalb on *nix, use the following
+    To run two instances of radikalb on *nix, use the following
 
-	a) Uncomment SHARED_MEM_DRIVER below
-	b) Open two terminals
-	c) In terminal 1: mkdir /tmp/x1; cd /tmp/x1; /path/to/mame64 -np 2 -mt -rp /mnt/mame/romlib/r -inipath . radikalb -w -nomaximize -inipath .
-	d) In terminal 2: mkdir /tmp/x2; cd /tmp/x2; /path/to/mame64 -np 2 -mt -rp /mnt/mame/romlib/r -inipath . radikalb -w -nomaximize -inipath .
-	e) Set one instance to be master and one to be slave in service mode
-	f) Have fun
+    a) Uncomment SHARED_MEM_DRIVER below
+    b) Open two terminals
+    c) In terminal 1: mkdir /tmp/x1; cd /tmp/x1; /path/to/mame64 -np 2 -mt -rp /mnt/mame/romlib/r -inipath . radikalb -w -nomaximize -inipath .
+    d) In terminal 2: mkdir /tmp/x2; cd /tmp/x2; /path/to/mame64 -np 2 -mt -rp /mnt/mame/romlib/r -inipath . radikalb -w -nomaximize -inipath .
+    e) Set one instance to be master and one to be slave in service mode
+    f) Have fun
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "gaelco3d.h"
 
-//#define SHARED_MEM_DRIVER		 (1)
+//#define SHARED_MEM_DRIVER      (1)
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -47,7 +47,7 @@
 
 #define VERBOSE		(0)
 #if VERBOSE
-#define LOGMSG(x) 	logerror x
+#define LOGMSG(x)	logerror x
 #else
 #define LOGMSG(x)	do {} while (0);
 #endif
@@ -89,7 +89,7 @@ struct _buf_t
 typedef struct _shmem_t shmem_t;
 struct _shmem_t
 {
-	volatile INT32 	lock;
+	volatile INT32	lock;
 	buf_t				buf[2];
 };
 
@@ -504,7 +504,7 @@ static DEVICE_RESET( gaelco_serial )
 {
 	gaelco_serial_state *state = get_token(device);
 
-	state->status = GAELCOSER_STATUS_READY 	|GAELCOSER_STATUS_IRQ_ENABLE ;
+	state->status = GAELCOSER_STATUS_READY	|GAELCOSER_STATUS_IRQ_ENABLE ;
 
 	state->last_in_msg_cnt = -1;
 	state->slack_cnt = LINK_SLACK_B;
@@ -534,7 +534,7 @@ DEVICE_GET_INFO( gaelco_serial )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(gaelco_serial_state);	break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;							break;
-		//case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;		break;
+		//case DEVINFO_INT_CLASS:                           info->i = DEVICE_CLASS_PERIPHERAL;      break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(gaelco_serial);break;

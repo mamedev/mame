@@ -105,7 +105,7 @@ void sh4_dma_ddt(device_t *device, struct sh4_ddt_dma *s);
     COMPILER-SPECIFIC OPTIONS
 ***************************************************************************/
 
-#define SH4DRC_STRICT_VERIFY   	0x0001			/* verify all instructions */
+#define SH4DRC_STRICT_VERIFY	0x0001			/* verify all instructions */
 #define SH4DRC_FLUSH_PC			0x0002			/* flush the PC value before each memory access */
 #define SH4DRC_STRICT_PCREL		0x0004			/* do actual loads on MOVLI/MOVWI instead of collapsing to immediates */
 

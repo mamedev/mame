@@ -3,10 +3,10 @@
     upd7725.c
 
     Core implementation for the portable NEC uPD7725/uPD96050 emulator
- 
+
     Original by byuu in the public domain.
     MAME conversion by R. Belmont
- 
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -246,7 +246,7 @@ void necdsp_device::device_start()
 
 void necdsp_device::device_reset()
 {
-	for (unsigned i = 0; i <  2048; i++) 
+	for (unsigned i = 0; i <  2048; i++)
 	{
 		dataRAM[i] = 0x0000;
 	}
@@ -335,7 +335,7 @@ offs_t necdsp_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *o
 	return CPU_DISASSEMBLE_NAME(upd7725)(NULL, buffer, pc, oprom, opram, 0);
 }
 
-void necdsp_device::execute_run() 
+void necdsp_device::execute_run()
 {
     UINT32 opcode;
 
@@ -356,7 +356,7 @@ void necdsp_device::execute_run()
 		  case 2: exec_jp(opcode); break;
 		  case 3: exec_ld(opcode); break;
 		}
-	
+
 		INT32 result = (INT32)regs.k * regs.l;  //sign + 30-bit result
 		regs.m = result >> 15;  //store sign + top 15-bits
 		regs.n = result <<  1;  //store low 15-bits + zero
@@ -584,12 +584,12 @@ void necdsp_device::exec_ld(UINT32 opcode) {
 }
 
 UINT8 necdsp_device::snesdsp_read(bool mode) {
-	
+
 	if (!mode)
 	{
 		return regs.sr >> 8;
 	}
-	
+
 	if (regs.sr.drc == 0)
 	{
 		//16-bit
@@ -597,14 +597,14 @@ UINT8 necdsp_device::snesdsp_read(bool mode) {
 		{
 			regs.sr.drs = 1;
 			return regs.dr >> 0;
-		} 
-		else 
+		}
+		else
 		{
 			regs.sr.rqm = 0;
 			regs.sr.drs = 0;
 			return regs.dr >> 8;
 		}
-	} 
+	}
 	else
 	{
 		//8-bit
@@ -615,23 +615,23 @@ UINT8 necdsp_device::snesdsp_read(bool mode) {
 
 void necdsp_device::snesdsp_write(bool mode, UINT8 data) {
 	if (!mode) return;
-	
-	if (regs.sr.drc == 0) 
+
+	if (regs.sr.drc == 0)
 	{
 		//16-bit
 		if (regs.sr.drs == 0)
 		{
 			regs.sr.drs = 1;
 			regs.dr = (regs.dr & 0xff00) | (data << 0);
-		} 
-		else 
+		}
+		else
 		{
 			regs.sr.rqm = 0;
 			regs.sr.drs = 0;
 			regs.dr = (data << 8) | (regs.dr & 0x00ff);
 		}
-	} 
-	else 
+	}
+	else
 	{
 		//8-bit
 		regs.sr.rqm = 0;

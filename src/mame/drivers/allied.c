@@ -12,10 +12,10 @@ public:
 
 static ADDRESS_MAP_START( allied_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_RAM 
-	AM_RANGE(0x1400, 0x1fff) AM_ROM 
+	AM_RANGE(0x0000, 0x0fff) AM_RAM
+	AM_RANGE(0x1400, 0x1fff) AM_ROM
 ADDRESS_MAP_END
-   	
+
 static INPUT_PORTS_START( allied )
 INPUT_PORTS_END
 
@@ -31,15 +31,15 @@ static MACHINE_CONFIG_START( allied, allied_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6504, 3572549/4)
 	MCFG_CPU_PROGRAM_MAP(allied_map)
-	
+
 	MCFG_MACHINE_RESET( allied )
-	
+
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 ROM_START( allied )
-    ROM_REGION( 0x10000, "maincpu", 0 )	
+    ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "alliedu5.bin", 0x1400, 0x0400, CRC(e4fb64fb) SHA1(a3d9de7cbfb42180a860e0bbbeaeba96d8bd1e20))
 	ROM_LOAD( "alliedu6.bin", 0x1800, 0x0400, CRC(dca980dd) SHA1(3817d75413854d889fc1ce4fd6a51d820d1e0534))
 	ROM_LOAD( "alliedu3.bin", 0x1c00, 0x0400, CRC(13f42789) SHA1(baa0f73fda08a3c5d6f1423fb329e4febb07ef97))
@@ -57,7 +57,7 @@ ROM_END
 #define rom_circa33     rom_allied
 #define rom_starshot    rom_allied
 
-GAME(1977, 	allied, 	0, 			allied, allied, allied, ROT0, 	"Allied Leisure",				"Allied System", 				GAME_IS_BIOS_ROOT)
+GAME(1977,	allied, 	0,			allied, allied, allied, ROT0,	"Allied Leisure",				"Allied System",				GAME_IS_BIOS_ROOT)
 GAME(1977,	suprpick,	allied,		allied,	allied,	allied,	ROT0,	"Allied Leisure",				"Super Picker",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1977,	royclark,	allied,		allied,	allied,	allied,	ROT0,	"Fascination Int.",				"Roy Clark - The Entertainer",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1977,	thndbolt,	allied,		allied,	allied,	allied,	ROT0,	"Allied Leisure",				"Thunderbolt",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

@@ -580,7 +580,7 @@ PALETTE_INIT( blandia )
 			colortable_entry_set_value(machine->colortable, 0x1a00 + ((color << 6) | pen), 0x400 + pen);
 		}
 	}
-	
+
 	// setup the colortable for the effect palette.
 	// what are used for palette from 0x800 to 0xBFF?
 	for(int i = 0; i < 0x2200; i++)
@@ -714,9 +714,9 @@ static void set_pens(running_machine *machine)
 		else
 			palette_set_color(machine, i, color);
 	}
-	
+
 	if(state->paletteram2 != NULL)
-	{	
+	{
 		for (i = 0; i < state->paletteram2_size / 2; i++)
 		{
 			UINT16 data = state->paletteram2[i];
@@ -934,10 +934,10 @@ static void draw_tilemap_palette_effect(running_machine *machine, bitmap_t *bitm
 	int opaque_mask = gfx_tilemap->color_granularity - 1;
 	int pixel_effect_mask = gfx_tilemap->color_base + (gfx_tilemap->total_colors - 1) * gfx_tilemap->color_granularity;
 	int p;
-	
+
 	width_mask = src_bitmap->width - 1;
 	height_mask = src_bitmap->height - 1;
-	
+
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
 		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
@@ -953,7 +953,7 @@ static void draw_tilemap_palette_effect(running_machine *machine, bitmap_t *bitm
 			{
 				p = *BITMAP_ADDR16(src_bitmap, (y - scrolly - 256) & height_mask, (x - scrollx - 512) & width_mask);
 			}
-		
+
 			// draw not transparent pixels
 			if(p & opaque_mask)
 			{
@@ -1110,12 +1110,12 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 		if (order & 2)	// layer-sprite priority?
 		{
 			if (layers_ctrl & 8)	draw_sprites(screen->machine,bitmap,cliprect);
-			
+
 			if(order & 4)
 			{
 				popmessage("Missing palette effect. Contact MAMETesters.");
 			}
-				
+
 			if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->tilemap_0, 0, 0);
 			if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->tilemap_1, 0, 0);
 		}
@@ -1125,10 +1125,10 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 			{
 				popmessage("Missing palette effect. Contact MAMETesters.");
 			}
-				
+
 			if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->tilemap_0,  0, 0);
 			if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->tilemap_1,  0, 0);
-			
+
 			if (layers_ctrl & 8)	draw_sprites(screen->machine, bitmap,cliprect);
 		}
 	}
@@ -1158,7 +1158,7 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 				{
 					popmessage("Missing palette effect. Contact MAMETesters.");
 				}
-				
+
 				if (state->tilemap_2)
 				{
 					if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->tilemap_2, 0, 0);
@@ -1192,7 +1192,7 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 					if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->tilemap_3, 0, 0);
 				}
 			}
-				
+
 			if (layers_ctrl & 8)	draw_sprites(screen->machine, bitmap,cliprect);
 		}
 	}

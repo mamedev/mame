@@ -6,54 +6,54 @@
     Preliminary, partially functional driver by Jonathan Gevaryahu
     AKA Lord Nightmare
 
-	TODO:
-	* The entire NOISE generator is just copied from exidy.c and is completely
-	 wrong. It should be using an MM5837 self-clocked LFSR with taps on bits
-	 16(0x10) and 13(0xD)
-	* The entire audio 6522 VIA isn't even HANDLED in this driver yet, hence
-	 the sound channel provided by the VIA is completely missing! (it is
-	 handled in /machine/beezer.c as via 1 at the moment)
-	* Related to above, the hookup of timer1 out (from pb7 of 6522) isn't done
-	 which means selectively latched noise cannot work properly.
-	* Several inexplicable things on the schematic are not handled, such as the
-	 'VCO' input for 6840 channel 2 external clock whose source does not appear
-	 anywhere on the schematic, nor does it handle the 'DMOD DATA' and 'DMOD
-	 CLR' outputs for some sort of digital modulator (perhaps an hc55516?)
-	 from the VIA, which also does not appear anywhere on schematic.
-	 The latter the VIA *DOES* seem to write something to, but it may be just
-	 a silence waveform for 55516, alternating zeroes and ones.
-	* The volume dac ram values could be handled better, currently the MSB bit
-	 is just thrown out; it should invert the waveform.
-	* The channel mixing is done additively at the moment rather than
-	 emulating the original multiplexer, which is actually not that hard to do
-	* The 'FM OR AM' output of the audio via (pb1) appears to control some sort
-	 of suppression or filtering change of the post-DAC amplifier when enabled,
-	 only during the TIMER1 OUT time-slot of the multiplexer, see page 1B 3-3
-	 of schematics. This will be a MESS to emulate since theres a lot of analog
-	 crap involved.
-	* The /INT line and related logic of the 6840 is not emulated, and should
-	 be hooked to the audio 6809
-	* Convert this to a modern device instead of a deprecated old style device
+    TODO:
+    * The entire NOISE generator is just copied from exidy.c and is completely
+     wrong. It should be using an MM5837 self-clocked LFSR with taps on bits
+     16(0x10) and 13(0xD)
+    * The entire audio 6522 VIA isn't even HANDLED in this driver yet, hence
+     the sound channel provided by the VIA is completely missing! (it is
+     handled in /machine/beezer.c as via 1 at the moment)
+    * Related to above, the hookup of timer1 out (from pb7 of 6522) isn't done
+     which means selectively latched noise cannot work properly.
+    * Several inexplicable things on the schematic are not handled, such as the
+     'VCO' input for 6840 channel 2 external clock whose source does not appear
+     anywhere on the schematic, nor does it handle the 'DMOD DATA' and 'DMOD
+     CLR' outputs for some sort of digital modulator (perhaps an hc55516?)
+     from the VIA, which also does not appear anywhere on schematic.
+     The latter the VIA *DOES* seem to write something to, but it may be just
+     a silence waveform for 55516, alternating zeroes and ones.
+    * The volume dac ram values could be handled better, currently the MSB bit
+     is just thrown out; it should invert the waveform.
+    * The channel mixing is done additively at the moment rather than
+     emulating the original multiplexer, which is actually not that hard to do
+    * The 'FM OR AM' output of the audio via (pb1) appears to control some sort
+     of suppression or filtering change of the post-DAC amplifier when enabled,
+     only during the TIMER1 OUT time-slot of the multiplexer, see page 1B 3-3
+     of schematics. This will be a MESS to emulate since theres a lot of analog
+     crap involved.
+    * The /INT line and related logic of the 6840 is not emulated, and should
+     be hooked to the audio 6809
+    * Convert this to a modern device instead of a deprecated old style device
 
 
-	Notes on multiplexer:
-	The sound output is from a DAC76xx 8-bit dac; driving this dac is a pair
-	 of 74ls670 4x4 register files wired up as four 8-bit words;
-	 The four words are used as the volumes for four 1-bit channels by inversion
-	 of the MSB of the 8 bit value.
-	The four channels are:
-	CNT1 CNT0
-	0    0    6522 pin 7 output (squarewave) NOT EMULATED YET; 'FM or AM'
-	           affects this slot only
-	0    1    6840 channel 1 clocked by E1(int) OR by 6522 PB7-latched NOISE
-	1    0    6840 channel 2 clocked by E1(int) OR by "VCO" ext (Huh?)
-	1    1    6840 channel 3 clocked by E1(int) OR by channel 2-latched NOISE
-	
-	The four slots determine which address is selected of the 8-bit words and
-	 which source will XOR against the MSB of the 8-bit word before it goes
-	 to the DAC (effectively making the 8-bit word be a 7-bit volume control
-	 plus optional wave invert). The speed which cnt0 and cnt1 count at is
-	 E1/16 or 62500Hz.
+    Notes on multiplexer:
+    The sound output is from a DAC76xx 8-bit dac; driving this dac is a pair
+     of 74ls670 4x4 register files wired up as four 8-bit words;
+     The four words are used as the volumes for four 1-bit channels by inversion
+     of the MSB of the 8 bit value.
+    The four channels are:
+    CNT1 CNT0
+    0    0    6522 pin 7 output (squarewave) NOT EMULATED YET; 'FM or AM'
+               affects this slot only
+    0    1    6840 channel 1 clocked by E1(int) OR by 6522 PB7-latched NOISE
+    1    0    6840 channel 2 clocked by E1(int) OR by "VCO" ext (Huh?)
+    1    1    6840 channel 3 clocked by E1(int) OR by channel 2-latched NOISE
+
+    The four slots determine which address is selected of the 8-bit words and
+     which source will XOR against the MSB of the 8-bit word before it goes
+     to the DAC (effectively making the 8-bit word be a 7-bit volume control
+     plus optional wave invert). The speed which cnt0 and cnt1 count at is
+     E1/16 or 62500Hz.
 
 *************************************************************************/
 
@@ -148,8 +148,8 @@ INLINE beezer_sound_state *get_safe_token(device_t *device)
 
 /*static WRITE_LINE_DEVICE_HANDLER( update_irq_state )
 {
-	beezer_sound_state *sndstate = get_safe_token(device);
-	cputag_set_input_line(device->machine, "audiocpu", M6809_IRQ_LINE, (sndstate->ptm_irq_state) ? ASSERT_LINE : CLEAR_LINE);
+    beezer_sound_state *sndstate = get_safe_token(device);
+    cputag_set_input_line(device->machine, "audiocpu", M6809_IRQ_LINE, (sndstate->ptm_irq_state) ? ASSERT_LINE : CLEAR_LINE);
 }*/
 
 
@@ -352,7 +352,7 @@ static STREAM_UPDATE( beezer_stream_update )
 				sample += (state->sh6840_volume[2]&0x7F);
 			else
 				sample -= (state->sh6840_volume[2]&0x7F);
-			
+
 			/* generate channel 1-clocked noise if configured to do so */
 			if (noisy != 0)
 				noise_clocks_this_sample = sh6840_update_noise(state, t->clocks - chan1_clocks);

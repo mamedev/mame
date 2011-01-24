@@ -1407,15 +1407,15 @@ static WRITE16_HANDLER( mgdha_magic_w )
 
 		default:
 /*
-			04aba0: warning, writing to igs_magic 08 = d0
-			04abb0: warning, writing to igs_magic 09 = 76
-			04abc0: warning, writing to igs_magic 0a = 97
-			04abd0: warning, writing to igs_magic 0b = bf
-			04abe0: warning, writing to igs_magic 0c = ff
-			04abf0: warning, writing to igs_magic 04 = 3f
-			04ac00: warning, writing to igs_magic 05 = 82
-			04ac10: warning, writing to igs_magic 06 = ff
-			04ac20: warning, writing to igs_magic 07 = 3f
+            04aba0: warning, writing to igs_magic 08 = d0
+            04abb0: warning, writing to igs_magic 09 = 76
+            04abc0: warning, writing to igs_magic 0a = 97
+            04abd0: warning, writing to igs_magic 0b = bf
+            04abe0: warning, writing to igs_magic 0c = ff
+            04abf0: warning, writing to igs_magic 04 = 3f
+            04ac00: warning, writing to igs_magic 05 = 82
+            04ac10: warning, writing to igs_magic 06 = ff
+            04ac20: warning, writing to igs_magic 07 = 3f
 */
 			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", cpu_get_pc(space->cpu), igs_magic[0], data);
 	}
@@ -1455,7 +1455,7 @@ static ADDRESS_MAP_START( mgdha_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x876002, 0x876003) AM_READ ( mgdha_magic_r )
 	AM_RANGE(0xa02000, 0xa02fff) AM_READWRITE( spriteram_lsb_r, spriteram_lsb_w ) AM_BASE_GENERIC( spriteram )
 	AM_RANGE(0xa03000, 0xa037ff) AM_RAM_WRITE( sdmg2_paletteram_xRRRRRGGGGGBBBBB_w ) AM_BASE_GENERIC( paletteram )
-//	AM_RANGE(0xa04014, 0xa04015) // written with FF at boot
+//  AM_RANGE(0xa04014, 0xa04015) // written with FF at boot
 	AM_RANGE(0xa04020, 0xa04027) AM_DEVREAD8( "ppi8255", ppi8255_r, 0x00ff )
 	AM_RANGE(0xa04024, 0xa04025) AM_WRITE( video_disable_lsb_w )
 	AM_RANGE(0xa04028, 0xa04029) AM_WRITE( irq2_enable_w )

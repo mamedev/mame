@@ -58,7 +58,7 @@ Glitch list!
     LeagueMan:
         Raster effects don't work properly (not even cpu time per line?).
 
-	(0.141 update: at least following two seems fixed from a lot of time ... -AS)
+    (0.141 update: at least following two seems fixed from a lot of time ... -AS)
     Perfect Soliders:
         Shortly into the fight, the sound CPU enters a tight loop, continuously
         writing to the status port and with interrupts disabled. I don't see how

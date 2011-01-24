@@ -1,9 +1,9 @@
 /*
-	Midway A084-91313-G627
-		   A080-91313-G627 
-		   A082-91320-C000
-		   
-	Only one of it's kind
+    Midway A084-91313-G627
+           A080-91313-G627
+           A082-91320-C000
+
+    Only one of it's kind
 */
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -21,7 +21,7 @@ public:
 static ADDRESS_MAP_START( g627_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
-   	
+
 static INPUT_PORTS_START( g627 )
 INPUT_PORTS_END
 
@@ -37,9 +37,9 @@ static MACHINE_CONFIG_START( g627, g627_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 14138000/8)
 	MCFG_CPU_PROGRAM_MAP(g627_map)
-	
+
 	MCFG_MACHINE_RESET( g627 )
-	
+
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END

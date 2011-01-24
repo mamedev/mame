@@ -1,6 +1,6 @@
 /*
-	Stern MP-100 MPU	
-	(almost identical to Bally MPU-17)
+    Stern MP-100 MPU
+    (almost identical to Bally MPU-17)
 */
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
@@ -18,7 +18,7 @@ public:
 static ADDRESS_MAP_START( st_mp100_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
-   	
+
 static INPUT_PORTS_START( st_mp100 )
 INPUT_PORTS_END
 
@@ -34,9 +34,9 @@ static MACHINE_CONFIG_START( st_mp100, st_mp100_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 1000000)
 	MCFG_CPU_PROGRAM_MAP(st_mp100_map)
-	
+
 	MCFG_MACHINE_RESET( st_mp100 )
-	
+
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END

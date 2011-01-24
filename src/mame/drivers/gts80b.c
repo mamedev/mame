@@ -1,7 +1,7 @@
 /*
-    
-	Gottlieb System 80B
-	
+
+    Gottlieb System 80B
+
 */
 
 #include "emu.h"
@@ -23,7 +23,7 @@ static ADDRESS_MAP_START( gts80b_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3000, 0x3fff) AM_MIRROR(0xc000) AM_ROM	/* u3 ROM */
 ADDRESS_MAP_END
 
-   	
+
 static INPUT_PORTS_START( gts80b )
 INPUT_PORTS_END
 
@@ -42,9 +42,9 @@ static MACHINE_CONFIG_START( gts80b_s, gts80b_state )
 	MCFG_CPU_PROGRAM_MAP(gts80b_map)
 
 	MCFG_MACHINE_RESET( gts80b )
-	
+
 	/* related to src/mame/audio/gottlieb.c */
-//	MCFG_IMPORT_FROM(gts80s_s)
+//  MCFG_IMPORT_FROM(gts80s_s)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
@@ -56,9 +56,9 @@ static MACHINE_CONFIG_START( gts80b_s1, gts80b_state )
 	MCFG_CPU_PROGRAM_MAP(gts80b_map)
 
 	MCFG_MACHINE_RESET( gts80b )
-	
+
 	/* related to src/mame/audio/gottlieb.c? */
-//	MCFG_IMPORT_FROM(gts80s_b1)
+//  MCFG_IMPORT_FROM(gts80s_b1)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
@@ -70,9 +70,9 @@ static MACHINE_CONFIG_START( gts80b_s2, gts80b_state )
 	MCFG_CPU_PROGRAM_MAP(gts80b_map)
 
 	MCFG_MACHINE_RESET( gts80b )
-	
+
 	/* related to src/mame/audio/gottlieb.c? */
-//	MCFG_IMPORT_FROM(gts80s_b2)
+//  MCFG_IMPORT_FROM(gts80s_b2)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
@@ -84,9 +84,9 @@ static MACHINE_CONFIG_START( gts80b_s3, gts80b_state )
 	MCFG_CPU_PROGRAM_MAP(gts80b_map)
 
 	MCFG_MACHINE_RESET( gts80b )
-	
+
 	/* related to src/mame/audio/gottlieb.c? */
-//	MCFG_IMPORT_FROM(gts80s_b3)
+//  MCFG_IMPORT_FROM(gts80s_b3)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
@@ -98,9 +98,9 @@ static MACHINE_CONFIG_START( bonebstr, gts80b_state )
 	MCFG_CPU_PROGRAM_MAP(gts80b_map)
 
 	MCFG_MACHINE_RESET( gts80b )
-	
+
 	/* related to src/mame/audio/gottlieb.c? */
-//	MCFG_IMPORT_FROM(gts80s_b3a)
+//  MCFG_IMPORT_FROM(gts80s_b3a)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)

@@ -226,7 +226,7 @@ WRITE16_MEMBER(raiden2_state::cop_pgm_data_w)
 			logerror("?\n");
 			break;
 		}
-	}       
+	}
 }
 
 WRITE16_MEMBER(raiden2_state::cop_pgm_addr_w)
@@ -301,10 +301,10 @@ WRITE16_MEMBER(raiden2_state::cop_dma_trigger_w)
 	switch(cop_dma_mode) {
 	case 0x14: {
 		/* TODO: this transfers the whole VRAM, not only spriteram!
-		   For whatever reason, this stopped working as soon as I've implemented DMA slot concept.
-		   Raiden 2 uses this DMA with cop_dma_dst == 0xfffe, effectively changing the order of the uploaded VRAMs.
-		   Also the size is used for doing a sprite limit trickery.
-		*/
+           For whatever reason, this stopped working as soon as I've implemented DMA slot concept.
+           Raiden 2 uses this DMA with cop_dma_dst == 0xfffe, effectively changing the order of the uploaded VRAMs.
+           Also the size is used for doing a sprite limit trickery.
+        */
 		static int rsize = ((0x80 - cop_dma_size[cop_dma_mode]) & 0x7f) +1;
 
 		sprites_cur_start = 0x1000 - (rsize << 5);
@@ -547,17 +547,17 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 	}
 
 	case 0x5205:   // 5205 0006 fff7 0050 - 0180 02e0 03a0 00a0 03a0 0000 0000 0000
-		//		fprintf(stderr, "sprcpt 5205 %04x %04x %04x %08x %08x\n", cop_regs[0], cop_regs[1], cop_regs[3], space.read_dword(cop_regs[0]), space.read_dword(cop_regs[3]));
+		//      fprintf(stderr, "sprcpt 5205 %04x %04x %04x %08x %08x\n", cop_regs[0], cop_regs[1], cop_regs[3], space.read_dword(cop_regs[0]), space.read_dword(cop_regs[3]));
 		space.write_dword(cop_regs[1], space.read_dword(cop_regs[0]));
 		break;
 
 	case 0x5a05:   // 5a05 0006 fff7 0058 - 0180 02e0 03a0 00a0 03a0 0000 0000 0000
-		//		fprintf(stderr, "sprcpt 5a05 %04x %04x %04x %08x %08x\n", cop_regs[0], cop_regs[1], cop_regs[3], space.read_dword(cop_regs[0]), space.read_dword(cop_regs[3]));
+		//      fprintf(stderr, "sprcpt 5a05 %04x %04x %04x %08x %08x\n", cop_regs[0], cop_regs[1], cop_regs[3], space.read_dword(cop_regs[0]), space.read_dword(cop_regs[3]));
 		space.write_dword(cop_regs[1], space.read_dword(cop_regs[0]));
 		break;
 
 	case 0xf205:   // f205 0006 fff7 00f0 - 0182 02e0 03c0 00c0 03c0 0000 0000 0000
-		//		fprintf(stderr, "sprcpt f205 %04x %04x %04x %08x %08x\n", cop_regs[0]+4, cop_regs[1], cop_regs[3], space.read_dword(cop_regs[0]+4), space.read_dword(cop_regs[3]));
+		//      fprintf(stderr, "sprcpt f205 %04x %04x %04x %08x %08x\n", cop_regs[0]+4, cop_regs[1], cop_regs[3], space.read_dword(cop_regs[0]+4), space.read_dword(cop_regs[3]));
 		space.write_dword(cop_regs[2], space.read_dword(cop_regs[0]+4));
 		break;
 
@@ -1186,8 +1186,8 @@ WRITE16_MEMBER(raiden2_state::sprite_prot_dst2_w)
 
 /* MEMORY MAPS */
 static ADDRESS_MAP_START( raiden2_cop_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state )
-//	AM_RANGE(0x0041c, 0x0041d) AM_WRITENOP // angle compare (for 0x6200 COP macro)
-//	AM_RANGE(0x0041e, 0x0041f) AM_WRITENOP // angle mod value (for 0x6200 COP macro)
+//  AM_RANGE(0x0041c, 0x0041d) AM_WRITENOP // angle compare (for 0x6200 COP macro)
+//  AM_RANGE(0x0041e, 0x0041f) AM_WRITENOP // angle mod value (for 0x6200 COP macro)
 	AM_RANGE(0x00420, 0x00421) AM_WRITE(cop_itoa_low_w)
 	AM_RANGE(0x00422, 0x00423) AM_WRITE(cop_itoa_high_w)
 	AM_RANGE(0x00424, 0x00425) AM_WRITE(cop_itoa_digit_count_w)
@@ -1213,7 +1213,7 @@ static ADDRESS_MAP_START( raiden2_cop_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_st
 	AM_RANGE(0x004c0, 0x004c9) AM_READWRITE(cop_reg_low_r, cop_reg_low_w)
 	AM_RANGE(0x00500, 0x00505) AM_WRITE(cop_cmd_w)
 	AM_RANGE(0x00580, 0x00581) AM_READ(cop_collision_status_r)
-//	AM_RANGE(0x00588, 0x00589) AM_READ(cop_collision_status2_r) // used by Zero Team (only this, why?)
+//  AM_RANGE(0x00588, 0x00589) AM_READ(cop_collision_status2_r) // used by Zero Team (only this, why?)
 	AM_RANGE(0x00590, 0x00599) AM_READ(cop_itoa_digits_r)
 	AM_RANGE(0x005b0, 0x005b1) AM_READ(cop_status_r)
 	AM_RANGE(0x005b2, 0x005b3) AM_READ(cop_dist_r)
@@ -1278,7 +1278,7 @@ static ADDRESS_MAP_START( raidendx_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state
 	AM_RANGE(0x004d0, 0x004d7) AM_RAM //???
 	AM_RANGE(0x0062c, 0x0062d) AM_WRITE(tilemap_enable_w)
 	AM_RANGE(0x00610, 0x0061b) AM_WRITE(tile_scroll_w)
-//	AM_RANGE(0x006ca, 0x006cb) AM_WRITENOP
+//  AM_RANGE(0x006ca, 0x006cb) AM_WRITENOP
 	AM_IMPORT_FROM( raiden2_mem )
 ADDRESS_MAP_END
 

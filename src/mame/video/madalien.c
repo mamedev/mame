@@ -278,10 +278,10 @@ static VIDEO_UPDATE( madalien )
 	draw_foreground(screen->machine, bitmap, cliprect, flip);
 
 	/* highlight section A (outside of tunnels).
-	 * also, bit 1 of the madalien_video_flags register (6A) is 
-	 * combined with the headlight signal through NOR gate 1A,
-	 * which is used to light up the tunnel when an alien explodes
-	*/
+     * also, bit 1 of the madalien_video_flags register (6A) is
+     * combined with the headlight signal through NOR gate 1A,
+     * which is used to light up the tunnel when an alien explodes
+    */
 	if (scroll_mode != 1 || *madalien_video_flags & 2)
 	{
 		int x;

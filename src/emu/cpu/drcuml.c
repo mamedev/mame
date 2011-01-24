@@ -127,7 +127,7 @@ drcbe_interface::drcbe_interface(drcuml_state &drcuml, drc_cache &cache, device_
 				m_space[spacenum]->accessors(m_accessors[spacenum]);
 		}
 }
-	
+
 
 //-------------------------------------------------
 //  ~drcbe_interface - destructor
@@ -150,9 +150,9 @@ drcbe_interface::~drcbe_interface()
 drcuml_state::drcuml_state(device_t &device, drc_cache &cache, UINT32 flags, int modes, int addrbits, int ignorebits)
 	: m_device(device),
 	  m_cache(cache),
-	  m_beintf((flags & DRCUML_OPTION_USE_C) ? 
-	  		*static_cast<drcbe_interface *>(auto_alloc(device.machine, drcbe_c(*this, device, cache, flags, modes, addrbits, ignorebits))) : 
-	  		*static_cast<drcbe_interface *>(auto_alloc(device.machine, drcbe_native(*this, device, cache, flags, modes, addrbits, ignorebits)))),
+	  m_beintf((flags & DRCUML_OPTION_USE_C) ?
+			*static_cast<drcbe_interface *>(auto_alloc(device.machine, drcbe_c(*this, device, cache, flags, modes, addrbits, ignorebits))) :
+			*static_cast<drcbe_interface *>(auto_alloc(device.machine, drcbe_native(*this, device, cache, flags, modes, addrbits, ignorebits)))),
 	  m_umllog(NULL),
 	  m_blocklist(device.machine->m_respool),
 	  m_symlist(device.machine->m_respool)
@@ -179,7 +179,7 @@ drcuml_state::~drcuml_state()
 
 
 //-------------------------------------------------
-//  reset - reset the state completely, flushing 
+//  reset - reset the state completely, flushing
 //  the cache and all information
 //-------------------------------------------------
 
@@ -199,15 +199,15 @@ void drcuml_state::reset()
 		m_beintf.reset();
 
 		// do a one-time validation if requested
-/*		if (VALIDATE_BACKEND)
-		{
-			static bool validated = false;
-			if (!validated)
-			{
-				validated = true;
-				validate_backend(this);
-			}
-		}*/
+/*      if (VALIDATE_BACKEND)
+        {
+            static bool validated = false;
+            if (!validated)
+            {
+                validated = true;
+                validate_backend(this);
+            }
+        }*/
 	}
 	catch (drcuml_block::abort_compilation &)
 	{
@@ -232,7 +232,7 @@ drcuml_block *drcuml_state::begin_block(UINT32 maxinst)
 	if (bestblock == NULL)
 		bestblock = &m_blocklist.append(*auto_alloc(m_device.machine, drcuml_block(*this, maxinst * 3/2)));
 
-	// start the block	
+	// start the block
 	bestblock->begin();
 	return bestblock;
 }
@@ -250,7 +250,7 @@ code_handle *drcuml_state::handle_alloc(const char *name)
 
 
 //-------------------------------------------------
-//  symbol_add - add a symbol to the internal 
+//  symbol_add - add a symbol to the internal
 //  symbol table
 //-------------------------------------------------
 
@@ -261,7 +261,7 @@ void drcuml_state::symbol_add(void *base, UINT32 length, const char *name)
 
 
 //-------------------------------------------------
-//  symbol_find - look up a symbol from the 
+//  symbol_find - look up a symbol from the
 //  internal symbol table or return NULL if not
 //  found
 //-------------------------------------------------
@@ -290,7 +290,7 @@ const char *drcuml_state::symbol_find(void *base, UINT32 *offset)
 
 
 //-------------------------------------------------
-//  log_printf - directly printf to the UML log 
+//  log_printf - directly printf to the UML log
 //  if generated
 //-------------------------------------------------
 
@@ -353,7 +353,7 @@ void drcuml_block::begin()
 
 
 //-------------------------------------------------
-//  end - complete a code block and commit it to 
+//  end - complete a code block and commit it to
 //  the cache via the back-end
 //-------------------------------------------------
 
@@ -402,13 +402,13 @@ uml::instruction &drcuml_block::append()
 	instruction &curinst = m_inst[m_nextinst++];
 	if (m_nextinst > m_maxinst)
 		fatalerror("Overran maxinst in drcuml_block_append");
-	
+
 	return curinst;
 }
 
 
 //-------------------------------------------------
-//  comment - attach a comment to the current 
+//  comment - attach a comment to the current
 //  output location in the specified block
 //-------------------------------------------------
 
@@ -433,7 +433,7 @@ void drcuml_block::append_comment(const char *format, ...)
 
 
 //-------------------------------------------------
-//  optimize - apply various optimizations to a 
+//  optimize - apply various optimizations to a
 //  block of code
 //-------------------------------------------------
 
@@ -480,7 +480,7 @@ void drcuml_block::optimize()
 
 
 //-------------------------------------------------
-//  disassemble - disassemble a block of 
+//  disassemble - disassemble a block of
 //  instructions to the log
 //-------------------------------------------------
 
@@ -488,7 +488,7 @@ void drcuml_block::disassemble()
 {
 	astring comment;
 	astring dasm;
-	
+
 	// iterate over instructions and output
 	int firstcomment = -1;
 	for (int instnum = 0; instnum < m_nextinst; instnum++)

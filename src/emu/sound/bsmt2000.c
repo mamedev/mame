@@ -139,7 +139,7 @@ device_t *bsmt2000_device_config::alloc_device(running_machine &machine) const
 
 
 //-------------------------------------------------
-//  static_set_ready_callback - configuration 
+//  static_set_ready_callback - configuration
 //  helper to set the ready callback
 //-------------------------------------------------
 
@@ -228,7 +228,7 @@ void bsmt2000_device::device_start()
 	// internally at 24MHz the max output sample rate is 32kHz
 	// divided by 128 gives us 6x the max output rate which is plenty for oversampling
 	m_stream = stream_create(*this, 0, 2, clock() / 128);
-	
+
 	// register for save states
 	state_save_register_device_item(this, 0, m_register_select);
 	state_save_register_device_item(this, 0, m_write_data);
@@ -264,12 +264,12 @@ void bsmt2000_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			stream_update(m_stream);
 			m_cpu->reset();
 			break;
-	
+
 		// deferred register write
 		case TIMER_ID_REG_WRITE:
 			m_register_select = param & 0xffff;
 			break;
-		
+
 		// deferred data write
 		case TIMER_ID_DATA_WRITE:
 			m_write_data = param & 0xffff;
@@ -307,7 +307,7 @@ UINT16 bsmt2000_device::read_status()
 
 
 //-------------------------------------------------
-//  write_reg - handle writes to the BSMT2000 
+//  write_reg - handle writes to the BSMT2000
 //  register select interface
 //-------------------------------------------------
 
@@ -318,14 +318,14 @@ void bsmt2000_device::write_reg(UINT16 data)
 
 
 //-------------------------------------------------
-//  write_data - handle writes to the BSMT2000 
+//  write_data - handle writes to the BSMT2000
 //  data port
 //-------------------------------------------------
 
 void bsmt2000_device::write_data(UINT16 data)
 {
 	device_timer_call_after_resynch(*this, TIMER_ID_DATA_WRITE, data);
-	
+
 	// boost the interleave on a write so that the caller detects the status more accurately
 	m_machine.scheduler().boost_interleave(ATTOTIME_IN_USEC(1), ATTOTIME_IN_USEC(10));
 }
@@ -343,7 +343,7 @@ READ16_MEMBER( bsmt2000_device::tms_register_r )
 
 
 //-------------------------------------------------
-//  tms_data_r - return the value written to the 
+//  tms_data_r - return the value written to the
 //  data port
 //-------------------------------------------------
 
@@ -392,7 +392,7 @@ WRITE16_MEMBER( bsmt2000_device::tms_rom_bank_w )
 
 
 //-------------------------------------------------
-//  tms_left_w - handle writes to the left channel 
+//  tms_left_w - handle writes to the left channel
 //  DAC
 //-------------------------------------------------
 
@@ -404,7 +404,7 @@ WRITE16_MEMBER( bsmt2000_device::tms_left_w )
 
 
 //-------------------------------------------------
-//  tms_right_w - handle writes to the right 
+//  tms_right_w - handle writes to the right
 //  channel DAC
 //-------------------------------------------------
 

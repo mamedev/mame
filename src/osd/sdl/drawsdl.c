@@ -74,7 +74,7 @@ struct _sdl_info
 
 struct _sdl_scale_mode
 {
-	const char 		*name;
+	const char		*name;
 	int				is_scale;			/* Scale mode?           */
 	int				is_yuv;				/* Yuv mode?             */
 	int				mult_w;				/* Width multiplier      */

@@ -204,8 +204,8 @@ static INTERRUPT_GEN( cshooter_interrupt )
 	else
       cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x10);
 
-//	if(mainram!=NULL)
-//		ar_coin_hack(device->machine);
+//  if(mainram!=NULL)
+//      ar_coin_hack(device->machine);
 }
 
 
@@ -295,8 +295,8 @@ static WRITE8_HANDLER( seibu_sound_comms_w )
 static ADDRESS_MAP_START( airraid_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1") AM_WRITENOP // rld result write-back
-//	AM_RANGE(0xb000, 0xb0ff) AM_RAM
-//	AM_RANGE(0xb100, 0xb1ff) AM_RAM//ROMBANK("bank1")
+//  AM_RANGE(0xb000, 0xb0ff) AM_RAM
+//  AM_RANGE(0xb100, 0xb1ff) AM_RAM//ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")

@@ -1,6 +1,6 @@
 /*
-	Stern MP-200 MPU	
-	(almost identical to Bally MPU-35)
+    Stern MP-200 MPU
+    (almost identical to Bally MPU-35)
 */
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
@@ -18,7 +18,7 @@ public:
 static ADDRESS_MAP_START( st_mp200_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
-   	
+
 static INPUT_PORTS_START( st_mp200 )
 INPUT_PORTS_END
 
@@ -34,9 +34,9 @@ static MACHINE_CONFIG_START( st_mp200, st_mp200_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 1000000)
 	MCFG_CPU_PROGRAM_MAP(st_mp200_map)
-	
+
 	MCFG_MACHINE_RESET( st_mp200 )
-	
+
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
@@ -339,7 +339,7 @@ ROM_START(st_game)
 ROM_END
 
 
-//GAME(1982,	cue,		0,		st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern",				"Cue",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+//GAME(1982,    cue,        0,      st_mp200,   st_mp200,   st_mp200,   ROT0,   "Stern",                "Cue",              GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1980,	ali,		0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern",				"Ali",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1980,	biggame,	0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern",				"Big Game",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1981,	catacomp,	0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern",				"Catacomb (Pinball)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

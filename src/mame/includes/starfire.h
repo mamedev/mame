@@ -27,7 +27,7 @@ public:
 
     UINT8 *starfire_videoram;
     UINT8 *starfire_colorram;
-    
+
     emu_timer* scanline_timer;
     bitmap_t *starfire_screen;
 };

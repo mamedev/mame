@@ -721,7 +721,7 @@ static DRIVER_INIT( ssf2mdb )
 	memory_set_bankptr(machine,  "bank5", machine->region( "maincpu" )->base() + 0x400000 );
 
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x770070, 0x770075, 0, 0, ssf2mdb_dsw_r );
-	
+
 	megadrive_6buttons_pad = 1;
 
 	DRIVER_INIT_CALL(megadrij);

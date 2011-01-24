@@ -86,7 +86,7 @@ namespace uml
 	const UINT8 FLAG_S = 0x08;		// sign flag (defined for integer only)
 	const UINT8 FLAG_U = 0x10;		// unordered flag (defined for FP only)
 
-	// testable conditions; note that these are defined such that (condition ^ 1) is 
+	// testable conditions; note that these are defined such that (condition ^ 1) is
 	// always the opposite
 	enum condition_t
 	{
@@ -139,7 +139,7 @@ namespace uml
 		SIZE_SHORT = SIZE_DWORD,	// 4-byte (float)
 		SIZE_DOUBLE = SIZE_QWORD	// 8-byte (float)
 	};
-	
+
 	// memory scale factors
 	enum memory_scale
 	{
@@ -164,89 +164,89 @@ namespace uml
 		OP_INVALID,
 
 		// compile-time opcodes
-		OP_HANDLE,					// HANDLE  handle                
-		OP_HASH,					// HASH    mode,pc               
-		OP_LABEL,					// LABEL   imm                   
-		OP_COMMENT,					// COMMENT string                
-		OP_MAPVAR,					// MAPVAR  mapvar,value          
+		OP_HANDLE,					// HANDLE  handle
+		OP_HASH,					// HASH    mode,pc
+		OP_LABEL,					// LABEL   imm
+		OP_COMMENT,					// COMMENT string
+		OP_MAPVAR,					// MAPVAR  mapvar,value
 
 		// control flow operations
-		OP_NOP,						// NOP                           
-		OP_DEBUG,					// DEBUG   pc                    
-		OP_EXIT,					// EXIT    src1[,c]              
-		OP_HASHJMP,					// HASHJMP mode,pc,handle        
-		OP_JMP,						// JMP     imm[,c]               
-		OP_EXH,						// EXH     handle,param[,c]      
-		OP_CALLH,					// CALLH   handle[,c]            
-		OP_RET,						// RET     [c]                   
-		OP_CALLC,					// CALLC   func,ptr[,c]          
-		OP_RECOVER,					// RECOVER dst,mapvar            
+		OP_NOP,						// NOP
+		OP_DEBUG,					// DEBUG   pc
+		OP_EXIT,					// EXIT    src1[,c]
+		OP_HASHJMP,					// HASHJMP mode,pc,handle
+		OP_JMP,						// JMP     imm[,c]
+		OP_EXH,						// EXH     handle,param[,c]
+		OP_CALLH,					// CALLH   handle[,c]
+		OP_RET,						// RET     [c]
+		OP_CALLC,					// CALLC   func,ptr[,c]
+		OP_RECOVER,					// RECOVER dst,mapvar
 
 		// internal register operations
-		OP_SETFMOD,					// SETFMOD src                   
-		OP_GETFMOD,					// GETFMOD dst                   
-		OP_GETEXP,					// GETEXP  dst                   
-		OP_GETFLGS,					// GETFLGS dst[,f]               
-		OP_SAVE,					// SAVE    mem                   
-		OP_RESTORE,					// RESTORE mem                   
+		OP_SETFMOD,					// SETFMOD src
+		OP_GETFMOD,					// GETFMOD dst
+		OP_GETEXP,					// GETEXP  dst
+		OP_GETFLGS,					// GETFLGS dst[,f]
+		OP_SAVE,					// SAVE    mem
+		OP_RESTORE,					// RESTORE mem
 
 		// integer operations
-		OP_LOAD,					// LOAD    dst,base,index,size   
-		OP_LOADS,					// LOADS   dst,base,index,size   
-		OP_STORE,					// STORE   base,index,src,size   
-		OP_READ,					// READ    dst,src1,space/size   
+		OP_LOAD,					// LOAD    dst,base,index,size
+		OP_LOADS,					// LOADS   dst,base,index,size
+		OP_STORE,					// STORE   base,index,src,size
+		OP_READ,					// READ    dst,src1,space/size
 		OP_READM,					// READM   dst,src1,mask,space/size
-		OP_WRITE,					// WRITE   dst,src1,space/size   
+		OP_WRITE,					// WRITE   dst,src1,space/size
 		OP_WRITEM,					// WRITEM  dst,mask,src1,space/size
-		OP_CARRY,					// CARRY   src,bitnum            
-		OP_SET,						// SET     dst,c                 
-		OP_MOV,						// MOV     dst,src[,c]           
-		OP_SEXT,					// SEXT    dst,src,size          
-		OP_ROLAND,					// ROLAND  dst,src,shift,mask    
-		OP_ROLINS,					// ROLINS  dst,src,shift,mask    
-		OP_ADD,						// ADD     dst,src1,src2[,f]     
-		OP_ADDC,					// ADDC    dst,src1,src2[,f]     
-		OP_SUB,						// SUB     dst,src1,src2[,f]     
-		OP_SUBB,					// SUBB    dst,src1,src2[,f]     
-		OP_CMP,						// CMP     src1,src2[,f]         
+		OP_CARRY,					// CARRY   src,bitnum
+		OP_SET,						// SET     dst,c
+		OP_MOV,						// MOV     dst,src[,c]
+		OP_SEXT,					// SEXT    dst,src,size
+		OP_ROLAND,					// ROLAND  dst,src,shift,mask
+		OP_ROLINS,					// ROLINS  dst,src,shift,mask
+		OP_ADD,						// ADD     dst,src1,src2[,f]
+		OP_ADDC,					// ADDC    dst,src1,src2[,f]
+		OP_SUB,						// SUB     dst,src1,src2[,f]
+		OP_SUBB,					// SUBB    dst,src1,src2[,f]
+		OP_CMP,						// CMP     src1,src2[,f]
 		OP_MULU,					// MULU    dst,edst,src1,src2[,f]
 		OP_MULS,					// MULS    dst,edst,src1,src2[,f]
 		OP_DIVU,					// DIVU    dst,edst,src1,src2[,f]
 		OP_DIVS,					// DIVS    dst,edst,src1,src2[,f]
-		OP_AND,						// AND     dst,src1,src2[,f]     
-		OP_TEST,					// TEST    src1,src2[,f]         
-		OP_OR,						// OR      dst,src1,src2[,f]     
-		OP_XOR,						// XOR     dst,src1,src2[,f]     
-		OP_LZCNT,					// LZCNT   dst,src               
-		OP_BSWAP,					// BSWAP   dst,src               
-		OP_SHL,						// SHL     dst,src,count[,f]     
-		OP_SHR,						// SHR     dst,src,count[,f]     
-		OP_SAR,						// SAR     dst,src,count[,f]     
-		OP_ROL,						// ROL     dst,src,count[,f]     
-		OP_ROLC,					// ROLC    dst,src,count[,f]     
-		OP_ROR,						// ROL     dst,src,count[,f]     
-		OP_RORC,					// ROLC    dst,src,count[,f]     
+		OP_AND,						// AND     dst,src1,src2[,f]
+		OP_TEST,					// TEST    src1,src2[,f]
+		OP_OR,						// OR      dst,src1,src2[,f]
+		OP_XOR,						// XOR     dst,src1,src2[,f]
+		OP_LZCNT,					// LZCNT   dst,src
+		OP_BSWAP,					// BSWAP   dst,src
+		OP_SHL,						// SHL     dst,src,count[,f]
+		OP_SHR,						// SHR     dst,src,count[,f]
+		OP_SAR,						// SAR     dst,src,count[,f]
+		OP_ROL,						// ROL     dst,src,count[,f]
+		OP_ROLC,					// ROLC    dst,src,count[,f]
+		OP_ROR,						// ROL     dst,src,count[,f]
+		OP_RORC,					// ROLC    dst,src,count[,f]
 
 		// floating point operations
-		OP_FLOAD,					// FLOAD   dst,base,index        
-		OP_FSTORE,					// FSTORE  base,index,src        
-		OP_FREAD,					// FREAD   dst,space,src1        
-		OP_FWRITE,					// FWRITE  space,dst,src1        
-		OP_FMOV,					// FMOV    dst,src1[,c]          
-		OP_FTOINT,					// FTOINT  dst,src1,size,round   
-		OP_FFRINT,					// FFRINT  dst,src1,size         
-		OP_FFRFLT,					// FFRFLT  dst,src1,size         
-		OP_FRNDS,					// FRNDS   dst,src1              
-		OP_FADD,					// FADD    dst,src1,src2         
-		OP_FSUB,					// FSUB    dst,src1,src2         
-		OP_FCMP,					// FCMP    src1,src2             
-		OP_FMUL,					// FMUL    dst,src1,src2         
-		OP_FDIV,					// FDIV    dst,src1,src2         
-		OP_FNEG,					// FNEG    dst,src1              
-		OP_FABS,					// FABS    dst,src1              
-		OP_FSQRT,					// FSQRT   dst,src1              
+		OP_FLOAD,					// FLOAD   dst,base,index
+		OP_FSTORE,					// FSTORE  base,index,src
+		OP_FREAD,					// FREAD   dst,space,src1
+		OP_FWRITE,					// FWRITE  space,dst,src1
+		OP_FMOV,					// FMOV    dst,src1[,c]
+		OP_FTOINT,					// FTOINT  dst,src1,size,round
+		OP_FFRINT,					// FFRINT  dst,src1,size
+		OP_FFRFLT,					// FFRFLT  dst,src1,size
+		OP_FRNDS,					// FRNDS   dst,src1
+		OP_FADD,					// FADD    dst,src1,src2
+		OP_FSUB,					// FSUB    dst,src1,src2
+		OP_FCMP,					// FCMP    src1,src2
+		OP_FMUL,					// FMUL    dst,src1,src2
+		OP_FDIV,					// FDIV    dst,src1,src2
+		OP_FNEG,					// FNEG    dst,src1
+		OP_FABS,					// FABS    dst,src1
+		OP_FSQRT,					// FSQRT   dst,src1
 		OP_FRECIP,					// FRECIP  dst,src1
-		OP_FRSQRT,					// FRSQRT  dst,src1              
+		OP_FRSQRT,					// FRSQRT  dst,src1
 
 		OP_MAX
 	};
@@ -259,12 +259,12 @@ namespace uml
 	{
 		friend class ::drcuml_state;
 		template<class T> friend class ::simple_list;
-	
+
 		// construction/destruction
 		code_handle(drcuml_state &drcuml, const char *name);
 
 	public:
-		// getters		
+		// getters
 		code_handle *next() const { return m_next; }
 		drccodeptr codeptr() const { return *m_code; }
 		drccodeptr *codeptr_addr() { return m_code; }
@@ -280,22 +280,22 @@ namespace uml
 		code_handle *			m_next;				// link to next handle in the list
 		drcuml_state &			m_drcuml;			// pointer to owning object
 	};
-	
+
 	// class describing a local code label
 	class code_label
 	{
 	public:
 		// construction
 		code_label(UINT32 label = 0) : m_label(label) { }
-		
+
 		// operators
 		operator UINT32 &() { return m_label; }
 		bool operator==(const code_label &rhs) const { return (m_label == rhs.m_label); }
 		bool operator!=(const code_label &rhs) const { return (m_label != rhs.m_label); }
-		
+
 		// getters
 		UINT32 label() const { return m_label; }
-		
+
 	private:
 		UINT32 m_label;
 	};
@@ -336,7 +336,7 @@ namespace uml
 		parameter(operand_size size, memory_space space) : m_type(PTYPE_SIZE_SPACE), m_value((space << 4) | size) { assert(size >= SIZE_BYTE && size <= SIZE_DQWORD); assert(space >= SPACE_PROGRAM && space <= SPACE_IO); }
 		parameter(code_handle &handle) : m_type(PTYPE_CODE_HANDLE), m_value(reinterpret_cast<parameter_value>(&handle)) { }
 		parameter(code_label &label) : m_type(PTYPE_CODE_LABEL), m_value(label) { }
-		
+
 		// creators for types that don't safely default
 		static inline parameter make_ireg(int regnum) { assert(regnum >= REG_I0 && regnum < REG_I_END); return parameter(PTYPE_INT_REGISTER, regnum); }
 		static inline parameter make_freg(int regnum) { assert(regnum >= REG_F0 && regnum < REG_F_END); return parameter(PTYPE_FLOAT_REGISTER, regnum); }
@@ -352,7 +352,7 @@ namespace uml
 		// operators
 		bool operator==(const parameter &rhs) const { return (m_type == rhs.m_type && m_value == rhs.m_value); }
 		bool operator!=(const parameter &rhs) const { return (m_type != rhs.m_type || m_value != rhs.m_value); }
-		
+
 		// getters
 		parameter_type type() const { return m_type; }
 		UINT64 immediate() const { assert(m_type == PTYPE_IMMEDIATE); return m_value; }
@@ -362,14 +362,14 @@ namespace uml
 		int mapvar() const { assert(m_type == PTYPE_MAPVAR); assert(m_value >= MAPVAR_M0 && m_value < MAPVAR_END); return m_value; }
 		void *memory() const { assert(m_type == PTYPE_MEMORY); return reinterpret_cast<void *>(m_value); }
 		operand_size size() const { assert(m_type == PTYPE_SIZE || m_type == PTYPE_SIZE_SCALE || m_type == PTYPE_SIZE_SPACE); return operand_size(m_value & 15); }
-		memory_scale scale() const { assert(m_type == PTYPE_SIZE_SCALE); return memory_scale(m_value >> 4); } 
+		memory_scale scale() const { assert(m_type == PTYPE_SIZE_SCALE); return memory_scale(m_value >> 4); }
 		memory_space space() const { assert(m_type == PTYPE_SIZE_SPACE); return memory_space(m_value >> 4); }
 		code_handle &handle() const { assert(m_type == PTYPE_CODE_HANDLE); return *reinterpret_cast<code_handle *>(m_value); }
 		code_label label() const { assert(m_type == PTYPE_CODE_LABEL); return code_label(m_value); }
 		c_function cfunc() const { assert(m_type == PTYPE_C_FUNCTION); return reinterpret_cast<c_function>(m_value); }
 		float_rounding_mode rounding() const { assert(m_type == PTYPE_ROUNDING); return float_rounding_mode(m_value); }
 		const char *string() const { assert(m_type == PTYPE_STRING); return reinterpret_cast<const char *>(m_value); }
-		
+
 		// type queries
 		bool is_immediate() const { return (m_type == PTYPE_IMMEDIATE); }
 		bool is_int_register() const { return (m_type == PTYPE_INT_REGISTER); }
@@ -385,10 +385,10 @@ namespace uml
 		bool is_c_function() const { return (m_type == PTYPE_C_FUNCTION); }
 		bool is_rounding() const { return (m_type == PTYPE_ROUNDING); }
 		bool is_string() const { return (m_type == PTYPE_STRING); }
-		
+
 		// other queries
 		bool is_immediate_value(UINT64 value) const { return (m_type == PTYPE_IMMEDIATE && m_value == value); }
-		
+
 	private:
 		// private constructor
 		parameter(parameter_type type, parameter_value value) : m_type(type), m_value(value) { }
@@ -415,7 +415,7 @@ namespace uml
 		UINT8				inflags;			// input flags
 		UINT8				outflags;			// output flags
 		UINT8				modflags;			// modified flags
-		parameter_info 		param[4];			// information about parameters
+		parameter_info		param[4];			// information about parameters
 	};
 
 	// a single UML instructon is encoded like this
@@ -450,7 +450,7 @@ namespace uml
 		void label(code_label lab) { configure(OP_LABEL, 4, lab); }
 		void comment(const char *string) { configure(OP_COMMENT, 4, parameter::make_string(string)); }
 		void mapvar(parameter mapvar, UINT32 value) { assert(mapvar.is_mapvar()); configure(OP_MAPVAR, 4, mapvar, value); }
-		
+
 		// control flow operations
 		void nop() { configure(OP_NOP, 4); }
 		void debug(UINT32 pc) { configure(OP_DEBUG, 4, pc); }
@@ -573,7 +573,7 @@ namespace uml
 		void fssqrt(parameter dst, parameter src1) { configure(OP_FSQRT, 4, dst, src1); }
 		void fsrecip(parameter dst, parameter src1) { configure(OP_FRECIP, 4, dst, src1); }
 		void fsrsqrt(parameter dst, parameter src1) { configure(OP_FRSQRT, 4, dst, src1); }
-		
+
 		// 64-bit floating point operations
 		void fdload(parameter dst, const void *base, parameter index) { configure(OP_FLOAD, 8, dst, parameter::make_memory(base), index); }
 		void fdstore(void *base, parameter index, parameter src1) { configure(OP_FSTORE, 8, parameter::make_memory(base), index, src1); }
@@ -595,10 +595,10 @@ namespace uml
 		void fdsqrt(parameter dst, parameter src1) { configure(OP_FSQRT, 8, dst, src1); }
 		void fdrecip(parameter dst, parameter src1) { configure(OP_FRECIP, 8, dst, src1); }
 		void fdrsqrt(parameter dst, parameter src1) { configure(OP_FRSQRT, 8, dst, src1); }
-		
+
 		// constants
 		static const int MAX_PARAMS = 4;
-	
+
 	private:
 		// internal configuration
 		void configure(opcode_t op, UINT8 size, condition_t cond = COND_ALWAYS);
@@ -611,7 +611,7 @@ namespace uml
 		void validate();
 		void convert_to_mov_immediate(UINT64 immediate) { m_opcode = OP_MOV; m_numparams = 2; m_param[1] = immediate; }
 		void convert_to_mov_param(int pnum) { m_opcode = OP_MOV; m_numparams = 2; m_param[1] = m_param[pnum]; }
-		
+
 		// internal state
 		opcode_t			m_opcode;			// opcode
 		condition_t			m_condition;		// condition
@@ -651,7 +651,7 @@ namespace uml
 	const parameter I7(parameter::make_ireg(REG_I0 + 7));
 	const parameter I8(parameter::make_ireg(REG_I0 + 8));
 	const parameter I9(parameter::make_ireg(REG_I0 + 9));
-	
+
 	const parameter F0(parameter::make_freg(REG_F0 + 0));
 	const parameter F1(parameter::make_freg(REG_F0 + 1));
 	const parameter F2(parameter::make_freg(REG_F0 + 2));
@@ -662,7 +662,7 @@ namespace uml
 	const parameter F7(parameter::make_freg(REG_F0 + 7));
 	const parameter F8(parameter::make_freg(REG_F0 + 8));
 	const parameter F9(parameter::make_freg(REG_F0 + 9));
-	
+
 	const parameter V0(parameter::make_vreg(REG_V0 + 0));
 	const parameter V1(parameter::make_vreg(REG_V0 + 1));
 	const parameter V2(parameter::make_vreg(REG_V0 + 2));
@@ -673,7 +673,7 @@ namespace uml
 	const parameter V7(parameter::make_vreg(REG_V0 + 7));
 	const parameter V8(parameter::make_vreg(REG_V0 + 8));
 	const parameter V9(parameter::make_vreg(REG_V0 + 9));
-	
+
 	const parameter M0(parameter::make_mapvar(MAPVAR_M0 + 0));
 	const parameter M1(parameter::make_mapvar(MAPVAR_M0 + 1));
 	const parameter M2(parameter::make_mapvar(MAPVAR_M0 + 2));

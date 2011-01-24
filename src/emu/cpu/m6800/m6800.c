@@ -53,29 +53,29 @@ TODO:
 
 /*
 
-    Chip                RAM     NVRAM   ROM     SCI		r15-f	ports
+    Chip                RAM     NVRAM   ROM     SCI     r15-f   ports
     -----------------------------------------------------------------
-    MC6800              -       -       -       no		no		4
-    MC6802              128     32      -       no		no		4
-    MC6802NS            128     -       -       no		no		4
-    MC6808              -       -       -       no		no		4
-    
-	MC6801              128     64      2K      yes		no		4
-    MC68701             128     64      -       yes		no		4
-    MC6803              128     64      -       yes		no		4
+    MC6800              -       -       -       no      no      4
+    MC6802              128     32      -       no      no      4
+    MC6802NS            128     -       -       no      no      4
+    MC6808              -       -       -       no      no      4
 
-	MC6801U4			192		32		4K		yes		yes		4
-	MC6803U4			192		32		-		yes		yes		4
+    MC6801              128     64      2K      yes     no      4
+    MC68701             128     64      -       yes     no      4
+    MC6803              128     64      -       yes     no      4
 
-    HD6801              128     64      2K      yes		no		4
-	HD6301V             128     -       4K      yes		no		4
-    HD63701V            192     -       4K      yes		no		4
-    HD6303R             128     -       -       yes		no		4
+    MC6801U4            192     32      4K      yes     yes     4
+    MC6803U4            192     32      -       yes     yes     4
 
-	HD6301X				192		-		4K		yes		yes		6
-	HD6301Y             256     -       16K     yes		yes		6
-	HD6303X             192     -       -       yes		yes		6
-    HD6303Y             256     -       -       yes		yes		6
+    HD6801              128     64      2K      yes     no      4
+    HD6301V             128     -       4K      yes     no      4
+    HD63701V            192     -       4K      yes     no      4
+    HD6303R             128     -       -       yes     no      4
+
+    HD6301X             192     -       4K      yes     yes     6
+    HD6301Y             256     -       16K     yes     yes     6
+    HD6303X             192     -       -       yes     yes     6
+    HD6303Y             256     -       -       yes     yes     6
 
     NSC8105
     MS2010-A
@@ -827,7 +827,7 @@ static void serial_transmit(m6800_state *cpustate)
 					cpustate->tx = 0;
 
 					cpustate->txbits++;
-					
+
 					//logerror("M6800 '%s' Transmit START Data %02x\n", cpustate->device->tag(), cpustate->tsr);
 				}
 				break;
@@ -866,7 +866,7 @@ static void serial_transmit(m6800_state *cpustate)
 static void serial_receive(m6800_state *cpustate)
 {
 	//logerror("M6800 '%s' Rx Tick TRCSR %02x bits %u check %02x\n", cpustate->device->tag(), cpustate->trcsr, cpustate->rxbits, cpustate->trcsr & M6800_TRCSR_RE);
-	
+
 	if (cpustate->trcsr & M6800_TRCSR_RE)
 	{
 		if (cpustate->trcsr & M6800_TRCSR_WU)
@@ -903,7 +903,7 @@ static void serial_receive(m6800_state *cpustate)
 				{
 					// start bit found
 					cpustate->rxbits++;
-				
+
 					//logerror("M6800 '%s' Received START bit\n", cpustate->device->tag());
 				}
 				break;
@@ -928,7 +928,7 @@ static void serial_receive(m6800_state *cpustate)
 						{
 							// transfer data into receive register
 							cpustate->rdr = cpustate->rsr;
-			
+
 							//logerror("M6800 '%s' Receive Data Register: %02x\n", cpustate->device->tag(), cpustate->rdr);
 
 							// set RDRF flag
@@ -1387,7 +1387,7 @@ static READ8_HANDLER( m6801_io_r )
 			data = (cpustate->io->read_byte(M6803_PORT1) & (cpustate->port1_ddr ^ 0xff))
 				| (cpustate->port1_data & cpustate->port1_ddr);
 		break;
-		
+
 	case IO_P2DATA:
 		if(cpustate->port2_ddr == 0xff)
 			data = cpustate->port2_data;
@@ -1395,7 +1395,7 @@ static READ8_HANDLER( m6801_io_r )
 			data = (cpustate->io->read_byte(M6803_PORT2) & (cpustate->port2_ddr ^ 0xff))
 				| (cpustate->port2_data & cpustate->port2_ddr);
 		break;
-		
+
 	case IO_P3DDR:
 		logerror("M6801 '%s' Port 3 DDR is a write-only register\n", space->cpu->tag());
 		break;
@@ -1505,12 +1505,12 @@ static READ8_HANDLER( m6801_io_r )
 		{
 			cpustate->trcsr_read_tdre = 1;
 		}
-			
+
 		if (cpustate->trcsr & M6800_TRCSR_ORFE)
 		{
 			cpustate->trcsr_read_orfe = 1;
 		}
-			
+
 		if (cpustate->trcsr & M6800_TRCSR_RDRF)
 		{
 			cpustate->trcsr_read_rdrf = 1;
@@ -1750,7 +1750,7 @@ static WRITE8_HANDLER( m6801_io_w )
 			cpustate->txbits = 0;
 			cpustate->tx = 1;
 		}
-			
+
 		if ((data & M6800_TRCSR_RE) && !(cpustate->trcsr & M6800_TRCSR_RE))
 		{
 			cpustate->rxbits = 0;

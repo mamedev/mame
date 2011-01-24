@@ -554,9 +554,9 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
 			parse_ini_file(options, gparent->name, OPTION_PRIORITY_GPARENT_INI);
 		if (parent != NULL)
 			parse_ini_file(options, parent->name, OPTION_PRIORITY_PARENT_INI);
-		
+
 		options_revert_driver_only(options, OPTION_PRIORITY_CMDLINE);
-		
+
 		parse_ini_file(options, driver->name, OPTION_PRIORITY_DRIVER_INI);
 	}
 }

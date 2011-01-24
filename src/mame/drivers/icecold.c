@@ -14,7 +14,7 @@ public:
 static ADDRESS_MAP_START( icecold_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
-   	
+
 static INPUT_PORTS_START( icecold )
 INPUT_PORTS_END
 
@@ -30,9 +30,9 @@ static MACHINE_CONFIG_START( icecold, icecold_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 1000000)
 	MCFG_CPU_PROGRAM_MAP(icecold_map)
-	
+
 	MCFG_MACHINE_RESET( icecold )
-	
+
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END

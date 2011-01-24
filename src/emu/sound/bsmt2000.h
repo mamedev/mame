@@ -74,7 +74,7 @@ class bsmt2000_device_config :	public device_config,
 								public device_config_memory_interface
 {
 	friend class bsmt2000_device;
-	
+
 	typedef void (*ready_callback)(bsmt2000_device &device);
 
 	// construction/destruction
@@ -98,7 +98,7 @@ protected:
 
 	// internal state
 	const address_space_config  m_space_config;
-	
+
 	// inline data
 	ready_callback				m_ready_callback;
 };
@@ -126,7 +126,7 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	
+
 	// sound interface overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 

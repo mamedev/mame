@@ -59,7 +59,7 @@ public:
 	// construction/destruction
 	drcbe_c(drcuml_state &drcuml, device_t &device, drc_cache &cache, UINT32 flags, int modes, int addrbits, int ignorebits);
 	virtual ~drcbe_c();
-	
+
 	// required overrides
 	virtual void reset();
 	virtual int execute(uml::code_handle &entry);

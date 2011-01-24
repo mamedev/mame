@@ -684,7 +684,7 @@ static int open_rom_file(rom_load_data *romdata, const char *regiontag, const ro
 			if (separator2 != -1)
 			{
 				has_parent = TRUE;
-				
+
 				// we are loading a clone through softlists, split the setname from the parentname
 				tag5.cpysubstr(tag4, separator2 + 1, tag4.len() - separator2 + 1);
 				tag4.del(separator2, tag4.len() - separator2);
@@ -1073,17 +1073,17 @@ chd_error open_disk_image_options(core_options *options, const game_driver *game
 		astring tag1(locationtag), tag2, tag3, tag4, tag5;
 		bool is_list = FALSE;
 		bool has_parent = FALSE;
-		
+
 		int separator1 = tag1.chr(0, '%');
 		if (separator1 != -1)
 		{
 			is_list = TRUE;
-			
+
 			// we are loading through softlists, split the listname from the regiontag
 			tag4.cpysubstr(tag1, separator1 + 1, tag1.len() - separator1 + 1);
 			tag1.del(separator1, tag1.len() - separator1);
 			tag1.cat(PATH_SEPARATOR);
-			
+
 			// check if we are loading a clone (if this is the case also tag1 have a separator '%')
 			int separator2 = tag4.chr(0, '%');
 			if (separator2 != -1)
@@ -1094,7 +1094,7 @@ chd_error open_disk_image_options(core_options *options, const game_driver *game
 				tag5.cpysubstr(tag4, separator2 + 1, tag4.len() - separator2 + 1);
 				tag4.del(separator2, tag4.len() - separator2);
 			}
-			
+
 			// prepare locations where we have to load from: list/parentname (if any) & list/clonename
 			astring swlist(tag1.cstr());
 			tag2.cpy(swlist.cat(tag4));
@@ -1104,10 +1104,10 @@ chd_error open_disk_image_options(core_options *options, const game_driver *game
 				tag3.cpy(swlist.cat(tag5));
 			}
 		}
-		
+
 		if (tag5.chr(0, '%') != -1)
 			fatalerror("We do not support clones of clones!\n");
-		
+
 		// try to load from the available location(s):
 		// - if we are not using lists, we have locationtag only;
 		// - if we are using lists, we have: list/clonename, list/parentname, clonename, parentname
@@ -1421,7 +1421,7 @@ void load_software_part_region(device_t *device, char *swlist, char *swname, rom
 		romdata->errorstring.catprintf("WARNING: support for software %s (in list %s) is only preliminary\n", swname, swlist);
 		romdata->warnings++;
 	}
-	
+
 	/* loop until we hit the end */
 	for (region = start_region; region != NULL; region = rom_next_region(region))
 	{

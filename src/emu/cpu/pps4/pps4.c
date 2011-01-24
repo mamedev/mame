@@ -23,23 +23,23 @@ typedef struct _pps4_state pps4_state;
 struct _pps4_state
 {
 	UINT8	A; // Accumulator
-	UINT8	X; 
-	
-	PAIR 	P;
+	UINT8	X;
+
+	PAIR	P;
 	PAIR    SA;
 	PAIR    SB;
-	PAIR 	B; // BU + BM + BL
+	PAIR	B; // BU + BM + BL
 
-	UINT8 	C; // Carry flag
+	UINT8	C; // Carry flag
 	UINT8	FF1; // Flip-flop 1
 	UINT8	FF2; // Flip-flop 2
-	
+
 	legacy_cpu_device *device;
 	const address_space *program;
 	direct_read_data *direct;
 	const address_space *data;
 	const address_space *io;
-	
+
 	int					icount;
 };
 
@@ -79,18 +79,18 @@ static void execute_one(pps4_state *cpustate, int opcode)
 	switch (opcode)
 	{
 		// Arithmetic instructions
-		case 0x0b: 	// AD
+		case 0x0b:	// AD
 					break;
-		case 0x0a: 	// ADC
+		case 0x0a:	// ADC
 					break;
-		case 0x09:	// ADSK 
+		case 0x09:	// ADSK
 					break;
 		case 0x08:	// ADCSK
 					break;
 		case 0x60:	case 0x61:	case 0x62:	case 0x63:
 		case 0x64:	case 0x66:	case 0x67:	case 0x68:
 		case 0x69:	case 0x6a:	case 0x6b:	case 0x6c:
-		case 0x6d:	case 0x6e:	
+		case 0x6d:	case 0x6e:
 					// ADI
 					break;
 		case 0x65:	//DC
@@ -99,9 +99,9 @@ static void execute_one(pps4_state *cpustate, int opcode)
 		// Logical instructions
 		case 0x0d:	// AND
 					break;
-		case 0x0f:	// OR 
+		case 0x0f:	// OR
 					break;
-		case 0x0c:	// EOR 
+		case 0x0c:	// EOR
 					break;
 		case 0x0e:	// COMP
 					cpustate->A ^= 0x0f;
@@ -124,7 +124,7 @@ static void execute_one(pps4_state *cpustate, int opcode)
 					break;
 		case 0x25:	// RF2
 					cpustate->FF2 = 0;
-					break;		
+					break;
 		case 0x30:	case 0x31:	case 0x32:	case 0x33:
 		case 0x34:	case 0x35:	case 0x36:	case 0x37:
 					// LD
@@ -206,14 +206,14 @@ static void execute_one(pps4_state *cpustate, int opcode)
 						UINT8 tmp = ARG(cpustate);
 						cpustate->icount -= 1;
 						cpustate->B.w.l = tmp;
-					}		
+					}
 					break;
 		case 0x17:	// INCB
 					if ((cpustate->B.w.l & 0x0f) == 0x0f) {
 						cpustate->B.w.l &= 0xff0;
 						DO_SKIP(cpustate);
 					} else {
-						cpustate->B.w.l += 1;						
+						cpustate->B.w.l += 1;
 					}
 					break;
 		case 0x1f:	// DECB
@@ -221,7 +221,7 @@ static void execute_one(pps4_state *cpustate, int opcode)
 						cpustate->B.w.l |= 0x00f;
 						DO_SKIP(cpustate);
 					} else {
-						cpustate->B.w.l -= 1;						
+						cpustate->B.w.l -= 1;
 					}
 					break;
 		// Control transfer instructions
@@ -243,7 +243,7 @@ static void execute_one(pps4_state *cpustate, int opcode)
 		case 0xbc:	case 0xbd:	case 0xbe:	case 0xbf:
 					// T
 					cpustate->P.w.l = (cpustate->P.w.l & 0xfc0) | (opcode & 0x3f);
-					break;		
+					break;
 		case 0xd0:	case 0xd1:	case 0xd2:	case 0xd3:
 		case 0xd4:	case 0xd5:	case 0xd6:	case 0xd7:
 		case 0xd8:	case 0xd9:	case 0xda:	case 0xdb:
@@ -295,7 +295,7 @@ static void execute_one(pps4_state *cpustate, int opcode)
 					break;
 		// Input/Output instructions
 		case 0x1c:	// IOL
-					{					
+					{
 						//UINT8 tmp = ARG(cpustate);
 						cpustate->icount -= 1;
 					}
@@ -342,7 +342,7 @@ static CPU_INIT( pps4 )
 	cpustate->direct = &cpustate->program->direct();
 	cpustate->data = device->space(AS_DATA);
 	cpustate->io = device->space(AS_IO);
-	
+
 	state_save_register_device_item(device, 0, cpustate->A);
 	state_save_register_device_item(device, 0, cpustate->X);
 	state_save_register_device_item(device, 0, cpustate->P);
@@ -364,7 +364,7 @@ static CPU_RESET( pps4 )
 
 	cpustate->A = cpustate->X = 0;
 	cpustate->C = cpustate->FF1 = cpustate->FF2 = 0;
-	
+
 	cpustate->P.d = 0;
 	cpustate->SA.d = 0;
 	cpustate->SB.d = 0;
@@ -411,17 +411,17 @@ CPU_GET_INFO( pps4 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 2;							break;
 
-		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 8;							break; 
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 8;							break;
 		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 12;							break;
 		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: 		info->i = 0;							break;
 
 		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 8;							break; // 4 bit for RAM
-		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 12;							break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 			info->i = 0;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 12;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:			info->i = 0;							break;
 
 		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:				info->i = 8;							break; // 4 bit
-		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 				info->i = 8;							break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 				info->i = 0;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:				info->i = 8;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:				info->i = 0;							break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case CPUINFO_FCT_SET_INFO:		info->setinfo = CPU_SET_INFO_NAME(pps4);				break;

@@ -38,7 +38,7 @@
 			nec_state->ISPR &= ~tmp;	\
 			break;	\
 		}	\
-	} 
+	}
 
 OP( 0x0f, i_pre_v25  ) { UINT32 ModRM, tmp, tmp2;
 	switch (FETCH()) {

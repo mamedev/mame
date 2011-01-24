@@ -3503,7 +3503,7 @@
 #define DISCRETE_STOP(_class)					void DISCRETE_CLASS_FUNC(_class, stop)(void)
 #define DISCRETE_DECLARE_INFO(_name)			const _name *info = (const  _name *)this->custom_data();
 
-//#define DISCRETE_INPUT(_num)					(*(this->m_input[_num]))
+//#define DISCRETE_INPUT(_num)                  (*(this->m_input[_num]))
 #define DISCRETE_INPUT(_num)					(input(_num))
 
 /*************************************
@@ -3817,7 +3817,7 @@ public:
 			m_arr[i-1] = m_arr[i];
 		m_count--;
 	}
-	inline void clear(void) { m_count = 0; 	}
+	inline void clear(void) { m_count = 0;	}
 	inline int count(void) const { return m_count; }
 	inline T *begin_ptr(void) const { return m_arr; }
 	inline T *end_ptr(void) const { return m_arr + (m_count - 1); }
@@ -4383,7 +4383,7 @@ protected:
 	double				m_neg_sample_time;
 
 	/* list of all nodes */
-	node_list_t			 	m_node_list;		/* node_description * */
+	node_list_t				m_node_list;		/* node_description * */
 
 private:
 	void discrete_build_list(const discrete_block *intf, sound_block_list_t &block_list);
@@ -4427,7 +4427,7 @@ public:
 
 // ======================> discrete_sound_device
 
-class discrete_sound_device : 	public discrete_device,
+class discrete_sound_device :	public discrete_device,
 								public device_sound_interface
 {
 	friend class discrete_sound_device_config;
@@ -4462,7 +4462,7 @@ private:
 	/* the input streams */
 	istream_node_list_t		m_input_stream_list;
 	/* output node tracking */
-	node_output_list_t	 	m_output_list;
+	node_output_list_t		m_output_list;
 };
 
 // device type definition

@@ -371,10 +371,10 @@ static const cartslot_pcb_type *identify_pcb(device_image_interface &image)
 		{
 			if (me != MCERR_NOT_MULTICART)
 				fatalerror("multicart error: %s", multicart_error_text(me));
-			
+
 			/* Force fetching of image metadata */
 			image.crc();
-			
+
 			if (image.pcb() != NULL)
 			{
 				/* read from hash file */

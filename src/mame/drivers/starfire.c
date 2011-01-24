@@ -58,7 +58,7 @@ starfira has one less rom in total than starfire but everything passes as
 static WRITE8_HANDLER( starfire_scratch_w )
 {
 	starfire_state *state = space->machine->driver_data<starfire_state>();
-    
+
     /* A12 and A3 select video control registers */
 	if ((offset & 0x1008) == 0x1000)
 	{
@@ -82,7 +82,7 @@ static WRITE8_HANDLER( starfire_scratch_w )
 static READ8_HANDLER( starfire_scratch_r )
 {
 	starfire_state *state = space->machine->driver_data<starfire_state>();
-    
+
     /* A11 selects input ports */
 	if (offset & 0x800)
 		return (*state->input_read)(space, offset);
@@ -384,7 +384,7 @@ static DRIVER_INIT( starfire )
 static DRIVER_INIT( fireone )
 {
 	starfire_state *state = machine->driver_data<starfire_state>();
-	
+
 	state->input_read = fireone_input_r;
 
 	/* register for state saving */

@@ -1,5 +1,5 @@
 /*
-	Gottlieb System 3
+    Gottlieb System 3
 */
 #include "emu.h"
 #include "cpu/m6502/m65ce02.h"
@@ -17,7 +17,7 @@ public:
 static ADDRESS_MAP_START( gts3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
-   	
+
 static INPUT_PORTS_START( gts3 )
 INPUT_PORTS_END
 
@@ -33,9 +33,9 @@ static MACHINE_CONFIG_START( gts3, gts3_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, 2000000)
 	MCFG_CPU_PROGRAM_MAP(gts3_map)
-	
+
 	MCFG_MACHINE_RESET( gts3 )
-	
+
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
@@ -136,7 +136,7 @@ ROM_START(ccruise)
 	ROM_REGION(0x10000, "cpu3", 0)
 	ROM_LOAD("drom1.bin", 0x8000,  0x8000, CRC(4480257e) SHA1(50b93d4496816ef7cdf007ac75c72c6aaa956aba))
 	ROM_REGION(0x100000, "sound1", 0)
-	ROM_LOAD("arom1.bin", 0x00000, 0x40000, CRC(f8cec60c) SHA1(e52f3a5890a3bb5eb6c932c3d0ed471ed76909c9))	
+	ROM_LOAD("arom1.bin", 0x00000, 0x40000, CRC(f8cec60c) SHA1(e52f3a5890a3bb5eb6c932c3d0ed471ed76909c9))
 	ROM_RELOAD(0x40000,  0x40000)
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(6e424e53) SHA1(90a9bf5ce84680972f9d12eb386215494c584b9b))
@@ -631,7 +631,7 @@ ROM_START(smb3)
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 	ROM_REGION(0x80000, "user1", 0)
 	ROM_LOAD("dsprom2.bin", 0x00000, 0x40000, CRC(181e8234) SHA1(9b22681f61cae401269a88c3cfd783d683390877))
-	ROM_RELOAD( 0x40000, 0x40000)	
+	ROM_RELOAD( 0x40000, 0x40000)
 	ROM_REGION(0x10000, "cpu4", 0)
 	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(6f1d0a3e) SHA1(c7f665d79b9073f28f90debde16cafa9ab57a47c))
 	ROM_REGION(0x100000, "sound1", 0)

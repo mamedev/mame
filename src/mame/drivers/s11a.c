@@ -1,5 +1,5 @@
 /*
-	Williams System 11a
+    Williams System 11a
 */
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
@@ -17,7 +17,7 @@ public:
 static ADDRESS_MAP_START( williams_s11a_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
-   	
+
 static INPUT_PORTS_START( williams_s11a )
 INPUT_PORTS_END
 
@@ -33,9 +33,9 @@ static MACHINE_CONFIG_START( williams_s11a, williams_s11a_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 1000000)
 	MCFG_CPU_PROGRAM_MAP(williams_s11a_map)
-	
+
 	MCFG_MACHINE_RESET( williams_s11a )
-	
+
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
@@ -106,7 +106,7 @@ ROM_START(fire_l3)
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 	ROM_REGION(0x30000, "sound1", 0)
 	ROM_LOAD("fire_u4.l1", 0x00000, 0x8000, CRC(0e058918) SHA1(4d6bf2290141119174787f8dd653c47ea4c73693))
-	ROM_RELOAD(0x00000+0x8000, 0x8000)	
+	ROM_RELOAD(0x00000+0x8000, 0x8000)
 ROM_END
 
 /*--------------------

@@ -23,7 +23,7 @@
 READ8_DEVICE_HANDLER(discrete_sound_r)
 {
 	discrete_device *disc_device = downcast<discrete_device *>(device);
-	return 	disc_device->read( *disc_device->machine->firstcpu->space(), offset, 0xff);
+	return	disc_device->read( *disc_device->machine->firstcpu->space(), offset, 0xff);
 }
 
 

@@ -57,7 +57,7 @@ class drc_hash_table
 public:
 	// construction/destruction
 	drc_hash_table(drc_cache &cache, UINT32 modes, UINT8 addrbits, UINT8 ignorebits);
-	
+
 	// getters
 	drccodeptr ***base() const { return m_base; }
 	UINT8 l1bits() const { return m_l1bits; }
@@ -67,7 +67,7 @@ public:
 	offs_t l1mask() const { return m_l1mask; }
 	offs_t l2mask() const { return m_l2mask; }
 	bool is_mode_populated(UINT32 mode) const { return m_base[mode] != m_emptyl1; }
-	
+
 	// set up and configuration
 	bool reset();
 	void set_default_codeptr(drccodeptr code);

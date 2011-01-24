@@ -230,7 +230,7 @@ VIDEO_START(godzilla)
     +0   ..x..... ........  Flip y ???
     +0   ...xxx.. ........  Width: do this many tiles horizontally
     +0   ......xx x.......  Height: do this many tiles vertically
-    +0   ........ .x......  Tile bank,used in Denjin Makai / extra Priority in Grainbow (to external pin?) 
+    +0   ........ .x......  Tile bank,used in Denjin Makai / extra Priority in Grainbow (to external pin?)
     +0   ........ ..xxxxxx  Color bank
 
     +1   xx...... ........  Priority? (1=high?)
@@ -261,7 +261,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		{
 
 			cur_pri = (spriteram16[offs+1] & 0xc000) >> 14;
-			
+
 			if(data & 0x0040)
 			{
 				cur_pri |= 0x4; // definitely seems to be needed by grainbow
@@ -272,7 +272,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			// -32 behind mid
 			// -256 behind tx
 			// 0    above all
-			
+
 			// is the low bit REALLY priority?
 
 			switch (cur_pri)
@@ -285,7 +285,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 				//case 5: pri_mask = 0; break;
 				case 6: pri_mask = 0; break; // insert coin in gundam
 				//case 7: pri_mask = 0; break;
-			
+
 				default: printf("unhandled pri %d\n",cur_pri); pri_mask=0;
 			}
 
@@ -307,7 +307,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		sprite = spriteram16[offs+1];
 
 		sprite &= 0x3fff;
-		
+
 		if (legionna_has_extended_banking)
 		{
 			if(data & 0x0040)

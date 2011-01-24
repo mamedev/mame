@@ -1,4 +1,4 @@
-/* 
+/*
   ATV Track
   (c)2002 Gaelco
 
@@ -30,7 +30,7 @@ static INPUT_PORTS_START( atvtrack )
 INPUT_PORTS_END
 
 // ?
-#define ATV_CPU_CLOCK 200000000 
+#define ATV_CPU_CLOCK 200000000
 // ?
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, ATV_CPU_CLOCK };
 

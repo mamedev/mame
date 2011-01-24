@@ -720,10 +720,10 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 	t->sizex = 1 << (3+((t->sizes >> 3) & 7));
 	t->sizey = 1 << (3+(t->sizes & 7));
 
-	
+
 	/* Stride select is used only in the non-twiddled case */
 	t->stride = (t->mode & 1) && sa->strideselect ? t->sizex : (pvrta_regs[TEXT_CONTROL] & 0x1f) << 5;
-	
+
 
 	t->blend_mode  = sa->blend_mode;
 	t->filter_mode = sa->filtermode;
@@ -736,7 +736,7 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 	t->vqbase = t->address;
 	t->blend = sa->use_alpha ? blend_functions[t->blend_mode] : bl10;
 
-	//	fprintf(stderr, "tex %d %d %d %d\n", t->pf, t->mode, pvrta_regs[PAL_RAM_CTRL], t->mipmapped);
+	//  fprintf(stderr, "tex %d %d %d %d\n", t->pf, t->mode, pvrta_regs[PAL_RAM_CTRL], t->mipmapped);
 
 	switch(t->pf) {
 	case 0: // 1555

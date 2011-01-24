@@ -1,5 +1,5 @@
 /*
-	Bally MPU AS-2518-17
+    Bally MPU AS-2518-17
 */
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
@@ -17,11 +17,11 @@ public:
 static ADDRESS_MAP_START( by17_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x007f) AM_RAM 
+	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x0200, 0x02ff) AM_RAM // CMOS NVRAM
-	AM_RANGE(0x1000, 0x7fff) AM_ROM 
+	AM_RANGE(0x1000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
-   	
+
 static INPUT_PORTS_START( by17 )
 INPUT_PORTS_END
 
@@ -37,9 +37,9 @@ static MACHINE_CONFIG_START( by17, by17_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 1000000)
 	MCFG_CPU_PROGRAM_MAP(by17_map)
-	
+
 	MCFG_MACHINE_RESET( by17 )
-	
+
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
@@ -143,12 +143,12 @@ ROM_START(stk_sprs)
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
 
-GAME( 1978, blackjck, 0, 		by17, by17, by17, ROT0, "Bally","Black Jack (Pinball)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1976, bowarrow, 0, 		by17, by17, by17, ROT0, "Bally","Bow & Arrow (Prototype)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1977, eightbll, 0, 		by17, by17, by17, ROT0, "Bally","Eight Ball", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1977, evelknie, 0, 		by17, by17, by17, ROT0, "Bally","Evel Knievel", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1977, freedom,  0, 		by17, by17, by17, ROT0, "Bally","Freedom", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1978, matahari, 0, 		by17, by17, by17, ROT0, "Bally","Mata Hari", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1977, nightrdr, 0, 		by17, by17, by17, ROT0, "Bally","Night Rider", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1978, pwerplay, 0, 		by17, by17, by17, ROT0, "Bally","Power Play (Pinball)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1978, stk_sprs, 0, 		by17, by17, by17, ROT0, "Bally","Strikes and Spares", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1978, blackjck, 0,		by17, by17, by17, ROT0, "Bally","Black Jack (Pinball)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1976, bowarrow, 0,		by17, by17, by17, ROT0, "Bally","Bow & Arrow (Prototype)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1977, eightbll, 0,		by17, by17, by17, ROT0, "Bally","Eight Ball", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1977, evelknie, 0,		by17, by17, by17, ROT0, "Bally","Evel Knievel", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1977, freedom,  0,		by17, by17, by17, ROT0, "Bally","Freedom", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1978, matahari, 0,		by17, by17, by17, ROT0, "Bally","Mata Hari", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1977, nightrdr, 0,		by17, by17, by17, ROT0, "Bally","Night Rider", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1978, pwerplay, 0,		by17, by17, by17, ROT0, "Bally","Power Play (Pinball)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1978, stk_sprs, 0,		by17, by17, by17, ROT0, "Bally","Strikes and Spares", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

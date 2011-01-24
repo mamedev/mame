@@ -93,7 +93,7 @@ ppc_frontend::ppc_frontend(powerpc_state &state, UINT32 window_start, UINT32 win
 
 
 //-------------------------------------------------
-//  describe - build a description of a single 
+//  describe - build a description of a single
 //  instruction
 //-------------------------------------------------
 

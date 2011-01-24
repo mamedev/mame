@@ -30,7 +30,7 @@ rsp_frontend::rsp_frontend(rsp_state &state, UINT32 window_start, UINT32 window_
 
 
 //-------------------------------------------------
-//  describe - build a description of a single 
+//  describe - build a description of a single
 //  instruction
 //-------------------------------------------------
 
@@ -155,7 +155,7 @@ bool rsp_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 
 //-------------------------------------------------
-//  describe_special - build a description of a 
+//  describe_special - build a description of a
 //  single instruction in the 'special' group
 //-------------------------------------------------
 
@@ -217,7 +217,7 @@ bool rsp_frontend::describe_special(UINT32 op, opcode_desc &desc)
 
 
 //-------------------------------------------------
-//  describe_regimm - build a description of a 
+//  describe_regimm - build a description of a
 //  single instruction in the 'regimm' group
 //-------------------------------------------------
 
@@ -260,7 +260,7 @@ bool rsp_frontend::describe_regimm(UINT32 op, opcode_desc &desc)
 
 
 //-------------------------------------------------
-//  describe_cop0 - build a description of a 
+//  describe_cop0 - build a description of a
 //  single instruction in the COP0 group
 //-------------------------------------------------
 
@@ -281,7 +281,7 @@ bool rsp_frontend::describe_cop0(UINT32 op, opcode_desc &desc)
 }
 
 //-------------------------------------------------
-//  describe_cop2 - build a description of a 
+//  describe_cop2 - build a description of a
 //  single instruction in the COP2 group
 //-------------------------------------------------
 

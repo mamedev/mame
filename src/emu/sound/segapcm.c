@@ -35,26 +35,26 @@ static STREAM_UPDATE( SEGAPCM_update )
 	memset(outputs[0], 0, samples*sizeof(*outputs[0]));
 	memset(outputs[1], 0, samples*sizeof(*outputs[1]));
 
-	// reg		function
+	// reg      function
 	// ------------------------------------------------
-	// 0x00		?
-	// 0x01		?
-	// 0x02		volume left
-	// 0x03		volume right
-	// 0x04		loop address (08-15)
-	// 0x05		loop address (16-23)
-	// 0x06		end address
-	// 0x07		address delta
-	// 0x80		?
-	// 0x81		?
-	// 0x82		?
-	// 0x83		?
-	// 0x84		current address (08-15), 00-07 is internal?
-	// 0x85		current address (16-23)
-	// 0x86		bit 0: channel disable?
-	//			bit 1: loop disable
-	//			other bits: bank
-	// 0x87		?
+	// 0x00     ?
+	// 0x01     ?
+	// 0x02     volume left
+	// 0x03     volume right
+	// 0x04     loop address (08-15)
+	// 0x05     loop address (16-23)
+	// 0x06     end address
+	// 0x07     address delta
+	// 0x80     ?
+	// 0x81     ?
+	// 0x82     ?
+	// 0x83     ?
+	// 0x84     current address (08-15), 00-07 is internal?
+	// 0x85     current address (16-23)
+	// 0x86     bit 0: channel disable?
+	//          bit 1: loop disable
+	//          other bits: bank
+	// 0x87     ?
 
 	/* loop over channels */
 	for (ch = 0; ch < 16; ch++)

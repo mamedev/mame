@@ -63,7 +63,7 @@ UINT8 st010_read_ram(snes_state *state, UINT16 addr)
 	UINT16 temp = state->upd96050->dataram_r(addr/2);
 	UINT8 res;
 
-	if (addr & 1) 
+	if (addr & 1)
 	{
 		res = temp>>8;
 	}
@@ -1134,7 +1134,7 @@ READ8_HANDLER( snes_r_bank4 )
 		else
 			value = snes_open_bus_r(space, 0);
 	}
-	else if (state->has_addon_chip == HAS_ST010 || state->has_addon_chip == HAS_ST011) 
+	else if (state->has_addon_chip == HAS_ST010 || state->has_addon_chip == HAS_ST011)
 	{
 		if (offset >= 0x80000 && address < 0x1000)
 		{
@@ -1294,7 +1294,7 @@ READ8_HANDLER( snes_r_bank7 )
 		value = sdd1_read(space->machine, offset);
 	else if (state->has_addon_chip == HAS_ST010 || state->has_addon_chip == HAS_ST011)
 	{
-		if (offset >= 0x280000 && offset < 0x300000 && address < 0x1000) 
+		if (offset >= 0x280000 && offset < 0x300000 && address < 0x1000)
 		{
 			value = st010_read_ram(state, address);
 		}
@@ -1449,7 +1449,7 @@ WRITE8_HANDLER( snes_w_bank4 )
 		snes_ram[0xe00000 + offset] = data;
 	else if (state->has_addon_chip == HAS_ST010 || state->has_addon_chip == HAS_ST011)
 	{
-		if (offset >= 0x80000 && address < 0x1000) 
+		if (offset >= 0x80000 && address < 0x1000)
 		{
 			st010_write_ram(state, address, data);
 		}
@@ -1760,7 +1760,7 @@ static void snes_init_ram( running_machine *machine )
 	snes_ram[VMAIN] = 0x80;
 
 	// see if there's a uPD7725 DSP in the machine config
-	state->upd7725 = machine->device<upd7725_device>("dsp"); 
+	state->upd7725 = machine->device<upd7725_device>("dsp");
 
 	// if we have a DSP, halt it for the moment
 	if (state->upd7725)
@@ -1790,7 +1790,7 @@ static void snes_init_ram( running_machine *machine )
 			{
 				logerror("SNES: Game uses a DSP, but the machine driver is missing the uPD7725!\n");
 				state->has_addon_chip = HAS_NONE;	// prevent crash trying to access NULL device
-			}   							
+			}
 			break;
 
 		case HAS_RTC:
@@ -1816,7 +1816,7 @@ static void snes_init_ram( running_machine *machine )
 			{
 				logerror("SNES: Game uses a Seta DSP, but the machine driver is missing the uPD96050!\n");
 				state->has_addon_chip = HAS_NONE;	// prevent crash trying to access NULL device
-			}   		 
+			}
 			break;
 
 		default:

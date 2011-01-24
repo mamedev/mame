@@ -81,12 +81,12 @@ public:
 	// construction/destruction
 	drc_cache(size_t bytes);
 	~drc_cache();
-	
+
 	// getters
 	drccodeptr near() const { return m_near; }
 	drccodeptr base() const { return m_base; }
 	drccodeptr top() const { return m_top; }
-	
+
 	// pointer checking
 	bool contains_pointer(const void *ptr) const { return ((const drccodeptr)ptr >= m_near && (const drccodeptr)ptr < m_near + m_size); }
 	bool contains_near_pointer(const void *ptr) const { return ((const drccodeptr)ptr >= m_near && (const drccodeptr)ptr < m_neartop); }
@@ -129,7 +129,7 @@ private:
 	struct oob_handler
 	{
 		oob_handler *next() const { return m_next; }
-		
+
 		oob_handler *	m_next;				// next handler
 		oob_func		m_callback;			// callback function
 		void *			m_param1;			// 1st pointer parameter

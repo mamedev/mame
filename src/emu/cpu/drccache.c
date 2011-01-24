@@ -101,7 +101,7 @@ void drc_cache::flush()
 
 
 //-------------------------------------------------
-//  alloc - allocate permanent memory from the 
+//  alloc - allocate permanent memory from the
 //  cache
 //-------------------------------------------------
 
@@ -186,7 +186,7 @@ void *drc_cache::alloc_temporary(size_t bytes)
 
 
 //-------------------------------------------------
-//  free - release permanent memory allocated from 
+//  free - release permanent memory allocated from
 //  the cache
 //-------------------------------------------------
 
@@ -259,7 +259,7 @@ drccodeptr drc_cache::end_codegen()
 
 
 //-------------------------------------------------
-//  request_oob_codegen - request callback for 
+//  request_oob_codegen - request callback for
 //  out-of-band codegen
 //-------------------------------------------------
 

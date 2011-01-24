@@ -106,8 +106,8 @@ drc_frontend::~drc_frontend()
 
 
 //-------------------------------------------------
-//  describe_code - describe a sequence of code 
-//  that falls within the configured window 
+//  describe_code - describe a sequence of code
+//  that falls within the configured window
 //  relative to the specified startpc
 //-------------------------------------------------
 
@@ -395,7 +395,7 @@ void drc_frontend::release_descriptions()
 	// release all delay slots first
 	for (opcode_desc *curdesc = m_desc_live_list.first(); curdesc != NULL; curdesc = curdesc->next())
 		m_desc_allocator.reclaim_all(curdesc->delay);
-	
+
 	// reclaim all the descriptors
 	m_desc_allocator.reclaim_all(m_desc_live_list);
 }

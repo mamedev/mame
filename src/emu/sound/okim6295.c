@@ -324,7 +324,7 @@ void okim6295_device::write_command(UINT8 command)
 		// the manual explicitly says that it's not possible to start multiple voices at the same time
 		int voicemask = command >> 4;
 		//if (voicemask != 0 && voicemask != 1 && voicemask != 2 && voicemask != 4 && voicemask != 8)
-		//	popmessage("OKI6295 start %x contact MAMEDEV", voicemask);
+		//  popmessage("OKI6295 start %x contact MAMEDEV", voicemask);
 
 		// update the stream
 		stream_update(m_stream);

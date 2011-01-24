@@ -421,7 +421,7 @@ static MACHINE_CONFIG_START( spaceg, spaceg_state )
 	MCFG_VIDEO_UPDATE( spaceg )
 
 	/* sound hardware */
-//	MCFG_SPEAKER_STANDARD_MONO("mono")
+//  MCFG_SPEAKER_STANDARD_MONO("mono")
 
 //  MCFG_SOUND_ADD("sn1", SN76496, 15468480/4)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

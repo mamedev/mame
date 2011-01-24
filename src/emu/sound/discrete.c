@@ -112,7 +112,7 @@ public:
 	inline void unlock(void) { m_threadid = -1; }
 
 	//const linked_list_entry *list;
-	node_step_list_t 		step_list;
+	node_step_list_t		step_list;
 
 	/* list of source nodes */
 	dynamic_array_t<input_buffer> source_list;		/* discrete_source_node */
@@ -135,7 +135,7 @@ protected:
 	void check(discrete_task *dest_task);
 	void prepare_for_queue(int samples);
 
-	dynamic_array_t<output_buffer> 		m_buffers;
+	dynamic_array_t<output_buffer>		m_buffers;
 	discrete_device	&					m_device;
 
 private:
@@ -303,7 +303,7 @@ void discrete_task::check(discrete_task *dest_task)
 						output_buffer *pbuf = NULL;
 
 						for (i = 0; i < m_buffers.count(); i++)
-//							if (m_buffers[i].node->block_node() == inputnode_num)
+//                          if (m_buffers[i].node->block_node() == inputnode_num)
 							if (m_buffers[i].node_num == inputnode_num)
 							{
 								found = i;

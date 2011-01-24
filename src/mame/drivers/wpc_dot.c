@@ -14,7 +14,7 @@ public:
 static ADDRESS_MAP_START( wpc_dot_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
-   	
+
 static INPUT_PORTS_START( wpc_dot )
 INPUT_PORTS_END
 
@@ -30,9 +30,9 @@ static MACHINE_CONFIG_START( wpc_dot, wpc_dot_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)
 	MCFG_CPU_PROGRAM_MAP(wpc_dot_map)
-	
+
 	MCFG_MACHINE_RESET( wpc_dot )
-	
+
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END

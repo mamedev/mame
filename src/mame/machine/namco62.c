@@ -6,7 +6,7 @@
     device. It is used by just one game: Gaplus.
 
     TODO: Chip pin description/layout/notes
-	
+
 ***************************************************************************/
 
 #include "emu.h"

@@ -14,7 +14,7 @@ public:
 static ADDRESS_MAP_START( ltd_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
-   	
+
 static INPUT_PORTS_START( ltd )
 INPUT_PORTS_END
 
@@ -30,9 +30,9 @@ static MACHINE_CONFIG_START( ltd, ltd_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6803, 1000000)
 	MCFG_CPU_PROGRAM_MAP(ltd_map)
-	
+
 	MCFG_MACHINE_RESET( ltd )
-	
+
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END

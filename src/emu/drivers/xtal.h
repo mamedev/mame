@@ -67,7 +67,7 @@ enum
 	XTAL_5_7143MHz		= 5714300,		/* Cidelsa Destroyer */
 	XTAL_5_9904MHz		= 5990400,		/* Luxor ABC 800 keyboard */
 	XTAL_6MHz   		= 6000000,		/* American Poker II */
-	XTAL_6_5MHz   		= 6500000,		/* Jupiter Ace */
+	XTAL_6_5MHz 		= 6500000,		/* Jupiter Ace */
 	XTAL_6_144MHz		= 6144000,		/* Used on Alpha Denshi early 80's games sound board */
 	XTAL_7MHz   		= 7000000,		/* Jaleco Mega System PCBs */
 	XTAL_7_15909MHz 	= 7159090,		/* Blood Bros */

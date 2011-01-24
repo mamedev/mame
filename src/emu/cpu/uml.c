@@ -432,8 +432,8 @@ void uml::instruction::configure(opcode_t op, UINT8 size, parameter p0, paramete
 
 
 //-------------------------------------------------
-//  simplify - simplify instructions that have 
-//  immediate values we can evaluate at compile 
+//  simplify - simplify instructions that have
+//  immediate values we can evaluate at compile
 //  time
 //-------------------------------------------------
 
@@ -767,22 +767,22 @@ void uml::instruction::simplify()
 		}
 
 	/*
-		if (LOG_SIMPLIFICATIONS && memcmp(&orig, inst, sizeof(orig)) != 0)
-		{
-			astring disasm1, disasm2;
-			orig.disasm(disasm1, block->drcuml);
-			inst->disasm(disasm2, block->drcuml);
-			mame_printf_debug("Simplified: %-50.50s -> %s\n", disasm1.cstr(), disasm2.cstr());
-		}
-	*/
-	
+        if (LOG_SIMPLIFICATIONS && memcmp(&orig, inst, sizeof(orig)) != 0)
+        {
+            astring disasm1, disasm2;
+            orig.disasm(disasm1, block->drcuml);
+            inst->disasm(disasm2, block->drcuml);
+            mame_printf_debug("Simplified: %-50.50s -> %s\n", disasm1.cstr(), disasm2.cstr());
+        }
+    */
+
 		// loop until we stop changing opcodes
 	} while (m_opcode != origop);
 }
 
 
 //-------------------------------------------------
-//  validate - verify that the instruction created 
+//  validate - verify that the instruction created
 //  meets all requirements
 //-------------------------------------------------
 
@@ -816,8 +816,8 @@ void uml::instruction::validate()
 
 
 //-------------------------------------------------
-//  input_flags - return the effective input flags 
-//  based on any conditions encoded in an 
+//  input_flags - return the effective input flags
+//  based on any conditions encoded in an
 //  instruction
 //-------------------------------------------------
 
@@ -826,21 +826,21 @@ UINT8 uml::instruction::input_flags() const
 	static const UINT8 flags_for_condition[] =
 	{
 		FLAG_Z,						// COND_Z
-		FLAG_Z,						// COND_NZ	
-		FLAG_S,						// COND_S	
-		FLAG_S,						// COND_NS	
-		FLAG_C,						// COND_C	
-		FLAG_C,						// COND_NC	
-		FLAG_V,						// COND_V	
-		FLAG_V,						// COND_NV	
-		FLAG_U,						// COND_U	
-		FLAG_U,						// COND_NU	
-		FLAG_C | FLAG_Z,			// COND_A	
-		FLAG_C | FLAG_Z,			// COND_BE	
-		FLAG_S | FLAG_V | FLAG_Z,	// COND_G	
-		FLAG_S | FLAG_V | FLAG_Z,	// COND_LE	
-		FLAG_S | FLAG_V,			// COND_L	
-		FLAG_S | FLAG_V				// COND_GE	
+		FLAG_Z,						// COND_NZ
+		FLAG_S,						// COND_S
+		FLAG_S,						// COND_NS
+		FLAG_C,						// COND_C
+		FLAG_C,						// COND_NC
+		FLAG_V,						// COND_V
+		FLAG_V,						// COND_NV
+		FLAG_U,						// COND_U
+		FLAG_U,						// COND_NU
+		FLAG_C | FLAG_Z,			// COND_A
+		FLAG_C | FLAG_Z,			// COND_BE
+		FLAG_S | FLAG_V | FLAG_Z,	// COND_G
+		FLAG_S | FLAG_V | FLAG_Z,	// COND_LE
+		FLAG_S | FLAG_V,			// COND_L
+		FLAG_S | FLAG_V				// COND_GE
 	};
 
 	UINT8 flags = s_opcode_info_table[m_opcode].inflags;
@@ -853,8 +853,8 @@ UINT8 uml::instruction::input_flags() const
 
 
 //-------------------------------------------------
-//  output_flags - return the effective output 
-//  flags based on any conditions encoded in an 
+//  output_flags - return the effective output
+//  flags based on any conditions encoded in an
 //  instruction
 //-------------------------------------------------
 
@@ -868,8 +868,8 @@ UINT8 uml::instruction::output_flags() const
 
 
 //-------------------------------------------------
-//  modified_flags - return the effective output 
-//  flags based on any conditions encoded in an 
+//  modified_flags - return the effective output
+//  flags based on any conditions encoded in an
 //  instruction
 //-------------------------------------------------
 
@@ -880,7 +880,7 @@ UINT8 uml::instruction::modified_flags() const
 
 
 //-------------------------------------------------
-//  disasm - disassemble an instruction to the 
+//  disasm - disassemble an instruction to the
 //  given buffer
 //-------------------------------------------------
 

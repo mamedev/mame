@@ -40,7 +40,7 @@ VIDEO_START( starfire )
 WRITE8_HANDLER( starfire_colorram_w )
 {
 	starfire_state *state = space->machine->driver_data<starfire_state>();
-    
+
     /* handle writes to the pseudo-color RAM */
 	if ((offset & 0xe0) == 0)
 	{
@@ -50,10 +50,10 @@ WRITE8_HANDLER( starfire_colorram_w )
 		int cl = (state->starfire_vidctrl1 & 0x80) ? state->starfire_color : (data & 0x1f);
 		int cr = (data >> 5) | ((offset & 0x100) >> 5);
         cr |= (state->starfire_vidctrl1 & 0x80) ? (state->starfire_color & 0x10) : (data & 0x10);
-		
+
 		state->starfire_colorram[offset & ~0x100] = cl;
         state->starfire_colorram[offset |  0x100] = cr;
-		
+
 		state->starfire_color = cl;
 
 		/* don't modify the palette unless the TRANS bit is set */
@@ -188,7 +188,7 @@ READ8_HANDLER( starfire_videoram_r )
 	int offset1 = offset & 0x1fff;
 	int offset2 = (offset + 0x100) & 0x1fff;
     starfire_state *state = space->machine->driver_data<starfire_state>();
-    
+
 	/* selector 6A */
 	if (offset & 0x2000)
 		sh = (state->starfire_vidctrl >> 1) & 0x07;

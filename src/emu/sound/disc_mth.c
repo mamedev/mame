@@ -1585,7 +1585,7 @@ DISCRETE_STEP(dst_transform)
 	{
 		switch (*fPTR++)
 		{
-			case TOK_MULT: 		top = stack.pop() * top;					break;
+			case TOK_MULT:		top = stack.pop() * top;					break;
 			case TOK_DIV:		top = stack.pop() / top;					break;
 			case TOK_ADD:		top = stack.pop() + top;					break;
 			case TOK_MINUS:		top = stack.pop() - top;					break;
@@ -1630,7 +1630,7 @@ DISCRETE_RESET(dst_transform)
 			case '4':	*p = TOK_4;			break;
 			case 'P':	*p = TOK_DUP;		break;
 			case 'a':	*p = TOK_ABS;		break; /* absolute value */
-			case 'i':	*p = TOK_NEG; 		break; /* * -1 */
+			case 'i':	*p = TOK_NEG;		break; /* * -1 */
 			case '!':	*p = TOK_NOT;		break; /* Logical NOT of Last Value */
 			case '=':	*p = TOK_EQUAL;		break; /* Logical = */
 			case '>':	*p = TOK_GREATER;	break; /* Logical > */
@@ -1863,7 +1863,7 @@ DISCRETE_STEP(dst_tvca_op_amp)
 	double	i_pos = 0;	/* current into + input */
 	double	i_out = 0;	/* current at output */
 
-	double 	v_out;
+	double	v_out;
 
 	trig0 = (int)DST_TVCA_OP_AMP__TRG0;
 	trig1 = (int)DST_TVCA_OP_AMP__TRG1;

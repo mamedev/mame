@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	drcbex86.c
+    drcbex86.c
 
     32-bit x86 back-end for the universal machine language.
 
@@ -216,89 +216,89 @@ static const UINT16 fp_control[4] =
 const drcbe_x86::opcode_table_entry drcbe_x86::s_opcode_table_source[] =
 {
 	// Compile-time opcodes
-	{ uml::OP_HANDLE,  &drcbe_x86::op_handle },		// HANDLE  handle                
-	{ uml::OP_HASH,    &drcbe_x86::op_hash },		// HASH    mode,pc               
-	{ uml::OP_LABEL,   &drcbe_x86::op_label },		// LABEL   imm                   
-	{ uml::OP_COMMENT, &drcbe_x86::op_comment },	// COMMENT string                
-	{ uml::OP_MAPVAR,  &drcbe_x86::op_mapvar },		// MAPVAR  mapvar,value          
+	{ uml::OP_HANDLE,  &drcbe_x86::op_handle },		// HANDLE  handle
+	{ uml::OP_HASH,    &drcbe_x86::op_hash },		// HASH    mode,pc
+	{ uml::OP_LABEL,   &drcbe_x86::op_label },		// LABEL   imm
+	{ uml::OP_COMMENT, &drcbe_x86::op_comment },	// COMMENT string
+	{ uml::OP_MAPVAR,  &drcbe_x86::op_mapvar },		// MAPVAR  mapvar,value
 
 	// Control Flow Operations
-	{ uml::OP_NOP,     &drcbe_x86::op_nop },		// NOP                           
-	{ uml::OP_DEBUG,   &drcbe_x86::op_debug },		// DEBUG   pc                    
-	{ uml::OP_EXIT,    &drcbe_x86::op_exit },		// EXIT    src1[,c]              
-	{ uml::OP_HASHJMP, &drcbe_x86::op_hashjmp },	// HASHJMP mode,pc,handle        
-	{ uml::OP_JMP,     &drcbe_x86::op_jmp },		// JMP     imm[,c]               
-	{ uml::OP_EXH,     &drcbe_x86::op_exh },		// EXH     handle,param[,c]      
-	{ uml::OP_CALLH,   &drcbe_x86::op_callh },		// CALLH   handle[,c]            
-	{ uml::OP_RET,     &drcbe_x86::op_ret },		// RET     [c]                   
-	{ uml::OP_CALLC,   &drcbe_x86::op_callc },		// CALLC   func,ptr[,c]          
-	{ uml::OP_RECOVER, &drcbe_x86::op_recover },	// RECOVER dst,mapvar            
+	{ uml::OP_NOP,     &drcbe_x86::op_nop },		// NOP
+	{ uml::OP_DEBUG,   &drcbe_x86::op_debug },		// DEBUG   pc
+	{ uml::OP_EXIT,    &drcbe_x86::op_exit },		// EXIT    src1[,c]
+	{ uml::OP_HASHJMP, &drcbe_x86::op_hashjmp },	// HASHJMP mode,pc,handle
+	{ uml::OP_JMP,     &drcbe_x86::op_jmp },		// JMP     imm[,c]
+	{ uml::OP_EXH,     &drcbe_x86::op_exh },		// EXH     handle,param[,c]
+	{ uml::OP_CALLH,   &drcbe_x86::op_callh },		// CALLH   handle[,c]
+	{ uml::OP_RET,     &drcbe_x86::op_ret },		// RET     [c]
+	{ uml::OP_CALLC,   &drcbe_x86::op_callc },		// CALLC   func,ptr[,c]
+	{ uml::OP_RECOVER, &drcbe_x86::op_recover },	// RECOVER dst,mapvar
 
 	// Internal Register Operations
-	{ uml::OP_SETFMOD, &drcbe_x86::op_setfmod },	// SETFMOD src                   
-	{ uml::OP_GETFMOD, &drcbe_x86::op_getfmod },	// GETFMOD dst                   
-	{ uml::OP_GETEXP,  &drcbe_x86::op_getexp },		// GETEXP  dst                   
-	{ uml::OP_GETFLGS, &drcbe_x86::op_getflgs },	// GETFLGS dst[,f]               
-	{ uml::OP_SAVE,    &drcbe_x86::op_save },		// SAVE    dst                   
-	{ uml::OP_RESTORE, &drcbe_x86::op_restore },	// RESTORE dst                   
+	{ uml::OP_SETFMOD, &drcbe_x86::op_setfmod },	// SETFMOD src
+	{ uml::OP_GETFMOD, &drcbe_x86::op_getfmod },	// GETFMOD dst
+	{ uml::OP_GETEXP,  &drcbe_x86::op_getexp },		// GETEXP  dst
+	{ uml::OP_GETFLGS, &drcbe_x86::op_getflgs },	// GETFLGS dst[,f]
+	{ uml::OP_SAVE,    &drcbe_x86::op_save },		// SAVE    dst
+	{ uml::OP_RESTORE, &drcbe_x86::op_restore },	// RESTORE dst
 
 	// Integer Operations
-	{ uml::OP_LOAD,    &drcbe_x86::op_load },		// LOAD    dst,base,index,size   
-	{ uml::OP_LOADS,   &drcbe_x86::op_loads },		// LOADS   dst,base,index,size   
-	{ uml::OP_STORE,   &drcbe_x86::op_store },		// STORE   base,index,src,size   
-	{ uml::OP_READ,    &drcbe_x86::op_read },		// READ    dst,src1,spacesize    
+	{ uml::OP_LOAD,    &drcbe_x86::op_load },		// LOAD    dst,base,index,size
+	{ uml::OP_LOADS,   &drcbe_x86::op_loads },		// LOADS   dst,base,index,size
+	{ uml::OP_STORE,   &drcbe_x86::op_store },		// STORE   base,index,src,size
+	{ uml::OP_READ,    &drcbe_x86::op_read },		// READ    dst,src1,spacesize
 	{ uml::OP_READM,   &drcbe_x86::op_readm },		// READM   dst,src1,mask,spacesize
-	{ uml::OP_WRITE,   &drcbe_x86::op_write },		// WRITE   dst,src1,spacesize    
-	{ uml::OP_WRITEM,  &drcbe_x86::op_writem },		// WRITEM  dst,src1,spacesize    
-	{ uml::OP_CARRY,   &drcbe_x86::op_carry },		// CARRY   src,bitnum            
-	{ uml::OP_SET,     &drcbe_x86::op_set },		// SET     dst,c                 
-	{ uml::OP_MOV,     &drcbe_x86::op_mov },		// MOV     dst,src[,c]           
-	{ uml::OP_SEXT,    &drcbe_x86::op_sext },		// SEXT    dst,src               
-	{ uml::OP_ROLAND,  &drcbe_x86::op_roland },		// ROLAND  dst,src1,src2,src3    
-	{ uml::OP_ROLINS,  &drcbe_x86::op_rolins },		// ROLINS  dst,src1,src2,src3    
-	{ uml::OP_ADD,     &drcbe_x86::op_add },		// ADD     dst,src1,src2[,f]     
-	{ uml::OP_ADDC,    &drcbe_x86::op_addc },		// ADDC    dst,src1,src2[,f]     
-	{ uml::OP_SUB,     &drcbe_x86::op_sub },		// SUB     dst,src1,src2[,f]     
-	{ uml::OP_SUBB,    &drcbe_x86::op_subc },		// SUBB    dst,src1,src2[,f]     
-	{ uml::OP_CMP,     &drcbe_x86::op_cmp },		// CMP     src1,src2[,f]         
+	{ uml::OP_WRITE,   &drcbe_x86::op_write },		// WRITE   dst,src1,spacesize
+	{ uml::OP_WRITEM,  &drcbe_x86::op_writem },		// WRITEM  dst,src1,spacesize
+	{ uml::OP_CARRY,   &drcbe_x86::op_carry },		// CARRY   src,bitnum
+	{ uml::OP_SET,     &drcbe_x86::op_set },		// SET     dst,c
+	{ uml::OP_MOV,     &drcbe_x86::op_mov },		// MOV     dst,src[,c]
+	{ uml::OP_SEXT,    &drcbe_x86::op_sext },		// SEXT    dst,src
+	{ uml::OP_ROLAND,  &drcbe_x86::op_roland },		// ROLAND  dst,src1,src2,src3
+	{ uml::OP_ROLINS,  &drcbe_x86::op_rolins },		// ROLINS  dst,src1,src2,src3
+	{ uml::OP_ADD,     &drcbe_x86::op_add },		// ADD     dst,src1,src2[,f]
+	{ uml::OP_ADDC,    &drcbe_x86::op_addc },		// ADDC    dst,src1,src2[,f]
+	{ uml::OP_SUB,     &drcbe_x86::op_sub },		// SUB     dst,src1,src2[,f]
+	{ uml::OP_SUBB,    &drcbe_x86::op_subc },		// SUBB    dst,src1,src2[,f]
+	{ uml::OP_CMP,     &drcbe_x86::op_cmp },		// CMP     src1,src2[,f]
 	{ uml::OP_MULU,    &drcbe_x86::op_mulu },		// MULU    dst,edst,src1,src2[,f]
 	{ uml::OP_MULS,    &drcbe_x86::op_muls },		// MULS    dst,edst,src1,src2[,f]
 	{ uml::OP_DIVU,    &drcbe_x86::op_divu },		// DIVU    dst,edst,src1,src2[,f]
 	{ uml::OP_DIVS,    &drcbe_x86::op_divs },		// DIVS    dst,edst,src1,src2[,f]
-	{ uml::OP_AND,     &drcbe_x86::op_and },		// AND     dst,src1,src2[,f]     
-	{ uml::OP_TEST,    &drcbe_x86::op_test },		// TEST    src1,src2[,f]         
-	{ uml::OP_OR,      &drcbe_x86::op_or },			// OR      dst,src1,src2[,f]     
-	{ uml::OP_XOR,     &drcbe_x86::op_xor },		// XOR     dst,src1,src2[,f]     
-	{ uml::OP_LZCNT,   &drcbe_x86::op_lzcnt },		// LZCNT   dst,src[,f]           
-	{ uml::OP_BSWAP,   &drcbe_x86::op_bswap },		// BSWAP   dst,src               
-	{ uml::OP_SHL,     &drcbe_x86::op_shl },		// SHL     dst,src,count[,f]     
-	{ uml::OP_SHR,     &drcbe_x86::op_shr },		// SHR     dst,src,count[,f]     
-	{ uml::OP_SAR,     &drcbe_x86::op_sar },		// SAR     dst,src,count[,f]     
-	{ uml::OP_ROL,     &drcbe_x86::op_rol },		// ROL     dst,src,count[,f]     
-	{ uml::OP_ROLC,    &drcbe_x86::op_rolc },		// ROLC    dst,src,count[,f]     
-	{ uml::OP_ROR,     &drcbe_x86::op_ror },		// ROR     dst,src,count[,f]     
-	{ uml::OP_RORC,    &drcbe_x86::op_rorc },		// RORC    dst,src,count[,f]     
+	{ uml::OP_AND,     &drcbe_x86::op_and },		// AND     dst,src1,src2[,f]
+	{ uml::OP_TEST,    &drcbe_x86::op_test },		// TEST    src1,src2[,f]
+	{ uml::OP_OR,      &drcbe_x86::op_or },			// OR      dst,src1,src2[,f]
+	{ uml::OP_XOR,     &drcbe_x86::op_xor },		// XOR     dst,src1,src2[,f]
+	{ uml::OP_LZCNT,   &drcbe_x86::op_lzcnt },		// LZCNT   dst,src[,f]
+	{ uml::OP_BSWAP,   &drcbe_x86::op_bswap },		// BSWAP   dst,src
+	{ uml::OP_SHL,     &drcbe_x86::op_shl },		// SHL     dst,src,count[,f]
+	{ uml::OP_SHR,     &drcbe_x86::op_shr },		// SHR     dst,src,count[,f]
+	{ uml::OP_SAR,     &drcbe_x86::op_sar },		// SAR     dst,src,count[,f]
+	{ uml::OP_ROL,     &drcbe_x86::op_rol },		// ROL     dst,src,count[,f]
+	{ uml::OP_ROLC,    &drcbe_x86::op_rolc },		// ROLC    dst,src,count[,f]
+	{ uml::OP_ROR,     &drcbe_x86::op_ror },		// ROR     dst,src,count[,f]
+	{ uml::OP_RORC,    &drcbe_x86::op_rorc },		// RORC    dst,src,count[,f]
 
 	// Floating Point Operations
-	{ uml::OP_FLOAD,   &drcbe_x86::op_fload },		// FLOAD   dst,base,index        
-	{ uml::OP_FSTORE,  &drcbe_x86::op_fstore },		// FSTORE  base,index,src        
-	{ uml::OP_FREAD,   &drcbe_x86::op_fread },		// FREAD   dst,space,src1        
-	{ uml::OP_FWRITE,  &drcbe_x86::op_fwrite },		// FWRITE  space,dst,src1        
-	{ uml::OP_FMOV,    &drcbe_x86::op_fmov },		// FMOV    dst,src1[,c]          
-	{ uml::OP_FTOINT,  &drcbe_x86::op_ftoint },		// FTOINT  dst,src1,size,round   
-	{ uml::OP_FFRINT,  &drcbe_x86::op_ffrint },		// FFRINT  dst,src1,size         
-	{ uml::OP_FFRFLT,  &drcbe_x86::op_ffrflt },		// FFRFLT  dst,src1,size         
-	{ uml::OP_FRNDS,   &drcbe_x86::op_frnds },		// FRNDS   dst,src1              
-	{ uml::OP_FADD,    &drcbe_x86::op_fadd },		// FADD    dst,src1,src2         
-	{ uml::OP_FSUB,    &drcbe_x86::op_fsub },		// FSUB    dst,src1,src2         
-	{ uml::OP_FCMP,    &drcbe_x86::op_fcmp },		// FCMP    src1,src2             
-	{ uml::OP_FMUL,    &drcbe_x86::op_fmul },		// FMUL    dst,src1,src2         
-	{ uml::OP_FDIV,    &drcbe_x86::op_fdiv },		// FDIV    dst,src1,src2         
-	{ uml::OP_FNEG,    &drcbe_x86::op_fneg },		// FNEG    dst,src1              
-	{ uml::OP_FABS,    &drcbe_x86::op_fabs },		// FABS    dst,src1              
-	{ uml::OP_FSQRT,   &drcbe_x86::op_fsqrt },		// FSQRT   dst,src1              
-	{ uml::OP_FRECIP,  &drcbe_x86::op_frecip },		// FRECIP  dst,src1              
-	{ uml::OP_FRSQRT,  &drcbe_x86::op_frsqrt }		// FRSQRT  dst,src1              
+	{ uml::OP_FLOAD,   &drcbe_x86::op_fload },		// FLOAD   dst,base,index
+	{ uml::OP_FSTORE,  &drcbe_x86::op_fstore },		// FSTORE  base,index,src
+	{ uml::OP_FREAD,   &drcbe_x86::op_fread },		// FREAD   dst,space,src1
+	{ uml::OP_FWRITE,  &drcbe_x86::op_fwrite },		// FWRITE  space,dst,src1
+	{ uml::OP_FMOV,    &drcbe_x86::op_fmov },		// FMOV    dst,src1[,c]
+	{ uml::OP_FTOINT,  &drcbe_x86::op_ftoint },		// FTOINT  dst,src1,size,round
+	{ uml::OP_FFRINT,  &drcbe_x86::op_ffrint },		// FFRINT  dst,src1,size
+	{ uml::OP_FFRFLT,  &drcbe_x86::op_ffrflt },		// FFRFLT  dst,src1,size
+	{ uml::OP_FRNDS,   &drcbe_x86::op_frnds },		// FRNDS   dst,src1
+	{ uml::OP_FADD,    &drcbe_x86::op_fadd },		// FADD    dst,src1,src2
+	{ uml::OP_FSUB,    &drcbe_x86::op_fsub },		// FSUB    dst,src1,src2
+	{ uml::OP_FCMP,    &drcbe_x86::op_fcmp },		// FCMP    src1,src2
+	{ uml::OP_FMUL,    &drcbe_x86::op_fmul },		// FMUL    dst,src1,src2
+	{ uml::OP_FDIV,    &drcbe_x86::op_fdiv },		// FDIV    dst,src1,src2
+	{ uml::OP_FNEG,    &drcbe_x86::op_fneg },		// FNEG    dst,src1
+	{ uml::OP_FABS,    &drcbe_x86::op_fabs },		// FABS    dst,src1
+	{ uml::OP_FSQRT,   &drcbe_x86::op_fsqrt },		// FSQRT   dst,src1
+	{ uml::OP_FRECIP,  &drcbe_x86::op_frecip },		// FRECIP  dst,src1
+	{ uml::OP_FRSQRT,  &drcbe_x86::op_frsqrt }		// FRSQRT  dst,src1
 };
 
 
@@ -357,8 +357,8 @@ drcbe_x86::be_parameter::be_parameter(drcbe_x86 &drcbe, const parameter &param, 
 
 
 //-------------------------------------------------
-//  select_register - select a register to use, 
-//  avoiding conflicts with the optional 
+//  select_register - select a register to use,
+//  avoiding conflicts with the optional
 //  checkparam
 //-------------------------------------------------
 
@@ -385,8 +385,8 @@ inline int drcbe_x86::be_parameter::select_register(int defreg, const be_paramet
 
 
 //-------------------------------------------------
-//  select_register - select a register to use, 
-//  avoiding conflicts with the optional 
+//  select_register - select a register to use,
+//  avoiding conflicts with the optional
 //  checkparam
 //-------------------------------------------------
 
@@ -4210,7 +4210,7 @@ void drcbe_x86::op_set(x86code *&dst, const instruction &inst)
 void drcbe_x86::op_mov(x86code *&dst, const instruction &inst)
 {
 	x86code *savedst = dst;
-	
+
 	// validate instruction
 	assert(inst.size() == 4 || inst.size() == 8);
 	assert_any_condition(inst);

@@ -13,11 +13,11 @@ public:
 
 static ADDRESS_MAP_START( mephisto_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x0ffff) AM_ROM 	
-	AM_RANGE(0x10000, 0x1ffff) AM_RAM 
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM 		
+	AM_RANGE(0x00000, 0x0ffff) AM_ROM
+	AM_RANGE(0x10000, 0x1ffff) AM_RAM
+	AM_RANGE(0xf8000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
-   	
+
 static INPUT_PORTS_START( mephisto )
 INPUT_PORTS_END
 
@@ -33,9 +33,9 @@ static MACHINE_CONFIG_START( mephisto, mephisto_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, 8000000)
 	MCFG_CPU_PROGRAM_MAP(mephisto_map)
-	
+
 	MCFG_MACHINE_RESET( mephisto )
-	
+
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END

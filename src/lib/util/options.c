@@ -251,9 +251,9 @@ void options_revert(core_options *opts, int priority)
 }
 
 /*-------------------------------------------------
-    options_revert_driver_only - revert options 
+    options_revert_driver_only - revert options
     that are marked as driver only and are under
-	priority level
+    priority level
 -------------------------------------------------*/
 
 void options_revert_driver_only(core_options *opts, int priority)
@@ -475,13 +475,13 @@ int options_parse_command_line(core_options *opts, int argc, char **argv, int pr
 
 		/* find our entry */
 		data = find_entry_data(opts, optionname, TRUE);
-		if (data == NULL) continue;		
+		if (data == NULL) continue;
 		if ((data->flags & OPTION_COMMAND) != 0) {
 			// in case of any command force show error to TRUE
 			show_error = TRUE;
 			break;
 		}
-	}	
+	}
 	/* loop over commands, looking for options */
 	for (arg = 1; arg < argc; arg++)
 	{
@@ -776,9 +776,9 @@ const char *options_get_string(core_options *opts, const char *name)
 
 
 /*-------------------------------------------------
-    options_get_string_priority - return data 
+    options_get_string_priority - return data
     formatted as a string if priority is equal
-	or better
+    or better
 -------------------------------------------------*/
 
 const char *options_get_string_priority(core_options *opts, const char *name, int priority)
@@ -791,9 +791,9 @@ const char *options_get_string_priority(core_options *opts, const char *name, in
 		message(opts, OPTMSG_ERROR, "Unexpected option %s queried\n", name);
 
 	/* copy if non-NULL */
-	else {	
+	else {
 		if (data->priority!=OPTION_PRIORITY_DEFAULT) {
-			if (priority > data->priority) return value;	
+			if (priority > data->priority) return value;
 		}
 		value = astring_c(data->data);
 	}
@@ -1148,9 +1148,9 @@ static void update_data(core_options *opts, options_data *data, const char *newd
 			}
 			break;
 	}
-	
+
 	/* ignore if we don't have priority */
-	if (priority < data->priority) {	
+	if (priority < data->priority) {
 		return;
 	}
 	/* allocate a copy of the data */

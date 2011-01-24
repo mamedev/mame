@@ -104,7 +104,7 @@ struct _z80bin_config
 	MCFG_DEVICE_CONFIG_DATA64(snapquick_config, delay_seconds, (seconds_t) (_delay)) \
 	MCFG_DEVICE_CONFIG_DATA64(snapquick_config, delay_attoseconds, (attoseconds_t) (((_delay) - (int)(_delay)) * ATTOSECONDS_PER_SECOND)) \
 	MCFG_DEVICE_CONFIG_DATAPTR(z80bin_config, execute, Z80BIN_EXECUTE_NAME(_execute))
-	
+
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/

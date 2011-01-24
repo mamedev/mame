@@ -1,5 +1,5 @@
 /*
-	Capcom A0015405
+    Capcom A0015405
 */
 
 #include "emu.h"
@@ -18,7 +18,7 @@ public:
 static ADDRESS_MAP_START( capcom_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
-   	
+
 static INPUT_PORTS_START( capcom )
 INPUT_PORTS_END
 
@@ -34,9 +34,9 @@ static MACHINE_CONFIG_START( capcom, capcom_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16670000) // M68306
 	MCFG_CPU_PROGRAM_MAP(capcom_map)
-	
+
 	MCFG_MACHINE_RESET( capcom )
-	
+
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END

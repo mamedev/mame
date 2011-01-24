@@ -15,7 +15,7 @@
  *
  *  Additions/bugfix February 2003 - D.Renaud, F.Palazzolo, K.Wilkins
  *  Discrete parallel tasks 2009 - Couriersud
- *  Discrete classes 2010		 - Couriersud
+ *  Discrete classes 2010        - Couriersud
  *
  ***********************************************************************/
 
@@ -48,7 +48,7 @@ DISCRETE_CLASS_STEP_RESET(dss_lfsr_noise, 2,
 );
 
 DISCRETE_CLASS_STEP_RESET(dss_noise, 2,
-	double 			m_phase;
+	double			m_phase;
 );
 
 DISCRETE_CLASS_STEP_RESET(dss_note, 1,
@@ -128,12 +128,12 @@ protected:
 	inline double tftab(double x);
 	inline double tf(double x);
 private:
-	DISCRETE_CLASS_INPUT(I_ENABLE, 	0);
+	DISCRETE_CLASS_INPUT(I_ENABLE,	0);
 	DISCRETE_CLASS_INPUT(I_MOD, 	1);
-	DISCRETE_CLASS_INPUT(I_RC, 		2);
-	DISCRETE_CLASS_INPUT(I_RP, 		3);
-	DISCRETE_CLASS_INPUT(I_C, 		4);
-	DISCRETE_CLASS_INPUT(I_R2, 		5);
+	DISCRETE_CLASS_INPUT(I_RC,		2);
+	DISCRETE_CLASS_INPUT(I_RP,		3);
+	DISCRETE_CLASS_INPUT(I_C,		4);
+	DISCRETE_CLASS_INPUT(I_R2,		5);
 
 	double			mc_v_cap;
 	double			mc_v_g2_old;

@@ -17,18 +17,18 @@ CPU_DISASSEMBLE( pps4 )
 {
 	UINT32 flags = 0;
 	unsigned PC = pc;
-	UINT8 op;	
+	UINT8 op;
 	switch (op = OP(pc++))
 	{
 		// Arithmetic instructions
-		case 0x0b: 	sprintf (buffer,"ad");	break;
-		case 0x0a: 	sprintf (buffer,"adc");	break;
+		case 0x0b:	sprintf (buffer,"ad");	break;
+		case 0x0a:	sprintf (buffer,"adc");	break;
 		case 0x09:	sprintf (buffer,"adsk");	break;
 		case 0x08:	sprintf (buffer,"adcsk");	break;
 		case 0x60:	case 0x61:	case 0x62:	case 0x63:
 		case 0x64:	case 0x66:	case 0x67:	case 0x68:
 		case 0x69:	case 0x6a:	case 0x6b:	case 0x6c:
-		case 0x6d:	case 0x6e:	
+		case 0x6d:	case 0x6e:
 					sprintf (buffer,"adi %01x",(op & 0x0f));	break;
 		case 0x65:	sprintf (buffer,"dc");	break;
 		// Logical instructions
@@ -42,7 +42,7 @@ CPU_DISASSEMBLE( pps4 )
 		case 0x22:	sprintf (buffer,"sf1");	break;
 		case 0x26:	sprintf (buffer,"rf1");	break;
 		case 0x21:	sprintf (buffer,"sf2");	break;
-		case 0x25:	sprintf (buffer,"rf2");	break;		
+		case 0x25:	sprintf (buffer,"rf2");	break;
 		case 0x30:	case 0x31:	case 0x32:	case 0x33:
 		case 0x34:	case 0x35:	case 0x36:	case 0x37:
 					sprintf (buffer,"ld %01x",(op & 0x07));	break;
@@ -90,7 +90,7 @@ CPU_DISASSEMBLE( pps4 )
 		case 0xb4:	case 0xb5:	case 0xb6:	case 0xb7:
 		case 0xb8:	case 0xb9:	case 0xba:	case 0xbb:
 		case 0xbc:	case 0xbd:	case 0xbe:	case 0xbf:
-					sprintf (buffer,"t %02x",(op & 0x3f));	break;		
+					sprintf (buffer,"t %02x",(op & 0x3f));	break;
 		case 0xd0:	case 0xd1:	case 0xd2:	case 0xd3:
 		case 0xd4:	case 0xd5:	case 0xd6:	case 0xd7:
 		case 0xd8:	case 0xd9:	case 0xda:	case 0xdb:
@@ -130,6 +130,6 @@ CPU_DISASSEMBLE( pps4 )
 		// Special instructions
 		case 0x13:	sprintf (buffer,"sag");	break;
 	}
-	
+
 	return (pc - PC) | flags | DASMFLAG_SUPPORTED;
 }

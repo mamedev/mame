@@ -489,8 +489,8 @@ static READ8_HANDLER( leta_r )
 				UINT32 temp;
 				UINT32 rotate_count = input_port_read(space->machine, "FAKE_SPINNER") & 0xffff;
 				/* rotate_count behaves the same as the real LEAT1 Rotate encoder
-				 * we use it to generate the LETA0 Center encoder count
-				 */
+                 * we use it to generate the LETA0 Center encoder count
+                 */
 
 				if (rotate_count != last_rotate_count)
 				{
@@ -558,14 +558,14 @@ static READ8_HANDLER( leta_r )
 				else
 					/* offset == 1 */
 					return rotate_count & 0xff;
-		 	}
+			}
 
 			default:
 				logerror("Unknown controller passed to leta_r");
 				return 0xff;
 		}
 	}
-   	return input_port_read(space->machine, letanames[offset]);
+	return input_port_read(space->machine, letanames[offset]);
 }
 
 
@@ -968,17 +968,17 @@ static INPUT_PORTS_START( 720 )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	/* 720 uses a special controller to control the player rotation.
-	 * It uses 1 disc with 72 teeth for the rotation and another disc
-	 * with 2 teeth for the alignment of the joystick to the top position.
-	 * The following graph shows how the Center and Rotate disc align.
-	 * The numbers show how the optical count varies from center.
-	 *
-	 *   _____2  1________1  2_____
-	 *        |__|        |__|          Center disc - 2 teeth.  Shown lined up with Rotate disc
-	 *      __    __    __    __
-	 *	 __|  |__|  |__|  |__|  |__     Rotate disc - 72 teeth (144 positions)
-	 *     4  3  2  1  1  2  3  4
-	 */
+     * It uses 1 disc with 72 teeth for the rotation and another disc
+     * with 2 teeth for the alignment of the joystick to the top position.
+     * The following graph shows how the Center and Rotate disc align.
+     * The numbers show how the optical count varies from center.
+     *
+     *   _____2  1________1  2_____
+     *        |__|        |__|          Center disc - 2 teeth.  Shown lined up with Rotate disc
+     *      __    __    __    __
+     *   __|  |__|  |__|  |__|  |__     Rotate disc - 72 teeth (144 positions)
+     *     4  3  2  1  1  2  3  4
+     */
 
 	/* Center disc */
 	/* X1, X2 LETA inputs */
@@ -999,7 +999,7 @@ static INPUT_PORTS_START( 720 )
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x01)
 
 	/* Let's assume we are using a 1200 count spinner.  We scale to get a 144 count.
-	 * 144/1200 = 0.12 = 12% */
+     * 144/1200 = 0.12 = 12% */
 	PORT_START("FAKE_SPINNER")	/* not direct mapped */
 	PORT_BIT( 0xffff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(12) PORT_KEYDELTA(10) PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x02)
 

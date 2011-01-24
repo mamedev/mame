@@ -6,7 +6,7 @@
   which use one or more Toaplan L7A0498 GP9001 graphic controllers.
 
   The simpler hardware of these games use one GP9001 controller.
-  
+
   Next we have games that use two GP9001 controllers, the mixing of
   the VDPs depends on a PAL on the motherboard.
   (mixing handled in toaplan2.c)
@@ -569,20 +569,20 @@ static void gp9001_scroll_reg_data_w(gp9001vdp_device *vdp, offs_t offset, UINT1
 	/************************************************************************/
 
 	//printf("gp9001_scroll_reg_data_w %04x %04x\n", offset, data);
-	
+
 	// writes with 8x set turn on flip for the specified layer / axis
 	int flip = vdp->gp9001_scroll_reg & 0x80;
 
 	switch(vdp->gp9001_scroll_reg&0x7f)
 	{
 		case 0x00: gp9001_set_scrollx_and_flip_reg(&vdp->bg, data, mem_mask, flip); break;
-		case 0x01: gp9001_set_scrolly_and_flip_reg(&vdp->bg, data, mem_mask, flip); break;					
+		case 0x01: gp9001_set_scrolly_and_flip_reg(&vdp->bg, data, mem_mask, flip); break;
 
 		case 0x02: gp9001_set_scrollx_and_flip_reg(&vdp->fg, data, mem_mask, flip); break;
-		case 0x03: gp9001_set_scrolly_and_flip_reg(&vdp->fg, data, mem_mask, flip); break;					
+		case 0x03: gp9001_set_scrolly_and_flip_reg(&vdp->fg, data, mem_mask, flip); break;
 
 		case 0x04: gp9001_set_scrollx_and_flip_reg(&vdp->top,data, mem_mask, flip); break;
-		case 0x05: gp9001_set_scrolly_and_flip_reg(&vdp->top,data, mem_mask, flip); break;					
+		case 0x05: gp9001_set_scrolly_and_flip_reg(&vdp->top,data, mem_mask, flip); break;
 
 		case 0x06: gp9001_set_sprite_scrollx_and_flip_reg(&vdp->sp, data,mem_mask,flip); break;
 		case 0x07: gp9001_set_sprite_scrolly_and_flip_reg(&vdp->sp, data,mem_mask,flip); break;
@@ -614,11 +614,11 @@ static void gp9001_scroll_reg_data_w(gp9001vdp_device *vdp, offs_t offset, UINT1
 void gp9001vdp_device::init_scroll_regs()
 {
 	gp9001_set_scrollx_and_flip_reg(&bg, 0, 0xffff, 0);
-	gp9001_set_scrolly_and_flip_reg(&bg, 0, 0xffff, 0);					
+	gp9001_set_scrolly_and_flip_reg(&bg, 0, 0xffff, 0);
 	gp9001_set_scrollx_and_flip_reg(&fg, 0, 0xffff, 0);
-	gp9001_set_scrolly_and_flip_reg(&fg, 0, 0xffff, 0);					
+	gp9001_set_scrolly_and_flip_reg(&fg, 0, 0xffff, 0);
 	gp9001_set_scrollx_and_flip_reg(&top,0, 0xffff, 0);
-	gp9001_set_scrolly_and_flip_reg(&top,0, 0xffff, 0);					
+	gp9001_set_scrolly_and_flip_reg(&top,0, 0xffff, 0);
 	gp9001_set_sprite_scrollx_and_flip_reg(&sp, 0,0xffff,0);
 	gp9001_set_sprite_scrolly_and_flip_reg(&sp, 0,0xffff,0);
 }
@@ -796,7 +796,7 @@ void gp9001vdp_device::draw_sprites( running_machine *machine, bitmap_t *bitmap,
 	int offs, old_x, old_y;
 
 	UINT16 *source;
-	
+
 	if (sp.use_sprite_buffer) source=(UINT16 *)(sp.vram16_buffer);
 	else source=(UINT16 *)(sp.vram16);
 

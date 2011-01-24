@@ -1,5 +1,5 @@
 /*
-	Playmatic MPU 3
+    Playmatic MPU 3
 */
 #include "emu.h"
 #include "cpu/cosmac/cosmac.h"
@@ -17,7 +17,7 @@ public:
 static ADDRESS_MAP_START( play_3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
-   	
+
 static INPUT_PORTS_START( play_3 )
 INPUT_PORTS_END
 
@@ -33,9 +33,9 @@ static MACHINE_CONFIG_START( play_3, play_3_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COSMAC, 2950000)
 	MCFG_CPU_PROGRAM_MAP(play_3_map)
-	
+
 	MCFG_MACHINE_RESET( play_3 )
-	
+
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END

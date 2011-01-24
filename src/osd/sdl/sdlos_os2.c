@@ -258,7 +258,7 @@ osd_directory_entry *osd_stat(const char *path)
 
 	// create an osd_directory_entry; be sure to make sure that the caller can
 	// free all resources by just freeing the resulting osd_directory_entry
-	result = (osd_directory_entry *) osd_malloc(sizeof(*result) + strlen(path) 
+	result = (osd_directory_entry *) osd_malloc(sizeof(*result) + strlen(path)
  1);
 	strcpy(((char *) result) + sizeof(*result), path);
 	result->name = ((char *) result) + sizeof(*result);

@@ -158,11 +158,11 @@ public:
 	// construction/destruction
 	drc_frontend(device_t &cpu, UINT32 window_start, UINT32 window_end, UINT32 max_sequence);
 	virtual ~drc_frontend();
-	
+
 	// describe a block
 	const opcode_desc *describe_code(offs_t startpc);
 
-protected:	
+protected:
 	// required overrides
 	virtual bool describe(opcode_desc &desc, const opcode_desc *prev) = 0;
 

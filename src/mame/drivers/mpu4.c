@@ -441,8 +441,8 @@ static WRITE_LINE_DEVICE_HANDLER( cpu0_irq )
 
 /*static WRITE_LINE_DEVICE_HANDLER( cpu0_irq_m6840 )
 {
-//	cpu0_irq(device->machine->device("pia_ic3"), state);
-	cpu0_irq(device->machine->device("6840ptm"), state);
+//  cpu0_irq(device->machine->device("pia_ic3"), state);
+    cpu0_irq(device->machine->device("6840ptm"), state);
 }*/
 
 
@@ -1718,7 +1718,7 @@ static ADDRESS_MAP_START( mod2_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x0850, 0x0850) AM_READWRITE(bankswitch_r,bankswitch_w)	/* write bank (rom page select) */
 
-/*  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE(68681_duart_r,68681_duart_w) */ //Runs hoppers 
+/*  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE(68681_duart_r,68681_duart_w) */ //Runs hoppers
 
 	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("ptm_ic2", ptm6840_read, ptm6840_write)/* PTM6840 IC2 */
 

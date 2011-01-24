@@ -1,5 +1,5 @@
 /*
-	Williams System 11
+    Williams System 11
 */
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
@@ -17,7 +17,7 @@ public:
 static ADDRESS_MAP_START( williams_s11_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
-   	
+
 static INPUT_PORTS_START( williams_s11 )
 INPUT_PORTS_END
 
@@ -33,9 +33,9 @@ static MACHINE_CONFIG_START( williams_s11, williams_s11_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 1000000)
 	MCFG_CPU_PROGRAM_MAP(williams_s11_map)
-	
+
 	MCFG_MACHINE_RESET( williams_s11 )
-	
+
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END

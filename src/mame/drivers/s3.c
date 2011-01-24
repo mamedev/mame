@@ -1,5 +1,5 @@
 /*
-	Williams System 3
+    Williams System 3
 */
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
@@ -20,7 +20,7 @@ static ADDRESS_MAP_START( williams_s3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_ROM
 ADDRESS_MAP_END
-   	
+
 static INPUT_PORTS_START( williams_s3 )
 INPUT_PORTS_END
 
@@ -37,7 +37,7 @@ static MACHINE_CONFIG_START( williams_s3, williams_s3_state )
 	MCFG_CPU_PROGRAM_MAP(williams_s3_map)
 
 	MCFG_MACHINE_RESET( williams_s3 )
-	
+
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
@@ -116,8 +116,8 @@ ROM_START(wldcp_l1)
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
 
-GAME( 1977, httip_l1, 0, williams_s3, williams_s3, williams_s3, ROT0, "Williams", "Hot Tip (L-1)", 			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1977, lucky_l1, 0, williams_s3, williams_s3, williams_s3, ROT0, "Williams", "Lucky Seven (L-1)",	 	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1977, httip_l1, 0, williams_s3, williams_s3, williams_s3, ROT0, "Williams", "Hot Tip (L-1)",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1977, lucky_l1, 0, williams_s3, williams_s3, williams_s3, ROT0, "Williams", "Lucky Seven (L-1)",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME( 1978, wldcp_l1, 0, williams_s3, williams_s3, williams_s3, ROT0, "Williams", "World Cup Soccer (L-1)", 	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1978, cntct_l1, 0, williams_s3, williams_s3, williams_s3, ROT0, "Williams", "Contact (L-1)", 			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1978, disco_l1, 0, williams_s3, williams_s3, williams_s3, ROT0, "Williams", "Disco Fever (L-1", 		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1978, cntct_l1, 0, williams_s3, williams_s3, williams_s3, ROT0, "Williams", "Contact (L-1)",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1978, disco_l1, 0, williams_s3, williams_s3, williams_s3, ROT0, "Williams", "Disco Fever (L-1",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

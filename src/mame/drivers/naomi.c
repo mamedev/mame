@@ -349,7 +349,7 @@ Marvel Vs. Capcom 2 (Rev A)             841-0007C  23085A  14 (64Mb)  present   
 Quiz Ah Megamisama                      840-0030C  23227   16 (64Mb)  present   317-0280-JPN
 Shootout Pool                           840-0098C  23844    4 (64mb)  present   317-0336-COM
 Shootout Pool - Shootout Pool Prize     840-0128C  24065    4 (64mb)  present   317-0367-COM
-Shootout Pool Medal                     ?          24148    4 (64Mb)  ?         ? 
+Shootout Pool Medal                     ?          24148    4 (64Mb)  ?         ?
 Virtua Fighter 4 Evolution              840-0106B  23934   20 (64Mb)  present   317-0339-COM
 Virtua Tennis 2 / Power Smash 2 (Rev A) 840-0084C  22327A  18 (64Mb)  present   317-0320-COM
 
@@ -439,10 +439,10 @@ Notes:
       CN4   - 6 legs connector for ISP programming
 
    Games known to use this PCB include....
-                                   Sticker    EPROM        FLASHROMs   XC3S50   PIC16C621A    XCF01S  
+                                   Sticker    EPROM        FLASHROMs   XC3S50   PIC16C621A    XCF01S
 Game                               on cart    IC7#         # of SOP56  IC2#     IC3#          IC4#     Notes
 ----------------------------------------------------------------------------------------------------------------------------
-Dynamite Deka EX / Asian Dynamite  840-0175C  ?            ?           ?        ?             ? 
+Dynamite Deka EX / Asian Dynamite  840-0175C  ?            ?           ?        ?             ?
 Mamonoro                           841-0060C  not present  4 (512Mb)   present  317-5132-JPN  present  IC2# is labeled "VER.2"
 Touch De Zunou (Rev A)             840-0166C  not present  2 (512Mb)   present  317-0435-JPN  present  IC4# is marked "18"
 
@@ -489,10 +489,10 @@ Notes:
    CN1/2/3  - connectors joining to main board
 
    Games known to use this PCB include....
-								   Sticker   FL0-FL3   FLASHROMs   X76F100      EPM7064   EPM7064   315-5581      Game
+                                   Sticker   FL0-FL3   FLASHROMs   X76F100      EPM7064   EPM7064   315-5581      Game
  Game                              on cart   FLASHROM  # of SOP48  IC @ 1F      IC @ 1H   IC @ 2K   IC @ 1M       code       Notes
 -----------------------------------------------------------------------------------------------------------------------------------------------
-Gun Survivor 2: Biohazard Code V.  25709801  1 (64Mb)  14 (128Mb)  ?            NAODEC2A  NAODEC1A  317-5075-COM  
+Gun Survivor 2: Biohazard Code V.  25709801  1 (64Mb)  14 (128Mb)  ?            NAODEC2A  NAODEC1A  317-5075-COM
 /Shin Nihon Prowrestling                                                                                                     FL0 & FL1 have pin55 raised from PCB.
 \Toukon Retsuden 4 Arcade Edition  25349801  2 (64Mb)  15 (128Mb)  not present  NAODEC2A  NAODEC1B  317-5040-COM  TRF1Ver.A  They are connected togheter and go to pin89 on 2K.
 World Kicks                        25209801  2 (32Mb)  10 (128Mb)  ?            NAODEC2A  NAODEC1A  317-5040-COM  WK3 Ver.A  317-5040-COM must be checked.
@@ -537,7 +537,7 @@ Notes:
    CN1/2/3  - connectors joining to main board
 
    Games known to use this PCB include....
-			   Sticker   FL0-FL3   FLASHROMs   X76F100  CY37128  315-5581      Game
+               Sticker   FL0-FL3   FLASHROMs   X76F100  CY37128  315-5581      Game
  Game          on cart   FLASHROM  # of SOP48  IC @ 1F  IC @ 3J  IC @ 1M       code        Notes
 --------------------------------------------------------------------------------------------------------------------
 Ninja Assault  25469801  3 (64Mb)   9 (128Mb)  present  NAODEC3  317-5068-COM  NJA3 Ver.A
@@ -6754,7 +6754,7 @@ GAME( 2001, naomi2,   0,        naomi,    naomi,    0, ROT0, "Sega",            
 /* 0061C */ GAME( 2001, vstrik3cb,vstrik3c,naomi,    naomi,    0,  ROT0,  "Sega",          "Virtua Striker 3 (Cart, Rev B) (USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0080C */ GAME( 2001, vf4cart,  naomi2,  naomi,    naomi,    0,  ROT0,  "Sega",          "Virtua Fighter 4 (Cartridge)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0106C */ GAME( 2001, vf4evoct, naomi2,  naomi,    naomi,    vf4evoct,  ROT0,  "Sega",   "Virtua Fighter 4 Evolution (Cartridge)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 01??C */ GAME( 2002, kingrt66, naomi2,  naomi,    naomi,    0,  ROT0,  "Sega",  		"King of Route 66 (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 01??C */ GAME( 2002, kingrt66, naomi2,  naomi,    naomi,    0,  ROT0,  "Sega",		"King of Route 66 (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0139C */ GAME( 2002, clubkrte, naomi2,  naomi,    naomi,    0,  ROT0,  "Sega",          "Club Kart: European Session", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 
 /* GDS-xxxx (Sega first party games) */

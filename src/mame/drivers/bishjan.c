@@ -148,17 +148,17 @@ static READ8_HANDLER( bishjan_videoram_1_lo_r )		{	return layers[1].videorams[VR
 
 xplan:
 
-80 = 00		40 = FD		L0 = -		L1 = 8x8	; ram test (disable = 01 -> L0 disabled)
-80 = 70		40 = FF		L0 = 64x32	L1 = 8x8	; shoot'em up demo / gambling demo
-80 = 40		40 = BF		L0 = 8x32	L1 = 8x8	; title screen [L0 line scroll] / 3 planes with scrolling clouds (before title screen)
-80 = 00		40 = EF		L0 = 8x8	L1 = 8x8	; parachutist and cars demo [L1 line scroll]
-80 = 00		40 = FF		L0 = 8x8	L1 = 8x8	; test mode and stat screens
+80 = 00     40 = FD     L0 = -      L1 = 8x8    ; ram test (disable = 01 -> L0 disabled)
+80 = 70     40 = FF     L0 = 64x32  L1 = 8x8    ; shoot'em up demo / gambling demo
+80 = 40     40 = BF     L0 = 8x32   L1 = 8x8    ; title screen [L0 line scroll] / 3 planes with scrolling clouds (before title screen)
+80 = 00     40 = EF     L0 = 8x8    L1 = 8x8    ; parachutist and cars demo [L1 line scroll]
+80 = 00     40 = FF     L0 = 8x8    L1 = 8x8    ; test mode and stat screens
 
 bishjan:
 
-80 = 00		40 = FD		L0 = -		L1 = 8x8	; ram test (disable = 01 -> L0 disabled)
-80 = 00		40 = 0F		L0 = 8x8	L1 = 8x8	; soft dsw screen
-80 = 00		40 = 0x		L0 = 8x8	L1 = 8x8	; stat screens (40 = 07/0d, seems a don't care)
+80 = 00     40 = FD     L0 = -      L1 = 8x8    ; ram test (disable = 01 -> L0 disabled)
+80 = 00     40 = 0F     L0 = 8x8    L1 = 8x8    ; soft dsw screen
+80 = 00     40 = 0x     L0 = 8x8    L1 = 8x8    ; stat screens (40 = 07/0d, seems a don't care)
 
 ***************************************************************************/
 
@@ -1143,7 +1143,7 @@ static MACHINE_CONFIG_START( mtrain, driver_device )
 	MCFG_CPU_PROGRAM_MAP( mtrain_map )
 	MCFG_CPU_IO_MAP( mtrain_io )
 
-//	MCFG_NVRAM_ADD_0FILL("nvram")
+//  MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

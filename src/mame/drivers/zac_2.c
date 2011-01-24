@@ -1,5 +1,5 @@
 /*
-	Zaccaria Generation 2
+    Zaccaria Generation 2
 */
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
@@ -17,7 +17,7 @@ public:
 static ADDRESS_MAP_START( zac_2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
-   	
+
 static INPUT_PORTS_START( zac_2 )
 INPUT_PORTS_END
 
@@ -33,9 +33,9 @@ static MACHINE_CONFIG_START( zac_2, zac_2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 6000000/2)
 	MCFG_CPU_PROGRAM_MAP(zac_2_map)
-	
+
 	MCFG_MACHINE_RESET( zac_2 )
-	
+
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END

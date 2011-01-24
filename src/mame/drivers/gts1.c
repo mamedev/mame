@@ -1,6 +1,6 @@
 /*
-	Gottlieb System 1
-*/	
+    Gottlieb System 1
+*/
 #include "emu.h"
 #include "cpu/pps4/pps4.h"
 
@@ -17,7 +17,7 @@ public:
 static ADDRESS_MAP_START( gts1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
-   	
+
 static INPUT_PORTS_START( gts1 )
 INPUT_PORTS_END
 
@@ -33,13 +33,13 @@ static MACHINE_CONFIG_START( gts1, gts1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPS4, 198864)
 	MCFG_CPU_PROGRAM_MAP(gts1_map)
-	
+
 	MCFG_MACHINE_RESET( gts1 )
-	
+
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
-	
+
 
 ROM_START( gts1 )
     ROM_REGION( 0x10000, "maincpu", 0 )
@@ -294,7 +294,7 @@ GAME(1977,	gts1,		0,		gts1,	gts1,	gts1,	ROT0,	"Gottlieb",		"System 1",								GA
 
 //Exact same roms as gts1 with added hardware we'll likely need roms for to emulate properly
 GAME(1979,	gts1s,		gts1,		gts1,	gts1,	gts1,	ROT0,	"Gottlieb",		"System 1 with sound board",						GAME_IS_BIOS_ROOT)
-                                                                               	
+
 GAME(1980,	astannie,	gts1s,		gts1,	gts1,	gts1,	ROT0,	"Gottlieb",		"Asteroid Annie and the Aliens",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1980,	buckrgrs,	gts1s,		gts1,	gts1,	gts1,	ROT0,	"Gottlieb",		"Buck Rogers",							GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1978,	charlies,	gts1,		gts1,	gts1,	gts1,	ROT0,	"Gottlieb",		"Charlie's Angels",						GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

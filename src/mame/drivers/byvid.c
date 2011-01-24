@@ -1,6 +1,6 @@
 /*
-	Bally MPU AS-2518-133
-*/	
+    Bally MPU AS-2518-133
+*/
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
@@ -18,14 +18,14 @@ public:
 static ADDRESS_MAP_START( by133_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x1000, 0x7fff) AM_ROM 
+	AM_RANGE(0x1000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( by133_video_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
-   	
+
 static INPUT_PORTS_START( by133 )
 INPUT_PORTS_END
 
@@ -41,14 +41,14 @@ static MACHINE_CONFIG_START( by133, by133_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 3580000/4)
 	MCFG_CPU_PROGRAM_MAP(by133_map)
-	
+
 	MCFG_CPU_ADD("videocpu", M6809, 3580000/4)
-	MCFG_CPU_PROGRAM_MAP(by133_video_map)	
-	
+	MCFG_CPU_PROGRAM_MAP(by133_video_map)
+
 	MCFG_MACHINE_RESET( by133 )
-	
+
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pinball)	
+	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
 
 /*-----------------------------------------------------
@@ -90,6 +90,6 @@ ROM_START(granny)
 	ROM_REGION(0x10000, "soundcpu", 0)
 	ROM_LOAD( "cs_u3.764", 0xe000, 0x2000, CRC(0a39a51d) SHA1(98342ba38e48578ce9870f2ee85b553d46c0e35f))
 ROM_END
-	
+
 GAME( 1982, babypac, 0, 		by133, by133, by133, ROT0, "Bally","Baby Pacman (Video/Pinball Combo)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME( 1984, granny,  0, 		by133, by133, by133, ROT0, "Bally","Granny and the Gators (Video/Pinball Combo)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

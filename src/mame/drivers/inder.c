@@ -14,7 +14,7 @@ static ADDRESS_MAP_START( inder_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
-   	
+
 static INPUT_PORTS_START( inder )
 INPUT_PORTS_END
 
@@ -32,7 +32,7 @@ static MACHINE_CONFIG_START( inder, inder_state )
 	MCFG_CPU_PROGRAM_MAP(inder_map)
 
 	MCFG_MACHINE_RESET( inder )
-	
+
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END

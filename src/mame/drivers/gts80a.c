@@ -1,7 +1,7 @@
 /*
-    
-	Gottlieb System 80A
-	
+
+    Gottlieb System 80A
+
 */
 
 #include "emu.h"
@@ -51,9 +51,9 @@ static MACHINE_CONFIG_START( gts80a_s, gts80a_state )
 	MCFG_CPU_PROGRAM_MAP(gts80a_map)
 
 	MCFG_MACHINE_RESET( gts80a )
-	
+
 	/* related to src/mame/audio/gottlieb.c */
-//	MCFG_IMPORT_FROM(gts80s_s)
+//  MCFG_IMPORT_FROM(gts80s_s)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
@@ -65,9 +65,9 @@ static MACHINE_CONFIG_START( gts80a_ss, gts80a_state )
 	MCFG_CPU_PROGRAM_MAP(gts80a_map)
 
 	MCFG_MACHINE_RESET( gts80a )
-	
+
 	/* related to src/mame/audio/gottlieb.c */
-//	MCFG_IMPORT_FROM(gts80s_ss)
+//  MCFG_IMPORT_FROM(gts80s_ss)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
@@ -89,9 +89,9 @@ static MACHINE_CONFIG_START( caveman, gts80a_state )
 	MCFG_CPU_PROGRAM_MAP(caveman_map)
 
 	MCFG_MACHINE_RESET( gts80a )
-	
+
 	/* related to src/mame/audio/gottlieb.c */
-//	MCFG_IMPORT_FROM(gts80s_ss)
+//  MCFG_IMPORT_FROM(gts80s_ss)
 
 	MCFG_CPU_ADD("video_cpu", I8086, 5000000)
 	MCFG_CPU_PROGRAM_MAP(video_map)
@@ -227,7 +227,7 @@ ROM_START(cavemana)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Devil's Dare 
+/ Devil's Dare
 /-------------------------------------------------------------------*/
 ROM_START(dvlsdre)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -661,6 +661,6 @@ ROM_END
 /* disp3 */GAME(1984,	thegames,	0,		gts80a_s,	gts80a,	gts80a,	ROT0,	"Gottlieb",		"The Games",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 /* disp3 */GAME(1984,	touchdn,	0,		gts80a_s,	gts80a,	gts80a,	ROT0,	"Gottlieb",		"Touchdown",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 
-/* custom (+video) */ 
+/* custom (+video) */
 GAME(1981,	caveman,	0,			caveman,	caveman,	gts80a,	ROT0,	"Gottlieb",		"Caveman (Pinball/Video Combo)",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1981,	cavemana,	caveman,	caveman,	caveman,	gts80a,	ROT0,	"Gottlieb",		"Caveman (Pinball/Video Combo, Set 2)",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

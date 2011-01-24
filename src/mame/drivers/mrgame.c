@@ -1,6 +1,6 @@
 /*
-	Mr. Game 1B11188/0
-*/	
+    Mr. Game 1B11188/0
+*/
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 
@@ -17,7 +17,7 @@ public:
 static ADDRESS_MAP_START( mrgame_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
-   	
+
 static INPUT_PORTS_START( mrgame )
 INPUT_PORTS_END
 
@@ -33,9 +33,9 @@ static MACHINE_CONFIG_START( mrgame, mrgame_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 6000000)
 	MCFG_CPU_PROGRAM_MAP(mrgame_map)
-	
+
 	MCFG_MACHINE_RESET( mrgame )
-	
+
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END

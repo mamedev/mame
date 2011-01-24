@@ -353,7 +353,7 @@ bool legacy_image_device_base::load_software(char *swlist, char *swname, rom_ent
 
 				if (software_get_support(swlist, swname) == SOFTWARE_SUPPORTED_NO)
 					mame_printf_error("WARNING: support for software %s (in list %s) is only preliminary\n", swname, swlist);
-				
+
 				// check if locationtag actually contains two locations separated by '%'
 				// (i.e. check if we are dealing with a clone in softwarelist)
 				astring tag2, tag3, tag4(locationtag), tag5;

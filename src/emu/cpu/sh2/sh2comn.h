@@ -191,7 +191,7 @@ class sh2_frontend : public drc_frontend
 public:
 	sh2_frontend(sh2_state &state, UINT32 window_start, UINT32 window_end, UINT32 max_sequence);
 
-protected:	
+protected:
 	virtual bool describe(opcode_desc &desc, const opcode_desc *prev);
 
 private:

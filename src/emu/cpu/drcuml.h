@@ -132,7 +132,7 @@ public:
 	bool inuse() const { return m_inuse; }
 	UINT32 maxinst() const { return m_maxinst; }
 
-	// code generation	
+	// code generation
 	void begin();
 	void end();
 	void abort();
@@ -171,7 +171,7 @@ public:
 	// construction/destruction
 	drcbe_interface(drcuml_state &drcuml, drc_cache &cache, device_t &device);
 	virtual ~drcbe_interface();
-	
+
 	// required overrides
 	virtual void reset() = 0;
 	virtual int execute(uml::code_handle &entry) = 0;
@@ -197,7 +197,7 @@ public:
 	// construction/destruction
 	drcuml_state(device_t &device, drc_cache &cache, UINT32 flags, int modes, int addrbits, int ignorebits);
 	~drcuml_state();
-	
+
 	// getters
 	device_t &device() const { return m_device; }
 	drc_cache &cache() const { return m_cache; }
@@ -206,7 +206,7 @@ public:
 	void reset();
 	int execute(uml::code_handle &entry) { return m_beintf.execute(entry); }
 
-	// code generation	
+	// code generation
 	drcuml_block *begin_block(UINT32 maxinst);
 
 	// back-end interface
@@ -216,7 +216,7 @@ public:
 
 	// handle management
 	uml::code_handle *handle_alloc(const char *name);
-	
+
 	// symbol management
 	void symbol_add(void *base, UINT32 length, const char *name);
 	const char *symbol_find(void *base, UINT32 *offset = NULL);
@@ -232,7 +232,7 @@ private:
 	{
 		friend class drcuml_state;
 		template<class T> friend class simple_list;
-	
+
 		// construction/destruction
 		symbol(void *base, UINT32 length, const char *name)
 			: m_next(NULL),
@@ -257,7 +257,7 @@ private:
 	drc_cache &					m_cache;			// pointer to the codegen cache
 	drcbe_interface &			m_beintf;			// backend interface pointer
 	FILE *						m_umllog;			// handle to the UML logfile
-	simple_list<drcuml_block> 	m_blocklist;		// list of active blocks
+	simple_list<drcuml_block>	m_blocklist;		// list of active blocks
 	simple_list<uml::code_handle> m_handlelist;		// list of active handles
 	simple_list<symbol>			m_symlist;			// list of symbols
 };

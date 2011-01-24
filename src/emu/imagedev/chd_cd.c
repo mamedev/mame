@@ -79,7 +79,7 @@ static DEVICE_IMAGE_LOAD(cdrom)
 	dev_cdrom_t	*cdrom = get_safe_token(&image.device());
 	chd_error	err = (chd_error)0;
 	chd_file	*chd = NULL;
-	astring tempstring;	
+	astring tempstring;
 
 	if (image.software_entry() == NULL)
 	{
@@ -148,7 +148,7 @@ static DEVICE_START(cdrom)
 static DEVICE_IMAGE_SOFTLIST_LOAD(cdrom)
 {
 	load_software_part_region( &image.device(), swlist, swname, start_entry );
-	return TRUE;	
+	return TRUE;
 }
 
 /*-------------------------------------------------

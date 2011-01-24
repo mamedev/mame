@@ -503,7 +503,7 @@ ADDRESS_MAP_START( seibu2_airraid_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
 	AM_RANGE(0x4018, 0x4019) AM_WRITE(seibu_main_data_w)
 	AM_RANGE(0x401b, 0x401b) AM_WRITE(seibu_coin_w)
-//	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+//  AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

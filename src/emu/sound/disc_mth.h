@@ -15,7 +15,7 @@
  *
  *  Additions/bugfix February 2003 - D.Renaud, F.Palazzolo, K.Wilkins
  *  Discrete parallel tasks 2009 - Couriersud
- *  Discrete classes 2010		 - Couriersud
+ *  Discrete classes 2010        - Couriersud
  *
  ***********************************************************************/
 
@@ -56,7 +56,7 @@ DISCRETE_CLASS_STEP_RESET(dst_logic_dff, 1,
 );
 
 DISCRETE_CLASS_STEP_RESET(dst_logic_jkff, 1,
-	double 			m_v_out;
+	double			m_v_out;
 	int 			m_last_clk;
 );
 
@@ -91,7 +91,7 @@ DISCRETE_CLASS_STEP_RESET(dst_ramp, 1,
 );
 
 DISCRETE_CLASS_STEP_RESET(dst_samphold, 1,
-	double 			m_last_input;
+	double			m_last_input;
 	int				m_clocktype;
 );
 
@@ -118,13 +118,13 @@ public:
 		TOK_4,
 		TOK_DUP,
 		TOK_ABS,		 /* absolute value */
-		TOK_NEG, 		 /* * -1 */
+		TOK_NEG,		 /* * -1 */
 		TOK_NOT,		 /* Logical NOT of Last Value */
 		TOK_EQUAL,		 /* Logical = */
 		TOK_GREATER,	 /* Logical > */
 		TOK_LESS,		 /* Logical < */
 		TOK_AND,		 /* Bitwise AND */
-		TOK_OR,		 	 /* Bitwise OR */
+		TOK_OR,			 /* Bitwise OR */
 		TOK_XOR			 /* Bitwise XOR */
 	};
 	void step(void);

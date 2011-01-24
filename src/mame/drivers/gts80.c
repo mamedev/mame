@@ -1,7 +1,7 @@
 /*
-    
-	Gottlieb System 80
-	
+
+    Gottlieb System 80
+
 */
 
 #include "emu.h"
@@ -23,7 +23,7 @@ static ADDRESS_MAP_START( gts80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3000, 0x3fff) AM_MIRROR(0xc000) AM_ROM
 ADDRESS_MAP_END
 
-   	
+
 static INPUT_PORTS_START( gts80 )
 INPUT_PORTS_END
 
@@ -42,9 +42,9 @@ static MACHINE_CONFIG_START( gts80_s, gts80_state )
 	MCFG_CPU_PROGRAM_MAP(gts80_map)
 
 	MCFG_MACHINE_RESET( gts80 )
-	
+
 	/* related to src/mame/audio/gottlieb.c */
-//	MCFG_IMPORT_FROM(gts80s_s)
+//  MCFG_IMPORT_FROM(gts80s_s)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
@@ -58,9 +58,9 @@ static MACHINE_CONFIG_START( gts80_ss, driver_device )
 	MCFG_CPU_PROGRAM_MAP(gts80_map)
 
 	MCFG_MACHINE_RESET( gts80 )
-	
+
 	/* related to src/mame/audio/gottlieb.c */
-//	MCFG_IMPORT_FROM(gts80s_ss)
+//  MCFG_IMPORT_FROM(gts80s_ss)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
@@ -303,7 +303,7 @@ ROM_START(hh_1)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ James Bond 
+/ James Bond
 /-------------------------------------------------------------------*/
 ROM_START(jamesb)
 	ROM_REGION(0x10000, "maincpu", 0)

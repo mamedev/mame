@@ -832,7 +832,7 @@ const char *software_get_clone(char *swlist, const char *swname)
 	{
 		software_info *tmp = software_list_find(software_list_ptr, swname, NULL);
 		retval = core_strdup(tmp->parentname);
-		software_list_close(software_list_ptr);		
+		software_list_close(software_list_ptr);
 	}
 
 	return retval;
@@ -853,7 +853,7 @@ UINT32 software_get_support(char *swlist, const char *swname)
 	{
 		software_info *tmp = software_list_find(software_list_ptr, swname, NULL);
 		retval = tmp->supported;
-		software_list_close(software_list_ptr);		
+		software_list_close(software_list_ptr);
 	}
 
 	return retval;
@@ -1525,18 +1525,18 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 const char *software_part_get_feature(software_part *part, const char *feature_name)
 {
 	feature_list *feature;
-	
+
 	if (part == NULL)
 		return NULL;
-	
+
 	for (feature = part->featurelist; feature; feature = feature->next)
 	{
 		if (!strcmp(feature->name, feature_name))
 			return feature->value;
 	}
-	
+
 	return NULL;
-	
+
 }
 
 

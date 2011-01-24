@@ -19,7 +19,7 @@
 #define GAELCOSER_STATUS_RTS			0x02
 
 /* only RTS currently understood ! */
-//#define GAELCOSER_STATUS_DTR			0x04
+//#define GAELCOSER_STATUS_DTR          0x04
 
 #define GAELCOSER_EXT_STATUS_MASK		0x03
 

@@ -19,12 +19,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(flicker_map, ADDRESS_SPACE_DATA, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00FF) AM_RAM
-ADDRESS_MAP_END  
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( flicker_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
- 	
+
 static INPUT_PORTS_START( flicker )
 INPUT_PORTS_END
 
@@ -42,9 +42,9 @@ static MACHINE_CONFIG_START( flicker, flicker_state )
 	MCFG_CPU_PROGRAM_MAP(flicker_rom)
 	MCFG_CPU_DATA_MAP(flicker_map)
 	MCFG_CPU_IO_MAP(flicker_io)
-	
+
 	MCFG_MACHINE_RESET( flicker )
-	
+
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END

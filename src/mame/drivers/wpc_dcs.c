@@ -14,7 +14,7 @@ public:
 static ADDRESS_MAP_START( wpc_dcs_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
-   	
+
 static INPUT_PORTS_START( wpc_dcs )
 INPUT_PORTS_END
 
@@ -30,9 +30,9 @@ static MACHINE_CONFIG_START( wpc_dcs, wpc_dcs_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)
 	MCFG_CPU_PROGRAM_MAP(wpc_dcs_map)
-	
+
 	MCFG_MACHINE_RESET( wpc_dcs )
-	
+
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
@@ -339,7 +339,7 @@ ROM_START(ij_l3)
 ROM_END
 
 /*-----------------
-/  Judge Dredd 
+/  Judge Dredd
 /------------------*/
 ROM_START(jd_l7)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
@@ -642,7 +642,7 @@ ROM_START(afv_l4)
 	ROM_LOAD("afv_su2.l1", 0x000000, 0x080000, CRC(1aa878fc) SHA1(59a89071001b5da6ab56d691721a015773f5f0b5))
 	ROM_RELOAD(0x000000+0x080000, 0x080000)
 ROM_END
-                                                                                                                                                                                 
+
 GAME(1994,	dm_lx4,		0,			wpc_dcs,	wpc_dcs,	wpc_dcs,	ROT0,	"Williams",				"Demolition Man (LX-4)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1994,	dm_pa2,		dm_lx4,		wpc_dcs,	wpc_dcs,	wpc_dcs,	ROT0,	"Williams",				"Demolition Man (PA-2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1994,	dm_px5,		dm_lx4,		wpc_dcs,	wpc_dcs,	wpc_dcs,	ROT0,	"Williams",				"Demolition Man (PX-5)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

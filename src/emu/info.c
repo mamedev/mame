@@ -1108,7 +1108,7 @@ static void print_game_info(FILE *out, const game_driver *game)
 	print_game_adjusters(out, game, portlist);
 	print_game_driver(out, game, config);
 	print_game_images( out, game, config );
-	print_game_software_list( out, game, config );	
+	print_game_software_list( out, game, config );
 	print_game_ramoptions( out, game, config );
 	/* close the topmost tag */
 	fprintf(out, "\t</" XML_TOP ">\n");

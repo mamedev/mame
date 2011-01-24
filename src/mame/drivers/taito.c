@@ -14,7 +14,7 @@ public:
 static ADDRESS_MAP_START( taito_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
-   	
+
 static INPUT_PORTS_START( taito )
 INPUT_PORTS_END
 
@@ -30,9 +30,9 @@ static MACHINE_CONFIG_START( taito, driver_device )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 19000000/9)
 	MCFG_CPU_PROGRAM_MAP(taito_map)
-	
+
 	MCFG_MACHINE_RESET( taito )
-	
+
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END

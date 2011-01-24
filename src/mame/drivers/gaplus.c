@@ -560,7 +560,7 @@ static MACHINE_CONFIG_START( gaplus, driver_device )
 	MCFG_NAMCO58XX_ADD("58xx", intf1)
 
 	MCFG_NAMCO_62XX_ADD("62xx", 24576000/6/2, namco_62xx_intf)	/* totally made up - TODO: fix */
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.606060)

@@ -15,7 +15,7 @@
  *
  *  Additions/bugfix February 2003 - D.Renaud, F.Palazzolo, K.Wilkins
  *  Discrete parallel tasks 2009 - Couriersud
- *  Discrete classes 2010		 - Couriersud
+ *  Discrete classes 2010        - Couriersud
  *
  ***********************************************************************/
 
@@ -25,7 +25,7 @@
 
 #define DISCRETE_CLASS_CONSTRUCTOR(_name, _base)						\
 	public:																\
-		DISCRETE_CLASS_NAME(_name)() 									\
+		DISCRETE_CLASS_NAME(_name)()									\
 		 : DISCRETE_CLASS_NAME(_base)() { }
 
 #define DISCRETE_CLASS_DESTRUCTOR(_name)								\
@@ -45,7 +45,7 @@ private:																\
 	_priv																\
 }
 
-#define DISCRETE_CLASS_STEP(_name, _maxout, _priv)	 					\
+#define DISCRETE_CLASS_STEP(_name, _maxout, _priv)						\
 class DISCRETE_CLASS_NAME(_name): public discrete_base_node, public discrete_step_interface				\
 {																		\
 	DISCRETE_CLASS_CONSTRUCTOR(_name, base)								\
@@ -58,7 +58,7 @@ private:																\
 	_priv																\
 }
 
-#define  DISCRETE_CLASS_RESET(_name, _maxout) 							\
+#define  DISCRETE_CLASS_RESET(_name, _maxout)							\
 class DISCRETE_CLASS_NAME(_name): public discrete_base_node				\
 {																		\
 	DISCRETE_CLASS_CONSTRUCTOR(_name, base)								\
@@ -68,7 +68,7 @@ public:																	\
 	int max_output(void) { return _maxout; }					\
 }
 
-#define  DISCRETE_CLASS(_name, _maxout, _priv) 						\
+#define  DISCRETE_CLASS(_name, _maxout, _priv)						\
 class DISCRETE_CLASS_NAME(_name): public discrete_base_node, public discrete_step_interface				\
 {																		\
 	DISCRETE_CLASS_DESTRUCTOR(_name)									\
@@ -105,7 +105,7 @@ public:
  *
  *************************************/
 
-class DISCRETE_CLASS_NAME(dso_output): 	public discrete_base_node,
+class DISCRETE_CLASS_NAME(dso_output):	public discrete_base_node,
 										public discrete_sound_output_interface,
 										public discrete_step_interface
 {
@@ -238,7 +238,7 @@ private:
 	UINT8		m_data;				/* data written */
 	UINT8				m_is_buffered;
 	/* the buffer stream */
-	sound_stream 		*m_buffer_stream;
+	sound_stream		*m_buffer_stream;
 };
 
 class DISCRETE_CLASS_NAME(dss_input_buffer): public DISCRETE_CLASS_NAME(dss_input_stream)

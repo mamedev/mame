@@ -1,5 +1,5 @@
 /*
-	Playmatic MPU 2
+    Playmatic MPU 2
 */
 #include "emu.h"
 #include "cpu/cosmac/cosmac.h"
@@ -16,7 +16,7 @@ public:
 static ADDRESS_MAP_START( play_2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
-   	
+
 static INPUT_PORTS_START( play_2 )
 INPUT_PORTS_END
 
@@ -32,9 +32,9 @@ static MACHINE_CONFIG_START( play_2, play_2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COSMAC, 2950000)
 	MCFG_CPU_PROGRAM_MAP(play_2_map)
-	
+
 	MCFG_MACHINE_RESET( play_2 )
-	
+
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
@@ -155,7 +155,7 @@ ROM_START(attack)
 	ROM_LOAD("attack11.bin", 0x0c00, 0x0400, CRC(972157b4) SHA1(23c90f23a34b34acfe445496a133b6022a749ccc))
 	ROM_RELOAD(0x4c00, 0x0400)
 	ROM_RELOAD(0x8c00, 0x0400)
-	ROM_RELOAD(0xcc00, 0x0400)		
+	ROM_RELOAD(0xcc00, 0x0400)
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -178,7 +178,7 @@ ROM_START(blkfever)
 	ROM_LOAD("blackf11.bin", 0x0c00, 0x0400, CRC(5a97c1b4) SHA1(b9d7eb0dd55ef6d959c0fab48f710e4b1c8d8003))
 	ROM_RELOAD(0x4c00, 0x0400)
 	ROM_RELOAD(0x8c00, 0x0400)
-	ROM_RELOAD(0xcc00, 0x0400)		
+	ROM_RELOAD(0xcc00, 0x0400)
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -212,12 +212,12 @@ ROM_START(cerberup)
 	ROM_RELOAD(0xc000, 0x2000)
 ROM_END
 
-// ??/84 Nautilus 
-// ??/84 The Raid 
-// ??/85 Stop Ship 
-// ??/86 Flash Dragon 
-// ??/87 Phantom Ship 
-// ??/87 Skill Flight 
+// ??/84 Nautilus
+// ??/84 The Raid
+// ??/85 Stop Ship
+// ??/86 Flash Dragon
+// ??/87 Phantom Ship
+// ??/87 Skill Flight
 
 
 GAME(1979,	antar,		0,	play_2,	play_2,	play_2,	ROT0,	"Playmatic",	"Antar",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

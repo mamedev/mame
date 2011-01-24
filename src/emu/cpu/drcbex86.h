@@ -63,7 +63,7 @@ public:
 	// construction/destruction
 	drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, UINT32 flags, int modes, int addrbits, int ignorebits);
 	virtual ~drcbe_x86();
-	
+
 	// required overrides
 	virtual void reset();
 	virtual int execute(uml::code_handle &entry);
@@ -96,7 +96,7 @@ private:
 		be_parameter(const be_parameter &param) : m_type(param.m_type), m_value(param.m_value) { }
 		be_parameter(UINT64 val) : m_type(PTYPE_IMMEDIATE), m_value(val) { }
 		be_parameter(drcbe_x86 &drcbe, const uml::parameter &param, UINT32 allowed);
-		
+
 		// creators for types that don't safely default
 		static inline be_parameter make_ireg(int regnum) { assert(regnum >= 0 && regnum < x86emit::REG_MAX); return be_parameter(PTYPE_INT_REGISTER, regnum); }
 		static inline be_parameter make_freg(int regnum) { assert(regnum >= 0 && regnum < x86emit::REG_MAX); return be_parameter(PTYPE_FLOAT_REGISTER, regnum); }
@@ -107,7 +107,7 @@ private:
 		// operators
 		bool operator==(const be_parameter &rhs) const { return (m_type == rhs.m_type && m_value == rhs.m_value); }
 		bool operator!=(const be_parameter &rhs) const { return (m_type != rhs.m_type || m_value != rhs.m_value); }
-		
+
 		// getters
 		be_parameter_type type() const { return m_type; }
 		UINT64 immediate() const { assert(m_type == PTYPE_IMMEDIATE); return m_value; }
@@ -115,14 +115,14 @@ private:
 		int freg() const { assert(m_type == PTYPE_FLOAT_REGISTER); assert(m_value >= 0 && m_value < x86emit::REG_MAX); return m_value; }
 		int vreg() const { assert(m_type == PTYPE_VECTOR_REGISTER); assert(m_value >= 0 && m_value < x86emit::REG_MAX); return m_value; }
 		void *memory(UINT32 offset = 0) const { assert(m_type == PTYPE_MEMORY); return reinterpret_cast<void *>(m_value + offset); }
-		
+
 		// type queries
 		bool is_immediate() const { return (m_type == PTYPE_IMMEDIATE); }
 		bool is_int_register() const { return (m_type == PTYPE_INT_REGISTER); }
 		bool is_float_register() const { return (m_type == PTYPE_FLOAT_REGISTER); }
 		bool is_vector_register() const { return (m_type == PTYPE_VECTOR_REGISTER); }
 		bool is_memory() const { return (m_type == PTYPE_MEMORY); }
-		
+
 		// other queries
 		bool is_immediate_value(UINT64 value) const { return (m_type == PTYPE_IMMEDIATE && m_value == value); }
 
@@ -130,7 +130,7 @@ private:
 		int select_register(int defreg) const;
 		int select_register(int defreg, const be_parameter &checkparam) const;
 		int select_register(int defreg, const be_parameter &checkparam, const be_parameter &checkparam2) const;
-		
+
 	private:
 		// private constructor
 		be_parameter(be_parameter_type type, be_parameter_value value) : m_type(type), m_value(value) { }
@@ -317,7 +317,7 @@ private:
 	// floating-point code emission helpers
 	void emit_fld_p(x86code *&dst, int size, const be_parameter &param);
 	void emit_fstp_p(x86code *&dst, int size, const be_parameter &param);
-	
+
 	// callback helpers
 	static int dmulu(UINT64 &dstlo, UINT64 &dsthi, UINT64 src1, UINT64 src2, int flags);
 	static int dmuls(UINT64 &dstlo, UINT64 &dsthi, INT64 src1, INT64 src2, int flags);

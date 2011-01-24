@@ -27,8 +27,8 @@
  - dquizgo2: bugged video test
 
  Notes:
- [1] 	Mr. Kicker game code crashes if the eeprom values are empty, because it replaces the SP register with a bogus value at PC = $18D0 before crashing.
-		It could be an original game bug or a hyperstone core bug
+ [1]    Mr. Kicker game code crashes if the eeprom values are empty, because it replaces the SP register with a bogus value at PC = $18D0 before crashing.
+        It could be an original game bug or a hyperstone core bug
 
  Mr Kicker is also known to exist (not dumped) on the F-E1-16-010 PCB
  that Semicom also used for Date Quiz Go Go Episode 2 game.
@@ -1493,7 +1493,7 @@ ROM_START( mrkicker )
 	ROM_COPY( "user2", 0x040000, 0x0a0000, 0x020000)
 	ROM_COPY( "user2", 0x000000, 0x0c0000, 0x020000)
 	ROM_COPY( "user2", 0x060000, 0x0e0000, 0x020000)
-	
+
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* Default EEPROM (it doesn't boot without and the game code crashes) */
 	ROM_LOAD( "eeprom-mrkicker.bin", 0x0000, 0x0080, CRC(87afb8f7) SHA1(444203b793c1d7929fc5916f18b510198719cd38) )
 ROM_END
@@ -1720,9 +1720,9 @@ static READ32_HANDLER( mrkicker_speedup_r )
 	UINT32 pc = cpu_get_pc(space->cpu);
 	if(pc == 0x469de || pc == 0x46a36)
 	{
-//		if(irq_active(space))
-//			cpu_spinuntil_int(space->cpu);
-//		else
+//      if(irq_active(space))
+//          cpu_spinuntil_int(space->cpu);
+//      else
 			cpu_eat_cycles(space->cpu, 50);
 	}
 

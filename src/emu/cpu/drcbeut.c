@@ -154,7 +154,7 @@ void drc_hash_table::block_end(drcuml_block &block)
 
 
 //-------------------------------------------------
-//  set_default_codeptr - change the default 
+//  set_default_codeptr - change the default
 //  codeptr
 //-------------------------------------------------
 
@@ -182,7 +182,7 @@ void drc_hash_table::set_default_codeptr(drccodeptr nocodeptr)
 
 
 //-------------------------------------------------
-//  set_codeptr - set the codeptr for the given 
+//  set_codeptr - set the codeptr for the given
 //  mode/pc
 //-------------------------------------------------
 
@@ -346,7 +346,7 @@ void drc_map_variables::block_end(drcuml_block &block)
 
 
 //-------------------------------------------------
-//  set_value - set a map value for the given 
+//  set_value - set a map value for the given
 //  code pointer
 //-------------------------------------------------
 
@@ -374,7 +374,7 @@ void drc_map_variables::set_value(drccodeptr codebase, UINT32 mapvar, UINT32 new
 
 
 //-------------------------------------------------
-//  get_value - return a map value for the given 
+//  get_value - return a map value for the given
 //  code pointer
 //-------------------------------------------------
 
@@ -442,7 +442,7 @@ UINT32 drc_map_variables::static_get_value(drc_map_variables &map, drccodeptr co
 
 
 //-------------------------------------------------
-//  get_last_value - return the most recently set 
+//  get_last_value - return the most recently set
 //  map value
 //-------------------------------------------------
 
@@ -503,8 +503,8 @@ void drc_label_list::block_end(drcuml_block &block)
 
 
 //-------------------------------------------------
-//  get_codeptr - find or allocate a new label; 
-//  returns NULL and requests an OOB callback if 
+//  get_codeptr - find or allocate a new label;
+//  returns NULL and requests an OOB callback if
 //  undefined
 //-------------------------------------------------
 
@@ -534,7 +534,7 @@ void drc_label_list::set_codeptr(uml::code_label label, drccodeptr codeptr)
 
 
 //-------------------------------------------------
-//  reset - reset a label list (add all entries to 
+//  reset - reset a label list (add all entries to
 //  the free list)
 //-------------------------------------------------
 
@@ -555,7 +555,7 @@ void drc_label_list::reset(bool fatal_on_leftovers)
 
 
 //-------------------------------------------------
-//  find_or_allocate - look up a label and 
+//  find_or_allocate - look up a label and
 //  allocate a new one if not found
 //-------------------------------------------------
 
@@ -580,7 +580,7 @@ drc_label_list::label_entry *drc_label_list::find_or_allocate(uml::code_label la
 
 
 //-------------------------------------------------
-//  oob_callback - out-of-band codegen callback 
+//  oob_callback - out-of-band codegen callback
 //  for labels
 //-------------------------------------------------
 

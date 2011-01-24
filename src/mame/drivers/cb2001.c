@@ -395,7 +395,7 @@ static VIDEO_UPDATE(cb2001)
 			tile = (cb2001_vram_fg[count] & 0x0fff);
 			colour = (cb2001_vram_fg[count] & 0xf000)>>12;
 			tile += cb2001_videobank*0x2000;
-			
+
 			if (other2 & 0x4)
 			{
 				tile += 0x1000;
@@ -436,7 +436,7 @@ WRITE16_HANDLER( cb2001_vidctrl2_w )
 	else // something else
 		other2 = data & 0x00ff;
 
-//		printf("cb2001_vidctrl2_w %04x %04x\n", data, mem_mask); // bank could be here instead
+//      printf("cb2001_vidctrl2_w %04x %04x\n", data, mem_mask); // bank could be here instead
 }
 
 

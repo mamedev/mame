@@ -1,5 +1,5 @@
 /*
-	Atari Generation/System 1
+    Atari Generation/System 1
 */
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
@@ -16,10 +16,10 @@ static ADDRESS_MAP_START( atari_s1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x7000, 0x77ff) AM_ROM 
+	AM_RANGE(0x7000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_ROM
 ADDRESS_MAP_END
-   	
+
 static INPUT_PORTS_START( atari_s1 )
 INPUT_PORTS_END
 
@@ -35,9 +35,9 @@ static MACHINE_CONFIG_START( atari_s1, atari_s1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 1000000)
 	MCFG_CPU_PROGRAM_MAP(atari_s1_map)
-	
+
 	MCFG_MACHINE_RESET( atari_s1 )
-	
+
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
@@ -55,10 +55,10 @@ ROM_END
 / The Atarians (working bootleg)
 /-------------------------------------------------------------------*/
 //ROM_START(atarianb)
-//	ROM_REGION(0x10000, "maincpu", 0)
-//	ROM_LOAD("atarianb.e00", 0x7000, 0x0800, CRC(74fc86e4) SHA1(135d75e5c03feae0929fa84caa3c802353cdd94e))
-//	ROM_LOAD("atarian.e0", 0x7800, 0x0800, CRC(45cb0427) SHA1(e286930ca36bdd0f79acefd142d2a5431fa8005b))
-//	ROM_RELOAD(0xf800, 0x0800)
+//  ROM_REGION(0x10000, "maincpu", 0)
+//  ROM_LOAD("atarianb.e00", 0x7000, 0x0800, CRC(74fc86e4) SHA1(135d75e5c03feae0929fa84caa3c802353cdd94e))
+//  ROM_LOAD("atarian.e0", 0x7800, 0x0800, CRC(45cb0427) SHA1(e286930ca36bdd0f79acefd142d2a5431fa8005b))
+//  ROM_RELOAD(0xf800, 0x0800)
 //ROM_END
 
 /*-------------------------------------------------------------------
@@ -97,9 +97,9 @@ ROM_START(spcrider)
 	ROM_LOAD("spacel.bin", 0x7800, 0x0800, CRC(66ffb04e) SHA1(42d8b7fb7206b30478f631d0e947c0908dcf5419))
 ROM_END
 
-GAME( 1976, atarians, 0, 		atari_s1, atari_s1, atari_s1, ROT0, "Atari","The Atarians", 	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-//GAME( 2002, atarianb, atarians,	atari_s1, atari_s1, atari_s1, ROT0, "Atari / Gaston","The Atarians (working bootleg)", 	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1977, time2000, 0, 		atari_s1, atari_s1, atari_s1, ROT0, "Atari","Time 2000", 		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1977, aavenger, 0, 		atari_s1, atari_s1, atari_s1, ROT0, "Atari","Airborne Avenger", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1978, midearth, 0, 		atari_s1, atari_s1, atari_s1, ROT0, "Atari","Middle Earth", 	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1978, spcrider, 0, 		atari_s1, atari_s1, atari_s1, ROT0, "Atari","Space Riders",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1976, atarians, 0,		atari_s1, atari_s1, atari_s1, ROT0, "Atari","The Atarians", 	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+//GAME( 2002, atarianb, atarians,   atari_s1, atari_s1, atari_s1, ROT0, "Atari / Gaston","The Atarians (working bootleg)",  GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1977, time2000, 0,		atari_s1, atari_s1, atari_s1, ROT0, "Atari","Time 2000",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1977, aavenger, 0,		atari_s1, atari_s1, atari_s1, ROT0, "Atari","Airborne Avenger", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1978, midearth, 0,		atari_s1, atari_s1, atari_s1, ROT0, "Atari","Middle Earth", 	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1978, spcrider, 0,		atari_s1, atari_s1, atari_s1, ROT0, "Atari","Space Riders",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

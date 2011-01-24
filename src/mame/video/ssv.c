@@ -282,7 +282,7 @@ VIDEO_START( gdfs )
     1c006a-6b   fedc ba98 7654 3210 y start visible area
     1c006c-6d   fedc ba98 7654 3210 y end visible area
     1c006e-6f   ---- ---- ---- ---- ?                           106     for all games
-    1c0070-71   fedc ba98 7654 3210 signed y global tilemap x offset               
+    1c0070-71   fedc ba98 7654 3210 signed y global tilemap x offset
     1c0072-73   ---- ---- ---- ---- ?
     1c0074-75   ---- ---- ---- ---- ?
                 -e-- ---- ---- ---- y flipscreen
@@ -782,7 +782,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		tilemaps_offsy = ((s2[3] & 0x1ff) - (s2[3] & 0x200));
 
 		/* Every single sprite is offset by x & yoffs, and additionally
-		by one of the 8 x & y offsets in the 1c0040-1c005f area   */
+        by one of the 8 x & y offsets in the 1c0040-1c005f area   */
 
 		xoffs	+=		ssv_scroll[((mode & 0x00e0) >> 4) + 0x40/2];
 		yoffs	+=		ssv_scroll[((mode & 0x00e0) >> 4) + 0x42/2];
@@ -906,7 +906,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				{
 					sy = -sy;
 					if (ssv_scroll[0x74/2] & 0x8000)
-						sy += 0x00;			// 
+						sy += 0x00;			//
 					else
 						sy -= 0x10;			// vasara (hack)
 				}
@@ -1087,14 +1087,14 @@ static void gdfs_draw_zooming_sprites(running_machine *machine, bitmap_t *bitmap
 			flipy	=	(attr & 0x4000);
 
 /*
-			if ((ssv_scroll[0x74/2] & 0x1000) && ((ssv_scroll[0x74/2] & 0x2000) == 0))
-			{
-				if (flipx == 0) flipx = 1; else flipx = 0;
-			}
-			if ((ssv_scroll[0x74/2] & 0x4000) && ((ssv_scroll[0x74/2] & 0x2000) == 0))
-			{
-				if (flipy == 0) flipy = 1; else flipy = 0;
-			}
+            if ((ssv_scroll[0x74/2] & 0x1000) && ((ssv_scroll[0x74/2] & 0x2000) == 0))
+            {
+                if (flipx == 0) flipx = 1; else flipx = 0;
+            }
+            if ((ssv_scroll[0x74/2] & 0x4000) && ((ssv_scroll[0x74/2] & 0x2000) == 0))
+            {
+                if (flipy == 0) flipy = 1; else flipy = 0;
+            }
 */
 
 			color	=	(attr & 0x0400) ? attr : attr * 4;

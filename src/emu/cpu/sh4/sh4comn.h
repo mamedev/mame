@@ -119,13 +119,13 @@ typedef struct
 	int maxpcfsel;				// highest valid pcflush entry
 	UINT32 pcflushes[16];		// pcflush entries
 
-	drc_cache *			cache;	   	    	/* pointer to the DRC code cache */
+	drc_cache *			cache;		    	/* pointer to the DRC code cache */
 	drcuml_state *		drcuml;				/* DRC UML generator state */
 	sh4_frontend *		drcfe;				/* pointer to the DRC front-end class */
 	UINT32				drcoptions;			/* configurable DRC options */
 
 	/* internal stuff */
-	UINT8				cache_dirty;       	/* true if we need to flush the cache */
+	UINT8				cache_dirty;    	/* true if we need to flush the cache */
 
 	/* parameters for subroutines */
 	UINT64				numcycles;		    /* return value from gettotalcycles */
@@ -159,7 +159,7 @@ class sh4_frontend : public drc_frontend
 public:
 	sh4_frontend(sh4_state &state, UINT32 window_start, UINT32 window_end, UINT32 max_sequence);
 
-protected:	
+protected:
 	virtual bool describe(opcode_desc &desc, const opcode_desc *prev);
 
 private:
@@ -233,8 +233,8 @@ enum
 
 /* register flags 1 */
 #define REGFLAG_PR						(1 << 0)
-#define REGFLAG_MACL			   		(1 << 1)
-#define REGFLAG_MACH			   		(1 << 2)
+#define REGFLAG_MACL					(1 << 1)
+#define REGFLAG_MACH					(1 << 2)
 #define REGFLAG_GBR						(1 << 3)
 #define REGFLAG_VBR						(1 << 4)
 #define REGFLAG_SR						(1 << 5)

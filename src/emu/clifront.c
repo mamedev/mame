@@ -162,7 +162,7 @@ int cli_execute(int argc, char **argv, osd_interface &osd, const options_entry *
 		core_filename_extract_base(&gamename, gamename_option, TRUE);
 		driver = driver_get_name(gamename);
 
-		/* execute any commands specified */		
+		/* execute any commands specified */
 		result = execute_commands(options, exename, driver);
 		if (result != -1)
 			goto error;
@@ -181,7 +181,7 @@ int cli_execute(int argc, char **argv, osd_interface &osd, const options_entry *
 			result = MAMERR_INVALID_CONFIG;
 			goto error;
 		}
-		
+
 
 		/* run the game */
 		result = mame_execute(osd, options);
@@ -882,7 +882,7 @@ static int info_listsoftware(core_options *options, const char *gamename)
 				"<softwarelists>\n"
 				);
 	}
-	
+
 	for ( int drvindex = 0; drivers[drvindex] != NULL; drvindex++ )
 	{
 		if ( mame_strwildcmp( gamename, drivers[drvindex]->name ) == 0 )

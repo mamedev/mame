@@ -1,5 +1,5 @@
 /*
-	Bally Kiss 8035 prototype
+    Bally Kiss 8035 prototype
 */
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
@@ -17,7 +17,7 @@ public:
 static ADDRESS_MAP_START( kissp_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
-   	
+
 static INPUT_PORTS_START( kissp )
 INPUT_PORTS_END
 
@@ -33,9 +33,9 @@ static MACHINE_CONFIG_START( kissp, kissp_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8035, 6000000/15)
 	MCFG_CPU_PROGRAM_MAP(kissp_map)
-	
+
 	MCFG_MACHINE_RESET( kissp )
-	
+
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pinball)
 MACHINE_CONFIG_END
@@ -50,5 +50,5 @@ ROM_START(kissp)
 	ROM_RELOAD( 0x4800, 0x0800)
 ROM_END
 
-GAME( 1979, kissp, 	  kiss,		kissp, kissp, kissp, ROT0, "Bally","Kiss (prototype)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1979, kissp,	  kiss,		kissp, kissp, kissp, ROT0, "Bally","Kiss (prototype)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 

@@ -1664,8 +1664,8 @@ ADDRESS_MAP_END
 READ8_DEVICE_HANDLER( fixeight_eeprom_r )
 {
 	int bit = eeprom_read_bit(device);
-	
-	return bit<<7; 
+
+	return bit<<7;
 }
 
 static WRITE8_DEVICE_HANDLER(fixeight_eeprom_w )
@@ -1687,7 +1687,7 @@ static READ8_HANDLER( fixeight_region_r )
 	// this makes me wonder if there are decryption errors, therefore
 	// this code, and the default eeproms use should be considered subject
 	// to change
-	
+
 	if (!strcmp(space->machine->gamedrv->name,"fixeightkt"))	return 0x00;
 	if (!strcmp(space->machine->gamedrv->name,"fixeightk"))	return 0x01;
 	if (!strcmp(space->machine->gamedrv->name,"fixeightht"))	return 0x02;
@@ -1700,8 +1700,8 @@ static READ8_HANDLER( fixeight_region_r )
 	if (!strcmp(space->machine->gamedrv->name,"fixeight9"))	return 0x09;
 	if (!strcmp(space->machine->gamedrv->name,"fixeighta"))	return 0x0a;
 	if (!strcmp(space->machine->gamedrv->name,"fixeightu"))	return 0x0b;
-//	if (!strcmp(space->machine->gamedrv->name,"fixeightc"))	return 0x0c; // invalid
-//	if (!strcmp(space->machine->gamedrv->name,"fixeightd"))	return 0x0d; // invalid
+//  if (!strcmp(space->machine->gamedrv->name,"fixeightc")) return 0x0c; // invalid
+//  if (!strcmp(space->machine->gamedrv->name,"fixeightd")) return 0x0d; // invalid
 	if (!strcmp(space->machine->gamedrv->name,"fixeightj"))	return 0x0e;
 	if (!strcmp(space->machine->gamedrv->name,"fixeightjt"))	return 0x0f;
 
@@ -1716,7 +1716,7 @@ static ADDRESS_MAP_START( V25_fixeight_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( V25_fixeight_port, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(V25_PORT_P0, V25_PORT_P0) AM_DEVREADWRITE("eeprom", fixeight_eeprom_r, fixeight_eeprom_w)	
+	AM_RANGE(V25_PORT_P0, V25_PORT_P0) AM_DEVREADWRITE("eeprom", fixeight_eeprom_r, fixeight_eeprom_w)
 ADDRESS_MAP_END
 
 
@@ -1991,7 +1991,7 @@ static INPUT_PORTS_START( dogyuun )
 //  PORT_DIPSETTING(        0x0090, "Hong Kong (Charterfield license)" )
 	PORT_DIPSETTING(		0x0060, "Taiwan" )
 //  PORT_DIPSETTING(        0x00b0, "Taiwan" )
-	//PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Sound ready */
+	//PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* Sound ready */
 INPUT_PORTS_END
 
 
@@ -2015,7 +2015,7 @@ static INPUT_PORTS_START( dogyuunk )
 //  PORT_DIPSETTING(        0x0090, "Hong Kong (Charterfield license)" )
 	PORT_DIPSETTING(		0x0060, "Taiwan" )
 //  PORT_DIPSETTING(        0x00b0, "Taiwan" )
-	//PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Sound ready */
+	//PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* Sound ready */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dogyuunt )
@@ -2263,7 +2263,7 @@ static INPUT_PORTS_START( fixeight )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_START3 )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Unknown/Unused */
-	
+
 	PORT_START("SYS")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_COIN3 )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_TILT )
@@ -3615,7 +3615,7 @@ static MACHINE_CONFIG_START( fixeight, toaplan2_state )
 
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_16MHz)			/* NEC V25 type Toaplan marked CPU ??? */
 	MCFG_CPU_PROGRAM_MAP(V25_fixeight_mem)
-//	IO map must be different - has eeprom but no dips or jumpers */
+//  IO map must be different - has eeprom but no dips or jumpers */
 	MCFG_CPU_CONFIG(ts001turbo_config)
 	MCFG_CPU_IO_MAP(V25_fixeight_port)
 

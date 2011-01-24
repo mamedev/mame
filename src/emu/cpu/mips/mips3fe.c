@@ -58,7 +58,7 @@ mips3_frontend::mips3_frontend(mips3_state &state, UINT32 window_start, UINT32 w
 
 
 //-------------------------------------------------
-//  describe - build a description of a single 
+//  describe - build a description of a single
 //  instruction
 //-------------------------------------------------
 
@@ -255,7 +255,7 @@ bool mips3_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 
 //-------------------------------------------------
-//  describe_special - build a description of a 
+//  describe_special - build a description of a
 //  single instruction in the 'special' group
 //-------------------------------------------------
 
@@ -406,7 +406,7 @@ bool mips3_frontend::describe_special(UINT32 op, opcode_desc &desc)
 
 
 //-------------------------------------------------
-//  describe_regimm - build a description of a 
+//  describe_regimm - build a description of a
 //  single instruction in the 'regimm' group
 //-------------------------------------------------
 
@@ -463,7 +463,7 @@ bool mips3_frontend::describe_regimm(UINT32 op, opcode_desc &desc)
 
 
 //-------------------------------------------------
-//  describe_idt - build a description of a single 
+//  describe_idt - build a description of a single
 //  instruction in the IDT-specific group
 //-------------------------------------------------
 
@@ -494,7 +494,7 @@ bool mips3_frontend::describe_idt(UINT32 op, opcode_desc &desc)
 
 
 //-------------------------------------------------
-//  describe_cop0 - build a description of a 
+//  describe_cop0 - build a description of a
 //  single instruction in the COP0 group
 //-------------------------------------------------
 
@@ -569,7 +569,7 @@ bool mips3_frontend::describe_cop0(UINT32 op, opcode_desc &desc)
 
 
 //-------------------------------------------------
-//  describe_cop1 - build a description of a 
+//  describe_cop1 - build a description of a
 //  single instruction in the COP1 group
 //-------------------------------------------------
 
@@ -687,7 +687,7 @@ bool mips3_frontend::describe_cop1(UINT32 op, opcode_desc &desc)
 
 
 //-------------------------------------------------
-//  describe_cop1x - build a description of a 
+//  describe_cop1x - build a description of a
 //  single instruction in the COP1X group
 //-------------------------------------------------
 
@@ -730,7 +730,7 @@ bool mips3_frontend::describe_cop1x(UINT32 op, opcode_desc &desc)
 
 
 //-------------------------------------------------
-//  describe_cop2 - build a description of a 
+//  describe_cop2 - build a description of a
 //  single instruction in the COP2 group
 //-------------------------------------------------
 
