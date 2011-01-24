@@ -211,7 +211,7 @@ Truxton 2                      Working.
 Pipi & Bibis                   Working.
 Whoopee                        Working, but no sound. Missing sound MCU dump. It's a Hitachi HD647180.
 Pipi & Bibis (Ryouta Kikaku)   Working.
-FixEight                       Not working properly. Missing background GFX, and sound FX only (missing music). Both controlled by PLCC94 NEC V25 MCU stamped 'TS-001-TURBO'
+FixEight                       Working, MCU type is a NEC V25. Chip is a PLCC94 stamped 'TS-001-TURBO'
 FixEight bootleg               Working. One unknown ROM (same as pipibibi one). Region hardcoded to Korea (@ $4d8)
 Grind Stormer / VFive          Working, MCU type is a NEC V25. Chip is a PLCC94 stamped 'TS-004-SPY'.*
 Batsugun / Batsugun Sp'        Working, MCU type is a NEC V25. Chip is a PLCC94 stamped 'TS-004-SPY'.*
