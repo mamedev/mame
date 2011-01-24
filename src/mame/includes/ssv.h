@@ -1,8 +1,14 @@
+#include "cpu/upd7725/upd7725.h"
+
 class ssv_state : public driver_device
 {
 public:
 	ssv_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		m_dsp(*this, "dsp")
+	{ }
+
+	optional_device<upd96050_device> m_dsp;
 
 	UINT16 *scroll;
 	UINT16 *paletteram;
