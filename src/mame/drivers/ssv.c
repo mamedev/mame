@@ -339,28 +339,64 @@ static MACHINE_RESET( ssv )
 
 ***************************************************************************/
 
+static ADDRESS_MAP_START( dsp_prg_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("dspprg", 0)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( dsp_data_map, ADDRESS_SPACE_DATA, 16 )
+	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("dspdata", 0)
+ADDRESS_MAP_END
+
+static READ16_HANDLER( dsp_dr_r )
+{
+	ssv_state *state = space->machine->driver_data<ssv_state>();
+
+	return state->m_dsp->snesdsp_read(true);
+}
+
+static WRITE16_HANDLER( dsp_dr_w )
+{
+	ssv_state *state = space->machine->driver_data<ssv_state>();
+
+	state->m_dsp->snesdsp_write(true, data);
+}
+
+static READ16_HANDLER( dsp_r )
+{
+	ssv_state *state = space->machine->driver_data<ssv_state>();
+	UINT16 temp = state->m_dsp->dataram_r(offset/2);
+	UINT16 res;
+
+	if (offset & 1) 
+	{
+		res = temp>>8;
+	}
+	else
+	{
+		res = temp & 0xff;
+	}
+
+	return res;
+}
 
 static WRITE16_HANDLER( dsp_w )
 {
 	ssv_state *state = space->machine->driver_data<ssv_state>();
-	UINT16 *dsp_ram = state->dsp_ram;
+	UINT16 temp = state->m_dsp->dataram_r(offset/2);
 
-	COMBINE_DATA(dsp_ram+offset);
-	if(offset == 0x21 && dsp_ram[0x21]) {
-		switch(dsp_ram[0x20]) {
-		case 0x0001:
-			dsp_ram[0x11] = (UINT8)(128*atan2((double)(dsp_ram[0] - dsp_ram[1]), (double)(dsp_ram[2] - dsp_ram[3]))/M_PI) ^ 0x80;
-			dsp_ram[0x21] = 0;
-			break;
-		default:
-			dsp_ram[0x21] = 0;
-			logerror("SSV DSP: unknown function %x (%x)\n", dsp_ram[0x20], cpu_get_pc(space->cpu));
-			break;
-		}
+	if (offset & 1)
+	{
+		temp &= 0xff;
+		temp |= data<<8;
 	}
+	else
+	{
+		temp &= 0xff00;
+		temp |= data;
+	}
+
+	state->m_dsp->dataram_w(offset/2, temp);
 }
-
-
 
 /***************************************************************************
 
@@ -393,11 +429,7 @@ static READ16_HANDLER( fake_r )   {   return ssv_scroll[offset];  }
 	AM_RANGE(0x240000, 0x240071) AM_WRITE(ssv_irq_ack_w )                               			/*  IRQ Ack */	\
 	AM_RANGE(0x260000, 0x260001) AM_WRITE(ssv_irq_enable_w)                             			/*  IRQ En  */  \
 	AM_RANGE(0x300000, 0x30007f) AM_DEVREADWRITE8("ensoniq", es5506_r, es5506_w, 0x00ff)			/*  Sound   */	\
-	AM_RANGE(0x482000, 0x482fff) AM_RAM_WRITE(dsp_w) AM_BASE_MEMBER(ssv_state, dsp_ram)												\
 	AM_RANGE(_ROM, 0xffffff) AM_ROMBANK("bank1")														/*  ROM     */	\
-//AM_RANGE(0x990000, 0x99007f) AM_READ(fake_r)
-
-
 
 /***************************************************************************
                                 Drift Out '94
@@ -411,7 +443,8 @@ static READ16_HANDLER( drifto94_rand_r )
 static ADDRESS_MAP_START( drifto94_map, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 1 at the start
 	AM_RANGE(0x400000, 0x47ffff) AM_WRITEONLY										// ?
-	AM_RANGE(0x480000, 0x480001) AM_NOP													// ?
+	AM_RANGE(0x480000, 0x480001) AM_READWRITE(dsp_dr_r, dsp_dr_w)
+	AM_RANGE(0x482000, 0x482fff) AM_READWRITE(dsp_r, dsp_w)
 	AM_RANGE(0x483000, 0x485fff) AM_WRITENOP										// ?
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP										// ??
 	AM_RANGE(0x510000, 0x510001) AM_READ(drifto94_rand_r		)						// ??
@@ -859,6 +892,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( twineag2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x010000, 0x03ffff) AM_RAM							// More RAM
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)	// Watchdog (also value is cmp.b with mem 8)
+	AM_RANGE(0x480000, 0x480001) AM_READWRITE(dsp_dr_r, dsp_dr_w)
+	AM_RANGE(0x482000, 0x482fff) AM_READWRITE(dsp_r, dsp_w)
 	SSV_MAP( 0xe00000 )
 ADDRESS_MAP_END
 
@@ -2633,7 +2668,28 @@ static void init_hypreac2(running_machine *machine)
 		state->tile_code[i]	=	(i << 16);
 }
 
-static DRIVER_INIT( drifto94 )		{	init_ssv(machine, 0);	}
+// massages the data from the BPMicro-compatible dump to runnable form
+static void init_st010(running_machine *machine)
+{
+	UINT8 *dspsrc = (UINT8 *)machine->region("st010")->base();
+	UINT32 *dspprg = (UINT32 *)machine->region("dspprg")->base(); 
+	UINT16 *dspdata = (UINT16 *)machine->region("dspdata")->base(); 
+
+	// copy DSP program
+	for (int i = 0; i < 0x10000; i+= 4)
+	{
+		*dspprg = dspsrc[0+i]<<24 | dspsrc[1+i]<<16 | dspsrc[2+i]<<8;
+		dspprg++;
+	}
+
+	// copy DSP data
+	for (int i = 0; i < 0x1000; i+= 2)
+	{
+		*dspdata++ = dspsrc[0x10000+i]<<8 | dspsrc[0x10001+i];
+	}
+}
+
+static DRIVER_INIT( drifto94 )		{	init_ssv(machine, 0); init_st010(machine);  }
 static DRIVER_INIT( eaglshot )		{	init_ssv(machine, 0); init_hypreac2(machine);	}
 static DRIVER_INIT( gdfs )			{	init_ssv(machine, 0);	}
 static DRIVER_INIT( hypreact )		{	init_ssv(machine, 0);	}
@@ -2647,13 +2703,13 @@ static DRIVER_INIT( srmp4 )			{	init_ssv(machine, 0);
 //  ((UINT16 *)machine->region("user1")->base())[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
 }
 static DRIVER_INIT( srmp7 )			{	init_ssv(machine, 0);	}
-static DRIVER_INIT( stmblade )		{	init_ssv(machine, 0);	}
+static DRIVER_INIT( stmblade )		{	init_ssv(machine, 0); init_st010(machine); }
 static DRIVER_INIT( survarts )		{	init_ssv(machine, 0);	}
 static DRIVER_INIT( dynagear )		{	init_ssv(machine, 0);	}
 static DRIVER_INIT( sxyreact )		{	init_ssv(machine, 0); init_hypreac2(machine);	}
 static DRIVER_INIT( cairblad )		{	init_ssv(machine, 0); init_hypreac2(machine);	}
 static DRIVER_INIT( sxyreac2 )		{	init_ssv(machine, 0); init_hypreac2(machine);	}
-static DRIVER_INIT( twineag2 )		{	init_ssv(machine, 1);	}
+static DRIVER_INIT( twineag2 )		{	init_ssv(machine, 1); init_st010(machine);  }
 static DRIVER_INIT( ultrax )			{	init_ssv(machine, 1);	}
 static DRIVER_INIT( vasara )			{	init_ssv(machine, 0);	}
 static DRIVER_INIT( jsk )			{	init_ssv(machine, 0);	}
@@ -2694,6 +2750,12 @@ static MACHINE_CONFIG_DERIVED( drifto94, ssv )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(drifto94_map)
+
+	MCFG_CPU_ADD("dsp", UPD96050, 10000000)
+	MCFG_CPU_PROGRAM_MAP(dsp_prg_map)
+	MCFG_CPU_DATA_MAP(dsp_data_map)
+
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2848,6 +2910,12 @@ static MACHINE_CONFIG_DERIVED( stmblade, ssv )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(drifto94_map)
 
+	MCFG_CPU_ADD("dsp", UPD96050, 10000000)
+	MCFG_CPU_PROGRAM_MAP(dsp_prg_map)
+	MCFG_CPU_DATA_MAP(dsp_data_map)
+
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2938,6 +3006,12 @@ static MACHINE_CONFIG_DERIVED( twineag2, ssv )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(twineag2_map)
+
+	MCFG_CPU_ADD("dsp", UPD96050, 10000000)
+	MCFG_CPU_PROGRAM_MAP(dsp_prg_map)
+	MCFG_CPU_DATA_MAP(dsp_data_map)
+
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -3130,6 +3204,11 @@ ROM_START( drifto94 )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE | 0 )	/* Samples */
 	ROM_LOAD16_BYTE( "vg003-18.u15", 0x000000, 0x200000, CRC(511b3e93) SHA1(09eda175c8f1b21c18645519cc6e89c6ca1fc5de) )
+
+	ROM_REGION( 0x11000, "st010", 0)
+	ROM_LOAD( "st010.bin",    0x000000, 0x011000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) ) 
+	ROM_REGION( 0x10000, "dspprg", ROMREGION_ERASEFF)
+	ROM_REGION( 0x1000, "dspdata", ROMREGION_ERASEFF)
 ROM_END
 
 
@@ -4239,6 +4318,11 @@ ROM_START( stmblade )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 )	/* Samples */
 	ROM_LOAD16_BYTE( "sb-snd0.u22", 0x000000, 0x200000, CRC(4efd605b) SHA1(9c97be105c923c7db847d9b9aea37025edb685a0) )
+
+	ROM_REGION( 0x11000, "st010", 0)
+	ROM_LOAD( "st010.bin",    0x000000, 0x011000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) ) 
+	ROM_REGION( 0x10000, "dspprg", ROMREGION_ERASEFF)
+	ROM_REGION( 0x1000, "dspdata", ROMREGION_ERASEFF)
 ROM_END
 
 
@@ -4309,6 +4393,11 @@ ROM_START( twineag2 )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.3", 0 ) /* Samples */
 	ROM_COPY( "ensoniq.1", 0x000000, 0x000000, 0x400000 )
+
+	ROM_REGION( 0x11000, "st010", 0)
+	ROM_LOAD( "st010.bin",    0x000000, 0x011000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) ) 
+	ROM_REGION( 0x10000, "dspprg", ROMREGION_ERASEFF)
+	ROM_REGION( 0x1000, "dspdata", ROMREGION_ERASEFF)
 ROM_END
 
 
