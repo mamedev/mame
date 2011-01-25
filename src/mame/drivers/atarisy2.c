@@ -1003,7 +1003,7 @@ static INPUT_PORTS_START( 720 )
 	PORT_START("FAKE_SPINNER")	/* not direct mapped */
 	PORT_BIT( 0xffff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(12) PORT_KEYDELTA(10) PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x02)
 
-	PORT_START("SELECT")		/* IN6 - fake port, used to set the game select dial */
+	PORT_START("SELECT")
     PORT_CONFNAME( 0x03, 0x02, "Controller Type" )
     PORT_CONFSETTING(    0x00, "Real" )
     PORT_CONFSETTING(    0x01, "Joystick" )

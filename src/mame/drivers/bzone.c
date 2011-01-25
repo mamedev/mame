@@ -534,12 +534,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const pokey_interface bzone_pokey_interface =
-{
-	{ DEVCB_NULL },
-	DEVCB_INPUT_PORT("IN3")
-};
-
 
 static const pokey_interface redbaron_pokey_interface =
 {

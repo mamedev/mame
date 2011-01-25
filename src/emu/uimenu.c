@@ -122,7 +122,7 @@ struct _ui_menu
 	render_container *	container;			/* render_container we render to */
 	ui_menu_handler_func handler;			/* handler callback */
 	void *				parameter;			/* parameter */
-	ui_menu_event		menu_event;				/* the UI menu_event that occurred */
+	ui_menu_event		menu_event;			/* the UI menu_event that occurred */
 	ui_menu *			parent;				/* pointer to parent menu */
 	void *				state;				/* menu-specific state */
 	ui_menu_destroy_state_func destroy_state; /* destroy state callback */

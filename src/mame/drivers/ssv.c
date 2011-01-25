@@ -367,7 +367,7 @@ static READ16_HANDLER( dsp_r )
 	UINT16 temp = state->m_dsp->dataram_r(offset/2);
 	UINT16 res;
 
-	if (offset & 1) 
+	if (offset & 1)
 	{
 		res = temp>>8;
 	}
@@ -2672,8 +2672,8 @@ static void init_hypreac2(running_machine *machine)
 static void init_st010(running_machine *machine)
 {
 	UINT8 *dspsrc = (UINT8 *)machine->region("st010")->base();
-	UINT32 *dspprg = (UINT32 *)machine->region("dspprg")->base(); 
-	UINT16 *dspdata = (UINT16 *)machine->region("dspdata")->base(); 
+	UINT32 *dspprg = (UINT32 *)machine->region("dspprg")->base();
+	UINT16 *dspdata = (UINT16 *)machine->region("dspdata")->base();
 
 	// copy DSP program
 	for (int i = 0; i < 0x10000; i+= 4)
@@ -3206,7 +3206,7 @@ ROM_START( drifto94 )
 	ROM_LOAD16_BYTE( "vg003-18.u15", 0x000000, 0x200000, CRC(511b3e93) SHA1(09eda175c8f1b21c18645519cc6e89c6ca1fc5de) )
 
 	ROM_REGION( 0x11000, "st010", 0)
-	ROM_LOAD( "st010.bin",    0x000000, 0x011000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) ) 
+	ROM_LOAD( "st010.bin",    0x000000, 0x011000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) )
 	ROM_REGION( 0x10000, "dspprg", ROMREGION_ERASEFF)
 	ROM_REGION( 0x1000, "dspdata", ROMREGION_ERASEFF)
 ROM_END
@@ -4320,7 +4320,7 @@ ROM_START( stmblade )
 	ROM_LOAD16_BYTE( "sb-snd0.u22", 0x000000, 0x200000, CRC(4efd605b) SHA1(9c97be105c923c7db847d9b9aea37025edb685a0) )
 
 	ROM_REGION( 0x11000, "st010", 0)
-	ROM_LOAD( "st010.bin",    0x000000, 0x011000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) ) 
+	ROM_LOAD( "st010.bin",    0x000000, 0x011000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) )
 	ROM_REGION( 0x10000, "dspprg", ROMREGION_ERASEFF)
 	ROM_REGION( 0x1000, "dspdata", ROMREGION_ERASEFF)
 ROM_END
@@ -4395,7 +4395,7 @@ ROM_START( twineag2 )
 	ROM_COPY( "ensoniq.1", 0x000000, 0x000000, 0x400000 )
 
 	ROM_REGION( 0x11000, "st010", 0)
-	ROM_LOAD( "st010.bin",    0x000000, 0x011000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) ) 
+	ROM_LOAD( "st010.bin",    0x000000, 0x011000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) )
 	ROM_REGION( 0x10000, "dspprg", ROMREGION_ERASEFF)
 	ROM_REGION( 0x1000, "dspdata", ROMREGION_ERASEFF)
 ROM_END
