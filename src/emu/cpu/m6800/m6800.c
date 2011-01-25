@@ -630,7 +630,7 @@ static void m6800_check_irq2(m6800_state *cpustate)
 	{
 		TAKE_ICI;
 		if( cpustate->irq_callback )
-			(void)(*cpustate->irq_callback)(cpustate->device, M6800_TIN_LINE);
+			(void)(*cpustate->irq_callback)(cpustate->device, M6801_TIN_LINE);
 	}
 	else if ((cpustate->tcsr & (TCSR_EOCI|TCSR_OCF)) == (TCSR_EOCI|TCSR_OCF))
 	{
@@ -768,7 +768,7 @@ INLINE void write_port2(m6800_state *cpustate)
 
 	data &= 0x1f;
 
-	cpustate->io->write_byte(M6803_PORT2, data);
+	cpustate->io->write_byte(M6801_PORT2, data);
 }
 
 /* include the opcode prototypes and function pointer tables */
@@ -779,7 +779,7 @@ INLINE void write_port2(m6800_state *cpustate)
 
 static int m6800_rx(m6800_state *cpustate)
 {
-	return (cpustate->io->read_byte(M6803_PORT2) & M6800_PORT2_IO3) >> 3;
+	return (cpustate->io->read_byte(M6801_PORT2) & M6800_PORT2_IO3) >> 3;
 }
 
 static void serial_transmit(m6800_state *cpustate)
@@ -1066,7 +1066,7 @@ static CPU_RESET( m6800 )
 	cpustate->nmi_pending = 0;
 	cpustate->sc1_state = 0;
 	cpustate->irq_state[M6800_IRQ_LINE] = 0;
-	cpustate->irq_state[M6800_TIN_LINE] = 0;
+	cpustate->irq_state[M6801_TIN_LINE] = 0;
 	cpustate->ic_eddge = 0;
 
 	cpustate->port1_ddr = 0x00;
@@ -1118,13 +1118,13 @@ static void set_irq_line(m6800_state *cpustate, int irqline, int state)
 		cpustate->nmi_state = state;
 		break;
 
-	case M6800_SC1_LINE:
+	case M6801_SC1_LINE:
 		if (!cpustate->port3_latched && (cpustate->p3csr & M6801_P3CSR_LE))
 		{
 			if (!cpustate->sc1_state && state)
 			{
 				// latch input data to port 3
-				cpustate->port3_data = (cpustate->io->read_byte(M6803_PORT3) & (cpustate->port3_ddr ^ 0xff)) | (cpustate->port3_data & cpustate->port3_ddr);
+				cpustate->port3_data = (cpustate->io->read_byte(M6801_PORT3) & (cpustate->port3_ddr ^ 0xff)) | (cpustate->port3_data & cpustate->port3_ddr);
 				cpustate->port3_latched = 1;
 				//logerror("M6801 '%s' Latched Port 3 Data: %02x\n", cpustate->device->tag(), cpustate->port3_data);
 
@@ -1139,7 +1139,7 @@ static void set_irq_line(m6800_state *cpustate, int irqline, int state)
 		LOG(("M6800 '%s' set_irq_line %d,%d\n", cpustate->device->tag(), irqline, state));
 		cpustate->irq_state[irqline] = state;
 
-		if (irqline == M6800_TIN_LINE && state != cpustate->irq_state[irqline])
+		if (irqline == M6801_TIN_LINE && state != cpustate->irq_state[irqline])
 		{
 			//eddge = (state == CLEAR_LINE ) ? 2 : 0;
 			if( ((cpustate->tcsr&TCSR_IEDG) ^ (state==CLEAR_LINE ? TCSR_IEDG : 0))==0 )
@@ -1254,10 +1254,14 @@ static CPU_INIT( m6803 )
 	cpustate->sci_timer = timer_alloc(device->machine, sci_tick, cpustate);
 
 	state_register(cpustate, "m6803");
-}
 
-static READ8_HANDLER( m6801_io_r );
-static WRITE8_HANDLER( m6801_io_w );
+	if (device->baseconfig().static_config() != NULL)
+	{
+		m6801_interface *intf = (m6801_interface *) device->baseconfig().static_config();
+
+		devcb_resolve_write_line(&cpustate->out_sc2_func, &intf->out_sc2_func, device);
+	}
+}
 
 static ADDRESS_MAP_START(m6803_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(m6801_io_r, m6801_io_w)
@@ -1324,19 +1328,6 @@ static void hd63701_trap_pc(m6800_state *cpustate)
 }
 #endif
 
-static READ8_HANDLER( m6801_io_r );
-static WRITE8_HANDLER( m6801_io_w );
-
-READ8_HANDLER( hd63701_internal_registers_r )
-{
-	return m6801_io_r(space, offset);
-}
-
-WRITE8_HANDLER( hd63701_internal_registers_w )
-{
-	m6801_io_w(space, offset,data);
-}
-
 /****************************************************************************
  * NSC-8105 similiar to the M6800, but the opcodes are scrambled and there
  * is at least one new opcode ($fc)
@@ -1364,7 +1355,7 @@ INLINE void set_os3(m6800_state *cpustate, int state)
 	devcb_call_write_line(&cpustate->out_sc2_func, state);
 }
 
-static READ8_HANDLER( m6801_io_r )
+READ8_HANDLER( m6801_io_r )
 {
 	m6800_state *cpustate = get_safe_token(space->cpu);
 
@@ -1384,7 +1375,7 @@ static READ8_HANDLER( m6801_io_r )
 		if(cpustate->port1_ddr == 0xff)
 			data = cpustate->port1_data;
 		else
-			data = (cpustate->io->read_byte(M6803_PORT1) & (cpustate->port1_ddr ^ 0xff))
+			data = (cpustate->io->read_byte(M6801_PORT1) & (cpustate->port1_ddr ^ 0xff))
 				| (cpustate->port1_data & cpustate->port1_ddr);
 		break;
 
@@ -1392,7 +1383,7 @@ static READ8_HANDLER( m6801_io_r )
 		if(cpustate->port2_ddr == 0xff)
 			data = cpustate->port2_data;
 		else
-			data = (cpustate->io->read_byte(M6803_PORT2) & (cpustate->port2_ddr ^ 0xff))
+			data = (cpustate->io->read_byte(M6801_PORT2) & (cpustate->port2_ddr ^ 0xff))
 				| (cpustate->port2_data & cpustate->port2_ddr);
 		break;
 
@@ -1420,7 +1411,7 @@ static READ8_HANDLER( m6801_io_r )
 		if ((cpustate->p3csr & M6801_P3CSR_LE) || (cpustate->port3_ddr == 0xff))
 			data = cpustate->port3_data;
 		else
-			data = (cpustate->io->read_byte(M6803_PORT3) & (cpustate->port3_ddr ^ 0xff))
+			data = (cpustate->io->read_byte(M6801_PORT3) & (cpustate->port3_ddr ^ 0xff))
 				| (cpustate->port3_data & cpustate->port3_ddr);
 
 		cpustate->port3_latched = 0;
@@ -1435,7 +1426,7 @@ static READ8_HANDLER( m6801_io_r )
 		if(cpustate->port4_ddr == 0xff)
 			data = cpustate->port4_data;
 		else
-			data = (cpustate->io->read_byte(M6803_PORT4) & (cpustate->port4_ddr ^ 0xff))
+			data = (cpustate->io->read_byte(M6801_PORT4) & (cpustate->port4_ddr ^ 0xff))
 				| (cpustate->port4_data & cpustate->port4_ddr);
 		break;
 
@@ -1563,7 +1554,7 @@ static READ8_HANDLER( m6801_io_r )
 	return data;
 }
 
-static WRITE8_HANDLER( m6801_io_w )
+WRITE8_HANDLER( m6801_io_w )
 {
 	m6800_state *cpustate = get_safe_token(space->cpu);
 
@@ -1576,9 +1567,9 @@ static WRITE8_HANDLER( m6801_io_w )
 		{
 			cpustate->port1_ddr = data;
 			if(cpustate->port1_ddr == 0xff)
-				cpustate->io->write_byte(M6803_PORT1,cpustate->port1_data);
+				cpustate->io->write_byte(M6801_PORT1,cpustate->port1_data);
 			else
-				cpustate->io->write_byte(M6803_PORT1,(cpustate->port1_data & cpustate->port1_ddr) | (cpustate->port1_ddr ^ 0xff));
+				cpustate->io->write_byte(M6801_PORT1,(cpustate->port1_data & cpustate->port1_ddr) | (cpustate->port1_ddr ^ 0xff));
 		}
 		break;
 
@@ -1600,9 +1591,9 @@ static WRITE8_HANDLER( m6801_io_w )
 
 		cpustate->port1_data = data;
 		if(cpustate->port1_ddr == 0xff)
-			cpustate->io->write_byte(M6803_PORT1,cpustate->port1_data);
+			cpustate->io->write_byte(M6801_PORT1,cpustate->port1_data);
 		else
-			cpustate->io->write_byte(M6803_PORT1,(cpustate->port1_data & cpustate->port1_ddr) | (cpustate->port1_ddr ^ 0xff));
+			cpustate->io->write_byte(M6801_PORT1,(cpustate->port1_data & cpustate->port1_ddr) | (cpustate->port1_ddr ^ 0xff));
 		break;
 
 	case IO_P2DATA:
@@ -1620,9 +1611,9 @@ static WRITE8_HANDLER( m6801_io_w )
 		{
 			cpustate->port3_ddr = data;
 			if(cpustate->port3_ddr == 0xff)
-				cpustate->io->write_byte(M6803_PORT3,cpustate->port3_data);
+				cpustate->io->write_byte(M6801_PORT3,cpustate->port3_data);
 			else
-				cpustate->io->write_byte(M6803_PORT3,(cpustate->port3_data & cpustate->port3_ddr) | (cpustate->port3_ddr ^ 0xff));
+				cpustate->io->write_byte(M6801_PORT3,(cpustate->port3_data & cpustate->port3_ddr) | (cpustate->port3_ddr ^ 0xff));
 		}
 		break;
 
@@ -1633,9 +1624,9 @@ static WRITE8_HANDLER( m6801_io_w )
 		{
 			cpustate->port4_ddr = data;
 			if(cpustate->port4_ddr == 0xff)
-				cpustate->io->write_byte(M6803_PORT4,cpustate->port4_data);
+				cpustate->io->write_byte(M6801_PORT4,cpustate->port4_data);
 			else
-				cpustate->io->write_byte(M6803_PORT4,(cpustate->port4_data & cpustate->port4_ddr) | (cpustate->port4_ddr ^ 0xff));
+				cpustate->io->write_byte(M6801_PORT4,(cpustate->port4_data & cpustate->port4_ddr) | (cpustate->port4_ddr ^ 0xff));
 		}
 		break;
 
@@ -1656,9 +1647,9 @@ static WRITE8_HANDLER( m6801_io_w )
 
 		cpustate->port3_data = data;
 		if(cpustate->port3_ddr == 0xff)
-			cpustate->io->write_byte(M6803_PORT3,cpustate->port3_data);
+			cpustate->io->write_byte(M6801_PORT3,cpustate->port3_data);
 		else
-			cpustate->io->write_byte(M6803_PORT3,(cpustate->port3_data & cpustate->port3_ddr) | (cpustate->port3_ddr ^ 0xff));
+			cpustate->io->write_byte(M6801_PORT3,(cpustate->port3_data & cpustate->port3_ddr) | (cpustate->port3_ddr ^ 0xff));
 
 		if (cpustate->p3csr & M6801_P3CSR_OSS)
 		{
@@ -1671,9 +1662,9 @@ static WRITE8_HANDLER( m6801_io_w )
 
 		cpustate->port4_data = data;
 		if(cpustate->port4_ddr == 0xff)
-			cpustate->io->write_byte(M6803_PORT4,cpustate->port4_data);
+			cpustate->io->write_byte(M6801_PORT4,cpustate->port4_data);
 		else
-			cpustate->io->write_byte(M6803_PORT4,(cpustate->port4_data & cpustate->port4_ddr) | (cpustate->port4_ddr ^ 0xff));
+			cpustate->io->write_byte(M6801_PORT4,(cpustate->port4_data & cpustate->port4_ddr) | (cpustate->port4_ddr ^ 0xff));
 		break;
 
 	case IO_TCSR:
@@ -1806,8 +1797,8 @@ static CPU_SET_INFO( m6800 )
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 		case CPUINFO_INT_INPUT_STATE + M6800_IRQ_LINE:	set_irq_line(cpustate, M6800_IRQ_LINE, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + M6800_TIN_LINE:	set_irq_line(cpustate, M6800_TIN_LINE, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + M6800_SC1_LINE:	set_irq_line(cpustate, M6800_SC1_LINE, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + M6801_TIN_LINE:	set_irq_line(cpustate, M6801_TIN_LINE, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + M6801_SC1_LINE:	set_irq_line(cpustate, M6801_SC1_LINE, info->i);	break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	set_irq_line(cpustate, INPUT_LINE_NMI, info->i);	break;
 
 		case CPUINFO_INT_PC:							PC = info->i;								break;
@@ -1855,8 +1846,8 @@ CPU_GET_INFO( m6800 )
 		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + M6800_IRQ_LINE:	info->i = cpustate->irq_state[M6800_IRQ_LINE]; break;
-		case CPUINFO_INT_INPUT_STATE + M6800_TIN_LINE:	info->i = cpustate->irq_state[M6800_TIN_LINE]; break;
-		case CPUINFO_INT_INPUT_STATE + M6800_SC1_LINE:	info->i = cpustate->irq_state[M6800_SC1_LINE]; break;
+		case CPUINFO_INT_INPUT_STATE + M6801_TIN_LINE:	info->i = cpustate->irq_state[M6801_TIN_LINE]; break;
+		case CPUINFO_INT_INPUT_STATE + M6801_SC1_LINE:	info->i = cpustate->irq_state[M6801_SC1_LINE]; break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = cpustate->nmi_state;				break;
 
 		case CPUINFO_INT_PREVIOUSPC:					info->i = cpustate->ppc.w.l;				break;

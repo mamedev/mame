@@ -180,7 +180,7 @@ static READ8_HANDLER( soundkludge_r )
 }
 
 static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_internal_registers_r,hd63701_internal_registers_w)/* internal registers */
+	AM_RANGE(0x0000, 0x001f) AM_READWRITE(m6801_io_r,m6801_io_w)/* internal registers */
 	AM_RANGE(0x0080, 0x00ff) AM_RAM								/* built in RAM */
 	AM_RANGE(0x1105, 0x1105) AM_READ(soundkludge_r)				/* cures speech */
 	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("namco", namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */
@@ -198,10 +198,10 @@ static READ8_HANDLER( readFF )
 }
 
 static ADDRESS_MAP_START( mcu_port_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(HD63701_PORT1, HD63701_PORT1) AM_READ(inputport_r)			/* input ports read */
-	AM_RANGE(HD63701_PORT1, HD63701_PORT1) AM_WRITE(inputport_select_w)	/* input port select */
-	AM_RANGE(HD63701_PORT2, HD63701_PORT2) AM_READ(readFF)	/* leds won't work otherwise */
-	AM_RANGE(HD63701_PORT2, HD63701_PORT2) AM_WRITE(baraduke_lamps_w)		/* lamps */
+	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ(inputport_r)			/* input ports read */
+	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_WRITE(inputport_select_w)	/* input port select */
+	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READ(readFF)	/* leds won't work otherwise */
+	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_WRITE(baraduke_lamps_w)		/* lamps */
 ADDRESS_MAP_END
 
 
