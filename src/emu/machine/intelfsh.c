@@ -35,6 +35,7 @@ enum
 	FM_ERASEAMD3,	// part 3 of AMD erase sequence
 	FM_ERASEAMD4,	// part 4 of AMD erase sequence
 	FM_BYTEPROGRAM,
+	FM_BANKSELECT,
 };
 
 
@@ -249,7 +250,8 @@ intelfsh_device::intelfsh_device(running_machine &_machine, const intelfsh_devic
 	  m_erase_sector(0),
 	  m_flash_mode(FM_NORMAL),
 	  m_flash_master_lock(false),
-	  m_timer(NULL)
+	  m_timer(NULL),
+	  m_bank(0)
 {
 }
 
@@ -364,6 +366,7 @@ void intelfsh_device::nvram_write(mame_file &file)
 UINT32 intelfsh_device::read_full(UINT32 address)
 {
 	UINT32 data = 0;
+	address += m_bank << 16;
 	switch( m_flash_mode )
 	{
 	default:
@@ -458,6 +461,8 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 {
 //  logerror( "intelflash_write( %d, %08x, %08x )\n", chip, address, data );
 
+	address += m_bank << 16;
+
 	switch( m_flash_mode )
 	{
 	case FM_NORMAL:
@@ -548,6 +553,10 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 		else if( ( address & 0xffff ) == 0x5555 && ( data & 0xff ) == 0xf0 )
 		{
 			m_flash_mode = FM_NORMAL;
+		}
+		else if( ( address & 0xffff ) == 0x5555 && ( data & 0xff ) == 0xb0 && m_config.m_maker_id == 0x62 && m_config.m_device_id == 0x13 )
+		{
+			m_flash_mode = FM_BANKSELECT;
 		}
 		else
 		{
@@ -692,6 +701,10 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 			logerror( "unexpected %08x=%02x in FM_SETMASTER:\n", address, data & 0xff );
 			break;
 		}
+		m_flash_mode = FM_NORMAL;
+		break;
+	case FM_BANKSELECT:
+		m_bank = data & 0xff;
 		m_flash_mode = FM_NORMAL;
 		break;
 	}

@@ -131,6 +131,7 @@ protected:
 	INT32						m_flash_mode;
 	bool						m_flash_master_lock;
 	emu_timer *					m_timer;
+	INT32						m_bank;
 };
 
 
