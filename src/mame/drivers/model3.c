@@ -1766,6 +1766,7 @@ static WRITE64_HANDLER(daytona2_rombank_w)
 		data >>= 56;
 		data = (~data) & 0xf;
 		memory_set_bankptr(space->machine,  "bank1", space->machine->region( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
+		memory_set_bankptr(space->machine,  "bank2", space->machine->region( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
 	}
 }
 
@@ -5468,6 +5469,7 @@ static DRIVER_INIT( daytona2 )
 	DRIVER_INIT_CALL(model3_20);
 
 	memory_install_write64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc3800000, 0xc3800007, 0, 0, daytona2_rombank_w );
+	memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc3000000, 0xc37fffff, 0, 0, "bank2" );
 
 	//rom[(0x68468c^4)/4] = 0x60000000;
 	rom[(0x6063c4^4)/4] = 0x60000000;
@@ -5481,6 +5483,7 @@ static DRIVER_INIT( dayto2pe )
 	DRIVER_INIT_CALL(model3_20);
 
 	memory_install_write64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc3800000, 0xc3800007, 0, 0, daytona2_rombank_w );
+	memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc3000000, 0xc37fffff, 0, 0, "bank2" );
 
 	rom[(0x606784^4)/4] = 0x60000000;
 	rom[(0x69a3fc^4)/4] = 0x60000000;		// jump to encrypted code
