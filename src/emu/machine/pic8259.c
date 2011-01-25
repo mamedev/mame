@@ -174,7 +174,6 @@ int pic8259_acknowledge(device_t *device)
 				logerror("pic8259_acknowledge(): PIC acknowledge IRQ #%d\n", irq);
 			pic8259->irr &= ~mask;
 			pic8259->esr &= ~mask;
-			pic8259->irq_lines &= ~mask;
 
 			if (!pic8259->auto_eoi)
 				pic8259->isr |= mask;
