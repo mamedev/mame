@@ -102,6 +102,7 @@ CPU_DISASSEMBLE( cp1610 );
 CPU_DISASSEMBLE( cquestsnd );
 CPU_DISASSEMBLE( cquestrot );
 CPU_DISASSEMBLE( cquestlin );
+CPU_DISASSEMBLE( dsp16a );
 CPU_DISASSEMBLE( dsp32c );
 CPU_DISASSEMBLE( dsp56k );
 CPU_DISASSEMBLE( hyperstone_generic );
@@ -227,6 +228,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "cquestsnd",	_64be, -3, CPU_DISASSEMBLE_NAME(cquestsnd) },
 	{ "cquestrot",	_64be, -3, CPU_DISASSEMBLE_NAME(cquestrot) },
 	{ "cquestlin",	_64be, -3, CPU_DISASSEMBLE_NAME(cquestlin) },
+	{ "dsp16a",		_16le, -1, CPU_DISASSEMBLE_NAME(dsp16a) },
 	{ "dsp32c",		_32le,  0, CPU_DISASSEMBLE_NAME(dsp32c) },
 	{ "dsp56k",		_16le, -1, CPU_DISASSEMBLE_NAME(dsp56k) },
 	{ "hyperstone",	_16be,  0, CPU_DISASSEMBLE_NAME(hyperstone_generic) },

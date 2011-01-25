@@ -176,6 +176,20 @@ $(CPUOBJ)/apexc/apexc.o:	$(CPUSRC)/apexc/apexc.c \
 
 
 #-------------------------------------------------
+# AT&T DSP16A
+#-------------------------------------------------
+
+ifneq ($(filter DSP16A,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/dsp16
+CPUOBJS += $(CPUOBJ)/dsp16/dsp16.o
+DASMOBJS += $(CPUOBJ)/dsp16/dsp16dis.o
+endif
+
+$(CPUOBJ)/dsp16/dsp16.o:	$(CPUSRC)/dsp16/dsp16.c \
+							$(CPUSRC)/dsp16/dsp16.h
+
+
+#-------------------------------------------------
 # AT&T DSP32C
 #-------------------------------------------------
 
