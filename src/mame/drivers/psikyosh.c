@@ -942,7 +942,7 @@ ROM_START( daraku )
 	ROM_LOAD( "eeprom-daraku.bin", 0x0000, 0x0100, CRC(a9715297) SHA1(fcd32b936e0d05bad4ba4969ddec24aae7768cea) )
 ROM_END
 
-ROM_START( sbomberb )
+ROM_START( sbomber ) /* Version B - Only shows "Version B" when set to Japan region */
 	ROM_REGION( 0x100000, "maincpu", 0)
 	ROM_LOAD32_WORD_SWAP( "1-b_pr_l.u18", 0x000002, 0x080000, CRC(52d12225) SHA1(0a31a5d557414e7bf51dc6f7fbdd417a20b78df1) )
 	ROM_LOAD32_WORD_SWAP( "1-b_pr_h.u17", 0x000000, 0x080000, CRC(1bbd0345) SHA1(c6ccb7c97cc9e9ea298c1883d1dd5563907a7255) )
@@ -963,7 +963,31 @@ ROM_START( sbomberb )
 	ROM_LOAD( "sound.u32", 0x000000, 0x400000, CRC(85cbff69) SHA1(34c7f4d337111de2064f84214294b6bdc37bf16c) )
 
 	ROM_REGION( 0x100, "eeprom", 0 )
-	ROM_LOAD( "eeprom-sbomberb.bin", 0x0000, 0x0100, CRC(7ac38846) SHA1(c5f4b05a94211f3c96b8c472adbe634f2e77d753) )
+	ROM_LOAD( "eeprom-sbomber.bin", 0x0000, 0x0100, CRC(7ac38846) SHA1(c5f4b05a94211f3c96b8c472adbe634f2e77d753) ) /* Both versions use the same default settings */
+ROM_END
+
+ROM_START( sbombera ) /* Original version */
+	ROM_REGION( 0x100000, "maincpu", 0)
+	ROM_LOAD32_WORD_SWAP( "2.u18", 0x000002, 0x080000, CRC(57819a26) SHA1(d7a6fc957e39adf97762ab0a35b91aa17ec026e0) )
+	ROM_LOAD32_WORD_SWAP( "1.u17", 0x000000, 0x080000, CRC(c388e847) SHA1(cbf4f2e191894160bdf0290d72cf20c222aaf7a7) )
+
+	ROM_REGION( 0x2800000, "gfx1", 0 )
+	ROM_LOAD32_WORD( "0l.u4",  0x0000000, 0x400000, CRC(b7e4ac51) SHA1(70e802b6235932116496a77ee0c78a256e85aff3) )
+	ROM_LOAD32_WORD( "0h.u13", 0x0000002, 0x400000, CRC(235e6c27) SHA1(c597d7b5bef4edac1474ad0024cfb33eb1257106) )
+	ROM_LOAD32_WORD( "1l.u3",  0x0800000, 0x400000, CRC(3c88c48c) SHA1(d1ce4ab60ba18449bbd96e29c310e060a0bb6de6) )
+	ROM_LOAD32_WORD( "1h.u12", 0x0800002, 0x400000, CRC(15626a6e) SHA1(5493e92c9724982938591d758bee7d86cf96fd19) )
+	ROM_LOAD32_WORD( "2l.u2",  0x1000000, 0x400000, CRC(41e92f64) SHA1(ea121c7cb35266ed0c21af4bb958fe5d73d84977) )
+	ROM_LOAD32_WORD( "2h.u20", 0x1000002, 0x400000, CRC(4ae62e84) SHA1(adc1dab2f09aa4f5665d7bb7603a9b75c978031e) )
+	ROM_LOAD32_WORD( "3l.u1",  0x1800000, 0x400000, CRC(43ba5f0f) SHA1(b8f93ed055441fd06b68103c9fd62b6aa3f3da7d) )
+	ROM_LOAD32_WORD( "3h.u19", 0x1800002, 0x400000, CRC(ff01bb12) SHA1(df6fab898356c02f34ee7a45fdcc265218f2f20e) )
+	ROM_LOAD32_WORD( "4l.u10", 0x2000000, 0x400000, CRC(e491d593) SHA1(12a7f6c282969be342b70443b8c802a399571245) )
+	ROM_LOAD32_WORD( "4h.u31", 0x2000002, 0x400000, CRC(7bdd377a) SHA1(e357c98f82b8ea3ae4fd8eae6c1ad2dfb500db9c) )
+
+	ROM_REGION( 0x400000, "ymf", 0 ) /* Samples */
+	ROM_LOAD( "sound.u32", 0x000000, 0x400000, CRC(85cbff69) SHA1(34c7f4d337111de2064f84214294b6bdc37bf16c) )
+
+	ROM_REGION( 0x100, "eeprom", 0 )
+	ROM_LOAD( "eeprom-sbomber.bin", 0x0000, 0x0100, CRC(7ac38846) SHA1(c5f4b05a94211f3c96b8c472adbe634f2e77d753) ) /* Both versions use the same default settings */
 ROM_END
 
 /* PS5 */
@@ -1256,7 +1280,8 @@ static DRIVER_INIT( mjgtaste )
 GAME( 1997, soldivid, 0,        psikyo3v1,   soldivid, soldivid, ROT0,   "Psikyo", "Sol Divide - The Sword Of Darkness", GAME_SUPPORTS_SAVE )
 GAME( 1997, s1945ii,  0,        psikyo3v1,   s1945ii,  s1945ii,  ROT270, "Psikyo", "Strikers 1945 II", GAME_SUPPORTS_SAVE )
 GAME( 1998, daraku,   0,        psikyo3v1,   daraku,   daraku,   ROT0,   "Psikyo", "Daraku Tenshi - The Fallen Angels", GAME_SUPPORTS_SAVE )
-GAME( 1998, sbomberb, 0,        psikyo3v1,   sbomberb, sbomberb, ROT270, "Psikyo", "Space Bomber (ver. B)", GAME_SUPPORTS_SAVE )
+GAME( 1998, sbomber,  0,        psikyo3v1,   sbomberb, sbomberb, ROT270, "Psikyo", "Space Bomber (ver. B)", GAME_SUPPORTS_SAVE )
+GAME( 1998, sbombera, sbomber,  psikyo3v1,   sbomberb, sbomberb, ROT270, "Psikyo", "Space Bomber", GAME_SUPPORTS_SAVE )
 
 /* ps5 */
 GAME( 1998, gunbird2, 0,        psikyo5,     gunbird2, gunbird2, ROT270, "Psikyo", "Gunbird 2", GAME_SUPPORTS_SAVE )
