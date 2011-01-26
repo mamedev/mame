@@ -17,8 +17,6 @@
      from the VIA, which also does not appear anywhere on schematic.
      The latter the VIA *DOES* seem to write something to, but it may be just
      a silence waveform for 55516, alternating zeroes and ones.
-    * The volume dac ram values could be handled better, currently the MSB bit
-     is just thrown out; it should invert the waveform.
     * The channel mixing is done additively at the moment rather than
      emulating the original multiplexer, which is actually not that hard to do
     * The 'FM OR AM' output of the audio via (pb1) appears to control some sort
@@ -105,7 +103,7 @@ struct _beezer_sound_state
 	UINT8 ptm_irq_state;
 
 	struct sh6840_timer_channel sh6840_timer[3];
-	INT16 sh6840_volume[4];
+	UINT8 sh6840_volume[4];
 	UINT8 sh6840_MSB_latch;
 	UINT8 sh6840_LSB_latch;
 	UINT8 sh6840_LFSR_oldxor;
@@ -314,8 +312,9 @@ static STREAM_UPDATE( beezer_stream_update )
 		struct sh6840_timer_channel *t;
 		int clocks_this_sample;
 		int clocks;
+		INT16 sample1, sample2, sample3, sample0;
 		INT16 sample = 0;
-
+		sample1 = sample2 = sample3 = sample0 = 0;
 
 		/* determine how many 6840 clocks this sample */
 		state->sh6840_clock_count += state->sh6840_clocks_per_sample;
@@ -336,20 +335,14 @@ static STREAM_UPDATE( beezer_stream_update )
 			t = &sh6840_timer[0];
 			clocks = (t->cr & 0x02) ? clocks_this_sample : state->sh6840_noiselatch1;
 			sh6840_apply_clock(t, clocks);
-			if (t->state && (t->cr & 0x80))
-				sample += (state->sh6840_volume[1]&0x7F);
-			else
-				sample -= (state->sh6840_volume[1]&0x7F);
+			sample1 = (t->state && (t->cr & 0x80))?1:0;
 
 			/* handle timer 1 if enabled */
 			t = &sh6840_timer[1];
 			chan1_clocks = t->clocks;
 			clocks = (t->cr & 0x02) ? clocks_this_sample : 0; // TODO: this is WRONG: channel 1 is clocked by a mystery "VCO CLOCK" signal if not set to E clock. it may not even be connected to anything!
 			sh6840_apply_clock(t, clocks);
-			if (t->state && (t->cr & 0x80))
-				sample += (state->sh6840_volume[2]&0x7F);
-			else
-				sample -= (state->sh6840_volume[2]&0x7F);
+			sample2 = (t->state && (t->cr & 0x80))?1:0;
 
 			/* generate channel 1-clocked noise if configured to do so */
 			if (noisy != 0)
@@ -369,15 +362,22 @@ static STREAM_UPDATE( beezer_stream_update )
 				clocks /= 8;
 			}
 			sh6840_apply_clock(t, clocks);
-			if (t->state && (t->cr & 0x80))
-				sample += (state->sh6840_volume[3]&0x7F);
-			else
-				sample -= (state->sh6840_volume[3]&0x7F);
+			sample3 = (t->state && (t->cr & 0x80))?1:0;
 		}
-		sample += (state->sh6840_volume[0]&0x7F)*(state->sh6840_latchwrite?1:0);
+		sample0 = state->sh6840_latchwrite?1:0;
 
 		/* stash */
-		*buffer++ = sample*64;
+		/* each sample feeds an xor bit on the sign bit of a sign-magnitude (NOT 2'S COMPLEMENT)
+		 * DAC. This requires some rather convoluted processing:
+		 * samplex*0x80 brings the sample to the sign bit
+		 * state->sh6840_volume[x]&0x80 pulls the sign bit from the dac sample
+		 * state->sh6840_volume[x]&0x7F pulls the magnitude from the dac sample
+		 */
+		sample += (((sample0*0x80)^(state->sh6840_volume[0]&0x80))?-1:1)*(state->sh6840_volume[0]&0x7F);
+		sample += (((sample1*0x80)^(state->sh6840_volume[1]&0x80))?-1:1)*(state->sh6840_volume[1]&0x7F);
+		sample += (((sample2*0x80)^(state->sh6840_volume[2]&0x80))?-1:1)*(state->sh6840_volume[2]&0x7F);
+		sample += (((sample3*0x80)^(state->sh6840_volume[3]&0x80))?-1:1)*(state->sh6840_volume[3]&0x7F);
+		*buffer++ = sample*64; // adding 3 numbers ranging from -128 to 127 yields a range of -512 to 508; to scale that to '-32768 to 32767' we multiply by 64
 	}
 }
 
@@ -571,17 +571,14 @@ WRITE8_DEVICE_HANDLER( beezer_sh6840_w )
 
 /*************************************
  *
- *  External sound effect controls
+ *  DAC write handler
  *
  *************************************/
 
 WRITE8_DEVICE_HANDLER( beezer_sfxctrl_w )
 {
 	beezer_sound_state *state = get_safe_token(device);
-
 	stream_update(state->stream);
-
 	state->sh6840_volume[offset] = data;
-	//fprintf(stderr,"dacram: write of %0x to slot %0x\n", data, offset);
 }
 
