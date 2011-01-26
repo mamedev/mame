@@ -77,6 +77,7 @@ Sonic Hedgehog 2           171-6215A   837-6963-62       610-0239-62         MPR
 #include "imagedev/cartslot.h"
 
 static struct _mtech_bios mtech_bios;
+static int cart_is_genesis[8];
 
 /* Megatech BIOS specific */
 static UINT8* megatech_banked_ram;
@@ -218,7 +219,6 @@ static READ8_HANDLER( megatech_cart_select_r )
 
 
 
-
 static TIMER_CALLBACK( megatech_z80_run_state )
 {
 	char tempname[20];
@@ -229,7 +229,7 @@ static TIMER_CALLBACK( megatech_z80_run_state )
 
 	memcpy(machine->region("maincpu")->base(), game_region, 0x400000);
 
-	if (game_region[0x400000]==2)
+	if (!cart_is_genesis[param])
 	{
 		printf("enabling SMS Z80\n");
 		mtech_bios.current_game_is_sms = 1;
@@ -237,7 +237,7 @@ static TIMER_CALLBACK( megatech_z80_run_state )
 		//cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_HALT, CLEAR_LINE);
 		cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_RESET, CLEAR_LINE);
 	}
-	else if (game_region[0x400000]==1)
+	else
 	{
 		mtech_bios.current_game_is_sms = 0;
 		printf("disabling SMS Z80\n");
@@ -413,11 +413,23 @@ ADDRESS_MAP_END
 
 
 
-static DRIVER_INIT(mtnew)
+static DRIVER_INIT(mt_slot)
 {
 	megatech_banked_ram = auto_alloc_array(machine, UINT8, 0x1000*8);
+
 	DRIVER_INIT_CALL(megadriv);
 	DRIVER_INIT_CALL(megatech_bios);
+
+	// this gets set in DEVICE_IMAGE_LOAD
+	memset(cart_is_genesis, 0, ARRAY_LENGTH(cart_is_genesis));
+}
+
+static DRIVER_INIT(mtnew)
+{
+	UINT8* game_region = machine->region("game0")->base();
+
+	DRIVER_INIT_CALL(mt_slot);
+	cart_is_genesis[0] = (game_region[0x400000] == 1) ? 1 : 0;
 }
 
 static VIDEO_START(mtnew)
@@ -491,20 +503,21 @@ MACHINE_CONFIG_END
 struct megatech_cart_region
 {
 	const char *tag;
+	int        slot;
 	const char *region;
 };
 
 // we keep old region tags for compatibility with older macros... this might be changed at a later stage
 static const struct megatech_cart_region megatech_cart_table[] =
 {
-	{ "cart1", "game0" },
-	{ "cart2", "game1" },
-	{ "cart3", "game2" },
-	{ "cart4", "game3" },
-	{ "cart5", "game4" },
-	{ "cart6", "game5" },
-	{ "cart7", "game6" },
-	{ "cart8", "game7" },
+	{ "cart1", 0, "game0" },
+	{ "cart2", 1, "game1" },
+	{ "cart3", 2, "game2" },
+	{ "cart4", 3, "game3" },
+	{ "cart5", 4, "game4" },
+	{ "cart6", 5, "game5" },
+	{ "cart7", 6, "game6" },
+	{ "cart8", 7, "game7" },
 	{ 0 }
 };
 
@@ -541,12 +554,12 @@ static DEVICE_IMAGE_LOAD( megatech_cart )
 		if (!mame_stricmp("genesis", pcb_name))
 		{
 			printf("%s is genesis\n", mt_cart->tag);
-			ROM[0x400000] = 0x01;
+			cart_is_genesis[this_cart->slot] = 1;
 		}
 		else if (!mame_stricmp("sms", pcb_name))
 		{	
 			printf("%s is sms\n", mt_cart->tag);
-			ROM[0x400000] = 0x02;
+			cart_is_genesis[this_cart->slot] = 0;
 		}
 		else
 		{
@@ -1149,36 +1162,9 @@ ROM_START( mt_soni2 ) /* Sonic The Hedgehog 2 */
 	MEGATECH_GAME62("game0")
 ROM_END
 
-/* Compilations of games to show the multi-cart support */
-
-ROM_START( mt_comp1 )
-	MEGATECH_BIOS
-	MEGATECH_GAME01("game0")
-	MEGATECH_GAME13("game1")
-	MEGATECH_GAME21("game2")
-	MEGATECH_GAME06("game3")
-	MEGATECH_GAME08("game4")
-	MEGATECH_GAME28("game5")
-	MEGATECH_GAME49("game6")
-	MEGATECH_GAME60("game7")
-ROM_END
-
-ROM_START( mt_comp2 )
-	MEGATECH_BIOS
-	MEGATECH_GAME10("game0")
-	MEGATECH_GAME39("game1")
-	MEGATECH_GAME24("game2")
-	MEGATECH_GAME52("game3")
-	MEGATECH_GAME29("game4")
-	MEGATECH_GAME36("game5")
-	MEGATECH_GAME40("game6")
-	MEGATECH_GAME57("game7")
-ROM_END
-
-
 
 /* nn */ /* nn is part of the instruction rom name, should there be a game for each number? */
-/* -- */ CONS( 1989, megatech, 0, 0,     megatech_slot, megatech, mtnew, "Sega",                  "Mega-Tech", GAME_IS_BIOS_ROOT )
+/* -- */ CONS( 1989, megatech, 0, 0,     megatech_slot, megatech, mt_slot, "Sega",                 "Mega-Tech", GAME_IS_BIOS_ROOT )
 /* 01 */ GAME( 1988, mt_beast, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Altered Beast (Mega-Tech)", GAME_NOT_WORKING )
 /* 02 */ GAME( 1988, mt_shar2, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Space Harrier II (Mega-Tech)", GAME_NOT_WORKING )
 /* 03 */ GAME( 1988, mt_stbld, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Super Thunder Blade (Mega-Tech)", GAME_NOT_WORKING )
@@ -1244,7 +1230,3 @@ ROM_END
 /* 62 */ GAME( 1992, mt_soni2, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Sonic The Hedgehog 2 (Mega-Tech)", GAME_NOT_WORKING )
 
 /* more? */
-
-/* Compilations to test multi-game support */
-/* xx */ GAME( 1992, mt_comp1, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Mega-Tech with various carts (set 1) (Mega-Tech)", GAME_NOT_WORKING )
-/* xx */ GAME( 1992, mt_comp2, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Mega-Tech with various carts (set 2) (Mega-Tech)", GAME_NOT_WORKING )
