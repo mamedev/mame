@@ -46,7 +46,10 @@
 #define GAME_UNOFFICIAL     			0x00008000	/* unofficial hardware change */
 #define GAME_NO_SOUND_HW				0x00010000	/* sound hardware not available */
 #define GAME_MECHANICAL					0x00020000	/* contains mechanical parts (pinball, redemption games,...) */
-
+#define GAME_TYPE_ARCADE				0x00040000	/* arcade machine (coin operated machines) */
+#define GAME_TYPE_CONSOLE				0x00080000	/* console system */
+#define GAME_TYPE_COMPUTER				0x00100000	/* any kind of computer including home computers, minis, calcs,... */
+#define GAME_TYPE_OTHER					0x00200000	/* any other emulated system that doesn't fit above (ex. clock, satelite receiver,...) */
 
 /* ----- flags to return from video_update ----- */
 #define UPDATE_HAS_NOT_CHANGED			0x0001	/* the video has not changed */
@@ -111,7 +114,7 @@ extern const game_driver GAME_NAME(NAME) =	\
 	DRIVER_INIT_NAME(INIT),					\
 	ROM_NAME(NAME),							\
 	NULL,									\
-	(MONITOR)|(FLAGS),						\
+	(MONITOR)|(FLAGS)|GAME_TYPE_ARCADE,		\
 	&LAYOUT[0]								\
 };
 
@@ -129,7 +132,7 @@ extern const game_driver GAME_NAME(NAME) =	\
 	DRIVER_INIT_NAME(INIT),					\
 	ROM_NAME(NAME),							\
 	#COMPAT,								\
-	ROT0|(FLAGS),							\
+	ROT0|(FLAGS)|GAME_TYPE_CONSOLE,			\
 	NULL									\
 };
 
@@ -147,7 +150,25 @@ extern const game_driver GAME_NAME(NAME) =	\
 	DRIVER_INIT_NAME(INIT),					\
 	ROM_NAME(NAME),							\
 	#COMPAT,								\
-	ROT0|(FLAGS),				\
+	ROT0|(FLAGS)|GAME_TYPE_COMPUTER,		\
+	NULL									\
+};
+
+#define SYST(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,INIT,COMPANY,FULLNAME,FLAGS)	\
+extern const game_driver GAME_NAME(NAME) =	\
+{											\
+	__FILE__,								\
+	#PARENT,								\
+	#NAME,									\
+	FULLNAME,								\
+	#YEAR,									\
+	COMPANY,								\
+	MACHINE_CONFIG_NAME(MACHINE),			\
+	INPUT_PORTS_NAME(INPUT),				\
+	DRIVER_INIT_NAME(INIT),					\
+	ROM_NAME(NAME),							\
+	#COMPAT,								\
+	ROT0|(FLAGS)|GAME_TYPE_OTHER,		\
 	NULL									\
 };
 
