@@ -6,10 +6,10 @@ astring disasmF1Field(const UINT8& F1, const UINT8& D, const UINT8& S)
     astring ret = "";
     switch (F1)
     {
-        case 0x00: ret.printf("a%d = p         p = x*y", D); break;
-        case 0x01: ret.printf("a%d = a%d + p   p = x*y", D, S); break;
+        case 0x00: ret.printf("a%d = p, p = x*y", D); break;
+        case 0x01: ret.printf("a%d = a%d + p, p = x*y", D, S); break;
         case 0x02: ret.printf("p = x*y"); break;
-        case 0x03: ret.printf("a%d = a%d - p   p = x*y", D, S); break;
+        case 0x03: ret.printf("a%d = a%d - p, p = x*y", D, S); break;
         case 0x04: ret.printf("a$d = p", D); break;
         case 0x05: ret.printf("a%d = a%d + p", D, S); break;
         case 0x06: ret.printf("NOP"); break;
@@ -26,12 +26,6 @@ astring disasmF1Field(const UINT8& F1, const UINT8& D, const UINT8& S)
         default: return "UNKNOWN";
     }
     return ret;
-}
-
-astring disasmXField(const UINT8& X)
-{
-    // TODO
-    return "";
 }
 
 astring disasmYField(const UINT8& Y)
@@ -269,44 +263,152 @@ CPU_DISASSEMBLE( dsp16a )
             const UINT8 D = (op & 0x0400) >> 10;
             const UINT8 F1 = (op & 0x01e0) >> 5;
             astring yString = disasmYField(Y);
-            astring f1String = disasmF1Field(F1, D, S);
-            sprintf(buffer, "%s, %s", f1String.cstr(), yString.cstr());
-            opSize = 1;
+            astring fString = disasmF1Field(F1, D, S);
+            sprintf(buffer, "%s, %s", fString.cstr(), yString.cstr());
             break;
         }
         case 0x04: case 0x1c: 
         {
             // F1 Y=a0[1] | F1 Y=a1[1]
-            // PAGE 3-40 - WIP
+            const UINT8 Y = (op & 0x000f);
+            const UINT8 S = (op & 0x0200) >> 9;
+            const UINT8 D = (op & 0x0400) >> 10;
+            const UINT8 F1 = (op & 0x01e0) >> 5;
+            astring yString = disasmYField(Y);
+            astring fString = disasmF1Field(F1, D, S);
+            astring aString = (opcode == 0x1c) ? "a0" : "a1";
+            sprintf(buffer, "%s = %s, %s", yString.cstr(), aString.cstr(), fString.cstr());
             break;
         }
-
-        case 0x14: case 0x16:
-        case 0x17: case 0x19: 
-        case 0x1b: case 0x1f:
+        case 0x16:
         {
-            sprintf(buffer, "format 1");
+            // F1, x = Y
+            const UINT8 Y = (op & 0x000f);
+            const UINT8 S = (op & 0x0200) >> 9;
+            const UINT8 D = (op & 0x0400) >> 10;
+            const UINT8 F1 = (op & 0x01e0) >> 5;
+            astring yString = disasmYField(Y);
+            astring fString = disasmF1Field(F1, D, S);
+            sprintf(buffer, "%s, x = %s", fString.cstr(), yString.cstr());
+            break;
+        }
+        case 0x17:
+        {
+            // F1, y[l] = Y
+            const UINT8 Y = (op & 0x000f);
+            const UINT8 X = (op & 0x0010) >> 4;
+            const UINT8 S = (op & 0x0200) >> 9;
+            const UINT8 D = (op & 0x0400) >> 10;
+            const UINT8 F1 = (op & 0x01e0) >> 5;
+            astring yString = disasmYField(Y);
+            astring fString = disasmF1Field(F1, D, S);
+            astring xString = (X ? "y" : "y1");
+            sprintf(buffer, "%s, %s = %s", fString.cstr(), xString.cstr(), yString.cstr());
+            break;
+        }
+        case 0x1f:
+        {
+            // F1, y = Y, x = *pt++[i]
+            const UINT8 Y = (op & 0x000f);
+            const UINT8 X = (op & 0x0010) >> 4;
+            const UINT8 S = (op & 0x0200) >> 9;
+            const UINT8 D = (op & 0x0400) >> 10;
+            const UINT8 F1 = (op & 0x01e0) >> 5;
+            astring yString = disasmYField(Y);
+            astring fString = disasmF1Field(F1, D, S);
+            astring xString = (X ? "*pt++i" : "*pt++");
+            sprintf(buffer, "%s, y = %s, x = %s", fString.cstr(), yString.cstr(), xString.cstr());
+            break;
+        }
+        case 0x19: case 0x1b:
+        {
+            // F1, y = a0|1, x = *pt++[i]
+            const UINT8 Y = (op & 0x000f);
+            const UINT8 X = (op & 0x0010) >> 4;
+            const UINT8 S = (op & 0x0200) >> 9;
+            const UINT8 D = (op & 0x0400) >> 10;
+            const UINT8 F1 = (op & 0x01e0) >> 5;
+            astring fString = disasmF1Field(F1, D, S);
+            astring xString = (X ? "*pt++i" : "*pt++");
+            astring aString = (opcode == 0x19) ? "a0" : "a1";
+            sprintf(buffer, "%s, y = %s, x = %s", fString.cstr(), aString.cstr(), xString.cstr());
+            if (Y != 0x00) sprintf(buffer, "UNKNOWN");
+            break;
+        }         
+        case 0x14:
+        {
+            // F1, Y = y[1]
+            const UINT8 Y = (op & 0x000f);
+            const UINT8 X = (op & 0x0010) >> 4;
+            const UINT8 S = (op & 0x0200) >> 9;
+            const UINT8 D = (op & 0x0400) >> 10;
+            const UINT8 F1 = (op & 0x01e0) >> 5;
+            astring yString = disasmYField(Y);
+            astring xString = (X ? "y" : "y1");
+            astring fString = disasmF1Field(F1, D, S);
+            sprintf(buffer, "%s, %s = %s", fString.cstr(), yString.cstr(), xString.cstr());
             break;
         }
 
-        // Format 1a: Multiply/ALU Read/Write Group  (TODO: Seperate)
+        // Format 1a: Multiply/ALU Read/Write Group (major typo in docs on p3-51)
         case 0x07:
         {
-            sprintf(buffer, "format 1a");
+            // F1, At[1] = Y
+            const UINT8 Y = (op & 0x000f);
+            const UINT8 S = (op & 0x0200) >> 9;
+            const UINT8 aT = (op & 0x0400) >> 10;
+            const UINT8 F1 = (op & 0x01e0) >> 5;
+            astring yString = disasmYField(Y);
+            astring atString = (aT ? "a0" : "a1");
+            astring fString = disasmF1Field(F1, aT, S);
+            sprintf(buffer, "%s, %s = %s", fString.cstr(), atString.cstr(), yString.cstr());
             break;
         }
 
         // Format 2: Multiply/ALU Read/Write Group
-        case 0x15: case 0x1d:
+        case 0x15:
         {
-            sprintf(buffer, "format 2");
+            // F1, Z : y[1]
+            const UINT8 Z = (op & 0x000f);
+            const UINT8 X = (op & 0x0010) >> 4;
+            const UINT8 S = (op & 0x0200) >> 9;
+            const UINT8 D = (op & 0x0400) >> 10;
+            const UINT8 F1 = (op & 0x01e0) >> 5;
+            astring zString = disasmZField(Z);
+            astring xString = (X ? "y" : "y1");
+            astring fString = disasmF1Field(F1, D, S);
+            sprintf(buffer, "%s, %s <=> %s", fString.cstr(), xString.cstr(), zString.cstr());
+            break;
+        }
+        case 0x1d:
+        {
+            // F1, Z : y, x=*pt++[i]
+            const UINT8 Z = (op & 0x000f);
+            const UINT8 X = (op & 0x0010) >> 4;
+            const UINT8 S = (op & 0x0200) >> 9;
+            const UINT8 D = (op & 0x0400) >> 10;
+            const UINT8 F1 = (op & 0x01e0) >> 5;
+            astring zString = disasmZField(Z);
+            astring xString = (X ? "*pt++i" : "*pt++");
+            astring fString = disasmF1Field(F1, D, S);
+            sprintf(buffer, "%s, %s <=> y, x = %s", fString.cstr(), zString.cstr(), xString.cstr());
             break;
         }
 
         // Format 2a: Multiply/ALU Read/Write Group
         case 0x05:
         {
-            sprintf(buffer, "format 2a");
+            // F1, Z : aT[1]
+            const UINT8 Z = (op & 0x000f);
+            const UINT8 X = (op & 0x0010) >> 4;
+            const UINT8 S = (op & 0x0200) >> 9;
+            const UINT8 aT = (op & 0x0400) >> 10;
+            const UINT8 F1 = (op & 0x01e0) >> 5;
+            astring zString = disasmZField(Z);
+            astring atString = (aT ? "a0" : "a1");
+            atString += X ? "" : "1";   // TODO: Figure out unclear wording.
+            astring fString = disasmF1Field(F1, aT, S);
+            sprintf(buffer, "%s, %s <=> %s", fString.cstr(), zString.cstr(), atString.cstr());
             break;
         }
         
@@ -319,10 +421,10 @@ CPU_DISASSEMBLE( dsp16a )
             const UINT8 S = (op & 0x0200) >> 9;
             const UINT8 D = (op & 0x0400) >> 10;
             const UINT8 F2 = (op & 0x01e0) >> 5;
-            astring f2String = disasmF2Field(F2, D, S);
+            astring fString = disasmF2Field(F2, D, S);
             astring conString = disasmCONField(CON);
-            if (op & 0x0800) sprintf(buffer,  "if %s : %s", conString.cstr(), f2String.cstr());
-            else             sprintf(buffer, "ifc %s : %s", conString.cstr(), f2String.cstr());
+            if (op & 0x0800) sprintf(buffer,  "if %s : %s", conString.cstr(), fString.cstr());
+            else             sprintf(buffer, "ifc %s : %s", conString.cstr(), fString.cstr());
             break;
         }
         
@@ -334,7 +436,6 @@ CPU_DISASSEMBLE( dsp16a )
             const UINT16 JA = (op & 0x0fff) | (pc & 0xf000);
             if (op & 0x8000) sprintf(buffer, "call 0x%04x", JA);
             else             sprintf(buffer, "goto 0x%04x", JA);
-            opSize = 1;
             break;
         }
         
@@ -345,7 +446,6 @@ CPU_DISASSEMBLE( dsp16a )
             const UINT8 B = (op & 0x0700) >> 8;
             astring bString = disasmBField(B);
             sprintf(buffer, "%s", bString.cstr());
-            opSize = 1;
             break;
         }
         
@@ -359,7 +459,6 @@ CPU_DISASSEMBLE( dsp16a )
             // TODO: Test for invalid ops
             // icall
             if (op == 0xd40e) sprintf(buffer, "icall");
-            opSize = 1;
             break;
         }
         
@@ -371,7 +470,6 @@ CPU_DISASSEMBLE( dsp16a )
             const UINT8 S = (op & 0x1000) >> 12;
             astring rString = disasmRField(R);
             sprintf(buffer, "%s = %s", rString.cstr(), (S ? "a1" : "a0"));
-            opSize = 1;
             break;
         }
         case 0x08: 
@@ -381,7 +479,6 @@ CPU_DISASSEMBLE( dsp16a )
             const UINT8 aT = (op & 0x0400) >> 10;
             astring rString = disasmRField(R);
             sprintf(buffer, "%s = %s", (aT ? "a0" : "a1"), rString.cstr());
-            opSize = 1;
             break;
         }
         case 0x0f:
@@ -393,7 +490,6 @@ CPU_DISASSEMBLE( dsp16a )
             astring rString = disasmRField(R);
             sprintf(buffer, "%s = %s", rString.cstr(), yString.cstr());
             // TODO: Special case the R == [y, y1, or x] case
-            opSize = 1;
             break;
         }
         case 0x0c: 
@@ -404,7 +500,6 @@ CPU_DISASSEMBLE( dsp16a )
             astring yString = disasmYField(Y);
             astring rString = disasmRField(R);
             sprintf(buffer, "%s = %s", yString.cstr(), rString.cstr());
-            opSize = 1;
             break;
         }
         case 0x0d: 
@@ -414,8 +509,7 @@ CPU_DISASSEMBLE( dsp16a )
             const UINT8 R = (op & 0x03f0) >> 4;
             astring zString = disasmZField(Z);
             astring rString = disasmRField(R);
-            sprintf(buffer, "%s : %s", zString.cstr(), rString.cstr());
-            opSize = 1;
+            sprintf(buffer, "%s <=> %s", zString.cstr(), rString.cstr());
             break;
         }
         
@@ -438,7 +532,6 @@ CPU_DISASSEMBLE( dsp16a )
             const UINT8 R = (op & 0x0e00) >> 9;
             astring rString = disasmRImmediateField(R);
             sprintf(buffer, "%s = 0x%02x", rString.cstr(), M);
-            opSize = 1;
             break;
         }
         
@@ -452,7 +545,6 @@ CPU_DISASSEMBLE( dsp16a )
             // TODO: Limits on K & NI
             if (NI == 0x00)
                 sprintf(buffer, "redo %d\n", K);
-            opSize = 1;
             break;
         }
         
