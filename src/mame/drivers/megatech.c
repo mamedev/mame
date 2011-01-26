@@ -488,19 +488,48 @@ static MACHINE_CONFIG_DERIVED( megatech, megadriv )
 MACHINE_CONFIG_END
 
 
-static int megatech_load_list(device_image_interface &image, int gameno)
+struct megatech_cart_region
 {
+	const char *tag;
+	const char *region;
+};
+
+// we keep old region tags for compatibility with older macros... this might be changed at a later stage
+static const struct megatech_cart_region megatech_cart_table[] =
+{
+	{ "cart1", "game0" },
+	{ "cart2", "game1" },
+	{ "cart3", "game2" },
+	{ "cart4", "game3" },
+	{ "cart5", "game4" },
+	{ "cart6", "game5" },
+	{ "cart7", "game6" },
+	{ "cart8", "game7" },
+	{ 0 }
+};
+
+static DEVICE_IMAGE_LOAD( megatech_cart )
+{
+	const struct megatech_cart_region *mt_cart = &megatech_cart_table[0], *this_cart;
 	const char	*pcb_name;
+	
+	/* First, determine where this cart has to be loaded */
+	while (mt_cart->tag)
+	{
+		if (strcmp(mt_cart->tag, image.device().tag()) == 0)
+			break;
+		
+		mt_cart++;
+	}
+
+	this_cart = mt_cart;
 
 	if (image.software_entry() == NULL)
 		return IMAGE_INIT_FAIL;
 
-	char tempname[20];
-	sprintf(tempname, "game%d", gameno-1);
-
-	printf("load list\n");
-	UINT8 *ROM = image.device().machine->region(tempname)->base();
-	printf("load list2\n");
+	//printf("load list\n");
+	UINT8 *ROM = image.device().machine->region(this_cart->region)->base();
+	//printf("load list2\n");
 	UINT32 length = image.get_software_region_length("rom");
 	memcpy(ROM, image.get_software_region("rom"), length);
 
@@ -511,17 +540,17 @@ static int megatech_load_list(device_image_interface &image, int gameno)
 	{
 		if (!mame_stricmp("genesis", pcb_name))
 		{
-			printf("cart %d is genesis\n", gameno);
+			printf("%s is genesis\n", mt_cart->tag);
 			ROM[0x400000] = 0x01;
 		}
 		else if (!mame_stricmp("sms", pcb_name))
 		{	
-			printf("cart %d is sms\n", gameno);
+			printf("%s is sms\n", mt_cart->tag);
 			ROM[0x400000] = 0x02;
 		}
 		else
 		{
-			printf("cart %d is invalid\n", gameno);
+			printf("%s is invalid\n", mt_cart->tag);
 		}
 
 	}
@@ -529,54 +558,22 @@ static int megatech_load_list(device_image_interface &image, int gameno)
 	return IMAGE_INIT_PASS;
 }
 
-
-static DEVICE_IMAGE_LOAD( megatech_cart1 ) { return megatech_load_list(image, 1); }
-static DEVICE_IMAGE_LOAD( megatech_cart2 ) { return megatech_load_list(image, 2); }
-static DEVICE_IMAGE_LOAD( megatech_cart3 ) { return megatech_load_list(image, 3); }
-static DEVICE_IMAGE_LOAD( megatech_cart4 ) { return megatech_load_list(image, 4); }
-static DEVICE_IMAGE_LOAD( megatech_cart5 ) { return megatech_load_list(image, 5); }
-static DEVICE_IMAGE_LOAD( megatech_cart6 ) { return megatech_load_list(image, 6); }
-static DEVICE_IMAGE_LOAD( megatech_cart7 ) { return megatech_load_list(image, 7); }
-static DEVICE_IMAGE_LOAD( megatech_cart8 ) { return megatech_load_list(image, 8); }
-
-
+#define MCFG_MEGATECH_CARTSLOT_ADD(_tag) \
+	MCFG_CARTSLOT_ADD(_tag) \
+	MCFG_CARTSLOT_INTERFACE("megatech_cart") \
+	MCFG_CARTSLOT_LOAD(megatech_cart)
 
 MACHINE_CONFIG_FRAGMENT( megatech_cartslot )
-	MCFG_CARTSLOT_ADD("cart1")
-	MCFG_CARTSLOT_INTERFACE("megatech_cart")
-	MCFG_CARTSLOT_LOAD(megatech_cart1)
-
-	MCFG_CARTSLOT_ADD("cart2")
-	MCFG_CARTSLOT_INTERFACE("megatech_cart")
-	MCFG_CARTSLOT_LOAD(megatech_cart2)
-	
-	MCFG_CARTSLOT_ADD("cart3")
-	MCFG_CARTSLOT_INTERFACE("megatech_cart")
-	MCFG_CARTSLOT_LOAD(megatech_cart3)
-	
-	MCFG_CARTSLOT_ADD("cart4")
-	MCFG_CARTSLOT_INTERFACE("megatech_cart")
-	MCFG_CARTSLOT_LOAD(megatech_cart4)
-
-	MCFG_CARTSLOT_ADD("cart5")
-	MCFG_CARTSLOT_INTERFACE("megatech_cart")
-	MCFG_CARTSLOT_LOAD(megatech_cart5)
-
-	MCFG_CARTSLOT_ADD("cart6")
-	MCFG_CARTSLOT_INTERFACE("megatech_cart")
-	MCFG_CARTSLOT_LOAD(megatech_cart6)
-
-	MCFG_CARTSLOT_ADD("cart7")
-	MCFG_CARTSLOT_INTERFACE("megatech_cart")
-	MCFG_CARTSLOT_LOAD(megatech_cart7)
-
-	MCFG_CARTSLOT_ADD("cart8")
-	MCFG_CARTSLOT_INTERFACE("megatech_cart")
-	MCFG_CARTSLOT_LOAD(megatech_cart8)
-
+	MCFG_MEGATECH_CARTSLOT_ADD("cart1")
+	MCFG_MEGATECH_CARTSLOT_ADD("cart2")
+	MCFG_MEGATECH_CARTSLOT_ADD("cart3")
+	MCFG_MEGATECH_CARTSLOT_ADD("cart4")
+	MCFG_MEGATECH_CARTSLOT_ADD("cart5")
+	MCFG_MEGATECH_CARTSLOT_ADD("cart6")
+	MCFG_MEGATECH_CARTSLOT_ADD("cart7")
+	MCFG_MEGATECH_CARTSLOT_ADD("cart8")
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","megatech")
-
 MACHINE_CONFIG_END
 
 
