@@ -150,7 +150,7 @@ static WRITE8_DEVICE_HANDLER( b_via_1_pa_w )
 
 static WRITE8_DEVICE_HANDLER( b_via_1_pb_w )
 {
-	// TODO: sound controls go here
+	beezer_timer1_w(device->machine->device("custom"), 0, data&0x80);
 }
 
 DRIVER_INIT( beezer )

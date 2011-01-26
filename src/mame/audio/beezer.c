@@ -10,11 +10,6 @@
     * The entire NOISE generator is just copied from exidy.c and is completely
      wrong. It should be using an MM5837 self-clocked LFSR with taps on bits
      16(0x10) and 13(0xD)
-    * The entire audio 6522 VIA isn't even HANDLED in this driver yet, hence
-     the sound channel provided by the VIA is completely missing! (it is
-     handled in /machine/beezer.c as via 1 at the moment)
-    * Related to above, the hookup of timer1 out (from pb7 of 6522) isn't done
-     which means selectively latched noise cannot work properly.
     * Several inexplicable things on the schematic are not handled, such as the
      'VCO' input for 6840 channel 2 external clock whose source does not appear
      anywhere on the schematic, nor does it handle the 'DMOD DATA' and 'DMOD
@@ -43,8 +38,7 @@
      of the MSB of the 8 bit value.
     The four channels are:
     CNT1 CNT0
-    0    0    6522 pin 7 output (squarewave) NOT EMULATED YET; 'FM or AM'
-               affects this slot only
+    0    0    6522 pin 7 output (squarewave); 'FM or AM' affects this slot only
     0    1    6840 channel 1 clocked by E1(int) OR by 6522 PB7-latched NOISE
     1    0    6840 channel 2 clocked by E1(int) OR by "VCO" ext (Huh?)
     1    1    6840 channel 3 clocked by E1(int) OR by channel 2-latched NOISE
@@ -122,6 +116,8 @@ struct _beezer_sound_state
 	UINT32 sh6840_clocks_per_sample;
 	UINT32 sh6840_clock_count;
 
+	UINT32 sh6840_latchwrite;
+	UINT32 sh6840_latchwriteold;
 	UINT32 sh6840_noiselatch1;
 	UINT32 sh6840_noiselatch3;
 
@@ -143,7 +139,7 @@ INLINE beezer_sound_state *get_safe_token(device_t *device)
 /*************************************
  *
  *  Interrupt generation helper
- *
+ *  TODO: make this actually do something useful
  *************************************/
 
 /*static WRITE_LINE_DEVICE_HANDLER( update_irq_state )
@@ -271,6 +267,8 @@ static void sh6840_register_state_globals(device_t *device)
 	state_save_register_device_item(device, 0, state->sh6840_LFSR_2);
 	state_save_register_device_item(device, 0, state->sh6840_LFSR_3);
 	state_save_register_device_item(device, 0, state->sh6840_clock_count);
+	state_save_register_device_item(device, 0, state->sh6840_latchwrite);
+	state_save_register_device_item(device, 0, state->sh6840_latchwriteold);
 	state_save_register_device_item(device, 0, state->sh6840_noiselatch1);
 	state_save_register_device_item(device, 0, state->sh6840_noiselatch3);
 	state_save_register_device_item(device, 0, state->sh6840_timer[0].cr);
@@ -336,7 +334,7 @@ static STREAM_UPDATE( beezer_stream_update )
 
 			/* handle timer 0 if enabled */
 			t = &sh6840_timer[0];
-			clocks = (t->cr & 0x02) ? clocks_this_sample : noise_clocks_this_sample;
+			clocks = (t->cr & 0x02) ? clocks_this_sample : state->sh6840_noiselatch1;
 			sh6840_apply_clock(t, clocks);
 			if (t->state && (t->cr & 0x80))
 				sample += (state->sh6840_volume[1]&0x7F);
@@ -346,7 +344,7 @@ static STREAM_UPDATE( beezer_stream_update )
 			/* handle timer 1 if enabled */
 			t = &sh6840_timer[1];
 			chan1_clocks = t->clocks;
-			clocks = (t->cr & 0x02) ? clocks_this_sample : noise_clocks_this_sample; // TODO: this is WRONG: channel 1 is clocked by a mystery "VCO CLOCK" signal if not set to E clock. it may not even be connected to anything!
+			clocks = (t->cr & 0x02) ? clocks_this_sample : 0; // TODO: this is WRONG: channel 1 is clocked by a mystery "VCO CLOCK" signal if not set to E clock. it may not even be connected to anything!
 			sh6840_apply_clock(t, clocks);
 			if (t->state && (t->cr & 0x80))
 				sample += (state->sh6840_volume[2]&0x7F);
@@ -355,11 +353,14 @@ static STREAM_UPDATE( beezer_stream_update )
 
 			/* generate channel 1-clocked noise if configured to do so */
 			if (noisy != 0)
+			{
 				noise_clocks_this_sample = sh6840_update_noise(state, t->clocks - chan1_clocks);
+				if (clocks) state->sh6840_noiselatch3 = state->sh6840_LFSR_oldxor;
+			}
 
 			/* handle timer 2 if enabled */
 			t = &sh6840_timer[2];
-			clocks = (t->cr & 0x02) ? clocks_this_sample : noise_clocks_this_sample;
+			clocks = (t->cr & 0x02) ? clocks_this_sample : state->sh6840_noiselatch3;
 			/* prescale */
 			if (t->cr & 0x01)
 			{
@@ -373,7 +374,7 @@ static STREAM_UPDATE( beezer_stream_update )
 			else
 				sample -= (state->sh6840_volume[3]&0x7F);
 		}
-		//sample += (state->sh6840_volume[0]&0x7F)*state->sh6840_noiselatch1;
+		sample += (state->sh6840_volume[0]&0x7F)*(state->sh6840_latchwrite?1:0);
 
 		/* stash */
 		*buffer++ = sample*64;
@@ -429,6 +430,8 @@ static DEVICE_RESET( common_sh_reset )
 	state->sh6840_volume[2] = 0;
 	state->sh6840_volume[3] = 0;
 	state->sh6840_clock_count = 0;
+	state->sh6840_latchwrite = 0;
+	state->sh6840_latchwriteold = 0;
 	state->sh6840_noiselatch1 = 0;
 	state->sh6840_noiselatch3 = 0;
 
@@ -501,8 +504,12 @@ WRITE8_DEVICE_HANDLER( beezer_timer1_w )
 
 	/* force an update of the stream */
 	stream_update(state->stream);
-	if (data) // really should be rising edge
-		state->sh6840_noiselatch1 = state->sh6840_noiselatch3 = state->sh6840_LFSR_oldxor;
+	state->sh6840_latchwriteold = state->sh6840_latchwrite;
+	state->sh6840_latchwrite = data&0x80;
+	if ((!state->sh6840_latchwriteold) && (state->sh6840_latchwrite)) // rising edge
+	{
+		state->sh6840_noiselatch1 = state->sh6840_LFSR_oldxor;
+	}
 }
 
 WRITE8_DEVICE_HANDLER( beezer_sh6840_w )
@@ -577,3 +584,4 @@ WRITE8_DEVICE_HANDLER( beezer_sfxctrl_w )
 	state->sh6840_volume[offset] = data;
 	//fprintf(stderr,"dacram: write of %0x to slot %0x\n", data, offset);
 }
+
