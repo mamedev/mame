@@ -1,0 +1,114 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+    This list should be kept up to date with any changes made
+    to drivers/megatech.c
+    
+    This is considered an alternate way of launching the titles, in order to support mult-cart mode.
+    
+    It is not intended to replace the primary MAME launch system!
+-->
+
+<softwarelist name="megatech" description="Sega MegaTech cartridges">
+
+
+
+  <!-- Game 01 : Altered Beast -->
+  <software name="mt_beast">
+    <description>Altered Beast</description>
+    <year>199?</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp12538.ic1"      size="0x080000" crc="3bea3dce" sha1="ec72e4fde191dedeb3f148f132603ed3c23f0f86" offset="0x000000" />
+        <rom name="epr-12368-01.ic2" size="0x008000" crc="40cb0088" sha1="e1711532c29f395a35a1cb34d789015881b5a1ed" offset="0x300000" loadflag="load16_byte" />
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 02 : Space Harrier 2 -->
+  <software name="mt_shar2">
+    <description>Space Harrier 2</description>
+    <year>199?</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp11934.ic1"      size="0x080000" crc="932daa09" sha1="a2d7a76f3604c6227d43229908bfbd02b0ef5fd9" offset="0x000000" />
+        <rom name="epr-12368-02.ic2" size="0x008000" crc="c129c66c" sha1="e7c0c97db9df9eb04e2f9ff561b64305219b8f1f" offset="0x300000" loadflag="load16_byte" />
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 03 : Super Thunder Blade-->
+
+  <software name="mt_stbld">
+    <description>Super Thunder Blade</description>
+    <year>199?</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp11996f.ic1"      size="0x080000" crc="9355c34e" sha1="26ff91c2921408673c644b0b1c8931d98524bf63" offset="0x000000" />
+        <rom name="epr-12368-03.ic2" size="0x008000" crc="1ba4ac5d" sha1="9bde57d70189d159ebdc537a9026001abfd0deae" offset="0x300000" loadflag="load16_byte" />
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 04 : Great Golf -->
+  <software name="mt_ggolf">
+    <description>Great Golf</description>
+    <year>199?</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="sms" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp11129f.ic1"     size="0x020000" crc="c6611c84" sha1="eab0eed872dd26b13bcf0b2dd74fcbbc078812c9" offset="0x000000" />
+        <rom name="epr-12368-04.ic2" size="0x008000" crc="62e5579b" sha1="e1f531be5c40a1216d4192baeda9352384444410" offset="0x300000" loadflag="load16_byte" />
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 06 : Outrun -->
+  <software name="mt_orun">
+    <description>Out Run</description>
+    <year>199?</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="sms" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mpr-11078.ic1"    size="0x040000" crc="5589d8d2" sha1="4f9b61b24f0d9fee0448cdbbe8fc05411dbb1102" offset="0x000000" />
+        <rom name="epr-12368-06.ic2" size="0x008000" crc="c7c74429" sha1="22ee261a653e10d66e0d6703c988bb7f236a7571" offset="0x300000" loadflag="load16_byte" />
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game 25 : Golden Axe -->
+	<software name="mt_gaxe">
+		<description>Golden Axe</description>
+		<year>199?</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megatech_cart">
+			<feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="12806.ic1"        size="0x080000" crc="43456820" sha1="2f7f1fcd979969ac99426f11ab99999a5494a121" offset="0x000000" />
+        <rom name="epr-12368-25.ic2" size="0x008000" crc="1f07ed28" sha1="9d54192f4c6c1f8a51c38a835c1dd1e4e3e8279e" offset="0x300000" loadflag="load16_byte" />
+      </dataarea>
+     </part>
+	</software>
+
+  <!-- Game 62 : Sonic the Hedgehog 2 -->
+  <software name="mt_soni2">
+    <description>Sonic the Hedgehog 2</description>
+    <year>199?</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="mp15000a-f.ic1"   size="0x100000" crc="679ebb49" sha1="557482064677702454562f753460993067ef9e16" offset="0x000000" />
+        <rom name="epr-12368-62.ic2" size="0x008000" crc="14a8566f" sha1="d1d14162144bf068ddd19e9736477ff98fb43f9e" offset="0x300000" loadflag="load16_byte" />
+      </dataarea>
+    </part>
+  </software>
+</softwarelist>

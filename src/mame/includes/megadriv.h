@@ -112,8 +112,6 @@ struct _mtech_bios	/* once all the regs are saved in this structure, it would be
 	UINT32 bios_ctrl_inputs;
 	UINT8 bios_ctrl[6];
 
-	int mt_bank_bank_pos;
-	int mt_bank_partial;
 	int mt_bank_addr;
 };
 

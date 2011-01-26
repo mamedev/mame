@@ -4,6 +4,7 @@ docs/license.txt svneol=native#text/plain
 docs/mame.txt svneol=native#text/plain
 docs/newvideo.txt svneol=native#text/plain
 docs/windows.txt svneol=native#text/plain
+hash/megatech.xml svneol=native#text/plain
 /makefile svneol=native#text/plain
 src/build/build.mak svneol=native#text/plain
 src/build/file2str.c svneol=native#text/plain

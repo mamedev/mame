@@ -413,36 +413,6 @@ static struct
 
 static void segacd_mark_tiles_dirty(running_machine* machine, int offset);
 
-#ifdef UNUSED_FUNCTION
-/* taken from segaic16.c */
-/* doesn't seem to meet my needs, not used */
-static UINT16 read_next_instruction(address_space *space)
-{
-	static UINT8 recurse = 0;
-	UINT16 result;
-
-	/* Unmapped memory returns the last word on the data bus, which is almost always the opcode */
-	/* of the next instruction due to prefetch; however, since we may be encrypted, we actually */
-	/* need to return the encrypted opcode, not the last decrypted data. */
-
-	/* Believe it or not, this is actually important for Cotton, which has the following evil */
-	/* code: btst #0,$7038f7, which tests the low bit of an unmapped address, which thus should */
-	/* return the prefetched value. */
-
-	/* prevent recursion */
-	if (recurse)
-		return 0xffff;
-
-	/* read original encrypted memory at that address */
-	recurse = 1;
-	result = space->read_word(cpu_get_pc(space->cpu));
-	recurse = 0;
-	return result;
-}
-#endif
-
-
-
 static struct genesis_z80_vars
 {
 	int z80_is_reset;
