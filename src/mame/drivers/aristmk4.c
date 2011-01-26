@@ -1170,13 +1170,14 @@ static DRIVER_INIT( aristmk4 )
 {
 	shapeRomPtr = (UINT8 *)machine->region("tile_gfx")->base();
     memcpy(shapeRom,shapeRomPtr,sizeof(shapeRom)); // back up
+	nvram = auto_alloc_array(machine, UINT8, 0x1000);
 }
 
 static MACHINE_START( aristmk4 )
 {
 
 	samples = machine->device("samples");
-    state_save_register_global_pointer(machine, nvram,0x1000); // nvram
+    state_save_register_global_pointer(machine, nvram, 0x1000); // nvram
 }
 
 
