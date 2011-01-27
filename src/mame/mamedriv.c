@@ -4886,7 +4886,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( rangrmsn )	/* 2004.03 Ranger Mission */
 	DRIVER( salmankt )	/* 2004.06 Salary Man Kintarou Net Select */
 	DRIVER( kofnw )		/* 2004.07 The King of Fighters Neo Wave */
-	DRIVER( kofnwj )    	/* 2004.07 The King of Fighters Neo Wave (Japan) */
+	DRIVER( kofnwj )    /* 2004.07 The King of Fighters Neo Wave (Japan) */
 	DRIVER( xtrmhunt )	/* 2004.09 Extreme Hunting */
 	DRIVER( dirtypig )	/* 2004.09 Dirty Pig Skin Football */
 	DRIVER( ftspeed )	/* 2004.09 Faster than Speed */
@@ -4897,8 +4897,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2005.09 Samurai Spirits Tenkaichi Kenkakuden */
 	DRIVER( kofxi )		/* 2005.10 The King of Fighters XI */
 	DRIVER( fotns )		/* 2005.12 Hokuto no Ken */
-						/* 2006.02 Metal Slug 6 */
-	DRIVER( xtrmhnt2 )			/* 2006.09 Extreme Hunting 2 Tournament Edition */
+	DRIVER( mslug6 )	/* 2006.02 Metal Slug 6 */
+	DRIVER( xtrmhnt2 )	/* 2006.09 Extreme Hunting 2 Tournament Edition */
 						/* 2008.?? Sega Clay Challenge */
 
 	/* Hikaru */

@@ -6881,6 +6881,7 @@ static const UINT32 maxspeed_key = 0x28dd6;
 static const UINT32 ftspeed_key  = 0x0762f;
 static const UINT32 kofxi_key    = 0xa4be3;
 static const UINT32 dirtypig_key = 0xc194f;
+static const UINT32 mslug6_key   = 0x53627;
 
 static DRIVER_INIT( atomiswave )
 {
@@ -6930,6 +6931,7 @@ AW_DRIVER_INIT(salmankt)
 AW_DRIVER_INIT(maxspeed)
 AW_DRIVER_INIT(ftspeed)
 AW_DRIVER_INIT(dirtypig)
+AW_DRIVER_INIT(mslug6)
 
 ROM_START( fotns )
 	ROM_REGION( 0x200000, "awflash", 0)
@@ -7053,13 +7055,13 @@ ROM_START( ngbc )
 
 	ROM_REGION( 0xf000000, "user1", ROMREGION_ERASE)
 	ROM_LOAD( "ax3301p01.fmem1", 0x0000000, 0x0800000, CRC(6dd78275) SHA1(72d4cab58dbcebd666db21aeef190378ef447580) )
-        ROM_LOAD( "ax3301m01.mrom1", 0x1000000, 0x2000000, CRC(e6013de9) SHA1(ccbc7c2e76153348646d75938d5c008dc80df17d) )
-        ROM_LOAD( "ax3301m01.mrom2", 0x3000000, 0x2000000, CRC(f7cfef6c) SHA1(c9e6231499a9c9c8650d9e61f34ff1fcce8d442c) )
-        ROM_LOAD( "ax3301m01.mrom3", 0x5000000, 0x2000000, CRC(0cdf8647) SHA1(0423f96842bef2c2ff454318dc6960b5052c0551) )
-        ROM_LOAD( "ax3301m01.mrom4", 0x7000000, 0x2000000, CRC(2f031db0) SHA1(3214735f04fadf160137f0585bfc1a27eeecfac6) )
-        ROM_LOAD( "ax3301m01.mrom5", 0x9000000, 0x2000000, CRC(f6668aaa) SHA1(6a78f8f0c7d7a71854ff87329290d38970cfb476) )
-        ROM_LOAD( "ax3301m01.mrom6", 0xb000000, 0x2000000, CRC(5cf32fbd) SHA1(b6ae0abe5791b3d6f8db07b8c8ca22219a153801) )
-        ROM_LOAD( "ax3301m01.mrom7", 0xd000000, 0x2000000, CRC(26d9da53) SHA1(0015b4be670005a451274de68279b4302fc42a97) )
+	ROM_LOAD( "ax3301m01.mrom1", 0x1000000, 0x2000000, CRC(e6013de9) SHA1(ccbc7c2e76153348646d75938d5c008dc80df17d) )
+	ROM_LOAD( "ax3301m01.mrom2", 0x3000000, 0x2000000, CRC(f7cfef6c) SHA1(c9e6231499a9c9c8650d9e61f34ff1fcce8d442c) )
+	ROM_LOAD( "ax3301m01.mrom3", 0x5000000, 0x2000000, CRC(0cdf8647) SHA1(0423f96842bef2c2ff454318dc6960b5052c0551) )
+	ROM_LOAD( "ax3301m01.mrom4", 0x7000000, 0x2000000, CRC(2f031db0) SHA1(3214735f04fadf160137f0585bfc1a27eeecfac6) )
+	ROM_LOAD( "ax3301m01.mrom5", 0x9000000, 0x2000000, CRC(f6668aaa) SHA1(6a78f8f0c7d7a71854ff87329290d38970cfb476) )
+	ROM_LOAD( "ax3301m01.mrom6", 0xb000000, 0x2000000, CRC(5cf32fbd) SHA1(b6ae0abe5791b3d6f8db07b8c8ca22219a153801) )
+	ROM_LOAD( "ax3301m01.mrom7", 0xd000000, 0x2000000, CRC(26d9da53) SHA1(0015b4be670005a451274de68279b4302fc42a97) )
 ROM_END
 
 ROM_START( kofnw )
@@ -7209,6 +7211,19 @@ ROM_START( dirtypig )
         ROM_LOAD( "837-14695.u17", 0x7000000, 0x1000000, CRC(16bb5992) SHA1(18772587272aba1d50a48d384f472276c3b48d96) )
 ROM_END
 
+ROM_START( mslug6 )
+	ROM_REGION( 0x200000, "awflash", 0)
+	AW_BIOS
+
+	ROM_REGION( 0xf000000, "user1", ROMREGION_ERASE)
+	ROM_LOAD( "ax3001p01.fmem1", 0x0000000, 0x0800000, CRC(af67dbce) SHA1(5aba108caf3e4ced6994bc26e752d4e225c231e8) ) 
+	ROM_LOAD( "ax3001m01.mrom1", 0x1000000, 0x2000000, CRC(e56417ee) SHA1(27692ad5c1093aff0973d2aafd01a5e30c7bfbbe) ) 
+	ROM_LOAD( "ax3002m01.mrom2", 0x3000000, 0x2000000, CRC(1be3bbc1) SHA1(d75ce5c855c9c4eeacdbf84d440c73a94de060fe) ) 
+	ROM_LOAD( "ax3003m01.mrom3", 0x5000000, 0x2000000, CRC(4fe37370) SHA1(85d51db94c3e34265e37b636d6545ed2801ba5a6) ) 
+	ROM_LOAD( "ax3004m01.mrom4", 0x7000000, 0x2000000, CRC(2f4c4c6f) SHA1(5815c28fdaf0429003986e725c0015fe4c08721f) ) 
+	ROM_LOAD( "ax3001m01.mrom1", 0x9000000, 0x2000000, CRC(e56417ee) SHA1(27692ad5c1093aff0973d2aafd01a5e30c7bfbbe) ) 
+ROM_END
+
 /* Atomiswave */
 GAME( 2001, awbios,   0,        aw,    aw,    atomiswave, ROT0, "Sammy",                           "Atomiswave Bios", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
@@ -7230,4 +7245,5 @@ GAME( 2005, fotns,    awbios,   aw,    aw,    fotns,    ROT0, "Sega / Arc System
 GAME( 2005, kofnw,    awbios,   aw,    aw,    kofnw,    ROT0, "Sammy / SNK Playmore",            "The King of Fighters Neowave", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2005, kofnwj,   kofnw,   aw,    aw,    kofnw,    ROT0, "Sammy / SNK Playmore",            "The King of Fighters Neowave (Japan)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2005, xtrmhunt, awbios,   aw,    aw,    xtrmhunt, ROT0, "Sammy",                           "Extreme Hunting", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2006, mslug6,   awbios,   aw,    aw,    mslug6,   ROT0, "Sammy",                           "Metal Slug 6", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2006, xtrmhnt2, awbios,   aw,    aw,    xtrmhnt2, ROT0, "Sega",                            "Extreme Hunting 2", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
