@@ -1287,8 +1287,9 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa14000, 0xa14003, 0, 0, genesis_TMSS_bank_w);
 }
 
-static void setup_megadriv_sram(running_machine *machine)
+static void setup_megadriv_sram(device_image_interface &image)
 {
+	running_machine *machine = image.device().machine;
 	UINT8 *ROM = machine->region("maincpu")->base();
 	megadriv_backupram = NULL;
 	md_cart.sram = NULL;
@@ -1302,9 +1303,10 @@ static void setup_megadriv_sram(running_machine *machine)
 	/* install SRAM & i2c handlers for the specific type of cart */
 	switch (md_cart.type)
 	{
+		// These types only come from xml
 		case SEGA_SRAM:
 			md_cart.sram_start = 0x200000;
-			md_cart.sram_end = md_cart.sram_start + 0x3fff;
+			md_cart.sram_end = md_cart.sram_start + image.get_software_region_length("sram") - 1;
 			md_cart.sram_detected = 1;
 			megadriv_backupram = (UINT16*) (ROM + md_cart.sram_start);
 			memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa130f0, 0xa130f1, 0, 0, genesis_sram_toggle);
@@ -1326,7 +1328,7 @@ static void setup_megadriv_sram(running_machine *machine)
 
 		case SEGA_FRAM:
 			md_cart.sram_start = 0x200000;
-			md_cart.sram_end = md_cart.sram_start + 0x3ff;
+			md_cart.sram_end = md_cart.sram_start + image.get_software_region_length("fram") - 1;
 			md_cart.sram_detected = 1;
 			megadriv_backupram = (UINT16*) (ROM + md_cart.sram_start);
 			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa130f0, 0xa130f1, 0, 0, sega_6658a_reg_r);
@@ -1334,6 +1336,7 @@ static void setup_megadriv_sram(running_machine *machine)
 			install_sram_rw_handlers(machine, FALSE);
 			break;
 
+		// These types might come either from xml or from old-styele loading
 		case SEGA_EEPROM:
 			md_cart.has_serial_eeprom = 1;
 			memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x200001, 0, 0, wboy_v_eeprom_r, wboy_v_eeprom_w);
@@ -1873,7 +1876,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 		setup_megadriv_custom_mappers(image.device().machine);
 
 		// STEP 4: take care of SRAM.
-		setup_megadriv_sram(image.device().machine);
+		setup_megadriv_sram(image);
 
 		return IMAGE_INIT_PASS;
 	}
