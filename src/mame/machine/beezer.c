@@ -60,11 +60,11 @@ const via6522_interface b_via_0_interface =
         bit 7: output: TIMER1 OUT (used to gate NOISE (see below) to clock channel 1 of 6840, plus acts as channel 0 by itself)
         bit 6: input: NOISE (from mn5837 14-bit LFSR, which also connects to clock above)
         bit 5: output?: N/C
-        bit 4: output?: FMSEL1 (does not appear elsewhere on schematics! what does this do? needs tracing)
-        bit 3: output?: FMSEL0 (does not appear elsewhere on schematics! what does this do? needs tracing)
-        bit 2: output?: AM (does not appear elsewhere on schematics! what does this do? needs tracing)
-        bit 1: output: FM or AM (appears to control some sort of suppression or filtering change of the post-DAC amplifier when enabled, only during the TIMER1 OUT time-slot of the multiplexer, see page 1B 3-3 of schematics)
-        bit 0: output?: DMOD DISABLE (does not appear elsewhere on schematics! what does this do? needs tracing)
+        bit 4: output?: FMSEL1 (does not appear elsewhere on schematics! what does this do? needs tracing) - always 0?
+        bit 3: output?: FMSEL0 (does not appear elsewhere on schematics! what does this do? needs tracing) - always 0?
+        bit 2: output?: AM (does not appear elsewhere on schematics! what does this do? needs tracing) - always 0?
+        bit 1: output: FM or AM (appears to control some sort of suppression or filtering change of the post-DAC amplifier when enabled, only during the TIMER1 OUT time-slot of the multiplexer, see page 1B 3-3 of schematics) - always 0? why is there a special circuit for it?
+        bit 0: output?: DMOD DISABLE (does not appear elsewhere on schematics! what does this do? needs tracing) - on startup is 0, turns to 1 and stays that way?
     port C:
         CA1: AHS2 from via 0 (are these two switched?)
         CA2: AHS1 from via 0 "
@@ -87,13 +87,13 @@ const via6522_interface b_via_1_interface =
 
 static READ_LINE_DEVICE_HANDLER( b_via_0_ca2_r )
 {
-	return 0; // TODO: TDISP on schematic, same as D5 bit of scanline count from 74LS161 counter at 7A
+	return 0; // TODO: TDISP on schematic, same as D5 bit of scanline count from 74LS161 counter at 7A; attach properly
 
 }
 
 static READ8_DEVICE_HANDLER( b_via_0_pa_r )
 {
-	return (banklatch&0x38)<<2; // return X,Y,Z bits
+	return (banklatch&0x38)<<2; // return X,Y,Z bits TODO: the Z bit connects somewhere else... where?
 }
 
 static READ8_DEVICE_HANDLER( b_via_0_pb_r )
@@ -140,7 +140,7 @@ static READ8_DEVICE_HANDLER( b_via_1_pa_r )
 
 static READ8_DEVICE_HANDLER( b_via_1_pb_r )
 {
-	return 0x1F | (device->machine->rand()&0x40); // bit 6 is NOISE input from MM5837 17-bit LFSR
+	return 0x1F | (device->machine->rand()&0x40); // TODO: bit 6 is NOISE input from MM5837 17-bit LFSR; attach to audio device
 }
 
 static WRITE8_DEVICE_HANDLER( b_via_1_pa_w )
@@ -151,6 +151,8 @@ static WRITE8_DEVICE_HANDLER( b_via_1_pa_w )
 static WRITE8_DEVICE_HANDLER( b_via_1_pb_w )
 {
 	beezer_timer1_w(device->machine->device("custom"), 0, data&0x80);
+	//if ((data&0x1f) != 0x01)
+	//	popmessage("via1 pb low write of 0x%02x is not supported! contact mamedev!", data&0x1f);
 }
 
 DRIVER_INIT( beezer )
