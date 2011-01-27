@@ -434,13 +434,6 @@ each direction to assign the boundries.
 #include "sound/sn76496.h"
 #include "sound/pokey.h"
 
-
-static UINT8 oldpos[4];
-static UINT8 sign[4];
-static UINT8 dsw_select, control_select;
-static UINT8 *rambase;
-
-
 /*************************************
  *
  *  Interrupts
@@ -462,26 +455,32 @@ static TIMER_DEVICE_CALLBACK( generate_interrupt )
 
 static MACHINE_START( centiped )
 {
-	state_save_register_global_array(machine, oldpos);
-	state_save_register_global_array(machine, sign);
-	state_save_register_global(machine, dsw_select);
+	centiped_state *state = machine->driver_data<centiped_state>();
+
+	state_save_register_global_array(machine, state->oldpos);
+	state_save_register_global_array(machine, state->sign);
+	state_save_register_global(machine, state->dsw_select);
 }
 
 
 static MACHINE_RESET( centiped )
 {
+	centiped_state *state = machine->driver_data<centiped_state>();
+
 	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
-	dsw_select = 0;
-	control_select = 0;
+	state->dsw_select = 0;
+	state->control_select = 0;
 }
 
 
 static MACHINE_RESET( magworm )
 {
+	centiped_state *state = machine->driver_data<centiped_state>();
+
 	MACHINE_RESET_CALL(centiped);
 
 	/* kludge: clear RAM so that magworm can be reset cleanly */
-	memset(rambase, 0, 0x400);
+	memset(state->rambase, 0, 0x400);
 }
 
 
@@ -518,28 +517,29 @@ static WRITE8_HANDLER( irq_ack_w )
 
 INLINE int read_trackball(running_machine *machine, int idx, int switch_port)
 {
+	centiped_state *state = machine->driver_data<centiped_state>();
 	UINT8 newpos;
 	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
 	static const char *const tracknames[] = { "TRACK0_X", "TRACK0_Y", "TRACK1_X", "TRACK1_Y" };
 
 	/* adjust idx if we're cocktail flipped */
-	if (centiped_flipscreen)
+	if (state->flipscreen)
 		idx += 2;
 
 	/* if we're to read the dipswitches behind the trackball data, do it now */
-	if (dsw_select)
-		return (input_port_read(machine, portnames[switch_port]) & 0x7f) | sign[idx];
+	if (state->dsw_select)
+		return (input_port_read(machine, portnames[switch_port]) & 0x7f) | state->sign[idx];
 
 	/* get the new position and adjust the result */
 	newpos = input_port_read(machine, tracknames[idx]);
-	if (newpos != oldpos[idx])
+	if (newpos != state->oldpos[idx])
 	{
-		sign[idx] = (newpos - oldpos[idx]) & 0x80;
-		oldpos[idx] = newpos;
+		state->sign[idx] = (newpos - state->oldpos[idx]) & 0x80;
+		state->oldpos[idx] = newpos;
 	}
 
 	/* blend with the bits from the switch port */
-	return (input_port_read(machine, portnames[switch_port]) & 0x70) | (oldpos[idx] & 0x0f) | sign[idx];
+	return (input_port_read(machine, portnames[switch_port]) & 0x70) | (state->oldpos[idx] & 0x0f) | state->sign[idx];
 }
 
 
@@ -562,6 +562,7 @@ static READ8_HANDLER( milliped_IN1_r )
 
 static READ8_HANDLER( milliped_IN2_r )
 {
+	centiped_state *state = space->machine->driver_data<centiped_state>();
 	UINT8 data = input_port_read(space->machine, "IN2");
 
 	/* MSH - 15 Feb, 2007
@@ -571,7 +572,7 @@ static READ8_HANDLER( milliped_IN2_r )
      * the inputs, and has the good side effect of disabling
      * the actual Joy1 inputs while control_select is no zero.
      */
-	if (0 != control_select) {
+	if (0 != state->control_select) {
 		/* Bottom 4 bits is our joystick inputs */
 		UINT8 joy2data = input_port_read(space->machine, "IN3") & 0x0f;
 		data = data & 0xf0; /* Keep the top 4 bits */
@@ -583,27 +584,34 @@ static READ8_HANDLER( milliped_IN2_r )
 
 static WRITE8_HANDLER( input_select_w )
 {
-	dsw_select = (~data >> 7) & 1;
+	centiped_state *state = space->machine->driver_data<centiped_state>();
+
+	state->dsw_select = (~data >> 7) & 1;
 }
 
 /* used P2 controls if 1, P1 controls if 0 */
 static WRITE8_HANDLER( control_select_w )
 {
-	control_select = (data >> 7) & 1;
+	centiped_state *state = space->machine->driver_data<centiped_state>();
+
+	state->control_select = (data >> 7) & 1;
 }
 
 
 static READ8_HANDLER( mazeinv_input_r )
 {
+	centiped_state *state = space->machine->driver_data<centiped_state>();
 	static const char *const sticknames[] = { "STICK0", "STICK1", "STICK2", "STICK3" };
 
-	return input_port_read(space->machine, sticknames[control_select]);
+	return input_port_read(space->machine, sticknames[state->control_select]);
 }
 
 
 static WRITE8_HANDLER( mazeinv_input_select_w )
 {
-	control_select = offset & 3;
+	centiped_state *state = space->machine->driver_data<centiped_state>();
+
+	state->control_select = offset & 3;
 }
 
 static READ8_HANDLER( bullsdrt_data_port_r )
@@ -680,7 +688,7 @@ static READ8_DEVICE_HANDLER( caterplr_AY8910_r )
 
 static ADDRESS_MAP_START( centiped_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE(&rambase)
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE_MEMBER(centiped_state, rambase)
 	AM_RANGE(0x0400, 0x07bf) AM_RAM_WRITE(centiped_videoram_w) AM_BASE_MEMBER(centiped_state, videoram)
 	AM_RANGE(0x07c0, 0x07ff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("DSW1")		/* DSW1 */
@@ -854,7 +862,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bullsdrt_port_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_WRITE(bullsdrt_sprites_bank_w)
-	AM_RANGE(0x20, 0x3f) AM_WRITE(bullsdrt_tilesbank_w) AM_BASE(&bullsdrt_tiles_bankram)
+	AM_RANGE(0x20, 0x3f) AM_WRITE(bullsdrt_tilesbank_w) AM_BASE_MEMBER(centiped_state, bullsdrt_tiles_bankram)
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(bullsdrt_data_port_r) AM_DEVWRITE("snsnd", sn76496_w)
 ADDRESS_MAP_END
 
@@ -1992,7 +2000,9 @@ static DRIVER_INIT( magworm )
 
 static DRIVER_INIT( bullsdrt )
 {
-	dsw_select = 0;
+	centiped_state *state = machine->driver_data<centiped_state>();
+
+	state->dsw_select = 0;
 }
 
 

@@ -49,6 +49,7 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	UINT8 irq_mask;
 };
 
 
@@ -123,7 +124,6 @@ static READ8_HANDLER( cmmb_input_r )
 	return 0xff;
 }
 
-static UINT8 irq_mask;
 
 /*
     {
@@ -137,6 +137,7 @@ static UINT8 irq_mask;
 
 static WRITE8_HANDLER( cmmb_output_w )
 {
+	cmmb_state *state = space->machine->driver_data<cmmb_state>();
 	//printf("%02x -> [%02x] W\n",data,offset);
 	switch(offset)
 	{
@@ -150,7 +151,7 @@ static WRITE8_HANDLER( cmmb_output_w )
 			}
 			break;
 		case 0x03:
-			irq_mask = data & 0x80;
+			state->irq_mask = data & 0x80;
 			break;
 		case 0x07:
 			break;

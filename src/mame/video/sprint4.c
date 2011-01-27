@@ -8,12 +8,6 @@ Atari Sprint 4 video emulation
 #include "audio/sprint4.h"
 #include "includes/sprint4.h"
 
-static tilemap_t* playfield;
-
-static bitmap_t* helper;
-
-int sprint4_collision[4];
-
 
 PALETTE_INIT( sprint4 )
 {
@@ -56,9 +50,10 @@ static TILE_GET_INFO( sprint4_tile_info )
 
 VIDEO_START( sprint4 )
 {
-	helper = machine->primary_screen->alloc_compatible_bitmap();
+	sprint4_state *state = machine->driver_data<sprint4_state>();
+	state->helper = machine->primary_screen->alloc_compatible_bitmap();
 
-	playfield = tilemap_create(machine, sprint4_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->playfield = tilemap_create(machine, sprint4_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 
@@ -68,7 +63,7 @@ VIDEO_UPDATE( sprint4 )
 	UINT8 *videoram = state->videoram;
 	int i;
 
-	tilemap_draw(bitmap, cliprect, playfield, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->playfield, 0, 0);
 
 	for (i = 0; i < 4; i++)
 	{
@@ -123,12 +118,12 @@ VIDEO_EOF( sprint4 )
 
 		sect_rect(&rect, &machine->primary_screen->visible_area());
 
-		tilemap_draw(helper, &rect, playfield, 0, 0);
+		tilemap_draw(state->helper, &rect, state->playfield, 0, 0);
 
 		if (i & 1)
 			bank = 32;
 
-		drawgfx_transpen(helper, &rect, machine->gfx[1],
+		drawgfx_transpen(state->helper, &rect, machine->gfx[1],
 			(code >> 3) | bank,
 			4,
 			0, 0,
@@ -137,8 +132,8 @@ VIDEO_EOF( sprint4 )
 
 		for (y = rect.min_y; y <= rect.max_y; y++)
 			for (x = rect.min_x; x <= rect.max_x; x++)
-				if (colortable_entry_get_value(machine->colortable, *BITMAP_ADDR16(helper, y, x)) != 0)
-					sprint4_collision[i] = 1;
+				if (colortable_entry_get_value(machine->colortable, *BITMAP_ADDR16(state->helper, y, x)) != 0)
+					state->collision[i] = 1;
 	}
 
 	/* update sound status */
@@ -155,5 +150,5 @@ WRITE8_HANDLER( sprint4_video_ram_w )
 	sprint4_state *state = space->machine->driver_data<sprint4_state>();
 	UINT8 *videoram = state->videoram;
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(playfield, offset);
+	tilemap_mark_tile_dirty(state->playfield, offset);
 }

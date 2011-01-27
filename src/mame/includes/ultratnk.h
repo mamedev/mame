@@ -12,12 +12,14 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	int da_latch;
+	int collision[4];
+	tilemap_t* playfield;
+	bitmap_t* helper;
 };
 
 
 /*----------- defined in video/ultratnk.c -----------*/
-
-extern int ultratnk_collision[4];
 
 PALETTE_INIT( ultratnk );
 VIDEO_START( ultratnk );

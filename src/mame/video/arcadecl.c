@@ -9,6 +9,7 @@
 
 
 #include "emu.h"
+#include "includes/rampart.h"
 #include "includes/arcadecl.h"
 
 

@@ -8,12 +8,6 @@ Atari Ultra Tank video emulation
 #include "includes/ultratnk.h"
 #include "audio/sprint4.h"
 
-static tilemap_t* playfield;
-
-static bitmap_t* helper;
-
-int ultratnk_collision[4];
-
 
 PALETTE_INIT( ultratnk )
 {
@@ -54,9 +48,10 @@ static TILE_GET_INFO( ultratnk_tile_info )
 
 VIDEO_START( ultratnk )
 {
-	helper = machine->primary_screen->alloc_compatible_bitmap();
+	ultratnk_state *state = machine->driver_data<ultratnk_state>();
+	state->helper = machine->primary_screen->alloc_compatible_bitmap();
 
-	playfield = tilemap_create(machine, ultratnk_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->playfield = tilemap_create(machine, ultratnk_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 
@@ -66,7 +61,7 @@ VIDEO_UPDATE( ultratnk )
 	UINT8 *videoram = state->videoram;
 	int i;
 
-	tilemap_draw(bitmap, cliprect, playfield, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->playfield, 0, 0);
 
 	for (i = 0; i < 4; i++)
 	{
@@ -125,12 +120,12 @@ VIDEO_EOF( ultratnk )
 
 		sect_rect(&rect, &machine->primary_screen->visible_area());
 
-		tilemap_draw(helper, &rect, playfield, 0, 0);
+		tilemap_draw(state->helper, &rect, state->playfield, 0, 0);
 
 		if (code & 4)
 			bank = 32;
 
-		drawgfx_transpen(helper, &rect, machine->gfx[1],
+		drawgfx_transpen(state->helper, &rect, machine->gfx[1],
 			(code >> 3) | bank,
 			4,
 			0, 0,
@@ -139,8 +134,8 @@ VIDEO_EOF( ultratnk )
 
 		for (y = rect.min_y; y <= rect.max_y; y++)
 			for (x = rect.min_x; x <= rect.max_x; x++)
-				if (colortable_entry_get_value(machine->colortable, *BITMAP_ADDR16(helper, y, x)) != BG)
-					ultratnk_collision[i] = 1;
+				if (colortable_entry_get_value(machine->colortable, *BITMAP_ADDR16(state->helper, y, x)) != BG)
+					state->collision[i] = 1;
 	}
 
 	/* update sound status */
@@ -155,5 +150,5 @@ WRITE8_HANDLER( ultratnk_video_ram_w )
 	ultratnk_state *state = space->machine->driver_data<ultratnk_state>();
 	UINT8 *videoram = state->videoram;
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(playfield, offset);
+	tilemap_mark_tile_dirty(state->playfield, offset);
 }

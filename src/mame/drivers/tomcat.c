@@ -36,20 +36,32 @@
 #include "sound/tms5220.h"
 #include "sound/2151intf.h"
 
-static int tomcat_control_num;
-static UINT16 *tomcat_shared_ram;
-static UINT8 *tomcat_nvram;
-static int dsp_BIO;
-static int dsp_idle;
+
+class tomcat_state : public driver_device
+{
+public:
+	tomcat_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	int control_num;
+	UINT16 *shared_ram;
+	UINT8 *nvram;
+	int dsp_BIO;
+	int dsp_idle;
+};
+
+
 
 static WRITE16_HANDLER(tomcat_adcon_w)
 {
-	tomcat_control_num = data;
+	tomcat_state *state = space->machine->driver_data<tomcat_state>();
+	state->control_num = data;
 }
 
 static READ16_HANDLER(tomcat_adcread_r)
 {
-	switch( tomcat_control_num )
+	tomcat_state *state = space->machine->driver_data<tomcat_state>();
+	switch( state->control_num )
 	{
 	case 0: return input_port_read(space->machine, "STICKY");
 	case 1: return input_port_read(space->machine, "STICKX");
@@ -149,9 +161,10 @@ static WRITE16_HANDLER(tomcat_mresl_w)
 
 static WRITE16_HANDLER(tomcat_mresh_w)
 {
+	tomcat_state *state = space->machine->driver_data<tomcat_state>();
 	// 320 Reset high        (Address Strobe)
 	// Release reset of TMS320
-	dsp_BIO = 0;
+	state->dsp_BIO = 0;
 	cpu_set_input_line(space->machine->device("dsp"), INPUT_LINE_RESET, CLEAR_LINE);
 }
 
@@ -163,6 +176,7 @@ static WRITE16_HANDLER(tomcat_irqclr_w)
 
 static READ16_HANDLER(tomcat_inputs2_r)
 {
+	tomcat_state *state = space->machine->driver_data<tomcat_state>();
 /*
 *       D15 LNKFLAG     (Game Link)
 *       D14 PC3        "    "
@@ -173,33 +187,35 @@ static READ16_HANDLER(tomcat_inputs2_r)
 *       D9  /IDLE*      (TMS320 System)
 *       D8
 */
-	return dsp_idle ? 0 : (1 << 9);
+	return state->dsp_idle ? 0 : (1 << 9);
 }
 
 static READ16_HANDLER(tomcat_320bio_r)
 {
-	dsp_BIO = 1;
+	tomcat_state *state = space->machine->driver_data<tomcat_state>();
+	state->dsp_BIO = 1;
 	space->machine->device<cpu_device>("maincpu")->suspend(SUSPEND_REASON_SPIN, 1);
 	return 0;
 }
 
 static READ16_HANDLER(dsp_BIO_r)
 {
+	tomcat_state *state = space->machine->driver_data<tomcat_state>();
 	if ( cpu_get_pc(space->cpu) == 0x0001 )
 	{
-		if ( dsp_idle == 0 )
+		if ( state->dsp_idle == 0 )
 		{
-			dsp_idle = 1;
-			dsp_BIO = 0;
+			state->dsp_idle = 1;
+			state->dsp_BIO = 0;
 		}
-		return !dsp_BIO;
+		return !state->dsp_BIO;
 	}
 	else if ( cpu_get_pc(space->cpu) == 0x0003 )
 	{
-		if ( dsp_BIO == 1 )
+		if ( state->dsp_BIO == 1 )
 		{
-			dsp_idle = 0;
-			dsp_BIO = 0;
+			state->dsp_idle = 0;
+			state->dsp_BIO = 0;
 			space->machine->device<cpu_device>("maincpu")->resume(SUSPEND_REASON_SPIN );
 			return 0;
 		}
@@ -211,28 +227,32 @@ static READ16_HANDLER(dsp_BIO_r)
 	}
 	else
 	{
-		return !dsp_BIO;
+		return !state->dsp_BIO;
 	}
 }
 
 static READ16_HANDLER(tomcat_shared_ram_r)
 {
-	return tomcat_shared_ram[offset];
+	tomcat_state *state = space->machine->driver_data<tomcat_state>();
+	return state->shared_ram[offset];
 }
 
 static WRITE16_HANDLER(tomcat_shared_ram_w)
 {
-	COMBINE_DATA(&tomcat_shared_ram[offset]);
+	tomcat_state *state = space->machine->driver_data<tomcat_state>();
+	COMBINE_DATA(&state->shared_ram[offset]);
 }
 
 static READ8_HANDLER(tomcat_nvram_r)
 {
-	return tomcat_nvram[offset];
+	tomcat_state *state = space->machine->driver_data<tomcat_state>();
+	return state->nvram[offset];
 }
 
 static WRITE8_HANDLER(tomcat_nvram_w)
 {
-	tomcat_nvram[offset] = data;
+	tomcat_state *state = space->machine->driver_data<tomcat_state>();
+	state->nvram[offset] = data;
 }
 
 static ADDRESS_MAP_START( tomcat_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -266,7 +286,7 @@ static ADDRESS_MAP_START( tomcat_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsp_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE(&tomcat_shared_ram)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_MEMBER(tomcat_state, shared_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsp_io_map, ADDRESS_SPACE_IO, 16 )
@@ -328,20 +348,21 @@ ROM_END
 
 static MACHINE_START(tomcat)
 {
-	((UINT16*)tomcat_shared_ram)[0x0000] = 0xf600;
-	((UINT16*)tomcat_shared_ram)[0x0001] = 0x0000;
-	((UINT16*)tomcat_shared_ram)[0x0002] = 0xf600;
-	((UINT16*)tomcat_shared_ram)[0x0003] = 0x0000;
+	tomcat_state *state = machine->driver_data<tomcat_state>();
+	((UINT16*)state->shared_ram)[0x0000] = 0xf600;
+	((UINT16*)state->shared_ram)[0x0001] = 0x0000;
+	((UINT16*)state->shared_ram)[0x0002] = 0xf600;
+	((UINT16*)state->shared_ram)[0x0003] = 0x0000;
 
-	tomcat_nvram = auto_alloc_array(machine, UINT8, 0x800);
-	machine->device<nvram_device>("nvram")->set_base(tomcat_nvram, 0x800);
+	state->nvram = auto_alloc_array(machine, UINT8, 0x800);
+	machine->device<nvram_device>("nvram")->set_base(state->nvram, 0x800);
 
-	state_save_register_global_pointer(machine, tomcat_nvram, 0x800);
-	state_save_register_global(machine, tomcat_control_num);
-	state_save_register_global(machine, dsp_BIO);
-	state_save_register_global(machine, dsp_idle);
+	state_save_register_global_pointer(machine, state->nvram, 0x800);
+	state_save_register_global(machine, state->control_num);
+	state_save_register_global(machine, state->dsp_BIO);
+	state_save_register_global(machine, state->dsp_idle);
 
-	dsp_BIO = 0;
+	state->dsp_BIO = 0;
 }
 
 static const riot6532_interface tomcat_riot6532_intf =
@@ -365,7 +386,7 @@ static const riot6532_interface tomcat_riot6532_intf =
 	DEVCB_NULL	// connected to IRQ line of 6502
 };
 
-static MACHINE_CONFIG_START( tomcat, driver_device )
+static MACHINE_CONFIG_START( tomcat, tomcat_state )
 	MCFG_CPU_ADD("maincpu", M68010, XTAL_12MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(tomcat_map)
 	MCFG_CPU_VBLANK_INT_HACK(irq1_line_assert, 5)

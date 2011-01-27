@@ -223,6 +223,17 @@
 #include "machine/atari_vg.h"
 #include "sound/pokey.h"
 
+
+class bwidow_state : public driver_device
+{
+public:
+	bwidow_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	int lastdata;
+};
+
+
 #define MASTER_CLOCK (12096000)
 #define CLOCK_3KHZ  (MASTER_CLOCK / 4096)
 
@@ -317,20 +328,20 @@ static CUSTOM_INPUT( clock_r )
 
 static WRITE8_HANDLER( bwidow_misc_w )
 {
+	bwidow_state *state = space->machine->driver_data<bwidow_state>();
 	/*
         0x10 = p1 led
         0x20 = p2 led
         0x01 = coin counter 1
         0x02 = coin counter 2
     */
-	static int lastdata;
 
-	if (data == lastdata) return;
+	if (data == state->lastdata) return;
 	set_led_status(space->machine, 0,~data & 0x10);
 	set_led_status(space->machine, 1,~data & 0x20);
 	coin_counter_w(space->machine, 0, data & 0x01);
 	coin_counter_w(space->machine, 1, data & 0x02);
-	lastdata = data;
+	state->lastdata = data;
 }
 
 /*************************************
@@ -709,7 +720,7 @@ static const pokey_interface pokey_interface_2 =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( bwidow, driver_device )
+static MACHINE_CONFIG_START( bwidow, bwidow_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)

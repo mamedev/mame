@@ -68,8 +68,9 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "includes/arcadecl.h"
 #include "sound/okim6295.h"
+#include "includes/rampart.h"
+#include "includes/arcadecl.h"
 
 
 #define MASTER_CLOCK		XTAL_14_31818MHz

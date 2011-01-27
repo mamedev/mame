@@ -259,29 +259,23 @@ static WRITE32_HANDLER( sound_data_w )
  *
  *************************************/
 
-#define ADDRSEQ_COUNT	4
 
-static offs_t protaddr[ADDRSEQ_COUNT];
-static UINT8 protmode;
-static UINT16 protresult;
-static UINT8 protdata[0x800];
 
-static UINT8 ignore_writes = 0;
-
-static void tmek_update_mode(offs_t offset)
+static void tmek_update_mode(atarigt_state *state, offs_t offset)
 {
 	int i;
 
 	/* pop us into the readseq */
 	for (i = 0; i < ADDRSEQ_COUNT - 1; i++)
-		protaddr[i] = protaddr[i + 1];
-	protaddr[ADDRSEQ_COUNT - 1] = offset;
+		state->protaddr[i] = state->protaddr[i + 1];
+	state->protaddr[ADDRSEQ_COUNT - 1] = offset;
 
 }
 
 
 static void tmek_protection_w(address_space *space, offs_t offset, UINT16 data)
 {
+	atarigt_state *state = space->machine->driver_data<atarigt_state>();
 /*
     T-Mek init:
         ($387C0) = $0001
@@ -293,22 +287,23 @@ static void tmek_protection_w(address_space *space, offs_t offset, UINT16 data)
 	if (LOG_PROTECTION) logerror("%06X:Protection W@%06X = %04X\n", cpu_get_previouspc(space->cpu), offset, data);
 
 	/* track accesses */
-	tmek_update_mode(offset);
+	tmek_update_mode(state, offset);
 
 	switch (offset)
 	{
 		case 0xdb0000:
-			ignore_writes = (data == 0x18);
+			state->ignore_writes = (data == 0x18);
 			break;
 	}
 }
 
 static void tmek_protection_r(address_space *space, offs_t offset, UINT16 *data)
 {
+	atarigt_state *state = space->machine->driver_data<atarigt_state>();
 	if (LOG_PROTECTION) logerror("%06X:Protection R@%06X\n", cpu_get_previouspc(space->cpu), offset);
 
 	/* track accesses */
-	tmek_update_mode(offset);
+	tmek_update_mode(state, offset);
 
 	/* handle specific reads */
 	switch (offset)
@@ -316,7 +311,7 @@ static void tmek_protection_r(address_space *space, offs_t offset, UINT16 *data)
 		/* status register; the code spins on this waiting for the high bit to be set */
 		case 0xdb8700:
 		case 0xdb87c0:
-//          if (protmode != 0)
+//          if (state->protmode != 0)
 			{
 				*data = -1;//0x8000;
 			}
@@ -332,37 +327,37 @@ static void tmek_protection_r(address_space *space, offs_t offset, UINT16 *data)
  *
  *************************************/
 
-static void primage_update_mode(offs_t offset)
+static void primage_update_mode(atarigt_state *state, offs_t offset)
 {
 	int i;
 
 	/* pop us into the readseq */
 	for (i = 0; i < ADDRSEQ_COUNT - 1; i++)
-		protaddr[i] = protaddr[i + 1];
-	protaddr[ADDRSEQ_COUNT - 1] = offset;
+		state->protaddr[i] = state->protaddr[i + 1];
+	state->protaddr[ADDRSEQ_COUNT - 1] = offset;
 
 	/* check for particular sequences */
-	if (!protmode)
+	if (!state->protmode)
 	{
 		/* this is from the code at $20f90 */
-		if (protaddr[1] == 0xdcc7c4 && protaddr[2] == 0xdcc7c4 && protaddr[3] == 0xdc4010)
+		if (state->protaddr[1] == 0xdcc7c4 && state->protaddr[2] == 0xdcc7c4 && state->protaddr[3] == 0xdc4010)
 		{
 			if (LOG_PROTECTION) logerror("prot:Entering mode 1\n");
-			protmode = 1;
+			state->protmode = 1;
 		}
 
 		/* this is from the code at $27592 */
-		if (protaddr[0] == 0xdcc7ca && protaddr[1] == 0xdcc7ca && protaddr[2] == 0xdcc7c6 && protaddr[3] == 0xdc4022)
+		if (state->protaddr[0] == 0xdcc7ca && state->protaddr[1] == 0xdcc7ca && state->protaddr[2] == 0xdcc7c6 && state->protaddr[3] == 0xdc4022)
 		{
 			if (LOG_PROTECTION) logerror("prot:Entering mode 2\n");
-			protmode = 2;
+			state->protmode = 2;
 		}
 
 		/* this is from the code at $3d8dc */
-		if (protaddr[0] == 0xdcc7c0 && protaddr[1] == 0xdcc7c0 && protaddr[2] == 0xdc80f2 && protaddr[3] == 0xdc7af2)
+		if (state->protaddr[0] == 0xdcc7c0 && state->protaddr[1] == 0xdcc7c0 && state->protaddr[2] == 0xdc80f2 && state->protaddr[3] == 0xdc7af2)
 		{
 			if (LOG_PROTECTION) logerror("prot:Entering mode 3\n");
-			protmode = 3;
+			state->protmode = 3;
 		}
 	}
 }
@@ -371,6 +366,7 @@ static void primage_update_mode(offs_t offset)
 
 static void primrage_protection_w(address_space *space, offs_t offset, UINT16 data)
 {
+	atarigt_state *state = space->machine->driver_data<atarigt_state>();
 	if (LOG_PROTECTION)
 	{
 	UINT32 pc = cpu_get_previouspc(space->cpu);
@@ -414,25 +410,25 @@ static void primrage_protection_w(address_space *space, offs_t offset, UINT16 da
 /* mask = 0x78fff */
 
 	/* track accesses */
-	primage_update_mode(offset);
+	primage_update_mode(state, offset);
 
 	/* check for certain read sequences */
-	if (protmode == 1 && offset >= 0xdc7800 && offset < 0xdc7800 + sizeof(protdata) * 2)
-		protdata[(offset - 0xdc7800) / 2] = data;
+	if (state->protmode == 1 && offset >= 0xdc7800 && offset < 0xdc7800 + sizeof(state->protdata) * 2)
+		state->protdata[(offset - 0xdc7800) / 2] = data;
 
-	if (protmode == 2)
+	if (state->protmode == 2)
 	{
 		int temp = (offset - 0xdc7800) / 2;
 		if (LOG_PROTECTION) logerror("prot:mode 2 param = %04X\n", temp);
-		protresult = temp * 0x6915 + 0x6915;
+		state->protresult = temp * 0x6915 + 0x6915;
 	}
 
-	if (protmode == 3)
+	if (state->protmode == 3)
 	{
 		if (offset == 0xdc4700)
 		{
 			if (LOG_PROTECTION) logerror("prot:Clearing mode 3\n");
-			protmode = 0;
+			state->protmode = 0;
 		}
 	}
 }
@@ -441,8 +437,9 @@ static void primrage_protection_w(address_space *space, offs_t offset, UINT16 da
 
 static void primrage_protection_r(address_space *space, offs_t offset, UINT16 *data)
 {
+	atarigt_state *state = space->machine->driver_data<atarigt_state>();
 	/* track accesses */
-	primage_update_mode(offset);
+	primage_update_mode(state, offset);
 
 if (LOG_PROTECTION)
 {
@@ -519,7 +516,7 @@ if (LOG_PROTECTION)
 	{
 		/* status register; the code spins on this waiting for the high bit to be set */
 		case 0xdc4700:
-//          if (protmode != 0)
+//          if (state->protmode != 0)
 			{
 				*data = 0x8000;
 			}
@@ -527,18 +524,18 @@ if (LOG_PROTECTION)
 
 		/* some kind of result register */
 		case 0xdcc7c2:
-			if (protmode == 2)
+			if (state->protmode == 2)
 			{
-				*data = protresult;
-				protmode = 0;
+				*data = state->protresult;
+				state->protmode = 0;
 			if (LOG_PROTECTION) logerror("prot:Clearing mode 2\n");
 			}
 			break;
 
 		case 0xdcc7c4:
-			if (protmode == 1)
+			if (state->protmode == 1)
 			{
-				protmode = 0;
+				state->protmode = 0;
 			if (LOG_PROTECTION) logerror("prot:Clearing mode 1\n");
 			}
 			break;
@@ -584,13 +581,13 @@ static WRITE32_HANDLER( colorram_protection_w )
 
 	if (ACCESSING_BITS_16_31)
 	{
-		if (!ignore_writes)
+		if (!state->ignore_writes)
 			atarigt_colorram_w(state, address, data >> 16, mem_mask >> 16);
 		(*state->protection_w)(space, address, data >> 16);
 	}
 	if (ACCESSING_BITS_0_15)
 	{
-		if (!ignore_writes)
+		if (!state->ignore_writes)
 			atarigt_colorram_w(state, address + 2, data, mem_mask);
 		(*state->protection_w)(space, address + 2, data);
 	}

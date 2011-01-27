@@ -359,6 +359,14 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	const UINT8 *writeprom;
+	emu_timer *irq_timer;
+	emu_timer *cpu_timer;
+	UINT8 irq_state;
+	UINT8 ctrld;
+	UINT8 flipscreen;
+	UINT8 madsel_delay;
+	UINT16 madsel_lastpc;
 };
 
 
@@ -380,16 +388,8 @@ public:
  *
  *************************************/
 
-static const UINT8 *writeprom;
 
-static emu_timer *irq_timer;
-static emu_timer *cpu_timer;
 
-static UINT8 irq_state;
-static UINT8 ctrld;
-static UINT8 flipscreen;
-static UINT8 madsel_delay;
-static UINT16 madsel_lastpc;
 
 
 
@@ -399,47 +399,49 @@ static UINT16 madsel_lastpc;
  *
  *************************************/
 
-INLINE int scanline_to_v(int scanline)
+INLINE int scanline_to_v(missile_state *state, int scanline)
 {
 	/* since the vertical sync counter counts backwards when flipped,
         this function returns the current effective V value, given
         that vpos() only counts forward */
-	return flipscreen ? (256 - scanline) : scanline;
+	return state->flipscreen ? (256 - scanline) : scanline;
 }
 
 
-INLINE int v_to_scanline(int v)
+INLINE int v_to_scanline(missile_state *state, int v)
 {
 	/* same as a above, but the opposite transformation */
-	return flipscreen ? (256 - v) : v;
+	return state->flipscreen ? (256 - v) : v;
 }
 
 
 INLINE void schedule_next_irq(running_machine *machine, int curv)
 {
+	missile_state *state = machine->driver_data<missile_state>();
 	/* IRQ = /32V, clocked by /16V ^ flip */
 	/* When not flipped, clocks on 0, 64, 128, 192 */
 	/* When flipped, clocks on 16, 80, 144, 208 */
-	if (flipscreen)
+	if (state->flipscreen)
 		curv = ((curv - 32) & 0xff) | 0x10;
 	else
 		curv = ((curv + 32) & 0xff) & ~0x10;
 
 	/* next one at the start of this scanline */
-	timer_adjust_oneshot(irq_timer, machine->primary_screen->time_until_pos(v_to_scanline(curv), 0), curv);
+	timer_adjust_oneshot(state->irq_timer, machine->primary_screen->time_until_pos(v_to_scanline(state, curv), 0), curv);
 }
 
 
 static TIMER_CALLBACK( clock_irq )
 {
+	missile_state *state = machine->driver_data<missile_state>();
 	int curv = param;
 
 	/* assert the IRQ if not already asserted */
-	irq_state = (~curv >> 5) & 1;
-	cputag_set_input_line(machine, "maincpu", 0, irq_state ? ASSERT_LINE : CLEAR_LINE);
+	state->irq_state = (~curv >> 5) & 1;
+	cputag_set_input_line(machine, "maincpu", 0, state->irq_state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* force an update while we're here */
-	machine->primary_screen->update_partial(v_to_scanline(curv));
+	machine->primary_screen->update_partial(v_to_scanline(state, curv));
 
 	/* find the next edge */
 	schedule_next_irq(machine, curv);
@@ -448,7 +450,8 @@ static TIMER_CALLBACK( clock_irq )
 
 static CUSTOM_INPUT( get_vblank )
 {
-	int v = scanline_to_v(field->port->machine->primary_screen->vpos());
+	missile_state *state = field->port->machine->driver_data<missile_state>();
+	int v = scanline_to_v(state, field->port->machine->primary_screen->vpos());
 	return v < 24;
 }
 
@@ -462,6 +465,7 @@ static CUSTOM_INPUT( get_vblank )
 
 static TIMER_CALLBACK( adjust_cpu_speed )
 {
+	missile_state *state = machine->driver_data<missile_state>();
 	int curv = param;
 
 	/* starting at scanline 224, the CPU runs at half speed */
@@ -472,7 +476,7 @@ static TIMER_CALLBACK( adjust_cpu_speed )
 
 	/* scanline for the next run */
 	curv ^= 224;
-	timer_adjust_oneshot(cpu_timer, machine->primary_screen->time_until_pos(v_to_scanline(curv), 0), curv);
+	timer_adjust_oneshot(state->cpu_timer, machine->primary_screen->time_until_pos(v_to_scanline(state, curv), 0), curv);
 }
 
 
@@ -504,36 +508,38 @@ DIRECT_UPDATE_HANDLER( missile_direct_handler )
 
 static MACHINE_START( missile )
 {
+	missile_state *state = machine->driver_data<missile_state>();
 	/* initialize globals */
-	writeprom = machine->region("proms")->base();
-	flipscreen = 0;
+	state->writeprom = machine->region("proms")->base();
+	state->flipscreen = 0;
 
 	/* set up an opcode base handler since we use mapped handlers for RAM */
 	address_space *space = machine->device<m6502_device>("maincpu")->space(AS_PROGRAM);
 	space->set_direct_update_handler(direct_update_delegate_create_static(missile_direct_handler, *machine));
 
 	/* create a timer to speed/slow the CPU */
-	cpu_timer = timer_alloc(machine, adjust_cpu_speed, NULL);
-	timer_adjust_oneshot(cpu_timer, machine->primary_screen->time_until_pos(v_to_scanline(0), 0), 0);
+	state->cpu_timer = timer_alloc(machine, adjust_cpu_speed, NULL);
+	timer_adjust_oneshot(state->cpu_timer, machine->primary_screen->time_until_pos(v_to_scanline(state, 0), 0), 0);
 
 	/* create a timer for IRQs and set up the first callback */
-	irq_timer = timer_alloc(machine, clock_irq, NULL);
-	irq_state = 0;
+	state->irq_timer = timer_alloc(machine, clock_irq, NULL);
+	state->irq_state = 0;
 	schedule_next_irq(machine, -32);
 
 	/* setup for save states */
-	state_save_register_global(machine, irq_state);
-	state_save_register_global(machine, ctrld);
-	state_save_register_global(machine, flipscreen);
-	state_save_register_global(machine, madsel_delay);
-	state_save_register_global(machine, madsel_lastpc);
+	state_save_register_global(machine, state->irq_state);
+	state_save_register_global(machine, state->ctrld);
+	state_save_register_global(machine, state->flipscreen);
+	state_save_register_global(machine, state->madsel_delay);
+	state_save_register_global(machine, state->madsel_lastpc);
 }
 
 
 static MACHINE_RESET( missile )
 {
+	missile_state *state = machine->driver_data<missile_state>();
 	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
-	irq_state = 0;
+	state->irq_state = 0;
 }
 
 
@@ -546,25 +552,26 @@ static MACHINE_RESET( missile )
 
 INLINE int get_madsel(address_space *space)
 {
+	missile_state *state = space->machine->driver_data<missile_state>();
 	UINT16 pc = cpu_get_previouspc(space->cpu);
 
 	/* if we're at a different instruction than last time, reset our delay counter */
-	if (pc != madsel_lastpc)
-		madsel_delay = 0;
+	if (pc != state->madsel_lastpc)
+		state->madsel_delay = 0;
 
 	/* MADSEL signal disables standard address decoding and routes
         writes to video RAM; it is enabled if the IRQ signal is clear
         and the low 5 bits of the fetched opcode are 0x01 */
-	if (!irq_state && (space->direct().read_decrypted_byte(pc) & 0x1f) == 0x01)
+	if (!state->irq_state && (space->direct().read_decrypted_byte(pc) & 0x1f) == 0x01)
 	{
 		/* the MADSEL signal goes high 5 cycles after the opcode is identified;
             this effectively skips the indirect memory read. Since this is difficult
             to do in MAME, we just ignore the first two positive hits on MADSEL
             and only return TRUE on the third or later */
-		madsel_lastpc = pc;
-		return (++madsel_delay >= 4);
+		state->madsel_lastpc = pc;
+		return (++state->madsel_delay >= 4);
 	}
-	madsel_delay = 0;
+	state->madsel_delay = 0;
 	return 0;
 }
 
@@ -595,7 +602,7 @@ static void write_vram(address_space *space, offs_t address, UINT8 data)
 	/* this should only be called if MADSEL == 1 */
 	vramaddr = address >> 2;
 	vramdata = data_lookup[data >> 6];
-	vrammask = writeprom[(address & 7) | 0x10];
+	vrammask = state->writeprom[(address & 7) | 0x10];
 	videoram[vramaddr] = (videoram[vramaddr] & vrammask) | (vramdata & ~vrammask);
 
 	/* 3-bit VRAM writes use an extra clock to write the 3rd bit elsewhere */
@@ -604,7 +611,7 @@ static void write_vram(address_space *space, offs_t address, UINT8 data)
 	{
 		vramaddr = get_bit3_addr(address);
 		vramdata = -((data >> 5) & 1);
-		vrammask = writeprom[(address & 7) | 0x18];
+		vrammask = state->writeprom[(address & 7) | 0x18];
 		videoram[vramaddr] = (videoram[vramaddr] & vrammask) | (vramdata & ~vrammask);
 
 		/* account for the extra clock cycle */
@@ -668,7 +675,7 @@ static VIDEO_UPDATE( missile )
 	{
 		UINT16 *dst = (UINT16 *)bitmap->base + y * bitmap->rowpixels;
 
-		int effy = flipscreen ? ((256+24 - y) & 0xff) : y;
+		int effy = state->flipscreen ? ((256+24 - y) & 0xff) : y;
 		UINT8 *src = &videoram[effy * 64];
 		UINT8 *src3 = NULL;
 
@@ -725,13 +732,13 @@ static WRITE8_HANDLER( missile_w )
 	/* OUT0 */
 	else if (offset < 0x4900)
 	{
-		flipscreen = ~data & 0x40;
+		state->flipscreen = ~data & 0x40;
 		coin_counter_w(space->machine, 0, data & 0x20);
 		coin_counter_w(space->machine, 1, data & 0x10);
 		coin_counter_w(space->machine, 2, data & 0x08);
 		set_led_status(space->machine, 1, ~data & 0x04);
 		set_led_status(space->machine, 0, ~data & 0x02);
-		ctrld = data & 1;
+		state->ctrld = data & 1;
 	}
 
 	/* color RAM */
@@ -745,10 +752,10 @@ static WRITE8_HANDLER( missile_w )
 	/* interrupt ack */
 	else if (offset >= 0x4d00 && offset < 0x4e00)
 	{
-		if (irq_state)
+		if (state->irq_state)
 		{
 			cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
-			irq_state = 0;
+			state->irq_state = 0;
 		}
 	}
 
@@ -786,9 +793,9 @@ static READ8_HANDLER( missile_r )
 	/* IN0 */
 	else if (offset < 0x4900)
 	{
-		if (ctrld)	/* trackball */
+		if (state->ctrld)	/* trackball */
 		{
-			if (!flipscreen)
+			if (!state->flipscreen)
 			    result = ((input_port_read(space->machine, "TRACK0_Y") << 4) & 0xf0) | (input_port_read(space->machine, "TRACK0_X") & 0x0f);
 			else
 			    result = ((input_port_read(space->machine, "TRACK1_Y") << 4) & 0xf0) | (input_port_read(space->machine, "TRACK1_X") & 0x0f);

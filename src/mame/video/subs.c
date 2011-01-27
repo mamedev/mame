@@ -41,7 +41,7 @@ VIDEO_UPDATE( subs )
 {
 	subs_state *state = screen->machine->driver_data<subs_state>();
 	UINT8 *videoram = state->videoram;
-	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
+	UINT8 *spriteram = state->spriteram;
 	int offs;
 
 	device_t *left_screen  = screen->machine->device("lscreen");

@@ -11,9 +11,7 @@ Atari Starship 1 driver
 #include "cpu/m6502/m6502.h"
 #include "includes/starshp1.h"
 
-int starshp1_attract;
 
-static int starshp1_analog_in_select;
 
 
 static INTERRUPT_GEN( starshp1_interrupt )
@@ -25,16 +23,17 @@ static INTERRUPT_GEN( starshp1_interrupt )
 
 static WRITE8_DEVICE_HANDLER( starshp1_audio_w )
 {
+	starshp1_state *state = device->machine->driver_data<starshp1_state>();
 	data &= 1;
 
 	switch (offset & 7)
 	{
 	case 0:
-		starshp1_attract = data;
+		state->attract = data;
 		discrete_sound_w(device, STARSHP1_ATTRACT, data);
 		break;
 	case 1:
-		starshp1_phasor = data;
+		state->phasor = data;
 		discrete_sound_w(device, STARSHP1_PHASOR_ON, data);
 		break;
 	case 2:
@@ -54,22 +53,24 @@ static WRITE8_DEVICE_HANDLER( starshp1_audio_w )
 		break;
 	}
 
-	coin_lockout_w(device->machine, 0, !starshp1_attract);
-	coin_lockout_w(device->machine, 1, !starshp1_attract);
+	coin_lockout_w(device->machine, 0, !state->attract);
+	coin_lockout_w(device->machine, 1, !state->attract);
 }
 
 
 static WRITE8_HANDLER( starshp1_collision_reset_w )
 {
-	starshp1_collision_latch = 0;
+	starshp1_state *state = space->machine->driver_data<starshp1_state>();
+	state->collision_latch = 0;
 }
 
 
 static CUSTOM_INPUT( starshp1_analog_r )
 {
+	starshp1_state *state = field->port->machine->driver_data<starshp1_state>();
 	int val = 0;
 
-	switch (starshp1_analog_in_select)
+	switch (state->analog_in_select)
 	{
 	case 0:
 		val = input_port_read(field->port->machine, "STICKY");
@@ -91,22 +92,25 @@ static CUSTOM_INPUT( starshp1_analog_r )
 
 static CUSTOM_INPUT( collision_latch_r )
 {
-	return starshp1_collision_latch & 0x0f;
+	starshp1_state *state = field->port->machine->driver_data<starshp1_state>();
+	return state->collision_latch & 0x0f;
 }
 
 
 static WRITE8_HANDLER( starshp1_analog_in_w )
 {
-	starshp1_analog_in_select = offset & 3;
+	starshp1_state *state = space->machine->driver_data<starshp1_state>();
+	state->analog_in_select = offset & 3;
 }
 
 
 static WRITE8_DEVICE_HANDLER( starshp1_analog_out_w )
 {
+	starshp1_state *state = device->machine->driver_data<starshp1_state>();
 	switch (offset & 7)
 	{
 	case 1:
-		starshp1_ship_size = data;
+		state->ship_size = data;
 		break;
 	case 2:
 		discrete_sound_w(device, STARSHP1_NOISE_AMPLITUDE, data);
@@ -118,13 +122,13 @@ static WRITE8_DEVICE_HANDLER( starshp1_analog_out_w )
 		discrete_sound_w(device, STARSHP1_MOTOR_SPEED, data);
 		break;
 	case 5:
-		starshp1_circle_hpos = data;
+		state->circle_hpos = data;
 		break;
 	case 6:
-		starshp1_circle_vpos = data;
+		state->circle_vpos = data;
 		break;
 	case 7:
-		starshp1_circle_size = data;
+		state->circle_size = data;
 		break;
 	}
 }
@@ -132,30 +136,31 @@ static WRITE8_DEVICE_HANDLER( starshp1_analog_out_w )
 
 static WRITE8_HANDLER( starshp1_misc_w )
 {
+	starshp1_state *state = space->machine->driver_data<starshp1_state>();
 	data &= 1;
 
 	switch (offset & 7)
 	{
 	case 0:
-		starshp1_ship_explode = data;
+		state->ship_explode = data;
 		break;
 	case 1:
-		starshp1_circle_mod = data;
+		state->circle_mod = data;
 		break;
 	case 2:
-		starshp1_circle_kill = !data;
+		state->circle_kill = !data;
 		break;
 	case 3:
-		starshp1_starfield_kill = data;
+		state->starfield_kill = data;
 		break;
 	case 4:
-		starshp1_inverse = data;
+		state->inverse = data;
 		break;
 	case 5:
 		/* BLACK HOLE, not used */
 		break;
 	case 6:
-		starshp1_mux = data;
+		state->mux = data;
 		break;
 	case 7:
 		set_led_status(space->machine, 0, !data);
@@ -172,10 +177,10 @@ static ADDRESS_MAP_START( starshp1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc300, 0xc3ff) AM_WRITE(starshp1_sspic_w) /* spaceship picture */
 	AM_RANGE(0xc400, 0xc400) AM_READ_PORT("COINAGE")
 	AM_RANGE(0xc400, 0xc4ff) AM_WRITE(starshp1_ssadd_w) /* spaceship address */
-	AM_RANGE(0xc800, 0xc9ff) AM_RAM_WRITE(starshp1_playfield_w) AM_BASE(&starshp1_playfield_ram)
-	AM_RANGE(0xcc00, 0xcc0f) AM_WRITEONLY AM_BASE(&starshp1_hpos_ram)
-	AM_RANGE(0xd000, 0xd00f) AM_WRITEONLY AM_BASE(&starshp1_vpos_ram)
-	AM_RANGE(0xd400, 0xd40f) AM_WRITEONLY AM_BASE(&starshp1_obj_ram)
+	AM_RANGE(0xc800, 0xc9ff) AM_RAM_WRITE(starshp1_playfield_w) AM_BASE_MEMBER(starshp1_state, playfield_ram)
+	AM_RANGE(0xcc00, 0xcc0f) AM_WRITEONLY AM_BASE_MEMBER(starshp1_state, hpos_ram)
+	AM_RANGE(0xd000, 0xd00f) AM_WRITEONLY AM_BASE_MEMBER(starshp1_state, vpos_ram)
+	AM_RANGE(0xd400, 0xd40f) AM_WRITEONLY AM_BASE_MEMBER(starshp1_state, obj_ram)
 	AM_RANGE(0xd800, 0xd800) AM_READ(starshp1_rng_r)
 	AM_RANGE(0xd800, 0xd80f) AM_WRITE(starshp1_collision_reset_w)
 	AM_RANGE(0xdc00, 0xdc0f) AM_WRITE(starshp1_misc_w)
@@ -293,7 +298,7 @@ static GFXDECODE_START( starshp1 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( starshp1, driver_device )
+static MACHINE_CONFIG_START( starshp1, starshp1_state )
 
 	/* basic machine hardware */
 

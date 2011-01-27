@@ -1,7 +1,30 @@
-/*----------- defined in video/wolfpack.c -----------*/
+class wolfpack_state : public driver_device
+{
+public:
+	wolfpack_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-extern int wolfpack_collision;
-extern UINT8* wolfpack_alpha_num_ram;
+	int collision;
+	UINT8* alpha_num_ram;
+	unsigned current_index;
+	UINT8 video_invert;
+	UINT8 ship_reflect;
+	UINT8 pt_pos_select;
+	UINT8 pt_horz;
+	UINT8 pt_pic;
+	UINT8 ship_h;
+	UINT8 torpedo_pic;
+	UINT8 ship_size;
+	UINT8 ship_h_precess;
+	UINT8 ship_pic;
+	UINT8 torpedo_h;
+	UINT8 torpedo_v;
+	UINT8* LFSR;
+	bitmap_t* helper;
+};
+
+
+/*----------- defined in video/wolfpack.c -----------*/
 
 PALETTE_INIT( wolfpack );
 VIDEO_UPDATE( wolfpack );

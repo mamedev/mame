@@ -35,15 +35,6 @@
 #define MASTER_CLOCK (12096000)
 #define CLOCK_3KHZ  (MASTER_CLOCK / 4096)
 
-UINT8 starwars_is_esb;
-
-/* Local variables */
-static UINT8 *slapstic_source;
-static UINT8 *slapstic_base;
-static UINT8 slapstic_current_bank;
-static offs_t slapstic_last_pc;
-static offs_t slapstic_last_address;
-
 
 
 /*************************************
@@ -54,22 +45,23 @@ static offs_t slapstic_last_address;
 
 static MACHINE_RESET( starwars )
 {
+	starwars_state *state = machine->driver_data<starwars_state>();
 	/* ESB-specific */
-	if (starwars_is_esb)
+	if (state->is_esb)
 	{
 		address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 		/* reset the slapstic */
 		slapstic_reset();
-		slapstic_current_bank = slapstic_bank();
-		memcpy(slapstic_base, &slapstic_source[slapstic_current_bank * 0x2000], 0x2000);
+		state->slapstic_current_bank = slapstic_bank();
+		memcpy(state->slapstic_base, &state->slapstic_source[state->slapstic_current_bank * 0x2000], 0x2000);
 
 		/* reset all the banks */
 		starwars_out_w(space, 4, 0);
 	}
 
 	/* reset the matrix processor */
-	starwars_mproc_reset();
+	starwars_mproc_reset(machine);
 }
 
 
@@ -95,20 +87,22 @@ static WRITE8_HANDLER( irq_ack_w )
 
 static void esb_slapstic_tweak(address_space *space, offs_t offset)
 {
+	starwars_state *state = space->machine->driver_data<starwars_state>();
 	int new_bank = slapstic_tweak(space, offset);
 
 	/* update for the new bank */
-	if (new_bank != slapstic_current_bank)
+	if (new_bank != state->slapstic_current_bank)
 	{
-		slapstic_current_bank = new_bank;
-		memcpy(slapstic_base, &slapstic_source[slapstic_current_bank * 0x2000], 0x2000);
+		state->slapstic_current_bank = new_bank;
+		memcpy(state->slapstic_base, &state->slapstic_source[state->slapstic_current_bank * 0x2000], 0x2000);
 	}
 }
 
 
 static READ8_HANDLER( esb_slapstic_r )
 {
-	int result = slapstic_base[offset];
+	starwars_state *state = space->machine->driver_data<starwars_state>();
+	int result = state->slapstic_base[offset];
 	esb_slapstic_tweak(space, offset);
 	return result;
 }
@@ -129,6 +123,7 @@ static WRITE8_HANDLER( esb_slapstic_w )
 
 DIRECT_UPDATE_HANDLER( esb_setdirect )
 {
+	starwars_state *state = machine->driver_data<starwars_state>();
 	/* if we are in the slapstic region, process it */
 	if ((address & 0xe000) == 0x8000)
 	{
@@ -139,10 +134,10 @@ DIRECT_UPDATE_HANDLER( esb_setdirect )
             1. Because we have read/write handlers backing the current address
             2. Because the CPU core executed a jump to a new address
         */
-		if (pc != slapstic_last_pc || address != slapstic_last_address)
+		if (pc != state->slapstic_last_pc || address != state->slapstic_last_address)
 		{
-			slapstic_last_pc = pc;
-			slapstic_last_address = address;
+			state->slapstic_last_pc = pc;
+			state->slapstic_last_address = address;
 			esb_slapstic_tweak(&direct.space(), address & 0x1fff);
 		}
 		return ~0;
@@ -182,7 +177,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4701, 0x4701) AM_READ(starwars_div_rel_r)
 	AM_RANGE(0x4703, 0x4703) AM_READ(starwars_prng_r)			/* pseudo random number generator */
 	AM_RANGE(0x4800, 0x4fff) AM_RAM								/* CPU and Math RAM */
-	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_BASE(&starwars_mathram)	/* CPU and Math RAM */
+	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_BASE_MEMBER(starwars_state, mathram)	/* CPU and Math RAM */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")						/* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM								/* rest of main_rom */
 ADDRESS_MAP_END
@@ -321,7 +316,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( starwars, driver_device )
+static MACHINE_CONFIG_START( starwars, starwars_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK / 8)
@@ -503,8 +498,9 @@ ROM_END
 
 static DRIVER_INIT( starwars )
 {
+	starwars_state *state = machine->driver_data<starwars_state>();
 	/* prepare the mathbox */
-	starwars_is_esb = 0;
+	state->is_esb = 0;
 	starwars_mproc_init(machine);
 
 	/* initialize banking */
@@ -515,12 +511,13 @@ static DRIVER_INIT( starwars )
 
 static DRIVER_INIT( esb )
 {
+	starwars_state *state = machine->driver_data<starwars_state>();
 	UINT8 *rom = machine->region("maincpu")->base();
 
 	/* init the slapstic */
 	slapstic_init(machine, 101);
-	slapstic_source = &rom[0x14000];
-	slapstic_base = &rom[0x08000];
+	state->slapstic_source = &rom[0x14000];
+	state->slapstic_base = &rom[0x08000];
 
 	/* install an opcode base handler */
 	address_space *space = machine->device<m6809_device>("maincpu")->space(AS_PROGRAM);
@@ -533,7 +530,7 @@ static DRIVER_INIT( esb )
 	memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xffff, 0, 0, "bank2");
 
 	/* prepare the matrix processor */
-	starwars_is_esb = 1;
+	state->is_esb = 1;
 	starwars_mproc_init(machine);
 
 	/* initialize banking */
@@ -543,9 +540,9 @@ static DRIVER_INIT( esb )
 	memory_set_bank(machine, "bank2", 0);
 
 	/* additional globals for state saving */
-	state_save_register_global(machine, slapstic_current_bank);
-	state_save_register_global(machine, slapstic_last_pc);
-	state_save_register_global(machine, slapstic_last_address);
+	state_save_register_global(machine, state->slapstic_current_bank);
+	state_save_register_global(machine, state->slapstic_last_pc);
+	state_save_register_global(machine, state->slapstic_last_address);
 }
 
 

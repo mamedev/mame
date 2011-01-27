@@ -7,20 +7,17 @@
 #include "emu.h"
 #include "includes/subs.h"
 
-static int subs_steering_buf1;
-static int subs_steering_buf2;
-static int subs_steering_val1;
-static int subs_steering_val2;
 
 /***************************************************************************
 subs_init_machine
 ***************************************************************************/
 MACHINE_RESET( subs )
 {
-	subs_steering_buf1 = 0;
-	subs_steering_buf2 = 0;
-	subs_steering_val1 = 0x00;
-	subs_steering_val2 = 0x00;
+	subs_state *state = machine->driver_data<subs_state>();
+	state->steering_buf1 = 0;
+	state->steering_buf2 = 0;
+	state->steering_val1 = 0x00;
+	state->steering_val2 = 0x00;
 }
 
 /***************************************************************************
@@ -42,60 +39,60 @@ Be sure to keep returning a direction until steer_reset is called.
 ***************************************************************************/
 static int subs_steering_1(running_machine *machine)
 {
-	static int last_val=0;
+	subs_state *state = machine->driver_data<subs_state>();
 	int this_val;
 	int delta;
 
 	this_val=input_port_read(machine, "DIAL2");
 
-	delta=this_val-last_val;
-	last_val=this_val;
+	delta=this_val-state->last_val_1;
+	state->last_val_1=this_val;
 	if (delta>128) delta-=256;
 	else if (delta<-128) delta+=256;
 	/* Divide by four to make our steering less sensitive */
-	subs_steering_buf1+=(delta/4);
+	state->steering_buf1+=(delta/4);
 
-	if (subs_steering_buf1>0)
+	if (state->steering_buf1>0)
 	{
-	      subs_steering_buf1--;
-	      subs_steering_val1=0xC0;
+	      state->steering_buf1--;
+	      state->steering_val1=0xC0;
 	}
-	else if (subs_steering_buf1<0)
+	else if (state->steering_buf1<0)
 	{
-	      subs_steering_buf1++;
-	      subs_steering_val1=0x80;
+	      state->steering_buf1++;
+	      state->steering_val1=0x80;
 	}
 
-	return subs_steering_val1;
+	return state->steering_val1;
 }
 
 static int subs_steering_2(running_machine *machine)
 {
-	static int last_val=0;
+	subs_state *state = machine->driver_data<subs_state>();
 	int this_val;
 	int delta;
 
 	this_val=input_port_read(machine, "DIAL1");
 
-	delta=this_val-last_val;
-	last_val=this_val;
+	delta=this_val-state->last_val_2;
+	state->last_val_2=this_val;
 	if (delta>128) delta-=256;
 	else if (delta<-128) delta+=256;
 	/* Divide by four to make our steering less sensitive */
-	subs_steering_buf2+=(delta/4);
+	state->steering_buf2+=(delta/4);
 
-	if (subs_steering_buf2>0)
+	if (state->steering_buf2>0)
 	{
-		subs_steering_buf2--;
-		subs_steering_val2=0xC0;
+		state->steering_buf2--;
+		state->steering_val2=0xC0;
 	}
-	else if (subs_steering_buf2<0)
+	else if (state->steering_buf2<0)
 	{
-		subs_steering_buf2++;
-		subs_steering_val2=0x80;
+		state->steering_buf2++;
+		state->steering_val2=0x80;
 	}
 
-	return subs_steering_val2;
+	return state->steering_val2;
 }
 
 /***************************************************************************
@@ -103,8 +100,9 @@ subs_steer_reset
 ***************************************************************************/
 WRITE8_HANDLER( subs_steer_reset_w )
 {
-    subs_steering_val1 = 0x00;
-    subs_steering_val2 = 0x00;
+	subs_state *state = space->machine->driver_data<subs_state>();
+	state->steering_val1 = 0x00;
+	state->steering_val2 = 0x00;
 }
 
 /***************************************************************************

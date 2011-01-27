@@ -311,6 +311,18 @@ public:
 		  m_nvram(*this, "nvram") { }
 
 	required_shared_ptr<UINT32>	m_nvram;
+	cpu_device *main_cpu;
+	UINT32 misc_control_data;
+	UINT8 eeprom_enable;
+	UINT32 *rom_base;
+	UINT32 *gpu_jump_address;
+	UINT8 gpu_command_pending;
+	UINT32 gpu_spin_pc;
+	UINT32 *main_speedup;
+	int main_speedup_hits;
+	UINT64 main_speedup_last_cycles;
+	UINT64 main_speedup_max_cycles;
+	UINT32 *main_gpu_wait;
 };
 
 
@@ -336,12 +348,8 @@ UINT8 cojag_is_r3000;
  *
  *************************************/
 
-static cpu_device *main_cpu;
 
-static UINT32 misc_control_data;
-static UINT8 eeprom_enable;
 
-static UINT32 *rom_base;
 
 
 
@@ -353,11 +361,12 @@ static UINT32 *rom_base;
 
 static MACHINE_RESET( cojag )
 {
+	cojag_state *state = machine->driver_data<cojag_state>();
 	UINT8 *rom = machine->region("user2")->base();
 
 	/* 68020 only: copy the interrupt vectors into RAM */
 	if (!cojag_is_r3000)
-		memcpy(jaguar_shared_ram, rom_base, 0x10);
+		memcpy(jaguar_shared_ram, state->rom_base, 0x10);
 
 	/* configure banks for gfx/sound ROMs */
 	if (rom)
@@ -400,6 +409,7 @@ static MACHINE_RESET( cojag )
 
 static READ32_HANDLER( misc_control_r )
 {
+	cojag_state *state = space->machine->driver_data<cojag_state>();
 	/*  D7    = board reset (low)
         D6    = audio must & reset (high)
         D5    = volume control data (invert on write)
@@ -407,12 +417,13 @@ static READ32_HANDLER( misc_control_r )
         D3-D1 = audio bank 2-0
         D0    = shared memory select (0=XBUS) */
 
-	return misc_control_data ^ 0x20;
+	return state->misc_control_data ^ 0x20;
 }
 
 
 static WRITE32_HANDLER( misc_control_w )
 {
+	cojag_state *state = space->machine->driver_data<cojag_state>();
 	logerror("%08X:misc_control_w(%02X)\n", cpu_get_previouspc(space->cpu), data);
 
 	/*  D7    = board reset (low)
@@ -441,7 +452,7 @@ static WRITE32_HANDLER( misc_control_w )
 		memory_set_bank(space->machine, "bank9", (data >> 1) & 7);
 	}
 
-	COMBINE_DATA(&misc_control_data);
+	COMBINE_DATA(&state->misc_control_data);
 }
 
 
@@ -529,15 +540,16 @@ static READ32_HANDLER( eeprom_data_r )
 
 static WRITE32_HANDLER( eeprom_enable_w )
 {
-	eeprom_enable = 1;
+	cojag_state *state = space->machine->driver_data<cojag_state>();
+	state->eeprom_enable = 1;
 }
 
 
 static WRITE32_HANDLER( eeprom_data_w )
 {
-//  if (eeprom_enable)
+	cojag_state *state = space->machine->driver_data<cojag_state>();
+//  if (state->eeprom_enable)
 	{
-		cojag_state *state = space->machine->driver_data<cojag_state>();
 		if (cojag_is_r3000)
 			state->m_nvram[offset] = data & 0x000000ff;
 		else
@@ -545,7 +557,7 @@ static WRITE32_HANDLER( eeprom_data_w )
 	}
 //  else
 //      logerror("%08X:error writing to disabled EEPROM\n", cpu_get_previouspc(space->cpu));
-	eeprom_enable = 0;
+	state->eeprom_enable = 0;
 }
 
 
@@ -577,38 +589,38 @@ static WRITE32_HANDLER( eeprom_data_w )
     run it until we get back to the spin loop.
 */
 
-static UINT32 *gpu_jump_address;
-static UINT8 gpu_command_pending;
-static UINT32 gpu_spin_pc;
 
 static TIMER_CALLBACK( gpu_sync_timer )
 {
+	cojag_state *state = machine->driver_data<cojag_state>();
 	/* if a command is still pending, and we haven't maxed out our timer, set a new one */
-	if (gpu_command_pending && param < 1000)
+	if (state->gpu_command_pending && param < 1000)
 		timer_set(machine, ATTOTIME_IN_USEC(50), NULL, ++param, gpu_sync_timer);
 }
 
 
 static WRITE32_HANDLER( gpu_jump_w )
 {
+	cojag_state *state = space->machine->driver_data<cojag_state>();
 	/* update the data in memory */
-	COMBINE_DATA(gpu_jump_address);
-	logerror("%08X:GPU jump address = %08X\n", cpu_get_previouspc(space->cpu), *gpu_jump_address);
+	COMBINE_DATA(state->gpu_jump_address);
+	logerror("%08X:GPU jump address = %08X\n", cpu_get_previouspc(space->cpu), *state->gpu_jump_address);
 
 	/* if the GPU is suspended, release it now */
 	jaguar_gpu_resume(space->machine);
 
 	/* start the sync timer going, and note that there is a command pending */
 	timer_call_after_resynch(space->machine, NULL, 0, gpu_sync_timer);
-	gpu_command_pending = 1;
+	state->gpu_command_pending = 1;
 }
 
 
 static READ32_HANDLER( gpu_jump_r )
 {
+	cojag_state *state = space->machine->driver_data<cojag_state>();
 	/* if the current GPU command is just pointing back to the spin loop, and */
 	/* we're reading it from the spin loop, we can optimize */
-	if (*gpu_jump_address == gpu_spin_pc && cpu_get_previouspc(space->cpu) == gpu_spin_pc)
+	if (*state->gpu_jump_address == state->gpu_spin_pc && cpu_get_previouspc(space->cpu) == state->gpu_spin_pc)
 	{
 #if ENABLE_SPEEDUP_HACKS
 		/* spin if we're allowed */
@@ -616,11 +628,11 @@ static READ32_HANDLER( gpu_jump_r )
 #endif
 
 		/* no command is pending */
-		gpu_command_pending = 0;
+		state->gpu_command_pending = 0;
 	}
 
 	/* return the current value */
-	return *gpu_jump_address;
+	return *state->gpu_jump_address;
 }
 
 
@@ -644,35 +656,32 @@ static READ32_HANDLER( gpu_jump_r )
 
 #if ENABLE_SPEEDUP_HACKS
 
-static UINT32 *main_speedup;
-static int main_speedup_hits;
-static UINT64 main_speedup_last_cycles;
-static UINT64 main_speedup_max_cycles;
 
 static READ32_HANDLER( cojagr3k_main_speedup_r )
 {
-	UINT64 curcycles = main_cpu->total_cycles();
+	cojag_state *state = space->machine->driver_data<cojag_state>();
+	UINT64 curcycles = state->main_cpu->total_cycles();
 
 	/* if it's been less than main_speedup_max_cycles cycles since the last time */
-	if (curcycles - main_speedup_last_cycles < main_speedup_max_cycles)
+	if (curcycles - state->main_speedup_last_cycles < state->main_speedup_max_cycles)
 	{
 		/* increment the count; if we hit 5, we can spin until an interrupt comes */
-		if (main_speedup_hits++ > 5)
+		if (state->main_speedup_hits++ > 5)
 		{
 			cpu_spinuntil_int(space->cpu);
-			main_speedup_hits = 0;
+			state->main_speedup_hits = 0;
 		}
 	}
 
 	/* if it's been more than main_speedup_max_cycles cycles, reset our count */
 	else
-		main_speedup_hits = 0;
+		state->main_speedup_hits = 0;
 
 	/* remember the last cycle count */
-	main_speedup_last_cycles = curcycles;
+	state->main_speedup_last_cycles = curcycles;
 
 	/* return the real value */
-	return *main_speedup;
+	return *state->main_speedup;
 }
 
 #endif
@@ -696,13 +705,13 @@ static READ32_HANDLER( cojagr3k_main_speedup_r )
 
 #if ENABLE_SPEEDUP_HACKS
 
-static UINT32 *main_gpu_wait;
 
 static READ32_HANDLER( main_gpu_wait_r )
 {
-	if (gpu_command_pending)
+	cojag_state *state = space->machine->driver_data<cojag_state>();
+	if (state->gpu_command_pending)
 		cpu_spinuntil_int(space->cpu);
-	return *main_gpu_wait;
+	return *state->main_gpu_wait;
 }
 
 #endif
@@ -726,28 +735,29 @@ static READ32_HANDLER( main_gpu_wait_r )
 
 static WRITE32_HANDLER( area51_main_speedup_w )
 {
-	UINT64 curcycles = main_cpu->total_cycles();
+	cojag_state *state = space->machine->driver_data<cojag_state>();
+	UINT64 curcycles = state->main_cpu->total_cycles();
 
 	/* store the data */
-	COMBINE_DATA(main_speedup);
+	COMBINE_DATA(state->main_speedup);
 
 	/* if it's been less than 400 cycles since the last time */
-	if (*main_speedup == 0 && curcycles - main_speedup_last_cycles < 400)
+	if (*state->main_speedup == 0 && curcycles - state->main_speedup_last_cycles < 400)
 	{
 		/* increment the count; if we hit 5, we can spin until an interrupt comes */
-		if (main_speedup_hits++ > 5)
+		if (state->main_speedup_hits++ > 5)
 		{
 			cpu_spinuntil_int(space->cpu);
-			main_speedup_hits = 0;
+			state->main_speedup_hits = 0;
 		}
 	}
 
 	/* if it's been more than 400 cycles, reset our count */
 	else
-		main_speedup_hits = 0;
+		state->main_speedup_hits = 0;
 
 	/* remember the last cycle count */
-	main_speedup_last_cycles = curcycles;
+	state->main_speedup_last_cycles = curcycles;
 }
 
 
@@ -760,28 +770,29 @@ static WRITE32_HANDLER( area51_main_speedup_w )
 
 static WRITE32_HANDLER( area51mx_main_speedup_w )
 {
-	UINT64 curcycles = main_cpu->total_cycles();
+	cojag_state *state = space->machine->driver_data<cojag_state>();
+	UINT64 curcycles = state->main_cpu->total_cycles();
 
 	/* store the data */
-	COMBINE_DATA(&main_speedup[offset]);
+	COMBINE_DATA(&state->main_speedup[offset]);
 
 	/* if it's been less than 450 cycles since the last time */
-	if (((main_speedup[0] << 16) | (main_speedup[1] >> 16)) == 0 && curcycles - main_speedup_last_cycles < 450)
+	if (((state->main_speedup[0] << 16) | (state->main_speedup[1] >> 16)) == 0 && curcycles - state->main_speedup_last_cycles < 450)
 	{
 		/* increment the count; if we hit 5, we can spin until an interrupt comes */
-		if (main_speedup_hits++ > 10)
+		if (state->main_speedup_hits++ > 10)
 		{
 			cpu_spinuntil_int(space->cpu);
-			main_speedup_hits = 0;
+			state->main_speedup_hits = 0;
 		}
 	}
 
 	/* if it's been more than 450 cycles, reset our count */
 	else
-		main_speedup_hits = 0;
+		state->main_speedup_hits = 0;
 
 	/* remember the last cycle count */
-	main_speedup_last_cycles = curcycles;
+	state->main_speedup_last_cycles = curcycles;
 }
 
 #endif
@@ -819,13 +830,13 @@ static ADDRESS_MAP_START( r3000_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x14000004, 0x14000007) AM_WRITE(watchdog_reset32_w)
 	AM_RANGE(0x16000000, 0x16000003) AM_WRITE(eeprom_enable_w)
 	AM_RANGE(0x18000000, 0x18001fff) AM_READWRITE(eeprom_data_r, eeprom_data_w) AM_SHARE("nvram")
-	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("user1", 0) AM_BASE(&rom_base)
+	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("user1", 0) AM_BASE_MEMBER(cojag_state, rom_base)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( m68020_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x7fffff) AM_RAM AM_BASE(&jaguar_shared_ram) AM_SHARE("share1")
-	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("user1", 0) AM_BASE(&rom_base)
+	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("user1", 0) AM_BASE_MEMBER(cojag_state, rom_base)
 	AM_RANGE(0xa00000, 0xa1ffff) AM_RAM
 	AM_RANGE(0xa20000, 0xa21fff) AM_READWRITE(eeprom_data_r, eeprom_data_w) AM_SHARE("nvram")
 	AM_RANGE(0xa30000, 0xa30003) AM_WRITE(watchdog_reset32_w)
@@ -1518,9 +1529,10 @@ ROM_END
 
 static void cojag_common_init(running_machine *machine, UINT16 gpu_jump_offs, UINT16 spin_pc)
 {
+	cojag_state *state = machine->driver_data<cojag_state>();
 	/* copy over the ROM */
-	main_cpu = machine->device<cpu_device>("maincpu");
-	cojag_is_r3000 = (main_cpu->type() == R3041BE);
+	state->main_cpu = machine->device<cpu_device>("maincpu");
+	cojag_is_r3000 = (state->main_cpu->type() == R3041BE);
 
 	/* install synchronization hooks for GPU */
 	if (cojag_is_r3000)
@@ -1528,8 +1540,8 @@ static void cojag_common_init(running_machine *machine, UINT16 gpu_jump_offs, UI
 	else
 		memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf0b000 + gpu_jump_offs, 0xf0b003 + gpu_jump_offs, 0, 0, gpu_jump_w);
 	memory_install_read32_handler(cputag_get_address_space(machine, "gpu", ADDRESS_SPACE_PROGRAM), 0xf03000 + gpu_jump_offs, 0xf03003 + gpu_jump_offs, 0, 0, gpu_jump_r);
-	gpu_jump_address = &jaguar_gpu_ram[gpu_jump_offs/4];
-	gpu_spin_pc = 0xf03000 + spin_pc;
+	state->gpu_jump_address = &jaguar_gpu_ram[gpu_jump_offs/4];
+	state->gpu_spin_pc = 0xf03000 + spin_pc;
 
 	/* init the sound system and install DSP speedups */
 	cojag_sound_init(machine);
@@ -1538,92 +1550,99 @@ static void cojag_common_init(running_machine *machine, UINT16 gpu_jump_offs, UI
 
 static DRIVER_INIT( area51a )
 {
+	cojag_state *state = machine->driver_data<cojag_state>();
 	cojag_common_init(machine, 0x5c4, 0x5a0);
 
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
-	main_speedup = memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa02030, 0xa02033, 0, 0, area51_main_speedup_w);
+	state->main_speedup = memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa02030, 0xa02033, 0, 0, area51_main_speedup_w);
 #endif
 }
 
 
 static DRIVER_INIT( area51 )
 {
+	cojag_state *state = machine->driver_data<cojag_state>();
 	cojag_common_init(machine, 0x0c0, 0x09e);
 
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
-	main_speedup_max_cycles = 120;
-	main_speedup = memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x100062e8, 0x100062eb, 0, 0, cojagr3k_main_speedup_r);
+	state->main_speedup_max_cycles = 120;
+	state->main_speedup = memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x100062e8, 0x100062eb, 0, 0, cojagr3k_main_speedup_r);
 #endif
 }
 
 static DRIVER_INIT( maxforce )
 {
+	cojag_state *state = machine->driver_data<cojag_state>();
 	cojag_common_init(machine, 0x0c0, 0x09e);
 
 	/* patch the protection */
-	rom_base[0x220/4] = 0x03e00008;
+	state->rom_base[0x220/4] = 0x03e00008;
 
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
-	main_speedup_max_cycles = 120;
-	main_speedup = memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1000865c, 0x1000865f, 0, 0, cojagr3k_main_speedup_r);
+	state->main_speedup_max_cycles = 120;
+	state->main_speedup = memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1000865c, 0x1000865f, 0, 0, cojagr3k_main_speedup_r);
 #endif
 }
 
 
 static DRIVER_INIT( area51mx )
 {
+	cojag_state *state = machine->driver_data<cojag_state>();
 	cojag_common_init(machine, 0x0c0, 0x09e);
 
 	/* patch the protection */
-	rom_base[0x418/4] = 0x4e754e75;
+	state->rom_base[0x418/4] = 0x4e754e75;
 
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
-	main_speedup = memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa19550, 0xa19557, 0, 0, area51mx_main_speedup_w);
+	state->main_speedup = memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa19550, 0xa19557, 0, 0, area51mx_main_speedup_w);
 #endif
 }
 
 
 static DRIVER_INIT( a51mxr3k )
 {
+	cojag_state *state = machine->driver_data<cojag_state>();
 	cojag_common_init(machine, 0x0c0, 0x09e);
 
 	/* patch the protection */
-	rom_base[0x220/4] = 0x03e00008;
+	state->rom_base[0x220/4] = 0x03e00008;
 
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
-	main_speedup_max_cycles = 120;
-	main_speedup = memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x10006f0c, 0x10006f0f, 0, 0, cojagr3k_main_speedup_r);
+	state->main_speedup_max_cycles = 120;
+	state->main_speedup = memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x10006f0c, 0x10006f0f, 0, 0, cojagr3k_main_speedup_r);
 #endif
 }
 
 
 static DRIVER_INIT( fishfren )
 {
+	cojag_state *state = machine->driver_data<cojag_state>();
 	cojag_common_init(machine, 0x578, 0x554);
 
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
-	main_speedup_max_cycles = 200;
-	main_speedup = memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x10021b60, 0x10021b63, 0, 0, cojagr3k_main_speedup_r);
+	state->main_speedup_max_cycles = 200;
+	state->main_speedup = memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x10021b60, 0x10021b63, 0, 0, cojagr3k_main_speedup_r);
 #endif
 }
 
 
 static void init_freeze_common(running_machine *machine, offs_t main_speedup_addr)
 {
+	cojag_state *state = machine->driver_data<cojag_state>();
 	cojag_common_init(machine, 0x0bc, 0x09c);
 
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
-	main_speedup_max_cycles = 200;
+	state->main_speedup_max_cycles = 200;
 	if (main_speedup_addr != 0)
-		main_speedup = memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), main_speedup_addr, main_speedup_addr + 3, 0, 0, cojagr3k_main_speedup_r);
-	main_gpu_wait = memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0400d900, 0x0400d900 + 3, 0, 0, main_gpu_wait_r);
+		state->main_speedup = memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), main_speedup_addr, main_speedup_addr + 3, 0, 0, cojagr3k_main_speedup_r);
+	state->main_gpu_wait = memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0400d900, 0x0400d900 + 3, 0, 0, main_gpu_wait_r);
 #endif
 }
 
@@ -1637,12 +1656,13 @@ static DRIVER_INIT( freezeat6 ) { init_freeze_common(machine, 0x10019684); }
 
 static DRIVER_INIT( vcircle )
 {
+	cojag_state *state = machine->driver_data<cojag_state>();
 	cojag_common_init(machine, 0x5c0, 0x5a0);
 
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
-	main_speedup_max_cycles = 50;
-	main_speedup = memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x12005b34, 0x12005b37, 0, 0, cojagr3k_main_speedup_r);
+	state->main_speedup_max_cycles = 50;
+	state->main_speedup = memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x12005b34, 0x12005b37, 0, 0, cojagr3k_main_speedup_r);
 #endif
 }
 

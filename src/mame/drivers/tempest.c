@@ -285,6 +285,17 @@ Version 1 for Tempest Analog Vector-Generator PCB Assembly A037383-01 or A037383
 #include "machine/atari_vg.h"
 #include "sound/pokey.h"
 
+
+class tempest_state : public driver_device
+{
+public:
+	tempest_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 player_select;
+};
+
+
 #define MASTER_CLOCK (XTAL_12_096MHz)
 #define CLOCK_3KHZ  (MASTER_CLOCK / 4096)
 
@@ -294,11 +305,11 @@ Version 1 for Tempest Analog Vector-Generator PCB Assembly A037383-01 or A037383
 #define TEMPEST_BUTTONS_P2_TAG	("BUTTONSP2")
 
 
-static UINT8 tempest_player_select;
 
 static MACHINE_START( tempest )
 {
-	state_save_register_global(machine, tempest_player_select);
+	tempest_state *state = machine->driver_data<tempest_state>();
+	state_save_register_global(machine, state->player_select);
 }
 
 /*************************************
@@ -321,13 +332,15 @@ static WRITE8_HANDLER( wdclr_w )
 
 static CUSTOM_INPUT( tempest_knob_r )
 {
-	return input_port_read(field->port->machine, (tempest_player_select == 0) ?
+	tempest_state *state = field->port->machine->driver_data<tempest_state>();
+	return input_port_read(field->port->machine, (state->player_select == 0) ?
 										TEMPEST_KNOB_P1_TAG : TEMPEST_KNOB_P2_TAG);
 }
 
 static CUSTOM_INPUT( tempest_buttons_r )
 {
-	return input_port_read(field->port->machine, (tempest_player_select == 0) ?
+	tempest_state *state = field->port->machine->driver_data<tempest_state>();
+	return input_port_read(field->port->machine, (state->player_select == 0) ?
 										TEMPEST_BUTTONS_P1_TAG : TEMPEST_BUTTONS_P2_TAG);
 }
 
@@ -360,10 +373,11 @@ static READ8_DEVICE_HANDLER( input_port_2_bit_r )
 
 static WRITE8_HANDLER( tempest_led_w )
 {
+	tempest_state *state = space->machine->driver_data<tempest_state>();
 	set_led_status(space->machine, 0, ~data & 0x02);
 	set_led_status(space->machine, 1, ~data & 0x01);
 	/* FLIP is bit 0x04 */
-	tempest_player_select = data & 0x04;
+	state->player_select = data & 0x04;
 }
 
 
@@ -570,7 +584,7 @@ static const pokey_interface pokey_interface_2 =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tempest, driver_device )
+static MACHINE_CONFIG_START( tempest, tempest_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)

@@ -7,18 +7,6 @@ Atari Sprint 8 video emulation
 #include "emu.h"
 #include "includes/sprint8.h"
 
-UINT8* sprint8_video_ram;
-UINT8* sprint8_pos_h_ram;
-UINT8* sprint8_pos_v_ram;
-UINT8* sprint8_pos_d_ram;
-UINT8* sprint8_team;
-
-static tilemap_t* tilemap1;
-static tilemap_t* tilemap2;
-
-static bitmap_t* helper1;
-static bitmap_t* helper2;
-
 
 PALETTE_INIT( sprint8 )
 {
@@ -40,13 +28,13 @@ PALETTE_INIT( sprint8 )
 }
 
 
-static void set_pens(colortable_t *colortable)
+static void set_pens(sprint8_state *state, colortable_t *colortable)
 {
 	int i;
 
 	for (i = 0; i < 0x10; i += 8)
 	{
-		if (*sprint8_team & 1)
+		if (*state->team & 1)
 		{
 			colortable_palette_set_color(colortable, i + 0, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
 			colortable_palette_set_color(colortable, i + 1, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
@@ -77,7 +65,8 @@ static void set_pens(colortable_t *colortable)
 
 static TILE_GET_INFO( get_tile_info1 )
 {
-	UINT8 code = sprint8_video_ram[tile_index];
+	sprint8_state *state = machine->driver_data<sprint8_state>();
+	UINT8 code = state->video_ram[tile_index];
 
 	int color = 0;
 
@@ -102,7 +91,8 @@ static TILE_GET_INFO( get_tile_info1 )
 
 static TILE_GET_INFO( get_tile_info2 )
 {
-	UINT8 code = sprint8_video_ram[tile_index];
+	sprint8_state *state = machine->driver_data<sprint8_state>();
+	UINT8 code = state->video_ram[tile_index];
 
 	int color = 0;
 
@@ -117,35 +107,38 @@ static TILE_GET_INFO( get_tile_info2 )
 
 WRITE8_HANDLER( sprint8_video_ram_w )
 {
-	sprint8_video_ram[offset] = data;
-	tilemap_mark_tile_dirty(tilemap1, offset);
-	tilemap_mark_tile_dirty(tilemap2, offset);
+	sprint8_state *state = space->machine->driver_data<sprint8_state>();
+	state->video_ram[offset] = data;
+	tilemap_mark_tile_dirty(state->tilemap1, offset);
+	tilemap_mark_tile_dirty(state->tilemap2, offset);
 }
 
 
 VIDEO_START( sprint8 )
 {
-	helper1 = machine->primary_screen->alloc_compatible_bitmap();
-	helper2 = machine->primary_screen->alloc_compatible_bitmap();
+	sprint8_state *state = machine->driver_data<sprint8_state>();
+	state->helper1 = machine->primary_screen->alloc_compatible_bitmap();
+	state->helper2 = machine->primary_screen->alloc_compatible_bitmap();
 
-	tilemap1 = tilemap_create(machine, get_tile_info1, tilemap_scan_rows, 16, 8, 32, 32);
-	tilemap2 = tilemap_create(machine, get_tile_info2, tilemap_scan_rows, 16, 8, 32, 32);
+	state->tilemap1 = tilemap_create(machine, get_tile_info1, tilemap_scan_rows, 16, 8, 32, 32);
+	state->tilemap2 = tilemap_create(machine, get_tile_info2, tilemap_scan_rows, 16, 8, 32, 32);
 
-	tilemap_set_scrolly(tilemap1, 0, +24);
-	tilemap_set_scrolly(tilemap2, 0, +24);
+	tilemap_set_scrolly(state->tilemap1, 0, +24);
+	tilemap_set_scrolly(state->tilemap2, 0, +24);
 }
 
 
 static void draw_sprites(running_machine *machine, bitmap_t* bitmap, const rectangle *cliprect)
 {
+	sprint8_state *state = machine->driver_data<sprint8_state>();
 	int i;
 
 	for (i = 0; i < 16; i++)
 	{
-		UINT8 code = sprint8_pos_d_ram[i];
+		UINT8 code = state->pos_d_ram[i];
 
-		int x = sprint8_pos_h_ram[i];
-		int y = sprint8_pos_v_ram[i];
+		int x = state->pos_h_ram[i];
+		int y = state->pos_v_ram[i];
 
 		if (code & 0x80)
 			x |= 0x100;
@@ -167,8 +160,9 @@ static TIMER_CALLBACK( sprint8_collision_callback )
 
 VIDEO_UPDATE( sprint8 )
 {
-	set_pens(screen->machine->colortable);
-	tilemap_draw(bitmap, cliprect, tilemap1, 0, 0);
+	sprint8_state *state = screen->machine->driver_data<sprint8_state>();
+	set_pens(state, screen->machine->colortable);
+	tilemap_draw(bitmap, cliprect, state->tilemap1, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }
@@ -176,20 +170,21 @@ VIDEO_UPDATE( sprint8 )
 
 VIDEO_EOF( sprint8 )
 {
+	sprint8_state *state = machine->driver_data<sprint8_state>();
 	int x;
 	int y;
 	const rectangle &visarea = machine->primary_screen->visible_area();
 
-	tilemap_draw(helper2, &visarea, tilemap2, 0, 0);
+	tilemap_draw(state->helper2, &visarea, state->tilemap2, 0, 0);
 
-	bitmap_fill(helper1, &visarea, 0x20);
+	bitmap_fill(state->helper1, &visarea, 0x20);
 
-	draw_sprites(machine, helper1, &visarea);
+	draw_sprites(machine, state->helper1, &visarea);
 
 	for (y = visarea.min_y; y <= visarea.max_y; y++)
 	{
-		const UINT16* p1 = BITMAP_ADDR16(helper1, y, 0);
-		const UINT16* p2 = BITMAP_ADDR16(helper2, y, 0);
+		const UINT16* p1 = BITMAP_ADDR16(state->helper1, y, 0);
+		const UINT16* p2 = BITMAP_ADDR16(state->helper2, y, 0);
 
 		for (x = visarea.min_x; x <= visarea.max_x; x++)
 			if (p1[x] != 0x20 && p2[x] == 0x23)

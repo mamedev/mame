@@ -34,6 +34,16 @@ public:
 	emu_timer *		yscroll_reset_timer;
 	UINT32			playfield_tile_bank[2];
 	UINT32			videobank;
+	
+	// 720 fake joystick
+	double			joy_last_angle;
+	int				joy_rotations;
+	
+	// 720 fake spinner
+	UINT32 			spin_last_rotate_count;
+	INT32  			spin_pos;					/* track fake position of spinner */
+	UINT32 			spin_center_count;
+
 	UINT16			vram[0x8000/2];
 };
 

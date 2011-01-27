@@ -39,6 +39,7 @@ static CUSTOM_INPUT( wolfpack_dial_r )
 
 static READ8_HANDLER( wolfpack_misc_r )
 {
+	wolfpack_state *state = space->machine->driver_data<wolfpack_state>();
 	device_t *device = space->machine->device("speech");
 	UINT8 val = 0;
 
@@ -54,7 +55,7 @@ static READ8_HANDLER( wolfpack_misc_r )
 	if (!s14001a_bsy_r(device))
         val |= 0x01;
 
-	if (!wolfpack_collision)
+	if (!state->collision)
 		val |= 0x10;
 
 	if (space->machine->primary_screen->vpos() >= 240)
@@ -103,14 +104,15 @@ static WRITE8_HANDLER( wolfpack_credit_w )
 
 static WRITE8_HANDLER( wolfpack_coldetres_w )
 {
-	wolfpack_collision = 0;
+	wolfpack_state *state = space->machine->driver_data<wolfpack_state>();
+	state->collision = 0;
 }
 
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x100)
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x1000, 0x10ff) AM_WRITEONLY AM_BASE(&wolfpack_alpha_num_ram)
+	AM_RANGE(0x1000, 0x10ff) AM_WRITEONLY AM_BASE_MEMBER(wolfpack_state, alpha_num_ram)
 	AM_RANGE(0x2000, 0x2000) AM_READ(wolfpack_misc_r)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(wolfpack_high_explo_w)
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(wolfpack_sonar_ping_w)
@@ -284,7 +286,7 @@ static GFXDECODE_START( wolfpack )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( wolfpack, driver_device )
+static MACHINE_CONFIG_START( wolfpack, wolfpack_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	/* basic machine hardware */

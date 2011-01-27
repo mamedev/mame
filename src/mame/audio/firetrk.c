@@ -11,8 +11,9 @@
 
 WRITE8_DEVICE_HANDLER( firetrk_skid_reset_w )
 {
-	firetrk_skid[0] = 0;
-	firetrk_skid[1] = 0;
+	firetrk_state *state = device->machine->driver_data<firetrk_state>();
+	state->skid[0] = 0;
+	state->skid[1] = 0;
 
 	// also SUPERBUG_SKID_EN
 	discrete_sound_w(device, FIRETRUCK_SKID_EN, 1);

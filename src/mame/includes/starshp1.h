@@ -30,35 +30,40 @@
 #define STARSHP1_VBSTART			(0x0f0)
 
 
-/*----------- defined in drivers/starshp1.c -----------*/
+class starshp1_state : public driver_device
+{
+public:
+	starshp1_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-extern int starshp1_attract;
+	int analog_in_select;
+	int attract;
+	UINT8 *playfield_ram;
+	UINT8 *hpos_ram;
+	UINT8 *vpos_ram;
+	UINT8 *obj_ram;
+	int ship_explode;
+	int ship_picture;
+	int ship_hoffset;
+	int ship_voffset;
+	int ship_size;
+	int circle_hpos;
+	int circle_vpos;
+	int circle_size;
+	int circle_mod;
+	int circle_kill;
+	int phasor;
+	int collision_latch;
+	int starfield_kill;
+	int mux;
+	int inverse;
+	UINT16 *LSFR;
+	bitmap_t *helper;
+	tilemap_t *bg_tilemap;
+};
 
 
 /*----------- defined in video/starshp1.c -----------*/
-
-extern UINT8 *starshp1_playfield_ram;
-extern UINT8 *starshp1_hpos_ram;
-extern UINT8 *starshp1_vpos_ram;
-extern UINT8 *starshp1_obj_ram;
-
-extern int starshp1_ship_explode;
-extern int starshp1_ship_picture;
-extern int starshp1_ship_hoffset;
-extern int starshp1_ship_voffset;
-extern int starshp1_ship_size;
-
-extern int starshp1_circle_hpos;
-extern int starshp1_circle_vpos;
-extern int starshp1_circle_size;
-extern int starshp1_circle_mod;
-extern int starshp1_circle_kill;
-
-extern int starshp1_phasor;
-extern int starshp1_collision_latch;
-extern int starshp1_starfield_kill;
-extern int starshp1_mux;
-extern int starshp1_inverse;
 
 READ8_HANDLER( starshp1_rng_r );
 

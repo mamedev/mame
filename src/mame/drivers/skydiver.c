@@ -94,7 +94,6 @@
 
 #define MASTER_CLOCK (XTAL_12_096MHz)
 
-static int skydiver_nmion;
 
 
 
@@ -141,22 +140,24 @@ static PALETTE_INIT( skydiver )
 
 static WRITE8_HANDLER( skydiver_nmion_w )
 {
-	skydiver_nmion = offset;
+	skydiver_state *state = space->machine->driver_data<skydiver_state>();
+	state->nmion = offset;
 }
 
 
 static INTERRUPT_GEN( skydiver_interrupt )
 {
+	skydiver_state *state = device->machine->driver_data<skydiver_state>();
 	device_t *discrete = device->machine->device("discrete");
 
 	/* Convert range data to divide value and write to sound */
-	discrete_sound_w(discrete, SKYDIVER_RANGE_DATA, (0x01 << (~skydiver_videoram[0x394] & 0x07)) & 0xff);	// Range 0-2
+	discrete_sound_w(discrete, SKYDIVER_RANGE_DATA, (0x01 << (~state->videoram[0x394] & 0x07)) & 0xff);	// Range 0-2
 
-	discrete_sound_w(discrete, SKYDIVER_RANGE3_EN,  skydiver_videoram[0x394] & 0x08);		// Range 3 - note disable
-	discrete_sound_w(discrete, SKYDIVER_NOTE_DATA, ~skydiver_videoram[0x395] & 0xff);		// Note - freq
-	discrete_sound_w(discrete, SKYDIVER_NOISE_DATA,  skydiver_videoram[0x396] & 0x0f);	// NAM - Noise Amplitude
+	discrete_sound_w(discrete, SKYDIVER_RANGE3_EN,  state->videoram[0x394] & 0x08);		// Range 3 - note disable
+	discrete_sound_w(discrete, SKYDIVER_NOTE_DATA, ~state->videoram[0x395] & 0xff);		// Note - freq
+	discrete_sound_w(discrete, SKYDIVER_NOISE_DATA,  state->videoram[0x396] & 0x0f);	// NAM - Noise Amplitude
 
-	if (skydiver_nmion)
+	if (state->nmion)
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -190,7 +191,7 @@ static ADDRESS_MAP_START( skydiver_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x4300) AM_READWRITE(skydiver_wram_r, skydiver_wram_w)
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x4000) AM_RAM		/* RAM B1 */
-	AM_RANGE(0x0400, 0x07ff) AM_MIRROR(0x4000) AM_RAM_WRITE(skydiver_videoram_w) AM_BASE(&skydiver_videoram)		/* RAMs K1,M1,P1,J1,N1,K/L1,L1,H/J1 */
+	AM_RANGE(0x0400, 0x07ff) AM_MIRROR(0x4000) AM_RAM_WRITE(skydiver_videoram_w) AM_BASE_MEMBER(skydiver_state, videoram)		/* RAMs K1,M1,P1,J1,N1,K/L1,L1,H/J1 */
 	AM_RANGE(0x0800, 0x0801) AM_MIRROR(0x47f0) AM_WRITE(skydiver_lamp_s_w)
 	AM_RANGE(0x0802, 0x0803) AM_MIRROR(0x47f0) AM_WRITE(skydiver_lamp_k_w)
 	AM_RANGE(0x0804, 0x0805) AM_MIRROR(0x47f0) AM_WRITE(skydiver_start_lamp_1_w)
@@ -371,7 +372,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( skydiver, driver_device )
+static MACHINE_CONFIG_START( skydiver, skydiver_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800,MASTER_CLOCK/16)	   /* ???? */

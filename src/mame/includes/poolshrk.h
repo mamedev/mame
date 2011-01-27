@@ -8,6 +8,20 @@
 
 /* Discrete Sound Input Nodes */
 
+class poolshrk_state : public driver_device
+{
+public:
+	poolshrk_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	int da_latch;
+	UINT8* playfield_ram;
+	UINT8* hpos_ram;
+	UINT8* vpos_ram;
+	tilemap_t* bg_tilemap;
+};
+
+
 /*----------- defined in audio/poolshrk.c -----------*/
 
 WRITE8_DEVICE_HANDLER( poolshrk_scratch_sound_w );
@@ -23,6 +37,3 @@ DISCRETE_SOUND_EXTERN( poolshrk );
 VIDEO_START( poolshrk );
 VIDEO_UPDATE( poolshrk );
 
-extern UINT8* poolshrk_playfield_ram;
-extern UINT8* poolshrk_hpos_ram;
-extern UINT8* poolshrk_vpos_ram;

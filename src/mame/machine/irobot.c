@@ -21,34 +21,12 @@
  * too high.
  */
 
-#define IR_TIMING				1		/* try to emulate MB and VG running time */
 #define DISASSEMBLE_MB_ROM		0		/* generate a disassembly of the mathbox ROMs */
 
 #define IR_CPU_STATE(m) \
 	logerror(\
 			"%s, scanline: %d\n", cpuexec_describe_context(m), (m)->primary_screen->vpos())
 
-
-UINT8 irobot_vg_clear;
-static UINT8 irvg_vblank;
-static UINT8 irvg_running;
-static UINT8 irmb_running;
-
-#if IR_TIMING
-static timer_device *irvg_timer;
-static timer_device *irmb_timer;
-#endif
-
-static UINT8 *comRAM[2], *mbRAM, *mbROM;
-static UINT8 irobot_control_num = 0;
-static UINT8 irobot_statwr;
-static UINT8 irobot_out0;
-static UINT8 irobot_outx,irobot_mpage;
-
-static UINT8 *irobot_combase_mb;
-UINT8 *irobot_combase;
-UINT8 irobot_bufsel;
-UINT8 irobot_alphamap;
 
 static void irmb_run(running_machine *machine);
 
@@ -59,17 +37,18 @@ static void irmb_run(running_machine *machine);
 
 READ8_HANDLER( irobot_sharedmem_r )
 {
-	if (irobot_outx == 3)
-		return mbRAM[BYTE_XOR_BE(offset)];
+	irobot_state *state = space->machine->driver_data<irobot_state>();
+	if (state->outx == 3)
+		return state->mbRAM[BYTE_XOR_BE(offset)];
 
-	if (irobot_outx == 2)
-		return irobot_combase[BYTE_XOR_BE(offset & 0xFFF)];
+	if (state->outx == 2)
+		return state->combase[BYTE_XOR_BE(offset & 0xFFF)];
 
-	if (irobot_outx == 0)
-		return mbROM[((irobot_mpage & 1) << 13) + BYTE_XOR_BE(offset)];
+	if (state->outx == 0)
+		return state->mbROM[((state->mpage & 1) << 13) + BYTE_XOR_BE(offset)];
 
-	if (irobot_outx == 1)
-		return mbROM[0x4000 + ((irobot_mpage & 3) << 13) + BYTE_XOR_BE(offset)];
+	if (state->outx == 1)
+		return state->mbROM[0x4000 + ((state->mpage & 3) << 13) + BYTE_XOR_BE(offset)];
 
 	return 0xFF;
 }
@@ -77,55 +56,59 @@ READ8_HANDLER( irobot_sharedmem_r )
 /* Comment out the mbRAM =, comRAM2 = or comRAM1 = and it will start working */
 WRITE8_HANDLER( irobot_sharedmem_w )
 {
-	if (irobot_outx == 3)
-		mbRAM[BYTE_XOR_BE(offset)] = data;
+	irobot_state *state = space->machine->driver_data<irobot_state>();
+	if (state->outx == 3)
+		state->mbRAM[BYTE_XOR_BE(offset)] = data;
 
-	if (irobot_outx == 2)
-		irobot_combase[BYTE_XOR_BE(offset & 0xFFF)] = data;
+	if (state->outx == 2)
+		state->combase[BYTE_XOR_BE(offset & 0xFFF)] = data;
 }
 
 TIMER_DEVICE_CALLBACK( irobot_irvg_done_callback )
 {
+	irobot_state *state = timer.machine->driver_data<irobot_state>();
 	logerror("vg done. ");
-	irvg_running = 0;
+	state->irvg_running = 0;
 }
 
 WRITE8_HANDLER( irobot_statwr_w )
 {
+	irobot_state *state = space->machine->driver_data<irobot_state>();
 	logerror("write %2x ", data);
 	IR_CPU_STATE(space->machine);
 
-	irobot_combase = comRAM[data >> 7];
-	irobot_combase_mb = comRAM[(data >> 7) ^ 1];
-	irobot_bufsel = data & 0x02;
-	if (((data & 0x01) == 0x01) && (irobot_vg_clear == 0))
+	state->combase = state->comRAM[data >> 7];
+	state->combase_mb = state->comRAM[(data >> 7) ^ 1];
+	state->bufsel = data & 0x02;
+	if (((data & 0x01) == 0x01) && (state->vg_clear == 0))
 		irobot_poly_clear(space->machine);
 
-	irobot_vg_clear = data & 0x01;
+	state->vg_clear = data & 0x01;
 
-	if ((data & 0x04) && !(irobot_statwr & 0x04))
+	if ((data & 0x04) && !(state->statwr & 0x04))
 	{
-		irobot_run_video();
+		irobot_run_video(space->machine);
 #if IR_TIMING
-		if (irvg_running == 0)
+		if (state->irvg_running == 0)
 			logerror("vg start ");
 		else
 			logerror("vg start [busy!] ");
 		IR_CPU_STATE(space->machine);
-		irvg_timer->adjust(ATTOTIME_IN_MSEC(10));
+		state->irvg_timer->adjust(ATTOTIME_IN_MSEC(10));
 #endif
-		irvg_running=1;
+		state->irvg_running=1;
 	}
-	if ((data & 0x10) && !(irobot_statwr & 0x10))
+	if ((data & 0x10) && !(state->statwr & 0x10))
 		irmb_run(space->machine);
-	irobot_statwr = data;
+	state->statwr = data;
 }
 
 WRITE8_HANDLER( irobot_out0_w )
 {
+	irobot_state *state = space->machine->driver_data<irobot_state>();
 	UINT8 *RAM = space->machine->region("maincpu")->base();
 
-	irobot_out0 = data;
+	state->out0 = data;
 	switch (data & 0x60)
 	{
 		case 0:
@@ -138,9 +121,9 @@ WRITE8_HANDLER( irobot_out0_w )
 			memory_set_bankptr(space->machine, "bank2", &RAM[0x1D000]);
 			break;
 	}
-	irobot_outx = (data & 0x18) >> 3;
-	irobot_mpage = (data & 0x06) >> 1;
-	irobot_alphamap = (data & 0x80);
+	state->outx = (data & 0x18) >> 3;
+	state->mpage = (data & 0x06) >> 1;
+	state->alphamap = (data & 0x80);
 }
 
 WRITE8_HANDLER( irobot_rom_banksel_w )
@@ -174,10 +157,11 @@ WRITE8_HANDLER( irobot_rom_banksel_w )
 
 static TIMER_CALLBACK( scanline_callback )
 {
+	irobot_state *state = machine->driver_data<irobot_state>();
 	int scanline = param;
 
-    if (scanline == 0) irvg_vblank=0;
-    if (scanline == 224) irvg_vblank=1;
+    if (scanline == 0) state->irvg_vblank=0;
+    if (scanline == 224) state->irvg_vblank=1;
     logerror("SCANLINE CALLBACK %d\n",scanline);
     /* set the IRQ line state based on the 32V line state */
     cputag_set_input_line(machine, "maincpu", M6809_IRQ_LINE, (scanline & 32) ? ASSERT_LINE : CLEAR_LINE);
@@ -190,42 +174,45 @@ static TIMER_CALLBACK( scanline_callback )
 
 MACHINE_RESET( irobot )
 {
+	irobot_state *state = machine->driver_data<irobot_state>();
 	UINT8 *MB = machine->region("mathbox")->base();
 
 	/* initialize the memory regions */
-	mbROM		= MB + 0x00000;
-	mbRAM		= MB + 0x0c000;
-	comRAM[0]	= MB + 0x0e000;
-	comRAM[1]	= MB + 0x0f000;
+	state->mbROM		= MB + 0x00000;
+	state->mbRAM		= MB + 0x0c000;
+	state->comRAM[0]	= MB + 0x0e000;
+	state->comRAM[1]	= MB + 0x0f000;
 
-	irvg_vblank=0;
-	irvg_running = 0;
-	irvg_timer = machine->device<timer_device>("irvg_timer");
-	irmb_running = 0;
-	irmb_timer = machine->device<timer_device>("irmb_timer");
+	state->irvg_vblank=0;
+	state->irvg_running = 0;
+	state->irvg_timer = machine->device<timer_device>("irvg_timer");
+	state->irmb_running = 0;
+	state->irmb_timer = machine->device<timer_device>("irmb_timer");
 
 	/* set an initial timer to go off on scanline 0 */
 	timer_set(machine, machine->primary_screen->time_until_pos(0), NULL, 0, scanline_callback);
 
 	irobot_rom_banksel_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),0,0);
 	irobot_out0_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),0,0);
-	irobot_combase = comRAM[0];
-	irobot_combase_mb = comRAM[1];
-	irobot_outx = 0;
+	state->combase = state->comRAM[0];
+	state->combase_mb = state->comRAM[1];
+	state->outx = 0;
 }
 
 WRITE8_HANDLER( irobot_control_w )
 {
+	irobot_state *state = space->machine->driver_data<irobot_state>();
 
-	irobot_control_num = offset & 0x03;
+	state->control_num = offset & 0x03;
 }
 
 READ8_HANDLER( irobot_control_r )
 {
+	irobot_state *state = space->machine->driver_data<irobot_state>();
 
-	if (irobot_control_num == 0)
+	if (state->control_num == 0)
 		return input_port_read(space->machine, "AN0");
-	else if (irobot_control_num == 1)
+	else if (state->control_num == 1)
 		return input_port_read(space->machine, "AN1");
 	return 0;
 
@@ -235,21 +222,22 @@ READ8_HANDLER( irobot_control_r )
     them to simulate the mathbox and vector generator running in real time */
 READ8_HANDLER( irobot_status_r )
 {
+	irobot_state *state = space->machine->driver_data<irobot_state>();
 	int d=0;
 
 	logerror("status read. ");
 	IR_CPU_STATE(space->machine);
 
-	if (!irmb_running) d |= 0x20;
-	if (irvg_running) d |= 0x40;
+	if (!state->irmb_running) d |= 0x20;
+	if (state->irvg_running) d |= 0x40;
 
-	//        d = (irmb_running * 0x20) | (irvg_running * 0x40);
-	if (irvg_vblank) d = d | 0x80;
+	//        d = (state->irmb_running * 0x20) | (state->irvg_running * 0x40);
+	if (state->irvg_vblank) d = d | 0x80;
 #if IR_TIMING
 	/* flags are cleared by callbacks */
 #else
-	irmb_running=0;
-	irvg_running=0;
+	state->irmb_running=0;
+	state->irvg_running=0;
 #endif
 	return d;
 }
@@ -306,63 +294,44 @@ READ8_HANDLER( irobot_status_r )
 #define FL_DIV 0x40
 #define FL_MBRW 0x80
 
-typedef struct irmb_ops
-{
-	const struct irmb_ops *nxtop;
-	UINT32 func;
-	UINT32 diradd;
-	UINT32 latchmask;
-	UINT32 *areg;
-	UINT32 *breg;
-	UINT8 cycles;
-	UINT8 diren;
-	UINT8 flags;
-	UINT8 ramsel;
-} irmb_ops;
-
-static irmb_ops *mbops;
-
-static const irmb_ops *irmb_stack[16];
-static UINT32 irmb_regs[16];
-static UINT32 irmb_latch;
 
 #if DISASSEMBLE_MB_ROM
 static void disassemble_instruction(irmb_ops *op);
 #endif
 
 
-static UINT32 irmb_din(const irmb_ops *curop)
+static UINT32 irmb_din(irobot_state *state, const irmb_ops *curop)
 {
 	UINT32 d = 0;
 
 	if (!(curop->flags & FL_MBMEMDEC) && (curop->flags & FL_MBRW))
 	{
-		UINT32 ad = curop->diradd | (irmb_latch & curop->latchmask);
+		UINT32 ad = curop->diradd | (state->irmb_latch & curop->latchmask);
 
-		if (curop->diren || (irmb_latch & 0x6000) == 0)
-			d = ((UINT16 *)mbRAM)[ad & 0xfff];				/* MB RAM read */
-		else if (irmb_latch & 0x4000)
-			d = ((UINT16 *)mbROM)[ad + 0x2000];				/* MB ROM read, CEMATH = 1 */
+		if (curop->diren || (state->irmb_latch & 0x6000) == 0)
+			d = ((UINT16 *)state->mbRAM)[ad & 0xfff];				/* MB RAM read */
+		else if (state->irmb_latch & 0x4000)
+			d = ((UINT16 *)state->mbROM)[ad + 0x2000];				/* MB ROM read, CEMATH = 1 */
 		else
-			d = ((UINT16 *)mbROM)[ad & 0x1fff];				/* MB ROM read, CEMATH = 0 */
+			d = ((UINT16 *)state->mbROM)[ad & 0x1fff];				/* MB ROM read, CEMATH = 0 */
 	}
 	return d;
 }
 
 
-static void irmb_dout(const irmb_ops *curop, UINT32 d)
+static void irmb_dout(irobot_state *state, const irmb_ops *curop, UINT32 d)
 {
 	/* Write to video com ram */
 	if (curop->ramsel == 3)
-		((UINT16 *)irobot_combase_mb)[irmb_latch & 0x7ff] = d;
+		((UINT16 *)state->combase_mb)[state->irmb_latch & 0x7ff] = d;
 
     /* Write to mathox ram */
 	if (!(curop->flags & FL_MBMEMDEC))
 	{
-		UINT32 ad = curop->diradd | (irmb_latch & curop->latchmask);
+		UINT32 ad = curop->diradd | (state->irmb_latch & curop->latchmask);
 
-		if (curop->diren || (irmb_latch & 0x6000) == 0)
-			((UINT16 *)mbRAM)[ad & 0xfff] = d;				/* MB RAM write */
+		if (curop->diren || (state->irmb_latch & 0x6000) == 0)
+			((UINT16 *)state->mbRAM)[ad & 0xfff] = d;				/* MB RAM write */
 	}
 }
 
@@ -370,46 +339,47 @@ static void irmb_dout(const irmb_ops *curop, UINT32 d)
 /* Convert microcode roms to a more usable form */
 static void load_oproms(running_machine *machine)
 {
+	irobot_state *state = machine->driver_data<irobot_state>();
 	UINT8 *MB = machine->region("proms")->base() + 0x20;
 	int i;
 
 	/* allocate RAM */
-	mbops = auto_alloc_array(machine, irmb_ops, 1024);
+	state->mbops = auto_alloc_array(machine, irmb_ops, 1024);
 
 	for (i = 0; i < 1024; i++)
 	{
 		int nxtadd, func, ramsel, diradd, latchmask, dirmask, time;
 
-		mbops[i].areg = &irmb_regs[MB[0x0000 + i] & 0x0F];
-		mbops[i].breg = &irmb_regs[MB[0x0400 + i] & 0x0F];
+		state->mbops[i].areg = &state->irmb_regs[MB[0x0000 + i] & 0x0F];
+		state->mbops[i].breg = &state->irmb_regs[MB[0x0400 + i] & 0x0F];
 		func = (MB[0x0800 + i] & 0x0F) << 5;
 		func |= ((MB[0x0C00 +i] & 0x0F) << 1);
 		func |= (MB[0x1000 + i] & 0x08) >> 3;
 		time = MB[0x1000 + i] & 0x03;
-		mbops[i].flags = (MB[0x1000 + i] & 0x04) >> 2;
+		state->mbops[i].flags = (MB[0x1000 + i] & 0x04) >> 2;
 		nxtadd = (MB[0x1400 + i] & 0x0C) >> 2;
 		diradd = MB[0x1400 + i] & 0x03;
 		nxtadd |= ((MB[0x1800 + i] & 0x0F) << 6);
 		nxtadd |= ((MB[0x1C00 + i] & 0x0F) << 2);
 		diradd |= (MB[0x2000 + i] & 0x0F) << 2;
 		func |= (MB[0x2400 + i] & 0x0E) << 9;
-		mbops[i].flags |= (MB[0x2400 + i] & 0x01) << 1;
-		mbops[i].flags |= (MB[0x2800 + i] & 0x0F) << 2;
-		mbops[i].flags |= ((MB[0x2C00 + i] & 0x01) << 6);
-		mbops[i].flags |= (MB[0x2C00 + i] & 0x08) << 4;
+		state->mbops[i].flags |= (MB[0x2400 + i] & 0x01) << 1;
+		state->mbops[i].flags |= (MB[0x2800 + i] & 0x0F) << 2;
+		state->mbops[i].flags |= ((MB[0x2C00 + i] & 0x01) << 6);
+		state->mbops[i].flags |= (MB[0x2C00 + i] & 0x08) << 4;
 		ramsel = (MB[0x2C00 + i] & 0x06) >> 1;
 		diradd |= (MB[0x3000 + i] & 0x03) << 6;
 
-		if (mbops[i].flags & FL_shift) func |= 0x200;
+		if (state->mbops[i].flags & FL_shift) func |= 0x200;
 
-		mbops[i].func = func;
-		mbops[i].nxtop = &mbops[nxtadd];
+		state->mbops[i].func = func;
+		state->mbops[i].nxtop = &state->mbops[nxtadd];
 
 		/* determine the number of 12MHz cycles for this operation */
 		if (time == 3)
-			mbops[i].cycles = 2;
+			state->mbops[i].cycles = 2;
 		else
-			mbops[i].cycles = 3 + time;
+			state->mbops[i].cycles = 3 + time;
 
 		/* precompute the hardcoded address bits and the mask to be used on the latch value */
 		if (ramsel == 0)
@@ -427,13 +397,13 @@ static void load_oproms(running_machine *machine)
 		else
 			dirmask |= 0x0003;
 
-		mbops[i].ramsel = ramsel;
-		mbops[i].diradd = diradd & dirmask;
-		mbops[i].latchmask = latchmask;
-		mbops[i].diren = (ramsel == 0);
+		state->mbops[i].ramsel = ramsel;
+		state->mbops[i].diradd = diradd & dirmask;
+		state->mbops[i].latchmask = latchmask;
+		state->mbops[i].diren = (ramsel == 0);
 
 #if DISASSEMBLE_MB_ROM
-		disassemble_instruction(&mbops[i]);
+		disassemble_instruction(&state->mbops[i]);
 #endif
 	}
 }
@@ -442,20 +412,22 @@ static void load_oproms(running_machine *machine)
 /* Init mathbox (only called once) */
 DRIVER_INIT( irobot )
 {
+	irobot_state *state = machine->driver_data<irobot_state>();
 	int i;
 	for (i = 0; i < 16; i++)
 	{
-		irmb_stack[i] = &mbops[0];
-		irmb_regs[i] = 0;
+		state->irmb_stack[i] = &state->mbops[0];
+		state->irmb_regs[i] = 0;
 	}
-	irmb_latch=0;
+	state->irmb_latch=0;
 	load_oproms(machine);
 }
 
 TIMER_DEVICE_CALLBACK( irobot_irmb_done_callback )
 {
-    logerror("mb done. ");
-	irmb_running = 0;
+	irobot_state *state = timer.machine->driver_data<irobot_state>();
+	logerror("mb done. ");
+	state->irmb_running = 0;
 	cputag_set_input_line(timer.machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
@@ -568,15 +540,16 @@ TIMER_DEVICE_CALLBACK( irobot_irmb_done_callback )
 #define JUMP3	if (!nflag) curop = curop->nxtop; else curop++;
 #define JUMP4	if (nflag) curop = curop->nxtop; else curop++;
 #define JUMP5	curop = curop->nxtop;
-#define JUMP6	irmb_stack[SP] = curop + 1; SP = (SP + 1) & 15; curop = curop->nxtop;
-#define JUMP7	SP = (SP - 1) & 15; curop = irmb_stack[SP];
+#define JUMP6	state->irmb_stack[SP] = curop + 1; SP = (SP + 1) & 15; curop = curop->nxtop;
+#define JUMP7	SP = (SP - 1) & 15; curop = state->irmb_stack[SP];
 
 
 /* Run mathbox */
 static void irmb_run(running_machine *machine)
 {
-	const irmb_ops *prevop = &mbops[0];
-	const irmb_ops *curop = &mbops[0];
+	irobot_state *state = machine->driver_data<irobot_state>();
+	const irmb_ops *prevop = &state->mbops[0];
+	const irmb_ops *curop = &state->mbops[0];
 
 	UINT32 Q = 0;
 	UINT32 Y = 0;
@@ -621,65 +594,65 @@ static void irmb_run(running_machine *machine)
 			case 0x02:	ADD(0, Q);											break;
 			case 0x03:	ADD(0, *curop->breg);								break;
 			case 0x04:	ADD(0, *curop->areg);								break;
-			case 0x05:	tmp = irmb_din(curop); ADD(tmp, *curop->areg);		break;
-			case 0x06:	tmp = irmb_din(curop); ADD(tmp, Q);					break;
-			case 0x07:	tmp = irmb_din(curop); ADD(tmp, 0);					break;
+			case 0x05:	tmp = irmb_din(state, curop); ADD(tmp, *curop->areg);		break;
+			case 0x06:	tmp = irmb_din(state, curop); ADD(tmp, Q);					break;
+			case 0x07:	tmp = irmb_din(state, curop); ADD(tmp, 0);					break;
 			case 0x08:	SUBR(*curop->areg, Q);								break;
 			case 0x09:	SUBR(*curop->areg, *curop->breg);					break;
 			case 0x0a:	SUBR(0, Q);											break;
 			case 0x0b:	SUBR(0, *curop->breg);								break;
 			case 0x0c:	SUBR(0, *curop->areg);								break;
-			case 0x0d:	tmp = irmb_din(curop); SUBR(tmp, *curop->areg);		break;
-			case 0x0e:	tmp = irmb_din(curop); SUBR(tmp, Q);				break;
-			case 0x0f:	tmp = irmb_din(curop); SUBR(tmp, 0);				break;
+			case 0x0d:	tmp = irmb_din(state, curop); SUBR(tmp, *curop->areg);		break;
+			case 0x0e:	tmp = irmb_din(state, curop); SUBR(tmp, Q);				break;
+			case 0x0f:	tmp = irmb_din(state, curop); SUBR(tmp, 0);				break;
 			case 0x10:	SUB(*curop->areg, Q);								break;
 			case 0x11:	SUB(*curop->areg, *curop->breg);					break;
 			case 0x12:	SUB(0, Q);											break;
 			case 0x13:	SUB(0, *curop->breg);								break;
 			case 0x14:	SUB(0, *curop->areg);								break;
-			case 0x15:	tmp = irmb_din(curop); SUB(tmp, *curop->areg);		break;
-			case 0x16:	tmp = irmb_din(curop); SUB(tmp, Q);					break;
-			case 0x17:	tmp = irmb_din(curop); SUB(tmp, 0);					break;
+			case 0x15:	tmp = irmb_din(state, curop); SUB(tmp, *curop->areg);		break;
+			case 0x16:	tmp = irmb_din(state, curop); SUB(tmp, Q);					break;
+			case 0x17:	tmp = irmb_din(state, curop); SUB(tmp, 0);					break;
 			case 0x18:	OR(*curop->areg, Q);								break;
 			case 0x19:	OR(*curop->areg, *curop->breg);						break;
 			case 0x1a:	OR(0, Q);											break;
 			case 0x1b:	OR(0, *curop->breg);								break;
 			case 0x1c:	OR(0, *curop->areg);								break;
-			case 0x1d:	OR(irmb_din(curop), *curop->areg);					break;
-			case 0x1e:	OR(irmb_din(curop), Q);								break;
-			case 0x1f:	OR(irmb_din(curop), 0);								break;
+			case 0x1d:	OR(irmb_din(state, curop), *curop->areg);					break;
+			case 0x1e:	OR(irmb_din(state, curop), Q);								break;
+			case 0x1f:	OR(irmb_din(state, curop), 0);								break;
 			case 0x20:	AND(*curop->areg, Q);								break;
 			case 0x21:	AND(*curop->areg, *curop->breg);					break;
 			case 0x22:	AND(0, Q);											break;
 			case 0x23:	AND(0, *curop->breg);								break;
 			case 0x24:	AND(0, *curop->areg);								break;
-			case 0x25:	AND(irmb_din(curop), *curop->areg);					break;
-			case 0x26:	AND(irmb_din(curop), Q);							break;
-			case 0x27:	AND(irmb_din(curop), 0);							break;
+			case 0x25:	AND(irmb_din(state, curop), *curop->areg);					break;
+			case 0x26:	AND(irmb_din(state, curop), Q);							break;
+			case 0x27:	AND(irmb_din(state, curop), 0);							break;
 			case 0x28:	IAND(*curop->areg, Q);								break;
 			case 0x29:	IAND(*curop->areg, *curop->breg);					break;
 			case 0x2a:	IAND(0, Q);											break;
 			case 0x2b:	IAND(0, *curop->breg);								break;
 			case 0x2c:	IAND(0, *curop->areg);								break;
-			case 0x2d:	IAND(irmb_din(curop), *curop->areg);				break;
-			case 0x2e:	IAND(irmb_din(curop), Q);							break;
-			case 0x2f:	IAND(irmb_din(curop), 0);							break;
+			case 0x2d:	IAND(irmb_din(state, curop), *curop->areg);				break;
+			case 0x2e:	IAND(irmb_din(state, curop), Q);							break;
+			case 0x2f:	IAND(irmb_din(state, curop), 0);							break;
 			case 0x30:	XOR(*curop->areg, Q);								break;
 			case 0x31:	XOR(*curop->areg, *curop->breg);					break;
 			case 0x32:	XOR(0, Q);											break;
 			case 0x33:	XOR(0, *curop->breg);								break;
 			case 0x34:	XOR(0, *curop->areg);								break;
-			case 0x35:	XOR(irmb_din(curop), *curop->areg);					break;
-			case 0x36:	XOR(irmb_din(curop), Q);							break;
-			case 0x37:	XOR(irmb_din(curop), 0);							break;
+			case 0x35:	XOR(irmb_din(state, curop), *curop->areg);					break;
+			case 0x36:	XOR(irmb_din(state, curop), Q);							break;
+			case 0x37:	XOR(irmb_din(state, curop), 0);							break;
 			case 0x38:	IXOR(*curop->areg, Q);								break;
 			case 0x39:	IXOR(*curop->areg, *curop->breg);					break;
 			case 0x3a:	IXOR(0, Q);											break;
 			case 0x3b:	IXOR(0, *curop->breg);								break;
 			case 0x3c:	IXOR(0, *curop->areg);								break;
-			case 0x3d:	IXOR(irmb_din(curop), *curop->areg);				break;
-			case 0x3e:	IXOR(irmb_din(curop), Q);							break;
-default:	case 0x3f:	IXOR(irmb_din(curop), 0);							break;
+			case 0x3d:	IXOR(irmb_din(state, curop), *curop->areg);				break;
+			case 0x3e:	IXOR(irmb_din(state, curop), Q);							break;
+default:	case 0x3f:	IXOR(irmb_din(state, curop), 0);							break;
 		}
 
 		/* Evaluate flags */
@@ -830,15 +803,15 @@ default:	case 0x3f:	IXOR(irmb_din(curop), 0);							break;
 
 		/* Do write */
 		if (!(prevop->flags & FL_MBRW))
-			irmb_dout(prevop, Y);
+			irmb_dout(state, prevop, Y);
 
 		/* ADDEN */
 		if (!(prevop->flags & FL_ADDEN))
 		{
 			if (prevop->flags & FL_MBRW)
-				irmb_latch = irmb_din(prevop);
+				state->irmb_latch = irmb_din(state, prevop);
 			else
-				irmb_latch = Y;
+				state->irmb_latch = Y;
 		}
 	}
 	g_profiler.stop();
@@ -847,9 +820,9 @@ default:	case 0x3f:	IXOR(irmb_din(curop), 0);							break;
 
 
 #if IR_TIMING
-	if (irmb_running == 0)
+	if (state->irmb_running == 0)
 	{
-		irmb_timer->adjust(attotime_mul(ATTOTIME_IN_HZ(12000000), icount));
+		state->irmb_timer->adjust(attotime_mul(ATTOTIME_IN_HZ(12000000), icount));
 		logerror("mb start ");
 		IR_CPU_STATE(machine);
 	}
@@ -857,12 +830,12 @@ default:	case 0x3f:	IXOR(irmb_din(curop), 0);							break;
 	{
 		logerror("mb start [busy!] ");
 		IR_CPU_STATE(machine);
-		irmb_timer->adjust(attotime_mul(ATTOTIME_IN_NSEC(200), icount));
+		state->irmb_timer->adjust(attotime_mul(ATTOTIME_IN_NSEC(200), icount));
 	}
 #else
 	cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
 #endif
-	irmb_running=1;
+	state->irmb_running=1;
 }
 
 

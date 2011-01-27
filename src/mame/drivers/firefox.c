@@ -35,6 +35,30 @@ but requires a special level III player for proper control. Video: CAV. Audio: A
 #include "machine/x2212.h"
 
 
+class firefox_state : public driver_device
+{
+public:
+	firefox_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	device_t *laserdisc;
+	int m_n_disc_lock;
+	int m_n_disc_data;
+	int m_n_disc_read_data;
+	unsigned char *tileram;
+	unsigned char *tile_palette;
+	unsigned char *sprite_palette;
+	x2212_device *nvram_1c;
+	x2212_device *nvram_1d;
+	tilemap_t *bgtiles;
+	int control_num;
+	UINT8 sound_to_main_flag;
+	UINT8 main_to_sound_flag;
+	int sprite_bank;
+};
+
+
+
 #define MASTER_XTAL		XTAL_14_31818MHz
 
 
@@ -57,10 +81,6 @@ fffe=reset e7cc
 /* FXXXXX for first field
    AXXXXX for second field */
 
-static device_t *laserdisc;
-static int m_n_disc_lock;
-static int m_n_disc_data;
-static int m_n_disc_read_data;
 
 /* 20 = DISKOPR - Active low
    40 = DISKFULL - Active low
@@ -68,12 +88,13 @@ static int m_n_disc_read_data;
    */
 static READ8_HANDLER( firefox_disc_status_r )
 {
+	firefox_state *state = space->machine->driver_data<firefox_state>();
 	UINT8 result = 0xff;
 
 	result ^= 0x20;
-	if (!laserdisc_line_r(laserdisc, LASERDISC_LINE_READY))
+	if (!laserdisc_line_r(state->laserdisc, LASERDISC_LINE_READY))
 		result ^= 0x40;
-	if (laserdisc_line_r(laserdisc, LASERDISC_LINE_DATA_AVAIL))
+	if (laserdisc_line_r(state->laserdisc, LASERDISC_LINE_DATA_AVAIL))
 		result ^= 0x80;
 
 	return result;
@@ -83,19 +104,22 @@ static READ8_HANDLER( firefox_disc_status_r )
 /* this reset RDDSK (&DSKRD) */
 static READ8_HANDLER( firefox_disc_data_r )
 {
-	return m_n_disc_read_data;
+	firefox_state *state = space->machine->driver_data<firefox_state>();
+	return state->m_n_disc_read_data;
 }
 
 /* DISK READ ENABLE */
 /* 4218 - DSKREAD, set RDDSK */
 static WRITE8_HANDLER( firefox_disc_read_w )
 {
-	m_n_disc_read_data = laserdisc_data_r(laserdisc);
+	firefox_state *state = space->machine->driver_data<firefox_state>();
+	state->m_n_disc_read_data = laserdisc_data_r(state->laserdisc);
 }
 
 static WRITE8_HANDLER( firefox_disc_lock_w )
 {
-	m_n_disc_lock = data & 0x80;
+	firefox_state *state = space->machine->driver_data<firefox_state>();
+	state->m_n_disc_lock = data & 0x80;
 }
 
 static WRITE8_HANDLER( audio_enable_w )
@@ -105,34 +129,27 @@ static WRITE8_HANDLER( audio_enable_w )
 
 static WRITE8_HANDLER( firefox_disc_reset_w )
 {
-	laserdisc_line_w(laserdisc, LASERDISC_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	firefox_state *state = space->machine->driver_data<firefox_state>();
+	laserdisc_line_w(state->laserdisc, LASERDISC_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /* active low on dbb7 */
 static WRITE8_HANDLER( firefox_disc_write_w )
 {
+	firefox_state *state = space->machine->driver_data<firefox_state>();
 	if ( ( data & 0x80 ) == 0 )
-		laserdisc_data_w(laserdisc, m_n_disc_data);
+		laserdisc_data_w(state->laserdisc, state->m_n_disc_data);
 }
 
 /* latch the data */
 static WRITE8_HANDLER( firefox_disc_data_w )
 {
-	m_n_disc_data = data;
+	firefox_state *state = space->machine->driver_data<firefox_state>();
+	state->m_n_disc_data = data;
 }
 
 
-static unsigned char *tileram;
-static unsigned char *tile_palette;
-static unsigned char *sprite_palette;
-static x2212_device *nvram_1c;
-static x2212_device *nvram_1d;
-static tilemap_t *bgtiles;
 
-static int control_num;
-static UINT8 sound_to_main_flag;
-static UINT8 main_to_sound_flag;
-static int sprite_bank;
 
 /*************************************
  *
@@ -142,27 +159,31 @@ static int sprite_bank;
 
 static TILE_GET_INFO( bgtile_get_info )
 {
-	SET_TILE_INFO(0, tileram[tile_index], 0, 0);
+	firefox_state *state = machine->driver_data<firefox_state>();
+	SET_TILE_INFO(0, state->tileram[tile_index], 0, 0);
 }
 
 
 static WRITE8_HANDLER( tileram_w )
 {
-	tileram[offset] = data;
-	tilemap_mark_tile_dirty(bgtiles, offset);
+	firefox_state *state = space->machine->driver_data<firefox_state>();
+	state->tileram[offset] = data;
+	tilemap_mark_tile_dirty(state->bgtiles, offset);
 }
 
 
 static VIDEO_START( firefox )
 {
-	bgtiles = tilemap_create(machine, bgtile_get_info, tilemap_scan_rows, 8,8, 64,64);
-	tilemap_set_transparent_pen(bgtiles, 0);
-	tilemap_set_scrolldy(bgtiles, machine->primary_screen->visible_area().min_y, 0);
+	firefox_state *state = machine->driver_data<firefox_state>();
+	state->bgtiles = tilemap_create(machine, bgtile_get_info, tilemap_scan_rows, 8,8, 64,64);
+	tilemap_set_transparent_pen(state->bgtiles, 0);
+	tilemap_set_scrolldy(state->bgtiles, machine->primary_screen->visible_area().min_y, 0);
 }
 
 
 static VIDEO_UPDATE( firefox )
 {
+	firefox_state *state = screen->machine->driver_data<firefox_state>();
 	int sprite;
 	int gfxtop = screen->visible_area().min_y;
 
@@ -170,7 +191,7 @@ static VIDEO_UPDATE( firefox )
 
 	for( sprite = 0; sprite < 32; sprite++ )
 	{
-		UINT8 *sprite_data = screen->machine->generic.spriteram.u8 + ( 0x200 * sprite_bank ) + ( sprite * 16 );
+		UINT8 *sprite_data = screen->machine->generic.spriteram.u8 + ( 0x200 * state->sprite_bank ) + ( sprite * 16 );
 		int flags = sprite_data[ 0 ];
 		int y = sprite_data[ 1 ] + ( 256 * ( ( flags >> 0 ) & 1 ) );
 		int x = sprite_data[ 2 ] + ( 256 * ( ( flags >> 1 ) & 1 ) );
@@ -191,7 +212,7 @@ static VIDEO_UPDATE( firefox )
 		}
 	}
 
-	tilemap_draw( bitmap, cliprect, bgtiles, 0, 0 );
+	tilemap_draw( bitmap, cliprect, state->bgtiles, 0, 0 );
 
 	return 0;
 }
@@ -215,19 +236,22 @@ static void set_rgba( running_machine *machine, int start, int index, unsigned c
 
 static WRITE8_HANDLER( tile_palette_w )
 {
-	tile_palette[ offset ] = data;
-	set_rgba( space->machine, 0, offset & 0xff, tile_palette );
+	firefox_state *state = space->machine->driver_data<firefox_state>();
+	state->tile_palette[ offset ] = data;
+	set_rgba( space->machine, 0, offset & 0xff, state->tile_palette );
 }
 
 static WRITE8_HANDLER( sprite_palette_w )
 {
-	sprite_palette[ offset ] = data;
-	set_rgba( space->machine, 256, offset & 0xff, sprite_palette );
+	firefox_state *state = space->machine->driver_data<firefox_state>();
+	state->sprite_palette[ offset ] = data;
+	set_rgba( space->machine, 256, offset & 0xff, state->sprite_palette );
 }
 
 static WRITE8_HANDLER( firefox_objram_bank_w )
 {
-	sprite_bank = data & 0x03;
+	firefox_state *state = space->machine->driver_data<firefox_state>();
+	state->sprite_bank = data & 0x03;
 }
 
 
@@ -240,43 +264,50 @@ static WRITE8_HANDLER( firefox_objram_bank_w )
 
 static CUSTOM_INPUT( mainflag_r )
 {
-	return main_to_sound_flag;
+	firefox_state *state = field->port->machine->driver_data<firefox_state>();
+	return state->main_to_sound_flag;
 }
 
 static CUSTOM_INPUT( soundflag_r )
 {
-	return sound_to_main_flag;
+	firefox_state *state = field->port->machine->driver_data<firefox_state>();
+	return state->sound_to_main_flag;
 }
 
 static READ8_HANDLER( sound_to_main_r )
 {
-	sound_to_main_flag = 0;
+	firefox_state *state = space->machine->driver_data<firefox_state>();
+	state->sound_to_main_flag = 0;
 	return soundlatch2_r(space, 0);
 }
 
 static WRITE8_HANDLER( main_to_sound_w )
 {
-	main_to_sound_flag = 1;
+	firefox_state *state = space->machine->driver_data<firefox_state>();
+	state->main_to_sound_flag = 1;
 	soundlatch_w(space, 0, data);
 	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( sound_reset_w )
 {
+	firefox_state *state = space->machine->driver_data<firefox_state>();
 	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 	if ((data & 0x80) != 0)
-		sound_to_main_flag = main_to_sound_flag = 0;
+		state->sound_to_main_flag = state->main_to_sound_flag = 0;
 }
 
 static READ8_HANDLER( main_to_sound_r )
 {
-	main_to_sound_flag = 0;
+	firefox_state *state = space->machine->driver_data<firefox_state>();
+	state->main_to_sound_flag = 0;
 	return soundlatch_r(space, 0);
 }
 
 static WRITE8_HANDLER( sound_to_main_w )
 {
-	sound_to_main_flag = 1;
+	firefox_state *state = space->machine->driver_data<firefox_state>();
+	state->sound_to_main_flag = 1;
 	soundlatch2_w(space, 0, data);
 }
 
@@ -290,6 +321,7 @@ static WRITE8_HANDLER( sound_to_main_w )
 
 static READ8_DEVICE_HANDLER( riot_porta_r )
 {
+	firefox_state *state = device->machine->driver_data<firefox_state>();
 	/* bit 7 = MAINFLAG */
 	/* bit 6 = SOUNDFLAG */
 	/* bit 5 = PA5 */
@@ -299,7 +331,7 @@ static READ8_DEVICE_HANDLER( riot_porta_r )
 	/* bit 1 = TMS /read */
 	/* bit 0 = TMS /write */
 
-	return (main_to_sound_flag << 7) | (sound_to_main_flag << 6) | 0x10 | (tms5220_readyq_r(device) << 2);
+	return (state->main_to_sound_flag << 7) | (state->sound_to_main_flag << 6) | 0x10 | (tms5220_readyq_r(device) << 2);
 }
 
 static WRITE8_DEVICE_HANDLER( riot_porta_w )
@@ -328,7 +360,8 @@ static WRITE_LINE_DEVICE_HANDLER( riot_irq )
 
 static READ8_HANDLER( adc_r )
 {
-	if( control_num == 0 )
+	firefox_state *state = space->machine->driver_data<firefox_state>();
+	if( state->control_num == 0 )
 	{
 		return input_port_read( space->machine, "PITCH" );
 	}
@@ -338,7 +371,8 @@ static READ8_HANDLER( adc_r )
 
 static WRITE8_HANDLER( adc_select_w )
 {
-	control_num = offset;
+	firefox_state *state = space->machine->driver_data<firefox_state>();
+	state->control_num = offset;
 }
 
 
@@ -351,25 +385,29 @@ static WRITE8_HANDLER( adc_select_w )
 
 static WRITE8_HANDLER( nvram_w )
 {
-	nvram_1c->write(*space, offset, data >> 4);
-	nvram_1d->write(*space, offset, data & 0xf);
+	firefox_state *state = space->machine->driver_data<firefox_state>();
+	state->nvram_1c->write(*space, offset, data >> 4);
+	state->nvram_1d->write(*space, offset, data & 0xf);
 }
 
 static READ8_HANDLER( nvram_r )
 {
-	return (nvram_1c->read(*space, offset) << 4) | (nvram_1d->read(*space, offset) & 0x0f);
+	firefox_state *state = space->machine->driver_data<firefox_state>();
+	return (state->nvram_1c->read(*space, offset) << 4) | (state->nvram_1d->read(*space, offset) & 0x0f);
 }
 
 static WRITE8_HANDLER( novram_recall_w )
 {
-	nvram_1c->recall(data & 0x80);
-	nvram_1d->recall(data & 0x80);
+	firefox_state *state = space->machine->driver_data<firefox_state>();
+	state->nvram_1c->recall(data & 0x80);
+	state->nvram_1d->recall(data & 0x80);
 }
 
 static WRITE8_HANDLER( novram_store_w )
 {
-	nvram_1c->store(data & 0x80);
-	nvram_1d->store(data & 0x80);
+	firefox_state *state = space->machine->driver_data<firefox_state>();
+	state->nvram_1c->store(data & 0x80);
+	state->nvram_1d->store(data & 0x80);
 }
 
 
@@ -429,15 +467,16 @@ static void firq_gen(device_t *device, int state)
 
 static MACHINE_START( firefox )
 {
+	firefox_state *state = machine->driver_data<firefox_state>();
 	memory_configure_bank(machine, "bank1", 0, 32, machine->region("maincpu")->base() + 0x10000, 0x1000);
-	nvram_1c = machine->device<x2212_device>("nvram_1c");
-	nvram_1d = machine->device<x2212_device>("nvram_1d");
+	state->nvram_1c = machine->device<x2212_device>("nvram_1c");
+	state->nvram_1d = machine->device<x2212_device>("nvram_1d");
 
-	laserdisc = machine->device("laserdisc");
-	vp931_set_data_ready_callback(laserdisc, firq_gen);
+	state->laserdisc = machine->device("laserdisc");
+	vp931_set_data_ready_callback(state->laserdisc, firq_gen);
 
-	control_num = 0;
-	sprite_bank = 0;
+	state->control_num = 0;
+	state->sprite_bank = 0;
 }
 
 
@@ -449,11 +488,11 @@ static MACHINE_START( firefox )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(tileram_w) AM_BASE(&tileram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(tileram_w) AM_BASE_MEMBER(firefox_state, tileram)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE_GENERIC(spriteram)
-	AM_RANGE(0x2800, 0x2aff) AM_RAM_WRITE(sprite_palette_w) AM_BASE(&sprite_palette)
+	AM_RANGE(0x2800, 0x2aff) AM_RAM_WRITE(sprite_palette_w) AM_BASE_MEMBER(firefox_state, sprite_palette)
 	AM_RANGE(0x2b00, 0x2b00) AM_MIRROR(0x04ff) AM_WRITE(firefox_objram_bank_w)
-	AM_RANGE(0x2c00, 0x2eff) AM_RAM_WRITE(tile_palette_w) AM_BASE(&tile_palette)
+	AM_RANGE(0x2c00, 0x2eff) AM_RAM_WRITE(tile_palette_w) AM_BASE_MEMBER(firefox_state, tile_palette)
 	AM_RANGE(0x3000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x40ff) AM_READWRITE(nvram_r, nvram_w)						/* NOVRAM */
 	AM_RANGE(0x4100, 0x4100) AM_MIRROR(0x00f8) AM_READ_PORT("rdin0")			/* RDIN0 */
@@ -641,7 +680,7 @@ static const riot6532_interface riot_intf =
 };
 
 
-static MACHINE_CONFIG_START( firefox, driver_device )
+static MACHINE_CONFIG_START( firefox, firefox_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809E, MASTER_XTAL/2)

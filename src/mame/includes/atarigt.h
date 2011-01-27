@@ -11,6 +11,8 @@
 #define TRAM_ENTRIES		0x4000
 #define MRAM_ENTRIES		0x8000
 
+#define ADDRSEQ_COUNT	4
+
 class atarigt_state : public atarigen_state
 {
 public:
@@ -36,6 +38,12 @@ public:
 
 	void			(*protection_w)(address_space *space, offs_t offset, UINT16 data);
 	void			(*protection_r)(address_space *space, offs_t offset, UINT16 *data);
+
+	UINT8			ignore_writes;
+	offs_t			protaddr[ADDRSEQ_COUNT];
+	UINT8			protmode;
+	UINT16			protresult;
+	UINT8			protdata[0x800];
 };
 
 

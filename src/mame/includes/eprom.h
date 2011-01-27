@@ -15,6 +15,7 @@ public:
 	int 			screen_intensity;
 	int 			video_disable;
 	UINT16 *		sync_data;
+	int			last_offset;
 };
 
 

@@ -23,6 +23,13 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	UINT8 *spriteram;
+	int steering_buf1;
+	int steering_buf2;
+	int steering_val1;
+	int steering_val2;
+	int last_val_1;
+	int last_val_2;
 };
 
 

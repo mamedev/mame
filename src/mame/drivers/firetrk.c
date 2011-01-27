@@ -12,16 +12,12 @@ Atari Fire Truck + Super Bug + Monte Carlo driver
 
 #define MASTER_CLOCK (XTAL_12_096MHz)
 
-static UINT8 in_service_mode;
-static UINT32 dial[2];
-static UINT8 steer_dir[2];
-static UINT8 steer_flag[2];
-static UINT8 gear;
 
 
 static void set_service_mode(running_machine *machine, int enable)
 {
-	in_service_mode = enable;
+	firetrk_state *state = machine->driver_data<firetrk_state>();
+	state->in_service_mode = enable;
 
 	/* watchdog is disabled during service mode */
 	watchdog_enable(machine, !enable);
@@ -46,18 +42,20 @@ static INPUT_CHANGED( firetrk_horn_changed )
 
 static INPUT_CHANGED( gear_changed )
 {
+	firetrk_state *state = field->port->machine->driver_data<firetrk_state>();
 	if (newval)
-		gear = (FPTR)param;
+		state->gear = (FPTR)param;
 }
 
 
 static INTERRUPT_GEN( firetrk_interrupt )
 {
+	firetrk_state *state = device->machine->driver_data<firetrk_state>();
 	/* Super Bug - ASR - when is this used and what is an ASR? */
-//  discrete_sound_w(machine->device("discrete"), SUPERBUG_ASR_EN, 0);
+//  discrete_sound_w(device->machine->device("discrete"), SUPERBUG_ASR_EN, 0);
 
 	/* NMI interrupts are disabled during service mode in firetrk and montecar */
-	if (!in_service_mode)
+	if (!state->in_service_mode)
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -80,6 +78,7 @@ static TIMER_CALLBACK( periodic_callback )
 
 static WRITE8_HANDLER( firetrk_output_w )
 {
+	firetrk_state *state = space->machine->driver_data<firetrk_state>();
 	device_t *discrete = space->machine->device("discrete");
 
 	/* BIT0 => START1 LAMP */
@@ -89,7 +88,7 @@ static WRITE8_HANDLER( firetrk_output_w )
 	set_led_status(space->machine, 1, !(data & 0x02));
 
 	/* BIT2 => FLASH       */
-	firetrk_flash = data & 0x04;
+	state->flash = data & 0x04;
 
 	/* BIT3 => TRACK LAMP  */
 	set_led_status(space->machine, 3, !(data & 0x08));
@@ -111,6 +110,7 @@ static WRITE8_HANDLER( firetrk_output_w )
 
 static WRITE8_HANDLER( superbug_output_w )
 {
+	firetrk_state *state = space->machine->driver_data<firetrk_state>();
 	device_t *discrete = space->machine->device("discrete");
 
 	/* BIT0 => START LAMP */
@@ -122,7 +122,7 @@ static WRITE8_HANDLER( superbug_output_w )
 	coin_lockout_w(space->machine, 1, !(offset & 0x02));
 
 	/* BIT2 => FLASH      */
-	firetrk_flash = offset & 0x04;
+	state->flash = offset & 0x04;
 
 	/* BIT3 => TRACK LAMP */
 	set_led_status(space->machine, 1, offset & 0x08);
@@ -158,9 +158,10 @@ static WRITE8_HANDLER( montecar_output_1_w )
 
 static WRITE8_HANDLER( montecar_output_2_w )
 {
+	firetrk_state *state = space->machine->driver_data<firetrk_state>();
 	device_t *discrete = space->machine->device("discrete");
 
-	firetrk_flash = data & 0x80;
+	state->flash = data & 0x80;
 
 	discrete_sound_w(discrete, MONTECAR_BEEPER_EN, data & 0x10);
 	discrete_sound_w(discrete, MONTECAR_DRONE_LOUD_DATA, data & 0x0f);
@@ -201,25 +202,28 @@ static READ8_HANDLER( montecar_dip_r )
 
 static CUSTOM_INPUT( steer_dir_r )
 {
-	return steer_dir[(FPTR)param];
+	firetrk_state *state = field->port->machine->driver_data<firetrk_state>();
+	return state->steer_dir[(FPTR)param];
 }
 
 
 static CUSTOM_INPUT( steer_flag_r )
 {
-	return steer_flag[(FPTR)param];
+	firetrk_state *state = field->port->machine->driver_data<firetrk_state>();
+	return state->steer_flag[(FPTR)param];
 }
 
 
 static CUSTOM_INPUT( skid_r )
 {
+	firetrk_state *state = field->port->machine->driver_data<firetrk_state>();
 	UINT32 ret;
 	int which = (FPTR)param;
 
 	if (which != 2)
-		ret = firetrk_skid[which];
+		ret = state->skid[which];
 	else
-		ret = firetrk_skid[0] | firetrk_skid[1];
+		ret = state->skid[0] | state->skid[1];
 
 	return ret;
 }
@@ -227,13 +231,14 @@ static CUSTOM_INPUT( skid_r )
 
 static CUSTOM_INPUT( crash_r )
 {
+	firetrk_state *state = field->port->machine->driver_data<firetrk_state>();
 	UINT32 ret;
 	int which = (FPTR)param;
 
 	if (which != 2)
-		ret = firetrk_crash[which];
+		ret = state->crash[which];
 	else
-		ret = firetrk_crash[0] | firetrk_crash[1];
+		ret = state->crash[0] | state->crash[1];
 
 	return ret;
 }
@@ -241,26 +246,28 @@ static CUSTOM_INPUT( crash_r )
 
 static CUSTOM_INPUT( gear_r )
 {
-	return (gear == (FPTR)param) ? 1 : 0;
+	firetrk_state *state = field->port->machine->driver_data<firetrk_state>();
+	return (state->gear == (FPTR)param) ? 1 : 0;
 }
 
 
 static READ8_HANDLER( firetrk_input_r )
 {
+	firetrk_state *state = space->machine->driver_data<firetrk_state>();
 	int i;
 
 	/* update steering wheels */
 	for (i = 0; i < 2; i++)
 	{
 		UINT32 new_dial = input_port_read_safe(space->machine, (i ? "STEER_2" : "STEER_1"), 0);
-		INT32 delta = new_dial - dial[i];
+		INT32 delta = new_dial - state->dial[i];
 
 		if (delta != 0)
 		{
-			steer_flag[i] = 0;
-			steer_dir[i] = (delta < 0) ? 1 : 0;
+			state->steer_flag[i] = 0;
+			state->steer_dir[i] = (delta < 0) ? 1 : 0;
 
-			dial[i] = dial[i] + delta;
+			state->dial[i] = state->dial[i] + delta;
 		}
 	}
 
@@ -272,13 +279,14 @@ static READ8_HANDLER( firetrk_input_r )
 
 static READ8_HANDLER( montecar_input_r )
 {
+	firetrk_state *state = space->machine->driver_data<firetrk_state>();
 	UINT8 ret = firetrk_input_r(space, offset);
 
-	if (firetrk_crash[0])
+	if (state->crash[0])
 		ret |= 0x02;
 
 	/* can this be right, bit 0 again ???? */
-	if (firetrk_crash[1])
+	if (state->crash[1])
 		ret |= 0x01;
 
 	return ret;
@@ -287,56 +295,61 @@ static READ8_HANDLER( montecar_input_r )
 
 static WRITE8_HANDLER( blink_on_w )
 {
-	*firetrk_blink = TRUE;
+	firetrk_state *state = space->machine->driver_data<firetrk_state>();
+	*state->blink = TRUE;
 }
 
 
 static WRITE8_HANDLER( montecar_car_reset_w )
 {
-	firetrk_crash[0] = 0;
-	firetrk_skid[0] = 0;
+	firetrk_state *state = space->machine->driver_data<firetrk_state>();
+	state->crash[0] = 0;
+	state->skid[0] = 0;
 }
 
 
 static WRITE8_HANDLER( montecar_drone_reset_w )
 {
-	firetrk_crash[1] = 0;
-	firetrk_skid[1] = 0;
+	firetrk_state *state = space->machine->driver_data<firetrk_state>();
+	state->crash[1] = 0;
+	state->skid[1] = 0;
 }
 
 
 static WRITE8_HANDLER( steer_reset_w )
 {
-	steer_flag[0] = 1;
-	steer_flag[1] = 1;
+	firetrk_state *state = space->machine->driver_data<firetrk_state>();
+	state->steer_flag[0] = 1;
+	state->steer_flag[1] = 1;
 }
 
 
 static WRITE8_HANDLER( crash_reset_w )
 {
-	firetrk_crash[0] = 0;
-	firetrk_crash[1] = 0;
+	firetrk_state *state = space->machine->driver_data<firetrk_state>();
+	state->crash[0] = 0;
+	state->crash[1] = 0;
 }
 
 
 static ADDRESS_MAP_START( firetrk_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0700) AM_RAM AM_BASE(&firetrk_alpha_num_ram)
-	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x0700) AM_RAM AM_BASE(&firetrk_playfield_ram)
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE(&firetrk_scroll_y)
-	AM_RANGE(0x1020, 0x1020) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE(&firetrk_scroll_x)
+	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0700) AM_RAM AM_BASE_MEMBER(firetrk_state, alpha_num_ram)
+	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x0700) AM_RAM AM_BASE_MEMBER(firetrk_state, playfield_ram)
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE_MEMBER(firetrk_state, scroll_y)
+	AM_RANGE(0x1020, 0x1020) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE_MEMBER(firetrk_state, scroll_x)
 	AM_RANGE(0x1040, 0x1040) AM_MIRROR(0x001f) AM_WRITE(crash_reset_w)
 	AM_RANGE(0x1060, 0x1060) AM_MIRROR(0x001f) AM_DEVWRITE("discrete", firetrk_skid_reset_w)
-	AM_RANGE(0x1080, 0x1080) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE(&firetrk_car_rot)
+	AM_RANGE(0x1080, 0x1080) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE_MEMBER(firetrk_state, car_rot)
 	AM_RANGE(0x10a0, 0x10a0) AM_MIRROR(0x001f) AM_WRITE(steer_reset_w)
 	AM_RANGE(0x10c0, 0x10c0) AM_MIRROR(0x001f) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x10e0, 0x10e0) AM_MIRROR(0x001f) AM_WRITE(blink_on_w) AM_BASE(&firetrk_blink)
+	AM_RANGE(0x10e0, 0x10e0) AM_MIRROR(0x001f) AM_WRITE(blink_on_w) AM_BASE_MEMBER(firetrk_state, blink)
 	AM_RANGE(0x1400, 0x1400) AM_MIRROR(0x001f) AM_DEVWRITE("discrete", firetrk_motor_snd_w)
 	AM_RANGE(0x1420, 0x1420) AM_MIRROR(0x001f) AM_DEVWRITE("discrete", firetrk_crash_snd_w)
 	AM_RANGE(0x1440, 0x1440) AM_MIRROR(0x001f) AM_DEVWRITE("discrete", firetrk_skid_snd_w)
-	AM_RANGE(0x1460, 0x1460) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE(&firetrk_drone_x)
-	AM_RANGE(0x1480, 0x1480) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE(&firetrk_drone_y)
-	AM_RANGE(0x14a0, 0x14a0) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE(&firetrk_drone_rot)
+	AM_RANGE(0x1460, 0x1460) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE_MEMBER(firetrk_state, drone_x)
+	AM_RANGE(0x1480, 0x1480) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE_MEMBER(firetrk_state, drone_y)
+	AM_RANGE(0x14a0, 0x14a0) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE_MEMBER(firetrk_state, drone_rot)
 	AM_RANGE(0x14c0, 0x14c0) AM_MIRROR(0x001f) AM_WRITE(firetrk_output_w)
 	AM_RANGE(0x14e0, 0x14e0) AM_MIRROR(0x001f) AM_DEVWRITE("discrete", firetrk_xtndply_w)
 	AM_RANGE(0x1800, 0x1807) AM_MIRROR(0x03f8) AM_READ(firetrk_input_r) AM_WRITENOP
@@ -348,14 +361,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( superbug_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
-	AM_RANGE(0x0100, 0x0100) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE(&firetrk_scroll_y)
-	AM_RANGE(0x0120, 0x0120) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE(&firetrk_scroll_x)
+	AM_RANGE(0x0100, 0x0100) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE_MEMBER(firetrk_state, scroll_y)
+	AM_RANGE(0x0120, 0x0120) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE_MEMBER(firetrk_state, scroll_x)
 	AM_RANGE(0x0140, 0x0140) AM_MIRROR(0x001f) AM_WRITE(crash_reset_w)
 	AM_RANGE(0x0160, 0x0160) AM_MIRROR(0x001f) AM_DEVWRITE("discrete", firetrk_skid_reset_w)
-	AM_RANGE(0x0180, 0x0180) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE(&firetrk_car_rot)
+	AM_RANGE(0x0180, 0x0180) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE_MEMBER(firetrk_state, car_rot)
 	AM_RANGE(0x01a0, 0x01a0) AM_MIRROR(0x001f) AM_WRITE(steer_reset_w)
 	AM_RANGE(0x01c0, 0x01c0) AM_MIRROR(0x001f) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x01e0, 0x01e0) AM_MIRROR(0x001f) AM_WRITE(blink_on_w) AM_BASE(&firetrk_blink)
+	AM_RANGE(0x01e0, 0x01e0) AM_MIRROR(0x001f) AM_WRITE(blink_on_w) AM_BASE_MEMBER(firetrk_state, blink)
 	AM_RANGE(0x0200, 0x0207) AM_MIRROR(0x0018) AM_READ(firetrk_input_r)
 	AM_RANGE(0x0220, 0x0220) AM_MIRROR(0x001f) AM_DEVWRITE("discrete", superbug_asr_w)
 	AM_RANGE(0x0240, 0x0243) AM_MIRROR(0x001c) AM_READ(firetrk_dip_r)
@@ -363,30 +376,30 @@ static ADDRESS_MAP_START( superbug_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0280, 0x0280) AM_MIRROR(0x001f) AM_DEVWRITE("discrete", superbug_motor_snd_w)
 	AM_RANGE(0x02a0, 0x02a0) AM_MIRROR(0x001f) AM_DEVWRITE("discrete", firetrk_crash_snd_w)
 	AM_RANGE(0x02c0, 0x02c0) AM_MIRROR(0x001f) AM_DEVWRITE("discrete", firetrk_skid_snd_w)
-	AM_RANGE(0x0400, 0x041f) AM_RAM AM_BASE(&firetrk_alpha_num_ram)
-	AM_RANGE(0x0500, 0x05ff) AM_RAM AM_BASE(&firetrk_playfield_ram)
+	AM_RANGE(0x0400, 0x041f) AM_RAM AM_BASE_MEMBER(firetrk_state, alpha_num_ram)
+	AM_RANGE(0x0500, 0x05ff) AM_RAM AM_BASE_MEMBER(firetrk_state, playfield_ram)
 	AM_RANGE(0x0800, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( montecar_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0700) AM_RAM AM_BASE(&firetrk_alpha_num_ram)
-	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x0700) AM_RAM AM_BASE(&firetrk_playfield_ram)
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE(&firetrk_scroll_y)
-	AM_RANGE(0x1020, 0x1020) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE(&firetrk_scroll_x)
+	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0700) AM_RAM AM_BASE_MEMBER(firetrk_state, alpha_num_ram)
+	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x0700) AM_RAM AM_BASE_MEMBER(firetrk_state, playfield_ram)
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE_MEMBER(firetrk_state, scroll_y)
+	AM_RANGE(0x1020, 0x1020) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE_MEMBER(firetrk_state, scroll_x)
 	AM_RANGE(0x1040, 0x1040) AM_MIRROR(0x001f) AM_WRITE(montecar_drone_reset_w)
 	AM_RANGE(0x1060, 0x1060) AM_MIRROR(0x001f) AM_WRITE(montecar_car_reset_w)
-	AM_RANGE(0x1080, 0x1080) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE(&firetrk_car_rot)
+	AM_RANGE(0x1080, 0x1080) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE_MEMBER(firetrk_state, car_rot)
 	AM_RANGE(0x10a0, 0x10a0) AM_MIRROR(0x001f) AM_WRITE(steer_reset_w)
 	AM_RANGE(0x10c0, 0x10c0) AM_MIRROR(0x001f) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x10e0, 0x10e0) AM_MIRROR(0x001f) AM_DEVWRITE("discrete", montecar_skid_reset_w)
 	AM_RANGE(0x1400, 0x1400) AM_MIRROR(0x001f) AM_DEVWRITE("discrete", firetrk_motor_snd_w)
 	AM_RANGE(0x1420, 0x1420) AM_MIRROR(0x001f) AM_DEVWRITE("discrete", firetrk_crash_snd_w)
 	AM_RANGE(0x1440, 0x1440) AM_MIRROR(0x001f) AM_DEVWRITE("discrete", firetrk_skid_snd_w)
-	AM_RANGE(0x1460, 0x1460) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE(&firetrk_drone_x)
-	AM_RANGE(0x1480, 0x1480) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE(&firetrk_drone_y)
-	AM_RANGE(0x14a0, 0x14a0) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE(&firetrk_drone_rot)
+	AM_RANGE(0x1460, 0x1460) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE_MEMBER(firetrk_state, drone_x)
+	AM_RANGE(0x1480, 0x1480) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE_MEMBER(firetrk_state, drone_y)
+	AM_RANGE(0x14a0, 0x14a0) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE_MEMBER(firetrk_state, drone_rot)
 	AM_RANGE(0x14c0, 0x14c0) AM_MIRROR(0x001f) AM_WRITE(montecar_output_1_w)
 	AM_RANGE(0x14e0, 0x14e0) AM_MIRROR(0x001f) AM_WRITE(montecar_output_2_w)
 	AM_RANGE(0x1800, 0x1807) AM_MIRROR(0x03f8) AM_READ(montecar_input_r) AM_WRITENOP
@@ -876,7 +889,7 @@ static GFXDECODE_START( montecar )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( firetrk, driver_device )
+static MACHINE_CONFIG_START( firetrk, firetrk_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, MASTER_CLOCK/12)	/* 750Khz during service mode */

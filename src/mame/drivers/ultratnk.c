@@ -17,23 +17,22 @@ Atari Ultra Tank driver
 #define PIXEL_CLOCK    (MASTER_CLOCK / 2)
 
 
-static int da_latch;
-
-
 
 static CUSTOM_INPUT( get_collision )
 {
-	return ultratnk_collision[(FPTR) param];
+	ultratnk_state *state = field->port->machine->driver_data<ultratnk_state>();
+	return state->collision[(FPTR) param];
 }
 
 
 static CUSTOM_INPUT( get_joystick )
 {
+	ultratnk_state *state = field->port->machine->driver_data<ultratnk_state>();
 	UINT8 joy = input_port_read(field->port->machine, (const char *)param) & 3;
 
 	if (joy == 1)
 	{
-		return (da_latch < 8) ? 1 : 0;
+		return (state->da_latch < 8) ? 1 : 0;
 	}
 	if (joy == 2)
 	{
@@ -106,13 +105,15 @@ static WRITE8_HANDLER( ultratnk_wram_w )
 
 static WRITE8_HANDLER( ultratnk_collision_reset_w )
 {
-	ultratnk_collision[(offset >> 1) & 3] = 0;
+	ultratnk_state *state = space->machine->driver_data<ultratnk_state>();
+	state->collision[(offset >> 1) & 3] = 0;
 }
 
 
 static WRITE8_HANDLER( ultratnk_da_latch_w )
 {
-	da_latch = data & 15;
+	ultratnk_state *state = space->machine->driver_data<ultratnk_state>();
+	state->da_latch = data & 15;
 }
 
 

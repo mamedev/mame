@@ -11,6 +11,17 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	UINT8 *spriteram;
+	int nvram_enabled;
+	UINT8 bitmap_videoram_selected;
+	UINT8 bitmap_videoram_address_x;
+	UINT8 bitmap_videoram_address_y;
+	UINT8 *bitmap_videoram1;
+	UINT8 *bitmap_videoram2;
+	UINT8 *current_bitmap_videoram_accessed;
+	UINT8 *current_bitmap_videoram_displayed;
+	UINT16 *palette_ram;
+	tilemap_t *bg_tilemap;
 };
 
 

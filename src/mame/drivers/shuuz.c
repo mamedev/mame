@@ -93,8 +93,8 @@ static WRITE16_HANDLER( latch_w )
 
 static READ16_HANDLER( leta_r )
 {
+	shuuz_state *state = space->machine->driver_data<shuuz_state>();
 	/* trackball -- rotated 45 degrees? */
-	static int cur[2];
 	int which = offset & 1;
 
 	/* when reading the even ports, do a real analog port update */
@@ -103,12 +103,12 @@ static READ16_HANDLER( leta_r )
 		int dx = (INT8)input_port_read(space->machine, "TRACKX");
 		int dy = (INT8)input_port_read(space->machine, "TRACKY");
 
-		cur[0] = dx + dy;
-		cur[1] = dx - dy;
+		state->cur[0] = dx + dy;
+		state->cur[1] = dx - dy;
 	}
 
 	/* clip the result to -0x3f to +0x3f to remove directional ambiguities */
-	return cur[which];
+	return state->cur[which];
 }
 
 

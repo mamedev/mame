@@ -16,11 +16,7 @@
 #include "videopin.lh"
 #include "sound/discrete.h"
 
-static attotime time_pushed;
-static attotime time_released;
 
-static UINT8 prev = 0;
-static UINT8 mask = 0;
 
 static WRITE8_DEVICE_HANDLER(videopin_out1_w);
 static WRITE8_DEVICE_HANDLER(videopin_out2_w);
@@ -28,21 +24,22 @@ static WRITE8_DEVICE_HANDLER(videopin_out2_w);
 
 static void update_plunger(running_machine *machine)
 {
+	videopin_state *state = machine->driver_data<videopin_state>();
 	UINT8 val = input_port_read(machine, "IN2");
 
-	if (prev != val)
+	if (state->prev != val)
 	{
 		if (val == 0)
 		{
-			time_released = timer_get_time(machine);
+			state->time_released = timer_get_time(machine);
 
-			if (!mask)
+			if (!state->mask)
 				cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 		}
 		else
-			time_pushed = timer_get_time(machine);
+			state->time_pushed = timer_get_time(machine);
 
-		prev = val;
+		state->prev = val;
 	}
 }
 
@@ -79,7 +76,8 @@ static MACHINE_RESET( videopin )
 
 static double calc_plunger_pos(running_machine *machine)
 {
-	return (attotime_to_double(timer_get_time(machine)) - attotime_to_double(time_released)) * (attotime_to_double(time_released) - attotime_to_double(time_pushed) + 0.2);
+	videopin_state *state = machine->driver_data<videopin_state>();
+	return (attotime_to_double(timer_get_time(machine)) - attotime_to_double(state->time_released)) * (attotime_to_double(state->time_released) - attotime_to_double(state->time_pushed) + 0.2);
 }
 
 
@@ -140,6 +138,7 @@ static WRITE8_HANDLER( videopin_led_w )
 
 static WRITE8_DEVICE_HANDLER( videopin_out1_w )
 {
+	videopin_state *state = device->machine->driver_data<videopin_state>();
 	/* D0 => OCTAVE0  */
 	/* D1 => OCTACE1  */
 	/* D2 => OCTAVE2  */
@@ -149,9 +148,9 @@ static WRITE8_DEVICE_HANDLER( videopin_out1_w )
 	/* D6 => NOT USED */
 	/* D7 => NOT USED */
 
-	mask = ~data & 0x10;
+	state->mask = ~data & 0x10;
 
-	if (mask)
+	if (state->mask)
 		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 
 	coin_lockout_global_w(device->machine, ~data & 0x08);
@@ -196,7 +195,7 @@ static WRITE8_DEVICE_HANDLER( videopin_note_dvsr_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x07ff) AM_RAM_WRITE(videopin_video_ram_w) AM_BASE(&videopin_video_ram)
+	AM_RANGE(0x0200, 0x07ff) AM_RAM_WRITE(videopin_video_ram_w) AM_BASE_MEMBER(videopin_state, video_ram)
 	AM_RANGE(0x0800, 0x0800) AM_READ(videopin_misc_r) AM_DEVWRITE("discrete", videopin_note_dvsr_w)
 	AM_RANGE(0x0801, 0x0801) AM_WRITE(videopin_led_w)
 	AM_RANGE(0x0802, 0x0802) AM_WRITE(watchdog_reset_w)
@@ -321,7 +320,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( videopin, driver_device )
+static MACHINE_CONFIG_START( videopin, videopin_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 16)

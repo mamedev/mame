@@ -30,6 +30,38 @@ Atari Fire Truck + Super Bug + Monte Carlo driver
 #define MONTECAR_ATTRACT_INV		FIRETRUCK_ATTRACT_EN
 
 
+class firetrk_state : public driver_device
+{
+public:
+	firetrk_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 in_service_mode;
+	UINT32 dial[2];
+	UINT8 steer_dir[2];
+	UINT8 steer_flag[2];
+	UINT8 gear;
+	UINT8 *alpha_num_ram;
+	UINT8 *playfield_ram;
+	UINT8 *scroll_x;
+	UINT8 *scroll_y;
+	UINT8 *car_rot;
+	UINT8 *drone_rot;
+	UINT8 *drone_x;
+	UINT8 *drone_y;
+	UINT8 *blink;
+	UINT8 flash;
+	UINT8 crash[2];
+	UINT8 skid[2];
+	bitmap_t *helper1;
+	bitmap_t *helper2;
+	UINT32 color1_mask;
+	UINT32 color2_mask;
+	tilemap_t *tilemap1;
+	tilemap_t *tilemap2;
+};
+
+
 /*----------- defined in audio/firetrk.c -----------*/
 
 WRITE8_DEVICE_HANDLER( firetrk_skid_reset_w );
@@ -57,16 +89,4 @@ VIDEO_UPDATE( firetrk );
 VIDEO_UPDATE( superbug );
 VIDEO_UPDATE( montecar );
 
-extern UINT8 *firetrk_alpha_num_ram;
-extern UINT8 *firetrk_playfield_ram;
-extern UINT8 *firetrk_scroll_x;
-extern UINT8 *firetrk_scroll_y;
-extern UINT8 *firetrk_car_rot;
-extern UINT8 *firetrk_drone_rot;
-extern UINT8 *firetrk_drone_x;
-extern UINT8 *firetrk_drone_y;
-extern UINT8 *firetrk_blink;
-extern UINT8  firetrk_flash;
 
-extern UINT8 firetrk_crash[2];
-extern UINT8 firetrk_skid[2];

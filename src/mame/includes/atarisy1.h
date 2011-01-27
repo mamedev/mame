@@ -40,6 +40,8 @@ public:
 	/* graphics bank tracking */
 	UINT8			bank_gfx[3][8];
 	UINT8			bank_color_shift[MAX_GFX_ELEMENTS];
+
+	UINT8			cur[2][2];
 };
 
 

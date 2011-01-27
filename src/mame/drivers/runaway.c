@@ -16,10 +16,10 @@
 #include "sound/pokey.h"
 #include "includes/runaway.h"
 
-static emu_timer *interrupt_timer;
 
 static TIMER_CALLBACK( interrupt_callback )
 {
+	runaway_state *state = machine->driver_data<runaway_state>();
 	/* assume Centipede-style interrupt timing */
 	int scanline = param;
 
@@ -30,17 +30,19 @@ static TIMER_CALLBACK( interrupt_callback )
 	if (scanline >= 263)
 		scanline = 16;
 
-	timer_adjust_oneshot(interrupt_timer, machine->primary_screen->time_until_pos(scanline), scanline);
+	timer_adjust_oneshot(state->interrupt_timer, machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 static MACHINE_START( runaway )
 {
-	interrupt_timer = timer_alloc(machine, interrupt_callback, NULL);
+	runaway_state *state = machine->driver_data<runaway_state>();
+	state->interrupt_timer = timer_alloc(machine, interrupt_callback, NULL);
 }
 
 static MACHINE_RESET( runaway )
 {
-	timer_adjust_oneshot(interrupt_timer, machine->primary_screen->time_until_pos(16), 16);
+	runaway_state *state = machine->driver_data<runaway_state>();
+	timer_adjust_oneshot(state->interrupt_timer, machine->primary_screen->time_until_pos(16), 16);
 }
 
 
@@ -81,8 +83,8 @@ static WRITE8_HANDLER( runaway_irq_ack_w )
 
 static ADDRESS_MAP_START( runaway_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07bf) AM_RAM_WRITE(runaway_video_ram_w) AM_BASE(&runaway_video_ram)
-	AM_RANGE(0x07c0, 0x07ff) AM_RAM AM_BASE(&runaway_sprite_ram)
+	AM_RANGE(0x0400, 0x07bf) AM_RAM_WRITE(runaway_video_ram_w) AM_BASE_MEMBER(runaway_state, video_ram)
+	AM_RANGE(0x07c0, 0x07ff) AM_RAM AM_BASE_MEMBER(runaway_state, sprite_ram)
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(runaway_irq_ack_w)
 	AM_RANGE(0x1400, 0x143f) AM_DEVWRITE("earom", atari_vg_earom_w)
 	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("earom", atari_vg_earom_ctrl_w)
@@ -345,7 +347,7 @@ static const pokey_interface pokey_interface_2 =
 };
 
 
-static MACHINE_CONFIG_START( runaway, driver_device )
+static MACHINE_CONFIG_START( runaway, runaway_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 8) /* ? */

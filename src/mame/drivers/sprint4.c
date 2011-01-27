@@ -17,43 +17,37 @@ Atari Sprint 4 driver
 #define PIXEL_CLOCK    (MASTER_CLOCK / 2)
 
 
-
-static int da_latch;
-
-static int steer_FF1[4];
-static int steer_FF2[4];
-
-static int gear[4];
-
-
 static CUSTOM_INPUT( get_lever )
 {
+	sprint4_state *state = field->port->machine->driver_data<sprint4_state>();
 	int n = (FPTR) param;
 
-	return 4 * gear[n] > da_latch;
+	return 4 * state->gear[n] > state->da_latch;
 }
 
 
 static CUSTOM_INPUT( get_wheel )
 {
+	sprint4_state *state = field->port->machine->driver_data<sprint4_state>();
 	int n = (FPTR) param;
 
-	return 8 * steer_FF1[n] + 8 * steer_FF2[n] > da_latch;
+	return 8 * state->steer_FF1[n] + 8 * state->steer_FF2[n] > state->da_latch;
 }
 
 
 static CUSTOM_INPUT( get_collision )
 {
+	sprint4_state *state = field->port->machine->driver_data<sprint4_state>();
 	int n = (FPTR) param;
 
-	return sprint4_collision[n];
+	return state->collision[n];
 }
 
 
 static TIMER_CALLBACK( nmi_callback	)
 {
+	sprint4_state *state = machine->driver_data<sprint4_state>();
 	int scanline = param;
-	static UINT8 last_wheel[4];
 
 	/* MAME updates controls only once per frame but the game checks them on every NMI */
 
@@ -78,25 +72,25 @@ static TIMER_CALLBACK( nmi_callback	)
 
 	for (i = 0; i < 4; i++)
 	{
-		signed char delta = wheel[i] - last_wheel[i];
+		signed char delta = wheel[i] - state->last_wheel[i];
 
 		if (delta < 0)
 		{
-			steer_FF2[i] = 0;
+			state->steer_FF2[i] = 0;
 		}
 		if (delta > 0)
 		{
-			steer_FF2[i] = 1;
+			state->steer_FF2[i] = 1;
 		}
 
-		steer_FF1[i] = (wheel[i] >> 4) & 1;
+		state->steer_FF1[i] = (wheel[i] >> 4) & 1;
 
-		if (lever[i] & 1) { gear[i] = 1; }
-		if (lever[i] & 2) { gear[i] = 2; }
-		if (lever[i] & 4) { gear[i] = 3; }
-		if (lever[i] & 8) { gear[i] = 4; }
+		if (lever[i] & 1) { state->gear[i] = 1; }
+		if (lever[i] & 2) { state->gear[i] = 2; }
+		if (lever[i] & 4) { state->gear[i] = 3; }
+		if (lever[i] & 8) { state->gear[i] = 4; }
 
-		last_wheel[i] = wheel[i];
+		state->last_wheel[i] = wheel[i];
 	}
 
 	scanline += 64;
@@ -119,17 +113,18 @@ static TIMER_CALLBACK( nmi_callback	)
 
 static MACHINE_RESET( sprint4 )
 {
+	sprint4_state *state = machine->driver_data<sprint4_state>();
 	timer_set(machine, machine->primary_screen->time_until_pos(32), NULL, 32, nmi_callback);
 
-	memset(steer_FF1, 0, sizeof steer_FF1);
-	memset(steer_FF2, 0, sizeof steer_FF2);
+	memset(state->steer_FF1, 0, sizeof state->steer_FF1);
+	memset(state->steer_FF2, 0, sizeof state->steer_FF2);
 
-	gear[0] = 1;
-	gear[1] = 1;
-	gear[2] = 1;
-	gear[3] = 1;
+	state->gear[0] = 1;
+	state->gear[1] = 1;
+	state->gear[2] = 1;
+	state->gear[3] = 1;
 
-	da_latch = 0;
+	state->da_latch = 0;
 }
 
 
@@ -171,13 +166,15 @@ static WRITE8_HANDLER( sprint4_wram_w )
 
 static WRITE8_HANDLER( sprint4_collision_reset_w )
 {
-	sprint4_collision[(offset >> 1) & 3] = 0;
+	sprint4_state *state = space->machine->driver_data<sprint4_state>();
+	state->collision[(offset >> 1) & 3] = 0;
 }
 
 
 static WRITE8_HANDLER( sprint4_da_latch_w )
 {
-	da_latch = data & 15;
+	sprint4_state *state = space->machine->driver_data<sprint4_state>();
+	state->da_latch = data & 15;
 }
 
 

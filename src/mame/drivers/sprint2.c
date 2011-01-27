@@ -22,34 +22,34 @@
 #include "includes/sprint2.h"
 #include "sound/discrete.h"
 
-#define GAME_IS_SPRINT1   (game == 1)
-#define GAME_IS_SPRINT2   (game == 2)
-#define GAME_IS_DOMINOS   (game == 3)
+#define GAME_IS_SPRINT1   (state->game == 1)
+#define GAME_IS_SPRINT2   (state->game == 2)
+#define GAME_IS_DOMINOS   (state->game == 3)
 
 
 
-static int attract;
-static int steering[2];
-static int gear[2];
-static int game;
 
 
 static DRIVER_INIT( sprint1 )
 {
-	game = 1;
+	sprint2_state *state = machine->driver_data<sprint2_state>();
+	state->game = 1;
 }
 static DRIVER_INIT( sprint2 )
 {
-	game = 2;
+	sprint2_state *state = machine->driver_data<sprint2_state>();
+	state->game = 2;
 }
 static DRIVER_INIT( dominos )
 {
-	game = 3;
+	sprint2_state *state = machine->driver_data<sprint2_state>();
+	state->game = 3;
 }
 
 
 static int service_mode(running_machine *machine)
 {
+	sprint2_state *state = machine->driver_data<sprint2_state>();
 	UINT8 v = input_port_read(machine, "INB");
 
 	if (GAME_IS_SPRINT1)
@@ -71,10 +71,10 @@ static int service_mode(running_machine *machine)
 
 static INTERRUPT_GEN( sprint2 )
 {
+	sprint2_state *state = device->machine->driver_data<sprint2_state>();
 	device_t *discrete = device->machine->device("discrete");
-	static UINT8 dial[2];
 
-	/* handle steering wheels */
+	/* handle state->steering wheels */
 
 	if (GAME_IS_SPRINT1 || GAME_IS_SPRINT2)
 	{
@@ -82,32 +82,32 @@ static INTERRUPT_GEN( sprint2 )
 
 		for (i = 0; i < 2; i++)
 		{
-			signed char delta = input_port_read(device->machine, i ? "DIAL_P2" : "DIAL_P1") - dial[i];
+			signed char delta = input_port_read(device->machine, i ? "DIAL_P2" : "DIAL_P1") - state->dial[i];
 
 			if (delta < 0)
 			{
-				steering[i] = 0x00;
+				state->steering[i] = 0x00;
 			}
 			if (delta > 0)
 			{
-				steering[i] = 0x40;
+				state->steering[i] = 0x40;
 			}
 
-			dial[i] += delta;
+			state->dial[i] += delta;
 
 			switch (input_port_read(device->machine, i ? "GEAR_P2" : "GEAR_P1") & 15)
 			{
-			case 1: gear[i] = 1; break;
-			case 2: gear[i] = 2; break;
-			case 4: gear[i] = 3; break;
-			case 8: gear[i] = 4; break;
+			case 1: state->gear[i] = 1; break;
+			case 2: state->gear[i] = 2; break;
+			case 4: state->gear[i] = 3; break;
+			case 8: state->gear[i] = 4; break;
 			}
 		}
 	}
 
-	discrete_sound_w(discrete, SPRINT2_MOTORSND1_DATA, sprint2_video_ram[0x394] & 15);	// also DOMINOS_FREQ_DATA
-	discrete_sound_w(discrete, SPRINT2_MOTORSND2_DATA, sprint2_video_ram[0x395] & 15);
-	discrete_sound_w(discrete, SPRINT2_CRASHSND_DATA, sprint2_video_ram[0x396] & 15);	// also DOMINOS_AMP_DATA
+	discrete_sound_w(discrete, SPRINT2_MOTORSND1_DATA, state->video_ram[0x394] & 15);	// also DOMINOS_FREQ_DATA
+	discrete_sound_w(discrete, SPRINT2_MOTORSND2_DATA, state->video_ram[0x395] & 15);
+	discrete_sound_w(discrete, SPRINT2_CRASHSND_DATA, state->video_ram[0x396] & 15);	// also DOMINOS_AMP_DATA
 
 	/* interrupts and watchdog are disabled during service mode */
 
@@ -120,7 +120,8 @@ static INTERRUPT_GEN( sprint2 )
 
 static READ8_HANDLER( sprint2_wram_r )
 {
-	return sprint2_video_ram[0x380 + offset % 0x80];
+	sprint2_state *state = space->machine->driver_data<sprint2_state>();
+	return state->video_ram[0x380 + offset % 0x80];
 }
 
 
@@ -132,16 +133,17 @@ static READ8_HANDLER( sprint2_dip_r )
 
 static READ8_HANDLER( sprint2_input_A_r )
 {
+	sprint2_state *state = space->machine->driver_data<sprint2_state>();
 	UINT8 val = input_port_read(space->machine, "INA");
 
 	if (GAME_IS_SPRINT2)
 	{
-		if (gear[0] == 1) val &= ~0x01;
-		if (gear[1] == 1) val &= ~0x02;
-		if (gear[0] == 2) val &= ~0x04;
-		if (gear[1] == 2) val &= ~0x08;
-		if (gear[0] == 3) val &= ~0x10;
-		if (gear[1] == 3) val &= ~0x20;
+		if (state->gear[0] == 1) val &= ~0x01;
+		if (state->gear[1] == 1) val &= ~0x02;
+		if (state->gear[0] == 2) val &= ~0x04;
+		if (state->gear[1] == 2) val &= ~0x08;
+		if (state->gear[0] == 3) val &= ~0x10;
+		if (state->gear[1] == 3) val &= ~0x20;
 	}
 
 	return (val << (offset ^ 7)) & 0x80;
@@ -150,13 +152,14 @@ static READ8_HANDLER( sprint2_input_A_r )
 
 static READ8_HANDLER( sprint2_input_B_r )
 {
+	sprint2_state *state = space->machine->driver_data<sprint2_state>();
 	UINT8 val = input_port_read(space->machine, "INB");
 
 	if (GAME_IS_SPRINT1)
 	{
-		if (gear[0] == 1) val &= ~0x01;
-		if (gear[0] == 2) val &= ~0x02;
-		if (gear[0] == 3) val &= ~0x04;
+		if (state->gear[0] == 1) val &= ~0x01;
+		if (state->gear[0] == 2) val &= ~0x02;
+		if (state->gear[0] == 3) val &= ~0x04;
 	}
 
 	return (val << (offset ^ 7)) & 0x80;
@@ -165,9 +168,10 @@ static READ8_HANDLER( sprint2_input_B_r )
 
 static READ8_HANDLER( sprint2_sync_r )
 {
+	sprint2_state *state = space->machine->driver_data<sprint2_state>();
 	UINT8 val = 0;
 
-	if (attract != 0)
+	if (state->attract != 0)
 		val |= 0x10;
 
 	if (space->machine->primary_screen->vpos() == 261)
@@ -185,36 +189,42 @@ static READ8_HANDLER( sprint2_sync_r )
 
 static READ8_HANDLER( sprint2_steering1_r )
 {
-	return steering[0];
+	sprint2_state *state = space->machine->driver_data<sprint2_state>();
+	return state->steering[0];
 }
 static READ8_HANDLER( sprint2_steering2_r )
 {
-	return steering[1];
+	sprint2_state *state = space->machine->driver_data<sprint2_state>();
+	return state->steering[1];
 }
 
 
 static WRITE8_HANDLER( sprint2_steering_reset1_w )
 {
-	steering[0] |= 0x80;
+	sprint2_state *state = space->machine->driver_data<sprint2_state>();
+	state->steering[0] |= 0x80;
 }
 static WRITE8_HANDLER( sprint2_steering_reset2_w )
 {
-	steering[1] |= 0x80;
+	sprint2_state *state = space->machine->driver_data<sprint2_state>();
+	state->steering[1] |= 0x80;
 }
 
 
 static WRITE8_HANDLER( sprint2_wram_w )
 {
-	sprint2_video_ram[0x380 + offset % 0x80] = data;
+	sprint2_state *state = space->machine->driver_data<sprint2_state>();
+	state->video_ram[0x380 + offset % 0x80] = data;
 }
 
 
 static WRITE8_DEVICE_HANDLER( sprint2_attract_w )
 {
-	attract = offset & 1;
+	sprint2_state *state = device->machine->driver_data<sprint2_state>();
+	state->attract = offset & 1;
 
 	// also DOMINOS_ATTRACT_EN
-	discrete_sound_w(device, SPRINT2_ATTRACT_EN, attract);
+	discrete_sound_w(device, SPRINT2_ATTRACT_EN, state->attract);
 }
 
 
@@ -248,7 +258,7 @@ static WRITE8_HANDLER( sprint2_lamp2_w )
 
 static ADDRESS_MAP_START( sprint2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_READWRITE(sprint2_wram_r,sprint2_wram_w)
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(sprint2_video_ram_w) AM_BASE(&sprint2_video_ram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(sprint2_video_ram_w) AM_BASE_MEMBER(sprint2_state, video_ram)
 	AM_RANGE(0x0818, 0x081f) AM_READ(sprint2_input_A_r)
 	AM_RANGE(0x0828, 0x082f) AM_READ(sprint2_input_B_r)
 	AM_RANGE(0x0830, 0x0837) AM_READ(sprint2_dip_r)
@@ -492,7 +502,7 @@ static GFXDECODE_START( sprint2 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( sprint2, driver_device )
+static MACHINE_CONFIG_START( sprint2, sprint2_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 16)

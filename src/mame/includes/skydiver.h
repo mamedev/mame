@@ -19,14 +19,25 @@
 #define SKYDIVER_SOUND_EN		NODE_10
 
 
+class skydiver_state : public driver_device
+{
+public:
+	skydiver_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	int nmion;
+	UINT8 *videoram;
+	tilemap_t *bg_tilemap;
+	int width;
+};
+
+
 /*----------- defined in audio/skydiver.c -----------*/
 
 DISCRETE_SOUND_EXTERN( skydiver );
 
 
 /*----------- defined in video/skydiver.c -----------*/
-
-extern UINT8 *skydiver_videoram;
 
 MACHINE_RESET( skydiver );
 WRITE8_HANDLER( skydiver_videoram_w );

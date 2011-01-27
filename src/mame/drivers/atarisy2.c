@@ -441,24 +441,21 @@ static READ8_HANDLER( leta_r )
 			case 1:	/* Fake Joystick */
 			/* special thanks to MAME Analog+ for the mapping code */
 			{
-				static double last_angle;
-				static int rotations;
-
 				int analogx = input_port_read(space->machine, "FAKE_JOY_X") - 128;
 				int analogy = input_port_read(space->machine, "FAKE_JOY_Y") - 128;
 				double angle;
 
 				/* if the joystick is centered, leave the rest of this alone */
-				angle = last_angle;
+				angle = state->joy_last_angle;
 				if (analogx < -32 || analogx > 32 || analogy < -32 || analogy > 32)
 					angle = atan2((double)analogx, (double)analogy) * 360 / (2 * M_PI);
 
 				/* detect when we pass the 0 point in either direction */
-				if (last_angle < -90 && angle > 90)
-					rotations--;
-				else if (last_angle > 90 && angle < -90)
-					rotations++;
-				last_angle = angle;
+				if (state->joy_last_angle < -90 && angle > 90)
+					state->joy_rotations--;
+				else if (state->joy_last_angle > 90 && angle < -90)
+					state->joy_rotations++;
+				state->joy_last_angle = angle;
 
 				/* make offset 0 return 0xff when the controller blocks one of two gaps */
 				/* this is not accurate, as a counter should count up/down 2 counts as it passes through each gap */
@@ -476,15 +473,12 @@ static READ8_HANDLER( leta_r )
 				else
 				{
 					/* take the rotations * 144 plus the current angle */
-					return (rotations * 144 + (int)(angle * 144.0 / 360.0)) & 0xff;
+					return (state->joy_rotations * 144 + (int)(angle * 144.0 / 360.0)) & 0xff;
 				}
 			}
 
 			case 2:	/* Fake Spinner */
 			{
-				static UINT32 last_rotate_count;
-				static INT32  pos;					/* track fake position of spinner */
-				static UINT32 center_count;
 				INT32  diff;
 				UINT32 temp;
 				UINT32 rotate_count = input_port_read(space->machine, "FAKE_SPINNER") & 0xffff;
@@ -492,26 +486,26 @@ static READ8_HANDLER( leta_r )
                  * we use it to generate the LETA0 Center encoder count
                  */
 
-				if (rotate_count != last_rotate_count)
+				if (rotate_count != state->spin_last_rotate_count)
 				{
 					/* see if count rolled between 0xffff and 0x0000 */
-					if ((last_rotate_count > 0xc000) && (rotate_count < 0x03ff))
+					if ((state->spin_last_rotate_count > 0xc000) && (rotate_count < 0x03ff))
 					{
-						temp = 0xffff - last_rotate_count;
+						temp = 0xffff - state->spin_last_rotate_count;
 						diff = rotate_count + temp + 1;
 					}
-					else if ((rotate_count > 0xc000) && (last_rotate_count < 0x03ff))
+					else if ((rotate_count > 0xc000) && (state->spin_last_rotate_count < 0x03ff))
 					{
 						temp = 0xffff - rotate_count;
-						diff = last_rotate_count - temp - 1;
+						diff = state->spin_last_rotate_count - temp - 1;
 					}
 					else
 					{
-						temp = rotate_count - last_rotate_count;
+						temp = rotate_count - state->spin_last_rotate_count;
 						diff = temp;
 					}
 
-					last_rotate_count = rotate_count;
+					state->spin_last_rotate_count = rotate_count;
 
 					/* you may not like this, but it is the easiest way to accurately fake the center count */
 					/* diff is never a big number anyways */
@@ -519,17 +513,17 @@ static READ8_HANDLER( leta_r )
 					{
 						for (int i = 0; i > diff; i--)
 						{
-							pos--;
-							if (pos < 0)
-								pos = 143;
+							state->spin_pos--;
+							if (state->spin_pos < 0)
+								state->spin_pos = 143;
 							else
-								switch (pos)
+								switch (state->spin_pos)
 								{
 									case 2:
 									case 3:
 									case 141:
 									case 142:
-										center_count--;
+										state->spin_center_count--;
 								}
 						}
 					}
@@ -537,24 +531,24 @@ static READ8_HANDLER( leta_r )
 					{
 						for (int i = 0; i < diff; i++)
 						{
-							pos++;
-							if (pos > 143)
-								pos = 0;
+							state->spin_pos++;
+							if (state->spin_pos > 143)
+								state->spin_pos = 0;
 							else
-								switch (pos)
+								switch (state->spin_pos)
 								{
 									case 2:
 									case 3:
 									case 141:
 									case 142:
-										center_count++;
+										state->spin_center_count++;
 								}
 						}
 					}
 				}
 
 				if (offset == 0)
-					return center_count & 0xff;
+					return state->spin_center_count & 0xff;
 				else
 					/* offset == 1 */
 					return rotate_count & 0xff;

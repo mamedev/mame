@@ -88,11 +88,11 @@ static READ16_HANDLER( special_port1_r )
 
 static READ16_HANDLER( adc_r )
 {
-	static int last_offset;
+	eprom_state *state = space->machine->driver_data<eprom_state>();
 	static const char *const adcnames[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
-	int result = input_port_read(space->machine, adcnames[last_offset & 3]);
+	int result = input_port_read(space->machine, adcnames[state->last_offset & 3]);
 
-	last_offset = offset;
+	state->last_offset = offset;
 	return result;
 }
 

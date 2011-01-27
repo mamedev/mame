@@ -63,7 +63,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x006a, 0x006b) AM_DEVWRITE("discrete", subs_crash_w)
 	AM_RANGE(0x006c, 0x006d) AM_WRITE(subs_invert1_w)
 	AM_RANGE(0x006e, 0x006f) AM_WRITE(subs_invert2_w)
-	AM_RANGE(0x0090, 0x009f) AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x0090, 0x009f) AM_BASE_MEMBER(subs_state, spriteram)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_BASE_MEMBER(subs_state, videoram)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM

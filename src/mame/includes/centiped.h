@@ -11,12 +11,20 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	UINT8 oldpos[4];
+	UINT8 sign[4];
+	UINT8 dsw_select;
+	UINT8 control_select;
+	UINT8 *rambase;
+	UINT8 flipscreen;
+	UINT8 *bullsdrt_tiles_bankram;
+	tilemap_t *bg_tilemap;
+	UINT8 bullsdrt_sprites_bank;
+	UINT8 penmask[64];
 };
 
 
 /*----------- defined in video/centiped.c -----------*/
-
-extern UINT8 centiped_flipscreen, *bullsdrt_tiles_bankram;
 
 PALETTE_INIT( warlords );
 
@@ -39,4 +47,3 @@ WRITE8_HANDLER( bullsdrt_tilesbank_w );
 WRITE8_HANDLER( bullsdrt_sprites_bank_w );
 
 WRITE8_HANDLER( mazeinv_paletteram_w );
-
