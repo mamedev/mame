@@ -1175,10 +1175,10 @@ int input_machine_has_keyboard(running_machine *machine);
 void inputx_init(running_machine *machine);
 
 /* called by drivers to setup natural keyboard support */
-void inputx_setup_natural_keyboard(
-	int (*queue_chars)(const unicode_char *text, size_t text_len),
-	int (*accept_char)(unicode_char ch),
-	int (*charqueue_empty)(void));
+void inputx_setup_natural_keyboard(running_machine *machine,
+	int (*queue_chars)(running_machine *machine, const unicode_char *text, size_t text_len),
+	int (*accept_char)(running_machine *machine, unicode_char ch),
+	int (*charqueue_empty)(running_machine *machine));
 
 /* validity checks */
 int validate_natural_keyboard_statics(void);
