@@ -3,15 +3,15 @@
 <!--
     This list should be kept up to date with any changes made
     to drivers/megatech.c
-    
+
     This is considered an alternate way of launching the titles, in order to support mult-cart mode.
-    
+
     It is not intended to replace the primary MAME launch system!
 -->
 
 <softwarelist name="megatech" description="Sega MegaTech cartridges">
 
-  
+
   <!-- Game 01 : Altered Beast -->
   <software name="mt_beast">
     <description>Altered Beast</description>
@@ -25,7 +25,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 02 : Space Harrier II -->
   <software name="mt_shar2">
     <description>Space Harrier II</description>
@@ -39,7 +39,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 03 : Super Thunder Blade -->
   <software name="mt_stbld">
     <description>Super Thunder Blade</description>
@@ -53,7 +53,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 04 : Great Golf (SMS based) -->
   <software name="mt_ggolf">
     <description>Great Golf (SMS based)</description>
@@ -67,7 +67,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 05 : Great Soccer (SMS based) -->
   <software name="mt_gsocr">
     <description>Great Soccer (SMS based)</description>
@@ -81,7 +81,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 06 : Out Run (SMS based) -->
   <software name="mt_orun">
     <description>Out Run (SMS based)</description>
@@ -95,7 +95,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 07 : Alien Syndrome (SMS based) -->
   <software name="mt_asyn">
     <description>Alien Syndrome (SMS based)</description>
@@ -109,7 +109,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 08 : Shinobi (SMS based) -->
   <software name="mt_shnbi">
     <description>Shinobi (SMS based)</description>
@@ -123,7 +123,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 09 : Fantasy Zone (SMS based) -->
   <software name="mt_fz">
     <description>Fantasy Zone (SMS based)</description>
@@ -137,7 +137,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 10 : After Burner (SMS based) -->
   <software name="mt_aftrb">
     <description>After Burner (SMS based)</description>
@@ -151,7 +151,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 11 : Thunder Force II MD -->
   <software name="mt_tfor2">
     <description>Thunder Force II MD</description>
@@ -165,7 +165,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 13 : Astro Warrior (SMS based) -->
   <software name="mt_astro">
     <description>Astro Warrior (SMS based)</description>
@@ -179,7 +179,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 19 : Great Football (SMS based) -->
   <software name="mt_gfoot">
     <description>Great Football (SMS based)</description>
@@ -193,7 +193,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 20 : Last Battle -->
   <software name="mt_lastb">
     <description>Last Battle</description>
@@ -207,7 +207,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 21 : World Championship Soccer -->
   <software name="mt_wcsoc">
     <description>World Championship Soccer</description>
@@ -221,7 +221,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 22 : Tetris -->
   <software name="mt_tetri">
     <description>Tetris</description>
@@ -230,13 +230,13 @@
     <part name="cart" interface="megatech_cart">
       <feature name="pcb_type" value="genesis" />
       <dataarea name="rom" size="0x400000">
-        <rom name="mpr-12356f.ic1"   size="0x020000" crc="1e71c1a0" sha1="44b2312792e49d46d71e0417a7f022e5ffddbbfe" offset="0x000001"/>
-        <rom name="mpr-12357f.ic2"   size="0x020000" crc="d52ca49c" sha1="a9159892eee2c0cf28ebfcfa99f81f80781851c6" offset="0x000000"/>
+        <rom name="mpr-12356f.ic1"   size="0x020000" crc="1e71c1a0" sha1="44b2312792e49d46d71e0417a7f022e5ffddbbfe" offset="0x000000" loadflag="load16_byte"/>
+        <rom name="mpr-12357f.ic2"   size="0x020000" crc="d52ca49c" sha1="a9159892eee2c0cf28ebfcfa99f81f80781851c6" offset="0x000001" loadflag="load16_byte"/>
         <rom name="epr-12368-22.ic3" size="0x008000" crc="1c1b6468" sha1="568a38f4186167486e39ab4aa2c1ceffd0b81156" offset="0x300000" loadflag="load16_byte"/>
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 23 : Ghouls'n Ghosts -->
   <software name="mt_gng">
     <description>Ghouls'n Ghosts</description>
@@ -246,12 +246,13 @@
       <feature name="pcb_type" value="genesis" />
       <dataarea name="rom" size="0x400000">
         <rom name="mp12605.ic1"      size="0x020000" crc="1066c6ab" sha1="c30e4442732bdb38c96d780542f8550a94d127b0" offset="0x000000"/>
-        <rom name="mpr12606.ic2"     size="0x080000" crc="d0be7777" sha1="a44b2a3d427f6973b5c1a3dcd8d1776366acb9f7" offset="0x080000"/>
+        <rom name="mpr12606.ic2"     size="0x020000" crc="d0be7777" sha1="a44b2a3d427f6973b5c1a3dcd8d1776366acb9f7" offset="0x080000"/>
+        <rom                         size="0x060000"                                                                offset="0x020000" loadflag="continue" />
         <rom name="epr-12368-23.ic3" size="0x008000" crc="7ee58546" sha1="ad5bb0934475eacdc5e354f67c96fe0d2512d33b" offset="0x300000" loadflag="load16_byte"/>
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 24 : Super Hang-On -->
   <software name="mt_shang">
     <description>Super Hang-On</description>
@@ -265,7 +266,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 25 : Golden Axe -->
   <software name="mt_gaxe">
     <description>Golden Axe</description>
@@ -279,7 +280,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 26 : Forgotten Worlds -->
   <software name="mt_fwrld">
     <description>Forgotten Worlds</description>
@@ -288,12 +289,13 @@
     <part name="cart" interface="megatech_cart">
       <feature name="pcb_type" value="genesis" />
       <dataarea name="rom" size="0x400000">
-        <rom name="mpr-12672-h.ic1"  size="0x080000" crc="d0ee6434" sha1="8b9a37c206c332ef23dc71f09ec40e1a92b1f83a" offset="0x000000"/>
+        <!-- This ROM is byteswapped like a MD dump targetted at console emulators, is it correct? -->
+        <rom name="mpr-12672-h.ic1"  size="0x080000" crc="d0ee6434" sha1="8b9a37c206c332ef23dc71f09ec40e1a92b1f83a" offset="0x000000" loadflag="load16_word_swap"/>
         <rom name="epr-12368-26.ic2" size="0x008000" crc="4623b573" sha1="29df4a5c5de66cd9cb7519e4f30000f7dddc2138" offset="0x300000" loadflag="load16_byte"/>
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 27 : Mystic Defender -->
   <software name="mt_mystd">
     <description>Mystic Defender</description>
@@ -307,7 +309,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 28 : The Revenge of Shinobi -->
   <software name="mt_revsh">
     <description>The Revenge of Shinobi</description>
@@ -321,7 +323,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 29 : Parlour Games (SMS based) -->
   <software name="mt_parlg">
     <description>Parlour Games (SMS based)</description>
@@ -335,7 +337,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 31 : Arnold Palmer Tournament Golf -->
   <software name="mt_tgolf">
     <description>Arnold Palmer Tournament Golf</description>
@@ -349,7 +351,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 32 : Super Real Basketball -->
   <software name="mt_srbb">
     <description>Super Real Basketball</description>
@@ -358,12 +360,13 @@
     <part name="cart" interface="megatech_cart">
       <feature name="pcb_type" value="genesis" />
       <dataarea name="rom" size="0x400000">
-        <rom name="mpr-12904f.ic1"   size="0x080000" crc="4346e11a" sha1="c86725780027ef9783cb7884c8770cc030b0cd0d" offset="0x000000"/>
+        <!-- This ROM is byteswapped like a MD dump targetted at console emulators, is it correct? -->
+        <rom name="mpr-12904f.ic1"   size="0x080000" crc="4346e11a" sha1="c86725780027ef9783cb7884c8770cc030b0cd0d" offset="0x000000" loadflag="load16_word_swap"/>
         <rom name="epr-12368-32.ic2" size="0x008000" crc="f70adcbe" sha1="d4412a7cd59fe282a1c6619aa1051a2a2e00e1aa" offset="0x300000" loadflag="load16_byte"/>
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 35 : Tommy Lasorda Baseball -->
   <software name="mt_tlbba">
     <description>Tommy Lasorda Baseball</description>
@@ -377,7 +380,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 36 : Columns -->
   <software name="mt_cols">
     <description>Columns</description>
@@ -391,7 +394,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 38 : Cyber Police ESWAT: Enhanced Special Weapons and Tactics -->
   <software name="mt_eswat">
     <description>Cyber Police ESWAT: Enhanced Special Weapons and Tactics</description>
@@ -405,7 +408,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 39 : Super Monaco GP -->
   <software name="mt_smgp">
     <description>Super Monaco GP</description>
@@ -419,7 +422,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 40 : Michael Jackson's Moonwalker -->
   <software name="mt_mwalk">
     <description>Michael Jackson's Moonwalker</description>
@@ -433,7 +436,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 41 : Crack Down -->
   <software name="mt_crack">
     <description>Crack Down</description>
@@ -447,7 +450,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 43 : Shadow Dancer -->
   <software name="mt_shado">
     <description>Shadow Dancer</description>
@@ -461,7 +464,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 44 : Arrow Flash -->
   <software name="mt_arrow">
     <description>Arrow Flash</description>
@@ -475,7 +478,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 47 : Alien Storm -->
   <software name="mt_astrm">
     <description>Alien Storm</description>
@@ -489,7 +492,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 48 : Wrestle War -->
   <software name="mt_wwar">
     <description>Wrestle War</description>
@@ -503,7 +506,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 49 : Bonanza Bros. -->
   <software name="mt_bbros">
     <description>Bonanza Bros.</description>
@@ -517,7 +520,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 51 : Streets of Rage -->
   <software name="mt_srage">
     <description>Streets of Rage</description>
@@ -531,7 +534,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 52 : Sonic The Hedgehog (set 1) -->
   <software name="mt_sonic">
     <description>Sonic The Hedgehog (set 1)</description>
@@ -545,7 +548,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 52 : Sonic The Hedgehog (set 2) -->
   <software name="mt_sonia" cloneof="mt_sonic">
     <description>Sonic The Hedgehog (set 2)</description>
@@ -559,7 +562,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 53 : Fire Shark -->
   <software name="mt_fshrk">
     <description>Fire Shark</description>
@@ -573,7 +576,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 54 : Spider-Man vs The Kingpin -->
   <software name="mt_spman">
     <description>Spider-Man vs The Kingpin</description>
@@ -587,7 +590,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 57 : Golden Axe II -->
   <software name="mt_gaxe2">
     <description>Golden Axe II</description>
@@ -601,7 +604,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 58 : Joe Montana II: Sports Talk Football -->
   <software name="mt_stf">
     <description>Joe Montana II: Sports Talk Football</description>
@@ -615,7 +618,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 59 : Mario Lemieux Hockey -->
   <software name="mt_mlh">
     <description>Mario Lemieux Hockey</description>
@@ -629,7 +632,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 60 : Kid Chameleon -->
   <software name="mt_kcham">
     <description>Kid Chameleon</description>
@@ -643,7 +646,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 61 : Turbo Outrun -->
   <software name="mt_tout">
     <description>Turbo Outrun</description>
@@ -657,7 +660,7 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Game 62 : Sonic The Hedgehog 2 -->
   <software name="mt_soni2">
     <description>Sonic The Hedgehog 2</description>
