@@ -2130,9 +2130,11 @@ static void mb87078_gain_changed( running_machine *machine, int channel, int per
 
 	if (channel == 1)
 	{
-		sound_set_output_gain(state->ym, 0, percent / 100.0);
-		sound_set_output_gain(state->ym, 1, percent / 100.0);
-		sound_set_output_gain(state->ym, 2, percent / 100.0);
+		device_sound_interface *sound;
+		state->ym->interface(sound);
+		sound->set_output_gain(0, percent / 100.0);
+		sound->set_output_gain(1, percent / 100.0);
+		sound->set_output_gain(2, percent / 100.0);
 		//popmessage("MB87078 gain ch#%i percent=%i", channel, percent);
 	}
 }

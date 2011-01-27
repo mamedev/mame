@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "sound/upd7759.h"
 #include "includes/micro3d.h"
 
@@ -193,7 +192,7 @@ void micro3d_noise_sh_w(running_machine *machine, UINT8 data)
 			double q;
 			double fc;
 
-			stream_update(nstate->stream);
+			nstate->stream->update();
 
 			nstate->dac[data & 3] = state->dac_data;
 
@@ -315,7 +314,7 @@ static DEVICE_START( micro3d_sound )
 	noise_state *state = get_safe_token(device);
 
 	/* Allocate the stream */
-	state->stream = stream_create(device, 0, 2, machine->sample_rate, state, micro3d_stream_update);
+	state->stream = device->machine->sound().stream_alloc(*device, 0, 2, machine->sample_rate, state, micro3d_stream_update);
 	filter_init(machine, &state->filter, machine->sample_rate);
 
 	configure_filter(&state->noise_filters[0], 2.7e3 + 2.7e3, 1.0e-6);

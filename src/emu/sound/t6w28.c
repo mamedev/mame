@@ -30,7 +30,6 @@ Offset 0:
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "t6w28.h"
 
 
@@ -73,7 +72,7 @@ WRITE8_DEVICE_HANDLER( t6w28_w )
 
 
 	/* update the output buffer before changing the registers */
-	stream_update(R->Channel);
+	R->Channel->update();
 
 	offset &= 1;
 
@@ -310,7 +309,7 @@ static int t6w28_init(device_t *device, t6w28_state *R)
 	int sample_rate = device->clock()/16;
 	int i;
 
-	R->Channel = stream_create(device,0,2,sample_rate,R,t6w28_update);
+	R->Channel = device->machine->sound().stream_alloc(*device,0,2,sample_rate,R,t6w28_update);
 
 	R->SampleRate = sample_rate;
 

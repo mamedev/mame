@@ -4,7 +4,6 @@
 ************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "st0016.h"
 
 #define VERBOSE (0)
@@ -143,7 +142,7 @@ static DEVICE_START( st0016 )
 
 	info->sound_ram = intf->p_soundram;
 
-	info->stream = stream_create(device, 0, 2, 44100, info, st0016_update);
+	info->stream = device->machine->sound().stream_alloc(*device, 0, 2, 44100, info, st0016_update);
 }
 
 

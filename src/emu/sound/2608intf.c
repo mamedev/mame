@@ -12,7 +12,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "ay8910.h"
 #include "2608intf.h"
 #include "fm.h"
@@ -110,7 +109,7 @@ static void timer_handler(void *param,int c,int count,int clock)
 void ym2608_update_request(void *param)
 {
 	ym2608_state *info = (ym2608_state *)param;
-	stream_update(info->stream);
+	info->stream->update();
 }
 
 static STREAM_UPDATE( ym2608_stream_update )
@@ -157,7 +156,7 @@ static DEVICE_START( ym2608 )
 	info->timer[1] = timer_alloc(device->machine, timer_callback_2608_1, info);
 
 	/* stream system initialize */
-	info->stream = stream_create(device,0,2,rate,info,ym2608_stream_update);
+	info->stream = device->machine->sound().stream_alloc(*device,0,2,rate,info,ym2608_stream_update);
 	/* setup adpcm buffers */
 	pcmbufa  = *device->region();
 	pcmsizea = device->region()->bytes();

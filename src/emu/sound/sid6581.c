@@ -35,7 +35,7 @@ static void sid_start(device_t *device, SIDTYPE sidtype)
 	const sid6581_interface *iface = (const sid6581_interface*) device->baseconfig().static_config();
 
 	sid->device = device;
-	sid->mixer_channel = stream_create (device, 0, 1,  device->machine->sample_rate, (void *) sid, sid_update);
+	sid->mixer_channel = device->machine->sound().stream_alloc(*device, 0, 1,  device->machine->sample_rate, (void *) sid, sid_update);
 	sid->PCMfreq = device->machine->sample_rate;
 	sid->clock = device->clock();
 	sid->ad_read = iface ? iface->ad_read : NULL;

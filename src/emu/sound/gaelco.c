@@ -34,7 +34,6 @@ Registers per channel:
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "gaelco.h"
 #include "wavwrite.h"
 
@@ -213,7 +212,7 @@ WRITE16_DEVICE_HANDLER( gaelcosnd_w )
 	LOG_READ_WRITES(("%s: (GAE1): write %04x to %04x\n", cpuexec_describe_context(device->machine), data, offset));
 
 	/* first update the stream to this point in time */
-	stream_update(info->stream);
+	info->stream->update();
 
 	COMBINE_DATA(&info->sndregs[offset]);
 
@@ -260,7 +259,7 @@ static DEVICE_START( gaelco )
 	for (j = 0; j < 4; j++){
 		info->banks[j] = intf->banks[j];
 	}
-	info->stream = stream_create(device, 0, 2, 8000, info, gaelco_update);
+	info->stream = device->machine->sound().stream_alloc(*device, 0, 2, 8000, info, gaelco_update);
 	info->snd_data = (UINT8 *)device->machine->region(intf->gfxregion)->base();
 	if (info->snd_data == NULL)
 		info->snd_data = *device->region();

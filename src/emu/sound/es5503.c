@@ -34,7 +34,6 @@
 */
 
 #include "emu.h"
-#include "streams.h"
 #include "es5503.h"
 
 typedef struct
@@ -141,7 +140,7 @@ static TIMER_CALLBACK( es5503_timer_cb )
 	ES5503Osc *osc = (ES5503Osc *)ptr;
 	ES5503Chip *chip = (ES5503Chip *)osc->chip;
 
-	stream_update(chip->stream);
+	chip->stream->update();
 }
 
 static STREAM_UPDATE( es5503_pcm_update )
@@ -267,7 +266,7 @@ static DEVICE_START( es5503 )
 	chip->oscsenabled = 1;
 
 	chip->output_rate = (device->clock()/8)/34;	// (input clock / 8) / # of oscs. enabled + 2
-	chip->stream = stream_create(device, 0, 2, chip->output_rate, chip, es5503_pcm_update);
+	chip->stream = device->machine->sound().stream_alloc(*device, 0, 2, chip->output_rate, chip, es5503_pcm_update);
 }
 
 READ8_DEVICE_HANDLER( es5503_r )
@@ -276,7 +275,7 @@ READ8_DEVICE_HANDLER( es5503_r )
 	int i;
 	ES5503Chip *chip = get_safe_token(device);
 
-	stream_update(chip->stream);
+	chip->stream->update();
 
 	if (offset < 0xe0)
 	{
@@ -376,7 +375,7 @@ WRITE8_DEVICE_HANDLER( es5503_w )
 {
 	ES5503Chip *chip = get_safe_token(device);
 
-	stream_update(chip->stream);
+	chip->stream->update();
 
 	if (offset < 0xe0)
 	{
@@ -486,7 +485,7 @@ WRITE8_DEVICE_HANDLER( es5503_w )
 				chip->oscsenabled = (data>>1);
 
 				chip->output_rate = (chip->clock/8)/(2+chip->oscsenabled);
-				stream_set_sample_rate(chip->stream, chip->output_rate);
+				chip->stream->set_sample_rate(chip->output_rate);
 				break;
 
 			case 0xe2:	// A/D converter

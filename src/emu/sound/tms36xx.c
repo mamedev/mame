@@ -1,5 +1,4 @@
 #include "emu.h"
-#include "streams.h"
 #include "tms36xx.h"
 
 #define VERBOSE 1
@@ -421,7 +420,7 @@ void mm6221aa_tune_w(device_t *device, int tune)
 	LOG(("%s tune:%X\n", tms->subtype, tune));
 
     /* update the stream before changing the tune */
-    stream_update(tms->channel);
+    tms->channel->update();
 
     tms->tune_num = tune;
     tms->tune_ofs = 0;
@@ -441,7 +440,7 @@ void tms36xx_note_w(device_t *device, int octave, int note)
 	LOG(("%s octave:%X note:%X\n", tms->subtype, octave, note));
 
 	/* update the stream before changing the tune */
-    stream_update(tms->channel);
+    tms->channel->update();
 
 	/* play a single note from 'tune 4', a list of the 13 tones */
 	tms36xx_reset_counters(tms);
@@ -461,7 +460,7 @@ static void tms3617_enable(tms_state *tms, int enable)
 		return;
 
     /* update the stream before changing the tune */
-    stream_update(tms->channel);
+    tms->channel->update();
 
 	LOG(("%s enable voices", tms->subtype));
     for (i = 0; i < 6; i++)
@@ -501,7 +500,7 @@ static DEVICE_START( tms36xx )
 
 	tms->intf = (const tms36xx_interface *)device->baseconfig().static_config();
 
-   tms->channel = stream_create(device, 0, 1, device->clock() * 64, tms, tms36xx_sound_update);
+   tms->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->clock() * 64, tms, tms36xx_sound_update);
 	tms->samplerate = device->clock() * 64;
 	tms->basefreq = device->clock();
 	enable = 0;

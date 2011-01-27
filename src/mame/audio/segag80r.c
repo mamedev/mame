@@ -8,7 +8,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "cpu/mcs48/mcs48.h"
 #include "includes/segag80r.h"
 #include "machine/8255ppi.h"
@@ -276,7 +275,7 @@ WRITE8_HANDLER( astrob_sound_w )
 			if ((data & 0x10) && sample_playing(samples, 4)) sample_stop(samples, 4);
 
 			/* MUTE */
-			sound_global_enable(space->machine, !(data & 0x20));
+			space->machine->sound().system_mute(data & 0x20);
 
 			/* REFILL: channel 5 */
 			if (!(data & 0x40) && !sample_playing(samples, 5)) sample_start(samples, 5, 9, FALSE);
@@ -547,7 +546,7 @@ static WRITE8_DEVICE_HANDLER( sega005_sound_b_w )
 	//mame_printf_debug("sound[%d] = %02X\n", 1, data);
 
 	/* force a stream update */
-	stream_update(sega005_stream);
+	sega005_stream->update();
 
 	/* ROM address */
 	sound_addr = ((data & 0x0f) << 7) | (sound_addr & 0x7f);
@@ -580,7 +579,7 @@ static DEVICE_START( sega005_sound )
 	running_machine *machine = device->machine;
 
 	/* create the stream */
-	sega005_stream = stream_create(device, 0, 1, SEGA005_COUNTER_FREQ, NULL, sega005_stream_update);
+	sega005_stream = device->machine->sound().stream_alloc(*device, 0, 1, SEGA005_COUNTER_FREQ, NULL, sega005_stream_update);
 
 	/* create a timer for the 555 */
 	sega005_sound_timer = timer_alloc(machine, sega005_auto_timer, NULL);
@@ -630,7 +629,7 @@ static STREAM_UPDATE( sega005_stream_update )
 static TIMER_CALLBACK( sega005_auto_timer )
 {
 	/* force an update then clock the sound address if not held in reset */
-	stream_update(sega005_stream);
+	sega005_stream->update();
 	if ((sound_state[1] & 0x20) && !(sound_state[1] & 0x10))
 	{
 		sound_addr = (sound_addr & 0x780) | ((sound_addr + 1) & 0x07f);

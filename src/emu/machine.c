@@ -112,7 +112,6 @@
 #include "ui.h"
 #include "uimenu.h"
 #include "uiinput.h"
-#include "streams.h"
 #include "crsshair.h"
 #include "validity.h"
 #include "debug/debugcon.h"
@@ -164,7 +163,6 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 	  streams_data(NULL),
 	  devices_data(NULL),
 	  romload_data(NULL),
-	  sound_data(NULL),
 	  input_data(NULL),
 	  input_port_data(NULL),
 	  ui_input_data(NULL),
@@ -192,6 +190,7 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 	  m_driver_device(NULL),
 	  m_cheat(NULL),
 	  m_render(NULL),
+	  m_sound(NULL),
 	  m_video(NULL),
 	  m_debug_view(NULL)
 {
@@ -302,7 +301,7 @@ void running_machine::start()
 	ui_input_init(this);
 
 	// initialize the streams engine before the sound devices start
-	streams_init(this);
+	m_sound = auto_alloc(this, sound_manager(*this));
 
 	// first load ROMs, then populate memory, and finally initialize CPUs
 	// these operations must proceed in this order
@@ -323,7 +322,6 @@ void running_machine::start()
 	image_init(this);
 	tilemap_init(this);
 	crosshair_init(this);
-	sound_init(this);
 
 	// initialize the debugger
 	if ((debug_flags & DEBUG_FLAG_ENABLED) != 0)
@@ -382,7 +380,7 @@ int running_machine::run(bool firstrun)
 		// load the configuration settings and NVRAM
 		bool settingsloaded = config_load_settings(this);
 		nvram_load(this);
-		sound_mute(this, FALSE);
+		sound().ui_mute(false);
 
 		// display the startup screens
 		ui_display_startup_screens(this, firstrun, !settingsloaded);
@@ -415,7 +413,7 @@ int running_machine::run(bool firstrun)
 		m_current_phase = MACHINE_PHASE_EXIT;
 
 		// save the NVRAM and configuration
-		sound_mute(this, true);
+		sound().ui_mute(true);
 		nvram_save(this);
 		config_save_settings(this);
 	}

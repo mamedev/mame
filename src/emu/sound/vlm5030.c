@@ -108,7 +108,6 @@ chirp 12-..: vokume   0   : silent
 
 */
 #include "emu.h"
-#include "streams.h"
 #include "vlm5030.h"
 
 /* interpolator per frame   */
@@ -488,7 +487,7 @@ phase_stop:
 /* realtime update */
 static void vlm5030_update(vlm5030_state *chip)
 {
-	stream_update(chip->channel);
+	chip->channel->update();
 }
 
 /* setup parameteroption when RST=H */
@@ -704,7 +703,7 @@ static DEVICE_START( vlm5030 )
 	else
 		chip->address_mask = chip->intf->memory_size-1;
 
-	chip->channel = stream_create(device, 0, 1, emulation_rate,chip,vlm5030_update_callback);
+	chip->channel = device->machine->sound().stream_alloc(*device, 0, 1, emulation_rate,chip,vlm5030_update_callback);
 
 	/* don't restore "UINT8 *chip->rom" when use vlm5030_set_rom() */
 

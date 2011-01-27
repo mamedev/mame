@@ -100,7 +100,7 @@ static WRITE8_HANDLER( firefox_disc_lock_w )
 
 static WRITE8_HANDLER( audio_enable_w )
 {
-	sound_set_output_gain(space->machine->device("ldsound"), ~offset & 1, (data & 0x80) ? 1.0 : 0.0);
+	space->machine->device<laserdisc_sound_device>("ldsound")->set_output_gain(~offset & 1, (data & 0x80) ? 1.0 : 0.0);
 }
 
 static WRITE8_HANDLER( firefox_disc_reset_w )

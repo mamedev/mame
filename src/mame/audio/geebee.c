@@ -8,7 +8,6 @@
  ****************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "includes/warpwarp.h"
 
 
@@ -44,7 +43,7 @@ WRITE8_DEVICE_HANDLER( geebee_sound_w )
 {
 	geebee_sound_state *state = get_safe_token(device);
 
-	stream_update(state->channel);
+	state->channel->update();
 	state->sound_latch = data;
 	state->volume = 0x7fff; /* set volume */
 	state->noise = 0x0000;  /* reset noise shifter */
@@ -139,7 +138,7 @@ static DEVICE_START( geebee_sound )
 		state->decay[0x7fff-i] = (INT16) (0x7fff/exp(1.0*i/4096));
 
 	/* 1V = HSYNC = 18.432MHz / 3 / 2 / 384 = 8000Hz */
-	state->channel = stream_create(device, 0, 1, 18432000 / 3 / 2 / 384, NULL, geebee_sound_update);
+	state->channel = device->machine->sound().stream_alloc(*device, 0, 1, 18432000 / 3 / 2 / 384, NULL, geebee_sound_update);
 	state->vcount = 0;
 
 	state->volume_timer = timer_alloc(machine, volume_decay, state);

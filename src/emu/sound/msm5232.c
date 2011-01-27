@@ -1,5 +1,4 @@
 #include "emu.h"
-#include "streams.h"
 
 #include "msm5232.h"
 
@@ -345,7 +344,7 @@ WRITE8_DEVICE_HANDLER( msm5232_w )
 	if (offset > 0x0d)
 		return;
 
-	stream_update (chip->stream);
+	chip->stream->update ();
 
 	if (offset < 0x08) /* pitch */
 	{
@@ -797,7 +796,7 @@ static DEVICE_START( msm5232 )
 
 	msm5232_init(chip, intf, device->clock(), rate);
 
-	chip->stream = stream_create(device, 0, 11, rate, chip, MSM5232_update_one);
+	chip->stream = device->machine->sound().stream_alloc(*device, 0, 11, rate, chip, MSM5232_update_one);
 
 	/* register with the save state system */
 	state_save_register_postload(device->machine, msm5232_postload, chip);
@@ -844,11 +843,11 @@ void msm5232_set_clock(device_t *device, int clock)
 
 	if (chip->clock != clock)
 	{
-		stream_update (chip->stream);
+		chip->stream->update ();
 		chip->clock = clock;
 		chip->rate = clock/CLOCK_RATE_DIVIDER;
 		msm5232_init_tables( chip );
-		stream_set_sample_rate(chip->stream, chip->rate);
+		chip->stream->set_sample_rate(chip->rate);
 	}
 }
 

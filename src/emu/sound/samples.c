@@ -1,6 +1,5 @@
 #include "emu.h"
 #include "emuopts.h"
-#include "streams.h"
 #include "samples.h"
 
 
@@ -250,7 +249,7 @@ void sample_start(device_t *device,int channel,int samplenum,int loop)
     chan = &info->channel[channel];
 
 	/* force an update before we start */
-	stream_update(chan->stream);
+	chan->stream->update();
 
 	/* update the parameters */
 	sample = &info->samples->sample[samplenum];
@@ -275,7 +274,7 @@ void sample_start_raw(device_t *device,int channel,const INT16 *sampledata,int s
     chan = &info->channel[channel];
 
 	/* force an update before we start */
-	stream_update(chan->stream);
+	chan->stream->update();
 
 	/* update the parameters */
 	chan->source = sampledata;
@@ -299,7 +298,7 @@ void sample_set_freq(device_t *device,int channel,int freq)
     chan = &info->channel[channel];
 
 	/* force an update before we start */
-	stream_update(chan->stream);
+	chan->stream->update();
 
 	chan->step = ((INT64)freq << FRAC_BITS) / info->device->machine->sample_rate;
 }
@@ -314,7 +313,7 @@ void sample_set_volume(device_t *device,int channel,float volume)
 
     chan = &info->channel[channel];
 
-	stream_set_output_gain(chan->stream, 0, volume);
+	chan->stream->set_output_gain(0, volume);
 }
 
 
@@ -328,7 +327,7 @@ void sample_set_pause(device_t *device,int channel,int pause)
     chan = &info->channel[channel];
 
 	/* force an update before we start */
-	stream_update(chan->stream);
+	chan->stream->update();
 
 	chan->paused = pause;
 }
@@ -344,7 +343,7 @@ void sample_stop(device_t *device,int channel)
     chan = &info->channel[channel];
 
     /* force an update before we start */
-    stream_update(chan->stream);
+    chan->stream->update();
     chan->source = NULL;
     chan->source_num = -1;
 }
@@ -360,7 +359,7 @@ int sample_get_base_freq(device_t *device,int channel)
     chan = &info->channel[channel];
 
 	/* force an update before we start */
-	stream_update(chan->stream);
+	chan->stream->update();
 	return chan->basefreq;
 }
 
@@ -375,7 +374,7 @@ int sample_playing(device_t *device,int channel)
     chan = &info->channel[channel];
 
 	/* force an update before we start */
-	stream_update(chan->stream);
+	chan->stream->update();
 	return (chan->source != NULL);
 }
 
@@ -485,7 +484,7 @@ static DEVICE_START( samples )
 	info->channel = auto_alloc_array(device->machine, sample_channel, info->numchannels);
 	for (i = 0; i < info->numchannels; i++)
 	{
-	    info->channel[i].stream = stream_create(device, 0, 1, device->machine->sample_rate, &info->channel[i], sample_update_sound);
+	    info->channel[i].stream = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate, &info->channel[i], sample_update_sound);
 
 		info->channel[i].source = NULL;
 		info->channel[i].source_num = -1;

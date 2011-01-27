@@ -38,7 +38,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 
 
 
@@ -51,8 +50,7 @@
 //-------------------------------------------------
 
 device_config_sound_interface::device_config_sound_interface(const machine_config &mconfig, device_config &devconfig)
-	: device_config_interface(mconfig, devconfig),
-	  m_route_list(NULL)
+	: device_config_interface(mconfig, devconfig)
 {
 }
 
@@ -63,7 +61,6 @@ device_config_sound_interface::device_config_sound_interface(const machine_confi
 
 device_config_sound_interface::~device_config_sound_interface()
 {
-	reset_routes();
 }
 
 
@@ -74,13 +71,13 @@ device_config_sound_interface::~device_config_sound_interface()
 
 void device_config_sound_interface::static_add_route(device_config *device, UINT32 output, const char *target, double gain, UINT32 input)
 {
+	// find our sound interface
 	device_config_sound_interface *sound = dynamic_cast<device_config_sound_interface *>(device);
 	if (sound == NULL)
 		throw emu_fatalerror("MCFG_SOUND_ROUTE called on device '%s' with no sound interface", device->tag());
 
-	sound_route **routeptr;
-	for (routeptr = &sound->m_route_list; *routeptr != NULL; routeptr = &(*routeptr)->m_next) ;
-	*routeptr = global_alloc(sound_route(output, input, gain, target));
+	// append a new route to the list
+	sound->m_route_list.append(*global_alloc(sound_route(output, input, gain, target)));
 }
 
 
@@ -91,11 +88,13 @@ void device_config_sound_interface::static_add_route(device_config *device, UINT
 
 void device_config_sound_interface::static_reset_routes(device_config *device)
 {
+	// find our sound interface
 	device_config_sound_interface *sound = dynamic_cast<device_config_sound_interface *>(device);
 	if (sound == NULL)
 		throw emu_fatalerror("MCFG_SOUND_ROUTES_RESET called on device '%s' with no sound interface", device->tag());
 
-	sound->reset_routes();
+	// reset the routine list
+	sound->m_route_list.reset();
 }
 
 
@@ -110,7 +109,7 @@ bool device_config_sound_interface::interface_validity_check(const game_driver &
 	bool error = false;
 
 	// loop over all the routes
-	for (const sound_route *route = m_route_list; route != NULL; route = route->m_next)
+	for (const sound_route *route = first_route(); route != NULL; route = route->next())
 	{
 		// find a device with the requested tag
 		const device_config *target = m_machine_config.m_devicelist.find(route->m_target);
@@ -129,23 +128,6 @@ bool device_config_sound_interface::interface_validity_check(const game_driver &
 		}
 	}
 	return error;
-}
-
-
-//-------------------------------------------------
-//  reset_routes - free up all allocated routes
-//  in this configuration
-//-------------------------------------------------
-
-void device_config_sound_interface::reset_routes()
-{
-	// loop until all are gone
-	while (m_route_list != NULL)
-	{
-		sound_route *temp = m_route_list;
-		m_route_list = temp->m_next;
-		global_free(temp);
-	}
 }
 
 
@@ -174,8 +156,9 @@ device_config_sound_interface::sound_route::sound_route(int output, int input, f
 
 device_sound_interface::device_sound_interface(running_machine &machine, const device_config &config, device_t &device)
 	: device_interface(machine, config, device),
+	  m_sound_config(dynamic_cast<const device_config_sound_interface &>(config)),
 	  m_outputs(0),
-	  m_sound_config(dynamic_cast<const device_config_sound_interface &>(config))
+	  m_auto_allocated_inputs(0)
 {
 }
 
@@ -190,13 +173,115 @@ device_sound_interface::~device_sound_interface()
 
 
 //-------------------------------------------------
-//  sound_stream_update - provide data for the
-//  given sound stream
+//  inputs - return the total number of inputs 
+//  for the given device
 //-------------------------------------------------
 
-void device_sound_interface::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+int device_sound_interface::inputs() const
 {
-	fatalerror("device_sound_interface::sound_stream_update - this method should have been overridden");
+	// scan the list counting streams we own and summing their inputs
+	int inputs = 0;
+	for (sound_stream *stream = m_device.machine->sound().first_stream(); stream != NULL; stream = stream->next())
+		if (&stream->device() == &m_device)
+			inputs += stream->input_count();
+	return inputs;
+}
+
+
+//-------------------------------------------------
+//  outputs - return the total number of outputs 
+//  for the given device
+//-------------------------------------------------
+
+int device_sound_interface::outputs() const
+{
+	// scan the list counting streams we own and summing their outputs
+	int outputs = 0;
+	for (sound_stream *stream = m_device.machine->sound().first_stream(); stream != NULL; stream = stream->next())
+		if (&stream->device() == &m_device)
+			outputs += stream->output_count();
+	return outputs;
+}
+
+
+//-------------------------------------------------
+//  input_to_stream_input - convert a device's
+//	input index to a stream and the input index
+//  on that stream
+//-------------------------------------------------
+
+sound_stream *device_sound_interface::input_to_stream_input(int inputnum, int &stream_inputnum)
+{
+	assert(inputnum >= 0);
+	
+	// scan the list looking for streams owned by this device
+	for (sound_stream *stream = m_device.machine->sound().first_stream(); stream != NULL; stream = stream->next())
+		if (&stream->device() == &m_device)
+		{
+			if (inputnum < stream->input_count())
+			{
+				stream_inputnum = inputnum;
+				return stream;
+			}
+			inputnum -= stream->input_count();
+		}
+	
+	// not found
+	return NULL;
+}
+
+
+//-------------------------------------------------
+//  output_to_stream_output - convert a device's
+//	output index to a stream and the output index
+//  on that stream
+//-------------------------------------------------
+
+sound_stream *device_sound_interface::output_to_stream_output(int outputnum, int &stream_outputnum)
+{
+	assert(outputnum >= 0);
+	
+	// scan the list looking for streams owned by this device
+	for (sound_stream *stream = m_device.machine->sound().first_stream(); stream != NULL; stream = stream->next())
+		if (&stream->device() == &device())
+		{
+			if (outputnum < stream->output_count())
+			{
+				stream_outputnum = outputnum;
+				return stream;
+			}
+			outputnum -= stream->output_count();
+		}
+	
+	// not found
+	return NULL;
+}
+
+
+//-------------------------------------------------
+//  set_output_gain - set the gain on the given
+//	output index of the device
+//-------------------------------------------------
+
+void device_sound_interface::set_output_gain(int outputnum, float gain)
+{
+	// handle ALL_OUTPUTS as a special case
+	if (outputnum == ALL_OUTPUTS)
+	{
+		for (sound_stream *stream = m_device.machine->sound().first_stream(); stream != NULL; stream = stream->next())
+			if (&stream->device() == &device())
+				for (int outputnum = 0; outputnum < stream->output_count(); outputnum++)
+					stream->set_output_gain(outputnum, gain);
+	}
+	
+	// look up the stream and stream output index
+	else
+	{
+		int stream_outputnum;
+		sound_stream *stream = output_to_stream_output(outputnum, stream_outputnum);
+		if (stream != NULL)
+			stream->set_output_gain(stream_outputnum, gain);
+	}
 }
 
 
@@ -212,12 +297,29 @@ void device_sound_interface::interface_pre_start()
 	for (bool gotone = m_device.machine->m_devicelist.first(sound); gotone; gotone = sound->next(sound))
 	{
 		// scan each route on the device
-		for (const device_config_sound_interface::sound_route *route = sound->sound_config().m_route_list; route != NULL; route = route->m_next)
+		for (const device_config_sound_interface::sound_route *route = sound->sound_config().first_route(); route != NULL; route = route->next())
 		{
-			// if we are the target of this route but the source hasn't yet started, defer our start for later
+			// see if we are the target of this route; if we are, make sure the source device is started
 			device_t *target_device = m_device.machine->device(route->m_target);
 			if (target_device == &m_device && !sound->device().started())
 				throw device_missing_dependencies();
+		}
+	}
+	
+	// now iterate through devices again and assign any auto-allocated inputs
+	m_auto_allocated_inputs = 0;
+	for (bool gotone = m_device.machine->m_devicelist.first(sound); gotone; gotone = sound->next(sound))
+	{
+		// scan each route on the device
+		for (const device_config_sound_interface::sound_route *route = sound->sound_config().first_route(); route != NULL; route = route->next())
+		{
+			// see if we are the target of this route
+			device_t *target_device = m_device.machine->device(route->m_target);
+			if (target_device == &m_device && route->m_input == AUTO_ALLOC_INPUT)
+			{
+				const_cast<device_config_sound_interface::sound_route *>(route)->m_input = m_auto_allocated_inputs;
+				m_auto_allocated_inputs += (route->m_output == ALL_OUTPUTS) ? sound->outputs() : 1;
+			}
 		}
 	}
 }
@@ -230,33 +332,12 @@ void device_sound_interface::interface_pre_start()
 
 void device_sound_interface::interface_post_start()
 {
-	// count the outputs
-	for (int outputnum = 0; outputnum < MAX_OUTPUTS; outputnum++)
-	{
-		// stop when we run out of streams
-		sound_stream *stream = stream_find_by_device(&m_device, outputnum);
-		if (stream == NULL)
-			break;
-
-		// accumulate the number of outputs from this stream
-		int numoutputs = stream_get_outputs(stream);
-		assert(m_outputs + numoutputs < MAX_OUTPUTS);
-
-		// fill in the array
-		for (int curoutput = 0; curoutput < numoutputs; curoutput++)
-		{
-			sound_output *output = &m_output[m_outputs++];
-			output->stream = stream;
-			output->output = curoutput;
-		}
-	}
-
 	// iterate over all the sound devices
 	device_sound_interface *sound = NULL;
 	for (bool gotone = m_device.machine->m_devicelist.first(sound); gotone; gotone = sound->next(sound))
 	{
 		// scan each route on the device
-		for (const device_config_sound_interface::sound_route *route = sound->sound_config().m_route_list; route != NULL; route = route->m_next)
+		for (const device_config_sound_interface::sound_route *route = sound->sound_config().first_route(); route != NULL; route = route->next())
 		{
 			// if we are the target of this route, hook it up
 			device_t *target_device = m_device.machine->device(route->m_target);
@@ -264,19 +345,40 @@ void device_sound_interface::interface_post_start()
 			{
 				// iterate over all outputs, matching any that apply
 				int inputnum = route->m_input;
-				int numoutputs = stream_get_device_outputs(*sound);
+				int numoutputs = sound->outputs();
 				for (int outputnum = 0; outputnum < numoutputs; outputnum++)
 					if (route->m_output == outputnum || route->m_output == ALL_OUTPUTS)
 					{
-						sound_stream *inputstream, *stream;
-						int streaminput, streamoutput;
+						// find the output stream to connect from
+						int streamoutputnum;
+						sound_stream *outputstream = sound->output_to_stream_output(outputnum, streamoutputnum);
+						if (outputstream == NULL)
+							fatalerror("Sound device '%s' specifies route for non-existant output #%d", route->m_target, outputnum);
 
-						// get the input and output streams and wire them together
-						if (stream_device_input_to_stream_input(target_device, inputnum++, &inputstream, &streaminput))
-							if (stream_device_output_to_stream_output(*sound, outputnum, &stream, &streamoutput))
-								stream_set_input(inputstream, streaminput, stream, streamoutput, route->m_gain);
+						// find the input stream to connect to
+						int streaminputnum;
+						sound_stream *inputstream = input_to_stream_input(inputnum++, streaminputnum);
+						if (inputstream == NULL)
+							fatalerror("Sound device '%s' targeted output #%d to non-existant device '%s' input %d", route->m_target, outputnum, m_device.tag(), inputnum - 1);
+
+						// set the input
+						inputstream->set_input(streaminputnum, outputstream, streamoutputnum, route->m_gain);
 					}
 			}
 		}
 	}
+}
+
+
+//-------------------------------------------------
+//  interface_pre_reset - called prior to 
+//  resetting the device
+//-------------------------------------------------
+
+void device_sound_interface::interface_pre_reset()
+{
+	// update all streams on this device prior to reset
+	for (sound_stream *stream = m_device.machine->sound().first_stream(); stream != NULL; stream = stream->next())
+		if (&stream->device() == &device())
+			stream->update();
 }

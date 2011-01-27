@@ -49,7 +49,6 @@ Registers:
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "x1_010.h"
 
 
@@ -217,7 +216,7 @@ static DEVICE_START( x1_010 )
 	LOG_SOUND(("masterclock = %d rate = %d\n", device->clock(), info->rate ));
 
 	/* get stream channels */
-	info->stream = stream_create(device,0,2,info->rate,info,seta_update);
+	info->stream = device->machine->sound().stream_alloc(*device,0,2,info->rate,info,seta_update);
 }
 
 

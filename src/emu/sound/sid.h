@@ -10,7 +10,6 @@
 
 #include "sound/sid6581.h"
 #include "sidvoice.h"
-#include "streams.h"
 
 /* private area */
 typedef struct __SID6581

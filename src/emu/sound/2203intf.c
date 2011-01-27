@@ -1,5 +1,4 @@
 #include "emu.h"
-#include "streams.h"
 #include "2203intf.h"
 #include "fm.h"
 
@@ -81,7 +80,7 @@ static TIMER_CALLBACK( timer_callback_2203_1 )
 void ym2203_update_request(void *param)
 {
 	ym2203_state *info = (ym2203_state *)param;
-	stream_update(info->stream);
+	info->stream->update();
 }
 
 
@@ -139,7 +138,7 @@ static DEVICE_START( ym2203 )
 	info->timer[1] = timer_alloc(device->machine, timer_callback_2203_1, info);
 
 	/* stream system initialize */
-	info->stream = stream_create(device,0,1,rate,info,ym2203_stream_update);
+	info->stream = device->machine->sound().stream_alloc(*device,0,1,rate,info,ym2203_stream_update);
 
 	/* Initialize FM emurator */
 	info->chip = ym2203_init(info,device,device->clock(),rate,timer_handler,IRQHandler,&psgintf);

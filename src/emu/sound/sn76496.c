@@ -103,7 +103,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "sn76496.h"
 
 
@@ -152,14 +151,14 @@ INLINE sn76496_state *get_safe_token(device_t *device)
 READ_LINE_DEVICE_HANDLER( sn76496_ready_r )
 {
 	sn76496_state *R = get_safe_token(device);
-	stream_update(R->Channel);
+	R->Channel->update();
 	return (R->CyclestoREADY? 0 : 1);
 }
 
 WRITE8_DEVICE_HANDLER( sn76496_stereo_w )
 {
 	sn76496_state *R = get_safe_token(device);
-	stream_update(R->Channel);
+	R->Channel->update();
 	if (R->Stereo) R->StereoMask = data;
 	else fatalerror("Call to stereo write with mono chip!\n");
 }
@@ -171,7 +170,7 @@ WRITE8_DEVICE_HANDLER( sn76496_w )
 
 
 	/* update the output buffer before changing the registers */
-	stream_update(R->Channel);
+	R->Channel->update();
 
 	/* set number of cycles until READY is active; this is always one
            'sample', i.e. it equals the clock divider exactly; until the
@@ -347,7 +346,7 @@ static int SN76496_init(device_t *device, sn76496_state *R, int stereo)
 	int sample_rate = device->clock()/2;
 	int i;
 
-	R->Channel = stream_create(device,0,(stereo?2:1),sample_rate,R,SN76496Update);
+	R->Channel = device->machine->sound().stream_alloc(*device,0,(stereo?2:1),sample_rate,R,SN76496Update);
 
 	for (i = 0;i < 4;i++) R->Volume[i] = 0;
 

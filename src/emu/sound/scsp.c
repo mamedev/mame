@@ -27,7 +27,6 @@
 */
 
 #include "emu.h"
-#include "streams.h"
 #include "scsp.h"
 #include "scspdsp.h"
 
@@ -1250,7 +1249,7 @@ static DEVICE_START( scsp )
 	{
 		scsp->Int68kCB = intf->irq_callback;
 
-		scsp->stream = stream_create(device, 0, 2, 44100, scsp, SCSP_Update);
+		scsp->stream = device->machine->sound().stream_alloc(*device, 0, 2, 44100, scsp, SCSP_Update);
 	}
 }
 
@@ -1272,7 +1271,7 @@ READ16_DEVICE_HANDLER( scsp_r )
 {
 	scsp_state *scsp = get_safe_token(device);
 
-	stream_update(scsp->stream);
+	scsp->stream->update();
 
 	return SCSP_r16(scsp, offset*2);
 }
@@ -1284,7 +1283,7 @@ WRITE16_DEVICE_HANDLER( scsp_w )
 	scsp_state *scsp = get_safe_token(device);
 	UINT16 tmp, *scsp_regs;
 
-	stream_update(scsp->stream);
+	scsp->stream->update();
 
 	tmp = SCSP_r16(scsp, offset*2);
 	COMBINE_DATA(&tmp);

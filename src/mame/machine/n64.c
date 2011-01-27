@@ -3,7 +3,6 @@
 #include "emu.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/mips/mips3com.h"
-#include "streams.h"
 #include "includes/n64.h"
 #include "sound/dmadac.h"
 #include "profiler.h"

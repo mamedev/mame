@@ -247,7 +247,6 @@ device), PES Speech adapter (serial port connection)
 ***********************************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "tms5220.h"
 
 /* *****optional defines***** */
@@ -1519,7 +1518,7 @@ static DEVICE_START( tms5220 )
 	devcb_resolve_write_line(&tms->readyq_func, &tms->intf->readyq_func, device);
 
 	/* initialize a stream */
-	tms->stream = stream_create(device, 0, 1, device->clock() / 80, tms, tms5220_update);
+	tms->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->clock() / 80, tms, tms5220_update);
 
 	/*if (tms->table == NULL)
     {
@@ -1629,13 +1628,13 @@ static TIMER_CALLBACK( io_ready_cb )
 			logerror("Serviced write: %02x\n", tms->write_latch);
 			//fprintf(stderr, "Processed write data: %02X\n", tms->write_latch);
 #endif
-		    stream_update(tms->stream);
+		    tms->stream->update();
 		    tms5220_data_write(tms, tms->write_latch);
 		    break;
 		case 0x01:
 			/* Read */
 		    /* bring up to date first */
-		    stream_update(tms->stream);
+		    tms->stream->update();
 		    tms->read_latch = tms5220_status_read(tms);
 			break;
 		case 0x03:
@@ -1780,7 +1779,7 @@ WRITE8_DEVICE_HANDLER( tms5220_data_w )
 	if (!tms->true_timing)
 	{
 		/* bring up to date first */
-	    stream_update(tms->stream);
+	    tms->stream->update();
 	    tms5220_data_write(tms, data);
 	}
 	else
@@ -1808,7 +1807,7 @@ READ8_DEVICE_HANDLER( tms5220_status_r )
 	if (!tms->true_timing)
 	{
 	   /* bring up to date first */
-	    stream_update(tms->stream);
+	    tms->stream->update();
 	    return tms5220_status_read(tms);
 	}
 	else
@@ -1836,7 +1835,7 @@ READ_LINE_DEVICE_HANDLER( tms5220_readyq_r )
 {
 	tms5220_state *tms = get_safe_token(device);
     /* bring up to date first */
-    stream_update(tms->stream);
+    tms->stream->update();
     return !tms5220_ready_read(tms);
 }
 
@@ -1854,7 +1853,7 @@ double tms5220_time_to_ready(device_t *device)
 	double cycles;
 
 	/* bring up to date first */
-	stream_update(tms->stream);
+	tms->stream->update();
 	cycles = tms5220_cycles_to_ready(tms);
 	return cycles * 80.0 / tms->clock;
 }
@@ -1871,7 +1870,7 @@ READ_LINE_DEVICE_HANDLER( tms5220_intq_r )
 {
 	tms5220_state *tms = get_safe_token(device);
     /* bring up to date first */
-    stream_update(tms->stream);
+    tms->stream->update();
     return !tms5220_int_read(tms);
 }
 
@@ -1916,7 +1915,7 @@ static STREAM_UPDATE( tms5220_update )
 void tms5220_set_frequency(device_t *device, int frequency)
 {
 	tms5220_state *tms = get_safe_token(device);
-	stream_set_sample_rate(tms->stream, frequency / 80);
+	tms->stream->set_sample_rate(frequency / 80);
 	tms->clock = frequency;
 }
 

@@ -22,7 +22,6 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "sound/okim6295.h"
@@ -73,7 +72,7 @@ static DEVICE_START( mjkjidai_adpcm )
 	mjkjidai_adpcm_state *state = (mjkjidai_adpcm_state *)downcast<legacy_device_base *>(device)->token();
 
 	state->playing = 0;
-	state->stream = stream_create(device, 0, 1, device->clock(), state, mjkjidai_adpcm_callback);
+	state->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->clock(), state, mjkjidai_adpcm_callback);
 	state->base = machine->region("adpcm")->base();
 	state->adpcm.reset();
 }

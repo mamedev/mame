@@ -295,7 +295,7 @@ void DISCRETE_CLASS_FUNC(dss_input_stream, input_write)(int sub_node, UINT8 data
 		if (m_is_buffered)
 		{
 			/* Bring the system up to now */
-			stream_update(m_buffer_stream);
+			m_buffer_stream->update();
 
 			m_data = new_data;
 		}
@@ -334,9 +334,8 @@ void DISCRETE_CLASS_NAME(dss_input_stream)::stream_start(void)
 		discrete_sound_device *snd_device = downcast<discrete_sound_device *>(m_device);
 		//assert(DSS_INPUT_STREAM__STREAM < snd_device->m_input_stream_list.count());
 
-		m_buffer_stream = stream_create(snd_device, 0, 1, this->sample_rate(), this, static_stream_generate);
+		m_buffer_stream = m_device->machine->sound().stream_alloc(*snd_device, 0, 1, this->sample_rate(), this, static_stream_generate);
 
-		stream_set_input(snd_device->get_stream(), m_stream_in_number,
-			m_buffer_stream, 0, 1.0);
+		snd_device->get_stream()->set_input(m_stream_in_number, m_buffer_stream);
 	}
 }

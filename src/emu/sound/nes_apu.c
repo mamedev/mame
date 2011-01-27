@@ -45,7 +45,6 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "nes_apu.h"
 #include "cpu/m6502/m6502.h"
 
@@ -664,7 +663,7 @@ INLINE uint8 apu_read(nesapu_state *info,int address)
 INLINE void apu_write(nesapu_state *info,int address, uint8 value)
 {
 	info->APU.regs[address]=value;
-	stream_update(info->stream);
+	info->stream->update();
 	apu_regwrite(info,address,value);
 }
 
@@ -707,7 +706,7 @@ static DEVICE_START( nesapu )
 	/* Initialize individual chips */
 	(info->APU.dpcm).memory = cputag_get_address_space(device->machine, intf->cpu_tag, ADDRESS_SPACE_PROGRAM);
 
-	info->stream = stream_create(device, 0, 1, rate, info, nes_psg_update_sound);
+	info->stream = device->machine->sound().stream_alloc(*device, 0, 1, rate, info, nes_psg_update_sound);
 
 	/* register for save */
 	for (i = 0; i < 2; i++)

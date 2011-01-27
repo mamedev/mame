@@ -9,7 +9,6 @@
 
 
 #include "emu.h"
-#include "streams.h"
 #include "sound/tms36xx.h"
 #include "includes/phoenix.h"
 
@@ -503,7 +502,7 @@ WRITE8_DEVICE_HANDLER( phoenix_sound_control_a_w )
 	discrete_sound_w(state->discrete, PHOENIX_EFFECT_3_EN  , data & 0x40);
 	discrete_sound_w(state->discrete, PHOENIX_EFFECT_4_EN  , data & 0x80);
 #endif
-	stream_update(state->channel);
+	state->channel->update();
 	state->sound_latch_a = data;
 }
 
@@ -567,7 +566,7 @@ static DEVICE_START( phoenix_sound )
 		state->poly18[i] = bits;
 	}
 
-	state->channel = stream_create(device, 0, 1, device->machine->sample_rate, 0, phoenix_sound_update);
+	state->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate, 0, phoenix_sound_update);
 
 	register_state(device);
 }

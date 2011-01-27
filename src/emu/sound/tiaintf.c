@@ -1,5 +1,4 @@
 #include "emu.h"
-#include "streams.h"
 #include "tiaintf.h"
 #include "tiasound.h"
 
@@ -29,7 +28,7 @@ static DEVICE_START( tia )
 {
 	tia_state *info = get_safe_token(device);
 
-	info->channel = stream_create(device, 0, 1, device->clock(), info, tia_update);
+	info->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->clock(), info, tia_update);
 
 	info->chip = tia_sound_init(device->clock(), device->clock(), 16);
 	assert_always(info->chip != NULL, "Error creating TIA chip");
@@ -44,7 +43,7 @@ static DEVICE_STOP( tia )
 WRITE8_DEVICE_HANDLER( tia_sound_w )
 {
 	tia_state *info = get_safe_token(device);
-	stream_update(info->channel);
+	info->channel->update();
 	tia_write(info->chip, offset, data);
 }
 

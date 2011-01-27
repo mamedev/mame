@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "includes/gomoku.h"
 
 
@@ -180,7 +179,7 @@ static DEVICE_START( gomoku_sound )
 	int ch;
 
 	/* get stream channels */
-	state->stream = stream_create(device, 0, 1, samplerate, NULL, gomoku_update_mono);
+	state->stream = device->machine->sound().stream_alloc(*device, 0, 1, samplerate, NULL, gomoku_update_mono);
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
 	state->mixer_buffer = auto_alloc_array(machine, short, 2 * samplerate);
@@ -237,7 +236,7 @@ WRITE8_DEVICE_HANDLER( gomoku_sound1_w )
 	int ch;
 
 	/* update the streams */
-	stream_update(state->stream);
+	state->stream->update();
 
 	/* set the register */
 	state->soundregs1[offset] = data;
@@ -260,7 +259,7 @@ WRITE8_DEVICE_HANDLER( gomoku_sound2_w )
 	int ch;
 
 	/* update the streams */
-	stream_update(state->stream);
+	state->stream->update();
 
 	/* set the register */
 	state->soundregs2[offset] = data;

@@ -9,7 +9,6 @@
 */
 
 #include "emu.h"
-#include "streams.h"
 #include "aica.h"
 #include "aicadsp.h"
 
@@ -1255,7 +1254,7 @@ static DEVICE_START( aica )
 	{
 		AICA->IntARMCB = intf->irq_callback;
 
-		AICA->stream = stream_create(device, 0, 2, 44100, AICA, AICA_Update);
+		AICA->stream = device->machine->sound().stream_alloc(*device, 0, 2, 44100, AICA, AICA_Update);
 	}
 }
 

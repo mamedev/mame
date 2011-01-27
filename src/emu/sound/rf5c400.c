@@ -16,7 +16,6 @@
 */
 
 #include "emu.h"
-#include "streams.h"
 #include "rf5c400.h"
 
 typedef struct _rf5c400_channel rf5c400_channel;
@@ -346,7 +345,7 @@ static void rf5c400_init_chip(device_t *device, rf5c400_state *info)
 		state_save_register_device_item(device, i, info->channels[i].env_scale);
 	}
 
-	info->stream = stream_create(device, 0, 2, device->clock()/384, info, rf5c400_update);
+	info->stream = device->machine->sound().stream_alloc(*device, 0, 2, device->clock()/384, info, rf5c400_update);
 }
 
 

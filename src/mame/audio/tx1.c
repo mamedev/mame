@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
 #include "includes/tx1.h"
@@ -77,7 +76,7 @@ INLINE tx1_sound_state *get_safe_token(device_t *device)
 WRITE8_DEVICE_HANDLER( tx1_pit8253_w )
 {
 	tx1_sound_state *state = get_safe_token(device);
-	stream_update(state->stream);
+	state->stream->update();
 
 	if (offset < 3)
 	{
@@ -172,7 +171,7 @@ static const double tx1_engine_gains[16] =
 WRITE8_DEVICE_HANDLER( tx1_ay8910_a_w )
 {
 	tx1_sound_state *state = get_safe_token(device);
-	stream_update(state->stream);
+	state->stream->update();
 
 	/* All outputs inverted */
 	state->ay_outputa = ~data;
@@ -183,15 +182,17 @@ WRITE8_DEVICE_HANDLER( tx1_ay8910_b_w )
 	tx1_sound_state *state = get_safe_token(device);
 	double gain;
 
-	stream_update(state->stream);
+	state->stream->update();
 	/* Only B3-0 are inverted */
 	state->ay_outputb = data ^ 0xf;
 
 	/* It'll do until we get quadrophonic speaker support! */
 	gain = BIT(state->ay_outputb, 4) ? 1.5 : 2.0;
-	sound_set_output_gain(device, 0, gain);
-	sound_set_output_gain(device, 1, gain);
-	sound_set_output_gain(device, 2, gain);
+	device_sound_interface *sound;
+	device->interface(sound);
+	sound->set_output_gain(0, gain);
+	sound->set_output_gain(1, gain);
+	sound->set_output_gain(2, gain);
 }
 
 /***************************************************************************
@@ -300,7 +301,7 @@ static DEVICE_START( tx1_sound )
 
 
 	/* Allocate the stream */
-	state->stream = stream_create(device, 0, 2, machine->sample_rate, NULL, tx1_stream_update);
+	state->stream = device->machine->sound().stream_alloc(*device, 0, 2, machine->sample_rate, NULL, tx1_stream_update);
 	state->freq_to_step = (double)(1 << TX1_FRAC) / (double)machine->sample_rate;
 
 	/* Compute the engine resistor weights */
@@ -418,7 +419,7 @@ WRITE8_DEVICE_HANDLER( bb_ym1_a_w )
 {
 	tx1_sound_state *state = get_safe_token(device);
 
-	stream_update(state->stream);
+	state->stream->update();
 	state->ym1_outputa = data ^ 0xff;
 }
 
@@ -426,7 +427,7 @@ WRITE8_DEVICE_HANDLER( bb_ym2_a_w )
 {
 	tx1_sound_state *state = get_safe_token(device);
 
-	stream_update(state->stream);
+	state->stream->update();
 	state->ym2_outputa = data ^ 0xff;
 }
 
@@ -437,7 +438,7 @@ WRITE8_DEVICE_HANDLER( bb_ym2_b_w )
 	device_t *ym2 = device->machine->device("ym2");
 	double gain;
 
-	stream_update(state->stream);
+	state->stream->update();
 
 	state->ym2_outputb = data ^ 0xff;
 
@@ -454,16 +455,19 @@ WRITE8_DEVICE_HANDLER( bb_ym2_b_w )
     */
 
 	/* Rear left speaker */
+	device_sound_interface *sound;
+	ym1->interface(sound);
 	gain = data & 0x80 ? 1.0 : 2.0;
-	sound_set_output_gain(ym1, 0, gain);
-	sound_set_output_gain(ym1, 1, gain);
-	sound_set_output_gain(ym1, 2, gain);
+	sound->set_output_gain(0, gain);
+	sound->set_output_gain(1, gain);
+	sound->set_output_gain(2, gain);
 
 	/* Rear right speaker */
+	ym2->interface(sound);
 	gain = data & 0x40 ? 1.0 : 2.0;
-	sound_set_output_gain(ym2, 0, gain);
-	sound_set_output_gain(ym2, 1, gain);
-	sound_set_output_gain(ym2, 2, gain);
+	sound->set_output_gain(0, gain);
+	sound->set_output_gain(1, gain);
+	sound->set_output_gain(2, gain);
 }
 
 /* This is admittedly a bit of a hack job... */
@@ -568,7 +572,7 @@ static DEVICE_START( buggyboy_sound )
 		state->eng_voltages[i] = combine_4_weights(aweights, BIT(tmp[i], 0), BIT(tmp[i], 1), BIT(tmp[i], 2), BIT(tmp[i], 3));
 
 	/* Allocate the stream */
-	state->stream = stream_create(device, 0, 2, machine->sample_rate, NULL, buggyboy_stream_update);
+	state->stream = device->machine->sound().stream_alloc(*device, 0, 2, machine->sample_rate, NULL, buggyboy_stream_update);
 	state->freq_to_step = (double)(1 << 24) / (double)machine->sample_rate;
 }
 

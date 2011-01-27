@@ -808,7 +808,7 @@ static void print_game_display(FILE *out, const game_driver *game, const machine
 
 static void print_game_sound(FILE *out, const game_driver *game, const machine_config &config)
 {
-	int speakers = speaker_output_count(&config);
+	int speakers = config.m_devicelist.count(SPEAKER);
 
 	/* if we have no sound, zero out the speaker count */
 	const device_config_sound_interface *sound = NULL;

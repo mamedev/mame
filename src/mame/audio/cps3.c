@@ -4,7 +4,6 @@
 
 ***************************************************************************/
 #include "emu.h"
-#include "streams.h"
 #include "includes/cps3.h"
 
 #define CPS3_VOICES		16
@@ -115,7 +114,7 @@ static DEVICE_START( cps3_sound )
 	cps3_sound_state *state = get_safe_token(device);
 
 	/* Allocate the stream */
-	state->stream = stream_create(device, 0, 2, device->clock() / 384, NULL, cps3_stream_update);
+	state->stream = device->machine->sound().stream_alloc(*device, 0, 2, device->clock() / 384, NULL, cps3_stream_update);
 }
 
 DEVICE_GET_INFO( cps3_sound )
@@ -139,7 +138,7 @@ WRITE32_DEVICE_HANDLER( cps3_sound_w )
 {
 	cps3_sound_state *state = get_safe_token(device);
 
-	stream_update(state->stream);
+	state->stream->update();
 
 	if (offset < 0x80)
 	{
@@ -170,7 +169,7 @@ WRITE32_DEVICE_HANDLER( cps3_sound_w )
 READ32_DEVICE_HANDLER( cps3_sound_r )
 {
 	cps3_sound_state *state = get_safe_token(device);
-	stream_update(state->stream);
+	state->stream->update();
 
 	if (offset < 0x80)
 	{

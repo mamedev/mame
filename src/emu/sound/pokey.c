@@ -50,7 +50,6 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "pokey.h"
 
 /*
@@ -668,7 +667,7 @@ static DEVICE_START( pokey )
 	devcb_resolve_write8(&chip->serout_w, &chip->intf.serout_w, device);
 	chip->interrupt_cb = chip->intf.interrupt_cb;
 
-	chip->channel = stream_create(device, 0, 1, sample_rate, chip, pokey_update);
+	chip->channel = device->machine->sound().stream_alloc(*device, 0, 1, sample_rate, chip, pokey_update);
 
 	register_for_save(chip, device);
 }
@@ -956,7 +955,7 @@ WRITE8_DEVICE_HANDLER( pokey_w )
 	pokey_state *p = get_safe_token(device);
 	int ch_mask = 0, new_val;
 
-	stream_update(p->channel);
+	p->channel->update();
 
     /* determine which address was changed */
 	switch (offset & 15)

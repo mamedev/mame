@@ -14,7 +14,6 @@ silence compression: '00 nn' must be replaced by nn+1 times '80'.
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "n63701x.h"
 
 
@@ -115,7 +114,7 @@ static DEVICE_START( namco_63701x )
 
 	chip->rom = *device->region();
 
-	chip->stream = stream_create(device, 0, 2, device->clock()/1000, chip, namco_63701x_update);
+	chip->stream = device->machine->sound().stream_alloc(*device, 0, 2, device->clock()/1000, chip, namco_63701x_update);
 }
 
 
@@ -140,7 +139,7 @@ WRITE8_DEVICE_HANDLER( namco_63701x_w )
 			int rom_offs;
 
 			/* update the streams */
-			stream_update(chip->stream);
+			chip->stream->update();
 
 			chip->voices[ch].playing = 1;
 			chip->voices[ch].base_addr = 0x10000 * ((chip->voices[ch].select & 0xe0) >> 5);

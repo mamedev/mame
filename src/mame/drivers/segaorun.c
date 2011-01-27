@@ -699,7 +699,7 @@ static WRITE16_HANDLER( outrun_custom_io_w )
                     D7: /MUTE
                     D6-D0: unknown
                 */
-				sound_global_enable(space->machine, data & 0x80);
+				space->machine->sound().system_enable(data & 0x80);
 			}
 			return;
 

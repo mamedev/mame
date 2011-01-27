@@ -80,7 +80,7 @@ static WRITE8_HANDLER( mcu_portB_w )
 		cputag_set_input_line(space->machine, "mcu", M6805_IRQ_LINE, CLEAR_LINE );
 
 	/* AUDMUTE */
-	sound_global_enable(space->machine, (data >> 5) & 1);
+	space->machine->sound().system_enable((data >> 5) & 1);
 
 	/* RES600 */
 	if (diff & 0x10)

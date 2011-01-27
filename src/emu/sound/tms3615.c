@@ -1,5 +1,4 @@
 #include "emu.h"
-#include "streams.h"
 #include "tms3615.h"
 
 #define VMIN	0x0000
@@ -90,7 +89,7 @@ static DEVICE_START( tms3615 )
 {
 	tms_state *tms = get_safe_token(device);
 
-	tms->channel = stream_create(device, 0, 2, device->clock()/8, tms, tms3615_sound_update);
+	tms->channel = device->machine->sound().stream_alloc(*device, 0, 2, device->clock()/8, tms, tms3615_sound_update);
 	tms->samplerate = device->clock()/8;
 	tms->basefreq = device->clock();
 }

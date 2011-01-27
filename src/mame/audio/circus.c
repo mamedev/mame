@@ -275,5 +275,5 @@ WRITE8_HANDLER( circus_clown_z_w )
 	}
 
 	/* Bit 7 enables amplifier (0 = on) */
-	sound_global_enable(space->machine, ~data & 0x80);
+	space->machine->sound().system_mute(data & 0x80);
 }

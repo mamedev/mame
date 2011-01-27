@@ -12,7 +12,6 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "sound/beep.h"
 
 
@@ -93,7 +92,7 @@ static DEVICE_START( beep )
 {
 	beep_state *pBeep = get_safe_token(device);
 
-	pBeep->stream = stream_create(device, 0, 1, BEEP_RATE, pBeep, beep_sound_update );
+	pBeep->stream = device->machine->sound().stream_alloc(*device, 0, 1, BEEP_RATE, pBeep, beep_sound_update );
 	pBeep->enable = 0;
 	pBeep->frequency = 3250;
 	pBeep->incr = 0;
@@ -116,7 +115,7 @@ void beep_set_state(device_t *device, int on)
 	if (info->enable == on)
 		return;
 
-	stream_update(info->stream);
+	info->stream->update();
 
 	info->enable = on;
 	/* restart wave from beginning */
@@ -139,7 +138,7 @@ void beep_set_frequency(device_t *device,int frequency)
 	if (info->frequency == frequency)
 		return;
 
-	stream_update(info->stream);
+	info->stream->update();
 	info->frequency = frequency;
 	info->signal = 0x07fff;
 	info->incr = 0;
@@ -157,11 +156,11 @@ void beep_set_volume(device_t *device, int volume)
 {
 	beep_state *info = get_safe_token(device);
 
-	stream_update(info->stream);
+	info->stream->update();
 
 	volume = 100 * volume / 7;
 
-	sound_set_output_gain(device, 0, volume);
+	downcast<beep_device *>(device)->set_output_gain(0, volume);
 }
 
 

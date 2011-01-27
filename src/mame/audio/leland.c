@@ -78,7 +78,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "cpu/i86/i86.h"
 #include "cpu/z80/z80.h"
 #include "includes/leland.h"
@@ -272,7 +271,7 @@ static DEVICE_START( leland_sound )
 	state->dac_bufout[0] = state->dac_bufout[1] = 0;
 
 	/* allocate the stream */
-	state->dac_stream = stream_create(device, 0, 1, 256*60, NULL, leland_update);
+	state->dac_stream = device->machine->sound().stream_alloc(*device, 0, 1, 256*60, NULL, leland_update);
 
 	/* allocate memory */
 	state->dac_buffer[0] = auto_alloc_array(device->machine, UINT8, DAC_BUFFER_SIZE);
@@ -546,14 +545,14 @@ static DEVICE_START( common_sh_start )
 	state->has_ym2151 = (device->machine->device("ymsnd") != NULL);
 
 	/* allocate separate streams for the DMA and non-DMA DACs */
-	state->dma_stream = stream_create(device, 0, 1, OUTPUT_RATE, (void *)dmaspace, leland_80186_dma_update);
-	state->nondma_stream = stream_create(device, 0, 1, OUTPUT_RATE, NULL, leland_80186_dac_update);
+	state->dma_stream = device->machine->sound().stream_alloc(*device, 0, 1, OUTPUT_RATE, (void *)dmaspace, leland_80186_dma_update);
+	state->nondma_stream = device->machine->sound().stream_alloc(*device, 0, 1, OUTPUT_RATE, NULL, leland_80186_dac_update);
 
 	/* if we have a 2151, install an externally driven DAC stream */
 	if (state->has_ym2151)
 	{
 		state->ext_base = machine->region("dac")->base();
-		state->extern_stream = stream_create(device, 0, 1, OUTPUT_RATE, NULL, leland_80186_extern_update);
+		state->extern_stream = device->machine->sound().stream_alloc(*device, 0, 1, OUTPUT_RATE, NULL, leland_80186_extern_update);
 	}
 
 	/* create timers here so they stick around */
@@ -1087,7 +1086,7 @@ static TIMER_CALLBACK( dma_timer_callback )
 	struct dma_state *d = &state->i80186.dma[which];
 
 	/* force an update and see if we're really done */
-	stream_update(state->dma_stream);
+	state->dma_stream->update();
 
 	/* complete the status update */
 	d->control &= ~0x0002;
@@ -1302,42 +1301,42 @@ static READ16_DEVICE_HANDLER( i80186_internal_port_r )
 		case 0xd0/2:
 			if (LOG_PORTS) logerror("%05X:read 80186 DMA%d lower source address\n", cpu_get_pc(state->i80186.cpu), (offset - 0xc0/2) / 8);
 			which = (offset - 0xc0/2) / 8;
-			stream_update(state->dma_stream);
+			state->dma_stream->update();
 			return state->i80186.dma[which].source;
 
 		case 0xc2/2:
 		case 0xd2/2:
 			if (LOG_PORTS) logerror("%05X:read 80186 DMA%d upper source address\n", cpu_get_pc(state->i80186.cpu), (offset - 0xc0/2) / 8);
 			which = (offset - 0xc0/2) / 8;
-			stream_update(state->dma_stream);
+			state->dma_stream->update();
 			return state->i80186.dma[which].source >> 16;
 
 		case 0xc4/2:
 		case 0xd4/2:
 			if (LOG_PORTS) logerror("%05X:read 80186 DMA%d lower dest address\n", cpu_get_pc(state->i80186.cpu), (offset - 0xc0/2) / 8);
 			which = (offset - 0xc0/2) / 8;
-			stream_update(state->dma_stream);
+			state->dma_stream->update();
 			return state->i80186.dma[which].dest;
 
 		case 0xc6/2:
 		case 0xd6/2:
 			if (LOG_PORTS) logerror("%05X:read 80186 DMA%d upper dest address\n", cpu_get_pc(state->i80186.cpu), (offset - 0xc0/2) / 8);
 			which = (offset - 0xc0/2) / 8;
-			stream_update(state->dma_stream);
+			state->dma_stream->update();
 			return state->i80186.dma[which].dest >> 16;
 
 		case 0xc8/2:
 		case 0xd8/2:
 			if (LOG_PORTS) logerror("%05X:read 80186 DMA%d transfer count\n", cpu_get_pc(state->i80186.cpu), (offset - 0xc0/2) / 8);
 			which = (offset - 0xc0/2) / 8;
-			stream_update(state->dma_stream);
+			state->dma_stream->update();
 			return state->i80186.dma[which].count;
 
 		case 0xca/2:
 		case 0xda/2:
 			if (LOG_PORTS) logerror("%05X:read 80186 DMA%d control\n", cpu_get_pc(state->i80186.cpu), (offset - 0xc0/2) / 8);
 			which = (offset - 0xc0/2) / 8;
-			stream_update(state->dma_stream);
+			state->dma_stream->update();
 			return state->i80186.dma[which].control;
 
 		default:
@@ -1530,7 +1529,7 @@ static WRITE16_DEVICE_HANDLER( i80186_internal_port_w )
 		case 0xd0/2:
 			if (LOG_PORTS) logerror("%05X:80186 DMA%d lower source address = %04X & %04X\n", cpu_get_pc(state->i80186.cpu), (offset - 0xc0/2) / 8, data, mem_mask);
 			which = (offset - 0xc0/2) / 8;
-			stream_update(state->dma_stream);
+			state->dma_stream->update();
 			state->i80186.dma[which].source = (state->i80186.dma[which].source & ~0x0ffff) | (data & 0x0ffff);
 			break;
 
@@ -1538,7 +1537,7 @@ static WRITE16_DEVICE_HANDLER( i80186_internal_port_w )
 		case 0xd2/2:
 			if (LOG_PORTS) logerror("%05X:80186 DMA%d upper source address = %04X & %04X\n", cpu_get_pc(state->i80186.cpu), (offset - 0xc0/2) / 8, data, mem_mask);
 			which = (offset - 0xc0/2) / 8;
-			stream_update(state->dma_stream);
+			state->dma_stream->update();
 			state->i80186.dma[which].source = (state->i80186.dma[which].source & ~0xf0000) | ((data << 16) & 0xf0000);
 			break;
 
@@ -1546,7 +1545,7 @@ static WRITE16_DEVICE_HANDLER( i80186_internal_port_w )
 		case 0xd4/2:
 			if (LOG_PORTS) logerror("%05X:80186 DMA%d lower dest address = %04X & %04X\n", cpu_get_pc(state->i80186.cpu), (offset - 0xc0/2) / 8, data, mem_mask);
 			which = (offset - 0xc0/2) / 8;
-			stream_update(state->dma_stream);
+			state->dma_stream->update();
 			state->i80186.dma[which].dest = (state->i80186.dma[which].dest & ~0x0ffff) | (data & 0x0ffff);
 			break;
 
@@ -1554,7 +1553,7 @@ static WRITE16_DEVICE_HANDLER( i80186_internal_port_w )
 		case 0xd6/2:
 			if (LOG_PORTS) logerror("%05X:80186 DMA%d upper dest address = %04X & %04X\n", cpu_get_pc(state->i80186.cpu), (offset - 0xc0/2) / 8, data, mem_mask);
 			which = (offset - 0xc0/2) / 8;
-			stream_update(state->dma_stream);
+			state->dma_stream->update();
 			state->i80186.dma[which].dest = (state->i80186.dma[which].dest & ~0xf0000) | ((data << 16) & 0xf0000);
 			break;
 
@@ -1562,7 +1561,7 @@ static WRITE16_DEVICE_HANDLER( i80186_internal_port_w )
 		case 0xd8/2:
 			if (LOG_PORTS) logerror("%05X:80186 DMA%d transfer count = %04X & %04X\n", cpu_get_pc(state->i80186.cpu), (offset - 0xc0/2) / 8, data, mem_mask);
 			which = (offset - 0xc0/2) / 8;
-			stream_update(state->dma_stream);
+			state->dma_stream->update();
 			state->i80186.dma[which].count = data;
 			break;
 
@@ -1570,7 +1569,7 @@ static WRITE16_DEVICE_HANDLER( i80186_internal_port_w )
 		case 0xda/2:
 			if (LOG_PORTS) logerror("%05X:80186 DMA%d control = %04X & %04X\n", cpu_get_pc(state->i80186.cpu), (offset - 0xc0/2) / 8, data, mem_mask);
 			which = (offset - 0xc0/2) / 8;
-			stream_update(state->dma_stream);
+			state->dma_stream->update();
 			update_dma_control(state, which, data);
 			break;
 
@@ -1942,7 +1941,7 @@ static WRITE16_DEVICE_HANDLER( dac_w )
 		{
 			/* if this is the first byte, sync the stream */
 			if (count == 0)
-				stream_update(state->nondma_stream);
+				state->nondma_stream->update();
 
 			/* prescale by the volume */
 			d->buffer[d->bufin] = d->value * d->volume;
@@ -1978,7 +1977,7 @@ static WRITE16_DEVICE_HANDLER( redline_dac_w )
 	{
 		/* if this is the first byte, sync the stream */
 		if (count == 0)
-			stream_update(state->nondma_stream);
+			state->nondma_stream->update();
 
 		/* prescale by the volume */
 		d->buffer[d->bufin] = d->value * d->volume;
@@ -2015,7 +2014,7 @@ static WRITE16_DEVICE_HANDLER( dac_10bit_w )
 	{
 		/* if this is the first byte, sync the stream */
 		if (count == 0)
-			stream_update(state->nondma_stream);
+			state->nondma_stream->update();
 
 		/* prescale by the volume */
 		d->buffer[d->bufin] = d->value * (0xff / DAC_VOLUME_SCALE / 2);
@@ -2052,7 +2051,7 @@ static WRITE16_DEVICE_HANDLER( ataxx_dac_control )
 	/* if we have a YM2151 (and an external DAC), handle those offsets */
 	if (state->has_ym2151)
 	{
-		stream_update(state->extern_stream);
+		state->extern_stream->update();
 		switch (offset)
 		{
 			case 0x04:

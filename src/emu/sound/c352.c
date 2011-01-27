@@ -14,7 +14,6 @@
  */
 
 #include "emu.h"
-#include "streams.h"
 #include "c352.h"
 
 #define VERBOSE (0)
@@ -365,7 +364,7 @@ static unsigned short c352_read_reg16(c352_state *info, unsigned long address)
 	unsigned long	chan;
 	unsigned short	val;
 
-	stream_update(info->stream);
+	info->stream->update();
 
 	chan = (address >> 4) & 0xfff;
 	if (chan > 31)
@@ -391,7 +390,7 @@ static void c352_write_reg16(c352_state *info, unsigned long address, unsigned s
 	unsigned long	chan;
 	int i;
 
-	stream_update(info->stream);
+	info->stream->update();
 
 	chan = (address >> 4) & 0xfff;
 
@@ -546,7 +545,7 @@ static DEVICE_START( c352 )
 
 	info->sample_rate_base = device->clock() / 192;
 
-	info->stream = stream_create(device, 0, 4, info->sample_rate_base, info, c352_update);
+	info->stream = device->machine->sound().stream_alloc(*device, 0, 4, info->sample_rate_base, info, c352_update);
 
 	c352_init(info, device);
 }

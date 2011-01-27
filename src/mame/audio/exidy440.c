@@ -9,7 +9,6 @@
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
-#include "streams.h"
 #include "includes/exidy440.h"
 
 
@@ -162,7 +161,7 @@ static DEVICE_START( exidy440_sound )
 	channel_frequency[3] = device->clock()/2;
 
 	/* get stream channels */
-	stream = stream_create(device, 0, 2, device->clock(), NULL, channel_update);
+	stream = device->machine->sound().stream_alloc(*device, 0, 2, device->clock(), NULL, channel_update);
 
 	/* allocate the sample cache */
 	length = machine->region("cvsd")->bytes() * 16 + MAX_CACHE_ENTRIES * sizeof(sound_cache_entry);
@@ -359,7 +358,7 @@ static WRITE8_HANDLER( sound_volume_w )
 		fprintf(debuglog, "Volume %02X=%02X\n", offset, data);
 
 	/* update the stream */
-	stream_update(stream);
+	stream->update();
 
 	/* set the new volume */
 	sound_volume[offset] = ~data;
@@ -389,7 +388,7 @@ static WRITE8_HANDLER( sound_interrupt_clear_w )
 static void m6844_update(void)
 {
 	/* update the stream */
-	stream_update(stream);
+	stream->update();
 }
 
 
@@ -714,7 +713,7 @@ static void stop_cvsd(int ch)
 {
 	/* the DMA channel is marked inactive; that will kill the audio */
 	sound_channel[ch].remaining = 0;
-	stream_update(stream);
+	stream->update();
 
 	if (SOUND_LOG && debuglog)
 		fprintf(debuglog, "Channel %d stop\n", ch);

@@ -713,10 +713,12 @@ static WRITE8_DEVICE_HANDLER( sound_control_0_w )
 //  popmessage("SND0 0=%02x 1=%02x 2=%02x 3=%02x", state->snd_ctrl0, state->snd_ctrl1, state->snd_ctrl2, state->snd_ctrl3);
 
 	/* this definitely controls main melody voice on 2'-1 and 4'-1 outputs */
-	sound_set_output_gain(device, 0, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
-	sound_set_output_gain(device, 1, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
-	sound_set_output_gain(device, 2, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
-	sound_set_output_gain(device, 3, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
+	device_sound_interface *sound;
+	device->interface(sound);
+	sound->set_output_gain(0, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
+	sound->set_output_gain(1, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
+	sound->set_output_gain(2, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
+	sound->set_output_gain(3, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
 
 }
 static WRITE8_DEVICE_HANDLER( sound_control_1_w )
@@ -724,10 +726,12 @@ static WRITE8_DEVICE_HANDLER( sound_control_1_w )
 	fortyl_state *state = device->machine->driver_data<fortyl_state>();
 	state->snd_ctrl1 = data & 0xff;
 //  popmessage("SND1 0=%02x 1=%02x 2=%02x 3=%02x", state->snd_ctrl0, state->snd_ctrl1, state->snd_ctrl2, state->snd_ctrl3);
-	sound_set_output_gain(device, 4, state->vol_ctrl[(state->snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
-	sound_set_output_gain(device, 5, state->vol_ctrl[(state->snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
-	sound_set_output_gain(device, 6, state->vol_ctrl[(state->snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
-	sound_set_output_gain(device, 7, state->vol_ctrl[(state->snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
+	device_sound_interface *sound;
+	device->interface(sound);
+	sound->set_output_gain(4, state->vol_ctrl[(state->snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
+	sound->set_output_gain(5, state->vol_ctrl[(state->snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
+	sound->set_output_gain(6, state->vol_ctrl[(state->snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
+	sound->set_output_gain(7, state->vol_ctrl[(state->snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
 }
 
 static WRITE8_DEVICE_HANDLER( sound_control_2_w )
@@ -737,8 +741,10 @@ static WRITE8_DEVICE_HANDLER( sound_control_2_w )
 	state->snd_ctrl2 = data & 0xff;
 //  popmessage("SND2 0=%02x 1=%02x 2=%02x 3=%02x", state->snd_ctrl0, state->snd_ctrl1, state->snd_ctrl2, state->snd_ctrl3);
 
+	device_sound_interface *sound;
+	device->interface(sound);
 	for (i = 0; i < 3; i++)
-		sound_set_output_gain(device, i, state->vol_ctrl[(state->snd_ctrl2 >> 4) & 15] / 100.0);	/* ym2149f all */
+		sound->set_output_gain(i, state->vol_ctrl[(state->snd_ctrl2 >> 4) & 15] / 100.0);	/* ym2149f all */
 }
 
 static WRITE8_DEVICE_HANDLER( sound_control_3_w ) /* unknown */

@@ -301,7 +301,7 @@ WRITE8_HANDLER( dday_control_w )
 	if (!(data & 0x10) && (state->control & 0x10))
 		state->ay1->reset();
 
-	sound_global_enable(space->machine, data & 0x10);
+	space->machine->sound().system_enable(data & 0x10);
 
 	/* bit 6 is search light enable */
 	state->sl_enable = data & 0x40;

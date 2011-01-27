@@ -4,8 +4,36 @@
 
     Core sound interface functions and definitions.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
+****************************************************************************
+
+    Copyright Aaron Giles
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************/
 
@@ -19,221 +47,229 @@
 #define __SOUND_H__
 
 
-/***************************************************************************
-    MACROS
-***************************************************************************/
+//**************************************************************************
+//  MACROS
+//**************************************************************************
 
-/* these functions are macros primarily due to include file ordering */
-/* plus, they are very simple */
-#define speaker_output_count(config)		(config)->m_devicelist.count(SPEAKER)
-#define speaker_output_first(config)		(config)->m_devicelist.first(SPEAKER)
-#define speaker_output_next(previous)		(previous)->typenext()
+#define STREAM_UPDATE(name) void name(device_t *device, sound_stream *stream, void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 
 
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
-// ======================> speaker_device_config
+// forward references
+class speaker_device;
+typedef struct _wav_file wav_file;
 
-class speaker_device_config : public device_config
+
+// structure describing an indexed speaker
+struct speaker_input
 {
-	friend class speaker_device;
-
-	// construction/destruction
-	speaker_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-
-	// inline configuration helpers
-	static void static_set_position(device_config *device, double x, double y, double z);
-
-protected:
-	// inline configuration state
-	double		m_x;
-	double		m_y;
-	double		m_z;
+	speaker_device *	speaker;					// owning device
+	sound_stream *		stream;						// stream within the device
+	int					inputnum;					// input on the stream
 };
 
 
+// ======================> sound_stream
 
-// ======================> speaker_device
-
-class speaker_device : public device_t
+class sound_stream
 {
-	friend class speaker_device_config;
-	friend resource_pool_object<speaker_device>::~resource_pool_object();
+	friend class simple_list<sound_stream>;
+	friend class sound_manager;
+	
+	typedef void (*stream_update_func)(device_t *device, sound_stream *stream, void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
-	// construction/destruction
-	speaker_device(running_machine &_machine, const speaker_device_config &config);
-	virtual ~speaker_device();
-
-public:
-	// input properties
-	int inputs() const { return m_inputs; }
-	float input_gain(int index = 0) const { return m_input[index].m_gain; }
-	float input_default_gain(int index = 0) const { return m_input[index].m_default_gain; }
-	const char *input_name(int index = 0) const { return m_input[index].m_name; }
-	void set_input_gain(int index, float gain);
-
-	// internally for use by the sound system
-	void mix(INT32 *leftmix, INT32 *rightmix, int &samples_this_update, bool suppress);
-
-protected:
-	// device-level overrides
-	virtual void device_start();
-	virtual void device_post_load();
-
-	// internal helpers
-	static STREAM_UPDATE( static_mixer_update ) { downcast<speaker_device *>(device)->mixer_update(inputs, outputs, samples); }
-	void mixer_update(stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-
-	// a single input
-	struct speaker_input
+	// stream output class
+	class stream_output
 	{
-		float			m_gain;					// current gain
-		float			m_default_gain;			// default gain
-		astring			m_name;					// name of this input
+	public:
+		// construction/destruction
+		stream_output();
+		
+		// internal state
+		sound_stream *		m_stream;				// owning stream
+		stream_sample_t *	m_buffer;				// output buffer
+		int					m_dependents;			// number of dependents
+		INT16				m_gain;					// gain to apply to the output
 	};
 
-	// internal state
-	const speaker_device_config &m_config;
-	sound_stream *		m_mixer_stream;			// mixing stream
-	int					m_inputs;				// number of input streams
-	speaker_input *		m_input;				// array of input information
-#ifdef MAME_DEBUG
-	INT32				m_max_sample;			// largest sample value we've seen
-	INT32				m_clipped_samples;		// total number of clipped samples
-	INT32				m_total_samples;		// total number of samples
-#endif
+	// stream input class
+	class stream_input
+	{
+	public:
+		// construction/destruction
+		stream_input();
+		
+		// internal state
+		stream_output *		m_source;				// pointer to the sound_output for this source
+		stream_sample_t *	m_resample;				// buffer for resampling to the stream's sample rate
+		UINT32				m_bufsize;				// size of output buffer, in samples
+		UINT32				m_bufalloc;				// allocated size of output buffer, in samples
+		attoseconds_t		m_latency_attoseconds;	// latency between this stream and the input stream
+		INT16				m_gain;					// gain to apply to this input
+		INT16				m_initial_gain;			// initial gain supplied at creation
+	};
+
+	// constants
+	static const int OUTPUT_BUFFER_UPDATES		= 5;
+	static const UINT32 FRAC_BITS				= 22;
+	static const UINT32 FRAC_ONE				= 1 << FRAC_BITS;
+	static const UINT32 FRAC_MASK 				= FRAC_ONE - 1;
+
+	// construction/destruction
+	sound_stream(device_t &device, int inputs, int outputs, int sample_rate, void *param = NULL, stream_update_func callback = &sound_stream::device_stream_update_stub);
+
+public:
+	// getters
+	sound_stream *next() const { return m_next; }
+	device_t &device() const { return m_device; }
+	int sample_rate() const { return (m_new_sample_rate != 0) ? m_new_sample_rate : m_sample_rate; }
+	attotime sample_time() const;
+	attotime sample_period() const { return attotime_make(0, m_attoseconds_per_sample); }
+	int input_count() const { return m_inputs; }
+	int output_count() const { return m_outputs; }
+	float input_gain(int inputnum) const;
+	float initial_input_gain(int inputnum) const;
+	const char *input_name(int inputnum, astring &string) const;
+	float output_gain(int outputnum) const;
+
+	// operations
+	void set_input(int inputnum, sound_stream *input_stream, int outputnum = 0, float gain = 1.0f);
+	void update();
+	const stream_sample_t *output_since_last_update(int outputnum, int &numsamples);
+
+	// timing
+	void set_sample_rate(int sample_rate);
+	void set_input_gain(int inputnum, float gain);
+	void set_output_gain(int outputnum, float gain);
+	
+private:
+	// helpers called by our friends only
+	void update_with_accounting(bool second_tick);
+	void apply_sample_rate_changes();
+
+	// internal helpers
+	static STREAM_UPDATE( device_stream_update_stub );
+	void recompute_sample_rate_data();
+	void allocate_resample_buffers();
+	void allocate_output_buffers();
+	void postload();
+	void generate_samples(int samples);
+	stream_sample_t *generate_resampled_data(stream_input &input, UINT32 numsamples);
+
+	// linking information
+	device_t &			m_device;				// owning device
+	sound_stream *		m_next;					// next stream in the chain
+
+	// general information
+	UINT32				m_sample_rate;			// sample rate of this stream
+	UINT32				m_new_sample_rate;		// newly-set sample rate for the stream
+
+	// timing information
+	attoseconds_t		m_attoseconds_per_sample;// number of attoseconds per sample
+	INT32				m_max_samples_per_update;// maximum samples per update
+
+	// input information
+	int					m_inputs;				// number of inputs
+	stream_input *		m_input;				// list of streams we directly depend upon
+	stream_sample_t **	m_input_array;			// array of inputs for passing to the callback
+
+	// resample buffer information
+	UINT32				m_resample_bufalloc;	// allocated size of each resample buffer
+
+	// output information
+	int					m_outputs;				// number of outputs
+	stream_output *		m_output;				// list of streams which directly depend upon us
+	stream_sample_t **	m_output_array;			// array of outputs for passing to the callback
+
+	// output buffer information
+	UINT32				m_output_bufalloc;		// allocated size of each output buffer
+	INT32				m_output_sampindex;		// current position within each output buffer
+	INT32				m_output_update_sampindex;// position at time of last global update
+	INT32				m_output_base_sampindex;// sample at base of buffer, relative to the current emulated second
+
+	// callback information
+	stream_update_func	m_callback;				// callback function
+	void *				m_param;				// callback function parameter
 };
 
 
-// device type definition
-extern const device_type SPEAKER;
+// ======================> sound_manager
 
-
-
-/***************************************************************************
-    SOUND DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-/* add/remove speakers */
-#define MCFG_SPEAKER_ADD(_tag, _x, _y, _z) \
-	MCFG_DEVICE_ADD(_tag, SPEAKER, 0) \
-	speaker_device_config::static_set_position(device, _x, _y, _z); \
-
-#define MCFG_SPEAKER_STANDARD_MONO(_tag) \
-	MCFG_SPEAKER_ADD(_tag, 0.0, 0.0, 1.0)
-
-#define MCFG_SPEAKER_STANDARD_STEREO(_tagl, _tagr) \
-	MCFG_SPEAKER_ADD(_tagl, -0.2, 0.0, 1.0) \
-	MCFG_SPEAKER_ADD(_tagr, 0.2, 0.0, 1.0)
-
-
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-/* core interfaces */
-void sound_init(running_machine *machine);
-
-
-
-/* ----- sound device interface ----- */
-
-/* global sound controls */
-void sound_mute(running_machine *machine, int mute);
-void sound_set_attenuation(running_machine *machine, int attenuation);
-int sound_get_attenuation(running_machine *machine);
-void sound_global_enable(running_machine *machine, int enable);
-
-/* user gain controls on speaker inputs for mixing */
-int sound_get_user_gain_count(running_machine *machine);
-void sound_set_user_gain(running_machine *machine, int index, float gain);
-float sound_get_user_gain(running_machine *machine, int index);
-float sound_get_default_gain(running_machine *machine, int index);
-const char *sound_get_user_gain_name(running_machine *machine, int index);
-
-
-/* driver gain controls on chip outputs */
-void sound_set_output_gain(device_t *device, int output, float gain);
-
-
-
-//**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  speaker_count - return the number of speaker
-//  devices in a machine_config
-//-------------------------------------------------
-
-inline int speaker_count(const machine_config &config)
+class sound_manager
 {
-	return config.m_devicelist.count(SPEAKER);
-}
+	friend class sound_stream;
 
+	// reasons for muting
+	static const UINT8 MUTE_REASON_PAUSE = 0x01;
+	static const UINT8 MUTE_REASON_UI = 0x02;
+	static const UINT8 MUTE_REASON_DEBUGGER = 0x04;
+	static const UINT8 MUTE_REASON_SYSTEM = 0x08;
 
-//-------------------------------------------------
-//  speaker_first - return the first speaker
-//  device config in a machine_config
-//-------------------------------------------------
+	// stream updates
+	static const attotime STREAMS_UPDATE_ATTOTIME;
 
-inline const speaker_device_config *speaker_first(const machine_config &config)
-{
-	return downcast<speaker_device_config *>(config.m_devicelist.first(SPEAKER));
-}
+public:
+	static const int STREAMS_UPDATE_FREQUENCY = 50;
 
+	// construction/destruction
+	sound_manager(running_machine &machine);
+	~sound_manager();
+	
+	// getters
+	int attenuation() const { return m_attenuation; }
+	sound_stream *first_stream() const { return m_stream_list.first(); }
+	attotime last_update() const { return m_last_update; }
+	attoseconds_t update_attoseconds() const { return m_update_attoseconds; }
+	
+	// stream creation
+	sound_stream *stream_alloc(device_t &device, int inputs, int outputs, int sample_rate, void *param = NULL, sound_stream::stream_update_func callback = NULL);
+	
+	// global controls
+	void set_attenuation(int attenuation);
+	void ui_mute(bool turn_off = true) { mute(turn_off, MUTE_REASON_UI); }
+	void debugger_mute(bool turn_off = true) { mute(turn_off, MUTE_REASON_DEBUGGER); }
+	void system_mute(bool turn_off = true) { mute(turn_off, MUTE_REASON_SYSTEM); }
+	void system_enable(bool turn_on = true) { mute(!turn_on, MUTE_REASON_SYSTEM); }
+	
+	// user gain controls
+	bool indexed_speaker_input(int index, speaker_input &info) const;
+	
+private:
+	// internal helpers
+	void mute(bool mute, UINT8 reason);
+	static void reset(running_machine &machine);
+	static void pause(running_machine &machine);
+	static void resume(running_machine &machine);
+	static void config_load(running_machine *machine, int config_type, xml_data_node *parentnode);
+	static void config_save(running_machine *machine, int config_type, xml_data_node *parentnode);
 
-//-------------------------------------------------
-//  speaker_next - return the next speaker
-//  device config in a machine_config
-//-------------------------------------------------
+	static TIMER_CALLBACK( update_static ) { reinterpret_cast<sound_manager *>(ptr)->update(); }
+	void update();
 
-inline const speaker_device_config *speaker_next(const speaker_device_config *previous)
-{
-	return downcast<speaker_device_config *>(previous->typenext());
-}
+	// internal state
+	running_machine &	m_machine;				// reference to our machine
+	emu_timer *			m_update_timer;			// timer to drive periodic updates
 
+	UINT32 				m_finalmix_leftover;
+	INT16 *				m_finalmix;
+	INT32 *				m_leftmix;
+	INT32 *				m_rightmix;
 
-//-------------------------------------------------
-//  speaker_count - return the number of speaker
-//  devices in a machine
-//-------------------------------------------------
+	UINT8 				m_muted;
+	int 				m_attenuation;
+	int 				m_nosound_mode;
 
-inline int speaker_count(running_machine &machine)
-{
-	return machine.m_devicelist.count(SPEAKER);
-}
-
-
-//-------------------------------------------------
-//  speaker_first - return the first speaker
-//  device in a machine
-//-------------------------------------------------
-
-inline speaker_device *speaker_first(running_machine &machine)
-{
-	return downcast<speaker_device *>(machine.m_devicelist.first(SPEAKER));
-}
-
-
-//-------------------------------------------------
-//  speaker_next - return the next speaker
-//  device in a machine
-//-------------------------------------------------
-
-inline speaker_device *speaker_next(speaker_device *previous)
-{
-	return downcast<speaker_device *>(previous->typenext());
-}
+	wav_file *			m_wavfile;
+	
+	// streams data
+	simple_list<sound_stream> m_stream_list;	// list of streams
+	attoseconds_t		m_update_attoseconds;	// attoseconds between global updates
+	attotime			m_last_update;			// last update time
+};
 
 
 #endif	/* __SOUND_H__ */

@@ -12,7 +12,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "cem3394.h"
 
 
@@ -335,7 +334,7 @@ static DEVICE_START( cem3394 )
 	chip->inv_sample_rate = 1.0 / (double)chip->sample_rate;
 
 	/* allocate stream channels, 1 per chip */
-	chip->stream = stream_create(device, 0, 1, chip->sample_rate, chip, cem3394_update);
+	chip->stream = device->machine->sound().stream_alloc(*device, 0, 1, chip->sample_rate, chip, cem3394_update);
 	chip->external = intf->external;
 	chip->vco_zero_freq = intf->vco_zero_freq;
 	chip->filter_zero_freq = intf->filter_zero_freq;
@@ -426,7 +425,7 @@ void cem3394_set_voltage(device_t *device, int input, double voltage)
 	chip->values[input] = voltage;
 
 	/* update the stream first */
-	stream_update(chip->stream);
+	chip->stream->update();
 
 	/* switch off the input */
 	switch (input)

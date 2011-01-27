@@ -105,7 +105,6 @@ has twice the steps, happening twice as fast.
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "ay8910.h"
 
 /*************************************
@@ -776,7 +775,7 @@ void *ay8910_start_ym(void *infoptr, device_type chip_type, device_t *device, in
 
 	/* The envelope is pacing twice as fast for the YM2149 as for the AY-3-8910,    */
 	/* This handled by the step parameter. Consequently we use a divider of 8 here. */
-	info->channel = stream_create(device, 0, info->streams, device->clock() / 8, info, ay8910_update);
+	info->channel = device->machine->sound().stream_alloc(*device, 0, info->streams, device->clock() / 8, info, ay8910_update);
 
 	ay8910_set_clock_ym(info,device->clock());
 	ay8910_statesave(info, device);
@@ -833,13 +832,13 @@ void ay8910_set_volume(device_t *device,int channel,int volume)
 
 	for (ch = 0; ch < psg->streams; ch++)
 		if (channel == ch || psg->streams == 1 || channel == ALL_8910_CHANNELS)
-			stream_set_output_gain(psg->channel, ch, volume / 100.0);
+			psg->channel->set_output_gain(ch, volume / 100.0);
 }
 
 void ay8910_set_clock_ym(void *chip, int clock)
 {
 	ay8910_context *psg = (ay8910_context *)chip;
-	stream_set_sample_rate(psg->channel, clock / 8 );
+	psg->channel->set_sample_rate( clock / 8 );
 }
 
 void ay8910_write_ym(void *chip, int addr, int data)
@@ -854,7 +853,7 @@ void ay8910_write_ym(void *chip, int addr, int data)
 		if (r == AY_ESHAPE || psg->regs[r] != data)
 		{
 			/* update the output buffer before changing the register */
-			stream_update(psg->channel);
+			psg->channel->update();
 		}
 
 		ay8910_write_reg(psg,r,data);
@@ -874,7 +873,7 @@ int ay8910_read_ym(void *chip)
 	if (r > 15) return 0;
 
 	/* There are no state dependent register in the AY8910! */
-	/* stream_update(psg->channel); */
+	/* psg->channel->update(); */
 
 	switch (r)
 	{

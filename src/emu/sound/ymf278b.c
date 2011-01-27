@@ -58,7 +58,6 @@
 */
 
 #include "emu.h"
-#include "streams.h"
 #include "ymf278b.h"
 
 #define VERBOSE 0
@@ -742,7 +741,7 @@ static DEVICE_START( ymf278b )
 	intf = (device->baseconfig().static_config() != NULL) ? (const ymf278b_interface *)device->baseconfig().static_config() : &defintrf;
 
 	ymf278b_init(device, chip, intf->irq_callback);
-	chip->stream = stream_create(device, 0, 2, device->clock()/768, chip, ymf278b_pcm_update);
+	chip->stream = device->machine->sound().stream_alloc(*device, 0, 2, device->clock()/768, chip, ymf278b_pcm_update);
 
 	// Volume table, 1 = -0.375dB, 8 = -3dB, 256 = -96dB
 	for(i = 0; i < 256; i++)

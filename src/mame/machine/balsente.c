@@ -974,7 +974,7 @@ WRITE8_HANDLER( balsente_counter_control_w )
 	{
 		int ch;
 		for (ch = 0; ch < 6; ch++)
-			sound_set_output_gain(state->cem_device[ch], 0, (data & 0x01) ? 1.0 : 0);
+			state->cem_device[ch]->set_output_gain(0, (data & 0x01) ? 1.0 : 0);
 	}
 
 	/* bit D1 is hooked to counter 0's gate */

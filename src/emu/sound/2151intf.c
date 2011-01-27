@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "fm.h"
 #include "2151intf.h"
 #include "ym2151.h"
@@ -57,7 +56,7 @@ static DEVICE_START( ym2151 )
 	rate = device->clock()/64;
 
 	/* stream setup */
-	info->stream = stream_create(device,0,2,rate,info,ym2151_update);
+	info->stream = device->machine->sound().stream_alloc(*device,0,2,rate,info,ym2151_update);
 
 	info->chip = ym2151_init(device,device->clock(),rate);
 	assert_always(info->chip != NULL, "Error creating YM2151 chip");
@@ -88,7 +87,7 @@ READ8_DEVICE_HANDLER( ym2151_r )
 
 	if (offset & 1)
 	{
-		stream_update(token->stream);
+		token->stream->update();
 		return ym2151_read_status(token->chip);
 	}
 	else
@@ -101,7 +100,7 @@ WRITE8_DEVICE_HANDLER( ym2151_w )
 
 	if (offset & 1)
 	{
-		stream_update(token->stream);
+		token->stream->update();
 		ym2151_write_reg(token->chip, token->lastreg, data);
 	}
 	else

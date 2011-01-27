@@ -235,7 +235,6 @@ and off as it normally does during speech). Once START has gone low-high-low, th
 #undef ACCURATE_SQUEAL
 
 #include "emu.h"
-#include "streams.h"
 #include "s14001a.h"
 
 typedef struct
@@ -593,13 +592,13 @@ static DEVICE_START( s14001a )
 
 	chip->SpeechRom = *device->region();
 
-	chip->stream = stream_create(device, 0, 1, device->clock() ? device->clock() : device->machine->sample_rate, chip, s14001a_pcm_update);
+	chip->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->clock() ? device->clock() : device->machine->sample_rate, chip, s14001a_pcm_update);
 }
 
 int s14001a_bsy_r(device_t *device)
 {
 	S14001AChip *chip = get_safe_token(device);
-	stream_update(chip->stream);
+	chip->stream->update();
 #ifdef DEBUGSTATE
 	fprintf(stderr,"busy state checked: %d\n",(chip->machineState != 0) );
 #endif
@@ -609,14 +608,14 @@ int s14001a_bsy_r(device_t *device)
 void s14001a_reg_w(device_t *device, int data)
 {
 	S14001AChip *chip = get_safe_token(device);
-	stream_update(chip->stream);
+	chip->stream->update();
 	chip->WordInput = data;
 }
 
 void s14001a_rst_w(device_t *device, int data)
 {
 	S14001AChip *chip = get_safe_token(device);
-	stream_update(chip->stream);
+	chip->stream->update();
 	chip->LatchedWord = chip->WordInput;
 	chip->resetState = (data==1);
 	chip->machineState = chip->resetState ? 1 : chip->machineState;
@@ -625,13 +624,13 @@ void s14001a_rst_w(device_t *device, int data)
 void s14001a_set_clock(device_t *device, int clock)
 {
 	S14001AChip *chip = get_safe_token(device);
-	stream_set_sample_rate(chip->stream, clock);
+	chip->stream->set_sample_rate(clock);
 }
 
 void s14001a_set_volume(device_t *device, int volume)
 {
 	S14001AChip *chip = get_safe_token(device);
-	stream_update(chip->stream);
+	chip->stream->update();
 	chip->VSU1000_amp = volume;
 }
 

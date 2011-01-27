@@ -61,7 +61,6 @@
 ***********************************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "tms5110.h"
 
 #define MAX_SAMPLE_CHUNK		512
@@ -1032,7 +1031,7 @@ static DEVICE_START( tms5110 )
 	devcb_resolve_read_line(&tms->data_func, &tms->intf->data_func, device);
 
 	/* initialize a stream */
-	tms->stream = stream_create(device, 0, 1, device->clock() / 80, tms, tms5110_update);
+	tms->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->clock() / 80, tms, tms5110_update);
 
 	if (tms->table == NULL)
 	{
@@ -1153,7 +1152,7 @@ WRITE8_DEVICE_HANDLER( tms5110_ctl_w )
 	tms5110_state *tms = get_safe_token(device);
 
     /* bring up to date first */
-    stream_update(tms->stream);
+    tms->stream->update();
 	tms->CTL_pins = data & 0xf;
 }
 
@@ -1169,7 +1168,7 @@ WRITE_LINE_DEVICE_HANDLER( tms5110_pdc_w )
 	tms5110_state *tms = get_safe_token(device);
 
     /* bring up to date first */
-    stream_update(tms->stream);
+    tms->stream->update();
     tms5110_PDC_set(tms, state);
 }
 
@@ -1195,7 +1194,7 @@ READ8_DEVICE_HANDLER( tms5110_ctl_r )
 	tms5110_state *tms = get_safe_token(device);
 
     /* bring up to date first */
-    stream_update(tms->stream);
+    tms->stream->update();
     if (tms->state == CTL_STATE_OUTPUT)
     {
 		//if (DEBUG_5110) logerror("Status read (status=%2d)\n", tms->talk_status);
@@ -1213,7 +1212,7 @@ READ8_DEVICE_HANDLER( m58817_status_r )
 	tms5110_state *tms = get_safe_token(device);
 
     /* bring up to date first */
-    stream_update(tms->stream);
+    tms->stream->update();
     return (tms->talk_status << 0); /*CTL1 = still talking ? */
 }
 
@@ -1234,7 +1233,7 @@ READ8_DEVICE_HANDLER( tms5110_romclk_hack_r )
 	tms5110_state *tms = get_safe_token(device);
 
     /* bring up to date first */
-    stream_update(tms->stream);
+    tms->stream->update();
 
     /* create and start timer if necessary */
     if (!tms->romclk_hack_timer_started)
@@ -1258,7 +1257,7 @@ int tms5110_ready_r(device_t *device)
 	tms5110_state *tms = get_safe_token(device);
 
     /* bring up to date first */
-    stream_update(tms->stream);
+    tms->stream->update();
     return (tms->fifo_count < FIFO_SIZE-1);
 }
 
@@ -1303,7 +1302,7 @@ static STREAM_UPDATE( tms5110_update )
 void tms5110_set_frequency(device_t *device, int frequency)
 {
 	tms5110_state *tms = get_safe_token(device);
-	stream_set_sample_rate(tms->stream, frequency / 80);
+	tms->stream->set_sample_rate(frequency / 80);
 }
 
 

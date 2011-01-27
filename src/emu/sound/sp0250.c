@@ -17,7 +17,6 @@
 */
 
 #include "emu.h"
-#include "streams.h"
 #include "sp0250.h"
 
 /*
@@ -128,7 +127,7 @@ static void sp0250_load_values(sp0250_state *sp)
 static TIMER_CALLBACK( sp0250_timer_tick )
 {
 	sp0250_state *sp = (sp0250_state *)ptr;
-	stream_update(sp->stream);
+	sp->stream->update();
 }
 
 static STREAM_UPDATE( sp0250_update )
@@ -212,14 +211,14 @@ static DEVICE_START( sp0250 )
 		timer_pulse(device->machine, attotime_mul(ATTOTIME_IN_HZ(device->clock()), CLOCK_DIVIDER), sp, 0, sp0250_timer_tick);
 	}
 
-	sp->stream = stream_create(device, 0, 1, device->clock() / CLOCK_DIVIDER, sp, sp0250_update);
+	sp->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->clock() / CLOCK_DIVIDER, sp, sp0250_update);
 }
 
 
 WRITE8_DEVICE_HANDLER( sp0250_w )
 {
 	sp0250_state *sp = get_safe_token(device);
-	stream_update(sp->stream);
+	sp->stream->update();
 	if (sp->fifo_pos != 15)
 	{
 		sp->fifo[sp->fifo_pos++] = data;
@@ -234,7 +233,7 @@ WRITE8_DEVICE_HANDLER( sp0250_w )
 UINT8 sp0250_drq_r(device_t *device)
 {
 	sp0250_state *sp = get_safe_token(device);
-	stream_update(sp->stream);
+	sp->stream->update();
 	return (sp->fifo_pos == 15) ? CLEAR_LINE : ASSERT_LINE;
 }
 

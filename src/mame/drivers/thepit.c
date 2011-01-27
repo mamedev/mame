@@ -142,7 +142,7 @@ static READ8_HANDLER( thepit_colorram_r )
 
 static WRITE8_HANDLER( thepit_sound_enable_w )
 {
-	sound_global_enable(space->machine, data);
+	space->machine->sound().system_enable(data);
 }
 
 

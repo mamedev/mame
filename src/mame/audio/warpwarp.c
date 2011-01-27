@@ -8,7 +8,6 @@
  ****************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "includes/warpwarp.h"
 
 #define CLOCK_16H	(18432000/3/2/16)
@@ -56,7 +55,7 @@ WRITE8_DEVICE_HANDLER( warpwarp_sound_w )
 {
 	warpwarp_sound_state *state = get_safe_token(device);
 
-	stream_update(state->channel);
+	state->channel->update();
 	state->sound_latch = data & 0x0f;
 	state->sound_volume = 0x7fff; /* set sound_volume */
 	state->noise = 0x0000;  /* reset noise shifter */
@@ -95,7 +94,7 @@ WRITE8_DEVICE_HANDLER( warpwarp_music1_w )
 {
 	warpwarp_sound_state *state = get_safe_token(device);
 
-	stream_update(state->channel);
+	state->channel->update();
 	state->music1_latch = data & 0x3f;
 }
 
@@ -109,7 +108,7 @@ static TIMER_CALLBACK( music_volume_decay )
 WRITE8_DEVICE_HANDLER( warpwarp_music2_w )
 {
 	warpwarp_sound_state *state = get_safe_token(device);
-	stream_update(state->channel);
+	state->channel->update();
 	state->music2_latch = data & 0x3f;
 	state->music_volume = 0x7fff;
 	/* fast decay enabled? */
@@ -235,7 +234,7 @@ static DEVICE_START( warpwarp_sound )
 	for( i = 0; i < 0x8000; i++ )
 		state->decay[0x7fff-i] = (INT16) (0x7fff/exp(1.0*i/4096));
 
-	state->channel = stream_create(device, 0, 1, CLOCK_16H, NULL, warpwarp_sound_update);
+	state->channel = device->machine->sound().stream_alloc(*device, 0, 1, CLOCK_16H, NULL, warpwarp_sound_update);
 
 	state->sound_volume_timer = timer_alloc(machine, sound_volume_decay, state);
 	state->music_volume_timer = timer_alloc(machine, music_volume_decay, state);

@@ -1,6 +1,8 @@
 #ifndef _CPS1_H_
 #define _CPS1_H_
 
+#include "sound/msm5205.h"
+
 struct gfx_range
 {
 	// start and end are as passed by the game (shift adjusted to be all
@@ -129,8 +131,8 @@ public:
 	/* devices */
 	device_t *maincpu;
 	device_t *audiocpu;
-	device_t *msm_1;	// fcrash
-	device_t *msm_2;	// fcrash
+	msm5205_device *msm_1;	// fcrash
+	msm5205_device *msm_2;	// fcrash
 };
 
 /*----------- defined in drivers/cps1.c -----------*/

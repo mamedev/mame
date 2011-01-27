@@ -271,8 +271,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// internal callbacks
-	static STREAM_UPDATE( static_stream_generate );
-	virtual void stream_generate(stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 	inline bool is_ntsc();
 	inline UINT8 read_page_ram_byte(offs_t address);

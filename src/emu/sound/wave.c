@@ -14,7 +14,6 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "imagedev/cassette.h"
 #include "wave.h"
 
@@ -23,7 +22,7 @@
 static STREAM_UPDATE( wave_sound_update )
 {
 	device_image_interface *image = (device_image_interface *)param;
-	int speakers = speaker_output_count(image->device().machine->config);
+	int speakers = image->device().machine->m_devicelist.count(SPEAKER);
 	cassette_image *cassette;
 	cassette_state state;
 	double time_index;
@@ -69,12 +68,12 @@ static DEVICE_START( wave )
 
 	assert( device != NULL );
 	assert( device->baseconfig().static_config() != NULL );
-	int speakers = speaker_output_count(device->machine->config);
+	int speakers = device->machine->config->m_devicelist.count(SPEAKER);
 	image = dynamic_cast<device_image_interface *>(device->machine->device( (const char *)device->baseconfig().static_config()));
 	if (speakers > 1)
-		stream_create(device, 0, 2, device->machine->sample_rate, (void *)image, wave_sound_update);
+		device->machine->sound().stream_alloc(*device, 0, 2, device->machine->sample_rate, (void *)image, wave_sound_update);
 	else
-		stream_create(device, 0, 1, device->machine->sample_rate, (void *)image, wave_sound_update);
+		device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate, (void *)image, wave_sound_update);
 }
 
 

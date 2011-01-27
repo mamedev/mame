@@ -49,7 +49,7 @@ void ics2115_device::device_start()
     m_rom = *region();
     m_timer[0].timer = timer_alloc(machine, timer_cb_0, this);
     m_timer[1].timer = timer_alloc(machine, timer_cb_1, this);
-    m_stream = stream_create(this, 0, 2, 33075, this, static_stream_generate);
+    m_stream = m_machine.sound().stream_alloc(*this, 0, 2, 33075);
 
     //Exact formula as per patent 5809466
     //This seems to give the ok fit but it is not good enough.
@@ -146,11 +146,6 @@ void ics2115_device::device_reset()
 		m_voice[i].vol.mode = 0;
 		m_voice[i].state.value = 0;
 	}
-}
-
-STREAM_UPDATE( ics2115_device::static_stream_generate )
-{
-	reinterpret_cast<ics2115_device *>(param)->stream_generate(inputs, outputs, samples);
 }
 
 //TODO: improve using next-state logic from column 126 of patent 5809466
@@ -363,7 +358,7 @@ int ics2115_device::fill_output(ics2115_voice& voice, stream_sample_t *outputs[2
     return irq_invalid;
 }
 
-void ics2115_device::stream_generate(stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void ics2115_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	memset(outputs[0], 0, samples * sizeof(stream_sample_t));
 	memset(outputs[1], 0, samples * sizeof(stream_sample_t));

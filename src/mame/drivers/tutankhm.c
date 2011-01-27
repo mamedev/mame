@@ -102,7 +102,7 @@ static WRITE8_HANDLER( tutankhm_bankselect_w )
 
 static WRITE8_HANDLER( sound_mute_w )
 {
-	sound_global_enable(space->machine, ~data & 1);
+	space->machine->sound().system_mute(data & 1);
 }
 
 

@@ -182,6 +182,7 @@ class gfx_element;
 class colortable_t;
 class cheat_manager;
 class render_manager;
+class sound_manager;
 class video_manager;
 class debug_view_manager;
 class osd_interface;
@@ -196,7 +197,6 @@ typedef struct _tilemap_private tilemap_private;
 typedef struct _streams_private streams_private;
 typedef struct _devices_private devices_private;
 typedef struct _romload_private romload_private;
-typedef struct _sound_private sound_private;
 typedef struct _input_private input_private;
 typedef struct _input_port_private input_port_private;
 typedef struct _ui_input_private ui_input_private;
@@ -392,6 +392,7 @@ public:
 	// managers
 	cheat_manager &cheat() const { assert(m_cheat != NULL); return *m_cheat; }
 	render_manager &render() const { assert(m_render != NULL); return *m_render; }
+	sound_manager &sound() const { assert(m_sound != NULL); return *m_sound; }
 	video_manager &video() const { assert(m_video != NULL); return *m_video; }
 	debug_view_manager &debug_view() const { assert(m_debug_view != NULL); return *m_debug_view; }
 
@@ -452,7 +453,6 @@ public:
 	streams_private *		streams_data;		// internal data from streams.c
 	devices_private *		devices_data;		// internal data from devices.c
 	romload_private *		romload_data;		// internal data from romload.c
-	sound_private *			sound_data;			// internal data from sound.c
 	input_private *			input_data;			// internal data from input.c
 	input_port_private *	input_port_data;	// internal data from inptport.c
 	ui_input_private *		ui_input_data;		// internal data from uiinput.c
@@ -533,6 +533,7 @@ private:
 	driver_device *			m_driver_device;
 	cheat_manager *			m_cheat;			// internal data from cheat.c
 	render_manager *		m_render;			// internal data from render.c
+	sound_manager *			m_sound;			// internal data from sound.c
 	video_manager *			m_video;			// internal data from video.c
 	debug_view_manager *	m_debug_view;		// internal data from debugvw.c
 };

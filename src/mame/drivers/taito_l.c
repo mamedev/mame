@@ -658,7 +658,9 @@ static WRITE8_DEVICE_HANDLER( champwr_msm5205_stop_w )
 
 static WRITE8_DEVICE_HANDLER( champwr_msm5205_volume_w )
 {
-	sound_set_output_gain(device, 0, data / 255.0);
+	device_sound_interface *sound;
+	device->interface(sound);
+	sound->set_output_gain(0, data / 255.0);
 }
 
 static READ8_HANDLER( horshoes_tracky_reset_r )

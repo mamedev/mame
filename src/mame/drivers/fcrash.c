@@ -55,8 +55,8 @@ static WRITE8_HANDLER( fcrash_snd_bankswitch_w )
 {
 	cps_state *state = space->machine->driver_data<cps_state>();
 
-	sound_set_output_gain(state->msm_1, 0, (data & 0x08) ? 0.0 : 1.0);
-	sound_set_output_gain(state->msm_2, 0, (data & 0x10) ? 0.0 : 1.0);
+	state->msm_1->set_output_gain(0, (data & 0x08) ? 0.0 : 1.0);
+	state->msm_2->set_output_gain(0, (data & 0x10) ? 0.0 : 1.0);
 
 	memory_set_bank(space->machine, "bank1", data & 0x07);
 }
@@ -698,8 +698,8 @@ static MACHINE_START( fcrash )
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("soundcpu");
-	state->msm_1 = machine->device("msm1");
-	state->msm_2 = machine->device("msm2");
+	state->msm_1 = machine->device<msm5205_device>("msm1");
+	state->msm_2 = machine->device<msm5205_device>("msm2");
 
 	state_save_register_global(machine, state->sample_buffer1);
 	state_save_register_global(machine, state->sample_buffer2);

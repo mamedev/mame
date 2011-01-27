@@ -172,7 +172,7 @@ WRITE8_HANDLER( bking_cont3_w )
 
 	state->palette_bank = (data >> 1) & 0x03;
 
-	sound_global_enable(space->machine, ~data & 0x08);
+	space->machine->sound().system_mute(data & 0x08);
 }
 
 

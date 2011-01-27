@@ -17,7 +17,6 @@
 *
 ******************************************************************************/
 #include "emu.h"
-#include "streams.h"
 #include "8950intf.h"
 #include "fm.h"
 #include "sound/fmopl.h"
@@ -110,7 +109,7 @@ static STREAM_UPDATE( y8950_stream_update )
 static void _stream_update(void *param, int interval)
 {
 	y8950_state *info = (y8950_state *)param;
-	stream_update(info->stream);
+	info->stream->update();
 }
 
 
@@ -130,8 +129,7 @@ static DEVICE_START( y8950 )
 	/* ADPCM ROM data */
 	y8950_set_delta_t_memory(info->chip, *device->region(), device->region()->bytes());
 
-	info->stream = stream_create(device,0,1,rate,info,y8950_stream_update);
-
+	info->stream = device->machine->sound().stream_alloc(*device,0,1,rate,info,y8950_stream_update);
 	/* port and keyboard handler */
 	y8950_set_port_handler(info->chip, Y8950PortHandler_w, Y8950PortHandler_r, info);
 	y8950_set_keyboard_handler(info->chip, Y8950KeyboardHandler_w, Y8950KeyboardHandler_r, info);

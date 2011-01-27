@@ -338,8 +338,8 @@ static READ8_HANDLER( gorf_io_1_r )
 		case 4: astrocade_sparkle[2] = data;	break;
 		case 5: astrocade_sparkle[3] = data;	break;
 		case 6:
-			sound_set_output_gain(space->machine->device("astrocade1"), 0, data ? 0.0 : 1.0);
-			sound_set_output_gain(space->machine->device("samples"), 0, data ? 1.0 : 0.0);
+			space->machine->device<astrocade_device>("astrocade1")->set_output_gain(0, data ? 0.0 : 1.0);
+			space->machine->device<samples_device>("samples")->set_output_gain(0, data ? 1.0 : 0.0);
 			break;
 		case 7:	mame_printf_debug("io_1:%d\n", data); break;
 	}

@@ -23,7 +23,6 @@
 */
 
 #include "emu.h"
-#include "streams.h"
 #include "cdp1864.h"
 
 /***************************************************************************
@@ -447,7 +446,7 @@ static DEVICE_START( cdp1864 )
 	cdp1864_init_palette(device, intf);
 
 	/* create sound stream */
-	cdp1864->stream = stream_create(device, 0, 1, device->machine->sample_rate, cdp1864, cdp1864_stream_update);
+	cdp1864->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate, cdp1864, cdp1864_stream_update);
 
 	/* create the timers */
 	cdp1864->int_timer = timer_alloc(device->machine, cdp1864_int_tick, (void *)device);

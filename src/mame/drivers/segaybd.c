@@ -368,7 +368,7 @@ static WRITE16_HANDLER( io_chip_w )
 
 			/* D7 = /MUTE */
 			/* D6-D0 = FLT31-25 */
-			sound_global_enable(space->machine, data & 0x80);
+			space->machine->sound().system_enable(data & 0x80);
 			break;
 
 		/* CNT register */

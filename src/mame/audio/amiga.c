@@ -9,7 +9,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "includes/amiga.h"
 #include "cpu/m68000/m68000.h"
 
@@ -118,7 +117,7 @@ void amiga_audio_update(device_t *device)
 {
 	amiga_audio *audio_state = get_safe_token(device);
 
-	stream_update(audio_state->stream);
+	audio_state->stream->update();
 }
 
 
@@ -275,7 +274,7 @@ static DEVICE_START( amiga_sound )
 	}
 
 	/* create the stream */
-	audio_state->stream = stream_create(device, 0, 4, device->clock() / CLOCK_DIVIDER, audio_state, amiga_stream_update);
+	audio_state->stream = device->machine->sound().stream_alloc(*device, 0, 4, device->clock() / CLOCK_DIVIDER, audio_state, amiga_stream_update);
 }
 
 

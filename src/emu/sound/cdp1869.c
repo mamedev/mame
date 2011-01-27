@@ -434,7 +434,7 @@ void cdp1869_device::device_start()
 	initialize_palette();
 
 	// create sound stream
-	m_stream = stream_create(this, 0, 1, m_machine.sample_rate, this, static_stream_generate);
+	m_stream = m_machine.sound().stream_alloc(*this, 0, 1, m_machine.sample_rate);
 
 	// register for state saving
 	state_save_register_device_item(this, 0, m_prd);
@@ -512,16 +512,11 @@ void cdp1869_device::initialize_palette()
 
 
 //-------------------------------------------------
-//  stream_generate - handle update requests for
+//  sound_stream_update - handle update requests for
 //  our sound stream
 //-------------------------------------------------
 
-STREAM_UPDATE( cdp1869_device::static_stream_generate )
-{
-	reinterpret_cast<cdp1869_device *>(param)->stream_generate(inputs, outputs, samples);
-}
-
-void cdp1869_device::stream_generate(stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void cdp1869_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	// reset the output stream
 	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
@@ -713,7 +708,7 @@ WRITE8_MEMBER( cdp1869_device::out4_w )
 	m_toneoff = BIT(offset, 7);
 	m_tonediv = (offset & 0x7f00) >> 8;
 
-	stream_update(m_stream);
+	m_stream->update();
 }
 
 
@@ -753,7 +748,7 @@ WRITE8_MEMBER( cdp1869_device::out5_w )
 	m_wnfreq = (offset & 0x7000) >> 12;
 	m_wnoff = BIT(offset, 15);
 
-	stream_update(m_stream);
+	m_stream->update();
 
 	if (m_cmem)
 	{

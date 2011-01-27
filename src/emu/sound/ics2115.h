@@ -3,7 +3,6 @@
 #ifndef __ICS2115_H__
 #define __ICS2115_H__
 
-#include "streams.h"
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -138,8 +137,7 @@ protected:
 	virtual void device_reset();
 
 	// internal callbacks
-	static STREAM_UPDATE( static_stream_generate );
-	virtual void stream_generate(stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 	// internal state
 	const ics2115_device_config &m_config;

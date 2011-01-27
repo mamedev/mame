@@ -122,8 +122,8 @@ typedef device_config * (*machine_config_constructor)(machine_config &config, de
 #include "video.h"
 
 // sound-related
-#include "streams.h"
 #include "sound.h"
+#include "speaker.h"
 
 // generic helpers
 #include "devcb.h"

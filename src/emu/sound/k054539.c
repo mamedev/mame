@@ -18,7 +18,6 @@ CHANNEL_DEBUG enables the following keys:
 *********************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "k054539.h"
 
 #define CHANNEL_DEBUG 0
@@ -473,7 +472,7 @@ static void k054539_init_chip(device_t *device, k054539_state *info)
 		// 480 hz is TRUSTED by gokuparo disco stage - the looping sample doesn't line up otherwise
 		timer_pulse(device->machine, ATTOTIME_IN_HZ(480), info, 0, k054539_irq);
 
-	info->stream = stream_create(device, 0, 2, device->clock(), info, k054539_update);
+	info->stream = device->machine->sound().stream_alloc(*device, 0, 2, device->clock(), info, k054539_update);
 
 	state_save_register_device_item_array(device, 0, info->regs);
 	state_save_register_device_item_pointer(device, 0, info->ram,  0x4000);

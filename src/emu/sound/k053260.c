@@ -5,7 +5,6 @@
 *********************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "k053260.h"
 
 /* 2004-02-28: Fixed PPCM decoding. Games sound much better now.*/
@@ -234,7 +233,7 @@ static DEVICE_START( k053260 )
 
 	ic->delta_table = auto_alloc_array( device->machine, UINT32, 0x1000 );
 
-	ic->channel = stream_create( device, 0, 2, rate, ic, k053260_update );
+	ic->channel = device->machine->sound().stream_alloc( *device, 0, 2, rate, ic, k053260_update );
 
 	InitDeltaTable( ic, rate, device->clock() );
 
@@ -297,7 +296,7 @@ WRITE8_DEVICE_HANDLER( k053260_w )
 		return;
 	}
 
-	stream_update( ic->channel);
+	 ic->channel->update();
 
 	/* before we update the regs, we need to check for a latched reg */
 	if ( r == 0x28 ) {

@@ -9,7 +9,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "psx.h"
 
 #define VERBOSE_LEVEL ( 0 )
@@ -370,7 +369,7 @@ static DEVICE_START( psxspu )
 
 	chip->installHack = 0;
 
-	chip->stream = stream_create( device, 0, 2, 44100, chip, PSXSPU_update );
+	chip->stream = device->machine->sound().stream_alloc( *device, 0, 2, 44100, chip, PSXSPU_update );
 }
 
 

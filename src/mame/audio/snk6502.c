@@ -11,7 +11,6 @@
 
 
 #include "emu.h"
-#include "streams.h"
 #include "sound/sn76477.h"
 #include "sound/samples.h"
 #include "includes/snk6502.h"
@@ -663,7 +662,7 @@ static DEVICE_START( snk6502_sound )
 	// 38.99 Hz update (according to schematic)
 	snk6502_set_music_clock(device->machine, M_LN2 * (RES_K(18) * 2 + RES_K(1)) * CAP_U(1));
 
-	state->tone_stream = stream_create(device, 0, 1, SAMPLE_RATE, NULL, snk6502_tone_update);
+	state->tone_stream = device->machine->sound().stream_alloc(*device, 0, 1, SAMPLE_RATE, NULL, snk6502_tone_update);
 }
 
 DEVICE_GET_INFO( snk6502_sound )

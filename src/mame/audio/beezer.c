@@ -51,7 +51,6 @@
 
 #include "emu.h"
 #include "machine/rescap.h"
-#include "streams.h"
 #include "cpu/m6809/m6809.h"
 #include "includes/beezer.h"
 
@@ -397,7 +396,7 @@ static DEVICE_START( common_sh_start )
 	state->sh6840_clocks_per_sample = (int)(((double)SH6840_CLOCK / (double)sample_rate) * (double)(1 << 24));
 
 	/* allocate the stream */
-	state->stream = stream_create(device, 0, 1, sample_rate, NULL, beezer_stream_update);
+	state->stream = device->machine->sound().stream_alloc(*device, 0, 1, sample_rate, NULL, beezer_stream_update);
 	state->maincpu = device->machine->device("maincpu");
 
 	sh6840_register_state_globals(device);
@@ -477,7 +476,7 @@ READ8_DEVICE_HANDLER( beezer_sh6840_r )
 	beezer_sound_state *state = get_safe_token(device);
 
 	/* force an update of the stream */
-	stream_update(state->stream);
+	state->stream->update();
 
 	switch (offset)
 	{
@@ -503,7 +502,7 @@ WRITE8_DEVICE_HANDLER( beezer_timer1_w )
 	beezer_sound_state *state = get_safe_token(device);
 
 	/* force an update of the stream */
-	stream_update(state->stream);
+	state->stream->update();
 	state->sh6840_latchwriteold = state->sh6840_latchwrite;
 	state->sh6840_latchwrite = data&0x80;
 	if ((!state->sh6840_latchwriteold) && (state->sh6840_latchwrite)) // rising edge
@@ -518,7 +517,7 @@ WRITE8_DEVICE_HANDLER( beezer_sh6840_w )
 	struct sh6840_timer_channel *sh6840_timer = state->sh6840_timer;
 
 	/* force an update of the stream */
-	stream_update(state->stream);
+	state->stream->update();
 
 	switch (offset)
 	{
@@ -578,7 +577,7 @@ WRITE8_DEVICE_HANDLER( beezer_sh6840_w )
 WRITE8_DEVICE_HANDLER( beezer_sfxctrl_w )
 {
 	beezer_sound_state *state = get_safe_token(device);
-	stream_update(state->stream);
+	state->stream->update();
 	state->sh6840_volume[offset] = data;
 }
 

@@ -33,7 +33,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "audio/seibu.h"
 #include "sound/3812intf.h"
 #include "sound/2151intf.h"
@@ -175,7 +174,7 @@ static DEVICE_START( seibu_adpcm )
 	seibu_adpcm_state *state = (seibu_adpcm_state *)downcast<legacy_device_base *>(device)->token();
 
 	state->playing = 0;
-	state->stream = stream_create(device, 0, 1, device->clock(), state, seibu_adpcm_callback);
+	state->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->clock(), state, seibu_adpcm_callback);
 	state->base = machine->region("adpcm")->base();
 	state->adpcm.reset();
 }
@@ -218,7 +217,7 @@ WRITE8_DEVICE_HANDLER( seibu_adpcm_adr_w )
 	seibu_adpcm_state *state = (seibu_adpcm_state *)downcast<legacy_device_base *>(device)->token();
 
 	if (state->stream)
-		stream_update(state->stream);
+		state->stream->update();
 	if (offset)
 	{
 		state->end = data<<8;
@@ -236,7 +235,7 @@ WRITE8_DEVICE_HANDLER( seibu_adpcm_ctl_w )
 
 	// sequence is 00 02 01 each time.
 	if (state->stream)
-		stream_update(state->stream);
+		state->stream->update();
 	switch (data)
 	{
 		case 0:

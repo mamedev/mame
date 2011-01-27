@@ -98,7 +98,6 @@
 *************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "upd7759.h"
 
 
@@ -536,7 +535,7 @@ static TIMER_CALLBACK( upd7759_slave_update )
 	UINT8 olddrq = chip->drq;
 
 	/* update the stream */
-	stream_update(chip->channel);
+	chip->channel->update();
 
 	/* advance the state */
 	advance_state(chip);
@@ -642,7 +641,7 @@ static DEVICE_START( upd7759 )
 	chip->device = device;
 
 	/* allocate a stream channel */
-	chip->channel = stream_create(device, 0, 1, device->clock()/4, chip, upd7759_update);
+	chip->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->clock()/4, chip, upd7759_update);
 
 	/* compute the stepping rate based on the chip's clock speed */
 	chip->step = 4 * FRAC_ONE;
@@ -687,7 +686,7 @@ void upd7759_reset_w(device_t *device, UINT8 data)
 	chip->reset = (data != 0);
 
 	/* update the stream first */
-	stream_update(chip->channel);
+	chip->channel->update();
 
 	/* on the falling edge, reset everything */
 	if (oldreset && !chip->reset)
@@ -704,7 +703,7 @@ void upd7759_start_w(device_t *device, UINT8 data)
 	logerror("upd7759_start_w: %d->%d\n", oldstart, chip->start);
 
 	/* update the stream first */
-	stream_update(chip->channel);
+	chip->channel->update();
 
 	/* on the rising edge, if we're idle, start going, but not if we're held in reset */
 	if (chip->state == STATE_IDLE && !oldstart && chip->start && chip->reset)

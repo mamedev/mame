@@ -27,7 +27,6 @@ Revisions:
 *********************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "iremga20.h"
 
 #define MAX_VOL 256
@@ -148,7 +147,7 @@ WRITE8_DEVICE_HANDLER( irem_ga20_w )
 
 	//logerror("GA20:  Offset %02x, data %04x\n",offset,data);
 
-	stream_update(chip->stream);
+	chip->stream->update();
 
 	channel = offset >> 3;
 
@@ -193,7 +192,7 @@ READ8_DEVICE_HANDLER( irem_ga20_r )
 	ga20_state *chip = get_safe_token(device);
 	int channel;
 
-	stream_update(chip->stream);
+	chip->stream->update();
 
 	channel = offset >> 3;
 
@@ -248,7 +247,7 @@ static DEVICE_START( iremga20 )
 	for ( i = 0; i < 0x40; i++ )
 		chip->regs[i] = 0;
 
-	chip->stream = stream_create( device, 0, 2, device->clock()/4, chip, IremGA20_update );
+	chip->stream = device->machine->sound().stream_alloc( *device, 0, 2, device->clock()/4, chip, IremGA20_update );
 
 	state_save_register_device_item_array(device, 0, chip->regs);
 	for (i = 0; i < 4; i++)

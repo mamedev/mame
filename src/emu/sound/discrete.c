@@ -34,7 +34,6 @@
  ************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "wavwrite.h"
 #include "discrete.h"
 
@@ -316,7 +315,7 @@ void discrete_task::check(discrete_task *dest_task)
 							output_buffer buf;
 
 							buf.node_buf = auto_alloc_array(m_device.machine, double,
-									((task_node->sample_rate() + STREAMS_UPDATE_FREQUENCY) / STREAMS_UPDATE_FREQUENCY));
+									((task_node->sample_rate() + sound_manager::STREAMS_UPDATE_FREQUENCY) / sound_manager::STREAMS_UPDATE_FREQUENCY));
 							buf.ptr = buf.node_buf;
 							buf.source = dest_node->m_input[inputnum];
 							buf.node_num = inputnode_num;
@@ -657,7 +656,7 @@ void discrete_device::display_profiling(void)
 		printf("Task(%d): %8.2f %15.2f\n", (*task)->task_group, tt / (double) total * 100.0, tt / (double) m_total_samples);
 	}
 
-	printf("Average samples/stream_update: %8.2f\n", (double) m_total_samples / (double) m_total_stream_updates);
+	printf("Average samples/double->update: %8.2f\n", (double) m_total_samples / (double) m_total_stream_updates);
 }
 
 
@@ -919,7 +918,7 @@ discrete_device::~discrete_device(void)
 void discrete_device::device_start()
 {
 	// create the stream
-	//m_stream = stream_create(this, 0, 2, 22257, this, static_stream_generate);
+	//m_stream = m_machine.sound().stream_alloc(*this, 0, 2, 22257);
 
 	const discrete_block *intf_start = (m_config.m_intf != NULL) ? m_config.m_intf : (discrete_block *) baseconfig().static_config();
 	char name[32];
@@ -1019,7 +1018,7 @@ void discrete_sound_device::device_start()
 		fatalerror("init_nodes() - Couldn't find an output node");
 
 	/* initialize the stream(s) */
-	m_stream = stream_create(*this,m_input_stream_list.count(), m_output_list.count(), m_sample_rate);
+	m_stream = m_machine.sound().stream_alloc(*this,m_input_stream_list.count(), m_output_list.count(), m_sample_rate);
 
 	/* Finalize stream_input_nodes */
 	for_each(discrete_dss_input_stream_node **, node, &m_input_stream_list)

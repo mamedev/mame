@@ -16,7 +16,6 @@
 */
 
 #include "emu.h"
-#include "streams.h"
 #include "cdp1863.h"
 
 /***************************************************************************
@@ -176,7 +175,7 @@ static DEVICE_START( cdp1863 )
 	const cdp1863_config *config = get_safe_config(device);
 
 	/* set initial values */
-	cdp1863->stream = stream_create(device, 0, 1, device->machine->sample_rate, cdp1863, cdp1863_stream_update);
+	cdp1863->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate, cdp1863, cdp1863_stream_update);
 	cdp1863->clock1 = device->clock();
 	cdp1863->clock2 = config->clock2;
 	cdp1863->oe = 1;

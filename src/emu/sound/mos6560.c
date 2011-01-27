@@ -57,7 +57,6 @@
 
 
 #include "emu.h"
-#include "streams.h"
 #include "sound/mos6560.h"
 
 /***************************************************************************
@@ -579,7 +578,7 @@ static void mos6560_soundport_w( device_t *device, int offset, int data )
 {
 	mos6560_state *mos6560 = get_safe_token(device);
 	int old = mos6560->reg[offset];
-	stream_update(mos6560->channel);
+	mos6560->channel->update();
 
 	switch (offset)
 	{
@@ -740,7 +739,7 @@ static void mos6560_sound_start( device_t *device )
 	mos6560_state *mos6560 = get_safe_token(device);
 	int i;
 
-	mos6560->channel = stream_create(device, 0, 1, device->machine->sample_rate, 0, mos6560_update);
+	mos6560->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate, 0, mos6560_update);
 
 	/* buffer for fastest played sample for 5 second so we have enough data for min 5 second */
 	mos6560->noisesize = NOISE_FREQUENCY_MAX * NOISE_BUFFER_SIZE_SEC;

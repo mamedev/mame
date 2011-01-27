@@ -28,7 +28,6 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "wavwrite.h"
 #include "sn76477.h"
 
@@ -991,7 +990,7 @@ static void SN76477_test_enable_w(sn76477_state *sn, UINT32 data)
 {
 	if (data != sn->enable)
 	{
-		stream_update(sn->channel);
+		sn->channel->update();
 
 		_SN76477_enable_w(sn, data);
 
@@ -1034,7 +1033,7 @@ void sn76477_mixer_a_w(device_t *device, UINT32 data)
 
 	if (data != ((sn->mixer_mode >> 0) & 0x01))
 	{
-		stream_update(sn->channel);
+		sn->channel->update();
 
 		_SN76477_mixer_a_w(sn, data);
 
@@ -1059,7 +1058,7 @@ void sn76477_mixer_b_w(device_t *device, UINT32 data)
 
 	if (data != ((sn->mixer_mode >> 1) & 0x01))
 	{
-		stream_update(sn->channel);
+		sn->channel->update();
 
 		_SN76477_mixer_b_w(sn, data);
 
@@ -1084,7 +1083,7 @@ void sn76477_mixer_c_w(device_t *device, UINT32 data)
 
 	if (data != ((sn->mixer_mode >> 2) & 0x01))
 	{
-		stream_update(sn->channel);
+		sn->channel->update();
 
 		_SN76477_mixer_c_w(sn, data);
 
@@ -1116,7 +1115,7 @@ void sn76477_envelope_1_w(device_t *device, UINT32 data)
 
 	if (data != ((sn->envelope_mode >> 0) & 0x01))
 	{
-		stream_update(sn->channel);
+		sn->channel->update();
 
 		_SN76477_envelope_1_w(sn, data);
 
@@ -1141,7 +1140,7 @@ void sn76477_envelope_2_w(device_t *device, UINT32 data)
 
 	if (data != ((sn->envelope_mode >> 1) & 0x01))
 	{
-		stream_update(sn->channel);
+		sn->channel->update();
 
 		_SN76477_envelope_2_w(sn, data);
 
@@ -1173,7 +1172,7 @@ void sn76477_vco_w(device_t *device, UINT32 data)
 
 	if (data != sn->vco_mode)
 	{
-		stream_update(sn->channel);
+		sn->channel->update();
 
 		_SN76477_vco_w(sn, data);
 
@@ -1205,7 +1204,7 @@ void sn76477_one_shot_res_w(device_t *device, double data)
 
 	if (data != sn->one_shot_res)
 	{
-		stream_update(sn->channel);
+		sn->channel->update();
 
 		_SN76477_one_shot_res_w(sn, data);
 
@@ -1237,7 +1236,7 @@ void sn76477_one_shot_cap_w(device_t *device, double data)
 
 	if (data != sn->one_shot_cap)
 	{
-		stream_update(sn->channel);
+		sn->channel->update();
 
 		_SN76477_one_shot_cap_w(sn, data);
 
@@ -1266,7 +1265,7 @@ void sn76477_one_shot_cap_voltage_w(device_t *device, double data)
 		/* switch to internal, if not already */
 		if (sn->one_shot_cap_voltage_ext)
 		{
-			stream_update(sn->channel);
+			sn->channel->update();
 
 			sn->one_shot_cap_voltage_ext = 0;
 
@@ -1278,7 +1277,7 @@ void sn76477_one_shot_cap_voltage_w(device_t *device, double data)
 		/* set the voltage on the cap */
 		if (!sn->one_shot_cap_voltage_ext || (data != sn->one_shot_cap_voltage))
 		{
-			stream_update(sn->channel);
+			sn->channel->update();
 
 			sn->one_shot_cap_voltage_ext = 1;
 			sn->one_shot_cap_voltage = data;
@@ -1312,7 +1311,7 @@ void sn76477_slf_res_w(device_t *device, double data)
 
 	if (data != sn->slf_res)
 	{
-		stream_update(sn->channel);
+		sn->channel->update();
 
 		_SN76477_slf_res_w(sn, data);
 
@@ -1344,7 +1343,7 @@ void sn76477_slf_cap_w(device_t *device, double data)
 
 	if (data != sn->slf_cap)
 	{
-		stream_update(sn->channel);
+		sn->channel->update();
 
 		_SN76477_slf_cap_w(sn, data);
 
@@ -1375,7 +1374,7 @@ void sn76477_slf_cap_voltage_w(device_t *device, double data)
 		/* switch to internal, if not already */
 		if (sn->slf_cap_voltage_ext)
 		{
-			stream_update(sn->channel);
+			sn->channel->update();
 
 			sn->slf_cap_voltage_ext = 0;
 
@@ -1387,7 +1386,7 @@ void sn76477_slf_cap_voltage_w(device_t *device, double data)
 		/* set the voltage on the cap */
 		if (!sn->slf_cap_voltage_ext || (data != sn->slf_cap_voltage))
 		{
-			stream_update(sn->channel);
+			sn->channel->update();
 
 			sn->slf_cap_voltage_ext = 1;
 			sn->slf_cap_voltage = data;
@@ -1421,7 +1420,7 @@ void sn76477_vco_res_w(device_t *device, double data)
 
 	if (data != sn->vco_res)
 	{
-		stream_update(sn->channel);
+		sn->channel->update();
 
 		_SN76477_vco_res_w(sn, data);
 
@@ -1453,7 +1452,7 @@ void sn76477_vco_cap_w(device_t *device, double data)
 
 	if (data != sn->vco_cap)
 	{
-		stream_update(sn->channel);
+		sn->channel->update();
 
 		_SN76477_vco_cap_w(sn, data);
 
@@ -1482,7 +1481,7 @@ void sn76477_vco_cap_voltage_w(device_t *device, double data)
 		/* switch to internal, if not already */
 		if (sn->vco_cap_voltage_ext)
 		{
-			stream_update(sn->channel);
+			sn->channel->update();
 
 			sn->vco_cap_voltage_ext = 0;
 
@@ -1494,7 +1493,7 @@ void sn76477_vco_cap_voltage_w(device_t *device, double data)
 		/* set the voltage on the cap */
 		if (!sn->vco_cap_voltage_ext || (data != sn->vco_cap_voltage))
 		{
-			stream_update(sn->channel);
+			sn->channel->update();
 
 			sn->vco_cap_voltage_ext = 1;
 			sn->vco_cap_voltage = data;
@@ -1528,7 +1527,7 @@ void sn76477_vco_voltage_w(device_t *device, double data)
 
 	if (data != sn->vco_voltage)
 	{
-		stream_update(sn->channel);
+		sn->channel->update();
 
 		_SN76477_vco_voltage_w(sn, data);
 
@@ -1561,7 +1560,7 @@ void sn76477_pitch_voltage_w(device_t *device, double data)
 
 	if (data != sn->pitch_voltage)
 	{
-		stream_update(sn->channel);
+		sn->channel->update();
 
 		_SN76477_pitch_voltage_w(sn, data);
 
@@ -1594,7 +1593,7 @@ void sn76477_noise_clock_w(device_t *device, UINT32 data)
            if external control is enabled */
 		if (sn->noise_clock && sn->noise_clock_ext)
 		{
-			stream_update(sn->channel);
+			sn->channel->update();
 
 			sn->real_noise_bit_ff = generate_next_real_noise_bit(sn);
 		}
@@ -1635,7 +1634,7 @@ void sn76477_noise_clock_res_w(device_t *device, double data)
 	if (((data == 0) && !sn->noise_clock_ext) ||
 		((data != 0) && (data != sn->noise_clock_res)))
 	{
-		stream_update(sn->channel);
+		sn->channel->update();
 
 		_SN76477_noise_clock_res_w(sn, data);
 
@@ -1667,7 +1666,7 @@ void sn76477_noise_filter_res_w(device_t *device, double data)
 
 	if (data != sn->noise_filter_res)
 	{
-		stream_update(sn->channel);
+		sn->channel->update();
 
 		_SN76477_noise_filter_res_w(sn, data);
 
@@ -1699,7 +1698,7 @@ void sn76477_noise_filter_cap_w(device_t *device, double data)
 
 	if (data != sn->noise_filter_cap)
 	{
-		stream_update(sn->channel);
+		sn->channel->update();
 
 		_SN76477_noise_filter_cap_w(sn, data);
 
@@ -1728,7 +1727,7 @@ void sn76477_noise_filter_cap_voltage_w(device_t *device, double data)
 		/* switch to internal, if not already */
 		if (sn->noise_filter_cap_voltage_ext)
 		{
-			stream_update(sn->channel);
+			sn->channel->update();
 
 			sn->noise_filter_cap_voltage_ext = 0;
 
@@ -1740,7 +1739,7 @@ void sn76477_noise_filter_cap_voltage_w(device_t *device, double data)
 		/* set the voltage on the cap */
 		if (!sn->noise_filter_cap_voltage_ext || (data != sn->noise_filter_cap_voltage))
 		{
-			stream_update(sn->channel);
+			sn->channel->update();
 
 			sn->noise_filter_cap_voltage_ext = 1;
 			sn->noise_filter_cap_voltage = data;
@@ -1774,7 +1773,7 @@ void sn76477_attack_res_w(device_t *device, double data)
 
 	if (data != sn->attack_res)
 	{
-		stream_update(sn->channel);
+		sn->channel->update();
 
 		_SN76477_attack_res_w(sn, data);
 
@@ -1806,7 +1805,7 @@ void sn76477_decay_res_w(device_t *device, double data)
 
 	if (data != sn->decay_res)
 	{
-		stream_update(sn->channel);
+		sn->channel->update();
 
 		_SN76477_decay_res_w(sn, data);
 
@@ -1838,7 +1837,7 @@ void sn76477_attack_decay_cap_w(device_t *device, double data)
 
 	if (data != sn->attack_decay_cap)
 	{
-		stream_update(sn->channel);
+		sn->channel->update();
 
 		_SN76477_attack_decay_cap_w(sn, data);
 
@@ -1868,7 +1867,7 @@ void sn76477_attack_decay_cap_voltage_w(device_t *device, double data)
 		/* switch to internal, if not already */
 		if (sn->attack_decay_cap_voltage_ext)
 		{
-			stream_update(sn->channel);
+			sn->channel->update();
 
 			sn->attack_decay_cap_voltage_ext = 0;
 
@@ -1881,7 +1880,7 @@ void sn76477_attack_decay_cap_voltage_w(device_t *device, double data)
 		/* set the voltage on the cap */
 		if (!sn->attack_decay_cap_voltage_ext || (data != sn->attack_decay_cap_voltage))
 		{
-			stream_update(sn->channel);
+			sn->channel->update();
 
 			sn->attack_decay_cap_voltage_ext = 1;
 			sn->attack_decay_cap_voltage = data;
@@ -1916,7 +1915,7 @@ void sn76477_amplitude_res_w(device_t *device, double data)
 
 	if (data != sn->amplitude_res)
 	{
-		stream_update(sn->channel);
+		sn->channel->update();
 
 		_SN76477_amplitude_res_w(sn, data);
 
@@ -1948,7 +1947,7 @@ void sn76477_feedback_res_w(device_t *device, double data)
 
 	if (data != sn->feedback_res)
 	{
-		stream_update(sn->channel);
+		sn->channel->update();
 
 		_SN76477_feedback_res_w(sn, data);
 
@@ -1989,13 +1988,13 @@ static STREAM_UPDATE( SN76477_update )
 
 
 #if TEST_MODE
-	static int recursing = 0;	/* we need to prevent recursion since enable_w calls stream_update */
+	static int recursing = 0;	/* we need to prevent recursion since enable_w calls input_code_pressed_once(device->machine, KEYCODE_SPACE->update */
 
-	if (input_code_pressed_once(device->machine, KEYCODE_SPACE) && !recursing)
+	if () && !recursing)
 	{
 		recursing = 1;
 
-		sound_global_enable(device->machine, 1);
+		device->machine->sound().system_enable();
 		SN76477_test_enable_w(sn, !sn->enable);
 	}
 
@@ -2407,7 +2406,7 @@ static DEVICE_START( sn76477 )
 
 	sn->device = device;
 
-	sn->channel = stream_create(device, 0, 1, device->machine->sample_rate, sn, SN76477_update);
+	sn->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate, sn, SN76477_update);
 
 	if (device->clock() > 0)
 	{

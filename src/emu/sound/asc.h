@@ -12,7 +12,6 @@
 #ifndef __ASC_H__
 #define __ASC_H__
 
-#include "streams.h"
 
 
 

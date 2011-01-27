@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "includes/flower.h"
 
 
@@ -172,7 +171,7 @@ static DEVICE_START( flower_sound )
 	int i;
 
 	/* get stream channels */
-	state->stream = stream_create(device, 0, 1, samplerate, 0, flower_update_mono);
+	state->stream = device->machine->sound().stream_alloc(*device, 0, 1, samplerate, 0, flower_update_mono);
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
 	state->mixer_buffer = auto_alloc_array(device->machine, short, 2 * samplerate);
@@ -241,7 +240,7 @@ WRITE8_DEVICE_HANDLER( flower_sound1_w )
 	int base;
 
 	/* update the streams */
-	stream_update(state->stream);
+	state->stream->update();
 
 	/* set the register */
 	state->soundregs1[offset] = data;
@@ -291,7 +290,7 @@ popmessage("%02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%
 */
 
 	/* update the streams */
-	stream_update(state->stream);
+	state->stream->update();
 
 	/* set the register */
 	state->soundregs2[offset] = data;

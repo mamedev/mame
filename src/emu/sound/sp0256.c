@@ -32,7 +32,6 @@
 */
 
 #include "emu.h"
-#include "streams.h"
 #include "sp0256.h"
 
 #define CLOCK_DIVIDER (7*6*8)
@@ -1187,7 +1186,7 @@ static DEVICE_START( sp0256 )
 	devcb_call_write_line(&sp->drq, 1);
 	devcb_call_write_line(&sp->sby, 1);
 
-	sp->stream = stream_create(device, 0, 1, device->clock() / CLOCK_DIVIDER, sp, sp0256_update);
+	sp->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->clock() / CLOCK_DIVIDER, sp, sp0256_update);
 
     /* -------------------------------------------------------------------- */
     /*  Configure our internal variables.                                   */

@@ -24,7 +24,6 @@ added external port callback, and functions to set the volume of the channels
 
 
 #include "emu.h"
-#include "streams.h"
 #include "k007232.h"
 
 
@@ -329,7 +328,7 @@ static DEVICE_START( k007232 )
 
 	for( i = 0; i < 0x10; i++ )  info->wreg[i] = 0;
 
-	info->stream = stream_create(device,0,2,device->clock()/128,info,KDAC_A_update);
+	info->stream = device->machine->sound().stream_alloc(*device,0,2,device->clock()/128,info,KDAC_A_update);
 
 	KDAC_A_make_fncode(info);
 }
@@ -343,7 +342,7 @@ WRITE8_DEVICE_HANDLER( k007232_w )
   int r = offset;
   int v = data;
 
-  stream_update(info->stream);
+  info->stream->update();
 
   info->wreg[r] = v;			/* stock write data */
 

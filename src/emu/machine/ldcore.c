@@ -12,7 +12,6 @@
 #include "emu.h"
 #include "ldcore.h"
 #include "avcomp.h"
-#include "streams.h"
 #include "vbiparse.h"
 #include "config.h"
 #include "render.h"
@@ -198,7 +197,7 @@ INLINE void update_audio(laserdisc_state *ld)
 	if (ldcore->audiocustom != NULL)
 	{
 		sound_token *token = (sound_token *)downcast<legacy_device_base *>(ldcore->audiocustom)->token();
-		stream_update(token->stream);
+		token->stream->update();
 	}
 }
 
@@ -965,7 +964,7 @@ static void process_track_data(device_t *device)
 static DEVICE_START( laserdisc_sound )
 {
 	sound_token *token = (sound_token *)downcast<legacy_device_base *>(device)->token();
-	token->stream = stream_create(device, 0, 2, 48000, token, custom_stream_callback);
+	token->stream = device->machine->sound().stream_alloc(*device, 0, 2, 48000, token, custom_stream_callback);
 	token->ld = NULL;
 }
 
@@ -1567,7 +1566,7 @@ static DEVICE_RESET( laserdisc )
 	{
 		sound_token *token = (sound_token *)downcast<legacy_device_base *>(ldcore->audiocustom)->token();
 		token->ld = ld;
-		stream_set_sample_rate(token->stream, ldcore->samplerate);
+		token->stream->set_sample_rate(ldcore->samplerate);
 	}
 
 	/* set up the general ld */

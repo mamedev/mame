@@ -15,7 +15,6 @@
  */
 
 #include "emu.h"
-#include "streams.h"
 #include "msm5205.h"
 
 /*
@@ -148,7 +147,7 @@ static TIMER_CALLBACK( MSM5205_vclk_callback )
 	/* update when signal changed */
 	if( voice->signal != new_signal)
 	{
-		stream_update(voice->stream);
+		voice->stream->update();
 		voice->signal = new_signal;
 	}
 }
@@ -188,7 +187,7 @@ static DEVICE_START( msm5205 )
 	ComputeTables (voice);
 
 	/* stream system initialize */
-	voice->stream = stream_create(device,0,1,device->clock(),voice,MSM5205_update);
+	voice->stream = device->machine->sound().stream_alloc(*device,0,1,device->clock(),voice,MSM5205_update);
 	voice->timer = timer_alloc(device->machine, MSM5205_vclk_callback, voice);
 
 	/* initialize */
@@ -269,7 +268,7 @@ static void msm5205_playmode(msm5205_state *voice,int select)
 
 	if( voice->prescaler != prescaler )
 	{
-		stream_update(voice->stream);
+		voice->stream->update();
 
 		voice->prescaler = prescaler;
 		/* timer set */
@@ -284,7 +283,7 @@ static void msm5205_playmode(msm5205_state *voice,int select)
 
 	if( voice->bitwidth != bitwidth )
 	{
-		stream_update(voice->stream);
+		voice->stream->update();
 
 		voice->bitwidth = bitwidth;
 	}
@@ -295,7 +294,7 @@ void msm5205_set_volume(device_t *device,int volume)
 {
 	msm5205_state *voice = get_safe_token(device);
 
-	stream_set_output_gain(voice->stream,0,volume / 100.0);
+	voice->stream->set_output_gain(0,volume / 100.0);
 }
 
 void msm5205_change_clock_w(device_t *device, INT32 clock)

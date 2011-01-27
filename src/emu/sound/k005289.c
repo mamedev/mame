@@ -26,7 +26,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "k005289.h"
 
 #define FREQBASEBITS	16
@@ -165,7 +164,7 @@ static DEVICE_START( k005289 )
 
 	/* get stream channels */
 	info->rate = device->clock()/16;
-	info->stream = stream_create(device, 0, 1, info->rate, info, K005289_update);
+	info->stream = device->machine->sound().stream_alloc(*device, 0, 1, info->rate, info, K005289_update);
 	info->mclock = device->clock();
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
@@ -194,7 +193,7 @@ static void k005289_recompute(k005289_state *info)
 {
 	k005289_sound_channel *voice = info->channel_list;
 
-	stream_update(info->stream);	/* update the streams */
+	info->stream->update();	/* update the streams */
 
 	voice[0].frequency = info->k005289_A_frequency;
 	voice[1].frequency = info->k005289_B_frequency;

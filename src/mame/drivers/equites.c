@@ -408,7 +408,7 @@ static TIMER_CALLBACK( equites_frq_adjuster_callback )
 	state->cymvol *= 0.94f;
 	state->hihatvol *= 0.94f;
 
-	sound_set_output_gain(state->msm, 10, state->hihatvol + state->cymvol * (state->ay_port_b & 3) * 0.33);	/* NO from msm5232 */
+	state->msm->set_output_gain(10, state->hihatvol + state->cymvol * (state->ay_port_b & 3) * 0.33);	/* NO from msm5232 */
 }
 
 static SOUND_START(equites)
@@ -596,25 +596,25 @@ static WRITE8_HANDLER(equites_8155_w)
 			break;
 		case 1: //logerror( "8155 I/O Port A write %x\n", data );
 			state->eq8155_port_a = data;
-			sound_set_output_gain(state->msm, 0, (data >> 4) / 15.0);	/* group1 from msm5232 */
-			sound_set_output_gain(state->msm, 1, (data >> 4) / 15.0);	/* group1 from msm5232 */
-			sound_set_output_gain(state->msm, 2, (data >> 4) / 15.0);	/* group1 from msm5232 */
-			sound_set_output_gain(state->msm, 3, (data >> 4) / 15.0);	/* group1 from msm5232 */
-			sound_set_output_gain(state->msm, 4, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
-			sound_set_output_gain(state->msm, 5, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
-			sound_set_output_gain(state->msm, 6, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
-			sound_set_output_gain(state->msm, 7, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
+			state->msm->set_output_gain(0, (data >> 4) / 15.0);	/* group1 from msm5232 */
+			state->msm->set_output_gain(1, (data >> 4) / 15.0);	/* group1 from msm5232 */
+			state->msm->set_output_gain(2, (data >> 4) / 15.0);	/* group1 from msm5232 */
+			state->msm->set_output_gain(3, (data >> 4) / 15.0);	/* group1 from msm5232 */
+			state->msm->set_output_gain(4, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
+			state->msm->set_output_gain(5, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
+			state->msm->set_output_gain(6, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
+			state->msm->set_output_gain(7, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
 			break;
 		case 2: //logerror( "8155 I/O Port B write %x\n", data );
 			equites_8155_portb_w(space, 0, data);
 			break;
 		case 3: //logerror( "8155 I/O Port C (or control) write %x\n", data );
 			state->eq8155_port_c = data;
-			sound_set_output_gain(state->msm, 8, (data & 0x0f) / 15.0);	/* SOLO  8' from msm5232 */
+			state->msm->set_output_gain(8, (data & 0x0f) / 15.0);	/* SOLO  8' from msm5232 */
 			if (data & 0x20)
-				sound_set_output_gain(state->msm, 9, (data & 0x0f) / 15.0);	/* SOLO 16' from msm5232 */
+				state->msm->set_output_gain(9, (data & 0x0f) / 15.0);	/* SOLO 16' from msm5232 */
 			else
-				sound_set_output_gain(state->msm, 9, 0);	/* SOLO 16' from msm5232 */
+				state->msm->set_output_gain(9, 0);	/* SOLO 16' from msm5232 */
 
 			break;
 		case 4: //logerror( "8155 Timer low 8 bits write %x\n", data );
@@ -1188,7 +1188,7 @@ static MACHINE_START( equites )
 
 	state->mcu = machine->device("mcu");
 	state->audio_cpu = machine->device("audiocpu");
-	state->msm = machine->device("msm");
+	state->msm = machine->device<msm5232_device>("msm");
 	state->dac_1 = machine->device("dac1");
 	state->dac_2 = machine->device("dac2");
 

@@ -26,7 +26,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "audio/snes_snd.h"
 
 /***************************************************************************
@@ -1059,7 +1058,7 @@ static READ8_DEVICE_HANDLER( snes_dsp_io_r )
 {
 	snes_sound_state *spc700 = get_safe_token(device);
 
-	stream_update(spc700->channel);
+	spc700->channel->update();
 
 #ifdef NO_ENVX
 	if (8 == (spc700->ram[0xf2] & 0x0f))
@@ -1074,7 +1073,7 @@ static WRITE8_DEVICE_HANDLER( snes_dsp_io_w )
 {
 	snes_sound_state *spc700 = get_safe_token(device);
 
-	stream_update(spc700->channel);
+	spc700->channel->update();
 
 	if (offset == 0x7c)
 	{
@@ -1310,7 +1309,7 @@ static DEVICE_START( snes_sound )
 	snes_sound_state *spc700 = get_safe_token(device);
 	running_machine *machine = device->machine;
 
-	spc700->channel = stream_create(device, 0, 2, 32000, 0, snes_sh_update);
+	spc700->channel = device->machine->sound().stream_alloc(*device, 0, 2, 32000, 0, snes_sh_update);
 
 	spc700->ram = auto_alloc_array_clear(device->machine, UINT8, SNES_SPCRAM_SIZE);
 

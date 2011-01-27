@@ -258,7 +258,7 @@ void sid6581_port_w (_SID6581 *This, int offset, int data)
 			break;
 		case 0x15: case 0x16: case 0x17:
 		case 0x18:
-			stream_update(This->mixer_channel);
+			This->mixer_channel->update();
 			This->reg[offset] = data;
 			This->masterVolume = ( This->reg[0x18] & 15 );
 			This->masterVolumeAmplIndex = This->masterVolume << 8;
@@ -300,7 +300,7 @@ void sid6581_port_w (_SID6581 *This, int offset, int data)
 			break;
 
 		default:
-			stream_update(This->mixer_channel);
+			This->mixer_channel->update();
 			This->reg[offset] = data;
 
 			if (offset<7) {
@@ -348,11 +348,11 @@ int sid6581_port_r (running_machine *machine, _SID6581 *This, int offset)
 	    data=0;
 	break;
     case 0x1b:
-	stream_update(This->mixer_channel);
+	This->mixer_channel->update();
 	data = This->optr3.output;
 	break;
     case 0x1c:
-	stream_update(This->mixer_channel);
+	This->mixer_channel->update();
 	data = This->optr3.enveVol;
 	break;
     default:

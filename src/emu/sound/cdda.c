@@ -4,7 +4,6 @@
 */
 
 #include "emu.h"
-#include "streams.h"
 #include "cdrom.h"
 #include "cdda.h"
 
@@ -59,7 +58,7 @@ static DEVICE_START( cdda )
 
 	//intf = (const struct CDDAinterface *)device->baseconfig().static_config();
 
-	info->stream = stream_create(device, 0, 2, 44100, info, cdda_update);
+	info->stream = device->machine->sound().stream_alloc(*device, 0, 2, 44100, info, cdda_update);
 
 	state_save_register_device_item( device, 0, info->audio_playing );
 	state_save_register_device_item( device, 0, info->audio_pause );
@@ -114,7 +113,7 @@ void cdda_start_audio(device_t *device, UINT32 startlba, UINT32 numblocks)
 {
 	cdda_info *info = get_safe_token(device);
 
-	stream_update(info->stream);
+	info->stream->update();
 	info->audio_playing = TRUE;
 	info->audio_pause = FALSE;
 	info->audio_ended_normally = FALSE;
@@ -132,7 +131,7 @@ void cdda_stop_audio(device_t *device)
 {
 	cdda_info *info = get_safe_token(device);
 
-	stream_update(info->stream);
+	info->stream->update();
 	info->audio_playing = FALSE;
 	info->audio_ended_normally = TRUE;
 }
@@ -147,7 +146,7 @@ void cdda_pause_audio(device_t *device, int pause)
 {
 	cdda_info *info = get_safe_token(device);
 
-	stream_update(info->stream);
+	info->stream->update();
 	info->audio_pause = pause;
 }
 
@@ -161,7 +160,7 @@ UINT32 cdda_get_audio_lba(device_t *device)
 {
 	cdda_info *info = get_safe_token(device);
 
-	stream_update(info->stream);
+	info->stream->update();
 	return info->audio_lba;
 }
 
@@ -175,7 +174,7 @@ int cdda_audio_active(device_t *device)
 {
 	cdda_info *info = get_safe_token(device);
 
-	stream_update(info->stream);
+	info->stream->update();
 	return info->audio_playing;
 }
 
@@ -299,8 +298,8 @@ void cdda_set_volume(device_t *device,int volume)
 {
 	cdda_info *cdda = get_safe_token(device);
 
-	stream_set_output_gain(cdda->stream,0,volume / 100.0);
-	stream_set_output_gain(cdda->stream,1,volume / 100.0);
+	cdda->stream->set_output_gain(0,volume / 100.0);
+	cdda->stream->set_output_gain(1,volume / 100.0);
 }
 
 /*-------------------------------------------------
@@ -313,9 +312,9 @@ void cdda_set_channel_volume(device_t *device, int channel, int volume)
 	cdda_info *cdda = get_safe_token(device);
 
 	if(channel == 0)
-		stream_set_output_gain(cdda->stream,0,volume / 100.0);
+		cdda->stream->set_output_gain(0,volume / 100.0);
 	if(channel == 1)
-		stream_set_output_gain(cdda->stream,1,volume / 100.0);
+		cdda->stream->set_output_gain(1,volume / 100.0);
 }
 
 /**************************************************************************

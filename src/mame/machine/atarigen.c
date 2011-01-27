@@ -840,7 +840,7 @@ void atarigen_set_vol(running_machine *machine, int volume, device_type type)
 	device_sound_interface *sound = NULL;
 	for (bool gotone = machine->m_devicelist.first(sound); gotone; gotone = sound->next(sound))
 		if (sound->device().type() == type)
-			sound_set_output_gain(*sound, ALL_OUTPUTS, volume / 100.0);
+			sound->set_output_gain(ALL_OUTPUTS, volume / 100.0);
 }
 
 

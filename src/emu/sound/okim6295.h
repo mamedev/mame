@@ -11,7 +11,6 @@
 #ifndef __OKIM6295_H__
 #define __OKIM6295_H__
 
-#include "streams.h"
 
 
 

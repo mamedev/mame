@@ -286,7 +286,7 @@ static WRITE8_HANDLER( dai3wksi_audio_1_w )
 {
 	device_t *ic79 = space->machine->device("ic79");
 
-	sound_global_enable(space->machine, data & 0x80);
+	space->machine->sound().system_enable(data & 0x80);
 
 	sn76477_enable_w(ic79, (~data >> 5) & 0x01);		/* invader movement enable */
 	sn76477_envelope_1_w(ic79, (~data >> 2) & 0x01);	/* invader movement envelope control*/

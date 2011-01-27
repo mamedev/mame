@@ -43,7 +43,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "bsmt2000.h"
 
 
@@ -227,7 +226,7 @@ void bsmt2000_device::device_start()
 	// in theory we should generate a 24MHz stream, but that's certainly overkill
 	// internally at 24MHz the max output sample rate is 32kHz
 	// divided by 128 gives us 6x the max output rate which is plenty for oversampling
-	m_stream = stream_create(*this, 0, 2, clock() / 128);
+	m_stream = m_machine.sound().stream_alloc(*this, 0, 2, clock() / 128);
 
 	// register for save states
 	state_save_register_device_item(this, 0, m_register_select);
@@ -261,7 +260,7 @@ void bsmt2000_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	{
 		// deferred reset
 		case TIMER_ID_RESET:
-			stream_update(m_stream);
+			m_stream->update();
 			m_cpu->reset();
 			break;
 
@@ -281,8 +280,8 @@ void bsmt2000_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 
 //-------------------------------------------------
-//  stream_generate - handle update requests for
-//  our sound stream
+//  sound_stream_update - handle update requests 
+//  for our sound stream
 //-------------------------------------------------
 
 void bsmt2000_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
@@ -398,7 +397,7 @@ WRITE16_MEMBER( bsmt2000_device::tms_rom_bank_w )
 
 WRITE16_MEMBER( bsmt2000_device::tms_left_w )
 {
-	stream_update(m_stream);
+	m_stream->update();
 	m_left_data = data;
 }
 
@@ -410,7 +409,7 @@ WRITE16_MEMBER( bsmt2000_device::tms_left_w )
 
 WRITE16_MEMBER( bsmt2000_device::tms_right_w )
 {
-	stream_update(m_stream);
+	m_stream->update();
 	m_right_data = data;
 }
 

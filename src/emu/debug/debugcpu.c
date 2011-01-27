@@ -1948,7 +1948,7 @@ void device_debug::instruction_hook(offs_t curpc)
 		debugger_refresh_display(m_device.machine);
 
 		// wait for the debugger; during this time, disable sound output
-		sound_mute(m_device.machine, true);
+		m_device.machine->sound().debugger_mute(true);
 		while (global->execution_state == EXECUTION_STATE_STOPPED)
 		{
 			// flush any pending updates before waiting again
@@ -1976,7 +1976,7 @@ void device_debug::instruction_hook(offs_t curpc)
 			if (machine.scheduled_event_pending())
 				global->execution_state = EXECUTION_STATE_RUNNING;
 		}
-		sound_mute(m_device.machine, false);
+		m_device.machine->sound().debugger_mute(false);
 
 		// remember the last visible CPU in the debugger
 		global->visiblecpu = &m_device;

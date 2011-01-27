@@ -44,7 +44,6 @@
 */
 
 #include "emu.h"
-#include "streams.h"
 #include "zsg2.h"
 
 // 16 registers per channel, 48 channels
@@ -181,7 +180,7 @@ WRITE16_DEVICE_HANDLER( zsg2_w )
 
 	assert(mem_mask == 0xffff);	// we only support full 16-bit accesses
 
-	stream_update(info->stream);
+	info->stream->update();
 
 	if (adr < 0x600)
 	{
@@ -227,7 +226,7 @@ static DEVICE_START( zsg2 )
 	memset(&info->zc, 0, sizeof(info->zc));
 	memset(&info->act, 0, sizeof(info->act));
 
-	info->stream = stream_create(device, 0, 2, info->sample_rate, info, update_stereo);
+	info->stream = device->machine->sound().stream_alloc(*device, 0, 2, info->sample_rate, info, update_stereo);
 
 	info->bank_samples = device->machine->region(intf->samplergn)->base();
 }

@@ -735,7 +735,7 @@ WRITE8_HANDLER( copsnrob_misc_w )
 
 		case 0x07:
 			discrete_sound_w(device, COPSNROB_AUDIO_ENABLE, special_data);
-			//sound_global_enable(space->machine, !special_data);
+			//space->machine->sound().system_mute(special_data);
 			break;
 
 	}

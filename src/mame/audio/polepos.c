@@ -3,7 +3,6 @@
     Sound handler
 ****************************************************************************/
 #include "emu.h"
-#include "streams.h"
 #include "sound/filter.h"
 #include "machine/rescap.h"
 #include "namco52.h"
@@ -114,7 +113,7 @@ static STREAM_UPDATE( engine_sound_update )
 static DEVICE_START( polepos_sound )
 {
 	polepos_sound_state *state = get_safe_token(device);
-	state->stream = stream_create(device, 0, 1, OUTPUT_RATE, NULL, engine_sound_update);
+	state->stream = device->machine->sound().stream_alloc(*device, 0, 1, OUTPUT_RATE, NULL, engine_sound_update);
 	state->sample_msb = state->sample_lsb = 0;
 	state->sample_enable = 0;
 
@@ -165,7 +164,7 @@ WRITE8_DEVICE_HANDLER( polepos_engine_sound_lsb_w )
 {
 	polepos_sound_state *state = get_safe_token(device);
 	/* Update stream first so all samples at old frequency are updated. */
-	stream_update(state->stream);
+	state->stream->update();
 	state->sample_lsb = data & 62;
 	state->sample_enable = data & 1;
 }
@@ -176,7 +175,7 @@ WRITE8_DEVICE_HANDLER( polepos_engine_sound_lsb_w )
 WRITE8_DEVICE_HANDLER( polepos_engine_sound_msb_w )
 {
 	polepos_sound_state *state = get_safe_token(device);
-	stream_update(state->stream);
+	state->stream->update();
 	state->sample_msb = data & 63;
 }
 

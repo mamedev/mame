@@ -40,7 +40,6 @@
 ***********************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "astrocde.h"
 
 
@@ -272,7 +271,7 @@ static DEVICE_START( astrocade )
 		chip->bitswap[i] = BITSWAP8(i, 0,1,2,3,4,5,6,7);
 
 	/* allocate a stream for output */
-	chip->stream = stream_create(device, 0, 1, device->clock(), chip, astrocade_update);
+	chip->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->clock(), chip, astrocade_update);
 
 	/* reset state */
 	DEVICE_RESET_CALL(astrocade);
@@ -297,7 +296,7 @@ WRITE8_DEVICE_HANDLER( astrocade_sound_w )
 		offset &= 7;
 
 	/* update */
-	stream_update(chip->stream);
+	chip->stream->update();
 
 	/* stash the new register value */
 	chip->reg[offset & 7] = data;

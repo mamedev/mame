@@ -12,7 +12,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "namco.h"
 
 
@@ -389,9 +388,9 @@ static DEVICE_START( namco )
 
 	/* get stream channels */
 	if (intf->stereo)
-		chip->stream = stream_create(device, 0, 2, chip->sample_rate, chip, namco_update_stereo);
+		chip->stream = device->machine->sound().stream_alloc(*device, 0, 2, chip->sample_rate, chip, namco_update_stereo);
 	else
-		chip->stream = stream_create(device, 0, 1, chip->sample_rate, chip, namco_update_mono);
+		chip->stream = device->machine->sound().stream_alloc(*device, 0, 1, chip->sample_rate, chip, namco_update_mono);
 
 	/* start with sound enabled, many games don't have a sound enable register */
 	chip->sound_enable = 1;
@@ -471,7 +470,7 @@ WRITE8_DEVICE_HANDLER( pacman_sound_w )
 		return;
 
 	/* update the streams */
-	stream_update(chip->stream);
+	chip->stream->update();
 
 	/* set the register */
 	chip->soundregs[offset] = data;
@@ -567,7 +566,7 @@ WRITE8_DEVICE_HANDLER( polepos_sound_w )
 		return;
 
 	/* update the streams */
-	stream_update(chip->stream);
+	chip->stream->update();
 
 	/* set the register */
 	chip->soundregs[offset] = data;
@@ -645,7 +644,7 @@ static WRITE8_DEVICE_HANDLER( namco_15xx_w )
 		return;
 
 	/* update the streams */
-	stream_update(chip->stream);
+	chip->stream->update();
 
 	/* set the register */
 	chip->soundregs[offset] = data;
@@ -722,7 +721,7 @@ static WRITE8_DEVICE_HANDLER( namcos1_sound_w )
 		return;
 
 	/* update the streams */
-	stream_update(chip->stream);
+	chip->stream->update();
 
 	/* set the register */
 	chip->soundregs[offset] = data;
@@ -769,7 +768,7 @@ WRITE8_DEVICE_HANDLER( namcos1_cus30_w )
 		if (chip->wavedata[offset] != data)
 		{
 			/* update the streams */
-			stream_update(chip->stream);
+			chip->stream->update();
 
 			chip->wavedata[offset] = data;
 

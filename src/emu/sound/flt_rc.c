@@ -1,5 +1,4 @@
 #include "emu.h"
-#include "streams.h"
 #include "flt_rc.h"
 
 typedef struct _filter_rc_state filter_rc_state;
@@ -94,7 +93,7 @@ static DEVICE_START( filter_rc )
 	const flt_rc_config *conf = (const flt_rc_config *)device->baseconfig().static_config();
 
 	info->device = device;
-	info->stream = stream_create(device, 1, 1, device->machine->sample_rate, info, filter_rc_update);
+	info->stream = device->machine->sound().stream_alloc(*device, 1, 1, device->machine->sample_rate, info, filter_rc_update);
 	if (conf)
 		set_RC_info(info, conf->type, conf->R1, conf->R2, conf->R3, conf->C);
 	else
@@ -106,7 +105,7 @@ void filter_rc_set_RC(device_t *device, int type, double R1, double R2, double R
 {
 	filter_rc_state *info = get_safe_token(device);
 
-	stream_update(info->stream);
+	info->stream->update();
 
 	set_RC_info(info, type, R1, R2, R3, C);
 

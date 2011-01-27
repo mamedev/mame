@@ -5,7 +5,6 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "includes/gridlee.h"
 #include "sound/samples.h"
 
@@ -72,7 +71,7 @@ static DEVICE_START( gridlee_sound )
 	running_machine *machine = device->machine;
 
 	/* allocate the stream */
-	state->stream = stream_create(device, 0, 1, machine->sample_rate, NULL, gridlee_stream_update);
+	state->stream = device->machine->sound().stream_alloc(*device, 0, 1, machine->sample_rate, NULL, gridlee_stream_update);
 
 	state->samples = device->machine->device("samples");
 
@@ -104,7 +103,7 @@ WRITE8_DEVICE_HANDLER( gridlee_sound_w )
 	static UINT8 sound_data[24];
 	device_t *samples = state->samples;
 
-	stream_update(state->stream);
+	state->stream->update();
 
 	switch (offset)
 	{

@@ -6,7 +6,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "dmadac.h"
 
 
@@ -113,7 +112,7 @@ static DEVICE_START( dmadac )
 	info->volume = 0x100;
 
 	/* allocate a stream channel */
-	info->channel = stream_create(device, 0, 1, DEFAULT_SAMPLE_RATE, info, dmadac_update);
+	info->channel = device->machine->sound().stream_alloc(*device, 0, 1, DEFAULT_SAMPLE_RATE, info, dmadac_update);
 
 	/* register with the save state system */
 	state_save_register_device_item(device, 0, info->bufin);
@@ -140,7 +139,7 @@ void dmadac_transfer(dmadac_sound_device **devlist, UINT8 num_channels, offs_t c
 	for (i = 0; i < num_channels; i++)
 	{
 		dmadac_state *info = get_safe_token(devlist[i]);
-		stream_update(info->channel);
+		info->channel->update();
 	}
 
 	/* loop over all channels and accumulate the data */
@@ -187,7 +186,7 @@ void dmadac_enable(dmadac_sound_device **devlist, UINT8 num_channels, UINT8 enab
 	for (i = 0; i < num_channels; i++)
 	{
 		dmadac_state *info = get_safe_token(devlist[i]);
-		stream_update(info->channel);
+		info->channel->update();
 		info->enabled = enable;
 		if (!enable)
 			info->bufin = info->bufout = 0;
@@ -210,7 +209,7 @@ void dmadac_set_frequency(dmadac_sound_device **devlist, UINT8 num_channels, dou
 	for (i = 0; i < num_channels; i++)
 	{
 		dmadac_state *info = get_safe_token(devlist[i]);
-		stream_set_sample_rate(info->channel, frequency);
+		info->channel->set_sample_rate(frequency);
 	}
 }
 
@@ -230,7 +229,7 @@ void dmadac_set_volume(dmadac_sound_device **devlist, UINT8 num_channels, UINT16
 	for (i = 0; i < num_channels; i++)
 	{
 		dmadac_state *info = get_safe_token(devlist[i]);
-		stream_update(info->channel);
+		info->channel->update();
 		info->volume = volume;
 	}
 }

@@ -10,7 +10,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "cpu/mcs48/mcs48.h"
 #include "sound/sp0250.h"
 #include "segasnd.h"
@@ -651,7 +650,7 @@ static DEVICE_START( usb_sound )
 	usb.work_ram = auto_alloc_array(machine, UINT8, 0x400);
 
 	/* create a sound stream */
-	usb.stream = stream_create(device, 0, 1, SAMPLE_RATE, NULL, usb_stream_update);
+	usb.stream = device->machine->sound().stream_alloc(*device, 0, 1, SAMPLE_RATE, NULL, usb_stream_update);
 
 	/* initialize state */
 	usb.noise_shift = 0x15555;
@@ -758,7 +757,7 @@ static void timer_w(int which, UINT8 offset, UINT8 data)
 	timer8253_channel *ch;
 	int was_holding;
 
-	stream_update(usb.stream);
+	usb.stream->update();
 
 	/* switch off the offset */
 	switch (offset)
@@ -825,7 +824,7 @@ static void env_w(int which, UINT8 offset, UINT8 data)
 {
 	timer8253 *g = &usb.timer_group[which];
 
-	stream_update(usb.stream);
+	usb.stream->update();
 
 	if (offset < 3)
 		g->env[offset] = (double)data;

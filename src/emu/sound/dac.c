@@ -1,5 +1,4 @@
 #include "emu.h"
-#include "streams.h"
 #include "dac.h"
 
 
@@ -43,7 +42,7 @@ void dac_data_w(device_t *device, UINT8 data)
 	if (info->output != out)
 	{
 		/* update the output buffer before changing the registers */
-		stream_update(info->channel);
+		info->channel->update();
 		info->output = out;
 	}
 }
@@ -57,7 +56,7 @@ void dac_signed_data_w(device_t *device, UINT8 data)
 	if (info->output != out)
 	{
 		/* update the output buffer before changing the registers */
-		stream_update(info->channel);
+		info->channel->update();
 		info->output = out;
 	}
 }
@@ -71,7 +70,7 @@ void dac_data_16_w(device_t *device, UINT16 data)
 	if (info->output != out)
 	{
 		/* update the output buffer before changing the registers */
-		stream_update(info->channel);
+		info->channel->update();
 		info->output = out;
 	}
 }
@@ -86,7 +85,7 @@ void dac_signed_data_16_w(device_t *device, UINT16 data)
 	if (info->output != out)
 	{
 		/* update the output buffer before changing the registers */
-		stream_update(info->channel);
+		info->channel->update();
 		info->output = out;
 	}
 }
@@ -111,7 +110,7 @@ static DEVICE_START( dac )
 
 	DAC_build_voltable(info);
 
-	info->channel = stream_create(device,0,1,device->clock() ? device->clock() : DEFAULT_SAMPLE_RATE,info,DAC_update);
+	info->channel = device->machine->sound().stream_alloc(*device,0,1,device->clock() ? device->clock() : DEFAULT_SAMPLE_RATE,info,DAC_update);
 	info->output = 0;
 
 	state_save_register_device_item(device, 0, info->output);

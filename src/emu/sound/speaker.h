@@ -8,8 +8,8 @@
 
 #pragma once
 
-#ifndef __SPEAKER_H__
-#define __SPEAKER_H__
+#ifndef __SOUND_SPEAKER_H__
+#define __SOUND_SPEAKER_H__
 
 #include "devlegcy.h"
 

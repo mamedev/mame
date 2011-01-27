@@ -32,7 +32,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "qsound.h"
 
 /*
@@ -124,8 +123,8 @@ static DEVICE_START( qsound )
 
 	{
 		/* Allocate stream */
-		chip->stream = stream_create(
-			device, 0, 2,
+		chip->stream = device->machine->sound().stream_alloc(
+			*device, 0, 2,
 			device->clock() / QSOUND_CLOCKDIV,
 			chip,
 			qsound_update );

@@ -15,7 +15,6 @@
 */
 
 #include "emu.h"
-#include "streams.h"
 #include "includes/bzone.h"
 #include "sound/pokey.h"
 
@@ -63,7 +62,7 @@ WRITE8_DEVICE_HANDLER( redbaron_sounds_w )
 	if( data == state->latch )
 		return;
 
-	stream_update(state->channel);
+	state->channel->update();
 	state->latch = data;
 }
 
@@ -224,7 +223,7 @@ static DEVICE_START( redbaron_sound )
 		state->vol_crash[i] = 32767 * r0 / (r0 + r1);
 	}
 
-	state->channel = stream_create(device, 0, 1, OUTPUT_RATE, 0, redbaron_sound_update);
+	state->channel = device->machine->sound().stream_alloc(*device, 0, 1, OUTPUT_RATE, 0, redbaron_sound_update);
 }
 
 

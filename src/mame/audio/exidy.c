@@ -7,7 +7,6 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/rescap.h"
-#include "streams.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
 #include "machine/6532riot.h"
@@ -402,7 +401,7 @@ static DEVICE_START( common_sh_start )
 	state->sh6840_clocks_per_sample = (int)((double)SH6840_CLOCK / (double)sample_rate * (double)(1 << 24));
 
 	/* allocate the stream */
-	state->stream = stream_create(device, 0, 1, sample_rate, NULL, exidy_stream_update);
+	state->stream = device->machine->sound().stream_alloc(*device, 0, 1, sample_rate, NULL, exidy_stream_update);
 	state->maincpu = device->machine->device("maincpu");
 
 	sh6840_register_state_globals(device);
@@ -588,7 +587,7 @@ static WRITE8_DEVICE_HANDLER( exidy_sh8253_w )
 	exidy_sound_state *state = get_safe_token(device);
 	int chan;
 
-	stream_update(state->stream);
+	state->stream->update();
 
 	switch (offset)
 	{
@@ -640,7 +639,7 @@ READ8_DEVICE_HANDLER( exidy_sh6840_r )
 	exidy_sound_state *state = get_safe_token(device);
 
 	/* force an update of the stream */
-	stream_update(state->stream);
+	state->stream->update();
 
 	switch (offset)
 	{
@@ -668,7 +667,7 @@ WRITE8_DEVICE_HANDLER( exidy_sh6840_w )
 	struct sh6840_timer_channel *sh6840_timer = state->sh6840_timer;
 
 	/* force an update of the stream */
-	stream_update(state->stream);
+	state->stream->update();
 
 	switch (offset)
 	{
@@ -729,7 +728,7 @@ WRITE8_DEVICE_HANDLER( exidy_sfxctrl_w )
 {
 	exidy_sound_state *state = get_safe_token(device);
 
-	stream_update(state->stream);
+	state->stream->update();
 
 	switch (offset)
 	{

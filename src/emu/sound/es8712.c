@@ -13,7 +13,6 @@
 
 
 #include "emu.h"
-#include "streams.h"
 #include "es8712.h"
 
 #define MAX_SAMPLE_CHUNK	10000
@@ -228,7 +227,7 @@ static DEVICE_START( es8712 )
 	chip->region_base = *device->region();
 
 	/* generate the name and create the stream */
-	chip->stream = stream_create(device, 0, 1, device->clock(), chip, es8712_update);
+	chip->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->clock(), chip, es8712_update);
 
 	/* initialize the rest of the structure */
 	chip->signal = -2;
@@ -251,7 +250,7 @@ static DEVICE_RESET( es8712 )
 	if (chip->playing)
 	{
 		/* update the stream, then turn it off */
-		stream_update(chip->stream);
+		chip->stream->update();
 		chip->playing = 0;
 		chip->repeat = 0;
 	}
@@ -267,7 +266,7 @@ static DEVICE_RESET( es8712 )
 void es8712_set_bank_base(device_t *device, int base)
 {
 	es8712_state *chip = get_safe_token(device);
-	stream_update(chip->stream);
+	chip->stream->update();
 	chip->bank_offset = base;
 }
 
@@ -283,8 +282,8 @@ void es8712_set_frequency(device_t *device, int frequency)
 	es8712_state *chip = get_safe_token(device);
 
 	/* update the stream and set the new base */
-	stream_update(chip->stream);
-	stream_set_sample_rate(chip->stream, frequency);
+	chip->stream->update();
+	chip->stream->set_sample_rate(frequency);
 }
 
 
@@ -323,7 +322,7 @@ void es8712_play(device_t *device)
 		if (chip->playing)
 		{
 			/* update the stream */
-			stream_update(chip->stream);
+			chip->stream->update();
 			chip->playing = 0;
 		}
 	}

@@ -109,9 +109,9 @@ static MACHINE_RESET( magmax )
 
 static WRITE8_DEVICE_HANDLER( ay8910_portA_0_w )
 {
-device_t *ay1 = device->machine->device("ay1");
-device_t *ay2 = device->machine->device("ay2");
-device_t *ay3 = device->machine->device("ay3");
+ay8910_device *ay1 = device->machine->device<ay8910_device>("ay1");
+ay8910_device *ay2 = device->machine->device<ay8910_device>("ay2");
+ay8910_device *ay3 = device->machine->device<ay8910_device>("ay3");
 float percent;
 
 /*There are three AY8910 chips and four(!) separate amplifiers on the board
@@ -166,26 +166,26 @@ bit3 - SOUND Chan#8 name=AY-3-8910 #2 Ch C
 	/*popmessage("gain_ctrl = %2x",data&0x0f);*/
 
 	percent = (gain_control & 1) ? 1.0 : 0.50;
-	sound_set_output_gain(ay1, 0, percent);
+	ay1->set_output_gain(0, percent);
 //fixme:    set_RC_filter(0,10000,100000000,0,10000);   /* 10K, 10000pF = 0.010uF */
 
 	percent = (gain_control & 2) ? 0.45 : 0.23;
-	sound_set_output_gain(ay1, 1, percent);
-	sound_set_output_gain(ay1, 2, percent);
-	sound_set_output_gain(ay2, 0, percent);
-	sound_set_output_gain(ay2, 1, percent);
+	ay1->set_output_gain(1, percent);
+	ay1->set_output_gain(2, percent);
+	ay2->set_output_gain(0, percent);
+	ay2->set_output_gain(1, percent);
 //fixme:    set_RC_filter(1,4700,100000000,0,4700); /*  4.7K, 4700pF = 0.0047uF */
 //fixme:    set_RC_filter(2,4700,100000000,0,4700); /*  4.7K, 4700pF = 0.0047uF */
 //fixme:    set_RC_filter(3,4700,100000000,0,4700); /*  4.7K, 4700pF = 0.0047uF */
 //fixme:    set_RC_filter(4,4700,100000000,0,4700); /*  4.7K, 4700pF = 0.0047uF */
 
 	percent = (gain_control & 4) ? 0.45 : 0.23;
-	sound_set_output_gain(ay2, 2, percent);
-	sound_set_output_gain(ay3, 0, percent);
+	ay2->set_output_gain(2, percent);
+	ay3->set_output_gain(0, percent);
 
 	percent = (gain_control & 8) ? 0.45 : 0.23;
-	sound_set_output_gain(ay3, 1, percent);
-	sound_set_output_gain(ay3, 2, percent);
+	ay3->set_output_gain(1, percent);
+	ay3->set_output_gain(2, percent);
 }
 
 static WRITE16_HANDLER( magmax_vreg_w )

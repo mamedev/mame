@@ -1603,23 +1603,24 @@ static slider_state *slider_init(running_machine *machine)
 	slider_state *listhead = NULL;
 	slider_state **tailptr = &listhead;
 	astring string;
-	int numitems, item;
+	int item;
 
 	/* add overall volume */
 	*tailptr = slider_alloc(machine, "Master Volume", -32, 0, 0, 1, slider_volume, NULL);
 	tailptr = &(*tailptr)->next;
 
 	/* add per-channel volume */
-	numitems = sound_get_user_gain_count(machine);
-	for (item = 0; item < numitems; item++)
+	speaker_input info;
+	for (item = 0; machine->sound().indexed_speaker_input(item, info); item++)
 	{
 		INT32 maxval = 2000;
-		INT32 defval = sound_get_default_gain(machine, item) * 1000.0f + 0.5f;
+		INT32 defval = info.stream->initial_input_gain(info.inputnum) * 1000.0f + 0.5f;
 
 		if (defval > 1000)
 			maxval = 2 * defval;
 
-		string.printf("%s Volume", sound_get_user_gain_name(machine, item));
+		info.stream->input_name(info.inputnum, string);
+		string.cat(" Volume");
 		*tailptr = slider_alloc(machine, string, 0, defval, maxval, 20, slider_mixervol, (void *)(FPTR)item);
 		tailptr = &(*tailptr)->next;
 	}
@@ -1755,10 +1756,10 @@ static slider_state *slider_init(running_machine *machine)
 static INT32 slider_volume(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
 	if (newval != SLIDER_NOCHANGE)
-		sound_set_attenuation(machine, newval);
+		machine->sound().set_attenuation(newval);
 	if (string != NULL)
-		string->printf("%3ddB", sound_get_attenuation(machine));
-	return sound_get_attenuation(machine);
+		string->printf("%3ddB", machine->sound().attenuation());
+	return machine->sound().attenuation();
 }
 
 
@@ -1769,12 +1770,14 @@ static INT32 slider_volume(running_machine *machine, void *arg, astring *string,
 
 static INT32 slider_mixervol(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
-	int which = (FPTR)arg;
+	speaker_input info;
+	if (!machine->sound().indexed_speaker_input((FPTR)arg, info))
+		return 0;
 	if (newval != SLIDER_NOCHANGE)
-		sound_set_user_gain(machine, which, (float)newval * 0.001f);
+		info.stream->set_input_gain(info.inputnum, (float)newval * 0.001f);
 	if (string != NULL)
-		string->printf("%4.2f", sound_get_user_gain(machine, which));
-	return floor(sound_get_user_gain(machine, which) * 1000.0f + 0.5f);
+		string->printf("%4.2f", info.stream->input_gain(info.inputnum));
+	return floor(info.stream->input_gain(info.inputnum) * 1000.0f + 0.5f);
 }
 
 

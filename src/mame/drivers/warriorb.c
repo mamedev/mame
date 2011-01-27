@@ -568,7 +568,7 @@ static MACHINE_RESET( taito_dualscreen )
 	state->banknum = 0;
 
 	/**** mixer control enable ****/
-	sound_global_enable(machine, 1);	/* mixer enabled */
+	machine->sound().system_enable(true);	/* mixer enabled */
 }
 
 static MACHINE_CONFIG_START( darius2d, warriorb_state )

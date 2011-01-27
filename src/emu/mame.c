@@ -84,7 +84,6 @@
 #include "ui.h"
 #include "uimenu.h"
 #include "uiinput.h"
-#include "streams.h"
 #include "crsshair.h"
 #include "validity.h"
 #include "debug/debugcon.h"

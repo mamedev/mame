@@ -94,8 +94,8 @@ EMUOBJS = \
 	$(EMUOBJ)/screen.o \
 	$(EMUOBJ)/softlist.o \
 	$(EMUOBJ)/sound.o \
+	$(EMUOBJ)/speaker.o \
 	$(EMUOBJ)/state.o \
-	$(EMUOBJ)/streams.o \
 	$(EMUOBJ)/tilemap.o \
 	$(EMUOBJ)/timer.o \
 	$(EMUOBJ)/ui.o \

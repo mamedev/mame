@@ -36,7 +36,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "okim6295.h"
 
 
@@ -178,7 +177,7 @@ void okim6295_device::device_start()
 
 	// create the stream
 	int divisor = m_config.m_pin7 ? 132 : 165;
-	m_stream = stream_create(*this, 0, 1, clock() / divisor);
+	m_stream = m_machine.sound().stream_alloc(*this, 0, 1, clock() / divisor);
 
 	state_save_register_device_item(this, 0, m_command);
 	state_save_register_device_item(this, 0, m_bank_offs);
@@ -201,7 +200,7 @@ void okim6295_device::device_start()
 
 void okim6295_device::device_reset()
 {
-	stream_update(m_stream);
+	m_stream->update();
 	for (int voicenum = 0; voicenum < OKIM6295_VOICES; voicenum++)
 		m_voice[voicenum].m_playing = false;
 }
@@ -225,7 +224,7 @@ void okim6295_device::device_post_load()
 void okim6295_device::device_clock_changed()
 {
 	int divisor = m_pin7_state ? 132 : 165;
-	stream_set_sample_rate(m_stream, clock() / divisor);
+	m_stream->set_sample_rate(clock() / divisor);
 }
 
 
@@ -253,7 +252,7 @@ void okim6295_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 void okim6295_device::set_bank_base(offs_t base)
 {
 	// flush out anything pending
-	stream_update(m_stream);
+	m_stream->update();
 
 	// if we are setting a non-zero base, and we have no bank, allocate one
 	if (!m_bank_installed && base != 0)
@@ -293,7 +292,7 @@ UINT8 okim6295_device::read_status()
 	UINT8 result = 0xf0;	// naname expects bits 4-7 to be 1
 
 	// set the bit to 1 if something is playing on a given channel
-	stream_update(m_stream);
+	m_stream->update();
 	for (int voicenum = 0; voicenum < OKIM6295_VOICES; voicenum++)
 		if (m_voice[voicenum].m_playing)
 			result |= 1 << voicenum;
@@ -327,7 +326,7 @@ void okim6295_device::write_command(UINT8 command)
 		//  popmessage("OKI6295 start %x contact MAMEDEV", voicemask);
 
 		// update the stream
-		stream_update(m_stream);
+		m_stream->update();
 
 		// determine which voice(s) (voice is set by a 1 bit in the upper 4 bits of the second byte)
 		for (int voicenum = 0; voicenum < OKIM6295_VOICES; voicenum++, voicemask >>= 1)
@@ -386,7 +385,7 @@ void okim6295_device::write_command(UINT8 command)
 	else
 	{
 		// update the stream, then turn it off
-		stream_update(m_stream);
+		m_stream->update();
 
 		// determine which voice(s) (voice is set by a 1 bit in bits 3-6 of the command
 		int voicemask = command >> 3;

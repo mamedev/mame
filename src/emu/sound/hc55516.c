@@ -7,7 +7,6 @@
 *****************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "hc55516.h"
 
 
@@ -77,7 +76,7 @@ static void start_common(device_t *device, UINT8 _shiftreg_mask, int _active_clo
 	chip->last_clock_state = 0;
 
 	/* create the stream */
-	chip->channel = stream_create(device, 0, 1, SAMPLE_RATE, chip, hc55516_update);
+	chip->channel = device->machine->sound().stream_alloc(*device, 0, 1, SAMPLE_RATE, chip, hc55516_update);
 
 	state_save_register_device_item(device, 0, chip->last_clock_state);
 	state_save_register_device_item(device, 0, chip->digit);
@@ -255,7 +254,7 @@ void hc55516_clock_w(device_t *device, int state)
 	if (is_active_clock_transition(chip, clock_state))
 	{
 		/* update the output buffer before changing the registers */
-		stream_update(chip->channel);
+		chip->channel->update();
 
 		/* clear the update count */
 		chip->update_count = 0;
@@ -274,7 +273,7 @@ void hc55516_digit_w(device_t *device, int digit)
 
 	if (is_external_osciallator(chip))
 	{
-		stream_update(chip->channel);
+		chip->channel->update();
 		chip->new_digit = digit & 1;
 	}
 	else
@@ -289,7 +288,7 @@ int hc55516_clock_state_r(device_t *device)
 	/* only makes sense for setups with an external oscillator */
 	assert(is_external_osciallator(chip));
 
-	stream_update(chip->channel);
+	chip->channel->update();
 
 	return current_clock_state(chip);
 }

@@ -3,7 +3,6 @@
 
 #include "devlegcy.h"
 #include "devcb.h"
-#include "streams.h"
 #include "cpu/spc700/spc700.h"
 #include "cpu/g65816/g65816.h"
 #include "cpu/upd7725/upd7725.h"

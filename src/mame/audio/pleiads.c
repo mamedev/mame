@@ -7,7 +7,6 @@
  *
  ****************************************************************************/
 #include "emu.h"
-#include "streams.h"
 #include "sound/tms36xx.h"
 #include "audio/pleiads.h"
 
@@ -429,7 +428,7 @@ WRITE8_DEVICE_HANDLER( pleiads_sound_control_a_w )
 
 	logerror("pleiads_sound_control_b_w $%02x\n", data);
 
-	stream_update(state->channel);
+	state->channel->update();
 	state->sound_latch_a = data;
 }
 
@@ -455,7 +454,7 @@ WRITE8_DEVICE_HANDLER( pleiads_sound_control_b_w )
 
 	tms36xx_note_w(state->tms, pitch, note);
 
-	stream_update(state->channel);
+	state->channel->update();
 	state->sound_latch_b = data;
 }
 
@@ -468,7 +467,7 @@ WRITE8_DEVICE_HANDLER( pleiads_sound_control_c_w )
 		return;
 
 	logerror("pleiads_sound_control_c_w $%02x\n", data);
-	stream_update(state->channel);
+	state->channel->update();
 	state->sound_latch_c = data;
 }
 
@@ -497,7 +496,7 @@ static DEVICE_START( common_sh_start )
 		state->poly18[i] = bits;
 	}
 
-	state->channel = stream_create(device, 0, 1, device->machine->sample_rate, NULL, pleiads_sound_update);
+	state->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate, NULL, pleiads_sound_update);
 }
 
 static DEVICE_START( pleiads_sound )

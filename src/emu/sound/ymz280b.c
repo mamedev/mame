@@ -22,7 +22,6 @@
 
 
 #include "emu.h"
-#include "streams.h"
 #include "ymz280b.h"
 
 
@@ -652,7 +651,7 @@ static DEVICE_START( ymz280b )
 	chip->irq_callback = intf->irq_callback;
 
 	/* create the stream */
-	chip->stream = stream_create(device, 0, 2, INTERNAL_SAMPLE_RATE, chip, ymz280b_update);
+	chip->stream = device->machine->sound().stream_alloc(*device, 0, 2, INTERNAL_SAMPLE_RATE, chip, ymz280b_update);
 
 	/* allocate memory */
 	chip->scratch = auto_alloc_array(device->machine, INT16, MAX_SAMPLE_CHUNK);
@@ -716,7 +715,7 @@ static void write_to_register(ymz280b_state *chip, int data)
 	int i;
 
 	/* force an update */
-	stream_update(chip->stream);
+	chip->stream->update();
 
 	/* lower registers follow a pattern */
 	if (chip->current_register < 0x80)
@@ -903,7 +902,7 @@ static int compute_status(ymz280b_state *chip)
 	}
 
 	/* force an update */
-	stream_update(chip->stream);
+	chip->stream->update();
 
 	result = chip->status_register;
 

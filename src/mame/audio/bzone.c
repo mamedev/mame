@@ -18,7 +18,6 @@ D0  explosion enable        gates a noise generator
 */
 
 #include "emu.h"
-#include "streams.h"
 #include "includes/bzone.h"
 
 #include "sound/discrete.h"
@@ -393,7 +392,7 @@ WRITE8_DEVICE_HANDLER( bzone_sounds_w )
 	discrete_sound_w(device, BZ_INPUT, data);
 
 	output_set_value("startled", (data >> 6) & 1);
-    sound_global_enable(device->machine, data & 0x20);
+	device->machine->sound().system_enable(data & 0x20);
 }
 
 

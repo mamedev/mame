@@ -81,7 +81,6 @@ Ensoniq OTIS - ES5505                                            Ensoniq OTTO - 
 ***********************************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "es5506.h"
 
 
@@ -911,7 +910,7 @@ static void es5506_start_common(device_t *device, const void *config, device_typ
 		eslog = fopen("es.log", "w");
 
 	/* create the stream */
-	chip->stream = stream_create(device, 0, 2, device->clock() / (16*32), chip, es5506_update);
+	chip->stream = device->machine->sound().stream_alloc(*device, 0, 2, device->clock() / (16*32), chip, es5506_update);
 
 	/* initialize the regions */
 	chip->region_base[0] = intf->region0 ? (UINT16 *)device->machine->region(intf->region0)->base() : NULL;
@@ -1111,7 +1110,7 @@ INLINE void es5506_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t
 		{
 			chip->active_voices = data & 0x1f;
 			chip->sample_rate = chip->master_clock / (16 * (chip->active_voices + 1));
-			stream_set_sample_rate(chip->stream, chip->sample_rate);
+			chip->stream->set_sample_rate(chip->sample_rate);
 
 			if (LOG_COMMANDS && eslog)
 				fprintf(eslog, "active voices=%d, sample_rate=%d\n", chip->active_voices, chip->sample_rate);
@@ -1312,7 +1311,7 @@ WRITE8_DEVICE_HANDLER( es5506_w )
 		return;
 
 	/* force an update */
-	stream_update(chip->stream);
+	chip->stream->update();
 
 	/* switch off the page and register */
 	if (chip->current_page < 0x20)
@@ -1521,7 +1520,7 @@ READ8_DEVICE_HANDLER( es5506_r )
 		fprintf(eslog, "read from %02x/%02x -> ", chip->current_page, offset / 4 * 8);
 
 	/* force an update */
-	stream_update(chip->stream);
+	chip->stream->update();
 
 	/* switch off the page and register */
 	if (chip->current_page < 0x20)
@@ -1732,7 +1731,7 @@ INLINE void es5505_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t
 			{
 				chip->active_voices = data & 0x1f;
 				chip->sample_rate = chip->master_clock / (16 * (chip->active_voices + 1));
-				stream_set_sample_rate(chip->stream, chip->sample_rate);
+				chip->stream->set_sample_rate(chip->sample_rate);
 
 				if (LOG_COMMANDS && eslog)
 					fprintf(eslog, "active voices=%d, sample_rate=%d\n", chip->active_voices, chip->sample_rate);
@@ -1840,7 +1839,7 @@ INLINE void es5505_reg_write_high(es5506_state *chip, es5506_voice *voice, offs_
 			{
 				chip->active_voices = data & 0x1f;
 				chip->sample_rate = chip->master_clock / (16 * (chip->active_voices + 1));
-				stream_set_sample_rate(chip->stream, chip->sample_rate);
+				chip->stream->set_sample_rate(chip->sample_rate);
 
 				if (LOG_COMMANDS && eslog)
 					fprintf(eslog, "active voices=%d, sample_rate=%d\n", chip->active_voices, chip->sample_rate);
@@ -1884,7 +1883,7 @@ INLINE void es5505_reg_write_test(es5506_state *chip, es5506_voice *voice, offs_
 			{
 				chip->active_voices = data & 0x1f;
 				chip->sample_rate = chip->master_clock / (16 * (chip->active_voices + 1));
-				stream_set_sample_rate(chip->stream, chip->sample_rate);
+				chip->stream->set_sample_rate(chip->sample_rate);
 
 				if (LOG_COMMANDS && eslog)
 					fprintf(eslog, "active voices=%d, sample_rate=%d\n", chip->active_voices, chip->sample_rate);
@@ -1910,7 +1909,7 @@ WRITE16_DEVICE_HANDLER( es5505_w )
 //  logerror("%s:ES5505 write %02x/%02x = %04x & %04x\n", cpuexec_describe_context(machine), chip->current_page, offset, data, mem_mask);
 
 	/* force an update */
-	stream_update(chip->stream);
+	chip->stream->update();
 
 	/* switch off the page and register */
 	if (chip->current_page < 0x20)
@@ -2123,7 +2122,7 @@ READ16_DEVICE_HANDLER( es5505_r )
 		fprintf(eslog, "read from %02x/%02x -> ", chip->current_page, offset);
 
 	/* force an update */
-	stream_update(chip->stream);
+	chip->stream->update();
 
 	/* switch off the page and register */
 	if (chip->current_page < 0x20)

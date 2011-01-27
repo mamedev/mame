@@ -10,7 +10,6 @@
 
 
 #include "emu.h"
-#include "streams.h"
 #include "okim6258.h"
 
 #define COMMAND_STOP		(1 << 0)
@@ -202,7 +201,7 @@ static DEVICE_START( okim6258 )
 	info->output_bits = intf->output_12bits ? 12 : 10;
 	info->divider = dividers[intf->divider];
 
-	info->stream = stream_create(device, 0, 1, device->clock()/info->divider, info, okim6258_update);
+	info->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->clock()/info->divider, info, okim6258_update);
 
 	info->signal = -2;
 	info->step = 0;
@@ -221,7 +220,7 @@ static DEVICE_RESET( okim6258 )
 {
 	okim6258_state *info = get_safe_token(device);
 
-	stream_update(info->stream);
+	info->stream->update();
 
 	info->signal = -2;
 	info->step = 0;
@@ -241,7 +240,7 @@ void okim6258_set_divider(device_t *device, int val)
 	int divider = dividers[val];
 
 	info->divider = dividers[val];
-	stream_set_sample_rate(info->stream, info->master_clock / divider);
+	info->stream->set_sample_rate(info->master_clock / divider);
 }
 
 
@@ -256,7 +255,7 @@ void okim6258_set_clock(device_t *device, int val)
 	okim6258_state *info = get_safe_token(device);
 
 	info->master_clock = val;
-	stream_set_sample_rate(info->stream, info->master_clock / info->divider);
+	info->stream->set_sample_rate(info->master_clock / info->divider);
 }
 
 
@@ -284,7 +283,7 @@ READ8_DEVICE_HANDLER( okim6258_status_r )
 {
 	okim6258_state *info = get_safe_token(device);
 
-	stream_update(info->stream);
+	info->stream->update();
 
 	return (info->status & STATUS_PLAYING) ? 0x00 : 0x80;
 }
@@ -300,7 +299,7 @@ WRITE8_DEVICE_HANDLER( okim6258_data_w )
 	okim6258_state *info = get_safe_token(device);
 
 	/* update the stream */
-	stream_update(info->stream);
+	info->stream->update();
 
 	info->data_in = data;
 	info->nibble_shift = 0;
@@ -317,7 +316,7 @@ WRITE8_DEVICE_HANDLER( okim6258_ctrl_w )
 {
 	okim6258_state *info = get_safe_token(device);
 
-	stream_update(info->stream);
+	info->stream->update();
 
 	if (data & COMMAND_STOP)
 	{

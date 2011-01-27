@@ -71,7 +71,6 @@
  */
 
 #include "emu.h"
-#include "streams.h"
 #include "speaker.h"
 
 static const INT16 default_levels[2] = {0, 32767};
@@ -141,7 +140,7 @@ static DEVICE_START( speaker )
 	int i;
 	double x;
 
-	sp->channel = stream_create(device, 0, 1, device->machine->sample_rate, sp, speaker_sound_update);
+	sp->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate, sp, speaker_sound_update);
 
 	if (intf != NULL)
 	{
@@ -165,7 +164,7 @@ static DEVICE_START( speaker )
 	sp->channel_sample_period_secfrac = ATTOSECONDS_TO_DOUBLE(sp->channel_sample_period);
 	sp->interm_sample_period = sp->channel_sample_period / RATE_MULTIPLIER;
 	sp->interm_sample_period_secfrac = ATTOSECONDS_TO_DOUBLE(sp->interm_sample_period);
-	sp->channel_last_sample_time = stream_get_time(sp->channel);
+	sp->channel_last_sample_time = sp->channel->sample_time();
 	sp->channel_next_sample_time = attotime_add_attoseconds(sp->channel_last_sample_time, sp->channel_sample_period);
 	sp->next_interm_sample_time = attotime_add_attoseconds(sp->channel_last_sample_time, sp->interm_sample_period);
 	sp->interm_sample_index = 0;
@@ -211,7 +210,7 @@ static DEVICE_START( speaker )
 }
 
 
-/* Called via stream_update(stream).
+/* Called via stream->update().
  * This can be triggered by the core (based on emulated time) or via speaker_level_w().
  */
 static STREAM_UPDATE( speaker_sound_update )
@@ -230,7 +229,7 @@ static STREAM_UPDATE( speaker_sound_update )
 			sampled_time = attotime_mul(sampled_time, samples);
 
 		/* Note: since the stream is in the process of being updated,
-         * stream_get_time() will return the time before the update! (MAME 0.130)
+         * stream->sample_time() will return the time before the update! (MAME 0.130)
          * Avoid using it here in order to avoid a subtle dependence on the stream implementation.
          */
 	}
@@ -293,12 +292,12 @@ void speaker_level_w(device_t *device, int new_level)
      */
 
 	/* Force streams.c to update sound until this point in time now */
-	stream_update(sp->channel);
+	sp->channel->update();
 
 	/* This is redundant because time update has to be done within speaker_sound_update() anyway,
      * however this ensures synchronization between the speaker and stream timing:
      */
-	sp->channel_last_sample_time = stream_get_time(sp->channel);
+	sp->channel_last_sample_time = sp->channel->sample_time();
 	sp->channel_next_sample_time = attotime_add_attoseconds(sp->channel_last_sample_time, sp->channel_sample_period);
 	sp->next_interm_sample_time = attotime_add_attoseconds(sp->channel_last_sample_time, sp->interm_sample_period);
 	sp->last_update_time = sp->channel_last_sample_time;

@@ -1,4 +1,6 @@
 
+#include "sound/msm5232.h"
+
 #define POPDRUMKIT 0
 
 
@@ -39,7 +41,7 @@ public:
 	/* devices */
 	device_t *mcu;
 	device_t *audio_cpu;
-	device_t *msm;
+	msm5232_device *msm;
 	device_t *dac_1;
 	device_t *dac_2;
 };

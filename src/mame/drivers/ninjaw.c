@@ -794,7 +794,7 @@ static MACHINE_RESET( ninjaw )
 	memset(state->pandata, 0, sizeof(state->pandata));
 
 	/**** mixer control enable ****/
-	sound_global_enable(machine, 1);	/* mixer enabled */
+	machine->sound().system_enable(true);	/* mixer enabled */
 }
 
 static MACHINE_CONFIG_START( ninjaw, ninjaw_state )

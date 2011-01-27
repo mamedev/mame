@@ -44,7 +44,6 @@ Unmapped registers:
 
 
 #include "emu.h"
-#include "streams.h"
 #include "c140.h"
 
 #define MAX_VOICE 24
@@ -195,7 +194,7 @@ static long find_sample(c140_state *info, long adrs, long bank, int voice)
 WRITE8_DEVICE_HANDLER( c140_w )
 {
 	c140_state *info = get_safe_token(device);
-	stream_update(info->stream);
+	info->stream->update();
 
 	offset&=0x1ff;
 
@@ -471,7 +470,7 @@ static DEVICE_START( c140 )
 
 	info->banking_type = intf->banking_type;
 
-	info->stream = stream_create(device,0,2,info->sample_rate,info,update_stereo);
+	info->stream = device->machine->sound().stream_alloc(*device,0,2,info->sample_rate,info,update_stereo);
 
 	info->pRom=*device->region();
 

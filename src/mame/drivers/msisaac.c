@@ -246,14 +246,16 @@ static WRITE8_DEVICE_HANDLER( sound_control_0_w )
 	state->snd_ctrl0 = data & 0xff;
 	//popmessage("SND0 0=%2x 1=%2x", state->snd_ctrl0, state->snd_ctrl1);
 
-	sound_set_output_gain(device, 0, state->vol_ctrl[state->snd_ctrl0 & 15] / 100.0);	/* group1 from msm5232 */
-	sound_set_output_gain(device, 1, state->vol_ctrl[state->snd_ctrl0 & 15] / 100.0);	/* group1 from msm5232 */
-	sound_set_output_gain(device, 2, state->vol_ctrl[state->snd_ctrl0 & 15] / 100.0);	/* group1 from msm5232 */
-	sound_set_output_gain(device, 3, state->vol_ctrl[state->snd_ctrl0 & 15] / 100.0);	/* group1 from msm5232 */
-	sound_set_output_gain(device, 4, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
-	sound_set_output_gain(device, 5, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
-	sound_set_output_gain(device, 6, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
-	sound_set_output_gain(device, 7, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
+	device_sound_interface *sound;
+	device->interface(sound);
+	sound->set_output_gain(0, state->vol_ctrl[state->snd_ctrl0 & 15] / 100.0);	/* group1 from msm5232 */
+	sound->set_output_gain(1, state->vol_ctrl[state->snd_ctrl0 & 15] / 100.0);	/* group1 from msm5232 */
+	sound->set_output_gain(2, state->vol_ctrl[state->snd_ctrl0 & 15] / 100.0);	/* group1 from msm5232 */
+	sound->set_output_gain(3, state->vol_ctrl[state->snd_ctrl0 & 15] / 100.0);	/* group1 from msm5232 */
+	sound->set_output_gain(4, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
+	sound->set_output_gain(5, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
+	sound->set_output_gain(6, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
+	sound->set_output_gain(7, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
 }
 static WRITE8_HANDLER( sound_control_1_w )
 {

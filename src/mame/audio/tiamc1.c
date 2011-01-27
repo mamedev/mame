@@ -32,7 +32,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "includes/tiamc1.h"
 
 #define CLOCK_DIVIDER 16
@@ -307,7 +306,7 @@ static DEVICE_START( tiamc1_sound )
 	timer8253_reset(&state->timer0);
 	timer8253_reset(&state->timer1);
 
-	state->channel = stream_create(device, 0, 1, device->clock() / CLOCK_DIVIDER, 0, tiamc1_sound_update);
+	state->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->clock() / CLOCK_DIVIDER, 0, tiamc1_sound_update);
 
 	state->timer1_divider = 0;
 

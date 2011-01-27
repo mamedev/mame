@@ -51,8 +51,8 @@
 //  CONSTANTS
 //**************************************************************************
 
-const int MAX_OUTPUTS		= 4095;			// maximum number of outputs a sound chip can support
-const int ALL_OUTPUTS		= MAX_OUTPUTS;	// special value indicating all outputs for the current chip
+const int ALL_OUTPUTS		= 65535;	// special value indicating all outputs for the current chip
+const int AUTO_ALLOC_INPUT	= 65535;
 
 
 
@@ -79,7 +79,7 @@ const int ALL_OUTPUTS		= MAX_OUTPUTS;	// special value indicating all outputs fo
 	device_config_sound_interface::static_add_route(device, _output, _target, _gain, _input); \
 
 #define MCFG_SOUND_ROUTE(_output, _target, _gain) \
-	MCFG_SOUND_ROUTE_EX(_output, _target, _gain, 0)
+	MCFG_SOUND_ROUTE_EX(_output, _target, _gain, AUTO_ALLOC_INPUT)
 
 #define MCFG_SOUND_ROUTES_RESET() \
 	device_config_sound_interface::static_reset_routes(device); \
@@ -99,14 +99,13 @@ class sound_stream;
 class device_config_sound_interface : public device_config_interface
 {
 public:
-	// construction/destruction
-	device_config_sound_interface(const machine_config &mconfig, device_config &devconfig);
-	virtual ~device_config_sound_interface();
-
+	// sound route
 	class sound_route
 	{
 	public:
 		sound_route(int output, int input, float gain, const char *target);
+		
+		const sound_route *next() const { return m_next; }
 
 		sound_route *		m_next;				// pointer to next route
 		UINT32				m_output;			// output index, or ALL_OUTPUTS
@@ -115,19 +114,24 @@ public:
 		const char *		m_target;			// target tag
 	};
 
-	sound_route *		m_route_list;			// list of sound routes
+	// construction/destruction
+	device_config_sound_interface(const machine_config &mconfig, device_config &devconfig);
+	virtual ~device_config_sound_interface();
+
+	// getters
+	const sound_route *first_route() const { return m_route_list.first(); }
 
 	// static inline helpers
-	static void static_add_route(device_config *device, UINT32 output, const char *target, double gain, UINT32 input = 0);
+	static void static_add_route(device_config *device, UINT32 output, const char *target, double gain, UINT32 input = AUTO_ALLOC_INPUT);
 	static void static_reset_routes(device_config *device);
 
 protected:
 	// optional operation overrides
 	virtual bool interface_validity_check(const game_driver &driver) const;
 
-	void reset_routes();
+	// internal state
+	simple_list<sound_route> m_route_list;		// list of sound routes
 };
-
 
 
 // ======================> device_sound_interface
@@ -143,25 +147,27 @@ public:
 	const device_config_sound_interface &sound_config() const { return m_sound_config; }
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) = 0;
+
+	// helpers
+	int inputs() const;
+	int outputs() const;
+	sound_stream *input_to_stream_input(int inputnum, int &stream_inputnum);
+	sound_stream *output_to_stream_output(int outputnum, int &stream_outputnum);
+	void set_output_gain(int outputnum, float gain);
 
 protected:
 	// optional operation overrides
 	virtual void interface_pre_start();
 	virtual void interface_post_start();
-
-	struct sound_output
-	{
-		sound_stream *	stream;					// associated stream
-		int				output;					// output number
-	};
+	virtual void interface_pre_reset();
+	
+	// internal state
+	const device_config_sound_interface &m_sound_config;
 
 	int				m_outputs;					// number of outputs from this instance
-	sound_output	m_output[MAX_OUTPUTS];		// array of output information
-
-	const device_config_sound_interface &m_sound_config;
+	int				m_auto_allocated_inputs;	// number of auto-allocated inputs targeting us
 };
-
 
 
 #endif	/* __DISOUND_H__ */

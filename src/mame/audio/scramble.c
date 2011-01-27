@@ -85,7 +85,7 @@ WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w )
 	ttl7474_clock_w(target, (~data & 0x08) >> 3);
 
 	/* bit 4 is sound disable */
-	sound_global_enable(device->machine, (~data & 0x10) >> 4);
+	device->machine->sound().system_mute((data & 0x10) >> 4);
 }
 
 WRITE8_DEVICE_HANDLER( mrkougar_sh_irqtrigger_w )

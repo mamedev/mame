@@ -3465,7 +3465,6 @@
  *
  ************************************************************************/
 
-#include "streams.h"
 #include "wavwrite.h"
 
 /*************************************
@@ -4440,7 +4439,7 @@ public:
 
 	/* --------------------------------- */
 
-	virtual void update_to_current_time(void) const { stream_update(m_stream); }
+	virtual void update_to_current_time(void) const { m_stream->update(); }
 
 	sound_stream *get_stream(void) { return m_stream; }
 protected:

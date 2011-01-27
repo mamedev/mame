@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "streams.h"
 #include "includes/wiping.h"
 
 
@@ -180,7 +179,7 @@ static DEVICE_START( wiping_sound )
 	sound_channel *voice;
 
 	/* get stream channels */
-	state->stream = stream_create(device, 0, 1, samplerate, NULL, wiping_update_mono);
+	state->stream = device->machine->sound().stream_alloc(*device, 0, 1, samplerate, NULL, wiping_update_mono);
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
 	state->mixer_buffer = auto_alloc_array(machine, short, 2 * samplerate);
@@ -237,7 +236,7 @@ WRITE8_DEVICE_HANDLER( wiping_sound_w )
 	int base;
 
 	/* update the streams */
-	stream_update(state->stream);
+	state->stream->update();
 
 	/* set the register */
 	state->soundregs[offset] = data;

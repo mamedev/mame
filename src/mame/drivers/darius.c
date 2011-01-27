@@ -914,7 +914,7 @@ static MACHINE_RESET( darius )
 	state->adpcm_command = 0;
 	state->nmi_enable = 0;
 
-	sound_global_enable(machine, 1);	/* mixer enabled */
+	machine->sound().system_enable(true);	/* mixer enabled */
 
 	for (i = 0; i < DARIUS_VOL_MAX; i++)
 		state->vol[i] = 0x00;	/* min volume */
