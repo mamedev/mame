@@ -4748,6 +4748,7 @@ ROM_END
     Flash Point, Sega System 16B
     CPU: FD1094 (317-0127A)
     ROM Board: 171-5704
+    Sega ID# for ROM board: 834-7122-03
 
     Pos.   Silk        Type        Part         Pos.   Silk        Type        Part
 
