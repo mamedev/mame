@@ -31,8 +31,7 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *        videoram;
-	size_t         videoram_size;
+	UINT8 *        dotrikun_bitmap;
 
 	/* video-related */
 	UINT8          color;
@@ -48,39 +47,42 @@ public:
 static WRITE8_HANDLER( dotrikun_color_w )
 {
 	dotrikun_state *state = space->machine->driver_data<dotrikun_state>();
-	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
+	/*
+	x--- ---- screen color swap?
+	---- -x-- B
+	---- --x- G
+	---- ---x R
+	*/
+
 	state->color = data;
+	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 }
 
 
 static VIDEO_UPDATE( dotrikun )
 {
 	dotrikun_state *state = screen->machine->driver_data<dotrikun_state>();
-	int offs;
+	int x,y,i;
 
 	pen_t back_pen = MAKE_RGB(pal1bit(state->color >> 3), pal1bit(state->color >> 4), pal1bit(state->color >> 5));
 	pen_t fore_pen = MAKE_RGB(pal1bit(state->color >> 0), pal1bit(state->color >> 1), pal1bit(state->color >> 2));
 
-	for (offs = 0; offs < state->videoram_size; offs++)
+	for(y = (cliprect->min_y & ~1); y < cliprect->max_y; y+=2)
 	{
-		int i;
-		UINT8 data = state->videoram[offs];
-
-		UINT8 x = offs << 4;
-		UINT8 y = offs >> 4 << 1;
-
-		for (i = 0; i < 8; i++)
+		for (x = 0; x < 256; x+=16)
 		{
-			pen_t pen = (data & 0x80) ? fore_pen : back_pen;
+			UINT8 data = state->dotrikun_bitmap[((x/16)+((y/2)*16))];
 
-			/* I think the video hardware doubles pixels, screen would be too small otherwise */
-			*BITMAP_ADDR32(bitmap, y + 0, x + 0) = pen;
-			*BITMAP_ADDR32(bitmap, y + 0, x + 1) = pen;
-			*BITMAP_ADDR32(bitmap, y + 1, x + 0) = pen;
-			*BITMAP_ADDR32(bitmap, y + 1, x + 1) = pen;
+			for (i = 0; i < 8; i++)
+			{
+				pen_t pen = ((data >> (7 - i)) & 1) ? fore_pen : back_pen;
 
-			x = x + 2;
-			data = data << 1;
+				/* I think the video hardware doubles pixels, screen would be too small otherwise */
+				*BITMAP_ADDR32(bitmap, y + 0, (x + 0) + i*2) = pen;
+				*BITMAP_ADDR32(bitmap, y + 0, (x + 1) + i*2) = pen;
+				*BITMAP_ADDR32(bitmap, y + 1, (x + 0) + i*2) = pen;
+				*BITMAP_ADDR32(bitmap, y + 1, (x + 1) + i*2) = pen;
+			}
 		}
 	}
 
@@ -96,7 +98,8 @@ static VIDEO_UPDATE( dotrikun )
 
 static ADDRESS_MAP_START( dotrikun_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_SIZE_MEMBER(dotrikun_state, videoram, videoram_size)
+	AM_RANGE(0x8000, 0x85ff) AM_RAM AM_BASE_MEMBER(dotrikun_state, dotrikun_bitmap)
+	AM_RANGE(0x8600, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
@@ -143,11 +146,12 @@ static MACHINE_RESET( dotrikun )
 	state->color = 0;
 }
 
+#define MASTER_CLOCK XTAL_4MHz
 
 static MACHINE_CONFIG_START( dotrikun, dotrikun_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)		 /* 4 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)		 /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(dotrikun_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
@@ -159,11 +163,8 @@ static MACHINE_CONFIG_START( dotrikun, dotrikun_state )
 	MCFG_VIDEO_UPDATE(dotrikun)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK, 256+32, 0, 256, 192+32, 0, 192) // FIXME: h/v params of this are completely inaccurate, shows it especially under the "CRT test"
 
 	/* sound hardware */
 MACHINE_CONFIG_END
@@ -186,5 +187,5 @@ ROM_START( dotrikun2 )
 ROM_END
 
 
-GAME( 1990, dotrikun, 0,        dotrikun, dotrikun, 0, ROT0, "Sega", "Dottori Kun (new version)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-GAME( 1990, dotrikun2,dotrikun, dotrikun, dotrikun, 0, ROT0, "Sega", "Dottori Kun (old version)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+GAME( 1990, dotrikun, 0,        dotrikun, dotrikun, 0, ROT0, "Sega", "Dottori Kun (new version)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW | GAME_IMPERFECT_GRAPHICS )
+GAME( 1990, dotrikun2,dotrikun, dotrikun, dotrikun, 0, ROT0, "Sega", "Dottori Kun (old version)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW | GAME_IMPERFECT_GRAPHICS )
