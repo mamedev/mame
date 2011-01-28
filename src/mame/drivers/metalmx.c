@@ -390,7 +390,7 @@ static WRITE32_HANDLER( dsp32c_1_w )
 	else if (ACCESSING_BITS_16_31)
 		data >>= 16;
 
-	dsp32c_pio_w(state->dsp32c_1, offset, data);
+	state->dsp32c_1->pio_w(offset, data);
 }
 
 static READ32_HANDLER( dsp32c_1_r )
@@ -403,7 +403,7 @@ static READ32_HANDLER( dsp32c_1_r )
 	if (ACCESSING_BITS_0_15)
 		offset += 1;
 
-	data = dsp32c_pio_r(state->dsp32c_1, offset);
+	data = state->dsp32c_1->pio_r(offset);
 
 	if (ACCESSING_BITS_16_31)
 		data <<= 16;
@@ -422,7 +422,7 @@ static WRITE32_HANDLER( dsp32c_2_w )
 	else if (ACCESSING_BITS_16_31)
 		data >>= 16;
 
-	dsp32c_pio_w(state->dsp32c_2, offset, data);
+	state->dsp32c_2->pio_w(offset, data);
 }
 
 static READ32_HANDLER( dsp32c_2_r )
@@ -435,7 +435,7 @@ static READ32_HANDLER( dsp32c_2_r )
 	if (ACCESSING_BITS_0_15)
 		offset += 1;
 
-	data = dsp32c_pio_r(state->dsp32c_2, offset);
+	data = state->dsp32c_2->pio_r(offset);
 
 	if (ACCESSING_BITS_16_31)
 		data <<= 16;

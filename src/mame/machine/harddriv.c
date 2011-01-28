@@ -1372,11 +1372,11 @@ WRITE16_HANDLER( hd68k_ds3_program_w )
  *
  *************************************/
 
-void hddsk_update_pif(device_t *device, UINT32 pins)
+void hddsk_update_pif(dsp32c_device &device, UINT32 pins)
 {
-	atarigen_state *atarigen = device->machine->driver_data<atarigen_state>();
+	atarigen_state *atarigen = device.machine->driver_data<atarigen_state>();
 	atarigen->sound_int_state = ((pins & DSP32_OUTPUT_PIF) != 0);
-	hd68k_update_interrupts(device->machine);
+	hd68k_update_interrupts(device.machine);
 }
 
 
@@ -1481,7 +1481,7 @@ WRITE16_HANDLER( hd68k_dsk_dsp32_w )
 {
 	harddriv_state *state = space->machine->driver_data<harddriv_state>();
 	state->dsk_pio_access = TRUE;
-	dsp32c_pio_w(state->dsp32, offset, data);
+	state->dsp32->pio_w(offset, data);
 	state->dsk_pio_access = FALSE;
 }
 
@@ -1491,7 +1491,7 @@ READ16_HANDLER( hd68k_dsk_dsp32_r )
 	harddriv_state *state = space->machine->driver_data<harddriv_state>();
 	UINT16 result;
 	state->dsk_pio_access = TRUE;
-	result = dsp32c_pio_r(state->dsp32, offset);
+	result = state->dsp32->pio_r(offset);
 	state->dsk_pio_access = FALSE;
 	return result;
 }

@@ -168,6 +168,9 @@ adsp21xx_device_config::adsp21xx_device_config(const machine_config &mconfig, de
 	  m_data_config("data", ENDIANNESS_LITTLE, 16, 14, -1),
 	  m_chip_type(chiptype)
 {
+	m_sport_rx_callback = NULL;
+	m_sport_tx_callback = NULL;
+	m_timer_fired = NULL;
 }
 
 adsp2100_device_config::adsp2100_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)

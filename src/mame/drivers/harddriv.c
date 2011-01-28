@@ -1258,7 +1258,7 @@ static MACHINE_CONFIG_FRAGMENT( dsk )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("dsp32", DSP32C, 40000000)
-	MCFG_CPU_CONFIG(dsp32c_config)
+	MCFG_DSP32C_CONFIG(dsp32c_config)
 	MCFG_CPU_PROGRAM_MAP(dsk_dsp32_map)
 
 	/* ASIC65 */
@@ -1271,7 +1271,7 @@ static MACHINE_CONFIG_FRAGMENT( dsk2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("dsp32", DSP32C, 40000000)
-	MCFG_CPU_CONFIG(dsp32c_config)
+	MCFG_DSP32C_CONFIG(dsp32c_config)
 	MCFG_CPU_PROGRAM_MAP(dsk2_dsp32_map)
 
 	/* ASIC65 */

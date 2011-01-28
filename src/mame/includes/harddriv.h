@@ -35,7 +35,7 @@ public:
 	optional_device<cpu_device> soundcpu;
 	optional_device<cpu_device> sounddsp;
 	optional_device<cpu_device> jsacpu;
-	optional_device<cpu_device> dsp32;
+	optional_device<dsp32c_device> dsp32;
 	optional_device<adsp2105_device> ds4cpu1;
 	optional_device<adsp2105_device> ds4cpu2;
 
@@ -254,7 +254,7 @@ READ16_HANDLER( hd68k_ds3_program_r );
 WRITE16_HANDLER( hd68k_ds3_program_w );
 
 /* DSK board */
-void hddsk_update_pif(device_t *device, UINT32 pins);
+void hddsk_update_pif(dsp32c_device &device, UINT32 pins);
 WRITE16_HANDLER( hd68k_dsk_control_w );
 READ16_HANDLER( hd68k_dsk_ram_r );
 WRITE16_HANDLER( hd68k_dsk_ram_w );

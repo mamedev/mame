@@ -2,47 +2,77 @@
 
     dsp32ops.c
     Core implementation for the portable DSP32 emulator.
-    Written by Aaron Giles
 
-***************************************************************************/
+****************************************************************************
+
+    Copyright Aaron Giles
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+****************************************************************************/
 
 
 
-/***************************************************************************
-    COMPILE-TIME OPTIONS
-***************************************************************************/
+//**************************************************************************
+//  COMPILE-TIME OPTIONS
+//**************************************************************************
 
-/* these defined latencies are a pain to implement, but are necessary */
+// these defined latencies are a pain to implement, but are necessary
 #define EMULATE_MEMORY_LATENCY		(1)
 #define EMULATE_MULTIPLIER_LATENCY	(1)
 #define EMULATE_AFLAGS_LATENCY		(1)
 
-/* these optimizations should have some effect, but they don't really, so */
-/* leave them off */
+// these optimizations should have some effect, but they don't really, so
+// leave them off
 #define IGNORE_DAU_UV_FLAGS			(0)
 #define ASSUME_WRITEABLE			(0)
 #define ASSUME_UNCONDITIONAL_CAU	(0)
 
 
 
-/***************************************************************************
-    MACROS
-***************************************************************************/
+//**************************************************************************
+//  MACROS
+//**************************************************************************
 
-#define SET_V_16(cs,a,b,r)		(cs)->vflags = (((a) ^ (b) ^ (r) ^ ((r) >> 1)) << 8)
-#define SET_NZC_16(cs,r)		(cs)->nzcflags = ((r) << 8)
-#define SET_NZCV_16(cs,a,b,r)	SET_NZC_16(cs,r); SET_V_16(cs,a,b,r)
-#define SET_NZ00_16(cs,r)		(cs)->nzcflags = (((r) << 8) & 0xffffff); (cs)->vflags = 0
+#define SET_V_16(a,b,r)			m_vflags = (((a) ^ (b) ^ (r) ^ ((r) >> 1)) << 8)
+#define SET_NZC_16(r)			m_nzcflags = ((r) << 8)
+#define SET_NZCV_16(a,b,r)		SET_NZC_16(r); SET_V_16(a,b,r)
+#define SET_NZ00_16(r)			m_nzcflags = (((r) << 8) & 0xffffff); m_vflags = 0
 
-#define SET_V_24(cs,a,b,r)		(cs)->vflags = ((a) ^ (b) ^ (r) ^ ((r) >> 1))
-#define SET_NZC_24(cs,r)		(cs)->nzcflags = (r)
-#define SET_NZCV_24(cs,a,b,r)	SET_NZC_24(cs,r); SET_V_24(cs,a,b,r)
-#define SET_NZ00_24(cs,r)		(cs)->nzcflags = ((r) & 0xffffff); (cs)->vflags = 0
+#define SET_V_24(a,b,r)			m_vflags = ((a) ^ (b) ^ (r) ^ ((r) >> 1))
+#define SET_NZC_24(r)			m_nzcflags = (r)
+#define SET_NZCV_24(a,b,r)		SET_NZC_24(r); SET_V_24(a,b,r)
+#define SET_NZ00_24(r)			m_nzcflags = ((r) & 0xffffff); m_vflags = 0
 
 #define TRUNCATE24(a)			((a) & 0xffffff)
 #define EXTEND16_TO_24(a)		TRUNCATE24((INT32)(INT16)(a))
-#define REG16(cs,a)				((UINT16)(cs)->r[a])
-#define REG24(cs,a)				((cs)->r[a])
+#define REG16(a)				((UINT16)m_r[a])
+#define REG24(a)				(m_r[a])
 
 #define WRITEABLE_REGS			(0x6f3efffe)
 #if ASSUME_WRITEABLE
@@ -52,272 +82,264 @@
 #endif
 
 #if ASSUME_UNCONDITIONAL_CAU
-#define CONDITION_IS_TRUE(cs)	(1)
+#define CONDITION_IS_TRUE()		(1)
 #else
-#define CONDITION_IS_TRUE(cs)	(!(op & 0x400) || (condition(cs, (op >> 12) & 15)))
+#define CONDITION_IS_TRUE()		(!(op & 0x400) || (condition((op >> 12) & 15)))
 #endif
 
 #if EMULATE_MEMORY_LATENCY
-#define WWORD_DEFERRED(cs,a,v)	do { int bufidx = (cs)->mbuf_index & 3; (cs)->mbufaddr[bufidx] = -(a); (cs)->mbufdata[bufidx] = (v); } while (0)
-#define WLONG_DEFERRED(cs,a,v)	do { int bufidx = (cs)->mbuf_index & 3; (cs)->mbufaddr[bufidx] = (a); (cs)->mbufdata[bufidx] = (v); } while (0)
-#define PROCESS_DEFERRED_MEMORY(cs) 									\
-	if ((cs)->mbufaddr[++(cs)->mbuf_index & 3] != 1)					\
+#define WWORD_DEFERRED(a,v)		do { int bufidx = m_mbuf_index & 3; m_mbufaddr[bufidx] = -(a); m_mbufdata[bufidx] = (v); } while (0)
+#define WLONG_DEFERRED(a,v)		do { int bufidx = m_mbuf_index & 3; m_mbufaddr[bufidx] = (a); m_mbufdata[bufidx] = (v); } while (0)
+#define PROCESS_DEFERRED_MEMORY() 									\
+	if (m_mbufaddr[++m_mbuf_index & 3] != 1)					\
 	{																	\
-		int bufidx = (cs)->mbuf_index & 3;								\
-		if ((cs)->mbufaddr[bufidx] >= 0)								\
-			WLONG(cs, (cs)->mbufaddr[bufidx], (cs)->mbufdata[bufidx]);	\
+		int bufidx = m_mbuf_index & 3;								\
+		if (m_mbufaddr[bufidx] >= 0)								\
+			WLONG(m_mbufaddr[bufidx], m_mbufdata[bufidx]);	\
 		else															\
-			WWORD(cs, -(cs)->mbufaddr[bufidx], (cs)->mbufdata[bufidx]);	\
-		(cs)->mbufaddr[bufidx] = 1;										\
+			WWORD(-m_mbufaddr[bufidx], m_mbufdata[bufidx]);	\
+		m_mbufaddr[bufidx] = 1;										\
 	}
 #else
-#define WWORD_DEFERRED(cs,a,v)	WWORD(cs,a,v)
-#define WLONG_DEFERRED(cs,a,v)	WLONG(cs,a,v)
-#define PROCESS_DEFERRED_MEMORY(cs)
+#define WWORD_DEFERRED(a,v)	WWORD(a,v)
+#define WLONG_DEFERRED(a,v)	WLONG(a,v)
+#define PROCESS_DEFERRED_MEMORY()
 #endif
 
 #if EMULATE_MULTIPLIER_LATENCY
-#define DEFERRED_MULTIPLIER(cs,x)	dau_get_amult(cs, x)
+#define DEFERRED_MULTIPLIER(x)	dau_get_amult(x)
 #else
-#define DEFERRED_MULTIPLIER(cs,x)	(cs)->a[x]
+#define DEFERRED_MULTIPLIER(x)	m_a[x]
 #endif
 
 #if EMULATE_AFLAGS_LATENCY
-#define DEFERRED_NZFLAGS(cs)	dau_get_anzflags(cs)
-#define DEFERRED_VUFLAGS(cs)	dau_get_avuflags(cs)
+#define DEFERRED_NZFLAGS()	dau_get_anzflags()
+#define DEFERRED_VUFLAGS()	dau_get_avuflags()
 #else
-#define DEFERRED_NZFLAGS(cs)	(cs)->NZflags
-#define DEFERRED_VUFLAGS(cs)	(cs)->VUflags
+#define DEFERRED_NZFLAGS()	m_NZflags
+#define DEFERRED_VUFLAGS()	m_VUflags
 #endif
 
 
 
-/***************************************************************************
-    FORWARD DECLARATIONS
-***************************************************************************/
+//**************************************************************************
+//  TYPEDEFS
+//**************************************************************************
 
-extern void (*const dsp32ops[])(dsp32_state *cpustate, UINT32 op);
-
-
-
-/***************************************************************************
-    TYPEDEFS
-***************************************************************************/
-
-typedef union int_double
+union int_double
 {
 	double d;
 	UINT32 i[2];
-} int_double;
+};
 
 
 
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
+//**************************************************************************
+//  IMPLEMENTATION
+//**************************************************************************
 
-static void illegal(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::illegal(UINT32 op)
 {
 }
 
 
-static void unimplemented(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::unimplemented(UINT32 op)
 {
-    fatalerror("Unimplemented op @ %06X: %08X (dis=%02X, tbl=%03X)", cpustate->PC - 4, op, op >> 25, op >> 21);
+    fatalerror("Unimplemented op @ %06X: %08X (dis=%02X, tbl=%03X)", PC - 4, op, op >> 25, op >> 21);
 }
 
 
-INLINE void execute_one(dsp32_state *cpustate)
+inline void dsp32c_device::execute_one()
 {
 	UINT32 op;
 
-	PROCESS_DEFERRED_MEMORY(cpustate);
-	debugger_instruction_hook(cpustate->device, cpustate->PC);
-	op = ROPCODE(cpustate, cpustate->PC);
-	cpustate->icount -= 4;	/* 4 clocks per cycle */
-	cpustate->PC += 4;
+	PROCESS_DEFERRED_MEMORY();
+	debugger_instruction_hook(this, PC);
+	op = ROPCODE(PC);
+	m_icount -= 4;	// 4 clocks per cycle
+	PC += 4;
 	if (op)
-		(*dsp32ops[op >> 21])(cpustate, op);
+		(this->*s_dsp32ops[op >> 21])(op);
 }
 
 
 
-/***************************************************************************
-    CAU HELPERS
-***************************************************************************/
+//**************************************************************************
+//  CAU HELPERS
+//**************************************************************************
 
-static UINT32 cau_read_pi_special(dsp32_state *cpustate, UINT8 i)
+UINT32 dsp32c_device::cau_read_pi_special(UINT8 i)
 {
 	switch (i)
 	{
-		case 4:		return cpustate->ibuf;
-		case 5:		return cpustate->obuf;
-		case 6:		update_pcr(cpustate, cpustate->pcr & ~PCR_PDFs); return cpustate->pdr;
-		case 14:	return cpustate->piop;
-		case 20:	return cpustate->pdr2;
-		case 22:	update_pcr(cpustate, cpustate->pcr & ~PCR_PIFs); return cpustate->pir;
-		case 30:	return cpustate->pcw;
+		case 4:		return m_ibuf;
+		case 5:		return m_obuf;
+		case 6:		update_pcr(m_pcr & ~PCR_PDFs); return m_pdr;
+		case 14:	return m_piop;
+		case 20:	return m_pdr2;
+		case 22:	update_pcr(m_pcr & ~PCR_PIFs); return m_pir;
+		case 30:	return m_pcw;
 		default:	fprintf(stderr, "Unimplemented CAU PI read = %X\n", i);
 	}
 	return 0;
 }
 
 
-static void cau_write_pi_special(dsp32_state *cpustate, UINT8 i, UINT32 val)
+void dsp32c_device::cau_write_pi_special(UINT8 i, UINT32 val)
 {
 	switch (i)
 	{
-		case 4:		cpustate->ibuf = val;	break;
-		case 5:		cpustate->obuf = val;	break;
-		case 6:		cpustate->pdr = val; update_pcr(cpustate, cpustate->pcr | PCR_PDFs); break;
-		case 14:	cpustate->piop = val;	break;
-		case 20:	cpustate->pdr2 = val;	break;
-		case 22:	cpustate->pir = val; update_pcr(cpustate, cpustate->pcr | PCR_PIFs); break;
-		case 30:	cpustate->pcw = val;	break;
+		case 4:		m_ibuf = val;	break;
+		case 5:		m_obuf = val;	break;
+		case 6:		m_pdr = val; update_pcr(m_pcr | PCR_PDFs); break;
+		case 14:	m_piop = val;	break;
+		case 20:	m_pdr2 = val;	break;
+		case 22:	m_pir = val; update_pcr(m_pcr | PCR_PIFs); break;
+		case 30:	m_pcw = val;	break;
 		default:	fprintf(stderr, "Unimplemented CAU PI write = %X\n", i);
 	}
 }
 
 
-INLINE UINT8 cau_read_pi_1byte(dsp32_state *cpustate, int pi)
+inline UINT8 dsp32c_device::cau_read_pi_1byte(int pi)
 {
 	int p = (pi >> 5) & 0x1f;
 	int i = (pi >> 0) & 0x1f;
 	if (p)
 	{
-		UINT32 result = RBYTE(cpustate, cpustate->r[p]);
-		cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i]);
+		UINT32 result = RBYTE(m_r[p]);
+		m_r[p] = TRUNCATE24(m_r[p] + m_r[i]);
 		return result;
 	}
 	else
-		return cau_read_pi_special(cpustate, i);
+		return cau_read_pi_special(i);
 }
 
 
-INLINE UINT16 cau_read_pi_2byte(dsp32_state *cpustate, int pi)
+inline UINT16 dsp32c_device::cau_read_pi_2byte(int pi)
 {
 	int p = (pi >> 5) & 0x1f;
 	int i = (pi >> 0) & 0x1f;
 	if (p)
 	{
-		UINT32 result = RWORD(cpustate, cpustate->r[p]);
+		UINT32 result = RWORD(m_r[p]);
 		if (i < 22 || i > 23)
-			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i]);
+			m_r[p] = TRUNCATE24(m_r[p] + m_r[i]);
 		else
-			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i] * 2);
+			m_r[p] = TRUNCATE24(m_r[p] + m_r[i] * 2);
 		return result;
 	}
 	else
-		return cau_read_pi_special(cpustate, i);
+		return cau_read_pi_special(i);
 }
 
 
-INLINE UINT32 cau_read_pi_4byte(dsp32_state *cpustate, int pi)
+inline UINT32 dsp32c_device::cau_read_pi_4byte(int pi)
 {
 	int p = (pi >> 5) & 0x1f;
 	int i = (pi >> 0) & 0x1f;
 	if (p)
 	{
-		UINT32 result = RLONG(cpustate, cpustate->r[p]);
+		UINT32 result = RLONG(m_r[p]);
 		if (i < 22 || i > 23)
-			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i]);
+			m_r[p] = TRUNCATE24(m_r[p] + m_r[i]);
 		else
-			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i] * 4);
+			m_r[p] = TRUNCATE24(m_r[p] + m_r[i] * 4);
 		return result;
 	}
 	else
-		return cau_read_pi_special(cpustate, i);
+		return cau_read_pi_special(i);
 }
 
 
-INLINE void cau_write_pi_1byte(dsp32_state *cpustate, int pi, UINT8 val)
+inline void dsp32c_device::cau_write_pi_1byte(int pi, UINT8 val)
 {
 	int p = (pi >> 5) & 0x1f;
 	int i = (pi >> 0) & 0x1f;
 	if (p)
 	{
-		WBYTE(cpustate, cpustate->r[p], val);
-		cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i]);
+		WBYTE(m_r[p], val);
+		m_r[p] = TRUNCATE24(m_r[p] + m_r[i]);
 	}
 	else
-		cau_write_pi_special(cpustate, i, val);
+		cau_write_pi_special(i, val);
 }
 
 
-INLINE void cau_write_pi_2byte(dsp32_state *cpustate, int pi, UINT16 val)
+inline void dsp32c_device::cau_write_pi_2byte(int pi, UINT16 val)
 {
 	int p = (pi >> 5) & 0x1f;
 	int i = (pi >> 0) & 0x1f;
 	if (p)
 	{
-		WWORD(cpustate, cpustate->r[p], val);
+		WWORD(m_r[p], val);
 		if (i < 22 || i > 23)
-			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i]);
+			m_r[p] = TRUNCATE24(m_r[p] + m_r[i]);
 		else
-			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i] * 2);
+			m_r[p] = TRUNCATE24(m_r[p] + m_r[i] * 2);
 	}
 	else
-		cau_write_pi_special(cpustate, i, val);
+		cau_write_pi_special(i, val);
 }
 
 
-INLINE void cau_write_pi_4byte(dsp32_state *cpustate, int pi, UINT32 val)
+inline void dsp32c_device::cau_write_pi_4byte(int pi, UINT32 val)
 {
 	int p = (pi >> 5) & 0x1f;
 	int i = (pi >> 0) & 0x1f;
 	if (p)
 	{
-		WLONG(cpustate, cpustate->r[p], (INT32)(val << 8) >> 8);
+		WLONG(m_r[p], (INT32)(val << 8) >> 8);
 		if (i < 22 || i > 23)
-			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i]);
+			m_r[p] = TRUNCATE24(m_r[p] + m_r[i]);
 		else
-			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i] * 4);
+			m_r[p] = TRUNCATE24(m_r[p] + m_r[i] * 4);
 	}
 	else
-		cau_write_pi_special(cpustate, i, val);
+		cau_write_pi_special(i, val);
 }
 
 
 
-/***************************************************************************
-    DAU HELPERS
-***************************************************************************/
+//**************************************************************************
+//  DAU HELPERS
+//**************************************************************************
 
-INLINE double dau_get_amult(dsp32_state *cpustate, int aidx)
+inline double dsp32c_device::dau_get_amult(int aidx)
 {
-	int bufidx = (cpustate->abuf_index - 1) & 3;
-	double val = cpustate->a[aidx];
-	while (cpustate->icount >= cpustate->abufcycle[bufidx] - 2 * 4)
+	int bufidx = (m_abuf_index - 1) & 3;
+	double val = m_a[aidx];
+	while (m_icount >= m_abufcycle[bufidx] - 2 * 4)
 	{
-		if (cpustate->abufreg[bufidx] == aidx)
-			val = cpustate->abuf[bufidx];
+		if (m_abufreg[bufidx] == aidx)
+			val = m_abuf[bufidx];
 		bufidx = (bufidx - 1) & 3;
 	}
 	return val;
 }
 
 
-INLINE double dau_get_anzflags(dsp32_state *cpustate)
+inline double dsp32c_device::dau_get_anzflags()
 {
-	int bufidx = (cpustate->abuf_index - 1) & 3;
-	double nzflags = cpustate->NZflags;
-	while (cpustate->icount >= cpustate->abufcycle[bufidx] - 3 * 4)
+	int bufidx = (m_abuf_index - 1) & 3;
+	double nzflags = m_NZflags;
+	while (m_icount >= m_abufcycle[bufidx] - 3 * 4)
 	{
-		nzflags = cpustate->abufNZflags[bufidx];
+		nzflags = m_abufNZflags[bufidx];
 		bufidx = (bufidx - 1) & 3;
 	}
 	return nzflags;
 }
 
 
-INLINE UINT8 dau_get_avuflags(dsp32_state *cpustate)
+inline UINT8 dsp32c_device::dau_get_avuflags()
 {
 #if (!IGNORE_DAU_UV_FLAGS)
-	int bufidx = (cpustate->abuf_index - 1) & 3;
-	UINT8 vuflags = cpustate->VUflags;
-	while (cpustate->icount >= cpustate->abufcycle[bufidx] - 3 * 4)
+	int bufidx = (m_abuf_index - 1) & 3;
+	UINT8 vuflags = m_VUflags;
+	while (m_icount >= m_abufcycle[bufidx] - 3 * 4)
 	{
-		vuflags = cpustate->abufVUflags[bufidx];
+		vuflags = m_abufVUflags[bufidx];
 		bufidx = (bufidx - 1) & 3;
 	}
 	return vuflags;
@@ -327,56 +349,56 @@ INLINE UINT8 dau_get_avuflags(dsp32_state *cpustate)
 }
 
 
-INLINE void remember_last_dau(dsp32_state *cpustate, int aidx)
+inline void dsp32c_device::remember_last_dau(int aidx)
 {
 #if (EMULATE_MULTIPLIER_LATENCY || EMULATE_AFLAGS_LATENCY)
-	int bufidx = cpustate->abuf_index++ & 3;
-	cpustate->abuf[bufidx] = cpustate->a[aidx];
-	cpustate->abufreg[bufidx] = aidx;
-	cpustate->abufNZflags[bufidx] = cpustate->NZflags;
+	int bufidx = m_abuf_index++ & 3;
+	m_abuf[bufidx] = m_a[aidx];
+	m_abufreg[bufidx] = aidx;
+	m_abufNZflags[bufidx] = m_NZflags;
 #if (!IGNORE_DAU_UV_FLAGS)
-	cpustate->abufVUflags[bufidx] = cpustate->VUflags;
+	m_abufVUflags[bufidx] = m_VUflags;
 #endif
-	cpustate->abufcycle[bufidx] = cpustate->icount;
+	m_abufcycle[bufidx] = m_icount;
 #endif
 }
 
 
-INLINE void dau_set_val_noflags(dsp32_state *cpustate, int aidx, double res)
+inline void dsp32c_device::dau_set_val_noflags(int aidx, double res)
 {
-	remember_last_dau(cpustate, aidx);
-	cpustate->a[aidx] = res;
+	remember_last_dau(aidx);
+	m_a[aidx] = res;
 }
 
 
-INLINE void dau_set_val_flags(dsp32_state *cpustate, int aidx, double res)
+inline void dsp32c_device::dau_set_val_flags(int aidx, double res)
 {
-	remember_last_dau(cpustate, aidx);
+	remember_last_dau(aidx);
 #if (!IGNORE_DAU_UV_FLAGS)
 {
 	double absres = (res < 0) ? -res : res;
-	cpustate->VUflags = 0;
+	m_VUflags = 0;
 	if (absres < 5.87747e-39)
 	{
 		if (absres != 0)
-			cpustate->VUflags = UFLAGBIT;
+			m_VUflags = UFLAGBIT;
 		res = 0.0;
 	}
 	else if (absres > 3.40282e38)
 	{
-		cpustate->VUflags = VFLAGBIT;
+		m_VUflags = VFLAGBIT;
 //      debugger_break(Machine);
 //      fprintf(stderr, "Result = %g\n", absres);
 		res = (res < 0) ? -3.40282e38 : 3.40282e38;
 	}
 }
 #endif
-	cpustate->NZflags = res;
-	cpustate->a[aidx] = res;
+	m_NZflags = res;
+	m_a[aidx] = res;
 }
 
 
-INLINE double dsp_to_double(UINT32 val)
+inline double dsp32c_device::dsp_to_double(UINT32 val)
 {
 	int_double id;
 
@@ -399,7 +421,7 @@ INLINE double dsp_to_double(UINT32 val)
 }
 
 
-INLINE UINT32 double_to_dsp(double val)
+inline UINT32 dsp32c_device::double_to_dsp(double val)
 {
 	int mantissa, exponent;
 	int_double id;
@@ -425,183 +447,181 @@ INLINE UINT32 double_to_dsp(double val)
 }
 
 
-static double dau_read_pi_special(dsp32_state *cpustate, int i)
+double dsp32c_device::dau_read_pi_special(int i)
 {
     fatalerror("Unimplemented dau_read_pi_special(%d)", i);
 	return 0;
 }
 
 
-static void dau_write_pi_special(dsp32_state *cpustate, int i, double val)
+void dsp32c_device::dau_write_pi_special(int i, double val)
 {
     fatalerror("Unimplemented dau_write_pi_special(%d)", i);
 }
 
 
-static int lastp;
-
-INLINE double dau_read_pi_double_1st(dsp32_state *cpustate, int pi, int multiplier)
+inline double dsp32c_device::dau_read_pi_double_1st(int pi, int multiplier)
 {
 	int p = (pi >> 3) & 15;
 	int i = (pi >> 0) & 7;
 
-	lastp = p;
+	m_lastp = p;
 	if (p)
 	{
-		UINT32 result = RLONG(cpustate, cpustate->r[p]);
+		UINT32 result = RLONG(m_r[p]);
 		if (i < 6)
-			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i+16]);
+			m_r[p] = TRUNCATE24(m_r[p] + m_r[i+16]);
 		else
-			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i+16] * 4);
+			m_r[p] = TRUNCATE24(m_r[p] + m_r[i+16] * 4);
 		return dsp_to_double(result);
 	}
 	else if (i < 4)
-		return multiplier ? DEFERRED_MULTIPLIER(cpustate, i) : cpustate->a[i];
+		return multiplier ? DEFERRED_MULTIPLIER(i) : m_a[i];
 	else
-		return dau_read_pi_special(cpustate, i);
+		return dau_read_pi_special(i);
 }
 
 
-INLINE double dau_read_pi_double_2nd(dsp32_state *cpustate, int pi, int multiplier, double xval)
+inline double dsp32c_device::dau_read_pi_double_2nd(int pi, int multiplier, double xval)
 {
 	int p = (pi >> 3) & 15;
 	int i = (pi >> 0) & 7;
 
-	if (p == 15) p = lastp;		/* P=15 means Z inherits from Y, Y inherits from X */
-	lastp = p;
+	if (p == 15) p = m_lastp;		// P=15 means Z inherits from Y, Y inherits from X
+	m_lastp = p;
 	if (p)
 	{
 		UINT32 result;
-		result = RLONG(cpustate, cpustate->r[p]);
+		result = RLONG(m_r[p]);
 		if (i < 6)
-			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i+16]);
+			m_r[p] = TRUNCATE24(m_r[p] + m_r[i+16]);
 		else
-			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i+16] * 4);
+			m_r[p] = TRUNCATE24(m_r[p] + m_r[i+16] * 4);
 		return dsp_to_double(result);
 	}
 	else if (i < 4)
-		return multiplier ? DEFERRED_MULTIPLIER(cpustate, i) : cpustate->a[i];
+		return multiplier ? DEFERRED_MULTIPLIER(i) : m_a[i];
 	else
-		return dau_read_pi_special(cpustate, i);
+		return dau_read_pi_special(i);
 }
 
 
-INLINE UINT32 dau_read_pi_4bytes(dsp32_state *cpustate, int pi)
+inline UINT32 dsp32c_device::dau_read_pi_4bytes(int pi)
 {
 	int p = (pi >> 3) & 15;
 	int i = (pi >> 0) & 7;
 
-	lastp = p;
+	m_lastp = p;
 	if (p)
 	{
-		UINT32 result = RLONG(cpustate, cpustate->r[p]);
+		UINT32 result = RLONG(m_r[p]);
 		if (i < 6)
-			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i+16]);
+			m_r[p] = TRUNCATE24(m_r[p] + m_r[i+16]);
 		else
-			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i+16] * 4);
+			m_r[p] = TRUNCATE24(m_r[p] + m_r[i+16] * 4);
 		return result;
 	}
 	else if (i < 4)
-		return double_to_dsp(cpustate->a[i]);
+		return double_to_dsp(m_a[i]);
 	else
-		return dau_read_pi_special(cpustate, i);
+		return dau_read_pi_special(i);
 }
 
 
-INLINE UINT16 dau_read_pi_2bytes(dsp32_state *cpustate, int pi)
+inline UINT16 dsp32c_device::dau_read_pi_2bytes(int pi)
 {
 	int p = (pi >> 3) & 15;
 	int i = (pi >> 0) & 7;
 
-	lastp = p;
+	m_lastp = p;
 	if (p)
 	{
-		UINT32 result = RWORD(cpustate, cpustate->r[p]);
+		UINT32 result = RWORD(m_r[p]);
 		if (i < 6)
-			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i+16]);
+			m_r[p] = TRUNCATE24(m_r[p] + m_r[i+16]);
 		else
-			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i+16] * 2);
+			m_r[p] = TRUNCATE24(m_r[p] + m_r[i+16] * 2);
 		return result;
 	}
 	else if (i < 4)
-		return double_to_dsp(cpustate->a[i]);
+		return double_to_dsp(m_a[i]);
 	else
-		return dau_read_pi_special(cpustate, i);
+		return dau_read_pi_special(i);
 }
 
 
-INLINE void dau_write_pi_double(dsp32_state *cpustate, int pi, double val)
+inline void dsp32c_device::dau_write_pi_double(int pi, double val)
 {
 	int p = (pi >> 3) & 15;
 	int i = (pi >> 0) & 7;
 
-	if (p == 15) p = lastp;		/* P=15 means Z inherits from Y, Y inherits from X */
+	if (p == 15) p = m_lastp;		// P=15 means Z inherits from Y, Y inherits from X
 	if (p)
 	{
-		WLONG_DEFERRED(cpustate, cpustate->r[p], double_to_dsp(val));
+		WLONG_DEFERRED(m_r[p], double_to_dsp(val));
 		if (i < 6)
-			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i+16]);
+			m_r[p] = TRUNCATE24(m_r[p] + m_r[i+16]);
 		else
-			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i+16] * 4);
+			m_r[p] = TRUNCATE24(m_r[p] + m_r[i+16] * 4);
 	}
 	else if (i < 4)
-		dau_set_val_noflags(cpustate, i, val);
+		dau_set_val_noflags(i, val);
 	else
-		dau_write_pi_special(cpustate, i, val);
+		dau_write_pi_special(i, val);
 }
 
 
-INLINE void dau_write_pi_4bytes(dsp32_state *cpustate, int pi, UINT32 val)
+inline void dsp32c_device::dau_write_pi_4bytes(int pi, UINT32 val)
 {
 	int p = (pi >> 3) & 15;
 	int i = (pi >> 0) & 7;
 
-	if (p == 15) p = lastp;		/* P=15 means Z inherits from Y, Y inherits from X */
+	if (p == 15) p = m_lastp;		// P=15 means Z inherits from Y, Y inherits from X
 	if (p)
 	{
-		lastp = p;
-		WLONG_DEFERRED(cpustate, cpustate->r[p], val);
+		m_lastp = p;
+		WLONG_DEFERRED(m_r[p], val);
 		if (i < 6)
-			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i+16]);
+			m_r[p] = TRUNCATE24(m_r[p] + m_r[i+16]);
 		else
-			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i+16] * 4);
+			m_r[p] = TRUNCATE24(m_r[p] + m_r[i+16] * 4);
 	}
 	else if (i < 4)
-		dau_set_val_noflags(cpustate, i, dsp_to_double(val));
+		dau_set_val_noflags(i, dsp_to_double(val));
 	else
-		dau_write_pi_special(cpustate, i, val);
+		dau_write_pi_special(i, val);
 }
 
 
-INLINE void dau_write_pi_2bytes(dsp32_state *cpustate, int pi, UINT16 val)
+inline void dsp32c_device::dau_write_pi_2bytes(int pi, UINT16 val)
 {
 	int p = (pi >> 3) & 15;
 	int i = (pi >> 0) & 7;
 
-	if (p == 15) p = lastp;		/* P=15 means Z inherits from Y, Y inherits from X */
+	if (p == 15) p = m_lastp;		// P=15 means Z inherits from Y, Y inherits from X
 	if (p)
 	{
-		lastp = p;
-		WWORD_DEFERRED(cpustate, cpustate->r[p], val);
+		m_lastp = p;
+		WWORD_DEFERRED(m_r[p], val);
 		if (i < 6)
-			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i+16]);
+			m_r[p] = TRUNCATE24(m_r[p] + m_r[i+16]);
 		else
-			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i+16] * 2);
+			m_r[p] = TRUNCATE24(m_r[p] + m_r[i+16] * 2);
 	}
 	else if (i < 4)
-		dau_set_val_noflags(cpustate, i, dsp_to_double(val << 16));
+		dau_set_val_noflags(i, dsp_to_double(val << 16));
 	else
-		dau_write_pi_special(cpustate, i, val);
+		dau_write_pi_special(i, val);
 }
 
 
 
-/***************************************************************************
-    COMMON CONDITION ROUTINE
-***************************************************************************/
+//**************************************************************************
+//  COMMON CONDITION ROUTINE
+//**************************************************************************
 
 #if (!ASSUME_UNCONDITIONAL_CAU)
-static int condition(dsp32_state *cpustate, int cond)
+int dsp32c_device::condition(int cond)
 {
 	switch (cond)
 	{
@@ -639,42 +659,42 @@ static int condition(dsp32_state *cpustate, int cond)
 			return (cFLAG | zFLAG);
 
 		case 16:
-			return !(DEFERRED_VUFLAGS(cpustate) & UFLAGBIT);
+			return !(DEFERRED_VUFLAGS() & UFLAGBIT);
 		case 17:
-			return (DEFERRED_VUFLAGS(cpustate) & UFLAGBIT);
+			return (DEFERRED_VUFLAGS() & UFLAGBIT);
 		case 18:
-			return !(DEFERRED_NZFLAGS(cpustate) < 0);
+			return !(DEFERRED_NZFLAGS() < 0);
 		case 19:
-			return (DEFERRED_NZFLAGS(cpustate) < 0);
+			return (DEFERRED_NZFLAGS() < 0);
 		case 20:
-			return !(DEFERRED_NZFLAGS(cpustate) == 0);
+			return !(DEFERRED_NZFLAGS() == 0);
 		case 21:
-			return (DEFERRED_NZFLAGS(cpustate) == 0);
+			return (DEFERRED_NZFLAGS() == 0);
 		case 22:
-			return !(DEFERRED_VUFLAGS(cpustate) & VFLAGBIT);
+			return !(DEFERRED_VUFLAGS() & VFLAGBIT);
 		case 23:
-			return (DEFERRED_VUFLAGS(cpustate) & VFLAGBIT);
+			return (DEFERRED_VUFLAGS() & VFLAGBIT);
 		case 24:
-			return !(DEFERRED_NZFLAGS(cpustate) <= 0);
+			return !(DEFERRED_NZFLAGS() <= 0);
 		case 25:
-			return (DEFERRED_NZFLAGS(cpustate) <= 0);
+			return (DEFERRED_NZFLAGS() <= 0);
 
-		case 32:	/* !ibf */
-		case 33:	/* ibf */
-		case 34:	/* !obe */
-		case 35:	/* obe */
-		case 36:	/* !pdf */
-		case 37:	/* pdf */
-		case 38:	/* !pif */
-		case 39:	/* pif */
-		case 40:	/* !sy */
-		case 41:	/* sy */
-		case 42:	/* !fb */
-		case 43:	/* fb */
-		case 44:	/* !ireq1 */
-		case 45:	/* ireq1 */
-		case 46:	/* !ireq2 */
-		case 47:	/* ireq2 */
+		case 32:	// !ibf
+		case 33:	// ibf
+		case 34:	// !obe
+		case 35:	// obe
+		case 36:	// !pdf
+		case 37:	// pdf
+		case 38:	// !pif
+		case 39:	// pif
+		case 40:	// !sy
+		case 41:	// sy
+		case 42:	// !fb
+		case 43:	// fb
+		case 44:	// !ireq1
+		case 45:	// ireq1
+		case 46:	// !ireq2
+		case 47:	// ireq2
 		default:
 		    fatalerror("Unimplemented condition: %X", cond);
 	}
@@ -683,2087 +703,2087 @@ static int condition(dsp32_state *cpustate, int cond)
 
 
 
-/***************************************************************************
-    CAU BRANCH INSTRUCTION IMPLEMENTATION
-***************************************************************************/
+//**************************************************************************
+//  CAU BRANCH INSTRUCTION IMPLEMENTATION
+//**************************************************************************
 
-static void nop(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::nop(UINT32 op)
 {
 	if (op == 0)
 		return;
-	execute_one(cpustate);
-	cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
+	execute_one();
+	PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
 }
 
 
-static void goto_t(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_t(UINT32 op)
 {
-	execute_one(cpustate);
-	cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
+	execute_one();
+	PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
 }
 
 
-static void goto_pl(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_pl(UINT32 op)
 {
 	if (!nFLAG)
 	{
-		execute_one(cpustate);
-		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
+		execute_one();
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_mi(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_mi(UINT32 op)
 {
 	if (nFLAG)
 	{
-		execute_one(cpustate);
-		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
+		execute_one();
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_ne(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_ne(UINT32 op)
 {
 	if (!zFLAG)
 	{
-		execute_one(cpustate);
-		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
+		execute_one();
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_eq(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_eq(UINT32 op)
 {
 	if (zFLAG)
 	{
-		execute_one(cpustate);
-		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
+		execute_one();
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_vc(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_vc(UINT32 op)
 {
 	if (!vFLAG)
 	{
-		execute_one(cpustate);
-		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
+		execute_one();
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_vs(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_vs(UINT32 op)
 {
 	if (vFLAG)
 	{
-		execute_one(cpustate);
-		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
+		execute_one();
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_cc(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_cc(UINT32 op)
 {
 	if (!cFLAG)
 	{
-		execute_one(cpustate);
-		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
+		execute_one();
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_cs(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_cs(UINT32 op)
 {
 	if (cFLAG)
 	{
-		execute_one(cpustate);
-		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
+		execute_one();
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_ge(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_ge(UINT32 op)
 {
 	if (!(nFLAG ^ vFLAG))
 	{
-		execute_one(cpustate);
-		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
+		execute_one();
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_lt(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_lt(UINT32 op)
 {
 	if (nFLAG ^ vFLAG)
 	{
-		execute_one(cpustate);
-		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
+		execute_one();
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_gt(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_gt(UINT32 op)
 {
 	if (!(zFLAG | (nFLAG ^ vFLAG)))
 	{
-		execute_one(cpustate);
-		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
+		execute_one();
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_le(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_le(UINT32 op)
 {
 	if (zFLAG | (nFLAG ^ vFLAG))
 	{
-		execute_one(cpustate);
-		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
+		execute_one();
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_hi(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_hi(UINT32 op)
 {
 	if (!cFLAG && !zFLAG)
 	{
-		execute_one(cpustate);
-		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
+		execute_one();
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_ls(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_ls(UINT32 op)
 {
 	if (cFLAG || zFLAG)
 	{
-		execute_one(cpustate);
-		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
+		execute_one();
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_auc(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_auc(UINT32 op)
 {
-	if (!(DEFERRED_VUFLAGS(cpustate) & UFLAGBIT))
+	if (!(DEFERRED_VUFLAGS() & UFLAGBIT))
 	{
-		execute_one(cpustate);
-		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
+		execute_one();
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_aus(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_aus(UINT32 op)
 {
-	if (DEFERRED_VUFLAGS(cpustate) & UFLAGBIT)
+	if (DEFERRED_VUFLAGS() & UFLAGBIT)
 	{
-		execute_one(cpustate);
-		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
+		execute_one();
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_age(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_age(UINT32 op)
 {
-	if (DEFERRED_NZFLAGS(cpustate) >= 0)
+	if (DEFERRED_NZFLAGS() >= 0)
 	{
-		execute_one(cpustate);
-		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
+		execute_one();
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_alt(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_alt(UINT32 op)
 {
-	if (DEFERRED_NZFLAGS(cpustate) < 0)
+	if (DEFERRED_NZFLAGS() < 0)
 	{
-		execute_one(cpustate);
-		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
+		execute_one();
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_ane(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_ane(UINT32 op)
 {
-	if (DEFERRED_NZFLAGS(cpustate) != 0)
+	if (DEFERRED_NZFLAGS() != 0)
 	{
-		execute_one(cpustate);
-		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
+		execute_one();
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_aeq(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_aeq(UINT32 op)
 {
-	if (DEFERRED_NZFLAGS(cpustate) == 0)
+	if (DEFERRED_NZFLAGS() == 0)
 	{
-		execute_one(cpustate);
-		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
+		execute_one();
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_avc(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_avc(UINT32 op)
 {
-	if (!(DEFERRED_VUFLAGS(cpustate) & VFLAGBIT))
+	if (!(DEFERRED_VUFLAGS() & VFLAGBIT))
 	{
-		execute_one(cpustate);
-		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
+		execute_one();
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_avs(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_avs(UINT32 op)
 {
-	if (DEFERRED_VUFLAGS(cpustate) & VFLAGBIT)
+	if (DEFERRED_VUFLAGS() & VFLAGBIT)
 	{
-		execute_one(cpustate);
-		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
+		execute_one();
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_agt(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_agt(UINT32 op)
 {
-	if (DEFERRED_NZFLAGS(cpustate) > 0)
+	if (DEFERRED_NZFLAGS() > 0)
 	{
-		execute_one(cpustate);
-		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
+		execute_one();
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_ale(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_ale(UINT32 op)
 {
-	if (DEFERRED_NZFLAGS(cpustate) <= 0)
+	if (DEFERRED_NZFLAGS() <= 0)
 	{
-		execute_one(cpustate);
-		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
+		execute_one();
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_ibe(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_ibe(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void goto_ibf(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_ibf(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void goto_obf(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_obf(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void goto_obe(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_obe(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void goto_pde(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_pde(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void goto_pdf(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_pdf(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void goto_pie(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_pie(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void goto_pif(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_pif(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void goto_syc(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_syc(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void goto_sys(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_sys(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void goto_fbc(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_fbc(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void goto_fbs(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_fbs(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void goto_irq1lo(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_irq1lo(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void goto_irq1hi(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_irq1hi(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void goto_irq2lo(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_irq2lo(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void goto_irq2hi(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto_irq2hi(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void dec_goto(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::dec_goto(UINT32 op)
 {
 	int hr = (op >> 21) & 0x1f;
-	int old = (INT16)cpustate->r[hr];
-	cpustate->r[hr] = EXTEND16_TO_24(cpustate->r[hr] - 1);
+	int old = (INT16)m_r[hr];
+	m_r[hr] = EXTEND16_TO_24(m_r[hr] - 1);
 	if (old >= 0)
 	{
-		execute_one(cpustate);
-		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
+		execute_one();
+		PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void call(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::call(UINT32 op)
 {
 	int mr = (op >> 21) & 0x1f;
 	if (IS_WRITEABLE(mr))
-		cpustate->r[mr] = cpustate->PC + 4;
-	execute_one(cpustate);
-	cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
+		m_r[mr] = PC + 4;
+	execute_one();
+	PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
 }
 
 
-static void goto24(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::goto24(UINT32 op)
 {
-	execute_one(cpustate);
-	cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (op & 0xffff) + ((op >> 5) & 0xff0000));
+	execute_one();
+	PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (op & 0xffff) + ((op >> 5) & 0xff0000));
 }
 
 
-static void call24(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::call24(UINT32 op)
 {
 	int mr = (op >> 16) & 0x1f;
 	if (IS_WRITEABLE(mr))
-		cpustate->r[mr] = cpustate->PC + 4;
-	execute_one(cpustate);
-	cpustate->PC = (op & 0xffff) + ((op >> 5) & 0xff0000);
+		m_r[mr] = PC + 4;
+	execute_one();
+	PC = (op & 0xffff) + ((op >> 5) & 0xff0000);
 }
 
 
-static void do_i(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::do_i(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void do_r(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::do_r(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
 
-/***************************************************************************
-    CAU 16-BIT ARITHMETIC IMPLEMENTATION
-***************************************************************************/
+//**************************************************************************
+//  CAU 16-BIT ARITHMETIC IMPLEMENTATION
+//**************************************************************************
 
-static void add_si(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::add_si(UINT32 op)
 {
 	int dr = (op >> 21) & 0x1f;
-	int hrval = REG16(cpustate, (op >> 16) & 0x1f);
+	int hrval = REG16((op >> 16) & 0x1f);
 	int res = hrval + (UINT16)op;
 	if (IS_WRITEABLE(dr))
-		cpustate->r[dr] = EXTEND16_TO_24(res);
-	SET_NZCV_16(cpustate, hrval, op, res);
+		m_r[dr] = EXTEND16_TO_24(res);
+	SET_NZCV_16(hrval, op, res);
 }
 
 
-static void add_ss(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::add_ss(UINT32 op)
 {
-	if (CONDITION_IS_TRUE(cpustate))
+	if (CONDITION_IS_TRUE())
 	{
 		int dr = (op >> 16) & 0x1f;
-		int s1rval = REG16(cpustate, (op >> 5) & 0x1f);
-		int s2rval = (op & 0x800) ? REG16(cpustate, (op >> 0) & 0x1f) : REG16(cpustate, dr);
+		int s1rval = REG16((op >> 5) & 0x1f);
+		int s2rval = (op & 0x800) ? REG16((op >> 0) & 0x1f) : REG16(dr);
 		int res = s2rval + s1rval;
 		if (IS_WRITEABLE(dr))
-			cpustate->r[dr] = EXTEND16_TO_24(res);
-		SET_NZCV_16(cpustate, s1rval, s2rval, res);
+			m_r[dr] = EXTEND16_TO_24(res);
+		SET_NZCV_16(s1rval, s2rval, res);
 	}
 }
 
 
-static void mul2_s(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::mul2_s(UINT32 op)
 {
-	if (CONDITION_IS_TRUE(cpustate))
+	if (CONDITION_IS_TRUE())
 	{
 		int dr = (op >> 16) & 0x1f;
-		int s1rval = REG16(cpustate, (op >> 5) & 0x1f);
+		int s1rval = REG16((op >> 5) & 0x1f);
 		int res = s1rval * 2;
 		if (IS_WRITEABLE(dr))
-			cpustate->r[dr] = EXTEND16_TO_24(res);
-		SET_NZCV_16(cpustate, s1rval, 0, res);
+			m_r[dr] = EXTEND16_TO_24(res);
+		SET_NZCV_16(s1rval, 0, res);
 	}
 }
 
 
-static void subr_ss(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::subr_ss(UINT32 op)
 {
-	if (CONDITION_IS_TRUE(cpustate))
+	if (CONDITION_IS_TRUE())
 	{
 		int dr = (op >> 16) & 0x1f;
-		int s1rval = REG16(cpustate, (op >> 5) & 0x1f);
-		int s2rval = (op & 0x800) ? REG16(cpustate, (op >> 0) & 0x1f) : REG16(cpustate, dr);
+		int s1rval = REG16((op >> 5) & 0x1f);
+		int s2rval = (op & 0x800) ? REG16((op >> 0) & 0x1f) : REG16(dr);
 		int res = s1rval - s2rval;
 		if (IS_WRITEABLE(dr))
-			cpustate->r[dr] = EXTEND16_TO_24(res);
-		SET_NZCV_16(cpustate, s1rval, s2rval, res);
+			m_r[dr] = EXTEND16_TO_24(res);
+		SET_NZCV_16(s1rval, s2rval, res);
 	}
 }
 
 
-static void addr_ss(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::addr_ss(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void sub_ss(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::sub_ss(UINT32 op)
 {
-	if (CONDITION_IS_TRUE(cpustate))
+	if (CONDITION_IS_TRUE())
 	{
 		int dr = (op >> 16) & 0x1f;
-		int s1rval = REG16(cpustate, (op >> 5) & 0x1f);
-		int s2rval = (op & 0x800) ? REG16(cpustate, (op >> 0) & 0x1f) : REG16(cpustate, dr);
+		int s1rval = REG16((op >> 5) & 0x1f);
+		int s2rval = (op & 0x800) ? REG16((op >> 0) & 0x1f) : REG16(dr);
 		int res = s2rval - s1rval;
 		if (IS_WRITEABLE(dr))
-			cpustate->r[dr] = EXTEND16_TO_24(res);
-		SET_NZCV_16(cpustate, s1rval, s2rval, res);
+			m_r[dr] = EXTEND16_TO_24(res);
+		SET_NZCV_16(s1rval, s2rval, res);
 	}
 }
 
 
-static void neg_s(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::neg_s(UINT32 op)
 {
-	if (CONDITION_IS_TRUE(cpustate))
+	if (CONDITION_IS_TRUE())
 	{
 		int dr = (op >> 16) & 0x1f;
-		int s1rval = REG16(cpustate, (op >> 5) & 0x1f);
+		int s1rval = REG16((op >> 5) & 0x1f);
 		int res = -s1rval;
 		if (IS_WRITEABLE(dr))
-			cpustate->r[dr] = EXTEND16_TO_24(res);
-		SET_NZCV_16(cpustate, s1rval, 0, res);
+			m_r[dr] = EXTEND16_TO_24(res);
+		SET_NZCV_16(s1rval, 0, res);
 	}
 }
 
 
-static void andc_ss(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::andc_ss(UINT32 op)
 {
-	if (CONDITION_IS_TRUE(cpustate))
+	if (CONDITION_IS_TRUE())
 	{
 		int dr = (op >> 16) & 0x1f;
-		int s1rval = REG16(cpustate, (op >> 5) & 0x1f);
-		int s2rval = (op & 0x800) ? REG16(cpustate, (op >> 0) & 0x1f) : REG16(cpustate, dr);
+		int s1rval = REG16((op >> 5) & 0x1f);
+		int s2rval = (op & 0x800) ? REG16((op >> 0) & 0x1f) : REG16(dr);
 		int res = s2rval & ~s1rval;
 		if (IS_WRITEABLE(dr))
-			cpustate->r[dr] = EXTEND16_TO_24(res);
-		SET_NZ00_16(cpustate, res);
+			m_r[dr] = EXTEND16_TO_24(res);
+		SET_NZ00_16(res);
 	}
 }
 
 
-static void cmp_ss(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::cmp_ss(UINT32 op)
 {
-	if (CONDITION_IS_TRUE(cpustate))
+	if (CONDITION_IS_TRUE())
 	{
-		int drval = REG16(cpustate, (op >> 16) & 0x1f);
-		int s1rval = REG16(cpustate, (op >> 5) & 0x1f);
+		int drval = REG16((op >> 16) & 0x1f);
+		int s1rval = REG16((op >> 5) & 0x1f);
 		int res = drval - s1rval;
-		SET_NZCV_16(cpustate, drval, s1rval, res);
+		SET_NZCV_16(drval, s1rval, res);
 	}
 }
 
 
-static void xor_ss(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::xor_ss(UINT32 op)
 {
-	if (CONDITION_IS_TRUE(cpustate))
+	if (CONDITION_IS_TRUE())
 	{
 		int dr = (op >> 16) & 0x1f;
-		int s1rval = REG16(cpustate, (op >> 5) & 0x1f);
-		int s2rval = (op & 0x800) ? REG16(cpustate, (op >> 0) & 0x1f) : REG16(cpustate, dr);
+		int s1rval = REG16((op >> 5) & 0x1f);
+		int s2rval = (op & 0x800) ? REG16((op >> 0) & 0x1f) : REG16(dr);
 		int res = s2rval ^ s1rval;
 		if (IS_WRITEABLE(dr))
-			cpustate->r[dr] = EXTEND16_TO_24(res);
-		SET_NZ00_16(cpustate, res);
+			m_r[dr] = EXTEND16_TO_24(res);
+		SET_NZ00_16(res);
 	}
 }
 
 
-static void rcr_s(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::rcr_s(UINT32 op)
 {
-	if (CONDITION_IS_TRUE(cpustate))
+	if (CONDITION_IS_TRUE())
 	{
 		int dr = (op >> 16) & 0x1f;
-		int s1rval = REG16(cpustate, (op >> 5) & 0x1f);
-		int res = ((cpustate->nzcflags >> 9) & 0x8000) | (s1rval >> 1);
+		int s1rval = REG16((op >> 5) & 0x1f);
+		int res = ((m_nzcflags >> 9) & 0x8000) | (s1rval >> 1);
 		if (IS_WRITEABLE(dr))
-			cpustate->r[dr] = EXTEND16_TO_24(res);
-		cpustate->nzcflags = ((res & 0xffff) << 8) | ((s1rval & 1) << 24);
-		cpustate->vflags = 0;
+			m_r[dr] = EXTEND16_TO_24(res);
+		m_nzcflags = ((res & 0xffff) << 8) | ((s1rval & 1) << 24);
+		m_vflags = 0;
 	}
 }
 
 
-static void or_ss(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::or_ss(UINT32 op)
 {
-	if (CONDITION_IS_TRUE(cpustate))
+	if (CONDITION_IS_TRUE())
 	{
 		int dr = (op >> 16) & 0x1f;
-		int s1rval = REG16(cpustate, (op >> 5) & 0x1f);
-		int s2rval = (op & 0x800) ? REG16(cpustate, (op >> 0) & 0x1f) : REG16(cpustate, dr);
+		int s1rval = REG16((op >> 5) & 0x1f);
+		int s2rval = (op & 0x800) ? REG16((op >> 0) & 0x1f) : REG16(dr);
 		int res = s2rval | s1rval;
 		if (IS_WRITEABLE(dr))
-			cpustate->r[dr] = EXTEND16_TO_24(res);
-		SET_NZ00_16(cpustate, res);
+			m_r[dr] = EXTEND16_TO_24(res);
+		SET_NZ00_16(res);
 	}
 }
 
 
-static void rcl_s(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::rcl_s(UINT32 op)
 {
-	if (CONDITION_IS_TRUE(cpustate))
+	if (CONDITION_IS_TRUE())
 	{
 		int dr = (op >> 16) & 0x1f;
-		int s1rval = REG16(cpustate, (op >> 5) & 0x1f);
-		int res = ((cpustate->nzcflags >> 24) & 0x0001) | (s1rval << 1);
+		int s1rval = REG16((op >> 5) & 0x1f);
+		int res = ((m_nzcflags >> 24) & 0x0001) | (s1rval << 1);
 		if (IS_WRITEABLE(dr))
-			cpustate->r[dr] = EXTEND16_TO_24(res);
-		cpustate->nzcflags = ((res & 0xffff) << 8) | ((s1rval & 0x8000) << 9);
-		cpustate->vflags = 0;
+			m_r[dr] = EXTEND16_TO_24(res);
+		m_nzcflags = ((res & 0xffff) << 8) | ((s1rval & 0x8000) << 9);
+		m_vflags = 0;
 	}
 }
 
 
-static void shr_s(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::shr_s(UINT32 op)
 {
-	if (CONDITION_IS_TRUE(cpustate))
+	if (CONDITION_IS_TRUE())
 	{
 		int dr = (op >> 16) & 0x1f;
-		int s1rval = REG16(cpustate, (op >> 5) & 0x1f);
+		int s1rval = REG16((op >> 5) & 0x1f);
 		int res = s1rval >> 1;
 		if (IS_WRITEABLE(dr))
-			cpustate->r[dr] = EXTEND16_TO_24(res);
-		cpustate->nzcflags = ((res & 0xffff) << 8) | ((s1rval & 1) << 24);
-		cpustate->vflags = 0;
+			m_r[dr] = EXTEND16_TO_24(res);
+		m_nzcflags = ((res & 0xffff) << 8) | ((s1rval & 1) << 24);
+		m_vflags = 0;
 	}
 }
 
 
-static void div2_s(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::div2_s(UINT32 op)
 {
-	if (CONDITION_IS_TRUE(cpustate))
+	if (CONDITION_IS_TRUE())
 	{
 		int dr = (op >> 16) & 0x1f;
-		int s1rval = REG16(cpustate, (op >> 5) & 0x1f);
+		int s1rval = REG16((op >> 5) & 0x1f);
 		int res = (s1rval & 0x8000) | (s1rval >> 1);
 		if (IS_WRITEABLE(dr))
-			cpustate->r[dr] = EXTEND16_TO_24(res);
-		cpustate->nzcflags = ((res & 0xffff) << 8) | ((s1rval & 1) << 24);
-		cpustate->vflags = 0;
+			m_r[dr] = EXTEND16_TO_24(res);
+		m_nzcflags = ((res & 0xffff) << 8) | ((s1rval & 1) << 24);
+		m_vflags = 0;
 	}
 }
 
 
-static void and_ss(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::and_ss(UINT32 op)
 {
-	if (CONDITION_IS_TRUE(cpustate))
+	if (CONDITION_IS_TRUE())
 	{
 		int dr = (op >> 16) & 0x1f;
-		int s1rval = REG16(cpustate, (op >> 5) & 0x1f);
-		int s2rval = (op & 0x800) ? REG16(cpustate, (op >> 0) & 0x1f) : REG16(cpustate, dr);
+		int s1rval = REG16((op >> 5) & 0x1f);
+		int s2rval = (op & 0x800) ? REG16((op >> 0) & 0x1f) : REG16(dr);
 		int res = s2rval & s1rval;
 		if (IS_WRITEABLE(dr))
-			cpustate->r[dr] = EXTEND16_TO_24(res);
-		SET_NZ00_16(cpustate, res);
+			m_r[dr] = EXTEND16_TO_24(res);
+		SET_NZ00_16(res);
 	}
 }
 
 
-static void test_ss(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::test_ss(UINT32 op)
 {
-	if (CONDITION_IS_TRUE(cpustate))
+	if (CONDITION_IS_TRUE())
 	{
-		int drval = REG16(cpustate, (op >> 16) & 0x1f);
-		int s1rval = REG16(cpustate, (op >> 5) & 0x1f);
+		int drval = REG16((op >> 16) & 0x1f);
+		int s1rval = REG16((op >> 5) & 0x1f);
 		int res = drval & s1rval;
-		SET_NZ00_16(cpustate, res);
+		SET_NZ00_16(res);
 	}
 }
 
 
-static void add_di(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::add_di(UINT32 op)
 {
 	int dr = (op >> 16) & 0x1f;
-	int drval = REG16(cpustate, dr);
+	int drval = REG16(dr);
 	int res = drval + (UINT16)op;
 	if (IS_WRITEABLE(dr))
-		cpustate->r[dr] = EXTEND16_TO_24(res);
-	SET_NZCV_16(cpustate, drval, op, res);
+		m_r[dr] = EXTEND16_TO_24(res);
+	SET_NZCV_16(drval, op, res);
 }
 
 
-static void subr_di(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::subr_di(UINT32 op)
 {
 	int dr = (op >> 16) & 0x1f;
-	int drval = REG16(cpustate, dr);
+	int drval = REG16(dr);
 	int res = (UINT16)op - drval;
 	if (IS_WRITEABLE(dr))
-		cpustate->r[dr] = EXTEND16_TO_24(res);
-	SET_NZCV_16(cpustate, drval, op, res);
+		m_r[dr] = EXTEND16_TO_24(res);
+	SET_NZCV_16(drval, op, res);
 }
 
 
-static void addr_di(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::addr_di(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void sub_di(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::sub_di(UINT32 op)
 {
 	int dr = (op >> 16) & 0x1f;
-	int drval = REG16(cpustate, dr);
+	int drval = REG16(dr);
 	int res = drval - (UINT16)op;
 	if (IS_WRITEABLE(dr))
-		cpustate->r[dr] = EXTEND16_TO_24(res);
-	SET_NZCV_16(cpustate, drval, op, res);
+		m_r[dr] = EXTEND16_TO_24(res);
+	SET_NZCV_16(drval, op, res);
 }
 
 
-static void andc_di(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::andc_di(UINT32 op)
 {
 	int dr = (op >> 16) & 0x1f;
-	int drval = REG16(cpustate, dr);
+	int drval = REG16(dr);
 	int res = drval & ~(UINT16)op;
 	if (IS_WRITEABLE(dr))
-		cpustate->r[dr] = EXTEND16_TO_24(res);
-	SET_NZ00_16(cpustate, res);
+		m_r[dr] = EXTEND16_TO_24(res);
+	SET_NZ00_16(res);
 }
 
 
-static void cmp_di(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::cmp_di(UINT32 op)
 {
-	int drval = REG16(cpustate, (op >> 16) & 0x1f);
+	int drval = REG16((op >> 16) & 0x1f);
 	int res = drval - (UINT16)op;
-	SET_NZCV_16(cpustate, drval, op, res);
+	SET_NZCV_16(drval, op, res);
 }
 
 
-static void xor_di(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::xor_di(UINT32 op)
 {
 	int dr = (op >> 16) & 0x1f;
-	int drval = REG16(cpustate, dr);
+	int drval = REG16(dr);
 	int res = drval ^ (UINT16)op;
 	if (IS_WRITEABLE(dr))
-		cpustate->r[dr] = EXTEND16_TO_24(res);
-	SET_NZ00_16(cpustate, res);
+		m_r[dr] = EXTEND16_TO_24(res);
+	SET_NZ00_16(res);
 }
 
 
-static void or_di(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::or_di(UINT32 op)
 {
 	int dr = (op >> 16) & 0x1f;
-	int drval = REG16(cpustate, dr);
+	int drval = REG16(dr);
 	int res = drval | (UINT16)op;
 	if (IS_WRITEABLE(dr))
-		cpustate->r[dr] = EXTEND16_TO_24(res);
-	SET_NZ00_16(cpustate, res);
+		m_r[dr] = EXTEND16_TO_24(res);
+	SET_NZ00_16(res);
 }
 
 
-static void and_di(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::and_di(UINT32 op)
 {
 	int dr = (op >> 16) & 0x1f;
-	int drval = REG16(cpustate, dr);
+	int drval = REG16(dr);
 	int res = drval & (UINT16)op;
 	if (IS_WRITEABLE(dr))
-		cpustate->r[dr] = EXTEND16_TO_24(res);
-	SET_NZ00_16(cpustate, res);
+		m_r[dr] = EXTEND16_TO_24(res);
+	SET_NZ00_16(res);
 }
 
 
-static void test_di(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::test_di(UINT32 op)
 {
-	int drval = REG16(cpustate, (op >> 16) & 0x1f);
+	int drval = REG16((op >> 16) & 0x1f);
 	int res = drval & (UINT16)op;
-	SET_NZ00_16(cpustate, res);
+	SET_NZ00_16(res);
 }
 
 
 
-/***************************************************************************
-    CAU 24-BIT ARITHMETIC IMPLEMENTATION
-***************************************************************************/
+//**************************************************************************
+//  CAU 24-BIT ARITHMETIC IMPLEMENTATION
+//**************************************************************************
 
-static void adde_si(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::adde_si(UINT32 op)
 {
 	int dr = (op >> 21) & 0x1f;
-	int hrval = REG24(cpustate, (op >> 16) & 0x1f);
+	int hrval = REG24((op >> 16) & 0x1f);
 	int res = hrval + EXTEND16_TO_24(op);
 	if (IS_WRITEABLE(dr))
-		cpustate->r[dr] = TRUNCATE24(res);
-	SET_NZCV_24(cpustate, hrval, op << 8, res);
+		m_r[dr] = TRUNCATE24(res);
+	SET_NZCV_24(hrval, op << 8, res);
 }
 
 
-static void adde_ss(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::adde_ss(UINT32 op)
 {
-	if (CONDITION_IS_TRUE(cpustate))
+	if (CONDITION_IS_TRUE())
 	{
 		int dr = (op >> 16) & 0x1f;
-		int s1rval = REG24(cpustate, (op >> 5) & 0x1f);
-		int s2rval = (op & 0x800) ? REG24(cpustate, (op >> 0) & 0x1f) : REG24(cpustate, dr);
+		int s1rval = REG24((op >> 5) & 0x1f);
+		int s2rval = (op & 0x800) ? REG24((op >> 0) & 0x1f) : REG24(dr);
 		int res = s2rval + s1rval;
 		if (IS_WRITEABLE(dr))
-			cpustate->r[dr] = TRUNCATE24(res);
-		SET_NZCV_24(cpustate, s1rval, s2rval, res);
+			m_r[dr] = TRUNCATE24(res);
+		SET_NZCV_24(s1rval, s2rval, res);
 	}
 }
 
 
-static void mul2e_s(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::mul2e_s(UINT32 op)
 {
-	if (CONDITION_IS_TRUE(cpustate))
+	if (CONDITION_IS_TRUE())
 	{
 		int dr = (op >> 16) & 0x1f;
-		int s1rval = REG24(cpustate, (op >> 5) & 0x1f);
+		int s1rval = REG24((op >> 5) & 0x1f);
 		int res = s1rval * 2;
 		if (IS_WRITEABLE(dr))
-			cpustate->r[dr] = TRUNCATE24(res);
-		SET_NZCV_24(cpustate, s1rval, 0, res);
+			m_r[dr] = TRUNCATE24(res);
+		SET_NZCV_24(s1rval, 0, res);
 	}
 }
 
 
-static void subre_ss(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::subre_ss(UINT32 op)
 {
-	if (CONDITION_IS_TRUE(cpustate))
+	if (CONDITION_IS_TRUE())
 	{
 		int dr = (op >> 16) & 0x1f;
-		int s1rval = REG24(cpustate, (op >> 5) & 0x1f);
-		int s2rval = (op & 0x800) ? REG24(cpustate, (op >> 0) & 0x1f) : REG24(cpustate, dr);
+		int s1rval = REG24((op >> 5) & 0x1f);
+		int s2rval = (op & 0x800) ? REG24((op >> 0) & 0x1f) : REG24(dr);
 		int res = s1rval - s2rval;
 		if (IS_WRITEABLE(dr))
-			cpustate->r[dr] = TRUNCATE24(res);
-		SET_NZCV_24(cpustate, s1rval, s2rval, res);
+			m_r[dr] = TRUNCATE24(res);
+		SET_NZCV_24(s1rval, s2rval, res);
 	}
 }
 
 
-static void addre_ss(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::addre_ss(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void sube_ss(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::sube_ss(UINT32 op)
 {
-	if (CONDITION_IS_TRUE(cpustate))
+	if (CONDITION_IS_TRUE())
 	{
 		int dr = (op >> 16) & 0x1f;
-		int s1rval = REG24(cpustate, (op >> 5) & 0x1f);
-		int s2rval = (op & 0x800) ? REG24(cpustate, (op >> 0) & 0x1f) : REG24(cpustate, dr);
+		int s1rval = REG24((op >> 5) & 0x1f);
+		int s2rval = (op & 0x800) ? REG24((op >> 0) & 0x1f) : REG24(dr);
 		int res = s2rval - s1rval;
 		if (IS_WRITEABLE(dr))
-			cpustate->r[dr] = TRUNCATE24(res);
-		SET_NZCV_24(cpustate, s1rval, s2rval, res);
+			m_r[dr] = TRUNCATE24(res);
+		SET_NZCV_24(s1rval, s2rval, res);
 	}
 }
 
 
-static void nege_s(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::nege_s(UINT32 op)
 {
-	if (CONDITION_IS_TRUE(cpustate))
+	if (CONDITION_IS_TRUE())
 	{
 		int dr = (op >> 16) & 0x1f;
-		int s1rval = REG24(cpustate, (op >> 5) & 0x1f);
+		int s1rval = REG24((op >> 5) & 0x1f);
 		int res = -s1rval;
 		if (IS_WRITEABLE(dr))
-			cpustate->r[dr] = TRUNCATE24(res);
-		SET_NZCV_24(cpustate, s1rval, 0, res);
+			m_r[dr] = TRUNCATE24(res);
+		SET_NZCV_24(s1rval, 0, res);
 	}
 }
 
 
-static void andce_ss(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::andce_ss(UINT32 op)
 {
-	if (CONDITION_IS_TRUE(cpustate))
+	if (CONDITION_IS_TRUE())
 	{
 		int dr = (op >> 16) & 0x1f;
-		int s1rval = REG24(cpustate, (op >> 5) & 0x1f);
-		int s2rval = (op & 0x800) ? REG24(cpustate, (op >> 0) & 0x1f) : REG24(cpustate, dr);
+		int s1rval = REG24((op >> 5) & 0x1f);
+		int s2rval = (op & 0x800) ? REG24((op >> 0) & 0x1f) : REG24(dr);
 		int res = s2rval & ~s1rval;
 		if (IS_WRITEABLE(dr))
-			cpustate->r[dr] = res;
-		SET_NZ00_24(cpustate, res);
+			m_r[dr] = res;
+		SET_NZ00_24(res);
 	}
 }
 
 
-static void cmpe_ss(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::cmpe_ss(UINT32 op)
 {
-	if (CONDITION_IS_TRUE(cpustate))
+	if (CONDITION_IS_TRUE())
 	{
-		int drval = REG24(cpustate, (op >> 16) & 0x1f);
-		int s1rval = REG24(cpustate, (op >> 5) & 0x1f);
+		int drval = REG24((op >> 16) & 0x1f);
+		int s1rval = REG24((op >> 5) & 0x1f);
 		int res = drval - s1rval;
-		SET_NZCV_24(cpustate, drval, s1rval, res);
+		SET_NZCV_24(drval, s1rval, res);
 	}
 }
 
 
-static void xore_ss(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::xore_ss(UINT32 op)
 {
-	if (CONDITION_IS_TRUE(cpustate))
+	if (CONDITION_IS_TRUE())
 	{
 		int dr = (op >> 16) & 0x1f;
-		int s1rval = REG24(cpustate, (op >> 5) & 0x1f);
-		int s2rval = (op & 0x800) ? REG24(cpustate, (op >> 0) & 0x1f) : REG24(cpustate, dr);
+		int s1rval = REG24((op >> 5) & 0x1f);
+		int s2rval = (op & 0x800) ? REG24((op >> 0) & 0x1f) : REG24(dr);
 		int res = s2rval ^ s1rval;
 		if (IS_WRITEABLE(dr))
-			cpustate->r[dr] = res;
-		SET_NZ00_24(cpustate, res);
+			m_r[dr] = res;
+		SET_NZ00_24(res);
 	}
 }
 
 
-static void rcre_s(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::rcre_s(UINT32 op)
 {
-	if (CONDITION_IS_TRUE(cpustate))
+	if (CONDITION_IS_TRUE())
 	{
 		int dr = (op >> 16) & 0x1f;
-		int s1rval = REG24(cpustate, (op >> 5) & 0x1f);
-		int res = ((cpustate->nzcflags >> 1) & 0x800000) | (s1rval >> 1);
+		int s1rval = REG24((op >> 5) & 0x1f);
+		int res = ((m_nzcflags >> 1) & 0x800000) | (s1rval >> 1);
 		if (IS_WRITEABLE(dr))
-			cpustate->r[dr] = TRUNCATE24(res);
-		cpustate->nzcflags = res | ((s1rval & 1) << 24);
-		cpustate->vflags = 0;
+			m_r[dr] = TRUNCATE24(res);
+		m_nzcflags = res | ((s1rval & 1) << 24);
+		m_vflags = 0;
 	}
 }
 
 
-static void ore_ss(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::ore_ss(UINT32 op)
 {
-	if (CONDITION_IS_TRUE(cpustate))
+	if (CONDITION_IS_TRUE())
 	{
 		int dr = (op >> 16) & 0x1f;
-		int s1rval = REG24(cpustate, (op >> 5) & 0x1f);
-		int s2rval = (op & 0x800) ? REG24(cpustate, (op >> 0) & 0x1f) : REG24(cpustate, dr);
+		int s1rval = REG24((op >> 5) & 0x1f);
+		int s2rval = (op & 0x800) ? REG24((op >> 0) & 0x1f) : REG24(dr);
 		int res = s2rval | s1rval;
 		if (IS_WRITEABLE(dr))
-			cpustate->r[dr] = res;
-		SET_NZ00_24(cpustate, res);
+			m_r[dr] = res;
+		SET_NZ00_24(res);
 	}
 }
 
 
-static void rcle_s(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::rcle_s(UINT32 op)
 {
-	if (CONDITION_IS_TRUE(cpustate))
+	if (CONDITION_IS_TRUE())
 	{
 		int dr = (op >> 16) & 0x1f;
-		int s1rval = REG24(cpustate, (op >> 5) & 0x1f);
-		int res = ((cpustate->nzcflags >> 24) & 0x000001) | (s1rval << 1);
+		int s1rval = REG24((op >> 5) & 0x1f);
+		int res = ((m_nzcflags >> 24) & 0x000001) | (s1rval << 1);
 		if (IS_WRITEABLE(dr))
-			cpustate->r[dr] = TRUNCATE24(res);
-		cpustate->nzcflags = res | ((s1rval & 0x800000) << 1);
-		cpustate->vflags = 0;
+			m_r[dr] = TRUNCATE24(res);
+		m_nzcflags = res | ((s1rval & 0x800000) << 1);
+		m_vflags = 0;
 	}
 }
 
 
-static void shre_s(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::shre_s(UINT32 op)
 {
-	if (CONDITION_IS_TRUE(cpustate))
+	if (CONDITION_IS_TRUE())
 	{
 		int dr = (op >> 16) & 0x1f;
-		int s1rval = REG24(cpustate, (op >> 5) & 0x1f);
+		int s1rval = REG24((op >> 5) & 0x1f);
 		int res = s1rval >> 1;
 		if (IS_WRITEABLE(dr))
-			cpustate->r[dr] = res;
-		cpustate->nzcflags = res | ((s1rval & 1) << 24);
-		cpustate->vflags = 0;
+			m_r[dr] = res;
+		m_nzcflags = res | ((s1rval & 1) << 24);
+		m_vflags = 0;
 	}
 }
 
 
-static void div2e_s(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::div2e_s(UINT32 op)
 {
-	if (CONDITION_IS_TRUE(cpustate))
+	if (CONDITION_IS_TRUE())
 	{
 		int dr = (op >> 16) & 0x1f;
-		int s1rval = REG24(cpustate, (op >> 5) & 0x1f);
+		int s1rval = REG24((op >> 5) & 0x1f);
 		int res = (s1rval & 0x800000) | (s1rval >> 1);
 		if (IS_WRITEABLE(dr))
-			cpustate->r[dr] = TRUNCATE24(res);
-		cpustate->nzcflags = res | ((s1rval & 1) << 24);
-		cpustate->vflags = 0;
+			m_r[dr] = TRUNCATE24(res);
+		m_nzcflags = res | ((s1rval & 1) << 24);
+		m_vflags = 0;
 	}
 }
 
 
-static void ande_ss(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::ande_ss(UINT32 op)
 {
-	if (CONDITION_IS_TRUE(cpustate))
+	if (CONDITION_IS_TRUE())
 	{
 		int dr = (op >> 16) & 0x1f;
-		int s1rval = REG24(cpustate, (op >> 5) & 0x1f);
-		int s2rval = (op & 0x800) ? REG24(cpustate, (op >> 0) & 0x1f) : REG24(cpustate, dr);
+		int s1rval = REG24((op >> 5) & 0x1f);
+		int s2rval = (op & 0x800) ? REG24((op >> 0) & 0x1f) : REG24(dr);
 		int res = s2rval & s1rval;
 		if (IS_WRITEABLE(dr))
-			cpustate->r[dr] = res;
-		SET_NZ00_24(cpustate, res);
+			m_r[dr] = res;
+		SET_NZ00_24(res);
 	}
 }
 
 
-static void teste_ss(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::teste_ss(UINT32 op)
 {
-	if (CONDITION_IS_TRUE(cpustate))
+	if (CONDITION_IS_TRUE())
 	{
-		int drval = REG24(cpustate, (op >> 16) & 0x1f);
-		int s1rval = REG24(cpustate, (op >> 5) & 0x1f);
+		int drval = REG24((op >> 16) & 0x1f);
+		int s1rval = REG24((op >> 5) & 0x1f);
 		int res = drval & s1rval;
-		SET_NZ00_24(cpustate, res);
+		SET_NZ00_24(res);
 	}
 }
 
 
-static void adde_di(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::adde_di(UINT32 op)
 {
 	int dr = (op >> 16) & 0x1f;
-	int drval = REG24(cpustate, dr);
+	int drval = REG24(dr);
 	int res = drval + EXTEND16_TO_24(op);
 	if (IS_WRITEABLE(dr))
-		cpustate->r[dr] = TRUNCATE24(res);
-	SET_NZCV_24(cpustate, drval, op << 8, res);
+		m_r[dr] = TRUNCATE24(res);
+	SET_NZCV_24(drval, op << 8, res);
 }
 
 
-static void subre_di(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::subre_di(UINT32 op)
 {
 	int dr = (op >> 16) & 0x1f;
-	int drval = REG24(cpustate, dr);
+	int drval = REG24(dr);
 	int res = EXTEND16_TO_24(op) - drval;
 	if (IS_WRITEABLE(dr))
-		cpustate->r[dr] = TRUNCATE24(res);
-	SET_NZCV_24(cpustate, drval, op << 8, res);
+		m_r[dr] = TRUNCATE24(res);
+	SET_NZCV_24(drval, op << 8, res);
 }
 
 
-static void addre_di(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::addre_di(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void sube_di(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::sube_di(UINT32 op)
 {
 	int dr = (op >> 16) & 0x1f;
-	int drval = REG24(cpustate, dr);
+	int drval = REG24(dr);
 	int res = drval - EXTEND16_TO_24(op);
 	if (IS_WRITEABLE(dr))
-		cpustate->r[dr] = TRUNCATE24(res);
-	SET_NZCV_24(cpustate, drval, op << 8, res);
+		m_r[dr] = TRUNCATE24(res);
+	SET_NZCV_24(drval, op << 8, res);
 }
 
 
-static void andce_di(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::andce_di(UINT32 op)
 {
 	int dr = (op >> 16) & 0x1f;
-	int drval = REG24(cpustate, dr);
+	int drval = REG24(dr);
 	int res = drval & ~EXTEND16_TO_24(op);
 	if (IS_WRITEABLE(dr))
-		cpustate->r[dr] = res;
-	SET_NZ00_24(cpustate, res);
+		m_r[dr] = res;
+	SET_NZ00_24(res);
 }
 
 
-static void cmpe_di(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::cmpe_di(UINT32 op)
 {
-	int drval = REG24(cpustate, (op >> 16) & 0x1f);
+	int drval = REG24((op >> 16) & 0x1f);
 	int res = drval - EXTEND16_TO_24(op);
-	SET_NZCV_24(cpustate, drval, op << 8, res);
+	SET_NZCV_24(drval, op << 8, res);
 }
 
 
-static void xore_di(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::xore_di(UINT32 op)
 {
 	int dr = (op >> 16) & 0x1f;
-	int drval = REG24(cpustate, dr);
+	int drval = REG24(dr);
 	int res = drval ^ EXTEND16_TO_24(op);
 	if (IS_WRITEABLE(dr))
-		cpustate->r[dr] = res;
-	SET_NZ00_24(cpustate, res);
+		m_r[dr] = res;
+	SET_NZ00_24(res);
 }
 
 
-static void ore_di(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::ore_di(UINT32 op)
 {
 	int dr = (op >> 16) & 0x1f;
-	int drval = REG24(cpustate, dr);
+	int drval = REG24(dr);
 	int res = drval | EXTEND16_TO_24(op);
 	if (IS_WRITEABLE(dr))
-		cpustate->r[dr] = res;
-	SET_NZ00_24(cpustate, res);
+		m_r[dr] = res;
+	SET_NZ00_24(res);
 }
 
 
-static void ande_di(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::ande_di(UINT32 op)
 {
 	int dr = (op >> 16) & 0x1f;
-	int drval = REG24(cpustate, dr);
+	int drval = REG24(dr);
 	int res = drval & EXTEND16_TO_24(op);
 	if (IS_WRITEABLE(dr))
-		cpustate->r[dr] = res;
-	SET_NZ00_24(cpustate, res);
+		m_r[dr] = res;
+	SET_NZ00_24(res);
 }
 
 
-static void teste_di(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::teste_di(UINT32 op)
 {
-	int drval = REG24(cpustate, (op >> 16) & 0x1f);
+	int drval = REG24((op >> 16) & 0x1f);
 	int res = drval & EXTEND16_TO_24(op);
-	SET_NZ00_24(cpustate, res);
+	SET_NZ00_24(res);
 }
 
 
 
-/***************************************************************************
-    CAU LOAD/STORE IMPLEMENTATION
-***************************************************************************/
+//**************************************************************************
+//  CAU LOAD/STORE IMPLEMENTATION
+//**************************************************************************
 
-static void load_hi(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::load_hi(UINT32 op)
 {
 	int dr = (op >> 16) & 0x1f;
-	UINT32 res = RBYTE(cpustate, EXTEND16_TO_24(op));
+	UINT32 res = RBYTE(EXTEND16_TO_24(op));
 	if (IS_WRITEABLE(dr))
-		cpustate->r[dr] = EXTEND16_TO_24(res);
-	cpustate->nzcflags = res << 8;
-	cpustate->vflags = 0;
+		m_r[dr] = EXTEND16_TO_24(res);
+	m_nzcflags = res << 8;
+	m_vflags = 0;
 }
 
 
-static void load_li(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::load_li(UINT32 op)
 {
 	int dr = (op >> 16) & 0x1f;
-	UINT32 res = RBYTE(cpustate, EXTEND16_TO_24(op));
+	UINT32 res = RBYTE(EXTEND16_TO_24(op));
 	if (IS_WRITEABLE(dr))
-		cpustate->r[dr] = res;
-	cpustate->nzcflags = res << 8;
-	cpustate->vflags = 0;
+		m_r[dr] = res;
+	m_nzcflags = res << 8;
+	m_vflags = 0;
 }
 
 
-static void load_i(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::load_i(UINT32 op)
 {
-	UINT32 res = RWORD(cpustate, EXTEND16_TO_24(op));
+	UINT32 res = RWORD(EXTEND16_TO_24(op));
 	int dr = (op >> 16) & 0x1f;
 	if (IS_WRITEABLE(dr))
-		cpustate->r[dr] = EXTEND16_TO_24(res);
-	cpustate->nzcflags = res << 8;
-	cpustate->vflags = 0;
+		m_r[dr] = EXTEND16_TO_24(res);
+	m_nzcflags = res << 8;
+	m_vflags = 0;
 }
 
 
-static void load_ei(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::load_ei(UINT32 op)
 {
-	UINT32 res = TRUNCATE24(RLONG(cpustate, EXTEND16_TO_24(op)));
+	UINT32 res = TRUNCATE24(RLONG(EXTEND16_TO_24(op)));
 	int dr = (op >> 16) & 0x1f;
 	if (IS_WRITEABLE(dr))
-		cpustate->r[dr] = res;
-	cpustate->nzcflags = res;
-	cpustate->vflags = 0;
+		m_r[dr] = res;
+	m_nzcflags = res;
+	m_vflags = 0;
 }
 
 
-static void store_hi(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::store_hi(UINT32 op)
 {
-	WBYTE(cpustate, EXTEND16_TO_24(op), cpustate->r[(op >> 16) & 0x1f] >> 8);
+	WBYTE(EXTEND16_TO_24(op), m_r[(op >> 16) & 0x1f] >> 8);
 }
 
 
-static void store_li(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::store_li(UINT32 op)
 {
-	WBYTE(cpustate, EXTEND16_TO_24(op), cpustate->r[(op >> 16) & 0x1f]);
+	WBYTE(EXTEND16_TO_24(op), m_r[(op >> 16) & 0x1f]);
 }
 
 
-static void store_i(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::store_i(UINT32 op)
 {
-	WWORD(cpustate, EXTEND16_TO_24(op), REG16(cpustate, (op >> 16) & 0x1f));
+	WWORD(EXTEND16_TO_24(op), REG16((op >> 16) & 0x1f));
 }
 
 
-static void store_ei(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::store_ei(UINT32 op)
 {
-	WLONG(cpustate, EXTEND16_TO_24(op), (INT32)(REG24(cpustate, (op >> 16) & 0x1f) << 8) >> 8);
+	WLONG(EXTEND16_TO_24(op), (INT32)(REG24((op >> 16) & 0x1f) << 8) >> 8);
 }
 
 
-static void load_hr(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::load_hr(UINT32 op)
 {
 	if (!(op & 0x400))
 	{
 		int dr = (op >> 16) & 0x1f;
-		UINT32 res = cau_read_pi_1byte(cpustate, op) << 8;
+		UINT32 res = cau_read_pi_1byte(op) << 8;
 		if (IS_WRITEABLE(dr))
-			cpustate->r[dr] = EXTEND16_TO_24(res);
-		cpustate->nzcflags = res << 8;
-		cpustate->vflags = 0;
+			m_r[dr] = EXTEND16_TO_24(res);
+		m_nzcflags = res << 8;
+		m_vflags = 0;
 	}
 	else
-		unimplemented(cpustate, op);
+		unimplemented(op);
 }
 
 
-static void load_lr(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::load_lr(UINT32 op)
 {
 	if (!(op & 0x400))
 	{
 		int dr = (op >> 16) & 0x1f;
-		UINT32 res = cau_read_pi_1byte(cpustate, op);
+		UINT32 res = cau_read_pi_1byte(op);
 		if (IS_WRITEABLE(dr))
-			cpustate->r[dr] = res;
-		cpustate->nzcflags = res << 8;
-		cpustate->vflags = 0;
+			m_r[dr] = res;
+		m_nzcflags = res << 8;
+		m_vflags = 0;
 	}
 	else
-		unimplemented(cpustate, op);
+		unimplemented(op);
 }
 
 
-static void load_r(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::load_r(UINT32 op)
 {
 	if (!(op & 0x400))
 	{
-		UINT32 res = cau_read_pi_2byte(cpustate, op);
+		UINT32 res = cau_read_pi_2byte(op);
 		int dr = (op >> 16) & 0x1f;
 		if (IS_WRITEABLE(dr))
-			cpustate->r[dr] = EXTEND16_TO_24(res);
-		cpustate->nzcflags = res << 8;
-		cpustate->vflags = 0;
+			m_r[dr] = EXTEND16_TO_24(res);
+		m_nzcflags = res << 8;
+		m_vflags = 0;
 	}
 	else
-		unimplemented(cpustate, op);
+		unimplemented(op);
 }
 
 
-static void load_er(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::load_er(UINT32 op)
 {
 	if (!(op & 0x400))
 	{
-		UINT32 res = TRUNCATE24(cau_read_pi_4byte(cpustate, op));
+		UINT32 res = TRUNCATE24(cau_read_pi_4byte(op));
 		int dr = (op >> 16) & 0x1f;
 		if (IS_WRITEABLE(dr))
-			cpustate->r[dr] = res;
-		cpustate->nzcflags = res;
-		cpustate->vflags = 0;
+			m_r[dr] = res;
+		m_nzcflags = res;
+		m_vflags = 0;
 	}
 	else
-		unimplemented(cpustate, op);
+		unimplemented(op);
 }
 
 
-static void store_hr(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::store_hr(UINT32 op)
 {
 	if (!(op & 0x400))
-		cau_write_pi_1byte(cpustate, op, cpustate->r[(op >> 16) & 0x1f] >> 8);
+		cau_write_pi_1byte(op, m_r[(op >> 16) & 0x1f] >> 8);
 	else
-		unimplemented(cpustate, op);
+		unimplemented(op);
 }
 
 
-static void store_lr(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::store_lr(UINT32 op)
 {
 	if (!(op & 0x400))
-		cau_write_pi_1byte(cpustate, op, cpustate->r[(op >> 16) & 0x1f]);
+		cau_write_pi_1byte(op, m_r[(op >> 16) & 0x1f]);
 	else
-		unimplemented(cpustate, op);
+		unimplemented(op);
 }
 
 
-static void store_r(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::store_r(UINT32 op)
 {
 	if (!(op & 0x400))
-		cau_write_pi_2byte(cpustate, op, REG16(cpustate, (op >> 16) & 0x1f));
+		cau_write_pi_2byte(op, REG16((op >> 16) & 0x1f));
 	else
-		unimplemented(cpustate, op);
+		unimplemented(op);
 }
 
 
-static void store_er(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::store_er(UINT32 op)
 {
 	if (!(op & 0x400))
-		cau_write_pi_4byte(cpustate, op, REG24(cpustate, (op >> 16) & 0x1f));
+		cau_write_pi_4byte(op, REG24((op >> 16) & 0x1f));
 	else
-		unimplemented(cpustate, op);
+		unimplemented(op);
 }
 
 
-static void load24(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::load24(UINT32 op)
 {
 	int dr = (op >> 16) & 0x1f;
 	UINT32 res = (op & 0xffff) + ((op >> 5) & 0xff0000);
 	if (IS_WRITEABLE(dr))
-		cpustate->r[dr] = res;
+		m_r[dr] = res;
 }
 
 
 
-/***************************************************************************
-    DAU FORM 1 IMPLEMENTATION
-***************************************************************************/
+//**************************************************************************
+//  DAU FORM 1 IMPLEMENTATION
+//**************************************************************************
 
-static void d1_aMpp(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d1_aMpp(UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
-	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 0, xval);
-	double res = yval + DEFERRED_MULTIPLIER(cpustate, (op >> 26) & 7) * xval;
+	double xval = dau_read_pi_double_1st(op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(op >> 7, 0, xval);
+	double res = yval + DEFERRED_MULTIPLIER((op >> 26) & 7) * xval;
 	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(cpustate, zpi, res);
-	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
+		dau_write_pi_double(zpi, res);
+	dau_set_val_flags((op >> 21) & 3, res);
 }
 
 
-static void d1_aMpm(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d1_aMpm(UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
-	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 0, xval);
-	double res = yval - DEFERRED_MULTIPLIER(cpustate, (op >> 26) & 7) * xval;
+	double xval = dau_read_pi_double_1st(op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(op >> 7, 0, xval);
+	double res = yval - DEFERRED_MULTIPLIER((op >> 26) & 7) * xval;
 	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(cpustate, zpi, res);
-	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
+		dau_write_pi_double(zpi, res);
+	dau_set_val_flags((op >> 21) & 3, res);
 }
 
 
-static void d1_aMmp(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d1_aMmp(UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
-	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 0, xval);
-	double res = -yval + DEFERRED_MULTIPLIER(cpustate, (op >> 26) & 7) * xval;
+	double xval = dau_read_pi_double_1st(op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(op >> 7, 0, xval);
+	double res = -yval + DEFERRED_MULTIPLIER((op >> 26) & 7) * xval;
 	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(cpustate, zpi, res);
-	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
+		dau_write_pi_double(zpi, res);
+	dau_set_val_flags((op >> 21) & 3, res);
 }
 
 
-static void d1_aMmm(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d1_aMmm(UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
-	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 0, xval);
-	double res = -yval - DEFERRED_MULTIPLIER(cpustate, (op >> 26) & 7) * xval;
+	double xval = dau_read_pi_double_1st(op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(op >> 7, 0, xval);
+	double res = -yval - DEFERRED_MULTIPLIER((op >> 26) & 7) * xval;
 	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(cpustate, zpi, res);
-	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
+		dau_write_pi_double(zpi, res);
+	dau_set_val_flags((op >> 21) & 3, res);
 }
 
 
-static void d1_0px(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d1_0px(UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
-	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 0, xval);
+	double xval = dau_read_pi_double_1st(op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(op >> 7, 0, xval);
 	double res = yval;
 	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(cpustate, zpi, res);
-	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
+		dau_write_pi_double(zpi, res);
+	dau_set_val_flags((op >> 21) & 3, res);
 	(void)xval;
 }
 
 
-static void d1_0mx(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d1_0mx(UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
-	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 0, xval);
+	double xval = dau_read_pi_double_1st(op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(op >> 7, 0, xval);
 	double res = -yval;
 	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(cpustate, zpi, res);
-	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
+		dau_write_pi_double(zpi, res);
+	dau_set_val_flags((op >> 21) & 3, res);
 	(void)xval;
 }
 
 
-static void d1_1pp(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d1_1pp(UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
-	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 0, xval);
+	double xval = dau_read_pi_double_1st(op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(op >> 7, 0, xval);
 	double res = yval + xval;
 	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(cpustate, zpi, res);
-	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
+		dau_write_pi_double(zpi, res);
+	dau_set_val_flags((op >> 21) & 3, res);
 }
 
 
-static void d1_1pm(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d1_1pm(UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
-	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 0, xval);
+	double xval = dau_read_pi_double_1st(op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(op >> 7, 0, xval);
 	double res = yval - xval;
 	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(cpustate, zpi, res);
-	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
+		dau_write_pi_double(zpi, res);
+	dau_set_val_flags((op >> 21) & 3, res);
 }
 
 
-static void d1_1mp(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d1_1mp(UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
-	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 0, xval);
+	double xval = dau_read_pi_double_1st(op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(op >> 7, 0, xval);
 	double res = -yval + xval;
 	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(cpustate, zpi, res);
-	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
+		dau_write_pi_double(zpi, res);
+	dau_set_val_flags((op >> 21) & 3, res);
 }
 
 
-static void d1_1mm(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d1_1mm(UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
-	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 0, xval);
+	double xval = dau_read_pi_double_1st(op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(op >> 7, 0, xval);
 	double res = -yval - xval;
 	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(cpustate, zpi, res);
-	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
+		dau_write_pi_double(zpi, res);
+	dau_set_val_flags((op >> 21) & 3, res);
 }
 
 
-static void d1_aMppr(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d1_aMppr(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void d1_aMpmr(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d1_aMpmr(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void d1_aMmpr(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d1_aMmpr(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void d1_aMmmr(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d1_aMmmr(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
 
-/***************************************************************************
-    DAU FORM 2 IMPLEMENTATION
-***************************************************************************/
+//**************************************************************************
+//  DAU FORM 2 IMPLEMENTATION
+//**************************************************************************
 
-static void d2_aMpp(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d2_aMpp(UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
-	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 1, xval);
-	double res = cpustate->a[(op >> 26) & 7] + yval * xval;
+	double xval = dau_read_pi_double_1st(op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(op >> 7, 1, xval);
+	double res = m_a[(op >> 26) & 7] + yval * xval;
 	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(cpustate, zpi, yval);
-	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
+		dau_write_pi_double(zpi, yval);
+	dau_set_val_flags((op >> 21) & 3, res);
 }
 
 
-static void d2_aMpm(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d2_aMpm(UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
-	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 1, xval);
-	double res = cpustate->a[(op >> 26) & 7] - yval * xval;
+	double xval = dau_read_pi_double_1st(op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(op >> 7, 1, xval);
+	double res = m_a[(op >> 26) & 7] - yval * xval;
 	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(cpustate, zpi, yval);
-	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
+		dau_write_pi_double(zpi, yval);
+	dau_set_val_flags((op >> 21) & 3, res);
 }
 
 
-static void d2_aMmp(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d2_aMmp(UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
-	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 1, xval);
-	double res = -cpustate->a[(op >> 26) & 7] + yval * xval;
+	double xval = dau_read_pi_double_1st(op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(op >> 7, 1, xval);
+	double res = -m_a[(op >> 26) & 7] + yval * xval;
 	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(cpustate, zpi, yval);
-	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
+		dau_write_pi_double(zpi, yval);
+	dau_set_val_flags((op >> 21) & 3, res);
 }
 
 
-static void d2_aMmm(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d2_aMmm(UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
-	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 1, xval);
-	double res = -cpustate->a[(op >> 26) & 7] - yval * xval;
+	double xval = dau_read_pi_double_1st(op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(op >> 7, 1, xval);
+	double res = -m_a[(op >> 26) & 7] - yval * xval;
 	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(cpustate, zpi, yval);
-	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
+		dau_write_pi_double(zpi, yval);
+	dau_set_val_flags((op >> 21) & 3, res);
 }
 
 
-static void d2_aMppr(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d2_aMppr(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void d2_aMpmr(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d2_aMpmr(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void d2_aMmpr(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d2_aMmpr(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void d2_aMmmr(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d2_aMmmr(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
 
-/***************************************************************************
-    DAU FORM 3 IMPLEMENTATION
-***************************************************************************/
+//**************************************************************************
+//  DAU FORM 3 IMPLEMENTATION
+//**************************************************************************
 
-static void d3_aMpp(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d3_aMpp(UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
-	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 1, xval);
-	double res = cpustate->a[(op >> 26) & 7] + yval * xval;
+	double xval = dau_read_pi_double_1st(op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(op >> 7, 1, xval);
+	double res = m_a[(op >> 26) & 7] + yval * xval;
 	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(cpustate, zpi, res);
-	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
+		dau_write_pi_double(zpi, res);
+	dau_set_val_flags((op >> 21) & 3, res);
 }
 
 
-static void d3_aMpm(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d3_aMpm(UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
-	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 1, xval);
-	double res = cpustate->a[(op >> 26) & 7] - yval * xval;
+	double xval = dau_read_pi_double_1st(op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(op >> 7, 1, xval);
+	double res = m_a[(op >> 26) & 7] - yval * xval;
 	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(cpustate, zpi, res);
-	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
+		dau_write_pi_double(zpi, res);
+	dau_set_val_flags((op >> 21) & 3, res);
 }
 
 
-static void d3_aMmp(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d3_aMmp(UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
-	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 1, xval);
-	double res = -cpustate->a[(op >> 26) & 7] + yval * xval;
+	double xval = dau_read_pi_double_1st(op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(op >> 7, 1, xval);
+	double res = -m_a[(op >> 26) & 7] + yval * xval;
 	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(cpustate, zpi, res);
-	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
+		dau_write_pi_double(zpi, res);
+	dau_set_val_flags((op >> 21) & 3, res);
 }
 
 
-static void d3_aMmm(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d3_aMmm(UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
-	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 1, xval);
-	double res = -cpustate->a[(op >> 26) & 7] - yval * xval;
+	double xval = dau_read_pi_double_1st(op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(op >> 7, 1, xval);
+	double res = -m_a[(op >> 26) & 7] - yval * xval;
 	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(cpustate, zpi, res);
-	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
+		dau_write_pi_double(zpi, res);
+	dau_set_val_flags((op >> 21) & 3, res);
 }
 
 
-static void d3_aMppr(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d3_aMppr(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void d3_aMpmr(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d3_aMpmr(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void d3_aMmpr(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d3_aMmpr(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void d3_aMmmr(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d3_aMmmr(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
 
-/***************************************************************************
-    DAU FORM 4 IMPLEMENTATION
-***************************************************************************/
+//**************************************************************************
+//  DAU FORM 4 IMPLEMENTATION
+//**************************************************************************
 
-static void d4_pp(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d4_pp(UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
-	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 0, xval);
+	double xval = dau_read_pi_double_1st(op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(op >> 7, 0, xval);
 	double res = yval + xval;
 	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(cpustate, zpi, yval);
-	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
+		dau_write_pi_double(zpi, yval);
+	dau_set_val_flags((op >> 21) & 3, res);
 }
 
 
-static void d4_pm(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d4_pm(UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
-	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 0, xval);
+	double xval = dau_read_pi_double_1st(op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(op >> 7, 0, xval);
 	double res = yval - xval;
 	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(cpustate, zpi, yval);
-	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
+		dau_write_pi_double(zpi, yval);
+	dau_set_val_flags((op >> 21) & 3, res);
 }
 
 
-static void d4_mp(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d4_mp(UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
-	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 0, xval);
+	double xval = dau_read_pi_double_1st(op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(op >> 7, 0, xval);
 	double res = -yval + xval;
 	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(cpustate, zpi, yval);
-	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
+		dau_write_pi_double(zpi, yval);
+	dau_set_val_flags((op >> 21) & 3, res);
 }
 
 
-static void d4_mm(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d4_mm(UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
-	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 0, xval);
+	double xval = dau_read_pi_double_1st(op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(op >> 7, 0, xval);
 	double res = -yval - xval;
 	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(cpustate, zpi, yval);
-	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
+		dau_write_pi_double(zpi, yval);
+	dau_set_val_flags((op >> 21) & 3, res);
 }
 
 
-static void d4_ppr(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d4_ppr(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void d4_pmr(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d4_pmr(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void d4_mpr(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d4_mpr(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void d4_mmr(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d4_mmr(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
 
-/***************************************************************************
-    DAU FORM 5 IMPLEMENTATION
-***************************************************************************/
+//**************************************************************************
+//  DAU FORM 5 IMPLEMENTATION
+//**************************************************************************
 
-static void d5_ic(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d5_ic(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void d5_oc(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d5_oc(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void d5_float(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d5_float(UINT32 op)
 {
-	double res = (double)(INT16)dau_read_pi_2bytes(cpustate, op >> 7);
+	double res = (double)(INT16)dau_read_pi_2bytes(op >> 7);
 	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(cpustate, zpi, res);
-	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
+		dau_write_pi_double(zpi, res);
+	dau_set_val_flags((op >> 21) & 3, res);
 }
 
 
-static void d5_int(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d5_int(UINT32 op)
 {
-	double val = dau_read_pi_double_1st(cpustate, op >> 7, 0);
+	double val = dau_read_pi_double_1st(op >> 7, 0);
 	int zpi = (op >> 0) & 0x7f;
 	INT16 res;
-	if (!(cpustate->DAUC & 0x10)) val = floor(val + 0.5);
+	if (!(DAUC & 0x10)) val = floor(val + 0.5);
 	else val = ceil(val - 0.5);
 	res = (INT16)val;
 	if (zpi != 7)
-		dau_write_pi_2bytes(cpustate, zpi, res);
-	dau_set_val_noflags(cpustate, (op >> 21) & 3, dsp_to_double(res << 16));
+		dau_write_pi_2bytes(zpi, res);
+	dau_set_val_noflags((op >> 21) & 3, dsp_to_double(res << 16));
 }
 
 
-static void d5_round(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d5_round(UINT32 op)
 {
-	double res = (double)(float)dau_read_pi_double_1st(cpustate, op >> 7, 0);
+	double res = (double)(float)dau_read_pi_double_1st(op >> 7, 0);
 	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(cpustate, zpi, res);
-	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
+		dau_write_pi_double(zpi, res);
+	dau_set_val_flags((op >> 21) & 3, res);
 }
 
 
-static void d5_ifalt(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d5_ifalt(UINT32 op)
 {
 	int ar = (op >> 21) & 3;
-	double res = cpustate->a[ar];
+	double res = m_a[ar];
 	int zpi = (op >> 0) & 0x7f;
 	if (NFLAG)
-		res = dau_read_pi_double_1st(cpustate, op >> 7, 0);
+		res = dau_read_pi_double_1st(op >> 7, 0);
 	if (zpi != 7)
-		dau_write_pi_double(cpustate, zpi, res);
-	dau_set_val_noflags(cpustate, ar, res);
+		dau_write_pi_double(zpi, res);
+	dau_set_val_noflags(ar, res);
 }
 
 
-static void d5_ifaeq(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d5_ifaeq(UINT32 op)
 {
 	int ar = (op >> 21) & 3;
-	double res = cpustate->a[ar];
+	double res = m_a[ar];
 	int zpi = (op >> 0) & 0x7f;
 	if (ZFLAG)
-		res = dau_read_pi_double_1st(cpustate, op >> 7, 0);
+		res = dau_read_pi_double_1st(op >> 7, 0);
 	if (zpi != 7)
-		dau_write_pi_double(cpustate, zpi, res);
-	dau_set_val_noflags(cpustate, ar, res);
+		dau_write_pi_double(zpi, res);
+	dau_set_val_noflags(ar, res);
 }
 
 
-static void d5_ifagt(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d5_ifagt(UINT32 op)
 {
 	int ar = (op >> 21) & 3;
-	double res = cpustate->a[ar];
+	double res = m_a[ar];
 	int zpi = (op >> 0) & 0x7f;
 	if (!NFLAG && !ZFLAG)
-		res = dau_read_pi_double_1st(cpustate, op >> 7, 0);
+		res = dau_read_pi_double_1st(op >> 7, 0);
 	if (zpi != 7)
-		dau_write_pi_double(cpustate, zpi, res);
-	dau_set_val_noflags(cpustate, ar, res);
+		dau_write_pi_double(zpi, res);
+	dau_set_val_noflags(ar, res);
 }
 
 
-static void d5_float24(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d5_float24(UINT32 op)
 {
-	double res = (double)((INT32)(dau_read_pi_4bytes(cpustate, op >> 7) << 8) >> 8);
+	double res = (double)((INT32)(dau_read_pi_4bytes(op >> 7) << 8) >> 8);
 	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(cpustate, zpi, res);
-	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
+		dau_write_pi_double(zpi, res);
+	dau_set_val_flags((op >> 21) & 3, res);
 }
 
 
-static void d5_int24(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d5_int24(UINT32 op)
 {
-	double val = dau_read_pi_double_1st(cpustate, op >> 7, 0);
+	double val = dau_read_pi_double_1st(op >> 7, 0);
 	int zpi = (op >> 0) & 0x7f;
 	INT32 res;
-	if (!(cpustate->DAUC & 0x10)) val = floor(val + 0.5);
+	if (!(DAUC & 0x10)) val = floor(val + 0.5);
 	else val = ceil(val - 0.5);
 	res = (INT32)val;
 	if (res > 0x7fffff) res = 0x7fffff;
 	else if (res < -0x800000) res = -0x800000;
 	if (zpi != 7)
-		dau_write_pi_4bytes(cpustate, zpi, (INT32)(res << 8) >> 8);
-	dau_set_val_noflags(cpustate, (op >> 21) & 3, dsp_to_double(res << 8));
+		dau_write_pi_4bytes(zpi, (INT32)(res << 8) >> 8);
+	dau_set_val_noflags((op >> 21) & 3, dsp_to_double(res << 8));
 }
 
 
-static void d5_ieee(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d5_ieee(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void d5_dsp(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d5_dsp(UINT32 op)
 {
-	unimplemented(cpustate, op);
+	unimplemented(op);
 }
 
 
-static void d5_seed(dsp32_state *cpustate, UINT32 op)
+void dsp32c_device::d5_seed(UINT32 op)
 {
-	UINT32 val = dau_read_pi_4bytes(cpustate, op >> 7);
+	UINT32 val = dau_read_pi_4bytes(op >> 7);
 	INT32 res = val ^ 0x7fffffff;
 	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_4bytes(cpustate, zpi, res);
-	dau_set_val_flags(cpustate, (op >> 21) & 3, dsp_to_double((INT32)res));
+		dau_write_pi_4bytes(zpi, res);
+	dau_set_val_flags((op >> 21) & 3, dsp_to_double((INT32)res));
 }
 
 
 
-/***************************************************************************
-    FUNCTION TABLE
-***************************************************************************/
+//**************************************************************************
+//  FUNCTION TABLE
+//**************************************************************************
 
-void (*const dsp32ops[])(dsp32_state *cpustate, UINT32 op) =
+void (dsp32c_device::*const dsp32c_device::s_dsp32ops[])(UINT32 op) =
 {
-	nop,		goto_t,		goto_pl,	goto_mi,	goto_ne,	goto_eq,	goto_vc,	goto_vs,	/* 00 */
-	goto_cc,	goto_cs,	goto_ge,	goto_lt,	goto_gt,	goto_le,	goto_hi,	goto_ls,
-	goto_auc,	goto_aus,	goto_age,	goto_alt,	goto_ane,	goto_aeq,	goto_avc,	goto_avs,	/* 01 */
-	goto_agt,	goto_ale,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
-	goto_ibe,	goto_ibf,	goto_obf,	goto_obe,	goto_pde,	goto_pdf,	goto_pie,	goto_pif,	/* 02 */
-	goto_syc,	goto_sys,	goto_fbc,	goto_fbs,	goto_irq1lo,goto_irq1hi,goto_irq2lo,goto_irq2hi,
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	/* 03 */
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
+	&dsp32c_device::nop,		&dsp32c_device::goto_t,		&dsp32c_device::goto_pl,	&dsp32c_device::goto_mi,	&dsp32c_device::goto_ne,	&dsp32c_device::goto_eq,	&dsp32c_device::goto_vc,	&dsp32c_device::goto_vs,	// 00
+	&dsp32c_device::goto_cc,	&dsp32c_device::goto_cs,	&dsp32c_device::goto_ge,	&dsp32c_device::goto_lt,	&dsp32c_device::goto_gt,	&dsp32c_device::goto_le,	&dsp32c_device::goto_hi,	&dsp32c_device::goto_ls,
+	&dsp32c_device::goto_auc,	&dsp32c_device::goto_aus,	&dsp32c_device::goto_age,	&dsp32c_device::goto_alt,	&dsp32c_device::goto_ane,	&dsp32c_device::goto_aeq,	&dsp32c_device::goto_avc,	&dsp32c_device::goto_avs,	// 01
+	&dsp32c_device::goto_agt,	&dsp32c_device::goto_ale,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
+	&dsp32c_device::goto_ibe,	&dsp32c_device::goto_ibf,	&dsp32c_device::goto_obf,	&dsp32c_device::goto_obe,	&dsp32c_device::goto_pde,	&dsp32c_device::goto_pdf,	&dsp32c_device::goto_pie,	&dsp32c_device::goto_pif,	// 02
+	&dsp32c_device::goto_syc,	&dsp32c_device::goto_sys,	&dsp32c_device::goto_fbc,	&dsp32c_device::goto_fbs,	&dsp32c_device::goto_irq1lo,&dsp32c_device::goto_irq1hi,&dsp32c_device::goto_irq2lo,&dsp32c_device::goto_irq2hi,
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 03
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
 
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	/* 04 */
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	/* 05 */
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
-	dec_goto,	dec_goto,	dec_goto,	dec_goto,	dec_goto,	dec_goto,	dec_goto,	dec_goto,	/* 06 */
-	dec_goto,	dec_goto,	dec_goto,	dec_goto,	dec_goto,	dec_goto,	dec_goto,	dec_goto,
-	dec_goto,	dec_goto,	dec_goto,	dec_goto,	dec_goto,	dec_goto,	dec_goto,	dec_goto,	/* 07 */
-	dec_goto,	dec_goto,	dec_goto,	dec_goto,	dec_goto,	dec_goto,	dec_goto,	dec_goto,
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 04
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 05
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
+	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	// 06
+	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,
+	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	// 07
+	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,	&dsp32c_device::dec_goto,
 
-	call,		call,		call,		call,		call,		call,		call,		call,		/* 08 */
-	call,		call,		call,		call,		call,		call,		call,		call,
-	call,		call,		call,		call,		call,		call,		call,		call,		/* 09 */
-	call,		call,		call,		call,		call,		call,		call,		call,
-	add_si,		add_si,		add_si,		add_si,		add_si,		add_si,		add_si,		add_si,		/* 0a */
-	add_si,		add_si,		add_si,		add_si,		add_si,		add_si,		add_si,		add_si,
-	add_si,		add_si,		add_si,		add_si,		add_si,		add_si,		add_si,		add_si,		/* 0b */
-	add_si,		add_si,		add_si,		add_si,		add_si,		add_si,		add_si,		add_si,
+	&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		// 08
+	&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,
+	&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		// 09
+	&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,		&dsp32c_device::call,
+	&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		// 0a
+	&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,
+	&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		// 0b
+	&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,		&dsp32c_device::add_si,
 
-	add_ss,		mul2_s,		subr_ss,	addr_ss,	sub_ss,		neg_s,		andc_ss,	cmp_ss,		/* 0c */
-	xor_ss,		rcr_s,		or_ss,		rcl_s,		shr_s,		div2_s,		and_ss,		test_ss,
-	add_di,		illegal,	subr_di,	addr_di,	sub_di,		illegal,	andc_di,	cmp_di,		/* 0d */
-	xor_di,		illegal,	or_di,		illegal,	illegal,	illegal,	and_di,		test_di,
-	load_hi,	load_hi,	load_li,	load_li,	load_i,		load_i,		load_ei,	load_ei,	/* 0e */
-	store_hi,	store_hi,	store_li,	store_li,	store_i,	store_i,	store_ei,	store_ei,
-	load_hr,	load_hr,	load_lr,	load_lr,	load_r,		load_r,		load_er,	load_er,	/* 0f */
-	store_hr,	store_hr,	store_lr,	store_lr,	store_r,	store_r,	store_er,	store_er,
+	&dsp32c_device::add_ss,		&dsp32c_device::mul2_s,		&dsp32c_device::subr_ss,	&dsp32c_device::addr_ss,	&dsp32c_device::sub_ss,		&dsp32c_device::neg_s,		&dsp32c_device::andc_ss,	&dsp32c_device::cmp_ss,		// 0c
+	&dsp32c_device::xor_ss,		&dsp32c_device::rcr_s,		&dsp32c_device::or_ss,		&dsp32c_device::rcl_s,		&dsp32c_device::shr_s,		&dsp32c_device::div2_s,		&dsp32c_device::and_ss,		&dsp32c_device::test_ss,
+	&dsp32c_device::add_di,		&dsp32c_device::illegal,	&dsp32c_device::subr_di,	&dsp32c_device::addr_di,	&dsp32c_device::sub_di,		&dsp32c_device::illegal,	&dsp32c_device::andc_di,	&dsp32c_device::cmp_di,		// 0d
+	&dsp32c_device::xor_di,		&dsp32c_device::illegal,	&dsp32c_device::or_di,		&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::and_di,		&dsp32c_device::test_di,
+	&dsp32c_device::load_hi,	&dsp32c_device::load_hi,	&dsp32c_device::load_li,	&dsp32c_device::load_li,	&dsp32c_device::load_i,		&dsp32c_device::load_i,		&dsp32c_device::load_ei,	&dsp32c_device::load_ei,	// 0e
+	&dsp32c_device::store_hi,	&dsp32c_device::store_hi,	&dsp32c_device::store_li,	&dsp32c_device::store_li,	&dsp32c_device::store_i,	&dsp32c_device::store_i,	&dsp32c_device::store_ei,	&dsp32c_device::store_ei,
+	&dsp32c_device::load_hr,	&dsp32c_device::load_hr,	&dsp32c_device::load_lr,	&dsp32c_device::load_lr,	&dsp32c_device::load_r,		&dsp32c_device::load_r,		&dsp32c_device::load_er,	&dsp32c_device::load_er,	// 0f
+	&dsp32c_device::store_hr,	&dsp32c_device::store_hr,	&dsp32c_device::store_lr,	&dsp32c_device::store_lr,	&dsp32c_device::store_r,	&dsp32c_device::store_r,	&dsp32c_device::store_er,	&dsp32c_device::store_er,
 
-	d1_aMpp,	d1_aMpp,	d1_aMpp,	d1_aMpp,	d1_aMpm,	d1_aMpm,	d1_aMpm,	d1_aMpm,	/* 10 */
-	d1_aMmp,	d1_aMmp,	d1_aMmp,	d1_aMmp,	d1_aMmm,	d1_aMmm,	d1_aMmm,	d1_aMmm,
-	d1_aMppr,	d1_aMppr,	d1_aMppr,	d1_aMppr,	d1_aMpmr,	d1_aMpmr,	d1_aMpmr,	d1_aMpmr,	/* 11 */
-	d1_aMmpr,	d1_aMmpr,	d1_aMmpr,	d1_aMmpr,	d1_aMmmr,	d1_aMmmr,	d1_aMmmr,	d1_aMmmr,
-	d1_aMpp,	d1_aMpp,	d1_aMpp,	d1_aMpp,	d1_aMpm,	d1_aMpm,	d1_aMpm,	d1_aMpm,	/* 12 */
-	d1_aMmp,	d1_aMmp,	d1_aMmp,	d1_aMmp,	d1_aMmm,	d1_aMmm,	d1_aMmm,	d1_aMmm,
-	d1_aMppr,	d1_aMppr,	d1_aMppr,	d1_aMppr,	d1_aMpmr,	d1_aMpmr,	d1_aMpmr,	d1_aMpmr,	/* 13 */
-	d1_aMmpr,	d1_aMmpr,	d1_aMmpr,	d1_aMmpr,	d1_aMmmr,	d1_aMmmr,	d1_aMmmr,	d1_aMmmr,
+	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpm,	&dsp32c_device::d1_aMpm,	&dsp32c_device::d1_aMpm,	&dsp32c_device::d1_aMpm,	// 10
+	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmm,	&dsp32c_device::d1_aMmm,	&dsp32c_device::d1_aMmm,	&dsp32c_device::d1_aMmm,
+	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	// 11
+	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,
+	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpm,	&dsp32c_device::d1_aMpm,	&dsp32c_device::d1_aMpm,	&dsp32c_device::d1_aMpm,	// 12
+	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmm,	&dsp32c_device::d1_aMmm,	&dsp32c_device::d1_aMmm,	&dsp32c_device::d1_aMmm,
+	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	// 13
+	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,
 
-	d1_aMpp,	d1_aMpp,	d1_aMpp,	d1_aMpp,	d1_aMpm,	d1_aMpm,	d1_aMpm,	d1_aMpm,	/* 14 */
-	d1_aMmp,	d1_aMmp,	d1_aMmp,	d1_aMmp,	d1_aMmm,	d1_aMmm,	d1_aMmm,	d1_aMmm,
-	d1_aMppr,	d1_aMppr,	d1_aMppr,	d1_aMppr,	d1_aMpmr,	d1_aMpmr,	d1_aMpmr,	d1_aMpmr,	/* 15 */
-	d1_aMmpr,	d1_aMmpr,	d1_aMmpr,	d1_aMmpr,	d1_aMmmr,	d1_aMmmr,	d1_aMmmr,	d1_aMmmr,
-	d1_aMpp,	d1_aMpp,	d1_aMpp,	d1_aMpp,	d1_aMpm,	d1_aMpm,	d1_aMpm,	d1_aMpm,	/* 16 */
-	d1_aMmp,	d1_aMmp,	d1_aMmp,	d1_aMmp,	d1_aMmm,	d1_aMmm,	d1_aMmm,	d1_aMmm,
-	d1_aMppr,	d1_aMppr,	d1_aMppr,	d1_aMppr,	d1_aMpmr,	d1_aMpmr,	d1_aMpmr,	d1_aMpmr,	/* 17 */
-	d1_aMmpr,	d1_aMmpr,	d1_aMmpr,	d1_aMmpr,	d1_aMmmr,	d1_aMmmr,	d1_aMmmr,	d1_aMmmr,
+	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpm,	&dsp32c_device::d1_aMpm,	&dsp32c_device::d1_aMpm,	&dsp32c_device::d1_aMpm,	// 14
+	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmm,	&dsp32c_device::d1_aMmm,	&dsp32c_device::d1_aMmm,	&dsp32c_device::d1_aMmm,
+	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	// 15
+	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,
+	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpp,	&dsp32c_device::d1_aMpm,	&dsp32c_device::d1_aMpm,	&dsp32c_device::d1_aMpm,	&dsp32c_device::d1_aMpm,	// 16
+	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmp,	&dsp32c_device::d1_aMmm,	&dsp32c_device::d1_aMmm,	&dsp32c_device::d1_aMmm,	&dsp32c_device::d1_aMmm,
+	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	// 17
+	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,
 
-	d1_0px,		d1_0px,		d1_0px,		d1_0px,		d1_0px,		d1_0px,		d1_0px,		d1_0px,		/* 18 */
-	d1_0mx,		d1_0mx,		d1_0mx,		d1_0mx,		d1_0mx,		d1_0mx,		d1_0mx,		d1_0mx,
-	d1_aMppr,	d1_aMppr,	d1_aMppr,	d1_aMppr,	d1_aMpmr,	d1_aMpmr,	d1_aMpmr,	d1_aMpmr,	/* 19 */
-	d1_aMmpr,	d1_aMmpr,	d1_aMmpr,	d1_aMmpr,	d1_aMmmr,	d1_aMmmr,	d1_aMmmr,	d1_aMmmr,
-	d1_1pp,		d1_1pp,		d1_1pp,		d1_1pp,		d1_1pm,		d1_1pm,		d1_1pm,		d1_1pm,		/* 1a */
-	d1_1mp,		d1_1mp,		d1_1mp,		d1_1mp,		d1_1mm,		d1_1mm,		d1_1mm,		d1_1mm,
-	d1_aMppr,	d1_aMppr,	d1_aMppr,	d1_aMppr,	d1_aMpmr,	d1_aMpmr,	d1_aMpmr,	d1_aMpmr,	/* 1b */
-	d1_aMmpr,	d1_aMmpr,	d1_aMmpr,	d1_aMmpr,	d1_aMmmr,	d1_aMmmr,	d1_aMmmr,	d1_aMmmr,
+	&dsp32c_device::d1_0px,		&dsp32c_device::d1_0px,		&dsp32c_device::d1_0px,		&dsp32c_device::d1_0px,		&dsp32c_device::d1_0px,		&dsp32c_device::d1_0px,		&dsp32c_device::d1_0px,		&dsp32c_device::d1_0px,		// 18
+	&dsp32c_device::d1_0mx,		&dsp32c_device::d1_0mx,		&dsp32c_device::d1_0mx,		&dsp32c_device::d1_0mx,		&dsp32c_device::d1_0mx,		&dsp32c_device::d1_0mx,		&dsp32c_device::d1_0mx,		&dsp32c_device::d1_0mx,
+	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	// 19
+	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,
+	&dsp32c_device::d1_1pp,		&dsp32c_device::d1_1pp,		&dsp32c_device::d1_1pp,		&dsp32c_device::d1_1pp,		&dsp32c_device::d1_1pm,		&dsp32c_device::d1_1pm,		&dsp32c_device::d1_1pm,		&dsp32c_device::d1_1pm,		// 1a
+	&dsp32c_device::d1_1mp,		&dsp32c_device::d1_1mp,		&dsp32c_device::d1_1mp,		&dsp32c_device::d1_1mp,		&dsp32c_device::d1_1mm,		&dsp32c_device::d1_1mm,		&dsp32c_device::d1_1mm,		&dsp32c_device::d1_1mm,
+	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMppr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	&dsp32c_device::d1_aMpmr,	// 1b
+	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmpr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,	&dsp32c_device::d1_aMmmr,
 
-	d4_pp,		d4_pp,		d4_pp,		d4_pp,		d4_pm,		d4_pm,		d4_pm,		d4_pm,		/* 1c */
-	d4_mp,		d4_mp,		d4_mp,		d4_mp,		d4_mm,		d4_mm,		d4_mm,		d4_mm,
-	d4_ppr,		d4_ppr,		d4_ppr,		d4_ppr,		d4_pmr,		d4_pmr,		d4_pmr,		d4_pmr,		/* 1d */
-	d4_mpr,		d4_mpr,		d4_mpr,		d4_mpr,		d4_mmr,		d4_mmr,		d4_mmr,		d4_mmr,
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	/* 1e */
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	/* 1f */
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
+	&dsp32c_device::d4_pp,		&dsp32c_device::d4_pp,		&dsp32c_device::d4_pp,		&dsp32c_device::d4_pp,		&dsp32c_device::d4_pm,		&dsp32c_device::d4_pm,		&dsp32c_device::d4_pm,		&dsp32c_device::d4_pm,		// 1c
+	&dsp32c_device::d4_mp,		&dsp32c_device::d4_mp,		&dsp32c_device::d4_mp,		&dsp32c_device::d4_mp,		&dsp32c_device::d4_mm,		&dsp32c_device::d4_mm,		&dsp32c_device::d4_mm,		&dsp32c_device::d4_mm,
+	&dsp32c_device::d4_ppr,		&dsp32c_device::d4_ppr,		&dsp32c_device::d4_ppr,		&dsp32c_device::d4_ppr,		&dsp32c_device::d4_pmr,		&dsp32c_device::d4_pmr,		&dsp32c_device::d4_pmr,		&dsp32c_device::d4_pmr,		// 1d
+	&dsp32c_device::d4_mpr,		&dsp32c_device::d4_mpr,		&dsp32c_device::d4_mpr,		&dsp32c_device::d4_mpr,		&dsp32c_device::d4_mmr,		&dsp32c_device::d4_mmr,		&dsp32c_device::d4_mmr,		&dsp32c_device::d4_mmr,
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 1e
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 1f
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
 
-	d2_aMpp,	d2_aMpp,	d2_aMpp,	d2_aMpp,	d2_aMpm,	d2_aMpm,	d2_aMpm,	d2_aMpm,	/* 20 */
-	d2_aMmp,	d2_aMmp,	d2_aMmp,	d2_aMmp,	d2_aMmm,	d2_aMmm,	d2_aMmm,	d2_aMmm,
-	d2_aMppr,	d2_aMppr,	d2_aMppr,	d2_aMppr,	d2_aMpmr,	d2_aMpmr,	d2_aMpmr,	d2_aMpmr,	/* 21 */
-	d2_aMmpr,	d2_aMmpr,	d2_aMmpr,	d2_aMmpr,	d2_aMmmr,	d2_aMmmr,	d2_aMmmr,	d2_aMmmr,
-	d2_aMpp,	d2_aMpp,	d2_aMpp,	d2_aMpp,	d2_aMpm,	d2_aMpm,	d2_aMpm,	d2_aMpm,	/* 22 */
-	d2_aMmp,	d2_aMmp,	d2_aMmp,	d2_aMmp,	d2_aMmm,	d2_aMmm,	d2_aMmm,	d2_aMmm,
-	d2_aMppr,	d2_aMppr,	d2_aMppr,	d2_aMppr,	d2_aMpmr,	d2_aMpmr,	d2_aMpmr,	d2_aMpmr,	/* 23 */
-	d2_aMmpr,	d2_aMmpr,	d2_aMmpr,	d2_aMmpr,	d2_aMmmr,	d2_aMmmr,	d2_aMmmr,	d2_aMmmr,
+	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	// 20
+	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,
+	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	// 21
+	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,
+	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	// 22
+	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,
+	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	// 23
+	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,
 
-	d2_aMpp,	d2_aMpp,	d2_aMpp,	d2_aMpp,	d2_aMpm,	d2_aMpm,	d2_aMpm,	d2_aMpm,	/* 24 */
-	d2_aMmp,	d2_aMmp,	d2_aMmp,	d2_aMmp,	d2_aMmm,	d2_aMmm,	d2_aMmm,	d2_aMmm,
-	d2_aMppr,	d2_aMppr,	d2_aMppr,	d2_aMppr,	d2_aMpmr,	d2_aMpmr,	d2_aMpmr,	d2_aMpmr,	/* 25 */
-	d2_aMmpr,	d2_aMmpr,	d2_aMmpr,	d2_aMmpr,	d2_aMmmr,	d2_aMmmr,	d2_aMmmr,	d2_aMmmr,
-	d2_aMpp,	d2_aMpp,	d2_aMpp,	d2_aMpp,	d2_aMpm,	d2_aMpm,	d2_aMpm,	d2_aMpm,	/* 26 */
-	d2_aMmp,	d2_aMmp,	d2_aMmp,	d2_aMmp,	d2_aMmm,	d2_aMmm,	d2_aMmm,	d2_aMmm,
-	d2_aMppr,	d2_aMppr,	d2_aMppr,	d2_aMppr,	d2_aMpmr,	d2_aMpmr,	d2_aMpmr,	d2_aMpmr,	/* 27 */
-	d2_aMmpr,	d2_aMmpr,	d2_aMmpr,	d2_aMmpr,	d2_aMmmr,	d2_aMmmr,	d2_aMmmr,	d2_aMmmr,
+	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	// 24
+	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,
+	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	// 25
+	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,
+	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	// 26
+	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,
+	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	// 27
+	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,
 
-	d2_aMpp,	d2_aMpp,	d2_aMpp,	d2_aMpp,	d2_aMpm,	d2_aMpm,	d2_aMpm,	d2_aMpm,	/* 28 */
-	d2_aMmp,	d2_aMmp,	d2_aMmp,	d2_aMmp,	d2_aMmm,	d2_aMmm,	d2_aMmm,	d2_aMmm,
-	d2_aMppr,	d2_aMppr,	d2_aMppr,	d2_aMppr,	d2_aMpmr,	d2_aMpmr,	d2_aMpmr,	d2_aMpmr,	/* 29 */
-	d2_aMmpr,	d2_aMmpr,	d2_aMmpr,	d2_aMmpr,	d2_aMmmr,	d2_aMmmr,	d2_aMmmr,	d2_aMmmr,
-	d2_aMpp,	d2_aMpp,	d2_aMpp,	d2_aMpp,	d2_aMpm,	d2_aMpm,	d2_aMpm,	d2_aMpm,	/* 2a */
-	d2_aMmp,	d2_aMmp,	d2_aMmp,	d2_aMmp,	d2_aMmm,	d2_aMmm,	d2_aMmm,	d2_aMmm,
-	d2_aMppr,	d2_aMppr,	d2_aMppr,	d2_aMppr,	d2_aMpmr,	d2_aMpmr,	d2_aMpmr,	d2_aMpmr,	/* 2b */
-	d2_aMmpr,	d2_aMmpr,	d2_aMmpr,	d2_aMmpr,	d2_aMmmr,	d2_aMmmr,	d2_aMmmr,	d2_aMmmr,
+	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	// 28
+	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,
+	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	// 29
+	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,
+	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpp,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	&dsp32c_device::d2_aMpm,	// 2a
+	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmp,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,	&dsp32c_device::d2_aMmm,
+	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMppr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	&dsp32c_device::d2_aMpmr,	// 2b
+	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmpr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,	&dsp32c_device::d2_aMmmr,
 
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	/* 2c */
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	/* 2d */
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	/* 2e */
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	/* 2f */
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 2c
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 2d
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 2e
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 2f
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
 
-	d3_aMpp,	d3_aMpp,	d3_aMpp,	d3_aMpp,	d3_aMpm,	d3_aMpm,	d3_aMpm,	d3_aMpm,	/* 30 */
-	d3_aMmp,	d3_aMmp,	d3_aMmp,	d3_aMmp,	d3_aMmm,	d3_aMmm,	d3_aMmm,	d3_aMmm,
-	d3_aMppr,	d3_aMppr,	d3_aMppr,	d3_aMppr,	d3_aMpmr,	d3_aMpmr,	d3_aMpmr,	d3_aMpmr,	/* 31 */
-	d3_aMmpr,	d3_aMmpr,	d3_aMmpr,	d3_aMmpr,	d3_aMmmr,	d3_aMmmr,	d3_aMmmr,	d3_aMmmr,
-	d3_aMpp,	d3_aMpp,	d3_aMpp,	d3_aMpp,	d3_aMpm,	d3_aMpm,	d3_aMpm,	d3_aMpm,	/* 32 */
-	d3_aMmp,	d3_aMmp,	d3_aMmp,	d3_aMmp,	d3_aMmm,	d3_aMmm,	d3_aMmm,	d3_aMmm,
-	d3_aMppr,	d3_aMppr,	d3_aMppr,	d3_aMppr,	d3_aMpmr,	d3_aMpmr,	d3_aMpmr,	d3_aMpmr,	/* 33 */
-	d3_aMmpr,	d3_aMmpr,	d3_aMmpr,	d3_aMmpr,	d3_aMmmr,	d3_aMmmr,	d3_aMmmr,	d3_aMmmr,
+	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	// 30
+	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,
+	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	// 31
+	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,
+	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	// 32
+	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,
+	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	// 33
+	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,
 
-	d3_aMpp,	d3_aMpp,	d3_aMpp,	d3_aMpp,	d3_aMpm,	d3_aMpm,	d3_aMpm,	d3_aMpm,	/* 34 */
-	d3_aMmp,	d3_aMmp,	d3_aMmp,	d3_aMmp,	d3_aMmm,	d3_aMmm,	d3_aMmm,	d3_aMmm,
-	d3_aMppr,	d3_aMppr,	d3_aMppr,	d3_aMppr,	d3_aMpmr,	d3_aMpmr,	d3_aMpmr,	d3_aMpmr,	/* 35 */
-	d3_aMmpr,	d3_aMmpr,	d3_aMmpr,	d3_aMmpr,	d3_aMmmr,	d3_aMmmr,	d3_aMmmr,	d3_aMmmr,
-	d3_aMpp,	d3_aMpp,	d3_aMpp,	d3_aMpp,	d3_aMpm,	d3_aMpm,	d3_aMpm,	d3_aMpm,	/* 36 */
-	d3_aMmp,	d3_aMmp,	d3_aMmp,	d3_aMmp,	d3_aMmm,	d3_aMmm,	d3_aMmm,	d3_aMmm,
-	d3_aMppr,	d3_aMppr,	d3_aMppr,	d3_aMppr,	d3_aMpmr,	d3_aMpmr,	d3_aMpmr,	d3_aMpmr,	/* 37 */
-	d3_aMmpr,	d3_aMmpr,	d3_aMmpr,	d3_aMmpr,	d3_aMmmr,	d3_aMmmr,	d3_aMmmr,	d3_aMmmr,
+	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	// 34
+	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,
+	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	// 35
+	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,
+	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	// 36
+	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,
+	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	// 37
+	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,
 
-	d3_aMpp,	d3_aMpp,	d3_aMpp,	d3_aMpp,	d3_aMpm,	d3_aMpm,	d3_aMpm,	d3_aMpm,	/* 38 */
-	d3_aMmp,	d3_aMmp,	d3_aMmp,	d3_aMmp,	d3_aMmm,	d3_aMmm,	d3_aMmm,	d3_aMmm,
-	d3_aMppr,	d3_aMppr,	d3_aMppr,	d3_aMppr,	d3_aMpmr,	d3_aMpmr,	d3_aMpmr,	d3_aMpmr,	/* 39 */
-	d3_aMmpr,	d3_aMmpr,	d3_aMmpr,	d3_aMmpr,	d3_aMmmr,	d3_aMmmr,	d3_aMmmr,	d3_aMmmr,
-	d3_aMpp,	d3_aMpp,	d3_aMpp,	d3_aMpp,	d3_aMpm,	d3_aMpm,	d3_aMpm,	d3_aMpm,	/* 3a */
-	d3_aMmp,	d3_aMmp,	d3_aMmp,	d3_aMmp,	d3_aMmm,	d3_aMmm,	d3_aMmm,	d3_aMmm,
-	d3_aMppr,	d3_aMppr,	d3_aMppr,	d3_aMppr,	d3_aMpmr,	d3_aMpmr,	d3_aMpmr,	d3_aMpmr,	/* 3b */
-	d3_aMmpr,	d3_aMmpr,	d3_aMmpr,	d3_aMmpr,	d3_aMmmr,	d3_aMmmr,	d3_aMmmr,	d3_aMmmr,
+	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	// 38
+	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,
+	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	// 39
+	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,
+	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpp,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	&dsp32c_device::d3_aMpm,	// 3a
+	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmp,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,	&dsp32c_device::d3_aMmm,
+	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMppr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	&dsp32c_device::d3_aMpmr,	// 3b
+	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmpr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,	&dsp32c_device::d3_aMmmr,
 
-	d5_ic,		d5_ic,		d5_ic,		d5_ic,		d5_oc,		d5_oc,		d5_oc,		d5_oc,		/* 3c */
-	d5_float,	d5_float,	d5_float,	d5_float,	d5_int,		d5_int,		d5_int,		d5_int,
-	d5_round,	d5_round,	d5_round,	d5_round,	d5_ifalt,	d5_ifalt,	d5_ifalt,	d5_ifalt,	/* 3d */
-	d5_ifaeq,	d5_ifaeq,	d5_ifaeq,	d5_ifaeq,	d5_ifagt,	d5_ifagt,	d5_ifagt,	d5_ifagt,
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	/* 3e */
-	d5_float24,	d5_float24,	d5_float24,	d5_float24,	d5_int24,	d5_int24,	d5_int24,	d5_int24,
-	d5_ieee,	d5_ieee,	d5_ieee,	d5_ieee,	d5_dsp,		d5_dsp,		d5_dsp,		d5_dsp,		/* 3f */
-	d5_seed,	d5_seed,	d5_seed,	d5_seed,	illegal,	illegal,	illegal,	illegal,
+	&dsp32c_device::d5_ic,		&dsp32c_device::d5_ic,		&dsp32c_device::d5_ic,		&dsp32c_device::d5_ic,		&dsp32c_device::d5_oc,		&dsp32c_device::d5_oc,		&dsp32c_device::d5_oc,		&dsp32c_device::d5_oc,		// 3c
+	&dsp32c_device::d5_float,	&dsp32c_device::d5_float,	&dsp32c_device::d5_float,	&dsp32c_device::d5_float,	&dsp32c_device::d5_int,		&dsp32c_device::d5_int,		&dsp32c_device::d5_int,		&dsp32c_device::d5_int,
+	&dsp32c_device::d5_round,	&dsp32c_device::d5_round,	&dsp32c_device::d5_round,	&dsp32c_device::d5_round,	&dsp32c_device::d5_ifalt,	&dsp32c_device::d5_ifalt,	&dsp32c_device::d5_ifalt,	&dsp32c_device::d5_ifalt,	// 3d
+	&dsp32c_device::d5_ifaeq,	&dsp32c_device::d5_ifaeq,	&dsp32c_device::d5_ifaeq,	&dsp32c_device::d5_ifaeq,	&dsp32c_device::d5_ifagt,	&dsp32c_device::d5_ifagt,	&dsp32c_device::d5_ifagt,	&dsp32c_device::d5_ifagt,
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 3e
+	&dsp32c_device::d5_float24,	&dsp32c_device::d5_float24,	&dsp32c_device::d5_float24,	&dsp32c_device::d5_float24,	&dsp32c_device::d5_int24,	&dsp32c_device::d5_int24,	&dsp32c_device::d5_int24,	&dsp32c_device::d5_int24,
+	&dsp32c_device::d5_ieee,	&dsp32c_device::d5_ieee,	&dsp32c_device::d5_ieee,	&dsp32c_device::d5_ieee,	&dsp32c_device::d5_dsp,		&dsp32c_device::d5_dsp,		&dsp32c_device::d5_dsp,		&dsp32c_device::d5_dsp,		// 3f
+	&dsp32c_device::d5_seed,	&dsp32c_device::d5_seed,	&dsp32c_device::d5_seed,	&dsp32c_device::d5_seed,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
 
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	/* 40 */
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	/* 41 */
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	/* 42 */
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	/* 43 */
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 40
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 41
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 42
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 43
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
 
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	/* 44 */
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	/* 45 */
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
-	do_i,		do_r,		illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	/* 46 */
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	/* 47 */
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 44
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 45
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
+	&dsp32c_device::do_i,		&dsp32c_device::do_r,		&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 46
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 47
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
 
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	/* 48 */
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	/* 49 */
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
-	adde_si,	adde_si,	adde_si,	adde_si,	adde_si,	adde_si,	adde_si,	adde_si,	/* 4a */
-	adde_si,	adde_si,	adde_si,	adde_si,	adde_si,	adde_si,	adde_si,	adde_si,
-	adde_si,	adde_si,	adde_si,	adde_si,	adde_si,	adde_si,	adde_si,	adde_si,	/* 4b */
-	adde_si,	adde_si,	adde_si,	adde_si,	adde_si,	adde_si,	adde_si,	adde_si,
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 48
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 49
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
+	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	// 4a
+	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,
+	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	// 4b
+	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,	&dsp32c_device::adde_si,
 
-	adde_ss,	mul2e_s,	subre_ss,	addre_ss,	sube_ss,	nege_s,		andce_ss,	cmpe_ss,	/* 4c */
-	xore_ss,	rcre_s,		ore_ss,		rcle_s,		shre_s,		div2e_s,	ande_ss,	teste_ss,
-	adde_di,	illegal,	subre_di,	addre_di,	sube_di,	illegal,	andce_di,	cmpe_di,	/* 4d */
-	xore_di,	illegal,	ore_di,		illegal,	illegal,	illegal,	ande_di,	teste_di,
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	/* 4e */
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	/* 4f */
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
+	&dsp32c_device::adde_ss,	&dsp32c_device::mul2e_s,	&dsp32c_device::subre_ss,	&dsp32c_device::addre_ss,	&dsp32c_device::sube_ss,	&dsp32c_device::nege_s,		&dsp32c_device::andce_ss,	&dsp32c_device::cmpe_ss,	// 4c
+	&dsp32c_device::xore_ss,	&dsp32c_device::rcre_s,		&dsp32c_device::ore_ss,		&dsp32c_device::rcle_s,		&dsp32c_device::shre_s,		&dsp32c_device::div2e_s,	&dsp32c_device::ande_ss,	&dsp32c_device::teste_ss,
+	&dsp32c_device::adde_di,	&dsp32c_device::illegal,	&dsp32c_device::subre_di,	&dsp32c_device::addre_di,	&dsp32c_device::sube_di,	&dsp32c_device::illegal,	&dsp32c_device::andce_di,	&dsp32c_device::cmpe_di,	// 4d
+	&dsp32c_device::xore_di,	&dsp32c_device::illegal,	&dsp32c_device::ore_di,		&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::ande_di,	&dsp32c_device::teste_di,
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 4e
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	// 4f
+	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,	&dsp32c_device::illegal,
 
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		/* 50 */
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		/* 51 */
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		/* 52 */
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		/* 53 */
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 50
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 51
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 52
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 53
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
 
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		/* 54 */
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		/* 55 */
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		/* 56 */
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		/* 57 */
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 54
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 55
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 56
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 57
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
 
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		/* 58 */
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		/* 59 */
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		/* 5a */
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		/* 5b */
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 58
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 59
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 5a
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 5b
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
 
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		/* 5c */
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		/* 5d */
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		/* 5e */
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		/* 5f */
-	goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,		goto24,
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 5c
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 5d
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 5e
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		// 5f
+	&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,		&dsp32c_device::goto24,
 
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,		/* 60 */
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,		/* 61 */
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,		/* 62 */
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,		/* 63 */
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 60
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 61
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 62
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 63
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
 
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,		/* 64 */
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,		/* 65 */
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,		/* 66 */
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,		/* 67 */
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 64
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 65
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 66
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 67
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
 
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,		/* 68 */
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,		/* 69 */
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,		/* 6a */
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,		/* 6b */
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 68
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 69
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 6a
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 6b
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
 
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,		/* 6c */
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,		/* 6d */
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,		/* 6e */
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,		/* 6f */
-	load24,		load24,		load24,		load24,		load24,		load24,		load24,		load24,
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 6c
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 6d
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 6e
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		// 6f
+	&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,		&dsp32c_device::load24,
 
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24,		/* 70 */
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24,
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24,		/* 71 */
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24,
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24,		/* 72 */
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24,
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24,		/* 73 */
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24,
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 70
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 71
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 72
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 73
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,
 
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24,		/* 74 */
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24,
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24,		/* 75 */
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24,
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24,		/* 76 */
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24,
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24,		/* 77 */
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24,
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 74
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 75
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 76
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 77
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,
 
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24,		/* 78 */
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24,
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24,		/* 79 */
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24,
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24,		/* 7a */
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24,
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24,		/* 7b */
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24,
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 78
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 79
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 7a
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 7b
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,
 
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24,		/* 7c */
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24,
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24,		/* 7d */
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24,
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24,		/* 7e */
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24,
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24,		/* 7f */
-	call24,		call24,		call24,		call24,		call24,		call24,		call24,		call24
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 7c
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 7d
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 7e
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		// 7f
+	&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24,		&dsp32c_device::call24
 };
 
 
