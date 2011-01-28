@@ -115,8 +115,8 @@ const UINT8 lethalth_decryption_table[256] = {
 // ssss !!!! !!!!      !!!!      !!!! !!!!  !!!!      !!!! !!!! !!!!           !!!!
    xxxx,0xbd,xxxx,0x22,0x10,xxxx,0x02,0x57, 0x70,xxxx,0x7c,xxxx,0xe7,0x52,xxxx,0xa9, /* 10 */
 //                !!!!           !!!! !!!!            ????      !!!! !!!!      gggg
-   xxxx,xxxx,0xc6,0x06,0xa0,0xfe,0xcf,0x8e, 0x43,0x8f,0x2d,xxxx,0xd4,0x85,0x75,0xa2, /* 20 */
-//           !!!! !!!!      !!!! !!!! !!!!  !!!!                          !!!! !!!!
+   xxxx,xxxx,0xc6,0x06,0xa0,0xfe,0xcf,0x8e, 0x43,0x8f,0x2d,0x8c,0xd4,0x85,0x75,0xa2, /* 20 */
+//           !!!! !!!!      !!!! !!!! !!!!  !!!!           gggg           !!!! !!!!
    0x3d,xxxx,xxxx,0x38,0x7e,0x89,0xd1,0x80, 0x3b,0x72,0x07,xxxx,0x42,0x37,0x0a,0x18, /* 30 */
 // gggg           !!!! ???? !!!! !!!! !!!!  !!!! !!!! !!!!           ssss !!!!
    0x88,0xb4,0x98,0x8b,0xb9,0x9c,0xad,0x0e, 0x2b,xxxx,0xbf,xxxx,0x55,xxxx,0x56,0xb0, /* 40 */
@@ -149,8 +149,9 @@ missing opcode:
 
 1cedd : 68 c0 03
 17cb4 : b8 f0
-11bb9 : 2b d8
 11bda : 09 ...
+1724e : 09 ...
+
 1a -> (7c,7e) ->
 34 -> (7c,7e) ->
 c5 -> (18d56 - from 1844f) (71,76,7a,7d,7e) -> to handle level number (a008d=00-0f) ->
@@ -164,17 +165,14 @@ fb ->
 "ssss" -> sure
 "????" -> missing
 
-
-
-
 probably:
 42 -> 0x98 (083a3)
 50 -> 0x93 (083a7)
 
-
 very probably:
 48 -> 0x2b
 e5 -> 0x73
+2b -> 0x8c
 
 sure:
 00 -> 0x7f
