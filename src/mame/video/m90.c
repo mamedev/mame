@@ -324,10 +324,12 @@ VIDEO_UPDATE( m90 )
 	{
 		tilemap_set_scroll_rows(pf1_layer,512);
 		tilemap_set_scroll_rows(pf1_wide_layer,512);
+
 		for (i=0; i<512; i++)
 			tilemap_set_scrollx( pf1_layer,i, m90_video_data[0xf000/2+i]+2);
 		for (i=0; i<512; i++)
 			tilemap_set_scrollx( pf1_wide_layer,i, m90_video_data[0xf000/2+i]+256+2);
+
 	}
 	else
 	{
@@ -338,7 +340,8 @@ VIDEO_UPDATE( m90 )
 	}
 
 	/* Setup scrolling */
-	if (m90_video_control_data[6]&0x20) {
+	if (m90_video_control_data[6]&0x20)
+	{
 		tilemap_set_scroll_rows(pf2_layer,512);
 		tilemap_set_scroll_rows(pf2_wide_layer,512);
 		for (i=0; i<512; i++)
@@ -354,15 +357,14 @@ VIDEO_UPDATE( m90 )
 
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
-	if (video_enable) {
-		if (!pf2_enable)
-			bitmap_fill(bitmap,cliprect,0);
+	if (video_enable)
+	{
 
 		if (pf2_enable)
 		{
 			// use the playfield 2 y-offset table for each scanline
-			if (m90_video_control_data[6] & 0x40) {
-
+			if (m90_video_control_data[6] & 0x40)
+			{
 				int line;
 				rectangle clip;
 				clip.min_x = cliprect->min_x;
@@ -372,12 +374,13 @@ VIDEO_UPDATE( m90 )
 				{
 					clip.min_y = clip.max_y = line;
 
-					if (m90_video_control_data[6] & 0x4) {
-						tilemap_set_scrolly(pf2_wide_layer, 0, m90_video_control_data[2] + m90_video_data[0xfc00/2 + line] + 128);
+					if (m90_video_control_data[6] & 0x4)
+					{
+						tilemap_set_scrolly(pf2_wide_layer, 0, 0x200 + m90_video_data[0xfc00/2 + line]);
 						tilemap_draw(bitmap,&clip,pf2_wide_layer,0,0);
 						tilemap_draw(bitmap,&clip,pf2_wide_layer,1,1);
 					} else {
-						tilemap_set_scrolly(pf2_layer, 0, m90_video_control_data[2] + m90_video_data[0xfc00/2 + line] + 128);
+						tilemap_set_scrolly(pf2_layer, 0, 0x200 + m90_video_data[0xfc00/2 + line]);
 						tilemap_draw(bitmap,&clip,pf2_layer,0,0);
 						tilemap_draw(bitmap,&clip,pf2_layer,1,1);
 					}
@@ -385,7 +388,8 @@ VIDEO_UPDATE( m90 )
 			}
 			else
 			{
-				if (m90_video_control_data[6] & 0x4) {
+				if (m90_video_control_data[6] & 0x4)
+				{
 					tilemap_set_scrolly( pf2_wide_layer,0, m90_video_control_data[2] );
 					tilemap_draw(bitmap,cliprect,pf2_wide_layer,0,0);
 					tilemap_draw(bitmap,cliprect,pf2_wide_layer,1,1);
@@ -396,12 +400,16 @@ VIDEO_UPDATE( m90 )
 				}
 			}
 		}
+		else
+		{
+			bitmap_fill(bitmap,cliprect,0);
+		}
 
 		if (pf1_enable)
 		{
 			// use the playfield 1 y-offset table for each scanline
-			if (m90_video_control_data[5] & 0x40) {
-
+			if (m90_video_control_data[5] & 0x40)
+			{
 				int line;
 				rectangle clip;
 				clip.min_x = cliprect->min_x;
@@ -411,12 +419,13 @@ VIDEO_UPDATE( m90 )
 				{
 					clip.min_y = clip.max_y = line;
 
-					if (m90_video_control_data[5] & 0x4) {
-						tilemap_set_scrolly(pf1_wide_layer, 0, m90_video_control_data[0] + m90_video_data[0xf800/2 + line] + 128);
+					if (m90_video_control_data[5] & 0x4)
+					{
+						tilemap_set_scrolly(pf1_wide_layer, 0, 0x200 + m90_video_data[0xf800/2 + line]);
 						tilemap_draw(bitmap,&clip,pf1_wide_layer,0,0);
 						tilemap_draw(bitmap,&clip,pf1_wide_layer,1,1);
 					} else {
-						tilemap_set_scrolly(pf1_layer, 0, m90_video_control_data[0] + m90_video_data[0xf800/2 + line] + 128 );
+						tilemap_set_scrolly(pf1_layer, 0, 0x200 + m90_video_data[0xf800/2 + line]);
 						tilemap_draw(bitmap,&clip,pf1_layer,0,0);
 						tilemap_draw(bitmap,&clip,pf1_layer,1,1);
 					}
@@ -424,7 +433,8 @@ VIDEO_UPDATE( m90 )
 			}
 			else
 			{
-				if (m90_video_control_data[5] & 0x4) {
+				if (m90_video_control_data[5] & 0x4)
+				{
 					tilemap_set_scrolly( pf1_wide_layer,0, m90_video_control_data[0] );
 					tilemap_draw(bitmap,cliprect,pf1_wide_layer,0,0);
 					tilemap_draw(bitmap,cliprect,pf1_wide_layer,1,1);
