@@ -943,7 +943,14 @@
                         UINT32 ld_st_address;
 
                         rd = (insn & THUMB_MULTLS_BASE) >> THUMB_MULTLS_BASE_SHIFT;
-                        ld_st_address = GET_REGISTER(cpustate, rd) & 0xfffffffc;
+
+                        // "The address should normally be a word aligned quantity and non-word aligned addresses do not affect the instruction."
+                        // "However, the bottom 2 bits of the address will appear on A[1:0] and might be interpreted by the memory system."
+
+                        // GBA "BB Ball" performs an unaligned read with A[1:0] = 2 and expects A[1] not to be ignored [BP 800B90A,(R4&3)!=0]
+                        // GBA "Gadget Racers" performs an unaligned read with A[1:0] = 1 and expects A[0] to be ignored [BP B72,(R0&3)!=0]
+
+                        ld_st_address = GET_REGISTER(cpustate, rd);
 
                         if (insn & THUMB_MULTLS) /* Load */
                         {
@@ -954,7 +961,7 @@
                             {
                                 if (insn & (1 << offs))
                                 {
-                                    SET_REGISTER(cpustate, offs, READ32(ld_st_address));
+                                    SET_REGISTER(cpustate, offs, READ32(ld_st_address & ~1));
                                     ld_st_address += 4;
                                 }
                             }
@@ -968,7 +975,7 @@
                             {
                                 if (insn & (1 << offs))
                                 {
-                                    WRITE32(ld_st_address, GET_REGISTER(cpustate, offs));
+                                    WRITE32(ld_st_address & ~3, GET_REGISTER(cpustate, offs));
                                     ld_st_address += 4;
                                 }
                             }
