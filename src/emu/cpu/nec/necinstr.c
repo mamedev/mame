@@ -344,7 +344,7 @@ OP( 0x8e, i_mov_sregw ) { UINT16 src; GetModRM; src = GetRMWord(ModRM); CLKR(15,
 	nec_state->no_interrupt=1;
 }
 OP( 0x8f, i_popw ) { UINT16 tmp; GetModRM; POP(tmp); PutRMWord(ModRM,tmp); nec_state->icount-=21; }
-OP( 0x90, i_nop  ) { CLK(3); }
+OP( 0x90, i_nop  ) { CLK(3); /* { if (nec_state->MF == 0) printf("90 -> %06x: \n",PC(nec_state)); }  */ }
 OP( 0x91, i_xchg_axcx ) { XchgAWReg(CW); CLK(3); }
 OP( 0x92, i_xchg_axdx ) { XchgAWReg(DW); CLK(3); }
 OP( 0x93, i_xchg_axbx ) { XchgAWReg(BW); CLK(3); }
