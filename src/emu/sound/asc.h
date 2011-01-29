@@ -127,10 +127,6 @@ protected:
 
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
-	// internal callbacks
-	static STREAM_UPDATE( static_stream_generate );
-	virtual void stream_generate(stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-
 	// internal state
 	const asc_device_config &m_config;
 

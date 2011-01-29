@@ -29,9 +29,7 @@ OBJDIRS += \
 
 
 #-------------------------------------------------
-# specify available CPU cores; some of these are
-# only for MESS, but are included so that they get
-# updated with any MAME core changes
+# specify available CPU cores
 #-------------------------------------------------
 
 CPUS += Z80
@@ -57,7 +55,7 @@ CPUS += S2650
 CPUS += TMS340X0
 CPUS += TMS9900
 CPUS += Z8000
-#CPUS += Z8001
+CPUS += Z8001
 CPUS += TMS32010
 CPUS += TMS32025
 CPUS += TMS32031
@@ -128,8 +126,7 @@ CPUS += UPD7725
 CPUS += HD61700
 
 #-------------------------------------------------
-# specify available sound cores; some of these are
-# only for MESS and so aren't included
+# specify available sound cores
 #-------------------------------------------------
 
 SOUNDS += SAMPLES
@@ -213,13 +210,13 @@ SOUNDS += ST0016
 SOUNDS += NILE
 SOUNDS += X1_010
 SOUNDS += VRENDER0
-#SOUNDS += VOTRAX
+SOUNDS += VOTRAX
 SOUNDS += ES8712
 SOUNDS += CDP1869
 SOUNDS += S14001A
 SOUNDS += WAVE
-#SOUNDS += SID6581
-#SOUNDS += SID8580
+SOUNDS += SID6581
+SOUNDS += SID8580
 SOUNDS += SP0256
 SOUNDS += DIGITALKER
 SOUNDS += CDP1863
@@ -227,7 +224,7 @@ SOUNDS += CDP1864
 SOUNDS += ZSG2
 SOUNDS += MOS656X
 SOUNDS += S2636
-#SOUNDS += ASC
+SOUNDS += ASC
 
 
 
