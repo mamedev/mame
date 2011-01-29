@@ -4769,6 +4769,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( bdrdown )	/* 2003.04 Border Down */
 	DRIVER( usagui )	/* 2003.06 Usagi Yamashiro Mahjong Hen */
 						/* 2003.07 Yonin Uchi Mahjong MJ Network Taisen ver. NEW */
+	DRIVER( oinori )	/* 2003.08 Oinori-daimyoujin Matsuri */
 	DRIVER( psyvar2 )	/* 2003.11 Psyvariar 2 */
 	DRIVER( puyofev )	/* 2003.11 Puyopuyo Fever */
 	DRIVER( shootopl )	/* Shootout Pool */
