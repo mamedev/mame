@@ -1,7 +1,7 @@
 /***************************************************************************
-
-  Namco System 12 - Arcade PSX Hardware
-  =====================================
+ 
+  Namco System 12 - Arcade Playstation-based Hardware
+  ===================================================
   Driver by smf
   Board notes by The Guru
   H8/3002 and Golgo13 support by R. Belmont based on work by The_Author and DynaChicken
@@ -11,14 +11,19 @@
     graphics are glitchy in some games.
 
     - golgo13 assumes the test switch is a switch, not a button - must hold down F2 to stay in test mode
+ 
+    - truckk doesn't boot: the H8/3002 never enters InitJVSBoards @ 1DE2.  1DE2 is referenced in a table of commands at 4032,
+      which is called by the routine at 3FEA.  It is not clear how execution is intended to get to 3FEA - there are no direct
+      branches to that location, and the bytes 3F EA don't appear at all in the program.
+ 
 
-
-Namco System 12 - Arcade PSX Hardware
-=====================================
+Namco System 12 - Arcade Playstation-based Hardware
+===================================================
 
 Game & software revision                 Company/Year            CPU board   Mother board        Daughter board   Keycus
 ------------------------------------------------------------------------------------------------------------------------
 Aqua Rush (AQ1/VER.A1)                   (C) Namco,        1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M5F2    KC053
+Attack Pla-Rail                          (C) Tomy/Namco,   199?
 Derby Quiz My Dream Horse (MDH1/VER.A2)  (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M10X64  KC035
 Ehrgeiz (EG2/VER.A)                      (C) Square/Namco, 1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC021
 Ehrgeiz (EG3/VER.A)                      (C) Square/Namco, 1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC021
@@ -52,15 +57,12 @@ Tekken 3 (TET3/VER.B)                    (C) Namco,        1996  COH-700     SYS
 Tekken Tag Tournament (TEG3/VER.B)       (C) Namco,        1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F4    KC044
 Tekken Tag Tournament (TEG3/VER.C1)      (C) Namco,        1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F4    KC044
 Toukon Retsuden 3 (TR1/VER.A)            (C) Namco,        1997  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC019
-
+Truck Kyosokyoku (TKK2/VER.A)            (C) Namco,        2000  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M8F6    KC056
 
 Wanted Games
 ------------
 Aerosmith - Quest for Fame              (C) Namco,        2001
 http://www.bandainamcogames.co.jp/am/vg/questforfame/
-
-Attack Pla-Rail                         (C) Tomy/Namco,   199?
-Possibly some kind of redemption game for kids
 
 Kart Duel                               (C) Namco,        2000
 http://www.bandainamcogames.co.jp/am/english/aa/kartduel/
@@ -82,9 +84,6 @@ http://www.bandainamcogames.co.jp/am/em/techno-drive/main/index.php
 Tekno Werk                              (C) Namco,        1999
 Some kind of music game similar to Konami's Keyboard Mania series
 
-Truck Kyosokyoku                        (C) Namco,        2000
-http://www.bandainamcogames.co.jp/am/english/aa/truckkyosokyoku/
-
 Um Jammer Lammy                         (C) Namco,        1999
 http://www.wailee.com/sys/lpic/UM_Jammer_Lammy.jpg
 
@@ -102,22 +101,27 @@ ROM PCB     - There are nine known revisions of this PCB (so far). They're mostl
               number of ROMs used. Most have a PAL and a CPLD known as a 'KEYCUS'. Some also have an additional CPLD for
               protection.
 
-And 2 game-specific/optional PCBs....
+And 4 game-specific/optional PCBs....
 NETWORK PCB - Used to connect 2 PCBs together using standard USB cables. The board plugs in where the CPU board would
               normally be, and the CPU board plugs into another connector on the Network PCB. Seems to be only used on
               Libero Grande, Tekken 3 and Ehrgeiz (so far?)
 GUN I/F PCB - Used to connect and control the light guns. The board plugs in where the CPU board would
               normally be, and the CPU board plugs into another connector on the GUN I/F PCB. The guns plug into this
               PCB directly, no extra gun hardware is needed. Used only on Ghoul Panic and Point Blank 2 so far.
-
+CDXA PCB    - Used on Truck Kyosokyoku to control the CDROM drive. The board plugs in where the CPU board would
+              normally be, and the CPU board plugs into another connector on the CDXA PCB.
+V233 DECO PCB-This is the I/O board used by Truck Kyosokyoku. It contains a custom Namco C78 (Hitachi H8/3334) and one 
+              EPROM. A similar board might also be required for Attack Pla-Rail as it will not boot without some kind 
+              of I/O board.
+              
 Each game has a 3 or 4 digit letter code assigned to it which is printed on a small sticker and placed on the underside
 of the main PCB.
 The 4 digit code is then proceeded by a number (generally 1, 2 or 3), then 'Rev.' then A/B/C/D/E which denotes the software
 revision, and in some cases a sub-revision such as 1 or 2 (usually only listed in the test mode).
-The first 1 denotes a Japanese version. 2 (and maybe 3) denotes a World version. So far there are no other numbers used
-other than 1, 2, or 3. There is one exception so far. Point Blank 2 was first produced on System 11 hardware. To solve a
-naming conflict, the System 12 version uses a '4' to denote a Japanese version and a '5' to denote a World version.
-For World versions, usually only the main program is changed, the rest of the ROMs are the Japanese region code '1' ROMs.
+The first 1 denotes a Japanese version. 2 (and maybe 3) denotes a World version. For general use there are no other numbers 
+used other than 1, 2, or 3. There is one exception so far. Point Blank 2 was first produced on System 11 hardware. To 
+solve a naming conflict, the System 12 version uses a '4' to denote a Japanese version and a '5' to denote a World version.
+For World versions usually only the main program is changed, the rest of the ROMs are the Japanese region code '1' ROMs.
 See the Main PCB and ROM Daughterboard PCB texts below for more details on ROM naming specifics.
 
 Main PCB
@@ -243,7 +247,10 @@ Notes:
                      Super World Stadium 2001  SS11 Ver.A   SS11/VER.A2      MOTHER(C) (ROMs serialised)
                      Tekken Tag Tournament     TEG3 Ver.B   TEG3/VER.B       MOTHER(B)
                      Tekken Tag Tournament     TEG3 Ver.B   TEG3/VER.C1      MOTHER(B)
+                     Truck Kyosokyoku          TKK2 Ver.A   none             MOTHER(C) (ROMs serialised)
 
+                     Note: Games with 'none' for S/W Revision have a date in the test menu in the 'OTHER' item
+                     
       PRG.2N/PRG.2R: Main program ROMs \ Intel 28F016S5 2M x8 FLASHROM (for 2N, TSOP40)
                                        / Intel 28F008SA 1M x8 FLASHROM (for 2R, TSOP40)
                      These ROMs are not populated on any System12 PCB dumped so far. Probably they are completely
@@ -282,7 +289,7 @@ ROM Daughterboard PCB
 This PCB holds the remainder of the ROMs, used for graphics and the 3D geometry.
 There are 8 known types of ROM daughterboards used on S12 games (so far).
 All of the PCBs are the same size (approx 2" x 7") containing one custom connector and some MASKROMs/FlashROMs, a PLCC
-PAL and a KEYCUS (which is a PLCC CPLD) and in some cases an extra TQFP CPLD.
+PAL and a KEYCUS (which is a PLCC44 CPLD) and in some cases an extra TQFP CPLD.
 The PCBs are named with a special coding. First a letter M, denoting MASKROM (always SOP44), then a number denoting how
 many ROMs of that type, then another letter F, denoting FLASHROM (always TSOP40/48/56), then a number denoting how many
 ROMs of that type. That number is always the maximum amount of that ROM type that can be used on the PCB. The actual number
@@ -665,6 +672,12 @@ Kiseki no Dandou                                                                
                                                                                      GLS1 FL4L, GLS1 FL4U
                                                                                      GLS1 FL5L, GLS1 FL5U
 
+Truck          none          Same PCB but sticker says....                  KC056    TKK1 WAVE0               R3
+Kyosokyoku     (sticker:     'SYSTEM 12 M8F6-4 PCB 8661962400'                       TKK1 ROM0L, TKK1 ROM1L
+               TKK2 VER.A)                                                           TKK1 ROM2L, TKK1 ROM0U
+                                                                                     TKK1 ROM1U, TKK1 ROM2U
+                                                                                     TKK1 FL3L, TKK1 FL3U
+
 
 ********
 *Type 7*
@@ -746,7 +759,7 @@ This PCB is used on:
                Software
 Game           Revision      PCB                                            KEYCUS   ROMs Populated
 -----------------------------------------------------------------------------------------------------------
-Soul Calibur   SOC14/VER.C   JO 11-04-98                                    -----    WAVE0, WAVE1
+Soul Calibur   SOC14/VER.C   JO 11-04-98                                    none     WAVE0, WAVE1
                                                                                      ROM0, ROM0-1, ROM1
                                                                                      ROM1-1, ROM2, ROM2-1
                                                                                      FL3, FL4
@@ -926,6 +939,84 @@ Notes:
       This PCB was found on the following games (so far)....
       Ghoul Panic (OB2/VER.A)
       Point Blank 2 (GNB5/VER.A)
+
+      
+CDXA PCB
+--------
+SYSTEM12 CDXA PCB 8661962101 (8661972101)
+|---------------------------------------------------|
+|                               J8     J9           |
+|           6734               4556   3121          |
+|                                                   |
+|    J2                                    MB87078  |
+|    |-|        IS61C256                            |
+|    | |        IS61C256                   LC78836M |
+|    | |                                            |
+|    | |                                            |
+|    | |        |--------|                          |
+|    | |        |        |    |------|   TC558128   |
+|    | |        |  C448  |    | SH2  |              |
+|    | |        |        |    |      |              |
+|    | |        |        |    |------|   TC558128   |
+|    | |        |--------|                          |
+|    | |                                            |
+|    | |                                            |         
+|    |-|                                            |
+|        2061ASC-1        |------|                  |
+|                         |ALTERA|                  |
+|        14.7456MHz       |MAX   |                  |
+|                         |EPM7128                  |
+|                         |------|                  |
+|               J3              J4                  |
+|---------------------------------------------------|
+Notes:
+      6734     : Texas Instruments TPS6734 Fixed 12V 120mA Boost-Converter Supply compatible with MAX734 (SOIC8)
+      4556     : NJM4556 Dual High Current Operational Amplifier (SOIC8)
+      3121     : Rohm BA3121 Ground Isolation Amplifier (SOIC8)
+      C448     : Namco Custom C448 (QFP160)
+      SH2      : Hitachi SH2 HD6417014F28 CPU (QFP112)
+      2061ASC-1: IC Designs 2061ASC-1 programmable clock generator (SOIC16)
+      TC558128 : Toshiba TC558128BFT-15 128k x8 SRAM (x2, SOJ32)
+      IS61C256 : ISSI IS61C256AH-12T 32k x8 SRAM (x2, TSOP28)
+      EPM7128  : Altera Max EPM7128 CPLD with sticker 'S12C DX0A' (QFP100)
+      LC78836  : Sanyo LC78836 2-Channel 16-Bit D/A Converter with On-Chip 8X Oversampling Digital Filters (SOIC24)
+      MB87078  : Fujitsu MB87078 6-bit, 4-channel Electronic Volume Controller (SOIC24)
+      J2       : Custom Namco connector for plug-in CPU PCB
+      J3       : 40 pin connector for IDE CDROM data cable
+      J4       : 6 pin connector (possibly to re-program the CPLD)
+      J8       : 4 pin connector (left/right audio output)
+      J9       : 3 pin connector (possibly mono audio output or another audio output)
+
+      This PCB was found on the following games (so far)....
+
+      Truck Kyosokyoku (TKK2/VER.A) 
+      A CDROM drive and CDROM disc is also required
+      The disc is labelled 'TKK2-A'
+      
+      
+I/O Board (for use with Truck Kyosokyoku)
+---------      
+
+V233 DECO PCB
+2532960102 (2532970102)
+|-------------------------------------------|
+|    DSW(2)  JP1       14.7456MHz           |
+|LED                                        |
+|             C78              MB3771       |
+|J8                    TKK1PRG0.IC7         |
+|                                           |
+|    SLA4031 SLA4031 SLA4031 SLA4031 SLA4031|
+|                                           |
+|J9          J1          J2             J3  |
+|-------------------------------------------|
+Notes:
+      TKK1PRG0.IC7 - 27C1001 EPROM (DIP28)
+      SLA4031      - Sanken SLA4031 Quad High-Voltage, High-Current NPN Darlington transistor
+                     array for sink drive with built-in flywheel diode (SIL12)
+      C78          - Hitachi H8/3334 Micro-controller (PLCC84)
+      JP1          - Jumper to configure the H8/3334 for internal or external ROM usage. Set to 2-3 (EXT)
+      J1/2/3/8     - Multi-pin connectors joining to controls and main PCB
+      J9           - Power input connector
 */
 
 #include "emu.h"
@@ -1307,6 +1398,7 @@ static MACHINE_RESET( namcos12 )
 		strcmp( machine->gamedrv->name, "ptblank2" ) == 0 ||
 		strcmp( machine->gamedrv->name, "sws2000" ) == 0 ||
 		strcmp( machine->gamedrv->name, "sws2001" ) == 0 ||
+		strcmp( machine->gamedrv->name, "truckk" ) == 0 ||
 		strcmp( machine->gamedrv->name, "ghlpanic" ) == 0 )
 	{
 		/* this is based on guesswork, it might not even be keycus. */
@@ -2485,6 +2577,34 @@ ROM_START( toukon3 )
 	ROM_LOAD( "tr1wave1.4",  0x0400000, 0x400000, CRC(34539cdd) SHA1(afb7079c0f447fbda285a5b97a37c04baf26db75) )
 ROM_END
 
+ROM_START( truckk )
+	ROM_REGION32_LE( 0x00400000, "user1", 0 ) /* main prg */
+	ROM_LOAD16_BYTE( "tkk2vera.2l",  0x000000, 0x200000, CRC(321344e0) SHA1(0273284d05707b76ca38fd160ef6f17572314a8b) ) 
+	ROM_LOAD16_BYTE( "tkk2vera.2p",  0x000001, 0x200000, CRC(a7b5e4ea) SHA1(f11eefd80559b4d42318a920088b77bd67b70cc3) ) 
+
+	ROM_REGION32_LE( 0x3400000, "user2", 0 ) /* main data */
+	ROM_LOAD16_BYTE( "tkk1rom0l.ic10", 0x0000000, 0x800000, CRC(5e1c8660) SHA1(05fcfa9cc834f85c38e41610a32624464d67ee21) ) 
+	ROM_LOAD16_BYTE( "tkk1rom0u.ic14", 0x0000001, 0x800000, CRC(ee4e6566) SHA1(f3c7e227681003a3491a3996a90887e1091c0eed) ) 
+	ROM_LOAD16_BYTE( "tkk1rom1l.ic11", 0x1000000, 0x800000, CRC(fde2863c) SHA1(a01141df8c84730974c9f37fa2ee911e2f4e45f9) ) 
+	ROM_LOAD16_BYTE( "tkk1rom1u.ic15", 0x1000001, 0x800000, CRC(e51a56d7) SHA1(c5bad8df8edd5a5f352e5bf3bb93133503ca4ba0) ) 
+	ROM_LOAD16_BYTE( "tkk1rom2l.ic12", 0x2000000, 0x800000, CRC(029cf107) SHA1(30cbcf00ffb9c379c64718914874936ff32ed186) ) 
+	ROM_LOAD16_BYTE( "tkk1rom2u.ic16", 0x2000001, 0x800000, CRC(30c426dd) SHA1(2dae3d415715c779251c79006ea18e3bd14a1f51) ) 
+	ROM_LOAD16_BYTE( "tkk1fl3l.ic4", 0x3000000, 0x200000, CRC(b0e98cb2) SHA1(8c53037b8e20410a395db8d9bb9229b550ebf228) ) 
+	ROM_LOAD16_BYTE( "tkk1fl3u.ic5", 0x3000001, 0x200000, CRC(16d9ede7) SHA1(e989e0a6afbfca5e7ef81bf7c24e8e6b38a11eca) ) 
+
+	ROM_REGION( 0x0080000, "sub", 0 ) /* sound prg */
+	ROM_LOAD16_WORD_SWAP( "tkk2vera.11s", 0x000000, 0x080000, CRC(d3d0a46a) SHA1(20569462df49ad93ff1118b587d6d32edf9d851e) ) 
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
+	ROM_LOAD( "tkk1wave0.ic1", 0x000000, 0x800000, CRC(037d3095) SHA1(cc343bdd45d023c133964321e2df5cb1c91525ef) ) 
+
+	ROM_REGION( 0x20000, "ioboard", 0)	/* Truck K. I/O board */
+	ROM_LOAD( "tkk1prg0.ic7", 0x000000, 0x020000, CRC(11fd9c31) SHA1(068b8364ec0eb1e88f9f85f40b8b322876f6f3e2) ) 
+
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE( "tkk2-a", 0, SHA1(6b7c3686b22a508c44f67295b188504b757dd482) )
+ROM_END
+
 GAME( 1996, tekken3,   0,        coh700,   namcos12, namcos12, ROT0, "Namco",           "Tekken 3 (Japan, TET1/VER.E1)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC006 */
 GAME( 1996, tekken3a,  tekken3,  coh700,   namcos12, namcos12, ROT0, "Namco",           "Tekken 3 (TET2/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC006 */
 GAME( 1996, tekken3b,  tekken3,  coh700,   namcos12, namcos12, ROT0, "Namco",           "Tekken 3 (TET3/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC006 */
@@ -2521,4 +2641,5 @@ GAME( 1999, aquarush,  0,        coh700,   namcos12, namcos12, ROT0, "Namco",   
 GAME( 1999, golgo13,   0,        coh700,   golgo13,  namcos12, ROT0, "Eighting / Raizing / Namco", "Golgo 13 (Japan, GLG1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC054 */
 GAME( 1999, g13knd,    0,        coh700,   golgo13,  namcos12, ROT0, "Eighting / Raizing / Namco", "Golgo 13 Kiseki no Dandou (Japan, GLS1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC059 */
 GAME( 2000, sws2000,   0,        coh700,   namcos12, namcos12, ROT0, "Namco",           "Super World Stadium 2000 (Japan, SS01/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC055 */
+GAME( 2000, truckk,    0,        coh700,   namcos12, namcos12, ROT0, "Metro / Namco",   "Truck Kyosokyoku (Japan, TKK2/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC056 */
 GAME( 2001, sws2001,   sws2000,  coh700,   namcos12, namcos12, ROT0, "Namco",           "Super World Stadium 2001 (Japan, SS11/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC061 */
