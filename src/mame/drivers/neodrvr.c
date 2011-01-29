@@ -8336,7 +8336,7 @@ GAME( 1999, garoup,    garou,    neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Gar
 GAME( 1999, garoubl,   garou,    neogeo,   neogeo,   garoubl,  ROT0, "bootleg", "Garou - Mark of the Wolves (bootleg)", GAME_SUPPORTS_SAVE ) /* Bootleg of garoup */
 GAME( 2000, mslug3,    neogeo,   neogeo,   neogeo,   mslug3,   ROT0, "SNK", "Metal Slug 3" , GAME_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
 GAME( 2000, mslug3h,   mslug3,   neogeo,   neogeo,   mslug3h,  ROT0, "SNK", "Metal Slug 3 (not encrypted)" , GAME_SUPPORTS_SAVE ) /* Encrypted GFX */
-GAME( 2000, mslug3b6,  mslug3,   neogeo,   neogeo,   mslug3b6, ROT0, "bootleg", "Metal Slug 6 (Metal Slug 3 bootleg)", GAME_SUPPORTS_SAVE ) /* real Metal Slug 6 is an Atomiswave HW game, see atomswav.c ;-) */
+GAME( 2000, mslug3b6,  mslug3,   neogeo,   neogeo,   mslug3b6, ROT0, "bootleg", "Metal Slug 6 (Metal Slug 3 bootleg)", GAME_SUPPORTS_SAVE ) /* real Metal Slug 6 is an Atomiswave HW game, see naomi.c ;-) */
 GAME( 2000, kof2000,   neogeo,   neogeo,   neogeo,   kof2000,  ROT0, "SNK", "The King of Fighters 2000" , GAME_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
 GAME( 2000, kof2000n,  kof2000,  neogeo,   neogeo,   kof2000n, ROT0, "SNK", "The King of Fighters 2000 (not encrypted)" , GAME_SUPPORTS_SAVE ) /* Encrypted GFX */
 GAME( 2001, zupapa,    neogeo,   neogeo,   neogeo,   zupapa,   ROT0, "SNK", "Zupapa!" , GAME_SUPPORTS_SAVE )	/* Encrypted GFX */
