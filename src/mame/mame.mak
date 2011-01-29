@@ -225,7 +225,7 @@ SOUNDS += ZSG2
 SOUNDS += MOS656X
 SOUNDS += S2636
 SOUNDS += ASC
-
+SOUNDS += MAS3507D
 
 
 #-------------------------------------------------

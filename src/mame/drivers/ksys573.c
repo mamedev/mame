@@ -349,6 +349,7 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 #include "machine/zs01.h"
 #include "sound/psx.h"
 #include "sound/cdda.h"
+#include "sound/mas3507d.h"
 
 #define VERBOSE_LEVEL ( 0 )
 
@@ -2137,6 +2138,7 @@ static const UINT8 ds2401_xid[] =
 	0x3d, 0xbc, 0x9a, 0x78, 0x56, 0x34, 0x12, 0x01
 };
 
+
 static READ32_HANDLER( gx894pwbba_r )
 {
 	ksys573_state *state = space->machine->driver_data<ksys573_state>();
@@ -2154,11 +2156,11 @@ static READ32_HANDLER( gx894pwbba_r )
 		}
 		break;
 	case 0x2b:
-		/* sound? */
 		if( ACCESSING_BITS_0_15 )
 		{
-//          data |= 0x00001000; /* ? */
-			data |= 0x00002000; /* ? */
+			mas3507d_device *mas3507d = space->machine->device<mas3507d_device>("mpeg");
+			data |= mas3507d->i2c_scl_r() << 13;
+			data |= mas3507d->i2c_sda_r() << 12;
 		}
 		if( ACCESSING_BITS_16_31 )
 		{
@@ -2169,7 +2171,6 @@ static READ32_HANDLER( gx894pwbba_r )
 		if( ACCESSING_BITS_0_15 )
 		{
 			data |= state->gx894_ram[ state->gx894_ram_read_offset / 2 ];
-//          printf( "reading %08x %04x\r", state->gx894_ram_read_offset, state->gx894_ram[ state->gx894_ram_read_offset / 2 ] );
 			state->gx894_ram_read_offset += 2;
 		}
 		if( ACCESSING_BITS_16_31 )
@@ -2224,6 +2225,11 @@ static READ32_HANDLER( gx894pwbba_r )
 	case 0x3d:
 		if( ACCESSING_BITS_16_31 )
 		{
+			// fpga/digital board status checks
+			// wants & c000 = 8000 (just after program upload?)
+			// write 0000 to +f4.w
+			// write 8000 to +f6.w
+			
 			/* fails if !8000 */
 			/* fails if  4000 */
 			/* fails if !2000 */
@@ -2290,8 +2296,35 @@ static WRITE32_HANDLER( gx894pwbba_w )
 
 	switch( offset )
 	{
+	case 0x28:
+		if(ACCESSING_BITS_0_15)
+			logerror("FPGA MPEG start address high %04x\n", data);
+		if(ACCESSING_BITS_16_31)
+			logerror("FPGA MPEG start address low %04x\n", data >> 16);
+		break;
+	case 0x29:
+		if(ACCESSING_BITS_0_15)
+			logerror("FPGA MPEG end address high %04x\n", data);
+		if(ACCESSING_BITS_16_31)
+			logerror("FPGA MPEG end address low %04x\n", data >> 16);
+		break;
+	case 0x2a:
+		if(ACCESSING_BITS_0_15)
+			logerror("FPGA MPEG key 1/3 %04x\n", data);
+		break;
 	case 0x2b:
-		/* sound? */
+		if(ACCESSING_BITS_0_15) {
+			mas3507d_device *mas3507d = space->machine->device<mas3507d_device>("mpeg");
+			mas3507d->i2c_scl_w(data & 0x2000);
+			mas3507d->i2c_sda_w(data & 0x1000);
+		}
+		if( ACCESSING_BITS_16_31 )
+		{
+			logerror("FPGA MPEG control %c%c%c\n",
+					 data & 0x80000000 ? '#' : '.',
+					 data & 0x40000000 ? '#' : '.',
+					 data & 0x20000000 ? '#' : '.');
+		}
 		break;
 	case 0x2c:
 		if( ACCESSING_BITS_0_15 )
@@ -2309,7 +2342,6 @@ static WRITE32_HANDLER( gx894pwbba_w )
 		if( ACCESSING_BITS_0_15 )
 		{
 			state->gx894_ram[ state->gx894_ram_write_offset / 2 ] = data & 0xffff;
-//          printf( "writing %08x %04x\r", state->gx894_ram_write_offset, state->gx894_ram[ state->gx894_ram_write_offset / 2 ] );
 			state->gx894_ram_write_offset += 2;
 		}
 		if( ACCESSING_BITS_16_31 )
@@ -2351,7 +2383,13 @@ static WRITE32_HANDLER( gx894pwbba_w )
 		}
 		COMBINE_DATA( &state->b );
 		break;
+	case 0x3a:
+		if( ACCESSING_BITS_16_31 )
+			logerror("FPGA MPEG key 2/3 %04x\n", data >> 16);
+		break;
 	case 0x3b:
+		if( ACCESSING_BITS_0_15 )
+			logerror("FPGA MPEG key 3/3 %02x\n", data & 0xff);
 		if( ACCESSING_BITS_16_31 )
 		{
 			ds2401_write( space->machine, 2, !( ( data >> 28 ) & 1 ) );
@@ -3019,6 +3057,20 @@ static MACHINE_CONFIG_DERIVED( k573bait, konami573 )
 
 	/* Additional NEC Encoder */
 	MCFG_UPD4701_ADD( "upd4701" )
+MACHINE_CONFIG_END
+
+
+// Variants with additional digital sound board
+static MACHINE_CONFIG_DERIVED( k573d, konami573 )
+	MCFG_MAS3507D_ADD( "mpeg" )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( pccard1d, pccard1 )
+	MCFG_MAS3507D_ADD( "mpeg" )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( pccard2d, pccard2 )
+	MCFG_MAS3507D_ADD( "mpeg" )
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( konami573 )
@@ -4513,48 +4565,48 @@ GAME( 1999, gtrfrk2m, sys573,   pccard1,   gtrfrks,   gtrfrks,    ROT0, "Konami"
 GAME( 1999, dsftkd,   sys573,   konami573, ddr,       ddr,        ROT0, "Konami", "Dancing Stage featuring TRUE KiSS DESTiNATiON (G*884 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, cr589fw,  sys573,   konami573, konami573, konami573,  ROT0, "Konami", "CD-ROM Drive Updater 2.0 (700B04)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, cr589fwa, sys573,   konami573, konami573, konami573,  ROT0, "Konami", "CD-ROM Drive Updater (700A04)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 2000, ddr3mk,   sys573,   pccard2,   ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 3rd Mix - Ver.Korea2 (GN887 VER. KBA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.3 */
-GAME( 2000, ddr3mka,  ddr3mk,   pccard2,   ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 3rd Mix - Ver.Korea (GN887 VER. KAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.3 */
-GAME( 1999, ddr3ma,   ddr3mk,   pccard2,   ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 3rd Mix (GN887 VER. AAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.1 */
-GAME( 1999, ddr3mj,   ddr3mk,   pccard2,   ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 3rd Mix (GN887 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.0 */
+GAME( 2000, ddr3mk,   sys573,   pccard2d,  ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 3rd Mix - Ver.Korea2 (GN887 VER. KBA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.3 */
+GAME( 2000, ddr3mka,  ddr3mk,   pccard2d,  ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 3rd Mix - Ver.Korea (GN887 VER. KAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.3 */
+GAME( 1999, ddr3ma,   ddr3mk,   pccard2d,  ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 3rd Mix (GN887 VER. AAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.1 */
+GAME( 1999, ddr3mj,   ddr3mk,   pccard2d,  ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 3rd Mix (GN887 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.0 */
 GAME( 1999, ddrsbm,   sys573,   konami573, ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution Solo Bass Mix (GQ894 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1999, ddrs2k,   sys573,   konami573, ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution Solo 2000 (GC905 VER. AAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.3 */
 GAME( 1999, ddrs2kj,  ddrs2k,   konami573, ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution Solo 2000 (GC905 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.2 */
 GAME( 1999, hyperbbc, sys573,   konami573, hyperbbc,  hyperbbc,   ROT0, "Konami", "Hyper Bishi Bashi Champ (GX908 1999/08/24 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, hyperbbck,hyperbbc, konami573, hyperbbc,  hyperbbc,   ROT0, "Konami", "Hyper Bishi Bashi Champ (GX908 1999/08/24 VER. KAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, dsfdct,   sys573,   pccard2,   ddr,       ddrdigital, ROT0, "Konami", "Dancing Stage featuring Dreams Come True (GC910 VER. JCA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1999, dsfdct,   sys573,   pccard2d,  ddr,       ddrdigital, ROT0, "Konami", "Dancing Stage featuring Dreams Come True (GC910 VER. JCA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1999, dsfdcta,  dsfdct,   pccard2,   ddr,       ddr,        ROT0, "Konami", "Dancing Stage featuring Dreams Come True (GC910 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, drmn2m,   sys573,   konami573, drmn,      drmndigital,ROT0, "Konami", "DrumMania 2nd Mix (GE912 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.5 */
-GAME( 1999, drmn2mpu, drmn2m,   konami573, drmn,      drmndigital,ROT0, "Konami", "DrumMania 2nd Mix Session Power Up Kit (GE912 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.5 */
+GAME( 1999, drmn2m,   sys573,   k573d,     drmn,      drmndigital,ROT0, "Konami", "DrumMania 2nd Mix (GE912 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.5 */
+GAME( 1999, drmn2mpu, drmn2m,   k573d,     drmn,      drmndigital,ROT0, "Konami", "DrumMania 2nd Mix Session Power Up Kit (GE912 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.5 */
 GAME( 2000, dncfrks,  sys573,   konami573, dmx,       dmx,        ROT0, "Konami", "Dance Freaks (G*874 VER. KAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.6 */
 GAME( 2000, dmx,      dncfrks,  konami573, dmx,       dmx,        ROT0, "Konami", "Dance Maniax (G*874 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.6 */
-GAME( 2000, dsem,     sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dancing Stage Euro Mix (G*936 VER. EAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.7 */
+GAME( 2000, dsem,     sys573,   k573d,     ddr,       ddrdigital, ROT0, "Konami", "Dancing Stage Euro Mix (G*936 VER. EAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.7 */
 GAME( 2000, gtrfrk3m, sys573,   pccard1,   gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 3rd Mix (GE949 VER. JAC)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.4 */
 GAME( 2000, gtfrk3ma, gtrfrk3m, pccard1,   gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 3rd Mix (GE949 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.4 */
 GAME( 2000, gtfrk3mb, gtrfrk3m, pccard1,   gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 3rd Mix - security cassette versionup (949JAZ02)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.4 */
 GAME( 2000, salarymc, sys573,   konami573, hyperbbc,  salarymc,   ROT0, "Konami", "Salary Man Champ (GCA18 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 2000, ddr3mp,   sys573,   pccard2,   ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 3rd Mix Plus (G*A22 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.6 */
+GAME( 2000, ddr3mp,   sys573,   pccard2d,  ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 3rd Mix Plus (G*A22 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.6 */
 GAME( 2000, pcnfrk3m, sys573,   konami573, drmn,      drmndigital,ROT0, "Konami", "Percussion Freaks 3rd Mix (G*A23 VER. KAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
 GAME( 2000, drmn3m,   pcnfrk3m, konami573, drmn,      drmndigital,ROT0, "Konami", "DrumMania 3rd Mix (G*A23 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
 GAME( 2000, gtrfrk4m, sys573,   pccard1,   gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 4th Mix (G*A24 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
-GAME( 2000, ddr4m,    sys573,   pccard2,   ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 4th Mix (G*A33 VER. AAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
-GAME( 2000, ddr4mj,   ddr4m,    pccard2,   ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 4th Mix (G*A33 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
+GAME( 2000, ddr4m,    sys573,   pccard2d,  ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 4th Mix (G*A33 VER. AAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
+GAME( 2000, ddr4mj,   ddr4m,    pccard2d,  ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 4th Mix (G*A33 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
 GAME( 2000, ddr4ms,   sys573,   pccard2,   ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution 4th Mix Solo (G*A33 VER. ABA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
 GAME( 2000, ddr4msj,  ddr4ms,   pccard2,   ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution 4th Mix Solo (G*A33 VER. JBA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
-GAME( 2000, dsfdr,    sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dancing Stage Featuring Disney's Rave (GCA37JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
-GAME( 2000, ddrusa,   sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution USA (G*A44 VER. UAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
-GAME( 2000, ddr4mp,   sys573,   pccard2,   ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 4th Mix Plus (G*A34 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
+GAME( 2000, dsfdr,    sys573,   k573d,     ddr,       ddrdigital, ROT0, "Konami", "Dancing Stage Featuring Disney's Rave (GCA37JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
+GAME( 2000, ddrusa,   sys573,   k573d,     ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution USA (G*A44 VER. UAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
+GAME( 2000, ddr4mp,   sys573,   pccard2d,  ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 4th Mix Plus (G*A34 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2000, ddr4mps,  sys573,   pccard2,   ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution 4th Mix Plus Solo (G*A34 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2000, dmx2m,    sys573,   konami573, dmx,       dmx,        ROT0, "Konami", "Dance Maniax 2nd Mix (G*A39 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2000, fmania,   sys573,   konami573, konami573, konami573,  ROT0, "Konami", "Fighting Mania (918 xx B02)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 2001, gtrfrk5m, sys573,   pccard1,   gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 5th Mix (G*A26 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
-GAME( 2001, ddr5m,    sys573,   pccard2,   ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 5th Mix (G*A27 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
+GAME( 2001, gtrfrk5m, sys573,   pccard1d,  gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 5th Mix (G*A26 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
+GAME( 2001, ddr5m,    sys573,   pccard2d,  ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 5th Mix (G*A27 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, dmx2majp, sys573,   konami573, dmx,       dmx,        ROT0, "Konami", "Dance Maniax 2nd Mix Append J-Paradise (G*A38 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, mamboagg, sys573,   konami573, mamboagg,  mamboagg,   ROT0, "Konami", "Mambo A Go-Go (GQA40 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
-GAME( 2001, gtrfrk6m, sys573,   pccard1,   gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 6th Mix (G*B06 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
-GAME( 2001, gtrfrk7m, sys573,   pccard1,   gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 7th Mix (G*B17 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
-GAME( 2001, ddrmax,   sys573,   pccard2,   ddr,       ddrdigital, ROT0, "Konami", "DDR Max - Dance Dance Revolution 6th Mix (G*B19 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
-GAME( 2002, ddrmax2,  sys573,   pccard2,   ddr,       ddrdigital, ROT0, "Konami", "DDR Max 2 - Dance Dance Revolution 7th Mix (G*B20 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
-GAME( 2002, dsem2,    sys573,   pccard2,   ddr,       ddrdigital, ROT0, "Konami", "Dancing Stage Euro Mix 2 (G*C23 VER. EAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
-GAME( 2002, ddrextrm, sys573,   pccard2,   ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution Extreme (G*C36 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
-GAME( 2004, gtfrk11m, sys573,   pccard1,   gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 11th Mix (G*D39 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
+GAME( 2001, gtrfrk6m, sys573,   pccard1d,  gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 6th Mix (G*B06 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
+GAME( 2001, gtrfrk7m, sys573,   pccard1d,  gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 7th Mix (G*B17 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
+GAME( 2001, ddrmax,   sys573,   pccard2d,  ddr,       ddrdigital, ROT0, "Konami", "DDR Max - Dance Dance Revolution 6th Mix (G*B19 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
+GAME( 2002, ddrmax2,  sys573,   pccard2d,  ddr,       ddrdigital, ROT0, "Konami", "DDR Max 2 - Dance Dance Revolution 7th Mix (G*B20 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
+GAME( 2002, dsem2,    sys573,   pccard2d,  ddr,       ddrdigital, ROT0, "Konami", "Dancing Stage Euro Mix 2 (G*C23 VER. EAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
+GAME( 2002, ddrextrm, sys573,   pccard2d,  ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution Extreme (G*C36 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
+GAME( 2004, gtfrk11m, sys573,   pccard1d,  gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 11th Mix (G*D39 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
