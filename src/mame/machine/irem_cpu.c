@@ -111,8 +111,8 @@ const UINT8 bomberman_decryption_table[256] = {
 
 // lethalth, gunforc2, quizf1
 const UINT8 lethalth_decryption_table[256] = {
-   0x7f,0x26,0x5d,xxxx,0xba,xxxx,0x1e,0x5e, 0xb8,xxxx,0xbc,0xe8,0x01,xxxx,0x4a,0x25, /* 00 */
-// ssss !!!! !!!!      !!!!      !!!! !!!!  !!!!      !!!! !!!! !!!!           !!!!
+   0x7f,0x26,0x5d,xxxx,0xba,xxxx,0x1e,0x5e, 0xb8,0x49,0xbc,0xe8,0x01,xxxx,0x4a,0x25, /* 00 */
+// ssss !!!! !!!!      !!!!      !!!! !!!!  !!!! gggg !!!! !!!! !!!!           !!!!
    xxxx,0xbd,xxxx,0x22,0x10,xxxx,0x02,0x57, 0x70,xxxx,0x7c,xxxx,0xe7,0x52,xxxx,0xa9, /* 10 */
 //                !!!!           !!!! !!!!            ????      !!!! !!!!      gggg
    xxxx,xxxx,0xc6,0x06,0xa0,0xfe,0xcf,0x8e, 0x43,0x8f,0x2d,0x8c,0xd4,0x85,0x75,0xa2, /* 20 */
@@ -124,7 +124,7 @@ const UINT8 lethalth_decryption_table[256] = {
    0x93,0x91,xxxx,0xeb,xxxx,0x50,0x41,0x29, 0x47,xxxx,xxxx,0x60,xxxx,0xab,xxxx,xxxx, /* 50 */
 // pppp !!!! !!!!      !!!!      !!!! !!!!                      !!!!      !!!!
    0xc3,0xe2,0xd0,0xb2,0x11,0x79,xxxx,0x08, 0x82,0xfb,xxxx,0x2c,0x23,xxxx,0x28,0x0d, /* 60 */
-// !!!! !!!! !!!! !!!!      gggg            ???? !!!!           !!!!
+// !!!! !!!! !!!! !!!!      gggg            pppp !!!!           !!!!
    xxxx,xxxx,xxxx,0x83,0x3c,xxxx,0x1b,0x34, 0x5b,xxxx,0x40,xxxx,xxxx,0x04,0xfc,0xcd, /* 70 */
 //                !!!! !!!!                 !!!!                     !!!! !!!! ssss
    0xb1,0xf3,0x8a,xxxx,xxxx,0x87,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,0xbe,0x84,0x1f,0xe6, /* 80 */
@@ -147,17 +147,13 @@ const UINT8 lethalth_decryption_table[256] = {
 /*
 missing opcode:
 
-1cedd : 68 c0 03
-17cb4 : b8 f0
-11bda : 09 ...
-1724e : 09 ...
-
+b8 -> 0x13 ??? (17cb4)
 1a -> (7c,7e) ->
 34 -> (7c,7e) ->
 c5 -> (18d56 - from 1844f) (71,76,7a,7d,7e) -> to handle level number (a008d=00-0f) ->
 af -> (7d) (strange 71) ->
 ed -> (p76,7c,7e) ->
-fb ->
+fb -> 0x35 ???
 
 "!!!!" -> checked against gussun
 "gggg" -> very probably
@@ -166,10 +162,12 @@ fb ->
 "????" -> missing
 
 probably:
+68 -> 0x82
 42 -> 0x98 (083a3)
 50 -> 0x93 (083a7)
 
 very probably:
+09 -> 0x49
 48 -> 0x2b
 e5 -> 0x73
 2b -> 0x8c
