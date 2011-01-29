@@ -1256,9 +1256,9 @@ $(MAMEOBJ)/stern.a: \
 	$(DRIVERS)/supdrapo.o \
 
 $(MAMEOBJ)/subsino.a: \
-	$(DRIVERS)/bishjan.o \
 	$(DRIVERS)/lastfght.o \
 	$(DRIVERS)/subsino.o \
+	$(DRIVERS)/subsino2.o \
 
 $(MAMEOBJ)/sun.a: \
 	$(DRIVERS)/arabian.o $(VIDEO)/arabian.o \
