@@ -129,7 +129,7 @@ asc_device::asc_device(running_machine &_machine, const asc_device_config &confi
 void asc_device::device_start()
 {
 	// create the stream
-	m_stream = m_machine.sound().stream_alloc(*this, 0, 2, 22257, this, static_stream_generate);
+	m_stream = m_machine.sound().stream_alloc(*this, 0, 2, 22257, this);
 
 	memset(m_regs, 0, sizeof(m_regs));
 
@@ -169,16 +169,11 @@ void asc_device::device_reset()
 }
 
 //-------------------------------------------------
-//  stream_generate - handle update requests for
+//  sound_stream_update - handle update requests for
 //  our sound stream
 //-------------------------------------------------
 
-STREAM_UPDATE( asc_device::static_stream_generate )
-{
-	reinterpret_cast<asc_device *>(param)->stream_generate(inputs, outputs, samples);
-}
-
-void asc_device::stream_generate(stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void asc_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	stream_sample_t *outL, *outR;
 	int i, ch;
