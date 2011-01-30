@@ -13,6 +13,8 @@ Mainboard + Cart combo
     Green      = Asia
     Red        = Korean
 
+ There is a USA version of Cyvern known to exist, but not dumped. The cart color is Black.
+
   Credits (in no particular order):
    Olivier Galibert for all the assistance and information he's provided
    R.Belmont for working on the SH2 timers so sound worked
@@ -1455,8 +1457,6 @@ ROM_START( puzzloopu )
 	ROM_REGION( 0x400000, "ymz", 0 ) /* Samples */
 	ROM_LOAD( "pzl30000.u4", 0x000000, 0x400000, CRC(38604b8d) SHA1(1191cf48a6a7baa58e51509442b40ea67f5252d2) )
 ROM_END
-
-/* haven't even tried to run the ones below yet */
 
 ROM_START( jjparads )
 	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
