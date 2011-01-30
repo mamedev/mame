@@ -1137,7 +1137,7 @@ ROM_START( zwackery )
 	ROM_LOAD16_BYTE( "tilee.bin",  0x0001, 0x4000, CRC(ab504dc8) SHA1(4ebdcd42624e94c29ccdb8247bfff2d8e936ddd7) )
 
 	ROM_REGION( 0x000D, "plds", 0 )
-    /* According to the manual these pal's are located on the "Venus CPU" board */
+	/* According to the manual these pal's are located on the "Venus CPU" board */
 	ROM_LOAD( "pal.d5",    0x0000, 0x00001, NO_DUMP ) /* marked H-T in manual */
 	ROM_LOAD( "pal.d2",    0x0001, 0x00001, NO_DUMP ) /* marked V-T in manual */
 	ROM_LOAD( "pal.d4",    0x0002, 0x00001, NO_DUMP ) /* marked MISC V&H PAL in manual */
@@ -1145,14 +1145,14 @@ ROM_START( zwackery )
 	ROM_LOAD( "pal.e6",    0x0004, 0x00001, NO_DUMP ) /* marked CPU WTS PAL in manual*/
 	ROM_LOAD( "pal.f8",    0x0005, 0x00001, NO_DUMP ) /* marked CPU IOC PAL in manual*/
 	ROM_LOAD( "pal.a5",    0x0006, 0x00001, NO_DUMP ) /* marked CPU RMD PAL in manual*/
-    /* According to the manual these pal's are located on the "Venus VIDEO" board */
+	/* According to the manual these pal's are located on the "Venus VIDEO" board */
 	ROM_LOAD( "pal.1f",    0x0007, 0x00001, NO_DUMP ) /* marked PAL FGBDCD in manual*/
 	ROM_LOAD( "pal.1d",    0x0008, 0x00001, NO_DUMP ) /* marked PAL HCT in manual*/
-    /* According to the manual these pal's are located on the "Venus BACKGROUND" board */
+	/* According to the manual these pal's are located on the "Venus BACKGROUND" board */
 	ROM_LOAD( "pal.1c",    0x0009, 0x00001, NO_DUMP ) /* marked BGBPE PAL in manual*/
 	ROM_LOAD( "pal.5c",    0x000a, 0x00001, NO_DUMP ) /* marked HCT PAL in manual*/
 	ROM_LOAD( "pal.5j",    0x000b, 0x00001, NO_DUMP ) /* marked BGBDCD PAL in manual*/
-    /* According to the manual this pal is located on the "Artificial Artist" board */
+	/* According to the manual this pal is located on the "Artificial Artist" board */
 	ROM_LOAD( "pal20.u15", 0x000c, 0x00001, NO_DUMP ) /* marked CSD002R0 in manual, pal type not specified */
 ROM_END
 
@@ -1163,7 +1163,7 @@ ROM_END
     Sound Board:     A080-91863-B000
 */
 
-ROM_START( xenophob )
+ROM_START( xenophob ) /* Service mode shows "VERSION CO" */
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "xeno_pro.3c",  0x00000, 0x10000, CRC(f44c2e60) SHA1(9130b26eb1e0e0a75f9fdec898e1f0976de8a766) )
 	ROM_LOAD16_BYTE( "xeno_pro.3b",  0x00001, 0x10000, CRC(01609a3b) SHA1(9e065bc72f56439a885bfdfc8eb60df666df7c37) )
@@ -1186,22 +1186,22 @@ ROM_START( xenophob )
 	ROM_LOAD( "xeno_fg.9j",   0x20000, 0x10000, CRC(82fb3e09) SHA1(f06e9df20044244a6c174f4876e615ccc18e1cba) )
 	ROM_LOAD( "xeno_fg.10j",  0x30000, 0x10000, CRC(6a7a3516) SHA1(1def9c134220eac9ba5e46d38282ff18f51b6398) )
 
-    /* PLD's located on the cpu/video board */
+	/* PLD's located on the cpu/video board */
 	ROM_REGION( 0x000C, "cpu_plds", 0 )
 	ROM_LOAD( "b61a-49aaj-axad.bin", 0x00000, 0x00001, NO_DUMP ) /* PAL20L8 at 9B */
 	ROM_LOAD( "b75a-50aaj-bxad.bin", 0x00001, 0x00001, NO_DUMP ) /* PAL16L8 at 1J */
 	ROM_LOAD( "b75a-50aaj-axad.bin", 0x00002, 0x00001, NO_DUMP ) /* PAL16L8 at 2J */
 	ROM_LOAD( "b75a-41aaj-axad.bin", 0x00003, 0x00001, NO_DUMP ) /* PAL16R4 at 2K */
 	ROM_LOAD( "b75a-41aaj-bxab.bin", 0x00004, 0x00001, NO_DUMP ) /* PAL16R4 at 14K */
-    ROM_LOAD( "a59a26axlaxhd.bin",   0x00005, 0x00001, NO_DUMP ) /* PLS153 at 11J */
-    ROM_LOAD( "a59a26axlbxhd.bin",   0x00006, 0x00001, NO_DUMP ) /* PLS153 at 12J */
-    ROM_LOAD( "a59a26axlcxhd.bin",   0x00007, 0x00001, NO_DUMP ) /* PLS153 at 14H */
-    ROM_LOAD( "0066-316bx-xxqx.bin", 0x00008, 0x00001, NO_DUMP ) /* 20 Pin PLD? at 14E */
-    ROM_LOAD( "0066-314bx-xxqx.bin", 0x00009, 0x00001, NO_DUMP ) /* 24 Pin PLD? at 14F */
-    ROM_LOAD( "0066-315bx-xxqx.bin", 0x0000A, 0x00001, NO_DUMP ) /* 20 Pin PLD? at 15E */
-    ROM_LOAD( "0066-313bx-xxqx.bin", 0x0000B, 0x00001, NO_DUMP ) /* 24 Pin PLD? at 15F */
+	ROM_LOAD( "a59a26axlaxhd.bin",   0x00005, 0x00001, NO_DUMP ) /* PLS153 at 11J */
+	ROM_LOAD( "a59a26axlbxhd.bin",   0x00006, 0x00001, NO_DUMP ) /* PLS153 at 12J */
+	ROM_LOAD( "a59a26axlcxhd.bin",   0x00007, 0x00001, NO_DUMP ) /* PLS153 at 14H */
+	ROM_LOAD( "0066-316bx-xxqx.bin", 0x00008, 0x00001, NO_DUMP ) /* 20 Pin PLD? at 14E */
+	ROM_LOAD( "0066-314bx-xxqx.bin", 0x00009, 0x00001, NO_DUMP ) /* 24 Pin PLD? at 14F */
+	ROM_LOAD( "0066-315bx-xxqx.bin", 0x0000A, 0x00001, NO_DUMP ) /* 20 Pin PLD? at 15E */
+	ROM_LOAD( "0066-313bx-xxqx.bin", 0x0000B, 0x00001, NO_DUMP ) /* 24 Pin PLD? at 15F */
 
-    /* PLD located on the "Sounds Good" board */
+	/* PLD located on the "Sounds Good" board */
 	ROM_REGION( 0x0001, "snd_pld", 0 )
 	ROM_LOAD( "e36a31axnax00.bin",   0x00000, 0x00001, NO_DUMP ) /* PAL20L10 at U15 */
 ROM_END
@@ -1233,13 +1233,13 @@ ROM_START( spyhunt2 )
 	ROM_LOAD( "fg3.10j",  0x60000, 0x20000, CRC(d3475ff8) SHA1(aa7a283a190a6c43e365fcd9242c5d0b920dbf32) )
 
 	ROM_REGION( 0x0006, "plds", 0 )
-    /* According to the manual these pal's are located on the Video Game board */
+	/* According to the manual these pal's are located on the Video Game board */
 	ROM_LOAD( "pal20l8.9b",   0x00000, 0x00001, NO_DUMP ) /* marked COLARB in manual */
 	ROM_LOAD( "pal16l8.1j",   0x00001, 0x00001, NO_DUMP ) /* marked IODCD in manual */
 	ROM_LOAD( "pal16l8.2j",   0x00002, 0x00001, NO_DUMP ) /* marked MEMDCD in manual */
 	ROM_LOAD( "pal16r4.2k",   0x00003, 0x00001, NO_DUMP ) /* marked DTACK in manual */
 	ROM_LOAD( "pal16r4.14k",  0x00004, 0x00001, NO_DUMP ) /* marked HSYNC in manual*/
-    /* According to the manual this pal is located on the "Sounds Good" board */
+	/* According to the manual this pal is located on the "Sounds Good" board */
 	ROM_LOAD( "pal20.u15",    0x00005, 0x00001, NO_DUMP ) /* marked SG01R0 in manual, pal type not specified */
 ROM_END
 
@@ -1270,18 +1270,18 @@ ROM_START( spyhunt2a )
 	ROM_LOAD( "fg3.10j",  0x60000, 0x20000, CRC(d3475ff8) SHA1(aa7a283a190a6c43e365fcd9242c5d0b920dbf32) )
 
 	ROM_REGION( 0x0006, "plds", 0 )
-    /* According to the manual these pal's are located on the Video Game board */
+	/* According to the manual these pal's are located on the Video Game board */
 	ROM_LOAD( "pal20l8.9b",   0x00000, 0x00001, NO_DUMP ) /* marked COLARB in manual */
 	ROM_LOAD( "pal16l8.1j",   0x00001, 0x00001, NO_DUMP ) /* marked IODCD in manual */
 	ROM_LOAD( "pal16l8.2j",   0x00002, 0x00001, NO_DUMP ) /* marked MEMDCD in manual */
 	ROM_LOAD( "pal16r4.2k",   0x00003, 0x00001, NO_DUMP ) /* marked DTACK in manual */
 	ROM_LOAD( "pal16r4.14k",  0x00004, 0x00001, NO_DUMP ) /* marked HSYNC in manual*/
-    /* According to the manual this pal is located on the "Sounds Good" board */
+	/* According to the manual this pal is located on the "Sounds Good" board */
 	ROM_LOAD( "pal20.u15",    0x00005, 0x00001, NO_DUMP ) /* marked SG01R0 in manual, pal type not specified */
 ROM_END
 
 
-ROM_START( blasted )
+ROM_START( blasted ) /* Service mode shows "prod. code v.1" and the date 4/27/88 */
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "3c",  0x00000, 0x10000, CRC(b243b7df) SHA1(b44179c30e5286362b0be4e2e9b0742e7e27f7c9) )
 	ROM_LOAD16_BYTE( "3b",  0x00001, 0x10000, CRC(627e30d3) SHA1(c430191dd539a22603e49df4c4cb697747a0cd02) )
@@ -1305,17 +1305,17 @@ ROM_START( blasted )
 	ROM_LOAD( "fg3",  0x60000, 0x20000, CRC(18e4a130) SHA1(2412b45ca58b36515c80b0888a5d35303a5ce5a2) )
 
 	ROM_REGION( 0x0006, "plds", 0 )
-    /* According to the manual these pal's are located on the Video Game board */
+	/* According to the manual these pal's are located on the Video Game board */
 	ROM_LOAD( "pal20l8.9b",   0x00000, 0x00001, NO_DUMP ) /* marked COLARB in manual */
 	ROM_LOAD( "pal16l8.1j",   0x00001, 0x00001, NO_DUMP ) /* marked IODCD in manual */
 	ROM_LOAD( "pal16l8.2j",   0x00002, 0x00001, NO_DUMP ) /* marked MEMDCD in manual */
 	ROM_LOAD( "pal16r4.2k",   0x00003, 0x00001, NO_DUMP ) /* marked DTACK in manual */
 	ROM_LOAD( "pal16r4.14k",  0x00004, 0x00001, NO_DUMP ) /* marked HSYNC in manual*/
-    /* According to the manual this pal is located on the "Sounds Good" board */
+	/* According to the manual this pal is located on the "Sounds Good" board */
 	ROM_LOAD( "pal20.u15",    0x00005, 0x00001, NO_DUMP ) /* marked SG01R0 in manual, pal type not specified */
 ROM_END
 
-ROM_START( intlaser )
+ROM_START( intlaser ) /* Service mode shows "TOP SECRET PROJ. #F01" and the date 10/01/87 */
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "3c.bin",  0x00000, 0x10000, CRC(ddab582a) SHA1(db124e35b7b33d282f71104412a8dab71ce71cb4) )
 	ROM_LOAD16_BYTE( "3b.bin",  0x00001, 0x10000, CRC(e4498eca) SHA1(69cbc80ab9a801e957a74278475869d3b54e9a2a) )
@@ -1339,20 +1339,20 @@ ROM_START( intlaser )
 	ROM_LOAD( "10j.bin", 0x60000, 0x20000, CRC(203b55b8) SHA1(72311af32039d09f3b0f4641b71eaf836302fc9a) )
 
 	ROM_REGION( 0x0006, "plds", 0 )
-    /* According to the manual these pal's are located on the Video Game board */
+	/* According to the manual these pal's are located on the Video Game board */
 	ROM_LOAD( "pal20l8.9b",   0x00000, 0x00001, NO_DUMP ) /* marked COLARB in manual */
 	ROM_LOAD( "pal16l8.1j",   0x00001, 0x00001, NO_DUMP ) /* marked IODCD in manual */
 	ROM_LOAD( "pal16l8.2j",   0x00002, 0x00001, NO_DUMP ) /* marked MEMDCD in manual */
 	ROM_LOAD( "pal16r4.2k",   0x00003, 0x00001, NO_DUMP ) /* marked DTACK in manual */
 	ROM_LOAD( "pal16r4.14k",  0x00004, 0x00001, NO_DUMP ) /* marked HSYNC in manual*/
-    /* According to the manual this pal is located on the "Sounds Good" board */
+	/* According to the manual this pal is located on the "Sounds Good" board */
 	ROM_LOAD( "pal20.u15",    0x00005, 0x00001, NO_DUMP ) /* marked SG01R0 in manual, pal type not specified */
 ROM_END
 
 
 ROM_START( archrivl )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "3c-rev2",  0x00000, 0x10000, CRC(60d4b760) SHA1(9c24c72f62310475b0dade85299cb661904f8f41) )
+	ROM_LOAD16_BYTE( "3c-rev2",  0x00000, 0x10000, CRC(60d4b760) SHA1(9c24c72f62310475b0dade85299cb661904f8f41) ) /* Reports as rev 4.0 6/29/89 */
 	ROM_LOAD16_BYTE( "3b-rev2",  0x00001, 0x10000, CRC(e0c07a8d) SHA1(ace5b480d4c2cd3d78dff0e284cf13a8d28c40b7) )
 	ROM_LOAD16_BYTE( "2c-rev2",  0x20000, 0x10000, CRC(cc2893f7) SHA1(44931299cb98e27ac2f11b3922da76895fbfe0a7) )
 	ROM_LOAD16_BYTE( "2b-rev2",  0x20001, 0x10000, CRC(fa977050) SHA1(67c66995da755401162f7e668b97eb42ac769ec0) )
@@ -1399,7 +1399,7 @@ ROM_END
 
 ROM_START( archrivl2 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "archrivl.4",  0x00000, 0x10000, CRC(3c545740) SHA1(84a467756c959385a3ec3b97026823470bbab7ab) )
+	ROM_LOAD16_BYTE( "archrivl.4",  0x00000, 0x10000, CRC(3c545740) SHA1(84a467756c959385a3ec3b97026823470bbab7ab) ) /* Reports as rev 2.0 5/03/89 */
 	ROM_LOAD16_BYTE( "archrivl.2",  0x00001, 0x10000, CRC(bc4df2b9) SHA1(7314d03d4cf7e8a83135fa67969dda3088e212fb) )
 	ROM_LOAD16_BYTE( "archrivl.3",  0x20000, 0x10000, CRC(d6d08ff7) SHA1(bbbd4b5c3218c9bb461b17e536191d40ab39f67c) )
 	ROM_LOAD16_BYTE( "archrivl.1",  0x20001, 0x10000, CRC(92f3a43d) SHA1(45fdcbacd65f5898d54cc2ac95639b7ee2c097e6) )
@@ -1444,30 +1444,30 @@ ROM_START( archrivl2 )
 ROM_END
 
 
-ROM_START( pigskin )
+ROM_START( pigskin ) /* Initial boot screen reports KIT CODE REV 1.1K 8/01/90 */
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "pigskin.a5",  0x00000, 0x10000, CRC(ab61c29b) SHA1(01cf2d9b3f41442280e614541d5651c6e46b4a4b) )
-	ROM_LOAD16_BYTE( "pigskin.b5",  0x00001, 0x10000, CRC(55a802aa) SHA1(a75f54bce5aad3f7375ab15ad204744e2f6fdc92) )
-	ROM_LOAD16_BYTE( "pigskin.a6",  0x20000, 0x10000, CRC(4d8b7e50) SHA1(9e5d0edf1603e11f22d3129a2b8865ebcb5e27f9) )
-	ROM_LOAD16_BYTE( "pigskin.b6",  0x20001, 0x10000, CRC(1194f187) SHA1(e7cebe5322a5c8e382b6773939be5bc88492f289) )
+	ROM_LOAD16_BYTE( "pigskin-k_la1.a5",  0x00000, 0x10000, CRC(ab61c29b) SHA1(01cf2d9b3f41442280e614541d5651c6e46b4a4b) )
+	ROM_LOAD16_BYTE( "pigskin-k_la1.b5",  0x00001, 0x10000, CRC(55a802aa) SHA1(a75f54bce5aad3f7375ab15ad204744e2f6fdc92) )
+	ROM_LOAD16_BYTE( "pigskin-k_la1.a6",  0x20000, 0x10000, CRC(4d8b7e50) SHA1(9e5d0edf1603e11f22d3129a2b8865ebcb5e27f9) )
+	ROM_LOAD16_BYTE( "pigskin-k_la1.b6",  0x20001, 0x10000, CRC(1194f187) SHA1(e7cebe5322a5c8e382b6773939be5bc88492f289) )
 
 	ROM_REGION( 0x90000, "cvsdcpu", 0 )  /* Audio System board */
-	ROM_LOAD( "pigskin.u4",  0x10000, 0x10000, CRC(6daf2d37) SHA1(4c8098520fe44e36b01389bcfcfe3ad1d027cbde) )
-	ROM_RELOAD(              0x20000, 0x10000 )
-	ROM_LOAD( "pigskin.u19", 0x30000, 0x10000, CRC(56fd16a3) SHA1(b91aabdbd3185355f2b7177fc4d3a86fa110f51d) )
-	ROM_RELOAD(              0x40000, 0x10000 )
-	ROM_LOAD( "pigskin.u20", 0x50000, 0x10000, CRC(5d032fb8) SHA1(a236cdc64856637e560bec7119b051fac13efbe0) )
-	ROM_RELOAD(              0x60000, 0x10000 )
+	ROM_LOAD( "pigskin_sl1.u4",  0x10000, 0x10000, CRC(6daf2d37) SHA1(4c8098520fe44e36b01389bcfcfe3ad1d027cbde) )
+	ROM_RELOAD(                  0x20000, 0x10000 )
+	ROM_LOAD( "pigskin_sl1.u19", 0x30000, 0x10000, CRC(56fd16a3) SHA1(b91aabdbd3185355f2b7177fc4d3a86fa110f51d) )
+	ROM_RELOAD(                  0x40000, 0x10000 )
+	ROM_LOAD( "pigskin_sl1.u20", 0x50000, 0x10000, CRC(5d032fb8) SHA1(a236cdc64856637e560bec7119b051fac13efbe0) )
+	ROM_RELOAD(                  0x60000, 0x10000 )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
-	ROM_LOAD( "pigskin.e2",  0x00000, 0x10000, CRC(12d5737b) SHA1(73040233bb86eaa42257112e2f0540de1206e310) )
-	ROM_LOAD( "pigskin.e1",  0x10000, 0x10000, CRC(460202a9) SHA1(8c2f7ae3615519e13e750c99b89ccb28e9946bb8) )
+	ROM_LOAD( "pigskin_la1.e2",  0x00000, 0x10000, CRC(12d5737b) SHA1(73040233bb86eaa42257112e2f0540de1206e310) )
+	ROM_LOAD( "pigskin_la1.e1",  0x10000, 0x10000, CRC(460202a9) SHA1(8c2f7ae3615519e13e750c99b89ccb28e9946bb8) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "pigskin.h15", 0x00000, 0x20000, CRC(2655d03f) SHA1(de2e2a7fb40844d921b6afaa724a7089a0397270) )
-	ROM_LOAD( "pigskin.h17", 0x20000, 0x20000, CRC(31c52ea7) SHA1(1fcb99a70494eecb970bc47bd47ef04a170fab5d) )
-	ROM_LOAD( "pigskin.h18", 0x40000, 0x20000, CRC(b36c4109) SHA1(4eeae5dfbbe061ea55d7429a7386ec75c734befb) )
-	ROM_LOAD( "pigskin.h14", 0x60000, 0x20000, CRC(09c87104) SHA1(34ac22bdcd8218b9d6a0b4219c67b9b0cc000375) )
+	ROM_LOAD( "pigskin_la3.h15", 0x00000, 0x20000, CRC(2655d03f) SHA1(de2e2a7fb40844d921b6afaa724a7089a0397270) )
+	ROM_LOAD( "pigskin_la3.h17", 0x20000, 0x20000, CRC(31c52ea7) SHA1(1fcb99a70494eecb970bc47bd47ef04a170fab5d) )
+	ROM_LOAD( "pigskin_la3.h18", 0x40000, 0x20000, CRC(b36c4109) SHA1(4eeae5dfbbe061ea55d7429a7386ec75c734befb) )
+	ROM_LOAD( "pigskin_la3.h14", 0x60000, 0x20000, CRC(09c87104) SHA1(34ac22bdcd8218b9d6a0b4219c67b9b0cc000375) )
 ROM_END
 
 
@@ -1650,7 +1650,7 @@ GAME( 1987, spyhunt2, 0,        spyhunt2, spyhunt2, spyhunt2, ROT0,   "Bally Mid
 GAME( 1987, spyhunt2a,spyhunt2, spyhunt2, spyhunt2, spyhunt2, ROT0,   "Bally Midway", "Spy Hunter 2 (rev 1)", GAME_SUPPORTS_SAVE )
 GAME( 1988, blasted,  0,        xenophob, blasted,  blasted,  ROT0,   "Bally Midway", "Blasted", GAME_SUPPORTS_SAVE )
 GAME( 1987, intlaser, blasted,  intlaser, intlaser, intlaser, ROT0,   "Bally Midway", "International Team Laser (prototype)", GAME_SUPPORTS_SAVE )
-GAME( 1989, archrivl, 0,        archrivl, archrivl, archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 4.0)", GAME_SUPPORTS_SAVE )
-GAME( 1989, archrivl2,archrivl, archrivl, archrivl, archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 2.0)", GAME_SUPPORTS_SAVE )
+GAME( 1989, archrivl, 0,        archrivl, archrivl, archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 4.0 6/29/89)", GAME_SUPPORTS_SAVE )
+GAME( 1989, archrivl2,archrivl, archrivl, archrivl, archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 2.0 5/03/89)", GAME_SUPPORTS_SAVE )
 GAME( 1989, trisport, 0,        trisport, trisport, trisport, ROT270, "Bally Midway", "Tri-Sports", GAME_SUPPORTS_SAVE )
-GAME( 1990, pigskin,  0,        pigskin,  pigskin,  pigskin,  ROT0,   "Midway", "Pigskin 621AD", GAME_SUPPORTS_SAVE )
+GAME( 1990, pigskin,  0,        pigskin,  pigskin,  pigskin,  ROT0,   "Midway", "Pigskin 621AD (rev 1.1K 8/01/90)", GAME_SUPPORTS_SAVE )
