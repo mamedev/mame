@@ -288,7 +288,7 @@ static void ROMC_0F(f8_Regs *cpustate)
      * must move the contents of the data bus into the low order
      * byte of PC0.
      */
-    cpustate->irq_vector = (*cpustate->irq_callback)(cpustate->device, 0);
+    cpustate->irq_vector = (*cpustate->irq_callback)(cpustate->device, F8_INPUT_LINE_INT_REQ);
     cpustate->dbus = cpustate->irq_vector & 0x00ff;
     cpustate->pc1 = cpustate->pc0;
     cpustate->pc0 = (cpustate->pc0 & 0xff00) | cpustate->dbus;
