@@ -1843,7 +1843,12 @@ static void HandleMemBlock(arm_state *cpustate, UINT32 insn)
                     if (rb == 15)
                         LOG(("%08x:  Illegal LDRM writeback to r15\n", R15));
 #endif
-                SET_REGISTER(cpustate, rb, GET_REGISTER(cpustate, rb) + result * 4);
+				// "A LDM will always overwrite the updated base if the base is in the list." (also for a user bank transfer?)
+				// GBA "V-Rally 3" expects R0 not to be overwritten with the updated base value [BP 8077B0C]
+				if (((insn >> rb) & 1) == 0)
+				{
+					SET_REGISTER(cpustate, rb, GET_REGISTER(cpustate, rb) + result * 4);
+				}
             }
 
             // R15 included? (NOTE: CPSR restore must occur LAST otherwise wrong registers restored!)
@@ -1896,7 +1901,11 @@ static void HandleMemBlock(arm_state *cpustate, UINT32 insn)
             {
                 if (rb == 0xf)
                     LOG(("%08x:  Illegal LDRM writeback to r15\n", R15));
-                SET_REGISTER(cpustate, rb, GET_REGISTER(cpustate, rb)-result*4);
+				// "A LDM will always overwrite the updated base if the base is in the list." (also for a user bank transfer?)
+				if (((insn >> rb) & 1) == 0)
+				{
+					SET_REGISTER(cpustate, rb, GET_REGISTER(cpustate, rb) - result * 4);
+				}
             }
 
             // R15 included? (NOTE: CPSR restore must occur LAST otherwise wrong registers restored!)
