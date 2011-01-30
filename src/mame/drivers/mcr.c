@@ -1892,7 +1892,7 @@ ROM_START( tron )
 	ROM_REGION( 0x0020, "proms", 0 ) /* PROM's located on the Super Sound I/O Board (90913) */
 	ROM_LOAD( "9860-07axn-axhd.d12",     0x0000, 0x0020, CRC(e1281ee9) SHA1(9ac9b01d24affc0ee9227a4364c4fd8f8290343a) ) /* N82S123 */
 
-    ROM_REGION( 0x0005, "scpu_pals", 0) /* PAL's located on the Super CPU Board (90010) */
+	ROM_REGION( 0x0005, "scpu_pals", 0) /* PAL's located on the Super CPU Board (90010) */
 	ROM_LOAD( "0066-313bx-xxqx.a12.bin", 0x0000, 0x0001, NO_DUMP)
 	ROM_LOAD( "0066-315bx-xxqx.b12.bin", 0x0000, 0x0001, NO_DUMP)
 	ROM_LOAD( "0066-322bx-xx0x.e3.bin",  0x0000, 0x0001, NO_DUMP)
@@ -1931,7 +1931,7 @@ ROM_START( tron2 )
 	ROM_REGION( 0x0020, "proms", 0 ) /* PROM's located on the Super Sound I/O Board (90913) */
 	ROM_LOAD( "9860-07axn-axhd.d12",     0x0000, 0x0020, CRC(e1281ee9) SHA1(9ac9b01d24affc0ee9227a4364c4fd8f8290343a) ) /* N82S123 */
 
-    ROM_REGION( 0x0005, "scpu_pals", 0) /* PAL's located on the Super CPU Board (90010) */
+	ROM_REGION( 0x0005, "scpu_pals", 0) /* PAL's located on the Super CPU Board (90010) */
 	ROM_LOAD( "0066-313bx-xxqx.a12.bin", 0x0000, 0x0001, NO_DUMP)
 	ROM_LOAD( "0066-315bx-xxqx.b12.bin", 0x0000, 0x0001, NO_DUMP)
 	ROM_LOAD( "0066-322bx-xx0x.e3.bin",  0x0000, 0x0001, NO_DUMP)
@@ -1970,7 +1970,7 @@ ROM_START( tron3 )
 	ROM_REGION( 0x0020, "proms", 0 ) /* PROM's located on the Super Sound I/O Board (90913) */
 	ROM_LOAD( "9860-07axn-axhd.d12",     0x0000, 0x0020, CRC(e1281ee9) SHA1(9ac9b01d24affc0ee9227a4364c4fd8f8290343a) ) /* N82S123 */
 
-    ROM_REGION( 0x0005, "scpu_pals", 0) /* PAL's located on the Super CPU Board (90010) */
+	ROM_REGION( 0x0005, "scpu_pals", 0) /* PAL's located on the Super CPU Board (90010) */
 	ROM_LOAD( "0066-313bx-xxqx.a12.bin", 0x0000, 0x0001, NO_DUMP)
 	ROM_LOAD( "0066-315bx-xxqx.b12.bin", 0x0000, 0x0001, NO_DUMP)
 	ROM_LOAD( "0066-322bx-xx0x.e3.bin",  0x0000, 0x0001, NO_DUMP)
@@ -2009,7 +2009,7 @@ ROM_START( tron4 )
 	ROM_REGION( 0x0020, "proms", 0 ) /* PROM's located on the Super Sound I/O Board (90913) */
 	ROM_LOAD( "9860-07axn-axhd.d12",     0x0000, 0x0020, CRC(e1281ee9) SHA1(9ac9b01d24affc0ee9227a4364c4fd8f8290343a) ) /* N82S123 */
 
-    ROM_REGION( 0x0005, "scpu_pals", 0) /* PAL's located on the Super CPU Board (90010) */
+	ROM_REGION( 0x0005, "scpu_pals", 0) /* PAL's located on the Super CPU Board (90010) */
 	ROM_LOAD( "0066-313bx-xxqx.a12.bin", 0x0000, 0x0001, NO_DUMP)
 	ROM_LOAD( "0066-315bx-xxqx.b12.bin", 0x0000, 0x0001, NO_DUMP)
 	ROM_LOAD( "0066-322bx-xx0x.e3.bin",  0x0000, 0x0001, NO_DUMP)
@@ -2687,8 +2687,8 @@ GAME( 1982, kroozr,   0,        mcr_90010,     kroozr,   kroozr,    ROT0,  "Ball
 GAME( 1983, journey,  0,        mcr_91475,     journey,  journey,   ROT90, "Bally Midway", "Journey", GAME_SUPPORTS_SAVE )
 
 /* 91490 CPU board + 91464 video gen + 90913 sound I/O */
-GAME( 1983, tapper,   0,        mcr_91490,     tapper,   mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser)", GAME_SUPPORTS_SAVE )
-GAME( 1983, tappera,  tapper,   mcr_91490,     tapper,   mcr_91490, ROT0,  "Bally Midway", "Tapper (alternate)", GAME_SUPPORTS_SAVE )
+GAME( 1983, tapper,   0,        mcr_91490,     tapper,   mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1983, tappera,  tapper,   mcr_91490,     tapper,   mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser, set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1983, sutapper, tapper,   mcr_91490,     tapper,   mcr_91490, ROT0,  "Bally Midway", "Tapper (Suntory)", GAME_SUPPORTS_SAVE )
 GAME( 1984, rbtapper, tapper,   mcr_91490,     tapper,   mcr_91490, ROT0,  "Bally Midway", "Tapper (Root Beer)", GAME_SUPPORTS_SAVE )
 GAME( 1984, timber,   0,        mcr_91490,     timber,   mcr_91490, ROT0,  "Bally Midway", "Timber", GAME_SUPPORTS_SAVE )
