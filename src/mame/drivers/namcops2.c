@@ -320,8 +320,8 @@ ROM_START( rrvac )
 	SYSTEM246_BIOS
 
 	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
-	ROM_LOAD( "rrv1vera.ic002", 0x000000, 0x800000, NO_DUMP )
-	ROM_LOAD( "rrv1vera_spr.ic002", 0x800000, 0x040000, NO_DUMP )
+	ROM_LOAD( "rrv3vera.ic002", 0x000000, 0x800000, CRC(dd20c4a2) SHA1(07bddaac958ac62d9fc29671fc83bd1e3b27f4b8) ) 
+	ROM_LOAD( "rrv3vera_spr.ic002", 0x800000, 0x040000, CRC(712e0e9a) SHA1(d396aaf918036ff7f909a84daefe8f651fdf9b05) ) 
 
 	DISK_REGION("dvd")
 	DISK_IMAGE_READONLY( "rrv1-a", 0, SHA1(77bb70407511cbb12ab999410e797dcaf0779229) )
@@ -340,7 +340,7 @@ ROM_START( scptour )
 ROM_END
 
 GAME(2001, sys246,          0, system246, system246, 0, ROT0, "Namco", "System 246 BIOS", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT)
-GAME(2001, rrvac,      sys246, system246, system246, 0, ROT0, "Namco", "Ridge Racer V Arcade Battle (RRV1 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
+GAME(2001, rrvac,      sys246, system246, system246, 0, ROT0, "Namco", "Ridge Racer V Arcade Battle (RRV3 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
 GAME(2002, dragchrn,   sys246, system246, system246, 0, ROT0, "Namco", "Dragon Chronicles (DC001 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
 GAME(2002, netchu02,   sys246, system246, system246, 0, ROT0, "Namco", "Netchuu Pro Yakyuu 2002 (NPY1 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
 GAME(2002, scptour,    sys246, system246, system246, 0, ROT0, "Namco", "Smash Court Pro Tournament (SCP1)", GAME_NO_SOUND|GAME_NOT_WORKING)
