@@ -133,16 +133,16 @@ static void render_poly(screen_device &screen, UINT32 *polydata)
 {
 	float midx = screen.width() / 2;
 	float midy = screen.height() / 2;
-	float z0 = convert_tms3203x_fp_to_float(polydata[0]);
-	float voz_dy = convert_tms3203x_fp_to_float(polydata[1]) * 256.0f;
-	float voz_dx = convert_tms3203x_fp_to_float(polydata[2]) * 256.0f;
-	float ooz_dy = convert_tms3203x_fp_to_float(polydata[3]);
-	float ooz_dx = convert_tms3203x_fp_to_float(polydata[4]);
-	float uoz_dy = convert_tms3203x_fp_to_float(polydata[5]) * 256.0f;
-	float uoz_dx = convert_tms3203x_fp_to_float(polydata[6]) * 256.0f;
-	float voz_base = convert_tms3203x_fp_to_float(polydata[7]) * 256.0f - midx * voz_dx - midy * voz_dy;
-	float ooz_base = convert_tms3203x_fp_to_float(polydata[8]) - midx * ooz_dx - midy * ooz_dy;
-	float uoz_base = convert_tms3203x_fp_to_float(polydata[9]) * 256.0f - midx * uoz_dx - midy * uoz_dy;
+	float z0 = tms3203x_device::fp_to_float(polydata[0]);
+	float voz_dy = tms3203x_device::fp_to_float(polydata[1]) * 256.0f;
+	float voz_dx = tms3203x_device::fp_to_float(polydata[2]) * 256.0f;
+	float ooz_dy = tms3203x_device::fp_to_float(polydata[3]);
+	float ooz_dx = tms3203x_device::fp_to_float(polydata[4]);
+	float uoz_dy = tms3203x_device::fp_to_float(polydata[5]) * 256.0f;
+	float uoz_dx = tms3203x_device::fp_to_float(polydata[6]) * 256.0f;
+	float voz_base = tms3203x_device::fp_to_float(polydata[7]) * 256.0f - midx * voz_dx - midy * voz_dy;
+	float ooz_base = tms3203x_device::fp_to_float(polydata[8]) - midx * ooz_dx - midy * ooz_dy;
+	float uoz_base = tms3203x_device::fp_to_float(polydata[9]) * 256.0f - midx * uoz_dx - midy * uoz_dy;
 	poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(poly);
 	int color = (polydata[10] & 0x7f) << 8;
 	poly_vertex vert[MAX_VERTICES];
@@ -153,16 +153,16 @@ static void render_poly(screen_device &screen, UINT32 *polydata)
 	{
 		int t;
 		logerror("poly: %12.2f %12.2f %12.2f %12.2f %12.2f %12.2f %12.2f %12.2f %12.2f %12.2f %08X %08X (%4d,%4d) %08X",
-				(double)convert_tms3203x_fp_to_float(polydata[0]),
-				(double)convert_tms3203x_fp_to_float(polydata[1]),
-				(double)convert_tms3203x_fp_to_float(polydata[2]),
-				(double)convert_tms3203x_fp_to_float(polydata[3]),
-				(double)convert_tms3203x_fp_to_float(polydata[4]),
-				(double)convert_tms3203x_fp_to_float(polydata[5]),
-				(double)convert_tms3203x_fp_to_float(polydata[6]),
-				(double)convert_tms3203x_fp_to_float(polydata[7]),
-				(double)convert_tms3203x_fp_to_float(polydata[8]),
-				(double)convert_tms3203x_fp_to_float(polydata[9]),
+				(double)tms3203x_device::fp_to_float(polydata[0]),
+				(double)tms3203x_device::fp_to_float(polydata[1]),
+				(double)tms3203x_device::fp_to_float(polydata[2]),
+				(double)tms3203x_device::fp_to_float(polydata[3]),
+				(double)tms3203x_device::fp_to_float(polydata[4]),
+				(double)tms3203x_device::fp_to_float(polydata[5]),
+				(double)tms3203x_device::fp_to_float(polydata[6]),
+				(double)tms3203x_device::fp_to_float(polydata[7]),
+				(double)tms3203x_device::fp_to_float(polydata[8]),
+				(double)tms3203x_device::fp_to_float(polydata[9]),
 				polydata[10],
 				polydata[11],
 				(INT16)(polydata[12] >> 16), (INT16)(polydata[12] << 2) >> 2, polydata[12]);

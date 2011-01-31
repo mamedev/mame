@@ -374,7 +374,7 @@ static void disasm_parallel_storestore(const char *opstring1, const char *opstri
 
 
 
-static unsigned dasm_tms32031(char *buffer, unsigned pc, UINT32 op)
+static unsigned dasm_tms3203x(char *buffer, unsigned pc, UINT32 op)
 {
 	UINT32 flags = 0;
 
@@ -734,8 +734,8 @@ static unsigned dasm_tms32031(char *buffer, unsigned pc, UINT32 op)
 }
 
 
-CPU_DISASSEMBLE( tms32031 )
+CPU_DISASSEMBLE( tms3203x )
 {
 	UINT32 op = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24);
-    return dasm_tms32031(buffer, pc, op);
+    return dasm_tms3203x(buffer, pc, op);
 }

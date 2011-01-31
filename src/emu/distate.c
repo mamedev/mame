@@ -409,7 +409,6 @@ device_config_state_interface::~device_config_state_interface()
 
 device_state_interface::device_state_interface(running_machine &machine, const device_config &config, device_t &device)
 	: device_interface(machine, config, device),
-	  m_machine(machine),
 	  m_state_config(dynamic_cast<const device_config_state_interface &>(config))
 {
 	memset(m_fast_state, 0, sizeof(m_fast_state));
@@ -580,7 +579,7 @@ device_state_entry &device_state_interface::state_add(int index, const char *sym
 	assert(symbol != NULL);
 
 	// allocate new entry
-	device_state_entry *entry = auto_alloc(&m_machine, device_state_entry(index, symbol, data, size));
+	device_state_entry *entry = auto_alloc(device().machine, device_state_entry(index, symbol, data, size));
 
 	// append to the end of the list
 	m_state_list.append(*entry);

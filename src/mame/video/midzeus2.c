@@ -805,20 +805,20 @@ static int zeus_fifo_process(running_machine *machine, const UINT32 *data, int n
 				return FALSE;
 
 			/* extract the matrix from the raw data */
-			zeus_matrix[0][0] = convert_tms3203x_fp_to_float(data[dataoffs + 1]);
-			zeus_matrix[0][1] = convert_tms3203x_fp_to_float(data[dataoffs + 2]);
-			zeus_matrix[0][2] = convert_tms3203x_fp_to_float(data[dataoffs + 3]);
-			zeus_matrix[1][0] = convert_tms3203x_fp_to_float(data[dataoffs + 4]);
-			zeus_matrix[1][1] = convert_tms3203x_fp_to_float(data[dataoffs + 5]);
-			zeus_matrix[1][2] = convert_tms3203x_fp_to_float(data[dataoffs + 6]);
-			zeus_matrix[2][0] = convert_tms3203x_fp_to_float(data[dataoffs + 7]);
-			zeus_matrix[2][1] = convert_tms3203x_fp_to_float(data[dataoffs + 8]);
-			zeus_matrix[2][2] = convert_tms3203x_fp_to_float(data[dataoffs + 9]);
+			zeus_matrix[0][0] = tms3203x_device::fp_to_float(data[dataoffs + 1]);
+			zeus_matrix[0][1] = tms3203x_device::fp_to_float(data[dataoffs + 2]);
+			zeus_matrix[0][2] = tms3203x_device::fp_to_float(data[dataoffs + 3]);
+			zeus_matrix[1][0] = tms3203x_device::fp_to_float(data[dataoffs + 4]);
+			zeus_matrix[1][1] = tms3203x_device::fp_to_float(data[dataoffs + 5]);
+			zeus_matrix[1][2] = tms3203x_device::fp_to_float(data[dataoffs + 6]);
+			zeus_matrix[2][0] = tms3203x_device::fp_to_float(data[dataoffs + 7]);
+			zeus_matrix[2][1] = tms3203x_device::fp_to_float(data[dataoffs + 8]);
+			zeus_matrix[2][2] = tms3203x_device::fp_to_float(data[dataoffs + 9]);
 
 			/* extract the translation point from the raw data */
-			zeus_point[0] = convert_tms3203x_fp_to_float(data[dataoffs + 10]);
-			zeus_point[1] = convert_tms3203x_fp_to_float(data[dataoffs + 11]);
-			zeus_point[2] = convert_tms3203x_fp_to_float(data[dataoffs + 12]);
+			zeus_point[0] = tms3203x_device::fp_to_float(data[dataoffs + 10]);
+			zeus_point[1] = tms3203x_device::fp_to_float(data[dataoffs + 11]);
+			zeus_point[2] = tms3203x_device::fp_to_float(data[dataoffs + 12]);
 
 			if (log_fifo)
 			{
@@ -841,9 +841,9 @@ static int zeus_fifo_process(running_machine *machine, const UINT32 *data, int n
 				return FALSE;
 
 			/* extract the translation point from the raw data */
-			zeus_point[0] = convert_tms3203x_fp_to_float(data[1]);
-			zeus_point[1] = convert_tms3203x_fp_to_float(data[2]);
-			zeus_point[2] = convert_tms3203x_fp_to_float(data[3]);
+			zeus_point[0] = tms3203x_device::fp_to_float(data[1]);
+			zeus_point[1] = tms3203x_device::fp_to_float(data[2]);
+			zeus_point[2] = tms3203x_device::fp_to_float(data[3]);
 
 			if (log_fifo)
 			{
@@ -863,14 +863,14 @@ static int zeus_fifo_process(running_machine *machine, const UINT32 *data, int n
 			{
 				log_fifo_command(data, numwords, " -- unknown control + hack clear screen\n");
 				logerror("\t\tvector %8.2f %8.2f %8.5f\n",
-					convert_tms3203x_fp_to_float(data[1]),
-					convert_tms3203x_fp_to_float(data[2]),
-					convert_tms3203x_fp_to_float(data[3]));
+					tms3203x_device::fp_to_float(data[1]),
+					tms3203x_device::fp_to_float(data[2]),
+					tms3203x_device::fp_to_float(data[3]));
 
 				/* extract the translation point from the raw data */
-				zeus_point2[0] = convert_tms3203x_fp_to_float(data[1]);
-				zeus_point2[1] = convert_tms3203x_fp_to_float(data[2]);
-				zeus_point2[2] = convert_tms3203x_fp_to_float(data[3]);
+				zeus_point2[0] = tms3203x_device::fp_to_float(data[1]);
+				zeus_point2[1] = tms3203x_device::fp_to_float(data[2]);
+				zeus_point2[2] = tms3203x_device::fp_to_float(data[3]);
 			}
 			{
 				/* not right -- just a hack */

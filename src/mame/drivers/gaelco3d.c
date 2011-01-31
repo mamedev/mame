@@ -484,11 +484,11 @@ static WRITE32_HANDLER( tms_m68k_ram_w )
 }
 
 
-static void iack_w(device_t *device, UINT8 state, offs_t addr)
+static void iack_w(tms3203x_device &device, UINT8 state, offs_t addr)
 {
 	if (LOG)
 		logerror("iack_w(%d) - %06X\n", state, addr);
-	cpu_set_input_line(device, 0, CLEAR_LINE);
+	device.set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -978,7 +978,7 @@ static const adsp21xx_config adsp_config =
 	NULL					/* callback for timer fired */
 };
 
-static const tms32031_config tms_config =
+static const tms3203x_config tms_config =
 {
 	0x1000,
 	0,
@@ -995,7 +995,7 @@ static MACHINE_CONFIG_START( gaelco3d, driver_device )
 	MCFG_CPU_VBLANK_INT("screen", vblank_gen)
 
 	MCFG_CPU_ADD("tms", TMS32031, 60000000)
-	MCFG_CPU_CONFIG(tms_config)
+	MCFG_TMS3203X_CONFIG(tms_config)
 	MCFG_CPU_PROGRAM_MAP(tms_map)
 
 	MCFG_CPU_ADD("adsp", ADSP2115, 16000000)

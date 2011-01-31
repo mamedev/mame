@@ -232,7 +232,7 @@ static TIMER_DEVICE_CALLBACK( dma_timer_callback )
 	tms32031_io_regs[DMA_SOURCE_ADDR] = param;
 
 	/* set the interrupt */
-	cpu_set_input_line(cage_cpu, TMS32031_DINT, ASSERT_LINE);
+	cpu_set_input_line(cage_cpu, TMS3203X_DINT, ASSERT_LINE);
 	dma_enabled = 0;
 }
 
@@ -301,7 +301,7 @@ static TIMER_DEVICE_CALLBACK( cage_timer_callback )
 	int which = param;
 
 	/* set the interrupt */
-	cpu_set_input_line(cage_cpu, TMS32031_TINT0 + which, ASSERT_LINE);
+	cpu_set_input_line(cage_cpu, TMS3203X_TINT0 + which, ASSERT_LINE);
 	cage_timer_enabled[which] = 0;
 	update_timer(which);
 }
@@ -470,11 +470,11 @@ static void update_control_lines(running_machine *machine)
 	}
 
 	/* set the IOF input lines */
-	val = cpu_get_reg(cage_cpu, TMS32031_IOF);
+	val = cpu_get_reg(cage_cpu, TMS3203X_IOF);
 	val &= ~0x88;
 	if (cpu_to_cage_ready) val |= 0x08;
 	if (cage_to_cpu_ready) val |= 0x80;
-	cage_cpu->set_state(TMS32031_IOF, val);
+	cage_cpu->set_state(TMS3203X_IOF, val);
 }
 
 
@@ -484,7 +484,7 @@ static READ32_HANDLER( cage_from_main_r )
 		logerror("%06X:CAGE read command = %04X\n", cpu_get_pc(space->cpu), cage_from_main);
 	cpu_to_cage_ready = 0;
 	update_control_lines(space->machine);
-	cpu_set_input_line(cage_cpu, TMS32031_IRQ0, CLEAR_LINE);
+	cpu_set_input_line(cage_cpu, TMS3203X_IRQ0, CLEAR_LINE);
 	return cage_from_main;
 }
 
@@ -532,7 +532,7 @@ static TIMER_CALLBACK( deferred_cage_w )
 	cage_from_main = param;
 	cpu_to_cage_ready = 1;
 	update_control_lines(machine);
-	cpu_set_input_line(cage_cpu, TMS32031_IRQ0, ASSERT_LINE);
+	cpu_set_input_line(cage_cpu, TMS3203X_IRQ0, ASSERT_LINE);
 }
 
 
@@ -610,7 +610,7 @@ static WRITE32_HANDLER( speedup_w )
  *
  *************************************/
 
-static const tms32031_config cage_config =
+static const tms3203x_config cage_config =
 {
 	0x400000
 };
@@ -651,7 +651,7 @@ MACHINE_CONFIG_FRAGMENT( cage )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cage", TMS32031, 33868800)
-	MCFG_CPU_CONFIG(cage_config)
+	MCFG_TMS3203X_CONFIG(cage_config)
 	MCFG_CPU_PROGRAM_MAP(cage_map)
 
 	MCFG_TIMER_ADD("cage_dma_timer", dma_timer_callback)

@@ -309,7 +309,7 @@ static void process_dma_queue(running_machine *machine)
 	poly_vertex vert[4];
 
 	/* if we're rendering to the same page we're viewing, it has changed */
-	if ((((page_control >> 2) ^ page_control) & 1) == 0)
+	if ((((page_control >> 2) ^ page_control) & 1) == 0 || WATCH_RENDER)
 		video_changed = TRUE;
 
 	/* fill in the vertex data */

@@ -305,7 +305,6 @@ protected:
 	};
 
 	// configuration
-	running_machine &		m_machine;					// reference to owning machine
 	const device_config_execute_interface &m_execute_config;	// reference to our device_config_execute_interface
 
 	// execution lists
