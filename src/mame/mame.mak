@@ -1631,6 +1631,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/flower.o $(AUDIO)/flower.o $(VIDEO)/flower.o \
 	$(DRIVERS)/fortecar.o \
 	$(DRIVERS)/freekick.o $(VIDEO)/freekick.o \
+	$(DRIVERS)/funkball.o \
 	$(DRIVERS)/funworld.o $(VIDEO)/funworld.o \
 	$(DRIVERS)/galaxi.o \
 	$(DRIVERS)/gamecstl.o \

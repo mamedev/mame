@@ -9244,6 +9244,7 @@ Other Sun games
 	DRIVER( crazywar )	/* (c) 2002 Eolith */
 	DRIVER( bballoon )	/* (c) 2003 Eolith */
 	DRIVER( hapytour )	/* (c) 2005 GAV Company (on Eolith's Ghost hardware) */
+	DRIVER( funkball )	/* (c) 1998 dgPIX Entertainment Inc */
 	DRIVER( xfiles )	/* (c) 1999 dgPIX Entertainment Inc */
 	DRIVER( kdynastg )	/* (c) 1999 EZ Graphics */
 	DRIVER( fmaniac3 )	/* (c) 2002 Saero Entertainment */
