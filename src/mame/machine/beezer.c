@@ -58,7 +58,7 @@ const via6522_interface b_via_0_interface =
         bits 7-0: input/output: pbus
     port B:
         bit 7: output: TIMER1 OUT (used to gate NOISE (see below) to clock channel 1 of 6840, plus acts as channel 0 by itself)
-        bit 6: input: NOISE (from mn5837 14-bit LFSR, which also connects to clock above)
+        bit 6: input: NOISE (from mm5837 14-bit LFSR, which also connects to clock above)
         bit 5: output?: N/C
         bit 4: output?: FMSEL1 (does not appear elsewhere on schematics! what does this do? needs tracing) - always 0?
         bit 3: output?: FMSEL0 (does not appear elsewhere on schematics! what does this do? needs tracing) - always 0?
@@ -140,7 +140,7 @@ static READ8_DEVICE_HANDLER( b_via_1_pa_r )
 
 static READ8_DEVICE_HANDLER( b_via_1_pb_r )
 {
-	return 0x1F | (device->machine->rand()&0x40); // TODO: bit 6 is NOISE input from MM5837 17-bit LFSR; attach to audio device
+	return 0x1F | (beezer_noise_r(device->machine->device("custom"), 0)?0x40:0);
 }
 
 static WRITE8_DEVICE_HANDLER( b_via_1_pa_w )

@@ -24,6 +24,7 @@ READ8_DEVICE_HANDLER( beezer_sh6840_r );
 WRITE8_DEVICE_HANDLER( beezer_sh6840_w );
 WRITE8_DEVICE_HANDLER( beezer_sfxctrl_w );
 WRITE8_DEVICE_HANDLER( beezer_timer1_w );
+READ8_DEVICE_HANDLER( beezer_noise_r );
 
 /*----------- defined in video/beezer.c -----------*/
 

@@ -7,9 +7,7 @@
     AKA Lord Nightmare
 
     TODO:
-    * The entire NOISE generator is just copied from exidy.c and is completely
-     wrong. It should be using an MM5837 self-clocked LFSR with taps on bits
-     16(0x10) and 13(0xD)
+    * get rid of sh6840_LFSR_oldxor, is leftover of old code.
     * Several inexplicable things on the schematic are not handled, such as the
      'VCO' input for 6840 channel 2 external clock whose source does not appear
      anywhere on the schematic, nor does it handle the 'DMOD DATA' and 'DMOD
@@ -66,7 +64,6 @@
 #define SH6840_CLOCK			(CRYSTAL_OSC / 12)
 #define MULTIPLEX_FREQ			(SH6840_CLOCK / 16)
 
-
 /*************************************
  *
  *  Local variables
@@ -106,10 +103,8 @@ struct _beezer_sound_state
 	UINT8 sh6840_MSB_latch;
 	UINT8 sh6840_LSB_latch;
 	UINT8 sh6840_LFSR_oldxor;
-	UINT32 sh6840_LFSR_0;
-	UINT32 sh6840_LFSR_1;
-	UINT32 sh6840_LFSR_2;
-	UINT32 sh6840_LFSR_3;
+	UINT32 sh6840_LFSR;
+	UINT32 sh6840_LFSR_clocks;
 	UINT32 sh6840_clocks_per_sample;
 	UINT32 sh6840_clock_count;
 
@@ -208,7 +203,6 @@ INLINE void sh6840_apply_clock(struct sh6840_timer_channel *t, int clocks)
  *
  *************************************/
 
-// TODO: switch this to using the 17 bit lfsr of the MM5837 (bit 17 xor bit 14)
 INLINE int sh6840_update_noise(beezer_sound_state *state, int clocks)
 {
 	UINT32 newxor;
@@ -218,26 +212,22 @@ INLINE int sh6840_update_noise(beezer_sound_state *state, int clocks)
 	/* loop over clocks */
 	for (i = 0; i < clocks; i++)
 	{
-		/* shift the LFSR. its a LOOOONG LFSR, so we need
-        * four longs to hold it all!
-        * first we grab new sample, then shift the high bits,
-        * then the low ones; finally or in the result and see if we've
-        * had a 0->1 transition */
-		newxor = (state->sh6840_LFSR_3 ^ state->sh6840_LFSR_2) >> 31; /* high bits of 3 and 2 xored is new xor */
-		state->sh6840_LFSR_3 <<= 1;
-		state->sh6840_LFSR_3 |= state->sh6840_LFSR_2 >> 31;
-		state->sh6840_LFSR_2 <<= 1;
-		state->sh6840_LFSR_2 |= state->sh6840_LFSR_1 >> 31;
-		state->sh6840_LFSR_1 <<= 1;
-		state->sh6840_LFSR_1 |= state->sh6840_LFSR_0 >> 31;
-		state->sh6840_LFSR_0 <<= 1;
-		state->sh6840_LFSR_0 |= newxor ^ state->sh6840_LFSR_oldxor;
-		state->sh6840_LFSR_oldxor = newxor;
-		/*printf("LFSR: %4x, %4x, %4x, %4x\n", sh6840_LFSR_3, sh6840_LFSR_2, sh6840_LFSR_1, sh6840_LFSR_0);*/
-		/* if we clocked 0->1, that will serve as an external clock */
-		if ((state->sh6840_LFSR_2 & 0x03) == 0x01) /* tap is at 96th bit */
+		state->sh6840_LFSR_clocks++;
+		if (state->sh6840_LFSR_clocks >= 10) // about 10 clocks per 6840 clock
 		{
-			noise_clocks++;
+			state->sh6840_LFSR_clocks = 0;
+			/* shift the LFSR. finally or in the result and see if we've
+			* had a 0->1 transition */
+			state->sh6840_LFSR_oldxor = state->sh6840_LFSR&0x1;
+			newxor = (((state->sh6840_LFSR&0x10000)?1:0) ^ ((state->sh6840_LFSR&0x2000)?1:0))?1:0; 
+			state->sh6840_LFSR <<= 1;
+			state->sh6840_LFSR |= newxor;
+			/*printf("LFSR: %4x, %4x, %4x, %4x\n", sh6840_LFSR_3, sh6840_LFSR_2, sh6840_LFSR_1, sh6840_LFSR_0);*/
+			/* if we clocked 0->1, that will serve as an external clock */
+			if ((state->sh6840_LFSR & 0x01) == 0x01) /* tap is at bit 0, GUESSED */
+			{
+				noise_clocks++;
+			}
 		}
 	}
 	return noise_clocks;
@@ -259,10 +249,8 @@ static void sh6840_register_state_globals(device_t *device)
 	state_save_register_device_item(device, 0, state->sh6840_MSB_latch);
 	state_save_register_device_item(device, 0, state->sh6840_LSB_latch);
 	state_save_register_device_item(device, 0, state->sh6840_LFSR_oldxor);
-	state_save_register_device_item(device, 0, state->sh6840_LFSR_0);
-	state_save_register_device_item(device, 0, state->sh6840_LFSR_1);
-	state_save_register_device_item(device, 0, state->sh6840_LFSR_2);
-	state_save_register_device_item(device, 0, state->sh6840_LFSR_3);
+	state_save_register_device_item(device, 0, state->sh6840_LFSR);
+	state_save_register_device_item(device, 0, state->sh6840_LFSR_clocks);
 	state_save_register_device_item(device, 0, state->sh6840_clock_count);
 	state_save_register_device_item(device, 0, state->sh6840_latchwrite);
 	state_save_register_device_item(device, 0, state->sh6840_latchwriteold);
@@ -436,10 +424,8 @@ static DEVICE_RESET( common_sh_reset )
 
 	/* LFSR */
 	state->sh6840_LFSR_oldxor = 0;
-	state->sh6840_LFSR_0 = 0xffffffff;
-	state->sh6840_LFSR_1 = 0xffffffff;
-	state->sh6840_LFSR_2 = 0xffffffff;
-	state->sh6840_LFSR_3 = 0xffffffff;
+	state->sh6840_LFSR = 0xffffffff;
+	state->sh6840_LFSR_clocks = 0;
 }
 
 static DEVICE_RESET( beezer_sound )
@@ -509,6 +495,15 @@ WRITE8_DEVICE_HANDLER( beezer_timer1_w )
 	{
 		state->sh6840_noiselatch1 = state->sh6840_LFSR_oldxor;
 	}
+}
+
+READ8_DEVICE_HANDLER( beezer_noise_r )
+{
+	beezer_sound_state *state = get_safe_token(device);
+
+	/* force an update of the stream */
+	state->stream->update();
+	return state->sh6840_LFSR_oldxor;
 }
 
 WRITE8_DEVICE_HANDLER( beezer_sh6840_w )
