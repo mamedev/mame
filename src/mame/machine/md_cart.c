@@ -1304,6 +1304,8 @@ static void setup_megadriv_sram(device_image_interface &image)
 	switch (md_cart.type)
 	{
 		// These types only come from xml
+		// TODO: Eventually megadriv_backupram should point to the allocated cart:sram region! 
+		// For now, we only use the region as a placeholder to carry size info...
 		case SEGA_SRAM:
 			md_cart.sram_start = 0x200000;
 			md_cart.sram_end = md_cart.sram_start + image.get_software_region_length("sram") - 1;
