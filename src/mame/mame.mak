@@ -1864,7 +1864,8 @@ $(DRIVERS)/luckgrln.o:	$(LAYOUT)/luckgrln.lh
 
 $(DRIVERS)/lucky74.o:	$(LAYOUT)/lucky74.lh
 
-$(DRIVERS)/magic10.o:	$(LAYOUT)/sgsafari.lh
+$(DRIVERS)/magic10.o:	$(LAYOUT)/sgsafari.lh \
+						$(LAYOUT)/musicsrt.lh
 
 $(DRIVERS)/maxaflex.o:	$(LAYOUT)/maxaflex.lh
 

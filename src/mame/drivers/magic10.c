@@ -9,14 +9,15 @@
 
     Supported games:
 
-    Magic's 10 (ver. 16.15),       1995, AWP Games.
-    Magic's 10 (ver. 16.45),       1995, AWP Games.
-    Magic's 10 (ver. 16.55),       1995, AWP Games.
-    Magic's 10 2,                  1997, ABM Games.
-    Super Pool (9743 rev.01),      1997, ABM Games.
-    Hot Slot (ver. 05.01),         1996, ABM Electronics.
-    Magic Colors (ver. 1.7a),      1999, Unknown.
-    Super Gran Safari (ver 3.11),  1996, New Impeuropex Corp.
+    Magic's 10 (ver. 16.15),        1995, AWP Games.
+    Magic's 10 (ver. 16.45),        1995, AWP Games.
+    Magic's 10 (ver. 16.55),        1995, AWP Games.
+    Magic's 10 2,                   1997, ABM Games.
+    Music Sort (ver 2.02, English), 1995, ABM Games.
+    Super Pool (9743 rev.01),       1997, ABM Games.
+    Hot Slot (ver. 05.01),          1996, ABM Electronics.
+    Magic Colors (ver. 1.7a),       1999, Unknown.
+    Super Gran Safari (ver 3.11),   1996, New Impeuropex Corp.
 
 
 *****************************************************************************
@@ -63,13 +64,14 @@
     - Ticket / Hopper support.
     - Some unknown writes
     - Finish magic10_2 (association coin - credits handling its inputs
-      and some reads that drive the note displayed?)
+       and some reads that drive the note displayed?)
     - Dump/decap/trojan the MCU in the later games (magic102, suprpool, hotslot, mcolors).
-      The MCU shares memory addresses at $500000-$50001f (in magic102)
-      It can't be simulated with a high level of confidence because all the game logic is
-      in there, including rngs for the cards and combinations for the points.
+       The MCU shares memory addresses at $500000-$50001f (in magic102)
+       It can't be simulated with a high level of confidence because all the game logic is
+       in there, including rngs for the cards and combinations for the points.
     - Priorities,likely to be hardwired with the color writes (0=tile has the
-      highest priority).
+       highest priority).
+    - Define parent/clone relationship between Magic's 10 and Music Sort.
 
 
 ****************************************************************************/
@@ -80,6 +82,7 @@
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
 #include "sgsafari.lh"
+#include "musicsrt.lh"
 
 static tilemap_t *layer0_tilemap, *layer1_tilemap, *layer2_tilemap;
 static UINT16 *layer0_videoram, *layer1_videoram, *layer2_videoram;
@@ -504,6 +507,50 @@ static INPUT_PORTS_START( magic102 )
     PORT_DIPSETTING(      0x80, DEF_STR( On ) )
     PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
 */
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( musicsrt )
+	PORT_START("INPUTS")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2 / Heads")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Hold 4 / Tails")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Hold 5 / Half Gamble")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Play (Bet / Take)")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Door") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Aux A")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("Aux B")
+	PORT_SERVICE_NO_TOGGLE( 0x1000, IP_ACTIVE_LOW )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN5 ) PORT_NAME("Aux C") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("OK")
+
+	PORT_START("DSW")
+    PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_DIPNAME( 0x0300, 0x0100, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1: 1, 2")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Medium ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0300, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1: 3, 4")
+	PORT_DIPSETTING(      0x0000, "Coin A: 50 - Coin B: 50" )
+	PORT_DIPSETTING(      0x0800, "Coin A: 50 - Coin B: 50" )
+	PORT_DIPSETTING(      0x0400, "Coin A: 100 - Coin B: 100" )
+	PORT_DIPSETTING(      0x0c00, "Coin A: 100 - Coin B: 100" )
+	PORT_DIPNAME( 0x3000, 0x3000, "Bonus?" )				PORT_DIPLOCATION("SW1: 5, 6")
+	PORT_DIPSETTING(      0x3000, "1000= 1 Play; 2000= 2 Play; 3000= 3 Play" )
+	PORT_DIPSETTING(      0x2000, "2000= 1 Play; 4000= 2 Play; 6000= 3 Play" )
+	PORT_DIPSETTING(      0x1000, "2500= 1 Play; 5000= 2 Play; 7500= 3 Play" )
+	PORT_DIPSETTING(      0x0000, "5000= 1 Play; 10000= 2 Play; 15000= 3 Play" )
+	PORT_DIPNAME( 0x4000, 0x4000, "Hopper" )				PORT_DIPLOCATION("SW1: 7")
+	PORT_DIPSETTING(      0x0000, "Disabled" )
+	PORT_DIPSETTING(      0x4000, "Enabled" )
+	PORT_DIPNAME( 0x8000, 0x8000, "Score" )					PORT_DIPLOCATION("SW1: 8")
+	PORT_DIPSETTING(      0x0000, "Play Score" )
+	PORT_DIPSETTING(      0x8000, "No Play Score" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hotslot )
@@ -1087,6 +1134,49 @@ ROM_START( sgsafari )
 	ROM_LOAD( "3.u39", 0x00000, 0x40000, CRC(43257bb5) SHA1(993fbeb6ee0a8a4da185303ec24eee8424b90cd0) )
 ROM_END
 
+/*
+
+Music Sort (Ver. 2.02).
+Same PCB than Magic's 10 (ver. 16.15)
+
+CPU:
+1x TS68000P12 (main)
+2x TPC1020AFN-084C (PLD)(not dumped)
+
+Sound:
+1x OKI M6295
+1x TDA2003
+1x LM358N
+
+1x oscillator 20.000000MHz (close to main)
+1x oscillator 30.000MHz (close to sound)
+1x orange resonator 1000J (close to sound)
+
+Note:
+1x 28x2 edge connector
+1x trimmer (volume)
+1x 8x2 switches dip
+1x battery
+
+*/
+ROM_START( musicsrt )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "2.u3", 0x000000, 0x20000, CRC(6a5cd39f) SHA1(c7ec0d9a640ff876bd9362bfe896ebc09795b418) )
+	ROM_LOAD16_BYTE( "3.u2", 0x000001, 0x20000, CRC(7af68760) SHA1(08d333037a70cda60df9b0c288e9f6eb6fa7eb84) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 ) /* tiles */
+	ROM_LOAD( "6.u25", 0x00000, 0x20000, CRC(9bcf89a6) SHA1(5b16ef9482249585a714cf2d3efffddd3f0e5834) )
+	ROM_LOAD( "4.u26", 0x20000, 0x20000, CRC(b9397659) SHA1(f809f612fd6a7ecfdb0fa55260ef7a57f00c0733) )
+	ROM_LOAD( "5.u27", 0x40000, 0x20000, CRC(36d7aeb3) SHA1(2c0863f2f366008640e8a19587460a30fda4ad6e) )
+	ROM_LOAD( "7.u28", 0x60000, 0x20000, CRC(a03e750b) SHA1(046e3eb5671bed09d9e5fd3572a8d41ac9e8b69e) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_LOAD( "1.u22", 0x00000, 0x40000, CRC(98885246) SHA1(752d549e6248074f2a7f6c5cc4d0bbc44c7fa4c3) )
+
+	ROM_REGION( 0x0800, "nvram", 0 ) /* default Non Volatile RAM */
+	ROM_LOAD( "musicsrt_nv.bin", 0x0000, 0x0800, CRC(f4e063cf) SHA1(a60bbd960bb7dcf023417e8c7164303b6ce71014) )
+ROM_END
+
 
 /****************************
 *       Driver Init         *
@@ -1130,12 +1220,13 @@ static DRIVER_INIT( sgsafari )
 *        Game Drivers         *
 ******************************/
 
-/*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY                 FULLNAME                       FLAGS            LAYOUT  */
-GAMEL( 1995, magic10,  0,        magic10,  magic10,  magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.55)",      0,               layout_sgsafari )
-GAMEL( 1995, magic10a, magic10,  magic10a, magic10,  magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.45)",      0,               layout_sgsafari )
-GAMEL( 1995, magic10b, magic10,  magic10a, magic10,  magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.15)",      0,               layout_sgsafari )
-GAME(  1997, magic102, 0,        magic102, magic102, magic102, ROT0, "ABM Games",            "Magic's 10 2 (ver 1.1)",       GAME_NOT_WORKING                 )
-GAME(  1997, suprpool, 0,        magic102, magic102, suprpool, ROT0, "ABM Games",            "Super Pool (9743 rev.01)",     GAME_NOT_WORKING                 )
-GAME(  1996, hotslot,  0,        hotslot,  hotslot,  hotslot,  ROT0, "ABM Electronics",      "Hot Slot (ver. 05.01)",        GAME_NOT_WORKING                 )
-GAME(  1999, mcolors,  0,        magic102, magic102, magic102, ROT0, "<unknown>",            "Magic Colors (ver. 1.7a)",     GAME_NOT_WORKING                 )
-GAMEL( 1996, sgsafari, 0,        sgsafari, sgsafari, sgsafari, ROT0, "New Impeuropex Corp.", "Super Gran Safari (ver 3.11)", 0,               layout_sgsafari )
+/*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY                 FULLNAME                         FLAGS            LAYOUT  */
+GAMEL( 1995, magic10,  0,        magic10,  magic10,  magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.55)",        0,               layout_sgsafari )
+GAMEL( 1995, magic10a, magic10,  magic10a, magic10,  magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.45)",        0,               layout_sgsafari )
+GAMEL( 1995, magic10b, magic10,  magic10a, magic10,  magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.15)",        0,               layout_sgsafari )
+GAME(  1997, magic102, 0,        magic102, magic102, magic102, ROT0, "ABM Games",            "Magic's 10 2 (ver 1.1)",         GAME_NOT_WORKING                 )
+GAME(  1997, suprpool, 0,        magic102, magic102, suprpool, ROT0, "ABM Games",            "Super Pool (9743 rev.01)",       GAME_NOT_WORKING                 )
+GAME(  1996, hotslot,  0,        hotslot,  hotslot,  hotslot,  ROT0, "ABM Electronics",      "Hot Slot (ver. 05.01)",          GAME_NOT_WORKING                 )
+GAME(  1999, mcolors,  0,        magic102, magic102, magic102, ROT0, "<unknown>",            "Magic Colors (ver. 1.7a)",       GAME_NOT_WORKING                 )
+GAMEL( 1996, sgsafari, 0,        sgsafari, sgsafari, sgsafari, ROT0, "New Impeuropex Corp.", "Super Gran Safari (ver 3.11)",   0,               layout_sgsafari )
+GAMEL( 1995, musicsrt, 0,        magic10a, musicsrt, magic10,  ROT0, "ABM Games",            "Music Sort (ver 2.02, English)", 0,               layout_musicsrt )
