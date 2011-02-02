@@ -297,6 +297,34 @@ ROM_START( prehisleu )
 	ROM_LOAD( "gt4.4",  0x000000, 0x20000, CRC(85dfb9ec) SHA1(78c865e7ccffddb71dcddccab358fa945f521f25) )
 ROM_END
 
+ROM_START( prehislek )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "gt-k2.2h", 0x00000, 0x20000, CRC(f2d3544d) SHA1(28d41a81ac12ef951610ba0aa70945c069d69d75) ) /* red "K" stamped on printed label */
+	ROM_LOAD16_BYTE( "gt-k3.3h", 0x00001, 0x20000, CRC(ebf7439b) SHA1(76fcad47bc8ae371ecf265fd378e2c4856d39c7f) ) /* red "K" stamped on printed label */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
+	ROM_LOAD( "gt1.1",  0x000000, 0x10000, CRC(80a4c093) SHA1(abe59e43259eb80b504bd5541f58cd0e5eb998ab) )
+
+	ROM_REGION( 0x008000, "gfx1", 0 )
+	ROM_LOAD( "gt15.b15",   0x000000, 0x08000, CRC(ac652412) SHA1(916c04c3a8a7bfb961313ab73c0a27d7f5e48de1) )
+
+	ROM_REGION( 0x040000, "gfx2", 0 )
+	ROM_LOAD( "pi8914.b14", 0x000000, 0x40000, CRC(207d6187) SHA1(505dfd1424b894e7b898f91b89f021ddde433c48) )
+
+	ROM_REGION( 0x040000, "gfx3", 0 )
+	ROM_LOAD( "pi8916.h16", 0x000000, 0x40000, CRC(7cffe0f6) SHA1(aba08617964fc425418b098be5167021768bd47c) )
+
+	ROM_REGION( 0x0a0000, "gfx4", 0 )
+	ROM_LOAD( "pi8910.k14", 0x000000, 0x80000, CRC(5a101b0b) SHA1(9645ab1f8d058cf2c6c42ccb4ce92a9b5db10c51) )
+	ROM_LOAD( "gt5.5",      0x080000, 0x20000, CRC(3d3ab273) SHA1(b5706ada9eb2c22fcc0ac8ede2d2ee02ee853191) )
+
+	ROM_REGION( 0x10000, "gfx5", 0 )	/* background tilemaps */
+	ROM_LOAD( "gt11.11",  0x000000, 0x10000, CRC(b4f0fcf0) SHA1(b81cc0b6e3e6f5616789bb3e77807dc0ef718a38) )
+
+	ROM_REGION( 0x20000, "upd", 0 )	/* ADPCM samples */
+	ROM_LOAD( "gt4.4",  0x000000, 0x20000, CRC(85dfb9ec) SHA1(78c865e7ccffddb71dcddccab358fa945f521f25) )
+ROM_END
+
 ROM_START( gensitou )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "gt-j2.2h", 0x00000, 0x20000, CRC(a2da0b6b) SHA1(d102118f83b96094fd4ea4b3468713c4946c949d) ) /* red "J" stamped on printed label */
@@ -330,4 +358,5 @@ ROM_END
 
 GAME( 1989, prehisle, 0,        prehisle, prehisle, 0, ROT0, "SNK", "Prehistoric Isle in 1930 (World)", GAME_SUPPORTS_SAVE )
 GAME( 1989, prehisleu,prehisle, prehisle, prehisle, 0, ROT0, "SNK", "Prehistoric Isle in 1930 (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, prehislek,prehisle, prehisle, prehisle, 0, ROT0, "SNK (Victor license)", "Prehistoric Isle in 1930 (Korea)", GAME_SUPPORTS_SAVE )
 GAME( 1989, gensitou, prehisle, prehisle, prehisle, 0, ROT0, "SNK", "Genshi-Tou 1930's", GAME_SUPPORTS_SAVE )

@@ -419,27 +419,52 @@ MACHINE_CONFIG_END
 
 ROM_START( zerohour )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "zerohour.1",   0x0000, 0x0800, CRC(0dff4b48) SHA1(4911255f953851d0e5c2b66090b95254ac59ac9e) )
-	ROM_LOAD( "zerohour.2",   0x0800, 0x0800, CRC(cf41b6ac) SHA1(263794e6be22c20e2b10fe9099e475097475df7b) )
-	ROM_LOAD( "zerohour.3",	  0x1000, 0x0800, CRC(5ef48b67) SHA1(ae291aa84b109e6a51eebdd5526abca1d901b7b9) )
-	ROM_LOAD( "zerohour.4",	  0x1800, 0x0800, CRC(25c5872d) SHA1(df008db607b72a92c4284d6a8127eafec2432ca4) )
-	ROM_LOAD( "zerohour.5",	  0x2000, 0x0800, CRC(d7ce3add) SHA1(d8dd7ad98e7a0a4f35de181549b2e88a9e0a73d6) )
-	ROM_LOAD( "zerohour.6",	  0x2800, 0x0800, CRC(8a93ae6e) SHA1(a66f05bb27e67b755c64ac8b68fa38ffe4cd961c) )
+	ROM_LOAD( "ze1_1.c8", 0x0000, 0x0800, CRC(0dff4b48) SHA1(4911255f953851d0e5c2b66090b95254ac59ac9e) )
+	ROM_LOAD( "ze2_2.c7", 0x0800, 0x0800, CRC(cf41b6ac) SHA1(263794e6be22c20e2b10fe9099e475097475df7b) )
+	ROM_LOAD( "ze3_3.c6", 0x1000, 0x0800, CRC(5ef48b67) SHA1(ae291aa84b109e6a51eebdd5526abca1d901b7b9) )
+	ROM_LOAD( "ze4_4.c5", 0x1800, 0x0800, CRC(25c5872d) SHA1(df008db607b72a92c4284d6a8127eafec2432ca4) )
+	ROM_LOAD( "ze5_5.c4", 0x2000, 0x0800, CRC(d7ce3add) SHA1(d8dd7ad98e7a0a4f35de181549b2e88a9e0a73d6) )
+	ROM_LOAD( "ze6_6.c3", 0x2800, 0x0800, CRC(8a93ae6e) SHA1(a66f05bb27e67b755c64ac8b68fa38ffe4cd961c) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
-	ROM_LOAD( "zerohour.9",   0x0000, 0x0800, CRC(17ae6f13) SHA1(ce7a02f4e1aa2e5292d3807a0cfed6d92752fc7a) )
+	ROM_LOAD( "z9", 0x0000, 0x0800, CRC(17ae6f13) SHA1(ce7a02f4e1aa2e5292d3807a0cfed6d92752fc7a) )
 
 	ROM_REGION( 0x1000, "gfx2", 0 )
-	ROM_LOAD( "zerohour.7",	  0x0000, 0x0800, CRC(4c12f59d) SHA1(b99a21415bff0e59b6130df60182f05b1a5d0811) )
-	ROM_LOAD( "zerohour.8",	  0x0800, 0x0800, CRC(6b9a6b6e) SHA1(f80d893b1b26c75c297e1da1c20db04e7129c92a) )
+	ROM_LOAD( "z7", 0x0000, 0x0800, CRC(4c12f59d) SHA1(b99a21415bff0e59b6130df60182f05b1a5d0811) )
+	ROM_LOAD( "z8", 0x0800, 0x0800, CRC(6b9a6b6e) SHA1(f80d893b1b26c75c297e1da1c20db04e7129c92a) )
 
 	ROM_REGION( 0x1000, "gfx3", ROMREGION_ERASE00 )
 	/* gfx data will be rearranged here for 8x8 sprites */
 
 	ROM_REGION( 0x0600, "proms", 0 )
-	ROM_LOAD( "zerohour.ic2", 0x0000, 0x0020, CRC(b55aee56) SHA1(33e4767c8afbb7b3af67517ea1dfd69bf692cac7) ) /* palette */
-	ROM_LOAD( "zerohour.n2",  0x0020, 0x0020, CRC(9adabf46) SHA1(f3538fdbc4280b6be46a4d7ebb4c34bd1a1ce2b7) ) /* sprite color lookup table */
-	ROM_LOAD( "zerohour.u6",  0x0040, 0x0020, CRC(27fa3a50) SHA1(7cf59b7a37c156640d6ea91554d1c4276c1780e0) ) /* ?? */
+	ROM_LOAD( "z1.ic2", 0x0000, 0x0020, CRC(b55aee56) SHA1(33e4767c8afbb7b3af67517ea1dfd69bf692cac7) ) /* 82S123, palette */
+	ROM_LOAD( "z2.n2",  0x0020, 0x0020, CRC(9adabf46) SHA1(f3538fdbc4280b6be46a4d7ebb4c34bd1a1ce2b7) ) /* MM6330, sprite color lookup table */
+	ROM_LOAD( "z3.u6",  0x0040, 0x0020, CRC(27fa3a50) SHA1(7cf59b7a37c156640d6ea91554d1c4276c1780e0) ) /* MM6330, Unknown purpose */
+ROM_END
+
+ROM_START( zerohoura ) /* Earlier version? */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "z1_1.c8", 0x0000, 0x0800, CRC(77418b5d) SHA1(2ff7da1f0d9b311a32736c4784b1ba6acfc29512) )
+	ROM_LOAD( "z2_2.c7", 0x0800, 0x0800, CRC(9b23b5ac) SHA1(2baca7a9ef65d5fe8216dce891a933d39bcdb1b1) )
+	ROM_LOAD( "z3_3.c6", 0x1000, 0x0800, CRC(7aa25c95) SHA1(0bab20cabeb6ffe77d3122f2b489348b5efbdcb1) )
+	ROM_LOAD( "z4_4.c5", 0x1800, 0x0800, CRC(b0a26dea) SHA1(69b00a5c4971fc161453efe6126bd36711420f99) )
+	ROM_LOAD( "z5_5.c4", 0x2000, 0x0800, CRC(d7ce3add) SHA1(d8dd7ad98e7a0a4f35de181549b2e88a9e0a73d6) ) /* Same as above set */
+	ROM_LOAD( "z6_6.c3", 0x2800, 0x0800, CRC(8a93ae6e) SHA1(a66f05bb27e67b755c64ac8b68fa38ffe4cd961c) ) /* Same as above set */
+
+	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_LOAD( "z9", 0x0000, 0x0800, CRC(17ae6f13) SHA1(ce7a02f4e1aa2e5292d3807a0cfed6d92752fc7a) ) /* Same as above set */
+
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_LOAD( "z7", 0x0000, 0x0800, CRC(4c12f59d) SHA1(b99a21415bff0e59b6130df60182f05b1a5d0811) ) /* Same as above set */
+	ROM_LOAD( "z8", 0x0800, 0x0800, CRC(6b9a6b6e) SHA1(f80d893b1b26c75c297e1da1c20db04e7129c92a) ) /* Same as above set */
+
+	ROM_REGION( 0x1000, "gfx3", ROMREGION_ERASE00 )
+	/* gfx data will be rearranged here for 8x8 sprites */
+
+	ROM_REGION( 0x0600, "proms", 0 )
+	ROM_LOAD( "z1.ic2", 0x0000, 0x0020, CRC(b55aee56) SHA1(33e4767c8afbb7b3af67517ea1dfd69bf692cac7) ) /* 82S123, palette */
+	ROM_LOAD( "z2.n2",  0x0020, 0x0020, CRC(9adabf46) SHA1(f3538fdbc4280b6be46a4d7ebb4c34bd1a1ce2b7) ) /* MM6330, sprite color lookup table */
+	ROM_LOAD( "z3.u6",  0x0040, 0x0020, CRC(27fa3a50) SHA1(7cf59b7a37c156640d6ea91554d1c4276c1780e0) ) /* MM6330, Unknown purpose */
 ROM_END
 
 ROM_START( redclash )
@@ -533,7 +558,8 @@ static DRIVER_INIT( redclash )
 }
 
 
-GAME( 1980, zerohour,  0,        zerohour, zerohour, redclash, ROT270, "Universal", "Zero Hour",          GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1980, zerohour,  0,        zerohour, zerohour, redclash, ROT270, "Universal", "Zero Hour (set 1)",  GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1980, zerohoura, zerohour, zerohour, zerohour, redclash, ROT270, "Universal", "Zero Hour (set 2)",  GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1981, redclash,  0,        redclash, redclash, redclash, ROT270, "Tehkan",    "Red Clash (set 1)",  GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1981, redclasha, redclash, redclash, redclash, redclash, ROT270, "Tehkan",    "Red Clash (set 2)",  GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1981, redclashk, redclash, redclash, redclash, redclash, ROT270, "Tehkan (Kaneko license)", "Red Clash (Kaneko)", GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
