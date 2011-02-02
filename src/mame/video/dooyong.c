@@ -158,9 +158,6 @@ WRITE8_HANDLER( pollux_ctrl_w )
 
 	/* bit 2 is continuously toggled (unknown) */
 	/* bit 4 is used but unknown */
-
-flytiger_palette_bank = data & 0x02;
-
 }
 
 WRITE8_HANDLER( primella_ctrl_w )
