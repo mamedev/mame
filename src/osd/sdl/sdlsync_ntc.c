@@ -2,7 +2,7 @@
 //
 //  sdlsync.c - SDL core synchronization functions
 //
-//  Copyright (c) 1996-2010, Nicola Salmoria and the MAME Team.
+//  Copyright (c) 1996-2011, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
@@ -17,6 +17,11 @@
 
 #ifdef SDLMAME_MACOSX
 #include <mach/mach.h>
+#include <signal.h>
+#endif
+
+#ifdef SDLMAME_NETBSD
+/* for SIGKILL */
 #include <signal.h>
 #endif
 

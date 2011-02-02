@@ -296,6 +296,10 @@ INLINE astring *astring_assemble_5(astring *dst, const char *src1, const char *s
 ***************************************************************************/
 
 #ifdef __cplusplus
+#ifdef SDLMAME_NETBSD
+#undef toupper
+#undef tolower
+#endif
 
 /* derived class for C++ */
 class astring : public astring_base

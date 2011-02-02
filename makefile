@@ -86,6 +86,9 @@ endif
 ifeq ($(firstword $(filter GNU/kFreeBSD,$(UNAME))),GNU/kFreeBSD)
 TARGETOS = freebsd
 endif
+ifeq ($(firstword $(filter NetBSD,$(UNAME))),NetBSD)
+TARGETOS = netbsd
+endif
 ifeq ($(firstword $(filter OpenBSD,$(UNAME))),OpenBSD)
 TARGETOS = openbsd
 endif
@@ -470,7 +473,8 @@ CCOMFLAGS += \
 	-Wundef \
 	-Wformat-security \
 	-Wwrite-strings \
-	-Wno-sign-compare
+	-Wno-sign-compare \
+	-Wno-conversion
 
 # warnings only applicable to C compiles
 CONLYFLAGS += \

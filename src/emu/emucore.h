@@ -686,6 +686,7 @@ inline void fatalerror_exitcode(running_machine *machine, int exitcode, const ch
 //**************************************************************************
 
 // population count
+#ifndef SDLMAME_NETBSD
 inline int popcount(UINT32 val)
 {
 	int count;
@@ -694,6 +695,7 @@ inline int popcount(UINT32 val)
 		val &= val - 1;
 	return count;
 }
+#endif
 
 
 // convert a series of 32 bits into a float
