@@ -4396,26 +4396,26 @@ DokiDoki Penguin Land *not confirmed
 
 	/* Model 2B-CRX (SHARC, SCSP sound board) */
 	DRIVER( vstriker )	/* 1995.05 virtua Striker */
-	DRIVER( vstrikero )
+	DRIVER( vstrikero )	/* 1995.05 virtua Striker */
 	DRIVER( rchase2 )	/* 1995.06 Rail Chase 2 (Arcade TV Game List - P.104, Left, 12 from top) */
 	DRIVER( indy500 )	/* 1995.07 Indy 500 */
-	DRIVER( indy500d )
-	DRIVER( indy500to )
+	DRIVER( indy500d )	/* 1995.07 Indy 500 */
+	DRIVER( indy500to )	/* 1995.07 Indy 500 */
 	DRIVER( skytargt )	/* 1995.10 Sky Target */
 	DRIVER( fvipers )	/* 1995.11 Fighting Vipers */
-	DRIVER( von )		/* 1996.01 Dennou Senki Virtual-On */
-	DRIVER( vonj )
+	DRIVER( von )		/* 1996.01 Dennou Senki Virtual-On (USA) */
+	DRIVER( vonj )		/* 1996.01 Dennou Senki Virtual-On (Japan) */
 	DRIVER( gunblade )	/* 1996.04 Gunblade N.Y. */
 	DRIVER( schamp )	/* 1996.05 Sonic Championship */
 	DRIVER( sfight )	/* 1996.05 Sonic the Fighters */
 	DRIVER( lastbrnx )	/* 1996.06 Last Bronx */
-	DRIVER( lastbrnxj )
+	DRIVER( lastbrnxj )	/* 1996.06 Last Bronx (Japan) */
 	DRIVER( sgt24h )	/* 1996.07 Super GT 24h */
 	DRIVER( dynabb )	/* 1996.08 Dynamite Baseball */
 	DRIVER( doa )		/* 1996.11 Dead or Alive */
 						/* 1997.04 Dynamite Baseball '97 */
 	DRIVER( zerogun )	/* 1997.12 Zero Gunner */
-	DRIVER( zerogunj )
+	DRIVER( zerogunj )	/* 1997.12 Zero Gunner (Japan) */
 	DRIVER( dyndeka2b )	/* 1998.05 Dynamite Deka 2 */
 	DRIVER( dynamcopb )	/* 1998.09 Dynamite Cop */
 	DRIVER( pltkids )	/* 1999.03 Pilot Kids */
@@ -4428,7 +4428,8 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( waverunr )	/* 1996.10 Wave Runner */
 	DRIVER( hotd )		/* 1997.03 The House of the Dead */
 	DRIVER( topskatr )	/* 1997.05 Top Skater */
-	DRIVER( topskatru )
+	DRIVER( topskatru )	/* 1997.05 Top Skater (USA) */
+	DRIVER( topskatrj )	/* 1997.05 Top Skater (Japan) */
 	DRIVER( overrev )	/* 1997.09 Overrev */
 	DRIVER( segawski )	/* 1997.09 Sega Water Ski */
 	DRIVER( dynamcopc )	/* 1998.09 Dynamite Cop */
