@@ -1027,6 +1027,7 @@ const game_driver * const drivers[] =
 	DRIVER( devzone2 )	/* 8022 (c) [1980] */
 	DRIVER( cheekyms )	/* 8004 (c) [1980?] */
 	DRIVER( zerohour )	/* 8011 (c) Universal */
+	DRIVER( zerohoura )	/* 8011 (c) Universal */
 	DRIVER( redclash )	/* (c) 1981 Tehkan */
 	DRIVER( redclasha )	/* (c) 1981 Tehkan */
 	DRIVER( redclashk )	/* (c) Kaneko (bootleg?) */
@@ -6545,6 +6546,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( streetsmj )	/* A8007 'S2' (c) 1989 */
 	DRIVER( prehisle )	/* A8003 'GT' (c) 1989 */
 	DRIVER( prehisleu )	/* A8003 'GT' (c) 1989 */
+	DRIVER( prehislek )	/* A8003 'GT' (c) 1989 */
 	DRIVER( gensitou )	/* A8003 'GT' (c) 1989 */
 	DRIVER( mechatt )	/* A8002 'MA' (c) 1989 */
 	DRIVER( mechattu )	/* A8002 'MA' (c) 1989 */
