@@ -19,7 +19,6 @@ These games all run on different but similar hardware. A common thing that they
 all have is tilemaps hardcoded in ROM.
 
 TODO:
-- video driver is not optimized at all
 - port A of both of the YM2203 is constantly read and stored in memory -
   function unknown
 - bluehawk and flytiger main programs often write to the program ROM
@@ -35,8 +34,6 @@ TODO:
   regularly to the ROM area - 0x00 is written to 0x0003 and 0xF7 is
   written to 0x0004 - is this just a bug, or is there something
   connected there?  Possibly a watchdog?
-Gulf Storm:
-- there seem to be some invisible enemies around the first bridge
 Primella:
 - does the game really support cocktail mode as service mode suggests?
 - are buttons 2 and 3 used as service mode suggests?
@@ -44,8 +41,6 @@ Pop Bingo
 - appears to combine 2 4bpp layers to make 1 8bpp layer, for now we just
   treat it as 1 8bpp layer and ignore the 2nd set of registers.
 - some unknown reads / writes
-Flying Tiger
-- layer2 palette bank
 
 ***************************************************************************/
 
@@ -115,7 +110,8 @@ static ADDRESS_MAP_START( pollux_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf010, 0xf010) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xf018, 0xf01f) AM_WRITE(dooyong_bgscroll8_w)
 	AM_RANGE(0xf020, 0xf027) AM_WRITE(dooyong_fgscroll8_w)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(paletteram_flytiger_w) AM_BASE(&paletteram_flytiger)
+//	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gulfstrm_map, ADDRESS_SPACE_PROGRAM, 8 )

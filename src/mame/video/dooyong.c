@@ -157,8 +157,10 @@ WRITE8_HANDLER( pollux_ctrl_w )
 	/* bit 1 is used but unknown */
 
 	/* bit 2 is continuously toggled (unknown) */
-
 	/* bit 4 is used but unknown */
+
+flytiger_palette_bank = data & 0x02;
+
 }
 
 WRITE8_HANDLER( primella_ctrl_w )
@@ -411,20 +413,19 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				height = (buffered_spriteram[offs+0x1c] & 0x70) >> 4;
 				code &= ~height;
 
+				flipx = buffered_spriteram[offs+0x1c] & 0x08;
+				flipy = buffered_spriteram[offs+0x1c] & 0x04;
+
 				if (pollux_extensions == 3)
 				{
 					/* bluehawk */
 					sy += 6 - ((~buffered_spriteram[offs+0x1c] & 0x02) << 7);
-					flipx = buffered_spriteram[offs+0x1c] & 0x08;
-					flipy = buffered_spriteram[offs+0x1c] & 0x04;
 				}
 
 				if (pollux_extensions == 4)
 				{
 					/* flytiger */
 					sy -=(buffered_spriteram[offs+0x1c] & 0x02) << 7;
-					flipx = buffered_spriteram[offs+0x1c] & 0x08;
-					flipy = buffered_spriteram[offs+0x1c] & 0x04;
 				}
 			}
 		}
