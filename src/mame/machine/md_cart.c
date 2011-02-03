@@ -628,7 +628,7 @@ static READ16_HANDLER( radica_bank_select )
 {
 	int bank = offset & 0x3f;
 	UINT8 *ROM = space->machine->region("maincpu")->base();
-	memcpy(ROM, ROM +  (bank * 0x10000) + VIRGIN_COPY_GEN, 0x400000);
+	memcpy(ROM, ROM + 0x400000 + (bank * 0x10000), 0x400000);
 	return 0;
 }
 
@@ -1076,9 +1076,9 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 			break;
 
 		case RADICA:
+			memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN], 0x400000);
 			memcpy(&ROM[0x400000], &ROM[VIRGIN_COPY_GEN], 0x400000); // keep a copy for later banking.. making use of huge ROM_REGION allocated to genesis driver
 			memcpy(&ROM[0x800000], &ROM[VIRGIN_COPY_GEN], 0x400000); // wraparound banking (from hazemd code)
-			memcpy(&ROM[0x000000], &ROM[VIRGIN_COPY_GEN], 0x400000);
 
 			memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa13000, 0xa1307f, 0, 0, radica_bank_select);
 			break;
