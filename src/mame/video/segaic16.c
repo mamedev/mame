@@ -1095,14 +1095,14 @@ static TIMER_CALLBACK( segaic16_tilemap_16b_latch_values )
 	}
 
 	/* set a timer to do this again next frame */
-	timer_set(machine, machine->primary_screen->time_until_pos(261), NULL, param, segaic16_tilemap_16b_latch_values);
+	timer_adjust_oneshot(info->latch_timer, machine->primary_screen->time_until_pos(261), param);
 }
 
 
 static void segaic16_tilemap_16b_reset(running_machine *machine, struct tilemap_info *info)
 {
 	/* set a timer to latch values on scanline 261 */
-	timer_set(machine, machine->primary_screen->time_until_pos(261), NULL, info->index, segaic16_tilemap_16b_latch_values);
+	timer_adjust_oneshot(info->latch_timer, machine->primary_screen->time_until_pos(261), info->index);
 }
 
 
@@ -1151,6 +1151,7 @@ void segaic16_tilemap_init(running_machine *machine, int which, int type, int co
 			info->numpages = 4;
 			info->draw_layer = segaic16_tilemap_16a_draw_layer;
 			info->reset = NULL;
+			info->latch_timer = NULL;
 			break;
 
 		case SEGAIC16_TILEMAP_16A:
@@ -1159,6 +1160,7 @@ void segaic16_tilemap_init(running_machine *machine, int which, int type, int co
 			info->numpages = 8;
 			info->draw_layer = segaic16_tilemap_16a_draw_layer;
 			info->reset = NULL;
+			info->latch_timer = NULL;
 			break;
 
 		case SEGAIC16_TILEMAP_16B:
@@ -1167,6 +1169,7 @@ void segaic16_tilemap_init(running_machine *machine, int which, int type, int co
 			info->numpages = 16;
 			info->draw_layer = segaic16_tilemap_16b_draw_layer;
 			info->reset = segaic16_tilemap_16b_reset;
+			info->latch_timer = timer_alloc(machine, segaic16_tilemap_16b_latch_values, NULL);
 			break;
 
 		case SEGAIC16_TILEMAP_16B_ALT:
@@ -1175,6 +1178,7 @@ void segaic16_tilemap_init(running_machine *machine, int which, int type, int co
 			info->numpages = 16;
 			info->draw_layer = segaic16_tilemap_16b_draw_layer;
 			info->reset = segaic16_tilemap_16b_reset;
+			info->latch_timer = timer_alloc(machine, segaic16_tilemap_16b_latch_values, NULL);
 			break;
 
 		default:

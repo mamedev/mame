@@ -318,9 +318,9 @@ static void update_main_irqs(running_machine *machine)
 }
 
 
-static TIMER_CALLBACK( scanline_callback )
+static TIMER_DEVICE_CALLBACK( scanline_callback )
 {
-	segas1x_state *state = machine->driver_data<segas1x_state>();
+	segas1x_state *state = timer.machine->driver_data<segas1x_state>();
 
 	int scanline = param;
 	int next_scanline = (scanline + 2) % 262;
@@ -349,10 +349,10 @@ static TIMER_CALLBACK( scanline_callback )
 
 	/* update IRQs on the main CPU */
 	if (update)
-		update_main_irqs(machine);
+		update_main_irqs(timer.machine);
 
 	/* come back in 2 scanlines */
-	timer_set(machine, machine->primary_screen->time_until_pos(next_scanline), NULL, next_scanline, scanline_callback);
+	timer.adjust(timer.machine->primary_screen->time_until_pos(next_scanline), next_scanline);
 }
 
 
@@ -424,6 +424,7 @@ static void xboard_reset(device_t *device)
 
 static MACHINE_RESET( xboard )
 {
+	segas1x_state *state = machine->driver_data<segas1x_state>();
 	fd1094_machine_init(machine->device("maincpu"));
 	segaic16_tilemap_reset(machine, 0);
 
@@ -431,7 +432,7 @@ static MACHINE_RESET( xboard )
 	m68k_set_reset_callback(machine->device("maincpu"), xboard_reset);
 
 	/* start timers to track interrupts */
-	timer_set(machine, machine->primary_screen->time_until_pos(1), NULL, 1, scanline_callback);
+	state->interrupt_timer->adjust(machine->primary_screen->time_until_pos(1), 1);
 }
 
 
@@ -1348,6 +1349,8 @@ static MACHINE_CONFIG_START( xboard, segas1x_state )
 	MCFG_NVRAM_ADD_0FILL("backup1")
 	MCFG_NVRAM_ADD_0FILL("backup2")
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+
+	MCFG_TIMER_ADD("int_timer", scanline_callback)
 
 	MCFG_315_5248_ADD("5248_main")
 	MCFG_315_5248_ADD("5248_subx")
