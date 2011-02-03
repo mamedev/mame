@@ -102,15 +102,6 @@ static void update_irq_state( running_machine *machine )
 		cpu_set_input_line(state->maincpu, state->irq_level, CLEAR_LINE);
 }
 
-static TIMER_CALLBACK( cave_vblank_start )
-{
-	cave_state *state = machine->driver_data<cave_state>();
-	state->vblank_irq = 1;
-	update_irq_state(machine);
-	cave_get_sprite_info(machine);
-	state->agallet_vblank_irq = 1;
-}
-
 static TIMER_CALLBACK( cave_vblank_end )
 {
 	cave_state *state = machine->driver_data<cave_state>();
@@ -122,12 +113,21 @@ static TIMER_CALLBACK( cave_vblank_end )
 	state->agallet_vblank_irq = 0;
 }
 
+static TIMER_DEVICE_CALLBACK( cave_vblank_start )
+{
+	cave_state *state = timer.machine->driver_data<cave_state>();
+	state->vblank_irq = 1;
+	update_irq_state(timer.machine);
+	cave_get_sprite_info(timer.machine);
+	state->agallet_vblank_irq = 1;
+	timer_set(timer.machine, attotime::from_usec(2000), NULL, 0, cave_vblank_end);
+}
+
 /* Called once/frame to generate the VBLANK interrupt */
 static INTERRUPT_GEN( cave_interrupt )
 {
 	cave_state *state = device->machine->driver_data<cave_state>();
-	timer_set(device->machine, attotime::from_usec(17376 - state->time_vblank_irq), NULL, 0, cave_vblank_start);
-	timer_set(device->machine, attotime::from_usec(17376 - state->time_vblank_irq + 2000), NULL, 0, cave_vblank_end);
+	state->int_timer->adjust(attotime::from_usec(17376 - state->time_vblank_irq));
 }
 
 /* Called by the YMZ280B to set the IRQ state */
@@ -1034,6 +1034,18 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
+
+static ADDRESS_MAP_START( oki_map, 0, 8 )
+	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("bank3")
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank4")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( oki2_map, 0, 8 )
+	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("bank5")
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank6")
+ADDRESS_MAP_END
+
+
 /***************************************************************************
                                 Hotdog Storm
 ***************************************************************************/
@@ -1048,11 +1060,10 @@ static WRITE8_HANDLER( hotdogst_rombank_w )
 
 static WRITE8_HANDLER( hotdogst_okibank_w )
 {
-	UINT8 *RAM = space->machine->region("oki")->base();
 	int bank1 = (data >> 0) & 0x3;
 	int bank2 = (data >> 4) & 0x3;
-	memcpy(RAM + 0x20000 * 0, RAM + 0x40000 + 0x20000 * bank1, 0x20000);
-	memcpy(RAM + 0x20000 * 1, RAM + 0x40000 + 0x20000 * bank2, 0x20000);
+	memory_set_bank(space->machine, "bank3", bank1);
+	memory_set_bank(space->machine, "bank4", bank2);
 }
 
 static ADDRESS_MAP_START( hotdogst_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1117,20 +1128,18 @@ static WRITE8_HANDLER( metmqstr_rombank_w )
 
 static WRITE8_HANDLER( metmqstr_okibank0_w )
 {
-	UINT8 *ROM = space->machine->region("oki1")->base();
 	int bank1 = (data >> 0) & 0x7;
 	int bank2 = (data >> 4) & 0x7;
-	memcpy(ROM + 0x20000 * 0, ROM + 0x40000 + 0x20000 * bank1, 0x20000);
-	memcpy(ROM + 0x20000 * 1, ROM + 0x40000 + 0x20000 * bank2, 0x20000);
+	memory_set_bank(space->machine, "bank3", bank1);
+	memory_set_bank(space->machine, "bank4", bank2);
 }
 
 static WRITE8_HANDLER( metmqstr_okibank1_w )
 {
-	UINT8 *ROM = space->machine->region("oki2")->base();
 	int bank1 = (data >> 0) & 0x7;
 	int bank2 = (data >> 4) & 0x7;
-	memcpy(ROM + 0x20000 * 0, ROM + 0x40000 + 0x20000 * bank1, 0x20000);
-	memcpy(ROM + 0x20000 * 1, ROM + 0x40000 + 0x20000 * bank2, 0x20000);
+	memory_set_bank(space->machine, "bank5", bank1);
+	memory_set_bank(space->machine, "bank6", bank2);
 }
 
 static ADDRESS_MAP_START( metmqstr_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1211,20 +1220,18 @@ static WRITE8_HANDLER( sailormn_rombank_w )
 
 static WRITE8_HANDLER( sailormn_okibank0_w )
 {
-	UINT8 *RAM = space->machine->region("oki1")->base();
 	int bank1 = (data >> 0) & 0xf;
 	int bank2 = (data >> 4) & 0xf;
-	memcpy(RAM + 0x20000 * 0, RAM + 0x40000 + 0x20000 * bank1, 0x20000);
-	memcpy(RAM + 0x20000 * 1, RAM + 0x40000 + 0x20000 * bank2, 0x20000);
+	memory_set_bank(space->machine, "bank3", bank1);
+	memory_set_bank(space->machine, "bank4", bank2);
 }
 
 static WRITE8_HANDLER( sailormn_okibank1_w )
 {
-	UINT8 *RAM = space->machine->region("oki2")->base();
 	int bank1 = (data >> 0) & 0xf;
 	int bank2 = (data >> 4) & 0xf;
-	memcpy(RAM + 0x20000 * 0, RAM + 0x40000 + 0x20000 * bank1, 0x20000);
-	memcpy(RAM + 0x20000 * 1, RAM + 0x40000 + 0x20000 * bank2, 0x20000);
+	memory_set_bank(space->machine, "bank5", bank1);
+	memory_set_bank(space->machine, "bank6", bank2);
 }
 
 static ADDRESS_MAP_START( sailormn_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1859,6 +1866,8 @@ static MACHINE_CONFIG_START( dfeveron, cave_state )
 	MCFG_MACHINE_RESET(cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
+	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
@@ -1899,6 +1908,8 @@ static MACHINE_CONFIG_START( ddonpach, cave_state )
 	MCFG_MACHINE_START(cave)
 	MCFG_MACHINE_RESET(cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
+
+	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1945,6 +1956,8 @@ static MACHINE_CONFIG_START( donpachi, cave_state )
 	MCFG_MACHINE_RESET(cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
+	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
@@ -1990,6 +2003,8 @@ static MACHINE_CONFIG_START( esprade, cave_state )
 	MCFG_MACHINE_RESET(cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
+	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
@@ -2028,6 +2043,8 @@ static MACHINE_CONFIG_START( gaia, cave_state )
 
 	MCFG_MACHINE_START(cave)
 	MCFG_MACHINE_RESET(cave)
+
+	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2068,6 +2085,8 @@ static MACHINE_CONFIG_START( guwange, cave_state )
 	MCFG_MACHINE_START(cave)
 	MCFG_MACHINE_RESET(cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
+
+	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2112,6 +2131,8 @@ static MACHINE_CONFIG_START( hotdogst, cave_state )
 	MCFG_MACHINE_RESET(cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
+	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
@@ -2144,6 +2165,7 @@ static MACHINE_CONFIG_START( hotdogst, cave_state )
 	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
 
@@ -2161,6 +2183,8 @@ static MACHINE_CONFIG_START( korokoro, cave_state )
 	MCFG_MACHINE_START(cave)
 	MCFG_MACHINE_RESET(cave)
 	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit)
+
+	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2215,6 +2239,8 @@ static MACHINE_CONFIG_START( mazinger, cave_state )
 	MCFG_MACHINE_RESET(cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
+	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
@@ -2247,6 +2273,7 @@ static MACHINE_CONFIG_START( mazinger, cave_state )
 	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 2.0)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
 
@@ -2270,6 +2297,8 @@ static MACHINE_CONFIG_START( metmqstr, cave_state )
 	MCFG_MACHINE_START(cave)
 	MCFG_MACHINE_RESET(cave)	/* start with the watchdog armed */
 	MCFG_EEPROM_93C46_ADD("eeprom")
+
+	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2297,10 +2326,12 @@ static MACHINE_CONFIG_START( metmqstr, cave_state )
 	MCFG_OKIM6295_ADD("oki1", XTAL_32MHz / 16 , OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 
 	MCFG_OKIM6295_ADD("oki2", XTAL_32MHz / 16 , OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 MACHINE_CONFIG_END
 
 
@@ -2322,6 +2353,8 @@ static MACHINE_CONFIG_START( pacslot, cave_state )
 	MCFG_MACHINE_START(cave)
 	MCFG_MACHINE_RESET(cave)
 	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C46_pacslot)
+
+	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2349,7 +2382,6 @@ static MACHINE_CONFIG_START( pacslot, cave_state )
 	MCFG_OKIM6295_ADD("oki2", XTAL_28MHz / 28, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-
 MACHINE_CONFIG_END
 
 
@@ -2378,6 +2410,8 @@ static MACHINE_CONFIG_START( pwrinst2, cave_state )
 	MCFG_MACHINE_START(cave)
 	MCFG_MACHINE_RESET(cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
+
+	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2441,6 +2475,8 @@ static MACHINE_CONFIG_START( sailormn, cave_state )
 	MCFG_MACHINE_RESET(cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
+	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
@@ -2466,10 +2502,12 @@ static MACHINE_CONFIG_START( sailormn, cave_state )
 	MCFG_OKIM6295_ADD("oki1", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 
 	MCFG_OKIM6295_ADD("oki2", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 MACHINE_CONFIG_END
 
 
@@ -2491,6 +2529,8 @@ static MACHINE_CONFIG_START( tjumpman, cave_state )
 	MCFG_MACHINE_START(cave)
 	MCFG_MACHINE_RESET(cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
+
+	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2531,6 +2571,8 @@ static MACHINE_CONFIG_START( uopoko, cave_state )
 
 	MCFG_MACHINE_START(cave)
 	MCFG_EEPROM_93C46_ADD("eeprom")
+
+	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2694,11 +2736,11 @@ BP962A.U77  23C16000    GFX
 	ROM_LOAD( "bp962a.u65", 0x200000, 0x100000, CRC(135fcf9a) SHA1(2e8c89c2627bbdef160d96724d07883fb2fa1a57) ) \
 	ROM_CONTINUE(           0x200000, 0x100000             ) \
 	\
-	ROM_REGION( 0x240000, "oki1", 0 ) \
-	ROM_LOAD( "bp962a.u48", 0x040000, 0x200000, CRC(ae00a1ce) SHA1(5e8c74df0ac77efb3080406870856f958be14f79) ) \
+	ROM_REGION( 0x200000, "oki1", 0 ) \
+	ROM_LOAD( "bp962a.u48", 0x000000, 0x200000, CRC(ae00a1ce) SHA1(5e8c74df0ac77efb3080406870856f958be14f79) ) \
 	\
-	ROM_REGION( 0x240000, "oki2", 0 )	\
-	ROM_LOAD( "bp962a.u47", 0x040000, 0x200000, CRC(6d4e9737) SHA1(81c7ecdfc2d38d0b35e26745866f6672f566f936) ) \
+	ROM_REGION( 0x200000, "oki2", 0 )	\
+	ROM_LOAD( "bp962a.u47", 0x000000, 0x200000, CRC(6d4e9737) SHA1(81c7ecdfc2d38d0b35e26745866f6672f566f936) ) \
 
 /* the regions differ only in the EEPROM, hence the macro above - all EEPROMs are Factory Defaulted */
 ROM_START( agallet )
@@ -3432,9 +3474,8 @@ ROM_START( hotdogst )
 	ROM_REGION( 0x80000, "layer2", 0 )	/* Layer 2 */
 	ROM_LOAD( "mp5u64", 0x00000, 0x80000, CRC(9b26458c) SHA1(acef62422fa3f92e6ca1eba0ee6fb914cd1ee190) )
 
-	ROM_REGION( 0xc0000, "oki", 0 )	/* Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "mp1u65", 0x40000, 0x80000, CRC(4868be1b) SHA1(32b8234b19fdbe07fa5057fa7965e36807e35e77) )	// 1xxxxxxxxxxxxxxxxxx = 0xFF, 4 x 0x20000
+	ROM_REGION( 0x80000, "oki", 0 )	/* Samples */
+	ROM_LOAD( "mp1u65", 0x00000, 0x80000, CRC(4868be1b) SHA1(32b8234b19fdbe07fa5057fa7965e36807e35e77) )	// 1xxxxxxxxxxxxxxxxxx = 0xFF, 4 x 0x20000
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "eeprom-hotdogst.bin", 0x0000, 0x0080, CRC(12b4f934) SHA1(5b28d8fbd78869db78ce49e541a9d65558841966) )
@@ -3566,8 +3607,8 @@ U55
 	ROM_REGION( 0x200000, "layer1", 0 ) \
 	ROM_LOAD( "bp943a-0.u63", 0x000000, 0x200000, CRC(c1fed98a) SHA1(c276505f80a49b129862966a19db507f97153e45) ) \
 	\
-	ROM_REGION( 0x0c0000, "oki", 0 ) \
-	ROM_LOAD( "bp943a-4.u64", 0x040000, 0x080000, CRC(3fc7f29a) SHA1(feb21b918243c0a03dfa4a80cc80b86be4f62680) ) \
+	ROM_REGION( 0x080000, "oki", 0 ) \
+	ROM_LOAD( "bp943a-4.u64", 0x000000, 0x080000, CRC(3fc7f29a) SHA1(feb21b918243c0a03dfa4a80cc80b86be4f62680) ) \
 
 /* the regions differ only in the EEPROM, hence the macro above - all EEPROMs are Factory Defaulted */
 ROM_START( mazinger )
@@ -3658,15 +3699,13 @@ ROM_START( metmqstr )
 	ROM_LOAD( "bp947a.u46", 0x000000, 0x100000, CRC(0f9c906e) SHA1(03872e8be28637df66373bddb04ed91de4f9db75) )	// FIRST AND SECOND HALF IDENTICAL
 	ROM_CONTINUE(           0x000000, 0x100000             )
 
-	ROM_REGION( 0x140000, "oki1", 0 )	/* OKIM6295 #1 Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "bp947a.u42", 0x040000, 0x100000, CRC(2ce8ff2a) SHA1(8ef8c5b7d4a0e60c980c2962e75f7977faafa311) )	// FIRST AND SECOND HALF IDENTICAL
-	ROM_CONTINUE(           0x040000, 0x100000             )
+	ROM_REGION( 0x100000, "oki1", 0 )	/* OKIM6295 #1 Samples */
+	ROM_LOAD( "bp947a.u42", 0x000000, 0x100000, CRC(2ce8ff2a) SHA1(8ef8c5b7d4a0e60c980c2962e75f7977faafa311) )	// FIRST AND SECOND HALF IDENTICAL
+	ROM_CONTINUE(           0x000000, 0x100000             )
 
-	ROM_REGION( 0x140000, "oki2", 0 )	/* OKIM6295 #2 Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "bp947a.u37", 0x040000, 0x100000, CRC(c3077c8f) SHA1(0a76316a81b7de78279b859549eb5161a721ac71) )	// FIRST AND SECOND HALF IDENTICAL
-	ROM_CONTINUE(           0x040000, 0x100000             )
+	ROM_REGION( 0x100000, "oki2", 0 )	/* OKIM6295 #2 Samples */
+	ROM_LOAD( "bp947a.u37", 0x000000, 0x100000, CRC(c3077c8f) SHA1(0a76316a81b7de78279b859549eb5161a721ac71) )	// FIRST AND SECOND HALF IDENTICAL
+	ROM_CONTINUE(           0x000000, 0x100000             )
 ROM_END
 
 ROM_START( nmaster )
@@ -3697,15 +3736,13 @@ ROM_START( nmaster )
 	ROM_LOAD( "bp947a.u46", 0x000000, 0x100000, CRC(0f9c906e) SHA1(03872e8be28637df66373bddb04ed91de4f9db75) )	// FIRST AND SECOND HALF IDENTICAL
 	ROM_CONTINUE(           0x000000, 0x100000             )
 
-	ROM_REGION( 0x140000, "oki1", 0 )	/* OKIM6295 #1 Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "bp947a.u42", 0x040000, 0x100000, CRC(2ce8ff2a) SHA1(8ef8c5b7d4a0e60c980c2962e75f7977faafa311) )	// FIRST AND SECOND HALF IDENTICAL
-	ROM_CONTINUE(           0x040000, 0x100000             )
+	ROM_REGION( 0x100000, "oki1", 0 )	/* OKIM6295 #1 Samples */
+	ROM_LOAD( "bp947a.u42", 0x000000, 0x100000, CRC(2ce8ff2a) SHA1(8ef8c5b7d4a0e60c980c2962e75f7977faafa311) )	// FIRST AND SECOND HALF IDENTICAL
+	ROM_CONTINUE(           0x000000, 0x100000             )
 
-	ROM_REGION( 0x140000, "oki2", 0 )	/* OKIM6295 #2 Samples */
-	/* Leave the 0x40000 bytes addressable by the chip empty */
-	ROM_LOAD( "bp947a.u37", 0x040000, 0x100000, CRC(c3077c8f) SHA1(0a76316a81b7de78279b859549eb5161a721ac71) )	// FIRST AND SECOND HALF IDENTICAL
-	ROM_CONTINUE(           0x040000, 0x100000             )
+	ROM_REGION( 0x100000, "oki2", 0 )	/* OKIM6295 #2 Samples */
+	ROM_LOAD( "bp947a.u37", 0x000000, 0x100000, CRC(c3077c8f) SHA1(0a76316a81b7de78279b859549eb5161a721ac71) )	// FIRST AND SECOND HALF IDENTICAL
+	ROM_CONTINUE(           0x000000, 0x100000             )
 ROM_END
 
 
@@ -4091,14 +4128,14 @@ BPSM.U77    23C16000    GFX
 	ROM_LOAD( "bpsm.u63", 0xe00000, 0x100000, CRC(d57a56b4) SHA1(e039b336887b66eba4e0630a3cb04cbd8fe14073) ) \
 	ROM_CONTINUE(         0xe00000, 0x100000             ) \
 	\
-	ROM_REGION( 0x240000, "oki1", 0 ) \
-	ROM_LOAD( "bpsm.u48", 0x040000, 0x200000, CRC(498e4ed1) SHA1(28d45a41702d9e5af4e214c1800b2e513ec84d51) ) \
+	ROM_REGION( 0x200000, "oki1", 0 ) \
+	ROM_LOAD( "bpsm.u48", 0x000000, 0x200000, CRC(498e4ed1) SHA1(28d45a41702d9e5af4e214c1800b2e513ec84d51) ) \
 	\
-	ROM_REGION( 0x240000, "oki2", 0 ) \
-	ROM_LOAD( "bpsm.u47", 0x040000, 0x080000, CRC(0f2901b9) SHA1(ebd3e9e39e8d2bc91688dac19b99548a28b4733c) ) \
-	ROM_RELOAD(           0x0c0000, 0x080000             ) \
-	ROM_RELOAD(           0x140000, 0x080000             ) \
-	ROM_RELOAD(           0x1c0000, 0x080000             ) \
+	ROM_REGION( 0x200000, "oki2", 0 ) \
+	ROM_LOAD( "bpsm.u47", 0x000000, 0x080000, CRC(0f2901b9) SHA1(ebd3e9e39e8d2bc91688dac19b99548a28b4733c) ) \
+	ROM_RELOAD(           0x080000, 0x080000             ) \
+	ROM_RELOAD(           0x100000, 0x080000             ) \
+	ROM_RELOAD(           0x180000, 0x080000             ) \
 
 /* the regions differ only in the EEPROM, hence the macro above - all EEPROMs are Factory Defaulted */
 ROM_START( sailormn )
@@ -4176,14 +4213,14 @@ ROM_END
 	ROM_LOAD( "bpsm.u63", 0xe00000, 0x100000, CRC(d57a56b4) SHA1(e039b336887b66eba4e0630a3cb04cbd8fe14073) ) \
 	ROM_CONTINUE(         0xe00000, 0x100000             ) \
 	\
-	ROM_REGION( 0x240000, "oki1", 0 ) \
-	ROM_LOAD( "bpsm.u48", 0x040000, 0x200000, CRC(498e4ed1) SHA1(28d45a41702d9e5af4e214c1800b2e513ec84d51) ) \
+	ROM_REGION( 0x200000, "oki1", 0 ) \
+	ROM_LOAD( "bpsm.u48", 0x000000, 0x200000, CRC(498e4ed1) SHA1(28d45a41702d9e5af4e214c1800b2e513ec84d51) ) \
 	\
-	ROM_REGION( 0x240000, "oki2", 0 ) \
-	ROM_LOAD( "bpsm.u47", 0x040000, 0x080000, CRC(0f2901b9) SHA1(ebd3e9e39e8d2bc91688dac19b99548a28b4733c) ) \
-	ROM_RELOAD(           0x0c0000, 0x080000             ) \
-	ROM_RELOAD(           0x140000, 0x080000             ) \
-	ROM_RELOAD(           0x1c0000, 0x080000             ) \
+	ROM_REGION( 0x200000, "oki2", 0 ) \
+	ROM_LOAD( "bpsm.u47", 0x000000, 0x080000, CRC(0f2901b9) SHA1(ebd3e9e39e8d2bc91688dac19b99548a28b4733c) ) \
+	ROM_RELOAD(           0x080000, 0x080000             ) \
+	ROM_RELOAD(           0x100000, 0x080000             ) \
+	ROM_RELOAD(           0x180000, 0x080000             ) \
 
 /* the regions differ only in the EEPROM, hence the macro above - all EEPROMs are Factory Defaulted */
 ROM_START( sailormno )
@@ -4367,6 +4404,14 @@ static DRIVER_INIT( agallet )
 	memory_configure_bank(machine, "bank1", 0, 0x02, &ROM[0x00000], 0x4000);
 	memory_configure_bank(machine, "bank1", 2, 0x1e, &ROM[0x10000], 0x4000);
 
+	ROM = machine->region("oki1")->base();
+	memory_configure_bank(machine, "bank3", 0, 0x10, &ROM[0x00000], 0x20000);
+	memory_configure_bank(machine, "bank4", 0, 0x10, &ROM[0x00000], 0x20000);
+
+	ROM = machine->region("oki2")->base();
+	memory_configure_bank(machine, "bank5", 0, 0x10, &ROM[0x00000], 0x20000);
+	memory_configure_bank(machine, "bank6", 0, 0x10, &ROM[0x00000], 0x20000);
+
 	sailormn_unpack_tiles(machine, "layer2");
 
 	unpack_sprites(machine);
@@ -4458,6 +4503,10 @@ static DRIVER_INIT( hotdogst )
 	memory_configure_bank(machine, "bank2", 0, 0x2, &ROM[0x00000], 0x4000);
 	memory_configure_bank(machine, "bank2", 2, 0xe, &ROM[0x10000], 0x4000);
 
+	ROM = machine->region("oki")->base();
+	memory_configure_bank(machine, "bank3", 0, 4, &ROM[0x00000], 0x20000);
+	memory_configure_bank(machine, "bank4", 0, 4, &ROM[0x00000], 0x20000);
+
 	unpack_sprites(machine);
 	state->spritetype[0] = 2;	// Normal sprites with different position handling
 	state->time_vblank_irq = 2000;	/**/
@@ -4475,6 +4524,10 @@ static DRIVER_INIT( mazinger )
 
 	memory_configure_bank(machine, "bank2", 0, 2, &ROM[0x00000], 0x4000);
 	memory_configure_bank(machine, "bank2", 2, 6, &ROM[0x10000], 0x4000);
+
+	ROM = machine->region("oki")->base();
+	memory_configure_bank(machine, "bank3", 0, 4, &ROM[0x00000], 0x20000);
+	memory_configure_bank(machine, "bank4", 0, 4, &ROM[0x00000], 0x20000);
 
 	/* decrypt sprites */
 	buffer = auto_alloc_array(machine, UINT8, len);
@@ -4505,6 +4558,14 @@ static DRIVER_INIT( metmqstr )
 
 	memory_configure_bank(machine, "bank1", 0, 0x2, &ROM[0x00000], 0x4000);
 	memory_configure_bank(machine, "bank1", 2, 0xe, &ROM[0x10000], 0x4000);
+
+	ROM = machine->region("oki1")->base();
+	memory_configure_bank(machine, "bank3", 0, 8, &ROM[0x00000], 0x20000);
+	memory_configure_bank(machine, "bank4", 0, 8, &ROM[0x00000], 0x20000);
+
+	ROM = machine->region("oki2")->base();
+	memory_configure_bank(machine, "bank5", 0, 8, &ROM[0x00000], 0x20000);
+	memory_configure_bank(machine, "bank6", 0, 8, &ROM[0x00000], 0x20000);
 
 	unpack_sprites(machine);
 	state->spritetype[0] = 2;	// Normal sprites with different position handling
@@ -4574,6 +4635,14 @@ static DRIVER_INIT( sailormn )
 
 	memory_configure_bank(machine, "bank1", 0, 0x02, &ROM[0x00000], 0x4000);
 	memory_configure_bank(machine, "bank1", 2, 0x1e, &ROM[0x10000], 0x4000);
+
+	ROM = machine->region("oki1")->base();
+	memory_configure_bank(machine, "bank3", 0, 0x10, &ROM[0x00000], 0x20000);
+	memory_configure_bank(machine, "bank4", 0, 0x10, &ROM[0x00000], 0x20000);
+
+	ROM = machine->region("oki2")->base();
+	memory_configure_bank(machine, "bank5", 0, 0x10, &ROM[0x00000], 0x20000);
+	memory_configure_bank(machine, "bank6", 0, 0x10, &ROM[0x00000], 0x20000);
 
 	/* decrypt sprites */
 	buffer = auto_alloc_array(machine, UINT8, len);
@@ -4645,71 +4714,71 @@ static DRIVER_INIT( korokoro )
 
 ***************************************************************************/
 
-GAME( 1994, pwrinst2,   0,        pwrinst2, metmqstr, pwrinst2, ROT0,   "Atlus",                                  "Power Instinct 2 (US, Ver. 94/04/08)",                   0 )
-GAME( 1994, pwrinst2j,  pwrinst2, pwrinst2, metmqstr, pwrinst2j,ROT0,   "Atlus",                                  "Gouketsuji Ichizoku 2 (Japan, Ver. 94/04/08)",           0 )
+GAME( 1994, pwrinst2,   0,        pwrinst2, metmqstr, pwrinst2, ROT0,   "Atlus",                                  "Power Instinct 2 (US, Ver. 94/04/08)",         GAME_SUPPORTS_SAVE )
+GAME( 1994, pwrinst2j,  pwrinst2, pwrinst2, metmqstr, pwrinst2j,ROT0,   "Atlus",                                  "Gouketsuji Ichizoku 2 (Japan, Ver. 94/04/08)", GAME_SUPPORTS_SAVE )
 
 // The EEPROM determines the region, program roms are the same between sets
-GAME( 1994, mazinger,   0,        mazinger, cave,     mazinger, ROT90,  "Banpresto / Dynamic Pl. Toei Animation", "Mazinger Z (World)",                                     0 )
-GAME( 1994, mazingerj,  mazinger, mazinger, cave,     mazinger, ROT90,  "Banpresto / Dynamic Pl. Toei Animation", "Mazinger Z (Japan)",                                     0 )
+GAME( 1994, mazinger,   0,        mazinger, cave,     mazinger, ROT90,  "Banpresto / Dynamic Pl. Toei Animation", "Mazinger Z (World)", GAME_SUPPORTS_SAVE )
+GAME( 1994, mazingerj,  mazinger, mazinger, cave,     mazinger, ROT90,  "Banpresto / Dynamic Pl. Toei Animation", "Mazinger Z (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1995, donpachi,   0,        donpachi, cave,     donpachi, ROT270, "Cave (Atlus license)",                   "DonPachi (US)",                                          0 )
-GAME( 1995, donpachij,  donpachi, donpachi, cave,     donpachi, ROT270, "Cave (Atlus license)",                   "DonPachi (Japan)",                                       0 )
-GAME( 1995, donpachikr, donpachi, donpachi, cave,     donpachi, ROT270, "Cave (Atlus license)",                   "DonPachi (Korea)",                                       0 )
-GAME( 1995, donpachihk, donpachi, donpachi, cave,     donpachi, ROT270, "Cave (Atlus license)",                   "DonPachi (Hong Kong)",                                   0 )
+GAME( 1995, donpachi,   0,        donpachi, cave,     donpachi, ROT270, "Cave (Atlus license)",                   "DonPachi (US)",        GAME_SUPPORTS_SAVE )
+GAME( 1995, donpachij,  donpachi, donpachi, cave,     donpachi, ROT270, "Cave (Atlus license)",                   "DonPachi (Japan)",     GAME_SUPPORTS_SAVE )
+GAME( 1995, donpachikr, donpachi, donpachi, cave,     donpachi, ROT270, "Cave (Atlus license)",                   "DonPachi (Korea)",     GAME_SUPPORTS_SAVE )
+GAME( 1995, donpachihk, donpachi, donpachi, cave,     donpachi, ROT270, "Cave (Atlus license)",                   "DonPachi (Hong Kong)", GAME_SUPPORTS_SAVE )
 
-GAME( 1995, metmqstr,   0,        metmqstr, metmqstr, metmqstr, ROT0,   "Banpresto / Pandorabox",                 "Metamoqester (International)",                           0 )
-GAME( 1995, nmaster,    metmqstr, metmqstr, metmqstr, metmqstr, ROT0,   "Banpresto / Pandorabox",                 "Oni - The Ninja Master (Japan)",                         0 )
+GAME( 1995, metmqstr,   0,        metmqstr, metmqstr, metmqstr, ROT0,   "Banpresto / Pandorabox",                 "Metamoqester (International)",   GAME_SUPPORTS_SAVE )
+GAME( 1995, nmaster,    metmqstr, metmqstr, metmqstr, metmqstr, ROT0,   "Banpresto / Pandorabox",                 "Oni - The Ninja Master (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1995, plegends,   0,        pwrinst2, metmqstr, pwrinst2j,ROT0,   "Atlus",                                  "Gogetsuji Legends (US, Ver. 95/06/20)",                  0 )
-GAME( 1995, plegendsj,  plegends, pwrinst2, metmqstr, pwrinst2j,ROT0,   "Atlus",                                  "Gouketsuji Gaiden -  Saikyou Densetsu (Japan, Ver. 95/06/20)", 0 )
-
-// The EEPROM determines the region, program roms are the same between sets
-GAME( 1995, sailormn,   0,        sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Europe)",    0 )
-GAME( 1995, sailormnu,  sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22B, USA)",       0 )
-GAME( 1995, sailormnj,  sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Japan)",     0 )
-GAME( 1995, sailormnk,  sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Korea)",     0 )
-GAME( 1995, sailormnt,  sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Taiwan)",    0 )
-GAME( 1995, sailormnh,  sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Hong Kong)", 0 )
-GAME( 1995, sailormno,  sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22, Europe)",     0 )
-GAME( 1995, sailormnou, sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22, USA)",        0 )
-GAME( 1995, sailormnoj, sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22, Japan)",      0 )
-GAME( 1995, sailormnok, sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22, Korea)",      0 )
-GAME( 1995, sailormnot, sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22, Taiwan)",     0 )
-GAME( 1995, sailormnoh, sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22, Hong Kong)",	0 )
+GAME( 1995, plegends,   0,        pwrinst2, metmqstr, pwrinst2j,ROT0,   "Atlus",                                  "Gogetsuji Legends (US, Ver. 95/06/20)",                       GAME_SUPPORTS_SAVE )
+GAME( 1995, plegendsj,  plegends, pwrinst2, metmqstr, pwrinst2j,ROT0,   "Atlus",                                  "Gouketsuji Gaiden - Saikyou Densetsu (Japan, Ver. 95/06/20)", GAME_SUPPORTS_SAVE )
 
 // The EEPROM determines the region, program roms are the same between sets
-GAME( 1996, agallet,    0,        sailormn, cave,     agallet,  ROT270, "Banpresto / Gazelle",                    "Air Gallet (Europe)", 0 )
-GAME( 1996, agalletu,   agallet,  sailormn, cave,     agallet,  ROT270, "Banpresto / Gazelle",                    "Air Gallet (USA)", 0 )
-GAME( 1996, agalletj,   agallet,  sailormn, cave,     agallet,  ROT270, "Banpresto / Gazelle",                    "Air Gallet (Japan)", 0 )
-GAME( 1996, agalletk,   agallet,  sailormn, cave,     agallet,  ROT270, "Banpresto / Gazelle",                    "Air Gallet (Korea)", 0 )
-GAME( 1996, agallett,   agallet,  sailormn, cave,     agallet,  ROT270, "Banpresto / Gazelle",                    "Air Gallet (Taiwan)", 0 )
-GAME( 1996, agalleth,   agallet,  sailormn, cave,     agallet,  ROT270, "Banpresto / Gazelle",                    "Air Gallet (Hong Kong)",                               0 )
+GAME( 1995, sailormn,   0,        sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Europe)",    GAME_SUPPORTS_SAVE )
+GAME( 1995, sailormnu,  sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22B, USA)",       GAME_SUPPORTS_SAVE )
+GAME( 1995, sailormnj,  sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Japan)",     GAME_SUPPORTS_SAVE )
+GAME( 1995, sailormnk,  sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Korea)",     GAME_SUPPORTS_SAVE )
+GAME( 1995, sailormnt,  sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Taiwan)",    GAME_SUPPORTS_SAVE )
+GAME( 1995, sailormnh,  sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Hong Kong)", GAME_SUPPORTS_SAVE )
+GAME( 1995, sailormno,  sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22, Europe)",     GAME_SUPPORTS_SAVE )
+GAME( 1995, sailormnou, sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22, USA)",        GAME_SUPPORTS_SAVE )
+GAME( 1995, sailormnoj, sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22, Japan)",      GAME_SUPPORTS_SAVE )
+GAME( 1995, sailormnok, sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22, Korea)",      GAME_SUPPORTS_SAVE )
+GAME( 1995, sailormnot, sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22, Taiwan)",     GAME_SUPPORTS_SAVE )
+GAME( 1995, sailormnoh, sailormn, sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22, Hong Kong)",	GAME_SUPPORTS_SAVE )
 
-GAME( 1996, hotdogst,   0,        hotdogst, cave,     hotdogst, ROT90,  "Marble",                                 "Hotdog Storm (International)",                         0 )
+// The EEPROM determines the region, program roms are the same between sets
+GAME( 1996, agallet,    0,        sailormn, cave,     agallet,  ROT270, "Banpresto / Gazelle",                    "Air Gallet (Europe)",    GAME_SUPPORTS_SAVE )
+GAME( 1996, agalletu,   agallet,  sailormn, cave,     agallet,  ROT270, "Banpresto / Gazelle",                    "Air Gallet (USA)",       GAME_SUPPORTS_SAVE )
+GAME( 1996, agalletj,   agallet,  sailormn, cave,     agallet,  ROT270, "Banpresto / Gazelle",                    "Akuu Gallet (Japan)",    GAME_SUPPORTS_SAVE )
+GAME( 1996, agalletk,   agallet,  sailormn, cave,     agallet,  ROT270, "Banpresto / Gazelle",                    "Air Gallet (Korea)",     GAME_SUPPORTS_SAVE )
+GAME( 1996, agallett,   agallet,  sailormn, cave,     agallet,  ROT270, "Banpresto / Gazelle",                    "Air Gallet (Taiwan)",    GAME_SUPPORTS_SAVE )
+GAME( 1996, agalleth,   agallet,  sailormn, cave,     agallet,  ROT270, "Banpresto / Gazelle",                    "Air Gallet (Hong Kong)", GAME_SUPPORTS_SAVE )
 
-GAME( 1996, pacslot,    0,        pacslot,  pacslot,  tjumpman, ROT0,   "Namco",                                  "Pac-Slot",                                             0 )
+GAME( 1996, hotdogst,   0,        hotdogst, cave,     hotdogst, ROT90,  "Marble",                                 "Hotdog Storm (International)", GAME_SUPPORTS_SAVE )
 
-GAME( 1997, ddonpach,   0,        ddonpach, cave,     ddonpach, ROT270, "Cave (Atlus license)",                   "DoDonPachi (International, Master Ver. 97/02/05)",     0 )
-GAME( 1997, ddonpachj,  ddonpach, ddonpach, cave,     ddonpach, ROT270, "Cave (Atlus license)",                   "DoDonPachi (Japan, Master Ver. 97/02/05)",             0 )
+GAME( 1996, pacslot,    0,        pacslot,  pacslot,  tjumpman, ROT0,   "Namco",                                  "Pac-Slot", GAME_SUPPORTS_SAVE )
 
-GAME( 1998, dfeveron,   feversos, dfeveron, cave,     dfeveron, ROT270, "Cave (Nihon System license)",            "Dangun Feveron (Japan, Ver. 98/09/17)",                0 )
-GAME( 1998, feversos,   0,        dfeveron, cave,     feversos, ROT270, "Cave (Nihon System license)",            "Fever SOS (International, Ver. 98/09/25)",             0 )
+GAME( 1997, ddonpach,   0,        ddonpach, cave,     ddonpach, ROT270, "Cave (Atlus license)",                   "DoDonPachi (International, Master Ver. 97/02/05)", GAME_SUPPORTS_SAVE )
+GAME( 1997, ddonpachj,  ddonpach, ddonpach, cave,     ddonpach, ROT270, "Cave (Atlus license)",                   "DoDonPachi (Japan, Master Ver. 97/02/05)",         GAME_SUPPORTS_SAVE )
 
-GAME( 1998, esprade,    0,        esprade,  cave,     esprade,  ROT270, "Cave (Atlus license)",                   "ESP Ra.De. (International, Ver. 98/04/22)",            0 )
-GAME( 1998, espradej,   esprade,  esprade,  cave,     esprade,  ROT270, "Cave (Atlus license)",                   "ESP Ra.De. (Japan, Ver. 98/04/21)",                    0 )
-GAME( 1998, espradejo,  esprade,  esprade,  cave,     esprade,  ROT270, "Cave (Atlus license)",                   "ESP Ra.De. (Japan, Ver. 98/04/14)",                    0 )
+GAME( 1998, dfeveron,   feversos, dfeveron, cave,     dfeveron, ROT270, "Cave (Nihon System license)",            "Dangun Feveron (Japan, Ver. 98/09/17)",    GAME_SUPPORTS_SAVE )
+GAME( 1998, feversos,   0,        dfeveron, cave,     feversos, ROT270, "Cave (Nihon System license)",            "Fever SOS (International, Ver. 98/09/25)", GAME_SUPPORTS_SAVE )
 
-GAME( 1998, uopoko,     0,        uopoko,   cave,     uopoko,   ROT0,   "Cave (Jaleco license)",                  "Puzzle Uo Poko (International)",                       0 )
-GAME( 1998, uopokoj,    uopoko,   uopoko,   cave,     uopoko,   ROT0,   "Cave (Jaleco license)",                  "Puzzle Uo Poko (Japan)",                               0 )
+GAME( 1998, esprade,    0,        esprade,  cave,     esprade,  ROT270, "Cave (Atlus license)",                   "ESP Ra.De. (International, Ver. 98/04/22)", GAME_SUPPORTS_SAVE )
+GAME( 1998, espradej,   esprade,  esprade,  cave,     esprade,  ROT270, "Cave (Atlus license)",                   "ESP Ra.De. (Japan, Ver. 98/04/21)",         GAME_SUPPORTS_SAVE )
+GAME( 1998, espradejo,  esprade,  esprade,  cave,     esprade,  ROT270, "Cave (Atlus license)",                   "ESP Ra.De. (Japan, Ver. 98/04/14)",         GAME_SUPPORTS_SAVE )
 
-GAME( 1999, guwange,    0,        guwange,  guwange,  guwange,  ROT270, "Cave (Atlus license)",                   "Guwange (Japan, Master Ver. 99/06/24)",                0 )
+GAME( 1998, uopoko,     0,        uopoko,   cave,     uopoko,   ROT0,   "Cave (Jaleco license)",                  "Puzzle Uo Poko (International)", GAME_SUPPORTS_SAVE )
+GAME( 1998, uopokoj,    uopoko,   uopoko,   cave,     uopoko,   ROT0,   "Cave (Jaleco license)",                  "Puzzle Uo Poko (Japan)",         GAME_SUPPORTS_SAVE )
 
-GAME( 1999, gaia,       0,        gaia,     gaia,     gaia,     ROT0,   "Noise Factory",                          "Gaia Crusaders",		                                  GAME_IMPERFECT_SOUND ) // cuts out occasionally
+GAME( 1999, guwange,    0,        guwange,  guwange,  guwange,  ROT270, "Cave (Atlus license)",                   "Guwange (Japan, Master Ver. 99/06/24)", GAME_SUPPORTS_SAVE )
 
-GAME( 2001, theroes,    0,        gaia,     theroes,  gaia,     ROT0,   "Primetek Investments",                   "Thunder Heroes",		                                  GAME_IMPERFECT_SOUND ) // cuts out occasionally
+GAME( 1999, gaia,       0,        gaia,     gaia,     gaia,     ROT0,   "Noise Factory",                          "Gaia Crusaders", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) // cuts out occasionally
 
-GAME( 1999, korokoro,   0,        korokoro, korokoro, korokoro, ROT0,   "Takumi",                                 "Koro Koro Quest (Japan)",                              0 )
+GAME( 2001, theroes,    0,        gaia,     theroes,  gaia,     ROT0,   "Primetek Investments",                   "Thunder Heroes",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) // cuts out occasionally
 
-GAME( 1999, crusherm,   0,        crusherm, korokoro, korokoro, ROT0,   "Takumi",                                 "Crusher Makochan (Japan)",                             0 )
+GAME( 1999, korokoro,   0,        korokoro, korokoro, korokoro, ROT0,   "Takumi",                                 "Koro Koro Quest (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1999, tjumpman,   0,        tjumpman, tjumpman, tjumpman, ROT0,   "Namco",                                  "Tobikose! Jumpman",                                    0 )
+GAME( 1999, crusherm,   0,        crusherm, korokoro, korokoro, ROT0,   "Takumi",                                 "Crusher Makochan (Japan)", GAME_SUPPORTS_SAVE )
+
+GAME( 1999, tjumpman,   0,        tjumpman, tjumpman, tjumpman, ROT0,   "Namco",                                  "Tobikose! Jumpman", GAME_SUPPORTS_SAVE )

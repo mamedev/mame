@@ -25,7 +25,7 @@ class cave_state : public driver_device
 {
 public:
 	cave_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config), int_timer(*this, "int_timer") { }
 
 	/* memory pointers */
 	UINT16 *     videoregs;
@@ -112,6 +112,7 @@ public:
 	/* devices */
 	device_t *maincpu;
 	device_t *audiocpu;
+	required_device<timer_device> int_timer;
 };
 
 /*----------- defined in video/cave.c -----------*/

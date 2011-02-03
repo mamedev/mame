@@ -20,7 +20,6 @@ struct _nmk112_state
 	UINT8 page_mask;
 
 	UINT8 current_bank[8];
-	UINT8 last_bank[2];
 
 	UINT8 *rom0, *rom1;
 	int   size0, size1;
@@ -46,24 +45,23 @@ INLINE const nmk112_interface *get_interface( device_t *device )
 }
 
 /*****************************************************************************
-    DEVICE HANDLERS
+    STATIC FUNCTIONS
 *****************************************************************************/
 
-WRITE8_DEVICE_HANDLER( nmk112_okibank_w )
+static void do_bankswitch( nmk112_state *nmk112, int offset, int data )
 {
-	nmk112_state *nmk112 = get_safe_token(device);
 	int chip = (offset & 4) >> 2;
 	int banknum = offset & 3;
 	int paged = (nmk112->page_mask & (1 << chip));
 
 	UINT8 *rom = chip ? nmk112->rom1 : nmk112->rom0;
 	int size = chip ? nmk112->size1 : nmk112->size0;
-	int bankaddr = (data * BANKSIZE) % size;
-
-	if (nmk112->current_bank[offset] == data)
-		return;
 
 	nmk112->current_bank[offset] = data;
+
+	if (size == 0) return;
+
+	int bankaddr = (data * BANKSIZE) % size;
 
 	/* copy the samples */
 	if ((paged) && (banknum == 0))
@@ -77,8 +75,18 @@ WRITE8_DEVICE_HANDLER( nmk112_okibank_w )
 		rom += banknum * TABLESIZE;
 		memcpy(rom, rom + 0x40000 + bankaddr, TABLESIZE);
 	}
+}
 
-	nmk112->last_bank[chip] = offset & 3;
+/*****************************************************************************
+    DEVICE HANDLERS
+*****************************************************************************/
+
+WRITE8_DEVICE_HANDLER( nmk112_okibank_w )
+{
+	nmk112_state *nmk112 = get_safe_token(device);
+
+	if (nmk112->current_bank[offset] != data)
+		do_bankswitch(nmk112, offset, data);
 }
 
 WRITE16_DEVICE_HANDLER( nmk112_okibank_lsb_w )
@@ -92,30 +100,9 @@ WRITE16_DEVICE_HANDLER( nmk112_okibank_lsb_w )
 static STATE_POSTLOAD( nmk112_postload_bankswitch )
 {
 	nmk112_state *nmk112 = (nmk112_state *)param;
-	int i;
 
-	for (i = 0; i < 2; i++)
-	{
-		int banknum = nmk112->last_bank[i];
-		int paged = (nmk112->page_mask & (1 << i));
-
-		UINT8 *rom = i ? nmk112->rom1 : nmk112->rom0;
-		int size = i ? nmk112->size1 : nmk112->size0;
-		int bankaddr = (nmk112->current_bank[nmk112->last_bank[i] + i * 4] * BANKSIZE) % size;
-
-		/* copy the samples */
-		if ((paged) && (banknum == 0))
-			memcpy(rom + 0x400, rom + 0x40000 + bankaddr + 0x400, BANKSIZE - 0x400);
-		else
-			memcpy(rom + banknum * BANKSIZE, rom + 0x40000 + bankaddr, BANKSIZE);
-
-		/* also copy the sample address table, if it is paged on this chip */
-		if (paged)
-		{
-			rom += banknum * TABLESIZE;
-			memcpy(rom, rom + 0x40000 + bankaddr, TABLESIZE);
-		}
-	}
+	for (int i = 0; i < 8; i++)
+		do_bankswitch(nmk112, i, nmk112->current_bank[i]);
 }
 
 
@@ -128,25 +115,43 @@ static DEVICE_START( nmk112 )
 	nmk112_state *nmk112 = get_safe_token(device);
 	const nmk112_interface *intf = get_interface(device);
 
-	nmk112->rom0 = device->machine->region(intf->rgn0)->base();
-	nmk112->size0 = device->machine->region(intf->rgn0)->bytes() - 0x40000;
-	nmk112->rom1 = device->machine->region(intf->rgn1)->base();
-	nmk112->size1 = device->machine->region(intf->rgn1)->bytes() - 0x40000;
+	if (intf->rgn0 == NULL)
+	{
+		nmk112->rom0 = NULL;
+		nmk112->size0 = 0;
+	}
+	else
+	{
+		nmk112->rom0 = device->machine->region(intf->rgn0)->base();
+		nmk112->size0 = device->machine->region(intf->rgn0)->bytes() - 0x40000;
+	}
+
+	if (intf->rgn1 == NULL)
+	{
+		nmk112->rom1 = NULL;
+		nmk112->size1 = 0;
+	}
+	else
+	{
+		nmk112->rom1 = device->machine->region(intf->rgn1)->base();
+		nmk112->size1 = device->machine->region(intf->rgn1)->bytes() - 0x40000;
+	}
 
 	nmk112->page_mask = ~intf->disable_page_mask;
 
 	state_save_register_device_item_array(device, 0, nmk112->current_bank);
-	state_save_register_device_item_array(device, 0, nmk112->last_bank);
 	state_save_register_postload(device->machine, nmk112_postload_bankswitch, nmk112);
 }
 
 static DEVICE_RESET( nmk112 )
 {
 	nmk112_state *nmk112 = get_safe_token(device);
-	int i;
 
-	for (i = 0; i < 8; i++)
-		nmk112->current_bank[i] = ~0;
+	for (int i = 0; i < 8; i++)
+	{
+		nmk112->current_bank[i] = 0;
+		do_bankswitch(nmk112, i, nmk112->current_bank[i]);
+	}
 }
 
 

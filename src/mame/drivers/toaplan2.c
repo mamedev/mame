@@ -213,8 +213,8 @@ Whoopee                        Working, but no sound. Missing sound MCU dump. It
 Pipi & Bibis (Ryouta Kikaku)   Working.
 FixEight                       Working, MCU type is a NEC V25. Chip is a PLCC94 stamped 'TS-001-TURBO'
 FixEight bootleg               Working. One unknown ROM (same as pipibibi one). Region hardcoded to Korea (@ $4d8)
-Grind Stormer / VFive          Working, MCU type is a NEC V25. Chip is a PLCC94 stamped 'TS-004-SPY'.*
-Batsugun / Batsugun Sp'        Working, MCU type is a NEC V25. Chip is a PLCC94 stamped 'TS-004-SPY'.*
+Grind Stormer / VFive          Working, MCU type is a NEC V25. Chip is a PLCC94 stamped 'TS-007-SPY'.*
+Batsugun / Batsugun Sp'        Working, MCU type is a NEC V25. Chip is a PLCC94 stamped 'TS-007-SPY'.*
 Snow Bros. 2                   Working.
 Mahou Daisakusen               Working.
 Shippu Mahou Daisakusen        Working.
@@ -811,6 +811,13 @@ static WRITE16_HANDLER( ghox_shared_ram_w )
 	}
 }
 
+static WRITE16_HANDLER( fixeight_subcpu_ctrl_w )
+{
+	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
+
+	cpu_set_input_line(state->sub_cpu, INPUT_LINE_RESET, (data & state->v25_reset_line) ? CLEAR_LINE : ASSERT_LINE);
+}
+
 static WRITE16_DEVICE_HANDLER( oki_bankswitch_w )
 {
 	if (ACCESSING_BITS_0_7)
@@ -1297,16 +1304,6 @@ static ADDRESS_MAP_START( pipibibi_bootleg_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-WRITE16_HANDLER( fixeight_subcpu_ctrl )
-{
-	printf("fixeight_subcpu_ctrl %04x\n",data);
-
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
-
-	cpu_set_input_line(state->sub_cpu, INPUT_LINE_RESET,  (data & state->v25_reset_line) ? CLEAR_LINE : ASSERT_LINE);
-}
-
-
 /* this one is rather different to the other v25 based ones, shared ram is moved for example */
 static ADDRESS_MAP_START( fixeight_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
@@ -1317,13 +1314,13 @@ static ADDRESS_MAP_START( fixeight_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("SYS")
 	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_coin_word_w)	/* Coin count/lock */
 	AM_RANGE(0x280000, 0x28ffff) AM_READWRITE( batsugun_share_r, batsugun_share_w )
-	AM_RANGE(0x700000, 0x700001) AM_WRITE(fixeight_subcpu_ctrl) // guess!!!
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500000, 0x501fff) AM_READWRITE(toaplan2_txvideoram16_r, toaplan2_txvideoram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16, tx_vram_size)
 	AM_RANGE(0x502000, 0x5021ff) AM_READWRITE(toaplan2_txvideoram16_offs_r, toaplan2_txvideoram16_offs_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16_offs, tx_offs_vram_size)
 	AM_RANGE(0x503000, 0x5031ff) AM_READWRITE(toaplan2_txscrollram16_r, toaplan2_txscrollram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txscrollram16, tx_scroll_vram_size)
 	AM_RANGE(0x600000, 0x60ffff) AM_READWRITE(toaplan2_tx_gfxram16_r, toaplan2_tx_gfxram16_w) AM_BASE_MEMBER(toaplan2_state, tx_gfxram16)
+	AM_RANGE(0x700000, 0x700001) AM_WRITE(fixeight_subcpu_ctrl_w)
 	AM_RANGE(0x800000, 0x800001) AM_READ(video_count_r)
 ADDRESS_MAP_END
 
@@ -3748,8 +3745,6 @@ static MACHINE_CONFIG_START( batsugun, toaplan2_state )
 	MCFG_CPU_PROGRAM_MAP(V25_rambased_mem)
 	MCFG_CPU_IO_MAP(V25_port)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-
 	MCFG_MACHINE_RESET(batsugun)
 
 	/* video hardware */
@@ -3908,7 +3903,7 @@ MACHINE_CONFIG_END
 
 static const nmk112_interface bgaregga_nmk112_intf =
 {
-	"oki", "oki", 0
+	"oki", NULL, 0
 };
 
 static const nmk112_interface batrider_nmk112_intf =
@@ -5266,7 +5261,6 @@ GAME( 1991, pipibibsa, pipibibs, pipibibs, pipibibs, T2_Z80,   ROT0,   "Toaplan"
 GAME( 1991, whoopee,   pipibibs, whoopee,  whoopee,  T2_Z180,  ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Whoopee!! board)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // original Whoopee!! boards have a HD647180 instead of Z80
 GAME( 1991, pipibibsbl,pipibibs, pipibibi_bootleg, pipibibsbl, pipibibsbl, ROT0,   "bootleg (Ryouta Kikaku)", "Pipi & Bibis / Whoopee!! (bootleg)", GAME_SUPPORTS_SAVE )
 
-
 // region is in eeprom (and also requires correct return value from a v25 mapped address??)
 // todo: something could be wrong here, because the _dumped_ eeprom doesn't work..
 GAME( 1992, fixeight,   0,        fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight (Europe)",  GAME_SUPPORTS_SAVE )
@@ -5326,8 +5320,3 @@ GAME( 1999, bkraidu,  0,        bbakradu, bbakraid, bbakradu, ROT270, "Eighting"
 GAME( 1999, bkraiduj, bkraidu,  bbakradu, bbakraid, bbakradu, ROT270, "Eighting", "Battle Bakraid - Unlimited Version (Japan) (Tue Jun 8 1999)", GAME_SUPPORTS_SAVE )
 // older revision of the code
 GAME( 1999, bkraidj,  bkraidu,  bbakraid, bbakraid, bbakraid, ROT270, "Eighting", "Battle Bakraid (Japan) (Wed Apr 7 1999)", GAME_SUPPORTS_SAVE )
-
-
-
-
-
