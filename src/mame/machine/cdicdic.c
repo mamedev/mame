@@ -25,6 +25,7 @@ TODO:
 #include "machine/cdicdic.h"
 #include "includes/cdi.h"
 #include "sound/cdda.h"
+#include "imagedev/chd_cd.h"
 
 #if ENABLE_VERBOSE_LOG
 INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt, ...)
@@ -861,9 +862,10 @@ void cdicdic_device::process_delayed_command()
 
             m_time = next_msf << 8;
 
-            timer_adjust_oneshot(m_interrupt_timer, attotime::from_hz(75), 0);
+			// the following line BREAKS 'The Apprentice', hangs when you attempt to start the game
+            //timer_adjust_oneshot(m_interrupt_timer, attotime::from_hz(75), 0);
 
-            m_x_buffer |= 0x8000;
+			m_x_buffer |= 0x8000;
             //m_data_buffer |= 0x4000;
 
 			for(index = 6; index < 2352/2; index++)
@@ -1231,8 +1233,19 @@ void cdicdic_device::device_reset()
 {
     init();
 
-	m_cd = cdrom_open(get_disk_handle(&m_machine, "cdrom"));
-	cdda_set_cdrom(m_machine.device("cdda"), m_cd);
+	device_t *cdrom_dev = m_machine.device("cdrom");
+	if( cdrom_dev )
+	{
+		// MESS case (has CDROM device)
+		m_cd = cd_get_cdrom_file(cdrom_dev);
+		cdda_set_cdrom(m_machine.device("cdda"), m_cd);
+	}
+	else
+	{
+		// MAME case
+		m_cd = cdrom_open(get_disk_handle(&m_machine, "cdrom"));
+		cdda_set_cdrom(m_machine.device("cdda"), m_cd);
+	}
 }
 
 void cdicdic_device::init()

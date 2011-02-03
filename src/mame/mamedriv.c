@@ -10490,7 +10490,7 @@ Other Sun games
 	DRIVER( gnome_2a )	/* bootleg */
 
 	/* Disney */
-	DRIVER( cdi )		/* Base unit */
+	DRIVER( cdimono1 )		/* Base unit */
 	DRIVER( quizard )	/* (c) Disney 1996 */
 	DRIVER( quizrd22 )	/* (c) Disney 1995 */
 	DRIVER( quizrd17 )	/* (c) Disney 1996 */
