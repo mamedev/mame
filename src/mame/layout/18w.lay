@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.3" blue="0.0" />
+		</led7seg>
+	</element>
+	
+	<view name="Simple LEDs">
+		<bounds left="0" right="256" top="0" bottom="256" />
+		
+		<!-- left panel -->
+		<!-- TIME -->
+		<bezel name="digit3" element="digit">
+			<bounds left="0" top="0" right="9" bottom="15" />
+		</bezel>
+		<bezel name="digit2" element="digit">
+			<bounds left="10" top="0" right="19" bottom="15" />
+		</bezel>
+		
+		<!-- not connected -->
+		<bezel name="dummy_digita" element="digit">
+			<bounds left="20" top="0" right="29" bottom="15" />
+		</bezel>
+		<bezel name="dummy_digitb" element="digit">
+			<bounds left="30" top="0" right="39" bottom="15" />
+		</bezel>
+		
+		<!-- M.P.H. -->
+		<bezel name="digit1" element="digit">
+			<bounds left="40" top="0" right="49" bottom="15" />
+		</bezel>
+		<bezel name="digit0" element="digit">
+			<bounds left="50" top="0" right="59" bottom="15" />
+		</bezel>
+		
+		<!-- right panel -->
+		<!-- SCORE -->
+		<bezel name="digit9" element="digit">
+			<bounds left="100" top="0" right="109" bottom="15" />
+		</bezel>
+		<bezel name="digit8" element="digit">
+			<bounds left="110" top="0" right="119" bottom="15" />
+		</bezel>
+		<bezel name="digit7" element="digit">
+			<bounds left="120" top="0" right="129" bottom="15" />
+		</bezel>
+		<bezel name="digit6" element="digit">
+			<bounds left="130" top="0" right="139" bottom="15" />
+		</bezel>
+		<bezel name="digit5" element="digit">
+			<bounds left="140" top="0" right="149" bottom="15" />
+		</bezel>
+		<bezel name="digit4" element="digit">
+			<bounds left="150" top="0" right="159" bottom="15" />
+		</bezel>
+	</view>
+</mamelayout>

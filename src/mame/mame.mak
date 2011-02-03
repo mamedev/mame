@@ -892,6 +892,7 @@ $(MAMEOBJ)/midcoin.a: \
 $(MAMEOBJ)/midw8080.a: \
 	$(DRIVERS)/8080bw.o $(AUDIO)/8080bw.o $(VIDEO)/8080bw.o \
 	$(DRIVERS)/m79amb.o $(AUDIO)/m79amb.o \
+	$(DRIVERS)/mw18w.o \
 	$(DRIVERS)/mw8080bw.o $(MACHINE)/mw8080bw.o $(AUDIO)/mw8080bw.o $(VIDEO)/mw8080bw.o \
 	$(DRIVERS)/rotaryf.o \
 	$(DRIVERS)/sspeedr.o $(VIDEO)/sspeedr.o \
@@ -1876,6 +1877,8 @@ $(DRIVERS)/mpoker.o:	$(LAYOUT)/mpoker.lh
 $(DRIVERS)/mpu4.o:		$(LAYOUT)/mpu4.lh \
 						$(LAYOUT)/connect4.lh \
 						$(LAYOUT)/gamball.lh
+
+$(DRIVERS)/mw18w.o:		$(LAYOUT)/18w.lh
 
 $(DRIVERS)/mw8080bw.o:	$(LAYOUT)/280zzzap.lh \
 						$(LAYOUT)/clowns.lh \

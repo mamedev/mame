@@ -1383,6 +1383,8 @@ const game_driver * const drivers[] =
 	DRIVER( cosmo )		/* TDS+Mints */
 	DRIVER( darthvdr )	/* bootleg */
 
+	DRIVER( 18w )		/* 653 (c) 1979 Midway */
+	DRIVER( 18w2 )		/* 653 (c) 1979 Midway */
 	DRIVER( sspeedr )	/* 1979 Midway */
 
 	/* Similar but with a M6800 instead of an 8080 */
