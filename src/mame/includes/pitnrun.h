@@ -5,6 +5,24 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	int nmi;
+	UINT8* videoram2;
+	UINT8 fromz80;
+	UINT8 toz80;
+	int zaccept;
+	int zready;
+	UINT8 portA_in;
+	UINT8 portA_out;
+	int address;
+	int h_heed;
+	int v_heed;
+	int ha;
+	int scroll;
+	int char_bank;
+	int color_select;
+	bitmap_t *tmp_bitmap[4];
+	tilemap_t *bg;
+	tilemap_t *fg;
 };
 
 
@@ -25,8 +43,6 @@ WRITE8_HANDLER( pitnrun_mcu_data_w );
 
 
 /*----------- defined in video/pitnrun.c -----------*/
-
-extern UINT8* pitnrun_videoram2;
 
 WRITE8_HANDLER( pitnrun_videoram_w );
 WRITE8_HANDLER( pitnrun_videoram2_w );

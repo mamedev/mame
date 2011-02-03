@@ -215,8 +215,6 @@ static WRITE8_HANDLER( slither_addresslatch_w )
  *
  *************************************/
 
-#define NUM_PENS	(0x100)
-
 
 static WRITE8_HANDLER( qix_paletteram_w )
 {
@@ -316,11 +314,9 @@ static MC6845_BEGIN_UPDATE( begin_update )
 #endif
 
 	/* create the pens */
-	static pen_t pens[NUM_PENS];
+	get_pens(state, state->pens);
 
-	get_pens(state, pens);
-
-	return pens;
+	return state->pens;
 }
 
 

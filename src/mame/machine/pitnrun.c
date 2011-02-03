@@ -12,32 +12,33 @@
 #include "includes/pitnrun.h"
 
 
-static UINT8 fromz80,toz80;
-static int zaccept,zready;
-
 MACHINE_RESET( pitnrun )
 {
-	zaccept = 1;
-	zready = 0;
+	pitnrun_state *state = machine->driver_data<pitnrun_state>();
+	state->zaccept = 1;
+	state->zready = 0;
 	cputag_set_input_line(machine, "mcu", 0, CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( pitnrun_mcu_real_data_r )
 {
-	zaccept = 1;
+	pitnrun_state *state = machine->driver_data<pitnrun_state>();
+	state->zaccept = 1;
 }
 
 READ8_HANDLER( pitnrun_mcu_data_r )
 {
+	pitnrun_state *state = space->machine->driver_data<pitnrun_state>();
 	timer_call_after_resynch(space->machine, NULL, 0,pitnrun_mcu_real_data_r);
-	return toz80;
+	return state->toz80;
 }
 
 static TIMER_CALLBACK( pitnrun_mcu_real_data_w )
 {
-	zready = 1;
+	pitnrun_state *state = machine->driver_data<pitnrun_state>();
+	state->zready = 1;
 	cputag_set_input_line(machine, "mcu", 0, ASSERT_LINE);
-	fromz80 = param;
+	state->fromz80 = param;
 }
 
 WRITE8_HANDLER( pitnrun_mcu_data_w )
@@ -48,22 +49,24 @@ WRITE8_HANDLER( pitnrun_mcu_data_w )
 
 READ8_HANDLER( pitnrun_mcu_status_r )
 {
+	pitnrun_state *state = space->machine->driver_data<pitnrun_state>();
 	/* mcu synchronization */
 	/* bit 0 = the 68705 has read data from the Z80 */
 	/* bit 1 = the 68705 has written data for the Z80 */
-	return ~((zready << 1) | (zaccept << 0));
+	return ~((state->zready << 1) | (state->zaccept << 0));
 }
 
-static UINT8 portA_in,portA_out;
 
 READ8_HANDLER( pitnrun_68705_portA_r )
 {
-	return portA_in;
+	pitnrun_state *state = space->machine->driver_data<pitnrun_state>();
+	return state->portA_in;
 }
 
 WRITE8_HANDLER( pitnrun_68705_portA_w )
 {
-	portA_out = data;
+	pitnrun_state *state = space->machine->driver_data<pitnrun_state>();
+	state->portA_out = data;
 }
 
 
@@ -91,49 +94,51 @@ READ8_HANDLER( pitnrun_68705_portB_r )
 	return 0xff;
 }
 
-static int address;
 
 static TIMER_CALLBACK( pitnrun_mcu_data_real_r )
 {
-	zready = 0;
+	pitnrun_state *state = machine->driver_data<pitnrun_state>();
+	state->zready = 0;
 }
 
 static TIMER_CALLBACK( pitnrun_mcu_status_real_w )
 {
-	toz80 = param;
-	zaccept = 0;
+	pitnrun_state *state = machine->driver_data<pitnrun_state>();
+	state->toz80 = param;
+	state->zaccept = 0;
 }
 
 WRITE8_HANDLER( pitnrun_68705_portB_w )
 {
+	pitnrun_state *state = space->machine->driver_data<pitnrun_state>();
 	address_space *cpu0space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	if (~data & 0x02)
 	{
 		/* 68705 is going to read data from the Z80 */
 		timer_call_after_resynch(space->machine, NULL, 0,pitnrun_mcu_data_real_r);
 		cputag_set_input_line(space->machine, "mcu",0,CLEAR_LINE);
-		portA_in = fromz80;
+		state->portA_in = state->fromz80;
 	}
 	if (~data & 0x04)
 	{
 		/* 68705 is writing data for the Z80 */
-		timer_call_after_resynch(space->machine, NULL, portA_out,pitnrun_mcu_status_real_w);
+		timer_call_after_resynch(space->machine, NULL, state->portA_out,pitnrun_mcu_status_real_w);
 	}
 	if (~data & 0x10)
 	{
-		cpu0space->write_byte(address, portA_out);
+		cpu0space->write_byte(state->address, state->portA_out);
 	}
 	if (~data & 0x20)
 	{
-		portA_in = cpu0space->read_byte(address);
+		state->portA_in = cpu0space->read_byte(state->address);
 	}
 	if (~data & 0x40)
 	{
-		address = (address & 0xff00) | portA_out;
+		state->address = (state->address & 0xff00) | state->portA_out;
 	}
 	if (~data & 0x80)
 	{
-		address = (address & 0x00ff) | (portA_out << 8);
+		state->address = (state->address & 0x00ff) | (state->portA_out << 8);
 	}
 }
 
@@ -149,5 +154,6 @@ WRITE8_HANDLER( pitnrun_68705_portB_w )
 
 READ8_HANDLER( pitnrun_68705_portC_r )
 {
-	return (zready << 0) | (zaccept << 1);
+	pitnrun_state *state = space->machine->driver_data<pitnrun_state>();
+	return (state->zready << 0) | (state->zaccept << 1);
 }

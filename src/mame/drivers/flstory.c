@@ -158,29 +158,27 @@ static ADDRESS_MAP_START( victnine_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_MEMBER(flstory_state, workram) /* work RAM */
 ADDRESS_MAP_END
 
-static UINT8 mcu_cmd,mcu_counter,mcu_b4_cmd;
-static UINT8 mcu_param;
-static UINT8 mcu_b2_res,mcu_b1_res,mcu_bb_res,mcu_b5_res,mcu_b6_res;
 
 static READ8_HANDLER( rumba_mcu_r )
 {
-	//printf("PC=%04x R %02x\n",cpu_get_pc(space->cpu),mcu_cmd);
+	flstory_state *state = space->machine->driver_data<flstory_state>();
+	//printf("PC=%04x R %02x\n",cpu_get_pc(space->cpu),state->mcu_cmd);
 
-	if((mcu_cmd & 0xf0) == 0x00) // end packet cmd, value returned is meaningless (probably used for main <-> mcu comms syncronization)
+	if((state->mcu_cmd & 0xf0) == 0x00) // end packet cmd, value returned is meaningless (probably used for main <-> mcu comms syncronization)
 		return 0;
 
-	switch(mcu_cmd)
+	switch(state->mcu_cmd)
 	{
 		case 0x73: return 0xa4; //initial MCU check
-		case 0x33: return mcu_b2_res; //0xb2 result
-		case 0x31: return mcu_b1_res; //0xb1 result
+		case 0x33: return state->mcu_b2_res; //0xb2 result
+		case 0x31: return state->mcu_b1_res; //0xb1 result
 
-		case 0x35: mcu_b5_res = 1; mcu_b6_res = 1; return 0;
-		case 0x36: return mcu_b4_cmd; //0xb4 command, extra protection for lives (first play only), otherwise game gives one extra life at start-up (!)
-		case 0x37: return mcu_b5_res; //0xb4 / 0xb5 / 0xb6 result y value
-		case 0x38: return mcu_b6_res; //x value
+		case 0x35: state->mcu_b5_res = 1; state->mcu_b6_res = 1; return 0;
+		case 0x36: return state->mcu_b4_cmd; //0xb4 command, extra protection for lives (first play only), otherwise game gives one extra life at start-up (!)
+		case 0x37: return state->mcu_b5_res; //0xb4 / 0xb5 / 0xb6 result y value
+		case 0x38: return state->mcu_b6_res; //x value
 
-		case 0x3b: return mcu_bb_res; //0xbb result
+		case 0x3b: return state->mcu_bb_res; //0xbb result
 		case 0x40: return 0;
 		case 0x41: return 0;
 		case 0x42:
@@ -207,7 +205,7 @@ static READ8_HANDLER( rumba_mcu_r )
 			return 0;
 		}
 		//case 0x42: return 0x06;
-		//default:  printf("PC=%04x R %02x\n",cpu_get_pc(space->cpu),mcu_cmd); break;
+		//default:  printf("PC=%04x R %02x\n",cpu_get_pc(space->cpu),state->mcu_cmd); break;
 	}
 
 	return 0;
@@ -215,19 +213,20 @@ static READ8_HANDLER( rumba_mcu_r )
 
 static WRITE8_HANDLER( rumba_mcu_w )
 {
-	//if((mcu_cmd & 0xf0) == 0xc0)
+	flstory_state *state = space->machine->driver_data<flstory_state>();
+	//if((state->mcu_cmd & 0xf0) == 0xc0)
 	//  printf("%02x ",data);
 
-	//if(mcu_cmd == 0x42)
+	//if(state->mcu_cmd == 0x42)
 	//  printf("\n");
 
-	if(mcu_param)
+	if(state->mcu_param)
 	{
-		mcu_param = 0; // clear param
+		state->mcu_param = 0; // clear param
 
-		//printf("%02x %02x\n",mcu_cmd,data);
+		//printf("%02x %02x\n",state->mcu_cmd,data);
 
-		switch(mcu_cmd)
+		switch(state->mcu_cmd)
 		{
 			case 0xb0: // counter, used by command 0xb1 (and something else?
 			{
@@ -235,21 +234,21 @@ static WRITE8_HANDLER( rumba_mcu_w )
                 sends 0xb0 -> param then 0xb1 -> param -> 0x01 (end of cmd packet?) finally 0x31 for reply
                 */
 
-				mcu_counter = data;
+				state->mcu_counter = data;
 
 				break;
 			}
 			case 0xb1: // player death sequence, controls X position
 			{
-				mcu_b1_res = data;
+				state->mcu_b1_res = data;
 
 				/* TODO: this is pretty hard to simulate ... */
-				if(mcu_counter >= 0x10)
-					mcu_b1_res++; // left
-				else if(mcu_counter >= 0x08)
-					mcu_b1_res--; // right
+				if(state->mcu_counter >= 0x10)
+					state->mcu_b1_res++; // left
+				else if(state->mcu_counter >= 0x08)
+					state->mcu_b1_res--; // right
 				else
-					mcu_b1_res++; // left again
+					state->mcu_b1_res++; // left again
 
 				break;
 			}
@@ -261,10 +260,10 @@ static WRITE8_HANDLER( rumba_mcu_w )
 
 				switch(data)
 				{
-					case 1: mcu_b2_res = 0xaa; break; //left
-					case 2: mcu_b2_res = 0xaa; break; //right
-					case 4: mcu_b2_res = 0xab; break; //down
-					case 8: mcu_b2_res = 0xa9; break; //up
+					case 1: state->mcu_b2_res = 0xaa; break; //left
+					case 2: state->mcu_b2_res = 0xaa; break; //right
+					case 4: state->mcu_b2_res = 0xab; break; //down
+					case 8: state->mcu_b2_res = 0xa9; break; //up
 				}
 				break;
 			}
@@ -274,15 +273,15 @@ static WRITE8_HANDLER( rumba_mcu_w )
                 sends 0xbb -> param -> 0x04 (end of cmd packet?) then 0x3b for reply
                 */
 
-				mcu_bb_res = data;
-				//printf("PC=%04x W %02x -> %02x\n",cpu_get_pc(space->cpu),mcu_cmd,data);
+				state->mcu_bb_res = data;
+				//printf("PC=%04x W %02x -> %02x\n",cpu_get_pc(space->cpu),state->mcu_cmd,data);
 				break;
 			}
 			case 0xb4: // when the bird touches the top / bottom / left / right of the screen, for correct repositioning
 			{
-				mcu_b4_cmd = data;
+				state->mcu_b4_cmd = data;
 
-				//popmessage("%02x",mcu_b4_cmd);
+				//popmessage("%02x",state->mcu_b4_cmd);
 
 				/*
                 sends 0xb4 -> param -> 0xb5 -> param (bird X coord) -> 0xb6 -> param (bird Y coord) ->
@@ -302,43 +301,43 @@ static WRITE8_HANDLER( rumba_mcu_w )
 			case 0xb5: // bird X coord
 			{
 				/* TODO: values might be off by one */
-				mcu_b5_res = data;
+				state->mcu_b5_res = data;
 
-				if(mcu_b4_cmd == 3) // from right to left
-					mcu_b5_res = 0x0d;
+				if(state->mcu_b4_cmd == 3) // from right to left
+					state->mcu_b5_res = 0x0d;
 
-				if(mcu_b4_cmd == 2) // from left to right
-					mcu_b5_res = 0xe4;
+				if(state->mcu_b4_cmd == 2) // from left to right
+					state->mcu_b5_res = 0xe4;
 
 				break;
 			}
 			case 0xb6: // bird Y coord
 			{
-				mcu_b6_res = data;
+				state->mcu_b6_res = data;
 
-				if(mcu_b4_cmd == 1) // from up to down
-					mcu_b6_res = 0x04;
+				if(state->mcu_b4_cmd == 1) // from up to down
+					state->mcu_b6_res = 0x04;
 
-				if(mcu_b4_cmd == 4) // from down to up
-					mcu_b6_res = 0xdc;
+				if(state->mcu_b4_cmd == 4) // from down to up
+					state->mcu_b6_res = 0xdc;
 
 				break;
 			}
 		}
 
-		//if((mcu_cmd & 0xf0) == 0xc0)
+		//if((state->mcu_cmd & 0xf0) == 0xc0)
 		//  printf("%02x ",data);
 
-		//if(mcu_cmd == 0xc7)
+		//if(state->mcu_cmd == 0xc7)
 		//  printf("\n");
 
 		return;
 	}
 
-	mcu_cmd = data;
+	state->mcu_cmd = data;
 
-	if(((data & 0xf0) == 0xb0 || (data & 0xf0) == 0xc0) && mcu_param == 0)
-		mcu_param = 1;
+	if(((data & 0xf0) == 0xb0 || (data & 0xf0) == 0xc0) && state->mcu_param == 0)
+		state->mcu_param = 1;
 }
 
 static ADDRESS_MAP_START( rumba_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1267,8 +1266,9 @@ MACHINE_CONFIG_END
 
 static MACHINE_RESET( rumba )
 {
+	flstory_state *state = machine->driver_data<flstory_state>();
 	MACHINE_RESET_CALL(flstory);
-	mcu_cmd = 0;
+	state->mcu_cmd = 0;
 }
 
 static MACHINE_CONFIG_START( rumba, flstory_state )

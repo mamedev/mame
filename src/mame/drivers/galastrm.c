@@ -46,14 +46,13 @@ $305.b invincibility
 #include "audio/taito_en.h"
 #include "includes/galastrm.h"
 
-static UINT16 coin_word, frame_counter=0;
-static UINT32 *galastrm_ram;
 
 /*********************************************************************/
 
 static INTERRUPT_GEN( galastrm_interrupt )
 {
-	frame_counter ^= 1;
+	galastrm_state *state = device->machine->driver_data<galastrm_state>();
+	state->frame_counter ^= 1;
 	cpu_set_input_line(device, 5, HOLD_LINE);
 }
 
@@ -63,55 +62,57 @@ static TIMER_CALLBACK( galastrm_interrupt6 )
 }
 
 
-static int tc0110pcr_addr;
-static int tc0610_0_addr;
-static int tc0610_1_addr;
 
 static WRITE32_HANDLER( galastrm_palette_w )
 {
+	galastrm_state *state = space->machine->driver_data<galastrm_state>();
 	if (ACCESSING_BITS_16_31)
-		tc0110pcr_addr = data >> 16;
-	if ((ACCESSING_BITS_0_15) && (tc0110pcr_addr < 4096))
-		palette_set_color_rgb(space->machine, tc0110pcr_addr, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+		state->tc0110pcr_addr = data >> 16;
+	if ((ACCESSING_BITS_0_15) && (state->tc0110pcr_addr < 4096))
+		palette_set_color_rgb(space->machine, state->tc0110pcr_addr, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 static WRITE32_HANDLER( galastrm_tc0610_0_w )
 {
+	galastrm_state *state = space->machine->driver_data<galastrm_state>();
 	if (ACCESSING_BITS_16_31)
-		tc0610_0_addr = data >> 16;
-	if ((ACCESSING_BITS_0_15) && (tc0610_0_addr < 8))
-		galastrm_tc0610_ctrl_reg[0][tc0610_0_addr] = data;
+		state->tc0610_0_addr = data >> 16;
+	if ((ACCESSING_BITS_0_15) && (state->tc0610_0_addr < 8))
+		state->tc0610_ctrl_reg[0][state->tc0610_0_addr] = data;
 }
 
 static WRITE32_HANDLER( galastrm_tc0610_1_w )
 {
+	galastrm_state *state = space->machine->driver_data<galastrm_state>();
 	if (ACCESSING_BITS_16_31)
-		tc0610_1_addr = data >> 16;
-	if ((ACCESSING_BITS_0_15) && (tc0610_1_addr < 8))
-		galastrm_tc0610_ctrl_reg[1][tc0610_1_addr] = data;
+		state->tc0610_1_addr = data >> 16;
+	if ((ACCESSING_BITS_0_15) && (state->tc0610_1_addr < 8))
+		state->tc0610_ctrl_reg[1][state->tc0610_1_addr] = data;
 }
 
 
 static CUSTOM_INPUT( frame_counter_r )
 {
-	return frame_counter;
+	galastrm_state *state = field->port->machine->driver_data<galastrm_state>();
+	return state->frame_counter;
 }
 
 static CUSTOM_INPUT( coin_word_r )
 {
-	return coin_word;
+	galastrm_state *state = field->port->machine->driver_data<galastrm_state>();
+	return state->coin_word;
 }
 
 static WRITE32_HANDLER( galastrm_input_w )
 {
+	galastrm_state *state = space->machine->driver_data<galastrm_state>();
 
 #if 0
 {
 char t[64];
-static UINT32 mem[2];
-COMBINE_DATA(&mem[offset]);
+COMBINE_DATA(&state->mem[offset]);
 
-sprintf(t,"%08x %08x",mem[0],mem[1]);
+sprintf(t,"%08x %08x",state->mem[0],state->mem[1]);
 popmessage(t);
 }
 #endif
@@ -144,7 +145,7 @@ popmessage(t);
 				coin_lockout_w(space->machine, 1, ~data & 0x02000000);
 				coin_counter_w(space->machine, 0, data & 0x04000000);
 				coin_counter_w(space->machine, 1, data & 0x04000000);
-				coin_word = (data >> 16) &0xffff;
+				state->coin_word = (data >> 16) &0xffff;
 			}
 //logerror("CPU #0 PC %06x: write input %06x\n",cpu_get_pc(space->cpu),offset);
 		}
@@ -174,7 +175,7 @@ static WRITE32_HANDLER( galastrm_adstick_ctrl_w )
 
 static ADDRESS_MAP_START( galastrm_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE(&galastrm_ram)								/* main CPUA ram */
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE_MEMBER(galastrm_state, ram)								/* main CPUA ram */
 	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x400000, 0x400003) AM_READ_PORT("IN0")
 	AM_RANGE(0x400004, 0x400007) AM_READ_PORT("IN1")
@@ -312,7 +313,7 @@ static const tc0480scp_interface galastrm_tc0480scp_intf =
 	0		/* col_base */
 };
 
-static MACHINE_CONFIG_START( galastrm, driver_device )
+static MACHINE_CONFIG_START( galastrm, galastrm_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(galastrm_map)

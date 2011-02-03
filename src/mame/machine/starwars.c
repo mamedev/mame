@@ -328,7 +328,7 @@ static void run_mproc(running_machine *machine)
 
 			state->ACC += (((INT32)(state->A - state->B) << 1) * state->C) << 1;
 
-			/* state->A and state->B are sign extended (requred by the ls384). After
+			/* A and B are sign extended (requred by the ls384). After
              * multiplication they just contain the sign.
              */
 			state->A = (state->A & 0x8000)? 0xffff: 0;
@@ -355,7 +355,7 @@ static void run_mproc(running_machine *machine)
          * leaking from one to another.  It may not matter, but I've put it in anyway
          */
 		tmp = state->MPA + 1;
-		state->MPA = (state->MPA & 0x0300) | (tmp & 0x00ff); /* New state->MPA value */
+		state->MPA = (state->MPA & 0x0300) | (tmp & 0x00ff); /* New MPA value */
 
 		M_STOP--; /* Decrease count */
 	}

@@ -71,9 +71,6 @@
 #include "audio/taito_en.h"
 #include "includes/groundfx.h"
 
-static UINT16 coin_word, frame_counter=0;
-static UINT16 port_sel = 0;
-static UINT32 *groundfx_ram;
 
 /***********************************************************
                 COLOR RAM
@@ -130,16 +127,19 @@ static const eeprom_interface groundfx_eeprom_interface =
 
 static CUSTOM_INPUT( frame_counter_r )
 {
-	return frame_counter;
+	groundfx_state *state = field->port->machine->driver_data<groundfx_state>();
+	return state->frame_counter;
 }
 
 static CUSTOM_INPUT( coin_word_r )
 {
-	return coin_word;
+	groundfx_state *state = field->port->machine->driver_data<groundfx_state>();
+	return state->coin_word;
 }
 
 static WRITE32_HANDLER( groundfx_input_w )
 {
+	groundfx_state *state = space->machine->driver_data<groundfx_state>();
 	switch (offset)
 	{
 		case 0x00:
@@ -162,7 +162,7 @@ static WRITE32_HANDLER( groundfx_input_w )
 				coin_lockout_w(space->machine, 1,~data & 0x02000000);
 				coin_counter_w(space->machine, 0, data & 0x04000000);
 				coin_counter_w(space->machine, 1, data & 0x08000000);
-				coin_word = (data >> 16) &0xffff;
+				state->coin_word = (data >> 16) &0xffff;
 			}
 			break;
 	}
@@ -182,15 +182,16 @@ static WRITE32_HANDLER( groundfx_adc_w )
 
 static WRITE32_HANDLER( rotate_control_w )	/* only a guess that it's rotation */
 {
+	groundfx_state *state = space->machine->driver_data<groundfx_state>();
 		if (ACCESSING_BITS_0_15)
 		{
-			groundfx_rotate_ctrl[port_sel] = data;
+			state->rotate_ctrl[state->port_sel] = data;
 			return;
 		}
 
 		if (ACCESSING_BITS_16_31)
 		{
-			port_sel = (data &0x70000) >> 16;
+			state->port_sel = (data &0x70000) >> 16;
 		}
 }
 
@@ -217,7 +218,7 @@ static WRITE32_HANDLER( motor_control_w )
 
 static ADDRESS_MAP_START( groundfx_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM	AM_BASE(&groundfx_ram) /* main CPUA ram */
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM	AM_BASE_MEMBER(groundfx_state, ram) /* main CPUA ram */
 	AM_RANGE(0x300000, 0x303fff) AM_RAM	AM_BASE_SIZE_GENERIC(spriteram) /* sprite ram */
 	AM_RANGE(0x400000, 0x400003) AM_WRITE(motor_control_w)	/* gun vibration */
 	AM_RANGE(0x500000, 0x500003) AM_READ_PORT("BUTTONS")
@@ -360,11 +361,12 @@ static const tc0480scp_interface groundfx_tc0480scp_intf =
 
 static INTERRUPT_GEN( groundfx_interrupt )
 {
-	frame_counter^=1;
+	groundfx_state *state = device->machine->driver_data<groundfx_state>();
+	state->frame_counter^=1;
 	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( groundfx, driver_device )
+static MACHINE_CONFIG_START( groundfx, groundfx_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
@@ -440,17 +442,18 @@ ROM_END
 
 static READ32_HANDLER( irq_speedup_r_groundfx )
 {
+	groundfx_state *state = space->machine->driver_data<groundfx_state>();
 	cpu_device *cpu = downcast<cpu_device *>(space->cpu);
 	int ptr;
 	offs_t sp = cpu->sp();
-	if ((sp&2)==0) ptr=groundfx_ram[(sp&0x1ffff)/4];
-	else ptr=(((groundfx_ram[(sp&0x1ffff)/4])&0x1ffff)<<16) |
-	(groundfx_ram[((sp&0x1ffff)/4)+1]>>16);
+	if ((sp&2)==0) ptr=state->ram[(sp&0x1ffff)/4];
+	else ptr=(((state->ram[(sp&0x1ffff)/4])&0x1ffff)<<16) |
+	(state->ram[((sp&0x1ffff)/4)+1]>>16);
 
 	if (cpu->pc()==0x1ece && ptr==0x1b9a)
 		cpu->spin_until_interrupt();
 
-	return groundfx_ram[0xb574/4];
+	return state->ram[0xb574/4];
 }
 
 

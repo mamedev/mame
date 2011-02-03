@@ -592,10 +592,10 @@ static READ32_HANDLER(dsp_shared_r)
 #define DEBUG_BLOCK_MOVES		0
 
 #if DEBUG_DSP
-static UINT16 debug_dsp_ram[0x8000];
 
 static void debug_dsp_command(void)
 {
+	taitojc_state *state = machine->driver_data<taitojc_state>();
 	UINT16 *cmd = &dsp_shared_ram[0x7f0];
 
 	switch (cmd[0])
@@ -638,7 +638,7 @@ static void debug_dsp_command(void)
 						UINT16 d = dsp_shared_ram[saddr++];
 						if (daddr >= 0x8000 && daddr < 0x10000)
 						{
-							debug_dsp_ram[daddr-0x8000] = d;
+							state->debug_dsp_ram[daddr-0x8000] = d;
 						}
 						daddr++;
 
@@ -678,7 +678,7 @@ static void debug_dsp_command(void)
 				while (!end)
 				{
 					int i;
-					UINT16 cmd = debug_dsp_ram[addr++];
+					UINT16 cmd = state->debug_dsp_ram[addr++];
 					int length = cmd & 0xff;
 
 					if ((cmd >> 11) == 6)
@@ -687,7 +687,7 @@ static void debug_dsp_command(void)
 					printf("   %04X (%02X): ", cmd, cmd >> 11);
 					for (i=0; i < length; i++)
 					{
-						printf("%04X ", debug_dsp_ram[addr+i]);
+						printf("%04X ", state->debug_dsp_ram[addr+i]);
 					}
 					printf("\n");
 

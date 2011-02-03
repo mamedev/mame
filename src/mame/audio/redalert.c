@@ -36,17 +36,6 @@
 
 /*************************************
  *
- *  Statics
- *
- *************************************/
-
-static UINT8 ay8910_latch_1;
-static UINT8 ay8910_latch_2;
-
-
-
-/*************************************
- *
  *  Read Alert analog sounds
  *
  *************************************/
@@ -87,6 +76,7 @@ WRITE8_HANDLER( redalert_audio_command_w )
 
 static WRITE8_DEVICE_HANDLER( redalert_AY8910_w )
 {
+	redalert_state *state = device->machine->driver_data<redalert_state>();
 	/* BC2 is connected to a pull-up resistor, so BC2=1 always */
 	switch (data & 0x03)
 	{
@@ -96,7 +86,7 @@ static WRITE8_DEVICE_HANDLER( redalert_AY8910_w )
 
 		/* BC1=1, BDIR=0 : read from PSG */
 		case 0x01:
-			ay8910_latch_1 = ay8910_r(device, 0);
+			state->ay8910_latch_1 = ay8910_r(device, 0);
 			break;
 
 		/* BC1=0, BDIR=1 : write to PSG */
@@ -104,7 +94,7 @@ static WRITE8_DEVICE_HANDLER( redalert_AY8910_w )
 		case 0x02:
 		case 0x03:
 		default:
-			ay8910_data_address_w(device, data, ay8910_latch_2);
+			ay8910_data_address_w(device, data, state->ay8910_latch_2);
 			break;
 	}
 }
@@ -112,13 +102,15 @@ static WRITE8_DEVICE_HANDLER( redalert_AY8910_w )
 
 static READ8_HANDLER( redalert_ay8910_latch_1_r )
 {
-	return ay8910_latch_1;
+	redalert_state *state = space->machine->driver_data<redalert_state>();
+	return state->ay8910_latch_1;
 }
 
 
 static WRITE8_HANDLER( redalert_ay8910_latch_2_w )
 {
-	ay8910_latch_2 = data;
+	redalert_state *state = space->machine->driver_data<redalert_state>();
+	state->ay8910_latch_2 = data;
 }
 
 
@@ -150,8 +142,9 @@ ADDRESS_MAP_END
 
 static SOUND_START( redalert_audio )
 {
-	state_save_register_global(machine, ay8910_latch_1);
-	state_save_register_global(machine, ay8910_latch_2);
+	redalert_state *state = machine->driver_data<redalert_state>();
+	state_save_register_global(machine, state->ay8910_latch_1);
+	state_save_register_global(machine, state->ay8910_latch_2);
 }
 
 
@@ -297,52 +290,55 @@ WRITE8_HANDLER( demoneye_audio_command_w )
 
 static WRITE8_DEVICE_HANDLER( demoneye_ay8910_latch_1_w )
 {
-	ay8910_latch_1 = data;
+	redalert_state *state = device->machine->driver_data<redalert_state>();
+	state->ay8910_latch_1 = data;
 }
 
 
 static READ8_DEVICE_HANDLER( demoneye_ay8910_latch_2_r )
 {
-	return ay8910_latch_2;
+	redalert_state *state = device->machine->driver_data<redalert_state>();
+	return state->ay8910_latch_2;
 }
 
 
 static WRITE8_DEVICE_HANDLER( demoneye_ay8910_data_w )
 {
+	redalert_state *state = device->machine->driver_data<redalert_state>();
 	device_t *ay1 = device->machine->device("ay1");
 	device_t *ay2 = device->machine->device("ay2");
 
-	switch (ay8910_latch_1 & 0x03)
+	switch (state->ay8910_latch_1 & 0x03)
 	{
 		case 0x00:
-			if (ay8910_latch_1 & 0x10)
+			if (state->ay8910_latch_1 & 0x10)
 				ay8910_data_w(ay1, 0, data);
 
-			if (ay8910_latch_1 & 0x20)
+			if (state->ay8910_latch_1 & 0x20)
 				ay8910_data_w(ay2, 0, data);
 
 			break;
 
 		case 0x01:
-			if (ay8910_latch_1 & 0x10)
-				ay8910_latch_2 = ay8910_r(ay1, 0);
+			if (state->ay8910_latch_1 & 0x10)
+				state->ay8910_latch_2 = ay8910_r(ay1, 0);
 
-			if (ay8910_latch_1 & 0x20)
-				ay8910_latch_2 = ay8910_r(ay2, 0);
+			if (state->ay8910_latch_1 & 0x20)
+				state->ay8910_latch_2 = ay8910_r(ay2, 0);
 
 			break;
 
 		case 0x03:
-			if (ay8910_latch_1 & 0x10)
+			if (state->ay8910_latch_1 & 0x10)
 				ay8910_address_w(ay1, 0, data);
 
-			if (ay8910_latch_1 & 0x20)
+			if (state->ay8910_latch_1 & 0x20)
 				ay8910_address_w(ay2, 0, data);
 
 			break;
 
 		default:
-			logerror("demoneye_ay8910_data_w called with latch %02X  data %02X\n", ay8910_latch_1, data);
+			logerror("demoneye_ay8910_data_w called with latch %02X  data %02X\n", state->ay8910_latch_1, data);
 			break;
 	}
 }
@@ -393,8 +389,9 @@ static const pia6821_interface demoneye_pia_intf =
 
 static SOUND_START( demoneye )
 {
-	state_save_register_global(machine, ay8910_latch_1);
-	state_save_register_global(machine, ay8910_latch_2);
+	redalert_state *state = machine->driver_data<redalert_state>();
+	state_save_register_global(machine, state->ay8910_latch_1);
+	state_save_register_global(machine, state->ay8910_latch_2);
 }
 
 

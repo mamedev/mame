@@ -145,40 +145,41 @@ static ADDRESS_MAP_START( bking_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 #if 0
-static UINT8 port_a_in,port_a_out,ddr_a;
-
 static READ8_HANDLER( bking3_68705_port_a_r )
 {
-	//printf("port_a_r = %02X\n",(port_a_out & ddr_a) | (port_a_in & ~ddr_a));
-	return (port_a_out & ddr_a) | (port_a_in & ~ddr_a);
+	bking_state *state = space->machine->driver_data<bking_state>();
+	//printf("port_a_r = %02X\n",(state->port_a_out & state->ddr_a) | (state->port_a_in & ~state->ddr_a));
+	return (state->port_a_out & state->ddr_a) | (state->port_a_in & ~state->ddr_a);
 }
 
 static WRITE8_HANDLER( bking3_68705_port_a_w )
 {
-	port_a_out = data;
+	bking_state *state = space->machine->driver_data<bking_state>();
+	state->port_a_out = data;
 //  printf("port_a_out = %02X\n",data);
 }
 
 static WRITE8_HANDLER( bking3_68705_ddr_a_w )
 {
-	ddr_a = data;
+	bking_state *state = space->machine->driver_data<bking_state>();
+	state->ddr_a = data;
 }
-
-static UINT8 port_b_in,port_b_out,ddr_b;
 
 static READ8_HANDLER( bking3_68705_port_b_r )
 {
-	return (port_b_out & ddr_b) | (port_b_in & ~ddr_b);
+	bking_state *state = space->machine->driver_data<bking_state>();
+	return (state->port_b_out & state->ddr_b) | (state->port_b_in & ~state->ddr_b);
 }
 
 static WRITE8_HANDLER( bking3_68705_port_b_w )
 {
+	bking_state *state = space->machine->driver_data<bking_state>();
 //  if(data != 0xff)
 //      printf("port_b_out = %02X\n",data);
 
 	if (~data & 0x02)
 	{
-		port_a_in = from_main;
+		state->port_a_in = from_main;
 		if (main_sent) cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
 		main_sent = 0;
 	}
@@ -186,19 +187,20 @@ static WRITE8_HANDLER( bking3_68705_port_b_w )
 	if (~data & 0x04)
 	{
 		/* 68705 is writing data for the Z80 */
-		from_mcu = port_a_out;
+		from_mcu = state->port_a_out;
 		mcu_sent = 1;
 	}
 
 	if(data != 0xff && data != 0xfb && data != 0xfd)
 		printf("port_b_w = %X\n",data);
 
-	port_b_out = data;
+	state->port_b_out = data;
 }
 
 static WRITE8_HANDLER( bking3_68705_ddr_b_w )
 {
-	ddr_b = data;
+	bking_state *state = space->machine->driver_data<bking_state>();
+	state->ddr_b = data;
 }
 
 static READ8_HANDLER( bking3_68705_port_c_r )

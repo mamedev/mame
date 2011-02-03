@@ -17,10 +17,25 @@
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
 
+
+class taitowlf_state : public driver_device
+{
+public:
+	taitowlf_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT32 *cga_ram;
+	UINT32 *bios_ram;
+	UINT8 mxtc_config_reg[256];
+	UINT8 piix4_config_reg[4][256];
+	int dma_channel;
+	UINT8 dma_offset[2][4];
+	UINT8 at_pages[0x10];
+};
+
+
 static void ide_interrupt(device_t *device, int state);
 
-static UINT32 *cga_ram;
-static UINT32 *bios_ram;
 
 static struct {
 	device_t	*pit8254;
@@ -71,9 +86,10 @@ static void draw_char(bitmap_t *bitmap, const rectangle *cliprect, const gfx_ele
 
 static VIDEO_UPDATE(taitowlf)
 {
+	taitowlf_state *state = screen->machine->driver_data<taitowlf_state>();
 	int i, j;
 	const gfx_element *gfx = screen->machine->gfx[0];
-	UINT32 *cga = cga_ram;
+	UINT32 *cga = state->cga_ram;
 	int index = 0;
 
 	bitmap_fill(bitmap, cliprect, 0);
@@ -118,17 +134,18 @@ static WRITE32_DEVICE_HANDLER(at32_dma8237_2_w)
 
 
 // Intel 82439TX System Controller (MXTC)
-static UINT8 mxtc_config_reg[256];
 
 static UINT8 mxtc_config_r(device_t *busdevice, device_t *device, int function, int reg)
 {
+	taitowlf_state *state = busdevice->machine->driver_data<taitowlf_state>();
 //  mame_printf_debug("MXTC: read %d, %02X\n", function, reg);
 
-	return mxtc_config_reg[reg];
+	return state->mxtc_config_reg[reg];
 }
 
 static void mxtc_config_w(device_t *busdevice, device_t *device, int function, int reg, UINT8 data)
 {
+	taitowlf_state *state = busdevice->machine->driver_data<taitowlf_state>();
 //  mame_printf_debug("%s:MXTC: write %d, %02X, %02X\n", cpuexec_describe_context(machine), function, reg, data);
 
 	switch(reg)
@@ -137,7 +154,7 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 		{
 			if (data & 0x10)		// enable RAM access to region 0xf0000 - 0xfffff
 			{
-				memory_set_bankptr(busdevice->machine, "bank1", bios_ram);
+				memory_set_bankptr(busdevice->machine, "bank1", state->bios_ram);
 			}
 			else					// disable RAM access (reads go to BIOS ROM)
 			{
@@ -147,17 +164,18 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 		}
 	}
 
-	mxtc_config_reg[reg] = data;
+	state->mxtc_config_reg[reg] = data;
 }
 
-static void intel82439tx_init(void)
+static void intel82439tx_init(running_machine *machine)
 {
-	mxtc_config_reg[0x60] = 0x02;
-	mxtc_config_reg[0x61] = 0x02;
-	mxtc_config_reg[0x62] = 0x02;
-	mxtc_config_reg[0x63] = 0x02;
-	mxtc_config_reg[0x64] = 0x02;
-	mxtc_config_reg[0x65] = 0x02;
+	taitowlf_state *state = machine->driver_data<taitowlf_state>();
+	state->mxtc_config_reg[0x60] = 0x02;
+	state->mxtc_config_reg[0x61] = 0x02;
+	state->mxtc_config_reg[0x62] = 0x02;
+	state->mxtc_config_reg[0x63] = 0x02;
+	state->mxtc_config_reg[0x64] = 0x02;
+	state->mxtc_config_reg[0x65] = 0x02;
 }
 
 static UINT32 intel82439tx_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
@@ -203,18 +221,19 @@ static void intel82439tx_pci_w(device_t *busdevice, device_t *device, int functi
 }
 
 // Intel 82371AB PCI-to-ISA / IDE bridge (PIIX4)
-static UINT8 piix4_config_reg[4][256];
 
 static UINT8 piix4_config_r(device_t *busdevice, device_t *device, int function, int reg)
 {
+	taitowlf_state *state = device->machine->driver_data<taitowlf_state>();
 //  mame_printf_debug("PIIX4: read %d, %02X\n", function, reg);
-	return piix4_config_reg[function][reg];
+	return state->piix4_config_reg[function][reg];
 }
 
 static void piix4_config_w(device_t *busdevice, device_t *device, int function, int reg, UINT8 data)
 {
+	taitowlf_state *state = busdevice->machine->driver_data<taitowlf_state>();
 //  mame_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", cpuexec_describe_context(machine), function, reg, data);
-	piix4_config_reg[function][reg] = data;
+	state->piix4_config_reg[function][reg] = data;
 }
 
 static UINT32 intel82371ab_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
@@ -303,9 +322,10 @@ static WRITE32_DEVICE_HANDLER( fdc_w )
 
 static WRITE32_HANDLER(bios_ram_w)
 {
-	if (mxtc_config_reg[0x59] & 0x20)		// write to RAM if this region is write-enabled
+	taitowlf_state *state = space->machine->driver_data<taitowlf_state>();
+	if (state->mxtc_config_reg[0x59] & 0x20)		// write to RAM if this region is write-enabled
 	{
-		COMBINE_DATA(bios_ram + offset);
+		COMBINE_DATA(state->bios_ram + offset);
 	}
 }
 
@@ -316,28 +336,26 @@ static WRITE32_HANDLER(bios_ram_w)
  *
  *************************************************************************/
 
-static int dma_channel;
-static UINT8 dma_offset[2][4];
-static UINT8 at_pages[0x10];
 
 
 static READ8_HANDLER(at_page8_r)
 {
-	UINT8 data = at_pages[offset % 0x10];
+	taitowlf_state *state = space->machine->driver_data<taitowlf_state>();
+	UINT8 data = state->at_pages[offset % 0x10];
 
 	switch(offset % 8)
 	{
 	case 1:
-		data = dma_offset[(offset / 8) & 1][2];
+		data = state->dma_offset[(offset / 8) & 1][2];
 		break;
 	case 2:
-		data = dma_offset[(offset / 8) & 1][3];
+		data = state->dma_offset[(offset / 8) & 1][3];
 		break;
 	case 3:
-		data = dma_offset[(offset / 8) & 1][1];
+		data = state->dma_offset[(offset / 8) & 1][1];
 		break;
 	case 7:
-		data = dma_offset[(offset / 8) & 1][0];
+		data = state->dma_offset[(offset / 8) & 1][0];
 		break;
 	}
 	return data;
@@ -346,21 +364,22 @@ static READ8_HANDLER(at_page8_r)
 
 static WRITE8_HANDLER(at_page8_w)
 {
-	at_pages[offset % 0x10] = data;
+	taitowlf_state *state = space->machine->driver_data<taitowlf_state>();
+	state->at_pages[offset % 0x10] = data;
 
 	switch(offset % 8)
 	{
 	case 1:
-		dma_offset[(offset / 8) & 1][2] = data;
+		state->dma_offset[(offset / 8) & 1][2] = data;
 		break;
 	case 2:
-		dma_offset[(offset / 8) & 1][3] = data;
+		state->dma_offset[(offset / 8) & 1][3] = data;
 		break;
 	case 3:
-		dma_offset[(offset / 8) & 1][1] = data;
+		state->dma_offset[(offset / 8) & 1][1] = data;
 		break;
 	case 7:
-		dma_offset[(offset / 8) & 1][0] = data;
+		state->dma_offset[(offset / 8) & 1][0] = data;
 		break;
 	}
 }
@@ -377,7 +396,8 @@ static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 
 static READ8_HANDLER( pc_dma_read_byte )
 {
-	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16)
+	taitowlf_state *state = space->machine->driver_data<taitowlf_state>();
+	offs_t page_offset = (((offs_t) state->dma_offset[0][state->dma_channel]) << 16)
 		& 0xFF0000;
 
 	return space->read_byte(page_offset + offset);
@@ -386,17 +406,37 @@ static READ8_HANDLER( pc_dma_read_byte )
 
 static WRITE8_HANDLER( pc_dma_write_byte )
 {
-	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16)
+	taitowlf_state *state = space->machine->driver_data<taitowlf_state>();
+	offs_t page_offset = (((offs_t) state->dma_offset[0][state->dma_channel]) << 16)
 		& 0xFF0000;
 
 	space->write_byte(page_offset + offset, data);
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( pc_dack0_w ) { if (state) dma_channel = 0; }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack1_w ) { if (state) dma_channel = 1; }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack2_w ) { if (state) dma_channel = 2; }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack3_w ) { if (state) dma_channel = 3; }
+static WRITE_LINE_DEVICE_HANDLER( pc_dack0_w )
+{
+	taitowlf_state *drvstate = device->machine->driver_data<taitowlf_state>();
+	if (state) drvstate->dma_channel = 0;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( pc_dack1_w )
+{
+	taitowlf_state *drvstate = device->machine->driver_data<taitowlf_state>();
+	if (state) drvstate->dma_channel = 1;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( pc_dack2_w )
+{
+	taitowlf_state *drvstate = device->machine->driver_data<taitowlf_state>();
+	if (state) drvstate->dma_channel = 2;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( pc_dack3_w )
+{
+	taitowlf_state *drvstate = device->machine->driver_data<taitowlf_state>();
+	if (state) drvstate->dma_channel = 3;
+}
 
 static I8237_INTERFACE( dma8237_1_config )
 {
@@ -437,7 +477,7 @@ static WRITE32_HANDLER(at_page32_w)
 static ADDRESS_MAP_START( taitowlf_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000affff) AM_RAM
-	AM_RANGE(0x000b0000, 0x000b7fff) AM_RAM AM_BASE(&cga_ram)
+	AM_RANGE(0x000b0000, 0x000b7fff) AM_RAM AM_BASE_MEMBER(taitowlf_state, cga_ram)
 	AM_RANGE(0x000e0000, 0x000effff) AM_RAM
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x000f0000, 0x000fffff) AM_WRITE(bios_ram_w)
@@ -597,7 +637,7 @@ static const struct pit8253_config taitowlf_pit8254_config =
 	}
 };
 
-static MACHINE_CONFIG_START( taitowlf, driver_device )
+static MACHINE_CONFIG_START( taitowlf, taitowlf_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM, 200000000)
@@ -673,11 +713,12 @@ static void taitowlf_set_keyb_int(running_machine *machine, int state)
 
 static DRIVER_INIT( taitowlf )
 {
-	bios_ram = auto_alloc_array(machine, UINT32, 0x10000/4);
+	taitowlf_state *state = machine->driver_data<taitowlf_state>();
+	state->bios_ram = auto_alloc_array(machine, UINT32, 0x10000/4);
 
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, taitowlf_set_keyb_int);
 
-	intel82439tx_init();
+	intel82439tx_init(machine);
 
 	kbdc8042_init(machine, &at8042);
 }

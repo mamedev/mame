@@ -1,18 +1,7 @@
 #include "emu.h"
 #include "includes/rollrace.h"
 
-UINT8 *rollrace_videoram;
-UINT8 *rollrace_colorram;
 
-static int ra_charbank[2] = { 0,0 };
-static int ra_bkgpage = 0;
-static int ra_bkgflip = 0;
-static int ra_chrbank = 0;
-static int ra_bkgpen = 0;
-static int ra_bkgcol = 0;
-static int ra_flipy = 0;
-static int ra_flipx = 0;
-static int ra_spritebank =0 ;
 
 #define	RA_FGCHAR_BASE	0
 #define RA_BGCHAR_BASE	4
@@ -20,48 +9,56 @@ static int ra_spritebank =0 ;
 
 WRITE8_HANDLER( rollrace_charbank_w)
 {
+	rollrace_state *state = space->machine->driver_data<rollrace_state>();
 
-	ra_charbank[offset&1] = data;
-	ra_chrbank = ra_charbank[0] | (ra_charbank[1] << 1) ;
+	state->ra_charbank[offset&1] = data;
+	state->ra_chrbank = state->ra_charbank[0] | (state->ra_charbank[1] << 1) ;
 }
 
 
 WRITE8_HANDLER( rollrace_bkgpen_w)
 {
-	ra_bkgpen = data;
+	rollrace_state *state = space->machine->driver_data<rollrace_state>();
+	state->ra_bkgpen = data;
 }
 
 WRITE8_HANDLER(rollrace_spritebank_w)
 {
-	ra_spritebank = data;
+	rollrace_state *state = space->machine->driver_data<rollrace_state>();
+	state->ra_spritebank = data;
 }
 
 WRITE8_HANDLER(rollrace_backgroundpage_w)
 {
+	rollrace_state *state = space->machine->driver_data<rollrace_state>();
 
-	ra_bkgpage = data & 0x1f;
-	ra_bkgflip = ( data & 0x80 ) >> 7;
+	state->ra_bkgpage = data & 0x1f;
+	state->ra_bkgflip = ( data & 0x80 ) >> 7;
 
 	/* 0x80 flip vertical */
 }
 
 WRITE8_HANDLER( rollrace_backgroundcolor_w )
 {
-	ra_bkgcol = data;
+	rollrace_state *state = space->machine->driver_data<rollrace_state>();
+	state->ra_bkgcol = data;
 }
 
 WRITE8_HANDLER( rollrace_flipy_w )
 {
-	ra_flipy = data & 0x01;
+	rollrace_state *state = space->machine->driver_data<rollrace_state>();
+	state->ra_flipy = data & 0x01;
 }
 
 WRITE8_HANDLER( rollrace_flipx_w )
 {
-	ra_flipx = data & 0x01;
+	rollrace_state *state = space->machine->driver_data<rollrace_state>();
+	state->ra_flipx = data & 0x01;
 }
 
 VIDEO_UPDATE( rollrace )
 {
+	rollrace_state *state = screen->machine->driver_data<rollrace_state>();
 	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
 	int offs;
 	int sx, sy;
@@ -70,12 +67,12 @@ VIDEO_UPDATE( rollrace )
 	const UINT8 *mem = screen->machine->region("user1")->base();
 
 	/* fill in background colour*/
-	bitmap_fill(bitmap,cliprect,ra_bkgpen);
+	bitmap_fill(bitmap,cliprect,state->ra_bkgpen);
 
 	/* draw road */
 	for (offs = 0x3ff; offs >= 0; offs--)
 		{
-			if(!(ra_bkgflip))
+			if(!(state->ra_bkgflip))
 				{
 				sy = ( 31 - offs / 32 ) ;
 				}
@@ -84,18 +81,18 @@ VIDEO_UPDATE( rollrace )
 
 			sx = ( offs%32 ) ;
 
-			if(ra_flipx)
+			if(state->ra_flipx)
 				sx = 31-sx ;
 
-			if(ra_flipy)
+			if(state->ra_flipy)
 				sy = 31-sy ;
 
 			drawgfx_transpen(bitmap,
 				cliprect,screen->machine->gfx[RA_BGCHAR_BASE],
-				mem[offs + ( ra_bkgpage * 1024 )]
-				+ ((( mem[offs + 0x4000 + ( ra_bkgpage * 1024 )] & 0xc0 ) >> 6 ) * 256 ) ,
-				ra_bkgcol,
-				ra_flipx,(ra_bkgflip^ra_flipy),
+				mem[offs + ( state->ra_bkgpage * 1024 )]
+				+ ((( mem[offs + 0x4000 + ( state->ra_bkgpage * 1024 )] & 0xc0 ) >> 6 ) * 256 ) ,
+				state->ra_bkgcol,
+				state->ra_flipx,(state->ra_bkgflip^state->ra_flipy),
 				sx*8,sy*8,0);
 
 
@@ -116,9 +113,9 @@ VIDEO_UPDATE( rollrace )
 		if(sx && sy)
 		{
 
-		if(ra_flipx)
+		if(state->ra_flipx)
 			sx = 224 - sx;
-		if(ra_flipy)
+		if(state->ra_flipy)
 			sy = 224 - sy;
 
 		if(spriteram[offs+1] & 0x80)
@@ -127,12 +124,12 @@ VIDEO_UPDATE( rollrace )
 		bank = (( spriteram[offs+1] & 0x40 ) >> 6 ) ;
 
 		if(bank)
-			bank += ra_spritebank;
+			bank += state->ra_spritebank;
 
 		drawgfx_transpen(bitmap, cliprect,screen->machine->gfx[ RA_SP_BASE + bank ],
 			spriteram[offs+1] & 0x3f ,
 			spriteram[offs+2] & 0x1f,
-			ra_flipx,!(s_flipy^ra_flipy),
+			state->ra_flipx,!(s_flipy^state->ra_flipy),
 			sx,sy,0);
 		}
 	}
@@ -147,20 +144,20 @@ VIDEO_UPDATE( rollrace )
 		sx =  offs % 32;
 		sy =  offs / 32;
 
-		scroll = ( 8 * sy + rollrace_colorram[2 * sx] ) % 256;
-		col = rollrace_colorram[ sx * 2 + 1 ]&0x1f;
+		scroll = ( 8 * sy + state->colorram[2 * sx] ) % 256;
+		col = state->colorram[ sx * 2 + 1 ]&0x1f;
 
-		if (!ra_flipy)
+		if (!state->ra_flipy)
 		{
 		   scroll = (248 - scroll) % 256;
 		}
 
-		if (ra_flipx) sx = 31 - sx;
+		if (state->ra_flipx) sx = 31 - sx;
 
-		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[RA_FGCHAR_BASE + ra_chrbank]  ,
-			rollrace_videoram[ offs ]  ,
+		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[RA_FGCHAR_BASE + state->ra_chrbank]  ,
+			state->videoram[ offs ]  ,
 			col,
-			ra_flipx,ra_flipy,
+			state->ra_flipx,state->ra_flipy,
 			8*sx,scroll,0);
 
 	}

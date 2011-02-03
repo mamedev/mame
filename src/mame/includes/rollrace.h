@@ -1,7 +1,24 @@
-/*----------- defined in video/rollrace.c -----------*/
+class rollrace_state : public driver_device
+{
+public:
+	rollrace_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-extern UINT8 *rollrace_videoram;
-extern UINT8 *rollrace_colorram;
+	UINT8 *videoram;
+	UINT8 *colorram;
+	int ra_charbank[2];
+	int ra_bkgpage;
+	int ra_bkgflip;
+	int ra_chrbank;
+	int ra_bkgpen;
+	int ra_bkgcol;
+	int ra_flipy;
+	int ra_flipx;
+	int ra_spritebank;
+};
+
+
+/*----------- defined in video/rollrace.c -----------*/
 
 VIDEO_UPDATE( rollrace );
 

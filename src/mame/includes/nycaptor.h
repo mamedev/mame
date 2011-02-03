@@ -29,6 +29,7 @@ public:
 	UINT8 snd_data;
 	int vol_ctrl[16];
 	int  gametype;
+	int mask;
 
 	/* devices */
 	device_t *maincpu;

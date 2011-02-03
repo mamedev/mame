@@ -27,6 +27,7 @@ public:
 	UINT16      piv_zoom[3], piv_scrollx[3], piv_scrolly[3];
 	UINT16      rotate_ctrl[8];
 	int         piv_xoffs, piv_yoffs;
+	UINT8       dislayer[4];
 
 	/* misc */
 	UINT16      cpua_ctrl;

@@ -53,8 +53,6 @@
 #include "audio/taito_en.h"
 #include "includes/gunbustr.h"
 
-static UINT16 coin_word;
-static UINT32 *gunbustr_ram;
 
 /*********************************************************************/
 
@@ -83,19 +81,20 @@ static WRITE32_HANDLER( gunbustr_palette_w )
 
 static CUSTOM_INPUT( coin_word_r )
 {
-	return coin_word;
+	gunbustr_state *state = field->port->machine->driver_data<gunbustr_state>();
+	return state->coin_word;
 }
 
 static WRITE32_HANDLER( gunbustr_input_w )
 {
+	gunbustr_state *state = space->machine->driver_data<gunbustr_state>();
 
 #if 0
 {
 char t[64];
-static UINT32 mem[2];
-COMBINE_DATA(&mem[offset]);
+COMBINE_DATA(&state->mem[offset]);
 
-sprintf(t,"%08x %08x",mem[0],mem[1]);
+sprintf(t,"%08x %08x",state->mem[0],state->mem[1]);
 popmessage(t);
 }
 #endif
@@ -131,7 +130,7 @@ popmessage(t);
 				coin_lockout_w(space->machine, 1, data & 0x02000000);
 				coin_counter_w(space->machine, 0, data & 0x04000000);
 				coin_counter_w(space->machine, 1, data & 0x04000000);
-				coin_word = (data >> 16) &0xffff;
+				state->coin_word = (data >> 16) &0xffff;
 			}
 //logerror("CPU #0 PC %06x: write input %06x\n",cpu_get_pc(space->cpu),offset);
 		}
@@ -195,7 +194,7 @@ static WRITE32_HANDLER( gunbustr_gun_w )
 
 static ADDRESS_MAP_START( gunbustr_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE(&gunbustr_ram)										/* main CPUA ram */
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE_MEMBER(gunbustr_state, ram)										/* main CPUA ram */
 	AM_RANGE(0x300000, 0x301fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)				/* Sprite ram */
 	AM_RANGE(0x380000, 0x380003) AM_WRITE(motor_control_w)											/* motor, lamps etc. */
 	AM_RANGE(0x390000, 0x3907ff) AM_RAM AM_BASE(&f3_shared_ram)										/* Sound shared ram */
@@ -342,7 +341,7 @@ static const tc0480scp_interface gunbustr_tc0480scp_intf =
 	0		/* col_base */
 };
 
-static MACHINE_CONFIG_START( gunbustr, driver_device )
+static MACHINE_CONFIG_START( gunbustr, gunbustr_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
@@ -409,10 +408,11 @@ ROM_END
 
 static READ32_HANDLER( main_cycle_r )
 {
-	if (cpu_get_pc(space->cpu)==0x55a && (gunbustr_ram[0x3acc/4]&0xff000000)==0)
+	gunbustr_state *state = space->machine->driver_data<gunbustr_state>();
+	if (cpu_get_pc(space->cpu)==0x55a && (state->ram[0x3acc/4]&0xff000000)==0)
 		cpu_spinuntil_int(space->cpu);
 
-	return gunbustr_ram[0x3acc/4];
+	return state->ram[0x3acc/4];
 }
 
 static DRIVER_INIT( gunbustr )

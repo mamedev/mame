@@ -4,12 +4,6 @@
 
 
 
-UINT16 *m72_videoram1,*m72_videoram2,*majtitle_rowscrollram;
-UINT32 m72_raster_irq_position;
-static UINT16 *m72_spriteram;
-static tilemap_t *fg_tilemap,*bg_tilemap;
-static INT32 scrollx1,scrolly1,scrollx2,scrolly2;
-static INT32 video_off;
 
 
 
@@ -70,27 +64,32 @@ INLINE void rtype2_get_tile_info(running_machine *machine,tile_data *tileinfo,in
 
 static TILE_GET_INFO( m72_get_bg_tile_info )
 {
-	m72_get_tile_info(machine,tileinfo,tile_index,m72_videoram2,2);
+	m72_state *state = machine->driver_data<m72_state>();
+	m72_get_tile_info(machine,tileinfo,tile_index,state->videoram2,2);
 }
 
 static TILE_GET_INFO( m72_get_fg_tile_info )
 {
-	m72_get_tile_info(machine,tileinfo,tile_index,m72_videoram1,1);
+	m72_state *state = machine->driver_data<m72_state>();
+	m72_get_tile_info(machine,tileinfo,tile_index,state->videoram1,1);
 }
 
 static TILE_GET_INFO( hharry_get_bg_tile_info )
 {
-	m72_get_tile_info(machine,tileinfo,tile_index,m72_videoram2,1);
+	m72_state *state = machine->driver_data<m72_state>();
+	m72_get_tile_info(machine,tileinfo,tile_index,state->videoram2,1);
 }
 
 static TILE_GET_INFO( rtype2_get_bg_tile_info )
 {
-	rtype2_get_tile_info(machine,tileinfo,tile_index,m72_videoram2,1);
+	m72_state *state = machine->driver_data<m72_state>();
+	rtype2_get_tile_info(machine,tileinfo,tile_index,state->videoram2,1);
 }
 
 static TILE_GET_INFO( rtype2_get_fg_tile_info )
 {
-	rtype2_get_tile_info(machine,tileinfo,tile_index,m72_videoram1,1);
+	m72_state *state = machine->driver_data<m72_state>();
+	rtype2_get_tile_info(machine,tileinfo,tile_index,state->videoram1,1);
 }
 
 
@@ -109,130 +108,136 @@ static TILEMAP_MAPPER( majtitle_scan_rows )
 
 static void register_savestate(running_machine *machine)
 {
-	state_save_register_global(machine, m72_raster_irq_position);
-	state_save_register_global(machine, video_off);
-	state_save_register_global(machine, scrollx1);
-	state_save_register_global(machine, scrolly1);
-	state_save_register_global(machine, scrollx2);
-	state_save_register_global(machine, scrolly2);
-	state_save_register_global_pointer(machine, m72_spriteram, machine->generic.spriteram_size/2);
+	m72_state *state = machine->driver_data<m72_state>();
+	state_save_register_global(machine, state->raster_irq_position);
+	state_save_register_global(machine, state->video_off);
+	state_save_register_global(machine, state->scrollx1);
+	state_save_register_global(machine, state->scrolly1);
+	state_save_register_global(machine, state->scrollx2);
+	state_save_register_global(machine, state->scrolly2);
+	state_save_register_global_pointer(machine, state->spriteram, machine->generic.spriteram_size/2);
 }
 
 
 VIDEO_START( m72 )
 {
-	bg_tilemap = tilemap_create(machine, m72_get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
-	fg_tilemap = tilemap_create(machine, m72_get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
+	m72_state *state = machine->driver_data<m72_state>();
+	state->bg_tilemap = tilemap_create(machine, m72_get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
+	state->fg_tilemap = tilemap_create(machine, m72_get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
 
-	m72_spriteram = auto_alloc_array(machine, UINT16, machine->generic.spriteram_size/2);
+	state->spriteram = auto_alloc_array(machine, UINT16, machine->generic.spriteram_size/2);
 
-	tilemap_set_transmask(fg_tilemap,0,0xffff,0x0001);
-	tilemap_set_transmask(fg_tilemap,1,0x00ff,0xff01);
-	tilemap_set_transmask(fg_tilemap,2,0x0001,0xffff);
+	tilemap_set_transmask(state->fg_tilemap,0,0xffff,0x0001);
+	tilemap_set_transmask(state->fg_tilemap,1,0x00ff,0xff01);
+	tilemap_set_transmask(state->fg_tilemap,2,0x0001,0xffff);
 
-	tilemap_set_transmask(bg_tilemap,0,0xffff,0x0000);
-	tilemap_set_transmask(bg_tilemap,1,0x00ff,0xff00);
-	//tilemap_set_transmask(bg_tilemap,2,0x0001,0xfffe);
-	tilemap_set_transmask(bg_tilemap,2,0x0007,0xfff8);
+	tilemap_set_transmask(state->bg_tilemap,0,0xffff,0x0000);
+	tilemap_set_transmask(state->bg_tilemap,1,0x00ff,0xff00);
+	//tilemap_set_transmask(state->bg_tilemap,2,0x0001,0xfffe);
+	tilemap_set_transmask(state->bg_tilemap,2,0x0007,0xfff8);
 
-	memset(m72_spriteram,0,machine->generic.spriteram_size);
+	memset(state->spriteram,0,machine->generic.spriteram_size);
 
-	tilemap_set_scrolldx(fg_tilemap,0,0);
-	tilemap_set_scrolldy(fg_tilemap,-128,16);
+	tilemap_set_scrolldx(state->fg_tilemap,0,0);
+	tilemap_set_scrolldy(state->fg_tilemap,-128,16);
 
-	tilemap_set_scrolldx(bg_tilemap,0,0);
-	tilemap_set_scrolldy(bg_tilemap,-128,16);
+	tilemap_set_scrolldx(state->bg_tilemap,0,0);
+	tilemap_set_scrolldy(state->bg_tilemap,-128,16);
 
 	register_savestate(machine);
 }
 
 VIDEO_START( rtype2 )
 {
-	bg_tilemap = tilemap_create(machine, rtype2_get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
-	fg_tilemap = tilemap_create(machine, rtype2_get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
+	m72_state *state = machine->driver_data<m72_state>();
+	state->bg_tilemap = tilemap_create(machine, rtype2_get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
+	state->fg_tilemap = tilemap_create(machine, rtype2_get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
 
-	m72_spriteram = auto_alloc_array(machine, UINT16, machine->generic.spriteram_size/2);
+	state->spriteram = auto_alloc_array(machine, UINT16, machine->generic.spriteram_size/2);
 
-	tilemap_set_transmask(fg_tilemap,0,0xffff,0x0001);
-	tilemap_set_transmask(fg_tilemap,1,0x00ff,0xff01);
-	tilemap_set_transmask(fg_tilemap,2,0x0001,0xffff);
+	tilemap_set_transmask(state->fg_tilemap,0,0xffff,0x0001);
+	tilemap_set_transmask(state->fg_tilemap,1,0x00ff,0xff01);
+	tilemap_set_transmask(state->fg_tilemap,2,0x0001,0xffff);
 
-	tilemap_set_transmask(bg_tilemap,0,0xffff,0x0000);
-	tilemap_set_transmask(bg_tilemap,1,0x00ff,0xff00);
-	tilemap_set_transmask(bg_tilemap,2,0x0001,0xfffe);
+	tilemap_set_transmask(state->bg_tilemap,0,0xffff,0x0000);
+	tilemap_set_transmask(state->bg_tilemap,1,0x00ff,0xff00);
+	tilemap_set_transmask(state->bg_tilemap,2,0x0001,0xfffe);
 
-	memset(m72_spriteram,0,machine->generic.spriteram_size);
+	memset(state->spriteram,0,machine->generic.spriteram_size);
 
-	tilemap_set_scrolldx(fg_tilemap,4,0);
-	tilemap_set_scrolldy(fg_tilemap,-128,16);
+	tilemap_set_scrolldx(state->fg_tilemap,4,0);
+	tilemap_set_scrolldy(state->fg_tilemap,-128,16);
 
-	tilemap_set_scrolldx(bg_tilemap,4,0);
-	tilemap_set_scrolldy(bg_tilemap,-128,16);
+	tilemap_set_scrolldx(state->bg_tilemap,4,0);
+	tilemap_set_scrolldy(state->bg_tilemap,-128,16);
 
 	register_savestate(machine);
 }
 
 VIDEO_START( poundfor )
 {
+	m72_state *state = machine->driver_data<m72_state>();
 	VIDEO_START_CALL(rtype2);
 
-	tilemap_set_scrolldx(fg_tilemap,6,0);
-	tilemap_set_scrolldx(bg_tilemap,6,0);
+	tilemap_set_scrolldx(state->fg_tilemap,6,0);
+	tilemap_set_scrolldx(state->bg_tilemap,6,0);
 }
 
 
 /* Major Title has a larger background RAM, and rowscroll */
 VIDEO_START( majtitle )
 {
+	m72_state *state = machine->driver_data<m72_state>();
 // The tilemap can be 256x64, but seems to be used at 128x64 (scroll wraparound).
 // The layout ramains 256x64, the right half is just not displayed.
-//  bg_tilemap = tilemap_create(machine, rtype2_get_bg_tile_info,tilemap_scan_rows,8,8,256,64);
-	bg_tilemap = tilemap_create(machine, rtype2_get_bg_tile_info,majtitle_scan_rows,8,8,128,64);
-	fg_tilemap = tilemap_create(machine, rtype2_get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
+//  state->bg_tilemap = tilemap_create(machine, rtype2_get_bg_tile_info,tilemap_scan_rows,8,8,256,64);
+	state->bg_tilemap = tilemap_create(machine, rtype2_get_bg_tile_info,majtitle_scan_rows,8,8,128,64);
+	state->fg_tilemap = tilemap_create(machine, rtype2_get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
 
-	m72_spriteram = auto_alloc_array(machine, UINT16, machine->generic.spriteram_size/2);
+	state->spriteram = auto_alloc_array(machine, UINT16, machine->generic.spriteram_size/2);
 
-	tilemap_set_transmask(fg_tilemap,0,0xffff,0x0001);
-	tilemap_set_transmask(fg_tilemap,1,0x00ff,0xff01);
-	tilemap_set_transmask(fg_tilemap,2,0x0001,0xffff);
+	tilemap_set_transmask(state->fg_tilemap,0,0xffff,0x0001);
+	tilemap_set_transmask(state->fg_tilemap,1,0x00ff,0xff01);
+	tilemap_set_transmask(state->fg_tilemap,2,0x0001,0xffff);
 
-	tilemap_set_transmask(bg_tilemap,0,0xffff,0x0000);
-	tilemap_set_transmask(bg_tilemap,1,0x00ff,0xff00);
-	tilemap_set_transmask(bg_tilemap,2,0x0001,0xfffe);
+	tilemap_set_transmask(state->bg_tilemap,0,0xffff,0x0000);
+	tilemap_set_transmask(state->bg_tilemap,1,0x00ff,0xff00);
+	tilemap_set_transmask(state->bg_tilemap,2,0x0001,0xfffe);
 
-	memset(m72_spriteram,0,machine->generic.spriteram_size);
+	memset(state->spriteram,0,machine->generic.spriteram_size);
 
-	tilemap_set_scrolldx(fg_tilemap,4,0);
-	tilemap_set_scrolldy(fg_tilemap,-128,16);
+	tilemap_set_scrolldx(state->fg_tilemap,4,0);
+	tilemap_set_scrolldy(state->fg_tilemap,-128,16);
 
-	tilemap_set_scrolldx(bg_tilemap,4,0);
-	tilemap_set_scrolldy(bg_tilemap,-128,16);
+	tilemap_set_scrolldx(state->bg_tilemap,4,0);
+	tilemap_set_scrolldy(state->bg_tilemap,-128,16);
 
 	register_savestate(machine);
 }
 
 VIDEO_START( hharry )
 {
-	bg_tilemap = tilemap_create(machine, hharry_get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
-	fg_tilemap = tilemap_create(machine, m72_get_fg_tile_info,   tilemap_scan_rows,8,8,64,64);
+	m72_state *state = machine->driver_data<m72_state>();
+	state->bg_tilemap = tilemap_create(machine, hharry_get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
+	state->fg_tilemap = tilemap_create(machine, m72_get_fg_tile_info,   tilemap_scan_rows,8,8,64,64);
 
-	m72_spriteram = auto_alloc_array(machine, UINT16, machine->generic.spriteram_size/2);
+	state->spriteram = auto_alloc_array(machine, UINT16, machine->generic.spriteram_size/2);
 
-	tilemap_set_transmask(fg_tilemap,0,0xffff,0x0001);
-	tilemap_set_transmask(fg_tilemap,1,0x00ff,0xff01);
-	tilemap_set_transmask(fg_tilemap,2,0x0001,0xffff);
+	tilemap_set_transmask(state->fg_tilemap,0,0xffff,0x0001);
+	tilemap_set_transmask(state->fg_tilemap,1,0x00ff,0xff01);
+	tilemap_set_transmask(state->fg_tilemap,2,0x0001,0xffff);
 
-	tilemap_set_transmask(bg_tilemap,0,0xffff,0x0000);
-	tilemap_set_transmask(bg_tilemap,1,0x00ff,0xff00);
-	tilemap_set_transmask(bg_tilemap,2,0x0001,0xfffe);
+	tilemap_set_transmask(state->bg_tilemap,0,0xffff,0x0000);
+	tilemap_set_transmask(state->bg_tilemap,1,0x00ff,0xff00);
+	tilemap_set_transmask(state->bg_tilemap,2,0x0001,0xfffe);
 
-	memset(m72_spriteram,0,machine->generic.spriteram_size);
+	memset(state->spriteram,0,machine->generic.spriteram_size);
 
-	tilemap_set_scrolldx(fg_tilemap,4,0);
-	tilemap_set_scrolldy(fg_tilemap,-128,16);
+	tilemap_set_scrolldx(state->fg_tilemap,4,0);
+	tilemap_set_scrolldy(state->fg_tilemap,-128,16);
 
-	tilemap_set_scrolldx(bg_tilemap,6,0);
-	tilemap_set_scrolldy(bg_tilemap,-128,16);
+	tilemap_set_scrolldx(state->bg_tilemap,6,0);
+	tilemap_set_scrolldy(state->bg_tilemap,-128,16);
 
 	register_savestate(machine);
 }
@@ -295,50 +300,59 @@ WRITE16_HANDLER( m72_palette2_w )
 
 WRITE16_HANDLER( m72_videoram1_w )
 {
-	COMBINE_DATA(&m72_videoram1[offset]);
-	tilemap_mark_tile_dirty(fg_tilemap,offset/2);
+	m72_state *state = space->machine->driver_data<m72_state>();
+	COMBINE_DATA(&state->videoram1[offset]);
+	tilemap_mark_tile_dirty(state->fg_tilemap,offset/2);
 }
 
 WRITE16_HANDLER( m72_videoram2_w )
 {
-	COMBINE_DATA(&m72_videoram2[offset]);
-	tilemap_mark_tile_dirty(bg_tilemap,offset/2);
+	m72_state *state = space->machine->driver_data<m72_state>();
+	COMBINE_DATA(&state->videoram2[offset]);
+	tilemap_mark_tile_dirty(state->bg_tilemap,offset/2);
 }
 
 WRITE16_HANDLER( m72_irq_line_w )
 {
-	COMBINE_DATA(&m72_raster_irq_position);
+	m72_state *state = space->machine->driver_data<m72_state>();
+	COMBINE_DATA(&state->raster_irq_position);
 }
 
 WRITE16_HANDLER( m72_scrollx1_w )
 {
-	COMBINE_DATA(&scrollx1);
+	m72_state *state = space->machine->driver_data<m72_state>();
+	COMBINE_DATA(&state->scrollx1);
 }
 
 WRITE16_HANDLER( m72_scrollx2_w )
 {
-	COMBINE_DATA(&scrollx2);
+	m72_state *state = space->machine->driver_data<m72_state>();
+	COMBINE_DATA(&state->scrollx2);
 }
 
 WRITE16_HANDLER( m72_scrolly1_w )
 {
-	COMBINE_DATA(&scrolly1);
+	m72_state *state = space->machine->driver_data<m72_state>();
+	COMBINE_DATA(&state->scrolly1);
 }
 
 WRITE16_HANDLER( m72_scrolly2_w )
 {
-	COMBINE_DATA(&scrolly2);
+	m72_state *state = space->machine->driver_data<m72_state>();
+	COMBINE_DATA(&state->scrolly2);
 }
 
 WRITE16_HANDLER( m72_dmaon_w )
 {
+	m72_state *state = space->machine->driver_data<m72_state>();
 	if (ACCESSING_BITS_0_7)
-		memcpy(m72_spriteram,space->machine->generic.spriteram.u16,space->machine->generic.spriteram_size);
+		memcpy(state->spriteram,space->machine->generic.spriteram.u16,space->machine->generic.spriteram_size);
 }
 
 
 WRITE16_HANDLER( m72_port02_w )
 {
+	m72_state *state = space->machine->driver_data<m72_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		if (data & 0xe0) logerror("write %02x to port 02\n",data);
@@ -351,7 +365,7 @@ WRITE16_HANDLER( m72_port02_w )
 		flip_screen_set(space->machine, ((data & 0x04) >> 2) ^ ((~input_port_read(space->machine, "DSW") >> 8) & 1));
 
 		/* bit 3 is display disable */
-		video_off = data & 0x08;
+		state->video_off = data & 0x08;
 
 		/* bit 4 resets sound CPU (active low) */
 		if (data & 0x10)
@@ -365,6 +379,7 @@ WRITE16_HANDLER( m72_port02_w )
 
 WRITE16_HANDLER( rtype2_port02_w )
 {
+	m72_state *state = space->machine->driver_data<m72_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		if (data & 0xe0) logerror("write %02x to port 02\n",data);
@@ -377,22 +392,22 @@ WRITE16_HANDLER( rtype2_port02_w )
 		flip_screen_set(space->machine, ((data & 0x04) >> 2) ^ ((~input_port_read(space->machine, "DSW") >> 8) & 1));
 
 		/* bit 3 is display disable */
-		video_off = data & 0x08;
+		state->video_off = data & 0x08;
 
 		/* other bits unknown */
 	}
 }
 
 
-static int majtitle_rowscroll;
 
 /* the following is mostly a kludge. This register seems to be used for something else */
 WRITE16_HANDLER( majtitle_gfx_ctrl_w )
 {
+	m72_state *state = space->machine->driver_data<m72_state>();
 	if (ACCESSING_BITS_8_15)
 	{
-		if (data & 0xff00) majtitle_rowscroll = 1;
-		else majtitle_rowscroll = 0;
+		if (data & 0xff00) state->majtitle_rowscroll = 1;
+		else state->majtitle_rowscroll = 0;
 	}
 }
 
@@ -405,6 +420,7 @@ WRITE16_HANDLER( majtitle_gfx_ctrl_w )
 
 static void m72_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	m72_state *state = machine->driver_data<m72_state>();
 	int offs;
 
 	offs = 0;
@@ -413,15 +429,15 @@ static void m72_draw_sprites(running_machine *machine, bitmap_t *bitmap,const re
 		int code,color,sx,sy,flipx,flipy,w,h,x,y;
 
 
-		code = m72_spriteram[offs+1];
-		color = m72_spriteram[offs+2] & 0x0f;
-		sx = -256+(m72_spriteram[offs+3] & 0x3ff);
-		sy = 384-(m72_spriteram[offs+0] & 0x1ff);
-		flipx = m72_spriteram[offs+2] & 0x0800;
-		flipy = m72_spriteram[offs+2] & 0x0400;
+		code = state->spriteram[offs+1];
+		color = state->spriteram[offs+2] & 0x0f;
+		sx = -256+(state->spriteram[offs+3] & 0x3ff);
+		sy = 384-(state->spriteram[offs+0] & 0x1ff);
+		flipx = state->spriteram[offs+2] & 0x0800;
+		flipy = state->spriteram[offs+2] & 0x0400;
 
-		w = 1 << ((m72_spriteram[offs+2] & 0xc000) >> 14);
-		h = 1 << ((m72_spriteram[offs+2] & 0x3000) >> 12);
+		w = 1 << ((state->spriteram[offs+2] & 0xc000) >> 14);
+		h = 1 << ((state->spriteram[offs+2] & 0x3000) >> 12);
 		sy -= 16 * h;
 
 		if (flip_screen_get(machine))
@@ -507,59 +523,61 @@ static void majtitle_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 
 VIDEO_UPDATE( m72 )
 {
-	if (video_off)
+	m72_state *state = screen->machine->driver_data<m72_state>();
+	if (state->video_off)
 	{
 		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 		return 0;
 	}
 
-	tilemap_set_scrollx(fg_tilemap,0,scrollx1);
-	tilemap_set_scrolly(fg_tilemap,0,scrolly1);
+	tilemap_set_scrollx(state->fg_tilemap,0,state->scrollx1);
+	tilemap_set_scrolly(state->fg_tilemap,0,state->scrolly1);
 
-	tilemap_set_scrollx(bg_tilemap,0,scrollx2);
-	tilemap_set_scrolly(bg_tilemap,0,scrolly2);
+	tilemap_set_scrollx(state->bg_tilemap,0,state->scrollx2);
+	tilemap_set_scrolly(state->bg_tilemap,0,state->scrolly2);
 
-	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1,0);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_DRAW_LAYER1,0);
+	tilemap_draw(bitmap,cliprect,state->bg_tilemap,TILEMAP_DRAW_LAYER1,0);
+	tilemap_draw(bitmap,cliprect,state->fg_tilemap,TILEMAP_DRAW_LAYER1,0);
 	m72_draw_sprites(screen->machine, bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0,0);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_DRAW_LAYER0,0);
+	tilemap_draw(bitmap,cliprect,state->bg_tilemap,TILEMAP_DRAW_LAYER0,0);
+	tilemap_draw(bitmap,cliprect,state->fg_tilemap,TILEMAP_DRAW_LAYER0,0);
 	return 0;
 }
 
 VIDEO_UPDATE( majtitle )
 {
+	m72_state *state = screen->machine->driver_data<m72_state>();
 	int i;
 
 
-	if (video_off)
+	if (state->video_off)
 	{
 		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 		return 0;
 	}
 
-	tilemap_set_scrollx(fg_tilemap,0,scrollx1);
-	tilemap_set_scrolly(fg_tilemap,0,scrolly1);
+	tilemap_set_scrollx(state->fg_tilemap,0,state->scrollx1);
+	tilemap_set_scrolly(state->fg_tilemap,0,state->scrolly1);
 
-	if (majtitle_rowscroll)
+	if (state->majtitle_rowscroll)
 	{
-		tilemap_set_scroll_rows(bg_tilemap,512);
+		tilemap_set_scroll_rows(state->bg_tilemap,512);
 		for (i = 0;i < 512;i++)
-			tilemap_set_scrollx(bg_tilemap,(i+scrolly2)&0x1ff,
-					256 + majtitle_rowscrollram[i]);
+			tilemap_set_scrollx(state->bg_tilemap,(i+state->scrolly2)&0x1ff,
+					256 + state->majtitle_rowscrollram[i]);
 	}
 	else
 	{
-		tilemap_set_scroll_rows(bg_tilemap,1);
-		tilemap_set_scrollx(bg_tilemap,0,256 + scrollx2);
+		tilemap_set_scroll_rows(state->bg_tilemap,1);
+		tilemap_set_scrollx(state->bg_tilemap,0,256 + state->scrollx2);
 	}
-	tilemap_set_scrolly(bg_tilemap,0,scrolly2);
+	tilemap_set_scrolly(state->bg_tilemap,0,state->scrolly2);
 
-	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1,0);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_DRAW_LAYER1,0);
+	tilemap_draw(bitmap,cliprect,state->bg_tilemap,TILEMAP_DRAW_LAYER1,0);
+	tilemap_draw(bitmap,cliprect,state->fg_tilemap,TILEMAP_DRAW_LAYER1,0);
 	majtitle_draw_sprites(screen->machine, bitmap,cliprect);
 	m72_draw_sprites(screen->machine, bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0,0);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_DRAW_LAYER0,0);
+	tilemap_draw(bitmap,cliprect,state->bg_tilemap,TILEMAP_DRAW_LAYER0,0);
+	tilemap_draw(bitmap,cliprect,state->fg_tilemap,TILEMAP_DRAW_LAYER0,0);
 	return 0;
 }

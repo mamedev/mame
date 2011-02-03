@@ -115,38 +115,34 @@ VIDEO_UPDATE( topspeed )
 	UINT8 layer[4];
 
 #ifdef MAME_DEBUG
-	static UINT8 dislayer[5];
-#endif
-
-#ifdef MAME_DEBUG
 	if (input_code_pressed_once (screen->machine, KEYCODE_V))
 	{
-		dislayer[0] ^= 1;
-		popmessage("bg: %01x", dislayer[0]);
+		state->dislayer[0] ^= 1;
+		popmessage("bg: %01x", state->dislayer[0]);
 	}
 
 	if (input_code_pressed_once (screen->machine, KEYCODE_B))
 	{
-		dislayer[1] ^= 1;
-		popmessage("fg: %01x", dislayer[1]);
+		state->dislayer[1] ^= 1;
+		popmessage("fg: %01x", state->dislayer[1]);
 	}
 
 	if (input_code_pressed_once (screen->machine, KEYCODE_N))
 	{
-		dislayer[2] ^= 1;
-		popmessage("bg2: %01x", dislayer[2]);
+		state->dislayer[2] ^= 1;
+		popmessage("bg2: %01x", state->dislayer[2]);
 	}
 
 	if (input_code_pressed_once (screen->machine, KEYCODE_M))
 	{
-		dislayer[3] ^= 1;
-		popmessage("fg2: %01x", dislayer[3]);
+		state->dislayer[3] ^= 1;
+		popmessage("fg2: %01x", state->dislayer[3]);
 	}
 
 	if (input_code_pressed_once (screen->machine, KEYCODE_C))
 	{
-		dislayer[4] ^= 1;
-		popmessage("sprites: %01x", dislayer[4]);
+		state->dislayer[4] ^= 1;
+		popmessage("sprites: %01x", state->dislayer[4]);
 	}
 #endif
 
@@ -163,27 +159,27 @@ VIDEO_UPDATE( topspeed )
 	bitmap_fill(bitmap, cliprect, 0);
 
 #ifdef MAME_DEBUG
-	if (dislayer[3] == 0)
+	if (state->dislayer[3] == 0)
 #endif
 	pc080sn_tilemap_draw(state->pc080sn_2, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
 
 #ifdef MAME_DEBUG
-	if (dislayer[2] == 0)
+	if (state->dislayer[2] == 0)
 #endif
 	pc080sn_tilemap_draw_special(state->pc080sn_2, bitmap, cliprect, layer[1], 0, 2, state->raster_ctrl);
 
 #ifdef MAME_DEBUG
-	if (dislayer[1] == 0)
+	if (state->dislayer[1] == 0)
 #endif
 	pc080sn_tilemap_draw_special(state->pc080sn_1, bitmap, cliprect, layer[2], 0, 4, state->raster_ctrl + 0x100);
 
 #ifdef MAME_DEBUG
-	if (dislayer[0] == 0)
+	if (state->dislayer[0] == 0)
 #endif
 	pc080sn_tilemap_draw(state->pc080sn_1, bitmap, cliprect, layer[3], 0, 8);
 
 #ifdef MAME_DEBUG
-	if (dislayer[4] == 0)
+	if (state->dislayer[4] == 0)
 #endif
 
 	draw_sprites(screen->machine, bitmap,cliprect);

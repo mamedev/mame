@@ -51,6 +51,8 @@ public:
 	UINT8 mcu_comm_hc11;
 	UINT8 mcu_data_main;
 	UINT8 mcu_data_hc11;
+
+	UINT16 debug_dsp_ram[0x8000];
 };
 
 

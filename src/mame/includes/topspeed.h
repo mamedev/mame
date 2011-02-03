@@ -33,6 +33,8 @@ public:
 	device_t *pc080sn_1;
 	device_t *pc080sn_2;
 	device_t *tc0220ioc;
+
+	UINT8 dislayer[5];
 };
 
 

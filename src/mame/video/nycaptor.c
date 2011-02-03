@@ -10,11 +10,6 @@
 
 #define NYCAPTOR_DEBUG	0
 
-#if NYCAPTOR_DEBUG
-static  int nycaptor_mask = 0;
-#endif
-
-
 /*
  298 (e298) - spot (0-3) , 299 (e299) - lives
  spot number isn't set to 0 in main menu ; lives - yes
@@ -60,7 +55,7 @@ static TILE_GET_INFO( get_tile_info )
 		tileinfo->group = 3;
 
 #if NYCAPTOR_DEBUG
-	if (nycaptor_mask & (1 << tileinfo->category))
+	if (state->mask & (1 << tileinfo->category))
 	{
 		if (nycaptor_spot(machine))
 			pal = 0xe;
@@ -192,7 +187,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		if (priori == pri)
 		{
 #if NYCAPTOR_DEBUG
-			if (nycaptor_mask & (1 << (pri + 4))) pal = 0xd;
+			if (state->mask & (1 << (pri + 4))) pal = 0xd;
 #endif
 			flipx = BIT(state->spriteram[offs + 1], 6);
 			flipy = BIT(state->spriteram[offs + 1], 7);
@@ -229,7 +224,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
    x - no bg/sprite pri.
 */
 
-#define mKEY_MASK(x,y) if (input_code_pressed_once(machine, x)) { nycaptor_mask |= y; tilemap_mark_all_tiles_dirty(state->bg_tilemap);}
+#define mKEY_MASK(x,y) if (input_code_pressed_once(machine, x)) { state->mask |= y; tilemap_mark_all_tiles_dirty(state->bg_tilemap); }
 
 static void nycaptor_setmask( running_machine *machine )
 {
@@ -249,8 +244,8 @@ static void nycaptor_setmask( running_machine *machine )
 	mKEY_MASK(KEYCODE_J, 0x400);
 	mKEY_MASK(KEYCODE_K, 0x800);
 
-	if (input_code_pressed_once(machine, KEYCODE_Z)){nycaptor_mask = 0; tilemap_mark_all_tiles_dirty(state->bg_tilemap);} /* disable */
-	if (input_code_pressed_once(machine, KEYCODE_X)){nycaptor_mask |= 0x1000; tilemap_mark_all_tiles_dirty(state->bg_tilemap);} /* no layers */
+	if (input_code_pressed_once(machine, KEYCODE_Z)){state->mask = 0; tilemap_mark_all_tiles_dirty(state->bg_tilemap);} /* disable */
+	if (input_code_pressed_once(machine, KEYCODE_X)){state->mask |= 0x1000; tilemap_mark_all_tiles_dirty(state->bg_tilemap);} /* no layers */
 }
 #endif
 
@@ -260,7 +255,7 @@ VIDEO_UPDATE( nycaptor )
 
 #if NYCAPTOR_DEBUG
 	nycaptor_setmask(screen->machine);
-	if (nycaptor_mask & 0x1000)
+	if (state->mask & 0x1000)
 	{
 		tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER1 | 3, 0);
 		tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER0 | 3, 0);

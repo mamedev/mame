@@ -35,7 +35,6 @@ Notes:
 #include "sound/sn76496.h"
 #include "includes/retofinv.h"
 
-static UINT8 cpu2_m6000=0;
 
 
 static WRITE8_HANDLER( cpu1_reset_w )
@@ -57,12 +56,14 @@ static WRITE8_HANDLER( mcu_reset_w )
 
 static WRITE8_HANDLER( cpu2_m6000_w )
 {
-	cpu2_m6000 = data;
+	retofinv_state *state = space->machine->driver_data<retofinv_state>();
+	state->cpu2_m6000 = data;
 }
 
 static READ8_HANDLER( cpu0_mf800_r )
 {
-	return cpu2_m6000;
+	retofinv_state *state = space->machine->driver_data<retofinv_state>();
+	return state->cpu2_m6000;
 }
 
 static WRITE8_HANDLER( soundcommand_w )
@@ -105,9 +106,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7fff, 0x7fff) AM_WRITE(coincounter_w)
 	AM_RANGE(0x7b00, 0x7bff) AM_ROM	/* space for diagnostic ROM? The code looks */
 									/* for a string here, and jumps if it's present */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(retofinv_fg_videoram_w) AM_SHARE("share2") AM_BASE(&retofinv_fg_videoram)
-	AM_RANGE(0x8800, 0x9fff) AM_RAM AM_SHARE("share1") AM_BASE(&retofinv_sharedram)
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(retofinv_bg_videoram_w) AM_SHARE("share3") AM_BASE(&retofinv_bg_videoram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(retofinv_fg_videoram_w) AM_SHARE("share2") AM_BASE_MEMBER(retofinv_state, fg_videoram)
+	AM_RANGE(0x8800, 0x9fff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(retofinv_state, sharedram)
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(retofinv_bg_videoram_w) AM_SHARE("share3") AM_BASE_MEMBER(retofinv_state, bg_videoram)
 	AM_RANGE(0xb800, 0xb802) AM_WRITE(retofinv_gfx_ctrl_w)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P2")
@@ -336,7 +337,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( retofinv, driver_device )
+static MACHINE_CONFIG_START( retofinv, retofinv_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz? */

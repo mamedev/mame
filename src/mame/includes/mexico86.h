@@ -28,6 +28,11 @@ public:
 	device_t *audiocpu;
 	device_t *subcpu;
 	device_t *mcu;
+
+	/* queue */
+	UINT8 queue[64];
+	int qfront;
+	int qstate;
 };
 
 

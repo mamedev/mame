@@ -197,12 +197,7 @@ Board contains only 29 ROMs and not much else.
 
 #include "cbombers.lh"
 
-static UINT16 coin_word;
-static UINT16 port_sel = 0;
-static int frame_counter=0;
 
-static UINT32 *undrfire_ram;	/* will be read in video for gun target calcs */
-static UINT32 *shared_ram;
 
 /***********************************************************
                 COLOR RAM
@@ -259,11 +254,13 @@ static const eeprom_interface undrfire_eeprom_interface =
 
 static CUSTOM_INPUT(frame_counter_r)
 {
-	return frame_counter;
+	undrfire_state *state = field->port->machine->driver_data<undrfire_state>();
+	return state->frame_counter;
 }
 
 static READ32_HANDLER( undrfire_input_r )
 {
+	undrfire_state *state = space->machine->driver_data<undrfire_state>();
 	switch (offset)
 	{
 		case 0x00:
@@ -273,7 +270,7 @@ static READ32_HANDLER( undrfire_input_r )
 
 		case 0x01:
 		{
-			return input_port_read(space->machine, "SYSTEM") | (coin_word << 16);
+			return input_port_read(space->machine, "SYSTEM") | (state->coin_word << 16);
 		}
 	}
 
@@ -282,6 +279,7 @@ static READ32_HANDLER( undrfire_input_r )
 
 static WRITE32_HANDLER( undrfire_input_w )
 {
+	undrfire_state *state = space->machine->driver_data<undrfire_state>();
 	switch (offset)
 	{
 		case 0x00:
@@ -311,7 +309,7 @@ static WRITE32_HANDLER( undrfire_input_w )
 				coin_lockout_w(space->machine, 1,~data & 0x02000000);
 				coin_counter_w(space->machine, 0, data & 0x04000000);
 				coin_counter_w(space->machine, 1, data & 0x08000000);
-				coin_word = (data >> 16) &0xffff;
+				state->coin_word = (data >> 16) &0xffff;
 			}
 		}
 	}
@@ -320,22 +318,24 @@ static WRITE32_HANDLER( undrfire_input_w )
 
 static READ16_HANDLER( shared_ram_r )
 {
-	if ((offset&1)==0) return (shared_ram[offset/2]&0xffff0000)>>16;
-	return (shared_ram[offset/2]&0x0000ffff);
+	undrfire_state *state = space->machine->driver_data<undrfire_state>();
+	if ((offset&1)==0) return (state->shared_ram[offset/2]&0xffff0000)>>16;
+	return (state->shared_ram[offset/2]&0x0000ffff);
 }
 
 static WRITE16_HANDLER( shared_ram_w )
 {
+	undrfire_state *state = space->machine->driver_data<undrfire_state>();
 	if ((offset&1)==0) {
 		if (ACCESSING_BITS_8_15)
-			shared_ram[offset/2]=(shared_ram[offset/2]&0x00ffffff)|((data&0xff00)<<16);
+			state->shared_ram[offset/2]=(state->shared_ram[offset/2]&0x00ffffff)|((data&0xff00)<<16);
 		if (ACCESSING_BITS_0_7)
-			shared_ram[offset/2]=(shared_ram[offset/2]&0xff00ffff)|((data&0x00ff)<<16);
+			state->shared_ram[offset/2]=(state->shared_ram[offset/2]&0xff00ffff)|((data&0x00ff)<<16);
 	} else {
 		if (ACCESSING_BITS_8_15)
-			shared_ram[offset/2]=(shared_ram[offset/2]&0xffff00ff)|((data&0xff00)<< 0);
+			state->shared_ram[offset/2]=(state->shared_ram[offset/2]&0xffff00ff)|((data&0xff00)<< 0);
 		if (ACCESSING_BITS_0_7)
-			shared_ram[offset/2]=(shared_ram[offset/2]&0xffffff00)|((data&0x00ff)<< 0);
+			state->shared_ram[offset/2]=(state->shared_ram[offset/2]&0xffffff00)|((data&0x00ff)<< 0);
 	}
 }
 
@@ -407,15 +407,16 @@ logerror("CPU #0 PC %06x: warning - read unmapped lightgun offset %06x\n",cpu_ge
 
 static WRITE32_HANDLER( rotate_control_w )	/* only a guess that it's rotation */
 {
+	undrfire_state *state = space->machine->driver_data<undrfire_state>();
 	if (ACCESSING_BITS_0_15)
 	{
-		undrfire_rotate_ctrl[port_sel] = data;
+		state->rotate_ctrl[state->port_sel] = data;
 		return;
 	}
 
 	if (ACCESSING_BITS_16_31)
 	{
-		port_sel = (data &0x70000) >> 16;
+		state->port_sel = (data &0x70000) >> 16;
 	}
 }
 
@@ -464,7 +465,7 @@ static WRITE32_HANDLER( cbombers_adc_w )
 
 static ADDRESS_MAP_START( undrfire_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE(&undrfire_ram)
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE_MEMBER(undrfire_state, ram)
 	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 //  AM_RANGE(0x304000, 0x304003) AM_RAM // debugging - doesn't change ???
 //  AM_RANGE(0x304400, 0x304403) AM_RAM // debugging - doesn't change ???
@@ -499,7 +500,7 @@ static ADDRESS_MAP_START( cbombers_cpua_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xb00000, 0xb0000f) AM_RAM /* ? */
 	AM_RANGE(0xc00000, 0xc00007) AM_RAM /* LAN controller? */
 	AM_RANGE(0xd00000, 0xd00003) AM_WRITE(rotate_control_w)		/* perhaps port based rotate control? */
-	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_BASE(&shared_ram)
+	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_BASE_MEMBER(undrfire_state, shared_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cbombers_cpub_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -690,7 +691,8 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( undrfire_interrupt )
 {
-	frame_counter ^= 1;
+	undrfire_state *state = device->machine->driver_data<undrfire_state>();
+	state->frame_counter ^= 1;
 	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
@@ -714,7 +716,7 @@ static const tc0480scp_interface undrfire_tc0480scp_intf =
 	0		/* col_base */
 };
 
-static MACHINE_CONFIG_START( undrfire, driver_device )
+static MACHINE_CONFIG_START( undrfire, undrfire_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
@@ -745,7 +747,7 @@ static MACHINE_CONFIG_START( undrfire, driver_device )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( cbombers, driver_device )
+static MACHINE_CONFIG_START( cbombers, undrfire_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */

@@ -181,30 +181,28 @@ static void kiki_clogic(running_machine *machine, int address, int latch)
 {
 	mexico86_state *state = machine->driver_data<mexico86_state>();
 	static const UINT8 db[16]={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x08,0x00,0x10,0x18,0x00,0x00,0x00,0x00};
-	static UINT8 queue[64];
-	static int qfront = 0, state = 0;
 	int sy, sx, hw, i, qptr, diff1, diff2;
 
-	if (address != KIKI_CL_TRIGGER) // queue latched data
+	if (address != KIKI_CL_TRIGGER) // state->queue latched data
 	{
-		queue[qfront++] = latch;
-		qfront &= 0x3f;
+		state->queue[state->qfront++] = latch;
+		state->qfront &= 0x3f;
 	}
-	else if (state ^= 1) // scan queue
+	else if (state->qstate ^= 1) // scan state->queue
 	{
-		sy = queue[(qfront-0x3a)&0x3f] + ((0x18-DCHEIGHT)>>1);
-		sx = queue[(qfront-0x39)&0x3f] + ((0x18-DCWIDTH)>>1);
+		sy = state->queue[(state->qfront-0x3a)&0x3f] + ((0x18-DCHEIGHT)>>1);
+		sx = state->queue[(state->qfront-0x39)&0x3f] + ((0x18-DCWIDTH)>>1);
 
 		for (i=0x38; i; i-=8)
 		{
-			qptr = qfront - i;
-			if (!(hw = db[queue[qptr&0x3f]&0xf])) continue;
+			qptr = state->qfront - i;
+			if (!(hw = db[state->queue[qptr&0x3f]&0xf])) continue;
 
-			diff1 = sx - (short)(queue[(qptr+6)&0x3f]<<8|queue[(qptr+7)&0x3f]) + DCWIDTH;
+			diff1 = sx - (short)(state->queue[(qptr+6)&0x3f]<<8|state->queue[(qptr+7)&0x3f]) + DCWIDTH;
 			diff2 = diff1 - (hw + DCWIDTH);
 			if ((diff1^diff2)<0)
 			{
-				diff1 = sy - (short)(queue[(qptr+4)&0x3f]<<8|queue[(qptr+5)&0x3f]) + DCHEIGHT;
+				diff1 = sy - (short)(state->queue[(qptr+4)&0x3f]<<8|state->queue[(qptr+5)&0x3f]) + DCHEIGHT;
 				diff2 = diff1 - (hw + DCHEIGHT);
 				if ((diff1^diff2)<0)
 					state->protection_ram[KIKI_CL_OUT] = 1; // we have a collision

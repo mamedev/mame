@@ -1,3 +1,47 @@
+class taitosj_state : public driver_device
+{
+public:
+	taitosj_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 sndnmi_disable;
+	UINT8 input_port_4_f0;
+	UINT8 kikstart_gears[2];
+	INT8 dac_out;
+	UINT8 dac_vol;
+	UINT8 *videoram_1;
+	UINT8 *videoram_2;
+	UINT8 *videoram_3;
+	UINT8 *spriteram;
+	UINT8 *paletteram;
+	UINT8 *characterram;
+	UINT8 *scroll;
+	UINT8 *colscrolly;
+	UINT8 *gfxpointer;
+	UINT8 *colorbank;
+	UINT8 *video_mode;
+	UINT8 *video_priority;
+	UINT8 *collision_reg;
+	UINT8 *kikstart_scrollram;
+	UINT8 fromz80;
+	UINT8 toz80;
+	UINT8 zaccept;
+	UINT8 zready;
+	UINT8 busreq;
+	UINT8 portA_in;
+	UINT8 portA_out;
+	UINT8 spacecr_prot_value;
+	UINT8 protection_value;
+	UINT32 address;
+	bitmap_t *layer_bitmap[3];
+	bitmap_t *sprite_sprite_collbitmap1;
+	bitmap_t *sprite_sprite_collbitmap2;
+	bitmap_t *sprite_layer_collbitmap1;
+	bitmap_t *sprite_layer_collbitmap2[3];
+	int draw_order[32][4];
+};
+
+
 /*----------- defined in machine/taitosj.c -----------*/
 
 MACHINE_START( taitosj );
@@ -22,21 +66,6 @@ READ8_HANDLER( alpine_port_2_r );
 
 
 /*----------- defined in video/taitosj.c -----------*/
-
-extern UINT8 *taitosj_videoram_1;
-extern UINT8 *taitosj_videoram_2;
-extern UINT8 *taitosj_videoram_3;
-extern UINT8 *taitosj_spriteram;
-extern UINT8 *taitosj_paletteram;
-extern UINT8 *taitosj_characterram;
-extern UINT8 *taitosj_scroll;
-extern UINT8 *taitosj_colscrolly;
-extern UINT8 *taitosj_gfxpointer;
-extern UINT8 *taitosj_colorbank;
-extern UINT8 *taitosj_video_mode;
-extern UINT8 *taitosj_video_priority;
-extern UINT8 *taitosj_collision_reg;
-extern UINT8 *kikstart_scrollram;
 
 READ8_HANDLER( taitosj_gfxrom_r );
 WRITE8_HANDLER( taitosj_characterram_w );

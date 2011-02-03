@@ -4,10 +4,42 @@
 
 *************************************************************************/
 
-/*----------- defined in video/m72.c -----------*/
+class m72_state : public driver_device
+{
+public:
+	m72_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-extern UINT16 *m72_videoram1,*m72_videoram2,*majtitle_rowscrollram;
-extern UINT32 m72_raster_irq_position;
+	UINT8 irqvector;
+	UINT32 sample_addr;
+	UINT16 *protection_ram;
+	emu_timer *scanline_timer;
+	UINT8 irq_base;
+	UINT8 mcu_snd_cmd_latch;
+	UINT8 mcu_sample_latch;
+	UINT32 mcu_sample_addr;
+	const UINT8 *protection_code;
+	const UINT8 *protection_crc;
+	UINT8 *soundram;
+	int prev[4];
+	int diff[4];
+	UINT16 *videoram1;
+	UINT16 *videoram2;
+	UINT16 *majtitle_rowscrollram;
+	UINT32 raster_irq_position;
+	UINT16 *spriteram;
+	tilemap_t *fg_tilemap;
+	tilemap_t *bg_tilemap;
+	INT32 scrollx1;
+	INT32 scrolly1;
+	INT32 scrollx2;
+	INT32 scrolly2;
+	INT32 video_off;
+	int majtitle_rowscroll;
+};
+
+
+/*----------- defined in video/m72.c -----------*/
 
 VIDEO_START( m72 );
 VIDEO_START( rtype2 );

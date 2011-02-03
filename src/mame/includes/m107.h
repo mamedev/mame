@@ -5,11 +5,35 @@
 *************************************************************************/
 
 
-/*----------- defined in video/m107.c -----------*/
+typedef struct _pf_layer_info pf_layer_info;
+struct _pf_layer_info
+{
+	tilemap_t *		tmap;
+	UINT16			vram_base;
+	UINT16			control[4];
+};
 
-extern UINT16 *m107_vram_data;
-extern UINT8 m107_spritesystem;
-extern UINT16 m107_raster_irq_position;
+class m107_state : public driver_device
+{
+public:
+	m107_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	emu_timer *scanline_timer;
+	UINT8 irq_vectorbase;
+	int irqvector;
+	int sound_status;
+	UINT16 *vram_data;
+	UINT8 spritesystem;
+	UINT8 sprite_display;
+	UINT16 raster_irq_position;
+	pf_layer_info pf_layer[4];
+	UINT16 control[0x10];
+	UINT16 *spriteram;
+};
+
+
+/*----------- defined in video/m107.c -----------*/
 
 WRITE16_HANDLER( m107_spritebuffer_w );
 VIDEO_UPDATE( m107 );

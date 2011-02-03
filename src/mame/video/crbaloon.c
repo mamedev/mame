@@ -10,15 +10,6 @@
 #include "includes/crbaloon.h"
 
 
-UINT8 *crbaloon_videoram;
-UINT8 *crbaloon_colorram;
-UINT8 *crbaloon_spriteram;
-
-static UINT16 crbaloon_collision_address;
-static UINT8 crbaloon_collision_address_clear;
-static tilemap_t *bg_tilemap;
-
-
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -58,52 +49,59 @@ PALETTE_INIT( crbaloon )
 
 WRITE8_HANDLER( crbaloon_videoram_w )
 {
-	crbaloon_videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	crbaloon_state *state = space->machine->driver_data<crbaloon_state>();
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( crbaloon_colorram_w )
 {
-	crbaloon_colorram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	crbaloon_state *state = space->machine->driver_data<crbaloon_state>();
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = crbaloon_videoram[tile_index];
-	int color = crbaloon_colorram[tile_index] & 0x0f;
+	crbaloon_state *state = machine->driver_data<crbaloon_state>();
+	int code = state->videoram[tile_index];
+	int color = state->colorram[tile_index] & 0x0f;
 
 	SET_TILE_INFO(0, code, color, 0);
 }
 
 VIDEO_START( crbaloon )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows_flip_xy,  8, 8, 32, 32);
+	crbaloon_state *state = machine->driver_data<crbaloon_state>();
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows_flip_xy,  8, 8, 32, 32);
 
-	state_save_register_global(machine, crbaloon_collision_address);
-	state_save_register_global(machine, crbaloon_collision_address_clear);
+	state_save_register_global(machine, state->collision_address);
+	state_save_register_global(machine, state->collision_address_clear);
 }
 
 
-UINT16 crbaloon_get_collision_address(void)
+UINT16 crbaloon_get_collision_address(running_machine *machine)
 {
-	return crbaloon_collision_address_clear ? 0xffff : crbaloon_collision_address;
+	crbaloon_state *state = machine->driver_data<crbaloon_state>();
+	return state->collision_address_clear ? 0xffff : state->collision_address;
 }
 
 
-void crbaloon_set_clear_collision_address(int _crbaloon_collision_address_clear)
+void crbaloon_set_clear_collision_address(running_machine *machine, int _crbaloon_collision_address_clear)
 {
-	crbaloon_collision_address_clear = !_crbaloon_collision_address_clear; /* active LO */
+	crbaloon_state *state = machine->driver_data<crbaloon_state>();
+	state->collision_address_clear = !_crbaloon_collision_address_clear; /* active LO */
 }
 
 
 
 static void draw_sprite_and_check_collision(running_machine *machine, bitmap_t *bitmap)
 {
+	crbaloon_state *state = machine->driver_data<crbaloon_state>();
 	int y;
-	UINT8 code = crbaloon_spriteram[0] & 0x0f;
-	UINT8 color = crbaloon_spriteram[0] >> 4;
-	UINT8 sy = crbaloon_spriteram[2] - 32;
+	UINT8 code = state->spriteram[0] & 0x0f;
+	UINT8 color = state->spriteram[0] >> 4;
+	UINT8 sy = state->spriteram[2] - 32;
 
 	UINT8 *gfx = machine->region("gfx2")->base() + (code << 7);
 
@@ -112,13 +110,13 @@ static void draw_sprite_and_check_collision(running_machine *machine, bitmap_t *
 		sy += 32;
 
 	/* assume no collision */
-    crbaloon_collision_address = 0xffff;
+    state->collision_address = 0xffff;
 
 	for (y = 0x1f; y >= 0; y--)
 	{
 		int x;
 		UINT8 data = 0;
-		UINT8 sx = crbaloon_spriteram[1];
+		UINT8 sx = state->spriteram[1];
 
 		for (x = 0x1f; x >= 0; x--)
 		{
@@ -136,7 +134,7 @@ static void draw_sprite_and_check_collision(running_machine *machine, bitmap_t *
 				if (*BITMAP_ADDR16(bitmap, sy, sx) & 0x01)
 					/* compute the collision address -- the +1 is via observation
                        of the game code, probably wrong for cocktail mode */
-					crbaloon_collision_address = ((((sy ^ 0xff) >> 3) << 5) | ((sx ^ 0xff) >> 3)) + 1;
+					state->collision_address = ((((sy ^ 0xff) >> 3) << 5) | ((sx ^ 0xff) >> 3)) + 1;
 
 				*BITMAP_ADDR16(bitmap, sy, sx) = (color << 1) | 1;
 			}
@@ -152,7 +150,8 @@ static void draw_sprite_and_check_collision(running_machine *machine, bitmap_t *
 
 VIDEO_UPDATE( crbaloon )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	crbaloon_state *state = screen->machine->driver_data<crbaloon_state>();
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
 	draw_sprite_and_check_collision(screen->machine, bitmap);
 

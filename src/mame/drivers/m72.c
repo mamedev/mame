@@ -97,12 +97,6 @@ other supported games as well.
 #define SOUND_CLOCK			XTAL_3_579545MHz
 
 
-static UINT16 *protection_ram;
-static emu_timer *scanline_timer;
-static UINT8 m72_irq_base;
-static UINT8 mcu_snd_cmd_latch;
-static UINT8 mcu_sample_latch;
-static UINT32 mcu_sample_addr;
 
 static TIMER_CALLBACK( m72_scanline_interrupt );
 static TIMER_CALLBACK( kengo_scanline_interrupt );
@@ -111,18 +105,20 @@ static TIMER_CALLBACK( kengo_scanline_interrupt );
 
 static MACHINE_START( m72 )
 {
-	scanline_timer = timer_alloc(machine, m72_scanline_interrupt, NULL);
+	m72_state *state = machine->driver_data<m72_state>();
+	state->scanline_timer = timer_alloc(machine, m72_scanline_interrupt, NULL);
 
-	state_save_register_global(machine, mcu_sample_addr);
-	state_save_register_global(machine, mcu_snd_cmd_latch);
+	state_save_register_global(machine, state->mcu_sample_addr);
+	state_save_register_global(machine, state->mcu_snd_cmd_latch);
 }
 
 static MACHINE_START( kengo )
 {
-	scanline_timer = timer_alloc(machine, kengo_scanline_interrupt, NULL);
+	m72_state *state = machine->driver_data<m72_state>();
+	state->scanline_timer = timer_alloc(machine, kengo_scanline_interrupt, NULL);
 
-	state_save_register_global(machine, mcu_sample_addr);
-	state_save_register_global(machine, mcu_snd_cmd_latch);
+	state_save_register_global(machine, state->mcu_sample_addr);
+	state_save_register_global(machine, state->mcu_snd_cmd_latch);
 }
 
 static TIMER_CALLBACK( synch_callback )
@@ -133,55 +129,60 @@ static TIMER_CALLBACK( synch_callback )
 
 static MACHINE_RESET( m72 )
 {
-	m72_irq_base = 0x20;
-	mcu_sample_addr = 0;
-	mcu_snd_cmd_latch = 0;
+	m72_state *state = machine->driver_data<m72_state>();
+	state->irq_base = 0x20;
+	state->mcu_sample_addr = 0;
+	state->mcu_snd_cmd_latch = 0;
 
-	timer_adjust_oneshot(scanline_timer, machine->primary_screen->time_until_pos(0), 0);
+	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->time_until_pos(0), 0);
 	timer_call_after_resynch(machine,  NULL, 0, synch_callback);
 }
 
 static MACHINE_RESET( xmultipl )
 {
-	m72_irq_base = 0x08;
-	timer_adjust_oneshot(scanline_timer, machine->primary_screen->time_until_pos(0), 0);
+	m72_state *state = machine->driver_data<m72_state>();
+	state->irq_base = 0x08;
+	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->time_until_pos(0), 0);
 }
 
 static MACHINE_RESET( kengo )
 {
-	timer_adjust_oneshot(scanline_timer, machine->primary_screen->time_until_pos(0), 0);
+	m72_state *state = machine->driver_data<m72_state>();
+	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->time_until_pos(0), 0);
 }
 
 static TIMER_CALLBACK( m72_scanline_interrupt )
 {
+	m72_state *state = machine->driver_data<m72_state>();
 	int scanline = param;
 
 	/* raster interrupt - visible area only? */
-	if (scanline < 256 && scanline == m72_raster_irq_position - 128)
+	if (scanline < 256 && scanline == state->raster_irq_position - 128)
 	{
 		machine->primary_screen->update_partial(scanline);
-		cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, m72_irq_base + 2);
+		cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, state->irq_base + 2);
 	}
 
 	/* VBLANK interrupt */
 	else if (scanline == 256)
 	{
 		machine->primary_screen->update_partial(scanline);
-		cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, m72_irq_base + 0);
+		cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, state->irq_base + 0);
 	}
 
 	/* adjust for next scanline */
 	if (++scanline >= machine->primary_screen->height())
 		scanline = 0;
-	timer_adjust_oneshot(scanline_timer, machine->primary_screen->time_until_pos(scanline), scanline);
+	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 static TIMER_CALLBACK( kengo_scanline_interrupt )
 {
+	m72_state *state = machine->driver_data<m72_state>();
 	int scanline = param;
 
 	/* raster interrupt - visible area only? */
-	if (scanline < 256 && scanline == m72_raster_irq_position - 128)
+	if (scanline < 256 && scanline == state->raster_irq_position - 128)
 	{
 		machine->primary_screen->update_partial(scanline);
 		cputag_set_input_line(machine, "maincpu", NEC_INPUT_LINE_INTP2, ASSERT_LINE);
@@ -201,7 +202,7 @@ static TIMER_CALLBACK( kengo_scanline_interrupt )
 	/* adjust for next scanline */
 	if (++scanline >= machine->primary_screen->height())
 		scanline = 0;
-	timer_adjust_oneshot(scanline_timer, machine->primary_screen->time_until_pos(scanline), scanline);
+	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 /***************************************************************************
@@ -231,19 +232,21 @@ static TIMER_CALLBACK( delayed_ram16_w )
 
 static WRITE16_HANDLER( m72_main_mcu_sound_w )
 {
+	m72_state *state = space->machine->driver_data<m72_state>();
 	if (data & 0xfff0)
 		logerror("sound_w: %04x %04x\n", mem_mask, data);
 
 	if (ACCESSING_BITS_0_7)
 	{
-		mcu_snd_cmd_latch = data;
+		state->mcu_snd_cmd_latch = data;
 		cputag_set_input_line(space->machine, "mcu", 1, ASSERT_LINE);
 	}
 }
 
 static WRITE16_HANDLER( m72_main_mcu_w)
 {
-	UINT16 val = protection_ram[offset];
+	m72_state *state = space->machine->driver_data<m72_state>();
+	UINT16 val = state->protection_ram[offset];
 
 	COMBINE_DATA(&val);
 
@@ -253,27 +256,29 @@ static WRITE16_HANDLER( m72_main_mcu_w)
 
 	if (offset == 0x0fff/2 && ACCESSING_BITS_8_15)
 	{
-		protection_ram[offset] = val;
+		state->protection_ram[offset] = val;
 		cputag_set_input_line(space->machine, "mcu", 0, ASSERT_LINE);
 		/* Line driven, most likely by write line */
 		//timer_set(space->machine, space->machine->device<cpu_device>("mcu")->cycles_to_attotime(2), NULL, 0, mcu_irq0_clear);
 		//timer_set(space->machine, space->machine->device<cpu_device>("mcu")->cycles_to_attotime(0), NULL, 0, mcu_irq0_raise);
 	}
 	else
-		timer_call_after_resynch( space->machine, protection_ram, (offset<<16) | val, delayed_ram16_w);
+		timer_call_after_resynch( space->machine, state->protection_ram, (offset<<16) | val, delayed_ram16_w);
 }
 
 static WRITE8_HANDLER( m72_mcu_data_w )
 {
+	m72_state *state = space->machine->driver_data<m72_state>();
 	UINT16 val;
-	if (offset&1) val = (protection_ram[offset/2] & 0x00ff) | (data << 8);
-	else val = (protection_ram[offset/2] & 0xff00) | (data&0xff);
+	if (offset&1) val = (state->protection_ram[offset/2] & 0x00ff) | (data << 8);
+	else val = (state->protection_ram[offset/2] & 0xff00) | (data&0xff);
 
-	timer_call_after_resynch( space->machine, protection_ram, ((offset >>1 ) << 16) | val, delayed_ram16_w);
+	timer_call_after_resynch( space->machine, state->protection_ram, ((offset >>1 ) << 16) | val, delayed_ram16_w);
 }
 
 static READ8_HANDLER(m72_mcu_data_r )
 {
+	m72_state *state = space->machine->driver_data<m72_state>();
 	UINT8 ret;
 
 	if (offset == 0x0fff || offset == 0x0ffe)
@@ -281,35 +286,39 @@ static READ8_HANDLER(m72_mcu_data_r )
 		cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
 	}
 
-	if (offset&1) ret = (protection_ram[offset/2] & 0xff00)>>8;
-	else ret = (protection_ram[offset/2] & 0x00ff);
+	if (offset&1) ret = (state->protection_ram[offset/2] & 0xff00)>>8;
+	else ret = (state->protection_ram[offset/2] & 0x00ff);
 
 	return ret;
 }
 
 static INTERRUPT_GEN( m72_mcu_int )
 {
-	//mcu_snd_cmd_latch |= 0x11; /* 0x10 is special as well - FIXME */
-	mcu_snd_cmd_latch = 0x11;// | (machine->rand() & 1); /* 0x10 is special as well - FIXME */
+	m72_state *state = device->machine->driver_data<m72_state>();
+	//state->mcu_snd_cmd_latch |= 0x11; /* 0x10 is special as well - FIXME */
+	state->mcu_snd_cmd_latch = 0x11;// | (machine->rand() & 1); /* 0x10 is special as well - FIXME */
 	cpu_set_input_line(device, 1, ASSERT_LINE);
 }
 
 static READ8_HANDLER(m72_mcu_sample_r )
 {
+	m72_state *state = space->machine->driver_data<m72_state>();
 	UINT8 sample;
-	sample = space->machine->region("samples")->base()[mcu_sample_addr++];
+	sample = space->machine->region("samples")->base()[state->mcu_sample_addr++];
 	return sample;
 }
 
 static WRITE8_HANDLER(m72_mcu_ack_w )
 {
+	m72_state *state = space->machine->driver_data<m72_state>();
 	cputag_set_input_line(space->machine, "mcu", 1, CLEAR_LINE);
-	mcu_snd_cmd_latch = 0;
+	state->mcu_snd_cmd_latch = 0;
 }
 
 static READ8_HANDLER(m72_mcu_snd_r )
 {
-	return mcu_snd_cmd_latch;
+	m72_state *state = space->machine->driver_data<m72_state>();
+	return state->mcu_snd_cmd_latch;
 }
 
 static READ8_HANDLER(m72_mcu_port_r )
@@ -320,9 +329,10 @@ static READ8_HANDLER(m72_mcu_port_r )
 
 static WRITE8_HANDLER(m72_mcu_port_w )
 {
+	m72_state *state = space->machine->driver_data<m72_state>();
 	if (offset == 1)
 	{
-		mcu_sample_latch = data;
+		state->mcu_sample_latch = data;
 		cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
@@ -332,14 +342,16 @@ static WRITE8_HANDLER(m72_mcu_port_w )
 
 static WRITE8_HANDLER( m72_mcu_low_w )
 {
-	mcu_sample_addr = (mcu_sample_addr & 0xffe000) | (data<<5);
-	logerror("low: %02x %02x %08x\n", offset, data, mcu_sample_addr);
+	m72_state *state = space->machine->driver_data<m72_state>();
+	state->mcu_sample_addr = (state->mcu_sample_addr & 0xffe000) | (data<<5);
+	logerror("low: %02x %02x %08x\n", offset, data, state->mcu_sample_addr);
 }
 
 static WRITE8_HANDLER( m72_mcu_high_w )
 {
-	mcu_sample_addr = (mcu_sample_addr & 0x1fff) | (data<<(8+5));
-	logerror("high: %02x %02x %08x\n", offset, data, mcu_sample_addr);
+	m72_state *state = space->machine->driver_data<m72_state>();
+	state->mcu_sample_addr = (state->mcu_sample_addr & 0x1fff) | (data<<(8+5));
+	logerror("high: %02x %02x %08x\n", offset, data, state->mcu_sample_addr);
 }
 
 static WRITE8_DEVICE_HANDLER( m72_snd_cpu_sample_w )
@@ -350,20 +362,22 @@ static WRITE8_DEVICE_HANDLER( m72_snd_cpu_sample_w )
 
 static READ8_HANDLER( m72_snd_cpu_sample_r )
 {
-	return mcu_sample_latch;
+	m72_state *state = space->machine->driver_data<m72_state>();
+	return state->mcu_sample_latch;
 }
 
 INLINE DRIVER_INIT( m72_8751 )
 {
+	m72_state *state = machine->driver_data<m72_state>();
 	address_space *program = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	address_space *io = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 	address_space *sndio = cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_IO);
 	device_t *dac = machine->device("dac");
 
-	protection_ram = auto_alloc_array(machine, UINT16, 0x10000/2);
+	state->protection_ram = auto_alloc_array(machine, UINT16, 0x10000/2);
 	memory_install_read_bank(program, 0xb0000, 0xbffff, 0, 0, "bank1");
 	memory_install_write16_handler(program, 0xb0000, 0xb0fff, 0, 0, m72_main_mcu_w);
-	memory_set_bankptr(machine, "bank1", protection_ram);
+	memory_set_bankptr(machine, "bank1", state->protection_ram);
 
 	//memory_install_write16_handler(io, 0xc0, 0xc1, 0, 0, loht_sample_trigger_w);
 	memory_install_write16_handler(io, 0xc0, 0xc1, 0, 0, m72_main_mcu_sound_w);
@@ -702,7 +716,6 @@ static const UINT8 dkgenm72_crc[CRC_LEN] =  {	0xc8,0xb4,0xdc,0xf8, 0xd3,0xba,0x4
 												0x79,0x08,0x1c,0xb3, 0x00,0x00 };
 
 
-static const UINT8 *protection_code, *protection_crc;
 
 static void copy_le(UINT16 *dest, const UINT8 *src, UINT8 bytes)
 {
@@ -714,30 +727,33 @@ static void copy_le(UINT16 *dest, const UINT8 *src, UINT8 bytes)
 
 static READ16_HANDLER( protection_r )
 {
+	m72_state *state = space->machine->driver_data<m72_state>();
 	if (ACCESSING_BITS_8_15)
-		copy_le(protection_ram,protection_code,CODE_LEN);
-	return protection_ram[0xffa/2+offset];
+		copy_le(state->protection_ram,state->protection_code,CODE_LEN);
+	return state->protection_ram[0xffa/2+offset];
 }
 
 static WRITE16_HANDLER( protection_w )
 {
+	m72_state *state = space->machine->driver_data<m72_state>();
 	data ^= 0xffff;
-	COMBINE_DATA(&protection_ram[offset]);
+	COMBINE_DATA(&state->protection_ram[offset]);
 	data ^= 0xffff;
 
 	if (offset == 0x0fff/2 && ACCESSING_BITS_8_15 && (data >> 8) == 0)
-		copy_le(&protection_ram[0x0fe0],protection_crc,CRC_LEN);
+		copy_le(&state->protection_ram[0x0fe0],state->protection_crc,CRC_LEN);
 }
 
 static void install_protection_handler(running_machine *machine, const UINT8 *code,const UINT8 *crc)
 {
-	protection_ram = auto_alloc_array(machine, UINT16, 0x1000/2);
-	protection_code = code;
-	protection_crc =  crc;
+	m72_state *state = machine->driver_data<m72_state>();
+	state->protection_ram = auto_alloc_array(machine, UINT16, 0x1000/2);
+	state->protection_code = code;
+	state->protection_crc =  crc;
 	memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xb0000, 0xb0fff, 0, 0, "bank1");
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xb0ffa, 0xb0ffb, 0, 0, protection_r);
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xb0000, 0xb0fff, 0, 0, protection_w);
-	memory_set_bankptr(machine, "bank1", protection_ram);
+	memory_set_bankptr(machine, "bank1", state->protection_ram);
 }
 
 static DRIVER_INIT( bchopper )
@@ -770,12 +786,13 @@ static DRIVER_INIT( imgfight )
 
 static DRIVER_INIT( loht )
 {
+	m72_state *state = machine->driver_data<m72_state>();
 	install_protection_handler(machine, loht_code,loht_crc);
 
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, loht_sample_trigger_w);
 
 	/* since we skip the startup tests, clear video RAM to prevent garbage on title screen */
-	memset(m72_videoram2,0,0x4000);
+	memset(state->videoram2,0,0x4000);
 }
 
 static DRIVER_INIT( xmultiplm72 )
@@ -814,26 +831,27 @@ static DRIVER_INIT( gallop )
 
 
 
-static UINT8 *soundram;
 
 
 static READ16_HANDLER( soundram_r )
 {
-	return soundram[offset * 2 + 0] | (soundram[offset * 2 + 1] << 8);
+	m72_state *state = space->machine->driver_data<m72_state>();
+	return state->soundram[offset * 2 + 0] | (state->soundram[offset * 2 + 1] << 8);
 }
 
 static WRITE16_HANDLER( soundram_w )
 {
+	m72_state *state = space->machine->driver_data<m72_state>();
 	if (ACCESSING_BITS_0_7)
-		soundram[offset * 2 + 0] = data;
+		state->soundram[offset * 2 + 0] = data;
 	if (ACCESSING_BITS_8_15)
-		soundram[offset * 2 + 1] = data >> 8;
+		state->soundram[offset * 2 + 1] = data >> 8;
 }
 
 
 static READ16_HANDLER( poundfor_trackball_r )
 {
-	static int prev[4],diff[4];
+	m72_state *state = space->machine->driver_data<m72_state>();
 	static const char *const axisnames[] = { "TRACK0_X", "TRACK0_Y", "TRACK1_X", "TRACK1_Y" };
 
 	if (offset == 0)
@@ -843,8 +861,8 @@ static READ16_HANDLER( poundfor_trackball_r )
 		for (i = 0;i < 4;i++)
 		{
 			curr = input_port_read(space->machine, axisnames[i]);
-			diff[i] = (curr - prev[i]);
-			prev[i] = curr;
+			state->diff[i] = (curr - state->prev[i]);
+			state->prev[i] = curr;
 		}
 	}
 
@@ -852,13 +870,13 @@ static READ16_HANDLER( poundfor_trackball_r )
 	{
 		default:
 		case 0:
-			return (diff[0] & 0xff) | ((diff[2] & 0xff) << 8);
+			return (state->diff[0] & 0xff) | ((state->diff[2] & 0xff) << 8);
 		case 1:
-			return ((diff[0] >> 8) & 0x1f) | (diff[2] & 0x1f00) | (input_port_read(space->machine, "IN0") & 0xe0e0);
+			return ((state->diff[0] >> 8) & 0x1f) | (state->diff[2] & 0x1f00) | (input_port_read(space->machine, "IN0") & 0xe0e0);
 		case 2:
-			return (diff[1] & 0xff) | ((diff[3] & 0xff) << 8);
+			return (state->diff[1] & 0xff) | ((state->diff[3] & 0xff) << 8);
 		case 3:
-			return ((diff[1] >> 8) & 0x1f) | (diff[3] & 0x1f00);
+			return ((state->diff[1] >> 8) & 0x1f) | (state->diff[3] & 0x1f00);
 	}
 }
 
@@ -870,8 +888,8 @@ static ADDRESS_MAP_START( NAME##_map, ADDRESS_SPACE_PROGRAM, 16 )		\
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	\
 	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE_GENERIC(paletteram)			\
 	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE_GENERIC(paletteram2)		\
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)		\
-	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(&m72_videoram2)		\
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE_MEMBER(m72_state, videoram1)		\
+	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE_MEMBER(m72_state, videoram2)		\
 	AM_RANGE(0xe0000, 0xeffff) AM_READWRITE(soundram_r, soundram_w)							\
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM									\
 ADDRESS_MAP_END
@@ -890,8 +908,8 @@ static ADDRESS_MAP_START( xmultipl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)
-	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(&m72_videoram2)
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE_MEMBER(m72_state, videoram1)
+	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE_MEMBER(m72_state, videoram2)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -902,8 +920,8 @@ static ADDRESS_MAP_START( dbreed_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)
-	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(&m72_videoram2)
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE_MEMBER(m72_state, videoram1)
+	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE_MEMBER(m72_state, videoram2)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -913,8 +931,8 @@ static ADDRESS_MAP_START( rtype2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(m72_dmaon_w)
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)
-	AM_RANGE(0xd4000, 0xd7fff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(&m72_videoram2)
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE_MEMBER(m72_state, videoram1)
+	AM_RANGE(0xd4000, 0xd7fff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE_MEMBER(m72_state, videoram2)
 	AM_RANGE(0xd8000, 0xd8bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0xe0000, 0xe3fff) AM_RAM	/* work RAM */
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
@@ -922,10 +940,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( majtitle_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0xa0000, 0xa03ff) AM_RAM AM_BASE(&majtitle_rowscrollram)
+	AM_RANGE(0xa0000, 0xa03ff) AM_RAM AM_BASE_MEMBER(m72_state, majtitle_rowscrollram)
 	AM_RANGE(0xa4000, 0xa4bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0xac000, 0xaffff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)
-	AM_RANGE(0xb0000, 0xbffff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(&m72_videoram2)	/* larger than the other games */
+	AM_RANGE(0xac000, 0xaffff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE_MEMBER(m72_state, videoram1)
+	AM_RANGE(0xb0000, 0xbffff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE_MEMBER(m72_state, videoram2)	/* larger than the other games */
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xc8000, 0xc83ff) AM_RAM AM_BASE_GENERIC(spriteram2)
 	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE_GENERIC(paletteram)
@@ -943,8 +961,8 @@ static ADDRESS_MAP_START( hharry_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)
-	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(&m72_videoram2)
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE_MEMBER(m72_state, videoram1)
+	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE_MEMBER(m72_state, videoram2)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -956,8 +974,8 @@ static ADDRESS_MAP_START( hharryu_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(m72_dmaon_w)
 	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY	/* leftover from protection?? */
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)
-	AM_RANGE(0xd4000, 0xd7fff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(&m72_videoram2)
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE_MEMBER(m72_state, videoram1)
+	AM_RANGE(0xd4000, 0xd7fff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE_MEMBER(m72_state, videoram2)
 	AM_RANGE(0xe0000, 0xe3fff) AM_RAM	/* work RAM */
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -970,8 +988,8 @@ static ADDRESS_MAP_START( kengo_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xb4000, 0xb4001) AM_WRITENOP	/* ??? */
 	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(m72_dmaon_w)
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x80000, 0x83fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)
-	AM_RANGE(0x84000, 0x87fff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(&m72_videoram2)
+	AM_RANGE(0x80000, 0x83fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE_MEMBER(m72_state, videoram1)
+	AM_RANGE(0x84000, 0x87fff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE_MEMBER(m72_state, videoram2)
 	AM_RANGE(0xe0000, 0xe3fff) AM_RAM	/* work RAM */
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -1062,7 +1080,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( sound_ram_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE(&soundram)
+	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE_MEMBER(m72_state, soundram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_rom_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1827,7 +1845,7 @@ static const ym2151_interface ym2151_config =
 
 
 
-static MACHINE_CONFIG_START( m72_base, driver_device )
+static MACHINE_CONFIG_START( m72_base, m72_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",V30,MASTER_CLOCK/2/2)	/* 16 MHz external freq (8MHz internal) */
@@ -1883,7 +1901,7 @@ static MACHINE_CONFIG_DERIVED( m72_8751, m72_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rtype, driver_device )
+static MACHINE_CONFIG_START( rtype, m72_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",V30,MASTER_CLOCK/2/2)	/* 16 MHz external freq (8MHz internal) */
@@ -1921,7 +1939,7 @@ static MACHINE_CONFIG_START( rtype, driver_device )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( xmultipl, driver_device )
+static MACHINE_CONFIG_START( xmultipl, m72_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",V30,MASTER_CLOCK/2/2)	/* 16 MHz external freq (8MHz internal) */
@@ -1964,7 +1982,7 @@ static MACHINE_CONFIG_START( xmultipl, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( xmultiplm72, driver_device )
+static MACHINE_CONFIG_START( xmultiplm72, m72_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",V30,MASTER_CLOCK/2/2)	/* 16 MHz external freq (8MHz internal) */
@@ -2007,7 +2025,7 @@ static MACHINE_CONFIG_START( xmultiplm72, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( dbreed, driver_device )
+static MACHINE_CONFIG_START( dbreed, m72_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",V30,MASTER_CLOCK/2/2)	/* 16 MHz external freq (8MHz internal) */
@@ -2050,7 +2068,7 @@ static MACHINE_CONFIG_START( dbreed, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( dbreedm72, driver_device )
+static MACHINE_CONFIG_START( dbreedm72, m72_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30,MASTER_CLOCK/2/2)	/* 16 MHz external freq (8MHz internal) */
@@ -2093,7 +2111,7 @@ static MACHINE_CONFIG_START( dbreedm72, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( rtype2, driver_device )
+static MACHINE_CONFIG_START( rtype2, m72_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30,MASTER_CLOCK/2/2)	/* 16 MHz external freq (8MHz internal) */
@@ -2136,7 +2154,7 @@ static MACHINE_CONFIG_START( rtype2, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( majtitle, driver_device )
+static MACHINE_CONFIG_START( majtitle, m72_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30,MASTER_CLOCK/2/2)	/* 16 MHz external freq (8MHz internal) */
@@ -2179,7 +2197,7 @@ static MACHINE_CONFIG_START( majtitle, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hharry, driver_device )
+static MACHINE_CONFIG_START( hharry, m72_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30,MASTER_CLOCK/2/2)	/* 16 MHz external freq (8MHz internal) */
@@ -2222,7 +2240,7 @@ static MACHINE_CONFIG_START( hharry, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hharryu, driver_device )
+static MACHINE_CONFIG_START( hharryu, m72_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30,MASTER_CLOCK/2/2)	/* 16 MHz external freq (8MHz internal) */
@@ -2265,7 +2283,7 @@ static MACHINE_CONFIG_START( hharryu, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( dkgenm72, driver_device )
+static MACHINE_CONFIG_START( dkgenm72, m72_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",V30,MASTER_CLOCK/2/2)	/* 16 MHz external freq (8MHz internal) */
@@ -2308,7 +2326,7 @@ static MACHINE_CONFIG_START( dkgenm72, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( poundfor, driver_device )
+static MACHINE_CONFIG_START( poundfor, m72_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30,MASTER_CLOCK/2/2)	/* 16 MHz external freq (8MHz internal) */
@@ -2351,7 +2369,7 @@ static MACHINE_CONFIG_START( poundfor, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cosmccop, driver_device )
+static MACHINE_CONFIG_START( cosmccop, m72_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V35,MASTER_CLOCK/2)

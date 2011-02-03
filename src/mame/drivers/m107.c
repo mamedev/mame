@@ -32,15 +32,13 @@ confirmed for m107 games as well.
 #include "sound/iremga20.h"
 
 
-#define M107_IRQ_0 ((m107_irq_vectorbase+0)/4) /* VBL interrupt*/
-#define M107_IRQ_1 ((m107_irq_vectorbase+4)/4) /* ??? */
-#define M107_IRQ_2 ((m107_irq_vectorbase+8)/4) /* Raster interrupt */
-#define M107_IRQ_3 ((m107_irq_vectorbase+12)/4) /* ??? */
+#define M107_IRQ_0 ((state->irq_vectorbase+0)/4) /* VBL interrupt*/
+#define M107_IRQ_1 ((state->irq_vectorbase+4)/4) /* ??? */
+#define M107_IRQ_2 ((state->irq_vectorbase+8)/4) /* Raster interrupt */
+#define M107_IRQ_3 ((state->irq_vectorbase+12)/4) /* ??? */
 
 
 
-static emu_timer *scanline_timer;
-static UINT8 m107_irq_vectorbase;
 
 static TIMER_CALLBACK( m107_scanline_interrupt );
 
@@ -57,22 +55,25 @@ static WRITE16_HANDLER( bankswitch_w )
 
 static MACHINE_START( m107 )
 {
-	scanline_timer = timer_alloc(machine, m107_scanline_interrupt, NULL);
+	m107_state *state = machine->driver_data<m107_state>();
+	state->scanline_timer = timer_alloc(machine, m107_scanline_interrupt, NULL);
 }
 
 static MACHINE_RESET( m107 )
 {
-	timer_adjust_oneshot(scanline_timer, machine->primary_screen->time_until_pos(0), 0);
+	m107_state *state = machine->driver_data<m107_state>();
+	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->time_until_pos(0), 0);
 }
 
 /*****************************************************************************/
 
 static TIMER_CALLBACK( m107_scanline_interrupt )
 {
+	m107_state *state = machine->driver_data<m107_state>();
 	int scanline = param;
 
 	/* raster interrupt */
-	if (scanline == m107_raster_irq_position)
+	if (scanline == state->raster_irq_position)
 	{
 		machine->primary_screen->update_partial(scanline);
 		cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, M107_IRQ_2);
@@ -88,7 +89,7 @@ static TIMER_CALLBACK( m107_scanline_interrupt )
 	/* adjust for next scanline */
 	if (++scanline >= machine->primary_screen->height())
 		scanline = 0;
-	timer_adjust_oneshot(scanline_timer, machine->primary_screen->time_until_pos(scanline), scanline);
+	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -107,23 +108,23 @@ enum { VECTOR_INIT, YM2151_ASSERT, YM2151_CLEAR, V30_ASSERT, V30_CLEAR };
 
 static TIMER_CALLBACK( setvector_callback )
 {
-	static int irqvector;
+	m107_state *state = machine->driver_data<m107_state>();
 
 	switch(param)
 	{
-		case VECTOR_INIT:	irqvector = 0;		break;
-		case YM2151_ASSERT:	irqvector |= 0x2;	break;
-		case YM2151_CLEAR:	irqvector &= ~0x2;	break;
-		case V30_ASSERT:	irqvector |= 0x1;	break;
-		case V30_CLEAR:		irqvector &= ~0x1;	break;
+		case VECTOR_INIT:	state->irqvector = 0;		break;
+		case YM2151_ASSERT:	state->irqvector |= 0x2;	break;
+		case YM2151_CLEAR:	state->irqvector &= ~0x2;	break;
+		case V30_ASSERT:	state->irqvector |= 0x1;	break;
+		case V30_CLEAR:		state->irqvector &= ~0x1;	break;
 	}
 
-	if (irqvector & 0x2)		/* YM2151 has precedence */
+	if (state->irqvector & 0x2)		/* YM2151 has precedence */
 		cpu_set_input_line_vector(machine->device("soundcpu"), 0, 0x18);
-	else if (irqvector & 0x1)	/* V30 */
+	else if (state->irqvector & 0x1)	/* V30 */
 		cpu_set_input_line_vector(machine->device("soundcpu"), 0, 0x19);
 
-	if (irqvector == 0)	/* no IRQs pending */
+	if (state->irqvector == 0)	/* no IRQs pending */
 		cputag_set_input_line(machine, "soundcpu", 0, CLEAR_LINE);
 	else	/* IRQ pending */
 		cputag_set_input_line(machine, "soundcpu", 0, ASSERT_LINE);
@@ -136,11 +137,11 @@ static WRITE16_HANDLER( m107_soundlatch_w )
 //      logerror("soundlatch_w %02x\n",data);
 }
 
-static int sound_status;
 
 static READ16_HANDLER( m107_sound_status_r )
 {
-	return sound_status;
+	m107_state *state = space->machine->driver_data<m107_state>();
+	return state->sound_status;
 }
 
 static READ16_HANDLER( m107_soundlatch_r )
@@ -155,7 +156,8 @@ static WRITE16_HANDLER( m107_sound_irq_ack_w )
 
 static WRITE16_HANDLER( m107_sound_status_w )
 {
-	COMBINE_DATA(&sound_status);
+	m107_state *state = space->machine->driver_data<m107_state>();
+	COMBINE_DATA(&state->sound_status);
 	cputag_set_input_line_and_vector(space->machine, "maincpu", 0, HOLD_LINE, M107_IRQ_3);
 }
 
@@ -169,7 +171,7 @@ static WRITE16_HANDLER( m107_sound_reset_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x9ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xbffff) AM_ROMBANK("bank1")
-	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m107_vram_w) AM_BASE(&m107_vram_data)
+	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m107_vram_w) AM_BASE_MEMBER(m107_state, vram_data)
 	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
 	AM_RANGE(0xf8000, 0xf8fff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0xf9000, 0xf9fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
@@ -817,7 +819,7 @@ static const ym2151_interface ym2151_config =
 
 static const nec_config firebarr_config ={ rtypeleo_decryption_table, };
 
-static MACHINE_CONFIG_START( firebarr, driver_device )
+static MACHINE_CONFIG_START( firebarr, m107_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V33, 28000000/2)	/* NEC V33, 28MHz clock */
@@ -1012,6 +1014,7 @@ ROM_END
 
 static DRIVER_INIT( firebarr )
 {
+	m107_state *state = machine->driver_data<m107_state>();
 	UINT8 *RAM = machine->region("maincpu")->base();
 
 	memcpy(RAM + 0xffff0, RAM + 0x7fff0, 0x10); /* Start vector */
@@ -1020,12 +1023,13 @@ static DRIVER_INIT( firebarr )
 	RAM = machine->region("soundcpu")->base();
 	memcpy(RAM + 0xffff0,RAM + 0x1fff0, 0x10); /* Sound cpu Start vector */
 
-	m107_irq_vectorbase = 0x20;
-	m107_spritesystem = 1;
+	state->irq_vectorbase = 0x20;
+	state->spritesystem = 1;
 }
 
 static DRIVER_INIT( dsoccr94 )
 {
+	m107_state *state = machine->driver_data<m107_state>();
 	UINT8 *RAM = machine->region("maincpu")->base();
 
 	memcpy(RAM + 0xffff0, RAM + 0x7fff0, 0x10); /* Start vector */
@@ -1034,12 +1038,13 @@ static DRIVER_INIT( dsoccr94 )
 	RAM = machine->region("soundcpu")->base();
 	memcpy(RAM + 0xffff0, RAM + 0x1fff0, 0x10); /* Sound cpu Start vector */
 
-	m107_irq_vectorbase = 0x80;
-	m107_spritesystem = 0;
+	state->irq_vectorbase = 0x80;
+	state->spritesystem = 0;
 }
 
 static DRIVER_INIT( wpksoc )
 {
+	m107_state *state = machine->driver_data<m107_state>();
 	UINT8 *RAM = machine->region("maincpu")->base();
 
 	memcpy(RAM + 0xffff0, RAM + 0x7fff0, 0x10); /* Start vector */
@@ -1049,8 +1054,8 @@ static DRIVER_INIT( wpksoc )
 	memcpy(RAM + 0xffff0, RAM + 0x1fff0, 0x10); /* Sound cpu Start vector */
 
 
-	m107_irq_vectorbase = 0x80;
-	m107_spritesystem = 0;
+	state->irq_vectorbase = 0x80;
+	state->spritesystem = 0;
 }
 
 /***************************************************************************/

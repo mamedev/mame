@@ -26,6 +26,16 @@ public:
 
 	/* devices */
 	device_t *audiocpu;
+
+#if 0
+	/* 68705 */
+	UINT8 port_a_in;
+	UINT8 port_a_out;
+	UINT8 ddr_a;
+	UINT8 port_b_in;
+	UINT8 port_b_out;
+	UINT8 ddr_b;
+#endif
 };
 
 

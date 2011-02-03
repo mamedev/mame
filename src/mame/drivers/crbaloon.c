@@ -19,10 +19,6 @@
 #include "includes/crbaloon.h"
 
 
-static UINT8 *pc3092_data;
-
-
-
 /*************************************
  *
  *  PC3092 custom chip
@@ -56,15 +52,17 @@ static void pc3092_reset(void)
 
 static void pc3092_update(running_machine *machine)
 {
-	flip_screen_set(machine, (pc3092_data[1] & 0x01) ? TRUE : FALSE);
+	crbaloon_state *state = machine->driver_data<crbaloon_state>();
+	flip_screen_set(machine, (state->pc3092_data[1] & 0x01) ? TRUE : FALSE);
 }
 
 
 static WRITE8_HANDLER( pc3092_w )
 {
-	pc3092_data[offset] = data & 0x0f;
+	crbaloon_state *state = space->machine->driver_data<crbaloon_state>();
+	state->pc3092_data[offset] = data & 0x0f;
 
-	if (LOG_PC3092) logerror("%04X:  write PC3092 #%d = 0x%02x\n", cpu_get_pc(space->cpu), offset, pc3092_data[offset]);
+	if (LOG_PC3092) logerror("%04X:  write PC3092 #%d = 0x%02x\n", cpu_get_pc(space->cpu), offset, state->pc3092_data[offset]);
 
 	pc3092_update(space->machine);
 }
@@ -72,10 +70,11 @@ static WRITE8_HANDLER( pc3092_w )
 
 static CUSTOM_INPUT( pc3092_r )
 {
+	crbaloon_state *state = field->port->machine->driver_data<crbaloon_state>();
 	UINT32 ret;
 
 	/* enable coin & start input? Wild guess!!! */
-	if (pc3092_data[1] & 0x02)
+	if (state->pc3092_data[1] & 0x02)
 		ret = input_port_read(field->port->machine, "PC3092");
 	else
 		ret = 0x00;
@@ -121,7 +120,7 @@ static READ8_HANDLER( pc3259_r )
 	UINT8 ret = 0;
 	UINT8 reg = offset >> 2;
 
-	UINT16 collision_address = crbaloon_get_collision_address();
+	UINT16 collision_address = crbaloon_get_collision_address(space->machine);
 	int collided = (collision_address != 0xffff);
 
 	switch (reg)
@@ -164,7 +163,7 @@ static WRITE8_HANDLER( port_sound_w )
 
 	/* D0 - interrupt enable - also goes to PC3259 as /HTCTRL */
 	cpu_interrupt_enable(space->machine->device("maincpu"), (data & 0x01) ? TRUE : FALSE);
-	crbaloon_set_clear_collision_address((data & 0x01) ? TRUE : FALSE);
+	crbaloon_set_clear_collision_address(space->machine, (data & 0x01) ? TRUE : FALSE);
 
 	/* D1 - SOUND STOP */
 	space->machine->sound().system_enable((data & 0x02) ? TRUE : FALSE);
@@ -201,8 +200,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)	/* A15 is not decoded */
 	AM_RANGE(0x0000, 0x3fff) AM_ROM		/* not fully populated */
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE(crbaloon_videoram_w) AM_BASE(&crbaloon_videoram)
-	AM_RANGE(0x5000, 0x53ff) AM_MIRROR(0x0400) AM_RAM_WRITE(crbaloon_colorram_w) AM_BASE(&crbaloon_colorram)
+	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE(crbaloon_videoram_w) AM_BASE_MEMBER(crbaloon_state, videoram)
+	AM_RANGE(0x5000, 0x53ff) AM_MIRROR(0x0400) AM_RAM_WRITE(crbaloon_colorram_w) AM_BASE_MEMBER(crbaloon_state, colorram)
 	AM_RANGE(0x5800, 0x7fff) AM_NOP
 ADDRESS_MAP_END
 
@@ -223,10 +222,10 @@ static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
 
 	AM_RANGE(0x00, 0x00) AM_WRITENOP	/* not connected */
 	AM_RANGE(0x01, 0x01) AM_WRITENOP /* watchdog */
-	AM_RANGE(0x02, 0x04) AM_WRITEONLY AM_BASE(&crbaloon_spriteram)
+	AM_RANGE(0x02, 0x04) AM_WRITEONLY AM_BASE_MEMBER(crbaloon_state, spriteram)
 	AM_RANGE(0x05, 0x05) AM_DEVWRITE("discrete", crbaloon_audio_set_music_freq)
 	AM_RANGE(0x06, 0x06) AM_WRITE(port_sound_w)
-	AM_RANGE(0x07, 0x0b) AM_WRITE(pc3092_w) AM_BASE(&pc3092_data)
+	AM_RANGE(0x07, 0x0b) AM_WRITE(pc3092_w) AM_BASE_MEMBER(crbaloon_state, pc3092_data)
 	AM_RANGE(0x0c, 0x0c) AM_WRITENOP /* MSK - to PC3259 */
 	AM_RANGE(0x0d, 0x0d) AM_WRITENOP /* schematics has it in a box marked "NOT USE" */
 	AM_RANGE(0x0e, 0x0f) AM_WRITENOP
@@ -358,7 +357,7 @@ static MACHINE_RESET( crballoon )
  *
  *************************************/
 
-static MACHINE_CONFIG_START( crbaloon, driver_device )
+static MACHINE_CONFIG_START( crbaloon, crbaloon_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CRBALOON_MASTER_XTAL / 3)

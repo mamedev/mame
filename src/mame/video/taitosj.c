@@ -11,31 +11,13 @@
 #include "includes/taitosj.h"
 
 
-#define GLOBAL_FLIP_X			(*taitosj_video_mode & 0x01)
-#define GLOBAL_FLIP_Y			(*taitosj_video_mode & 0x02)
-#define SPRITE_RAM_PAGE_OFFSET	((*taitosj_video_mode & 0x04) ? 0x80 : 0x00)
-#define SPRITES_ON				(*taitosj_video_mode & 0x80)
+#define GLOBAL_FLIP_X			(*state->video_mode & 0x01)
+#define GLOBAL_FLIP_Y			(*state->video_mode & 0x02)
+#define SPRITE_RAM_PAGE_OFFSET	((*state->video_mode & 0x04) ? 0x80 : 0x00)
+#define SPRITES_ON				(*state->video_mode & 0x80)
 #define TRANSPARENT_PEN			(0x40)
 
 
-UINT8 *taitosj_videoram_1;
-UINT8 *taitosj_videoram_2;
-UINT8 *taitosj_videoram_3;
-UINT8 *taitosj_spriteram;
-UINT8 *taitosj_paletteram;
-UINT8 *taitosj_characterram;
-UINT8 *taitosj_scroll;
-UINT8 *taitosj_colscrolly;
-UINT8 *taitosj_gfxpointer;
-UINT8 *taitosj_colorbank;
-UINT8 *taitosj_video_mode;
-UINT8 *taitosj_video_priority;
-UINT8 *taitosj_collision_reg;
-UINT8 *kikstart_scrollram;
-static bitmap_t *taitosj_layer_bitmap[3];
-static bitmap_t *sprite_sprite_collbitmap1,*sprite_sprite_collbitmap2;
-static bitmap_t *sprite_layer_collbitmap1;
-static bitmap_t *sprite_layer_collbitmap2[3];
 
 static const int layer_enable_mask[3] = { 0x10, 0x20, 0x40 };
 
@@ -85,7 +67,6 @@ typedef void (*copy_layer_func_t)(running_machine *, bitmap_t *,
 
 ***************************************************************************/
 
-static int draw_order[32][4];
 
 
 /***************************************************************************
@@ -111,6 +92,7 @@ static int draw_order[32][4];
 
 static void set_pens(running_machine *machine)
 {
+	taitosj_state *state = machine->driver_data<taitosj_state>();
 	static const int resistances[3] = { 1000, 470, 270 };
 	double rweights[3], gweights[3], bweights[3];
 	int i;
@@ -127,22 +109,22 @@ static void set_pens(running_machine *machine)
 		int r, g, b, val;
 
 		/* red component */
-		val = taitosj_paletteram[(i << 1) | 0x01];
+		val = state->paletteram[(i << 1) | 0x01];
 		bit0 = (~val >> 6) & 0x01;
 		bit1 = (~val >> 7) & 0x01;
-		val = taitosj_paletteram[(i << 1) | 0x00];
+		val = state->paletteram[(i << 1) | 0x00];
 		bit2 = (~val >> 0) & 0x01;
 		r = combine_3_weights(rweights, bit0, bit1, bit2);
 
 		/* green component */
-		val = taitosj_paletteram[(i << 1) | 0x01];
+		val = state->paletteram[(i << 1) | 0x01];
 		bit0 = (~val >> 3) & 0x01;
 		bit1 = (~val >> 4) & 0x01;
 		bit2 = (~val >> 5) & 0x01;
 		g = combine_3_weights(gweights, bit0, bit1, bit2);
 
 		/* blue component */
-		val = taitosj_paletteram[(i << 1) | 0x01];
+		val = state->paletteram[(i << 1) | 0x01];
 		bit0 = (~val >> 0) & 0x01;
 		bit1 = (~val >> 1) & 0x01;
 		bit2 = (~val >> 2) & 0x01;
@@ -160,6 +142,7 @@ static void set_pens(running_machine *machine)
 
 static void compute_draw_order(running_machine *machine)
 {
+	taitosj_state *state = machine->driver_data<taitosj_state>();
 	int i;
 	UINT8 *color_prom = machine->region("proms")->base();
 
@@ -182,7 +165,7 @@ static void compute_draw_order(running_machine *machine)
 
 			mask |= (1 << data);	/* in next loop, we'll see which of the remaining */
 									/* layers has top priority when this one is transparent */
-			draw_order[i][j] = data;
+			state->draw_order[i][j] = data;
 		}
 	}
 }
@@ -190,23 +173,24 @@ static void compute_draw_order(running_machine *machine)
 
 VIDEO_START( taitosj )
 {
+	taitosj_state *state = machine->driver_data<taitosj_state>();
 	int i;
 
-	sprite_layer_collbitmap1 = auto_bitmap_alloc(machine,16,16,machine->primary_screen->format());
+	state->sprite_layer_collbitmap1 = auto_bitmap_alloc(machine,16,16,machine->primary_screen->format());
 
 	for (i = 0; i < 3; i++)
 	{
-		taitosj_layer_bitmap[i] = machine->primary_screen->alloc_compatible_bitmap();
-		sprite_layer_collbitmap2[i] = machine->primary_screen->alloc_compatible_bitmap();
+		state->layer_bitmap[i] = machine->primary_screen->alloc_compatible_bitmap();
+		state->sprite_layer_collbitmap2[i] = machine->primary_screen->alloc_compatible_bitmap();
 	}
 
-	sprite_sprite_collbitmap1 = auto_bitmap_alloc(machine,32,32,machine->primary_screen->format());
-	sprite_sprite_collbitmap2 = auto_bitmap_alloc(machine,32,32,machine->primary_screen->format());
+	state->sprite_sprite_collbitmap1 = auto_bitmap_alloc(machine,32,32,machine->primary_screen->format());
+	state->sprite_sprite_collbitmap2 = auto_bitmap_alloc(machine,32,32,machine->primary_screen->format());
 
-	gfx_element_set_source(machine->gfx[0], taitosj_characterram);
-	gfx_element_set_source(machine->gfx[1], taitosj_characterram);
-	gfx_element_set_source(machine->gfx[2], taitosj_characterram + 0x1800);
-	gfx_element_set_source(machine->gfx[3], taitosj_characterram + 0x1800);
+	gfx_element_set_source(machine->gfx[0], state->characterram);
+	gfx_element_set_source(machine->gfx[1], state->characterram);
+	gfx_element_set_source(machine->gfx[2], state->characterram + 0x1800);
+	gfx_element_set_source(machine->gfx[3], state->characterram + 0x1800);
 
 	compute_draw_order(machine);
 }
@@ -215,9 +199,10 @@ VIDEO_START( taitosj )
 
 READ8_HANDLER( taitosj_gfxrom_r )
 {
+	taitosj_state *state = space->machine->driver_data<taitosj_state>();
 	UINT8 ret;
 
-	offs_t offs = taitosj_gfxpointer[0] | (taitosj_gfxpointer[1] << 8);
+	offs_t offs = state->gfxpointer[0] | (state->gfxpointer[1] << 8);
 
 	if (offs < 0x8000)
 		ret = space->machine->region("gfx1")->base()[offs];
@@ -226,8 +211,8 @@ READ8_HANDLER( taitosj_gfxrom_r )
 
 	offs = offs + 1;
 
-	taitosj_gfxpointer[0] = offs & 0xff;
-	taitosj_gfxpointer[1] = offs >> 8;
+	state->gfxpointer[0] = offs & 0xff;
+	state->gfxpointer[1] = offs >> 8;
 
 	return ret;
 }
@@ -236,7 +221,8 @@ READ8_HANDLER( taitosj_gfxrom_r )
 
 WRITE8_HANDLER( taitosj_characterram_w )
 {
-	if (taitosj_characterram[offset] != data)
+	taitosj_state *state = space->machine->driver_data<taitosj_state>();
+	if (state->characterram[offset] != data)
 	{
 		if (offset < 0x1800)
 		{
@@ -249,7 +235,7 @@ WRITE8_HANDLER( taitosj_characterram_w )
 			gfx_element_mark_dirty(space->machine->gfx[3], (offset / 32) & 0x3f);
 		}
 
-		taitosj_characterram[offset] = data;
+		state->characterram[offset] = data;
 	}
 }
 
@@ -261,19 +247,20 @@ WRITE8_HANDLER( junglhbr_characterram_w )
 
 WRITE8_HANDLER( taitosj_collision_reg_clear_w )
 {
-	taitosj_collision_reg[0] = 0;
-	taitosj_collision_reg[1] = 0;
-	taitosj_collision_reg[2] = 0;
-	taitosj_collision_reg[3] = 0;
+	taitosj_state *state = space->machine->driver_data<taitosj_state>();
+	state->collision_reg[0] = 0;
+	state->collision_reg[1] = 0;
+	state->collision_reg[2] = 0;
+	state->collision_reg[3] = 0;
 }
 
 
-INLINE int get_sprite_xy(UINT8 which, UINT8* sx, UINT8* sy)
+INLINE int get_sprite_xy(taitosj_state *state, UINT8 which, UINT8* sx, UINT8* sy)
 {
 	offs_t offs = which * 4;
 
-	*sx =       taitosj_spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 0] - 1;
-	*sy = 240 - taitosj_spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 1];
+	*sx =       state->spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 0] - 1;
+	*sy = 240 - state->spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 1];
 
 	return (*sy < 240);
 }
@@ -281,9 +268,10 @@ INLINE int get_sprite_xy(UINT8 which, UINT8* sx, UINT8* sy)
 
 INLINE const gfx_element *get_sprite_gfx_element(running_machine *machine, UINT8 which)
 {
+	taitosj_state *state = machine->driver_data<taitosj_state>();
 	offs_t offs = which * 4;
 
-	return machine->gfx[(taitosj_spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 3] & 0x40) ? 3 : 1];
+	return machine->gfx[(state->spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 3] & 0x40) ? 3 : 1];
 }
 
 
@@ -291,6 +279,7 @@ static int check_sprite_sprite_bitpattern(running_machine *machine,
 										  int sx1, int sy1, int which1,
 										  int sx2, int sy2, int which2)
 {
+	taitosj_state *state = machine->driver_data<taitosj_state>();
 	int x, y, minx, miny, maxx = 16, maxy = 16;
 
 	offs_t offs1 = which1 * 4;
@@ -324,26 +313,26 @@ static int check_sprite_sprite_bitpattern(running_machine *machine,
 	}
 
 	/* draw the sprites into seperate bitmaps and check overlapping region */
-	bitmap_fill(sprite_layer_collbitmap1, NULL, TRANSPARENT_PEN);
-	drawgfx_transpen(sprite_sprite_collbitmap1, 0, get_sprite_gfx_element(machine, which1),
-			taitosj_spriteram[SPRITE_RAM_PAGE_OFFSET + offs1 + 3] & 0x3f,
+	bitmap_fill(state->sprite_layer_collbitmap1, NULL, TRANSPARENT_PEN);
+	drawgfx_transpen(state->sprite_sprite_collbitmap1, 0, get_sprite_gfx_element(machine, which1),
+			state->spriteram[SPRITE_RAM_PAGE_OFFSET + offs1 + 3] & 0x3f,
 			0,
-			taitosj_spriteram[SPRITE_RAM_PAGE_OFFSET + offs1 + 2] & 0x01,
-			taitosj_spriteram[SPRITE_RAM_PAGE_OFFSET + offs1 + 2] & 0x02,
+			state->spriteram[SPRITE_RAM_PAGE_OFFSET + offs1 + 2] & 0x01,
+			state->spriteram[SPRITE_RAM_PAGE_OFFSET + offs1 + 2] & 0x02,
 			sx1, sy1, 0);
 
-	bitmap_fill(sprite_sprite_collbitmap2, NULL, TRANSPARENT_PEN);
-	drawgfx_transpen(sprite_sprite_collbitmap2, 0, get_sprite_gfx_element(machine, which2),
-			taitosj_spriteram[SPRITE_RAM_PAGE_OFFSET + offs2 + 3] & 0x3f,
+	bitmap_fill(state->sprite_sprite_collbitmap2, NULL, TRANSPARENT_PEN);
+	drawgfx_transpen(state->sprite_sprite_collbitmap2, 0, get_sprite_gfx_element(machine, which2),
+			state->spriteram[SPRITE_RAM_PAGE_OFFSET + offs2 + 3] & 0x3f,
 			0,
-			taitosj_spriteram[SPRITE_RAM_PAGE_OFFSET + offs2 + 2] & 0x01,
-			taitosj_spriteram[SPRITE_RAM_PAGE_OFFSET + offs2 + 2] & 0x02,
+			state->spriteram[SPRITE_RAM_PAGE_OFFSET + offs2 + 2] & 0x01,
+			state->spriteram[SPRITE_RAM_PAGE_OFFSET + offs2 + 2] & 0x02,
 			sx2, sy2, 0);
 
 	for (y = miny; y < maxy; y++)
 		for (x = minx; x < maxx; x++)
-			if ((*BITMAP_ADDR16(sprite_sprite_collbitmap1, y, x) != TRANSPARENT_PEN) &&
-			    (*BITMAP_ADDR16(sprite_sprite_collbitmap2, y, x) != TRANSPARENT_PEN))
+			if ((*BITMAP_ADDR16(state->sprite_sprite_collbitmap1, y, x) != TRANSPARENT_PEN) &&
+			    (*BITMAP_ADDR16(state->sprite_sprite_collbitmap2, y, x) != TRANSPARENT_PEN))
 				return 1;  /* collided */
 
 	return 0;
@@ -352,6 +341,7 @@ static int check_sprite_sprite_bitpattern(running_machine *machine,
 
 static void check_sprite_sprite_collision(running_machine *machine)
 {
+	taitosj_state *state = machine->driver_data<taitosj_state>();
 	if (SPRITES_ON)
 	{
 		int which1;
@@ -364,7 +354,7 @@ static void check_sprite_sprite_collision(running_machine *machine)
 
 			if ((which1 >= 0x10) && (which1 <= 0x17)) continue;	/* no sprites here */
 
-			if (!get_sprite_xy(which1, &sx1, &sy1)) continue;
+			if (!get_sprite_xy(state, which1, &sx1, &sy1)) continue;
 
 			for (which2 = which1 + 1; which2 < 0x20; which2++)
 			{
@@ -372,7 +362,7 @@ static void check_sprite_sprite_collision(running_machine *machine)
 
 				if ((which2 >= 0x10) && (which2 <= 0x17)) continue;	  /* no sprites here */
 
-				if (!get_sprite_xy(which2, &sx2, &sy2)) continue;
+				if (!get_sprite_xy(state, which2, &sx2, &sy2)) continue;
 
 				/* quickly rule out any pairs that cannot be touching */
 				if ((abs((INT8)sx1 - (INT8)sx2) < 16) &&
@@ -393,14 +383,14 @@ static void check_sprite_sprite_collision(running_machine *machine)
 						reg = which1 >> 3;
 						if (reg == 3)  reg = 2;
 
-						taitosj_collision_reg[reg] |= (1 << (which1 & 0x07));
+						state->collision_reg[reg] |= (1 << (which1 & 0x07));
 					}
 					else
 					{
 						reg = which2 >> 3;
 						if (reg == 3)  reg = 2;
 
-						taitosj_collision_reg[reg] |= (1 << (which2 & 0x07));
+						state->collision_reg[reg] |= (1 << (which2 & 0x07));
 					}
 				}
 			}
@@ -411,6 +401,7 @@ static void check_sprite_sprite_collision(running_machine *machine)
 
 static void calculate_sprite_areas(running_machine *machine, int *sprites_on, rectangle *sprite_areas)
 {
+	taitosj_state *state = machine->driver_data<taitosj_state>();
 	int which;
 	int width = machine->primary_screen->width();
 	int height = machine->primary_screen->height();
@@ -421,7 +412,7 @@ static void calculate_sprite_areas(running_machine *machine, int *sprites_on, re
 
 		if ((which >= 0x10) && (which <= 0x17)) continue;	/* no sprites here */
 
-		if (get_sprite_xy(which, &sx, &sy))
+		if (get_sprite_xy(state, which, &sx, &sy))
 		{
 			int minx, miny, maxx, maxy;
 
@@ -461,41 +452,42 @@ static void calculate_sprite_areas(running_machine *machine, int *sprites_on, re
 
 static int check_sprite_layer_bitpattern(running_machine *machine, int which, rectangle *sprite_areas)
 {
+	taitosj_state *state = machine->driver_data<taitosj_state>();
 	int y, x;
 	offs_t offs = which * 4;
 	int result = 0;  /* no collisions */
 
-	int	check_layer_1 = *taitosj_video_mode & layer_enable_mask[0];
-	int	check_layer_2 = *taitosj_video_mode & layer_enable_mask[1];
-	int	check_layer_3 = *taitosj_video_mode & layer_enable_mask[2];
+	int	check_layer_1 = *state->video_mode & layer_enable_mask[0];
+	int	check_layer_2 = *state->video_mode & layer_enable_mask[1];
+	int	check_layer_3 = *state->video_mode & layer_enable_mask[2];
 
 	int minx = sprite_areas[which].min_x;
 	int miny = sprite_areas[which].min_y;
 	int maxx = sprite_areas[which].max_x + 1;
 	int maxy = sprite_areas[which].max_y + 1;
 
-	int flip_x = (taitosj_spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 2] & 0x01) ^ GLOBAL_FLIP_X;
-	int flip_y = (taitosj_spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 2] & 0x02) ^ GLOBAL_FLIP_Y;
+	int flip_x = (state->spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 2] & 0x01) ^ GLOBAL_FLIP_X;
+	int flip_y = (state->spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 2] & 0x02) ^ GLOBAL_FLIP_Y;
 
 	/* draw sprite into a bitmap and check if layers collide */
-	bitmap_fill(sprite_layer_collbitmap1, NULL, TRANSPARENT_PEN);
-	drawgfx_transpen(sprite_layer_collbitmap1, 0,get_sprite_gfx_element(machine, which),
-			taitosj_spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 3] & 0x3f,
+	bitmap_fill(state->sprite_layer_collbitmap1, NULL, TRANSPARENT_PEN);
+	drawgfx_transpen(state->sprite_layer_collbitmap1, 0,get_sprite_gfx_element(machine, which),
+			state->spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 3] & 0x3f,
 			0,
 			flip_x, flip_y,
 			0,0,0);
 
 	for (y = miny; y < maxy; y++)
 		for (x = minx; x < maxx; x++)
-			if (*BITMAP_ADDR16(sprite_layer_collbitmap1, y - miny, x - minx) != TRANSPARENT_PEN) /* is there anything to check for ? */
+			if (*BITMAP_ADDR16(state->sprite_layer_collbitmap1, y - miny, x - minx) != TRANSPARENT_PEN) /* is there anything to check for ? */
 			{
-				if (check_layer_1 && (*BITMAP_ADDR16(sprite_layer_collbitmap2[0], y, x) != TRANSPARENT_PEN))
+				if (check_layer_1 && (*BITMAP_ADDR16(state->sprite_layer_collbitmap2[0], y, x) != TRANSPARENT_PEN))
 					result |= 0x01;  /* collided with layer 1 */
 
-				if (check_layer_2 && (*BITMAP_ADDR16(sprite_layer_collbitmap2[1], y, x) != TRANSPARENT_PEN))
+				if (check_layer_2 && (*BITMAP_ADDR16(state->sprite_layer_collbitmap2[1], y, x) != TRANSPARENT_PEN))
 					result |= 0x02;  /* collided with layer 2 */
 
-				if (check_layer_3 && (*BITMAP_ADDR16(sprite_layer_collbitmap2[2], y, x) != TRANSPARENT_PEN))
+				if (check_layer_3 && (*BITMAP_ADDR16(state->sprite_layer_collbitmap2[2], y, x) != TRANSPARENT_PEN))
 					result |= 0x04;  /* collided with layer 3 */
 			}
 
@@ -505,6 +497,7 @@ static int check_sprite_layer_bitpattern(running_machine *machine, int which, re
 
 static void check_sprite_layer_collision(running_machine *machine, int *sprites_on, rectangle *sprite_areas)
 {
+	taitosj_state *state = machine->driver_data<taitosj_state>();
 	if (SPRITES_ON)
 	{
 		int which;
@@ -515,7 +508,7 @@ static void check_sprite_layer_collision(running_machine *machine, int *sprites_
 			if ((which >= 0x10) && (which <= 0x17)) continue;	/* no sprites here */
 
 			if (sprites_on[which])
-				taitosj_collision_reg[3] |= check_sprite_layer_bitpattern(machine, which, sprite_areas);
+				state->collision_reg[3] |= check_sprite_layer_bitpattern(machine, which, sprite_areas);
 		}
 	}
 }
@@ -523,11 +516,12 @@ static void check_sprite_layer_collision(running_machine *machine, int *sprites_
 
 static void draw_layers(running_machine *machine)
 {
+	taitosj_state *state = machine->driver_data<taitosj_state>();
 	offs_t offs;
 
-	bitmap_fill(taitosj_layer_bitmap[0], NULL, TRANSPARENT_PEN);
-	bitmap_fill(taitosj_layer_bitmap[1], NULL, TRANSPARENT_PEN);
-	bitmap_fill(taitosj_layer_bitmap[2], NULL, TRANSPARENT_PEN);
+	bitmap_fill(state->layer_bitmap[0], NULL, TRANSPARENT_PEN);
+	bitmap_fill(state->layer_bitmap[1], NULL, TRANSPARENT_PEN);
+	bitmap_fill(state->layer_bitmap[2], NULL, TRANSPARENT_PEN);
 
 	for (offs = 0; offs < 0x0400; offs++)
 	{
@@ -537,21 +531,21 @@ static void draw_layers(running_machine *machine)
 		if (GLOBAL_FLIP_X) sx = 31 - sx;
 		if (GLOBAL_FLIP_Y) sy = 31 - sy;
 
-		drawgfx_transpen(taitosj_layer_bitmap[0],0,machine->gfx[taitosj_colorbank[0] & 0x08 ? 2 : 0],
-				taitosj_videoram_1[offs],
-				taitosj_colorbank[0] & 0x07,
+		drawgfx_transpen(state->layer_bitmap[0],0,machine->gfx[state->colorbank[0] & 0x08 ? 2 : 0],
+				state->videoram_1[offs],
+				state->colorbank[0] & 0x07,
 				GLOBAL_FLIP_X,GLOBAL_FLIP_Y,
 				8*sx,8*sy,0);
 
-		drawgfx_transpen(taitosj_layer_bitmap[1],0,machine->gfx[taitosj_colorbank[0] & 0x80 ? 2 : 0],
-				taitosj_videoram_2[offs],
-				(taitosj_colorbank[0] >> 4) & 0x07,
+		drawgfx_transpen(state->layer_bitmap[1],0,machine->gfx[state->colorbank[0] & 0x80 ? 2 : 0],
+				state->videoram_2[offs],
+				(state->colorbank[0] >> 4) & 0x07,
 				GLOBAL_FLIP_X,GLOBAL_FLIP_Y,
 				8*sx,8*sy,0);
 
-		drawgfx_transpen(taitosj_layer_bitmap[2],0,machine->gfx[taitosj_colorbank[1] & 0x08 ? 2 : 0],
-				taitosj_videoram_3[offs],
-				taitosj_colorbank[1] & 0x07,
+		drawgfx_transpen(state->layer_bitmap[2],0,machine->gfx[state->colorbank[1] & 0x08 ? 2 : 0],
+				state->videoram_3[offs],
+				state->colorbank[1] & 0x07,
 				GLOBAL_FLIP_X,GLOBAL_FLIP_Y,
 				8*sx,8*sy,0);
 	}
@@ -560,6 +554,7 @@ static void draw_layers(running_machine *machine)
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap)
 {
+	taitosj_state *state = machine->driver_data<taitosj_state>();
 	/*
        sprite visibility area is missing 4 pixels from the sides, surely to reduce
        wraparound side effects. This was verified on a real Elevator Action.
@@ -591,12 +586,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap)
 
 			if ((which >= 0x10) && (which <= 0x17)) continue;	/* no sprites here */
 
-			if (get_sprite_xy(which, &sx, &sy))
+			if (get_sprite_xy(state, which, &sx, &sy))
 			{
-				int code = taitosj_spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 3] & 0x3f;
-				int color = 2 * ((taitosj_colorbank[1] >> 4) & 0x03) + ((taitosj_spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 2] >> 2) & 0x01);
-				int flip_x = taitosj_spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 2] & 0x01;
-				int flip_y = taitosj_spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 2] & 0x02;
+				int code = state->spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 3] & 0x3f;
+				int color = 2 * ((state->colorbank[1] >> 4) & 0x03) + ((state->spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 2] >> 2) & 0x01);
+				int flip_x = state->spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 2] & 0x01;
+				int flip_y = state->spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 2] & 0x02;
 
 				if (GLOBAL_FLIP_X)
 				{
@@ -625,14 +620,15 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap)
 static void taitosj_copy_layer(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
 							   int which, int *sprites_on, rectangle *sprite_areas)
 {
+	taitosj_state *state = machine->driver_data<taitosj_state>();
 	static const int fudge1[3] = { 3,  1, -1 };
 	static const int fudge2[3] = { 8, 10, 12 };
 
-	if (*taitosj_video_mode & layer_enable_mask[which])
+	if (*state->video_mode & layer_enable_mask[which])
 	{
 		int i, scrollx, scrolly[32];
 
-		scrollx = taitosj_scroll[2 * which];
+		scrollx = state->scroll[2 * which];
 
 		if (GLOBAL_FLIP_X)
 			scrollx =  (scrollx & 0xf8) + ((scrollx + fudge1[which]) & 7) + fudge2[which];
@@ -641,12 +637,12 @@ static void taitosj_copy_layer(running_machine *machine, bitmap_t *bitmap, const
 
 		if (GLOBAL_FLIP_Y)
 			for (i = 0;i < 32;i++)
-				scrolly[31 - i] =  taitosj_colscrolly[32 * which + i] + taitosj_scroll[2 * which + 1];
+				scrolly[31 - i] =  state->colscrolly[32 * which + i] + state->scroll[2 * which + 1];
 		else
 			for (i = 0;i < 32;i++)
-				scrolly[i]      = -taitosj_colscrolly[32 * which + i] - taitosj_scroll[2 * which + 1];
+				scrolly[i]      = -state->colscrolly[32 * which + i] - state->scroll[2 * which + 1];
 
-		copyscrollbitmap_trans(bitmap, taitosj_layer_bitmap[which], 1, &scrollx, 32, scrolly, cliprect, TRANSPARENT_PEN);
+		copyscrollbitmap_trans(bitmap, state->layer_bitmap[which], 1, &scrollx, 32, scrolly, cliprect, TRANSPARENT_PEN);
 
 		/* store parts covered with sprites for sprites/layers collision detection */
 		for (i = 0; i < 0x20; i++)
@@ -654,7 +650,7 @@ static void taitosj_copy_layer(running_machine *machine, bitmap_t *bitmap, const
 			if ((i >= 0x10) && (i <= 0x17)) continue; /* no sprites here */
 
 			if (sprites_on[i])
-				copyscrollbitmap(sprite_layer_collbitmap2[which], taitosj_layer_bitmap[which], 1, &scrollx, 32, scrolly, &sprite_areas[i]);
+				copyscrollbitmap(state->sprite_layer_collbitmap2[which], state->layer_bitmap[which], 1, &scrollx, 32, scrolly, &sprite_areas[i]);
 		}
 	}
 }
@@ -663,7 +659,8 @@ static void taitosj_copy_layer(running_machine *machine, bitmap_t *bitmap, const
 static void kikstart_copy_layer(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
 								int which, int *sprites_on, rectangle *sprite_areas)
 {
-	if (*taitosj_video_mode & layer_enable_mask[which])
+	taitosj_state *state = machine->driver_data<taitosj_state>();
+	if (*state->video_mode & layer_enable_mask[which])
 	{
 		int i, scrolly, scrollx[32 * 8];
 
@@ -672,19 +669,19 @@ static void kikstart_copy_layer(running_machine *machine, bitmap_t *bitmap, cons
 				switch (which)
 				{
 				case 0:	scrollx[32 * 8 - i] = 0 ;break;
-				case 1:	scrollx[32 * 8 - i] = kikstart_scrollram[i] + ((taitosj_scroll[2 * which] + 0x0a) & 0xff);break;
-				case 2:	scrollx[32 * 8 - i] = kikstart_scrollram[0x100 + i] + ((taitosj_scroll[2 * which] + 0xc) & 0xff);break;
+				case 1:	scrollx[32 * 8 - i] = state->kikstart_scrollram[i] + ((state->scroll[2 * which] + 0x0a) & 0xff);break;
+				case 2:	scrollx[32 * 8 - i] = state->kikstart_scrollram[0x100 + i] + ((state->scroll[2 * which] + 0xc) & 0xff);break;
 				}
 			else
 				switch (which)
 				{
 				case 0:	scrollx[i] = 0 ;break;
-				case 1:	scrollx[i] = 0xff - kikstart_scrollram[i - 1] - ((taitosj_scroll[2 * which] - 0x10) & 0xff);break;
-				case 2:	scrollx[i] = 0xff - kikstart_scrollram[0x100 + i - 1] - ((taitosj_scroll[2 * which] - 0x12) & 0xff);break;
+				case 1:	scrollx[i] = 0xff - state->kikstart_scrollram[i - 1] - ((state->scroll[2 * which] - 0x10) & 0xff);break;
+				case 2:	scrollx[i] = 0xff - state->kikstart_scrollram[0x100 + i - 1] - ((state->scroll[2 * which] - 0x12) & 0xff);break;
 				}
 
-		scrolly = taitosj_scroll[2 * which + 1];	/* always 0 */
-		copyscrollbitmap_trans(bitmap, taitosj_layer_bitmap[which], 32 * 8, scrollx, 1, &scrolly, cliprect, TRANSPARENT_PEN);
+		scrolly = state->scroll[2 * which + 1];	/* always 0 */
+		copyscrollbitmap_trans(bitmap, state->layer_bitmap[which], 32 * 8, scrollx, 1, &scrolly, cliprect, TRANSPARENT_PEN);
 
 		/* store parts covered with sprites for sprites/layers collision detection */
 		for (i = 0; i < 0x20; i++)
@@ -692,7 +689,7 @@ static void kikstart_copy_layer(running_machine *machine, bitmap_t *bitmap, cons
 			if ((i >= 0x10) && (i <= 0x17)) continue; /* no sprites here */
 
 			if (sprites_on[i])
-				copyscrollbitmap(sprite_layer_collbitmap2[which], taitosj_layer_bitmap[which], 32 * 8, scrollx, 1, &scrolly, &sprite_areas[i]);
+				copyscrollbitmap(state->sprite_layer_collbitmap2[which], state->layer_bitmap[which], 32 * 8, scrollx, 1, &scrolly, &sprite_areas[i]);
 		}
 	}
 }
@@ -711,14 +708,15 @@ static void copy_layer(running_machine *machine, bitmap_t *bitmap, const rectang
 static void copy_layers(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
 						copy_layer_func_t copy_layer_func, int *sprites_on, rectangle *sprite_areas)
 {
+	taitosj_state *state = machine->driver_data<taitosj_state>();
 	int i = 0;
 
 	/* fill the screen with the background color */
-	bitmap_fill(bitmap, cliprect, 8 * (taitosj_colorbank[1] & 0x07));
+	bitmap_fill(bitmap, cliprect, 8 * (state->colorbank[1] & 0x07));
 
 	for (i = 0; i < 4; i++)
 	{
-		int which = draw_order[*taitosj_video_priority & 0x1f][i];
+		int which = state->draw_order[*state->video_priority & 0x1f][i];
 
 		copy_layer(machine, bitmap, cliprect, copy_layer_func, which, sprites_on, sprite_areas);
 	}

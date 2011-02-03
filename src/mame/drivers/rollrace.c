@@ -30,8 +30,8 @@ static ADDRESS_MAP_START( rollrace_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd806, 0xd806) AM_READNOP /* looks like a watchdog, bit4 checked*/
 	AM_RANGE(0xd900, 0xd900) AM_READWRITE(ra_fake_d800_r,ra_fake_d800_w) /* protection ??*/
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE(&rollrace_videoram)
-	AM_RANGE(0xe400, 0xe47f) AM_RAM AM_BASE(&rollrace_colorram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE_MEMBER(rollrace_state, videoram)
+	AM_RANGE(0xe400, 0xe47f) AM_RAM AM_BASE_MEMBER(rollrace_state, colorram)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xec00, 0xec0f) AM_NOP /* Analog sound effects ?? ec00 sound enable ?*/
 	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
@@ -197,7 +197,7 @@ static GFXDECODE_START( rollrace )
 	GFXDECODE_ENTRY( "gfx5", 0x0000, spritelayout,	0,	32 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( rollrace, driver_device )
+static MACHINE_CONFIG_START( rollrace, rollrace_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_24MHz/8) /* verified on pcb */

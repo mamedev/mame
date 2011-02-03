@@ -9,14 +9,6 @@
 #include "emu.h"
 #include "includes/retofinv.h"
 
-UINT8 *retofinv_bg_videoram;
-UINT8 *retofinv_fg_videoram;
-UINT8 *retofinv_sharedram;
-
-static int fg_bank,bg_bank;
-static tilemap_t *bg_tilemap,*fg_tilemap;
-
-
 
 PALETTE_INIT( retofinv )
 {
@@ -81,22 +73,24 @@ static TILEMAP_MAPPER( tilemap_scan )
 
 static TILE_GET_INFO( bg_get_tile_info )
 {
+	retofinv_state *state = machine->driver_data<retofinv_state>();
 	SET_TILE_INFO(
 			2,
-			retofinv_bg_videoram[tile_index] + 256 * bg_bank,
-			retofinv_bg_videoram[0x400 + tile_index] & 0x3f,
+			state->bg_videoram[tile_index] + 256 * state->bg_bank,
+			state->bg_videoram[0x400 + tile_index] & 0x3f,
 			0);
 }
 
 static TILE_GET_INFO( fg_get_tile_info )
 {
-	int color = retofinv_fg_videoram[0x400 + tile_index];
+	retofinv_state *state = machine->driver_data<retofinv_state>();
+	int color = state->fg_videoram[0x400 + tile_index];
 
 	tileinfo->group = color;
 
 	SET_TILE_INFO(
 			0,
-			retofinv_fg_videoram[tile_index] + 256 * fg_bank,
+			state->fg_videoram[tile_index] + 256 * state->fg_bank,
 			color,
 			0);
 }
@@ -111,10 +105,11 @@ static TILE_GET_INFO( fg_get_tile_info )
 
 VIDEO_START( retofinv )
 {
-	bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan,8,8,36,28);
-	fg_tilemap = tilemap_create(machine, fg_get_tile_info,tilemap_scan,8,8,36,28);
+	retofinv_state *state = machine->driver_data<retofinv_state>();
+	state->bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan,8,8,36,28);
+	state->fg_tilemap = tilemap_create(machine, fg_get_tile_info,tilemap_scan,8,8,36,28);
 
-	colortable_configure_tilemap_groups(machine->colortable, fg_tilemap, machine->gfx[0], 0);
+	colortable_configure_tilemap_groups(machine->colortable, state->fg_tilemap, machine->gfx[0], 0);
 }
 
 
@@ -127,18 +122,21 @@ VIDEO_START( retofinv )
 
 WRITE8_HANDLER( retofinv_bg_videoram_w )
 {
-	retofinv_bg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap,offset & 0x3ff);
+	retofinv_state *state = space->machine->driver_data<retofinv_state>();
+	state->bg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( retofinv_fg_videoram_w )
 {
-	retofinv_fg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap,offset & 0x3ff);
+	retofinv_state *state = space->machine->driver_data<retofinv_state>();
+	state->fg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->fg_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( retofinv_gfx_ctrl_w )
 {
+	retofinv_state *state = space->machine->driver_data<retofinv_state>();
 	switch (offset)
 	{
 		case 0:
@@ -146,18 +144,18 @@ WRITE8_HANDLER( retofinv_gfx_ctrl_w )
 			break;
 
 		case 1:
-			if (fg_bank != (data & 1))
+			if (state->fg_bank != (data & 1))
 			{
-				fg_bank = data & 1;
-				tilemap_mark_all_tiles_dirty(fg_tilemap);
+				state->fg_bank = data & 1;
+				tilemap_mark_all_tiles_dirty(state->fg_tilemap);
 			}
 			break;
 
 		case 2:
-			if (bg_bank != (data & 1))
+			if (state->bg_bank != (data & 1))
 			{
-				bg_bank = data & 1;
-				tilemap_mark_all_tiles_dirty(bg_tilemap);
+				state->bg_bank = data & 1;
+				tilemap_mark_all_tiles_dirty(state->bg_tilemap);
 			}
 			break;
 	}
@@ -173,9 +171,10 @@ WRITE8_HANDLER( retofinv_gfx_ctrl_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap)
 {
-	UINT8 *spriteram = retofinv_sharedram + 0x0780;
-	UINT8 *spriteram_2 = retofinv_sharedram + 0x0f80;
-	UINT8 *spriteram_3 = retofinv_sharedram + 0x1780;
+	retofinv_state *state = machine->driver_data<retofinv_state>();
+	UINT8 *spriteram = state->sharedram + 0x0780;
+	UINT8 *spriteram_2 = state->sharedram + 0x0f80;
+	UINT8 *spriteram_3 = state->sharedram + 0x1780;
 	int offs;
 	static const rectangle spritevisiblearea =
 	{
@@ -232,8 +231,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap)
 
 VIDEO_UPDATE( retofinv )
 {
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
+	retofinv_state *state = screen->machine->driver_data<retofinv_state>();
+	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
 	draw_sprites(screen->machine, bitmap);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,0);
 	return 0;
 }

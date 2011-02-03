@@ -17,6 +17,8 @@
 #define QIX_CHARACTER_CLOCK		(20000000/2/16)
 
 
+#define NUM_PENS	(0x100)
+
 class qix_state : public driver_device
 {
 public:
@@ -38,6 +40,7 @@ public:
 	UINT8  palette_bank;
 	UINT8  leds;
 	UINT8 *scanline_latch;
+	pen_t pens[NUM_PENS];
 };
 
 

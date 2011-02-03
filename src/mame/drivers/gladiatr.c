@@ -320,23 +320,24 @@ static WRITE8_HANDLER( gladiatr_irq_patch_w )
 
 
 
-static int data1,data2,flag1,flag2;
 
 static WRITE8_HANDLER(qx0_w)
 {
+	gladiatr_state *state = space->machine->driver_data<gladiatr_state>();
 	if(!offset)
 	{
-		data2=data;
-		flag2=1;
+		state->data2=data;
+		state->flag2=1;
 	}
 }
 
 static WRITE8_HANDLER(qx1_w)
 {
+	gladiatr_state *state = space->machine->driver_data<gladiatr_state>();
 	if(!offset)
 	{
-		data1=data;
-		flag1=1;
+		state->data1=data;
+		state->flag1=1;
 	}
 }
 
@@ -350,24 +351,27 @@ static READ8_HANDLER(qx3_r){ return space->machine->rand()&0xf; }
 
 static READ8_HANDLER(qx0_r)
 {
+	gladiatr_state *state = space->machine->driver_data<gladiatr_state>();
 	if(!offset)
-		 return data1;
+		 return state->data1;
 	else
-		return flag2;
+		return state->flag2;
 }
 
 static READ8_HANDLER(qx1_r)
 {
+	gladiatr_state *state = space->machine->driver_data<gladiatr_state>();
 	if(!offset)
-		return data2;
+		return state->data2;
 	else
-		return flag1;
+		return state->flag1;
 }
 
 static MACHINE_RESET( ppking )
 {
-	data1 = data2 = 0;
-	flag1 = flag2 = 1;
+	gladiatr_state *state = machine->driver_data<gladiatr_state>();
+	state->data1 = state->data2 = 0;
+	state->flag1 = state->flag2 = 1;
 }
 
 static ADDRESS_MAP_START( ppking_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -375,9 +379,9 @@ static ADDRESS_MAP_START( ppking_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xcbff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0xcc00, 0xcfff) AM_WRITE(ppking_video_registers_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(gladiatr_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(gladiatr_videoram_w) AM_BASE(&gladiatr_videoram)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(gladiatr_colorram_w) AM_BASE(&gladiatr_colorram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(gladiatr_textram_w) AM_BASE(&gladiatr_textram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(gladiatr_videoram_w) AM_BASE_MEMBER(gladiatr_state, videoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(gladiatr_colorram_w) AM_BASE_MEMBER(gladiatr_state, colorram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(gladiatr_textram_w) AM_BASE_MEMBER(gladiatr_state, textram)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram") /* battery backed RAM */
 ADDRESS_MAP_END
 
@@ -413,9 +417,9 @@ static ADDRESS_MAP_START( gladiatr_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xcbff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0xcc00, 0xcfff) AM_WRITE(gladiatr_video_registers_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(gladiatr_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(gladiatr_videoram_w) AM_BASE(&gladiatr_videoram)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(gladiatr_colorram_w) AM_BASE(&gladiatr_colorram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(gladiatr_textram_w) AM_BASE(&gladiatr_textram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(gladiatr_videoram_w) AM_BASE_MEMBER(gladiatr_state, videoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(gladiatr_colorram_w) AM_BASE_MEMBER(gladiatr_state, colorram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(gladiatr_textram_w) AM_BASE_MEMBER(gladiatr_state, textram)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram") /* battery backed RAM */
 ADDRESS_MAP_END
 

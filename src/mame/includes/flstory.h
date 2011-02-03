@@ -41,6 +41,17 @@ public:
 	device_t *maincpu;
 	device_t *audiocpu;
 	device_t *mcu;
+
+	/* mcu */
+	UINT8 mcu_cmd;
+	UINT8 mcu_counter;
+	UINT8 mcu_b4_cmd;
+	UINT8 mcu_param;
+	UINT8 mcu_b2_res;
+	UINT8 mcu_b1_res;
+	UINT8 mcu_bb_res;
+	UINT8 mcu_b5_res;
+	UINT8 mcu_b6_res;
 };
 
 

@@ -463,38 +463,34 @@ VIDEO_UPDATE( slapshot )
 	UINT16 priority;
 
 #ifdef MAME_DEBUG
-	static int dislayer[5];	/* Layer toggles to help get the layers correct */
-#endif
-
-#ifdef MAME_DEBUG
 	if (input_code_pressed_once (screen->machine, KEYCODE_Z))
 	{
-		dislayer[0] ^= 1;
-		popmessage("bg0: %01x",dislayer[0]);
+		state->dislayer[0] ^= 1;
+		popmessage("bg0: %01x",state->dislayer[0]);
 	}
 
 	if (input_code_pressed_once (screen->machine, KEYCODE_X))
 	{
-		dislayer[1] ^= 1;
-		popmessage("bg1: %01x",dislayer[1]);
+		state->dislayer[1] ^= 1;
+		popmessage("bg1: %01x",state->dislayer[1]);
 	}
 
 	if (input_code_pressed_once (screen->machine, KEYCODE_C))
 	{
-		dislayer[2] ^= 1;
-		popmessage("bg2: %01x",dislayer[2]);
+		state->dislayer[2] ^= 1;
+		popmessage("bg2: %01x",state->dislayer[2]);
 	}
 
 	if (input_code_pressed_once (screen->machine, KEYCODE_V))
 	{
-		dislayer[3] ^= 1;
-		popmessage("bg3: %01x",dislayer[3]);
+		state->dislayer[3] ^= 1;
+		popmessage("bg3: %01x",state->dislayer[3]);
 	}
 
 	if (input_code_pressed_once (screen->machine, KEYCODE_B))
 	{
-		dislayer[4] ^= 1;
-		popmessage("text: %01x",dislayer[4]);
+		state->dislayer[4] ^= 1;
+		popmessage("text: %01x",state->dislayer[4]);
 	}
 #endif
 
@@ -527,22 +523,22 @@ VIDEO_UPDATE( slapshot )
 	bitmap_fill(bitmap, cliprect, 0);
 
 #ifdef MAME_DEBUG
-	if (dislayer[layer[0]] == 0)
+	if (state->dislayer[layer[0]] == 0)
 #endif
 		tc0480scp_tilemap_draw(state->tc0480scp, bitmap, cliprect, layer[0], 0, 1);
 
 #ifdef MAME_DEBUG
-	if (dislayer[layer[1]] == 0)
+	if (state->dislayer[layer[1]] == 0)
 #endif
 		tc0480scp_tilemap_draw(state->tc0480scp, bitmap, cliprect, layer[1], 0, 2);
 
 #ifdef MAME_DEBUG
-	if (dislayer[layer[2]] == 0)
+	if (state->dislayer[layer[2]] == 0)
 #endif
 		tc0480scp_tilemap_draw(state->tc0480scp, bitmap, cliprect, layer[2], 0, 4);
 
 #ifdef MAME_DEBUG
-	if (dislayer[layer[3]] == 0)
+	if (state->dislayer[layer[3]] == 0)
 #endif
 		tc0480scp_tilemap_draw(state->tc0480scp, bitmap, cliprect, layer[3], 0, 8);
 
@@ -568,7 +564,7 @@ VIDEO_UPDATE( slapshot )
     */
 
 #ifdef MAME_DEBUG
-	if (dislayer[layer[4]] == 0)
+	if (state->dislayer[layer[4]] == 0)
 #endif
 	tc0480scp_tilemap_draw(state->tc0480scp, bitmap, cliprect, layer[4], 0, 0);
 	return 0;

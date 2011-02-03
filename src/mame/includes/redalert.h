@@ -7,6 +7,23 @@
 
 ****************************************************************************/
 
+class redalert_state : public driver_device
+{
+public:
+	redalert_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 ay8910_latch_1;
+	UINT8 ay8910_latch_2;
+	UINT8 *bitmap_videoram;
+	UINT8 *bitmap_color;
+	UINT8 *charmap_videoram;
+	UINT8 *video_control;
+	UINT8 *bitmap_colorram;
+	UINT8 control_xor;
+};
+
+
 /*----------- defined in audio/redalert.c -----------*/
 
 WRITE8_HANDLER( redalert_audio_command_w );
@@ -21,10 +38,6 @@ MACHINE_CONFIG_EXTERN( demoneye_audio );
 
 /*----------- defined in video/redalert.c -----------*/
 
-extern UINT8 *redalert_bitmap_videoram;
-extern UINT8 *redalert_bitmap_color;
-extern UINT8 *redalert_charmap_videoram;
-extern UINT8 *redalert_video_control;
 WRITE8_HANDLER( redalert_bitmap_videoram_w );
 
 MACHINE_CONFIG_EXTERN( ww3_video );

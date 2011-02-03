@@ -650,32 +650,28 @@ VIDEO_UPDATE( wgp )
 	UINT8 layer[3];
 
 #ifdef MAME_DEBUG
-	static UINT8 dislayer[4];
-#endif
-
-#ifdef MAME_DEBUG
 	if (input_code_pressed_once (screen->machine, KEYCODE_V))
 	{
-		dislayer[0] ^= 1;
-		popmessage("piv0: %01x",dislayer[0]);
+		state->dislayer[0] ^= 1;
+		popmessage("piv0: %01x",state->dislayer[0]);
 	}
 
 	if (input_code_pressed_once (screen->machine, KEYCODE_B))
 	{
-		dislayer[1] ^= 1;
-		popmessage("piv1: %01x",dislayer[1]);
+		state->dislayer[1] ^= 1;
+		popmessage("piv1: %01x",state->dislayer[1]);
 	}
 
 	if (input_code_pressed_once (screen->machine, KEYCODE_N))
 	{
-		dislayer[2] ^= 1;
-		popmessage("piv2: %01x",dislayer[2]);
+		state->dislayer[2] ^= 1;
+		popmessage("piv2: %01x",state->dislayer[2]);
 	}
 
 	if (input_code_pressed_once (screen->machine, KEYCODE_M))
 	{
-		dislayer[3] ^= 1;
-		popmessage("TC0100SCN top bg layer: %01x",dislayer[3]);
+		state->dislayer[3] ^= 1;
+		popmessage("TC0100SCN top bg layer: %01x",state->dislayer[3]);
 	}
 #endif
 
@@ -702,17 +698,17 @@ VIDEO_UPDATE( wgp )
 /* We should draw the following on a 1024x1024 bitmap... */
 
 #ifdef MAME_DEBUG
-	if (dislayer[layer[0]] == 0)
+	if (state->dislayer[layer[0]] == 0)
 #endif
 	wgp_piv_layer_draw(screen->machine, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
 
 #ifdef MAME_DEBUG
-	if (dislayer[layer[1]] == 0)
+	if (state->dislayer[layer[1]] == 0)
 #endif
 	wgp_piv_layer_draw(screen->machine, bitmap, cliprect, layer[1], 0, 2);
 
 #ifdef MAME_DEBUG
-	if (dislayer[layer[2]] == 0)
+	if (state->dislayer[layer[2]] == 0)
 #endif
 	wgp_piv_layer_draw(screen->machine, bitmap, cliprect, layer[2], 0, 4);
 
@@ -726,7 +722,7 @@ VIDEO_UPDATE( wgp )
 	tc0100scn_tilemap_draw(state->tc0100scn, bitmap, cliprect, layer[0], 0, 0);
 
 #ifdef MAME_DEBUG
-	if (dislayer[3] == 0)
+	if (state->dislayer[3] == 0)
 #endif
 	tc0100scn_tilemap_draw(state->tc0100scn, bitmap, cliprect, layer[1], 0, 0);
 	tc0100scn_tilemap_draw(state->tc0100scn, bitmap, cliprect, layer[2], 0, 0);

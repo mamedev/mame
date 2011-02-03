@@ -341,7 +341,7 @@ static void draw_bglayer( running_machine *machine, int layer, bitmap_t *bitmap,
 }
 
 
-/* populate state->bg_bitmap for the given bank if it's not already */
+/* populate bg_bitmap for the given bank if it's not already */
 static void cache_bitmap(int scanline, psikyosh_state *state, gfx_element *gfx, int size, int tilebank, int alpha, int *last_bank)
 {
 	// test if the tile row is the cached one or not

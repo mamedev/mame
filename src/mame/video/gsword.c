@@ -8,17 +8,6 @@
 #include "emu.h"
 #include "includes/gsword.h"
 
-size_t gsword_spritexy_size;
-
-//UINT8 *gsword_scrolly_ram;
-UINT8 *gsword_spritexy_ram;
-UINT8 *gsword_spritetile_ram;
-UINT8 *gsword_spriteattrib_ram;
-
-static int charbank, charpalbank, flipscreen;
-
-static tilemap_t *bg_tilemap;
-
 
 static PALETTE_INIT( common )
 {
@@ -106,20 +95,22 @@ WRITE8_HANDLER( gsword_videoram_w )
 	gsword_state *state = space->machine->driver_data<gsword_state>();
 	UINT8 *videoram = state->videoram;
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( gsword_charbank_w )
 {
-	if (charbank != data)
+	gsword_state *state = space->machine->driver_data<gsword_state>();
+	if (state->charbank != data)
 	{
-		charbank = data;
+		state->charbank = data;
 		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 }
 
 WRITE8_HANDLER( gsword_videoctrl_w )
 {
+	gsword_state *state = space->machine->driver_data<gsword_state>();
 	if (data & 0x8f)
 	{
 		popmessage("videoctrl %02x",data);
@@ -127,17 +118,17 @@ WRITE8_HANDLER( gsword_videoctrl_w )
 
 	/* bits 5-6 are char palette bank */
 
-	if (charpalbank != ((data & 0x60) >> 5))
+	if (state->charpalbank != ((data & 0x60) >> 5))
 	{
-		charpalbank = (data & 0x60) >> 5;
+		state->charpalbank = (data & 0x60) >> 5;
 		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 
 	/* bit 4 is flip screen */
 
-	if (flipscreen != (data & 0x10))
+	if (state->flipscreen != (data & 0x10))
 	{
-		flipscreen = data & 0x10;
+		state->flipscreen = data & 0x10;
 	    tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 
@@ -148,43 +139,46 @@ WRITE8_HANDLER( gsword_videoctrl_w )
 
 WRITE8_HANDLER( gsword_scroll_w )
 {
-	tilemap_set_scrolly(bg_tilemap, 0, data);
+	gsword_state *state = space->machine->driver_data<gsword_state>();
+	tilemap_set_scrolly(state->bg_tilemap, 0, data);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	gsword_state *state = machine->driver_data<gsword_state>();
 	UINT8 *videoram = state->videoram;
-	int code = videoram[tile_index] + ((charbank & 0x03) << 8);
-	int color = ((code & 0x3c0) >> 6) + 16 * charpalbank;
-	int flags = flipscreen ? (TILE_FLIPX | TILE_FLIPY) : 0;
+	int code = videoram[tile_index] + ((state->charbank & 0x03) << 8);
+	int color = ((code & 0x3c0) >> 6) + 16 * state->charpalbank;
+	int flags = state->flipscreen ? (TILE_FLIPX | TILE_FLIPY) : 0;
 
 	SET_TILE_INFO(0, code, color, flags);
 }
 
 VIDEO_START( gsword )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
+	gsword_state *state = machine->driver_data<gsword_state>();
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 64);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	gsword_state *state = machine->driver_data<gsword_state>();
 	int offs;
 
-	for (offs = 0; offs < gsword_spritexy_size - 1; offs+=2)
+	for (offs = 0; offs < state->spritexy_size - 1; offs+=2)
 	{
 		int sx,sy,flipx,flipy,spritebank,tile,color;
 
-		if (gsword_spritexy_ram[offs]!=0xf1)
+		if (state->spritexy_ram[offs]!=0xf1)
 		{
 			spritebank = 0;
-			tile = gsword_spritetile_ram[offs];
-			color = gsword_spritetile_ram[offs+1] & 0x3f;
-			sy = 241-gsword_spritexy_ram[offs];
-			sx = gsword_spritexy_ram[offs+1]-56;
-			flipx = gsword_spriteattrib_ram[offs] & 0x02;
-			flipy = gsword_spriteattrib_ram[offs] & 0x01;
+			tile = state->spritetile_ram[offs];
+			color = state->spritetile_ram[offs+1] & 0x3f;
+			sy = 241-state->spritexy_ram[offs];
+			sx = state->spritexy_ram[offs+1]-56;
+			flipx = state->spriteattrib_ram[offs] & 0x02;
+			flipy = state->spriteattrib_ram[offs] & 0x01;
 
 			// Adjust sprites that should be far far right!
 			if (sx<0) sx+=256;
@@ -196,7 +190,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				tile -= 128;
 				sy-=16;
 			}
-			if (flipscreen)
+			if (state->flipscreen)
 			{
 				flipx = !flipx;
 				flipy = !flipy;
@@ -213,7 +207,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( gsword )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	gsword_state *state = screen->machine->driver_data<gsword_state>();
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

@@ -34,6 +34,7 @@ public:
 	INT32       sprites_disabled, sprites_active_area, sprites_master_scrollx, sprites_master_scrolly;
 	int         sprites_flipscreen;
 	int         prepare_sprites;
+	int         dislayer[5];
 
 	UINT16      spritebank[8];
 

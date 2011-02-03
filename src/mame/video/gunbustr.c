@@ -2,22 +2,12 @@
 #include "video/taitoic.h"
 #include "includes/gunbustr.h"
 
-struct tempsprite
-{
-	int gfx;
-	int code,color;
-	int flipx,flipy;
-	int x,y;
-	int zoomx,zoomy;
-	int primask;
-};
-static struct tempsprite *spritelist;
-
 /************************************************************/
 
 VIDEO_START( gunbustr )
 {
-	spritelist = auto_alloc_array(machine, struct tempsprite, 0x4000);
+	gunbustr_state *state = machine->driver_data<gunbustr_state>();
+	state->spritelist = auto_alloc_array(machine, struct tempsprite, 0x4000);
 }
 
 /************************************************************
@@ -68,6 +58,7 @@ Heavy use is made of sprite zooming.
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,const int *primasks,int x_offs,int y_offs)
 {
+	gunbustr_state *state = machine->driver_data<gunbustr_state>();
 	UINT32 *spriteram32 = machine->generic.spriteram.u32;
 	UINT16 *spritemap = (UINT16 *)machine->region("user1")->base();
 	int offs, data, tilenum, color, flipx, flipy;
@@ -79,7 +70,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
        while processing sprite ram and then draw them all at the end */
-	struct tempsprite *sprite_ptr = spritelist;
+	struct tempsprite *sprite_ptr = state->spritelist;
 
 	for (offs = (machine->generic.spriteram_size/4-4);offs >= 0;offs -= 4)
 	{
@@ -191,7 +182,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 	}
 
 	/* this happens only if primsks != NULL */
-	while (sprite_ptr != spritelist)
+	while (sprite_ptr != state->spritelist)
 	{
 		sprite_ptr--;
 

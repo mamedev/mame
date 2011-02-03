@@ -69,16 +69,17 @@ K1000233A
 #include "sound/ay8910.h"
 #include "includes/pitnrun.h"
 
-static int pitnrun_nmi;
 
 static INTERRUPT_GEN( pitnrun_nmi_source )
 {
-	 if(pitnrun_nmi) cpu_set_input_line(device,INPUT_LINE_NMI, PULSE_LINE);
+	pitnrun_state *state = device->machine->driver_data<pitnrun_state>();
+	if(state->nmi) cpu_set_input_line(device,INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
-        pitnrun_nmi = data & 1;
+	pitnrun_state *state = space->machine->driver_data<pitnrun_state>();
+        state->nmi = data & 1;
 }
 
 static WRITE8_HANDLER(pitnrun_hflip_w)
@@ -95,7 +96,7 @@ static ADDRESS_MAP_START( pitnrun_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(pitnrun_videoram_w) AM_BASE_MEMBER(pitnrun_state, videoram)
-	AM_RANGE(0x9000, 0x9fff) AM_RAM_WRITE(pitnrun_videoram2_w) AM_BASE(&pitnrun_videoram2)
+	AM_RANGE(0x9000, 0x9fff) AM_RAM_WRITE(pitnrun_videoram2_w) AM_BASE_MEMBER(pitnrun_state, videoram2)
 	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xa800, 0xa807) AM_WRITENOP /* Analog Sound */

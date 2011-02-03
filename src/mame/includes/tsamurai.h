@@ -1,8 +1,29 @@
-/*----------- defined in video/tsamurai.c -----------*/
+class tsamurai_state : public driver_device
+{
+public:
+	tsamurai_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-extern UINT8 *tsamurai_videoram;
-extern UINT8 *tsamurai_colorram;
-extern UINT8 *tsamurai_bg_videoram;
+	int nmi_enabled;
+	int sound_command1;
+	int sound_command2;
+	int sound_command3;
+	int vsgongf_sound_nmi_enabled;
+	UINT8 *videoram;
+	UINT8 *colorram;
+	UINT8 *bg_videoram;
+	int bgcolor;
+	int textbank1;
+	int textbank2;
+	tilemap_t *background;
+	tilemap_t *foreground;
+	int flicker;
+	int vsgongf_color;
+	int key_count;
+};
+
+
+/*----------- defined in video/tsamurai.c -----------*/
 
 WRITE8_HANDLER( vsgongf_color_w );
 

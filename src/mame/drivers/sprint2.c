@@ -74,7 +74,7 @@ static INTERRUPT_GEN( sprint2 )
 	sprint2_state *state = device->machine->driver_data<sprint2_state>();
 	device_t *discrete = device->machine->device("discrete");
 
-	/* handle state->steering wheels */
+	/* handle steering wheels */
 
 	if (GAME_IS_SPRINT1 || GAME_IS_SPRINT2)
 	{

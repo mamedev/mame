@@ -48,17 +48,17 @@ TODO:
 #include "sound/dac.h"
 #include "includes/tsamurai.h"
 
-static int nmi_enabled;
-static int sound_command1, sound_command2, sound_command3;
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
-	nmi_enabled = data;
+	tsamurai_state *state = space->machine->driver_data<tsamurai_state>();
+	state->nmi_enabled = data;
 }
 
 static INTERRUPT_GEN( samurai_interrupt )
 {
-	if (nmi_enabled) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	tsamurai_state *state = device->machine->driver_data<tsamurai_state>();
+	if (state->nmi_enabled) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static READ8_HANDLER( unknown_d803_r )
@@ -88,19 +88,22 @@ static READ8_HANDLER( unknown_d938_r )
 
 static WRITE8_HANDLER( sound_command1_w )
 {
-	sound_command1 = data;
+	tsamurai_state *state = space->machine->driver_data<tsamurai_state>();
+	state->sound_command1 = data;
 	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE );
 }
 
 static WRITE8_HANDLER( sound_command2_w )
 {
-	sound_command2 = data;
+	tsamurai_state *state = space->machine->driver_data<tsamurai_state>();
+	state->sound_command2 = data;
 	cputag_set_input_line(space->machine, "audio2", 0, HOLD_LINE );
 }
 
 static WRITE8_HANDLER( sound_command3_w )
 {
-	sound_command3 = data;
+	tsamurai_state *state = space->machine->driver_data<tsamurai_state>();
+	state->sound_command3 = data;
 	cputag_set_input_line(space->machine, "audio3", 0, HOLD_LINE );
 }
 
@@ -125,10 +128,10 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd900, 0xd900) AM_READ(unknown_d900_r)
 	AM_RANGE(0xd938, 0xd938) AM_READ(unknown_d938_r)
 
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(tsamurai_fg_videoram_w) AM_BASE(&tsamurai_videoram)
-	AM_RANGE(0xe400, 0xe43f) AM_RAM_WRITE(tsamurai_fg_colorram_w) AM_BASE(&tsamurai_colorram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(tsamurai_fg_videoram_w) AM_BASE_MEMBER(tsamurai_state, videoram)
+	AM_RANGE(0xe400, 0xe43f) AM_RAM_WRITE(tsamurai_fg_colorram_w) AM_BASE_MEMBER(tsamurai_state, colorram)
 	AM_RANGE(0xe440, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(tsamurai_bg_videoram_w) AM_BASE(&tsamurai_bg_videoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(tsamurai_bg_videoram_w) AM_BASE_MEMBER(tsamurai_state, bg_videoram)
 	AM_RANGE(0xf000, 0xf3ff) AM_RAM AM_BASE_GENERIC(spriteram)
 
 	AM_RANGE(0xf400, 0xf400) AM_WRITENOP
@@ -158,10 +161,10 @@ static ADDRESS_MAP_START( m660_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd900, 0xd900) AM_READ(unknown_d900_r)
 	AM_RANGE(0xd938, 0xd938) AM_READ(unknown_d938_r)
 
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(tsamurai_fg_videoram_w) AM_BASE(&tsamurai_videoram)
-	AM_RANGE(0xe400, 0xe43f) AM_RAM_WRITE(tsamurai_fg_colorram_w) AM_BASE(&tsamurai_colorram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(tsamurai_fg_videoram_w) AM_BASE_MEMBER(tsamurai_state, videoram)
+	AM_RANGE(0xe400, 0xe43f) AM_RAM_WRITE(tsamurai_fg_colorram_w) AM_BASE_MEMBER(tsamurai_state, colorram)
 	AM_RANGE(0xe440, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(tsamurai_bg_videoram_w) AM_BASE(&tsamurai_bg_videoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(tsamurai_bg_videoram_w) AM_BASE_MEMBER(tsamurai_state, bg_videoram)
 	AM_RANGE(0xf000, 0xf3ff) AM_RAM AM_BASE_GENERIC(spriteram)
 
 	AM_RANGE(0xf400, 0xf400) AM_WRITENOP/* This is always written with F401, F402 & F403 data */
@@ -202,17 +205,20 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( sound_command1_r )
 {
-	return sound_command1;
+	tsamurai_state *state = space->machine->driver_data<tsamurai_state>();
+	return state->sound_command1;
 }
 
 static READ8_HANDLER( sound_command2_r )
 {
-	return sound_command2;
+	tsamurai_state *state = space->machine->driver_data<tsamurai_state>();
+	return state->sound_command2;
 }
 
 static READ8_HANDLER( sound_command3_r )
 {
-	return sound_command3;
+	tsamurai_state *state = space->machine->driver_data<tsamurai_state>();
+	return state->sound_command3;
 }
 
 /*******************************************************************************/
@@ -271,15 +277,16 @@ ADDRESS_MAP_END
 
 /*******************************************************************************/
 
-static int vsgongf_sound_nmi_enabled;
 static WRITE8_HANDLER( vsgongf_sound_nmi_enable_w )
 {
-	vsgongf_sound_nmi_enabled = data;
+	tsamurai_state *state = space->machine->driver_data<tsamurai_state>();
+	state->vsgongf_sound_nmi_enabled = data;
 }
 
 static INTERRUPT_GEN( vsgongf_sound_interrupt )
 {
-	if (vsgongf_sound_nmi_enabled) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	tsamurai_state *state = device->machine->driver_data<tsamurai_state>();
+	if (state->vsgongf_sound_nmi_enabled) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /* what are these, protection of some kind? */
@@ -318,7 +325,7 @@ static ADDRESS_MAP_START( vsgongf_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa006, 0xa006) AM_READ(vsgongf_a006_r) /* protection */
 	AM_RANGE(0xa100, 0xa100) AM_READ(vsgongf_a100_r) /* protection */
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM					 /* work ram */
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(tsamurai_fg_videoram_w) AM_BASE(&tsamurai_videoram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(tsamurai_fg_videoram_w) AM_BASE_MEMBER(tsamurai_state, videoram)
 	AM_RANGE(0xe400, 0xe43f) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0xe440, 0xe47b) AM_RAM
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(vsgongf_sound_command_w)
@@ -641,7 +648,7 @@ GFXDECODE_END
 
 /*******************************************************************************/
 
-static MACHINE_CONFIG_START( tsamurai, driver_device )
+static MACHINE_CONFIG_START( tsamurai, tsamurai_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
@@ -684,7 +691,7 @@ static MACHINE_CONFIG_START( tsamurai, driver_device )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( m660, driver_device )
+static MACHINE_CONFIG_START( m660, tsamurai_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
@@ -732,7 +739,7 @@ static MACHINE_CONFIG_START( m660, driver_device )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( vsgongf, driver_device )
+static MACHINE_CONFIG_START( vsgongf, tsamurai_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)

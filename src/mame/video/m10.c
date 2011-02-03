@@ -13,7 +13,10 @@
 #include "emu.h"
 #include "includes/m10.h"
 
-static UINT32 extyoffs[32 * 8];	// FIXME: this should be moved to m10_state, but backlayout would have problems
+static const UINT32 extyoffs[] =
+{
+	STEP256(0, 8)
+};
 
 
 static const gfx_layout backlayout =
@@ -103,10 +106,6 @@ INLINE void plot_pixel_m10( running_machine *machine, bitmap_t *bm, int x, int y
 VIDEO_START( m10 )
 {
 	m10_state *state = machine->driver_data<m10_state>();
-	int i;
-
-	for (i = 0; i < 32 * 8; i++)
-		extyoffs[i] = i * 8;
 
 	state->tx_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan, 8, 8, 32, 32);
 	tilemap_set_transparent_pen(state->tx_tilemap, 0);
