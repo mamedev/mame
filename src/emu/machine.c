@@ -466,7 +466,7 @@ void running_machine::schedule_exit()
 	m_scheduler.eat_all_cycles();
 
 	// if we're autosaving on exit, schedule a save as well
-	if (options_get_bool(&m_options, OPTION_AUTOSAVE) && (m_game.flags & GAME_SUPPORTS_SAVE) && attotime_compare(timer_get_time(this), attotime_zero) > 0)
+	if (options_get_bool(&m_options, OPTION_AUTOSAVE) && (m_game.flags & GAME_SUPPORTS_SAVE) && timer_get_time(this) > attotime::zero)
 		schedule_save("auto");
 }
 
@@ -786,7 +786,7 @@ void running_machine::handle_saveload()
 	if (timer_count_anonymous(this) > 0)
 	{
 		// if more than a second has passed, we're probably screwed
-		if (attotime_sub(timer_get_time(this), m_saveload_schedule_time).seconds > 0)
+		if ((timer_get_time(this) - m_saveload_schedule_time) > attotime::from_seconds(1))
 		{
 			popmessage("Unable to %s due to pending anonymous timers. See error.log for details.", opname);
 			goto cancel;

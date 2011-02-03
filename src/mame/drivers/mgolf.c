@@ -126,7 +126,7 @@ static TIMER_CALLBACK( interrupt_callback )
 static double calc_plunger_pos(running_machine *machine)
 {
 	mgolf_state *state = machine->driver_data<mgolf_state>();
-	return (attotime_to_double(timer_get_time(machine)) - attotime_to_double(state->time_released)) * (attotime_to_double(state->time_released) - attotime_to_double(state->time_pushed) + 0.2);
+	return (timer_get_time(machine).as_double() - state->time_released.as_double()) * (state->time_released.as_double() - state->time_pushed.as_double() + 0.2);
 }
 
 

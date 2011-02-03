@@ -1223,13 +1223,13 @@ static TIMER_CALLBACK( run_state_machine )
 
 		/* If halt flag was set, let CPU catch up before we make halt visible */
 		if (vg->halt && !(vg->state_latch & 0x10))
-			timer_adjust_oneshot(vg_halt_timer, attotime_mul(ATTOTIME_IN_HZ(MASTER_CLOCK), cycles), 1);
+			timer_adjust_oneshot(vg_halt_timer, attotime::from_hz(MASTER_CLOCK) * cycles, 1);
 
 		vg->state_latch = (vg->halt << 4) | (vg->state_latch & 0xf);
 		cycles += 8;
 	}
 
-	timer_adjust_oneshot(vg_run_timer, attotime_mul(ATTOTIME_IN_HZ(MASTER_CLOCK), cycles), 0);
+	timer_adjust_oneshot(vg_run_timer, attotime::from_hz(MASTER_CLOCK) * cycles, 0);
 }
 
 

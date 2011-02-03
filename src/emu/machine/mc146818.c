@@ -436,7 +436,7 @@ READ8_MEMBER( mc146818_device::read )
 		switch (m_index % MC146818_DATA_SIZE) {
 		case 0xa:
 			data = m_data[m_index  % MC146818_DATA_SIZE];
-			if (attotime_compare(attotime_sub(timer_get_time(space.machine), m_last_refresh), ATTOTIME_IN_HZ(32768)) < 0)
+			if ((timer_get_time(space.machine) - m_last_refresh) < ATTOTIME_IN_HZ(32768))
 				data |= 0x80;
 #if 0
 			/* for pc1512 bios realtime clock test */

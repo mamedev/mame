@@ -1124,7 +1124,7 @@ static void start_audio_dma(running_machine *machine)
     ai_status |= 0x40000000;
 
    // adjust the timer
-   period = attotime_mul(ATTOTIME_IN_HZ(DACRATE_NTSC), (ai_dacrate + 1) * (current->length / 4));
+   period = attotime::from_hz(DACRATE_NTSC) * ((ai_dacrate + 1) * (current->length / 4));
    timer_adjust_oneshot(audio_timer, period, 0);
 }
 
@@ -1156,7 +1156,7 @@ READ32_HANDLER( n64_ai_reg_r )
             }
             else if (ai_status & 0x40000000)
             {
-                double secs_left = attotime_to_double(attotime_sub(timer_firetime(audio_timer),timer_get_time(space->machine)));
+                double secs_left = (timer_firetime(audio_timer) - timer_get_time(space->machine)).as_double();
                 unsigned int samples_left = secs_left * DACRATE_NTSC / (ai_dacrate + 1);
                 return samples_left * 4;
             }

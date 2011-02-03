@@ -149,13 +149,13 @@ void via6522_device_config::device_config_complete()
 
 attotime via6522_device::cycles_to_time(int c)
 {
-	return attotime_mul(ATTOTIME_IN_HZ(clock()), c);
+	return attotime::from_hz(clock()) * c;
 }
 
 
 UINT32 via6522_device::time_to_cycles(attotime t)
 {
-	return attotime_to_double(attotime_mul(t, clock()));
+	return (t * clock()).as_double();
 }
 
 
@@ -169,7 +169,7 @@ UINT16 via6522_device::get_counter1_value()
 	}
     else
     {
-        val = 0xffff - time_to_cycles(attotime_sub(timer_get_time(&m_machine), m_time1));
+        val = 0xffff - time_to_cycles(timer_get_time(&m_machine) - m_time1);
 	}
 
 	return val;
@@ -605,7 +605,7 @@ READ8_MEMBER( via6522_device::read )
             }
 			else
             {
-				val = (0x10000 - (time_to_cycles(attotime_sub(timer_get_time(&m_machine), m_time2)) & 0xffff) - 1) & 0xff;
+				val = (0x10000 - (time_to_cycles(timer_get_time(&m_machine) - m_time2) & 0xffff) - 1) & 0xff;
             }
 		}
 		break;
@@ -623,7 +623,7 @@ READ8_MEMBER( via6522_device::read )
             }
 			else
             {
-				val = (0x10000 - (time_to_cycles(attotime_sub(timer_get_time(&m_machine), m_time2)) & 0xffff) - 1) >> 8;
+				val = (0x10000 - (time_to_cycles(timer_get_time(&m_machine) - m_time2) & 0xffff) - 1) >> 8;
             }
 		}
 		break;

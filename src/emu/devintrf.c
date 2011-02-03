@@ -650,12 +650,12 @@ void device_t::set_clock_scale(double clockscale)
 attotime device_t::clocks_to_attotime(UINT64 numclocks) const
 {
 	if (numclocks < m_clock)
-		return attotime_make(0, numclocks * m_attoseconds_per_clock);
+		return attotime(0, numclocks * m_attoseconds_per_clock);
 	else
 	{
 		UINT32 remainder;
 		UINT32 quotient = divu_64x32_rem(numclocks, m_clock, &remainder);
-		return attotime_make(quotient, (UINT64)remainder * (UINT64)m_attoseconds_per_clock);
+		return attotime(quotient, (UINT64)remainder * (UINT64)m_attoseconds_per_clock);
 	}
 }
 

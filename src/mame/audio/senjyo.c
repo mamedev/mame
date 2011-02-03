@@ -64,7 +64,7 @@ static TIMER_CALLBACK( senjyo_sh_update )
 	/* ctc2 timer single tone generator frequency */
 	z80ctc_device *ctc = machine->device<z80ctc_device>("z80ctc");
 	attotime period = ctc->period(2);
-	if (attotime_compare(period, attotime_zero) != 0 )
+	if (period != attotime::zero)
 		state->single_rate = ATTOSECONDS_TO_HZ(period.attoseconds);
 	else
 		state->single_rate = 0;

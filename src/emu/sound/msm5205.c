@@ -274,7 +274,7 @@ static void msm5205_playmode(msm5205_state *voice,int select)
 		/* timer set */
 		if( prescaler )
 		{
-			attotime period = attotime_mul(ATTOTIME_IN_HZ(voice->clock), prescaler);
+			attotime period = attotime::from_hz(voice->clock) * prescaler;
 			timer_adjust_periodic(voice->timer, period, 0, period);
 		}
 		else
@@ -304,7 +304,7 @@ void msm5205_change_clock_w(device_t *device, INT32 clock)
 
 	voice->clock = clock;
 
-	period = attotime_mul(ATTOTIME_IN_HZ(voice->clock), voice->prescaler);
+	period = attotime::from_hz(voice->clock) * voice->prescaler;
 	timer_adjust_periodic(voice->timer, period, 0, period);
 }
 

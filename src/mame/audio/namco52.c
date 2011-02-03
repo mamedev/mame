@@ -220,7 +220,7 @@ static DEVICE_START( namco_52xx )
 
 	/* start the external clock */
 	if (intf->extclock != 0)
-		timer_pulse(device->machine, attotime_make(0, intf->extclock), (void *)device, 0, external_clock_pulse);
+		timer_pulse(device->machine, attotime(0, intf->extclock), (void *)device, 0, external_clock_pulse);
 }
 
 

@@ -360,7 +360,7 @@ static void run_mproc(running_machine *machine)
 		M_STOP--; /* Decrease count */
 	}
 
-	timer_adjust_oneshot(state->math_timer, attotime_mul(ATTOTIME_IN_HZ(MASTER_CLOCK), mptime), 1);
+	timer_adjust_oneshot(state->math_timer, attotime::from_hz(MASTER_CLOCK) * mptime, 1);
 }
 
 

@@ -1053,9 +1053,9 @@ static int cycle(running_machine *machine)
 
 static void after(running_machine *machine, int cycles, timer_fired_func function, const char *funcname)
 {
-    attotime duration = attotime_make(0, attotime_to_attoseconds(machine->primary_screen->scan_period()) * cycles / CYCLES_PER_LINE);
+    attotime duration = machine->primary_screen->scan_period() * cycles / CYCLES_PER_LINE;
     (void)funcname;
-	LOG(("           after %3d (%5.1f us) %s\n", cycles, attotime_to_double(duration) * 1.0e6, funcname));
+	LOG(("           after %3d (%5.1f us) %s\n", cycles, duration.as_double() * 1.0e6, funcname));
 	timer_set(machine, duration, NULL, 0, function);
 }
 

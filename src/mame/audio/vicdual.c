@@ -170,7 +170,7 @@ WRITE8_HANDLER( frogs_audio_w )
 		if (last_croak)
 		{
 			/* The croak will keep playing until .429s after being disabled */
-			timer_adjust_oneshot(frogs_croak_timer, double_to_attotime(1.1 * RES_K(390) * CAP_U(1)), 0);
+			timer_adjust_oneshot(frogs_croak_timer, attotime::from_double(1.1 * RES_K(390) * CAP_U(1)), 0);
 		}
 	}
 	if (new_buzzz)

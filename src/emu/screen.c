@@ -59,7 +59,7 @@
 
 const device_type SCREEN = screen_device_config::static_alloc_device_config;
 
-const attotime screen_device::DEFAULT_FRAME_PERIOD = STATIC_ATTOTIME_IN_HZ(DEFAULT_FRAME_RATE);
+const attotime screen_device::DEFAULT_FRAME_PERIOD(attotime::from_hz(DEFAULT_FRAME_RATE));
 
 
 
@@ -355,8 +355,8 @@ void screen_device::device_start()
 	configure(m_config.m_width, m_config.m_height, m_config.m_visarea, m_config.m_refresh);
 
 	// reset VBLANK timing
-	m_vblank_start_time = attotime_zero;
-	m_vblank_end_time = attotime_make(0, m_vblank_period);
+	m_vblank_start_time = attotime::zero;
+	m_vblank_end_time = attotime(0, m_vblank_period);
 
 	// start the timer to generate per-scanline updates
 	if ((machine->config->m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0)
@@ -468,8 +468,8 @@ void screen_device::reset_origin(int beamy, int beamx)
 {
 	// compute the effective VBLANK start/end times
 	attotime curtime = timer_get_time(machine);
-	m_vblank_end_time = attotime_sub_attoseconds(curtime, beamy * m_scantime + beamx * m_pixeltime);
-	m_vblank_start_time = attotime_sub_attoseconds(m_vblank_end_time, m_vblank_period);
+	m_vblank_end_time = curtime - attotime(0, beamy * m_scantime + beamx * m_pixeltime);
+	m_vblank_start_time = m_vblank_end_time - attotime(0, m_vblank_period);
 
 	// if we are resetting relative to (0,0) == VBLANK end, call the
 	// scanline 0 timer by hand now; otherwise, adjust it for the future
@@ -667,7 +667,7 @@ void screen_device::update_now()
 
 int screen_device::vpos() const
 {
-	attoseconds_t delta = attotime_to_attoseconds(attotime_sub(timer_get_time(machine), m_vblank_start_time));
+	attoseconds_t delta = (timer_get_time(machine) - m_vblank_start_time).as_attoseconds();
 	int vpos;
 
 	// round to the nearest pixel
@@ -688,7 +688,7 @@ int screen_device::vpos() const
 
 int screen_device::hpos() const
 {
-	attoseconds_t delta = attotime_to_attoseconds(attotime_sub(timer_get_time(machine), m_vblank_start_time));
+	attoseconds_t delta = (timer_get_time(machine) - m_vblank_start_time).as_attoseconds();
 
 	// round to the nearest pixel
 	delta += m_pixeltime / 2;
@@ -724,14 +724,14 @@ attotime screen_device::time_until_pos(int vpos, int hpos) const
 	attoseconds_t targetdelta = (attoseconds_t)vpos * m_scantime + (attoseconds_t)hpos * m_pixeltime;
 
 	// if we're past that time (within 1/2 of a pixel), head to the next frame
-	attoseconds_t curdelta = attotime_to_attoseconds(attotime_sub(timer_get_time(machine), m_vblank_start_time));
+	attoseconds_t curdelta = (timer_get_time(machine) - m_vblank_start_time).as_attoseconds();
 	if (targetdelta <= curdelta + m_pixeltime / 2)
 		targetdelta += m_frame_period;
 	while (targetdelta <= curdelta)
 		targetdelta += m_frame_period;
 
 	// return the difference
-	return attotime_make(0, targetdelta - curdelta);
+	return attotime(0, targetdelta - curdelta);
 }
 
 
@@ -747,8 +747,8 @@ attotime screen_device::time_until_vblank_end() const
 	// if we are in the VBLANK region, compute the time until the end of the current VBLANK period
 	attotime target_time = m_vblank_end_time;
 	if (!vblank())
-		target_time = attotime_add_attoseconds(target_time, m_frame_period);
-	return attotime_sub(target_time, timer_get_time(machine));
+		target_time += attotime(0, m_frame_period);
+	return target_time - timer_get_time(machine);
 }
 
 
@@ -788,7 +788,7 @@ void screen_device::vblank_begin_callback()
 {
 	// reset the starting VBLANK time
 	m_vblank_start_time = timer_get_time(machine);
-	m_vblank_end_time = attotime_add_attoseconds(m_vblank_start_time, m_vblank_period);
+	m_vblank_end_time = m_vblank_start_time + attotime(0, m_vblank_period);
 
 	// call the screen specific callbacks
 	for (callback_item *item = m_callback_list; item != NULL; item = item->m_next)

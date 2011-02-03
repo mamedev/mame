@@ -920,7 +920,7 @@ static TIMER_CALLBACK( galileo_timer_callback )
 
 	/* if we're a timer, adjust the timer to fire again */
 	if (galileo.reg[GREG_TIMER_CONTROL] & (2 << (2 * which)))
-		timer_adjust_oneshot(timer->timer, attotime_mul(TIMER_PERIOD, timer->count), which);
+		timer_adjust_oneshot(timer->timer, TIMER_PERIOD * timer->count, which);
 	else
 		timer->active = timer->count = 0;
 
@@ -1100,7 +1100,7 @@ static READ32_HANDLER( galileo_r )
 			result = timer->count;
 			if (timer->active)
 			{
-				UINT32 elapsed = attotime_to_double(attotime_mul(timer_timeelapsed(timer->timer), SYSTEM_CLOCK));
+				UINT32 elapsed = (timer_timeelapsed(timer->timer) * SYSTEM_CLOCK).as_double();
 				result = (result > elapsed) ? (result - elapsed) : 0;
 			}
 
@@ -1231,13 +1231,13 @@ static WRITE32_HANDLER( galileo_w )
 						if (which != 0)
 							timer->count &= 0xffffff;
 					}
-					timer_adjust_oneshot(timer->timer, attotime_mul(TIMER_PERIOD, timer->count), which);
+					timer_adjust_oneshot(timer->timer, TIMER_PERIOD * timer->count, which);
 					if (LOG_TIMERS)
-						logerror("Adjusted timer to fire in %f secs\n", attotime_to_double(attotime_mul(TIMER_PERIOD, timer->count)));
+						logerror("Adjusted timer to fire in %f secs\n", (TIMER_PERIOD * timer->count).as_double());
 				}
 				else if (timer->active && !(data & mask))
 				{
-					UINT32 elapsed = attotime_to_double(attotime_mul(timer_timeelapsed(timer->timer), SYSTEM_CLOCK));
+					UINT32 elapsed = (timer_timeelapsed(timer->timer) * SYSTEM_CLOCK).as_double();
 					timer->active = 0;
 					timer->count = (timer->count > elapsed) ? (timer->count - elapsed) : 0;
 					timer_adjust_oneshot(timer->timer, attotime_never, which);

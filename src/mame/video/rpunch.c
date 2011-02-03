@@ -83,7 +83,7 @@ static TIMER_CALLBACK( crtc_interrupt_gen )
 {
 	cputag_set_input_line(machine, "maincpu", 1, HOLD_LINE);
 	if (param != 0)
-		timer_adjust_periodic(crtc_timer, attotime_div(machine->primary_screen->frame_period(), param), 0, attotime_div(machine->primary_screen->frame_period(), param));
+		timer_adjust_periodic(crtc_timer, machine->primary_screen->frame_period() / param, 0, machine->primary_screen->frame_period() / param);
 }
 
 

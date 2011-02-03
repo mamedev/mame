@@ -1338,7 +1338,7 @@ static void root_timer_adjust( running_machine *machine, int n_counter )
 
 		n_duration *= root_divider( machine, n_counter );
 
-		timer_adjust_oneshot( state->m_p_timer_root[ n_counter ], attotime_mul(ATTOTIME_IN_HZ(33868800), n_duration), n_counter);
+		timer_adjust_oneshot( state->m_p_timer_root[ n_counter ], attotime::from_hz(33868800) * n_duration, n_counter);
 	}
 }
 

@@ -522,7 +522,7 @@ static READ32_HANDLER( trackball32_4bit_r )
 	static attotime lasttime;
 	attotime curtime = timer_get_time(space->machine);
 
-	if (attotime_compare(attotime_sub(curtime, lasttime), space->machine->primary_screen->scan_period()) > 0)
+	if ((curtime - lasttime) > space->machine->primary_screen->scan_period())
 	{
 		int upper, lower;
 		int dx, dy;
@@ -561,7 +561,7 @@ static READ32_HANDLER( trackball32_4bit_p2_r )
 	static attotime lasttime;
 	attotime curtime = timer_get_time(space->machine);
 
-	if (attotime_compare(attotime_sub(curtime, lasttime), space->machine->primary_screen->scan_period()) > 0)
+	if ((curtime - lasttime) > space->machine->primary_screen->scan_period())
 	{
 		int upper, lower;
 		int dx, dy;

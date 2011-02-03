@@ -267,7 +267,7 @@ INTERRUPT_GEN( mcr68_interrupt )
 	/* also set a timer to generate the 493 signal at a specific time before the next VBLANK */
 	/* the timing of this is crucial for Blasted and Tri-Sports, which check the timing of */
 	/* VBLANK and 493 using counter 2 */
-	timer_set(device->machine, attotime_sub(ATTOTIME_IN_HZ(30), mcr68_timing_factor), NULL, 0, v493_callback);
+	timer_set(device->machine, attotime::from_hz(30) - mcr68_timing_factor, NULL, 0, v493_callback);
 }
 
 
@@ -479,8 +479,8 @@ static void reload_count(int counter)
 		count = count + 1;
 
 	/* set the timer */
-	total_period = attotime_make(0, attotime_to_attoseconds(period) * count);
-LOG(("reload_count(%d): period = %f  count = %d\n", counter, attotime_to_double(period), count));
+	total_period = period * count;
+LOG(("reload_count(%d): period = %f  count = %d\n", counter, period.as_double(), count));
 	timer_adjust_oneshot(m6840_state[counter].timer, total_period, (count << 2) + counter);
 	m6840_state[counter].timer_active = 1;
 }
@@ -502,7 +502,7 @@ static UINT16 compute_counter(int counter)
 		period = m6840_counter_periods[counter];
 
 	/* see how many are left */
-	remaining = attotime_to_attoseconds(timer_timeleft(m6840_state[counter].timer)) / attotime_to_attoseconds(period);
+	remaining = timer_timeleft(m6840_state[counter].timer).as_attoseconds() / period.as_attoseconds();
 
 	/* adjust the count for dual byte mode */
 	if (m6840_state[counter].control & 0x04)

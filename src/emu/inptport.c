@@ -1536,7 +1536,7 @@ input_port_value input_port_read_direct(const input_port_config *port)
 			/* interpolate if appropriate and if time has passed since the last update */
 			if (analog->interpolate && !(analog->field->flags & ANALOG_FLAG_RESET) && portdata->last_delta_nsec != 0)
 			{
-				attoseconds_t nsec_since_last = attotime_to_attoseconds(attotime_sub(timer_get_time(port->machine), portdata->last_frame_time)) / ATTOSECONDS_PER_NANOSECOND;
+				attoseconds_t nsec_since_last = (timer_get_time(port->machine) - portdata->last_frame_time).as_attoseconds() / ATTOSECONDS_PER_NANOSECOND;
 				value = analog->previous + ((INT64)(analog->accum - analog->previous) * nsec_since_last / portdata->last_delta_nsec);
 			}
 
@@ -2479,7 +2479,7 @@ g_profiler.start(PROFILER_INPUT);
 	record_frame(machine, curtime);
 
 	/* track the duration of the previous frame */
-	portdata->last_delta_nsec = attotime_to_attoseconds(attotime_sub(curtime, portdata->last_frame_time)) / ATTOSECONDS_PER_NANOSECOND;
+	portdata->last_delta_nsec = (curtime - portdata->last_frame_time).as_attoseconds() / ATTOSECONDS_PER_NANOSECOND;
 	portdata->last_frame_time = curtime;
 
 	/* update the digital joysticks */
@@ -4478,7 +4478,7 @@ static void playback_frame(running_machine *machine, attotime curtime)
 		/* first the absolute time */
 		readtime.seconds = playback_read_uint32(machine);
 		readtime.attoseconds = playback_read_uint64(machine);
-		if (attotime_compare(readtime, curtime) != 0)
+		if (readtime != curtime)
 			playback_end(machine, "Out of sync");
 
 		/* then the speed */
@@ -5024,29 +5024,28 @@ static int can_post_key_alternate(running_machine *machine, unicode_char ch)
 
 static attotime choose_delay(input_port_private *portdata, unicode_char ch)
 {
-	attoseconds_t delay = 0;
-
-	if (attotime_compare(portdata->current_rate, attotime_zero) != 0)
+	if (portdata->current_rate != attotime::zero)
 		return portdata->current_rate;
 
+	attotime delay = attotime::zero;
 	if (portdata->queue_chars)
 	{
 		/* systems with queue_chars can afford a much smaller delay */
-		delay = DOUBLE_TO_ATTOSECONDS(0.01);
+		delay = attotime::from_msec(10);
 	}
 	else
 	{
 		switch(ch) {
 		case '\r':
-			delay = DOUBLE_TO_ATTOSECONDS(0.2);
+			delay = attotime::from_msec(200);
 			break;
 
 		default:
-			delay = DOUBLE_TO_ATTOSECONDS(0.05);
+			delay = attotime::from_msec(50);
 			break;
 		}
 	}
-	return attotime_make(0, delay);
+	return delay;
 }
 
 
@@ -5156,7 +5155,7 @@ static TIMER_CALLBACK(inputx_timerproc)
 			keybuf->begin_pos++;
 			keybuf->begin_pos %= ARRAY_LENGTH(keybuf->buffer);
 
-			if (attotime_compare(portdata->current_rate, attotime_zero) != 0)
+			if (portdata->current_rate != attotime::zero)
 				break;
 		}
 	}
@@ -5282,7 +5281,7 @@ static void inputx_postc_rate(running_machine *machine, unicode_char ch, attotim
 
 void inputx_postc(running_machine *machine, unicode_char ch)
 {
-	inputx_postc_rate(machine, ch, attotime_make(0, 0));
+	inputx_postc_rate(machine, ch, attotime::zero);
 }
 
 static void inputx_postn_utf8_rate(running_machine *machine, const char *text, size_t text_len, attotime rate)
@@ -5296,7 +5295,7 @@ static void inputx_postn_utf8_rate(running_machine *machine, const char *text, s
 	{
 		if (len == ARRAY_LENGTH(buf))
 		{
-			inputx_postn_rate(machine, buf, len, attotime_make(0, 0));
+			inputx_postn_rate(machine, buf, len, attotime::zero);
 			len = 0;
 		}
 
@@ -5315,7 +5314,7 @@ static void inputx_postn_utf8_rate(running_machine *machine, const char *text, s
 
 void inputx_post_utf8(running_machine *machine, const char *text)
 {
-	inputx_postn_utf8_rate(machine, text, strlen(text), attotime_make(0, 0));
+	inputx_postn_utf8_rate(machine, text, strlen(text), attotime::zero);
 }
 
 void inputx_post_utf8_rate(running_machine *machine, const char *text, attotime rate)
@@ -5512,7 +5511,7 @@ int input_category_active(running_machine *machine, int category)
 
 static void execute_input(running_machine *machine, int ref, int params, const char *param[])
 {
-	inputx_postn_coded_rate(machine, param[0], strlen(param[0]), attotime_make(0, 0));
+	inputx_postn_coded_rate(machine, param[0], strlen(param[0]), attotime::zero);
 }
 
 

@@ -1515,7 +1515,7 @@ attotime amiga_get_serial_char_period(running_machine *machine)
 	UINT32 divisor = (CUSTOM_REG(REG_SERPER) & 0x7fff) + 1;
 	UINT32 baud = cputag_get_clock(machine, "maincpu") / 2 / divisor;
 	UINT32 numbits = 2 + ((CUSTOM_REG(REG_SERPER) & 0x8000) ? 9 : 8);
-	return attotime_mul(ATTOTIME_IN_HZ(baud), numbits);
+	return attotime::from_hz(baud) * numbits;
 }
 
 

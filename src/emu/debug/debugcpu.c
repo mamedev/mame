@@ -1906,9 +1906,9 @@ void device_debug::instruction_hook(offs_t curpc)
 	if (global->execution_state != EXECUTION_STATE_STOPPED && (m_flags & (DEBUG_FLAG_STOP_TIME | DEBUG_FLAG_STOP_PC | DEBUG_FLAG_LIVE_BP)) != 0)
 	{
 		// see if we hit a target time
-		if ((m_flags & DEBUG_FLAG_STOP_TIME) != 0 && attotime_compare(timer_get_time(&machine), m_stoptime) >= 0)
+		if ((m_flags & DEBUG_FLAG_STOP_TIME) != 0 && timer_get_time(&machine) >= m_stoptime)
 		{
-			debug_console_printf(&machine, "Stopped at time interval %.1g\n", attotime_to_double(timer_get_time(&machine)));
+			debug_console_printf(&machine, "Stopped at time interval %.1g\n", timer_get_time(&machine).as_double());
 			global->execution_state = EXECUTION_STATE_STOPPED;
 		}
 
@@ -2222,7 +2222,7 @@ void device_debug::go_milliseconds(UINT64 milliseconds)
 
 	assert(m_exec != NULL);
 
-	m_stoptime = attotime_add(timer_get_time(m_device.machine), ATTOTIME_IN_MSEC(milliseconds));
+	m_stoptime = timer_get_time(m_device.machine) + attotime::from_msec(milliseconds);
 	m_flags |= DEBUG_FLAG_STOP_TIME;
 	global->execution_state = EXECUTION_STATE_RUNNING;
 }
@@ -2777,7 +2777,7 @@ void device_debug::compute_debug_flags()
 		machine->debug_flags |= DEBUG_FLAG_CALL_HOOK;
 
 	// if we are stopping at a particular time and that time is within the current timeslice, we need to be called
-	if ((m_flags & DEBUG_FLAG_STOP_TIME) && attotime_compare(m_endexectime, m_stoptime) <= 0)
+	if ((m_flags & DEBUG_FLAG_STOP_TIME) && m_endexectime <= m_stoptime)
 		machine->debug_flags |= DEBUG_FLAG_CALL_HOOK;
 }
 

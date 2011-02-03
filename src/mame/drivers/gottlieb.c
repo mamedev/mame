@@ -438,7 +438,7 @@ static WRITE8_HANDLER( laserdisc_command_w )
        a sequence of events that sends serial data to the player */
 
 	/* set a timer to clock the bits through; a total of 12 bits are clocked */
-	timer_adjust_oneshot(laserdisc_bit_timer, attotime_mul(LASERDISC_CLOCK, 10), (12 << 16) | data);
+	timer_adjust_oneshot(laserdisc_bit_timer, LASERDISC_CLOCK * 10, (12 << 16) | data);
 
 	/* it also clears bit 4 of the status (will be set when transmission is complete) */
 	laserdisc_status &= ~0x10;
@@ -487,14 +487,14 @@ static TIMER_CALLBACK( laserdisc_bit_callback )
 
 	/* assert the line and set a timer for deassertion */
 	laserdisc_line_w(laserdisc, LASERDISC_LINE_CONTROL, ASSERT_LINE);
-	timer_set(machine, attotime_mul(LASERDISC_CLOCK, 10), NULL, 0, laserdisc_bit_off_callback);
+	timer_set(machine, LASERDISC_CLOCK * 10, NULL, 0, laserdisc_bit_off_callback);
 
 	/* determine how long for the next command; there is a 555 timer with a
        variable resistor controlling the timing of the pulses. Nominally, the
        555 runs at 40083Hz, is divided by 10, and then is divided by 4 for a
        0 bit or 8 for a 1 bit. This gives 998usec per 0 pulse or 1996usec
        per 1 pulse. */
-	duration = attotime_mul(LASERDISC_CLOCK, 10 * ((data & 0x80) ? 8 : 4));
+	duration = LASERDISC_CLOCK * (10 * ((data & 0x80) ? 8 : 4));
 	data <<= 1;
 
 	/* if we're not out of bits, set a timer for the next one; else set the ready bit */
@@ -568,12 +568,12 @@ static void audio_process_clock(int logit)
 static void audio_handle_zero_crossing(attotime zerotime, int logit)
 {
 	/* compute time from last clock */
-	attotime deltaclock = attotime_sub(zerotime, laserdisc_last_clock);
+	attotime deltaclock = zerotime - laserdisc_last_clock;
 	if (logit)
-		logerror(" -- zero @ %s (delta=%s)", attotime_string(zerotime, 6), attotime_string(deltaclock, 6));
+		logerror(" -- zero @ %s (delta=%s)", zerotime.as_string(6), deltaclock.as_string(6));
 
 	/* if we are within 150usec, we count as a bit */
-	if (attotime_compare(deltaclock, ATTOTIME_IN_USEC(150)) < 0)
+	if (deltaclock < attotime::from_usec(150))
 	{
 		if (logit)
 			logerror(" -- count as bit");
@@ -582,7 +582,7 @@ static void audio_handle_zero_crossing(attotime zerotime, int logit)
 	}
 
 	/* if we are within 215usec, we count as a clock */
-	else if (attotime_compare(deltaclock, ATTOTIME_IN_USEC(215)) < 0)
+	else if (deltaclock < attotime::from_usec(215))
 	{
 		if (logit)
 			logerror(" -- clock, bit=%d", laserdisc_zero_seen);
@@ -592,11 +592,11 @@ static void audio_handle_zero_crossing(attotime zerotime, int logit)
 	/* if we are outside of 215usec, we are technically a missing clock
        however, due to sampling errors, it is best to assume this is just
        an out-of-skew clock, so we correct it if we are within 75usec */
-	else if (attotime_compare(deltaclock, ATTOTIME_IN_USEC(275)) < 0)
+	else if (deltaclock < attotime::from_usec(275))
 	{
 		if (logit)
 			logerror(" -- skewed clock, correcting");
-		laserdisc_last_clock = attotime_add(laserdisc_last_clock, ATTOTIME_IN_USEC(200));
+		laserdisc_last_clock += attotime::from_usec(200);
 	}
 
 	/* we'll count anything more than 275us as an actual missing clock */
@@ -625,7 +625,7 @@ static void laserdisc_audio_process(device_t *device, int samplerate, int sample
 	/* if no data, reset it all */
 	if (ch1 == NULL)
 	{
-		laserdisc_last_time = attotime_add(curtime, attotime_mul(time_per_sample, samples));
+		laserdisc_last_time = curtime + time_per_sample * samples;
 		return;
 	}
 
@@ -636,10 +636,10 @@ static void laserdisc_audio_process(device_t *device, int samplerate, int sample
 
 		/* start by logging the current sample and time */
 		if (logit)
-			logerror("%s: %d", attotime_string(attotime_add(attotime_add(curtime, time_per_sample), time_per_sample), 6), sample);
+			logerror("%s: %d", (curtime + time_per_sample + time_per_sample).as_string(6), sample);
 
 		/* if we are past the "break in transmission" time, reset everything */
-		if (attotime_compare(attotime_sub(curtime, laserdisc_last_clock), ATTOTIME_IN_USEC(400)) > 0)
+		if ((curtime - laserdisc_last_clock) > attotime::from_usec(400))
 			audio_end_state();
 
 		/* if this sample reinforces that the previous one ended a zero crossing, count it */
@@ -653,7 +653,7 @@ static void laserdisc_audio_process(device_t *device, int samplerate, int sample
 			fractime = (-laserdisc_last_samples[0] * 1000) / (laserdisc_last_samples[1] - laserdisc_last_samples[0]);
 
 			/* use this fraction to compute the approximate actual zero crossing time */
-			zerotime = attotime_add(curtime, attotime_div(attotime_mul(time_per_sample, fractime), 1000));
+			zerotime = curtime + time_per_sample * fractime / 1000;
 
 			/* determine if this is a clock; if it is, process */
 			audio_handle_zero_crossing(zerotime, logit);
@@ -664,7 +664,7 @@ static void laserdisc_audio_process(device_t *device, int samplerate, int sample
 		/* update our sample tracking and advance time */
 		laserdisc_last_samples[0] = laserdisc_last_samples[1];
 		laserdisc_last_samples[1] = sample;
-		curtime = attotime_add(curtime, time_per_sample);
+		curtime += time_per_sample;
 	}
 
 	/* remember the last time */

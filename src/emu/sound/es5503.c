@@ -444,7 +444,7 @@ WRITE8_DEVICE_HANDLER( es5503_w )
 						}
 
 						// ok, we run for this long
-						period = attotime_mul(ATTOTIME_IN_HZ(chip->output_rate), length);
+						period = attotime::from_hz(chip->output_rate) * length;
 
 						timer_adjust_periodic(chip->oscillators[osc].timer, period, 0, period);
 					}

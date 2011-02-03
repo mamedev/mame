@@ -2352,11 +2352,11 @@ static void t90_start_timer(t90_Regs *cpustate, int i)
 	}
 
 
-	period = attotime_mul(cpustate->timer_period, prescaler);
+	period = cpustate->timer_period * prescaler;
 
 	timer_adjust_periodic(cpustate->timer[i], period, i, period);
 
-	logerror("%04X: CPU Timer %d started at %lf Hz\n", cpustate->pc.w.l, i, 1.0 / attotime_to_double(period));
+	logerror("%04X: CPU Timer %d started at %lf Hz\n", cpustate->pc.w.l, i, 1.0 / period.as_double());
 }
 
 static void t90_start_timer4(t90_Regs *cpustate)
@@ -2374,11 +2374,11 @@ static void t90_start_timer4(t90_Regs *cpustate)
 					return;
 	}
 
-	period = attotime_mul(cpustate->timer_period, prescaler);
+	period = cpustate->timer_period * prescaler;
 
 	timer_adjust_periodic(cpustate->timer[4], period, 4, period);
 
-	logerror("%04X: CPU Timer 4 started at %lf Hz\n", cpustate->pc.w.l, 1.0 / attotime_to_double(period));
+	logerror("%04X: CPU Timer 4 started at %lf Hz\n", cpustate->pc.w.l, 1.0 / period.as_double());
 }
 
 
@@ -2715,7 +2715,7 @@ static CPU_INIT( t90 )
 	cpustate->program = device->space(AS_PROGRAM);
 	cpustate->io = device->space(AS_IO);
 
-	cpustate->timer_period = attotime_mul(ATTOTIME_IN_HZ(device->unscaled_clock()), 8);
+	cpustate->timer_period = attotime::from_hz(device->unscaled_clock()) * 8;
 
 	// Reset registers to their initial values
 

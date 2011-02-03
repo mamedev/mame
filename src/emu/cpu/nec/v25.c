@@ -191,7 +191,7 @@ static CPU_RESET( v25 )
 	nec_state->IDB = 0xFFE00;
 
 	tmp = nec_state->PCK << nec_state->TB;
-	time = attotime_mul(ATTOTIME_IN_HZ(nec_state->device->unscaled_clock()), tmp);
+	time = attotime::from_hz(nec_state->device->unscaled_clock()) * tmp;
 	timer_adjust_periodic(nec_state->timers[3], time, INTTB, time);
 
 	timer_adjust_oneshot(nec_state->timers[0], attotime_never, 0);

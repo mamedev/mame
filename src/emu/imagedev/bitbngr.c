@@ -409,7 +409,7 @@ static TIMER_CALLBACK(bitbanger_input_timer)
       if(bi->input_buffer_size == 0)
       {
          /* no more data, wait and try again */
-         bi->idle_delay = attotime_min(attotime_add(bi->idle_delay, ATTOTIME_IN_MSEC(100)), ATTOTIME_IN_SEC(1));
+         bi->idle_delay = min(bi->idle_delay + attotime::from_msec(100), attotime::from_seconds(1));
          timer_adjust_oneshot(bi->bitbanger_input_timer, bi->idle_delay, 0);
 
 
@@ -449,11 +449,11 @@ void bitbanger_output(device_t *device, int value)
       bi->build_count = 9;
       bi->build_byte = 0;
 
-      one_point_five_baud = attotime_add(bi->current_baud, attotime_div(bi->current_baud,2));
+      one_point_five_baud = bi->current_baud + bi->current_baud / 2;
       timer_adjust_periodic(bi->bitbanger_output_timer, one_point_five_baud, 0, bi->current_baud);
    }
 
-   //fprintf(stderr,"%s, %d\n", attotime_string(timer_get_time(device->machine),9), value);
+   //fprintf(stderr,"%s, %d\n", timer_get_time(device->machine).as_string(9), value);
    bi->output_value = value;
 }
 

@@ -984,7 +984,7 @@ static void adjust_vblank_timer(voodoo_state *v)
 	attotime vblank_period = v->screen->time_until_pos(v->fbi.vsyncscan);
 
 	/* if zero, adjust to next frame, otherwise we may get stuck in an infinite loop */
-	if (attotime_compare(vblank_period, attotime_zero) == 0)
+	if (vblank_period == attotime::zero)
 		vblank_period = v->screen->frame_period();
 	timer_adjust_oneshot(v->fbi.vblank_timer, vblank_period, 0);
 }
@@ -2003,7 +2003,7 @@ static void cmdfifo_w(voodoo_state *v, cmdfifo_info *f, offs_t offset, UINT32 da
 		if (cycles > 0)
 		{
 			v->pci.op_pending = TRUE;
-			v->pci.op_end_time = attotime_add_attoseconds(timer_get_time(v->device->machine), (attoseconds_t)cycles * v->attoseconds_per_cycle);
+			v->pci.op_end_time = timer_get_time(v->device->machine) + attotime(0, (attoseconds_t)cycles * v->attoseconds_per_cycle);
 
 			if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:direct write start at %d.%08X%08X end at %d.%08X%08X\n", v->index,
 				timer_get_time(v->device->machine).seconds, (UINT32)(timer_get_time(v->device->machine).attoseconds >> 32), (UINT32)timer_get_time(v->device->machine).attoseconds,
@@ -2076,7 +2076,7 @@ static void check_stalled_cpu(voodoo_state *v, attotime current_time)
 	/* if not, set a timer for the next one */
 	else
 	{
-		timer_adjust_oneshot(v->pci.continue_timer, attotime_sub(v->pci.op_end_time, current_time), 0);
+		timer_adjust_oneshot(v->pci.continue_timer, v->pci.op_end_time - current_time, 0);
 	}
 }
 
@@ -2097,7 +2097,7 @@ static void stall_cpu(voodoo_state *v, int state, attotime current_time)
 		cpu_spinuntil_trigger(v->cpu, v->trigger);
 
 	/* set a timer to clear the stall */
-	timer_adjust_oneshot(v->pci.continue_timer, attotime_sub(v->pci.op_end_time, current_time), 0);
+	timer_adjust_oneshot(v->pci.continue_timer, v->pci.op_end_time - current_time, 0);
 }
 
 
@@ -3338,7 +3338,7 @@ static void flush_fifos(voodoo_state *v, attotime current_time)
 		current_time.seconds, (UINT32)(current_time.attoseconds >> 32), (UINT32)current_time.attoseconds);
 
 	/* loop while we still have cycles to burn */
-	while (attotime_compare(v->pci.op_end_time, current_time) <= 0)
+	while (v->pci.op_end_time <= current_time)
 	{
 		INT32 extra_cycles = 0;
 		INT32 cycles;
@@ -3429,7 +3429,7 @@ static void flush_fifos(voodoo_state *v, attotime current_time)
 		cycles += extra_cycles;
 
 		/* account for those cycles */
-		v->pci.op_end_time = attotime_add_attoseconds(v->pci.op_end_time, (attoseconds_t)cycles * v->attoseconds_per_cycle);
+		v->pci.op_end_time += attotime(0, (attoseconds_t)cycles * v->attoseconds_per_cycle);
 
 		if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:update -- pending=%d.%08X%08X cur=%d.%08X%08X\n", v->index,
 			v->pci.op_end_time.seconds, (UINT32)(v->pci.op_end_time.attoseconds >> 32), (UINT32)v->pci.op_end_time.attoseconds,
@@ -3544,7 +3544,7 @@ WRITE32_DEVICE_HANDLER( voodoo_w )
 		if (cycles)
 		{
 			v->pci.op_pending = TRUE;
-			v->pci.op_end_time = attotime_add_attoseconds(timer_get_time(device->machine), (attoseconds_t)cycles * v->attoseconds_per_cycle);
+			v->pci.op_end_time = timer_get_time(device->machine) + attotime(0, (attoseconds_t)cycles * v->attoseconds_per_cycle);
 
 			if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:direct write start at %d.%08X%08X end at %d.%08X%08X\n", v->index,
 				timer_get_time(device->machine).seconds, (UINT32)(timer_get_time(device->machine).attoseconds >> 32), (UINT32)timer_get_time(device->machine).attoseconds,

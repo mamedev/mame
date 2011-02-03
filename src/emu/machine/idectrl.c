@@ -1314,7 +1314,7 @@ static UINT32 ide_controller_read(device_t *device, int bank, offs_t offset, int
 		/* return the current status but don't clear interrupts */
 		case IDE_BANK1_STATUS_CONTROL:
 			result = ide->status;
-			if (attotime_compare(timer_timeelapsed(ide->last_status_timer), TIME_PER_ROTATION) > 0)
+			if (timer_timeelapsed(ide->last_status_timer) > TIME_PER_ROTATION)
 			{
 				result |= IDE_STATUS_HIT_INDEX;
 				timer_adjust_oneshot(ide->last_status_timer, attotime_never, 0);

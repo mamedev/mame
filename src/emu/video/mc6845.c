@@ -384,7 +384,7 @@ static void recompute_parameters(mc6845_t *mc6845, int postload)
 			vert_sync_pix_width = 0x10;
 
 		/* determine the transparent update cycle time, 1 update every 4 character clocks */
-		mc6845->upd_time = attotime_mul(ATTOTIME_IN_HZ(mc6845->clock), 4 * mc6845->hpixels_per_column);
+		mc6845->upd_time = attotime::from_hz(mc6845->clock) * (4 * mc6845->hpixels_per_column);
 
 		hsync_on_pos = mc6845->horiz_sync_pos * mc6845->hpixels_per_column;
 		hsync_off_pos = hsync_on_pos + (horiz_sync_char_width * mc6845->hpixels_per_column);
@@ -447,11 +447,11 @@ static void recompute_parameters(mc6845_t *mc6845, int postload)
 
 INLINE void mc6845_update_counters(mc6845_t *mc6845)
 {
-	mc6845->character_counter = attotime_to_ticks( timer_timeelapsed( mc6845->line_timer ), mc6845->clock );
+	mc6845->character_counter = timer_timeelapsed( mc6845->line_timer ).as_ticks( mc6845->clock );
 
 	if ( timer_enabled( mc6845->hsync_off_timer ) )
 	{
-		mc6845->hsync_width_counter = attotime_to_ticks( timer_timeelapsed( mc6845->hsync_off_timer ), mc6845->clock );
+		mc6845->hsync_width_counter = timer_timeelapsed( mc6845->hsync_off_timer ).as_ticks( mc6845->clock );
 	}
 }
 
@@ -549,7 +549,7 @@ static TIMER_CALLBACK( cur_on_timer_cb )
 	mc6845_set_cur( mc6845, TRUE );
 
 	/* Schedule CURSOR off signal */
-	timer_adjust_oneshot( mc6845->cur_off_timer, ticks_to_attotime( 1, mc6845->clock ), 0 );
+	timer_adjust_oneshot( mc6845->cur_off_timer, attotime::from_ticks( 1, mc6845->clock ), 0 );
 }
 
 
@@ -572,7 +572,7 @@ static TIMER_CALLBACK( hsync_on_timer_cb )
 	mc6845_set_hsync( mc6845, TRUE );
 
 	/* Schedule HSYNC off signal */
-	timer_adjust_oneshot( mc6845->hsync_off_timer, ticks_to_attotime( hsync_width, mc6845->clock ), 0 );
+	timer_adjust_oneshot( mc6845->hsync_off_timer, attotime::from_ticks( hsync_width, mc6845->clock ), 0 );
 }
 
 
@@ -668,7 +668,7 @@ static TIMER_CALLBACK( line_timer_cb )
 	if ( mc6845->line_enable_ff )
 	{
 		/* Schedule DE off signal change */
-		timer_adjust_oneshot(mc6845->de_off_timer, ticks_to_attotime( mc6845->horiz_disp, mc6845->clock ), 0);
+		timer_adjust_oneshot(mc6845->de_off_timer, attotime::from_ticks( mc6845->horiz_disp, mc6845->clock ), 0);
 
 		/* Is cursor visible on this line? */
 		if ( mc6845->cursor_state &&
@@ -680,15 +680,15 @@ static TIMER_CALLBACK( line_timer_cb )
 			mc6845->cursor_x = mc6845->cursor_addr - mc6845->line_address;
 
 			/* Schedule CURSOR ON signal */
-			timer_adjust_oneshot( mc6845->cur_on_timer, ticks_to_attotime( mc6845->cursor_x, mc6845->clock ), 0 );
+			timer_adjust_oneshot( mc6845->cur_on_timer, attotime::from_ticks( mc6845->cursor_x, mc6845->clock ), 0 );
 		}
 	}
 
 	/* Schedule HSYNC on signal */
-	timer_adjust_oneshot( mc6845->hsync_on_timer, ticks_to_attotime( mc6845->horiz_sync_pos, mc6845->clock ), 0 );
+	timer_adjust_oneshot( mc6845->hsync_on_timer, attotime::from_ticks( mc6845->horiz_sync_pos, mc6845->clock ), 0 );
 
 	/* Schedule our next callback */
-	timer_adjust_oneshot( mc6845->line_timer, ticks_to_attotime( mc6845->horiz_char_total + 1, mc6845->clock ), 0 );
+	timer_adjust_oneshot( mc6845->line_timer, attotime::from_ticks( mc6845->horiz_char_total + 1, mc6845->clock ), 0 );
 
 	/* Set VSYNC and DE signals */
 	mc6845_set_vsync( mc6845, new_vsync );
@@ -730,7 +730,7 @@ void mc6845_assert_light_pen_input(device_t *device)
 
 	/* compute the pixel coordinate of the NEXT character -- this is when the light pen latches */
 	/* set the timer that will latch the display address into the light pen registers */
-	timer_adjust_oneshot(mc6845->light_pen_latch_timer, ticks_to_attotime( 1, mc6845->clock ), 0);
+	timer_adjust_oneshot(mc6845->light_pen_latch_timer, attotime::from_ticks( 1, mc6845->clock ), 0);
 }
 
 
@@ -1011,7 +1011,7 @@ static DEVICE_RESET( mc6845 )
 
 	if ( ! timer_enabled( mc6845->line_timer ) )
 	{
-		timer_adjust_oneshot( mc6845->line_timer, ticks_to_attotime( mc6845->horiz_char_total + 1, mc6845->clock ), 0 );
+		timer_adjust_oneshot( mc6845->line_timer, attotime::from_ticks( mc6845->horiz_char_total + 1, mc6845->clock ), 0 );
 	}
 
 	mc6845->light_pen_latched = FALSE;

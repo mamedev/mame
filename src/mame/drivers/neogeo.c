@@ -245,7 +245,7 @@ static void adjust_display_position_interrupt_timer( running_machine *machine )
 
 	if ((state->display_counter + 1) != 0)
 	{
-		attotime period = attotime_mul(ATTOTIME_IN_HZ(NEOGEO_PIXEL_CLOCK), state->display_counter + 1);
+		attotime period = attotime::from_hz(NEOGEO_PIXEL_CLOCK) * (state->display_counter + 1);
 		if (LOG_VIDEO_SYSTEM) logerror("adjust_display_position_interrupt_timer  current y: %02x  current x: %02x   target y: %x  target x: %x\n", machine->primary_screen->vpos(), machine->primary_screen->hpos(), (state->display_counter + 1) / NEOGEO_HTOTAL, (state->display_counter + 1) % NEOGEO_HTOTAL);
 
 		timer_adjust_oneshot(state->display_position_interrupt_timer, period, 0);

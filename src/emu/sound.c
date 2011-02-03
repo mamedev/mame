@@ -139,9 +139,7 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 
 attotime sound_stream::sample_time() const
 {
-	attotime base = m_device.machine->sound().last_update();
-	base.attoseconds = 0;
-	return attotime_add_attoseconds(base, m_output_sampindex * m_attoseconds_per_sample);
+	return attotime(m_device.machine->sound().last_update().seconds, 0) + attotime(0, m_output_sampindex * m_attoseconds_per_sample);
 }
 
 

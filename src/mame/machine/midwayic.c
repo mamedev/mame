@@ -300,7 +300,7 @@ UINT8 midway_serial_pic2_status_r(address_space *space)
 	/* if we're still holding the data ready bit high, do it */
 	if (pic.latch & 0xf00)
 	{
-		if (attotime_compare(timer_get_time(space->machine), pic.latch_expire_time) > 0)
+		if (timer_get_time(space->machine) > pic.latch_expire_time)
 			pic.latch &= 0xff;
 		else
 			pic.latch -= 0x100;
@@ -347,7 +347,7 @@ void midway_serial_pic2_w(address_space *space, UINT8 data)
 
 	/* store in the latch, along with a bit to indicate we have data */
 	pic.latch = (data & 0x00f) | 0x480;
-	pic.latch_expire_time = attotime_add(timer_get_time(machine), ATTOTIME_IN_MSEC(1));
+	pic.latch_expire_time = timer_get_time(machine) + attotime::from_msec(1);
 	if (data & 0x10)
 	{
 		int cmd = pic.state ? (pic.state & 0x0f) : (pic.latch & 0x0f);

@@ -260,7 +260,7 @@ static void update_slider_pos(ldcore_data *ldcore, attotime curtime)
 	/* otherwise, compute the number of tracks covered */
 	else
 	{
-		attoseconds_t delta = attotime_to_attoseconds(attotime_sub(curtime, ldcore->sliderupdate));
+		attoseconds_t delta = (curtime - ldcore->sliderupdate).as_attoseconds();
 		INT32 tracks_covered;
 
 		/* determine how many tracks we covered and advance */
@@ -269,14 +269,14 @@ static void update_slider_pos(ldcore_data *ldcore, attotime curtime)
 			tracks_covered = delta / ldcore->attospertrack;
 			add_and_clamp_track(ldcore, tracks_covered);
 			if (tracks_covered != 0)
-				ldcore->sliderupdate = attotime_add_attoseconds(ldcore->sliderupdate, tracks_covered * ldcore->attospertrack);
+				ldcore->sliderupdate += attotime(0, tracks_covered * ldcore->attospertrack);
 		}
 		else
 		{
 			tracks_covered = delta / -ldcore->attospertrack;
 			add_and_clamp_track(ldcore, -tracks_covered);
 			if (tracks_covered != 0)
-				ldcore->sliderupdate = attotime_add_attoseconds(ldcore->sliderupdate, tracks_covered * -ldcore->attospertrack);
+				ldcore->sliderupdate += attotime(0, tracks_covered * -ldcore->attospertrack);
 		}
 	}
 }
@@ -562,11 +562,11 @@ void ldcore_set_slider_speed(laserdisc_state *ld, INT32 tracks_per_vsync)
 
 	/* positive values store positive times */
 	else if (tracks_per_vsync > 0)
-		ldcore->attospertrack = attotime_to_attoseconds(attotime_div(vsyncperiod, tracks_per_vsync));
+		ldcore->attospertrack = (vsyncperiod / tracks_per_vsync).as_attoseconds();
 
 	/* negative values store negative times */
 	else
-		ldcore->attospertrack = -attotime_to_attoseconds(attotime_div(vsyncperiod, -tracks_per_vsync));
+		ldcore->attospertrack = -(vsyncperiod / -tracks_per_vsync).as_attoseconds();
 
 	if (LOG_SLIDER)
 		printf("Slider speed = %d\n", tracks_per_vsync);
@@ -640,7 +640,7 @@ INT32 ldcore_generic_update(laserdisc_state *ld, const vbi_metadata *vbi, int fi
 	{
 		case LDSTATE_EJECTING:
 			/* when time expires, switch to the ejected state */
-			if (attotime_compare(curtime, ld->state.endtime) >= 0)
+			if (curtime >= ld->state.endtime)
 			    newstate->state = LDSTATE_EJECTED;
 			break;
 
@@ -654,14 +654,14 @@ INT32 ldcore_generic_update(laserdisc_state *ld, const vbi_metadata *vbi, int fi
 
 		case LDSTATE_LOADING:
 			/* when time expires, switch to the spinup state */
-			if (attotime_compare(curtime, ld->state.endtime) >= 0)
+			if (curtime >= ld->state.endtime)
 			    newstate->state = LDSTATE_SPINUP;
 			advanceby = -GENERIC_SEARCH_SPEED;
 			break;
 
 		case LDSTATE_SPINUP:
 			/* when time expires, switch to the playing state */
-			if (attotime_compare(curtime, ld->state.endtime) >= 0)
+			if (curtime >= ld->state.endtime)
 			    newstate->state = LDSTATE_PLAYING;
 			advanceby = -GENERIC_SEARCH_SPEED;
 			break;

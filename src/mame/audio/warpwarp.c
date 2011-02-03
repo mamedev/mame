@@ -72,7 +72,7 @@ WRITE8_DEVICE_HANDLER( warpwarp_sound_w )
          * discharge C90(?) (1uF) through R13||R14 (22k||47k)
          * 0.639 * 15k * 1uF -> 0.9585s
          */
-		attotime period = attotime_div(attotime_mul(ATTOTIME_IN_HZ(32768), 95850), 100000);
+		attotime period = attotime::from_hz(32768) * 95850 / 100000;
 		timer_adjust_periodic(state->sound_volume_timer, period, 0, period);
 	}
 	else
@@ -84,8 +84,8 @@ WRITE8_DEVICE_HANDLER( warpwarp_sound_w )
          * ...but this is not very realistic for the game sound :(
          * maybe there _is_ a discharge through the diode D17?
          */
-		//attotime period = attotime_div(attotime_mul(ATTOTIME_IN_HZ(32768), 702900), 100000);
-		attotime period = attotime_div(attotime_mul(ATTOTIME_IN_HZ(32768), 191700), 100000);
+		//attotime period = attotime::from_hz(32768) * 702900 / 100000;
+		attotime period = attotime::from_hz(32768) * 191700 / 100000;
 		timer_adjust_periodic(state->sound_volume_timer, period, 0, period);
 	}
 }
@@ -124,7 +124,7 @@ WRITE8_DEVICE_HANDLER( warpwarp_music2_w )
          * 0.639 * 15k * 10uF -> 9.585s
          * ...I'm sure this is off by one number of magnitude :/
          */
-		attotime period = attotime_div(attotime_mul(ATTOTIME_IN_HZ(32768), 95850), 100000);
+		attotime period = attotime::from_hz(32768) * 95850 / 100000;
 		timer_adjust_periodic(state->music_volume_timer, period, 0, period);
 	}
 	else
@@ -134,8 +134,8 @@ WRITE8_DEVICE_HANDLER( warpwarp_music2_w )
          * discharge C95(?) (10uF) through R14 (47k)
          * 0.639 * 47k * 10uF -> 30.033s
          */
-		//attotime period = attotime_div(attotime_mul(ATTOTIME_IN_HZ(32768), 3003300), 100000);
-		attotime period = attotime_div(attotime_mul(ATTOTIME_IN_HZ(32768),  300330), 100000);
+		//attotime period = attotime::from_hz(32768) * 3003300 / 100000;
+		attotime period = attotime::from_hz(32768) * 300330 / 100000;
 		timer_adjust_periodic(state->music_volume_timer, period, 0, period);
 	}
 

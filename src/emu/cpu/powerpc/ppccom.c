@@ -1911,7 +1911,7 @@ static void ppc4xx_spu_timer_reset(powerpc_state *ppc)
 		attotime clockperiod = ATTOTIME_IN_HZ((ppc->dcr[DCR4XX_IOCR] & 0x02) ? 3686400 : 33333333);
 		int divisor = ((ppc->spu.regs[SPU4XX_BAUD_DIVISOR_H] * 256 + ppc->spu.regs[SPU4XX_BAUD_DIVISOR_L]) & 0xfff) + 1;
 		int bpc = 7 + ((ppc->spu.regs[SPU4XX_CONTROL] & 8) >> 3) + 1 + (ppc->spu.regs[SPU4XX_CONTROL] & 1);
-		attotime charperiod = attotime_mul(clockperiod, divisor * 16 * bpc);
+		attotime charperiod = clockperiod * (divisor * 16 * bpc);
 		timer_adjust_periodic(ppc->spu.timer, charperiod, 0, charperiod);
 		if (PRINTF_SPU)
 			printf("ppc4xx_spu_timer_reset: baud rate = %.0f\n", ATTOSECONDS_TO_HZ(charperiod.attoseconds) * bpc);

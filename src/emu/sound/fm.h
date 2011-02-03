@@ -43,9 +43,9 @@ struct _ssg_callbacks
 #define TIME_TYPE					attotime
 #define UNDEFINED_TIME				attotime_zero
 #define FM_GET_TIME_NOW(machine)			timer_get_time(machine)
-#define ADD_TIMES(t1, t2)   		attotime_add((t1), (t2))
-#define COMPARE_TIMES(t1, t2)		attotime_compare((t1), (t2))
-#define MULTIPLY_TIME_BY_INT(t,i)	attotime_mul(t, i)
+#define ADD_TIMES(t1, t2)   		((t1) + (t2))
+#define COMPARE_TIMES(t1, t2)		(((t1) == (t2)) ? 0 : ((t1) < (t2)) ? -1 : 1)
+#define MULTIPLY_TIME_BY_INT(t,i)	((t) * (i))
 #endif
 
 #if BUILD_YM2203

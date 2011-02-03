@@ -375,7 +375,7 @@ static void ymf278b_timer_a_reset(YMF278BChip *chip)
 		attotime period = ATTOTIME_IN_NSEC((256-chip->timer_a_count) * 80800);
 
 		if (chip->clock != YMF278B_STD_CLOCK)
-			period = attotime_div(attotime_mul(period, chip->clock), YMF278B_STD_CLOCK);
+			period = (period * chip->clock) / YMF278B_STD_CLOCK;
 
 		timer_adjust_periodic(chip->timer_a, period, 0, period);
 	}
@@ -390,7 +390,7 @@ static void ymf278b_timer_b_reset(YMF278BChip *chip)
 		attotime period = ATTOTIME_IN_NSEC((256-chip->timer_b_count) * 323100);
 
 		if (chip->clock != YMF278B_STD_CLOCK)
-			period = attotime_div(attotime_mul(period, chip->clock), YMF278B_STD_CLOCK);
+			period = (period * chip->clock) / YMF278B_STD_CLOCK;
 
 		timer_adjust_periodic(chip->timer_b, period, 0, period);
 	}

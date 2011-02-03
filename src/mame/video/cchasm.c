@@ -100,7 +100,7 @@ static void cchasm_refresh (running_machine *machine)
 		}
 	}
     /* Refresh processor runs with 6 MHz */
-    timer_set (machine, attotime_mul(ATTOTIME_IN_HZ(6000000), total_length), NULL, 0, cchasm_refresh_end);
+    timer_set (machine, attotime::from_hz(6000000) * total_length, NULL, 0, cchasm_refresh_end);
 }
 
 

@@ -145,7 +145,7 @@ INLINE const mos6560_interface *get_interface( device_t *device )
 		if(VERBOSE_LEVEL >= N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s", attotime_to_double(timer_get_time(device->machine)), (char*) M ); \
+				logerror("%11.6f: %-24s", timer_get_time(device->machine).as_double(), (char*) M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -460,7 +460,7 @@ READ8_DEVICE_HANDLER( mos6560_port_r )
 		break;
 	case 6:						   /*lightpen horizontal */
 	case 7:						   /*lightpen vertical */
-		if (LIGHTPEN_BUTTON && ((attotime_to_double(timer_get_time(device->machine)) - mos6560->lightpenreadtime) * MOS656X_VRETRACERATE >= 1))
+		if (LIGHTPEN_BUTTON && ((timer_get_time(device->machine).as_double() - mos6560->lightpenreadtime) * MOS656X_VRETRACERATE >= 1))
 		{
 			/* only 1 update each frame */
 			/* and diode must recognize light */
@@ -469,7 +469,7 @@ READ8_DEVICE_HANDLER( mos6560_port_r )
 				mos6560->reg[6] = MOS656X_X_VALUE;
 				mos6560->reg[7] = MOS656X_Y_VALUE;
 			}
-			mos6560->lightpenreadtime = attotime_to_double(timer_get_time(device->machine));
+			mos6560->lightpenreadtime = timer_get_time(device->machine).as_double();
 		}
 		val = mos6560->reg[offset];
 		break;

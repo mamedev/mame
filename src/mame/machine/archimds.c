@@ -381,7 +381,7 @@ static const char *const ioc_regnames[] =
 
 static void latch_timer_cnt(int tmr)
 {
-	double time = attotime_to_double(timer_timeelapsed(timer[tmr]));
+	double time = timer_timeelapsed(timer[tmr]).as_double();
 	time *= 2000000.0;	// find out how many 2 MHz ticks have gone by
 	ioc_timerout[tmr] = ioc_timercnt[tmr] - (UINT32)time;
 }

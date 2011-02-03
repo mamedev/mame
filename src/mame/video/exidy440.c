@@ -454,12 +454,12 @@ static VIDEO_UPDATE( exidy440 )
             From this, it appears that they are expecting to get beams over
             a 12 scanline period, and trying to pick roughly the middle one.
             This is how it is implemented. */
-		attoseconds_t increment = attotime_to_attoseconds(screen->scan_period());
-		attotime time = attotime_sub(screen->time_until_pos(beamy, beamx), attotime_make(0, increment * 6));
+		attotime increment = screen->scan_period();
+		attotime time = screen->time_until_pos(beamy, beamx) - increment * 6;
 		for (i = 0; i <= 12; i++)
 		{
 			timer_set(screen->machine, time, NULL, beamx, beam_firq_callback);
-			time = attotime_add(time, attotime_make(0, increment));
+			time += increment;
 		}
 	}
 

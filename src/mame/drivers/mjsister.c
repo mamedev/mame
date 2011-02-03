@@ -160,7 +160,7 @@ static TIMER_CALLBACK( dac_callback )
 	dac_data_w(state->dac, DACROM[(state->dac_bank * 0x10000 + state->dac_adr++) & 0x1ffff]);
 
 	if (((state->dac_adr & 0xff00 ) >> 8) !=  state->dac_adr_e)
-		timer_set(machine, attotime_mul(ATTOTIME_IN_HZ(MCLK), 1024), NULL, 0, dac_callback);
+		timer_set(machine, attotime::from_hz(MCLK) * 1024, NULL, 0, dac_callback);
 	else
 		state->dac_busy = 0;
 }

@@ -812,7 +812,7 @@ WRITE8_HANDLER( schaser_sh_port_1_w )
 	{
 		if (effect)
 		{
-			if (attotime_compare(state->schaser_effect_555_time_remain, attotime_zero) != 0)
+			if (state->schaser_effect_555_time_remain != attotime::zero)
 			{
 				/* timer re-enabled, use up remaining 555 high time */
 				timer_adjust_oneshot(state->schaser_effect_555_timer, state->schaser_effect_555_time_remain, effect);
@@ -820,7 +820,7 @@ WRITE8_HANDLER( schaser_sh_port_1_w )
 			else if (!state->schaser_effect_555_is_low)
 			{
 				/* set 555 high time */
-				attotime new_time = attotime_make(0, ATTOSECONDS_PER_SECOND * .8873 * schaser_effect_rc[effect]);
+				attotime new_time = attotime(0, ATTOSECONDS_PER_SECOND * .8873 * schaser_effect_rc[effect]);
 				timer_adjust_oneshot(state->schaser_effect_555_timer, new_time, effect);
 			}
 		}
@@ -830,7 +830,7 @@ WRITE8_HANDLER( schaser_sh_port_1_w )
 			if (!state->schaser_effect_555_is_low)
 			{
 				state->schaser_effect_555_time_remain = timer_timeleft(state->schaser_effect_555_timer);
-            		state->schaser_effect_555_time_remain_savable = attotime_to_double(state->schaser_effect_555_time_remain);
+            		state->schaser_effect_555_time_remain_savable = state->schaser_effect_555_time_remain.as_double();
 				timer_adjust_oneshot(state->schaser_effect_555_timer, attotime_never, 0);
 			}
 		}
@@ -888,16 +888,16 @@ static TIMER_CALLBACK( schaser_effect_555_cb )
 	/* Toggle 555 output */
 	state->schaser_effect_555_is_low = !state->schaser_effect_555_is_low;
 	state->schaser_effect_555_time_remain = attotime_zero;
-	state->schaser_effect_555_time_remain_savable = attotime_to_double(state->schaser_effect_555_time_remain);
+	state->schaser_effect_555_time_remain_savable = state->schaser_effect_555_time_remain.as_double();
 
 	if (state->schaser_effect_555_is_low)
-		new_time = attotime_div(PERIOD_OF_555_ASTABLE(0, RES_K(20), CAP_U(1)), 2);
+		new_time = PERIOD_OF_555_ASTABLE(0, RES_K(20), CAP_U(1)) / 2;
 	else
 	{
 		if (effect)
-			new_time = attotime_make(0, ATTOSECONDS_PER_SECOND * .8873 * schaser_effect_rc[effect]);
+			new_time = attotime(0, ATTOSECONDS_PER_SECOND * .8873 * schaser_effect_rc[effect]);
 		else
-			new_time = attotime_never;
+			new_time = attotime::never;
 	}
 	timer_adjust_oneshot(state->schaser_effect_555_timer, new_time, effect);
 	sn76477_enable_w(state->sn, !(state->schaser_effect_555_is_low || state->schaser_explosion));
@@ -909,7 +909,7 @@ static STATE_POSTLOAD( schaser_reinit_555_time_remain )
 {
 	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 	address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
-	state->schaser_effect_555_time_remain = double_to_attotime(state->schaser_effect_555_time_remain_savable);
+	state->schaser_effect_555_time_remain = attotime::from_double(state->schaser_effect_555_time_remain_savable);
 	schaser_sh_port_2_w(space, 0, state->port_2_last_extra);
 }
 
@@ -938,7 +938,7 @@ MACHINE_RESET( schaser_sh )
 	schaser_sh_port_1_w(space, 0, 0);
 	schaser_sh_port_2_w(space, 0, 0);
 	state->schaser_effect_555_time_remain = attotime_zero;
-	state->schaser_effect_555_time_remain_savable = attotime_to_double(state->schaser_effect_555_time_remain);
+	state->schaser_effect_555_time_remain_savable = state->schaser_effect_555_time_remain.as_double();
 }
 
 

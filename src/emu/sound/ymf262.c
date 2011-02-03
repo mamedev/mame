@@ -1317,7 +1317,7 @@ static void OPL3_initalize(OPL3 *chip)
 	/* logerror("YMF262: freqbase=%f\n", chip->freqbase); */
 
 	/* Timer base time */
-	chip->TimerBase = attotime_mul(ATTOTIME_IN_HZ(chip->clock), 8*36);
+	chip->TimerBase = attotime::from_hz(chip->clock) * (8*36);
 
 	/* make fnumber -> increment counter table */
 	for( i=0 ; i < 1024 ; i++ )
@@ -1742,14 +1742,14 @@ static void OPL3WriteReg(OPL3 *chip, int r, int v)
 				/* timer 2 */
 				if(chip->st[1] != st2)
 				{
-					attotime period = st2 ? attotime_mul(chip->TimerBase, chip->T[1]) : attotime_zero;
+					attotime period = st2 ? chip->TimerBase * chip->T[1] : attotime::zero;
 					chip->st[1] = st2;
 					if (chip->timer_handler) (chip->timer_handler)(chip->TimerParam,1,period);
 				}
 				/* timer 1 */
 				if(chip->st[0] != st1)
 				{
-					attotime period = st1 ? attotime_mul(chip->TimerBase, chip->T[0]) : attotime_zero;
+					attotime period = st1 ? chip->TimerBase * chip->T[0] : attotime::zero;
 					chip->st[0] = st1;
 					if (chip->timer_handler) (chip->timer_handler)(chip->TimerParam,0,period);
 				}
@@ -2454,7 +2454,7 @@ static int OPL3TimerOver(OPL3 *chip,int c)
 		OPL3_STATUS_SET(chip,0x40);
 	}
 	/* reload timer */
-	if (chip->timer_handler) (chip->timer_handler)(chip->TimerParam,c,attotime_mul(chip->TimerBase, chip->T[c]));
+	if (chip->timer_handler) (chip->timer_handler)(chip->TimerParam,c,chip->TimerBase * chip->T[c]);
 	return chip->status>>7;
 }
 

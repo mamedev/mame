@@ -229,7 +229,7 @@ static WRITE8_HANDLER( sound_nmi_rate_w )
 	/* rate is controlled by the value written here */
 	/* this value is latched into up-counters, which are clocked at the */
 	/* input clock / 256 */
-	attotime nmi_rate = attotime_mul(ATTOTIME_IN_HZ(4000000), 4096 * (256 - data));
+	attotime nmi_rate = attotime::from_hz(4000000) * (4096 * (256 - data));
 	timer_device *nmi_timer = space->machine->device<timer_device>("snd_nmi_timer");
 	nmi_timer->adjust(nmi_rate, 0, nmi_rate);
 }

@@ -650,7 +650,7 @@ INLINE void counter_start(balsente_state *state, int which)
 		if (state->counter[which].gate && !state->counter[which].timer_active)
 		{
 			state->counter[which].timer_active = 1;
-			state->counter[which].timer->adjust(attotime_mul(ATTOTIME_IN_HZ(2000000), state->counter[which].count), which);
+			state->counter[which].timer->adjust(attotime::from_hz(2000000) * state->counter[which].count, which);
 		}
 	}
 }
@@ -671,7 +671,7 @@ INLINE void counter_update_count(balsente_state *state, int which)
 	if (state->counter[which].timer_active)
 	{
 		/* determine how many 2MHz cycles are remaining */
-		int count = attotime_to_double(attotime_mul(state->counter[which].timer->time_left(), 2000000));
+		int count = (state->counter[which].timer->time_left() * 2000000).as_double();
 		state->counter[which].count = (count < 0) ? 0 : count;
 	}
 }

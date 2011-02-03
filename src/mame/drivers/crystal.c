@@ -287,7 +287,7 @@ INLINE void Timer_w( address_space *space, int which, UINT32 data, UINT32 mem_ma
 	{
 		int PD = (data >> 8) & 0xff;
 		int TCV = space->read_dword(0x01801404 + which * 8);
-		attotime period = attotime_mul(ATTOTIME_IN_HZ(43000000), (PD + 1) * (TCV + 1));
+		attotime period = attotime::from_hz(43000000) * ((PD + 1) * (TCV + 1));
 
 		if (state->Timerctrl[which] & 2)
 			timer_adjust_periodic(state->Timer[which], period, 0, period);

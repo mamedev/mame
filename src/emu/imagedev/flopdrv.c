@@ -244,12 +244,12 @@ static void floppy_drive_index_func(device_t *img)
 	if (drive->idx)
 	{
 		drive->idx = 0;
-		timer_adjust_oneshot((emu_timer*)drive->index_timer, double_to_attotime(ms*19/20/1000.0), 0);
+		timer_adjust_oneshot((emu_timer*)drive->index_timer, attotime::from_double(ms*19/20/1000.0), 0);
 	}
 	else
 	{
 		drive->idx = 1;
-		timer_adjust_oneshot((emu_timer*)drive->index_timer, double_to_attotime(ms/20/1000.0), 0);
+		timer_adjust_oneshot((emu_timer*)drive->index_timer, attotime::from_double(ms/20/1000.0), 0);
 	}
 
 	devcb_call_write_line(&drive->out_idx_func, drive->idx);

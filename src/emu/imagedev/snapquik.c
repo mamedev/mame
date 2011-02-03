@@ -153,7 +153,7 @@ static DEVICE_IMAGE_LOAD( snapquick )
 	/* adjust the timer */
 	timer_adjust_oneshot(
 		token->timer,
-		attotime_make(config->delay_seconds, config->delay_attoseconds),
+		attotime(config->delay_seconds, config->delay_attoseconds),
 		0);
 
 	return IMAGE_INIT_PASS;

@@ -368,7 +368,7 @@ static INPUT_CHANGED( touchscreen_press )
 {
 	if (newval == 0)
 	{
-		attotime rx_period = attotime_mul(ATTOTIME_IN_HZ(10000), 16);
+		attotime rx_period = attotime::from_hz(10000) * 16;
 
 		/* Each touch screen packet is 3 bytes */
 		touch_data[0] = 0x2a;

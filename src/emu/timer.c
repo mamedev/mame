@@ -197,7 +197,7 @@ INLINE void timer_list_insert(emu_timer *timer)
 	for (t = global->activelist; t != NULL; lt = t, t = t->next)
 	{
 		/* if the current list entry expires after us, we should be inserted before it */
-		if (attotime_compare(t->expire, expire) > 0)
+		if (t->expire > expire)
 		{
 			/* link the new guy in before the current list entry */
 			timer->prev = t->prev;
@@ -348,7 +348,7 @@ void timer_execute_timers(running_machine *machine)
 	emu_timer *timer;
 
 	/* if the current quantum has expired, find a new one */
-	if (attotime_compare(global->exec.basetime, global->quantum_current->expire) >= 0)
+	if (global->exec.basetime >= global->quantum_current->expire)
 	{
 		int curr;
 
@@ -360,16 +360,16 @@ void timer_execute_timers(running_machine *machine)
 		global->exec.curquantum = global->quantum_current->actual;
 	}
 
-	LOG(("timer_set_global_time: new=%s head->expire=%s\n", attotime_string(global->exec.basetime, 9), attotime_string(global->activelist->expire, 9)));
+	LOG(("timer_set_global_time: new=%s head->expire=%s\n", global->exec.basetime.as_string(), global->activelist->expire.as_string()));
 
 	/* now process any timers that are overdue */
-	while (attotime_compare(global->activelist->expire, global->exec.basetime) <= 0)
+	while (global->activelist->expire <= global->exec.basetime)
 	{
 		int was_enabled = global->activelist->enabled;
 
 		/* if this is a one-shot timer, disable it now */
 		timer = global->activelist;
-		if (attotime_compare(timer->period, attotime_zero) == 0 || attotime_compare(timer->period, attotime_never) == 0)
+		if (timer->period == attotime::zero || timer->period == attotime::never)
 			timer->enabled = FALSE;
 
 		/* set the global state of which callback we're in */
@@ -384,7 +384,7 @@ void timer_execute_timers(running_machine *machine)
 				timer->device->timer_fired(*timer, timer->id, timer->param, timer->ptr);
 			else if (timer->callback != NULL)
 			{
-				LOG(("Timer %s:%d[%s] fired (expire=%s)\n", timer->file, timer->line, timer->func, attotime_string(timer->expire, 9)));
+				LOG(("Timer %s:%d[%s] fired (expire=%s)\n", timer->file, timer->line, timer->func, timer->expire.as_string()));
 				g_profiler.start(PROFILER_TIMER_CALLBACK);
 				(*timer->callback)(machine, timer->ptr, timer->param);
 				g_profiler.stop();
@@ -405,7 +405,7 @@ void timer_execute_timers(running_machine *machine)
 			else
 			{
 				timer->start = timer->expire;
-				timer->expire = attotime_add(timer->expire, timer->period);
+				timer->expire += timer->period;
 
 				timer_list_remove(timer);
 				timer_list_insert(timer);
@@ -425,7 +425,7 @@ void timer_add_scheduling_quantum(running_machine *machine, attoseconds_t quantu
 {
 	timer_private *global = machine->timer_data;
 	attotime curtime = timer_get_time(machine);
-	attotime expire = attotime_add(curtime, duration);
+	attotime expire = curtime + duration;
 	int curr, blank = -1;
 
 	/* a 0 request (minimum) needs to be non-zero to occupy a slot */
@@ -440,7 +440,7 @@ void timer_add_scheduling_quantum(running_machine *machine, attoseconds_t quantu
 		/* look for a matching quantum and extend it */
 		if (slot->requested == quantum)
 		{
-			slot->expire = attotime_max(slot->expire, expire);
+			slot->expire = max(slot->expire, expire);
 			return;
 		}
 
@@ -452,7 +452,7 @@ void timer_add_scheduling_quantum(running_machine *machine, attoseconds_t quantu
 		}
 
 		/* otherwise, expire any expired slots */
-		else if (attotime_compare(curtime, slot->expire) >= 0)
+		else if (curtime >= slot->expire)
 			slot->requested = 0;
 	}
 
@@ -718,7 +718,7 @@ void timer_adjust_periodic(emu_timer *which, attotime start_delay, INT32 param, 
 
 	/* set the start and expire times */
 	which->start = time;
-	which->expire = attotime_add(time, start_delay);
+	which->expire = time + start_delay;
 	which->period = period;
 
 	/* remove and re-insert the timer in its new order */
@@ -726,7 +726,7 @@ void timer_adjust_periodic(emu_timer *which, attotime start_delay, INT32 param, 
 	timer_list_insert(which);
 
 	/* if this was inserted as the head, abort the current timeslice and resync */
-	LOG(("timer_adjust_oneshot %s.%s:%d to expire @ %s\n", which->file, which->func, which->line, attotime_string(which->expire, 9)));
+	LOG(("timer_adjust_oneshot %s.%s:%d to expire @ %s\n", which->file, which->func, which->line, which->expire.as_string()));
 	if (which == global->activelist)
 		which->machine->scheduler().abort_timeslice();
 }
@@ -874,7 +874,7 @@ void timer_set_ptr(emu_timer *which, void *ptr)
 
 attotime timer_timeelapsed(emu_timer *which)
 {
-	return attotime_sub(get_current_time(which->machine), which->start);
+	return get_current_time(which->machine) - which->start;
 }
 
 
@@ -885,7 +885,7 @@ attotime timer_timeelapsed(emu_timer *which)
 
 attotime timer_timeleft(emu_timer *which)
 {
-	return attotime_sub(which->expire, get_current_time(which->machine));
+	return which->expire - get_current_time(which->machine);
 }
 
 
@@ -942,12 +942,12 @@ static void timer_logtimers(running_machine *machine)
 	logerror("Enqueued timers:\n");
 	for (t = global->activelist; t; t = t->next)
 		logerror("  Start=%15.6f Exp=%15.6f Per=%15.6f Ena=%d Tmp=%d (%s:%d[%s])\n",
-			attotime_to_double(t->start), attotime_to_double(t->expire), attotime_to_double(t->period), t->enabled, t->temporary, t->file, t->line, t->func);
+			t->start.as_double(), t->expire.as_double(), t->period.as_double(), t->enabled, t->temporary, t->file, t->line, t->func);
 
 	logerror("Free timers:\n");
 	for (t = global->freelist; t; t = t->next)
 		logerror("  Start=%15.6f Exp=%15.6f Per=%15.6f Ena=%d Tmp=%d (%s:%d[%s])\n",
-			attotime_to_double(t->start), attotime_to_double(t->expire), attotime_to_double(t->period), t->enabled, t->temporary, t->file, t->line, t->func);
+			t->start.as_double(), t->expire.as_double(), t->period.as_double(), t->enabled, t->temporary, t->file, t->line, t->func);
 
 	logerror("==============\n");
 	logerror("TIMER LOG STOP\n");
@@ -960,7 +960,7 @@ void timer_print_first_timer(running_machine *machine)
 	timer_private *global = machine->timer_data;
 	emu_timer *t = global->activelist;
 	printf("  Start=%15.6f Exp=%15.6f Per=%15.6f Ena=%d Tmp=%d (%s)\n",
-		attotime_to_double(t->start), attotime_to_double(t->expire), attotime_to_double(t->period), t->enabled, t->temporary, t->func);
+		t->start.as_double(), t->expire.as_double(), t->period.as_double(), t->enabled, t->temporary, t->func);
 }
 
 
@@ -1112,16 +1112,16 @@ bool timer_device_config::device_validity_check(const game_driver &driver) const
 	switch (m_type)
 	{
 		case TIMER_TYPE_GENERIC:
-			if (m_screen != NULL || m_first_vpos != 0 || attotime_compare(m_start_delay, attotime_zero) != 0)
+			if (m_screen != NULL || m_first_vpos != 0 || m_start_delay != attotime::zero)
 				mame_printf_warning("%s: %s generic timer '%s' specified parameters for a scanline timer\n", driver.source_file, driver.name, tag());
-			if (attotime_compare(m_period, attotime_zero) != 0 || attotime_compare(m_start_delay, attotime_zero) != 0)
+			if (m_period != attotime::zero || m_start_delay != attotime::zero)
 				mame_printf_warning("%s: %s generic timer '%s' specified parameters for a periodic timer\n", driver.source_file, driver.name, tag());
 			break;
 
 		case TIMER_TYPE_PERIODIC:
 			if (m_screen != NULL || m_first_vpos != 0)
 				mame_printf_warning("%s: %s periodic timer '%s' specified parameters for a scanline timer\n", driver.source_file, driver.name, tag());
-			if (attotime_compare(m_period, attotime_zero) <= 0)
+			if (m_period <= attotime::zero)
 			{
 				mame_printf_error("%s: %s periodic timer '%s' specified invalid period\n", driver.source_file, driver.name, tag());
 				error = true;
@@ -1129,7 +1129,7 @@ bool timer_device_config::device_validity_check(const game_driver &driver) const
 			break;
 
 		case TIMER_TYPE_SCANLINE:
-			if (attotime_compare(m_period, attotime_zero) != 0 || attotime_compare(m_start_delay, attotime_zero) != 0)
+			if (m_period != attotime::zero || m_start_delay != attotime::zero)
 				mame_printf_warning("%s: %s scanline timer '%s' specified parameters for a periodic timer\n", driver.source_file, driver.name, tag());
 			if (m_param != 0)
 				mame_printf_warning("%s: %s scanline timer '%s' specified parameter which is ignored\n", driver.source_file, driver.name, tag());
@@ -1208,13 +1208,13 @@ void timer_device::device_reset()
 		{
 			// convert the period into attotime
 			attotime period = attotime_never;
-			if (attotime_compare(m_config.m_period, attotime_zero) > 0)
+			if (m_config.m_period > attotime::zero)
 			{
 				period = m_config.m_period;
 
 				// convert the start_delay into attotime
 				attotime start_delay = attotime_zero;
-				if (attotime_compare(m_config.m_start_delay, attotime_zero) > 0)
+				if (m_config.m_start_delay > attotime_zero)
 					start_delay = m_config.m_start_delay;
 
 				// allocate and start the backing timer

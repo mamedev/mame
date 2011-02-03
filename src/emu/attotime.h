@@ -4,8 +4,36 @@
 
     Support functions for working with attotime data.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
+****************************************************************************
+
+    Copyright Aaron Giles
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
 
 ****************************************************************************
 
@@ -39,400 +67,392 @@
 #include <math.h>
 
 
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
+//**************************************************************************
+//  CONSTANTS
+//**************************************************************************
 
-#define ATTOSECONDS_PER_SECOND_SQRT		((attoseconds_t)1000000000)
-#define ATTOSECONDS_PER_SECOND			(ATTOSECONDS_PER_SECOND_SQRT * ATTOSECONDS_PER_SECOND_SQRT)
-#define ATTOSECONDS_PER_MILLISECOND		(ATTOSECONDS_PER_SECOND / 1000)
-#define ATTOSECONDS_PER_MICROSECOND		(ATTOSECONDS_PER_SECOND / 1000000)
-#define ATTOSECONDS_PER_NANOSECOND		(ATTOSECONDS_PER_SECOND / 1000000000)
+// core components of the attotime structure
+typedef INT64 attoseconds_t;
+typedef INT32 seconds_t;
 
-#define ATTOTIME_MAX_SECONDS			((seconds_t)1000000000)
+// core definitions
+const attoseconds_t ATTOSECONDS_PER_SECOND_SQRT = 1000000000;
+const attoseconds_t ATTOSECONDS_PER_SECOND = ATTOSECONDS_PER_SECOND_SQRT * ATTOSECONDS_PER_SECOND_SQRT;
+const attoseconds_t ATTOSECONDS_PER_MILLISECOND = ATTOSECONDS_PER_SECOND / 1000;
+const attoseconds_t ATTOSECONDS_PER_MICROSECOND = ATTOSECONDS_PER_SECOND / 1000000;
+const attoseconds_t ATTOSECONDS_PER_NANOSECOND = ATTOSECONDS_PER_SECOND / 1000000000;
+
+const seconds_t ATTOTIME_MAX_SECONDS = 1000000000;
 
 
 
-/***************************************************************************
-    MACROS
-***************************************************************************/
+//**************************************************************************
+//  MACROS
+//**************************************************************************
 
-/* convert between a double and attoseconds */
+// convert between a double and attoseconds
 #define ATTOSECONDS_TO_DOUBLE(x)		((double)(x) * 1e-18)
 #define DOUBLE_TO_ATTOSECONDS(x)		((attoseconds_t)((x) * 1e18))
 
-/* convert between hertz (as a double) and attoseconds */
+// convert between hertz (as a double) and attoseconds
 #define ATTOSECONDS_TO_HZ(x)			((double)ATTOSECONDS_PER_SECOND / (double)(x))
 #define HZ_TO_ATTOSECONDS(x)			((attoseconds_t)(ATTOSECONDS_PER_SECOND / (x)))
 
-/* macros for converting other seconds types to attoseconds */
+// macros for converting other seconds types to attoseconds
 #define ATTOSECONDS_IN_SEC(x)			((attoseconds_t)(x) * ATTOSECONDS_PER_SECOND)
 #define ATTOSECONDS_IN_MSEC(x)			((attoseconds_t)(x) * ATTOSECONDS_PER_MILLISECOND)
 #define ATTOSECONDS_IN_USEC(x)			((attoseconds_t)(x) * ATTOSECONDS_PER_MICROSECOND)
 #define ATTOSECONDS_IN_NSEC(x)			((attoseconds_t)(x) * ATTOSECONDS_PER_NANOSECOND)
 
-/* macros for building attotimes from other types at runtime */
-#define ATTOTIME_IN_HZ(hz)				attotime_make((0), (HZ_TO_ATTOSECONDS(hz)))
-#define ATTOTIME_IN_SEC(s)				attotime_make(((s) / 1), ((s) % 1))
-#define ATTOTIME_IN_MSEC(ms)			attotime_make(((ms) / 1000), (ATTOSECONDS_IN_MSEC((ms) % 1000)))
-#define ATTOTIME_IN_USEC(us)			attotime_make(((us) / 1000000), (ATTOSECONDS_IN_USEC((us) % 1000000)))
-#define ATTOTIME_IN_NSEC(ns)			attotime_make(((ns) / 1000000000), (ATTOSECONDS_IN_NSEC((ns) % 1000000000)))
+// macros for building attotimes from other types at runtime
+#define ATTOTIME_IN_HZ(hz)				attotime::from_hz(hz)
+#define ATTOTIME_IN_SEC(s)				attotime::from_seconds(s)
+#define ATTOTIME_IN_MSEC(ms)			attotime::from_msec(ms)
+#define ATTOTIME_IN_USEC(us)			attotime::from_usec(us)
+#define ATTOTIME_IN_NSEC(ns)			attotime::from_nsec(ns)
 
-/* macros for building attotimes from other types at compile time */
-#define STATIC_ATTOTIME_IN_HZ(hz)		{ (0), (HZ_TO_ATTOSECONDS(hz)) }
-#define STATIC_ATTOTIME_IN_SEC(s)		{ ((s) / 1), ((s) % 1) }
-#define STATIC_ATTOTIME_IN_MSEC(ms)		{ ((ms) / 1000), (ATTOSECONDS_IN_MSEC((ms) % 1000)) }
-#define STATIC_ATTOTIME_IN_USEC(us)		{ ((us) / 1000000), (ATTOSECONDS_IN_USEC((us) % 1000000)) }
-#define STATIC_ATTOTIME_IN_NSEC(ns)		{ ((ns) / 1000000000), (ATTOSECONDS_IN_NSEC((ns) % 1000000000)) }
-
-/* macros for building a reduced-resolution attotime for tokenized storage in a UINT64 */
-/* this form supports up to 1000 seconds and sacrifices 1/1000 of the full attotime resolution */
+// macros for building a reduced-resolution attotime for tokenized storage in a UINT64
+// this form supports up to 1000 seconds and sacrifices 1/1000 of the full attotime resolution
 #define UINT64_ATTOTIME_IN_HZ(hz)		((UINT64)((ATTOSECONDS_PER_SECOND / 1000) / (hz)))
 #define UINT64_ATTOTIME_IN_SEC(s)		((UINT64)(s) * (ATTOSECONDS_PER_SECOND / 1000))
 #define UINT64_ATTOTIME_IN_MSEC(ms)		((UINT64)(ms) * (ATTOSECONDS_PER_SECOND / 1000 / 1000))
 #define UINT64_ATTOTIME_IN_USEC(us)		((UINT64)(us) * (ATTOSECONDS_PER_SECOND / 1000 / 1000 / 1000))
 #define UINT64_ATTOTIME_IN_NSEC(ns)		((UINT64)(ns) * (ATTOSECONDS_PER_SECOND / 1000 / 1000 / 1000 / 1000))
 
-/* macros for converting a UINT64 attotime to a full attotime */
-#define UINT64_ATTOTIME_TO_ATTOTIME(v)	attotime_make((v) / (ATTOSECONDS_PER_SECOND / 1000), ((v) % (ATTOSECONDS_PER_SECOND / 1000)) * 1000)
+// macros for converting a UINT64 attotime to a full attotime
+#define UINT64_ATTOTIME_TO_ATTOTIME(v)	attotime((v) / (ATTOSECONDS_PER_SECOND / 1000), ((v) % (ATTOSECONDS_PER_SECOND / 1000)) * 1000)
 
 
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+//**************************************************************************
+//  TYPE DEFINITIONS
+//***************************************************************************/
 
-/* core components of the attotime structure */
-typedef INT64 attoseconds_t;
-typedef INT32 seconds_t;
-
-
-/* the attotime structure itself */
-typedef struct _attotime attotime;
-struct _attotime
+// the attotime structure itself
+class attotime
 {
+public:
+	// construction/destruction
+	attotime()
+		: seconds(0),
+		  attoseconds(0) { }
+		  
+	attotime(seconds_t secs, attoseconds_t attos)
+		: seconds(secs),
+		  attoseconds(attos) { }
+	
+	// queries
+	bool is_zero() const { return (seconds == 0 && attoseconds == 0); }
+	bool is_never() const { return (seconds >= ATTOTIME_MAX_SECONDS); }
+
+	// conversion to other forms
+	double as_double() const { return double(seconds) + ATTOSECONDS_TO_DOUBLE(attoseconds); }
+	attoseconds_t as_attoseconds() const;
+	UINT64 as_ticks(UINT32 frequency) const;
+	const char *as_string(int precision = 9) const;
+
+	// conversion from other forms
+	static attotime from_double(double _time);
+	static attotime from_ticks(UINT64 ticks, UINT32 frequency);
+	static attotime from_seconds(INT32 seconds) { return attotime(seconds, 0); }
+	static attotime from_msec(INT64 msec) { return attotime(msec / 1000, (msec % 1000) * (ATTOSECONDS_PER_SECOND / 1000)); }
+	static attotime from_usec(INT64 usec) { return attotime(usec / 1000000, (usec % 1000000) * (ATTOSECONDS_PER_SECOND / 1000000)); }
+	static attotime from_nsec(INT64 nsec) { return attotime(nsec / 1000000000, (nsec % 1000000000) * (ATTOSECONDS_PER_SECOND / 1000000000)); }
+	static attotime from_hz(double frequency) { return attotime(0, double(ATTOSECONDS_PER_SECOND) / frequency); }
+	
+	// math
+	attotime &operator+=(const attotime &right);
+	attotime &operator-=(const attotime &right);
+	attotime &operator*=(UINT32 factor);
+	attotime &operator/=(UINT32 factor);
+
+	// members
 	seconds_t		seconds;
 	attoseconds_t	attoseconds;
+
+	// constants
+	static const attotime never;
+	static const attotime zero;
 };
 
 
 
-/***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
+//**************************************************************************
+//  INLINE FUNCTIONS
+//**************************************************************************
 
-/* constant times for zero and never */
-extern const attotime		attotime_zero;
-extern const attotime		attotime_never;
+//-------------------------------------------------
+//  operator+ - handle addition between two 
+//  attotimes
+//-------------------------------------------------
 
-
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-/* ----- core math functions ----- */
-
-/* multiply an attotime by a constant */
-attotime attotime_mul(attotime _time1, UINT32 factor);
-
-/* divide an attotime by a constant */
-attotime attotime_div(attotime _time1, UINT32 factor);
-
-
-/* ----- misc utilities ----- */
-
-/* return a temporary printable string describing an attotime */
-const char *attotime_string(attotime _time, int precision);
-
-
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    attotime_make - assemble an attotime from
-    seconds and attoseconds components
--------------------------------------------------*/
-
-INLINE attotime attotime_make(seconds_t _secs, attoseconds_t _subsecs)
+inline attotime operator+(const attotime &left, const attotime &right)
 {
 	attotime result;
-	result.seconds = _secs;
-	result.attoseconds = _subsecs;
+
+	// if one of the items is never, return never
+	if (left.seconds >= ATTOTIME_MAX_SECONDS || right.seconds >= ATTOTIME_MAX_SECONDS)
+		return attotime::never;
+
+	// add the seconds and attoseconds
+	result.attoseconds = left.attoseconds + right.attoseconds;
+	result.seconds = left.seconds + right.seconds;
+
+	// normalize and return
+	if (result.attoseconds >= ATTOSECONDS_PER_SECOND)
+	{
+		result.attoseconds -= ATTOSECONDS_PER_SECOND;
+		result.seconds++;
+	}
+
+	// overflow
+	if (result.seconds >= ATTOTIME_MAX_SECONDS)
+		return attotime::never;
+	return result;
+}
+
+inline attotime &attotime::operator+=(const attotime &right)
+{
+	// if one of the items is never, return never
+	if (this->seconds >= ATTOTIME_MAX_SECONDS || right.seconds >= ATTOTIME_MAX_SECONDS)
+		return *this = never;
+
+	// add the seconds and attoseconds
+	attoseconds += right.attoseconds;
+	seconds += right.seconds;
+
+	// normalize and return
+	if (this->attoseconds >= ATTOSECONDS_PER_SECOND)
+	{
+		this->attoseconds -= ATTOSECONDS_PER_SECOND;
+		this->seconds++;
+	}
+
+	// overflow
+	if (this->seconds >= ATTOTIME_MAX_SECONDS)
+		return *this = never;
+	return *this;
+}
+
+
+//-------------------------------------------------
+//  operator- - handle subtraction between two 
+//  attotimes
+//-------------------------------------------------
+
+inline attotime operator-(const attotime &left, const attotime &right)
+{
+	attotime result;
+
+	// if time1 is never, return never
+	if (left.seconds >= ATTOTIME_MAX_SECONDS)
+		return attotime::never;
+
+	// add the seconds and attoseconds
+	result.attoseconds = left.attoseconds - right.attoseconds;
+	result.seconds = left.seconds - right.seconds;
+
+	// normalize and return
+	if (result.attoseconds < 0)
+	{
+		result.attoseconds += ATTOSECONDS_PER_SECOND;
+		result.seconds--;
+	}
+	return result;
+}
+
+inline attotime &attotime::operator-=(const attotime &right)
+{
+	// if time1 is never, return never
+	if (this->seconds >= ATTOTIME_MAX_SECONDS)
+		return *this = never;
+
+	// add the seconds and attoseconds
+	attoseconds -= right.attoseconds;
+	seconds -= right.seconds;
+
+	// normalize and return
+	if (this->attoseconds < 0)
+	{
+		this->attoseconds += ATTOSECONDS_PER_SECOND;
+		this->seconds--;
+	}
+	return *this;
+}
+
+
+//-------------------------------------------------
+//  operator* - handle multiplication/division by
+//  an integral factor; defined in terms of the
+//  assignment operators
+//-------------------------------------------------
+
+inline attotime operator*(const attotime &left, UINT32 factor)
+{
+	attotime result = left;
+	result *= factor;
+	return result;
+}
+
+inline attotime operator*(UINT32 factor, const attotime &right)
+{
+	attotime result = right;
+	result *= factor;
+	return result;
+}
+
+inline attotime operator/(const attotime &left, UINT32 factor)
+{
+	attotime result = left;
+	result /= factor;
 	return result;
 }
 
 
-/*-------------------------------------------------
-    attotime_to_double - convert from attotime
-    to double
--------------------------------------------------*/
+//-------------------------------------------------
+//  operator== - handle comparisons between 
+//  attotimes
+//-------------------------------------------------
 
-INLINE double attotime_to_double(attotime _time)
+inline bool operator==(const attotime &left, const attotime &right)
 {
-	return (double)_time.seconds + ATTOSECONDS_TO_DOUBLE(_time.attoseconds);
+	return (left.seconds == right.seconds && left.attoseconds == right.attoseconds);
+}
+
+inline bool operator!=(const attotime &left, const attotime &right)
+{
+	return (left.seconds != right.seconds || left.attoseconds != right.attoseconds);
+}
+
+inline bool operator<(const attotime &left, const attotime &right)
+{
+	return (left.seconds < right.seconds || (left.seconds == right.seconds && left.attoseconds < right.attoseconds));
+}
+
+inline bool operator<=(const attotime &left, const attotime &right)
+{
+	return (left.seconds < right.seconds || (left.seconds == right.seconds && left.attoseconds <= right.attoseconds));
+}
+
+inline bool operator>(const attotime &left, const attotime &right)
+{
+	return (left.seconds > right.seconds || (left.seconds == right.seconds && left.attoseconds > right.attoseconds));
+}
+
+inline bool operator>=(const attotime &left, const attotime &right)
+{
+	return (left.seconds > right.seconds || (left.seconds == right.seconds && left.attoseconds >= right.attoseconds));
 }
 
 
-/*-------------------------------------------------
-    double_to_attotime - convert from double to
-    attotime
--------------------------------------------------*/
+//-------------------------------------------------
+//  min - return the minimum of two attotimes
+//-------------------------------------------------
 
-INLINE attotime double_to_attotime(double _time)
+inline attotime min(const attotime &left, const attotime &right)
 {
-	attotime result;
-
-	/* set seconds to the integral part */
-	result.seconds = floor(_time);
-
-	/* set attoseconds to the fractional part */
-	_time -= (double)result.seconds;
-	result.attoseconds = DOUBLE_TO_ATTOSECONDS(_time);
-	return result;
+	if (left.seconds > right.seconds)
+		return right;
+	if (left.seconds < right.seconds)
+		return left;
+	if (left.attoseconds > right.attoseconds)
+		return right;
+	return left;
 }
 
 
-/*-------------------------------------------------
-    attotime_to_attoseconds - convert a attotime
-    to attoseconds, clamping to maximum positive/
-    negative values
--------------------------------------------------*/
+//-------------------------------------------------
+//  max - return the maximum of two attotimes
+//-------------------------------------------------
 
-INLINE attoseconds_t attotime_to_attoseconds(attotime _time)
+inline attotime max(const attotime &left, const attotime &right)
 {
-	/* positive values between 0 and 1 second */
-	if (_time.seconds == 0)
-		return _time.attoseconds;
+	if (left.seconds > right.seconds)
+		return right;
+	if (left.seconds < right.seconds)
+		return left;
+	if (left.attoseconds > right.attoseconds)
+		return right;
+	return left;
+}
 
-	/* negative values between -1 and 0 seconds */
-	else if (_time.seconds == -1)
-		return _time.attoseconds - ATTOSECONDS_PER_SECOND;
 
-	/* out-of-range positive values */
-	else if (_time.seconds > 0)
+//-------------------------------------------------
+//  as_attoseconds - convert to an attoseconds
+//  value, clamping to +/- 1 second
+//-------------------------------------------------
+
+inline attoseconds_t attotime::as_attoseconds() const
+{
+	// positive values between 0 and 1 second
+	if (seconds == 0)
+		return attoseconds;
+
+	// negative values between -1 and 0 seconds
+	else if (seconds == -1)
+		return attoseconds - ATTOSECONDS_PER_SECOND;
+
+	// out-of-range positive values
+	else if (seconds > 0)
 		return ATTOSECONDS_PER_SECOND;
 
-	/* out-of-range negative values */
+	// out-of-range negative values
 	else
 		return -ATTOSECONDS_PER_SECOND;
 }
 
 
-/*-------------------------------------------------
-    attotime_to_ticks - convert an attotime to
-    clock ticks at the given frequency
--------------------------------------------------*/
+//-------------------------------------------------
+//  as_ticks - convert to ticks at the given
+//  frequency
+//-------------------------------------------------
 
-INLINE UINT64 attotime_to_ticks(attotime _time, UINT32 frequency)
+inline UINT64 attotime::as_ticks(UINT32 frequency) const
 {
-	UINT32 fracticks = attotime_mul(attotime_make(0, _time.attoseconds), frequency).seconds;
-	return mulu_32x32(_time.seconds, frequency) + fracticks;
+	UINT32 fracticks = (attotime(0, attoseconds) * frequency).seconds;
+	return mulu_32x32(seconds, frequency) + fracticks;
 }
+	
 
+//-------------------------------------------------
+//  from_ticks - create an attotime from a tick
+//  count at the given frequency
+//-------------------------------------------------
 
-/*-------------------------------------------------
-    ticks_to_attotime - convert clock ticks at
-    the given frequency to an attotime
--------------------------------------------------*/
-
-INLINE attotime ticks_to_attotime(UINT64 ticks, UINT32 frequency)
+inline attotime attotime::from_ticks(UINT64 ticks, UINT32 frequency)
 {
 	attoseconds_t attos_per_tick = HZ_TO_ATTOSECONDS(frequency);
-	attotime result;
 
 	if (ticks < frequency)
-	{
-		result.seconds = 0;
-		result.attoseconds = ticks * attos_per_tick;
-	}
-	else
-	{
-		UINT32 remainder;
-		result.seconds = divu_64x32_rem(ticks, frequency, &remainder);
-		result.attoseconds = (UINT64)remainder * attos_per_tick;
-	}
-	return result;
+		return attotime(0, ticks * attos_per_tick);
+
+	UINT32 remainder;
+	INT32 secs = divu_64x32_rem(ticks, frequency, &remainder);
+	return attotime(secs, (UINT64)remainder * attos_per_tick);
 }
+	
 
+//-------------------------------------------------
+//  from_double - create an attotime from floating
+//  point count of seconds
+//-------------------------------------------------
 
-/*-------------------------------------------------
-    attotime_add - add two attotimes
--------------------------------------------------*/
-
-INLINE attotime attotime_add(attotime _time1, attotime _time2)
+inline attotime attotime::from_double(double _time)
 {
-	attotime result;
-
-	/* if one of the items is attotime_never, return attotime_never */
-	if (_time1.seconds >= ATTOTIME_MAX_SECONDS || _time2.seconds >= ATTOTIME_MAX_SECONDS)
-		return attotime_never;
-
-	/* add the seconds and attoseconds */
-	result.attoseconds = _time1.attoseconds + _time2.attoseconds;
-	result.seconds = _time1.seconds + _time2.seconds;
-
-	/* normalize and return */
-	if (result.attoseconds >= ATTOSECONDS_PER_SECOND)
-	{
-		result.attoseconds -= ATTOSECONDS_PER_SECOND;
-		result.seconds++;
-	}
-
-	/* overflow */
-	if (result.seconds >= ATTOTIME_MAX_SECONDS)
-		return attotime_never;
-	return result;
+	seconds_t secs = floor(_time);
+	_time -= double(secs);
+	attoseconds_t attos = DOUBLE_TO_ATTOSECONDS(_time);
+	return attotime(secs, attos);
 }
+	
 
 
-/*-------------------------------------------------
-    attotime_add_attoseconds - add attoseconds
-    to a attotime
--------------------------------------------------*/
+//**************************************************************************
+//  LEGACY MAPPINGS
+//**************************************************************************
 
-INLINE attotime attotime_add_attoseconds(attotime _time1, attoseconds_t _attoseconds)
-{
-	attotime result;
-
-	/* if one of the items is attotime_never, return attotime_never */
-	if (_time1.seconds >= ATTOTIME_MAX_SECONDS)
-		return attotime_never;
-
-	/* add the seconds and attoseconds */
-	result.attoseconds = _time1.attoseconds + _attoseconds;
-	result.seconds = _time1.seconds;
-
-	/* normalize and return */
-	if (result.attoseconds >= ATTOSECONDS_PER_SECOND)
-	{
-		result.attoseconds -= ATTOSECONDS_PER_SECOND;
-		result.seconds++;
-	}
-
-	/* overflow */
-	if (result.seconds >= ATTOTIME_MAX_SECONDS)
-		return attotime_never;
-	return result;
-}
+#define attotime_zero 					attotime::zero
+#define attotime_never 					attotime::never
 
 
-/*-------------------------------------------------
-    attotime_sub - subtract two attotimes
--------------------------------------------------*/
-
-INLINE attotime attotime_sub(attotime _time1, attotime _time2)
-{
-	attotime result;
-
-	/* if time1 is attotime_never, return attotime_never */
-	if (_time1.seconds >= ATTOTIME_MAX_SECONDS)
-		return attotime_never;
-
-	/* add the seconds and attoseconds */
-	result.attoseconds = _time1.attoseconds - _time2.attoseconds;
-	result.seconds = _time1.seconds - _time2.seconds;
-
-	/* normalize and return */
-	if (result.attoseconds < 0)
-	{
-		result.attoseconds += ATTOSECONDS_PER_SECOND;
-		result.seconds--;
-	}
-	return result;
-}
-
-
-/*-------------------------------------------------
-    attotime_sub_attoseconds - subtract
-    attoseconds from a attotime
--------------------------------------------------*/
-
-INLINE attotime attotime_sub_attoseconds(attotime _time1, attoseconds_t _attoseconds)
-{
-	attotime result;
-
-	/* if time1 is attotime_never, return attotime_never */
-	if (_time1.seconds >= ATTOTIME_MAX_SECONDS)
-		return attotime_never;
-
-	/* add the seconds and attoseconds */
-	result.attoseconds = _time1.attoseconds - _attoseconds;
-	result.seconds = _time1.seconds;
-
-	/* normalize and return */
-	if (result.attoseconds < 0)
-	{
-		result.attoseconds += ATTOSECONDS_PER_SECOND;
-		result.seconds--;
-	}
-	return result;
-}
-
-
-/*-------------------------------------------------
-    attotime_compare - compare two attotimes
--------------------------------------------------*/
-
-INLINE int attotime_compare(attotime _time1, attotime _time2)
-{
-	if (_time1.seconds > _time2.seconds)
-		return 1;
-	if (_time1.seconds < _time2.seconds)
-		return -1;
-	if (_time1.attoseconds > _time2.attoseconds)
-		return 1;
-	if (_time1.attoseconds < _time2.attoseconds)
-		return -1;
-	return 0;
-}
-
-
-/*-------------------------------------------------
-    attotime_min - return the minimum of two
-    attotimes
--------------------------------------------------*/
-
-INLINE attotime attotime_min(attotime _time1, attotime _time2)
-{
-	if (_time1.seconds > _time2.seconds)
-		return _time2;
-	if (_time1.seconds < _time2.seconds)
-		return _time1;
-	if (_time1.attoseconds > _time2.attoseconds)
-		return _time2;
-	return _time1;
-}
-
-
-/*-------------------------------------------------
-    attotime_max - return the maximum of two
-    attotimes
--------------------------------------------------*/
-
-INLINE attotime attotime_max(attotime _time1, attotime _time2)
-{
-	if (_time1.seconds > _time2.seconds)
-		return _time1;
-	if (_time1.seconds < _time2.seconds)
-		return _time2;
-	if (_time1.attoseconds > _time2.attoseconds)
-		return _time1;
-	return _time2;
-}
-
-
-/*-------------------------------------------------
-    attotime_is_never - return whether or not an
-    attotime is attotime_never
--------------------------------------------------*/
-
-INLINE int attotime_is_never(attotime _time)
-{
-	return (_time.seconds >= ATTOTIME_MAX_SECONDS);
-}
-
-
-#endif	/* __ATTOTIME_H__ */
+#endif	// __ATTOTIME_H__

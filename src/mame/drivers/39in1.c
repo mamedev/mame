@@ -270,10 +270,10 @@ static void pxa255_dma_load_descriptor_and_start(running_machine* machine, int c
 	switch(channel)
 	{
 		case 3:
-			period = attotime_mul(ATTOTIME_IN_HZ((147600000 / state->i2s_regs.sadiv) / (4 * 64)), dma_regs->dcmd[channel] & 0x00001fff);
+			period = attotime::from_hz((147600000 / state->i2s_regs.sadiv) / (4 * 64)) * (dma_regs->dcmd[channel] & 0x00001fff);
 			break;
 		default:
-			period = attotime_mul(ATTOTIME_IN_HZ(100000000), dma_regs->dcmd[channel] & 0x00001fff);
+			period = attotime::from_hz(100000000) * (dma_regs->dcmd[channel] & 0x00001fff);
 			break;
 	}
 
@@ -624,7 +624,7 @@ static WRITE32_HANDLER( pxa255_ostimer_w )
 			ostimer_regs->osmr[0] = data;
 			if(ostimer_regs->oier & PXA255_OIER_E0)
 			{
-				attotime period = attotime_mul(ATTOTIME_IN_HZ(3846400), ostimer_regs->osmr[0] - ostimer_regs->oscr);
+				attotime period = attotime::from_hz(3846400) * (ostimer_regs->osmr[0] - ostimer_regs->oscr);
 
 				//printf( "Adjusting one-shot timer to 200MHz * %08x\n", ostimer_regs->osmr[0]);
 				timer_adjust_oneshot(ostimer_regs->timer[0], period, 0);
@@ -635,7 +635,7 @@ static WRITE32_HANDLER( pxa255_ostimer_w )
 			ostimer_regs->osmr[1] = data;
 			if(ostimer_regs->oier & PXA255_OIER_E1)
 			{
-				attotime period = attotime_mul(ATTOTIME_IN_HZ(3846400), ostimer_regs->osmr[1] - ostimer_regs->oscr);
+				attotime period = attotime::from_hz(3846400) * (ostimer_regs->osmr[1] - ostimer_regs->oscr);
 
 				timer_adjust_oneshot(ostimer_regs->timer[1], period, 1);
 			}
@@ -645,7 +645,7 @@ static WRITE32_HANDLER( pxa255_ostimer_w )
 			ostimer_regs->osmr[2] = data;
 			if(ostimer_regs->oier & PXA255_OIER_E2)
 			{
-				attotime period = attotime_mul(ATTOTIME_IN_HZ(3846400), ostimer_regs->osmr[2] - ostimer_regs->oscr);
+				attotime period = attotime::from_hz(3846400) * (ostimer_regs->osmr[2] - ostimer_regs->oscr);
 
 				timer_adjust_oneshot(ostimer_regs->timer[2], period, 2);
 			}
@@ -655,7 +655,7 @@ static WRITE32_HANDLER( pxa255_ostimer_w )
 			ostimer_regs->osmr[3] = data;
 			if(ostimer_regs->oier & PXA255_OIER_E3)
 			{
-				//attotime period = attotime_mul(ATTOTIME_IN_HZ(3846400), ostimer_regs->osmr[3] - ostimer_regs->oscr);
+				//attotime period = attotime::from_hz(3846400) * (ostimer_regs->osmr[3] - ostimer_regs->oscr);
 
 				//timer_adjust_oneshot(ostimer_regs->timer[3], period, 3);
 			}
@@ -682,7 +682,7 @@ static WRITE32_HANDLER( pxa255_ostimer_w )
 			{
 				if(ostimer_regs->oier & (1 << index))
 				{
-					//attotime period = attotime_mul(ATTOTIME_IN_HZ(200000000), ostimer_regs->osmr[index]);
+					//attotime period = attotime::from_hz(200000000) * ostimer_regs->osmr[index];
 
 					//timer_adjust_oneshot(ostimer_regs->timer[index], period, index);
 				}
@@ -1088,7 +1088,7 @@ static void pxa255_lcd_dma_kickoff(running_machine* machine, int channel)
 
 	if(lcd_regs->dma[channel].fdadr != 0)
 	{
-		attotime period = attotime_mul(ATTOTIME_IN_HZ(20000000), lcd_regs->dma[channel].ldcmd & 0x000fffff);
+		attotime period = attotime::from_hz(20000000) * (lcd_regs->dma[channel].ldcmd & 0x000fffff);
 
 		timer_adjust_oneshot(lcd_regs->dma[channel].eof, period, channel);
 

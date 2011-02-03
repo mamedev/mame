@@ -76,7 +76,7 @@ static WRITE16_HANDLER( rockn_systemregs_w )
 		tetrisp2_systemregs[offset] = data;
 		if (offset == 0x0c)
 		{
-			attotime timer = attotime_mul(ROCKN_TIMER_BASE, 4096 - data);
+			attotime timer = ROCKN_TIMER_BASE * (4096 - data);
 			timer_adjust_periodic(rockn_timer_l4, timer, 0, timer);
 		}
 	}
@@ -90,7 +90,7 @@ static WRITE16_HANDLER( rocknms_sub_systemregs_w )
 		rocknms_sub_systemregs[offset] = data;
 		if (offset == 0x0c)
 		{
-			attotime timer = attotime_mul(ROCKN_TIMER_BASE, 4096 - data);
+			attotime timer = ROCKN_TIMER_BASE * (4096 - data);
 			timer_adjust_periodic(rockn_timer_sub_l4, timer, 0, timer);
 		}
 	}

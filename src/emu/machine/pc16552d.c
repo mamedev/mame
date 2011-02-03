@@ -170,7 +170,7 @@ static void duart_push_tx_fifo(int chip, int channel, UINT8 data)
 	ch->tx_fifo[ch->tx_fifo_num] = data;
 	ch->tx_fifo_num++;
 
-	period = attotime_mul(ATTOTIME_IN_HZ(duart[chip].frequency), ch->divisor * 16 * 16 * 8);
+	period = attotime::from_hz(duart[chip].frequency) * (ch->divisor * 16 * 16 * 8);
 
 	timer_adjust_oneshot(duart[chip].ch[channel].tx_fifo_timer, period, (chip * 2) + channel);
 }

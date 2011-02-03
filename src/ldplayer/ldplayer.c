@@ -306,7 +306,7 @@ static TIMER_CALLBACK( pr8210_bit_callback )
 		timer_set(machine, ATTOTIME_IN_USEC(250), ptr, 0, pr8210_bit_off_callback);
 
 		/* space 0 bits apart by 1msec, and 1 bits by 2msec */
-		duration = attotime_mul(ATTOTIME_IN_MSEC(1), (data & 0x80) ? 2 : 1);
+		duration = attotime::from_msec((data & 0x80) ? 2 : 1);
 		data <<= 1;
 		bitsleft--;
 	}

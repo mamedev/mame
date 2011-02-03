@@ -612,9 +612,9 @@ static void	simulate2(device_t *device, struct pit8253_timer *timer, INT64 elaps
 	}
 	else
 	{
-		attotime next_fire_time = attotime_add( timer->last_updated, double_to_attotime( cycles_to_output / timer->clockin ) );
+		attotime next_fire_time = timer->last_updated + cycles_to_output * attotime::from_hz( timer->clockin );
 
-		timer_adjust_oneshot(timer->updatetimer, attotime_sub( next_fire_time, timer_get_time(device->machine) ), timer->index );
+		timer_adjust_oneshot(timer->updatetimer, next_fire_time - timer_get_time(device->machine), timer->index );
 	}
 
     LOG2(("pit8253: simulate2(): simulating %d cycles for %d in mode %d, bcd = %d, phase = %d, gate = %d, output %d, value = 0x%04x, cycles_to_output = %04x\n",
@@ -645,7 +645,7 @@ static void	simulate(device_t *device, struct pit8253_timer *timer, INT64 elapse
 		simulate2(device, timer, elapsed_cycles);
 	else
 		if ( timer->clockin )
-			timer_adjust_oneshot(timer->updatetimer, double_to_attotime( 1 / timer->clockin ), timer->index );
+			timer_adjust_oneshot(timer->updatetimer, attotime::from_hz( timer->clockin ), timer->index );
 }
 
 
@@ -655,14 +655,14 @@ static void	update(device_t *device, struct pit8253_timer *timer)
 	/* With the 82C54's maximum clockin of 10MHz, 64 bits is nearly 60,000
        years of time. Should be enough for now. */
 	attotime now =	timer_get_time(device->machine);
-	attotime elapsed_time = attotime_sub(now,timer->last_updated);
-	INT64 elapsed_cycles =	attotime_to_double(elapsed_time) * timer->clockin;
+	attotime elapsed_time = now - timer->last_updated;
+	INT64 elapsed_cycles =	elapsed_time.as_double() * timer->clockin;
 
 	LOG1(("pit8253: update(): timer %d, %" I64FMT "d elapsed_cycles\n", timer->index, elapsed_cycles));
 
 	if ( timer->clockin )
 	{
-		timer->last_updated	= attotime_add(timer->last_updated,double_to_attotime(elapsed_cycles/timer->clockin));
+		timer->last_updated	+= elapsed_cycles * attotime::from_hz(timer->clockin);
 	}
 	else
 	{
@@ -916,7 +916,7 @@ WRITE8_DEVICE_HANDLER( pit8253_w )
 
 		update(device, timer);
 
-		if ( attotime_compare( timer_get_time(device->machine), timer->last_updated ) > 0 && timer->clockin != 0 )
+		if ( timer_get_time(device->machine) > timer->last_updated && timer->clockin != 0 )
 		{
 			middle_of_a_cycle = 1;
 		}
@@ -931,7 +931,7 @@ WRITE8_DEVICE_HANDLER( pit8253_w )
 
 			/* check if we should compensate for not being on a cycle boundary */
 			if ( middle_of_a_cycle )
-				timer->last_updated = attotime_add(timer->last_updated,double_to_attotime(1/timer->clockin));
+				timer->last_updated += attotime::from_hz(timer->clockin);
 
 			load_count(device, timer, data);
 			simulate2(device, timer, 0 );
@@ -946,7 +946,7 @@ WRITE8_DEVICE_HANDLER( pit8253_w )
 
 			/* check if we should compensate for not being on a cycle boundary */
 			if ( middle_of_a_cycle )
-				timer->last_updated = attotime_add(timer->last_updated,double_to_attotime(1/timer->clockin));
+				timer->last_updated += attotime::from_hz(timer->clockin);
 
 			load_count(device, timer, data << 8);
 			simulate2(device, timer, 0 );
@@ -958,7 +958,7 @@ WRITE8_DEVICE_HANDLER( pit8253_w )
 			{
 				/* check if we should compensate for not being on a cycle boundary */
 				if ( middle_of_a_cycle )
-					timer->last_updated = attotime_add(timer->last_updated,double_to_attotime(1/timer->clockin));
+					timer->last_updated += attotime::from_hz(timer->clockin);
 
 				load_count(device, timer,timer->lowcount | (data << 8));
 				simulate2(device, timer, 0 );

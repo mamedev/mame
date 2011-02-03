@@ -42,7 +42,7 @@ public:
 	UINT32 *		m_ram_base;
 	UINT32 *		m_rom_base;
 
-	double			m_hblank_offset;
+	attotime		m_hblank_offset;
 
 	UINT8			m_irq_line_state;
 	UINT8			m_irq_enable[3];

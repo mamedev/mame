@@ -524,7 +524,7 @@ static void int_control_w(address_space *space, int offset, UINT8 data)
 			duration = v60_irq_control[8] + ((v60_irq_control[9] << 8) & 0xf00);
 			if (duration)
 			{
-				attotime period = attotime_make(0, attotime_to_attoseconds(ATTOTIME_IN_HZ(TIMER_0_CLOCK)) * duration);
+				attotime period = attotime::from_hz(TIMER_0_CLOCK) * duration;
 				v60_irq_timer[0]->adjust(period, MAIN_IRQ_TIMER0);
 			}
 			break;
@@ -535,7 +535,7 @@ static void int_control_w(address_space *space, int offset, UINT8 data)
 			duration = v60_irq_control[10] + ((v60_irq_control[11] << 8) & 0xf00);
 			if (duration)
 			{
-				attotime period = attotime_make(0, attotime_to_attoseconds(ATTOTIME_IN_HZ(TIMER_1_CLOCK)) * duration);
+				attotime period = attotime::from_hz(TIMER_1_CLOCK) * duration;
 				v60_irq_timer[1]->adjust(period, MAIN_IRQ_TIMER1);
 			}
 			break;

@@ -607,7 +607,7 @@ void cdicdic_device::sample_trigger()
 
         //// Delay for Frequency * (18*28*2*size in bytes) before requesting more data
         verboselog(&m_machine, 0, "Data is valid, setting up a new callback\n" );
-        m_decode_period = attotime_mul(ATTOTIME_IN_HZ(CDIC_SAMPLE_BUF_FREQ(m_ram, m_decode_addr & 0x3ffe)), 18*28*2*CDIC_SAMPLE_BUF_SIZE(m_ram, m_decode_addr & 0x3ffe));
+        m_decode_period = attotime::from_hz(CDIC_SAMPLE_BUF_FREQ(m_ram, m_decode_addr & 0x3ffe)) * (18*28*2*CDIC_SAMPLE_BUF_SIZE(m_ram, m_decode_addr & 0x3ffe));
         timer_adjust_oneshot(m_audio_sample_timer, m_decode_period, 0);
         //dmadac_enable(&dmadac[0], 2, 0);
     }
@@ -999,7 +999,7 @@ UINT16 cdicdic_device::register_read(const UINT32 offset, const UINT16 mem_mask)
 
         case 0x3ffa/2: // AUDCTL
         {
-            if(attotime_is_never(timer_timeleft(m_audio_sample_timer)))
+            if(timer_timeleft(m_audio_sample_timer).is_never())
             {
                 m_z_buffer ^= 0x0001;
             }
@@ -1119,7 +1119,7 @@ void cdicdic_device::register_write(const UINT32 offset, const UINT16 data, cons
             if(m_z_buffer & 0x2000)
 			{
                 attotime period = timer_timeleft(m_audio_sample_timer);
-				if(attotime_is_never(period))
+				if(period.is_never())
 				{
                     m_decode_addr = m_z_buffer & 0x3a00;
                     m_decode_delay = 1;
@@ -1164,7 +1164,7 @@ void cdicdic_device::register_write(const UINT32 offset, const UINT16 data, cons
 					case 0x2c: // Seek
 					{
                         attotime period = timer_timeleft(m_interrupt_timer);
-						if(!attotime_is_never(period))
+						if(!period.is_never())
 						{
                             timer_adjust_oneshot(m_interrupt_timer, period, 0);
 						}

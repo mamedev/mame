@@ -59,7 +59,7 @@ static TIMER_CALLBACK( timer_callback_1 )
 static void TimerHandler(void *param,int c,attotime period)
 {
 	y8950_state *info = (y8950_state *)param;
-	if( attotime_compare(period, attotime_zero) == 0 )
+	if( period == attotime::zero )
 	{	/* Reset FM Timer */
 		timer_enable(info->timer[c], 0);
 	}

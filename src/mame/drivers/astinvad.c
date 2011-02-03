@@ -219,7 +219,7 @@ static TIMER_CALLBACK( kamizake_int_gen )
 	timer_adjust_oneshot(state->int_timer, machine->primary_screen->time_until_pos(param), param);
 
 	/* an RC circuit turns the interrupt off after a short amount of time */
-	timer_set(machine, double_to_attotime(300 * 0.1e-6), NULL, 0, kamikaze_int_off);
+	timer_set(machine, attotime::from_double(300 * 0.1e-6), NULL, 0, kamikaze_int_off);
 }
 
 

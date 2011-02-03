@@ -8258,7 +8258,7 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 	{
 		genesis_scanline_counter++;
 //      mame_printf_debug("scanline %d\n",genesis_scanline_counter);
-		scanline_timer->adjust(attotime_div(ATTOTIME_IN_HZ(megadriv_framerate), megadrive_total_scanlines));
+		scanline_timer->adjust(attotime::from_hz(megadriv_framerate) / megadrive_total_scanlines);
 		render_timer->adjust(ATTOTIME_IN_USEC(1));
 
 		if (genesis_scanline_counter==megadrive_irq6_scanline )

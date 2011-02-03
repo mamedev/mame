@@ -694,16 +694,16 @@ static void adsp_tx_callback(adsp21xx_device &device, int port, INT32 data)
 			/* calculate how long until we generate an interrupt */
 
 			/* period per each bit sent */
-			sample_period = attotime_mul(ATTOTIME_IN_HZ(device.clock()), 2 * (adsp_control_regs[S1_SCLKDIV_REG] + 1));
+			sample_period = attotime::from_hz(device.clock()) * (2 * (adsp_control_regs[S1_SCLKDIV_REG] + 1));
 
 			/* now put it down to samples, so we know what the channel frequency has to be */
-			sample_period = attotime_mul(sample_period, 16 * SOUND_CHANNELS);
+			sample_period *= 16 * SOUND_CHANNELS;
 
 			dmadac_set_frequency(&dmadac[0], SOUND_CHANNELS, ATTOSECONDS_TO_HZ(sample_period.attoseconds));
 			dmadac_enable(&dmadac[0], SOUND_CHANNELS, 1);
 
 			/* fire off a timer wich will hit every half-buffer */
-			sample_period = attotime_div(attotime_mul(sample_period, adsp_size), SOUND_CHANNELS * adsp_incs);
+			sample_period = (sample_period * adsp_size) / (SOUND_CHANNELS * adsp_incs);
 
 			adsp_autobuffer_timer->adjust(sample_period, 0, sample_period);
 

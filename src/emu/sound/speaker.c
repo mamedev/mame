@@ -165,8 +165,8 @@ static DEVICE_START( speaker )
 	sp->interm_sample_period = sp->channel_sample_period / RATE_MULTIPLIER;
 	sp->interm_sample_period_secfrac = ATTOSECONDS_TO_DOUBLE(sp->interm_sample_period);
 	sp->channel_last_sample_time = sp->channel->sample_time();
-	sp->channel_next_sample_time = attotime_add_attoseconds(sp->channel_last_sample_time, sp->channel_sample_period);
-	sp->next_interm_sample_time = attotime_add_attoseconds(sp->channel_last_sample_time, sp->interm_sample_period);
+	sp->channel_next_sample_time = sp->channel_last_sample_time + attotime(0, sp->channel_sample_period);
+	sp->next_interm_sample_time = sp->channel_last_sample_time + attotime(0, sp->interm_sample_period);
 	sp->interm_sample_index = 0;
 	/* Note: To avoid time drift due to floating point inaccuracies,
      * it is good if the speaker time synchronizes itself with the stream timing regularly.
@@ -224,9 +224,9 @@ static STREAM_UPDATE( speaker_sound_update )
 	if (samples > 0)
 	{
 		/* Prepare to update time state */
-		sampled_time = attotime_make(0, sp->channel_sample_period);
+		sampled_time = attotime(0, sp->channel_sample_period);
 		if (samples > 1)
-			sampled_time = attotime_mul(sampled_time, samples);
+			sampled_time *= samples;
 
 		/* Note: since the stream is in the process of being updated,
          * stream->sample_time() will return the time before the update! (MAME 0.130)
@@ -250,9 +250,9 @@ static STREAM_UPDATE( speaker_sound_update )
 		}
 
 		/* Update the time state */
-		sp->channel_last_sample_time = attotime_add(sp->channel_last_sample_time, sampled_time);
-		sp->channel_next_sample_time = attotime_add_attoseconds(sp->channel_last_sample_time, sp->channel_sample_period);
-		sp->next_interm_sample_time = attotime_add_attoseconds(sp->channel_last_sample_time, sp->interm_sample_period);
+		sp->channel_last_sample_time += sampled_time;
+		sp->channel_next_sample_time = sp->channel_last_sample_time + attotime(0, sp->channel_sample_period);
+		sp->next_interm_sample_time = sp->channel_last_sample_time + attotime(0, sp->interm_sample_period);
 		sp->last_update_time = sp->channel_last_sample_time;
 	}
 
@@ -277,7 +277,7 @@ void speaker_level_w(device_t *device, int new_level)
 	volume = sp->levels[sp->level];
 	time = timer_get_time(device->machine);
 
-	if (attotime_compare(time, sp->channel_next_sample_time) < 0)
+	if (time < sp->channel_next_sample_time)
 	{
 		/* Stream sample is yet unfinished, but we may have one or more interm. samples */
 		update_interm_samples(sp, time, volume);
@@ -298,8 +298,8 @@ void speaker_level_w(device_t *device, int new_level)
      * however this ensures synchronization between the speaker and stream timing:
      */
 	sp->channel_last_sample_time = sp->channel->sample_time();
-	sp->channel_next_sample_time = attotime_add_attoseconds(sp->channel_last_sample_time, sp->channel_sample_period);
-	sp->next_interm_sample_time = attotime_add_attoseconds(sp->channel_last_sample_time, sp->interm_sample_period);
+	sp->channel_next_sample_time = sp->channel_last_sample_time + attotime(0, sp->channel_sample_period);
+	sp->next_interm_sample_time = sp->channel_last_sample_time + attotime(0, sp->interm_sample_period);
 	sp->last_update_time = sp->channel_last_sample_time;
 
 	/* Assertion: time - last_update_time < channel_sample_period, i.e. time < channel_next_sample_time */
@@ -318,7 +318,7 @@ static void update_interm_samples(speaker_state *sp, attotime time, int volume)
 	double fraction;
 
 	/* We may have completed zero, one or more interm. samples: */
-	while (attotime_compare(time, sp->next_interm_sample_time) >= 0)
+	while (time >= sp->next_interm_sample_time)
 	{
 		/* First interm. sample may be composed, subsequent samples will be homogeneous. */
 		/* Treat all the same general way. */
@@ -373,8 +373,7 @@ static void finalize_interm_sample(speaker_state *sp, int volume)
 	sp->composed_volume[sp->composed_sample_index] += volume * fraction;
 	/* Update time state */
 	sp->last_update_time = sp->next_interm_sample_time;
-	sp->next_interm_sample_time = attotime_add_attoseconds(sp->next_interm_sample_time,
-	                                                       sp->interm_sample_period);
+	sp->next_interm_sample_time += attotime(0, sp->interm_sample_period);
 
 	/* For compatibility with filtering, do not incr. index and initialise next sample yet. */
 }
@@ -396,7 +395,7 @@ static void init_next_interm_sample(speaker_state *sp)
 static double make_fraction(attotime a, attotime b, double timediv)
 {
 	/* fraction = (a - b) / timediv */
-	return attotime_to_double(attotime_sub(a, b)) / timediv;
+	return (a - b).as_double() / timediv;
 }
 
 

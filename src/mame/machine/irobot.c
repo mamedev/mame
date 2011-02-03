@@ -822,7 +822,7 @@ default:	case 0x3f:	IXOR(irmb_din(state, curop), 0);							break;
 #if IR_TIMING
 	if (state->irmb_running == 0)
 	{
-		state->irmb_timer->adjust(attotime_mul(ATTOTIME_IN_HZ(12000000), icount));
+		state->irmb_timer->adjust(attotime::from_hz(12000000) * icount);
 		logerror("mb start ");
 		IR_CPU_STATE(machine);
 	}
@@ -830,7 +830,7 @@ default:	case 0x3f:	IXOR(irmb_din(state, curop), 0);							break;
 	{
 		logerror("mb start [busy!] ");
 		IR_CPU_STATE(machine);
-		state->irmb_timer->adjust(attotime_mul(ATTOTIME_IN_NSEC(200), icount));
+		state->irmb_timer->adjust(attotime::from_hz(200) * icount);
 	}
 #else
 	cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);

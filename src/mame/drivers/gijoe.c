@@ -43,7 +43,7 @@ Known Issues
 #include "includes/gijoe.h"
 
 #define JOE_DEBUG 0
-#define JOE_DMADELAY attotime_add(ATTOTIME_IN_NSEC(42700), ATTOTIME_IN_NSEC(341300))
+#define JOE_DMADELAY (attotime::from_nsec(42700 + 341300))
 
 
 static const eeprom_interface eeprom_intf =

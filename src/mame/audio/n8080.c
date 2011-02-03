@@ -431,7 +431,7 @@ static WRITE8_HANDLER( helifire_sound_ctrl_w )
 		state->helifire_dac_timing = DECAY_RATE * log(state->helifire_dac_volume);
 	}
 
-	state->helifire_dac_timing += attotime_to_double(timer_get_time(space->machine));
+	state->helifire_dac_timing += timer_get_time(space->machine).as_double();
 }
 
 
@@ -443,7 +443,7 @@ static TIMER_DEVICE_CALLBACK( spacefev_vco_voltage_timer )
 
 	if (state->mono_flop[2])
 	{
-		voltage = 5 * (1 - exp(- attotime_to_double(timer_timeelapsed(state->sound_timer[2])) / 0.22));
+		voltage = 5 * (1 - exp(- timer_timeelapsed(state->sound_timer[2]).as_double() / 0.22));
 	}
 
 	sn76477_vco_voltage_w(sn, voltage);
@@ -453,7 +453,7 @@ static TIMER_DEVICE_CALLBACK( spacefev_vco_voltage_timer )
 static TIMER_DEVICE_CALLBACK( helifire_dac_volume_timer )
 {
 	n8080_state *state = timer.machine->driver_data<n8080_state>();
-	double t = state->helifire_dac_timing - attotime_to_double(timer_get_time(timer.machine));
+	double t = state->helifire_dac_timing - timer_get_time(timer.machine).as_double();
 
 	if (state->helifire_dac_phase)
 	{

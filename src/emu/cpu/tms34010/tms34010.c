@@ -1040,7 +1040,7 @@ static TIMER_CALLBACK( scanline_callback )
 
 	/* note that we add !master (0 or 1) as a attoseconds value; this makes no practical difference */
 	/* but helps ensure that masters are updated first before slaves */
-	timer_adjust_oneshot(tms->scantimer, attotime_add_attoseconds(tms->screen->time_until_pos(vcount), !master), vcount);
+	timer_adjust_oneshot(tms->scantimer, tms->screen->time_until_pos(vcount) + attotime(0, !master), vcount);
 }
 
 
@@ -1494,7 +1494,7 @@ READ16_HANDLER( tms34010_io_register_r )
 			/* have an IRQ handler. For this reason, we return it signalled a bit early in order */
 			/* to make it past these loops. */
 			if (SMART_IOREG(tms, VCOUNT) + 1 == SMART_IOREG(tms, DPYINT) &&
-				attotime_compare(timer_timeleft(tms->scantimer), ATTOTIME_IN_HZ(40000000/8/3)) < 0)
+				timer_timeleft(tms->scantimer) < attotime::from_hz(40000000/8/3))
 				result |= TMS34010_DI;
 			return result;
 	}

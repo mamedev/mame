@@ -188,7 +188,7 @@ void f3853_device::f3853_set_interrupt_request_line()
 
 void f3853_device::f3853_timer_start(UINT8 value)
 {
-	attotime period = (value != 0xff) ? attotime_mul(ATTOTIME_IN_HZ(clock()), m_value_to_cycle[value]*31) : attotime_never;
+	attotime period = (value != 0xff) ? attotime::from_hz(clock()) * (m_value_to_cycle[value]*31) : attotime::never;
 
 	timer_adjust_oneshot(m_timer, period, 0);
 }

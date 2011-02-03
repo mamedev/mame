@@ -1232,7 +1232,7 @@ static UINT16 s3c24xx_pwm_calc_observation( device_t *device, int ch)
 	s3c24xx_t *s3c24xx = get_token( device);
 	double timeleft, x1, x2;
 	UINT32 cnto;
-	timeleft = attotime_to_double( timer_timeleft( s3c24xx->pwm.timer[ch]));
+	timeleft = timer_timeleft( s3c24xx->pwm.timer[ch]).as_double();
 //  printf( "timeleft %f freq %d cntb %d cmpb %d\n", timeleft, s3c24xx->pwm.freq[ch], s3c24xx->pwm.cnt[ch], s3c24xx->pwm.cmp[ch]);
 	x1 = 1 / ((double)s3c24xx->pwm.freq[ch] / (s3c24xx->pwm.cnt[ch]- s3c24xx->pwm.cmp[ch] + 1));
 	x2 = x1 / timeleft;
@@ -2004,7 +2004,7 @@ static UINT16 s3c24xx_wdt_calc_current_count( device_t *device)
 	s3c24xx_t *s3c24xx = get_token( device);
 	double timeleft, x1, x2;
 	UINT32 cnt;
-	timeleft = attotime_to_double( timer_timeleft( s3c24xx->wdt.timer));
+	timeleft = timer_timeleft( s3c24xx->wdt.timer).as_double();
 //  printf( "timeleft %f freq %d cnt %d\n", timeleft, s3c24xx->wdt.freq, s3c24xx->wdt.cnt);
 	x1 = 1 / ((double)s3c24xx->wdt.freq / s3c24xx->wdt.cnt);
 	x2 = x1 / timeleft;

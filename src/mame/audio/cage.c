@@ -165,7 +165,7 @@ void cage_init(running_machine *machine, offs_t speedup)
 
 	cage_cpu = machine->device<cpu_device>("cage");
 	cage_cpu_clock_period = ATTOTIME_IN_HZ(cage_cpu->clock());
-	cage_cpu_h1_clock_period = attotime_mul(cage_cpu_clock_period, 2);
+	cage_cpu_h1_clock_period = cage_cpu_clock_period * 2;
 
 	dma_timer = machine->device<timer_device>("cage_dma_timer");
 	timer[0] = machine->device<timer_device>("cage_timer0");
@@ -271,7 +271,7 @@ static void update_dma_state(address_space *space)
 		/* compute the time of the interrupt and set the timer */
 		if (!dma_timer_enabled)
 		{
-			attotime period = attotime_mul(serial_period_per_word, tms32031_io_regs[DMA_TRANSFER_COUNT]);
+			attotime period = serial_period_per_word * tms32031_io_regs[DMA_TRANSFER_COUNT];
 			dma_timer->adjust(period, addr, period);
 			dma_timer_enabled = 1;
 		}
@@ -316,7 +316,7 @@ static void update_timer(int which)
 	/* see if we turned on */
 	if (enabled && !cage_timer_enabled[which])
 	{
-		attotime period = attotime_mul(cage_cpu_h1_clock_period, 2 * tms32031_io_regs[base + TIMER0_PERIOD]);
+		attotime period = cage_cpu_h1_clock_period * (2 * tms32031_io_regs[base + TIMER0_PERIOD]);
 
 		/* make sure our assumptions are correct */
 		if (tms32031_io_regs[base + TIMER0_GLOBAL_CTL] != 0x2c1)
@@ -349,17 +349,17 @@ static void update_serial(running_machine *machine)
 	UINT32 freq;
 
 	/* we start out at half the H1 frequency (or 2x the H1 period) */
-	serial_clock_period = attotime_mul(cage_cpu_h1_clock_period, 2);
+	serial_clock_period = cage_cpu_h1_clock_period * 2;
 
 	/* if we're in clock mode, muliply by another factor of 2 */
 	if (tms32031_io_regs[SPORT_GLOBAL_CTL] & 4)
-		serial_clock_period = attotime_mul(serial_clock_period, 2);
+		serial_clock_period *= 2;
 
 	/* now multiply by the timer period */
-	bit_clock_period = attotime_mul(serial_clock_period, (tms32031_io_regs[SPORT_TIMER_PERIOD] & 0xffff));
+	bit_clock_period = serial_clock_period * (tms32031_io_regs[SPORT_TIMER_PERIOD] & 0xffff);
 
 	/* and times the number of bits per sample */
-	serial_period_per_word = attotime_mul(bit_clock_period, 8 * (((tms32031_io_regs[SPORT_GLOBAL_CTL] >> 18) & 3) + 1));
+	serial_period_per_word = bit_clock_period * (8 * (((tms32031_io_regs[SPORT_GLOBAL_CTL] >> 18) & 3) + 1));
 
 	/* compute the step value to stretch this to the sample_rate */
 	freq = ATTOSECONDS_TO_HZ(serial_period_per_word.attoseconds) / DAC_BUFFER_CHANNELS;

@@ -292,11 +292,11 @@ void ptm6840_device::subtract_from_counter(int counter, int count)
 
 	if (m_enabled[counter])
 	{
-		attotime duration = attotime_mul(ATTOTIME_IN_HZ(clock), m_counter[counter]);
+		attotime duration = attotime::from_hz(clock) * m_counter[counter];
 
 		if (counter == 2)
 		{
-			duration = attotime_mul(duration, m_t3_divisor);
+			duration *= m_t3_divisor;
 		}
 
 		timer_adjust_oneshot(m_timer[counter], duration, 0);
@@ -390,7 +390,7 @@ UINT16 ptm6840_device::compute_counter( int counter )
 		PLOG(("MC6840 #%s: %d external clock freq %f \n", tag(), counter, clock));
 	}
 	/* See how many are left */
-	int remaining = attotime_to_double(attotime_mul(timer_timeleft(m_timer[counter]), clock));
+	int remaining = (timer_timeleft(m_timer[counter]) * clock).as_double();
 
 	/* Adjust the count for dual byte mode */
 	if (m_control_reg[counter] & 0x04)
@@ -454,13 +454,13 @@ void ptm6840_device::reload_count(int idx)
 	/* Set the timer */
 	PLOG(("MC6840 #%s: reload_count(%d): clock = %f  count = %d\n", tag(), idx, clock, count));
 
-	attotime duration = attotime_mul(ATTOTIME_IN_HZ(clock), count);
+	attotime duration = attotime::from_hz(clock) * count;
 	if (idx == 2)
 	{
-		duration = attotime_mul(duration, m_t3_divisor);
+		duration *= m_t3_divisor;
 	}
 
-	PLOG(("MC6840 #%s: reload_count(%d): output = %lf\n", tag(), idx, attotime_to_double(duration)));
+	PLOG(("MC6840 #%s: reload_count(%d): output = %lf\n", tag(), idx, duration.as_double()));
 
 #if 0
 	if (!(m_control_reg[idx] & 0x02))
@@ -833,11 +833,11 @@ void ptm6840_device::ptm6840_set_ext_clock(int counter, double clock)
 			count = count + 1;
 		}
 
-		duration = attotime_mul(ATTOTIME_IN_HZ(clock), count);
+		duration = attotime::from_hz(clock) * count;
 
 		if (counter == 2)
 		{
-			duration = attotime_mul(duration, m_t3_divisor);
+			duration *= m_t3_divisor;
 		}
 
 		m_enabled[counter] = 1;

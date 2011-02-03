@@ -288,7 +288,7 @@ static READ32_HANDLER( timers_r )
 	if (model2_timerrun[offset])
 	{
 		// get elapsed time, convert to units of 25 MHz
-		UINT32 cur = attotime_to_double(attotime_mul(model2_timers[offset]->time_elapsed(), 25000000));
+		UINT32 cur = (model2_timers[offset]->time_elapsed() * 25000000).as_double();
 
 		// subtract units from starting value
 		model2_timervals[offset] = model2_timerorig[offset] - cur;
@@ -305,7 +305,7 @@ static WRITE32_HANDLER( timers_w )
 	COMBINE_DATA(&model2_timervals[offset]);
 
 	model2_timerorig[offset] = model2_timervals[offset];
-	period = attotime_mul(ATTOTIME_IN_HZ(25000000), model2_timerorig[offset]);
+	period = attotime::from_hz(25000000) * model2_timerorig[offset];
 	model2_timers[offset]->adjust(period);
 	model2_timerrun[offset] = 1;
 }

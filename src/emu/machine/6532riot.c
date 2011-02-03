@@ -171,13 +171,13 @@ UINT8 riot6532_device::get_timer()
 	/* if counting, return the number of ticks remaining */
 	else if (m_timerstate == TIMER_COUNTING)
 	{
-		return attotime_to_ticks(timer_timeleft(m_timer), clock()) >> m_timershift;
+		return timer_timeleft(m_timer).as_ticks(clock()) >> m_timershift;
 	}
 
 	/* if finishing, return the number of ticks without the shift */
 	else
 	{
-		return attotime_to_ticks(timer_timeleft(m_timer), clock());
+		return timer_timeleft(m_timer).as_ticks(clock());
 	}
 }
 
@@ -202,7 +202,7 @@ void riot6532_device::timer_end()
 	if(m_timerstate == TIMER_COUNTING)
 	{
 		m_timerstate = TIMER_FINISHING;
-		timer_adjust_oneshot(m_timer, ticks_to_attotime(256, clock()), 0);
+		timer_adjust_oneshot(m_timer, attotime::from_ticks(256, clock()), 0);
 
 		/* signal timer IRQ as well */
 		m_irqstate |= TIMER_FLAG;
@@ -212,7 +212,7 @@ void riot6532_device::timer_end()
 	/* if we finished finishing, keep spinning */
 	else if (m_timerstate == TIMER_FINISHING)
 	{
-		timer_adjust_oneshot(m_timer, ticks_to_attotime(256, clock()), 0);
+		timer_adjust_oneshot(m_timer, attotime::from_ticks(256, clock()), 0);
 	}
 }
 
@@ -259,8 +259,8 @@ void riot6532_device::reg_w(UINT8 offset, UINT8 data)
 
 		/* update the timer */
 		m_timerstate = TIMER_COUNTING;
-		target = attotime_to_ticks(curtime, clock()) + 1 + (data << m_timershift);
-		timer_adjust_oneshot(m_timer, attotime_sub(ticks_to_attotime(target, clock()), curtime), 0);
+		target = curtime.as_ticks(clock()) + 1 + (data << m_timershift);
+		timer_adjust_oneshot(m_timer, attotime::from_ticks(target, clock()) - curtime, 0);
 	}
 
 	/* if A4 == 0 and A2 == 1, we are writing to the edge detect control */

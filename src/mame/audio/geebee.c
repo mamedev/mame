@@ -58,7 +58,7 @@ WRITE8_DEVICE_HANDLER( geebee_sound_w )
          * Decay:
          * discharge C33 (1uF) through R50 (22k) -> 0.14058s
          */
-		attotime period = attotime_div(attotime_mul(ATTOTIME_IN_HZ(32768), 14058), 100000);
+		attotime period = attotime::from_hz(32768) * 14058 / 100000;
 		timer_adjust_periodic(state->volume_timer, period, 0, period);
 	}
 	else
@@ -70,7 +70,7 @@ WRITE8_DEVICE_HANDLER( geebee_sound_w )
          * I can only guess here that the decay should be slower,
          * maybe half as fast?
          */
-		attotime period = attotime_div(attotime_mul(ATTOTIME_IN_HZ(32768), 29060), 100000);
+		attotime period = attotime::from_hz(32768) * 29060 / 100000;
 		timer_adjust_periodic(state->volume_timer, period, 0, period);
     }
 }

@@ -264,7 +264,7 @@ static READ32_HANDLER( tms32031_control_r )
 	{
 		/* timer is clocked at 100ns */
 		int which = (offset >> 4) & 1;
-		INT32 result = attotime_to_double(attotime_mul(timer[which]->time_elapsed(), timer_rate));
+		INT32 result = (timer[which]->time_elapsed() * timer_rate).as_double();
 //      logerror("%06X:tms32031_control_r(%02X) = %08X\n", cpu_get_pc(space->cpu), offset, result);
 		return result;
 	}

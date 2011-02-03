@@ -160,8 +160,8 @@ z80ctc_device::z80ctc_device(running_machine &_machine, const z80ctc_device_conf
 
 void z80ctc_device::device_start()
 {
-	m_period16 = attotime_mul(ATTOTIME_IN_HZ(m_clock), 16);
-	m_period256 = attotime_mul(ATTOTIME_IN_HZ(m_clock), 256);
+	m_period16 = attotime::from_hz(m_clock) * 16;
+	m_period256 = attotime::from_hz(m_clock) * 256;
 
 	// resolve callbacks
 	devcb_resolve_write_line(&m_intr, &m_config.m_intr, this);
@@ -379,7 +379,7 @@ attotime z80ctc_device::ctc_channel::period() const
 
 	// compute the period
 	attotime period = ((m_mode & PRESCALER) == PRESCALER_16) ? m_device->m_period16 : m_device->m_period256;
-	return attotime_mul(period, m_tconst);
+	return period * m_tconst;
 }
 
 
@@ -401,7 +401,7 @@ UINT8 z80ctc_device::ctc_channel::read()
 		VPRINTF(("CTC clock %f\n",ATTOSECONDS_TO_HZ(period.attoseconds)));
 
 		if (m_timer != NULL)
-			return ((int)(attotime_to_double(timer_timeleft(m_timer)) / attotime_to_double(period)) + 1) & 0xff;
+			return ((int)(timer_timeleft(m_timer).as_double() / period.as_double()) + 1) & 0xff;
 		else
 			return 0;
 	}
@@ -506,7 +506,7 @@ void z80ctc_device::ctc_channel::trigger(UINT8 data)
 				if (!m_notimer)
 				{
 					attotime curperiod = period();
-					VPRINTF(("CTC period %s\n", attotime_string(curperiod, 9)));
+					VPRINTF(("CTC period %s\n", curperiod.as_string()));
 					timer_adjust_periodic(m_timer, curperiod, m_index, curperiod);
 				}
 				else

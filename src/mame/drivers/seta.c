@@ -1333,7 +1333,7 @@ static void uPD71054_update_timer( running_machine *machine, device_t *cpu, int 
 	UINT16 max = uPD71054->max[no]&0xffff;
 
 	if( max != 0 ) {
-		attotime period = attotime_mul(ATTOTIME_IN_HZ(cputag_get_clock(machine, "maincpu")), 16 * max);
+		attotime period = attotime::from_hz(cputag_get_clock(machine, "maincpu")) * (16 * max);
 		timer_adjust_oneshot( uPD71054->timer[no], period, no );
 	} else {
 		timer_adjust_oneshot( uPD71054->timer[no], attotime_never, no);

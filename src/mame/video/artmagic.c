@@ -308,7 +308,7 @@ static void execute_blit(running_machine *machine)
 	g_profiler.stop();
 
 #if (!INSTANT_BLIT)
-	blitter_busy_until = attotime_add(timer_get_time(machine), ATTOTIME_IN_NSEC(w*h*20));
+	blitter_busy_until = timer_get_time(machine) + attotime::from_nsec(w*h*20);
 #endif
 }
 
@@ -322,7 +322,7 @@ READ16_HANDLER( artmagic_blitter_r )
     */
 	UINT16 result = 0xffef | (blitter_page << 4);
 #if (!INSTANT_BLIT)
-	if (attotime_compare(timer_get_time(space->machine), blitter_busy_until) < 0)
+	if (timer_get_time(space->machine) < blitter_busy_until)
 		result ^= 6;
 #endif
 	return result;

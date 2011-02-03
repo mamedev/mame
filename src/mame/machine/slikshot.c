@@ -415,7 +415,7 @@ static void compute_sensors(running_machine *machine)
 	inters_to_words(inter1, inter2, inter3, &beams, &word1, &word2, &word3);
 	words_to_sensors(word1, word2, word3, beams, &sensor0, &sensor1, &sensor2, &sensor3);
 
-	logerror("%15f: Sensor values: %04x %04x %04x %04x\n", attotime_to_double(timer_get_time(machine)), sensor0, sensor1, sensor2, sensor3);
+	logerror("%15f: Sensor values: %04x %04x %04x %04x\n", timer_get_time(machine).as_double(), sensor0, sensor1, sensor2, sensor3);
 }
 
 

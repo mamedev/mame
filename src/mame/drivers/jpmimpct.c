@@ -292,7 +292,7 @@ static READ16_HANDLER( duart_1_r )
 		}
 		case 0xe:
 		{
-			attotime rate = attotime_mul(ATTOTIME_IN_HZ(MC68681_1_CLOCK), 16 * duart_1.CT);
+			attotime rate = attotime::from_hz(MC68681_1_CLOCK) * (16 * duart_1.CT);
 			timer_device *duart_timer = space->machine->device<timer_device>("duart_1_timer");
 			duart_timer->adjust(rate, 0, rate);
 			break;

@@ -690,21 +690,21 @@ static void init_chip_tables(YM2151 *chip)
 	for (i=0; i<1024; i++)
 	{
 		/* ASG 980324: changed to compute both tim_A_tab and timer_A_time */
-		pom= attotime_mul(ATTOTIME_IN_HZ(chip->clock), 64 * (1024 - i));
+		pom= attotime::from_hz(chip->clock) * (64 * (1024 - i));
 		#ifdef USE_MAME_TIMERS
 			chip->timer_A_time[i] = pom;
 		#else
-			chip->tim_A_tab[i] = attotime_to_double(pom) * (double)chip->sampfreq * mult;  /* number of samples that timer period takes (fixed point) */
+			chip->tim_A_tab[i] = pom.as_double() * (double)chip->sampfreq * mult;  /* number of samples that timer period takes (fixed point) */
 		#endif
 	}
 	for (i=0; i<256; i++)
 	{
 		/* ASG 980324: changed to compute both tim_B_tab and timer_B_time */
-		pom= attotime_mul(ATTOTIME_IN_HZ(chip->clock), 1024 * (256 - i));
+		pom= attotime::from_hz(chip->clock) * (1024 * (256 - i));
 		#ifdef USE_MAME_TIMERS
 			chip->timer_B_time[i] = pom;
 		#else
-			chip->tim_B_tab[i] = attotime_to_double(pom) * (double)chip->sampfreq * mult;  /* number of samples that timer period takes (fixed point) */
+			chip->tim_B_tab[i] = pom.as_double() * (double)chip->sampfreq * mult;  /* number of samples that timer period takes (fixed point) */
 		#endif
 	}
 
@@ -1049,7 +1049,7 @@ void ym2151_write_reg(void *_chip, int r, int v)
 #if 0
 	/* There is no info on what YM2151 really does when busy flag is set */
 	if ( chip->status & 0x80 ) return;
-	timer_set ( attotime_mul(ATTOTIME_IN_HZ(chip->clock), 64), chip, 0, timer_callback_chip_busy);
+	timer_set ( attotime::from_hz(chip->clock) * 64, chip, 0, timer_callback_chip_busy);
 	chip->status |= 0x80;	/* set busy flag for 64 chip clock cycles */
 #endif
 

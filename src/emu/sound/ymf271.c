@@ -1484,7 +1484,7 @@ static void ymf271_write_timer(YMF271Chip *chip, int data)
 					if (chip->irq_callback) chip->irq_callback(chip->device, 0);
 
 					//period = (double)(256.0 - chip->timerAVal ) * ( 384.0 * 4.0 / (double)CLOCK);
-					period = attotime_mul(ATTOTIME_IN_HZ(chip->clock), 384 * (1024 - chip->timerAVal));
+					period = attotime::from_hz(chip->clock) * (384 * (1024 - chip->timerAVal));
 
 					timer_adjust_periodic(chip->timA, period, 0, period);
 				}
@@ -1495,7 +1495,7 @@ static void ymf271_write_timer(YMF271Chip *chip, int data)
 
 					if (chip->irq_callback) chip->irq_callback(chip->device, 0);
 
-					period = attotime_mul(ATTOTIME_IN_HZ(chip->clock), 384 * 16 * (256 - chip->timerBVal));
+					period = attotime::from_hz(chip->clock) * (384 * 16 * (256 - chip->timerBVal));
 
 					timer_adjust_periodic(chip->timB, period, 0, period);
 				}

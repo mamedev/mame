@@ -208,7 +208,7 @@ static DEVICE_START( sp0250 )
 	if (sp->drq != NULL)
 	{
 		sp->drq(sp->device, ASSERT_LINE);
-		timer_pulse(device->machine, attotime_mul(ATTOTIME_IN_HZ(device->clock()), CLOCK_DIVIDER), sp, 0, sp0250_timer_tick);
+		timer_pulse(device->machine, attotime::from_hz(device->clock()) * CLOCK_DIVIDER, sp, 0, sp0250_timer_tick);
 	}
 
 	sp->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->clock() / CLOCK_DIVIDER, sp, sp0250_update);

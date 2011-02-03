@@ -1991,17 +1991,17 @@ static void recompute_sample_rate(running_machine *machine)
 	/* calculate how long until we generate an interrupt */
 
 	/* frequency the time per each bit sent */
-	attotime sample_period = attotime_mul(ATTOTIME_IN_HZ(dcs.cpu->unscaled_clock()), 2 * (dcs.control_regs[S1_SCLKDIV_REG] + 1));
+	attotime sample_period = attotime::from_hz(dcs.cpu->unscaled_clock()) * (2 * (dcs.control_regs[S1_SCLKDIV_REG] + 1));
 
 	/* now put it down to samples, so we know what the channel frequency has to be */
-	sample_period = attotime_mul(sample_period, 16 * dcs.channels);
+	sample_period = sample_period * (16 * dcs.channels);
 	dmadac_set_frequency(&dcs.dmadac[0], dcs.channels, ATTOSECONDS_TO_HZ(sample_period.attoseconds));
 	dmadac_enable(&dcs.dmadac[0], dcs.channels, 1);
 
 	/* fire off a timer wich will hit every half-buffer */
 	if (dcs.incs)
 	{
-		attotime period = attotime_div(attotime_mul(sample_period, dcs.size), (2 * dcs.channels * dcs.incs));
+		attotime period = (sample_period * dcs.size) / (2 * dcs.channels * dcs.incs);
 		dcs.reg_timer->adjust(period, 0, period);
 	}
 }

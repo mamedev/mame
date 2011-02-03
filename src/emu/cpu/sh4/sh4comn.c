@@ -212,7 +212,7 @@ static UINT32 compute_ticks_refresh_timer(emu_timer *timer, int hertz, int base,
 	// elapsed:total = x : ticks
 	// x=elapsed*tics/total -> x=elapsed*(double)100000000/rtcnt_div[(sh4->m[RTCSR] >> 3) & 7]
 	// ticks/total=ticks / ((rtcnt_div[(sh4->m[RTCSR] >> 3) & 7] * ticks) / 100000000)=1/((rtcnt_div[(sh4->m[RTCSR] >> 3) & 7] / 100000000)=100000000/rtcnt_div[(sh4->m[RTCSR] >> 3) & 7]
-	return base + (UINT32)((attotime_to_double(timer_timeelapsed(timer)) * (double)hertz) / (double)divisor);
+	return base + (UINT32)((timer_timeelapsed(timer).as_double() * (double)hertz) / (double)divisor);
 }
 
 static void sh4_refresh_timer_recompute(sh4_state *sh4)
@@ -224,7 +224,7 @@ UINT32 ticks;
 	ticks = sh4->m[RTCOR]-sh4->m[RTCNT];
 	if (ticks <= 0)
 		ticks = 256 + ticks;
-	timer_adjust_oneshot(sh4->refresh_timer, attotime_mul(attotime_mul(ATTOTIME_IN_HZ(sh4->bus_clock), rtcnt_div[(sh4->m[RTCSR] >> 3) & 7]), ticks), 0);
+	timer_adjust_oneshot(sh4->refresh_timer, attotime::from_hz(sh4->bus_clock) * rtcnt_div[(sh4->m[RTCSR] >> 3) & 7] * ticks, 0);
 	sh4->refresh_timer_base = sh4->m[RTCNT];
 }
 
@@ -235,14 +235,14 @@ UINT32 ticks;
 
 INLINE attotime sh4_scale_up_mame_time(attotime _time1, UINT32 factor1)
 {
-	return attotime_add(attotime_mul(_time1, factor1), _time1);
+	return _time1 * factor1 + _time1;
 }
 
 static UINT32 compute_ticks_timer(emu_timer *timer, int hertz, int divisor)
 {
 	double ret;
 
-	ret=((attotime_to_double(timer_timeleft(timer)) * (double)hertz) / (double)divisor) - 1;
+	ret=((timer_timeleft(timer).as_double() * (double)hertz) / (double)divisor) - 1;
 	return (UINT32)ret;
 }
 
@@ -251,7 +251,7 @@ static void sh4_timer_recompute(sh4_state *sh4, int which)
 	double ticks;
 
 	ticks = sh4->m[tcnt[which]];
-	timer_adjust_oneshot(sh4->timer[which], sh4_scale_up_mame_time(attotime_mul(ATTOTIME_IN_HZ(sh4->pm_clock), tcnt_div[sh4->m[tcr[which]] & 7]), ticks), which);
+	timer_adjust_oneshot(sh4->timer[which], sh4_scale_up_mame_time(attotime::from_hz(sh4->pm_clock) * tcnt_div[sh4->m[tcr[which]] & 7], ticks), which);
 }
 
 static TIMER_CALLBACK( sh4_refresh_timer_callback )

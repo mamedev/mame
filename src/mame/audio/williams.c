@@ -554,7 +554,7 @@ static TIMER_CALLBACK( narc_sync_clear )
 
 static WRITE8_HANDLER( narc_master_sync_w )
 {
-	timer_set(space->machine, double_to_attotime(TIME_OF_74LS123(180000, 0.000001)), NULL, 0x01, narc_sync_clear);
+	timer_set(space->machine, attotime::from_double(TIME_OF_74LS123(180000, 0.000001)), NULL, 0x01, narc_sync_clear);
 	audio_sync |= 0x01;
 	logerror("Master sync = %02X\n", data);
 }
@@ -568,7 +568,7 @@ static WRITE8_HANDLER( narc_slave_talkback_w )
 
 static WRITE8_HANDLER( narc_slave_sync_w )
 {
-	timer_set(space->machine, double_to_attotime(TIME_OF_74LS123(180000, 0.000001)), NULL, 0x02, narc_sync_clear);
+	timer_set(space->machine, attotime::from_double(TIME_OF_74LS123(180000, 0.000001)), NULL, 0x02, narc_sync_clear);
 	audio_sync |= 0x02;
 	logerror("Slave sync = %02X\n", data);
 }

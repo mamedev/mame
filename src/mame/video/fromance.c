@@ -266,7 +266,7 @@ static TIMER_CALLBACK( crtc_interrupt_gen )
 	fromance_state *state = machine->driver_data<fromance_state>();
 	cpu_set_input_line(state->subcpu, 0, HOLD_LINE);
 	if (param != 0)
-		timer_adjust_periodic(state->crtc_timer, attotime_div(machine->primary_screen->frame_period(), param), 0, attotime_div(machine->primary_screen->frame_period(), param));
+		timer_adjust_periodic(state->crtc_timer, machine->primary_screen->frame_period() / param, 0, machine->primary_screen->frame_period() / param);
 }
 
 

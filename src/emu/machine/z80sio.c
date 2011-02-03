@@ -289,7 +289,7 @@ inline void z80sio_device::sio_channel::clear_interrupt(int type)
 inline attotime z80sio_device::sio_channel::compute_time_per_character()
 {
 	// fix me -- should compute properly and include data, stop, parity bit
-	return attotime_mul(ATTOTIME_IN_HZ(9600), 10);
+	return attotime::from_hz(9600) * 10;
 }
 
 

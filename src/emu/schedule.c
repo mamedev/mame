@@ -125,7 +125,7 @@ if (TEMPLOG) printf("Timeslice start\n");
 if (TEMPLOG)
 {
 	void timer_print_first_timer(running_machine *machine);
-	printf("Timeslice loop: basetime=%15.6f\n", attotime_to_double(timerexec->basetime));
+	printf("Timeslice loop: basetime=%15.6f\n", timerexec->basetime.as_double());
 	timer_print_first_timer(&m_machine);
 }
 
@@ -137,12 +137,12 @@ if (TEMPLOG)
 		ATTOTIME_NORMALIZE(target);
 
 		// however, if the next timer is going to fire before then, override
-		assert(attotime_sub(timerexec->nextfire, target).seconds <= 0);
+		assert((timerexec->nextfire - target).seconds <= 0);
 		if (ATTOTIME_LT(timerexec->nextfire, target))
 			target = timerexec->nextfire;
 
 		LOG(("------------------\n"));
-		LOG(("cpu_timeslice: target = %s\n", attotime_string(target, 9)));
+		LOG(("cpu_timeslice: target = %s\n", target.as_string()));
 
 		// apply pending suspension changes
 		UINT32 suspendchanged = 0;
@@ -168,7 +168,7 @@ if (TEMPLOG)
 				attoseconds_t delta = target.attoseconds - exec->m_localtime.attoseconds;
 				if (delta < 0 && target.seconds > exec->m_localtime.seconds)
 					delta += ATTOSECONDS_PER_SECOND;
-				assert(delta == attotime_to_attoseconds(attotime_sub(target, exec->m_localtime)));
+				assert(delta == (target - exec->m_localtime).as_attoseconds());
 
 				// if we have enough for at least 1 cycle, do the math
 				if (delta >= exec->m_attoseconds_per_cycle)
@@ -214,18 +214,18 @@ if (TEMPLOG) printf("Skipping %s for %d cycles\n", exec->device().tag(), ran);
 					attoseconds_t actualdelta = exec->m_attoseconds_per_cycle * ran;
 					exec->m_localtime.attoseconds += actualdelta;
 					ATTOTIME_NORMALIZE(exec->m_localtime);
-					LOG(("         %d ran, %d total, time = %s\n", ran, (INT32)exec->m_totalcycles, attotime_string(exec->m_localtime, 9)));
+					LOG(("         %d ran, %d total, time = %s\n", ran, (INT32)exec->m_totalcycles, exec->m_localtime.as_string()));
 
 					// if the new local CPU time is less than our target, move the target up
 					if (ATTOTIME_LT(exec->m_localtime, target))
 					{
-						assert(attotime_compare(exec->m_localtime, target) < 0);
+						assert(exec->m_localtime < target);
 						target = exec->m_localtime;
 
 						// however, if this puts us before the base, clamp to the base as a minimum
 						if (ATTOTIME_LT(target, timerexec->basetime))
 						{
-							assert(attotime_compare(target, timerexec->basetime) < 0);
+							assert(target < timerexec->basetime);
 							target = timerexec->basetime;
 						}
 						LOG(("         (new target)\n"));
@@ -376,7 +376,7 @@ void device_scheduler::rebuild_execute_list()
 		attotime min_quantum = m_machine.config->m_minimum_quantum;
 
 		// if none specified default to 60Hz
-		if (attotime_compare(min_quantum, attotime_zero) == 0)
+		if (min_quantum == attotime::zero)
 			min_quantum = ATTOTIME_IN_HZ(60);
 
 		// if the configuration specifies a device to make perfect, pick that as the minimum
@@ -390,8 +390,7 @@ void device_scheduler::rebuild_execute_list()
 			if (!device->interface(exec))
 				fatalerror("Device '%s' specified for perfect interleave is not an executing device!", m_machine.config->m_perfect_cpu_quantum);
 
-			attotime cpu_quantum = attotime_make(0, exec->minimum_quantum());
-			min_quantum = attotime_min(cpu_quantum, min_quantum);
+			min_quantum = min(attotime(0, exec->minimum_quantum()), min_quantum);
 		}
 
 		// inform the timer system of our decision

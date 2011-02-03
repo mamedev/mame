@@ -435,7 +435,7 @@ WRITE32_HANDLER( jaguar_serial_w )
 				logerror("Unexpected write to SMODE = %X\n", data);
 			if ((data & 0x3f) == 0x15)
 			{
-				attotime rate = attotime_mul(ATTOTIME_IN_HZ(26000000), 32 * 2 * (serial_frequency + 1));
+				attotime rate = attotime::from_hz(26000000) * (32 * 2 * (serial_frequency + 1));
 				timer_device *serial_timer = space->machine->device<timer_device>("serial_timer");
 				serial_timer->adjust(rate, 0, rate);
 			}

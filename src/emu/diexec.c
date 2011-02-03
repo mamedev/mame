@@ -246,12 +246,12 @@ bool device_config_execute_interface::interface_validity_check(const game_driver
 		error = true;
 	}
 
-	if (m_timed_interrupt != NULL && attotime_compare(m_timed_interrupt_period, attotime_zero) == 0)
+	if (m_timed_interrupt != NULL && m_timed_interrupt_period == attotime::zero)
 	{
 		mame_printf_error("%s: %s device '%s' has a timer interrupt handler with 0 period!\n", driver.source_file, driver.name, devconfig->tag());
 		error = true;
 	}
-	else if (m_timed_interrupt == NULL && attotime_compare(m_timed_interrupt_period, attotime_zero) != 0)
+	else if (m_timed_interrupt == NULL && m_timed_interrupt_period != attotime::zero)
 	{
 		mame_printf_error("%s: %s device '%s' has a no timer interrupt handler but has a non-0 period given!\n", driver.source_file, driver.name, devconfig->tag());
 		error = true;
@@ -493,7 +493,7 @@ attotime device_execute_interface::local_time() const
 	{
 		assert(m_cycles_running >= *m_icountptr);
 		int cycles = m_cycles_running - *m_icountptr;
-		result = attotime_add(result, cycles_to_attotime(cycles));
+		result += cycles_to_attotime(cycles);
 	}
 	return result;
 }
@@ -559,7 +559,7 @@ void device_execute_interface::interface_pre_start()
 	// allocate timers if we need them
 	if (m_execute_config.m_vblank_interrupts_per_frame > 1)
 		m_partial_frame_timer = timer_alloc(device().machine, static_trigger_partial_frame_interrupt, (void *)this);
-	if (attotime_compare(m_execute_config.m_timed_interrupt_period, attotime_zero) != 0)
+	if (m_execute_config.m_timed_interrupt_period != attotime::zero)
 		m_timedint_timer = timer_alloc(device().machine, static_trigger_periodic_interrupt, (void *)this);
 
 	// register for save states
@@ -635,7 +635,7 @@ void device_execute_interface::interface_post_reset()
 	}
 
 	// reconfigure periodic interrupts
-	if (attotime_compare(m_execute_config.m_timed_interrupt_period, attotime_zero) != 0)
+	if (m_execute_config.m_timed_interrupt_period != attotime::zero)
 	{
 		attotime timedint_period = m_execute_config.m_timed_interrupt_period;
 		assert(m_timedint_timer != NULL);
@@ -741,7 +741,7 @@ void device_execute_interface::on_vblank_start(screen_device &screen)
 		// if we have more than one interrupt per frame, start the timer now to trigger the rest of them
 		if (m_execute_config.m_vblank_interrupts_per_frame > 1 && !suspended(SUSPEND_REASON_DISABLE))
 		{
-			m_partial_frame_period = attotime_div(device().machine->primary_screen->frame_period(), m_execute_config.m_vblank_interrupts_per_frame);
+			m_partial_frame_period = device().machine->primary_screen->frame_period() / m_execute_config.m_vblank_interrupts_per_frame;
 			timer_adjust_oneshot(m_partial_frame_timer, m_partial_frame_period, 0);
 		}
 	}

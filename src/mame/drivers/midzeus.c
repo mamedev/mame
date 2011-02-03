@@ -388,7 +388,7 @@ static READ32_HANDLER( tms32031_control_r )
 	{
 		/* timer is clocked at 100ns */
 		int which = (offset >> 4) & 1;
-		INT32 result = attotime_to_double(attotime_mul(timer_timeelapsed(timer[which]), 10000000));
+		INT32 result = (timer_timeelapsed(timer[which]) * 10000000).as_double();
 		return result;
 	}
 

@@ -409,11 +409,11 @@ void rtc65271_w(device_t *device, int xramsel, offs_t offset, UINT8 data)
 					if (data & reg_A_RS)
 					{
 						attotime period = ATTOTIME_IN_HZ(SQW_freq_table[data & reg_A_RS]);
-						attotime half_period = attotime_div(period, 2);
+						attotime half_period = period / 2;
 						attotime elapsed = timer_timeelapsed(state->update_timer);
 
-						if (attotime_compare(half_period, elapsed) > 0)
-							timer_adjust_oneshot(state->SQW_timer, attotime_sub(half_period, elapsed), 0);
+						if (half_period > elapsed)
+							timer_adjust_oneshot(state->SQW_timer, half_period - elapsed, 0);
 						else
 							timer_adjust_oneshot(state->SQW_timer, half_period, 0);
 					}
@@ -505,7 +505,7 @@ static TIMER_CALLBACK( rtc_SQW_callback )
 		field_interrupts(device);
 	}
 
-	half_period = attotime_div(ATTOTIME_IN_HZ(SQW_freq_table[state->regs[reg_A] & reg_A_RS]), 2);
+	half_period = attotime::from_hz(SQW_freq_table[state->regs[reg_A] & reg_A_RS]) / 2;
 	timer_adjust_oneshot(state->SQW_timer, half_period, 0);
 }
 

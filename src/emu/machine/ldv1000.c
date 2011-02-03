@@ -257,7 +257,7 @@ static void ldv1000_vsync(laserdisc_state *ld, const vbi_metadata *vbi, int fiel
 
 	/* signal VSYNC and set a timer to turn it off */
 	player->vsync = TRUE;
-	timer_set(ld->device->machine, attotime_mul(ld->screen->scan_period(), 4), ld, 0, vsync_off);
+	timer_set(ld->device->machine, ld->screen->scan_period() * 4, ld, 0, vsync_off);
 
 	/* also set a timer to fetch the VBI data when it is ready */
 	timer_set(ld->device->machine, ld->screen->time_until_pos(19*2), ld, 0, vbi_data_fetch);

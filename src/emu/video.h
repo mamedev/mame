@@ -195,7 +195,7 @@ private:
 
 	static const UINT8		s_skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS];
 
-	static const attoseconds_t SUBSECONDS_PER_SPEED_UPDATE = ATTOSECONDS_PER_SECOND / 4;
+	static const attoseconds_t ATTOSECONDS_PER_SPEED_UPDATE = ATTOSECONDS_PER_SECOND / 4;
 	static const int PAUSED_REFRESH_RATE = 30;
 };
 

@@ -52,7 +52,7 @@ static TIMER_CALLBACK( timer_callback_262_1 )
 static void timer_handler_262(void *param,int timer, attotime period)
 {
 	ymf262_state *info = (ymf262_state *)param;
-	if( attotime_compare(period, attotime_zero) == 0 )
+	if( period == attotime::zero )
 	{	/* Reset FM Timer */
 		timer_enable(info->timer[timer], 0);
 	}

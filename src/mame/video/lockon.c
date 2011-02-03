@@ -388,7 +388,7 @@ static void ground_draw( running_machine *machine )
 		/* End of list marker */
 		if (state->ground_ram[offs + 2] & 0x8000)
 		{
-			timer_adjust_oneshot(state->bufend_timer, attotime_mul(ATTOTIME_IN_HZ(FRAMEBUFFER_CLOCK), FRAMEBUFFER_MAX_X * y), 0);
+			timer_adjust_oneshot(state->bufend_timer, attotime::from_hz(FRAMEBUFFER_CLOCK) * (FRAMEBUFFER_MAX_X * y), 0);
 		}
 	}
 }

@@ -98,7 +98,7 @@ static INPUT_CHANGED( coin_changed )
 		cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 
 		/* simulate the coin switch being closed for a while */
-		timer_set(field->port->machine, double_to_attotime(4 * attotime_to_double(field->port->machine->primary_screen->frame_period())), NULL, 0, clear_coin_status);
+		timer_set(field->port->machine, 4 * field->port->machine->primary_screen->frame_period(), NULL, 0, clear_coin_status);
 	}
 }
 
@@ -155,7 +155,7 @@ static CUSTOM_INPUT( vicdual_get_composite_blank_comp )
 static CUSTOM_INPUT( vicdual_get_timer_value )
 {
 	/* return the state of the timer (old code claims "4MHz square wave", but it was toggled once every 2msec, or 500Hz) */
-	return attotime_to_ticks(timer_get_time(field->port->machine), 500) & 1;
+	return timer_get_time(field->port->machine).as_ticks(500) & 1;
 }
 
 

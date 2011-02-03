@@ -64,8 +64,8 @@ static void update_scanline_irq( running_machine *machine )
 
 		/* determine the time; if it's in this scanline, bump to the next frame */
 		time = machine->primary_screen->time_until_pos(effscan);
-		if (attotime_compare(time, machine->primary_screen->scan_period()) < 0)
-			time = attotime_add(time, machine->primary_screen->frame_period());
+		if (time < machine->primary_screen->scan_period())
+			time += machine->primary_screen->frame_period();
 		timer_adjust_oneshot(state->blitter_timer, time, 0);
 	}
 }
@@ -206,7 +206,7 @@ static void do_blit( running_machine *machine )
 	}
 
 	/* signal an IRQ when done (timing is just a guess) */
-	timer_set(machine, attotime_make(0, attotime_to_attoseconds(machine->primary_screen->scan_period()) / 2), NULL, 2, dcheese_signal_irq_callback);
+	timer_set(machine, machine->primary_screen->scan_period() / 2, NULL, 2, dcheese_signal_irq_callback);
 
 	/* these extra parameters are written but they are always zero, so I don't know what they do */
 	if (state->blitter_xparam[8] != 0 || state->blitter_xparam[9] != 0 || state->blitter_xparam[10] != 0 || state->blitter_xparam[11] != 0 ||

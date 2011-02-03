@@ -166,7 +166,7 @@ public:
 	// beam positioning and state
 	int vpos() const;
 	int hpos() const;
-	bool vblank() const { return attotime_compare(timer_get_time(machine), m_vblank_end_time) < 0; }
+	bool vblank() const { return (timer_get_time(machine) < m_vblank_end_time); }
 	bool hblank() const { int curpos = hpos(); return (curpos < m_visarea.min_x || curpos > m_visarea.max_x); }
 
 	// timing
@@ -174,8 +174,8 @@ public:
 	attotime time_until_vblank_start() const { return time_until_pos(m_visarea.max_y + 1); }
 	attotime time_until_vblank_end() const;
 	attotime time_until_update() const { return (machine->config->m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK) ? time_until_vblank_end() : time_until_vblank_start(); }
-	attotime scan_period() const { return attotime_make(0, m_scantime); }
-	attotime frame_period() const { return (this == NULL || !started()) ? DEFAULT_FRAME_PERIOD : attotime_make(0, m_frame_period); };
+	attotime scan_period() const { return attotime(0, m_scantime); }
+	attotime frame_period() const { return (this == NULL || !started()) ? DEFAULT_FRAME_PERIOD : attotime(0, m_frame_period); };
 	UINT64 frame_number() const { return m_frame_number; }
 	int partial_updates() const { return m_partial_updates_this_frame; }
 

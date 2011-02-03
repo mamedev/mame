@@ -52,7 +52,7 @@ static void scc68070_set_timer_callback(scc68070_regs_t *scc68070, int channel)
     {
         case 0:
             compare = 0x10000 - scc68070->timers.timer0;
-            period = attotime_mul(ATTOTIME_IN_HZ(CLOCK_A/192), compare);
+            period = attotime::from_hz(CLOCK_A/192) * compare;
             timer_adjust_oneshot(scc68070->timers.timer0_timer, period, 0);
             break;
         default:
@@ -118,7 +118,7 @@ static void scc68070_uart_tx_check(running_machine *machine, scc68070_regs_t *sc
 			scc68070->uart.status_register |= USR_TXRDY;
 		}
 
-		if(attotime_compare(timer_timeleft(scc68070->uart.tx_timer), attotime_never) == 0)
+		if(timer_timeleft(scc68070->uart.tx_timer) == attotime::never)
 		{
 			UINT32 div = 0x10000 >> (scc68070->uart.clock_select & 7);
 			timer_adjust_oneshot(scc68070->uart.tx_timer, ATTOTIME_IN_HZ((49152000 / div) / 8), 0);

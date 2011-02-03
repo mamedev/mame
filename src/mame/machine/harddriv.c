@@ -534,7 +534,7 @@ TIMER_DEVICE_CALLBACK( hd68k_duart_callback )
 		state->duart_irq_state = (state->duart_read_data[0x05] & state->duart_write_data[0x05]) != 0;
 		atarigen_update_interrupts(timer.machine);
 	}
-	timer.adjust(attotime_mul(duart_clock_period(state), 65536));
+	timer.adjust(duart_clock_period(state) * 65536);
 }
 
 
@@ -562,13 +562,13 @@ READ16_HANDLER( hd68k_duart_r )
 		case 0x0e:		/* Start-Counter Command 3 */
 		{
 			int reps = (state->duart_write_data[0x06] << 8) | state->duart_write_data[0x07];
-			state->duart_timer->adjust(attotime_mul(duart_clock_period(state), reps));
-			logerror("DUART timer started (period=%f)\n", attotime_to_double(attotime_mul(duart_clock_period(state), reps)));
+			state->duart_timer->adjust(duart_clock_period(state) * reps);
+			logerror("DUART timer started (period=%f)\n", (duart_clock_period(state) * reps).as_double());
 			return 0x00ff;
 		}
 		case 0x0f:		/* Stop-Counter Command 3 */
 			{
-				int reps = attotime_to_double(attotime_mul(state->duart_timer->time_left(), duart_clock(state)));
+				int reps = (state->duart_timer->time_left() * duart_clock(state)).as_double();
 				state->duart_timer->reset();
 				state->duart_read_data[0x06] = reps >> 8;
 				state->duart_read_data[0x07] = reps & 0xff;

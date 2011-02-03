@@ -615,7 +615,7 @@ static void ic24_setup(void)
 		{
 			ic23_active=1;
 			ic24_output(0);
-			timer_adjust_oneshot(ic24_timer, double_to_attotime(duration), 0);
+			timer_adjust_oneshot(ic24_timer, attotime::from_double(duration), 0);
 		}
 	}
 }
