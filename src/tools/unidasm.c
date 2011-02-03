@@ -191,7 +191,7 @@ CPU_DISASSEMBLE( tms1000 );
 CPU_DISASSEMBLE( tms1100 );
 CPU_DISASSEMBLE( tms32010 );
 CPU_DISASSEMBLE( tms32025 );
-CPU_DISASSEMBLE( tms32031 );
+CPU_DISASSEMBLE( tms3203x );
 CPU_DISASSEMBLE( tms32051 );
 CPU_DISASSEMBLE( tms34010 );
 CPU_DISASSEMBLE( tms34020 );
@@ -320,7 +320,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "tms1100",    _8bit,  0, CPU_DISASSEMBLE_NAME(tms1100) },
 	{ "tms32010",   _16be, -1, CPU_DISASSEMBLE_NAME(tms32010) },
 	{ "tms32025",   _16be, -1, CPU_DISASSEMBLE_NAME(tms32025) },
-	{ "tms32031",   _32le, -2, CPU_DISASSEMBLE_NAME(tms32031) },
+	{ "tms32031",   _32le, -2, CPU_DISASSEMBLE_NAME(tms3203x) },
 	{ "tms32051",   _16le, -1, CPU_DISASSEMBLE_NAME(tms32051) },
 	{ "tms34010",   _8bit,  3, CPU_DISASSEMBLE_NAME(tms34010) },
 	{ "tms34020",   _8bit,  3, CPU_DISASSEMBLE_NAME(tms34020) },
