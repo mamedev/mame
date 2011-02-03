@@ -9235,6 +9235,7 @@ Other Sun games
 	DRIVER( ironfortj )	/* (c) 1998 Eolith */
 	DRIVER( puzzlekg )	/* (c) 1998 Eolith */
 	DRIVER( hidctch2 )	/* (c) 1999 Eolith */
+	DRIVER( hidctch2a)	/* (c) 1999 Eolith */
 	DRIVER( nhidctch )	/* (c) 1999 Eolith */
 	DRIVER( landbrk )	/* (c) 1999 Eolith */
 	DRIVER( landbrka )	/* (c) 1999 Eolith */

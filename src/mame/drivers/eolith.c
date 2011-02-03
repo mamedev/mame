@@ -663,6 +663,44 @@ ROM_START( hidctch2 )
 	ROM_LOAD( "qs1001a.u96",  0x000000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
+ROM_START( hidctch2a )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
+	ROM_LOAD( "hc2j.u43",        0x00000, 0x80000, CRC(8d3b8394) SHA1(29093ee13eb3609abc670d6722f3095f03045af6) )
+
+	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
+	ROM_LOAD32_WORD_SWAP( "00", 0x0000000, 0x200000, CRC(c6b1bc84) SHA1(205d1dc5079562b11cef72fef25a3c570eaecf78) )
+	ROM_LOAD32_WORD_SWAP( "01", 0x0000002, 0x200000, CRC(5a1c1ab3) SHA1(3c07a98f9ea8b30bac5a260403e688314fd12abb) )
+	ROM_LOAD32_WORD_SWAP( "02", 0x0400000, 0x200000, CRC(3f7815aa) SHA1(ed46cbe03fde5cab15e004812036b0aaa00fc628) )
+	ROM_LOAD32_WORD_SWAP( "03", 0x0400002, 0x200000, CRC(d686c59b) SHA1(f82d97f17d9cb10cae4d47f4efdd3ba6c5baace3) )
+	ROM_LOAD32_WORD_SWAP( "04", 0x0800000, 0x200000, CRC(d35cb515) SHA1(75943b6c8052232c8b01ab57b4d32d54a22e7279) )
+	ROM_LOAD32_WORD_SWAP( "05", 0x0800002, 0x200000, CRC(7870e5c6) SHA1(e36a62cb205d396337abdea8e553d70b6da32f8f) )
+	ROM_LOAD32_WORD_SWAP( "06", 0x0c00000, 0x200000, CRC(10184a21) SHA1(fc99bc003ba69b651691ca37a5490beae29e36bc) )
+	ROM_LOAD32_WORD_SWAP( "07", 0x0c00002, 0x200000, CRC(b6c4879f) SHA1(b672d5d7fc3dd1b32cd2f1084a71d1a225594866) )
+	ROM_LOAD32_WORD_SWAP( "08", 0x1000000, 0x200000, CRC(670204d1) SHA1(efdead17ea1d1796f47abf65dc4792a10406b45c) )
+	ROM_LOAD32_WORD_SWAP( "09", 0x1000002, 0x200000, CRC(28c0f55c) SHA1(0390aaf272deb1338293823d9d3a27306b2d9db6) )
+	ROM_LOAD32_WORD_SWAP( "10", 0x1400000, 0x200000, CRC(45f374f4) SHA1(a5cec2fcb58445e0ff74c86b20aba7accd132ea5) )
+	ROM_LOAD32_WORD_SWAP( "11", 0x1400002, 0x200000, CRC(cac54db3) SHA1(c31366e22d242ec0c0bb9f79869352894173db88) )
+	ROM_LOAD32_WORD_SWAP( "12", 0x1800000, 0x200000, CRC(66e681ff) SHA1(8f78dec1dc3e5c6825f559cef69e413c98ed9aab) )
+	ROM_LOAD32_WORD_SWAP( "13", 0x1800002, 0x200000, CRC(14bd38a9) SHA1(a3ff48de8150616a8ca49abf60225455397b938c) )
+	ROM_LOAD32_WORD_SWAP( "14", 0x1c00000, 0x200000, CRC(8eb1b01b) SHA1(e144ba01aa65dc96e22d1d41c3ca87ae19e874d5) )
+	ROM_LOAD32_WORD_SWAP( "15", 0x1c00002, 0x200000, CRC(3b06fe4e) SHA1(35356a116e6b825b8ed93c8ea1e016491ac1863a) )
+
+	ROM_REGION( 0x008000, "cpu1", 0 ) /* QDSP ('51) Code */
+	ROM_LOAD( "u107",        0x0000, 0x8000, CRC(89450a2f) SHA1(d58efa805f497bec179fdbfb8c5860ac5438b4ec) )
+
+	ROM_REGION( 0x008000, "cpu2", 0 ) /* Sound (80c301) CPU Code */
+	ROM_LOAD( "hc2j.u111", 0x0000, 0x8000, CRC(79012474) SHA1(09a2d5705d7bc52cc2d1644c87c1e31ee44813ef) )
+
+	ROM_REGION( 0x080000, "music", 0 ) /* Music data */
+	ROM_LOAD( "u108",        0x00000, 0x80000, CRC(75fc7a65) SHA1(308715ab62d28787ee894ddcf7304464e2543b2e) )
+
+	ROM_REGION( 0x080000, "sfx", 0 ) /* QDSP samples (SFX) */
+	ROM_LOAD( "u97",        0x00000, 0x80000, CRC(a7a1627e) SHA1(a93ced858d839daac1fa9a85f4f8c89cb179bad5) )
+
+	ROM_REGION( 0x080000, "wavetable", 0 ) /* QDSP wavetable rom */
+	ROM_LOAD( "qs1001a.u96",  0x000000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
+ROM_END
+
 
 /*
 
@@ -1116,10 +1154,11 @@ GAME( 1998, ironfortj, ironfort, ironfort, ironfortj, eolith,   ROT0, "Eolith", 
 GAME( 1998, hidnctch,  0,        eolith45, hidnctch,  eolith,   ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.03)",  GAME_NO_SOUND ) // or Teurrin Geurim Chajgi '98
 GAME( 1998, raccoon,   0,        eolith45, raccoon,   eolith,   ROT0, "Eolith", "Raccoon World", GAME_NO_SOUND )
 GAME( 1998, puzzlekg,  0,        eolith45, puzzlekg,  eolith,   ROT0, "Eolith", "Puzzle King (Dance & Puzzle)",  GAME_NO_SOUND )
-GAME( 1999, hidctch2,  0,        eolith50, hidnctch,  hidctch2, ROT0, "Eolith", "Hidden Catch 2 (pcb ver 3.03)", GAME_NO_SOUND )
+GAME( 1999, hidctch2,  0,        eolith50, hidnctch,  hidctch2, ROT0, "Eolith", "Hidden Catch 2 (pcb ver 3.03) (Kor/Eng) (AT89c52 protected)", GAME_NO_SOUND )
+GAME( 1999, hidctch2a, hidctch2, eolith50, hidnctch,  eolith,   ROT0, "Eolith", "Hidden Catch 2 (pcb ver 1.00) (Kor/Eng/Jpn/Chi)", GAME_NO_SOUND )
 GAME( 1999, landbrk,   0,        eolith45, landbrk,   landbrk,  ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.02)",  GAME_NO_SOUND ) // or Miss Ttang Jjareugi
-GAME( 1999, landbrka,  landbrk,  eolith45, landbrk,   landbrka, ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.03)",  GAME_NO_SOUND ) // or Miss Ttang Jjareugi
-GAME( 1999, penfan,    0,        eolith45, landbrk,   eolith,   ROT0, "Eolith", "Penfan Girls - Step1. Mild Mind",  GAME_NO_SOUND ) // alt title of Ribbon? (todo: speedup)
+GAME( 1999, landbrka,  landbrk,  eolith45, landbrk,   landbrka, ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.03) (AT89c52 protected)",  GAME_NO_SOUND ) // or Miss Ttang Jjareugi
+GAME( 1999, penfan,    0,        eolith45, landbrk,   eolith,   ROT0, "Eolith", "Penfan Girls - Step1. Mild Mind",  GAME_NO_SOUND ) // alt title of Ribbon?
 GAME( 1999, nhidctch,  0,        eolith45, hidnctch,  eolith,   ROT0, "Eolith", "New Hidden Catch (World) / New Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.02)", GAME_NO_SOUND ) // or New Teurrin Geurim Chajgi '98
 GAME( 2000, hidctch3,  0,        eolith50, hidctch3,  hidctch3, ROT0, "Eolith", "Hidden Catch 3 (ver 1.00 / pcb ver 3.05)", GAME_NO_SOUND )
 GAME( 2001, fort2b,    0,        eolith50, common,    eolith,   ROT0, "Eolith", "Fortress 2 Blue Arcade (ver 1.01 / pcb ver 3.05)",  GAME_NO_SOUND )

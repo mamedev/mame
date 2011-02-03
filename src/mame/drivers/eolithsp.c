@@ -44,6 +44,7 @@ static const struct
 	{ "raccoon",  0x40008204, 239 },
 	{ "puzzlekg", 0x40029458, 239 },
 	{ "hidctch2", 0x40009524, 239 },
+	{ "hidctch2a",0x40029B58, 239 },
 	{ "landbrk",  0x40023574, 239 },
 	{ "landbrka", 0x4002446c, 239 },
 	{ "nhidctch", 0x40012778, 239 },
