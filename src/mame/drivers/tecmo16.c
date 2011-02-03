@@ -383,7 +383,7 @@ static MACHINE_CONFIG_START( fstarfrc, driver_device )
 	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)			/* 4MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 								/* NMIs are triggered by the main CPU */
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

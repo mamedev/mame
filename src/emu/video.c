@@ -102,15 +102,15 @@ video_manager::video_manager(running_machine &machine)
 	: m_machine(machine),
 	  m_screenless_frame_timer(NULL),
 	  m_throttle_last_ticks(0),
-	  m_throttle_realtime(attotime_zero),
-	  m_throttle_emutime(attotime_zero),
+	  m_throttle_realtime(attotime::zero),
+	  m_throttle_emutime(attotime::zero),
 	  m_throttle_history(0),
 	  m_speed_last_realtime(0),
-	  m_speed_last_emutime(attotime_zero),
+	  m_speed_last_emutime(attotime::zero),
 	  m_speed_percent(1.0),
 	  m_overall_real_seconds(0),
 	  m_overall_real_ticks(0),
-	  m_overall_emutime(attotime_zero),
+	  m_overall_emutime(attotime::zero),
 	  m_overall_valid_counter(0),
 	  m_throttle(options_get_bool(machine.options(), OPTION_THROTTLE)),
 	  m_fastforward(false),
@@ -130,8 +130,8 @@ video_manager::video_manager(running_machine &machine)
 	  m_snap_height(0),
 	  m_mngfile(NULL),
 	  m_avifile(NULL),
-	  m_movie_frame_period(attotime_zero),
-	  m_movie_next_frame_time(attotime_zero),
+	  m_movie_frame_period(attotime::zero),
+	  m_movie_next_frame_time(attotime::zero),
 	  m_movie_frame(0)
 {
 	// request a callback upon exiting
@@ -467,7 +467,7 @@ void video_manager::begin_recording(const char *name, movie_format format)
 			return end_recording();
 
 		// compute the frame time
-		m_movie_frame_period = ATTOTIME_IN_HZ(rate);
+		m_movie_frame_period = attotime::from_hz(rate);
 	}
 }
 

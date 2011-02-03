@@ -122,8 +122,8 @@ void acia6850_device::device_start()
 	m_status_read = 0;
 	m_brk = 0;
 
-	timer_reset(m_rx_timer, attotime_never);
-	timer_reset(m_tx_timer, attotime_never);
+	timer_reset(m_rx_timer, attotime::never);
+	timer_reset(m_tx_timer, attotime::never);
 
 	state_save_register_device_item(this, 0, m_ctrl);
 	state_save_register_device_item(this, 0, m_status);

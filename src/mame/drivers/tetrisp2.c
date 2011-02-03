@@ -67,7 +67,7 @@ static WRITE16_HANDLER( tetrisp2_systemregs_w )
 	}
 }
 
-#define ROCKN_TIMER_BASE ATTOTIME_IN_NSEC(500000)
+#define ROCKN_TIMER_BASE attotime::from_nsec(500000)
 
 static WRITE16_HANDLER( rockn_systemregs_w )
 {
@@ -1044,7 +1044,7 @@ static TIMER_CALLBACK( rockn_timer_sub_level1_callback )
 
 static void init_rockn_timer(running_machine *machine)
 {
-	timer_pulse(machine, ATTOTIME_IN_MSEC(32), NULL, 0, rockn_timer_level1_callback);
+	timer_pulse(machine, attotime::from_msec(32), NULL, 0, rockn_timer_level1_callback);
 	rockn_timer_l4 = timer_alloc(machine, rockn_timer_level4_callback, NULL);
 
 	state_save_register_global_array(machine, tetrisp2_systemregs);
@@ -1076,7 +1076,7 @@ static DRIVER_INIT( rocknms )
 {
 	init_rockn_timer(machine);
 
-	timer_pulse(machine, ATTOTIME_IN_MSEC(32), NULL, 0, rockn_timer_sub_level1_callback);
+	timer_pulse(machine, attotime::from_msec(32), NULL, 0, rockn_timer_sub_level1_callback);
 	rockn_timer_sub_l4 = timer_alloc(machine, rockn_timer_sub_level4_callback, NULL);
 
 	rockn_protectdata = 3;

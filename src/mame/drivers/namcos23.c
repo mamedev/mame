@@ -1330,7 +1330,7 @@ static TIMER_CALLBACK( c361_timer_cb )
 	if (c361_scanline != 511)
 	{
 		cputag_set_input_line(machine, "maincpu", MIPS3_IRQ1, ASSERT_LINE);
-		timer_adjust_oneshot(c361_timer, attotime_never, 0);
+		timer_adjust_oneshot(c361_timer, attotime::never, 0);
 	}
 }
 
@@ -1350,7 +1350,7 @@ static WRITE16_HANDLER(s23_c361_w)
 		if (data == 0x1ff)
 		{
 			cputag_set_input_line(space->machine, "maincpu", MIPS3_IRQ1, CLEAR_LINE);
-			timer_adjust_oneshot(c361_timer, attotime_never, 0);
+			timer_adjust_oneshot(c361_timer, attotime::never, 0);
 		}
 		else
 		{
@@ -1808,7 +1808,7 @@ static WRITE32_HANDLER( p3d_w)
 		return;
 	case 0x17:
 		cputag_set_input_line(space->machine, "maincpu", MIPS3_IRQ1, CLEAR_LINE);
-		timer_adjust_oneshot(c361_timer, attotime_never, 0);
+		timer_adjust_oneshot(c361_timer, attotime::never, 0);
 		return;
 	}
 	logerror("p3d_w %02x, %08x @ %08x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
@@ -2041,7 +2041,7 @@ static INTERRUPT_GEN(s23_interrupt)
 static MACHINE_START( s23 )
 {
 	c361_timer = timer_alloc(machine, c361_timer_cb, 0);
-	timer_adjust_oneshot(c361_timer, attotime_never, 0);
+	timer_adjust_oneshot(c361_timer, attotime::never, 0);
 }
 
 static ADDRESS_MAP_START( gorgon_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -2714,7 +2714,7 @@ static MACHINE_CONFIG_START( gorgon, driver_device )
 	MCFG_CPU_PROGRAM_MAP( gorgoniobrdmap )
 	MCFG_CPU_IO_MAP( s23iobrdiomap )
 
-	MCFG_QUANTUM_TIME(HZ(60000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(S23_VSYNC1)
@@ -2760,7 +2760,7 @@ static MACHINE_CONFIG_START( s23, driver_device )
 	MCFG_CPU_PROGRAM_MAP( s23iobrdmap )
 	MCFG_CPU_IO_MAP( s23iobrdiomap )
 
-	MCFG_QUANTUM_TIME(HZ(60*18000))	// higher than 60*20000 causes timecrs2 crash after power-on test $1e
+	MCFG_QUANTUM_TIME(attotime::from_hz(60*18000))	// higher than 60*20000 causes timecrs2 crash after power-on test $1e
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(S23_VSYNC1)
@@ -2802,7 +2802,7 @@ static MACHINE_CONFIG_START( ss23, driver_device )
 	MCFG_CPU_IO_MAP( s23h8noiobmap )
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_pulse)
 
-	MCFG_QUANTUM_TIME(HZ(60*18000))	// higher than 60*20000 causes timecrs2 crash after power-on test $1e
+	MCFG_QUANTUM_TIME(attotime::from_hz(60*18000))	// higher than 60*20000 causes timecrs2 crash after power-on test $1e
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(S23_VSYNC1)

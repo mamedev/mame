@@ -632,7 +632,7 @@ static INTERRUPT_GEN( generate_nmi )
 {
 	/* signal the NMI */
 	itech8_update_interrupts(device->machine, 1, -1, -1);
-	timer_set(device->machine, ATTOTIME_IN_USEC(1), NULL, 0, irq_off);
+	timer_set(device->machine, attotime::from_usec(1), NULL, 0, irq_off);
 
 	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", device->machine->primary_screen->vpos());
 }

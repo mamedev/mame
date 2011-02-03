@@ -402,7 +402,7 @@ static MACHINE_CONFIG_START( nvram, seicross_state )
 	MCFG_CPU_ADD("mcu", NSC8105, 6000000)	/* ??? */
 	MCFG_CPU_PROGRAM_MAP(mcu_nvram_map)
 
-	MCFG_QUANTUM_TIME(HZ(1200))	/* 20 CPU slices per frame - an high value to ensure proper */
+	MCFG_QUANTUM_TIME(attotime::from_hz(1200))	/* 20 CPU slices per frame - an high value to ensure proper */
 						/* synchronization of the CPUs */
 	MCFG_MACHINE_RESET(friskyt)
 	MCFG_NVRAM_HANDLER(seicross)

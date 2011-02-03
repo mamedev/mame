@@ -3454,7 +3454,7 @@ static MACHINE_CONFIG_START( pipibibs, toaplan2_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_27MHz/8)			/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(pipibibs_sound_z80_mem)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_RESET(toaplan2)
 
@@ -3536,7 +3536,7 @@ static MACHINE_CONFIG_START( pipibibi_bootleg, toaplan2_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_27MHz/8)			/* ??? 3.37MHz */
 	MCFG_CPU_PROGRAM_MAP(pipibibs_sound_z80_mem)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_RESET(toaplan2)
 
@@ -3748,7 +3748,7 @@ static MACHINE_CONFIG_START( batsugun, toaplan2_state )
 	MCFG_CPU_PROGRAM_MAP(V25_rambased_mem)
 	MCFG_CPU_IO_MAP(V25_port)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_RESET(batsugun)
 
@@ -3830,7 +3830,7 @@ static MACHINE_CONFIG_START( mahoudai, toaplan2_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)		/* 4MHz , 32MHz Oscillator */
 	MCFG_CPU_PROGRAM_MAP(raizing_sound_z80_mem)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_RESET(toaplan2)
 
@@ -3873,7 +3873,7 @@ static MACHINE_CONFIG_START( shippumd, toaplan2_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)		/* 4MHz , 32MHz Oscillator */
 	MCFG_CPU_PROGRAM_MAP(raizing_sound_z80_mem)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_RESET(toaplan2)
 
@@ -3927,7 +3927,7 @@ static MACHINE_CONFIG_START( bgaregga, toaplan2_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)		/* 4MHz , 32MHz Oscillator */
 	MCFG_CPU_PROGRAM_MAP(bgaregga_sound_z80_mem)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_RESET(bgaregga)
 
@@ -3973,7 +3973,7 @@ static MACHINE_CONFIG_START( batrider, toaplan2_state )
 	MCFG_CPU_PROGRAM_MAP(batrider_sound_z80_mem)
 	MCFG_CPU_IO_MAP(batrider_sound_z80_port)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_RESET(bgaregga)
 
@@ -4021,7 +4021,7 @@ static MACHINE_CONFIG_START( bbakraid, toaplan2_state )
 	MCFG_CPU_IO_MAP(bbakraid_sound_z80_port)
 	MCFG_CPU_PERIODIC_INT(bbakraid_snd_interrupt, 448)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_RESET(toaplan2)
 	MCFG_EEPROM_ADD("eeprom", bbakraid_93C66_intf)

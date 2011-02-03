@@ -150,7 +150,7 @@ void i8237_device::device_reset()
 	m_chan[2].m_mode = 0;
 	m_chan[3].m_mode = 0;
 
-	timer_adjust_periodic(m_timer, ATTOTIME_IN_HZ(clock()), 0, ATTOTIME_IN_HZ(clock()));
+	timer_adjust_periodic(m_timer, attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
 }
 
 

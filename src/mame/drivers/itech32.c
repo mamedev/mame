@@ -836,7 +836,7 @@ static WRITE32_HANDLER( tms1_68k_ram_w )
 	if (offset == 0) COMBINE_DATA(tms1_boot);
 	if (offset == 0x382 && tms_spinning[0]) STOP_TMS_SPINNING(space->machine, 0);
 	if (!tms_spinning[0])
-		cpuexec_boost_interleave(space->machine, ATTOTIME_IN_HZ(CPU020_CLOCK/256), ATTOTIME_IN_USEC(20));
+		cpuexec_boost_interleave(space->machine, attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
 }
 
 
@@ -845,21 +845,21 @@ static WRITE32_HANDLER( tms2_68k_ram_w )
 	COMBINE_DATA(&tms2_ram[offset]);
 	if (offset == 0x382 && tms_spinning[1]) STOP_TMS_SPINNING(space->machine, 1);
 	if (!tms_spinning[1])
-		cpuexec_boost_interleave(space->machine, ATTOTIME_IN_HZ(CPU020_CLOCK/256), ATTOTIME_IN_USEC(20));
+		cpuexec_boost_interleave(space->machine, attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
 }
 
 
 static WRITE32_HANDLER( tms1_trigger_w )
 {
 	COMBINE_DATA(&tms1_ram[offset]);
-	cpuexec_boost_interleave(space->machine, ATTOTIME_IN_HZ(CPU020_CLOCK/256), ATTOTIME_IN_USEC(20));
+	cpuexec_boost_interleave(space->machine, attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
 }
 
 
 static WRITE32_HANDLER( tms2_trigger_w )
 {
 	COMBINE_DATA(&tms2_ram[offset]);
-	cpuexec_boost_interleave(space->machine, ATTOTIME_IN_HZ(CPU020_CLOCK/256), ATTOTIME_IN_USEC(20));
+	cpuexec_boost_interleave(space->machine, attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
 }
 
 
@@ -1769,7 +1769,7 @@ static MACHINE_CONFIG_DERIVED( drivedge, bloodstm )
 //  MCFG_CPU_ADD("comm", M6803, 8000000/4) -- network CPU
 
 	MCFG_MACHINE_RESET(drivedge)
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 MACHINE_CONFIG_END
 
 

@@ -265,7 +265,7 @@ static void wave_dma_execute(address_space *space)
 	wave_dma.flag = (wave_dma.indirect & 1) ? 1 : 0;
 	/* Note: if you trigger an instant DMA IRQ trigger, sfz3upper doesn't play any bgm. */
 	/* TODO: timing of this */
-	timer_set(space->machine, ATTOTIME_IN_USEC(300), NULL, 0, aica_dma_irq);
+	timer_set(space->machine, attotime::from_usec(300), NULL, 0, aica_dma_irq);
 }
 
 static void pvr_dma_execute(address_space *space)
@@ -303,7 +303,7 @@ static void pvr_dma_execute(address_space *space)
 	}
 	/* Note: do not update the params, since this DMA type doesn't support it. */
 	/* TODO: timing of this */
-	timer_set(space->machine, ATTOTIME_IN_USEC(250), NULL, 0, pvr_dma_irq);
+	timer_set(space->machine, attotime::from_usec(250), NULL, 0, pvr_dma_irq);
 }
 
 // register decode helpers
@@ -689,10 +689,10 @@ WRITE64_HANDLER( dc_sysctrl_w )
 					dc_sysctrl_regs[SB_C2DSTAT]=address+ddtdata.length;
 
 				/* 200 usecs breaks sfz3upper */
-				timer_set(space->machine, ATTOTIME_IN_USEC(50), NULL, 0, ch2_dma_irq);
+				timer_set(space->machine, attotime::from_usec(50), NULL, 0, ch2_dma_irq);
 				/* simulate YUV FIFO processing here */
 				if((address & 0x1800000) == 0x0800000)
-					timer_set(space->machine, ATTOTIME_IN_USEC(500), NULL, 0, yuv_fifo_irq);
+					timer_set(space->machine, attotime::from_usec(500), NULL, 0, yuv_fifo_irq);
 			}
 			break;
 
@@ -1066,7 +1066,7 @@ WRITE64_HANDLER( naomi_maple_w )
 
 					if (endflag)
 					{
-						timer_set(space->machine, ATTOTIME_IN_USEC(200), NULL, 0, maple_dma_irq);
+						timer_set(space->machine, attotime::from_usec(200), NULL, 0, maple_dma_irq);
 						break;
 					}
 					// skip fixed packet header
@@ -1215,7 +1215,7 @@ WRITE64_HANDLER( dc_maple_w )
 
 					if (endflag)
 					{
-						timer_set(space->machine, ATTOTIME_IN_USEC(200), NULL, 0, maple_dma_irq);
+						timer_set(space->machine, attotime::from_usec(200), NULL, 0, maple_dma_irq);
 						break;
 					}
 					// skip fixed packet header
@@ -1333,7 +1333,7 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 			sh4_dma_ddt(space->machine->device("maincpu"), &ddtdata);
 			/* Note: KOF Neowave definitely wants this to be delayed (!) */
 			/* FIXME: timing of this */
-			timer_set(space->machine, ATTOTIME_IN_USEC(500), NULL, 0, gdrom_dma_irq);
+			timer_set(space->machine, attotime::from_usec(500), NULL, 0, gdrom_dma_irq);
 		}
 		break;
 	}
@@ -1556,7 +1556,7 @@ WRITE64_HANDLER( dc_rtc_w )
 		if (dc_rtcregister[RTC3] == 0)
 			dc_rtcregister[reg] = old;
 		else
-			timer_adjust_periodic(dc_rtc_timer, attotime_zero, 0, ATTOTIME_IN_SEC(1));
+			timer_adjust_periodic(dc_rtc_timer, attotime::zero, 0, attotime::from_seconds(1));
 		break;
 	case RTC3:
 		dc_rtcregister[RTC3] &= 1;
@@ -1626,7 +1626,7 @@ MACHINE_RESET( dc )
 	memset(maple_regs, 0, sizeof(maple_regs));
 	memset(dc_coin_counts, 0, sizeof(dc_coin_counts));
 
-	timer_adjust_periodic(dc_rtc_timer, attotime_zero, 0, ATTOTIME_IN_SEC(1));
+	timer_adjust_periodic(dc_rtc_timer, attotime::zero, 0, attotime::from_seconds(1));
 
 	dc_sysctrl_regs[SB_SBREV] = 0x0b;
 

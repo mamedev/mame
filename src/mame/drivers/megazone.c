@@ -260,7 +260,7 @@ static MACHINE_CONFIG_START( megazone, megazone_state )
 	MCFG_CPU_PROGRAM_MAP(megazone_i8039_map)
 	MCFG_CPU_IO_MAP(megazone_i8039_io_map)
 
-	MCFG_QUANTUM_TIME(HZ(900))
+	MCFG_QUANTUM_TIME(attotime::from_hz(900))
 	MCFG_MACHINE_START(megazone)
 	MCFG_MACHINE_RESET(megazone)
 

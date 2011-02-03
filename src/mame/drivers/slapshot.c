@@ -561,7 +561,7 @@ static MACHINE_CONFIG_START( slapshot, slapshot_state )
 	MCFG_CPU_ADD("audiocpu", Z80,32000000/8)	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(opwolf3_z80_sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(slapshot)
 
@@ -610,7 +610,7 @@ static MACHINE_CONFIG_START( opwolf3, slapshot_state )
 	MCFG_CPU_ADD("audiocpu", Z80,32000000/8)	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(opwolf3_z80_sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(slapshot)
 

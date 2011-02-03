@@ -131,7 +131,7 @@ MACHINE_RESET( namcos2 )
 	InitC148();
 
 	/* reset POSIRQ timer */
-	timer_adjust_oneshot(namcos2_posirq_timer, attotime_never, 0);
+	timer_adjust_oneshot(namcos2_posirq_timer, attotime::never, 0);
 }
 
 /*************************************************************/

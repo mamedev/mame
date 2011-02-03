@@ -66,7 +66,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 	cpu_triggerint(machine->device("audiocpu"));
 
 	/* use a timer to make long transfers faster */
-	timer_set(machine, ATTOTIME_IN_USEC(50), NULL, 0, 0);
+	timer_set(machine, attotime::from_usec(50), NULL, 0, 0);
 }
 
 

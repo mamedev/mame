@@ -741,7 +741,7 @@ static MACHINE_CONFIG_START( dblewing, dblewing_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_START(dblewing)
 	MCFG_MACHINE_RESET(dblewing)

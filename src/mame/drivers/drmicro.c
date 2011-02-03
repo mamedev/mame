@@ -255,7 +255,7 @@ static MACHINE_CONFIG_START( drmicro, drmicro_state )
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT("screen", drmicro_interrupt)
 
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START(drmicro)
 	MCFG_MACHINE_RESET(drmicro)

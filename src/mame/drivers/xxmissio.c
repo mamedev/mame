@@ -298,7 +298,7 @@ static MACHINE_CONFIG_START( xxmissio, driver_device )
 	MCFG_CPU_PROGRAM_MAP(map2)
 	MCFG_CPU_VBLANK_INT_HACK(xxmissio_interrupt_s,2)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_START(xxmissio)
 

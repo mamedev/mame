@@ -49,7 +49,7 @@ static TIMER_CALLBACK( ticket_dispenser_toggle )
 	{
 		state->status ^= state->active_bit;
 		LOG(("Ticket Status Changed to %02X\n", state->status));
-		timer_adjust_oneshot(state->timer, ATTOTIME_IN_MSEC(state->time_msec), 0);
+		timer_adjust_oneshot(state->timer, attotime::from_msec(state->time_msec), 0);
 	}
 
 	if (state->status == state->ticketdispensed)
@@ -91,7 +91,7 @@ WRITE8_DEVICE_HANDLER( ticket_dispenser_w )
 		if (!state->power)
 		{
 			LOG(("%s: Ticket Power On\n", cpuexec_describe_context(device->machine)));
-			timer_adjust_oneshot(state->timer, ATTOTIME_IN_MSEC(state->time_msec), 0);
+			timer_adjust_oneshot(state->timer, attotime::from_msec(state->time_msec), 0);
 			state->power = 1;
 
 			state->status = state->ticketnotdispensed;
@@ -102,7 +102,7 @@ WRITE8_DEVICE_HANDLER( ticket_dispenser_w )
 		if (state->power)
 		{
 			LOG(("%s: Ticket Power Off\n", cpuexec_describe_context(device->machine)));
-			timer_adjust_oneshot(state->timer, attotime_never, 0);
+			timer_adjust_oneshot(state->timer, attotime::never, 0);
 			set_led_status(device->machine, 2,0);
 			state->power = 0;
 		}

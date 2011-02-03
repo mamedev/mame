@@ -29,14 +29,14 @@
 
 #define IDE_DISK_SECTOR_SIZE			512
 
-#define MINIMUM_COMMAND_TIME			(ATTOTIME_IN_USEC(10))
+#define MINIMUM_COMMAND_TIME			(attotime::from_usec(10))
 
-#define TIME_PER_SECTOR					(ATTOTIME_IN_USEC(100))
-#define TIME_PER_ROTATION				(ATTOTIME_IN_HZ(5400/60))
-#define TIME_SECURITY_ERROR				(ATTOTIME_IN_MSEC(1000))
+#define TIME_PER_SECTOR					(attotime::from_usec(100))
+#define TIME_PER_ROTATION				(attotime::from_hz(5400/60))
+#define TIME_SECURITY_ERROR				(attotime::from_msec(1000))
 
-#define TIME_SEEK_MULTISECTOR			(ATTOTIME_IN_MSEC(13))
-#define TIME_NO_SEEK_MULTISECTOR		(ATTOTIME_IN_NSEC(16300))
+#define TIME_SEEK_MULTISECTOR			(attotime::from_msec(13))
+#define TIME_NO_SEEK_MULTISECTOR		(attotime::from_nsec(16300))
 
 #define IDE_STATUS_ERROR				0x01
 #define IDE_STATUS_HIT_INDEX			0x02
@@ -825,7 +825,7 @@ static void read_next_sector(ide_state *ide)
 			read_sector_done(ide);
 		else
 			/* just set a timer */
-			timer_set(ide->device->machine, ATTOTIME_IN_USEC(1), ide, 0, read_sector_done_callback);
+			timer_set(ide->device->machine, attotime::from_usec(1), ide, 0, read_sector_done_callback);
 	}
 	else
 		/* just set a timer */
@@ -1317,7 +1317,7 @@ static UINT32 ide_controller_read(device_t *device, int bank, offs_t offset, int
 			if (timer_timeelapsed(ide->last_status_timer) > TIME_PER_ROTATION)
 			{
 				result |= IDE_STATUS_HIT_INDEX;
-				timer_adjust_oneshot(ide->last_status_timer, attotime_never, 0);
+				timer_adjust_oneshot(ide->last_status_timer, attotime::never, 0);
 			}
 
 			/* clear interrutps only when reading the real status */
@@ -1500,7 +1500,7 @@ static void ide_controller_write(device_t *device, int bank, offs_t offset, int 
 			{
 				ide->status |= IDE_STATUS_BUSY;
 				ide->status &= ~IDE_STATUS_DRIVE_READY;
-				timer_adjust_oneshot(ide->reset_timer, ATTOTIME_IN_MSEC(5), 0);
+				timer_adjust_oneshot(ide->reset_timer, attotime::from_msec(5), 0);
 			}
 			break;
 	}

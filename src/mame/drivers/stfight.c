@@ -442,7 +442,7 @@ static MACHINE_CONFIG_START( stfight, driver_device )
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold,120)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_RESET(stfight)
 

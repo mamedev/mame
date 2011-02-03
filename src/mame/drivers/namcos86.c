@@ -1010,7 +1010,7 @@ static MACHINE_CONFIG_START( hopmappy, driver_device )
 	MCFG_CPU_IO_MAP(mcu_port_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	/* ??? */
 
-	MCFG_QUANTUM_TIME(HZ(48000))	/* heavy interleaving needed to avoid hangs in rthunder */
+	MCFG_QUANTUM_TIME(attotime::from_hz(48000))	/* heavy interleaving needed to avoid hangs in rthunder */
 
 	MCFG_MACHINE_RESET(namco86)
 

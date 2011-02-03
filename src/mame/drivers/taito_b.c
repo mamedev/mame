@@ -2226,7 +2226,7 @@ static MACHINE_CONFIG_START( rastsag2, taitob_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(taitob)
 	MCFG_MACHINE_RESET(taitob)
@@ -2273,7 +2273,7 @@ static MACHINE_CONFIG_START( ashura, taitob_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(taitob)
 	MCFG_MACHINE_RESET(taitob)
@@ -2320,7 +2320,7 @@ static MACHINE_CONFIG_START( crimec, taitob_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(taitob)
 	MCFG_MACHINE_RESET(taitob)
@@ -2367,7 +2367,7 @@ static MACHINE_CONFIG_START( tetrist, taitob_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(taitob)
 	MCFG_MACHINE_RESET(taitob)
@@ -2413,7 +2413,7 @@ static MACHINE_CONFIG_START( tetrista, taitob_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(masterw_sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(taitob)
 	MCFG_MACHINE_RESET(taitob)
@@ -2460,7 +2460,7 @@ static MACHINE_CONFIG_START( hitice, taitob_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(viofight_sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(taitob)
 	MCFG_MACHINE_RESET(taitob)
@@ -2512,7 +2512,7 @@ static MACHINE_CONFIG_START( rambo3, taitob_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(taitob)
 	MCFG_MACHINE_RESET(taitob)
@@ -2559,7 +2559,7 @@ static MACHINE_CONFIG_START( rambo3a, taitob_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(taitob)
 	MCFG_MACHINE_RESET(taitob)
@@ -2608,7 +2608,7 @@ static MACHINE_CONFIG_START( pbobble, taitob_state )
 	MCFG_MACHINE_START(taitob)
 	MCFG_MACHINE_RESET(taitob)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_EEPROM_ADD("eeprom", taitob_eeprom_intf)
 
@@ -2656,7 +2656,7 @@ static MACHINE_CONFIG_START( spacedx, taitob_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(taitob)
 	MCFG_MACHINE_RESET(taitob)
@@ -2707,7 +2707,7 @@ static MACHINE_CONFIG_START( spacedxo, taitob_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(taitob)
 	MCFG_MACHINE_RESET(taitob)
@@ -2754,7 +2754,7 @@ static MACHINE_CONFIG_START( qzshowby, taitob_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(taitob)
 	MCFG_MACHINE_RESET(taitob)
@@ -2805,7 +2805,7 @@ static MACHINE_CONFIG_START( viofight, taitob_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 6000000)	/* 6 MHz verified */
 	MCFG_CPU_PROGRAM_MAP(viofight_sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(taitob)
 	MCFG_MACHINE_RESET(taitob)
@@ -2855,7 +2855,7 @@ static MACHINE_CONFIG_START( masterw, taitob_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(masterw_sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(taitob)
 	MCFG_MACHINE_RESET(taitob)
@@ -2903,7 +2903,7 @@ static MACHINE_CONFIG_START( silentd, taitob_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(taitob)
 	MCFG_MACHINE_RESET(taitob)
@@ -2950,7 +2950,7 @@ static MACHINE_CONFIG_START( selfeena, taitob_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(taitob)
 	MCFG_MACHINE_RESET(taitob)
@@ -3006,7 +3006,7 @@ static MACHINE_CONFIG_START( ryujin, taitob_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(taitob)
 	MCFG_MACHINE_RESET(taitob)
@@ -3060,7 +3060,7 @@ static MACHINE_CONFIG_START( sbm, taitob_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(taitob)
 	MCFG_MACHINE_RESET(taitob)

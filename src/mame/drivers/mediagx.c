@@ -687,7 +687,7 @@ static TIMER_DEVICE_CALLBACK( sound_timer_callback )
 	mediagx_state *state = timer.machine->driver_data<mediagx_state>();
 
 	state->ad1847_sample_counter = 0;
-	timer.adjust(ATTOTIME_IN_MSEC(10));
+	timer.adjust(attotime::from_msec(10));
 
 	dmadac_transfer(&state->dmadac[0], 1, 0, 1, state->dacl_ptr, state->dacl);
 	dmadac_transfer(&state->dmadac[1], 1, 0, 1, state->dacr_ptr, state->dacr);
@@ -1042,7 +1042,7 @@ static MACHINE_RESET(mediagx)
 	machine->device("maincpu")->reset();
 
 	timer_device *sound_timer = machine->device<timer_device>("sound_timer");
-	sound_timer->adjust(ATTOTIME_IN_MSEC(10));
+	sound_timer->adjust(attotime::from_msec(10));
 
 	state->dmadac[0] = machine->device<dmadac_sound_device>("dac1");
 	state->dmadac[1] = machine->device<dmadac_sound_device>("dac2");

@@ -385,7 +385,7 @@ static MACHINE_CONFIG_START( tceptor, driver_device )
 	MCFG_CPU_IO_MAP(mcu_io_map)
 	MCFG_CPU_VBLANK_INT("2dscreen", mcu_vb_interrupt)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 

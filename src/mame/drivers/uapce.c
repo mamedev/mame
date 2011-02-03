@@ -193,7 +193,7 @@ static MACHINE_CONFIG_START( uapce, driver_device )
 	MCFG_CPU_ADD("sub", Z80, 1400000)
 	MCFG_CPU_PROGRAM_MAP(z80_map)
 
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_RESET( uapce )
 

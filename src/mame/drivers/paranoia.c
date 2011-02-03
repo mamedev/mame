@@ -142,7 +142,7 @@ static MACHINE_CONFIG_START( paranoia, driver_device )
 	MCFG_CPU_IO_MAP(pce_io)
 	MCFG_CPU_VBLANK_INT_HACK(pce_interrupt, VDC_LPF)
 
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_CPU_ADD("sub", I8085A, 18000000/3)
 	MCFG_CPU_PROGRAM_MAP(paranoia_8085_map)

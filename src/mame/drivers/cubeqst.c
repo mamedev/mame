@@ -510,7 +510,7 @@ static MACHINE_CONFIG_START( cubeqst, driver_device )
 	MCFG_CPU_PROGRAM_MAP(line_sound_map)
 	MCFG_CPU_CONFIG(snd_config)
 
-	MCFG_QUANTUM_TIME(HZ(48000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(48000))
 
 	MCFG_MACHINE_START(cubeqst)
 	MCFG_MACHINE_RESET(cubeqst)

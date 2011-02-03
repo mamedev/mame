@@ -1170,7 +1170,7 @@ static MACHINE_CONFIG_START( ampoker2, ampoker2_state )
 	MCFG_CPU_PROGRAM_MAP(ampoker2_map)
 	MCFG_CPU_IO_MAP(ampoker2_io_map)
 	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 1536)
-	MCFG_WATCHDOG_TIME_INIT(MSEC(200))	/* 200 ms, measured */
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(200))	/* 200 ms, measured */
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

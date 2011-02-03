@@ -1334,7 +1334,7 @@ static MACHINE_CONFIG_START( bnstars, driver_device )
 //  MCFG_CPU_ADD("audiocpu", Z80, 4000000)
 //  MCFG_CPU_PROGRAM_MAP(bnstars_z80_map)
 
-	MCFG_QUANTUM_TIME(HZ(60000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
 	MCFG_MACHINE_RESET(ms32)
 

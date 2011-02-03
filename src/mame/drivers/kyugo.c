@@ -492,7 +492,7 @@ static MACHINE_CONFIG_START( gyrodine, kyugo_state )
 	MCFG_CPU_IO_MAP(gyrodine_sub_portmap)
 	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_START(kyugo)
 	MCFG_MACHINE_RESET(kyugo)

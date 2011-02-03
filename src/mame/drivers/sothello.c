@@ -360,7 +360,7 @@ static MACHINE_CONFIG_START( sothello, driver_device )
     MCFG_CPU_ADD("sub",M6809, SUBCPU_CLOCK)
     MCFG_CPU_PROGRAM_MAP(subcpu_mem_map)
 
-    MCFG_QUANTUM_TIME(HZ(600))
+    MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
     MCFG_MACHINE_RESET(sothello)
 

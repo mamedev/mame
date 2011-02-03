@@ -948,7 +948,7 @@ static MACHINE_CONFIG_START( darius, darius_state )
 	MCFG_CPU_PROGRAM_MAP(darius_sound2_map)
 	MCFG_CPU_IO_MAP(darius_sound2_io_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame ? */
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame ? */
 
 	MCFG_MACHINE_START(darius)
 	MCFG_MACHINE_RESET(darius)

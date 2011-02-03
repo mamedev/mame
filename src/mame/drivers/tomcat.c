@@ -402,7 +402,7 @@ static MACHINE_CONFIG_START( tomcat, tomcat_state )
 
 	MCFG_RIOT6532_ADD("riot", XTAL_14_31818MHz / 8, tomcat_riot6532_intf)
 
-	MCFG_QUANTUM_TIME(HZ(4000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(4000))
 
 	MCFG_MACHINE_START(tomcat)
 

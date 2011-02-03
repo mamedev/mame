@@ -600,11 +600,11 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 
 			if (m_config.m_sector_is_4k)
 			{
-				timer_adjust_oneshot( m_timer, ATTOTIME_IN_SEC( 1 ), 0 );
+				timer_adjust_oneshot( m_timer, attotime::from_seconds( 1 ), 0 );
 			}
 			else
 			{
-				timer_adjust_oneshot( m_timer, ATTOTIME_IN_SEC( 16 ), 0 );
+				timer_adjust_oneshot( m_timer, attotime::from_seconds( 16 ), 0 );
 			}
 		}
 		else if( ( data & 0xff ) == 0x30 )
@@ -617,14 +617,14 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 				for (offs_t offs = 0; offs < 4 * 1024; offs++)
 					m_addrspace[0]->write_byte((base & ~0xfff) + offs, 0xff);
 				m_erase_sector = address & ((m_config.m_bits == 16) ? ~0x7ff : ~0xfff);
-				timer_adjust_oneshot( m_timer, ATTOTIME_IN_MSEC( 125 ), 0 );
+				timer_adjust_oneshot( m_timer, attotime::from_msec( 125 ), 0 );
 			}
 			else
 			{
 				for (offs_t offs = 0; offs < 64 * 1024; offs++)
 					m_addrspace[0]->write_byte((base & ~0xffff) + offs, 0xff);
 				m_erase_sector = address & ((m_config.m_bits == 16) ? ~0x7fff : ~0xffff);
-				timer_adjust_oneshot( m_timer, ATTOTIME_IN_SEC( 1 ), 0 );
+				timer_adjust_oneshot( m_timer, attotime::from_seconds( 1 ), 0 );
 			}
 
 			m_status = 1 << 3;
@@ -680,7 +680,7 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 			m_status = 0x00;
 			m_flash_mode = FM_READSTATUS;
 
-			timer_adjust_oneshot( m_timer, ATTOTIME_IN_SEC( 1 ), 0 );
+			timer_adjust_oneshot( m_timer, attotime::from_seconds( 1 ), 0 );
 			break;
 		}
 		else

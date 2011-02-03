@@ -58,7 +58,7 @@ static VIDEO_START( acefruit )
 static INTERRUPT_GEN( acefruit_vblank )
 {
 	cpu_set_input_line(device, 0, HOLD_LINE );
-	timer_adjust_oneshot( acefruit_refresh_timer, attotime_zero, 0 );
+	timer_adjust_oneshot( acefruit_refresh_timer, attotime::zero, 0 );
 }
 
 static VIDEO_UPDATE( acefruit )

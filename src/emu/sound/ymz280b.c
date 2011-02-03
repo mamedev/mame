@@ -205,7 +205,7 @@ static STATE_POSTLOAD( YMZ280B_state_save_update_step )
 		struct YMZ280BVoice *voice = &chip->voice[j];
 		update_step(chip, voice);
 		if(voice->irq_schedule)
-			timer_set(machine, attotime_zero, chip, 0, update_irq_state_cb[j]);
+			timer_set(machine, attotime::zero, chip, 0, update_irq_state_cb[j]);
 	}
 }
 
@@ -581,7 +581,7 @@ static STREAM_UPDATE( ymz280b_update )
 				voice->playing = 0;
 
 				/* set update_irq_state_timer. IRQ is signaled on next CPU execution. */
-				timer_set(chip->device->machine, attotime_zero, chip, 0, update_irq_state_cb[v]);
+				timer_set(chip->device->machine, attotime::zero, chip, 0, update_irq_state_cb[v]);
 				voice->irq_schedule = 1;
 			}
 		}

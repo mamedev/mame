@@ -3280,7 +3280,7 @@ static CPU_RESET( sh4 )
 	sh4_default_exception_priorities(sh4);
 	memset(sh4->exception_requesting, 0, sizeof(sh4->exception_requesting));
 
-	timer_adjust_oneshot(sh4->rtc_timer, ATTOTIME_IN_HZ(128), 0);
+	timer_adjust_oneshot(sh4->rtc_timer, attotime::from_hz(128), 0);
 	sh4->m[RCR2] = 0x09;
 	sh4->m[TCOR0] = 0xffffffff;
 	sh4->m[TCNT0] = 0xffffffff;

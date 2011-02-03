@@ -372,7 +372,7 @@ static void ymf278b_timer_a_reset(YMF278BChip *chip)
 {
 	if(chip->enable & 1)
 	{
-		attotime period = ATTOTIME_IN_NSEC((256-chip->timer_a_count) * 80800);
+		attotime period = attotime::from_nsec((256-chip->timer_a_count) * 80800);
 
 		if (chip->clock != YMF278B_STD_CLOCK)
 			period = (period * chip->clock) / YMF278B_STD_CLOCK;
@@ -380,14 +380,14 @@ static void ymf278b_timer_a_reset(YMF278BChip *chip)
 		timer_adjust_periodic(chip->timer_a, period, 0, period);
 	}
 	else
-		timer_adjust_oneshot(chip->timer_a, attotime_never, 0);
+		timer_adjust_oneshot(chip->timer_a, attotime::never, 0);
 }
 
 static void ymf278b_timer_b_reset(YMF278BChip *chip)
 {
 	if(chip->enable & 2)
 	{
-		attotime period = ATTOTIME_IN_NSEC((256-chip->timer_b_count) * 323100);
+		attotime period = attotime::from_nsec((256-chip->timer_b_count) * 323100);
 
 		if (chip->clock != YMF278B_STD_CLOCK)
 			period = (period * chip->clock) / YMF278B_STD_CLOCK;
@@ -395,7 +395,7 @@ static void ymf278b_timer_b_reset(YMF278BChip *chip)
 		timer_adjust_periodic(chip->timer_b, period, 0, period);
 	}
 	else
-		timer_adjust_oneshot(chip->timer_b, attotime_never, 0);
+		timer_adjust_oneshot(chip->timer_b, attotime::never, 0);
 }
 
 static void ymf278b_A_w(running_machine *machine, YMF278BChip *chip, UINT8 reg, UINT8 data)

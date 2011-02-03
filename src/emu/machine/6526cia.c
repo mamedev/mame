@@ -208,7 +208,7 @@ void mos6526_device::device_start()
 	/* setup TOD timer, if appropriate */
 	if (m_config.m_tod_clock != 0)
 	{
-		timer_pulse(&m_machine, ATTOTIME_IN_HZ(m_config.m_tod_clock), (void *)this, 0, clock_tod_callback);
+		timer_pulse(&m_machine, attotime::from_hz(m_config.m_tod_clock), (void *)this, 0, clock_tod_callback);
 	}
 
 	/* state save support */
@@ -893,7 +893,7 @@ void mos6526_device::cia_timer::update(int which, INT32 new_count)
 	else
 	{
 		/* timer is off or not connected to clock */
-		timer_adjust_oneshot(m_timer, attotime_never, which);
+		timer_adjust_oneshot(m_timer, attotime::never, which);
 	}
 }
 

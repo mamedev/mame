@@ -1624,7 +1624,7 @@ static MACHINE_CONFIG_START( default, driver_device )
 	MCFG_CPU_PROGRAM_MAP(mcu_default_am)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_QUANTUM_TIME(HZ(12000)) /* CPU slices per frame */
+	MCFG_QUANTUM_TIME(attotime::from_hz(12000)) /* CPU slices per frame */
 
 	MCFG_MACHINE_START(namcos2)
 	MCFG_MACHINE_RESET(namcos2)
@@ -1668,7 +1668,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( assaultp, default2 )
 
-	MCFG_QUANTUM_TIME(HZ(12000*8)) /* CPU slices per frame - boosted (along with MCU speed) so that the Mode Select works */
+	MCFG_QUANTUM_TIME(attotime::from_hz(12000*8)) /* CPU slices per frame - boosted (along with MCU speed) so that the Mode Select works */
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( default3, default )
@@ -1701,7 +1701,7 @@ static MACHINE_CONFIG_START( gollygho, driver_device )
 	MCFG_CPU_PROGRAM_MAP(mcu_default_am)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_QUANTUM_TIME(HZ(6000)) /* CPU slices per frame */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
 
 	MCFG_MACHINE_START(namcos2)
 	MCFG_MACHINE_RESET(namcos2)
@@ -1751,7 +1751,7 @@ static MACHINE_CONFIG_START( finallap, driver_device )
 	MCFG_CPU_PROGRAM_MAP(mcu_default_am)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_QUANTUM_TIME(HZ(6000)) /* CPU slices per frame */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
 
 	MCFG_MACHINE_START(namcos2)
 	MCFG_MACHINE_RESET(namcos2)
@@ -1801,7 +1801,7 @@ static MACHINE_CONFIG_START( sgunner, driver_device )
 	MCFG_CPU_PROGRAM_MAP(mcu_default_am)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_QUANTUM_TIME(HZ(6000)) /* CPU slices per frame */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
 
 	MCFG_MACHINE_START(namcos2)
 	MCFG_MACHINE_RESET(namcos2)
@@ -1851,7 +1851,7 @@ static MACHINE_CONFIG_START( luckywld, driver_device )
 	MCFG_CPU_PROGRAM_MAP(mcu_default_am)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_QUANTUM_TIME(HZ(6000)) /* CPU slices per frame */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
 
 	MCFG_MACHINE_START(namcos2)
 	MCFG_MACHINE_RESET(namcos2)
@@ -1901,7 +1901,7 @@ static MACHINE_CONFIG_START( metlhawk, driver_device )
 	MCFG_CPU_PROGRAM_MAP(mcu_default_am)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_QUANTUM_TIME(HZ(6000)) /* CPU slices per frame */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
 
 	MCFG_MACHINE_START(namcos2)
 	MCFG_MACHINE_RESET(namcos2)

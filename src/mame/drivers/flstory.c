@@ -1105,7 +1105,7 @@ static MACHINE_CONFIG_START( flstory, flstory_state )
 	MCFG_CPU_ADD("mcu", M68705,XTAL_18_432MHz/6)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(flstory_m68705_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MCFG_MACHINE_START(flstory)
 	MCFG_MACHINE_RESET(flstory)
@@ -1163,7 +1163,7 @@ static MACHINE_CONFIG_START( onna34ro, flstory_state )
 //  MCFG_CPU_ADD("mcu", M68705,4000000)  /* ??? */
 //  MCFG_CPU_PROGRAM_MAP(m68705_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MCFG_MACHINE_START(flstory)
 	MCFG_MACHINE_RESET(flstory)
@@ -1221,7 +1221,7 @@ static MACHINE_CONFIG_START( victnine, flstory_state )
 //  MCFG_CPU_ADD("mcu", M68705,4000000)  /* ??? */
 //  MCFG_CPU_PROGRAM_MAP(m68705_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MCFG_MACHINE_START(flstory)
 	MCFG_MACHINE_RESET(flstory)
@@ -1286,7 +1286,7 @@ static MACHINE_CONFIG_START( rumba, flstory_state )
 
 //  MCFG_CPU_PROGRAM_MAP(m68705_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MCFG_MACHINE_START(flstory)
 	MCFG_MACHINE_RESET(rumba)

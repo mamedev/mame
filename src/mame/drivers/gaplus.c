@@ -259,10 +259,10 @@ static INTERRUPT_GEN( gaplus_interrupt_1 )
 								// so don't replace with cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 
 	if (!namcoio_read_reset_line(io58xx))		/* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(device->machine, ATTOTIME_IN_USEC(50), NULL, 0, namcoio_run);
+		timer_set(device->machine, attotime::from_usec(50), NULL, 0, namcoio_run);
 
 	if (!namcoio_read_reset_line(io56xx))		/* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(device->machine, ATTOTIME_IN_USEC(50), NULL, 1, namcoio_run);
+		timer_set(device->machine, attotime::from_usec(50), NULL, 1, namcoio_run);
 
 }
 
@@ -553,7 +553,7 @@ static MACHINE_CONFIG_START( gaplus, driver_device )
 	MCFG_CPU_PROGRAM_MAP(cpu3_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MCFG_QUANTUM_TIME(HZ(6000))	/* a high value to ensure proper synchronization of the CPUs */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* a high value to ensure proper synchronization of the CPUs */
 	MCFG_MACHINE_RESET(gaplus)
 
 	MCFG_NAMCO56XX_ADD("56xx", intf0_lamps)

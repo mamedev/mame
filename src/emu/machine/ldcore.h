@@ -83,9 +83,9 @@ typedef enum _slider_position slider_position;
 #define GENERIC_SEARCH_SPEED		(5000)					/* 5000x normal speed */
 
 /* generic timings; use player-specific information where appropriate */
-#define GENERIC_EJECT_TIME			(ATTOTIME_IN_SEC(5))
-#define GENERIC_SPINUP_TIME			(ATTOTIME_IN_SEC(2))
-#define GENERIC_LOAD_TIME			(ATTOTIME_IN_SEC(5))
+#define GENERIC_EJECT_TIME			(attotime::from_seconds(5))
+#define GENERIC_SPINUP_TIME			(attotime::from_seconds(2))
+#define GENERIC_LOAD_TIME			(attotime::from_seconds(5))
 
 
 

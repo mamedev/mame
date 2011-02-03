@@ -447,7 +447,7 @@ static MACHINE_CONFIG_START( pushman, pushman_state )
 	MCFG_CPU_ADD("mcu", M68705, 4000000)	/* No idea */
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
-	MCFG_QUANTUM_TIME(HZ(3600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(3600))
 
 	MCFG_MACHINE_START(pushman)
 	MCFG_MACHINE_RESET(pushman)
@@ -497,7 +497,7 @@ static MACHINE_CONFIG_START( bballs, pushman_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 
-	MCFG_QUANTUM_TIME(HZ(3600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(3600))
 
 	MCFG_MACHINE_START(pushman)
 	MCFG_MACHINE_RESET(bballs)

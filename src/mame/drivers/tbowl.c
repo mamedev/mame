@@ -478,7 +478,7 @@ static MACHINE_CONFIG_START( tbowl, driver_device )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* Actual Z80 */
 	MCFG_CPU_PROGRAM_MAP(6206A_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
 	MCFG_GFXDECODE(tbowl)

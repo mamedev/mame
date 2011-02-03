@@ -232,7 +232,7 @@ static MACHINE_CONFIG_START( flkatck, flkatck_state )
 	MCFG_CPU_ADD("audiocpu", Z80,3579545)	/* NEC D780C-1, 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(flkatck_sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(flkatck)
 	MCFG_MACHINE_RESET(flkatck)

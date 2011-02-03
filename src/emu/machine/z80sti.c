@@ -253,14 +253,14 @@ void z80sti_device::device_start()
 	if (m_config.m_rx_clock > 0)
 	{
 		m_rx_timer = timer_alloc(&m_machine, static_rx_tick, (void *)this);
-		timer_adjust_periodic(m_rx_timer, attotime_zero, 0, ATTOTIME_IN_HZ(m_config.m_rx_clock));
+		timer_adjust_periodic(m_rx_timer, attotime::zero, 0, attotime::from_hz(m_config.m_rx_clock));
 	}
 
 	// create serial transmit clock timer
 	if (m_config.m_tx_clock > 0)
 	{
 		m_tx_timer = timer_alloc(&m_machine, static_tx_tick, (void *)this);
-		timer_adjust_periodic(m_tx_timer, attotime_zero, 0, ATTOTIME_IN_HZ(m_config.m_tx_clock));
+		timer_adjust_periodic(m_tx_timer, attotime::zero, 0, attotime::from_hz(m_config.m_tx_clock));
 	}
 
 	// register for state saving
@@ -560,12 +560,12 @@ void z80sti_device::write(offs_t offset, UINT8 data)
 			LOG(("Z80STI '%s' Timer D Prescaler: %u\n", tag(), tdc));
 
 			if (tcc)
-				timer_adjust_periodic(m_timer[TIMER_C], ATTOTIME_IN_HZ(clock() / tcc), TIMER_C, ATTOTIME_IN_HZ(clock() / tcc));
+				timer_adjust_periodic(m_timer[TIMER_C], attotime::from_hz(clock() / tcc), TIMER_C, attotime::from_hz(clock() / tcc));
 			else
 				timer_enable(m_timer[TIMER_C], 0);
 
 			if (tdc)
-				timer_adjust_periodic(m_timer[TIMER_D], ATTOTIME_IN_HZ(clock() / tdc), TIMER_D, ATTOTIME_IN_HZ(clock() / tdc));
+				timer_adjust_periodic(m_timer[TIMER_D], attotime::from_hz(clock() / tdc), TIMER_D, attotime::from_hz(clock() / tdc));
 			else
 				timer_enable(m_timer[TIMER_D], 0);
 
@@ -666,12 +666,12 @@ void z80sti_device::write(offs_t offset, UINT8 data)
 		LOG(("Z80STI '%s' Timer B Prescaler: %u\n", tag(), tbc));
 
 		if (tac)
-			timer_adjust_periodic(m_timer[TIMER_A], ATTOTIME_IN_HZ(clock() / tac), TIMER_A, ATTOTIME_IN_HZ(clock() / tac));
+			timer_adjust_periodic(m_timer[TIMER_A], attotime::from_hz(clock() / tac), TIMER_A, attotime::from_hz(clock() / tac));
 		else
 			timer_enable(m_timer[TIMER_A], 0);
 
 		if (tbc)
-			timer_adjust_periodic(m_timer[TIMER_B], ATTOTIME_IN_HZ(clock() / tbc), TIMER_B, ATTOTIME_IN_HZ(clock() / tbc));
+			timer_adjust_periodic(m_timer[TIMER_B], attotime::from_hz(clock() / tbc), TIMER_B, attotime::from_hz(clock() / tbc));
 		else
 			timer_enable(m_timer[TIMER_B], 0);
 		}

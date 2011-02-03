@@ -910,7 +910,7 @@ static TIMER_CALLBACK( internal_timer_int )
 		if (LOG_TIMER) logerror("  Repriming interrupt\n");
 	}
 	else
-		timer_adjust_oneshot(t->int_timer, attotime_never, which);
+		timer_adjust_oneshot(t->int_timer, attotime::never, which);
 }
 
 
@@ -1024,7 +1024,7 @@ static void internal_timer_update(leland_sound_state *state, int which, int new_
 				internal_timer_sync(state, which);
 
 				/* nuke the timer and force the interrupt timer to be recomputed */
-				timer_adjust_oneshot(t->time_timer, attotime_never, which);
+				timer_adjust_oneshot(t->time_timer, attotime::never, which);
 				t->time_timer_active = 0;
 				update_int_timer = 1;
 			}
@@ -1033,7 +1033,7 @@ static void internal_timer_update(leland_sound_state *state, int which, int new_
 			else if ((diff & 0x8000) && (new_control & 0x8000))
 			{
 				/* start the timing */
-				timer_adjust_oneshot(t->time_timer, attotime_never, which);
+				timer_adjust_oneshot(t->time_timer, attotime::never, which);
 				t->time_timer_active = 1;
 				update_int_timer = 1;
 			}
@@ -1066,7 +1066,7 @@ static void internal_timer_update(leland_sound_state *state, int which, int new_
 				if (LOG_TIMER) logerror("Set interrupt timer for %d\n", which);
 			}
 			else
-				timer_adjust_oneshot(t->int_timer, attotime_never, which);
+				timer_adjust_oneshot(t->int_timer, attotime::never, which);
 		}
 }
 
@@ -1696,7 +1696,7 @@ static WRITE16_DEVICE_HANDLER( pit8254_w )
 				if (ctr->count == 0) ctr->count = 0x10000;
 
 				/* reset/start the timer */
-				timer_adjust_oneshot(ctr->timer, attotime_never, 0);
+				timer_adjust_oneshot(ctr->timer, attotime::never, 0);
 
 				if (LOG_PIT) logerror("PIT counter %d set to %d (%d Hz)\n", which, ctr->count, 4000000 / ctr->count);
 

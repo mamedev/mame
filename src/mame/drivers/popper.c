@@ -336,7 +336,7 @@ static MACHINE_CONFIG_START( popper, popper_state )
 	MCFG_CPU_PROGRAM_MAP(popper_sound_map)
 	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,4)		//NMIs caused by the main CPU
 
-	MCFG_QUANTUM_TIME(HZ(1800))
+	MCFG_QUANTUM_TIME(attotime::from_hz(1800))
 
 	MCFG_MACHINE_START(popper)
 	MCFG_MACHINE_RESET(popper)

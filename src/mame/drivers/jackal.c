@@ -373,7 +373,7 @@ static MACHINE_CONFIG_START( jackal, jackal_state )
 	MCFG_CPU_ADD("slave", M6809, MASTER_CLOCK/12) // verified on pcb
 	MCFG_CPU_PROGRAM_MAP(slave_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_START(jackal)
 	MCFG_MACHINE_RESET(jackal)

@@ -465,7 +465,7 @@ static MACHINE_CONFIG_START( mcatadv, mcatadv_state )
 	MCFG_GFXDECODE(mcatadv)
 	MCFG_PALETTE_LENGTH(0x2000/2)
 
-	MCFG_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))	/* a guess, and certainly wrong */
 
 	MCFG_VIDEO_START(mcatadv)
 	MCFG_VIDEO_EOF(mcatadv) // Buffer Spriteram

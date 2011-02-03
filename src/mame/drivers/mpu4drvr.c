@@ -2235,7 +2235,7 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 static MACHINE_CONFIG_START( mpu4_vid, driver_device )
 	MCFG_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4 )
 	MCFG_CPU_PROGRAM_MAP(mpu4_6809_map)
-	MCFG_TIMER_ADD_PERIODIC("50hz",gen_50hz, HZ(100))
+	MCFG_TIMER_ADD_PERIODIC("50hz",gen_50hz, attotime::from_hz(100))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")				/* confirm */
 
@@ -2259,7 +2259,7 @@ static MACHINE_CONFIG_START( mpu4_vid, driver_device )
 	MCFG_CPU_ADD("video", M68000, VIDEO_MASTER_CLOCK )
 	MCFG_CPU_PROGRAM_MAP(mpu4_68k_map)
 
-	MCFG_QUANTUM_TIME(HZ(960))
+	MCFG_QUANTUM_TIME(attotime::from_hz(960))
 
 	MCFG_MACHINE_START(mpu4_vid)
 	MCFG_MACHINE_RESET(mpu4_vid)
@@ -2312,7 +2312,7 @@ static MACHINE_CONFIG_START( dealem, driver_device )
 	MCFG_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(dealem_memmap)
 
-	MCFG_TIMER_ADD_PERIODIC("50hz",gen_50hz, HZ(100))
+	MCFG_TIMER_ADD_PERIODIC("50hz",gen_50hz, attotime::from_hz(100))
 
 	MCFG_PTM6840_ADD("ptm_ic2", ptm_ic2_intf)
 

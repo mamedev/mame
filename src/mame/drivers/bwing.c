@@ -430,7 +430,7 @@ static MACHINE_CONFIG_START( bwing, bwing_state )
 	MCFG_CPU_IO_MAP(bwp3_io_map)
 	MCFG_CPU_PERIODIC_INT(bwp3_interrupt, 1000)
 
-	MCFG_QUANTUM_TIME(HZ(18000))		// high enough?
+	MCFG_QUANTUM_TIME(attotime::from_hz(18000))		// high enough?
 
 	MCFG_MACHINE_START(bwing)
 	MCFG_MACHINE_RESET(bwing)

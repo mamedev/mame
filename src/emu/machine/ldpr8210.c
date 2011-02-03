@@ -55,12 +55,12 @@
 
 /* serial timing, mostly from the service manual, derived from the XTAL */
 #define SERIAL_CLOCK					XTAL_455kHz
-#define SERIAL_0_BIT_TIME				ATTOTIME_IN_HZ((double)SERIAL_CLOCK / 512)
-#define SERIAL_1_BIT_TIME				ATTOTIME_IN_HZ((double)SERIAL_CLOCK / 1024)
-#define SERIAL_MIDPOINT_TIME			ATTOTIME_IN_HZ((double)SERIAL_CLOCK / 600)
-#define SERIAL_MAX_BIT_TIME				ATTOTIME_IN_HZ((double)SERIAL_CLOCK / 4096)
-#define SERIAL_MAX_WORD_TIME			ATTOTIME_IN_HZ((double)SERIAL_CLOCK / 11520)
-#define SERIAL_REJECT_DUPLICATE_TIME	ATTOTIME_IN_HZ((double)SERIAL_CLOCK / 11520 / 4)
+#define SERIAL_0_BIT_TIME				attotime::from_hz((double)SERIAL_CLOCK / 512)
+#define SERIAL_1_BIT_TIME				attotime::from_hz((double)SERIAL_CLOCK / 1024)
+#define SERIAL_MIDPOINT_TIME			attotime::from_hz((double)SERIAL_CLOCK / 600)
+#define SERIAL_MAX_BIT_TIME				attotime::from_hz((double)SERIAL_CLOCK / 4096)
+#define SERIAL_MAX_WORD_TIME			attotime::from_hz((double)SERIAL_CLOCK / 11520)
+#define SERIAL_REJECT_DUPLICATE_TIME	attotime::from_hz((double)SERIAL_CLOCK / 11520 / 4)
 
 
 

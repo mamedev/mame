@@ -237,7 +237,7 @@ static WRITE8_HANDLER( polyplay_start_timer2 )
 		polyplay_timer->reset();
 
 	if (data == 0xb5)
-		polyplay_timer->adjust(ATTOTIME_IN_HZ(40), 0, ATTOTIME_IN_HZ(40));
+		polyplay_timer->adjust(attotime::from_hz(40), 0, attotime::from_hz(40));
 }
 
 static READ8_HANDLER( polyplay_random_read )

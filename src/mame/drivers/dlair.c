@@ -731,7 +731,7 @@ static MACHINE_CONFIG_START( dleuro, dlair_state )
 	MCFG_Z80CTC_ADD("ctc", MASTER_CLOCK_EURO/4 /* same as "maincpu" */, ctc_intf)
 	MCFG_Z80SIO_ADD("sio", MASTER_CLOCK_EURO/4 /* same as "maincpu" */, sio_intf)
 
-	MCFG_WATCHDOG_TIME_INIT(HZ(MASTER_CLOCK_EURO/(16*16*16*16*16*8)))
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(MASTER_CLOCK_EURO/(16*16*16*16*16*8)))
 
 	MCFG_MACHINE_START(dlair)
 	MCFG_MACHINE_RESET(dlair)

@@ -1239,7 +1239,7 @@ READ8_DEVICE_HANDLER( tms5110_romclk_hack_r )
     if (!tms->romclk_hack_timer_started)
     {
     	tms->romclk_hack_timer_started = TRUE;
-		timer_adjust_periodic(tms->romclk_hack_timer, ATTOTIME_IN_HZ(device->clock() / 40), 0, ATTOTIME_IN_HZ(device->clock() / 40));
+		timer_adjust_periodic(tms->romclk_hack_timer, attotime::from_hz(device->clock() / 40), 0, attotime::from_hz(device->clock() / 40));
 	}
     return tms->romclk_hack_state;
 }
@@ -1422,7 +1422,7 @@ static DEVICE_START( tmsprom )
 	tms->clock = device->clock();
 
 	tms->romclk_timer = timer_alloc(device->machine, tmsprom_step, device);
-	timer_adjust_periodic(tms->romclk_timer, attotime_zero, 0, ATTOTIME_IN_HZ(tms->clock));
+	timer_adjust_periodic(tms->romclk_timer, attotime::zero, 0, attotime::from_hz(tms->clock));
 
 	tms->bit = 0;
 	tms->base_address = 0;

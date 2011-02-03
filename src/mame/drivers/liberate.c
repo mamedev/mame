@@ -838,7 +838,7 @@ static MACHINE_CONFIG_START( liberate, liberate_state )
 	MCFG_CPU_PROGRAM_MAP(liberate_sound_map)
 	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,16*60) /* ??? */
 
-	MCFG_QUANTUM_TIME(HZ(12000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
 	MCFG_MACHINE_START(liberate)
 	MCFG_MACHINE_RESET(liberate)
@@ -894,7 +894,7 @@ static MACHINE_CONFIG_DERIVED( prosoccr, liberate )
 	MCFG_CPU_CLOCK(10000000/8) //xtal is 12 Mhz, divider is unknown
 	MCFG_CPU_PROGRAM_MAP(prosoccr_sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(12000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 32*8-1)
@@ -917,7 +917,7 @@ static MACHINE_CONFIG_START( prosport, liberate_state )
 	MCFG_CPU_PROGRAM_MAP(liberate_sound_map)
 	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,16*60) /* ??? */
 
-//  MCFG_QUANTUM_TIME(HZ(12000))
+//  MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
 	MCFG_MACHINE_START(liberate)
 	MCFG_MACHINE_RESET(liberate)

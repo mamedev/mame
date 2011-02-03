@@ -674,7 +674,7 @@ DEVICE_IMAGE_LOAD( floppy )
 	else
 		next_wpt = CLEAR_LINE;
 
-	timer_set(image.device().machine, ATTOTIME_IN_MSEC(250), flopimg, next_wpt, set_wpt);
+	timer_set(image.device().machine, attotime::from_msec(250), flopimg, next_wpt, set_wpt);
 
 	return retVal;
 }
@@ -702,7 +702,7 @@ DEVICE_IMAGE_UNLOAD( floppy )
 	devcb_call_write_line(&flopimg->out_wpt_func, flopimg->wpt);
 
 	/* set timer for disk eject */
-	timer_set(image.device().machine, ATTOTIME_IN_MSEC(250), flopimg, ASSERT_LINE, set_wpt);
+	timer_set(image.device().machine, attotime::from_msec(250), flopimg, ASSERT_LINE, set_wpt);
 }
 
 device_t *floppy_get_device(running_machine *machine,int drive)
@@ -843,7 +843,7 @@ WRITE_LINE_DEVICE_HANDLER( floppy_mon_w )
 
 	/* on -> off */
 	else if (drive->mon == CLEAR_LINE && state)
-		timer_adjust_oneshot((emu_timer*)drive->index_timer, attotime_zero, 0);
+		timer_adjust_oneshot((emu_timer*)drive->index_timer, attotime::zero, 0);
 
 	drive->mon = state;
 }

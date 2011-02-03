@@ -576,7 +576,7 @@ static MACHINE_CONFIG_START( syvalion, taitoh_state )
 	MCFG_MACHINE_START(taitoh)
 	MCFG_MACHINE_RESET(taitoh)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_TC0220IOC_ADD("tc0220ioc", taitoh_io_intf)
 
@@ -621,7 +621,7 @@ static MACHINE_CONFIG_START( recordbr, taitoh_state )
 	MCFG_MACHINE_START(taitoh)
 	MCFG_MACHINE_RESET(taitoh)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_TC0220IOC_ADD("tc0220ioc", taitoh_io_intf)
 
@@ -666,7 +666,7 @@ static MACHINE_CONFIG_START( dleague, taitoh_state )
 	MCFG_MACHINE_START(taitoh)
 	MCFG_MACHINE_RESET(taitoh)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_TC0220IOC_ADD("tc0220ioc", taitoh_io_intf)
 

@@ -306,7 +306,7 @@
  *************************************/
 
 #define SYSTEM_CLOCK		100000000
-#define TIMER_PERIOD		ATTOTIME_IN_HZ(SYSTEM_CLOCK)
+#define TIMER_PERIOD		attotime::from_hz(SYSTEM_CLOCK)
 
 #define MAX_DYNAMIC_ADDRESSES	32
 
@@ -1171,7 +1171,7 @@ static WRITE32_HANDLER( nile_w )
 				if (nile_regs[offset] & 2)
 					logerror("Unexpected value: timer %d is prescaled\n", which);
 				nile_regs[offset + 1] = timer_timeleft(timer[which]).as_double() * SYSTEM_CLOCK;
-				timer_adjust_oneshot(timer[which], attotime_never, which);
+				timer_adjust_oneshot(timer[which], attotime::never, which);
 			}
 			break;
 

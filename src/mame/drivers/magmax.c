@@ -359,7 +359,7 @@ static MACHINE_CONFIG_START( magmax, magmax_state )
 	MCFG_CPU_PROGRAM_MAP(magmax_sound_map)
 	MCFG_CPU_IO_MAP(magmax_sound_io_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(magmax)
 	MCFG_MACHINE_RESET(magmax)

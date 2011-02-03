@@ -572,7 +572,7 @@ static MACHINE_CONFIG_START( twincobr, driver_device )
 	/* Data Map is internal to the CPU */
 	MCFG_CPU_IO_MAP(DSP_io_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_RESET(twincobr)
 

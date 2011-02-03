@@ -254,7 +254,7 @@ static void dma_stop_timer( psx_machine *p_psx, int n_channel )
 {
 	psx_dma_channel *dma = &p_psx->channel[ n_channel ];
 
-	timer_adjust_oneshot( dma->timer, attotime_never, 0);
+	timer_adjust_oneshot( dma->timer, attotime::never, 0);
 	dma->b_running = 0;
 }
 
@@ -656,7 +656,7 @@ static void root_timer_adjust( psx_machine *p_psx, int n_counter )
 
 	if( ( root->n_mode & PSX_RC_STOP ) != 0 )
 	{
-		timer_adjust_oneshot( root->timer, attotime_never, n_counter);
+		timer_adjust_oneshot( root->timer, attotime::never, n_counter);
 	}
 	else
 	{
@@ -818,13 +818,13 @@ static void sio_timer_adjust( psx_machine *p_psx, int n_port )
 		}
 		else
 		{
-			n_time = attotime_never;
+			n_time = attotime::never;
 			verboselog( p_psx, 0, "sio_timer_adjust( %d ) invalid baud rate ( %d x %d )\n", n_port, n_prescaler, sio->n_baud );
 		}
 	}
 	else
 	{
-		n_time = attotime_never;
+		n_time = attotime::never;
 		verboselog( p_psx, 2, "sio_timer_adjust( %d ) finished\n", n_port );
 	}
 	timer_adjust_oneshot( sio->timer, n_time, n_port);

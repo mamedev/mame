@@ -1324,7 +1324,7 @@ static MACHINE_CONFIG_START( jalmah, driver_device )
 	MCFG_VIDEO_START(jalmah)
 	MCFG_VIDEO_UPDATE(jalmah)
 
-	MCFG_TIMER_ADD_PERIODIC("mcusim", jalmah_mcu_sim, HZ(10000)) // not real, but for simulating the MCU
+	MCFG_TIMER_ADD_PERIODIC("mcusim", jalmah_mcu_sim, attotime::from_hz(10000)) // not real, but for simulating the MCU
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_OKIM6295_ADD("oki", 4000000, OKIM6295_PIN7_LOW)

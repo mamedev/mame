@@ -94,7 +94,7 @@ WRITE8_HANDLER( irobot_statwr_w )
 		else
 			logerror("vg start [busy!] ");
 		IR_CPU_STATE(space->machine);
-		state->irvg_timer->adjust(ATTOTIME_IN_MSEC(10));
+		state->irvg_timer->adjust(attotime::from_msec(10));
 #endif
 		state->irvg_running=1;
 	}

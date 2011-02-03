@@ -890,7 +890,7 @@ static MACHINE_CONFIG_START( cntsteer, cntsteer_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_GFXDECODE(cntsteer)
 	MCFG_PALETTE_LENGTH(256)
@@ -927,7 +927,7 @@ static MACHINE_CONFIG_START( zerotrgt, cntsteer_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT(sound_interrupt, 480)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_START(zerotrgt)
 	MCFG_MACHINE_RESET(zerotrgt)

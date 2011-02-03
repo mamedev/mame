@@ -192,7 +192,7 @@ static void refresh_timer(mn102_info *cpustate, int tmr)
 				rate /= cpustate->simple_timer[tmr].base;
 
 				if (tmr != 8)	// HACK: timer 8 is run at 500 kHz by the Taito program for no obvious reason, which kills performance
-					timer_adjust_oneshot(cpustate->timer_timers[tmr], ATTOTIME_IN_HZ(rate), tmr);
+					timer_adjust_oneshot(cpustate->timer_timers[tmr], attotime::from_hz(rate), tmr);
 			}
 			else
 			{
@@ -202,7 +202,7 @@ static void refresh_timer(mn102_info *cpustate, int tmr)
 	}
 	else	// disabled, so stop it
 	{
-		timer_adjust_oneshot(cpustate->timer_timers[tmr], attotime_never, tmr);
+		timer_adjust_oneshot(cpustate->timer_timers[tmr], attotime::never, tmr);
 	}
 }
 
@@ -296,7 +296,7 @@ static CPU_INIT(mn10200)
 	for (tmr = 0; tmr < NUM_TIMERS_8BIT; tmr++)
 	{
 		cpustate->timer_timers[tmr] = timer_alloc(device->machine, simple_timer_cb, cpustate);
-		timer_adjust_oneshot(cpustate->timer_timers[tmr], attotime_never, tmr);
+		timer_adjust_oneshot(cpustate->timer_timers[tmr], attotime::never, tmr);
 	}
 }
 
@@ -319,7 +319,7 @@ static CPU_RESET(mn10200)
 		cpustate->simple_timer[tmr].mode = 0;
 		cpustate->simple_timer[tmr].cur = 0;
 		cpustate->simple_timer[tmr].base = 0;
-		timer_adjust_oneshot(cpustate->timer_timers[tmr], attotime_never, tmr);
+		timer_adjust_oneshot(cpustate->timer_timers[tmr], attotime::never, tmr);
 	}
 
 	// clear all interrupt groups

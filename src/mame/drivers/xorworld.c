@@ -179,7 +179,7 @@ static MACHINE_CONFIG_START( xorworld, xorworld_state )
 	MCFG_CPU_PROGRAM_MAP(xorworld_map)
 	MCFG_CPU_VBLANK_INT_HACK(xorworld_interrupt, 4)	// 1 IRQ2 + 1 IRQ4 + 1 IRQ6
 
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 

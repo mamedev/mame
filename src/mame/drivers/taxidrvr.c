@@ -374,7 +374,7 @@ static MACHINE_CONFIG_START( taxidrvr, driver_device )
 	MCFG_CPU_IO_MAP(cpu3_port_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	/* ??? */
 
-	MCFG_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 
 	MCFG_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )

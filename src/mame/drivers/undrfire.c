@@ -756,7 +756,7 @@ static MACHINE_CONFIG_START( cbombers, driver_device )
 	MCFG_CPU_PROGRAM_MAP(cbombers_cpub_map)
 	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MCFG_QUANTUM_TIME(HZ(480))	/* CPU slices - Need to interleave Cpu's 1 & 3 */
+	MCFG_QUANTUM_TIME(attotime::from_hz(480))	/* CPU slices - Need to interleave Cpu's 1 & 3 */
 
 	MCFG_EEPROM_ADD("eeprom", undrfire_eeprom_interface)
 

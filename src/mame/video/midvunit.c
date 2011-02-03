@@ -61,7 +61,7 @@ static TIMER_CALLBACK( scanline_timer_cb )
 	{
 		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 		timer_adjust_oneshot(scanline_timer, machine->primary_screen->time_until_pos(scanline + 1), scanline);
-		timer_set(machine, ATTOTIME_IN_HZ(25000000), NULL, -1, scanline_timer_cb);
+		timer_set(machine, attotime::from_hz(25000000), NULL, -1, scanline_timer_cb);
 	}
 	else
 		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);

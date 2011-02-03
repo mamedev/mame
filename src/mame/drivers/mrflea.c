@@ -370,7 +370,7 @@ static MACHINE_CONFIG_START( mrflea, mrflea_state )
 	MCFG_CPU_IO_MAP(mrflea_slave_io_map)
 	MCFG_CPU_VBLANK_INT_HACK(mrflea_slave_interrupt,2)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_START(mrflea)
 	MCFG_MACHINE_RESET(mrflea)

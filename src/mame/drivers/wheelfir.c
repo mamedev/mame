@@ -813,7 +813,7 @@ static MACHINE_CONFIG_START( wheelfir, wheelfir_state )
 	MCFG_CPU_PROGRAM_MAP(wheelfir_sub)
 	//MCFG_CPU_VBLANK_INT_HACK(irq1_line_hold,256)
 
-	MCFG_QUANTUM_TIME(HZ(12000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
 	MCFG_MACHINE_RESET (wheelfir)
 

@@ -109,7 +109,7 @@ static WRITE16_HANDLER( cabal_sound_irq_trigger_word_w )
 	seibu_main_word_w(space,4,data,mem_mask);
 
 	/* spin for a while to let the Z80 read the command, otherwise coins "stick" */
-	cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(50));
+	cpu_spinuntil_time(space->cpu, attotime::from_usec(50));
 }
 
 static WRITE16_HANDLER( cabalbl_sound_irq_trigger_word_w )
@@ -547,7 +547,7 @@ static MACHINE_CONFIG_START( cabalbl, cabal_state )
 	MCFG_CPU_IO_MAP(cabalbl_talk2_portmap)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold,8000)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_RESET(cabalbl)
 

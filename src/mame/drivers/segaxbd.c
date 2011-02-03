@@ -313,7 +313,7 @@ static void update_main_irqs(running_machine *machine)
 	if (irq)
 	{
 		cpu_set_input_line(state->maincpu, irq, ASSERT_LINE);
-		cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
+		cpuexec_boost_interleave(machine, attotime::zero, attotime::from_usec(100));
 	}
 }
 
@@ -418,7 +418,7 @@ static void xboard_reset(device_t *device)
 	segas1x_state *state = device->machine->driver_data<segas1x_state>();
 
 	cpu_set_input_line(state->subcpu, INPUT_LINE_RESET, PULSE_LINE);
-	cpuexec_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(100));
+	cpuexec_boost_interleave(device->machine, attotime::zero, attotime::from_usec(100));
 }
 
 
@@ -677,7 +677,7 @@ static WRITE16_HANDLER( loffire_sync0_w )
 	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 
 	COMBINE_DATA(&state->loffire_sync[offset]);
-	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(10));
+	cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(10));
 }
 
 
@@ -1347,7 +1347,7 @@ static MACHINE_CONFIG_START( xboard, segas1x_state )
 	MCFG_MACHINE_RESET(xboard)
 	MCFG_NVRAM_ADD_0FILL("backup1")
 	MCFG_NVRAM_ADD_0FILL("backup2")
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_315_5248_ADD("5248_main")
 	MCFG_315_5248_ADD("5248_subx")

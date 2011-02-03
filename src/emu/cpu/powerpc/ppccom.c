@@ -1809,7 +1809,7 @@ static TIMER_CALLBACK( ppc4xx_fit_callback )
 
 	/* otherwise, turn ourself off */
 	else
-		timer_adjust_oneshot(ppc->fit_timer, attotime_never, FALSE);
+		timer_adjust_oneshot(ppc->fit_timer, attotime::never, FALSE);
 }
 
 
@@ -1840,7 +1840,7 @@ static TIMER_CALLBACK( ppc4xx_pit_callback )
 
 	/* otherwise, turn ourself off */
 	else
-		timer_adjust_oneshot(ppc->pit_timer, attotime_never, FALSE);
+		timer_adjust_oneshot(ppc->pit_timer, attotime::never, FALSE);
 }
 
 
@@ -1908,7 +1908,7 @@ static void ppc4xx_spu_timer_reset(powerpc_state *ppc)
 	/* if we're enabled, reset at the current baud rate */
 	if (enabled)
 	{
-		attotime clockperiod = ATTOTIME_IN_HZ((ppc->dcr[DCR4XX_IOCR] & 0x02) ? 3686400 : 33333333);
+		attotime clockperiod = attotime::from_hz((ppc->dcr[DCR4XX_IOCR] & 0x02) ? 3686400 : 33333333);
 		int divisor = ((ppc->spu.regs[SPU4XX_BAUD_DIVISOR_H] * 256 + ppc->spu.regs[SPU4XX_BAUD_DIVISOR_L]) & 0xfff) + 1;
 		int bpc = 7 + ((ppc->spu.regs[SPU4XX_CONTROL] & 8) >> 3) + 1 + (ppc->spu.regs[SPU4XX_CONTROL] & 1);
 		attotime charperiod = clockperiod * (divisor * 16 * bpc);
@@ -1919,7 +1919,7 @@ static void ppc4xx_spu_timer_reset(powerpc_state *ppc)
 
 	/* otherwise, disable the timer */
 	else
-		timer_adjust_oneshot(ppc->spu.timer, attotime_never, 0);
+		timer_adjust_oneshot(ppc->spu.timer, attotime::never, 0);
 }
 
 

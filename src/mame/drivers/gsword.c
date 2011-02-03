@@ -692,13 +692,13 @@ static MACHINE_CONFIG_START( gsword, gsword_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18MHz/6) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu3_map)
 
-	MCFG_QUANTUM_TIME(HZ(12000)) /* Allow time for 2nd cpu to interleave*/
+	MCFG_QUANTUM_TIME(attotime::from_hz(12000)) /* Allow time for 2nd cpu to interleave*/
 
 	MCFG_MACHINE_RESET(gsword)
 
 #if 1
 	/* to MCU timeout champbbj */
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 #endif
 
 	/* video hardware */

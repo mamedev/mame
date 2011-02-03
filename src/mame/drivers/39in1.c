@@ -255,7 +255,7 @@ static void pxa255_dma_load_descriptor_and_start(running_machine* machine, int c
 	// transfer is running before starting another one on the same channel.
 	if (timer_enabled(dma_regs->timer[channel]))
 	{
-		timer_adjust_oneshot(dma_regs->timer[channel], attotime_never, 0);
+		timer_adjust_oneshot(dma_regs->timer[channel], attotime::never, 0);
 	}
 
 	// Load the next descriptor

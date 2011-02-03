@@ -424,7 +424,7 @@ static MACHINE_CONFIG_START( triforce_base, driver_device )
 	MCFG_CPU_ADD("maincpu", PPC403GA, 64000000) /* Wrong! */
 	MCFG_CPU_PROGRAM_MAP(gc_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

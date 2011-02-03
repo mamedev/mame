@@ -73,7 +73,7 @@ static void sh2_timer_activate(sh2_state *sh2)
 	int max_delta = 0xfffff;
 	UINT16 frc;
 
-	timer_adjust_oneshot(sh2->timer, attotime_never, 0);
+	timer_adjust_oneshot(sh2->timer, attotime::never, 0);
 
 	frc = sh2->frc;
 	if(!(sh2->m[4] & OCFA)) {
@@ -172,7 +172,7 @@ void sh2_notify_dma_data_available(device_t *device)
 		{
 		//  printf("resuming stalled dma\n");
 			sh2->dma_timer_active[dma]=1;
-			timer_adjust_oneshot(sh2->dma_current_active_timer[dma], attotime_zero, dma);
+			timer_adjust_oneshot(sh2->dma_current_active_timer[dma], attotime::zero, dma);
 		}
 	}
 
@@ -493,8 +493,8 @@ static void sh2_dmac_check(sh2_state *sh2, int dma)
 		if(sh2->dma_timer_active[dma])
 		{
 			logerror("SH2: DMA %d cancelled in-flight\n", dma);
-			//timer_adjust_oneshot(sh2->dma_complete_timer[dma], attotime_never, 0);
-			timer_adjust_oneshot(sh2->dma_current_active_timer[dma], attotime_never, 0);
+			//timer_adjust_oneshot(sh2->dma_complete_timer[dma], attotime::never, 0);
+			timer_adjust_oneshot(sh2->dma_current_active_timer[dma], attotime::never, 0);
 
 			sh2->dma_timer_active[dma] = 0;
 		}
@@ -924,13 +924,13 @@ void sh2_common_init(sh2_state *sh2, legacy_cpu_device *device, device_irq_callb
 	int i;
 
 	sh2->timer = timer_alloc(device->machine, sh2_timer_callback, sh2);
-	timer_adjust_oneshot(sh2->timer, attotime_never, 0);
+	timer_adjust_oneshot(sh2->timer, attotime::never, 0);
 
 	sh2->dma_current_active_timer[0] = timer_alloc(device->machine, sh2_dma_current_active_callback, sh2);
-	timer_adjust_oneshot(sh2->dma_current_active_timer[0], attotime_never, 0);
+	timer_adjust_oneshot(sh2->dma_current_active_timer[0], attotime::never, 0);
 
 	sh2->dma_current_active_timer[1] = timer_alloc(device->machine, sh2_dma_current_active_callback, sh2);
-	timer_adjust_oneshot(sh2->dma_current_active_timer[1], attotime_never, 0);
+	timer_adjust_oneshot(sh2->dma_current_active_timer[1], attotime::never, 0);
 
 
 	sh2->m = auto_alloc_array(device->machine, UINT32, 0x200/4);

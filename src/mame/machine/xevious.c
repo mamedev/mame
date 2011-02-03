@@ -102,7 +102,7 @@ WRITE8_HANDLER( battles_customio0_w )
 			timer->reset();
 			return; /* nop */
 	}
-	timer->adjust(ATTOTIME_IN_USEC(166), 0, ATTOTIME_IN_USEC(166));
+	timer->adjust(attotime::from_usec(166), 0, attotime::from_usec(166));
 
 }
 

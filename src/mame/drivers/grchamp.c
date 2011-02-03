@@ -693,7 +693,7 @@ static MACHINE_CONFIG_START( grchamp, grchamp_state )
 
 	MCFG_MACHINE_RESET(grchamp)
 	MCFG_WATCHDOG_VBLANK_INIT(8)
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)

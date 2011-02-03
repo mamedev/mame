@@ -603,7 +603,7 @@ static MACHINE_CONFIG_START( djboy, djboy_state )
 	MCFG_CPU_ADD("beast", I80C51, 6000000)
 	MCFG_CPU_IO_MAP(djboy_mcu_io_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_START(djboy)
 	MCFG_MACHINE_RESET(djboy)

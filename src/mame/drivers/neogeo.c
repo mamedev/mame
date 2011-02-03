@@ -646,7 +646,7 @@ static WRITE16_HANDLER( audio_command_w )
 		audio_cpu_assert_nmi(space->machine);
 
 		/* boost the interleave to let the audio CPU read the command */
-		cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(50));
+		cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(50));
 
 		if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_command_w %04x - %04x\n", cpu_get_pc(space->cpu), data, mem_mask);
 	}
@@ -1351,7 +1351,7 @@ static MACHINE_CONFIG_START( neogeo, neogeo_state )
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 	MCFG_CPU_IO_MAP(audio_io_map)
 
-	MCFG_WATCHDOG_TIME_INIT(USEC(128762))
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_usec(128762))
 
 	MCFG_MACHINE_START(neogeo)
 	MCFG_MACHINE_RESET(neogeo)

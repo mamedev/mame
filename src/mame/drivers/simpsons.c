@@ -130,7 +130,7 @@ static WRITE8_HANDLER( z80_arm_nmi_w )
 {
 	simpsons_state *state = space->machine->driver_data<simpsons_state>();
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
-	timer_set(space->machine, ATTOTIME_IN_USEC(25), NULL, 0, nmi_callback);	/* kludge until the K053260 is emulated correctly */
+	timer_set(space->machine, attotime::from_usec(25), NULL, 0, nmi_callback);	/* kludge until the K053260 is emulated correctly */
 }
 
 static ADDRESS_MAP_START( z80_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -269,7 +269,7 @@ static INTERRUPT_GEN( simpsons_irq )
 	{
 		simpsons_objdma(device->machine);
 		// 32+256us delay at 8MHz dotclock; artificially shortened since actual V-blank length is unknown
-		timer_set(device->machine, ATTOTIME_IN_USEC(30), NULL, 0, dmaend_callback);
+		timer_set(device->machine, attotime::from_usec(30), NULL, 0, dmaend_callback);
 	}
 
 	if (k052109_is_irq_enabled(state->k052109))

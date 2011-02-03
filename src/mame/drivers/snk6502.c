@@ -848,7 +848,7 @@ static MACHINE_CONFIG_START( sasuke, snk6502_state )
 
 	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK / 16, mc6845_intf)
 
-	MCFG_TIMER_ADD_PERIODIC("sasuke_timer", sasuke_update_counter, HZ(MASTER_CLOCK / 8))	// 1.4 MHz
+	MCFG_TIMER_ADD_PERIODIC("sasuke_timer", sasuke_update_counter, attotime::from_hz(MASTER_CLOCK / 8))	// 1.4 MHz
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -494,7 +494,7 @@ static MACHINE_CONFIG_START( kingofb, kingofb_state )
 	MCFG_CPU_IO_MAP(kingobox_sound_io_map)
 	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 6000)	/* Hz */
 
-	MCFG_QUANTUM_TIME(HZ(6000)) /* We really need heavy synching among the processors */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* We really need heavy synching among the processors */
 
 	MCFG_MACHINE_START(kingofb)
 	MCFG_MACHINE_RESET(kingofb)
@@ -547,7 +547,7 @@ static MACHINE_CONFIG_START( ringking, kingofb_state )
 	MCFG_CPU_IO_MAP(ringking_sound_io_map)
 	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 6000)	/* Hz */
 
-	MCFG_QUANTUM_TIME(HZ(6000)) /* We really need heavy synching among the processors */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* We really need heavy synching among the processors */
 
 	MCFG_MACHINE_START(kingofb)
 	MCFG_MACHINE_RESET(kingofb)

@@ -75,7 +75,7 @@ public:
 
 	void timeslice();
 
-	void trigger(int trigid, attotime after = attotime_zero);
+	void trigger(int trigid, attotime after = attotime::zero);
 
 	void boost_interleave(attotime timeslice_time, attotime boost_duration);
 	void abort_timeslice();

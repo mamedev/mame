@@ -1740,7 +1740,7 @@ static void start_stars_blink_timer(double ra, double rb, double c)
 
 	int period_in_ms = 693 * (ra + 2.0 * rb) * c;
 
-	timer_adjust_periodic(stars_blink_timer, ATTOTIME_IN_MSEC(period_in_ms), 0, ATTOTIME_IN_MSEC(period_in_ms));
+	timer_adjust_periodic(stars_blink_timer, attotime::from_msec(period_in_ms), 0, attotime::from_msec(period_in_ms));
 }
 
 

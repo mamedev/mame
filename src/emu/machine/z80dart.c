@@ -294,28 +294,28 @@ void z80dart_device::device_start()
 	{
 		// allocate channel A receive timer
 		m_rxca_timer = timer_alloc(&m_machine, dart_channel::static_rxc_tick, (void *)&m_channel[CHANNEL_A]);
-		timer_adjust_periodic(m_rxca_timer, attotime_zero, 0, ATTOTIME_IN_HZ(m_config.m_rx_clock_a));
+		timer_adjust_periodic(m_rxca_timer, attotime::zero, 0, attotime::from_hz(m_config.m_rx_clock_a));
 	}
 
 	if (m_config.m_tx_clock_a != 0)
 	{
 		// allocate channel A transmit timer
 		m_txca_timer = timer_alloc(&m_machine, dart_channel::static_txc_tick, (void *)&m_channel[CHANNEL_A]);
-		timer_adjust_periodic(m_txca_timer, attotime_zero, 0, ATTOTIME_IN_HZ(m_config.m_tx_clock_a));
+		timer_adjust_periodic(m_txca_timer, attotime::zero, 0, attotime::from_hz(m_config.m_tx_clock_a));
 	}
 
 	if (m_config.m_rx_clock_b != 0)
 	{
 		// allocate channel B receive timer
 		m_rxcb_timer = timer_alloc(&m_machine, dart_channel::static_rxc_tick, (void *)&m_channel[CHANNEL_B]);
-		timer_adjust_periodic(m_rxcb_timer, attotime_zero, 0, ATTOTIME_IN_HZ(m_config.m_rx_clock_b));
+		timer_adjust_periodic(m_rxcb_timer, attotime::zero, 0, attotime::from_hz(m_config.m_rx_clock_b));
 	}
 
 	if (m_config.m_tx_clock_b != 0)
 	{
 		// allocate channel B transmit timer
 		m_txcb_timer = timer_alloc(&m_machine, dart_channel::static_txc_tick, (void *)&m_channel[CHANNEL_B]);
-		timer_adjust_periodic(m_txcb_timer, attotime_zero, 0, ATTOTIME_IN_HZ(m_config.m_tx_clock_b));
+		timer_adjust_periodic(m_txcb_timer, attotime::zero, 0, attotime::from_hz(m_config.m_tx_clock_b));
 	}
 
 	state_save_register_device_item_array(this, 0, m_int_state);

@@ -724,7 +724,7 @@ static MACHINE_CONFIG_START( ninjakun, driver_device )
 	MCFG_CPU_PROGRAM_MAP(ninjakun_cpu2_map)
 	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,4) /* ? */
 
-	MCFG_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame */
 
 	MCFG_MACHINE_START(ninjakun)
 
@@ -800,7 +800,7 @@ static MACHINE_CONFIG_START( raiders5, driver_device )
 	MCFG_CPU_PROGRAM_MAP(raiders5_cpu2_map)
 	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* ? */
 
-	MCFG_QUANTUM_TIME(HZ(24000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(24000))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

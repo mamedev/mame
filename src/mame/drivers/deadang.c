@@ -230,7 +230,7 @@ static MACHINE_CONFIG_START( deadang, deadang_state )
 
 	SEIBU3A_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4)
 
-	MCFG_QUANTUM_TIME(HZ(60)) // the game stops working with higher interleave rates..
+	MCFG_QUANTUM_TIME(attotime::from_hz(60)) // the game stops working with higher interleave rates..
 
 	MCFG_MACHINE_RESET(seibu_sound)
 

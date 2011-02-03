@@ -452,7 +452,7 @@ WRITE8_DEVICE_HANDLER( es5503_w )
 				else if (!(chip->oscillators[osc].control & 1) && (data&1))
 				{
 					// key off
-					timer_adjust_oneshot(chip->oscillators[osc].timer, attotime_never, 0);
+					timer_adjust_oneshot(chip->oscillators[osc].timer, attotime::never, 0);
 				}
 
 				chip->oscillators[osc].control = data;

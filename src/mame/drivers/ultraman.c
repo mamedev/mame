@@ -227,7 +227,7 @@ static MACHINE_CONFIG_START( ultraman, ultraman_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(ultraman)
 	MCFG_MACHINE_RESET(ultraman)

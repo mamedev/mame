@@ -582,7 +582,7 @@ static void upd7759_reset(upd7759_state *chip)
 
 	/* turn off any timer */
 	if (chip->timer)
-		timer_adjust_oneshot(chip->timer, attotime_never, 0);
+		timer_adjust_oneshot(chip->timer, attotime::never, 0);
 }
 
 
@@ -647,7 +647,7 @@ static DEVICE_START( upd7759 )
 	chip->step = 4 * FRAC_ONE;
 
 	/* compute the clock period */
-	chip->clock_period = ATTOTIME_IN_HZ(device->clock());
+	chip->clock_period = attotime::from_hz(device->clock());
 
 	/* set the intial state */
 	chip->state = STATE_IDLE;
@@ -712,7 +712,7 @@ void upd7759_start_w(device_t *device, UINT8 data)
 
 		/* for slave mode, start the timer going */
 		if (chip->timer)
-			timer_adjust_oneshot(chip->timer, attotime_zero, 0);
+			timer_adjust_oneshot(chip->timer, attotime::zero, 0);
 	}
 }
 

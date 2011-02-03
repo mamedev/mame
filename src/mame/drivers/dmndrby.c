@@ -497,7 +497,7 @@ static MACHINE_CONFIG_START( dderby, driver_device )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* verified on schematics */
 	MCFG_CPU_PROGRAM_MAP(dderby_sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */

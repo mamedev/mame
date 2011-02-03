@@ -190,7 +190,7 @@ WRITE8_DEVICE_HANDLER( namco_06xx_ctrl_w )
 	if ((state->control & 0x0f) == 0)
 	{
 		LOG(("disabling nmi generate timer\n"));
-		timer_adjust_oneshot(state->nmi_timer, attotime_never, 0);
+		timer_adjust_oneshot(state->nmi_timer, attotime::never, 0);
 	}
 	else
 	{
@@ -200,7 +200,7 @@ WRITE8_DEVICE_HANDLER( namco_06xx_ctrl_w )
 		// inputs if a transfer terminates at the wrong time.
 		// On the other hand, the time cannot be too short otherwise the 54XX will
 		// not have enough time to process the incoming controls.
-		timer_adjust_periodic(state->nmi_timer, ATTOTIME_IN_USEC(200), 0, ATTOTIME_IN_USEC(200));
+		timer_adjust_periodic(state->nmi_timer, attotime::from_usec(200), 0, attotime::from_usec(200));
 
 		if (state->control & 0x10)
 			for (devnum = 0; devnum < 4; devnum++)

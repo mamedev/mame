@@ -241,7 +241,7 @@ static MACHINE_CONFIG_START( timelimt, timelimt_state )
 	MCFG_CPU_IO_MAP(sound_io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold) /* ? */
 
-	MCFG_QUANTUM_TIME(HZ(3000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(3000))
 
 	MCFG_MACHINE_START(timelimt)
 	MCFG_MACHINE_RESET(timelimt)

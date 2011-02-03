@@ -833,5 +833,5 @@ void rainbow_cchip_init( running_machine *machine, int version )
 
 	state_save_register_item(machine, "cchip", NULL, 0, state->current_bank);
 
-	timer_pulse(machine, ATTOTIME_IN_HZ(60), NULL, 0, cchip_timer);
+	timer_pulse(machine, attotime::from_hz(60), NULL, 0, cchip_timer);
 }

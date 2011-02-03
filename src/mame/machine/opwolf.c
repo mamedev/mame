@@ -752,5 +752,5 @@ void opwolf_cchip_init( running_machine *machine )
 	state->cchip_coins_for_credit[1] = 1;
 	state->cchip_credits_for_coin[1] = 1;
 
-	timer_pulse(machine, ATTOTIME_IN_HZ(60), NULL, 0, cchip_timer);
+	timer_pulse(machine, attotime::from_hz(60), NULL, 0, cchip_timer);
 }

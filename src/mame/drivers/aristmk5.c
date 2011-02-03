@@ -76,7 +76,7 @@ static READ32_HANDLER( ext_timer_latch_r )
 {
 	/* reset 2KHz timer */
 	ioc_regs[IRQ_STATUS_A] &= 0xfe;
-	timer_adjust_oneshot(mk5_2KHz_timer, ATTOTIME_IN_HZ(2000), 0);
+	timer_adjust_oneshot(mk5_2KHz_timer, attotime::from_hz(2000), 0);
 
 	return 0xffffffff; //value doesn't matter apparently
 }
@@ -221,7 +221,7 @@ static TIMER_CALLBACK( mk5_2KHz_callback )
 {
 	ioc_regs[4] |= 1;
 
-	timer_adjust_oneshot(mk5_2KHz_timer, attotime_never, 0);
+	timer_adjust_oneshot(mk5_2KHz_timer, attotime::never, 0);
 }
 
 static MACHINE_START( aristmk5 )
@@ -237,7 +237,7 @@ static MACHINE_START( aristmk5 )
 static MACHINE_RESET( aristmk5 )
 {
 	archimedes_reset(machine);
-	timer_adjust_oneshot(mk5_2KHz_timer, ATTOTIME_IN_HZ(2000), 0);
+	timer_adjust_oneshot(mk5_2KHz_timer, attotime::from_hz(2000), 0);
 
 	ioc_regs[IRQ_STATUS_B] |= 0x40; //hack, set keyboard irq empty to be ON
 

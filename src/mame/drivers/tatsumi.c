@@ -874,7 +874,7 @@ static MACHINE_CONFIG_START( apache3, tatsumi_state )
 	MCFG_CPU_PROGRAM_MAP(apache3_z80_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_MACHINE_RESET(apache3)
 
@@ -915,7 +915,7 @@ static MACHINE_CONFIG_START( roundup5, tatsumi_state )
 	MCFG_CPU_ADD("audiocpu", Z80, CLOCK_1 / 4)
 	MCFG_CPU_PROGRAM_MAP(roundup5_z80_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -958,7 +958,7 @@ static MACHINE_CONFIG_START( cyclwarr, tatsumi_state )
 	MCFG_CPU_ADD("audiocpu", Z80, CLOCK_1 / 4)
 	MCFG_CPU_PROGRAM_MAP(cyclwarr_z80_map)
 
-	MCFG_QUANTUM_TIME(HZ(12000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1001,7 +1001,7 @@ static MACHINE_CONFIG_START( bigfight, tatsumi_state )
 	MCFG_CPU_ADD("audiocpu", Z80, CLOCK_1 / 4)
 	MCFG_CPU_PROGRAM_MAP(cyclwarr_z80_map)
 
-	MCFG_QUANTUM_TIME(HZ(12000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

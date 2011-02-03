@@ -113,7 +113,7 @@ DRIVER_INIT(prikura)
 	DRIVER_INIT_CALL(stv);
 
 	minit_boost = sinit_boost = 0;
-	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(50);
+	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(50);
 
 }
 
@@ -169,7 +169,7 @@ DRIVER_INIT(puyosun)
 	DRIVER_INIT_CALL(stv);
 
 	minit_boost = sinit_boost = 0;
-	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(50);
+	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 /* mausuke
@@ -189,7 +189,7 @@ DRIVER_INIT(mausuke)
 	DRIVER_INIT_CALL(stv);
 
 	minit_boost = sinit_boost = 0;
-	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(50);
+	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 DRIVER_INIT(cottonbm)
@@ -199,7 +199,7 @@ DRIVER_INIT(cottonbm)
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(10);
+	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(10);
 }
 
 DRIVER_INIT(cotton2)
@@ -209,7 +209,7 @@ DRIVER_INIT(cotton2)
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(50);
+	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 DRIVER_INIT(dnmtdeka)
@@ -260,7 +260,7 @@ DRIVER_INIT( groovef )
 	DRIVER_INIT_CALL(stv);
 
 	minit_boost = sinit_boost = 0;
-	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(50);
+	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 DRIVER_INIT( danchih )
@@ -271,7 +271,7 @@ DRIVER_INIT( danchih )
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(5);
+	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(5);
 
 }
 
@@ -325,7 +325,7 @@ DRIVER_INIT(thunt)
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(1);
+	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(1);
 }
 
 DRIVER_INIT(sandor)
@@ -335,7 +335,7 @@ DRIVER_INIT(sandor)
 	sh2drc_add_pcflush(machine->device("slave"), 0x602abcc);
 
 	DRIVER_INIT_CALL(stv);
-	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(1);
+	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(1);
 
 }
 
@@ -346,7 +346,7 @@ DRIVER_INIT(grdforce)
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(50);
+	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 DRIVER_INIT(batmanfr)
@@ -357,7 +357,7 @@ DRIVER_INIT(batmanfr)
 	DRIVER_INIT_CALL(stv);
 
 	minit_boost = sinit_boost = 0;
-	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(50);
+	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 DRIVER_INIT(colmns97)
@@ -377,7 +377,7 @@ DRIVER_INIT(winterht)
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(2);
+	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(2);
 }
 
 DRIVER_INIT(seabass)
@@ -387,7 +387,7 @@ DRIVER_INIT(seabass)
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(5);
+	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(5);
 }
 
 DRIVER_INIT(vfremix)
@@ -397,7 +397,7 @@ DRIVER_INIT(vfremix)
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(20);
+	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(20);
 }
 
 DRIVER_INIT(sss)
@@ -409,7 +409,7 @@ DRIVER_INIT(sss)
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(50);
+	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 DRIVER_INIT(othellos)
@@ -419,7 +419,7 @@ DRIVER_INIT(othellos)
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(50);
+	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(50);
 
 }
 
@@ -429,7 +429,7 @@ DRIVER_INIT(sasissu)
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(2);
+	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(2);
 }
 
 DRIVER_INIT(gaxeduel)
@@ -451,7 +451,7 @@ DRIVER_INIT(sokyugrt)
 {
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(50);
+	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 DRIVER_INIT(znpwfv)
@@ -460,7 +460,7 @@ DRIVER_INIT(znpwfv)
 	sh2drc_add_pcflush(machine->device("slave"), 0x60175a6);
 
 	DRIVER_INIT_CALL(stv);
-	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_NSEC(500);
+	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_nsec(500);
 }
 
 DRIVER_INIT(twcup98)
@@ -471,7 +471,7 @@ DRIVER_INIT(twcup98)
 	DRIVER_INIT_CALL(stv);
 	install_twcup98_protection(machine);
 
-	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(5);
+	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(5);
 }
 
 DRIVER_INIT(smleague)
@@ -481,7 +481,7 @@ DRIVER_INIT(smleague)
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(50);
+	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 DRIVER_INIT(finlarch)
@@ -499,7 +499,7 @@ DRIVER_INIT(maruchan)
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(50);
+	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 DRIVER_INIT(pblbeach)
@@ -524,7 +524,7 @@ DRIVER_INIT(elandore)
 	install_elandore_protection(machine);
 
 	DRIVER_INIT_CALL(stv);
-	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(0);
+	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(0);
 
 }
 
@@ -537,7 +537,7 @@ DRIVER_INIT(rsgun)
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(20);
+	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(20);
 
 }
 

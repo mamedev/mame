@@ -72,7 +72,7 @@ static WRITE8_HANDLER( sound_arm_nmi_w )
 {
 	rollerg_state *state = space->machine->driver_data<rollerg_state>();
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
-	timer_set(space->machine, ATTOTIME_IN_USEC(50), NULL, 0, nmi_callback);	/* kludge until the K053260 is emulated correctly */
+	timer_set(space->machine, attotime::from_usec(50), NULL, 0, nmi_callback);	/* kludge until the K053260 is emulated correctly */
 }
 
 static READ8_HANDLER( pip_r )

@@ -346,7 +346,7 @@ static MACHINE_CONFIG_START( overdriv, overdriv_state )
 						/* 60 fps, that's how I fixed it for now. */
 	MCFG_CPU_PROGRAM_MAP(overdriv_sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(12000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
 	MCFG_MACHINE_START(overdriv)
 	MCFG_MACHINE_RESET(overdriv)

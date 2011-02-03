@@ -114,7 +114,7 @@ static TIMER_CALLBACK( pic8259_timerproc )
 
 INLINE void pic8259_set_timer(pic8259_t *pic8259)
 {
-	timer_adjust_oneshot(pic8259->timer, attotime_zero, 0);
+	timer_adjust_oneshot(pic8259->timer, attotime::zero, 0);
 }
 
 

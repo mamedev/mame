@@ -1015,7 +1015,7 @@ static MACHINE_CONFIG_START( wgp, wgp_state )
 	MCFG_MACHINE_START(wgp)
 	MCFG_MACHINE_RESET(wgp)
 
-	MCFG_QUANTUM_TIME(HZ(30000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
 
 	MCFG_TC0220IOC_ADD("tc0220ioc", wgp_io_intf)
 
@@ -1051,7 +1051,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( wgp2, wgp )
 
-	MCFG_QUANTUM_TIME(HZ(12000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 	/* video hardware */
 	MCFG_VIDEO_START(wgp2)
 

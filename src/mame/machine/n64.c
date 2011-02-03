@@ -2077,7 +2077,7 @@ MACHINE_RESET( n64 )
 
 	cic_status = 0;
 
-	timer_adjust_oneshot(audio_timer, attotime_never, 0);
+	timer_adjust_oneshot(audio_timer, attotime::never, 0);
 
 	cputag_set_input_line(machine, "rsp", INPUT_LINE_HALT, ASSERT_LINE);
 

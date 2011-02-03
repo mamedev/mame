@@ -464,7 +464,7 @@ static MACHINE_CONFIG_START( sfkick, driver_device )
 	MCFG_CPU_IO_MAP(sfkick_io_map)
 	MCFG_CPU_VBLANK_INT_HACK(sfkick_interrupt,262)
 
-	MCFG_QUANTUM_TIME(HZ(60000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
 	MCFG_CPU_ADD("soundcpu",Z80,MASTER_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(sfkick_sound_map)

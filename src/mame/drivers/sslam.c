@@ -270,7 +270,7 @@ static void sslam_play(device_t *device, int track, int data)
 					oki->write_command(0x40);
 				oki->write_command((0x80 | data));
 				oki->write_command(0x81);
-				timer_adjust_periodic(state->music_timer, ATTOTIME_IN_MSEC(4), 0, ATTOTIME_IN_HZ(250));	/* 250Hz for smooth sequencing */
+				timer_adjust_periodic(state->music_timer, attotime::from_msec(4), 0, attotime::from_hz(250));	/* 250Hz for smooth sequencing */
 			}
 		}
 		else {

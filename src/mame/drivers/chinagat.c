@@ -581,7 +581,7 @@ static MACHINE_CONFIG_START( chinagat, ddragon_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)		/* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000)) /* heavy interleaving to sync up sprite<->main cpu's */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* heavy interleaving to sync up sprite<->main cpu's */
 
 	MCFG_MACHINE_START(chinagat)
 	MCFG_MACHINE_RESET(chinagat)
@@ -626,7 +626,7 @@ static MACHINE_CONFIG_START( saiyugoub1, ddragon_state )
 	MCFG_CPU_PROGRAM_MAP(i8748_map)
 	MCFG_CPU_IO_MAP(i8748_portmap)
 
-	MCFG_QUANTUM_TIME(HZ(6000))	/* heavy interleaving to sync up sprite<->main cpu's */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* heavy interleaving to sync up sprite<->main cpu's */
 
 	MCFG_MACHINE_START(chinagat)
 	MCFG_MACHINE_RESET(chinagat)
@@ -668,7 +668,7 @@ static MACHINE_CONFIG_START( saiyugoub2, ddragon_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)		/* 3.579545 MHz oscillator */
 	MCFG_CPU_PROGRAM_MAP(ym2203c_sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000)) /* heavy interleaving to sync up sprite<->main cpu's */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* heavy interleaving to sync up sprite<->main cpu's */
 
 	MCFG_MACHINE_START(chinagat)
 	MCFG_MACHINE_RESET(chinagat)

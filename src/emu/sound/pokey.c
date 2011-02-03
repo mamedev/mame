@@ -465,7 +465,7 @@ static TIMER_CALLBACK( pokey_pot_trigger );
 			PROCESS_SAMPLE(chip);										\
 		}																\
 	}																	\
-	timer_adjust_oneshot(chip->rtimer, attotime_never, 0)
+	timer_adjust_oneshot(chip->rtimer, attotime::never, 0)
 
 #else   /* no HEAVY_MACRO_USAGE */
 /*
@@ -516,7 +516,7 @@ static TIMER_CALLBACK( pokey_pot_trigger );
 			PROCESS_CHANNEL(chip,channel);								\
 		}																\
 	}																	\
-	timer_adjust_oneshot(chip->rtimer, attotime_never, 0)
+	timer_adjust_oneshot(chip->rtimer, attotime::never, 0)
 
 #endif
 
@@ -621,7 +621,7 @@ static DEVICE_START( pokey )
 	if (device->baseconfig().static_config())
 		memcpy(&chip->intf, device->baseconfig().static_config(), sizeof(pokey_interface));
 	chip->device = device;
-	chip->clock_period = ATTOTIME_IN_HZ(device->clock());
+	chip->clock_period = attotime::from_hz(device->clock());
 
 	/* calculate the A/D times
      * In normal, slow mode (SKCTL bit SK_PADDLE is clear) the conversion
@@ -908,7 +908,7 @@ READ8_DEVICE_HANDLER( pokey_r )
 			LOG_RAND(("POKEY '%s' adjust %u rand17[$%05x]: $%02x\n", p->device->tag(), adjust, p->r17, p->RANDOM));
 		}
 		if (adjust > 0)
-			timer_adjust_oneshot(p->rtimer, attotime_never, 0);
+			timer_adjust_oneshot(p->rtimer, attotime::never, 0);
 		data = p->RANDOM ^ 0xff;
 		break;
 
@@ -1043,9 +1043,9 @@ WRITE8_DEVICE_HANDLER( pokey_w )
         /* first remove any existing timers */
 		LOG_TIMER(("POKEY '%s' STIMER $%02x\n", p->device->tag(), data));
 
-		timer_adjust_oneshot(p->timer[TIMER1], attotime_never, p->timer_param[TIMER1]);
-		timer_adjust_oneshot(p->timer[TIMER2], attotime_never, p->timer_param[TIMER2]);
-		timer_adjust_oneshot(p->timer[TIMER4], attotime_never, p->timer_param[TIMER4]);
+		timer_adjust_oneshot(p->timer[TIMER1], attotime::never, p->timer_param[TIMER1]);
+		timer_adjust_oneshot(p->timer[TIMER2], attotime::never, p->timer_param[TIMER2]);
+		timer_adjust_oneshot(p->timer[TIMER4], attotime::never, p->timer_param[TIMER4]);
 
         /* reset all counters to zero (side effect) */
 		p->polyadjust = 0;
@@ -1141,9 +1141,9 @@ WRITE8_DEVICE_HANDLER( pokey_w )
          * loaders from Ballblazer and Escape from Fractalus
          * The real times are unknown
          */
-        timer_set(device->machine, ATTOTIME_IN_USEC(200), p, 0, pokey_serout_ready_cb);
+        timer_set(device->machine, attotime::from_usec(200), p, 0, pokey_serout_ready_cb);
         /* 10 bits (assumption 1 start, 8 data and 1 stop bit) take how long? */
-        timer_set(device->machine, ATTOTIME_IN_USEC(2000), p, 0, pokey_serout_complete);
+        timer_set(device->machine, attotime::from_usec(2000), p, 0, pokey_serout_complete);
         break;
 
     case IRQEN_C:

@@ -3647,7 +3647,7 @@ static MACHINE_CONFIG_START( marvins, snk_state )
 	MCFG_CPU_IO_MAP(marvins_sound_portmap)
 	MCFG_CPU_PERIODIC_INT(nmi_line_assert, 244)	// schematics show a separate 244Hz timer
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -3717,7 +3717,7 @@ static MACHINE_CONFIG_START( jcross, snk_state )
 	MCFG_CPU_IO_MAP(jcross_sound_portmap)
 	MCFG_CPU_PERIODIC_INT(irq0_line_assert, 244)	// Marvin's frequency, sounds ok
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -3796,7 +3796,7 @@ static MACHINE_CONFIG_START( tnk3, snk_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(tnk3_YM3526_sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -3881,7 +3881,7 @@ static MACHINE_CONFIG_START( ikari, snk_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(YM3526_YM3526_sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -3939,7 +3939,7 @@ static MACHINE_CONFIG_START( bermudat, snk_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(YM3526_Y8950_sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(24000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(24000))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4043,7 +4043,7 @@ static MACHINE_CONFIG_START( tdfever, snk_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(YM3526_Y8950_sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)

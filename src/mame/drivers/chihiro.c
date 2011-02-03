@@ -305,7 +305,7 @@ static MACHINE_CONFIG_START( chihiro_base, driver_device )
 	MCFG_CPU_PROGRAM_MAP(xbox_map)
 	MCFG_CPU_IO_MAP(xbox_map_io)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_PCI_BUS_ADD("pcibus", 0)
 	MCFG_PCI_BUS_DEVICE(0, "PCI Bridge Device - Host Bridge", dummy_pci_r, dummy_pci_w)

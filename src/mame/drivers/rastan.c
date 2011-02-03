@@ -419,7 +419,7 @@ static MACHINE_CONFIG_START( rastan, rastan_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rastan_s_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	MCFG_MACHINE_START(rastan)
 	MCFG_MACHINE_RESET(rastan)

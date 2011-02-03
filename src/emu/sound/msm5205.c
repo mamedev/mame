@@ -278,7 +278,7 @@ static void msm5205_playmode(msm5205_state *voice,int select)
 			timer_adjust_periodic(voice->timer, period, 0, period);
 		}
 		else
-			timer_adjust_oneshot(voice->timer, attotime_never, 0);
+			timer_adjust_oneshot(voice->timer, attotime::never, 0);
 	}
 
 	if( voice->bitwidth != bitwidth )

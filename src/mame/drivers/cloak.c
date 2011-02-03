@@ -341,7 +341,7 @@ static MACHINE_CONFIG_START( cloak, cloak_state )
 	MCFG_CPU_PROGRAM_MAP(slave_map)
 	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold, 2)
 
-	MCFG_QUANTUM_TIME(HZ(1000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(1000))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

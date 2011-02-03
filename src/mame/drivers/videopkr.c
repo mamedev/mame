@@ -1190,7 +1190,7 @@ static MACHINE_CONFIG_START( videopkr, driver_device )
 	MCFG_MACHINE_START(videopkr)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_TIMER_ADD_PERIODIC("t1_timer", sound_t1_callback, HZ(50))
+	MCFG_TIMER_ADD_PERIODIC("t1_timer", sound_t1_callback, attotime::from_hz(50))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

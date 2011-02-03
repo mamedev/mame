@@ -514,7 +514,7 @@ static WRITE8_HANDLER( soundport_w )
 {
 	/* boost interleave when communicating with the sound CPU */
 	soundlatch_w(space, 0, data);
-	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(100));
+	cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(100));
 }
 
 
@@ -598,7 +598,7 @@ static INTERRUPT_GEN( mcu_irq_assert )
 	cpu_set_input_line(device, MCS51_INT0_LINE, CLEAR_LINE);
 
 	/* boost interleave to ensure that the MCU can break the Z80 out of a HALT */
-	cpuexec_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(10));
+	cpuexec_boost_interleave(device->machine, attotime::zero, attotime::from_usec(10));
 }
 
 
@@ -655,7 +655,7 @@ static WRITE8_HANDLER( nob_maincpu_latch_w )
 {
 	nob_maincpu_latch = data;
 	cputag_set_input_line(space->machine, "mcu", MCS51_INT0_LINE, ASSERT_LINE);
-	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(100));
+	cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(100));
 }
 
 
@@ -2180,7 +2180,7 @@ static MACHINE_CONFIG_FRAGMENT( mcu )
 	MCFG_CPU_IO_MAP(mcu_io_map)
 	MCFG_CPU_VBLANK_INT("screen", mcu_irq_assert)
 
-	MCFG_TIMER_ADD_PERIODIC("mcu_t0", mcu_t0_callback, MSEC(20))	/* ??? actual clock unknown */
+	MCFG_TIMER_ADD_PERIODIC("mcu_t0", mcu_t0_callback, attotime::from_msec(20))	/* ??? actual clock unknown */
 MACHINE_CONFIG_END
 
 

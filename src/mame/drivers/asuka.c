@@ -905,7 +905,7 @@ static MACHINE_CONFIG_START( bonzeadv, asuka_state )
 	MCFG_MACHINE_START(asuka)
 	MCFG_MACHINE_RESET(asuka)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -949,7 +949,7 @@ static MACHINE_CONFIG_START( asuka, asuka_state )
 	MCFG_MACHINE_START(asuka)
 	MCFG_MACHINE_RESET(asuka)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_TC0220IOC_ADD("tc0220ioc", asuka_io_intf)
 
@@ -1002,7 +1002,7 @@ static MACHINE_CONFIG_START( cadash, asuka_state )
 	MCFG_MACHINE_START(asuka)
 	MCFG_MACHINE_RESET(asuka)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_TC0220IOC_ADD("tc0220ioc", asuka_io_intf)
 
@@ -1047,7 +1047,7 @@ static MACHINE_CONFIG_START( mofflott, asuka_state )
 	MCFG_MACHINE_START(asuka)
 	MCFG_MACHINE_RESET(asuka)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_TC0220IOC_ADD("tc0220ioc", asuka_io_intf)
 
@@ -1096,7 +1096,7 @@ static MACHINE_CONFIG_START( galmedes, asuka_state )
 	MCFG_MACHINE_START(asuka)
 	MCFG_MACHINE_RESET(asuka)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_TC0220IOC_ADD("tc0220ioc", asuka_io_intf)
 
@@ -1141,7 +1141,7 @@ static MACHINE_CONFIG_START( eto, asuka_state )
 	MCFG_MACHINE_START(asuka)
 	MCFG_MACHINE_RESET(asuka)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_TC0220IOC_ADD("tc0220ioc", asuka_io_intf)
 

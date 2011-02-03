@@ -2188,7 +2188,7 @@ static WRITE32_HANDLER( namcos22_system_controller_w )
 		{ /* SUBCPU enable on System 22 (guessed, but too early crashes Rave Racer so it's a good test) */
 			if (data == 0xff00)
 			{
-				timer_set(space->machine, ATTOTIME_IN_MSEC(50), NULL, 0, start_subcpu);
+				timer_set(space->machine, attotime::from_msec(50), NULL, 0, start_subcpu);
 			}
 		}
 	}
@@ -2889,7 +2889,7 @@ static MACHINE_CONFIG_START( namcos22s, driver_device )
 	MCFG_CPU_IO_MAP( mcu_io)
 	MCFG_CPU_VBLANK_INT_HACK(mcu_interrupt, 3)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_NVRAM_HANDLER(namcos22)
 	MCFG_SCREEN_ADD("screen", RASTER)

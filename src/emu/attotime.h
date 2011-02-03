@@ -104,24 +104,6 @@ const seconds_t ATTOTIME_MAX_SECONDS = 1000000000;
 #define ATTOSECONDS_IN_USEC(x)			((attoseconds_t)(x) * ATTOSECONDS_PER_MICROSECOND)
 #define ATTOSECONDS_IN_NSEC(x)			((attoseconds_t)(x) * ATTOSECONDS_PER_NANOSECOND)
 
-// macros for building attotimes from other types at runtime
-#define ATTOTIME_IN_HZ(hz)				attotime::from_hz(hz)
-#define ATTOTIME_IN_SEC(s)				attotime::from_seconds(s)
-#define ATTOTIME_IN_MSEC(ms)			attotime::from_msec(ms)
-#define ATTOTIME_IN_USEC(us)			attotime::from_usec(us)
-#define ATTOTIME_IN_NSEC(ns)			attotime::from_nsec(ns)
-
-// macros for building a reduced-resolution attotime for tokenized storage in a UINT64
-// this form supports up to 1000 seconds and sacrifices 1/1000 of the full attotime resolution
-#define UINT64_ATTOTIME_IN_HZ(hz)		((UINT64)((ATTOSECONDS_PER_SECOND / 1000) / (hz)))
-#define UINT64_ATTOTIME_IN_SEC(s)		((UINT64)(s) * (ATTOSECONDS_PER_SECOND / 1000))
-#define UINT64_ATTOTIME_IN_MSEC(ms)		((UINT64)(ms) * (ATTOSECONDS_PER_SECOND / 1000 / 1000))
-#define UINT64_ATTOTIME_IN_USEC(us)		((UINT64)(us) * (ATTOSECONDS_PER_SECOND / 1000 / 1000 / 1000))
-#define UINT64_ATTOTIME_IN_NSEC(ns)		((UINT64)(ns) * (ATTOSECONDS_PER_SECOND / 1000 / 1000 / 1000 / 1000))
-
-// macros for converting a UINT64 attotime to a full attotime
-#define UINT64_ATTOTIME_TO_ATTOTIME(v)	attotime((v) / (ATTOSECONDS_PER_SECOND / 1000), ((v) % (ATTOSECONDS_PER_SECOND / 1000)) * 1000)
-
 
 
 //**************************************************************************
@@ -445,14 +427,5 @@ inline attotime attotime::from_double(double _time)
 	return attotime(secs, attos);
 }
 	
-
-
-//**************************************************************************
-//  LEGACY MAPPINGS
-//**************************************************************************
-
-#define attotime_zero 					attotime::zero
-#define attotime_never 					attotime::never
-
 
 #endif	// __ATTOTIME_H__

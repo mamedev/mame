@@ -1099,7 +1099,7 @@ static MACHINE_CONFIG_START( ns1, driver_device )
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	// heavy sync required to prevent CPUs from fighting for video RAM access and going into deadlocks
-	MCFG_QUANTUM_TIME(HZ(38400))
+	MCFG_QUANTUM_TIME(attotime::from_hz(38400))
 
 	MCFG_MACHINE_RESET(namcos1)
 	MCFG_NVRAM_ADD_0FILL("nvram")

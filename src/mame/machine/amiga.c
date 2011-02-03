@@ -400,7 +400,7 @@ static TIMER_CALLBACK( amiga_irq_proc )
 	amiga_state *state = machine->driver_data<amiga_state>();
 
 	update_irqs(machine);
-	timer_reset( state->irq_timer, attotime_never);
+	timer_reset( state->irq_timer, attotime::never);
 }
 
 
@@ -937,7 +937,7 @@ static TIMER_CALLBACK( amiga_blitter_proc )
 	amiga_custom_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_BLIT, 0xffff);
 
 	/* reset the blitter timer */
-	timer_reset( state->blitter_timer, attotime_never);
+	timer_reset( state->blitter_timer, attotime::never);
 }
 
 

@@ -437,7 +437,7 @@ static MACHINE_CONFIG_START( skykid, driver_device )
 	MCFG_CPU_IO_MAP(mcu_port_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MCFG_QUANTUM_TIME(HZ(6000))	/* we need heavy synch */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* we need heavy synch */
 
 	MCFG_MACHINE_START(skykid)
 

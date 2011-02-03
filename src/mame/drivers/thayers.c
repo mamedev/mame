@@ -64,7 +64,7 @@ static WRITE8_HANDLER( intrq_w )
 
 	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_IRQ0, HOLD_LINE);
 
-	timer_set(space->machine, ATTOTIME_IN_USEC(8250), NULL, 0, intrq_tick);
+	timer_set(space->machine, attotime::from_usec(8250), NULL, 0, intrq_tick);
 }
 
 static READ8_HANDLER( irqstate_r )
@@ -459,11 +459,11 @@ static WRITE8_HANDLER( ssi263_register_w )
 		case 0:
 		case 1:
 			// phoneme timing response
-			timer_set(space->machine, ATTOTIME_IN_USEC(phoneme_time), NULL, 0, ssi263_phoneme_tick);
+			timer_set(space->machine, attotime::from_usec(phoneme_time), NULL, 0, ssi263_phoneme_tick);
 			break;
 		case 2:
 			// frame timing response
-			timer_set(space->machine, ATTOTIME_IN_USEC(frame_time), NULL, 0, ssi263_phoneme_tick);
+			timer_set(space->machine, attotime::from_usec(frame_time), NULL, 0, ssi263_phoneme_tick);
 			break;
 		case 3:
 			// disable A/_R output

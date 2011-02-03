@@ -2036,7 +2036,7 @@ static MACHINE_CONFIG_START( fhawk, taitol_state )
 	MCFG_CPU_PROGRAM_MAP(fhawk_2_map)
 	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,3) /* fixes slow down problems */
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_START(taito_l)
 	MCFG_MACHINE_RESET(fhawk)
@@ -2133,7 +2133,7 @@ static MACHINE_CONFIG_START( kurikint, taitol_state )
 	MCFG_CPU_PROGRAM_MAP(kurikint_2_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_START(taito_l)
 	MCFG_MACHINE_RESET(kurikint)
@@ -2273,7 +2273,7 @@ static MACHINE_CONFIG_START( evilston, taitol_state )
 	MCFG_CPU_PROGRAM_MAP(evilston_2_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_START(taito_l)
 	MCFG_MACHINE_RESET(evilston)

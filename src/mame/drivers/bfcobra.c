@@ -692,7 +692,7 @@ static void RunBlit(address_space *space)
 	} while (blitter.command  & CMD_RUN);
 
 	/* Burn Z80 cycles while blitter is in operation */
-	cpu_spinuntil_time(space->cpu,  ATTOTIME_IN_NSEC( (1000000000 / Z80_XTAL)*cycles_used * 2 ) );
+	cpu_spinuntil_time(space->cpu,  attotime::from_nsec( (1000000000 / Z80_XTAL)*cycles_used * 2 ) );
 }
 
 

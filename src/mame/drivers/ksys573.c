@@ -599,7 +599,7 @@ static TIMER_CALLBACK( atapi_xfer_end )
 	int i, n_this;
 	UINT8 sector_buffer[ 4096 ];
 
-	timer_adjust_oneshot(state->atapi_timer, attotime_never, 0);
+	timer_adjust_oneshot(state->atapi_timer, attotime::never, 0);
 
 //  verboselog( machine, 2, "atapi_xfer_end( %d ) atapi_xferlen = %d, atapi_xfermod=%d\n", x, atapi_xfermod, atapi_xferlen );
 
@@ -1052,7 +1052,7 @@ static void atapi_init(running_machine *machine)
 	state->atapi_cdata_wait = 0;
 
 	state->atapi_timer = timer_alloc(machine, atapi_xfer_end, NULL);
-	timer_adjust_oneshot(state->atapi_timer, attotime_never, 0);
+	timer_adjust_oneshot(state->atapi_timer, attotime::never, 0);
 
 	for( i = 0; i < 2; i++ )
 	{
@@ -1324,7 +1324,7 @@ static void root_timer_adjust( running_machine *machine, int n_counter )
 
 	if( ( state->m_p_n_root_mode[ n_counter ] & PSX_RC_STOP ) != 0 )
 	{
-		timer_adjust_oneshot( state->m_p_timer_root[ n_counter ], attotime_never, n_counter);
+		timer_adjust_oneshot( state->m_p_timer_root[ n_counter ], attotime::never, n_counter);
 	}
 	else
 	{

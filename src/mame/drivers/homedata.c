@@ -1331,7 +1331,7 @@ static MACHINE_CONFIG_START( reikaids, homedata_state )
 	MCFG_CPU_IO_MAP(reikaids_upd7807_io_map)
 	MCFG_CPU_VBLANK_INT("screen", upd7807_irq)
 
-	MCFG_QUANTUM_TIME(HZ(30000))	// very high interleave required to sync for startup tests
+	MCFG_QUANTUM_TIME(attotime::from_hz(30000))	// very high interleave required to sync for startup tests
 
 	MCFG_MACHINE_START(reikaids)
 	MCFG_MACHINE_RESET(reikaids)
@@ -1382,7 +1382,7 @@ static MACHINE_CONFIG_START( pteacher, homedata_state )
 	MCFG_CPU_IO_MAP(pteacher_upd7807_io_map)
 	MCFG_CPU_VBLANK_INT("screen", upd7807_irq)
 
-	MCFG_QUANTUM_TIME(HZ(6000))	// should be enough
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	// should be enough
 
 	MCFG_MACHINE_START(pteacher)
 	MCFG_MACHINE_RESET(pteacher)
@@ -1551,7 +1551,7 @@ static MACHINE_CONFIG_START( mirderby, homedata_state )
 	//MCFG_CPU_VBLANK_INT("screen", mirderby_irq)
 
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

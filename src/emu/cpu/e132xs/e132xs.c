@@ -620,7 +620,7 @@ static void adjust_timer_interrupt(hyperstone_state *cpustate)
 		if (delta > 0x80000000)
 		{
 			if (!cpustate->timer_int_pending)
-				timer_adjust_oneshot(cpustate->timer, attotime_zero, 0);
+				timer_adjust_oneshot(cpustate->timer, attotime::zero, 0);
 		}
 		else
 		{
@@ -632,7 +632,7 @@ static void adjust_timer_interrupt(hyperstone_state *cpustate)
 
 	/* otherwise, disable the timer */
 	else
-		timer_adjust_oneshot(cpustate->timer, attotime_never, 0);
+		timer_adjust_oneshot(cpustate->timer, attotime::never, 0);
 }
 
 static TIMER_CALLBACK( e132xs_timer_callback )

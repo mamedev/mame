@@ -565,7 +565,7 @@ static MACHINE_CONFIG_START( srmp5, srmp5_state )
 	MCFG_CPU_PROGRAM_MAP(srmp5_mem)
 	MCFG_CPU_VBLANK_INT("screen", irq4_line_assert)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -305,7 +305,7 @@ static MACHINE_CONFIG_START( vastar, vastar_state )
 	MCFG_CPU_IO_MAP(cpu2_port_map)
 	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* ??? */
 
-	MCFG_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - seems enough to ensure proper */
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - seems enough to ensure proper */
 						/* synchronization of the CPUs */
 	MCFG_MACHINE_RESET(vastar)
 

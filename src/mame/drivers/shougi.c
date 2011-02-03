@@ -405,7 +405,7 @@ static MACHINE_CONFIG_START( shougi, shougi_state )
 	MCFG_CPU_ADD("mcu", ALPHA8201, 10000000/4/8)
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 	MCFG_WATCHDOG_VBLANK_INIT(16)	// assuming it's the same as champbas
 
 	/* video hardware */

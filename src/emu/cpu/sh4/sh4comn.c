@@ -369,7 +369,7 @@ static TIMER_CALLBACK( sh4_rtc_timer_callback )
 {
 	sh4_state *sh4 = (sh4_state *)ptr;
 
-	timer_adjust_oneshot(sh4->rtc_timer, ATTOTIME_IN_HZ(128), 0);
+	timer_adjust_oneshot(sh4->rtc_timer, attotime::from_hz(128), 0);
 	sh4->m[R64CNT] = (sh4->m[R64CNT]+1) & 0x7f;
 	if (sh4->m[R64CNT] == 64)
 	{
@@ -458,7 +458,7 @@ static int sh4_dma_transfer(sh4_state *sh4, int channel, int timermode, UINT32 c
 	else if (timermode == 2)
 	{
 		sh4->dma_timer_active[channel] = 1;
-		timer_adjust_oneshot(sh4->dma_timer[channel], attotime_zero, channel);
+		timer_adjust_oneshot(sh4->dma_timer[channel], attotime::zero, channel);
 	}
 
 	src &= AM;
@@ -601,7 +601,7 @@ UINT32 dmatcr,chcr,sar,dar;
 		if (sh4->dma_timer_active[channel])
 		{
 			logerror("SH4: DMA %d cancelled in-flight but all data transferred", channel);
-			timer_adjust_oneshot(sh4->dma_timer[channel], attotime_never, channel);
+			timer_adjust_oneshot(sh4->dma_timer[channel], attotime::never, channel);
 			sh4->dma_timer_active[channel] = 0;
 		}
 	}
@@ -617,7 +617,7 @@ int s;
 		if (sh4->dma_timer_active[s])
 		{
 			logerror("SH4: DMA %d cancelled due to NMI but all data transferred", s);
-			timer_adjust_oneshot(sh4->dma_timer[s], attotime_never, s);
+			timer_adjust_oneshot(sh4->dma_timer[s], attotime::never, s);
 			sh4->dma_timer_active[s] = 0;
 		}
 	}
@@ -671,7 +671,7 @@ WRITE32_HANDLER( sh4_internal_w )
 		}
 		else
 		{
-			timer_adjust_oneshot(sh4->refresh_timer, attotime_never, 0);
+			timer_adjust_oneshot(sh4->refresh_timer, attotime::never, 0);
 		}
 		break;
 
@@ -717,11 +717,11 @@ WRITE32_HANDLER( sh4_internal_w )
 		}
 		if ((sh4->m[RCR2] & 8) && (~old & 8))
 		{ // 0 -> 1
-			timer_adjust_oneshot(sh4->rtc_timer, ATTOTIME_IN_HZ(128), 0);
+			timer_adjust_oneshot(sh4->rtc_timer, attotime::from_hz(128), 0);
 		}
 		else if (~(sh4->m[RCR2]) & 8)
 		{ // 0
-			timer_adjust_oneshot(sh4->rtc_timer, attotime_never, 0);
+			timer_adjust_oneshot(sh4->rtc_timer, attotime::never, 0);
 		}
 		break;
 
@@ -730,21 +730,21 @@ WRITE32_HANDLER( sh4_internal_w )
 		if (old & 1)
 			sh4->m[TCNT0] = compute_ticks_timer(sh4->timer[0], sh4->pm_clock, tcnt_div[sh4->m[TCR0] & 7]);
 		if ((sh4->m[TSTR] & 1) == 0) {
-			timer_adjust_oneshot(sh4->timer[0], attotime_never, 0);
+			timer_adjust_oneshot(sh4->timer[0], attotime::never, 0);
 		} else
 			sh4_timer_recompute(sh4, 0);
 
 		if (old & 2)
 			sh4->m[TCNT1] = compute_ticks_timer(sh4->timer[1], sh4->pm_clock, tcnt_div[sh4->m[TCR1] & 7]);
 		if ((sh4->m[TSTR] & 2) == 0) {
-			timer_adjust_oneshot(sh4->timer[1], attotime_never, 0);
+			timer_adjust_oneshot(sh4->timer[1], attotime::never, 0);
 		} else
 			sh4_timer_recompute(sh4, 1);
 
 		if (old & 4)
 			sh4->m[TCNT2] = compute_ticks_timer(sh4->timer[2], sh4->pm_clock, tcnt_div[sh4->m[TCR2] & 7]);
 		if ((sh4->m[TSTR] & 4) == 0) {
-			timer_adjust_oneshot(sh4->timer[2], attotime_never, 0);
+			timer_adjust_oneshot(sh4->timer[2], attotime::never, 0);
 		} else
 			sh4_timer_recompute(sh4, 2);
 		break;
@@ -1161,21 +1161,21 @@ void sh4_common_init(device_t *device)
 	for (i=0; i<3; i++)
 	{
 		sh4->timer[i] = timer_alloc(device->machine, sh4_timer_callback, sh4);
-		timer_adjust_oneshot(sh4->timer[i], attotime_never, i);
+		timer_adjust_oneshot(sh4->timer[i], attotime::never, i);
 	}
 
 	for (i=0; i<4; i++)
 	{
 		sh4->dma_timer[i] = timer_alloc(device->machine, sh4_dmac_callback, sh4);
-		timer_adjust_oneshot(sh4->dma_timer[i], attotime_never, i);
+		timer_adjust_oneshot(sh4->dma_timer[i], attotime::never, i);
 	}
 
 	sh4->refresh_timer = timer_alloc(device->machine, sh4_refresh_timer_callback, sh4);
-	timer_adjust_oneshot(sh4->refresh_timer, attotime_never, 0);
+	timer_adjust_oneshot(sh4->refresh_timer, attotime::never, 0);
 	sh4->refresh_timer_base = 0;
 
 	sh4->rtc_timer = timer_alloc(device->machine, sh4_rtc_timer_callback, sh4);
-	timer_adjust_oneshot(sh4->rtc_timer, attotime_never, 0);
+	timer_adjust_oneshot(sh4->rtc_timer, attotime::never, 0);
 
 	sh4->m = auto_alloc_array(device->machine, UINT32, 16384);
 }

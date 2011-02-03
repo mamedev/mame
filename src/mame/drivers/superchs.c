@@ -379,7 +379,7 @@ static MACHINE_CONFIG_START( superchs, driver_device )
 	MCFG_CPU_PROGRAM_MAP(superchs_cpub_map)
 	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)/* VBL */
 
-	MCFG_QUANTUM_TIME(HZ(480))	/* CPU slices - Need to interleave Cpu's 1 & 3 */
+	MCFG_QUANTUM_TIME(attotime::from_hz(480))	/* CPU slices - Need to interleave Cpu's 1 & 3 */
 
 	MCFG_EEPROM_ADD("eeprom", superchs_eeprom_interface)
 

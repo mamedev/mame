@@ -301,7 +301,7 @@ MACHINE_CONFIG_FRAGMENT( carnival_audio )
 	MCFG_CPU_PROGRAM_MAP(carnival_audio_map)
 	MCFG_CPU_IO_MAP(carnival_audio_io_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_SOUND_ADD("psg", AY8910, PSG_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)

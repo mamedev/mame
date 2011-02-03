@@ -194,7 +194,7 @@ static MACHINE_CONFIG_START( zerozone, zerozone_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 1000000)	/* 1 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(zerozone)
 	MCFG_MACHINE_RESET(zerozone)

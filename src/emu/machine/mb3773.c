@@ -151,7 +151,7 @@ void mb3773_device::set_ck( int state )
 
 void mb3773_device::reset_timer()
 {
-	timer_adjust_oneshot( m_watchdog_timer, ATTOTIME_IN_SEC( 5 ), 0 );
+	timer_adjust_oneshot( m_watchdog_timer, attotime::from_seconds( 5 ), 0 );
 }
 
 TIMER_CALLBACK( mb3773_device::watchdog_timeout )

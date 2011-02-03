@@ -927,7 +927,7 @@ static void megadrive_do_insta_68k_to_vram_dma(running_machine *machine, UINT32 
 	if (length==0x00) length = 0xffff;
 
 	/* This is a hack until real DMA timings are implemented */
-	cpu_spinuntil_time(machine->device("maincpu"), ATTOTIME_IN_NSEC(length * 1000 / 3500));
+	cpu_spinuntil_time(machine->device("maincpu"), attotime::from_nsec(length * 1000 / 3500));
 
 	for (count = 0;count<(length>>1);count++)
 	{
@@ -2269,7 +2269,7 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 
 	/* If the z80 is running, sync the z80 execution state */
 	if ( ! genz80.z80_is_reset )
-		timer_set( space->machine, attotime_zero, NULL, 0, megadriv_z80_run_state );
+		timer_set( space->machine, attotime::zero, NULL, 0, megadriv_z80_run_state );
 }
 
 static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
@@ -2313,7 +2313,7 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 			genz80.z80_is_reset = 1;
 		}
 	}
-	timer_set( space->machine, attotime_zero, NULL, 0, megadriv_z80_run_state );
+	timer_set( space->machine, attotime::zero, NULL, 0, megadriv_z80_run_state );
 }
 
 
@@ -3019,14 +3019,14 @@ static void calculate_pwm_timer(void)
 
 	/* if both RMD and LMD are set to OFF or pwm cycle register is one, then PWM timer ticks doesn't occur */
 	if(pwm_cycle == 1 || ((pwm_ctrl & 0xf) == 0))
-		timer_adjust_oneshot(_32x_pwm_timer, attotime_never, 0);
+		timer_adjust_oneshot(_32x_pwm_timer, attotime::never, 0);
 	else
 	{
 		pwm_timer_tick = 0;
 		lch_fifo_state = rch_fifo_state = 0x4000;
 		lch_index_r = rch_index_r = 0;
 		lch_index_w = rch_index_w = 0;
-		timer_adjust_oneshot(_32x_pwm_timer, ATTOTIME_IN_HZ((PWM_CLOCK) / (pwm_cycle - 1)), 0);
+		timer_adjust_oneshot(_32x_pwm_timer, attotime::from_hz((PWM_CLOCK) / (pwm_cycle - 1)), 0);
 	}
 }
 
@@ -3071,7 +3071,7 @@ static TIMER_CALLBACK( _32x_pwm_callback )
 		if(sh2_slave_pwmint_enable) { cpu_set_input_line(_32x_slave_cpu, SH2_PINT_IRQ_LEVEL,ASSERT_LINE); }
 	}
 
-	timer_adjust_oneshot(_32x_pwm_timer, ATTOTIME_IN_HZ((PWM_CLOCK) / (pwm_cycle - 1)), 0);
+	timer_adjust_oneshot(_32x_pwm_timer, attotime::from_hz((PWM_CLOCK) / (pwm_cycle - 1)), 0);
 }
 
 static READ16_HANDLER( _32x_pwm_r )
@@ -3989,7 +3989,7 @@ static WRITE16_HANDLER( scd_a12002_memory_mode_w )
 					{
 						//printf("main dmna\n");
 						segacd_dmna = 1;
-						timer_adjust_oneshot(segacd_dmna_ret_timer, ATTOTIME_IN_USEC(100), 0);
+						timer_adjust_oneshot(segacd_dmna_ret_timer, attotime::from_usec(100), 0);
 					}
 				}
 			}
@@ -4058,7 +4058,7 @@ static WRITE16_HANDLER( segacd_sub_memory_mode_w )
 					//  printf("sub ret\n");
 					//  segacd_ret = 1;
 					//  segacd_dmna = 0;
-						timer_adjust_oneshot(segacd_dmna_ret_timer, ATTOTIME_IN_USEC(100), 0);
+						timer_adjust_oneshot(segacd_dmna_ret_timer, attotime::from_usec(100), 0);
 					}
 				}
 			}
@@ -4098,7 +4098,7 @@ static WRITE16_HANDLER( segacd_sub_memory_mode_w )
 					// reset it flags etc.?
 					segacd_ret = 0;
 					segacd_dmna = 0;
-					timer_adjust_oneshot(segacd_dmna_ret_timer, ATTOTIME_IN_USEC(100), 0);
+					timer_adjust_oneshot(segacd_dmna_ret_timer, attotime::from_usec(100), 0);
 				}
 				else
 				{
@@ -4983,7 +4983,7 @@ static TIMER_CALLBACK( segacd_hock_callback )
 		hock_cmd = 0;
 	}
 
-	timer_adjust_oneshot(segacd_hock_timer, ATTOTIME_IN_HZ(75), 0);
+	timer_adjust_oneshot(segacd_hock_timer, attotime::from_hz(75), 0);
 }
 
 
@@ -5022,16 +5022,16 @@ void segacd_init_main_cpu( running_machine* machine )
 	memory_install_read16_handler (space, 0x0000070, 0x0000073, 0, 0, scd_hint_vector_r );
 
 	segacd_gfx_conversion_timer = timer_alloc(machine, segacd_gfx_conversion_timer_callback, 0);
-	timer_adjust_oneshot(segacd_gfx_conversion_timer, attotime_never, 0);
+	timer_adjust_oneshot(segacd_gfx_conversion_timer, attotime::never, 0);
 
 	segacd_dmna_ret_timer = timer_alloc(machine, segacd_dmna_ret_timer_callback, 0);
-	timer_adjust_oneshot(segacd_gfx_conversion_timer, attotime_never, 0);
+	timer_adjust_oneshot(segacd_gfx_conversion_timer, attotime::never, 0);
 
 	segacd_hock_timer = timer_alloc(machine, segacd_hock_callback, 0);
-	timer_adjust_oneshot(segacd_hock_timer, attotime_never, 0);
+	timer_adjust_oneshot(segacd_hock_timer, attotime::never, 0);
 
 	segacd_irq3_timer = timer_alloc(machine, segacd_irq3_timer_callback, 0);
-	timer_adjust_oneshot(segacd_irq3_timer, attotime_never, 0);
+	timer_adjust_oneshot(segacd_irq3_timer, attotime::never, 0);
 
 
 
@@ -5112,8 +5112,8 @@ static MACHINE_RESET( segacd )
 	segacd_ram_mode = 0;
 	segacd_ram_mode_old = 0;
 
-	timer_adjust_oneshot(segacd_dmna_ret_timer, attotime_zero, 0);
-	timer_adjust_oneshot(segacd_hock_timer, attotime_zero, 0);
+	timer_adjust_oneshot(segacd_dmna_ret_timer, attotime::zero, 0);
+	timer_adjust_oneshot(segacd_hock_timer, attotime::zero, 0);
 	hock_cmd = 0;
 }
 
@@ -5259,7 +5259,7 @@ static void cdd_hock_irq(running_machine *machine,UINT8 dir)
 	if((segacd_cdd.ctrl & 4 || dir) && segacd_irq_mask & 0x10) // export status, check if bit 2 (HOst ClocK) and irq is enabled
 	{
 		segacd_cdd.ctrl |= 4; // enable Hock bit if it isn't already active
-		timer_set(machine, ATTOTIME_IN_HZ(75), NULL,0, execute_hock_irq); // 1 / 75th of a second
+		timer_set(machine, attotime::from_hz(75), NULL,0, execute_hock_irq); // 1 / 75th of a second
 	}
 }
 #endif
@@ -5288,9 +5288,9 @@ static WRITE16_HANDLER( segacd_cdd_ctrl_w )
 	hock_cmd = (data & 4) >> 2;
 
 	if(data & 4) // enable Hock timer
-		timer_adjust_oneshot(segacd_hock_timer, ATTOTIME_IN_HZ(75), 0);
+		timer_adjust_oneshot(segacd_hock_timer, attotime::from_hz(75), 0);
 	else
-		timer_adjust_oneshot(segacd_hock_timer, attotime_never, 0);
+		timer_adjust_oneshot(segacd_hock_timer, attotime::never, 0);
 }
 
 /* 68k <- CDD communication comms are 4-bit wide */
@@ -5724,7 +5724,7 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 		segacd_conversion_active = 1;
 
 		// todo: proper time calculation
-		timer_adjust_oneshot(segacd_gfx_conversion_timer, ATTOTIME_IN_HZ(500), 0);
+		timer_adjust_oneshot(segacd_gfx_conversion_timer, attotime::from_hz(500), 0);
 
 
 		int line;
@@ -5862,7 +5862,7 @@ static READ16_HANDLER( segacd_irq3timer_r )
 	return segacd_irq3_timer_reg; // always returns value written, not current counter!
 }
 
-#define SEGACD_IRQ3_TIMER_SPEED (ATTOTIME_IN_NSEC(segacd_irq3_timer_reg*30720))
+#define SEGACD_IRQ3_TIMER_SPEED (attotime::from_nsec(segacd_irq3_timer_reg*30720))
 
 static WRITE16_HANDLER( segacd_irq3timer_w )
 {
@@ -5875,7 +5875,7 @@ static WRITE16_HANDLER( segacd_irq3timer_w )
 		if (segacd_irq3_timer_reg)
 			timer_adjust_oneshot(segacd_irq3_timer, SEGACD_IRQ3_TIMER_SPEED, 0);
 		else
-			timer_adjust_oneshot(segacd_irq3_timer, attotime_never, 0);
+			timer_adjust_oneshot(segacd_irq3_timer, attotime::never, 0);
 
 		printf("segacd_irq3timer_w %02x\n", segacd_irq3_timer_reg);
 	}
@@ -6269,7 +6269,7 @@ static UINT8 megadrive_io_read_data_port_svp(running_machine *machine, int portn
 
 static READ16_HANDLER( svp_speedup_r )
 {
-	 cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(100));
+	 cpu_spinuntil_time(space->cpu, attotime::from_usec(100));
 	return 0x0425;
 }
 
@@ -8259,12 +8259,12 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 		genesis_scanline_counter++;
 //      mame_printf_debug("scanline %d\n",genesis_scanline_counter);
 		scanline_timer->adjust(attotime::from_hz(megadriv_framerate) / megadrive_total_scanlines);
-		render_timer->adjust(ATTOTIME_IN_USEC(1));
+		render_timer->adjust(attotime::from_usec(1));
 
 		if (genesis_scanline_counter==megadrive_irq6_scanline )
 		{
 		//  mame_printf_debug("x %d",genesis_scanline_counter);
-			irq6_on_timer->adjust(ATTOTIME_IN_USEC(6));
+			irq6_on_timer->adjust(attotime::from_usec(6));
 			megadrive_irq6_pending = 1;
 			megadrive_vblank_flag = 1;
 
@@ -8299,7 +8299,7 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 
 				if (MEGADRIVE_REG0_IRQ4_ENABLE)
 				{
-					irq4_on_timer->adjust(ATTOTIME_IN_USEC(1));
+					irq4_on_timer->adjust(attotime::from_usec(1));
 					//mame_printf_debug("irq4 on scanline %d reload %d\n",genesis_scanline_counter,MEGADRIVE_REG0A_HINT_VALUE);
 				}
 			}
@@ -8310,7 +8310,7 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 			else irq4counter=MEGADRIVE_REG0A_HINT_VALUE;
 		}
 
-		//if (genesis_scanline_counter==0) irq4_on_timer->adjust(ATTOTIME_IN_USEC(2));
+		//if (genesis_scanline_counter==0) irq4_on_timer->adjust(attotime::from_usec(2));
 
 		if(_32x_is_connected)
 		{
@@ -8424,7 +8424,7 @@ MACHINE_RESET( megadriv )
 		genz80.z80_has_bus = 1;
 		genz80.z80_bank_addr = 0;
 		genesis_scanline_counter = -1;
-		timer_set( machine, attotime_zero, NULL, 0, megadriv_z80_run_state );
+		timer_set( machine, attotime::zero, NULL, 0, megadriv_z80_run_state );
 	}
 
 	megadrive_imode = 0;
@@ -8438,8 +8438,8 @@ MACHINE_RESET( megadriv )
 	irq6_on_timer = machine->device<timer_device>("irq6_timer");
 	irq4_on_timer = machine->device<timer_device>("irq4_timer");
 
-	frame_timer->adjust(attotime_zero);
-	scanline_timer->adjust(attotime_zero);
+	frame_timer->adjust(attotime::zero);
+	scanline_timer->adjust(attotime::zero);
 
 	if (genesis_other_hacks)
 	{
@@ -8605,10 +8605,10 @@ int megadrive_z80irq_hpos = 320;
 		//xxx = machine->device<cpudevice>("maincpu")->attotime_to_cycles(time_elapsed_since_crap);
 		//mame_printf_debug("---------- cycles %d, %08x %08x\n",xxx, (UINT32)(time_elapsed_since_crap.attoseconds>>32),(UINT32)(time_elapsed_since_crap.attoseconds&0xffffffff));
 		//mame_printf_debug("---------- framet %d, %08x %08x\n",xxx, (UINT32)(frametime>>32),(UINT32)(frametime&0xffffffff));
-		frame_timer->adjust(attotime_zero);
+		frame_timer->adjust(attotime::zero);
 	}
 
-	scanline_timer->adjust(attotime_zero);
+	scanline_timer->adjust(attotime::zero);
 
 	if(_32x_is_connected)
 		_32x_hcount_compare_val = -1;
@@ -8789,7 +8789,7 @@ MACHINE_CONFIG_DERIVED( genesis_32x, megadriv )
 	//
 	// boosting the interleave here actually makes Kolibri run incorrectly however, that
 	// one works best just boosting the interleave on communications?!
-	MCFG_QUANTUM_TIME(HZ(1800000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(1800000))
 
 	// we need to remove and re-add the sound system because the balance is different
 	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
@@ -8837,7 +8837,7 @@ MACHINE_CONFIG_DERIVED( genesis_32x_pal, megadpal )
 	//
 	// boosting the interleave here actually makes Kolibri run incorrectly however, that
 	// one works best just boosting the interleave on communications?!
-	MCFG_QUANTUM_TIME(HZ(1800000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(1800000))
 
 	// we need to remove and re-add the sound system because the balance is different
 	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
@@ -8960,7 +8960,7 @@ static void megadriv_init_common(running_machine *machine)
 	if(_32x_is_connected)
 	{
 		_32x_pwm_timer = timer_alloc(machine, _32x_pwm_callback, 0);
-		timer_adjust_oneshot(_32x_pwm_timer, attotime_never, 0);
+		timer_adjust_oneshot(_32x_pwm_timer, attotime::never, 0);
 	}
 
 	sega_cd_connected = 0;

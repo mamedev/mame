@@ -158,7 +158,7 @@ static WRITE8_HANDLER( sound_answer_w )
 
 	/* in Gridiron, the sound CPU goes in a tight loop after the self test, */
 	/* probably waiting to be reset by a watchdog */
-	if (cpu_get_pc(space->cpu) == 0x08bc) timer_set(space->machine, ATTOTIME_IN_SEC(1), NULL, 0, reset_callback);
+	if (cpu_get_pc(space->cpu) == 0x08bc) timer_set(space->machine, attotime::from_seconds(1), NULL, 0, reset_callback);
 }
 
 
@@ -656,7 +656,7 @@ static MACHINE_CONFIG_START( tehkanwc, driver_device )
 	MCFG_CPU_IO_MAP(sound_port)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - seems enough to keep the CPUs in sync */
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - seems enough to keep the CPUs in sync */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

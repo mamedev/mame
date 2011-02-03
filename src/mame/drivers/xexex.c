@@ -71,7 +71,7 @@ Unresolved Issues:
 
 #define XE_DEBUG      0
 #define XE_SKIPIDLE   1
-#define XE_DMADELAY   ATTOTIME_IN_USEC(256)
+#define XE_DMADELAY   attotime::from_usec(256)
 
 static const eeprom_interface eeprom_intf =
 {
@@ -531,7 +531,7 @@ static MACHINE_CONFIG_START( xexex, xexex_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(1920))
+	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
 
 	MCFG_MACHINE_START(xexex)
 	MCFG_MACHINE_RESET(xexex)

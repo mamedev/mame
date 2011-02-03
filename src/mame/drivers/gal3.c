@@ -655,7 +655,7 @@ static MACHINE_CONFIG_START( gal3, driver_device )
     MCFG_CPU_ADD("psn_b3_cpu", M68000, 12000000) // ??
     MCFG_CPU_PROGRAM_MAP(psn_b1_cpu_map,0)
 */
-	MCFG_QUANTUM_TIME(HZ(60*8000)) /* 8000 CPU slices per frame */
+	MCFG_QUANTUM_TIME(attotime::from_hz(60*8000)) /* 8000 CPU slices per frame */
 
 	MCFG_NVRAM_HANDLER(gal3)
 

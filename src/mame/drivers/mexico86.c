@@ -489,7 +489,7 @@ static MACHINE_CONFIG_START( mexico86, mexico86_state )
 	MCFG_CPU_PROGRAM_MAP(mexico86_sub_cpu_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_QUANTUM_TIME(HZ(6000))    /* 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    /* 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs */
 
 	MCFG_MACHINE_START(mexico86)
 	MCFG_MACHINE_RESET(mexico86)

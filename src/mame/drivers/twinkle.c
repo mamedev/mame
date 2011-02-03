@@ -930,7 +930,7 @@ static MACHINE_CONFIG_START( twinkle, twinkle_state )
 	MCFG_CPU_ADD("audiocpu", M68000, 32000000/2)	/* 16.000 MHz */
 	MCFG_CPU_PROGRAM_MAP( sound_map )
 
-	MCFG_WATCHDOG_TIME_INIT(MSEC(1200)) /* check TD pin on LTC1232 */
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1200)) /* check TD pin on LTC1232 */
 
 	MCFG_MACHINE_RESET( twinkle )
 	MCFG_I2CMEM_ADD("security",i2cmem_interface)

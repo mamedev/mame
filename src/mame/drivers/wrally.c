@@ -256,7 +256,7 @@ static MACHINE_CONFIG_START( wrally, driver_device )
 	MCFG_CPU_PROGRAM_MAP(dallas_rom)
 	MCFG_CPU_IO_MAP(dallas_ram)
 
-	MCFG_QUANTUM_TIME(HZ(38400))					/* heavy sync */
+	MCFG_QUANTUM_TIME(attotime::from_hz(38400))					/* heavy sync */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

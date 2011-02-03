@@ -1521,7 +1521,7 @@ static MACHINE_CONFIG_START( rallybik, toaplan1_state )
 	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
 	MCFG_CPU_IO_MAP(rallybik_sound_io_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_RESET(toaplan1)
 
@@ -1561,7 +1561,7 @@ static MACHINE_CONFIG_START( truxton, toaplan1_state )
 	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
 	MCFG_CPU_IO_MAP(truxton_sound_io_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_RESET(toaplan1)
 
@@ -1601,7 +1601,7 @@ static MACHINE_CONFIG_START( hellfire, toaplan1_state )
 	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
 	MCFG_CPU_IO_MAP(hellfire_sound_io_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_RESET(toaplan1)
 
@@ -1641,7 +1641,7 @@ static MACHINE_CONFIG_START( zerowing, toaplan1_state )
 	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
 	MCFG_CPU_IO_MAP(zerowing_sound_io_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_RESET(zerowing)
 
@@ -1685,7 +1685,7 @@ static MACHINE_CONFIG_START( demonwld, toaplan1_state )
 	MCFG_CPU_PROGRAM_MAP(DSP_program_map)
 	MCFG_CPU_IO_MAP(DSP_io_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_RESET(demonwld)
 
@@ -1763,7 +1763,7 @@ static MACHINE_CONFIG_START( outzone, toaplan1_state )
 	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
 	MCFG_CPU_IO_MAP(outzone_sound_io_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_RESET(zerowing)
 

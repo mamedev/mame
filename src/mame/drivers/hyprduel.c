@@ -71,7 +71,7 @@ static INTERRUPT_GEN( hyprduel_interrupt )
 		state->requested_int |= 0x20;
 		cpu_set_input_line(device, 2, HOLD_LINE);
 		/* the duration is a guess */
-		timer_set(device->machine, ATTOTIME_IN_USEC(2500), NULL, 0x20, vblank_end_callback);
+		timer_set(device->machine, attotime::from_usec(2500), NULL, 0x20, vblank_end_callback);
 	}
 	else
 		state->requested_int |= 0x12;		/* hsync */
@@ -342,7 +342,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
                        another blit. */
 					if (b1 == 0)
 					{
-						timer_set(space->machine, ATTOTIME_IN_USEC(500), NULL, 0, hyprduel_blit_done);
+						timer_set(space->machine, attotime::from_usec(500), NULL, 0, hyprduel_blit_done);
 						return;
 					}
 
@@ -668,7 +668,7 @@ static MACHINE_START( magerror )
 	hyprduel_state *state = machine->driver_data<hyprduel_state>();
 
 	MACHINE_START_CALL(hyprduel);
-	timer_adjust_periodic(state->magerror_irq_timer, attotime_zero, 0, ATTOTIME_IN_HZ(968));		/* tempo? */
+	timer_adjust_periodic(state->magerror_irq_timer, attotime::zero, 0, attotime::from_hz(968));		/* tempo? */
 }
 
 static MACHINE_CONFIG_START( hyprduel, hyprduel_state )

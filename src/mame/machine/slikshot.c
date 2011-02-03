@@ -516,7 +516,7 @@ static TIMER_CALLBACK( delayed_z80_control_w )
 	}
 
 	/* boost the interleave whenever this is written to */
-	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
+	cpuexec_boost_interleave(machine, attotime::zero, attotime::from_usec(100));
 
 	/* stash the new value */
 	z80_ctrl = data;

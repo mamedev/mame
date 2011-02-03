@@ -395,7 +395,7 @@ static MACHINE_CONFIG_START( missb2, bublbobl_state )
 //  MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 	MCFG_CPU_VBLANK_INT("screen", missb2_interrupt)
 
-	MCFG_QUANTUM_TIME(HZ(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
 	MCFG_MACHINE_START(missb2)
 	MCFG_MACHINE_RESET(missb2)

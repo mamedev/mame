@@ -924,7 +924,7 @@ static MACHINE_CONFIG_START( hangon_base, segas1x_state )
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 
 	MCFG_MACHINE_RESET(hangon)
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_PPI8255_ADD( "ppi8255_1", hangon_ppi_intf[0] )
 	MCFG_PPI8255_ADD( "ppi8255_2", hangon_ppi_intf[1] )

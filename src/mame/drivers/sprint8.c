@@ -461,7 +461,7 @@ static MACHINE_CONFIG_START( sprint8, sprint8_state )
 
 	MCFG_MACHINE_RESET(sprint8)
 
-	MCFG_TIMER_ADD_PERIODIC("input_timer", input_callback, HZ(60))
+	MCFG_TIMER_ADD_PERIODIC("input_timer", input_callback, attotime::from_hz(60))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

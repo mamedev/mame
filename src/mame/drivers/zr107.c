@@ -677,7 +677,7 @@ static void sound_irq_callback( running_machine *machine, int irq )
 	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
 
 	cputag_set_input_line(machine, "audiocpu", line, ASSERT_LINE);
-	timer_set(machine, ATTOTIME_IN_USEC(1), NULL, line, irq_off);
+	timer_set(machine, attotime::from_usec(1), NULL, line, irq_off);
 }
 
 static const k056800_interface zr107_k056800_interface =
@@ -731,7 +731,7 @@ static MACHINE_CONFIG_START( zr107, driver_device )
 	MCFG_CPU_CONFIG(sharc_cfg)
 	MCFG_CPU_DATA_MAP(sharc_map)
 
-	MCFG_QUANTUM_TIME(HZ(30000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 	MCFG_MACHINE_START(zr107)
@@ -792,7 +792,7 @@ static MACHINE_CONFIG_START( jetwave, driver_device )
 	MCFG_CPU_CONFIG(sharc_cfg)
 	MCFG_CPU_DATA_MAP(sharc_map)
 
-	MCFG_QUANTUM_TIME(HZ(30000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 	MCFG_MACHINE_START(zr107)

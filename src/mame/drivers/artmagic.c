@@ -161,7 +161,7 @@ static READ16_HANDLER( ultennis_hack_r )
 	{
 		hack_irq = 1;
 		update_irq_state(space->machine);
-		timer_set(space->machine, ATTOTIME_IN_USEC(1), NULL, 0, irq_off);
+		timer_set(space->machine, attotime::from_usec(1), NULL, 0, irq_off);
 	}
 	return input_port_read(space->machine, "300000");
 }
@@ -852,7 +852,7 @@ static MACHINE_CONFIG_START( artmagic, driver_device )
 
 	MCFG_MACHINE_START(artmagic)
 	MCFG_MACHINE_RESET(artmagic)
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */

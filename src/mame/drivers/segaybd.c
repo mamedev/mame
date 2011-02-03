@@ -96,7 +96,7 @@ static void update_main_irqs(running_machine *machine)
 	cpu_set_input_line(state->suby, 6, state->timer_irq_state && state->vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
 
 	if (state->timer_irq_state || state->vblank_irq_state)
-		cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(50));
+		cpuexec_boost_interleave(machine, attotime::zero, attotime::from_usec(50));
 }
 
 
@@ -1005,7 +1005,7 @@ static MACHINE_CONFIG_START( yboard, segas1x_state )
 	MCFG_MACHINE_START(yboard)
 	MCFG_MACHINE_RESET(yboard)
 	MCFG_NVRAM_ADD_0FILL("backupram")
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_TIMER_ADD("int_timer", scanline_callback)
 

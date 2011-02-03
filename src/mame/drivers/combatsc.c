@@ -366,12 +366,12 @@ static READ8_DEVICE_HANDLER ( combatsc_ym2203_r )
 		if (state->boost)
 		{
 			state->boost = 0;
-			timer_adjust_periodic(state->interleave_timer, attotime_zero, 0, state->audiocpu->cycles_to_attotime(80));
+			timer_adjust_periodic(state->interleave_timer, attotime::zero, 0, state->audiocpu->cycles_to_attotime(80));
 		}
 		else if (status & 2)
 		{
 			state->boost = 1;
-			timer_adjust_oneshot(state->interleave_timer, attotime_zero, 0);
+			timer_adjust_oneshot(state->interleave_timer, attotime::zero, 0);
 		}
 	}
 
@@ -744,7 +744,7 @@ static MACHINE_CONFIG_START( combatsc, combatsc_state )
 	MCFG_CPU_ADD("audiocpu", Z80,3579545)	/* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(combatsc_sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(1200))
+	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 
 	MCFG_MACHINE_START(combatsc)
 	MCFG_MACHINE_RESET(combatsc)
@@ -789,7 +789,7 @@ static MACHINE_CONFIG_START( combatscb, combatsc_state )
 	MCFG_CPU_ADD("audiocpu", Z80,3579545)	/* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(combatsc_sound_map) /* FAKE */
 
-	MCFG_QUANTUM_TIME(HZ(1200))
+	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 
 	MCFG_MACHINE_START(combatsc)
 	MCFG_MACHINE_RESET(combatsc)

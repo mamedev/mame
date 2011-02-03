@@ -823,7 +823,7 @@ static MACHINE_CONFIG_START( dunhuang, dunhuang_state )
 	MCFG_MACHINE_START(dunhuang)
 	MCFG_MACHINE_RESET(dunhuang)
 
-	MCFG_WATCHDOG_TIME_INIT(SEC(5))
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(5))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

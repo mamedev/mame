@@ -63,7 +63,7 @@ static TIMER_CALLBACK( ds2401_reset )
 	verboselog( machine, 1, "ds2401_reset(%d)\n", which );
 
 	c->state = STATE_RESET;
-	timer_adjust_oneshot( c->timer, attotime_never, which );
+	timer_adjust_oneshot( c->timer, attotime::never, which );
 }
 
 static TIMER_CALLBACK( ds2401_tick )
@@ -140,11 +140,11 @@ void ds2401_init( running_machine *machine, int which, const UINT8 *data )
 	c->rx = 1;
 	c->tx = 1;
 	c->data = data;
-	c->t_samp = ATTOTIME_IN_USEC( 15 );
-	c->t_rdv = ATTOTIME_IN_USEC( 15 );
-	c->t_rstl = ATTOTIME_IN_USEC( 480 );
-	c->t_pdh = ATTOTIME_IN_USEC( 15 );
-	c->t_pdl = ATTOTIME_IN_USEC( 60 );
+	c->t_samp = attotime::from_usec( 15 );
+	c->t_rdv = attotime::from_usec( 15 );
+	c->t_rstl = attotime::from_usec( 480 );
+	c->t_pdh = attotime::from_usec( 15 );
+	c->t_pdl = attotime::from_usec( 60 );
 
 	state_save_register_item(machine,  "ds2401", NULL, which, c->state );
 	state_save_register_item(machine,  "ds2401", NULL, which, c->bit );
@@ -205,7 +205,7 @@ void ds2401_write( running_machine *machine, int which, int data )
 			timer_adjust_oneshot( c->timer, c->t_pdh, which );
 			break;
 		}
-		timer_adjust_oneshot( c->reset_timer, attotime_never, which );
+		timer_adjust_oneshot( c->reset_timer, attotime::never, which );
 	}
 	c->rx = data;
 }

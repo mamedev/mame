@@ -582,7 +582,7 @@ static MACHINE_START( exctsccr )
 	state->audiocpu = machine->device("audiocpu");
 
 	// FIXME
-	timer_pulse(machine, ATTOTIME_IN_HZ(75), NULL, 0, exctsccr_fm_callback); /* updates fm */
+	timer_pulse(machine, attotime::from_hz(75), NULL, 0, exctsccr_fm_callback); /* updates fm */
 
 	MACHINE_START_CALL(champbas);
 }
@@ -682,7 +682,7 @@ static MACHINE_CONFIG_DERIVED( champmcu, champbas )
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
 	/* to MCU timeout champbbj */
-	MCFG_QUANTUM_TIME(HZ(3000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(3000))
 MACHINE_CONFIG_END
 
 

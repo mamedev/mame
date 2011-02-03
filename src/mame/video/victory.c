@@ -44,7 +44,7 @@ static struct
 /* but the interrupt test does some precise timing, and fails */
 /* if it's not 8 */
 #define VICTORY_MICRO_STATE_CLOCK	(XTAL_11_289MHz)
-#define MICRO_STATE_CLOCK_PERIOD	ATTOTIME_IN_HZ(VICTORY_MICRO_STATE_CLOCK / 8)
+#define MICRO_STATE_CLOCK_PERIOD	attotime::from_hz(VICTORY_MICRO_STATE_CLOCK / 8)
 
 
 /* debugging constants */
@@ -530,13 +530,13 @@ INLINE void count_states(int states)
 
 	if (!micro.timer)
 	{
-		timer_adjust_oneshot(micro.timer, attotime_never, 0);
+		timer_adjust_oneshot(micro.timer, attotime::never, 0);
 		micro.timer_active = 1;
 		micro.endtime = state_time;
 	}
 	else if (timer_timeelapsed(micro.timer) > micro.endtime)
 	{
-		timer_adjust_oneshot(micro.timer, attotime_never, 0);
+		timer_adjust_oneshot(micro.timer, attotime::never, 0);
 		micro.timer_active = 1;
 		micro.endtime = state_time;
 	}

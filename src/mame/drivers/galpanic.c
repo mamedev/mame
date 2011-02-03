@@ -909,7 +909,7 @@ static MACHINE_CONFIG_DERIVED( galpanica, galpanic )
 	/* basic machine hardware */
 
 	/* arm watchdog */
-	MCFG_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))	/* a guess, and certainly wrong */
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( comad, galpanic )

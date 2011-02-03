@@ -440,7 +440,7 @@ static void josvolly_8741_do(running_machine *machine, int num)
 	if( (i8741[num].sts & 0x02) )
 	{
 		/* transmit data */
-		timer_set (machine, ATTOTIME_IN_USEC(1), NULL, num, josvolly_8741_tx);
+		timer_set (machine, attotime::from_usec(1), NULL, num, josvolly_8741_tx);
 	}
 }
 

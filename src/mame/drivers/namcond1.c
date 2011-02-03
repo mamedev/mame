@@ -300,7 +300,7 @@ static MACHINE_CONFIG_START( namcond1, driver_device )
 	MCFG_CPU_IO_MAP( nd1h8iomap)
 	MCFG_CPU_VBLANK_INT("screen", mcu_interrupt)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_START(namcond1)
 	MCFG_MACHINE_RESET(namcond1)

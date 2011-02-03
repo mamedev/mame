@@ -42,7 +42,7 @@ extern void h8_3002_InterruptRequest(h83xx_state *h8, UINT8 source, UINT8 state)
 
 static void h8itu_timer_expire(h83xx_state *h8, int which)
 {
-	timer_adjust_oneshot(h8->timer[which], attotime_never, 0);
+	timer_adjust_oneshot(h8->timer[which], attotime::never, 0);
 	h8->h8TCNT[which] = 0;
 	h8->per_regs[tsr[which]] |= 4;
 	// interrupt on overflow ?
@@ -489,7 +489,7 @@ static void h8itu_3007_timer_expire(h83xx_state *h8, int tnum)
 		else
 		{
 			//logerror("h8/3007 timer %d GRA match, stopping\n",tnum);
-			timer_adjust_oneshot(h8->timer[tnum], attotime_never, 0);
+			timer_adjust_oneshot(h8->timer[tnum], attotime::never, 0);
 		}
 
 		h8->per_regs[0x64] |= 1<<tnum;
@@ -511,7 +511,7 @@ static void h8itu_3007_timer_expire(h83xx_state *h8, int tnum)
 		else
 		{
 			//logerror("h8/3007 timer %d GRB match, stopping\n",tnum);
-			timer_adjust_oneshot(h8->timer[tnum], attotime_never, 0);
+			timer_adjust_oneshot(h8->timer[tnum], attotime::never, 0);
 		}
 
 		h8->per_regs[0x65] |= 1<<tnum;
@@ -790,5 +790,5 @@ void h8_itu_reset(h83xx_state *h8)
 
 	// stop all the timers
 	for (i=0; i<5; i++)
-		timer_adjust_oneshot(h8->timer[i], attotime_never, 0);
+		timer_adjust_oneshot(h8->timer[i], attotime::never, 0);
 }

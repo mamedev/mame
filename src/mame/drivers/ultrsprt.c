@@ -211,7 +211,7 @@ static MACHINE_CONFIG_START( ultrsprt, driver_device )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT(irq5_line_hold, 1)	// ???
 
-	MCFG_QUANTUM_TIME(HZ(12000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 	MCFG_MACHINE_START(ultrsprt)

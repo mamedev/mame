@@ -282,7 +282,7 @@ static UINT8 vp931_data_r(laserdisc_state *ld)
 	}
 
 	/* also boost interleave for 4 scanlines to ensure proper communications */
-	cpuexec_boost_interleave(ld->device->machine, attotime_zero, ld->screen->scan_period() * 4);
+	cpuexec_boost_interleave(ld->device->machine, attotime::zero, ld->screen->scan_period() * 4);
 	return player->tocontroller;
 }
 
@@ -335,7 +335,7 @@ static TIMER_CALLBACK( vbi_data_fetch )
 	if (which == 0)
 	{
 		cpu_set_input_line(player->cpu, MCS48_INPUT_IRQ, ASSERT_LINE);
-		timer_set(machine, ATTOTIME_IN_NSEC(5580), ld, 0, irq_off);
+		timer_set(machine, attotime::from_nsec(5580), ld, 0, irq_off);
 	}
 
 	/* clock the data strobe on each subsequent callback */
@@ -343,7 +343,7 @@ static TIMER_CALLBACK( vbi_data_fetch )
 	{
 		player->daticval = code >> (8 * (3 - which));
 		player->datastrobe = 1;
-		timer_set(machine, ATTOTIME_IN_NSEC(5000), ld, 0, datastrobe_off);
+		timer_set(machine, attotime::from_nsec(5000), ld, 0, datastrobe_off);
 	}
 
 	/* determine the next bit to fetch and reprime ourself */
@@ -616,7 +616,7 @@ static WRITE8_HANDLER( to_controller_w )
 		(*player->data_ready_cb)(ld->device, TRUE);
 
 	/* also boost interleave for 4 scanlines to ensure proper communications */
-	cpuexec_boost_interleave(ld->device->machine, attotime_zero, ld->screen->scan_period() * 4);
+	cpuexec_boost_interleave(ld->device->machine, attotime::zero, ld->screen->scan_period() * 4);
 }
 
 
@@ -706,10 +706,10 @@ static WRITE8_HANDLER( port1_w )
 		else if (((player->port1 ^ data) & 0x11) != 0)
 		{
 			/* speeds here are just guesses, but work with the player logic; this is the time per half-track */
-			attotime speed = (data & 0x10) ? ATTOTIME_IN_USEC(60) : ATTOTIME_IN_USEC(10);
+			attotime speed = (data & 0x10) ? attotime::from_usec(60) : attotime::from_usec(10);
 
 			/* always start with an initial long delay; the code expects this */
-			player->tracktimer->adjust(ATTOTIME_IN_USEC(100), 0, speed);
+			player->tracktimer->adjust(attotime::from_usec(100), 0, speed);
 		}
 	}
 

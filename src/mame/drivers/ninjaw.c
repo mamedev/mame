@@ -811,7 +811,7 @@ static MACHINE_CONFIG_START( ninjaw, ninjaw_state )
 	MCFG_CPU_PROGRAM_MAP(ninjaw_slave_map)
 	MCFG_CPU_VBLANK_INT("lscreen", irq4_line_hold)
 
-	MCFG_QUANTUM_TIME(HZ(6000))	/* CPU slices */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* CPU slices */
 
 	MCFG_MACHINE_START(ninjaw)
 	MCFG_MACHINE_RESET(ninjaw)
@@ -895,7 +895,7 @@ static MACHINE_CONFIG_START( darius2, ninjaw_state )
 	MCFG_CPU_PROGRAM_MAP(darius2_slave_map)
 	MCFG_CPU_VBLANK_INT("lscreen", irq4_line_hold)
 
-	MCFG_QUANTUM_TIME(HZ(6000))	/* CPU slices */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* CPU slices */
 
 	MCFG_MACHINE_START(ninjaw)
 	MCFG_MACHINE_RESET(ninjaw)

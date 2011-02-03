@@ -1098,7 +1098,7 @@ static MACHINE_CONFIG_DERIVED( meritm_crt260, meritm_crt250 )
 
 	MCFG_PPI8255_RECONFIG( "ppi8255", crt260_ppi8255_intf )
 
-	MCFG_WATCHDOG_TIME_INIT(MSEC(1200))	// DS1232, TD connected to VCC
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1200))	// DS1232, TD connected to VCC
 	MCFG_MACHINE_START(meritm_crt260)
 
 MACHINE_CONFIG_END

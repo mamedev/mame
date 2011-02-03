@@ -648,11 +648,11 @@ static MACHINE_CONFIG_START( airbustr, airbustr_state )
 	MCFG_CPU_IO_MAP(sound_io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)		// nmi are caused by sub cpu writing a sound command
 
-	MCFG_QUANTUM_TIME(HZ(6000))	// Palette RAM is filled by sub cpu with data supplied by main cpu
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	// Palette RAM is filled by sub cpu with data supplied by main cpu
 							// Maybe a high value is safer in order to avoid glitches
 	MCFG_MACHINE_START(airbustr)
 	MCFG_MACHINE_RESET(airbustr)
-	MCFG_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))	/* a guess, and certainly wrong */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -685,7 +685,7 @@ static MACHINE_CONFIG_START( airbustr, airbustr_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( airbustrb, airbustr )
-	MCFG_WATCHDOG_TIME_INIT(SEC(0)) // no protection device or watchdog
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(0)) // no protection device or watchdog
 MACHINE_CONFIG_END
 
 

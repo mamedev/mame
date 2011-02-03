@@ -524,7 +524,7 @@ static MACHINE_CONFIG_START( gyruss, gyruss_state )
 	MCFG_CPU_PROGRAM_MAP(audio_cpu2_map)
 	MCFG_CPU_IO_MAP(audio_cpu2_io_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_START(gyruss)
 

@@ -541,7 +541,7 @@ if (LOG_DMA)
 	}
 
 	/* signal we're done */
-	timer_set(space->machine, ATTOTIME_IN_NSEC(41 * dma_state.width * dma_state.height), NULL, 0, dma_callback);
+	timer_set(space->machine, attotime::from_nsec(41 * dma_state.width * dma_state.height), NULL, 0, dma_callback);
 
 	g_profiler.stop();
 }

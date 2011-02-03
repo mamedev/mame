@@ -746,7 +746,7 @@ static MACHINE_CONFIG_START( opwolf, opwolf_state )
 	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK )	/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(opwolf_sound_z80_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	MCFG_MACHINE_START(opwolf)
 	MCFG_MACHINE_RESET(opwolf)
@@ -803,7 +803,7 @@ static MACHINE_CONFIG_START( opwolfb, opwolf_state ) /* OSC clocks unknown for t
 	MCFG_CPU_PROGRAM_MAP(opwolfb_sub_z80_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	MCFG_MACHINE_START(opwolf)
 

@@ -473,7 +473,7 @@ static WRITE8_DEVICE_HANDLER( n7751_control_w )
 
 	cpu_set_input_line(state->n7751, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 	cpu_set_input_line(state->n7751, 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-	cpuexec_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(100));
+	cpuexec_boost_interleave(device->machine, attotime::zero, attotime::from_usec(100));
 }
 
 
@@ -887,7 +887,7 @@ static WRITE8_HANDLER( mcu_control_w )
 		segaic16_set_display_enable(space->machine, 1);
 
 	if ((state->mcu_control ^ data) & 0x40)
-		cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(10));
+		cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(10));
 
 	state->mcu_control = data;
 }
@@ -991,7 +991,7 @@ static INTERRUPT_GEN( mcu_irq_assert )
 	cpu_set_input_line(device, MCS51_INT0_LINE, CLEAR_LINE);
 
 	/* boost interleave to ensure that the MCU can break the M68000 out of a STOP */
-	cpuexec_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(100));
+	cpuexec_boost_interleave(device->machine, attotime::zero, attotime::from_usec(100));
 }
 
 

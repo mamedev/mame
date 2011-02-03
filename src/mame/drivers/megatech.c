@@ -272,7 +272,7 @@ static TIMER_CALLBACK( megatech_z80_stop_state )
 	if (game_region)
 	{
 		{
-			timer_set( machine, attotime_zero, NULL, param, megatech_z80_run_state );
+			timer_set( machine, attotime::zero, NULL, param, megatech_z80_run_state );
 		}
 	}
 	else
@@ -287,7 +287,7 @@ static TIMER_CALLBACK( megatech_z80_stop_state )
 
 static void megatech_select_game(running_machine *machine, int gameno)
 {
-	timer_set( machine, attotime_zero, NULL, gameno, megatech_z80_stop_state );
+	timer_set( machine, attotime::zero, NULL, gameno, megatech_z80_stop_state );
 }
 
 static WRITE8_HANDLER( megatech_cart_select_w )
@@ -437,7 +437,7 @@ static VIDEO_START(mtnew)
 	init_for_megadrive(machine); // create an sms vdp too, for comptibility mode
 	VIDEO_START_CALL(megadriv);
 }
-//attotime_never
+//attotime::never
 static VIDEO_UPDATE(mtnew)
 {
 	device_t *megadriv_screen = screen->machine->device("megadriv");

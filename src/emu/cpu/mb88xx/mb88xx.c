@@ -217,7 +217,7 @@ static TIMER_CALLBACK( serial_timer )
 	/* if we get too many interrupts with no servicing, disable the timer
        until somebody does something */
 	if (cpustate->SBcount >= SERIAL_DISABLE_THRESH)
-		timer_adjust_oneshot(cpustate->serial, attotime_never, 0);
+		timer_adjust_oneshot(cpustate->serial, attotime::never, 0);
 
 	/* only read if not full; this is needed by the Namco 52xx to ensure that
        the program can write to S and recover the value even if serial is enabled */
@@ -261,9 +261,9 @@ static void update_pio_enable( mb88_state *cpustate, UINT8 newpio )
 	if ((cpustate->pio ^ newpio) & 0x30)
 	{
 		if ((newpio & 0x30) == 0)
-			timer_adjust_oneshot(cpustate->serial, attotime_never, 0);
+			timer_adjust_oneshot(cpustate->serial, attotime::never, 0);
 		else if ((newpio & 0x30) == 0x20)
-			timer_adjust_periodic(cpustate->serial, ATTOTIME_IN_HZ(cpustate->device->clock() / SERIAL_PRESCALE), 0, ATTOTIME_IN_HZ(cpustate->device->clock() / SERIAL_PRESCALE));
+			timer_adjust_periodic(cpustate->serial, attotime::from_hz(cpustate->device->clock() / SERIAL_PRESCALE), 0, attotime::from_hz(cpustate->device->clock() / SERIAL_PRESCALE));
 		else
 			fatalerror("mb88xx: update_pio_enable set serial enable to unsupported value %02X\n", newpio & 0x30);
 	}
@@ -625,7 +625,7 @@ static CPU_EXECUTE( mb88 )
 				{
 					/* re-enable the timer if we disabled it previously */
 					if (cpustate->SBcount >= SERIAL_DISABLE_THRESH)
-						timer_adjust_periodic(cpustate->serial, ATTOTIME_IN_HZ(cpustate->device->clock() / SERIAL_PRESCALE), 0, ATTOTIME_IN_HZ(cpustate->device->clock() / SERIAL_PRESCALE));
+						timer_adjust_periodic(cpustate->serial, attotime::from_hz(cpustate->device->clock() / SERIAL_PRESCALE), 0, attotime::from_hz(cpustate->device->clock() / SERIAL_PRESCALE));
 					cpustate->SBcount = 0;
 				}
 				cpustate->sf = 0;

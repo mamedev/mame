@@ -520,14 +520,14 @@ INLINE void sega005_update_sound_data(running_machine *machine)
 	if ((diff & 0x20) && !(newval & 0x20))
 	{
 		//mame_printf_debug("Stopping timer\n");
-		timer_adjust_oneshot(sega005_sound_timer, attotime_never, 0);
+		timer_adjust_oneshot(sega005_sound_timer, attotime::never, 0);
 	}
 
 	/* if bit 5 goes low, we start the timer again */
 	if ((diff & 0x20) && (newval & 0x20))
 	{
 		//mame_printf_debug("Starting timer\n");
-		timer_adjust_periodic(sega005_sound_timer, ATTOTIME_IN_HZ(SEGA005_555_TIMER_FREQ), 0, ATTOTIME_IN_HZ(SEGA005_555_TIMER_FREQ));
+		timer_adjust_periodic(sega005_sound_timer, attotime::from_hz(SEGA005_555_TIMER_FREQ), 0, attotime::from_hz(SEGA005_555_TIMER_FREQ));
 	}
 }
 
@@ -948,7 +948,7 @@ static WRITE8_DEVICE_HANDLER( n7751_command_w )
     */
 	n7751_command = data & 0x07;
 	cputag_set_input_line(device->machine, "audiocpu", 0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
-	cpuexec_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(100));
+	cpuexec_boost_interleave(device->machine, attotime::zero, attotime::from_usec(100));
 }
 
 

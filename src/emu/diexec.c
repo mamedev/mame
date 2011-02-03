@@ -78,7 +78,7 @@ device_config_execute_interface::device_config_execute_interface(const machine_c
 	  m_vblank_interrupts_per_frame(0),
 	  m_vblank_interrupt_screen(NULL),
 	  m_timed_interrupt(NULL),
-	  m_timed_interrupt_period(attotime_zero)
+	  m_timed_interrupt_period(attotime::zero)
 {
 }
 

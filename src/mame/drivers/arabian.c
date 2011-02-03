@@ -373,7 +373,7 @@ static MACHINE_CONFIG_START( arabian, arabian_state )
 	MCFG_CPU_ADD("mcu", MB8841, MAIN_OSC/3/2)
 	MCFG_CPU_IO_MAP(mcu_io_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_START(arabian)
 	MCFG_MACHINE_RESET(arabian)

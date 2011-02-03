@@ -676,7 +676,7 @@ static MACHINE_CONFIG_START( ppking, gladiatr_state )
 	MCFG_CPU_ADD("audiocpu", M6809, XTAL_12MHz/16) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(ppking_cpu3_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_RESET(ppking)
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -725,7 +725,7 @@ static MACHINE_CONFIG_START( gladiatr, gladiatr_state )
 	MCFG_CPU_ADD("audiocpu", M6809, XTAL_12MHz/16) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(gladiatr_cpu3_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_RESET(gladiator)
 	MCFG_NVRAM_ADD_0FILL("nvram")

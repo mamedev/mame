@@ -395,7 +395,7 @@ static MACHINE_CONFIG_START( chqflag, chqflag_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(chqflag_sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(chqflag)
 	MCFG_MACHINE_RESET(chqflag)

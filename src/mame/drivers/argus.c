@@ -544,7 +544,7 @@ static MACHINE_CONFIG_START( argus, driver_device )
 	MCFG_CPU_IO_MAP(sound_portmap_2)
 #endif
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -598,7 +598,7 @@ static MACHINE_CONFIG_START( valtric, driver_device )
 	MCFG_CPU_PROGRAM_MAP(sound_map_a)
 	MCFG_CPU_IO_MAP(sound_portmap_2)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -643,7 +643,7 @@ static MACHINE_CONFIG_START( butasan, driver_device )
 	MCFG_CPU_PROGRAM_MAP(sound_map_b)
 	MCFG_CPU_IO_MAP(sound_portmap_2)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

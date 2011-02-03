@@ -202,7 +202,7 @@ void ttl74123_device::set_output()
 {
 	int output = timer_running();
 
-	timer_set( &m_machine, attotime_zero, (void *)this, output, output_callback );
+	timer_set( &m_machine, attotime::zero, (void *)this, output, output_callback );
 
 	if (LOG) logerror("74123 %s:  Output: %d\n", tag(), output);
 }
@@ -325,7 +325,7 @@ void ttl74123_device::clear_w(UINT8 data)
 	}
 	else if (!data)	 /* clear the output  */
 	{
-		timer_adjust_oneshot(m_timer, attotime_zero, 0);
+		timer_adjust_oneshot(m_timer, attotime::zero, 0);
 
 		if (LOG) logerror("74123 #%s:  Cleared\n", tag() );
 	}

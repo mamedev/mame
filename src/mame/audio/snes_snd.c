@@ -1186,7 +1186,7 @@ WRITE8_DEVICE_HANDLER( spc_io_w )
 		case 0x7:		/* Port 3 */
 			// mame_printf_debug("SPC: %02x to APU @ %d (PC=%x)\n", data, offset & 3, cpu_get_pc(space->cpu));
 			spc700->port_out[offset - 4] = data;
-			cpuexec_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(20));
+			cpuexec_boost_interleave(device->machine, attotime::zero, attotime::from_usec(20));
 			break;
 		case 0xa:		/* Timer 0 */
 		case 0xb:		/* Timer 1 */
@@ -1321,13 +1321,13 @@ static DEVICE_START( snes_sound )
 
 	/* Initialize the timers */
 	spc700->timer[0] = timer_alloc(machine, snes_spc_timer, spc700);
-	timer_adjust_periodic(spc700->timer[0], ATTOTIME_IN_HZ(8000),  0, ATTOTIME_IN_HZ(8000));
+	timer_adjust_periodic(spc700->timer[0], attotime::from_hz(8000),  0, attotime::from_hz(8000));
 	timer_enable(spc700->timer[0], 0);
 	spc700->timer[1] = timer_alloc(machine, snes_spc_timer, spc700);
-	timer_adjust_periodic(spc700->timer[1], ATTOTIME_IN_HZ(8000),  1, ATTOTIME_IN_HZ(8000));
+	timer_adjust_periodic(spc700->timer[1], attotime::from_hz(8000),  1, attotime::from_hz(8000));
 	timer_enable(spc700->timer[1], 0);
 	spc700->timer[2] = timer_alloc(machine, snes_spc_timer, spc700);
-	timer_adjust_periodic(spc700->timer[2], ATTOTIME_IN_HZ(64000), 2, ATTOTIME_IN_HZ(64000));
+	timer_adjust_periodic(spc700->timer[2], attotime::from_hz(64000), 2, attotime::from_hz(64000));
 	timer_enable(spc700->timer[2], 0);
 
 	state_register(device);

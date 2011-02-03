@@ -325,7 +325,7 @@ static void akiko_cdda_stop(akiko_state *state)
 	if (cdda != NULL)
 	{
 		cdda_stop_audio(cdda);
-		timer_reset( state->frame_timer, attotime_never );
+		timer_reset( state->frame_timer, attotime::never );
 	}
 }
 
@@ -335,7 +335,7 @@ static void akiko_cdda_play(akiko_state *state, UINT32 lba, UINT32 num_blocks)
 	if (cdda != NULL)
 	{
 		cdda_start_audio(cdda, lba, num_blocks);
-		timer_adjust_oneshot( state->frame_timer, ATTOTIME_IN_HZ( 75 ), 0 );
+		timer_adjust_oneshot( state->frame_timer, attotime::from_hz( 75 ), 0 );
 	}
 }
 
@@ -350,11 +350,11 @@ static void akiko_cdda_pause(akiko_state *state, int pause)
 
 			if ( pause )
 			{
-				timer_reset( state->frame_timer, attotime_never );
+				timer_reset( state->frame_timer, attotime::never );
 			}
 			else
 			{
-				timer_adjust_oneshot( state->frame_timer, ATTOTIME_IN_HZ( 75 ), 0 );
+				timer_adjust_oneshot( state->frame_timer, attotime::from_hz( 75 ), 0 );
 			}
 		}
 	}
@@ -417,7 +417,7 @@ static TIMER_CALLBACK(akiko_frame_proc)
 			akiko_set_cd_status(state, 0x80000000);	/* subcode ready */
 		}
 
-		timer_adjust_oneshot( state->frame_timer, ATTOTIME_IN_HZ( 75 ), 0 );
+		timer_adjust_oneshot( state->frame_timer, attotime::from_hz( 75 ), 0 );
 	}
 }
 
@@ -502,7 +502,7 @@ static TIMER_CALLBACK(akiko_dma_proc)
 	if ( state->cdrom_readreqmask == 0 )
 		akiko_set_cd_status(state, 0x04000000);
 	else
-		timer_adjust_oneshot( state->dma_timer, ATTOTIME_IN_USEC( CD_SECTOR_TIME / state->cdrom_speed ), 0 );
+		timer_adjust_oneshot( state->dma_timer, attotime::from_usec( CD_SECTOR_TIME / state->cdrom_speed ), 0 );
 }
 
 static void akiko_start_dma(akiko_state *state)
@@ -518,7 +518,7 @@ static void akiko_start_dma(akiko_state *state)
 
 	state->cdrom_lba_cur = state->cdrom_lba_start;
 
-	timer_adjust_oneshot( state->dma_timer, ATTOTIME_IN_USEC( CD_SECTOR_TIME / state->cdrom_speed ), 0 );
+	timer_adjust_oneshot( state->dma_timer, attotime::from_usec( CD_SECTOR_TIME / state->cdrom_speed ), 0 );
 }
 
 static void akiko_setup_response( akiko_state *state, int len, UINT8 *r1 )
@@ -702,7 +702,7 @@ static void akiko_update_cdrom(akiko_state *state)
 		{
 			state->cdrom_cmd_start = (state->cdrom_cmd_start+3) & 0xff;
 
-			timer_set( state->machine, ATTOTIME_IN_MSEC(1), state, resp[0], akiko_cd_delayed_cmd );
+			timer_set( state->machine, attotime::from_msec(1), state, resp[0], akiko_cd_delayed_cmd );
 
 			break;
 		}

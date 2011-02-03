@@ -210,7 +210,7 @@ static UINT32 copro_fifoout_pop(address_space *space)
 		i960_stall(space->cpu);
 
 		/* spin the main cpu and let the TGP catch up */
-		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(100));
+		cpu_spinuntil_time(space->cpu, attotime::from_usec(100));
 
 		return 0;
 	}
@@ -759,7 +759,7 @@ static WRITE32_HANDLER( geo_sharc_ctl1_w )
         {
             logerror("Boot geo, %d dwords\n", model2_geocnt);
             cputag_set_input_line(space->machine, "dsp2", INPUT_LINE_HALT, CLEAR_LINE);
-            //cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(1000));       // Give the SHARC enough time to boot itself
+            //cpu_spinuntil_time(space->cpu, attotime::from_usec(1000));       // Give the SHARC enough time to boot itself
         }
     }
 
@@ -991,7 +991,7 @@ static int snd_68k_ready_r(address_space *space)
 
 	if ((sr & 0x0700) > 0x0100)
 	{
-		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(40));
+		cpu_spinuntil_time(space->cpu, attotime::from_usec(40));
 		return 0;	// not ready yet, interrupts disabled
 	}
 
@@ -1002,7 +1002,7 @@ static void snd_latch_to_68k_w(address_space *space, int data)
 {
 	if (!snd_68k_ready_r(space))
 	{
-		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(40));
+		cpu_spinuntil_time(space->cpu, attotime::from_usec(40));
 	}
 
 	to_68k = data;
@@ -1010,7 +1010,7 @@ static void snd_latch_to_68k_w(address_space *space, int data)
 	cputag_set_input_line(space->machine, "audiocpu", 2, HOLD_LINE);
 
 	// give the 68k time to notice
-	cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(40));
+	cpu_spinuntil_time(space->cpu, attotime::from_usec(40));
 }
 
 static READ32_HANDLER( model2_serial_r )
@@ -1038,7 +1038,7 @@ static WRITE32_HANDLER( model2_serial_w )
 		scsp_midi_in(space->machine->device("scsp"), 0, data&0xff, 0);
 
 		// give the 68k time to notice
-		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(40));
+		cpu_spinuntil_time(space->cpu, attotime::from_usec(40));
 	}
 }
 
@@ -2150,7 +2150,7 @@ static MACHINE_CONFIG_START( model2b, driver_device )
 	//MCFG_CPU_CONFIG(sharc_cfg)
 	//MCFG_CPU_DATA_MAP(geo_sharc_map)
 
-	MCFG_QUANTUM_TIME(HZ(18000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(18000))
 
 	MCFG_MACHINE_RESET(model2b)
 

@@ -606,9 +606,9 @@ void z80dma_device::update_status()
 	{
 		m_is_read = true;
 		m_cur_cycle = (PORTA_IS_SOURCE ? PORTA_CYCLE_LEN : PORTB_CYCLE_LEN);
-		next = ATTOTIME_IN_HZ(clock());
+		next = attotime::from_hz(clock());
 		timer_adjust_periodic(m_timer,
-			attotime_zero,
+			attotime::zero,
 			0,
 			// 1 byte transferred in 4 clock cycles
 			next);
@@ -618,7 +618,7 @@ void z80dma_device::update_status()
 		if (m_is_read)
 		{
 			// no transfers active right now
-			timer_reset(m_timer, attotime_never);
+			timer_reset(m_timer, attotime::never);
 		}
 	}
 

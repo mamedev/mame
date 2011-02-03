@@ -227,7 +227,7 @@ public:
  *************************************/
 
 #define SYSTEM_CLOCK			50000000
-#define TIMER_PERIOD			ATTOTIME_IN_HZ(SYSTEM_CLOCK)
+#define TIMER_PERIOD			attotime::from_hz(SYSTEM_CLOCK)
 
 /* various board configurations */
 #define PHOENIX_CONFIG			(0)
@@ -1240,7 +1240,7 @@ static WRITE32_HANDLER( galileo_w )
 					UINT32 elapsed = (timer_timeelapsed(timer->timer) * SYSTEM_CLOCK).as_double();
 					timer->active = 0;
 					timer->count = (timer->count > elapsed) ? (timer->count - elapsed) : 0;
-					timer_adjust_oneshot(timer->timer, attotime_never, which);
+					timer_adjust_oneshot(timer->timer, attotime::never, which);
 					if (LOG_TIMERS)
 						logerror("Disabled timer\n");
 				}

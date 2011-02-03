@@ -218,7 +218,7 @@ static MACHINE_CONFIG_START( ajax, ajax_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)	/* 3.58 MHz */
 	MCFG_CPU_PROGRAM_MAP(ajax_sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_RESET(ajax)
 	MCFG_MACHINE_START(ajax)

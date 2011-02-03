@@ -208,7 +208,7 @@ void mips3com_update_cycle_counting(mips3_state *mips)
 		timer_adjust_oneshot(mips->compare_int_timer, newtime, 0);
 		return;
 	}
-	timer_adjust_oneshot(mips->compare_int_timer, attotime_never, 0);
+	timer_adjust_oneshot(mips->compare_int_timer, attotime::never, 0);
 }
 
 

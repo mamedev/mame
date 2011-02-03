@@ -859,7 +859,7 @@ static MACHINE_CONFIG_START( nycaptor, nycaptor_state )
 	MCFG_CPU_ADD("mcu", M68705,2000000)
 	MCFG_CPU_PROGRAM_MAP(nycaptor_m68705_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs */
 
 	MCFG_MACHINE_START(nycaptor)
 	MCFG_MACHINE_RESET(nycaptor)
@@ -923,7 +923,7 @@ static MACHINE_CONFIG_START( cyclshtg, nycaptor_state )
 	MCFG_CPU_PROGRAM_MAP(nycaptor_m68705_map)
 #endif
 
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 	MCFG_MACHINE_START(nycaptor)
 	MCFG_MACHINE_RESET(nycaptor)
 
@@ -981,7 +981,7 @@ static MACHINE_CONFIG_START( bronx, nycaptor_state )
 	MCFG_CPU_PROGRAM_MAP(nycaptor_sound_map)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60)
 
-	MCFG_QUANTUM_TIME(HZ(120))
+	MCFG_QUANTUM_TIME(attotime::from_hz(120))
 	MCFG_MACHINE_START(nycaptor)
 	MCFG_MACHINE_RESET(nycaptor)
 

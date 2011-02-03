@@ -196,7 +196,7 @@ TIMER_DEVICE_CALLBACK( stv_sector_cb )
 	cr3 = (cd_curfad>>16)&0xff;
 	cr4 = cd_curfad;
 
-	timer.adjust(ATTOTIME_IN_HZ(150));
+	timer.adjust(attotime::from_hz(150));
 }
 
 // global functions
@@ -272,7 +272,7 @@ void stvcd_reset(running_machine *machine)
 	}
 
 	sector_timer = machine->device<timer_device>("sector_timer");
-	sector_timer->adjust(ATTOTIME_IN_HZ(150));	// 150 sectors / second = 300kBytes/second
+	sector_timer->adjust(attotime::from_hz(150));	// 150 sectors / second = 300kBytes/second
 }
 
 static blockT *cd_alloc_block(UINT8 *blknum)
@@ -764,7 +764,7 @@ static void cd_writeWord(running_machine *machine, UINT32 addr, UINT16 data)
 			// and do the disc I/O
 			// make sure it doesn't come in too early
 			sector_timer->reset();
-			sector_timer->adjust(ATTOTIME_IN_HZ(150));	// 150 sectors / second = 300kBytes/second
+			sector_timer->adjust(attotime::from_hz(150));	// 150 sectors / second = 300kBytes/second
 			break;
 
 		case 0x1100: // disk seek
@@ -1272,7 +1272,7 @@ static void cd_writeWord(running_machine *machine, UINT32 addr, UINT16 data)
 			playtype = 1;
 
 			// and do the disc I/O
-//          sector_timer->adjust(ATTOTIME_IN_HZ(150));  // 150 sectors / second = 300kBytes/second
+//          sector_timer->adjust(attotime::from_hz(150));  // 150 sectors / second = 300kBytes/second
 			break;
 
 		case 0x7500:

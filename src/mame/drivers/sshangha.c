@@ -352,7 +352,7 @@ static MACHINE_CONFIG_START( sshangha, driver_device )
 	MCFG_CPU_ADD("audiocpu", Z80, 16000000/4)
 	MCFG_CPU_PROGRAM_MAP(sshangha_sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_RESET(sshangha)	/* init machine */
 

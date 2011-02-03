@@ -1083,7 +1083,7 @@ static MACHINE_CONFIG_START( 40love, fortyl_state )
 	MCFG_CPU_PROGRAM_MAP(buggychl_mcu_map)
 	MCFG_DEVICE_ADD("bmcu", BUGGYCHL_MCU, 0)
 
-	MCFG_QUANTUM_TIME(HZ(6000))	/* high interleave to ensure proper synchronization of CPUs */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* high interleave to ensure proper synchronization of CPUs */
 	MCFG_MACHINE_START(40love)
 	MCFG_MACHINE_RESET(40love)
 

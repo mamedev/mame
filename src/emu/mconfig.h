@@ -217,7 +217,7 @@ device_config *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_config 
 
 // core parameters
 #define MCFG_QUANTUM_TIME(_time) \
-	config.m_minimum_quantum = ATTOTIME_IN_##_time; \
+	config.m_minimum_quantum = _time; \
 
 #define MCFG_QUANTUM_PERFECT_CPU(_cputag) \
 	config.m_perfect_cpu_quantum = _cputag; \
@@ -226,7 +226,7 @@ device_config *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_config 
 	config.m_watchdog_vblank_count = _count; \
 
 #define MCFG_WATCHDOG_TIME_INIT(_time) \
-	config.m_watchdog_time = ATTOTIME_IN_##_time; \
+	config.m_watchdog_time = _time; \
 
 
 // core functions

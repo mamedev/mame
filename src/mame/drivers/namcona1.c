@@ -1018,7 +1018,7 @@ static MACHINE_CONFIG_START( namcona1, namcona1_state )
 	MCFG_NVRAM_HANDLER(namcosna1)
 	MCFG_MACHINE_START(namcona1)
 	MCFG_MACHINE_RESET(namcona1_mcu)
-	MCFG_QUANTUM_TIME(HZ(2400))
+	MCFG_QUANTUM_TIME(attotime::from_hz(2400))
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)

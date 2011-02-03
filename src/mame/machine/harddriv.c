@@ -519,7 +519,7 @@ INLINE int duart_clock(harddriv_state *state)
 
 INLINE attotime duart_clock_period(harddriv_state *state)
 {
-	return ATTOTIME_IN_HZ(duart_clock(state));
+	return attotime::from_hz(duart_clock(state));
 }
 
 
@@ -1181,7 +1181,7 @@ READ16_HANDLER( hd68k_ds3_gdata_r )
 	/* it is important that all the CPUs be in sync before we continue, so spin a little */
 	/* while to let everyone else catch up */
 	cpu_spinuntil_trigger(space->cpu, DS3_TRIGGER);
-	cpuexec_triggertime(space->machine, DS3_TRIGGER, ATTOTIME_IN_USEC(5));
+	cpuexec_triggertime(space->machine, DS3_TRIGGER, attotime::from_usec(5));
 
 	return state->ds3_gdata;
 }

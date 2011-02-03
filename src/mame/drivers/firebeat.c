@@ -2216,7 +2216,7 @@ static void init_keyboard(running_machine *machine)
 {
 	// set keyboard timer
 	keyboard_timer = timer_alloc(machine, keyboard_timer_callback, NULL);
-	timer_adjust_periodic(keyboard_timer, ATTOTIME_IN_MSEC(10), 0, ATTOTIME_IN_MSEC(10));
+	timer_adjust_periodic(keyboard_timer, attotime::from_msec(10), 0, attotime::from_msec(10));
 }
 
 static DRIVER_INIT(kbm)

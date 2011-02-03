@@ -1851,7 +1851,7 @@ static MACHINE_CONFIG_START( bishjan, driver_device )
 	MCFG_CPU_ADD("maincpu", H83044, XTAL_44_1MHz / 3)
 	MCFG_CPU_PROGRAM_MAP( bishjan_map )
 	MCFG_CPU_VBLANK_INT( "screen", irq0_line_hold )
-	MCFG_TIMER_ADD_PERIODIC("timer", h8_timer_irq, HZ(60)) // timer, ?? Hz
+	MCFG_TIMER_ADD_PERIODIC("timer", h8_timer_irq, attotime::from_hz(60)) // timer, ?? Hz
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_TICKET_DISPENSER_ADD("hopper", 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
@@ -1913,7 +1913,7 @@ static MACHINE_CONFIG_START( saklove, driver_device )
 	MCFG_CPU_ADD("maincpu", I80188, XTAL_20MHz )	// !! AMD AM188-EM !!
 	MCFG_CPU_PROGRAM_MAP( saklove_map )
 	MCFG_CPU_IO_MAP( saklove_io )
-	MCFG_TIMER_ADD_PERIODIC("timer2", am188em_timer2_irq, HZ(60)) // timer 2, ?? Hz
+	MCFG_TIMER_ADD_PERIODIC("timer2", am188em_timer2_irq, attotime::from_hz(60)) // timer 2, ?? Hz
 
 	MCFG_MACHINE_RESET(am188em)
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -1951,7 +1951,7 @@ static MACHINE_CONFIG_START( xplan, driver_device )
 	MCFG_CPU_PROGRAM_MAP( xplan_map )
 	MCFG_CPU_IO_MAP( xplan_io )
 	MCFG_CPU_VBLANK_INT( "screen", am188em_int0_irq )
-	MCFG_TIMER_ADD_PERIODIC("timer2", am188em_timer2_irq, HZ(60)) // timer 2, ?? Hz
+	MCFG_TIMER_ADD_PERIODIC("timer2", am188em_timer2_irq, attotime::from_hz(60)) // timer 2, ?? Hz
 
 	MCFG_MACHINE_RESET(am188em)
 	MCFG_NVRAM_ADD_0FILL("nvram")

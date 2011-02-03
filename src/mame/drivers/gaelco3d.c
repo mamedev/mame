@@ -1008,7 +1008,7 @@ static MACHINE_CONFIG_START( gaelco3d, driver_device )
 
 	MCFG_EEPROM_93C66B_ADD("eeprom")
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_TIMER_ADD("adsp_timer", adsp_autobuffer_irq)
 	MCFG_GAELCO_SERIAL_ADD("serial", 0, serial_interface)

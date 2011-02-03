@@ -118,7 +118,7 @@ static TIMER_CALLBACK( display_irq_off )
 static INTERRUPT_GEN( display_irq )
 {
 	cpu_set_input_line(device, 0, ASSERT_LINE);
-	timer_set(device->machine, ATTOTIME_IN_HZ(30000000), NULL, 0, display_irq_off);
+	timer_set(device->machine, attotime::from_hz(30000000), NULL, 0, display_irq_off);
 }
 
 
@@ -413,7 +413,7 @@ static WRITE32_HANDLER( tms32031_control_w )
 	{
 		int which = (offset >> 4) & 1;
 		if (data & 0x40)
-			timer_adjust_oneshot(timer[which], attotime_never, 0);
+			timer_adjust_oneshot(timer[which], attotime::never, 0);
 	}
 	else
 		logerror("%06X:tms32031_control_w(%02X) = %08X\n", cpu_get_pc(space->cpu), offset, data);

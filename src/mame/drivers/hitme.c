@@ -313,7 +313,7 @@ static MACHINE_RESET( hitme )
 {
 	hitme_state *state = machine->driver_data<hitme_state>();
 
-	state->timeout_time = attotime_zero;
+	state->timeout_time = attotime::zero;
 }
 
 static MACHINE_CONFIG_START( hitme, hitme_state )

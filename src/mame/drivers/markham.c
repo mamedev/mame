@@ -183,7 +183,7 @@ static MACHINE_CONFIG_START( markham, markham_state )
 	MCFG_CPU_PROGRAM_MAP(markham_slave_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

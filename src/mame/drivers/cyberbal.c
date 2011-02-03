@@ -447,7 +447,7 @@ static MACHINE_CONFIG_START( cyberbal, cyberbal_state )
 	MCFG_CPU_PROGRAM_MAP(sound_68k_map)
 	MCFG_CPU_PERIODIC_INT(cyberbal_sound_68k_irq_gen, 10000)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(cyberbal)
 	MCFG_MACHINE_RESET(cyberbal)

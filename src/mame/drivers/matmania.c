@@ -319,7 +319,7 @@ static MACHINE_CONFIG_START( matmania, matmania_state )
 	MCFG_CPU_PROGRAM_MAP(matmania_sound_map)
 	MCFG_CPU_VBLANK_INT_HACK(nmi_line_pulse,15)	/* ???? */
 								/* IRQs are caused by the main CPU */
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(matmania)
 
@@ -420,7 +420,7 @@ static MACHINE_CONFIG_START( maniach, matmania_state )
 	MCFG_CPU_ADD("mcu", M68705, 1500000*2)	/* (don't know really how fast, but it doesn't need to even be this fast) */
 	MCFG_CPU_PROGRAM_MAP(maniach_mcu_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))	/* 100 CPU slice per frame - high interleaving to sync main and mcu */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slice per frame - high interleaving to sync main and mcu */
 
 	MCFG_MACHINE_START(maniach)
 	MCFG_MACHINE_RESET(maniach)

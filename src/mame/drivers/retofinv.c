@@ -354,7 +354,7 @@ static MACHINE_CONFIG_START( retofinv, driver_device )
 	MCFG_CPU_ADD("68705", M68705,18432000/6)	/* 3.072 MHz? */
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - enough for the sound CPU to read all commands */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

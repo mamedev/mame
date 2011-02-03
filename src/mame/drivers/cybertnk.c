@@ -848,7 +848,7 @@ static MACHINE_CONFIG_START( cybertnk, driver_device )
 	MCFG_CPU_ADD("audiocpu", Z80,3579500)
 	MCFG_CPU_PROGRAM_MAP(sound_mem)
 
-	MCFG_QUANTUM_TIME(HZ(6000))//arbitrary value,needed to get the communication to work
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))//arbitrary value,needed to get the communication to work
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)

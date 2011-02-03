@@ -1767,7 +1767,7 @@ static TIMER_CALLBACK( decrementer_callback )
 */
 static void reset_decrementer(tms99xx_state *cpustate)
 {
-	timer_adjust_oneshot(cpustate->timer, attotime_never, 0);
+	timer_adjust_oneshot(cpustate->timer, attotime::never, 0);
 
 	/* reload count */
 	cpustate->decrementer_count = cpustate->decrementer_interval;

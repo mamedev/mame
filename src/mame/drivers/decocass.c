@@ -639,7 +639,7 @@ static MACHINE_CONFIG_START( decocass, decocass_state )
 	MCFG_CPU_ADD("mcu", I8041, HCLK)
 	MCFG_CPU_IO_MAP(decocass_mcu_portmap)
 
-	MCFG_QUANTUM_TIME(HZ(4200))				/* interleave CPUs */
+	MCFG_QUANTUM_TIME(attotime::from_hz(4200))				/* interleave CPUs */
 
 	MCFG_MACHINE_START(decocass)
 	MCFG_MACHINE_RESET(decocass)

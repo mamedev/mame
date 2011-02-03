@@ -2172,7 +2172,7 @@ static MACHINE_CONFIG_START( oscar, dec8_state )
 	MCFG_CPU_ADD("audiocpu", M6502, XTAL_12MHz/8)
 	MCFG_CPU_PROGRAM_MAP(oscar_s_map)
 								/* NMIs are caused by the main CPU */
-	MCFG_QUANTUM_TIME(HZ(2400)) /* 40 CPU slices per frame */
+	MCFG_QUANTUM_TIME(attotime::from_hz(2400)) /* 40 CPU slices per frame */
 
 	MCFG_MACHINE_START(dec8)
 	MCFG_MACHINE_RESET(dec8)
@@ -2219,7 +2219,7 @@ static MACHINE_CONFIG_START( lastmisn, dec8_state )
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)
 	MCFG_CPU_PROGRAM_MAP(ym3526_s_map)
 								/* NMIs are caused by the main CPU */
-	MCFG_QUANTUM_TIME(HZ(12000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
 	MCFG_MACHINE_START(dec8)
 	MCFG_MACHINE_RESET(dec8)
@@ -2266,7 +2266,7 @@ static MACHINE_CONFIG_START( shackled, dec8_state )
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)
 	MCFG_CPU_PROGRAM_MAP(ym3526_s_map)
 								/* NMIs are caused by the main CPU */
-	MCFG_QUANTUM_TIME(HZ(4800))
+	MCFG_QUANTUM_TIME(attotime::from_hz(4800))
 
 	MCFG_MACHINE_START(dec8)
 	MCFG_MACHINE_RESET(dec8)
@@ -2314,7 +2314,7 @@ static MACHINE_CONFIG_START( csilver, dec8_state )
 	MCFG_CPU_ADD("audiocpu", M6502, XTAL_12MHz/8) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(csilver_s_map)
 								/* NMIs are caused by the main CPU */
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_START(dec8)
 	MCFG_MACHINE_RESET(dec8)

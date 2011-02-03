@@ -3936,7 +3936,7 @@ static MACHINE_CONFIG_START( tdragon, driver_device )
 	MCFG_VIDEO_START(macross)
 	MCFG_VIDEO_EOF(nmk)
 	MCFG_VIDEO_UPDATE(tdragon)
-	MCFG_TIMER_ADD_PERIODIC("coinsim", tdragon_mcu_sim, HZ(10000)) // not real, but for simulating the MCU
+	MCFG_TIMER_ADD_PERIODIC("coinsim", tdragon_mcu_sim, attotime::from_hz(10000)) // not real, but for simulating the MCU
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -4056,7 +4056,7 @@ static MACHINE_CONFIG_START( hachamf, driver_device )
 	MCFG_VIDEO_START(macross)
 	MCFG_VIDEO_EOF(nmk)
 	MCFG_VIDEO_UPDATE(hachamf)
-	MCFG_TIMER_ADD_PERIODIC("coinsim", hachamf_mcu_sim, HZ(10000)) // not real, but for simulating the MCU
+	MCFG_TIMER_ADD_PERIODIC("coinsim", hachamf_mcu_sim, attotime::from_hz(10000)) // not real, but for simulating the MCU
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

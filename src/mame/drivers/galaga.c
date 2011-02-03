@@ -1605,7 +1605,7 @@ static MACHINE_CONFIG_START( bosco, _galaga_state )
 	MCFG_NAMCO_06XX_ADD("06xx_1", MASTER_CLOCK/6/64, "sub",     "50xx_2", "52xx", NULL,     NULL)
 
 	MCFG_WATCHDOG_VBLANK_INIT(8)
-	MCFG_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MCFG_MACHINE_START(galaga)
 	MCFG_MACHINE_RESET(galaga)
@@ -1657,7 +1657,7 @@ static MACHINE_CONFIG_START( galaga, _galaga_state )
 	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64, "maincpu", "51xx", NULL, NULL, "54xx")
 
 	MCFG_WATCHDOG_VBLANK_INIT(8)
-	MCFG_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MCFG_MACHINE_START(galaga)
 	MCFG_MACHINE_RESET(galaga)
@@ -1727,7 +1727,7 @@ static MACHINE_CONFIG_START( xevious, _galaga_state )
 	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64, "maincpu", "51xx", NULL, "50xx", "54xx")
 
 	MCFG_WATCHDOG_VBLANK_INIT(8)
-	MCFG_QUANTUM_TIME(HZ(60000))	/* 1000 CPU slices per frame - an high value to ensure proper */
+	MCFG_QUANTUM_TIME(attotime::from_hz(60000))	/* 1000 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MCFG_MACHINE_START(galaga)
 	MCFG_MACHINE_RESET(galaga)
@@ -1807,7 +1807,7 @@ static MACHINE_CONFIG_START( digdug, _galaga_state )
 
 	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64, "maincpu", "51xx", "53xx", NULL, NULL)
 
-	MCFG_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MCFG_MACHINE_START(galaga)
 	MCFG_MACHINE_RESET(galaga)

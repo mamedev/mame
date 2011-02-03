@@ -1978,7 +1978,7 @@ static MACHINE_CONFIG_START( galaxian_base, galaxian_state )
 	MCFG_VIDEO_UPDATE(galaxian)
 
 	/* blinking frequency is determined by 555 counter with Ra=100k, Rb=10k, C=10uF */
-	MCFG_TIMER_ADD_PERIODIC("stars", galaxian_stars_blink_timer, NSEC(PERIOD_OF_555_ASTABLE_NSEC(100000, 10000, 0.00001)))
+	MCFG_TIMER_ADD_PERIODIC("stars", galaxian_stars_blink_timer, attotime::from_nsec(PERIOD_OF_555_ASTABLE_NSEC(100000, 10000, 0.00001)))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

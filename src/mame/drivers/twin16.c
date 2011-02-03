@@ -732,7 +732,7 @@ static MACHINE_CONFIG_START( twin16, twin16_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_START(twin16)
 	MCFG_MACHINE_RESET(twin16)
@@ -774,7 +774,7 @@ static MACHINE_CONFIG_START( twin16, twin16_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( devilw, twin16 )
-	MCFG_QUANTUM_TIME(HZ(60000)) // watchdog reset otherwise
+	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) // watchdog reset otherwise
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( fround, twin16_state )
@@ -786,7 +786,7 @@ static MACHINE_CONFIG_START( fround, twin16_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_START(twin16)
 	MCFG_MACHINE_RESET(twin16)

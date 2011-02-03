@@ -68,9 +68,9 @@ static void tmp68301_update_timer( running_machine *machine, int i )
 	UINT16 MAX2	=	tmp68301_regs[(0x206 + i * 0x20)/2];
 
 	int max = 0;
-	attotime duration = attotime_zero;
+	attotime duration = attotime::zero;
 
-	timer_adjust_oneshot(tmp68301_timer[i],attotime_never,i);
+	timer_adjust_oneshot(tmp68301_timer[i],attotime::never,i);
 
 	// timers 1&2 only
 	switch( (TCR & 0x0030)>>4 )						// MR2..1

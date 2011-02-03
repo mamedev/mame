@@ -127,8 +127,8 @@ static MACHINE_START( kengo )
 
 static TIMER_CALLBACK( synch_callback )
 {
-	//cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(8000000));
-	cpuexec_boost_interleave(machine, ATTOTIME_IN_HZ(MASTER_CLOCK/4/12), ATTOTIME_IN_SEC(25));
+	//cpuexec_boost_interleave(machine, attotime::zero, attotime::from_usec(8000000));
+	cpuexec_boost_interleave(machine, attotime::from_hz(MASTER_CLOCK/4/12), attotime::from_seconds(25));
 }
 
 static MACHINE_RESET( m72 )

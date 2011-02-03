@@ -675,8 +675,8 @@ static READ32_HANDLER( backfire_speedup_r )
 
 	//mame_printf_debug( "%08x\n",cpu_get_pc(space->cpu));
 
-	if (cpu_get_pc(space->cpu )== 0xce44)  cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400)); // backfire
-	if (cpu_get_pc(space->cpu) == 0xcee4)  cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400)); // backfirea
+	if (cpu_get_pc(space->cpu )== 0xce44)  cpu_spinuntil_time(space->cpu, attotime::from_usec(400)); // backfire
+	if (cpu_get_pc(space->cpu) == 0xcee4)  cpu_spinuntil_time(space->cpu, attotime::from_usec(400)); // backfirea
 
 	return state->mainram[0x18/4];
 }

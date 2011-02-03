@@ -502,7 +502,7 @@ static MACHINE_CONFIG_START( kothello, driver_device )
 
 	SEIBU3A_SOUND_SYSTEM_CPU(14318180/4)
 
-	MCFG_QUANTUM_TIME(HZ(12000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
 	MCFG_MACHINE_RESET(seibu_sound)
 

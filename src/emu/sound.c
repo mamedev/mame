@@ -66,7 +66,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const attotime sound_manager::STREAMS_UPDATE_ATTOTIME = ATTOTIME_IN_HZ(STREAMS_UPDATE_FREQUENCY);
+const attotime sound_manager::STREAMS_UPDATE_ATTOTIME = attotime::from_hz(STREAMS_UPDATE_FREQUENCY);
 
 
 
@@ -777,7 +777,7 @@ sound_manager::sound_manager(running_machine &machine)
 	  m_wavfile(NULL),
 	  m_stream_list(machine.m_respool),
 	  m_update_attoseconds(STREAMS_UPDATE_ATTOTIME.attoseconds),
-	  m_last_update(attotime_zero)
+	  m_last_update(attotime::zero)
 {
 	// get filename for WAV file or AVI file if specified
 	const char *wavfile = options_get_string(machine.options(), OPTION_WAVWRITE);

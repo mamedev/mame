@@ -580,5 +580,5 @@ void riot6532_device::device_reset()
 	/* reset timer states */
 	m_timershift = 0;
 	m_timerstate = TIMER_IDLE;
-	timer_adjust_oneshot(m_timer, attotime_never, 0);
+	timer_adjust_oneshot(m_timer, attotime::never, 0);
 }

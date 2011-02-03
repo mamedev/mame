@@ -275,7 +275,7 @@ static TIMER_CALLBACK( set_status_cb )
 
 static void set_status(gaelco_serial_state *state, UINT8 mask, UINT8 set, int wait)
 {
-	timer_set(state->device->machine, ATTOTIME_IN_HZ(wait),
+	timer_set(state->device->machine, attotime::from_hz(wait),
 			state, (mask << 8)|set, set_status_cb);
 }
 
@@ -472,7 +472,7 @@ static DEVICE_START( gaelco_serial )
 	//state_save_register_device_item(device, 0, earom->data);
 
 #ifdef SHARED_MEM_DRIVER
-	timer_adjust_periodic(state->sync_timer, attotime_zero,0,ATTOTIME_IN_HZ(SYNC_FREQ));
+	timer_adjust_periodic(state->sync_timer, attotime::zero,0,attotime::from_hz(SYNC_FREQ));
 #endif
 
 	state->os_shmem = osd_sharedmem_alloc(PATH_NAME, 0, sizeof(shmem_t));

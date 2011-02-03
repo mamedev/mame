@@ -341,7 +341,7 @@ static TIMER_CALLBACK( hblank_callback )
 	if (ppu2c0x->hblank_callback_proc)
 		(*ppu2c0x->hblank_callback_proc) (device, ppu2c0x->scanline, vblank, blanked);
 
-	timer_adjust_oneshot(ppu2c0x->hblank_timer, attotime_never, 0);
+	timer_adjust_oneshot(ppu2c0x->hblank_timer, attotime::never, 0);
 }
 
 static TIMER_CALLBACK( nmi_callback )
@@ -354,7 +354,7 @@ static TIMER_CALLBACK( nmi_callback )
 	if (ppu2c0x->nmi_callback_proc != NULL)
 		(*ppu2c0x->nmi_callback_proc) (device, ppu_regs);
 
-	timer_adjust_oneshot(ppu2c0x->nmi_timer, attotime_never, 0);
+	timer_adjust_oneshot(ppu2c0x->nmi_timer, attotime::never, 0);
 }
 
 static void draw_background( device_t *device, UINT8 *line_priority )
@@ -1308,7 +1308,7 @@ static DEVICE_START( ppu2c0x )
 	timer_adjust_oneshot(ppu2c0x->hblank_timer, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(86.67), 0); // ??? FIXME - hardcoding NTSC, need better calculation
 
 	ppu2c0x->nmi_timer = timer_alloc(device->machine, nmi_callback, (void *) device);
-	timer_adjust_oneshot(ppu2c0x->nmi_timer, attotime_never, 0);
+	timer_adjust_oneshot(ppu2c0x->nmi_timer, attotime::never, 0);
 
 	ppu2c0x->nmi_callback_proc = intf->nmi_handler;
 	ppu2c0x->color_base = intf->color_base;

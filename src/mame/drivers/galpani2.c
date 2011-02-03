@@ -77,7 +77,7 @@ static MACHINE_RESET( galpani2 )
 
 	kaneko16_sprite_xoffs = 0x10000 - 0x16c0 + 0xc00;
 	kaneko16_sprite_yoffs = 0x000;
-	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(50)); //initial mcu xchk
+	cpuexec_boost_interleave(machine, attotime::zero, attotime::from_usec(50)); //initial mcu xchk
 }
 
 static void galpani2_write_kaneko(device_t *device)

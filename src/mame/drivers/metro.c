@@ -256,7 +256,7 @@ static INTERRUPT_GEN( karatour_interrupt )
 			state->requested_int[0] = 1;
 			state->requested_int[5] = 1;	// write the scroll registers
 			/* the duration is a guess */
-			timer_set(device->machine, ATTOTIME_IN_USEC(2500), NULL, 0, vblank_end_callback);
+			timer_set(device->machine, attotime::from_usec(2500), NULL, 0, vblank_end_callback);
 			update_irq_state(device->machine);
 			break;
 
@@ -281,7 +281,7 @@ static WRITE16_HANDLER( mouja_irq_timer_ctrl_w )
 	metro_state *state = space->machine->driver_data<metro_state>();
 	double freq = 58.0 + (0xff - (data & 0xff)) / 2.2;					/* 0xff=58Hz, 0x80=116Hz? */
 
-	timer_adjust_periodic(state->mouja_irq_timer, attotime_zero, 0, ATTOTIME_IN_HZ(freq));
+	timer_adjust_periodic(state->mouja_irq_timer, attotime::zero, 0, attotime::from_hz(freq));
 }
 
 static INTERRUPT_GEN( mouja_interrupt )
@@ -729,7 +729,7 @@ static WRITE16_HANDLER( metro_blitter_w )
                        another blit. */
 				if (b1 == 0)
 				{
-					timer_set(space->machine, ATTOTIME_IN_USEC(500), NULL, 0, metro_blit_done);
+					timer_set(space->machine, attotime::from_usec(500), NULL, 0, metro_blit_done);
 					return;
 				}
 

@@ -525,7 +525,7 @@ static MACHINE_CONFIG_START( bigevglf, bigevglf_state )
 	MCFG_CPU_ADD("mcu", M68705,2000000)	/* ??? */
 	MCFG_CPU_PROGRAM_MAP(m68705_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - interleaving is forced on the fly */
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - interleaving is forced on the fly */
 
 	MCFG_MACHINE_START(bigevglf)
 	MCFG_MACHINE_RESET(bigevglf)

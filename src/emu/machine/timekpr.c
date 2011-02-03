@@ -228,7 +228,7 @@ void timekeeper_device::device_start()
 	state_save_register_device_item_pointer( this, 0, m_data, m_size );
 
 	timer = timer_alloc( &m_machine, timekeeper_tick_callback, (void *)this );
-	duration = ATTOTIME_IN_SEC(1);
+	duration = attotime::from_seconds(1);
 	timer_adjust_periodic( timer, duration, 0, duration );
 }
 

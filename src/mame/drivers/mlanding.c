@@ -284,7 +284,7 @@ static WRITE16_HANDLER( ml_sub_reset_w )
 	if (pixels)
 	{
 		dma_active = 1;
-		timer_set(space->machine, ATTOTIME_IN_MSEC(20), NULL, 0, dma_complete);
+		timer_set(space->machine, attotime::from_msec(20), NULL, 0, dma_complete);
 	}
 
 	if(!(data & 0x40)) // unknown line used
@@ -740,7 +740,7 @@ static MACHINE_CONFIG_START( mlanding, driver_device )
 	MCFG_CPU_DATA_MAP(DSP_map_data)
 	MCFG_CPU_IO_MAP(DSP_map_io)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

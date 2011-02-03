@@ -648,7 +648,7 @@ static MACHINE_CONFIG_START( snes, snes_state )
 	MCFG_CPU_ADD("soundcpu", SPC700, 2048000/2)	/* 2.048 Mhz, but internal divider */
 	MCFG_CPU_PROGRAM_MAP(spc_mem)
 
-//  MCFG_QUANTUM_TIME(HZ(24000))
+//  MCFG_QUANTUM_TIME(attotime::from_hz(24000))
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_MACHINE_START( snes )

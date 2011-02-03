@@ -34,14 +34,14 @@
 /* R is in ohms, C is in farads */
 #define PERIOD_OF_555_MONOSTABLE_NSEC(r,c)	((attoseconds_t)(1100000000 * (double)(r) * (double)(c)))
 #define PERIOD_OF_555_ASTABLE_NSEC(r1,r2,c)	((attoseconds_t)( 693000000 * ((double)(r1) + 2.0 * (double)(r2)) * (double)(c)))
-#define PERIOD_OF_555_MONOSTABLE(r,c)		ATTOTIME_IN_NSEC(PERIOD_OF_555_MONOSTABLE_NSEC(r,c))
-#define PERIOD_OF_555_ASTABLE(r1,r2,c)		ATTOTIME_IN_NSEC(PERIOD_OF_555_ASTABLE_NSEC(r1,r2,c))
+#define PERIOD_OF_555_MONOSTABLE(r,c)		attotime::from_nsec(PERIOD_OF_555_MONOSTABLE_NSEC(r,c))
+#define PERIOD_OF_555_ASTABLE(r1,r2,c)		attotime::from_nsec(PERIOD_OF_555_ASTABLE_NSEC(r1,r2,c))
 
 /* macros that map all allocations to provide file/line/functions to the callee */
 #define timer_alloc(m,c,ptr)			_timer_alloc_internal(m, c, ptr, __FILE__, __LINE__, #c)
 #define timer_pulse(m,e,ptr,p,c)		_timer_pulse_internal(m, e, ptr, p, c, __FILE__, __LINE__, #c)
 #define timer_set(m,d,ptr,p,c)			_timer_set_internal(m, d, ptr, p, c, __FILE__, __LINE__, #c)
-#define timer_call_after_resynch(m,ptr,p,c) _timer_set_internal(m, attotime_zero, ptr, p, c, __FILE__, __LINE__, #c)
+#define timer_call_after_resynch(m,ptr,p,c) _timer_set_internal(m, attotime::zero, ptr, p, c, __FILE__, __LINE__, #c)
 
 /* macros for a timer callback functions */
 #define TIMER_CALLBACK(name)			void name(running_machine *machine, void *ptr, int param)
@@ -82,7 +82,7 @@ struct timer_execution_state
 
 #define MCFG_TIMER_ADD_PERIODIC(_tag, _callback, _period) \
 	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	timer_device_config::static_configure_periodic(device, _callback, ATTOTIME_IN_##_period); \
+	timer_device_config::static_configure_periodic(device, _callback, _period); \
 
 #define MCFG_TIMER_ADD_SCANLINE(_tag, _callback, _screen, _first_vpos, _increment) \
 	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
@@ -95,7 +95,7 @@ struct timer_execution_state
 	timer_device_config::static_set_callback(device, _callback); \
 
 #define MCFG_TIMER_START_DELAY(_start_delay) \
-	timer_device_config::static_set_start_delay(device, ATTOTIME_IN_##_start_delay); \
+	timer_device_config::static_set_start_delay(device, _start_delay); \
 
 #define MCFG_TIMER_PARAM(_param) \
 	timer_device_config::static_set_param(device, _param); \
@@ -290,8 +290,8 @@ public:
 	void enable(bool enable = true) { timer_enable(m_timer, enable); }
 
 	// adjustments
-	void reset() { adjust(attotime_never, 0, attotime_never); }
-	void adjust(attotime duration, INT32 param = 0, attotime period = attotime_never) { assert(m_config.m_type == timer_device_config::TIMER_TYPE_GENERIC); timer_adjust_periodic(m_timer, duration, param, period); }
+	void reset() { adjust(attotime::never, 0, attotime::never); }
+	void adjust(attotime duration, INT32 param = 0, attotime period = attotime::never) { assert(m_config.m_type == timer_device_config::TIMER_TYPE_GENERIC); timer_adjust_periodic(m_timer, duration, param, period); }
 
 	// timing information
 	attotime time_elapsed() const { return timer_timeelapsed(m_timer); }

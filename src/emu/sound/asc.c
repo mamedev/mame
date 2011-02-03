@@ -506,11 +506,11 @@ WRITE8_MEMBER( asc_device::write )
 
 					if (data != 0)
 					{
-						timer_adjust_periodic(m_sync_timer, attotime_zero, 0, ATTOTIME_IN_HZ(22257/4));
+						timer_adjust_periodic(m_sync_timer, attotime::zero, 0, attotime::from_hz(22257/4));
 					}
 					else
 					{
-						timer_adjust_oneshot(m_sync_timer, attotime_never, 0);
+						timer_adjust_oneshot(m_sync_timer, attotime::never, 0);
 					}
 				}
 				break;

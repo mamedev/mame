@@ -753,7 +753,7 @@ static MACHINE_CONFIG_START( whizz, sidearms_state )
 	MCFG_CPU_IO_MAP(whizz_io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_QUANTUM_TIME(HZ(60000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)

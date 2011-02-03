@@ -2151,9 +2151,9 @@ static void tape_change_speed(device_t *device, INT8 newspeed)
 	/* compute how fast to run the tape timer */
 	absnewspeed = (newspeed < 0) ? -newspeed : newspeed;
 	if (newspeed == 0)
-		newperiod = attotime_never;
+		newperiod = attotime::never;
 	else
-		newperiod = ATTOTIME_IN_HZ(TAPE_CLOCKRATE * absnewspeed);
+		newperiod = attotime::from_hz(TAPE_CLOCKRATE * absnewspeed);
 
 	/* set the new speed */
 	timer_adjust_periodic(tape->timer, newperiod, 0, newperiod);

@@ -570,7 +570,7 @@ static MACHINE_CONFIG_START( vcombat, driver_device )
 
 /* Temporary hack for experimenting with timing. */
 #if 0
-	//MCFG_QUANTUM_TIME(HZ(1200))
+	//MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 #endif
 

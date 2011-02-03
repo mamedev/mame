@@ -39,7 +39,7 @@ static void start_countdown_timer(running_machine *machine)
 
 	state->timer_value = 0;
 
-	timer_pulse(machine, ATTOTIME_IN_SEC(1), NULL, 0, countdown_timer_callback);
+	timer_pulse(machine, attotime::from_seconds(1), NULL, 0, countdown_timer_callback);
 }
 
 

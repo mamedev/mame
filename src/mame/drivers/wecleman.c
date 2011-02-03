@@ -1047,7 +1047,7 @@ static MACHINE_CONFIG_START( wecleman, driver_device )
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(wecleman_sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_RESET(wecleman)
 
@@ -1120,7 +1120,7 @@ static MACHINE_CONFIG_START( hotchase, driver_device )
 
 	/* Amuse: every 2 ms */
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

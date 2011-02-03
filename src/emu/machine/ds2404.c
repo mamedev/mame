@@ -130,7 +130,7 @@ void ds2404_device::device_start()
 	m_rtc[4] = (current_time >> 24) & 0xff;
 
 	emu_timer *timer = timer_alloc(&m_machine, ds2404_tick_callback, (void *)this);
-	timer_adjust_periodic(timer, ATTOTIME_IN_HZ(256), 0, ATTOTIME_IN_HZ(256));
+	timer_adjust_periodic(timer, attotime::from_hz(256), 0, attotime::from_hz(256));
 }
 
 

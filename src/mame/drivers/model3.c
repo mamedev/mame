@@ -1608,7 +1608,7 @@ static WRITE64_HANDLER(model3_sound_w)
 		scsp_midi_in(space->machine->device("scsp1"), 0, (data>>56)&0xff, 0);
 
 		// give the 68k time to notice
-		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(40));
+		cpu_spinuntil_time(space->cpu, attotime::from_usec(40));
 	}
 }
 
@@ -4978,7 +4978,7 @@ static MACHINE_CONFIG_START( model3_10, driver_device )
 	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(model3_snd)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(model3_10)
 	MCFG_MACHINE_RESET(model3_10)

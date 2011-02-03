@@ -501,7 +501,7 @@ static MACHINE_CONFIG_START( galsnew, driver_device )
 	MCFG_PALETTE_INIT(berlwall)
 
 	/* arm watchdog */
-	MCFG_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))	/* a guess, and certainly wrong */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -518,7 +518,7 @@ static MACHINE_CONFIG_DERIVED( fantasia, galsnew )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(fantasia_map)
 
-	MCFG_WATCHDOG_TIME_INIT(SEC(0))	/* a guess, and certainly wrong */
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(0))	/* a guess, and certainly wrong */
 
 MACHINE_CONFIG_END
 

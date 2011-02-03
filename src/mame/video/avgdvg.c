@@ -1260,7 +1260,7 @@ WRITE8_HANDLER( avgdvg_go_w )
 	vg_flush(space->machine);
 
 	vg_set_halt(0);
-	timer_adjust_oneshot(vg_run_timer, attotime_zero, 0);
+	timer_adjust_oneshot(vg_run_timer, attotime::zero, 0);
 }
 
 WRITE16_HANDLER( avgdvg_go_word_w )

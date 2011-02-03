@@ -160,7 +160,7 @@ void microtouch_init(running_machine *machine, microtouch_tx_func tx_cb, microto
 	microtouch.touch_callback = touch_cb;
 
 	microtouch.timer = timer_alloc(machine, microtouch_timer_callback, NULL);
-	timer_adjust_periodic(microtouch.timer, ATTOTIME_IN_HZ(167*5), 0, ATTOTIME_IN_HZ(167*5));
+	timer_adjust_periodic(microtouch.timer, attotime::from_hz(167*5), 0, attotime::from_hz(167*5));
 
 	state_save_register_item(machine, "microtouch", NULL, 0, microtouch.reset_done);
 	state_save_register_item(machine, "microtouch", NULL, 0, microtouch.format_tablet);

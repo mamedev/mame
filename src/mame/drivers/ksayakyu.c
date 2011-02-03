@@ -282,7 +282,7 @@ static MACHINE_CONFIG_START( ksayakyu, ksayakyu_state )
 	MCFG_CPU_PROGRAM_MAP(soundcpu_map)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold,60) //guess, controls music tempo
 
-	MCFG_QUANTUM_TIME(HZ(60000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
 	MCFG_MACHINE_START(ksayakyu)
 	MCFG_MACHINE_RESET(ksayakyu)

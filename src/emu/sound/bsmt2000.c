@@ -326,7 +326,7 @@ void bsmt2000_device::write_data(UINT16 data)
 	device_timer_call_after_resynch(*this, TIMER_ID_DATA_WRITE, data);
 
 	// boost the interleave on a write so that the caller detects the status more accurately
-	m_machine.scheduler().boost_interleave(ATTOTIME_IN_USEC(1), ATTOTIME_IN_USEC(10));
+	m_machine.scheduler().boost_interleave(attotime::from_usec(1), attotime::from_usec(10));
 }
 
 

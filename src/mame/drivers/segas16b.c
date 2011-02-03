@@ -1110,7 +1110,7 @@ static TIMER_CALLBACK( suspend_i8751 )
 
 static TIMER_CALLBACK( boost_interleave )
 {
-	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_MSEC(10));
+	cpuexec_boost_interleave(machine, attotime::zero, attotime::from_msec(10));
 }
 
 
@@ -3351,7 +3351,7 @@ static MACHINE_CONFIG_DERIVED( atomicp, system16b ) /* 10MHz CPU Clock verified 
 	MCFG_DEVICE_REMOVE("soundcpu")
 
 	MCFG_MACHINE_START(atomicp)
-	MCFG_TIMER_ADD_PERIODIC("atomicp_timer", atomicp_sound_irq, HZ(10000))
+	MCFG_TIMER_ADD_PERIODIC("atomicp_timer", atomicp_sound_irq, attotime::from_hz(10000))
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("ymsnd", YM2413, XTAL_20MHz/4) /* 20MHz OSC divided by 4 (verified) */

@@ -172,7 +172,7 @@ mc146818_device::mc146818_device(running_machine &_machine, const mc146818_devic
 	  m_index(0),
 	  m_eindex(0),
 	  m_updated(false),
-	  m_last_refresh(attotime_zero)
+	  m_last_refresh(attotime::zero)
 {
 }
 
@@ -187,9 +187,9 @@ void mc146818_device::device_start()
 	emu_timer *timer = device_timer_alloc(*this);
 	if (m_config.m_type == mc146818_device_config::MC146818_UTC) {
 		// hack: for apollo we increase the update frequency to stay in sync with real time
-		timer_adjust_periodic(timer, ATTOTIME_IN_HZ(2), 0, ATTOTIME_IN_HZ(2));
+		timer_adjust_periodic(timer, attotime::from_hz(2), 0, attotime::from_hz(2));
 	} else {
-		timer_adjust_periodic(timer, ATTOTIME_IN_HZ(1), 0, ATTOTIME_IN_HZ(1));
+		timer_adjust_periodic(timer, attotime::from_hz(1), 0, attotime::from_hz(1));
 	}
 	set_base_datetime();
 }
@@ -436,7 +436,7 @@ READ8_MEMBER( mc146818_device::read )
 		switch (m_index % MC146818_DATA_SIZE) {
 		case 0xa:
 			data = m_data[m_index  % MC146818_DATA_SIZE];
-			if ((timer_get_time(space.machine) - m_last_refresh) < ATTOTIME_IN_HZ(32768))
+			if ((timer_get_time(space.machine) - m_last_refresh) < attotime::from_hz(32768))
 				data |= 0x80;
 #if 0
 			/* for pc1512 bios realtime clock test */

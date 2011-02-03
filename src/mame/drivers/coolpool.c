@@ -177,7 +177,7 @@ static WRITE16_HANDLER( nvram_thrash_w )
 	{
 		nvram_write_enable = 1;
 		timer_device *nvram_timer = space->machine->device<timer_device>("nvram_timer");
-		nvram_timer->adjust(ATTOTIME_IN_MSEC(1000));
+		nvram_timer->adjust(attotime::from_msec(1000));
 	}
 }
 
@@ -477,7 +477,7 @@ static TIMER_CALLBACK( deferred_iop_w )
 	cputag_set_input_line(machine, "dsp", 0, HOLD_LINE);	/* ???  I have no idea who should generate this! */
 															/* the DSP polls the status bit so it isn't strictly */
 															/* necessary to also have an IRQ */
-	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(50));
+	cpuexec_boost_interleave(machine, attotime::zero, attotime::from_usec(50));
 }
 
 

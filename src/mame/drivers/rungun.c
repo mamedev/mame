@@ -404,7 +404,7 @@ static MACHINE_CONFIG_START( rng, rungun_state )
 	MCFG_CPU_PROGRAM_MAP(rungun_sound_map)
 	MCFG_CPU_PERIODIC_INT(audio_interrupt, 480)
 
-	MCFG_QUANTUM_TIME(HZ(6000)) // higher if sound stutters
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // higher if sound stutters
 
 	MCFG_GFXDECODE(rungun)
 

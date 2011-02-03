@@ -464,7 +464,7 @@ static MACHINE_CONFIG_START( exterm, driver_device )
 	MCFG_CPU_ADD("audioslave", M6502, 2000000)
 	MCFG_CPU_PROGRAM_MAP(sound_slave_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

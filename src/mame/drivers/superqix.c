@@ -377,7 +377,7 @@ logerror("Z80 sends command %02x\n",param);
 	from_z80 = param;
 	from_mcu_pending = 0;
 	cputag_set_input_line(machine, "mcu", 0, HOLD_LINE);
-	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(200));
+	cpuexec_boost_interleave(machine, attotime::zero, attotime::from_usec(200));
 }
 
 static TIMER_CALLBACK( delayed_mcu_z80_w )
@@ -1091,7 +1091,7 @@ static MACHINE_CONFIG_START( sqix, driver_device )
 	MCFG_CPU_ADD("mcu", I8751, 12000000/3)	/* ??? */
 	MCFG_CPU_IO_MAP(bootleg_mcu_io_map)
 
-	MCFG_QUANTUM_TIME(HZ(30000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
 
 	MCFG_MACHINE_START(superqix)
 

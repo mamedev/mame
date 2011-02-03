@@ -667,7 +667,7 @@ static MACHINE_CONFIG_START( psychic5, driver_device )
 	MCFG_CPU_PROGRAM_MAP(psychic5_sound_map)
 	MCFG_CPU_IO_MAP(psychic5_soundport_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))      /* Allow time for 2nd cpu to interleave */
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))      /* Allow time for 2nd cpu to interleave */
 	MCFG_MACHINE_RESET(psychic5)
 
 	/* video hardware */
@@ -714,7 +714,7 @@ static MACHINE_CONFIG_START( bombsa, driver_device )
 	MCFG_CPU_PROGRAM_MAP(bombsa_sound_map)
 	MCFG_CPU_IO_MAP(bombsa_soundport_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 	MCFG_MACHINE_RESET(psychic5)
 
 	/* video hardware */

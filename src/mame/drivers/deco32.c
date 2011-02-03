@@ -1950,7 +1950,7 @@ static MACHINE_CONFIG_START( nslasher, driver_device )
 	MCFG_CPU_PROGRAM_MAP(nslasher_sound)
 	MCFG_CPU_IO_MAP(nslasher_io_sound)
 
-	MCFG_QUANTUM_TIME(HZ(6000))	/* to improve main<->audio comms */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* to improve main<->audio comms */
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 

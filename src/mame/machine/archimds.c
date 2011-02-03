@@ -130,7 +130,7 @@ static TIMER_CALLBACK( vidc_video_tick )
 	if(video_dma_on)
 		timer_adjust_oneshot(vid_timer, space->machine->primary_screen->time_until_pos(vidc_regs[0xb4]), 0);
 	else
-		timer_adjust_oneshot(vid_timer, attotime_never, 0);
+		timer_adjust_oneshot(vid_timer, attotime::never, 0);
 }
 
 /* audio DMA */
@@ -162,7 +162,7 @@ static TIMER_CALLBACK( vidc_audio_tick )
 
 		if(!audio_dma_on)
 		{
-			timer_adjust_oneshot(snd_timer, attotime_never, 0);
+			timer_adjust_oneshot(snd_timer, attotime::never, 0);
 			for(ch=0;ch<8;ch++)
 				dac_signed_data_16_w(space->machine->device(dac_port[ch & 7]), 0x8000);
 		}
@@ -177,15 +177,15 @@ static void a310_set_timer(int tmr)
 	{
 		case 0:
 		case 1:
-			timer_adjust_oneshot(timer[tmr], ATTOTIME_IN_USEC(ioc_timercnt[tmr]/8), tmr); // TODO: ARM timings are quite off there, it should be latch and not latch/8
+			timer_adjust_oneshot(timer[tmr], attotime::from_usec(ioc_timercnt[tmr]/8), tmr); // TODO: ARM timings are quite off there, it should be latch and not latch/8
 			break;
 		case 2:
 			freq = 1000000.0 / (double)(ioc_timercnt[tmr]+1);
-			timer_adjust_oneshot(timer[tmr], ATTOTIME_IN_HZ(freq), tmr);
+			timer_adjust_oneshot(timer[tmr], attotime::from_hz(freq), tmr);
 			break;
 		case 3:
 			freq = 1000000.0 / (double)((ioc_timercnt[tmr]+1)*16);
-			timer_adjust_oneshot(timer[tmr], ATTOTIME_IN_HZ(freq), tmr);
+			timer_adjust_oneshot(timer[tmr], attotime::from_hz(freq), tmr);
 			break;
 	}
 }
@@ -232,20 +232,20 @@ void archimedes_init(running_machine *machine)
 	memc_pagesize = 0;
 
 	vbl_timer = timer_alloc(machine, vidc_vblank, NULL);
-	timer_adjust_oneshot(vbl_timer, attotime_never, 0);
+	timer_adjust_oneshot(vbl_timer, attotime::never, 0);
 
 	timer[0] = timer_alloc(machine, ioc_timer, NULL);
 	timer[1] = timer_alloc(machine, ioc_timer, NULL);
 	timer[2] = timer_alloc(machine, ioc_timer, NULL);
 	timer[3] = timer_alloc(machine, ioc_timer, NULL);
-	timer_adjust_oneshot(timer[0], attotime_never, 0);
-	timer_adjust_oneshot(timer[1], attotime_never, 0);
-	timer_adjust_oneshot(timer[2], attotime_never, 0);
-	timer_adjust_oneshot(timer[3], attotime_never, 0);
+	timer_adjust_oneshot(timer[0], attotime::never, 0);
+	timer_adjust_oneshot(timer[1], attotime::never, 0);
+	timer_adjust_oneshot(timer[2], attotime::never, 0);
+	timer_adjust_oneshot(timer[3], attotime::never, 0);
 
 	vid_timer = timer_alloc(machine, vidc_video_tick, NULL);
 	snd_timer = timer_alloc(machine, vidc_audio_tick, NULL);
-	timer_adjust_oneshot(snd_timer, attotime_never, 0);
+	timer_adjust_oneshot(snd_timer, attotime::never, 0);
 }
 
 READ32_HANDLER(archimedes_memc_logical_r)
@@ -923,7 +923,7 @@ WRITE32_HANDLER(archimedes_memc_w)
 
 					printf("MEMC: Starting audio DMA at %f Hz, buffer from %x to %x\n", sndhz, vidc_sndstart, vidc_sndend);
 
-					timer_adjust_periodic(snd_timer, attotime_zero, 0, ATTOTIME_IN_HZ(sndhz));
+					timer_adjust_periodic(snd_timer, attotime::zero, 0, attotime::from_hz(sndhz));
 				}
 
 				break;

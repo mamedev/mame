@@ -950,7 +950,7 @@ static MACHINE_CONFIG_START( mystwarr, driver_device )
 	MCFG_CPU_PROGRAM_MAP(mystwarr_sound_map)
 	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 480)
 
-	MCFG_QUANTUM_TIME(HZ(1920))
+	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 

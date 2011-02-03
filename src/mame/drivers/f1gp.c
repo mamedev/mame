@@ -482,7 +482,7 @@ static MACHINE_CONFIG_START( f1gp, f1gp_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000)) /* 100 CPU slices per frame */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
 
 	MCFG_MACHINE_START(f1gp)
 	MCFG_MACHINE_RESET(f1gp)
@@ -526,7 +526,7 @@ static MACHINE_CONFIG_START( f1gpb, f1gp_state )
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	/* NO sound CPU */
-	MCFG_QUANTUM_TIME(HZ(6000)) /* 100 CPU slices per frame */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
 
 	MCFG_MACHINE_START(f1gpb)
 	MCFG_MACHINE_RESET(f1gp)

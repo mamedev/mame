@@ -410,7 +410,7 @@ static MACHINE_CONFIG_START( pacland, driver_device )
 	MCFG_CPU_IO_MAP(mcu_port_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MCFG_QUANTUM_TIME(HZ(6000))	/* we need heavy synching between the MCU and the CPU */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* we need heavy synching between the MCU and the CPU */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

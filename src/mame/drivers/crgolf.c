@@ -395,7 +395,7 @@ static MACHINE_CONFIG_START( crgolf, crgolf_state )
 
 	MCFG_MACHINE_START(crgolf)
 	MCFG_MACHINE_RESET(crgolf)
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(crgolf_video)

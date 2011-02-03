@@ -2184,7 +2184,7 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( scorpion2_vid, driver_device )
 	MCFG_MACHINE_RESET( init )							// main scorpion2 board initialisation
-	MCFG_QUANTUM_TIME(HZ(960))									// needed for serial communication !!
+	MCFG_QUANTUM_TIME(attotime::from_hz(960))									// needed for serial communication !!
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 )	// 6809 CPU at 2 Mhz
 	MCFG_CPU_PROGRAM_MAP(memmap_vid)					// setup scorpion2 board memorymap
 	MCFG_CPU_PERIODIC_INT(timer_irq, 1000)				// generate 1000 IRQ's per second
@@ -3965,7 +3965,7 @@ MACHINE_CONFIG_END
 /* machine driver for scorpion2 board + matrix board */
 static MACHINE_CONFIG_START( scorpion2_dm01, driver_device )
 	MCFG_MACHINE_RESET(dm01_init)
-	MCFG_QUANTUM_TIME(HZ(960))									// needed for serial communication !!
+	MCFG_QUANTUM_TIME(attotime::from_hz(960))									// needed for serial communication !!
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 )
 	MCFG_CPU_PROGRAM_MAP(memmap_sc2_dm01)
 	MCFG_CPU_PERIODIC_INT(timer_irq, 1000 )

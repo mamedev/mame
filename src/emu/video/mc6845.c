@@ -208,7 +208,7 @@ INLINE void call_on_update_address(device_t *device, int strobe)
 	mc6845_t *mc6845 = get_safe_token(device);
 
 	if (mc6845->intf->on_update_addr_changed)
-		timer_set(device->machine, attotime_zero, (void *) device, (mc6845->update_addr << 8) | strobe, on_update_address_cb);
+		timer_set(device->machine, attotime::zero, (void *) device, (mc6845->update_addr << 8) | strobe, on_update_address_cb);
 	else
 		fatalerror("M6845: transparent memory mode without handler\n");
 }
@@ -465,7 +465,7 @@ INLINE void mc6845_set_de(mc6845_t *mc6845, int state)
 		if ( mc6845->de )
 		{
 			/* If the upd_adr_timer was running, cancel it */
-			timer_adjust_oneshot(mc6845->upd_adr_timer,  attotime_never, 0);
+			timer_adjust_oneshot(mc6845->upd_adr_timer,  attotime::never, 0);
 		}
 		else
 		{

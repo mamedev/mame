@@ -755,7 +755,7 @@ static MACHINE_CONFIG_START( perfrman, driver_device )
 	MCFG_CPU_PROGRAM_MAP(perfrman_sound_map)
 	MCFG_CPU_VBLANK_INT_HACK(getstar_interrupt,4)	/* music speed, verified */
 
-	MCFG_QUANTUM_TIME(HZ(600))		/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))		/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	MCFG_MACHINE_RESET(slapfight)
 
@@ -802,7 +802,7 @@ static MACHINE_CONFIG_START( tigerhb, driver_device )
 	MCFG_CPU_PROGRAM_MAP(slapfght_sound_map)
 	MCFG_CPU_VBLANK_INT_HACK(nmi_line_pulse,6)    /* ??? */
 
-	MCFG_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	MCFG_MACHINE_RESET(slapfight)
 
@@ -851,7 +851,7 @@ static MACHINE_CONFIG_START( tigerh, driver_device )
 	MCFG_CPU_ADD("mcu", M68705,XTAL_36MHz/12) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(tigerh_m68705_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	MCFG_MACHINE_RESET(slapfight)
 
@@ -901,7 +901,7 @@ static MACHINE_CONFIG_START( slapfigh, driver_device )
 	MCFG_CPU_ADD("mcu", M68705, XTAL_36MHz/12) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(slapfight_m68705_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	MCFG_MACHINE_RESET(slapfight)
 

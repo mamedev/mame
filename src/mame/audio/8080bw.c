@@ -831,7 +831,7 @@ WRITE8_HANDLER( schaser_sh_port_1_w )
 			{
 				state->schaser_effect_555_time_remain = timer_timeleft(state->schaser_effect_555_timer);
             		state->schaser_effect_555_time_remain_savable = state->schaser_effect_555_time_remain.as_double();
-				timer_adjust_oneshot(state->schaser_effect_555_timer, attotime_never, 0);
+				timer_adjust_oneshot(state->schaser_effect_555_timer, attotime::never, 0);
 			}
 		}
 		state->schaser_last_effect = effect;
@@ -887,7 +887,7 @@ static TIMER_CALLBACK( schaser_effect_555_cb )
 	attotime new_time;
 	/* Toggle 555 output */
 	state->schaser_effect_555_is_low = !state->schaser_effect_555_is_low;
-	state->schaser_effect_555_time_remain = attotime_zero;
+	state->schaser_effect_555_time_remain = attotime::zero;
 	state->schaser_effect_555_time_remain_savable = state->schaser_effect_555_time_remain.as_double();
 
 	if (state->schaser_effect_555_is_low)
@@ -934,10 +934,10 @@ MACHINE_RESET( schaser_sh )
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	state->schaser_effect_555_is_low = 0;
-	timer_adjust_oneshot(state->schaser_effect_555_timer, attotime_never, 0);
+	timer_adjust_oneshot(state->schaser_effect_555_timer, attotime::never, 0);
 	schaser_sh_port_1_w(space, 0, 0);
 	schaser_sh_port_2_w(space, 0, 0);
-	state->schaser_effect_555_time_remain = attotime_zero;
+	state->schaser_effect_555_time_remain = attotime::zero;
 	state->schaser_effect_555_time_remain_savable = state->schaser_effect_555_time_remain.as_double();
 }
 

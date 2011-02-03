@@ -629,7 +629,7 @@ static MACHINE_CONFIG_START( lsasquad, lsasquad_state )
 	MCFG_CPU_ADD("mcu", M68705, MASTER_CLOCK / 8)
 	MCFG_CPU_PROGRAM_MAP(lsasquad_m68705_map)
 
-	MCFG_QUANTUM_TIME(HZ(30000))	/* 500 CPU slices per frame - an high value to ensure proper */
+	MCFG_QUANTUM_TIME(attotime::from_hz(30000))	/* 500 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 							/* main<->sound synchronization depends on this */
 
@@ -686,7 +686,7 @@ static MACHINE_CONFIG_START( daikaiju, lsasquad_state )
 	MCFG_CPU_ADD("mcu", M68705, MASTER_CLOCK / 8)
 	MCFG_CPU_PROGRAM_MAP(lsasquad_m68705_map)
 
-	MCFG_QUANTUM_TIME(HZ(30000))	/* 500 CPU slices per frame - an high value to ensure proper */
+	MCFG_QUANTUM_TIME(attotime::from_hz(30000))	/* 500 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 							/* main<->sound synchronization depends on this */
 

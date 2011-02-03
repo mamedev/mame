@@ -373,7 +373,7 @@ void system32_set_vblank(running_machine *machine, int state)
 {
 	/* at the end of VBLANK is when automatic sprite rendering happens */
 	if (!state)
-		timer_set(machine, ATTOTIME_IN_USEC(50), NULL, 1, update_sprites);
+		timer_set(machine, attotime::from_usec(50), NULL, 1, update_sprites);
 }
 
 

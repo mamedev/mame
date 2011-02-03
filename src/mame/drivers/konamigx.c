@@ -635,7 +635,7 @@ static void dmastart_callback(int data)
 	}
 
 	// simulate DMA delay
-	timer_adjust_oneshot(dmadelay_timer, ATTOTIME_IN_USEC(120), 0);
+	timer_adjust_oneshot(dmadelay_timer, attotime::from_usec(120), 0);
 }
 
 
@@ -1799,7 +1799,7 @@ static MACHINE_CONFIG_START( konamigx, driver_device )
 	MCFG_CPU_DATA_MAP(gxtmsmap)
 	MCFG_CPU_PERIODIC_INT(tms_sync, 48000)
 
-	MCFG_QUANTUM_TIME(HZ(1920))
+	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
 
 	MCFG_MACHINE_START(konamigx)
 	MCFG_MACHINE_RESET(konamigx)

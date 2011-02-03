@@ -262,7 +262,7 @@ static MACHINE_CONFIG_START( raiden, raiden_state )
 
 	SEIBU_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4) /* verified on pcb */
 
-	MCFG_QUANTUM_TIME(HZ(12000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
 	MCFG_MACHINE_RESET(seibu_sound)
 

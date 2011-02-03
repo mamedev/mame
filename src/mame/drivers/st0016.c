@@ -465,7 +465,7 @@ static MACHINE_CONFIG_DERIVED( mayjinsn, st0016 )
 	MCFG_CPU_IO_MAP(st0016_m2_io)
 	MCFG_CPU_ADD("sub", V810, 10000000)//25 Mhz ?
 	MCFG_CPU_PROGRAM_MAP(v810_mem)
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 MACHINE_CONFIG_END
 
 /*************************************

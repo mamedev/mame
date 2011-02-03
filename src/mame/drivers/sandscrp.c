@@ -198,7 +198,7 @@ static WRITE16_HANDLER( sandscrp_soundlatch_word_w )
 		latch1_full = 1;
 		soundlatch_w(space, 0, data & 0xff);
 		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
-		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(100));	// Allow the other cpu to reply
+		cpu_spinuntil_time(space->cpu, attotime::from_usec(100));	// Allow the other cpu to reply
 	}
 }
 
@@ -449,7 +449,7 @@ static MACHINE_CONFIG_START( sandscrp, driver_device )
 	MCFG_CPU_PROGRAM_MAP(sandscrp_soundmem)
 	MCFG_CPU_IO_MAP(sandscrp_soundport)
 
-	MCFG_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))	/* a guess, and certainly wrong */
 
 	MCFG_MACHINE_RESET(sandscrp)
 

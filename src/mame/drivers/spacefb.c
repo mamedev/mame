@@ -344,7 +344,7 @@ static MACHINE_CONFIG_START( spacefb, driver_device )
 	MCFG_CPU_PROGRAM_MAP(spacefb_audio_map)
 	MCFG_CPU_IO_MAP(spacefb_audio_io_map)
 
-	MCFG_QUANTUM_TIME(HZ(180))
+	MCFG_QUANTUM_TIME(attotime::from_hz(180))
 
 	MCFG_MACHINE_START(spacefb)
 	MCFG_MACHINE_RESET(spacefb)

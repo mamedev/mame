@@ -342,7 +342,7 @@ static MACHINE_CONFIG_START( gradius3, gradius3_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(gradius3_s_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_START(gradius3)
 	MCFG_MACHINE_RESET(gradius3)

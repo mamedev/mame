@@ -889,7 +889,7 @@ static MACHINE_CONFIG_START( polepos, driver_device )
 
 	MCFG_WATCHDOG_VBLANK_INIT(16)	// 128V clocks the same as VBLANK
 
-	MCFG_QUANTUM_TIME(HZ(6000))	/* some interleaving */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* some interleaving */
 
 	MCFG_MACHINE_RESET(polepos)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -972,7 +972,7 @@ static MACHINE_CONFIG_START( topracern, driver_device )
 
 	MCFG_WATCHDOG_VBLANK_INIT(16)	// 128V clocks the same as VBLANK
 
-	MCFG_QUANTUM_TIME(HZ(6000))	/* some interleaving */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* some interleaving */
 
 	MCFG_MACHINE_RESET(polepos)
 	MCFG_NVRAM_ADD_1FILL("nvram")

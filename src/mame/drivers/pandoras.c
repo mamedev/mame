@@ -367,7 +367,7 @@ static MACHINE_CONFIG_START( pandoras, pandoras_state )
 	MCFG_CPU_PROGRAM_MAP(pandoras_i8039_map)
 	MCFG_CPU_IO_MAP(pandoras_i8039_io_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - needed for correct synchronization of the sound CPUs */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - needed for correct synchronization of the sound CPUs */
 
 	MCFG_MACHINE_START(pandoras)
 	MCFG_MACHINE_RESET(pandoras)

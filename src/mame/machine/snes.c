@@ -107,7 +107,7 @@ static TIMER_CALLBACK( snes_nmi_tick )
 	cpu_set_input_line(state->maincpu, G65816_LINE_NMI, ASSERT_LINE);
 
 	// don't happen again
-	timer_adjust_oneshot(state->nmi_timer, attotime_never, 0);
+	timer_adjust_oneshot(state->nmi_timer, attotime::never, 0);
 }
 
 static void snes_hirq_tick( running_machine *machine )
@@ -121,7 +121,7 @@ static void snes_hirq_tick( running_machine *machine )
 	cpu_set_input_line(state->maincpu, G65816_LINE_IRQ, ASSERT_LINE);
 
 	// don't happen again
-	timer_adjust_oneshot(state->hirq_timer, attotime_never, 0);
+	timer_adjust_oneshot(state->hirq_timer, attotime::never, 0);
 }
 
 static TIMER_CALLBACK( snes_hirq_tick_callback )
@@ -157,7 +157,7 @@ static TIMER_CALLBACK( snes_update_io )
 	state->io_read(cpu0space->machine);
 	snes_ram[HVBJOY] &= 0xfe;		/* Clear busy bit */
 
-	timer_adjust_oneshot(state->io_timer, attotime_never, 0);
+	timer_adjust_oneshot(state->io_timer, attotime::never, 0);
 }
 
 static TIMER_CALLBACK( snes_scanline_tick )
@@ -245,7 +245,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 		cpu_set_input_line(state->maincpu, G65816_LINE_NMI, CLEAR_LINE );
 	}
 
-	timer_adjust_oneshot(state->scanline_timer, attotime_never, 0);
+	timer_adjust_oneshot(state->scanline_timer, attotime::never, 0);
 	timer_adjust_oneshot(state->hblank_timer, machine->primary_screen->time_until_pos(snes_ppu.beam.current_vert, state->hblank_offset * state->htmult), 0);
 
 //  printf("%02x %d\n",snes_ram[HVBJOY],snes_ppu.beam.current_vert);
@@ -261,7 +261,7 @@ static TIMER_CALLBACK( snes_hblank_tick )
 	snes_ppu.beam.current_vert = machine->primary_screen->vpos();
 
 	/* make sure we halt */
-	timer_adjust_oneshot(state->hblank_timer, attotime_never, 0);
+	timer_adjust_oneshot(state->hblank_timer, attotime::never, 0);
 
 	/* draw a scanline */
 	if (snes_ppu.beam.current_vert <= snes_ppu.beam.last_visible_line)
@@ -616,7 +616,7 @@ WRITE8_HANDLER( snes_w_io )
 	{
 //      printf("816: %02x to APU @ %d (PC=%06x)\n", data, offset & 3,cpu_get_pc(space->cpu));
 		spc_port_in(state->spc700, offset & 0x3, data);
-		cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(20));
+		cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(20));
 		return;
 	}
 
@@ -1709,19 +1709,19 @@ static void snes_init_timers( running_machine *machine )
 
 	/* init timers and stop them */
 	state->scanline_timer = timer_alloc(machine, snes_scanline_tick, NULL);
-	timer_adjust_oneshot(state->scanline_timer, attotime_never, 0);
+	timer_adjust_oneshot(state->scanline_timer, attotime::never, 0);
 	state->hblank_timer = timer_alloc(machine, snes_hblank_tick, NULL);
-	timer_adjust_oneshot(state->hblank_timer, attotime_never, 0);
+	timer_adjust_oneshot(state->hblank_timer, attotime::never, 0);
 	state->nmi_timer = timer_alloc(machine, snes_nmi_tick, NULL);
-	timer_adjust_oneshot(state->nmi_timer, attotime_never, 0);
+	timer_adjust_oneshot(state->nmi_timer, attotime::never, 0);
 	state->hirq_timer = timer_alloc(machine, snes_hirq_tick_callback, NULL);
-	timer_adjust_oneshot(state->hirq_timer, attotime_never, 0);
+	timer_adjust_oneshot(state->hirq_timer, attotime::never, 0);
 	state->div_timer = timer_alloc(machine, snes_div_callback, NULL);
-	timer_adjust_oneshot(state->div_timer, attotime_never, 0);
+	timer_adjust_oneshot(state->div_timer, attotime::never, 0);
 	state->mult_timer = timer_alloc(machine, snes_mult_callback, NULL);
-	timer_adjust_oneshot(state->mult_timer, attotime_never, 0);
+	timer_adjust_oneshot(state->mult_timer, attotime::never, 0);
 	state->io_timer = timer_alloc(machine, snes_update_io, NULL);
-	timer_adjust_oneshot(state->io_timer, attotime_never, 0);
+	timer_adjust_oneshot(state->io_timer, attotime::never, 0);
 
 	// SNES hcounter has a 0-339 range.  hblank starts at counter 260.
 	// clayfighter sets an HIRQ at 260, apparently it wants it to be before hdma kicks off, so we'll delay 2 pixels.

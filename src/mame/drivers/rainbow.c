@@ -685,7 +685,7 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rainbow_sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	MCFG_MACHINE_START(rainbow)
 
@@ -728,7 +728,7 @@ static MACHINE_CONFIG_START( jumping, rainbow_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6)	/* not verified but music tempo matches original */
 	MCFG_CPU_PROGRAM_MAP(jumping_sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough ? */
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - enough ? */
 
 	MCFG_MACHINE_START(rainbow)
 

@@ -565,7 +565,7 @@ static MACHINE_CONFIG_START( dassault, dassault_state )
 	MCFG_CPU_ADD("audiocpu", H6280,32220000/8)	/* Accurate */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(8400)) /* 140 CPU slices per frame */
+	MCFG_QUANTUM_TIME(attotime::from_hz(8400)) /* 140 CPU slices per frame */
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)

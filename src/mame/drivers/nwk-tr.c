@@ -665,7 +665,7 @@ static MACHINE_CONFIG_START( nwktr, driver_device )
 	MCFG_CPU_CONFIG(sharc_cfg)
 	MCFG_CPU_DATA_MAP(sharc_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_START(nwktr)
 	MCFG_MACHINE_RESET(nwktr)

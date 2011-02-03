@@ -72,7 +72,7 @@ static WRITE16_HANDLER( esd16_sound_command_w )
 	{
 		soundlatch_w(space, 0, data & 0xff);
 		cpu_set_input_line(state->audio_cpu, 0, ASSERT_LINE);		// Generate an IRQ
-		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(50));	// Allow the other CPU to reply
+		cpu_spinuntil_time(space->cpu, attotime::from_usec(50));	// Allow the other CPU to reply
 	}
 }
 

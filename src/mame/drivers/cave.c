@@ -126,8 +126,8 @@ static TIMER_CALLBACK( cave_vblank_end )
 static INTERRUPT_GEN( cave_interrupt )
 {
 	cave_state *state = device->machine->driver_data<cave_state>();
-	timer_set(device->machine, ATTOTIME_IN_USEC(17376 - state->time_vblank_irq), NULL, 0, cave_vblank_start);
-	timer_set(device->machine, ATTOTIME_IN_USEC(17376 - state->time_vblank_irq + 2000), NULL, 0, cave_vblank_end);
+	timer_set(device->machine, attotime::from_usec(17376 - state->time_vblank_irq), NULL, 0, cave_vblank_start);
+	timer_set(device->machine, attotime::from_usec(17376 - state->time_vblank_irq + 2000), NULL, 0, cave_vblank_end);
 }
 
 /* Called by the YMZ280B to set the IRQ state */
@@ -227,7 +227,7 @@ static WRITE16_HANDLER( sound_cmd_w )
 //  state->sound_flag2 = 1;
 	soundlatch_word_w(space, offset, data, mem_mask);
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
-	cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(50));	// Allow the other cpu to reply
+	cpu_spinuntil_time(space->cpu, attotime::from_usec(50));	// Allow the other cpu to reply
 }
 
 /* Sound CPU: read the low 8 bits of the 16 bit sound latch */
@@ -2209,7 +2209,7 @@ static MACHINE_CONFIG_START( mazinger, cave_state )
 	MCFG_CPU_PROGRAM_MAP(mazinger_sound_map)
 	MCFG_CPU_IO_MAP(mazinger_sound_portmap)
 
-	MCFG_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))	/* a guess, and certainly wrong */
 
 	MCFG_MACHINE_START(cave)
 	MCFG_MACHINE_RESET(cave)
@@ -2265,7 +2265,7 @@ static MACHINE_CONFIG_START( metmqstr, cave_state )
 	MCFG_CPU_PROGRAM_MAP(metmqstr_sound_map)
 	MCFG_CPU_IO_MAP(metmqstr_sound_portmap)
 
-	MCFG_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))	/* a guess, and certainly wrong */
 
 	MCFG_MACHINE_START(cave)
 	MCFG_MACHINE_RESET(cave)	/* start with the watchdog armed */
@@ -2317,7 +2317,7 @@ static MACHINE_CONFIG_START( pacslot, cave_state )
 	MCFG_CPU_PROGRAM_MAP(pacslot_map)
 	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
 
-	MCFG_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))	/* a guess, and certainly wrong */
 
 	MCFG_MACHINE_START(cave)
 	MCFG_MACHINE_RESET(cave)
@@ -2435,7 +2435,7 @@ static MACHINE_CONFIG_START( sailormn, cave_state )
 	MCFG_CPU_PROGRAM_MAP(sailormn_sound_map)
 	MCFG_CPU_IO_MAP(sailormn_sound_portmap)
 
-//  MCFG_QUANTUM_TIME(HZ(600))
+//  MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(cave)
 	MCFG_MACHINE_RESET(cave)
@@ -2486,7 +2486,7 @@ static MACHINE_CONFIG_START( tjumpman, cave_state )
 	MCFG_CPU_PROGRAM_MAP(tjumpman_map)
 	MCFG_CPU_VBLANK_INT("screen", cave_interrupt)
 
-	MCFG_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))	/* a guess, and certainly wrong */
 
 	MCFG_MACHINE_START(cave)
 	MCFG_MACHINE_RESET(cave)

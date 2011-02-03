@@ -377,7 +377,7 @@ void device_scheduler::rebuild_execute_list()
 
 		// if none specified default to 60Hz
 		if (min_quantum == attotime::zero)
-			min_quantum = ATTOTIME_IN_HZ(60);
+			min_quantum = attotime::from_hz(60);
 
 		// if the configuration specifies a device to make perfect, pick that as the minimum
 		if (m_machine.config->m_perfect_cpu_quantum != NULL)
@@ -395,7 +395,7 @@ void device_scheduler::rebuild_execute_list()
 
 		// inform the timer system of our decision
 		assert(min_quantum.seconds == 0);
-		timer_add_scheduling_quantum(&m_machine, min_quantum.attoseconds, attotime_never);
+		timer_add_scheduling_quantum(&m_machine, min_quantum.attoseconds, attotime::never);
 if (TEMPLOG) printf("Setting quantum: %08X%08X\n", (UINT32)(min_quantum.attoseconds >> 32), (UINT32)min_quantum.attoseconds);
 		m_quantum_set = true;
 	}

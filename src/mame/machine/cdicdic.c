@@ -573,7 +573,7 @@ void cdicdic_device::sample_trigger()
     if(m_decode_addr == 0xffff)
     {
         verboselog(&m_machine, 0, "Decode stop requested, stopping playback\n" );
-        timer_adjust_oneshot(m_audio_sample_timer, attotime_never, 0);
+        timer_adjust_oneshot(m_audio_sample_timer, attotime::never, 0);
         return;
     }
 
@@ -784,13 +784,13 @@ void cdicdic_device::process_delayed_command()
 
                 if((buffer[CDIC_SECTOR_SUBMODE2] & CDIC_SUBMODE_EOF) == 0 && m_command != 0x23)
 				{
-                    timer_adjust_oneshot(m_interrupt_timer, ATTOTIME_IN_HZ(75), 0); // 75Hz = 1x CD-ROM speed
+                    timer_adjust_oneshot(m_interrupt_timer, attotime::from_hz(75), 0); // 75Hz = 1x CD-ROM speed
 				}
 				else
 				{
                     if(m_command == 0x23) // Mode 1 Reset
 					{
-                        timer_adjust_oneshot(m_interrupt_timer, attotime_never, 0);
+                        timer_adjust_oneshot(m_interrupt_timer, attotime::never, 0);
 					}
 				}
 			}
@@ -799,7 +799,7 @@ void cdicdic_device::process_delayed_command()
 		}
 
 		case 0x2e: // Abort
-            timer_adjust_oneshot(m_interrupt_timer, attotime_never, 0);
+            timer_adjust_oneshot(m_interrupt_timer, attotime::never, 0);
             //m_data_buffer &= ~4;
 			break;
 
@@ -861,7 +861,7 @@ void cdicdic_device::process_delayed_command()
 
             m_time = next_msf << 8;
 
-            timer_adjust_oneshot(m_interrupt_timer, ATTOTIME_IN_HZ(75), 0);
+            timer_adjust_oneshot(m_interrupt_timer, attotime::from_hz(75), 0);
 
             m_x_buffer |= 0x8000;
             //m_data_buffer |= 0x4000;
@@ -894,7 +894,7 @@ void cdicdic_device::process_delayed_command()
 			};
 			lba = nybbles[0] + nybbles[1]*10 + ((nybbles[2] + nybbles[3]*10)*75) + ((nybbles[4] + nybbles[5]*10)*75*60);
 
-            timer_adjust_oneshot(m_interrupt_timer, ATTOTIME_IN_HZ(75), 0);
+            timer_adjust_oneshot(m_interrupt_timer, attotime::from_hz(75), 0);
 
             cdrom_read_data(m_cd, lba, buffer, CD_TRACK_RAW_DONTCARE);
 
@@ -1123,13 +1123,13 @@ void cdicdic_device::register_write(const UINT32 offset, const UINT16 data, cons
 				{
                     m_decode_addr = m_z_buffer & 0x3a00;
                     m_decode_delay = 1;
-                    timer_adjust_oneshot(m_audio_sample_timer, ATTOTIME_IN_HZ(75), 0);
+                    timer_adjust_oneshot(m_audio_sample_timer, attotime::from_hz(75), 0);
 				}
 			}
 			else
 			{
                 m_decode_addr = 0xffff;
-                timer_adjust_oneshot(m_audio_sample_timer, attotime_never, 0);
+                timer_adjust_oneshot(m_audio_sample_timer, attotime::never, 0);
 			}
 			break;
 		}
@@ -1148,14 +1148,14 @@ void cdicdic_device::register_write(const UINT32 offset, const UINT16 data, cons
 					//case 0x24: // Reset Mode 2
 					case 0x2e: // Abort
 					{
-                        timer_adjust_oneshot(m_interrupt_timer, attotime_never, 0);
+                        timer_adjust_oneshot(m_interrupt_timer, attotime::never, 0);
 						dmadac_enable(&state->dmadac[0], 2, 0);
                         //m_data_buffer &= 0xbfff;
 						break;
 					}
 					case 0x2b: // Stop CDDA
 						cdda_stop_audio(m_machine.device("cdda"));
-                        timer_adjust_oneshot(m_interrupt_timer, attotime_never, 0);
+                        timer_adjust_oneshot(m_interrupt_timer, attotime::never, 0);
 						break;
 					case 0x23: // Reset Mode 1
 					case 0x29: // Read Mode 1
@@ -1172,7 +1172,7 @@ void cdicdic_device::register_write(const UINT32 offset, const UINT16 data, cons
 						{
                             if(m_command != 0x23 && m_command != 0x24)
 							{
-                                timer_adjust_oneshot(m_interrupt_timer, ATTOTIME_IN_HZ(75), 0);
+                                timer_adjust_oneshot(m_interrupt_timer, attotime::from_hz(75), 0);
 							}
 						}
 						break;
@@ -1215,10 +1215,10 @@ void cdicdic_device::device_start()
     register_globals();
 
     m_interrupt_timer = timer_alloc(&m_machine, trigger_readback_int, 0);
-    timer_adjust_oneshot(m_interrupt_timer, attotime_never, 0);
+    timer_adjust_oneshot(m_interrupt_timer, attotime::never, 0);
 
     m_audio_sample_timer = timer_alloc(&m_machine, audio_sample_trigger, 0);
-    timer_adjust_oneshot(m_audio_sample_timer, attotime_never, 0);
+    timer_adjust_oneshot(m_audio_sample_timer, attotime::never, 0);
 
     m_ram = auto_alloc_array(&m_machine, UINT16, 0x3c00/2);
 }

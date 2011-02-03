@@ -54,8 +54,8 @@
     CONSTANTS
 ***************************************************************************/
 
-#define SOUND_TIMER_RATE			ATTOTIME_IN_USEC(5)
-#define SOUND_TIMER_BOOST			ATTOTIME_IN_USEC(100)
+#define SOUND_TIMER_RATE			attotime::from_usec(5)
+#define SOUND_TIMER_BOOST			attotime::from_usec(100)
 
 
 

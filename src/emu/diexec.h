@@ -115,7 +115,7 @@ enum
 	device_config_execute_interface::static_set_vblank_int(device, _func, _tag); \
 
 #define MCFG_DEVICE_PERIODIC_INT(_func, _rate)	\
-	device_config_execute_interface::static_set_periodic_int(device, _func, ATTOTIME_IN_HZ(_rate)); \
+	device_config_execute_interface::static_set_periodic_int(device, _func, attotime::from_hz(_rate)); \
 
 
 

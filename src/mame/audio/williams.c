@@ -649,7 +649,7 @@ static READ8_HANDLER( adpcm_command_r )
 
 	/* don't clear the external IRQ state for a short while; this allows the
        self-tests to pass */
-	timer_set(space->machine, ATTOTIME_IN_USEC(10), NULL, 0, clear_irq_state);
+	timer_set(space->machine, attotime::from_usec(10), NULL, 0, clear_irq_state);
 	return soundlatch_r(space, 0);
 }
 
@@ -674,7 +674,7 @@ void williams_adpcm_data_w(int data)
 	{
 		cpu_set_input_line(sound_cpu, M6809_IRQ_LINE, ASSERT_LINE);
 		williams_sound_int_state = 1;
-		cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(100));
+		cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(100));
 	}
 }
 

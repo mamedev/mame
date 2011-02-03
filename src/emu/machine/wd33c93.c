@@ -238,7 +238,7 @@ static void wd33c93_read_data(int bytes, UINT8 *pData)
 static void wd33c93_complete_immediate( running_machine *machine, int status )
 {
 	/* reset our timer */
-	timer_reset( scsi_data.cmd_timer, attotime_never );
+	timer_reset( scsi_data.cmd_timer, attotime::never );
 
 	/* set the new status */
 	scsi_data.regs[WD_SCSI_STATUS] = status & 0xff;
@@ -287,7 +287,7 @@ static TIMER_CALLBACK(wd33c93_deassert_cip)
 static void wd33c93_complete_cmd( UINT8 status )
 {
 	/* fire off a timer to complete the command */
-	timer_adjust_oneshot( scsi_data.cmd_timer, ATTOTIME_IN_USEC(1), status );
+	timer_adjust_oneshot( scsi_data.cmd_timer, attotime::from_usec(1), status );
 }
 
 /* command handlers */
@@ -352,7 +352,7 @@ static CMD_HANDLER( wd33c93_select_cmd )
 		}
 
 		/* queue up a service request out in the future */
-		timer_set( machine, ATTOTIME_IN_USEC(50), NULL, 0, wd33c93_service_request );
+		timer_set( machine, attotime::from_usec(50), NULL, 0, wd33c93_service_request );
 	}
 	else
 	{
@@ -424,7 +424,7 @@ static CMD_HANDLER( wd33c93_selectxfer_cmd )
 			scsi_data.busphase = PHS_MESS_IN;
 
 			/* queue up a service request out in the future */
-			timer_set( machine, ATTOTIME_IN_MSEC(50), NULL, 0, wd33c93_service_request );
+			timer_set( machine, attotime::from_msec(50), NULL, 0, wd33c93_service_request );
 		}
 	}
 	else
@@ -454,7 +454,7 @@ static CMD_HANDLER( wd33c93_xferinfo_cmd )
 	scsi_data.regs[WD_AUXILIARY_STATUS] |= ASR_CIP;
 
 	/* the command will be completed once the data is transferred */
-	timer_set( machine, ATTOTIME_IN_MSEC(1), NULL, 0, wd33c93_deassert_cip );
+	timer_set( machine, attotime::from_msec(1), NULL, 0, wd33c93_deassert_cip );
 }
 
 /* Command handlers */

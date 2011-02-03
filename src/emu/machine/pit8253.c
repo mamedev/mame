@@ -608,7 +608,7 @@ static void	simulate2(device_t *device, struct pit8253_timer *timer, INT64 elaps
 	timer->cycles_to_output	= cycles_to_output;
 	if (cycles_to_output ==	CYCLES_NEVER ||	timer->clockin == 0)
 	{
-		timer_adjust_oneshot(timer->updatetimer, attotime_never, timer->index);
+		timer_adjust_oneshot(timer->updatetimer, attotime::never, timer->index);
 	}
 	else
 	{
@@ -1082,7 +1082,7 @@ static void common_start( device_t *device, int device_type ) {
 		/* initialize timer */
 		timer->clockin = pit8253->config->timer[timerno].clockin;
 		timer->updatetimer = timer_alloc(device->machine, update_timer_cb, (void *)device);
-		timer_adjust_oneshot(timer->updatetimer, attotime_never, timerno);
+		timer_adjust_oneshot(timer->updatetimer, attotime::never, timerno);
 
 		/* resolve callbacks */
 		devcb_resolve_read_line(&timer->in_gate_func, &pit8253->config->timer[timerno].in_gate_func, device);

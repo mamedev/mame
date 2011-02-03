@@ -122,13 +122,13 @@ WRITE8_HANDLER( taitosj_mcu_data_w )
 	LOG(("%04x: protection write %02x\n",cpu_get_pc(space->cpu),data));
 	timer_call_after_resynch(space->machine, NULL, data,taitosj_mcu_real_data_w);
 	/* temporarily boost the interleave to sync things up */
-	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(10));
+	cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(10));
 }
 
 READ8_HANDLER( taitosj_mcu_status_r )
 {
 	/* temporarily boost the interleave to sync things up */
-	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(10));
+	cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(10));
 
 	/* bit 0 = the 68705 has read data from the Z80 */
 	/* bit 1 = the 68705 has written data for the Z80 */

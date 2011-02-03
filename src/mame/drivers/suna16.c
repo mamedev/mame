@@ -767,7 +767,7 @@ static MACHINE_CONFIG_START( bssoccer, suna16_state )
 	MCFG_CPU_PROGRAM_MAP(bssoccer_pcm_2_map)
 	MCFG_CPU_IO_MAP(bssoccer_pcm_2_io_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -825,7 +825,7 @@ static MACHINE_CONFIG_START( uballoon, suna16_state )
 
 	/* 2nd PCM Z80 missing */
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_RESET(uballoon)
 
@@ -877,7 +877,7 @@ static MACHINE_CONFIG_START( sunaq, suna16_state )
 
 	/* 2nd PCM Z80 missing */
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -950,7 +950,7 @@ static MACHINE_CONFIG_START( bestbest, suna16_state )
 
 	/* 2nd PCM Z80 missing */
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

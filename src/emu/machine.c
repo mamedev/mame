@@ -184,7 +184,7 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 	  m_soft_reset_timer(NULL),
 	  m_logfile(NULL),
 	  m_saveload_schedule(SLS_NONE),
-	  m_saveload_schedule_time(attotime_zero),
+	  m_saveload_schedule_time(attotime::zero),
 	  m_saveload_searchpath(NULL),
 	  m_rand_seed(0x9d14abd7),
 	  m_driver_device(NULL),
@@ -492,7 +492,7 @@ void running_machine::schedule_hard_reset()
 
 void running_machine::schedule_soft_reset()
 {
-	timer_adjust_oneshot(m_soft_reset_timer, attotime_zero, 0);
+	timer_adjust_oneshot(m_soft_reset_timer, attotime::zero, 0);
 
 	// we can't be paused since the timer needs to fire
 	resume();

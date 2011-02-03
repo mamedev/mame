@@ -410,21 +410,21 @@ static void recalc_8bit_timer(h83xx_state *h8, int t)
 	// if "no clock source", stop
 	if (div < 2)
 	{
-		timer_adjust_oneshot(h8->timer[(t*2)], attotime_never, 0);
-		timer_adjust_oneshot(h8->timer[(t*2)+1], attotime_never, 0);
+		timer_adjust_oneshot(h8->timer[(t*2)], attotime::never, 0);
+		timer_adjust_oneshot(h8->timer[(t*2)+1], attotime::never, 0);
 		return;
 	}
 
 	if (h8->TCORA[t])
 	{
 		time = (h8->device->unscaled_clock() / dividers[div]) / (h8->TCORA[t] - h8->TCNT[t]);
-		timer_adjust_oneshot(h8->timer[(t*2)], ATTOTIME_IN_HZ(time), 0);
+		timer_adjust_oneshot(h8->timer[(t*2)], attotime::from_hz(time), 0);
 	}
 
 	if (h8->TCORB[t])
 	{
 		time = (h8->device->unscaled_clock() / dividers[div]) / (h8->TCORB[t] - h8->TCNT[t]);
-		timer_adjust_oneshot(h8->timer[(t*2)+1], ATTOTIME_IN_HZ(time), 0);
+		timer_adjust_oneshot(h8->timer[(t*2)+1], attotime::from_hz(time), 0);
 	}
 }
 
@@ -433,7 +433,7 @@ static void timer_8bit_expire(h83xx_state *h8, int t, int sel)
 {
 	static const int irqbase[2] = { 19, 22 };
 
-	timer_adjust_oneshot(h8->timer[(t*2)+sel], attotime_never, 0);
+	timer_adjust_oneshot(h8->timer[(t*2)+sel], attotime::never, 0);
 
 	h8->TCSR[t] |= ((0x40)<<sel);
 

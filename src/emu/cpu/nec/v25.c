@@ -194,9 +194,9 @@ static CPU_RESET( v25 )
 	time = attotime::from_hz(nec_state->device->unscaled_clock()) * tmp;
 	timer_adjust_periodic(nec_state->timers[3], time, INTTB, time);
 
-	timer_adjust_oneshot(nec_state->timers[0], attotime_never, 0);
-	timer_adjust_oneshot(nec_state->timers[1], attotime_never, 0);
-	timer_adjust_oneshot(nec_state->timers[2], attotime_never, 0);
+	timer_adjust_oneshot(nec_state->timers[0], attotime::never, 0);
+	timer_adjust_oneshot(nec_state->timers[1], attotime::never, 0);
+	timer_adjust_oneshot(nec_state->timers[2], attotime::never, 0);
 
 	SetRB(7);
 	Sreg(PS) = 0xffff;

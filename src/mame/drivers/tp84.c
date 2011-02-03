@@ -288,7 +288,7 @@ static MACHINE_CONFIG_START( tp84, driver_device )
 	MCFG_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 
 	MCFG_MACHINE_START(tp84)

@@ -540,7 +540,7 @@ static MACHINE_CONFIG_START( sms, driver_device )
 	MCFG_CPU_ADD("soundcpu", Z80, XTAL_16MHz/8)
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_START(sms)
 	MCFG_MACHINE_RESET(sms)

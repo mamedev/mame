@@ -145,7 +145,7 @@ static MACHINE_CONFIG_START( nitedrvr, nitedrvr_state )
 	MCFG_MACHINE_START(nitedrvr)
 	MCFG_MACHINE_RESET(nitedrvr)
 
-	MCFG_TIMER_ADD_PERIODIC("crash_timer", nitedrvr_crash_toggle_callback, NSEC(PERIOD_OF_555_ASTABLE_NSEC(RES_K(180), 330, CAP_U(1))))
+	MCFG_TIMER_ADD_PERIODIC("crash_timer", nitedrvr_crash_toggle_callback, attotime::from_nsec(PERIOD_OF_555_ASTABLE_NSEC(RES_K(180), 330, CAP_U(1))))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

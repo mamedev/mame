@@ -197,7 +197,7 @@ static void write_sfr(v25_state_t *nec_state, unsigned o, UINT8 d)
 					timer_adjust_oneshot(nec_state->timers[0], time, INTTU0);
 				}
 				else
-					timer_adjust_oneshot(nec_state->timers[0], attotime_never, 0);
+					timer_adjust_oneshot(nec_state->timers[0], attotime::never, 0);
 
 				if(d & 0x20)
 				{
@@ -206,7 +206,7 @@ static void write_sfr(v25_state_t *nec_state, unsigned o, UINT8 d)
 					timer_adjust_oneshot(nec_state->timers[1], time, INTTU1);
 				}
 				else
-					timer_adjust_oneshot(nec_state->timers[1], attotime_never, 0);
+					timer_adjust_oneshot(nec_state->timers[1], attotime::never, 0);
 			}
 			else	/* interval mode */
 			{
@@ -215,13 +215,13 @@ static void write_sfr(v25_state_t *nec_state, unsigned o, UINT8 d)
 					tmp = nec_state->MD0 * nec_state->PCK * ((d & 0x40) ? 128 : 6 );
 					time = attotime::from_hz(nec_state->device->unscaled_clock()) * tmp;
 					timer_adjust_periodic(nec_state->timers[0], time, INTTU0, time);
-					timer_adjust_oneshot(nec_state->timers[1], attotime_never, 0);
+					timer_adjust_oneshot(nec_state->timers[1], attotime::never, 0);
 					nec_state->TM0 = nec_state->MD0;
 				}
 				else
 				{
-					timer_adjust_oneshot(nec_state->timers[0], attotime_never, 0);
-					timer_adjust_oneshot(nec_state->timers[1], attotime_never, 0);
+					timer_adjust_oneshot(nec_state->timers[0], attotime::never, 0);
+					timer_adjust_oneshot(nec_state->timers[1], attotime::never, 0);
 				}
 			}
 			break;
@@ -235,7 +235,7 @@ static void write_sfr(v25_state_t *nec_state, unsigned o, UINT8 d)
 				nec_state->TM1 = nec_state->MD1;
 			}
 			else
-				timer_adjust_oneshot(nec_state->timers[2], attotime_never, 0);
+				timer_adjust_oneshot(nec_state->timers[2], attotime::never, 0);
 			break;
 		case 0x9C: /* TMIC0 */
 			write_irqcontrol(nec_state, INTTU0, d);

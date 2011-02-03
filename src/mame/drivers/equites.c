@@ -417,7 +417,7 @@ static SOUND_START(equites)
 	state->nmi_timer = timer_alloc(machine, equites_nmi_callback, NULL);
 
 	state->adjuster_timer = timer_alloc(machine, equites_frq_adjuster_callback, NULL);
-	timer_adjust_periodic(state->adjuster_timer, ATTOTIME_IN_HZ(60), 0, ATTOTIME_IN_HZ(60));
+	timer_adjust_periodic(state->adjuster_timer, attotime::from_hz(60), 0, attotime::from_hz(60));
 }
 
 static WRITE8_HANDLER(equites_c0f8_w)
@@ -592,7 +592,7 @@ static WRITE8_HANDLER(equites_8155_w)
 	{
 		case 0: //logerror( "8155 Command register write %x, timer command = %x, interrupt enable = %x, ports = %x\n", data, (data >> 6) & 3, (data >> 4) & 3, data & 0xf );
 			if (((data >> 6) & 3) == 3)
-				timer_adjust_periodic(state->nmi_timer, ATTOTIME_IN_HZ(XTAL_6_144MHz/2 / state->timer_count), 0, ATTOTIME_IN_HZ(XTAL_6_144MHz/2 / state->timer_count));
+				timer_adjust_periodic(state->nmi_timer, attotime::from_hz(XTAL_6_144MHz/2 / state->timer_count), 0, attotime::from_hz(XTAL_6_144MHz/2 / state->timer_count));
 			break;
 		case 1: //logerror( "8155 I/O Port A write %x\n", data );
 			state->eq8155_port_a = data;

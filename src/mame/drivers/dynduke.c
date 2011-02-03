@@ -282,7 +282,7 @@ static MACHINE_CONFIG_START( dynduke, dynduke_state )
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 
-	MCFG_QUANTUM_TIME(HZ(3600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(3600))
 
 	MCFG_MACHINE_RESET(seibu_sound)
 

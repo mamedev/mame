@@ -536,7 +536,7 @@ static MACHINE_CONFIG_DERIVED( bking3, bking )
 	MCFG_MACHINE_START(bking3)
 	MCFG_MACHINE_RESET(bking3)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 MACHINE_CONFIG_END
 
 /***************************************************************************

@@ -653,7 +653,7 @@ static CPU_INIT( tms34010 )
 
 	/* allocate a scanline timer and set it to go off at the start */
 	tms->scantimer = timer_alloc(device->machine, scanline_callback, tms);
-	timer_adjust_oneshot(tms->scantimer, attotime_zero, 0);
+	timer_adjust_oneshot(tms->scantimer, attotime::zero, 0);
 
 	/* allocate the shiftreg */
 	tms->shiftreg = auto_alloc_array(device->machine, UINT16, SHIFTREG_SIZE/2);

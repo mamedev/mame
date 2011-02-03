@@ -657,7 +657,7 @@ static MACHINE_CONFIG_START( plygonet, polygonet_state )
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 
 	/* TODO: TEMPORARY!  UNTIL A MORE LOCALIZED SYNC CAN BE MADE */
-	MCFG_QUANTUM_TIME(HZ(1200000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(1200000))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

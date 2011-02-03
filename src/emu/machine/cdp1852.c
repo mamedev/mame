@@ -166,7 +166,7 @@ static DEVICE_START( cdp1852 )
 	{
 		/* create the scan timer */
 		cdp1852->scan_timer = timer_alloc(device->machine, cdp1852_scan_tick, (void *)device);
-		timer_adjust_periodic(cdp1852->scan_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock()));
+		timer_adjust_periodic(cdp1852->scan_timer, attotime::zero, 0, attotime::from_hz(device->clock()));
 	}
 
 	/* register for state saving */

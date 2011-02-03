@@ -110,13 +110,13 @@ static INTERRUPT_GEN( toypop_main_interrupt )
 								// so don't replace with cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 
 	if (!namcoio_read_reset_line(namcoio_0))		/* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(device->machine, ATTOTIME_IN_USEC(50), NULL, 0, namcoio_run);
+		timer_set(device->machine, attotime::from_usec(50), NULL, 0, namcoio_run);
 
 	if (!namcoio_read_reset_line(namcoio_1))		/* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(device->machine, ATTOTIME_IN_USEC(50), NULL, 1, namcoio_run);
+		timer_set(device->machine, attotime::from_usec(50), NULL, 1, namcoio_run);
 
 	if (!namcoio_read_reset_line(namcoio_2))		/* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(device->machine, ATTOTIME_IN_USEC(50), NULL, 2, namcoio_run);
+		timer_set(device->machine, attotime::from_usec(50), NULL, 2, namcoio_run);
 
 }
 
@@ -558,7 +558,7 @@ static MACHINE_CONFIG_START( liblrabl, toypop_state )
 	MCFG_CPU_PROGRAM_MAP(m68k_map)
 	MCFG_CPU_VBLANK_INT("screen", toypop_m68000_interrupt)
 
-	MCFG_QUANTUM_TIME(HZ(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MCFG_MACHINE_RESET(toypop)
 

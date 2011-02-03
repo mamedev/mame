@@ -375,7 +375,7 @@ static WRITE8_DEVICE_HANDLER( qixmcu_coinctrl_w )
 		cputag_set_input_line(device->machine, "mcu", M68705_IRQ_LINE, ASSERT_LINE);
 		/* temporarily boost the interleave to sync things up */
 		/* note: I'm using 50 because 30 is not enough for space dungeon at game over */
-		cpuexec_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(50));
+		cpuexec_boost_interleave(device->machine, attotime::zero, attotime::from_usec(50));
 	}
 	else
 		cputag_set_input_line(device->machine, "mcu", M68705_IRQ_LINE, CLEAR_LINE);

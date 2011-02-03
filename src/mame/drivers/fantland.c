@@ -868,7 +868,7 @@ static MACHINE_CONFIG_START( fantland, fantland_state )
 	MCFG_MACHINE_START(fantland)
 	MCFG_MACHINE_RESET(fantland)
 
-	MCFG_QUANTUM_TIME(HZ(8000))	// sound irq must feed the DAC at 8kHz
+	MCFG_QUANTUM_TIME(attotime::from_hz(8000))	// sound irq must feed the DAC at 8kHz
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

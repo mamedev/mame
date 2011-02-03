@@ -225,7 +225,7 @@ static WRITE32_HANDLER( ms32_sound_w )
 	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
 
 	// give the Z80 time to respond
-	cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(40));
+	cpu_spinuntil_time(space->cpu, attotime::from_usec(40));
 }
 
 static READ32_HANDLER( ms32_sound_r )
@@ -1322,7 +1322,7 @@ static MACHINE_CONFIG_START( ms32, driver_device )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(ms32_sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(60000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
 	MCFG_MACHINE_RESET(ms32)
 

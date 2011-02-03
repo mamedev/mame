@@ -2384,7 +2384,7 @@ static void t90_start_timer4(t90_Regs *cpustate)
 
 static void t90_stop_timer(t90_Regs *cpustate, int i)
 {
-	timer_adjust_oneshot(cpustate->timer[i], attotime_never, i);
+	timer_adjust_oneshot(cpustate->timer[i], attotime::never, i);
 	logerror("%04X: CPU Timer %d stopped\n", cpustate->pc.w.l, i);
 }
 

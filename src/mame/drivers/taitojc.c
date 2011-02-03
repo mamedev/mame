@@ -1328,7 +1328,7 @@ static MACHINE_CONFIG_START( taitojc, taitojc_state )
 	MCFG_CPU_PROGRAM_MAP(tms_program_map)
 	MCFG_CPU_DATA_MAP(tms_data_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_RESET(taitojc)
 	MCFG_EEPROM_93C46_ADD("eeprom")

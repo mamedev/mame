@@ -246,7 +246,7 @@ void at28c16_device::write( offs_t offset, UINT8 data )
 			}
 
 			m_last_write = 0xff;
-			timer_adjust_oneshot( m_write_timer, ATTOTIME_IN_USEC( 200 ), 0 );
+			timer_adjust_oneshot( m_write_timer, attotime::from_usec( 200 ), 0 );
 		}
 	}
 	else
@@ -261,7 +261,7 @@ void at28c16_device::write( offs_t offset, UINT8 data )
 		{
 			m_addrspace[ 0 ]->write_byte( offset, data );
 			m_last_write = data;
-			timer_adjust_oneshot( m_write_timer, ATTOTIME_IN_USEC( 200 ), 0 );
+			timer_adjust_oneshot( m_write_timer, attotime::from_usec( 200 ), 0 );
 		}
 	}
 }

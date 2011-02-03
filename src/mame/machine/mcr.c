@@ -335,7 +335,7 @@ READ8_HANDLER( mcr_ipu_watchdog_r )
 {
 	/* watchdog counter is clocked by 7.3728MHz crystal / 16 */
 	/* watchdog is tripped when 14-bit counter overflows => / 32768 = 14.0625Hz*/
-	timer_adjust_oneshot(ipu_watchdog_timer, ATTOTIME_IN_HZ(7372800 / 16 / 32768), 0);
+	timer_adjust_oneshot(ipu_watchdog_timer, attotime::from_hz(7372800 / 16 / 32768), 0);
 	return 0xff;
 }
 

@@ -967,7 +967,7 @@ static MACHINE_CONFIG_START( arkanoid, arkanoid_state )
 	MCFG_CPU_ADD("mcu", M68705, XTAL_12MHz/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))					// 100 CPU slices per second to synchronize between the MCU and the main CPU
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))					// 100 CPU slices per second to synchronize between the MCU and the main CPU
 
 	MCFG_MACHINE_START(arkanoid)
 	MCFG_MACHINE_RESET(arkanoid)

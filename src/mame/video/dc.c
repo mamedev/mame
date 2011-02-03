@@ -1092,7 +1092,7 @@ WRITE64_HANDLER( pvr_ta_w )
 				// this should really be done for each tile!
 				render_to_accumulation_buffer(space->machine,fake_accumulationbuffer_bitmap,&clip);
 
-				timer_adjust_oneshot(endofrender_timer_isp, ATTOTIME_IN_USEC(4000) , 0); // hack, make sure render takes some amount of time
+				timer_adjust_oneshot(endofrender_timer_isp, attotime::from_usec(4000) , 0); // hack, make sure render takes some amount of time
 
 				/* copy the tiles to the framebuffer (really the rendering should be in this loop too) */
 				if (pvrta_regs[FPU_PARAM_CFG] & 0x200000)
@@ -1241,8 +1241,8 @@ WRITE64_HANDLER( pvr_ta_w )
 
 	case SPG_VBLANK_INT:
 		/* clear pending irqs and modify them with the updated ones */
-		timer_adjust_oneshot(vbin_timer, attotime_never, 0);
-		timer_adjust_oneshot(vbout_timer, attotime_never, 0);
+		timer_adjust_oneshot(vbin_timer, attotime::never, 0);
+		timer_adjust_oneshot(vbout_timer, attotime::never, 0);
 
 		timer_adjust_oneshot(vbin_timer, space->machine->primary_screen->time_until_pos(spg_vblank_in_irq_line_num), 0);
 		timer_adjust_oneshot(vbout_timer, space->machine->primary_screen->time_until_pos(spg_vblank_out_irq_line_num), 0);
@@ -1399,11 +1399,11 @@ static void process_ta_fifo(running_machine* machine)
 		/* FIXME: timing of these */
 		switch (state_ta.tafifo_listtype)
 		{
-		case 0: timer_set(machine, ATTOTIME_IN_USEC(100), NULL, 0, transfer_opaque_list_irq); break;
-		case 1: timer_set(machine, ATTOTIME_IN_USEC(100), NULL, 0, transfer_opaque_modifier_volume_list_irq); break;
-		case 2: timer_set(machine, ATTOTIME_IN_USEC(100), NULL, 0, transfer_translucent_list_irq); break;
-		case 3: timer_set(machine, ATTOTIME_IN_USEC(100), NULL, 0, transfer_translucent_modifier_volume_list_irq); break;
-		case 4: timer_set(machine, ATTOTIME_IN_USEC(100), NULL, 0, transfer_punch_through_list_irq); break;
+		case 0: timer_set(machine, attotime::from_usec(100), NULL, 0, transfer_opaque_list_irq); break;
+		case 1: timer_set(machine, attotime::from_usec(100), NULL, 0, transfer_opaque_modifier_volume_list_irq); break;
+		case 2: timer_set(machine, attotime::from_usec(100), NULL, 0, transfer_translucent_list_irq); break;
+		case 3: timer_set(machine, attotime::from_usec(100), NULL, 0, transfer_translucent_modifier_volume_list_irq); break;
+		case 4: timer_set(machine, attotime::from_usec(100), NULL, 0, transfer_punch_through_list_irq); break;
 		}
 		state_ta.tafifo_listtype= -1; // no list being received
 		state_ta.listtype_used |= (2+8);
@@ -2498,7 +2498,7 @@ static TIMER_CALLBACK(endofrender_video)
 {
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_VIDEO;// VIDEO end of render
 	dc_update_interrupt_status(machine);
-	timer_adjust_oneshot(endofrender_timer_video, attotime_never, 0);
+	timer_adjust_oneshot(endofrender_timer_video, attotime::never, 0);
 }
 
 static TIMER_CALLBACK(endofrender_tsp)
@@ -2506,8 +2506,8 @@ static TIMER_CALLBACK(endofrender_tsp)
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_TSP;	// TSP end of render
 	dc_update_interrupt_status(machine);
 
-	timer_adjust_oneshot(endofrender_timer_tsp, attotime_never, 0);
-	timer_adjust_oneshot(endofrender_timer_video, ATTOTIME_IN_USEC(500) , 0);
+	timer_adjust_oneshot(endofrender_timer_tsp, attotime::never, 0);
+	timer_adjust_oneshot(endofrender_timer_video, attotime::from_usec(500) , 0);
 }
 
 static TIMER_CALLBACK(endofrender_isp)
@@ -2515,8 +2515,8 @@ static TIMER_CALLBACK(endofrender_isp)
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_ISP;	// ISP end of render
 	dc_update_interrupt_status(machine);
 
-	timer_adjust_oneshot(endofrender_timer_isp, attotime_never, 0);
-	timer_adjust_oneshot(endofrender_timer_tsp, ATTOTIME_IN_USEC(500) , 0);
+	timer_adjust_oneshot(endofrender_timer_isp, attotime::never, 0);
+	timer_adjust_oneshot(endofrender_timer_tsp, attotime::from_usec(500) , 0);
 }
 
 
@@ -2567,9 +2567,9 @@ VIDEO_START(dc)
 	endofrender_timer_tsp = timer_alloc(machine, endofrender_tsp, 0);
 	endofrender_timer_video = timer_alloc(machine, endofrender_video, 0);
 
-	timer_adjust_oneshot(endofrender_timer_isp, attotime_never, 0);
-	timer_adjust_oneshot(endofrender_timer_tsp, attotime_never, 0);
-	timer_adjust_oneshot(endofrender_timer_video, attotime_never, 0);
+	timer_adjust_oneshot(endofrender_timer_isp, attotime::never, 0);
+	timer_adjust_oneshot(endofrender_timer_tsp, attotime::never, 0);
+	timer_adjust_oneshot(endofrender_timer_video, attotime::never, 0);
 
 	fake_accumulationbuffer_bitmap = auto_bitmap_alloc(machine,1024,1024,BITMAP_FORMAT_RGB32);
 

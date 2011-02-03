@@ -609,7 +609,7 @@ static MACHINE_RESET( crystal )
 	for (i = 0; i < 4; i++)
 	{
 		state->Timerctrl[i] = 0;
-		timer_adjust_oneshot(state->Timer[i], attotime_never, 0);
+		timer_adjust_oneshot(state->Timer[i], attotime::never, 0);
 	}
 
 	vr0_snd_set_areas(machine->device("vrender"), state->textureram, state->frameram);

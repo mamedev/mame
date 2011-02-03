@@ -1856,7 +1856,7 @@ static MACHINE_CONFIG_DERIVED( mcu, nomcu )
 	MCFG_CPU_ADD("mcu", M68705,3000000)      /* xtal is 3MHz, divided by 4 internally */
 	MCFG_CPU_PROGRAM_MAP(taitosj_mcu_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 MACHINE_CONFIG_END
 
 

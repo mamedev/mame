@@ -150,7 +150,7 @@ static MACHINE_CONFIG_START( ggconnie, driver_device )
 	MCFG_CPU_IO_MAP(sgx_io)
 	MCFG_CPU_VBLANK_INT_HACK(sgx_interrupt, VDC_LPF)
 
-	MCFG_QUANTUM_TIME(HZ(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
     /* video hardware */
 

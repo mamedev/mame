@@ -136,7 +136,7 @@ static TIMER_CALLBACK( delayed_gamma_w )
 	cputag_set_input_line(machine, "gamma", INPUT_LINE_NMI, PULSE_LINE);
 
 	/* the sound CPU needs to reply in 250microseconds (according to Neil Bradley) */
-	timer_set(machine, ATTOTIME_IN_USEC(250), NULL, 0, 0);
+	timer_set(machine, attotime::from_usec(250), NULL, 0, 0);
 }
 
 

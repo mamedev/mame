@@ -283,7 +283,7 @@ static READ16_HANDLER( joystick_r )
 
 	/* clear any existing interrupt and set a timer for a new one */
 	state->joystick_int = 0;
-	state->joystick_timer->adjust(ATTOTIME_IN_USEC(50), newval);
+	state->joystick_timer->adjust(attotime::from_usec(50), newval);
 	atarigen_update_interrupts(space->machine);
 
 	return state->joystick_value;

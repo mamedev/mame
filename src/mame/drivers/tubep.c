@@ -910,7 +910,7 @@ static MACHINE_CONFIG_START( tubep, driver_device )
 	MCFG_CPU_ADD("mcu",NSC8105,6000000)	/* 6 MHz Xtal - divided internally ??? */
 	MCFG_CPU_PROGRAM_MAP(nsc_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_START(tubep)
 	MCFG_MACHINE_RESET(tubep)

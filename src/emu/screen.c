@@ -296,8 +296,8 @@ screen_device::screen_device(running_machine &_machine, const screen_device_conf
 	  m_scantime(1),
 	  m_pixeltime(1),
 	  m_vblank_period(0),
-	  m_vblank_start_time(attotime_zero),
-	  m_vblank_end_time(attotime_zero),
+	  m_vblank_start_time(attotime::zero),
+	  m_vblank_end_time(attotime::zero),
 	  m_vblank_begin_timer(NULL),
 	  m_vblank_end_timer(NULL),
 	  m_scanline0_timer(NULL),
@@ -447,7 +447,7 @@ void screen_device::configure(int width, int height, const rectangle &visarea, a
 	// if we are on scanline 0 already, reset the update timer immediately
 	// otherwise, defer until the next scanline 0
 	if (vpos() == 0)
-		timer_adjust_oneshot(m_scanline0_timer, attotime_zero, 0);
+		timer_adjust_oneshot(m_scanline0_timer, attotime::zero, 0);
 	else
 		timer_adjust_oneshot(m_scanline0_timer, time_until_pos(0), 0);
 

@@ -1864,7 +1864,7 @@ static MACHINE_CONFIG_START( spi, driver_device )
 	MCFG_CPU_ADD("soundcpu", Z80, 28636360/4)
 	MCFG_CPU_PROGRAM_MAP(spisound_map)
 
-	MCFG_QUANTUM_TIME(HZ(12000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
 	MCFG_MACHINE_START(spi)
 	MCFG_MACHINE_RESET(spi)

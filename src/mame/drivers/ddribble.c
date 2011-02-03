@@ -296,7 +296,7 @@ static MACHINE_CONFIG_START( ddribble, ddribble_state )
 	MCFG_CPU_ADD("cpu2", M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))	/* we need heavy synch */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* we need heavy synch */
 
 	MCFG_MACHINE_START(ddribble)
 	MCFG_MACHINE_RESET(ddribble)

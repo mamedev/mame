@@ -359,7 +359,7 @@ WRITE8_HANDLER( sega_usb_data_w )
 	timer_call_after_resynch(space->machine, NULL, data, delayed_usb_data_w);
 
 	/* boost the interleave so that sequences can be sent */
-	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(250));
+	cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(250));
 }
 
 
@@ -921,7 +921,7 @@ MACHINE_CONFIG_FRAGMENT( sega_universal_sound_board )
 	MCFG_CPU_PROGRAM_MAP(usb_map)
 	MCFG_CPU_IO_MAP(usb_portmap)
 
-	MCFG_TIMER_ADD_PERIODIC("usb_timer", increment_t1_clock, HZ(USB_2MHZ_CLOCK / 256))
+	MCFG_TIMER_ADD_PERIODIC("usb_timer", increment_t1_clock, attotime::from_hz(USB_2MHZ_CLOCK / 256))
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("usbsnd", USB, 0)

@@ -104,7 +104,7 @@ static CPU_INIT( sc61860 )
 {
 	sc61860_state *cpustate = get_safe_token(device);
 	cpustate->config = (sc61860_cpu_core *) device->baseconfig().static_config();
-	timer_pulse(device->machine, ATTOTIME_IN_HZ(500), cpustate, 0, sc61860_2ms_tick);
+	timer_pulse(device->machine, attotime::from_hz(500), cpustate, 0, sc61860_2ms_tick);
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();

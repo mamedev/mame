@@ -447,7 +447,7 @@ static void update_main_irqs(running_machine *machine)
 	cpu_set_input_line(state->maincpu, 6, state->vblank_irq_state && state->irq2_state ? ASSERT_LINE : CLEAR_LINE);
 
 	if (state->vblank_irq_state || state->irq2_state)
-		cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
+		cpuexec_boost_interleave(machine, attotime::zero, attotime::from_usec(100));
 }
 
 
@@ -1116,7 +1116,7 @@ static MACHINE_CONFIG_START( outrun_base, segas1x_state )
 	MCFG_CPU_IO_MAP(sound_portmap)
 
 	MCFG_MACHINE_RESET(outrun)
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_PPI8255_ADD( "ppi8255", single_ppi_intf )
 

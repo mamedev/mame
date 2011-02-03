@@ -1737,7 +1737,7 @@ static MACHINE_CONFIG_DERIVED( steaser, ilpag )
 	MCFG_CPU_PROGRAM_MAP(steaser_map)
 	MCFG_CPU_VBLANK_INT_HACK(steaser_irq,4)
 
-	MCFG_TIMER_ADD_PERIODIC("coinsim", steaser_mcu_sim, HZ(10000)) // not real, but for simulating the MCU
+	MCFG_TIMER_ADD_PERIODIC("coinsim", steaser_mcu_sim, attotime::from_hz(10000)) // not real, but for simulating the MCU
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( cjffruit, blitz68k_state )

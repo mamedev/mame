@@ -2146,7 +2146,7 @@ MACHINE_CONFIG_DERIVED( vortex, mw8080bw_root )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(vortex_io_map)
 	MCFG_MACHINE_START(extra_8080bw)
-	MCFG_WATCHDOG_TIME_INIT(USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_usec(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
 
 	/* video hardware */
 	// TODO: replace with modified invaders color renderer code allowing midscanline color writes

@@ -62,7 +62,7 @@ const attotime attotime::never(ATTOTIME_MAX_SECONDS, 0);
 
 attotime &attotime::operator*=(UINT32 factor)
 {
-	// if one of the items is attotime_never, return attotime_never
+	// if one of the items is attotime::never, return attotime::never
 	if (seconds >= ATTOTIME_MAX_SECONDS)
 		return *this = never;
 
@@ -102,7 +102,7 @@ attotime &attotime::operator*=(UINT32 factor)
 
 attotime &attotime::operator/=(UINT32 factor)
 {
-	// if one of the items is attotime_never, return attotime_never
+	// if one of the items is attotime::never, return attotime::never
 	if (seconds >= ATTOTIME_MAX_SECONDS)
 		return *this = never;
 

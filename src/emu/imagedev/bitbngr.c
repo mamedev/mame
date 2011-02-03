@@ -225,7 +225,7 @@ bool bitbanger_inc_baud(device_t *device, bool test)
    if( !test)
    {
       bi->baud = adjust_baud;
-      bi->current_baud = ATTOTIME_IN_HZ(bitbanger_baud_value(device));
+      bi->current_baud = attotime::from_hz(bitbanger_baud_value(device));
    }
 
    return TRUE;
@@ -246,7 +246,7 @@ bool bitbanger_dec_baud(device_t *device, bool test)
    if( !test)
    {
       bi->baud = adjust_baud;
-      bi->current_baud = ATTOTIME_IN_HZ(bitbanger_baud_value(device));
+      bi->current_baud = attotime::from_hz(bitbanger_baud_value(device));
    }
 
    return TRUE;
@@ -267,7 +267,7 @@ bool bitbanger_inc_tune(device_t *device, bool test)
    if( !test)
    {
       bi->tune = adjust_tune;
-      bi->current_baud = ATTOTIME_IN_HZ(bitbanger_baud_value(device));
+      bi->current_baud = attotime::from_hz(bitbanger_baud_value(device));
    }
 
    return TRUE;
@@ -288,7 +288,7 @@ bool bitbanger_dec_tune(device_t *device, bool test)
    if( !test)
    {
       bi->tune = adjust_tune;
-      bi->current_baud = ATTOTIME_IN_HZ(bitbanger_baud_value(device));
+      bi->current_baud = attotime::from_hz(bitbanger_baud_value(device));
    }
 
    return TRUE;
@@ -348,14 +348,14 @@ static DEVICE_START(bitbanger)
 
 	/* input config */
 	bi->bitbanger_input_timer = timer_alloc(device->machine, bitbanger_input_timer, (void *) device );
-	bi->idle_delay = ATTOTIME_IN_SEC(1);
+	bi->idle_delay = attotime::from_seconds(1);
 	bi->input_buffer_size = 0;
 	bi->input_buffer_cursor = 0;
 
 	bi->mode = config->default_mode;
 	bi->baud = config->default_baud;
 	bi->tune = config->default_tune;
-	bi->current_baud = ATTOTIME_IN_HZ(bitbanger_baud_value(device));
+	bi->current_baud = attotime::from_hz(bitbanger_baud_value(device));
 
 	/* test callback */
 	if(!config->input_callback)
@@ -386,7 +386,7 @@ static TIMER_CALLBACK(bitbanger_output_timer)
       else
          logerror("Bitbanger: Output framing error.\n" );
 
-      timer_reset(bi->bitbanger_output_timer, attotime_never);
+      timer_reset(bi->bitbanger_output_timer, attotime::never);
    }
 }
 
@@ -469,7 +469,7 @@ static DEVICE_IMAGE_LOAD( bitbanger )
 	bi = get_token(device);
 
 	timer_enable(bi->bitbanger_input_timer, TRUE);
-	timer_adjust_periodic(bi->bitbanger_input_timer, attotime_zero, 0, ATTOTIME_IN_SEC(1));
+	timer_adjust_periodic(bi->bitbanger_input_timer, attotime::zero, 0, attotime::from_seconds(1));
 
 	/* we don't need to do anything special */
 	return IMAGE_INIT_PASS;

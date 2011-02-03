@@ -1464,7 +1464,7 @@ static MACHINE_CONFIG_START( system_A, driver_device )
 	MCFG_CPU_ADD("soundcpu", M68000, SOUND_CPU_CLOCK) /* 7MHz verified */
 	MCFG_CPU_PROGRAM_MAP(megasys1A_sound_map)
 
-	MCFG_QUANTUM_TIME(HZ(120000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(120000))
 
 	MCFG_MACHINE_RESET(megasys1)
 

@@ -343,7 +343,7 @@ static WRITE32_HANDLER( macrossp_soundcmd_w )
 		state->sndpending = 1;
 		cpu_set_input_line(state->audiocpu, 2, HOLD_LINE);
 		/* spin for a while to let the sound CPU read the command */
-		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(50));
+		cpu_spinuntil_time(space->cpu, attotime::from_usec(50));
 	}
 }
 

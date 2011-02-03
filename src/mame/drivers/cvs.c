@@ -322,7 +322,7 @@ static void start_393hz_timer(running_machine *machine)
 {
 	cvs_state *state = machine->driver_data<cvs_state>();
 	state->cvs_393hz_timer = timer_alloc(machine, cvs_393hz_timer_cb, NULL);
-	timer_adjust_periodic(state->cvs_393hz_timer, ATTOTIME_IN_HZ(30*393), 0, ATTOTIME_IN_HZ(30*393));
+	timer_adjust_periodic(state->cvs_393hz_timer, attotime::from_hz(30*393), 0, attotime::from_hz(30*393));
 }
 
 

@@ -562,7 +562,7 @@ static MACHINE_CONFIG_START( imolagp, imolagp_state )
 	MCFG_CPU_IO_MAP(readport_slave)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_START(imolagp)
 	MCFG_MACHINE_RESET(imolagp)

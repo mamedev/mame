@@ -1826,7 +1826,7 @@ static MACHINE_CONFIG_START( mpu4mod2, driver_device )
 	MCFG_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(mod2_memmap)
 
-	MCFG_TIMER_ADD_PERIODIC("50hz",gen_50hz, HZ(100))
+	MCFG_TIMER_ADD_PERIODIC("50hz",gen_50hz, attotime::from_hz(100))
 
 	/* 6840 PTM */
 	MCFG_PTM6840_ADD("ptm_ic2", ptm_ic2_intf)

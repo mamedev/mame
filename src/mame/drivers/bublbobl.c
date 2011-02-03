@@ -778,7 +778,7 @@ static MACHINE_CONFIG_START( tokio, bublbobl_state )
 	MCFG_CPU_ADD("audiocpu", Z80, MAIN_XTAL/8)	// 3 MHz
 	MCFG_CPU_PROGRAM_MAP(tokio_sound_map) // NMIs are triggered by the main CPU, IRQs are triggered by the YM2203
 
-	MCFG_QUANTUM_TIME(HZ(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
 	MCFG_MACHINE_START(tokio)
 	MCFG_MACHINE_RESET(tokio)
@@ -863,7 +863,7 @@ static MACHINE_CONFIG_START( bublbobl, bublbobl_state )
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_pulse) // comes from the same clock that latches the INT pin on the second Z80
 
-	MCFG_QUANTUM_TIME(HZ(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
 	MCFG_MACHINE_START(bublbobl)
 	MCFG_MACHINE_RESET(bublbobl)

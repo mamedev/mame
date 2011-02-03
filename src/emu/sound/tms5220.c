@@ -1696,7 +1696,7 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_rsq_w )
 			tms->io_ready = 0;
 			update_ready_state(tms);
 			/* How long does /READY stay inactive, when /RS is pulled low? I believe its almost always ~16 clocks (25 usec at 800khz as shown on the datasheet) */
-			timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock()/16), tms, 1, io_ready_cb); // this should take around 10-16 (closer to ~11?) cycles to complete
+			timer_set(tms->device->machine, attotime::from_hz(device->clock()/16), tms, 1, io_ready_cb); // this should take around 10-16 (closer to ~11?) cycles to complete
 		}
 	}
 }
@@ -1759,7 +1759,7 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_wsq_w )
             SET RATE (5220C only): ? cycles (probably ~16)
             */
 			// TODO: actually HANDLE the timing differences! currently just assuming always 16 cycles
-			timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock()/16), tms, 1, io_ready_cb); // this should take around 10-16 (closer to ~15) cycles to complete for fifo writes, TODO: but actually depends on what command is written if in command mode
+			timer_set(tms->device->machine, attotime::from_hz(device->clock()/16), tms, 1, io_ready_cb); // this should take around 10-16 (closer to ~15) cycles to complete for fifo writes, TODO: but actually depends on what command is written if in command mode
 		}
 	}
 }

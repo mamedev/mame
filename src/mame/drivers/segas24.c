@@ -828,7 +828,7 @@ static void irq_timer_reset(void)
 	int freq = (irq_timerb << 12) | irq_timera;
 	freq &= 0x1fff;
 
-	irq_timer->adjust(ATTOTIME_IN_HZ(freq), 0, ATTOTIME_IN_HZ(freq));
+	irq_timer->adjust(attotime::from_hz(freq), 0, attotime::from_hz(freq));
 	logerror("New timer frequency: %0d [%02x %04x]\n", freq, irq_timerb, irq_timera);
 }
 
@@ -915,7 +915,7 @@ static INTERRUPT_GEN(irq_vbl)
 		irq_vblank = 1;
 	}
 
-	irq_timer_clear->adjust(ATTOTIME_IN_HZ(VIDEO_CLOCK/2/656.0));
+	irq_timer_clear->adjust(attotime::from_hz(VIDEO_CLOCK/2/656.0));
 
 	mask = 1 << irq;
 
@@ -1781,7 +1781,7 @@ static MACHINE_CONFIG_START( system24, driver_device )
 	MCFG_CPU_ADD("sub", M68000, MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(system24_cpu2_map)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_START(system24)
 	MCFG_MACHINE_RESET(system24)

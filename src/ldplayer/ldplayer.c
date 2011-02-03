@@ -261,7 +261,7 @@ static TIMER_CALLBACK( autoplay )
 static MACHINE_RESET( ldplayer )
 {
 	/* set up a timer to start playing immediately */
-	timer_set(machine, attotime_zero, NULL, 0, autoplay);
+	timer_set(machine, attotime::zero, NULL, 0, autoplay);
 
 	/* indicate the name of the file we opened */
 	popmessage("Opened %s\n", filename.cstr());
@@ -293,7 +293,7 @@ static TIMER_CALLBACK( pr8210_bit_off_callback )
 
 static TIMER_CALLBACK( pr8210_bit_callback )
 {
-	attotime duration = ATTOTIME_IN_MSEC(30);
+	attotime duration = attotime::from_msec(30);
 	device_t *laserdisc = (device_t *)ptr;
 	UINT8 bitsleft = param >> 16;
 	UINT8 data = param;
@@ -303,7 +303,7 @@ static TIMER_CALLBACK( pr8210_bit_callback )
 	{
 		/* assert the line and set a timer for deassertion */
 		laserdisc_line_w(laserdisc, LASERDISC_LINE_CONTROL, ASSERT_LINE);
-		timer_set(machine, ATTOTIME_IN_USEC(250), ptr, 0, pr8210_bit_off_callback);
+		timer_set(machine, attotime::from_usec(250), ptr, 0, pr8210_bit_off_callback);
 
 		/* space 0 bits apart by 1msec, and 1 bits by 2msec */
 		duration = attotime::from_msec((data & 0x80) ? 2 : 1);
@@ -332,7 +332,7 @@ static MACHINE_START( pr8210 )
 static MACHINE_RESET( pr8210 )
 {
 	MACHINE_RESET_CALL(ldplayer);
-	timer_adjust_oneshot(pr8210_bit_timer, attotime_zero, 0);
+	timer_adjust_oneshot(pr8210_bit_timer, attotime::zero, 0);
 }
 
 

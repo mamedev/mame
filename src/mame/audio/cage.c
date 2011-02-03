@@ -164,7 +164,7 @@ void cage_init(running_machine *machine, offs_t speedup)
 	memory_set_bankptr(machine, "bank11", machine->region("cage")->base());
 
 	cage_cpu = machine->device<cpu_device>("cage");
-	cage_cpu_clock_period = ATTOTIME_IN_HZ(cage_cpu->clock());
+	cage_cpu_clock_period = attotime::from_hz(cage_cpu->clock());
 	cage_cpu_h1_clock_period = cage_cpu_clock_period * 2;
 
 	dma_timer = machine->device<timer_device>("cage_dma_timer");
@@ -221,7 +221,7 @@ static TIMER_DEVICE_CALLBACK( dma_timer_callback )
 	{
 		if (dma_timer_enabled)
 		{
-			timer.adjust(attotime_never);
+			timer.adjust(attotime::never);
 			dma_timer_enabled = 0;
 		}
 		return;
@@ -328,7 +328,7 @@ static void update_timer(int which)
 	/* see if we turned off */
 	else if (!enabled && cage_timer_enabled[which])
 	{
-		timer[which]->adjust(attotime_never, which);
+		timer[which]->adjust(attotime::never, which);
 	}
 
 	/* set the new state */

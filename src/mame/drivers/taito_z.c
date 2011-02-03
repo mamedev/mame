@@ -3157,7 +3157,7 @@ static MACHINE_CONFIG_START( enforce, taitoz_state )
 	MCFG_MACHINE_START(taitoz)
 	MCFG_MACHINE_RESET(taitoz)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_TC0220IOC_ADD("tc0220ioc", taitoz_io220_intf)
 
@@ -3220,7 +3220,7 @@ static MACHINE_CONFIG_START( bshark, taitoz_state )
 	MCFG_MACHINE_START(bshark)
 	MCFG_MACHINE_RESET(taitoz)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_TC0220IOC_ADD("tc0220ioc", taitoz_io220_intf)
 
@@ -3283,7 +3283,7 @@ static MACHINE_CONFIG_START( sci, taitoz_state )
 	MCFG_MACHINE_START(taitoz)
 	MCFG_MACHINE_RESET(taitoz)
 
-	MCFG_QUANTUM_TIME(HZ(3000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(3000))
 
 	MCFG_TC0220IOC_ADD("tc0220ioc", taitoz_io220_intf)
 
@@ -3346,7 +3346,7 @@ static MACHINE_CONFIG_START( nightstr, taitoz_state )
 	MCFG_MACHINE_START(taitoz)
 	MCFG_MACHINE_RESET(taitoz)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_TC0220IOC_ADD("tc0220ioc", taitoz_io220_intf)
 
@@ -3411,7 +3411,7 @@ static MACHINE_CONFIG_START( aquajack, taitoz_state )
 	MCFG_MACHINE_START(taitoz)
 	MCFG_MACHINE_RESET(taitoz)
 
-	MCFG_QUANTUM_TIME(HZ(30000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
 
 	MCFG_TC0220IOC_ADD("tc0220ioc", taitoz_io220_intf)
 
@@ -3535,7 +3535,7 @@ static MACHINE_CONFIG_START( dblaxle, taitoz_state )
 	MCFG_MACHINE_START(taitoz)
 	MCFG_MACHINE_RESET(taitoz)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_TC0510NIO_ADD("tc0510nio", taitoz_io510_intf)
 
@@ -3598,7 +3598,7 @@ static MACHINE_CONFIG_START( racingb, taitoz_state )
 	MCFG_MACHINE_START(taitoz)
 	MCFG_MACHINE_RESET(taitoz)
 
-	MCFG_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_TC0510NIO_ADD("tc0510nio", taitoz_io510_intf)
 

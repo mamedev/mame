@@ -28,7 +28,7 @@ UINT16 actel_id;
 static READ64_HANDLER( naomi_bios_idle_skip_r )
 {
 	if (cpu_get_pc(space->cpu)==0xc04173c)
-		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(500));
+		cpu_spinuntil_time(space->cpu, attotime::from_usec(500));
 		//cpu_spinuntil_int(space->cpu);
 //  else
 //      printf("%08x\n", cpu_get_pc(space->cpu));
@@ -198,7 +198,7 @@ DRIVER_INIT(naomi_mp)
 static READ64_HANDLER( naomigd_ggxxsla_idle_skip_r )
 {
 	if (cpu_get_pc(space->cpu)==0x0c0c9adc)
-		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(500));
+		cpu_spinuntil_time(space->cpu, attotime::from_usec(500));
 
 	return naomi_ram64[0x1aae18/8];
 }
@@ -212,7 +212,7 @@ DRIVER_INIT( ggxxsla )
 static READ64_HANDLER( naomigd_ggxx_idle_skip_r )
 {
 	if (cpu_get_pc(space->cpu)==0xc0b5c3c) // or 0xc0bab0c
-		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(500));
+		cpu_spinuntil_time(space->cpu, attotime::from_usec(500));
 
 	return naomi_ram64[0x1837b8/8];
 }
@@ -227,7 +227,7 @@ DRIVER_INIT( ggxx )
 static READ64_HANDLER( naomigd_ggxxrl_idle_skip_r )
 {
 	if (cpu_get_pc(space->cpu)==0xc0b84bc) // or 0xc0bab0c
-		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(500));
+		cpu_spinuntil_time(space->cpu, attotime::from_usec(500));
 
 	//printf("%08x\n", cpu_get_pc(space->cpu));
 
@@ -244,7 +244,7 @@ DRIVER_INIT( ggxxrl )
 static READ64_HANDLER( naomigd_sfz3ugd_idle_skip_r )
 {
 	if (cpu_get_pc(space->cpu)==0xc36a2dc)
-		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(500));
+		cpu_spinuntil_time(space->cpu, attotime::from_usec(500));
 
 	return naomi_ram64[0x5dc900/8];
 }

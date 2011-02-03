@@ -691,10 +691,10 @@ static MACHINE_CONFIG_START( firefox, firefox_state )
 	MCFG_CPU_ADD("audiocpu", M6502, MASTER_XTAL/8)
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 
-	MCFG_QUANTUM_TIME(HZ(60000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
 	MCFG_MACHINE_START(firefox)
-	MCFG_WATCHDOG_TIME_INIT(HZ((double)MASTER_XTAL/8/16/16/16/16))
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz((double)MASTER_XTAL/8/16/16/16/16))
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_RGB32)

@@ -381,7 +381,7 @@ static MACHINE_CONFIG_START( chinhero, shangkid_state )
 
 	MCFG_MACHINE_RESET(chinhero)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -595,7 +595,7 @@ static TIMER_CALLBACK( gpu_sync_timer )
 	cojag_state *state = machine->driver_data<cojag_state>();
 	/* if a command is still pending, and we haven't maxed out our timer, set a new one */
 	if (state->gpu_command_pending && param < 1000)
-		timer_set(machine, ATTOTIME_IN_USEC(50), NULL, ++param, gpu_sync_timer);
+		timer_set(machine, attotime::from_usec(50), NULL, ++param, gpu_sync_timer);
 }
 
 

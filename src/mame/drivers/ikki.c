@@ -232,7 +232,7 @@ static MACHINE_CONFIG_START( ikki, ikki_state )
 	MCFG_CPU_PROGRAM_MAP(ikki_cpu2)
 	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
-	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(ikki)
 	MCFG_MACHINE_RESET(ikki)

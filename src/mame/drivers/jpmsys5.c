@@ -351,7 +351,7 @@ static TIMER_CALLBACK( touch_cb )
 
 			if (++touch_data_count == 3)
 			{
-				timer_reset(touch_timer, attotime_never);
+				timer_reset(touch_timer, attotime::never);
 				touch_state = IDLE;
 			}
 			else
@@ -582,7 +582,7 @@ static MACHINE_START( jpmsys5v )
 
 static MACHINE_RESET( jpmsys5v )
 {
-	timer_reset(touch_timer, attotime_never);
+	timer_reset(touch_timer, attotime::never);
 	touch_state = IDLE;
 	a2_data_in = 1;
 	a2_acia_dcd = 0;

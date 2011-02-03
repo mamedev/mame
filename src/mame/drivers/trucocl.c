@@ -76,7 +76,7 @@ static WRITE8_DEVICE_HANDLER( audio_dac_w )
 
 	dac_data_w( device, rom[dac_address+cur_dac_address_index] );
 
-	timer_set( device->machine, ATTOTIME_IN_HZ( 16000 ), NULL, 0, dac_irq );
+	timer_set( device->machine, attotime::from_hz( 16000 ), NULL, 0, dac_irq );
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
