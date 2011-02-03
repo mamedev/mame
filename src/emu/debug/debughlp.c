@@ -106,6 +106,9 @@ static const help_item static_help_list[] =
 		"  save <filename>,<address>,<length>[,<cpu>] -- save binary program memory to the given file\n"
 		"  saved <filename>,<address>,<length>[,<cpu>] -- save binary data memory to the given file\n"
 		"  savei <filename>,<address>,<length>[,<cpu>] -- save binary I/O memory to the given file\n"
+		"  load <filename>,<address>,<length>[,<cpu>] -- load binary program memory from the given file\n"
+		"  loadd <filename>,<address>,<length>[,<cpu>] -- load binary data memory from the given file\n"
+		"  loadi <filename>,<address>,<length>[,<cpu>] -- load binary I/O memory from the given file\n"
 		"  map <address> -- map logical program address to physical address and bank\n"
 		"  mapd <address> -- map logical data address to physical address and bank\n"
 		"  mapi <address> -- map logical I/O address to physical address and bank\n"
@@ -488,6 +491,28 @@ static const help_item static_help_list[] =
 		"saved harddriv.bin,3000,1000,3\n"
 		"  Saves data memory addresses 3000-3fff from CPU #3 to the binary file 'harddriv.bin'.\n"
 	},
+	{
+		"load",
+		"\n"
+		"  load[{d|i}] <filename>,<address>,<length>[,<cpu>]\n"
+		"\n"
+		"The load/loadd/loadi commands load raw memory from the binary file specified in the <filename> "
+		"parameter. 'load' will load program space memory, while 'loadd' will load data space memory "
+		"and 'loadi' will load I/O space memory. <address> indicates the address of the start of saving, "
+		"and <length> indicates how much memory to load. The range <address> through <address>+<length>-1 "
+		"inclusive will be read in from the file. If you specify <length> = 0 or a length greater than the "
+		"total length of the file it will load the entire contents of the file and no more. You can also load "
+		"memory from another CPU by specifying the <cpu> parameter.\n"
+		"NOTE: This will only actually write memory that is possible to overwrite in the Memory Window\n"
+		"\n"
+		"Examples:\n"
+		"\n"
+		"load venture.bin,0,10000\n"
+		"  Loads addresses 0-ffff in the current CPU from the binary file 'venture.bin'.\n"
+		"\n"
+		"loadd harddriv.bin,3000,1000,3\n"
+		"  Loads data memory addresses 3000-3fff from CPU #3 from the binary file 'harddriv.bin'.\n"
+	},  
 	{
 		"step",
 		"\n"

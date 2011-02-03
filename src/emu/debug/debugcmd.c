@@ -130,6 +130,7 @@ static void execute_wpdisenable(running_machine *machine, int ref, int params, c
 static void execute_wplist(running_machine *machine, int ref, int params, const char **param);
 static void execute_hotspot(running_machine *machine, int ref, int params, const char **param);
 static void execute_save(running_machine *machine, int ref, int params, const char **param);
+static void execute_load(running_machine *machine, int ref, int params, const char **param);
 static void execute_dump(running_machine *machine, int ref, int params, const char **param);
 static void execute_cheatinit(running_machine *machine, int ref, int params, const char **param);
 static void execute_cheatnext(running_machine *machine, int ref, int params, const char **param);
@@ -314,6 +315,10 @@ void debug_command_init(running_machine *machine)
 	debug_console_register_command(machine, "saved",     CMDFLAG_NONE, ADDRESS_SPACE_DATA, 3, 4, execute_save);
 	debug_console_register_command(machine, "savei",     CMDFLAG_NONE, ADDRESS_SPACE_IO, 3, 4, execute_save);
 
+	debug_console_register_command(machine, "load",      CMDFLAG_NONE, ADDRESS_SPACE_PROGRAM, 3, 4, execute_load);
+	debug_console_register_command(machine, "loadd",     CMDFLAG_NONE, ADDRESS_SPACE_DATA, 3, 4, execute_load);
+	debug_console_register_command(machine, "loadi",     CMDFLAG_NONE, ADDRESS_SPACE_IO, 3, 4, execute_load);
+  
 	debug_console_register_command(machine, "dump",      CMDFLAG_NONE, ADDRESS_SPACE_PROGRAM, 3, 6, execute_dump);
 	debug_console_register_command(machine, "dumpd",     CMDFLAG_NONE, ADDRESS_SPACE_DATA, 3, 6, execute_dump);
 	debug_console_register_command(machine, "dumpi",     CMDFLAG_NONE, ADDRESS_SPACE_IO, 3, 6, execute_dump);
@@ -1544,6 +1549,56 @@ static void execute_save(running_machine *machine, int ref, int params, const ch
 	/* close the file */
 	fclose(f);
 	debug_console_printf(machine, "Data saved successfully\n");
+}
+
+
+/*-------------------------------------------------
+    execute_load - execute the load command
+-------------------------------------------------*/
+
+static void execute_load(running_machine *machine, int ref, int params, const char *param[])
+{
+	UINT64 offset, endoffset, length;
+	address_space *space;
+	FILE *f;
+	UINT64 i;
+
+	/* validate parameters */
+	if (!debug_command_parameter_number(machine, param[1], &offset))
+		return;
+	if (!debug_command_parameter_number(machine, param[2], &length))
+		return;
+	if (!debug_command_parameter_cpu_space(machine, (params > 3) ? param[3] : NULL, ref, &space))
+		return;
+
+	/* determine the addresses to read */
+	endoffset = space->address_to_byte(offset + length - 1) & space->bytemask();
+	offset = space->address_to_byte(offset) & space->bytemask();
+
+	/* open the file */
+	f = fopen(param[0], "rb");
+	if (!f)
+	{
+		debug_console_printf(machine, "Error opening file '%s'\n", param[0]);
+		return;
+	}
+
+	/* now read the data in, ignore endoffset and load entire file if length has been set to zero (offset-1) */
+	UINT8 byte;
+	for (i = offset; i <= endoffset || endoffset == offset - 1 ; i++)
+	{
+		fread(&byte, 1, 1, f);
+		/* check if end of file has been reached and stop loading if it has */    
+		if (feof(f))
+			break;
+		debug_write_byte(space, i, byte, TRUE);
+	}
+	/* close the file */
+	fclose(f);
+	if ( i == offset)
+		debug_console_printf(machine, "Length specified too large, load failed\n");
+	else
+		debug_console_printf(machine, "Data loaded successfully to memory : 0x%s to 0x%s\n", core_i64_hex_format(offset,0), core_i64_hex_format(i-1,0));
 }
 
 
