@@ -19,9 +19,16 @@ To diagnose game, turn on service mode and:
 #include "18w.lh"
 
 
-static WRITE8_HANDLER( mw18w_sound_w )
+static WRITE8_HANDLER( mw18w_sound0_w )
 {
-	if (offset==0) coin_counter_w(space->machine, 0, data&1);
+	// sound write (airhorn, brake, crash) plus motor speed for backdrop, and coin counter
+	coin_counter_w(space->machine, 0, data&1);
+}
+
+static WRITE8_HANDLER( mw18w_sound1_w )
+{
+	// sound write (bell, engine) plus lamp dim control for backdrop lamp
+	;
 }
 
 static WRITE8_HANDLER( mw18w_lamps_w )
@@ -63,13 +70,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mw18w_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(4) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(4) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(4) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(4) AM_READ_PORT("DSW")
-	AM_RANGE(0x00, 0x01) AM_WRITE(mw18w_sound_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(mw18w_lamps_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(mw18w_led_display_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(mw18w_sound0_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITE(mw18w_sound1_w)
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_WRITE(mw18w_lamps_w)
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW") AM_WRITE(mw18w_led_display_w)
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN4")
 	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(mw18w_irq0_clear_w)
 ADDRESS_MAP_END
@@ -91,8 +96,8 @@ static INPUT_PORTS_START( mw18w )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )		// for both coin chutes
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )	// left/right sw.
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(mw18w_sensors_r, NULL)
@@ -102,7 +107,7 @@ static INPUT_PORTS_START( mw18w )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Shifter 1st Gear")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Shifter 3rd Gear")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Shifter 2nd Gear")
-	
+
 	PORT_START("IN2")
 	PORT_BIT( 0x3f, 0x1f, IPT_PADDLE ) PORT_REMAP_TABLE(mw18w_controller_table) PORT_SENSITIVITY(100) PORT_KEYDELTA(1)			// steering wheel
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )	// brake
@@ -142,6 +147,13 @@ static INPUT_PORTS_START( mw18w )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC(0x80, IP_ACTIVE_LOW, "SW:8" )
+
+	PORT_START("IN4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )		// n/c
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )		// n/c
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )		// for both coin chutes
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
