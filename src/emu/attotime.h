@@ -64,6 +64,10 @@
 #ifndef __ATTOTIME_H__
 #define __ATTOTIME_H__
 
+#include <math.h>
+#undef min
+#undef max
+
 
 
 //**************************************************************************
