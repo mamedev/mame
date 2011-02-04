@@ -3987,7 +3987,6 @@ static MACHINE_CONFIG_START( ssmissin, driver_device )
 	MCFG_OKIM6295_ADD("oki1", 8000000/8, OKIM6295_PIN7_HIGH) /* 1 Mhz, pin 7 high */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_NMK112_ADD("nmk112", nmk16_nmk112_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( strahl, driver_device )
