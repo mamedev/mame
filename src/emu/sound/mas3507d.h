@@ -19,7 +19,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-struct mas3507d_device_config : public device_config, public device_config_sound_interface
+class mas3507d_device_config : public device_config, public device_config_sound_interface
 {
 	friend class mas3507d_device;
 
