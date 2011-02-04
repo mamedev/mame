@@ -419,6 +419,26 @@ static TIMER_CALLBACK( tx_timer_callback )
 	if ((duart68681->duart_config->tx_callback) && ((duart68681->channel[ch].MR2&0xC0) != 0x80))
 		duart68681->duart_config->tx_callback(device, ch, duart68681->channel[ch].tx_data);
 
+  	// if local loopback is on, write the transmitted data as if a byte had been received
+  	if ((duart68681->channel[ch].MR2 & 0xC0) == 0x80)
+  	{
+  		if (duart68681->channel[ch].rx_fifo_num >= RX_FIFO_SIZE)
+  		{
+  			LOG(( "68681: FIFO overflow\n" ));
+  			duart68681->channel[ch].SR |= STATUS_OVERRUN_ERROR;
+  		}
+  		else
+  		{
+  			duart68681->channel[ch].rx_fifo[duart68681->channel[ch].rx_fifo_write_ptr++]
+  					= duart68681->channel[ch].tx_data;
+  			if (duart68681->channel[ch].rx_fifo_write_ptr == RX_FIFO_SIZE)
+  			{
+  				duart68681->channel[ch].rx_fifo_write_ptr = 0;
+  			}
+  			duart68681->channel[ch].rx_fifo_num++;
+  		}
+  	}
+  
 	duart68681->channel[ch].tx_ready = 1;
 	duart68681->channel[ch].SR |= STATUS_TRANSMITTER_READY;
 
@@ -437,11 +457,8 @@ static void duart68681_write_TX(duart68681_state* duart68681, int ch, UINT8 data
 
 	duart68681->channel[ch].tx_data = data;
 
-	// tx_ready will stay on in local loopback mode
-	if ((duart68681->channel[ch].MR2 & 0xc0) != 0x80) {
-		duart68681->channel[ch].tx_ready = 0;
-		duart68681->channel[ch].SR &= ~STATUS_TRANSMITTER_READY;
-	}
+	duart68681->channel[ch].tx_ready = 0;
+	duart68681->channel[ch].SR &= ~STATUS_TRANSMITTER_READY;
 
 	if (ch == 0)
 		duart68681->ISR &= ~INT_TXRDYA;
@@ -453,23 +470,6 @@ static void duart68681_write_TX(duart68681_state* duart68681, int ch, UINT8 data
 	period = attotime::from_hz(duart68681->channel[ch].baud_rate / 10 );
 	timer_adjust_oneshot(duart68681->channel[ch].tx_timer, period, ch);
 
-	// if local loopback is on, write the transmitted data as if a byte had been recieved
-	if ((duart68681->channel[ch].MR2&0xC0) == 0x80)
-	{
-		if ( duart68681->channel[ch].rx_fifo_num >= RX_FIFO_SIZE )
-		{
-			LOG(( "68681: FIFO overflow\n" ));
-			duart68681->channel[ch].SR |= STATUS_OVERRUN_ERROR;
-			return;
-		}
-		duart68681->channel[ch].rx_fifo[duart68681->channel[ch].rx_fifo_write_ptr++] = data;
-		if ( duart68681->channel[ch].rx_fifo_write_ptr == RX_FIFO_SIZE )
-		{
-			duart68681->channel[ch].rx_fifo_write_ptr = 0;
-		}
-		duart68681->channel[ch].rx_fifo_num++;
-		duart68681_update_interrupts(duart68681);
-	}
 };
 
 READ8_DEVICE_HANDLER(duart68681_r)
