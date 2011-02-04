@@ -289,6 +289,7 @@ OSDOBJS = \
 	$(WINOBJ)/sound.o \
 	$(WINOBJ)/video.o \
 	$(WINOBJ)/window.o \
+	$(WINOBJ)/winmenu.o \
 	$(WINOBJ)/winmain.o
 
 ifeq ($(DIRECT3D),9)

@@ -50,13 +50,6 @@
 //  PARAMETERS
 //============================================================
 
-#ifndef MENU_BAR
-#define HAS_WINDOW_MENU			FALSE
-#else
-#define HAS_WINDOW_MENU			TRUE
-#endif
-
-
 
 //============================================================
 //  CONSTANTS
@@ -153,6 +146,8 @@ void winwindow_video_window_update(win_window_info *window);
 win_monitor_info *winwindow_video_window_monitor(win_window_info *window, const RECT *proposed);
 
 LRESULT CALLBACK winwindow_video_window_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
+extern LRESULT CALLBACK winwindow_video_window_proc_ui(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
+
 void winwindow_toggle_full_screen(void);
 
 void winwindow_process_events_periodic(running_machine *machine);

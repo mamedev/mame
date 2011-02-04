@@ -69,6 +69,7 @@
 #define WINOPTION_PRESCALE				"prescale"
 #define WINOPTION_WAITVSYNC				"waitvsync"
 #define WINOPTION_SYNCREFRESH			"syncrefresh"
+#define WINOPTION_MENU					"menu"
 
 // DirectDraw-specific options
 #define WINOPTION_HWSTRETCH				"hwstretch"

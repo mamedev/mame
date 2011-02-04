@@ -312,6 +312,7 @@ const options_entry mame_win_options[] =
 	{ "prescale",                 "1",        0,                 "scale screen rendering by this amount in software" },
 	{ "waitvsync",                "0",        OPTION_BOOLEAN,    "enable waiting for the start of VBLANK before flipping screens; reduces tearing effects" },
 	{ "syncrefresh",              "0",        OPTION_BOOLEAN,    "enable using the start of VBLANK for throttling instead of the game time" },
+	{ "menu",              		  "0",        OPTION_BOOLEAN,    "enable menu bar if available by UI implementation" },
 
 	// DirectDraw-specific options
 	{ NULL,                       NULL,       OPTION_HEADER,     "DIRECTDRAW-SPECIFIC OPTIONS" },

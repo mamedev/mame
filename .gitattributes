@@ -4517,6 +4517,7 @@ src/osd/windows/windows.mak svneol=native#text/plain
 src/osd/windows/winfile.c svneol=native#text/plain
 src/osd/windows/winmain.c svneol=native#text/plain
 src/osd/windows/winmain.h svneol=native#text/plain
+src/osd/windows/winmenu.c svneol=native#text/plain
 src/osd/windows/winmisc.c svneol=native#text/plain
 src/osd/windows/winprefix.h svneol=native#text/plain
 src/osd/windows/winsync.c svneol=native#text/plain

@@ -582,11 +582,11 @@ static void global_init(void)
 	InitializeCriticalSection(&memory_lock);
 
 	// determine if we enabled by default
-#if defined(WINUI)
-	use_malloc_tracking = FALSE;
-#else
-	use_malloc_tracking = TRUE;
-#endif
+	if (win_is_gui_application()) {
+		use_malloc_tracking = FALSE;
+	} else {
+		use_malloc_tracking = TRUE;
+	}
 
 	// now allow overrides by the environment
 	envstring = _tgetenv(_T("OSDDEBUGMALLOC"));
