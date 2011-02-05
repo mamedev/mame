@@ -742,7 +742,17 @@ static LRESULT CALLBACK debugwin_window_proc(HWND wnd, UINT message, WPARAM wpar
 		// mouse wheel: forward to the first view
 		case WM_MOUSEWHEEL:
 		{
-			int delta = (INT16)HIWORD(wparam) / WHEEL_DELTA;
+			static int units_carryover = 0;
+
+			UINT lines_per_click;
+			if (!SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &lines_per_click, 0))
+				lines_per_click = 3;
+
+			int units = GET_WHEEL_DELTA_WPARAM(wparam) + units_carryover;
+			int clicks = units / WHEEL_DELTA;
+			units_carryover = units % WHEEL_DELTA;
+
+			int delta = clicks * lines_per_click;
 			int viewnum = 0;
 			POINT point;
 			HWND child;
@@ -763,10 +773,10 @@ static LRESULT CALLBACK debugwin_window_proc(HWND wnd, UINT message, WPARAM wpar
 			// send the appropriate message to this view's scrollbar
 			if (info->view[viewnum].wnd && info->view[viewnum].vscroll)
 			{
-				int message_type = SB_LINELEFT;
+				int message_type = SB_LINEUP;
 				if (delta < 0)
 				{
-					message_type = SB_LINERIGHT;
+					message_type = SB_LINEDOWN;
 					delta = -delta;
 				}
 				while (delta > 0)
