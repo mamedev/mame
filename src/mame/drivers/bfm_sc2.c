@@ -183,10 +183,6 @@ static int  get_scorpion2_uart_status(void);	// retrieve status of uart on scorp
 static int  read_e2ram(void);
 static void e2ram_reset(void);
 
-// global vars ////////////////////////////////////////////////////////////
-
-static int sc2gui_update_mmtr;	// bit pattern which mechanical meter needs updating
-
 // local vars /////////////////////////////////////////////////////////////
 
 static UINT8 key[16];		// security device on gamecard (video games only)
@@ -321,7 +317,6 @@ static void on_scorpion2_reset(running_machine *machine)
 
 	hopper_running    = 0;  // for video games
 	hopper_coin_sense = 0;
-	sc2gui_update_mmtr= 0xFF;
 
 	slide_states[0] = 0;
 	slide_states[1] = 0;
@@ -583,7 +578,6 @@ static WRITE8_HANDLER( mmtr_w )
 {
 	int i;
 	int  changed = mmtr_latch ^ data;
-	UINT64 cycles  = downcast<cpu_device *>(space->cpu)->total_cycles();
 
 	mmtr_latch = data;
 
@@ -591,10 +585,7 @@ static WRITE8_HANDLER( mmtr_w )
 	{
 		if ( changed & (1 << i) )
 		{
-			if ( Mechmtr_update(i, cycles, data & (1 << i) ) )
-			{
-				sc2gui_update_mmtr |= (1 << i);
-			}
+			MechMtr_update(i, data & (1 << i) );
 		}
 	}
 	if ( data & 0x1F ) cputag_set_input_line(space->machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE );
@@ -2251,7 +2242,7 @@ static DRIVER_INIT (quintoon)
 {
 	sc2_common_init(machine, 1);
 	adder2_decode_char_roms(machine);
-	Mechmtr_init(8);					// setup mech meters
+	MechMtr_config(machine,8);					// setup mech meters
 
 	has_hopper = 0;
 
@@ -4005,7 +3996,7 @@ static void sc2awp_common_init(running_machine *machine,int reels, int decrypt)
 static DRIVER_INIT (bbrkfst)
 {
 	sc2awp_common_init(machine,5, 1);
-	Mechmtr_init(8);
+	MechMtr_config(machine,8);
 
 	BFM_BD1_init(0);
 	BFM_BD1_init(1);
@@ -4027,7 +4018,7 @@ static DRIVER_INIT (bbrkfst)
 static DRIVER_INIT (drwho)
 {
 	sc2awp_common_init(machine,4, 1);
-	Mechmtr_init(8);
+	MechMtr_config(machine,8);
 
 	BFM_BD1_init(0);
 	BFM_BD1_init(1);
@@ -4047,7 +4038,7 @@ static DRIVER_INIT (drwho)
 static DRIVER_INIT (drwhon)
 {
 	sc2awp_common_init(machine,4, 0);
-	Mechmtr_init(8);
+	MechMtr_config(machine,8);
 
 	BFM_BD1_init(0);
 	BFM_BD1_init(1);
@@ -4068,7 +4059,7 @@ static DRIVER_INIT (drwhon)
 static DRIVER_INIT (focus)
 {
 	sc2awp_common_init(machine,6, 1);
-	Mechmtr_init(5);
+	MechMtr_config(machine,5);
 
 	BFM_BD1_init(0);
 }
@@ -4077,7 +4068,7 @@ static DRIVER_INIT (cpeno1)
 {
 	sc2awp_common_init(machine,6, 1);
 
-	Mechmtr_init(5);
+	MechMtr_config(machine,5);
 
 	Scorpion2_SetSwitchState(3,3,1);	/*  5p play */
 	Scorpion2_SetSwitchState(3,4,1);	/* 20p play */
@@ -4120,7 +4111,7 @@ static DRIVER_INIT (cpeno1)
 static DRIVER_INIT (bfmcgslm)
 {
 	sc2awp_common_init(machine,6, 1);
-	Mechmtr_init(8);
+	MechMtr_config(machine,8);
 	BFM_BD1_init(0);
 	has_hopper = 0;
 }
@@ -4128,7 +4119,7 @@ static DRIVER_INIT (bfmcgslm)
 static DRIVER_INIT (luvjub)
 {
 	sc2awp_common_init(machine,6, 1);
-	Mechmtr_init(8);
+	MechMtr_config(machine,8);
 	has_hopper = 0;
 
 	Scorpion2_SetSwitchState(3,0,1);

@@ -561,7 +561,6 @@ static READ16_HANDLER( jpmio_r )
 
 static WRITE16_HANDLER( jpmio_w )
 {
-	UINT64 cycles = space->machine->firstcpu->total_cycles();
 	switch (offset)
 	{
 		case 0x02:
@@ -589,7 +588,7 @@ static WRITE16_HANDLER( jpmio_w )
 			}
 			else
 //          slide = 0;
-			Mechmtr_update(0, cycles, data >> 10);
+			MechMtr_update(0, data >> 10);
 			duart_1.IP &= ~0x10;
 			break;
 		}
@@ -1206,7 +1205,6 @@ static READ16_HANDLER( optos_r )
 static WRITE16_HANDLER( jpmioawp_w )
 {
 	int i;
-	UINT64 cycles  = space->machine->firstcpu->total_cycles();
 	switch (offset)
 	{
 		case 0x00:
@@ -1248,7 +1246,7 @@ static WRITE16_HANDLER( jpmioawp_w )
 			}
 			else
 //          slide = 0;
-			Mechmtr_update(0, cycles, data >> 10);
+			MechMtr_update(0, data >> 10);
 			if ( data )
 			{
 				duart_1.IP &= ~0x10;

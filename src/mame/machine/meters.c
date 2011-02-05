@@ -2,12 +2,6 @@
 //                                                                       //
 // Electro mechanical meters                                             //
 //                                                                       //
-// 23-07-2004: Re-Animator                                               //
-//                                                                       //
-// TODO: - meter ticks if the signal changes from high to low AND the    //
-//         signal was high for at least 'reacttime' cycles               //
-//         It should tick if the signal goes from low to high AND stays  //
-//         high for at least xxx milliseconds                            //
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 
@@ -18,72 +12,84 @@
 
 static struct
 {
-  long timestamp,	// time stamp in cycles after which timer will tick
-	   reacttime,
-	   count;		// mechmeter value
-  int  state;		// state 0/1
+	long on,	// Activity of reel
+		reacttime,
+		count;		// mechmeter value
+	int  state;		// state 0/1
+	emu_timer *meter_timer;
 } meter_info[MAXMECHMETERS];
-
 
 static int number_mtr;
 
 ///////////////////////////////////////////////////////////////////////////
-
-void Mechmtr_init(int number)
+static TIMER_CALLBACK( meter_callback )
 {
-  int i;
+	meter_info[param].count++;
+}
 
-  if ( number > MAXMECHMETERS ) number = MAXMECHMETERS;
+void MechMtr_config(running_machine *machine, int number)
+{
+	int i;
 
-  for ( i = 0; i < number; i++ )
-  {
-	meter_info[i].reacttime = METERREACTTIME;
-	meter_info[i].state     = 0;
-	meter_info[i].count     = 0;
-	meter_info[i].timestamp = 0;
-  }
-  number_mtr = number;
+	if ( number > MAXMECHMETERS ) number = MAXMECHMETERS;
+
+	for ( i = 0; i < number; i++ )
+	{
+		meter_info[i].reacttime = METERREACTTIME;
+		meter_info[i].state     = 0;
+		meter_info[i].count     = 0;
+		meter_info[i].on		= 0;
+		meter_info[i].meter_timer = timer_alloc(machine, meter_callback, (void*)(FPTR)i);
+		timer_reset(meter_info[i].meter_timer, attotime::never);
+	}
+	number_mtr = number;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-int  MechMtr_GetNumberMeters(void)
+int MechMtr_GetNumberMeters(void)
 {
-  return number_mtr;
+	return number_mtr;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
 void MechMtr_Setcount(int id, long count)
 {
-  if ( id >= number_mtr ) return;
+	if ( id >= number_mtr ) return;
 
-  meter_info[id].count = count;
+	meter_info[id].count = count;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
 long MechMtr_Getcount(int id)
 {
-  long result = 0;
+	long result = 0;
 
-  if ( id < number_mtr ) result = meter_info[id].count;
+	if ( id < number_mtr ) result = meter_info[id].count;
 
-  return result;
+	return result;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
 void MechMtr_ReactTime(int id, long cycles)
 {
-  if ( id >= number_mtr ) return;
-
-  meter_info[id].reacttime = cycles;
+	if ( id >= number_mtr ) return;
+	meter_info[id].reacttime = cycles;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-int Mechmtr_update(int id, long cycles, int state)
+int MechMtr_GetActivity(int id)
+{
+	return meter_info[id].on;
+}
+
+///////////////////////////////////////////////////////////////////////////
+
+int MechMtr_update(int id, int state)
 {
   int res = 0;
 
@@ -97,15 +103,13 @@ int Mechmtr_update(int id, long cycles, int state)
 
 	if ( state )
 	{
-	  meter_info[id].timestamp = cycles + meter_info[id].reacttime;
+		meter_info[id].on =1;
+		timer_adjust_oneshot(meter_info[id].meter_timer, attotime::from_seconds(meter_info[id].reacttime), id);
 	}
 	else
 	{
-	  if ( cycles > meter_info[id].timestamp )
-	  { // meter has been active long enough
-		res = 1;
-		meter_info[id].count++;
-	  }
+		meter_info[id].on =0;
+		timer_adjust_oneshot(meter_info[id].meter_timer, attotime::never, id);
 	}
   }
 

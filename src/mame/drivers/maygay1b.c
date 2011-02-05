@@ -645,7 +645,7 @@ static MACHINE_START( m1 )
 	int i;
 
 // setup 8 mechanical meters ////////////////////////////////////////////
-	Mechmtr_init(8);
+	MechMtr_config(machine,8);
 
 // setup 6 default 96 half step reels ///////////////////////////////////
 	for ( i = 0; i < 6; i++ )
@@ -706,10 +706,9 @@ static UINT8 m1_duart_r (device_t *device)
 static WRITE8_DEVICE_HANDLER( m1_meter_w )
 {
 	int i;
-	UINT64 cycles  = device->machine->device<cpu_device>("maincpu")->total_cycles();
 
 	for (i=0; i<8; i++)
-	if ( data & (1 << i) )	Mechmtr_update(i, cycles, data & (1 << i) );
+	if ( data & (1 << i) )	MechMtr_update(i, data & (1 << i) );
 }
 
 static WRITE8_HANDLER( m1_latch_w )

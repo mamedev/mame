@@ -11,7 +11,8 @@
 // 05-03-2004: Re-Animator                                               //
 //                                                                       //
 // TODO:  add different types of stepper motors if needed                //
-//                                                                       //
+//        someone who understands the device system may want to convert  //
+//        this                                                           //
 ///////////////////////////////////////////////////////////////////////////
 
 #include "emu.h"
@@ -344,7 +345,7 @@ static const int BarcrestStepTab[] =
 	0, //0001->0110 1->6
 	0, //0001->0111 1->7
 	0, //0001->1000 1->8
-	-1,//0001->1001 1->9
+	-1,//0001->1001 1->9	-1,//1001->1000 9->8
 	0, //0001->1010 1->A
 	0, //0001->1011 1->B
 	0, //0001->1100 1->C
@@ -660,17 +661,31 @@ static void update_optic(int which)
 		start = step[which].index_start,
 		end = step[which].index_end;
 
-	if ( (( pos >= start ) && ( pos <= end )) &&
+	if (start > end) // cope with index patterns that wrap around
+	{
+		if ( (( pos > start ) || ( pos < end )) &&
 		( ( step[which].pattern == step[which].index_patt || step[which].index_patt==0) ||
 		( step[which].pattern == 0 &&
 		(step[which].old_pattern == step[which].index_patt || step[which].index_patt==0)
 		) ) )
+		{
+			step[which].optic = 1;
+		}
+		else step[which].optic = 0;
+		}
+	else
 	{
+		if ( (( pos > start ) && ( pos < end )) &&
+		( ( step[which].pattern == step[which].index_patt || step[which].index_patt==0) ||
+		( step[which].pattern == 0 &&
+		(step[which].old_pattern == step[which].index_patt || step[which].index_patt==0)
+		) ) )
+		{
 		step[which].optic = 1;
+		}
+		else step[which].optic = 0;
 	}
-	else step[which].optic = 0;
 }
-
 ///////////////////////////////////////////////////////////////////////////
 
 void stepper_reset_position(int which)
@@ -729,7 +744,7 @@ int stepper_update(int which, UINT8 pattern)
 			break;
 		}
 		#if 0 /* Assists with new index generation */
-		if ( which ==0 )logerror("which %d Index %d Steps %d Pattern Old %02X New %02X\n",which,index,steps,step[which].old_pattern,step[which].pattern);
+		if ( which ==0 )popmessage("which %d Index %d Steps %d Pattern Old %02X New %02X\n",which,index,steps,step[which].old_pattern,step[which].pattern);
 		#endif
 
 		if ( steps )

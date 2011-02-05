@@ -269,7 +269,6 @@ static WRITE8_HANDLER( mmtr_w )
 	else
 	{
 		int  changed = mmtr_latch ^ data;
-		UINT64 cycles  = downcast<cpu_device *>(space->cpu)->total_cycles();
 
 		mmtr_latch = data;
 
@@ -277,7 +276,7 @@ static WRITE8_HANDLER( mmtr_w )
 		{
 			if ( changed & (1 << i) )
 			{
-				Mechmtr_update(i, cycles, data & (1 << i) );
+				MechMtr_update(i, data & (1 << i) );
 				generic_pulse_irq_line(space->machine->device("maincpu"), M6809_FIRQ_LINE);
 			}
 		}
@@ -1362,7 +1361,7 @@ static DRIVER_INIT(toppoker)
 {
 	sc1_common_init(machine,3,1);
 	adder2_decode_char_roms(machine);	// decode GFX roms
-	Mechmtr_init(8);
+	MechMtr_config(machine,8);
 
 	BFM_BD1_init(0);
 }
@@ -1370,7 +1369,7 @@ static DRIVER_INIT(toppoker)
 static DRIVER_INIT(lotse)
 {
 	sc1_common_init(machine,6,1);
-	Mechmtr_init(8);
+	MechMtr_config(machine,8);
 
 	BFM_BD1_init(0);
 	BFM_BD1_init(1);
@@ -1381,7 +1380,7 @@ static DRIVER_INIT(lotse)
 static DRIVER_INIT(rou029)
 {
 	sc1_common_init(machine,6,0);
-	Mechmtr_init(8);
+	MechMtr_config(machine,8);
 
 	BFM_BD1_init(0);
 }
@@ -1391,7 +1390,7 @@ static DRIVER_INIT(rou029)
 static DRIVER_INIT(clatt)
 {
 	sc1_common_init(machine,6,1);
-	Mechmtr_init(8);
+	MechMtr_config(machine,8);
 
 	BFM_BD1_init(0);
 

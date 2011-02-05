@@ -8963,10 +8963,14 @@ Other Sun games
 	DRIVER( eyesdown )	/* 199? */
 	DRIVER( eyesdownd )	/* 199? */
 
+	/* BwB games */
 	DRIVER( blox )		/* 199? */
 	DRIVER( bloxd )		/* 199? */
+	DRIVER( bwbtetrs )	/* 199? */
 	DRIVER( prizeinv )	/* 199? */
 	DRIVER( vgpoker )	/* 199? */
+	DRIVER( renoreel )	/* 199? */
+	DRIVER( redhtpkr )	/* 199? */
 
 	/* ADP games */
 	DRIVER( backgamn )	/* (c) 1990 */
@@ -10564,6 +10568,7 @@ Other Sun games
 	DRIVER( m_oldtmr )	/* Barcrest - highly prelim*/
 	DRIVER( m_ccelbr )
 	DRIVER( m_gmball )
+	DRIVER( m_grtecp )	/* 199? */
 
 	/* MPU5 */
 	DRIVER( m_honmon )

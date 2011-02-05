@@ -172,6 +172,7 @@ TODO:
       - Hook up OKIM6376 sound in The Mating Game
       - Get the BwB games running
         * They have a slightly different 68k memory map. The 6850 is at e00000 and the 6840 is at e01000
+		They appear to hang on the handshake with the MPU4 board
       - Find out what causes the games to reset in service mode (see jump taken at CPU1:c8e8)
       - Deal 'Em lockouts vary on certain cabinets (normally connected to AUX2, but not there?)
       - Deal 'Em has bad tiles (apostrophe, logo, bottom corner), black should actually be transparent
@@ -1094,6 +1095,84 @@ static READ16_HANDLER( ef9369_r )
 	}
 }
 
+/******************************************
+ *
+ *  Brooktree Bt471 RAMDAC
+ *  Implementation stolen from JPM 
+ *  Impact, may not be 100% (that has a 477)
+ ******************************************/
+
+static struct
+{
+	UINT8 address;
+	UINT8 addr_cnt;
+	UINT8 pixmask;
+	UINT8 command;
+	rgb_t color;
+} bt471;
+
+
+/*
+ *  0 0 0    Address register (RAM write mode)
+ *  0 0 1    Color palette RAMs
+ *  0 1 0    Pixel read mask register
+ *  0 1 1    Address register (RAM read mode)
+ *  1 0 0    Address register (overlay write mode)
+ *  1 1 1    Address register (overlay read mode)
+ *  1 0 1    Overlay register
+ */
+
+WRITE16_HANDLER( bt471_w )
+{
+	UINT8 val = data & 0xff;
+		{
+			popmessage("Bt477: Unhandled write access (offset:%x, data:%x)", offset, val);
+		}
+
+	switch (offset)
+	{
+		case 0x0:
+		{
+			bt471.address = val;
+			bt471.addr_cnt = 0;
+			break;
+		}
+		case 0x1:
+		{
+			UINT8 *addr_cnt = &bt471.addr_cnt;
+			rgb_t *color = &bt471.color;
+
+			color[*addr_cnt] = val;
+
+			if (++*addr_cnt == 3)
+			{
+				palette_set_color(space->machine, bt471.address, MAKE_RGB(color[0], color[1], color[2]));
+				*addr_cnt = 0;
+
+				/* Address register increments */
+				bt471.address++;
+			}
+			break;
+		}
+		case 0x2:
+		{
+			bt471.pixmask = val;
+			break;
+		}
+
+//		default:
+		{
+			popmessage("Bt477: Unhandled write access (offset:%x, data:%x)", offset, val);
+		}
+	}
+}
+
+READ16_HANDLER( bt471_r )
+{
+	popmessage("Bt477: Unhandled read access (offset:%x)", offset);
+	return 0;
+}
+
 
 /*************************************
  *
@@ -1888,17 +1967,12 @@ static MACHINE_START( mpu4_vid )
 {
 	mpu4_config_common(machine);
 
+	mod_number=4; //No AY chip
 	/* setup communications */
 	link7a_connected = 1;
 
 	/* setup 8 mechanical meters */
-	Mechmtr_init(8);
-
-	/* setup 4 reels (for hybrid machines) */
-	stepper_config(machine, 0, &barcrest_reel_interface);
-	stepper_config(machine, 1, &barcrest_reel_interface);
-	stepper_config(machine, 2, &barcrest_reel_interface);
-	stepper_config(machine, 3, &barcrest_reel_interface);
+	MechMtr_config(machine,8);
 
 	/* setup the standard oki MSC1937 display */
 	ROC10937_init(0, MSC1937, 0);
@@ -1977,12 +2051,64 @@ static ADDRESS_MAP_START( vp_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 /*  AM_RANGE(0xffd000, 0xffd00f) AM_READWRITE(characteriser16_r, characteriser16_w) Word-based version of old CHR??? */
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( bwbvid_6809_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE("acia6850_0", acia6850_stat_r, acia6850_ctrl_w)
+	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("acia6850_0", acia6850_data_r, acia6850_data_w)
+	AM_RANGE(0x0880, 0x0881) //AM_NOP //Read/write here
+	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("ptm_ic2", ptm6840_read, ptm6840_write)
+	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_r, pia6821_w)
+	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_r, pia6821_w)
+	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE("pia_ic5", pia6821_r, pia6821_w)
+	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE("pia_ic6", pia6821_r, pia6821_w)
+	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE("pia_ic7", pia6821_r, pia6821_w)
+	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE("pia_ic8", pia6821_r, pia6821_w)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM
+	AM_RANGE(0xbe00, 0xbfff) AM_RAM
+	AM_RANGE(0xc000, 0xffff) AM_ROM	AM_REGION("maincpu",0)  /* 64k EPROM on board, only this region read */
+ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( bwbvid_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x7fffff) AM_ROM
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE(&mpu4_vid_mainram)
+	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
+	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_data_w, 0x00ff)
+	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_control_w, 0x00ff)
+	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE(ef9369_r, ef9369_w)
+//	AM_RANGE(0xa00000, 0xa0000f) AM_READWRITE(bt471_r,bt471_w) //Some games use this
+/*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
+	AM_RANGE(0xb00000, 0xb0000f) AM_READWRITE(mpu4_vid_scn2674_r, mpu4_vid_scn2674_w)
+	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w)
+	AM_RANGE(0xe05000, 0xe05001) //AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
+	AM_RANGE(0xe00000, 0xe00001) AM_DEVREADWRITE8("acia6850_1", acia6850_stat_r, acia6850_ctrl_w, 0xff)
+	AM_RANGE(0xe00002, 0xe00003) AM_DEVREADWRITE8("acia6850_1", acia6850_data_r, acia6850_data_w, 0xff)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( bwbvid5_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x7fffff) AM_ROM
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE(&mpu4_vid_mainram)
+	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
+	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_data_w, 0x00ff)
+	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_control_w, 0x00ff)
+	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE(ef9369_r, ef9369_w)
+	//AM_RANGE(0xa00000, 0xa00003) AM_READWRITE(bt471_r,bt471_w) Some games use this
+/*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
+	AM_RANGE(0xb00000, 0xb0000f) AM_READWRITE(mpu4_vid_scn2674_r, mpu4_vid_scn2674_w)
+	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w)
+	AM_RANGE(0xe05000, 0xe05001) //AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
+	AM_RANGE(0xe00000, 0xe00001) AM_DEVREADWRITE8("acia6850_1", acia6850_stat_r, acia6850_ctrl_w, 0xff)
+	AM_RANGE(0xe00002, 0xe00003) AM_DEVREADWRITE8("acia6850_1", acia6850_data_r, acia6850_data_w, 0xff)
+	AM_RANGE(0xe01000, 0xe0100f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_read, ptm6840_write, 0xff)
+	AM_RANGE(0xe02000, 0xe02007) AM_DEVREADWRITE8("pia_ic4ss", pia6821_r, pia6821_w, 0xff)
+	AM_RANGE(0xe03000, 0xe0300f) AM_DEVREADWRITE8("6840ptm_ic3ss", ptm6840_read, ptm6840_write, 0xff)
+ADDRESS_MAP_END
+//	
 /* Deal 'Em */
 /* Deal 'Em was designed as an enhanced gamecard, to fit into an existing MPU4 cabinet
 It's an unoffical addon, and does all its work through the existing 6809 CPU.
 Although given unofficial status, Barcrest's patent on the MPU4 Video hardware (GB1596363) describes
-the Deal 'Em board design, rather than the one they ultimately used, suggesting some sort of licensing deal. */
+the Deal 'Em board design, rather than the one they ultimately used, suggesting some sort of licensing deal.
+Perhaps this was the (seemingly very rare) MPU3 Video card design? */
 
 static const gfx_layout dealemcharlayout =
 {
@@ -2269,12 +2395,6 @@ static MACHINE_CONFIG_START( mpu4_vid, driver_device )
 	MCFG_PALETTE_LENGTH(16)
 
 	MCFG_PTM6840_ADD("6840ptm_68k", ptm_vid_intf)
-
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8913",AY8913, MPU4_MASTER_CLOCK/4)
-	MCFG_SOUND_CONFIG(ay8910_config)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
 	/* Present on all video cards */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("saa", SAA1099, 8000000)
@@ -2293,9 +2413,9 @@ static MACHINE_CONFIG_DERIVED( crmaze, mpu4_vid )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mating, crmaze )
-
 	MCFG_SOUND_ADD("oki", OKIM6376, 64000) //?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( vgpoker, mpu4_vid )
@@ -2303,7 +2423,69 @@ static MACHINE_CONFIG_DERIVED( vgpoker, mpu4_vid )
 	MCFG_CPU_PROGRAM_MAP(vp_68k_map)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( bwbvid, driver_device )
+	MCFG_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4 )
+	MCFG_CPU_PROGRAM_MAP(bwbvid_6809_map)
+	MCFG_TIMER_ADD_PERIODIC("50hz",gen_50hz, attotime::from_hz(100))
 
+	MCFG_NVRAM_ADD_0FILL("nvram")				/* confirm */
+
+	/* 6840 PTM */
+	MCFG_PTM6840_ADD("ptm_ic2", ptm_ic2_intf)
+
+	MCFG_PIA6821_ADD("pia_ic3", pia_ic3_intf)
+	MCFG_PIA6821_ADD("pia_ic4", pia_ic4_intf)
+	MCFG_PIA6821_ADD("pia_ic5", pia_ic5_intf)
+	MCFG_PIA6821_ADD("pia_ic6", pia_ic6_intf)
+	MCFG_PIA6821_ADD("pia_ic7", pia_ic7_intf)
+	MCFG_PIA6821_ADD("pia_ic8", pia_ic8_intf)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(64*8, 40*8) // note this directly affects the scanline counters used below, and thus the timing of everything
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 63*8-1, 0*8, 37*8-1)
+	MCFG_SCREEN_REFRESH_RATE(50)
+
+	MCFG_CPU_ADD("video", M68000, VIDEO_MASTER_CLOCK )
+	MCFG_CPU_PROGRAM_MAP(bwbvid_68k_map)
+
+	MCFG_QUANTUM_TIME(attotime::from_hz(960))
+
+	MCFG_MACHINE_START(mpu4_vid)
+	MCFG_MACHINE_RESET(mpu4_vid)
+	MCFG_VIDEO_START (mpu4_vid)
+	MCFG_VIDEO_UPDATE(mpu4_vid)
+
+	MCFG_PALETTE_LENGTH(16)
+
+	MCFG_PTM6840_ADD("6840ptm_68k", ptm_vid_intf)
+
+	/* Present on all video cards */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD("saa", SAA1099, 8000000)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
+
+	MCFG_ACIA6850_ADD("acia6850_0", m6809_acia_if)
+	MCFG_ACIA6850_ADD("acia6850_1", m68k_acia_if)
+
+	// for the video timing
+	MCFG_TIMER_ADD_SCANLINE("scan_timer", scanline_timer_callback, "screen", 0, 1)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( bwbvid5, bwbvid )
+	MCFG_CPU_MODIFY("video")
+	MCFG_CPU_PROGRAM_MAP(bwbvid5_68k_map)
+
+	MCFG_PTM6840_ADD("6840ptm_ic3ss", ptm_ic3ss_intf)
+	MCFG_PIA6821_ADD("pia_ic4ss", pia_ic4ss_intf)
+
+	MCFG_SOUND_ADD("msm6376", OKIM6376, 64000) //?
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
+
+MACHINE_CONFIG_END
 
 /* machine driver for Zenitone Deal 'Em board */
 static MACHINE_CONFIG_START( dealem, driver_device )
@@ -2695,6 +2877,64 @@ ROM_START( bloxd )
 	ROM_LOAD16_BYTE( "blxv___2.0_4",  0x020001, 0x10000, CRC(e431471a) SHA1(cf90dc48be3bc5e3c5a8efea5818dbc15fa442e9) )
 	ROM_LOAD16_BYTE( "blxv___2.0_5",  0x040001, 0x10000, CRC(98ac6bc7) SHA1(9575014ba21fa4330138a34f53e13d30d312bc8b) )
 	ROM_LOAD16_BYTE( "blxv___2.0_6",  0x040001, 0x10000, CRC(a3d92b5b) SHA1(1e7042d5eae4a19a01a3ef7d806c434886dc9f4d) )
+ROM_END
+
+ROM_START( bwbtetrs )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("tetris22.p0",  0x00000, 0x04000, CRC(b711c7ae) SHA1(767b17ddf9021fdf79ff6c52f04a5d8ea60cf30e) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "tetris22.p1",  0x000000, 0x10000, CRC(e81dd182) SHA1(28b460224abf6fe24b637542ccd1c84040674555) )
+	ROM_LOAD16_BYTE( "tetris22.p2",  0x000001, 0x10000, CRC(68aa4f15) SHA1(4e4511a64391fc64e5f5b7ccb46a78fd2e1d94d6) )
+	ROM_LOAD16_BYTE( "tetris22.p3",  0x020000, 0x10000, CRC(b38b4763) SHA1(d28e77fdd6869cb5b5ec40ed1f300a2a947e0482) )
+	ROM_LOAD16_BYTE( "tetris22.p4",  0x020001, 0x10000, CRC(1649f604) SHA1(ca4ac303391a0969d41c8f988b8e81cfcee1a21c) )
+	ROM_LOAD16_BYTE( "tetris22.p5",  0x040001, 0x10000, CRC(02859676) SHA1(5293c767021a6b5253eecab0b0568aa082ea7084) )
+	ROM_LOAD16_BYTE( "tetris22.p6",  0x040001, 0x10000, CRC(40d24c82) SHA1(7ac3cf148af84ad93eaf11ce3420abbe45d986e2) )
+ROM_END
+
+/* Vegas Poker Prototype dumped by HIGHWAYMAN */
+ROM_START( vgpoker )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("comms-v2.0.bin",  0x00000, 0x10000,  CRC(1717581f) SHA1(40f8cae39a2ab0c89d2bbfd8a37725aaae229c96))
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE("video-1.bin",  0x000000, 0x010000,  CRC(7ba2396c) SHA1(eb24b802b984315fc2eba4f15c208e2c1925c1c8))
+	ROM_LOAD16_BYTE("video-2.bin",  0x000001, 0x010000,  CRC(4f9e830b) SHA1(f17bebb289c3620bf4c88b2b358a9dab87ac214f))
+	ROM_LOAD16_BYTE("video-3.bin",  0x020000, 0x010000,  CRC(607e0baa) SHA1(9f64a46ef3b9a854e939b5e7f0d1e6e925735922))
+	ROM_LOAD16_BYTE("video-4.bin",  0x020001, 0x010000,  CRC(2019f5d3) SHA1(d183b3b92d03be9f9d57b5df1a621cbfe955ed93))
+	ROM_LOAD16_BYTE("video-5.bin",  0x040000, 0x010000,  CRC(c029202e) SHA1(b08bb2678c2ff62a58ef67d5440c326d0fadc34e))
+	ROM_LOAD16_BYTE("video-6.bin",  0x040001, 0x010000,  CRC(3287ae4e) SHA1(3b05a036de3ca7ec644bfbf04934e44e631d1e28))
+	ROM_LOAD16_BYTE("video-7.bin",  0x060000, 0x010000,  CRC(231cf163) SHA1(02b28ef0e1661a82d0fba2ecc5474c79651fa9e7))
+	ROM_LOAD16_BYTE("video-8.bin",  0x060001, 0x010000,  CRC(076efdc8) SHA1(bef0a1d8f0e7486ee5dc7407ce5c96854cefa5cf))
+ROM_END
+
+
+ROM_START( renoreel )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("rr_27s__.a60",  0x00000, 0x10000,  CRC(44c9ff47) SHA1(93a3155144b233c113aa3b49bd4eb5969e400a68))
+
+	ROM_REGION( 0x800000, "video", 0 )	
+	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
+	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "renosnda.bin",  0x000000, 0x080000,  CRC(a72a5e1b) SHA1(a0d5338a400345a55484848a7612119405f617b1) )
+	ROM_LOAD( "renosndb.bin",  0x080000, 0x080000,  CRC(46e9a32f) SHA1(d45835a82368992597e44b3c5b9d00d8b901e733) )
+
+ROM_END
+
+ROM_START( redhtpkr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("rp_20s__.3_0",  0x00000, 0x10000,  CRC(b7d02d22) SHA1(f9da1c6dde064bc39d0c48a165dac7acde933397))
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE("rp______.3_1",  0x000000, 0x010000,  CRC(b987406d) SHA1(8c4d386570c0c6298b1cabf50295021b3b0cf625))
+	ROM_LOAD16_BYTE("rp______.3_2",  0x000001, 0x010000,  CRC(73e3c12e) SHA1(19e3ed7255fa0c3bfa14b6a4b705c0c3e1a237b6))
+	ROM_LOAD16_BYTE("rp______.3_3",  0x020000, 0x010000,  CRC(05a30183) SHA1(302f4926073bf7335da7f0b1e6399b64ea9bbae4))
+	ROM_LOAD16_BYTE("rp______.3_4",  0x020001, 0x010000,  CRC(6b122765) SHA1(72cd0fda322790bed8cdc7697306ec01efc43789))
+	ROM_LOAD16_BYTE("rp______.3_5",  0x040000, 0x010000,  CRC(d9fd05d0) SHA1(330ef58c012b5d5fd018bea54b3ae315b3e45cfd))
+	ROM_LOAD16_BYTE("rp______.3_6",  0x040001, 0x010000,  CRC(eeea91ff) SHA1(cc7870a68f62d4dd70c13713a432a61a091821ef))
+
 ROM_END
 
 ROM_START( crmaze )
@@ -3122,21 +3362,6 @@ ROM_START( quidgrid2d )
 ROM_END
 
 
-/* Vegas Poker Prototype dumped by HIGHWAYMAN */
-ROM_START( vgpoker )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("comms-v2.0.bin",  0x00000, 0x10000,  CRC(1717581f) SHA1(40f8cae39a2ab0c89d2bbfd8a37725aaae229c96))
-
-	ROM_REGION( 0x800000, "video", 0 )
-	ROM_LOAD16_BYTE("video-1.bin",  0x000000, 0x010000,  CRC(7ba2396c) SHA1(eb24b802b984315fc2eba4f15c208e2c1925c1c8))
-	ROM_LOAD16_BYTE("video-2.bin",  0x000001, 0x010000,  CRC(4f9e830b) SHA1(f17bebb289c3620bf4c88b2b358a9dab87ac214f))
-	ROM_LOAD16_BYTE("video-3.bin",  0x020000, 0x010000,  CRC(607e0baa) SHA1(9f64a46ef3b9a854e939b5e7f0d1e6e925735922))
-	ROM_LOAD16_BYTE("video-4.bin",  0x020001, 0x010000,  CRC(2019f5d3) SHA1(d183b3b92d03be9f9d57b5df1a621cbfe955ed93))
-	ROM_LOAD16_BYTE("video-5.bin",  0x040000, 0x010000,  CRC(c029202e) SHA1(b08bb2678c2ff62a58ef67d5440c326d0fadc34e))
-	ROM_LOAD16_BYTE("video-6.bin",  0x040001, 0x010000,  CRC(3287ae4e) SHA1(3b05a036de3ca7ec644bfbf04934e44e631d1e28))
-	ROM_LOAD16_BYTE("video-7.bin",  0x060000, 0x010000,  CRC(231cf163) SHA1(02b28ef0e1661a82d0fba2ecc5474c79651fa9e7))
-	ROM_LOAD16_BYTE("video-8.bin",  0x060001, 0x010000,  CRC(076efdc8) SHA1(bef0a1d8f0e7486ee5dc7407ce5c96854cefa5cf))
-ROM_END
 /*Deal 'Em was a conversion kit designed to make early MPU4 machines into video games by replacing the top glass
 and reel assembly with this kit and a supplied monitor.
 The real Deal 'Em ran on Summit Coin hardware, and was made by someone else.
@@ -3192,8 +3417,11 @@ GAME( 199?,  quidgridd, quidgrid, mpu4_vid, mpu4,     quidgrid, ROT0, "Barcrest"
 GAME( 199?,  quidgrid2, quidgrid, mpu4_vid, mpu4,     quidgrid, ROT0, "Barcrest",		"Ten Quid Grid (v2.4)",												GAME_NOT_WORKING )
 GAME( 199?,  quidgrid2d,quidgrid, mpu4_vid, mpu4,     quidgrid, ROT0, "Barcrest",		"Ten Quid Grid (v2.4, Datapak)",									GAME_NOT_WORKING )
 
-/* Games below are newer BwB games and use their own BIOS ROMs */
+/* Games below are newer BwB games and use their own BIOS ROMs and hardware setups*/
 GAME( 199?,  vgpoker,   0,        vgpoker,  mpu4,     0,        ROT0, "BwB",			"Vegas Poker (prototype, release 2)",								GAME_NOT_WORKING )
-GAME( 199?,  prizeinv,  0,        mpu4_vid, mpu4,     0,        ROT0, "BwB",			"Prize Space Invaders (20\" v1.1)",									GAME_NOT_WORKING )
-GAME( 199?,  blox,      0,        mpu4_vid, mpu4,     0,        ROT0, "BwB",			"Blox (v2.0)",														GAME_NOT_WORKING )
-GAME( 199?,  bloxd,     blox,     mpu4_vid, mpu4,     0,        ROT0, "BwB",			"Blox (v2.0, Datapak)",												GAME_NOT_WORKING )
+GAME( 199?,  prizeinv,  0,        bwbvid, mpu4,     0,        ROT0, "BwB",			"Prize Space Invaders (20\" v1.1)",									GAME_NOT_WORKING )
+GAME( 199?,  blox,      0,        bwbvid, mpu4,     0,        ROT0, "BwB",			"Blox (v2.0)",														GAME_NOT_WORKING )
+GAME( 199?,  bloxd,     blox,     bwbvid, mpu4,     0,        ROT0, "BwB",			"Blox (v2.0, Datapak)",												GAME_NOT_WORKING )
+GAME( 1996,  renoreel,  0,        bwbvid5,  mpu4,     0,		ROT0, "BwB",			"Reno Reels (20p/10GBP Cash, release A)",										GAME_NOT_WORKING )
+GAME( 199?,  redhtpkr,  0,        bwbvid,   mpu4,     0,	    ROT0, "BwB",			"Red Hot Poker (20p/10GBP Cash, release 3)",									GAME_NOT_WORKING )
+GAME( 199?,  bwbtetrs,  0,        bwbvid,   mpu4,     0,	    ROT0, "BwB",			"BwB Tetris v 2.2",									GAME_NOT_WORKING )

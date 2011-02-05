@@ -1360,7 +1360,6 @@ static WRITE8_HANDLER( meter_w )
 {
 	int i;
 	int  changed = meter_latch ^ data;
-	UINT64 cycles = downcast<cpu_device *>(space->cpu)->total_cycles();
 
 	meter_latch = data;
 
@@ -1372,7 +1371,7 @@ static WRITE8_HANDLER( meter_w )
 	{
 		if (changed & (1 << i))
 		{
-			Mechmtr_update(i, cycles, data & (1 << i) );
+			MechMtr_update(i, data & (1 << i) );
 			generic_pulse_irq_line(space->cpu, M6809_FIRQ_LINE);
 		}
 	}

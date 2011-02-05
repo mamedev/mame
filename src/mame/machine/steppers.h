@@ -1,22 +1,18 @@
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-// Steppermotor emulation                                                //
+// steppers.c steppermotor emulation                                     //
 //                                                                       //
 // Emulates : 48 step motors driven with full step or half step          //
 //            also emulates the index optic                              //
 //                                                                       //
-// 13-08-2008: J. Wallace - Added a rigid interface structure,           //
-//                          and removed unnecessary inline functions     //
-//                          Rewritten to make it more flexible           //
-// 26-01-2007: J. Wallace - Rewritten to make it more flexible           //
-// 26-01-2007: J. Wallace - Rewritten to make it more flexible           //
 // 26-01-2007: J. Wallace - Rewritten to make it more flexible           //
 //                          and to allow indices to be set in drivers    //
 // 29-12-2006: J. Wallace - Added state save support                     //
 // 05-03-2004: Re-Animator                                               //
 //                                                                       //
 // TODO:  add different types of stepper motors if needed                //
-//                                                                       //
+//        someone who understands the device system may want to convert  //
+//        this                                                           //
 ///////////////////////////////////////////////////////////////////////////
 
 
