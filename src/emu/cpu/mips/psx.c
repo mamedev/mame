@@ -1052,6 +1052,7 @@ static void log_bioscall( psxcpu_state *psxcpu )
 			sprintf( buf, "unknown_%02x_%02x", address, operation );
 		}
 		logerror( "%08x: bioscall %s\n", (unsigned int)psxcpu->r[ 31 ] - 8, buf );
+		psxcpu->berr = 0;
 	}
 }
 
