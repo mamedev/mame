@@ -399,6 +399,7 @@ static MACHINE_CONFIG_DERIVED( powerina, powerins )
 
 	MCFG_DEVICE_REMOVE("oki2")
 	MCFG_DEVICE_REMOVE("ym2203")
+	MCFG_DEVICE_REMOVE("nmk112")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( powerinb, powerins )
