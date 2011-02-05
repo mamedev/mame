@@ -7,7 +7,6 @@
     AKA Lord Nightmare
 
     TODO:
-    * get rid of sh6840_LFSR_oldxor, is leftover of old code.
     * Several inexplicable things on the schematic are not handled, such as the
      'VCO' input for 6840 channel 2 external clock whose source does not appear
      anywhere on the schematic, nor does it handle the 'DMOD DATA' and 'DMOD
@@ -102,7 +101,6 @@ struct _beezer_sound_state
 	UINT8 sh6840_volume[4];
 	UINT8 sh6840_MSB_latch;
 	UINT8 sh6840_LSB_latch;
-	UINT8 sh6840_LFSR_oldxor;
 	UINT32 sh6840_LFSR;
 	UINT32 sh6840_LFSR_clocks;
 	UINT32 sh6840_clocks_per_sample;
@@ -218,7 +216,6 @@ INLINE int sh6840_update_noise(beezer_sound_state *state, int clocks)
 			state->sh6840_LFSR_clocks = 0;
 			/* shift the LFSR. finally or in the result and see if we've
 			* had a 0->1 transition */
-			state->sh6840_LFSR_oldxor = state->sh6840_LFSR&0x1;
 			newxor = (((state->sh6840_LFSR&0x10000)?1:0) ^ ((state->sh6840_LFSR&0x2000)?1:0))?1:0; 
 			state->sh6840_LFSR <<= 1;
 			state->sh6840_LFSR |= newxor;
@@ -248,7 +245,6 @@ static void sh6840_register_state_globals(device_t *device)
 	state_save_register_device_item_array(device, 0, state->sh6840_volume);
 	state_save_register_device_item(device, 0, state->sh6840_MSB_latch);
 	state_save_register_device_item(device, 0, state->sh6840_LSB_latch);
-	state_save_register_device_item(device, 0, state->sh6840_LFSR_oldxor);
 	state_save_register_device_item(device, 0, state->sh6840_LFSR);
 	state_save_register_device_item(device, 0, state->sh6840_LFSR_clocks);
 	state_save_register_device_item(device, 0, state->sh6840_clock_count);
@@ -335,7 +331,7 @@ static STREAM_UPDATE( beezer_stream_update )
 			if (noisy != 0)
 			{
 				noise_clocks_this_sample = sh6840_update_noise(state, t->clocks - chan1_clocks);
-				if (clocks) state->sh6840_noiselatch3 = state->sh6840_LFSR_oldxor;
+				if (clocks) state->sh6840_noiselatch3 = (state->sh6840_LFSR&0x1);
 			}
 
 			/* handle timer 2 if enabled */
@@ -423,7 +419,6 @@ static DEVICE_RESET( common_sh_reset )
 	state->sh6840_noiselatch3 = 0;
 
 	/* LFSR */
-	state->sh6840_LFSR_oldxor = 0;
 	state->sh6840_LFSR = 0xffffffff;
 	state->sh6840_LFSR_clocks = 0;
 }
@@ -493,7 +488,7 @@ WRITE8_DEVICE_HANDLER( beezer_timer1_w )
 	state->sh6840_latchwrite = data&0x80;
 	if ((!state->sh6840_latchwriteold) && (state->sh6840_latchwrite)) // rising edge
 	{
-		state->sh6840_noiselatch1 = state->sh6840_LFSR_oldxor;
+		state->sh6840_noiselatch1 = (state->sh6840_LFSR&0x1);
 	}
 }
 
@@ -503,7 +498,7 @@ READ8_DEVICE_HANDLER( beezer_noise_r )
 
 	/* force an update of the stream */
 	state->stream->update();
-	return state->sh6840_LFSR_oldxor;
+	return (state->sh6840_LFSR&0x1);
 }
 
 WRITE8_DEVICE_HANDLER( beezer_sh6840_w )
