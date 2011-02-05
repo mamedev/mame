@@ -63,6 +63,7 @@ const UINT32 DRCUML_OPTION_LOG_NATIVE	= 0x0004;		// tell the back-end to generat
 
 // determine the type of the native DRC, falling back to C
 #ifndef NATIVE_DRC
+class drcbe_c;
 typedef drcbe_c drcbe_native;
 #else
 class NATIVE_DRC;
