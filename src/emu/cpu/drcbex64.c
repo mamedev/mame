@@ -1265,7 +1265,7 @@ void drcbe_x64::emit_or_r32_p32(x86code *&dst, UINT8 reg, const be_parameter &pa
 		if (inst.flags() == 0 && (UINT32)param.immediate() == 0)
 			;// skip
 		else if (inst.flags() == 0 && (UINT32)param.immediate() == 0xffffffff)
-			emit_mov_r32_imm(dst, reg, -1);												// mov  reg,-1
+			emit_mov_r32_imm(dst, reg, 0xffffffff);										// mov  reg,-1
 		else
 			emit_or_r32_imm(dst, reg, param.immediate());								// or   reg,param
 	}
@@ -1288,7 +1288,7 @@ void drcbe_x64::emit_or_m32_p32(x86code *&dst, x86_memref memref, const be_param
 		if (inst.flags() == 0 && (UINT32)param.immediate() == 0)
 			;// skip
 		else if (inst.flags() == 0 && (UINT32)param.immediate() == 0xffffffff)
-			emit_mov_m32_imm(dst, memref, -1);										// mov   [dest],-1
+			emit_mov_m32_imm(dst, memref, 0xffffffff); 									// mov   [dest],-1
 		else
 			emit_or_m32_imm(dst, memref, param.immediate());							// or   [dest],param
 	}
