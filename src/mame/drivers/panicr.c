@@ -216,23 +216,22 @@ static VIDEO_START( panicr )
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect )
 {
 	UINT8 *spriteram = machine->generic.spriteram.u8;
-	int offs,fx,fy,x,y,color,sprite;
+	int offs,flipx,flipy,x,y,color,sprite;
 
 	for (offs = 0; offs<0x1000; offs+=16)
 	{
-
-		fx = 0;
-		fy = spriteram[offs+1] & 0x80;
+		flipx = 0;
+		flipy = spriteram[offs+1] & 0x80;
 		y = spriteram[offs+2];
 		x = spriteram[offs+3];
+		if (spriteram[offs+1] & 0x40) x -= 0x100;
 
 		color = spriteram[offs+1] & 0x0f;
-
 		sprite = spriteram[offs+0]+(scrollram[0x0c]<<8);
 
 		drawgfx_transmask(bitmap,cliprect,machine->gfx[2],
 				sprite,
-				color,fx,fy,x,y,
+				color,flipx,flipy,x,y,
 				colortable_get_transpen_mask(machine->colortable, machine->gfx[2], color, 0));
 	}
 }
