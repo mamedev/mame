@@ -267,6 +267,11 @@ Utyuu Daisakusen Chocovader Contactee CVC1  Ver.A   KC022A
 #include "cpu/mips/psx.h"
 #include "includes/psx.h"
 
+WRITE32_HANDLER( namcos10_bank_w )
+{
+	memory_set_bank( space->machine, "bank1", data & 0xf );
+}
+
 class namcos10_state : public psx_state
 {
 public:
@@ -276,6 +281,8 @@ public:
 
 static ADDRESS_MAP_START( namcos10_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_SHARE("share1") /* ram */
+	AM_RANGE(0x1f300000, 0x1f300003) AM_WRITE(namcos10_bank_w)
+	AM_RANGE(0x1f400000, 0x1f7fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x1f800000, 0x1f8003ff) AM_RAM /* scratchpad */
 	AM_RANGE(0x1f801000, 0x1f801007) AM_WRITENOP
 	AM_RANGE(0x1f801008, 0x1f80100b) AM_RAM /* ?? */
@@ -314,6 +321,7 @@ static void memcpy32le( UINT32 *dst, UINT8 *src, int len )
 static void memm_driver_init( running_machine *machine )
 {
 	psx_driver_init(machine);
+	memory_configure_bank( machine, "bank1", 0, 16, machine->region( "user2" )->base(), 4 * 1024 * 1024 );
 }
 
 static void memn_driver_init( running_machine *machine )
@@ -465,17 +473,17 @@ ROM_START( mrdrilr2 )
 	ROM_LOAD( "dr21vera.1a",  0x000000, 0x800000, CRC(f93532a2) SHA1(8b72f2868978be1f0e0abd11425a3c8b2b0c4e99) )
 
 	ROM_REGION( 0x4000000, "user2", 0 ) /* main prg */
-        ROM_LOAD( "dr21ma1.1d", 0x0000000, 0x1000000, CRC(26dc6f55) SHA1(a9cedf547fa7a4d5850b9b3b867d46e577a035e0) )
-        ROM_LOAD( "dr21ma2.2d", 0x1000000, 0x1000000, CRC(702556ff) SHA1(c95defd5fd6a9b406fc8d8f28ecfab732ef1ff42) )
+	ROM_LOAD( "dr21ma1.1d", 0x0000000, 0x1000000, CRC(26dc6f55) SHA1(a9cedf547fa7a4d5850b9b3b867d46e577a035e0) )
+	ROM_LOAD( "dr21ma2.2d", 0x1000000, 0x1000000, CRC(702556ff) SHA1(c95defd5fd6a9b406fc8d8f28ecfab732ef1ff42) )
 ROM_END
 
 ROM_START( mrdrlr2a )
 	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* main prg */
-        ROM_LOAD( "dr22vera.1a",  0x000000, 0x800000, CRC(f2633388) SHA1(42e56c9758ee833390003d4b41956f75f5a22760) )
+	ROM_LOAD( "dr22vera.1a",  0x000000, 0x800000, CRC(f2633388) SHA1(42e56c9758ee833390003d4b41956f75f5a22760) )
 
 	ROM_REGION( 0x4000000, "user2", 0 ) /* main prg */
-        ROM_LOAD( "dr21ma1.1d", 0x0000000, 0x1000000, CRC(26dc6f55) SHA1(a9cedf547fa7a4d5850b9b3b867d46e577a035e0) )
-        ROM_LOAD( "dr21ma2.2d", 0x1000000, 0x1000000, CRC(702556ff) SHA1(c95defd5fd6a9b406fc8d8f28ecfab732ef1ff42) )
+	ROM_LOAD( "dr21ma1.1d", 0x0000000, 0x1000000, CRC(26dc6f55) SHA1(a9cedf547fa7a4d5850b9b3b867d46e577a035e0) )
+	ROM_LOAD( "dr21ma2.2d", 0x1000000, 0x1000000, CRC(702556ff) SHA1(c95defd5fd6a9b406fc8d8f28ecfab732ef1ff42) )
 ROM_END
 
 ROM_START( gjspace )
