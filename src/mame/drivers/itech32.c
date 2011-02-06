@@ -520,7 +520,7 @@ static READ32_HANDLER( trackball32_4bit_r )
 	static int effx, effy;
 	static int lastresult;
 	static attotime lasttime;
-	attotime curtime = timer_get_time(space->machine);
+	attotime curtime = space->machine->time();
 
 	if ((curtime - lasttime) > space->machine->primary_screen->scan_period())
 	{
@@ -559,7 +559,7 @@ static READ32_HANDLER( trackball32_4bit_p2_r )
 	static int effx, effy;
 	static int lastresult;
 	static attotime lasttime;
-	attotime curtime = timer_get_time(space->machine);
+	attotime curtime = space->machine->time();
 
 	if ((curtime - lasttime) > space->machine->primary_screen->scan_period())
 	{

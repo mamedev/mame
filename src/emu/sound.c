@@ -258,7 +258,7 @@ void sound_stream::set_input(int index, sound_stream *input_stream, int output_i
 void sound_stream::update()
 {
 	// determine the number of samples since the start of this second
-	attotime time = timer_get_time(m_device.machine);
+	attotime time = m_device.machine->time();
 	INT32 update_sampindex = INT32(time.attoseconds / m_attoseconds_per_sample);
 
 	// if we're ahead of the last update, then adjust upwards
@@ -1045,7 +1045,7 @@ void sound_manager::update()
 	}
 
 	// see if we ticked over to the next second
-	attotime curtime = timer_get_time(&m_machine);
+	attotime curtime = m_machine.time();
 	bool second_tick = false;
 	if (curtime.seconds != m_last_update.seconds)
 	{

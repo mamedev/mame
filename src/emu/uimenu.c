@@ -2438,7 +2438,7 @@ static void menu_bookkeeping(running_machine *machine, ui_menu *menu, void *para
 	prevtime = (attotime *)state;
 
 	/* if the time has rolled over another second, regenerate */
-	curtime = timer_get_time(machine);
+	curtime = machine->time();
 	if (prevtime->seconds != curtime.seconds)
 	{
 		ui_menu_reset(menu, UI_MENU_RESET_SELECT_FIRST);

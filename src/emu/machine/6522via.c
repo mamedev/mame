@@ -169,7 +169,7 @@ UINT16 via6522_device::get_counter1_value()
 	}
     else
     {
-        val = 0xffff - time_to_cycles(timer_get_time(&m_machine) - m_time1);
+        val = 0xffff - time_to_cycles(m_machine.time() - m_time1);
 	}
 
 	return val;
@@ -217,7 +217,7 @@ void via6522_device::device_start()
     m_t1lh = 0xb5; /* ports are not written by kernel! */
     m_t2ll = 0xff; /* taken from vice */
     m_t2lh = 0xff;
-    m_time2 = m_time1 = timer_get_time(&m_machine);
+    m_time2 = m_time1 = m_machine.time();
     m_t1 = timer_alloc(TIMER_T1);
     m_t2 = timer_alloc(TIMER_T2);
     m_shift_timer = timer_alloc(TIMER_SHIFT);
@@ -441,7 +441,7 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		            m_out_b |= 0x80;
 		        }
 		        m_t1_active = 0;
-		        m_time1 = timer_get_time(&m_machine);
+		        m_time1 = m_machine.time();
 		    }
 		    if (m_ddr_b)
 			{
@@ -458,7 +458,7 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		// t2 timeout
 		case TIMER_T2:
 		    m_t2_active = 0;
-		    m_time2 = timer_get_time(&m_machine);
+		    m_time2 = m_machine.time();
 
 		    if (!(m_ifr & INT_T2))
 		    {
@@ -605,7 +605,7 @@ READ8_MEMBER( via6522_device::read )
             }
 			else
             {
-				val = (0x10000 - (time_to_cycles(timer_get_time(&m_machine) - m_time2) & 0xffff) - 1) & 0xff;
+				val = (0x10000 - (time_to_cycles(m_machine.time() - m_time2) & 0xffff) - 1) & 0xff;
             }
 		}
 		break;
@@ -623,7 +623,7 @@ READ8_MEMBER( via6522_device::read )
             }
 			else
             {
-				val = (0x10000 - (time_to_cycles(timer_get_time(&m_machine) - m_time2) & 0xffff) - 1) >> 8;
+				val = (0x10000 - (time_to_cycles(m_machine.time() - m_time2) & 0xffff) - 1) >> 8;
             }
 		}
 		break;
@@ -825,7 +825,7 @@ WRITE8_MEMBER( via6522_device::write )
 		{
 			timer_adjust_oneshot(m_t2, cycles_to_time(TIMER2_VALUE), 0);
 			m_t2_active = 1;
-			m_time2 = timer_get_time(&m_machine);
+			m_time2 = m_machine.time();
 		}
 		break;
 

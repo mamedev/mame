@@ -95,8 +95,8 @@ static void update_irq_encoder(running_machine *machine, int line, int state)
 static WRITE_LINE_DEVICE_HANDLER( v_irq4_w )
 {
 	update_irq_encoder(device->machine, INPUT_LINE_IRQ4, state);
-	vertigo_vproc(device->machine->device<cpu_device>("maincpu")->attotime_to_cycles(timer_get_time(device->machine) - irq4_time), state);
-	irq4_time = timer_get_time(device->machine);
+	vertigo_vproc(device->machine->device<cpu_device>("maincpu")->attotime_to_cycles(device->machine->time() - irq4_time), state);
+	irq4_time = device->machine->time();
 }
 
 
@@ -229,7 +229,7 @@ MACHINE_RESET( vertigo )
 	ttl74148_update(ttl74148);
 	vertigo_vproc_reset(machine);
 
-	irq4_time = timer_get_time(machine);
+	irq4_time = machine->time();
 	irq_state = 7;
 }
 

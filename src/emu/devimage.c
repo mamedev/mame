@@ -500,7 +500,7 @@ done:
 	}
 	else {
 		/* do we need to reset the CPU? only schedule it if load/create is successful */
-		if (timer_get_time(device().machine) > attotime::zero && m_image_config.is_reset_on_load())
+		if (device().machine->time() > attotime::zero && m_image_config.is_reset_on_load())
 			device().machine->schedule_hard_reset();
 		else
 		{

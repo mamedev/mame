@@ -71,7 +71,7 @@ INLINE int cassette_is_motor_on(device_t *device)
 static void cassette_update(device_t *device)
 {
 	dev_cassette_t	*cassette = get_safe_token( device );
-	double cur_time = timer_get_time(device->machine).as_double();
+	double cur_time = device->machine->time().as_double();
 
 	if (cassette_is_motor_on(device))
 	{
@@ -187,7 +187,7 @@ double cassette_get_position(device_t *device)
 	position = cassette->position;
 
 	if (cassette_is_motor_on(device))
-		position += timer_get_time(device->machine).as_double() - cassette->position_time;
+		position += device->machine->time().as_double() - cassette->position_time;
 	return position;
 }
 
@@ -302,7 +302,7 @@ static DEVICE_IMAGE_LOAD( cassette )
 
 	/* reset the position */
 	cassette->position = 0.0;
-	cassette->position_time = timer_get_time(device->machine).as_double();
+	cassette->position_time = device->machine->time().as_double();
 
 	return IMAGE_INIT_PASS;
 

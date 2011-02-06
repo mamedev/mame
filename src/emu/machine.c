@@ -154,14 +154,10 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 	  sample_rate(options_get_int(&options, OPTION_SAMPLERATE)),
 	  debug_flags(0),
       ui_active(false),
-	  mame_data(NULL),
-	  timer_data(NULL),
 	  state_data(NULL),
 	  memory_data(NULL),
 	  palette_data(NULL),
 	  tilemap_data(NULL),
-	  streams_data(NULL),
-	  devices_data(NULL),
 	  romload_data(NULL),
 	  input_data(NULL),
 	  input_port_data(NULL),
@@ -466,7 +462,7 @@ void running_machine::schedule_exit()
 	m_scheduler.eat_all_cycles();
 
 	// if we're autosaving on exit, schedule a save as well
-	if (options_get_bool(&m_options, OPTION_AUTOSAVE) && (m_game.flags & GAME_SUPPORTS_SAVE) && timer_get_time(this) > attotime::zero)
+	if (options_get_bool(&m_options, OPTION_AUTOSAVE) && (m_game.flags & GAME_SUPPORTS_SAVE) && this->time() > attotime::zero)
 		schedule_save("auto");
 }
 
@@ -550,7 +546,7 @@ void running_machine::schedule_save(const char *filename)
 
 	// note the start time and set a timer for the next timeslice to actually schedule it
 	m_saveload_schedule = SLS_SAVE;
-	m_saveload_schedule_time = timer_get_time(this);
+	m_saveload_schedule_time = this->time();
 
 	// we can't be paused since we need to clear out anonymous timers
 	resume();
@@ -569,7 +565,7 @@ void running_machine::schedule_load(const char *filename)
 
 	// note the start time and set a timer for the next timeslice to actually schedule it
 	m_saveload_schedule = SLS_LOAD;
-	m_saveload_schedule_time = timer_get_time(this);
+	m_saveload_schedule_time = this->time();
 
 	// we can't be paused since we need to clear out anonymous timers
 	resume();
@@ -735,7 +731,7 @@ void running_machine::base_datetime(system_time &systime)
 
 void running_machine::current_datetime(system_time &systime)
 {
-	systime.set(m_base_time + timer_get_time(this).seconds);
+	systime.set(m_base_time + this->time().seconds);
 }
 
 
@@ -786,7 +782,7 @@ void running_machine::handle_saveload()
 	if (m_scheduler.can_save())
 	{
 		// if more than a second has passed, we're probably screwed
-		if ((timer_get_time(this) - m_saveload_schedule_time) > attotime::from_seconds(1))
+		if ((this->time() - m_saveload_schedule_time) > attotime::from_seconds(1))
 		{
 			popmessage("Unable to %s due to pending anonymous timers. See error.log for details.", opname);
 			goto cancel;

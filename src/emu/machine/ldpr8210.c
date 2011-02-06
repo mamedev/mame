@@ -340,7 +340,7 @@ const ldplayer_interface pr8210_interface =
 static void pr8210_init(laserdisc_state *ld)
 {
 	astring tempstring;
-	attotime curtime = timer_get_time(ld->device->machine);
+	attotime curtime = ld->device->machine->time();
 	ldplayer_data *player = ld->player;
 
 	/* reset our state */
@@ -451,7 +451,7 @@ static void pr8210_control_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
 	/* handle rising edge */
 	if (prev != ASSERT_LINE && data == ASSERT_LINE)
 	{
-		attotime curtime = timer_get_time(ld->device->machine);
+		attotime curtime = ld->device->machine->time();
 		attotime delta, overalldelta;
 		int longpulse;
 
@@ -840,7 +840,7 @@ static WRITE8_HANDLER( pr8210_port2_w )
 
 	/* on the falling edge of bit 5, start the slow timer */
 	if (!(data & 0x20) && (prev & 0x20))
-		player->slowtrg = timer_get_time(space->machine);
+		player->slowtrg = space->machine->time();
 
 	/* bit 6 when low triggers an IRQ on the MCU */
 	if (player->cpu != NULL)

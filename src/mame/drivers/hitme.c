@@ -138,7 +138,7 @@ static UINT8 read_port_and_t0( running_machine *machine, int port )
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 
 	UINT8 val = input_port_read(machine, portnames[port]);
-	if (timer_get_time(machine) > state->timeout_time)
+	if (machine->time() > state->timeout_time)
 		val ^= 0x80;
 	return val;
 }
@@ -196,7 +196,7 @@ static WRITE8_DEVICE_HANDLER( output_port_0_w )
 	UINT8 raw_game_speed = input_port_read(device->machine, "R3");
 	double resistance = raw_game_speed * 25000 / 100;
 	attotime duration = attotime(0, ATTOSECONDS_PER_SECOND * 0.45 * 6.8e-6 * resistance * (data + 1));
-	state->timeout_time = timer_get_time(device->machine) + duration;
+	state->timeout_time = device->machine->time() + duration;
 
 	discrete_sound_w(device, HITME_DOWNCOUNT_VAL, data);
 	discrete_sound_w(device, HITME_OUT0, 1);

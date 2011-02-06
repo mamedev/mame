@@ -621,7 +621,7 @@ void generic_pulse_irq_line(device_t *device, int irqline)
 
 	cpu_device *cpudevice = downcast<cpu_device *>(device);
 	attotime target_time = cpudevice->local_time() + cpudevice->cycles_to_attotime(cpudevice->min_cycles());
-	device->machine->scheduler().timer_set(target_time - timer_get_time(device->machine), FUNC(irq_pulse_clear), irqline, (void *)device);
+	device->machine->scheduler().timer_set(target_time - device->machine->time(), FUNC(irq_pulse_clear), irqline, (void *)device);
 }
 
 
@@ -638,7 +638,7 @@ void generic_pulse_irq_line_and_vector(device_t *device, int irqline, int vector
 
 	cpu_device *cpudevice = downcast<cpu_device *>(device);
 	attotime target_time = cpudevice->local_time() + cpudevice->cycles_to_attotime(cpudevice->min_cycles());
-	device->machine->scheduler().timer_set(target_time - timer_get_time(device->machine), FUNC(irq_pulse_clear), irqline, (void *)device);
+	device->machine->scheduler().timer_set(target_time - device->machine->time(), FUNC(irq_pulse_clear), irqline, (void *)device);
 }
 
 

@@ -92,13 +92,13 @@ static void update_plunger( running_machine *machine )
 	{
 		if (val == 0)
 		{
-			state->time_released = timer_get_time(machine);
+			state->time_released = machine->time();
 
 			if (!state->mask)
 				cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
 		}
 		else
-			state->time_pushed = timer_get_time(machine);
+			state->time_pushed = machine->time();
 
 		state->prev = val;
 	}
@@ -126,7 +126,7 @@ static TIMER_CALLBACK( interrupt_callback )
 static double calc_plunger_pos(running_machine *machine)
 {
 	mgolf_state *state = machine->driver_data<mgolf_state>();
-	return (timer_get_time(machine).as_double() - state->time_released.as_double()) * (state->time_released.as_double() - state->time_pushed.as_double() + 0.2);
+	return (machine->time().as_double() - state->time_released.as_double()) * (state->time_released.as_double() - state->time_pushed.as_double() + 0.2);
 }
 
 

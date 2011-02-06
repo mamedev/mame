@@ -942,13 +942,6 @@ void device_scheduler::add_scheduling_quantum(attotime quantum, attotime duratio
 }
 
 
-
-
-
-attotime timer_get_time(running_machine *machine) { return machine->time(); }
-
-
-
 /***************************************************************************
 //  DEBUGGING
 ***************************************************************************/

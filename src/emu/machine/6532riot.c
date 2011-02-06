@@ -238,7 +238,7 @@ void riot6532_device::reg_w(UINT8 offset, UINT8 data)
 	if ((offset & 0x14) == 0x14)
 	{
 		static const UINT8 timershift[4] = { 0, 3, 6, 10 };
-		attotime curtime = timer_get_time(&m_machine);
+		attotime curtime = m_machine.time();
 		INT64 target;
 
 		/* A0-A1 contain the timer divisor */

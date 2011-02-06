@@ -31,11 +31,11 @@
 
 #define VERBOSE_DBG 0       /* general debug messages */
 #define DBG_LOG(N,M,A) \
-	if(VERBOSE_DBG>=N){ if( M )logerror("%11.6f: %-24s",timer_get_time(pc_keyb.machine).as_double(),(char*)M ); logerror A; }
+	if(VERBOSE_DBG>=N){ if( M )logerror("%11.6f: %-24s",pc_keyb.machine->time().as_double(),(char*)M ); logerror A; }
 
 #define VERBOSE_JOY 0		/* JOY (joystick port) */
 #define JOY_LOG(N,M,A) \
-	if(VERBOSE_JOY>=N){ if( M )logerror("%11.6f: %-24s",timer_get_time(pc_keyb.machine).as_double(),(char*)M ); logerror A; }
+	if(VERBOSE_JOY>=N){ if( M )logerror("%11.6f: %-24s",pc_keyb.machine->time().as_double(),(char*)M ); logerror A; }
 
 
 static TIMER_CALLBACK( pc_keyb_timer );

@@ -467,7 +467,7 @@ void screen_device::configure(int width, int height, const rectangle &visarea, a
 void screen_device::reset_origin(int beamy, int beamx)
 {
 	// compute the effective VBLANK start/end times
-	attotime curtime = timer_get_time(machine);
+	attotime curtime = machine->time();
 	m_vblank_end_time = curtime - attotime(0, beamy * m_scantime + beamx * m_pixeltime);
 	m_vblank_start_time = m_vblank_end_time - attotime(0, m_vblank_period);
 
@@ -667,7 +667,7 @@ void screen_device::update_now()
 
 int screen_device::vpos() const
 {
-	attoseconds_t delta = (timer_get_time(machine) - m_vblank_start_time).as_attoseconds();
+	attoseconds_t delta = (machine->time() - m_vblank_start_time).as_attoseconds();
 	int vpos;
 
 	// round to the nearest pixel
@@ -688,7 +688,7 @@ int screen_device::vpos() const
 
 int screen_device::hpos() const
 {
-	attoseconds_t delta = (timer_get_time(machine) - m_vblank_start_time).as_attoseconds();
+	attoseconds_t delta = (machine->time() - m_vblank_start_time).as_attoseconds();
 
 	// round to the nearest pixel
 	delta += m_pixeltime / 2;
@@ -724,7 +724,7 @@ attotime screen_device::time_until_pos(int vpos, int hpos) const
 	attoseconds_t targetdelta = (attoseconds_t)vpos * m_scantime + (attoseconds_t)hpos * m_pixeltime;
 
 	// if we're past that time (within 1/2 of a pixel), head to the next frame
-	attoseconds_t curdelta = (timer_get_time(machine) - m_vblank_start_time).as_attoseconds();
+	attoseconds_t curdelta = (machine->time() - m_vblank_start_time).as_attoseconds();
 	if (targetdelta <= curdelta + m_pixeltime / 2)
 		targetdelta += m_frame_period;
 	while (targetdelta <= curdelta)
@@ -748,7 +748,7 @@ attotime screen_device::time_until_vblank_end() const
 	attotime target_time = m_vblank_end_time;
 	if (!vblank())
 		target_time += attotime(0, m_frame_period);
-	return target_time - timer_get_time(machine);
+	return target_time - machine->time();
 }
 
 
@@ -787,7 +787,7 @@ void screen_device::register_vblank_callback(vblank_state_changed_func vblank_ca
 void screen_device::vblank_begin_callback()
 {
 	// reset the starting VBLANK time
-	m_vblank_start_time = timer_get_time(machine);
+	m_vblank_start_time = machine->time();
 	m_vblank_end_time = m_vblank_start_time + attotime(0, m_vblank_period);
 
 	// call the screen specific callbacks

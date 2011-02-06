@@ -247,8 +247,6 @@ private:
 
 
 // temporary stuff
-attotime timer_get_time(running_machine *machine);
-
 inline void timer_adjust_oneshot(emu_timer *which, attotime duration, INT32 param) { which->adjust(duration, param); }
 inline void timer_adjust_periodic(emu_timer *which, attotime start_delay, INT32 param, attotime period) { which->adjust(start_delay, param, period); }
 

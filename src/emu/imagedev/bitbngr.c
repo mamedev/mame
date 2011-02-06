@@ -453,7 +453,7 @@ void bitbanger_output(device_t *device, int value)
       timer_adjust_periodic(bi->bitbanger_output_timer, one_point_five_baud, 0, bi->current_baud);
    }
 
-   //fprintf(stderr,"%s, %d\n", timer_get_time(device->machine).as_string(9), value);
+   //fprintf(stderr,"%s, %d\n", device->machine->time().as_string(9), value);
    bi->output_value = value;
 }
 

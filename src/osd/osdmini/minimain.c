@@ -179,7 +179,7 @@ void mini_osd_interface::update(bool skip_redraw)
 	primlist.release_lock();
 
 	// after 5 seconds, exit
-	if (timer_get_time(&machine()) > attotime::from_seconds(5))
+	if (machine().time() > attotime::from_seconds(5))
 		machine().schedule_exit();
 }
 

@@ -694,7 +694,7 @@ static DEVICE_RESET( leland_80186_sound )
 static IRQ_CALLBACK( int_callback )
 {
 	leland_sound_state *state = get_safe_token(device->machine->device("custom"));
-	if (LOG_INTERRUPTS) logerror("(%f) **** Acknowledged interrupt vector %02X\n", timer_get_time(device->machine).as_double(), state->i80186.intr.poll_status & 0x1f);
+	if (LOG_INTERRUPTS) logerror("(%f) **** Acknowledged interrupt vector %02X\n", device->machine->time().as_double(), state->i80186.intr.poll_status & 0x1f);
 
 	/* clear the interrupt */
 	cpu_set_input_line(state->i80186.cpu, 0, CLEAR_LINE);
@@ -809,7 +809,7 @@ generate_int:
 	if (!state->i80186.intr.pending)
 		cputag_set_input_line(machine, "audiocpu", 0, ASSERT_LINE);
 	state->i80186.intr.pending = 1;
-	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", timer_get_time(machine).as_double(), new_vector);
+	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", machine->time().as_double(), new_vector);
 }
 
 
@@ -836,7 +836,7 @@ static void handle_eoi(device_t *device, int data)
 			case 0x0f:	state->i80186.intr.in_service &= ~0x80;	break;
 			default:	logerror("%s:ERROR - 80186 EOI with unknown vector %02X\n", cpuexec_describe_context(machine), data & 0x1f);
 		}
-		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", timer_get_time(machine).as_double(), data & 0x1f);
+		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", machine->time().as_double(), data & 0x1f);
 	}
 
 	/* non-specific case */
@@ -849,7 +849,7 @@ static void handle_eoi(device_t *device, int data)
 			if ((state->i80186.intr.timer & 7) == i && (state->i80186.intr.in_service & 0x01))
 			{
 				state->i80186.intr.in_service &= ~0x01;
-				if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for timer\n", timer_get_time(machine).as_double());
+				if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for timer\n", machine->time().as_double());
 				return;
 			}
 
@@ -858,7 +858,7 @@ static void handle_eoi(device_t *device, int data)
 				if ((state->i80186.intr.dma[j] & 7) == i && (state->i80186.intr.in_service & (0x04 << j)))
 				{
 					state->i80186.intr.in_service &= ~(0x04 << j);
-					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for DMA%d\n", timer_get_time(machine).as_double(), j);
+					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for DMA%d\n", machine->time().as_double(), j);
 					return;
 				}
 
@@ -867,7 +867,7 @@ static void handle_eoi(device_t *device, int data)
 				if ((state->i80186.intr.ext[j] & 7) == i && (state->i80186.intr.in_service & (0x10 << j)))
 				{
 					state->i80186.intr.in_service &= ~(0x10 << j);
-					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for INT%d\n", timer_get_time(machine).as_double(), j);
+					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for INT%d\n", machine->time().as_double(), j);
 					return;
 				}
 		}

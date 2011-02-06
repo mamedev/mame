@@ -166,7 +166,7 @@ public:
 	// beam positioning and state
 	int vpos() const;
 	int hpos() const;
-	bool vblank() const { return (timer_get_time(machine) < m_vblank_end_time); }
+	bool vblank() const { return (machine->time() < m_vblank_end_time); }
 	bool hblank() const { int curpos = hpos(); return (curpos < m_visarea.min_x || curpos > m_visarea.max_x); }
 
 	// timing

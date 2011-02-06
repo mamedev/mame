@@ -1156,7 +1156,7 @@ READ32_HANDLER( n64_ai_reg_r )
             }
             else if (ai_status & 0x40000000)
             {
-                double secs_left = (timer_firetime(audio_timer) - timer_get_time(space->machine)).as_double();
+                double secs_left = (timer_firetime(audio_timer) - space->machine->time()).as_double();
                 unsigned int samples_left = secs_left * DACRATE_NTSC / (ai_dacrate + 1);
                 return samples_left * 4;
             }

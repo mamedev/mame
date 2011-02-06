@@ -911,13 +911,13 @@ static void swap_buffers(voodoo_state *v)
 	/* reset the last_op_time to now and start processing the next command */
 	if (v->pci.op_pending)
 	{
-		v->pci.op_end_time = timer_get_time(v->device->machine);
+		v->pci.op_end_time = v->device->machine->time();
 		flush_fifos(v, v->pci.op_end_time);
 	}
 
 	/* we may be able to unstall now */
 	if (v->pci.stall_state != NOT_STALLED)
-		check_stalled_cpu(v, timer_get_time(v->device->machine));
+		check_stalled_cpu(v, v->device->machine->time());
 
 	/* periodically log rasterizer info */
 	v->stats.swaps++;
@@ -1016,7 +1016,7 @@ static TIMER_CALLBACK( vblank_callback )
 	if (v->pci.op_pending)
 	{
 		if (LOG_VBLANK_SWAP) logerror("---- vblank flush begin\n");
-		flush_fifos(v, timer_get_time(machine));
+		flush_fifos(v, machine->time());
 		if (LOG_VBLANK_SWAP) logerror("---- vblank flush end\n");
 	}
 
@@ -2003,10 +2003,10 @@ static void cmdfifo_w(voodoo_state *v, cmdfifo_info *f, offs_t offset, UINT32 da
 		if (cycles > 0)
 		{
 			v->pci.op_pending = TRUE;
-			v->pci.op_end_time = timer_get_time(v->device->machine) + attotime(0, (attoseconds_t)cycles * v->attoseconds_per_cycle);
+			v->pci.op_end_time = v->device->machine->time() + attotime(0, (attoseconds_t)cycles * v->attoseconds_per_cycle);
 
 			if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:direct write start at %d.%08X%08X end at %d.%08X%08X\n", v->index,
-				timer_get_time(v->device->machine).seconds, (UINT32)(timer_get_time(v->device->machine).attoseconds >> 32), (UINT32)timer_get_time(v->device->machine).attoseconds,
+				v->device->machine->time().seconds, (UINT32)(v->device->machine->time().attoseconds >> 32), (UINT32)v->device->machine->time().attoseconds,
 				v->pci.op_end_time.seconds, (UINT32)(v->pci.op_end_time.attoseconds >> 32), (UINT32)v->pci.op_end_time.attoseconds);
 		}
 	}
@@ -2023,7 +2023,7 @@ static void cmdfifo_w(voodoo_state *v, cmdfifo_info *f, offs_t offset, UINT32 da
 
 static TIMER_CALLBACK( stall_cpu_callback )
 {
-	check_stalled_cpu((voodoo_state *)ptr, timer_get_time(machine));
+	check_stalled_cpu((voodoo_state *)ptr, machine->time());
 }
 
 
@@ -3464,7 +3464,7 @@ WRITE32_DEVICE_HANDLER( voodoo_w )
 
 	/* if we have something pending, flush the FIFOs up to the current time */
 	if (v->pci.op_pending)
-		flush_fifos(v, timer_get_time(device->machine));
+		flush_fifos(v, device->machine->time());
 
 	/* special handling for registers */
 	if ((offset & 0xc00000/4) == 0)
@@ -3544,10 +3544,10 @@ WRITE32_DEVICE_HANDLER( voodoo_w )
 		if (cycles)
 		{
 			v->pci.op_pending = TRUE;
-			v->pci.op_end_time = timer_get_time(device->machine) + attotime(0, (attoseconds_t)cycles * v->attoseconds_per_cycle);
+			v->pci.op_end_time = device->machine->time() + attotime(0, (attoseconds_t)cycles * v->attoseconds_per_cycle);
 
 			if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:direct write start at %d.%08X%08X end at %d.%08X%08X\n", v->index,
-				timer_get_time(device->machine).seconds, (UINT32)(timer_get_time(device->machine).attoseconds >> 32), (UINT32)timer_get_time(device->machine).attoseconds,
+				device->machine->time().seconds, (UINT32)(device->machine->time().attoseconds >> 32), (UINT32)device->machine->time().attoseconds,
 				v->pci.op_end_time.seconds, (UINT32)(v->pci.op_end_time.attoseconds >> 32), (UINT32)v->pci.op_end_time.attoseconds);
 		}
 		g_profiler.stop();
@@ -3597,7 +3597,7 @@ WRITE32_DEVICE_HANDLER( voodoo_w )
 			fifo_items(&v->fbi.fifo) >= 2 * 32 * FBIINIT0_MEMORY_FIFO_HWM(v->reg[fbiInit0].u))
 		{
 			if (LOG_FIFO) logerror("VOODOO.%d.FIFO:voodoo_w hit memory FIFO HWM -- stalling\n", v->index);
-			stall_cpu(v, STALLED_UNTIL_FIFO_LWM, timer_get_time(device->machine));
+			stall_cpu(v, STALLED_UNTIL_FIFO_LWM, device->machine->time());
 		}
 	}
 
@@ -3606,14 +3606,14 @@ WRITE32_DEVICE_HANDLER( voodoo_w )
 		fifo_space(&v->pci.fifo) <= 2 * FBIINIT0_PCI_FIFO_LWM(v->reg[fbiInit0].u))
 	{
 		if (LOG_FIFO) logerror("VOODOO.%d.FIFO:voodoo_w hit PCI FIFO free LWM -- stalling\n", v->index);
-		stall_cpu(v, STALLED_UNTIL_FIFO_LWM, timer_get_time(device->machine));
+		stall_cpu(v, STALLED_UNTIL_FIFO_LWM, device->machine->time());
 	}
 
 	/* if we weren't ready, and this is a non-FIFO access, stall until the FIFOs are clear */
 	if (stall)
 	{
 		if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:voodoo_w wrote non-FIFO register -- stalling until clear\n", v->index);
-		stall_cpu(v, STALLED_UNTIL_FIFO_EMPTY, timer_get_time(device->machine));
+		stall_cpu(v, STALLED_UNTIL_FIFO_EMPTY, device->machine->time());
 	}
 
 	g_profiler.stop();
@@ -3891,7 +3891,7 @@ READ32_DEVICE_HANDLER( voodoo_r )
 
 	/* if we have something pending, flush the FIFOs up to the current time */
 	if (v->pci.op_pending)
-		flush_fifos(v, timer_get_time(device->machine));
+		flush_fifos(v, device->machine->time());
 
 	/* target the appropriate location */
 	if (!(offset & (0xc00000/4)))
@@ -3979,7 +3979,7 @@ READ32_DEVICE_HANDLER( banshee_r )
 
 	/* if we have something pending, flush the FIFOs up to the current time */
 	if (v->pci.op_pending)
-		flush_fifos(v, timer_get_time(device->machine));
+		flush_fifos(v, device->machine->time());
 
 	if (offset < 0x80000/4)
 		result = banshee_io_r(device, offset, mem_mask);
@@ -4013,7 +4013,7 @@ READ32_DEVICE_HANDLER( banshee_fb_r )
 
 	/* if we have something pending, flush the FIFOs up to the current time */
 	if (v->pci.op_pending)
-		flush_fifos(v, timer_get_time(device->machine));
+		flush_fifos(v, device->machine->time());
 
 	if (offset < v->fbi.lfb_base)
 	{
@@ -4274,7 +4274,7 @@ WRITE32_DEVICE_HANDLER( banshee_w )
 
 	/* if we have something pending, flush the FIFOs up to the current time */
 	if (v->pci.op_pending)
-		flush_fifos(v, timer_get_time(device->machine));
+		flush_fifos(v, device->machine->time());
 
 	if (offset < 0x80000/4)
 		banshee_io_w(device, offset, data, mem_mask);
@@ -4307,7 +4307,7 @@ WRITE32_DEVICE_HANDLER( banshee_fb_w )
 
 	/* if we have something pending, flush the FIFOs up to the current time */
 	if (v->pci.op_pending)
-		flush_fifos(v, timer_get_time(device->machine));
+		flush_fifos(v, device->machine->time());
 
 	if (offset < v->fbi.lfb_base)
 	{
