@@ -390,7 +390,7 @@ static WRITE16_HANDLER( arm7_latch_68k_w )
 	COMBINE_DATA(&state->kov2_latchdata_68k_w);
 
 	generic_pulse_irq_line(state->prot, ARM7_FIRQ_LINE);
-	cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(200));
+	space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(200));
 	cpu_spinuntil_time(space->cpu, state->prot->cycles_to_attotime(200)); // give the arm time to respond (just boosting the interleave doesn't help)
 }
 
@@ -930,7 +930,7 @@ static WRITE16_HANDLER( svg_68k_nmi_w )
 {
 	pgm_state *state = space->machine->driver_data<pgm_state>();
 	generic_pulse_irq_line(state->prot, ARM7_FIRQ_LINE);
-	cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(200));
+	space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(200));
 	cpu_spinuntil_time(space->cpu, state->prot->cycles_to_attotime(200)); // give the arm time to respond (just boosting the interleave doesn't help)
 }
 

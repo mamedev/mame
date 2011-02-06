@@ -71,7 +71,7 @@ static READ8_DEVICE_HANDLER( scramble_protection_r )
 	case 0x1ca2: return 0x00;  /* I don't think it's checked */
 	case 0x1d7e: return 0xb0;
 	default:
-		logerror("%s: read protection\n",cpuexec_describe_context(device->machine));
+		logerror("%s: read protection\n",device->machine->describe_context());
 		return 0;
 	}
 }

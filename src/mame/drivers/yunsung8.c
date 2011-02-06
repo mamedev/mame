@@ -102,7 +102,7 @@ static WRITE8_DEVICE_HANDLER( yunsung8_sound_bankswitch_w )
 	memory_set_bank(device->machine, "bank2", data & 0x07);
 
 	if (data != (data & (~0x27)))
-		logerror("%s: Bank %02X\n", cpuexec_describe_context(device->machine), data);
+		logerror("%s: Bank %02X\n", device->machine->describe_context(), data);
 }
 
 static WRITE8_HANDLER( yunsung8_adpcm_w )

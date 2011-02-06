@@ -58,7 +58,7 @@ static WRITE8_HANDLER( paradise_rombank_w )
 static WRITE8_DEVICE_HANDLER( paradise_okibank_w )
 {
 	if (data & ~0x02)
-		logerror("%s: unknown oki bank bits %02X\n", cpuexec_describe_context(device->machine), data);
+		logerror("%s: unknown oki bank bits %02X\n", device->machine->describe_context(), data);
 
 	downcast<okim6295_device *>(device)->set_bank_base((data & 0x02) ? 0x40000 : 0);
 }

@@ -289,7 +289,7 @@ static WRITE8_HANDLER( soundlatch_ack_w )
 static WRITE16_DEVICE_HANDLER( cave_eeprom_msb_w )
 {
 	if (data & ~0xfe00)
-		logerror("%s: Unknown EEPROM bit written %04X\n", cpuexec_describe_context(device->machine), data);
+		logerror("%s: Unknown EEPROM bit written %04X\n", device->machine->describe_context(), data);
 
 	if (ACCESSING_BITS_8_15)  // even address
 	{
@@ -333,7 +333,7 @@ static WRITE16_DEVICE_HANDLER( hotdogst_eeprom_msb_w )
 static WRITE16_DEVICE_HANDLER( cave_eeprom_lsb_w )
 {
 	if (data & ~0x00ef)
-		logerror("%s: Unknown EEPROM bit written %04X\n",cpuexec_describe_context(device->machine),data);
+		logerror("%s: Unknown EEPROM bit written %04X\n",device->machine->describe_context(),data);
 
 	if (ACCESSING_BITS_0_7)  // odd address
 	{
@@ -368,7 +368,7 @@ static WRITE16_HANDLER( gaia_coin_lsb_w )
 static WRITE16_DEVICE_HANDLER( metmqstr_eeprom_msb_w )
 {
 	if (data & ~0xff00)
-		logerror("%s: Unknown EEPROM bit written %04X\n", cpuexec_describe_context(device->machine), data);
+		logerror("%s: Unknown EEPROM bit written %04X\n", device->machine->describe_context(), data);
 
 	if (ACCESSING_BITS_8_15)  // even address
 	{
@@ -684,7 +684,7 @@ static WRITE16_DEVICE_HANDLER( korokoro_eeprom_msb_w )
 	cave_state *state = device->machine->driver_data<cave_state>();
 	if (data & ~0x7000)
 	{
-		logerror("%s: Unknown EEPROM bit written %04X\n",cpuexec_describe_context(device->machine),data);
+		logerror("%s: Unknown EEPROM bit written %04X\n",device->machine->describe_context(),data);
 		COMBINE_DATA(&state->leds[1]);
 		show_leds(device->machine);
 	}
@@ -905,7 +905,7 @@ ADDRESS_MAP_END
 static WRITE16_DEVICE_HANDLER( tjumpman_eeprom_lsb_w )
 {
 	if (data & ~0x0038)
-		logerror("%s: Unknown EEPROM bit written %04X\n",cpuexec_describe_context(device->machine),data);
+		logerror("%s: Unknown EEPROM bit written %04X\n",device->machine->describe_context(),data);
 
 	if (ACCESSING_BITS_0_7)  // odd address
 	{

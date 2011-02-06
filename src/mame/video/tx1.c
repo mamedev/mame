@@ -35,7 +35,7 @@ static emu_timer *interrupt_timer;
 static TIMER_CALLBACK( interrupt_callback )
 {
 	cputag_set_input_line_and_vector(machine, "main_cpu", 0, HOLD_LINE, 0xff);
-	timer_adjust_oneshot(interrupt_timer, machine->primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS), 0);
+	interrupt_timer->adjust(machine->primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
 
 
@@ -1131,7 +1131,7 @@ VIDEO_START( tx1 )
 	interrupt_timer = machine->scheduler().timer_alloc(FUNC(interrupt_callback));
 
 	/* /CUDISP CRTC interrupt */
-	timer_adjust_oneshot(interrupt_timer, machine->primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS), 0);
+	interrupt_timer->adjust(machine->primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
 
 VIDEO_EOF( tx1 )
@@ -3050,7 +3050,7 @@ VIDEO_START( buggyboy )
 	interrupt_timer = machine->scheduler().timer_alloc(FUNC(interrupt_callback));
 
 	/* /CUDISP CRTC interrupt */
-	timer_adjust_oneshot(interrupt_timer, machine->primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS), 0);
+	interrupt_timer->adjust(machine->primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
 
 VIDEO_START( buggybjr )
@@ -3064,7 +3064,7 @@ VIDEO_START( buggybjr )
 	interrupt_timer = machine->scheduler().timer_alloc(FUNC(interrupt_callback));
 
 	/* /CUDISP CRTC interrupt */
-	timer_adjust_oneshot(interrupt_timer, machine->primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS), 0);
+	interrupt_timer->adjust(machine->primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
 
 VIDEO_EOF( buggyboy )

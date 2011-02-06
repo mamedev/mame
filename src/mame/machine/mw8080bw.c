@@ -68,7 +68,7 @@ static TIMER_CALLBACK( mw8080bw_interrupt_callback )
 	}
 
 	next_vpos = vysnc_chain_counter_to_vpos(next_counter, next_vblank);
-	timer_adjust_oneshot(state->interrupt_timer, machine->primary_screen->time_until_pos(next_vpos), 0);
+	state->interrupt_timer->adjust(machine->primary_screen->time_until_pos(next_vpos));
 }
 
 
@@ -83,7 +83,7 @@ static void mw8080bw_start_interrupt_timer( running_machine *machine )
 {
 	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 	int vpos = vysnc_chain_counter_to_vpos(MW8080BW_INT_TRIGGER_COUNT_1, MW8080BW_INT_TRIGGER_VBLANK_1);
-	timer_adjust_oneshot(state->interrupt_timer, machine->primary_screen->time_until_pos(vpos), 0);
+	state->interrupt_timer->adjust(machine->primary_screen->time_until_pos(vpos));
 }
 
 

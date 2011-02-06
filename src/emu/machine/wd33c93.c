@@ -238,7 +238,7 @@ static void wd33c93_read_data(int bytes, UINT8 *pData)
 static void wd33c93_complete_immediate( running_machine *machine, int status )
 {
 	/* reset our timer */
-	timer_reset( scsi_data.cmd_timer, attotime::never );
+	scsi_data.cmd_timer->reset(  );
 
 	/* set the new status */
 	scsi_data.regs[WD_SCSI_STATUS] = status & 0xff;
@@ -287,13 +287,13 @@ static TIMER_CALLBACK(wd33c93_deassert_cip)
 static void wd33c93_complete_cmd( UINT8 status )
 {
 	/* fire off a timer to complete the command */
-	timer_adjust_oneshot( scsi_data.cmd_timer, attotime::from_usec(1), status );
+	scsi_data.cmd_timer->adjust( attotime::from_usec(1), status );
 }
 
 /* command handlers */
 static CMD_HANDLER( wd33c93_invalid_cmd )
 {
-	logerror( "%s:Unknown/Unimplemented SCSI controller command: %02x\n", cpuexec_describe_context(machine), scsi_data.regs[WD_COMMAND] );
+	logerror( "%s:Unknown/Unimplemented SCSI controller command: %02x\n", machine->describe_context(), scsi_data.regs[WD_COMMAND] );
 
 	/* complete the command */
 	wd33c93_complete_cmd( CSR_INVALID );

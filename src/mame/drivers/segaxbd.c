@@ -313,7 +313,7 @@ static void update_main_irqs(running_machine *machine)
 	if (irq)
 	{
 		cpu_set_input_line(state->maincpu, irq, ASSERT_LINE);
-		cpuexec_boost_interleave(machine, attotime::zero, attotime::from_usec(100));
+		machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 	}
 }
 
@@ -418,7 +418,7 @@ static void xboard_reset(device_t *device)
 	segas1x_state *state = device->machine->driver_data<segas1x_state>();
 
 	cpu_set_input_line(state->subcpu, INPUT_LINE_RESET, PULSE_LINE);
-	cpuexec_boost_interleave(device->machine, attotime::zero, attotime::from_usec(100));
+	device->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
 
@@ -678,7 +678,7 @@ static WRITE16_HANDLER( loffire_sync0_w )
 	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 
 	COMBINE_DATA(&state->loffire_sync[offset]);
-	cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(10));
+	space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
 }
 
 

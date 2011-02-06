@@ -290,9 +290,9 @@ INLINE void Timer_w( address_space *space, int which, UINT32 data, UINT32 mem_ma
 		attotime period = attotime::from_hz(43000000) * ((PD + 1) * (TCV + 1));
 
 		if (state->Timerctrl[which] & 2)
-			timer_adjust_periodic(state->Timer[which], period, 0, period);
+			state->Timer[which]->adjust(period, 0, period);
 		else
-			timer_adjust_oneshot(state->Timer[which], period, 0);
+			state->Timer[which]->adjust(period);
 	}
 	COMBINE_DATA(&state->Timerctrl[which]);
 }
@@ -609,7 +609,7 @@ static MACHINE_RESET( crystal )
 	for (i = 0; i < 4; i++)
 	{
 		state->Timerctrl[i] = 0;
-		timer_adjust_oneshot(state->Timer[i], attotime::never, 0);
+		state->Timer[i]->adjust(attotime::never);
 	}
 
 	vr0_snd_set_areas(machine->device("vrender"), state->textureram, state->frameram);

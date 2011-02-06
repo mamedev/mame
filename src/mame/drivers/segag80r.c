@@ -298,7 +298,7 @@ static WRITE8_DEVICE_HANDLER( sindbadm_soundport_w )
 	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	soundlatch_w(space, 0, data);
 	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
-	cpuexec_boost_interleave(device->machine, attotime::zero, attotime::from_usec(50));
+	device->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
 }
 
 

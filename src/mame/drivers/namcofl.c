@@ -216,7 +216,7 @@ static WRITE32_HANDLER( namcofl_paletteram_w )
 		UINT16 v = space->machine->generic.paletteram.u32[offset] >> 16;
 		UINT16 triggerscanline=(((v>>8)&0xff)|((v&0xff)<<8))-(32+1);
 
-		timer_adjust_oneshot(raster_interrupt_timer, space->machine->primary_screen->time_until_pos(triggerscanline), 0);
+		raster_interrupt_timer->adjust(space->machine->primary_screen->time_until_pos(triggerscanline));
 	}
 }
 
@@ -550,7 +550,7 @@ static TIMER_CALLBACK( raster_interrupt_callback )
 {
 	machine->primary_screen->update_partial(machine->primary_screen->vpos());
 	cputag_set_input_line(machine, "maincpu", I960_IRQ1, ASSERT_LINE);
-	timer_adjust_oneshot(raster_interrupt_timer, machine->primary_screen->frame_period(), 0);
+	raster_interrupt_timer->adjust(machine->primary_screen->frame_period());
 }
 
 static INTERRUPT_GEN( mcu_interrupt )

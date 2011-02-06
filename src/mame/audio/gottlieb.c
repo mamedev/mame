@@ -420,7 +420,7 @@ static WRITE8_HANDLER( signal_audio_nmi_w )
 INLINE void nmi_timer_adjust(void)
 {
 	/* adjust timer to go off in the future based on the current rate */
-	timer_adjust_oneshot(nmi_timer, attotime::from_hz(SOUND2_CLOCK/16) * (256 * (256 - nmi_rate)), 0);
+	nmi_timer->adjust(attotime::from_hz(SOUND2_CLOCK/16) * (256 * (256 - nmi_rate)));
 }
 
 

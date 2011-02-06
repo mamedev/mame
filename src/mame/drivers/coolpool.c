@@ -477,7 +477,7 @@ static TIMER_CALLBACK( deferred_iop_w )
 	cputag_set_input_line(machine, "dsp", 0, HOLD_LINE);	/* ???  I have no idea who should generate this! */
 															/* the DSP polls the status bit so it isn't strictly */
 															/* necessary to also have an IRQ */
-	cpuexec_boost_interleave(machine, attotime::zero, attotime::from_usec(50));
+	machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
 }
 
 

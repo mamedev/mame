@@ -1486,7 +1486,7 @@ static void ymf271_write_timer(YMF271Chip *chip, int data)
 					//period = (double)(256.0 - chip->timerAVal ) * ( 384.0 * 4.0 / (double)CLOCK);
 					period = attotime::from_hz(chip->clock) * (384 * (1024 - chip->timerAVal));
 
-					timer_adjust_periodic(chip->timA, period, 0, period);
+					chip->timA->adjust(period, 0, period);
 				}
 				if (data & 0x20)
 				{	// timer B reset
@@ -1497,7 +1497,7 @@ static void ymf271_write_timer(YMF271Chip *chip, int data)
 
 					period = attotime::from_hz(chip->clock) * (384 * 16 * (256 - chip->timerBVal));
 
-					timer_adjust_periodic(chip->timB, period, 0, period);
+					chip->timB->adjust(period, 0, period);
 				}
 
 				break;

@@ -36,7 +36,7 @@ WRITE8_HANDLER( arkanoid_Z80_mcu_w )
 {
 	space->machine->scheduler().synchronize(FUNC(test), data);
 	/* boost the interleave for a few usecs to make sure it is read successfully */
-	cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(10));
+	space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
 }
 
 READ8_HANDLER( arkanoid_68705_port_a_r )

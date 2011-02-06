@@ -722,7 +722,7 @@ static TIMER_CALLBACK( s3c24xx_lcd_timer_exp )
 	{
 		s3c24xx_lcd_render_tpal( device);
 	}
-	timer_adjust_oneshot( s3c24xx->lcd.timer, screen->time_until_pos( s3c24xx->lcd.vpos, s3c24xx->lcd.hpos), 0);
+	s3c24xx->lcd.timer->adjust( screen->time_until_pos( s3c24xx->lcd.vpos, s3c24xx->lcd.hpos));
 }
 
 static void s3c24xx_video_start( device_t *device, running_machine *machine)
@@ -917,14 +917,14 @@ static void s3c24xx_lcd_start( device_t *device)
 	verboselog( device->machine, 1, "LCD start\n");
 	s3c24xx_lcd_configure( device);
 	s3c24xx_lcd_dma_init( device);
-	timer_adjust_oneshot( s3c24xx->lcd.timer, screen->time_until_pos( s3c24xx->lcd.vpos_min, s3c24xx->lcd.hpos_min), 0);
+	s3c24xx->lcd.timer->adjust( screen->time_until_pos( s3c24xx->lcd.vpos_min, s3c24xx->lcd.hpos_min));
 }
 
 static void s3c24xx_lcd_stop( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	verboselog( device->machine, 1, "LCD stop\n");
-	timer_adjust_oneshot( s3c24xx->lcd.timer, attotime::never, 0);
+	s3c24xx->lcd.timer->adjust( attotime::never);
 }
 
 static void s3c24xx_lcd_recalc( device_t *device)
@@ -1232,7 +1232,7 @@ static UINT16 s3c24xx_pwm_calc_observation( device_t *device, int ch)
 	s3c24xx_t *s3c24xx = get_token( device);
 	double timeleft, x1, x2;
 	UINT32 cnto;
-	timeleft = timer_timeleft( s3c24xx->pwm.timer[ch]).as_double();
+	timeleft = s3c24xx->pwm.timer[ch]->remaining( ).as_double();
 //  printf( "timeleft %f freq %d cntb %d cmpb %d\n", timeleft, s3c24xx->pwm.freq[ch], s3c24xx->pwm.cnt[ch], s3c24xx->pwm.cmp[ch]);
 	x1 = 1 / ((double)s3c24xx->pwm.freq[ch] / (s3c24xx->pwm.cnt[ch]- s3c24xx->pwm.cmp[ch] + 1));
 	x2 = x1 / timeleft;
@@ -1357,11 +1357,11 @@ static void s3c24xx_pwm_start( device_t *device, int timer)
 	s3c24xx->pwm.freq[timer] = freq;
 	if (auto_reload)
 	{
-		timer_adjust_periodic( s3c24xx->pwm.timer[timer], attotime::from_hz( hz), timer, attotime::from_hz( hz));
+		s3c24xx->pwm.timer[timer]->adjust( attotime::from_hz( hz), timer, attotime::from_hz( hz));
 	}
 	else
 	{
-		timer_adjust_oneshot( s3c24xx->pwm.timer[timer], attotime::from_hz( hz), timer);
+		s3c24xx->pwm.timer[timer]->adjust( attotime::from_hz( hz), timer);
 	}
 }
 
@@ -1369,7 +1369,7 @@ static void s3c24xx_pwm_stop( device_t *device, int timer)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	verboselog( device->machine, 1, "PWM %d stop\n", timer);
-	timer_adjust_oneshot( s3c24xx->pwm.timer[timer], attotime::never, 0);
+	s3c24xx->pwm.timer[timer]->adjust( attotime::never);
 }
 
 static void s3c24xx_pwm_recalc( device_t *device, int timer)
@@ -2004,7 +2004,7 @@ static UINT16 s3c24xx_wdt_calc_current_count( device_t *device)
 	s3c24xx_t *s3c24xx = get_token( device);
 	double timeleft, x1, x2;
 	UINT32 cnt;
-	timeleft = timer_timeleft( s3c24xx->wdt.timer).as_double();
+	timeleft = s3c24xx->wdt.timer->remaining( ).as_double();
 //  printf( "timeleft %f freq %d cnt %d\n", timeleft, s3c24xx->wdt.freq, s3c24xx->wdt.cnt);
 	x1 = 1 / ((double)s3c24xx->wdt.freq / s3c24xx->wdt.cnt);
 	x2 = x1 / timeleft;
@@ -2055,7 +2055,7 @@ static void s3c24xx_wdt_start( device_t *device)
 	freq = (double)pclk / (prescaler + 1) / clock;
 	hz = freq / s3c24xx->wdt.regs.wtcnt;
 	verboselog( device->machine, 5, "WDT pclk %d prescaler %d clock %d freq %f hz %f\n", pclk, prescaler, clock, freq, hz);
-	timer_adjust_periodic( s3c24xx->wdt.timer, attotime::from_hz( hz), 0, attotime::from_hz( hz));
+	s3c24xx->wdt.timer->adjust( attotime::from_hz( hz), 0, attotime::from_hz( hz));
 #if defined(DEVICE_S3C2410)
 	s3c24xx->wdt.freq = freq;
 	s3c24xx->wdt.cnt = s3c24xx->wdt.regs.wtcnt;
@@ -2067,7 +2067,7 @@ static void s3c24xx_wdt_stop( device_t *device)
 	s3c24xx_t *s3c24xx = get_token( device);
 	verboselog( device->machine, 1, "WDT stop\n");
 	s3c24xx->wdt.regs.wtcnt = s3c24xx_wdt_calc_current_count( device);
-	timer_adjust_oneshot( s3c24xx->wdt.timer, attotime::never, 0);
+	s3c24xx->wdt.timer->adjust( attotime::never);
 }
 
 static void s3c24xx_wdt_recalc( device_t *device)
@@ -2223,7 +2223,7 @@ static void iic_start( device_t *device)
 		case 2 : i2c_send_byte( device, s3c24xx->iic.regs.iicds | 0x01); break;
 		case 3 : i2c_send_byte( device, s3c24xx->iic.regs.iicds & 0xFE); break;
 	}
-	timer_adjust_oneshot( s3c24xx->iic.timer, attotime::from_usec( 1), 0);
+	s3c24xx->iic.timer->adjust( attotime::from_usec( 1));
 }
 
 static void iic_stop( device_t *device)
@@ -2231,7 +2231,7 @@ static void iic_stop( device_t *device)
 	s3c24xx_t *s3c24xx = get_token( device);
 	verboselog( device->machine, 1, "IIC stop\n");
 	i2c_send_stop( device);
-	timer_adjust_oneshot( s3c24xx->iic.timer, attotime::never, 0);
+	s3c24xx->iic.timer->adjust( attotime::never);
 }
 
 static void iic_resume( device_t *device)
@@ -2245,7 +2245,7 @@ static void iic_resume( device_t *device)
 		case 2 : s3c24xx->iic.regs.iicds = i2c_receive_byte( device, BIT( s3c24xx->iic.regs.iiccon, 7)); break;
 		case 3 : i2c_send_byte( device, s3c24xx->iic.regs.iicds & 0xFF); break;
 	}
-	timer_adjust_oneshot( s3c24xx->iic.timer, attotime::from_usec( 1), 0);
+	s3c24xx->iic.timer->adjust( attotime::from_usec( 1));
 }
 
 static READ32_DEVICE_HANDLER( s3c24xx_iic_r )
@@ -2383,14 +2383,14 @@ static void s3c24xx_iis_start( device_t *device)
 	pclk = s3c24xx_get_pclk( device);
 	freq = ((double)pclk / (prescaler_control_a + 1) / codeclk_table[codeclk]) * 2; // why do I have to multiply by two?
 	verboselog( device->machine, 5, "IIS - pclk %d psc_enable %d psc_a %d psc_b %d codeclk %d freq %f\n", pclk, prescaler_enable, prescaler_control_a, prescaler_control_b, codeclk_table[codeclk], freq);
-	timer_adjust_periodic( s3c24xx->iis.timer, attotime::from_hz( freq), 0, attotime::from_hz( freq));
+	s3c24xx->iis.timer->adjust( attotime::from_hz( freq), 0, attotime::from_hz( freq));
 }
 
 static void s3c24xx_iis_stop( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	verboselog( device->machine, 1, "IIS stop\n");
-	timer_adjust_oneshot( s3c24xx->iis.timer, attotime::never, 0);
+	s3c24xx->iis.timer->adjust( attotime::never);
 }
 
 static void s3c24xx_iis_recalc( device_t *device)
@@ -2500,11 +2500,11 @@ static void s3c24xx_rtc_recalc( device_t *device)
 		ttc = BITS( s3c24xx->rtc.regs.ticnt, 6, 0);
 		freq = 128 / (ttc + 1);
 //      printf( "ttc %d freq %f\n", ttc, freq);
-		timer_adjust_periodic( s3c24xx->rtc.timer_tick_count, attotime::from_hz( freq), 0, attotime::from_hz( freq));
+		s3c24xx->rtc.timer_tick_count->adjust( attotime::from_hz( freq), 0, attotime::from_hz( freq));
 	}
 	else
 	{
-		timer_adjust_oneshot( s3c24xx->rtc.timer_tick_count, attotime::never, 0);
+		s3c24xx->rtc.timer_tick_count->adjust( attotime::never);
 	}
 }
 
@@ -3176,7 +3176,7 @@ static DEVICE_START( s3c24xx )
 	s3c24xx->rtc.timer_tick_count = device->machine->scheduler().timer_alloc( FUNC(s3c24xx_rtc_timer_tick_count_exp), (void*)device);
 	s3c24xx->rtc.timer_update = device->machine->scheduler().timer_alloc( FUNC(s3c24xx_rtc_timer_update_exp), (void*)device);
 	s3c24xx->wdt.timer = device->machine->scheduler().timer_alloc( FUNC(s3c24xx_wdt_timer_exp), (void*)device);
-	timer_adjust_periodic( s3c24xx->rtc.timer_update, attotime::from_msec( 1000), 0, attotime::from_msec( 1000));
+	s3c24xx->rtc.timer_update->adjust( attotime::from_msec( 1000), 0, attotime::from_msec( 1000));
 	s3c24xx_rtc_init( device);
 }
 

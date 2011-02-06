@@ -353,18 +353,18 @@ INLINE void register_write(z8_state *cpustate, UINT8 offset, UINT8 data)
 		if (data & Z8_TMR_LOAD_T0)
 		{
 			cpustate->t0 = T0;
-			timer_adjust_periodic(cpustate->t0_timer, attotime::zero, 0, attotime::from_hz(cpustate->clock / 2 / 4 / ((PRE0 >> 2) + 1)));
+			cpustate->t0_timer->adjust(attotime::zero, 0, attotime::from_hz(cpustate->clock / 2 / 4 / ((PRE0 >> 2) + 1)));
 		}
 
-		timer_enable(cpustate->t0_timer, data & Z8_TMR_ENABLE_T0);
+		cpustate->t0_timer->enable(data & Z8_TMR_ENABLE_T0);
 
 		if (data & Z8_TMR_LOAD_T1)
 		{
 			cpustate->t1 = T1;
-			timer_adjust_periodic(cpustate->t1_timer, attotime::zero, 0, attotime::from_hz(cpustate->clock / 2 / 4 / ((PRE1 >> 2) + 1)));
+			cpustate->t1_timer->adjust(attotime::zero, 0, attotime::from_hz(cpustate->clock / 2 / 4 / ((PRE1 >> 2) + 1)));
 		}
 
-		timer_enable(cpustate->t1_timer, data & Z8_TMR_ENABLE_T1);
+		cpustate->t1_timer->enable(data & Z8_TMR_ENABLE_T1);
 		break;
 
 	case Z8_REGISTER_P2M:
@@ -613,8 +613,8 @@ static TIMER_CALLBACK( t0_tick )
 	if (cpustate->t0 == 0)
 	{
 		cpustate->t0 = T0;
-		timer_adjust_periodic(cpustate->t0_timer, attotime::zero, 0, attotime::from_hz(cpustate->clock / 2 / 4 / ((PRE0 >> 2) + 1)));
-		timer_enable(cpustate->t0_timer, PRE0 & Z8_PRE0_COUNT_MODULO_N);
+		cpustate->t0_timer->adjust(attotime::zero, 0, attotime::from_hz(cpustate->clock / 2 / 4 / ((PRE0 >> 2) + 1)));
+		cpustate->t0_timer->enable(PRE0 & Z8_PRE0_COUNT_MODULO_N);
 		cpustate->irq[4] = ASSERT_LINE;
 	}
 }
@@ -628,8 +628,8 @@ static TIMER_CALLBACK( t1_tick )
 	if (cpustate->t1 == 0)
 	{
 		cpustate->t1 = T1;
-		timer_adjust_periodic(cpustate->t1_timer, attotime::zero, 0, attotime::from_hz(cpustate->clock / 2 / 4 / ((PRE1 >> 2) + 1)));
-		timer_enable(cpustate->t1_timer, PRE1 & Z8_PRE0_COUNT_MODULO_N);
+		cpustate->t1_timer->adjust(attotime::zero, 0, attotime::from_hz(cpustate->clock / 2 / 4 / ((PRE1 >> 2) + 1)));
+		cpustate->t1_timer->enable(PRE1 & Z8_PRE0_COUNT_MODULO_N);
 		cpustate->irq[5] = ASSERT_LINE;
 	}
 }

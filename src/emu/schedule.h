@@ -58,12 +58,6 @@
 #define MFUNC(s,c,x) s##_stub<c, &c::x>, #c "::" #x
 
 
-// these must be macros because we are included before the running_machine
-#define cpuexec_describe_context(mach)				(mach)->describe_context()
-#define cpuexec_boost_interleave(mach, slice, dur)	(mach)->scheduler().boost_interleave(slice, dur)
-#define cpuexec_trigger(mach, trigid)				(mach)->scheduler().trigger(trigid)
-#define cpuexec_triggertime(mach, trigid, dur)		(mach)->scheduler().trigger(trigid, dur)
-
 // macro for the RC time constant on a 74LS123 with C > 1000pF
 // R is in ohms, C is in farads
 #define TIME_OF_74LS123(r,c)			(0.45 * (double)(r) * (double)(c))
@@ -125,7 +119,7 @@ public:
 	void set_ptr(void *ptr) { m_ptr = ptr; }
 
 	// control
-	void reset(attotime duration) { adjust(duration, m_param, m_period); }
+	void reset(attotime duration = attotime::never) { adjust(duration, m_param, m_period); }
 	void adjust(attotime duration, INT32 param = 0, attotime periodicity = attotime::never);
 
 	// timing queries
@@ -243,24 +237,5 @@ private:
 	attoseconds_t				m_quantum_minimum;			// duration of minimum quantum
 };
 
-
-
-
-// temporary stuff
-inline void timer_adjust_oneshot(emu_timer *which, attotime duration, INT32 param) { which->adjust(duration, param); }
-inline void timer_adjust_periodic(emu_timer *which, attotime start_delay, INT32 param, attotime period) { which->adjust(start_delay, param, period); }
-
-inline void timer_reset(emu_timer *which, attotime duration) { which->reset(duration); }
-inline int timer_enable(emu_timer *which, int enable) { return which->enable(enable); }
-inline int timer_enabled(emu_timer *which) { return which->enabled(); }
-inline int timer_get_param(emu_timer *which) { return which->param(); }
-inline void timer_set_param(emu_timer *which, int param) { which->set_param(param); }
-inline void *timer_get_ptr(emu_timer *which) { return which->ptr(); }
-inline void timer_set_ptr(emu_timer *which, void *ptr) { which->set_ptr(ptr); }
-
-inline attotime timer_timeelapsed(emu_timer *which) { return which->elapsed(); }
-inline attotime timer_timeleft(emu_timer *which) { return which->remaining(); }
-inline attotime timer_starttime(emu_timer *which) { return which->start(); }
-inline attotime timer_firetime(emu_timer *which) { return which->expire(); }
 
 #endif	// __SCHEDULE_H__ */

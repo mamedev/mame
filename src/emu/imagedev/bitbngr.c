@@ -386,7 +386,7 @@ static TIMER_CALLBACK(bitbanger_output_timer)
       else
          logerror("Bitbanger: Output framing error.\n" );
 
-      timer_reset(bi->bitbanger_output_timer, attotime::never);
+      bi->bitbanger_output_timer->reset();
    }
 }
 
@@ -410,7 +410,7 @@ static TIMER_CALLBACK(bitbanger_input_timer)
       {
          /* no more data, wait and try again */
          bi->idle_delay = min(bi->idle_delay + attotime::from_msec(100), attotime::from_seconds(1));
-         timer_adjust_oneshot(bi->bitbanger_input_timer, bi->idle_delay, 0);
+         bi->bitbanger_input_timer->adjust(bi->idle_delay);
 
 
          if( bi->mode == BITBANGER_MODEM )
@@ -423,7 +423,7 @@ static TIMER_CALLBACK(bitbanger_input_timer)
       else
       {
          bi->idle_delay = bi->current_baud;
-         timer_adjust_periodic(bi->bitbanger_input_timer, bi->idle_delay, 0, bi->idle_delay);
+         bi->bitbanger_input_timer->adjust(bi->idle_delay, 0, bi->idle_delay);
       }
    }
 
@@ -450,7 +450,7 @@ void bitbanger_output(device_t *device, int value)
       bi->build_byte = 0;
 
       one_point_five_baud = bi->current_baud + bi->current_baud / 2;
-      timer_adjust_periodic(bi->bitbanger_output_timer, one_point_five_baud, 0, bi->current_baud);
+      bi->bitbanger_output_timer->adjust(one_point_five_baud, 0, bi->current_baud);
    }
 
    //fprintf(stderr,"%s, %d\n", device->machine->time().as_string(9), value);
@@ -468,8 +468,8 @@ static DEVICE_IMAGE_LOAD( bitbanger )
 	bitbanger_token *bi;
 	bi = get_token(device);
 
-	timer_enable(bi->bitbanger_input_timer, TRUE);
-	timer_adjust_periodic(bi->bitbanger_input_timer, attotime::zero, 0, attotime::from_seconds(1));
+	bi->bitbanger_input_timer->enable(true);
+	bi->bitbanger_input_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 
 	/* we don't need to do anything special */
 	return IMAGE_INIT_PASS;
@@ -486,7 +486,7 @@ static DEVICE_IMAGE_UNLOAD( bitbanger )
 	bitbanger_token *bi;
 	bi = get_token(device);
 
-	timer_enable(bi->bitbanger_input_timer, FALSE);
+	bi->bitbanger_input_timer->enable(false);
 }
 
 

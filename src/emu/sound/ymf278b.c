@@ -377,10 +377,10 @@ static void ymf278b_timer_a_reset(YMF278BChip *chip)
 		if (chip->clock != YMF278B_STD_CLOCK)
 			period = (period * chip->clock) / YMF278B_STD_CLOCK;
 
-		timer_adjust_periodic(chip->timer_a, period, 0, period);
+		chip->timer_a->adjust(period, 0, period);
 	}
 	else
-		timer_adjust_oneshot(chip->timer_a, attotime::never, 0);
+		chip->timer_a->adjust(attotime::never);
 }
 
 static void ymf278b_timer_b_reset(YMF278BChip *chip)
@@ -392,10 +392,10 @@ static void ymf278b_timer_b_reset(YMF278BChip *chip)
 		if (chip->clock != YMF278B_STD_CLOCK)
 			period = (period * chip->clock) / YMF278B_STD_CLOCK;
 
-		timer_adjust_periodic(chip->timer_b, period, 0, period);
+		chip->timer_b->adjust(period, 0, period);
 	}
 	else
-		timer_adjust_oneshot(chip->timer_b, attotime::never, 0);
+		chip->timer_b->adjust(attotime::never);
 }
 
 static void ymf278b_A_w(running_machine *machine, YMF278BChip *chip, UINT8 reg, UINT8 data)
@@ -620,7 +620,7 @@ READ8_DEVICE_HANDLER( ymf278b_r )
 			return chip->current_irq | (chip->irq_line == ASSERT_LINE ? 0x80 : 0x00);
 
 		default:
-			logerror("%s: unexpected read at offset %X from ymf278b\n", cpuexec_describe_context(device->machine), offset);
+			logerror("%s: unexpected read at offset %X from ymf278b\n", device->machine->describe_context(), offset);
 			break;
 	}
 	return 0xff;
@@ -657,7 +657,7 @@ WRITE8_DEVICE_HANDLER( ymf278b_w )
 			break;
 
 		default:
-			logerror("%s: unexpected write at offset %X to ymf278b = %02X\n", cpuexec_describe_context(device->machine), offset, data);
+			logerror("%s: unexpected write at offset %X to ymf278b = %02X\n", device->machine->describe_context(), offset, data);
 			break;
 	}
 }

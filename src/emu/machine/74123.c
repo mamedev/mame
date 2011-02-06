@@ -173,8 +173,8 @@ attotime ttl74123_device::compute_duration()
 
 int ttl74123_device::timer_running()
 {
-	return (timer_timeleft(m_timer) > attotime::zero) &&
-		   (timer_timeleft(m_timer) != attotime::never);
+	return (m_timer->remaining() > attotime::zero) &&
+		   (m_timer->remaining() != attotime::never);
 }
 
 
@@ -239,9 +239,9 @@ void ttl74123_device::start_pulse()
 		/* retriggering, but not if we are called to quickly */
 		attotime delay_time = attotime(0, ATTOSECONDS_PER_SECOND * m_config.m_cap * 220);
 
-		if(timer_timeelapsed(m_timer) >= delay_time)
+		if(m_timer->elapsed() >= delay_time)
 		{
-			timer_adjust_oneshot(m_timer, duration, 0);
+			m_timer->adjust(duration);
 
 			if (LOG) logerror("74123 %s:  Retriggering pulse.  Duration: %f\n", tag(), duration.as_double());
 		}
@@ -253,7 +253,7 @@ void ttl74123_device::start_pulse()
 	else
 	{
 		/* starting */
-		timer_adjust_oneshot(m_timer, duration, 0);
+		m_timer->adjust(duration);
 
 		set_output();
 
@@ -325,7 +325,7 @@ void ttl74123_device::clear_w(UINT8 data)
 	}
 	else if (!data)	 /* clear the output  */
 	{
-		timer_adjust_oneshot(m_timer, attotime::zero, 0);
+		m_timer->adjust(attotime::zero);
 
 		if (LOG) logerror("74123 #%s:  Cleared\n", tag() );
 	}

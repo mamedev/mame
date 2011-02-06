@@ -229,7 +229,7 @@ void timekeeper_device::device_start()
 
 	timer = m_machine.scheduler().timer_alloc( FUNC(timekeeper_tick_callback), (void *)this );
 	duration = attotime::from_seconds(1);
-	timer_adjust_periodic( timer, duration, 0, duration );
+	timer->adjust( duration, 0, duration );
 }
 
 void m48t02_device::device_start()

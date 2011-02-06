@@ -1253,7 +1253,7 @@ static READ8_DEVICE_HANDLER( dkong_tune_r )
 	}
 	else
 	{
-		/* printf("%s:rom access\n",cpuexec_describe_context(device->machine)); */
+		/* printf("%s:rom access\n",device->machine->describe_context()); */
 		return (state->snd_rom[0x1000 + (page & 7) * 256 + offset]);
 	}
 }

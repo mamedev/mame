@@ -455,7 +455,7 @@ static WRITE32_DEVICE_HANDLER( dragngun_eeprom_w )
 		eeprom_set_cs_line(device, (data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
 		return;
 	}
-	logerror("%s:Write control 1 %08x %08x\n",cpuexec_describe_context(device->machine),offset,data);
+	logerror("%s:Write control 1 %08x %08x\n",device->machine->describe_context(),offset,data);
 }
 
 /**********************************************************************************/

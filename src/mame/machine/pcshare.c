@@ -99,14 +99,14 @@ void pc_keyb_set_clock(int on)
 	if (pc_keyb.on != on)
 	{
 		if (!on)
-			timer_adjust_oneshot(pc_keyb.timer, attotime::from_msec(5), 0);
+			pc_keyb.timer->adjust(attotime::from_msec(5));
 		else {
 			if ( pc_keyb.self_test ) {
 				/* The self test of the keyboard takes some time. 2 msec seems to work. */
 				/* This still needs to verified against a real keyboard. */
-				timer_adjust_oneshot(pc_keyb.timer, attotime::from_msec( 2 ), 0);
+				pc_keyb.timer->adjust(attotime::from_msec( 2 ));
 			} else {
-				timer_reset(pc_keyb.timer, attotime::never);
+				pc_keyb.timer->reset();
 				pc_keyb.self_test = 0;
 			}
 		}

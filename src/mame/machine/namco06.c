@@ -136,11 +136,11 @@ READ8_DEVICE_HANDLER( namco_06xx_data_r )
 	UINT8 result = 0xff;
 	int devnum;
 
-	LOG(("%s: 06XX '%s' read offset %d\n",cpuexec_describe_context(device->machine),device->tag(),offset));
+	LOG(("%s: 06XX '%s' read offset %d\n",device->machine->describe_context(),device->tag(),offset));
 
 	if (!(state->control & 0x10))
 	{
-		logerror("%s: 06XX '%s' read in write mode %02x\n",cpuexec_describe_context(device->machine),device->tag(),state->control);
+		logerror("%s: 06XX '%s' read in write mode %02x\n",device->machine->describe_context(),device->tag(),state->control);
 		return 0;
 	}
 
@@ -157,11 +157,11 @@ WRITE8_DEVICE_HANDLER( namco_06xx_data_w )
 	namco_06xx_state *state = get_safe_token(device);
 	int devnum;
 
-	LOG(("%s: 06XX '%s' write offset %d = %02x\n",cpuexec_describe_context(device->machine),device->tag(),offset,data));
+	LOG(("%s: 06XX '%s' write offset %d = %02x\n",device->machine->describe_context(),device->tag(),offset,data));
 
 	if (state->control & 0x10)
 	{
-		logerror("%s: 06XX '%s' write in read mode %02x\n",cpuexec_describe_context(device->machine),device->tag(),state->control);
+		logerror("%s: 06XX '%s' write in read mode %02x\n",device->machine->describe_context(),device->tag(),state->control);
 		return;
 	}
 
@@ -174,7 +174,7 @@ WRITE8_DEVICE_HANDLER( namco_06xx_data_w )
 READ8_DEVICE_HANDLER( namco_06xx_ctrl_r )
 {
 	namco_06xx_state *state = get_safe_token(device);
-	LOG(("%s: 06XX '%s' ctrl_r\n",cpuexec_describe_context(device->machine),device->tag()));
+	LOG(("%s: 06XX '%s' ctrl_r\n",device->machine->describe_context(),device->tag()));
 	return state->control;
 }
 
@@ -183,14 +183,14 @@ WRITE8_DEVICE_HANDLER( namco_06xx_ctrl_w )
 	namco_06xx_state *state = get_safe_token(device);
 	int devnum;
 
-	LOG(("%s: 06XX '%s' control %02x\n",cpuexec_describe_context(device->machine),device->tag(),data));
+	LOG(("%s: 06XX '%s' control %02x\n",device->machine->describe_context(),device->tag(),data));
 
 	state->control = data;
 
 	if ((state->control & 0x0f) == 0)
 	{
 		LOG(("disabling nmi generate timer\n"));
-		timer_adjust_oneshot(state->nmi_timer, attotime::never, 0);
+		state->nmi_timer->adjust(attotime::never);
 	}
 	else
 	{
@@ -200,7 +200,7 @@ WRITE8_DEVICE_HANDLER( namco_06xx_ctrl_w )
 		// inputs if a transfer terminates at the wrong time.
 		// On the other hand, the time cannot be too short otherwise the 54XX will
 		// not have enough time to process the incoming controls.
-		timer_adjust_periodic(state->nmi_timer, attotime::from_usec(200), 0, attotime::from_usec(200));
+		state->nmi_timer->adjust(attotime::from_usec(200), 0, attotime::from_usec(200));
 
 		if (state->control & 0x10)
 			for (devnum = 0; devnum < 4; devnum++)

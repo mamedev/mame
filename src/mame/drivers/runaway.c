@@ -30,7 +30,7 @@ static TIMER_CALLBACK( interrupt_callback )
 	if (scanline >= 263)
 		scanline = 16;
 
-	timer_adjust_oneshot(state->interrupt_timer, machine->primary_screen->time_until_pos(scanline), scanline);
+	state->interrupt_timer->adjust(machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 static MACHINE_START( runaway )
@@ -42,7 +42,7 @@ static MACHINE_START( runaway )
 static MACHINE_RESET( runaway )
 {
 	runaway_state *state = machine->driver_data<runaway_state>();
-	timer_adjust_oneshot(state->interrupt_timer, machine->primary_screen->time_until_pos(16), 16);
+	state->interrupt_timer->adjust(machine->primary_screen->time_until_pos(16), 16);
 }
 
 

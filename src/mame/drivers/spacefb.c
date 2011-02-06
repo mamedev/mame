@@ -141,7 +141,7 @@ static TIMER_CALLBACK( interrupt_callback )
 	else
 		next_vpos = SPACEFB_INT_TRIGGER_COUNT_1;
 
-	timer_adjust_oneshot(interrupt_timer, machine->primary_screen->time_until_pos(next_vpos), 0);
+	interrupt_timer->adjust(machine->primary_screen->time_until_pos(next_vpos));
 }
 
 
@@ -153,7 +153,7 @@ static void create_interrupt_timer(running_machine *machine)
 
 static void start_interrupt_timer(running_machine *machine)
 {
-	timer_adjust_oneshot(interrupt_timer, machine->primary_screen->time_until_pos(SPACEFB_INT_TRIGGER_COUNT_1), 0);
+	interrupt_timer->adjust(machine->primary_screen->time_until_pos(SPACEFB_INT_TRIGGER_COUNT_1));
 }
 
 

@@ -314,7 +314,7 @@ void timer_device::device_reset()
 					start_delay = m_config.m_start_delay;
 
 				// allocate and start the backing timer
-				timer_adjust_periodic(m_timer, start_delay, m_config.m_param, period);
+				m_timer->adjust(start_delay, m_config.m_param, period);
 			}
 			break;
 		}
@@ -325,7 +325,7 @@ void timer_device::device_reset()
 
 			// set the timer to to fire immediately
 			m_first_time = true;
-			timer_adjust_oneshot(m_timer, attotime::zero, m_config.m_param);
+			m_timer->adjust(attotime::zero, m_config.m_param);
 			break;
 	}
 }
@@ -370,7 +370,7 @@ void timer_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 			m_first_time = false;
 
 			// adjust the timer
-			timer_adjust_oneshot(m_timer, m_screen->time_until_pos(next_vpos), 0);
+			m_timer->adjust(m_screen->time_until_pos(next_vpos));
 			break;
 		}
 	}

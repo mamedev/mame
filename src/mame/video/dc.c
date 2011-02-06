@@ -1092,7 +1092,7 @@ WRITE64_HANDLER( pvr_ta_w )
 				// this should really be done for each tile!
 				render_to_accumulation_buffer(space->machine,fake_accumulationbuffer_bitmap,&clip);
 
-				timer_adjust_oneshot(endofrender_timer_isp, attotime::from_usec(4000) , 0); // hack, make sure render takes some amount of time
+				endofrender_timer_isp->adjust(attotime::from_usec(4000) ); // hack, make sure render takes some amount of time
 
 				/* copy the tiles to the framebuffer (really the rendering should be in this loop too) */
 				if (pvrta_regs[FPU_PARAM_CFG] & 0x200000)
@@ -1241,11 +1241,11 @@ WRITE64_HANDLER( pvr_ta_w )
 
 	case SPG_VBLANK_INT:
 		/* clear pending irqs and modify them with the updated ones */
-		timer_adjust_oneshot(vbin_timer, attotime::never, 0);
-		timer_adjust_oneshot(vbout_timer, attotime::never, 0);
+		vbin_timer->adjust(attotime::never);
+		vbout_timer->adjust(attotime::never);
 
-		timer_adjust_oneshot(vbin_timer, space->machine->primary_screen->time_until_pos(spg_vblank_in_irq_line_num), 0);
-		timer_adjust_oneshot(vbout_timer, space->machine->primary_screen->time_until_pos(spg_vblank_out_irq_line_num), 0);
+		vbin_timer->adjust(space->machine->primary_screen->time_until_pos(spg_vblank_in_irq_line_num));
+		vbout_timer->adjust(space->machine->primary_screen->time_until_pos(spg_vblank_out_irq_line_num));
 		break;
 	/* TODO: timer adjust for SPG_HBLANK_INT too */
 	case TA_LIST_CONT:
@@ -2451,7 +2451,7 @@ static TIMER_CALLBACK(vbin)
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_IN; // V Blank-in interrupt
 	dc_update_interrupt_status(machine);
 
-	timer_adjust_oneshot(vbin_timer, machine->primary_screen->time_until_pos(spg_vblank_in_irq_line_num), 0);
+	vbin_timer->adjust(machine->primary_screen->time_until_pos(spg_vblank_in_irq_line_num));
 }
 
 static TIMER_CALLBACK(vbout)
@@ -2459,7 +2459,7 @@ static TIMER_CALLBACK(vbout)
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_OUT; // V Blank-out interrupt
 	dc_update_interrupt_status(machine);
 
-	timer_adjust_oneshot(vbout_timer, machine->primary_screen->time_until_pos(spg_vblank_out_irq_line_num), 0);
+	vbout_timer->adjust(machine->primary_screen->time_until_pos(spg_vblank_out_irq_line_num));
 }
 
 static TIMER_CALLBACK(hbin)
@@ -2489,7 +2489,7 @@ static TIMER_CALLBACK(hbin)
 		next_y = spg_line_comp_val;
 	}
 
-	timer_adjust_oneshot(hbin_timer, machine->primary_screen->time_until_pos(scanline, spg_hblank_in_irq-1), 0);
+	hbin_timer->adjust(machine->primary_screen->time_until_pos(scanline, spg_hblank_in_irq-1));
 }
 
 
@@ -2498,7 +2498,7 @@ static TIMER_CALLBACK(endofrender_video)
 {
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_VIDEO;// VIDEO end of render
 	dc_update_interrupt_status(machine);
-	timer_adjust_oneshot(endofrender_timer_video, attotime::never, 0);
+	endofrender_timer_video->adjust(attotime::never);
 }
 
 static TIMER_CALLBACK(endofrender_tsp)
@@ -2506,8 +2506,8 @@ static TIMER_CALLBACK(endofrender_tsp)
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_TSP;	// TSP end of render
 	dc_update_interrupt_status(machine);
 
-	timer_adjust_oneshot(endofrender_timer_tsp, attotime::never, 0);
-	timer_adjust_oneshot(endofrender_timer_video, attotime::from_usec(500) , 0);
+	endofrender_timer_tsp->adjust(attotime::never);
+	endofrender_timer_video->adjust(attotime::from_usec(500) );
 }
 
 static TIMER_CALLBACK(endofrender_isp)
@@ -2515,8 +2515,8 @@ static TIMER_CALLBACK(endofrender_isp)
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_ISP;	// ISP end of render
 	dc_update_interrupt_status(machine);
 
-	timer_adjust_oneshot(endofrender_timer_isp, attotime::never, 0);
-	timer_adjust_oneshot(endofrender_timer_tsp, attotime::from_usec(500) , 0);
+	endofrender_timer_isp->adjust(attotime::never);
+	endofrender_timer_tsp->adjust(attotime::from_usec(500) );
 }
 
 
@@ -2552,13 +2552,13 @@ VIDEO_START(dc)
 	computedilated();
 
 	vbout_timer = machine->scheduler().timer_alloc(FUNC(vbout));
-	timer_adjust_oneshot(vbout_timer, machine->primary_screen->time_until_pos(spg_vblank_out_irq_line_num), 0);
+	vbout_timer->adjust(machine->primary_screen->time_until_pos(spg_vblank_out_irq_line_num));
 
 	vbin_timer = machine->scheduler().timer_alloc(FUNC(vbin));
-	timer_adjust_oneshot(vbin_timer, machine->primary_screen->time_until_pos(spg_vblank_in_irq_line_num), 0);
+	vbin_timer->adjust(machine->primary_screen->time_until_pos(spg_vblank_in_irq_line_num));
 
 	hbin_timer = machine->scheduler().timer_alloc(FUNC(hbin));
-	timer_adjust_oneshot(hbin_timer, machine->primary_screen->time_until_pos(0, spg_hblank_in_irq-1), 0);
+	hbin_timer->adjust(machine->primary_screen->time_until_pos(0, spg_hblank_in_irq-1));
 
 	scanline = 0;
 	next_y = 0;
@@ -2567,9 +2567,9 @@ VIDEO_START(dc)
 	endofrender_timer_tsp = machine->scheduler().timer_alloc(FUNC(endofrender_tsp));
 	endofrender_timer_video = machine->scheduler().timer_alloc(FUNC(endofrender_video));
 
-	timer_adjust_oneshot(endofrender_timer_isp, attotime::never, 0);
-	timer_adjust_oneshot(endofrender_timer_tsp, attotime::never, 0);
-	timer_adjust_oneshot(endofrender_timer_video, attotime::never, 0);
+	endofrender_timer_isp->adjust(attotime::never);
+	endofrender_timer_tsp->adjust(attotime::never);
+	endofrender_timer_video->adjust(attotime::never);
 
 	fake_accumulationbuffer_bitmap = auto_bitmap_alloc(machine,1024,1024,BITMAP_FORMAT_RGB32);
 

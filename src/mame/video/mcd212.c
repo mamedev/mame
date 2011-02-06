@@ -1506,7 +1506,7 @@ TIMER_CALLBACK( mcd212_perform_scan )
             }
         }
     }
-    timer_adjust_oneshot(mcd212->scan_timer, machine->primary_screen->time_until_pos(( scanline + 1 ) % 302, 0), 0);
+    mcd212->scan_timer->adjust(machine->primary_screen->time_until_pos(( scanline + 1 ) % 302, 0));
 }
 
 void mcd212_init(running_machine *machine, mcd212_regs_t *mcd212)
@@ -1656,7 +1656,7 @@ VIDEO_START( cdimono1 )
     mcd212_ab_init(&state->mcd212_ab);
     mcd212_init(machine, &state->mcd212_regs);
     state->mcd212_regs.scan_timer = machine->scheduler().timer_alloc(FUNC(mcd212_perform_scan));
-    timer_adjust_oneshot(state->mcd212_regs.scan_timer, machine->primary_screen->time_until_pos(0, 0), 0);
+    state->mcd212_regs.scan_timer->adjust(machine->primary_screen->time_until_pos(0, 0));
 
     state->lcdbitmap = downcast<screen_device *>(machine->device("lcd"))->alloc_compatible_bitmap();
 }

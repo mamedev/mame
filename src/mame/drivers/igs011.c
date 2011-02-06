@@ -865,7 +865,7 @@ static WRITE16_HANDLER( igs011_prot1_w )
 			break;
 	}
 
-	logerror("%s: warning, unknown igs011_prot1_w( %04x, %04x )\n", cpuexec_describe_context(space->machine), offset, data);
+	logerror("%s: warning, unknown igs011_prot1_w( %04x, %04x )\n", space->machine->describe_context(), offset, data);
 }
 static READ16_HANDLER( igs011_prot1_r )
 {
@@ -937,7 +937,7 @@ static WRITE16_HANDLER( igs011_prot2_inc_w )
 		igs011_prot2++;
 	}
 //  else
-//      logerror("%s: warning, unknown igs011_prot2_inc_w( %04x, %04x )\n", cpuexec_describe_context(space->machine), offset, data);
+//      logerror("%s: warning, unknown igs011_prot2_inc_w( %04x, %04x )\n", space->machine->describe_context(), offset, data);
 }
 
 // vbowl (33)
@@ -948,7 +948,7 @@ static WRITE16_HANDLER( igs011_prot2_dec_w )
 		igs011_prot2--;
 	}
 //  else
-//      logerror("%s: warning, unknown igs011_prot2_dec_w( %04x, %04x )\n", cpuexec_describe_context(space->machine), offset, data);
+//      logerror("%s: warning, unknown igs011_prot2_dec_w( %04x, %04x )\n", space->machine->describe_context(), offset, data);
 }
 
 
@@ -964,7 +964,7 @@ static WRITE16_HANDLER( drgnwrld_igs011_prot2_swap_w )
 		igs011_prot2 = ((BIT(x,3)&BIT(x,0))<<4) | (BIT(x,2)<<3) | ((BIT(x,0)|BIT(x,1))<<2) | ((BIT(x,2)^BIT(x,4)^1)<<1) | (BIT(x,1)^1^BIT(x,3));
 	}
 //  else
-//      logerror("%s: warning, unknown igs011_prot2_swap_w( %04x, %04x )\n", cpuexec_describe_context(space->machine), offset, data);
+//      logerror("%s: warning, unknown igs011_prot2_swap_w( %04x, %04x )\n", space->machine->describe_context(), offset, data);
 }
 
 // lhb, xymg, lhb2
@@ -979,7 +979,7 @@ static WRITE16_HANDLER( lhb_igs011_prot2_swap_w )
 		igs011_prot2 = (((BIT(x,0)^1)|BIT(x,1))<<2) | (BIT(x,2)<<1) | (BIT(x,0)&BIT(x,1));
 	}
 //  else
-//      logerror("%s: warning, unknown igs011_prot2_swap_w( %04x, %04x )\n", cpuexec_describe_context(space->machine), offset, data);
+//      logerror("%s: warning, unknown igs011_prot2_swap_w( %04x, %04x )\n", space->machine->describe_context(), offset, data);
 }
 
 // wlcc
@@ -994,7 +994,7 @@ static WRITE16_HANDLER( wlcc_igs011_prot2_swap_w )
 		igs011_prot2 = ((BIT(x,3)^BIT(x,2))<<4) | ((BIT(x,2)^BIT(x,1))<<3) | ((BIT(x,1)^BIT(x,0))<<2) | ((BIT(x,4)^BIT(x,0)^1)<<1) | (BIT(x,4)^BIT(x,3)^1);
 	}
 //  else
-//      logerror("%s: warning, unknown igs011_prot2_swap_w( %04x, %04x )\n", cpuexec_describe_context(space->machine), offset, data);
+//      logerror("%s: warning, unknown igs011_prot2_swap_w( %04x, %04x )\n", space->machine->describe_context(), offset, data);
 }
 
 // vbowl
@@ -1009,7 +1009,7 @@ static WRITE16_HANDLER( vbowl_igs011_prot2_swap_w )
 		igs011_prot2 = ((BIT(x,3)^BIT(x,2))<<4) | ((BIT(x,2)^BIT(x,1))<<3) | ((BIT(x,1)^BIT(x,0))<<2) | ((BIT(x,4)^BIT(x,0))<<1) | (BIT(x,4)^BIT(x,3));
 	}
 //  else
-//      logerror("%s: warning, unknown igs011_prot2_swap_w( %04x, %04x )\n", cpuexec_describe_context(space->machine), offset, data);
+//      logerror("%s: warning, unknown igs011_prot2_swap_w( %04x, %04x )\n", space->machine->describe_context(), offset, data);
 }
 
 
@@ -1128,7 +1128,7 @@ static WRITE16_HANDLER( igs012_prot_mode_w )
 		igs012_prot_mode = igs012_prot_mode ^ 1;
 	}
 	else
-		logerror("%s: warning, unknown igs012_prot_mode_w( %04x, %04x ), mode %x\n", cpuexec_describe_context(space->machine), offset, data, igs012_prot_mode);
+		logerror("%s: warning, unknown igs012_prot_mode_w( %04x, %04x ), mode %x\n", space->machine->describe_context(), offset, data, igs012_prot_mode);
 }
 
 static WRITE16_HANDLER( igs012_prot_inc_w )
@@ -1138,7 +1138,7 @@ static WRITE16_HANDLER( igs012_prot_inc_w )
 		igs012_prot = (igs012_prot + 1) & 0x1f;
 	}
 	else
-		logerror("%s: warning, unknown igs012_prot_inc_w( %04x, %04x ), mode %x\n", cpuexec_describe_context(space->machine), offset, data, igs012_prot_mode);
+		logerror("%s: warning, unknown igs012_prot_inc_w( %04x, %04x ), mode %x\n", space->machine->describe_context(), offset, data, igs012_prot_mode);
 }
 
 static WRITE16_HANDLER( igs012_prot_dec_inc_w )
@@ -1152,7 +1152,7 @@ static WRITE16_HANDLER( igs012_prot_dec_inc_w )
 		igs012_prot = (igs012_prot + 1) & 0x1f;
 	}
 	else
-		logerror("%s: warning, unknown igs012_prot_dec_inc_w( %04x, %04x ), mode %x\n", cpuexec_describe_context(space->machine), offset, data, igs012_prot_mode);
+		logerror("%s: warning, unknown igs012_prot_dec_inc_w( %04x, %04x ), mode %x\n", space->machine->describe_context(), offset, data, igs012_prot_mode);
 }
 
 static WRITE16_HANDLER( igs012_prot_dec_copy_w )
@@ -1166,7 +1166,7 @@ static WRITE16_HANDLER( igs012_prot_dec_copy_w )
 		igs012_prot = (igs012_prot - 1) & 0x1f;
 	}
 	else
-		logerror("%s: warning, unknown igs012_prot_dec_copy_w( %04x, %04x ), mode %x\n", cpuexec_describe_context(space->machine), offset, data, igs012_prot_mode);
+		logerror("%s: warning, unknown igs012_prot_dec_copy_w( %04x, %04x ), mode %x\n", space->machine->describe_context(), offset, data, igs012_prot_mode);
 }
 
 static WRITE16_HANDLER( igs012_prot_copy_w )
@@ -1176,7 +1176,7 @@ static WRITE16_HANDLER( igs012_prot_copy_w )
 		igs012_prot = igs012_prot_swap;
 	}
 	else
-		logerror("%s: warning, unknown igs012_prot_copy_w( %04x, %04x ), mode %x\n", cpuexec_describe_context(space->machine), offset, data, igs012_prot_mode);
+		logerror("%s: warning, unknown igs012_prot_copy_w( %04x, %04x ), mode %x\n", space->machine->describe_context(), offset, data, igs012_prot_mode);
 }
 
 static WRITE16_HANDLER( igs012_prot_swap_w )
@@ -1188,7 +1188,7 @@ static WRITE16_HANDLER( igs012_prot_swap_w )
 		igs012_prot_swap = (((BIT(x,3)|BIT(x,1))^1)<<3) | ((BIT(x,2)&BIT(x,1))<<2) | ((BIT(x,3)^BIT(x,0))<<1) | (BIT(x,2)^1);
 	}
 	else
-		logerror("%s: warning, unknown igs012_prot_swap_w( %04x, %04x ), mode %x\n", cpuexec_describe_context(space->machine), offset, data, igs012_prot_mode);
+		logerror("%s: warning, unknown igs012_prot_swap_w( %04x, %04x ), mode %x\n", space->machine->describe_context(), offset, data, igs012_prot_mode);
 }
 
 static READ16_HANDLER( igs012_prot_r )
@@ -2076,7 +2076,7 @@ static WRITE16_DEVICE_HANDLER( lhb_okibank_w )
 	}
 
 	if ( data & (~0x200) )
-		logerror("%s: warning, unknown bits written in oki bank = %02x\n", cpuexec_describe_context(device->machine), data);
+		logerror("%s: warning, unknown bits written in oki bank = %02x\n", device->machine->describe_context(), data);
 
 //  popmessage("oki %04x",data);
 }

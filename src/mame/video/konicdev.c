@@ -2837,7 +2837,7 @@ static int k051960_fetchromdata( device_t *device, int byte )
 	addr = (code << 7) | (off1 << 2) | byte;
 	addr &= device->machine->region(k051960->memory_region)->bytes() - 1;
 
-//  popmessage("%s: addr %06x", cpuexec_describe_context(device->machine), addr);
+//  popmessage("%s: addr %06x", device->machine->describe_context(), addr);
 
 	return device->machine->region(k051960->memory_region)->base()[addr];
 }
@@ -3432,7 +3432,7 @@ READ8_DEVICE_HANDLER( k053244_r )
 			| ((offset & 3) ^ 1);
 		addr &= machine->region(k053244->memory_region)->bytes() - 1;
 
-		//  popmessage("%s: offset %02x addr %06x", cpuexec_describe_context(machine), offset & 3, addr);
+		//  popmessage("%s: offset %02x addr %06x", machine->describe_context(), offset & 3, addr);
 
 		return machine->region(k053244->memory_region)->base()[addr];
 	}
@@ -3443,7 +3443,7 @@ READ8_DEVICE_HANDLER( k053244_r )
 	}
 	else
 	{
-		//logerror("%s: read from unknown 053244 address %x\n", cpuexec_describe_context(machine), offset);
+		//logerror("%s: read from unknown 053244 address %x\n", machine->describe_context(), offset);
 		return 0;
 	}
 }
@@ -3461,7 +3461,7 @@ WRITE8_DEVICE_HANDLER( k053244_w )
 //          popmessage("053244 reg 05 = %02x",data);
 		/* bit 2 = unknown, Parodius uses it */
 		/* bit 5 = unknown, Rollergames uses it */
-//      logerror("%s: write %02x to 053244 address 5\n", cpuexec_describe_context(device->machine), data);
+//      logerror("%s: write %02x to 053244 address 5\n", device->machine->describe_context(), data);
 		break;
 
 	case 0x06:
@@ -5170,13 +5170,13 @@ READ8_DEVICE_HANDLER( k051316_rom_r )
 			addr /= 2;
 		addr &= device->machine->region(k051316->memory_region)->bytes() - 1;
 
-		//  popmessage("%s: offset %04x addr %04x", cpuexec_describe_context(device->machine), offset, addr);
+		//  popmessage("%s: offset %04x addr %04x", device->machine->describe_context(), offset, addr);
 
 		return device->machine->region(k051316->memory_region)->base()[addr];
 	}
 	else
 	{
-		//logerror("%s: read 051316 ROM offset %04x but reg 0x0c bit 0 not clear\n", cpuexec_describe_context(device->machine), offset);
+		//logerror("%s: read 051316 ROM offset %04x but reg 0x0c bit 0 not clear\n", device->machine->describe_context(), offset);
 		return 0;
 	}
 }
@@ -5185,7 +5185,7 @@ WRITE8_DEVICE_HANDLER( k051316_ctrl_w )
 {
 	k051316_state *k051316= k051316_get_safe_token(device);
 	k051316->ctrlram[offset] = data;
-	//if (offset >= 0x0c) logerror("%s: write %02x to 051316 reg %x\n", cpuexec_describe_context(device->machine), data, offset);
+	//if (offset >= 0x0c) logerror("%s: write %02x to 051316 reg %x\n", device->machine->describe_context(), data, offset);
 }
 
 // a few games (ajax, rollerg, ultraman, etc.) can enable and disable wraparound after start

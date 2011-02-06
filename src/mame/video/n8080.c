@@ -51,7 +51,7 @@ void spacefev_start_red_cannon( running_machine *machine )
 	n8080_state *state = machine->driver_data<n8080_state>();
 
 	state->spacefev_red_cannon = 1;
-	timer_adjust_oneshot(state->cannon_timer, attotime::from_usec(550 * 68 * 10), 0);
+	state->cannon_timer->adjust(attotime::from_usec(550 * 68 * 10));
 }
 
 
@@ -60,7 +60,7 @@ static TIMER_CALLBACK( spacefev_stop_red_cannon )
 	n8080_state *state = machine->driver_data<n8080_state>();
 
 	state->spacefev_red_cannon = 0;
-	timer_adjust_oneshot(state->cannon_timer, attotime::never, 0);
+	state->cannon_timer->adjust(attotime::never);
 }
 
 

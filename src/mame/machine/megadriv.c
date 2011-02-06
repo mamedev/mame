@@ -815,7 +815,7 @@ static void megadrive_vdp_set_register(running_machine *machine, int regnum, UIN
 //  if (regnum == 0x0a)
 //      mame_printf_debug("Set HINT Reload Register to %d on scanline %d\n",value, genesis_scanline_counter);
 
-//  mame_printf_debug("%s: Setting VDP Register #%02x to %02x\n",cpuexec_describe_context(machine), regnum,value);
+//  mame_printf_debug("%s: Setting VDP Register #%02x to %02x\n",machine->describe_context(), regnum,value);
 }
 
 static void update_megadrive_vdp_code_and_address(void)
@@ -1012,7 +1012,7 @@ static void handle_dma_bits(running_machine *machine)
 		UINT16 length;
 		source = (MEGADRIVE_REG15_DMASOURCE1 | (MEGADRIVE_REG16_DMASOURCE2<<8) | ((MEGADRIVE_REG17_DMASOURCE3&0xff)<<16))<<1;
 		length = (MEGADRIVE_REG13_DMALENGTH1 | (MEGADRIVE_REG14_DMALENGTH2<<8))<<1;
-	//  mame_printf_debug("%s 68k DMAtran set source %06x length %04x dest %04x enabled %01x code %02x %02x\n", cpuexec_describe_context(machine), source, length, megadrive_vdp_address,MEGADRIVE_REG01_DMA_ENABLE, megadrive_vdp_code,MEGADRIVE_REG0F_AUTO_INC);
+	//  mame_printf_debug("%s 68k DMAtran set source %06x length %04x dest %04x enabled %01x code %02x %02x\n", machine->describe_context(), source, length, megadrive_vdp_address,MEGADRIVE_REG01_DMA_ENABLE, megadrive_vdp_code,MEGADRIVE_REG0F_AUTO_INC);
 
 	}
 
@@ -1622,7 +1622,7 @@ READ8_DEVICE_HANDLER( megadriv_68k_YM2612_read)
 	}
 	else
 	{
-		logerror("%s: 68000 attempting to access YM2612 (read) without bus\n", cpuexec_describe_context(device->machine));
+		logerror("%s: 68000 attempting to access YM2612 (read) without bus\n", device->machine->describe_context());
 		return 0;
 	}
 
@@ -1640,7 +1640,7 @@ WRITE8_DEVICE_HANDLER( megadriv_68k_YM2612_write)
 	}
 	else
 	{
-		logerror("%s: 68000 attempting to access YM2612 (write) without bus\n", cpuexec_describe_context(device->machine));
+		logerror("%s: 68000 attempting to access YM2612 (write) without bus\n", device->machine->describe_context());
 	}
 }
 
@@ -1999,7 +1999,7 @@ static void megadrive_io_write_data_port_6button(running_machine *machine, int p
 		if (((megadrive_io_data_regs[portnum]&0x40)==0x00) && ((data&0x40) == 0x40))
 		{
 			io_stage[portnum]++;
-			timer_adjust_oneshot(io_timeout[portnum], machine->device<cpu_device>("maincpu")->cycles_to_attotime(8192), 0);
+			io_timeout[portnum]->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(8192));
 		}
 
 	}
@@ -3019,14 +3019,14 @@ static void calculate_pwm_timer(void)
 
 	/* if both RMD and LMD are set to OFF or pwm cycle register is one, then PWM timer ticks doesn't occur */
 	if(pwm_cycle == 1 || ((pwm_ctrl & 0xf) == 0))
-		timer_adjust_oneshot(_32x_pwm_timer, attotime::never, 0);
+		_32x_pwm_timer->adjust(attotime::never);
 	else
 	{
 		pwm_timer_tick = 0;
 		lch_fifo_state = rch_fifo_state = 0x4000;
 		lch_index_r = rch_index_r = 0;
 		lch_index_w = rch_index_w = 0;
-		timer_adjust_oneshot(_32x_pwm_timer, attotime::from_hz((PWM_CLOCK) / (pwm_cycle - 1)), 0);
+		_32x_pwm_timer->adjust(attotime::from_hz((PWM_CLOCK) / (pwm_cycle - 1)));
 	}
 }
 
@@ -3071,7 +3071,7 @@ static TIMER_CALLBACK( _32x_pwm_callback )
 		if(sh2_slave_pwmint_enable) { cpu_set_input_line(_32x_slave_cpu, SH2_PINT_IRQ_LEVEL,ASSERT_LINE); }
 	}
 
-	timer_adjust_oneshot(_32x_pwm_timer, attotime::from_hz((PWM_CLOCK) / (pwm_cycle - 1)), 0);
+	_32x_pwm_timer->adjust(attotime::from_hz((PWM_CLOCK) / (pwm_cycle - 1)));
 }
 
 static READ16_HANDLER( _32x_pwm_r )
@@ -3983,13 +3983,13 @@ static WRITE16_HANDLER( scd_a12002_memory_mode_w )
 			//printf("main cpu dmna set dmna: %d ret: %d\n", segacd_dmna, segacd_ret);
 			if (segacd_ram_mode==0)
 			{
-				if (!timer_enabled(segacd_dmna_ret_timer))
+				if (!segacd_dmna_ret_timer->enabled())
 				{
 					if (!segacd_dmna)
 					{
 						//printf("main dmna\n");
 						segacd_dmna = 1;
-						timer_adjust_oneshot(segacd_dmna_ret_timer, attotime::from_usec(100), 0);
+						segacd_dmna_ret_timer->adjust(attotime::from_usec(100));
 					}
 				}
 			}
@@ -4051,14 +4051,14 @@ static WRITE16_HANDLER( segacd_sub_memory_mode_w )
 
 			if (segacd_ram_mode==0)
 			{
-				if (!timer_enabled(segacd_dmna_ret_timer))
+				if (!segacd_dmna_ret_timer->enabled())
 				{
 					if (segacd_dmna)
 					{
 					//  printf("sub ret\n");
 					//  segacd_ret = 1;
 					//  segacd_dmna = 0;
-						timer_adjust_oneshot(segacd_dmna_ret_timer, attotime::from_usec(100), 0);
+						segacd_dmna_ret_timer->adjust(attotime::from_usec(100));
 					}
 				}
 			}
@@ -4098,7 +4098,7 @@ static WRITE16_HANDLER( segacd_sub_memory_mode_w )
 					// reset it flags etc.?
 					segacd_ret = 0;
 					segacd_dmna = 0;
-					timer_adjust_oneshot(segacd_dmna_ret_timer, attotime::from_usec(100), 0);
+					segacd_dmna_ret_timer->adjust(attotime::from_usec(100));
 				}
 				else
 				{
@@ -4983,7 +4983,7 @@ static TIMER_CALLBACK( segacd_hock_callback )
 		hock_cmd = 0;
 	}
 
-	timer_adjust_oneshot(segacd_hock_timer, attotime::from_hz(75), 0);
+	segacd_hock_timer->adjust(attotime::from_hz(75));
 }
 
 
@@ -5022,16 +5022,16 @@ void segacd_init_main_cpu( running_machine* machine )
 	memory_install_read16_handler (space, 0x0000070, 0x0000073, 0, 0, scd_hint_vector_r );
 
 	segacd_gfx_conversion_timer = machine->scheduler().timer_alloc(FUNC(segacd_gfx_conversion_timer_callback));
-	timer_adjust_oneshot(segacd_gfx_conversion_timer, attotime::never, 0);
+	segacd_gfx_conversion_timer->adjust(attotime::never);
 
 	segacd_dmna_ret_timer = machine->scheduler().timer_alloc(FUNC(segacd_dmna_ret_timer_callback));
-	timer_adjust_oneshot(segacd_gfx_conversion_timer, attotime::never, 0);
+	segacd_gfx_conversion_timer->adjust(attotime::never);
 
 	segacd_hock_timer = machine->scheduler().timer_alloc(FUNC(segacd_hock_callback));
-	timer_adjust_oneshot(segacd_hock_timer, attotime::never, 0);
+	segacd_hock_timer->adjust(attotime::never);
 
 	segacd_irq3_timer = machine->scheduler().timer_alloc(FUNC(segacd_irq3_timer_callback));
-	timer_adjust_oneshot(segacd_irq3_timer, attotime::never, 0);
+	segacd_irq3_timer->adjust(attotime::never);
 
 
 
@@ -5112,8 +5112,8 @@ static MACHINE_RESET( segacd )
 	segacd_ram_mode = 0;
 	segacd_ram_mode_old = 0;
 
-	timer_adjust_oneshot(segacd_dmna_ret_timer, attotime::zero, 0);
-	timer_adjust_oneshot(segacd_hock_timer, attotime::zero, 0);
+	segacd_dmna_ret_timer->adjust(attotime::zero);
+	segacd_hock_timer->adjust(attotime::zero);
 	hock_cmd = 0;
 }
 
@@ -5288,9 +5288,9 @@ static WRITE16_HANDLER( segacd_cdd_ctrl_w )
 	hock_cmd = (data & 4) >> 2;
 
 	if(data & 4) // enable Hock timer
-		timer_adjust_oneshot(segacd_hock_timer, attotime::from_hz(75), 0);
+		segacd_hock_timer->adjust(attotime::from_hz(75));
 	else
-		timer_adjust_oneshot(segacd_hock_timer, attotime::never, 0);
+		segacd_hock_timer->adjust(attotime::never);
 }
 
 /* 68k <- CDD communication comms are 4-bit wide */
@@ -5724,7 +5724,7 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 		segacd_conversion_active = 1;
 
 		// todo: proper time calculation
-		timer_adjust_oneshot(segacd_gfx_conversion_timer, attotime::from_hz(500), 0);
+		segacd_gfx_conversion_timer->adjust(attotime::from_hz(500));
 
 
 		int line;
@@ -5873,9 +5873,9 @@ static WRITE16_HANDLER( segacd_irq3timer_w )
 		// time = reg * 30.72 us
 
 		if (segacd_irq3_timer_reg)
-			timer_adjust_oneshot(segacd_irq3_timer, SEGACD_IRQ3_TIMER_SPEED, 0);
+			segacd_irq3_timer->adjust(SEGACD_IRQ3_TIMER_SPEED);
 		else
-			timer_adjust_oneshot(segacd_irq3_timer, attotime::never, 0);
+			segacd_irq3_timer->adjust(attotime::never);
 
 		printf("segacd_irq3timer_w %02x\n", segacd_irq3_timer_reg);
 	}
@@ -5886,7 +5886,7 @@ static TIMER_CALLBACK( segacd_irq3_timer_callback )
 	if (segacd_irq_mask & 0x08)
 		cputag_set_input_line(machine, "segacd_68k", 3, HOLD_LINE);
 
-	timer_adjust_oneshot(segacd_irq3_timer, SEGACD_IRQ3_TIMER_SPEED, 0);
+	segacd_irq3_timer->adjust(SEGACD_IRQ3_TIMER_SPEED);
 }
 
 
@@ -8960,7 +8960,7 @@ static void megadriv_init_common(running_machine *machine)
 	if(_32x_is_connected)
 	{
 		_32x_pwm_timer = machine->scheduler().timer_alloc(FUNC(_32x_pwm_callback));
-		timer_adjust_oneshot(_32x_pwm_timer, attotime::never, 0);
+		_32x_pwm_timer->adjust(attotime::never);
 	}
 
 	sega_cd_connected = 0;

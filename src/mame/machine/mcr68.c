@@ -206,7 +206,7 @@ static void mcr68_common_init(running_machine *machine)
 		m6840->control = 0x00;
 		m6840->latch = 0xffff;
 		m6840->count = 0xffff;
-		timer_enable(m6840->timer, FALSE);
+		m6840->timer->enable(false);
 		m6840->timer_active = 0;
 		m6840->period = m6840_counter_periods[i];
 	}
@@ -460,7 +460,7 @@ static void reload_count(int counter)
 	/* counter 0 is self-updating if clocked externally */
 	if (counter == 0 && !(m6840_state[counter].control & 0x02))
 	{
-		timer_adjust_oneshot(m6840_state[counter].timer, attotime::never, 0);
+		m6840_state[counter].timer->adjust(attotime::never);
 		m6840_state[counter].timer_active = 0;
 		return;
 	}
@@ -481,7 +481,7 @@ static void reload_count(int counter)
 	/* set the timer */
 	total_period = period * count;
 LOG(("reload_count(%d): period = %f  count = %d\n", counter, period.as_double(), count));
-	timer_adjust_oneshot(m6840_state[counter].timer, total_period, (count << 2) + counter);
+	m6840_state[counter].timer->adjust(total_period, (count << 2) + counter);
 	m6840_state[counter].timer_active = 1;
 }
 
@@ -502,7 +502,7 @@ static UINT16 compute_counter(int counter)
 		period = m6840_counter_periods[counter];
 
 	/* see how many are left */
-	remaining = timer_timeleft(m6840_state[counter].timer).as_attoseconds() / period.as_attoseconds();
+	remaining = m6840_state[counter].timer->remaining().as_attoseconds() / period.as_attoseconds();
 
 	/* adjust the count for dual byte mode */
 	if (m6840_state[counter].control & 0x04)
@@ -544,7 +544,7 @@ static WRITE8_HANDLER( mcr68_6840_w_common )
 			{
 				for (i = 0; i < 3; i++)
 				{
-					timer_adjust_oneshot(m6840_state[i].timer, attotime::never, 0);
+					m6840_state[i].timer->adjust(attotime::never);
 					m6840_state[i].timer_active = 0;
 				}
 			}

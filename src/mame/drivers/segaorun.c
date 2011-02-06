@@ -447,7 +447,7 @@ static void update_main_irqs(running_machine *machine)
 	cpu_set_input_line(state->maincpu, 6, state->vblank_irq_state && state->irq2_state ? ASSERT_LINE : CLEAR_LINE);
 
 	if (state->vblank_irq_state || state->irq2_state)
-		cpuexec_boost_interleave(machine, attotime::zero, attotime::from_usec(100));
+		machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
 

@@ -488,7 +488,7 @@ void running_machine::schedule_hard_reset()
 
 void running_machine::schedule_soft_reset()
 {
-	timer_adjust_oneshot(m_soft_reset_timer, attotime::zero, 0);
+	m_soft_reset_timer->adjust(attotime::zero);
 
 	// we can't be paused since the timer needs to fire
 	resume();

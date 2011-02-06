@@ -198,7 +198,7 @@ WRITE32_HANDLER( cgboard_dsp_shared_w_ppc )
 {
 	if (cgboard_id < MAX_CG_BOARDS)
 	{
-		cpuexec_trigger(space->machine, 10000);		// Remove the timeout (a part of the GTI Club FIFO test workaround)
+		space->machine->scheduler().trigger(10000);		// Remove the timeout (a part of the GTI Club FIFO test workaround)
 		COMBINE_DATA(dsp_shared_ram[cgboard_id] + (offset + (dsp_shared_ram_bank[cgboard_id] * DSP_BANK_SIZE_WORD)));
 	}
 }
@@ -275,7 +275,7 @@ static void dsp_comm_sharc_w(address_space *space, int board, int offset, UINT32
 		}
 	}
 
-//  printf("%s:cgboard_dsp_comm_w_sharc: %08X, %08X, %08X\n", cpuexec_describe_context(space->machine), data, offset, mem_mask);
+//  printf("%s:cgboard_dsp_comm_w_sharc: %08X, %08X, %08X\n", space->machine->describe_context(), data, offset, mem_mask);
 
 	dsp_comm_sharc[board][offset] = data;
 }

@@ -151,7 +151,7 @@ static WRITE8_DEVICE_HANDLER( lordgun_eeprom_w )
 	if (data & ~0xfd)
 	{
 //      popmessage("EE: %02x", data);
-		logerror("%s: Unknown EEPROM bit written %02X\n",cpuexec_describe_context(device->machine),data);
+		logerror("%s: Unknown EEPROM bit written %02X\n",device->machine->describe_context(),data);
 	}
 
 	coin_counter_w(device->machine, 0, data & 0x01);
@@ -182,7 +182,7 @@ static WRITE8_DEVICE_HANDLER( aliencha_eeprom_w )
 	if (~data & ~0xf8)
 	{
 //      popmessage("EE: %02x", data);
-		logerror("%s: Unknown EEPROM bit written %02X\n",cpuexec_describe_context(device->machine),data);
+		logerror("%s: Unknown EEPROM bit written %02X\n",device->machine->describe_context(),data);
 	}
 
 	// bit 1? cleared during screen transitions
@@ -212,7 +212,7 @@ static READ8_DEVICE_HANDLER( aliencha_dip_r )
 		case 0x50:	return input_port_read(device->machine, "DIP3");
 
 		default:
-			logerror("%s: dip_r with unknown dip_sel = %02X\n",cpuexec_describe_context(device->machine),aliencha_dip_sel);
+			logerror("%s: dip_r with unknown dip_sel = %02X\n",device->machine->describe_context(),aliencha_dip_sel);
 			return 0xff;
 	}
 }
@@ -319,7 +319,7 @@ ADDRESS_MAP_END
 static WRITE8_DEVICE_HANDLER( lordgun_okibank_w )
 {
 	downcast<okim6295_device *>(device)->set_bank_base((data & 2) ? 0x40000 : 0);
-	if (data & ~3)	logerror("%s: unknown okibank bits %02x\n", cpuexec_describe_context(device->machine), data);
+	if (data & ~3)	logerror("%s: unknown okibank bits %02x\n", device->machine->describe_context(), data);
 //  popmessage("OKI %x", data);
 }
 

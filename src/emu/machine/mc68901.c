@@ -727,7 +727,7 @@ inline void mc68901_device::timer_input(int index, int value)
 	case TCR_TIMER_PULSE_64:
 	case TCR_TIMER_PULSE_100:
 	case TCR_TIMER_PULSE_200:
-		timer_enable(m_timer[index], (value == aer));
+		m_timer[index]->enable((value == aer));
 
 		if (((m_ti[index] ^ aer) == 0) && ((value ^ aer) == 1))
 		{
@@ -809,13 +809,13 @@ void mc68901_device::device_start()
 	if (m_config.rx_clock > 0)
 	{
 		m_rx_timer = timer_alloc(TIMER_RX);
-		timer_adjust_periodic(m_rx_timer, attotime::zero, 0, attotime::from_hz(m_config.rx_clock));
+		m_rx_timer->adjust(attotime::zero, 0, attotime::from_hz(m_config.rx_clock));
 	}
 
 	if (m_config.tx_clock > 0)
 	{
 		m_tx_timer = timer_alloc(TIMER_TX);
-		timer_adjust_periodic(m_tx_timer, attotime::zero, 0, attotime::from_hz(m_config.tx_clock));
+		m_tx_timer->adjust(attotime::zero, 0, attotime::from_hz(m_config.tx_clock));
 	}
 
 	/* register for state saving */
@@ -1066,7 +1066,7 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 		{
 		case TCR_TIMER_STOPPED:
 			if (LOG) logerror("MC68901 '%s' Timer A Stopped\n", tag());
-			timer_enable(m_timer[TIMER_A], 0);
+			m_timer[TIMER_A]->enable(false);
 			break;
 
 		case TCR_TIMER_DELAY_4:
@@ -1079,13 +1079,13 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 			{
 			int divisor = PRESCALER[m_tacr & 0x07];
 			if (LOG) logerror("MC68901 '%s' Timer A Delay Mode : %u Prescale\n", tag(), divisor);
-			timer_adjust_periodic(m_timer[TIMER_A], attotime::from_hz(m_timer_clock / divisor), 0, attotime::from_hz(m_timer_clock / divisor));
+			m_timer[TIMER_A]->adjust(attotime::from_hz(m_timer_clock / divisor), 0, attotime::from_hz(m_timer_clock / divisor));
 			}
 			break;
 
 		case TCR_TIMER_EVENT:
 			if (LOG) logerror("MC68901 '%s' Timer A Event Count Mode\n", tag());
-			timer_enable(m_timer[TIMER_A], 0);
+			m_timer[TIMER_A]->enable(false);
 			break;
 
 		case TCR_TIMER_PULSE_4:
@@ -1098,8 +1098,8 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 			{
 			int divisor = PRESCALER[m_tacr & 0x07];
 			if (LOG) logerror("MC68901 '%s' Timer A Pulse Width Mode : %u Prescale\n", tag(), divisor);
-			timer_adjust_periodic(m_timer[TIMER_A], attotime::never, 0, attotime::from_hz(m_timer_clock / divisor));
-			timer_enable(m_timer[TIMER_A], 0);
+			m_timer[TIMER_A]->adjust(attotime::never, 0, attotime::from_hz(m_timer_clock / divisor));
+			m_timer[TIMER_A]->enable(false);
 			}
 			break;
 		}
@@ -1121,7 +1121,7 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 		{
 		case TCR_TIMER_STOPPED:
 			if (LOG) logerror("MC68901 '%s' Timer B Stopped\n", tag());
-			timer_enable(m_timer[TIMER_B], 0);
+			m_timer[TIMER_B]->enable(false);
 			break;
 
 		case TCR_TIMER_DELAY_4:
@@ -1134,13 +1134,13 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 			{
 			int divisor = PRESCALER[m_tbcr & 0x07];
 			if (LOG) logerror("MC68901 '%s' Timer B Delay Mode : %u Prescale\n", tag(), divisor);
-			timer_adjust_periodic(m_timer[TIMER_B], attotime::from_hz(m_timer_clock / divisor), 0, attotime::from_hz(m_timer_clock / divisor));
+			m_timer[TIMER_B]->adjust(attotime::from_hz(m_timer_clock / divisor), 0, attotime::from_hz(m_timer_clock / divisor));
 			}
 			break;
 
 		case TCR_TIMER_EVENT:
 			if (LOG) logerror("MC68901 '%s' Timer B Event Count Mode\n", tag());
-			timer_enable(m_timer[TIMER_B], 0);
+			m_timer[TIMER_B]->enable(false);
 			break;
 
 		case TCR_TIMER_PULSE_4:
@@ -1153,8 +1153,8 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 			{
 			int divisor = PRESCALER[m_tbcr & 0x07];
 			if (LOG) logerror("MC68901 '%s' Timer B Pulse Width Mode : %u Prescale\n", tag(), DIVISOR);
-			timer_adjust_periodic(m_timer[TIMER_B], attotime::never, 0, attotime::from_hz(m_timer_clock / divisor));
-			timer_enable(m_timer[TIMER_B], 0);
+			m_timer[TIMER_B]->adjust(attotime::never, 0, attotime::from_hz(m_timer_clock / divisor));
+			m_timer[TIMER_B]->enable(false);
 			}
 			break;
 		}
@@ -1176,7 +1176,7 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 		{
 		case TCR_TIMER_STOPPED:
 			if (LOG) logerror("MC68901 '%s' Timer D Stopped\n", tag());
-			timer_enable(m_timer[TIMER_D], 0);
+			m_timer[TIMER_D]->enable(false);
 			break;
 
 		case TCR_TIMER_DELAY_4:
@@ -1189,7 +1189,7 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 			{
 			int divisor = PRESCALER[m_tcdcr & 0x07];
 			if (LOG) logerror("MC68901 '%s' Timer D Delay Mode : %u Prescale\n", tag(), divisor);
-			timer_adjust_periodic(m_timer[TIMER_D], attotime::from_hz(m_timer_clock / divisor), 0, attotime::from_hz(m_timer_clock / divisor));
+			m_timer[TIMER_D]->adjust(attotime::from_hz(m_timer_clock / divisor), 0, attotime::from_hz(m_timer_clock / divisor));
 			}
 			break;
 		}
@@ -1198,7 +1198,7 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 		{
 		case TCR_TIMER_STOPPED:
 			if (LOG) logerror("MC68901 '%s' Timer C Stopped\n", tag());
-			timer_enable(m_timer[TIMER_C], 0);
+			m_timer[TIMER_C]->enable(false);
 			break;
 
 		case TCR_TIMER_DELAY_4:
@@ -1211,7 +1211,7 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 			{
 			int divisor = PRESCALER[(m_tcdcr >> 4) & 0x07];
 			if (LOG) logerror("MC68901 '%s' Timer C Delay Mode : %u Prescale\n", tag(), divisor);
-			timer_adjust_periodic(m_timer[TIMER_C], attotime::from_hz(m_timer_clock / divisor), 0, attotime::from_hz(m_timer_clock / divisor));
+			m_timer[TIMER_C]->adjust(attotime::from_hz(m_timer_clock / divisor), 0, attotime::from_hz(m_timer_clock / divisor));
 			}
 			break;
 		}
@@ -1222,7 +1222,7 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 
 		m_tdr[TIMER_A] = data;
 
-		if (!timer_enabled(m_timer[TIMER_A]))
+		if (!m_timer[TIMER_A]->enabled())
 		{
 			m_tmc[TIMER_A] = data;
 		}
@@ -1233,7 +1233,7 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 
 		m_tdr[TIMER_B] = data;
 
-		if (!timer_enabled(m_timer[TIMER_B]))
+		if (!m_timer[TIMER_B]->enabled())
 		{
 			m_tmc[TIMER_B] = data;
 		}
@@ -1244,7 +1244,7 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 
 		m_tdr[TIMER_C] = data;
 
-		if (!timer_enabled(m_timer[TIMER_C]))
+		if (!m_timer[TIMER_C]->enabled())
 		{
 			m_tmc[TIMER_C] = data;
 		}
@@ -1255,7 +1255,7 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 
 		m_tdr[TIMER_D] = data;
 
-		if (!timer_enabled(m_timer[TIMER_D]))
+		if (!m_timer[TIMER_D]->enabled())
 		{
 			m_tmc[TIMER_D] = data;
 		}

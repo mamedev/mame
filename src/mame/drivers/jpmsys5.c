@@ -263,7 +263,7 @@ static WRITE16_DEVICE_HANDLER( jpm_upd7759_w )
 	}
 	else
 	{
-		logerror("%s: upd7759: Unknown write to %x with %x\n", cpuexec_describe_context(device->machine),  offset, data);
+		logerror("%s: upd7759: Unknown write to %x with %x\n", device->machine->describe_context(),  offset, data);
 	}
 }
 
@@ -351,7 +351,7 @@ static TIMER_CALLBACK( touch_cb )
 
 			if (++touch_data_count == 3)
 			{
-				timer_reset(touch_timer, attotime::never);
+				touch_timer->reset();
 				touch_state = IDLE;
 			}
 			else
@@ -378,7 +378,7 @@ static INPUT_CHANGED( touchscreen_press )
 		/* Start sending the data to the 68000 serially */
 		touch_data_count = 0;
 		touch_state = START;
-		timer_adjust_periodic(touch_timer, rx_period, 0, rx_period);
+		touch_timer->adjust(rx_period, 0, rx_period);
 	}
 }
 
@@ -582,7 +582,7 @@ static MACHINE_START( jpmsys5v )
 
 static MACHINE_RESET( jpmsys5v )
 {
-	timer_reset(touch_timer, attotime::never);
+	touch_timer->reset();
 	touch_state = IDLE;
 	a2_data_in = 1;
 	a2_acia_dcd = 0;

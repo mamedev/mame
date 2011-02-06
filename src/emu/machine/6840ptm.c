@@ -138,7 +138,7 @@ void ptm6840_device::device_start()
 
 	for (int i = 0; i < 3; i++)
 	{
-		timer_enable(m_timer[i], FALSE);
+		m_timer[i]->enable(false);
 	}
 
 	devcb_resolve_write_line(&m_irq_func, &m_config.m_irq_func, this);
@@ -299,7 +299,7 @@ void ptm6840_device::subtract_from_counter(int counter, int count)
 			duration *= m_t3_divisor;
 		}
 
-		timer_adjust_oneshot(m_timer[counter], duration, 0);
+		m_timer[counter]->adjust(duration);
 	}
 }
 
@@ -390,7 +390,7 @@ UINT16 ptm6840_device::compute_counter( int counter )
 		PLOG(("MC6840 #%s: %d external clock freq %f \n", tag(), counter, clock));
 	}
 	/* See how many are left */
-	int remaining = (timer_timeleft(m_timer[counter]) * clock).as_double();
+	int remaining = (m_timer[counter]->remaining() * clock).as_double();
 
 	/* Adjust the count for dual byte mode */
 	if (m_control_reg[counter] & 0x04)
@@ -468,15 +468,15 @@ void ptm6840_device::reload_count(int idx)
 		if (!m_external_clock[idx])
 		{
 			m_enabled[idx] = 0;
-			timer_enable(m_timer[idx],FALSE);
+			m_timer[idx]->enable(false);
 		}
 	}
 	else
 #endif
 	{
 		m_enabled[idx] = 1;
-		timer_adjust_oneshot(m_timer[idx], duration, 0);
-		timer_enable(m_timer[idx], TRUE);
+		m_timer[idx]->adjust(duration);
+		m_timer[idx]->enable(true);
 	}
 }
 
@@ -500,7 +500,7 @@ READ8_DEVICE_HANDLER_TRAMPOLINE(ptm6840, ptm6840_read)
 
 		case PTM_6840_STATUS:
 		{
-			PLOG(("%s: MC6840 #%s: Status read = %04X\n", cpuexec_describe_context(&m_machine), tag(), m_status_reg));
+			PLOG(("%s: MC6840 #%s: Status read = %04X\n", m_machine.describe_context(), tag(), m_status_reg));
 			m_status_read_since_int |= m_status_reg & 0x07;
 			val = m_status_reg;
 			break;
@@ -522,7 +522,7 @@ READ8_DEVICE_HANDLER_TRAMPOLINE(ptm6840, ptm6840_read)
 
 			m_lsb_buffer = result & 0xff;
 
-			PLOG(("%s: MC6840 #%s: Counter %d read = %04X\n", cpuexec_describe_context(&m_machine), tag(), idx, result >> 8));
+			PLOG(("%s: MC6840 #%s: Counter %d read = %04X\n", m_machine.describe_context(), tag(), idx, result >> 8));
 			val = result >> 8;
 			break;
 		}
@@ -582,7 +582,7 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(ptm6840, ptm6840_write)
 					PLOG(("MC6840 #%s : Timer reset\n", tag()));
 					for (int i = 0; i < 3; i++)
 					{
-						timer_enable(m_timer[i], FALSE);
+						m_timer[i]->enable(false);
 						m_enabled[i] = 0;
 					}
 				}
@@ -633,7 +633,7 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(ptm6840, ptm6840_write)
 				reload_count(idx);
 			}
 
-			PLOG(("%s:MC6840 #%s: Counter %d latch = %04X\n", cpuexec_describe_context(&m_machine), tag(), idx, m_latch[idx]));
+			PLOG(("%s:MC6840 #%s: Counter %d latch = %04X\n", m_machine.describe_context(), tag(), idx, m_latch[idx]));
 			break;
 		}
 	}
@@ -813,7 +813,7 @@ void ptm6840_device::ptm6840_set_ext_clock(int counter, double clock)
 		if (!m_external_clock[counter])
 		{
 			m_enabled[counter] = 0;
-			timer_enable(m_timer[counter], FALSE);
+			m_timer[counter]->enable(false);
 		}
 	}
 	else
@@ -841,8 +841,8 @@ void ptm6840_device::ptm6840_set_ext_clock(int counter, double clock)
 		}
 
 		m_enabled[counter] = 1;
-		timer_adjust_oneshot(m_timer[counter], duration, 0);
-		timer_enable(m_timer[counter], TRUE);
+		m_timer[counter]->adjust(duration);
+		m_timer[counter]->enable(true);
 	}
 }
 

@@ -633,13 +633,13 @@ static WRITE8_HANDLER( konami_sound_filter_w )
 
 static WRITE8_DEVICE_HANDLER( konami_portc_0_w )
 {
-	logerror("%s:ppi0_portc_w = %02X\n", cpuexec_describe_context(device->machine), data);
+	logerror("%s:ppi0_portc_w = %02X\n", device->machine->describe_context(), data);
 }
 
 
 static WRITE8_DEVICE_HANDLER( konami_portc_1_w )
 {
-	logerror("%s:ppi1_portc_w = %02X\n", cpuexec_describe_context(device->machine), data);
+	logerror("%s:ppi1_portc_w = %02X\n", device->machine->describe_context(), data);
 }
 
 
@@ -1978,7 +1978,7 @@ static MACHINE_CONFIG_START( galaxian_base, galaxian_state )
 	MCFG_VIDEO_UPDATE(galaxian)
 
 	/* blinking frequency is determined by 555 counter with Ra=100k, Rb=10k, C=10uF */
-	MCFG_TIMER_ADD_PERIODIC("stars", galaxian_stars_blink_timer, attotime::from_nsec(PERIOD_OF_555_ASTABLE_NSEC(100000, 10000, 0.00001)))
+	MCFG_TIMER_ADD_PERIODIC("stars", galaxian_stars_blink_timer, PERIOD_OF_555_ASTABLE(100000, 10000, 0.00001))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

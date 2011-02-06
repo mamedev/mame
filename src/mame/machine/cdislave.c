@@ -93,7 +93,7 @@ void cdislave_device::readback_trigger()
     verboselog(&m_machine, 0, "Asserting IRQ2\n" );
     cpu_set_input_line_vector(m_machine.device("maincpu"), M68K_IRQ_2, 26);
     cputag_set_input_line(&m_machine, "maincpu", M68K_IRQ_2, ASSERT_LINE);
-    timer_adjust_oneshot(m_interrupt_timer, attotime::never, 0);
+    m_interrupt_timer->adjust(attotime::never);
 }
 
 void cdislave_device::prepare_readback(attotime delay, UINT8 channel, UINT8 count, UINT8 data0, UINT8 data1, UINT8 data2, UINT8 data3, UINT8 cmd)
@@ -106,7 +106,7 @@ void cdislave_device::prepare_readback(attotime delay, UINT8 channel, UINT8 coun
     m_channel[channel].m_out_buf[3] = data3;
     m_channel[channel].m_out_cmd = cmd;
 
-    timer_adjust_oneshot(m_interrupt_timer, delay, 0);
+    m_interrupt_timer->adjust(delay);
 }
 
 void cdislave_device::perform_mouse_update()
@@ -344,7 +344,7 @@ void cdislave_device::register_write(const UINT32 offset, const UINT16 data, con
                         dmadac_enable(&state->dmadac[0], 2, 0);
                         m_in_index = 0;
                         m_in_count = 0;
-                        //timer_adjust_oneshot(cdic->audio_sample_timer, attotime::never, 0);
+                        //cdic->audio_sample_timer->adjust(attotime::never);
                         break;
                     case 0x83: // Unmute Audio
                         verboselog(&m_machine, 0, "slave_w: Channel %d: Unmute Audio (0x83)\n", offset );
@@ -475,7 +475,7 @@ void cdislave_device::device_start()
     register_globals();
 
     m_interrupt_timer = m_machine.scheduler().timer_alloc(FUNC(trigger_readback_int));
-    timer_adjust_oneshot(m_interrupt_timer, attotime::never, 0);
+    m_interrupt_timer->adjust(attotime::never);
 }
 
 //-------------------------------------------------

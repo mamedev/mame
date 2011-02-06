@@ -366,12 +366,12 @@ static READ8_DEVICE_HANDLER ( combatsc_ym2203_r )
 		if (state->boost)
 		{
 			state->boost = 0;
-			timer_adjust_periodic(state->interleave_timer, attotime::zero, 0, state->audiocpu->cycles_to_attotime(80));
+			state->interleave_timer->adjust(attotime::zero, 0, state->audiocpu->cycles_to_attotime(80));
 		}
 		else if (status & 2)
 		{
 			state->boost = 1;
-			timer_adjust_oneshot(state->interleave_timer, attotime::zero, 0);
+			state->interleave_timer->adjust(attotime::zero);
 		}
 	}
 

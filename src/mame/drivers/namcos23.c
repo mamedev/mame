@@ -1330,7 +1330,7 @@ static TIMER_CALLBACK( c361_timer_cb )
 	if (c361_scanline != 511)
 	{
 		cputag_set_input_line(machine, "maincpu", MIPS3_IRQ1, ASSERT_LINE);
-		timer_adjust_oneshot(c361_timer, attotime::never, 0);
+		c361_timer->adjust(attotime::never);
 	}
 }
 
@@ -1350,11 +1350,11 @@ static WRITE16_HANDLER(s23_c361_w)
 		if (data == 0x1ff)
 		{
 			cputag_set_input_line(space->machine, "maincpu", MIPS3_IRQ1, CLEAR_LINE);
-			timer_adjust_oneshot(c361_timer, attotime::never, 0);
+			c361_timer->adjust(attotime::never);
 		}
 		else
 		{
-			timer_adjust_oneshot(c361_timer, space->machine->primary_screen->time_until_pos(c361_scanline), 0);
+			c361_timer->adjust(space->machine->primary_screen->time_until_pos(c361_scanline));
 		}
 		break;
 
@@ -1808,7 +1808,7 @@ static WRITE32_HANDLER( p3d_w)
 		return;
 	case 0x17:
 		cputag_set_input_line(space->machine, "maincpu", MIPS3_IRQ1, CLEAR_LINE);
-		timer_adjust_oneshot(c361_timer, attotime::never, 0);
+		c361_timer->adjust(attotime::never);
 		return;
 	}
 	logerror("p3d_w %02x, %08x @ %08x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
@@ -2041,7 +2041,7 @@ static INTERRUPT_GEN(s23_interrupt)
 static MACHINE_START( s23 )
 {
 	c361_timer = machine->scheduler().timer_alloc(FUNC(c361_timer_cb));
-	timer_adjust_oneshot(c361_timer, attotime::never, 0);
+	c361_timer->adjust(attotime::never);
 }
 
 static ADDRESS_MAP_START( gorgon_map, ADDRESS_SPACE_PROGRAM, 32 )

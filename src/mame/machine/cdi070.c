@@ -53,7 +53,7 @@ static void scc68070_set_timer_callback(scc68070_regs_t *scc68070, int channel)
         case 0:
             compare = 0x10000 - scc68070->timers.timer0;
             period = attotime::from_hz(CLOCK_A/192) * compare;
-            timer_adjust_oneshot(scc68070->timers.timer0_timer, period, 0);
+            scc68070->timers.timer0_timer->adjust(period);
             break;
         default:
             fatalerror( "Unsupported timer channel to scc68070_set_timer_callback!" );
@@ -96,12 +96,12 @@ static void scc68070_uart_rx_check(running_machine *machine, scc68070_regs_t *sc
 	if((scc68070->uart.command_register & 3) == 1)
 	{
 		UINT32 div = 0x10000 >> ((scc68070->uart.clock_select >> 4) & 7);
-		timer_adjust_oneshot(scc68070->uart.rx_timer, attotime::from_hz((49152000 / div) / 8), 0);
+		scc68070->uart.rx_timer->adjust(attotime::from_hz((49152000 / div) / 8));
 	}
 	else
 	{
 		scc68070->uart.status_register &= ~USR_RXRDY;
-		timer_adjust_oneshot(scc68070->uart.rx_timer, attotime::never, 0);
+		scc68070->uart.rx_timer->adjust(attotime::never);
 	}
 }
 
@@ -118,15 +118,15 @@ static void scc68070_uart_tx_check(running_machine *machine, scc68070_regs_t *sc
 			scc68070->uart.status_register |= USR_TXRDY;
 		}
 
-		if(timer_timeleft(scc68070->uart.tx_timer) == attotime::never)
+		if(scc68070->uart.tx_timer->remaining() == attotime::never)
 		{
 			UINT32 div = 0x10000 >> (scc68070->uart.clock_select & 7);
-			timer_adjust_oneshot(scc68070->uart.tx_timer, attotime::from_hz((49152000 / div) / 8), 0);
+			scc68070->uart.tx_timer->adjust(attotime::from_hz((49152000 / div) / 8));
 		}
 	}
 	else
 	{
-		timer_adjust_oneshot(scc68070->uart.tx_timer, attotime::never, 0);
+		scc68070->uart.tx_timer->adjust(attotime::never);
 	}
 }
 
@@ -176,7 +176,7 @@ TIMER_CALLBACK( scc68070_rx_callback )
 
 			scc68070->uart.status_register |= USR_RXRDY;
 			UINT32 div = 0x10000 >> ((scc68070->uart.clock_select >> 4) & 7);
-			timer_adjust_oneshot(scc68070->uart.rx_timer, attotime::from_hz((49152000 / div) / 8), 0);
+			scc68070->uart.rx_timer->adjust(attotime::from_hz((49152000 / div) / 8));
 		}
 		else
 		{
@@ -389,16 +389,16 @@ TIMER_CALLBACK( scc68070_tx_callback )
 			scc68070->uart.transmit_pointer--;
 
 			UINT32 div = 0x10000 >> (scc68070->uart.clock_select & 7);
-			timer_adjust_oneshot(scc68070->uart.tx_timer, attotime::from_hz((49152000 / div) / 8), 0);
+			scc68070->uart.tx_timer->adjust(attotime::from_hz((49152000 / div) / 8));
 		}
 		else
 		{
-			timer_adjust_oneshot(scc68070->uart.tx_timer, attotime::never, 0);
+			scc68070->uart.tx_timer->adjust(attotime::never);
 		}
 	}
 	else
 	{
-		timer_adjust_oneshot(scc68070->uart.tx_timer, attotime::never, 0);
+		scc68070->uart.tx_timer->adjust(attotime::never);
 	}
 
 	scc68070_uart_tx_check(machine, scc68070);
@@ -1144,13 +1144,13 @@ void scc68070_register_globals(running_machine *machine, scc68070_regs_t *scc680
     state_save_register_global(machine, scc68070->mmu.desc[7].base);
 
 	scc68070->timers.timer0_timer = machine->scheduler().timer_alloc(FUNC(scc68070_timer0_callback));
-	timer_adjust_oneshot(scc68070->timers.timer0_timer, attotime::never, 0);
+	scc68070->timers.timer0_timer->adjust(attotime::never);
 
 	scc68070->uart.rx_timer = machine->scheduler().timer_alloc(FUNC(scc68070_rx_callback));
-	timer_adjust_oneshot(scc68070->uart.rx_timer, attotime::never, 0);
+	scc68070->uart.rx_timer->adjust(attotime::never);
 
 	scc68070->uart.tx_timer = machine->scheduler().timer_alloc(FUNC(scc68070_tx_callback));
-	timer_adjust_oneshot(scc68070->uart.tx_timer, attotime::never, 0);
+	scc68070->uart.tx_timer->adjust(attotime::never);
 }
 
 #if ENABLE_UART_PRINTING

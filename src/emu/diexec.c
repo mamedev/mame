@@ -639,7 +639,7 @@ void device_execute_interface::interface_post_reset()
 	{
 		attotime timedint_period = m_execute_config.m_timed_interrupt_period;
 		assert(m_timedint_timer != NULL);
-		timer_adjust_periodic(m_timedint_timer, timedint_period, 0, timedint_period);
+		m_timedint_timer->adjust(timedint_period, 0, timedint_period);
 	}
 }
 
@@ -742,7 +742,7 @@ void device_execute_interface::on_vblank_start(screen_device &screen)
 		if (m_execute_config.m_vblank_interrupts_per_frame > 1 && !suspended(SUSPEND_REASON_DISABLE))
 		{
 			m_partial_frame_period = device().machine->primary_screen->frame_period() / m_execute_config.m_vblank_interrupts_per_frame;
-			timer_adjust_oneshot(m_partial_frame_timer, m_partial_frame_period, 0);
+			m_partial_frame_timer->adjust(m_partial_frame_period);
 		}
 	}
 }
@@ -773,7 +773,7 @@ void device_execute_interface::trigger_partial_frame_interrupt()
 
 	// set up to retrigger if there's more interrupts to generate
 	if (m_iloops > 1)
-		timer_adjust_oneshot(m_partial_frame_timer, m_partial_frame_period, 0);
+		m_partial_frame_timer->adjust(m_partial_frame_period);
 }
 
 

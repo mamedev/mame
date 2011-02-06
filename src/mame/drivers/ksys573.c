@@ -430,7 +430,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%s: %s", cpuexec_describe_context(machine), buf );
+		logerror( "%s: %s", machine->describe_context(), buf );
 	}
 }
 
@@ -599,7 +599,7 @@ static TIMER_CALLBACK( atapi_xfer_end )
 	int i, n_this;
 	UINT8 sector_buffer[ 4096 ];
 
-	timer_adjust_oneshot(state->atapi_timer, attotime::never, 0);
+	state->atapi_timer->adjust(attotime::never);
 
 //  verboselog( machine, 2, "atapi_xfer_end( %d ) atapi_xferlen = %d, atapi_xfermod=%d\n", x, atapi_xfermod, atapi_xferlen );
 
@@ -645,7 +645,7 @@ static TIMER_CALLBACK( atapi_xfer_end )
 		atapi_regs[ATAPI_REG_COUNTLOW] = state->atapi_xferlen & 0xff;
 		atapi_regs[ATAPI_REG_COUNTHIGH] = (state->atapi_xferlen>>8)&0xff;
 
-		timer_adjust_oneshot(state->atapi_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (state->atapi_xferlen/2048))), 0);
+		state->atapi_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (state->atapi_xferlen/2048))));
 	}
 	else
 	{
@@ -878,7 +878,7 @@ static WRITE32_HANDLER( atapi_w )
 
 					case 0x45: // PLAY
 						atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_BSY;
-						timer_adjust_oneshot( state->atapi_timer, downcast<cpu_device *>(space->cpu)->cycles_to_attotime( ATAPI_CYCLES_PER_SECTOR ), 0 );
+						state->atapi_timer->adjust( downcast<cpu_device *>(space->cpu)->cycles_to_attotime( ATAPI_CYCLES_PER_SECTOR ) );
 						break;
 				}
 
@@ -1052,7 +1052,7 @@ static void atapi_init(running_machine *machine)
 	state->atapi_cdata_wait = 0;
 
 	state->atapi_timer = machine->scheduler().timer_alloc(FUNC(atapi_xfer_end));
-	timer_adjust_oneshot(state->atapi_timer, attotime::never, 0);
+	state->atapi_timer->adjust(attotime::never);
 
 	for( i = 0; i < 2; i++ )
 	{
@@ -1124,7 +1124,7 @@ static void cdrom_dma_write( running_machine *machine, UINT32 n_address, INT32 n
 	verboselog( machine, 2, "atapi_xfer_end: %d %d\n", state->atapi_xferlen, state->atapi_xfermod );
 
 	// set a transfer complete timer (Note: CYCLES_PER_SECTOR can't be lower than 2000 or the BIOS ends up "out of order")
-	timer_adjust_oneshot(state->atapi_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (state->atapi_xferlen/2048))), 0);
+	state->atapi_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (state->atapi_xferlen/2048))));
 }
 
 static WRITE32_HANDLER( security_w )
@@ -1324,7 +1324,7 @@ static void root_timer_adjust( running_machine *machine, int n_counter )
 
 	if( ( state->m_p_n_root_mode[ n_counter ] & PSX_RC_STOP ) != 0 )
 	{
-		timer_adjust_oneshot( state->m_p_timer_root[ n_counter ], attotime::never, n_counter);
+		state->m_p_timer_root[ n_counter ]->adjust( attotime::never, n_counter);
 	}
 	else
 	{
@@ -1338,7 +1338,7 @@ static void root_timer_adjust( running_machine *machine, int n_counter )
 
 		n_duration *= root_divider( machine, n_counter );
 
-		timer_adjust_oneshot( state->m_p_timer_root[ n_counter ], attotime::from_hz(33868800) * n_duration, n_counter);
+		state->m_p_timer_root[ n_counter ]->adjust( attotime::from_hz(33868800) * n_duration, n_counter);
 	}
 }
 

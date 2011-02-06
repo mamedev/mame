@@ -335,7 +335,7 @@ static void duart68681_write_CR(duart68681_state *duart68681, int ch, UINT8 data
 				duart68681->ISR &= ~INT_TXRDYA;
 			else
 				duart68681->ISR &= ~INT_TXRDYB;
-			timer_adjust_oneshot(duart68681->channel[ch].tx_timer, attotime::never, ch);
+			duart68681->channel[ch].tx_timer->adjust(attotime::never, ch);
 			break;
 		case 4: /* Reset Error Status */
 			duart68681->channel[ch].SR &= ~(STATUS_RECEIVED_BREAK | STATUS_FRAMING_ERROR | STATUS_PARITY_ERROR | STATUS_OVERRUN_ERROR);
@@ -448,7 +448,7 @@ static TIMER_CALLBACK( tx_timer_callback )
 		duart68681->ISR |= INT_TXRDYB;
 
 	duart68681_update_interrupts(duart68681);
-	timer_adjust_oneshot(duart68681->channel[ch].tx_timer, attotime::never, ch);
+	duart68681->channel[ch].tx_timer->adjust(attotime::never, ch);
 };
 
 static void duart68681_write_TX(duart68681_state* duart68681, int ch, UINT8 data)
@@ -468,7 +468,7 @@ static void duart68681_write_TX(duart68681_state* duart68681, int ch, UINT8 data
 	duart68681_update_interrupts(duart68681);
 
 	period = attotime::from_hz(duart68681->channel[ch].baud_rate / 10 );
-	timer_adjust_oneshot(duart68681->channel[ch].tx_timer, period, ch);
+	duart68681->channel[ch].tx_timer->adjust(period, ch);
 
 };
 
@@ -559,13 +559,13 @@ READ8_DEVICE_HANDLER(duart68681_r)
 				case 0x03: /* Counter, CLK/16 */
 					{
 						attotime rate = attotime::from_hz(2*device->clock()/(2*16*16*duart68681->CTR.w.l));
-						timer_adjust_periodic(duart68681->duart_timer, rate, 0, rate);
+						duart68681->duart_timer->adjust(rate, 0, rate);
 					}
 					break;
 				case 0x06: /* Timer, CLK/1 */
 					{
 						attotime rate = attotime::from_hz(2*device->clock()/(2*16*duart68681->CTR.w.l));
-						timer_adjust_periodic(duart68681->duart_timer, rate, 0, rate);
+						duart68681->duart_timer->adjust(rate, 0, rate);
 					}
 					break;
 				case 0x07: /* Timer, CLK/16 */
@@ -574,7 +574,7 @@ READ8_DEVICE_HANDLER(duart68681_r)
 						//attotime rate = attotime::from_hz(duart68681->clock) * (16*duart68681->CTR.w.l);
 						attotime rate = attotime::from_hz(2*device->clock()/(2*16*16*duart68681->CTR.w.l));
 						//hz = ATTOSECONDS_TO_HZ(rate.attoseconds);
-						timer_adjust_periodic(duart68681->duart_timer, rate, 0, rate);
+						duart68681->duart_timer->adjust(rate, 0, rate);
 					}
 					break;
 			}
@@ -582,7 +582,7 @@ READ8_DEVICE_HANDLER(duart68681_r)
 		case 0x0f: /* Stop counter command */
 			duart68681->ISR &= ~INT_COUNTER_READY;
 			if (((duart68681->ACR >>4)& 0x07) < 4) // if in counter mode...
-			timer_adjust_oneshot(duart68681->duart_timer, attotime::never, 0); // shut down timer
+			duart68681->duart_timer->adjust(attotime::never); // shut down timer
 			duart68681_update_interrupts(duart68681);
 			break;
 		default:
@@ -783,8 +783,8 @@ static DEVICE_RESET(duart68681)
 		duart68681->duart_config->output_port_write(duart68681->device, duart68681->OPR ^ 0xff);
 
 	// reset timers
-	timer_adjust_oneshot(duart68681->channel[0].tx_timer, attotime::never, 0);
-	timer_adjust_oneshot(duart68681->channel[1].tx_timer, attotime::never, 1);
+	duart68681->channel[0].tx_timer->adjust(attotime::never);
+	duart68681->channel[1].tx_timer->adjust(attotime::never, 1);
 }
 
 /*-------------------------------------------------

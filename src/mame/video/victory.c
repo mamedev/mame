@@ -192,7 +192,7 @@ READ8_HANDLER( victory_video_control_r )
 			// D5 = 5VIRQ
 			// D4 = 5BCIRQ (3B1)
 			// D3 = SL256
-			if (micro.timer_active && timer_timeelapsed(micro.timer) < micro.endtime)
+			if (micro.timer_active && micro.timer->elapsed() < micro.endtime)
 				result |= 0x80;
 			result |= (~fgcoll & 1) << 6;
 			result |= (~vblank_irq & 1) << 5;
@@ -530,13 +530,13 @@ INLINE void count_states(int states)
 
 	if (!micro.timer)
 	{
-		timer_adjust_oneshot(micro.timer, attotime::never, 0);
+		micro.timer->adjust(attotime::never);
 		micro.timer_active = 1;
 		micro.endtime = state_time;
 	}
-	else if (timer_timeelapsed(micro.timer) > micro.endtime)
+	else if (micro.timer->elapsed() > micro.endtime)
 	{
-		timer_adjust_oneshot(micro.timer, attotime::never, 0);
+		micro.timer->adjust(attotime::never);
 		micro.timer_active = 1;
 		micro.endtime = state_time;
 	}

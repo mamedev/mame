@@ -267,7 +267,7 @@ inline void cdp1869_device::update_prd_changed_timer()
 	}
 
 	attotime duration = m_screen->time_until_pos(next_scanline);
-	timer_adjust_oneshot(m_prd_timer, duration, next_state);
+	m_prd_timer->adjust(duration, next_state);
 }
 
 

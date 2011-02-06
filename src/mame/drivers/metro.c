@@ -163,7 +163,7 @@ static IRQ_CALLBACK( metro_irq_callback )
 {
 	metro_state *state = device->machine->driver_data<metro_state>();
 
-	// logerror("%s: irq callback returns %04X\n", cpuexec_describe_context(device->machine), state->irq_vectors[int_level]);
+	// logerror("%s: irq callback returns %04X\n", device->machine->describe_context(), state->irq_vectors[int_level]);
 	return state->irq_vectors[irqline] & 0xff;
 }
 
@@ -281,7 +281,7 @@ static WRITE16_HANDLER( mouja_irq_timer_ctrl_w )
 	metro_state *state = space->machine->driver_data<metro_state>();
 	double freq = 58.0 + (0xff - (data & 0xff)) / 2.2;					/* 0xff=58Hz, 0x80=116Hz? */
 
-	timer_adjust_periodic(state->mouja_irq_timer, attotime::zero, 0, attotime::from_hz(freq));
+	state->mouja_irq_timer->adjust(attotime::zero, 0, attotime::from_hz(freq));
 }
 
 static INTERRUPT_GEN( mouja_interrupt )
@@ -673,7 +673,7 @@ INLINE void blt_write( address_space *space, const int tmap, const offs_t offs, 
 		case 2:	metro_vram_1_w(space, offs, data, mask);	break;
 		case 3:	metro_vram_2_w(space, offs, data, mask);	break;
 	}
-//  logerror("%s : Blitter %X] %04X <- %04X & %04X\n", cpuexec_describe_context(space->machine), tmap, offs, data, mask);
+//  logerror("%s : Blitter %X] %04X <- %04X & %04X\n", space->machine->describe_context(), tmap, offs, data, mask);
 }
 
 

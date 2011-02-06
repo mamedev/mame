@@ -206,7 +206,7 @@ WRITE16_DEVICE_HANDLER( kickgoal_snd_w )
 static WRITE16_DEVICE_HANDLER( actionhw_snd_w )
 {
 	kickgoal_state *state = device->machine->driver_data<kickgoal_state>();
-	logerror("%s: Writing %04x to Sound CPU - mask %04x\n",cpuexec_describe_context(device->machine),data,mem_mask);
+	logerror("%s: Writing %04x to Sound CPU - mask %04x\n",device->machine->describe_context(),data,mem_mask);
 
 	if (!ACCESSING_BITS_0_7)
 		data >>= 8;

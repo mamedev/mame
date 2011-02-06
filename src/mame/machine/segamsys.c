@@ -446,7 +446,7 @@ static void *start_vdp(running_machine *machine, int type)
 /* stop timer and clear ram.. used on megatech when we switch between genesis and sms mode */
 void segae_md_sms_stop_scanline_timer(void)
 {
-	timer_adjust_oneshot(md_sms_vdp->sms_scanline_timer,  attotime::never, 0);
+	md_sms_vdp->sms_scanline_timer->adjust(attotime::never);
 	memset(md_sms_vdp->vram,0x00,0x4000);
 }
 
@@ -1008,7 +1008,7 @@ static TIMER_CALLBACK( sms_scanline_timer_callback )
 	if (chip->sms_scanline_counter<(chip->sms_total_scanlines-1))
 	{
 		chip->sms_scanline_counter++;
-		timer_adjust_oneshot(chip->sms_scanline_timer, attotime::from_hz(chip->sms_framerate * chip->sms_total_scanlines), 0);
+		chip->sms_scanline_timer->adjust(attotime::from_hz(chip->sms_framerate * chip->sms_total_scanlines));
 
 		if (chip->sms_scanline_counter>sms_mode_table[chip->screen_mode].sms2_height)
 		{
@@ -1175,7 +1175,7 @@ static void end_of_frame(running_machine *machine, struct sms_vdp *chip)
 
 	chip->sms_scanline_counter = -1;
 	chip->yscroll = chip->regs[0x9]; // this can't change mid-frame
-	timer_adjust_oneshot(chip->sms_scanline_timer, attotime::zero, 0);
+	chip->sms_scanline_timer->adjust(attotime::zero);
 }
 
 
@@ -1198,7 +1198,7 @@ VIDEO_START(sms)
 
 MACHINE_RESET(sms)
 {
-	timer_adjust_oneshot(md_sms_vdp->sms_scanline_timer, attotime::zero, 0);
+	md_sms_vdp->sms_scanline_timer->adjust(attotime::zero);
 }
 
 
@@ -1234,18 +1234,18 @@ void segae_set_vram_banks(UINT8 data)
 
 MACHINE_RESET(systeme)
 {
-	timer_adjust_oneshot(vdp1->sms_scanline_timer, attotime::zero, 0);
-	timer_adjust_oneshot(vdp2->sms_scanline_timer, attotime::zero, 0);
+	vdp1->sms_scanline_timer->adjust(attotime::zero);
+	vdp2->sms_scanline_timer->adjust(attotime::zero);
 }
 
 MACHINE_RESET(megatech_md_sms)
 {
-	timer_adjust_oneshot(md_sms_vdp->sms_scanline_timer, attotime::zero, 0);
+	md_sms_vdp->sms_scanline_timer->adjust(attotime::zero);
 }
 
 MACHINE_RESET(megatech_bios)
 {
-	timer_adjust_oneshot(vdp1->sms_scanline_timer, attotime::zero, 0);
+	vdp1->sms_scanline_timer->adjust(attotime::zero);
 }
 
 VIDEO_EOF(systeme)

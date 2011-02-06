@@ -128,7 +128,7 @@ static READ8_HANDLER( aquarium_oki_r )
 
 static WRITE8_HANDLER( aquarium_oki_w )
 {
-	logerror("%s:Writing %04x to the OKI M6295\n", cpuexec_describe_context(space->machine), aquarium_snd_bitswap(data));
+	logerror("%s:Writing %04x to the OKI M6295\n", space->machine->describe_context(), aquarium_snd_bitswap(data));
 	okim6295_device *oki = space->machine->device<okim6295_device>("oki");
 	oki->write(*space, offset, (aquarium_snd_bitswap(data)));
 }

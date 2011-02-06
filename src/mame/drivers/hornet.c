@@ -886,7 +886,7 @@ static void sound_irq_callback( running_machine *machine, int irq )
 	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
 
 	cputag_set_input_line(machine, "audiocpu", line, ASSERT_LINE);
-    timer_adjust_oneshot(sound_irq_timer, attotime::from_usec(1), line);
+    sound_irq_timer->adjust(attotime::from_usec(1), line);
 }
 
 static const k056800_interface hornet_k056800_interface =

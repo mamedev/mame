@@ -21,7 +21,7 @@ void eolith_speedup_read(address_space *space)
 {
 	/* for debug */
   //if ((cpu_get_pc(space->cpu)!=eolith_speedup_address) && (eolith_vblank!=1) )
-  //    printf("%s:eolith speedup_read data %02x\n",cpuexec_describe_context(space->machine), eolith_vblank);
+  //    printf("%s:eolith speedup_read data %02x\n",space->machine->describe_context(), eolith_vblank);
 
 	if (cpu_get_pc(space->cpu)==eolith_speedup_address && eolith_vblank==0 && eolith_scanline < eolith_speedup_resume_scanline)
 	{
@@ -90,7 +90,7 @@ INTERRUPT_GEN( eolith_speedup )
 
 	if (eolith_scanline==eolith_speedup_resume_scanline)
 	{
-		cpuexec_trigger(device->machine, 1000);
+		device->machine->scheduler().trigger(1000);
 	}
 
 	if (eolith_scanline==240)

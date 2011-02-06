@@ -20,7 +20,7 @@ INLINE void ATTR_PRINTF( 3, 4 ) verboselog( int n_level, running_machine *machin
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%s: %s", cpuexec_describe_context( machine ), buf );
+		logerror( "%s: %s", machine ->describe_context( ), buf );
 	}
 }
 

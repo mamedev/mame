@@ -1037,7 +1037,7 @@ static void hd63484_command_w(device_t *device, UINT16 cmd)
 #if LOG_COMMANDS
 		int i;
 
-		logerror("%s: HD63484 command %s (%04x) ", cpuexec_describe_context(device->machine), instruction_name[hd63484->fifo[0] >> 10], hd63484->fifo[0]);
+		logerror("%s: HD63484 command %s (%04x) ", device->machine->describe_context(), instruction_name[hd63484->fifo[0] >> 10], hd63484->fifo[0]);
 		for (i = 1; i < hd63484->fifo_counter; i++)
 			logerror("%04x ", hd63484->fifo[i]);
 		logerror("\n");

@@ -73,7 +73,7 @@ WRITE8_DEVICE_HANDLER( warpwarp_sound_w )
          * 0.639 * 15k * 1uF -> 0.9585s
          */
 		attotime period = attotime::from_hz(32768) * 95850 / 100000;
-		timer_adjust_periodic(state->sound_volume_timer, period, 0, period);
+		state->sound_volume_timer->adjust(period, 0, period);
 	}
 	else
 	{
@@ -86,7 +86,7 @@ WRITE8_DEVICE_HANDLER( warpwarp_sound_w )
          */
 		//attotime period = attotime::from_hz(32768) * 702900 / 100000;
 		attotime period = attotime::from_hz(32768) * 191700 / 100000;
-		timer_adjust_periodic(state->sound_volume_timer, period, 0, period);
+		state->sound_volume_timer->adjust(period, 0, period);
 	}
 }
 
@@ -125,7 +125,7 @@ WRITE8_DEVICE_HANDLER( warpwarp_music2_w )
          * ...I'm sure this is off by one number of magnitude :/
          */
 		attotime period = attotime::from_hz(32768) * 95850 / 100000;
-		timer_adjust_periodic(state->music_volume_timer, period, 0, period);
+		state->music_volume_timer->adjust(period, 0, period);
 	}
 	else
 	{
@@ -136,7 +136,7 @@ WRITE8_DEVICE_HANDLER( warpwarp_music2_w )
          */
 		//attotime period = attotime::from_hz(32768) * 3003300 / 100000;
 		attotime period = attotime::from_hz(32768) * 300330 / 100000;
-		timer_adjust_periodic(state->music_volume_timer, period, 0, period);
+		state->music_volume_timer->adjust(period, 0, period);
 	}
 
 }

@@ -146,7 +146,7 @@ static WRITE32_DEVICE_HANDLER( avengrs_eprom_w )
 		//volume control todo
 	}
 	else
-		logerror("%s:  eprom_w %08x mask %08x\n",cpuexec_describe_context(device->machine),data,mem_mask);
+		logerror("%s:  eprom_w %08x mask %08x\n",device->machine->describe_context(),data,mem_mask);
 }
 
 static WRITE32_HANDLER( avengrs_palette_w )

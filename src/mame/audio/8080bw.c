@@ -815,13 +815,13 @@ WRITE8_HANDLER( schaser_sh_port_1_w )
 			if (state->schaser_effect_555_time_remain != attotime::zero)
 			{
 				/* timer re-enabled, use up remaining 555 high time */
-				timer_adjust_oneshot(state->schaser_effect_555_timer, state->schaser_effect_555_time_remain, effect);
+				state->schaser_effect_555_timer->adjust(state->schaser_effect_555_time_remain, effect);
 			}
 			else if (!state->schaser_effect_555_is_low)
 			{
 				/* set 555 high time */
 				attotime new_time = attotime(0, ATTOSECONDS_PER_SECOND * .8873 * schaser_effect_rc[effect]);
-				timer_adjust_oneshot(state->schaser_effect_555_timer, new_time, effect);
+				state->schaser_effect_555_timer->adjust(new_time, effect);
 			}
 		}
 		else
@@ -829,9 +829,9 @@ WRITE8_HANDLER( schaser_sh_port_1_w )
 			/* disable effect - stops at end of low cycle */
 			if (!state->schaser_effect_555_is_low)
 			{
-				state->schaser_effect_555_time_remain = timer_timeleft(state->schaser_effect_555_timer);
+				state->schaser_effect_555_time_remain = state->schaser_effect_555_timer->remaining();
             		state->schaser_effect_555_time_remain_savable = state->schaser_effect_555_time_remain.as_double();
-				timer_adjust_oneshot(state->schaser_effect_555_timer, attotime::never, 0);
+				state->schaser_effect_555_timer->adjust(attotime::never);
 			}
 		}
 		state->schaser_last_effect = effect;
@@ -899,7 +899,7 @@ static TIMER_CALLBACK( schaser_effect_555_cb )
 		else
 			new_time = attotime::never;
 	}
-	timer_adjust_oneshot(state->schaser_effect_555_timer, new_time, effect);
+	state->schaser_effect_555_timer->adjust(new_time, effect);
 	sn76477_enable_w(state->sn, !(state->schaser_effect_555_is_low || state->schaser_explosion));
 	sn76477_one_shot_cap_voltage_w(state->sn, !(state->schaser_effect_555_is_low || state->schaser_explosion) ? 0 : SN76477_EXTERNAL_VOLTAGE_DISCONNECT);
 }
@@ -934,7 +934,7 @@ MACHINE_RESET( schaser_sh )
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	state->schaser_effect_555_is_low = 0;
-	timer_adjust_oneshot(state->schaser_effect_555_timer, attotime::never, 0);
+	state->schaser_effect_555_timer->adjust(attotime::never);
 	schaser_sh_port_1_w(space, 0, 0);
 	schaser_sh_port_2_w(space, 0, 0);
 	state->schaser_effect_555_time_remain = attotime::zero;

@@ -165,7 +165,7 @@ UINT16 via6522_device::get_counter1_value()
 
     if(m_t1_active)
     {
-        val = time_to_cycles(timer_timeleft(m_t1)) - IFR_DELAY;
+        val = time_to_cycles(m_t1->remaining()) - IFR_DELAY;
 	}
     else
     {
@@ -304,7 +304,7 @@ void via6522_device::set_int(int data)
 	m_ifr |= data;
 	if (TRACE_VIA)
     {
-		logerror("%s:6522VIA chip %s: IFR = %02X\n", cpuexec_describe_context(&m_machine), tag(), m_ifr);
+		logerror("%s:6522VIA chip %s: IFR = %02X\n", m_machine.describe_context(), tag(), m_ifr);
     }
 
 	if (m_ier & m_ifr)
@@ -325,7 +325,7 @@ void via6522_device::clear_int(int data)
 
 	if (TRACE_VIA)
     {
-		logerror("%s:6522VIA chip %s: IFR = %02X\n", cpuexec_describe_context(&m_machine), tag(), m_ifr);
+		logerror("%s:6522VIA chip %s: IFR = %02X\n", m_machine.describe_context(), tag(), m_ifr);
     }
 
 	if (m_ifr & m_ier)
@@ -363,9 +363,9 @@ void via6522_device::shift()
 		if (m_shift_counter)
         {
 			if (SO_O2_CONTROL(m_acr)) {
-				timer_adjust_oneshot(m_shift_timer, cycles_to_time(2), 0);
+				m_shift_timer->adjust(cycles_to_time(2));
 			} else {
-				timer_adjust_oneshot(m_shift_timer, cycles_to_time((m_t2ll + 2)*2), 0);
+				m_shift_timer->adjust(cycles_to_time((m_t2ll + 2)*2));
 			}
         }
 		else
@@ -432,7 +432,7 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		        {
 		            m_out_b ^= 0x80;
 		        }
-		        timer_adjust_oneshot(m_t1, cycles_to_time(TIMER1_VALUE + IFR_DELAY), 0);
+		        m_t1->adjust(cycles_to_time(TIMER1_VALUE + IFR_DELAY));
 		    }
 			else
 		    {
@@ -492,7 +492,7 @@ READ8_MEMBER( via6522_device::read )
                 }
 				else
                 {
-					logerror("%s:6522VIA chip %s: Port B is being read but has no handler\n", cpuexec_describe_context(&m_machine), tag());
+					logerror("%s:6522VIA chip %s: Port B is being read but has no handler\n", m_machine.describe_context(), tag());
                 }
 			}
 		}
@@ -522,7 +522,7 @@ READ8_MEMBER( via6522_device::read )
                 }
 				else
                 {
-					logerror("%s:6522VIA chip %s: Port A is being read but has no handler\n", cpuexec_describe_context(&m_machine), tag());
+					logerror("%s:6522VIA chip %s: Port A is being read but has no handler\n", m_machine.describe_context(), tag());
                 }
 			}
 		}
@@ -558,7 +558,7 @@ READ8_MEMBER( via6522_device::read )
             }
 			else
             {
-				logerror("%s:6522VIA chip %s: Port A is being read but has no handler\n", cpuexec_describe_context(&m_machine), tag());
+				logerror("%s:6522VIA chip %s: Port A is being read but has no handler\n", m_machine.describe_context(), tag());
             }
 		}
 
@@ -595,7 +595,7 @@ READ8_MEMBER( via6522_device::read )
 		clear_int(INT_T2);
 		if (m_t2_active)
         {
-			val = time_to_cycles(timer_timeleft(m_t2)) & 0xff;
+			val = time_to_cycles(m_t2->remaining()) & 0xff;
         }
 		else
 		{
@@ -613,7 +613,7 @@ READ8_MEMBER( via6522_device::read )
     case VIA_T2CH:
 		if (m_t2_active)
         {
-			val = time_to_cycles(timer_timeleft(m_t2)) >> 8;
+			val = time_to_cycles(m_t2->remaining()) >> 8;
         }
 		else
 		{
@@ -634,11 +634,11 @@ READ8_MEMBER( via6522_device::read )
 		clear_int(INT_SR);
 		if (SO_O2_CONTROL(m_acr))
 		{
-			timer_adjust_oneshot(m_shift_timer, cycles_to_time(2), 0);
+			m_shift_timer->adjust(cycles_to_time(2));
 		}
 		if (SO_T2_CONTROL(m_acr))
 		{
-			timer_adjust_oneshot(m_shift_timer, cycles_to_time((m_t2ll + 2)*2), 0);
+			m_shift_timer->adjust(cycles_to_time((m_t2ll + 2)*2));
 		}
 		break;
 
@@ -802,7 +802,7 @@ WRITE8_MEMBER( via6522_device::write )
 				devcb_call_write8(&m_out_b_func, 0, write_data);
 			}
 		}
-		timer_adjust_oneshot(m_t1, cycles_to_time(TIMER1_VALUE + IFR_DELAY), 0);
+		m_t1->adjust(cycles_to_time(TIMER1_VALUE + IFR_DELAY));
 		m_t1_active = 1;
 		break;
 
@@ -818,12 +818,12 @@ WRITE8_MEMBER( via6522_device::write )
 
 		if (!T2_COUNT_PB6(m_acr))
 		{
-			timer_adjust_oneshot(m_t2, cycles_to_time(TIMER2_VALUE + IFR_DELAY), 0);
+			m_t2->adjust(cycles_to_time(TIMER2_VALUE + IFR_DELAY));
 			m_t2_active = 1;
 		}
 		else
 		{
-			timer_adjust_oneshot(m_t2, cycles_to_time(TIMER2_VALUE), 0);
+			m_t2->adjust(cycles_to_time(TIMER2_VALUE));
 			m_t2_active = 1;
 			m_time2 = m_machine.time();
 		}
@@ -835,11 +835,11 @@ WRITE8_MEMBER( via6522_device::write )
 		clear_int(INT_SR);
 		if (SO_O2_CONTROL(m_acr))
 		{
-			timer_adjust_oneshot(m_shift_timer, cycles_to_time(2), 0);
+			m_shift_timer->adjust(cycles_to_time(2));
 		}
 		if (SO_T2_CONTROL(m_acr))
 		{
-			timer_adjust_oneshot(m_shift_timer, cycles_to_time((m_t2ll + 2)*2), 0);
+			m_shift_timer->adjust(cycles_to_time((m_t2ll + 2)*2));
 		}
 		break;
 
@@ -848,7 +848,7 @@ WRITE8_MEMBER( via6522_device::write )
 
 		if (TRACE_VIA)
         {
-			logerror("%s:6522VIA chip %s: PCR = %02X\n", cpuexec_describe_context(&m_machine), tag(), data);
+			logerror("%s:6522VIA chip %s: PCR = %02X\n", m_machine.describe_context(), tag(), data);
         }
 
 		if (CA2_FIX_OUTPUT(data) && CA2_OUTPUT_LEVEL(data) ^ m_out_ca2)
@@ -887,7 +887,7 @@ WRITE8_MEMBER( via6522_device::write )
 			}
 			if (T1_CONTINUOUS(data))
 			{
-				timer_adjust_oneshot(m_t1, cycles_to_time(counter1 + IFR_DELAY), 0);
+				m_t1->adjust(cycles_to_time(counter1 + IFR_DELAY));
 				m_t1_active = 1;
 			}
 		}
@@ -942,7 +942,7 @@ WRITE_LINE_MEMBER( via6522_device::write_ca1 )
 	if (state != m_in_ca1)
     {
 		if (TRACE_VIA)
-			logerror("%s:6522VIA chip %s: CA1 = %02X\n", cpuexec_describe_context(&m_machine), tag(), state);
+			logerror("%s:6522VIA chip %s: CA1 = %02X\n", m_machine.describe_context(), tag(), state);
 
 		if ((CA1_LOW_TO_HIGH(m_pcr) && state) || (CA1_HIGH_TO_LOW(m_pcr) && !state))
 		{
@@ -954,7 +954,7 @@ WRITE_LINE_MEMBER( via6522_device::write_ca1 )
                 }
 				else
                 {
-                    logerror("%s:6522VIA chip %s: Port A is being read but has no handler\n", cpuexec_describe_context(&m_machine), tag());
+                    logerror("%s:6522VIA chip %s: Port A is being read but has no handler\n", m_machine.describe_context(), tag());
                 }
 			}
 
@@ -1024,7 +1024,7 @@ WRITE_LINE_MEMBER( via6522_device::write_cb1 )
                 }
 				else
                 {
-                    logerror("%s:6522VIA chip %s: Port B is being read but has no handler\n", cpuexec_describe_context(&m_machine), tag());
+                    logerror("%s:6522VIA chip %s: Port B is being read but has no handler\n", m_machine.describe_context(), tag());
                 }
 			}
 			if (SO_EXT_CONTROL(m_acr) || SI_EXT_CONTROL(m_acr))

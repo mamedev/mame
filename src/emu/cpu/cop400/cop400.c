@@ -887,14 +887,14 @@ static void cop400_init(legacy_cpu_device *device, UINT8 g_mask, UINT8 d_mask, U
 	/* allocate serial timer */
 
 	cpustate->serial_timer = device->machine->scheduler().timer_alloc(FUNC(serial_tick), cpustate);
-	timer_adjust_periodic(cpustate->serial_timer, attotime::zero, 0, attotime::from_hz(device->clock() / 16));
+	cpustate->serial_timer->adjust(attotime::zero, 0, attotime::from_hz(device->clock() / 16));
 
 	/* allocate counter timer */
 
 	if (has_counter)
 	{
 		cpustate->counter_timer = device->machine->scheduler().timer_alloc(FUNC(counter_tick), cpustate);
-		timer_adjust_periodic(cpustate->counter_timer, attotime::zero, 0, attotime::from_hz(device->clock() / 16 / 4));
+		cpustate->counter_timer->adjust(attotime::zero, 0, attotime::from_hz(device->clock() / 16 / 4));
 	}
 
 	/* allocate IN latch timer */
@@ -902,7 +902,7 @@ static void cop400_init(legacy_cpu_device *device, UINT8 g_mask, UINT8 d_mask, U
 	if (has_inil)
 	{
 		cpustate->inil_timer = device->machine->scheduler().timer_alloc(FUNC(inil_tick), cpustate);
-		timer_adjust_periodic(cpustate->inil_timer, attotime::zero, 0, attotime::from_hz(device->clock() / 16));
+		cpustate->inil_timer->adjust(attotime::zero, 0, attotime::from_hz(device->clock() / 16));
 	}
 
 	/* allocate Microbus timer */
@@ -910,7 +910,7 @@ static void cop400_init(legacy_cpu_device *device, UINT8 g_mask, UINT8 d_mask, U
 	if (cpustate->intf->microbus == COP400_MICROBUS_ENABLED)
 	{
 		cpustate->microbus_timer = device->machine->scheduler().timer_alloc(FUNC(microbus_tick), cpustate);
-		timer_adjust_periodic(cpustate->microbus_timer, attotime::zero, 0, attotime::from_hz(device->clock() / 16));
+		cpustate->microbus_timer->adjust(attotime::zero, 0, attotime::from_hz(device->clock() / 16));
 	}
 
 	/* register for state saving */

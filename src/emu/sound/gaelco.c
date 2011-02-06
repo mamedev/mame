@@ -195,7 +195,7 @@ READ16_DEVICE_HANDLER( gaelcosnd_r )
 {
 	gaelco_sound_state *info = get_safe_token(device);
 
-	LOG_READ_WRITES(("%s: (GAE1): read from %04x\n", cpuexec_describe_context(device->machine), offset));
+	LOG_READ_WRITES(("%s: (GAE1): read from %04x\n", device->machine->describe_context(), offset));
 
 	return info->sndregs[offset];
 }
@@ -209,7 +209,7 @@ WRITE16_DEVICE_HANDLER( gaelcosnd_w )
 	gaelco_sound_state *info = get_safe_token(device);
 	gaelco_sound_channel *channel = &info->channel[offset >> 3];
 
-	LOG_READ_WRITES(("%s: (GAE1): write %04x to %04x\n", cpuexec_describe_context(device->machine), data, offset));
+	LOG_READ_WRITES(("%s: (GAE1): write %04x to %04x\n", device->machine->describe_context(), data, offset));
 
 	/* first update the stream to this point in time */
 	info->stream->update();

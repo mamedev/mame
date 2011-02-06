@@ -366,7 +366,7 @@ static int vdp_data_r(running_machine *machine)
 			break;
 
 		default:		/* Illegal read attempt */
-			logerror("%s: VDP illegal read type %02x\n", cpuexec_describe_context(machine), vdp_code);
+			logerror("%s: VDP illegal read type %02x\n", machine->describe_context(), vdp_code);
 			read = 0x00;
 			break;
 	}
@@ -427,7 +427,7 @@ static void vdp_data_w(running_machine *machine, int data)
 			break;
 
 		default:		/* Illegal write attempt */
-			logerror("%s: VDP illegal write type %02x data %04x\n", cpuexec_describe_context(machine), vdp_code, data);
+			logerror("%s: VDP illegal write type %02x data %04x\n", machine->describe_context(), vdp_code, data);
 			break;
 	}
 

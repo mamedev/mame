@@ -21,7 +21,7 @@ VIDEO_START( starfire )
 
 	state->starfire_screen = machine->primary_screen->alloc_compatible_bitmap();
 	state->scanline_timer = machine->scheduler().timer_alloc(FUNC(starfire_scanline_callback));
-	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->time_until_pos(STARFIRE_VBEND), STARFIRE_VBEND);
+	state->scanline_timer->adjust(machine->primary_screen->time_until_pos(STARFIRE_VBEND), STARFIRE_VBEND);
 
     /* register for state saving */
 	state_save_register_global(machine, state->starfire_vidctrl);
@@ -265,7 +265,7 @@ static TIMER_CALLBACK( starfire_scanline_callback )
 
 	y++;
 	if (y >= STARFIRE_VBSTART) y = STARFIRE_VBEND;
-	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->time_until_pos(y), y);
+	state->scanline_timer->adjust(machine->primary_screen->time_until_pos(y), y);
 }
 
 VIDEO_UPDATE( starfire )

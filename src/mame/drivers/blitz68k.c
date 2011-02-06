@@ -451,7 +451,7 @@ static WRITE8_HANDLER( blit_draw_w )
 	int x, y, x_size, y_size;
 	UINT32 src;
 
-	logerror("%s: blit x=%02x y=%02x w=%02x h=%02x addr=%02x%02x%02x pens=%02x %02x %02x %02x flag=%02x %02x %02x %02x - %02x %02x %02x %02x\n", cpuexec_describe_context(space->machine),
+	logerror("%s: blit x=%02x y=%02x w=%02x h=%02x addr=%02x%02x%02x pens=%02x %02x %02x %02x flag=%02x %02x %02x %02x - %02x %02x %02x %02x\n", space->machine->describe_context(),
 				blit.x,  blit.y, blit.w, blit.h,
 				blit.addr[2], blit.addr[1], blit.addr[0],
 				blit.pen[0], blit.pen[1], blit.pen[2], blit.pen[3],
@@ -645,13 +645,13 @@ ADDRESS_MAP_END
 static READ8_HANDLER( bankrob_mcu1_r )
 {
 	UINT8 ret = 0;	// space->machine->rand() gives "interesting" results
-	logerror("%s: mcu1 reads %02x\n", cpuexec_describe_context(space->machine), ret);
+	logerror("%s: mcu1 reads %02x\n", space->machine->describe_context(), ret);
 	return ret;
 }
 static READ8_HANDLER( bankrob_mcu2_r )
 {
 	UINT8 ret = 0;	// space->machine->rand() gives "interesting" results
-	logerror("%s: mcu2 reads %02x\n", cpuexec_describe_context(space->machine), ret);
+	logerror("%s: mcu2 reads %02x\n", space->machine->describe_context(), ret);
 	return ret;
 }
 
@@ -667,11 +667,11 @@ static READ8_HANDLER( bankrob_mcu_status_write_r )
 
 static WRITE8_HANDLER( bankrob_mcu1_w )
 {
-	logerror("%s: mcu1 written with %02x\n", cpuexec_describe_context(space->machine), data);
+	logerror("%s: mcu1 written with %02x\n", space->machine->describe_context(), data);
 }
 static WRITE8_HANDLER( bankrob_mcu2_w )
 {
-	logerror("%s: mcu2 written with %02x\n", cpuexec_describe_context(space->machine), data);
+	logerror("%s: mcu2 written with %02x\n", space->machine->describe_context(), data);
 }
 
 static ADDRESS_MAP_START( bankrob_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -728,13 +728,13 @@ ADDRESS_MAP_END
 static READ8_HANDLER( bankroba_mcu1_r )
 {
 	UINT8 ret = space->machine->rand();	// space->machine->rand() gives "interesting" results
-	logerror("%s: mcu1 reads %02x\n", cpuexec_describe_context(space->machine), ret);
+	logerror("%s: mcu1 reads %02x\n", space->machine->describe_context(), ret);
 	return ret;
 }
 static READ8_HANDLER( bankroba_mcu2_r )
 {
 	UINT8 ret = space->machine->rand();	// space->machine->rand() gives "interesting" results
-	logerror("%s: mcu2 reads %02x\n", cpuexec_describe_context(space->machine), ret);
+	logerror("%s: mcu2 reads %02x\n", space->machine->describe_context(), ret);
 	return ret;
 }
 
@@ -749,11 +749,11 @@ static READ8_HANDLER( bankroba_mcu2_status_write_r )
 
 static WRITE8_HANDLER( bankroba_mcu1_w )
 {
-	logerror("%s: mcu1 written with %02x\n", cpuexec_describe_context(space->machine), data);
+	logerror("%s: mcu1 written with %02x\n", space->machine->describe_context(), data);
 }
 static WRITE8_HANDLER( bankroba_mcu2_w )
 {
-	logerror("%s: mcu2 written with %02x\n", cpuexec_describe_context(space->machine), data);
+	logerror("%s: mcu2 written with %02x\n", space->machine->describe_context(), data);
 }
 
 static ADDRESS_MAP_START( bankroba_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -884,13 +884,13 @@ static WRITE16_DEVICE_HANDLER( crtc_lpen_w )
 static READ16_HANDLER( cjffruit_mcu_r )
 {
 	UINT8 ret = 0x00;	// space->machine->rand() gives "interesting" results
-	logerror("%s: mcu reads %02x\n", cpuexec_describe_context(space->machine), ret);
+	logerror("%s: mcu reads %02x\n", space->machine->describe_context(), ret);
 	return ret << 8;
 }
 
 static WRITE16_HANDLER( cjffruit_mcu_w )
 {
-	logerror("%s: mcu written with %02x\n", cpuexec_describe_context(space->machine),data >> 8);
+	logerror("%s: mcu written with %02x\n", space->machine->describe_context(),data >> 8);
 }
 
 static ADDRESS_MAP_START( cjffruit_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -935,13 +935,13 @@ ADDRESS_MAP_END
 static READ16_HANDLER( deucesw2_mcu_r )
 {
 	UINT8 ret = 0x00;	// space->machine->rand() gives "interesting" results
-	logerror("%s: mcu reads %02x\n", cpuexec_describe_context(space->machine), ret);
+	logerror("%s: mcu reads %02x\n", space->machine->describe_context(), ret);
 	return ret << 8;
 }
 
 static WRITE16_HANDLER( deucesw2_mcu_w )
 {
-	logerror("%s: mcu written with %02x\n", cpuexec_describe_context(space->machine),data >> 8);
+	logerror("%s: mcu written with %02x\n", space->machine->describe_context(),data >> 8);
 }
 
 static WRITE16_HANDLER( deucesw2_leds1_w )
@@ -1031,13 +1031,13 @@ ADDRESS_MAP_END
 static READ8_HANDLER( dualgame_mcu1_r )
 {
 	UINT8 ret = 0;	// space->machine->rand() gives "interesting" results
-	logerror("%s: mcu1 reads %02x\n", cpuexec_describe_context(space->machine), ret);
+	logerror("%s: mcu1 reads %02x\n", space->machine->describe_context(), ret);
 	return ret;
 }
 static READ8_HANDLER( dualgame_mcu2_r )
 {
 	UINT8 ret = 0;	// space->machine->rand() gives "interesting" results
-	logerror("%s: mcu2 reads %02x\n", cpuexec_describe_context(space->machine), ret);
+	logerror("%s: mcu2 reads %02x\n", space->machine->describe_context(), ret);
 	return ret;
 }
 
@@ -1053,11 +1053,11 @@ static READ8_HANDLER( dualgame_mcu_status_write_r )
 
 static WRITE8_HANDLER( dualgame_mcu1_w )
 {
-	logerror("%s: mcu1 written with %02x\n", cpuexec_describe_context(space->machine), data);
+	logerror("%s: mcu1 written with %02x\n", space->machine->describe_context(), data);
 }
 static WRITE8_HANDLER( dualgame_mcu2_w )
 {
-	logerror("%s: mcu2 written with %02x\n", cpuexec_describe_context(space->machine), data);
+	logerror("%s: mcu2 written with %02x\n", space->machine->describe_context(), data);
 }
 
 static ADDRESS_MAP_START( dualgame_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1119,13 +1119,13 @@ ADDRESS_MAP_END
 static READ16_HANDLER( hermit_mcu_r )
 {
 	UINT8 ret = 0x00;	// space->machine->rand() gives "interesting" results
-	logerror("%s: mcu reads %02x\n", cpuexec_describe_context(space->machine), ret);
+	logerror("%s: mcu reads %02x\n", space->machine->describe_context(), ret);
 	return ret << 8;
 }
 
 static WRITE16_HANDLER( hermit_mcu_w )
 {
-	logerror("%s: mcu written with %02x\n", cpuexec_describe_context(space->machine),data >> 8);
+	logerror("%s: mcu written with %02x\n", space->machine->describe_context(),data >> 8);
 }
 
 static WRITE16_HANDLER( hermit_leds1_w )
@@ -1198,13 +1198,13 @@ ADDRESS_MAP_END
 static READ8_HANDLER( maxidbl_mcu1_r )
 {
 	UINT8 ret = 0;	// space->machine->rand() gives "interesting" results
-	logerror("%s: mcu1 reads %02x\n", cpuexec_describe_context(space->machine), ret);
+	logerror("%s: mcu1 reads %02x\n", space->machine->describe_context(), ret);
 	return ret;
 }
 static READ8_HANDLER( maxidbl_mcu2_r )
 {
 	UINT8 ret = 0;	// space->machine->rand() gives "interesting" results
-	logerror("%s: mcu2 reads %02x\n", cpuexec_describe_context(space->machine), ret);
+	logerror("%s: mcu2 reads %02x\n", space->machine->describe_context(), ret);
 	return ret;
 }
 
@@ -1220,11 +1220,11 @@ static READ8_HANDLER( maxidbl_mcu_status_write_r )
 
 static WRITE8_HANDLER( maxidbl_mcu1_w )
 {
-	logerror("%s: mcu1 written with %02x\n", cpuexec_describe_context(space->machine), data);
+	logerror("%s: mcu1 written with %02x\n", space->machine->describe_context(), data);
 }
 static WRITE8_HANDLER( maxidbl_mcu2_w )
 {
-	logerror("%s: mcu2 written with %02x\n", cpuexec_describe_context(space->machine), data);
+	logerror("%s: mcu2 written with %02x\n", space->machine->describe_context(), data);
 }
 
 static ADDRESS_MAP_START( maxidbl_map, ADDRESS_SPACE_PROGRAM, 16 )

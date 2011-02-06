@@ -388,7 +388,7 @@ static void baddudes_i8751_write(running_machine *machine, int data)
 		case 0x75b: i8751_return=0x70f; break;
 	}
 
-	if (!i8751_return) logerror("%s: warning - write unknown command %02x to 8571\n",cpuexec_describe_context(machine),data);
+	if (!i8751_return) logerror("%s: warning - write unknown command %02x to 8571\n",machine->describe_context(),data);
 	cputag_set_input_line(machine, "maincpu", 5, HOLD_LINE);
 }
 
@@ -458,7 +458,7 @@ static void birdtry_i8751_write(running_machine *machine, int data)
 		/*These are activated after a shot (???)*/
 		case 0x6ca: i8751_return = 0xff;      break;
 		case 0x7ff: i8751_return = 0x200;     break;
-		default: logerror("%s: warning - write unknown command %02x to 8571\n",cpuexec_describe_context(machine),data);
+		default: logerror("%s: warning - write unknown command %02x to 8571\n",machine->describe_context(),data);
 	}
 	cputag_set_input_line(machine, "maincpu", 5, HOLD_LINE);
 }
@@ -472,7 +472,7 @@ void dec0_i8751_write(running_machine *machine, int data)
 	if (GAME == 2) baddudes_i8751_write(machine, data);
 	if (GAME == 3) birdtry_i8751_write(machine, data);
 
-	//logerror("%s: warning - write %02x to i8751\n",cpuexec_describe_context(machine),data);
+	//logerror("%s: warning - write %02x to i8751\n",machine->describe_context(),data);
 }
 
 void dec0_i8751_reset(void)

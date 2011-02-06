@@ -55,7 +55,7 @@ WRITE8_HANDLER( docastle_shared0_w )
 
 	if (offset == 8)
 		/* awake the master CPU */
-		cpuexec_trigger(space->machine, 500);
+		space->machine->scheduler().trigger(500);
 }
 
 

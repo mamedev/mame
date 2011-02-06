@@ -54,11 +54,11 @@ static void timer_handler_262(void *param,int timer, attotime period)
 	ymf262_state *info = (ymf262_state *)param;
 	if( period == attotime::zero )
 	{	/* Reset FM Timer */
-		timer_enable(info->timer[timer], 0);
+		info->timer[timer]->enable(false);
 	}
 	else
 	{	/* Start FM Timer */
-		timer_adjust_oneshot(info->timer[timer], period, 0);
+		info->timer[timer]->adjust(period);
 	}
 }
 

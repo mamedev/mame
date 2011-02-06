@@ -123,7 +123,7 @@ static void karnov_i8751_w( running_machine *machine, int data )
 	if (data == 0x401) state->i8751_return = 0x4138; /* ^Whistling wind */
 	if (data == 0x408) state->i8751_return = 0x4276; /* ^Heavy Gates */
 
-//  if (!state->i8751_return && data != 0x300) logerror("%s - Unknown Write %02x intel\n", cpuexec_describe_context(machine), data);
+//  if (!state->i8751_return && data != 0x300) logerror("%s - Unknown Write %02x intel\n", machine->describe_context(), data);
 
 	cpu_set_input_line(state->maincpu, 6, HOLD_LINE); /* Signal main cpu task is complete */
 	state->i8751_needs_ack = 1;
@@ -159,7 +159,7 @@ static void wndrplnt_i8751_w( running_machine *machine, int data )
 			case 0x18:	state->i8751_return = 0x5341; break;
 		}
 	}
-//  else logerror("%s - Unknown Write %02x intel\n", cpuexec_describe_context(machine), data);
+//  else logerror("%s - Unknown Write %02x intel\n", machine->describe_context(), data);
 
 	/* These are 68k function call addresses - different address for each power-up */
 	if (data == 0x400) state->i8751_return = 0x594;
@@ -315,7 +315,7 @@ static void chelnov_i8751_w( running_machine *machine, int data )
 		}
 	}
 
-	//  logerror("%s - Unknown Write %02x intel\n", cpuexec_describe_context(machine), data);
+	//  logerror("%s - Unknown Write %02x intel\n", machine->describe_context(), data);
 
 	cpu_set_input_line(state->maincpu, 6, HOLD_LINE); /* Signal main cpu task is complete */
 	state->i8751_needs_ack = 1;

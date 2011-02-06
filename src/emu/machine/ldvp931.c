@@ -282,7 +282,7 @@ static UINT8 vp931_data_r(laserdisc_state *ld)
 	}
 
 	/* also boost interleave for 4 scanlines to ensure proper communications */
-	cpuexec_boost_interleave(ld->device->machine, attotime::zero, ld->screen->scan_period() * 4);
+	ld->device->machine->scheduler().boost_interleave(attotime::zero, ld->screen->scan_period() * 4);
 	return player->tocontroller;
 }
 
@@ -616,7 +616,7 @@ static WRITE8_HANDLER( to_controller_w )
 		(*player->data_ready_cb)(ld->device, TRUE);
 
 	/* also boost interleave for 4 scanlines to ensure proper communications */
-	cpuexec_boost_interleave(ld->device->machine, attotime::zero, ld->screen->scan_period() * 4);
+	ld->device->machine->scheduler().boost_interleave(attotime::zero, ld->screen->scan_period() * 4);
 }
 
 

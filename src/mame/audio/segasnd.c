@@ -359,7 +359,7 @@ WRITE8_HANDLER( sega_usb_data_w )
 	space->machine->scheduler().synchronize(FUNC(delayed_usb_data_w), data);
 
 	/* boost the interleave so that sequences can be sent */
-	cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(250));
+	space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(250));
 }
 
 

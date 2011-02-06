@@ -424,7 +424,7 @@ static void mess_md_io_write_data_port(running_machine *machine, int portnum, UI
 			if (((megadrive_io_data_regs[portnum] & 0x40) == 0x00) && ((data & 0x40) == 0x40))
 			{
 				mess_io_stage[portnum]++;
-				timer_adjust_oneshot(mess_io_timeout[portnum], machine->device<cpu_device>("maincpu")->cycles_to_attotime(8192), 0);
+				mess_io_timeout[portnum]->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(8192));
 			}
 
 		}

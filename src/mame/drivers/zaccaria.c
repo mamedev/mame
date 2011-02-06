@@ -69,7 +69,7 @@ static WRITE8_DEVICE_HANDLER( zaccaria_dsw_sel_w )
 			break;
 
 		default:
-			logerror("%s: portsel = %02x\n", cpuexec_describe_context(device->machine), data);
+			logerror("%s: portsel = %02x\n", device->machine->describe_context(), data);
 			break;
 	}
 }

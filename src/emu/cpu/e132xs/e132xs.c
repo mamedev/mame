@@ -609,7 +609,7 @@ static void adjust_timer_interrupt(hyperstone_state *cpustate)
 	{
 		UINT64 clocks_until_int = cpustate->tr_clocks_per_tick - (clocks_since_base % cpustate->tr_clocks_per_tick);
 		UINT64 cycles_until_int = (clocks_until_int << cpustate->clock_scale) + cycles_until_next_clock;
-		timer_adjust_oneshot(cpustate->timer, cpustate->device->cycles_to_attotime(cycles_until_int + 1), 1);
+		cpustate->timer->adjust(cpustate->device->cycles_to_attotime(cycles_until_int + 1), 1);
 	}
 
 	/* else if the timer interrupt is enabled, configure it to fire at the appropriate time */
@@ -620,19 +620,19 @@ static void adjust_timer_interrupt(hyperstone_state *cpustate)
 		if (delta > 0x80000000)
 		{
 			if (!cpustate->timer_int_pending)
-				timer_adjust_oneshot(cpustate->timer, attotime::zero, 0);
+				cpustate->timer->adjust(attotime::zero);
 		}
 		else
 		{
 			UINT64 clocks_until_int = mulu_32x32(delta, cpustate->tr_clocks_per_tick);
 			UINT64 cycles_until_int = (clocks_until_int << cpustate->clock_scale) + cycles_until_next_clock;
-			timer_adjust_oneshot(cpustate->timer, cpustate->device->cycles_to_attotime(cycles_until_int), 0);
+			cpustate->timer->adjust(cpustate->device->cycles_to_attotime(cycles_until_int));
 		}
 	}
 
 	/* otherwise, disable the timer */
 	else
-		timer_adjust_oneshot(cpustate->timer, attotime::never, 0);
+		cpustate->timer->adjust(attotime::never);
 }
 
 static TIMER_CALLBACK( e132xs_timer_callback )

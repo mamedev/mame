@@ -372,7 +372,7 @@ MACHINE_START( leland )
 
 MACHINE_RESET( leland )
 {
-	timer_adjust_oneshot(master_int_timer, machine->primary_screen->time_until_pos(8), 8);
+	master_int_timer->adjust(machine->primary_screen->time_until_pos(8), 8);
 
 	/* reset globals */
 	leland_gfx_control = 0x00;
@@ -422,7 +422,7 @@ MACHINE_START( ataxx )
 MACHINE_RESET( ataxx )
 {
 	memset(extra_tram, 0, ATAXX_EXTRA_TRAM_SIZE);
-	timer_adjust_oneshot(master_int_timer, machine->primary_screen->time_until_pos(8), 8);
+	master_int_timer->adjust(machine->primary_screen->time_until_pos(8), 8);
 
 	/* initialize the XROM */
 	xrom_length = machine->region("user1")->bytes();
@@ -471,7 +471,7 @@ static TIMER_CALLBACK( leland_interrupt_callback )
 	scanline += 16;
 	if (scanline > 248)
 		scanline = 8;
-	timer_adjust_oneshot(master_int_timer, machine->primary_screen->time_until_pos(scanline), scanline);
+	master_int_timer->adjust(machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -483,7 +483,7 @@ static TIMER_CALLBACK( ataxx_interrupt_callback )
 	cputag_set_input_line(machine, "master", 0, HOLD_LINE);
 
 	/* set a timer for the next one */
-	timer_adjust_oneshot(master_int_timer, machine->primary_screen->time_until_pos(scanline), scanline);
+	master_int_timer->adjust(machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -598,7 +598,7 @@ void viper_bankswitch(running_machine *machine)
 	address = &master_base[bank_list[alternate_bank & 3]];
 	if (bank_list[alternate_bank & 3] >= master_length)
 	{
-		logerror("%s:Master bank %02X out of range!\n", cpuexec_describe_context(machine), alternate_bank & 3);
+		logerror("%s:Master bank %02X out of range!\n", machine->describe_context(), alternate_bank & 3);
 		address = &master_base[bank_list[0]];
 	}
 	memory_set_bankptr(machine, "bank1", address);
@@ -619,7 +619,7 @@ void offroad_bankswitch(running_machine *machine)
 	address = &master_base[bank_list[alternate_bank & 7]];
 	if (bank_list[alternate_bank & 7] >= master_length)
 	{
-		logerror("%s:Master bank %02X out of range!\n", cpuexec_describe_context(machine), alternate_bank & 7);
+		logerror("%s:Master bank %02X out of range!\n", machine->describe_context(), alternate_bank & 7);
 		address = &master_base[bank_list[0]];
 	}
 	memory_set_bankptr(machine, "bank1", address);
@@ -644,7 +644,7 @@ void ataxx_bankswitch(running_machine *machine)
 	address = &master_base[bank_list[master_bank & 15]];
 	if (bank_list[master_bank & 15] >= master_length)
 	{
-		logerror("%s:Master bank %02X out of range!\n", cpuexec_describe_context(machine), master_bank & 15);
+		logerror("%s:Master bank %02X out of range!\n", machine->describe_context(), master_bank & 15);
 		address = &master_base[bank_list[0]];
 	}
 	memory_set_bankptr(machine, "bank1", address);
@@ -856,14 +856,14 @@ void ataxx_init_eeprom(running_machine *machine, const UINT16 *data)
 READ8_DEVICE_HANDLER( ataxx_eeprom_r )
 {
 	int port = input_port_read(device->machine, "IN2");
-	if (LOG_EEPROM) logerror("%s:EE read\n", cpuexec_describe_context(device->machine));
+	if (LOG_EEPROM) logerror("%s:EE read\n", device->machine->describe_context());
 	return port;
 }
 
 
 WRITE8_DEVICE_HANDLER( ataxx_eeprom_w )
 {
-	if (LOG_EEPROM) logerror("%s:EE write %d%d%d\n", cpuexec_describe_context(device->machine),
+	if (LOG_EEPROM) logerror("%s:EE write %d%d%d\n", device->machine->describe_context(),
 			(data >> 6) & 1, (data >> 5) & 1, (data >> 4) & 1);
 	eeprom_write_bit     (device, (data & 0x10) >> 4);
 	eeprom_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
@@ -957,7 +957,7 @@ static int keycard_r(running_machine *machine)
 {
 	int result = 0;
 
-	if (LOG_KEYCARDS_FULL) logerror("  (%s:keycard_r)\n", cpuexec_describe_context(machine));
+	if (LOG_KEYCARDS_FULL) logerror("  (%s:keycard_r)\n", machine->describe_context());
 
 	/* if we have a valid keycard read state, we're reading from the keycard */
 	if (keycard_state & 0x80)
@@ -981,7 +981,7 @@ static void keycard_w(running_machine *machine, int data)
 	int new_state = data & 0xb0;
 	int new_clock = data & 0x40;
 
-	if (LOG_KEYCARDS_FULL) logerror("  (%s:keycard_w=%02X)\n", cpuexec_describe_context(machine), data);
+	if (LOG_KEYCARDS_FULL) logerror("  (%s:keycard_w=%02X)\n", machine->describe_context(), data);
 
 	/* check for going active */
 	if (!keycard_state && new_state)
@@ -1244,7 +1244,7 @@ WRITE8_HANDLER( ataxx_master_output_w )
 			break;
 
 		case 0x08:	/*  */
-			timer_adjust_oneshot(master_int_timer, space->machine->primary_screen->time_until_pos(data + 1), data + 1);
+			master_int_timer->adjust(space->machine->primary_screen->time_until_pos(data + 1), data + 1);
 			break;
 
 		default:
@@ -1353,7 +1353,7 @@ WRITE8_DEVICE_HANDLER( leland_sound_port_w )
     /* some bankswitching occurs here */
 	if (LOG_BANKSWITCHING_M)
 		if ((sound_port_bank ^ data) & 0x24)
-			logerror("%s:sound_port_bank = %02X\n", cpuexec_describe_context(device->machine), data & 0x24);
+			logerror("%s:sound_port_bank = %02X\n", device->machine->describe_context(), data & 0x24);
     sound_port_bank = data & 0x24;
     (*leland_update_master_bank)(device->machine);
 }

@@ -173,7 +173,7 @@ static void sn_divide(running_machine *machine)
 
 	if (SN74S516.X == 0)
 	{
-		mame_printf_debug("%s:SN74S516 tried to divide by zero\n", cpuexec_describe_context(machine));
+		mame_printf_debug("%s:SN74S516 tried to divide by zero\n", machine->describe_context());
 		SN74S516.ZW.Z = (INT16)0xffff;
 		SN74S516.ZW.W = 0xffff;
 		SN74S516.ZWfl = 0;
@@ -315,7 +315,7 @@ static void kick_sn74s516(running_machine *machine, UINT16 *data, const int ins)
 			if (SN74S516.code == 0x6666)
 			{
 				CLEAR_SEQUENCE;
-				mame_printf_debug("%s:Code 6666: PROMADDR:%x\n", cpuexec_describe_context(machine), math.promaddr);
+				mame_printf_debug("%s:Code 6666: PROMADDR:%x\n", machine->describe_context(), math.promaddr);
 			}
 
 			UPDATE_SEQUENCE;

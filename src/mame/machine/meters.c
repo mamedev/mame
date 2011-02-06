@@ -40,7 +40,7 @@ void MechMtr_config(running_machine *machine, int number)
 		meter_info[i].count     = 0;
 		meter_info[i].on		= 0;
 		meter_info[i].meter_timer = machine->scheduler().timer_alloc(FUNC(meter_callback), (void*)(FPTR)i);
-		timer_reset(meter_info[i].meter_timer, attotime::never);
+		meter_info[i].meter_timer->reset();
 	}
 	number_mtr = number;
 }
@@ -104,12 +104,12 @@ int MechMtr_update(int id, int state)
 	if ( state )
 	{
 		meter_info[id].on =1;
-		timer_adjust_oneshot(meter_info[id].meter_timer, attotime::from_seconds(meter_info[id].reacttime), id);
+		meter_info[id].meter_timer->adjust(attotime::from_seconds(meter_info[id].reacttime), id);
 	}
 	else
 	{
 		meter_info[id].on =0;
-		timer_adjust_oneshot(meter_info[id].meter_timer, attotime::never, id);
+		meter_info[id].meter_timer->adjust(attotime::never, id);
 	}
   }
 

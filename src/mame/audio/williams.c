@@ -674,7 +674,7 @@ void williams_adpcm_data_w(int data)
 	{
 		cpu_set_input_line(sound_cpu, M6809_IRQ_LINE, ASSERT_LINE);
 		williams_sound_int_state = 1;
-		cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(100));
+		space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 	}
 }
 

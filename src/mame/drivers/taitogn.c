@@ -362,7 +362,7 @@ public:
 static void rf5c296_reg_w(ATTR_UNUSED running_machine *machine, UINT8 reg, UINT8 data)
 {
 	taitogn_state *state = machine->driver_data<taitogn_state>();
-	//  fprintf(stderr, "rf5c296_reg_w %02x, %02x (%s)\n", reg, data, cpuexec_describe_context(machine));
+	//  fprintf(stderr, "rf5c296_reg_w %02x, %02x (%s)\n", reg, data, machine->describe_context());
 	switch (reg)
 	{
 		// Interrupt and General Control Register
@@ -383,7 +383,7 @@ static void rf5c296_reg_w(ATTR_UNUSED running_machine *machine, UINT8 reg, UINT8
 
 static UINT8 rf5c296_reg_r(ATTR_UNUSED running_machine *machine, UINT8 reg)
 {
-	//  fprintf(stderr, "rf5c296_reg_r %02x (%s)\n", reg, cpuexec_describe_context(machine));
+	//  fprintf(stderr, "rf5c296_reg_r %02x (%s)\n", reg, machine->describe_context());
 	return 0x00;
 }
 
@@ -586,7 +586,7 @@ static READ32_HANDLER(control_r)
 {
 	taitogn_state *state = space->machine->driver_data<taitogn_state>();
 
-	//      fprintf(stderr, "gn_r %08x @ %08x (%s)\n", 0x1fb00000+4*offset, mem_mask, cpuexec_describe_context(space->machine));
+	//      fprintf(stderr, "gn_r %08x @ %08x (%s)\n", 0x1fb00000+4*offset, mem_mask, space->machine->describe_context());
 	return state->control;
 }
 
@@ -617,7 +617,7 @@ static WRITE32_HANDLER(control_w)
 				control & 0x04 ? 'f' : '-',
 				control & 0x02 ? '1' : '0',
 				control & 0x01 ? '1' : '0',
-				cpuexec_describe_context(space->machine));
+				space->machine->describe_context());
 #endif
 
 	if((p ^ state->control) & 0x04)
@@ -786,7 +786,7 @@ static WRITE32_HANDLER( znsecsel_w )
 			psx_sio_install_handler( space->machine, 0, sio_dip_handler );
 			psx_sio_input( space->machine, 0, PSX_SIO_IN_DSR, 0 );
 
-			timer_adjust_oneshot( state->dip_timer, downcast<cpu_device *>(space->cpu)->cycles_to_attotime( 100 ), 1 );
+			state->dip_timer->adjust( downcast<cpu_device *>(space->cpu)->cycles_to_attotime( 100 ), 1 );
         }
 }
 
@@ -798,7 +798,7 @@ static TIMER_CALLBACK( dip_timer_fired )
 
 	if( param )
 	{
-		timer_adjust_oneshot(state->dip_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime(50), 0);
+		state->dip_timer->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(50));
 	}
 }
 

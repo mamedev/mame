@@ -355,7 +355,7 @@ static void tmaster_draw(running_machine *machine)
 
 #ifdef MAME_DEBUG
 #if 0
-	logerror("%s: blit w %03x, h %02x, x %03x, y %02x, src %06x, fill/addr %04x, repl/color %04x, mode %02x\n", cpuexec_describe_context(machine),
+	logerror("%s: blit w %03x, h %02x, x %03x, y %02x, src %06x, fill/addr %04x, repl/color %04x, mode %02x\n", machine->describe_context(),
 			sw,sh,sx,sy, addr, tmaster_addr, tmaster_color, mode
 	);
 #endif
@@ -380,7 +380,7 @@ static void tmaster_draw(running_machine *machine)
 		case 0x00:							// blit with transparency
 			if (addr > tmaster_gfx_size - sw*sh)
 			{
-				logerror("%s: blit error, addr %06x out of bounds\n", cpuexec_describe_context(machine),addr);
+				logerror("%s: blit error, addr %06x out of bounds\n", machine->describe_context(),addr);
 				addr = tmaster_gfx_size - sw*sh;
 			}
 

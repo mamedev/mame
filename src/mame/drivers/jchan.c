@@ -212,7 +212,7 @@ static void jchan_mcu_run(running_machine *machine)
 	UINT16 mcu_offset  = mcu_ram[0x0012/2] / 2;	/* offset in shared RAM where MCU will write */
 	UINT16 mcu_subcmd  = mcu_ram[0x0014/2];		/* sub-command parameter, happens only for command #4 */
 
-	logerror("%s : MCU executed command: %04X %04X %04X ",cpuexec_describe_context(machine),mcu_command,mcu_offset*2,mcu_subcmd);
+	logerror("%s : MCU executed command: %04X %04X %04X ",machine->describe_context(),mcu_command,mcu_offset*2,mcu_subcmd);
 
 /*
     the only MCU commands found in program code are:
@@ -233,7 +233,7 @@ static void jchan_mcu_run(running_machine *machine)
 		case 0x03:	// DSW
 		{
 			mcu_ram[mcu_offset] = input_port_read(machine, "DSW");
-			logerror("%s : MCU executed command: %04X %04X (read DSW)\n",cpuexec_describe_context(machine),mcu_command,mcu_offset*2);
+			logerror("%s : MCU executed command: %04X %04X (read DSW)\n",machine->describe_context(),mcu_command,mcu_offset*2);
 		}
 		break;
 

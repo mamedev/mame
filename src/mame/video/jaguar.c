@@ -295,7 +295,7 @@ INLINE int adjust_object_timer(running_machine *machine, int vc)
 		return FALSE;
 
 	/* adjust the timer */
-	timer_adjust_oneshot(object_timer, machine->primary_screen->time_until_pos(vc / 2, hdb), vc | (hdb << 16));
+	object_timer->adjust(machine->primary_screen->time_until_pos(vc / 2, hdb), vc | (hdb << 16));
 	return TRUE;
 }
 

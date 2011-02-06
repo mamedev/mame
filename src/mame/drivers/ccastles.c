@@ -148,7 +148,7 @@ INLINE void schedule_next_irq( running_machine *machine, int curscanline )
 			break;
 
 	/* next one at the start of this scanline */
-	timer_adjust_oneshot(state->irq_timer, machine->primary_screen->time_until_pos(curscanline), curscanline);
+	state->irq_timer->adjust(machine->primary_screen->time_until_pos(curscanline), curscanline);
 }
 
 

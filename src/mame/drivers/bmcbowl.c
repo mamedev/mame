@@ -437,7 +437,7 @@ static READ8_DEVICE_HANDLER(dips1_r)
 			case 0x00:	return  input_port_read(device->machine, "IN1");
 			case 0x40:	return  input_port_read(device->machine, "IN2");
 	}
-	logerror("%s:unknown input - %X\n",cpuexec_describe_context(device->machine),bmc_input);
+	logerror("%s:unknown input - %X\n",device->machine->describe_context(),bmc_input);
 	return 0xff;
 }
 

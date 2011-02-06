@@ -586,7 +586,7 @@ READ64_DEVICE_HANDLER( naomibd_r )
 	}
 	else
 	{
-		//mame_printf_verbose("%s:ROM: read mask %" I64FMT "x @ %x\n", cpuexec_describe_context(machine), mem_mask, offset);
+		//mame_printf_verbose("%s:ROM: read mask %" I64FMT "x @ %x\n", machine->describe_context(), mem_mask, offset);
 	}
 
 	return U64(0xffffffffffffffff);
@@ -733,7 +733,7 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 						v->prot_key = data;
 
 						#if NAOMIBD_PRINTF_PROTECTION
-						printf("Protection: set up read @ %x, key %x sum %x (PIO %x DMA %x) [%s]\n", v->prot_offset*2, v->prot_key, v->prot_sum, v->rom_offset, v->dma_offset, cpuexec_describe_context(device->machine));
+						printf("Protection: set up read @ %x, key %x sum %x (PIO %x DMA %x) [%s]\n", v->prot_offset*2, v->prot_key, v->prot_sum, v->rom_offset, v->dma_offset, device->machine->describe_context());
 
 						v->prot_pio_count = 0;
 						#endif
@@ -914,7 +914,7 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 		}
 		break;
 		default:
-			mame_printf_verbose("%s: ROM: write %" I64FMT "x to %x, mask %" I64FMT "x\n", cpuexec_describe_context(device->machine), data, offset, mem_mask);
+			mame_printf_verbose("%s: ROM: write %" I64FMT "x to %x, mask %" I64FMT "x\n", device->machine->describe_context(), data, offset, mem_mask);
 			break;
 	}
 }

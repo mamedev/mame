@@ -309,7 +309,7 @@ static MACHINE_RESET( gottlieb )
 {
 	/* if we have a laserdisc, reset our philips code callback for the next line 17 */
 	if (laserdisc != NULL)
-		timer_adjust_oneshot(laserdisc_philips_timer, machine->primary_screen->time_until_pos(17), 17);
+		laserdisc_philips_timer->adjust(machine->primary_screen->time_until_pos(17), 17);
 }
 
 
@@ -438,7 +438,7 @@ static WRITE8_HANDLER( laserdisc_command_w )
        a sequence of events that sends serial data to the player */
 
 	/* set a timer to clock the bits through; a total of 12 bits are clocked */
-	timer_adjust_oneshot(laserdisc_bit_timer, LASERDISC_CLOCK * 10, (12 << 16) | data);
+	laserdisc_bit_timer->adjust(LASERDISC_CLOCK * 10, (12 << 16) | data);
 
 	/* it also clears bit 4 of the status (will be set when transmission is complete) */
 	laserdisc_status &= ~0x10;
@@ -468,7 +468,7 @@ static TIMER_CALLBACK( laserdisc_philips_callback )
 
 	/* toggle to the next one */
 	param = (param == 17) ? 18 : 17;
-	timer_adjust_oneshot(laserdisc_philips_timer, machine->primary_screen->time_until_pos(param * 2), param);
+	laserdisc_philips_timer->adjust(machine->primary_screen->time_until_pos(param * 2), param);
 }
 
 
@@ -499,7 +499,7 @@ static TIMER_CALLBACK( laserdisc_bit_callback )
 
 	/* if we're not out of bits, set a timer for the next one; else set the ready bit */
 	if (bitsleft-- != 0)
-		timer_adjust_oneshot(laserdisc_bit_timer, duration, (bitsleft << 16) | data);
+		laserdisc_bit_timer->adjust(duration, (bitsleft << 16) | data);
 	else
 		laserdisc_status |= 0x10;
 }

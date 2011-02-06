@@ -77,7 +77,7 @@ static WRITE16_HANDLER( rockn_systemregs_w )
 		if (offset == 0x0c)
 		{
 			attotime timer = ROCKN_TIMER_BASE * (4096 - data);
-			timer_adjust_periodic(rockn_timer_l4, timer, 0, timer);
+			rockn_timer_l4->adjust(timer, 0, timer);
 		}
 	}
 }
@@ -91,7 +91,7 @@ static WRITE16_HANDLER( rocknms_sub_systemregs_w )
 		if (offset == 0x0c)
 		{
 			attotime timer = ROCKN_TIMER_BASE * (4096 - data);
-			timer_adjust_periodic(rockn_timer_sub_l4, timer, 0, timer);
+			rockn_timer_sub_l4->adjust(timer, 0, timer);
 		}
 	}
 }

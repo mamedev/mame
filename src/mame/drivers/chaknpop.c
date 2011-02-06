@@ -18,12 +18,12 @@
 
 static WRITE8_DEVICE_HANDLER ( unknown_port_1_w )
 {
-	//logerror("%s: write to unknow port 1: 0x%02x\n", cpuexec_describe_context(device->machine), data);
+	//logerror("%s: write to unknow port 1: 0x%02x\n", device->machine->describe_context(), data);
 }
 
 static WRITE8_DEVICE_HANDLER ( unknown_port_2_w )
 {
-	//logerror("%s: write to unknow port 2: 0x%02x\n", cpuexec_describe_context(device->machine), data);
+	//logerror("%s: write to unknow port 2: 0x%02x\n", device->machine->describe_context(), data);
 }
 
 static WRITE8_HANDLER ( coinlock_w )

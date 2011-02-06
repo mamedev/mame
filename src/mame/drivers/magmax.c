@@ -77,7 +77,7 @@ static TIMER_CALLBACK( scanline_callback )
 	scanline += 128;
 	scanline &= 255;
 
-	timer_adjust_oneshot(interrupt_timer, machine->primary_screen->time_until_pos(scanline), scanline);
+	interrupt_timer->adjust(machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 static MACHINE_START( magmax )
@@ -94,7 +94,7 @@ static MACHINE_START( magmax )
 
 static MACHINE_RESET( magmax )
 {
-	timer_adjust_oneshot(interrupt_timer, machine->primary_screen->time_until_pos(64), 64);
+	interrupt_timer->adjust(machine->primary_screen->time_until_pos(64), 64);
 
 #if 0
 	{

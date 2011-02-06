@@ -44,7 +44,7 @@ static TIMER_CALLBACK( pitnrun_mcu_real_data_w )
 WRITE8_HANDLER( pitnrun_mcu_data_w )
 {
 	space->machine->scheduler().synchronize(FUNC(pitnrun_mcu_real_data_w), data);
-	cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(5));
+	space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(5));
 }
 
 READ8_HANDLER( pitnrun_mcu_status_r )

@@ -89,13 +89,13 @@ static void timer_handler(void *param,int c,int count,int clock)
 	ym2203_state *info = (ym2203_state *)param;
 	if( count == 0 )
 	{	/* Reset FM Timer */
-		timer_enable(info->timer[c], 0);
+		info->timer[c]->enable(false);
 	}
 	else
 	{	/* Start FM Timer */
 		attotime period = attotime::from_hz(clock) * count;
-		if (!timer_enable(info->timer[c], 1))
-			timer_adjust_oneshot(info->timer[c], period, 0);
+		if (!info->timer[c]->enable(true))
+			info->timer[c]->adjust(period);
 	}
 }
 

@@ -1652,7 +1652,7 @@ INLINE int decode_reg32_64(running_machine *machine, UINT32 offset, UINT64 mem_m
 	// non 32-bit accesses have not yet been seen here, we need to know when they are
 	if ((mem_mask != U64(0xffffffff00000000)) && (mem_mask != U64(0x00000000ffffffff)))
 	{
-		mame_printf_verbose("%s:Wrong mask!\n", cpuexec_describe_context(machine));
+		mame_printf_verbose("%s:Wrong mask!\n", machine->describe_context());
 //      debugger_break(machine);
 	}
 

@@ -686,7 +686,7 @@ INLINE void log_blit( running_machine *machine, int data )
 
 #if 1
 	logerror("%s: blit src %06x x %03x y %03x flags %02x layer %02x pen %02x penmode %02x w %03x h %03x linelen %03x flip %02x clip: ctrl %x xy %03x %03x wh %03x %03x\n",
-			cpuexec_describe_context(machine),
+			machine->describe_context(),
 			state->ddenlovr_blit_address, state->ddenlovr_blit_x, state->ddenlovr_blit_y, data,
 			state->ddenlovr_dest_layer, state->ddenlovr_blit_pen, state->ddenlovr_blit_pen_mode, state->ddenlovr_rect_width, state->ddenlovr_rect_height, state->ddenlovr_line_length, state->ddenlovr_blit_flip,
 			state->ddenlovr_clip_ctrl, state->ddenlovr_clip_x, state->ddenlovr_clip_y, state->ddenlovr_clip_width, state->ddenlovr_clip_height);
@@ -994,7 +994,7 @@ g_profiler.start(PROFILER_VIDEO);
 							;
 				#ifdef MAME_DEBUG
 					popmessage("unknown blitter command %02x", data);
-					logerror("%s: unknown blitter command %02x\n", cpuexec_describe_context(machine), data);
+					logerror("%s: unknown blitter command %02x\n", machine->describe_context(), data);
 				#endif
 			}
 
@@ -1002,7 +1002,7 @@ g_profiler.start(PROFILER_VIDEO);
 			break;
 
 		default:
-			logerror("%s: Blitter %d reg %02x = %02x\n", cpuexec_describe_context(machine), blitter, state->ddenlovr_blit_regs[blitter], data);
+			logerror("%s: Blitter %d reg %02x = %02x\n", machine->describe_context(), blitter, state->ddenlovr_blit_regs[blitter], data);
 			break;
 		}
 	}
@@ -2653,7 +2653,7 @@ static void mjchuuka_get_romdata(running_machine *machine)
 
 	if (address >= size)
 	{
-		logerror("%s: Error, Blitter address %06X out of range\n", cpuexec_describe_context(machine), address);
+		logerror("%s: Error, Blitter address %06X out of range\n", machine->describe_context(), address);
 		address %= size;
 	}
 
@@ -2919,7 +2919,7 @@ static READ8_DEVICE_HANDLER( hginga_dsw_r )
 	if (!BIT(state->dsw_sel, 3))   return input_port_read(device->machine, "DSW1");
 	if (!BIT(state->dsw_sel, 4))   return input_port_read(device->machine, "DSW5");
 
-	logerror("%s: warning, unknown bits read, ddenlovr_select = %02x\n", cpuexec_describe_context(device->machine), state->dsw_sel);
+	logerror("%s: warning, unknown bits read, ddenlovr_select = %02x\n", device->machine->describe_context(), state->dsw_sel);
 	return 0xff;
 }
 

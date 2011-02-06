@@ -118,7 +118,7 @@ static void execute_blit(running_machine *machine)
 	static FILE *f;
 
 	logerror("%s:Blit from %06X to (%d,%d) %dx%d -- %04X %04X %04X %04X %04X %04X %04X %04X\n",
-				cpuexec_describe_context(machine), offset, x, y, w, h,
+				machine->describe_context(), offset, x, y, w, h,
 				blitter_data[0], blitter_data[1],
 				blitter_data[2], blitter_data[3],
 				blitter_data[4], blitter_data[5],
@@ -136,7 +136,7 @@ static void execute_blit(running_machine *machine)
 
 		fprintf(f, "----------------------\n"
 				   "%s:Blit from %06X to (%d,%d) %dx%d -- %04X %04X %04X %04X %04X %04X %04X %04X\n",
-					cpuexec_describe_context(machine), offset, x, y, w, h,
+					machine->describe_context(), offset, x, y, w, h,
 					blitter_data[0], blitter_data[1],
 					blitter_data[2], blitter_data[3],
 					blitter_data[4], blitter_data[5],

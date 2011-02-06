@@ -2354,7 +2354,7 @@ static void t90_start_timer(t90_Regs *cpustate, int i)
 
 	period = cpustate->timer_period * prescaler;
 
-	timer_adjust_periodic(cpustate->timer[i], period, i, period);
+	cpustate->timer[i]->adjust(period, i, period);
 
 	logerror("%04X: CPU Timer %d started at %lf Hz\n", cpustate->pc.w.l, i, 1.0 / period.as_double());
 }
@@ -2376,7 +2376,7 @@ static void t90_start_timer4(t90_Regs *cpustate)
 
 	period = cpustate->timer_period * prescaler;
 
-	timer_adjust_periodic(cpustate->timer[4], period, 4, period);
+	cpustate->timer[4]->adjust(period, 4, period);
 
 	logerror("%04X: CPU Timer 4 started at %lf Hz\n", cpustate->pc.w.l, 1.0 / period.as_double());
 }
@@ -2384,7 +2384,7 @@ static void t90_start_timer4(t90_Regs *cpustate)
 
 static void t90_stop_timer(t90_Regs *cpustate, int i)
 {
-	timer_adjust_oneshot(cpustate->timer[i], attotime::never, i);
+	cpustate->timer[i]->adjust(attotime::never, i);
 	logerror("%04X: CPU Timer %d stopped\n", cpustate->pc.w.l, i);
 }
 

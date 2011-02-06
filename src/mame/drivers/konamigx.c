@@ -606,7 +606,7 @@ static WRITE32_HANDLER( ccu_w )
 static TIMER_CALLBACK( dmaend_callback )
 {
 	// foul-proof (CPU0 could be deactivated while we wait)
-	if (resume_trigger && suspension_active) { suspension_active = 0; cpuexec_trigger(machine, resume_trigger); }
+	if (resume_trigger && suspension_active) { suspension_active = 0; machine->scheduler().trigger(resume_trigger); }
 
 	// DMA busy flag must be cleared before triggering IRQ 3
 	gx_rdport1_3 &= ~2;
@@ -635,14 +635,14 @@ static void dmastart_callback(int data)
 	}
 
 	// simulate DMA delay
-	timer_adjust_oneshot(dmadelay_timer, attotime::from_usec(120), 0);
+	dmadelay_timer->adjust(attotime::from_usec(120));
 }
 
 
 static INTERRUPT_GEN(konamigx_vbinterrupt)
 {
 	// lift idle suspension
-	if (resume_trigger && suspension_active) { suspension_active = 0; cpuexec_trigger(device->machine, resume_trigger); }
+	if (resume_trigger && suspension_active) { suspension_active = 0; device->machine->scheduler().trigger(resume_trigger); }
 
 	// IRQ 1 is the main 60hz vblank interrupt
 	if (gx_syncen & 0x20)
@@ -662,7 +662,7 @@ static INTERRUPT_GEN(konamigx_vbinterrupt)
 static INTERRUPT_GEN(konamigx_vbinterrupt_type4)
 {
 	// lift idle suspension
-	if (resume_trigger && suspension_active) { suspension_active = 0; cpuexec_trigger(device->machine, resume_trigger); }
+	if (resume_trigger && suspension_active) { suspension_active = 0; device->machine->scheduler().trigger(resume_trigger); }
 
 	// IRQ 1 is the main 60hz vblank interrupt
 	// the gx_syncen & 0x20 test doesn't work on type 3 or 4 ROM boards, likely because the ROM board

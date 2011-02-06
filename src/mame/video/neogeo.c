@@ -236,7 +236,7 @@ static TIMER_CALLBACK( auto_animation_timer_callback )
 	else
 		state->auto_animation_frame_counter = state->auto_animation_frame_counter - 1;
 
-	timer_adjust_oneshot(state->auto_animation_timer, machine->primary_screen->time_until_pos(NEOGEO_VSSTART), 0);
+	state->auto_animation_timer->adjust(machine->primary_screen->time_until_pos(NEOGEO_VSSTART));
 }
 
 
@@ -250,7 +250,7 @@ static void create_auto_animation_timer( running_machine *machine )
 static void start_auto_animation_timer( running_machine *machine )
 {
 	neogeo_state *state = machine->driver_data<neogeo_state>();
-	timer_adjust_oneshot(state->auto_animation_timer, machine->primary_screen->time_until_pos(NEOGEO_VSSTART), 0);
+	state->auto_animation_timer->adjust(machine->primary_screen->time_until_pos(NEOGEO_VSSTART));
 }
 
 
@@ -657,7 +657,7 @@ static TIMER_CALLBACK( sprite_line_timer_callback )
 	/* let's come back at the beginning of the next line */
 	scanline = (scanline + 1) % NEOGEO_VTOTAL;
 
-	timer_adjust_oneshot(state->sprite_line_timer, machine->primary_screen->time_until_pos(scanline), scanline);
+	state->sprite_line_timer->adjust(machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -671,7 +671,7 @@ static void create_sprite_line_timer( running_machine *machine )
 static void start_sprite_line_timer( running_machine *machine )
 {
 	neogeo_state *state = machine->driver_data<neogeo_state>();
-	timer_adjust_oneshot(state->sprite_line_timer, machine->primary_screen->time_until_pos(0), 0);
+	state->sprite_line_timer->adjust(machine->primary_screen->time_until_pos(0));
 }
 
 
@@ -775,7 +775,7 @@ static UINT16 get_video_control( running_machine *machine )
 
 	ret = (v_counter << 7) | (neogeo_get_auto_animation_counter(machine) & 0x0007);
 
-	if (VERBOSE) logerror("%s: video_control read (%04x)\n", cpuexec_describe_context(machine), ret);
+	if (VERBOSE) logerror("%s: video_control read (%04x)\n", machine->describe_context(), ret);
 
 	return ret;
 }
@@ -784,7 +784,7 @@ static UINT16 get_video_control( running_machine *machine )
 static void set_video_control( running_machine *machine, UINT16 data )
 {
 	/* this does much more than this, but I'm not sure exactly what */
-	if (VERBOSE) logerror("%s: video control write %04x\n", cpuexec_describe_context(machine), data);
+	if (VERBOSE) logerror("%s: video control write %04x\n", machine->describe_context(), data);
 
 	set_auto_animation_speed(machine, data >> 8);
 	set_auto_animation_disabled(machine, data & 0x0008);

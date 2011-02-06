@@ -70,7 +70,7 @@ static WRITE8_DEVICE_HANDLER( ppi0_portc_w )
 
 static READ8_DEVICE_HANDLER( ppi0_portc_r )
 {
-//  popmessage("%s",cpuexec_describe_context(device->machine));
+//  popmessage("%s",device->machine->describe_context());
 	return (~(eeprom_read_bit(device)<<1) & 2);
 }
 

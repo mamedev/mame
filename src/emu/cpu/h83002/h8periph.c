@@ -42,7 +42,7 @@ extern void h8_3002_InterruptRequest(h83xx_state *h8, UINT8 source, UINT8 state)
 
 static void h8itu_timer_expire(h83xx_state *h8, int which)
 {
-	timer_adjust_oneshot(h8->timer[which], attotime::never, 0);
+	h8->timer[which]->adjust(attotime::never);
 	h8->h8TCNT[which] = 0;
 	h8->per_regs[tsr[which]] |= 4;
 	// interrupt on overflow ?
@@ -103,7 +103,7 @@ static void h8_itu_refresh_timer(h83xx_state *h8, int tnum)
 		logerror("H8/3002: Timer %d is using an external clock.  Unsupported!\n", tnum);
 	}
 
-	timer_adjust_oneshot(h8->timer[tnum], period, 0);
+	h8->timer[tnum]->adjust(period);
 }
 
 static void h8_itu_sync_timers(h83xx_state *h8, int tnum)
@@ -116,7 +116,7 @@ static void h8_itu_sync_timers(h83xx_state *h8, int tnum)
 
 	// get the time per unit
 	cycle_time = attotime::from_hz(h8->device->unscaled_clock()) * tscales[ourTCR & 3];
-	cur = timer_timeelapsed(h8->timer[tnum]);
+	cur = h8->timer[tnum]->elapsed();
 
 	ratio = cur.as_double() / cycle_time.as_double();
 
@@ -464,7 +464,7 @@ static void h8_3007_itu_refresh_timer(h83xx_state *h8, int tnum)
 		logerror("H8/3007: Timer %d is using an external clock.  Unsupported!\n", tnum);
 	}
 
-	timer_adjust_oneshot(h8->timer[tnum], period, 0);
+	h8->timer[tnum]->adjust(period);
 }
 
 static void h8itu_3007_timer_expire(h83xx_state *h8, int tnum)
@@ -489,7 +489,7 @@ static void h8itu_3007_timer_expire(h83xx_state *h8, int tnum)
 		else
 		{
 			//logerror("h8/3007 timer %d GRA match, stopping\n",tnum);
-			timer_adjust_oneshot(h8->timer[tnum], attotime::never, 0);
+			h8->timer[tnum]->adjust(attotime::never);
 		}
 
 		h8->per_regs[0x64] |= 1<<tnum;
@@ -511,7 +511,7 @@ static void h8itu_3007_timer_expire(h83xx_state *h8, int tnum)
 		else
 		{
 			//logerror("h8/3007 timer %d GRB match, stopping\n",tnum);
-			timer_adjust_oneshot(h8->timer[tnum], attotime::never, 0);
+			h8->timer[tnum]->adjust(attotime::never);
 		}
 
 		h8->per_regs[0x65] |= 1<<tnum;
@@ -790,5 +790,5 @@ void h8_itu_reset(h83xx_state *h8)
 
 	// stop all the timers
 	for (i=0; i<5; i++)
-		timer_adjust_oneshot(h8->timer[i], attotime::never, 0);
+		h8->timer[i]->adjust(attotime::never);
 }

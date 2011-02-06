@@ -238,7 +238,7 @@ static TIMER_CALLBACK( music_playback )
 			state->track = 0;
 			state->melody = 0;
 			state->bar = 0;
-			timer_enable(state->music_timer,0);
+			state->music_timer->enable(false);
 		}
 		if (pattern) {
 			logerror("Changing bar in music track to pattern %02x\n",pattern);
@@ -270,7 +270,7 @@ static void sslam_play(device_t *device, int track, int data)
 					oki->write_command(0x40);
 				oki->write_command((0x80 | data));
 				oki->write_command(0x81);
-				timer_adjust_periodic(state->music_timer, attotime::from_msec(4), 0, attotime::from_hz(250));	/* 250Hz for smooth sequencing */
+				state->music_timer->adjust(attotime::from_msec(4), 0, attotime::from_hz(250));	/* 250Hz for smooth sequencing */
 			}
 		}
 		else {
@@ -290,7 +290,7 @@ static void sslam_play(device_t *device, int track, int data)
 	}
 	else {		/* use above 0x80 to turn off channels */
 		if (track) {
-			timer_enable(state->music_timer,0);
+			state->music_timer->enable(false);
 			state->track = 0;
 			state->melody = 0;
 			state->bar = 0;
@@ -306,7 +306,7 @@ static WRITE16_DEVICE_HANDLER( sslam_snd_w )
 	{
 		sslam_state *state = device->machine->driver_data<sslam_state>();
 
-		logerror("%s Writing %04x to Sound CPU\n",cpuexec_describe_context(device->machine),data);
+		logerror("%s Writing %04x to Sound CPU\n",device->machine->describe_context(),data);
 		if (data >= 0x40) {
 			if (data == 0xfe) {
 				/* This should reset the sound MCU and stop audio playback, but here, it */

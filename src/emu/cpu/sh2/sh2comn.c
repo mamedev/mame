@@ -73,7 +73,7 @@ static void sh2_timer_activate(sh2_state *sh2)
 	int max_delta = 0xfffff;
 	UINT16 frc;
 
-	timer_adjust_oneshot(sh2->timer, attotime::never, 0);
+	sh2->timer->adjust(attotime::never);
 
 	frc = sh2->frc;
 	if(!(sh2->m[4] & OCFA)) {
@@ -99,7 +99,7 @@ static void sh2_timer_activate(sh2_state *sh2)
 		if(divider) {
 			max_delta <<= divider;
 			sh2->frc_base = sh2->device->total_cycles();
-			timer_adjust_oneshot(sh2->timer, sh2->device->cycles_to_attotime(max_delta), 0);
+			sh2->timer->adjust(sh2->device->cycles_to_attotime(max_delta));
 		} else {
 			logerror("SH2.%s: Timer event in %d cycles of external clock", sh2->device->tag(), max_delta);
 		}
@@ -172,7 +172,7 @@ void sh2_notify_dma_data_available(device_t *device)
 		{
 		//  printf("resuming stalled dma\n");
 			sh2->dma_timer_active[dma]=1;
-			timer_adjust_oneshot(sh2->dma_current_active_timer[dma], attotime::zero, dma);
+			sh2->dma_current_active_timer[dma]->adjust(attotime::zero, dma);
 		}
 	}
 
@@ -221,7 +221,7 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 
 				#ifdef USE_TIMER_FOR_DMA
 				 //schedule next DMA callback
-				timer_adjust_oneshot(sh2->dma_current_active_timer[dma], sh2->device->cycles_to_attotime(2), dma);
+				sh2->dma_current_active_timer[dma]->adjust(sh2->device->cycles_to_attotime(2), dma);
 				#endif
 
 
@@ -269,7 +269,7 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 
 				#ifdef USE_TIMER_FOR_DMA
 				 //schedule next DMA callback
-				timer_adjust_oneshot(sh2->dma_current_active_timer[dma], sh2->device->cycles_to_attotime(2), dma);
+				sh2->dma_current_active_timer[dma]->adjust(sh2->device->cycles_to_attotime(2), dma);
 				#endif
 
 				// check: should this really be using read_word_32 / write_word_32?
@@ -316,7 +316,7 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 
 				#ifdef USE_TIMER_FOR_DMA
 				 //schedule next DMA callback
-				timer_adjust_oneshot(sh2->dma_current_active_timer[dma], sh2->device->cycles_to_attotime(2), dma);
+				sh2->dma_current_active_timer[dma]->adjust(sh2->device->cycles_to_attotime(2), dma);
 				#endif
 
 				dmadata	= sh2->program->read_dword(tempsrc);
@@ -361,7 +361,7 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 
 				#ifdef USE_TIMER_FOR_DMA
 				 //schedule next DMA callback
-				timer_adjust_oneshot(sh2->dma_current_active_timer[dma], sh2->device->cycles_to_attotime(2), dma);
+				sh2->dma_current_active_timer[dma]->adjust(sh2->device->cycles_to_attotime(2), dma);
 				#endif
 
 				dmadata = sh2->program->read_dword(tempsrc);
@@ -483,7 +483,7 @@ static void sh2_dmac_check(sh2_state *sh2, int dma)
 				sh2->device->suspend(SUSPEND_REASON_HALT, 1 );
 			}
 
-			timer_adjust_oneshot(sh2->dma_current_active_timer[dma], sh2->device->cycles_to_attotime(2), dma);
+			sh2->dma_current_active_timer[dma]->adjust(sh2->device->cycles_to_attotime(2), dma);
 #endif
 
 		}
@@ -493,8 +493,8 @@ static void sh2_dmac_check(sh2_state *sh2, int dma)
 		if(sh2->dma_timer_active[dma])
 		{
 			logerror("SH2: DMA %d cancelled in-flight\n", dma);
-			//timer_adjust_oneshot(sh2->dma_complete_timer[dma], attotime::never, 0);
-			timer_adjust_oneshot(sh2->dma_current_active_timer[dma], attotime::never, 0);
+			//sh2->dma_complete_timer[dma]->adjust(attotime::never);
+			sh2->dma_current_active_timer[dma]->adjust(attotime::never);
 
 			sh2->dma_timer_active[dma] = 0;
 		}
@@ -924,13 +924,13 @@ void sh2_common_init(sh2_state *sh2, legacy_cpu_device *device, device_irq_callb
 	int i;
 
 	sh2->timer = device->machine->scheduler().timer_alloc(FUNC(sh2_timer_callback), sh2);
-	timer_adjust_oneshot(sh2->timer, attotime::never, 0);
+	sh2->timer->adjust(attotime::never);
 
 	sh2->dma_current_active_timer[0] = device->machine->scheduler().timer_alloc(FUNC(sh2_dma_current_active_callback), sh2);
-	timer_adjust_oneshot(sh2->dma_current_active_timer[0], attotime::never, 0);
+	sh2->dma_current_active_timer[0]->adjust(attotime::never);
 
 	sh2->dma_current_active_timer[1] = device->machine->scheduler().timer_alloc(FUNC(sh2_dma_current_active_callback), sh2);
-	timer_adjust_oneshot(sh2->dma_current_active_timer[1], attotime::never, 0);
+	sh2->dma_current_active_timer[1]->adjust(attotime::never);
 
 
 	sh2->m = auto_alloc_array(device->machine, UINT32, 0x200/4);

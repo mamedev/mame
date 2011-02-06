@@ -430,7 +430,7 @@ static void sp_set_status(device_t *device, UINT32 status)
 {
 	if (status & 0x1)
 	{
-		//cpuexec_trigger(device->machine, 6789);
+		//device->machine->scheduler().trigger(6789);
 
 		cpu_set_input_line(device, INPUT_LINE_HALT, ASSERT_LINE);
         cpu_set_reg(device, RSP_SR, cpu_get_reg(device, RSP_SR) | RSP_STATUS_HALT);
@@ -1125,7 +1125,7 @@ static void start_audio_dma(running_machine *machine)
 
    // adjust the timer
    period = attotime::from_hz(DACRATE_NTSC) * ((ai_dacrate + 1) * (current->length / 4));
-   timer_adjust_oneshot(audio_timer, period, 0);
+   audio_timer->adjust(period);
 }
 
 static TIMER_CALLBACK( audio_timer_callback )
@@ -1156,7 +1156,7 @@ READ32_HANDLER( n64_ai_reg_r )
             }
             else if (ai_status & 0x40000000)
             {
-                double secs_left = (timer_firetime(audio_timer) - space->machine->time()).as_double();
+                double secs_left = (audio_timer->expire() - space->machine->time()).as_double();
                 unsigned int samples_left = secs_left * DACRATE_NTSC / (ai_dacrate + 1);
                 return samples_left * 4;
             }
@@ -2077,7 +2077,7 @@ MACHINE_RESET( n64 )
 
 	cic_status = 0;
 
-	timer_adjust_oneshot(audio_timer, attotime::never, 0);
+	audio_timer->adjust(attotime::never);
 
 	cputag_set_input_line(machine, "rsp", INPUT_LINE_HALT, ASSERT_LINE);
 

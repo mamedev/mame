@@ -142,7 +142,7 @@ static void start_mono_flop( device_t *sn, int n, attotime expire )
 
 	update_SN76477_status(sn);
 
-	timer_adjust_oneshot(state->sound_timer[n], expire, n);
+	state->sound_timer[n]->adjust(expire, n);
 }
 
 
@@ -153,7 +153,7 @@ static void stop_mono_flop( device_t *sn, int n )
 
 	update_SN76477_status(sn);
 
-	timer_adjust_oneshot(state->sound_timer[n], attotime::never, n);
+	state->sound_timer[n]->adjust(attotime::never, n);
 }
 
 
@@ -443,7 +443,7 @@ static TIMER_DEVICE_CALLBACK( spacefev_vco_voltage_timer )
 
 	if (state->mono_flop[2])
 	{
-		voltage = 5 * (1 - exp(- timer_timeelapsed(state->sound_timer[2]).as_double() / 0.22));
+		voltage = 5 * (1 - exp(- state->sound_timer[2]->elapsed().as_double() / 0.22));
 	}
 
 	sn76477_vco_voltage_w(sn, voltage);

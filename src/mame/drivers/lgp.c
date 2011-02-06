@@ -329,7 +329,7 @@ static INTERRUPT_GEN( vblank_callback_lgp )
 
 	// IRQ
 	cpu_set_input_line(device, 0, ASSERT_LINE);
-	timer_adjust_oneshot(irq_timer, attotime::from_usec(50), 0);
+	irq_timer->adjust(attotime::from_usec(50));
 }
 
 

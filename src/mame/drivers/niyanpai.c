@@ -107,7 +107,7 @@ static READ8_HANDLER( tmpz84c011_pio_r )
 			break;
 
 		default:
-			logerror("%s: TMPZ84C011_PIO Unknown Port Read %02X\n", cpuexec_describe_context(space->machine), offset);
+			logerror("%s: TMPZ84C011_PIO Unknown Port Read %02X\n", space->machine->describe_context(), offset);
 			portdata = 0xff;
 			break;
 	}
@@ -135,7 +135,7 @@ static WRITE8_HANDLER( tmpz84c011_pio_w)
 			break;
 
 		default:
-			logerror("%s: TMPZ84C011_PIO Unknown Port Write %02X, %02X\n", cpuexec_describe_context(space->machine), offset, data);
+			logerror("%s: TMPZ84C011_PIO Unknown Port Write %02X, %02X\n", space->machine->describe_context(), offset, data);
 			break;
 	}
 }

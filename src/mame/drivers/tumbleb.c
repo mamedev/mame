@@ -785,7 +785,7 @@ static WRITE16_HANDLER( semicom_soundcmd_w )
 		soundlatch_w(space, 0, data & 0xff);
 		// needed for Super Trio which reads the sound with polling
 		// cpu_spinuntil_time(space->cpu, attotime::from_usec(100));
-		cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(20));
+		space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
 
 	}
 }

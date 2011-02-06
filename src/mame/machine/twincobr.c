@@ -220,7 +220,7 @@ static STATE_POSTLOAD( twincobr_restore_dsp )
 
 static void toaplan0_control_w(running_machine *machine, int offset, int data)
 {
-	LOG(("%s:Writing %08x to %08x.\n",cpuexec_describe_context(machine),data,toaplan_port_type[toaplan_main_cpu] - offset));
+	LOG(("%s:Writing %08x to %08x.\n",machine->describe_context(),data,toaplan_port_type[toaplan_main_cpu] - offset));
 
 	if (toaplan_main_cpu == 1) {
 		if (data == 0x0c) { data = 0x1c; wardner_sprite_hack=0; }	/* Z80 ? */
@@ -274,7 +274,7 @@ WRITE16_HANDLER( twincobr_sharedram_w )
 static void toaplan0_coin_dsp_w(address_space *space, int offset, int data)
 {
 	if (data > 1)
-		LOG(("%s:Writing %08x to %08x.\n",cpuexec_describe_context(space->machine),data,toaplan_port_type[toaplan_main_cpu] - offset));
+		LOG(("%s:Writing %08x to %08x.\n",space->machine->describe_context(),data,toaplan_port_type[toaplan_main_cpu] - offset));
 	switch (data) {
 		case 0x08: coin_counter_w(space->machine, 0,0); break;
 		case 0x09: coin_counter_w(space->machine, 0,1); break;

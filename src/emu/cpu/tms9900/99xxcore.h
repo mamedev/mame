@@ -933,7 +933,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 			/* read decrementer */
 			if (cpustate->decrementer_enabled && !(cpustate->flag & 1))
 				/* timer mode, timer enabled */
-				return cpustate->device->attotime_to_cycles(timer_timeleft(cpustate->timer) / 16);
+				return cpustate->device->attotime_to_cycles(cpustate->timer->remaining() / 16);
 			else
 				/* event counter mode or timer mode, timer disabled */
 				return cpustate->decrementer_count;
@@ -997,7 +997,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 
 			if (cpustate->decrementer_enabled && !(cpustate->flag & 1))
 				/* timer mode, timer enabled */
-				value = cpustate->device->attotime_to_cycles(timer_timeleft(cpustate->timer) / 16);
+				value = cpustate->device->attotime_to_cycles(cpustate->timer->remaining() / 16);
 			else
 				/* event counter mode or timer mode, timer disabled */
 				value = cpustate->decrementer_count;
@@ -1767,7 +1767,7 @@ static TIMER_CALLBACK( decrementer_callback )
 */
 static void reset_decrementer(tms99xx_state *cpustate)
 {
-	timer_adjust_oneshot(cpustate->timer, attotime::never, 0);
+	cpustate->timer->adjust(attotime::never);
 
 	/* reload count */
 	cpustate->decrementer_count = cpustate->decrementer_interval;
@@ -1778,7 +1778,7 @@ static void reset_decrementer(tms99xx_state *cpustate)
 	if (cpustate->decrementer_enabled && ! (cpustate->flag & 1))
 	{	/* timer */
 		attotime period = cpustate->device->cycles_to_attotime(cpustate->decrementer_interval * 16L);
-		timer_adjust_periodic(cpustate->timer, period, 0, period);
+		cpustate->timer->adjust(period, 0, period);
 	}
 }
 

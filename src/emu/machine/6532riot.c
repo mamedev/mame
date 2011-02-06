@@ -121,7 +121,7 @@ void riot6532_device::update_irqstate()
 	}
 	else
 	{
-		logerror("%s:6532RIOT chip #%d: no irq callback function\n", cpuexec_describe_context(&m_machine), m_index);
+		logerror("%s:6532RIOT chip #%d: no irq callback function\n", m_machine.describe_context(), m_index);
 	}
 }
 
@@ -171,13 +171,13 @@ UINT8 riot6532_device::get_timer()
 	/* if counting, return the number of ticks remaining */
 	else if (m_timerstate == TIMER_COUNTING)
 	{
-		return timer_timeleft(m_timer).as_ticks(clock()) >> m_timershift;
+		return m_timer->remaining().as_ticks(clock()) >> m_timershift;
 	}
 
 	/* if finishing, return the number of ticks without the shift */
 	else
 	{
-		return timer_timeleft(m_timer).as_ticks(clock());
+		return m_timer->remaining().as_ticks(clock());
 	}
 }
 
@@ -202,7 +202,7 @@ void riot6532_device::timer_end()
 	if(m_timerstate == TIMER_COUNTING)
 	{
 		m_timerstate = TIMER_FINISHING;
-		timer_adjust_oneshot(m_timer, attotime::from_ticks(256, clock()), 0);
+		m_timer->adjust(attotime::from_ticks(256, clock()));
 
 		/* signal timer IRQ as well */
 		m_irqstate |= TIMER_FLAG;
@@ -212,7 +212,7 @@ void riot6532_device::timer_end()
 	/* if we finished finishing, keep spinning */
 	else if (m_timerstate == TIMER_FINISHING)
 	{
-		timer_adjust_oneshot(m_timer, attotime::from_ticks(256, clock()), 0);
+		m_timer->adjust(attotime::from_ticks(256, clock()));
 	}
 }
 
@@ -260,7 +260,7 @@ void riot6532_device::reg_w(UINT8 offset, UINT8 data)
 		/* update the timer */
 		m_timerstate = TIMER_COUNTING;
 		target = curtime.as_ticks(clock()) + 1 + (data << m_timershift);
-		timer_adjust_oneshot(m_timer, attotime::from_ticks(target, clock()) - curtime, 0);
+		m_timer->adjust(attotime::from_ticks(target, clock()) - curtime);
 	}
 
 	/* if A4 == 0 and A2 == 1, we are writing to the edge detect control */
@@ -302,7 +302,7 @@ void riot6532_device::reg_w(UINT8 offset, UINT8 data)
 			}
 			else
 			{
-				logerror("%s:6532RIOT chip %s: Port %c is being written to but has no handler. %02X\n", cpuexec_describe_context(&m_machine), tag(), 'A' + (offset & 1), data);
+				logerror("%s:6532RIOT chip %s: Port %c is being written to but has no handler. %02X\n", m_machine.describe_context(), tag(), 'A' + (offset & 1), data);
 			}
 		}
 
@@ -390,7 +390,7 @@ UINT8 riot6532_device::reg_r(UINT8 offset)
 			}
 			else
 			{
-				logerror("%s:6532RIOT chip %s: Port %c is being read but has no handler\n", cpuexec_describe_context(&m_machine), tag(), 'A' + (offset & 1));
+				logerror("%s:6532RIOT chip %s: Port %c is being read but has no handler\n", m_machine.describe_context(), tag(), 'A' + (offset & 1));
 			}
 
 			/* apply the DDR to the result */
@@ -580,5 +580,5 @@ void riot6532_device::device_reset()
 	/* reset timer states */
 	m_timershift = 0;
 	m_timerstate = TIMER_IDLE;
-	timer_adjust_oneshot(m_timer, attotime::never, 0);
+	m_timer->adjust(attotime::never);
 }

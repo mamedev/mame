@@ -360,7 +360,7 @@ void screen_device::device_start()
 
 	// start the timer to generate per-scanline updates
 	if ((machine->config->m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0)
-		timer_adjust_oneshot(m_scanline_timer, time_until_pos(0), 0);
+		m_scanline_timer->adjust(time_until_pos(0));
 
 	// create burn-in bitmap
 	if (options_get_int(machine->options(), OPTION_BURNIN) > 0)
@@ -447,12 +447,12 @@ void screen_device::configure(int width, int height, const rectangle &visarea, a
 	// if we are on scanline 0 already, reset the update timer immediately
 	// otherwise, defer until the next scanline 0
 	if (vpos() == 0)
-		timer_adjust_oneshot(m_scanline0_timer, attotime::zero, 0);
+		m_scanline0_timer->adjust(attotime::zero);
 	else
-		timer_adjust_oneshot(m_scanline0_timer, time_until_pos(0), 0);
+		m_scanline0_timer->adjust(time_until_pos(0));
 
 	// start the VBLANK timer
-	timer_adjust_oneshot(m_vblank_begin_timer, time_until_vblank_start(), 0);
+	m_vblank_begin_timer->adjust(time_until_vblank_start());
 
 	// adjust speed if necessary
 	m_machine.video().update_refresh_speed();
@@ -476,14 +476,14 @@ void screen_device::reset_origin(int beamy, int beamx)
 	if (beamy == 0 && beamx == 0)
 		scanline0_callback();
 	else
-		timer_adjust_oneshot(m_scanline0_timer, time_until_pos(0), 0);
+		m_scanline0_timer->adjust(time_until_pos(0));
 
 	// if we are resetting relative to (visarea.max_y + 1, 0) == VBLANK start,
 	// call the VBLANK start timer now; otherwise, adjust it for the future
 	if (beamy == m_visarea.max_y + 1 && beamx == 0)
 		vblank_begin_callback();
 	else
-		timer_adjust_oneshot(m_vblank_begin_timer, time_until_vblank_start(), 0);
+		m_vblank_begin_timer->adjust(time_until_vblank_start());
 }
 
 
@@ -799,13 +799,13 @@ void screen_device::vblank_begin_callback()
 		machine->video().frame_update();
 
 	// reset the VBLANK start timer for the next frame
-	timer_adjust_oneshot(m_vblank_begin_timer, time_until_vblank_start(), 0);
+	m_vblank_begin_timer->adjust(time_until_vblank_start());
 
 	// if no VBLANK period, call the VBLANK end callback immedietely, otherwise reset the timer
 	if (m_vblank_period == 0)
 		vblank_end_callback();
 	else
-		timer_adjust_oneshot(m_vblank_end_timer, time_until_vblank_end(), 0);
+		m_vblank_end_timer->adjust(time_until_vblank_end());
 }
 
 
@@ -840,7 +840,7 @@ void screen_device::scanline0_callback()
 	m_last_partial_scan = 0;
 	m_partial_updates_this_frame = 0;
 
-	timer_adjust_oneshot(m_scanline0_timer, time_until_pos(0), 0);
+	m_scanline0_timer->adjust(time_until_pos(0));
 }
 
 
@@ -858,7 +858,7 @@ void screen_device::scanline_update_callback(int scanline)
 	scanline++;
 	if (scanline > m_visarea.max_y)
 		scanline = m_visarea.min_y;
-	timer_adjust_oneshot(m_scanline_timer, time_until_pos(scanline), scanline);
+	m_scanline_timer->adjust(time_until_pos(scanline), scanline);
 }
 
 

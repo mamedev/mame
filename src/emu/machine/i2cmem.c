@@ -47,7 +47,7 @@ INLINE void ATTR_PRINTF( 3, 4 ) verboselog( device_t *device, int n_level, const
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%s: I2CMEM(%s) %s", cpuexec_describe_context( device->machine ), device->tag(), buf );
+		logerror( "%s: I2CMEM(%s) %s", device->machine ->describe_context( ), device->tag(), buf );
 	}
 }
 

@@ -233,11 +233,11 @@ void at28c16_device::write( offs_t offset, UINT8 data )
 {
 	if( m_last_write >= 0 )
 	{
-//      logerror( "%s: AT28C16: write( %04x, %02x ) busy\n", cpuexec_describe_context(machine), offset, data );
+//      logerror( "%s: AT28C16: write( %04x, %02x ) busy\n", machine->describe_context(), offset, data );
 	}
 	else if( m_oe_12v )
 	{
-//      logerror( "%s: AT28C16: write( %04x, %02x ) erase\n", cpuexec_describe_context(machine), offset, data );
+//      logerror( "%s: AT28C16: write( %04x, %02x ) erase\n", machine->describe_context(), offset, data );
 		if( m_last_write < 0 )
 		{
 			for( offs_t offs = 0; offs < AT28C16_TOTAL_BYTES; offs++ )
@@ -246,7 +246,7 @@ void at28c16_device::write( offs_t offset, UINT8 data )
 			}
 
 			m_last_write = 0xff;
-			timer_adjust_oneshot( m_write_timer, attotime::from_usec( 200 ), 0 );
+			m_write_timer->adjust( attotime::from_usec( 200 ) );
 		}
 	}
 	else
@@ -256,12 +256,12 @@ void at28c16_device::write( offs_t offset, UINT8 data )
 			offset += AT28C16_ID_BYTES;
 		}
 
-//      logerror( "%s: AT28C16: write( %04x, %02x )\n", cpuexec_describe_context(machine), offset, data );
+//      logerror( "%s: AT28C16: write( %04x, %02x )\n", machine->describe_context(), offset, data );
 		if( m_last_write < 0 && m_addrspace[ 0 ]->read_byte( offset ) != data )
 		{
 			m_addrspace[ 0 ]->write_byte( offset, data );
 			m_last_write = data;
-			timer_adjust_oneshot( m_write_timer, attotime::from_usec( 200 ), 0 );
+			m_write_timer->adjust( attotime::from_usec( 200 ) );
 		}
 	}
 }
@@ -277,7 +277,7 @@ UINT8 at28c16_device::read( offs_t offset )
 	if( m_last_write >= 0 )
 	{
 		UINT8 data = m_last_write ^ 0x80;
-//      logerror( "%s: AT28C16: read( %04x ) write status %02x\n", cpuexec_describe_context(machine), offset, data );
+//      logerror( "%s: AT28C16: read( %04x ) write status %02x\n", machine->describe_context(), offset, data );
 		return data;
 	}
 	else
@@ -288,7 +288,7 @@ UINT8 at28c16_device::read( offs_t offset )
 		}
 
 		UINT8 data = m_addrspace[ 0 ]->read_byte( offset );
-//      logerror( "%s: AT28C16: read( %04x ) data %02x\n", cpuexec_describe_context(machine), offset, data );
+//      logerror( "%s: AT28C16: read( %04x ) data %02x\n", machine->describe_context(), offset, data );
 		return data;
 	}
 }
@@ -304,7 +304,7 @@ void at28c16_device::set_a9_12v( int state )
 	state &= 1;
 	if( m_a9_12v != state )
 	{
-//      logerror( "%s: AT28C16: set_a9_12v( %d )\n", cpuexec_describe_context(machine), state );
+//      logerror( "%s: AT28C16: set_a9_12v( %d )\n", machine->describe_context(), state );
 		m_a9_12v = state;
 	}
 }
@@ -320,7 +320,7 @@ void at28c16_device::set_oe_12v( int state )
 	state &= 1;
 	if( m_oe_12v != state )
 	{
-//      logerror( "%s: AT28C16: set_oe_12v( %d )\n", cpuexec_describe_context(machine), state );
+//      logerror( "%s: AT28C16: set_oe_12v( %d )\n", machine->describe_context(), state );
 		m_oe_12v = state;
 	}
 }

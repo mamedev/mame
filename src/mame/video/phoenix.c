@@ -333,7 +333,7 @@ CUSTOM_INPUT( pleiads_protection_r )
 		/* Bit 3 is 1 */
 		return 1;
 	default:
-		logerror("%s:Unknown protection question %02X\n", cpuexec_describe_context(field->port->machine), pleiads_protection_question);
+		logerror("%s:Unknown protection question %02X\n", field->port->machine->describe_context(), pleiads_protection_question);
 		return 0;
 	}
 }

@@ -125,8 +125,8 @@ void ics2115_device::device_reset()
 	m_reg_select = 0;
     m_vmode = 0;
 	memset(m_voice, 0, sizeof(m_voice));
-	timer_adjust_oneshot(m_timer[0].timer, attotime::never, 0);
-	timer_adjust_oneshot(m_timer[1].timer, attotime::never, 0);
+	m_timer[0].timer->adjust(attotime::never);
+	m_timer[1].timer->adjust(attotime::never);
 	m_timer[0].period = 0;
 	m_timer[1].period = 0;
 	for(int i = 0; i < 32; i++) {
@@ -903,8 +903,8 @@ void ics2115_device::recalc_timer(int timer)
 		m_timer[timer].period = period;
 		// Adjust the timer lengths
 		if(period) // Reset the length
-			timer_adjust_periodic(m_timer[timer].timer, attotime::from_nsec(period), 0, attotime::from_nsec(period));
+			m_timer[timer].timer->adjust(attotime::from_nsec(period), 0, attotime::from_nsec(period));
 		else // Kill the timer if length == 0
-			timer_adjust_oneshot(m_timer[timer].timer, attotime::never, 0);
+			m_timer[timer].timer->adjust(attotime::never);
 	}
 }

@@ -141,7 +141,7 @@ static WRITE16_HANDLER( audio_command_w )
 		audio_cpu_assert_nmi(space->machine);
 
 		/* boost the interleave to let the audio CPU read the command */
-		cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(50));
+		space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
 
 		//if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_command_w %04x - %04x\n", cpu_get_pc(space->cpu), data, mem_mask);
 	}

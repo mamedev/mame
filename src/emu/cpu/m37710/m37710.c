@@ -266,7 +266,7 @@ static TIMER_CALLBACK( m37710_timer_cb )
 	int which = param;
 	int curirq = M37710_LINE_TIMERA0 - which;
 
-	timer_adjust_oneshot(cpustate->timers[which], cpustate->reload[which], param);
+	cpustate->timers[which]->adjust(cpustate->reload[which], param);
 
 	cpustate->m37710_regs[m37710_irq_levels[curirq]] |= 0x04;
 	m37710_set_irq_line(cpustate, curirq, PULSE_LINE);
@@ -334,7 +334,7 @@ static void m37710_recalc_timer(m37710i_cpu_struct *cpustate, int timer)
 					mame_printf_debug("Timer %d in timer mode, %f Hz\n", timer, 1.0 / time.as_double());
 					#endif
 
-					timer_adjust_oneshot(cpustate->timers[timer], time, timer);
+					cpustate->timers[timer]->adjust(time, timer);
 					cpustate->reload[timer] = time;
 					break;
 
@@ -369,7 +369,7 @@ static void m37710_recalc_timer(m37710i_cpu_struct *cpustate, int timer)
 					mame_printf_debug("Timer %d in timer mode, %f Hz\n", timer, 1.0 / time.as_double());
 					#endif
 
-					timer_adjust_oneshot(cpustate->timers[timer], time, timer);
+					cpustate->timers[timer]->adjust(time, timer);
 					cpustate->reload[timer] = time;
 					break;
 

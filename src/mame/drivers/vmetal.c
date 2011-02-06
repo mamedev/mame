@@ -158,7 +158,7 @@ static WRITE8_DEVICE_HANDLER( vmetal_control_w )
 		es8712_set_bank_base(device, 0x000000);
 
 	if (data & 0xa0)
-		logerror("%s:Writing unknown bits %04x to $200000\n",cpuexec_describe_context(device->machine),data);
+		logerror("%s:Writing unknown bits %04x to $200000\n",device->machine->describe_context(),data);
 }
 
 static WRITE8_DEVICE_HANDLER( vmetal_es8712_w )
@@ -194,7 +194,7 @@ static WRITE8_DEVICE_HANDLER( vmetal_es8712_w )
     */
 
 	es8712_w(device, offset, data);
-	logerror("%s:Writing %04x to ES8712 offset %02x\n", cpuexec_describe_context(device->machine), data, offset);
+	logerror("%s:Writing %04x to ES8712 offset %02x\n", device->machine->describe_context(), data, offset);
 }
 
 

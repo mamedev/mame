@@ -242,7 +242,7 @@ static READ32_HANDLER(backfire_control3_r)
 
 static WRITE32_DEVICE_HANDLER(backfire_eeprom_w)
 {
-	logerror("%s:write eprom %08x (%08x) %08x\n",cpuexec_describe_context(device->machine),offset<<1,mem_mask,data);
+	logerror("%s:write eprom %08x (%08x) %08x\n",device->machine->describe_context(),offset<<1,mem_mask,data);
 	if (ACCESSING_BITS_0_7)
 	{
 		eeprom_set_clock_line(device, BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);

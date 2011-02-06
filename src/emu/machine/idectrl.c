@@ -1244,7 +1244,7 @@ static UINT32 ide_controller_read(device_t *device, int bank, offs_t offset, int
 
 	/* logit */
 //  if (BANK(bank, offset) != IDE_BANK0_DATA && BANK(bank, offset) != IDE_BANK0_STATUS_COMMAND && BANK(bank, offset) != IDE_BANK1_STATUS_CONTROL)
-		LOG(("%s:IDE read at %d:%X, size=%d\n", cpuexec_describe_context(device->machine), bank, offset, size));
+		LOG(("%s:IDE read at %d:%X, size=%d\n", device->machine->describe_context(), bank, offset, size));
 
 	switch (BANK(bank, offset))
 	{
@@ -1279,7 +1279,7 @@ static UINT32 ide_controller_read(device_t *device, int bank, offs_t offset, int
 				/* if we're at the end of the buffer, handle it */
 				if (ide->buffer_offset >= IDE_DISK_SECTOR_SIZE)
 				{
-					LOG(("%s:IDE completed PIO read\n", cpuexec_describe_context(device->machine)));
+					LOG(("%s:IDE completed PIO read\n", device->machine->describe_context()));
 					continue_read(ide);
 				}
 			}
@@ -1314,10 +1314,10 @@ static UINT32 ide_controller_read(device_t *device, int bank, offs_t offset, int
 		/* return the current status but don't clear interrupts */
 		case IDE_BANK1_STATUS_CONTROL:
 			result = ide->status;
-			if (timer_timeelapsed(ide->last_status_timer) > TIME_PER_ROTATION)
+			if (ide->last_status_timer->elapsed() > TIME_PER_ROTATION)
 			{
 				result |= IDE_STATUS_HIT_INDEX;
-				timer_adjust_oneshot(ide->last_status_timer, attotime::never, 0);
+				ide->last_status_timer->adjust(attotime::never);
 			}
 
 			/* clear interrutps only when reading the real status */
@@ -1330,7 +1330,7 @@ static UINT32 ide_controller_read(device_t *device, int bank, offs_t offset, int
 
 		/* log anything else */
 		default:
-			logerror("%s:unknown IDE read at %03X, size=%d\n", cpuexec_describe_context(device->machine), offset, size);
+			logerror("%s:unknown IDE read at %03X, size=%d\n", device->machine->describe_context(), offset, size);
 			break;
 	}
 
@@ -1352,7 +1352,7 @@ static void ide_controller_write(device_t *device, int bank, offs_t offset, int 
 
 	/* logit */
 	if (BANK(bank, offset) != IDE_BANK0_DATA)
-		LOG(("%s:IDE write to %d:%X = %08X, size=%d\n", cpuexec_describe_context(device->machine), bank, offset, data, size));
+		LOG(("%s:IDE write to %d:%X = %08X, size=%d\n", device->machine->describe_context(), bank, offset, data, size));
 	//  fprintf(stderr, "ide write %03x %02x size=%d\n", offset, data, size);
 	switch (BANK(bank, offset))
 	{
@@ -1389,7 +1389,7 @@ static void ide_controller_write(device_t *device, int bank, offs_t offset, int 
 				/* if we're at the end of the buffer, handle it */
 				if (ide->buffer_offset >= IDE_DISK_SECTOR_SIZE)
 				{
-					LOG(("%s:IDE completed PIO write\n", cpuexec_describe_context(device->machine)));
+					LOG(("%s:IDE completed PIO write\n", device->machine->describe_context()));
 					if (ide->command == IDE_COMMAND_SECURITY_UNLOCK)
 					{
 						if (ide->user_password_enable && memcmp(ide->buffer, ide->user_password, 2 + 32) == 0)
@@ -1500,7 +1500,7 @@ static void ide_controller_write(device_t *device, int bank, offs_t offset, int 
 			{
 				ide->status |= IDE_STATUS_BUSY;
 				ide->status &= ~IDE_STATUS_DRIVE_READY;
-				timer_adjust_oneshot(ide->reset_timer, attotime::from_msec(5), 0);
+				ide->reset_timer->adjust(attotime::from_msec(5));
 			}
 			break;
 	}
@@ -1518,7 +1518,7 @@ static UINT32 ide_bus_master_read(device_t *device, offs_t offset, int size)
 {
 	ide_state *ide = get_safe_token(device);
 
-	LOG(("%s:ide_bus_master_read(%d, %d)\n", cpuexec_describe_context(device->machine), offset, size));
+	LOG(("%s:ide_bus_master_read(%d, %d)\n", device->machine->describe_context(), offset, size));
 
 	/* command register */
 	if (offset == 0)
@@ -1547,7 +1547,7 @@ static void ide_bus_master_write(device_t *device, offs_t offset, int size, UINT
 {
 	ide_state *ide = get_safe_token(device);
 
-	LOG(("%s:ide_bus_master_write(%d, %d, %08X)\n", cpuexec_describe_context(device->machine), offset, size, data));
+	LOG(("%s:ide_bus_master_write(%d, %d, %08X)\n", device->machine->describe_context(), offset, size, data));
 
 	/* command register */
 	if (offset == 0)

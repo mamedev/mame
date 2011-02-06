@@ -175,7 +175,7 @@ WRITE16_HANDLER( atarisy2_yscroll_w )
 	if (!(newscroll & 0x10))
 		tilemap_set_scrolly(state->playfield_tilemap, 0, (newscroll >> 6) - space->machine->primary_screen->vpos());
 	else
-		timer_adjust_oneshot(state->yscroll_reset_timer, space->machine->primary_screen->time_until_pos(0), newscroll >> 6);
+		state->yscroll_reset_timer->adjust(space->machine->primary_screen->time_until_pos(0), newscroll >> 6);
 
 	/* update the playfield banking */
 	if (state->playfield_tile_bank[1] != (newscroll & 0x0f) * 0x400)

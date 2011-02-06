@@ -520,7 +520,7 @@ static READ32_HANDLER( cage_io_status_r )
 UINT16 main_from_cage_r(address_space *space)
 {
 	if (LOG_COMM)
-		logerror("%s:main read data = %04X\n", cpuexec_describe_context(space->machine), soundlatch_word_r(space, 0, 0));
+		logerror("%s:main read data = %04X\n", space->machine->describe_context(), soundlatch_word_r(space, 0, 0));
 	cage_to_cpu_ready = 0;
 	update_control_lines(space->machine);
 	return soundlatch_word_r(space, 0, 0xffff);
@@ -540,7 +540,7 @@ void main_to_cage_w(UINT16 data)
 {
 	running_machine *machine = cage_cpu->machine;
 	if (LOG_COMM)
-		logerror("%s:Command to CAGE = %04X\n", cpuexec_describe_context(machine), data);
+		logerror("%s:Command to CAGE = %04X\n", machine->describe_context(), data);
 	machine->scheduler().synchronize(FUNC(deferred_cage_w), data);
 }
 

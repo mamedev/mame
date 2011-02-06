@@ -722,7 +722,7 @@ static void AICA_UpdateReg(aica_state *AICA, int reg)
 					time = (44100 / AICA->TimPris[0]) / (255-(AICA->udata.data[0x90/2]&0xff));
 					if (time)
 					{
-						timer_adjust_oneshot(AICA->timerA, attotime::from_hz(time), 0);
+						AICA->timerA->adjust(attotime::from_hz(time));
 					}
 				}
 			}
@@ -741,7 +741,7 @@ static void AICA_UpdateReg(aica_state *AICA, int reg)
 					time = (44100 / AICA->TimPris[1]) / (255-(AICA->udata.data[0x94/2]&0xff));
 					if (time)
 					{
-						timer_adjust_oneshot(AICA->timerB, attotime::from_hz(time), 0);
+						AICA->timerB->adjust(attotime::from_hz(time));
 					}
 				}
 			}
@@ -760,7 +760,7 @@ static void AICA_UpdateReg(aica_state *AICA, int reg)
 					time = (44100 / AICA->TimPris[2]) / (255-(AICA->udata.data[0x98/2]&0xff));
 					if (time)
 					{
-						timer_adjust_oneshot(AICA->timerC, attotime::from_hz(time), 0);
+						AICA->timerC->adjust(attotime::from_hz(time));
 					}
 				}
 			}

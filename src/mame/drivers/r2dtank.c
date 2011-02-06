@@ -142,7 +142,7 @@ static WRITE8_DEVICE_HANDLER( AY8910_select_w )
        D5-D7 - not used */
 	AY8910_selected = data;
 
-if (LOG_AUDIO_COMM) logerror("%s:  CPU#1  AY8910_select_w: %x\n", cpuexec_describe_context(device->machine), data);
+if (LOG_AUDIO_COMM) logerror("%s:  CPU#1  AY8910_select_w: %x\n", device->machine->describe_context(), data);
 }
 
 

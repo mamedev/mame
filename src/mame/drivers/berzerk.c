@@ -168,7 +168,7 @@ static TIMER_CALLBACK( irq_callback )
 	next_v256 = irq_trigger_v256s[next_irq_number];
 
 	next_vpos = vsync_chain_counter_to_vpos(next_counter, next_v256);
-	timer_adjust_oneshot(irq_timer, machine->primary_screen->time_until_pos(next_vpos), next_irq_number);
+	irq_timer->adjust(machine->primary_screen->time_until_pos(next_vpos), next_irq_number);
 }
 
 
@@ -181,7 +181,7 @@ static void create_irq_timer(running_machine *machine)
 static void start_irq_timer(running_machine *machine)
 {
 	int vpos = vsync_chain_counter_to_vpos(irq_trigger_counts[0], irq_trigger_v256s[0]);
-	timer_adjust_oneshot(irq_timer, machine->primary_screen->time_until_pos(vpos), 0);
+	irq_timer->adjust(machine->primary_screen->time_until_pos(vpos));
 }
 
 
@@ -245,7 +245,7 @@ static TIMER_CALLBACK( nmi_callback )
 	next_v256 = nmi_trigger_v256s[next_nmi_number];
 
 	next_vpos = vsync_chain_counter_to_vpos(next_counter, next_v256);
-	timer_adjust_oneshot(nmi_timer, machine->primary_screen->time_until_pos(next_vpos), next_nmi_number);
+	nmi_timer->adjust(machine->primary_screen->time_until_pos(next_vpos), next_nmi_number);
 }
 
 
@@ -258,7 +258,7 @@ static void create_nmi_timer(running_machine *machine)
 static void start_nmi_timer(running_machine *machine)
 {
 	int vpos = vsync_chain_counter_to_vpos(nmi_trigger_counts[0], nmi_trigger_v256s[0]);
-	timer_adjust_oneshot(nmi_timer, machine->primary_screen->time_until_pos(vpos), 0);
+	nmi_timer->adjust(machine->primary_screen->time_until_pos(vpos));
 }
 
 

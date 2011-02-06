@@ -193,7 +193,7 @@ INLINE void set_decrementer(powerpc_state *ppc, UINT32 newdec)
 	}
 
 	ppc->dec_zero_cycles = ppc->device->total_cycles() + cycles_until_done;
-	timer_adjust_oneshot(ppc->decrementer_int_timer, ppc->device->cycles_to_attotime(cycles_until_done), 0);
+	ppc->decrementer_int_timer->adjust(ppc->device->cycles_to_attotime(cycles_until_done));
 
 	if ((INT32)curdec >= 0 && (INT32)newdec < 0)
 		ppc->irq_pending |= 0x02;
@@ -1538,7 +1538,7 @@ static TIMER_CALLBACK( decrementer_int_callback )
 	/* advance by another full rev */
 	ppc->dec_zero_cycles += (UINT64)ppc->tb_divisor << 32;
 	cycles_until_next = ppc->dec_zero_cycles - ppc->device->total_cycles();
-	timer_adjust_oneshot(ppc->decrementer_int_timer, ppc->device->cycles_to_attotime(cycles_until_next), 0);
+	ppc->decrementer_int_timer->adjust(ppc->device->cycles_to_attotime(cycles_until_next));
 }
 
 
@@ -1804,12 +1804,12 @@ static TIMER_CALLBACK( ppc4xx_fit_callback )
 		UINT32 timebase = get_timebase(ppc);
 		UINT32 interval = 0x200 << (4 * ((ppc->spr[SPR4XX_TCR] & PPC4XX_TCR_FP_MASK) >> 24));
 		UINT32 target = (timebase + interval) & ~(interval - 1);
-		timer_adjust_oneshot(ppc->fit_timer, ppc->device->cycles_to_attotime((target + 1 - timebase) / ppc->tb_divisor), TRUE);
+		ppc->fit_timer->adjust(ppc->device->cycles_to_attotime((target + 1 - timebase) / ppc->tb_divisor), TRUE);
 	}
 
 	/* otherwise, turn ourself off */
 	else
-		timer_adjust_oneshot(ppc->fit_timer, attotime::never, FALSE);
+		ppc->fit_timer->adjust(attotime::never, FALSE);
 }
 
 
@@ -1835,12 +1835,12 @@ static TIMER_CALLBACK( ppc4xx_pit_callback )
 		UINT32 timebase = get_timebase(ppc);
 		UINT32 interval = ppc->pit_reload;
 		UINT32 target = timebase + interval;
-		timer_adjust_oneshot(ppc->pit_timer, ppc->device->cycles_to_attotime((target + 1 - timebase) / ppc->tb_divisor), TRUE);
+		ppc->pit_timer->adjust(ppc->device->cycles_to_attotime((target + 1 - timebase) / ppc->tb_divisor), TRUE);
 	}
 
 	/* otherwise, turn ourself off */
 	else
-		timer_adjust_oneshot(ppc->pit_timer, attotime::never, FALSE);
+		ppc->pit_timer->adjust(attotime::never, FALSE);
 }
 
 
@@ -1912,14 +1912,14 @@ static void ppc4xx_spu_timer_reset(powerpc_state *ppc)
 		int divisor = ((ppc->spu.regs[SPU4XX_BAUD_DIVISOR_H] * 256 + ppc->spu.regs[SPU4XX_BAUD_DIVISOR_L]) & 0xfff) + 1;
 		int bpc = 7 + ((ppc->spu.regs[SPU4XX_CONTROL] & 8) >> 3) + 1 + (ppc->spu.regs[SPU4XX_CONTROL] & 1);
 		attotime charperiod = clockperiod * (divisor * 16 * bpc);
-		timer_adjust_periodic(ppc->spu.timer, charperiod, 0, charperiod);
+		ppc->spu.timer->adjust(charperiod, 0, charperiod);
 		if (PRINTF_SPU)
 			printf("ppc4xx_spu_timer_reset: baud rate = %.0f\n", ATTOSECONDS_TO_HZ(charperiod.attoseconds) * bpc);
 	}
 
 	/* otherwise, disable the timer */
 	else
-		timer_adjust_oneshot(ppc->spu.timer, attotime::never, 0);
+		ppc->spu.timer->adjust(attotime::never);
 }
 
 

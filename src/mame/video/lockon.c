@@ -69,7 +69,7 @@ static TIMER_CALLBACK( cursor_callback )
 	if (state->main_inten)
 		cpu_set_input_line_and_vector(state->maincpu, 0, HOLD_LINE, 0xff);
 
-	timer_adjust_oneshot(state->cursor_timer, machine->primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS), 0);
+	state->cursor_timer->adjust(machine->primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
 
 /*************************************
@@ -388,7 +388,7 @@ static void ground_draw( running_machine *machine )
 		/* End of list marker */
 		if (state->ground_ram[offs + 2] & 0x8000)
 		{
-			timer_adjust_oneshot(state->bufend_timer, attotime::from_hz(FRAMEBUFFER_CLOCK) * (FRAMEBUFFER_MAX_X * y), 0);
+			state->bufend_timer->adjust(attotime::from_hz(FRAMEBUFFER_CLOCK) * (FRAMEBUFFER_MAX_X * y));
 		}
 	}
 }
@@ -922,7 +922,7 @@ VIDEO_START( lockon )
 
 	/* Timer for the CRTC cursor pulse */
 	state->cursor_timer = machine->scheduler().timer_alloc(FUNC(cursor_callback));
-	timer_adjust_oneshot(state->cursor_timer, machine->primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS), 0);
+	state->cursor_timer->adjust(machine->primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 
 	state_save_register_global_bitmap(machine, state->back_buffer);
 	state_save_register_global_bitmap(machine, state->front_buffer);

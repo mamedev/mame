@@ -390,7 +390,7 @@ static UINT32 *tms1_boot;
 static UINT8 tms_spinning[2];
 
 #define START_TMS_SPINNING(n)			do { cpu_spinuntil_trigger(space->cpu, 7351 + n); tms_spinning[n] = 1; } while (0)
-#define STOP_TMS_SPINNING(machine, n)	do { cpuexec_trigger(machine, 7351 + n); tms_spinning[n] = 0; } while (0)
+#define STOP_TMS_SPINNING(machine, n)	do { machine->scheduler().trigger(7351 + n); tms_spinning[n] = 0; } while (0)
 
 
 
@@ -836,7 +836,7 @@ static WRITE32_HANDLER( tms1_68k_ram_w )
 	if (offset == 0) COMBINE_DATA(tms1_boot);
 	if (offset == 0x382 && tms_spinning[0]) STOP_TMS_SPINNING(space->machine, 0);
 	if (!tms_spinning[0])
-		cpuexec_boost_interleave(space->machine, attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
+		space->machine->scheduler().boost_interleave(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
 }
 
 
@@ -845,21 +845,21 @@ static WRITE32_HANDLER( tms2_68k_ram_w )
 	COMBINE_DATA(&tms2_ram[offset]);
 	if (offset == 0x382 && tms_spinning[1]) STOP_TMS_SPINNING(space->machine, 1);
 	if (!tms_spinning[1])
-		cpuexec_boost_interleave(space->machine, attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
+		space->machine->scheduler().boost_interleave(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
 }
 
 
 static WRITE32_HANDLER( tms1_trigger_w )
 {
 	COMBINE_DATA(&tms1_ram[offset]);
-	cpuexec_boost_interleave(space->machine, attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
+	space->machine->scheduler().boost_interleave(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
 }
 
 
 static WRITE32_HANDLER( tms2_trigger_w )
 {
 	COMBINE_DATA(&tms2_ram[offset]);
-	cpuexec_boost_interleave(space->machine, attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
+	space->machine->scheduler().boost_interleave(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
 }
 
 

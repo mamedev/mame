@@ -948,7 +948,7 @@ static TIMER_CALLBACK( nile_timer_callback )
 		if (regs[1] & 2)
 			logerror("Unexpected value: timer %d is prescaled\n", which);
 		if (scale != 0)
-			timer_adjust_oneshot(timer[which], TIMER_PERIOD * scale, which);
+			timer[which]->adjust(TIMER_PERIOD * scale, which);
 	}
 
 	/* trigger the interrupt */
@@ -1031,7 +1031,7 @@ static READ32_HANDLER( nile_r )
 			{
 				if (nile_regs[offset] & 2)
 					logerror("Unexpected value: timer %d is prescaled\n", which);
-				result = nile_regs[offset + 1] = timer_timeleft(timer[which]).as_double() * (double)SYSTEM_CLOCK;
+				result = nile_regs[offset + 1] = timer[which]->remaining().as_double() * (double)SYSTEM_CLOCK;
 			}
 
 			if (LOG_TIMERS) logerror("%08X:NILE READ: timer %d counter(%03X) = %08X\n", cpu_get_pc(space->cpu), which, offset*4, result);
@@ -1161,7 +1161,7 @@ static WRITE32_HANDLER( nile_w )
 				if (nile_regs[offset] & 2)
 					logerror("Unexpected value: timer %d is prescaled\n", which);
 				if (scale != 0)
-					timer_adjust_oneshot(timer[which], TIMER_PERIOD * scale, which);
+					timer[which]->adjust(TIMER_PERIOD * scale, which);
 				if (LOG_TIMERS) logerror("Starting timer %d at a rate of %d Hz\n", which, (int)ATTOSECONDS_TO_HZ((TIMER_PERIOD * (nile_regs[offset + 1] + 1)).attoseconds));
 			}
 
@@ -1170,8 +1170,8 @@ static WRITE32_HANDLER( nile_w )
 			{
 				if (nile_regs[offset] & 2)
 					logerror("Unexpected value: timer %d is prescaled\n", which);
-				nile_regs[offset + 1] = timer_timeleft(timer[which]).as_double() * SYSTEM_CLOCK;
-				timer_adjust_oneshot(timer[which], attotime::never, which);
+				nile_regs[offset + 1] = timer[which]->remaining().as_double() * SYSTEM_CLOCK;
+				timer[which]->adjust(attotime::never, which);
 			}
 			break;
 
@@ -1187,7 +1187,7 @@ static WRITE32_HANDLER( nile_w )
 			{
 				if (nile_regs[offset - 1] & 2)
 					logerror("Unexpected value: timer %d is prescaled\n", which);
-				timer_adjust_oneshot(timer[which], TIMER_PERIOD * nile_regs[offset], which);
+				timer[which]->adjust(TIMER_PERIOD * nile_regs[offset], which);
 			}
 			break;
 

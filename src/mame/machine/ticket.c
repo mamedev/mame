@@ -49,7 +49,7 @@ static TIMER_CALLBACK( ticket_dispenser_toggle )
 	{
 		state->status ^= state->active_bit;
 		LOG(("Ticket Status Changed to %02X\n", state->status));
-		timer_adjust_oneshot(state->timer, attotime::from_msec(state->time_msec), 0);
+		state->timer->adjust(attotime::from_msec(state->time_msec));
 	}
 
 	if (state->status == state->ticketdispensed)
@@ -69,7 +69,7 @@ static TIMER_CALLBACK( ticket_dispenser_toggle )
 READ8_DEVICE_HANDLER( ticket_dispenser_r )
 {
 	ticket_state *state = get_safe_token(device);
-	LOG(("%s: Ticket Status Read = %02X\n", cpuexec_describe_context(device->machine), state->status));
+	LOG(("%s: Ticket Status Read = %02X\n", device->machine->describe_context(), state->status));
 	return state->status;
 }
 
@@ -90,8 +90,8 @@ WRITE8_DEVICE_HANDLER( ticket_dispenser_w )
 	{
 		if (!state->power)
 		{
-			LOG(("%s: Ticket Power On\n", cpuexec_describe_context(device->machine)));
-			timer_adjust_oneshot(state->timer, attotime::from_msec(state->time_msec), 0);
+			LOG(("%s: Ticket Power On\n", device->machine->describe_context()));
+			state->timer->adjust(attotime::from_msec(state->time_msec));
 			state->power = 1;
 
 			state->status = state->ticketnotdispensed;
@@ -101,8 +101,8 @@ WRITE8_DEVICE_HANDLER( ticket_dispenser_w )
 	{
 		if (state->power)
 		{
-			LOG(("%s: Ticket Power Off\n", cpuexec_describe_context(device->machine)));
-			timer_adjust_oneshot(state->timer, attotime::never, 0);
+			LOG(("%s: Ticket Power Off\n", device->machine->describe_context()));
+			state->timer->adjust(attotime::never);
 			set_led_status(device->machine, 2,0);
 			state->power = 0;
 		}

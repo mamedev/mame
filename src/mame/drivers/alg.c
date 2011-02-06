@@ -131,7 +131,7 @@ static TIMER_CALLBACK( response_timer )
 
 	/* if there's more to come, set another timer */
 	if (laserdisc_line_r(state->laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
-		timer_adjust_oneshot(state->serial_timer, amiga_get_serial_char_period(machine), 0);
+		state->serial_timer->adjust(amiga_get_serial_char_period(machine));
 	else
 		state->serial_timer_active = FALSE;
 }
@@ -144,7 +144,7 @@ static void vsync_callback(running_machine *machine)
 	/* if we have data available, set a timer to read it */
 	if (!state->serial_timer_active && laserdisc_line_r(state->laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
 	{
-		timer_adjust_oneshot(state->serial_timer, amiga_get_serial_char_period(machine), 0);
+		state->serial_timer->adjust(amiga_get_serial_char_period(machine));
 		state->serial_timer_active = TRUE;
 	}
 }
@@ -160,7 +160,7 @@ static void serial_w(running_machine *machine, UINT16 data)
 	/* if we have data available, set a timer to read it */
 	if (!state->serial_timer_active && laserdisc_line_r(state->laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
 	{
-		timer_adjust_oneshot(state->serial_timer, amiga_get_serial_char_period(machine), 0);
+		state->serial_timer->adjust(amiga_get_serial_char_period(machine));
 		state->serial_timer_active = TRUE;
 	}
 }
@@ -245,7 +245,7 @@ static READ8_DEVICE_HANDLER( alg_cia_0_porta_r )
 
 static READ8_DEVICE_HANDLER( alg_cia_0_portb_r )
 {
-	logerror("%s:alg_cia_0_portb_r\n", cpuexec_describe_context(device->machine));
+	logerror("%s:alg_cia_0_portb_r\n", device->machine->describe_context());
 	return 0xff;
 }
 
@@ -253,20 +253,20 @@ static READ8_DEVICE_HANDLER( alg_cia_0_portb_r )
 static WRITE8_DEVICE_HANDLER( alg_cia_0_portb_w )
 {
 	/* parallel port */
-	logerror("%s:alg_cia_0_portb_w(%02x)\n", cpuexec_describe_context(device->machine), data);
+	logerror("%s:alg_cia_0_portb_w(%02x)\n", device->machine->describe_context(), data);
 }
 
 
 static READ8_DEVICE_HANDLER( alg_cia_1_porta_r )
 {
-	logerror("%s:alg_cia_1_porta_r\n", cpuexec_describe_context(device->machine));
+	logerror("%s:alg_cia_1_porta_r\n", device->machine->describe_context());
 	return 0xff;
 }
 
 
 static WRITE8_DEVICE_HANDLER( alg_cia_1_porta_w )
 {
-	logerror("%s:alg_cia_1_porta_w(%02x)\n", cpuexec_describe_context(device->machine), data);
+	logerror("%s:alg_cia_1_porta_w(%02x)\n", device->machine->describe_context(), data);
 }
 
 

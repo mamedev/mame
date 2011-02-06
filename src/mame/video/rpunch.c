@@ -83,7 +83,7 @@ static TIMER_CALLBACK( crtc_interrupt_gen )
 {
 	cputag_set_input_line(machine, "maincpu", 1, HOLD_LINE);
 	if (param != 0)
-		timer_adjust_periodic(crtc_timer, machine->primary_screen->frame_period() / param, 0, machine->primary_screen->frame_period() / param);
+		crtc_timer->adjust(machine->primary_screen->frame_period() / param, 0, machine->primary_screen->frame_period() / param);
 }
 
 
@@ -171,7 +171,7 @@ WRITE16_HANDLER( rpunch_crtc_data_w )
 		{
 			/* only register we know about.... */
 			case 0x0b:
-				timer_adjust_oneshot(crtc_timer, space->machine->primary_screen->time_until_vblank_start(), (data == 0xc0) ? 2 : 1);
+				crtc_timer->adjust(space->machine->primary_screen->time_until_vblank_start(), (data == 0xc0) ? 2 : 1);
 				break;
 
 			default:

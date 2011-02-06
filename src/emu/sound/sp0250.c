@@ -226,7 +226,7 @@ WRITE8_DEVICE_HANDLER( sp0250_w )
 			sp->drq(sp->device, CLEAR_LINE);
 	}
 	else
-		logerror("%s: overflow SP0250 FIFO\n", cpuexec_describe_context(device->machine));
+		logerror("%s: overflow SP0250 FIFO\n", device->machine->describe_context());
 }
 
 

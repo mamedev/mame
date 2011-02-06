@@ -318,7 +318,7 @@ INLINE int decode_reg32_64(running_machine *machine, UINT32 offset, UINT64 mem_m
 	// non 32-bit accesses have not yet been seen here, we need to know when they are
 	if ((mem_mask != U64(0xffffffff00000000)) && (mem_mask != U64(0x00000000ffffffff)))
 	{
-		mame_printf_verbose("%s:Wrong mask!\n", cpuexec_describe_context(machine));
+		mame_printf_verbose("%s:Wrong mask!\n", machine->describe_context());
 //      debugger_break(machine);
 	}
 
@@ -342,7 +342,7 @@ INLINE int decode_reg3216_64(running_machine *machine, UINT32 offset, UINT64 mem
 	if ((mem_mask != U64(0x0000ffff00000000)) && (mem_mask != U64(0x000000000000ffff)) &&
 	    (mem_mask != U64(0xffffffff00000000)) && (mem_mask != U64(0x00000000ffffffff)))
 	{
-		mame_printf_verbose("%s:Wrong mask!\n", cpuexec_describe_context(machine));
+		mame_printf_verbose("%s:Wrong mask!\n", machine->describe_context());
 //      debugger_break(machine);
 	}
 
@@ -1556,7 +1556,7 @@ WRITE64_HANDLER( dc_rtc_w )
 		if (dc_rtcregister[RTC3] == 0)
 			dc_rtcregister[reg] = old;
 		else
-			timer_adjust_periodic(dc_rtc_timer, attotime::zero, 0, attotime::from_seconds(1));
+			dc_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 		break;
 	case RTC3:
 		dc_rtcregister[RTC3] &= 1;
@@ -1626,7 +1626,7 @@ MACHINE_RESET( dc )
 	memset(maple_regs, 0, sizeof(maple_regs));
 	memset(dc_coin_counts, 0, sizeof(dc_coin_counts));
 
-	timer_adjust_periodic(dc_rtc_timer, attotime::zero, 0, attotime::from_seconds(1));
+	dc_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 
 	dc_sysctrl_regs[SB_SBREV] = 0x0b;
 

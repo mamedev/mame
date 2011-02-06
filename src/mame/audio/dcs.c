@@ -1502,7 +1502,7 @@ int dcs_control_r(void)
 {
 	/* only boost for DCS2 boards */
 	if (!dcs.auto_ack && !transfer.hle_enabled)
-		cpuexec_boost_interleave(dcs.cpu->machine, attotime::from_nsec(500), attotime::from_usec(5));
+		dcs.cpu->machine->scheduler().boost_interleave(attotime::from_nsec(500), attotime::from_usec(5));
 	return dcs.latch_control;
 }
 
@@ -1512,7 +1512,7 @@ void dcs_reset_w(int state)
 	/* going high halts the CPU */
 	if (state)
 	{
-		logerror("%s: DCS reset = %d\n", cpuexec_describe_context(dcs.cpu->machine), state);
+		logerror("%s: DCS reset = %d\n", dcs.cpu->machine->describe_context(), state);
 
 		/* just run through the init code again */
 		dcs.cpu->machine->scheduler().synchronize(FUNC(dcs_reset));
@@ -1557,10 +1557,10 @@ static READ16_HANDLER( fifo_input_r )
 static void dcs_delayed_data_w(running_machine *machine, int data)
 {
 	if (LOG_DCS_IO)
-		logerror("%s:dcs_data_w(%04X)\n", cpuexec_describe_context(machine), data);
+		logerror("%s:dcs_data_w(%04X)\n", machine->describe_context(), data);
 
 	/* boost the interleave temporarily */
-	cpuexec_boost_interleave(machine, attotime::from_nsec(500), attotime::from_usec(5));
+	machine->scheduler().boost_interleave(attotime::from_nsec(500), attotime::from_usec(5));
 
 	/* set the IRQ line on the ADSP */
 	cpu_set_input_line(dcs.cpu, ADSP2105_IRQ2, ASSERT_LINE);
@@ -1663,7 +1663,7 @@ int dcs_data_r(void)
 		delayed_ack_w();
 
 	if (LOG_DCS_IO)
-		logerror("%s:dcs_data_r(%04X)\n", cpuexec_describe_context(dcs.cpu->machine), dcs.output_data);
+		logerror("%s:dcs_data_r(%04X)\n", dcs.cpu->machine->describe_context(), dcs.output_data);
 	return dcs.output_data;
 }
 
@@ -2153,7 +2153,7 @@ static int preprocess_stage_1(running_machine *machine, UINT16 data)
 			if (data == 0x001a)
 			{
 				if (LOG_DCS_TRANSFERS)
-					logerror("%s:DCS Transfer command %04X\n", cpuexec_describe_context(machine), data);
+					logerror("%s:DCS Transfer command %04X\n", machine->describe_context(), data);
 				transfer.state++;
 				if (transfer.hle_enabled)
 					return 1;
@@ -2163,7 +2163,7 @@ static int preprocess_stage_1(running_machine *machine, UINT16 data)
 			else if (data == 0x002a)
 			{
 				if (LOG_DCS_TRANSFERS)
-					logerror("%s:DCS State change %04X\n", cpuexec_describe_context(machine), data);
+					logerror("%s:DCS State change %04X\n", machine->describe_context(), data);
 				transfer.dcs_state = 1;
 			}
 
@@ -2289,7 +2289,7 @@ static int preprocess_stage_2(running_machine *machine, UINT16 data)
 			if (data == 0x55d0 || data == 0x55d1)
 			{
 				if (LOG_DCS_TRANSFERS)
-					logerror("%s:DCS Transfer command %04X\n", cpuexec_describe_context(machine), data);
+					logerror("%s:DCS Transfer command %04X\n", machine->describe_context(), data);
 				transfer.state++;
 				if (transfer.hle_enabled)
 					return 1;
@@ -2299,7 +2299,7 @@ static int preprocess_stage_2(running_machine *machine, UINT16 data)
 			else
 			{
 				if (LOG_DCS_TRANSFERS)
-					logerror("%s:Command: %04X\n", cpuexec_describe_context(machine), data);
+					logerror("%s:Command: %04X\n", machine->describe_context(), data);
 			}
 			break;
 

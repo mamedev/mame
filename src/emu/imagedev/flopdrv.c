@@ -70,7 +70,7 @@ struct _floppy_drive
 	int current_track;
 
 	/* index pulse timer */
-	void	*index_timer;
+	emu_timer	*index_timer;
 	/* index pulse callback */
 	void	(*index_pulse_callback)(device_t *controller,device_t *image, int state);
 	/* rotation per minute => gives index pulse frequency */
@@ -244,12 +244,12 @@ static void floppy_drive_index_func(device_t *img)
 	if (drive->idx)
 	{
 		drive->idx = 0;
-		timer_adjust_oneshot((emu_timer*)drive->index_timer, attotime::from_double(ms*19/20/1000.0), 0);
+		drive->index_timer->adjust(attotime::from_double(ms*19/20/1000.0));
 	}
 	else
 	{
 		drive->idx = 1;
-		timer_adjust_oneshot((emu_timer*)drive->index_timer, attotime::from_double(ms/20/1000.0), 0);
+		drive->index_timer->adjust(attotime::from_double(ms/20/1000.0));
 	}
 
 	devcb_call_write_line(&drive->out_idx_func, drive->idx);
@@ -843,7 +843,7 @@ WRITE_LINE_DEVICE_HANDLER( floppy_mon_w )
 
 	/* on -> off */
 	else if (drive->mon == CLEAR_LINE && state)
-		timer_adjust_oneshot((emu_timer*)drive->index_timer, attotime::zero, 0);
+		drive->index_timer->adjust(attotime::zero);
 
 	drive->mon = state;
 }

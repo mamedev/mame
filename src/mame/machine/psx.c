@@ -137,7 +137,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( psx_machine *p_psx, int n_level, const 
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%s: %s", cpuexec_describe_context(p_psx->machine), buf );
+		logerror( "%s: %s", p_psx->machine->describe_context(), buf );
 	}
 }
 
@@ -245,7 +245,7 @@ static void dma_start_timer( psx_machine *p_psx, int n_channel, UINT32 n_ticks )
 {
 	psx_dma_channel *dma = &p_psx->channel[ n_channel ];
 
-	timer_adjust_oneshot( dma->timer, attotime::from_hz(33868800) * n_ticks, n_channel);
+	dma->timer->adjust( attotime::from_hz(33868800) * n_ticks, n_channel);
 	dma->n_ticks = n_ticks;
 	dma->b_running = 1;
 }
@@ -254,7 +254,7 @@ static void dma_stop_timer( psx_machine *p_psx, int n_channel )
 {
 	psx_dma_channel *dma = &p_psx->channel[ n_channel ];
 
-	timer_adjust_oneshot( dma->timer, attotime::never, 0);
+	dma->timer->adjust( attotime::never);
 	dma->b_running = 0;
 }
 
@@ -656,7 +656,7 @@ static void root_timer_adjust( psx_machine *p_psx, int n_counter )
 
 	if( ( root->n_mode & PSX_RC_STOP ) != 0 )
 	{
-		timer_adjust_oneshot( root->timer, attotime::never, n_counter);
+		root->timer->adjust( attotime::never, n_counter);
 	}
 	else
 	{
@@ -670,7 +670,7 @@ static void root_timer_adjust( psx_machine *p_psx, int n_counter )
 
 		n_duration *= root_divider( p_psx, n_counter );
 
-		timer_adjust_oneshot( root->timer, attotime::from_hz(33868800) * n_duration, n_counter);
+		root->timer->adjust( attotime::from_hz(33868800) * n_duration, n_counter);
 	}
 }
 
@@ -827,7 +827,7 @@ static void sio_timer_adjust( psx_machine *p_psx, int n_port )
 		n_time = attotime::never;
 		verboselog( p_psx, 2, "sio_timer_adjust( %d ) finished\n", n_port );
 	}
-	timer_adjust_oneshot( sio->timer, n_time, n_port);
+	sio->timer->adjust( n_time, n_port);
 }
 
 static TIMER_CALLBACK( sio_clock )

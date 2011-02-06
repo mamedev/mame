@@ -172,7 +172,7 @@ static WRITE32_DEVICE_HANDLER( zeus2_timekeeper_w )
 	if (bitlatch[2] && !cmos_protected)
 		timekeeper_w(device, offset, data);
 	else
-		logerror("%s:zeus2_timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", cpuexec_describe_context(device->machine), bitlatch[2], cmos_protected);
+		logerror("%s:zeus2_timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", device->machine->describe_context(), bitlatch[2], cmos_protected);
 	cmos_protected = TRUE;
 }
 
@@ -388,7 +388,7 @@ static READ32_HANDLER( tms32031_control_r )
 	{
 		/* timer is clocked at 100ns */
 		int which = (offset >> 4) & 1;
-		INT32 result = (timer_timeelapsed(timer[which]) * 10000000).as_double();
+		INT32 result = (timer[which]->elapsed() * 10000000).as_double();
 		return result;
 	}
 
@@ -413,7 +413,7 @@ static WRITE32_HANDLER( tms32031_control_w )
 	{
 		int which = (offset >> 4) & 1;
 		if (data & 0x40)
-			timer_adjust_oneshot(timer[which], attotime::never, 0);
+			timer[which]->adjust(attotime::never);
 	}
 	else
 		logerror("%06X:tms32031_control_w(%02X) = %08X\n", cpu_get_pc(space->cpu), offset, data);
@@ -507,7 +507,7 @@ static TIMER_CALLBACK( invasn_gun_callback )
 	/* generate another interrupt on the next scanline while we are within the BEAM_DY */
 	beamy++;
 	if (beamy <= machine->primary_screen->visible_area().max_y && beamy <= gun_y[player] + BEAM_DY)
-		timer_adjust_oneshot(gun_timer[player], machine->primary_screen->time_until_pos(beamy, MAX(0, gun_x[player] - BEAM_DX)), player);
+		gun_timer[player]->adjust(machine->primary_screen->time_until_pos(beamy, MAX(0, gun_x[player] - BEAM_DX)), player);
 }
 
 
@@ -536,7 +536,7 @@ static WRITE32_HANDLER( invasn_gun_w )
 			};
 			gun_x[player] = input_port_read(space->machine, names[player][0]) * (visarea.max_x + 1 - visarea.min_x) / 255 + visarea.min_x + BEAM_XOFFS;
 			gun_y[player] = input_port_read(space->machine, names[player][1]) * (visarea.max_y + 1 - visarea.min_y) / 255 + visarea.min_y;
-			timer_adjust_oneshot(gun_timer[player], space->machine->primary_screen->time_until_pos(MAX(0, gun_y[player] - BEAM_DY), MAX(0, gun_x[player] - BEAM_DX)), player);
+			gun_timer[player]->adjust(space->machine->primary_screen->time_until_pos(MAX(0, gun_y[player] - BEAM_DY), MAX(0, gun_x[player] - BEAM_DX)), player);
 		}
 	}
 }

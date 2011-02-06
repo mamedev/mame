@@ -427,7 +427,7 @@ INLINE void schedule_next_irq(running_machine *machine, int curv)
 		curv = ((curv + 32) & 0xff) & ~0x10;
 
 	/* next one at the start of this scanline */
-	timer_adjust_oneshot(state->irq_timer, machine->primary_screen->time_until_pos(v_to_scanline(state, curv), 0), curv);
+	state->irq_timer->adjust(machine->primary_screen->time_until_pos(v_to_scanline(state, curv)), curv);
 }
 
 
@@ -476,7 +476,7 @@ static TIMER_CALLBACK( adjust_cpu_speed )
 
 	/* scanline for the next run */
 	curv ^= 224;
-	timer_adjust_oneshot(state->cpu_timer, machine->primary_screen->time_until_pos(v_to_scanline(state, curv), 0), curv);
+	state->cpu_timer->adjust(machine->primary_screen->time_until_pos(v_to_scanline(state, curv)), curv);
 }
 
 
@@ -519,7 +519,7 @@ static MACHINE_START( missile )
 
 	/* create a timer to speed/slow the CPU */
 	state->cpu_timer = machine->scheduler().timer_alloc(FUNC(adjust_cpu_speed));
-	timer_adjust_oneshot(state->cpu_timer, machine->primary_screen->time_until_pos(v_to_scanline(state, 0), 0), 0);
+	state->cpu_timer->adjust(machine->primary_screen->time_until_pos(v_to_scanline(state, 0), 0));
 
 	/* create a timer for IRQs and set up the first callback */
 	state->irq_timer = machine->scheduler().timer_alloc(FUNC(clock_irq));

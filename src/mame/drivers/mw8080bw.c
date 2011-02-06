@@ -852,7 +852,7 @@ static MACHINE_CONFIG_DERIVED( zzzap, mw8080bw_root )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(zzzap_io_map)
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_nsec(PERIOD_OF_555_MONOSTABLE_NSEC(RES_M(1), CAP_U(1)))) /* 1.1s */
+	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(RES_M(1), CAP_U(1))) /* 1.1s */
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -966,7 +966,7 @@ static MACHINE_CONFIG_DERIVED( maze, mw8080bw_root )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(maze_io_map)
 	MCFG_MACHINE_START(maze)
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_nsec(PERIOD_OF_555_MONOSTABLE_NSEC(RES_K(270), CAP_U(10)))) /* 2.97s */
+	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(RES_K(270), CAP_U(10))) /* 2.97s */
 
 	/* audio hardware */
 	MCFG_FRAGMENT_ADD(maze_audio)
@@ -1058,7 +1058,7 @@ static MACHINE_CONFIG_DERIVED( boothill, mw8080bw_root )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(boothill_io_map)
 	MCFG_MACHINE_START(boothill)
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_nsec(PERIOD_OF_555_MONOSTABLE_NSEC(RES_K(270), CAP_U(10)))) /* 2.97s */
+	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(RES_K(270), CAP_U(10))) /* 2.97s */
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -1164,7 +1164,7 @@ static MACHINE_CONFIG_DERIVED( checkmat, mw8080bw_root )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(checkmat_io_map)
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_nsec(PERIOD_OF_555_MONOSTABLE_NSEC(RES_K(270), CAP_U(10)))) /* 2.97s */
+	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(RES_K(270), CAP_U(10))) /* 2.97s */
 
 	/* audio hardware */
 	MCFG_FRAGMENT_ADD(checkmat_audio)

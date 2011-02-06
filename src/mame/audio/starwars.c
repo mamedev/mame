@@ -86,7 +86,7 @@ static TIMER_CALLBACK( sound_callback )
 	starwars_state *state = machine->driver_data<starwars_state>();
 	riot6532_porta_in_set(state->riot, 0x40, 0x40);
 	state->main_data = param;
-	cpuexec_boost_interleave(machine, attotime::zero, attotime::from_usec(100));
+	machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
 
@@ -133,7 +133,7 @@ static TIMER_CALLBACK( main_callback )
 
 	riot6532_porta_in_set(state->riot, 0x80, 0x80);
 	state->sound_data = param;
-	cpuexec_boost_interleave(machine, attotime::zero, attotime::from_usec(100));
+	machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
 WRITE8_HANDLER( starwars_main_wr_w )

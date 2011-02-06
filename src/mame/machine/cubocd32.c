@@ -325,7 +325,7 @@ static void akiko_cdda_stop(akiko_state *state)
 	if (cdda != NULL)
 	{
 		cdda_stop_audio(cdda);
-		timer_reset( state->frame_timer, attotime::never );
+		state->frame_timer->reset(  );
 	}
 }
 
@@ -335,7 +335,7 @@ static void akiko_cdda_play(akiko_state *state, UINT32 lba, UINT32 num_blocks)
 	if (cdda != NULL)
 	{
 		cdda_start_audio(cdda, lba, num_blocks);
-		timer_adjust_oneshot( state->frame_timer, attotime::from_hz( 75 ), 0 );
+		state->frame_timer->adjust( attotime::from_hz( 75 ) );
 	}
 }
 
@@ -350,11 +350,11 @@ static void akiko_cdda_pause(akiko_state *state, int pause)
 
 			if ( pause )
 			{
-				timer_reset( state->frame_timer, attotime::never );
+				state->frame_timer->reset(  );
 			}
 			else
 			{
-				timer_adjust_oneshot( state->frame_timer, attotime::from_hz( 75 ), 0 );
+				state->frame_timer->adjust( attotime::from_hz( 75 ) );
 			}
 		}
 	}
@@ -417,7 +417,7 @@ static TIMER_CALLBACK(akiko_frame_proc)
 			akiko_set_cd_status(state, 0x80000000);	/* subcode ready */
 		}
 
-		timer_adjust_oneshot( state->frame_timer, attotime::from_hz( 75 ), 0 );
+		state->frame_timer->adjust( attotime::from_hz( 75 ) );
 	}
 }
 
@@ -502,7 +502,7 @@ static TIMER_CALLBACK(akiko_dma_proc)
 	if ( state->cdrom_readreqmask == 0 )
 		akiko_set_cd_status(state, 0x04000000);
 	else
-		timer_adjust_oneshot( state->dma_timer, attotime::from_usec( CD_SECTOR_TIME / state->cdrom_speed ), 0 );
+		state->dma_timer->adjust( attotime::from_usec( CD_SECTOR_TIME / state->cdrom_speed ) );
 }
 
 static void akiko_start_dma(akiko_state *state)
@@ -518,7 +518,7 @@ static void akiko_start_dma(akiko_state *state)
 
 	state->cdrom_lba_cur = state->cdrom_lba_start;
 
-	timer_adjust_oneshot( state->dma_timer, attotime::from_usec( CD_SECTOR_TIME / state->cdrom_speed ), 0 );
+	state->dma_timer->adjust( attotime::from_usec( CD_SECTOR_TIME / state->cdrom_speed ) );
 }
 
 static void akiko_setup_response( akiko_state *state, int len, UINT8 *r1 )
@@ -665,7 +665,7 @@ static void akiko_update_cdrom(akiko_state *state)
 
 				if ( cmdbuf[7] == 0x80 )
 				{
-					if (LOG_AKIKO_CD) logerror( "%s:AKIKO CD: Data read - start lba: %08x - end lba: %08x\n", cpuexec_describe_context(state->machine), startpos, endpos );
+					if (LOG_AKIKO_CD) logerror( "%s:AKIKO CD: Data read - start lba: %08x - end lba: %08x\n", state->machine->describe_context(), startpos, endpos );
 					state->cdrom_speed = (cmdbuf[8] & 0x40) ? 2 : 1;
 					state->cdrom_lba_start = startpos;
 					state->cdrom_lba_end = endpos;

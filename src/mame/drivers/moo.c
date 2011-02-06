@@ -134,7 +134,7 @@ static INTERRUPT_GEN( moo_interrupt )
 		moo_objdma(device->machine, state->game_type);
 
 		// schedule DMA end interrupt (delay shortened to catch up with V-blank)
-        timer_adjust_oneshot(state->dmaend_timer, attotime::from_usec(MOO_DMADELAY), 0);
+        state->dmaend_timer->adjust(attotime::from_usec(MOO_DMADELAY));
 	}
 
 	// trigger V-blank interrupt
@@ -148,7 +148,7 @@ static INTERRUPT_GEN( moobl_interrupt )
 	moo_objdma(device->machine, state->game_type);
 
 	// schedule DMA end interrupt (delay shortened to catch up with V-blank)
-    timer_adjust_oneshot(state->dmaend_timer, attotime::from_usec(MOO_DMADELAY), 0);
+    state->dmaend_timer->adjust(attotime::from_usec(MOO_DMADELAY));
 
 	// trigger V-blank interrupt
 	cpu_set_input_line(device, 5, HOLD_LINE);

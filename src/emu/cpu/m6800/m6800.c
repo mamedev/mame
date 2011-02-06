@@ -735,7 +735,7 @@ INLINE void set_rmcr(m6800_state *cpustate, UINT8 data)
 	{
 	case 0:
 	case 3: // not implemented
-		timer_enable(cpustate->sci_timer, 0);
+		cpustate->sci_timer->enable(false);
 		break;
 
 	case 1:
@@ -743,7 +743,7 @@ INLINE void set_rmcr(m6800_state *cpustate, UINT8 data)
 		{
 			int divisor = M6800_RMCR_SS[cpustate->rmcr & M6800_RMCR_SS_MASK];
 
-			timer_adjust_periodic(cpustate->sci_timer, attotime::from_hz(cpustate->clock / divisor), 0, attotime::from_hz(cpustate->clock / divisor));
+			cpustate->sci_timer->adjust(attotime::from_hz(cpustate->clock / divisor), 0, attotime::from_hz(cpustate->clock / divisor));
 		}
 		break;
 	}

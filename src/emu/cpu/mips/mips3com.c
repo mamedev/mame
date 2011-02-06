@@ -205,10 +205,10 @@ void mips3com_update_cycle_counting(mips3_state *mips)
 		UINT32 compare = mips->cpr[0][COP0_Compare];
 		UINT32 delta = compare - count;
 		attotime newtime = mips->device->cycles_to_attotime((UINT64)delta * 2);
-		timer_adjust_oneshot(mips->compare_int_timer, newtime, 0);
+		mips->compare_int_timer->adjust(newtime);
 		return;
 	}
-	timer_adjust_oneshot(mips->compare_int_timer, attotime::never, 0);
+	mips->compare_int_timer->adjust(attotime::never);
 }
 
 

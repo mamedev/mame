@@ -1109,13 +1109,13 @@ static READ8_HANDLER( laserdisc_io_r )
 	UINT8 result = 0x00;
 	if (offset == 1)
 		result = 0x18;
-	mame_printf_debug("%s:ld read ($%02X) = %02X\n", cpuexec_describe_context(space->machine), 0x28 + offset, result);
+	mame_printf_debug("%s:ld read ($%02X) = %02X\n", space->machine->describe_context(), 0x28 + offset, result);
 	return result;
 }
 
 static WRITE8_HANDLER( laserdisc_io_w )
 {
-	mame_printf_debug("%s:ld write ($%02X) = %02X\n", cpuexec_describe_context(space->machine), 0x28 + offset, data);
+	mame_printf_debug("%s:ld write ($%02X) = %02X\n", space->machine->describe_context(), 0x28 + offset, data);
 }
 
 static DRIVER_INIT( laserdisc )

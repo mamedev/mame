@@ -717,7 +717,7 @@ static const ptm6840_interface ptm_ic2_intf =
 /* IC3, lamp data lines + alpha numeric display */
 static WRITE8_DEVICE_HANDLER( pia_ic3_porta_w )
 {
-	LOG_IC3(("%s: IC3 PIA Port A Set to %2x (lamp strobes 1 - 9)\n", cpuexec_describe_context(device->machine),data));
+	LOG_IC3(("%s: IC3 PIA Port A Set to %2x (lamp strobes 1 - 9)\n", device->machine->describe_context(),data));
 
 	if(ic23_active)
 	{
@@ -728,7 +728,7 @@ static WRITE8_DEVICE_HANDLER( pia_ic3_porta_w )
 
 static WRITE8_DEVICE_HANDLER( pia_ic3_portb_w )
 {
-	LOG_IC3(("%s: IC3 PIA Port B Set to %2x  (lamp strobes 10 - 17)\n", cpuexec_describe_context(device->machine),data));
+	LOG_IC3(("%s: IC3 PIA Port B Set to %2x  (lamp strobes 10 - 17)\n", device->machine->describe_context(),data));
 
 	if(ic23_active)
 	{
@@ -739,7 +739,7 @@ static WRITE8_DEVICE_HANDLER( pia_ic3_portb_w )
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic3_ca2_w )
 {
-	LOG_IC3(("%s: IC3 PIA Write CA2 (alpha data), %02X\n", cpuexec_describe_context(device->machine),state));
+	LOG_IC3(("%s: IC3 PIA Write CA2 (alpha data), %02X\n", device->machine->describe_context(),state));
 
 	alpha_data_line = state;
 	ROC10937_draw_16seg(0);
@@ -748,7 +748,7 @@ static WRITE_LINE_DEVICE_HANDLER( pia_ic3_ca2_w )
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic3_cb2_w )
 {
-	LOG_IC3(("%s: IC3 PIA Write CB (alpha reset), %02X\n",cpuexec_describe_context(device->machine),state));
+	LOG_IC3(("%s: IC3 PIA Write CB (alpha reset), %02X\n",device->machine->describe_context(),state));
 
 	if ( state ) ROC10937_reset(0);
 	ROC10937_draw_16seg(0);
@@ -829,7 +829,7 @@ static void ic24_setup(void)
 		{
 			ic23_active=1;
 			ic24_output(0);
-			timer_adjust_oneshot(ic24_timer, attotime::from_double(duration), 0);
+			ic24_timer->adjust(attotime::from_double(duration));
 		}
 	}
 }
@@ -923,14 +923,14 @@ static READ8_DEVICE_HANDLER( pia_ic4_portb_r )
 	if ( lamp_undercurrent ) ic4_input_b |= 0x01;
 	#endif
 
-	LOG_IC3(("%s: IC4 PIA Read of Port B %x\n",cpuexec_describe_context(device->machine),ic4_input_b));
+	LOG_IC3(("%s: IC4 PIA Read of Port B %x\n",device->machine->describe_context(),ic4_input_b));
 	return ic4_input_b;
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic4_ca2_w )
 {
-	LOG_IC3(("%s: IC4 PIA Write CA (input MUX strobe /LED B), %02X\n", cpuexec_describe_context(device->machine),state));
+	LOG_IC3(("%s: IC4 PIA Write CA (input MUX strobe /LED B), %02X\n", device->machine->describe_context(),state));
 
 	IC23GB = state;
 	ic23_update();
@@ -938,7 +938,7 @@ static WRITE_LINE_DEVICE_HANDLER( pia_ic4_ca2_w )
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic4_cb2_w )
 {
-	LOG_IC3(("%s: IC4 PIA Write CA (input MUX strobe /LED B), %02X\n", cpuexec_describe_context(device->machine),state));
+	LOG_IC3(("%s: IC4 PIA Write CA (input MUX strobe /LED B), %02X\n", device->machine->describe_context(),state));
 	reel_flag=state;
 }
 static const pia6821_interface pia_ic4_intf =
@@ -982,7 +982,7 @@ static READ8_DEVICE_HANDLER( pia_ic5_porta_r )
 			aux1_input &= ~0x04; 
 		}*/
 	}
-	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",cpuexec_describe_context(device->machine)));
+	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",device->machine->describe_context()));
 
 	return input_port_read(device->machine, "AUX1")|aux1_input;
 }
@@ -1071,7 +1071,7 @@ static READ8_DEVICE_HANDLER( pia_ic5_portb_r )
 		}*/
 	}
 
-	LOG(("%s: IC5 PIA Read of Port B (coin input AUX2)\n",cpuexec_describe_context(device->machine)));
+	LOG(("%s: IC5 PIA Read of Port B (coin input AUX2)\n",device->machine->describe_context()));
 	coin_lockout_w(device->machine, 0, (pia6821_get_output_b(pia_ic5) & 0x01) );
 	coin_lockout_w(device->machine, 1, (pia6821_get_output_b(pia_ic5) & 0x02) );
 	coin_lockout_w(device->machine, 2, (pia6821_get_output_b(pia_ic5) & 0x04) );
@@ -1082,7 +1082,7 @@ static READ8_DEVICE_HANDLER( pia_ic5_portb_r )
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic5_ca2_w )
 {
-	LOG(("%s: IC5 PIA Write CA2 (Serial Tx) %2x\n",cpuexec_describe_context(device->machine),state));
+	LOG(("%s: IC5 PIA Write CA2 (Serial Tx) %2x\n",device->machine->describe_context(),state));
 	serial_data = state;
 }
 
@@ -1179,7 +1179,7 @@ static const pia6821_interface pia_ic5_intf =
 /* IC6, Reel A and B and AY registers (MODs below 4 only) */
 static WRITE8_DEVICE_HANDLER( pia_ic6_portb_w )
 {
-	LOG(("%s: IC6 PIA Port B Set to %2x (Reel A and B)\n", cpuexec_describe_context(device->machine),data));
+	LOG(("%s: IC6 PIA Port B Set to %2x (Reel A and B)\n", device->machine->describe_context(),data));
 
 	if (reel_mux == SEVEN_REEL)
 	{
@@ -1209,7 +1209,7 @@ static WRITE8_DEVICE_HANDLER( pia_ic6_portb_w )
 
 static WRITE8_DEVICE_HANDLER( pia_ic6_porta_w )
 {
-	LOG(("%s: IC6 PIA Write A %2x\n", cpuexec_describe_context(device->machine),data));
+	LOG(("%s: IC6 PIA Write A %2x\n", device->machine->describe_context(),data));
 	if (mod_number <4)
 	{
 		ay_data = data;
@@ -1220,7 +1220,7 @@ static WRITE8_DEVICE_HANDLER( pia_ic6_porta_w )
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic6_ca2_w )
 {
-	LOG(("%s: IC6 PIA write CA2 %2x (AY8913 BC1)\n", cpuexec_describe_context(device->machine),state));
+	LOG(("%s: IC6 PIA write CA2 %2x (AY8913 BC1)\n", device->machine->describe_context(),state));
 	if (mod_number <4)
 	{
 		if ( state ) ay8913_address |=  0x01;
@@ -1232,7 +1232,7 @@ static WRITE_LINE_DEVICE_HANDLER( pia_ic6_ca2_w )
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic6_cb2_w )
 {
-	LOG(("%s: IC6 PIA write CB2 %2x (AY8913 BCDIR)\n", cpuexec_describe_context(device->machine),state));
+	LOG(("%s: IC6 PIA write CB2 %2x (AY8913 BCDIR)\n", device->machine->describe_context(),state));
 	if (mod_number <4)
 	{
 		if ( state ) ay8913_address |=  0x02;
@@ -1262,7 +1262,7 @@ static const pia6821_interface pia_ic6_intf =
 /* IC7 Reel C and D, mechanical meters/Reel E and F, input strobe bit A */
 static WRITE8_DEVICE_HANDLER( pia_ic7_porta_w )
 {
-	LOG(("%s: IC7 PIA Port A Set to %2x (Reel C and D)\n", cpuexec_describe_context(device->machine),data));
+	LOG(("%s: IC7 PIA Port A Set to %2x (Reel C and D)\n", device->machine->describe_context(),data));
 	if (reel_mux == SEVEN_REEL)
 	{
 		stepper_update(5, data&0x0F);
@@ -1338,7 +1338,7 @@ all eight meters are driven from this port, giving the 8 line driver chip
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic7_ca2_w )
 {
-	LOG(("%s: IC7 PIA write CA2 %2x (input strobe bit 0 / LED A)\n", cpuexec_describe_context(device->machine),state));
+	LOG(("%s: IC7 PIA write CA2 %2x (input strobe bit 0 / LED A)\n", device->machine->describe_context(),state));
 
 	IC23GA = state;
 	ic24_setup();
@@ -1373,7 +1373,7 @@ static READ8_DEVICE_HANDLER( pia_ic8_porta_r )
 	static const char *const portnames[] = { "ORANGE1", "ORANGE2", "BLACK1", "BLACK2", "ORANGE1", "ORANGE2", "DIL1", "DIL2" };
 	device_t *pia_ic5 = device->machine->device("pia_ic5");
 
-	LOG_IC8(("%s: IC8 PIA Read of Port A (MUX input data)\n", cpuexec_describe_context(device->machine)));
+	LOG_IC8(("%s: IC8 PIA Read of Port A (MUX input data)\n", device->machine->describe_context()));
 /* The orange inputs are polled twice as often as the black ones, for reasons of efficiency.
    This is achieved via connecting every input line to an AND gate, thus allowing two strobes
    to represent each orange input bank (strobes are active low). */
@@ -1393,7 +1393,7 @@ static WRITE8_DEVICE_HANDLER( pia_ic8_portb_w )
 //		duart.drive_sensor(data & 0x04, data & 0x01, data & 0x04, data & 0x02);
 	}
 	int i;
-	LOG_IC8(("%s: IC8 PIA Port B Set to %2x (OUTPUT PORT, TRIACS)\n", cpuexec_describe_context(device->machine),data));
+	LOG_IC8(("%s: IC8 PIA Port B Set to %2x (OUTPUT PORT, TRIACS)\n", device->machine->describe_context(),data));
 	for (i = 0; i < 8; i++)
 	{
 		output_set_indexed_value("triac", i, data & (1 << i));
@@ -1402,7 +1402,7 @@ static WRITE8_DEVICE_HANDLER( pia_ic8_portb_w )
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic8_ca2_w )
 {
-	LOG_IC8(("%s: IC8 PIA write CA2 (input_strobe bit 2 / LED C) %02X\n", cpuexec_describe_context(device->machine), state & 0xFF));
+	LOG_IC8(("%s: IC8 PIA write CA2 (input_strobe bit 2 / LED C) %02X\n", device->machine->describe_context(), state & 0xFF));
 
 	IC23GC = state;
 	ic23_update();
@@ -1411,7 +1411,7 @@ static WRITE_LINE_DEVICE_HANDLER( pia_ic8_ca2_w )
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic8_cb2_w )
 {
-	LOG_IC8(("%s: IC8 PIA write CB2 (alpha clock) %02X\n", cpuexec_describe_context(device->machine), state & 0xFF));
+	LOG_IC8(("%s: IC8 PIA write CB2 (alpha clock) %02X\n", device->machine->describe_context(), state & 0xFF));
 
 	if ( !alpha_clock && (state) )
 	{
@@ -1443,7 +1443,7 @@ static const pia6821_interface pia_ic8_intf =
 static WRITE8_DEVICE_HANDLER( pia_gb_porta_w )
 {
 	device_t *msm6376 = device->machine->device("msm6376");
-	LOG_SS(("%s: GAMEBOARD: PIA Port A Set to %2x\n", cpuexec_describe_context(device->machine),data));
+	LOG_SS(("%s: GAMEBOARD: PIA Port A Set to %2x\n", device->machine->describe_context(),data));
 	okim6376_w(msm6376, 0, data);
 }
 
@@ -1451,7 +1451,7 @@ static WRITE8_DEVICE_HANDLER( pia_gb_portb_w )
 {
 	int changed = expansion_latch^data;
 
-	LOG_SS(("%s: GAMEBOARD: PIA Port A Set to %2x\n", cpuexec_describe_context(device->machine),data));
+	LOG_SS(("%s: GAMEBOARD: PIA Port A Set to %2x\n", device->machine->describe_context(),data));
 
 	expansion_latch = data;
 
@@ -1478,7 +1478,7 @@ static WRITE8_DEVICE_HANDLER( pia_gb_portb_w )
 static READ8_DEVICE_HANDLER( pia_gb_portb_r )
 {
 	device_t *msm6376 = device->machine->device("msm6376");
-	LOG_SS(("%s: GAMEBOARD: PIA Read of Port B\n",cpuexec_describe_context(device->machine)));
+	LOG_SS(("%s: GAMEBOARD: PIA Read of Port B\n",device->machine->describe_context()));
 	//
 	// b7, 1 = OKI ready, 0 = OKI busy
 	// b5, vol clock
@@ -1490,7 +1490,7 @@ static READ8_DEVICE_HANDLER( pia_gb_portb_r )
 
 static WRITE_LINE_DEVICE_HANDLER( pia_gb_ca2_w )
 {
-	LOG_SS(("%s: GAMEBOARD: OKI RESET data = %02X\n", cpuexec_describe_context(device->machine), state));
+	LOG_SS(("%s: GAMEBOARD: OKI RESET data = %02X\n", device->machine->describe_context(), state));
 
 //  reset line
 }

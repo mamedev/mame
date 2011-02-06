@@ -131,7 +131,7 @@ MACHINE_RESET( namcos2 )
 	InitC148();
 
 	/* reset POSIRQ timer */
-	timer_adjust_oneshot(namcos2_posirq_timer, attotime::never, 0);
+	namcos2_posirq_timer->adjust(attotime::never);
 }
 
 /*************************************************************/
@@ -669,7 +669,7 @@ static TIMER_CALLBACK( namcos2_posirq_tick )
 
 void namcos2_adjust_posirq_timer( running_machine *machine, int scanline )
 {
-	timer_adjust_oneshot(namcos2_posirq_timer, machine->primary_screen->time_until_pos(scanline, 80), scanline);
+	namcos2_posirq_timer->adjust(machine->primary_screen->time_until_pos(scanline, 80), scanline);
 }
 
 INTERRUPT_GEN( namcos2_68k_master_vblank )

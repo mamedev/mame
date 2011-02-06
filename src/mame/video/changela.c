@@ -30,7 +30,7 @@ VIDEO_START( changela )
 	state->tree1_bitmap = machine->primary_screen->alloc_compatible_bitmap();
 
 	state->scanline_timer = machine->scheduler().timer_alloc(FUNC(changela_scanline_callback));
-	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->time_until_pos(30), 30);
+	state->scanline_timer->adjust(machine->primary_screen->time_until_pos(30), 30);
 
 	state_save_register_global_pointer(machine, state->memory_devices, 4 * 0x800);
 	state_save_register_global_pointer(machine, state->tree_ram, 2 * 0x20);
@@ -719,7 +719,7 @@ static TIMER_CALLBACK( changela_scanline_callback )
 
 	sy++;
 	if (sy > 256) sy = 30;
-	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->time_until_pos(sy), sy);
+	state->scanline_timer->adjust(machine->primary_screen->time_until_pos(sy), sy);
 }
 
 VIDEO_UPDATE( changela )

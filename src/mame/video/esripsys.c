@@ -73,7 +73,7 @@ static TIMER_CALLBACK( hblank_start_callback )
 		v = 0;
 
 	/* Set end of HBLANK timer */
-	timer_adjust_oneshot(hblank_end_timer, machine->primary_screen->time_until_pos(v, ESRIPSYS_HBLANK_END), v);
+	hblank_end_timer->adjust(machine->primary_screen->time_until_pos(v, ESRIPSYS_HBLANK_END), v);
 	esripsys_hblank = 0;
 }
 
@@ -85,7 +85,7 @@ static TIMER_CALLBACK( hblank_end_callback )
 		machine->primary_screen->update_partial(v - 1);
 
 	esripsys__12sel ^= 1;
-	timer_adjust_oneshot(hblank_start_timer, machine->primary_screen->time_until_pos(v, ESRIPSYS_HBLANK_START), 0);
+	hblank_start_timer->adjust(machine->primary_screen->time_until_pos(v, ESRIPSYS_HBLANK_START));
 
 	esripsys_hblank = 1;
 }
@@ -106,7 +106,7 @@ VIDEO_START( esripsys )
 	/* Create and initialise the HBLANK timers */
 	hblank_start_timer = machine->scheduler().timer_alloc(FUNC(hblank_start_callback));
 	hblank_end_timer = machine->scheduler().timer_alloc(FUNC(hblank_end_callback));
-	timer_adjust_oneshot(hblank_start_timer, machine->primary_screen->time_until_pos(0, ESRIPSYS_HBLANK_START), 0);
+	hblank_start_timer->adjust(machine->primary_screen->time_until_pos(0, ESRIPSYS_HBLANK_START));
 
 	/* Create the sprite scaling table */
 	scale_table = auto_alloc_array(machine, UINT8, 64 * 64);

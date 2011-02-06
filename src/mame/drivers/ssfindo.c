@@ -266,9 +266,9 @@ static void PS7500_startTimer0(void)
 	int val=((PS7500_IO[T0low]&0xff)|((PS7500_IO[T0high]&0xff)<<8))>>1;
 
 	if(val==0)
-		timer_adjust_oneshot(PS7500timer0, attotime::never, 0);
+		PS7500timer0->adjust(attotime::never);
 	else
-		timer_adjust_periodic(PS7500timer0, attotime::from_usec(val ), 0, attotime::from_usec(val ));
+		PS7500timer0->adjust(attotime::from_usec(val ), 0, attotime::from_usec(val ));
 }
 
 static TIMER_CALLBACK( PS7500_Timer1_callback )
@@ -284,9 +284,9 @@ static void PS7500_startTimer1(void)
 {
 	int val=((PS7500_IO[T1low]&0xff)|((PS7500_IO[T1high]&0xff)<<8))>>1;
 	if(val==0)
-		timer_adjust_oneshot(PS7500timer1, attotime::never, 0);
+		PS7500timer1->adjust(attotime::never);
 	else
-		timer_adjust_periodic(PS7500timer1, attotime::from_usec(val ), 0, attotime::from_usec(val ));
+		PS7500timer1->adjust(attotime::from_usec(val ), 0, attotime::from_usec(val ));
 }
 
 static INTERRUPT_GEN( ssfindo_interrupt )
@@ -303,8 +303,8 @@ static void PS7500_reset(void)
 		PS7500_IO[IOCR]			=	0x3f;
 		PS7500_IO[VIDCR]		=	0;
 
-		timer_adjust_oneshot( PS7500timer0, attotime::never, 0);
-		timer_adjust_oneshot( PS7500timer1, attotime::never, 0);
+		PS7500timer0->adjust( attotime::never);
+		PS7500timer1->adjust( attotime::never);
 }
 
 static READ32_HANDLER(PS7500_IO_r)

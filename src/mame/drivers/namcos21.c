@@ -575,7 +575,7 @@ ReadWordFromSlaveInput( address_space *space )
 		{
 			mpDspState->slaveBytesAdvertised--;
 		}
-		if (ENABLE_LOGGING) logerror( "%s:-%04x(0x%04x)\n", cpuexec_describe_context(space->machine), data, mpDspState->slaveBytesAvailable );
+		if (ENABLE_LOGGING) logerror( "%s:-%04x(0x%04x)\n", space->machine->describe_context(), data, mpDspState->slaveBytesAvailable );
 	}
 	return data;
 } /* ReadWordFromSlaveInput */

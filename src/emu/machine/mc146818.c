@@ -187,9 +187,9 @@ void mc146818_device::device_start()
 	emu_timer *timer = timer_alloc();
 	if (m_config.m_type == mc146818_device_config::MC146818_UTC) {
 		// hack: for apollo we increase the update frequency to stay in sync with real time
-		timer_adjust_periodic(timer, attotime::from_hz(2), 0, attotime::from_hz(2));
+		timer->adjust(attotime::from_hz(2), 0, attotime::from_hz(2));
 	} else {
-		timer_adjust_periodic(timer, attotime::from_hz(1), 0, attotime::from_hz(1));
+		timer->adjust(attotime::from_hz(1), 0, attotime::from_hz(1));
 	}
 	set_base_datetime();
 }

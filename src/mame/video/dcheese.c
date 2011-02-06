@@ -66,7 +66,7 @@ static void update_scanline_irq( running_machine *machine )
 		time = machine->primary_screen->time_until_pos(effscan);
 		if (time < machine->primary_screen->scan_period())
 			time += machine->primary_screen->frame_period();
-		timer_adjust_oneshot(state->blitter_timer, time, 0);
+		state->blitter_timer->adjust(time);
 	}
 }
 
@@ -212,7 +212,7 @@ static void do_blit( running_machine *machine )
 	if (state->blitter_xparam[8] != 0 || state->blitter_xparam[9] != 0 || state->blitter_xparam[10] != 0 || state->blitter_xparam[11] != 0 ||
 		state->blitter_yparam[8] != 0 || state->blitter_yparam[9] != 0 || state->blitter_yparam[10] != 0 || state->blitter_yparam[11] != 0)
 	{
-		logerror("%s:blit! (%04X)\n", cpuexec_describe_context(machine), state->blitter_color[0]);
+		logerror("%s:blit! (%04X)\n", machine->describe_context(), state->blitter_color[0]);
 		logerror("   %04X %04X %04X %04X - %04X %04X %04X %04X - %04X %04X %04X %04X - %04X %04X %04X %04X\n",
 				state->blitter_xparam[0], state->blitter_xparam[1], state->blitter_xparam[2], state->blitter_xparam[3],
 				state->blitter_xparam[4], state->blitter_xparam[5], state->blitter_xparam[6], state->blitter_xparam[7],

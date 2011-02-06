@@ -275,7 +275,7 @@ static TIMER_CALLBACK( dmaend_callback )
 		if (state->suspension_active)
 		{
 			state->suspension_active = 0;
-			cpuexec_trigger(machine, state->resume_trigger);
+			machine->scheduler().trigger(state->resume_trigger);
 		}
 
 		// IRQ 5 is the "object DMA end interrupt" and shouldn't be triggered
@@ -291,7 +291,7 @@ static INTERRUPT_GEN( xexex_interrupt )
 	if (state->suspension_active)
 	{
 		state->suspension_active = 0;
-		cpuexec_trigger(device->machine, state->resume_trigger);
+		device->machine->scheduler().trigger(state->resume_trigger);
 	}
 
 	switch (cpu_getiloops(device))
@@ -309,7 +309,7 @@ static INTERRUPT_GEN( xexex_interrupt )
 				xexex_objdma(device->machine, 0);
 
 				// schedule DMA end interrupt
-				timer_adjust_oneshot(state->dmadelay_timer, XE_DMADELAY, 0);
+				state->dmadelay_timer->adjust(XE_DMADELAY);
 			}
 
 			// IRQ 4 is the V-blank interrupt. It controls color, sound and

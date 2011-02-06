@@ -341,7 +341,7 @@ static TIMER_CALLBACK( fdc_data_callback )
 
 	if (more_data)
 	{
-		timer_adjust_oneshot(fdc_timer, attotime::from_usec(USEC_DELAY), 0);
+		fdc_timer->adjust(attotime::from_usec(USEC_DELAY));
 	}
 	else
 	{
@@ -426,7 +426,7 @@ static WRITE16_HANDLER( wd1770_w )
 															fdc.sector));
 
 					/* Set the data read timer */
-					timer_adjust_oneshot(fdc_timer, attotime::from_usec(USEC_DELAY), 0);
+					fdc_timer->adjust(attotime::from_usec(USEC_DELAY));
 
 					break;
 				}
@@ -463,7 +463,7 @@ static WRITE16_HANDLER( wd1770_w )
 				case 13:
 				{
 					/* Stop any operation in progress */
-					timer_reset(fdc_timer, attotime::never);
+					fdc_timer->reset();
 					fdc.status &= ~BUSY;
 					FDC_LOG(("Force Interrupt\n"));
 					break;
@@ -494,7 +494,7 @@ static WRITE16_HANDLER( wd1770_w )
 
 			/* Queue an event to write the data if write command was specified */
 			if (fdc.cmd & 0x20)
-				timer_adjust_oneshot(fdc_timer, attotime::from_usec(USEC_DELAY), 0);
+				fdc_timer->adjust(attotime::from_usec(USEC_DELAY));
 
 			break;
 		}

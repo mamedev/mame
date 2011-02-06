@@ -88,7 +88,7 @@ static void xtheball_to_shiftreg(address_space *space, UINT32 address, UINT16 *s
 	else if (address >= 0x02000000 && address <= 0x020fffff)
 		memcpy(shiftreg, &vram_fg[TOWORD(address & 0xff000)], TOBYTE(0x1000));
 	else
-		logerror("%s:xtheball_to_shiftreg(%08X)\n", cpuexec_describe_context(space->machine), address);
+		logerror("%s:xtheball_to_shiftreg(%08X)\n", space->machine->describe_context(), address);
 }
 
 
@@ -99,7 +99,7 @@ static void xtheball_from_shiftreg(address_space *space, UINT32 address, UINT16 
 	else if (address >= 0x02000000 && address <= 0x020fffff)
 		memcpy(&vram_fg[TOWORD(address & 0xff000)], shiftreg, TOBYTE(0x1000));
 	else
-		logerror("%s:xtheball_from_shiftreg(%08X)\n", cpuexec_describe_context(space->machine), address);
+		logerror("%s:xtheball_from_shiftreg(%08X)\n", space->machine->describe_context(), address);
 }
 
 

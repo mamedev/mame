@@ -270,7 +270,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( psx_gpu *p_psxgpu, int n_level, const c
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%s: %s", cpuexec_describe_context(p_psxgpu->machine), buf );
+		logerror( "%s: %s", p_psxgpu->machine->describe_context(), buf );
 	}
 }
 

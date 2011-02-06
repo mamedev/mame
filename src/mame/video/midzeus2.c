@@ -541,7 +541,7 @@ static void zeus_register_update(running_machine *machine, offs_t offset, UINT32
 				zeus_fifo_words = 0;
 
 			/* set the interrupt signal to indicate we can handle more */
-			timer_adjust_oneshot(int_timer, attotime::from_nsec(500), 0);
+			int_timer->adjust(attotime::from_nsec(500));
 			break;
 
 		case 0x20:

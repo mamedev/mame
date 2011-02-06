@@ -123,8 +123,8 @@ static MACHINE_START( kengo )
 
 static TIMER_CALLBACK( synch_callback )
 {
-	//cpuexec_boost_interleave(machine, attotime::zero, attotime::from_usec(8000000));
-	cpuexec_boost_interleave(machine, attotime::from_hz(MASTER_CLOCK/4/12), attotime::from_seconds(25));
+	//machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(8000000));
+	machine->scheduler().boost_interleave(attotime::from_hz(MASTER_CLOCK/4/12), attotime::from_seconds(25));
 }
 
 static MACHINE_RESET( m72 )
@@ -134,7 +134,7 @@ static MACHINE_RESET( m72 )
 	state->mcu_sample_addr = 0;
 	state->mcu_snd_cmd_latch = 0;
 
-	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->time_until_pos(0), 0);
+	state->scanline_timer->adjust(machine->primary_screen->time_until_pos(0));
 	machine->scheduler().synchronize(FUNC(synch_callback));
 }
 
@@ -142,13 +142,13 @@ static MACHINE_RESET( xmultipl )
 {
 	m72_state *state = machine->driver_data<m72_state>();
 	state->irq_base = 0x08;
-	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->time_until_pos(0), 0);
+	state->scanline_timer->adjust(machine->primary_screen->time_until_pos(0));
 }
 
 static MACHINE_RESET( kengo )
 {
 	m72_state *state = machine->driver_data<m72_state>();
-	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->time_until_pos(0), 0);
+	state->scanline_timer->adjust(machine->primary_screen->time_until_pos(0));
 }
 
 static TIMER_CALLBACK( m72_scanline_interrupt )
@@ -173,7 +173,7 @@ static TIMER_CALLBACK( m72_scanline_interrupt )
 	/* adjust for next scanline */
 	if (++scanline >= machine->primary_screen->height())
 		scanline = 0;
-	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->time_until_pos(scanline), scanline);
+	state->scanline_timer->adjust(machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 static TIMER_CALLBACK( kengo_scanline_interrupt )
@@ -202,7 +202,7 @@ static TIMER_CALLBACK( kengo_scanline_interrupt )
 	/* adjust for next scanline */
 	if (++scanline >= machine->primary_screen->height())
 		scanline = 0;
-	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->time_until_pos(scanline), scanline);
+	state->scanline_timer->adjust(machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 /***************************************************************************

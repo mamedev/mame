@@ -193,7 +193,7 @@ WRITE16_HANDLER( asic65_data_w )
 	if (asic65.type == ASIC65_ROMBASED)
 	{
 		space->machine->scheduler().synchronize(FUNC(m68k_asic65_deferred_w), data | (offset << 16));
-		cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(20));
+		space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
 		return;
 	}
 
@@ -231,7 +231,7 @@ READ16_HANDLER( asic65_r )
 	if (asic65.type == ASIC65_ROMBASED)
 	{
 		asic65._68full = 0;
-		cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(5));
+		space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(5));
 		return asic65._68data;
 	}
 
@@ -449,7 +449,7 @@ READ16_HANDLER( asic65_io_r )
 		/* bit 14 = 68FULL */
 		/* bit 13 = XFLG */
 		/* bit 12 = controlled by jumper */
-		cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(5));
+		space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(5));
 		return (asic65.tfull << 15) | (asic65._68full << 14) | (asic65.xflg << 13) | 0x0000;
 	}
 	else

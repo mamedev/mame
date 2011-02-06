@@ -307,7 +307,7 @@ void btoads_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
 	}
 
 	else
-		logerror("%s:btoads_to_shiftreg(%08X)\n", cpuexec_describe_context(space->machine), address);
+		logerror("%s:btoads_to_shiftreg(%08X)\n", space->machine->describe_context(), address);
 }
 
 
@@ -332,7 +332,7 @@ void btoads_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg
 		render_sprite_row(shiftreg, address);
 
 	else
-		logerror("%s:btoads_from_shiftreg(%08X)\n", cpuexec_describe_context(space->machine), address);
+		logerror("%s:btoads_from_shiftreg(%08X)\n", space->machine->describe_context(), address);
 }
 
 

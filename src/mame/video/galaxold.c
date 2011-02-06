@@ -1740,7 +1740,7 @@ static void start_stars_blink_timer(double ra, double rb, double c)
 
 	int period_in_ms = 693 * (ra + 2.0 * rb) * c;
 
-	timer_adjust_periodic(stars_blink_timer, attotime::from_msec(period_in_ms), 0, attotime::from_msec(period_in_ms));
+	stars_blink_timer->adjust(attotime::from_msec(period_in_ms), 0, attotime::from_msec(period_in_ms));
 }
 
 
@@ -1754,7 +1754,7 @@ static TIMER_CALLBACK( stars_scroll_callback )
 
 static void start_stars_scroll_timer(running_machine *machine)
 {
-	timer_adjust_periodic(stars_scroll_timer, machine->primary_screen->frame_period(), 0, machine->primary_screen->frame_period());
+	stars_scroll_timer->adjust(machine->primary_screen->frame_period(), 0, machine->primary_screen->frame_period());
 }
 
 

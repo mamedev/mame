@@ -172,7 +172,7 @@ WRITE16_HANDLER( micro3d_mc68901_w )
 			/* Timer stopped */
 			if (mode == 0)
 			{
-				timer_enable(state->mc68901.timer_a, 0);
+				state->mc68901.timer_a->enable(false);
 			}
 			else if (mode < 8)
 			{
@@ -192,7 +192,7 @@ WRITE16_HANDLER( micro3d_mc68901_w )
 
 				period = attotime::from_hz(4000000 / divisor) * data;
 
-				timer_adjust_periodic(state->mc68901.timer_a, period, 0, period);
+				state->mc68901.timer_a->adjust(period, 0, period);
 			}
 			else
 			{
@@ -701,7 +701,7 @@ WRITE16_HANDLER( micro3d_reset_w )
 WRITE16_HANDLER( host_drmath_int_w )
 {
 	cputag_set_input_line(space->machine, "drmath", AM29000_INTR2, ASSERT_LINE);
-	cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(10));
+	space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
 }
 
 

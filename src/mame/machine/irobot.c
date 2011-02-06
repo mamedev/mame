@@ -25,7 +25,7 @@
 
 #define IR_CPU_STATE(m) \
 	logerror(\
-			"%s, scanline: %d\n", cpuexec_describe_context(m), (m)->primary_screen->vpos())
+			"%s, scanline: %d\n", m->describe_context(), (m)->primary_screen->vpos())
 
 
 static void irmb_run(running_machine *machine);

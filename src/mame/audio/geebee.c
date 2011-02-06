@@ -59,7 +59,7 @@ WRITE8_DEVICE_HANDLER( geebee_sound_w )
          * discharge C33 (1uF) through R50 (22k) -> 0.14058s
          */
 		attotime period = attotime::from_hz(32768) * 14058 / 100000;
-		timer_adjust_periodic(state->volume_timer, period, 0, period);
+		state->volume_timer->adjust(period, 0, period);
 	}
 	else
 	{
@@ -71,7 +71,7 @@ WRITE8_DEVICE_HANDLER( geebee_sound_w )
          * maybe half as fast?
          */
 		attotime period = attotime::from_hz(32768) * 29060 / 100000;
-		timer_adjust_periodic(state->volume_timer, period, 0, period);
+		state->volume_timer->adjust(period, 0, period);
     }
 }
 

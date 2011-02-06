@@ -187,7 +187,7 @@ WRITE8_DEVICE_HANDLER( qsound_w )
 			break;
 
 		default:
-			logerror("%s: unexpected qsound write to offset %d == %02X\n", cpuexec_describe_context(device->machine), offset, data);
+			logerror("%s: unexpected qsound write to offset %d == %02X\n", device->machine->describe_context(), offset, data);
 			break;
 	}
 }

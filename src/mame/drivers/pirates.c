@@ -132,7 +132,7 @@ static CUSTOM_INPUT( prot_r )
 //  offs_t pc;
 	int bit;
 
-//  logerror("%s: IN1_r\n",cpuexec_describe_context(field->port->machine));
+//  logerror("%s: IN1_r\n",field->port->machine->describe_context());
 
 #if 0
 	/* Pirates protection workaround. It more complicated than this... see code at

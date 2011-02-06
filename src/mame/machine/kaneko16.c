@@ -2121,7 +2121,7 @@ void calc3_mcu_run(running_machine *machine)
 	if (mcu_command == 0) return;
 
 	logerror("%s : MCU executed command at %04X: %04X\n",
-		cpuexec_describe_context(machine),calc3_mcu_command_offset,mcu_command);
+		machine->describe_context(),calc3_mcu_command_offset,mcu_command);
 
 
 	if (mcu_command>0)
@@ -2453,7 +2453,7 @@ void bloodwar_mcu_run(running_machine *machine)
 				mame_fread(f,&kaneko16_mcu_ram[mcu_offset], 128);
 				mame_fclose(f);
 			}
-			logerror("%s : MCU executed command: %04X %04X (load NVRAM settings)\n", cpuexec_describe_context(machine), mcu_command, mcu_offset*2);
+			logerror("%s : MCU executed command: %04X %04X (load NVRAM settings)\n", machine->describe_context(), mcu_command, mcu_offset*2);
 		}
 		break;
 
@@ -2465,20 +2465,20 @@ void bloodwar_mcu_run(running_machine *machine)
 				mame_fwrite(f,&kaneko16_mcu_ram[mcu_offset], 128);
 				mame_fclose(f);
 			}
-			logerror("%s : MCU executed command: %04X %04X (save NVRAM settings)\n", cpuexec_describe_context(machine), mcu_command, mcu_offset*2);
+			logerror("%s : MCU executed command: %04X %04X (save NVRAM settings)\n", machine->describe_context(), mcu_command, mcu_offset*2);
 		}
 		break;
 
 		case 0x03:	// DSW
 		{
 			kaneko16_mcu_ram[mcu_offset] = input_port_read(machine, "DSW1");
-			logerror("%s : MCU executed command: %04X %04X (read DSW)\n", cpuexec_describe_context(machine), mcu_command, mcu_offset*2);
+			logerror("%s : MCU executed command: %04X %04X (read DSW)\n", machine->describe_context(), mcu_command, mcu_offset*2);
 		}
 		break;
 
 		case 0x04:	// Protection
 		{
-			logerror("%s : MCU executed command: %04X %04X %04X\n", cpuexec_describe_context(machine), mcu_command, mcu_offset*2, mcu_data);
+			logerror("%s : MCU executed command: %04X %04X %04X\n", machine->describe_context(), mcu_command, mcu_offset*2, mcu_data);
 
 			toxboy_handle_04_subcommand(machine, mcu_data, kaneko16_mcu_ram);
 
@@ -2486,7 +2486,7 @@ void bloodwar_mcu_run(running_machine *machine)
 		break;
 
 		default:
-			logerror("%s : MCU executed command: %04X %04X %04X (UNKNOWN COMMAND)\n", cpuexec_describe_context(machine), mcu_command, mcu_offset*2, mcu_data);
+			logerror("%s : MCU executed command: %04X %04X %04X (UNKNOWN COMMAND)\n", machine->describe_context(), mcu_command, mcu_offset*2, mcu_data);
 		break;
 	}
 }
@@ -2512,7 +2512,7 @@ void bonkadv_mcu_run(running_machine *machine)
 				mame_fread(f,&kaneko16_mcu_ram[mcu_offset], 128);
 				mame_fclose(f);
 			}
-			logerror("%s : MCU executed command: %04X %04X (load NVRAM settings)\n", cpuexec_describe_context(machine), mcu_command, mcu_offset*2);
+			logerror("%s : MCU executed command: %04X %04X (load NVRAM settings)\n", machine->describe_context(), mcu_command, mcu_offset*2);
 		}
 		break;
 
@@ -2524,7 +2524,7 @@ void bonkadv_mcu_run(running_machine *machine)
 				mame_fwrite(f,&kaneko16_mcu_ram[mcu_offset], 128);
 				mame_fclose(f);
 			}
-			logerror("%s : MCU executed command: %04X %04X (save NVRAM settings)\n", cpuexec_describe_context(machine), mcu_command, mcu_offset*2);
+			logerror("%s : MCU executed command: %04X %04X (save NVRAM settings)\n", machine->describe_context(), mcu_command, mcu_offset*2);
 		}
 		break;
 
@@ -2536,20 +2536,20 @@ void bonkadv_mcu_run(running_machine *machine)
 				mame_fwrite(f, bonkadv_mcu_43, sizeof(bonkadv_mcu_43));
 				mame_fclose(f);
 			}
-			logerror("%s : MCU executed command: %04X %04X (restore default NVRAM settings)\n", cpuexec_describe_context(machine), mcu_command, mcu_offset*2);
+			logerror("%s : MCU executed command: %04X %04X (restore default NVRAM settings)\n", machine->describe_context(), mcu_command, mcu_offset*2);
 		}
 		break;
 
 		case 0x03:	// DSW
 		{
 			kaneko16_mcu_ram[mcu_offset] = input_port_read(machine, "DSW1");
-			logerror("%s : MCU executed command: %04X %04X (read DSW)\n", cpuexec_describe_context(machine), mcu_command, mcu_offset*2);
+			logerror("%s : MCU executed command: %04X %04X (read DSW)\n", machine->describe_context(), mcu_command, mcu_offset*2);
 		}
 		break;
 
 		case 0x04:	// Protection
 		{
-			logerror("%s : MCU executed command: %04X %04X %04X\n", cpuexec_describe_context(machine), mcu_command, mcu_offset*2, mcu_data);
+			logerror("%s : MCU executed command: %04X %04X %04X\n", machine->describe_context(), mcu_command, mcu_offset*2, mcu_data);
 
 
 			switch(mcu_data)
@@ -2571,7 +2571,7 @@ void bonkadv_mcu_run(running_machine *machine)
 		break;
 
 		default:
-			logerror("%s : MCU executed command: %04X %04X %04X (UNKNOWN COMMAND)\n", cpuexec_describe_context(machine), mcu_command, mcu_offset*2, mcu_data);
+			logerror("%s : MCU executed command: %04X %04X %04X (UNKNOWN COMMAND)\n", machine->describe_context(), mcu_command, mcu_offset*2, mcu_data);
 		break;
 	}
 }
@@ -2594,7 +2594,7 @@ void gtmr_mcu_run(running_machine *machine)
 	UINT16 mcu_offset	=	kaneko16_mcu_ram[0x0012/2] / 2;
 	UINT16 mcu_data		=	kaneko16_mcu_ram[0x0014/2];
 
-	logerror("%s : MCU executed command: %04X %04X %04X\n", cpuexec_describe_context(machine), mcu_command, mcu_offset*2, mcu_data);
+	logerror("%s : MCU executed command: %04X %04X %04X\n", machine->describe_context(), mcu_command, mcu_offset*2, mcu_data);
 
 	switch (mcu_command >> 8)
 	{

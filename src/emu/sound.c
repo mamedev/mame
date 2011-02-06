@@ -813,7 +813,7 @@ sound_manager::sound_manager(running_machine &machine)
 	set_attenuation(options_get_int(machine.options(), OPTION_VOLUME));
 
 	// start the periodic update flushing timer
-	timer_adjust_periodic(m_update_timer, STREAMS_UPDATE_ATTOTIME, 0, STREAMS_UPDATE_ATTOTIME);
+	m_update_timer->adjust(STREAMS_UPDATE_ATTOTIME, 0, STREAMS_UPDATE_ATTOTIME);
 }
 
 

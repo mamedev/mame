@@ -210,7 +210,7 @@ void atarigen_update_interrupts(running_machine *machine)
 void atarigen_scanline_int_set(screen_device &screen, int scanline)
 {
 	emu_timer *timer = get_screen_timer(screen)->scanline_interrupt_timer;
-	timer_adjust_oneshot(timer, screen.time_until_pos(scanline), 0);
+	timer->adjust(screen.time_until_pos(scanline));
 }
 
 
@@ -326,7 +326,7 @@ static TIMER_CALLBACK( scanline_interrupt_callback )
 	atarigen_scanline_int_gen(machine->device("maincpu"));
 
 	/* set a new timer to go off at the same scan line next frame */
-	timer_adjust_oneshot(timer, screen.frame_period(), 0);
+	timer->adjust(screen.frame_period());
 }
 
 
@@ -777,7 +777,7 @@ static TIMER_CALLBACK( delayed_sound_reset )
 
 	/* allocate a high frequency timer until a response is generated */
 	/* the main CPU is *very* sensistive to the timing of the response */
-	cpuexec_boost_interleave(machine, SOUND_TIMER_RATE, SOUND_TIMER_BOOST);
+	machine->scheduler().boost_interleave(SOUND_TIMER_RATE, SOUND_TIMER_BOOST);
 }
 
 
@@ -801,7 +801,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 
 	/* allocate a high frequency timer until a response is generated */
 	/* the main CPU is *very* sensistive to the timing of the response */
-	cpuexec_boost_interleave(machine, SOUND_TIMER_RATE, SOUND_TIMER_BOOST);
+	machine->scheduler().boost_interleave(SOUND_TIMER_RATE, SOUND_TIMER_BOOST);
 }
 
 
@@ -896,7 +896,7 @@ void atarigen_scanline_timer_reset(screen_device &screen, atarigen_scanline_func
 	if (state->scanline_callback != NULL)
 	{
 		emu_timer *timer = get_screen_timer(screen)->scanline_timer;
-		timer_adjust_oneshot(timer, screen.time_until_pos(0), 0);
+		timer->adjust(screen.time_until_pos(0));
 	}
 }
 
@@ -921,7 +921,7 @@ static TIMER_CALLBACK( scanline_timer_callback )
 		scanline += state->scanlines_per_callback;
 		if (scanline >= screen.height())
 			scanline = 0;
-		timer_adjust_oneshot(get_screen_timer(screen)->scanline_timer, screen.time_until_pos(scanline), scanline);
+		get_screen_timer(screen)->scanline_timer->adjust(screen.time_until_pos(scanline), scanline);
 	}
 }
 
@@ -960,7 +960,7 @@ static TIMER_CALLBACK( atarivc_eof_update )
 		tilemap_set_scrollx(state->playfield2_tilemap, 0, state->atarivc_state.pf1_xscroll);
 		tilemap_set_scrolly(state->playfield2_tilemap, 0, state->atarivc_state.pf1_yscroll);
 	}
-	timer_adjust_oneshot(timer, screen.time_until_pos(0), 0);
+	timer->adjust(screen.time_until_pos(0));
 
 	/* use this for debugging the video controller values */
 #if 0
@@ -1003,7 +1003,7 @@ void atarivc_reset(screen_device &screen, UINT16 *eof_data, int playfields)
 	if (state->atarivc_eof_data)
 	{
 		emu_timer *timer = get_screen_timer(screen)->atarivc_eof_update_timer;
-		timer_adjust_oneshot(timer, screen.time_until_pos(0), 0);
+		timer->adjust(screen.time_until_pos(0));
 	}
 }
 

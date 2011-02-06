@@ -4730,7 +4730,7 @@ static WRITE8_DEVICE_HANDLER( twinactn_oki_bank_w )
 	downcast<okim6295_device *>(device)->set_bank_base((data & 3) * 0x40000);
 
 	if (data & (~3))
-		logerror("%s: invalid oki bank %02x\n", cpuexec_describe_context(device->machine), data);
+		logerror("%s: invalid oki bank %02x\n", device->machine->describe_context(), data);
 
 //  logerror("%04x: oki bank %02x\n", cpu_get_pc(space->cpu), data);
 }

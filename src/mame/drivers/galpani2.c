@@ -77,7 +77,7 @@ static MACHINE_RESET( galpani2 )
 
 	kaneko16_sprite_xoffs = 0x10000 - 0x16c0 + 0xc00;
 	kaneko16_sprite_yoffs = 0x000;
-	cpuexec_boost_interleave(machine, attotime::zero, attotime::from_usec(50)); //initial mcu xchk
+	machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); //initial mcu xchk
 }
 
 static void galpani2_write_kaneko(device_t *device)
@@ -143,7 +143,7 @@ static void galpani2_mcu_nmi1(running_machine *machine)
 		if (mcu_command != 0)
 		{
 			logerror("%s : MCU [$%06X] endidx = $%02X / command = $%02X addr = $%04X ? = $%02X.\n",
-			cpuexec_describe_context(machine),
+			machine->describe_context(),
 			mcu_list,
 			srcspace->read_byte(0x100020),
 			mcu_command,
@@ -166,7 +166,7 @@ static void galpani2_mcu_nmi1(running_machine *machine)
 
 			mcu_size	=	(srcspace->read_byte(mcu_address + 8)<<8) +
 							(srcspace->read_byte(mcu_address + 9)<<0) ;
-			logerror("%s : MCU executes command $%02X, %04X %02X-> %04x\n",cpuexec_describe_context(machine),mcu_command,mcu_src,mcu_size,mcu_dst);
+			logerror("%s : MCU executes command $%02X, %04X %02X-> %04x\n",machine->describe_context(),mcu_command,mcu_src,mcu_size,mcu_dst);
 
 			for( ; mcu_size > 0 ; mcu_size-- )
 			{
@@ -191,7 +191,7 @@ static void galpani2_mcu_nmi1(running_machine *machine)
 			mcu_size	=	(srcspace->read_byte(mcu_address + 8)<<8) +
 							(srcspace->read_byte(mcu_address + 9)<<0) ;
 
-			logerror("%s : MCU executes command $%02X, %04X %02X-> %04x\n",cpuexec_describe_context(machine),mcu_command,mcu_src,mcu_size,mcu_dst);
+			logerror("%s : MCU executes command $%02X, %04X %02X-> %04x\n",machine->describe_context(),mcu_command,mcu_src,mcu_size,mcu_dst);
 
 			for( ; mcu_size > 0 ; mcu_size-- )
 			{
@@ -219,7 +219,7 @@ static void galpani2_mcu_nmi1(running_machine *machine)
 			srcspace->write_byte(mcu_address+0,0xff);
 			srcspace->write_byte(mcu_address+1,0xff);
 
-			logerror("%s : MCU ERROR, unknown command $%02X\n",cpuexec_describe_context(machine),mcu_command);
+			logerror("%s : MCU ERROR, unknown command $%02X\n",machine->describe_context(),mcu_command);
 		}
 
 		/* Erase command (so that it won't be processed again)? */
@@ -230,7 +230,7 @@ static void galpani2_mcu_nmi1(running_machine *machine)
 static void galpani2_mcu_nmi2(running_machine *machine)
 {
 		galpani2_write_kaneko(machine->device("maincpu"));
-		//logerror("%s : MCU executes CHECKs synchro\n", cpuexec_describe_context(machine));
+		//logerror("%s : MCU executes CHECKs synchro\n", machine->describe_context());
 }
 
 static WRITE8_HANDLER( galpani2_mcu_nmi1_w ) //driven by CPU1's int5 ISR
@@ -276,7 +276,7 @@ static WRITE8_HANDLER( galpani2_coin_lockout_w )
 static WRITE8_DEVICE_HANDLER( galpani2_oki1_bank_w )
 {
 		UINT8 *ROM = device->machine->region("oki1")->base();
-		logerror("%s : %s bank %08X\n",cpuexec_describe_context(device->machine),device->tag(),data);
+		logerror("%s : %s bank %08X\n",device->machine->describe_context(),device->tag(),data);
 		memcpy(ROM + 0x30000, ROM + 0x40000 + 0x10000 * (~data & 0xf), 0x10000);
 }
 
@@ -284,7 +284,7 @@ static WRITE8_DEVICE_HANDLER( galpani2_oki2_bank_w )
 {
 		okim6295_device *oki = downcast<okim6295_device *>(device);
 		oki->set_bank_base(0x40000 * (data & 0xf) );
-		logerror("%s : %s bank %08X\n",cpuexec_describe_context(device->machine),device->tag(),data);
+		logerror("%s : %s bank %08X\n",device->machine->describe_context(),device->tag(),data);
 }
 
 

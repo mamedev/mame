@@ -61,11 +61,11 @@ static void TimerHandler(void *param,int c,attotime period)
 	y8950_state *info = (y8950_state *)param;
 	if( period == attotime::zero )
 	{	/* Reset FM Timer */
-		timer_enable(info->timer[c], 0);
+		info->timer[c]->enable(false);
 	}
 	else
 	{	/* Start FM Timer */
-		timer_adjust_oneshot(info->timer[c], period, 0);
+		info->timer[c]->adjust(period);
 	}
 }
 

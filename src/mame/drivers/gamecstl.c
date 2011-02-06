@@ -184,7 +184,7 @@ static UINT8 mxtc_config_r(device_t *busdevice, device_t *device, int function, 
 
 static void mxtc_config_w(device_t *busdevice, device_t *device, int function, int reg, UINT8 data)
 {
-//  mame_printf_debug("%s:MXTC: write %d, %02X, %02X\n", cpuexec_describe_context(busdevice->machine), function, reg, data);
+//  mame_printf_debug("%s:MXTC: write %d, %02X, %02X\n", busdevice->machine->describe_context(), function, reg, data);
 
 	switch(reg)
 	{
@@ -268,7 +268,7 @@ static UINT8 piix4_config_r(device_t *busdevice, device_t *device, int function,
 
 static void piix4_config_w(device_t *busdevice, device_t *device, int function, int reg, UINT8 data)
 {
-//  mame_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", cpuexec_describe_context(busdevice->machine), function, reg, data);
+//  mame_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", busdevice->machine->describe_context(), function, reg, data);
 	piix4_config_reg[function][reg] = data;
 }
 

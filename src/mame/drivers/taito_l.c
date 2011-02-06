@@ -96,7 +96,7 @@ static void palette_notifier(running_machine *machine, int addr)
 
 	if (addr > 0x200)
 	{
-		logerror("%s:Large palette ? %03x\n", cpuexec_describe_context(machine), addr);
+		logerror("%s:Large palette ? %03x\n", machine->describe_context(), addr);
 	}
 	else
 	{

@@ -472,7 +472,7 @@ static DEVICE_START( gaelco_serial )
 	//state_save_register_device_item(device, 0, earom->data);
 
 #ifdef SHARED_MEM_DRIVER
-	timer_adjust_periodic(state->sync_timer, attotime::zero,0,attotime::from_hz(SYNC_FREQ));
+	state->sync_timer->adjust(attotime::zero,0,attotime::from_hz(SYNC_FREQ));
 #endif
 
 	state->os_shmem = osd_sharedmem_alloc(PATH_NAME, 0, sizeof(shmem_t));

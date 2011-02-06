@@ -221,7 +221,7 @@ static WRITE32_HANDLER( fuuki32_vregs_w )
 		{
 			const rectangle &visarea = space->machine->primary_screen->visible_area();
 			attotime period = space->machine->primary_screen->frame_period();
-			timer_adjust_periodic(state->raster_interrupt_timer, space->machine->primary_screen->time_until_pos(state->vregs[0x1c / 4] >> 16, visarea.max_x + 1), 0, period);
+			state->raster_interrupt_timer->adjust(space->machine->primary_screen->time_until_pos(state->vregs[0x1c / 4] >> 16, visarea.max_x + 1), 0, period);
 		}
 	}
 }
@@ -504,7 +504,7 @@ static TIMER_CALLBACK( raster_interrupt_callback )
 	fuuki32_state *state = machine->driver_data<fuuki32_state>();
 	cpu_set_input_line(state->maincpu, 5, HOLD_LINE);	// Raster Line IRQ
 	machine->primary_screen->update_partial(machine->primary_screen->vpos());
-	timer_adjust_oneshot(state->raster_interrupt_timer, machine->primary_screen->frame_period(), 0);
+	state->raster_interrupt_timer->adjust(machine->primary_screen->frame_period());
 }
 
 
@@ -532,7 +532,7 @@ static MACHINE_RESET( fuuki32 )
 
 	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(248), FUNC(level_1_interrupt_callback));
 	machine->scheduler().timer_set(machine->primary_screen->time_until_vblank_start(), FUNC(vblank_interrupt_callback));
-	timer_adjust_oneshot(state->raster_interrupt_timer, machine->primary_screen->time_until_pos(0, visarea.max_x + 1), 0);
+	state->raster_interrupt_timer->adjust(machine->primary_screen->time_until_pos(0, visarea.max_x + 1));
 }
 
 

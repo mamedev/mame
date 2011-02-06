@@ -410,19 +410,19 @@ void rtc65271_w(device_t *device, int xramsel, offs_t offset, UINT8 data)
 					{
 						attotime period = attotime::from_hz(SQW_freq_table[data & reg_A_RS]);
 						attotime half_period = period / 2;
-						attotime elapsed = timer_timeelapsed(state->update_timer);
+						attotime elapsed = state->update_timer->elapsed();
 
 						if (half_period > elapsed)
-							timer_adjust_oneshot(state->SQW_timer, half_period - elapsed, 0);
+							state->SQW_timer->adjust(half_period - elapsed);
 						else
-							timer_adjust_oneshot(state->SQW_timer, half_period, 0);
+							state->SQW_timer->adjust(half_period);
 					}
 					else
 					{
 						state->SQW_internal_state = 0;	/* right??? */
 
 						/* Stop the divider used for SQW and periodic interrupts. */
-						timer_adjust_oneshot(state->SQW_timer, attotime::never, 0);
+						state->SQW_timer->adjust(attotime::never);
 					}
 				}
 				/* The UIP bit is read-only */
@@ -506,7 +506,7 @@ static TIMER_CALLBACK( rtc_SQW_callback )
 	}
 
 	half_period = attotime::from_hz(SQW_freq_table[state->regs[reg_A] & reg_A_RS]) / 2;
-	timer_adjust_oneshot(state->SQW_timer, half_period, 0);
+	state->SQW_timer->adjust(half_period);
 }
 
 /*
@@ -689,7 +689,7 @@ static DEVICE_START( rtc65271 )
 	rtc65271_state *state = get_safe_token(device);
 
 	state->update_timer = device->machine->scheduler().timer_alloc(FUNC(rtc_begin_update_callback), (void *)device);
-	timer_adjust_periodic(state->update_timer, attotime::from_seconds(1), 0, attotime::from_seconds(1));
+	state->update_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 	state->SQW_timer = device->machine->scheduler().timer_alloc(FUNC(rtc_SQW_callback), (void *)device);
 	state->interrupt_callback = config->interrupt_callback;
 

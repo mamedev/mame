@@ -223,7 +223,7 @@ VIDEO_START( astrocde )
 {
 	/* allocate a per-scanline timer */
 	scanline_timer = machine->scheduler().timer_alloc(FUNC(scanline_callback));
-	timer_adjust_oneshot(scanline_timer, machine->primary_screen->time_until_pos(1), 1);
+	scanline_timer->adjust(machine->primary_screen->time_until_pos(1), 1);
 
 	/* register for save states */
 	init_savestate(machine);
@@ -238,7 +238,7 @@ VIDEO_START( profpac )
 {
 	/* allocate a per-scanline timer */
 	scanline_timer = machine->scheduler().timer_alloc(FUNC(scanline_callback));
-	timer_adjust_oneshot(scanline_timer, machine->primary_screen->time_until_pos(1), 1);
+	scanline_timer->adjust(machine->primary_screen->time_until_pos(1), 1);
 
 	/* allocate videoram */
 	profpac_videoram = auto_alloc_array(machine, UINT16, 0x4000 * 4);
@@ -502,7 +502,7 @@ static TIMER_CALLBACK( scanline_callback )
 	scanline++;
 	if (scanline >= machine->primary_screen->height())
 		scanline = 0;
-	timer_adjust_oneshot(scanline_timer, machine->primary_screen->time_until_pos(scanline), scanline);
+	scanline_timer->adjust(machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 

@@ -100,7 +100,7 @@ static MACHINE_START( sbrkout )
 static MACHINE_RESET( sbrkout )
 {
 	sbrkout_state *state = machine->driver_data<sbrkout_state>();
-	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->time_until_pos(0), 0);
+	state->scanline_timer->adjust(machine->primary_screen->time_until_pos(0));
 }
 
 
@@ -131,14 +131,14 @@ static TIMER_CALLBACK( scanline_callback )
 	if (scanline == machine->primary_screen->visible_area().max_y + 1)
 	{
 		UINT8 potvalue = input_port_read(machine, "PADDLE");
-		timer_adjust_oneshot(state->pot_timer, machine->primary_screen->time_until_pos(56 + (potvalue / 2), (potvalue % 2) * 128), 0);
+		state->pot_timer->adjust(machine->primary_screen->time_until_pos(56 + (potvalue / 2), (potvalue % 2) * 128));
 	}
 
 	/* call us back in 4 scanlines */
 	scanline += 4;
 	if (scanline >= machine->primary_screen->height())
 		scanline = 0;
-	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->time_until_pos(scanline), scanline);
+	state->scanline_timer->adjust(machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 

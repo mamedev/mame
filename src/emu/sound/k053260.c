@@ -424,7 +424,7 @@ READ8_DEVICE_HANDLER( k053260_r )
 				ic->channels[0].pos += ( 1 << 16 );
 
 				if ( offs > ic->rom_size ) {
-					logerror("%s: K53260: Attempting to read past ROM size in ROM Read Mode (offs = %06x, size = %06x).\n", cpuexec_describe_context(device->machine),offs,ic->rom_size );
+					logerror("%s: K53260: Attempting to read past ROM size in ROM Read Mode (offs = %06x, size = %06x).\n", device->machine->describe_context(),offs,ic->rom_size );
 
 					return 0;
 				}

@@ -330,7 +330,7 @@ void i8257_device::i8257_update_status()
 	if (pending_transfer)
 	{
 		next = attotime::from_hz(clock() / 4 );
-		timer_adjust_periodic(m_timer,
+		m_timer->adjust(
 			attotime::zero,
 			0,
 			/* 1 byte transferred in 4 clock cycles */
@@ -339,7 +339,7 @@ void i8257_device::i8257_update_status()
 	else
 	{
 		/* no transfers active right now */
-		timer_reset(m_timer, attotime::never);
+		m_timer->reset();
 	}
 
 	/* set the halt line */
@@ -349,7 +349,7 @@ void i8257_device::i8257_update_status()
 
 void i8257_device::i8257_prepare_msb_flip()
 {
-	timer_adjust_oneshot(m_msbflip_timer, attotime::zero, 0);
+	m_msbflip_timer->adjust(attotime::zero);
 }
 
 

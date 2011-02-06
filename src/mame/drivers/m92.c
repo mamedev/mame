@@ -241,7 +241,7 @@ static MACHINE_START( m92 )
 static MACHINE_RESET( m92 )
 {
 	m92_state *state = machine->driver_data<m92_state>();
-	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->time_until_pos(0), 0);
+	state->scanline_timer->adjust(machine->primary_screen->time_until_pos(0));
 }
 
 /*****************************************************************************/
@@ -268,7 +268,7 @@ static TIMER_CALLBACK( m92_scanline_interrupt )
 	/* adjust for next scanline */
 	if (++scanline >= machine->primary_screen->height())
 		scanline = 0;
-	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->time_until_pos(scanline), scanline);
+	state->scanline_timer->adjust(machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 /*****************************************************************************/

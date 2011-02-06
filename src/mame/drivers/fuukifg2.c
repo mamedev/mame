@@ -60,7 +60,7 @@ static WRITE16_HANDLER( fuuki16_vregs_w )
 	{
 		const rectangle &visarea = space->machine->primary_screen->visible_area();
 		attotime period = space->machine->primary_screen->frame_period();
-		timer_adjust_periodic(state->raster_interrupt_timer, space->machine->primary_screen->time_until_pos(new_data, visarea.max_x + 1), 0, period);
+		state->raster_interrupt_timer->adjust(space->machine->primary_screen->time_until_pos(new_data, visarea.max_x + 1), 0, period);
 	}
 }
 
@@ -72,7 +72,7 @@ static WRITE16_HANDLER( fuuki16_sound_command_w )
 		soundlatch_w(space,0,data & 0xff);
 		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 //      cpu_spinuntil_time(space->cpu, attotime::from_usec(50));   // Allow the other CPU to reply
-		cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(50)); // Fixes glitching in rasters
+		space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); // Fixes glitching in rasters
 	}
 }
 
@@ -418,7 +418,7 @@ static TIMER_CALLBACK( raster_interrupt_callback )
 	fuuki16_state *state = machine->driver_data<fuuki16_state>();
 	cpu_set_input_line(state->maincpu, 5, HOLD_LINE);	// Raster Line IRQ
 	machine->primary_screen->update_partial(machine->primary_screen->vpos());
-	timer_adjust_oneshot(state->raster_interrupt_timer, machine->primary_screen->frame_period(), 0);
+	state->raster_interrupt_timer->adjust(machine->primary_screen->frame_period());
 }
 
 
@@ -443,7 +443,7 @@ static MACHINE_RESET( fuuki16 )
 
 	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(248), FUNC(level_1_interrupt_callback));
 	machine->scheduler().timer_set(machine->primary_screen->time_until_vblank_start(), FUNC(vblank_interrupt_callback));
-	timer_adjust_oneshot(state->raster_interrupt_timer, machine->primary_screen->time_until_pos(0, visarea.max_x + 1), 0);
+	state->raster_interrupt_timer->adjust(machine->primary_screen->time_until_pos(0, visarea.max_x + 1));
 }
 
 

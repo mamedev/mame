@@ -212,7 +212,7 @@ static UINT32 compute_ticks_refresh_timer(emu_timer *timer, int hertz, int base,
 	// elapsed:total = x : ticks
 	// x=elapsed*tics/total -> x=elapsed*(double)100000000/rtcnt_div[(sh4->m[RTCSR] >> 3) & 7]
 	// ticks/total=ticks / ((rtcnt_div[(sh4->m[RTCSR] >> 3) & 7] * ticks) / 100000000)=1/((rtcnt_div[(sh4->m[RTCSR] >> 3) & 7] / 100000000)=100000000/rtcnt_div[(sh4->m[RTCSR] >> 3) & 7]
-	return base + (UINT32)((timer_timeelapsed(timer).as_double() * (double)hertz) / (double)divisor);
+	return base + (UINT32)((timer->elapsed().as_double() * (double)hertz) / (double)divisor);
 }
 
 static void sh4_refresh_timer_recompute(sh4_state *sh4)
@@ -224,7 +224,7 @@ UINT32 ticks;
 	ticks = sh4->m[RTCOR]-sh4->m[RTCNT];
 	if (ticks <= 0)
 		ticks = 256 + ticks;
-	timer_adjust_oneshot(sh4->refresh_timer, attotime::from_hz(sh4->bus_clock) * rtcnt_div[(sh4->m[RTCSR] >> 3) & 7] * ticks, 0);
+	sh4->refresh_timer->adjust(attotime::from_hz(sh4->bus_clock) * rtcnt_div[(sh4->m[RTCSR] >> 3) & 7] * ticks);
 	sh4->refresh_timer_base = sh4->m[RTCNT];
 }
 
@@ -242,7 +242,7 @@ static UINT32 compute_ticks_timer(emu_timer *timer, int hertz, int divisor)
 {
 	double ret;
 
-	ret=((timer_timeleft(timer).as_double() * (double)hertz) / (double)divisor) - 1;
+	ret=((timer->remaining().as_double() * (double)hertz) / (double)divisor) - 1;
 	return (UINT32)ret;
 }
 
@@ -251,7 +251,7 @@ static void sh4_timer_recompute(sh4_state *sh4, int which)
 	double ticks;
 
 	ticks = sh4->m[tcnt[which]];
-	timer_adjust_oneshot(sh4->timer[which], sh4_scale_up_mame_time(attotime::from_hz(sh4->pm_clock) * tcnt_div[sh4->m[tcr[which]] & 7], ticks), which);
+	sh4->timer[which]->adjust(sh4_scale_up_mame_time(attotime::from_hz(sh4->pm_clock) * tcnt_div[sh4->m[tcr[which]] & 7], ticks), which);
 }
 
 static TIMER_CALLBACK( sh4_refresh_timer_callback )
@@ -369,7 +369,7 @@ static TIMER_CALLBACK( sh4_rtc_timer_callback )
 {
 	sh4_state *sh4 = (sh4_state *)ptr;
 
-	timer_adjust_oneshot(sh4->rtc_timer, attotime::from_hz(128), 0);
+	sh4->rtc_timer->adjust(attotime::from_hz(128));
 	sh4->m[R64CNT] = (sh4->m[R64CNT]+1) & 0x7f;
 	if (sh4->m[R64CNT] == 64)
 	{
@@ -453,12 +453,12 @@ static int sh4_dma_transfer(sh4_state *sh4, int channel, int timermode, UINT32 c
 	if (timermode == 1)
 	{
 		sh4->dma_timer_active[channel] = 1;
-		timer_adjust_oneshot(sh4->dma_timer[channel], sh4->device->cycles_to_attotime(2*count+1), channel);
+		sh4->dma_timer[channel]->adjust(sh4->device->cycles_to_attotime(2*count+1), channel);
 	}
 	else if (timermode == 2)
 	{
 		sh4->dma_timer_active[channel] = 1;
-		timer_adjust_oneshot(sh4->dma_timer[channel], attotime::zero, channel);
+		sh4->dma_timer[channel]->adjust(attotime::zero, channel);
 	}
 
 	src &= AM;
@@ -601,7 +601,7 @@ UINT32 dmatcr,chcr,sar,dar;
 		if (sh4->dma_timer_active[channel])
 		{
 			logerror("SH4: DMA %d cancelled in-flight but all data transferred", channel);
-			timer_adjust_oneshot(sh4->dma_timer[channel], attotime::never, channel);
+			sh4->dma_timer[channel]->adjust(attotime::never, channel);
 			sh4->dma_timer_active[channel] = 0;
 		}
 	}
@@ -617,7 +617,7 @@ int s;
 		if (sh4->dma_timer_active[s])
 		{
 			logerror("SH4: DMA %d cancelled due to NMI but all data transferred", s);
-			timer_adjust_oneshot(sh4->dma_timer[s], attotime::never, s);
+			sh4->dma_timer[s]->adjust(attotime::never, s);
 			sh4->dma_timer_active[s] = 0;
 		}
 	}
@@ -671,7 +671,7 @@ WRITE32_HANDLER( sh4_internal_w )
 		}
 		else
 		{
-			timer_adjust_oneshot(sh4->refresh_timer, attotime::never, 0);
+			sh4->refresh_timer->adjust(attotime::never);
 		}
 		break;
 
@@ -717,11 +717,11 @@ WRITE32_HANDLER( sh4_internal_w )
 		}
 		if ((sh4->m[RCR2] & 8) && (~old & 8))
 		{ // 0 -> 1
-			timer_adjust_oneshot(sh4->rtc_timer, attotime::from_hz(128), 0);
+			sh4->rtc_timer->adjust(attotime::from_hz(128));
 		}
 		else if (~(sh4->m[RCR2]) & 8)
 		{ // 0
-			timer_adjust_oneshot(sh4->rtc_timer, attotime::never, 0);
+			sh4->rtc_timer->adjust(attotime::never);
 		}
 		break;
 
@@ -730,21 +730,21 @@ WRITE32_HANDLER( sh4_internal_w )
 		if (old & 1)
 			sh4->m[TCNT0] = compute_ticks_timer(sh4->timer[0], sh4->pm_clock, tcnt_div[sh4->m[TCR0] & 7]);
 		if ((sh4->m[TSTR] & 1) == 0) {
-			timer_adjust_oneshot(sh4->timer[0], attotime::never, 0);
+			sh4->timer[0]->adjust(attotime::never);
 		} else
 			sh4_timer_recompute(sh4, 0);
 
 		if (old & 2)
 			sh4->m[TCNT1] = compute_ticks_timer(sh4->timer[1], sh4->pm_clock, tcnt_div[sh4->m[TCR1] & 7]);
 		if ((sh4->m[TSTR] & 2) == 0) {
-			timer_adjust_oneshot(sh4->timer[1], attotime::never, 0);
+			sh4->timer[1]->adjust(attotime::never);
 		} else
 			sh4_timer_recompute(sh4, 1);
 
 		if (old & 4)
 			sh4->m[TCNT2] = compute_ticks_timer(sh4->timer[2], sh4->pm_clock, tcnt_div[sh4->m[TCR2] & 7]);
 		if ((sh4->m[TSTR] & 4) == 0) {
-			timer_adjust_oneshot(sh4->timer[2], attotime::never, 0);
+			sh4->timer[2]->adjust(attotime::never);
 		} else
 			sh4_timer_recompute(sh4, 2);
 		break;
@@ -945,7 +945,7 @@ READ32_HANDLER( sh4_internal_r )
 		if ((sh4->m[RTCSR] >> 3) & 7)
 		{ // activated
 			//((double)rtcnt_div[(sh4->m[RTCSR] >> 3) & 7] / (double)100000000)
-			//return (refresh_timer_base + (timer_timeelapsed(sh4->refresh_timer) * (double)100000000) / (double)rtcnt_div[(sh4->m[RTCSR] >> 3) & 7]) & 0xff;
+			//return (refresh_timer_base + (sh4->refresh_timer->elapsed() * (double)100000000) / (double)rtcnt_div[(sh4->m[RTCSR] >> 3) & 7]) & 0xff;
 			return compute_ticks_refresh_timer(sh4->refresh_timer, sh4->bus_clock, sh4->refresh_timer_base, rtcnt_div[(sh4->m[RTCSR] >> 3) & 7]) & 0xff;
 		}
 		else
@@ -1161,21 +1161,21 @@ void sh4_common_init(device_t *device)
 	for (i=0; i<3; i++)
 	{
 		sh4->timer[i] = device->machine->scheduler().timer_alloc(FUNC(sh4_timer_callback), sh4);
-		timer_adjust_oneshot(sh4->timer[i], attotime::never, i);
+		sh4->timer[i]->adjust(attotime::never, i);
 	}
 
 	for (i=0; i<4; i++)
 	{
 		sh4->dma_timer[i] = device->machine->scheduler().timer_alloc(FUNC(sh4_dmac_callback), sh4);
-		timer_adjust_oneshot(sh4->dma_timer[i], attotime::never, i);
+		sh4->dma_timer[i]->adjust(attotime::never, i);
 	}
 
 	sh4->refresh_timer = device->machine->scheduler().timer_alloc(FUNC(sh4_refresh_timer_callback), sh4);
-	timer_adjust_oneshot(sh4->refresh_timer, attotime::never, 0);
+	sh4->refresh_timer->adjust(attotime::never);
 	sh4->refresh_timer_base = 0;
 
 	sh4->rtc_timer = device->machine->scheduler().timer_alloc(FUNC(sh4_rtc_timer_callback), sh4);
-	timer_adjust_oneshot(sh4->rtc_timer, attotime::never, 0);
+	sh4->rtc_timer->adjust(attotime::never);
 
 	sh4->m = auto_alloc_array(device->machine, UINT32, 16384);
 }

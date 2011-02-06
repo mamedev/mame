@@ -587,7 +587,7 @@ static void stv_SMPC_w8 (address_space *space, int offset, UINT8 data)
 				if(LOG_SMPC) logerror ("SMPC: Slave OFF\n");
 				smpc_ram[0x5f]=0x03;
 				stv_enable_slave_sh2 = 0;
-				cpuexec_trigger(space->machine, 1000);
+				space->machine->scheduler().trigger(1000);
 				cputag_set_input_line(space->machine, "slave", INPUT_LINE_RESET, ASSERT_LINE);
 				break;
 			case 0x06:
@@ -1969,15 +1969,15 @@ static READ32_HANDLER( stv_sh2_soundram_r )
 static WRITE32_HANDLER( minit_w )
 {
 	logerror("cpu %s (PC=%08X) MINIT write = %08x\n", space->cpu->tag(), cpu_get_pc(space->cpu),data);
-	cpuexec_boost_interleave(space->machine, minit_boost_timeslice, attotime::from_usec(minit_boost));
-	cpuexec_trigger(space->machine, 1000);
+	space->machine->scheduler().boost_interleave(minit_boost_timeslice, attotime::from_usec(minit_boost));
+	space->machine->scheduler().trigger(1000);
 	sh2_set_frt_input(space->machine->device("slave"), PULSE_LINE);
 }
 
 static WRITE32_HANDLER( sinit_w )
 {
 	logerror("cpu %s (PC=%08X) SINIT write = %08x\n", space->cpu->tag(), cpu_get_pc(space->cpu),data);
-	cpuexec_boost_interleave(space->machine, sinit_boost_timeslice, attotime::from_usec(sinit_boost));
+	space->machine->scheduler().boost_interleave(sinit_boost_timeslice, attotime::from_usec(sinit_boost));
 	sh2_set_frt_input(space->machine->device("maincpu"), PULSE_LINE);
 }
 
@@ -2848,7 +2848,7 @@ static MACHINE_RESET( stv )
 	vblank_out_timer->adjust(machine->primary_screen->time_until_pos(0));
 	scan_timer->adjust(machine->primary_screen->time_until_pos(224, 352));
 
-	timer_adjust_periodic(stv_rtc_timer, attotime::zero, 0, attotime::from_seconds(1));
+	stv_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 }
 
 

@@ -89,7 +89,7 @@ static CUSTOM_INPUT( z80_nmi_r )
 		/* main CPU might be waiting for sound CPU to finish NMI,
            so set a timer to give sound CPU a chance to run */
 		field->port->machine->scheduler().synchronize();
-//      logerror("%s - Read coin port during Z80 NMI\n", cpuexec_describe_context(machine));
+//      logerror("%s - Read coin port during Z80 NMI\n", machine->describe_context());
 	}
 
 	return ret;

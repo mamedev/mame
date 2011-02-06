@@ -60,7 +60,7 @@ static TIMER_CALLBACK( scanline_timer_cb )
 	if (scanline != -1)
 	{
 		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
-		timer_adjust_oneshot(scanline_timer, machine->primary_screen->time_until_pos(scanline + 1), scanline);
+		scanline_timer->adjust(machine->primary_screen->time_until_pos(scanline + 1), scanline);
 		machine->scheduler().timer_set(attotime::from_hz(25000000), FUNC(scanline_timer_cb), -1);
 	}
 	else
@@ -448,7 +448,7 @@ WRITE32_HANDLER( midvunit_video_control_w )
 
 	/* update the scanline timer */
 	if (offset == 0)
-		timer_adjust_oneshot(scanline_timer, space->machine->primary_screen->time_until_pos((data & 0x1ff) + 1, 0), data & 0x1ff);
+		scanline_timer->adjust(space->machine->primary_screen->time_until_pos((data & 0x1ff) + 1), data & 0x1ff);
 
 	/* if something changed, update our parameters */
 	if (old != video_regs[offset] && video_regs[6] != 0 && video_regs[11] != 0)

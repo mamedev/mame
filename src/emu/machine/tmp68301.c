@@ -23,7 +23,7 @@ static void tmp68301_update_timer( running_machine *machine, int i );
 static IRQ_CALLBACK(tmp68301_irq_callback)
 {
 	int vector = tmp68301_irq_vector[irqline];
-//  logerror("%s: irq callback returns %04X for level %x\n",cpuexec_describe_context(machine),vector,int_level);
+//  logerror("%s: irq callback returns %04X for level %x\n",machine->describe_context(),vector,int_level);
 	return vector;
 }
 
@@ -35,7 +35,7 @@ static TIMER_CALLBACK( tmp68301_timer_callback )
 	UINT16 ICR	=	tmp68301_regs[0x8e/2+i];	// Interrupt Controller Register (ICR7..9)
 	UINT16 IVNR	=	tmp68301_regs[0x9a/2];		// Interrupt Vector Number Register (IVNR)
 
-//  logerror("s: callback timer %04X, j = %d\n",cpuexec_describe_context(machine),i,tcount);
+//  logerror("s: callback timer %04X, j = %d\n",machine->describe_context(),i,tcount);
 
 	if	(	(TCR & 0x0004) &&	// INT
 			!(IMR & (0x100<<i))
@@ -70,7 +70,7 @@ static void tmp68301_update_timer( running_machine *machine, int i )
 	int max = 0;
 	attotime duration = attotime::zero;
 
-	timer_adjust_oneshot(tmp68301_timer[i],attotime::never,i);
+	tmp68301_timer[i]->adjust(attotime::never,i);
 
 	// timers 1&2 only
 	switch( (TCR & 0x0030)>>4 )						// MR2..1
@@ -95,14 +95,14 @@ static void tmp68301_update_timer( running_machine *machine, int i )
 		break;
 	}
 
-//  logerror("%s: TMP68301 Timer %d, duration %lf, max %04X\n",cpuexec_describe_context(machine),i,duration,max);
+//  logerror("%s: TMP68301 Timer %d, duration %lf, max %04X\n",machine->describe_context(),i,duration,max);
 
 	if (!(TCR & 0x0002))				// CS
 	{
 		if (duration != attotime::zero)
-			timer_adjust_oneshot(tmp68301_timer[i],duration,i);
+			tmp68301_timer[i]->adjust(duration,i);
 		else
-			logerror("%s: TMP68301 error, timer %d duration is 0\n",cpuexec_describe_context(machine),i);
+			logerror("%s: TMP68301 error, timer %d duration is 0\n",machine->describe_context(),i);
 	}
 }
 

@@ -325,7 +325,7 @@ static TIMER_CALLBACK( tubep_scanline_callback )
 	if (scanline >= 264)
 		scanline = 0;
 
-	timer_adjust_oneshot(interrupt_timer, machine->primary_screen->time_until_pos(scanline), scanline);
+	interrupt_timer->adjust(machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -357,7 +357,7 @@ static MACHINE_START( tubep )
 
 static MACHINE_RESET( tubep )
 {
-	timer_adjust_oneshot(interrupt_timer, machine->primary_screen->time_until_pos(0), 0);
+	interrupt_timer->adjust(machine->primary_screen->time_until_pos(0));
 }
 
 
@@ -505,7 +505,7 @@ static TIMER_CALLBACK( rjammer_scanline_callback )
 	if (scanline >= 264)
 		scanline = 0;
 
-	timer_adjust_oneshot(interrupt_timer, machine->primary_screen->time_until_pos(scanline), scanline);
+	interrupt_timer->adjust(machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -519,7 +519,7 @@ static MACHINE_START( rjammer )
 
 static MACHINE_RESET( rjammer )
 {
-	timer_adjust_oneshot(interrupt_timer, machine->primary_screen->time_until_pos(0), 0);
+	interrupt_timer->adjust(machine->primary_screen->time_until_pos(0));
 }
 
 

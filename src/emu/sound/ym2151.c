@@ -819,7 +819,7 @@ static TIMER_CALLBACK( irqBoff_callback )
 static TIMER_CALLBACK( timer_callback_a )
 {
 	YM2151 *chip = (YM2151 *)ptr;
-	timer_adjust_oneshot(chip->timer_A, chip->timer_A_time[ chip->timer_A_index ], 0);
+	chip->timer_A->adjust(chip->timer_A_time[ chip->timer_A_index ]);
 	chip->timer_A_index_old = chip->timer_A_index;
 	if (chip->irq_enable & 0x04)
 	{
@@ -832,7 +832,7 @@ static TIMER_CALLBACK( timer_callback_a )
 static TIMER_CALLBACK( timer_callback_b )
 {
 	YM2151 *chip = (YM2151 *)ptr;
-	timer_adjust_oneshot(chip->timer_B, chip->timer_B_time[ chip->timer_B_index ], 0);
+	chip->timer_B->adjust(chip->timer_B_time[ chip->timer_B_index ]);
 	chip->timer_B_index_old = chip->timer_B_index;
 	if (chip->irq_enable & 0x08)
 	{
@@ -1123,9 +1123,9 @@ void ym2151_write_reg(void *_chip, int r, int v)
 				#ifdef USE_MAME_TIMERS
 				/* ASG 980324: added a real timer */
 				/* start timer _only_ if it wasn't already started (it will reload time value next round) */
-					if (!timer_enable(chip->timer_B, 1))
+					if (!chip->timer_B->enable(true))
 					{
-						timer_adjust_oneshot(chip->timer_B, chip->timer_B_time[ chip->timer_B_index ], 0);
+						chip->timer_B->adjust(chip->timer_B_time[ chip->timer_B_index ]);
 						chip->timer_B_index_old = chip->timer_B_index;
 					}
 				#else
@@ -1140,7 +1140,7 @@ void ym2151_write_reg(void *_chip, int r, int v)
 			{		/* stop timer B */
 				#ifdef USE_MAME_TIMERS
 				/* ASG 980324: added a real timer */
-					timer_enable(chip->timer_B, 0);
+					chip->timer_B->enable(false);
 				#else
 					chip->tim_B = 0;
 				#endif
@@ -1151,9 +1151,9 @@ void ym2151_write_reg(void *_chip, int r, int v)
 				#ifdef USE_MAME_TIMERS
 				/* ASG 980324: added a real timer */
 				/* start timer _only_ if it wasn't already started (it will reload time value next round) */
-					if (!timer_enable(chip->timer_A, 1))
+					if (!chip->timer_A->enable(true))
 					{
-						timer_adjust_oneshot(chip->timer_A, chip->timer_A_time[ chip->timer_A_index ], 0);
+						chip->timer_A->adjust(chip->timer_A_time[ chip->timer_A_index ]);
 						chip->timer_A_index_old = chip->timer_A_index;
 					}
 				#else
@@ -1168,7 +1168,7 @@ void ym2151_write_reg(void *_chip, int r, int v)
 			{		/* stop timer A */
 				#ifdef USE_MAME_TIMERS
 				/* ASG 980324: added a real timer */
-					timer_enable(chip->timer_A, 0);
+					chip->timer_A->enable(false);
 				#else
 					chip->tim_A = 0;
 				#endif
@@ -1617,8 +1617,8 @@ void ym2151_reset_chip(void *_chip)
 	chip->irq_enable = 0;
 #ifdef USE_MAME_TIMERS
 	/* ASG 980324 -- reset the timers before writing to the registers */
-	timer_enable(chip->timer_A, 0);
-	timer_enable(chip->timer_B, 0);
+	chip->timer_A->enable(false);
+	chip->timer_B->enable(false);
 #else
 	chip->tim_A      = 0;
 	chip->tim_B      = 0;

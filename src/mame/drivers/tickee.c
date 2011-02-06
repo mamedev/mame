@@ -92,7 +92,7 @@ static TIMER_CALLBACK( setup_gun_interrupts )
 	int beamx, beamy;
 
 	/* set a timer to do this again next frame */
-	timer_adjust_oneshot(setup_gun_timer, machine->primary_screen->time_until_pos(0), 0);
+	setup_gun_timer->adjust(machine->primary_screen->time_until_pos(0));
 
 	/* only do work if the palette is flashed */
 	if (tickee_control)
@@ -122,7 +122,7 @@ static VIDEO_START( tickee )
 {
 	/* start a timer going on the first scanline of every frame */
 	setup_gun_timer = machine->scheduler().timer_alloc(FUNC(setup_gun_interrupts));
-	timer_adjust_oneshot(setup_gun_timer, machine->primary_screen->time_until_pos(0), 0);
+	setup_gun_timer->adjust(machine->primary_screen->time_until_pos(0));
 }
 
 

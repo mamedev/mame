@@ -146,7 +146,7 @@ static WRITE8_DEVICE_HANDLER( audio_reset_w )
 	if (data == 0)
 	{
 		state->riot->reset();
-		cpuexec_boost_interleave(device->machine, attotime::zero, attotime::from_usec(10));
+		device->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
 	}
 }
 
@@ -188,7 +188,7 @@ static WRITE_LINE_DEVICE_HANDLER( r6532_irq )
 
 	cpu_set_input_line(gameplan->audiocpu, 0, state);
 	if (state == ASSERT_LINE)
-		cpuexec_boost_interleave(device->machine, attotime::zero, attotime::from_usec(10));
+		device->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
 }
 
 

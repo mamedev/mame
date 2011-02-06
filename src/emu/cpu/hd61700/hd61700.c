@@ -169,7 +169,7 @@ void hd61700_cpu_device::device_start()
 	m_program = this->space(AS_PROGRAM);
 
 	m_sec_timer = timer_alloc(SEC_TIMER);
-	timer_adjust_periodic(m_sec_timer, attotime::from_seconds(1), 0, attotime::from_seconds(1));
+	m_sec_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 
 	// save state
 	state_save_register_device_item(this, 0, m_ppc);

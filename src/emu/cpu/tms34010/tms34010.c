@@ -653,7 +653,7 @@ static CPU_INIT( tms34010 )
 
 	/* allocate a scanline timer and set it to go off at the start */
 	tms->scantimer = device->machine->scheduler().timer_alloc(FUNC(scanline_callback), tms);
-	timer_adjust_oneshot(tms->scantimer, attotime::zero, 0);
+	tms->scantimer->adjust(attotime::zero);
 
 	/* allocate the shiftreg */
 	tms->shiftreg = auto_alloc_array(device->machine, UINT16, SHIFTREG_SIZE/2);
@@ -1040,7 +1040,7 @@ static TIMER_CALLBACK( scanline_callback )
 
 	/* note that we add !master (0 or 1) as a attoseconds value; this makes no practical difference */
 	/* but helps ensure that masters are updated first before slaves */
-	timer_adjust_oneshot(tms->scantimer, tms->screen->time_until_pos(vcount) + attotime(0, !master), vcount);
+	tms->scantimer->adjust(tms->screen->time_until_pos(vcount) + attotime(0, !master), vcount);
 }
 
 
@@ -1270,7 +1270,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 	}
 
 //  if (LOG_CONTROL_REGS)
-//      logerror("%s: %s = %04X (%d)\n", cpuexec_describe_context(tms->device->machine), ioreg_name[offset], IOREG(tms, offset), tms->screen->vpos());
+//      logerror("%s: %s = %04X (%d)\n", tms->device->machine->describe_context(), ioreg_name[offset], IOREG(tms, offset), tms->screen->vpos());
 }
 
 
@@ -1307,7 +1307,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 	IOREG(tms, offset) = data;
 
 //  if (LOG_CONTROL_REGS)
-//      logerror("%s: %s = %04X (%d)\n", cpuexec_describe_context(device->machine), ioreg020_name[offset], IOREG(tms, offset), tms->screen->vpos());
+//      logerror("%s: %s = %04X (%d)\n", device->machine->describe_context(), ioreg020_name[offset], IOREG(tms, offset), tms->screen->vpos());
 
 	switch (offset)
 	{
@@ -1466,7 +1466,7 @@ READ16_HANDLER( tms34010_io_register_r )
 	int result, total;
 
 //  if (LOG_CONTROL_REGS)
-//      logerror("%s: read %s\n", cpuexec_describe_context(device->machine), ioreg_name[offset]);
+//      logerror("%s: read %s\n", device->machine->describe_context(), ioreg_name[offset]);
 
 	switch (offset)
 	{
@@ -1494,7 +1494,7 @@ READ16_HANDLER( tms34010_io_register_r )
 			/* have an IRQ handler. For this reason, we return it signalled a bit early in order */
 			/* to make it past these loops. */
 			if (SMART_IOREG(tms, VCOUNT) + 1 == SMART_IOREG(tms, DPYINT) &&
-				timer_timeleft(tms->scantimer) < attotime::from_hz(40000000/8/3))
+				tms->scantimer->remaining() < attotime::from_hz(40000000/8/3))
 				result |= TMS34010_DI;
 			return result;
 	}
@@ -1509,7 +1509,7 @@ READ16_HANDLER( tms34020_io_register_r )
 	int result, total;
 
 //  if (LOG_CONTROL_REGS)
-//      logerror("%s: read %s\n", cpuexec_describe_context(device->machine), ioreg_name[offset]);
+//      logerror("%s: read %s\n", device->machine->describe_context(), ioreg_name[offset]);
 
 	switch (offset)
 	{

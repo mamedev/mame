@@ -341,7 +341,7 @@ static TIMER_CALLBACK( hblank_callback )
 	if (ppu2c0x->hblank_callback_proc)
 		(*ppu2c0x->hblank_callback_proc) (device, ppu2c0x->scanline, vblank, blanked);
 
-	timer_adjust_oneshot(ppu2c0x->hblank_timer, attotime::never, 0);
+	ppu2c0x->hblank_timer->adjust(attotime::never);
 }
 
 static TIMER_CALLBACK( nmi_callback )
@@ -354,7 +354,7 @@ static TIMER_CALLBACK( nmi_callback )
 	if (ppu2c0x->nmi_callback_proc != NULL)
 		(*ppu2c0x->nmi_callback_proc) (device, ppu_regs);
 
-	timer_adjust_oneshot(ppu2c0x->nmi_timer, attotime::never, 0);
+	ppu2c0x->nmi_timer->adjust(attotime::never);
 }
 
 static void draw_background( device_t *device, UINT8 *line_priority )
@@ -867,7 +867,7 @@ static TIMER_CALLBACK( scanline_callback )
 			// a game can read the high bit of $2002 before the NMI is called (potentially resetting the bit
 			// via a read from $2002 in the NMI handler).
 			// B-Wings is an example game that needs this.
-			timer_adjust_oneshot(ppu2c0x->nmi_timer, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), 0);
+			ppu2c0x->nmi_timer->adjust(device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(4));
 		}
 	}
 
@@ -895,10 +895,10 @@ static TIMER_CALLBACK( scanline_callback )
 		next_scanline = 0;
 
 	// Call us back when the hblank starts for this scanline
-	timer_adjust_oneshot(ppu2c0x->hblank_timer, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(86.67), 0); // ??? FIXME - hardcoding NTSC, need better calculation
+	ppu2c0x->hblank_timer->adjust(device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(86.67)); // ??? FIXME - hardcoding NTSC, need better calculation
 
 	// trigger again at the start of the next scanline
-	timer_adjust_oneshot(ppu2c0x->scanline_timer, device->machine->primary_screen->time_until_pos(next_scanline * ppu2c0x->scan_scale), 0);
+	ppu2c0x->scanline_timer->adjust(device->machine->primary_screen->time_until_pos(next_scanline * ppu2c0x->scan_scale));
 }
 
 /*************************************
@@ -1302,13 +1302,13 @@ static DEVICE_START( ppu2c0x )
 
 	/* initialize the scanline handling portion */
 	ppu2c0x->scanline_timer = device->machine->scheduler().timer_alloc(FUNC(scanline_callback), (void *) device);
-	timer_adjust_oneshot(ppu2c0x->scanline_timer, device->machine->primary_screen->time_until_pos(1), 0);
+	ppu2c0x->scanline_timer->adjust(device->machine->primary_screen->time_until_pos(1));
 
 	ppu2c0x->hblank_timer = device->machine->scheduler().timer_alloc(FUNC(hblank_callback), (void *) device);
-	timer_adjust_oneshot(ppu2c0x->hblank_timer, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(86.67), 0); // ??? FIXME - hardcoding NTSC, need better calculation
+	ppu2c0x->hblank_timer->adjust(device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(86.67)); // ??? FIXME - hardcoding NTSC, need better calculation
 
 	ppu2c0x->nmi_timer = device->machine->scheduler().timer_alloc(FUNC(nmi_callback), (void *) device);
-	timer_adjust_oneshot(ppu2c0x->nmi_timer, attotime::never, 0);
+	ppu2c0x->nmi_timer->adjust(attotime::never);
 
 	ppu2c0x->nmi_callback_proc = intf->nmi_handler;
 	ppu2c0x->color_base = intf->color_base;

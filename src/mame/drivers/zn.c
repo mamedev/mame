@@ -66,7 +66,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%s: %s", cpuexec_describe_context(machine), buf );
+		logerror( "%s: %s", machine->describe_context(), buf );
 	}
 }
 
@@ -348,7 +348,7 @@ static WRITE32_HANDLER( znsecsel_w )
 		psx_sio_install_handler( space->machine, 0, sio_dip_handler );
 		psx_sio_input( space->machine, 0, PSX_SIO_IN_DSR, 0 );
 
-		timer_adjust_oneshot( state->dip_timer, downcast<cpu_device *>(space->cpu)->cycles_to_attotime( 100 ), 1 );
+		state->dip_timer->adjust( downcast<cpu_device *>(space->cpu)->cycles_to_attotime( 100 ), 1 );
 	}
 
 	verboselog( space->machine, 2, "znsecsel_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
@@ -361,7 +361,7 @@ static TIMER_CALLBACK( dip_timer_fired )
 
 	if( param )
 	{
-		timer_adjust_oneshot( state->dip_timer, machine->device<cpu_device>( "maincpu" )->cycles_to_attotime(50 ), 0 );
+		state->dip_timer->adjust( machine->device<cpu_device>( "maincpu" )->cycles_to_attotime(50 ) );
 	}
 }
 

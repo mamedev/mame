@@ -385,7 +385,7 @@ logerror("Z80 sends command %02x\n",param);
 	state->from_z80 = param;
 	state->from_mcu_pending = 0;
 	cputag_set_input_line(machine, "mcu", 0, HOLD_LINE);
-	cpuexec_boost_interleave(machine, attotime::zero, attotime::from_usec(200));
+	machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(200));
 }
 
 static TIMER_CALLBACK( delayed_mcu_z80_w )

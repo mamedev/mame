@@ -98,7 +98,7 @@ WRITE8_DEVICE_HANDLER( namco_51xx_write )
 
 	data &= 0x07;
 
-	LOG(("%s: custom 51XX write %02x\n",cpuexec_describe_context(device->machine),data));
+	LOG(("%s: custom 51XX write %02x\n",device->machine->describe_context(),data));
 
 	if (state->coincred_mode)
 	{
@@ -196,7 +196,7 @@ READ8_DEVICE_HANDLER( namco_51xx_read )
 {
 	namco_51xx_state *state = get_safe_token(device);
 
-	LOG(("%s: custom 51XX read\n",cpuexec_describe_context(device->machine)));
+	LOG(("%s: custom 51XX read\n",device->machine->describe_context()));
 
 	if (state->mode == 0)	/* switch mode */
 	{

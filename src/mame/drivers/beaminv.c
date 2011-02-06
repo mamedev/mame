@@ -103,7 +103,7 @@ static TIMER_CALLBACK( interrupt_callback )
 	next_interrupt_number = (interrupt_number + 1) % INTERRUPTS_PER_FRAME;
 	next_vpos = interrupt_lines[next_interrupt_number];
 
-	timer_adjust_oneshot(state->interrupt_timer, machine->primary_screen->time_until_pos(next_vpos), next_interrupt_number);
+	state->interrupt_timer->adjust(machine->primary_screen->time_until_pos(next_vpos), next_interrupt_number);
 }
 
 
@@ -118,7 +118,7 @@ static void start_interrupt_timer( running_machine *machine )
 {
 	beaminv_state *state = machine->driver_data<beaminv_state>();
 	int vpos = interrupt_lines[0];
-	timer_adjust_oneshot(state->interrupt_timer, machine->primary_screen->time_until_pos(vpos), 0);
+	state->interrupt_timer->adjust(machine->primary_screen->time_until_pos(vpos));
 }
 
 

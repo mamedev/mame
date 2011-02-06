@@ -160,7 +160,7 @@ void f3853_device::device_reset()
 	m_priority_line = FALSE;
 	m_external_interrupt_line = TRUE;
 
-	timer_enable(m_timer, 0);
+	m_timer->enable(false);
 }
 
 
@@ -190,7 +190,7 @@ void f3853_device::f3853_timer_start(UINT8 value)
 {
 	attotime period = (value != 0xff) ? attotime::from_hz(clock()) * (m_value_to_cycle[value]*31) : attotime::never;
 
-	timer_adjust_oneshot(m_timer, period, 0);
+	m_timer->adjust(period);
 }
 
 

@@ -312,7 +312,7 @@ static void blit(int offset)
 
 #if HALLEYS_DEBUG
 if (0) {
-	logerror("%s:[%04x]", cpuexec_describe_context(machine), offset);
+	logerror("%s:[%04x]", machine->describe_context(), offset);
 	for (ecx=0; ecx<16; ecx++) logerror(" %02x", param[ecx]);
 	logerror("\n");
 }
@@ -1014,7 +1014,7 @@ static WRITE8_HANDLER( blitter_w )
 		else
 		{
 			blitter_busy = 1;
-			timer_adjust_oneshot(blitter_reset_timer, downcast<cpu_device *>(space->cpu)->cycles_to_attotime(100), 0); // free blitter if no updates in 100 cycles
+			blitter_reset_timer->adjust(downcast<cpu_device *>(space->cpu)->cycles_to_attotime(100)); // free blitter if no updates in 100 cycles
 		}
 	}
 }

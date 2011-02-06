@@ -1192,7 +1192,7 @@ static READ8_DEVICE_HANDLER( mgcs_keys_r )
 	if (~input_select & 0x40)	return input_port_read(device->machine, "KEY3");
 	if (~input_select & 0x80)	return input_port_read(device->machine, "KEY4");
 
-	logerror("%s: warning, reading key with input_select = %02x\n", cpuexec_describe_context(device->machine), input_select);
+	logerror("%s: warning, reading key with input_select = %02x\n", device->machine->describe_context(), input_select);
 	return 0xff;
 }
 
@@ -1271,7 +1271,7 @@ static READ8_HANDLER( sdmg2_keys_r )
 
 	if (input_select == 0x1f)	return input_port_read(space->machine, "KEY0");	// in joystick mode
 
-	logerror("%s: warning, reading key with input_select = %02x\n", cpuexec_describe_context(space->machine), input_select);
+	logerror("%s: warning, reading key with input_select = %02x\n", space->machine->describe_context(), input_select);
 	return 0xff;
 }
 
@@ -1359,7 +1359,7 @@ static READ8_HANDLER( mgdh_keys_r )
 
 	if ((input_select & 0xfc) == 0xfc)	return input_port_read(space->machine, "DSW1");
 
-	logerror("%s: warning, reading key with input_select = %02x\n", cpuexec_describe_context(space->machine), input_select);
+	logerror("%s: warning, reading key with input_select = %02x\n", space->machine->describe_context(), input_select);
 	return 0xff;
 }
 

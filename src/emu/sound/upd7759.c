@@ -547,7 +547,7 @@ static TIMER_CALLBACK( upd7759_slave_update )
 
 	/* set a timer to go off when that is done */
 	if (chip->state != STATE_IDLE)
-		timer_adjust_oneshot(chip->timer, chip->clock_period * chip->clocks_left, 0);
+		chip->timer->adjust(chip->clock_period * chip->clocks_left);
 }
 
 
@@ -582,7 +582,7 @@ static void upd7759_reset(upd7759_state *chip)
 
 	/* turn off any timer */
 	if (chip->timer)
-		timer_adjust_oneshot(chip->timer, attotime::never, 0);
+		chip->timer->adjust(attotime::never);
 }
 
 
@@ -712,7 +712,7 @@ void upd7759_start_w(device_t *device, UINT8 data)
 
 		/* for slave mode, start the timer going */
 		if (chip->timer)
-			timer_adjust_oneshot(chip->timer, attotime::zero, 0);
+			chip->timer->adjust(attotime::zero);
 	}
 }
 

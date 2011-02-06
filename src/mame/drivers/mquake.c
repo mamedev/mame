@@ -66,14 +66,14 @@ static WRITE8_DEVICE_HANDLER( mquake_cia_0_porta_w )
 static READ8_DEVICE_HANDLER( mquake_cia_0_portb_r )
 {
 	/* parallel port */
-	logerror("%s:CIA0_portb_r\n", cpuexec_describe_context(device->machine));
+	logerror("%s:CIA0_portb_r\n", device->machine->describe_context());
 	return 0xff;
 }
 
 static WRITE8_DEVICE_HANDLER( mquake_cia_0_portb_w )
 {
 	/* parallel port */
-	logerror("%s:CIA0_portb_w(%02x)\n", cpuexec_describe_context(device->machine), data);
+	logerror("%s:CIA0_portb_w(%02x)\n", device->machine->describe_context(), data);
 }
 
 

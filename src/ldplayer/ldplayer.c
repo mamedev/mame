@@ -317,7 +317,7 @@ static TIMER_CALLBACK( pr8210_bit_callback )
 		data = pr8210_command_buffer[pr8210_command_buffer_out++ % ARRAY_LENGTH(pr8210_command_buffer)];
 		bitsleft = 12;
 	}
-	timer_adjust_oneshot(pr8210_bit_timer, duration, (bitsleft << 16) | data);
+	pr8210_bit_timer->adjust(duration, (bitsleft << 16) | data);
 }
 
 
@@ -332,7 +332,7 @@ static MACHINE_START( pr8210 )
 static MACHINE_RESET( pr8210 )
 {
 	MACHINE_RESET_CALL(ldplayer);
-	timer_adjust_oneshot(pr8210_bit_timer, attotime::zero, 0);
+	pr8210_bit_timer->adjust(attotime::zero);
 }
 
 

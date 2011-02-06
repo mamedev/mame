@@ -312,7 +312,7 @@ static WRITE8_HANDLER( ss9601_tilesize_w )
 			sizes[0] = TILE_8x8;
 			sizes[1] = TILE_8x8;
 
-			logerror("%s: warning, unknown tilesize = %02x\n", cpuexec_describe_context(space->machine), data);
+			logerror("%s: warning, unknown tilesize = %02x\n", space->machine->describe_context(), data);
 			popmessage("UNKNOWN TILESIZE %02X", data);
 			break;
 	}
@@ -935,7 +935,7 @@ static WRITE8_HANDLER( mtrain_tilesize_w )
 			sizes[0] = TILE_8x8;
 			sizes[1] = TILE_8x8;
 
-			logerror("%s: warning, unknown tilesize = %02x\n", cpuexec_describe_context(space->machine), data);
+			logerror("%s: warning, unknown tilesize = %02x\n", space->machine->describe_context(), data);
 			popmessage("UNKNOWN TILESIZE %02X", data);
 			break;
 	}

@@ -317,7 +317,7 @@ static void borntofi_adpcm_start( device_t *device, int voice )
 	msm5205_reset_w(device, 0);
 	state->adpcm_playing[voice] = 1;
 	state->adpcm_nibble[voice] = 0;
-//  logerror("%s: adpcm start = %06x, stop = %06x\n", cpuexec_describe_context(device->machine), state->adpcm_addr[0][voice], state->adpcm_addr[1][voice]);
+//  logerror("%s: adpcm start = %06x, stop = %06x\n", device->machine->describe_context(), state->adpcm_addr[0][voice], state->adpcm_addr[1][voice]);
 }
 
 static void borntofi_adpcm_stop( device_t *device, int voice )

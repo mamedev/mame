@@ -1150,7 +1150,7 @@ static READ8_DEVICE_HANDLER( htengoku_dsw_r )
 	if (!BIT(state->dsw_sel, 2))	return input_port_read(device->machine, "DSW2");
 	if (!BIT(state->dsw_sel, 3))	return input_port_read(device->machine, "DSW3");
 	if (!BIT(state->dsw_sel, 4))	return input_port_read(device->machine, "DSW4");
-	logerror("%s: warning, unknown bits read, dsw_sel = %02x\n", cpuexec_describe_context(device->machine), state->dsw_sel);
+	logerror("%s: warning, unknown bits read, dsw_sel = %02x\n", device->machine->describe_context(), state->dsw_sel);
 
 	return 0xff;
 }
@@ -1375,7 +1375,7 @@ static READ8_DEVICE_HANDLER( tenkai_dsw_r )
 	if (!BIT(state->dsw_sel, 2)) return input_port_read(device->machine, "DSW2");
 	if (!BIT(state->dsw_sel, 3)) return input_port_read(device->machine, "DSW3");
 	if (!BIT(state->dsw_sel, 4)) return input_port_read(device->machine, "DSW4");
-	logerror("%s: unmapped dsw %02x read\n", cpuexec_describe_context(device->machine), state->dsw_sel);
+	logerror("%s: unmapped dsw %02x read\n", device->machine->describe_context(), state->dsw_sel);
 
 	return 0xff;
 }

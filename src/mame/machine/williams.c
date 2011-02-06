@@ -920,7 +920,7 @@ static READ8_DEVICE_HANDLER( tshoot_input_port_0_3_r )
 static WRITE8_DEVICE_HANDLER( tshoot_maxvol_w )
 {
 	/* something to do with the sound volume */
-	logerror("tshoot maxvol = %d (%s)\n", data, cpuexec_describe_context(device->machine));
+	logerror("tshoot maxvol = %d (%s)\n", data, device->machine->describe_context());
 }
 
 

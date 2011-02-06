@@ -5060,7 +5060,7 @@ static void internal_post_key(running_machine *machine, unicode_char ch)
 	/* need to start up the timer? */
 	if (keybuf->begin_pos == keybuf->end_pos)
 	{
-		timer_adjust_oneshot(portdata->inputx_timer, choose_delay(portdata, ch), 0);
+		portdata->inputx_timer->adjust(choose_delay(portdata, ch));
 		keybuf->status_keydown = 0;
 	}
 
@@ -5178,7 +5178,7 @@ static TIMER_CALLBACK(inputx_timerproc)
 	if (keybuf->begin_pos != keybuf->end_pos)
 	{
 		delay = choose_delay(portdata, keybuf->buffer[keybuf->begin_pos]);
-		timer_adjust_oneshot(portdata->inputx_timer, delay, 0);
+		portdata->inputx_timer->adjust(delay);
 	}
 }
 

@@ -739,7 +739,7 @@ static void SCSP_UpdateReg(scsp_state *scsp, int reg)
 					time = (44100 / scsp->TimPris[0]) / (255-(scsp->udata.data[0x18/2]&0xff));
 					if (time)
 					{
-						timer_adjust_oneshot(scsp->timerA, attotime::from_hz(time), 0);
+						scsp->timerA->adjust(attotime::from_hz(time));
 					}
 				}
 			}
@@ -758,7 +758,7 @@ static void SCSP_UpdateReg(scsp_state *scsp, int reg)
 					time = (44100 / scsp->TimPris[1]) / (255-(scsp->udata.data[0x1A/2]&0xff));
 					if (time)
 					{
-						timer_adjust_oneshot(scsp->timerB, attotime::from_hz(time), 0);
+						scsp->timerB->adjust(attotime::from_hz(time));
 					}
 				}
 			}
@@ -777,7 +777,7 @@ static void SCSP_UpdateReg(scsp_state *scsp, int reg)
 					time = (44100 / scsp->TimPris[2]) / (255-(scsp->udata.data[0x1C/2]&0xff));
 					if (time)
 					{
-						timer_adjust_oneshot(scsp->timerC, attotime::from_hz(time), 0);
+						scsp->timerC->adjust(attotime::from_hz(time));
 					}
 				}
 			}

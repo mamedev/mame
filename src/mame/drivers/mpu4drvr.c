@@ -1191,7 +1191,7 @@ static READ8_DEVICE_HANDLER( pia_ic5_porta_track_r )
     We invert the X and Y data at source due to the use of Schmitt triggers in the interface, which
     clean up the pulses and flip the active phase.*/
 
-	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",cpuexec_describe_context(device->machine)));
+	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",device->machine->describe_context()));
 
 	static INT8 cur[2];
 

@@ -400,7 +400,7 @@ static TIMER_CALLBACK( amiga_irq_proc )
 	amiga_state *state = machine->driver_data<amiga_state>();
 
 	update_irqs(machine);
-	timer_reset( state->irq_timer, attotime::never);
+	state->irq_timer->reset( );
 }
 
 
@@ -937,7 +937,7 @@ static TIMER_CALLBACK( amiga_blitter_proc )
 	amiga_custom_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_BLIT, 0xffff);
 
 	/* reset the blitter timer */
-	timer_reset( state->blitter_timer, attotime::never);
+	state->blitter_timer->reset( );
 }
 
 
@@ -956,7 +956,7 @@ static void blitter_setup(address_space *space)
 	/* is there another blitting in progress? */
 	if (CUSTOM_REG(REG_DMACON) & 0x4000)
 	{
-		logerror("%s - This program is playing tricks with the blitter\n", cpuexec_describe_context(space->machine) );
+		logerror("%s - This program is playing tricks with the blitter\n", space->machine->describe_context() );
 		return;
 	}
 
@@ -1002,7 +1002,7 @@ static void blitter_setup(address_space *space)
 	CUSTOM_REG(REG_DMACON) |= 0x4000;
 
 	/* set a timer */
-	timer_adjust_oneshot( state->blitter_timer, downcast<cpu_device *>(space->cpu)->cycles_to_attotime( blittime ), 0);
+	state->blitter_timer->adjust( downcast<cpu_device *>(space->cpu)->cycles_to_attotime( blittime ));
 }
 
 
@@ -1375,7 +1375,7 @@ WRITE16_HANDLER( amiga_custom_w )
 
 			/* if 'blitter-nasty' has been turned on and we have a blit pending, reschedule it */
 			if ( ( data & 0x400 ) && ( CUSTOM_REG(REG_DMACON) & 0x4000 ) )
-				timer_adjust_oneshot( state->blitter_timer, downcast<cpu_device *>(space->cpu)->cycles_to_attotime( BLITTER_NASTY_DELAY ), 0);
+				state->blitter_timer->adjust( downcast<cpu_device *>(space->cpu)->cycles_to_attotime( BLITTER_NASTY_DELAY ));
 
 			break;
 
@@ -1386,7 +1386,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			CUSTOM_REG(offset) = data;
 
 			if ( temp & 0x8000  ) /* if we're enabling irq's, delay a bit */
-				timer_adjust_oneshot( state->irq_timer, downcast<cpu_device *>(space->cpu)->cycles_to_attotime( AMIGA_IRQ_DELAY_CYCLES ), 0);
+				state->irq_timer->adjust( downcast<cpu_device *>(space->cpu)->cycles_to_attotime( AMIGA_IRQ_DELAY_CYCLES ));
 			else /* if we're disabling irq's, process right away */
 				update_irqs(space->machine);
 			break;
@@ -1405,7 +1405,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			CUSTOM_REG(offset) = data;
 
 			if ( temp & 0x8000  ) /* if we're generating irq's, delay a bit */
-				timer_adjust_oneshot( state->irq_timer, space->machine->device<cpu_device>("maincpu")->cycles_to_attotime( AMIGA_IRQ_DELAY_CYCLES ), 0);
+				state->irq_timer->adjust( space->machine->device<cpu_device>("maincpu")->cycles_to_attotime( AMIGA_IRQ_DELAY_CYCLES ));
 			else /* if we're clearing irq's, process right away */
 				update_irqs(space->machine);
 			break;

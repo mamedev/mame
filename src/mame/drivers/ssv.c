@@ -471,7 +471,7 @@ static WRITE16_DEVICE_HANDLER( gdfs_eeprom_w )
 	ssv_state *state = device->machine->driver_data<ssv_state>();
 
 	if (data & ~0x7b00)
-		logerror("%s - Unknown EEPROM bit written %04X\n",cpuexec_describe_context(device->machine),data);
+		logerror("%s - Unknown EEPROM bit written %04X\n",device->machine->describe_context(),data);
 
 	if ( ACCESSING_BITS_8_15 )
 	{

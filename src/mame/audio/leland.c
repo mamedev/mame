@@ -834,7 +834,7 @@ static void handle_eoi(device_t *device, int data)
 			case 0x0d:	state->i80186.intr.in_service &= ~0x20;	break;
 			case 0x0e:	state->i80186.intr.in_service &= ~0x40;	break;
 			case 0x0f:	state->i80186.intr.in_service &= ~0x80;	break;
-			default:	logerror("%s:ERROR - 80186 EOI with unknown vector %02X\n", cpuexec_describe_context(machine), data & 0x1f);
+			default:	logerror("%s:ERROR - 80186 EOI with unknown vector %02X\n", machine->describe_context(), data & 0x1f);
 		}
 		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", machine->time().as_double(), data & 0x1f);
 	}
@@ -906,11 +906,11 @@ static TIMER_CALLBACK( internal_timer_int )
 	if (t->control & 0x0001)
 	{
 		int count = t->maxA ? t->maxA : 0x10000;
-		timer_adjust_oneshot(t->int_timer, attotime::from_hz(2000000) * count, which);
+		t->int_timer->adjust(attotime::from_hz(2000000) * count, which);
 		if (LOG_TIMER) logerror("  Repriming interrupt\n");
 	}
 	else
-		timer_adjust_oneshot(t->int_timer, attotime::never, which);
+		t->int_timer->adjust(attotime::never, which);
 }
 
 
@@ -921,7 +921,7 @@ static void internal_timer_sync(leland_sound_state *state, int which)
 	/* if we have a timing timer running, adjust the count */
 	if (t->time_timer_active)
 	{
-		attotime current_time = timer_timeelapsed(t->time_timer);
+		attotime current_time = t->time_timer->elapsed();
 		int net_clocks = ((current_time - t->last_time) * 2000000).as_double();
 		t->last_time = current_time;
 
@@ -1024,7 +1024,7 @@ static void internal_timer_update(leland_sound_state *state, int which, int new_
 				internal_timer_sync(state, which);
 
 				/* nuke the timer and force the interrupt timer to be recomputed */
-				timer_adjust_oneshot(t->time_timer, attotime::never, which);
+				t->time_timer->adjust(attotime::never, which);
 				t->time_timer_active = 0;
 				update_int_timer = 1;
 			}
@@ -1033,7 +1033,7 @@ static void internal_timer_update(leland_sound_state *state, int which, int new_
 			else if ((diff & 0x8000) && (new_control & 0x8000))
 			{
 				/* start the timing */
-				timer_adjust_oneshot(t->time_timer, attotime::never, which);
+				t->time_timer->adjust(attotime::never, which);
 				t->time_timer_active = 1;
 				update_int_timer = 1;
 			}
@@ -1062,11 +1062,11 @@ static void internal_timer_update(leland_sound_state *state, int which, int new_
 			{
 				int diff = t->maxA - t->count;
 				if (diff <= 0) diff += 0x10000;
-				timer_adjust_oneshot(t->int_timer, attotime::from_hz(2000000) * diff, which);
+				t->int_timer->adjust(attotime::from_hz(2000000) * diff, which);
 				if (LOG_TIMER) logerror("Set interrupt timer for %d\n", which);
 			}
 			else
-				timer_adjust_oneshot(t->int_timer, attotime::never, which);
+				t->int_timer->adjust(attotime::never, which);
 		}
 }
 
@@ -1153,7 +1153,7 @@ static void update_dma_control(leland_sound_state *state, int which, int new_con
 			if (LOG_DMA) logerror("Initiated DMA %d - count = %04X, source = %04X, dest = %04X\n", which, d->count, d->source, d->dest);
 
 			d->finished = 0;
-			timer_adjust_oneshot(d->finish_timer, attotime::from_hz(state->dac[dacnum].frequency) * count, which);
+			d->finish_timer->adjust(attotime::from_hz(state->dac[dacnum].frequency) * count, which);
 		}
 	}
 
@@ -1612,7 +1612,7 @@ INLINE void counter_update_count(struct counter_state *ctr)
 	if (ctr->timer)
 	{
 		/* determine how many 2MHz cycles are remaining */
-		int count = (timer_timeleft(ctr->timer) * 2000000).as_double();
+		int count = (ctr->timer->remaining() * 2000000).as_double();
 		ctr->count = (count < 0) ? 0 : count;
 	}
 }
@@ -1696,7 +1696,7 @@ static WRITE16_DEVICE_HANDLER( pit8254_w )
 				if (ctr->count == 0) ctr->count = 0x10000;
 
 				/* reset/start the timer */
-				timer_adjust_oneshot(ctr->timer, attotime::never, 0);
+				ctr->timer->adjust(attotime::never);
 
 				if (LOG_PIT) logerror("PIT counter %d set to %d (%d Hz)\n", which, ctr->count, 4000000 / ctr->count);
 
@@ -1807,7 +1807,7 @@ static TIMER_CALLBACK( command_lo_sync )
 {
 	device_t *device = (device_t *)ptr;
 	leland_sound_state *state = get_safe_token(device);
-	if (LOG_COMM) logerror("%s:Write sound command latch lo = %02X\n", cpuexec_describe_context(machine), param);
+	if (LOG_COMM) logerror("%s:Write sound command latch lo = %02X\n", machine->describe_context(), param);
 	state->sound_command = (state->sound_command & 0xff00) | param;
 }
 

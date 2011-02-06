@@ -400,7 +400,7 @@ static WRITE16_DEVICE_HANDLER( bakubrkr_oki_bank_sw )
 	if (ACCESSING_BITS_0_7) {
 		okim6295_device *oki = downcast<okim6295_device *>(device);
 		oki->set_bank_base(0x40000 * (data & 0x7) );
-		logerror("%s:Selecting OKI bank %02X\n",cpuexec_describe_context(device->machine),data&0xff);
+		logerror("%s:Selecting OKI bank %02X\n",device->machine->describe_context(),data&0xff);
 	}
 }
 
@@ -544,7 +544,7 @@ static WRITE16_DEVICE_HANDLER( bonkadv_oki_0_bank_w )
 	{
 		okim6295_device *oki = downcast<okim6295_device *>(device);
 		oki->set_bank_base(0x40000 * (data & 0xF));
-		logerror("%s: OKI0  bank %08X\n",cpuexec_describe_context(device->machine),data);
+		logerror("%s: OKI0  bank %08X\n",device->machine->describe_context(),data);
 	}
 }
 
@@ -554,7 +554,7 @@ static WRITE16_DEVICE_HANDLER( bonkadv_oki_1_bank_w )
 	{
 		okim6295_device *oki = downcast<okim6295_device *>(device);
 		oki->set_bank_base(0x40000 * data );
-		logerror("%s: OKI1  bank %08X\n",cpuexec_describe_context(device->machine),data);
+		logerror("%s: OKI1  bank %08X\n",device->machine->describe_context(),data);
 	}
 }
 

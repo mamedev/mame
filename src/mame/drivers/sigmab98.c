@@ -180,13 +180,13 @@ static WRITE8_HANDLER( regs_w )
 		case 0x1f:
 			rombank = data;
 			if (data >= 0x18)
-				logerror("%s: unknown rom bank = %02x\n", cpuexec_describe_context(space->machine), data);
+				logerror("%s: unknown rom bank = %02x\n", space->machine->describe_context(), data);
 			else
 				memory_set_bank(space->machine, "rombank", data);
 			break;
 
 		default:
-			logerror("%s: unknown reg written: %02x = %02x\n", cpuexec_describe_context(space->machine), reg, data);
+			logerror("%s: unknown reg written: %02x = %02x\n", space->machine->describe_context(), reg, data);
 	}
 }
 static READ8_HANDLER( regs_r )
@@ -200,7 +200,7 @@ static READ8_HANDLER( regs_r )
 			return rombank;
 
 		default:
-			logerror("%s: unknown reg read: %02x\n", cpuexec_describe_context(space->machine), reg);
+			logerror("%s: unknown reg read: %02x\n", space->machine->describe_context(), reg);
 			return 0x00;
 	}
 }
@@ -227,12 +227,12 @@ static WRITE8_HANDLER( regs2_w )
 					memory_set_bank(space->machine, "rambank", 1);
 					break;
 				default:
-					logerror("%s: unknown ram bank = %02x\n", cpuexec_describe_context(space->machine), data);
+					logerror("%s: unknown ram bank = %02x\n", space->machine->describe_context(), data);
 			}
 			break;
 
 		default:
-			logerror("%s: unknown reg2 written: %02x = %02x\n", cpuexec_describe_context(space->machine), reg2, data);
+			logerror("%s: unknown reg2 written: %02x = %02x\n", space->machine->describe_context(), reg2, data);
 	}
 }
 static READ8_HANDLER( regs2_r )
@@ -246,7 +246,7 @@ static READ8_HANDLER( regs2_r )
 			return rambank;
 
 		default:
-			logerror("%s: unknown reg2 read: %02x\n", cpuexec_describe_context(space->machine), reg2);
+			logerror("%s: unknown reg2 read: %02x\n", space->machine->describe_context(), reg2);
 			return 0x00;
 	}
 }

@@ -204,7 +204,7 @@ static TIMER_CALLBACK( cliff_irq_callback )
 		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 	}
 
-	timer_adjust_oneshot(irq_timer, machine->primary_screen->time_until_pos(param * 2), param);
+	irq_timer->adjust(machine->primary_screen->time_until_pos(param * 2), param);
 }
 
 static void vdp_interrupt(running_machine *machine, int state)
@@ -224,7 +224,7 @@ static MACHINE_RESET( cliffhgr )
 {
 	port_bank = 0;
 	phillips_code = 0;
-	timer_adjust_oneshot(irq_timer, machine->primary_screen->time_until_pos(17), 17);
+	irq_timer->adjust(machine->primary_screen->time_until_pos(17), 17);
 }
 
 /********************************************************/

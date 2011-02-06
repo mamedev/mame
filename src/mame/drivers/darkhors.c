@@ -220,7 +220,7 @@ static const eeprom_interface eeprom_intf =
 static WRITE32_DEVICE_HANDLER( darkhors_eeprom_w )
 {
 	if (data & ~0xff000000)
-		logerror("%s: Unknown EEPROM bit written %08X\n",cpuexec_describe_context(device->machine),data);
+		logerror("%s: Unknown EEPROM bit written %08X\n",device->machine->describe_context(),data);
 
 	if ( ACCESSING_BITS_24_31 )
 	{

@@ -289,7 +289,7 @@ WRITE8_DEVICE_HANDLER( mc6845_register_w )
 {
 	mc6845_t *mc6845 = get_safe_token(device);
 
-	if (LOG)  logerror("%s:M6845 reg 0x%02x = 0x%02x\n", cpuexec_describe_context(device->machine), mc6845->register_address_latch, data);
+	if (LOG)  logerror("%s:M6845 reg 0x%02x = 0x%02x\n", device->machine->describe_context(), mc6845->register_address_latch, data);
 
 	switch (mc6845->register_address_latch)
 	{
@@ -447,11 +447,11 @@ static void recompute_parameters(mc6845_t *mc6845, int postload)
 
 INLINE void mc6845_update_counters(mc6845_t *mc6845)
 {
-	mc6845->character_counter = timer_timeelapsed( mc6845->line_timer ).as_ticks( mc6845->clock );
+	mc6845->character_counter = mc6845->line_timer ->elapsed( ).as_ticks( mc6845->clock );
 
-	if ( timer_enabled( mc6845->hsync_off_timer ) )
+	if ( mc6845->hsync_off_timer ->enabled( ) )
 	{
-		mc6845->hsync_width_counter = timer_timeelapsed( mc6845->hsync_off_timer ).as_ticks( mc6845->clock );
+		mc6845->hsync_width_counter = mc6845->hsync_off_timer ->elapsed( ).as_ticks( mc6845->clock );
 	}
 }
 
@@ -465,7 +465,7 @@ INLINE void mc6845_set_de(mc6845_t *mc6845, int state)
 		if ( mc6845->de )
 		{
 			/* If the upd_adr_timer was running, cancel it */
-			timer_adjust_oneshot(mc6845->upd_adr_timer,  attotime::never, 0);
+			mc6845->upd_adr_timer->adjust(attotime::never);
 		}
 		else
 		{
@@ -519,7 +519,7 @@ INLINE void mc6845_set_cur(mc6845_t *mc6845, int state)
 static void update_upd_adr_timer(mc6845_t *mc6845)
 {
 	if (! mc6845->de && supports_transparent[mc6845->device_type])
-		timer_adjust_oneshot(mc6845->upd_adr_timer,  mc6845->upd_time, 0);
+		mc6845->upd_adr_timer->adjust(mc6845->upd_time);
 }
 
 
@@ -549,7 +549,7 @@ static TIMER_CALLBACK( cur_on_timer_cb )
 	mc6845_set_cur( mc6845, TRUE );
 
 	/* Schedule CURSOR off signal */
-	timer_adjust_oneshot( mc6845->cur_off_timer, attotime::from_ticks( 1, mc6845->clock ), 0 );
+	mc6845->cur_off_timer->adjust( attotime::from_ticks( 1, mc6845->clock ) );
 }
 
 
@@ -572,7 +572,7 @@ static TIMER_CALLBACK( hsync_on_timer_cb )
 	mc6845_set_hsync( mc6845, TRUE );
 
 	/* Schedule HSYNC off signal */
-	timer_adjust_oneshot( mc6845->hsync_off_timer, attotime::from_ticks( hsync_width, mc6845->clock ), 0 );
+	mc6845->hsync_off_timer->adjust( attotime::from_ticks( hsync_width, mc6845->clock ) );
 }
 
 
@@ -668,7 +668,7 @@ static TIMER_CALLBACK( line_timer_cb )
 	if ( mc6845->line_enable_ff )
 	{
 		/* Schedule DE off signal change */
-		timer_adjust_oneshot(mc6845->de_off_timer, attotime::from_ticks( mc6845->horiz_disp, mc6845->clock ), 0);
+		mc6845->de_off_timer->adjust(attotime::from_ticks( mc6845->horiz_disp, mc6845->clock ));
 
 		/* Is cursor visible on this line? */
 		if ( mc6845->cursor_state &&
@@ -680,15 +680,15 @@ static TIMER_CALLBACK( line_timer_cb )
 			mc6845->cursor_x = mc6845->cursor_addr - mc6845->line_address;
 
 			/* Schedule CURSOR ON signal */
-			timer_adjust_oneshot( mc6845->cur_on_timer, attotime::from_ticks( mc6845->cursor_x, mc6845->clock ), 0 );
+			mc6845->cur_on_timer->adjust( attotime::from_ticks( mc6845->cursor_x, mc6845->clock ) );
 		}
 	}
 
 	/* Schedule HSYNC on signal */
-	timer_adjust_oneshot( mc6845->hsync_on_timer, attotime::from_ticks( mc6845->horiz_sync_pos, mc6845->clock ), 0 );
+	mc6845->hsync_on_timer->adjust( attotime::from_ticks( mc6845->horiz_sync_pos, mc6845->clock ) );
 
 	/* Schedule our next callback */
-	timer_adjust_oneshot( mc6845->line_timer, attotime::from_ticks( mc6845->horiz_char_total + 1, mc6845->clock ), 0 );
+	mc6845->line_timer->adjust( attotime::from_ticks( mc6845->horiz_char_total + 1, mc6845->clock ) );
 
 	/* Set VSYNC and DE signals */
 	mc6845_set_vsync( mc6845, new_vsync );
@@ -730,7 +730,7 @@ void mc6845_assert_light_pen_input(device_t *device)
 
 	/* compute the pixel coordinate of the NEXT character -- this is when the light pen latches */
 	/* set the timer that will latch the display address into the light pen registers */
-	timer_adjust_oneshot(mc6845->light_pen_latch_timer, attotime::from_ticks( 1, mc6845->clock ), 0);
+	mc6845->light_pen_latch_timer->adjust(attotime::from_ticks( 1, mc6845->clock ));
 }
 
 
@@ -1009,9 +1009,9 @@ static DEVICE_RESET( mc6845 )
 			devcb_call_write_line(&mc6845->out_vsync_func, FALSE);
 	}
 
-	if ( ! timer_enabled( mc6845->line_timer ) )
+	if ( ! mc6845->line_timer ->enabled( ) )
 	{
-		timer_adjust_oneshot( mc6845->line_timer, attotime::from_ticks( mc6845->horiz_char_total + 1, mc6845->clock ), 0 );
+		mc6845->line_timer->adjust( attotime::from_ticks( mc6845->horiz_char_total + 1, mc6845->clock ) );
 	}
 
 	mc6845->light_pen_latched = FALSE;

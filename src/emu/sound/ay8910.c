@@ -887,7 +887,7 @@ int ay8910_read_ym(void *chip)
 		if (psg->portAread.read)
 			psg->regs[AY_PORTA] = devcb_call_read8(&psg->portAread, 0);
 		else
-			logerror("%s: warning - read 8910 '%s' Port A\n",cpuexec_describe_context(psg->device->machine),psg->device->tag());
+			logerror("%s: warning - read 8910 '%s' Port A\n",psg->device->machine->describe_context(),psg->device->tag());
 		break;
 	case AY_PORTB:
 		if ((psg->regs[AY_ENABLE] & 0x80) != 0)
@@ -895,7 +895,7 @@ int ay8910_read_ym(void *chip)
 		if (psg->portBread.read)
 			psg->regs[AY_PORTB] = devcb_call_read8(&psg->portBread, 0);
 		else
-			logerror("%s: warning - read 8910 '%s' Port B\n",cpuexec_describe_context(psg->device->machine),psg->device->tag());
+			logerror("%s: warning - read 8910 '%s' Port B\n",psg->device->machine->describe_context(),psg->device->tag());
 		break;
 	}
 

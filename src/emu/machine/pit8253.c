@@ -608,13 +608,13 @@ static void	simulate2(device_t *device, struct pit8253_timer *timer, INT64 elaps
 	timer->cycles_to_output	= cycles_to_output;
 	if (cycles_to_output ==	CYCLES_NEVER ||	timer->clockin == 0)
 	{
-		timer_adjust_oneshot(timer->updatetimer, attotime::never, timer->index);
+		timer->updatetimer->adjust(attotime::never, timer->index);
 	}
 	else
 	{
 		attotime next_fire_time = timer->last_updated + cycles_to_output * attotime::from_hz( timer->clockin );
 
-		timer_adjust_oneshot(timer->updatetimer, next_fire_time - device->machine->time(), timer->index );
+		timer->updatetimer->adjust(next_fire_time - device->machine->time(), timer->index );
 	}
 
     LOG2(("pit8253: simulate2(): simulating %d cycles for %d in mode %d, bcd = %d, phase = %d, gate = %d, output %d, value = 0x%04x, cycles_to_output = %04x\n",
@@ -645,7 +645,7 @@ static void	simulate(device_t *device, struct pit8253_timer *timer, INT64 elapse
 		simulate2(device, timer, elapsed_cycles);
 	else
 		if ( timer->clockin )
-			timer_adjust_oneshot(timer->updatetimer, attotime::from_hz( timer->clockin ), timer->index );
+			timer->updatetimer->adjust(attotime::from_hz( timer->clockin ), timer->index );
 }
 
 
@@ -1082,7 +1082,7 @@ static void common_start( device_t *device, int device_type ) {
 		/* initialize timer */
 		timer->clockin = pit8253->config->timer[timerno].clockin;
 		timer->updatetimer = device->machine->scheduler().timer_alloc(FUNC(update_timer_cb), (void *)device);
-		timer_adjust_oneshot(timer->updatetimer, attotime::never, timerno);
+		timer->updatetimer->adjust(attotime::never, timerno);
 
 		/* resolve callbacks */
 		devcb_resolve_read_line(&timer->in_gate_func, &pit8253->config->timer[timerno].in_gate_func, device);

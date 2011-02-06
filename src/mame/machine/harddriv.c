@@ -1181,7 +1181,7 @@ READ16_HANDLER( hd68k_ds3_gdata_r )
 	/* it is important that all the CPUs be in sync before we continue, so spin a little */
 	/* while to let everyone else catch up */
 	cpu_spinuntil_trigger(space->cpu, DS3_TRIGGER);
-	cpuexec_triggertime(space->machine, DS3_TRIGGER, attotime::from_usec(5));
+	space->machine->scheduler().trigger(DS3_TRIGGER, attotime::from_usec(5));
 
 	return state->ds3_gdata;
 }
@@ -1277,7 +1277,7 @@ WRITE16_HANDLER( hdds3_special_w )
 			update_ds3_irq(state);
 
 			/* once we've written data, trigger the main CPU to wake up again */
-			cpuexec_trigger(space->machine, DS3_TRIGGER);
+			space->machine->scheduler().trigger(DS3_TRIGGER);
 			break;
 
 		case 1:

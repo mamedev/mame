@@ -1334,9 +1334,9 @@ static void uPD71054_update_timer( running_machine *machine, device_t *cpu, int 
 
 	if( max != 0 ) {
 		attotime period = attotime::from_hz(cputag_get_clock(machine, "maincpu")) * (16 * max);
-		timer_adjust_oneshot( uPD71054->timer[no], period, no );
+		uPD71054->timer[no]->adjust( period, no );
 	} else {
-		timer_adjust_oneshot( uPD71054->timer[no], attotime::never, no);
+		uPD71054->timer[no]->adjust( attotime::never, no);
 		logerror( "CPU #0 PC %06X: uPD71054 error, timer %d duration is 0\n",
 				(cpu != NULL) ? cpu_get_pc(cpu) : -1, no );
 	}
