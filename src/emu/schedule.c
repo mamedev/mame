@@ -586,7 +586,7 @@ void device_scheduler::timer_set(attotime duration, timer_expired_func callback,
 
 void device_scheduler::timer_pulse(attotime period, timer_expired_func callback, const char *name, int param, void *ptr)
 {
-	m_timer_allocator.alloc()->init(m_machine, callback, name, ptr, true).adjust(period, param, period);
+	m_timer_allocator.alloc()->init(m_machine, callback, name, ptr, false).adjust(period, param, period);
 }
 
 
