@@ -2065,6 +2065,18 @@ static INPUT_PORTS_START( funcube )
 	PORT_DIPSETTING( 0x00800000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( funcube4 )
+        PORT_INCLUDE(funcube)
+
+// Inverted this dip by default to allow game to be played
+
+	PORT_MODIFY("DEBUG")
+ 	PORT_DIPNAME(    0x00400000, 0x00000000, "Debug 6" )
+	PORT_DIPSETTING( 0x00000000, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00400000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
 
 /***************************************************************************
 
@@ -2869,4 +2881,4 @@ GAME( 2001, wschamp,  0,        samshoot, wschamp,  0,        ROT0, "Sammy USA C
 GAME( 2001, wschampa, wschamp,  samshoot, wschamp,  0,        ROT0, "Sammy USA Corporation", "Wing Shooting Championship V1.01",             GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 2002, trophyh,  0,        samshoot, trophyh,  0,        ROT0, "Sammy USA Corporation", "Trophy Hunting - Bear & Moose V1.0",           GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 2001, funcube2, 0,        funcube,  funcube,  funcube2, ROT0, "Namco",                 "Funcube 2 (v1.1)",                             GAME_NO_SOUND )
-GAME( 2001, funcube4, 0,        funcube,  funcube,  funcube4, ROT0, "Namco",                 "Funcube 4 (v1.0)",                             GAME_NO_SOUND )
+GAME( 2001, funcube4, 0,        funcube,  funcube4, funcube4, ROT0, "Namco",                 "Funcube 4 (v1.0)",                             GAME_NO_SOUND )
