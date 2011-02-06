@@ -234,6 +234,7 @@ TODO: - Fix lamp timing, MAME doesn't update fast enough to see everything
 #include "connect4.lh"
 #include "gamball.lh"
 #include "mpu4.lh"
+#include "mpu4ext.lh"
 #define MPU4_MASTER_CLOCK (6880000)
 
 /* local vars */
@@ -2427,7 +2428,7 @@ ROM_END
 GAME( 198?,  m_oldtmr,0,      mpu4dutch,mpu4,	  m_oldtmr, ROT0,   "Barcrest",		"Old Timer",				  GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME( 198?,  m_ccelbr,0,      mpu4mod2, mpu4,	  m_ccelbr, ROT0,   "Barcrest",		"Club Celebration",			  GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
 GAMEL(198?,  m_gmball,0,      mod4yam,  gamball,  m_gmball, ROT0,   "Barcrest",     "Gamball",					  GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_gamball )//Mechanical ball launcher
-GAME (198?,  m_grtecp,0,      mod4oki, mpu4,	  m_grtecp, ROT0,   "Barcrest",		"Andy's Great Escape",		  GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )//5 reel meter mux
+GAMEL(198?,  m_grtecp,0,      mod4oki, mpu4,	  m_grtecp, ROT0,   "Barcrest",		"Andy's Great Escape",		  GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK,layout_mpu4ext )//5 reel meter mux
 
 //SWP
 GAMEL(1989?,connect4,        0, mpu4mod2,   connect4,   connect4,   ROT0, "Dolbeck Systems","Connect 4",GAME_IMPERFECT_GRAPHICS|GAME_REQUIRES_ARTWORK,layout_connect4 )

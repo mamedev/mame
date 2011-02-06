@@ -3348,6 +3348,7 @@ src/mame/layout/maxaflex.lay svneol=native#text/plain
 src/mame/layout/mil4000.lay svneol=native#text/plain
 src/mame/layout/mpoker.lay svneol=native#text/plain
 src/mame/layout/mpu4.lay svneol=native#text/plain
+src/mame/layout/mpu4ext.lay svneol=native#text/plain
 src/mame/layout/musicsrt.lay svneol=native#text/plain
 src/mame/layout/namcofl.lay svneol=native#text/plain
 src/mame/layout/nbmj8688.lay svneol=native#text/plain
