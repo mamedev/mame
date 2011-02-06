@@ -637,7 +637,7 @@ static WRITE16_HANDLER(wheelfir_snd_w)
 	wheelfir_state *state = space->machine->driver_data<wheelfir_state>();
 	COMBINE_DATA(&state->soundlatch);
 	cputag_set_input_line(space->machine, "subcpu", 1, HOLD_LINE); /* guess, tested also with periodic interrupts and latch clear*/
-	space->machine->scheduler().synchronize(FUNC(0));
+	space->machine->scheduler().synchronize();
 }
 
 static READ16_HANDLER( wheelfir_snd_r )
@@ -721,7 +721,7 @@ INPUT_PORTS_END
 static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 {
 	wheelfir_state *state = timer.machine->driver_data<wheelfir_state>();
-	timer.machine->scheduler().synchronize(FUNC(0));
+	timer.machine->scheduler().synchronize();
 	state->current_scanline=param;
 
 	if(state->current_scanline<NUM_SCANLINES)

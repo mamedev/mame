@@ -302,7 +302,7 @@ READ16_HANDLER( midxunit_uart_r )
 				int temp = midwunit_sound_state_r(space, 0, 0xffff);
 				result |= (temp & 0x800) >> 9;
 				result |= (~temp & 0x400) >> 10;
-				space->machine->scheduler().synchronize(FUNC(0));
+				space->machine->scheduler().synchronize();
 			}
 			break;
 
@@ -329,7 +329,7 @@ READ16_HANDLER( midxunit_uart_r )
 				int temp = midwunit_sound_state_r(space, 0, 0xffff);
 				result |= (temp & 0x800) >> 11;
 				result |= (~temp & 0x400) >> 8;
-				space->machine->scheduler().synchronize(FUNC(0));
+				space->machine->scheduler().synchronize();
 			}
 			break;
 

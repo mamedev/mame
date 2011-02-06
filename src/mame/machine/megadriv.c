@@ -8246,7 +8246,7 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
        top-left of the screen.  The first scanline is scanline 0 (we set scanline to -1 in
        VIDEO_EOF) */
 
-	timer.machine->scheduler().synchronize(FUNC(0));
+	timer.machine->scheduler().synchronize();
 	/* Compensate for some rounding errors
 
        When the counter reaches 261 we should have reached the end of the frame, however due

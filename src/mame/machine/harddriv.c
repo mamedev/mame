@@ -790,7 +790,7 @@ WRITE16_HANDLER( hd68k_adsp_data_w )
 	if (offset == 0x1fff)
 	{
 		logerror("%06X:ADSP sync address written (%04X)\n", cpu_get_previouspc(space->cpu), data);
-		space->machine->scheduler().synchronize(FUNC(0));
+		space->machine->scheduler().synchronize();
 		cpu_triggerint(state->adsp);
 	}
 	else
