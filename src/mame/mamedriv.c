@@ -4899,7 +4899,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( vfurlong )	/* 2005.03 Net Select Keiba Victory Furlong */
 						/* 2005.03 The Rumble Fish 2 */
 	DRIVER( ngbc )		/* 2005.07 NeoGeo Battle Colloseum */
-						/* 2005.09 Samurai Spirits Tenkaichi Kenkakuden */
+	DRIVER( samsptk )	/* 2005.09 Samurai Spirits Tenkaichi Kenkakuden */
 	DRIVER( kofxi )		/* 2005.10 The King of Fighters XI */
 	DRIVER( fotns )		/* 2005.12 Hokuto no Ken */
 	DRIVER( mslug6 )	/* 2006.02 Metal Slug 6 */
