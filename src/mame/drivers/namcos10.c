@@ -281,8 +281,6 @@ public:
 
 static ADDRESS_MAP_START( namcos10_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_SHARE("share1") /* ram */
-	AM_RANGE(0x1f300000, 0x1f300003) AM_WRITE(namcos10_bank_w)
-	AM_RANGE(0x1f400000, 0x1f7fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x1f800000, 0x1f8003ff) AM_RAM /* scratchpad */
 	AM_RANGE(0x1f801000, 0x1f801007) AM_WRITENOP
 	AM_RANGE(0x1f801008, 0x1f80100b) AM_RAM /* ?? */
@@ -307,30 +305,88 @@ static ADDRESS_MAP_START( namcos10_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xfffe0130, 0xfffe0133) AM_WRITENOP
 ADDRESS_MAP_END
 
-static void memcpy32le( UINT32 *dst, UINT8 *src, int len )
-{
-	while( len > 0 )
-	{
-		*( dst ) = ( *( src + 0 ) << 0 ) | ( *( src + 1 ) << 8 ) | ( *( src + 2 ) << 16 ) | ( *( src + 3 ) << 24 );
-		dst++;
-		src += 4;
-		len -= 4;
-	}
-}
-
 static void memm_driver_init( running_machine *machine )
 {
 	psx_driver_init(machine);
+	memory_install_write32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f300000, 0x1f300003, 0, 0, namcos10_bank_w );
+	memory_install_read_bank( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f400000, 0x1f7fffff, 0, 0, "bank1" );
 	memory_configure_bank( machine, "bank1", 0, 16, machine->region( "user2" )->base(), 4 * 1024 * 1024 );
+}
+
+UINT8 *nand_base;
+UINT32 nand_address = 0;
+
+READ32_HANDLER( nand_status_r )
+{
+	return 0;
+}
+
+WRITE32_HANDLER( nand_address1_w )
+{
+	nand_address = ( nand_address & 0x00ffffff ) | ( ( data & 0xff ) << 24 );
+}
+
+WRITE32_HANDLER( nand_address2_w )
+{
+	nand_address = ( nand_address & 0xff00ffff ) | ( ( data & 0xff ) << 16 );
+}
+
+WRITE32_HANDLER( nand_address3_w )
+{
+	nand_address = ( nand_address & 0xffff00ff ) | ( ( data & 0xff ) << 8 );
+}
+
+WRITE32_HANDLER( nand_address4_w )
+{
+	nand_address = ( nand_address & 0xffffff00 ) | ( ( data & 0xff ) << 0 );
+}
+
+UINT16 nand_read( UINT32 address )
+{
+	int index = ( ( address / 512 ) * 528 ) + ( address % 512 );
+	return nand_base[ index ] | ( nand_base[ index + 1 ] << 8 );
+}
+
+UINT16 nand_read2( UINT32 address )
+{
+	int index = ( ( address / 512 ) * 528 ) + ( address % 512 );
+	return nand_base[ index + 1 ] | ( nand_base[ index ] << 8 );
+}
+
+READ32_HANDLER( nand_data_r )
+{
+	UINT32 data = nand_read2( nand_address * 2 );
+
+	printf( "data<-%08x (%08x)\n", data, nand_address );
+	nand_address++;
+
+	return data;
+}
+
+static void nand_copy( UINT32 *dst, UINT32 address, int len )
+{
+	while( len > 0 )
+	{
+		*( dst++ ) = nand_read( address ) | ( nand_read( address + 2 ) << 16 );
+		address += 4;
+		len -= 4;
+	}
 }
 
 static void memn_driver_init( running_machine *machine )
 {
 	UINT8 *BIOS = (UINT8 *)machine->region( "user1" )->base();
-	UINT8 *ROM = (UINT8 *)machine->region( "user2" )->base();
+	nand_base = (UINT8 *)machine->region( "user2" )->base();
 
-	memcpy32le( (UINT32 *)( BIOS + 0x0000000 ), ROM + 0x08000, 0x001c000 );
-	memcpy32le( (UINT32 *)( BIOS + 0x0020000 ), ROM + 0x24000, 0x03dffff );
+	nand_copy( (UINT32 *)( BIOS + 0x0000000 ), 0x08000, 0x001c000 );
+	nand_copy( (UINT32 *)( BIOS + 0x0020000 ), 0x24000, 0x03e0000 );
+
+	memory_install_read32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f400000, 0x1f400003, 0, 0, nand_status_r );
+	memory_install_write32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f410000, 0x1f410003, 0, 0, nand_address1_w );
+	memory_install_write32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f420000, 0x1f420003, 0, 0, nand_address2_w );
+	memory_install_write32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f430000, 0x1f430003, 0, 0, nand_address3_w );
+	memory_install_write32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f440000, 0x1f440003, 0, 0, nand_address4_w );
+	memory_install_read32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f450000, 0x1f450003, 0, 0, nand_data_r );
 
 	psx_driver_init(machine);
 }
@@ -491,10 +547,10 @@ ROM_START( gjspace )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION( 0x4000000, "user2", 0 ) /* main prg */
-	ROM_LOAD( "10011a_0.bin", 0x0000000, 0x1000000, CRC(853e329e) SHA1(dd272ab2de9052c5aeee9e0ead4ee3d14347593e) )
-	ROM_LOAD( "10011a_1.bin", 0x1000000, 0x1000000, CRC(7d4e96f7) SHA1(41b0d27b93662f15547311c8723ac5141e129cab) )
-	ROM_LOAD( "10011a_2.bin", 0x2000000, 0x1000000, CRC(83111de6) SHA1(d760fd41644104f6d3a2806ab4664df2c77bdc42) )
-	ROM_LOAD( "10011a_3.bin", 0x3000000, 0x1000000, CRC(b6ea8be7) SHA1(3e65deda2b0e6758ce0ed05419ed096efb8ad755) )
+	ROM_LOAD( "10011a_0.bin", 0x0000000, 0x1000000, BAD_DUMP CRC(853e329e) SHA1(dd272ab2de9052c5aeee9e0ead4ee3d14347593e) )
+	ROM_LOAD( "10011a_1.bin", 0x1000000, 0x1000000, BAD_DUMP CRC(7d4e96f7) SHA1(41b0d27b93662f15547311c8723ac5141e129cab) )
+	ROM_LOAD( "10011a_2.bin", 0x2000000, 0x1000000, BAD_DUMP CRC(83111de6) SHA1(d760fd41644104f6d3a2806ab4664df2c77bdc42) )
+	ROM_LOAD( "10011a_3.bin", 0x3000000, 0x1000000, BAD_DUMP CRC(b6ea8be7) SHA1(3e65deda2b0e6758ce0ed05419ed096efb8ad755) )
 ROM_END
 
 ROM_START( mrdrilrg )
@@ -502,9 +558,9 @@ ROM_START( mrdrilrg )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION( 0x3000000, "user2", 0 ) /* main prg */
-	ROM_LOAD( "drg1a_0.bin",  0x0000000, 0x1000000, CRC(1e5595f1) SHA1(0373ccb6e4b6fe96010afbb9657c3c0b2b02dd57) )
-	ROM_LOAD( "drg1a_1.bin",  0x1000000, 0x1000000, CRC(4db3a361) SHA1(d6a4fb682ab75cd98a9a960c244e94cacd367f12) )
-	ROM_LOAD( "drg1a_2.bin",  0x2000000, 0x1000000, CRC(c99ffa30) SHA1(fdcc0a348fe705c5ed1611170570f2fd9068525a) )
+	ROM_LOAD( "drg1a_0.bin",  0x0000000, 0x1000000, BAD_DUMP CRC(1e5595f1) SHA1(0373ccb6e4b6fe96010afbb9657c3c0b2b02dd57) )
+	ROM_LOAD( "drg1a_1.bin",  0x1000000, 0x1000000, BAD_DUMP CRC(4db3a361) SHA1(d6a4fb682ab75cd98a9a960c244e94cacd367f12) )
+	ROM_LOAD( "drg1a_2.bin",  0x2000000, 0x1000000, BAD_DUMP CRC(c99ffa30) SHA1(fdcc0a348fe705c5ed1611170570f2fd9068525a) )
 ROM_END
 
 ROM_START( knpuzzle )
@@ -512,9 +568,9 @@ ROM_START( knpuzzle )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION( 0x3000000, "user2", 0 ) /* main prg */
-	ROM_LOAD( "kpm1a_0.bin",  0x0000000, 0x1000000, CRC(606d001b) SHA1(5a94e56a164a9132af7f9bd51cae0674dbe0e036) )
-	ROM_LOAD( "kpm1a_1.bin",  0x1000000, 0x1000000, CRC(a506d767) SHA1(f4830edc8eaa42ff80e83aca2fa38a4d2807c667) )
-	ROM_LOAD( "kpm1a_2.bin",  0x2000000, 0x1000000, CRC(5f40c402) SHA1(2a56421c0f0c9cc5b7b93ddacfc6f3d214a946d9) )
+	ROM_LOAD( "kpm1a_0.bin",  0x0000000, 0x1000000, BAD_DUMP CRC(606d001b) SHA1(5a94e56a164a9132af7f9bd51cae0674dbe0e036) )
+	ROM_LOAD( "kpm1a_1.bin",  0x1000000, 0x1000000, BAD_DUMP CRC(a506d767) SHA1(f4830edc8eaa42ff80e83aca2fa38a4d2807c667) )
+	ROM_LOAD( "kpm1a_2.bin",  0x2000000, 0x1000000, BAD_DUMP CRC(5f40c402) SHA1(2a56421c0f0c9cc5b7b93ddacfc6f3d214a946d9) )
 ROM_END
 
 ROM_START( startrgn )
@@ -522,17 +578,17 @@ ROM_START( startrgn )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION( 0x2000000, "user2", 0 ) /* main prg */
-	ROM_LOAD( "stt1a_0.bin",  0x0000000, 0x1000000, CRC(07513d66) SHA1(baed445ff81e7f687e39b26648b3fe2ff601826b) )
-	ROM_LOAD( "stt1a_1.bin",  0x1000000, 0x1000000, CRC(f6e8e641) SHA1(37c8c1482d652b46a744252721299448b15e1027) )
+	ROM_LOAD( "stt1a_0.bin",  0x0000000, 0x1000000, BAD_DUMP CRC(07513d66) SHA1(baed445ff81e7f687e39b26648b3fe2ff601826b) )
+	ROM_LOAD( "stt1a_1.bin",  0x1000000, 0x1000000, BAD_DUMP CRC(f6e8e641) SHA1(37c8c1482d652b46a744252721299448b15e1027) )
 ROM_END
 
 ROM_START( gamshara )
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* bios */
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
-	ROM_REGION( 0x2000000, "user2", 0 ) /* main prg */
-	ROM_LOAD( "10021a.8e",    0x0000000, 0x1000000, CRC(db0a3687) SHA1(757360c43fba247e6c0c0fc66bb089575e19d646) )
-	ROM_LOAD( "10021a.8d",    0x1000000, 0x1000000, CRC(bebafef6) SHA1(6c965c09f3186523d27c50894a15b9c1dd02a794) )
+	ROM_REGION( 0x2100000, "user2", 0 ) /* main prg */
+	ROM_LOAD( "10021a.8e",    0x0000000, 0x1080000, CRC(6c0361fc) SHA1(7debf1f2e6bed31d59fb224a78a17a94fc573785) )
+	ROM_LOAD( "10021a.8d",    0x1080000, 0x1080000, CRC(73669ff7) SHA1(eb8bbf931f1f8a049208d081d040512a3ffa9c00) )
 ROM_END
 
 GAME( 2000, mrdrilr2,  0,        namcos10, namcos10, mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
