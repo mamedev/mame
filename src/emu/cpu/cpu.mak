@@ -1631,13 +1631,19 @@ $(CPUOBJ)/tms32051/tms32051.o:	$(CPUSRC)/tms32051/tms32051.c \
 
 ifneq ($(filter TMS57002,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/tms57002
-CPUOBJS += $(CPUOBJ)/tms57002/tms57002.o
+CPUOBJS += $(CPUOBJ)/tms57002/tms57002.o $(CPUOBJ)/tms57002/tms57kdec.o
 DASMOBJS += $(CPUOBJ)/tms57002/57002dsm.o
 TMSMAKE += $(BUILDOUT)/tmsmake$(BUILD_EXE)
 endif
 
 $(CPUOBJ)/tms57002/tms57002.o:	$(CPUSRC)/tms57002/tms57002.c \
 								$(CPUSRC)/tms57002/tms57002.h \
+								$(CPUSRC)/tms57002/tms57kpr.h \
+								$(CPUOBJ)/tms57002/tms57002.inc
+
+$(CPUOBJ)/tms57002/tms57kdec.o:	$(CPUSRC)/tms57002/tms57kdec.c \
+								$(CPUSRC)/tms57002/tms57002.h \
+								$(CPUSRC)/tms57002/tms57kpr.h \
 								$(CPUOBJ)/tms57002/tms57002.inc
 
 $(CPUOBJ)/tms57002/57002dsm.o:	$(CPUSRC)/tms57002/57002dsm.c \
