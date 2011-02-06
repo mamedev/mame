@@ -295,7 +295,7 @@ static void mess_init_6buttons_pad(running_machine *machine)
 
 	for (i = 0; i < 3; i++)
 	{
-		mess_io_timeout[i] = timer_alloc(machine, mess_io_timeout_timer_callback, (void*)(FPTR)i);
+		mess_io_timeout[i] = machine->scheduler().timer_alloc(FUNC(mess_io_timeout_timer_callback), (void*)(FPTR)i);
 		mess_io_stage[i] = -1;
 	}
 }

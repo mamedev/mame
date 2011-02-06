@@ -132,8 +132,8 @@ static READ8_HANDLER( analog_r )
 static void create_analog_timers( running_machine *machine )
 {
 	clayshoo_state *state = machine->driver_data<clayshoo_state>();
-	state->analog_timer_1 = timer_alloc(machine, reset_analog_bit, NULL);
-	state->analog_timer_2 = timer_alloc(machine, reset_analog_bit, NULL);
+	state->analog_timer_1 = machine->scheduler().timer_alloc(FUNC(reset_analog_bit));
+	state->analog_timer_2 = machine->scheduler().timer_alloc(FUNC(reset_analog_bit));
 }
 
 

@@ -520,12 +520,12 @@ static TIMER_CALLBACK( interrupt_callback )
 	if (param == 0)
 	{
 		cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);
-		timer_set(machine, machine->primary_screen->time_until_pos(IREMM10_VBSTART + 16), NULL, 1, interrupt_callback);
+		machine->scheduler().timer_set(machine->primary_screen->time_until_pos(IREMM10_VBSTART + 16), FUNC(interrupt_callback), 1);
 	}
 	if (param == 1)
 	{
 		cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);
-		timer_set(machine, machine->primary_screen->time_until_pos(IREMM10_VBSTART + 24), NULL, 2, interrupt_callback);
+		machine->scheduler().timer_set(machine->primary_screen->time_until_pos(IREMM10_VBSTART + 24), FUNC(interrupt_callback), 2);
 	}
 	if (param == -1)
 		cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
@@ -536,7 +536,7 @@ static TIMER_CALLBACK( interrupt_callback )
 static INTERRUPT_GEN( m11_interrupt )
 {
 	cpu_set_input_line(device, 0, ASSERT_LINE);
-	//timer_set(device->machine, machine->primary_screen->time_until_pos(IREMM10_VBEND), NULL, -1, interrupt_callback);
+	//device->machine->scheduler().timer_set(machine->primary_screen->time_until_pos(IREMM10_VBEND), FUNC(interrupt_callback), -1);
 }
 
 static INTERRUPT_GEN( m10_interrupt )
@@ -548,7 +548,7 @@ static INTERRUPT_GEN( m10_interrupt )
 static INTERRUPT_GEN( m15_interrupt )
 {
 	cpu_set_input_line(device, 0, ASSERT_LINE);
-	timer_set(device->machine, device->machine->primary_screen->time_until_pos(IREMM10_VBSTART + 1, 80), NULL, -1, interrupt_callback);
+	device->machine->scheduler().timer_set(device->machine->primary_screen->time_until_pos(IREMM10_VBSTART + 1, 80), FUNC(interrupt_callback), -1);
 }
 
 /*************************************

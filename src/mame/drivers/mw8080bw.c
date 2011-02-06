@@ -893,7 +893,7 @@ static MACHINE_START( maze )
 	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 
 	/* create astable timer for IC B1 */
-	timer_pulse(machine, MAZE_555_B1_PERIOD, NULL, 0, maze_tone_timing_timer_callback);
+	machine->scheduler().timer_pulse(MAZE_555_B1_PERIOD, FUNC(maze_tone_timing_timer_callback));
 
 	/* initialize state of Tone Timing FF, IC C1 */
 	state->maze_tone_timing_state = 0;

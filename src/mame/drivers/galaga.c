@@ -880,7 +880,7 @@ static TIMER_CALLBACK( cpu3_interrupt_callback )
 static MACHINE_START( galaga )
 {
 	/* create the interrupt timer */
-	cpu3_interrupt_timer = timer_alloc(machine, cpu3_interrupt_callback, NULL);
+	cpu3_interrupt_timer = machine->scheduler().timer_alloc(FUNC(cpu3_interrupt_callback));
 	custom_mod = 0;
 	state_save_register_global(machine, custom_mod);
 }

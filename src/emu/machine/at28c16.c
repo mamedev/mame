@@ -129,7 +129,7 @@ at28c16_device::at28c16_device( running_machine &_machine, const at28c16_device_
 
 void at28c16_device::device_start()
 {
-	m_write_timer = timer_alloc( &m_machine,  write_finished, this );
+	m_write_timer = m_machine.scheduler().timer_alloc( FUNC(write_finished), this );
 
 	state_save_register_device_item( this, 0, m_a9_12v );
 	state_save_register_device_item( this, 0, m_oe_12v );

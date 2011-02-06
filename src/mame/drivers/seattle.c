@@ -515,10 +515,10 @@ static MACHINE_START( seattle )
 	voodoo = machine->device("voodoo");
 
 	/* allocate timers for the galileo */
-	galileo.timer[0].timer = timer_alloc(machine, galileo_timer_callback, NULL);
-	galileo.timer[1].timer = timer_alloc(machine, galileo_timer_callback, NULL);
-	galileo.timer[2].timer = timer_alloc(machine, galileo_timer_callback, NULL);
-	galileo.timer[3].timer = timer_alloc(machine, galileo_timer_callback, NULL);
+	galileo.timer[0].timer = machine->scheduler().timer_alloc(FUNC(galileo_timer_callback));
+	galileo.timer[1].timer = machine->scheduler().timer_alloc(FUNC(galileo_timer_callback));
+	galileo.timer[2].timer = machine->scheduler().timer_alloc(FUNC(galileo_timer_callback));
+	galileo.timer[3].timer = machine->scheduler().timer_alloc(FUNC(galileo_timer_callback));
 
 	/* set the fastest DRC options, but strict verification */
 	mips3drc_set_options(machine->device("maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);

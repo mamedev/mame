@@ -2040,7 +2040,7 @@ static INTERRUPT_GEN(s23_interrupt)
 
 static MACHINE_START( s23 )
 {
-	c361_timer = timer_alloc(machine, c361_timer_cb, 0);
+	c361_timer = machine->scheduler().timer_alloc(FUNC(c361_timer_cb));
 	timer_adjust_oneshot(c361_timer, attotime::never, 0);
 }
 

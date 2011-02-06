@@ -232,7 +232,7 @@ VIDEO_START( itech32 )
 	/* reset statics */
 	memset(itech32_video, 0, 0x80);
 
-	scanline_timer = timer_alloc(machine, scanline_interrupt, NULL);
+	scanline_timer = machine->scheduler().timer_alloc(FUNC(scanline_interrupt));
 	enable_latch[0] = 1;
 	enable_latch[1] = (itech32_planes > 1) ? 1 : 0;
 

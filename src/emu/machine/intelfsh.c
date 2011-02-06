@@ -268,7 +268,7 @@ intelfsh16_device::intelfsh16_device(running_machine &_machine, const intelfsh_d
 
 void intelfsh_device::device_start()
 {
-	m_timer = device_timer_alloc(*this);
+	m_timer = timer_alloc();
 
 	state_save_register_device_item( this, 0, m_status );
 	state_save_register_device_item( this, 0, m_flash_mode );

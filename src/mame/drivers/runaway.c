@@ -36,7 +36,7 @@ static TIMER_CALLBACK( interrupt_callback )
 static MACHINE_START( runaway )
 {
 	runaway_state *state = machine->driver_data<runaway_state>();
-	state->interrupt_timer = timer_alloc(machine, interrupt_callback, NULL);
+	state->interrupt_timer = machine->scheduler().timer_alloc(FUNC(interrupt_callback));
 }
 
 static MACHINE_RESET( runaway )

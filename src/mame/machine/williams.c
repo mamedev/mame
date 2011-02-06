@@ -280,7 +280,7 @@ TIMER_DEVICE_CALLBACK( williams_count240_callback )
 	pia6821_ca1_w(pia_1, 1);
 
 	/* set a timer to turn it off once the scanline counter resets */
-	timer_set(timer.machine, timer.machine->primary_screen->time_until_pos(0), NULL, 0, williams_count240_off_callback);
+	timer.machine->scheduler().timer_set(timer.machine->primary_screen->time_until_pos(0), FUNC(williams_count240_off_callback));
 
 	/* set a timer for next frame */
 	timer.adjust(timer.machine->primary_screen->time_until_pos(240));
@@ -425,7 +425,7 @@ TIMER_DEVICE_CALLBACK( williams2_endscreen_callback )
 	pia6821_ca1_w(pia_0, 0);
 
 	/* set a timer to turn it off once the scanline counter resets */
-	timer_set(timer.machine, timer.machine->primary_screen->time_until_pos(8), NULL, 0, williams2_endscreen_off_callback);
+	timer.machine->scheduler().timer_set(timer.machine->primary_screen->time_until_pos(8), FUNC(williams2_endscreen_off_callback));
 
 	/* set a timer for next frame */
 	timer.adjust(timer.machine->primary_screen->time_until_pos(254));
@@ -546,12 +546,12 @@ static TIMER_CALLBACK( williams_deferred_snd_cmd_w )
 WRITE8_DEVICE_HANDLER( williams_snd_cmd_w )
 {
 	/* the high two bits are set externally, and should be 1 */
-	timer_call_after_resynch(device->machine, NULL, data | 0xc0, williams_deferred_snd_cmd_w);
+	device->machine->scheduler().synchronize(FUNC(williams_deferred_snd_cmd_w), data | 0xc0);
 }
 
 WRITE8_DEVICE_HANDLER( playball_snd_cmd_w )
 {
-	timer_call_after_resynch(device->machine, NULL, data, williams_deferred_snd_cmd_w);
+	device->machine->scheduler().synchronize(FUNC(williams_deferred_snd_cmd_w), data);
 }
 
 
@@ -564,7 +564,7 @@ static TIMER_CALLBACK( williams2_deferred_snd_cmd_w )
 
 static WRITE8_DEVICE_HANDLER( williams2_snd_cmd_w )
 {
-	timer_call_after_resynch(device->machine, NULL, data, williams2_deferred_snd_cmd_w);
+	device->machine->scheduler().synchronize(FUNC(williams2_deferred_snd_cmd_w), data);
 }
 
 
@@ -983,5 +983,5 @@ static WRITE8_DEVICE_HANDLER( joust2_snd_cmd_w )
 {
 	joust2_current_sound_data = (joust2_current_sound_data & ~0xff) | (data & 0xff);
 	williams_cvsd_data_w(device->machine, joust2_current_sound_data);
-	timer_call_after_resynch(device->machine, NULL, joust2_current_sound_data, joust2_deferred_snd_cmd_w);
+	device->machine->scheduler().synchronize(FUNC(joust2_deferred_snd_cmd_w), joust2_current_sound_data);
 }

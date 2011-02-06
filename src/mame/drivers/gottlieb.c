@@ -279,8 +279,8 @@ static MACHINE_START( gottlieb )
 		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x05806, 0x05806, 0, 0x07f8, laserdisc_select_w);
 
 		/* allocate a timer for serial transmission, and one for philips code processing */
-		laserdisc_bit_timer = timer_alloc(machine, laserdisc_bit_callback, NULL);
-		laserdisc_philips_timer = timer_alloc(machine, laserdisc_philips_callback, NULL);
+		laserdisc_bit_timer = machine->scheduler().timer_alloc(FUNC(laserdisc_bit_callback));
+		laserdisc_philips_timer = machine->scheduler().timer_alloc(FUNC(laserdisc_philips_callback));
 
 		/* create some audio RAM */
 		laserdisc_audio_buffer = auto_alloc_array(machine, UINT8, AUDIORAM_SIZE);
@@ -487,7 +487,7 @@ static TIMER_CALLBACK( laserdisc_bit_callback )
 
 	/* assert the line and set a timer for deassertion */
 	laserdisc_line_w(laserdisc, LASERDISC_LINE_CONTROL, ASSERT_LINE);
-	timer_set(machine, LASERDISC_CLOCK * 10, NULL, 0, laserdisc_bit_off_callback);
+	machine->scheduler().timer_set(LASERDISC_CLOCK * 10, FUNC(laserdisc_bit_off_callback));
 
 	/* determine how long for the next command; there is a 555 timer with a
        variable resistor controlling the timing of the pulses. Nominally, the
@@ -689,7 +689,7 @@ static INTERRUPT_GEN( gottlieb_interrupt )
 {
 	/* assert the NMI and set a timer to clear it at the first visible line */
 	cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
-	timer_set(device->machine, device->machine->primary_screen->time_until_pos(0), NULL, 0, nmi_clear);
+	device->machine->scheduler().timer_set(device->machine->primary_screen->time_until_pos(0), FUNC(nmi_clear));
 
 	/* if we have a laserdisc, update it */
 	if (laserdisc != NULL)

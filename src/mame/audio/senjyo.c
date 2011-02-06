@@ -90,5 +90,5 @@ SAMPLES_START( senjyo_sh_start )
 	sample_set_volume(device, 0, state->single_volume / 15.0);
 	sample_start_raw(device, 0, state->single_data, SINGLE_LENGTH, state->single_rate, 1);
 
-	timer_pulse(machine, machine->primary_screen->frame_period(), NULL, 0, senjyo_sh_update);
+	machine->scheduler().timer_pulse(machine->primary_screen->frame_period(), FUNC(senjyo_sh_update));
 }

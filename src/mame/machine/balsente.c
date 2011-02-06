@@ -49,7 +49,7 @@ TIMER_DEVICE_CALLBACK( balsente_interrupt_timer )
 	cputag_set_input_line(timer.machine, "maincpu", M6809_IRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
-	timer_set(timer.machine, timer.machine->primary_screen->time_until_pos(param, BALSENTE_HBSTART), NULL, 0, irq_off);
+	timer.machine->scheduler().timer_set(timer.machine->primary_screen->time_until_pos(param, BALSENTE_HBSTART), FUNC(irq_off));
 
 	/* if this is Grudge Match, update the steering */
 	if (state->grudge_steering_result & 0x80)
@@ -482,7 +482,7 @@ static TIMER_CALLBACK( m6850_w_callback )
 
 	/* set a timer for 500usec later to actually transmit the data */
 	/* (this is very important for several games, esp Snacks'n Jaxson) */
-	timer_set(machine, attotime::from_usec(500), NULL, param, m6850_data_ready_callback);
+	machine->scheduler().timer_set(attotime::from_usec(500), FUNC(m6850_data_ready_callback), param);
 }
 
 
@@ -501,7 +501,7 @@ WRITE8_HANDLER( balsente_m6850_w )
 
 	/* output register is at offset 1; set a timer to synchronize the CPUs */
 	else
-		timer_call_after_resynch(space->machine, NULL, data, m6850_w_callback);
+		space->machine->scheduler().synchronize(FUNC(m6850_w_callback), data);
 }
 
 
@@ -628,7 +628,7 @@ WRITE8_HANDLER( balsente_adc_select_w )
 	/* set a timer to go off and read the value after 50us */
 	/* it's important that we do this for Mini Golf */
 logerror("adc_select %d\n", offset & 7);
-	timer_set(space->machine, attotime::from_usec(50), NULL, offset & 7, adc_finished);
+	space->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(adc_finished), offset & 7);
 }
 
 

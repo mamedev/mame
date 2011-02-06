@@ -250,7 +250,7 @@ static TIMER_CALLBACK( delayed_bank_swap )
 static void swap_linecpu_banks(running_machine *machine)
 {
 	/* Best sync up before we switch banks around */
-	timer_call_after_resynch(machine, NULL, 0, delayed_bank_swap);
+	machine->scheduler().synchronize(FUNC(delayed_bank_swap));
 }
 
 

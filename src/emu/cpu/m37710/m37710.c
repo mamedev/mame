@@ -906,7 +906,7 @@ static CPU_INIT( m37710 )
 	cpustate->destination = 0;
 
 	for (i = 0; i < 8; i++)
-		cpustate->timers[i] = timer_alloc(device->machine, m37710_timer_cb, cpustate);
+		cpustate->timers[i] = device->machine->scheduler().timer_alloc(FUNC(m37710_timer_cb), cpustate);
 
 	state_save_register_device_item(device, 0, cpustate->a);
 	state_save_register_device_item(device, 0, cpustate->b);

@@ -375,7 +375,7 @@ static TIMER_CALLBACK( delayed_sound_data_w )
 
 static void sound_data_w(running_machine *machine, UINT8 data)
 {
-	timer_call_after_resynch(machine, NULL, data, delayed_sound_data_w);
+	machine->scheduler().synchronize(FUNC(delayed_sound_data_w), data);
 }
 
 
@@ -474,7 +474,7 @@ static TIMER_DEVICE_CALLBACK( scanline_callback )
 		case 65:
 		case 129:
 		case 193:
-			timer_set(timer.machine, timer.machine->primary_screen->time_until_pos(scanline, timer.machine->primary_screen->visible_area().max_x + 1), NULL, 0, irq2_gen);
+			timer.machine->scheduler().timer_set(timer.machine->primary_screen->time_until_pos(scanline, timer.machine->primary_screen->visible_area().max_x + 1), FUNC(irq2_gen));
 			next_scanline = scanline + 1;
 			break;
 

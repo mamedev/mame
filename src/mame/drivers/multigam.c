@@ -654,7 +654,7 @@ static WRITE8_HANDLER( mmc1_rom_switch_w )
 	else
 	{
 		multigam_mmc1_reg_write_enable = 0;
-		timer_call_after_resynch(space->machine, NULL, 0, mmc1_resync_callback);
+		space->machine->scheduler().synchronize(FUNC(mmc1_resync_callback));
 	}
 
 	int reg = (offset >> 13);

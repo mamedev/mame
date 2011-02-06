@@ -427,7 +427,7 @@ void cdp1869_device::device_start()
 	m_out_char_ram_func = m_config.out_char_ram_func;
 
 	// allocate timers
-	m_prd_timer = device_timer_alloc(*this);
+	m_prd_timer = timer_alloc();
 	update_prd_changed_timer();
 
 	// initialize palette

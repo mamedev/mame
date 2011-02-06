@@ -82,7 +82,7 @@ static WRITE8_HANDLER( sound_arm_nmi_w )
 	asterix_state *state = space->machine->driver_data<asterix_state>();
 
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
-	timer_set(space->machine, attotime::from_usec(5), NULL, 0, nmi_callback);
+	space->machine->scheduler().timer_set(attotime::from_usec(5), FUNC(nmi_callback));
 }
 
 static WRITE16_HANDLER( sound_irq_w )

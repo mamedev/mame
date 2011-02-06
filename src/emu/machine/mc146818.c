@@ -184,7 +184,7 @@ mc146818_device::mc146818_device(running_machine &_machine, const mc146818_devic
 void mc146818_device::device_start()
 {
 	m_last_refresh = timer_get_time(&m_machine);
-	emu_timer *timer = device_timer_alloc(*this);
+	emu_timer *timer = timer_alloc();
 	if (m_config.m_type == mc146818_device_config::MC146818_UTC) {
 		// hack: for apollo we increase the update frequency to stay in sync with real time
 		timer_adjust_periodic(timer, attotime::from_hz(2), 0, attotime::from_hz(2));

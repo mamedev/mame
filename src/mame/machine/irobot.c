@@ -169,7 +169,7 @@ static TIMER_CALLBACK( scanline_callback )
     /* set a callback for the next 32-scanline increment */
     scanline += 32;
     if (scanline >= 256) scanline = 0;
-    timer_set(machine, machine->primary_screen->time_until_pos(scanline), NULL, scanline, scanline_callback);
+    machine->scheduler().timer_set(machine->primary_screen->time_until_pos(scanline), FUNC(scanline_callback), scanline);
 }
 
 MACHINE_RESET( irobot )
@@ -190,7 +190,7 @@ MACHINE_RESET( irobot )
 	state->irmb_timer = machine->device<timer_device>("irmb_timer");
 
 	/* set an initial timer to go off on scanline 0 */
-	timer_set(machine, machine->primary_screen->time_until_pos(0), NULL, 0, scanline_callback);
+	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(0), FUNC(scanline_callback));
 
 	irobot_rom_banksel_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),0,0);
 	irobot_out0_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),0,0);

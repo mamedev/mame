@@ -1504,8 +1504,8 @@ static VIDEO_START( avg_common )
 
 	flip_x = flip_y = 0;
 
-	vg_halt_timer = timer_alloc(machine, vg_set_halt_callback, NULL);
-	vg_run_timer = timer_alloc(machine, run_state_machine, NULL);
+	vg_halt_timer = machine->scheduler().timer_alloc(FUNC(vg_set_halt_callback));
+	vg_run_timer = machine->scheduler().timer_alloc(FUNC(run_state_machine));
 
 	/*
      * The x and y DACs use 10 bit of the counter values which are in
@@ -1530,8 +1530,8 @@ VIDEO_START( dvg )
 	xmin = visarea.min_x;
 	ymin = visarea.min_y;
 
-	vg_halt_timer = timer_alloc(machine, vg_set_halt_callback, NULL);
-	vg_run_timer = timer_alloc(machine, run_state_machine, NULL);
+	vg_halt_timer = machine->scheduler().timer_alloc(FUNC(vg_set_halt_callback));
+	vg_run_timer = machine->scheduler().timer_alloc(FUNC(run_state_machine));
 
 	register_state (machine);
 

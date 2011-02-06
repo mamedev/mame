@@ -1531,7 +1531,7 @@ static void dma_direct_lv0(address_space *space)
 	if(LOG_SCU) logerror("DMA transfer END\n");
 
 	/*TODO: timing of this*/
-	timer_set(space->machine, attotime::from_usec(300), NULL, 0, dma_lv0_ended);
+	space->machine->scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv0_ended));
 
 	if(scu_add_tmp & 0x80000000)
 	{
@@ -1632,7 +1632,7 @@ static void dma_direct_lv1(address_space *space)
 
 	if(LOG_SCU) logerror("DMA transfer END\n");
 
-	timer_set(space->machine, attotime::from_usec(300), NULL, 0, dma_lv1_ended);
+	space->machine->scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv1_ended));
 
 	if(scu_add_tmp & 0x80000000)
 	{
@@ -1733,7 +1733,7 @@ static void dma_direct_lv2(address_space *space)
 
 	if(LOG_SCU) logerror("DMA transfer END\n");
 
-	timer_set(space->machine, attotime::from_usec(300), NULL, 0, dma_lv2_ended);
+	space->machine->scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv2_ended));
 
 	if(scu_add_tmp & 0x80000000)
 	{
@@ -1808,7 +1808,7 @@ static void dma_indirect_lv0(address_space *space)
 
 	}while(job_done == 0);
 
-	timer_set(space->machine, attotime::from_usec(300), NULL, 0, dma_lv0_ended);
+	space->machine->scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv0_ended));
 }
 
 static void dma_indirect_lv1(address_space *space)
@@ -1877,7 +1877,7 @@ static void dma_indirect_lv1(address_space *space)
 
 	}while(job_done == 0);
 
-	timer_set(space->machine, attotime::from_usec(300), NULL, 0, dma_lv1_ended);
+	space->machine->scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv1_ended));
 }
 
 static void dma_indirect_lv2(address_space *space)
@@ -1945,7 +1945,7 @@ static void dma_indirect_lv2(address_space *space)
 
 	}while(job_done == 0);
 
-	timer_set(space->machine, attotime::from_usec(300), NULL, 0, dma_lv2_ended);
+	space->machine->scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv2_ended));
 }
 
 
@@ -2633,7 +2633,7 @@ static MACHINE_START( stv )
     smpc_ram[0x2d] = DectoBCD(systime.local_time.minute);
     smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
 
-	stv_rtc_timer = timer_alloc(machine, stv_rtc_increment, 0);
+	stv_rtc_timer = machine->scheduler().timer_alloc(FUNC(stv_rtc_increment));
 }
 
 /*
@@ -2816,7 +2816,7 @@ static INTERRUPT_GEN( stv_interrupt )
 
 	/*TODO: timing of this one (related to the VDP1 speed)*/
 	/*      (NOTE: value shouldn't be at h_sync/v_sync position (will break shienryu))*/
-	timer_set(device->machine, device->machine->primary_screen->time_until_pos(0), NULL, 0, vdp1_irq);
+	device->machine->scheduler().timer_set(device->machine->primary_screen->time_until_pos(0), FUNC(vdp1_irq));
 }
 
 static MACHINE_RESET( stv )

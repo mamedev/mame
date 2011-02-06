@@ -29,7 +29,7 @@ VIDEO_START( changela )
 	state->tree0_bitmap = machine->primary_screen->alloc_compatible_bitmap();
 	state->tree1_bitmap = machine->primary_screen->alloc_compatible_bitmap();
 
-	state->scanline_timer = timer_alloc(machine, changela_scanline_callback, NULL);
+	state->scanline_timer = machine->scheduler().timer_alloc(FUNC(changela_scanline_callback));
 	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->time_until_pos(30), 30);
 
 	state_save_register_global_pointer(machine, state->memory_devices, 4 * 0x800);

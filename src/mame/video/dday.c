@@ -39,7 +39,7 @@ static void start_countdown_timer(running_machine *machine)
 
 	state->timer_value = 0;
 
-	timer_pulse(machine, attotime::from_seconds(1), NULL, 0, countdown_timer_callback);
+	machine->scheduler().timer_pulse(attotime::from_seconds(1), FUNC(countdown_timer_callback));
 }
 
 

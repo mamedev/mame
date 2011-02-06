@@ -1515,7 +1515,7 @@ void dcs_reset_w(int state)
 		logerror("%s: DCS reset = %d\n", cpuexec_describe_context(dcs.cpu->machine), state);
 
 		/* just run through the init code again */
-		timer_call_after_resynch(dcs.cpu->machine, NULL, 0, dcs_reset);
+		dcs.cpu->machine->scheduler().synchronize(FUNC(dcs_reset));
 		cpu_set_input_line(dcs.cpu, INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
@@ -1589,7 +1589,7 @@ void dcs_data_w(int data)
 
 	/* if we are DCS1, set a timer to latch the data */
 	if (dcs.sport_timer == NULL)
-		timer_call_after_resynch(dcs.cpu->machine, NULL, data, dcs_delayed_data_w_callback);
+		dcs.cpu->machine->scheduler().synchronize(FUNC(dcs_delayed_data_w_callback), data);
 	else
 		dcs_delayed_data_w(dcs.cpu->machine, data);
 }
@@ -1632,7 +1632,7 @@ static WRITE16_HANDLER( output_latch_w )
 {
 	if (LOG_DCS_IO)
 		logerror("%08X:output_latch_w(%04X) (empty=%d)\n", cpu_get_pc(space->cpu), data, IS_OUTPUT_EMPTY());
-	timer_call_after_resynch(space->machine, NULL, data, latch_delayed_w);
+	space->machine->scheduler().synchronize(FUNC(latch_delayed_w), data);
 }
 
 
@@ -1650,7 +1650,7 @@ static TIMER_CALLBACK( delayed_ack_w_callback )
 
 void dcs_ack_w(void)
 {
-	timer_call_after_resynch(dcs.cpu->machine, NULL, 0, delayed_ack_w_callback);
+	dcs.cpu->machine->scheduler().synchronize(FUNC(delayed_ack_w_callback));
 }
 
 
@@ -1686,7 +1686,7 @@ static WRITE16_HANDLER( output_control_w )
 {
 	if (LOG_DCS_IO)
 		logerror("%04X:output_control = %04X\n", cpu_get_pc(space->cpu), data);
-	timer_call_after_resynch(space->machine, NULL, data, output_control_delayed_w);
+	space->machine->scheduler().synchronize(FUNC(output_control_delayed_w), data);
 }
 
 
@@ -2122,7 +2122,7 @@ static TIMER_CALLBACK( s1_ack_callback2 )
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
 	{
-		timer_set(machine, attotime::from_usec(1), NULL, param, s1_ack_callback2);
+		machine->scheduler().timer_set(attotime::from_usec(1), FUNC(s1_ack_callback2), param);
 		return;
 	}
 	output_latch_w(cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_PROGRAM), 0, 0x000a, 0xffff);
@@ -2134,13 +2134,13 @@ static TIMER_CALLBACK( s1_ack_callback1 )
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
 	{
-		timer_set(machine, attotime::from_usec(1), NULL, param, s1_ack_callback1);
+		machine->scheduler().timer_set(attotime::from_usec(1), FUNC(s1_ack_callback1), param);
 		return;
 	}
 	output_latch_w(cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_PROGRAM), 0, param, 0xffff);
 
 	/* chain to the next word we need to write back */
-	timer_set(machine, attotime::from_usec(1), NULL, 0, s1_ack_callback2);
+	machine->scheduler().timer_set(attotime::from_usec(1), FUNC(s1_ack_callback2));
 }
 
 
@@ -2256,7 +2256,7 @@ static int preprocess_stage_1(running_machine *machine, UINT16 data)
 
 				/* if we're done, start a timer to send the response words */
 				if (transfer.state == 0)
-					timer_set(machine, attotime::from_usec(1), NULL, transfer.sum, s1_ack_callback1);
+					machine->scheduler().timer_set(attotime::from_usec(1), FUNC(s1_ack_callback1), transfer.sum);
 				return 1;
 			}
 			break;
@@ -2272,7 +2272,7 @@ static TIMER_CALLBACK( s2_ack_callback )
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
 	{
-		timer_set(machine, attotime::from_usec(1), NULL, param, s2_ack_callback);
+		machine->scheduler().timer_set(attotime::from_usec(1), FUNC(s2_ack_callback), param);
 		return;
 	}
 	output_latch_w(space, 0, param, 0xffff);
@@ -2369,7 +2369,7 @@ static int preprocess_stage_2(running_machine *machine, UINT16 data)
 				/* if we're done, start a timer to send the response words */
 				if (transfer.state == 0)
 				{
-					timer_set(machine, attotime::from_usec(1), NULL, transfer.sum, s2_ack_callback);
+					machine->scheduler().timer_set(attotime::from_usec(1), FUNC(s2_ack_callback), transfer.sum);
 					transfer.watchdog->reset();
 				}
 				return 1;

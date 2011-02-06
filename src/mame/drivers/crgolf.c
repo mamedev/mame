@@ -139,7 +139,7 @@ static TIMER_CALLBACK( main_to_sound_callback )
 
 static WRITE8_HANDLER( main_to_sound_w )
 {
-	timer_call_after_resynch(space->machine, NULL, data, main_to_sound_callback);
+	space->machine->scheduler().synchronize(FUNC(main_to_sound_callback), data);
 }
 
 
@@ -170,7 +170,7 @@ static TIMER_CALLBACK( sound_to_main_callback )
 
 static WRITE8_HANDLER( sound_to_main_w )
 {
-	timer_call_after_resynch(space->machine, NULL, data, sound_to_main_callback);
+	space->machine->scheduler().synchronize(FUNC(sound_to_main_callback), data);
 }
 
 

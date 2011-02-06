@@ -334,7 +334,7 @@ static void handle_lightpen( device_t *device )
     xt = x_val * (vis_area.max_x - vis_area.min_x) / 1024 + vis_area.min_x;
     yt = y_val * (vis_area.max_y - vis_area.min_y) / 1024 + vis_area.min_y;
 
-     timer_set(device->machine, device->machine->primary_screen->time_until_pos(yt, xt), (void *) device, 0, assert_lp_cb);
+     device->machine->scheduler().timer_set(device->machine->primary_screen->time_until_pos(yt, xt), FUNC(assert_lp_cb), 0, device);
 }
 
 static WRITE_LINE_DEVICE_HANDLER(crtc_vsync)

@@ -628,7 +628,7 @@ WRITE32_HANDLER( jaguar_blitter_w )
 	if (offset == B_CMD)
 	{
 		blitter_status = 0;
-		timer_set(space->machine, attotime::from_usec(100), NULL, 0, blitter_done);
+		space->machine->scheduler().timer_set(attotime::from_usec(100), FUNC(blitter_done));
 		blitter_run(space->machine);
 	}
 
@@ -688,7 +688,7 @@ static TIMER_CALLBACK( jaguar_pit )
 	if (gpu_regs[PIT0])
 	{
 		sample_period = attotime::from_nsec(((machine->device("gpu")->unscaled_clock()*PIT_MULT_DBG_HACK) / (1+gpu_regs[PIT0])) / (1+gpu_regs[PIT1]));
-		timer_set(machine, sample_period, NULL, 0, jaguar_pit);
+		machine->scheduler().timer_set(sample_period, FUNC(jaguar_pit));
 	}
 }
 
@@ -713,7 +713,7 @@ WRITE16_HANDLER( jaguar_tom_regs_w )
 				if (gpu_regs[PIT0] && gpu_regs[PIT0] != 0xffff) //FIXME: avoid too much small timers for now
 				{
 					sample_period = attotime::from_nsec(((space->machine->device("gpu")->unscaled_clock()*PIT_MULT_DBG_HACK) / (1+gpu_regs[PIT0])) / (1+gpu_regs[PIT1]));
-					timer_set(space->machine, sample_period, NULL, 0, jaguar_pit);
+					space->machine->scheduler().timer_set(sample_period, FUNC(jaguar_pit));
 				}
 				break;
 
@@ -902,7 +902,7 @@ VIDEO_START( cojag )
 	memset(&gpu_regs, 0, sizeof(gpu_regs));
 	cpu_irq_state = 0;
 
-	object_timer = timer_alloc(machine, cojag_scanline_update, NULL);
+	object_timer = machine->scheduler().timer_alloc(FUNC(cojag_scanline_update));
 	adjust_object_timer(machine, 0);
 
 	screen_bitmap = auto_bitmap_alloc(machine, 760, 512, BITMAP_FORMAT_RGB32);

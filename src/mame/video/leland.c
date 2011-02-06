@@ -83,7 +83,7 @@ static VIDEO_START( leland )
 	leland_video_ram = auto_alloc_array_clear(machine, UINT8, VRAM_SIZE);
 
 	/* scanline timer */
-	scanline_timer = timer_alloc(machine, scanline_callback, NULL);
+	scanline_timer = machine->scheduler().timer_alloc(FUNC(scanline_callback));
 	timer_adjust_oneshot(scanline_timer, machine->primary_screen->time_until_pos(0), 0);
 
 }
@@ -318,7 +318,7 @@ static TIMER_CALLBACK( leland_delayed_mvram_w )
 
 WRITE8_HANDLER( leland_mvram_port_w )
 {
-	timer_call_after_resynch(space->machine, NULL, 0x00000 | (offset << 8) | data, leland_delayed_mvram_w);
+	space->machine->scheduler().synchronize(FUNC(leland_delayed_mvram_w), 0x00000 | (offset << 8) | data);
 }
 
 
@@ -363,7 +363,7 @@ READ8_HANDLER( leland_svram_port_r )
 WRITE8_HANDLER( ataxx_mvram_port_w )
 {
 	offset = ((offset >> 1) & 0x07) | ((offset << 3) & 0x08) | (offset & 0x10);
-	timer_call_after_resynch(space->machine, NULL, 0x00000 | (offset << 8) | data, leland_delayed_mvram_w);
+	space->machine->scheduler().synchronize(FUNC(leland_delayed_mvram_w), 0x00000 | (offset << 8) | data);
 }
 
 

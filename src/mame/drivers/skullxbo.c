@@ -56,7 +56,7 @@ static void alpha_row_update(screen_device &screen, int scanline)
 	{
 		int	width = screen.width();
 		attotime period = screen.time_until_pos(screen.vpos() + 6, width * 0.9);
-		timer_set(screen.machine, period, NULL, 0, irq_gen);
+		screen.machine->scheduler().timer_set(period, FUNC(irq_gen));
 	}
 
 	/* update the playfield and motion objects */

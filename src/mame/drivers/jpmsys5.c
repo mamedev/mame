@@ -577,7 +577,7 @@ static ACIA6850_INTERFACE( acia2_if )
 static MACHINE_START( jpmsys5v )
 {
 	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base());
-	touch_timer = timer_alloc(machine, touch_cb, NULL);
+	touch_timer = machine->scheduler().timer_alloc(FUNC(touch_cb));
 }
 
 static MACHINE_RESET( jpmsys5v )

@@ -165,7 +165,7 @@ static DEVICE_START( cdp1852 )
 	if (device->clock() > 0)
 	{
 		/* create the scan timer */
-		cdp1852->scan_timer = timer_alloc(device->machine, cdp1852_scan_tick, (void *)device);
+		cdp1852->scan_timer = device->machine->scheduler().timer_alloc(FUNC(cdp1852_scan_tick), (void *)device);
 		timer_adjust_periodic(cdp1852->scan_timer, attotime::zero, 0, attotime::from_hz(device->clock()));
 	}
 

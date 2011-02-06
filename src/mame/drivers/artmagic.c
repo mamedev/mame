@@ -161,7 +161,7 @@ static READ16_HANDLER( ultennis_hack_r )
 	{
 		hack_irq = 1;
 		update_irq_state(space->machine);
-		timer_set(space->machine, attotime::from_usec(1), NULL, 0, irq_off);
+		space->machine->scheduler().timer_set(attotime::from_usec(1), FUNC(irq_off));
 	}
 	return input_port_read(space->machine, "300000");
 }

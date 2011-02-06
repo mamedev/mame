@@ -186,7 +186,7 @@ static MACHINE_START( cloud9 )
 	machine->primary_screen->configure(320, 256, visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
 
 	/* create a timer for IRQs and set up the first callback */
-	state->irq_timer = timer_alloc(machine, clock_irq, NULL);
+	state->irq_timer = machine->scheduler().timer_alloc(FUNC(clock_irq));
 	state->irq_state = 0;
 	schedule_next_irq(machine, 0-64);
 

@@ -83,7 +83,7 @@ static TIMER_CALLBACK( scanline_callback )
 static MACHINE_START( magmax )
 {
 	/* Create interrupt timer */
-	interrupt_timer = timer_alloc(machine, scanline_callback, NULL);
+	interrupt_timer = machine->scheduler().timer_alloc(FUNC(scanline_callback));
 
 	/* Set up save state */
 	state_save_register_global(machine, sound_latch);

@@ -136,12 +136,12 @@ static TIMER_CALLBACK( flyball_quarter_callback	)
 
 	for (i = 0; i < 64; i++)
 		if (potsense[i] != 0)
-			timer_set(machine, machine->primary_screen->time_until_pos(scanline + i), NULL, potsense[i], flyball_joystick_callback);
+			machine->scheduler().timer_set(machine->primary_screen->time_until_pos(scanline + i), FUNC(flyball_joystick_callback), potsense[i]);
 
 	scanline += 0x40;
 	scanline &= 0xff;
 
-	timer_set(machine, machine->primary_screen->time_until_pos(scanline), NULL, scanline, flyball_quarter_callback);
+	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(scanline), FUNC(flyball_quarter_callback), scanline);
 
 	state->potsense = 0;
 	state->potmask = 0;
@@ -387,7 +387,7 @@ static MACHINE_RESET( flyball )
 
 	machine->device("maincpu")->reset();
 
-	timer_set(machine, machine->primary_screen->time_until_pos(0), NULL, 0, flyball_quarter_callback);
+	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(0), FUNC(flyball_quarter_callback));
 
 	state->pitcher_vert = 0;
 	state->pitcher_horz = 0;

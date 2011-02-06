@@ -158,7 +158,7 @@ static WRITE8_HANDLER( sound_answer_w )
 
 	/* in Gridiron, the sound CPU goes in a tight loop after the self test, */
 	/* probably waiting to be reset by a watchdog */
-	if (cpu_get_pc(space->cpu) == 0x08bc) timer_set(space->machine, attotime::from_seconds(1), NULL, 0, reset_callback);
+	if (cpu_get_pc(space->cpu) == 0x08bc) space->machine->scheduler().timer_set(attotime::from_seconds(1), FUNC(reset_callback));
 }
 
 

@@ -20,7 +20,7 @@ VIDEO_START( starfire )
 	starfire_state *state = machine->driver_data<starfire_state>();
 
 	state->starfire_screen = machine->primary_screen->alloc_compatible_bitmap();
-	state->scanline_timer = timer_alloc(machine, starfire_scanline_callback, NULL);
+	state->scanline_timer = machine->scheduler().timer_alloc(FUNC(starfire_scanline_callback));
 	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->time_until_pos(STARFIRE_VBEND), STARFIRE_VBEND);
 
     /* register for state saving */

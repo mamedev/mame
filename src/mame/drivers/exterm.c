@@ -198,7 +198,7 @@ static TIMER_CALLBACK( sound_delayed_w )
 static WRITE16_HANDLER( sound_latch_w )
 {
 	if (ACCESSING_BITS_0_7)
-		timer_call_after_resynch(space->machine, NULL, data & 0xff, sound_delayed_w);
+		space->machine->scheduler().synchronize(FUNC(sound_delayed_w), data & 0xff);
 }
 
 

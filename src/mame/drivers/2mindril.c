@@ -213,23 +213,23 @@ static WRITE16_HANDLER( sensors_w )
 	/*---- ---- ---- -x-- lamp*/
 	if (data & 1)
 	{
-		//timer_set(space->machine,  attotime::from_seconds(2), NULL, 0x100, shutter_req );
+		//space->machine->scheduler().timer_set(attotime::from_seconds(2), FUNC(shutter_req ), 0x100);
 		state->shutter_sensor = 0x100;
 	}
 	else if (data & 2)
 	{
-		//timer_set( space->machine, attotime::from_seconds(2), NULL, 0x200, shutter_req );
+		//space->machine->scheduler().timer_set( attotime::from_seconds(2), FUNC(shutter_req ), 0x200);
 		state->shutter_sensor = 0x200;
 	}
 
 	if (data & 0x1000 || data & 0x4000)
 	{
-		//timer_set( space->machine, attotime::from_seconds(2), NULL, 0x800, defender_req );
+		//space->machine->scheduler().timer_set( attotime::from_seconds(2), FUNC(defender_req ), 0x800);
 		state->defender_sensor = 0x800;
 	}
 	else if (data & 0x2000 || data & 0x8000)
 	{
-		//timer_set( space->machine, attotime::from_seconds(2), NULL, 0x400, defender_req );
+		//space->machine->scheduler().timer_set( attotime::from_seconds(2), FUNC(defender_req ), 0x400);
 		state->defender_sensor = 0x400;
 	}
 }

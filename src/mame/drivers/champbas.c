@@ -582,7 +582,7 @@ static MACHINE_START( exctsccr )
 	state->audiocpu = machine->device("audiocpu");
 
 	// FIXME
-	timer_pulse(machine, attotime::from_hz(75), NULL, 0, exctsccr_fm_callback); /* updates fm */
+	machine->scheduler().timer_pulse(attotime::from_hz(75), FUNC(exctsccr_fm_callback)); /* updates fm */
 
 	MACHINE_START_CALL(champbas);
 }

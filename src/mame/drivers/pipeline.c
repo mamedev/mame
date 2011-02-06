@@ -161,7 +161,7 @@ static TIMER_CALLBACK( protection_deferred_w )
 
 static WRITE8_DEVICE_HANDLER(protection_w)
 {
-	timer_call_after_resynch(device->machine, NULL, data, protection_deferred_w);
+	device->machine->scheduler().synchronize(FUNC(protection_deferred_w), data);
 	cpuexec_boost_interleave(device->machine, attotime::zero, attotime::from_usec(100));
 }
 

@@ -336,7 +336,7 @@ static INTERRUPT_GEN( vblank_callback_lgp )
 static MACHINE_START( lgp )
 {
 	laserdisc = machine->device("laserdisc");
-    irq_timer = timer_alloc(machine, irq_stop, 0);
+    irq_timer = machine->scheduler().timer_alloc(FUNC(irq_stop));
 }
 
 

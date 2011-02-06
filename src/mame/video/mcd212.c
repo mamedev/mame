@@ -1655,7 +1655,7 @@ VIDEO_START( cdimono1 )
     VIDEO_START_CALL(generic_bitmapped);
     mcd212_ab_init(&state->mcd212_ab);
     mcd212_init(machine, &state->mcd212_regs);
-    state->mcd212_regs.scan_timer = timer_alloc(machine, mcd212_perform_scan, 0);
+    state->mcd212_regs.scan_timer = machine->scheduler().timer_alloc(FUNC(mcd212_perform_scan));
     timer_adjust_oneshot(state->mcd212_regs.scan_timer, machine->primary_screen->time_until_pos(0, 0), 0);
 
     state->lcdbitmap = downcast<screen_device *>(machine->device("lcd"))->alloc_compatible_bitmap();

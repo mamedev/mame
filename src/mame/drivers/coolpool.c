@@ -484,7 +484,7 @@ static TIMER_CALLBACK( deferred_iop_w )
 static WRITE16_HANDLER( coolpool_iop_w )
 {
 	logerror("%08x:IOP write %04x\n", cpu_get_pc(space->cpu), data);
-	timer_call_after_resynch(space->machine, NULL, data, deferred_iop_w);
+	space->machine->scheduler().synchronize(FUNC(deferred_iop_w), data);
 }
 
 

@@ -57,7 +57,7 @@ static TIMER_CALLBACK( interrupt_callback )
 	if (scanline >= 263)
 		scanline = 32;
 
-	timer_set(machine, machine->primary_screen->time_until_pos(scanline), NULL, scanline, interrupt_callback);
+	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(scanline), FUNC(interrupt_callback), scanline);
 }
 
 
@@ -65,7 +65,7 @@ static MACHINE_RESET( videopin )
 {
 	device_t *discrete = machine->device("discrete");
 
-	timer_set(machine, machine->primary_screen->time_until_pos(32), NULL, 32, interrupt_callback);
+	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(32), FUNC(interrupt_callback), 32);
 
 	/* both output latches are cleared on reset */
 

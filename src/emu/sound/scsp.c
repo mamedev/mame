@@ -547,9 +547,9 @@ static void SCSP_Init(device_t *device, scsp_state *scsp, const scsp_interface *
 		scsp->SCSPRAM += intf->roffset;
 	}
 
-	scsp->timerA = timer_alloc(device->machine, timerA_cb, scsp);
-	scsp->timerB = timer_alloc(device->machine, timerB_cb, scsp);
-	scsp->timerC = timer_alloc(device->machine, timerC_cb, scsp);
+	scsp->timerA = device->machine->scheduler().timer_alloc(FUNC(timerA_cb), scsp);
+	scsp->timerB = device->machine->scheduler().timer_alloc(FUNC(timerB_cb), scsp);
+	scsp->timerC = device->machine->scheduler().timer_alloc(FUNC(timerC_cb), scsp);
 
 	for(i=0;i<0x400;++i)
 	{

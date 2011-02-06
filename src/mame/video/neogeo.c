@@ -243,7 +243,7 @@ static TIMER_CALLBACK( auto_animation_timer_callback )
 static void create_auto_animation_timer( running_machine *machine )
 {
 	neogeo_state *state = machine->driver_data<neogeo_state>();
-	state->auto_animation_timer = timer_alloc(machine, auto_animation_timer_callback, NULL);
+	state->auto_animation_timer = machine->scheduler().timer_alloc(FUNC(auto_animation_timer_callback));
 }
 
 
@@ -664,7 +664,7 @@ static TIMER_CALLBACK( sprite_line_timer_callback )
 static void create_sprite_line_timer( running_machine *machine )
 {
 	neogeo_state *state = machine->driver_data<neogeo_state>();
-	state->sprite_line_timer = timer_alloc(machine, sprite_line_timer_callback, NULL);
+	state->sprite_line_timer = machine->scheduler().timer_alloc(FUNC(sprite_line_timer_callback));
 }
 
 

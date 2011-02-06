@@ -107,7 +107,7 @@ MACHINE_START( namcos2 )
 {
 	namcos2_eeprom = auto_alloc_array(machine, UINT8, namcos2_eeprom_size);
 	machine->device<nvram_device>("nvram")->set_base(namcos2_eeprom, namcos2_eeprom_size);
-	namcos2_posirq_timer = timer_alloc(machine, namcos2_posirq_tick, NULL);
+	namcos2_posirq_timer = machine->scheduler().timer_alloc(FUNC(namcos2_posirq_tick));
 }
 
 MACHINE_RESET( namcos2 )

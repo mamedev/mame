@@ -85,8 +85,8 @@ typedef device_config * (*machine_config_constructor)(machine_config &config, de
 #include "disound.h"
 #include "dinvram.h"
 #include "didisasm.h"
-#include "timer.h"
 #include "schedule.h"
+#include "timer.h"
 
 // I/O
 #include "input.h"

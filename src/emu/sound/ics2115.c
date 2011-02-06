@@ -47,8 +47,8 @@ ics2115_device::ics2115_device(running_machine &machine, const ics2115_device_co
 void ics2115_device::device_start()
 {
     m_rom = *region();
-    m_timer[0].timer = timer_alloc(machine, timer_cb_0, this);
-    m_timer[1].timer = timer_alloc(machine, timer_cb_1, this);
+    m_timer[0].timer = machine->scheduler().timer_alloc(FUNC(timer_cb_0), this);
+    m_timer[1].timer = machine->scheduler().timer_alloc(FUNC(timer_cb_1), this);
     m_stream = m_machine.sound().stream_alloc(*this, 0, 2, 33075);
 
     //Exact formula as per patent 5809466

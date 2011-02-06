@@ -1471,7 +1471,7 @@ static void demon_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_
 
 	/* watch for a 0->1 edge on bit 4 ("shift in") to clock in the new data */
 	if ((bits_changed & 0x10) && (sound_val & 0x10))
-		timer_call_after_resynch(machine, NULL, sound_val & 0x0f, synced_sound_w);
+		machine->scheduler().synchronize(FUNC(synced_sound_w), sound_val & 0x0f);
 }
 
 

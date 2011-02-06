@@ -104,8 +104,8 @@ VIDEO_START( esripsys )
 	line_buffer[1].priority_buf = auto_alloc_array(machine, UINT8, 512);
 
 	/* Create and initialise the HBLANK timers */
-	hblank_start_timer = timer_alloc(machine, hblank_start_callback, NULL);
-	hblank_end_timer = timer_alloc(machine, hblank_end_callback, NULL);
+	hblank_start_timer = machine->scheduler().timer_alloc(FUNC(hblank_start_callback));
+	hblank_end_timer = machine->scheduler().timer_alloc(FUNC(hblank_end_callback));
 	timer_adjust_oneshot(hblank_start_timer, machine->primary_screen->time_until_pos(0, ESRIPSYS_HBLANK_START), 0);
 
 	/* Create the sprite scaling table */

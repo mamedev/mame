@@ -651,15 +651,15 @@ static DEVICE_START( pokey )
 	chip->clockmult = DIV_64;
 	chip->KBCODE = 0x09;		 /* Atari 800 'no key' */
 	chip->SKCTL = SK_RESET;	 /* let the RNG run after reset */
-	chip->rtimer = timer_alloc(device->machine,  NULL, NULL);
+	chip->rtimer = device->machine->scheduler().timer_alloc(FUNC(NULL));
 
-	chip->timer[0] = timer_alloc(device->machine, pokey_timer_expire, chip);
-	chip->timer[1] = timer_alloc(device->machine, pokey_timer_expire, chip);
-	chip->timer[2] = timer_alloc(device->machine, pokey_timer_expire, chip);
+	chip->timer[0] = device->machine->scheduler().timer_alloc(FUNC(pokey_timer_expire), chip);
+	chip->timer[1] = device->machine->scheduler().timer_alloc(FUNC(pokey_timer_expire), chip);
+	chip->timer[2] = device->machine->scheduler().timer_alloc(FUNC(pokey_timer_expire), chip);
 
 	for (i=0; i<8; i++)
 	{
-		chip->ptimer[i] = timer_alloc(device->machine, pokey_pot_trigger, chip);
+		chip->ptimer[i] = device->machine->scheduler().timer_alloc(FUNC(pokey_pot_trigger), chip);
 		devcb_resolve_read8(&chip->pot_r[i], &chip->intf.pot_r[i], device);
 	}
 	devcb_resolve_read8(&chip->allpot_r, &chip->intf.allpot_r, device);
@@ -1141,9 +1141,9 @@ WRITE8_DEVICE_HANDLER( pokey_w )
          * loaders from Ballblazer and Escape from Fractalus
          * The real times are unknown
          */
-        timer_set(device->machine, attotime::from_usec(200), p, 0, pokey_serout_ready_cb);
+        device->machine->scheduler().timer_set(attotime::from_usec(200), FUNC(pokey_serout_ready_cb), 0, p);
         /* 10 bits (assumption 1 start, 8 data and 1 stop bit) take how long? */
-        timer_set(device->machine, attotime::from_usec(2000), p, 0, pokey_serout_complete);
+        device->machine->scheduler().timer_set(attotime::from_usec(2000), FUNC(pokey_serout_complete), 0, p);
         break;
 
     case IRQEN_C:
@@ -1338,7 +1338,7 @@ WRITE8_HANDLER( quad_pokey_w )
 void pokey_serin_ready(device_t *device, int after)
 {
 	pokey_state *p = get_safe_token(device);
-	timer_set(device->machine, p->clock_period * after, p, 0, pokey_serin_ready_cb);
+	device->machine->scheduler().timer_set(p->clock_period * after, FUNC(pokey_serin_ready_cb), 0, p);
 }
 
 void pokey_break_w(device_t *device, int shift)

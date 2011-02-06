@@ -428,6 +428,16 @@ public:
 		m_tail = tail;
 		m_count += count;
 	}
+	
+	T &insert_after(T &object, T *insert_after)
+	{
+		if (insert_after == NULL)
+			return prepend(object);
+		object.m_next = insert_after->m_next;
+		insert_after->m_next = &object;
+		m_count++;
+		return object;
+	}
 
 	T *detach_head()
 	{

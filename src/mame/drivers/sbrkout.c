@@ -88,8 +88,8 @@ static MACHINE_START( sbrkout )
 	sbrkout_state *state = machine->driver_data<sbrkout_state>();
 	UINT8 *videoram = state->videoram;
 	memory_set_bankptr(machine, "bank1", &videoram[0x380]);
-	state->scanline_timer = timer_alloc(machine, scanline_callback, NULL);
-	state->pot_timer = timer_alloc(machine, pot_trigger_callback, NULL);
+	state->scanline_timer = machine->scheduler().timer_alloc(FUNC(scanline_callback));
+	state->pot_timer = machine->scheduler().timer_alloc(FUNC(pot_trigger_callback));
 
 	state_save_register_global(machine, state->sync2_value);
 	state_save_register_global_array(machine, state->pot_mask);

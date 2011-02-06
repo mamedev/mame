@@ -272,7 +272,7 @@ static TIMER_CALLBACK( megatech_z80_stop_state )
 	if (game_region)
 	{
 		{
-			timer_set( machine, attotime::zero, NULL, param, megatech_z80_run_state );
+			machine->scheduler().timer_set( attotime::zero, FUNC(megatech_z80_run_state ), param);
 		}
 	}
 	else
@@ -287,7 +287,7 @@ static TIMER_CALLBACK( megatech_z80_stop_state )
 
 static void megatech_select_game(running_machine *machine, int gameno)
 {
-	timer_set( machine, attotime::zero, NULL, gameno, megatech_z80_stop_state );
+	machine->scheduler().timer_set( attotime::zero, FUNC(megatech_z80_stop_state ), gameno);
 }
 
 static WRITE8_HANDLER( megatech_cart_select_w )

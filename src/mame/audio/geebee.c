@@ -141,7 +141,7 @@ static DEVICE_START( geebee_sound )
 	state->channel = device->machine->sound().stream_alloc(*device, 0, 1, 18432000 / 3 / 2 / 384, NULL, geebee_sound_update);
 	state->vcount = 0;
 
-	state->volume_timer = timer_alloc(machine, volume_decay, state);
+	state->volume_timer = machine->scheduler().timer_alloc(FUNC(volume_decay), state);
 }
 
 DEVICE_GET_INFO( geebee_sound )

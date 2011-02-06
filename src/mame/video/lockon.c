@@ -918,10 +918,10 @@ VIDEO_START( lockon )
 	state->obj_pal_ram = auto_alloc_array(machine, UINT8, 2048);
 
 	/* Timer for ground display list callback */
-	state->bufend_timer = timer_alloc(machine, bufend_callback, NULL);
+	state->bufend_timer = machine->scheduler().timer_alloc(FUNC(bufend_callback));
 
 	/* Timer for the CRTC cursor pulse */
-	state->cursor_timer = timer_alloc(machine, cursor_callback, NULL);
+	state->cursor_timer = machine->scheduler().timer_alloc(FUNC(cursor_callback));
 	timer_adjust_oneshot(state->cursor_timer, machine->primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS), 0);
 
 	state_save_register_global_bitmap(machine, state->back_buffer);

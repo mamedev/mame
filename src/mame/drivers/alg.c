@@ -98,7 +98,7 @@ static MACHINE_START( alg )
 	alg_state *state = machine->driver_data<alg_state>();
 	state->laserdisc = machine->device("laserdisc");
 
-	state->serial_timer = timer_alloc(machine, response_timer, NULL);
+	state->serial_timer = machine->scheduler().timer_alloc(FUNC(response_timer));
 	state->serial_timer_active = FALSE;
 }
 

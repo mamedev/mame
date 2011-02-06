@@ -1143,13 +1143,13 @@ void scc68070_register_globals(running_machine *machine, scc68070_regs_t *scc680
     state_save_register_global(machine, scc68070->mmu.desc[7].segment);
     state_save_register_global(machine, scc68070->mmu.desc[7].base);
 
-	scc68070->timers.timer0_timer = timer_alloc(machine, scc68070_timer0_callback, 0);
+	scc68070->timers.timer0_timer = machine->scheduler().timer_alloc(FUNC(scc68070_timer0_callback));
 	timer_adjust_oneshot(scc68070->timers.timer0_timer, attotime::never, 0);
 
-	scc68070->uart.rx_timer = timer_alloc(machine, scc68070_rx_callback, 0);
+	scc68070->uart.rx_timer = machine->scheduler().timer_alloc(FUNC(scc68070_rx_callback));
 	timer_adjust_oneshot(scc68070->uart.rx_timer, attotime::never, 0);
 
-	scc68070->uart.tx_timer = timer_alloc(machine, scc68070_tx_callback, 0);
+	scc68070->uart.tx_timer = machine->scheduler().timer_alloc(FUNC(scc68070_tx_callback));
 	timer_adjust_oneshot(scc68070->uart.tx_timer, attotime::never, 0);
 }
 

@@ -376,7 +376,7 @@ static WRITE16_HANDLER( sound_data_w )
 	if (LOG)
 		logerror("%06X:sound_data_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
 	if (ACCESSING_BITS_0_7)
-		timer_call_after_resynch(space->machine, NULL, data & 0xff, delayed_sound_w);
+		space->machine->scheduler().synchronize(FUNC(delayed_sound_w), data & 0xff);
 }
 
 

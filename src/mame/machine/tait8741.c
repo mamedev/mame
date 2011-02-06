@@ -204,7 +204,7 @@ static void taito8741_update(address_space *space, int num)
 				st->txd[0] = st->portHandler ? st->portHandler(space,0) : st->portName ? input_port_read(space->machine, st->portName) : 0;
 				if( sst )
 				{
-					timer_call_after_resynch(space->machine, NULL, num, taito8741_serial_tx);
+					space->machine->scheduler().synchronize(FUNC(taito8741_serial_tx), num);
 					st->serial_out = 0;
 					st->status |= 0x04;
 					st->phase = CMD_08;
@@ -440,7 +440,7 @@ static void josvolly_8741_do(running_machine *machine, int num)
 	if( (i8741[num].sts & 0x02) )
 	{
 		/* transmit data */
-		timer_set (machine, attotime::from_usec(1), NULL, num, josvolly_8741_tx);
+		machine->scheduler().timer_set (attotime::from_usec(1), FUNC(josvolly_8741_tx), num);
 	}
 }
 

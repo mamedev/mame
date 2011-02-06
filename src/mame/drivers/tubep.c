@@ -349,7 +349,7 @@ static void tubep_setup_save_state(running_machine *machine)
 static MACHINE_START( tubep )
 {
 	/* Create interrupt timer */
-	interrupt_timer = timer_alloc(machine, tubep_scanline_callback, NULL);
+	interrupt_timer = machine->scheduler().timer_alloc(FUNC(tubep_scanline_callback));
 
 	tubep_setup_save_state(machine);
 }
@@ -512,7 +512,7 @@ static TIMER_CALLBACK( rjammer_scanline_callback )
 static MACHINE_START( rjammer )
 {
 	/* Create interrupt timer */
-	interrupt_timer = timer_alloc(machine, rjammer_scanline_callback, NULL);
+	interrupt_timer = machine->scheduler().timer_alloc(FUNC(rjammer_scanline_callback));
 
 	tubep_setup_save_state(machine);
 }

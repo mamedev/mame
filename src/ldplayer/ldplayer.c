@@ -238,7 +238,7 @@ static TIMER_CALLBACK( vsync_update )
 	/* set a timer to go off on the next VBLANK */
 	vblank_scanline = machine->primary_screen->visible_area().max_y + 1;
 	target = machine->primary_screen->time_until_pos(vblank_scanline);
-	timer_set(machine, target, NULL, 0, vsync_update);
+	machine->scheduler().timer_set(target, FUNC(vsync_update));
 }
 
 
@@ -261,7 +261,7 @@ static TIMER_CALLBACK( autoplay )
 static MACHINE_RESET( ldplayer )
 {
 	/* set up a timer to start playing immediately */
-	timer_set(machine, attotime::zero, NULL, 0, autoplay);
+	machine->scheduler().timer_set(attotime::zero, FUNC(autoplay));
 
 	/* indicate the name of the file we opened */
 	popmessage("Opened %s\n", filename.cstr());
@@ -303,7 +303,7 @@ static TIMER_CALLBACK( pr8210_bit_callback )
 	{
 		/* assert the line and set a timer for deassertion */
 		laserdisc_line_w(laserdisc, LASERDISC_LINE_CONTROL, ASSERT_LINE);
-		timer_set(machine, attotime::from_usec(250), ptr, 0, pr8210_bit_off_callback);
+		machine->scheduler().timer_set(attotime::from_usec(250), FUNC(pr8210_bit_off_callback), 0, ptr);
 
 		/* space 0 bits apart by 1msec, and 1 bits by 2msec */
 		duration = attotime::from_msec((data & 0x80) ? 2 : 1);
@@ -325,7 +325,7 @@ static MACHINE_START( pr8210 )
 {
 	device_t *laserdisc = machine->m_devicelist.first(LASERDISC);
 	MACHINE_START_CALL(ldplayer);
-	pr8210_bit_timer = timer_alloc(machine, pr8210_bit_callback, (void *)laserdisc);
+	pr8210_bit_timer = machine->scheduler().timer_alloc(FUNC(pr8210_bit_callback), (void *)laserdisc);
 }
 
 

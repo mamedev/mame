@@ -265,7 +265,7 @@ static void wave_dma_execute(address_space *space)
 	wave_dma.flag = (wave_dma.indirect & 1) ? 1 : 0;
 	/* Note: if you trigger an instant DMA IRQ trigger, sfz3upper doesn't play any bgm. */
 	/* TODO: timing of this */
-	timer_set(space->machine, attotime::from_usec(300), NULL, 0, aica_dma_irq);
+	space->machine->scheduler().timer_set(attotime::from_usec(300), FUNC(aica_dma_irq));
 }
 
 static void pvr_dma_execute(address_space *space)
@@ -303,7 +303,7 @@ static void pvr_dma_execute(address_space *space)
 	}
 	/* Note: do not update the params, since this DMA type doesn't support it. */
 	/* TODO: timing of this */
-	timer_set(space->machine, attotime::from_usec(250), NULL, 0, pvr_dma_irq);
+	space->machine->scheduler().timer_set(attotime::from_usec(250), FUNC(pvr_dma_irq));
 }
 
 // register decode helpers
@@ -689,10 +689,10 @@ WRITE64_HANDLER( dc_sysctrl_w )
 					dc_sysctrl_regs[SB_C2DSTAT]=address+ddtdata.length;
 
 				/* 200 usecs breaks sfz3upper */
-				timer_set(space->machine, attotime::from_usec(50), NULL, 0, ch2_dma_irq);
+				space->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(ch2_dma_irq));
 				/* simulate YUV FIFO processing here */
 				if((address & 0x1800000) == 0x0800000)
-					timer_set(space->machine, attotime::from_usec(500), NULL, 0, yuv_fifo_irq);
+					space->machine->scheduler().timer_set(attotime::from_usec(500), FUNC(yuv_fifo_irq));
 			}
 			break;
 
@@ -1066,7 +1066,7 @@ WRITE64_HANDLER( naomi_maple_w )
 
 					if (endflag)
 					{
-						timer_set(space->machine, attotime::from_usec(200), NULL, 0, maple_dma_irq);
+						space->machine->scheduler().timer_set(attotime::from_usec(200), FUNC(maple_dma_irq));
 						break;
 					}
 					// skip fixed packet header
@@ -1215,7 +1215,7 @@ WRITE64_HANDLER( dc_maple_w )
 
 					if (endflag)
 					{
-						timer_set(space->machine, attotime::from_usec(200), NULL, 0, maple_dma_irq);
+						space->machine->scheduler().timer_set(attotime::from_usec(200), FUNC(maple_dma_irq));
 						break;
 					}
 					// skip fixed packet header
@@ -1333,7 +1333,7 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 			sh4_dma_ddt(space->machine->device("maincpu"), &ddtdata);
 			/* Note: KOF Neowave definitely wants this to be delayed (!) */
 			/* FIXME: timing of this */
-			timer_set(space->machine, attotime::from_usec(500), NULL, 0, gdrom_dma_irq);
+			space->machine->scheduler().timer_set(attotime::from_usec(500), FUNC(gdrom_dma_irq));
 		}
 		break;
 	}
@@ -1609,7 +1609,7 @@ static void rtc_initial_setup(running_machine *machine)
 	dc_rtcregister[RTC2] = current_time & 0x0000ffff;
 	dc_rtcregister[RTC1] = (current_time & 0xffff0000) >> 16;
 
-	dc_rtc_timer = timer_alloc(machine, dc_rtc_increment, 0);
+	dc_rtc_timer = machine->scheduler().timer_alloc(FUNC(dc_rtc_increment));
 }
 
 MACHINE_START( dc )

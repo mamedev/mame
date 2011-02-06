@@ -430,7 +430,7 @@ static void v25_init(legacy_cpu_device *device, device_irq_callback irqcallback,
 	nec_state->config = config;
 
 	for (int i = 0; i < 4; i++)
-		nec_state->timers[i] = timer_alloc(device->machine, v25_timer_callback, nec_state);
+		nec_state->timers[i] = device->machine->scheduler().timer_alloc(FUNC(v25_timer_callback), nec_state);
 
 	state_save_register_device_item_array(device, 0, nec_state->ram.w);
 	state_save_register_device_item_array(device, 0, nec_state->intp_state);

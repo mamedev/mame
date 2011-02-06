@@ -621,7 +621,7 @@ void generic_pulse_irq_line(device_t *device, int irqline)
 
 	cpu_device *cpudevice = downcast<cpu_device *>(device);
 	attotime target_time = cpudevice->local_time() + cpudevice->cycles_to_attotime(cpudevice->min_cycles());
-	timer_set(device->machine, target_time - timer_get_time(device->machine), (void *)device, irqline, irq_pulse_clear);
+	device->machine->scheduler().timer_set(target_time - timer_get_time(device->machine), FUNC(irq_pulse_clear), irqline, (void *)device);
 }
 
 
@@ -638,7 +638,7 @@ void generic_pulse_irq_line_and_vector(device_t *device, int irqline, int vector
 
 	cpu_device *cpudevice = downcast<cpu_device *>(device);
 	attotime target_time = cpudevice->local_time() + cpudevice->cycles_to_attotime(cpudevice->min_cycles());
-	timer_set(device->machine, target_time - timer_get_time(device->machine), (void *)device, irqline, irq_pulse_clear);
+	device->machine->scheduler().timer_set(target_time - timer_get_time(device->machine), FUNC(irq_pulse_clear), irqline, (void *)device);
 }
 
 
@@ -664,7 +664,7 @@ void cpu_interrupt_enable(device_t *device, int enabled)
 
 	/* make sure there are no queued interrupts */
 	if (enabled == 0)
-		timer_call_after_resynch(device->machine, (void *)cpudevice, 0, clear_all_lines);
+		device->machine->scheduler().synchronize(FUNC(clear_all_lines), 0, (void *)cpudevice);
 }
 
 

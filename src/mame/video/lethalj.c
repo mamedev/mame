@@ -165,7 +165,7 @@ WRITE16_HANDLER( lethalj_blitter_w )
 		else
 			do_blit();
 
-		timer_set(space->machine, attotime::from_hz(XTAL_32MHz) * ((blitter_data[5] + 1) * (blitter_data[7] + 1)), NULL, 0, gen_ext1_int);
+		space->machine->scheduler().timer_set(attotime::from_hz(XTAL_32MHz) * ((blitter_data[5] + 1) * (blitter_data[7] + 1)), FUNC(gen_ext1_int));
 	}
 
 	/* clear the IRQ on offset 0 */

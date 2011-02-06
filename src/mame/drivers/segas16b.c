@@ -1130,9 +1130,9 @@ static MACHINE_RESET( system16b )
 
 	/* if we have a fake i8751 handler, disable the actual 8751, otherwise crank the interleave */
 	if (state->i8751_vblank_hook != NULL)
-		timer_call_after_resynch(machine, NULL, 0, suspend_i8751);
+		machine->scheduler().synchronize(FUNC(suspend_i8751));
 	else
-		timer_call_after_resynch(machine, NULL, 0, boost_interleave);
+		machine->scheduler().synchronize(FUNC(boost_interleave));
 
 	/* configure sprite banks */
 	for (i = 0; i < 16; i++)

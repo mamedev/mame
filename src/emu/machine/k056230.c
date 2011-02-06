@@ -128,7 +128,7 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(k056230, k056230_w)
 					{
 						cpu_set_input_line(m_cpu, INPUT_LINE_IRQ2, ASSERT_LINE);
 					}
-					timer_set(&m_machine, attotime::from_usec(10), (void*)this, 0, network_irq_clear_callback);
+					m_machine.scheduler().timer_set(attotime::from_usec(10), FUNC(network_irq_clear_callback), 0, (void*)this);
 				}
 			}
 //          else

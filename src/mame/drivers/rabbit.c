@@ -633,7 +633,7 @@ static void rabbit_do_blit(running_machine *machine)
 				if (!blt_amount)
 				{
 					if(BLITLOG) mame_printf_debug("end of blit list\n");
-					timer_set(machine, attotime::from_usec(500), NULL,0,rabbit_blit_done);
+					machine->scheduler().timer_set(attotime::from_usec(500), FUNC(rabbit_blit_done));
 					return;
 				}
 

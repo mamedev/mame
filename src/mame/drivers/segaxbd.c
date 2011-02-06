@@ -385,7 +385,7 @@ static TIMER_CALLBACK( delayed_sound_data_w )
 
 static void sound_data_w(running_machine *machine, UINT8 data)
 {
-	timer_call_after_resynch(machine, NULL, data, delayed_sound_data_w);
+	machine->scheduler().synchronize(FUNC(delayed_sound_data_w), data);
 }
 
 

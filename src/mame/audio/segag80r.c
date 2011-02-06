@@ -582,7 +582,7 @@ static DEVICE_START( sega005_sound )
 	sega005_stream = device->machine->sound().stream_alloc(*device, 0, 1, SEGA005_COUNTER_FREQ, NULL, sega005_stream_update);
 
 	/* create a timer for the 555 */
-	sega005_sound_timer = timer_alloc(machine, sega005_auto_timer, NULL);
+	sega005_sound_timer = machine->scheduler().timer_alloc(FUNC(sega005_auto_timer));
 
 	/* set the initial sound data */
 	sound_data = 0x00;

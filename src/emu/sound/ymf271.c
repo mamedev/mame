@@ -1752,8 +1752,8 @@ static void init_state(YMF271Chip *chip, device_t *device)
 
 static void ymf271_init(device_t *device, YMF271Chip *chip, UINT8 *rom, void (*cb)(device_t *,int), const devcb_read8 *ext_read, const devcb_write8 *ext_write)
 {
-	chip->timA = timer_alloc(device->machine, ymf271_timer_a_tick, chip);
-	chip->timB = timer_alloc(device->machine, ymf271_timer_b_tick, chip);
+	chip->timA = device->machine->scheduler().timer_alloc(FUNC(ymf271_timer_a_tick), chip);
+	chip->timB = device->machine->scheduler().timer_alloc(FUNC(ymf271_timer_b_tick), chip);
 
 	chip->rom = rom;
 	chip->irq_callback = cb;

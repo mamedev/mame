@@ -270,7 +270,7 @@ static DEVICE_START( amiga_sound )
 	for (i = 0; i < 4; i++)
 	{
 		audio_state->channel[i].index = i;
-		audio_state->channel[i].irq_timer = timer_alloc(device->machine, signal_irq, NULL);
+		audio_state->channel[i].irq_timer = device->machine->scheduler().timer_alloc(FUNC(signal_irq));
 	}
 
 	/* create the stream */

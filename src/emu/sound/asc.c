@@ -133,7 +133,7 @@ void asc_device::device_start()
 
 	memset(m_regs, 0, sizeof(m_regs));
 
-	m_sync_timer = timer_alloc(this->machine, sync_timer_cb, this);
+	m_sync_timer = this->machine->scheduler().timer_alloc(FUNC(sync_timer_cb), this);
 
 	state_save_register_device_item(this, 0, m_fifo_a_rdptr);
 	state_save_register_device_item(this, 0, m_fifo_b_rdptr);

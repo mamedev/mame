@@ -222,7 +222,7 @@ PALETTE_INIT( profpac )
 VIDEO_START( astrocde )
 {
 	/* allocate a per-scanline timer */
-	scanline_timer = timer_alloc(machine, scanline_callback, NULL);
+	scanline_timer = machine->scheduler().timer_alloc(FUNC(scanline_callback));
 	timer_adjust_oneshot(scanline_timer, machine->primary_screen->time_until_pos(1), 1);
 
 	/* register for save states */
@@ -237,7 +237,7 @@ VIDEO_START( astrocde )
 VIDEO_START( profpac )
 {
 	/* allocate a per-scanline timer */
-	scanline_timer = timer_alloc(machine, scanline_callback, NULL);
+	scanline_timer = machine->scheduler().timer_alloc(FUNC(scanline_callback));
 	timer_adjust_oneshot(scanline_timer, machine->primary_screen->time_until_pos(1), 1);
 
 	/* allocate videoram */
@@ -443,14 +443,14 @@ static void astrocade_trigger_lightpen(running_machine *machine, UINT8 vfeedback
 		if ((interrupt_enable & 0x01) == 0)
 		{
 			cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, interrupt_vector & 0xf0);
-			timer_set(machine, machine->primary_screen->time_until_pos(vfeedback), NULL, 0, interrupt_off);
+			machine->scheduler().timer_set(machine->primary_screen->time_until_pos(vfeedback), FUNC(interrupt_off));
 		}
 
 		/* mode 1 means assert for 1 instruction */
 		else
 		{
 			cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, interrupt_vector & 0xf0);
-			timer_set(machine, machine->device<cpu_device>("maincpu")->cycles_to_attotime(1), NULL, 0, interrupt_off);
+			machine->scheduler().timer_set(machine->device<cpu_device>("maincpu")->cycles_to_attotime(1), FUNC(interrupt_off));
 		}
 
 		/* latch the feedback registers */
@@ -483,14 +483,14 @@ static TIMER_CALLBACK( scanline_callback )
 		if ((interrupt_enable & 0x04) == 0)
 		{
 			cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, interrupt_vector);
-			timer_set(machine, machine->primary_screen->time_until_vblank_end(), NULL, 0, interrupt_off);
+			machine->scheduler().timer_set(machine->primary_screen->time_until_vblank_end(), FUNC(interrupt_off));
 		}
 
 		/* mode 1 means assert for 1 instruction */
 		else
 		{
 			cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, interrupt_vector);
-			timer_set(machine, machine->device<cpu_device>("maincpu")->cycles_to_attotime(1), NULL, 0, interrupt_off);
+			machine->scheduler().timer_set(machine->device<cpu_device>("maincpu")->cycles_to_attotime(1), FUNC(interrupt_off));
 		}
 	}
 

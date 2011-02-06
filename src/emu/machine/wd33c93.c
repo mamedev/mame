@@ -352,7 +352,7 @@ static CMD_HANDLER( wd33c93_select_cmd )
 		}
 
 		/* queue up a service request out in the future */
-		timer_set( machine, attotime::from_usec(50), NULL, 0, wd33c93_service_request );
+		machine->scheduler().timer_set( attotime::from_usec(50), FUNC(wd33c93_service_request ));
 	}
 	else
 	{
@@ -424,7 +424,7 @@ static CMD_HANDLER( wd33c93_selectxfer_cmd )
 			scsi_data.busphase = PHS_MESS_IN;
 
 			/* queue up a service request out in the future */
-			timer_set( machine, attotime::from_msec(50), NULL, 0, wd33c93_service_request );
+			machine->scheduler().timer_set( attotime::from_msec(50), FUNC(wd33c93_service_request ));
 		}
 	}
 	else
@@ -454,7 +454,7 @@ static CMD_HANDLER( wd33c93_xferinfo_cmd )
 	scsi_data.regs[WD_AUXILIARY_STATUS] |= ASR_CIP;
 
 	/* the command will be completed once the data is transferred */
-	timer_set( machine, attotime::from_msec(1), NULL, 0, wd33c93_deassert_cip );
+	machine->scheduler().timer_set( attotime::from_msec(1), FUNC(wd33c93_deassert_cip ));
 }
 
 /* Command handlers */
@@ -795,7 +795,7 @@ void wd33c93_init( running_machine *machine, const struct WD33C93interface *inte
 	}
 
 	/* allocate a timer for commands */
-	scsi_data.cmd_timer = timer_alloc(machine, wd33c93_complete_cb, NULL);
+	scsi_data.cmd_timer = machine->scheduler().timer_alloc(FUNC(wd33c93_complete_cb));
 
 	scsi_data.temp_input = auto_alloc_array( machine, UINT8, TEMP_INPUT_LEN );
 

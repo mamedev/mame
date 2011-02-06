@@ -163,10 +163,10 @@ static MACHINE_START( gridlee )
     state_save_register_global_array(machine, last_analog_input);
     state_save_register_global_array(machine, last_analog_output);
 
-    irq_off = timer_alloc(machine, irq_off_tick, 0);
-    irq_timer = timer_alloc(machine, irq_timer_tick, 0);
-    firq_off = timer_alloc(machine, firq_off_tick, 0);
-    firq_timer = timer_alloc(machine, firq_timer_tick, 0);
+    irq_off = machine->scheduler().timer_alloc(FUNC(irq_off_tick));
+    irq_timer = machine->scheduler().timer_alloc(FUNC(irq_timer_tick));
+    firq_off = machine->scheduler().timer_alloc(FUNC(firq_off_tick));
+    firq_timer = machine->scheduler().timer_alloc(FUNC(firq_timer_tick));
 }
 
 

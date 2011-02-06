@@ -116,7 +116,7 @@ static TIMER_CALLBACK( update_irq_state_timer_5 );
 static TIMER_CALLBACK( update_irq_state_timer_6 );
 static TIMER_CALLBACK( update_irq_state_timer_7 );
 
-static const timer_fired_func update_irq_state_cb[] =
+static const timer_expired_func update_irq_state_cb[] =
 {
 	update_irq_state_timer_0,
 	update_irq_state_timer_1,
@@ -205,7 +205,7 @@ static STATE_POSTLOAD( YMZ280B_state_save_update_step )
 		struct YMZ280BVoice *voice = &chip->voice[j];
 		update_step(chip, voice);
 		if(voice->irq_schedule)
-			timer_set(machine, attotime::zero, chip, 0, update_irq_state_cb[j]);
+			machine->scheduler().timer_set(attotime::zero, FUNC(update_irq_state_cb[j]), 0, chip);
 	}
 }
 
@@ -581,7 +581,7 @@ static STREAM_UPDATE( ymz280b_update )
 				voice->playing = 0;
 
 				/* set update_irq_state_timer. IRQ is signaled on next CPU execution. */
-				timer_set(chip->device->machine, attotime::zero, chip, 0, update_irq_state_cb[v]);
+				chip->device->machine->scheduler().timer_set(attotime::zero, FUNC(update_irq_state_cb[v]), 0, chip);
 				voice->irq_schedule = 1;
 			}
 		}

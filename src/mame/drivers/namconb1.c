@@ -348,7 +348,7 @@ static INTERRUPT_GEN( namconb1_interrupt )
 	}
 	if( scanline < NAMCONB1_VBSTART )
 	{
-		timer_set( device->machine, device->machine->primary_screen->time_until_pos(scanline), NULL, scanline, namconb1_TriggerPOSIRQ );
+		device->machine->scheduler().timer_set( device->machine->primary_screen->time_until_pos(scanline), FUNC(namconb1_TriggerPOSIRQ ), scanline);
 	}
 } /* namconb1_interrupt */
 
@@ -417,7 +417,7 @@ static INTERRUPT_GEN( namconb2_interrupt )
 		scanline = 0;
 
 	if( scanline < NAMCONB1_VBSTART )
-		timer_set( device->machine, device->machine->primary_screen->time_until_pos(scanline), NULL, scanline, namconb2_TriggerPOSIRQ );
+		device->machine->scheduler().timer_set( device->machine->primary_screen->time_until_pos(scanline), FUNC(namconb2_TriggerPOSIRQ ), scanline);
 } /* namconb2_interrupt */
 
 static void namconb1_cpureg8_w(running_machine *machine, int reg, UINT8 data)

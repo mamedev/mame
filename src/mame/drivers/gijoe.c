@@ -285,7 +285,7 @@ static MACHINE_START( gijoe )
 	state->k053246 = machine->device("k053246");
 	state->k053251 = machine->device("k053251");
 
-	state->dmadelay_timer = timer_alloc(machine, dmaend_callback, NULL);
+	state->dmadelay_timer = machine->scheduler().timer_alloc(FUNC(dmaend_callback));
 
 	state_save_register_global(machine, state->cur_control2);
 }

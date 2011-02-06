@@ -80,7 +80,7 @@ static TIMER_CALLBACK( periodic_callback )
 
 		for (i = 1; i < 256; i++)
 			if (mask[i] != 0)
-				timer_set(machine, machine->primary_screen->time_until_pos(i), NULL, mask[i], pot_interrupt);
+				machine->scheduler().timer_set(machine->primary_screen->time_until_pos(i), FUNC(pot_interrupt), mask[i]);
 
 		state->pot_state = 0;
 	}
@@ -90,7 +90,7 @@ static TIMER_CALLBACK( periodic_callback )
 	if (scanline >= 262)
 		scanline = 0;
 
-	timer_set(machine, machine->primary_screen->time_until_pos(scanline), NULL, scanline, periodic_callback);
+	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(scanline), FUNC(periodic_callback), scanline);
 }
 
 
@@ -428,7 +428,7 @@ static MACHINE_START( boxer )
 static MACHINE_RESET( boxer )
 {
 	boxer_state *state = machine->driver_data<boxer_state>();
-	timer_set(machine, machine->primary_screen->time_until_pos(0), NULL, 0, periodic_callback);
+	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(0), FUNC(periodic_callback));
 
 	state->pot_state = 0;
 	state->pot_latch = 0;

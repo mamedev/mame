@@ -1500,8 +1500,8 @@ void galaxold_init_stars(running_machine *machine, int colors_offset)
 
 	galaxold_stars_on = 0;
 	stars_blink_state = 0;
-	stars_blink_timer = timer_alloc(machine, stars_blink_callback, NULL);
-	stars_scroll_timer = timer_alloc(machine, stars_scroll_callback, NULL);
+	stars_blink_timer = machine->scheduler().timer_alloc(FUNC(stars_blink_callback));
+	stars_scroll_timer = machine->scheduler().timer_alloc(FUNC(stars_scroll_callback));
 	timer_adjusted = 0;
 	stars_colors_start = colors_offset;
 

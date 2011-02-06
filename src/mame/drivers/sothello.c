@@ -84,14 +84,14 @@ static TIMER_CALLBACK( subcpu_resume )
 
 static READ8_HANDLER( subcpu_halt_set )
 {
-    timer_call_after_resynch(space->machine, NULL, 0, subcpu_suspend);
+    space->machine->scheduler().synchronize(FUNC(subcpu_suspend));
     subcpu_status|=2;
     return 0;
 }
 
 static READ8_HANDLER( subcpu_halt_clear )
 {
-    timer_call_after_resynch(space->machine,NULL, 0, subcpu_resume);
+    space->machine->scheduler().synchronize(FUNC(subcpu_resume));
     subcpu_status&=~1;
     subcpu_status&=~2;
     return 0;

@@ -192,7 +192,7 @@ static INTERRUPT_GEN( assert_irq )
 static MACHINE_START( mustache )
 {
 	mustache_state *state = machine->driver_data<mustache_state>();
-	state->clear_irq_timer = timer_alloc(machine, clear_irq_cb, 0);
+	state->clear_irq_timer = machine->scheduler().timer_alloc(FUNC(clear_irq_cb));
 }
 
 static MACHINE_CONFIG_START( mustache, mustache_state )

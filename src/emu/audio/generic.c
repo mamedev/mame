@@ -87,7 +87,7 @@ static TIMER_CALLBACK( latch_callback )
 
 INLINE void latch_w(address_space *space, int which, UINT16 value)
 {
-	timer_call_after_resynch(space->machine, NULL, which | (value << 8), latch_callback);
+	space->machine->scheduler().synchronize(FUNC(latch_callback), which | (value << 8));
 }
 
 

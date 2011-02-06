@@ -207,7 +207,7 @@ static TIMER_CALLBACK( delayed_bank_swap )
 
 static WRITE8_HANDLER( frame_w )
 {
-	timer_call_after_resynch(space->machine, NULL, 0, delayed_bank_swap);
+	space->machine->scheduler().synchronize(FUNC(delayed_bank_swap));
 	esripsys_frame_vbl = 1;
 }
 

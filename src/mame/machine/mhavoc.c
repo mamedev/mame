@@ -136,7 +136,7 @@ static TIMER_CALLBACK( delayed_gamma_w )
 	cputag_set_input_line(machine, "gamma", INPUT_LINE_NMI, PULSE_LINE);
 
 	/* the sound CPU needs to reply in 250microseconds (according to Neil Bradley) */
-	timer_set(machine, attotime::from_usec(250), NULL, 0, 0);
+	machine->scheduler().timer_set(attotime::from_usec(250), FUNC(0));
 }
 
 
@@ -144,7 +144,7 @@ WRITE8_HANDLER( mhavoc_gamma_w )
 {
 	mhavoc_state *state = space->machine->driver_data<mhavoc_state>();
 	logerror("  writing to gamma processor: %02x (%d %d)\n", data, state->gamma_rcvd, state->alpha_xmtd);
-	timer_call_after_resynch(space->machine, NULL, data, delayed_gamma_w);
+	space->machine->scheduler().synchronize(FUNC(delayed_gamma_w), data);
 }
 
 

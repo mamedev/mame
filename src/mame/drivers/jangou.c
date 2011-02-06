@@ -894,7 +894,7 @@ static SOUND_START( jangou )
 	jangou_state *state = machine->driver_data<jangou_state>();
 
 	/* Create a timer to feed the CVSD DAC with sample bits */
-	state->cvsd_bit_timer = timer_alloc(machine, cvsd_bit_timer_callback, NULL);
+	state->cvsd_bit_timer = machine->scheduler().timer_alloc(FUNC(cvsd_bit_timer_callback));
 	timer_adjust_periodic(state->cvsd_bit_timer, attotime::from_hz(MASTER_CLOCK / 1024), 0, attotime::from_hz(MASTER_CLOCK / 1024));
 }
 

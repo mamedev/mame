@@ -448,7 +448,7 @@ static MACHINE_START( moo )
 	state_save_register_global_array(machine, state->layerpri);
 	state_save_register_global_array(machine, state->protram);
 
-    state->dmaend_timer = timer_alloc(machine, dmaend_callback, 0);
+    state->dmaend_timer = machine->scheduler().timer_alloc(FUNC(dmaend_callback));
 }
 
 static MACHINE_RESET( moo )

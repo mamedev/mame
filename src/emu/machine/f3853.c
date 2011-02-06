@@ -134,7 +134,7 @@ void f3853_device::device_start()
 		}
 	}
 
-	m_timer = timer_alloc(&m_machine, f3853_timer_callback, (void *)this );
+	m_timer = m_machine.scheduler().timer_alloc(FUNC(f3853_timer_callback), (void *)this );
 
 	state_save_register_device_item(this, 0, m_high );
 	state_save_register_device_item(this, 0, m_low );

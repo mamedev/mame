@@ -347,7 +347,7 @@ static void niyanpai_gfxdraw(running_machine *machine, int vram)
 	}
 
 	nb19010_busyflag = 0;
-	timer_set(machine, attotime::from_nsec(1650 * nb19010_busyctr), NULL, 0, blitter_timer_callback);
+	machine->scheduler().timer_set(attotime::from_nsec(1650 * nb19010_busyctr), FUNC(blitter_timer_callback));
 }
 
 /******************************************************************************

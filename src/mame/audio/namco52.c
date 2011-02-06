@@ -142,7 +142,7 @@ WRITE8_DEVICE_HANDLER( namco_52xx_write )
 {
 	namco_52xx_state *state = get_safe_token(device);
 
-	timer_call_after_resynch(device->machine, (void *)device, data, namco_52xx_latch_callback);
+	device->machine->scheduler().synchronize(FUNC(namco_52xx_latch_callback), data, (void *)device);
 
 	cpu_set_input_line(state->cpu, 0, ASSERT_LINE);
 
@@ -154,7 +154,7 @@ WRITE8_DEVICE_HANDLER( namco_52xx_write )
 
 	/* the 52xx uses TSTI to check for an interrupt; it also may be handling
        a timer interrupt, so we need to ensure the IRQ line is held long enough */
-	timer_set(device->machine, attotime::from_usec(5*21), (void *)device, 0, namco_52xx_irq_clear);
+	device->machine->scheduler().timer_set(attotime::from_usec(5*21), FUNC(namco_52xx_irq_clear), 0, (void *)device);
 }
 
 
@@ -220,7 +220,7 @@ static DEVICE_START( namco_52xx )
 
 	/* start the external clock */
 	if (intf->extclock != 0)
-		timer_pulse(device->machine, attotime(0, intf->extclock), (void *)device, 0, external_clock_pulse);
+		device->machine->scheduler().timer_pulse(attotime(0, intf->extclock), FUNC(external_clock_pulse), 0, device);
 }
 
 

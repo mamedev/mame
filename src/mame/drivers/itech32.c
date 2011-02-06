@@ -678,7 +678,7 @@ static TIMER_CALLBACK( delayed_sound_data_w )
 static WRITE16_HANDLER( sound_data_w )
 {
 	if (ACCESSING_BITS_0_7)
-		timer_call_after_resynch(space->machine, NULL, data & 0xff, delayed_sound_data_w);
+		space->machine->scheduler().synchronize(FUNC(delayed_sound_data_w), data & 0xff);
 }
 
 
@@ -691,7 +691,7 @@ static READ32_HANDLER( sound_data32_r )
 static WRITE32_HANDLER( sound_data32_w )
 {
 	if (ACCESSING_BITS_16_23)
-		timer_call_after_resynch(space->machine, NULL, (data >> 16) & 0xff, delayed_sound_data_w);
+		space->machine->scheduler().synchronize(FUNC(delayed_sound_data_w), (data >> 16) & 0xff);
 }
 
 

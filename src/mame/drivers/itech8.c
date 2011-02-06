@@ -632,7 +632,7 @@ static INTERRUPT_GEN( generate_nmi )
 {
 	/* signal the NMI */
 	itech8_update_interrupts(device->machine, 1, -1, -1);
-	timer_set(device->machine, attotime::from_usec(1), NULL, 0, irq_off);
+	device->machine->scheduler().timer_set(attotime::from_usec(1), FUNC(irq_off));
 
 	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", device->machine->primary_screen->vpos());
 }
@@ -664,7 +664,7 @@ static TIMER_CALLBACK( behind_the_beam_update );
 static MACHINE_START( sstrike )
 {
 	/* we need to update behind the beam as well */
-	timer_set(machine, machine->primary_screen->time_until_pos(0), NULL, 32, behind_the_beam_update);
+	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(0), FUNC(behind_the_beam_update), 32);
 }
 
 static MACHINE_RESET( itech8 )
@@ -707,7 +707,7 @@ static TIMER_CALLBACK( behind_the_beam_update )
 	if (scanline >= 256) scanline = 0;
 
 	/* set a new timer */
-	timer_set(machine, machine->primary_screen->time_until_pos(scanline), NULL, (scanline << 8) + interval, behind_the_beam_update);
+	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(scanline), FUNC(behind_the_beam_update), (scanline << 8) + interval);
 }
 
 
@@ -806,7 +806,7 @@ static TIMER_CALLBACK( delayed_sound_data_w )
 
 static WRITE8_HANDLER( sound_data_w )
 {
-	timer_call_after_resynch(space->machine, NULL, data, delayed_sound_data_w);
+	space->machine->scheduler().synchronize(FUNC(delayed_sound_data_w), data);
 }
 
 
@@ -817,7 +817,7 @@ static WRITE8_HANDLER( gtg2_sound_data_w )
 	       ((data & 0x5d) << 1) |
 	       ((data & 0x20) >> 3) |
 	       ((data & 0x02) << 5);
-	timer_call_after_resynch(space->machine, NULL, data, delayed_sound_data_w);
+	space->machine->scheduler().synchronize(FUNC(delayed_sound_data_w), data);
 }
 
 

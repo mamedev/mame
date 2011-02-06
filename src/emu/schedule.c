@@ -50,8 +50,6 @@
 
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
-#define TEMPLOG	0
-
 
 
 //**************************************************************************
@@ -69,17 +67,252 @@ enum
 
 
 //**************************************************************************
-//  MACROS
+//  EMU TIMER
 //**************************************************************************
 
-// these are macros to ensure inlining in device_scheduler::timeslice
-#define ATTOTIME_LT(a,b)		((a).seconds < (b).seconds || ((a).seconds == (b).seconds && (a).attoseconds < (b).attoseconds))
-#define ATTOTIME_NORMALIZE(a)	do { if ((a).attoseconds >= ATTOSECONDS_PER_SECOND) { (a).seconds++; (a).attoseconds -= ATTOSECONDS_PER_SECOND; } } while (0)
+//-------------------------------------------------
+//  emu_timer - constructor
+//-------------------------------------------------
+
+emu_timer::emu_timer()
+	: m_machine(NULL),
+	  m_next(NULL),
+	  m_prev(NULL),
+	  m_callback(NULL),
+	  m_param(0),
+	  m_ptr(NULL),
+	  m_func(NULL),
+	  m_enabled(false),
+	  m_temporary(false),
+	  m_period(attotime::zero),
+	  m_start(attotime::zero),
+	  m_expire(attotime::never),
+	  m_device(NULL),
+	  m_id(0)
+{
+}
+
+
+//-------------------------------------------------
+//  init - completely initialize the state when
+//  re-allocated as a non-device timer
+//-------------------------------------------------
+
+emu_timer &emu_timer::init(running_machine &machine, timer_expired_func callback, const char *name, void *ptr, bool temporary)
+{
+	// ensure the entire timer state is clean
+	m_machine = &machine;
+	m_next = NULL;
+	m_prev = NULL;
+	m_callback = callback;
+	m_param = 0;
+	m_ptr = ptr;
+	m_func = (name != NULL) ? name : "?";
+	m_enabled = false;
+	m_temporary = temporary;
+	m_period = attotime::never;
+	m_start = machine.time();
+	m_expire = attotime::never;
+	m_device = NULL;
+	m_id = 0;
+
+	// if we're not temporary, register ourselves with the save state system
+	if (!m_temporary)
+		register_save();
+	
+	// insert into the list
+	machine.scheduler().timer_list_insert(*this);
+	return *this;
+}
+
+
+//-------------------------------------------------
+//  init - completely initialize the state when
+//  re-allocated as a device timer
+//-------------------------------------------------
+
+emu_timer &emu_timer::init(device_t &device, device_timer_id id, void *ptr, bool temporary)
+{
+	// ensure the entire timer state is clean
+	m_machine = device.machine;
+	m_next = NULL;
+	m_prev = NULL;
+	m_callback = NULL;
+	m_param = 0;
+	m_ptr = ptr;
+	m_func = NULL;
+	m_enabled = false;
+	m_temporary = temporary;
+	m_period = attotime::never;
+	m_start = machine().time();
+	m_expire = attotime::never;
+	m_device = &device;
+	m_id = id;
+
+	// if we're not temporary, register ourselves with the save state system
+	if (!m_temporary)
+		register_save();
+	
+	// insert into the list
+	machine().scheduler().timer_list_insert(*this);
+	return *this;
+}
+
+
+//-------------------------------------------------
+//  release - release us from the global list
+//  management when deallocating
+//-------------------------------------------------
+
+emu_timer &emu_timer::release()
+{
+	// unhook us from the global list
+	machine().scheduler().timer_list_remove(*this);
+	return *this;
+}
+
+
+//-------------------------------------------------
+//  enable - enable/disable a timer
+//-------------------------------------------------
+
+bool emu_timer::enable(bool enable)
+{
+	// reschedule only if the state has changed
+	bool old = m_enabled;
+	if (old != enable)
+	{
+		// set the enable flag
+		m_enabled = enable;
+
+		// remove the timer and insert back into the list
+		machine().scheduler().timer_list_remove(*this);
+		machine().scheduler().timer_list_insert(*this);
+	}
+	return old;
+}
+
+
+//-------------------------------------------------
+//  adjust - adjust the time when this timer will 
+//  fire and specify a period for subsequent 
+//  firings
+//-------------------------------------------------
+
+void emu_timer::adjust(attotime start_delay, INT32 param, attotime period)
+{
+	// if this is the callback timer, mark it modified
+	device_scheduler &scheduler = machine().scheduler();
+	if (scheduler.m_callback_timer == this)
+		scheduler.m_callback_timer_modified = true;
+
+	// compute the time of the next firing and insert into the list
+	m_param = param;
+	m_enabled = true;
+
+	// clamp negative times to 0
+	if (start_delay.seconds < 0)
+		start_delay = attotime::zero;
+
+	// set the start and expire times
+	m_start = scheduler.time();
+	m_expire = m_start + start_delay;
+	m_period = period;
+
+	// remove and re-insert the timer in its new order
+	scheduler.timer_list_remove(*this);
+	scheduler.timer_list_insert(*this);
+
+	// if this was inserted as the head, abort the current timeslice and resync
+	if (this == scheduler.first_timer())
+		scheduler.abort_timeslice();
+}
+
+
+//-------------------------------------------------
+//  elapsed - return the amount of time since the
+//  timer was started
+//-------------------------------------------------
+
+attotime emu_timer::elapsed() const
+{
+	return machine().time() - m_start;
+}
+
+
+//-------------------------------------------------
+//  remaining - return the amount of time 
+//  remaining until the timer expires
+//-------------------------------------------------
+
+attotime emu_timer::remaining() const 
+{
+	return m_expire - machine().time(); 
+}
+
+
+//-------------------------------------------------
+//  timer_register_save - register ourself with
+//  the save state system
+//-------------------------------------------------
+
+void emu_timer::register_save()
+{
+	// determine our instance number and name
+	int index = 0;
+	astring name;
+	
+	// for non-device timers, it is an index based on the callback function name
+	if (m_device == NULL)
+	{
+		name = m_func;
+		for (emu_timer *curtimer = machine().scheduler().first_timer(); curtimer != NULL; curtimer = curtimer->next())
+			if (!curtimer->m_temporary && curtimer->m_device == NULL && strcmp(curtimer->m_func, m_func) == 0)
+				index++;
+	}
+	
+	// for device timers, it is an index based on the device and timer ID
+	else
+	{
+		name.printf("%s/%d", m_device->tag(), m_id);
+		for (emu_timer *curtimer = machine().scheduler().first_timer(); curtimer != NULL; curtimer = curtimer->next())
+			if (!curtimer->m_temporary && curtimer->m_device != NULL && curtimer->m_device == m_device && curtimer->m_id == m_id)
+				index++;
+	}
+
+	// save the bits
+	state_save_register_item(m_machine, "timer", name, index, m_param);
+	state_save_register_item(m_machine, "timer", name, index, m_enabled);
+	state_save_register_item(m_machine, "timer", name, index, m_period.seconds);
+	state_save_register_item(m_machine, "timer", name, index, m_period.attoseconds);
+	state_save_register_item(m_machine, "timer", name, index, m_start.seconds);
+	state_save_register_item(m_machine, "timer", name, index, m_start.attoseconds);
+	state_save_register_item(m_machine, "timer", name, index, m_expire.seconds);
+	state_save_register_item(m_machine, "timer", name, index, m_expire.attoseconds);
+}
+
+
+//-------------------------------------------------
+//  schedule_next_period - schedule the next
+//  period
+//-------------------------------------------------
+
+void emu_timer::schedule_next_period()
+{
+	// advance by one period
+	m_start = m_expire;
+	m_expire += m_period;
+
+	// remove and re-insert us
+	device_scheduler &scheduler = machine().scheduler();
+	scheduler.timer_list_remove(*this);
+	scheduler.timer_list_insert(*this);
+}
 
 
 
 //**************************************************************************
-//  CORE CPU EXECUTION
+//  DEVICE SCHEDULER
 //**************************************************************************
 
 //-------------------------------------------------
@@ -88,10 +321,31 @@ enum
 
 device_scheduler::device_scheduler(running_machine &machine) :
 	m_machine(machine),
-	m_quantum_set(false),
 	m_executing_device(NULL),
-	m_execute_list(NULL)
+	m_execute_list(NULL),
+	m_basetime(attotime::zero),
+	m_timer_list(NULL),
+	m_timer_allocator(machine.m_respool),
+	m_callback_timer(NULL),
+	m_callback_timer_modified(false),
+	m_callback_timer_expire_time(attotime::zero),
+	m_quantum_list(machine.m_respool),
+	m_quantum_allocator(machine.m_respool),
+	m_quantum_minimum(ATTOSECONDS_IN_NSEC(1) / 1000)
 {
+	// append a single never-expiring timer so there is always one in the list
+	m_timer_list = &m_timer_allocator.alloc()->init(m_machine, NULL, NULL, NULL, true);
+	m_timer_list->adjust(attotime::never);
+}
+
+
+// remove me once save state registration is embedded
+void device_scheduler::register_for_save()
+{
+	// register global states
+	state_save_register_item(&m_machine, "timer", NULL, 0, m_basetime.seconds);
+	state_save_register_item(&m_machine, "timer", NULL, 0, m_basetime.attoseconds);
+	state_save_register_postload(&m_machine, &state_postload_stub<device_scheduler, &device_scheduler::postload>, this);
 }
 
 
@@ -101,6 +355,42 @@ device_scheduler::device_scheduler(running_machine &machine) :
 
 device_scheduler::~device_scheduler()
 {
+	// remove all timers
+	while (m_timer_list != NULL)
+		m_timer_allocator.reclaim(m_timer_list->release());
+}
+
+
+//-------------------------------------------------
+//  time - return the current time
+//-------------------------------------------------
+
+attotime device_scheduler::time() const
+{
+	// if we're currently in a callback, use the timer's expiration time as a base
+	if (m_callback_timer != NULL)
+		return m_callback_timer_expire_time;
+
+	// if we're executing as a particular CPU, use its local time as a base
+	// otherwise, return the global base time
+	return (m_executing_device != NULL) ? m_executing_device->local_time() : m_basetime;
+}
+
+
+//-------------------------------------------------
+//  can_save - return true if it's safe to save
+//  (i.e., no temporary timers outstanding)
+//-------------------------------------------------
+
+bool device_scheduler::can_save() const
+{
+	// if any live temporary timers exit, fail
+	for (emu_timer *timer = m_timer_list; timer != NULL; timer = timer->next())
+		if (timer->m_temporary)
+			return false;
+
+	// otherwise, we're good
+	return true;
 }
 
 
@@ -112,34 +402,23 @@ device_scheduler::~device_scheduler()
 void device_scheduler::timeslice()
 {
 	bool call_debugger = ((m_machine.debug_flags & DEBUG_FLAG_ENABLED) != 0);
-	timer_execution_state *timerexec = timer_get_execution_state(&m_machine);
-if (TEMPLOG) printf("Timeslice start\n");
 
 	// build the execution list if we don't have one yet
 	if (m_execute_list == NULL)
 		rebuild_execute_list();
 
+	// execute timers
+	execute_timers();
+
 	// loop until we hit the next timer
-	while (ATTOTIME_LT(timerexec->basetime, timerexec->nextfire))
+	while (m_basetime < m_timer_list->m_expire)
 	{
-if (TEMPLOG)
-{
-	void timer_print_first_timer(running_machine *machine);
-	printf("Timeslice loop: basetime=%15.6f\n", timerexec->basetime.as_double());
-	timer_print_first_timer(&m_machine);
-}
-
-
 		// by default, assume our target is the end of the next quantum
-		attotime target;
-		target.seconds = timerexec->basetime.seconds;
-		target.attoseconds = timerexec->basetime.attoseconds + timerexec->curquantum;
-		ATTOTIME_NORMALIZE(target);
+		attotime target = m_basetime + attotime(0, m_quantum_list.first()->m_actual);
 
 		// however, if the next timer is going to fire before then, override
-		assert((timerexec->nextfire - target).seconds <= 0);
-		if (ATTOTIME_LT(timerexec->nextfire, target))
-			target = timerexec->nextfire;
+		if (m_timer_list->m_expire < target)
+			target = m_timer_list->m_expire;
 
 		LOG(("------------------\n"));
 		LOG(("cpu_timeslice: target = %s\n", target.as_string()));
@@ -148,7 +427,7 @@ if (TEMPLOG)
 		UINT32 suspendchanged = 0;
 		for (device_execute_interface *exec = m_execute_list; exec != NULL; exec = exec->m_nextexec)
 		{
-			suspendchanged |= (exec->m_suspend ^ exec->m_nextsuspend);
+			suspendchanged |= exec->m_suspend ^ exec->m_nextsuspend;
 			exec->m_suspend = exec->m_nextsuspend;
 			exec->m_nextsuspend &= ~SUSPEND_REASON_TIMESLICE;
 			exec->m_eatcycles = exec->m_nexteatcycles;
@@ -185,7 +464,6 @@ if (TEMPLOG)
 						// note that this global variable cycles_stolen can be modified
 						// via the call to cpu_execute
 						exec->m_cycles_stolen = 0;
-if (TEMPLOG) printf("Executing %s for %d cycles\n", exec->device().tag(), ran);
 						m_executing_device = exec;
 						*exec->m_icountptr = exec->m_cycles_running;
 						if (!call_debugger)
@@ -204,30 +482,19 @@ if (TEMPLOG) printf("Executing %s for %d cycles\n", exec->device().tag(), ran);
 						ran -= exec->m_cycles_stolen;
 						g_profiler.stop();
 					}
-else
-if (TEMPLOG) printf("Skipping %s for %d cycles\n", exec->device().tag(), ran);
 
 					// account for these cycles
 					exec->m_totalcycles += ran;
 
 					// update the local time for this CPU
-					attoseconds_t actualdelta = exec->m_attoseconds_per_cycle * ran;
-					exec->m_localtime.attoseconds += actualdelta;
-					ATTOTIME_NORMALIZE(exec->m_localtime);
+					exec->m_localtime += attotime(0, exec->m_attoseconds_per_cycle * ran);
 					LOG(("         %d ran, %d total, time = %s\n", ran, (INT32)exec->m_totalcycles, exec->m_localtime.as_string()));
 
-					// if the new local CPU time is less than our target, move the target up
-					if (ATTOTIME_LT(exec->m_localtime, target))
+					// if the new local CPU time is less than our target, move the target up, but not before the base
+					if (exec->m_localtime < target)
 					{
 						assert(exec->m_localtime < target);
-						target = exec->m_localtime;
-
-						// however, if this puts us before the base, clamp to the base as a minimum
-						if (ATTOTIME_LT(target, timerexec->basetime))
-						{
-							assert(target < timerexec->basetime);
-							target = timerexec->basetime;
-						}
+						target = max(exec->m_localtime, m_basetime);
 						LOG(("         (new target)\n"));
 					}
 				}
@@ -236,49 +503,14 @@ if (TEMPLOG) printf("Skipping %s for %d cycles\n", exec->device().tag(), ran);
 		m_executing_device = NULL;
 
 		// update the base time
-		timerexec->basetime = target;
+		m_basetime = target;
 	}
-if (TEMPLOG) printf("Timeslice end\n");
-
-	// execute timers
-	timer_execute_timers(&m_machine);
 }
 
 
 //-------------------------------------------------
-//  boost_interleave - temporarily boosts the
-//  interleave factor
-//-------------------------------------------------
-
-void device_scheduler::boost_interleave(attotime timeslice_time, attotime boost_duration)
-{
-	// ignore timeslices > 1 second
-	if (timeslice_time.seconds > 0)
-		return;
-	timer_add_scheduling_quantum(&m_machine, timeslice_time.attoseconds, boost_duration);
-}
-
-
-//-------------------------------------------------
-//  eat_all_cycles - eat a ton of cycles on all
-//  CPUs to force a quick exit
-//-------------------------------------------------
-
-void device_scheduler::eat_all_cycles()
-{
-	for (device_execute_interface *exec = m_execute_list; exec != NULL; exec = exec->m_nextexec)
-		exec->eat_cycles(1000000000);
-}
-
-
-
-//**************************************************************************
-//  GLOBAL HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  cpuexec_abort_timeslice - abort execution
-//  for the current timeslice
+//  abort_timeslice - abort execution for the 
+//  current timeslice
 //-------------------------------------------------
 
 void device_scheduler::abort_timeslice()
@@ -299,8 +531,8 @@ void device_scheduler::trigger(int trigid, attotime after)
 		rebuild_execute_list();
 
 	// if we have a non-zero time, schedule a timer
-	if (after.attoseconds != 0 || after.seconds != 0)
-		timer_set(&m_machine, after, (void *)this, trigid, static_timed_trigger);
+	if (after != attotime::zero)
+		timer_set(after, MFUNC(timer_expired, device_scheduler, timed_trigger), trigid, this);
 
 	// send the trigger to everyone who cares
 	else
@@ -310,13 +542,125 @@ void device_scheduler::trigger(int trigid, attotime after)
 
 
 //-------------------------------------------------
-//  static_timed_trigger - generate a trigger
-//  after a given amount of time
+//  boost_interleave - temporarily boosts the
+//  interleave factor
 //-------------------------------------------------
 
-TIMER_CALLBACK( device_scheduler::static_timed_trigger )
+void device_scheduler::boost_interleave(attotime timeslice_time, attotime boost_duration)
 {
-	reinterpret_cast<device_scheduler *>(ptr)->trigger(param);
+	// ignore timeslices > 1 second
+	if (timeslice_time.seconds > 0)
+		return;
+	add_scheduling_quantum(timeslice_time, boost_duration);
+}
+
+
+//-------------------------------------------------
+//  timer_alloc - allocate a global non-device
+//  timer and return a pointer
+//-------------------------------------------------
+
+emu_timer *device_scheduler::timer_alloc(timer_expired_func callback, const char *name, void *ptr)
+{
+	return &m_timer_allocator.alloc()->init(m_machine, callback, name, ptr, false);
+}
+
+
+//-------------------------------------------------
+//  timer_set - allocate an anonymous non-device
+//  timer and set it to go off after the given
+//  amount of time
+//-------------------------------------------------
+
+void device_scheduler::timer_set(attotime duration, timer_expired_func callback, const char *name, int param, void *ptr)
+{
+	m_timer_allocator.alloc()->init(m_machine, callback, name, ptr, true).adjust(duration, param);
+}
+
+
+//-------------------------------------------------
+//  timer_pulse - allocate an anonymous non-device
+//  timer and set it to go off at the given
+//  frequency
+//-------------------------------------------------
+
+void device_scheduler::timer_pulse(attotime period, timer_expired_func callback, const char *name, int param, void *ptr)
+{
+	m_timer_allocator.alloc()->init(m_machine, callback, name, ptr, true).adjust(period, param, period);
+}
+
+
+//-------------------------------------------------
+//  timer_alloc - allocate a global device timer
+//  and return a pointer
+//-------------------------------------------------
+
+emu_timer *device_scheduler::timer_alloc(device_t &device, device_timer_id id, void *ptr)
+{
+	return &m_timer_allocator.alloc()->init(device, id, ptr, false);
+}
+
+
+//-------------------------------------------------
+//  timer_set - allocate an anonymous device timer
+//  and set it to go off after the given amount of
+//  time
+//-------------------------------------------------
+
+void device_scheduler::timer_set(attotime duration, device_t &device, device_timer_id id, int param, void *ptr)
+{
+	m_timer_allocator.alloc()->init(device, id, ptr, true).adjust(duration, param);
+}
+
+
+//-------------------------------------------------
+//  eat_all_cycles - eat a ton of cycles on all
+//  CPUs to force a quick exit
+//-------------------------------------------------
+
+void device_scheduler::eat_all_cycles()
+{
+	for (device_execute_interface *exec = m_execute_list; exec != NULL; exec = exec->m_nextexec)
+		exec->eat_cycles(1000000000);
+}
+
+
+//-------------------------------------------------
+//  timed_trigger - generate a trigger after a 
+//  given amount of time
+//-------------------------------------------------
+
+void device_scheduler::timed_trigger(running_machine &machine, INT32 param)
+{
+	trigger(param);
+}
+
+
+//-------------------------------------------------
+//  postload - after loading a save state
+//-------------------------------------------------
+
+void device_scheduler::postload()
+{
+	// remove all timers and make a private list of permanent ones
+	simple_list<emu_timer> private_list;
+	while (m_timer_list != NULL)
+	{
+		emu_timer &timer = *m_timer_list;
+
+		// temporary timers go away entirely
+		if (timer.m_temporary)
+			m_timer_allocator.reclaim(timer.release());
+
+		// permanent ones get added to our private list
+		else
+			private_list.append(timer_list_remove(timer));
+	}
+
+	// now re-insert them; this effectively re-sorts them by time
+	emu_timer *timer;
+	while ((timer = private_list.detach_head()) != NULL)
+		timer_list_insert(*timer);
 }
 
 
@@ -335,15 +679,13 @@ void device_scheduler::compute_perfect_interleave()
 	device_execute_interface *first = m_execute_list;
 	if (first != NULL)
 	{
+		// start with a huge time factor and find the 2nd smallest cycle time
 		attoseconds_t smallest = first->minimum_quantum();
 		attoseconds_t perfect = ATTOSECONDS_PER_SECOND - 1;
-
-		// start with a huge time factor and find the 2nd smallest cycle time
 		for (device_execute_interface *exec = first->m_nextexec; exec != NULL; exec = exec->m_nextexec)
 		{
-			attoseconds_t curquantum = exec->minimum_quantum();
-
 			// find the 2nd smallest cycle interval
+			attoseconds_t curquantum = exec->minimum_quantum();
 			if (curquantum < smallest)
 			{
 				perfect = smallest;
@@ -353,10 +695,14 @@ void device_scheduler::compute_perfect_interleave()
 				perfect = curquantum;
 		}
 
-		// adjust the final value
-		timer_set_minimum_quantum(&m_machine, perfect);
-
-		LOG(("Perfect interleave = %.9f, smallest = %.9f\n", ATTOSECONDS_TO_DOUBLE(perfect), ATTOSECONDS_TO_DOUBLE(smallest)));
+		// if this is a new minimum quantum, apply it
+		if (m_quantum_minimum != perfect)
+		{
+			// adjust all the actuals; this doesn't affect the current
+			m_quantum_minimum = perfect;
+			for (quantum_slot *quant = m_quantum_list.first(); quant != NULL; quant = quant->next())
+				quant->m_actual = MAX(quant->m_requested, m_quantum_minimum);
+		}
 	}
 }
 
@@ -370,7 +716,7 @@ void device_scheduler::compute_perfect_interleave()
 void device_scheduler::rebuild_execute_list()
 {
 	// if we haven't yet set a scheduling quantum, do it now
-	if (!m_quantum_set)
+	if (m_quantum_list.first() == NULL)
 	{
 		// set the core scheduling quantum
 		attotime min_quantum = m_machine.config->m_minimum_quantum;
@@ -393,11 +739,11 @@ void device_scheduler::rebuild_execute_list()
 			min_quantum = min(attotime(0, exec->minimum_quantum()), min_quantum);
 		}
 
+		// make sure it's no higher than 60Hz
+		min_quantum = min(min_quantum, attotime::from_hz(60));
+
 		// inform the timer system of our decision
-		assert(min_quantum.seconds == 0);
-		timer_add_scheduling_quantum(&m_machine, min_quantum.attoseconds, attotime::never);
-if (TEMPLOG) printf("Setting quantum: %08X%08X\n", (UINT32)(min_quantum.attoseconds >> 32), (UINT32)min_quantum.attoseconds);
-		m_quantum_set = true;
+		add_scheduling_quantum(min_quantum, attotime::never);
 	}
 
 	// start with an empty list
@@ -428,11 +774,220 @@ if (TEMPLOG) printf("Setting quantum: %08X%08X\n", (UINT32)(min_quantum.attoseco
 
 	// append the suspend list to the end of the active list
 	*active_tailptr = suspend_list;
-if (TEMPLOG)
+}
+
+
+//-------------------------------------------------
+//  timer_list_insert - insert a new timer into
+//  the list at the appropriate location
+//-------------------------------------------------
+
+emu_timer &device_scheduler::timer_list_insert(emu_timer &timer)
 {
-	printf("Execute list:");
-	for (exec = m_execute_list; exec != NULL; exec = exec->m_nextexec)
-		printf(" %s", exec->device().tag());
-	printf("\n");
+	// disabled timers sort to the end
+	attotime expire = timer.m_enabled ? timer.m_expire : attotime::never;
+
+	// loop over the timer list
+	emu_timer *prevtimer = NULL;
+	for (emu_timer *curtimer = m_timer_list; curtimer != NULL; prevtimer = curtimer, curtimer = curtimer->next())
+	{
+		// if the current list entry expires after us, we should be inserted before it
+		if (curtimer->m_expire > expire)
+		{
+			// link the new guy in before the current list entry
+			timer.m_prev = curtimer->m_prev;
+			timer.m_next = curtimer;
+
+			if (curtimer->m_prev != NULL)
+				curtimer->m_prev->m_next = &timer;
+			else
+				m_timer_list = &timer;
+
+			curtimer->m_prev = &timer;
+			return timer;
+		}
+	}
+
+	// need to insert after the last one
+	if (prevtimer != NULL)
+		prevtimer->m_next = &timer;
+	else
+		m_timer_list = &timer;
+
+	timer.m_prev = prevtimer;
+	timer.m_next = NULL;
+	return timer;
 }
+
+
+//-------------------------------------------------
+//  timer_list_remove - remove a timer from the
+//  linked list
+//-------------------------------------------------
+
+emu_timer &device_scheduler::timer_list_remove(emu_timer &timer)
+{
+	// remove it from the list
+	if (timer.m_prev != NULL)
+		timer.m_prev->m_next = timer.m_next;
+	else
+		m_timer_list = timer.m_next;
+
+	if (timer.m_next != NULL)
+		timer.m_next->m_prev = timer.m_prev;
+
+	return timer;
 }
+
+
+//-------------------------------------------------
+//  execute_timers - execute timers and update 
+//  scheduling quanta
+//-------------------------------------------------
+
+void device_scheduler::execute_timers()
+{
+	// if the current quantum has expired, find a new one
+	while (m_basetime >= m_quantum_list.first()->m_expire)
+		m_quantum_allocator.reclaim(m_quantum_list.detach_head());
+
+	LOG(("timer_set_global_time: new=%s head->expire=%s\n", m_basetime.as_string(), m_timer_list->m_expire.as_string()));
+
+	// now process any timers that are overdue
+	while (m_timer_list->m_expire <= m_basetime)
+	{
+		// if this is a one-shot timer, disable it now
+		emu_timer &timer = *m_timer_list;
+		bool was_enabled = timer.m_enabled;
+		if (timer.m_period == attotime::zero || timer.m_period == attotime::never)
+			timer.m_enabled = false;
+
+		// set the global state of which callback we're in
+		m_callback_timer_modified = false;
+		m_callback_timer = &timer;
+		m_callback_timer_expire_time = timer.m_expire;
+
+		// call the callback
+		if (was_enabled)
+		{
+			g_profiler.start(PROFILER_TIMER_CALLBACK);
+
+			if (timer.m_device != NULL)
+				timer.m_device->timer_expired(timer, timer.m_id, timer.m_param, timer.m_ptr);
+			else if (timer.m_callback != NULL)
+				(*timer.m_callback)(&m_machine, timer.m_ptr, timer.m_param);
+
+			g_profiler.stop();
+		}
+
+		// clear the callback timer global
+		m_callback_timer = NULL;
+
+		// reset or remove the timer, but only if it wasn't modified during the callback
+		if (!m_callback_timer_modified)
+		{
+			// if the timer is temporary, remove it now
+			if (timer.m_temporary)
+				m_timer_allocator.reclaim(timer.release());
+
+			// otherwise, reschedule it
+			else
+				timer.schedule_next_period();
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  add_scheduling_quantum - add a scheduling 
+//  quantum; the smallest active one is the one 
+//  that is in use
+//-------------------------------------------------
+
+void device_scheduler::add_scheduling_quantum(attotime quantum, attotime duration)
+{
+	assert(quantum.seconds == 0);
+	
+	attotime curtime = time();
+	attotime expire = curtime + duration;
+
+	// figure out where to insert ourselves, expiring any quanta that are out-of-date
+	quantum_slot *insert_after = NULL;
+	quantum_slot *next;
+	for (quantum_slot *quant = m_quantum_list.first(); quant != NULL; quant = next)
+	{
+		// if this quantum is expired, nuke it
+		next = quant->next();
+		if (curtime >= quant->m_expire)
+			m_quantum_allocator.reclaim(m_quantum_list.detach(*quant));
+	
+		// if this quantum is shorter than us, we need to be inserted afterwards
+		else if (quant->m_requested <= quantum.attoseconds)
+			insert_after = quant;
+	}
+	
+	// if we found an exact match, just take the maximum expiry time
+	if (insert_after != NULL && insert_after->m_requested == quantum.attoseconds)
+		insert_after->m_expire = max(insert_after->m_expire, expire);
+	
+	// otherwise, allocate a new quantum and insert it after the one we picked
+	else
+	{
+		quantum_slot &quant = *m_quantum_allocator.alloc();
+		quant.m_requested = quantum.attoseconds;
+		quant.m_actual = MAX(quantum.attoseconds, m_quantum_minimum);
+		quant.m_expire = expire;
+		m_quantum_list.insert_after(quant, insert_after);
+	}
+}
+
+
+
+
+
+attotime timer_get_time(running_machine *machine) { return machine->time(); }
+
+
+
+/***************************************************************************
+//  DEBUGGING
+***************************************************************************/
+
+#if 0
+//-------------------------------------------------
+//  timer_logtimers - log all the timers
+//-------------------------------------------------
+
+static void timer_logtimers(running_machine *machine)
+{
+	emu_timer *t;
+
+	logerror("===============\n");
+	logerror("TIMER LOG START\n");
+	logerror("===============\n");
+
+	logerror("Enqueued timers:\n");
+	for (t = global->activelist; t; t = t->next)
+		logerror("  Start=%15.6f Exp=%15.6f Per=%15.6f Ena=%d Tmp=%d (%s:%d[%s])\n",
+			t->start.as_double(), t->expire.as_double(), t->period.as_double(), t->enabled, t->temporary, t->file, t->line, t->func);
+
+	logerror("Free timers:\n");
+	for (t = global->freelist; t; t = t->next)
+		logerror("  Start=%15.6f Exp=%15.6f Per=%15.6f Ena=%d Tmp=%d (%s:%d[%s])\n",
+			t->start.as_double(), t->expire.as_double(), t->period.as_double(), t->enabled, t->temporary, t->file, t->line, t->func);
+
+	logerror("==============\n");
+	logerror("TIMER LOG STOP\n");
+	logerror("==============\n");
+}
+
+
+void timer_print_first_timer(running_machine *machine)
+{
+	emu_timer *t = global->activelist;
+	printf("  Start=%15.6f Exp=%15.6f Per=%15.6f Ena=%d Tmp=%d (%s)\n",
+		t->start.as_double(), t->expire.as_double(), t->period.as_double(), t->enabled, t->temporary, t->func);
+}
+
+
+#endif

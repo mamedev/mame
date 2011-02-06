@@ -470,7 +470,7 @@ static void k054539_init_chip(device_t *device, k054539_state *info)
 		// One or more of the registers must be the timer period
 		// And anyway, this particular frequency is probably wrong
 		// 480 hz is TRUSTED by gokuparo disco stage - the looping sample doesn't line up otherwise
-		timer_pulse(device->machine, attotime::from_hz(480), info, 0, k054539_irq);
+		device->machine->scheduler().timer_pulse(attotime::from_hz(480), FUNC(k054539_irq), 0, info);
 
 	info->stream = device->machine->sound().stream_alloc(*device, 0, 2, device->clock(), info, k054539_update);
 

@@ -106,7 +106,7 @@ static TIMER_CALLBACK( kengo_scanline_interrupt );
 static MACHINE_START( m72 )
 {
 	m72_state *state = machine->driver_data<m72_state>();
-	state->scanline_timer = timer_alloc(machine, m72_scanline_interrupt, NULL);
+	state->scanline_timer = machine->scheduler().timer_alloc(FUNC(m72_scanline_interrupt));
 
 	state_save_register_global(machine, state->mcu_sample_addr);
 	state_save_register_global(machine, state->mcu_snd_cmd_latch);
@@ -115,7 +115,7 @@ static MACHINE_START( m72 )
 static MACHINE_START( kengo )
 {
 	m72_state *state = machine->driver_data<m72_state>();
-	state->scanline_timer = timer_alloc(machine, kengo_scanline_interrupt, NULL);
+	state->scanline_timer = machine->scheduler().timer_alloc(FUNC(kengo_scanline_interrupt));
 
 	state_save_register_global(machine, state->mcu_sample_addr);
 	state_save_register_global(machine, state->mcu_snd_cmd_latch);
@@ -135,7 +135,7 @@ static MACHINE_RESET( m72 )
 	state->mcu_snd_cmd_latch = 0;
 
 	timer_adjust_oneshot(state->scanline_timer, machine->primary_screen->time_until_pos(0), 0);
-	timer_call_after_resynch(machine,  NULL, 0, synch_callback);
+	machine->scheduler().synchronize(FUNC(synch_callback));
 }
 
 static MACHINE_RESET( xmultipl )
@@ -259,11 +259,11 @@ static WRITE16_HANDLER( m72_main_mcu_w)
 		state->protection_ram[offset] = val;
 		cputag_set_input_line(space->machine, "mcu", 0, ASSERT_LINE);
 		/* Line driven, most likely by write line */
-		//timer_set(space->machine, space->machine->device<cpu_device>("mcu")->cycles_to_attotime(2), NULL, 0, mcu_irq0_clear);
-		//timer_set(space->machine, space->machine->device<cpu_device>("mcu")->cycles_to_attotime(0), NULL, 0, mcu_irq0_raise);
+		//space->machine->scheduler().timer_set(space->machine->device<cpu_device>("mcu")->cycles_to_attotime(2), FUNC(mcu_irq0_clear));
+		//space->machine->scheduler().timer_set(space->machine->device<cpu_device>("mcu")->cycles_to_attotime(0), FUNC(mcu_irq0_raise));
 	}
 	else
-		timer_call_after_resynch( space->machine, state->protection_ram, (offset<<16) | val, delayed_ram16_w);
+		space->machine->scheduler().synchronize( FUNC(delayed_ram16_w), (offset<<16) | val, state->protection_ram);
 }
 
 static WRITE8_HANDLER( m72_mcu_data_w )
@@ -273,7 +273,7 @@ static WRITE8_HANDLER( m72_mcu_data_w )
 	if (offset&1) val = (state->protection_ram[offset/2] & 0x00ff) | (data << 8);
 	else val = (state->protection_ram[offset/2] & 0xff00) | (data&0xff);
 
-	timer_call_after_resynch( space->machine, state->protection_ram, ((offset >>1 ) << 16) | val, delayed_ram16_w);
+	space->machine->scheduler().synchronize( FUNC(delayed_ram16_w), ((offset >>1 ) << 16) | val, state->protection_ram);
 }
 
 static READ8_HANDLER(m72_mcu_data_r )

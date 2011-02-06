@@ -524,7 +524,7 @@ void z80sio_device::sio_channel::start(z80sio_device *device, int index)
 {
 	m_device = device;
 	m_index = index;
-	m_receive_timer = timer_alloc(&m_device->m_machine, static_serial_callback, this);
+	m_receive_timer = device->machine->scheduler().timer_alloc(FUNC(static_serial_callback), this);
 }
 
 
@@ -713,7 +713,7 @@ int z80sio_device::sio_channel::rts()
 
 void z80sio_device::sio_channel::set_cts(int state)
 {
-	timer_call_after_resynch(&m_device->m_machine, this, (SIO_RR0_CTS << 1) + (state != 0), static_change_input_line);
+	m_device->machine->scheduler().synchronize(FUNC(static_change_input_line), (SIO_RR0_CTS << 1) + (state != 0), this);
 }
 
 
@@ -723,7 +723,7 @@ void z80sio_device::sio_channel::set_cts(int state)
 
 void z80sio_device::sio_channel::set_dcd(int state)
 {
-	timer_call_after_resynch(&m_device->m_machine, this, (SIO_RR0_DCD << 1) + (state != 0), static_change_input_line);
+	m_device->machine->scheduler().synchronize(FUNC(static_change_input_line), (SIO_RR0_DCD << 1) + (state != 0), this);
 }
 
 

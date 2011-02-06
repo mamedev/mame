@@ -1201,7 +1201,7 @@ static CPU_INIT( m6801 )
 	cpustate->io = device->space(AS_IO);
 
 	cpustate->clock = device->clock() / 4;
-	cpustate->sci_timer = timer_alloc(device->machine, sci_tick, cpustate);
+	cpustate->sci_timer = device->machine->scheduler().timer_alloc(FUNC(sci_tick), cpustate);
 
 	state_register(cpustate, "m6801");
 
@@ -1251,7 +1251,7 @@ static CPU_INIT( m6803 )
 	cpustate->io = device->space(AS_IO);
 
 	cpustate->clock = device->clock() / 4;
-	cpustate->sci_timer = timer_alloc(device->machine, sci_tick, cpustate);
+	cpustate->sci_timer = device->machine->scheduler().timer_alloc(FUNC(sci_tick), cpustate);
 
 	state_register(cpustate, "m6803");
 
@@ -1309,7 +1309,7 @@ static CPU_INIT( hd63701 )
 	cpustate->io = device->space(AS_IO);
 
 	cpustate->clock = device->clock() / 4;
-	cpustate->sci_timer = timer_alloc(device->machine, sci_tick, cpustate);
+	cpustate->sci_timer = device->machine->scheduler().timer_alloc(FUNC(sci_tick), cpustate);
 
 	state_register(cpustate, "hd63701");
 }

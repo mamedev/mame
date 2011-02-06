@@ -414,9 +414,9 @@ static TIMER_CALLBACK( equites_frq_adjuster_callback )
 static SOUND_START(equites)
 {
 	equites_state *state = machine->driver_data<equites_state>();
-	state->nmi_timer = timer_alloc(machine, equites_nmi_callback, NULL);
+	state->nmi_timer = machine->scheduler().timer_alloc(FUNC(equites_nmi_callback));
 
-	state->adjuster_timer = timer_alloc(machine, equites_frq_adjuster_callback, NULL);
+	state->adjuster_timer = machine->scheduler().timer_alloc(FUNC(equites_frq_adjuster_callback));
 	timer_adjust_periodic(state->adjuster_timer, attotime::from_hz(60), 0, attotime::from_hz(60));
 }
 

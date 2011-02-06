@@ -523,7 +523,7 @@ static void init_fbi(voodoo_state *v, fbi_state *f, void *memory, int fbmem)
 	}
 
 	/* allocate a VBLANK timer */
-	f->vblank_timer = timer_alloc(v->device->machine, vblank_callback, v);
+	f->vblank_timer = v->device->machine->scheduler().timer_alloc(FUNC(vblank_callback), v);
 	f->vblank = FALSE;
 
 	/* initialize the memory FIFO */
@@ -1034,7 +1034,7 @@ static TIMER_CALLBACK( vblank_callback )
 		swap_buffers(v);
 
 	/* set a timer for the next off state */
-	timer_set(machine, v->screen->time_until_pos(0), v, 0, vblank_off_callback);
+	machine->scheduler().timer_set(v->screen->time_until_pos(0), FUNC(vblank_off_callback), 0, v);
 
 	/* set internal state and call the client */
 	v->fbi.vblank = TRUE;
@@ -4595,7 +4595,7 @@ static DEVICE_START( voodoo )
 	v->pci.fifo.size = 64*2;
 	v->pci.fifo.in = v->pci.fifo.out = 0;
 	v->pci.stall_state = NOT_STALLED;
-	v->pci.continue_timer = timer_alloc(v->device->machine, stall_cpu_callback, v);
+	v->pci.continue_timer = v->device->machine->scheduler().timer_alloc(FUNC(stall_cpu_callback), v);
 
 	/* allocate memory */
 	tmumem0 = config->tmumem0;

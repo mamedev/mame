@@ -39,7 +39,7 @@ void MechMtr_config(running_machine *machine, int number)
 		meter_info[i].state     = 0;
 		meter_info[i].count     = 0;
 		meter_info[i].on		= 0;
-		meter_info[i].meter_timer = timer_alloc(machine, meter_callback, (void*)(FPTR)i);
+		meter_info[i].meter_timer = machine->scheduler().timer_alloc(FUNC(meter_callback), (void*)(FPTR)i);
 		timer_reset(meter_info[i].meter_timer, attotime::never);
 	}
 	number_mtr = number;

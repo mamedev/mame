@@ -66,14 +66,14 @@ static TIMER_CALLBACK( delayed_sound_w )
 	cpu_triggerint(machine->device("audiocpu"));
 
 	/* use a timer to make long transfers faster */
-	timer_set(machine, attotime::from_usec(50), NULL, 0, 0);
+	machine->scheduler().timer_set(attotime::from_usec(50), FUNC(0));
 }
 
 
 static WRITE16_HANDLER( main_sound_w )
 {
 	if (ACCESSING_BITS_0_7)
-		timer_call_after_resynch(space->machine, NULL, data & 0xff, delayed_sound_w);
+		space->machine->scheduler().synchronize(FUNC(delayed_sound_w), data & 0xff);
 }
 
 

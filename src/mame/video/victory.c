@@ -86,7 +86,7 @@ VIDEO_START( victory )
 	scrollx = scrolly = 0;
 	video_control = 0;
 	memset(&micro, 0, sizeof(micro));
-	micro.timer = timer_alloc(machine, NULL, NULL);
+	micro.timer = machine->scheduler().timer_alloc(FUNC(NULL));
 
 	/* register for state saving */
 	state_save_register_global_array(machine, victory_paletteram);
@@ -1125,7 +1125,7 @@ VIDEO_UPDATE( victory )
 			int bpix = bg[(x + scrollx) & 255];
 			scanline[x] = bpix | (fpix << 3);
 			if (fpix && (bpix & bgcollmask) && count++ < 128)
-				timer_set(screen->machine, screen->time_until_pos(y, x), NULL, x | (y << 8), bgcoll_irq_callback);
+				screen->machine->scheduler().timer_set(screen->time_until_pos(y, x), FUNC(bgcoll_irq_callback), x | (y << 8));
 		}
 	}
 

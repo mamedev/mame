@@ -72,7 +72,7 @@ static TIMER_CALLBACK( periodic_callback )
 	if (scanline > 262)
 		scanline = 0;
 
-	timer_set(machine, machine->primary_screen->time_until_pos(scanline), NULL, scanline, periodic_callback);
+	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(scanline), FUNC(periodic_callback), scanline);
 }
 
 
@@ -172,7 +172,7 @@ static MACHINE_RESET( firetrk )
 {
 	set_service_mode(machine, 0);
 
-	timer_call_after_resynch(machine, NULL, 0, periodic_callback);
+	machine->scheduler().synchronize(FUNC(periodic_callback));
 }
 
 

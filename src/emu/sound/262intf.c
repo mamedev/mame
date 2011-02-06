@@ -95,8 +95,8 @@ static DEVICE_START( ymf262 )
 	ymf262_set_irq_handler   (info->chip, IRQHandler_262, info);
 	ymf262_set_update_handler(info->chip, _stream_update, info);
 
-	info->timer[0] = timer_alloc(device->machine, timer_callback_262_0, info);
-	info->timer[1] = timer_alloc(device->machine, timer_callback_262_1, info);
+	info->timer[0] = device->machine->scheduler().timer_alloc(FUNC(timer_callback_262_0), info);
+	info->timer[1] = device->machine->scheduler().timer_alloc(FUNC(timer_callback_262_1), info);
 }
 
 static DEVICE_STOP( ymf262 )

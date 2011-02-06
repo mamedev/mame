@@ -446,7 +446,7 @@ static READ8_DEVICE_HANDLER(via_b_r)
 		case 0x02:
 			ret=ret^0x20;
 			inscrd++;
-			timer_set(device->machine, attotime::from_msec(150), NULL, 0, coin_input_reset);
+			device->machine->scheduler().timer_set(attotime::from_msec(150), FUNC(coin_input_reset));
 			break;
 
 		default:
@@ -460,7 +460,7 @@ static READ8_DEVICE_HANDLER(via_b_r)
 	{
 		case 0x00:
 			ret=ret^0x40;
-			timer_set(device->machine, attotime::from_msec(175), NULL, 0, hopper_reset);
+			device->machine->scheduler().timer_set(attotime::from_msec(175), FUNC(hopper_reset));
 			hopper_motor=0x02;
 			break;
 		case 0x01:

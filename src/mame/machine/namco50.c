@@ -219,12 +219,12 @@ static void namco_50xx_irq_set(device_t *device)
 	// The input clock to the 06XX interface chip is 64H, that is
 	// 18432000/6/64 = 48kHz, so it makes sense for the irq line to be
 	// asserted for one clock cycle ~= 21us.
-	timer_set(device->machine, attotime::from_usec(21), (void *)device, 0, namco_50xx_irq_clear);
+	device->machine->scheduler().timer_set(attotime::from_usec(21), FUNC(namco_50xx_irq_clear), 0, (void *)device);
 }
 
 WRITE8_DEVICE_HANDLER( namco_50xx_write )
 {
-	timer_call_after_resynch(device->machine, (void *)device, data, namco_50xx_latch_callback);
+	device->machine->scheduler().synchronize(FUNC(namco_50xx_latch_callback), data, (void *)device);
 
 	namco_50xx_irq_set(device);
 }
@@ -232,7 +232,7 @@ WRITE8_DEVICE_HANDLER( namco_50xx_write )
 
 void namco_50xx_read_request(device_t *device)
 {
-	timer_call_after_resynch(device->machine, (void *)device, 0, namco_50xx_readrequest_callback);
+	device->machine->scheduler().synchronize(FUNC(namco_50xx_readrequest_callback), 0, (void *)device);
 
 	namco_50xx_irq_set(device);
 }

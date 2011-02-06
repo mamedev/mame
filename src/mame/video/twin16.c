@@ -504,7 +504,7 @@ VIDEO_START( twin16 )
 
 	memset(twin16_sprite_buffer,0xff,0x800*sizeof(UINT16));
 	twin16_sprite_busy = 0;
-	twin16_sprite_timer = timer_alloc(machine, twin16_sprite_tick, NULL);
+	twin16_sprite_timer = machine->scheduler().timer_alloc(FUNC(twin16_sprite_tick));
 	timer_adjust_oneshot(twin16_sprite_timer, attotime::never, 0);
 
 	/* register for savestates */

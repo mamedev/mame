@@ -245,7 +245,7 @@ void bsmt2000_device::device_start()
 
 void bsmt2000_device::device_reset()
 {
-	device_timer_call_after_resynch(*this, TIMER_ID_RESET);
+	synchronize(TIMER_ID_RESET);
 }
 
 
@@ -312,7 +312,7 @@ UINT16 bsmt2000_device::read_status()
 
 void bsmt2000_device::write_reg(UINT16 data)
 {
-	device_timer_call_after_resynch(*this, TIMER_ID_REG_WRITE, data);
+	synchronize(TIMER_ID_REG_WRITE, data);
 }
 
 
@@ -323,7 +323,7 @@ void bsmt2000_device::write_reg(UINT16 data)
 
 void bsmt2000_device::write_data(UINT16 data)
 {
-	device_timer_call_after_resynch(*this, TIMER_ID_DATA_WRITE, data);
+	synchronize(TIMER_ID_DATA_WRITE, data);
 
 	// boost the interleave on a write so that the caller detects the status more accurately
 	m_machine.scheduler().boost_interleave(attotime::from_usec(1), attotime::from_usec(10));

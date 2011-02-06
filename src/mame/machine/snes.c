@@ -213,7 +213,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 	/* Start of VBlank */
 	if (snes_ppu.beam.current_vert == snes_ppu.beam.last_visible_line)
 	{
-		timer_set(machine, machine->primary_screen->time_until_pos(snes_ppu.beam.current_vert, 10), NULL, 0, snes_reset_oam_address);
+		machine->scheduler().timer_set(machine->primary_screen->time_until_pos(snes_ppu.beam.current_vert, 10), FUNC(snes_reset_oam_address));
 
 		snes_ram[HVBJOY] |= 0x81;		/* Set vblank bit to on & indicate controllers being read */
 		snes_ram[RDNMI] |= 0x80;		/* Set NMI occured bit */
@@ -766,7 +766,7 @@ WRITE8_HANDLER( snes_w_io )
 			break;
 		case HDMAEN:	/* HDMA channel designation */
 			if (data) //if a HDMA is enabled, data is inited at the next scanline
-				timer_set(space->machine, space->machine->primary_screen->time_until_pos(snes_ppu.beam.current_vert + 1), NULL, 0, snes_reset_hdma);
+				space->machine->scheduler().timer_set(space->machine->primary_screen->time_until_pos(snes_ppu.beam.current_vert + 1), FUNC(snes_reset_hdma));
 			break;
 		case MEMSEL:	/* Access cycle designation in memory (2) area */
 			/* FIXME: Need to adjust the speed only during access of banks 0x80+
@@ -1708,19 +1708,19 @@ static void snes_init_timers( running_machine *machine )
 	snes_state *state = machine->driver_data<snes_state>();
 
 	/* init timers and stop them */
-	state->scanline_timer = timer_alloc(machine, snes_scanline_tick, NULL);
+	state->scanline_timer = machine->scheduler().timer_alloc(FUNC(snes_scanline_tick));
 	timer_adjust_oneshot(state->scanline_timer, attotime::never, 0);
-	state->hblank_timer = timer_alloc(machine, snes_hblank_tick, NULL);
+	state->hblank_timer = machine->scheduler().timer_alloc(FUNC(snes_hblank_tick));
 	timer_adjust_oneshot(state->hblank_timer, attotime::never, 0);
-	state->nmi_timer = timer_alloc(machine, snes_nmi_tick, NULL);
+	state->nmi_timer = machine->scheduler().timer_alloc(FUNC(snes_nmi_tick));
 	timer_adjust_oneshot(state->nmi_timer, attotime::never, 0);
-	state->hirq_timer = timer_alloc(machine, snes_hirq_tick_callback, NULL);
+	state->hirq_timer = machine->scheduler().timer_alloc(FUNC(snes_hirq_tick_callback));
 	timer_adjust_oneshot(state->hirq_timer, attotime::never, 0);
-	state->div_timer = timer_alloc(machine, snes_div_callback, NULL);
+	state->div_timer = machine->scheduler().timer_alloc(FUNC(snes_div_callback));
 	timer_adjust_oneshot(state->div_timer, attotime::never, 0);
-	state->mult_timer = timer_alloc(machine, snes_mult_callback, NULL);
+	state->mult_timer = machine->scheduler().timer_alloc(FUNC(snes_mult_callback));
 	timer_adjust_oneshot(state->mult_timer, attotime::never, 0);
-	state->io_timer = timer_alloc(machine, snes_update_io, NULL);
+	state->io_timer = machine->scheduler().timer_alloc(FUNC(snes_update_io));
 	timer_adjust_oneshot(state->io_timer, attotime::never, 0);
 
 	// SNES hcounter has a 0-339 range.  hblank starts at counter 260.

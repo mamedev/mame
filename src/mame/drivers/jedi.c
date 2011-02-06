@@ -158,7 +158,7 @@ static MACHINE_START( jedi )
 	jedi_state *state = machine->driver_data<jedi_state>();
 
 	/* set a timer to run the interrupts */
-	state->interrupt_timer = timer_alloc(machine, generate_interrupt, NULL);
+	state->interrupt_timer = machine->scheduler().timer_alloc(FUNC(generate_interrupt));
 	timer_adjust_oneshot(state->interrupt_timer, machine->primary_screen->time_until_pos(32), 32);
 
 	/* configure the banks */

@@ -583,7 +583,7 @@ static TIMER_CALLBACK( taitof2_interrupt6 )
 
 static INTERRUPT_GEN( taitof2_interrupt )
 {
-	timer_set(device->machine, downcast<cpu_device *>(device)->cycles_to_attotime(500), NULL, 0, taitof2_interrupt6);
+	device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(500), FUNC(taitof2_interrupt6));
 	cpu_set_input_line(device, 5, HOLD_LINE);
 }
 

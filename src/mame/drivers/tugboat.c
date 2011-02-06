@@ -188,12 +188,12 @@ static const pia6821_interface pia1_intf =
 static TIMER_CALLBACK( interrupt_gen )
 {
 	cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
-	timer_set(machine, machine->primary_screen->frame_period(), NULL, 0, interrupt_gen);
+	machine->scheduler().timer_set(machine->primary_screen->frame_period(), FUNC(interrupt_gen));
 }
 
 static MACHINE_RESET( tugboat )
 {
-	timer_set(machine, machine->primary_screen->time_until_pos(30*8+4), NULL, 0, interrupt_gen);
+	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(30*8+4), FUNC(interrupt_gen));
 }
 
 

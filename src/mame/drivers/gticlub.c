@@ -730,7 +730,7 @@ static void sound_irq_callback( running_machine *machine, int irq )
 	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
 
 	cputag_set_input_line(machine, "audiocpu", line, ASSERT_LINE);
-	timer_set(machine, attotime::from_usec(1), NULL, line, irq_off);
+	machine->scheduler().timer_set(attotime::from_usec(1), FUNC(irq_off), line);
 }
 
 static const k056800_interface gticlub_k056800_interface =

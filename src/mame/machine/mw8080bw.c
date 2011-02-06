@@ -75,7 +75,7 @@ static TIMER_CALLBACK( mw8080bw_interrupt_callback )
 static void mw8080bw_create_interrupt_timer( running_machine *machine )
 {
 	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
-	state->interrupt_timer = timer_alloc(machine, mw8080bw_interrupt_callback, NULL);
+	state->interrupt_timer = machine->scheduler().timer_alloc(FUNC(mw8080bw_interrupt_callback));
 }
 
 

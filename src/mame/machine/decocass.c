@@ -2178,7 +2178,7 @@ static DEVICE_START( decocass_tape )
 	assert(device->machine->config != NULL);
 
 	/* fetch the data pointer */
-	tape->timer = timer_alloc(device->machine, tape_clock_callback, (void *)device);
+	tape->timer = device->machine->scheduler().timer_alloc(FUNC(tape_clock_callback), (void *)device);
 	if (device->region() == NULL)
 		return;
 	UINT8 *regionbase = *device->region();

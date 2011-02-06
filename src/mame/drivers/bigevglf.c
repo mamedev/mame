@@ -83,14 +83,14 @@ static TIMER_CALLBACK( from_sound_latch_callback )
 }
 static WRITE8_HANDLER( beg_fromsound_w )	/* write to D800 sets bit 1 in status */
 {
-	timer_call_after_resynch(space->machine, NULL, (cpu_get_pc(space->cpu) << 16) | data, from_sound_latch_callback);
+	space->machine->scheduler().synchronize(FUNC(from_sound_latch_callback), (cpu_get_pc(space->cpu) << 16) | data);
 }
 
 static READ8_HANDLER( beg_fromsound_r )
 {
 	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
 	/* set a timer to force synchronization after the read */
-	timer_call_after_resynch(space->machine, NULL, 0, NULL);
+	space->machine->scheduler().synchronize();
 	return state->from_sound;
 }
 
@@ -99,7 +99,7 @@ static READ8_HANDLER( beg_soundstate_r )
 	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
 	UINT8 ret = state->sound_state;
 	/* set a timer to force synchronization after the read */
-	timer_call_after_resynch(space->machine, NULL, 0, NULL);
+	space->machine->scheduler().synchronize();
 	state->sound_state &= ~2; /* read from port 21 clears bit 1 in status */
 	return ret;
 }
@@ -108,7 +108,7 @@ static READ8_HANDLER( soundstate_r )
 {
 	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
 	/* set a timer to force synchronization after the read */
-	timer_call_after_resynch(space->machine, NULL, 0, NULL);
+	space->machine->scheduler().synchronize();
 	return state->sound_state;
 }
 
@@ -127,7 +127,7 @@ static WRITE8_HANDLER( sound_command_w )	/* write to port 20 clears bit 0 in sta
 {
 	bigevglf_state *state = space->machine->driver_data<bigevglf_state>();
 	state->for_sound = data;
-	timer_call_after_resynch(space->machine, NULL, data, nmi_callback);
+	space->machine->scheduler().synchronize(FUNC(nmi_callback), data);
 }
 
 static READ8_HANDLER( sound_command_r )	/* read from D800 sets bit 0 in status */
@@ -165,22 +165,22 @@ static TIMER_CALLBACK( deferred_ls74_w )
 /* do this on a timer to let the CPUs synchronize */
 static WRITE8_HANDLER( beg13_a_clr_w )
 {
-	timer_call_after_resynch(space->machine, NULL, (0 << 8) | 0, deferred_ls74_w);
+	space->machine->scheduler().synchronize(FUNC(deferred_ls74_w), (0 << 8) | 0);
 }
 
 static WRITE8_HANDLER( beg13_b_clr_w )
 {
-	timer_call_after_resynch(space->machine, NULL, (1 << 8) | 0, deferred_ls74_w);
+	space->machine->scheduler().synchronize(FUNC(deferred_ls74_w), (1 << 8) | 0);
 }
 
 static WRITE8_HANDLER( beg13_a_set_w )
 {
-	timer_call_after_resynch(space->machine, NULL, (0 << 8) | 1, deferred_ls74_w);
+	space->machine->scheduler().synchronize(FUNC(deferred_ls74_w), (0 << 8) | 1);
 }
 
 static WRITE8_HANDLER( beg13_b_set_w )
 {
-	timer_call_after_resynch(space->machine, NULL, (1 << 8) | 1, deferred_ls74_w);
+	space->machine->scheduler().synchronize(FUNC(deferred_ls74_w), (1 << 8) | 1);
 }
 
 static READ8_HANDLER( beg_status_r )
@@ -197,7 +197,7 @@ static READ8_HANDLER( beg_status_r )
 
 */
 	/* set a timer to force synchronization after the read */
-	timer_call_after_resynch(space->machine, NULL, 0, NULL);
+	space->machine->scheduler().synchronize();
 	return (state->beg13_ls74[0] << 0) | (state->beg13_ls74[1] << 1);
 }
 

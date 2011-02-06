@@ -39,7 +39,7 @@ static TIMER_CALLBACK( watchdog_callback );
 void watchdog_init(running_machine *machine)
 {
 	/* allocate a timer for the watchdog */
-	watchdog_timer = timer_alloc(machine, watchdog_callback, NULL);
+	watchdog_timer = machine->scheduler().timer_alloc(FUNC(watchdog_callback));
 
 	machine->add_notifier(MACHINE_NOTIFY_RESET, watchdog_internal_reset);
 

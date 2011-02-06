@@ -168,7 +168,7 @@ MACHINE_START( mcr )
 MACHINE_START( nflfoot )
 {
 	/* allocate a timer for the IPU watchdog */
-	ipu_watchdog_timer = timer_alloc(machine, ipu_watchdog_reset, NULL);
+	ipu_watchdog_timer = machine->scheduler().timer_alloc(FUNC(ipu_watchdog_reset));
 }
 
 

@@ -1081,7 +1081,7 @@ static void common_start( device_t *device, int device_type ) {
 
 		/* initialize timer */
 		timer->clockin = pit8253->config->timer[timerno].clockin;
-		timer->updatetimer = timer_alloc(device->machine, update_timer_cb, (void *)device);
+		timer->updatetimer = device->machine->scheduler().timer_alloc(FUNC(update_timer_cb), (void *)device);
 		timer_adjust_oneshot(timer->updatetimer, attotime::never, timerno);
 
 		/* resolve callbacks */

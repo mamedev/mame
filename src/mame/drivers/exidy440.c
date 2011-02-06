@@ -371,7 +371,7 @@ static TIMER_CALLBACK( delayed_sound_command_w )
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	timer_call_after_resynch(space->machine, NULL, data, delayed_sound_command_w);
+	space->machine->scheduler().synchronize(FUNC(delayed_sound_command_w), data);
 }
 
 

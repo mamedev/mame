@@ -710,9 +710,9 @@ static DEVICE_START(duart68681)
 	duart68681->duart_config = (const duart68681_config *)device->baseconfig().static_config();
 	duart68681->device = device;
 
-	duart68681->channel[0].tx_timer = timer_alloc(device->machine, tx_timer_callback, (void*)device);
-	duart68681->channel[1].tx_timer = timer_alloc(device->machine, tx_timer_callback, (void*)device);
-	duart68681->duart_timer = timer_alloc(device->machine, duart_timer_callback, (void*)device);
+	duart68681->channel[0].tx_timer = device->machine->scheduler().timer_alloc(FUNC(tx_timer_callback), (void*)device);
+	duart68681->channel[1].tx_timer = device->machine->scheduler().timer_alloc(FUNC(tx_timer_callback), (void*)device);
+	duart68681->duart_timer = device->machine->scheduler().timer_alloc(FUNC(duart_timer_callback), (void*)device);
 
 	state_save_register_device_item(device, 0, duart68681->ACR);
 	state_save_register_device_item(device, 0, duart68681->IMR);

@@ -400,10 +400,10 @@ void pc16552d_init(running_machine *machine, int chip, int frequency, void (* ir
 	duart[chip].ch[1].pending_interrupt = 0;
 
 	// allocate transmit timers
-	duart[chip].ch[0].tx_fifo_timer = timer_alloc(machine, tx_fifo_timer_callback, NULL);
+	duart[chip].ch[0].tx_fifo_timer = machine->scheduler().timer_alloc(FUNC(tx_fifo_timer_callback));
 	timer_adjust_oneshot(duart[chip].ch[0].tx_fifo_timer, attotime::never, (chip * 2) + 0);
 
-	duart[chip].ch[1].tx_fifo_timer = timer_alloc(machine, tx_fifo_timer_callback, NULL);
+	duart[chip].ch[1].tx_fifo_timer = machine->scheduler().timer_alloc(FUNC(tx_fifo_timer_callback));
 	timer_adjust_oneshot(duart[chip].ch[1].tx_fifo_timer, attotime::never, (chip * 2) + 1);
 }
 

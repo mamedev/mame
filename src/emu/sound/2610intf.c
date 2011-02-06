@@ -156,8 +156,8 @@ static DEVICE_START( ym2610 )
 	assert_always(info->psg != NULL, "Error creating YM2610/AY8910 chip");
 
 	/* Timer Handler set */
-	info->timer[0] = timer_alloc(device->machine, timer_callback_0, info);
-	info->timer[1] = timer_alloc(device->machine, timer_callback_1, info);
+	info->timer[0] = device->machine->scheduler().timer_alloc(FUNC(timer_callback_0), info);
+	info->timer[1] = device->machine->scheduler().timer_alloc(FUNC(timer_callback_1), info);
 
 	/* stream system initialize */
 	info->stream = device->machine->sound().stream_alloc(*device,0,2,rate,info,(type == YM2610) ? ym2610_stream_update : ym2610b_stream_update);

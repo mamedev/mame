@@ -652,7 +652,7 @@ static CPU_INIT( tms34010 )
 	}
 
 	/* allocate a scanline timer and set it to go off at the start */
-	tms->scantimer = timer_alloc(device->machine, scanline_callback, tms);
+	tms->scantimer = device->machine->scheduler().timer_alloc(FUNC(scanline_callback), tms);
 	timer_adjust_oneshot(tms->scantimer, attotime::zero, 0);
 
 	/* allocate the shiftreg */
@@ -1200,7 +1200,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 
 			/* NMI issued? */
 			if (data & 0x0100)
-				timer_call_after_resynch(tms->device->machine, tms, 0, internal_interrupt_callback);
+				tms->device->machine->scheduler().synchronize(FUNC(internal_interrupt_callback), 0, tms);
 			break;
 
 		case REG_HSTCTLL:
@@ -1235,7 +1235,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 
 			/* input interrupt? (should really be state-based, but the functions don't exist!) */
 			if (!(oldreg & 0x0008) && (newreg & 0x0008))
-				timer_call_after_resynch(tms->device->machine, tms, TMS34010_HI, internal_interrupt_callback);
+				tms->device->machine->scheduler().synchronize(FUNC(internal_interrupt_callback), TMS34010_HI, tms);
 			else if ((oldreg & 0x0008) && !(newreg & 0x0008))
 				IOREG(tms, REG_INTPEND) &= ~TMS34010_HI;
 			break;
@@ -1351,7 +1351,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 
 			/* NMI issued? */
 			if (data & 0x0100)
-				timer_call_after_resynch(tms->device->machine, tms, 0, internal_interrupt_callback);
+				tms->device->machine->scheduler().synchronize(FUNC(internal_interrupt_callback), 0, tms);
 			break;
 
 		case REG020_HSTCTLL:
@@ -1386,7 +1386,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 
 			/* input interrupt? (should really be state-based, but the functions don't exist!) */
 			if (!(oldreg & 0x0008) && (newreg & 0x0008))
-				timer_call_after_resynch(tms->device->machine, tms, TMS34010_HI, internal_interrupt_callback);
+				tms->device->machine->scheduler().synchronize(FUNC(internal_interrupt_callback), TMS34010_HI, tms);
 			else if ((oldreg & 0x0008) && !(newreg & 0x0008))
 				IOREG(tms, REG020_INTPEND) &= ~TMS34010_HI;
 			break;

@@ -357,7 +357,7 @@ static WRITE8_HANDLER( snd_irq_w )
 {
 	m63_state *state = space->machine->driver_data<m63_state>();
 	cpu_set_input_line(state->soundcpu, 0, ASSERT_LINE);
-	timer_call_after_resynch(space->machine, NULL, 0, NULL);
+	space->machine->scheduler().synchronize();
 }
 
 static WRITE8_HANDLER( snddata_w )

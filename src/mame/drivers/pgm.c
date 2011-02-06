@@ -752,7 +752,7 @@ static READ32_HANDLER( kovsh_arm7_protlatch_r )
 {
 	pgm_state *state = space->machine->driver_data<pgm_state>();
 
-	timer_call_after_resynch(space->machine, NULL, 0, 0); // force resync
+	space->machine->scheduler().synchronize(FUNC(0)); // force resync
 
 	return (state->kovsh_highlatch_68k_w << 16) | (state->kovsh_lowlatch_68k_w);
 }
@@ -761,7 +761,7 @@ static WRITE32_HANDLER( kovsh_arm7_protlatch_w )
 {
 	pgm_state *state = space->machine->driver_data<pgm_state>();
 
-	timer_call_after_resynch(space->machine, NULL, 0, 0); // force resync
+	space->machine->scheduler().synchronize(FUNC(0)); // force resync
 
 	if (ACCESSING_BITS_16_31)
 	{
@@ -779,7 +779,7 @@ static READ16_HANDLER( kovsh_68k_protlatch_r )
 {
 	pgm_state *state = space->machine->driver_data<pgm_state>();
 
-	timer_call_after_resynch(space->machine, NULL, 0, 0); // force resync
+	space->machine->scheduler().synchronize(FUNC(0)); // force resync
 
 	switch (offset)
 	{
@@ -793,7 +793,7 @@ static WRITE16_HANDLER( kovsh_68k_protlatch_w )
 {
 	pgm_state *state = space->machine->driver_data<pgm_state>();
 
-	timer_call_after_resynch(space->machine, NULL, 0, 0); // force resync
+	space->machine->scheduler().synchronize(FUNC(0)); // force resync
 
 	switch (offset)
 	{

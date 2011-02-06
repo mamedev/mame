@@ -1051,7 +1051,7 @@ static void atapi_init(running_machine *machine)
 	state->atapi_data_len = 0;
 	state->atapi_cdata_wait = 0;
 
-	state->atapi_timer = timer_alloc(machine, atapi_xfer_end, NULL);
+	state->atapi_timer = machine->scheduler().timer_alloc(FUNC(atapi_xfer_end));
 	timer_adjust_oneshot(state->atapi_timer, attotime::never, 0);
 
 	for( i = 0; i < 2; i++ )
@@ -1589,7 +1589,7 @@ static DRIVER_INIT( konami573 )
 
 	for (i = 0; i < 3; i++)
 	{
-		state->m_p_timer_root[i] = timer_alloc(machine, root_finished, NULL);
+		state->m_p_timer_root[i] = machine->scheduler().timer_alloc(FUNC(root_finished));
 	}
 
 	state_save_register_global( machine, state->m_n_security_control );

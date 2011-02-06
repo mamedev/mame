@@ -672,6 +672,28 @@ UINT64 device_t::attotime_to_clocks(attotime duration) const
 
 
 //-------------------------------------------------
+//  timer_alloc - allocate a timer for our device
+//  callback
+//-------------------------------------------------
+
+emu_timer *device_t::timer_alloc(device_timer_id id, void *ptr)
+{
+	return m_machine.scheduler().timer_alloc(*this, id, ptr);
+}
+
+
+//-------------------------------------------------
+//  timer_set - set a temporary timer that will
+//  call our device callback
+//-------------------------------------------------
+
+void device_t::timer_set(attotime duration, device_timer_id id, int param, void *ptr)
+{
+	m_machine.scheduler().timer_set(duration, *this, id, param, ptr);
+}
+
+
+//-------------------------------------------------
 //  find_interfaces - locate fast interfaces
 //-------------------------------------------------
 

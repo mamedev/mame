@@ -11,7 +11,7 @@ struct _lr35902_cpu_core
 {
 	const UINT16	*regs;
 	UINT8			features;
-	lr35902_timer_fired_func timer_fired_func;
+	lr35902_timer_fired_func timer_expired_func;
 };
 
 enum

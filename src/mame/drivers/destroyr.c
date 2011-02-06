@@ -130,8 +130,8 @@ static TIMER_CALLBACK( destroyr_frame_callback )
 	state->potsense[1] = 0;
 
 	/* PCB supports two dials, but cab has only got one */
-	timer_set(machine, machine->primary_screen->time_until_pos(input_port_read(machine, "PADDLE"), 0), NULL, 0, destroyr_dial_callback);
-	timer_set(machine, machine->primary_screen->time_until_pos(0), NULL, 0, destroyr_frame_callback);
+	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(input_port_read(machine, "PADDLE")), FUNC(destroyr_dial_callback));
+	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(0), FUNC(destroyr_frame_callback));
 }
 
 
@@ -139,7 +139,7 @@ static MACHINE_RESET( destroyr )
 {
 	destroyr_state *state = machine->driver_data<destroyr_state>();
 
-	timer_set(machine, machine->primary_screen->time_until_pos(0), NULL, 0, destroyr_frame_callback);
+	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(0), FUNC(destroyr_frame_callback));
 
 	state->cursor = 0;
 	state->wavemod = 0;

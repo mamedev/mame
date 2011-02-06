@@ -369,9 +369,9 @@ static TIMER_CALLBACK( vblank_interrupt_callback )
 static void create_interrupt_timers( running_machine *machine )
 {
 	neogeo_state *state = machine->driver_data<neogeo_state>();
-	state->display_position_interrupt_timer = timer_alloc(machine, display_position_interrupt_callback, NULL);
-	state->display_position_vblank_timer = timer_alloc(machine, display_position_vblank_callback, NULL);
-	state->vblank_interrupt_timer = timer_alloc(machine, vblank_interrupt_callback, NULL);
+	state->display_position_interrupt_timer = machine->scheduler().timer_alloc(FUNC(display_position_interrupt_callback));
+	state->display_position_vblank_timer = machine->scheduler().timer_alloc(FUNC(display_position_vblank_callback));
+	state->vblank_interrupt_timer = machine->scheduler().timer_alloc(FUNC(vblank_interrupt_callback));
 }
 
 

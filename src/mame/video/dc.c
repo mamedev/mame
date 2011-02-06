@@ -1399,11 +1399,11 @@ static void process_ta_fifo(running_machine* machine)
 		/* FIXME: timing of these */
 		switch (state_ta.tafifo_listtype)
 		{
-		case 0: timer_set(machine, attotime::from_usec(100), NULL, 0, transfer_opaque_list_irq); break;
-		case 1: timer_set(machine, attotime::from_usec(100), NULL, 0, transfer_opaque_modifier_volume_list_irq); break;
-		case 2: timer_set(machine, attotime::from_usec(100), NULL, 0, transfer_translucent_list_irq); break;
-		case 3: timer_set(machine, attotime::from_usec(100), NULL, 0, transfer_translucent_modifier_volume_list_irq); break;
-		case 4: timer_set(machine, attotime::from_usec(100), NULL, 0, transfer_punch_through_list_irq); break;
+		case 0: machine->scheduler().timer_set(attotime::from_usec(100), FUNC(transfer_opaque_list_irq)); break;
+		case 1: machine->scheduler().timer_set(attotime::from_usec(100), FUNC(transfer_opaque_modifier_volume_list_irq)); break;
+		case 2: machine->scheduler().timer_set(attotime::from_usec(100), FUNC(transfer_translucent_list_irq)); break;
+		case 3: machine->scheduler().timer_set(attotime::from_usec(100), FUNC(transfer_translucent_modifier_volume_list_irq)); break;
+		case 4: machine->scheduler().timer_set(attotime::from_usec(100), FUNC(transfer_punch_through_list_irq)); break;
 		}
 		state_ta.tafifo_listtype= -1; // no list being received
 		state_ta.listtype_used |= (2+8);
@@ -2551,21 +2551,21 @@ VIDEO_START(dc)
 
 	computedilated();
 
-	vbout_timer = timer_alloc(machine, vbout, 0);
+	vbout_timer = machine->scheduler().timer_alloc(FUNC(vbout));
 	timer_adjust_oneshot(vbout_timer, machine->primary_screen->time_until_pos(spg_vblank_out_irq_line_num), 0);
 
-	vbin_timer = timer_alloc(machine, vbin, 0);
+	vbin_timer = machine->scheduler().timer_alloc(FUNC(vbin));
 	timer_adjust_oneshot(vbin_timer, machine->primary_screen->time_until_pos(spg_vblank_in_irq_line_num), 0);
 
-	hbin_timer = timer_alloc(machine, hbin, 0);
+	hbin_timer = machine->scheduler().timer_alloc(FUNC(hbin));
 	timer_adjust_oneshot(hbin_timer, machine->primary_screen->time_until_pos(0, spg_hblank_in_irq-1), 0);
 
 	scanline = 0;
 	next_y = 0;
 
-	endofrender_timer_isp = timer_alloc(machine, endofrender_isp, 0);
-	endofrender_timer_tsp = timer_alloc(machine, endofrender_tsp, 0);
-	endofrender_timer_video = timer_alloc(machine, endofrender_video, 0);
+	endofrender_timer_isp = machine->scheduler().timer_alloc(FUNC(endofrender_isp));
+	endofrender_timer_tsp = machine->scheduler().timer_alloc(FUNC(endofrender_tsp));
+	endofrender_timer_video = machine->scheduler().timer_alloc(FUNC(endofrender_video));
 
 	timer_adjust_oneshot(endofrender_timer_isp, attotime::never, 0);
 	timer_adjust_oneshot(endofrender_timer_tsp, attotime::never, 0);

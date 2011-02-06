@@ -495,7 +495,7 @@ static MACHINE_START( xexex )
 	state_save_register_global(machine, state->cur_sound_region);
 	state_save_register_postload(machine, xexex_postload, NULL);
 
-	state->dmadelay_timer = timer_alloc(machine, dmaend_callback, NULL);
+	state->dmadelay_timer = machine->scheduler().timer_alloc(FUNC(dmaend_callback));
 }
 
 static MACHINE_RESET( xexex )

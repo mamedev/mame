@@ -160,7 +160,7 @@ static TIMER_CALLBACK( dac_callback )
 	dac_data_w(state->dac, DACROM[(state->dac_bank * 0x10000 + state->dac_adr++) & 0x1ffff]);
 
 	if (((state->dac_adr & 0xff00 ) >> 8) !=  state->dac_adr_e)
-		timer_set(machine, attotime::from_hz(MCLK) * 1024, NULL, 0, dac_callback);
+		machine->scheduler().timer_set(attotime::from_hz(MCLK) * 1024, FUNC(dac_callback));
 	else
 		state->dac_busy = 0;
 }
@@ -178,7 +178,7 @@ static WRITE8_HANDLER( mjsister_dac_adr_e_w )
 	state->dac_adr = state->dac_adr_s << 8;
 
 	if (state->dac_busy == 0)
-		timer_call_after_resynch(space->machine, NULL, 0, dac_callback);
+		space->machine->scheduler().synchronize(FUNC(dac_callback));
 
 	state->dac_busy = 1;
 }

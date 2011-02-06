@@ -947,8 +947,8 @@ static CPU_INIT( ppc403 )
 	// !!! why is rfci here !!!
 	ppc.optable19[51] = ppc_rfci;
 
-	ppc.spu.rx_timer = timer_alloc(device->machine, ppc403_spu_rx_callback, NULL);
-	ppc.spu.tx_timer = timer_alloc(device->machine, ppc403_spu_tx_callback, NULL);
+	ppc.spu.rx_timer = device->machine->scheduler().timer_alloc(FUNC(ppc403_spu_rx_callback));
+	ppc.spu.tx_timer = device->machine->scheduler().timer_alloc(FUNC(ppc403_spu_tx_callback));
 
 	ppc.read8 = ppc403_read8;
 	ppc.read16 = ppc403_read16;

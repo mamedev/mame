@@ -4925,7 +4925,7 @@ static void clear_keybuffer(running_machine &machine)
 static void setup_keybuffer(running_machine *machine)
 {
 	input_port_private *portdata = machine->input_port_data;
-	portdata->inputx_timer = timer_alloc(machine, inputx_timerproc, NULL);
+	portdata->inputx_timer = machine->scheduler().timer_alloc(FUNC(inputx_timerproc));
 	portdata->keybuffer = auto_alloc_clear(machine, key_buffer);
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, clear_keybuffer);
 }

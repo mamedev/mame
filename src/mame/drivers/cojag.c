@@ -595,7 +595,7 @@ static TIMER_CALLBACK( gpu_sync_timer )
 	cojag_state *state = machine->driver_data<cojag_state>();
 	/* if a command is still pending, and we haven't maxed out our timer, set a new one */
 	if (state->gpu_command_pending && param < 1000)
-		timer_set(machine, attotime::from_usec(50), NULL, ++param, gpu_sync_timer);
+		machine->scheduler().timer_set(attotime::from_usec(50), FUNC(gpu_sync_timer), ++param);
 }
 
 
@@ -610,7 +610,7 @@ static WRITE32_HANDLER( gpu_jump_w )
 	jaguar_gpu_resume(space->machine);
 
 	/* start the sync timer going, and note that there is a command pending */
-	timer_call_after_resynch(space->machine, NULL, 0, gpu_sync_timer);
+	space->machine->scheduler().synchronize(FUNC(gpu_sync_timer));
 	state->gpu_command_pending = 1;
 }
 

@@ -48,7 +48,7 @@ static UINT8 m6840_irq_vector;
 static UINT8 v493_irq_state;
 static UINT8 v493_irq_vector;
 
-static timer_fired_func v493_callback;
+static timer_expired_func v493_callback;
 
 static UINT8 zwackery_sound_data;
 
@@ -169,7 +169,7 @@ MACHINE_START( mcr68 )
 	{
 		struct counter_state *m6840 = &m6840_state[i];
 
-		m6840->timer = timer_alloc(machine, counter_fired_callback, NULL);
+		m6840->timer = machine->scheduler().timer_alloc(FUNC(counter_fired_callback));
 
 		state_save_register_item(machine, "m6840", NULL, i, m6840->control);
 		state_save_register_item(machine, "m6840", NULL, i, m6840->latch);
@@ -267,7 +267,7 @@ INTERRUPT_GEN( mcr68_interrupt )
 	/* also set a timer to generate the 493 signal at a specific time before the next VBLANK */
 	/* the timing of this is crucial for Blasted and Tri-Sports, which check the timing of */
 	/* VBLANK and 493 using counter 2 */
-	timer_set(device->machine, attotime::from_hz(30) - mcr68_timing_factor, NULL, 0, v493_callback);
+	device->machine->scheduler().timer_set(attotime::from_hz(30) - mcr68_timing_factor, FUNC(v493_callback));
 }
 
 
@@ -296,7 +296,7 @@ static TIMER_CALLBACK( mcr68_493_callback )
 {
 	v493_irq_state = 1;
 	update_mcr68_interrupts(machine);
-	timer_set(machine, machine->primary_screen->scan_period(), NULL, 0, mcr68_493_off_callback);
+	machine->scheduler().timer_set(machine->primary_screen->scan_period(), FUNC(mcr68_493_off_callback));
 	logerror("--- (INT1) ---\n");
 }
 
@@ -351,7 +351,7 @@ static TIMER_CALLBACK( zwackery_493_callback )
 	device_t *pia = machine->device("pia0");
 
 	pia6821_ca1_w(pia, 1);
-	timer_set(machine, machine->primary_screen->scan_period(), NULL, 0, zwackery_493_off_callback);
+	machine->scheduler().timer_set(machine->primary_screen->scan_period(), FUNC(zwackery_493_off_callback));
 }
 
 

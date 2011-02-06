@@ -1661,7 +1661,7 @@ static INTERRUPT_GEN( irq_start )
 	}
 
 	cpu_set_input_line(device, 0, ASSERT_LINE);
-	timer_set(device->machine, attotime::from_usec(50), NULL, 0, irq_stop);
+	device->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(irq_stop));
 }
 
 

@@ -666,8 +666,8 @@ static void ymf278b_init(device_t *device, YMF278BChip *chip, void (*cb)(device_
 {
 	chip->rom = *device->region();
 	chip->irq_callback = cb;
-	chip->timer_a = timer_alloc(device->machine, ymf278b_timer_a_tick, chip);
-	chip->timer_b = timer_alloc(device->machine, ymf278b_timer_b_tick, chip);
+	chip->timer_a = device->machine->scheduler().timer_alloc(FUNC(ymf278b_timer_a_tick), chip);
+	chip->timer_b = device->machine->scheduler().timer_alloc(FUNC(ymf278b_timer_b_tick), chip);
 	chip->irq_line = CLEAR_LINE;
 	chip->clock = device->clock();
 }

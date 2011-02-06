@@ -697,7 +697,7 @@ INLINE void stmsp_sync_w(address_space *space, offs_t offset, UINT16 data, UINT1
 
 	/* if being written from the 68000, synchronize on it */
 	if (state->hd34010_host_access)
-		timer_call_after_resynch(space->machine, NULL, newdata | (offset << 16) | (which << 28), stmsp_sync_update);
+		space->machine->scheduler().synchronize(FUNC(stmsp_sync_update), newdata | (offset << 16) | (which << 28));
 
 	/* otherwise, just update */
 	else
@@ -790,7 +790,7 @@ WRITE16_HANDLER( hd68k_adsp_data_w )
 	if (offset == 0x1fff)
 	{
 		logerror("%06X:ADSP sync address written (%04X)\n", cpu_get_previouspc(space->cpu), data);
-		timer_call_after_resynch(space->machine, NULL, 0, 0);
+		space->machine->scheduler().synchronize(FUNC(0));
 		cpu_triggerint(state->adsp);
 	}
 	else
@@ -897,7 +897,7 @@ WRITE16_HANDLER( hd68k_adsp_control_w )
 
 		case 3:
 			logerror("ADSP bank = %d (deferred)\n", val);
-			timer_call_after_resynch(space->machine, NULL, val, deferred_adsp_bank_switch);
+			space->machine->scheduler().synchronize(FUNC(deferred_adsp_bank_switch), val);
 			break;
 
 		case 5:
@@ -1520,7 +1520,7 @@ WRITE32_HANDLER( rddsp32_sync0_w )
 		COMBINE_DATA(&newdata);
 		state->dataptr[state->next_msp_sync % MAX_MSP_SYNC] = dptr;
 		state->dataval[state->next_msp_sync % MAX_MSP_SYNC] = newdata;
-		timer_call_after_resynch(space->machine, NULL, state->next_msp_sync++ % MAX_MSP_SYNC, rddsp32_sync_cb);
+		space->machine->scheduler().synchronize(FUNC(rddsp32_sync_cb), state->next_msp_sync++ % MAX_MSP_SYNC);
 	}
 	else
 		COMBINE_DATA(&state->rddsp32_sync[0][offset]);
@@ -1537,7 +1537,7 @@ WRITE32_HANDLER( rddsp32_sync1_w )
 		COMBINE_DATA(&newdata);
 		state->dataptr[state->next_msp_sync % MAX_MSP_SYNC] = dptr;
 		state->dataval[state->next_msp_sync % MAX_MSP_SYNC] = newdata;
-		timer_call_after_resynch(space->machine, NULL, state->next_msp_sync++ % MAX_MSP_SYNC, rddsp32_sync_cb);
+		space->machine->scheduler().synchronize(FUNC(rddsp32_sync_cb), state->next_msp_sync++ % MAX_MSP_SYNC);
 	}
 	else
 		COMBINE_DATA(&state->rddsp32_sync[1][offset]);

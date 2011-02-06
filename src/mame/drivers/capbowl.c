@@ -126,7 +126,7 @@ static TIMER_CALLBACK( capbowl_update )
 	machine->primary_screen->update_partial(scanline - 1);
 	scanline += 32;
 	if (scanline > 240) scanline = 32;
-	timer_set(machine, machine->primary_screen->time_until_pos(scanline), NULL, scanline, capbowl_update);
+	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(scanline), FUNC(capbowl_update), scanline);
 }
 
 
@@ -354,7 +354,7 @@ static MACHINE_RESET( capbowl )
 {
 	capbowl_state *state = machine->driver_data<capbowl_state>();
 
-	timer_set(machine, machine->primary_screen->time_until_pos(32), NULL, 32, capbowl_update);
+	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(32), FUNC(capbowl_update), 32);
 
 	state->blitter_addr = 0;
 	state->last_trackball_val[0] = 0;

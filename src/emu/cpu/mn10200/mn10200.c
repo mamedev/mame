@@ -295,7 +295,7 @@ static CPU_INIT(mn10200)
 
 	for (tmr = 0; tmr < NUM_TIMERS_8BIT; tmr++)
 	{
-		cpustate->timer_timers[tmr] = timer_alloc(device->machine, simple_timer_cb, cpustate);
+		cpustate->timer_timers[tmr] = device->machine->scheduler().timer_alloc(FUNC(simple_timer_cb), cpustate);
 		timer_adjust_oneshot(cpustate->timer_timers[tmr], attotime::never, tmr);
 	}
 }

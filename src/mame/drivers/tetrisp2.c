@@ -1044,8 +1044,8 @@ static TIMER_CALLBACK( rockn_timer_sub_level1_callback )
 
 static void init_rockn_timer(running_machine *machine)
 {
-	timer_pulse(machine, attotime::from_msec(32), NULL, 0, rockn_timer_level1_callback);
-	rockn_timer_l4 = timer_alloc(machine, rockn_timer_level4_callback, NULL);
+	machine->scheduler().timer_pulse(attotime::from_msec(32), FUNC(rockn_timer_level1_callback));
+	rockn_timer_l4 = machine->scheduler().timer_alloc(FUNC(rockn_timer_level4_callback));
 
 	state_save_register_global_array(machine, tetrisp2_systemregs);
 	state_save_register_global_array(machine, rocknms_sub_systemregs);
@@ -1076,8 +1076,8 @@ static DRIVER_INIT( rocknms )
 {
 	init_rockn_timer(machine);
 
-	timer_pulse(machine, attotime::from_msec(32), NULL, 0, rockn_timer_sub_level1_callback);
-	rockn_timer_sub_l4 = timer_alloc(machine, rockn_timer_sub_level4_callback, NULL);
+	machine->scheduler().timer_pulse(attotime::from_msec(32), FUNC(rockn_timer_sub_level1_callback));
+	rockn_timer_sub_l4 = machine->scheduler().timer_alloc(FUNC(rockn_timer_sub_level4_callback));
 
 	rockn_protectdata = 3;
 

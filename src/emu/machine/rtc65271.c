@@ -522,7 +522,7 @@ static TIMER_CALLBACK( rtc_begin_update_callback )
 		state->regs[reg_A] |= reg_A_UIP;
 
 		/* schedule end of update cycle */
-		timer_set(device->machine, UPDATE_CYCLE_TIME, (void *)device, 0, rtc_end_update_callback);
+		device->machine->scheduler().timer_set(UPDATE_CYCLE_TIME, FUNC(rtc_end_update_callback), 0, (void *)device);
 	}
 }
 
@@ -688,9 +688,9 @@ static DEVICE_START( rtc65271 )
 	rtc65271_config *config = (rtc65271_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 	rtc65271_state *state = get_safe_token(device);
 
-	state->update_timer = timer_alloc(device->machine, rtc_begin_update_callback, (void *)device);
+	state->update_timer = device->machine->scheduler().timer_alloc(FUNC(rtc_begin_update_callback), (void *)device);
 	timer_adjust_periodic(state->update_timer, attotime::from_seconds(1), 0, attotime::from_seconds(1));
-	state->SQW_timer = timer_alloc(device->machine, rtc_SQW_callback, (void *)device);
+	state->SQW_timer = device->machine->scheduler().timer_alloc(FUNC(rtc_SQW_callback), (void *)device);
 	state->interrupt_callback = config->interrupt_callback;
 
 	state_save_register_device_item_array(device, 0, state->regs);

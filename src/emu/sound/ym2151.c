@@ -824,7 +824,7 @@ static TIMER_CALLBACK( timer_callback_a )
 	if (chip->irq_enable & 0x04)
 	{
 		chip->status |= 1;
-		timer_set(machine, attotime::zero,chip,0,irqAon_callback);
+		machine->scheduler().timer_set(attotime::zero, FUNC(irqAon_callback), 0, chip);
 	}
 	if (chip->irq_enable & 0x80)
 		chip->csm_req = 2;		/* request KEY ON / KEY OFF sequence */
@@ -837,7 +837,7 @@ static TIMER_CALLBACK( timer_callback_b )
 	if (chip->irq_enable & 0x08)
 	{
 		chip->status |= 2;
-		timer_set(machine, attotime::zero,chip,0,irqBon_callback);
+		machine->scheduler().timer_set(attotime::zero, FUNC(irqBon_callback), 0, chip);
 	}
 }
 #if 0
@@ -1098,7 +1098,7 @@ void ym2151_write_reg(void *_chip, int r, int v)
 			{
 #ifdef USE_MAME_TIMERS
 				chip->status &= ~1;
-				timer_set(chip->device->machine, attotime::zero,chip,0,irqAoff_callback);
+				chip->device->machine->scheduler().timer_set(attotime::zero, FUNC(irqAoff_callback), 0, chip);
 #else
 				int oldstate = chip->status & 3;
 				chip->status &= ~1;
@@ -1110,7 +1110,7 @@ void ym2151_write_reg(void *_chip, int r, int v)
 			{
 #ifdef USE_MAME_TIMERS
 				chip->status &= ~2;
-				timer_set(chip->device->machine, attotime::zero,chip,0,irqBoff_callback);
+				chip->device->machine->scheduler().timer_set(attotime::zero, FUNC(irqBoff_callback), 0, chip);
 #else
 				int oldstate = chip->status & 3;
 				chip->status &= ~2;
@@ -1533,8 +1533,8 @@ void * ym2151_init(device_t *device, int clock, int rate)
 
 #ifdef USE_MAME_TIMERS
 /* this must be done _before_ a call to ym2151_reset_chip() */
-	PSG->timer_A = timer_alloc(device->machine, timer_callback_a, PSG);
-	PSG->timer_B = timer_alloc(device->machine, timer_callback_b, PSG);
+	PSG->timer_A = device->machine->scheduler().timer_alloc(FUNC(timer_callback_a), PSG);
+	PSG->timer_B = device->machine->scheduler().timer_alloc(FUNC(timer_callback_b), PSG);
 #else
 	PSG->tim_A      = 0;
 	PSG->tim_B      = 0;
@@ -1546,7 +1546,7 @@ void * ym2151_init(device_t *device, int clock, int rate)
 	{
 		cymfile = fopen("2151_.cym","wb");
 		if (cymfile)
-			timer_pulse ( device->machine, attotime::from_hz(110), NULL, 0, cymfile_callback); /*110 Hz pulse timer*/
+			device->machine->scheduler().timer_pulse ( attotime::from_hz(110), FUNC(cymfile_callback)); /*110 Hz pulse timer*/
 		else
 			logerror("Could not create file 2151_.cym\n");
 	}

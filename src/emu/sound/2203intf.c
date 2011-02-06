@@ -134,8 +134,8 @@ static DEVICE_START( ym2203 )
 	assert_always(info->psg != NULL, "Error creating YM2203/AY8910 chip");
 
 	/* Timer Handler set */
-	info->timer[0] = timer_alloc(device->machine, timer_callback_2203_0, info);
-	info->timer[1] = timer_alloc(device->machine, timer_callback_2203_1, info);
+	info->timer[0] = device->machine->scheduler().timer_alloc(FUNC(timer_callback_2203_0), info);
+	info->timer[1] = device->machine->scheduler().timer_alloc(FUNC(timer_callback_2203_1), info);
 
 	/* stream system initialize */
 	info->stream = device->machine->sound().stream_alloc(*device,0,1,rate,info,ym2203_stream_update);

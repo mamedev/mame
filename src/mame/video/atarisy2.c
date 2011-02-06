@@ -110,7 +110,7 @@ VIDEO_START( atarisy2 )
 	tilemap_set_transparent_pen(state->alpha_tilemap, 0);
 
 	/* reset the statics */
-	state->yscroll_reset_timer = timer_alloc(machine, reset_yscroll_callback, NULL);
+	state->yscroll_reset_timer = machine->scheduler().timer_alloc(FUNC(reset_yscroll_callback));
 	state->videobank = 0;
 
 	/* save states */

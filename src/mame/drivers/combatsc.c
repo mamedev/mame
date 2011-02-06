@@ -689,7 +689,7 @@ static MACHINE_START( combatsc )
 	state->page[0] = MEM + 0x4000;
 	state->page[1] = MEM + 0x6000;
 
-	state->interleave_timer = timer_alloc(machine, NULL, NULL);
+	state->interleave_timer = machine->scheduler().timer_alloc(FUNC(NULL));
 
 	state->audiocpu = machine->device<cpu_device>("audiocpu");
 	state->k007121_1 = machine->device("k007121_1");

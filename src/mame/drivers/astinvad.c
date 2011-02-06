@@ -219,7 +219,7 @@ static TIMER_CALLBACK( kamizake_int_gen )
 	timer_adjust_oneshot(state->int_timer, machine->primary_screen->time_until_pos(param), param);
 
 	/* an RC circuit turns the interrupt off after a short amount of time */
-	timer_set(machine, attotime::from_double(300 * 0.1e-6), NULL, 0, kamikaze_int_off);
+	machine->scheduler().timer_set(attotime::from_double(300 * 0.1e-6), FUNC(kamikaze_int_off));
 }
 
 
@@ -232,7 +232,7 @@ static MACHINE_START( kamikaze )
 	state->ppi8255_1 = machine->device("ppi8255_1");
 	state->samples = machine->device("samples");
 
-	state->int_timer = timer_alloc(machine, kamizake_int_gen, NULL);
+	state->int_timer = machine->scheduler().timer_alloc(FUNC(kamizake_int_gen));
 	timer_adjust_oneshot(state->int_timer, machine->primary_screen->time_until_pos(128), 128);
 
 	state_save_register_global(machine, state->screen_flip);

@@ -884,7 +884,7 @@ static DRIVER_INIT( coh3002t )
 	znsec_init(0, tt10);
 	znsec_init(1, tt16);
 	psx_sio_install_handler(machine, 0, sio_pad_handler);
-	state->dip_timer = timer_alloc( machine, dip_timer_fired, NULL );
+	state->dip_timer = machine->scheduler().timer_alloc( FUNC(dip_timer_fired), NULL );
 
 	memset(state->cis, 0xff, 512);
 	if (get_disk_handle(machine, "card") != NULL)

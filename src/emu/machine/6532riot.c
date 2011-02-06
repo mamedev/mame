@@ -534,7 +534,7 @@ void riot6532_device::device_start()
 	devcb_resolve_write_line(&m_irq_func, &m_config.m_irq_func, this);
 
 	/* allocate timers */
-	m_timer = timer_alloc(&m_machine, timer_end_callback, (void *)this);
+	m_timer = m_machine.scheduler().timer_alloc(FUNC(timer_end_callback), (void *)this);
 
 	/* register for save states */
 	state_save_register_device_item(this, 0, m_port[0].m_in);

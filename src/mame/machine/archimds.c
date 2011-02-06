@@ -231,20 +231,20 @@ void archimedes_init(running_machine *machine)
 {
 	memc_pagesize = 0;
 
-	vbl_timer = timer_alloc(machine, vidc_vblank, NULL);
+	vbl_timer = machine->scheduler().timer_alloc(FUNC(vidc_vblank));
 	timer_adjust_oneshot(vbl_timer, attotime::never, 0);
 
-	timer[0] = timer_alloc(machine, ioc_timer, NULL);
-	timer[1] = timer_alloc(machine, ioc_timer, NULL);
-	timer[2] = timer_alloc(machine, ioc_timer, NULL);
-	timer[3] = timer_alloc(machine, ioc_timer, NULL);
+	timer[0] = machine->scheduler().timer_alloc(FUNC(ioc_timer));
+	timer[1] = machine->scheduler().timer_alloc(FUNC(ioc_timer));
+	timer[2] = machine->scheduler().timer_alloc(FUNC(ioc_timer));
+	timer[3] = machine->scheduler().timer_alloc(FUNC(ioc_timer));
 	timer_adjust_oneshot(timer[0], attotime::never, 0);
 	timer_adjust_oneshot(timer[1], attotime::never, 0);
 	timer_adjust_oneshot(timer[2], attotime::never, 0);
 	timer_adjust_oneshot(timer[3], attotime::never, 0);
 
-	vid_timer = timer_alloc(machine, vidc_video_tick, NULL);
-	snd_timer = timer_alloc(machine, vidc_audio_tick, NULL);
+	vid_timer = machine->scheduler().timer_alloc(FUNC(vidc_video_tick));
+	snd_timer = machine->scheduler().timer_alloc(FUNC(vidc_audio_tick));
 	timer_adjust_oneshot(snd_timer, attotime::never, 0);
 }
 

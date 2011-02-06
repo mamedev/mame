@@ -130,8 +130,8 @@ void blstroid_scanline_update(screen_device &screen, int scanline)
 			period_on  = screen.time_until_pos(vpos + 7, width * 0.9);
 			period_off = screen.time_until_pos(vpos + 8, width * 0.9);
 
-			timer_set(screen.machine, period_on, NULL,  0, irq_on);
-			timer_set(screen.machine, period_off, NULL, 0, irq_off);
+			screen.machine->scheduler().timer_set(period_on, FUNC(irq_on));
+			screen.machine->scheduler().timer_set(period_off, FUNC(irq_off));
 		}
 }
 

@@ -1320,13 +1320,13 @@ static DEVICE_START( snes_sound )
 	memcpy(spc700->ipl_region, machine->region("user5")->base(), 64);
 
 	/* Initialize the timers */
-	spc700->timer[0] = timer_alloc(machine, snes_spc_timer, spc700);
+	spc700->timer[0] = machine->scheduler().timer_alloc(FUNC(snes_spc_timer), spc700);
 	timer_adjust_periodic(spc700->timer[0], attotime::from_hz(8000),  0, attotime::from_hz(8000));
 	timer_enable(spc700->timer[0], 0);
-	spc700->timer[1] = timer_alloc(machine, snes_spc_timer, spc700);
+	spc700->timer[1] = machine->scheduler().timer_alloc(FUNC(snes_spc_timer), spc700);
 	timer_adjust_periodic(spc700->timer[1], attotime::from_hz(8000),  1, attotime::from_hz(8000));
 	timer_enable(spc700->timer[1], 0);
-	spc700->timer[2] = timer_alloc(machine, snes_spc_timer, spc700);
+	spc700->timer[2] = machine->scheduler().timer_alloc(FUNC(snes_spc_timer), spc700);
 	timer_adjust_periodic(spc700->timer[2], attotime::from_hz(64000), 2, attotime::from_hz(64000));
 	timer_enable(spc700->timer[2], 0);
 

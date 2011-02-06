@@ -114,7 +114,7 @@ static MACHINE_START( atetris )
 	atetris_state *state = machine->driver_data<atetris_state>();
 
 	/* Allocate interrupt timer */
-	state->interrupt_timer = timer_alloc(machine, interrupt_gen, NULL);
+	state->interrupt_timer = machine->scheduler().timer_alloc(FUNC(interrupt_gen));
 
 	/* Set up save state */
 	state_save_register_global(machine, state->current_bank);

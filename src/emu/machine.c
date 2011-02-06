@@ -274,11 +274,11 @@ void running_machine::start()
 	m_render = auto_alloc(this, render_manager(*this));
 	generic_machine_init(this);
 	generic_sound_init(this);
+	
+	m_scheduler.register_for_save();
 
-	// initialize the timers and allocate a soft_reset timer
-	// this must be done before cpu_init so that CPU's can allocate timers
-	timer_init(this);
-	m_soft_reset_timer = timer_alloc(this, static_soft_reset, NULL);
+	// allocate a soft_reset timer
+	m_soft_reset_timer = m_scheduler.timer_alloc(MFUNC(timer_expired, running_machine, soft_reset), this);
 
 	// init the osd layer
 	m_osd.init(*this);
@@ -288,7 +288,7 @@ void running_machine::start()
 	ui_init(this);
 
 	// initialize the base time (needed for doing record/playback)
-	time(&m_base_time);
+	::time(&m_base_time);
 
 	// initialize the input system and input ports for the game
 	// this must be done before memory_init in order to allow specifying
@@ -386,7 +386,7 @@ int running_machine::run(bool firstrun)
 		ui_display_startup_screens(this, firstrun, !settingsloaded);
 
 		// perform a soft reset -- this takes us to the running phase
-		soft_reset();
+		soft_reset(*this);
 
 		// run the CPUs until a reset or exit
 		m_hard_reset_pending = false;
@@ -783,7 +783,7 @@ void running_machine::handle_saveload()
 
 	// if there are anonymous timers, we can't save just yet, and we can't load yet either
 	// because the timers might overwrite data we have loaded
-	if (timer_count_anonymous(this) > 0)
+	if (m_scheduler.can_save())
 	{
 		// if more than a second has passed, we're probably screwed
 		if ((timer_get_time(this) - m_saveload_schedule_time) > attotime::from_seconds(1))
@@ -856,9 +856,7 @@ cancel:
 //  of the system
 //-------------------------------------------------
 
-TIMER_CALLBACK( running_machine::static_soft_reset ) { machine->soft_reset(); }
-
-void running_machine::soft_reset()
+void running_machine::soft_reset(running_machine &machine, int param)
 {
 	logerror("Soft reset\n");
 
@@ -870,9 +868,6 @@ void running_machine::soft_reset()
 
 	// now we're running
 	m_current_phase = MACHINE_PHASE_RUNNING;
-
-	// allow 0-time queued callbacks to run before any CPUs execute
-	timer_execute_timers(this);
 }
 
 

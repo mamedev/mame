@@ -366,7 +366,7 @@ MACHINE_START( leland )
 	battery_ram = reinterpret_cast<UINT8 *>(memory_get_shared(*machine, "battery"));
 
 	/* start scanline interrupts going */
-	master_int_timer = timer_alloc(machine, leland_interrupt_callback, NULL);
+	master_int_timer = machine->scheduler().timer_alloc(FUNC(leland_interrupt_callback));
 }
 
 
@@ -415,7 +415,7 @@ MACHINE_START( ataxx )
 	extra_tram = auto_alloc_array(machine, UINT8, ATAXX_EXTRA_TRAM_SIZE);
 
 	/* start scanline interrupts going */
-	master_int_timer = timer_alloc(machine, ataxx_interrupt_callback, NULL);
+	master_int_timer = machine->scheduler().timer_alloc(FUNC(ataxx_interrupt_callback));
 }
 
 

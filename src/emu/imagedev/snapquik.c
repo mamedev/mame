@@ -132,7 +132,7 @@ static DEVICE_START( snapquick )
 	snapquick_token *token = get_token(device);
 
 	/* allocate a timer */
-	token->timer = timer_alloc(device->machine, process_snapshot_or_quickload, (void *) dynamic_cast<device_image_interface *>(device));
+	token->timer = device->machine->scheduler().timer_alloc(FUNC(process_snapshot_or_quickload), (void *) dynamic_cast<device_image_interface *>(device));
 
 }
 

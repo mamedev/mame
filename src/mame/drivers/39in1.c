@@ -1542,21 +1542,21 @@ static void pxa255_start(running_machine* machine)
 	for(index = 0; index < 16; index++)
 	{
 		state->dma_regs.dcsr[index] = 0x00000008;
-		state->dma_regs.timer[index] = timer_alloc(machine, pxa255_dma_dma_end, 0);
+		state->dma_regs.timer[index] = machine->scheduler().timer_alloc(FUNC(pxa255_dma_dma_end));
 	}
 
 	memset(&state->ostimer_regs, 0, sizeof(state->ostimer_regs));
 	for(index = 0; index < 4; index++)
 	{
 		state->ostimer_regs.osmr[index] = 0;
-		state->ostimer_regs.timer[index] = timer_alloc(machine, pxa255_ostimer_match, 0);
+		state->ostimer_regs.timer[index] = machine->scheduler().timer_alloc(FUNC(pxa255_ostimer_match));
 	}
 
 	memset(&state->intc_regs, 0, sizeof(state->intc_regs));
 
 	memset(&state->lcd_regs, 0, sizeof(state->lcd_regs));
-	state->lcd_regs.dma[0].eof = timer_alloc(machine, pxa255_lcd_dma_eof, 0);
-	state->lcd_regs.dma[1].eof = timer_alloc(machine, pxa255_lcd_dma_eof, 0);
+	state->lcd_regs.dma[0].eof = machine->scheduler().timer_alloc(FUNC(pxa255_lcd_dma_eof));
+	state->lcd_regs.dma[1].eof = machine->scheduler().timer_alloc(FUNC(pxa255_lcd_dma_eof));
 	state->lcd_regs.trgbr = 0x00aa5500;
 	state->lcd_regs.tcr = 0x0000754f;
 

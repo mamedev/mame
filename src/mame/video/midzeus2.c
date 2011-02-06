@@ -280,7 +280,7 @@ VIDEO_START( midzeus2 )
 	texel_width = 256;
 	zeus_renderbase = waveram[1];
 
-	int_timer = timer_alloc(machine, int_timer_callback, NULL);
+	int_timer = machine->scheduler().timer_alloc(FUNC(int_timer_callback));
 
 	/* save states */
 	state_save_register_global_pointer(machine, waveram[0], WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8 / sizeof(waveram[0][0]));

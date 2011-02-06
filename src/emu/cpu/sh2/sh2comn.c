@@ -923,13 +923,13 @@ void sh2_common_init(sh2_state *sh2, legacy_cpu_device *device, device_irq_callb
 	const sh2_cpu_core *conf = (const sh2_cpu_core *)device->baseconfig().static_config();
 	int i;
 
-	sh2->timer = timer_alloc(device->machine, sh2_timer_callback, sh2);
+	sh2->timer = device->machine->scheduler().timer_alloc(FUNC(sh2_timer_callback), sh2);
 	timer_adjust_oneshot(sh2->timer, attotime::never, 0);
 
-	sh2->dma_current_active_timer[0] = timer_alloc(device->machine, sh2_dma_current_active_callback, sh2);
+	sh2->dma_current_active_timer[0] = device->machine->scheduler().timer_alloc(FUNC(sh2_dma_current_active_callback), sh2);
 	timer_adjust_oneshot(sh2->dma_current_active_timer[0], attotime::never, 0);
 
-	sh2->dma_current_active_timer[1] = timer_alloc(device->machine, sh2_dma_current_active_callback, sh2);
+	sh2->dma_current_active_timer[1] = device->machine->scheduler().timer_alloc(FUNC(sh2_dma_current_active_callback), sh2);
 	timer_adjust_oneshot(sh2->dma_current_active_timer[1], attotime::never, 0);
 
 

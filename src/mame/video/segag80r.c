@@ -52,7 +52,7 @@ static void vblank_latch_set(running_machine *machine)
 	/* set a timer to mimic the 555 timer that drives the EDGINT signal */
 	/* the 555 is run in monostable mode with R=56000 and C=1000pF */
 	vblank_latch = 1;
-	timer_set(machine, PERIOD_OF_555_MONOSTABLE(CAP_P(1000), RES_K(56)), NULL, 0, vblank_latch_clear);
+	machine->scheduler().timer_set(PERIOD_OF_555_MONOSTABLE(CAP_P(1000), RES_K(56)), FUNC(vblank_latch_clear));
 
 	/* latch the current flip state at the same time */
 	video_flip = video_control & 1;

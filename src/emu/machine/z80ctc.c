@@ -336,7 +336,7 @@ void z80ctc_device::ctc_channel::start(z80ctc_device *device, int index, bool no
 	if (write_line != NULL)
 		devcb_resolve_write_line(&m_zc, write_line, m_device);
 	m_notimer = notimer;
-	m_timer = timer_alloc(&m_device->m_machine, static_timer_callback, this);
+	m_timer = m_device->machine->scheduler().timer_alloc(FUNC(static_timer_callback), this);
 
 	// register for save states
     state_save_register_device_item(m_device, m_index, m_mode);

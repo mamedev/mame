@@ -449,9 +449,9 @@ static DEVICE_START( cdp1864 )
 	cdp1864->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate, cdp1864, cdp1864_stream_update);
 
 	/* create the timers */
-	cdp1864->int_timer = timer_alloc(device->machine, cdp1864_int_tick, (void *)device);
-	cdp1864->efx_timer = timer_alloc(device->machine, cdp1864_efx_tick, (void *)device);
-	cdp1864->dma_timer = timer_alloc(device->machine, cdp1864_dma_tick, (void *)device);
+	cdp1864->int_timer = device->machine->scheduler().timer_alloc(FUNC(cdp1864_int_tick), (void *)device);
+	cdp1864->efx_timer = device->machine->scheduler().timer_alloc(FUNC(cdp1864_efx_tick), (void *)device);
+	cdp1864->dma_timer = device->machine->scheduler().timer_alloc(FUNC(cdp1864_dma_tick), (void *)device);
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, cdp1864->disp);

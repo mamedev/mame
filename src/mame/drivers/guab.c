@@ -752,7 +752,7 @@ INPUT_PORTS_END
 
  static MACHINE_START( guab )
 {
-	fdc_timer = timer_alloc(machine, fdc_data_callback, NULL);
+	fdc_timer = machine->scheduler().timer_alloc(FUNC(fdc_data_callback));
 }
 
 static MACHINE_RESET( guab )

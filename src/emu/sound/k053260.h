@@ -14,7 +14,7 @@
 typedef struct _k053260_interface k053260_interface;
 struct _k053260_interface {
 	const char *rgnoverride;
-	timer_fired_func irq;			/* called on SH1 complete cycle ( clock / 32 ) */
+	timer_expired_func irq;			/* called on SH1 complete cycle ( clock / 32 ) */
 };
 
 

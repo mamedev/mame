@@ -235,7 +235,7 @@ static MACHINE_START( m92 )
 	state_save_register_global(machine, state->bankaddress);
 	state_save_register_postload(machine, m92_postload, NULL);
 
-	state->scanline_timer = timer_alloc(machine, m92_scanline_interrupt, NULL);
+	state->scanline_timer = machine->scheduler().timer_alloc(FUNC(m92_scanline_interrupt));
 }
 
 static MACHINE_RESET( m92 )
@@ -348,7 +348,7 @@ static TIMER_CALLBACK( setvector_callback )
 
 static WRITE16_HANDLER( m92_soundlatch_w )
 {
-	timer_call_after_resynch(space->machine, NULL, V30_ASSERT, setvector_callback);
+	space->machine->scheduler().synchronize(FUNC(setvector_callback), V30_ASSERT);
 	soundlatch_w(space, 0, data & 0xff);
 }
 
@@ -366,7 +366,7 @@ static READ16_HANDLER( m92_soundlatch_r )
 
 static WRITE16_HANDLER( m92_sound_irq_ack_w )
 {
-	timer_call_after_resynch(space->machine, NULL, V30_CLEAR, setvector_callback);
+	space->machine->scheduler().synchronize(FUNC(setvector_callback), V30_CLEAR);
 }
 
 static WRITE16_HANDLER( m92_sound_status_w )
@@ -911,9 +911,9 @@ GFXDECODE_END
 static void sound_irq(device_t *device, int state)
 {
 	if (state)
-		timer_call_after_resynch(device->machine, NULL, YM2151_ASSERT, setvector_callback);
+		device->machine->scheduler().synchronize(FUNC(setvector_callback), YM2151_ASSERT);
 	else
-		timer_call_after_resynch(device->machine, NULL, YM2151_CLEAR, setvector_callback);
+		device->machine->scheduler().synchronize(FUNC(setvector_callback), YM2151_CLEAR);
 }
 
 static const ym2151_interface ym2151_config =

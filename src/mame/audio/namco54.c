@@ -120,7 +120,7 @@ WRITE8_DEVICE_HANDLER( namco_54xx_write )
 {
 	namco_54xx_state *state = get_safe_token(device);
 
-	timer_call_after_resynch(device->machine, (void *)device, data, namco_54xx_latch_callback);
+	device->machine->scheduler().synchronize(FUNC(namco_54xx_latch_callback), data, (void *)device);
 
 	cpu_set_input_line(state->cpu, 0, ASSERT_LINE);
 
@@ -129,7 +129,7 @@ WRITE8_DEVICE_HANDLER( namco_54xx_write )
 	// The input clock to the 06XX interface chip is 64H, that is
 	// 18432000/6/64 = 48kHz, so it makes sense for the irq line to be
 	// asserted for one clock cycle ~= 21us.
-	timer_set(device->machine, attotime::from_usec(21), (void *)device, 0, namco_54xx_irq_clear);
+	device->machine->scheduler().timer_set(attotime::from_usec(21), FUNC(namco_54xx_irq_clear), 0, (void *)device);
 }
 
 

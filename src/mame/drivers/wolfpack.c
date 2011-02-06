@@ -20,13 +20,13 @@ static TIMER_CALLBACK( periodic_callback )
 	if (scanline >= 262)
 		scanline = 0;
 
-	timer_set(machine, machine->primary_screen->time_until_pos(scanline), NULL, scanline, periodic_callback);
+	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(scanline), FUNC(periodic_callback), scanline);
 }
 
 
 static MACHINE_RESET( wolfpack )
 {
-	timer_set(machine, machine->primary_screen->time_until_pos(0), NULL, 0, periodic_callback);
+	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(0), FUNC(periodic_callback));
 }
 
 

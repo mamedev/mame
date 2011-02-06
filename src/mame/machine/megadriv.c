@@ -1659,7 +1659,7 @@ static void init_megadri6_io(running_machine *machine)
 
 	for (i=0; i<3; i++)
 	{
-		io_timeout[i] = timer_alloc(machine, io_timeout_timer_callback, (void*)(FPTR)i);
+		io_timeout[i] = machine->scheduler().timer_alloc(FUNC(io_timeout_timer_callback), (void*)(FPTR)i);
 	}
 }
 
@@ -2269,7 +2269,7 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 
 	/* If the z80 is running, sync the z80 execution state */
 	if ( ! genz80.z80_is_reset )
-		timer_set( space->machine, attotime::zero, NULL, 0, megadriv_z80_run_state );
+		space->machine->scheduler().timer_set( attotime::zero, FUNC(megadriv_z80_run_state ));
 }
 
 static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
@@ -2313,7 +2313,7 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 			genz80.z80_is_reset = 1;
 		}
 	}
-	timer_set( space->machine, attotime::zero, NULL, 0, megadriv_z80_run_state );
+	space->machine->scheduler().timer_set( attotime::zero, FUNC(megadriv_z80_run_state ));
 }
 
 
@@ -2977,7 +2977,7 @@ static UINT16 commsram[8];
 // reads
 static READ16_HANDLER( _32x_68k_commsram_r )
 {
-	if (_32X_COMMS_PORT_SYNC) timer_call_after_resynch(space->machine, NULL, 0, NULL);
+	if (_32X_COMMS_PORT_SYNC) space->machine->scheduler().synchronize();
 	return commsram[offset];
 }
 
@@ -2985,7 +2985,7 @@ static READ16_HANDLER( _32x_68k_commsram_r )
 static WRITE16_HANDLER( _32x_68k_commsram_w )
 {
 	COMBINE_DATA(&commsram[offset]);
-	if (_32X_COMMS_PORT_SYNC) timer_call_after_resynch(space->machine, NULL, 0, NULL);
+	if (_32X_COMMS_PORT_SYNC) space->machine->scheduler().synchronize();
 }
 
 /**********************************************************************************************/
@@ -4145,7 +4145,7 @@ static UINT16 segacd_comms_flags = 0x0000;
 
 static READ16_HANDLER( segacd_comms_flags_r )
 {
-	timer_call_after_resynch(space->machine, NULL, 0, NULL);
+	space->machine->scheduler().synchronize();
 	return segacd_comms_flags;
 }
 
@@ -4154,7 +4154,7 @@ static WRITE16_HANDLER( segacd_comms_flags_subcpu_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		segacd_comms_flags = (segacd_comms_flags & 0xff00) | (data & 0x00ff);
-		timer_call_after_resynch(space->machine, NULL, 0, NULL);
+		space->machine->scheduler().synchronize();
 	}
 
 	if (ACCESSING_BITS_8_15)
@@ -4180,7 +4180,7 @@ static WRITE16_HANDLER( segacd_comms_flags_maincpu_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		segacd_comms_flags = (segacd_comms_flags & 0x00ff) | (data & 0xff00);
-		timer_call_after_resynch(space->machine, NULL, 0, NULL);
+		space->machine->scheduler().synchronize();
 	}
 }
 
@@ -4216,19 +4216,19 @@ UINT16 segacd_comms_part2[0x8];
 
 static READ16_HANDLER( segacd_comms_main_part1_r )
 {
-	timer_call_after_resynch(space->machine, NULL, 0, NULL);
+	space->machine->scheduler().synchronize();
 	return segacd_comms_part1[offset];
 }
 
 static WRITE16_HANDLER( segacd_comms_main_part1_w )
 {
-	timer_call_after_resynch(space->machine, NULL, 0, NULL);
+	space->machine->scheduler().synchronize();
 	COMBINE_DATA(&segacd_comms_part1[offset]);
 }
 
 static READ16_HANDLER( segacd_comms_main_part2_r )
 {
-	timer_call_after_resynch(space->machine, NULL, 0, NULL);
+	space->machine->scheduler().synchronize();
 	return segacd_comms_part2[offset];
 }
 
@@ -4240,7 +4240,7 @@ static WRITE16_HANDLER( segacd_comms_main_part2_w )
 
 static READ16_HANDLER( segacd_comms_sub_part1_r )
 {
-	timer_call_after_resynch(space->machine, NULL, 0, NULL);
+	space->machine->scheduler().synchronize();
 	return segacd_comms_part1[offset];
 }
 
@@ -4251,13 +4251,13 @@ static WRITE16_HANDLER( segacd_comms_sub_part1_w )
 
 static READ16_HANDLER( segacd_comms_sub_part2_r )
 {
-	timer_call_after_resynch(space->machine, NULL, 0, NULL);
+	space->machine->scheduler().synchronize();
 	return segacd_comms_part2[offset];
 }
 
 static WRITE16_HANDLER( segacd_comms_sub_part2_w )
 {
-	timer_call_after_resynch(space->machine, NULL, 0, NULL);
+	space->machine->scheduler().synchronize();
 	COMBINE_DATA(&segacd_comms_part2[offset]);
 }
 
@@ -5021,16 +5021,16 @@ void segacd_init_main_cpu( running_machine* machine )
 
 	memory_install_read16_handler (space, 0x0000070, 0x0000073, 0, 0, scd_hint_vector_r );
 
-	segacd_gfx_conversion_timer = timer_alloc(machine, segacd_gfx_conversion_timer_callback, 0);
+	segacd_gfx_conversion_timer = machine->scheduler().timer_alloc(FUNC(segacd_gfx_conversion_timer_callback));
 	timer_adjust_oneshot(segacd_gfx_conversion_timer, attotime::never, 0);
 
-	segacd_dmna_ret_timer = timer_alloc(machine, segacd_dmna_ret_timer_callback, 0);
+	segacd_dmna_ret_timer = machine->scheduler().timer_alloc(FUNC(segacd_dmna_ret_timer_callback));
 	timer_adjust_oneshot(segacd_gfx_conversion_timer, attotime::never, 0);
 
-	segacd_hock_timer = timer_alloc(machine, segacd_hock_callback, 0);
+	segacd_hock_timer = machine->scheduler().timer_alloc(FUNC(segacd_hock_callback));
 	timer_adjust_oneshot(segacd_hock_timer, attotime::never, 0);
 
-	segacd_irq3_timer = timer_alloc(machine, segacd_irq3_timer_callback, 0);
+	segacd_irq3_timer = machine->scheduler().timer_alloc(FUNC(segacd_irq3_timer_callback));
 	timer_adjust_oneshot(segacd_irq3_timer, attotime::never, 0);
 
 
@@ -5259,7 +5259,7 @@ static void cdd_hock_irq(running_machine *machine,UINT8 dir)
 	if((segacd_cdd.ctrl & 4 || dir) && segacd_irq_mask & 0x10) // export status, check if bit 2 (HOst ClocK) and irq is enabled
 	{
 		segacd_cdd.ctrl |= 4; // enable Hock bit if it isn't already active
-		timer_set(machine, attotime::from_hz(75), NULL,0, execute_hock_irq); // 1 / 75th of a second
+		machine->scheduler().timer_set(attotime::from_hz(75), FUNC(execute_hock_irq)); // 1 / 75th of a second
 	}
 }
 #endif
@@ -8246,7 +8246,7 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
        top-left of the screen.  The first scanline is scanline 0 (we set scanline to -1 in
        VIDEO_EOF) */
 
-	timer_call_after_resynch(timer.machine, NULL, 0, 0);
+	timer.machine->scheduler().synchronize(FUNC(0));
 	/* Compensate for some rounding errors
 
        When the counter reaches 261 we should have reached the end of the frame, however due
@@ -8424,7 +8424,7 @@ MACHINE_RESET( megadriv )
 		genz80.z80_has_bus = 1;
 		genz80.z80_bank_addr = 0;
 		genesis_scanline_counter = -1;
-		timer_set( machine, attotime::zero, NULL, 0, megadriv_z80_run_state );
+		machine->scheduler().timer_set( attotime::zero, FUNC(megadriv_z80_run_state ));
 	}
 
 	megadrive_imode = 0;
@@ -8959,7 +8959,7 @@ static void megadriv_init_common(running_machine *machine)
 
 	if(_32x_is_connected)
 	{
-		_32x_pwm_timer = timer_alloc(machine, _32x_pwm_callback, 0);
+		_32x_pwm_timer = machine->scheduler().timer_alloc(FUNC(_32x_pwm_callback));
 		timer_adjust_oneshot(_32x_pwm_timer, attotime::never, 0);
 	}
 

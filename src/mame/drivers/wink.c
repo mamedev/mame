@@ -98,7 +98,7 @@ static WRITE8_HANDLER( sound_irq_w )
 {
 	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 	//sync with sound cpu (but it still loses some soundlatches...)
-	//timer_call_after_resynch(space->machine, NULL, 0, NULL);
+	//space->machine->scheduler().synchronize();
 }
 
 static ADDRESS_MAP_START( wink_map, ADDRESS_SPACE_PROGRAM, 8 )

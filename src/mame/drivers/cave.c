@@ -120,7 +120,7 @@ static TIMER_DEVICE_CALLBACK( cave_vblank_start )
 	update_irq_state(timer.machine);
 	cave_get_sprite_info(timer.machine);
 	state->agallet_vblank_irq = 1;
-	timer_set(timer.machine, attotime::from_usec(2000), NULL, 0, cave_vblank_end);
+	timer.machine->scheduler().timer_set(attotime::from_usec(2000), FUNC(cave_vblank_end));
 }
 
 /* Called once/frame to generate the VBLANK interrupt */

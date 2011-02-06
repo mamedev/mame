@@ -228,7 +228,7 @@ static VIDEO_START( mystston )
 	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 
 	/* create the interrupt timer */
-	state->interrupt_timer = timer_alloc(machine, interrupt_callback, NULL);
+	state->interrupt_timer = machine->scheduler().timer_alloc(FUNC(interrupt_callback));
 }
 
 

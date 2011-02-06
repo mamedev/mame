@@ -284,7 +284,7 @@ static WRITE16_HANDLER( ml_sub_reset_w )
 	if (pixels)
 	{
 		dma_active = 1;
-		timer_set(space->machine, attotime::from_msec(20), NULL, 0, dma_complete);
+		space->machine->scheduler().timer_set(attotime::from_msec(20), FUNC(dma_complete));
 	}
 
 	if(!(data & 0x40)) // unknown line used

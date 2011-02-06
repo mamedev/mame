@@ -341,15 +341,15 @@ void screen_device::device_start()
 	m_container->set_user_settings(settings);
 
 	// allocate the VBLANK timers
-	m_vblank_begin_timer = timer_alloc(machine, static_vblank_begin_callback, (void *)this);
-	m_vblank_end_timer = timer_alloc(machine, static_vblank_end_callback, (void *)this);
+	m_vblank_begin_timer = machine->scheduler().timer_alloc(FUNC(static_vblank_begin_callback), (void *)this);
+	m_vblank_end_timer = machine->scheduler().timer_alloc(FUNC(static_vblank_end_callback), (void *)this);
 
 	// allocate a timer to reset partial updates
-	m_scanline0_timer = timer_alloc(machine, static_scanline0_callback, (void *)this);
+	m_scanline0_timer = machine->scheduler().timer_alloc(FUNC(static_scanline0_callback), (void *)this);
 
 	// allocate a timer to generate per-scanline updates
 	if ((machine->config->m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0)
-		m_scanline_timer = timer_alloc(machine, static_scanline_update_callback, (void *)this);
+		m_scanline_timer = machine->scheduler().timer_alloc(FUNC(static_scanline_update_callback), (void *)this);
 
 	// configure the screen with the default parameters
 	configure(m_config.m_width, m_config.m_height, m_config.m_visarea, m_config.m_refresh);

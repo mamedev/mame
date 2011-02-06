@@ -88,7 +88,7 @@ static TIMER_CALLBACK( delayed_audio_latch_w )
 
 WRITE8_HANDLER( jedi_audio_latch_w )
 {
-	timer_call_after_resynch(space->machine, NULL, data, delayed_audio_latch_w);
+	space->machine->scheduler().synchronize(FUNC(delayed_audio_latch_w), data);
 }
 
 

@@ -174,7 +174,7 @@ static TIMER_CALLBACK( irq_callback )
 
 static void create_irq_timer(running_machine *machine)
 {
-	irq_timer = timer_alloc(machine, irq_callback, NULL);
+	irq_timer = machine->scheduler().timer_alloc(FUNC(irq_callback));
 }
 
 
@@ -251,7 +251,7 @@ static TIMER_CALLBACK( nmi_callback )
 
 static void create_nmi_timer(running_machine *machine)
 {
-	nmi_timer = timer_alloc(machine, nmi_callback, NULL);
+	nmi_timer = machine->scheduler().timer_alloc(FUNC(nmi_callback));
 }
 
 

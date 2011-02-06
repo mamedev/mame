@@ -110,7 +110,7 @@ MACHINE_START( tmp68301 )
 {
 	int i;
 	for (i = 0; i < 3; i++)
-		tmp68301_timer[i] = timer_alloc(machine, tmp68301_timer_callback, NULL);
+		tmp68301_timer[i] = machine->scheduler().timer_alloc(FUNC(tmp68301_timer_callback));
 }
 
 MACHINE_RESET( tmp68301 )

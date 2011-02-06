@@ -557,17 +557,17 @@ static DEVICE_START( common_sh_start )
 
 	/* create timers here so they stick around */
 	state->i80186.cpu = dmaspace->cpu;
-	state->i80186.timer[0].int_timer = timer_alloc(machine, internal_timer_int, device);
-	state->i80186.timer[1].int_timer = timer_alloc(machine, internal_timer_int, device);
-	state->i80186.timer[2].int_timer = timer_alloc(machine, internal_timer_int, device);
-	state->i80186.timer[0].time_timer = timer_alloc(machine, NULL, NULL);
-	state->i80186.timer[1].time_timer = timer_alloc(machine, NULL, NULL);
-	state->i80186.timer[2].time_timer = timer_alloc(machine, NULL, NULL);
-	state->i80186.dma[0].finish_timer = timer_alloc(machine, dma_timer_callback, device);
-	state->i80186.dma[1].finish_timer = timer_alloc(machine, dma_timer_callback, device);
+	state->i80186.timer[0].int_timer = machine->scheduler().timer_alloc(FUNC(internal_timer_int), device);
+	state->i80186.timer[1].int_timer = machine->scheduler().timer_alloc(FUNC(internal_timer_int), device);
+	state->i80186.timer[2].int_timer = machine->scheduler().timer_alloc(FUNC(internal_timer_int), device);
+	state->i80186.timer[0].time_timer = machine->scheduler().timer_alloc(FUNC(NULL));
+	state->i80186.timer[1].time_timer = machine->scheduler().timer_alloc(FUNC(NULL));
+	state->i80186.timer[2].time_timer = machine->scheduler().timer_alloc(FUNC(NULL));
+	state->i80186.dma[0].finish_timer = machine->scheduler().timer_alloc(FUNC(dma_timer_callback), device);
+	state->i80186.dma[1].finish_timer = machine->scheduler().timer_alloc(FUNC(dma_timer_callback), device);
 
 	for (i = 0; i < 9; i++)
-		state->counter[i].timer = timer_alloc(machine, NULL, NULL);
+		state->counter[i].timer = machine->scheduler().timer_alloc(FUNC(NULL));
 }
 
 static DEVICE_START( leland_80186_sound )
@@ -1814,7 +1814,7 @@ static TIMER_CALLBACK( command_lo_sync )
 
 WRITE8_DEVICE_HANDLER( leland_80186_command_lo_w )
 {
-	timer_call_after_resynch(device->machine, device, data, command_lo_sync);
+	device->machine->scheduler().synchronize(FUNC(command_lo_sync), data, device);
 }
 
 
@@ -1877,7 +1877,7 @@ READ8_DEVICE_HANDLER( leland_80186_response_r )
 	if (LOG_COMM) logerror("%04X:Read sound response latch = %02X\n", pc, state->sound_response);
 
 	/* synchronize the response */
-	timer_call_after_resynch(device->machine, device, pc + 2, delayed_response_r);
+	device->machine->scheduler().synchronize(FUNC(delayed_response_r), pc + 2, device);
 	return state->sound_response;
 }
 

@@ -188,7 +188,7 @@ static DEVICE_START( msm5205 )
 
 	/* stream system initialize */
 	voice->stream = device->machine->sound().stream_alloc(*device,0,1,device->clock(),voice,MSM5205_update);
-	voice->timer = timer_alloc(device->machine, MSM5205_vclk_callback, voice);
+	voice->timer = device->machine->scheduler().timer_alloc(FUNC(MSM5205_vclk_callback), voice);
 
 	/* initialize */
 	DEVICE_RESET_CALL(msm5205);

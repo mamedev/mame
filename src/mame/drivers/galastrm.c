@@ -166,7 +166,7 @@ static READ32_HANDLER( galastrm_adstick_ctrl_r )
 
 static WRITE32_HANDLER( galastrm_adstick_ctrl_w )
 {
-	timer_set(space->machine, downcast<cpu_device *>(space->cpu)->cycles_to_attotime(1000), NULL, 0, galastrm_interrupt6);
+	space->machine->scheduler().timer_set(downcast<cpu_device *>(space->cpu)->cycles_to_attotime(1000), FUNC(galastrm_interrupt6));
 }
 
 /***********************************************************

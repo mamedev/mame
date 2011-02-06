@@ -616,7 +616,7 @@ static MACHINE_START( qdrmfgp )
 static MACHINE_START( qdrmfgp2 )
 {
 	/* sound irq (CCU? 240Hz) */
-	timer_pulse(machine, attotime::from_hz(18432000/76800), NULL, 0, gp2_timer_callback);
+	machine->scheduler().timer_pulse(attotime::from_hz(18432000/76800), FUNC(gp2_timer_callback));
 
 	MACHINE_START_CALL( qdrmfgp );
 }

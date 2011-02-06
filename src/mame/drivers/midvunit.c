@@ -161,7 +161,7 @@ static WRITE32_HANDLER( midvunit_adc_w )
 		if (which < 0 || which > 2)
 			logerror("adc_w: unexpected which = %02X\n", which + 4);
 		adc_data = input_port_read_safe(space->machine, adcnames[which], 0);
-		timer_set(space->machine, attotime::from_msec(1), NULL, 0, adc_ready);
+		space->machine->scheduler().timer_set(attotime::from_msec(1), FUNC(adc_ready));
 	}
 	else
 		logerror("adc_w without enabling writes!\n");

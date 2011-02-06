@@ -387,7 +387,7 @@ static void nbmj9195_gfxdraw(running_machine *machine, int vram)
 	nb19010_busyflag = 0;
 
 	/* 1650ns per count */
-	timer_set(machine, attotime::from_nsec(nb19010_busyctr * 1650), NULL, 0, blitter_timer_callback);
+	machine->scheduler().timer_set(attotime::from_nsec(nb19010_busyctr * 1650), FUNC(blitter_timer_callback));
 }
 
 /******************************************************************************

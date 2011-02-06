@@ -241,10 +241,10 @@ static CPU_INIT(h8bit)
 	h8->direct = &h8->program->direct();
 	h8->io = device->space(AS_IO);
 
-	h8->timer[0] = timer_alloc(h8->device->machine, h8_timer_0_cb, h8);
-	h8->timer[1] = timer_alloc(h8->device->machine, h8_timer_1_cb, h8);
-	h8->timer[2] = timer_alloc(h8->device->machine, h8_timer_2_cb, h8);
-	h8->timer[3] = timer_alloc(h8->device->machine, h8_timer_3_cb, h8);
+	h8->timer[0] = h8->device->machine->scheduler().timer_alloc(FUNC(h8_timer_0_cb), h8);
+	h8->timer[1] = h8->device->machine->scheduler().timer_alloc(FUNC(h8_timer_1_cb), h8);
+	h8->timer[2] = h8->device->machine->scheduler().timer_alloc(FUNC(h8_timer_2_cb), h8);
+	h8->timer[3] = h8->device->machine->scheduler().timer_alloc(FUNC(h8_timer_3_cb), h8);
 
 	state_save_register_device_item(device, 0, h8->h8err);
 	state_save_register_device_item_array(device, 0, h8->regs);

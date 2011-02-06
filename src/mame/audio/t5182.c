@@ -206,25 +206,25 @@ static TIMER_CALLBACK( setirq_callback )
 
 WRITE8_HANDLER( t5182_sound_irq_w )
 {
-	timer_call_after_resynch(space->machine, NULL, CPU_ASSERT,setirq_callback);
+	space->machine->scheduler().synchronize(FUNC(setirq_callback), CPU_ASSERT);
 }
 
 static WRITE8_HANDLER( t5182_ym2151_irq_ack_w )
 {
-	timer_call_after_resynch(space->machine, NULL, YM2151_ACK,setirq_callback);
+	space->machine->scheduler().synchronize(FUNC(setirq_callback), YM2151_ACK);
 }
 
 static WRITE8_HANDLER( t5182_cpu_irq_ack_w )
 {
-	timer_call_after_resynch(space->machine, NULL, CPU_CLEAR,setirq_callback);
+	space->machine->scheduler().synchronize(FUNC(setirq_callback), CPU_CLEAR);
 }
 
 static void t5182_ym2151_irq_handler(device_t *device, int irq)
 {
 	if (irq)
-		timer_call_after_resynch(device->machine, NULL, YM2151_ASSERT,setirq_callback);
+		device->machine->scheduler().synchronize(FUNC(setirq_callback), YM2151_ASSERT);
 	else
-		timer_call_after_resynch(device->machine, NULL, YM2151_CLEAR,setirq_callback);
+		device->machine->scheduler().synchronize(FUNC(setirq_callback), YM2151_CLEAR);
 }
 
 

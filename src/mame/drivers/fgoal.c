@@ -86,7 +86,7 @@ static TIMER_CALLBACK( interrupt_callback )
 	if (scanline > 256)
 		scanline = 0;
 
-	timer_set(machine, machine->primary_screen->time_until_pos(scanline), NULL, 0, interrupt_callback);
+	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(scanline), FUNC(interrupt_callback));
 }
 
 
@@ -356,7 +356,7 @@ static MACHINE_RESET( fgoal )
 {
 	fgoal_state *state = machine->driver_data<fgoal_state>();
 
-	timer_set(machine, machine->primary_screen->time_until_pos(0), NULL, 0, interrupt_callback);
+	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(0), FUNC(interrupt_callback));
 
 	state->xpos = 0;
 	state->ypos = 0;

@@ -109,7 +109,7 @@ static TIMER_CALLBACK( deferred_sndpia1_porta_w )
 static WRITE8_DEVICE_HANDLER( sync_sndpia1_porta_w )
 {
 	/* we need to synchronize this so the sound CPU doesn't drop anything important */
-	timer_call_after_resynch(device->machine, (void *)device, data, deferred_sndpia1_porta_w);
+	device->machine->scheduler().synchronize(FUNC(deferred_sndpia1_porta_w), data, (void *)device);
 }
 
 

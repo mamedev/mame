@@ -471,7 +471,7 @@ void cidelsa_state::machine_reset()
 {
 	/* reset the CPU */
 	m_reset = 0;
-	timer_set(&m_machine, attotime::from_msec(200), NULL, 0, set_cpu_mode);
+	m_machine.scheduler().timer_set(attotime::from_msec(200), FUNC(set_cpu_mode));
 }
 
 /* Machine Drivers */

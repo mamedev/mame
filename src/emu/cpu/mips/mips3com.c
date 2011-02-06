@@ -105,7 +105,7 @@ void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, legacy
 	mips->vtlb = vtlb_alloc(device, ADDRESS_SPACE_PROGRAM, 2 * mips->tlbentries + 2, 0);
 
 	/* allocate a timer for the compare interrupt */
-	mips->compare_int_timer = timer_alloc(device->machine, compare_int_callback, (void *)device);
+	mips->compare_int_timer = device->machine->scheduler().timer_alloc(FUNC(compare_int_callback), (void *)device);
 
 	/* reset the state */
 	mips3com_reset(mips);

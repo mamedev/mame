@@ -135,8 +135,8 @@ static TIMER_CALLBACK( interrupt_assert_callback )
 static void create_interrupt_timers( running_machine *machine )
 {
 	enigma2_state *state = machine->driver_data<enigma2_state>();
-	state->interrupt_clear_timer = timer_alloc(machine, interrupt_clear_callback, NULL);
-	state->interrupt_assert_timer = timer_alloc(machine, interrupt_assert_callback, NULL);
+	state->interrupt_clear_timer = machine->scheduler().timer_alloc(FUNC(interrupt_clear_callback));
+	state->interrupt_assert_timer = machine->scheduler().timer_alloc(FUNC(interrupt_assert_callback));
 }
 
 

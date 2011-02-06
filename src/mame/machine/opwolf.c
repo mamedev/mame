@@ -695,7 +695,7 @@ static TIMER_CALLBACK( cchip_timer )
 	{
 		// Simulate time for command to execute (exact timing unknown, this is close)
 		state->current_cmd = 0xf5;
-		timer_set(machine, state->maincpu->cycles_to_attotime(80000), NULL, 0, opwolf_timer_callback);
+		machine->scheduler().timer_set(state->maincpu->cycles_to_attotime(80000), FUNC(opwolf_timer_callback));
 	}
 	state->cchip_last_7a = state->cchip_ram[0x7a];
 
@@ -752,5 +752,5 @@ void opwolf_cchip_init( running_machine *machine )
 	state->cchip_coins_for_credit[1] = 1;
 	state->cchip_credits_for_coin[1] = 1;
 
-	timer_pulse(machine, attotime::from_hz(60), NULL, 0, cchip_timer);
+	machine->scheduler().timer_pulse(attotime::from_hz(60), FUNC(cchip_timer));
 }

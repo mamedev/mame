@@ -197,8 +197,8 @@ static DEVICE_START( akiko )
 	state->cdrom_cmd_resp = 0;
 
 	state->cdrom_toc = NULL;
-	state->dma_timer = timer_alloc(machine, akiko_dma_proc, state);
-	state->frame_timer = timer_alloc(machine, akiko_frame_proc, state);
+	state->dma_timer = machine->scheduler().timer_alloc(FUNC(akiko_dma_proc), state);
+	state->frame_timer = machine->scheduler().timer_alloc(FUNC(akiko_frame_proc), state);
 	state->i2cmem = machine->device("i2cmem");
 
 
@@ -702,7 +702,7 @@ static void akiko_update_cdrom(akiko_state *state)
 		{
 			state->cdrom_cmd_start = (state->cdrom_cmd_start+3) & 0xff;
 
-			timer_set( state->machine, attotime::from_msec(1), state, resp[0], akiko_cd_delayed_cmd );
+			state->machine->scheduler().timer_set( attotime::from_msec(1), FUNC(akiko_cd_delayed_cmd ), resp[0], state);
 
 			break;
 		}

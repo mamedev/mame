@@ -933,7 +933,7 @@ static WRITE32_HANDLER(latch32_w)
 	if(!offset)
 		state->latches[2]|=1;
 	COMBINE_DATA(&state->latches[offset]);
-	timer_call_after_resynch(space->machine, NULL, 0, NULL);
+	space->machine->scheduler().synchronize();
 }
 
 static READ16_HANDLER(latch16_r)
@@ -952,7 +952,7 @@ static WRITE16_HANDLER(latch16_w)
 	if(!offset)
 		state->latches[2]|=2;
 	state->latches[offset]=data;
-	timer_call_after_resynch(space->machine, NULL, 0, NULL);
+	space->machine->scheduler().synchronize();
 }
 
 static ADDRESS_MAP_START( jsk_map, ADDRESS_SPACE_PROGRAM, 16 )

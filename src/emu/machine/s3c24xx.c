@@ -3168,14 +3168,14 @@ static DEVICE_START( s3c24xx )
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	s3c24xx->iface = (const s3c24xx_interface *)device->baseconfig().static_config();
-	for (int i = 0; i < 5; i++) s3c24xx->pwm.timer[i] = timer_alloc( device->machine, s3c24xx_pwm_timer_exp, (void*)device);
-	for (int i = 0; i < 4; i++) s3c24xx->dma[i].timer = timer_alloc( device->machine, s3c24xx_dma_timer_exp, (void*)device);
-	s3c24xx->iic.timer = timer_alloc( device->machine, s3c24xx_iic_timer_exp, (void*)device);
-	s3c24xx->iis.timer = timer_alloc( device->machine, s3c24xx_iis_timer_exp, (void*)device);
-	s3c24xx->lcd.timer = timer_alloc( device->machine, s3c24xx_lcd_timer_exp, (void*)device);
-	s3c24xx->rtc.timer_tick_count = timer_alloc( device->machine, s3c24xx_rtc_timer_tick_count_exp, (void*)device);
-	s3c24xx->rtc.timer_update = timer_alloc( device->machine, s3c24xx_rtc_timer_update_exp, (void*)device);
-	s3c24xx->wdt.timer = timer_alloc( device->machine, s3c24xx_wdt_timer_exp, (void*)device);
+	for (int i = 0; i < 5; i++) s3c24xx->pwm.timer[i] = device->machine->scheduler().timer_alloc( FUNC(s3c24xx_pwm_timer_exp), (void*)device);
+	for (int i = 0; i < 4; i++) s3c24xx->dma[i].timer = device->machine->scheduler().timer_alloc( FUNC(s3c24xx_dma_timer_exp), (void*)device);
+	s3c24xx->iic.timer = device->machine->scheduler().timer_alloc( FUNC(s3c24xx_iic_timer_exp), (void*)device);
+	s3c24xx->iis.timer = device->machine->scheduler().timer_alloc( FUNC(s3c24xx_iis_timer_exp), (void*)device);
+	s3c24xx->lcd.timer = device->machine->scheduler().timer_alloc( FUNC(s3c24xx_lcd_timer_exp), (void*)device);
+	s3c24xx->rtc.timer_tick_count = device->machine->scheduler().timer_alloc( FUNC(s3c24xx_rtc_timer_tick_count_exp), (void*)device);
+	s3c24xx->rtc.timer_update = device->machine->scheduler().timer_alloc( FUNC(s3c24xx_rtc_timer_update_exp), (void*)device);
+	s3c24xx->wdt.timer = device->machine->scheduler().timer_alloc( FUNC(s3c24xx_wdt_timer_exp), (void*)device);
 	timer_adjust_periodic( s3c24xx->rtc.timer_update, attotime::from_msec( 1000), 0, attotime::from_msec( 1000));
 	s3c24xx_rtc_init( device);
 }

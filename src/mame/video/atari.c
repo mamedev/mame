@@ -1051,12 +1051,12 @@ static int cycle(running_machine *machine)
 	return machine->primary_screen->hpos() * CYCLES_PER_LINE / machine->primary_screen->width();
 }
 
-static void after(running_machine *machine, int cycles, timer_fired_func function, const char *funcname)
+static void after(running_machine *machine, int cycles, timer_expired_func function, const char *funcname)
 {
     attotime duration = machine->primary_screen->scan_period() * cycles / CYCLES_PER_LINE;
     (void)funcname;
 	LOG(("           after %3d (%5.1f us) %s\n", cycles, duration.as_double() * 1.0e6, funcname));
-	timer_set(machine, duration, NULL, 0, function);
+	machine->scheduler().timer_set(duration, function, funcname);
 }
 
 static TIMER_CALLBACK( antic_issue_dli )
@@ -1158,7 +1158,7 @@ static TIMER_CALLBACK( antic_line_done )
 static TIMER_CALLBACK( antic_steal_cycles )
 {
 	LOG(("           @cycle #%3d steal %d cycles\n", cycle(machine), antic.steal_cycles));
-	after(machine, antic.steal_cycles, antic_line_done, "antic_line_done");
+	after(machine, antic.steal_cycles, FUNC(antic_line_done));
     antic.steal_cycles = 0;
 	cpu_spinuntil_trigger( machine->device("maincpu"), TRIGGER_STEAL );
 }
@@ -1229,7 +1229,7 @@ static TIMER_CALLBACK( antic_scanline_render )
 
     antic.steal_cycles += CYCLES_REFRESH;
 	LOG(("           run CPU for %d cycles\n", CYCLES_HSYNC - CYCLES_HSTART - antic.steal_cycles));
-	after(machine, CYCLES_HSYNC - CYCLES_HSTART - antic.steal_cycles, antic_steal_cycles, "antic_steal_cycles");
+	after(machine, CYCLES_HSYNC - CYCLES_HSTART - antic.steal_cycles, FUNC(antic_steal_cycles));
 }
 
 
@@ -1341,7 +1341,7 @@ static void antic_scanline_dma(running_machine *machine, int param)
 					{
 						/* remove the DLI bit */
 						new_cmd &= ~ANTIC_DLI;
-						after(machine, CYCLES_DLI_NMI, antic_issue_dli, "antic_issue_dli");
+						after(machine, CYCLES_DLI_NMI, FUNC(antic_issue_dli));
 					}
 					/* load memory scan bit set ? */
 					if( new_cmd & ANTIC_LMS )
@@ -1473,9 +1473,9 @@ static void antic_scanline_dma(running_machine *machine, int param)
 
 	antic.r.nmist &= ~DLI_NMI;
 	if( antic.modelines == 1 && (antic.cmd & antic.w.nmien & DLI_NMI) )
-		after(machine, CYCLES_DLI_NMI, antic_issue_dli, "antic_issue_dli");
+		after(machine, CYCLES_DLI_NMI, FUNC(antic_issue_dli));
 
-	after(machine, CYCLES_HSTART, antic_scanline_render, "antic_scanline_render");
+	after(machine, CYCLES_HSTART, FUNC(antic_scanline_render));
 }
 
 /*****************************************************************************

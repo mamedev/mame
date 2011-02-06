@@ -541,7 +541,7 @@ void main_to_cage_w(UINT16 data)
 	running_machine *machine = cage_cpu->machine;
 	if (LOG_COMM)
 		logerror("%s:Command to CAGE = %04X\n", cpuexec_describe_context(machine), data);
-	timer_call_after_resynch(machine, NULL, data, deferred_cage_w);
+	machine->scheduler().synchronize(FUNC(deferred_cage_w), data);
 }
 
 

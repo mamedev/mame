@@ -482,7 +482,7 @@ static void zn_driver_init( running_machine *machine )
 		n_game++;
 	}
 
-	state->dip_timer = timer_alloc( machine, dip_timer_fired, NULL );
+	state->dip_timer = machine->scheduler().timer_alloc( FUNC(dip_timer_fired), NULL );
 }
 
 static void psx_spu_irq(device_t *device, UINT32 data)

@@ -118,9 +118,9 @@ SOUND_RESET( m72 )
 void m72_ym2151_irq_handler(device_t *device, int irq)
 {
 	if (irq)
-		timer_call_after_resynch(device->machine, NULL, YM2151_ASSERT,setvector_callback);
+		device->machine->scheduler().synchronize(FUNC(setvector_callback), YM2151_ASSERT);
 	else
-		timer_call_after_resynch(device->machine, NULL, YM2151_CLEAR,setvector_callback);
+		device->machine->scheduler().synchronize(FUNC(setvector_callback), YM2151_CLEAR);
 }
 
 WRITE16_HANDLER( m72_sound_command_w )
@@ -128,19 +128,19 @@ WRITE16_HANDLER( m72_sound_command_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space,offset,data);
-		timer_call_after_resynch(space->machine, NULL, Z80_ASSERT,setvector_callback);
+		space->machine->scheduler().synchronize(FUNC(setvector_callback), Z80_ASSERT);
 	}
 }
 
 WRITE8_HANDLER( m72_sound_command_byte_w )
 {
 	soundlatch_w(space,offset,data);
-	timer_call_after_resynch(space->machine, NULL, Z80_ASSERT,setvector_callback);
+	space->machine->scheduler().synchronize(FUNC(setvector_callback), Z80_ASSERT);
 }
 
 WRITE8_HANDLER( m72_sound_irq_ack_w )
 {
-	timer_call_after_resynch(space->machine, NULL, Z80_CLEAR,setvector_callback);
+	space->machine->scheduler().synchronize(FUNC(setvector_callback), Z80_CLEAR);
 }
 
 

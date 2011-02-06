@@ -186,7 +186,7 @@ static TIMER_CALLBACK( sound_command_w )
 WRITE16_HANDLER( vertigo_audio_w )
 {
 	if (ACCESSING_BITS_0_7)
-		timer_call_after_resynch(space->machine, NULL, data & 0xff, sound_command_w);
+		space->machine->scheduler().synchronize(FUNC(sound_command_w), data & 0xff);
 }
 
 

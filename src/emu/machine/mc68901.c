@@ -801,20 +801,20 @@ void mc68901_device::device_start()
 	m_timer_clock = m_config.timer_clock;
 
 	/* create the timers */
-	m_timer[TIMER_A] = device_timer_alloc(*this, TIMER_A);
-	m_timer[TIMER_B] = device_timer_alloc(*this, TIMER_B);
-	m_timer[TIMER_C] = device_timer_alloc(*this, TIMER_C);
-	m_timer[TIMER_D] = device_timer_alloc(*this, TIMER_D);
+	m_timer[TIMER_A] = timer_alloc(TIMER_A);
+	m_timer[TIMER_B] = timer_alloc(TIMER_B);
+	m_timer[TIMER_C] = timer_alloc(TIMER_C);
+	m_timer[TIMER_D] = timer_alloc(TIMER_D);
 
 	if (m_config.rx_clock > 0)
 	{
-		m_rx_timer = device_timer_alloc(*this, TIMER_RX);
+		m_rx_timer = timer_alloc(TIMER_RX);
 		timer_adjust_periodic(m_rx_timer, attotime::zero, 0, attotime::from_hz(m_config.rx_clock));
 	}
 
 	if (m_config.tx_clock > 0)
 	{
-		m_tx_timer = device_timer_alloc(*this, TIMER_TX);
+		m_tx_timer = timer_alloc(TIMER_TX);
 		timer_adjust_periodic(m_tx_timer, attotime::zero, 0, attotime::from_hz(m_config.tx_clock));
 	}
 

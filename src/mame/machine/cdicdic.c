@@ -1216,10 +1216,10 @@ void cdicdic_device::device_start()
 {
     register_globals();
 
-    m_interrupt_timer = timer_alloc(&m_machine, trigger_readback_int, 0);
+    m_interrupt_timer = m_machine.scheduler().timer_alloc(FUNC(trigger_readback_int));
     timer_adjust_oneshot(m_interrupt_timer, attotime::never, 0);
 
-    m_audio_sample_timer = timer_alloc(&m_machine, audio_sample_trigger, 0);
+    m_audio_sample_timer = m_machine.scheduler().timer_alloc(FUNC(audio_sample_trigger));
     timer_adjust_oneshot(m_audio_sample_timer, attotime::never, 0);
 
     m_ram = auto_alloc_array(&m_machine, UINT16, 0x3c00/2);

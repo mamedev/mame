@@ -187,15 +187,10 @@ class video_manager;
 class debug_view_manager;
 class osd_interface;
 
-typedef struct _mame_private mame_private;
-typedef struct _cpuexec_private cpuexec_private;
-typedef struct _timer_private timer_private;
 typedef struct _state_private state_private;
 typedef struct _memory_private memory_private;
 typedef struct _palette_private palette_private;
 typedef struct _tilemap_private tilemap_private;
-typedef struct _streams_private streams_private;
-typedef struct _devices_private devices_private;
 typedef struct _romload_private romload_private;
 typedef struct _input_private input_private;
 typedef struct _input_port_private input_port_private;
@@ -364,6 +359,7 @@ public:
 	device_scheduler &scheduler() { return m_scheduler; }
 	osd_interface &osd() const { return m_osd; }
 	screen_device *first_screen() const { return primary_screen; }
+	attotime time() const { return m_scheduler.time(); }
 
 	// immediate operations
 	int run(bool firstrun);
@@ -381,7 +377,7 @@ public:
 	void schedule_save(const char *filename);
 	void schedule_load(const char *filename);
 
-	// time
+	// date & time
 	void base_datetime(system_time &systime);
 	void current_datetime(system_time &systime);
 
@@ -444,14 +440,10 @@ public:
 	generic_pointers		generic;			// generic pointers
 
 	// internal core information
-	mame_private *			mame_data;			// internal data from mame.c
-	timer_private *			timer_data;			// internal data from timer.c
 	state_private *			state_data;			// internal data from state.c
 	memory_private *		memory_data;		// internal data from memory.c
 	palette_private *		palette_data;		// internal data from palette.c
 	tilemap_private *		tilemap_data;		// internal data from tilemap.c
-	streams_private *		streams_data;		// internal data from streams.c
-	devices_private *		devices_data;		// internal data from devices.c
 	romload_private *		romload_data;		// internal data from romload.c
 	input_private *			input_data;			// internal data from input.c
 	input_port_private *	input_port_data;	// internal data from inptport.c
@@ -472,9 +464,7 @@ private:
 	void set_saveload_filename(const char *filename);
 	void fill_systime(system_time &systime, time_t t);
 	void handle_saveload();
-
-	static TIMER_CALLBACK( static_soft_reset );
-	void soft_reset();
+	void soft_reset(running_machine &machine, int param = 0);
 
 	static void logfile_callback(running_machine &machine, const char *buffer);
 

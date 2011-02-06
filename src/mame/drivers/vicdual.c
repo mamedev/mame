@@ -98,7 +98,7 @@ static INPUT_CHANGED( coin_changed )
 		cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 
 		/* simulate the coin switch being closed for a while */
-		timer_set(field->port->machine, 4 * field->port->machine->primary_screen->frame_period(), NULL, 0, clear_coin_status);
+		field->port->machine->scheduler().timer_set(4 * field->port->machine->primary_screen->frame_period(), FUNC(clear_coin_status));
 	}
 }
 

@@ -24,7 +24,7 @@ static WRITE16_HANDLER( vaportra_sound_w )
 	vaportra_state *state = space->machine->driver_data<vaportra_state>();
 
 	/* Force synchronisation between CPUs with fake timer */
-	timer_call_after_resynch(space->machine, NULL, 0, NULL);
+	space->machine->scheduler().synchronize();
 	soundlatch_w(space, 0, data & 0xff);
 	cpu_set_input_line(state->audiocpu, 0, ASSERT_LINE);
 }

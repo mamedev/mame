@@ -358,7 +358,7 @@ static WRITE8_DEVICE_HANDLER( ssio_portb1_w )
 /********* external interfaces ***********/
 WRITE8_HANDLER( ssio_data_w )
 {
-	timer_call_after_resynch(space->machine, NULL, (offset << 8) | (data & 0xff), ssio_delayed_data_w);
+	space->machine->scheduler().synchronize(FUNC(ssio_delayed_data_w), (offset << 8) | (data & 0xff));
 }
 
 READ8_HANDLER( ssio_status_r )
@@ -548,7 +548,7 @@ static WRITE16_DEVICE_HANDLER( csdeluxe_pia_w )
 /********* external interfaces ***********/
 WRITE8_HANDLER( csdeluxe_data_w )
 {
-	timer_call_after_resynch(space->machine, NULL, data, csdeluxe_delayed_data_w);
+	space->machine->scheduler().synchronize(FUNC(csdeluxe_delayed_data_w), data);
 }
 
 READ8_HANDLER( csdeluxe_status_r )
@@ -666,7 +666,7 @@ static TIMER_CALLBACK( soundsgood_delayed_data_w )
 /********* external interfaces ***********/
 WRITE8_HANDLER( soundsgood_data_w )
 {
-	timer_call_after_resynch(space->machine, NULL, data, soundsgood_delayed_data_w);
+	space->machine->scheduler().synchronize(FUNC(soundsgood_delayed_data_w), data);
 }
 
 READ8_HANDLER( soundsgood_status_r )
@@ -770,7 +770,7 @@ static TIMER_CALLBACK( turbocs_delayed_data_w )
 /********* external interfaces ***********/
 WRITE8_HANDLER( turbocs_data_w )
 {
-	timer_call_after_resynch(space->machine, NULL, data, turbocs_delayed_data_w);
+	space->machine->scheduler().synchronize(FUNC(turbocs_delayed_data_w), data);
 }
 
 READ8_HANDLER( turbocs_status_r )
@@ -903,7 +903,7 @@ static TIMER_CALLBACK( squawkntalk_delayed_data_w )
 /********* external interfaces ***********/
 WRITE8_HANDLER( squawkntalk_data_w )
 {
-	timer_call_after_resynch(space->machine, NULL, data, squawkntalk_delayed_data_w);
+	space->machine->scheduler().synchronize(FUNC(squawkntalk_delayed_data_w), data);
 }
 
 void squawkntalk_reset_w(running_machine *machine, int state)

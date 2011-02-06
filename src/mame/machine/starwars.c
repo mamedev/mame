@@ -178,7 +178,7 @@ void starwars_mproc_init(running_machine *machine)
 		state->PROM_AM[cnt]  = (val >> 7) & 0x0001;
 	}
 
-	state->math_timer = timer_alloc(machine, math_run_clear, NULL);
+	state->math_timer = machine->scheduler().timer_alloc(FUNC(math_run_clear));
 }
 
 

@@ -59,7 +59,7 @@ static MACHINE_RESET( marineb )
 	state->marineb_active_low_flipscreen = 0;
 
 	/* we must start with NMI interrupts disabled */
-	timer_call_after_resynch(machine, NULL, 0, interrupt_disable);
+	machine->scheduler().synchronize(FUNC(interrupt_disable));
 }
 
 static MACHINE_RESET( springer )

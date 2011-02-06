@@ -286,7 +286,7 @@ static void pastelg_gfxdraw(running_machine *machine)
 	}
 
 	nb1413m3_busyflag = 0;
-	timer_set(machine, attotime::from_hz(400000) * nb1413m3_busyctr, NULL, 0, blitter_timer_callback);
+	machine->scheduler().timer_set(attotime::from_hz(400000) * nb1413m3_busyctr, FUNC(blitter_timer_callback));
 }
 
 /******************************************************************************

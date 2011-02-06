@@ -1661,19 +1661,19 @@ void psx_driver_init( running_machine *machine )
 
 	for( n = 0; n < 7; n++ )
 	{
-		p_psx->channel[ n ].timer = timer_alloc( machine, dma_finished_callback, machine );
+		p_psx->channel[ n ].timer = machine->scheduler().timer_alloc( FUNC(dma_finished_callback), machine );
 		p_psx->channel[ n ].fn_read = NULL;
 		p_psx->channel[ n ].fn_write = NULL;
 	}
 
 	for( n = 0; n < 3; n++ )
 	{
-		p_psx->root[ n ].timer = timer_alloc( machine, root_finished , NULL);
+		p_psx->root[ n ].timer = machine->scheduler().timer_alloc( FUNC(root_finished ));
 	}
 
 	for( n = 0; n < 2; n++ )
 	{
-		p_psx->sio[ n ].timer = timer_alloc( machine, sio_clock , NULL);
+		p_psx->sio[ n ].timer = machine->scheduler().timer_alloc( FUNC(sio_clock ));
 		p_psx->sio[ n ].fn_handler = NULL;
 	}
 

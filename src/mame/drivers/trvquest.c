@@ -160,7 +160,7 @@ static void via_irq( device_t *device, int state )
 	/* Kaos sits in a tight loop polling the VIA irq flags register, but that register is
        cleared by the irq handler. Therefore, I wait a bit before triggering the irq to
        leave time for the program to see the flag change. */
-	timer_set(device->machine, attotime::from_usec(50), NULL, state, via_irq_delayed);
+	device->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(via_irq_delayed), state);
 }
 
 

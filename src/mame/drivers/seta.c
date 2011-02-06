@@ -1370,7 +1370,7 @@ static void uPD71054_timer_init( running_machine *machine )
 		uPD71054->max[no] = 0xffff;
 	}
 	for( no = 0; no < USED_TIMER_NUM; no++ ) {
-		uPD71054->timer[no] = timer_alloc( machine, uPD71054_timer_callback , NULL);
+		uPD71054->timer[no] = machine->scheduler().timer_alloc( FUNC(uPD71054_timer_callback ));
 	}
 }
 
@@ -2064,7 +2064,7 @@ static WRITE16_HANDLER( keroppi_prize_w )
 	if ((data & 0x0010) && !state->keroppi_prize_hop)
 	{
 		state->keroppi_prize_hop = 1;
-		timer_set(space->machine, attotime::from_seconds(3), NULL, 0x20, keroppi_prize_hop_callback);		/* 3 seconds */
+		space->machine->scheduler().timer_set(attotime::from_seconds(3), FUNC(keroppi_prize_hop_callback), 0x20);		/* 3 seconds */
 	}
 }
 

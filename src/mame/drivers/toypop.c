@@ -110,13 +110,13 @@ static INTERRUPT_GEN( toypop_main_interrupt )
 								// so don't replace with cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 
 	if (!namcoio_read_reset_line(namcoio_0))		/* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(device->machine, attotime::from_usec(50), NULL, 0, namcoio_run);
+		device->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(namcoio_run));
 
 	if (!namcoio_read_reset_line(namcoio_1))		/* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(device->machine, attotime::from_usec(50), NULL, 1, namcoio_run);
+		device->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(namcoio_run), 1);
 
 	if (!namcoio_read_reset_line(namcoio_2))		/* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(device->machine, attotime::from_usec(50), NULL, 2, namcoio_run);
+		device->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(namcoio_run), 2);
 
 }
 
@@ -154,7 +154,7 @@ static MACHINE_RESET( toypop )
 {
 	/* we must do this on a timer in order to have it take effect */
 	/* otherwise, the reset process will override our changes */
-	timer_call_after_resynch(machine, NULL, 0, disable_interrupts);
+	machine->scheduler().synchronize(FUNC(disable_interrupts));
 }
 
 static INTERRUPT_GEN( toypop_m68000_interrupt )

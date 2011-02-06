@@ -203,7 +203,7 @@ static WRITE_LINE_DEVICE_HANDLER( video_command_trigger_w )
 			/* set a timer for an arbitrarily short period.
                The real time it takes to clear to screen is not
                important to the software */
-			timer_call_after_resynch(device->machine, NULL, 0, clear_screen_done_callback);
+			device->machine->scheduler().synchronize(FUNC(clear_screen_done_callback));
 
 			break;
 		}
@@ -223,7 +223,7 @@ static void via_irq(device_t *device, int state)
 	/* Kaos sits in a tight loop polling the VIA irq flags register, but that register is
        cleared by the irq handler. Therefore, I wait a bit before triggering the irq to
        leave time for the program to see the flag change. */
-	timer_set(device->machine, attotime::from_usec(50), NULL, state, via_irq_delayed);
+	device->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(via_irq_delayed), state);
 }
 
 
@@ -291,7 +291,7 @@ static VIDEO_START( common )
 	state->videoram_size = (HBSTART - HBEND) * (VBSTART - VBEND);
 	state->videoram = auto_alloc_array(machine, UINT8, state->videoram_size);
 
-	state->via_0_ca1_timer = timer_alloc(machine, via_0_ca1_timer_callback, NULL);
+	state->via_0_ca1_timer = machine->scheduler().timer_alloc(FUNC(via_0_ca1_timer_callback));
 
 	/* register for save states */
 	state_save_register_global_pointer(machine, state->videoram, state->videoram_size);

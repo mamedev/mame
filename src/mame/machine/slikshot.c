@@ -525,7 +525,7 @@ static TIMER_CALLBACK( delayed_z80_control_w )
 
 WRITE8_HANDLER( slikshot_z80_control_w )
 {
-	timer_call_after_resynch(space->machine, NULL, data, delayed_z80_control_w);
+	space->machine->scheduler().synchronize(FUNC(delayed_z80_control_w), data);
 }
 
 

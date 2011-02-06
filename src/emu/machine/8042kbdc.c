@@ -279,7 +279,7 @@ void kbdc8042_init(running_machine *machine, const struct kbdc8042_interface *in
 	kbdc8042.inport = 0xa0;
 	at_8042_set_outport(machine, 0xfe, 1);
 
-	timer_pulse(machine, attotime::from_hz(60), NULL, 0, kbdc8042_time);
+	machine->scheduler().timer_pulse(attotime::from_hz(60), FUNC(kbdc8042_time));
 }
 
 static void at_8042_receive(running_machine *machine, UINT8 data)

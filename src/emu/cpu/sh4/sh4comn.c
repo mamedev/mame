@@ -1160,21 +1160,21 @@ void sh4_common_init(device_t *device)
 
 	for (i=0; i<3; i++)
 	{
-		sh4->timer[i] = timer_alloc(device->machine, sh4_timer_callback, sh4);
+		sh4->timer[i] = device->machine->scheduler().timer_alloc(FUNC(sh4_timer_callback), sh4);
 		timer_adjust_oneshot(sh4->timer[i], attotime::never, i);
 	}
 
 	for (i=0; i<4; i++)
 	{
-		sh4->dma_timer[i] = timer_alloc(device->machine, sh4_dmac_callback, sh4);
+		sh4->dma_timer[i] = device->machine->scheduler().timer_alloc(FUNC(sh4_dmac_callback), sh4);
 		timer_adjust_oneshot(sh4->dma_timer[i], attotime::never, i);
 	}
 
-	sh4->refresh_timer = timer_alloc(device->machine, sh4_refresh_timer_callback, sh4);
+	sh4->refresh_timer = device->machine->scheduler().timer_alloc(FUNC(sh4_refresh_timer_callback), sh4);
 	timer_adjust_oneshot(sh4->refresh_timer, attotime::never, 0);
 	sh4->refresh_timer_base = 0;
 
-	sh4->rtc_timer = timer_alloc(device->machine, sh4_rtc_timer_callback, sh4);
+	sh4->rtc_timer = device->machine->scheduler().timer_alloc(FUNC(sh4_rtc_timer_callback), sh4);
 	timer_adjust_oneshot(sh4->rtc_timer, attotime::never, 0);
 
 	sh4->m = auto_alloc_array(device->machine, UINT32, 16384);

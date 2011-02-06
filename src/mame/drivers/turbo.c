@@ -727,7 +727,7 @@ static WRITE8_DEVICE_HANDLER( buckrog_ppi8255_0_w )
 {
 	/* the port C handshaking signals control the sub CPU IRQ, */
 	/* so we have to sync whenever we access this PPI */
-	timer_call_after_resynch(device->machine, NULL, ((offset & 3) << 8) | (data & 0xff), delayed_ppi8255_w);
+	device->machine->scheduler().synchronize(FUNC(delayed_ppi8255_w), ((offset & 3) << 8) | (data & 0xff));
 }
 
 

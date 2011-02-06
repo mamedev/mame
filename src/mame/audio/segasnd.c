@@ -222,7 +222,7 @@ static TIMER_CALLBACK( delayed_speech_w )
 
 WRITE8_HANDLER( sega_speech_data_w )
 {
-	timer_call_after_resynch(space->machine, NULL, data, delayed_speech_w);
+	space->machine->scheduler().synchronize(FUNC(delayed_speech_w), data);
 }
 
 
@@ -356,7 +356,7 @@ static TIMER_CALLBACK( delayed_usb_data_w )
 WRITE8_HANDLER( sega_usb_data_w )
 {
 	LOG(("%04X:usb_data_w = %02X\n", cpu_get_pc(space->cpu), data));
-	timer_call_after_resynch(space->machine, NULL, data, delayed_usb_data_w);
+	space->machine->scheduler().synchronize(FUNC(delayed_usb_data_w), data);
 
 	/* boost the interleave so that sequences can be sent */
 	cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(250));

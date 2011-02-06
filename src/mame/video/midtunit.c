@@ -787,7 +787,7 @@ if (LOG_DMA)
 
 	/* signal we're done */
 skipdma:
-	timer_set(space->machine, attotime::from_nsec(41 * pixels), NULL, 0, dma_callback);
+	space->machine->scheduler().timer_set(attotime::from_nsec(41 * pixels), FUNC(dma_callback));
 
 	g_profiler.stop();
 }

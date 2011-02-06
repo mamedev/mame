@@ -251,8 +251,8 @@ void amiga_machine_config(running_machine *machine, const amiga_machine_interfac
 	}
 
 	/* setup the timers */
-	state->irq_timer = timer_alloc(machine, amiga_irq_proc, NULL);
-	state->blitter_timer = timer_alloc(machine, amiga_blitter_proc, NULL);
+	state->irq_timer = machine->scheduler().timer_alloc(FUNC(amiga_irq_proc));
+	state->blitter_timer = machine->scheduler().timer_alloc(FUNC(amiga_blitter_proc));
 
 	state->sound_device = machine->device("amiga");
 }
@@ -297,7 +297,7 @@ MACHINE_RESET( amiga )
 		(*state->intf->reset_callback)(machine);
 
 	/* start the scanline timer */
-	timer_set(machine, machine->primary_screen->time_until_pos(0), NULL, 0, scanline_callback);
+	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(0), FUNC(scanline_callback));
 }
 
 
@@ -346,7 +346,7 @@ static TIMER_CALLBACK( scanline_callback )
 
 	/* set timer for next line */
 	scanline = (scanline + 1) % machine->primary_screen->height();
-	timer_set(machine, machine->primary_screen->time_until_pos(scanline), NULL, scanline, scanline_callback);
+	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(scanline), FUNC(scanline_callback), scanline);
 }
 
 
@@ -1281,7 +1281,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			if (state->intf->serdat_w != NULL)
 				(*state->intf->serdat_w)(space->machine, data);
 			CUSTOM_REG(REG_SERDATR) &= ~0x3000;
-			timer_set(space->machine, amiga_get_serial_char_period(space->machine), NULL, 0, finish_serial_write);
+			space->machine->scheduler().timer_set(amiga_get_serial_char_period(space->machine), FUNC(finish_serial_write));
 			break;
 
 		case REG_BLTSIZE:

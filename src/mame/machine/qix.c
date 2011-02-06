@@ -480,7 +480,7 @@ WRITE8_DEVICE_HANDLER( qix_pia_w )
 {
 	/* make all the CPUs synchronize, and only AFTER that write the command to the PIA */
 	/* otherwise the 68705 will miss commands */
-	timer_call_after_resynch(device->machine, (void *)device, data | (offset << 8), pia_w_callback);
+	device->machine->scheduler().synchronize(FUNC(pia_w_callback), data | (offset << 8), (void *)device);
 }
 
 

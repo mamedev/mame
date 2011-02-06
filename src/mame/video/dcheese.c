@@ -98,7 +98,7 @@ VIDEO_START( dcheese )
 	state->dstbitmap = auto_bitmap_alloc(machine, DSTBITMAP_WIDTH, DSTBITMAP_HEIGHT, machine->primary_screen->format());
 
 	/* create a timer */
-	state->blitter_timer = timer_alloc(machine, blitter_scanline_callback, NULL);
+	state->blitter_timer = machine->scheduler().timer_alloc(FUNC(blitter_scanline_callback));
 
 	/* register for saving */
 	state_save_register_global_array(machine, state->blitter_color);
@@ -151,7 +151,7 @@ static void do_clear( running_machine *machine )
 		memset(BITMAP_ADDR16(state->dstbitmap, y % DSTBITMAP_HEIGHT, 0), 0, DSTBITMAP_WIDTH * 2);
 
 	/* signal an IRQ when done (timing is just a guess) */
-	timer_set(machine, machine->primary_screen->scan_period(), NULL, 1, dcheese_signal_irq_callback);
+	machine->scheduler().timer_set(machine->primary_screen->scan_period(), FUNC(dcheese_signal_irq_callback), 1);
 }
 
 
@@ -206,7 +206,7 @@ static void do_blit( running_machine *machine )
 	}
 
 	/* signal an IRQ when done (timing is just a guess) */
-	timer_set(machine, machine->primary_screen->scan_period() / 2, NULL, 2, dcheese_signal_irq_callback);
+	machine->scheduler().timer_set(machine->primary_screen->scan_period() / 2, FUNC(dcheese_signal_irq_callback), 2);
 
 	/* these extra parameters are written but they are always zero, so I don't know what they do */
 	if (state->blitter_xparam[8] != 0 || state->blitter_xparam[9] != 0 || state->blitter_xparam[10] != 0 || state->blitter_xparam[11] != 0 ||

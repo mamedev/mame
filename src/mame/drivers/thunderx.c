@@ -313,7 +313,7 @@ static WRITE8_HANDLER( thunderx_1f98_w )
 		calculate_collisions(space->machine);
 
 		/* 100 cycle delay is arbitrary */
-		timer_set(space->machine, downcast<cpu_device *>(space->cpu)->cycles_to_attotime(100), NULL, 0, thunderx_firq_callback);
+		space->machine->scheduler().timer_set(downcast<cpu_device *>(space->cpu)->cycles_to_attotime(100), FUNC(thunderx_firq_callback));
 	}
 
 	state->_1f98_data = data;

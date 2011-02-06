@@ -137,8 +137,8 @@ void i8257_device::device_start()
 	}
 
 	/* set initial values */
-	m_timer = device_timer_alloc(*this, TIMER_OPERATION);
-	m_msbflip_timer = device_timer_alloc(*this, TIMER_MSBFLIP);
+	m_timer = timer_alloc(TIMER_OPERATION);
+	m_msbflip_timer = timer_alloc(TIMER_MSBFLIP);
 
 	/* register for state saving */
 	state_save_register_device_item_array(this, 0, m_address);
@@ -449,7 +449,7 @@ void i8257_device::i8257_drq_w(int channel, int state)
 {
 	int param = (channel << 1) | (state ? 1 : 0);
 
-	device_timer_call_after_resynch(*this, TIMER_DRQ_SYNC, param);
+	synchronize(TIMER_DRQ_SYNC, param);
 }
 
 WRITE_LINE_DEVICE_HANDLER( i8257_hlda_w ) { }

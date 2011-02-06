@@ -1921,7 +1921,7 @@ static const stepper_interface barcrest_opto1_interface =
 /* Common configurations */
 static void mpu4_config_common(running_machine *machine)
 {
-	ic24_timer = timer_alloc(machine, ic24_timeout, NULL);
+	ic24_timer = machine->scheduler().timer_alloc(FUNC(ic24_timeout));
 }
 
 static void mpu4_config_common_reels(running_machine *machine,int reels)

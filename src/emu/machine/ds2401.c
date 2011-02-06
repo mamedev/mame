@@ -153,8 +153,8 @@ void ds2401_init( running_machine *machine, int which, const UINT8 *data )
 	state_save_register_item(machine,  "ds2401", NULL, which, c->rx );
 	state_save_register_item(machine,  "ds2401", NULL, which, c->tx );
 
-	c->timer = timer_alloc(machine, ds2401_tick , NULL);
-	c->reset_timer = timer_alloc(machine, ds2401_reset , NULL);
+	c->timer = machine->scheduler().timer_alloc(FUNC(ds2401_tick ));
+	c->reset_timer = machine->scheduler().timer_alloc(FUNC(ds2401_reset ));
 }
 
 void ds2401_write( running_machine *machine, int which, int data )

@@ -63,7 +63,7 @@ static TIMER_CALLBACK( gunbustr_interrupt5 )
 
 static INTERRUPT_GEN( gunbustr_interrupt )
 {
-	timer_set(device->machine, downcast<cpu_device *>(device)->cycles_to_attotime(200000-500), NULL, 0, gunbustr_interrupt5);
+	device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000-500), FUNC(gunbustr_interrupt5));
 	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
@@ -184,7 +184,7 @@ static READ32_HANDLER( gunbustr_gun_r )
 static WRITE32_HANDLER( gunbustr_gun_w )
 {
 	/* 10000 cycle delay is arbitrary */
-	timer_set(space->machine, downcast<cpu_device *>(space->cpu)->cycles_to_attotime(10000), NULL, 0, gunbustr_interrupt5);
+	space->machine->scheduler().timer_set(downcast<cpu_device *>(space->cpu)->cycles_to_attotime(10000), FUNC(gunbustr_interrupt5));
 }
 
 

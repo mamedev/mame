@@ -220,7 +220,7 @@ static MACHINE_START( ccastles )
 	memory_configure_bank(machine, "bank1", 0, 2, machine->region("maincpu")->base() + 0xa000, 0x6000);
 
 	/* create a timer for IRQs and set up the first callback */
-	state->irq_timer = timer_alloc(machine, clock_irq, NULL);
+	state->irq_timer = machine->scheduler().timer_alloc(FUNC(clock_irq));
 	state->irq_state = 0;
 	schedule_next_irq(machine, 0);
 

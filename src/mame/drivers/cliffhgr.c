@@ -217,7 +217,7 @@ static void vdp_interrupt(running_machine *machine, int state)
 static MACHINE_START( cliffhgr )
 {
 	laserdisc = machine->device("laserdisc");
-	irq_timer = timer_alloc(machine, cliff_irq_callback, NULL);
+	irq_timer = machine->scheduler().timer_alloc(FUNC(cliff_irq_callback));
 }
 
 static MACHINE_RESET( cliffhgr )

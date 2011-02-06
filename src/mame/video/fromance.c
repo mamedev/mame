@@ -70,7 +70,7 @@ static void init_common( running_machine *machine )
 	tilemap_set_transparent_pen(state->fg_tilemap, 15);
 
 	/* reset the timer */
-	state->crtc_timer = timer_alloc(machine, crtc_interrupt_gen, NULL);
+	state->crtc_timer = machine->scheduler().timer_alloc(FUNC(crtc_interrupt_gen));
 
 	/* state save */
 	state_save_register_global(machine, state->selected_videoram);

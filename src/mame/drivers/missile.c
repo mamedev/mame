@@ -518,11 +518,11 @@ static MACHINE_START( missile )
 	space->set_direct_update_handler(direct_update_delegate_create_static(missile_direct_handler, *machine));
 
 	/* create a timer to speed/slow the CPU */
-	state->cpu_timer = timer_alloc(machine, adjust_cpu_speed, NULL);
+	state->cpu_timer = machine->scheduler().timer_alloc(FUNC(adjust_cpu_speed));
 	timer_adjust_oneshot(state->cpu_timer, machine->primary_screen->time_until_pos(v_to_scanline(state, 0), 0), 0);
 
 	/* create a timer for IRQs and set up the first callback */
-	state->irq_timer = timer_alloc(machine, clock_irq, NULL);
+	state->irq_timer = machine->scheduler().timer_alloc(FUNC(clock_irq));
 	state->irq_state = 0;
 	schedule_next_irq(machine, -32);
 

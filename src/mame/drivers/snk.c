@@ -372,18 +372,18 @@ static TIMER_CALLBACK( sgladiat_sndirq_update_callback )
 static WRITE8_HANDLER( sgladiat_soundlatch_w )
 {
 	soundlatch_w(space, offset, data);
-	timer_call_after_resynch(space->machine, NULL, CMDIRQ_BUSY_ASSERT, sgladiat_sndirq_update_callback);
+	space->machine->scheduler().synchronize(FUNC(sgladiat_sndirq_update_callback), CMDIRQ_BUSY_ASSERT);
 }
 
 static READ8_HANDLER( sgladiat_soundlatch_r )
 {
-	timer_call_after_resynch(space->machine, NULL, BUSY_CLEAR, sgladiat_sndirq_update_callback);
+	space->machine->scheduler().synchronize(FUNC(sgladiat_sndirq_update_callback), BUSY_CLEAR);
 	return soundlatch_r(space,0);
 }
 
 static READ8_HANDLER( sgladiat_sound_nmi_ack_r )
 {
-	timer_call_after_resynch(space->machine, NULL, CMDIRQ_CLEAR, sgladiat_sndirq_update_callback);
+	space->machine->scheduler().synchronize(FUNC(sgladiat_sndirq_update_callback), CMDIRQ_CLEAR);
 	return 0xff;
 }
 
@@ -460,13 +460,13 @@ static TIMER_CALLBACK( sndirq_update_callback )
 static void ymirq_callback_1(device_t *device, int irq)
 {
 	if (irq)
-		timer_call_after_resynch(device->machine, NULL, YM1IRQ_ASSERT, sndirq_update_callback);
+		device->machine->scheduler().synchronize(FUNC(sndirq_update_callback), YM1IRQ_ASSERT);
 }
 
 static void ymirq_callback_2(device_t *device, int irq)
 {
 	if (irq)
-		timer_call_after_resynch(device->machine, NULL, YM2IRQ_ASSERT, sndirq_update_callback);
+		device->machine->scheduler().synchronize(FUNC(sndirq_update_callback), YM2IRQ_ASSERT);
 }
 
 
@@ -495,7 +495,7 @@ static const y8950_interface y8950_config_2 =
 static WRITE8_HANDLER( snk_soundlatch_w )
 {
 	soundlatch_w(space, offset, data);
-	timer_call_after_resynch(space->machine, NULL, CMDIRQ_BUSY_ASSERT, sndirq_update_callback);
+	space->machine->scheduler().synchronize(FUNC(sndirq_update_callback), CMDIRQ_BUSY_ASSERT);
 }
 
 static CUSTOM_INPUT( snk_sound_busy )
@@ -517,29 +517,29 @@ static READ8_HANDLER( snk_sound_status_r )
 static WRITE8_HANDLER( snk_sound_status_w )
 {
 	if (~data & 0x10)	// ack YM1 irq
-		timer_call_after_resynch(space->machine, NULL, YM1IRQ_CLEAR, sndirq_update_callback);
+		space->machine->scheduler().synchronize(FUNC(sndirq_update_callback), YM1IRQ_CLEAR);
 
 	if (~data & 0x20)	// ack YM2 irq
-		timer_call_after_resynch(space->machine, NULL, YM2IRQ_CLEAR, sndirq_update_callback);
+		space->machine->scheduler().synchronize(FUNC(sndirq_update_callback), YM2IRQ_CLEAR);
 
 	if (~data & 0x40)	// clear busy flag
-		timer_call_after_resynch(space->machine, NULL, BUSY_CLEAR, sndirq_update_callback);
+		space->machine->scheduler().synchronize(FUNC(sndirq_update_callback), BUSY_CLEAR);
 
 	if (~data & 0x80)	// ack command from main cpu
-		timer_call_after_resynch(space->machine, NULL, CMDIRQ_CLEAR, sndirq_update_callback);
+		space->machine->scheduler().synchronize(FUNC(sndirq_update_callback), CMDIRQ_CLEAR);
 }
 
 
 
 static READ8_HANDLER( tnk3_cmdirq_ack_r )
 {
-	timer_call_after_resynch(space->machine, NULL, CMDIRQ_CLEAR, sndirq_update_callback);
+	space->machine->scheduler().synchronize(FUNC(sndirq_update_callback), CMDIRQ_CLEAR);
 	return 0xff;
 }
 
 static READ8_HANDLER( tnk3_ymirq_ack_r )
 {
-	timer_call_after_resynch(space->machine, NULL, YM1IRQ_CLEAR, sndirq_update_callback);
+	space->machine->scheduler().synchronize(FUNC(sndirq_update_callback), YM1IRQ_CLEAR);
 	return 0xff;
 }
 
@@ -547,7 +547,7 @@ static READ8_HANDLER( tnk3_busy_clear_r )
 {
 	// it's uncertain whether the latch should be cleared here or when it's read
 	soundlatch_clear_w(space, 0, 0);
-	timer_call_after_resynch(space->machine, NULL, BUSY_CLEAR, sndirq_update_callback);
+	space->machine->scheduler().synchronize(FUNC(sndirq_update_callback), BUSY_CLEAR);
 	return 0xff;
 }
 

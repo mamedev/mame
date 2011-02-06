@@ -531,10 +531,10 @@ static MACHINE_START( vegas )
 	voodoo = machine->device("voodoo");
 
 	/* allocate timers for the NILE */
-	timer[0] = timer_alloc(machine, NULL, NULL);
-	timer[1] = timer_alloc(machine, NULL, NULL);
-	timer[2] = timer_alloc(machine, nile_timer_callback, NULL);
-	timer[3] = timer_alloc(machine, nile_timer_callback, NULL);
+	timer[0] = machine->scheduler().timer_alloc(FUNC(NULL));
+	timer[1] = machine->scheduler().timer_alloc(FUNC(NULL));
+	timer[2] = machine->scheduler().timer_alloc(FUNC(nile_timer_callback));
+	timer[3] = machine->scheduler().timer_alloc(FUNC(nile_timer_callback));
 
 	/* identify our sound board */
 	if (machine->device("dsio") != NULL)

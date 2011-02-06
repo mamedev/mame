@@ -1298,7 +1298,7 @@ static CPU_INIT( tms99xx )
 	cpustate->io = device->space(AS_IO);
 
 #if (TMS99XX_MODEL == TMS9995_ID)
-	cpustate->timer = timer_alloc(device->machine, decrementer_callback, cpustate);
+	cpustate->timer = device->machine->scheduler().timer_alloc(FUNC(decrementer_callback), cpustate);
 #endif
 
 	cpustate->idle_callback = param ? param->idle_callback : NULL;

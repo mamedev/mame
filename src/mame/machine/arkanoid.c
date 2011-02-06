@@ -34,7 +34,7 @@ static TIMER_CALLBACK( test )
 
 WRITE8_HANDLER( arkanoid_Z80_mcu_w )
 {
-	timer_call_after_resynch(space->machine, NULL, data, test);
+	space->machine->scheduler().synchronize(FUNC(test), data);
 	/* boost the interleave for a few usecs to make sure it is read successfully */
 	cpuexec_boost_interleave(space->machine, attotime::zero, attotime::from_usec(10));
 }

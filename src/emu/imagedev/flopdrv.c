@@ -214,7 +214,7 @@ static void floppy_drive_init(device_t *img)
 	pDrive->flags = 0;
 	pDrive->index_pulse_callback = NULL;
 	pDrive->ready_state_change_callback = NULL;
-	pDrive->index_timer = timer_alloc(img->machine, floppy_drive_index_callback, (void *) img);
+	pDrive->index_timer = img->machine->scheduler().timer_alloc(FUNC(floppy_drive_index_callback), (void *) img);
 	pDrive->idx = 0;
 
 	floppy_drive_set_geometry(img, ((floppy_config*)img->baseconfig().static_config())->floppy_type);
@@ -674,7 +674,7 @@ DEVICE_IMAGE_LOAD( floppy )
 	else
 		next_wpt = CLEAR_LINE;
 
-	timer_set(image.device().machine, attotime::from_msec(250), flopimg, next_wpt, set_wpt);
+	image.device().machine->scheduler().timer_set(attotime::from_msec(250), FUNC(set_wpt), next_wpt, flopimg);
 
 	return retVal;
 }
@@ -702,7 +702,7 @@ DEVICE_IMAGE_UNLOAD( floppy )
 	devcb_call_write_line(&flopimg->out_wpt_func, flopimg->wpt);
 
 	/* set timer for disk eject */
-	timer_set(image.device().machine, attotime::from_msec(250), flopimg, ASSERT_LINE, set_wpt);
+	image.device().machine->scheduler().timer_set(attotime::from_msec(250), FUNC(set_wpt), ASSERT_LINE, flopimg);
 }
 
 device_t *floppy_get_device(running_machine *machine,int drive)

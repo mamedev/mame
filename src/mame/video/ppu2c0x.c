@@ -1301,13 +1301,13 @@ static DEVICE_START( ppu2c0x )
 		ppu2c0x->security_value = 0x1b;
 
 	/* initialize the scanline handling portion */
-	ppu2c0x->scanline_timer = timer_alloc(device->machine, scanline_callback, (void *) device);
+	ppu2c0x->scanline_timer = device->machine->scheduler().timer_alloc(FUNC(scanline_callback), (void *) device);
 	timer_adjust_oneshot(ppu2c0x->scanline_timer, device->machine->primary_screen->time_until_pos(1), 0);
 
-	ppu2c0x->hblank_timer = timer_alloc(device->machine, hblank_callback, (void *) device);
+	ppu2c0x->hblank_timer = device->machine->scheduler().timer_alloc(FUNC(hblank_callback), (void *) device);
 	timer_adjust_oneshot(ppu2c0x->hblank_timer, device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(86.67), 0); // ??? FIXME - hardcoding NTSC, need better calculation
 
-	ppu2c0x->nmi_timer = timer_alloc(device->machine, nmi_callback, (void *) device);
+	ppu2c0x->nmi_timer = device->machine->scheduler().timer_alloc(FUNC(nmi_callback), (void *) device);
 	timer_adjust_oneshot(ppu2c0x->nmi_timer, attotime::never, 0);
 
 	ppu2c0x->nmi_callback_proc = intf->nmi_handler;

@@ -305,7 +305,7 @@ static void vblank_state_changed(screen_device &screen, void *param, bool vblank
 			(*ldcore->intf.vsync)(ld, &ldcore->metadata[ldcore->fieldnum], ldcore->fieldnum, curtime);
 
 		/* set a timer to begin fetching the next frame just before the VBI data would be fetched */
-		timer_set(screen.machine, screen.time_until_pos(16*2), ld, 0, perform_player_update);
+		screen.machine->scheduler().timer_set(screen.time_until_pos(16*2), FUNC(perform_player_update), 0, ld);
 	}
 }
 

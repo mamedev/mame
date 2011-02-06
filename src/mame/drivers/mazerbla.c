@@ -742,7 +742,7 @@ static READ8_HANDLER( ls670_0_r )
 	mazerbla_state *state = space->machine->driver_data<mazerbla_state>();
 
 	/* set a timer to force synchronization after the read */
-	timer_call_after_resynch(space->machine, NULL, 0, NULL);
+	space->machine->scheduler().synchronize();
 
 	return state->ls670_0[offset];
 }
@@ -759,7 +759,7 @@ static TIMER_CALLBACK( deferred_ls670_0_w )
 static WRITE8_HANDLER( ls670_0_w )
 {
 	/* do this on a timer to let the CPUs synchronize */
-	timer_call_after_resynch(space->machine, NULL, (offset << 8) | data, deferred_ls670_0_w);
+	space->machine->scheduler().synchronize(FUNC(deferred_ls670_0_w), (offset << 8) | data);
 }
 
 static READ8_HANDLER( ls670_1_r )
@@ -767,7 +767,7 @@ static READ8_HANDLER( ls670_1_r )
 	mazerbla_state *state = space->machine->driver_data<mazerbla_state>();
 
 	/* set a timer to force synchronization after the read */
-	timer_call_after_resynch(space->machine, NULL, 0, NULL);
+	space->machine->scheduler().synchronize();
 
 	return state->ls670_1[offset];
 }
@@ -784,7 +784,7 @@ static TIMER_CALLBACK( deferred_ls670_1_w )
 static WRITE8_HANDLER( ls670_1_w )
 {
 	/* do this on a timer to let the CPUs synchronize */
-	timer_call_after_resynch(space->machine, NULL, (offset << 8) | data, deferred_ls670_1_w);
+	space->machine->scheduler().synchronize(FUNC(deferred_ls670_1_w), (offset << 8) | data);
 }
 
 
@@ -928,7 +928,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 
 static WRITE8_HANDLER( main_sound_w )
 {
-	timer_call_after_resynch(space->machine, NULL, data & 0xff, delayed_sound_w);
+	space->machine->scheduler().synchronize(FUNC(delayed_sound_w), data & 0xff);
 }
 
 static WRITE8_HANDLER( sound_int_clear_w )

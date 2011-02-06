@@ -133,7 +133,7 @@ static DEVICE_START( ticket )
 	state->ticketdispensed		= config->statushigh ? state->active_bit : 0;
 	state->ticketnotdispensed	= state->ticketdispensed ^ state->active_bit;
 
-	state->timer				= timer_alloc(device->machine, ticket_dispenser_toggle, (void *)device);
+	state->timer				= device->machine->scheduler().timer_alloc(FUNC(ticket_dispenser_toggle), (void *)device);
 
 	state_save_register_device_item(device, 0, state->status);
 	state_save_register_device_item(device, 0, state->power);

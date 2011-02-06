@@ -772,10 +772,10 @@ static INTERRUPT_GEN( superpac_interrupt_1 )
 						// so don't replace with cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 
 	if (!namcoio_read_reset_line(namcoio_1))		/* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(device->machine, attotime::from_usec(50), NULL, 0, superpac_io_run);
+		device->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(superpac_io_run));
 
 	if (!namcoio_read_reset_line(namcoio_2))		/* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(device->machine, attotime::from_usec(50), NULL, 1, superpac_io_run);
+		device->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(superpac_io_run), 1);
 }
 
 static TIMER_CALLBACK( pacnpal_io_run )
@@ -803,10 +803,10 @@ static INTERRUPT_GEN( pacnpal_interrupt_1 )
 						// so don't replace with cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 
 	if (!namcoio_read_reset_line(namcoio_1))		/* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(device->machine, attotime::from_usec(50), NULL, 0, pacnpal_io_run);
+		device->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(pacnpal_io_run));
 
 	if (!namcoio_read_reset_line(namcoio_2))		/* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(device->machine, attotime::from_usec(50), NULL, 1, pacnpal_io_run);
+		device->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(pacnpal_io_run), 1);
 }
 
 static TIMER_CALLBACK( phozon_io_run )
@@ -834,10 +834,10 @@ static INTERRUPT_GEN( phozon_interrupt_1 )
 						// so don't replace with cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 
 	if (!namcoio_read_reset_line(namcoio_1))		/* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(device->machine, attotime::from_usec(50), NULL, 0, phozon_io_run);
+		device->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(phozon_io_run));
 
 	if (!namcoio_read_reset_line(namcoio_2))		/* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(device->machine, attotime::from_usec(50), NULL, 1, phozon_io_run);
+		device->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(phozon_io_run), 1);
 }
 
 static TIMER_CALLBACK( mappy_io_run )
@@ -865,10 +865,10 @@ static INTERRUPT_GEN( mappy_interrupt_1 )
 						// so don't replace with cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 
 	if (!namcoio_read_reset_line(namcoio_1))		/* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(device->machine, attotime::from_usec(50), NULL, 0, mappy_io_run);
+		device->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(mappy_io_run));
 
 	if (!namcoio_read_reset_line(namcoio_2))		/* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(device->machine, attotime::from_usec(50), NULL, 1, mappy_io_run);
+		device->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(mappy_io_run), 1);
 }
 
 

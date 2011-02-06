@@ -275,8 +275,8 @@ static TIMER_CALLBACK( set_status_cb )
 
 static void set_status(gaelco_serial_state *state, UINT8 mask, UINT8 set, int wait)
 {
-	timer_set(state->device->machine, attotime::from_hz(wait),
-			state, (mask << 8)|set, set_status_cb);
+	state->device->machine->scheduler().timer_set(attotime::from_hz(wait), FUNC(set_status_cb), (mask << 8)|set, 
+			state);
 }
 
 static void process_in(gaelco_serial_state *state)
@@ -465,7 +465,7 @@ static DEVICE_START( gaelco_serial )
 	state->device = device;
 
 	devcb_resolve_write_line(&state->irq_func, &intf->irq_func, device);
-	state->sync_timer = timer_alloc(device->machine, link_cb, state);
+	state->sync_timer = device->machine->scheduler().timer_alloc(FUNC(link_cb), state);
 
 	/* register for save states */
 	//state_save_register_device_item(device, 0, earom->offset);

@@ -442,7 +442,7 @@ void device_execute_interface::spin_until_time(attotime duration)
 	suspend_until_trigger(TRIGGER_SUSPENDTIME + timetrig, true);
 
 	// then set a timer for it
-	timer_set(device().machine, duration, this, TRIGGER_SUSPENDTIME + timetrig, static_timed_trigger_callback);
+	device().machine->scheduler().timer_set(duration, FUNC(static_timed_trigger_callback), TRIGGER_SUSPENDTIME + timetrig, this);
 	timetrig = (timetrig + 1) % 256;
 }
 
@@ -558,9 +558,9 @@ void device_execute_interface::interface_pre_start()
 
 	// allocate timers if we need them
 	if (m_execute_config.m_vblank_interrupts_per_frame > 1)
-		m_partial_frame_timer = timer_alloc(device().machine, static_trigger_partial_frame_interrupt, (void *)this);
+		m_partial_frame_timer = device().machine->scheduler().timer_alloc(FUNC(static_trigger_partial_frame_interrupt), (void *)this);
 	if (m_execute_config.m_timed_interrupt_period != attotime::zero)
-		m_timedint_timer = timer_alloc(device().machine, static_trigger_periodic_interrupt, (void *)this);
+		m_timedint_timer = device().machine->scheduler().timer_alloc(FUNC(static_trigger_periodic_interrupt), (void *)this);
 
 	// register for save states
 	state_save_register_device_item(&m_device, 0, m_suspend);
@@ -917,7 +917,7 @@ if (TEMPLOG) printf("setline(%s,%d,%d,%d)\n", m_device->tag(), m_linenum, state,
 
 		// if this is the first one, set the timer
 		if (event_index == 0)
-			timer_call_after_resynch(m_execute->device().machine, (void *)this, 0, static_empty_event_queue);
+			m_execute->device().machine->scheduler().synchronize(FUNC(static_empty_event_queue), 0, (void *)this);
 	}
 }
 

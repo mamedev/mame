@@ -401,7 +401,7 @@ static TIMER_CALLBACK( level_1_interrupt_callback )
 {
 	fuuki16_state *state = machine->driver_data<fuuki16_state>();
 	cpu_set_input_line(state->maincpu, 1, HOLD_LINE);
-	timer_set(machine, machine->primary_screen->time_until_pos(248), NULL, 0, level_1_interrupt_callback);
+	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(248), FUNC(level_1_interrupt_callback));
 }
 
 
@@ -409,7 +409,7 @@ static TIMER_CALLBACK( vblank_interrupt_callback )
 {
 	fuuki16_state *state = machine->driver_data<fuuki16_state>();
 	cpu_set_input_line(state->maincpu, 3, HOLD_LINE);	// VBlank IRQ
-	timer_set(machine, machine->primary_screen->time_until_vblank_start(), NULL, 0, vblank_interrupt_callback);
+	machine->scheduler().timer_set(machine->primary_screen->time_until_vblank_start(), FUNC(vblank_interrupt_callback));
 }
 
 
@@ -432,7 +432,7 @@ static MACHINE_START( fuuki16 )
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
 
-	state->raster_interrupt_timer = timer_alloc(machine, raster_interrupt_callback, NULL);
+	state->raster_interrupt_timer = machine->scheduler().timer_alloc(FUNC(raster_interrupt_callback));
 }
 
 
@@ -441,8 +441,8 @@ static MACHINE_RESET( fuuki16 )
 	fuuki16_state *state = machine->driver_data<fuuki16_state>();
 	const rectangle &visarea = machine->primary_screen->visible_area();
 
-	timer_set(machine, machine->primary_screen->time_until_pos(248), NULL, 0, level_1_interrupt_callback);
-	timer_set(machine, machine->primary_screen->time_until_vblank_start(), NULL, 0, vblank_interrupt_callback);
+	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(248), FUNC(level_1_interrupt_callback));
+	machine->scheduler().timer_set(machine->primary_screen->time_until_vblank_start(), FUNC(vblank_interrupt_callback));
 	timer_adjust_oneshot(state->raster_interrupt_timer, machine->primary_screen->time_until_pos(0, visarea.max_x + 1), 0);
 }
 

@@ -569,7 +569,7 @@ static MACHINE_START( crystal )
 
 	cpu_set_irq_callback(machine->device("maincpu"), icallback);
 	for (i = 0; i < 4; i++)
-		state->Timer[i] = timer_alloc(machine, Timercb, (void*)(FPTR)i);
+		state->Timer[i] = machine->scheduler().timer_alloc(FUNC(Timercb), (void*)(FPTR)i);
 
 	PatchReset(machine);
 

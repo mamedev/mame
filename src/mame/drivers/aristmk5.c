@@ -231,7 +231,7 @@ static MACHINE_START( aristmk5 )
 	// reset the DAC to centerline
 	//dac_signed_data_w(machine->device("dac"), 0x80);
 
-	mk5_2KHz_timer = timer_alloc(machine, mk5_2KHz_callback, 0);
+	mk5_2KHz_timer = machine->scheduler().timer_alloc(FUNC(mk5_2KHz_callback));
 }
 
 static MACHINE_RESET( aristmk5 )

@@ -257,10 +257,10 @@ static void ldv1000_vsync(laserdisc_state *ld, const vbi_metadata *vbi, int fiel
 
 	/* signal VSYNC and set a timer to turn it off */
 	player->vsync = TRUE;
-	timer_set(ld->device->machine, ld->screen->scan_period() * 4, ld, 0, vsync_off);
+	ld->device->machine->scheduler().timer_set(ld->screen->scan_period() * 4, FUNC(vsync_off), 0, ld);
 
 	/* also set a timer to fetch the VBI data when it is ready */
-	timer_set(ld->device->machine, ld->screen->time_until_pos(19*2), ld, 0, vbi_data_fetch);
+	ld->device->machine->scheduler().timer_set(ld->screen->time_until_pos(19*2), FUNC(vbi_data_fetch), 0, ld);
 
 	/* boost interleave for the first 1ms to improve communications */
 	cpuexec_boost_interleave(ld->device->machine, attotime::zero, attotime::from_msec(1));

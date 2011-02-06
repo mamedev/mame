@@ -100,7 +100,7 @@ VIDEO_START( rpunch )
 		memset(rpunch_bitmapram, 0xff, rpunch_bitmapram_size);
 
 	/* reset the timer */
-	crtc_timer = timer_alloc(machine, crtc_interrupt_gen, NULL);
+	crtc_timer = machine->scheduler().timer_alloc(FUNC(crtc_interrupt_gen));
 }
 
 

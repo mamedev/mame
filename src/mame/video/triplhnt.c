@@ -124,7 +124,7 @@ static void draw_sprites(running_machine *machine, bitmap_t* bitmap, const recta
 	}
 
 	if (hit_line != 999 && hit_code != 999)
-		timer_set(machine, machine->primary_screen->time_until_pos(hit_line), NULL, hit_code, triplhnt_hit_callback);
+		machine->scheduler().timer_set(machine->primary_screen->time_until_pos(hit_line), FUNC(triplhnt_hit_callback), hit_code);
 }
 
 

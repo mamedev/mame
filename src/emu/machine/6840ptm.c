@@ -132,9 +132,9 @@ void ptm6840_device::device_start()
 	}
 
 
-	m_timer[0] = timer_alloc(&m_machine, ptm6840_timer1_cb, (void *)this);
-	m_timer[1] = timer_alloc(&m_machine, ptm6840_timer2_cb, (void *)this);
-	m_timer[2] = timer_alloc(&m_machine, ptm6840_timer3_cb, (void *)this);
+	m_timer[0] = m_machine.scheduler().timer_alloc(FUNC(ptm6840_timer1_cb), (void *)this);
+	m_timer[1] = m_machine.scheduler().timer_alloc(FUNC(ptm6840_timer2_cb), (void *)this);
+	m_timer[2] = m_machine.scheduler().timer_alloc(FUNC(ptm6840_timer3_cb), (void *)this);
 
 	for (int i = 0; i < 3; i++)
 	{

@@ -147,7 +147,7 @@ static TIMER_CALLBACK( interrupt_callback )
 
 static void create_interrupt_timer(running_machine *machine)
 {
-	interrupt_timer = timer_alloc(machine, interrupt_callback, NULL);
+	interrupt_timer = machine->scheduler().timer_alloc(FUNC(interrupt_callback));
 }
 
 

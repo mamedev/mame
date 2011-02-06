@@ -918,7 +918,7 @@ MACHINE_START( schaser_sh )
 {
 	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 
-	state->schaser_effect_555_timer = timer_alloc(machine, schaser_effect_555_cb, NULL);
+	state->schaser_effect_555_timer = machine->scheduler().timer_alloc(FUNC(schaser_effect_555_cb));
 
 	state_save_register_global(machine, state->schaser_explosion);
 	state_save_register_global(machine, state->schaser_effect_555_is_low);

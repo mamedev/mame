@@ -766,7 +766,7 @@ sound_stream::stream_output::stream_output()
 
 sound_manager::sound_manager(running_machine &machine)
 	: m_machine(machine),
-	  m_update_timer(timer_alloc(&machine, update_static, this)),
+	  m_update_timer(machine.scheduler().timer_alloc(FUNC(update_static), this)),
 	  m_finalmix_leftover(0),
 	  m_finalmix(NULL),
 	  m_leftmix(NULL),

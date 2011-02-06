@@ -594,7 +594,7 @@ WRITE32_HANDLER( micro3d_mac2_w )
 
 	/* TODO: Calculate a better estimate for timing */
 	if (state->mac_stat)
-		timer_set(space->machine, attotime::from_hz(MAC_CLK) * mac_cycles, NULL, 0, mac_done_callback);
+		space->machine->scheduler().timer_set(attotime::from_hz(MAC_CLK) * mac_cycles, FUNC(mac_done_callback));
 
 	state->mrab11 = mrab11;
 	state->vtx_addr = vtx_addr;
@@ -658,7 +658,7 @@ WRITE16_HANDLER( micro3d_adc_w )
 		return;
 	}
 
-	timer_set(space->machine, attotime::from_usec(40), NULL, data & ~4, adc_done_callback);
+	space->machine->scheduler().timer_set(attotime::from_usec(40), FUNC(adc_done_callback), data & ~4);
 }
 
 CUSTOM_INPUT( botssa_hwchk_r )
@@ -757,7 +757,7 @@ DRIVER_INIT( micro3d )
     non-zero on a reset, otherwise the 3D object data doesn't get uploaded! */
 	space->write_dword(0x00470000, 0xa5a5a5a5);
 
-	state->mc68901.timer_a = timer_alloc(machine, mfp_timer_a_cb, NULL);
+	state->mc68901.timer_a = machine->scheduler().timer_alloc(FUNC(mfp_timer_a_cb));
 
 	/* TODO? BOTSS crashes when starting the final stage because the 68000
     overwrites memory in use by the Am29000. Slowing down the 68000 slightly

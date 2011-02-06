@@ -80,7 +80,7 @@ static TIMER_CALLBACK( interrupt_callback )
 	if (scanline >= 262)
 		scanline = 16;
 
-	timer_set(machine, machine->primary_screen->time_until_pos(scanline), NULL, scanline, interrupt_callback);
+	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(scanline), FUNC(interrupt_callback), scanline);
 }
 
 
@@ -92,7 +92,7 @@ static MACHINE_START( cball )
 
 static MACHINE_RESET( cball )
 {
-	timer_set(machine, machine->primary_screen->time_until_pos(16), NULL, 16, interrupt_callback);
+	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(16), FUNC(interrupt_callback), 16);
 }
 
 

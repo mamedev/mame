@@ -1048,7 +1048,7 @@ static DEVICE_START( tms5110 )
 	}
 
 	tms->state = CTL_STATE_INPUT; /* most probably not defined */
-	tms->romclk_hack_timer = timer_alloc(device->machine, romclk_hack_timer_cb, (void *) device);
+	tms->romclk_hack_timer = device->machine->scheduler().timer_alloc(FUNC(romclk_hack_timer_cb), (void *) device);
 
 	register_for_save_states(tms);
 }
@@ -1421,7 +1421,7 @@ static DEVICE_START( tmsprom )
 	tms->device = device;
 	tms->clock = device->clock();
 
-	tms->romclk_timer = timer_alloc(device->machine, tmsprom_step, device);
+	tms->romclk_timer = device->machine->scheduler().timer_alloc(FUNC(tmsprom_step), device);
 	timer_adjust_periodic(tms->romclk_timer, attotime::zero, 0, attotime::from_hz(tms->clock));
 
 	tms->bit = 0;

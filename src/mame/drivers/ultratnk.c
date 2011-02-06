@@ -57,13 +57,13 @@ static TIMER_CALLBACK( nmi_callback	)
 	if (input_port_read(machine, "IN0") & 0x40)
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 
-	timer_set(machine, machine->primary_screen->time_until_pos(scanline), NULL, scanline, nmi_callback);
+	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(scanline), FUNC(nmi_callback), scanline);
 }
 
 
 static MACHINE_RESET( ultratnk )
 {
-	timer_set(machine, machine->primary_screen->time_until_pos(32), NULL, 32, nmi_callback);
+	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(32), FUNC(nmi_callback), 32);
 }
 
 

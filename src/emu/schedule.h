@@ -51,11 +51,31 @@
 //  MACROS
 //**************************************************************************
 
+// this macro wraps a function 'x' and can be used to pass a function followed by its name
+#define FUNC(x) x, #x
+
+// this macro wraps a member function 'x' from class 'c' using a templatized stub of type 's'
+#define MFUNC(s,c,x) s##_stub<c, &c::x>, #c "::" #x
+
+
 // these must be macros because we are included before the running_machine
 #define cpuexec_describe_context(mach)				(mach)->describe_context()
 #define cpuexec_boost_interleave(mach, slice, dur)	(mach)->scheduler().boost_interleave(slice, dur)
 #define cpuexec_trigger(mach, trigid)				(mach)->scheduler().trigger(trigid)
 #define cpuexec_triggertime(mach, trigid, dur)		(mach)->scheduler().trigger(trigid, dur)
+
+// macro for the RC time constant on a 74LS123 with C > 1000pF
+// R is in ohms, C is in farads
+#define TIME_OF_74LS123(r,c)			(0.45 * (double)(r) * (double)(c))
+
+// macros for the RC time constant on a 555 timer IC
+// R is in ohms, C is in farads
+#define PERIOD_OF_555_MONOSTABLE_NSEC(r,c)	((attoseconds_t)(1100000000 * (double)(r) * (double)(c)))
+#define PERIOD_OF_555_ASTABLE_NSEC(r1,r2,c)	((attoseconds_t)( 693000000 * ((double)(r1) + 2.0 * (double)(r2)) * (double)(c)))
+#define PERIOD_OF_555_MONOSTABLE(r,c)		attotime::from_nsec(PERIOD_OF_555_MONOSTABLE_NSEC(r,c))
+#define PERIOD_OF_555_ASTABLE(r1,r2,c)		attotime::from_nsec(PERIOD_OF_555_ASTABLE_NSEC(r1,r2,c))
+
+#define TIMER_CALLBACK(name)			void name(running_machine *machine, void *ptr, int param)
 
 
 
@@ -63,42 +83,186 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+// timer callbacks look like this
+typedef void (*timer_expired_func)(running_machine *machine, void *ptr, INT32 param);
+
+// stub for when the ptr parameter points to a class
+template<class T, void (T::*func)(running_machine &machine, INT32 param)>
+void timer_expired_stub(running_machine *machine, void *ptr, INT32 param)
+{
+	T *target = reinterpret_cast<T *>(ptr);
+	(target->*func)(*machine, param);
+}
+
+
+// ======================> emu_timer
+
+class emu_timer
+{
+	friend class device_scheduler;
+	friend class simple_list<emu_timer>;
+	friend class fixed_allocator<emu_timer>;
+
+	// construction/destruction
+	emu_timer();
+
+	// allocation and re-use
+	emu_timer &init(running_machine &machine, timer_expired_func callback, const char *name, void *ptr, bool temporary);
+	emu_timer &init(device_t &device, device_timer_id id, void *ptr, bool temporary);
+	emu_timer &release();
+
+public:
+	// getters
+	emu_timer *next() const { return m_next; }
+	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+	bool enabled() const { return m_enabled; }
+	int param() const { return m_param; }
+	void *ptr() const { return m_ptr; }
+
+	// setters
+	bool enable(bool enable = true);
+	void set_param(int param) { m_param = param; }
+	void set_ptr(void *ptr) { m_ptr = ptr; }
+
+	// control
+	void reset(attotime duration) { adjust(duration, m_param, m_period); }
+	void adjust(attotime duration, INT32 param = 0, attotime periodicity = attotime::never);
+
+	// timing queries
+	attotime elapsed() const;
+	attotime remaining() const;
+	attotime start() const { return m_start; }
+	attotime expire() const { return m_expire; }
+
+private:
+	// internal helpers
+	void register_save();
+	void schedule_next_period();
+
+	// internal state
+	running_machine *	m_machine;		// reference to the owning machine
+	emu_timer *			m_next;			// next timer in order in the list
+	emu_timer *			m_prev;			// previous timer in order in the list
+	timer_expired_func	m_callback;		// callback function
+	INT32				m_param;		// integer parameter
+	void *				m_ptr;			// pointer parameter
+	const char *		m_func;			// string name of the callback function
+	bool				m_enabled;		// is the timer enabled?
+	bool				m_temporary;	// is the timer temporary?
+	attotime			m_period;		// the repeat frequency of the timer
+	attotime			m_start;		// time when the timer was started
+	attotime			m_expire;		// time when the timer will expire
+	device_t *			m_device;		// for device timers, a pointer to the device
+	device_timer_id		m_id;			// for device timers, the ID of the timer
+};
+
+
 // ======================> device_scheduler
 
 class device_scheduler
 {
 	friend class device_execute_interface;
+	friend class emu_timer;
 
 public:
+	// construction/destruction
 	device_scheduler(running_machine &machine);
 	~device_scheduler();
+	void register_for_save();
 
-	void timeslice();
-
-	void trigger(int trigid, attotime after = attotime::zero);
-
-	void boost_interleave(attotime timeslice_time, attotime boost_duration);
-	void abort_timeslice();
-
+	// getters
+	attotime time() const;
+	emu_timer *first_timer() const { return m_timer_list; }
 	device_execute_interface *currently_executing() const { return m_executing_device; }
+	bool can_save() const;
 
-	// for timer system only!
-	attotime override_local_time(attotime default_time);
+	// execution
+	void timeslice();
+	void abort_timeslice();
+	void trigger(int trigid, attotime after = attotime::zero);
+	void boost_interleave(attotime timeslice_time, attotime boost_duration);
+	
+	// timers, specified by callback/name
+	emu_timer *timer_alloc(timer_expired_func callback, const char *name, void *ptr = NULL);
+	void timer_set(attotime duration, timer_expired_func callback, const char *name, int param = 0, void *ptr = NULL);
+	void timer_pulse(attotime period, timer_expired_func callback, const char *name, int param = 0, void *ptr = NULL);
+	void synchronize(timer_expired_func callback = NULL, const char *name = NULL, int param = 0, void *ptr = NULL) { timer_set(attotime::zero, callback, name, param, ptr); }
+
+	// timers, specified by device/id; generally devices should use the device_t methods instead
+	emu_timer *timer_alloc(device_t &device, device_timer_id id = 0, void *ptr = NULL);
+	void timer_set(attotime duration, device_t &device, device_timer_id id = 0, int param = 0, void *ptr = NULL);
 
 	// for emergencies only!
 	void eat_all_cycles();
 
 private:
+	// callbacks
+	void timed_trigger(running_machine &machine, INT32 param);
+	void postload();
+	
+	// scheduling helpers
 	void compute_perfect_interleave();
 	void rebuild_execute_list();
+	void add_scheduling_quantum(attotime quantum, attotime duration);
+	
+	// timer helpers
+	emu_timer &timer_list_insert(emu_timer &timer);
+	emu_timer &timer_list_remove(emu_timer &timer);
+	void execute_timers();
 
-	static TIMER_CALLBACK( static_timed_trigger );
+	// internal state
+	running_machine &			m_machine;					// reference to our machine
+	device_execute_interface *	m_executing_device;			// pointer to currently executing device
+	device_execute_interface *	m_execute_list;				// list of devices to be executed
+	attotime					m_basetime;					// global basetime; everything moves forward from here
 
-	running_machine &			m_machine;				// reference to our owner
-	bool						m_quantum_set;			// have we set the scheduling quantum yet?
-	device_execute_interface *	m_executing_device;		// pointer to currently executing device
-	device_execute_interface *	m_execute_list;			// list of devices to be executed
+	// list of active timers
+	emu_timer *					m_timer_list;				// head of the active list
+	fixed_allocator<emu_timer>	m_timer_allocator;			// allocator for timers
+
+	// other internal states
+	emu_timer *					m_callback_timer;			// pointer to the current callback timer
+	bool						m_callback_timer_modified; 	// true if the current callback timer was modified
+	attotime					m_callback_timer_expire_time; // the original expiration time
+
+	// scheduling quanta
+	class quantum_slot
+	{
+		friend class simple_list<quantum_slot>;
+
+	public:
+		quantum_slot *next() const { return m_next; }
+	
+		quantum_slot *			m_next;
+		attoseconds_t			m_actual;					// actual duration of the quantum
+		attoseconds_t			m_requested;				// duration of the requested quantum
+		attotime				m_expire;					// absolute expiration time of this quantum
+	};
+	simple_list<quantum_slot> 	m_quantum_list;				// list of active quanta
+	fixed_allocator<quantum_slot> m_quantum_allocator;		// allocator for quanta
+	attoseconds_t				m_quantum_minimum;			// duration of minimum quantum
 };
 
 
-#endif	/* __SCHEDULE_H__ */
+
+
+// temporary stuff
+attotime timer_get_time(running_machine *machine);
+
+inline void timer_adjust_oneshot(emu_timer *which, attotime duration, INT32 param) { which->adjust(duration, param); }
+inline void timer_adjust_periodic(emu_timer *which, attotime start_delay, INT32 param, attotime period) { which->adjust(start_delay, param, period); }
+
+inline void timer_reset(emu_timer *which, attotime duration) { which->reset(duration); }
+inline int timer_enable(emu_timer *which, int enable) { return which->enable(enable); }
+inline int timer_enabled(emu_timer *which) { return which->enabled(); }
+inline int timer_get_param(emu_timer *which) { return which->param(); }
+inline void timer_set_param(emu_timer *which, int param) { which->set_param(param); }
+inline void *timer_get_ptr(emu_timer *which) { return which->ptr(); }
+inline void timer_set_ptr(emu_timer *which, void *ptr) { which->set_ptr(ptr); }
+
+inline attotime timer_timeelapsed(emu_timer *which) { return which->elapsed(); }
+inline attotime timer_timeleft(emu_timer *which) { return which->remaining(); }
+inline attotime timer_starttime(emu_timer *which) { return which->start(); }
+inline attotime timer_firetime(emu_timer *which) { return which->expire(); }
+
+#endif	// __SCHEDULE_H__ */

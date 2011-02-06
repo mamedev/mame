@@ -2262,7 +2262,7 @@ static int linecounter = 0;
 static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 {
 	int current_scanline=param;
-	timer_call_after_resynch(timer.machine, NULL, 0, 0);
+	timer.machine->scheduler().synchronize(FUNC(0));
 
 
 	if (current_scanline==0)

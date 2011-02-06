@@ -93,7 +93,7 @@ VIDEO_START( spacefev )
 {
 	n8080_state *state = machine->driver_data<n8080_state>();
 
-	state->cannon_timer = timer_alloc(machine, spacefev_stop_red_cannon, NULL);
+	state->cannon_timer = machine->scheduler().timer_alloc(FUNC(spacefev_stop_red_cannon));
 
 	flip_screen_set_no_update(machine, 0);
 

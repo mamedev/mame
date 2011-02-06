@@ -236,8 +236,8 @@ static DEVICE_START( warpwarp_sound )
 
 	state->channel = device->machine->sound().stream_alloc(*device, 0, 1, CLOCK_16H, NULL, warpwarp_sound_update);
 
-	state->sound_volume_timer = timer_alloc(machine, sound_volume_decay, state);
-	state->music_volume_timer = timer_alloc(machine, music_volume_decay, state);
+	state->sound_volume_timer = machine->scheduler().timer_alloc(FUNC(sound_volume_decay), state);
+	state->music_volume_timer = machine->scheduler().timer_alloc(FUNC(music_volume_decay), state);
 }
 
 

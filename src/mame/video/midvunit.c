@@ -61,7 +61,7 @@ static TIMER_CALLBACK( scanline_timer_cb )
 	{
 		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 		timer_adjust_oneshot(scanline_timer, machine->primary_screen->time_until_pos(scanline + 1), scanline);
-		timer_set(machine, attotime::from_hz(25000000), NULL, -1, scanline_timer_cb);
+		machine->scheduler().timer_set(attotime::from_hz(25000000), FUNC(scanline_timer_cb), -1);
 	}
 	else
 		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
@@ -76,7 +76,7 @@ static void midvunit_exit(running_machine &machine)
 
 VIDEO_START( midvunit )
 {
-	scanline_timer = timer_alloc(machine, scanline_timer_cb, NULL);
+	scanline_timer = machine->scheduler().timer_alloc(FUNC(scanline_timer_cb));
 	poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, midvunit_exit);
 

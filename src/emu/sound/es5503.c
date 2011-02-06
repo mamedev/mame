@@ -259,7 +259,7 @@ static DEVICE_START( es5503 )
 		chip->oscillators[osc].irqpend = 0;
 		chip->oscillators[osc].accumulator = 0;
 
-		chip->oscillators[osc].timer = timer_alloc(device->machine, es5503_timer_cb, &chip->oscillators[osc]);
+		chip->oscillators[osc].timer = device->machine->scheduler().timer_alloc(FUNC(es5503_timer_cb), &chip->oscillators[osc]);
 		chip->oscillators[osc].chip = (void *)chip;
 	}
 

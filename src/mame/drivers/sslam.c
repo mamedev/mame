@@ -938,7 +938,7 @@ static DRIVER_INIT( sslam )
 	state_save_register_global(machine, state->bar);
 	state_save_register_global(machine, state->snd_bank);
 
-	state->music_timer = timer_alloc(machine, music_playback, NULL);
+	state->music_timer = machine->scheduler().timer_alloc(FUNC(music_playback));
 }
 
 static DRIVER_INIT( powerbls )

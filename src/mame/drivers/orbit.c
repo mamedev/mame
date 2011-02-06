@@ -50,7 +50,7 @@ static TIMER_CALLBACK( irq_off )
 static INTERRUPT_GEN( orbit_interrupt )
 {
 	cpu_set_input_line(device, 0, ASSERT_LINE);
-	timer_set(device->machine, device->machine->primary_screen->time_until_vblank_end(), NULL, 0, irq_off);
+	device->machine->scheduler().timer_set(device->machine->primary_screen->time_until_vblank_end(), FUNC(irq_off));
 }
 
 

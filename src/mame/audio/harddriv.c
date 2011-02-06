@@ -78,7 +78,7 @@ static TIMER_CALLBACK( delayed_68k_w )
 
 WRITE16_HANDLER( hd68k_snd_data_w )
 {
-	timer_call_after_resynch(space->machine, NULL, data, delayed_68k_w);
+	space->machine->scheduler().synchronize(FUNC(delayed_68k_w), data);
 	logerror("%06X:main write to sound=%04X\n", cpu_get_previouspc(space->cpu), data);
 }
 

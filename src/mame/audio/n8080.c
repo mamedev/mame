@@ -329,12 +329,12 @@ static TIMER_CALLBACK( delayed_sound_2_callback )
 
 WRITE8_HANDLER( n8080_sound_1_w )
 {
-	timer_call_after_resynch(space->machine, NULL, data, delayed_sound_1_callback); /* force CPUs to sync */
+	space->machine->scheduler().synchronize(FUNC(delayed_sound_1_callback), data); /* force CPUs to sync */
 }
 
 WRITE8_HANDLER( n8080_sound_2_w )
 {
-	timer_call_after_resynch(space->machine, NULL, data, delayed_sound_2_callback); /* force CPUs to sync */
+	space->machine->scheduler().synchronize(FUNC(delayed_sound_2_callback), data); /* force CPUs to sync */
 }
 
 
@@ -470,9 +470,9 @@ MACHINE_START( spacefev_sound )
 {
 	n8080_state *state = machine->driver_data<n8080_state>();
 
-	state->sound_timer[0] = timer_alloc(machine, stop_mono_flop_callback, NULL);
-	state->sound_timer[1] = timer_alloc(machine, stop_mono_flop_callback, NULL);
-	state->sound_timer[2] = timer_alloc(machine, stop_mono_flop_callback, NULL);
+	state->sound_timer[0] = machine->scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
+	state->sound_timer[1] = machine->scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
+	state->sound_timer[2] = machine->scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
 
 	state_save_register_global(machine, state->prev_snd_data);
 	state_save_register_global(machine, state->prev_sound_pins);
@@ -502,8 +502,8 @@ MACHINE_START( sheriff_sound )
 {
 	n8080_state *state = machine->driver_data<n8080_state>();
 
-	state->sound_timer[0] = timer_alloc(machine, stop_mono_flop_callback, NULL);
-	state->sound_timer[1] = timer_alloc(machine, stop_mono_flop_callback, NULL);
+	state->sound_timer[0] = machine->scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
+	state->sound_timer[1] = machine->scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
 
 	state_save_register_global(machine, state->prev_snd_data);
 	state_save_register_global(machine, state->prev_sound_pins);

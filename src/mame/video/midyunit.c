@@ -541,7 +541,7 @@ if (LOG_DMA)
 	}
 
 	/* signal we're done */
-	timer_set(space->machine, attotime::from_nsec(41 * dma_state.width * dma_state.height), NULL, 0, dma_callback);
+	space->machine->scheduler().timer_set(attotime::from_nsec(41 * dma_state.width * dma_state.height), FUNC(dma_callback));
 
 	g_profiler.stop();
 }
@@ -580,5 +580,5 @@ void midyunit_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanl
 	/* if this is the last update of the screen, set a timer to clear out the final line */
 	/* (since we update one behind) */
 	if (scanline == screen.visible_area().max_y)
-		timer_set(screen.machine, screen.time_until_pos(scanline + 1, 0), NULL, params->rowaddr, autoerase_line);
+		screen.machine->scheduler().timer_set(screen.time_until_pos(scanline + 1), FUNC(autoerase_line), params->rowaddr);
 }
