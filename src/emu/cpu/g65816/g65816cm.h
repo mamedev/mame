@@ -40,7 +40,7 @@
 
 /* Allow for architectures that don't have 8-bit sizes */
 #if UCHAR_MAX == 0xff
-#define int8 char
+#define int8 signed char
 #define MAKE_INT_8(A) (int8)((A)&0xff)
 #else
 #define int8   int
