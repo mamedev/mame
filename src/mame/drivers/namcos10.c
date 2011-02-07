@@ -357,7 +357,7 @@ READ32_HANDLER( nand_data_r )
 {
 	UINT32 data = nand_read2( nand_address * 2 );
 
-	printf( "data<-%08x (%08x)\n", data, nand_address );
+/*	printf( "data<-%08x (%08x)\n", data, nand_address ); */
 	nand_address++;
 
 	return data;
@@ -371,6 +371,22 @@ static void nand_copy( UINT32 *dst, UINT32 address, int len )
 		address += 4;
 		len -= 4;
 	}
+}
+
+UINT32 block[ 0x1ff ];
+
+WRITE32_HANDLER( nand_block_w )
+{
+	COMBINE_DATA( &block[ offset ] );
+}
+
+READ32_HANDLER( nand_block_r )
+{
+	return block[ offset ];
+}
+
+WRITE32_HANDLER( watchdog_w )
+{
 }
 
 static void memn_driver_init( running_machine *machine )
@@ -387,6 +403,9 @@ static void memn_driver_init( running_machine *machine )
 	memory_install_write32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f430000, 0x1f430003, 0, 0, nand_address3_w );
 	memory_install_write32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f440000, 0x1f440003, 0, 0, nand_address4_w );
 	memory_install_read32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f450000, 0x1f450003, 0, 0, nand_data_r );
+	memory_install_write32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1fb60000, 0x1fb60003, 0, 0, watchdog_w );
+	memory_install_write32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xbf500000, 0xbf5007d7, 0, 0, nand_block_w );
+	memory_install_read32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xbf500000, 0xbf5007d7, 0, 0, nand_block_r );
 
 	psx_driver_init(machine);
 }
