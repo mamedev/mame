@@ -8515,6 +8515,11 @@ Other Sun games
 
 	/* Sigma B98 */
 	DRIVER( gegege )	/* (c) 1997 Banpresto / Sigma */
+	DRIVER( animalc )	/* 2000 Sammy */
+	DRIVER( itazuram )	/* 2000 Sammy */
+	DRIVER( pyenaget )	/* 2000 Sammy */
+	DRIVER( haekaka )	/* 2002 Sammy */
+	DRIVER( tdoboon )	/* 2002 Sammy */
 
 	/* IGS games ( www.igs.com.tw ) */
 	DRIVER( goldstar )	/* (c) 198? IGS */
