@@ -51,13 +51,6 @@
 //  MACROS
 //**************************************************************************
 
-// this macro wraps a function 'x' and can be used to pass a function followed by its name
-#define FUNC(x) x, #x
-
-// this macro wraps a member function 'x' from class 'c' using a templatized stub of type 's'
-#define MFUNC(s,c,x) s##_stub<c, &c::x>, #c "::" #x
-
-
 // macro for the RC time constant on a 74LS123 with C > 1000pF
 // R is in ohms, C is in farads
 #define TIME_OF_74LS123(r,c)			(0.45 * (double)(r) * (double)(c))

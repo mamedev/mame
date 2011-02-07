@@ -2911,7 +2911,7 @@ static void port_config_detokenize(ioport_list &portlist, const input_port_token
 				maskbits = 0;
 
 				string = TOKEN_GET_STRING(ipt);
-				curport = portlist.append(string, global_alloc(input_port_config(string)));
+				curport = &portlist.append(string, *global_alloc(input_port_config(string)));
 				curfield = NULL;
 				cursetting = NULL;
 				break;

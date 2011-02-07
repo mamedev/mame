@@ -547,7 +547,7 @@ void device_execute_interface::execute_set_input(int linenum, int state)
 void device_execute_interface::interface_pre_start()
 {
 	// fill in the initial states
-	int index = device().machine->m_devicelist.index(&m_device);
+	int index = device().machine->m_devicelist.indexof(m_device);
 	m_suspend = SUSPEND_REASON_RESET;
 	m_profiler = profile_type(index + PROFILER_DEVICE_FIRST);
 	m_inttrigger = index + TRIGGER_INT;

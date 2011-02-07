@@ -532,7 +532,7 @@ void device_scheduler::trigger(int trigid, attotime after)
 
 	// if we have a non-zero time, schedule a timer
 	if (after != attotime::zero)
-		timer_set(after, MFUNC(timer_expired, device_scheduler, timed_trigger), trigid, this);
+		timer_set(after, MSTUB(timer_expired, device_scheduler, timed_trigger), trigid, this);
 
 	// send the trigger to everyone who cares
 	else

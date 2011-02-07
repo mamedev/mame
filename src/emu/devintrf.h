@@ -162,7 +162,7 @@ public:
 	// pull the generic forms forward
 	using super::first;
 	using super::count;
-	using super::index;
+	using super::indexof;
 	using super::find;
 
 	// provide type-specific overrides
@@ -180,18 +180,18 @@ public:
 		return num;
 	}
 
-	int index(device_type type, T *object) const
+	int indexof(device_type type, T &object) const
 	{
 		int num = 0;
 		for (T *cur = first(type); cur != NULL; cur = cur->typenext(), num++)
-			if (cur == object) return num;
+			if (cur == &object) return num;
 		return -1;
 	}
 
-	int index(device_type type, const char *tag) const
+	int indexof(device_type type, const char *tag) const
 	{
 		T *object = find(tag);
-		return (object != NULL && object->type() == type) ? index(type, object) : -1;
+		return (object != NULL && object->type() == type) ? indexof(type, *object) : -1;
 	}
 
 	T *find(device_type type, int index) const
@@ -253,7 +253,7 @@ class device_config
 	friend class machine_config;
 	friend class device_t;
 	friend class device_config_interface;
-	template<class T> friend class tagged_list;
+	friend class simple_list<device_config>;
 
 protected:
 	// construction/destruction
@@ -376,7 +376,7 @@ class device_t : public bindable_object
 	DISABLE_COPYING(device_t);
 
 	friend class device_interface;
-	template<class T> friend class tagged_list;
+	friend class simple_list<device_t>;
 	friend class device_list;
 
 protected:

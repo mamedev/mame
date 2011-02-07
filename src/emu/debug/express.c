@@ -59,6 +59,7 @@
 ***************************************************************************/
 
 #include "emucore.h"
+#include "emutempl.h"
 #include "express.h"
 #include <ctype.h>
 
@@ -444,7 +445,7 @@ void symbol_table::configure_memory(void *param, valid_func valid, read_func rea
 void symbol_table::add(const char *name, read_write rw, UINT64 *ptr)
 {
 	m_symlist.remove(name);
-	m_symlist.append(name, global_alloc(integer_symbol_entry(*this, name, rw, ptr)));
+	m_symlist.append(name, *global_alloc(integer_symbol_entry(*this, name, rw, ptr)));
 }
 
 
@@ -455,7 +456,7 @@ void symbol_table::add(const char *name, read_write rw, UINT64 *ptr)
 void symbol_table::add(const char *name, UINT64 value)
 {
 	m_symlist.remove(name);
-	m_symlist.append(name, global_alloc(integer_symbol_entry(*this, name, value)));
+	m_symlist.append(name, *global_alloc(integer_symbol_entry(*this, name, value)));
 }
 
 
@@ -466,7 +467,7 @@ void symbol_table::add(const char *name, UINT64 value)
 void symbol_table::add(const char *name, void *ref, getter_func getter, setter_func setter)
 {
 	m_symlist.remove(name);
-	m_symlist.append(name, global_alloc(integer_symbol_entry(*this, name, ref, getter, setter)));
+	m_symlist.append(name, *global_alloc(integer_symbol_entry(*this, name, ref, getter, setter)));
 }
 
 
@@ -477,7 +478,7 @@ void symbol_table::add(const char *name, void *ref, getter_func getter, setter_f
 void symbol_table::add(const char *name, void *ref, int minparams, int maxparams, execute_func execute)
 {
 	m_symlist.remove(name);
-	m_symlist.append(name, global_alloc(function_symbol_entry(*this, name, ref, minparams, maxparams, execute)));
+	m_symlist.append(name, *global_alloc(function_symbol_entry(*this, name, ref, minparams, maxparams, execute)));
 }
 
 

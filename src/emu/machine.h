@@ -221,7 +221,7 @@ class memory_region
 	DISABLE_COPYING(memory_region);
 
 	friend class running_machine;
-	template<class T> friend class tagged_list;
+	friend class simple_list<memory_region>;
 	friend resource_pool_object<memory_region>::~resource_pool_object();
 
 	// construction/destruction

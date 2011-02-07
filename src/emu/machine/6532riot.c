@@ -522,7 +522,7 @@ void riot6532_device::device_start()
 	assert(this != NULL);
 
 	/* set static values */
-	m_index = m_machine.m_devicelist.index(RIOT6532, tag());
+	m_index = m_machine.m_devicelist.indexof(RIOT6532, tag());
 
 	/* configure the ports */
 	devcb_resolve_read8(&m_port[0].m_in_func, &m_config.m_in_a_func, this);

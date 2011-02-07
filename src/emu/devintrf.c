@@ -115,7 +115,7 @@ void device_list::import_config_list(const device_config_list &list, running_mac
 	for (const device_config *devconfig = list.first(); devconfig != NULL; devconfig = devconfig->next())
 	{
 		device_t *newdevice = devconfig->alloc_device(*m_machine);
-		append(devconfig->tag(), newdevice);
+		append(devconfig->tag(), *newdevice);
 		newdevice->find_interfaces();
 	}
 }
@@ -156,8 +156,8 @@ void device_list::start_all()
 			mame_printf_verbose("  (missing dependencies; rescheduling)\n");
 			if (nextdevice == NULL)
 				throw emu_fatalerror("Circular dependency in device startup; unable to start %s '%s'\n", device->name(), device->tag());
-			detach(device);
-			append(device->tag(), device);
+			detach(*device);
+			append(device->tag(), *device);
 		}
 	}
 }

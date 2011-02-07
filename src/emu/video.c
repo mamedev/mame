@@ -1063,7 +1063,7 @@ void video_manager::create_snapshot_bitmap(device_t *screen)
 	// select the appropriate view in our dummy target
 	if (m_snap_native && screen != NULL)
 	{
-		int view_index = m_machine.m_devicelist.index(SCREEN, screen->tag());
+		int view_index = m_machine.m_devicelist.indexof(SCREEN, screen->tag());
 		assert(view_index != -1);
 		m_snap_target->set_view(view_index);
 	}

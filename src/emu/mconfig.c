@@ -120,7 +120,7 @@ device_config *machine_config::device_add(device_config *owner, const char *tag,
 {
 	astring tempstring;
 	const char *fulltag = owner->subtag(tempstring, tag);
-	return m_devicelist.append(fulltag, (*type)(*this, fulltag, owner, clock));
+	return &m_devicelist.append(fulltag, *(*type)(*this, fulltag, owner, clock));
 }
 
 
@@ -133,7 +133,7 @@ device_config *machine_config::device_replace(device_config *owner, const char *
 {
 	astring tempstring;
 	const char *fulltag = owner->subtag(tempstring, tag);
-	return m_devicelist.replace(fulltag, (*type)(*this, fulltag, owner, clock));
+	return &m_devicelist.replace_and_remove(fulltag, *(*type)(*this, fulltag, owner, clock));
 }
 
 

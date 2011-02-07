@@ -514,19 +514,19 @@ void image_add_device_with_subdevices(device_t *owner, device_type type, const c
 	machine_config *config = (machine_config *)owner->machine->config;
 
 	device_config *devconfig = type(*config, owner->subtag(tempstring,tag), &owner->baseconfig(), clock);
-	device_t *device = device_list->append(devconfig->tag(), devconfig->alloc_device(*owner->machine));
+	device_t &device = device_list->append(devconfig->tag(), *devconfig->alloc_device(*owner->machine));
 
-	machine_config_constructor machconfig = device->machine_config_additions();
+	machine_config_constructor machconfig = device.machine_config_additions();
 	if (machconfig != NULL)
     {
     	(*machconfig)(*config, devconfig);
         for (const device_config *config_dev = config->m_devicelist.first(); config_dev != NULL; config_dev = config_dev->next())
         {
 			if (config_dev->owner()==devconfig) {
-				device_list->append(config_dev->tag(), config_dev->alloc_device(*owner->machine));
+				device_list->append(config_dev->tag(), *config_dev->alloc_device(*owner->machine));
 			}
         }
     }
-	config->m_devicelist.append(devconfig->tag(), devconfig);
+	config->m_devicelist.append(devconfig->tag(), *devconfig);
 }
 

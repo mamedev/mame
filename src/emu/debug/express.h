@@ -132,7 +132,7 @@ private:
 // symbol_entry describes a symbol in a symbol table
 class symbol_entry
 {
-	friend class tagged_list<symbol_entry>;
+	friend class simple_list<symbol_entry>;
 
 protected:
 	// symbol types

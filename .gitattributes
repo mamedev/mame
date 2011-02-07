@@ -653,6 +653,7 @@ src/emu/emuopts.c svneol=native#text/plain
 src/emu/emuopts.h svneol=native#text/plain
 src/emu/emupal.c svneol=native#text/plain
 src/emu/emupal.h svneol=native#text/plain
+src/emu/emutempl.h svneol=native#text/plain
 src/emu/fileio.c svneol=native#text/plain
 src/emu/fileio.h svneol=native#text/plain
 src/emu/hash.c svneol=native#text/plain

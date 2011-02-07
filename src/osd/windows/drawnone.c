@@ -44,7 +44,7 @@
 #include <windows.h>
 
 // MAME headers
-#include "emucore.h"
+#include "emu.h"
 
 // MAMEOS headers
 #include "window.h"

@@ -274,7 +274,7 @@ void running_machine::start()
 	m_scheduler.register_for_save();
 
 	// allocate a soft_reset timer
-	m_soft_reset_timer = m_scheduler.timer_alloc(MFUNC(timer_expired, running_machine, soft_reset), this);
+	m_soft_reset_timer = m_scheduler.timer_alloc(MSTUB(timer_expired, running_machine, soft_reset), this);
 
 	// init the osd layer
 	m_osd.init(*this);
@@ -616,7 +616,7 @@ memory_region *running_machine::region_alloc(const char *name, UINT32 length, UI
 		fatalerror("region_alloc called with duplicate region name \"%s\"\n", name);
 
 	// allocate the region
-	return m_regionlist.append(name, auto_alloc(this, memory_region(*this, name, length, flags)));
+	return &m_regionlist.append(name, *auto_alloc(this, memory_region(*this, name, length, flags)));
 }
 
 
