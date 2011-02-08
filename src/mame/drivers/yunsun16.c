@@ -561,8 +561,8 @@ static MACHINE_START( yunsun16 )
 
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->sprites_scrolldx);
-	state_save_register_global(machine, state->sprites_scrolldy);
+	state->save_item(NAME(state->sprites_scrolldx));
+	state->save_item(NAME(state->sprites_scrolldy));
 }
 
 static MACHINE_RESET( yunsun16 )

@@ -532,11 +532,11 @@ static MACHINE_START( hnayayoi )
 {
 	hnayayoi_state *state = machine->driver_data<hnayayoi_state>();
 
-	state_save_register_global(machine, state->palbank);
-	state_save_register_global(machine, state->blit_layer);
-	state_save_register_global(machine, state->blit_dest);
-	state_save_register_global(machine, state->blit_src);
-	state_save_register_global(machine, state->keyb);
+	state->save_item(NAME(state->palbank));
+	state->save_item(NAME(state->blit_layer));
+	state->save_item(NAME(state->blit_dest));
+	state->save_item(NAME(state->blit_src));
+	state->save_item(NAME(state->keyb));
 }
 
 static MACHINE_RESET( hnayayoi )

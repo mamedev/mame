@@ -605,11 +605,11 @@ static MACHINE_START( lazercmd )
 
 	state->dac = machine->device("dac");
 
-	state_save_register_global(machine, state->marker_x);
-	state_save_register_global(machine, state->marker_y);
-	state_save_register_global(machine, state->timer_count);
-	state_save_register_global(machine, state->sense_state);
-	state_save_register_global(machine, state->dac_data);
+	state->save_item(NAME(state->marker_x));
+	state->save_item(NAME(state->marker_y));
+	state->save_item(NAME(state->timer_count));
+	state->save_item(NAME(state->sense_state));
+	state->save_item(NAME(state->dac_data));
 }
 
 static MACHINE_RESET( lazercmd )

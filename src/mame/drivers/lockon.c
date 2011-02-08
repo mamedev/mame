@@ -477,22 +477,22 @@ static MACHINE_START( lockon )
 	state->f2203_2r = machine->device("f2203.2r");
 	state->f2203_3r = machine->device("f2203.3r");
 
-	state_save_register_global(machine, state->ground_ctrl);
-	state_save_register_global(machine, state->scroll_h);
-	state_save_register_global(machine, state->scroll_v);
-	state_save_register_global(machine, state->xsal);
-	state_save_register_global(machine, state->x0ll);
-	state_save_register_global(machine, state->dx0ll);
-	state_save_register_global(machine, state->dxll);
-	state_save_register_global(machine, state->ysal);
-	state_save_register_global(machine, state->y0ll);
-	state_save_register_global(machine, state->dy0ll);
-	state_save_register_global(machine, state->dyll);
-	state_save_register_global(machine, state->iden);
-	state_save_register_global(machine, state->obj_pal_latch);
-	state_save_register_global(machine, state->obj_pal_addr);
-	state_save_register_global(machine, state->ctrl_reg);
-	state_save_register_global(machine, state->main_inten);
+	state->save_item(NAME(state->ground_ctrl));
+	state->save_item(NAME(state->scroll_h));
+	state->save_item(NAME(state->scroll_v));
+	state->save_item(NAME(state->xsal));
+	state->save_item(NAME(state->x0ll));
+	state->save_item(NAME(state->dx0ll));
+	state->save_item(NAME(state->dxll));
+	state->save_item(NAME(state->ysal));
+	state->save_item(NAME(state->y0ll));
+	state->save_item(NAME(state->dy0ll));
+	state->save_item(NAME(state->dyll));
+	state->save_item(NAME(state->iden));
+	state->save_item(NAME(state->obj_pal_latch));
+	state->save_item(NAME(state->obj_pal_addr));
+	state->save_item(NAME(state->ctrl_reg));
+	state->save_item(NAME(state->main_inten));
 }
 
 static MACHINE_RESET( lockon )

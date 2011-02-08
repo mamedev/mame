@@ -164,7 +164,7 @@ VIDEO_START( paradise )
 	tilemap_set_transparent_pen(state->tilemap_1, 0xff);
 	tilemap_set_transparent_pen(state->tilemap_2, 0xff);
 
-	state_save_register_global_bitmap(machine, state->tmpbitmap);
+	state->save_item(NAME(*state->tmpbitmap));
 }
 
 

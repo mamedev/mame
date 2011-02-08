@@ -918,23 +918,23 @@ static MACHINE_START( arkanoid )
 
 	state->mcu = machine->device("mcu");
 
-	state_save_register_global(machine, state->bootleg_cmd);
+	state->save_item(NAME(state->bootleg_cmd));
 
-	state_save_register_global(machine, state->paddle_select);
-	state_save_register_global(machine, state->z80write);
-	state_save_register_global(machine, state->fromz80);
-	state_save_register_global(machine, state->m68705write);
-	state_save_register_global(machine, state->toz80);
+	state->save_item(NAME(state->paddle_select));
+	state->save_item(NAME(state->z80write));
+	state->save_item(NAME(state->fromz80));
+	state->save_item(NAME(state->m68705write));
+	state->save_item(NAME(state->toz80));
 
-	state_save_register_global(machine, state->port_a_in);
-	state_save_register_global(machine, state->port_a_out);
-	state_save_register_global(machine, state->ddr_a);
+	state->save_item(NAME(state->port_a_in));
+	state->save_item(NAME(state->port_a_out));
+	state->save_item(NAME(state->ddr_a));
 
-	state_save_register_global(machine, state->port_c_out);
-	state_save_register_global(machine, state->ddr_c);
+	state->save_item(NAME(state->port_c_out));
+	state->save_item(NAME(state->ddr_c));
 
-	state_save_register_global(machine, state->gfxbank);
-	state_save_register_global(machine, state->palettebank);
+	state->save_item(NAME(state->gfxbank));
+	state->save_item(NAME(state->palettebank));
 }
 
 static MACHINE_RESET( arkanoid )

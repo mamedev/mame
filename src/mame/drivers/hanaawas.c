@@ -188,7 +188,7 @@ static MACHINE_START( hanaawas )
 {
 	hanaawas_state *state = machine->driver_data<hanaawas_state>();
 
-	state_save_register_global(machine, state->mux);
+	state->save_item(NAME(state->mux));
 }
 
 static MACHINE_RESET( hanaawas )

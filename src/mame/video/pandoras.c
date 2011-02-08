@@ -110,7 +110,7 @@ VIDEO_START( pandoras )
 	pandoras_state *state = machine->driver_data<pandoras_state>();
 	state->layer0 = tilemap_create(machine, get_tile_info0, tilemap_scan_rows, 8, 8, 32, 32);
 
-	state_save_register_global(machine, state->flipscreen);
+	state->save_item(NAME(state->flipscreen));
 }
 
 /***************************************************************************

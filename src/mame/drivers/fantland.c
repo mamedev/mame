@@ -831,7 +831,7 @@ static MACHINE_START( fantland )
 
 	state->audio_cpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->nmi_enable);
+	state->save_item(NAME(state->nmi_enable));
 }
 
 static MACHINE_RESET( fantland )
@@ -977,14 +977,14 @@ static MACHINE_START( borntofi )
 	state->msm3 = machine->device("msm3");
 	state->msm4 = machine->device("msm4");
 
-	state_save_register_global_array(machine, state->old_x);
-	state_save_register_global_array(machine, state->old_y);
-	state_save_register_global_array(machine, state->old_f);
-	state_save_register_global_array(machine, state->input_ret);
-	state_save_register_global_array(machine, state->adpcm_playing);
-	state_save_register_global_array(machine, state->adpcm_addr[0]);
-	state_save_register_global_array(machine, state->adpcm_addr[1]);
-	state_save_register_global_array(machine, state->adpcm_nibble);
+	state->save_item(NAME(state->old_x));
+	state->save_item(NAME(state->old_y));
+	state->save_item(NAME(state->old_f));
+	state->save_item(NAME(state->input_ret));
+	state->save_item(NAME(state->adpcm_playing));
+	state->save_item(NAME(state->adpcm_addr[0]));
+	state->save_item(NAME(state->adpcm_addr[1]));
+	state->save_item(NAME(state->adpcm_nibble));
 }
 
 static MACHINE_RESET( borntofi )

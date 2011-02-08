@@ -243,21 +243,21 @@ static MACHINE_START( deniam )
 
 	state->audio_cpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->display_enable);
-	state_save_register_global(machine, state->coinctrl);
+	state->save_item(NAME(state->display_enable));
+	state->save_item(NAME(state->coinctrl));
 
-	state_save_register_global(machine, state->bg_scrollx_offs);
-	state_save_register_global(machine, state->bg_scrolly_offs);
-	state_save_register_global(machine, state->fg_scrollx_offs);
-	state_save_register_global(machine, state->fg_scrolly_offs);
-	state_save_register_global(machine, state->bg_scrollx_reg);
-	state_save_register_global(machine, state->bg_scrolly_reg);
-	state_save_register_global(machine, state->fg_scrollx_reg);
-	state_save_register_global(machine, state->fg_scrolly_reg);
-	state_save_register_global(machine, state->bg_page_reg);
-	state_save_register_global(machine, state->fg_page_reg);
-	state_save_register_global_array(machine, state->bg_page);
-	state_save_register_global_array(machine, state->fg_page);
+	state->save_item(NAME(state->bg_scrollx_offs));
+	state->save_item(NAME(state->bg_scrolly_offs));
+	state->save_item(NAME(state->fg_scrollx_offs));
+	state->save_item(NAME(state->fg_scrolly_offs));
+	state->save_item(NAME(state->bg_scrollx_reg));
+	state->save_item(NAME(state->bg_scrolly_reg));
+	state->save_item(NAME(state->fg_scrollx_reg));
+	state->save_item(NAME(state->fg_scrolly_reg));
+	state->save_item(NAME(state->bg_page_reg));
+	state->save_item(NAME(state->fg_page_reg));
+	state->save_item(NAME(state->bg_page));
+	state->save_item(NAME(state->fg_page));
 }
 
 

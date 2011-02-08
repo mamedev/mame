@@ -797,37 +797,37 @@ static void dynax_common_reset( running_machine *machine )
 	state->flipscreen = 0;
 	state->hanamai_priority = 0;
 
-	state_save_register_global(machine, state->blit_romregion);
-	state_save_register_global(machine, state->blit2_romregion);
-	state_save_register_global(machine, state->blit_dest);
-	state_save_register_global(machine, state->blit2_dest);
-	state_save_register_global(machine, state->blit_pen);
-	state_save_register_global(machine, state->blit2_pen);
-	state_save_register_global(machine, state->blit_palbank);
-	state_save_register_global(machine, state->blit2_palbank);
-	state_save_register_global(machine, state->blit_palettes);
-	state_save_register_global(machine, state->blit2_palettes);
-	state_save_register_global(machine, state->layer_enable);
-	state_save_register_global(machine, state->blit_backpen);
-	state_save_register_global(machine, state->extra_scroll_x);
-	state_save_register_global(machine, state->extra_scroll_y);
-	state_save_register_global(machine, state->hnoridur_layer_half2);
+	state->save_item(NAME(state->blit_romregion));
+	state->save_item(NAME(state->blit2_romregion));
+	state->save_item(NAME(state->blit_dest));
+	state->save_item(NAME(state->blit2_dest));
+	state->save_item(NAME(state->blit_pen));
+	state->save_item(NAME(state->blit2_pen));
+	state->save_item(NAME(state->blit_palbank));
+	state->save_item(NAME(state->blit2_palbank));
+	state->save_item(NAME(state->blit_palettes));
+	state->save_item(NAME(state->blit2_palettes));
+	state->save_item(NAME(state->layer_enable));
+	state->save_item(NAME(state->blit_backpen));
+	state->save_item(NAME(state->extra_scroll_x));
+	state->save_item(NAME(state->extra_scroll_y));
+	state->save_item(NAME(state->hnoridur_layer_half2));
 
-	state_save_register_global(machine, state->blit_scroll_x);
-	state_save_register_global(machine, state->blit2_scroll_x);
-	state_save_register_global(machine, state->blit_scroll_y);
-	state_save_register_global(machine, state->blit2_scroll_y);
-	state_save_register_global(machine, state->blit_wrap_enable);
-	state_save_register_global(machine, state->blit2_wrap_enable);
-	state_save_register_global(machine, state->blit_x);
-	state_save_register_global(machine, state->blit_y);
-	state_save_register_global(machine, state->blit2_x);
-	state_save_register_global(machine, state->blit2_y);
-	state_save_register_global(machine, state->blit_src);
-	state_save_register_global(machine, state->blit2_src);
-	state_save_register_global(machine, state->hanamai_layer_half);
-	state_save_register_global(machine, state->flipscreen);
-	state_save_register_global(machine, state->hanamai_priority);
+	state->save_item(NAME(state->blit_scroll_x));
+	state->save_item(NAME(state->blit2_scroll_x));
+	state->save_item(NAME(state->blit_scroll_y));
+	state->save_item(NAME(state->blit2_scroll_y));
+	state->save_item(NAME(state->blit_wrap_enable));
+	state->save_item(NAME(state->blit2_wrap_enable));
+	state->save_item(NAME(state->blit_x));
+	state->save_item(NAME(state->blit_y));
+	state->save_item(NAME(state->blit2_x));
+	state->save_item(NAME(state->blit2_y));
+	state->save_item(NAME(state->blit_src));
+	state->save_item(NAME(state->blit2_src));
+	state->save_item(NAME(state->hanamai_layer_half));
+	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->hanamai_priority));
 }
 
 VIDEO_START( hanamai )
@@ -846,14 +846,14 @@ VIDEO_START( hanamai )
 	dynax_common_reset(machine);
 	state->layer_layout = LAYOUT_HANAMAI;
 
-	state_save_register_global_pointer(machine, state->pixmap[0][0], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[0][1], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[1][0], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[1][1], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[2][0], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[2][1], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[3][0], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[3][1], 256 * 256);
+	state->save_pointer(NAME(state->pixmap[0][0]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[0][1]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[1][0]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[1][1]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[2][0]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[2][1]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[3][0]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[3][1]), 256 * 256);
 }
 
 VIDEO_START( hnoridur )
@@ -874,14 +874,14 @@ VIDEO_START( hnoridur )
 
 	state->priority_table = priority_hnoridur;
 
-	state_save_register_global_pointer(machine, state->pixmap[0][0], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[0][1], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[1][0], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[1][1], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[2][0], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[2][1], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[3][0], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[3][1], 256 * 256);
+	state->save_pointer(NAME(state->pixmap[0][0]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[0][1]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[1][0]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[1][1]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[2][0]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[2][1]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[3][0]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[3][1]), 256 * 256);
 }
 
 VIDEO_START( mcnpshnt )
@@ -906,12 +906,12 @@ VIDEO_START( sprtmtch )
 	dynax_common_reset(machine);
 	state->layer_layout = LAYOUT_DRGPUNCH;
 
-	state_save_register_global_pointer(machine, state->pixmap[0][0], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[0][1], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[1][0], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[1][1], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[2][0], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[2][1], 256 * 256);
+	state->save_pointer(NAME(state->pixmap[0][0]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[0][1]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[1][0]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[1][1]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[2][0]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[2][1]), 256 * 256);
 }
 
 VIDEO_START( jantouki )
@@ -939,22 +939,22 @@ VIDEO_START( jantouki )
 	state->layer_layout = LAYOUT_JANTOUKI;
 	state->update_irq_func = jantouki_update_irq;
 
-	state_save_register_global_pointer(machine, state->pixmap[0][0], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[0][1], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[1][0], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[1][1], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[2][0], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[2][1], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[3][0], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[3][1], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[4][0], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[4][1], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[5][0], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[5][1], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[6][0], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[6][1], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[7][0], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[7][1], 256 * 256);
+	state->save_pointer(NAME(state->pixmap[0][0]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[0][1]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[1][0]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[1][1]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[2][0]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[2][1]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[3][0]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[3][1]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[4][0]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[4][1]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[5][0]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[5][1]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[6][0]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[6][1]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[7][0]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[7][1]), 256 * 256);
 }
 
 VIDEO_START( mjdialq2 )
@@ -968,8 +968,8 @@ VIDEO_START( mjdialq2 )
 	state->layer_layout = LAYOUT_MJDIALQ2;
 	state->update_irq_func = 0;
 
-	state_save_register_global_pointer(machine, state->pixmap[0][0], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[1][0], 256 * 256);
+	state->save_pointer(NAME(state->pixmap[0][0]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[1][0]), 256 * 256);
 }
 
 VIDEO_START( mjelctrn )

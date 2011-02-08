@@ -420,9 +420,9 @@ static void outrun_generic_init(running_machine *machine)
 	if (nvram != NULL)
 		nvram->set_base(workram, 0x8000);
 
-	state_save_register_global(machine, state->adc_select);
-	state_save_register_global(machine, state->vblank_irq_state);
-	state_save_register_global(machine, state->irq2_state);
+	state->save_item(NAME(state->adc_select));
+	state->save_item(NAME(state->vblank_irq_state));
+	state->save_item(NAME(state->irq2_state));
 	state_save_register_global_pointer(machine, segaic16_spriteram_0, 0x01000/2);
 	state_save_register_global_pointer(machine, segaic16_paletteram,  0x02000/2);
 	state_save_register_global_pointer(machine, segaic16_tileram_0,   0x10000/2);

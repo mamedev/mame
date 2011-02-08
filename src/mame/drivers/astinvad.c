@@ -107,8 +107,8 @@ static VIDEO_START( spaceint )
 	astinvad_state *state = machine->driver_data<astinvad_state>();
 	state->colorram = auto_alloc_array(machine, UINT8, state->videoram_size);
 
-	state_save_register_global(machine, state->color_latch);
-	state_save_register_global_pointer(machine, state->colorram, state->videoram_size);
+	state->save_item(NAME(state->color_latch));
+	state->save_pointer(NAME(state->colorram), state->videoram_size);
 }
 
 
@@ -235,9 +235,9 @@ static MACHINE_START( kamikaze )
 	state->int_timer = machine->scheduler().timer_alloc(FUNC(kamizake_int_gen));
 	state->int_timer->adjust(machine->primary_screen->time_until_pos(128), 128);
 
-	state_save_register_global(machine, state->screen_flip);
-	state_save_register_global(machine, state->screen_red);
-	state_save_register_global_array(machine, state->sound_state);
+	state->save_item(NAME(state->screen_flip));
+	state->save_item(NAME(state->screen_red));
+	state->save_item(NAME(state->sound_state));
 }
 
 static MACHINE_RESET( kamikaze )
@@ -258,8 +258,8 @@ static MACHINE_START( spaceint )
 	state->maincpu = machine->device("maincpu");
 	state->samples = machine->device("samples");
 
-	state_save_register_global(machine, state->screen_flip);
-	state_save_register_global_array(machine, state->sound_state);
+	state->save_item(NAME(state->screen_flip));
+	state->save_item(NAME(state->sound_state));
 }
 
 static MACHINE_RESET( spaceint )

@@ -249,7 +249,7 @@ static MACHINE_START( aliens )
 	state->k052109 = machine->device("k052109");
 	state->k051960 = machine->device("k051960");
 
-	state_save_register_global(machine, state->palette_selected);
+	state->save_item(NAME(state->palette_selected));
 }
 
 static MACHINE_RESET( aliens )

@@ -933,10 +933,10 @@ static DRIVER_INIT( sslam )
 	state->melody = 0;
 	state->bar = 0;
 
-	state_save_register_global(machine, state->track);
-	state_save_register_global(machine, state->melody);
-	state_save_register_global(machine, state->bar);
-	state_save_register_global(machine, state->snd_bank);
+	state->save_item(NAME(state->track));
+	state->save_item(NAME(state->melody));
+	state->save_item(NAME(state->bar));
+	state->save_item(NAME(state->snd_bank));
 
 	state->music_timer = machine->scheduler().timer_alloc(FUNC(music_playback));
 }
@@ -945,9 +945,9 @@ static DRIVER_INIT( powerbls )
 {
 	sslam_state *state = machine->driver_data<sslam_state>();
 
-	state_save_register_global(machine, state->oki_control);
-	state_save_register_global(machine, state->oki_command);
-	state_save_register_global(machine, state->oki_bank);
+	state->save_item(NAME(state->oki_control));
+	state->save_item(NAME(state->oki_command));
+	state->save_item(NAME(state->oki_bank));
 }
 
 

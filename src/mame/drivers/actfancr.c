@@ -290,7 +290,7 @@ static MACHINE_START( triothep )
 
 	MACHINE_START_CALL(actfancr);
 
-	state_save_register_global(machine, state->trio_control_select);
+	state->save_item(NAME(state->trio_control_select));
 }
 
 static MACHINE_RESET( actfancr )

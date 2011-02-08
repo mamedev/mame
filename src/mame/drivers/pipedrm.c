@@ -602,8 +602,8 @@ static MACHINE_START( pipedrm )
 	memory_set_bank(machine, "bank2", 0);
 
 	/* state save */
-	state_save_register_global(machine, state->pending_command);
-	state_save_register_global(machine, state->sound_command);
+	state->save_item(NAME(state->pending_command));
+	state->save_item(NAME(state->sound_command));
 
 	/* video-related elements are saved in VIDEO_START */
 }

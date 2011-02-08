@@ -214,10 +214,10 @@ static MACHINE_START( surpratk )
 	state->k053251 = machine->device("k053251");
 	state->k052109 = machine->device("k052109");
 
-	state_save_register_global(machine, state->videobank);
-	state_save_register_global(machine, state->sprite_colorbase);
-	state_save_register_global_array(machine, state->layer_colorbase);
-	state_save_register_global_array(machine, state->layerpri);
+	state->save_item(NAME(state->videobank));
+	state->save_item(NAME(state->sprite_colorbase));
+	state->save_item(NAME(state->layer_colorbase));
+	state->save_item(NAME(state->layerpri));
 	state_save_register_global_pointer(machine, machine->generic.paletteram.u8, 0x1000);
 }
 

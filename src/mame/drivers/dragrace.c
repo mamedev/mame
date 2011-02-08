@@ -320,8 +320,8 @@ static MACHINE_START( dragrace )
 
 	state->discrete = machine->device("discrete");
 
-	state_save_register_global(machine, state->misc_flags);
-	state_save_register_global_array(machine, state->gear);
+	state->save_item(NAME(state->misc_flags));
+	state->save_item(NAME(state->gear));
 }
 
 static MACHINE_RESET( dragrace )

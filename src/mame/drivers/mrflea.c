@@ -339,11 +339,11 @@ static MACHINE_START( mrflea )
 	state->maincpu = machine->device("maincpu");
 	state->subcpu = machine->device("sub");
 
-	state_save_register_global(machine, state->gfx_bank);
-	state_save_register_global(machine, state->io);
-	state_save_register_global(machine, state->main);
-	state_save_register_global(machine, state->status);
-	state_save_register_global(machine, state->select1);
+	state->save_item(NAME(state->gfx_bank));
+	state->save_item(NAME(state->io));
+	state->save_item(NAME(state->main));
+	state->save_item(NAME(state->status));
+	state->save_item(NAME(state->select1));
 }
 
 static MACHINE_RESET( mrflea )

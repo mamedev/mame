@@ -105,7 +105,7 @@ void fatfury2_install_protection( running_machine *machine )
 
 	state->fatfury2_prot_data = 0;
 
-	state_save_register_global(machine, state->fatfury2_prot_data);
+	state->save_item(NAME(state->fatfury2_prot_data));
 }
 
 
@@ -403,7 +403,7 @@ void neogeo_reset_rng( running_machine *machine )
 static void sma_install_random_read_handler( running_machine *machine, int addr1, int addr2 )
 {
 	neogeo_state *state = machine->driver_data<neogeo_state>();
-	state_save_register_global(machine, state->neogeo_rng);
+	state->save_item(NAME(state->neogeo_rng));
 
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), addr1, addr1 + 1, 0, 0, sma_random_r);
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), addr2, addr2 + 1, 0, 0, sma_random_r);
@@ -538,7 +538,7 @@ void install_pvc_protection( running_machine *machine )
 {
 	neogeo_state *state = machine->driver_data<neogeo_state>();
 	state->pvc_cartridge_ram = auto_alloc_array(machine, UINT16, 0x2000 / 2);
-	state_save_register_global_pointer(machine, state->pvc_cartridge_ram, 0x2000 / 2);
+	state->save_pointer(NAME(state->pvc_cartridge_ram), 0x2000 / 2);
 
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2fe000, 0x2fffff, 0, 0, pvc_prot_r, pvc_prot_w);
 }

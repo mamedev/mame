@@ -267,14 +267,14 @@ static void register_savestate( running_machine *machine )
 {
 	m62_state *state = machine->driver_data<m62_state>();
 
-	state_save_register_global(machine, state->flipscreen);
-	state_save_register_global(machine, state->m62_background_hscroll);
-	state_save_register_global(machine, state->m62_background_vscroll);
+	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->m62_background_hscroll));
+	state->save_item(NAME(state->m62_background_vscroll));
 
-	state_save_register_global(machine, state->kidniki_background_bank);
-	state_save_register_global(machine, state->kidniki_text_vscroll);
-	state_save_register_global(machine, state->ldrun3_topbottom_mask);
-	state_save_register_global(machine, state->spelunkr_palbank);
+	state->save_item(NAME(state->kidniki_background_bank));
+	state->save_item(NAME(state->kidniki_text_vscroll));
+	state->save_item(NAME(state->ldrun3_topbottom_mask));
+	state->save_item(NAME(state->spelunkr_palbank));
 }
 
 

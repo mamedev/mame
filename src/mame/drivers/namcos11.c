@@ -965,7 +965,7 @@ static DRIVER_INIT( namcos11 )
 					memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f080000, 0x1f080003, 0, 0, bankswitch_rom64_upper_w );
 					memory_nop_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1fa10020, 0x1fa1002f, 0, 0 );
 					memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1fa10020, 0x1fa1002f, 0, 0, bankswitch_rom64_w );
-					state_save_register_global( machine, state->m_n_bankoffset );
+					state->save_item( NAME(state->m_n_bankoffset) );
 				}
 			}
 			else

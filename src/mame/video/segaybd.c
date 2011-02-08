@@ -28,7 +28,7 @@ VIDEO_START( yboard )
 	/* initialize the rotation layer */
 	segaic16_rotate_init(machine, 0, SEGAIC16_ROTATE_YBOARD, 0x000);
 
-	state_save_register_global_bitmap(machine, state->tmp_bitmap);
+	state->save_item(NAME(*state->tmp_bitmap));
 }
 
 

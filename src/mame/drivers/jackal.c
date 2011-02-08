@@ -345,7 +345,7 @@ static MACHINE_START( jackal )
 	state->mastercpu = machine->device("master");
 	state->slavecpu = machine->device("slave");
 
-	state_save_register_global(machine, state->irq_enable);
+	state->save_item(NAME(state->irq_enable));
 }
 
 static MACHINE_RESET( jackal )

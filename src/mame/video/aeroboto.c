@@ -48,12 +48,12 @@ VIDEO_START( aeroboto )
 	tilemap_set_transparent_pen(state->bg_tilemap, 0);
 	tilemap_set_scroll_rows(state->bg_tilemap, 64);
 
-	state_save_register_global(machine, state->charbank);
-	state_save_register_global(machine, state->starsoff);
-	state_save_register_global(machine, state->sx);
-	state_save_register_global(machine, state->sy);
-	state_save_register_global(machine, state->ox);
-	state_save_register_global(machine, state->oy);
+	state->save_item(NAME(state->charbank));
+	state->save_item(NAME(state->starsoff));
+	state->save_item(NAME(state->sx));
+	state->save_item(NAME(state->sy));
+	state->save_item(NAME(state->ox));
+	state->save_item(NAME(state->oy));
 
 	#if STARS_LAYOUT
 	{

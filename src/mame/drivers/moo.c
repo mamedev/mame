@@ -441,12 +441,12 @@ static MACHINE_START( moo )
 	state->k056832 = machine->device("k056832");
 	state->k054338 = machine->device("k054338");
 
-	state_save_register_global(machine, state->cur_control2);
-	state_save_register_global(machine, state->alpha_enabled);
-	state_save_register_global(machine, state->sprite_colorbase);
-	state_save_register_global_array(machine, state->layer_colorbase);
-	state_save_register_global_array(machine, state->layerpri);
-	state_save_register_global_array(machine, state->protram);
+	state->save_item(NAME(state->cur_control2));
+	state->save_item(NAME(state->alpha_enabled));
+	state->save_item(NAME(state->sprite_colorbase));
+	state->save_item(NAME(state->layer_colorbase));
+	state->save_item(NAME(state->layerpri));
+	state->save_item(NAME(state->protram));
 
     state->dmaend_timer = machine->scheduler().timer_alloc(FUNC(dmaend_callback));
 }

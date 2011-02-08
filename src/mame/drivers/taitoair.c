@@ -620,9 +620,9 @@ static MACHINE_START( taitoair )
 	state->dsp = machine->device("dsp");
 	state->tc0080vco = machine->device("tc0080vco");
 
-	state_save_register_global(machine, state->banknum);
-	state_save_register_global(machine, state->q.col);
-	state_save_register_global(machine, state->q.pcount);
+	state->save_item(NAME(state->banknum));
+	state->save_item(NAME(state->q.col));
+	state->save_item(NAME(state->q.pcount));
 
 	for (i = 0; i < TAITOAIR_POLY_MAX_PT; i++)
 	{

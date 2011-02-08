@@ -287,7 +287,7 @@ static MACHINE_START( gijoe )
 
 	state->dmadelay_timer = machine->scheduler().timer_alloc(FUNC(dmaend_callback));
 
-	state_save_register_global(machine, state->cur_control2);
+	state->save_item(NAME(state->cur_control2));
 }
 
 static MACHINE_RESET( gijoe )

@@ -830,8 +830,8 @@ static MACHINE_START( cninja )
 {
 	cninja_state *state = machine->driver_data<cninja_state>();
 
-	state_save_register_global(machine, state->scanline);
-	state_save_register_global(machine, state->irq_mask);
+	state->save_item(NAME(state->scanline));
+	state->save_item(NAME(state->irq_mask));
 }
 
 static MACHINE_RESET( cninja )

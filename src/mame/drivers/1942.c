@@ -242,8 +242,8 @@ static MACHINE_START( 1942 )
 
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->palette_bank);
-	state_save_register_global_array(machine, state->scroll);
+	state->save_item(NAME(state->palette_bank));
+	state->save_item(NAME(state->scroll));
 }
 
 static MACHINE_RESET( 1942 )

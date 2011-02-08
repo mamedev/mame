@@ -2978,14 +2978,14 @@ static MACHINE_START( bshark )
 	state->tc0220ioc = machine->device("tc0220ioc");
 	state->tc0140syt = machine->device("tc0140syt");
 
-	state_save_register_global(machine, state->cpua_ctrl);
+	state->save_item(NAME(state->cpua_ctrl));
 
 	/* these are specific to various games: we ought to split the inits */
-	state_save_register_global(machine, state->sci_int6);
-	state_save_register_global(machine, state->dblaxle_int6);
-	state_save_register_global(machine, state->ioc220_port);
+	state->save_item(NAME(state->sci_int6));
+	state->save_item(NAME(state->dblaxle_int6));
+	state->save_item(NAME(state->ioc220_port));
 
-	state_save_register_global(machine, state->banknum);
+	state->save_item(NAME(state->banknum));
 }
 
 static MACHINE_START( taitoz )
@@ -4889,7 +4889,7 @@ static DRIVER_INIT( bshark )
 	state->eep_latch = 0;
 
 	machine->state().register_postload(bshark_postload, NULL);
-	state_save_register_global(machine, state->eep_latch);
+	state->save_item(NAME(state->eep_latch));
 }
 
 static DRIVER_INIT( chasehq )

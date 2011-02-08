@@ -137,7 +137,7 @@ static MACHINE_START( beaminv )
 	state->maincpu = machine->device("maincpu");
 
 	/* setup for save states */
-	state_save_register_global(machine, state->controller_select);
+	state->save_item(NAME(state->controller_select));
 }
 
 

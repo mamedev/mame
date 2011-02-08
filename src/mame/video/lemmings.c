@@ -99,10 +99,10 @@ VIDEO_START( lemmings )
 
 	gfx_element_set_source(machine->gfx[2], state->vram_buffer);
 
-	state_save_register_global_bitmap(machine, state->bitmap0);
-	state_save_register_global_pointer(machine, state->vram_buffer, 2048 * 64);
-	state_save_register_global_pointer(machine, state->sprite_triple_buffer_0, 0x800 / 2);
-	state_save_register_global_pointer(machine, state->sprite_triple_buffer_1, 0x800 / 2);
+	state->save_item(NAME(*state->bitmap0));
+	state->save_pointer(NAME(state->vram_buffer), 2048 * 64);
+	state->save_pointer(NAME(state->sprite_triple_buffer_0), 0x800 / 2);
+	state->save_pointer(NAME(state->sprite_triple_buffer_1), 0x800 / 2);
 }
 
 VIDEO_EOF( lemmings )

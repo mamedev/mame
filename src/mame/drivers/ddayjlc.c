@@ -448,17 +448,17 @@ static MACHINE_START( ddayjlc )
 
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->char_bank);
-	state_save_register_global(machine, state->bgadr);
-	state_save_register_global(machine, state->sound_nmi_enable);
-	state_save_register_global(machine, state->main_nmi_enable);
-	state_save_register_global(machine, state->prot_addr);
+	state->save_item(NAME(state->char_bank));
+	state->save_item(NAME(state->bgadr));
+	state->save_item(NAME(state->sound_nmi_enable));
+	state->save_item(NAME(state->main_nmi_enable));
+	state->save_item(NAME(state->prot_addr));
 
-	state_save_register_global_array(machine, state->e00x_l);
-	state_save_register_global_array(machine, state->e00x_d[0]);
-	state_save_register_global_array(machine, state->e00x_d[1]);
-	state_save_register_global_array(machine, state->e00x_d[2]);
-	state_save_register_global_array(machine, state->e00x_d[3]);
+	state->save_item(NAME(state->e00x_l));
+	state->save_item(NAME(state->e00x_d[0]));
+	state->save_item(NAME(state->e00x_d[1]));
+	state->save_item(NAME(state->e00x_d[2]));
+	state->save_item(NAME(state->e00x_d[3]));
 }
 
 static MACHINE_RESET( ddayjlc )

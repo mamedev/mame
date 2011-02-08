@@ -117,7 +117,7 @@ VIDEO_START( equites )
 {
 	equites_state *state = machine->driver_data<equites_state>();
 	state->fg_videoram = auto_alloc_array(machine, UINT8, 0x800);
-	state_save_register_global_pointer(machine, state->fg_videoram, 0x800);
+	state->save_pointer(NAME(state->fg_videoram), 0x800);
 
 	state->fg_tilemap = tilemap_create(machine, equites_fg_info, tilemap_scan_cols,  8, 8, 32, 32);
 	tilemap_set_transparent_pen(state->fg_tilemap, 0);
@@ -133,7 +133,7 @@ VIDEO_START( splndrbt )
 	assert(machine->primary_screen->format() == BITMAP_FORMAT_INDEXED16);
 
 	state->fg_videoram = auto_alloc_array(machine, UINT8, 0x800);
-	state_save_register_global_pointer(machine, state->fg_videoram, 0x800);
+	state->save_pointer(NAME(state->fg_videoram), 0x800);
 
 	state->fg_tilemap = tilemap_create(machine, splndrbt_fg_info, tilemap_scan_cols,  8, 8, 32, 32);
 	tilemap_set_transparent_pen(state->fg_tilemap, 0);

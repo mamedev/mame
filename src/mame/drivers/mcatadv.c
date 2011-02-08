@@ -437,8 +437,8 @@ static MACHINE_START( mcatadv )
 	state->maincpu = machine->device("maincpu");
 	state->soundcpu = machine->device("soundcpu");
 
-	state_save_register_global(machine, state->palette_bank1);
-	state_save_register_global(machine, state->palette_bank2);
+	state->save_item(NAME(state->palette_bank1));
+	state->save_item(NAME(state->palette_bank2));
 }
 
 static MACHINE_CONFIG_START( mcatadv, mcatadv_state )

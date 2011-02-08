@@ -228,7 +228,7 @@ static MACHINE_START( dorachan )
 
 	state->main_cpu = machine->device("maincpu");
 
-	state_save_register_global(machine, state->flip_screen);
+	state->save_item(NAME(state->flip_screen));
 }
 
 static MACHINE_RESET( dorachan )

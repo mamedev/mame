@@ -239,7 +239,7 @@ VIDEO_START( mia )
 	state->sprite_colorbase = 16;
 
 	state->tmnt_priorityflag = 0;
-	state_save_register_global(machine, state->tmnt_priorityflag);
+	state->save_item(NAME(state->tmnt_priorityflag));
 }
 
 VIDEO_START( tmnt )
@@ -251,7 +251,7 @@ VIDEO_START( tmnt )
 	state->sprite_colorbase = 16;
 
 	state->tmnt_priorityflag = 0;
-	state_save_register_global(machine, state->tmnt_priorityflag);
+	state->save_item(NAME(state->tmnt_priorityflag));
 
 	palette_set_shadow_factor(machine,0.75);
 }
@@ -264,10 +264,10 @@ VIDEO_START( lgtnfght )	/* also tmnt2, ssriders */
 
 	state->dim_c = state->dim_v = state->lastdim = state->lasten = 0;
 
-	state_save_register_global(machine, state->dim_c);
-	state_save_register_global(machine, state->dim_v);
-	state_save_register_global(machine, state->lastdim);
-	state_save_register_global(machine, state->lasten);
+	state->save_item(NAME(state->dim_c));
+	state->save_item(NAME(state->dim_v));
+	state->save_item(NAME(state->lastdim));
+	state->save_item(NAME(state->lasten));
 }
 
 VIDEO_START( glfgreat )
@@ -280,9 +280,9 @@ VIDEO_START( glfgreat )
 	state->glfgreat_roz_rom_bank = 0;
 	state->glfgreat_roz_char_bank = 0;
 	state->glfgreat_roz_rom_mode = 0;
-	state_save_register_global(machine, state->glfgreat_roz_rom_bank);
-	state_save_register_global(machine, state->glfgreat_roz_char_bank);
-	state_save_register_global(machine, state->glfgreat_roz_rom_mode);
+	state->save_item(NAME(state->glfgreat_roz_rom_bank));
+	state->save_item(NAME(state->glfgreat_roz_char_bank));
+	state->save_item(NAME(state->glfgreat_roz_rom_mode));
 }
 
 VIDEO_START( prmrsocr )
@@ -294,8 +294,8 @@ VIDEO_START( prmrsocr )
 
 	state->prmrsocr_sprite_bank = 0;
 	state->glfgreat_roz_char_bank = 0;
-	state_save_register_global(machine, state->prmrsocr_sprite_bank);
-	state_save_register_global(machine, state->glfgreat_roz_char_bank);
+	state->save_item(NAME(state->prmrsocr_sprite_bank));
+	state->save_item(NAME(state->glfgreat_roz_char_bank));
 }
 
 VIDEO_START( blswhstl )
@@ -303,7 +303,7 @@ VIDEO_START( blswhstl )
 	tmnt_state *state = machine->driver_data<tmnt_state>();
 
 	state->blswhstl_rombank = -1;
-	state_save_register_global(machine, state->blswhstl_rombank);
+	state->save_item(NAME(state->blswhstl_rombank));
 }
 
 

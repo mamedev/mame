@@ -174,9 +174,9 @@ VIDEO_START( cvs )
 	state->scrolled_collision_background = machine->primary_screen->alloc_compatible_bitmap();
 
 	/* register save */
-	state_save_register_global_bitmap(machine, state->background_bitmap);
-	state_save_register_global_bitmap(machine, state->collision_background);
-	state_save_register_global_bitmap(machine, state->scrolled_collision_background);
+	state->save_item(NAME(*state->background_bitmap));
+	state->save_item(NAME(*state->collision_background));
+	state->save_item(NAME(*state->scrolled_collision_background));
 }
 
 

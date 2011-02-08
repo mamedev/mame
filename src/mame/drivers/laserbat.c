@@ -502,8 +502,8 @@ static VIDEO_START( laserbat )
 	state->videoram = auto_alloc_array(machine, UINT8, 0x400);
 	state->colorram = auto_alloc_array(machine, UINT8, 0x400);
 
-	state_save_register_global_pointer(machine, state->videoram, 0x400);
-	state_save_register_global_pointer(machine, state->colorram, 0x400);
+	state->save_pointer(NAME(state->videoram), 0x400);
+	state->save_pointer(NAME(state->colorram), 0x400);
 }
 
 static VIDEO_UPDATE( laserbat )
@@ -720,26 +720,26 @@ static MACHINE_START( laserbat )
 	state->ay1 = machine->device("ay1");
 	state->ay2 = machine->device("ay2");
 
-	state_save_register_global(machine, state->video_page);
-	state_save_register_global(machine, state->input_mux);
-	state_save_register_global(machine, state->active_8910);
-	state_save_register_global(machine, state->port0a);
-	state_save_register_global(machine, state->last_port0b);
-	state_save_register_global(machine, state->cb1_toggle);
-	state_save_register_global(machine, state->sprite_x);
-	state_save_register_global(machine, state->sprite_y);
-	state_save_register_global(machine, state->sprite_code);
-	state_save_register_global(machine, state->sprite_color);
-	state_save_register_global(machine, state->sprite_enable);
-	state_save_register_global(machine, state->csound1);
-	state_save_register_global(machine, state->ksound1);
-	state_save_register_global(machine, state->ksound2);
-	state_save_register_global(machine, state->ksound3);
-	state_save_register_global(machine, state->degr);
-	state_save_register_global(machine, state->filt);
-	state_save_register_global(machine, state->a);
-	state_save_register_global(machine, state->us);
-	state_save_register_global(machine, state->bit14);
+	state->save_item(NAME(state->video_page));
+	state->save_item(NAME(state->input_mux));
+	state->save_item(NAME(state->active_8910));
+	state->save_item(NAME(state->port0a));
+	state->save_item(NAME(state->last_port0b));
+	state->save_item(NAME(state->cb1_toggle));
+	state->save_item(NAME(state->sprite_x));
+	state->save_item(NAME(state->sprite_y));
+	state->save_item(NAME(state->sprite_code));
+	state->save_item(NAME(state->sprite_color));
+	state->save_item(NAME(state->sprite_enable));
+	state->save_item(NAME(state->csound1));
+	state->save_item(NAME(state->ksound1));
+	state->save_item(NAME(state->ksound2));
+	state->save_item(NAME(state->ksound3));
+	state->save_item(NAME(state->degr));
+	state->save_item(NAME(state->filt));
+	state->save_item(NAME(state->a));
+	state->save_item(NAME(state->us));
+	state->save_item(NAME(state->bit14));
 }
 
 static MACHINE_RESET( laserbat )

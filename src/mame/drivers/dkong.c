@@ -417,8 +417,8 @@ static MACHINE_START( dkong2b )
 	dkong_init_device_driver_data(machine);
 	state->hardware_type = HARDWARE_TKG04;
 
-	state_save_register_global(machine, state->decrypt_counter);
-	state_save_register_global(machine, state->dma_latch);
+	state->save_item(NAME(state->decrypt_counter));
+	state->save_item(NAME(state->dma_latch));
 }
 
 static MACHINE_START( s2650 )
@@ -437,9 +437,9 @@ static MACHINE_START( s2650 )
 
     state->hunchloopback = 0;
 
-    state_save_register_global(machine, state->hunchloopback);
-    state_save_register_global(machine, state->prot_cnt);
-    state_save_register_global(machine, state->main_fo);
+    state->save_item(NAME(state->hunchloopback));
+    state->save_item(NAME(state->prot_cnt));
+    state->save_item(NAME(state->main_fo));
 
     if (strcmp(game_name,"herbiedk") == 0) state->protect_type = DK2650_HERBIEDK;
     else if (strcmp(game_name,"hunchbkd") == 0) state->protect_type = DK2650_HUNCHBKD;

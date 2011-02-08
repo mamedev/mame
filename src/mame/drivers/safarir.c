@@ -320,11 +320,11 @@ static MACHINE_START( safarir )
 	state->samples = machine->device("samples");
 
 	/* setup for save states */
-	state_save_register_global_pointer(machine, state->ram_1, state->ram_size);
-	state_save_register_global_pointer(machine, state->ram_2, state->ram_size);
-	state_save_register_global(machine, state->ram_bank);
-	state_save_register_global(machine, state->port_last);
-	state_save_register_global(machine, state->port_last2);
+	state->save_pointer(NAME(state->ram_1), state->ram_size);
+	state->save_pointer(NAME(state->ram_2), state->ram_size);
+	state->save_item(NAME(state->ram_bank));
+	state->save_item(NAME(state->port_last));
+	state->save_item(NAME(state->port_last2));
 }
 
 

@@ -75,7 +75,7 @@ VIDEO_START( runaway )
 	runaway_state *state = machine->driver_data<runaway_state>();
 	state->bg_tilemap = tilemap_create(machine, runaway_get_tile_info, tilemap_scan_rows,  8, 8, 32, 30);
 
-	state_save_register_global(machine, state->tile_bank);
+	state->save_item(NAME(state->tile_bank));
 }
 
 
@@ -84,7 +84,7 @@ VIDEO_START( qwak )
 	runaway_state *state = machine->driver_data<runaway_state>();
 	state->bg_tilemap = tilemap_create(machine, qwak_get_tile_info, tilemap_scan_rows,  8, 8, 32, 30);
 
-	state_save_register_global(machine, state->tile_bank);
+	state->save_item(NAME(state->tile_bank));
 }
 
 

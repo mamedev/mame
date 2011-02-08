@@ -260,15 +260,15 @@ static MACHINE_START( asterix )
 	state->k053244 = machine->device("k053244");
 	state->k053251 = machine->device("k053251");
 
-	state_save_register_global(machine, state->cur_control2);
-	state_save_register_global_array(machine, state->prot);
+	state->save_item(NAME(state->cur_control2));
+	state->save_item(NAME(state->prot));
 
-	state_save_register_global(machine, state->sprite_colorbase);
-	state_save_register_global(machine, state->spritebank);
-	state_save_register_global_array(machine, state->layerpri);
-	state_save_register_global_array(machine, state->layer_colorbase);
-	state_save_register_global_array(machine, state->tilebanks);
-	state_save_register_global_array(machine, state->spritebanks);
+	state->save_item(NAME(state->sprite_colorbase));
+	state->save_item(NAME(state->spritebank));
+	state->save_item(NAME(state->layerpri));
+	state->save_item(NAME(state->layer_colorbase));
+	state->save_item(NAME(state->tilebanks));
+	state->save_item(NAME(state->spritebanks));
 }
 
 static MACHINE_RESET( asterix )

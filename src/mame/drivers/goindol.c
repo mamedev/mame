@@ -231,8 +231,8 @@ static MACHINE_START( goindol )
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
 
-	state_save_register_global(machine, state->char_bank);
-	state_save_register_global(machine, state->prot_toggle);
+	state->save_item(NAME(state->char_bank));
+	state->save_item(NAME(state->prot_toggle));
 }
 
 static MACHINE_RESET( goindol )

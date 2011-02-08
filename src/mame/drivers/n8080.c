@@ -438,9 +438,9 @@ static MACHINE_START( n8080 )
 
 	state->maincpu = machine->device("maincpu");
 
-	state_save_register_global(machine, state->shift_data);
-	state_save_register_global(machine, state->shift_bits);
-	state_save_register_global(machine, state->inte);
+	state->save_item(NAME(state->shift_data));
+	state->save_item(NAME(state->shift_bits));
+	state->save_item(NAME(state->inte));
 }
 
 static MACHINE_START( spacefev )

@@ -310,9 +310,9 @@ static MACHINE_START( gradius3 )
 	state->k052109 = machine->device("k052109");
 	state->k051960 = machine->device("k051960");
 
-	state_save_register_global(machine, state->irqAen);
-	state_save_register_global(machine, state->irqBmask);
-	state_save_register_global(machine, state->priority);
+	state->save_item(NAME(state->irqAen));
+	state->save_item(NAME(state->irqBmask));
+	state->save_item(NAME(state->priority));
 }
 
 static MACHINE_RESET( gradius3 )

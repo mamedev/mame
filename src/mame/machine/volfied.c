@@ -491,11 +491,11 @@ void volfied_cchip_init( running_machine *machine )
 
 	state->cchip_ram = auto_alloc_array_clear(machine, UINT8, 0x400 * 8);
 
-	state_save_register_global(machine, state->current_bank);
-	state_save_register_global(machine, state->current_cmd);
-	state_save_register_global(machine, state->current_flag);
-	state_save_register_global(machine, state->cc_port);
-	state_save_register_global_pointer(machine, state->cchip_ram, 0x400 * 8);
+	state->save_item(NAME(state->current_bank));
+	state->save_item(NAME(state->current_cmd));
+	state->save_item(NAME(state->current_flag));
+	state->save_item(NAME(state->cc_port));
+	state->save_pointer(NAME(state->cchip_ram), 0x400 * 8);
 }
 
 void volfied_cchip_reset( running_machine *machine )

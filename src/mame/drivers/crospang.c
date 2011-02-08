@@ -329,9 +329,9 @@ static MACHINE_START( crospang )
 
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->bestri_tilebank);
-	state_save_register_global(machine, state->xsproff);
-	state_save_register_global(machine, state->ysproff);
+	state->save_item(NAME(state->bestri_tilebank));
+	state->save_item(NAME(state->xsproff));
+	state->save_item(NAME(state->ysproff));
 }
 
 static MACHINE_RESET( crospang )

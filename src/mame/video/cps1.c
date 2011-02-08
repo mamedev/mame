@@ -2139,32 +2139,32 @@ static VIDEO_START( cps )
 	cps1_get_video_base(machine);   /* Calculate old base pointers */
 
 	/* state save register */
-	state_save_register_global(machine, state->scanline1);
-	state_save_register_global(machine, state->scanline2);
-	state_save_register_global(machine, state->scancalls);
+	state->save_item(NAME(state->scanline1));
+	state->save_item(NAME(state->scanline2));
+	state->save_item(NAME(state->scancalls));
 #if 0
 	/* these do not need to be saved, because they are recovered from cps_a_regs in cps1_postload */
-	state_save_register_global(machine, state->scroll1x);
-	state_save_register_global(machine, state->scroll1y);
-	state_save_register_global(machine, state->scroll2x);
-	state_save_register_global(machine, state->scroll2y);
-	state_save_register_global(machine, state->scroll3x);
-	state_save_register_global(machine, state->scroll3y);
-	state_save_register_global(machine, state->stars1x);
-	state_save_register_global(machine, state->stars1y);
-	state_save_register_global(machine, state->stars2x);
-	state_save_register_global(machine, state->stars2y);
-	state_save_register_global_array(machine, state->stars_enabled);
+	state->save_item(NAME(state->scroll1x));
+	state->save_item(NAME(state->scroll1y));
+	state->save_item(NAME(state->scroll2x));
+	state->save_item(NAME(state->scroll2y));
+	state->save_item(NAME(state->scroll3x));
+	state->save_item(NAME(state->scroll3y));
+	state->save_item(NAME(state->stars1x));
+	state->save_item(NAME(state->stars1y));
+	state->save_item(NAME(state->stars2x));
+	state->save_item(NAME(state->stars2y));
+	state->save_item(NAME(state->stars_enabled));
 #endif
-	state_save_register_global(machine, state->last_sprite_offset);
-	state_save_register_global(machine, state->pri_ctrl);
-	state_save_register_global(machine, state->objram_bank);
+	state->save_item(NAME(state->last_sprite_offset));
+	state->save_item(NAME(state->pri_ctrl));
+	state->save_item(NAME(state->objram_bank));
 
-	state_save_register_global_pointer(machine, state->buffered_obj, state->obj_size / 2);
+	state->save_pointer(NAME(state->buffered_obj), state->obj_size / 2);
 	if (state->cps_version == 2)
 	{
-		state_save_register_global(machine, state->cps2_last_sprite_offset);
-		state_save_register_global_pointer(machine, state->cps2_buffered_obj, state->cps2_obj_size / 2);
+		state->save_item(NAME(state->cps2_last_sprite_offset));
+		state->save_pointer(NAME(state->cps2_buffered_obj), state->cps2_obj_size / 2);
 	}
 
 	machine->state().register_postload(cps_postload, NULL);

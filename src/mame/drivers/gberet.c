@@ -373,9 +373,9 @@ static MACHINE_START( gberet )
 {
 	gberet_state *state = machine->driver_data<gberet_state>();
 
-	state_save_register_global(machine, state->irq_enable);
-	state_save_register_global(machine, state->nmi_enable);
-	state_save_register_global(machine, state->spritebank);
+	state->save_item(NAME(state->irq_enable));
+	state->save_item(NAME(state->nmi_enable));
+	state->save_item(NAME(state->spritebank));
 }
 
 static MACHINE_RESET( gberet )

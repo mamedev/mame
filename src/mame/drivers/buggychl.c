@@ -368,14 +368,14 @@ static MACHINE_START( buggychl )
 
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->sound_nmi_enable);
-	state_save_register_global(machine, state->pending_nmi);
-	state_save_register_global_array(machine, state->sprite_lookup);
-	state_save_register_global(machine, state->sl_bank);
-	state_save_register_global(machine, state->bg_on);
-	state_save_register_global(machine, state->sky_on);
-	state_save_register_global(machine, state->sprite_color_base);
-	state_save_register_global(machine, state->bg_scrollx);
+	state->save_item(NAME(state->sound_nmi_enable));
+	state->save_item(NAME(state->pending_nmi));
+	state->save_item(NAME(state->sprite_lookup));
+	state->save_item(NAME(state->sl_bank));
+	state->save_item(NAME(state->bg_on));
+	state->save_item(NAME(state->sky_on));
+	state->save_item(NAME(state->sprite_color_base));
+	state->save_item(NAME(state->bg_scrollx));
 }
 
 static MACHINE_RESET( buggychl )

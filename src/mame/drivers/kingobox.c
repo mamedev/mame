@@ -462,8 +462,8 @@ static MACHINE_START( kingofb )
 	state->sprite_cpu = machine->device("sprite");
 	state->audio_cpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->nmi_enable);
-	state_save_register_global(machine, state->palette_bank);
+	state->save_item(NAME(state->nmi_enable));
+	state->save_item(NAME(state->palette_bank));
 }
 
 static MACHINE_RESET( kingofb )

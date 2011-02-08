@@ -274,12 +274,12 @@ VIDEO_START( m92 )
 	memset(machine->generic.spriteram.u16,0,0x800);
 	memset(machine->generic.buffered_spriteram.u16,0,0x800);
 
-	state_save_register_global_array(machine, state->pf_master_control);
+	state->save_item(NAME(state->pf_master_control));
 
-	state_save_register_global(machine, state->sprite_list);
-	state_save_register_global(machine, state->raster_irq_position);
-	state_save_register_global(machine, state->sprite_buffer_busy);
-	state_save_register_global(machine, state->palette_bank);
+	state->save_item(NAME(state->sprite_list));
+	state->save_item(NAME(state->raster_irq_position));
+	state->save_item(NAME(state->sprite_buffer_busy));
+	state->save_item(NAME(state->palette_bank));
 
 	state_save_register_global_pointer(machine, machine->generic.paletteram.u16, 0x1000);
 }

@@ -93,14 +93,14 @@ MACHINE_START( simpsons )
 	state->k053246 = machine->device("k053246");
 	state->k053251 = machine->device("k053251");
 
-	state_save_register_global(machine, state->firq_enabled);
-	state_save_register_global(machine, state->video_bank);
-	state_save_register_global(machine, state->sprite_colorbase);
-	state_save_register_global_array(machine, state->layer_colorbase);
-	state_save_register_global_array(machine, state->layerpri);
+	state->save_item(NAME(state->firq_enabled));
+	state->save_item(NAME(state->video_bank));
+	state->save_item(NAME(state->sprite_colorbase));
+	state->save_item(NAME(state->layer_colorbase));
+	state->save_item(NAME(state->layerpri));
 	state_save_register_global_pointer(machine, machine->generic.paletteram.u8, 0x1000);
-	state_save_register_global_pointer(machine, state->xtraram, 0x1000);
-	state_save_register_global_pointer(machine, state->spriteram, 0x1000 / 2);
+	state->save_pointer(NAME(state->xtraram), 0x1000);
+	state->save_pointer(NAME(state->spriteram), 0x1000 / 2);
 	machine->state().register_postload(simpsons_postload, NULL);
 }
 

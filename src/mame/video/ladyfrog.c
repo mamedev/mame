@@ -152,7 +152,7 @@ static VIDEO_START( ladyfrog_common )
 
 	state_save_register_global_pointer(machine, machine->generic.paletteram.u8, 0x200);
 	state_save_register_global_pointer(machine, machine->generic.paletteram2.u8, 0x200);
-	state_save_register_global_pointer(machine, state->spriteram, 160);
+	state->save_pointer(NAME(state->spriteram), 160);
 }
 
 VIDEO_START( ladyfrog )

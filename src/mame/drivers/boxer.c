@@ -421,8 +421,8 @@ static MACHINE_START( boxer )
 
 	state->maincpu = machine->device("maincpu");
 
-	state_save_register_global(machine, state->pot_state);
-	state_save_register_global(machine, state->pot_latch);
+	state->save_item(NAME(state->pot_state));
+	state->save_item(NAME(state->pot_latch));
 }
 
 static MACHINE_RESET( boxer )

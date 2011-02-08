@@ -407,9 +407,9 @@ void toaplan1_driver_savestate(running_machine *machine)
 {
 	toaplan1_state *state = machine->driver_data<toaplan1_state>();
 
-	state_save_register_global(machine, state->intenable);
-	state_save_register_global(machine, state->coin_count);
-	state_save_register_global(machine, state->unk_reset_port);
+	state->save_item(NAME(state->intenable));
+	state->save_item(NAME(state->coin_count));
+	state->save_item(NAME(state->unk_reset_port));
 }
 
 MACHINE_RESET( zerowing )	/* Hack for ZeroWing and OutZone. See the video driver */
@@ -434,11 +434,11 @@ void demonwld_driver_savestate(running_machine *machine)
 {
 	toaplan1_state *state = machine->driver_data<toaplan1_state>();
 
-	state_save_register_global(machine, state->dsp_on);
-	state_save_register_global(machine, state->dsp_addr_w);
-	state_save_register_global(machine, state->main_ram_seg);
-	state_save_register_global(machine, state->dsp_BIO);
-	state_save_register_global(machine, state->dsp_execute);
+	state->save_item(NAME(state->dsp_on));
+	state->save_item(NAME(state->dsp_addr_w));
+	state->save_item(NAME(state->main_ram_seg));
+	state->save_item(NAME(state->dsp_BIO));
+	state->save_item(NAME(state->dsp_execute));
 	machine->state().register_postload(demonwld_restore_dsp, NULL);
 }
 
@@ -456,8 +456,8 @@ void vimana_driver_savestate(running_machine *machine)
 {
 	toaplan1_state *state = machine->driver_data<toaplan1_state>();
 
-	state_save_register_global(machine, state->vimana_coins[0]);
-	state_save_register_global(machine, state->vimana_coins[1]);
-	state_save_register_global(machine, state->vimana_credits);
-	state_save_register_global(machine, state->vimana_latch);
+	state->save_item(NAME(state->vimana_coins[0]));
+	state->save_item(NAME(state->vimana_coins[1]));
+	state->save_item(NAME(state->vimana_credits));
+	state->save_item(NAME(state->vimana_latch));
 }

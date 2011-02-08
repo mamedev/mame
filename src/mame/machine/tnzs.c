@@ -697,21 +697,21 @@ MACHINE_START( tnzs )
 	state->subcpu = machine->device("sub");
 	state->mcu = machine->device("mcu");
 
-	state_save_register_global(machine, state->screenflip);
-	state_save_register_global(machine, state->kageki_csport_sel);
-	state_save_register_global(machine, state->input_select);
-	state_save_register_global(machine, state->mcu_readcredits);
-	state_save_register_global(machine, state->insertcoin);
-	state_save_register_global(machine, state->mcu_initializing);
-	state_save_register_global(machine, state->mcu_coinage_init);
-	state_save_register_global_array(machine, state->mcu_coinage);
-	state_save_register_global(machine, state->mcu_coins_a);
-	state_save_register_global(machine, state->mcu_coins_b);
-	state_save_register_global(machine, state->mcu_credits);
-	state_save_register_global(machine, state->mcu_reportcoin);
-	state_save_register_global(machine, state->mcu_command);
-	state_save_register_global(machine, state->bank1);
-	state_save_register_global(machine, state->bank2);
+	state->save_item(NAME(state->screenflip));
+	state->save_item(NAME(state->kageki_csport_sel));
+	state->save_item(NAME(state->input_select));
+	state->save_item(NAME(state->mcu_readcredits));
+	state->save_item(NAME(state->insertcoin));
+	state->save_item(NAME(state->mcu_initializing));
+	state->save_item(NAME(state->mcu_coinage_init));
+	state->save_item(NAME(state->mcu_coinage));
+	state->save_item(NAME(state->mcu_coins_a));
+	state->save_item(NAME(state->mcu_coins_b));
+	state->save_item(NAME(state->mcu_credits));
+	state->save_item(NAME(state->mcu_reportcoin));
+	state->save_item(NAME(state->mcu_command));
+	state->save_item(NAME(state->bank1));
+	state->save_item(NAME(state->bank2));
 
 	machine->state().register_postload(tnzs_postload, NULL);
 }
@@ -731,9 +731,9 @@ MACHINE_START( jpopnics )
 	state->bank1 = 2;
 	state->bank2 = 0;
 
-	state_save_register_global(machine, state->screenflip);
-	state_save_register_global(machine, state->bank1);
-	state_save_register_global(machine, state->bank2);
+	state->save_item(NAME(state->screenflip));
+	state->save_item(NAME(state->bank1));
+	state->save_item(NAME(state->bank2));
 
 	machine->state().register_postload(tnzs_postload, NULL);
 }

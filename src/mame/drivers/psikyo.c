@@ -1033,11 +1033,11 @@ static MACHINE_START( psikyo )
 
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->soundlatch);
-	state_save_register_global(machine, state->z80_nmi);
-	state_save_register_global(machine, state->mcu_status);
-	state_save_register_global(machine, state->tilemap_0_bank);
-	state_save_register_global(machine, state->tilemap_1_bank);
+	state->save_item(NAME(state->soundlatch));
+	state->save_item(NAME(state->z80_nmi));
+	state->save_item(NAME(state->mcu_status));
+	state->save_item(NAME(state->tilemap_0_bank));
+	state->save_item(NAME(state->tilemap_1_bank));
 }
 
 static MACHINE_RESET( psikyo )
@@ -1879,15 +1879,15 @@ static void s1945_mcu_init( running_machine *machine )
 	state->s1945_mcu_mode = 0;
 	state->s1945_mcu_bctrl = 0x00;
 
-	state_save_register_global(machine, state->s1945_mcu_direction);
-	state_save_register_global(machine, state->s1945_mcu_inlatch);
-	state_save_register_global(machine, state->s1945_mcu_latch1);
-	state_save_register_global(machine, state->s1945_mcu_latch2);
-	state_save_register_global(machine, state->s1945_mcu_latching);
-	state_save_register_global(machine, state->s1945_mcu_control);
-	state_save_register_global(machine, state->s1945_mcu_index);
-	state_save_register_global(machine, state->s1945_mcu_mode);
-	state_save_register_global(machine, state->s1945_mcu_bctrl);
+	state->save_item(NAME(state->s1945_mcu_direction));
+	state->save_item(NAME(state->s1945_mcu_inlatch));
+	state->save_item(NAME(state->s1945_mcu_latch1));
+	state->save_item(NAME(state->s1945_mcu_latch2));
+	state->save_item(NAME(state->s1945_mcu_latching));
+	state->save_item(NAME(state->s1945_mcu_control));
+	state->save_item(NAME(state->s1945_mcu_index));
+	state->save_item(NAME(state->s1945_mcu_mode));
+	state->save_item(NAME(state->s1945_mcu_bctrl));
 }
 
 static DRIVER_INIT( tengai )

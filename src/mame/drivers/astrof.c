@@ -178,7 +178,7 @@ static VIDEO_START( astrof )
 
 	/* allocate the color RAM -- half the size of the video RAM as A0 is not connected */
 	state->colorram = auto_alloc_array(machine, UINT8, state->videoram_size / 2);
-	state_save_register_global_pointer(machine, state->colorram, state->videoram_size / 2);
+	state->save_pointer(NAME(state->colorram), state->videoram_size / 2);
 }
 
 
@@ -504,15 +504,15 @@ static MACHINE_START( astrof )
 	state->samples = machine->device("samples");
 
 	/* register for state saving */
-	state_save_register_global(machine, state->red_on);
-	state_save_register_global(machine, state->flipscreen);
-	state_save_register_global(machine, state->screen_off);
-	state_save_register_global(machine, state->astrof_palette_bank);
-	state_save_register_global(machine, state->port_1_last);
-	state_save_register_global(machine, state->port_2_last);
-	state_save_register_global(machine, state->astrof_start_explosion);
-	state_save_register_global(machine, state->astrof_death_playing);
-	state_save_register_global(machine, state->astrof_bosskill_playing);
+	state->save_item(NAME(state->red_on));
+	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->screen_off));
+	state->save_item(NAME(state->astrof_palette_bank));
+	state->save_item(NAME(state->port_1_last));
+	state->save_item(NAME(state->port_2_last));
+	state->save_item(NAME(state->astrof_start_explosion));
+	state->save_item(NAME(state->astrof_death_playing));
+	state->save_item(NAME(state->astrof_bosskill_playing));
 }
 
 
@@ -521,7 +521,7 @@ static MACHINE_START( abattle )
 	astrof_state *state = machine->driver_data<astrof_state>();
 
 	/* register for state saving */
-	state_save_register_global(machine, state->abattle_count);
+	state->save_item(NAME(state->abattle_count));
 
 	MACHINE_START_CALL(astrof);
 }
@@ -540,9 +540,9 @@ static MACHINE_START( spfghmk2 )
 	state->red_on = FALSE;
 
 	/* register for state saving */
-	state_save_register_global(machine, state->flipscreen);
-	state_save_register_global(machine, state->screen_off);
-	state_save_register_global(machine, state->astrof_palette_bank);
+	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->screen_off));
+	state->save_item(NAME(state->astrof_palette_bank));
 }
 
 
@@ -557,9 +557,9 @@ static MACHINE_START( tomahawk )
 	state->sn = machine->device("snsnd");
 
 	/* register for state saving */
-	state_save_register_global(machine, state->red_on);
-	state_save_register_global(machine, state->flipscreen);
-	state_save_register_global(machine, state->screen_off);
+	state->save_item(NAME(state->red_on));
+	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->screen_off));
 }
 
 

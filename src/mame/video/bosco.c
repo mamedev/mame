@@ -142,8 +142,8 @@ VIDEO_START( bosco )
 	state->bosco_radary = state->bosco_radarx + 0x0800;
 
 
-	state_save_register_global(machine, state->stars_scrollx);
-	state_save_register_global(machine, state->stars_scrolly);
+	state->save_item(NAME(state->stars_scrollx));
+	state->save_item(NAME(state->stars_scrolly));
 }
 
 

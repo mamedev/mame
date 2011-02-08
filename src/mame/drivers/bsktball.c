@@ -214,18 +214,18 @@ static MACHINE_START( bsktball )
 {
 	bsktball_state *state = machine->driver_data<bsktball_state>();
 
-	state_save_register_global(machine, state->nmi_on);
-	state_save_register_global(machine, state->i256v);
-	state_save_register_global(machine, state->ld1);
-	state_save_register_global(machine, state->ld2);
-	state_save_register_global(machine, state->dir0);
-	state_save_register_global(machine, state->dir1);
-	state_save_register_global(machine, state->dir2);
-	state_save_register_global(machine, state->dir3);
-	state_save_register_global(machine, state->last_p1_horiz);
-	state_save_register_global(machine, state->last_p1_vert);
-	state_save_register_global(machine, state->last_p2_horiz);
-	state_save_register_global(machine, state->last_p2_vert);
+	state->save_item(NAME(state->nmi_on));
+	state->save_item(NAME(state->i256v));
+	state->save_item(NAME(state->ld1));
+	state->save_item(NAME(state->ld2));
+	state->save_item(NAME(state->dir0));
+	state->save_item(NAME(state->dir1));
+	state->save_item(NAME(state->dir2));
+	state->save_item(NAME(state->dir3));
+	state->save_item(NAME(state->last_p1_horiz));
+	state->save_item(NAME(state->last_p1_vert));
+	state->save_item(NAME(state->last_p2_horiz));
+	state->save_item(NAME(state->last_p2_vert));
 }
 
 static MACHINE_RESET( bsktball )

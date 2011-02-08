@@ -989,11 +989,11 @@ static MACHINE_START( gameplan )
 	state->riot = machine->device("riot");
 
 	/* register for save states */
-	state_save_register_global(machine, state->current_port);
-	state_save_register_global(machine, state->video_x);
-	state_save_register_global(machine, state->video_y);
-	state_save_register_global(machine, state->video_command);
-	state_save_register_global(machine, state->video_data);
+	state->save_item(NAME(state->current_port));
+	state->save_item(NAME(state->video_x));
+	state->save_item(NAME(state->video_y));
+	state->save_item(NAME(state->video_command));
+	state->save_item(NAME(state->video_data));
 }
 
 

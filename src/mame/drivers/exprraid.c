@@ -480,7 +480,7 @@ static MACHINE_START( exprraid )
 	state->maincpu = machine->device("maincpu");
 	state->slave = machine->device("slave");
 
-	state_save_register_global_array(machine, state->bg_index);
+	state->save_item(NAME(state->bg_index));
 }
 
 static MACHINE_RESET( exprraid )

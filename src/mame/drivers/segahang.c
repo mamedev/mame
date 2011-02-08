@@ -104,7 +104,7 @@ static void hangon_generic_init( running_machine *machine )
 	state->ppi8255_1 = machine->device("ppi8255_1");
 	state->ppi8255_2 = machine->device("ppi8255_2");
 
-	state_save_register_global(machine, state->adc_select);
+	state->save_item(NAME(state->adc_select));
 }
 
 

@@ -439,12 +439,12 @@ static MACHINE_START( dacholer )
 
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->bg_bank);
-	state_save_register_global(machine, state->msm_data);
-	state_save_register_global(machine, state->msm_toggle);
-	state_save_register_global(machine, state->snd_interrupt_enable);
-	state_save_register_global(machine, state->music_interrupt_enable);
-	state_save_register_global(machine, state->snd_ack);
+	state->save_item(NAME(state->bg_bank));
+	state->save_item(NAME(state->msm_data));
+	state->save_item(NAME(state->msm_toggle));
+	state->save_item(NAME(state->snd_interrupt_enable));
+	state->save_item(NAME(state->music_interrupt_enable));
+	state->save_item(NAME(state->snd_ack));
 }
 
 static MACHINE_RESET( dacholer )

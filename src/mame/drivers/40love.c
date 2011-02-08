@@ -991,18 +991,18 @@ static MACHINE_START( 40love )
 	state->audiocpu = machine->device("audiocpu");
 
 	/* video */
-	state_save_register_global(machine, state->pix1);
-	state_save_register_global_array(machine, state->pix2);
+	state->save_item(NAME(state->pix1));
+	state->save_item(NAME(state->pix2));
 	/* sound */
-	state_save_register_global(machine, state->sound_nmi_enable);
-	state_save_register_global(machine, state->pending_nmi);
-	state_save_register_global(machine, state->snd_data);
-	state_save_register_global(machine, state->snd_flag);
-	state_save_register_global_array(machine, state->vol_ctrl);
-	state_save_register_global(machine, state->snd_ctrl0);
-	state_save_register_global(machine, state->snd_ctrl1);
-	state_save_register_global(machine, state->snd_ctrl2);
-	state_save_register_global(machine, state->snd_ctrl3);
+	state->save_item(NAME(state->sound_nmi_enable));
+	state->save_item(NAME(state->pending_nmi));
+	state->save_item(NAME(state->snd_data));
+	state->save_item(NAME(state->snd_flag));
+	state->save_item(NAME(state->vol_ctrl));
+	state->save_item(NAME(state->snd_ctrl0));
+	state->save_item(NAME(state->snd_ctrl1));
+	state->save_item(NAME(state->snd_ctrl2));
+	state->save_item(NAME(state->snd_ctrl3));
 }
 
 static MACHINE_START( undoukai )
@@ -1012,12 +1012,12 @@ static MACHINE_START( undoukai )
 	MACHINE_START_CALL(40love);
 
 	/* fake mcu */
-	state_save_register_global(machine, state->from_mcu);
-	state_save_register_global(machine, state->mcu_cmd);
-	state_save_register_global_array(machine, state->mcu_in[0]);
-	state_save_register_global_array(machine, state->mcu_in[1]);
-	state_save_register_global_array(machine, state->mcu_out[0]);
-	state_save_register_global_array(machine, state->mcu_out[1]);
+	state->save_item(NAME(state->from_mcu));
+	state->save_item(NAME(state->mcu_cmd));
+	state->save_item(NAME(state->mcu_in[0]));
+	state->save_item(NAME(state->mcu_in[1]));
+	state->save_item(NAME(state->mcu_out[0]));
+	state->save_item(NAME(state->mcu_out[1]));
 }
 
 static MACHINE_RESET( common )

@@ -67,7 +67,7 @@ VIDEO_START( blockout )
 
 	/* Allocate temporary bitmaps */
 	state->tmpbitmap = machine->primary_screen->alloc_compatible_bitmap();
-	state_save_register_global_bitmap(machine, state->tmpbitmap);
+	state->save_item(NAME(*state->tmpbitmap));
 }
 
 static void update_pixels( running_machine *machine, int x, int y )

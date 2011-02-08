@@ -370,9 +370,9 @@ static MACHINE_START( brkthru )
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->bgscroll);
-	state_save_register_global(machine, state->bgbasecolor);
-	state_save_register_global(machine, state->flipscreen);
+	state->save_item(NAME(state->bgscroll));
+	state->save_item(NAME(state->bgbasecolor));
+	state->save_item(NAME(state->flipscreen));
 }
 
 static MACHINE_RESET( brkthru )

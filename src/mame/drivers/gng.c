@@ -309,8 +309,8 @@ static MACHINE_START( gng )
 	memory_configure_bank(machine, "bank1", 0, 4, &rombase[0x10000], 0x2000);
 	memory_configure_bank(machine, "bank1", 4, 1, &rombase[0x4000], 0x2000);
 
-	state_save_register_global_array(machine, state->scrollx);
-	state_save_register_global_array(machine, state->scrolly);
+	state->save_item(NAME(state->scrollx));
+	state->save_item(NAME(state->scrolly));
 }
 
 static MACHINE_RESET( gng )

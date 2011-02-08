@@ -294,7 +294,7 @@ static VIDEO_START( common )
 	state->via_0_ca1_timer = machine->scheduler().timer_alloc(FUNC(via_0_ca1_timer_callback));
 
 	/* register for save states */
-	state_save_register_global_pointer(machine, state->videoram, state->videoram_size);
+	state->save_pointer(NAME(state->videoram), state->videoram_size);
 }
 
 

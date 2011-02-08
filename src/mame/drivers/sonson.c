@@ -233,7 +233,7 @@ static MACHINE_START( sonson )
 
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->last_irq);
+	state->save_item(NAME(state->last_irq));
 }
 
 static MACHINE_RESET( sonson )

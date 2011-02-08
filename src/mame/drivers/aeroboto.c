@@ -233,8 +233,8 @@ static MACHINE_START( formatz )
 	state->stars_rom = machine->region("gfx2")->base();
 	state->stars_length = machine->region("gfx2")->bytes();
 
-	state_save_register_global(machine, state->disable_irq);
-	state_save_register_global(machine, state->count);
+	state->save_item(NAME(state->disable_irq));
+	state->save_item(NAME(state->count));
 }
 
 static MACHINE_RESET( formatz )

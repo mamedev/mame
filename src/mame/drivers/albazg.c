@@ -380,9 +380,9 @@ static MACHINE_START( yumefuda )
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x2000);
 
-	state_save_register_global(machine, state->mux_data);
-	state_save_register_global(machine, state->bank);
-	state_save_register_global(machine, state->prot_lock);
+	state->save_item(NAME(state->mux_data));
+	state->save_item(NAME(state->bank));
+	state->save_item(NAME(state->prot_lock));
 }
 
 static MACHINE_RESET( yumefuda )

@@ -1868,14 +1868,14 @@ static MACHINE_START( common )
 
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->trigstate);
-	state_save_register_global(machine, state->deposits1);
-	state_save_register_global(machine, state->deposits2);
-    	state_save_register_global(machine, state->credits);
-	state_save_register_global(machine, state->coinvalue);
-	state_save_register_global(machine, state->microcontroller_data);
-	state_save_register_global(machine, state->latch);
-	state_save_register_global(machine, state->flipscreen);
+	state->save_item(NAME(state->trigstate));
+	state->save_item(NAME(state->deposits1));
+	state->save_item(NAME(state->deposits2));
+    	state->save_item(NAME(state->credits));
+	state->save_item(NAME(state->coinvalue));
+	state->save_item(NAME(state->microcontroller_data));
+	state->save_item(NAME(state->latch));
+	state->save_item(NAME(state->flipscreen));
 }
 
 static MACHINE_RESET( common )
@@ -1901,8 +1901,8 @@ static MACHINE_START( alpha68k_V )
 
 	MACHINE_START_CALL(common);
 
-	state_save_register_global(machine, state->bank_base);
-	state_save_register_global(machine, state->last_bank);
+	state->save_item(NAME(state->bank_base));
+	state->save_item(NAME(state->last_bank));
 }
 
 static MACHINE_RESET( alpha68k_V )
@@ -1937,11 +1937,11 @@ static MACHINE_START( alpha68k_II )
 
 	MACHINE_START_CALL(common);
 
-	state_save_register_global(machine, state->bank_base);
-	state_save_register_global(machine, state->last_bank);
-	state_save_register_global(machine, state->buffer_28);
-	state_save_register_global(machine, state->buffer_60);
-	state_save_register_global(machine, state->buffer_68);
+	state->save_item(NAME(state->bank_base));
+	state->save_item(NAME(state->last_bank));
+	state->save_item(NAME(state->buffer_28));
+	state->save_item(NAME(state->buffer_60));
+	state->save_item(NAME(state->buffer_68));
 
 }
 

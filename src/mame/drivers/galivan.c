@@ -406,11 +406,11 @@ static MACHINE_START( galivan )
 	memory_set_bank(machine, "bank1", 0);
 
 	/* register for saving */
-	state_save_register_global_array(machine, state->scrollx);
-	state_save_register_global_array(machine, state->scrolly);
-	state_save_register_global(machine, state->flipscreen);
-	state_save_register_global(machine, state->write_layers);
-	state_save_register_global(machine, state->layers);
+	state->save_item(NAME(state->scrollx));
+	state->save_item(NAME(state->scrolly));
+	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->write_layers));
+	state->save_item(NAME(state->layers));
 }
 
 static MACHINE_START( ninjemak )
@@ -423,10 +423,10 @@ static MACHINE_START( ninjemak )
 	memory_set_bank(machine, "bank1", 0);
 
 	/* register for saving */
-	state_save_register_global_array(machine, state->scrollx);
-	state_save_register_global_array(machine, state->scrolly);
-	state_save_register_global(machine, state->flipscreen);
-	state_save_register_global(machine, state->ninjemak_dispdisable);
+	state->save_item(NAME(state->scrollx));
+	state->save_item(NAME(state->scrolly));
+	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->ninjemak_dispdisable));
 }
 
 static MACHINE_RESET( galivan )

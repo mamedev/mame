@@ -368,21 +368,21 @@ static MACHINE_START( mermaid )
 	state->ay1 = machine->device("ay1");
 	state->ay2 = machine->device("ay2");
 
-	state_save_register_global(machine, state->coll_bit0);
-	state_save_register_global(machine, state->coll_bit1);
-	state_save_register_global(machine, state->coll_bit2);
-	state_save_register_global(machine, state->coll_bit3);
-	state_save_register_global(machine, state->coll_bit6);
-	state_save_register_global(machine, state->rougien_gfxbank1);
-	state_save_register_global(machine, state->rougien_gfxbank2);
+	state->save_item(NAME(state->coll_bit0));
+	state->save_item(NAME(state->coll_bit1));
+	state->save_item(NAME(state->coll_bit2));
+	state->save_item(NAME(state->coll_bit3));
+	state->save_item(NAME(state->coll_bit6));
+	state->save_item(NAME(state->rougien_gfxbank1));
+	state->save_item(NAME(state->rougien_gfxbank2));
 
-	state_save_register_global(machine, state->adpcm_pos);
-	state_save_register_global(machine, state->adpcm_end);
-	state_save_register_global(machine, state->adpcm_idle);
-	state_save_register_global(machine, state->adpcm_data);
-	state_save_register_global(machine, state->adpcm_trigger);
-	state_save_register_global(machine, state->adpcm_rom_sel);
-	state_save_register_global(machine, state->adpcm_play_reg);
+	state->save_item(NAME(state->adpcm_pos));
+	state->save_item(NAME(state->adpcm_end));
+	state->save_item(NAME(state->adpcm_idle));
+	state->save_item(NAME(state->adpcm_data));
+	state->save_item(NAME(state->adpcm_trigger));
+	state->save_item(NAME(state->adpcm_rom_sel));
+	state->save_item(NAME(state->adpcm_play_reg));
 }
 
 static MACHINE_RESET( mermaid )

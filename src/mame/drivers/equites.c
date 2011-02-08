@@ -1197,25 +1197,25 @@ static MACHINE_START( equites )
 	state->dac_1 = machine->device("dac1");
 	state->dac_2 = machine->device("dac2");
 
-	state_save_register_global(machine, state->fg_char_bank);
-	state_save_register_global(machine, state->bgcolor);
-	state_save_register_global(machine, state->splndrbt_bg_scrollx);
-	state_save_register_global(machine, state->splndrbt_bg_scrolly);
-	state_save_register_global(machine, state->sound_prom_address);
-	state_save_register_global(machine, state->dac_latch);
-	state_save_register_global(machine, state->eq8155_port_b);
-	state_save_register_global(machine, state->eq8155_port_a);
-	state_save_register_global(machine, state->eq8155_port_c);
-	state_save_register_global(machine, state->ay_port_a);
-	state_save_register_global(machine, state->ay_port_b);
-	state_save_register_global(machine, state->eq_cymbal_ctrl);
-	state_save_register_global(machine, state->cymvol);
-	state_save_register_global(machine, state->hihatvol);
-	state_save_register_global(machine, state->timer_count);
-	state_save_register_global(machine, state->unknown_bit);
+	state->save_item(NAME(state->fg_char_bank));
+	state->save_item(NAME(state->bgcolor));
+	state->save_item(NAME(state->splndrbt_bg_scrollx));
+	state->save_item(NAME(state->splndrbt_bg_scrolly));
+	state->save_item(NAME(state->sound_prom_address));
+	state->save_item(NAME(state->dac_latch));
+	state->save_item(NAME(state->eq8155_port_b));
+	state->save_item(NAME(state->eq8155_port_a));
+	state->save_item(NAME(state->eq8155_port_c));
+	state->save_item(NAME(state->ay_port_a));
+	state->save_item(NAME(state->ay_port_b));
+	state->save_item(NAME(state->eq_cymbal_ctrl));
+	state->save_item(NAME(state->cymvol));
+	state->save_item(NAME(state->hihatvol));
+	state->save_item(NAME(state->timer_count));
+	state->save_item(NAME(state->unknown_bit));
 #if POPDRUMKIT
-	state_save_register_global(machine, state->hihat);
-	state_save_register_global(machine, state->cymbal);
+	state->save_item(NAME(state->hihat));
+	state->save_item(NAME(state->cymbal));
 #endif
 }
 

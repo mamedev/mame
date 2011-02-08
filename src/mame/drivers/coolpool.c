@@ -1182,15 +1182,15 @@ static void register_state_save(running_machine *machine)
 {
 	coolpool_state *state = machine->driver_data<coolpool_state>();
 
-	state_save_register_global_array(machine, state->oldx);
-	state_save_register_global_array(machine, state->oldy);
-	state_save_register_global(machine, state->result);
-	state_save_register_global(machine, state->lastresult);
+	state->save_item(NAME(state->oldx));
+	state->save_item(NAME(state->oldy));
+	state->save_item(NAME(state->result));
+	state->save_item(NAME(state->lastresult));
 
-	state_save_register_global(machine, state->cmd_pending);
-	state_save_register_global(machine, state->iop_cmd);
-	state_save_register_global(machine, state->iop_answer);
-	state_save_register_global(machine, state->iop_romaddr);
+	state->save_item(NAME(state->cmd_pending));
+	state->save_item(NAME(state->iop_cmd));
+	state->save_item(NAME(state->iop_answer));
+	state->save_item(NAME(state->iop_romaddr));
 }
 
 

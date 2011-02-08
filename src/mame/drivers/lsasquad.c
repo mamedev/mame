@@ -575,22 +575,22 @@ static MACHINE_START( lsasquad )
 	state->audiocpu = machine->device("audiocpu");
 	state->mcu = machine->device("mcu");
 
-	state_save_register_global(machine, state->port_a_in);
-	state_save_register_global(machine, state->port_a_out);
-	state_save_register_global(machine, state->ddr_a);
-	state_save_register_global(machine, state->port_b_in);
-	state_save_register_global(machine, state->port_b_out);
-	state_save_register_global(machine, state->ddr_b);
-	state_save_register_global(machine, state->mcu_sent);
-	state_save_register_global(machine, state->main_sent);
-	state_save_register_global(machine, state->from_main);
-	state_save_register_global(machine, state->from_mcu);
+	state->save_item(NAME(state->port_a_in));
+	state->save_item(NAME(state->port_a_out));
+	state->save_item(NAME(state->ddr_a));
+	state->save_item(NAME(state->port_b_in));
+	state->save_item(NAME(state->port_b_out));
+	state->save_item(NAME(state->ddr_b));
+	state->save_item(NAME(state->mcu_sent));
+	state->save_item(NAME(state->main_sent));
+	state->save_item(NAME(state->from_main));
+	state->save_item(NAME(state->from_mcu));
 
-	state_save_register_global(machine, state->sound_pending);
-	state_save_register_global(machine, state->sound_nmi_enable);
-	state_save_register_global(machine, state->pending_nmi);
-	state_save_register_global(machine, state->sound_cmd);
-	state_save_register_global(machine, state->sound_result);
+	state->save_item(NAME(state->sound_pending));
+	state->save_item(NAME(state->sound_nmi_enable));
+	state->save_item(NAME(state->pending_nmi));
+	state->save_item(NAME(state->sound_cmd));
+	state->save_item(NAME(state->sound_result));
 }
 
 static MACHINE_RESET( lsasquad )

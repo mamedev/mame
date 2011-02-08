@@ -50,18 +50,18 @@ void decocass_video_state_save_init( running_machine *machine )
 {
 	decocass_state *state = machine->driver_data<decocass_state>();
 
-	state_save_register_global(machine, state->watchdog_count);
-	state_save_register_global(machine, state->watchdog_flip);
-	state_save_register_global(machine, state->color_missiles);
-	state_save_register_global(machine, state->color_center_bot);
-	state_save_register_global(machine, state->mode_set);
-	state_save_register_global(machine, state->back_h_shift);
-	state_save_register_global(machine, state->back_vl_shift);
-	state_save_register_global(machine, state->back_vr_shift);
-	state_save_register_global(machine, state->part_h_shift);
-	state_save_register_global(machine, state->part_v_shift);
-	state_save_register_global(machine, state->center_h_shift_space);
-	state_save_register_global(machine, state->center_v_shift);
+	state->save_item(NAME(state->watchdog_count));
+	state->save_item(NAME(state->watchdog_flip));
+	state->save_item(NAME(state->color_missiles));
+	state->save_item(NAME(state->color_center_bot));
+	state->save_item(NAME(state->mode_set));
+	state->save_item(NAME(state->back_h_shift));
+	state->save_item(NAME(state->back_vl_shift));
+	state->save_item(NAME(state->back_vr_shift));
+	state->save_item(NAME(state->part_h_shift));
+	state->save_item(NAME(state->part_v_shift));
+	state->save_item(NAME(state->center_h_shift_space));
+	state->save_item(NAME(state->center_v_shift));
 }
 
 /********************************************

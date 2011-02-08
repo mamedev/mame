@@ -90,7 +90,7 @@ VIDEO_START( blktiger )
 	tilemap_set_transmask(state->bg_tilemap4x8, 2, 0xff00, 0x80ff);
 	tilemap_set_transmask(state->bg_tilemap4x8, 3, 0xf000, 0x8fff);
 
-	state_save_register_global_pointer(machine, state->scroll_ram, BGRAM_BANK_SIZE * BGRAM_BANKS);
+	state->save_pointer(NAME(state->scroll_ram), BGRAM_BANK_SIZE * BGRAM_BANKS);
 }
 
 

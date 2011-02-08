@@ -633,19 +633,19 @@ static MACHINE_START( firetrap )
 	memory_configure_bank(machine, "bank1", 0, 4, &MAIN[0x10000], 0x4000);
 	memory_configure_bank(machine, "bank2", 0, 2, &SOUND[0x10000], 0x4000);
 
-	state_save_register_global(machine, state->i8751_current_command);
-	state_save_register_global(machine, state->irq_enable);
-	state_save_register_global(machine, state->nmi_enable);
-	state_save_register_global(machine, state->i8751_return);
-	state_save_register_global(machine, state->i8751_init_ptr);
-	state_save_register_global(machine, state->msm5205next);
-	state_save_register_global(machine, state->adpcm_toggle);
-	state_save_register_global(machine, state->int_latch);
-	state_save_register_global(machine, state->coin_command_pending);
-	state_save_register_global_array(machine, state->scroll1_x);
-	state_save_register_global_array(machine, state->scroll1_y);
-	state_save_register_global_array(machine, state->scroll2_x);
-	state_save_register_global_array(machine, state->scroll2_y);
+	state->save_item(NAME(state->i8751_current_command));
+	state->save_item(NAME(state->irq_enable));
+	state->save_item(NAME(state->nmi_enable));
+	state->save_item(NAME(state->i8751_return));
+	state->save_item(NAME(state->i8751_init_ptr));
+	state->save_item(NAME(state->msm5205next));
+	state->save_item(NAME(state->adpcm_toggle));
+	state->save_item(NAME(state->int_latch));
+	state->save_item(NAME(state->coin_command_pending));
+	state->save_item(NAME(state->scroll1_x));
+	state->save_item(NAME(state->scroll1_y));
+	state->save_item(NAME(state->scroll2_x));
+	state->save_item(NAME(state->scroll2_y));
 }
 
 static MACHINE_RESET( firetrap )

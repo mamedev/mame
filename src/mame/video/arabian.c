@@ -206,10 +206,10 @@ VIDEO_START( arabian )
 		state->converted_gfx[offs * 4 + 0] = p4;
 	}
 
-    state_save_register_global_pointer(machine, state->main_bitmap, BITMAP_WIDTH * BITMAP_HEIGHT);
-    state_save_register_global_pointer(machine, state->converted_gfx, 0x8000 * 2);
-    state_save_register_global(machine, state->video_control);
-    state_save_register_global(machine, state->flip_screen);
+    state->save_pointer(NAME(state->main_bitmap), BITMAP_WIDTH * BITMAP_HEIGHT);
+    state->save_pointer(NAME(state->converted_gfx), 0x8000 * 2);
+    state->save_item(NAME(state->video_control));
+    state->save_item(NAME(state->flip_screen));
 }
 
 

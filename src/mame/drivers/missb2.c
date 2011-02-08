@@ -364,10 +364,10 @@ static MACHINE_START( missb2 )
 	state->slave = machine->device("slave");
 	state->mcu = NULL;
 
-	state_save_register_global(machine, state->sound_nmi_enable);
-	state_save_register_global(machine, state->pending_nmi);
-	state_save_register_global(machine, state->sound_status);
-	state_save_register_global(machine, state->video_enable);
+	state->save_item(NAME(state->sound_nmi_enable));
+	state->save_item(NAME(state->pending_nmi));
+	state->save_item(NAME(state->sound_status));
+	state->save_item(NAME(state->video_enable));
 }
 
 static MACHINE_RESET( missb2 )

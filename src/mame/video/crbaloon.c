@@ -75,8 +75,8 @@ VIDEO_START( crbaloon )
 	crbaloon_state *state = machine->driver_data<crbaloon_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows_flip_xy,  8, 8, 32, 32);
 
-	state_save_register_global(machine, state->collision_address);
-	state_save_register_global(machine, state->collision_address_clear);
+	state->save_item(NAME(state->collision_address));
+	state->save_item(NAME(state->collision_address_clear));
 }
 
 

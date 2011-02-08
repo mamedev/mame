@@ -257,7 +257,7 @@ static MACHINE_START( mosaic )
 {
 	mosaic_state *state = machine->driver_data<mosaic_state>();
 
-	state_save_register_global(machine, state->prot_val);
+	state->save_item(NAME(state->prot_val));
 }
 
 static MACHINE_RESET( mosaic )

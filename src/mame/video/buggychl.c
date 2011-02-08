@@ -18,8 +18,8 @@ VIDEO_START( buggychl )
 	state->tmp_bitmap1 = machine->primary_screen->alloc_compatible_bitmap();
 	state->tmp_bitmap2 = machine->primary_screen->alloc_compatible_bitmap();
 
-	state_save_register_global_bitmap(machine, state->tmp_bitmap1);
-	state_save_register_global_bitmap(machine, state->tmp_bitmap2);
+	state->save_item(NAME(*state->tmp_bitmap1));
+	state->save_item(NAME(*state->tmp_bitmap2));
 
 	gfx_element_set_source(machine->gfx[0], state->charram);
 }

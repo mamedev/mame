@@ -380,9 +380,9 @@ static MACHINE_START( toratora )
 	state->pia_u2 = machine->device("pia_u2");
 	state->pia_u3 = machine->device("pia_u3");
 
-	state_save_register_global(machine, state->timer);
-	state_save_register_global(machine, state->last);
-	state_save_register_global(machine, state->clear_tv);
+	state->save_item(NAME(state->timer));
+	state->save_item(NAME(state->last));
+	state->save_item(NAME(state->clear_tv));
 }
 
 static MACHINE_RESET( toratora )

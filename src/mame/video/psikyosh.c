@@ -1281,10 +1281,10 @@ VIDEO_START( psikyosh )
 		state->bg_zoom[i] = (64 * 0x400) / (i + 64);
 	}
 
-	state_save_register_global_bitmap(machine, state->z_bitmap);
-	state_save_register_global_bitmap(machine, state->zoom_bitmap);
-	state_save_register_global_bitmap(machine, state->bg_bitmap);
-	state_save_register_global_pointer(machine, state->bg_zoom, 256);
+	state->save_item(NAME(*state->z_bitmap));
+	state->save_item(NAME(*state->zoom_bitmap));
+	state->save_item(NAME(*state->bg_bitmap));
+	state->save_pointer(NAME(state->bg_zoom), 256);
 }
 
 

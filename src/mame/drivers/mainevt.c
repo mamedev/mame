@@ -429,7 +429,7 @@ static MACHINE_START( mainevt )
 	state->k052109 = machine->device("k052109");
 	state->k051960 = machine->device("k051960");
 
-	state_save_register_global(machine, state->nmi_enable);
+	state->save_item(NAME(state->nmi_enable));
 }
 
 static MACHINE_RESET( mainevt )

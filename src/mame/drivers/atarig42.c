@@ -44,11 +44,11 @@ static MACHINE_START( atarig42 )
 	atarig42_state *state = machine->driver_data<atarig42_state>();
 	atarigen_init(machine);
 
-	state_save_register_global(machine, state->analog_data);
-	state_save_register_global(machine, state->sloop_bank);
-	state_save_register_global(machine, state->sloop_next_bank);
-	state_save_register_global(machine, state->sloop_offset);
-	state_save_register_global(machine, state->sloop_state);
+	state->save_item(NAME(state->analog_data));
+	state->save_item(NAME(state->sloop_bank));
+	state->save_item(NAME(state->sloop_next_bank));
+	state->save_item(NAME(state->sloop_offset));
+	state->save_item(NAME(state->sloop_state));
 }
 
 

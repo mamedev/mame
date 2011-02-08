@@ -26,8 +26,8 @@ VIDEO_START( jumping )
 	state->sprites_flipscreen = 0;
 
 	/* not 100% sure Jumping needs to save both... */
-	state_save_register_global(machine, state->sprite_ctrl);
-	state_save_register_global(machine, state->sprites_flipscreen);
+	state->save_item(NAME(state->sprite_ctrl));
+	state->save_item(NAME(state->sprites_flipscreen));
 }
 
 

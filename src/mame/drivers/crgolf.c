@@ -60,11 +60,11 @@ static MACHINE_START( crgolf )
 	memory_set_bank(machine, "bank1", 0);
 
 	/* register for save states */
-	state_save_register_global(machine, state->port_select);
-	state_save_register_global(machine, state->main_to_sound_data);
-	state_save_register_global(machine, state->sound_to_main_data);
-	state_save_register_global(machine, state->sample_offset);
-	state_save_register_global(machine, state->sample_count);
+	state->save_item(NAME(state->port_select));
+	state->save_item(NAME(state->main_to_sound_data));
+	state->save_item(NAME(state->sound_to_main_data));
+	state->save_item(NAME(state->sample_offset));
+	state->save_item(NAME(state->sample_count));
 }
 
 

@@ -565,13 +565,13 @@ static MACHINE_START( ddragon3 )
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->vreg);
-	state_save_register_global(machine, state->bg_scrollx);
-	state_save_register_global(machine, state->bg_scrolly);
-	state_save_register_global(machine, state->fg_scrollx);
-	state_save_register_global(machine, state->fg_scrolly);
-	state_save_register_global(machine, state->bg_tilebase);
-	state_save_register_global_array(machine, state->io_reg);
+	state->save_item(NAME(state->vreg));
+	state->save_item(NAME(state->bg_scrollx));
+	state->save_item(NAME(state->bg_scrolly));
+	state->save_item(NAME(state->fg_scrollx));
+	state->save_item(NAME(state->fg_scrolly));
+	state->save_item(NAME(state->bg_tilebase));
+	state->save_item(NAME(state->io_reg));
 }
 
 static MACHINE_RESET( ddragon3 )

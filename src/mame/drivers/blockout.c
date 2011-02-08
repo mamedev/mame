@@ -259,7 +259,7 @@ static MACHINE_START( blockout )
 
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->color);
+	state->save_item(NAME(state->color));
 }
 
 static MACHINE_RESET( blockout )

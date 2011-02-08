@@ -324,14 +324,14 @@ static MACHINE_START( inufuku )
 
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->pending_command);
-	state_save_register_global(machine, state->bg_scrollx);
-	state_save_register_global(machine, state->bg_scrolly);
-	state_save_register_global(machine, state->tx_scrollx);
-	state_save_register_global(machine, state->tx_scrolly);
-	state_save_register_global(machine, state->bg_raster);
-	state_save_register_global(machine, state->bg_palettebank);
-	state_save_register_global(machine, state->tx_palettebank);
+	state->save_item(NAME(state->pending_command));
+	state->save_item(NAME(state->bg_scrollx));
+	state->save_item(NAME(state->bg_scrolly));
+	state->save_item(NAME(state->tx_scrollx));
+	state->save_item(NAME(state->tx_scrolly));
+	state->save_item(NAME(state->bg_raster));
+	state->save_item(NAME(state->bg_palettebank));
+	state->save_item(NAME(state->tx_palettebank));
 }
 
 static MACHINE_RESET( inufuku )

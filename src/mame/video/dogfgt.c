@@ -71,10 +71,10 @@ VIDEO_START( dogfgt )
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 
 	state->bitmapram = auto_alloc_array(machine, UINT8, BITMAPRAM_SIZE);
-	state_save_register_global_pointer(machine, state->bitmapram, BITMAPRAM_SIZE);
+	state->save_pointer(NAME(state->bitmapram), BITMAPRAM_SIZE);
 
 	state->pixbitmap = machine->primary_screen->alloc_compatible_bitmap();
-	state_save_register_global_bitmap(machine, state->pixbitmap);
+	state->save_item(NAME(*state->pixbitmap));
 }
 
 

@@ -307,11 +307,11 @@ static MACHINE_START( pandoras )
 	state->audiocpu = machine->device<cpu_device>("audiocpu");
 	state->mcu = machine->device<cpu_device>("mcu");
 
-	state_save_register_global(machine, state->firq_old_data_a);
-	state_save_register_global(machine, state->firq_old_data_b);
-	state_save_register_global(machine, state->irq_enable_a);
-	state_save_register_global(machine, state->irq_enable_b);
-	state_save_register_global(machine, state->i8039_status);
+	state->save_item(NAME(state->firq_old_data_a));
+	state->save_item(NAME(state->firq_old_data_b));
+	state->save_item(NAME(state->irq_enable_a));
+	state->save_item(NAME(state->irq_enable_b));
+	state->save_item(NAME(state->i8039_status));
 }
 
 static MACHINE_RESET( pandoras )

@@ -64,9 +64,9 @@ static VIDEO_START( astrocorp )
 
 	state->bitmap = machine->primary_screen->alloc_compatible_bitmap();
 
-	state_save_register_global_bitmap(machine, state->bitmap);
-	state_save_register_global       (machine, state->screen_enable);
-	state_save_register_global       (machine, state->draw_sprites);
+	state->save_item(NAME(*state->bitmap));
+	state->save_item       (NAME(state->screen_enable));
+	state->save_item       (NAME(state->draw_sprites));
 }
 
 /***************************************************************************

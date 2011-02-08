@@ -546,7 +546,7 @@ static MACHINE_START( slapshot )
 	state->tc0640fio = machine->device("tc0640fio");
 
 	state->banknum = 0;
-	state_save_register_global(machine, state->banknum);
+	state->save_item(NAME(state->banknum));
 	machine->state().register_postload(slapshot_postload, NULL);
 }
 

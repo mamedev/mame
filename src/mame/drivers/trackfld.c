@@ -866,10 +866,10 @@ static MACHINE_START( trackfld )
 	trackfld_state *state = machine->driver_data<trackfld_state>();
 
 	/* video */
-	state_save_register_global(machine, state->bg_bank);
-	state_save_register_global(machine, state->sprite_bank1);
-	state_save_register_global(machine, state->sprite_bank2);
-	state_save_register_global(machine, state->old_gfx_bank);
+	state->save_item(NAME(state->bg_bank));
+	state->save_item(NAME(state->sprite_bank1));
+	state->save_item(NAME(state->sprite_bank2));
+	state->save_item(NAME(state->old_gfx_bank));
 }
 
 static MACHINE_RESET( trackfld )

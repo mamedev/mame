@@ -388,13 +388,13 @@ static MACHINE_START( exerion )
 
 	state->maincpu = machine->device("maincpu");
 
-	state_save_register_global(machine, state->porta);
-	state_save_register_global(machine, state->portb);
-	state_save_register_global(machine, state->cocktail_flip);
-	state_save_register_global(machine, state->char_palette);
-	state_save_register_global(machine, state->sprite_palette);
-	state_save_register_global(machine, state->char_bank);
-	state_save_register_global_array(machine, state->background_latches);
+	state->save_item(NAME(state->porta));
+	state->save_item(NAME(state->portb));
+	state->save_item(NAME(state->cocktail_flip));
+	state->save_item(NAME(state->char_palette));
+	state->save_item(NAME(state->sprite_palette));
+	state->save_item(NAME(state->char_bank));
+	state->save_item(NAME(state->background_latches));
 }
 
 static MACHINE_RESET( exerion )

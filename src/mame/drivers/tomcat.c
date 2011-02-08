@@ -357,10 +357,10 @@ static MACHINE_START(tomcat)
 	state->nvram = auto_alloc_array(machine, UINT8, 0x800);
 	machine->device<nvram_device>("nvram")->set_base(state->nvram, 0x800);
 
-	state_save_register_global_pointer(machine, state->nvram, 0x800);
-	state_save_register_global(machine, state->control_num);
-	state_save_register_global(machine, state->dsp_BIO);
-	state_save_register_global(machine, state->dsp_idle);
+	state->save_pointer(NAME(state->nvram), 0x800);
+	state->save_item(NAME(state->control_num));
+	state->save_item(NAME(state->dsp_BIO));
+	state->save_item(NAME(state->dsp_idle));
 
 	state->dsp_BIO = 0;
 }

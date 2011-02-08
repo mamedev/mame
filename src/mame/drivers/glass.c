@@ -175,10 +175,10 @@ static MACHINE_START( glass )
 {
 	glass_state *state = machine->driver_data<glass_state>();
 
-	state_save_register_global(machine, state->cause_interrupt);
-	state_save_register_global(machine, state->current_bit);
-	state_save_register_global(machine, state->current_command);
-	state_save_register_global_array(machine, state->blitter_serial_buffer);
+	state->save_item(NAME(state->cause_interrupt));
+	state->save_item(NAME(state->current_bit));
+	state->save_item(NAME(state->current_command));
+	state->save_item(NAME(state->blitter_serial_buffer));
 }
 
 static MACHINE_RESET( glass )

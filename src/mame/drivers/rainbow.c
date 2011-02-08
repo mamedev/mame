@@ -901,7 +901,7 @@ static DRIVER_INIT( jumping )
 
 	state->jumping_latch = 0;
 
-	state_save_register_global(machine, state->jumping_latch);
+	state->save_item(NAME(state->jumping_latch));
 }
 
 

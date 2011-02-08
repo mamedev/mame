@@ -231,7 +231,7 @@ VIDEO_START( karnov )
 	state->bitmap_f = auto_bitmap_alloc(machine, 512, 512, machine->primary_screen->format());
 	state->fix_tilemap = tilemap_create(machine, get_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	state_save_register_global_bitmap(machine, state->bitmap_f);
+	state->save_item(NAME(*state->bitmap_f));
 
 	tilemap_set_transparent_pen(state->fix_tilemap, 0);
 }
@@ -244,7 +244,7 @@ VIDEO_START( wndrplnt )
 	state->bitmap_f = auto_bitmap_alloc(machine, 512, 512, machine->primary_screen->format());
 	state->fix_tilemap = tilemap_create(machine, get_fix_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
 
-	state_save_register_global_bitmap(machine, state->bitmap_f);
+	state->save_item(NAME(*state->bitmap_f));
 
 	tilemap_set_transparent_pen(state->fix_tilemap, 0);
 }

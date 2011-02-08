@@ -117,7 +117,7 @@ static VIDEO_START( jangou )
 	jangou_state *state = machine->driver_data<jangou_state>();
 
 	state->blit_buffer = auto_alloc_array(machine, UINT8, 256 * 256);
-	state_save_register_global_pointer(machine, state->blit_buffer, 256 * 256);
+	state->save_pointer(NAME(state->blit_buffer), 256 * 256);
 }
 
 static VIDEO_UPDATE( jangou )
@@ -914,9 +914,9 @@ static MACHINE_START( common )
 	state->cvsd = machine->device("cvsd");
 	state->nsc = machine->device("nsc");
 
-	state_save_register_global_array(machine, state->pen_data);
-	state_save_register_global_array(machine, state->blit_data);
-	state_save_register_global(machine, state->mux_data);
+	state->save_item(NAME(state->pen_data));
+	state->save_item(NAME(state->blit_data));
+	state->save_item(NAME(state->mux_data));
 }
 
 static MACHINE_START( jangou )
@@ -925,8 +925,8 @@ static MACHINE_START( jangou )
 
 	MACHINE_START_CALL(common);
 
-	state_save_register_global(machine, state->cvsd_shiftreg);
-	state_save_register_global(machine, state->cvsd_shift_cnt);
+	state->save_item(NAME(state->cvsd_shiftreg));
+	state->save_item(NAME(state->cvsd_shift_cnt));
 }
 
 static MACHINE_START( jngolady )
@@ -935,10 +935,10 @@ static MACHINE_START( jngolady )
 
 	MACHINE_START_CALL(common);
 
-	state_save_register_global(machine, state->adpcm_byte);
-	state_save_register_global(machine, state->msm5205_vclk_toggle);
-	state_save_register_global(machine, state->nsc_latch);
-	state_save_register_global(machine, state->z80_latch);
+	state->save_item(NAME(state->adpcm_byte));
+	state->save_item(NAME(state->msm5205_vclk_toggle));
+	state->save_item(NAME(state->nsc_latch));
+	state->save_item(NAME(state->z80_latch));
 }
 
 static MACHINE_RESET( common )

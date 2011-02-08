@@ -230,8 +230,8 @@ static MACHINE_START( commando )
 
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global_array(machine, state->scroll_x);
-	state_save_register_global_array(machine, state->scroll_y);
+	state->save_item(NAME(state->scroll_x));
+	state->save_item(NAME(state->scroll_y));
 }
 
 static MACHINE_RESET( commando )

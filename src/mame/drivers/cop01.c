@@ -418,9 +418,9 @@ static MACHINE_START( cop01 )
 
 	state->audiocpu = machine->device<cpu_device>("audiocpu");
 
-	state_save_register_global(machine, state->pulse);
-	state_save_register_global(machine, state->timer);
-	state_save_register_global_array(machine, state->vreg);
+	state->save_item(NAME(state->pulse));
+	state->save_item(NAME(state->timer));
+	state->save_item(NAME(state->vreg));
 }
 
 static MACHINE_RESET( cop01 )

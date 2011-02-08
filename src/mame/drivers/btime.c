@@ -1430,12 +1430,12 @@ static MACHINE_START( btime )
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->btime_palette);
-	state_save_register_global(machine, state->bnj_scroll1);
-	state_save_register_global(machine, state->bnj_scroll2);
-	state_save_register_global_array(machine, state->btime_tilemap);
-	state_save_register_global(machine, state->audio_nmi_enabled);
-	state_save_register_global(machine, state->audio_nmi_state);
+	state->save_item(NAME(state->btime_palette));
+	state->save_item(NAME(state->bnj_scroll1));
+	state->save_item(NAME(state->bnj_scroll2));
+	state->save_item(NAME(state->btime_tilemap));
+	state->save_item(NAME(state->audio_nmi_enabled));
+	state->save_item(NAME(state->audio_nmi_state));
 }
 
 static MACHINE_START( mmonkey )
@@ -1444,10 +1444,10 @@ static MACHINE_START( mmonkey )
 
 	MACHINE_START_CALL(btime);
 
-	state_save_register_global(machine, state->protection_command);
-	state_save_register_global(machine, state->protection_status);
-	state_save_register_global(machine, state->protection_value);
-	state_save_register_global(machine, state->protection_ret);
+	state->save_item(NAME(state->protection_command));
+	state->save_item(NAME(state->protection_status));
+	state->save_item(NAME(state->protection_value));
+	state->save_item(NAME(state->protection_ret));
 }
 
 static MACHINE_RESET( btime )

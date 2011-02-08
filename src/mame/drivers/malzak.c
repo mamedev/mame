@@ -380,9 +380,9 @@ static MACHINE_START( malzak )
 	state->s2636_1 = machine->device("s2636_1");
 	state->saa5050 = machine->device("saa5050");
 
-	state_save_register_global_array(machine, state->playfield_code);
-	state_save_register_global(machine, state->malzak_x);
-	state_save_register_global(machine, state->malzak_y);
+	state->save_item(NAME(state->playfield_code));
+	state->save_item(NAME(state->malzak_x));
+	state->save_item(NAME(state->malzak_y));
 }
 
 static MACHINE_RESET( malzak )

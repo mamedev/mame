@@ -103,8 +103,8 @@ VIDEO_START( fuuki32 )
 	state->buf_spriteram = auto_alloc_array(machine, UINT32, state->spriteram_size / 4);
 	state->buf_spriteram2 = auto_alloc_array(machine, UINT32, state->spriteram_size / 4);
 
-	state_save_register_global_pointer(machine, state->buf_spriteram, state->spriteram_size / 4);
-	state_save_register_global_pointer(machine, state->buf_spriteram2, state->spriteram_size / 4);
+	state->save_pointer(NAME(state->buf_spriteram), state->spriteram_size / 4);
+	state->save_pointer(NAME(state->buf_spriteram2), state->spriteram_size / 4);
 
 	state->tilemap_0 = tilemap_create(machine, get_tile_info_0, tilemap_scan_rows, 16, 16, 64, 32);
 	state->tilemap_1 = tilemap_create(machine, get_tile_info_1, tilemap_scan_rows, 16, 16, 64, 32);

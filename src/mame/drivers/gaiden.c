@@ -318,20 +318,20 @@ static MACHINE_START( raiga )
 	gaiden_state *state = machine->driver_data<gaiden_state>();
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->prot);
-	state_save_register_global(machine, state->jumpcode);
+	state->save_item(NAME(state->prot));
+	state->save_item(NAME(state->jumpcode));
 
-	state_save_register_global(machine, state->tx_scroll_x);
-	state_save_register_global(machine, state->tx_scroll_y);
-	state_save_register_global(machine, state->bg_scroll_x);
-	state_save_register_global(machine, state->bg_scroll_y);
-	state_save_register_global(machine, state->fg_scroll_x);
-	state_save_register_global(machine, state->fg_scroll_y);
+	state->save_item(NAME(state->tx_scroll_x));
+	state->save_item(NAME(state->tx_scroll_y));
+	state->save_item(NAME(state->bg_scroll_x));
+	state->save_item(NAME(state->bg_scroll_y));
+	state->save_item(NAME(state->fg_scroll_x));
+	state->save_item(NAME(state->fg_scroll_y));
 
-	state_save_register_global(machine, state->tx_offset_y);
-	state_save_register_global(machine, state->fg_offset_y);
-	state_save_register_global(machine, state->bg_offset_y);
-	state_save_register_global(machine, state->spr_offset_y);
+	state->save_item(NAME(state->tx_offset_y));
+	state->save_item(NAME(state->fg_offset_y));
+	state->save_item(NAME(state->bg_offset_y));
+	state->save_item(NAME(state->spr_offset_y));
 }
 
 static WRITE16_HANDLER( raiga_protection_w )

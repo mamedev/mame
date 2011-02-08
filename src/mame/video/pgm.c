@@ -357,9 +357,9 @@ VIDEO_START( pgm )
 	/* easier this way because of the funky sprite format */
 	state->sprite_temp_render = auto_alloc_array(machine, UINT16, 0x400*0x200);
 
-	state_save_register_global_pointer(machine, state->spritebufferram, 0xa00/2);
-	state_save_register_global_pointer(machine, state->sprite_temp_render, 0x400*0x200);
-	state_save_register_global_bitmap(machine, state->tmppgmbitmap);
+	state->save_pointer(NAME(state->spritebufferram), 0xa00/2);
+	state->save_pointer(NAME(state->sprite_temp_render), 0x400*0x200);
+	state->save_item(NAME(*state->tmppgmbitmap));
 }
 
 VIDEO_UPDATE( pgm )

@@ -807,7 +807,7 @@ static MACHINE_START( psikyosh )
 	memory_configure_bank(machine, "bank2", 0, 0x1000, machine->region("gfx1")->base(), 0x20000);
 
 	state->sample_offs = 0;
-	state_save_register_global(machine, state->sample_offs);
+	state->save_item(NAME(state->sample_offs));
 }
 
 

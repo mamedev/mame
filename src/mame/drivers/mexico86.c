@@ -431,20 +431,20 @@ static MACHINE_START( mexico86 )
 	state->subcpu = machine->device("sub");
 	state->mcu = machine->device("mcu");
 
-	state_save_register_global(machine, state->port_a_in);
-	state_save_register_global(machine, state->port_a_out);
-	state_save_register_global(machine, state->ddr_a);
-	state_save_register_global(machine, state->port_b_in);
-	state_save_register_global(machine, state->port_b_out);
-	state_save_register_global(machine, state->ddr_b);
-	state_save_register_global(machine, state->address);
-	state_save_register_global(machine, state->latch);
+	state->save_item(NAME(state->port_a_in));
+	state->save_item(NAME(state->port_a_out));
+	state->save_item(NAME(state->ddr_a));
+	state->save_item(NAME(state->port_b_in));
+	state->save_item(NAME(state->port_b_out));
+	state->save_item(NAME(state->ddr_b));
+	state->save_item(NAME(state->address));
+	state->save_item(NAME(state->latch));
 
-	state_save_register_global(machine, state->mcu_running);
-	state_save_register_global(machine, state->mcu_initialised);
-	state_save_register_global(machine, state->coin_last);
+	state->save_item(NAME(state->mcu_running));
+	state->save_item(NAME(state->mcu_initialised));
+	state->save_item(NAME(state->coin_last));
 
-	state_save_register_global(machine, state->charbank);
+	state->save_item(NAME(state->charbank));
 }
 
 static MACHINE_RESET( mexico86 )

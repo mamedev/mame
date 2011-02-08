@@ -166,7 +166,7 @@ static VIDEO_START( redalert )
 	redalert_state *state = machine->driver_data<redalert_state>();
 	state->bitmap_colorram = auto_alloc_array(machine, UINT8, 0x0400);
 
-	state_save_register_global_pointer(machine, state->bitmap_colorram, 0x0400);
+	state->save_pointer(NAME(state->bitmap_colorram), 0x0400);
 
 	state->control_xor = 0x00;
 }

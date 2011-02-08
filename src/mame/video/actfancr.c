@@ -77,9 +77,9 @@ static TILE_GET_INFO( get_pf2_tile_info )
 static void register_savestate( running_machine *machine )
 {
 	actfancr_state *state = machine->driver_data<actfancr_state>();
-	state_save_register_global_array(machine, state->control_1);
-	state_save_register_global_array(machine, state->control_2);
-	state_save_register_global(machine, state->flipscreen);
+	state->save_item(NAME(state->control_1));
+	state->save_item(NAME(state->control_2));
+	state->save_item(NAME(state->flipscreen));
 }
 
 VIDEO_START( actfancr )

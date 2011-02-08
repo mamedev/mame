@@ -104,36 +104,36 @@ MACHINE_START( balsente )
 		state_save_register_item(machine, "8253counter", NULL, i, state->counter[i].writebyte);
 	}
 
-	state_save_register_global(machine, state->counter_control);
-	state_save_register_global(machine, state->counter_0_ff);
-	state_save_register_global(machine, state->counter_0_timer_active);
+	state->save_item(NAME(state->counter_control));
+	state->save_item(NAME(state->counter_0_ff));
+	state->save_item(NAME(state->counter_0_timer_active));
 
-	state_save_register_global_array(machine, state->analog_input_data);
-	state_save_register_global(machine, state->adc_value);
+	state->save_item(NAME(state->analog_input_data));
+	state->save_item(NAME(state->adc_value));
 
-	state_save_register_global(machine, state->dac_value);
-	state_save_register_global(machine, state->dac_register);
-	state_save_register_global(machine, state->chip_select);
+	state->save_item(NAME(state->dac_value));
+	state->save_item(NAME(state->dac_register));
+	state->save_item(NAME(state->chip_select));
 
-	state_save_register_global(machine, state->m6850_status);
-	state_save_register_global(machine, state->m6850_control);
-	state_save_register_global(machine, state->m6850_input);
-	state_save_register_global(machine, state->m6850_output);
-	state_save_register_global(machine, state->m6850_data_ready);
+	state->save_item(NAME(state->m6850_status));
+	state->save_item(NAME(state->m6850_control));
+	state->save_item(NAME(state->m6850_input));
+	state->save_item(NAME(state->m6850_output));
+	state->save_item(NAME(state->m6850_data_ready));
 
-	state_save_register_global(machine, state->m6850_sound_status);
-	state_save_register_global(machine, state->m6850_sound_control);
-	state_save_register_global(machine, state->m6850_sound_input);
-	state_save_register_global(machine, state->m6850_sound_output);
+	state->save_item(NAME(state->m6850_sound_status));
+	state->save_item(NAME(state->m6850_sound_control));
+	state->save_item(NAME(state->m6850_sound_input));
+	state->save_item(NAME(state->m6850_sound_output));
 
-	state_save_register_global_array(machine, state->noise_position);
+	state->save_item(NAME(state->noise_position));
 
-	state_save_register_global(machine, state->nstocker_bits);
-	state_save_register_global(machine, state->spiker_expand_color);
-	state_save_register_global(machine, state->spiker_expand_bgcolor);
-	state_save_register_global(machine, state->spiker_expand_bits);
-	state_save_register_global(machine, state->grudge_steering_result);
-	state_save_register_global_array(machine, state->grudge_last_steering);
+	state->save_item(NAME(state->nstocker_bits));
+	state->save_item(NAME(state->spiker_expand_color));
+	state->save_item(NAME(state->spiker_expand_bgcolor));
+	state->save_item(NAME(state->spiker_expand_bits));
+	state->save_item(NAME(state->grudge_steering_result));
+	state->save_item(NAME(state->grudge_last_steering));
 }
 
 

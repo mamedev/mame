@@ -24,10 +24,10 @@ VIDEO_START( starfire )
 	state->scanline_timer->adjust(machine->primary_screen->time_until_pos(STARFIRE_VBEND), STARFIRE_VBEND);
 
     /* register for state saving */
-	state_save_register_global(machine, state->starfire_vidctrl);
-	state_save_register_global(machine, state->starfire_vidctrl1);
-	state_save_register_global(machine, state->starfire_color);
-	state_save_register_global_array(machine, state->starfire_colors);
+	state->save_item(NAME(state->starfire_vidctrl));
+	state->save_item(NAME(state->starfire_vidctrl1));
+	state->save_item(NAME(state->starfire_color));
+	state->save_item(NAME(state->starfire_colors));
 }
 
 

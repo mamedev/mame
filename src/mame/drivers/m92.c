@@ -230,9 +230,9 @@ static STATE_POSTLOAD( m92_postload )
 static MACHINE_START( m92 )
 {
 	m92_state *state = machine->driver_data<m92_state>();
-	state_save_register_global(machine, state->irqvector);
-	state_save_register_global(machine, state->sound_status);
-	state_save_register_global(machine, state->bankaddress);
+	state->save_item(NAME(state->irqvector));
+	state->save_item(NAME(state->sound_status));
+	state->save_item(NAME(state->bankaddress));
 	machine->state().register_postload(m92_postload, NULL);
 
 	state->scanline_timer = machine->scheduler().timer_alloc(FUNC(m92_scanline_interrupt));

@@ -141,8 +141,8 @@ VIDEO_START( appoooh )
 	tilemap_set_scrolldy(state->fg_tilemap, 8, 8);
 	tilemap_set_scrolldy(state->bg_tilemap, 8, 8);
 
-	state_save_register_global(machine, state->scroll_x);
-	state_save_register_global(machine, state->priority);
+	state->save_item(NAME(state->scroll_x));
+	state->save_item(NAME(state->priority));
 }
 
 WRITE8_HANDLER( appoooh_scroll_w )

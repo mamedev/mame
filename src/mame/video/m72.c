@@ -109,13 +109,13 @@ static TILEMAP_MAPPER( majtitle_scan_rows )
 static void register_savestate(running_machine *machine)
 {
 	m72_state *state = machine->driver_data<m72_state>();
-	state_save_register_global(machine, state->raster_irq_position);
-	state_save_register_global(machine, state->video_off);
-	state_save_register_global(machine, state->scrollx1);
-	state_save_register_global(machine, state->scrolly1);
-	state_save_register_global(machine, state->scrollx2);
-	state_save_register_global(machine, state->scrolly2);
-	state_save_register_global_pointer(machine, state->spriteram, machine->generic.spriteram_size/2);
+	state->save_item(NAME(state->raster_irq_position));
+	state->save_item(NAME(state->video_off));
+	state->save_item(NAME(state->scrollx1));
+	state->save_item(NAME(state->scrolly1));
+	state->save_item(NAME(state->scrollx2));
+	state->save_item(NAME(state->scrolly2));
+	state->save_pointer(NAME(state->spriteram), machine->generic.spriteram_size/2);
 }
 
 

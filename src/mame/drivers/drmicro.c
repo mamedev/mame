@@ -232,9 +232,9 @@ static MACHINE_START( drmicro )
 
 	state->msm = machine->device("msm");
 
-	state_save_register_global(machine, state->nmi_enable);
-	state_save_register_global(machine, state->pcm_adr);
-	state_save_register_global(machine, state->flipscreen);
+	state->save_item(NAME(state->nmi_enable));
+	state->save_item(NAME(state->pcm_adr));
+	state->save_item(NAME(state->flipscreen));
 }
 
 static MACHINE_RESET( drmicro )

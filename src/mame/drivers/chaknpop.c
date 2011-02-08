@@ -248,13 +248,13 @@ static MACHINE_START( chaknpop )
 
 	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x4000);
 
-	state_save_register_global(machine, state->gfxmode);
-	state_save_register_global(machine, state->flip_x);
-	state_save_register_global(machine, state->flip_y);
+	state->save_item(NAME(state->gfxmode));
+	state->save_item(NAME(state->flip_x));
+	state->save_item(NAME(state->flip_y));
 
-	state_save_register_global(machine, state->mcu_seed);
-	state_save_register_global(machine, state->mcu_result);
-	state_save_register_global(machine, state->mcu_select);
+	state->save_item(NAME(state->mcu_seed));
+	state->save_item(NAME(state->mcu_result));
+	state->save_item(NAME(state->mcu_select));
 }
 
 static MACHINE_RESET( chaknpop )

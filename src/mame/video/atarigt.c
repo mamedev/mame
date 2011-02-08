@@ -132,12 +132,12 @@ VIDEO_START( atarigt )
 	memset(state->colorram, 0, 0x80000);
 
 	/* save states */
-	state_save_register_global(machine, state->playfield_tile_bank);
-	state_save_register_global(machine, state->playfield_color_bank);
-	state_save_register_global(machine, state->playfield_xscroll);
-	state_save_register_global(machine, state->playfield_yscroll);
-	state_save_register_global(machine, state->tram_checksum);
-	state_save_register_global_array(machine, state->expanded_mram);
+	state->save_item(NAME(state->playfield_tile_bank));
+	state->save_item(NAME(state->playfield_color_bank));
+	state->save_item(NAME(state->playfield_xscroll));
+	state->save_item(NAME(state->playfield_yscroll));
+	state->save_item(NAME(state->tram_checksum));
+	state->save_item(NAME(state->expanded_mram));
 }
 
 

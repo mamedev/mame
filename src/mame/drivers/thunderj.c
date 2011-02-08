@@ -45,7 +45,7 @@ static MACHINE_START( thunderj )
 	thunderj_state *state = machine->driver_data<thunderj_state>();
 	atarigen_init(machine);
 
-	state_save_register_global(machine, state->alpha_tile_bank);
+	state->save_item(NAME(state->alpha_tile_bank));
 }
 
 

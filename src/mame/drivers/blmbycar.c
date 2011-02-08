@@ -343,8 +343,8 @@ static MACHINE_START( blmbycar )
 {
 	blmbycar_state *state = machine->driver_data<blmbycar_state>();
 
-	state_save_register_global(machine, state->pot_wheel);
-	state_save_register_global(machine, state->old_val);
+	state->save_item(NAME(state->pot_wheel));
+	state->save_item(NAME(state->old_val));
 }
 
 static MACHINE_RESET( blmbycar )
@@ -393,7 +393,7 @@ static MACHINE_START( watrball )
 {
 	blmbycar_state *state = machine->driver_data<blmbycar_state>();
 
-	state_save_register_global(machine, state->retvalue);
+	state->save_item(NAME(state->retvalue));
 }
 
 static MACHINE_RESET( watrball )

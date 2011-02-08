@@ -130,7 +130,7 @@ static VIDEO_START(jantotsu)
 	jantotsu_state *state = machine->driver_data<jantotsu_state>();
 
 	state->bitmap = auto_alloc_array(machine, UINT8, 0x8000);
-	state_save_register_global_pointer(machine, state->bitmap, 0x8000);
+	state->save_pointer(NAME(state->bitmap), 0x8000);
 }
 
 static VIDEO_UPDATE(jantotsu)
@@ -481,12 +481,12 @@ static MACHINE_START( jantotsu )
 {
 	jantotsu_state *state = machine->driver_data<jantotsu_state>();
 
-	state_save_register_global(machine, state->vram_bank);
-	state_save_register_global(machine, state->mux_data);
-	state_save_register_global(machine, state->adpcm_pos);
-	state_save_register_global(machine, state->adpcm_idle);
-	state_save_register_global(machine, state->adpcm_data);
-	state_save_register_global(machine, state->adpcm_trigger);
+	state->save_item(NAME(state->vram_bank));
+	state->save_item(NAME(state->mux_data));
+	state->save_item(NAME(state->adpcm_pos));
+	state->save_item(NAME(state->adpcm_idle));
+	state->save_item(NAME(state->adpcm_data));
+	state->save_item(NAME(state->adpcm_trigger));
 }
 
 static MACHINE_RESET( jantotsu )

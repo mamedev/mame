@@ -18,9 +18,9 @@ MACHINE_START( extra_8080bw_sh )
 {
 	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 
-	state_save_register_global(machine, state->port_1_last_extra);
-	state_save_register_global(machine, state->port_2_last_extra);
-	state_save_register_global(machine, state->port_3_last_extra);
+	state->save_item(NAME(state->port_1_last_extra));
+	state->save_item(NAME(state->port_2_last_extra));
+	state->save_item(NAME(state->port_3_last_extra));
 }
 
 /*******************************************************/
@@ -920,10 +920,10 @@ MACHINE_START( schaser_sh )
 
 	state->schaser_effect_555_timer = machine->scheduler().timer_alloc(FUNC(schaser_effect_555_cb));
 
-	state_save_register_global(machine, state->schaser_explosion);
-	state_save_register_global(machine, state->schaser_effect_555_is_low);
-	state_save_register_global(machine, state->schaser_effect_555_time_remain_savable);
-	state_save_register_global(machine, state->port_2_last_extra);
+	state->save_item(NAME(state->schaser_explosion));
+	state->save_item(NAME(state->schaser_effect_555_is_low));
+	state->save_item(NAME(state->schaser_effect_555_time_remain_savable));
+	state->save_item(NAME(state->port_2_last_extra));
 	machine->state().register_postload(schaser_reinit_555_time_remain, NULL);
 }
 

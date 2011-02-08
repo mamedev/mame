@@ -701,10 +701,10 @@ static MACHINE_START( fcrash )
 	state->msm_1 = machine->device<msm5205_device>("msm1");
 	state->msm_2 = machine->device<msm5205_device>("msm2");
 
-	state_save_register_global(machine, state->sample_buffer1);
-	state_save_register_global(machine, state->sample_buffer2);
-	state_save_register_global(machine, state->sample_select1);
-	state_save_register_global(machine, state->sample_select2);
+	state->save_item(NAME(state->sample_buffer1));
+	state->save_item(NAME(state->sample_buffer2));
+	state->save_item(NAME(state->sample_select1));
+	state->save_item(NAME(state->sample_select2));
 }
 
 static MACHINE_START( kodb )

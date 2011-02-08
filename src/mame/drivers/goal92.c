@@ -299,9 +299,9 @@ static MACHINE_START( goal92 )
 
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->fg_bank);
-	state_save_register_global(machine, state->msm5205next);
-	state_save_register_global(machine, state->adpcm_toggle);
+	state->save_item(NAME(state->fg_bank));
+	state->save_item(NAME(state->msm5205next));
+	state->save_item(NAME(state->adpcm_toggle));
 }
 
 static MACHINE_RESET( goal92 )

@@ -346,7 +346,7 @@ static MACHINE_START( aquarium )
 
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->aquarium_snd_ack);
+	state->save_item(NAME(state->aquarium_snd_ack));
 }
 
 static MACHINE_RESET( aquarium )

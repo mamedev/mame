@@ -550,8 +550,8 @@ static MACHINE_START( paradise )
 	memory_configure_bank(machine, "bank1", 0, 3, &ROM[0x00000], 0x4000);
 	memory_configure_bank(machine, "bank1", 3, bank_n - 3, &ROM[0x10000], 0x4000);
 
-	state_save_register_global(machine, state->palbank);
-	state_save_register_global(machine, state->priority);
+	state->save_item(NAME(state->palbank));
+	state->save_item(NAME(state->priority));
 }
 
 static MACHINE_RESET( paradise )

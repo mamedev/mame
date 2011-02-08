@@ -388,12 +388,12 @@ static MACHINE_START( othello )
 	state->ay1 = machine->device("ay1");
 	state->ay2 = machine->device("ay2");
 
-	state_save_register_global(machine, state->tile_bank);
-	state_save_register_global(machine, state->ay_select);
-	state_save_register_global(machine, state->ack_data);
-	state_save_register_global(machine, state->n7751_command);
-	state_save_register_global(machine, state->sound_addr);
-	state_save_register_global(machine, state->n7751_busy);
+	state->save_item(NAME(state->tile_bank));
+	state->save_item(NAME(state->ay_select));
+	state->save_item(NAME(state->ack_data));
+	state->save_item(NAME(state->n7751_command));
+	state->save_item(NAME(state->sound_addr));
+	state->save_item(NAME(state->n7751_busy));
 }
 
 static MACHINE_RESET( othello )

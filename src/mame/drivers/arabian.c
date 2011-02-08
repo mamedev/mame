@@ -350,9 +350,9 @@ static MACHINE_START( arabian )
 {
 	arabian_state *state = machine->driver_data<arabian_state>();
 
-	state_save_register_global(machine, state->mcu_port_o);
-	state_save_register_global(machine, state->mcu_port_p);
-	state_save_register_global_array(machine, state->mcu_port_r);
+	state->save_item(NAME(state->mcu_port_o));
+	state->save_item(NAME(state->mcu_port_p));
+	state->save_item(NAME(state->mcu_port_r));
 }
 
 static MACHINE_RESET( arabian )

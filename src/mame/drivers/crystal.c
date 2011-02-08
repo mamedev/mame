@@ -574,17 +574,17 @@ static MACHINE_START( crystal )
 	PatchReset(machine);
 
 #ifdef IDLE_LOOP_SPEEDUP
-	state_save_register_global(machine, state->FlipCntRead);
+	state->save_item(NAME(state->FlipCntRead));
 #endif
 
-	state_save_register_global(machine, state->Bank);
-	state_save_register_global(machine, state->FlipCount);
-	state_save_register_global(machine, state->IntHigh);
-	state_save_register_global_array(machine, state->Timerctrl);
-	state_save_register_global(machine, state->FlashCmd);
-	state_save_register_global(machine, state->PIO);
-	state_save_register_global_array(machine, state->DMActrl);
-	state_save_register_global(machine, state->OldPort4);
+	state->save_item(NAME(state->Bank));
+	state->save_item(NAME(state->FlipCount));
+	state->save_item(NAME(state->IntHigh));
+	state->save_item(NAME(state->Timerctrl));
+	state->save_item(NAME(state->FlashCmd));
+	state->save_item(NAME(state->PIO));
+	state->save_item(NAME(state->DMActrl));
+	state->save_item(NAME(state->OldPort4));
 	machine->state().register_postload(crystal_banksw_postload, NULL);
 }
 

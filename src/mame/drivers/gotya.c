@@ -180,8 +180,8 @@ static MACHINE_START( gotya )
 
 	state->samples = machine->device("samples");
 
-	state_save_register_global(machine, state->scroll_bit_8);
-	state_save_register_global(machine, state->theme_playing);
+	state->save_item(NAME(state->scroll_bit_8));
+	state->save_item(NAME(state->theme_playing));
 }
 
 static MACHINE_RESET( gotya )

@@ -383,7 +383,7 @@ static VIDEO_START( mwarr )
 	tilemap_set_scroll_rows(state->mlow_tilemap, 256);
 	tilemap_set_scroll_rows(state->mhigh_tilemap, 256);
 
-	state_save_register_global_pointer(machine, state->sprites_buffer, 0x800);
+	state->save_pointer(NAME(state->sprites_buffer), 0x800);
 }
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
@@ -522,7 +522,7 @@ static MACHINE_START( mwarr )
 {
 	mwarr_state *state = machine->driver_data<mwarr_state>();
 
-	state_save_register_global(machine, state->which);
+	state->save_item(NAME(state->which));
 }
 
 static MACHINE_RESET( mwarr )

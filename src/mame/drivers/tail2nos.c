@@ -218,9 +218,9 @@ static MACHINE_START( tail2nos )
 	state->audiocpu = machine->device("audiocpu");
 	state->k051316 = machine->device("k051316");
 
-	state_save_register_global(machine, state->charbank);
-	state_save_register_global(machine, state->charpalette);
-	state_save_register_global(machine, state->video_enable);
+	state->save_item(NAME(state->charbank));
+	state->save_item(NAME(state->charpalette));
+	state->save_item(NAME(state->video_enable));
 }
 
 static MACHINE_RESET( tail2nos )

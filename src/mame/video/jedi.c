@@ -33,8 +33,8 @@ static VIDEO_START( jedi )
 	jedi_state *state = machine->driver_data<jedi_state>();
 
 	/* register for saving */
-	state_save_register_global(machine, state->vscroll);
-	state_save_register_global(machine, state->hscroll);
+	state->save_item(NAME(state->vscroll));
+	state->save_item(NAME(state->hscroll));
 }
 
 

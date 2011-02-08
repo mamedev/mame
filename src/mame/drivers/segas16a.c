@@ -246,14 +246,14 @@ static MACHINE_START( system16a )
 {
 	segas1x_state *state = machine->driver_data<segas1x_state>();
 
-	state_save_register_global(machine, state->video_control);
-	state_save_register_global(machine, state->mcu_control);
-	state_save_register_global(machine, state->n7751_command);
-	state_save_register_global(machine, state->n7751_rom_address);
-	state_save_register_global(machine, state->mj_input_num);
-	state_save_register_global(machine, state->last_buttons1);
-	state_save_register_global(machine, state->last_buttons2);
-	state_save_register_global(machine, state->read_port);
+	state->save_item(NAME(state->video_control));
+	state->save_item(NAME(state->mcu_control));
+	state->save_item(NAME(state->n7751_command));
+	state->save_item(NAME(state->n7751_rom_address));
+	state->save_item(NAME(state->mj_input_num));
+	state->save_item(NAME(state->last_buttons1));
+	state->save_item(NAME(state->last_buttons2));
+	state->save_item(NAME(state->read_port));
 }
 
 

@@ -426,7 +426,7 @@ static MACHINE_START( olibochu )
 {
 	olibochu_state *state = machine->driver_data<olibochu_state>();
 
-	state_save_register_global(machine, state->cmd);
+	state->save_item(NAME(state->cmd));
 }
 
 static MACHINE_RESET( olibochu )

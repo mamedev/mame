@@ -362,9 +362,9 @@ static MACHINE_START( ironhors )
 
 	state->soundcpu = machine->device("soundcpu");
 
-	state_save_register_global(machine, state->palettebank);
-	state_save_register_global(machine, state->charbank);
-	state_save_register_global(machine, state->spriterambank);
+	state->save_item(NAME(state->palettebank));
+	state->save_item(NAME(state->charbank));
+	state->save_item(NAME(state->spriterambank));
 }
 
 static MACHINE_RESET( ironhors )

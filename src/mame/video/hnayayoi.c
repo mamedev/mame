@@ -35,10 +35,10 @@ VIDEO_START( hnayayoi )
 	hnayayoi_state *state = machine->driver_data<hnayayoi_state>();
 	common_vh_start(machine, 4);	/* 4 bitmaps -> 2 layers */
 
-	state_save_register_global_pointer(machine, state->pixmap[0], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[1], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[2], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[3], 256 * 256);
+	state->save_pointer(NAME(state->pixmap[0]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[1]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[2]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[3]), 256 * 256);
 }
 
 VIDEO_START( untoucha )
@@ -46,14 +46,14 @@ VIDEO_START( untoucha )
 	hnayayoi_state *state = machine->driver_data<hnayayoi_state>();
 	common_vh_start(machine, 8);	/* 8 bitmaps -> 4 layers */
 
-	state_save_register_global_pointer(machine, state->pixmap[0], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[1], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[2], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[3], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[4], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[5], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[6], 256 * 256);
-	state_save_register_global_pointer(machine, state->pixmap[7], 256 * 256);
+	state->save_pointer(NAME(state->pixmap[0]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[1]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[2]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[3]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[4]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[5]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[6]), 256 * 256);
+	state->save_pointer(NAME(state->pixmap[7]), 256 * 256);
 }
 
 

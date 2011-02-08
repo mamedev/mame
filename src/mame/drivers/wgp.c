@@ -961,9 +961,9 @@ static MACHINE_START( wgp )
 	state->tc0140syt = machine->device("tc0140syt");
 	state->tc0100scn = machine->device("tc0100scn");
 
-	state_save_register_global(machine, state->cpua_ctrl);
-	state_save_register_global(machine, state->banknum);
-	state_save_register_global(machine, state->port_sel);
+	state->save_item(NAME(state->cpua_ctrl));
+	state->save_item(NAME(state->banknum));
+	state->save_item(NAME(state->port_sel));
 	machine->state().register_postload(wgp_postload, NULL);
 }
 

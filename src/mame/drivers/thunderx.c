@@ -637,11 +637,11 @@ static MACHINE_START( scontra )
 	state->k052109 = machine->device("k052109");
 	state->k051960 = machine->device("k051960");
 
-	state_save_register_global(machine, state->priority);
-	state_save_register_global(machine, state->_1f98_data);
-	state_save_register_global(machine, state->palette_selected);
-	state_save_register_global(machine, state->rambank);
-	state_save_register_global(machine, state->pmcbank);
+	state->save_item(NAME(state->priority));
+	state->save_item(NAME(state->_1f98_data));
+	state->save_item(NAME(state->palette_selected));
+	state->save_item(NAME(state->rambank));
+	state->save_item(NAME(state->pmcbank));
 	state_save_register_global_pointer(machine, machine->generic.paletteram.u8, 0x800);
 }
 
@@ -658,7 +658,7 @@ static MACHINE_START( thunderx )
 
 	MACHINE_START_CALL(scontra);
 
-	state_save_register_global_pointer(machine, state->pmcram, 0x800);
+	state->save_pointer(NAME(state->pmcram), 0x800);
 }
 
 static MACHINE_RESET( scontra )

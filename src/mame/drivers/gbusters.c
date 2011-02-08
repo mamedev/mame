@@ -288,8 +288,8 @@ static MACHINE_START( gbusters )
 	state->k051960 = machine->device("k051960");
 	state->k007232 = machine->device("k007232");
 
-	state_save_register_global(machine, state->palette_selected);
-	state_save_register_global(machine, state->priority);
+	state->save_item(NAME(state->palette_selected));
+	state->save_item(NAME(state->priority));
 	state_save_register_global_pointer(machine, machine->generic.paletteram.u8, 0x800);
 }
 

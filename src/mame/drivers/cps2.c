@@ -1206,7 +1206,7 @@ static MACHINE_START( cps2 )
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->scancount);
+	state->save_item(NAME(state->scancount));
 
 	if (state->audiocpu != NULL)	// gigamn2 has no audiocpu
 		memory_configure_bank(machine, "bank1", 0, (QSOUND_SIZE - 0x10000) / 0x4000, machine->region("audiocpu")->base() + 0x10000, 0x4000);
@@ -7979,7 +7979,7 @@ static DRIVER_INIT ( pzloop2 )
 
 	state->readpaddle = 0;
 
-	state_save_register_global(machine, state->readpaddle);
+	state->save_item(NAME(state->readpaddle));
 
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x804000, 0x804001, 0, 0, joy_or_paddle_r);
 }
@@ -8006,7 +8006,7 @@ static DRIVER_INIT( gigamn2 )
 	DRIVER_INIT_CALL(cps2);
 
 	state->gigamn2_dummyqsound_ram = auto_alloc_array(machine, UINT16, 0x20000 / 2);
-	state_save_register_global_pointer(machine, state->gigamn2_dummyqsound_ram, 0x20000 / 2);
+	state->save_pointer(NAME(state->gigamn2_dummyqsound_ram), 0x20000 / 2);
 
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x618000, 0x619fff, 0, 0, gigamn2_dummyqsound_r, gigamn2_dummyqsound_w); // no qsound..
 	space->set_decrypted_region(0x000000, (length) - 1, &rom[length/4]);

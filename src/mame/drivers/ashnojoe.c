@@ -336,9 +336,9 @@ static MACHINE_START( ashnojoe )
 
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->adpcm_byte);
-	state_save_register_global(machine, state->soundlatch_status);
-	state_save_register_global(machine, state->msm5205_vclk_toggle);
+	state->save_item(NAME(state->adpcm_byte));
+	state->save_item(NAME(state->soundlatch_status));
+	state->save_item(NAME(state->msm5205_vclk_toggle));
 }
 
 static MACHINE_RESET( ashnojoe )

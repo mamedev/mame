@@ -110,11 +110,11 @@ VIDEO_START( atarig42 )
 	tilemap_set_transparent_pen(state->alpha_tilemap, 0);
 
 	/* save states */
-	state_save_register_global(machine, state->current_control);
-	state_save_register_global(machine, state->playfield_tile_bank);
-	state_save_register_global(machine, state->playfield_color_bank);
-	state_save_register_global(machine, state->playfield_xscroll);
-	state_save_register_global(machine, state->playfield_yscroll);
+	state->save_item(NAME(state->current_control));
+	state->save_item(NAME(state->playfield_tile_bank));
+	state->save_item(NAME(state->playfield_color_bank));
+	state->save_item(NAME(state->playfield_xscroll));
+	state->save_item(NAME(state->playfield_yscroll));
 }
 
 

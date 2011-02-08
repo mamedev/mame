@@ -434,22 +434,22 @@ VIDEO_START( fromanc2 )
 	state->paletteram[0] = auto_alloc_array(machine, UINT16, 0x800);
 	state->paletteram[1] = auto_alloc_array(machine, UINT16, 0x800);
 
-	state_save_register_global_pointer(machine, state->videoram[0][0], (64 * 64));
-	state_save_register_global_pointer(machine, state->videoram[0][1], (64 * 64));
-	state_save_register_global_pointer(machine, state->videoram[0][2], (64 * 64));
-	state_save_register_global_pointer(machine, state->videoram[0][3], (64 * 64));
-	state_save_register_global_pointer(machine, state->videoram[1][0], (64 * 64));
-	state_save_register_global_pointer(machine, state->videoram[1][1], (64 * 64));
-	state_save_register_global_pointer(machine, state->videoram[1][2], (64 * 64));
-	state_save_register_global_pointer(machine, state->videoram[1][3], (64 * 64));
-	state_save_register_global_pointer(machine, state->paletteram[0], 0x800);
-	state_save_register_global_pointer(machine, state->paletteram[1], 0x800);
-	state_save_register_global_array(machine, state->scrollx[0]);
-	state_save_register_global_array(machine, state->scrollx[1]);
-	state_save_register_global_array(machine, state->scrolly[0]);
-	state_save_register_global_array(machine, state->scrolly[1]);
-	state_save_register_global_array(machine, state->gfxbank[0]);
-	state_save_register_global_array(machine, state->gfxbank[1]);
+	state->save_pointer(NAME(state->videoram[0][0]), (64 * 64));
+	state->save_pointer(NAME(state->videoram[0][1]), (64 * 64));
+	state->save_pointer(NAME(state->videoram[0][2]), (64 * 64));
+	state->save_pointer(NAME(state->videoram[0][3]), (64 * 64));
+	state->save_pointer(NAME(state->videoram[1][0]), (64 * 64));
+	state->save_pointer(NAME(state->videoram[1][1]), (64 * 64));
+	state->save_pointer(NAME(state->videoram[1][2]), (64 * 64));
+	state->save_pointer(NAME(state->videoram[1][3]), (64 * 64));
+	state->save_pointer(NAME(state->paletteram[0]), 0x800);
+	state->save_pointer(NAME(state->paletteram[1]), 0x800);
+	state->save_item(NAME(state->scrollx[0]));
+	state->save_item(NAME(state->scrollx[1]));
+	state->save_item(NAME(state->scrolly[0]));
+	state->save_item(NAME(state->scrolly[1]));
+	state->save_item(NAME(state->gfxbank[0]));
+	state->save_item(NAME(state->gfxbank[1]));
 }
 
 VIDEO_START( fromancr )
@@ -480,20 +480,20 @@ VIDEO_START( fromancr )
 	state->paletteram[0] = auto_alloc_array(machine, UINT16, 0x800);
 	state->paletteram[1] = auto_alloc_array(machine, UINT16, 0x800);
 
-	state_save_register_global_pointer(machine, state->videoram[0][0], (64 * 64));
-	state_save_register_global_pointer(machine, state->videoram[0][1], (64 * 64));
-	state_save_register_global_pointer(machine, state->videoram[0][2], (64 * 64));
-	state_save_register_global_pointer(machine, state->videoram[1][0], (64 * 64));
-	state_save_register_global_pointer(machine, state->videoram[1][1], (64 * 64));
-	state_save_register_global_pointer(machine, state->videoram[1][2], (64 * 64));
-	state_save_register_global_pointer(machine, state->paletteram[0], 0x800);
-	state_save_register_global_pointer(machine, state->paletteram[1], 0x800);
-	state_save_register_global_array(machine, state->scrollx[0]);
-	state_save_register_global_array(machine, state->scrollx[1]);
-	state_save_register_global_array(machine, state->scrolly[0]);
-	state_save_register_global_array(machine, state->scrolly[1]);
-	state_save_register_global_array(machine, state->gfxbank[0]);
-	state_save_register_global_array(machine, state->gfxbank[1]);
+	state->save_pointer(NAME(state->videoram[0][0]), (64 * 64));
+	state->save_pointer(NAME(state->videoram[0][1]), (64 * 64));
+	state->save_pointer(NAME(state->videoram[0][2]), (64 * 64));
+	state->save_pointer(NAME(state->videoram[1][0]), (64 * 64));
+	state->save_pointer(NAME(state->videoram[1][1]), (64 * 64));
+	state->save_pointer(NAME(state->videoram[1][2]), (64 * 64));
+	state->save_pointer(NAME(state->paletteram[0]), 0x800);
+	state->save_pointer(NAME(state->paletteram[1]), 0x800);
+	state->save_item(NAME(state->scrollx[0]));
+	state->save_item(NAME(state->scrollx[1]));
+	state->save_item(NAME(state->scrolly[0]));
+	state->save_item(NAME(state->scrolly[1]));
+	state->save_item(NAME(state->gfxbank[0]));
+	state->save_item(NAME(state->gfxbank[1]));
 }
 
 
@@ -525,20 +525,20 @@ VIDEO_START( fromanc4 )
 	state->paletteram[0] = auto_alloc_array(machine, UINT16, 0x800);
 	state->paletteram[1] = auto_alloc_array(machine, UINT16, 0x800);
 
-	state_save_register_global_pointer(machine, state->videoram[0][0], (256 * 64));
-	state_save_register_global_pointer(machine, state->videoram[0][1], (256 * 64));
-	state_save_register_global_pointer(machine, state->videoram[0][2], (256 * 64));
-	state_save_register_global_pointer(machine, state->videoram[1][0], (256 * 64));
-	state_save_register_global_pointer(machine, state->videoram[1][1], (256 * 64));
-	state_save_register_global_pointer(machine, state->videoram[1][2], (256 * 64));
-	state_save_register_global_pointer(machine, state->paletteram[0], 0x800);
-	state_save_register_global_pointer(machine, state->paletteram[1], 0x800);
-	state_save_register_global_array(machine, state->scrollx[0]);
-	state_save_register_global_array(machine, state->scrollx[1]);
-	state_save_register_global_array(machine, state->scrolly[0]);
-	state_save_register_global_array(machine, state->scrolly[1]);
-	state_save_register_global_array(machine, state->gfxbank[0]);
-	state_save_register_global_array(machine, state->gfxbank[1]);
+	state->save_pointer(NAME(state->videoram[0][0]), (256 * 64));
+	state->save_pointer(NAME(state->videoram[0][1]), (256 * 64));
+	state->save_pointer(NAME(state->videoram[0][2]), (256 * 64));
+	state->save_pointer(NAME(state->videoram[1][0]), (256 * 64));
+	state->save_pointer(NAME(state->videoram[1][1]), (256 * 64));
+	state->save_pointer(NAME(state->videoram[1][2]), (256 * 64));
+	state->save_pointer(NAME(state->paletteram[0]), 0x800);
+	state->save_pointer(NAME(state->paletteram[1]), 0x800);
+	state->save_item(NAME(state->scrollx[0]));
+	state->save_item(NAME(state->scrollx[1]));
+	state->save_item(NAME(state->scrolly[0]));
+	state->save_item(NAME(state->scrolly[1]));
+	state->save_item(NAME(state->gfxbank[0]));
+	state->save_item(NAME(state->gfxbank[1]));
 }
 
 /******************************************************************************

@@ -3579,19 +3579,19 @@ static MACHINE_START( metro )
 {
 	metro_state *state = machine->driver_data<metro_state>();
 
-	state_save_register_global(machine, state->blitter_bit);
-	state_save_register_global(machine, state->irq_line);
-	state_save_register_global_array(machine, state->requested_int);
-	state_save_register_global(machine, state->soundstatus);
-	state_save_register_global(machine, state->porta);
-	state_save_register_global(machine, state->portb);
-	state_save_register_global(machine, state->busy_sndcpu);
-	state_save_register_global(machine, state->gakusai_oki_bank_lo);
-	state_save_register_global(machine, state->gakusai_oki_bank_hi);
-	state_save_register_global(machine, state->sprite_xoffs);
-	state_save_register_global(machine, state->sprite_yoffs);
-	state_save_register_global_array(machine, state->bg_tilemap_enable);
-	state_save_register_global_array(machine, state->bg_tilemap_enable16);
+	state->save_item(NAME(state->blitter_bit));
+	state->save_item(NAME(state->irq_line));
+	state->save_item(NAME(state->requested_int));
+	state->save_item(NAME(state->soundstatus));
+	state->save_item(NAME(state->porta));
+	state->save_item(NAME(state->portb));
+	state->save_item(NAME(state->busy_sndcpu));
+	state->save_item(NAME(state->gakusai_oki_bank_lo));
+	state->save_item(NAME(state->gakusai_oki_bank_hi));
+	state->save_item(NAME(state->sprite_xoffs));
+	state->save_item(NAME(state->sprite_yoffs));
+	state->save_item(NAME(state->bg_tilemap_enable));
+	state->save_item(NAME(state->bg_tilemap_enable16));
 }
 
 static MACHINE_RESET( metro )
@@ -6048,9 +6048,9 @@ static DRIVER_INIT( karatour )
 
 	DRIVER_INIT_CALL(metro);
 
-	state_save_register_global_pointer(machine, state->vram_0, 0x20000/2);
-	state_save_register_global_pointer(machine, state->vram_1, 0x20000/2);
-	state_save_register_global_pointer(machine, state->vram_2, 0x20000/2);
+	state->save_pointer(NAME(state->vram_0), 0x20000/2);
+	state->save_pointer(NAME(state->vram_1), 0x20000/2);
+	state->save_pointer(NAME(state->vram_2), 0x20000/2);
 }
 
 static DRIVER_INIT( daitorid )

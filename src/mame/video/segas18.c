@@ -50,10 +50,10 @@ VIDEO_START( system18 )
 	state->tmp_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 
 
-	state_save_register_global(machine, state->grayscale_enable);
-	state_save_register_global(machine, state->vdp_enable);
-	state_save_register_global(machine, state->vdp_mixing);
-	state_save_register_global_bitmap(machine, state->tmp_bitmap);
+	state->save_item(NAME(state->grayscale_enable));
+	state->save_item(NAME(state->vdp_enable));
+	state->save_item(NAME(state->vdp_mixing));
+	state->save_item(NAME(*state->tmp_bitmap));
 }
 
 

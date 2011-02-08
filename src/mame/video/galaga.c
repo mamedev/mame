@@ -438,9 +438,9 @@ VIDEO_START( galaga )
 
 	state->galaga_gfxbank = 0;
 
-	state_save_register_global(machine, state->stars_scrollx);
-	state_save_register_global(machine, state->stars_scrolly);
-	state_save_register_global(machine, state->galaga_gfxbank);
+	state->save_item(NAME(state->stars_scrollx));
+	state->save_item(NAME(state->stars_scrolly));
+	state->save_item(NAME(state->galaga_gfxbank));
 }
 
 

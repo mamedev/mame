@@ -343,13 +343,13 @@ static MACHINE_START( fgoal )
 	state->maincpu = machine->device("maincpu");
 	state->mb14241 = machine->device("mb14241");
 
-	state_save_register_global(machine, state->xpos);
-	state_save_register_global(machine, state->ypos);
-	state_save_register_global(machine, state->current_color);
-	state_save_register_global(machine, state->fgoal_player);
-	state_save_register_global(machine, state->row);
-	state_save_register_global(machine, state->col);
-	state_save_register_global(machine, state->prev_coin);
+	state->save_item(NAME(state->xpos));
+	state->save_item(NAME(state->ypos));
+	state->save_item(NAME(state->current_color));
+	state->save_item(NAME(state->fgoal_player));
+	state->save_item(NAME(state->row));
+	state->save_item(NAME(state->col));
+	state->save_item(NAME(state->prev_coin));
 }
 
 static MACHINE_RESET( fgoal )

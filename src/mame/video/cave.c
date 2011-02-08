@@ -430,32 +430,32 @@ static void cave_vh_start( running_machine *machine, int num )
 			tilemap_set_transparent_pen(state->tilemap_3, 0);
 			tilemap_set_scroll_rows(state->tilemap_3, 1);
 			tilemap_set_scroll_cols(state->tilemap_3, 1);
-			state_save_register_global(machine, state->tiledim_3);
-			state_save_register_global(machine, state->old_tiledim_3);
+			state->save_item(NAME(state->tiledim_3));
+			state->save_item(NAME(state->old_tiledim_3));
 
 		case 3:
 			state->tilemap_2 = tilemap_create(machine, get_tile_info_2, tilemap_scan_rows, 8, 8, 512 / 8, 512 / 8);
 			tilemap_set_transparent_pen(state->tilemap_2, 0);
 			tilemap_set_scroll_rows(state->tilemap_2, 1);
 			tilemap_set_scroll_cols(state->tilemap_2, 1);
-			state_save_register_global(machine, state->tiledim_2);
-			state_save_register_global(machine, state->old_tiledim_2);
+			state->save_item(NAME(state->tiledim_2));
+			state->save_item(NAME(state->old_tiledim_2));
 
 		case 2:
 			state->tilemap_1 = tilemap_create(machine, get_tile_info_1, tilemap_scan_rows, 8, 8, 512 / 8, 512 / 8);
 			tilemap_set_transparent_pen(state->tilemap_1, 0);
 			tilemap_set_scroll_rows(state->tilemap_1, 1);
 			tilemap_set_scroll_cols(state->tilemap_1, 1);
-			state_save_register_global(machine, state->tiledim_1);
-			state_save_register_global(machine, state->old_tiledim_1);
+			state->save_item(NAME(state->tiledim_1));
+			state->save_item(NAME(state->old_tiledim_1));
 
 		case 1:
 			state->tilemap_0 = tilemap_create(machine, get_tile_info_0, tilemap_scan_rows, 8, 8, 512 / 8, 512 / 8);
 			tilemap_set_transparent_pen(state->tilemap_0, 0);
 			tilemap_set_scroll_rows(state->tilemap_0, 1);
 			tilemap_set_scroll_cols(state->tilemap_0, 1);
-			state_save_register_global(machine, state->tiledim_0);
-			state_save_register_global(machine, state->old_tiledim_0);
+			state->save_item(NAME(state->tiledim_0));
+			state->save_item(NAME(state->old_tiledim_0));
 
 			break;
 	}
@@ -783,16 +783,16 @@ static void sprite_init_cave( running_machine *machine )
 	memset(state->sprite_table, 0, sizeof(state->sprite_table));
 	state->sprite_draw = sprite_draw_donpachi;
 
-	state_save_register_global_bitmap(machine, state->sprite_zbuf);
-	state_save_register_global(machine, state->sprite_zbuf_baseval);
-	state_save_register_global(machine, state->num_sprites);
-	state_save_register_global(machine, state->spriteram_bank);
-	state_save_register_global(machine, state->spriteram_bank_delay);
+	state->save_item(NAME(*state->sprite_zbuf));
+	state->save_item(NAME(state->sprite_zbuf_baseval));
+	state->save_item(NAME(state->num_sprites));
+	state->save_item(NAME(state->spriteram_bank));
+	state->save_item(NAME(state->spriteram_bank_delay));
 
-	state_save_register_global(machine, state->blit.clip_left);
-	state_save_register_global(machine, state->blit.clip_right);
-	state_save_register_global(machine, state->blit.clip_top);
-	state_save_register_global(machine, state->blit.clip_bottom);
+	state->save_item(NAME(state->blit.clip_left));
+	state->save_item(NAME(state->blit.clip_right));
+	state->save_item(NAME(state->blit.clip_top));
+	state->save_item(NAME(state->blit.clip_bottom));
 
 	machine->state().register_postload(cave_sprite_postload, NULL);
 }

@@ -184,7 +184,7 @@ static MACHINE_START( kangaroo_mcu )
 
 	MACHINE_START_CALL(kangaroo);
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xef00, 0xefff, 0, 0, mcu_sim_r, mcu_sim_w);
-	state_save_register_global(machine, state->clock);
+	state->save_item(NAME(state->clock));
 }
 
 

@@ -238,7 +238,7 @@ static MACHINE_START( vaportra )
 	state->audiocpu = machine->device("audiocpu");
 	state->deco16ic = machine->device("deco_custom");
 
-	state_save_register_global_array(machine, state->priority);
+	state->save_item(NAME(state->priority));
 }
 
 static MACHINE_RESET( vaportra )

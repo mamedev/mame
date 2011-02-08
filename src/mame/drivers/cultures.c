@@ -22,7 +22,7 @@ public:
 
 	/* memory pointers */
 	UINT8 *   bg0_videoram;
-	UINT8 *   paletteram;
+	UINT8     paletteram[0x4000];
 	UINT8 *   bg0_regs_x;
 	UINT8 *   bg1_regs_x;
 	UINT8 *   bg2_regs_x;
@@ -364,14 +364,12 @@ static MACHINE_START( cultures )
 
 	memory_configure_bank(machine, "bank1", 0, 16, &ROM[0x0000], 0x4000);
 
-	state->paletteram = auto_alloc_array(machine, UINT8, 0x4000);
-	state_save_register_global_pointer(machine, state->paletteram, 0x4000);
-
-	state_save_register_global(machine, state->old_bank);
-	state_save_register_global(machine, state->video_bank);
-	state_save_register_global(machine, state->irq_enable);
-	state_save_register_global(machine, state->bg1_bank);
-	state_save_register_global(machine, state->bg2_bank);
+	state->save_item(NAME(state->paletteram));
+	state->save_item(NAME(state->old_bank));
+	state->save_item(NAME(state->video_bank));
+	state->save_item(NAME(state->irq_enable));
+	state->save_item(NAME(state->bg1_bank));
+	state->save_item(NAME(state->bg2_bank));
 }
 
 static MACHINE_RESET( cultures )

@@ -309,7 +309,7 @@ public:
 static MACHINE_START( tempest )
 {
 	tempest_state *state = machine->driver_data<tempest_state>();
-	state_save_register_global(machine, state->player_select);
+	state->save_item(NAME(state->player_select));
 }
 
 /*************************************

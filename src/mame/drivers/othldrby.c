@@ -220,10 +220,10 @@ static MACHINE_START( othldrby )
 {
 	othldrby_state *state = machine->driver_data<othldrby_state>();
 
-	state_save_register_global(machine, state->toggle);
-	state_save_register_global(machine, state->vram_addr);
-	state_save_register_global(machine, state->vreg_addr);
-	state_save_register_global_array(machine, state->vreg);
+	state->save_item(NAME(state->toggle));
+	state->save_item(NAME(state->vram_addr));
+	state->save_item(NAME(state->vreg_addr));
+	state->save_item(NAME(state->vreg));
 }
 
 static MACHINE_RESET( othldrby )

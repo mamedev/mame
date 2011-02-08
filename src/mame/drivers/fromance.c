@@ -967,13 +967,13 @@ static MACHINE_START( fromance )
 
 	state->subcpu = machine->device("sub");
 
-	state_save_register_global(machine, state->directionflag);
-	state_save_register_global(machine, state->commanddata);
-	state_save_register_global(machine, state->portselect);
+	state->save_item(NAME(state->directionflag));
+	state->save_item(NAME(state->commanddata));
+	state->save_item(NAME(state->portselect));
 
-	state_save_register_global(machine, state->adpcm_reset);
-	state_save_register_global(machine, state->adpcm_data);
-	state_save_register_global(machine, state->vclk_left);
+	state->save_item(NAME(state->adpcm_reset));
+	state->save_item(NAME(state->adpcm_data));
+	state->save_item(NAME(state->vclk_left));
 
 	/* video-related elements are saved in VIDEO_START */
 }

@@ -196,10 +196,10 @@ static MACHINE_START( exedexes )
 {
 	exedexes_state *state = machine->driver_data<exedexes_state>();
 
-	state_save_register_global(machine, state->chon);
-	state_save_register_global(machine, state->objon);
-	state_save_register_global(machine, state->sc1on);
-	state_save_register_global(machine, state->sc2on);
+	state->save_item(NAME(state->chon));
+	state->save_item(NAME(state->objon));
+	state->save_item(NAME(state->sc1on));
+	state->save_item(NAME(state->sc2on));
 }
 
 static MACHINE_RESET( exedexes )

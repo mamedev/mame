@@ -151,10 +151,10 @@ VIDEO_START( digdug )
 
 	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 
-	state_save_register_global(machine, state->bg_select);
-	state_save_register_global(machine, state->tx_color_mode);
-	state_save_register_global(machine, state->bg_disable);
-	state_save_register_global(machine, state->bg_color_bank);
+	state->save_item(NAME(state->bg_select));
+	state->save_item(NAME(state->tx_color_mode));
+	state->save_item(NAME(state->bg_disable));
+	state->save_item(NAME(state->bg_color_bank));
 }
 
 

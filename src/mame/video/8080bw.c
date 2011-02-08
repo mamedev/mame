@@ -17,14 +17,14 @@ MACHINE_START( extra_8080bw_vh )
 {
 	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 
-	state_save_register_global(machine, state->c8080bw_flip_screen);
-	state_save_register_global(machine, state->color_map);
-	state_save_register_global(machine, state->screen_red);
+	state->save_item(NAME(state->c8080bw_flip_screen));
+	state->save_item(NAME(state->color_map));
+	state->save_item(NAME(state->screen_red));
 
 	// These two only belong to schaser, but for simplicity's sake let's waste
 	// two bytes in other drivers' .sta files.
-	state_save_register_global(machine, state->schaser_background_disable);
-	state_save_register_global(machine, state->schaser_background_select);
+	state->save_item(NAME(state->schaser_background_disable));
+	state->save_item(NAME(state->schaser_background_select));
 }
 
 

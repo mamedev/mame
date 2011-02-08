@@ -284,10 +284,6 @@ public:
 	dwarfd_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	/* memory pointers */
-	UINT8 *  dw_ram;
-	UINT8 *  videobuf;
-
 	/* video-related */
 	int bank;
 	int line;
@@ -307,6 +303,10 @@ public:
 	int i8275FieldAttributeMode;
 	int i8275CursorFormat;
 	int i8275HorizontalRetrace;
+
+	/* memory */
+	UINT8    dw_ram[0x1000];
+	UINT8    videobuf[0x8000];
 };
 
 
@@ -915,24 +915,24 @@ static MACHINE_START( dwarfd )
 {
 	dwarfd_state *state = machine->driver_data<dwarfd_state>();
 
-	state_save_register_global(machine, state->bank);
-	state_save_register_global(machine, state->line);
-	state_save_register_global(machine, state->idx);
-	state_save_register_global(machine, state->crt_access);
+	state->save_item(NAME(state->bank));
+	state->save_item(NAME(state->line));
+	state->save_item(NAME(state->idx));
+	state->save_item(NAME(state->crt_access));
 
 	/* i8275 */
-	state_save_register_global(machine, state->i8275Command);
-	state_save_register_global(machine, state->i8275HorizontalCharactersRow);
-	state_save_register_global(machine, state->i8275CommandSeqCnt);
-	state_save_register_global(machine, state->i8275SpacedRows);
-	state_save_register_global(machine, state->i8275VerticalRows);
-	state_save_register_global(machine, state->i8275VerticalRetraceRows);
-	state_save_register_global(machine, state->i8275Underline);
-	state_save_register_global(machine, state->i8275Lines);
-	state_save_register_global(machine, state->i8275LineCounterMode);
-	state_save_register_global(machine, state->i8275FieldAttributeMode);
-	state_save_register_global(machine, state->i8275CursorFormat);
-	state_save_register_global(machine, state->i8275HorizontalRetrace);
+	state->save_item(NAME(state->i8275Command));
+	state->save_item(NAME(state->i8275HorizontalCharactersRow));
+	state->save_item(NAME(state->i8275CommandSeqCnt));
+	state->save_item(NAME(state->i8275SpacedRows));
+	state->save_item(NAME(state->i8275VerticalRows));
+	state->save_item(NAME(state->i8275VerticalRetraceRows));
+	state->save_item(NAME(state->i8275Underline));
+	state->save_item(NAME(state->i8275Lines));
+	state->save_item(NAME(state->i8275LineCounterMode));
+	state->save_item(NAME(state->i8275FieldAttributeMode));
+	state->save_item(NAME(state->i8275CursorFormat));
+	state->save_item(NAME(state->i8275HorizontalRetrace));
 }
 
 static MACHINE_RESET( dwarfd )
@@ -1173,14 +1173,11 @@ static DRIVER_INIT(dwarfd)
 	//      src[i] = src[i] & 0xe0;
 	}
 
-	state->videobuf = auto_alloc_array(machine, UINT8, 0x8000);
-	state->dw_ram = auto_alloc_array(machine, UINT8, 0x1000);
+	state->save_item(NAME(state->videobuf));
+	state->save_item(NAME(state->dw_ram));
 
-	state_save_register_global_pointer(machine, state->videobuf, 0x8000);
-	state_save_register_global_pointer(machine, state->dw_ram, 0x1000);
-
-	memset(state->videobuf, 0, 0x8000);
-	memset(state->dw_ram, 0, 0x1000);
+	memset(state->videobuf, 0, sizeof(state->videobuf));
+	memset(state->dw_ram, 0, sizeof(state->dw_ram));
 
 }
 

@@ -326,7 +326,7 @@ static DEVICE_START( tiamc1_sound )
 		}
 	}
 
-	state_save_register_global(machine, state->timer1_divider);
+	device->save_item(NAME(state->timer1_divider));
 }
 
 

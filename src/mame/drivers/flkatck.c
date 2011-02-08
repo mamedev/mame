@@ -205,9 +205,9 @@ static MACHINE_START( flkatck )
 	state->audiocpu = machine->device("audiocpu");
 	state->k007121 = machine->device("k007121");
 
-	state_save_register_global(machine, state->irq_enabled);
-	state_save_register_global_array(machine, state->multiply_reg);
-	state_save_register_global(machine, state->flipscreen);
+	state->save_item(NAME(state->irq_enabled));
+	state->save_item(NAME(state->multiply_reg));
+	state->save_item(NAME(state->flipscreen));
 }
 
 static MACHINE_RESET( flkatck )

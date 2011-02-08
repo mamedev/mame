@@ -308,16 +308,16 @@ static MACHINE_START( ginganin )
 
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->layers_ctrl);
-	state_save_register_global(machine, state->flipscreen);
-	state_save_register_global(machine, state->MC6840_index0);
-	state_save_register_global(machine, state->MC6840_register0);
-	state_save_register_global(machine, state->MC6840_index1);
-	state_save_register_global(machine, state->MC6840_register1);
-	state_save_register_global(machine, state->S_TEMPO);
-	state_save_register_global(machine, state->S_TEMPO_OLD);
-	state_save_register_global(machine, state->MC6809_CTR);
-	state_save_register_global(machine, state->MC6809_FLAG);
+	state->save_item(NAME(state->layers_ctrl));
+	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->MC6840_index0));
+	state->save_item(NAME(state->MC6840_register0));
+	state->save_item(NAME(state->MC6840_index1));
+	state->save_item(NAME(state->MC6840_register1));
+	state->save_item(NAME(state->S_TEMPO));
+	state->save_item(NAME(state->S_TEMPO_OLD));
+	state->save_item(NAME(state->MC6809_CTR));
+	state->save_item(NAME(state->MC6809_FLAG));
 }
 
 static MACHINE_RESET( ginganin )

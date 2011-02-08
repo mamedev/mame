@@ -721,7 +721,7 @@ static MACHINE_START( fitfight )
 {
 	fitfight_state *state = machine->driver_data<fitfight_state>();
 
-	state_save_register_global(machine, state->fof_700000_data);
+	state->save_item(NAME(state->fof_700000_data));
 }
 
 static MACHINE_RESET( fitfight )

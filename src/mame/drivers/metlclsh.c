@@ -280,8 +280,8 @@ static MACHINE_START( metlclsh )
 	state->maincpu = machine->device("maincpu");
 	state->subcpu = machine->device("sub");
 
-	state_save_register_global(machine, state->write_mask);
-	state_save_register_global(machine, state->gfxbank);
+	state->save_item(NAME(state->write_mask));
+	state->save_item(NAME(state->gfxbank));
 }
 
 static MACHINE_RESET( metlclsh )

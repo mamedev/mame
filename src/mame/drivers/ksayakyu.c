@@ -257,9 +257,9 @@ static MACHINE_START( ksayakyu )
 
 	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x4000);
 
-	state_save_register_global(machine, state->sound_status);
-	state_save_register_global(machine, state->video_ctrl);
-	state_save_register_global(machine, state->flipscreen);
+	state->save_item(NAME(state->sound_status));
+	state->save_item(NAME(state->video_ctrl));
+	state->save_item(NAME(state->flipscreen));
 }
 
 static MACHINE_RESET( ksayakyu )

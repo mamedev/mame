@@ -254,9 +254,9 @@ static MACHINE_START( gotcha )
 
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->banksel);
-	state_save_register_global_array(machine, state->gfxbank);
-	state_save_register_global_array(machine, state->scroll);
+	state->save_item(NAME(state->banksel));
+	state->save_item(NAME(state->gfxbank));
+	state->save_item(NAME(state->scroll));
 }
 
 static MACHINE_RESET( gotcha )

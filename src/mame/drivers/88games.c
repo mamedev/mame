@@ -325,13 +325,13 @@ static MACHINE_START( 88games )
 	state->upd_1 = machine->device("upd1");
 	state->upd_2 = machine->device("upd2");
 
-	state_save_register_global(machine, state->videobank);
-	state_save_register_global(machine, state->zoomreadroms);
-	state_save_register_global(machine, state->speech_chip);
-	state_save_register_global_array(machine, state->layer_colorbase);
-	state_save_register_global(machine, state->k88games_priority);
-	state_save_register_global(machine, state->sprite_colorbase);
-	state_save_register_global(machine, state->zoom_colorbase);
+	state->save_item(NAME(state->videobank));
+	state->save_item(NAME(state->zoomreadroms));
+	state->save_item(NAME(state->speech_chip));
+	state->save_item(NAME(state->layer_colorbase));
+	state->save_item(NAME(state->k88games_priority));
+	state->save_item(NAME(state->sprite_colorbase));
+	state->save_item(NAME(state->zoom_colorbase));
 }
 
 static MACHINE_RESET( 88games )

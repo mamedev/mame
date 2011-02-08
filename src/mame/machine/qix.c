@@ -238,8 +238,8 @@ MACHINE_START( qixmcu )
 	qix_state *state = machine->driver_data<qix_state>();
 
 	/* set up save states */
-	state_save_register_global_array(machine, state->_68705_port_in);
-	state_save_register_global(machine, state->coinctrl);
+	state->save_item(NAME(state->_68705_port_in));
+	state->save_item(NAME(state->coinctrl));
 }
 
 

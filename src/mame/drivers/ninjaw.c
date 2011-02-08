@@ -780,9 +780,9 @@ static MACHINE_START( ninjaw )
 	state->_2610_2l = machine->device("2610.2.l");
 	state->_2610_2r = machine->device("2610.2.r");
 
-	state_save_register_global(machine, state->cpua_ctrl);
-	state_save_register_global(machine, state->banknum);
-	state_save_register_global_array(machine, state->pandata);
+	state->save_item(NAME(state->cpua_ctrl));
+	state->save_item(NAME(state->banknum));
+	state->save_item(NAME(state->pandata));
 	machine->state().register_postload(ninjaw_postload, NULL);
 }
 

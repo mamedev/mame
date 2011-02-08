@@ -527,7 +527,7 @@ static MACHINE_START( esd16 )
 	state->audio_cpu = machine->device("audiocpu");
 	state->eeprom = machine->device("eeprom");
 
-	state_save_register_global(machine, state->tilemap0_color);
+	state->save_item(NAME(state->tilemap0_color));
 }
 
 static MACHINE_RESET( esd16 )

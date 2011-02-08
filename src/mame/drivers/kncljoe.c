@@ -254,11 +254,11 @@ static MACHINE_START( kncljoe )
 
 	state->soundcpu = machine->device("soundcpu");
 
-	state_save_register_global(machine, state->port1);
-	state_save_register_global(machine, state->port2);
-	state_save_register_global(machine, state->tile_bank);
-	state_save_register_global(machine, state->sprite_bank);
-	state_save_register_global(machine, state->flipscreen);
+	state->save_item(NAME(state->port1));
+	state->save_item(NAME(state->port2));
+	state->save_item(NAME(state->tile_bank));
+	state->save_item(NAME(state->sprite_bank));
+	state->save_item(NAME(state->flipscreen));
 }
 
 static MACHINE_RESET( kncljoe )

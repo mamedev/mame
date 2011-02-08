@@ -132,7 +132,7 @@ VIDEO_START( bnj )
 	bitmap_format format = machine->primary_screen->format();
 	state->background_bitmap = auto_bitmap_alloc(machine, 2 * width, height, format);
 
-	state_save_register_global_bitmap(machine, state->background_bitmap);
+	state->save_item(NAME(*state->background_bitmap));
 
 	VIDEO_START_CALL(btime);
 }

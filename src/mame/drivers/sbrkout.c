@@ -91,9 +91,9 @@ static MACHINE_START( sbrkout )
 	state->scanline_timer = machine->scheduler().timer_alloc(FUNC(scanline_callback));
 	state->pot_timer = machine->scheduler().timer_alloc(FUNC(pot_trigger_callback));
 
-	state_save_register_global(machine, state->sync2_value);
-	state_save_register_global_array(machine, state->pot_mask);
-	state_save_register_global_array(machine, state->pot_trigger);
+	state->save_item(NAME(state->sync2_value));
+	state->save_item(NAME(state->pot_mask));
+	state->save_item(NAME(state->pot_trigger));
 }
 
 

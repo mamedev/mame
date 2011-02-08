@@ -430,8 +430,8 @@ static SOUND_START( mario )
 	    memory_configure_bank(machine, "bank1", 1, 1, machine->region("audiocpu")->base() + 0x1000, 0x800);
 	}
 
-    state_save_register_global(machine, state->last);
-	state_save_register_global(machine, state->portT);
+    state->save_item(NAME(state->last));
+	state->save_item(NAME(state->portT));
 }
 
 static SOUND_RESET( mario )

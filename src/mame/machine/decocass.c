@@ -1298,33 +1298,33 @@ WRITE8_HANDLER( decocass_de0091_w )
 void decocass_machine_state_save_init( running_machine *machine )
 {
 	decocass_state *state = machine->driver_data<decocass_state>();
-	state_save_register_global(machine, state->firsttime);
-	state_save_register_global(machine, state->decocass_reset);
-	state_save_register_global(machine, state->i8041_p1);
-	state_save_register_global(machine, state->i8041_p2);
-	state_save_register_global(machine, state->de0091_enable);
-	state_save_register_global(machine, state->type1_inmap);
-	state_save_register_global(machine, state->type1_outmap);
-	state_save_register_global(machine, state->type2_d2_latch);
-	state_save_register_global(machine, state->type2_xx_latch);
-	state_save_register_global(machine, state->type2_promaddr);
-	state_save_register_global(machine, state->type3_ctrs);
-	state_save_register_global(machine, state->type3_d0_latch);
-	state_save_register_global(machine, state->type3_pal_19);
-	state_save_register_global(machine, state->type3_swap);
-	state_save_register_global(machine, state->type4_ctrs);
-	state_save_register_global(machine, state->type4_latch);
-	state_save_register_global(machine, state->type5_latch);
-	state_save_register_global(machine, state->sound_ack);
+	state->save_item(NAME(state->firsttime));
+	state->save_item(NAME(state->decocass_reset));
+	state->save_item(NAME(state->i8041_p1));
+	state->save_item(NAME(state->i8041_p2));
+	state->save_item(NAME(state->de0091_enable));
+	state->save_item(NAME(state->type1_inmap));
+	state->save_item(NAME(state->type1_outmap));
+	state->save_item(NAME(state->type2_d2_latch));
+	state->save_item(NAME(state->type2_xx_latch));
+	state->save_item(NAME(state->type2_promaddr));
+	state->save_item(NAME(state->type3_ctrs));
+	state->save_item(NAME(state->type3_d0_latch));
+	state->save_item(NAME(state->type3_pal_19));
+	state->save_item(NAME(state->type3_swap));
+	state->save_item(NAME(state->type4_ctrs));
+	state->save_item(NAME(state->type4_latch));
+	state->save_item(NAME(state->type5_latch));
+	state->save_item(NAME(state->sound_ack));
 
-	state_save_register_global_array(machine, state->quadrature_decoder);
-	state_save_register_global(machine, state->latch1);
-	state_save_register_global(machine, state->audio_nmi_enabled);
-	state_save_register_global(machine, state->audio_nmi_state);
-	state_save_register_global(machine, state->i8041_p1_write_latch);
-	state_save_register_global(machine, state->i8041_p2_write_latch);
-	state_save_register_global(machine, state->i8041_p1_read_latch);
-	state_save_register_global(machine, state->i8041_p2_read_latch);
+	state->save_item(NAME(state->quadrature_decoder));
+	state->save_item(NAME(state->latch1));
+	state->save_item(NAME(state->audio_nmi_enabled));
+	state->save_item(NAME(state->audio_nmi_state));
+	state->save_item(NAME(state->i8041_p1_write_latch));
+	state->save_item(NAME(state->i8041_p2_write_latch));
+	state->save_item(NAME(state->i8041_p1_read_latch));
+	state->save_item(NAME(state->i8041_p2_read_latch));
 }
 
 /***************************************************************************

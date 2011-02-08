@@ -10,8 +10,8 @@ VIDEO_START( taitoz )
 	state->road_palbank = 3;
 	state->sci_spriteframe = 0;
 
-	state_save_register_global(machine, state->road_palbank);
-	state_save_register_global(machine, state->sci_spriteframe);
+	state->save_item(NAME(state->road_palbank));
+	state->save_item(NAME(state->sci_spriteframe));
 }
 
 /********************************************************

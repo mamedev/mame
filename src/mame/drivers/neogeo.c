@@ -1081,26 +1081,26 @@ static MACHINE_START( neogeo )
 	state->upd4990a = machine->device("upd4990a");
 
 	/* register state save */
-	state_save_register_global(machine, state->display_position_interrupt_control);
-	state_save_register_global(machine, state->display_counter);
-	state_save_register_global(machine, state->vblank_interrupt_pending);
-	state_save_register_global(machine, state->display_position_interrupt_pending);
-	state_save_register_global(machine, state->irq3_pending);
-	state_save_register_global(machine, state->audio_result);
-	state_save_register_global(machine, state->controller_select);
-	state_save_register_global(machine, state->main_cpu_bank_address);
-	state_save_register_global(machine, state->main_cpu_vector_table_source);
-	state_save_register_global_array(machine, state->audio_cpu_banks);
-	state_save_register_global(machine, state->audio_cpu_rom_source);
-	state_save_register_global(machine, state->audio_cpu_rom_source_last);
-	state_save_register_global(machine, state->save_ram_unlocked);
+	state->save_item(NAME(state->display_position_interrupt_control));
+	state->save_item(NAME(state->display_counter));
+	state->save_item(NAME(state->vblank_interrupt_pending));
+	state->save_item(NAME(state->display_position_interrupt_pending));
+	state->save_item(NAME(state->irq3_pending));
+	state->save_item(NAME(state->audio_result));
+	state->save_item(NAME(state->controller_select));
+	state->save_item(NAME(state->main_cpu_bank_address));
+	state->save_item(NAME(state->main_cpu_vector_table_source));
+	state->save_item(NAME(state->audio_cpu_banks));
+	state->save_item(NAME(state->audio_cpu_rom_source));
+	state->save_item(NAME(state->audio_cpu_rom_source_last));
+	state->save_item(NAME(state->save_ram_unlocked));
 	state_save_register_global_pointer(machine, memcard_data, 0x800);
-	state_save_register_global(machine, state->output_data);
-	state_save_register_global(machine, state->output_latch);
-	state_save_register_global(machine, state->el_value);
-	state_save_register_global(machine, state->led1_value);
-	state_save_register_global(machine, state->led2_value);
-	state_save_register_global(machine, state->recurse);
+	state->save_item(NAME(state->output_data));
+	state->save_item(NAME(state->output_latch));
+	state->save_item(NAME(state->el_value));
+	state->save_item(NAME(state->led1_value));
+	state->save_item(NAME(state->led2_value));
+	state->save_item(NAME(state->recurse));
 
 	machine->state().register_postload(neogeo_postload, NULL);
 }

@@ -72,7 +72,7 @@ static void register_state_save(running_machine *machine)
 {
 	toaplan2_state *state = machine->driver_data<toaplan2_state>();
 
-	state_save_register_global(machine, state->tx_flip);
+	state->save_item(NAME(state->tx_flip));
 }
 
 
@@ -163,7 +163,7 @@ VIDEO_START( batrider )
 
 	/* Create the Text tilemap for this game */
 	state->tx_gfxram16 = auto_alloc_array_clear(machine, UINT16, RAIZING_TX_GFXRAM_SIZE/2);
-	state_save_register_global_pointer(machine, state->tx_gfxram16, RAIZING_TX_GFXRAM_SIZE/2);
+	state->save_pointer(NAME(state->tx_gfxram16), RAIZING_TX_GFXRAM_SIZE/2);
 	gfx_element_set_source(machine->gfx[2], (UINT8 *)state->tx_gfxram16);
 	truxton2_create_tx_tilemap(machine);
 	tilemap_set_scrolldx(state->tx_tilemap, 0x1d4, 0x2a);

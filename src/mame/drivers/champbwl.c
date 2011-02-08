@@ -340,8 +340,8 @@ static MACHINE_START( champbwl )
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
 
-	state_save_register_global(machine, state->screenflip);
-	state_save_register_global_array(machine, state->last_trackball_val);
+	state->save_item(NAME(state->screenflip));
+	state->save_item(NAME(state->last_trackball_val));
 }
 
 static MACHINE_RESET( champbwl )

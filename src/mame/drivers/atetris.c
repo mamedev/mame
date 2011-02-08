@@ -117,8 +117,8 @@ static MACHINE_START( atetris )
 	state->interrupt_timer = machine->scheduler().timer_alloc(FUNC(interrupt_gen));
 
 	/* Set up save state */
-	state_save_register_global(machine, state->current_bank);
-	state_save_register_global(machine, state->nvram_write_enable);
+	state->save_item(NAME(state->current_bank));
+	state->save_item(NAME(state->nvram_write_enable));
 	machine->state().register_postload(atetris_postload, NULL);
 }
 

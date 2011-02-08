@@ -1936,21 +1936,21 @@ static MACHINE_START( dec8 )
 	state->audiocpu = machine->device("audiocpu");
 	state->mcu = machine->device("mcu");
 
-	state_save_register_global(machine, state->latch);
-	state_save_register_global(machine, state->nmi_enable);
-	state_save_register_global(machine, state->i8751_port0);
-	state_save_register_global(machine, state->i8751_port1);
-	state_save_register_global(machine, state->i8751_return);
-	state_save_register_global(machine, state->i8751_value);
-	state_save_register_global(machine, state->coin1);
-	state_save_register_global(machine, state->coin2);
-	state_save_register_global(machine, state->snd);
-	state_save_register_global(machine, state->msm5205next);
-	state_save_register_global(machine, state->toggle);
+	state->save_item(NAME(state->latch));
+	state->save_item(NAME(state->nmi_enable));
+	state->save_item(NAME(state->i8751_port0));
+	state->save_item(NAME(state->i8751_port1));
+	state->save_item(NAME(state->i8751_return));
+	state->save_item(NAME(state->i8751_value));
+	state->save_item(NAME(state->coin1));
+	state->save_item(NAME(state->coin2));
+	state->save_item(NAME(state->snd));
+	state->save_item(NAME(state->msm5205next));
+	state->save_item(NAME(state->toggle));
 
-	state_save_register_global_array(machine, state->scroll2);
-	state_save_register_global_array(machine, state->pf0_control);
-	state_save_register_global_array(machine, state->pf1_control);
+	state->save_item(NAME(state->scroll2));
+	state->save_item(NAME(state->pf0_control));
+	state->save_item(NAME(state->pf1_control));
 }
 
 static MACHINE_RESET( dec8 )

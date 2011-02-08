@@ -135,10 +135,10 @@ static VIDEO_START( mazerbla )
 	state->tmpbitmaps[2] = machine->primary_screen->alloc_compatible_bitmap();
 	state->tmpbitmaps[3] = machine->primary_screen->alloc_compatible_bitmap();
 
-	state_save_register_global_bitmap(machine, state->tmpbitmaps[0]);
-	state_save_register_global_bitmap(machine, state->tmpbitmaps[1]);
-	state_save_register_global_bitmap(machine, state->tmpbitmaps[2]);
-	state_save_register_global_bitmap(machine, state->tmpbitmaps[3]);
+	state->save_item(NAME(*state->tmpbitmaps[0]));
+	state->save_item(NAME(*state->tmpbitmaps[1]));
+	state->save_item(NAME(*state->tmpbitmaps[2]));
+	state->save_item(NAME(*state->tmpbitmaps[3]));
 }
 
 #ifdef UNUSED_DEFINITION
@@ -1405,33 +1405,33 @@ static MACHINE_START( mazerbla )
 	state->maincpu = machine->device("maincpu");
 	state->subcpu = machine->device("sub");
 
-	state_save_register_global_array(machine, state->vcu_video_reg);
-	state_save_register_global(machine, state->vcu_gfx_addr);
-	state_save_register_global(machine, state->vcu_gfx_param_addr);
+	state->save_item(NAME(state->vcu_video_reg));
+	state->save_item(NAME(state->vcu_gfx_addr));
+	state->save_item(NAME(state->vcu_gfx_param_addr));
 
-	state_save_register_global(machine, state->bknd_col);
-	state_save_register_global(machine, state->port02_status);
-	state_save_register_global(machine, state->vbank);
-	state_save_register_global(machine, state->xpos);
-	state_save_register_global(machine, state->ypos);
-	state_save_register_global(machine, state->pix_xsize);
-	state_save_register_global(machine, state->pix_ysize);
-	state_save_register_global(machine, state->color1);
-	state_save_register_global(machine, state->color2);
-	state_save_register_global(machine, state->mode);
-	state_save_register_global(machine, state->plane);
-	state_save_register_global_array(machine, state->lookup_ram);
-	state_save_register_global(machine, state->gfx_rom_bank);
+	state->save_item(NAME(state->bknd_col));
+	state->save_item(NAME(state->port02_status));
+	state->save_item(NAME(state->vbank));
+	state->save_item(NAME(state->xpos));
+	state->save_item(NAME(state->ypos));
+	state->save_item(NAME(state->pix_xsize));
+	state->save_item(NAME(state->pix_ysize));
+	state->save_item(NAME(state->color1));
+	state->save_item(NAME(state->color2));
+	state->save_item(NAME(state->mode));
+	state->save_item(NAME(state->plane));
+	state->save_item(NAME(state->lookup_ram));
+	state->save_item(NAME(state->gfx_rom_bank));
 
-	state_save_register_global_array(machine, state->ls670_0);
-	state_save_register_global_array(machine, state->ls670_1);
+	state->save_item(NAME(state->ls670_0));
+	state->save_item(NAME(state->ls670_1));
 
-	state_save_register_global(machine, state->zpu_int_vector);
+	state->save_item(NAME(state->zpu_int_vector));
 
-	state_save_register_global(machine, state->bcd_7445);
+	state->save_item(NAME(state->bcd_7445));
 
-	state_save_register_global(machine, state->vsb_ls273);
-	state_save_register_global(machine, state->soundlatch);
+	state->save_item(NAME(state->vsb_ls273));
+	state->save_item(NAME(state->soundlatch));
 }
 
 static MACHINE_RESET( mazerbla )

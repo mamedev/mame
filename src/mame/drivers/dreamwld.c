@@ -404,9 +404,9 @@ static MACHINE_START( dreamwld )
 {
 	dreamwld_state *state = machine->driver_data<dreamwld_state>();
 
-	state_save_register_global(machine, state->protindex);
-	state_save_register_global_array(machine, state->tilebank);
-	state_save_register_global_array(machine, state->tilebankold);
+	state->save_item(NAME(state->protindex));
+	state->save_item(NAME(state->tilebank));
+	state->save_item(NAME(state->tilebankold));
 }
 
 static MACHINE_RESET( dreamwld )

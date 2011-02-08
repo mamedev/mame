@@ -2204,8 +2204,8 @@ static MACHINE_START( taitob )
 	state->tc0640fio = machine->device("tc0640fio");
 	state->tc0220ioc = machine->device("tc0220ioc");
 
-	state_save_register_global(machine, state->eep_latch);
-	state_save_register_global(machine, state->coin_word);
+	state->save_item(NAME(state->eep_latch));
+	state->save_item(NAME(state->coin_word));
 }
 
 static MACHINE_RESET( taitob )

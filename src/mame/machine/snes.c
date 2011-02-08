@@ -1895,34 +1895,34 @@ MACHINE_START( snes )
 		state_save_register_item(machine, "snes_dma", NULL, i, state->dma_channel[i].dma_disabled);
 	}
 
-	state_save_register_global(machine, state->htmult);
-	state_save_register_global(machine, state->cgram_address);
-	state_save_register_global(machine, state->vram_read_offset);
-	state_save_register_global(machine, state->read_ophct);
-	state_save_register_global(machine, state->read_opvct);
-	state_save_register_global(machine, state->hblank_offset);
-	state_save_register_global(machine, state->vram_fgr_high);
-	state_save_register_global(machine, state->vram_fgr_increment);
-	state_save_register_global(machine, state->vram_fgr_count);
-	state_save_register_global(machine, state->vram_fgr_mask);
-	state_save_register_global(machine, state->vram_fgr_shift);
-	state_save_register_global(machine, state->vram_read_buffer);
-	state_save_register_global(machine, state->wram_address);
-	state_save_register_global(machine, state->htime);
-	state_save_register_global(machine, state->vtime);
-	state_save_register_global(machine, state->vmadd);
-	state_save_register_global(machine, state->hdmaen);
-	state_save_register_global(machine, state->joy1l);
-	state_save_register_global(machine, state->joy1h);
-	state_save_register_global(machine, state->joy2l);
-	state_save_register_global(machine, state->joy2h);
-	state_save_register_global(machine, state->joy3l);
-	state_save_register_global(machine, state->joy3h);
-	state_save_register_global(machine, state->joy4l);
-	state_save_register_global(machine, state->joy4h);
-	state_save_register_global_array(machine, state->data1);
-	state_save_register_global_array(machine, state->data2);
-	state_save_register_global_array(machine, state->read_idx);
+	state->save_item(NAME(state->htmult));
+	state->save_item(NAME(state->cgram_address));
+	state->save_item(NAME(state->vram_read_offset));
+	state->save_item(NAME(state->read_ophct));
+	state->save_item(NAME(state->read_opvct));
+	state->save_item(NAME(state->hblank_offset));
+	state->save_item(NAME(state->vram_fgr_high));
+	state->save_item(NAME(state->vram_fgr_increment));
+	state->save_item(NAME(state->vram_fgr_count));
+	state->save_item(NAME(state->vram_fgr_mask));
+	state->save_item(NAME(state->vram_fgr_shift));
+	state->save_item(NAME(state->vram_read_buffer));
+	state->save_item(NAME(state->wram_address));
+	state->save_item(NAME(state->htime));
+	state->save_item(NAME(state->vtime));
+	state->save_item(NAME(state->vmadd));
+	state->save_item(NAME(state->hdmaen));
+	state->save_item(NAME(state->joy1l));
+	state->save_item(NAME(state->joy1h));
+	state->save_item(NAME(state->joy2l));
+	state->save_item(NAME(state->joy2h));
+	state->save_item(NAME(state->joy3l));
+	state->save_item(NAME(state->joy3h));
+	state->save_item(NAME(state->joy4l));
+	state->save_item(NAME(state->joy4h));
+	state->save_item(NAME(state->data1));
+	state->save_item(NAME(state->data2));
+	state->save_item(NAME(state->read_idx));
 
 	for (i = 0; i < 2; i++)
 	{

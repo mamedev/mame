@@ -437,13 +437,13 @@ static MACHINE_START( destroyr )
 
 	state->maincpu = machine->device("maincpu");
 
-	state_save_register_global(machine, state->cursor);
-	state_save_register_global(machine, state->wavemod);
-	state_save_register_global(machine, state->attract);
-	state_save_register_global(machine, state->motor_speed);
-	state_save_register_global(machine, state->noise);
-	state_save_register_global_array(machine, state->potmask);
-	state_save_register_global_array(machine, state->potsense);
+	state->save_item(NAME(state->cursor));
+	state->save_item(NAME(state->wavemod));
+	state->save_item(NAME(state->attract));
+	state->save_item(NAME(state->motor_speed));
+	state->save_item(NAME(state->noise));
+	state->save_item(NAME(state->potmask));
+	state->save_item(NAME(state->potsense));
 }
 
 static MACHINE_CONFIG_START( destroyr, destroyr_state )

@@ -209,8 +209,8 @@ static MACHINE_START( skattv )
 	state->duart = machine->device("duart68681");
 	state->hd63484 = machine->device("hd63484");
 
-	state_save_register_global(machine, state->mux_data);
-	state_save_register_global(machine, state->register_active);
+	state->save_item(NAME(state->mux_data));
+	state->save_item(NAME(state->register_active));
 
 	/*
         ACRTC memory:

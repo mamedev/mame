@@ -747,13 +747,13 @@ static MACHINE_START( lwings )
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
 
-	state_save_register_global(machine, state->bg2_image);
-	state_save_register_global_array(machine, state->scroll_x);
-	state_save_register_global_array(machine, state->scroll_y);
-	state_save_register_global_array(machine, state->param);
-	state_save_register_global(machine, state->palette_pen);
-	state_save_register_global(machine, state->soundstate);
-	state_save_register_global(machine, state->adpcm);
+	state->save_item(NAME(state->bg2_image));
+	state->save_item(NAME(state->scroll_x));
+	state->save_item(NAME(state->scroll_y));
+	state->save_item(NAME(state->param));
+	state->save_item(NAME(state->palette_pen));
+	state->save_item(NAME(state->soundstate));
+	state->save_item(NAME(state->adpcm));
 }
 
 static MACHINE_RESET( lwings )

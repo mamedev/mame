@@ -249,7 +249,7 @@ static MACHINE_START( rollerg )
 	state->k051316 = machine->device("k051316");
 	state->k053260 = machine->device("k053260");
 
-	state_save_register_global(machine, state->readzoomroms);
+	state->save_item(NAME(state->readzoomroms));
 }
 
 static MACHINE_RESET( rollerg )

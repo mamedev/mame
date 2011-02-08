@@ -179,7 +179,7 @@ VIDEO_START( mrdo )
 
 	state->flipscreen = 0;
 
-	state_save_register_global(machine, state->flipscreen);
+	state->save_item(NAME(state->flipscreen));
 }
 
 

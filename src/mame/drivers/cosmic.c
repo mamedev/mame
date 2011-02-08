@@ -1027,14 +1027,14 @@ static MACHINE_START( cosmic )
 	state->samples = machine->device("samples");
 	state->dac = machine->device("dac");
 
-	state_save_register_global(machine, state->sound_enabled);
-	state_save_register_global(machine, state->march_select);
-	state_save_register_global(machine, state->gun_die_select);
-	state_save_register_global(machine, state->dive_bomb_b_select);
-	state_save_register_global(machine, state->pixel_clock);
+	state->save_item(NAME(state->sound_enabled));
+	state->save_item(NAME(state->march_select));
+	state->save_item(NAME(state->gun_die_select));
+	state->save_item(NAME(state->dive_bomb_b_select));
+	state->save_item(NAME(state->pixel_clock));
 
-	state_save_register_global(machine, state->background_enable);
-	state_save_register_global_array(machine, state->color_registers);
+	state->save_item(NAME(state->background_enable));
+	state->save_item(NAME(state->color_registers));
 }
 
 static MACHINE_RESET( cosmic )

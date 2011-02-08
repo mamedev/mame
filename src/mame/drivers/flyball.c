@@ -365,13 +365,13 @@ static MACHINE_START( flyball )
 
 	state->maincpu = machine->device("maincpu");
 
-	state_save_register_global(machine, state->pitcher_vert);
-	state_save_register_global(machine, state->pitcher_horz);
-	state_save_register_global(machine, state->pitcher_pic);
-	state_save_register_global(machine, state->ball_vert);
-	state_save_register_global(machine, state->ball_horz);
-	state_save_register_global(machine, state->potmask);
-	state_save_register_global(machine, state->potsense);
+	state->save_item(NAME(state->pitcher_vert));
+	state->save_item(NAME(state->pitcher_horz));
+	state->save_item(NAME(state->pitcher_pic));
+	state->save_item(NAME(state->ball_vert));
+	state->save_item(NAME(state->ball_horz));
+	state->save_item(NAME(state->potmask));
+	state->save_item(NAME(state->potsense));
 }
 
 static MACHINE_RESET( flyball )

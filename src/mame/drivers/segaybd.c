@@ -199,11 +199,11 @@ static MACHINE_START( yboard )
 	state->subx = machine->device("subx");
 	state->suby = machine->device("suby");
 
-	state_save_register_global(machine, state->vblank_irq_state);
-	state_save_register_global(machine, state->timer_irq_state);
-	state_save_register_global(machine, state->irq2_scanline);
-	state_save_register_global_array(machine, state->misc_io_data);
-	state_save_register_global_array(machine, state->analog_data);
+	state->save_item(NAME(state->vblank_irq_state));
+	state->save_item(NAME(state->timer_irq_state));
+	state->save_item(NAME(state->irq2_scanline));
+	state->save_item(NAME(state->misc_io_data));
+	state->save_item(NAME(state->analog_data));
 }
 
 

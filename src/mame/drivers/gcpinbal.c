@@ -396,18 +396,18 @@ static MACHINE_START( gcpinbal )
 {
 	gcpinbal_state *state = machine->driver_data<gcpinbal_state>();
 
-	state_save_register_global_array(machine, state->scrollx);
-	state_save_register_global_array(machine, state->scrolly);
-	state_save_register_global(machine, state->bg0_gfxset);
-	state_save_register_global(machine, state->bg1_gfxset);
-	state_save_register_global(machine, state->msm_start);
-	state_save_register_global(machine, state->msm_end);
-	state_save_register_global(machine, state->msm_bank);
-	state_save_register_global(machine, state->adpcm_start);
-	state_save_register_global(machine, state->adpcm_end);
-	state_save_register_global(machine, state->adpcm_idle);
-	state_save_register_global(machine, state->adpcm_trigger);
-	state_save_register_global(machine, state->adpcm_data);
+	state->save_item(NAME(state->scrollx));
+	state->save_item(NAME(state->scrolly));
+	state->save_item(NAME(state->bg0_gfxset));
+	state->save_item(NAME(state->bg1_gfxset));
+	state->save_item(NAME(state->msm_start));
+	state->save_item(NAME(state->msm_end));
+	state->save_item(NAME(state->msm_bank));
+	state->save_item(NAME(state->adpcm_start));
+	state->save_item(NAME(state->adpcm_end));
+	state->save_item(NAME(state->adpcm_idle));
+	state->save_item(NAME(state->adpcm_trigger));
+	state->save_item(NAME(state->adpcm_data));
 }
 
 static MACHINE_RESET( gcpinbal )

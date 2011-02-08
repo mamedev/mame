@@ -690,10 +690,10 @@ static MACHINE_START( nyny )
 	state->pia2 = machine->device("pia2");
 
 	/* setup for save states */
-	state_save_register_global(machine, state->flipscreen);
-	state_save_register_global(machine, state->star_enable);
-	state_save_register_global(machine, state->star_delay_counter);
-	state_save_register_global(machine, state->star_shift_reg);
+	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->star_enable));
+	state->save_item(NAME(state->star_delay_counter));
+	state->save_item(NAME(state->star_shift_reg));
 }
 
 static MACHINE_RESET( nyny )

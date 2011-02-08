@@ -275,9 +275,9 @@ VIDEO_START( ojankohs )
 	state->colorram = auto_alloc_array(machine, UINT8, 0x1000);
 	state->paletteram = auto_alloc_array(machine, UINT8, 0x800);
 
-	state_save_register_global_pointer(machine, state->videoram, 0x2000);
-	state_save_register_global_pointer(machine, state->colorram, 0x1000);
-	state_save_register_global_pointer(machine, state->paletteram, 0x800);
+	state->save_pointer(NAME(state->videoram), 0x2000);
+	state->save_pointer(NAME(state->colorram), 0x1000);
+	state->save_pointer(NAME(state->paletteram), 0x800);
 }
 
 VIDEO_START( ojankoy )
@@ -289,9 +289,9 @@ VIDEO_START( ojankoy )
 	state->colorram = auto_alloc_array(machine, UINT8, 0x1000);
 	state->paletteram = auto_alloc_array(machine, UINT8, 0x800);
 
-	state_save_register_global_pointer(machine, state->videoram, 0x2000);
-	state_save_register_global_pointer(machine, state->colorram, 0x1000);
-	state_save_register_global_pointer(machine, state->paletteram, 0x800);
+	state->save_pointer(NAME(state->videoram), 0x2000);
+	state->save_pointer(NAME(state->colorram), 0x1000);
+	state->save_pointer(NAME(state->paletteram), 0x800);
 }
 
 VIDEO_START( ojankoc )
@@ -302,9 +302,9 @@ VIDEO_START( ojankoc )
 	state->videoram = auto_alloc_array(machine, UINT8, 0x8000);
 	state->paletteram = auto_alloc_array(machine, UINT8, 0x20);
 
-	state_save_register_global_pointer(machine, state->videoram, 0x8000);
-	state_save_register_global_pointer(machine, state->paletteram, 0x20);
-	state_save_register_global_bitmap(machine, state->tmpbitmap);
+	state->save_pointer(NAME(state->videoram), 0x8000);
+	state->save_pointer(NAME(state->paletteram), 0x20);
+	state->save_item(NAME(*state->tmpbitmap));
 }
 
 

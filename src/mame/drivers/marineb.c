@@ -78,7 +78,7 @@ static MACHINE_START( marineb )
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = NULL;
 
-	state_save_register_global(machine, state->marineb_active_low_flipscreen);
+	state->save_item(NAME(state->marineb_active_low_flipscreen));
 }
 
 static ADDRESS_MAP_START( marineb_map, ADDRESS_SPACE_PROGRAM, 8 )

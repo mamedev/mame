@@ -99,8 +99,8 @@ static VIDEO_START( crgolf )
 	state->videoram_b = auto_alloc_array(machine, UINT8, VIDEORAM_SIZE);
 
 	/* register for save states */
-	state_save_register_global_pointer(machine, state->videoram_a, VIDEORAM_SIZE);
-	state_save_register_global_pointer(machine, state->videoram_b, VIDEORAM_SIZE);
+	state->save_pointer(NAME(state->videoram_a), VIDEORAM_SIZE);
+	state->save_pointer(NAME(state->videoram_b), VIDEORAM_SIZE);
 }
 
 

@@ -584,12 +584,12 @@ static MACHINE_START( docastle )
 	state->maincpu = machine->device<cpu_device>("maincpu");
 	state->slave = machine->device<cpu_device>("slave");
 
-	state_save_register_global(machine, state->adpcm_pos);
-	state_save_register_global(machine, state->adpcm_data);
-	state_save_register_global(machine, state->adpcm_idle);
-	state_save_register_global(machine, state->adpcm_status);
-	state_save_register_global_array(machine, state->buffer0);
-	state_save_register_global_array(machine, state->buffer1);
+	state->save_item(NAME(state->adpcm_pos));
+	state->save_item(NAME(state->adpcm_data));
+	state->save_item(NAME(state->adpcm_idle));
+	state->save_item(NAME(state->adpcm_status));
+	state->save_item(NAME(state->buffer0));
+	state->save_item(NAME(state->buffer1));
 }
 
 static MACHINE_CONFIG_START( docastle, docastle_state )

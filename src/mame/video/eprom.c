@@ -142,8 +142,8 @@ VIDEO_START( eprom )
 	tilemap_set_transparent_pen(state->alpha_tilemap, 0);
 
 	/* save states */
-	state_save_register_global(machine, state->screen_intensity);
-	state_save_register_global(machine, state->video_disable);
+	state->save_item(NAME(state->screen_intensity));
+	state->save_item(NAME(state->video_disable));
 }
 
 
@@ -198,8 +198,8 @@ VIDEO_START( guts )
 	tilemap_set_transparent_pen(state->alpha_tilemap, 0);
 
 	/* save states */
-	state_save_register_global(machine, state->screen_intensity);
-	state_save_register_global(machine, state->video_disable);
+	state->save_item(NAME(state->screen_intensity));
+	state->save_item(NAME(state->video_disable));
 }
 
 

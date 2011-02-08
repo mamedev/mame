@@ -60,8 +60,8 @@ VIDEO_START( xmen6p )
 	state->screen_left  = auto_bitmap_alloc(machine, 64 * 8, 32 * 8, BITMAP_FORMAT_INDEXED16);
 	state->screen_right = auto_bitmap_alloc(machine, 64 * 8, 32 * 8, BITMAP_FORMAT_INDEXED16);
 
-	state_save_register_global_bitmap(machine, state->screen_left);
-	state_save_register_global_bitmap(machine, state->screen_right);
+	state->save_item(NAME(*state->screen_left));
+	state->save_item(NAME(*state->screen_right));
 }
 
 

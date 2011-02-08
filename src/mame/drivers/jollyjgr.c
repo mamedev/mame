@@ -618,11 +618,11 @@ static MACHINE_START( jollyjgr )
 {
 	jollyjgr_state *state = machine->driver_data<jollyjgr_state>();
 
-	state_save_register_global(machine, state->nmi_enable);
-	state_save_register_global(machine, state->flip_x);
-	state_save_register_global(machine, state->flip_y);
-	state_save_register_global(machine, state->bitmap_disable);
-	state_save_register_global(machine, state->tilemap_bank);
+	state->save_item(NAME(state->nmi_enable));
+	state->save_item(NAME(state->flip_x));
+	state->save_item(NAME(state->flip_y));
+	state->save_item(NAME(state->bitmap_disable));
+	state->save_item(NAME(state->tilemap_bank));
 }
 
 static MACHINE_RESET( jollyjgr )

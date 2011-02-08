@@ -468,8 +468,8 @@ static MACHINE_START( blockade )
 {
 	blockade_state *state = machine->driver_data<blockade_state>();
 
-	state_save_register_global(machine, state->coin_latch);
-	state_save_register_global(machine, state->just_been_reset);
+	state->save_item(NAME(state->coin_latch));
+	state->save_item(NAME(state->just_been_reset));
 }
 
 static MACHINE_RESET( blockade )

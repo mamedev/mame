@@ -299,8 +299,8 @@ VIDEO_START( combatsc )
 
 	tilemap_set_scroll_rows(state->textlayer, 32);
 
-	state_save_register_global_pointer(machine, state->spriteram[0], 0x800);
-	state_save_register_global_pointer(machine, state->spriteram[1], 0x800);
+	state->save_pointer(NAME(state->spriteram[0]), 0x800);
+	state->save_pointer(NAME(state->spriteram[1]), 0x800);
 }
 
 VIDEO_START( combatscb )
@@ -321,8 +321,8 @@ VIDEO_START( combatscb )
 	tilemap_set_scroll_rows(state->bg_tilemap[0], 32);
 	tilemap_set_scroll_rows(state->bg_tilemap[1], 32);
 
-	state_save_register_global_pointer(machine, state->spriteram[0], 0x800);
-	state_save_register_global_pointer(machine, state->spriteram[1], 0x800);
+	state->save_pointer(NAME(state->spriteram[0]), 0x800);
+	state->save_pointer(NAME(state->spriteram[1]), 0x800);
 }
 
 /***************************************************************************

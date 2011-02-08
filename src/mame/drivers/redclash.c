@@ -332,13 +332,13 @@ static MACHINE_START( redclash )
 
 	state->maincpu = machine->device("maincpu");
 
-	state_save_register_global(machine, state->star_speed);
-	state_save_register_global(machine, state->gfxbank);
-	state_save_register_global(machine, state->stars_enable);
-	state_save_register_global(machine, state->stars_speed);
-	state_save_register_global(machine, state->stars_state);
-	state_save_register_global(machine, state->stars_offset);
-	state_save_register_global(machine, state->stars_count);
+	state->save_item(NAME(state->star_speed));
+	state->save_item(NAME(state->gfxbank));
+	state->save_item(NAME(state->stars_enable));
+	state->save_item(NAME(state->stars_speed));
+	state->save_item(NAME(state->stars_state));
+	state->save_item(NAME(state->stars_offset));
+	state->save_item(NAME(state->stars_count));
 }
 
 static MACHINE_RESET( redclash )

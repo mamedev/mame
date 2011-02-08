@@ -114,9 +114,9 @@ VIDEO_START( atarisy2 )
 	state->videobank = 0;
 
 	/* save states */
-	state_save_register_global_array(machine, state->playfield_tile_bank);
-	state_save_register_global(machine, state->videobank);
-	state_save_register_global_array(machine, state->vram);
+	state->save_item(NAME(state->playfield_tile_bank));
+	state->save_item(NAME(state->videobank));
+	state->save_item(NAME(state->vram));
 }
 
 

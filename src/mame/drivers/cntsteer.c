@@ -806,24 +806,24 @@ static MACHINE_START( cntsteer )
 	state->audiocpu = machine->device("audiocpu");
 	state->subcpu = machine->device("subcpu");
 
-	state_save_register_global(machine, state->flipscreen);
-	state_save_register_global(machine, state->bg_bank);
-	state_save_register_global(machine, state->scrolly);
-	state_save_register_global(machine, state->scrollx);
-	state_save_register_global(machine, state->scrollx_hi);
-	state_save_register_global(machine, state->scrolly_hi);
-	state_save_register_global(machine, state->rotation_x);
-	state_save_register_global(machine, state->rotation_sign);
+	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->bg_bank));
+	state->save_item(NAME(state->scrolly));
+	state->save_item(NAME(state->scrollx));
+	state->save_item(NAME(state->scrollx_hi));
+	state->save_item(NAME(state->scrolly_hi));
+	state->save_item(NAME(state->rotation_x));
+	state->save_item(NAME(state->rotation_sign));
 
-	state_save_register_global(machine, state->bg_color_bank);
-	state_save_register_global(machine, state->disable_roz);
+	state->save_item(NAME(state->bg_color_bank));
+	state->save_item(NAME(state->disable_roz));
 }
 
 static MACHINE_START( zerotrgt )
 {
 	cntsteer_state *state = machine->driver_data<cntsteer_state>();
 
-	state_save_register_global(machine, state->nmimask);
+	state->save_item(NAME(state->nmimask));
 	MACHINE_START_CALL(cntsteer);
 }
 

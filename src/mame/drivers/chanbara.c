@@ -370,8 +370,8 @@ static MACHINE_START( chanbara )
 
 	state->maincpu = machine->device("maincpu");
 
-	state_save_register_global(machine, state->scroll);
-	state_save_register_global(machine, state->scrollhi);
+	state->save_item(NAME(state->scroll));
+	state->save_item(NAME(state->scrollhi));
 }
 
 static MACHINE_RESET( chanbara )

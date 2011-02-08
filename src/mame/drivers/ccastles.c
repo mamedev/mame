@@ -225,8 +225,8 @@ static MACHINE_START( ccastles )
 	schedule_next_irq(machine, 0);
 
 	/* setup for save states */
-	state_save_register_global(machine, state->irq_state);
-	state_save_register_global_array(machine, state->nvram_store);
+	state->save_item(NAME(state->irq_state));
+	state->save_item(NAME(state->nvram_store));
 }
 
 

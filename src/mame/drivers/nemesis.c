@@ -1652,17 +1652,17 @@ static MACHINE_START( nemesis )
 	state->audiocpu = machine->device<cpu_device>("audiocpu");
 	state->vlm = machine->device("vlm");
 
-	state_save_register_global(machine, state->irq_on);
-	state_save_register_global(machine, state->irq1_on);
-	state_save_register_global(machine, state->irq2_on);
-	state_save_register_global(machine, state->irq4_on);
-	state_save_register_global(machine, state->frame_counter);
-	state_save_register_global(machine, state->gx400_irq1_cnt);
-	state_save_register_global(machine, state->selected_ip);
+	state->save_item(NAME(state->irq_on));
+	state->save_item(NAME(state->irq1_on));
+	state->save_item(NAME(state->irq2_on));
+	state->save_item(NAME(state->irq4_on));
+	state->save_item(NAME(state->frame_counter));
+	state->save_item(NAME(state->gx400_irq1_cnt));
+	state->save_item(NAME(state->selected_ip));
 
-	state_save_register_global(machine, state->tilemap_flip);
-	state_save_register_global(machine, state->flipscreen);
-	state_save_register_global(machine, state->irq_port_last);
+	state->save_item(NAME(state->tilemap_flip));
+	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->irq_port_last));
 }
 
 static MACHINE_RESET( nemesis )

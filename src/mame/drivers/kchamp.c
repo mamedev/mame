@@ -395,8 +395,8 @@ static MACHINE_START( kchamp )
 
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->nmi_enable);
-	state_save_register_global(machine, state->sound_nmi_enable);
+	state->save_item(NAME(state->nmi_enable));
+	state->save_item(NAME(state->sound_nmi_enable));
 }
 
 static MACHINE_START( kchampvs )
@@ -405,9 +405,9 @@ static MACHINE_START( kchampvs )
 
 	MACHINE_START_CALL(kchamp);
 
-	state_save_register_global(machine, state->msm_data);
-	state_save_register_global(machine, state->msm_play_lo_nibble);
-	state_save_register_global(machine, state->counter);
+	state->save_item(NAME(state->msm_data));
+	state->save_item(NAME(state->msm_play_lo_nibble));
+	state->save_item(NAME(state->counter));
 }
 
 static MACHINE_RESET( kchamp )

@@ -367,8 +367,8 @@ static MACHINE_START( epos )
 {
 	epos_state *state = machine->driver_data<epos_state>();
 
-	state_save_register_global(machine, state->palette);
-	state_save_register_global(machine, state->counter);
+	state->save_item(NAME(state->palette));
+	state->save_item(NAME(state->counter));
 }
 
 static MACHINE_RESET( epos )

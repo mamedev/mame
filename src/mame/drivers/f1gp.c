@@ -435,11 +435,11 @@ static MACHINE_START( f1gpb )
 {
 	f1gp_state *state = machine->driver_data<f1gp_state>();
 
-	state_save_register_global(machine, state->pending_command);
-	state_save_register_global(machine, state->roz_bank);
-	state_save_register_global(machine, state->flipscreen);
-	state_save_register_global(machine, state->gfxctrl);
-	state_save_register_global_array(machine, state->scroll);
+	state->save_item(NAME(state->pending_command));
+	state->save_item(NAME(state->roz_bank));
+	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->gfxctrl));
+	state->save_item(NAME(state->scroll));
 }
 
 static MACHINE_START( f1gp )

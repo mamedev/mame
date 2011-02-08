@@ -259,8 +259,8 @@ static MACHINE_START( sprcros2 )
 {
 	sprcros2_state *state = machine->driver_data<sprcros2_state>();
 
-	state_save_register_global(machine, state->m_port7);
-	state_save_register_global(machine, state->s_port3);
+	state->save_item(NAME(state->m_port7));
+	state->save_item(NAME(state->s_port3));
 }
 
 static MACHINE_CONFIG_START( sprcros2, sprcros2_state )

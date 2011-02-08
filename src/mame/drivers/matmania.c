@@ -372,19 +372,19 @@ static MACHINE_START( maniach )
 
 	MACHINE_START_CALL(matmania);
 
-	state_save_register_global(machine, state->port_a_in);
-	state_save_register_global(machine, state->port_a_out);
-	state_save_register_global(machine, state->ddr_a);
-	state_save_register_global(machine, state->port_b_in);
-	state_save_register_global(machine, state->port_b_out);
-	state_save_register_global(machine, state->ddr_b);
-	state_save_register_global(machine, state->port_c_in);
-	state_save_register_global(machine, state->port_c_out);
-	state_save_register_global(machine, state->ddr_c);
-	state_save_register_global(machine, state->mcu_sent);
-	state_save_register_global(machine, state->main_sent);
-	state_save_register_global(machine, state->from_main);
-	state_save_register_global(machine, state->from_mcu);
+	state->save_item(NAME(state->port_a_in));
+	state->save_item(NAME(state->port_a_out));
+	state->save_item(NAME(state->ddr_a));
+	state->save_item(NAME(state->port_b_in));
+	state->save_item(NAME(state->port_b_out));
+	state->save_item(NAME(state->ddr_b));
+	state->save_item(NAME(state->port_c_in));
+	state->save_item(NAME(state->port_c_out));
+	state->save_item(NAME(state->ddr_c));
+	state->save_item(NAME(state->mcu_sent));
+	state->save_item(NAME(state->main_sent));
+	state->save_item(NAME(state->from_main));
+	state->save_item(NAME(state->from_mcu));
 }
 
 static MACHINE_RESET( maniach )

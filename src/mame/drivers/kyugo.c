@@ -454,12 +454,12 @@ static MACHINE_START( kyugo )
 	state->maincpu = machine->device("maincpu");
 	state->subcpu = machine->device("sub");
 
-	state_save_register_global(machine, state->scroll_x_lo);
-	state_save_register_global(machine, state->scroll_x_hi);
-	state_save_register_global(machine, state->scroll_y);
-	state_save_register_global(machine, state->bgpalbank);
-	state_save_register_global(machine, state->fgcolor);
-	state_save_register_global(machine, state->flipscreen);
+	state->save_item(NAME(state->scroll_x_lo));
+	state->save_item(NAME(state->scroll_x_hi));
+	state->save_item(NAME(state->scroll_y));
+	state->save_item(NAME(state->bgpalbank));
+	state->save_item(NAME(state->fgcolor));
+	state->save_item(NAME(state->flipscreen));
 }
 
 static MACHINE_RESET( kyugo )

@@ -165,7 +165,7 @@ static MACHINE_START( jedi )
 	memory_configure_bank(machine, "bank1", 0, 3, machine->region("maincpu")->base() + 0x10000, 0x4000);
 
 	/* set up save state */
-	state_save_register_global(machine, state->nvram_enabled);
+	state->save_item(NAME(state->nvram_enabled));
 }
 
 

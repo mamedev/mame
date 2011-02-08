@@ -334,12 +334,12 @@ static void register_state_save(running_machine *machine)
 {
 	toaplan2_state *state = machine->driver_data<toaplan2_state>();
 
-	state_save_register_global(machine, state->mcu_data);
-	state_save_register_global(machine, state->video_status);
-	state_save_register_global(machine, state->old_p1_paddle_h);
-	state_save_register_global(machine, state->old_p2_paddle_h);
-	state_save_register_global(machine, state->current_bank);
-	state_save_register_global(machine, state->z80_busreq);
+	state->save_item(NAME(state->mcu_data));
+	state->save_item(NAME(state->video_status));
+	state->save_item(NAME(state->old_p1_paddle_h));
+	state->save_item(NAME(state->old_p2_paddle_h));
+	state->save_item(NAME(state->current_bank));
+	state->save_item(NAME(state->z80_busreq));
 }
 
 static DRIVER_INIT( T2_Z80 )		/* init_t2_Z80(); */

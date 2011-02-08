@@ -708,11 +708,11 @@ static MACHINE_START( psikyo4 )
 //  memory_configure_bank(machine, "bank2", 0, 0x2000, machine->region("gfx1")->base(), 0x2000);
 
 	state->sample_offs = 0;
-	state_save_register_global(machine, state->sample_offs);
+	state->save_item(NAME(state->sample_offs));
 #endif
 
-	state_save_register_global(machine, state->oldbrt1);
-	state_save_register_global(machine, state->oldbrt2);
+	state->save_item(NAME(state->oldbrt1));
+	state->save_item(NAME(state->oldbrt2));
 }
 
 static MACHINE_RESET( psikyo4 )

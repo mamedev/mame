@@ -880,8 +880,8 @@ static MACHINE_START( rallyx )
 	state->maincpu = machine->device<cpu_device>("maincpu");
 	state->samples = machine->device("samples");
 
-	state_save_register_global(machine, state->last_bang);
-	state_save_register_global(machine, state->stars_enable);
+	state->save_item(NAME(state->last_bang));
+	state->save_item(NAME(state->stars_enable));
 }
 
 static MACHINE_RESET( rallyx )

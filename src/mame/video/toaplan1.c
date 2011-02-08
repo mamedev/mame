@@ -246,10 +246,10 @@ static void toaplan1_vram_alloc(running_machine *machine)
 	state->pf3_tilevram16 = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_TILEVRAM_SIZE/2);
 	state->pf4_tilevram16 = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_TILEVRAM_SIZE/2);
 
-	state_save_register_global_pointer(machine, state->pf1_tilevram16, TOAPLAN1_TILEVRAM_SIZE/2);
-	state_save_register_global_pointer(machine, state->pf2_tilevram16, TOAPLAN1_TILEVRAM_SIZE/2);
-	state_save_register_global_pointer(machine, state->pf3_tilevram16, TOAPLAN1_TILEVRAM_SIZE/2);
-	state_save_register_global_pointer(machine, state->pf4_tilevram16, TOAPLAN1_TILEVRAM_SIZE/2);
+	state->save_pointer(NAME(state->pf1_tilevram16), TOAPLAN1_TILEVRAM_SIZE/2);
+	state->save_pointer(NAME(state->pf2_tilevram16), TOAPLAN1_TILEVRAM_SIZE/2);
+	state->save_pointer(NAME(state->pf3_tilevram16), TOAPLAN1_TILEVRAM_SIZE/2);
+	state->save_pointer(NAME(state->pf4_tilevram16), TOAPLAN1_TILEVRAM_SIZE/2);
 
 #ifdef MAME_DEBUG
 	state->display_pf1 = 1;
@@ -269,10 +269,10 @@ static void toaplan1_spritevram_alloc(running_machine *machine)
 	state->spritesizeram16 = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_SPRITESIZERAM_SIZE/2);
 	state->buffered_spritesizeram16 = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_SPRITESIZERAM_SIZE/2);
 
-	state_save_register_global_pointer(machine, state->spriteram, TOAPLAN1_SPRITERAM_SIZE/2);
-	state_save_register_global_pointer(machine, state->buffered_spriteram, TOAPLAN1_SPRITERAM_SIZE/2);
-	state_save_register_global_pointer(machine, state->spritesizeram16, TOAPLAN1_SPRITESIZERAM_SIZE/2);
-	state_save_register_global_pointer(machine, state->buffered_spritesizeram16, TOAPLAN1_SPRITESIZERAM_SIZE/2);
+	state->save_pointer(NAME(state->spriteram), TOAPLAN1_SPRITERAM_SIZE/2);
+	state->save_pointer(NAME(state->buffered_spriteram), TOAPLAN1_SPRITERAM_SIZE/2);
+	state->save_pointer(NAME(state->spritesizeram16), TOAPLAN1_SPRITESIZERAM_SIZE/2);
+	state->save_pointer(NAME(state->buffered_spritesizeram16), TOAPLAN1_SPRITESIZERAM_SIZE/2);
 
 	state->spriteram_size = TOAPLAN1_SPRITERAM_SIZE;
 }
@@ -311,29 +311,29 @@ static void register_common(running_machine *machine)
 {
 	toaplan1_state *state = machine->driver_data<toaplan1_state>();
 
-	state_save_register_global(machine, state->scrollx_offs1);
-	state_save_register_global(machine, state->scrollx_offs2);
-	state_save_register_global(machine, state->scrollx_offs3);
-	state_save_register_global(machine, state->scrollx_offs4);
-	state_save_register_global(machine, state->scrolly_offs);
+	state->save_item(NAME(state->scrollx_offs1));
+	state->save_item(NAME(state->scrollx_offs2));
+	state->save_item(NAME(state->scrollx_offs3));
+	state->save_item(NAME(state->scrollx_offs4));
+	state->save_item(NAME(state->scrolly_offs));
 
-	state_save_register_global(machine, state->bcu_flipscreen);
-	state_save_register_global(machine, state->fcu_flipscreen);
-	state_save_register_global(machine, state->reset);
+	state->save_item(NAME(state->bcu_flipscreen));
+	state->save_item(NAME(state->fcu_flipscreen));
+	state->save_item(NAME(state->reset));
 
-	state_save_register_global(machine, state->pf1_scrollx);
-	state_save_register_global(machine, state->pf1_scrolly);
-	state_save_register_global(machine, state->pf2_scrollx);
-	state_save_register_global(machine, state->pf2_scrolly);
-	state_save_register_global(machine, state->pf3_scrollx);
-	state_save_register_global(machine, state->pf3_scrolly);
-	state_save_register_global(machine, state->pf4_scrollx);
-	state_save_register_global(machine, state->pf4_scrolly);
+	state->save_item(NAME(state->pf1_scrollx));
+	state->save_item(NAME(state->pf1_scrolly));
+	state->save_item(NAME(state->pf2_scrollx));
+	state->save_item(NAME(state->pf2_scrolly));
+	state->save_item(NAME(state->pf3_scrollx));
+	state->save_item(NAME(state->pf3_scrolly));
+	state->save_item(NAME(state->pf4_scrollx));
+	state->save_item(NAME(state->pf4_scrolly));
 
-	state_save_register_global(machine, state->tiles_offsetx);
-	state_save_register_global(machine, state->tiles_offsety);
-	state_save_register_global(machine, state->pf_voffs);
-	state_save_register_global(machine, state->spriteram_offs);
+	state->save_item(NAME(state->tiles_offsetx));
+	state->save_item(NAME(state->tiles_offsety));
+	state->save_item(NAME(state->pf_voffs));
+	state->save_item(NAME(state->spriteram_offs));
 }
 
 
@@ -346,7 +346,7 @@ VIDEO_START( rallybik )
 	toaplan1_vram_alloc(machine);
 
 	state->buffered_spriteram = auto_alloc_array_clear(machine, UINT16, state->spriteram_size/2);
-	state_save_register_global_pointer(machine, state->buffered_spriteram, state->spriteram_size/2);
+	state->save_pointer(NAME(state->buffered_spriteram), state->spriteram_size/2);
 
 	state->scrollx_offs1 = 0x00d + 6;
 	state->scrollx_offs2 = 0x00d + 4;

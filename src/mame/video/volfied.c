@@ -14,9 +14,9 @@ VIDEO_START( volfied )
 	state->video_ctrl = 0;
 	state->video_mask = 0;
 
-	state_save_register_global_pointer(machine, state->video_ram, 0x40000);
-	state_save_register_global(machine, state->video_ctrl);
-	state_save_register_global(machine, state->video_mask);
+	state->save_pointer(NAME(state->video_ram), 0x40000);
+	state->save_item(NAME(state->video_ctrl));
+	state->save_item(NAME(state->video_mask));
 }
 
 

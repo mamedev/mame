@@ -346,11 +346,11 @@ static MACHINE_START( pachifev)
     {
         pachifev_state *state = machine->driver_data<pachifev_state>();
 
-        state_save_register_global(machine, state->power);
-        state_save_register_global(machine, state->max_power);
-        state_save_register_global(machine, state->input_power);
-        state_save_register_global(machine, state->previous_power);
-        state_save_register_global(machine, state->cnt);
+        state->save_item(NAME(state->power));
+        state->save_item(NAME(state->max_power));
+        state->save_item(NAME(state->input_power));
+        state->save_item(NAME(state->previous_power));
+        state->save_item(NAME(state->cnt));
     }
 }
 

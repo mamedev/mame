@@ -538,21 +538,21 @@ static READ8_DEVICE_HANDLER(pbillian_ay_port_a_r)
 static void machine_init_common(running_machine *machine)
 {
 	superqix_state *state = machine->driver_data<superqix_state>();
-	state_save_register_global(machine, state->invert_coin_lockout);
-	state_save_register_global(machine, state->from_mcu_pending);
-	state_save_register_global(machine, state->from_z80_pending);
-	state_save_register_global(machine, state->port1);
-	state_save_register_global(machine, state->port2);
-	state_save_register_global(machine, state->port3);
-	state_save_register_global(machine, state->port3_latch);
-	state_save_register_global(machine, state->from_mcu);
-	state_save_register_global(machine, state->from_z80);
-	state_save_register_global(machine, state->portb);
+	state->save_item(NAME(state->invert_coin_lockout));
+	state->save_item(NAME(state->from_mcu_pending));
+	state->save_item(NAME(state->from_z80_pending));
+	state->save_item(NAME(state->port1));
+	state->save_item(NAME(state->port2));
+	state->save_item(NAME(state->port3));
+	state->save_item(NAME(state->port3_latch));
+	state->save_item(NAME(state->from_mcu));
+	state->save_item(NAME(state->from_z80));
+	state->save_item(NAME(state->portb));
 
 	// hotsmash ???
-	state_save_register_global(machine, state->portA_in);
-	state_save_register_global(machine, state->portB_out);
-	state_save_register_global(machine, state->portC);
+	state->save_item(NAME(state->portA_in));
+	state->save_item(NAME(state->portB_out));
+	state->save_item(NAME(state->portC));
 }
 
 static MACHINE_START( superqix )

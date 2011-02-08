@@ -282,8 +282,8 @@ static MACHINE_START( rockrage )
 	state->k007342 = machine->device("k007342");
 	state->k007420 = machine->device("k007420");
 
-	state_save_register_global(machine, state->vreg);
-	state_save_register_global_array(machine, state->layer_colorbase);
+	state->save_item(NAME(state->vreg));
+	state->save_item(NAME(state->layer_colorbase));
 }
 
 static MACHINE_RESET( rockrage )

@@ -43,8 +43,8 @@ static MACHINE_START( batman )
 	batman_state *state = machine->driver_data<batman_state>();
 	atarigen_init(machine);
 
-	state_save_register_global(machine, state->latch_data);
-	state_save_register_global(machine, state->alpha_tile_bank);
+	state->save_item(NAME(state->latch_data));
+	state->save_item(NAME(state->alpha_tile_bank));
 }
 
 

@@ -697,14 +697,14 @@ static MACHINE_START( combatsc )
 
 	memory_configure_bank(machine, "bank1", 0, 10, machine->region("maincpu")->base() + 0x10000, 0x4000);
 
-	state_save_register_global(machine, state->priority);
-	state_save_register_global(machine, state->vreg);
-	state_save_register_global(machine, state->bank_select);
-	state_save_register_global(machine, state->video_circuit);
-	state_save_register_global(machine, state->boost);
-	state_save_register_global_array(machine, state->prot);
-	state_save_register_global_array(machine, state->pos);
-	state_save_register_global_array(machine, state->sign);
+	state->save_item(NAME(state->priority));
+	state->save_item(NAME(state->vreg));
+	state->save_item(NAME(state->bank_select));
+	state->save_item(NAME(state->video_circuit));
+	state->save_item(NAME(state->boost));
+	state->save_item(NAME(state->prot));
+	state->save_item(NAME(state->pos));
+	state->save_item(NAME(state->sign));
 }
 
 

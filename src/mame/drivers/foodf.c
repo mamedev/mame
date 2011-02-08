@@ -140,7 +140,7 @@ static MACHINE_START( foodf )
 {
 	foodf_state *state = machine->driver_data<foodf_state>();
 	atarigen_init(machine);
-	state_save_register_global(machine, state->whichport);
+	state->save_item(NAME(state->whichport));
 }
 
 

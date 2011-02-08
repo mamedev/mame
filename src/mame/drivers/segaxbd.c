@@ -272,13 +272,13 @@ static void xboard_generic_init(running_machine *machine)
 	state->subcpu = machine->device("sub");
 	state->_315_5250_1 = machine->device("5250_main");
 
-	state_save_register_global(machine, state->iochip_force_input);
-	state_save_register_global(machine, state->vblank_irq_state);
-	state_save_register_global(machine, state->timer_irq_state);
-	state_save_register_global(machine, state->gprider_hack);
-	state_save_register_global_array(machine, state->iochip_regs[0]);
-	state_save_register_global_array(machine, state->iochip_regs[1]);
-	state_save_register_global_array(machine, state->adc_reverse);
+	state->save_item(NAME(state->iochip_force_input));
+	state->save_item(NAME(state->vblank_irq_state));
+	state->save_item(NAME(state->timer_irq_state));
+	state->save_item(NAME(state->gprider_hack));
+	state->save_item(NAME(state->iochip_regs[0]));
+	state->save_item(NAME(state->iochip_regs[1]));
+	state->save_item(NAME(state->adc_reverse));
 }
 
 

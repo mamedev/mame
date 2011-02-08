@@ -140,10 +140,10 @@ static void video_start_common(running_machine *machine, tile_get_info_func fg_t
 	tilemap_set_scrolldy(state->fg_tilemap, 0, machine->primary_screen->height() - 256);
 
 	/* register for save states */
-	state_save_register_global(machine, state->bg_enable);
-	state_save_register_global(machine, state->bg_color);
-	state_save_register_global(machine, state->bg_position);
-	state_save_register_global(machine, state->fg_color);
+	state->save_item(NAME(state->bg_enable));
+	state->save_item(NAME(state->bg_color));
+	state->save_item(NAME(state->bg_position));
+	state->save_item(NAME(state->fg_color));
 }
 
 
@@ -167,10 +167,10 @@ VIDEO_START( congo )
 	state->spriteram = auto_alloc_array(machine, UINT8, 0x100);
 
 	/* register for save states */
-	state_save_register_global(machine, state->congo_fg_bank);
-	state_save_register_global(machine, state->congo_color_bank);
-	state_save_register_global_array(machine, state->congo_custom);
-	state_save_register_global_pointer(machine, state->spriteram, 0x100);
+	state->save_item(NAME(state->congo_fg_bank));
+	state->save_item(NAME(state->congo_color_bank));
+	state->save_item(NAME(state->congo_custom));
+	state->save_pointer(NAME(state->spriteram), 0x100);
 
 	video_start_common(machine, congo_get_fg_tile_info);
 }

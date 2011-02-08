@@ -99,8 +99,8 @@ VIDEO_START( quasar )
 	state->collision_background = machine->primary_screen->alloc_compatible_bitmap();
 
 	/* register save */
-	state_save_register_global_bitmap(machine, state->collision_background);
-	state_save_register_global_pointer(machine, state->effectram, 0x400);
+	state->save_item(NAME(*state->collision_background));
+	state->save_pointer(NAME(state->effectram), 0x400);
 }
 
 VIDEO_UPDATE( quasar )

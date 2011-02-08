@@ -317,7 +317,7 @@ static MACHINE_START( m14 )
 
 	state->maincpu = machine->device("maincpu");
 
-	state_save_register_global(machine, state->hop_mux);
+	state->save_item(NAME(state->hop_mux));
 }
 
 static MACHINE_RESET( m14 )

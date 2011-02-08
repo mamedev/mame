@@ -280,7 +280,7 @@ static MACHINE_START( drtomy )
 {
 	drtomy_state *state = machine->driver_data<drtomy_state>();
 
-	state_save_register_global(machine, state->oki_bank);
+	state->save_item(NAME(state->oki_bank));
 }
 
 static MACHINE_RESET( drtomy )

@@ -289,15 +289,15 @@ static MACHINE_START( blktiger )
 	/* configure bankswitching */
 	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x10000, 0x4000);
 
-	state_save_register_global(machine, state->scroll_bank);
-	state_save_register_global(machine, state->screen_layout);
-	state_save_register_global(machine, state->chon);
-	state_save_register_global(machine, state->objon);
-	state_save_register_global(machine, state->bgon);
-	state_save_register_global(machine, state->z80_latch);
-	state_save_register_global(machine, state->i8751_latch);
-	state_save_register_global_array(machine, state->scroll_x);
-	state_save_register_global_array(machine, state->scroll_y);
+	state->save_item(NAME(state->scroll_bank));
+	state->save_item(NAME(state->screen_layout));
+	state->save_item(NAME(state->chon));
+	state->save_item(NAME(state->objon));
+	state->save_item(NAME(state->bgon));
+	state->save_item(NAME(state->z80_latch));
+	state->save_item(NAME(state->i8751_latch));
+	state->save_item(NAME(state->scroll_x));
+	state->save_item(NAME(state->scroll_y));
 }
 
 static MACHINE_RESET( blktiger )

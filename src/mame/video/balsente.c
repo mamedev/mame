@@ -30,8 +30,8 @@ VIDEO_START( balsente )
 	state->sprite_mask = machine->region("gfx1")->bytes() - 1;
 
 	/* register for saving */
-	state_save_register_global_array(machine, state->expanded_videoram);
-	state_save_register_global(machine, state->palettebank_vis);
+	state->save_item(NAME(state->expanded_videoram));
+	state->save_item(NAME(state->palettebank_vis));
 }
 
 

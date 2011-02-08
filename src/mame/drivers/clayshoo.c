@@ -171,8 +171,8 @@ static MACHINE_START( clayshoo )
 	create_analog_timers(machine);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->input_port_select);
-	state_save_register_global(machine, state->analog_port_val);
+	state->save_item(NAME(state->input_port_select));
+	state->save_item(NAME(state->analog_port_val));
 }
 
 

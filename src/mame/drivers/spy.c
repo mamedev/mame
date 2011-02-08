@@ -523,12 +523,12 @@ static MACHINE_START( spy )
 	state->k007232_1 = machine->device("k007232_1");
 	state->k007232_2 = machine->device("k007232_2");
 
-	state_save_register_global(machine, state->rambank);
-	state_save_register_global(machine, state->pmcbank);
-	state_save_register_global(machine, state->video_enable);
-	state_save_register_global(machine, state->old_3f90);
+	state->save_item(NAME(state->rambank));
+	state->save_item(NAME(state->pmcbank));
+	state->save_item(NAME(state->video_enable));
+	state->save_item(NAME(state->old_3f90));
 	state_save_register_global_pointer(machine, machine->generic.paletteram.u8, 0x800);
-	state_save_register_global_pointer(machine, state->pmcram, 0x800);
+	state->save_pointer(NAME(state->pmcram), 0x800);
 }
 
 static MACHINE_RESET( spy )

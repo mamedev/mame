@@ -322,9 +322,9 @@ static MACHINE_START( meijinsn )
 {
 	meijinsn_state *state = machine->driver_data<meijinsn_state>();
 
-	state_save_register_global(machine, state->deposits1);
-	state_save_register_global(machine, state->deposits2);
-	state_save_register_global(machine, state->credits);
+	state->save_item(NAME(state->deposits1));
+	state->save_item(NAME(state->deposits2));
+	state->save_item(NAME(state->credits));
 }
 
 static MACHINE_RESET( meijinsn )

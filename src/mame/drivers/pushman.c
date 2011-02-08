@@ -414,10 +414,10 @@ static MACHINE_START( pushman )
 	state->audiocpu = machine->device("audiocpu");
 	state->mcu = machine->device("mcu");
 
-	state_save_register_global_array(machine, state->control);
-	state_save_register_global_array(machine, state->shared_ram);
-	state_save_register_global(machine, state->latch);
-	state_save_register_global(machine, state->new_latch);
+	state->save_item(NAME(state->control));
+	state->save_item(NAME(state->shared_ram));
+	state->save_item(NAME(state->latch));
+	state->save_item(NAME(state->new_latch));
 }
 
 static MACHINE_RESET( pushman )

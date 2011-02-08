@@ -95,7 +95,7 @@ VIDEO_START( blueprnt )
 	tilemap_set_transparent_pen(state->bg_tilemap, 0);
 	tilemap_set_scroll_cols(state->bg_tilemap, 32);
 
-	state_save_register_global(machine, state->gfx_bank);
+	state->save_item(NAME(state->gfx_bank));
 }
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )

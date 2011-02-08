@@ -388,7 +388,7 @@ static DRIVER_INIT( fireone )
 	state->input_read = fireone_input_r;
 
 	/* register for state saving */
-	state_save_register_global(machine, state->fireone_select);
+	state->save_item(NAME(state->fireone_select));
 }
 
 

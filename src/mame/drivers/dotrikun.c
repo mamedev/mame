@@ -136,7 +136,7 @@ INPUT_PORTS_END
 static MACHINE_START( dotrikun )
 {
 	dotrikun_state *state = machine->driver_data<dotrikun_state>();
-	state_save_register_global(machine, state->color);
+	state->save_item(NAME(state->color));
 }
 
 static MACHINE_RESET( dotrikun )

@@ -118,7 +118,7 @@ VIDEO_START( exerion )
 	state->background_gfx[2] = state->background_gfx[1] + 256 * 256;
 	state->background_gfx[3] = state->background_gfx[2] + 256 * 256;
 
-	state_save_register_global_pointer(machine, state->background_gfx[0], 256 * 256 * 4);
+	state->save_pointer(NAME(state->background_gfx[0]), 256 * 256 * 4);
 
 	/*---------------------------------
      * Decode the background graphics

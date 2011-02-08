@@ -108,8 +108,8 @@ static MACHINE_START( m72 )
 	m72_state *state = machine->driver_data<m72_state>();
 	state->scanline_timer = machine->scheduler().timer_alloc(FUNC(m72_scanline_interrupt));
 
-	state_save_register_global(machine, state->mcu_sample_addr);
-	state_save_register_global(machine, state->mcu_snd_cmd_latch);
+	state->save_item(NAME(state->mcu_sample_addr));
+	state->save_item(NAME(state->mcu_snd_cmd_latch));
 }
 
 static MACHINE_START( kengo )
@@ -117,8 +117,8 @@ static MACHINE_START( kengo )
 	m72_state *state = machine->driver_data<m72_state>();
 	state->scanline_timer = machine->scheduler().timer_alloc(FUNC(kengo_scanline_interrupt));
 
-	state_save_register_global(machine, state->mcu_sample_addr);
-	state_save_register_global(machine, state->mcu_snd_cmd_latch);
+	state->save_item(NAME(state->mcu_sample_addr));
+	state->save_item(NAME(state->mcu_snd_cmd_latch));
 }
 
 static TIMER_CALLBACK( synch_callback )

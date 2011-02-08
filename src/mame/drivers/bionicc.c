@@ -337,9 +337,9 @@ static MACHINE_START( bionicc )
 {
 	bionicc_state *state = machine->driver_data<bionicc_state>();
 
-	state_save_register_global(machine, state->soundcommand);
-	state_save_register_global_array(machine, state->inp);
-	state_save_register_global_array(machine, state->scroll);
+	state->save_item(NAME(state->soundcommand));
+	state->save_item(NAME(state->inp));
+	state->save_item(NAME(state->scroll));
 }
 
 static MACHINE_RESET( bionicc )

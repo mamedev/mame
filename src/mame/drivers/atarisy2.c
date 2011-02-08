@@ -226,12 +226,12 @@ static MACHINE_START( atarisy2 )
 	atarisy2_state *state = machine->driver_data<atarisy2_state>();
 	atarigen_init(machine);
 
-	state_save_register_global(machine, state->interrupt_enable);
-	state_save_register_global(machine, state->which_adc);
-	state_save_register_global(machine, state->p2portwr_state);
-	state_save_register_global(machine, state->p2portrd_state);
+	state->save_item(NAME(state->interrupt_enable));
+	state->save_item(NAME(state->which_adc));
+	state->save_item(NAME(state->p2portwr_state));
+	state->save_item(NAME(state->p2portrd_state));
 	machine->state().register_postload(bankselect_postload, NULL);
-	state_save_register_global(machine, state->sound_reset_state);
+	state->save_item(NAME(state->sound_reset_state));
 }
 
 

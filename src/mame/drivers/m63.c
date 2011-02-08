@@ -679,7 +679,7 @@ static SAMPLES_START( fghtbskt_sh_start )
 	UINT8 *ROM = machine->region("samples")->base();
 
 	state->samplebuf = auto_alloc_array(machine, INT16, len);
-	state_save_register_global_pointer(machine, state->samplebuf, len);
+	state->save_pointer(NAME(state->samplebuf), len);
 
 	for(i = 0; i < len; i++)
 		state->samplebuf[i] = ((INT8)(ROM[i] ^ 0x80)) * 256;
@@ -707,15 +707,15 @@ static MACHINE_START( m63 )
 	state->ay2 = machine->device("ay2");
 	state->samples = machine->device("samples");
 
-	state_save_register_global(machine, state->pal_bank);
-	state_save_register_global(machine, state->fg_flag);
-	state_save_register_global(machine, state->sy_offset);
+	state->save_item(NAME(state->pal_bank));
+	state->save_item(NAME(state->fg_flag));
+	state->save_item(NAME(state->sy_offset));
 
 	/* sound-related */
-	state_save_register_global(machine, state->sound_irq);
-	state_save_register_global(machine, state->sound_status);
-	state_save_register_global(machine, state->p1);
-	state_save_register_global(machine, state->p2);
+	state->save_item(NAME(state->sound_irq));
+	state->save_item(NAME(state->sound_status));
+	state->save_item(NAME(state->p1));
+	state->save_item(NAME(state->p2));
 }
 
 static MACHINE_RESET( m63 )

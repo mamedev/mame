@@ -209,8 +209,8 @@ static MACHINE_START( bogeyman )
 {
 	bogeyman_state *state = machine->driver_data<bogeyman_state>();
 
-	state_save_register_global(machine, state->psg_latch);
-	state_save_register_global(machine, state->last_write);
+	state->save_item(NAME(state->psg_latch));
+	state->save_item(NAME(state->last_write));
 }
 
 static MACHINE_RESET( bogeyman )

@@ -375,9 +375,9 @@ static MACHINE_START( galaxi )
 {
 	galaxi_state *state = machine->driver_data<galaxi_state>();
 
-	state_save_register_global(machine, state->hopper);
-	state_save_register_global(machine, state->ticket);
-	state_save_register_global_array(machine, state->out);
+	state->save_item(NAME(state->hopper));
+	state->save_item(NAME(state->ticket));
+	state->save_item(NAME(state->out));
 }
 
 static MACHINE_RESET( galaxi )

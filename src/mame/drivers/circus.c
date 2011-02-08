@@ -284,9 +284,9 @@ static MACHINE_START( circus )
 	state->samples = machine->device("samples");
 	state->discrete = machine->device("discrete");
 
-	state_save_register_global(machine, state->clown_x);
-	state_save_register_global(machine, state->clown_y);
-	state_save_register_global(machine, state->clown_z);
+	state->save_item(NAME(state->clown_x));
+	state->save_item(NAME(state->clown_y));
+	state->save_item(NAME(state->clown_z));
 }
 
 static MACHINE_RESET( circus )

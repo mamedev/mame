@@ -345,9 +345,9 @@ static MACHINE_START( capbowl )
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->blitter_addr);
-	state_save_register_global(machine, state->last_trackball_val[0]);
-	state_save_register_global(machine, state->last_trackball_val[1]);
+	state->save_item(NAME(state->blitter_addr));
+	state->save_item(NAME(state->last_trackball_val[0]));
+	state->save_item(NAME(state->last_trackball_val[1]));
 }
 
 static MACHINE_RESET( capbowl )

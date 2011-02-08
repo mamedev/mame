@@ -285,7 +285,7 @@ static MACHINE_START( blueprnt )
 
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->dipsw);
+	state->save_item(NAME(state->dipsw));
 }
 
 static MACHINE_RESET( blueprnt )

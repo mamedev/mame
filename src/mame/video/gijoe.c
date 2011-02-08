@@ -67,12 +67,12 @@ VIDEO_START( gijoe )
 
 	state->avac_vrc = 0xffff;
 
-	state_save_register_global(machine, state->avac_vrc);
-	state_save_register_global(machine, state->sprite_colorbase);
-	state_save_register_global_array(machine, state->avac_occupancy);
-	state_save_register_global_array(machine, state->avac_bits);	// these could possibly be re-created at postload k056832 elements
-	state_save_register_global_array(machine, state->layer_colorbase);
-	state_save_register_global_array(machine, state->layer_pri);
+	state->save_item(NAME(state->avac_vrc));
+	state->save_item(NAME(state->sprite_colorbase));
+	state->save_item(NAME(state->avac_occupancy));
+	state->save_item(NAME(state->avac_bits));	// these could possibly be re-created at postload k056832 elements
+	state->save_item(NAME(state->layer_colorbase));
+	state->save_item(NAME(state->layer_pri));
 }
 
 VIDEO_UPDATE( gijoe )

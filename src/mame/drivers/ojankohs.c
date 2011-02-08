@@ -800,16 +800,16 @@ static MACHINE_START( common )
 	state->maincpu = machine->device("maincpu");
 	state->msm = machine->device("msm");
 
-	state_save_register_global(machine, state->gfxreg);
-	state_save_register_global(machine, state->flipscreen);
-	state_save_register_global(machine, state->flipscreen_old);
-	state_save_register_global(machine, state->scrollx);
-	state_save_register_global(machine, state->scrolly);
-	state_save_register_global(machine, state->screen_refresh);
-	state_save_register_global(machine, state->portselect);
-	state_save_register_global(machine, state->adpcm_reset);
-	state_save_register_global(machine, state->adpcm_data);
-	state_save_register_global(machine, state->vclk_left);
+	state->save_item(NAME(state->gfxreg));
+	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->flipscreen_old));
+	state->save_item(NAME(state->scrollx));
+	state->save_item(NAME(state->scrolly));
+	state->save_item(NAME(state->screen_refresh));
+	state->save_item(NAME(state->portselect));
+	state->save_item(NAME(state->adpcm_reset));
+	state->save_item(NAME(state->adpcm_data));
+	state->save_item(NAME(state->vclk_left));
 }
 
 static MACHINE_START( ojankohs )

@@ -343,9 +343,9 @@ static MACHINE_START( quasar )
 	MACHINE_START_CALL(cvs);
 
 	/* register state save */
-	state_save_register_global(machine, state->effectcontrol);
-	state_save_register_global(machine, state->page);
-	state_save_register_global(machine, state->io_page);
+	state->save_item(NAME(state->effectcontrol));
+	state->save_item(NAME(state->page));
+	state->save_item(NAME(state->io_page));
 }
 
 static MACHINE_RESET( quasar )

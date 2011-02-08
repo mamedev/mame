@@ -101,11 +101,11 @@ VIDEO_START( dcheese )
 	state->blitter_timer = machine->scheduler().timer_alloc(FUNC(blitter_scanline_callback));
 
 	/* register for saving */
-	state_save_register_global_array(machine, state->blitter_color);
-	state_save_register_global_array(machine, state->blitter_xparam);
-	state_save_register_global_array(machine, state->blitter_yparam);
-	state_save_register_global_array(machine, state->blitter_vidparam);
-	state_save_register_global_bitmap(machine, state->dstbitmap);
+	state->save_item(NAME(state->blitter_color));
+	state->save_item(NAME(state->blitter_xparam));
+	state->save_item(NAME(state->blitter_yparam));
+	state->save_item(NAME(state->blitter_vidparam));
+	state->save_item(NAME(*state->dstbitmap));
 }
 
 

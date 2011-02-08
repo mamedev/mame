@@ -924,9 +924,9 @@ VIDEO_START( lockon )
 	state->cursor_timer = machine->scheduler().timer_alloc(FUNC(cursor_callback));
 	state->cursor_timer->adjust(machine->primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 
-	state_save_register_global_bitmap(machine, state->back_buffer);
-	state_save_register_global_bitmap(machine, state->front_buffer);
-	state_save_register_global_pointer(machine, state->obj_pal_ram, 2048);
+	state->save_item(NAME(*state->back_buffer));
+	state->save_item(NAME(*state->front_buffer));
+	state->save_pointer(NAME(state->obj_pal_ram), 2048);
 }
 
 VIDEO_UPDATE( lockon )

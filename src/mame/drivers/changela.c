@@ -444,39 +444,39 @@ static MACHINE_START(changela)
 	state->mcu = machine->device("mcu");
 
 	/* video */
-	state_save_register_global(machine, state->slopeROM_bank);
-	state_save_register_global(machine, state->tree_en);
-	state_save_register_global(machine, state->horizon);
-	state_save_register_global(machine, state->mem_dev_selected);
-	state_save_register_global(machine, state->v_count_river);
-	state_save_register_global(machine, state->v_count_tree);
-	state_save_register_global_array(machine, state->tree_on);
+	state->save_item(NAME(state->slopeROM_bank));
+	state->save_item(NAME(state->tree_en));
+	state->save_item(NAME(state->horizon));
+	state->save_item(NAME(state->mem_dev_selected));
+	state->save_item(NAME(state->v_count_river));
+	state->save_item(NAME(state->v_count_tree));
+	state->save_item(NAME(state->tree_on));
 
 	/* mcu */
-	state_save_register_global(machine, state->port_a_in);
-	state_save_register_global(machine, state->port_a_out);
-	state_save_register_global(machine, state->ddr_a);
-	state_save_register_global(machine, state->port_b_out);
-	state_save_register_global(machine, state->ddr_b);
-	state_save_register_global(machine, state->port_c_in);
-	state_save_register_global(machine, state->port_c_out);
-	state_save_register_global(machine, state->ddr_c);
+	state->save_item(NAME(state->port_a_in));
+	state->save_item(NAME(state->port_a_out));
+	state->save_item(NAME(state->ddr_a));
+	state->save_item(NAME(state->port_b_out));
+	state->save_item(NAME(state->ddr_b));
+	state->save_item(NAME(state->port_c_in));
+	state->save_item(NAME(state->port_c_out));
+	state->save_item(NAME(state->ddr_c));
 
-	state_save_register_global(machine, state->mcu_out);
-	state_save_register_global(machine, state->mcu_in);
-	state_save_register_global(machine, state->mcu_pc_1);
-	state_save_register_global(machine, state->mcu_pc_0);
+	state->save_item(NAME(state->mcu_out));
+	state->save_item(NAME(state->mcu_in));
+	state->save_item(NAME(state->mcu_pc_1));
+	state->save_item(NAME(state->mcu_pc_0));
 
 	/* misc */
-	state_save_register_global(machine, state->tree0_col);
-	state_save_register_global(machine, state->tree1_col);
-	state_save_register_global(machine, state->left_bank_col);
-	state_save_register_global(machine, state->right_bank_col);
-	state_save_register_global(machine, state->boat_shore_col);
-	state_save_register_global(machine, state->collision_reset);
-	state_save_register_global(machine, state->tree_collision_reset);
-	state_save_register_global(machine, state->prev_value_31);
-	state_save_register_global(machine, state->dir_31);
+	state->save_item(NAME(state->tree0_col));
+	state->save_item(NAME(state->tree1_col));
+	state->save_item(NAME(state->left_bank_col));
+	state->save_item(NAME(state->right_bank_col));
+	state->save_item(NAME(state->boat_shore_col));
+	state->save_item(NAME(state->collision_reset));
+	state->save_item(NAME(state->tree_collision_reset));
+	state->save_item(NAME(state->prev_value_31));
+	state->save_item(NAME(state->dir_31));
 }
 
 static MACHINE_RESET (changela)

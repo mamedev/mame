@@ -271,14 +271,14 @@ static MACHINE_START( fcombat )
 
 	state->maincpu = machine->device("maincpu");
 
-	state_save_register_global(machine, state->cocktail_flip);
-	state_save_register_global(machine, state->char_palette);
-	state_save_register_global(machine, state->sprite_palette);
-	state_save_register_global(machine, state->char_bank);
-	state_save_register_global(machine, state->fcombat_sh);
-	state_save_register_global(machine, state->fcombat_sv);
-	state_save_register_global(machine, state->tx);
-	state_save_register_global(machine, state->ty);
+	state->save_item(NAME(state->cocktail_flip));
+	state->save_item(NAME(state->char_palette));
+	state->save_item(NAME(state->sprite_palette));
+	state->save_item(NAME(state->char_bank));
+	state->save_item(NAME(state->fcombat_sh));
+	state->save_item(NAME(state->fcombat_sv));
+	state->save_item(NAME(state->tx));
+	state->save_item(NAME(state->ty));
 }
 
 static MACHINE_RESET( fcombat )

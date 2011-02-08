@@ -62,14 +62,14 @@ VIDEO_START( bigevglf )
 	state->tmp_bitmap[1] = machine->primary_screen->alloc_compatible_bitmap();
 	state->tmp_bitmap[2] = machine->primary_screen->alloc_compatible_bitmap();
 	state->tmp_bitmap[3] = machine->primary_screen->alloc_compatible_bitmap();
-	state_save_register_global_bitmap(machine, state->tmp_bitmap[0]);
-	state_save_register_global_bitmap(machine, state->tmp_bitmap[1]);
-	state_save_register_global_bitmap(machine, state->tmp_bitmap[2]);
-	state_save_register_global_bitmap(machine, state->tmp_bitmap[3]);
+	state->save_item(NAME(*state->tmp_bitmap[0]));
+	state->save_item(NAME(*state->tmp_bitmap[1]));
+	state->save_item(NAME(*state->tmp_bitmap[2]));
+	state->save_item(NAME(*state->tmp_bitmap[3]));
 
 	state->vidram = auto_alloc_array(machine, UINT8, 0x100 * 0x100 * 4);
 
-	state_save_register_global_pointer(machine, state->vidram, 0x100 * 0x100 * 4);
+	state->save_pointer(NAME(state->vidram), 0x100 * 0x100 * 4);
 }
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )

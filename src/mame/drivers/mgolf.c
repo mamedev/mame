@@ -305,8 +305,8 @@ static MACHINE_START( mgolf )
 
 	state->maincpu = machine->device("maincpu");
 
-	state_save_register_global(machine, state->prev);
-	state_save_register_global(machine, state->mask);
+	state->save_item(NAME(state->prev));
+	state->save_item(NAME(state->mask));
 }
 
 static MACHINE_RESET( mgolf )

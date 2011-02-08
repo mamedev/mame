@@ -812,9 +812,9 @@ static MACHINE_START( sf )
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->sf_active);
-	state_save_register_global(machine, state->bgscroll);
-	state_save_register_global(machine, state->fgscroll);
+	state->save_item(NAME(state->sf_active));
+	state->save_item(NAME(state->bgscroll));
+	state->save_item(NAME(state->fgscroll));
 }
 
 static MACHINE_RESET( sf )

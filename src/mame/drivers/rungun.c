@@ -374,10 +374,10 @@ static MACHINE_START( rng )
 	state->k054539_1 = machine->device("k054539_1");
 	state->k054539_2 = machine->device("k054539_2");
 
-	state_save_register_global(machine, state->z80_control);
-	state_save_register_global(machine, state->sound_status);
-	state_save_register_global_array(machine, state->sysreg);
-	state_save_register_global_array(machine, state->ttl_vram);
+	state->save_item(NAME(state->z80_control));
+	state->save_item(NAME(state->sound_status));
+	state->save_item(NAME(state->sysreg));
+	state->save_item(NAME(state->ttl_vram));
 }
 
 static MACHINE_RESET( rng )

@@ -303,9 +303,9 @@ static MACHINE_START( suprslam )
 	state->audiocpu = machine->device("audiocpu");
 	state->k053936 = machine->device("k053936");
 
-	state_save_register_global(machine, state->screen_bank);
-	state_save_register_global(machine, state->bg_bank);
-	state_save_register_global(machine, state->pending_command);
+	state->save_item(NAME(state->screen_bank));
+	state->save_item(NAME(state->bg_bank));
+	state->save_item(NAME(state->pending_command));
 }
 
 static MACHINE_RESET( suprslam )

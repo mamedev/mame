@@ -112,7 +112,7 @@ VIDEO_START( prehisle )
 	tilemap_set_transparent_pen(state->fg_tilemap, 15);
 
 	/* register for saving */
-	state_save_register_global(machine, state->invert_controls);
+	state->save_item(NAME(state->invert_controls));
 }
 
 /* sprite layout

@@ -173,10 +173,10 @@ VIDEO_START( chaknpop )
 	state->vram3 = &RAM[0x14000];
 	state->vram4 = &RAM[0x16000];
 
-	state_save_register_global_pointer(machine, state->vram1, 0x2000);
-	state_save_register_global_pointer(machine, state->vram2, 0x2000);
-	state_save_register_global_pointer(machine, state->vram3, 0x2000);
-	state_save_register_global_pointer(machine, state->vram4, 0x2000);
+	state->save_pointer(NAME(state->vram1), 0x2000);
+	state->save_pointer(NAME(state->vram2), 0x2000);
+	state->save_pointer(NAME(state->vram3), 0x2000);
+	state->save_pointer(NAME(state->vram4), 0x2000);
 
 	memory_set_bank(machine, "bank1", 0);
 	tx_tilemap_mark_all_dirty(machine);

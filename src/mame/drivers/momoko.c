@@ -232,16 +232,16 @@ static MACHINE_START( momoko )
 
 	memory_configure_bank(machine, "bank1", 0, 32, &BG_MAP[0x0000], 0x1000);
 
-	state_save_register_global(machine, state->fg_scrollx);
-	state_save_register_global(machine, state->fg_scrolly);
-	state_save_register_global(machine, state->fg_select);
-	state_save_register_global(machine, state->text_scrolly);
-	state_save_register_global(machine, state->text_mode);
-	state_save_register_global(machine, state->bg_select);
-	state_save_register_global(machine, state->bg_priority);
-	state_save_register_global(machine, state->bg_mask);
-	state_save_register_global(machine, state->fg_mask);
-	state_save_register_global(machine, state->flipscreen);
+	state->save_item(NAME(state->fg_scrollx));
+	state->save_item(NAME(state->fg_scrolly));
+	state->save_item(NAME(state->fg_select));
+	state->save_item(NAME(state->text_scrolly));
+	state->save_item(NAME(state->text_mode));
+	state->save_item(NAME(state->bg_select));
+	state->save_item(NAME(state->bg_priority));
+	state->save_item(NAME(state->bg_mask));
+	state->save_item(NAME(state->fg_mask));
+	state->save_item(NAME(state->flipscreen));
 }
 
 static MACHINE_RESET( momoko )

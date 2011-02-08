@@ -1351,10 +1351,10 @@ static MACHINE_START( pgm )
 	state->prot = machine->device<cpu_device>("prot");
 	state->ics = machine->device("ics");
 
-	state_save_register_global(machine, state->cal_val);
-	state_save_register_global(machine, state->cal_mask);
-	state_save_register_global(machine, state->cal_com);
-	state_save_register_global(machine, state->cal_cnt);
+	state->save_item(NAME(state->cal_val));
+	state->save_item(NAME(state->cal_mask));
+	state->save_item(NAME(state->cal_com));
+	state->save_item(NAME(state->cal_cnt));
 }
 
 static MACHINE_RESET( pgm )
@@ -1513,12 +1513,12 @@ static MACHINE_START( cavepgm )
 
 	cavepgm_state *state = machine->driver_data<cavepgm_state>();
 
-	state_save_register_global(machine, state->value0);
-	state_save_register_global(machine, state->value1);
-	state_save_register_global(machine, state->valuekey);
-	state_save_register_global(machine, state->valueresponse);
-	state_save_register_global(machine, state->ddp3internal_slot);
-	state_save_register_global_array(machine, state->ddp3slots);
+	state->save_item(NAME(state->value0));
+	state->save_item(NAME(state->value1));
+	state->save_item(NAME(state->valuekey));
+	state->save_item(NAME(state->valueresponse));
+	state->save_item(NAME(state->ddp3internal_slot));
+	state->save_item(NAME(state->ddp3slots));
 }
 
 static MACHINE_CONFIG_START( cavepgm, cavepgm_state )
@@ -4421,14 +4421,14 @@ static DRIVER_INIT( orlegend )
 	state->asic3_h2 = 0;
 	state->asic3_hold = 0;
 
-	state_save_register_global(machine, state->asic3_reg);
-	state_save_register_global_array(machine, state->asic3_latch);
-	state_save_register_global(machine, state->asic3_x);
-	state_save_register_global(machine, state->asic3_y);
-	state_save_register_global(machine, state->asic3_z);
-	state_save_register_global(machine, state->asic3_h1);
-	state_save_register_global(machine, state->asic3_h2);
-	state_save_register_global(machine, state->asic3_hold);
+	state->save_item(NAME(state->asic3_reg));
+	state->save_item(NAME(state->asic3_latch));
+	state->save_item(NAME(state->asic3_x));
+	state->save_item(NAME(state->asic3_y));
+	state->save_item(NAME(state->asic3_z));
+	state->save_item(NAME(state->asic3_h1));
+	state->save_item(NAME(state->asic3_h2));
+	state->save_item(NAME(state->asic3_hold));
 }
 
 static void drgwld2_common_init(running_machine *machine)
@@ -4500,11 +4500,11 @@ static void kovsh_latch_init( running_machine *machine )
 	state->kovsh_lowlatch_68k_w = 0;
 	state->kovsh_counter = 1;
 
-	state_save_register_global(machine, state->kovsh_highlatch_arm_w);
-	state_save_register_global(machine, state->kovsh_lowlatch_arm_w);
-	state_save_register_global(machine, state->kovsh_highlatch_68k_w);
-	state_save_register_global(machine, state->kovsh_lowlatch_68k_w);
-	state_save_register_global(machine, state->kovsh_counter);
+	state->save_item(NAME(state->kovsh_highlatch_arm_w));
+	state->save_item(NAME(state->kovsh_lowlatch_arm_w));
+	state->save_item(NAME(state->kovsh_highlatch_68k_w));
+	state->save_item(NAME(state->kovsh_lowlatch_68k_w));
+	state->save_item(NAME(state->kovsh_counter));
 }
 
 static DRIVER_INIT( kov )
@@ -4534,14 +4534,14 @@ static DRIVER_INIT( pstar )
 	state->pstar_ram[2] = 0;
 	memset(state->pstars_regs, 0, 16);
 
-	state_save_register_global(machine, state->pstars_key);
-	state_save_register_global_array(machine, state->pstars_int);
-	state_save_register_global_array(machine, state->pstars_regs);
-	state_save_register_global(machine, state->pstars_val);
-	state_save_register_global(machine, state->pstar_e7);
-	state_save_register_global(machine, state->pstar_b1);
-	state_save_register_global(machine, state->pstar_ce);
-	state_save_register_global_array(machine, state->pstar_ram);
+	state->save_item(NAME(state->pstars_key));
+	state->save_item(NAME(state->pstars_int));
+	state->save_item(NAME(state->pstars_regs));
+	state->save_item(NAME(state->pstars_val));
+	state->save_item(NAME(state->pstar_e7));
+	state->save_item(NAME(state->pstar_b1));
+	state->save_item(NAME(state->pstar_ce));
+	state->save_item(NAME(state->pstar_ram));
 
 }
 
@@ -4588,8 +4588,8 @@ static void kov2_latch_init( running_machine *machine )
 	state->kov2_latchdata_68k_w = 0;
 	state->kov2_latchdata_arm_w = 0;
 
-	state_save_register_global(machine, state->kov2_latchdata_68k_w);
-	state_save_register_global(machine, state->kov2_latchdata_arm_w);
+	state->save_item(NAME(state->kov2_latchdata_68k_w));
+	state->save_item(NAME(state->kov2_latchdata_arm_w));
 }
 
 static DRIVER_INIT( kov2 )
@@ -4688,9 +4688,9 @@ static void svg_basic_init(running_machine *machine)
 	state->svg_shareram[1] = auto_alloc_array(machine, UINT32, 0x10000 / 4);
 	state->svg_ram_sel = 0;
 
-	state_save_register_global_pointer(machine, state->svg_shareram[0], 0x10000 / 4);
-	state_save_register_global_pointer(machine, state->svg_shareram[1], 0x10000 / 4);
-	state_save_register_global(machine, state->svg_ram_sel);
+	state->save_pointer(NAME(state->svg_shareram[0]), 0x10000 / 4);
+	state->save_pointer(NAME(state->svg_shareram[1]), 0x10000 / 4);
+	state->save_item(NAME(state->svg_ram_sel));
 }
 
 static DRIVER_INIT( theglad )
@@ -5084,11 +5084,11 @@ static DRIVER_INIT( killbld )
 	state->kb_region_sequence_position = 0;
 	memset(state->kb_regs, 0, 0x10);
 
-	state_save_register_global(machine, state->kb_region_sequence_position);
-	state_save_register_global(machine, state->kb_cmd);
-	state_save_register_global(machine, state->kb_reg);
-	state_save_register_global(machine, state->kb_ptr);
-	state_save_register_global_array(machine, state->kb_regs);
+	state->save_item(NAME(state->kb_region_sequence_position));
+	state->save_item(NAME(state->kb_cmd));
+	state->save_item(NAME(state->kb_reg));
+	state->save_item(NAME(state->kb_ptr));
+	state->save_item(NAME(state->kb_regs));
 }
 
 static MACHINE_RESET( dw3 )
@@ -5290,11 +5290,11 @@ static DRIVER_INIT( puzzli2 )
 	memset(state->asic_params, 0, 256);
 	memset(state->eoregs, 0, 16);
 
-	state_save_register_global(machine, state->asic28_key);
-	state_save_register_global(machine, state->asic28_rcnt);
-	state_save_register_global_array(machine, state->asic28_regs);
-	state_save_register_global_array(machine, state->asic_params);
-	state_save_register_global_array(machine, state->eoregs);
+	state->save_item(NAME(state->asic28_key));
+	state->save_item(NAME(state->asic28_rcnt));
+	state->save_item(NAME(state->asic28_regs));
+	state->save_item(NAME(state->asic_params));
+	state->save_item(NAME(state->eoregs));
 }
 
 static DRIVER_INIT( dw2001 )
@@ -5504,11 +5504,11 @@ static DRIVER_INIT( olds )
 	state->olds_bs = 0;
 	state->olds_cmd3 = 0;
 
-	state_save_register_global(machine, state->kb_cmd);
-	state_save_register_global(machine, state->kb_reg);
-	state_save_register_global(machine, state->kb_ptr);
-	state_save_register_global(machine, state->olds_bs);
-	state_save_register_global(machine, state->olds_cmd3);
+	state->save_item(NAME(state->kb_cmd));
+	state->save_item(NAME(state->kb_reg));
+	state->save_item(NAME(state->kb_ptr));
+	state->save_item(NAME(state->olds_bs));
+	state->save_item(NAME(state->olds_cmd3));
 }
 
 

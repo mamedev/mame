@@ -218,8 +218,8 @@ MACHINE_START( ajax )
 	state->k051960 = machine->device("k051960");
 	state->k051316 = machine->device("k051316");
 
-	state_save_register_global(machine, state->priority);
-	state_save_register_global(machine, state->firq_enable);
+	state->save_item(NAME(state->priority));
+	state->save_item(NAME(state->firq_enable));
 }
 
 MACHINE_RESET( ajax )

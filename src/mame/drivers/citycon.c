@@ -193,7 +193,7 @@ static MACHINE_START( citycon )
 
 	state->maincpu = machine->device("maincpu");
 
-	state_save_register_global(machine, state->bg_image);
+	state->save_item(NAME(state->bg_image));
 }
 
 static MACHINE_RESET( citycon )

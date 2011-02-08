@@ -276,8 +276,8 @@ static MACHINE_START( himesiki )
 
 	state->subcpu = machine->device("sub");
 
-	state_save_register_global_array(machine, state->scrollx);
-	state_save_register_global(machine, state->flipscreen);
+	state->save_item(NAME(state->scrollx));
+	state->save_item(NAME(state->flipscreen));
 }
 
 static MACHINE_RESET( himesiki )

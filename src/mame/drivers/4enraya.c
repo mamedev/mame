@@ -152,8 +152,8 @@ static MACHINE_START( 4enraya )
 {
 	_4enraya_state *state = machine->driver_data<_4enraya_state>();
 
-	state_save_register_global(machine, state->soundlatch);
-	state_save_register_global(machine, state->last_snd_ctrl);
+	state->save_item(NAME(state->soundlatch));
+	state->save_item(NAME(state->last_snd_ctrl));
 }
 
 static MACHINE_RESET( 4enraya )

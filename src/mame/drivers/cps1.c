@@ -9870,7 +9870,7 @@ static DRIVER_INIT( forgottn )
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x800052, 0x800055, 0, 0, forgottn_dial_0_r);
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x80005a, 0x80005d, 0, 0, forgottn_dial_1_r);
 
-	state_save_register_global_array(machine, state->dial);
+	state->save_item(NAME(state->dial));
 
 	state->dial[0] = 0;
 	state->dial[1] = 0;

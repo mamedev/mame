@@ -734,20 +734,20 @@ static MACHINE_START( sraider )
 
 	state->maincpu = machine->device("maincpu");
 
-	state_save_register_global(machine, state->grid_color);
-	state_save_register_global(machine, state->sound_low);
-	state_save_register_global(machine, state->sound_high);
-	state_save_register_global(machine, state->sraider_0x30);
-	state_save_register_global(machine, state->sraider_0x38);
-	state_save_register_global_array(machine, state->weird_value);
+	state->save_item(NAME(state->grid_color));
+	state->save_item(NAME(state->sound_low));
+	state->save_item(NAME(state->sound_high));
+	state->save_item(NAME(state->sraider_0x30));
+	state->save_item(NAME(state->sraider_0x38));
+	state->save_item(NAME(state->weird_value));
 
 	/* for stars */
-	state_save_register_global(machine, state->star_speed);
-	state_save_register_global(machine, state->stars_enable);
-	state_save_register_global(machine, state->stars_speed);
-	state_save_register_global(machine, state->stars_state);
-	state_save_register_global(machine, state->stars_offset);
-	state_save_register_global(machine, state->stars_count);
+	state->save_item(NAME(state->star_speed));
+	state->save_item(NAME(state->stars_enable));
+	state->save_item(NAME(state->stars_speed));
+	state->save_item(NAME(state->stars_state));
+	state->save_item(NAME(state->stars_offset));
+	state->save_item(NAME(state->stars_count));
 }
 
 static MACHINE_RESET( sraider )

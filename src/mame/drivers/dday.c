@@ -226,10 +226,10 @@ static MACHINE_START( dday )
 
 	state->ay1 = machine->device("ay1");
 
-	state_save_register_global(machine, state->control);
-	state_save_register_global(machine, state->sl_enable);
-	state_save_register_global(machine, state->sl_image);
-	state_save_register_global(machine, state->timer_value);
+	state->save_item(NAME(state->control));
+	state->save_item(NAME(state->sl_enable));
+	state->save_item(NAME(state->sl_image));
+	state->save_item(NAME(state->timer_value));
 }
 
 static MACHINE_RESET( dday )

@@ -108,7 +108,7 @@ VIDEO_START( drmicro)
 	drmicro_state *state = machine->driver_data<drmicro_state>();
 
 	state->videoram = auto_alloc_array(machine, UINT8, 0x1000);
-	state_save_register_global_pointer(machine, state->videoram, 0x1000);
+	state->save_pointer(NAME(state->videoram), 0x1000);
 
 	state->bg1 = tilemap_create(machine, get_bg1_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->bg2 = tilemap_create(machine, get_bg2_tile_info, tilemap_scan_rows, 8, 8, 32, 32);

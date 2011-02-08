@@ -150,10 +150,10 @@ VIDEO_START( mario )
 	state->gfx_bank = 0;
 	state->palette_bank = 0;
 	state->gfx_scroll = 0;
-	state_save_register_global(machine, state->gfx_bank);
-	state_save_register_global(machine, state->palette_bank);
-	state_save_register_global(machine, state->gfx_scroll);
-	state_save_register_global(machine, state->flip);
+	state->save_item(NAME(state->gfx_bank));
+	state->save_item(NAME(state->palette_bank));
+	state->save_item(NAME(state->gfx_scroll));
+	state->save_item(NAME(state->flip));
 }
 
 /*

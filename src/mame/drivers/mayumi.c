@@ -355,8 +355,8 @@ static MACHINE_START( mayumi )
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
 	memory_set_bank(machine, "bank1", 0);
 
-	state_save_register_global(machine, state->int_enable);
-	state_save_register_global(machine, state->input_sel);
+	state->save_item(NAME(state->int_enable));
+	state->save_item(NAME(state->input_sel));
 }
 
 static MACHINE_RESET( mayumi )

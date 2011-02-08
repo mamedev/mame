@@ -203,8 +203,8 @@ static MACHINE_START( blockhl )
 	state->k052109 = machine->device("k052109");
 	state->k051960 = machine->device("k051960");
 
-	state_save_register_global(machine, state->palette_selected);
-	state_save_register_global(machine, state->rombank);
+	state->save_item(NAME(state->palette_selected));
+	state->save_item(NAME(state->rombank));
 }
 
 static MACHINE_RESET( blockhl )

@@ -149,7 +149,7 @@ static void video_start_common(running_machine *machine, int pagecount)
 	state_save_register_global(machine, system1_video_mode);
 	state_save_register_global(machine, mix_collide_summary);
 	state_save_register_global(machine, sprite_collide_summary);
-	state_save_register_global_pointer(machine, state->videoram, 0x800 * pagecount);
+	state->save_pointer(NAME(state->videoram), 0x800 * pagecount);
 	state_save_register_global_pointer(machine, mix_collide, 64);
 	state_save_register_global_pointer(machine, sprite_collide, 1024);
 }

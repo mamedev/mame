@@ -609,10 +609,10 @@ static MACHINE_START( macrossp )
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->sndpending);
-	state_save_register_global(machine, state->snd_toggle);
-	state_save_register_global(machine, state->fade_effect);
-	state_save_register_global(machine, state->old_fade);
+	state->save_item(NAME(state->sndpending));
+	state->save_item(NAME(state->snd_toggle));
+	state->save_item(NAME(state->fade_effect));
+	state->save_item(NAME(state->old_fade));
 }
 
 static MACHINE_RESET( macrossp )

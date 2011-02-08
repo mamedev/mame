@@ -599,24 +599,24 @@ static MACHINE_START( marinedt )
 {
 	marinedt_state *state = machine->driver_data<marinedt_state>();
 
-	state_save_register_global(machine, state->obj1_a);
-	state_save_register_global(machine, state->obj1_x);
-	state_save_register_global(machine, state->obj1_y);
-	state_save_register_global(machine, state->obj2_a);
-	state_save_register_global(machine, state->obj2_x);
-	state_save_register_global(machine, state->obj2_y);
-	state_save_register_global(machine, state->pd);
-	state_save_register_global(machine, state->pf);
-	state_save_register_global(machine, state->music);
-	state_save_register_global(machine, state->sound);
-	state_save_register_global(machine, state->coll);
-	state_save_register_global(machine, state->cx);
-	state_save_register_global(machine, state->cyr);
-	state_save_register_global(machine, state->cyq);
-	state_save_register_global(machine, state->collh);
-	state_save_register_global(machine, state->cxh);
-	state_save_register_global(machine, state->cyrh);
-	state_save_register_global(machine, state->cyqh);
+	state->save_item(NAME(state->obj1_a));
+	state->save_item(NAME(state->obj1_x));
+	state->save_item(NAME(state->obj1_y));
+	state->save_item(NAME(state->obj2_a));
+	state->save_item(NAME(state->obj2_x));
+	state->save_item(NAME(state->obj2_y));
+	state->save_item(NAME(state->pd));
+	state->save_item(NAME(state->pf));
+	state->save_item(NAME(state->music));
+	state->save_item(NAME(state->sound));
+	state->save_item(NAME(state->coll));
+	state->save_item(NAME(state->cx));
+	state->save_item(NAME(state->cyr));
+	state->save_item(NAME(state->cyq));
+	state->save_item(NAME(state->collh));
+	state->save_item(NAME(state->cxh));
+	state->save_item(NAME(state->cyrh));
+	state->save_item(NAME(state->cyqh));
 }
 
 static MACHINE_RESET( marinedt )

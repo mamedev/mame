@@ -19,15 +19,15 @@ VIDEO_START( slapshot )
 	state->sprites_disabled = 1;
 	state->sprites_active_area = 0;
 
-	state_save_register_global_array(machine, state->spritebank);
-	state_save_register_global(machine, state->sprites_disabled);
-	state_save_register_global(machine, state->sprites_active_area);
-	state_save_register_global(machine, state->sprites_master_scrollx);
-	state_save_register_global(machine, state->sprites_master_scrolly);
-	state_save_register_global(machine, state->sprites_flipscreen);
-	state_save_register_global(machine, state->prepare_sprites);
-	state_save_register_global_pointer(machine, state->spriteram_delayed, state->spriteram_size / 2);
-	state_save_register_global_pointer(machine, state->spriteram_buffered, state->spriteram_size / 2);
+	state->save_item(NAME(state->spritebank));
+	state->save_item(NAME(state->sprites_disabled));
+	state->save_item(NAME(state->sprites_active_area));
+	state->save_item(NAME(state->sprites_master_scrollx));
+	state->save_item(NAME(state->sprites_master_scrolly));
+	state->save_item(NAME(state->sprites_flipscreen));
+	state->save_item(NAME(state->prepare_sprites));
+	state->save_pointer(NAME(state->spriteram_delayed), state->spriteram_size / 2);
+	state->save_pointer(NAME(state->spriteram_buffered), state->spriteram_size / 2);
 }
 
 /************************************************************

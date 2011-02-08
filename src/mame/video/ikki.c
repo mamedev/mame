@@ -120,7 +120,7 @@ VIDEO_START( ikki )
 {
 	ikki_state *state = machine->driver_data<ikki_state>();
 	state->sprite_bitmap = machine->primary_screen->alloc_compatible_bitmap();
-	state_save_register_global_bitmap(machine, state->sprite_bitmap);
+	state->save_item(NAME(*state->sprite_bitmap));
 }
 
 

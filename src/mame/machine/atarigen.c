@@ -124,45 +124,45 @@ void atarigen_init(running_machine *machine)
 		state->screen_timer[i].atarivc_eof_update_timer = machine->scheduler().timer_alloc(FUNC(atarivc_eof_update), (void *)screen);
 	}
 
-	state_save_register_global(machine, state->scanline_int_state);
-	state_save_register_global(machine, state->sound_int_state);
-	state_save_register_global(machine, state->video_int_state);
+	state->save_item(NAME(state->scanline_int_state));
+	state->save_item(NAME(state->sound_int_state));
+	state->save_item(NAME(state->video_int_state));
 
-	state_save_register_global(machine, state->cpu_to_sound_ready);
-	state_save_register_global(machine, state->sound_to_cpu_ready);
+	state->save_item(NAME(state->cpu_to_sound_ready));
+	state->save_item(NAME(state->sound_to_cpu_ready));
 
-	state_save_register_global(machine, state->atarivc_state.latch1);				/* latch #1 value (-1 means disabled) */
-	state_save_register_global(machine, state->atarivc_state.latch2);				/* latch #2 value (-1 means disabled) */
-	state_save_register_global(machine, state->atarivc_state.rowscroll_enable);		/* true if row-scrolling is enabled */
-	state_save_register_global(machine, state->atarivc_state.palette_bank);			/* which palette bank is enabled */
-	state_save_register_global(machine, state->atarivc_state.pf0_xscroll);			/* playfield 1 xscroll */
-	state_save_register_global(machine, state->atarivc_state.pf0_xscroll_raw);		/* playfield 1 xscroll raw value */
-	state_save_register_global(machine, state->atarivc_state.pf0_yscroll);			/* playfield 1 yscroll */
-	state_save_register_global(machine, state->atarivc_state.pf1_xscroll);			/* playfield 2 xscroll */
-	state_save_register_global(machine, state->atarivc_state.pf1_xscroll_raw);		/* playfield 2 xscroll raw value */
-	state_save_register_global(machine, state->atarivc_state.pf1_yscroll);			/* playfield 2 yscroll */
-	state_save_register_global(machine, state->atarivc_state.mo_xscroll);			/* sprite xscroll */
-	state_save_register_global(machine, state->atarivc_state.mo_yscroll);			/* sprite xscroll */
+	state->save_item(NAME(state->atarivc_state.latch1));				/* latch #1 value (-1 means disabled) */
+	state->save_item(NAME(state->atarivc_state.latch2));				/* latch #2 value (-1 means disabled) */
+	state->save_item(NAME(state->atarivc_state.rowscroll_enable));		/* true if row-scrolling is enabled */
+	state->save_item(NAME(state->atarivc_state.palette_bank));			/* which palette bank is enabled */
+	state->save_item(NAME(state->atarivc_state.pf0_xscroll));			/* playfield 1 xscroll */
+	state->save_item(NAME(state->atarivc_state.pf0_xscroll_raw));		/* playfield 1 xscroll raw value */
+	state->save_item(NAME(state->atarivc_state.pf0_yscroll));			/* playfield 1 yscroll */
+	state->save_item(NAME(state->atarivc_state.pf1_xscroll));			/* playfield 2 xscroll */
+	state->save_item(NAME(state->atarivc_state.pf1_xscroll_raw));		/* playfield 2 xscroll raw value */
+	state->save_item(NAME(state->atarivc_state.pf1_yscroll));			/* playfield 2 yscroll */
+	state->save_item(NAME(state->atarivc_state.mo_xscroll));			/* sprite xscroll */
+	state->save_item(NAME(state->atarivc_state.mo_yscroll));			/* sprite xscroll */
 
-	state_save_register_global(machine, state->eeprom_unlocked);
+	state->save_item(NAME(state->eeprom_unlocked));
 
-	state_save_register_global(machine, state->slapstic_num);
-	state_save_register_global(machine, state->slapstic_bank);
-	state_save_register_global(machine, state->slapstic_last_pc);
-	state_save_register_global(machine, state->slapstic_last_address);
+	state->save_item(NAME(state->slapstic_num));
+	state->save_item(NAME(state->slapstic_bank));
+	state->save_item(NAME(state->slapstic_last_pc));
+	state->save_item(NAME(state->slapstic_last_address));
 
-	state_save_register_global(machine, state->cpu_to_sound);
-	state_save_register_global(machine, state->sound_to_cpu);
-	state_save_register_global(machine, state->timed_int);
-	state_save_register_global(machine, state->ym2151_int);
+	state->save_item(NAME(state->cpu_to_sound));
+	state->save_item(NAME(state->sound_to_cpu));
+	state->save_item(NAME(state->timed_int));
+	state->save_item(NAME(state->ym2151_int));
 
-	state_save_register_global(machine, state->scanlines_per_callback);
+	state->save_item(NAME(state->scanlines_per_callback));
 
-	state_save_register_global(machine, state->actual_vc_latch0);
-	state_save_register_global(machine, state->actual_vc_latch1);
+	state->save_item(NAME(state->actual_vc_latch0));
+	state->save_item(NAME(state->actual_vc_latch1));
 
-	state_save_register_global(machine, state->playfield_latch);
-	state_save_register_global(machine, state->playfield2_latch);
+	state->save_item(NAME(state->playfield_latch));
+	state->save_item(NAME(state->playfield2_latch));
 
 	/* need a postload to reset the state */
 	machine->state().register_postload(slapstic_postload, NULL);

@@ -724,18 +724,18 @@ void opwolf_cchip_init( running_machine *machine )
 
 	state->cchip_ram = auto_alloc_array_clear(machine, UINT8, 0x400 * 8);
 
-	state_save_register_global(machine, state->current_bank);
-	state_save_register_global(machine, state->current_cmd);
-	state_save_register_global(machine, state->cchip_last_7a);
-	state_save_register_global(machine, state->cchip_last_04);
-	state_save_register_global(machine, state->cchip_last_05);
-	state_save_register_global(machine, state->c588);
-	state_save_register_global(machine, state->c589);
-	state_save_register_global(machine, state->c58a);
-	state_save_register_global_array(machine, state->cchip_coins);
-	state_save_register_global_array(machine, state->cchip_coins_for_credit);
-	state_save_register_global_array(machine, state->cchip_credits_for_coin);
-	state_save_register_global_pointer(machine, state->cchip_ram, 0x400 * 8);
+	state->save_item(NAME(state->current_bank));
+	state->save_item(NAME(state->current_cmd));
+	state->save_item(NAME(state->cchip_last_7a));
+	state->save_item(NAME(state->cchip_last_04));
+	state->save_item(NAME(state->cchip_last_05));
+	state->save_item(NAME(state->c588));
+	state->save_item(NAME(state->c589));
+	state->save_item(NAME(state->c58a));
+	state->save_item(NAME(state->cchip_coins));
+	state->save_item(NAME(state->cchip_coins_for_credit));
+	state->save_item(NAME(state->cchip_credits_for_coin));
+	state->save_pointer(NAME(state->cchip_ram), 0x400 * 8);
 
 	state->current_bank = 0;
 	state->current_cmd = 0;

@@ -406,8 +406,8 @@ static MACHINE_START( appoooh )
 
 	state->adpcm = machine->device("msm");
 
-	state_save_register_global(machine, state->adpcm_data);
-	state_save_register_global(machine, state->adpcm_address);
+	state->save_item(NAME(state->adpcm_data));
+	state->save_item(NAME(state->adpcm_address));
 }
 
 

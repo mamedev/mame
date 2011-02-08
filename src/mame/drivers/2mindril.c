@@ -430,8 +430,8 @@ static MACHINE_START( drill )
 
 	state->maincpu = machine->device("maincpu");
 
-	state_save_register_global(machine, state->defender_sensor);
-	state_save_register_global(machine, state->shutter_sensor);
+	state->save_item(NAME(state->defender_sensor));
+	state->save_item(NAME(state->shutter_sensor));
 }
 
 static MACHINE_RESET( drill )

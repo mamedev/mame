@@ -345,10 +345,10 @@ static MACHINE_START( bottom9 )
 	state->k007232_1 = machine->device("k007232_1");
 	state->k007232_2 = machine->device("k007232_2");
 
-	state_save_register_global(machine, state->video_enable);
-	state_save_register_global(machine, state->zoomreadroms);
-	state_save_register_global(machine, state->k052109_selected);
-	state_save_register_global(machine, state->nmienable);
+	state->save_item(NAME(state->video_enable));
+	state->save_item(NAME(state->zoomreadroms));
+	state->save_item(NAME(state->k052109_selected));
+	state->save_item(NAME(state->nmienable));
 }
 
 static MACHINE_RESET( bottom9 )

@@ -348,13 +348,13 @@ static MACHINE_START( oneshot )
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->gun_x_p1);
-	state_save_register_global(machine, state->gun_y_p1);
-	state_save_register_global(machine, state->gun_x_p2);
-	state_save_register_global(machine, state->gun_y_p2);
-	state_save_register_global(machine, state->gun_x_shift);
-	state_save_register_global(machine, state->p1_wobble);
-	state_save_register_global(machine, state->p2_wobble);
+	state->save_item(NAME(state->gun_x_p1));
+	state->save_item(NAME(state->gun_y_p1));
+	state->save_item(NAME(state->gun_x_p2));
+	state->save_item(NAME(state->gun_y_p2));
+	state->save_item(NAME(state->gun_x_shift));
+	state->save_item(NAME(state->p1_wobble));
+	state->save_item(NAME(state->p2_wobble));
 }
 
 static MACHINE_RESET( oneshot )

@@ -1628,9 +1628,9 @@ static DRIVER_INIT( namcos12 )
 	state->m_n_bankoffset = 0;
 	memory_set_bank( machine, "bank1", 0 );
 
-	state_save_register_global( machine, state->m_n_dmaoffset );
-	state_save_register_global( machine, state->m_n_dmabias );
-	state_save_register_global( machine, state->m_n_bankoffset );
+	state->save_item( NAME(state->m_n_dmaoffset) );
+	state->save_item( NAME(state->m_n_dmabias) );
+	state->save_item( NAME(state->m_n_bankoffset) );
 }
 
 static DRIVER_INIT( ptblank2 )

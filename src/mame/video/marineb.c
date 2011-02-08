@@ -72,10 +72,10 @@ VIDEO_START( marineb )
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_scroll_cols(state->bg_tilemap, 32);
 
-	state_save_register_global(machine, state->palette_bank);
-	state_save_register_global(machine, state->column_scroll);
-	state_save_register_global(machine, state->flipscreen_x);
-	state_save_register_global(machine, state->flipscreen_y);
+	state->save_item(NAME(state->palette_bank));
+	state->save_item(NAME(state->column_scroll));
+	state->save_item(NAME(state->flipscreen_x));
+	state->save_item(NAME(state->flipscreen_y));
 }
 
 

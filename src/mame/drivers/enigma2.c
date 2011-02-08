@@ -157,11 +157,11 @@ static MACHINE_START( enigma2 )
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->blink_count);
-	state_save_register_global(machine, state->sound_latch);
-	state_save_register_global(machine, state->last_sound_data);
-	state_save_register_global(machine, state->protection_data);
-	state_save_register_global(machine, state->flip_screen);
+	state->save_item(NAME(state->blink_count));
+	state->save_item(NAME(state->sound_latch));
+	state->save_item(NAME(state->last_sound_data));
+	state->save_item(NAME(state->protection_data));
+	state->save_item(NAME(state->flip_screen));
 }
 
 

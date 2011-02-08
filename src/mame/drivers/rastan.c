@@ -375,11 +375,11 @@ static MACHINE_START( rastan )
 	state->pc080sn = machine->device("pc080sn");
 	state->pc090oj = machine->device("pc090oj");
 
-	state_save_register_global(machine, state->sprite_ctrl);
-	state_save_register_global(machine, state->sprites_flipscreen);
+	state->save_item(NAME(state->sprite_ctrl));
+	state->save_item(NAME(state->sprites_flipscreen));
 
-	state_save_register_global(machine, state->adpcm_pos);
-	state_save_register_global(machine, state->adpcm_data);
+	state->save_item(NAME(state->adpcm_pos));
+	state->save_item(NAME(state->adpcm_data));
 }
 
 static MACHINE_RESET( rastan )

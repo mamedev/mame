@@ -22,7 +22,7 @@ VIDEO_START( rohga )
 {
 	rohga_state *state = machine->driver_data<rohga_state>();
 	state->spriteram = auto_alloc_array(machine, UINT16, 0x800/2);
-	state_save_register_global_pointer(machine, state->spriteram, 0x800/2);
+	state->save_pointer(NAME(state->spriteram), 0x800/2);
 }
 
 /******************************************************************************/

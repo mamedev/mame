@@ -312,10 +312,10 @@ static MACHINE_START( munchmo )
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->palette_bank);
-	state_save_register_global(machine, state->flipscreen);
-	state_save_register_global(machine, state->nmi_enable);
-	state_save_register_global(machine, state->which);
+	state->save_item(NAME(state->palette_bank));
+	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->nmi_enable));
+	state->save_item(NAME(state->which));
 }
 
 static MACHINE_RESET( munchmo )

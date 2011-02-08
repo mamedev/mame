@@ -763,15 +763,15 @@ static MACHINE_START( armedf )
 {
 	armedf_state *state = machine->driver_data<armedf_state>();
 
-	state_save_register_global(machine, state->mcu_mode);
-	state_save_register_global(machine, state->old_mcu_mode);
-	state_save_register_global(machine, state->scroll_msb);
-	state_save_register_global(machine, state->waiting_msb);
-	state_save_register_global(machine, state->vreg);
-	state_save_register_global(machine, state->fg_scrollx);
-	state_save_register_global(machine, state->fg_scrolly);
-	state_save_register_global(machine, state->bg_scrollx);
-	state_save_register_global(machine, state->bg_scrolly);
+	state->save_item(NAME(state->mcu_mode));
+	state->save_item(NAME(state->old_mcu_mode));
+	state->save_item(NAME(state->scroll_msb));
+	state->save_item(NAME(state->waiting_msb));
+	state->save_item(NAME(state->vreg));
+	state->save_item(NAME(state->fg_scrollx));
+	state->save_item(NAME(state->fg_scrolly));
+	state->save_item(NAME(state->bg_scrollx));
+	state->save_item(NAME(state->bg_scrolly));
 }
 
 static MACHINE_RESET( armedf )

@@ -64,13 +64,6 @@ public:
 	dunhuang_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	/* memory pointers */
-	UINT16 *        videoram;
-	UINT16 *        videoram2;
-	UINT8	 *        colorram;
-	UINT8  *        colorram2;
-	UINT8  *        paldata;
-
 	/* video-related */
 	tilemap_t         *tmap,*tmap2;
 	int             written, written2;
@@ -85,6 +78,13 @@ public:
 	/* input-related */
 	UINT8           input;
 	UINT8           hopper;
+
+	/* memory */
+	UINT16         videoram[0x40 * 0x20];
+	UINT16         videoram2[0x40 * 0x8];
+	UINT8	       colorram[0x40 * 0x20];
+	UINT8          colorram2[0x40 * 0x8];
+	UINT8          paldata[3 * 256];
 };
 
 
@@ -117,19 +117,11 @@ static VIDEO_START(dunhuang)
 	tilemap_set_transparent_pen(state->tmap, 0);
 	tilemap_set_transparent_pen(state->tmap2, 0);
 
-	state->videoram = auto_alloc_array(machine, UINT16, 0x40 * 0x20);
-	state->colorram = auto_alloc_array(machine, UINT8, 0x40 * 0x20);
-
-	state->videoram2 = auto_alloc_array(machine, UINT16, 0x40 * 0x8);
-	state->colorram2 = auto_alloc_array(machine, UINT8, 0x40 * 0x8);
-
-	state->paldata  = auto_alloc_array(machine, UINT8, 3 * 256);
-
-	state_save_register_global_pointer(machine, state->videoram, 0x40 * 0x20);
-	state_save_register_global_pointer(machine, state->colorram, 0x40 * 0x20);
-	state_save_register_global_pointer(machine, state->videoram2, 0x40 * 0x8);
-	state_save_register_global_pointer(machine, state->colorram2, 0x40 * 0x8);
-	state_save_register_global_pointer(machine, state->paldata, 3 * 256);
+	state->save_item(NAME(state->videoram));
+	state->save_item(NAME(state->colorram));
+	state->save_item(NAME(state->videoram2));
+	state->save_item(NAME(state->colorram2));
+	state->save_item(NAME(state->paldata));
 }
 
 static VIDEO_UPDATE( dunhuang )
@@ -769,23 +761,23 @@ static MACHINE_START( dunhuang )
 
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x8000);
 
-	state_save_register_global(machine, state->written);
-	state_save_register_global(machine, state->written2);
-	state_save_register_global(machine, state->pos_x);
-	state_save_register_global(machine, state->pos_y);
-	state_save_register_global(machine, state->clear_y);
-	state_save_register_global(machine, state->block_x);
-	state_save_register_global(machine, state->block_y);
-	state_save_register_global(machine, state->block_w);
-	state_save_register_global(machine, state->block_h);
-	state_save_register_global(machine, state->block_addr_hi);
-	state_save_register_global(machine, state->block_addr_lo);
-	state_save_register_global(machine, state->block_dest);
-	state_save_register_global(machine, state->block_c);
-	state_save_register_global(machine, state->layers);
-	state_save_register_global(machine, state->paloffs);
-	state_save_register_global(machine, state->input);
-	state_save_register_global(machine, state->hopper);
+	state->save_item(NAME(state->written));
+	state->save_item(NAME(state->written2));
+	state->save_item(NAME(state->pos_x));
+	state->save_item(NAME(state->pos_y));
+	state->save_item(NAME(state->clear_y));
+	state->save_item(NAME(state->block_x));
+	state->save_item(NAME(state->block_y));
+	state->save_item(NAME(state->block_w));
+	state->save_item(NAME(state->block_h));
+	state->save_item(NAME(state->block_addr_hi));
+	state->save_item(NAME(state->block_addr_lo));
+	state->save_item(NAME(state->block_dest));
+	state->save_item(NAME(state->block_c));
+	state->save_item(NAME(state->layers));
+	state->save_item(NAME(state->paloffs));
+	state->save_item(NAME(state->input));
+	state->save_item(NAME(state->hopper));
 }
 
 static MACHINE_RESET( dunhuang )

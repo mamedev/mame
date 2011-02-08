@@ -520,8 +520,8 @@ static MACHINE_START( fuuki32 )
 
 	state->raster_interrupt_timer = machine->scheduler().timer_alloc(FUNC(raster_interrupt_callback));
 
-	state_save_register_global_array(machine, state->spr_buffered_tilebank);
-	state_save_register_global_array(machine, state->shared_ram);
+	state->save_item(NAME(state->spr_buffered_tilebank));
+	state->save_item(NAME(state->shared_ram));
 }
 
 

@@ -296,7 +296,7 @@ static MACHINE_START( pzletime )
 {
 	pzletime_state *state = machine->driver_data<pzletime_state>();
 
-	state_save_register_global(machine, state->ticket);
+	state->save_item(NAME(state->ticket));
 }
 
 static MACHINE_RESET( pzletime )

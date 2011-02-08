@@ -230,7 +230,7 @@ VIDEO_START( xevious )
 	state->xevious_bs[0] = 0;
 	state->xevious_bs[1] = 0;
 
-	state_save_register_global_array(machine, state->xevious_bs);
+	state->save_item(NAME(state->xevious_bs));
 }
 
 

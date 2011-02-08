@@ -201,9 +201,9 @@ static MACHINE_START( m10 )
 	state->ic8j2 = machine->device("ic8j2");
 	state->samples = machine->device("samples");
 
-	state_save_register_global(machine, state->bottomline);
-	state_save_register_global(machine, state->flip);
-	state_save_register_global(machine, state->last);
+	state->save_item(NAME(state->bottomline));
+	state->save_item(NAME(state->flip));
+	state->save_item(NAME(state->last));
 }
 
 static MACHINE_RESET( m10 )

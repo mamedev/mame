@@ -598,10 +598,10 @@ static MACHINE_START( freekick )
 {
 	freekick_state *state = machine->driver_data<freekick_state>();
 
-	state_save_register_global(machine, state->romaddr);
-	state_save_register_global(machine, state->spinner);
-	state_save_register_global(machine, state->nmi_en);
-	state_save_register_global(machine, state->ff_data);
+	state->save_item(NAME(state->romaddr));
+	state->save_item(NAME(state->spinner));
+	state->save_item(NAME(state->nmi_en));
+	state->save_item(NAME(state->ff_data));
 }
 
 static MACHINE_RESET( freekick )
@@ -625,9 +625,9 @@ static MACHINE_START( oigas )
 {
 	freekick_state *state = machine->driver_data<freekick_state>();
 
-	state_save_register_global(machine, state->inval);
-	state_save_register_global(machine, state->outval);
-	state_save_register_global(machine, state->cnt);
+	state->save_item(NAME(state->inval));
+	state->save_item(NAME(state->outval));
+	state->save_item(NAME(state->cnt));
 
 	MACHINE_START_CALL(freekick);
 }

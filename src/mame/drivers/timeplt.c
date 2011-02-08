@@ -367,7 +367,7 @@ static MACHINE_START( timeplt )
 
 	MACHINE_START_CALL(common);
 
-	state_save_register_global(machine, state->nmi_enable);
+	state->save_item(NAME(state->nmi_enable));
 }
 
 static MACHINE_RESET( timeplt )

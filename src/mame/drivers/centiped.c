@@ -457,9 +457,9 @@ static MACHINE_START( centiped )
 {
 	centiped_state *state = machine->driver_data<centiped_state>();
 
-	state_save_register_global_array(machine, state->oldpos);
-	state_save_register_global_array(machine, state->sign);
-	state_save_register_global(machine, state->dsw_select);
+	state->save_item(NAME(state->oldpos));
+	state->save_item(NAME(state->sign));
+	state->save_item(NAME(state->dsw_select));
 }
 
 

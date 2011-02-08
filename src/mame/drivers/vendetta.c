@@ -470,10 +470,10 @@ static MACHINE_START( vendetta )
 	state->k054000 = machine->device("k054000");
 	state->k053260 = machine->device("k053260");
 
-	state_save_register_global(machine, state->irq_enabled);
-	state_save_register_global(machine, state->sprite_colorbase);
-	state_save_register_global_array(machine, state->layer_colorbase);
-	state_save_register_global_array(machine, state->layerpri);
+	state->save_item(NAME(state->irq_enabled));
+	state->save_item(NAME(state->sprite_colorbase));
+	state->save_item(NAME(state->layer_colorbase));
+	state->save_item(NAME(state->layerpri));
 	state_save_register_global_pointer(machine, machine->generic.paletteram.u8, 0x1000);
 }
 

@@ -592,10 +592,10 @@ static MACHINE_START( ddealer )
 {
 	ddealer_state *state = machine->driver_data<ddealer_state>();
 
-	state_save_register_global(machine, state->respcount);
-	state_save_register_global(machine, state->flipscreen);
-	state_save_register_global(machine, state->input_pressed);
-	state_save_register_global(machine, state->coin_input);
+	state->save_item(NAME(state->respcount));
+	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->input_pressed));
+	state->save_item(NAME(state->coin_input));
 }
 
 static MACHINE_RESET (ddealer)

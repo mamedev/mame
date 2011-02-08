@@ -664,35 +664,35 @@ static MACHINE_START( dblewing )
 	state->audiocpu = machine->device("audiocpu");
 	state->deco16ic = machine->device("deco_custom");
 
-	state_save_register_global(machine, state->_008_data);
-	state_save_register_global(machine, state->_104_data);
-	state_save_register_global(machine, state->_406_data);
-	state_save_register_global(machine, state->_608_data);
-	state_save_register_global(machine, state->_70c_data);
-	state_save_register_global(machine, state->_78a_data);
-	state_save_register_global(machine, state->_088_data);
-	state_save_register_global(machine, state->_58c_data);
-	state_save_register_global(machine, state->_408_data);
-	state_save_register_global(machine, state->_40e_data);
-	state_save_register_global(machine, state->_080_data);
-	state_save_register_global(machine, state->_788_data);
-	state_save_register_global(machine, state->_38e_data);
-	state_save_register_global(machine, state->_580_data);
-	state_save_register_global(machine, state->_60a_data);
-	state_save_register_global(machine, state->_200_data);
-	state_save_register_global(machine, state->_28c_data);
-	state_save_register_global(machine, state->_18a_data);
-	state_save_register_global(machine, state->_280_data);
-	state_save_register_global(machine, state->_384_data);
+	state->save_item(NAME(state->_008_data));
+	state->save_item(NAME(state->_104_data));
+	state->save_item(NAME(state->_406_data));
+	state->save_item(NAME(state->_608_data));
+	state->save_item(NAME(state->_70c_data));
+	state->save_item(NAME(state->_78a_data));
+	state->save_item(NAME(state->_088_data));
+	state->save_item(NAME(state->_58c_data));
+	state->save_item(NAME(state->_408_data));
+	state->save_item(NAME(state->_40e_data));
+	state->save_item(NAME(state->_080_data));
+	state->save_item(NAME(state->_788_data));
+	state->save_item(NAME(state->_38e_data));
+	state->save_item(NAME(state->_580_data));
+	state->save_item(NAME(state->_60a_data));
+	state->save_item(NAME(state->_200_data));
+	state->save_item(NAME(state->_28c_data));
+	state->save_item(NAME(state->_18a_data));
+	state->save_item(NAME(state->_280_data));
+	state->save_item(NAME(state->_384_data));
 
-	state_save_register_global(machine, state->boss_move);
-	state_save_register_global(machine, state->boss_shoot_type);
-	state_save_register_global(machine, state->boss_3_data);
-	state_save_register_global(machine, state->boss_4_data);
-	state_save_register_global(machine, state->boss_5_data);
-	state_save_register_global(machine, state->boss_5sx_data);
-	state_save_register_global(machine, state->boss_6_data);
-	state_save_register_global(machine, state->sound_irq);
+	state->save_item(NAME(state->boss_move));
+	state->save_item(NAME(state->boss_shoot_type));
+	state->save_item(NAME(state->boss_3_data));
+	state->save_item(NAME(state->boss_4_data));
+	state->save_item(NAME(state->boss_5_data));
+	state->save_item(NAME(state->boss_5sx_data));
+	state->save_item(NAME(state->boss_6_data));
+	state->save_item(NAME(state->sound_irq));
 }
 
 static MACHINE_RESET( dblewing )

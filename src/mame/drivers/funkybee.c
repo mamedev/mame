@@ -282,7 +282,7 @@ static MACHINE_START( funkybee )
 {
 	funkybee_state *state = machine->driver_data<funkybee_state>();
 
-	state_save_register_global(machine, state->gfx_bank);
+	state->save_item(NAME(state->gfx_bank));
 }
 
 static MACHINE_RESET( funkybee )

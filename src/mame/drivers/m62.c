@@ -934,8 +934,8 @@ static MACHINE_START( m62 )
 {
 	m62_state *state = machine->driver_data<m62_state>();
 
-	state_save_register_global(machine, state->ldrun2_bankswap);
-	state_save_register_global_array(machine, state->bankcontrol);
+	state->save_item(NAME(state->ldrun2_bankswap));
+	state->save_item(NAME(state->bankcontrol));
 }
 
 static MACHINE_RESET( m62 )

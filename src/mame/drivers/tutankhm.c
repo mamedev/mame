@@ -203,10 +203,10 @@ static MACHINE_START( tutankhm )
 
 	state->maincpu = machine->device<cpu_device>("maincpu");
 
-	state_save_register_global(machine, state->irq_toggle);
-	state_save_register_global(machine, state->irq_enable);
-	state_save_register_global(machine, state->flip_x);
-	state_save_register_global(machine, state->flip_y);
+	state->save_item(NAME(state->irq_toggle));
+	state->save_item(NAME(state->irq_enable));
+	state->save_item(NAME(state->flip_x));
+	state->save_item(NAME(state->flip_y));
 }
 
 static MACHINE_RESET( tutankhm )

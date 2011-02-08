@@ -55,7 +55,7 @@ VIDEO_START( f1gp )
 	state->zoomdata = (UINT16 *)machine->region("gfx4")->base();
 	gfx_element_set_source(machine->gfx[3], (UINT8 *)state->zoomdata);
 
-//  state_save_register_global_pointer(machine, state->zoomdata, machine->region("gfx4")->bytes());
+//  state->save_pointer(NAME(state->zoomdata), machine->region("gfx4")->bytes());
 }
 
 
@@ -71,7 +71,7 @@ VIDEO_START( f1gpb )
 	state->zoomdata = (UINT16 *)machine->region("gfx4")->base();
 	gfx_element_set_source(machine->gfx[3], (UINT8 *)state->zoomdata);
 
-//  state_save_register_global_pointer(machine, state->zoomdata, machine->region("gfx4")->bytes());
+//  state->save_pointer(NAME(state->zoomdata), machine->region("gfx4")->bytes());
 }
 
 VIDEO_START( f1gp2 )

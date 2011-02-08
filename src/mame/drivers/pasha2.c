@@ -328,8 +328,8 @@ static VIDEO_START( pasha2 )
 	state->bitmap0 = auto_alloc_array(machine, UINT16, 0x40000/2);
 	state->bitmap1 = auto_alloc_array(machine, UINT16, 0x40000/2);
 
-	state_save_register_global_pointer(machine, state->bitmap0, 0x40000/2);
-	state_save_register_global_pointer(machine, state->bitmap1, 0x40000/2);
+	state->save_pointer(NAME(state->bitmap0), 0x40000/2);
+	state->save_pointer(NAME(state->bitmap1), 0x40000/2);
 }
 
 static VIDEO_UPDATE( pasha2 )
@@ -385,8 +385,8 @@ static MACHINE_START( pasha2 )
 {
 	pasha2_state *state = machine->driver_data<pasha2_state>();
 
-	state_save_register_global(machine, state->old_bank);
-	state_save_register_global(machine, state->vbuffer);
+	state->save_item(NAME(state->old_bank));
+	state->save_item(NAME(state->vbuffer));
 }
 
 static MACHINE_RESET( pasha2 )

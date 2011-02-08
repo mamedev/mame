@@ -49,13 +49,6 @@ public:
 	discoboy_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	/* memory pointers */
-	UINT8 *  ram_1;
-	UINT8 *  ram_2;
-	UINT8 *  ram_3;
-	UINT8 *  ram_4;
-	UINT8 *  ram_att;
-
 	/* video-related */
 	UINT8    ram_bank;
 	UINT8    gfxbank;
@@ -64,6 +57,13 @@ public:
 
 	/* devices */
 	device_t *audiocpu;
+
+	/* memory */
+	UINT8    ram_1[0x800];
+	UINT8    ram_2[0x800];
+	UINT8    ram_3[0x1000];
+	UINT8    ram_4[0x1000];
+	UINT8    ram_att[0x800];
 };
 
 
@@ -446,10 +446,10 @@ static MACHINE_START( discoboy )
 
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->ram_bank);
-	state_save_register_global(machine, state->port_00);
-	state_save_register_global(machine, state->gfxbank);
-	state_save_register_global(machine, state->adpcm_data);
+	state->save_item(NAME(state->ram_bank));
+	state->save_item(NAME(state->port_00));
+	state->save_item(NAME(state->gfxbank));
+	state->save_item(NAME(state->adpcm_data));
 }
 
 static MACHINE_RESET( discoboy )
@@ -538,24 +538,17 @@ static DRIVER_INIT( discoboy )
 	discoboy_state *state = machine->driver_data<discoboy_state>();
 	UINT8 *ROM = machine->region("maincpu")->base();
 
-	state->ram_1 = auto_alloc_array(machine, UINT8, 0x800);
-	state->ram_2 = auto_alloc_array(machine, UINT8, 0x800);
-	state->ram_att = auto_alloc_array(machine, UINT8, 0x800);
+	memset(state->ram_1, 0, sizeof(state->ram_1));
+	memset(state->ram_2, 0, sizeof(state->ram_2));
+	memset(state->ram_att,0, sizeof(state->ram_att));
+	memset(state->ram_3, 0, sizeof(state->ram_3));
+	memset(state->ram_4, 0, sizeof(state->ram_4));
 
-	state->ram_3 = auto_alloc_array(machine, UINT8, 0x1000);
-	state->ram_4 = auto_alloc_array(machine, UINT8, 0x1000);
-
-	memset(state->ram_1, 0, 0x800);
-	memset(state->ram_2, 0, 0x800);
-	memset(state->ram_att,0, 0x800);
-	memset(state->ram_3, 0, 0x1000);
-	memset(state->ram_4, 0, 0x1000);
-
-	state_save_register_global_pointer(machine, state->ram_1, 0x800);
-	state_save_register_global_pointer(machine, state->ram_2, 0x800);
-	state_save_register_global_pointer(machine, state->ram_att, 0x800);
-	state_save_register_global_pointer(machine, state->ram_3, 0x1000);
-	state_save_register_global_pointer(machine, state->ram_4, 0x1000);
+	state->save_item(NAME(state->ram_1));
+	state->save_item(NAME(state->ram_2));
+	state->save_item(NAME(state->ram_att));
+	state->save_item(NAME(state->ram_3));
+	state->save_item(NAME(state->ram_4));
 
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 	memory_set_bank(machine, "bank1", 0);

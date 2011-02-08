@@ -215,7 +215,7 @@ VIDEO_START( bwing )
 	tilemap_set_transparent_pen(state->fgmap, 0);
 
 	state->srxlat = auto_alloc_array(machine, int, 0x2000);
-	state_save_register_global_pointer(machine, state->srxlat, 0x2000);
+	state->save_pointer(NAME(state->srxlat), 0x2000);
 
 	fill_srxlat(state->srxlat);
 

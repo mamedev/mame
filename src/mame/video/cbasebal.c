@@ -50,8 +50,8 @@ VIDEO_START( cbasebal )
 
 	tilemap_set_transparent_pen(state->fg_tilemap, 3);
 
-	state_save_register_global_pointer(machine, state->textram, 0x1000);
-	state_save_register_global_pointer(machine, state->scrollram, 0x1000);
+	state->save_pointer(NAME(state->textram), 0x1000);
+	state->save_pointer(NAME(state->scrollram), 0x1000);
 }
 
 

@@ -1080,12 +1080,12 @@ static MACHINE_START( mitchell )
 {
 	mitchell_state *state = machine->driver_data<mitchell_state>();
 
-	state_save_register_global(machine, state->sample_buffer);
-	state_save_register_global(machine, state->sample_select);
-	state_save_register_global(machine, state->dial_selected);
-	state_save_register_global(machine, state->keymatrix);
-	state_save_register_global_array(machine, state->dir);
-	state_save_register_global_array(machine, state->dial);
+	state->save_item(NAME(state->sample_buffer));
+	state->save_item(NAME(state->sample_select));
+	state->save_item(NAME(state->dial_selected));
+	state->save_item(NAME(state->keymatrix));
+	state->save_item(NAME(state->dir));
+	state->save_item(NAME(state->dial));
 //  state_save_register_global(machine, init_eeprom_count);
 }
 

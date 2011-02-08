@@ -116,13 +116,13 @@ VIDEO_START( fortyl )
 	tilemap_set_scroll_rows(state->bg_tilemap, 32);
 	tilemap_set_transparent_pen(state->bg_tilemap, 0);
 
-	state_save_register_global(machine, state->flipscreen);
-	state_save_register_global_array(machine, state->pix_color);
-	state_save_register_global_pointer(machine, state->pixram1, 0x4000);
-	state_save_register_global_pointer(machine, state->pixram2, 0x4000);
-	state_save_register_global_bitmap(machine, state->tmp_bitmap1);
-	state_save_register_global_bitmap(machine, state->tmp_bitmap2);
-	state_save_register_global(machine, state->pixram_sel);
+	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->pix_color));
+	state->save_pointer(NAME(state->pixram1), 0x4000);
+	state->save_pointer(NAME(state->pixram2), 0x4000);
+	state->save_item(NAME(*state->tmp_bitmap1));
+	state->save_item(NAME(*state->tmp_bitmap2));
+	state->save_item(NAME(state->pixram_sel));
 	machine->state().register_postload(redraw_pixels, NULL);
 }
 

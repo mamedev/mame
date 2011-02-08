@@ -1014,9 +1014,9 @@ static MACHINE_START( nmg5 )
 	state->maincpu = machine->device("maincpu");
 	state->soundcpu = machine->device("soundcpu");
 
-	state_save_register_global(machine, state->gfx_bank);
-	state_save_register_global(machine, state->priority_reg);
-	state_save_register_global(machine, state->input_data);
+	state->save_item(NAME(state->gfx_bank));
+	state->save_item(NAME(state->priority_reg));
+	state->save_item(NAME(state->input_data));
 }
 
 static MACHINE_RESET( nmg5 )

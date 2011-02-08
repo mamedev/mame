@@ -610,9 +610,9 @@ static MACHINE_START( lethalen )
 	state->k056832 = machine->device("k056832");
 	state->k054000 = machine->device("k054000");
 
-	state_save_register_global(machine, state->cur_control2);
-	state_save_register_global(machine, state->sprite_colorbase);
-	state_save_register_global_array(machine, state->layer_colorbase);
+	state->save_item(NAME(state->cur_control2));
+	state->save_item(NAME(state->sprite_colorbase));
+	state->save_item(NAME(state->layer_colorbase));
 
 	state_save_register_global_pointer(machine, machine->generic.paletteram.u8, 0x3800 + 0x02);
 }

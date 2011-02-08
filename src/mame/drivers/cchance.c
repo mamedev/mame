@@ -186,9 +186,9 @@ static MACHINE_START( cchance )
 	tnzs_state *state = machine->driver_data<tnzs_state>();
 	state->mcu = NULL;
 
-	state_save_register_global(machine, state->screenflip);
-	state_save_register_global(machine, state->hop_io);
-	state_save_register_global(machine, state->bell_io);
+	state->save_item(NAME(state->screenflip));
+	state->save_item(NAME(state->hop_io));
+	state->save_item(NAME(state->bell_io));
 }
 
 static MACHINE_RESET( cchance )

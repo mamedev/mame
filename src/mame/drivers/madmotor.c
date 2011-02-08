@@ -230,7 +230,7 @@ static MACHINE_START( madmotor )
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->flipscreen);
+	state->save_item(NAME(state->flipscreen));
 }
 
 static MACHINE_RESET( madmotor )

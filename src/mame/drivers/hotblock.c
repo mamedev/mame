@@ -134,7 +134,7 @@ static VIDEO_START(hotblock)
 {
 	hotblock_state *state = machine->driver_data<hotblock_state>();
 	state->pal = auto_alloc_array(machine, UINT8, 0x10000);
-	state_save_register_global_pointer(machine, state->pal, 0x10000);
+	state->save_pointer(NAME(state->pal), 0x10000);
 }
 
 static VIDEO_UPDATE(hotblock)

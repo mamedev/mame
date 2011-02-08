@@ -198,9 +198,9 @@ VIDEO_START( atarisy1 )
 	state->next_timer_scanline = -1;
 
 	/* save state */
-	state_save_register_global(machine, state->playfield_tile_bank);
-	state_save_register_global(machine, state->playfield_priority_pens);
-	state_save_register_global(machine, state->next_timer_scanline);
+	state->save_item(NAME(state->playfield_tile_bank));
+	state->save_item(NAME(state->playfield_priority_pens));
+	state->save_item(NAME(state->next_timer_scanline));
 }
 
 

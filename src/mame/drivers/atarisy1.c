@@ -221,9 +221,9 @@ static MACHINE_START( atarisy1 )
 	atarisy1_state *state = machine->driver_data<atarisy1_state>();
 	atarigen_init(machine);
 
-	state_save_register_global(machine, state->joystick_int);
-	state_save_register_global(machine, state->joystick_int_enable);
-	state_save_register_global(machine, state->joystick_value);
+	state->save_item(NAME(state->joystick_int));
+	state->save_item(NAME(state->joystick_int_enable));
+	state->save_item(NAME(state->joystick_value));
 }
 
 

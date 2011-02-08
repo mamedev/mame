@@ -231,9 +231,9 @@ static MACHINE_START( embargo )
 	embargo_state *state = machine->driver_data<embargo_state>();
 
 	/* register for state saving */
-	state_save_register_global(machine, state->dial_enable_1);
-	state_save_register_global(machine, state->dial_enable_2);
-	state_save_register_global(machine, state->input_select);
+	state->save_item(NAME(state->dial_enable_1));
+	state->save_item(NAME(state->dial_enable_2));
+	state->save_item(NAME(state->input_select));
 }
 
 

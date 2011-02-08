@@ -118,9 +118,9 @@ VIDEO_START( polygonet )
 	tilemap_set_transparent_pen(state->roz_tilemap, 0);
 
 	/* save states */
-	state_save_register_global(machine, state->ttl_gfx_index);
-	state_save_register_global_array(machine, state->ttl_vram);
-	state_save_register_global_array(machine, state->roz_vram);
+	state->save_item(NAME(state->ttl_gfx_index));
+	state->save_item(NAME(state->ttl_vram));
+	state->save_item(NAME(state->roz_vram));
 }
 
 VIDEO_UPDATE( polygonet )

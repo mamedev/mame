@@ -1010,12 +1010,6 @@ MACHINE_START( cvs )
 	cvs_state *state = machine->driver_data<cvs_state>();
 
 	/* allocate memory */
-	state->color_ram = auto_alloc_array(machine, UINT8, 0x400);
-	state->palette_ram = auto_alloc_array(machine, UINT8, 0x10);
-	state->character_ram = auto_alloc_array(machine, UINT8, 3 * 0x800);  /* only half is used, but
-                                                    by allocating twice the amount,
-                                                    we can use the same gfx_layout */
-
 	if (machine->gfx[1] != NULL)
 		gfx_element_set_source(machine->gfx[1], state->character_ram);
 
@@ -1032,18 +1026,18 @@ MACHINE_START( cvs )
 	state->s2636_2 = machine->device("s2636_2");
 
 	/* register state save */
-	state_save_register_global_pointer(machine, state->color_ram, 0x400);
-	state_save_register_global_pointer(machine, state->palette_ram, 0x10);
-	state_save_register_global_pointer(machine, state->character_ram, 3 * 0x800);
-	state_save_register_global(machine, state->character_banking_mode);
-	state_save_register_global(machine, state->character_ram_page_start);
-	state_save_register_global(machine, state->speech_rom_bit_address);
-	state_save_register_global(machine, state->cvs_393hz_clock);
-	state_save_register_global(machine, state->collision_register);
-	state_save_register_global(machine, state->total_stars);
-	state_save_register_global(machine, state->stars_on);
-	state_save_register_global(machine, state->scroll_reg);
-	state_save_register_global(machine, state->stars_scroll);
+	state->save_item(NAME(state->color_ram));
+	state->save_item(NAME(state->palette_ram));
+	state->save_item(NAME(state->character_ram));
+	state->save_item(NAME(state->character_banking_mode));
+	state->save_item(NAME(state->character_ram_page_start));
+	state->save_item(NAME(state->speech_rom_bit_address));
+	state->save_item(NAME(state->cvs_393hz_clock));
+	state->save_item(NAME(state->collision_register));
+	state->save_item(NAME(state->total_stars));
+	state->save_item(NAME(state->stars_on));
+	state->save_item(NAME(state->scroll_reg));
+	state->save_item(NAME(state->stars_scroll));
 }
 
 MACHINE_RESET( cvs )

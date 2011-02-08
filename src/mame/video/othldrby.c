@@ -67,8 +67,8 @@ VIDEO_START( othldrby )
 	tilemap_set_transparent_pen(state->bg_tilemap[1], 0);
 	tilemap_set_transparent_pen(state->bg_tilemap[2], 0);
 
-	state_save_register_global_pointer(machine, state->vram, VIDEORAM_SIZE);
-	state_save_register_global_pointer(machine, state->buf_spriteram, 2 * SPRITERAM_SIZE);
+	state->save_pointer(NAME(state->vram), VIDEORAM_SIZE);
+	state->save_pointer(NAME(state->buf_spriteram), 2 * SPRITERAM_SIZE);
 }
 
 

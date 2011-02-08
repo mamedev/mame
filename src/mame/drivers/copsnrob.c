@@ -253,8 +253,8 @@ static MACHINE_START( copsnrob )
 {
 	copsnrob_state *state = machine->driver_data<copsnrob_state>();
 
-	state_save_register_global(machine, state->ic_h3_data);
-	state_save_register_global(machine, state->misc);
+	state->save_item(NAME(state->ic_h3_data));
+	state->save_item(NAME(state->misc));
 }
 
 static MACHINE_RESET( copsnrob )

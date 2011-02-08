@@ -186,12 +186,12 @@ VIDEO_START( cloak )
 
 	set_current_bitmap_videoram_pointer(state);
 
-	state_save_register_global(machine, state->bitmap_videoram_address_x);
-	state_save_register_global(machine, state->bitmap_videoram_address_y);
-	state_save_register_global(machine, state->bitmap_videoram_selected);
-	state_save_register_global_pointer(machine, state->bitmap_videoram1, 256*256);
-	state_save_register_global_pointer(machine, state->bitmap_videoram2, 256*256);
-	state_save_register_global_pointer(machine, state->palette_ram, NUM_PENS);
+	state->save_item(NAME(state->bitmap_videoram_address_x));
+	state->save_item(NAME(state->bitmap_videoram_address_y));
+	state->save_item(NAME(state->bitmap_videoram_selected));
+	state->save_pointer(NAME(state->bitmap_videoram1), 256*256);
+	state->save_pointer(NAME(state->bitmap_videoram2), 256*256);
+	state->save_pointer(NAME(state->palette_ram), NUM_PENS);
 	machine->state().register_postload(cloak_postload, NULL);
 }
 

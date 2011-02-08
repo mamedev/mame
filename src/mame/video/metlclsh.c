@@ -150,7 +150,7 @@ VIDEO_START( metlclsh )
 	tilemap_set_transparent_pen(state->bg_tilemap, 0);
 	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 
-	state_save_register_global_pointer(machine, state->otherram, 0x800);
+	state->save_pointer(NAME(state->otherram), 0x800);
 }
 
 

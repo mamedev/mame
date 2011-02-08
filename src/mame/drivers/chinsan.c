@@ -570,11 +570,11 @@ static MACHINE_START( chinsan )
 
 	memory_configure_bank(machine, "bank1", 0, 4, machine->region("maincpu")->base() + 0x10000, 0x4000);
 
-	state_save_register_global(machine, state->adpcm_idle);
-	state_save_register_global(machine, state->port_select);
-	state_save_register_global(machine, state->adpcm_pos);
-	state_save_register_global(machine, state->adpcm_data);
-	state_save_register_global(machine, state->trigger);
+	state->save_item(NAME(state->adpcm_idle));
+	state->save_item(NAME(state->port_select));
+	state->save_item(NAME(state->adpcm_pos));
+	state->save_item(NAME(state->adpcm_data));
+	state->save_item(NAME(state->trigger));
 }
 
 static MACHINE_RESET( chinsan )

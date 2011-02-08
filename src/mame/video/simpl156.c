@@ -127,8 +127,8 @@ VIDEO_START( simpl156 )
 	machine->generic.paletteram.u16 =  auto_alloc_array(machine, UINT16, 0x1000/2);
 
 	/* and register the allocated ram so that save states still work */
-	state_save_register_global_pointer(machine, state->pf1_rowscroll, 0x800/2);
-	state_save_register_global_pointer(machine, state->pf2_rowscroll, 0x800/2);
+	state->save_pointer(NAME(state->pf1_rowscroll), 0x800/2);
+	state->save_pointer(NAME(state->pf2_rowscroll), 0x800/2);
 	state_save_register_global_pointer(machine, machine->generic.paletteram.u16, 0x1000/2);
 }
 

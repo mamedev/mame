@@ -451,10 +451,10 @@ static MACHINE_START( crshrace )
 	state->audiocpu = machine->device("audiocpu");
 	state->k053936 = machine->device("k053936");
 
-	state_save_register_global(machine, state->roz_bank);
-	state_save_register_global(machine, state->gfxctrl);
-	state_save_register_global(machine, state->flipscreen);
-	state_save_register_global(machine, state->pending_command);
+	state->save_item(NAME(state->roz_bank));
+	state->save_item(NAME(state->gfxctrl));
+	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->pending_command));
 }
 
 static MACHINE_RESET( crshrace )

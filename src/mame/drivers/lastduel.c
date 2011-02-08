@@ -478,8 +478,8 @@ static MACHINE_START( lastduel )
 
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->tilemap_priority);
-	state_save_register_global_array(machine, state->scroll);
+	state->save_item(NAME(state->tilemap_priority));
+	state->save_item(NAME(state->scroll));
 }
 
 static MACHINE_START( madgear )

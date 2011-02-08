@@ -249,11 +249,11 @@ static MACHINE_START( finalizr )
 
 	state->audio_cpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->spriterambank);
-	state_save_register_global(machine, state->charbank);
-	state_save_register_global(machine, state->T1_line);
-	state_save_register_global(machine, state->nmi_enable);
-	state_save_register_global(machine, state->irq_enable);
+	state->save_item(NAME(state->spriterambank));
+	state->save_item(NAME(state->charbank));
+	state->save_item(NAME(state->T1_line));
+	state->save_item(NAME(state->nmi_enable));
+	state->save_item(NAME(state->irq_enable));
 }
 
 static MACHINE_RESET( finalizr )

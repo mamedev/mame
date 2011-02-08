@@ -381,13 +381,13 @@ static MACHINE_START( drgnmst )
 {
 	drgnmst_state *state = machine->driver_data<drgnmst_state>();
 
-	state_save_register_global(machine, state->snd_flag);
-	state_save_register_global(machine, state->snd_command);
-	state_save_register_global(machine, state->oki_control);
-	state_save_register_global(machine, state->oki_command);
-	state_save_register_global(machine, state->pic16c5x_port0);
-	state_save_register_global(machine, state->oki1_bank);
-	state_save_register_global(machine, state->oki0_bank);
+	state->save_item(NAME(state->snd_flag));
+	state->save_item(NAME(state->snd_command));
+	state->save_item(NAME(state->oki_control));
+	state->save_item(NAME(state->oki_command));
+	state->save_item(NAME(state->pic16c5x_port0));
+	state->save_item(NAME(state->oki1_bank));
+	state->save_item(NAME(state->oki0_bank));
 }
 
 static MACHINE_RESET( drgnmst )

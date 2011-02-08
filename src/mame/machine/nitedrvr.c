@@ -287,15 +287,15 @@ MACHINE_START( nitedrvr )
 	state->maincpu = machine->device("maincpu");
 	state->discrete = machine->device("discrete");
 
-	state_save_register_global(machine, state->gear);
-	state_save_register_global(machine, state->track);
-	state_save_register_global(machine, state->steering_buf);
-	state_save_register_global(machine, state->steering_val);
-	state_save_register_global(machine, state->crash_en);
-	state_save_register_global(machine, state->crash_data);
-	state_save_register_global(machine, state->crash_data_en);
-	state_save_register_global(machine, state->ac_line);
-	state_save_register_global(machine, state->last_steering_val);
+	state->save_item(NAME(state->gear));
+	state->save_item(NAME(state->track));
+	state->save_item(NAME(state->steering_buf));
+	state->save_item(NAME(state->steering_val));
+	state->save_item(NAME(state->crash_en));
+	state->save_item(NAME(state->crash_data));
+	state->save_item(NAME(state->crash_data_en));
+	state->save_item(NAME(state->ac_line));
+	state->save_item(NAME(state->last_steering_val));
 }
 
 MACHINE_RESET( nitedrvr )

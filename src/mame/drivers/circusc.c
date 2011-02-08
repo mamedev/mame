@@ -67,7 +67,7 @@ static MACHINE_START( circusc )
 	state->dac = machine->device("dac");
 	state->discrete = machine->device("fltdisc");
 
-	state_save_register_global(machine, state->sn_latch);
+	state->save_item(NAME(state->sn_latch));
 }
 
 static MACHINE_RESET( circusc )

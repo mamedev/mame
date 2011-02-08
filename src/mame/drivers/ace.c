@@ -328,7 +328,7 @@ static STATE_POSTLOAD( ace_postload )
 static MACHINE_START( ace )
 {
 	ace_state *state = machine->driver_data<ace_state>();
-	state_save_register_global_array(machine, state->objpos);
+	state->save_item(NAME(state->objpos));
 	machine->state().register_postload(ace_postload, NULL);
 }
 

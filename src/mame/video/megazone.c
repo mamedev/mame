@@ -107,7 +107,7 @@ VIDEO_START( megazone )
 	megazone_state *state = machine->driver_data<megazone_state>();
 	state->tmpbitmap = auto_bitmap_alloc(machine, 256, 256, machine->primary_screen->format());
 
-	state_save_register_global_bitmap(machine, state->tmpbitmap);
+	state->save_item(NAME(*state->tmpbitmap));
 }
 
 

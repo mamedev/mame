@@ -198,12 +198,12 @@ static MACHINE_START( homerun )
 	memory_configure_bank(machine, "bank1", 0, 1, &ROM[0x00000], 0x4000);
 	memory_configure_bank(machine, "bank1", 1, 7, &ROM[0x10000], 0x4000);
 
-	state_save_register_global(machine, state->gfx_ctrl);
-	state_save_register_global(machine, state->gc_up);
-	state_save_register_global(machine, state->gc_down);
-	state_save_register_global(machine, state->xpa);
-	state_save_register_global(machine, state->xpb);
-	state_save_register_global(machine, state->xpc);
+	state->save_item(NAME(state->gfx_ctrl));
+	state->save_item(NAME(state->gc_up));
+	state->save_item(NAME(state->gc_down));
+	state->save_item(NAME(state->xpa));
+	state->save_item(NAME(state->xpb));
+	state->save_item(NAME(state->xpc));
 }
 
 static MACHINE_RESET( homerun )

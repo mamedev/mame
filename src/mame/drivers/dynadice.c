@@ -225,7 +225,7 @@ static PALETTE_INIT( dynadice )
 static MACHINE_START( dynadice )
 {
 	dynadice_state *state = machine->driver_data<dynadice_state>();
-	state_save_register_global(machine, state->ay_data);
+	state->save_item(NAME(state->ay_data));
 }
 
 static MACHINE_RESET( dynadice )

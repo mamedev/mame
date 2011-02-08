@@ -232,8 +232,8 @@ static MACHINE_START( megazone )
 	state->audiocpu = machine->device<cpu_device>("audiocpu");
 	state->daccpu = machine->device<cpu_device>("daccpu");
 
-	state_save_register_global(machine, state->flipscreen);
-	state_save_register_global(machine, state->i8039_status);
+	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->i8039_status));
 }
 
 static MACHINE_RESET( megazone )

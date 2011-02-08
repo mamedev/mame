@@ -482,11 +482,11 @@ static MACHINE_START( yunsung8 )
 
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global_pointer(machine, state->videoram, 0x4000);
-	state_save_register_global(machine, state->layers_ctrl);
-	state_save_register_global(machine, state->videobank);
-	state_save_register_global(machine, state->adpcm);
-	state_save_register_global(machine, state->toggle);
+	state->save_pointer(NAME(state->videoram), 0x4000);
+	state->save_item(NAME(state->layers_ctrl));
+	state->save_item(NAME(state->videobank));
+	state->save_item(NAME(state->adpcm));
+	state->save_item(NAME(state->toggle));
 }
 
 static MACHINE_RESET( yunsung8 )

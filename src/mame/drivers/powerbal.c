@@ -473,7 +473,7 @@ static MACHINE_START( powerbal )
 {
 	playmark_state *state = machine->driver_data<playmark_state>();
 
-	state_save_register_global(machine, state->tilebank);
+	state->save_item(NAME(state->tilebank));
 }
 
 static MACHINE_RESET( powerbal )

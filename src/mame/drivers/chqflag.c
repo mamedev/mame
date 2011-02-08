@@ -367,11 +367,11 @@ static MACHINE_START( chqflag )
 	state->k007232_1 = machine->device("k007232_1");
 	state->k007232_2 = machine->device("k007232_2");
 
-	state_save_register_global(machine, state->k051316_readroms);
-	state_save_register_global(machine, state->last_vreg);
-	state_save_register_global(machine, state->analog_ctrl);
-	state_save_register_global(machine, state->accel);
-	state_save_register_global(machine, state->wheel);
+	state->save_item(NAME(state->k051316_readroms));
+	state->save_item(NAME(state->last_vreg));
+	state->save_item(NAME(state->analog_ctrl));
+	state->save_item(NAME(state->accel));
+	state->save_item(NAME(state->wheel));
 }
 
 static MACHINE_RESET( chqflag )

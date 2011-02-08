@@ -1804,13 +1804,13 @@ static MACHINE_START( cave )
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->soundbuf_len);
-	state_save_register_global_array(machine, state->soundbuf_data);
+	state->save_item(NAME(state->soundbuf_len));
+	state->save_item(NAME(state->soundbuf_data));
 
-	state_save_register_global(machine, state->vblank_irq);
-	state_save_register_global(machine, state->sound_irq);
-	state_save_register_global(machine, state->unknown_irq);
-	state_save_register_global(machine, state->agallet_vblank_irq);
+	state->save_item(NAME(state->vblank_irq));
+	state->save_item(NAME(state->sound_irq));
+	state->save_item(NAME(state->unknown_irq));
+	state->save_item(NAME(state->agallet_vblank_irq));
 }
 
 static MACHINE_RESET( cave )
@@ -4662,7 +4662,7 @@ static DRIVER_INIT( sailormn )
 	state->time_vblank_irq = 2000;
 
 	state->sailormn_tilebank = 0;
-	state_save_register_global(machine, state->sailormn_tilebank);
+	state->save_item(NAME(state->sailormn_tilebank));
 }
 
 static DRIVER_INIT( tjumpman )
@@ -4676,7 +4676,7 @@ static DRIVER_INIT( tjumpman )
 	state->time_vblank_irq = 17376;
 
 	state->hopper = 0;
-	state_save_register_global(machine, state->hopper);
+	state->save_item(NAME(state->hopper));
 }
 
 static DRIVER_INIT( uopoko )
@@ -4702,8 +4702,8 @@ static DRIVER_INIT( korokoro )
 	state->leds[0] = 0;
 	state->leds[1] = 0;
 	state->hopper = 0;
-	state_save_register_global_array(machine, state->leds);
-	state_save_register_global(machine, state->hopper);
+	state->save_item(NAME(state->leds));
+	state->save_item(NAME(state->hopper));
 }
 
 /***************************************************************************

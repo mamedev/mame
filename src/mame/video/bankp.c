@@ -169,8 +169,8 @@ VIDEO_START( bankp )
 	colortable_configure_tilemap_groups(machine->colortable, state->bg_tilemap, machine->gfx[1], 0);
 	colortable_configure_tilemap_groups(machine->colortable, state->fg_tilemap, machine->gfx[0], 0);
 
-	state_save_register_global(machine, state->scroll_x);
-	state_save_register_global(machine, state->priority);
+	state->save_item(NAME(state->scroll_x));
+	state->save_item(NAME(state->priority));
 }
 
 VIDEO_UPDATE( bankp )

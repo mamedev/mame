@@ -43,7 +43,7 @@ VIDEO_START( foodf )
 
 	/* adjust the playfield for the 8 pixel offset */
 	tilemap_set_scrollx(state->playfield_tilemap, 0, -8);
-	state_save_register_global(machine, state->playfield_flip);
+	state->save_item(NAME(state->playfield_flip));
 
 	/* compute the color output resistor weights */
 	compute_resistor_weights(0,	255, -1.0,

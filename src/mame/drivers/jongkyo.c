@@ -469,10 +469,10 @@ static MACHINE_START( jongkyo )
 	jongkyo_state *state = machine->driver_data<jongkyo_state>();
 
 	state->videoram2 = auto_alloc_array(machine, UINT8, 0x4000);
-	state_save_register_global_pointer(machine, state->videoram2, 0x4000);
+	state->save_pointer(NAME(state->videoram2), 0x4000);
 
-	state_save_register_global(machine, state->rom_bank);
-	state_save_register_global(machine, state->mux_data);
+	state->save_item(NAME(state->rom_bank));
+	state->save_item(NAME(state->mux_data));
 }
 
 static MACHINE_RESET( jongkyo )

@@ -1056,11 +1056,11 @@ static void system16b_common_init(running_machine* machine, int _rom_board)
 	state->_315_5250_1 = machine->device("315_5250_1");
 	state->_315_5250_2 = machine->device("315_5250_2");
 
-	state_save_register_global(machine, state->disable_screen_blanking);
-	state_save_register_global(machine, state->mj_input_num);
-	state_save_register_global(machine, state->mj_last_val);
-	state_save_register_global(machine, state->hwc_input_value);
-	state_save_register_global(machine, state->atomicp_sound_divisor);
+	state->save_item(NAME(state->disable_screen_blanking));
+	state->save_item(NAME(state->mj_input_num));
+	state->save_item(NAME(state->mj_last_val));
+	state->save_item(NAME(state->hwc_input_value));
+	state->save_item(NAME(state->atomicp_sound_divisor));
 
 }
 
@@ -1591,7 +1591,7 @@ static void wb3_i8751_sim(running_machine *machine)
 static MACHINE_START( atomicp )
 {
 	segas1x_state *state = machine->driver_data<segas1x_state>();
-	state_save_register_global(machine, state->atomicp_sound_count);
+	state->save_item(NAME(state->atomicp_sound_count));
 }
 
 

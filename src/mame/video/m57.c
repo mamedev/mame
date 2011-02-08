@@ -148,7 +148,7 @@ VIDEO_START( m57 )
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
 	tilemap_set_scroll_rows(state->bg_tilemap, 256);
 
-	state_save_register_global(machine, state->flipscreen);
+	state->save_item(NAME(state->flipscreen));
 }
 
 

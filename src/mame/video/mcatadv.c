@@ -265,8 +265,8 @@ VIDEO_START( mcatadv )
 	state->palette_bank1 = 0;
 	state->palette_bank2 = 0;
 
-	state_save_register_global_pointer(machine, state->spriteram_old, state->spriteram_size / 2);
-	state_save_register_global_pointer(machine, state->vidregs_old, (0x0f + 1) / 2);
+	state->save_pointer(NAME(state->spriteram_old), state->spriteram_size / 2);
+	state->save_pointer(NAME(state->vidregs_old), (0x0f + 1) / 2);
 }
 
 VIDEO_EOF( mcatadv )

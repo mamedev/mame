@@ -248,15 +248,15 @@ static MACHINE_START( cbasebal )
 
 	memory_configure_bank(machine, "bank1", 0, 32, machine->region("maincpu")->base() + 0x10000, 0x4000);
 
-	state_save_register_global(machine, state->rambank);
-	state_save_register_global(machine, state->tilebank);
-	state_save_register_global(machine, state->spritebank);
-	state_save_register_global(machine, state->text_on);
-	state_save_register_global(machine, state->bg_on);
-	state_save_register_global(machine, state->obj_on);
-	state_save_register_global(machine, state->flipscreen);
-	state_save_register_global_array(machine, state->scroll_x);
-	state_save_register_global_array(machine, state->scroll_y);
+	state->save_item(NAME(state->rambank));
+	state->save_item(NAME(state->tilebank));
+	state->save_item(NAME(state->spritebank));
+	state->save_item(NAME(state->text_on));
+	state->save_item(NAME(state->bg_on));
+	state->save_item(NAME(state->obj_on));
+	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->scroll_x));
+	state->save_item(NAME(state->scroll_y));
 }
 
 static MACHINE_RESET( cbasebal )

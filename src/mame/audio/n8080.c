@@ -474,11 +474,11 @@ MACHINE_START( spacefev_sound )
 	state->sound_timer[1] = machine->scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
 	state->sound_timer[2] = machine->scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
 
-	state_save_register_global(machine, state->prev_snd_data);
-	state_save_register_global(machine, state->prev_sound_pins);
-	state_save_register_global(machine, state->curr_sound_pins);
-	state_save_register_global(machine, state->n8080_hardware);
-	state_save_register_global_array(machine, state->mono_flop);
+	state->save_item(NAME(state->prev_snd_data));
+	state->save_item(NAME(state->prev_sound_pins));
+	state->save_item(NAME(state->curr_sound_pins));
+	state->save_item(NAME(state->n8080_hardware));
+	state->save_item(NAME(state->mono_flop));
 }
 
 MACHINE_RESET( spacefev_sound )
@@ -505,11 +505,11 @@ MACHINE_START( sheriff_sound )
 	state->sound_timer[0] = machine->scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
 	state->sound_timer[1] = machine->scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
 
-	state_save_register_global(machine, state->prev_snd_data);
-	state_save_register_global(machine, state->prev_sound_pins);
-	state_save_register_global(machine, state->curr_sound_pins);
-	state_save_register_global(machine, state->n8080_hardware);
-	state_save_register_global_array(machine, state->mono_flop);
+	state->save_item(NAME(state->prev_snd_data));
+	state->save_item(NAME(state->prev_sound_pins));
+	state->save_item(NAME(state->curr_sound_pins));
+	state->save_item(NAME(state->n8080_hardware));
+	state->save_item(NAME(state->mono_flop));
 }
 
 MACHINE_RESET( sheriff_sound )
@@ -532,13 +532,13 @@ MACHINE_START( helifire_sound )
 {
 	n8080_state *state = machine->driver_data<n8080_state>();
 
-	state_save_register_global(machine, state->prev_snd_data);
-	state_save_register_global(machine, state->prev_sound_pins);
-	state_save_register_global(machine, state->curr_sound_pins);
-	state_save_register_global(machine, state->n8080_hardware);
-	state_save_register_global(machine, state->helifire_dac_volume);
-	state_save_register_global(machine, state->helifire_dac_timing);
-	state_save_register_global(machine, state->helifire_dac_phase);
+	state->save_item(NAME(state->prev_snd_data));
+	state->save_item(NAME(state->prev_sound_pins));
+	state->save_item(NAME(state->curr_sound_pins));
+	state->save_item(NAME(state->n8080_hardware));
+	state->save_item(NAME(state->helifire_dac_volume));
+	state->save_item(NAME(state->helifire_dac_timing));
+	state->save_item(NAME(state->helifire_dac_phase));
 }
 
 MACHINE_RESET( helifire_sound )

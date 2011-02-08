@@ -226,8 +226,8 @@ static MACHINE_START( skyfox )
 
 	state->maincpu = machine->device("maincpu");
 
-	state_save_register_global(machine, state->bg_pos);
-	state_save_register_global(machine, state->bg_ctrl);
+	state->save_item(NAME(state->bg_pos));
+	state->save_item(NAME(state->bg_ctrl));
 }
 
 static MACHINE_RESET( skyfox )

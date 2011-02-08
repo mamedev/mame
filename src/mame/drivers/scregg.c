@@ -207,10 +207,10 @@ static MACHINE_START( scregg )
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = NULL;
 
-	state_save_register_global(machine, state->btime_palette);
-	state_save_register_global(machine, state->bnj_scroll1);
-	state_save_register_global(machine, state->bnj_scroll2);
-	state_save_register_global_array(machine, state->btime_tilemap);
+	state->save_item(NAME(state->btime_palette));
+	state->save_item(NAME(state->bnj_scroll1));
+	state->save_item(NAME(state->bnj_scroll2));
+	state->save_item(NAME(state->btime_tilemap));
 }
 
 static MACHINE_RESET( scregg )

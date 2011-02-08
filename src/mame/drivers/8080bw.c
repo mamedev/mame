@@ -1159,7 +1159,7 @@ static CUSTOM_INPUT( sflush_80_r )
 static MACHINE_START( sflush )
 {
 	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
-	state_save_register_global(machine, state->sfl_int);
+	state->save_item(NAME(state->sfl_int));
 
 	MACHINE_START_CALL(mw8080bw);
 }
@@ -1376,8 +1376,8 @@ static INTERRUPT_GEN( polaris_interrupt )
 static MACHINE_START( polaris )
 {
 	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
-	state_save_register_global(machine, state->polaris_cloud_speed);
-	state_save_register_global(machine, state->polaris_cloud_pos);
+	state->save_item(NAME(state->polaris_cloud_speed));
+	state->save_item(NAME(state->polaris_cloud_pos));
 
 	MACHINE_START_CALL(mw8080bw);
 }

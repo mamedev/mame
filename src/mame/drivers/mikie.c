@@ -232,8 +232,8 @@ static MACHINE_START( mikie )
 	state->maincpu = machine->device<cpu_device>("maincpu");
 	state->audiocpu = machine->device<cpu_device>("audiocpu");
 
-	state_save_register_global(machine, state->palettebank);
-	state_save_register_global(machine, state->last_irq);
+	state->save_item(NAME(state->palettebank));
+	state->save_item(NAME(state->last_irq));
 }
 
 static MACHINE_RESET( mikie )

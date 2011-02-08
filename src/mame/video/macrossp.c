@@ -167,8 +167,8 @@ VIDEO_START( macrossp )
 	machine->gfx[2]->color_granularity = 64;
 	machine->gfx[3]->color_granularity = 64;
 
-	state_save_register_global_pointer(machine, state->spriteram_old, state->spriteram_size / 4);
-	state_save_register_global_pointer(machine, state->spriteram_old2, state->spriteram_size / 4);
+	state->save_pointer(NAME(state->spriteram_old), state->spriteram_size / 4);
+	state->save_pointer(NAME(state->spriteram_old2), state->spriteram_size / 4);
 }
 
 

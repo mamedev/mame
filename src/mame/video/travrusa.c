@@ -222,7 +222,7 @@ VIDEO_START( travrusa )
 {
 	travrusa_state *state = machine->driver_data<travrusa_state>();
 
-	state_save_register_global_array(machine, state->scrollx);
+	state->save_item(NAME(state->scrollx));
 
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 

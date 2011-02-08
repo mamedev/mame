@@ -336,7 +336,7 @@ VIDEO_START( phozon )
 
 	colortable_configure_tilemap_groups(machine->colortable, state->bg_tilemap, machine->gfx[0], 15);
 
-	state_save_register_global(machine, state->scroll);
+	state->save_item(NAME(state->scroll));
 }
 
 VIDEO_START( mappy )

@@ -246,7 +246,7 @@ static MACHINE_START( yiear )
 {
 	yiear_state *state = machine->driver_data<yiear_state>();
 
-	state_save_register_global(machine, state->yiear_nmi_enable);
+	state->save_item(NAME(state->yiear_nmi_enable));
 }
 
 static MACHINE_RESET( yiear )

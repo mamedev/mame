@@ -117,7 +117,7 @@ static MACHINE_START( news )
 {
 	news_state *state = machine->driver_data<news_state>();
 
-	state_save_register_global(machine, state->bgpic);
+	state->save_item(NAME(state->bgpic));
 }
 
 static MACHINE_RESET( news )

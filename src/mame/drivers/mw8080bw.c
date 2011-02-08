@@ -899,7 +899,7 @@ static MACHINE_START( maze )
 	state->maze_tone_timing_state = 0;
 
 	/* setup for save states */
-	state_save_register_global(machine, state->maze_tone_timing_state);
+	state->save_item(NAME(state->maze_tone_timing_state));
 	machine->state().register_postload(maze_update_discrete, NULL);
 
 	MACHINE_START_CALL(mw8080bw);
@@ -986,7 +986,7 @@ static MACHINE_START( boothill )
 	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 
 	/* setup for save states */
-	state_save_register_global(machine, state->rev_shift_res);
+	state->save_item(NAME(state->rev_shift_res));
 
 	MACHINE_START_CALL(mw8080bw);
 }
@@ -1188,7 +1188,7 @@ static MACHINE_START( desertgu )
 	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 
 	/* setup for save states */
-	state_save_register_global(machine, state->desertgun_controller_select);
+	state->save_item(NAME(state->desertgun_controller_select));
 
 	MACHINE_START_CALL(mw8080bw);
 }
@@ -1516,7 +1516,7 @@ static MACHINE_START( gmissile )
 	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 
 	/* setup for save states */
-	state_save_register_global(machine, state->rev_shift_res);
+	state->save_item(NAME(state->rev_shift_res));
 
 	MACHINE_START_CALL(mw8080bw);
 }
@@ -1612,7 +1612,7 @@ static MACHINE_START( m4 )
 	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 
 	/* setup for save states */
-	state_save_register_global(machine, state->rev_shift_res);
+	state->save_item(NAME(state->rev_shift_res));
 
 	MACHINE_START_CALL(mw8080bw);
 }
@@ -1710,7 +1710,7 @@ static MACHINE_START( clowns )
 	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 
 	/* setup for save states */
-	state_save_register_global(machine, state->clowns_controller_select);
+	state->save_item(NAME(state->clowns_controller_select));
 
 	MACHINE_START_CALL(mw8080bw);
 }
@@ -2148,10 +2148,10 @@ static MACHINE_START( spcenctr )
 	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 
 	/* setup for save states */
-	state_save_register_global(machine, state->spcenctr_strobe_state);
-	state_save_register_global(machine, state->spcenctr_trench_width);
-	state_save_register_global(machine, state->spcenctr_trench_center);
-	state_save_register_global_array(machine, state->spcenctr_trench_slope);
+	state->save_item(NAME(state->spcenctr_strobe_state));
+	state->save_item(NAME(state->spcenctr_trench_width));
+	state->save_item(NAME(state->spcenctr_trench_center));
+	state->save_item(NAME(state->spcenctr_trench_slope));
 
 	MACHINE_START_CALL(mw8080bw);
 }
@@ -2310,7 +2310,7 @@ static MACHINE_START( phantom2 )
 	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 
 	/* setup for save states */
-	state_save_register_global(machine, state->phantom2_cloud_counter);
+	state->save_item(NAME(state->phantom2_cloud_counter));
 
 	MACHINE_START_CALL(mw8080bw);
 }
@@ -2539,7 +2539,7 @@ static MACHINE_START( invaders )
 	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 
 	/* setup for save states */
-	state_save_register_global(machine, state->invaders_flip_screen);
+	state->save_item(NAME(state->invaders_flip_screen));
 
 	MACHINE_START_CALL(mw8080bw);
 }

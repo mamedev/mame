@@ -98,7 +98,7 @@ VIDEO_START( toobin )
 	/* allocate a playfield bitmap for rendering */
 	state->pfbitmap = auto_bitmap_alloc(machine, machine->primary_screen->width(), machine->primary_screen->height(), BITMAP_FORMAT_INDEXED16);
 
-	state_save_register_global(machine, state->brightness);
+	state->save_item(NAME(state->brightness));
 }
 
 

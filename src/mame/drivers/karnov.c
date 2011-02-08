@@ -779,15 +779,15 @@ static MACHINE_START( karnov )
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->flipscreen);
-	state_save_register_global_array(machine, state->scroll);
+	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->scroll));
 
-	state_save_register_global(machine, state->i8751_return);
-	state_save_register_global(machine, state->i8751_needs_ack);
-	state_save_register_global(machine, state->i8751_coin_pending);
-	state_save_register_global(machine, state->i8751_command_queue);
-	state_save_register_global(machine, state->i8751_level);
-	state_save_register_global(machine, state->latch);
+	state->save_item(NAME(state->i8751_return));
+	state->save_item(NAME(state->i8751_needs_ack));
+	state->save_item(NAME(state->i8751_coin_pending));
+	state->save_item(NAME(state->i8751_command_queue));
+	state->save_item(NAME(state->i8751_level));
+	state->save_item(NAME(state->latch));
 
 }
 

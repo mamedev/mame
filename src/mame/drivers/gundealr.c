@@ -451,8 +451,8 @@ static MACHINE_START( gundealr )
 
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 
-	state_save_register_global(machine, state->flipscreen);
-	state_save_register_global_array(machine, state->scroll);
+	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->scroll));
 }
 
 static MACHINE_RESET( gundealr )

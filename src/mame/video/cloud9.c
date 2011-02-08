@@ -39,9 +39,9 @@ VIDEO_START( cloud9 )
 	state->spritebitmap = machine->primary_screen->alloc_compatible_bitmap();
 
 	/* register for savestates */
-	state_save_register_global_pointer(machine, state->videoram, 0x8000);
-	state_save_register_global_array(machine, state->video_control);
-	state_save_register_global_array(machine, state->bitmode_addr);
+	state->save_pointer(NAME(state->videoram), 0x8000);
+	state->save_item(NAME(state->video_control));
+	state->save_item(NAME(state->bitmode_addr));
 }
 
 

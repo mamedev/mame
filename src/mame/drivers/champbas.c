@@ -571,9 +571,9 @@ static MACHINE_START( champbas )
 	state->maincpu = machine->device("maincpu");
 	state->mcu = machine->device(CPUTAG_MCU);
 
-	state_save_register_global(machine, state->watchdog_count);
-	state_save_register_global(machine, state->palette_bank);
-	state_save_register_global(machine, state->gfx_bank);
+	state->save_item(NAME(state->watchdog_count));
+	state->save_item(NAME(state->palette_bank));
+	state->save_item(NAME(state->gfx_bank));
 }
 
 static MACHINE_START( exctsccr )

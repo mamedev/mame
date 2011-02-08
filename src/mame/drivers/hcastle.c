@@ -187,11 +187,11 @@ static MACHINE_START( hcastle )
 	state->k007121_1 = machine->device("k007121_1");
 	state->k007121_2 = machine->device("k007121_2");
 
-	state_save_register_global(machine, state->pf2_bankbase);
-	state_save_register_global(machine, state->pf1_bankbase);
-	state_save_register_global(machine, state->gfx_bank);
-	state_save_register_global(machine, state->old_pf1);
-	state_save_register_global(machine, state->old_pf2);
+	state->save_item(NAME(state->pf2_bankbase));
+	state->save_item(NAME(state->pf1_bankbase));
+	state->save_item(NAME(state->gfx_bank));
+	state->save_item(NAME(state->old_pf1));
+	state->save_item(NAME(state->old_pf2));
 }
 
 static MACHINE_RESET( hcastle )

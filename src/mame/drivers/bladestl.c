@@ -315,9 +315,9 @@ static MACHINE_START( bladestl )
 	state->k007342 = machine->device("k007342");
 	state->k007420 = machine->device("k007420");
 
-	state_save_register_global(machine, state->spritebank);
-	state_save_register_global_array(machine, state->layer_colorbase);
-	state_save_register_global_array(machine, state->last_track);
+	state->save_item(NAME(state->spritebank));
+	state->save_item(NAME(state->layer_colorbase));
+	state->save_item(NAME(state->last_track));
 }
 
 static MACHINE_RESET( bladestl )

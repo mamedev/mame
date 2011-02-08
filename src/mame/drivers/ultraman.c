@@ -202,9 +202,9 @@ static MACHINE_START( ultraman )
 	state->k051316_2 = machine->device("k051316_2");
 	state->k051316_3 = machine->device("k051316_3");
 
-	state_save_register_global(machine, state->bank0);
-	state_save_register_global(machine, state->bank1);
-	state_save_register_global(machine, state->bank2);
+	state->save_item(NAME(state->bank0));
+	state->save_item(NAME(state->bank1));
+	state->save_item(NAME(state->bank2));
 }
 
 static MACHINE_RESET( ultraman )

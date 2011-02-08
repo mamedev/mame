@@ -96,7 +96,7 @@ static VIDEO_START( mole )
 	state->tileram = auto_alloc_array_clear(machine, UINT16, 0x400);
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 40, 25);
 
-	state_save_register_global_pointer(machine, state->tileram, 0x400);
+	state->save_pointer(NAME(state->tileram), 0x400);
 }
 
 static WRITE8_HANDLER( mole_videoram_w )
@@ -304,7 +304,7 @@ static MACHINE_START( mole )
 {
 	mole_state *state = machine->driver_data<mole_state>();
 
-	state_save_register_global(machine, state->tile_bank);
+	state->save_item(NAME(state->tile_bank));
 }
 
 static MACHINE_RESET( mole )

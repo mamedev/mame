@@ -846,16 +846,16 @@ static MACHINE_START( asuka )
 	memory_configure_bank(machine, "bank1", 0, 1, machine->region("audiocpu")->base(), 0);
 	memory_configure_bank(machine, "bank1", 1, 3, machine->region("audiocpu")->base() + 0x10000, 0x04000);
 
-	state_save_register_global(machine, state->adpcm_pos);
-	state_save_register_global(machine, state->adpcm_data);
+	state->save_item(NAME(state->adpcm_pos));
+	state->save_item(NAME(state->adpcm_data));
 
-	state_save_register_global(machine, state->current_round);
-	state_save_register_global(machine, state->current_bank);
-	state_save_register_global(machine, state->video_ctrl);
-	state_save_register_global(machine, state->video_mask);
-	state_save_register_global(machine, state->cc_port);
-	state_save_register_global(machine, state->restart_status);
-	state_save_register_global_array(machine, state->cval);
+	state->save_item(NAME(state->current_round));
+	state->save_item(NAME(state->current_bank));
+	state->save_item(NAME(state->video_ctrl));
+	state->save_item(NAME(state->video_mask));
+	state->save_item(NAME(state->cc_port));
+	state->save_item(NAME(state->restart_status));
+	state->save_item(NAME(state->cval));
 }
 
 static MACHINE_RESET( asuka )

@@ -281,8 +281,8 @@ static MACHINE_START( battlane )
 	state->maincpu = machine->device("maincpu");
 	state->subcpu = machine->device("sub");
 
-	state_save_register_global(machine, state->video_ctrl);
-	state_save_register_global(machine, state->cpu_control);
+	state->save_item(NAME(state->video_ctrl));
+	state->save_item(NAME(state->cpu_control));
 }
 
 static MACHINE_RESET( battlane )

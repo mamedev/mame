@@ -106,10 +106,10 @@ VIDEO_START( atarig1 )
 	state->pfscroll_xoffset = state->is_pitfight ? 2 : 0;
 
 	/* state saving */
-	state_save_register_global(machine, state->current_control);
-	state_save_register_global(machine, state->playfield_tile_bank);
-	state_save_register_global(machine, state->playfield_xscroll);
-	state_save_register_global(machine, state->playfield_yscroll);
+	state->save_item(NAME(state->current_control));
+	state->save_item(NAME(state->playfield_tile_bank));
+	state->save_item(NAME(state->playfield_xscroll));
+	state->save_item(NAME(state->playfield_yscroll));
 }
 
 

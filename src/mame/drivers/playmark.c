@@ -913,19 +913,19 @@ static MACHINE_START( playmark )
 	state->oki = machine->device<okim6295_device>("oki");
 	state->eeprom = machine->device("eeprom");
 
-	state_save_register_global(machine, state->bgscrollx);
-	state_save_register_global(machine, state->bgscrolly);
-	state_save_register_global(machine, state->bg_enable);
-	state_save_register_global(machine, state->bg_full_size);
-	state_save_register_global(machine, state->fgscrollx);
-	state_save_register_global(machine, state->fg_rowscroll_enable);
-	state_save_register_global_array(machine, state->scroll);
+	state->save_item(NAME(state->bgscrollx));
+	state->save_item(NAME(state->bgscrolly));
+	state->save_item(NAME(state->bg_enable));
+	state->save_item(NAME(state->bg_full_size));
+	state->save_item(NAME(state->fgscrollx));
+	state->save_item(NAME(state->fg_rowscroll_enable));
+	state->save_item(NAME(state->scroll));
 
-	state_save_register_global(machine, state->snd_command);
-	state_save_register_global(machine, state->snd_flag);
-	state_save_register_global(machine, state->oki_control);
-	state_save_register_global(machine, state->oki_command);
-	state_save_register_global(machine, state->old_oki_bank);
+	state->save_item(NAME(state->snd_command));
+	state->save_item(NAME(state->snd_flag));
+	state->save_item(NAME(state->oki_control));
+	state->save_item(NAME(state->oki_command));
+	state->save_item(NAME(state->old_oki_bank));
 }
 
 static MACHINE_RESET( playmark )

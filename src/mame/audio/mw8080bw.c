@@ -22,8 +22,8 @@ static SOUND_START( samples )
 	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
 
 	/* setup for save states */
-	state_save_register_global(machine, state->port_1_last);
-	state_save_register_global(machine, state->port_2_last);
+	state->save_item(NAME(state->port_1_last));
+	state->save_item(NAME(state->port_2_last));
 }
 
 

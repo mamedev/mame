@@ -298,10 +298,10 @@ static MACHINE_START( ohmygod )
 {
 	ohmygod_state *state = machine->driver_data<ohmygod_state>();
 
-	state_save_register_global(machine, state->spritebank);
-	state_save_register_global(machine, state->scrollx);
-	state_save_register_global(machine, state->scrolly);
-	state_save_register_global(machine, state->sndbank);
+	state->save_item(NAME(state->spritebank));
+	state->save_item(NAME(state->scrollx));
+	state->save_item(NAME(state->scrolly));
+	state->save_item(NAME(state->sndbank));
 }
 
 static MACHINE_RESET( ohmygod )

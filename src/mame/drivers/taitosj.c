@@ -2722,11 +2722,11 @@ static void reset_common(running_machine &machine)
 static void init_common(running_machine *machine)
 {
 	taitosj_state *state = machine->driver_data<taitosj_state>();
-	state_save_register_global(machine, state->sndnmi_disable);
-	state_save_register_global(machine, state->input_port_4_f0);
-	state_save_register_global_array(machine, state->kikstart_gears);
-	state_save_register_global(machine, state->dac_out);
-	state_save_register_global(machine, state->dac_vol);
+	state->save_item(NAME(state->sndnmi_disable));
+	state->save_item(NAME(state->input_port_4_f0));
+	state->save_item(NAME(state->kikstart_gears));
+	state->save_item(NAME(state->dac_out));
+	state->save_item(NAME(state->dac_vol));
 
 	machine->add_notifier(MACHINE_NOTIFY_RESET, reset_common);
 }

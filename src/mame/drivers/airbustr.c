@@ -592,15 +592,15 @@ static MACHINE_START( airbustr )
 	state->audiocpu = machine->device("audiocpu");
 	state->pandora = machine->device("pandora");
 
-	state_save_register_global(machine, state->soundlatch_status);
-	state_save_register_global(machine, state->soundlatch2_status);
-	state_save_register_global(machine, state->master_addr);
-	state_save_register_global(machine, state->slave_addr);
-	state_save_register_global(machine, state->bg_scrollx);
-	state_save_register_global(machine, state->bg_scrolly);
-	state_save_register_global(machine, state->fg_scrollx);
-	state_save_register_global(machine, state->fg_scrolly);
-	state_save_register_global(machine, state->highbits);
+	state->save_item(NAME(state->soundlatch_status));
+	state->save_item(NAME(state->soundlatch2_status));
+	state->save_item(NAME(state->master_addr));
+	state->save_item(NAME(state->slave_addr));
+	state->save_item(NAME(state->bg_scrollx));
+	state->save_item(NAME(state->bg_scrolly));
+	state->save_item(NAME(state->fg_scrollx));
+	state->save_item(NAME(state->fg_scrolly));
+	state->save_item(NAME(state->highbits));
 }
 
 static MACHINE_RESET( airbustr )

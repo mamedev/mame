@@ -326,10 +326,10 @@ static MACHINE_START( xmen )
 	state->lscreen = machine->device("lscreen");
 	state->rscreen = machine->device("rscreen");
 
-	state_save_register_global(machine, state->sound_curbank);
-	state_save_register_global(machine, state->sprite_colorbase);
-	state_save_register_global_array(machine, state->layer_colorbase);
-	state_save_register_global_array(machine, state->layerpri);
+	state->save_item(NAME(state->sound_curbank));
+	state->save_item(NAME(state->sprite_colorbase));
+	state->save_item(NAME(state->layer_colorbase));
+	state->save_item(NAME(state->layerpri));
 	machine->state().register_postload(xmen_postload, NULL);
 }
 
@@ -417,7 +417,7 @@ static MACHINE_START( xmen6p )
 
 	MACHINE_START_CALL(xmen);
 
-	state_save_register_global(machine, state->current_frame);
+	state->save_item(NAME(state->current_frame));
 }
 
 static MACHINE_RESET( xmen6p )

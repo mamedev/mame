@@ -380,19 +380,19 @@ static MACHINE_START( bwing )
 	state->subcpu = machine->device("sub");
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->coin);
-	state_save_register_global(machine, state->palatch);
-	state_save_register_global(machine, state->srbank);
-	state_save_register_global(machine, state->mapmask);
-	state_save_register_global(machine, state->mapflip);
-	state_save_register_global(machine, state->bwp3_nmimask);
-	state_save_register_global(machine, state->bwp3_u8F_d);
-	state_save_register_global(machine, state->ffcount);
-	state_save_register_global(machine, state->ffhead);
-	state_save_register_global(machine, state->fftail);
+	state->save_item(NAME(state->coin));
+	state->save_item(NAME(state->palatch));
+	state->save_item(NAME(state->srbank));
+	state->save_item(NAME(state->mapmask));
+	state->save_item(NAME(state->mapflip));
+	state->save_item(NAME(state->bwp3_nmimask));
+	state->save_item(NAME(state->bwp3_u8F_d));
+	state->save_item(NAME(state->ffcount));
+	state->save_item(NAME(state->ffhead));
+	state->save_item(NAME(state->fftail));
 
-	state_save_register_global_array(machine, state->sreg);
-	state_save_register_global_array(machine, state->sound_fifo);
+	state->save_item(NAME(state->sreg));
+	state->save_item(NAME(state->sound_fifo));
 }
 
 static MACHINE_RESET( bwing )

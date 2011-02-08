@@ -443,18 +443,18 @@ static MACHINE_START( msisaac )
 	state->audiocpu = machine->device("audiocpu");
 
 	/* video */
-	state_save_register_global(machine, state->bg2_textbank);
+	state->save_item(NAME(state->bg2_textbank));
 	/* sound */
-	state_save_register_global(machine, state->sound_nmi_enable);
-	state_save_register_global(machine, state->pending_nmi);
-	state_save_register_global_array(machine, state->vol_ctrl);
-	state_save_register_global(machine, state->snd_ctrl0);
-	state_save_register_global(machine, state->snd_ctrl1);
+	state->save_item(NAME(state->sound_nmi_enable));
+	state->save_item(NAME(state->pending_nmi));
+	state->save_item(NAME(state->vol_ctrl));
+	state->save_item(NAME(state->snd_ctrl0));
+	state->save_item(NAME(state->snd_ctrl1));
 
 #ifdef USE_MCU
 #else
-	state_save_register_global(machine, state->mcu_val);
-	state_save_register_global(machine, state->direction);
+	state->save_item(NAME(state->mcu_val));
+	state->save_item(NAME(state->direction));
 #endif
 }
 

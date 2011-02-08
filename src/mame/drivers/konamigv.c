@@ -315,12 +315,12 @@ static MACHINE_START( konamigv )
 {
 	konamigv_state *state = machine->driver_data<konamigv_state>();
 
-	state_save_register_global_array(machine, state->sector_buffer);
-	state_save_register_global(machine, state->flash_address);
-	state_save_register_global_array(machine, state->trackball_prev);
-	state_save_register_global_array(machine, state->trackball_data);
-	state_save_register_global_array(machine, state->btc_trackball_prev);
-	state_save_register_global_array(machine, state->btc_trackball_data);
+	state->save_item(NAME(state->sector_buffer));
+	state->save_item(NAME(state->flash_address));
+	state->save_item(NAME(state->trackball_prev));
+	state->save_item(NAME(state->trackball_data));
+	state->save_item(NAME(state->btc_trackball_prev));
+	state->save_item(NAME(state->btc_trackball_data));
 }
 
 static MACHINE_RESET( konamigv )

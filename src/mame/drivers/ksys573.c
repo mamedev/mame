@@ -1069,14 +1069,14 @@ static void atapi_init(running_machine *machine)
 
 	state->atapi_data = auto_alloc_array( machine, UINT8, ATAPI_DATA_SIZE );
 
-	state_save_register_global_pointer( machine, state->atapi_regs, ATAPI_REG_MAX );
-	state_save_register_global_pointer( machine, state->atapi_data, ATAPI_DATA_SIZE / 2 );
-	state_save_register_global( machine, state->atapi_data_ptr );
-	state_save_register_global( machine, state->atapi_data_len );
-	state_save_register_global( machine, state->atapi_xferlen );
-	state_save_register_global( machine, state->atapi_xferbase );
-	state_save_register_global( machine, state->atapi_cdata_wait );
-	state_save_register_global( machine, state->atapi_xfermod );
+	state->save_pointer( NAME(state->atapi_regs), ATAPI_REG_MAX );
+	state->save_pointer( NAME(state->atapi_data), ATAPI_DATA_SIZE / 2 );
+	state->save_item( NAME(state->atapi_data_ptr) );
+	state->save_item( NAME(state->atapi_data_len) );
+	state->save_item( NAME(state->atapi_xferlen) );
+	state->save_item( NAME(state->atapi_xferbase) );
+	state->save_item( NAME(state->atapi_cdata_wait) );
+	state->save_item( NAME(state->atapi_xfermod) );
 }
 
 static WRITE32_HANDLER( atapi_reset_w )
@@ -1485,8 +1485,8 @@ static void flash_init( running_machine *machine )
 		for (int index = 0; index < 16; index++)
 			state->flash_device[card][index] = machine->device<fujitsu_29f016a_device>(tempstr.format("pccard%d.%d", card, index));
 
-	state_save_register_global( machine, state->flash_bank );
-	state_save_register_global( machine, state->control );
+	state->save_item( NAME(state->flash_bank) );
+	state->save_item( NAME(state->control) );
 }
 
 static void *atapi_get_device(running_machine *machine)
@@ -1592,7 +1592,7 @@ static DRIVER_INIT( konami573 )
 		state->m_p_timer_root[i] = machine->scheduler().timer_alloc(FUNC(root_finished));
 	}
 
-	state_save_register_global( machine, state->m_n_security_control );
+	state->save_item( NAME(state->m_n_security_control) );
 
 	security_cart_init( machine, 0, "user2", "user9" );
 	security_cart_init( machine, 1, "user8", "user10" );
@@ -1889,7 +1889,7 @@ static void gx700pwfbf_init( running_machine *machine, void (*output_callback_fu
 
 	memory_install_readwrite32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f640000, 0x1f6400ff, 0, 0, gx700pwbf_io_r, gx700pwbf_io_w );
 
-	state_save_register_global_array( machine, state->gx700pwbf_output_data );
+	state->save_item( NAME(state->gx700pwbf_output_data) );
 }
 
 /*
@@ -2072,7 +2072,7 @@ static DRIVER_INIT( ddr )
 	state->stage_mask = 0xffffffff;
 	gx700pwfbf_init( machine, gn845pwbb_output_callback );
 
-	state_save_register_global( machine, state->stage_mask );
+	state->save_item( NAME(state->stage_mask) );
 }
 
 /*
@@ -2457,8 +2457,8 @@ static void gx894pwbba_init( running_machine *machine, void (*output_callback_fu
 
 	ds2401_init( machine, 2, ds2401_xid ); /* todo: load this from roms */
 
-	state_save_register_global_array( machine, state->gx894pwbba_output_data );
-	state_save_register_global_pointer( machine, state->gx894_ram, gx894_ram_size / 4 );
+	state->save_item( NAME(state->gx894pwbba_output_data) );
+	state->save_pointer( NAME(state->gx894_ram), gx894_ram_size / 4 );
 }
 
 /* ddr digital */
@@ -2830,9 +2830,9 @@ static DRIVER_INIT( salarymc )
 
 	state->security_callback = salarymc_lamp_callback;
 
-	state_save_register_global( machine, state->salarymc_lamp_bits );
-	state_save_register_global( machine, state->salarymc_lamp_shift );
-	state_save_register_global( machine, state->salarymc_lamp_clk );
+	state->save_item( NAME(state->salarymc_lamp_bits) );
+	state->save_item( NAME(state->salarymc_lamp_shift) );
+	state->save_item( NAME(state->salarymc_lamp_clk) );
 }
 
 /* Hyper Bishi Bashi Champ */
@@ -2873,8 +2873,8 @@ static DRIVER_INIT( hyperbbc )
 
 	state->security_callback = hyperbbc_lamp_callback;
 
-	state_save_register_global( machine, state->hyperbbc_lamp_strobe1 );
-	state_save_register_global( machine, state->hyperbbc_lamp_strobe2 );
+	state->save_item( NAME(state->hyperbbc_lamp_strobe1) );
+	state->save_item( NAME(state->hyperbbc_lamp_strobe2) );
 }
 
 /* Mambo A Go Go */

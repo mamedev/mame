@@ -86,8 +86,8 @@ VIDEO_START( battlex )
 	battlex_state *state = machine->driver_data<battlex_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
-	state_save_register_global(machine, state->scroll_lsb);
-	state_save_register_global(machine, state->scroll_msb);
+	state->save_item(NAME(state->scroll_lsb));
+	state->save_item(NAME(state->scroll_msb));
 }
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )

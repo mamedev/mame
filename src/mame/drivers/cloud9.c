@@ -191,7 +191,7 @@ static MACHINE_START( cloud9 )
 	schedule_next_irq(machine, 0-64);
 
 	/* setup for save states */
-	state_save_register_global(machine, state->irq_state);
+	state->save_item(NAME(state->irq_state));
 }
 
 

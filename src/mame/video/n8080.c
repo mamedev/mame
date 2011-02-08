@@ -97,8 +97,8 @@ VIDEO_START( spacefev )
 
 	flip_screen_set_no_update(machine, 0);
 
-	state_save_register_global(machine, state->spacefev_red_screen);
-	state_save_register_global(machine, state->spacefev_red_cannon);
+	state->save_item(NAME(state->spacefev_red_screen));
+	state->save_item(NAME(state->spacefev_red_cannon));
 }
 
 
@@ -108,8 +108,8 @@ VIDEO_START( sheriff )
 
 	flip_screen_set_no_update(machine, 0);
 
-	state_save_register_global(machine, state->sheriff_color_mode);
-	state_save_register_global(machine, state->sheriff_color_data);
+	state->save_item(NAME(state->sheriff_color_mode));
+	state->save_item(NAME(state->sheriff_color_data));
 }
 
 
@@ -119,10 +119,10 @@ VIDEO_START( helifire )
 	UINT8 data = 0;
 	int i;
 
-	state_save_register_global(machine, state->helifire_mv);
-	state_save_register_global(machine, state->helifire_sc);
-	state_save_register_global(machine, state->helifire_flash);
-	state_save_register_global_array(machine, state->helifire_LSFR);
+	state->save_item(NAME(state->helifire_mv));
+	state->save_item(NAME(state->helifire_sc));
+	state->save_item(NAME(state->helifire_flash));
+	state->save_item(NAME(state->helifire_LSFR));
 
 	for (i = 0; i < 63; i++)
 	{

@@ -407,8 +407,8 @@ static MACHINE_START( bishi )
 	state->k054338 = machine->device("k054338");
 	state->k055555 = machine->device("k055555");
 
-	state_save_register_global(machine, state->cur_control);
-	state_save_register_global(machine, state->cur_control2);
+	state->save_item(NAME(state->cur_control));
+	state->save_item(NAME(state->cur_control2));
 }
 
 static MACHINE_RESET( bishi )

@@ -441,13 +441,13 @@ static MACHINE_START( opwolf )
 	state->msm1 = machine->device("msm1");
 	state->msm2 = machine->device("msm2");
 
-	state_save_register_global(machine, state->sprite_ctrl);
-	state_save_register_global(machine, state->sprites_flipscreen);
+	state->save_item(NAME(state->sprite_ctrl));
+	state->save_item(NAME(state->sprites_flipscreen));
 
-	state_save_register_global_array(machine, state->adpcm_b);
-	state_save_register_global_array(machine, state->adpcm_c);
-	state_save_register_global_array(machine, state->adpcm_pos);
-	state_save_register_global_array(machine, state->adpcm_end);
+	state->save_item(NAME(state->adpcm_b));
+	state->save_item(NAME(state->adpcm_c));
+	state->save_item(NAME(state->adpcm_pos));
+	state->save_item(NAME(state->adpcm_end));
 }
 
 static MACHINE_RESET( opwolf )

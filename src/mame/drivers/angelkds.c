@@ -579,12 +579,12 @@ static MACHINE_START( angelkds )
 
 	state->subcpu = machine->device("sub");
 
-	state_save_register_global(machine, state->layer_ctrl);
-	state_save_register_global(machine, state->txbank);
-	state_save_register_global(machine, state->bgbotbank);
-	state_save_register_global(machine, state->bgtopbank);
-	state_save_register_global_array(machine, state->sound);
-	state_save_register_global_array(machine, state->sound2);
+	state->save_item(NAME(state->layer_ctrl));
+	state->save_item(NAME(state->txbank));
+	state->save_item(NAME(state->bgbotbank));
+	state->save_item(NAME(state->bgtopbank));
+	state->save_item(NAME(state->sound));
+	state->save_item(NAME(state->sound2));
 }
 
 static MACHINE_RESET( angelkds )

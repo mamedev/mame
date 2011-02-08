@@ -192,9 +192,9 @@ static VIDEO_START( imolagp )
 		memset(state->videoram[i], 0x00, 0x4000);
 	}
 
-	state_save_register_global_pointer(machine, state->videoram[0], 0x4000);
-	state_save_register_global_pointer(machine, state->videoram[1], 0x4000);
-	state_save_register_global_pointer(machine, state->videoram[2], 0x4000);
+	state->save_pointer(NAME(state->videoram[0]), 0x4000);
+	state->save_pointer(NAME(state->videoram[1]), 0x4000);
+	state->save_pointer(NAME(state->videoram[2]), 0x4000);
 
 	initialize_colors(machine);
 }
@@ -519,16 +519,16 @@ static MACHINE_START( imolagp )
 
 	state->slavecpu = machine->device("slave");
 
-	state_save_register_global(machine, state->control);
-	state_save_register_global(machine, state->scroll);
-	state_save_register_global(machine, state->steerlatch);
-	state_save_register_global(machine, state->draw_mode);
-	state_save_register_global(machine, state->oldsteer);
+	state->save_item(NAME(state->control));
+	state->save_item(NAME(state->scroll));
+	state->save_item(NAME(state->steerlatch));
+	state->save_item(NAME(state->draw_mode));
+	state->save_item(NAME(state->oldsteer));
 #ifdef HLE_COM
-	state_save_register_global_array(machine, state->mComData);
-	state_save_register_global(machine, state->mComCount);
+	state->save_item(NAME(state->mComData));
+	state->save_item(NAME(state->mComCount));
 #else
-	state_save_register_global_array(machine, state->mLatchedData);
+	state->save_item(NAME(state->mLatchedData));
 #endif
 }
 

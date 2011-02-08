@@ -240,8 +240,8 @@ GFXDECODE_END
 static MACHINE_START( jailbrek )
 {
 	jailbrek_state *state = machine->driver_data<jailbrek_state>();
-	state_save_register_global(machine, state->irq_enable);
-	state_save_register_global(machine, state->nmi_enable);
+	state->save_item(NAME(state->irq_enable));
+	state->save_item(NAME(state->nmi_enable));
 }
 
 static MACHINE_RESET( jailbrek )

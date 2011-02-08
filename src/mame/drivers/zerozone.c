@@ -175,7 +175,7 @@ static MACHINE_START( zerozone )
 
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->tilebank);
+	state->save_item(NAME(state->tilebank));
 }
 
 static MACHINE_RESET( zerozone )

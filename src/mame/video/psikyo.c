@@ -205,8 +205,8 @@ VIDEO_START( psikyo )
 	tilemap_set_scroll_rows(state->tilemap_1_size3, 0x10 * 16);	// line scrolling
 	tilemap_set_scroll_cols(state->tilemap_1_size3, 1);
 
-	state_save_register_global_pointer(machine, state->spritebuf1, 0x2000 / 4);
-	state_save_register_global_pointer(machine, state->spritebuf2, 0x2000 / 4);
+	state->save_pointer(NAME(state->spritebuf1), 0x2000 / 4);
+	state->save_pointer(NAME(state->spritebuf2), 0x2000 / 4);
 }
 
 VIDEO_START( sngkace )

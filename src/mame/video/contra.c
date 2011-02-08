@@ -186,8 +186,8 @@ VIDEO_START( contra )
 
 	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 
-	state_save_register_global_pointer(machine, state->spriteram, 0x800);
-	state_save_register_global_pointer(machine, state->spriteram_2, 0x800);
+	state->save_pointer(NAME(state->spriteram), 0x800);
+	state->save_pointer(NAME(state->spriteram_2), 0x800);
 }
 
 

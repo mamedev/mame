@@ -171,8 +171,8 @@ static VIDEO_START(egghunt)
 	state->bgram = auto_alloc_array(machine, UINT8, 0x1000);
 	state->spram = auto_alloc_array(machine, UINT8, 0x1000);
 
-	state_save_register_global_pointer(machine, state->bgram, 0x1000);
-	state_save_register_global_pointer(machine, state->spram, 0x1000);
+	state->save_pointer(NAME(state->bgram), 0x1000);
+	state->save_pointer(NAME(state->spram), 0x1000);
 }
 
 static VIDEO_UPDATE(egghunt)
@@ -395,9 +395,9 @@ static MACHINE_START( egghunt )
 
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->gfx_banking);
-	state_save_register_global(machine, state->okibanking);
-	state_save_register_global(machine, state->vidram_bank);
+	state->save_item(NAME(state->gfx_banking));
+	state->save_item(NAME(state->okibanking));
+	state->save_item(NAME(state->vidram_bank));
 }
 
 static MACHINE_RESET( egghunt )

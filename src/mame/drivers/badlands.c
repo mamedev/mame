@@ -202,7 +202,7 @@ static MACHINE_START( badlands )
 
 	atarigen_init(machine);
 
-	state_save_register_global_array(machine, state->pedal_value);
+	state->save_item(NAME(state->pedal_value));
 }
 
 

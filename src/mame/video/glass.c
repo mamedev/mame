@@ -134,7 +134,7 @@ VIDEO_START( glass )
 	state->pant[1] = tilemap_create(machine, get_tile_info_glass_screen1, tilemap_scan_rows, 16, 16, 32, 32);
 	state->screen_bitmap = auto_bitmap_alloc (machine, 320, 200, machine->primary_screen->format());
 
-	state_save_register_global_bitmap(machine, state->screen_bitmap);
+	state->save_item(NAME(*state->screen_bitmap));
 
 	tilemap_set_transparent_pen(state->pant[0], 0);
 	tilemap_set_transparent_pen(state->pant[1], 0);

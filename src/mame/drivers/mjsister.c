@@ -60,8 +60,8 @@ static VIDEO_START( mjsister )
 	state->videoram0 = auto_alloc_array(machine, UINT8, 0x8000);
 	state->videoram1 = auto_alloc_array(machine, UINT8, 0x8000);
 
-	state_save_register_global_pointer(machine, state->videoram0, 0x8000);
-	state_save_register_global_pointer(machine, state->videoram1, 0x8000);
+	state->save_pointer(NAME(state->videoram0), 0x8000);
+	state->save_pointer(NAME(state->videoram1), 0x8000);
 }
 
 static void mjsister_plot0( running_machine *machine, int offset, UINT8 data )
@@ -454,19 +454,19 @@ static MACHINE_START( mjsister )
 	state->maincpu = machine->device("maincpu");
 	state->dac = machine->device("dac");
 
-	state_save_register_global(machine, state->dac_busy);
-	state_save_register_global(machine, state->flip_screen);
-	state_save_register_global(machine, state->video_enable);
-	state_save_register_global(machine, state->vrambank);
-	state_save_register_global(machine, state->colorbank);
-	state_save_register_global(machine, state->input_sel1);
-	state_save_register_global(machine, state->input_sel2);
-	state_save_register_global(machine, state->rombank0);
-	state_save_register_global(machine, state->rombank1);
-	state_save_register_global(machine, state->dac_adr);
-	state_save_register_global(machine, state->dac_bank);
-	state_save_register_global(machine, state->dac_adr_s);
-	state_save_register_global(machine, state->dac_adr_e);
+	state->save_item(NAME(state->dac_busy));
+	state->save_item(NAME(state->flip_screen));
+	state->save_item(NAME(state->video_enable));
+	state->save_item(NAME(state->vrambank));
+	state->save_item(NAME(state->colorbank));
+	state->save_item(NAME(state->input_sel1));
+	state->save_item(NAME(state->input_sel2));
+	state->save_item(NAME(state->rombank0));
+	state->save_item(NAME(state->rombank1));
+	state->save_item(NAME(state->dac_adr));
+	state->save_item(NAME(state->dac_bank));
+	state->save_item(NAME(state->dac_adr_s));
+	state->save_item(NAME(state->dac_adr_e));
 	machine->state().register_postload(mjsister_redraw, 0);
 }
 

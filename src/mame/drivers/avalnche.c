@@ -220,7 +220,7 @@ static MACHINE_START( avalnche )
 {
 	avalnche_state *state = machine->driver_data<avalnche_state>();
 
-	state_save_register_global(machine, state->avalance_video_inverted);
+	state->save_item(NAME(state->avalance_video_inverted));
 }
 
 static MACHINE_RESET( avalnche )

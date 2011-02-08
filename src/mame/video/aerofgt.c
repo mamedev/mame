@@ -87,14 +87,14 @@ static TILE_GET_INFO( get_bg2_tile_info )
 static void aerofgt_register_state_globals( running_machine *machine )
 {
 	aerofgt_state *state = machine->driver_data<aerofgt_state>();
-	state_save_register_global_array(machine, state->gfxbank);
-	state_save_register_global_array(machine, state->bank);
-	state_save_register_global(machine, state->bg1scrollx);
-	state_save_register_global(machine, state->bg1scrolly);
-	state_save_register_global(machine, state->bg2scrollx);
-	state_save_register_global(machine, state->bg2scrolly);
-	state_save_register_global(machine, state->charpalettebank);
-	state_save_register_global(machine, state->spritepalettebank);
+	state->save_item(NAME(state->gfxbank));
+	state->save_item(NAME(state->bank));
+	state->save_item(NAME(state->bg1scrollx));
+	state->save_item(NAME(state->bg1scrolly));
+	state->save_item(NAME(state->bg2scrollx));
+	state->save_item(NAME(state->bg2scrolly));
+	state->save_item(NAME(state->charpalettebank));
+	state->save_item(NAME(state->spritepalettebank));
 }
 
 VIDEO_START( pspikes )
@@ -106,7 +106,7 @@ VIDEO_START( pspikes )
 	state->sprite_gfx = 1;
 
 	aerofgt_register_state_globals(machine);
-	state_save_register_global(machine, state->spikes91_lookup);
+	state->save_item(NAME(state->spikes91_lookup));
 }
 
 
@@ -180,7 +180,7 @@ VIDEO_START( wbbc97 )
 
 	aerofgt_register_state_globals(machine);
 
-	state_save_register_global(machine, state->wbbc97_bitmap_enable);
+	state->save_item(NAME(state->wbbc97_bitmap_enable));
 }
 
 /***************************************************************************

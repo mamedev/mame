@@ -471,7 +471,7 @@ static MACHINE_START( lasso )
 	state->sn_1 = machine->device("sn76489.1");
 	state->sn_2 = machine->device("sn76489.2");
 
-	state_save_register_global(machine, state->gfxbank);
+	state->save_item(NAME(state->gfxbank));
 }
 
 static MACHINE_START( wwjgtin )
@@ -480,7 +480,7 @@ static MACHINE_START( wwjgtin )
 
 	MACHINE_START_CALL(lasso);
 
-	state_save_register_global(machine, state->track_enable);
+	state->save_item(NAME(state->track_enable));
 }
 
 static MACHINE_RESET( lasso )

@@ -43,10 +43,10 @@ static VIDEO_START( taitob_core )
 	state->framebuffer[1] = auto_bitmap_alloc(machine, 512, 256, machine->primary_screen->format());
 	state->pixel_bitmap = NULL;  /* only hitice needs this */
 
-	state_save_register_global_array(machine, state->pixel_scroll);
+	state->save_item(NAME(state->pixel_scroll));
 
-	state_save_register_global_bitmap(machine, state->framebuffer[0]);
-	state_save_register_global_bitmap(machine, state->framebuffer[1]);
+	state->save_item(NAME(*state->framebuffer[0]));
+	state->save_item(NAME(*state->framebuffer[1]));
 }
 
 VIDEO_START( taitob_color_order0 )
@@ -93,7 +93,7 @@ VIDEO_START( hitice )
 
 	state->pixel_bitmap = auto_bitmap_alloc(machine, 1024, 512, machine->primary_screen->format());
 
-	state_save_register_global_bitmap(machine, state->pixel_bitmap);
+	state->save_item(NAME(*state->pixel_bitmap));
 }
 
 VIDEO_RESET( hitice )

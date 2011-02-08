@@ -159,7 +159,7 @@ static MACHINE_START( gauntlet )
 	gauntlet_state *state = machine->driver_data<gauntlet_state>();
 	atarigen_init(machine);
 
-	state_save_register_global(machine, state->sound_reset_val);
+	state->save_item(NAME(state->sound_reset_val));
 }
 
 

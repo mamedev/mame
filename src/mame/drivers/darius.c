@@ -891,14 +891,14 @@ static MACHINE_START( darius )
 	state->msm5205_l = machine->device("msm5205.l");
 	state->msm5205_r = machine->device("msm5205.r");
 
-	state_save_register_global(machine, state->cpua_ctrl);
-	state_save_register_global(machine, state->coin_word);
+	state->save_item(NAME(state->cpua_ctrl));
+	state->save_item(NAME(state->coin_word));
 
-	state_save_register_global(machine, state->banknum);
-	state_save_register_global(machine, state->adpcm_command);
-	state_save_register_global(machine, state->nmi_enable);
-	state_save_register_global_array(machine, state->vol);
-	state_save_register_global_array(machine, state->pan);
+	state->save_item(NAME(state->banknum));
+	state->save_item(NAME(state->adpcm_command));
+	state->save_item(NAME(state->nmi_enable));
+	state->save_item(NAME(state->vol));
+	state->save_item(NAME(state->pan));
 	machine->state().register_postload(darius_postload, NULL);
 }
 

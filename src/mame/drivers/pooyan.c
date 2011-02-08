@@ -212,7 +212,7 @@ static MACHINE_START( pooyan )
 
 	state->maincpu = machine->device<cpu_device>("maincpu");
 
-	state_save_register_global(machine, state->irq_enable);
+	state->save_item(NAME(state->irq_enable));
 }
 
 

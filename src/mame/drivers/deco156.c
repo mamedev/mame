@@ -31,14 +31,14 @@ public:
 		  deco16ic(*this, "deco_custom"),
 		  oki2(*this, "oki2") { }
 
-	/* memory pointers */
-	UINT16 *  pf1_rowscroll;
-	UINT16 *  pf2_rowscroll;
-
 	/* devices */
 	required_device<arm_device> maincpu;
 	required_device<deco16ic_device> deco16ic;
 	optional_device<okim6295_device> oki2;
+
+	/* memory */
+	UINT16   pf1_rowscroll[0x800/2];
+	UINT16   pf2_rowscroll[0x800/2];
 };
 
 
@@ -46,13 +46,9 @@ static VIDEO_START( wcvol95 )
 {
 	deco156_state *state = machine->driver_data<deco156_state>();
 
-	/* allocate the ram as 16-bit (we do it here because the CPU is 32-bit) */
-	state->pf1_rowscroll = auto_alloc_array(machine, UINT16, 0x800/2);
-	state->pf2_rowscroll = auto_alloc_array(machine, UINT16, 0x800/2);
-
 	/* and register the allocated ram so that save states still work */
-	state_save_register_global_pointer(machine, state->pf1_rowscroll, 0x800/2);
-	state_save_register_global_pointer(machine, state->pf2_rowscroll, 0x800/2);
+	state->save_item(NAME(state->pf1_rowscroll));
+	state->save_item(NAME(state->pf2_rowscroll));
 }
 
 /* spriteram is really 16-bit.. this can be changed to use 16-bit ram like the tilemaps

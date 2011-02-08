@@ -897,7 +897,7 @@ static MACHINE_START( taitox )
 	seta_state *state = machine->driver_data<seta_state>();
 
 	state->taitox_banknum = -1;
-	state_save_register_global(machine, state->taitox_banknum);
+	state->save_item(NAME(state->taitox_banknum));
 	machine->state().register_postload(taitox_postload, NULL);
 }
 

@@ -55,9 +55,9 @@ VIDEO_START( pbillian )
 	state->bg_tilemap = tilemap_create(machine, pb_get_bg_tile_info, tilemap_scan_rows,  8, 8,32,32);
 
 	/* Need to do save state here */
-	state_save_register_global(machine, state->last_power[0]);
-	state_save_register_global(machine, state->last_power[1]);
-	state_save_register_global(machine, state->pbillian_show_power);
+	state->save_item(NAME(state->last_power[0]));
+	state->save_item(NAME(state->last_power[1]));
+	state->save_item(NAME(state->pbillian_show_power));
 }
 
 VIDEO_START( superqix )
@@ -70,10 +70,10 @@ VIDEO_START( superqix )
 	tilemap_set_transmask(state->bg_tilemap,0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
 	tilemap_set_transmask(state->bg_tilemap,1,0x0001,0xfffe); /* split type 1 has pen 0 transparent in front half */
 
-	state_save_register_global(machine, state->gfxbank);
-	state_save_register_global(machine, state->show_bitmap);
-	state_save_register_global_bitmap(machine, state->fg_bitmap[0]);
-	state_save_register_global_bitmap(machine, state->fg_bitmap[1]);
+	state->save_item(NAME(state->gfxbank));
+	state->save_item(NAME(state->show_bitmap));
+	state->save_item(NAME(*state->fg_bitmap[0]));
+	state->save_item(NAME(*state->fg_bitmap[1]));
 }
 
 

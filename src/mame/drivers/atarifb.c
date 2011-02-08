@@ -511,23 +511,23 @@ static MACHINE_START( atarifb )
 
 	state->maincpu = machine->device("maincpu");
 
-	state_save_register_global(machine, state->CTRLD);
-	state_save_register_global(machine, state->sign_x_1);
-	state_save_register_global(machine, state->sign_x_2);
-	state_save_register_global(machine, state->sign_x_3);
-	state_save_register_global(machine, state->sign_x_4);
-	state_save_register_global(machine, state->sign_y_1);
-	state_save_register_global(machine, state->sign_y_2);
-	state_save_register_global(machine, state->sign_y_3);
-	state_save_register_global(machine, state->sign_y_4);
-	state_save_register_global(machine, state->counter_x_in0);
-	state_save_register_global(machine, state->counter_y_in0);
-	state_save_register_global(machine, state->counter_x_in0b);
-	state_save_register_global(machine, state->counter_y_in0b);
-	state_save_register_global(machine, state->counter_x_in2);
-	state_save_register_global(machine, state->counter_y_in2);
-	state_save_register_global(machine, state->counter_x_in2b);
-	state_save_register_global(machine, state->counter_y_in2b);
+	state->save_item(NAME(state->CTRLD));
+	state->save_item(NAME(state->sign_x_1));
+	state->save_item(NAME(state->sign_x_2));
+	state->save_item(NAME(state->sign_x_3));
+	state->save_item(NAME(state->sign_x_4));
+	state->save_item(NAME(state->sign_y_1));
+	state->save_item(NAME(state->sign_y_2));
+	state->save_item(NAME(state->sign_y_3));
+	state->save_item(NAME(state->sign_y_4));
+	state->save_item(NAME(state->counter_x_in0));
+	state->save_item(NAME(state->counter_y_in0));
+	state->save_item(NAME(state->counter_x_in0b));
+	state->save_item(NAME(state->counter_y_in0b));
+	state->save_item(NAME(state->counter_x_in2));
+	state->save_item(NAME(state->counter_y_in2));
+	state->save_item(NAME(state->counter_x_in2b));
+	state->save_item(NAME(state->counter_y_in2b));
 }
 
 static MACHINE_RESET( atarifb )

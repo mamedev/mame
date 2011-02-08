@@ -308,10 +308,10 @@ static MACHINE_START( overdriv )
 	state->k053246 = machine->device("k053246");
 	state->k053251 = machine->device("k053251");
 
-	state_save_register_global(machine, state->cpuB_ctrl);
-	state_save_register_global(machine, state->sprite_colorbase);
-	state_save_register_global_array(machine, state->zoom_colorbase);
-	state_save_register_global_array(machine, state->road_colorbase);
+	state->save_item(NAME(state->cpuB_ctrl));
+	state->save_item(NAME(state->sprite_colorbase));
+	state->save_item(NAME(state->zoom_colorbase));
+	state->save_item(NAME(state->road_colorbase));
 }
 
 static MACHINE_RESET( overdriv )

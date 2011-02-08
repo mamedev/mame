@@ -418,7 +418,7 @@ static MACHINE_START( calorie )
 {
 	calorie_state *state = machine->driver_data<calorie_state>();
 
-	state_save_register_global(machine, state->bg_bank);
+	state->save_item(NAME(state->bg_bank));
 }
 
 static MACHINE_RESET( calorie )

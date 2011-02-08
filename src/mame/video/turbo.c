@@ -191,7 +191,7 @@ VIDEO_START( buckrog )
 
 	/* allocate the bitmap RAM */
 	state->buckrog_bitmap_ram = auto_alloc_array(machine, UINT8, 0xe000);
-	state_save_register_global_pointer(machine, state->buckrog_bitmap_ram, 0xe000);
+	state->save_pointer(NAME(state->buckrog_bitmap_ram), 0xe000);
 }
 
 

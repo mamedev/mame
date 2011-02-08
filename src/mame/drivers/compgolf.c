@@ -230,11 +230,11 @@ static MACHINE_START( compgolf )
 {
 	compgolf_state *state = machine->driver_data<compgolf_state>();
 
-	state_save_register_global(machine, state->bank);
-	state_save_register_global(machine, state->scrollx_lo);
-	state_save_register_global(machine, state->scrollx_hi);
-	state_save_register_global(machine, state->scrolly_lo);
-	state_save_register_global(machine, state->scrolly_hi);
+	state->save_item(NAME(state->bank));
+	state->save_item(NAME(state->scrollx_lo));
+	state->save_item(NAME(state->scrollx_hi));
+	state->save_item(NAME(state->scrolly_lo));
+	state->save_item(NAME(state->scrolly_hi));
 }
 
 static MACHINE_RESET( compgolf )

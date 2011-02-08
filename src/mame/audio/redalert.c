@@ -143,8 +143,8 @@ ADDRESS_MAP_END
 static SOUND_START( redalert_audio )
 {
 	redalert_state *state = machine->driver_data<redalert_state>();
-	state_save_register_global(machine, state->ay8910_latch_1);
-	state_save_register_global(machine, state->ay8910_latch_2);
+	state->save_item(NAME(state->ay8910_latch_1));
+	state->save_item(NAME(state->ay8910_latch_2));
 }
 
 
@@ -390,8 +390,8 @@ static const pia6821_interface demoneye_pia_intf =
 static SOUND_START( demoneye )
 {
 	redalert_state *state = machine->driver_data<redalert_state>();
-	state_save_register_global(machine, state->ay8910_latch_1);
-	state_save_register_global(machine, state->ay8910_latch_2);
+	state->save_item(NAME(state->ay8910_latch_1));
+	state->save_item(NAME(state->ay8910_latch_2));
 }
 
 

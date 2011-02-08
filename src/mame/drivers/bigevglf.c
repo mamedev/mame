@@ -437,34 +437,34 @@ static MACHINE_START( bigevglf )
 	state->audiocpu = machine->device("audiocpu");
 	state->mcu = machine->device("mcu");
 
-	state_save_register_global(machine, state->vidram_bank);
-	state_save_register_global(machine, state->plane_selected);
-	state_save_register_global(machine, state->plane_visible);
+	state->save_item(NAME(state->vidram_bank));
+	state->save_item(NAME(state->plane_selected));
+	state->save_item(NAME(state->plane_visible));
 
-	state_save_register_global_array(machine, state->beg13_ls74);
-	state_save_register_global(machine, state->beg_bank);
-	state_save_register_global(machine, state->port_select);
+	state->save_item(NAME(state->beg13_ls74));
+	state->save_item(NAME(state->beg_bank));
+	state->save_item(NAME(state->port_select));
 
-	state_save_register_global(machine, state->sound_nmi_enable);
-	state_save_register_global(machine, state->pending_nmi);
-	state_save_register_global(machine, state->for_sound);
-	state_save_register_global(machine, state->from_sound);
-	state_save_register_global(machine, state->sound_state);
+	state->save_item(NAME(state->sound_nmi_enable));
+	state->save_item(NAME(state->pending_nmi));
+	state->save_item(NAME(state->for_sound));
+	state->save_item(NAME(state->from_sound));
+	state->save_item(NAME(state->sound_state));
 
-	state_save_register_global(machine, state->main_sent);
-	state_save_register_global(machine, state->mcu_sent);
-	state_save_register_global(machine, state->mcu_coin_bit5);
+	state->save_item(NAME(state->main_sent));
+	state->save_item(NAME(state->mcu_sent));
+	state->save_item(NAME(state->mcu_coin_bit5));
 
-	state_save_register_global(machine, state->port_a_in);
-	state_save_register_global(machine, state->port_a_out);
-	state_save_register_global(machine, state->ddr_a);
-	state_save_register_global(machine, state->port_b_in);
-	state_save_register_global(machine, state->port_b_out);
-	state_save_register_global(machine, state->ddr_b);
-	state_save_register_global(machine, state->port_c_in);
-	state_save_register_global(machine, state->port_c_out);
-	state_save_register_global(machine, state->ddr_c);
-	state_save_register_global(machine, state->from_mcu);
+	state->save_item(NAME(state->port_a_in));
+	state->save_item(NAME(state->port_a_out));
+	state->save_item(NAME(state->ddr_a));
+	state->save_item(NAME(state->port_b_in));
+	state->save_item(NAME(state->port_b_out));
+	state->save_item(NAME(state->ddr_b));
+	state->save_item(NAME(state->port_c_in));
+	state->save_item(NAME(state->port_c_out));
+	state->save_item(NAME(state->ddr_c));
+	state->save_item(NAME(state->from_mcu));
 }
 
 static MACHINE_RESET( bigevglf )

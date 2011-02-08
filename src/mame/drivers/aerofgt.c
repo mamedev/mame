@@ -1302,7 +1302,7 @@ static MACHINE_START( common )
 	aerofgt_state *state = machine->driver_data<aerofgt_state>();
 
 	state->audiocpu = machine->device("audiocpu");
-	state_save_register_global(machine, state->pending_command);
+	state->save_item(NAME(state->pending_command));
 }
 
 static MACHINE_START( aerofgt )

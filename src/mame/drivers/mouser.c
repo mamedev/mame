@@ -195,8 +195,8 @@ static MACHINE_START( mouser )
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->sound_byte);
-	state_save_register_global(machine, state->nmi_enable);
+	state->save_item(NAME(state->sound_byte));
+	state->save_item(NAME(state->nmi_enable));
 }
 
 static MACHINE_RESET( mouser )

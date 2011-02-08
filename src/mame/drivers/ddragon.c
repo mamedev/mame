@@ -159,13 +159,13 @@ static MACHINE_START( ddragon )
 	state->adpcm_2 = machine->device("adpcm2");
 
 	/* register for save states */
-	state_save_register_global(machine, state->dd_sub_cpu_busy);
-	state_save_register_global(machine, state->scrollx_hi);
-	state_save_register_global(machine, state->scrolly_hi);
-	state_save_register_global_array(machine, state->adpcm_pos);
-	state_save_register_global_array(machine, state->adpcm_end);
-	state_save_register_global_array(machine, state->adpcm_idle);
-	state_save_register_global_array(machine, state->adpcm_data);
+	state->save_item(NAME(state->dd_sub_cpu_busy));
+	state->save_item(NAME(state->scrollx_hi));
+	state->save_item(NAME(state->scrolly_hi));
+	state->save_item(NAME(state->adpcm_pos));
+	state->save_item(NAME(state->adpcm_end));
+	state->save_item(NAME(state->adpcm_idle));
+	state->save_item(NAME(state->adpcm_data));
 }
 
 

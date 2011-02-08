@@ -798,10 +798,10 @@ static MACHINE_START( jack )
 
 	state->audiocpu = machine->device<cpu_device>("audiocpu");
 
-	state_save_register_global(machine, state->joinem_snd_bit);
-	state_save_register_global(machine, state->question_address);
-	state_save_register_global(machine, state->question_rom);
-	state_save_register_global_array(machine, state->remap_address);
+	state->save_item(NAME(state->joinem_snd_bit));
+	state->save_item(NAME(state->question_address));
+	state->save_item(NAME(state->question_rom));
+	state->save_item(NAME(state->remap_address));
 }
 
 static MACHINE_RESET( jack )

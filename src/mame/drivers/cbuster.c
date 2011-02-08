@@ -301,8 +301,8 @@ static MACHINE_START( cbuster )
 	state->audiocpu = machine->device("audiocpu");
 	state->deco16ic = machine->device("deco_custom");
 
-	state_save_register_global(machine, state->prot);
-	state_save_register_global(machine, state->pri);
+	state->save_item(NAME(state->prot));
+	state->save_item(NAME(state->pri));
 }
 
 static MACHINE_RESET( cbuster )

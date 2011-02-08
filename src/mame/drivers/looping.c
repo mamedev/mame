@@ -297,7 +297,7 @@ static VIDEO_UPDATE( looping )
 static MACHINE_START( looping )
 {
 	looping_state *state = machine->driver_data<looping_state>();
-	state_save_register_global_array(machine, state->sound);
+	state->save_item(NAME(state->sound));
 }
 
 

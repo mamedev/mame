@@ -1155,15 +1155,15 @@ static MACHINE_START( homedata )
 	state->sn = machine->device("snsnd");
 	state->dac = machine->device("dac");
 
-	state_save_register_global(machine, state->visible_page);
-	state_save_register_global(machine, state->flipscreen);
-	state_save_register_global(machine, state->blitter_bank);
-	state_save_register_global(machine, state->blitter_param_count);
-	state_save_register_global_array(machine, state->blitter_param);
-	state_save_register_global(machine, state->vblank);
-	state_save_register_global(machine, state->sndbank);
-	state_save_register_global(machine, state->keyb);
-	state_save_register_global(machine, state->snd_command);
+	state->save_item(NAME(state->visible_page));
+	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->blitter_bank));
+	state->save_item(NAME(state->blitter_param_count));
+	state->save_item(NAME(state->blitter_param));
+	state->save_item(NAME(state->vblank));
+	state->save_item(NAME(state->sndbank));
+	state->save_item(NAME(state->keyb));
+	state->save_item(NAME(state->snd_command));
 }
 
 static MACHINE_START( reikaids )
@@ -1176,11 +1176,11 @@ static MACHINE_START( reikaids )
 
 	MACHINE_START_CALL(homedata);
 
-	state_save_register_global(machine, state->upd7807_porta);
-	state_save_register_global(machine, state->upd7807_portc);
+	state->save_item(NAME(state->upd7807_porta));
+	state->save_item(NAME(state->upd7807_portc));
 
-	state_save_register_global(machine, state->reikaids_which);
-	state_save_register_global_array(machine, state->gfx_bank);
+	state->save_item(NAME(state->reikaids_which));
+	state->save_item(NAME(state->gfx_bank));
 }
 
 static MACHINE_START( pteacher )
@@ -1193,12 +1193,12 @@ static MACHINE_START( pteacher )
 
 	MACHINE_START_CALL(homedata);
 
-	state_save_register_global(machine, state->upd7807_porta);
-	state_save_register_global(machine, state->upd7807_portc);
+	state->save_item(NAME(state->upd7807_porta));
+	state->save_item(NAME(state->upd7807_portc));
 
-	state_save_register_global_array(machine, state->gfx_bank);
-	state_save_register_global(machine, state->to_cpu);
-	state_save_register_global(machine, state->from_cpu);
+	state->save_item(NAME(state->gfx_bank));
+	state->save_item(NAME(state->to_cpu));
+	state->save_item(NAME(state->from_cpu));
 }
 
 static MACHINE_RESET( homedata )

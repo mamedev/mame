@@ -702,10 +702,10 @@ static MACHINE_START( othunder )
 	state->_2610_2l = machine->device("2610.2l");
 	state->_2610_2r = machine->device("2610.2r");
 
-	state_save_register_global(machine, state->vblank_irq);
-	state_save_register_global(machine, state->ad_irq);
-	state_save_register_global(machine, state->banknum);
-	state_save_register_global_array(machine, state->pan);
+	state->save_item(NAME(state->vblank_irq));
+	state->save_item(NAME(state->ad_irq));
+	state->save_item(NAME(state->banknum));
+	state->save_item(NAME(state->pan));
 	machine->state().register_postload(othunder_postload, NULL);
 }
 

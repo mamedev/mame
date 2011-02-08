@@ -804,13 +804,13 @@ static MACHINE_START( liberate )
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->background_disable);
-	state_save_register_global(machine, state->background_color);
-	state_save_register_global(machine, state->gfx_rom_readback);
-	state_save_register_global(machine, state->latch);
-	state_save_register_global(machine, state->bank);
+	state->save_item(NAME(state->background_disable));
+	state->save_item(NAME(state->background_color));
+	state->save_item(NAME(state->gfx_rom_readback));
+	state->save_item(NAME(state->latch));
+	state->save_item(NAME(state->bank));
 
-	state_save_register_global_array(machine, state->io_ram);
+	state->save_item(NAME(state->io_ram));
 }
 
 static MACHINE_RESET( liberate )

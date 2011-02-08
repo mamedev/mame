@@ -174,10 +174,10 @@ static void video_start_cyberbal_common(running_machine* machine, int screens)
 	}
 
 	/* save states */
-	state_save_register_global_array(machine, state->current_slip);
-	state_save_register_global_array(machine, state->playfield_palette_bank);
-	state_save_register_global_array(machine, state->playfield_xscroll);
-	state_save_register_global_array(machine, state->playfield_yscroll);
+	state->save_item(NAME(state->current_slip));
+	state->save_item(NAME(state->playfield_palette_bank));
+	state->save_item(NAME(state->playfield_xscroll));
+	state->save_item(NAME(state->playfield_yscroll));
 }
 
 

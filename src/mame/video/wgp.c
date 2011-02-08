@@ -60,11 +60,11 @@ static void wgp_core_vh_start( running_machine *machine, int piv_xoffs, int piv_
 	/* We don't need tilemap_set_scroll_rows, as the custom draw routine applies rowscroll manually */
 	tc0100scn_set_colbanks(state->tc0100scn, 0x80, 0xc0, 0x40);
 
-	state_save_register_global(machine, state->piv_ctrl_reg);
-	state_save_register_global_array(machine, state->rotate_ctrl);
-	state_save_register_global_array(machine, state->piv_zoom);
-	state_save_register_global_array(machine, state->piv_scrollx);
-	state_save_register_global_array(machine, state->piv_scrolly);
+	state->save_item(NAME(state->piv_ctrl_reg));
+	state->save_item(NAME(state->rotate_ctrl));
+	state->save_item(NAME(state->piv_zoom));
+	state->save_item(NAME(state->piv_scrollx));
+	state->save_item(NAME(state->piv_scrolly));
 }
 
 VIDEO_START( wgp )

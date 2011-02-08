@@ -129,7 +129,7 @@ VIDEO_START( airbustr )
 	tilemap_set_scrolldx(state->fg_tilemap, 0x094, 0x06a);
 	tilemap_set_scrolldy(state->fg_tilemap, 0x100, 0x1ff);
 
-	state_save_register_global_bitmap(machine, state->sprites_bitmap);
+	state->save_item(NAME(*state->sprites_bitmap));
 }
 
 

@@ -567,13 +567,13 @@ static MACHINE_START( dai3wksi )
 	dai3wksi_state *state = machine->driver_data<dai3wksi_state>();
 
 	/* Set up save state */
-	state_save_register_global(machine, state->dai3wksi_flipscreen);
-	state_save_register_global(machine, state->dai3wksi_redscreen);
-	state_save_register_global(machine, state->dai3wksi_redterop);
-	state_save_register_global(machine, state->port_last1);
-	state_save_register_global(machine, state->port_last2);
-	state_save_register_global(machine, state->enabled_sound);
-	state_save_register_global(machine, state->sound3_counter);
+	state->save_item(NAME(state->dai3wksi_flipscreen));
+	state->save_item(NAME(state->dai3wksi_redscreen));
+	state->save_item(NAME(state->dai3wksi_redterop));
+	state->save_item(NAME(state->port_last1));
+	state->save_item(NAME(state->port_last2));
+	state->save_item(NAME(state->enabled_sound));
+	state->save_item(NAME(state->sound3_counter));
 }
 
 static MACHINE_RESET( dai3wksi )

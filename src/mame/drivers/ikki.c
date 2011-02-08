@@ -210,8 +210,8 @@ static MACHINE_START( ikki )
 {
 	ikki_state *state = machine->driver_data<ikki_state>();
 
-	state_save_register_global(machine, state->flipscreen);
-	state_save_register_global(machine, state->punch_through_pen);
+	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->punch_through_pen));
 }
 
 static MACHINE_RESET( ikki )

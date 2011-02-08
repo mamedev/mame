@@ -325,7 +325,7 @@ static void alloc_empty_tiles( running_machine *machine )
 	int code,i;
 
 	state->empty_tiles = auto_alloc_array(machine, UINT8, 16*16*16);
-	state_save_register_global_pointer(machine, state->empty_tiles, 16*16*16);
+	state->save_pointer(NAME(state->empty_tiles), 16*16*16);
 
 	for (code = 0; code < 0x10; code++)
 		for (i = 0; i < 16 * 16; i++)
@@ -358,8 +358,8 @@ static VIDEO_START( common_14220 )
 	state->tiletable_old = auto_alloc_array(machine, UINT16, state->tiletable_size / 2);
 	state->dirtyindex = auto_alloc_array(machine, UINT8, state->tiletable_size / 4);
 
-	state_save_register_global_pointer(machine, state->tiletable_old, state->tiletable_size / 2);
-	state_save_register_global_pointer(machine, state->dirtyindex, state->tiletable_size / 4);
+	state->save_pointer(NAME(state->tiletable_old), state->tiletable_size / 2);
+	state->save_pointer(NAME(state->dirtyindex), state->tiletable_size / 4);
 
 	state->bg_tilemap[0] = tilemap_create(machine, get_tile_info_0_8bit, tilemap_scan_rows, 8, 8, WIN_NX, WIN_NY);
 	state->bg_tilemap[1] = tilemap_create(machine, get_tile_info_1_8bit, tilemap_scan_rows, 8, 8, WIN_NX, WIN_NY);
@@ -379,8 +379,8 @@ static VIDEO_START( common_14220 )
 	tilemap_set_scrolldx(state->bg_tilemap[2], 0, 0);
 
 	/* Set up save state */
-	state_save_register_global(machine, state->sprite_xoffs);
-	state_save_register_global(machine, state->sprite_yoffs);
+	state->save_item(NAME(state->sprite_xoffs));
+	state->save_item(NAME(state->sprite_yoffs));
 	machine->state().register_postload(hyprduel_postload, NULL);
 }
 

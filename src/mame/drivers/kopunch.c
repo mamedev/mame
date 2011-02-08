@@ -177,7 +177,7 @@ static MACHINE_START( kopunch )
 
 	state->maincpu = machine->device("maincpu");
 
-	state_save_register_global(machine, state->gfxbank);
+	state->save_item(NAME(state->gfxbank));
 }
 
 static MACHINE_RESET( kopunch )

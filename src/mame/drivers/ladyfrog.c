@@ -289,12 +289,12 @@ static MACHINE_START( ladyfrog )
 
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->tilebank);
-	state_save_register_global(machine, state->palette_bank);
-	state_save_register_global(machine, state->sound_nmi_enable);
-	state_save_register_global(machine, state->pending_nmi);
-	state_save_register_global(machine, state->snd_flag);
-	state_save_register_global(machine, state->snd_data);
+	state->save_item(NAME(state->tilebank));
+	state->save_item(NAME(state->palette_bank));
+	state->save_item(NAME(state->sound_nmi_enable));
+	state->save_item(NAME(state->pending_nmi));
+	state->save_item(NAME(state->snd_flag));
+	state->save_item(NAME(state->snd_data));
 }
 
 static MACHINE_RESET( ladyfrog )

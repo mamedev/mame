@@ -32,8 +32,8 @@ VIDEO_START( changela )
 	state->scanline_timer = machine->scheduler().timer_alloc(FUNC(changela_scanline_callback));
 	state->scanline_timer->adjust(machine->primary_screen->time_until_pos(30), 30);
 
-	state_save_register_global_pointer(machine, state->memory_devices, 4 * 0x800);
-	state_save_register_global_pointer(machine, state->tree_ram, 2 * 0x20);
+	state->save_pointer(NAME(state->memory_devices), 4 * 0x800);
+	state->save_pointer(NAME(state->tree_ram), 2 * 0x20);
 }
 
 /**************************************************************************

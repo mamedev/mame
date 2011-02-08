@@ -534,17 +534,17 @@ static MACHINE_START( chinagat )
 	memory_configure_bank(machine, "bank1", 0, 8, machine->region("maincpu")->base() + 0x10000, 0x4000);
 
 	/* register for save states */
-	state_save_register_global(machine, state->scrollx_hi);
-	state_save_register_global(machine, state->scrolly_hi);
-	state_save_register_global(machine, state->adpcm_sound_irq);
-	state_save_register_global(machine, state->adpcm_addr);
-	state_save_register_global(machine, state->pcm_shift);
-	state_save_register_global(machine, state->pcm_nibble);
-	state_save_register_global(machine, state->i8748_P1);
-	state_save_register_global(machine, state->i8748_P2);
-	state_save_register_global(machine, state->mcu_command);
+	state->save_item(NAME(state->scrollx_hi));
+	state->save_item(NAME(state->scrolly_hi));
+	state->save_item(NAME(state->adpcm_sound_irq));
+	state->save_item(NAME(state->adpcm_addr));
+	state->save_item(NAME(state->pcm_shift));
+	state->save_item(NAME(state->pcm_nibble));
+	state->save_item(NAME(state->i8748_P1));
+	state->save_item(NAME(state->i8748_P2));
+	state->save_item(NAME(state->mcu_command));
 #if 0
-	state_save_register_global(machine, state->m5205_clk);
+	state->save_item(NAME(state->m5205_clk));
 #endif
 }
 

@@ -659,9 +659,9 @@ static MACHINE_START( topspeed )
 	state->pc080sn_1 = machine->device("pc080sn_1");
 	state->pc080sn_2 = machine->device("pc080sn_2");
 
-	state_save_register_global(machine, state->cpua_ctrl);
-	state_save_register_global(machine, state->ioc220_port);
-	state_save_register_global(machine, state->banknum);
+	state->save_item(NAME(state->cpua_ctrl));
+	state->save_item(NAME(state->ioc220_port));
+	state->save_item(NAME(state->banknum));
 	machine->state().register_postload(topspeed_postload, NULL);
 }
 

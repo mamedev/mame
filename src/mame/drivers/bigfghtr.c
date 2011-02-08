@@ -657,12 +657,12 @@ static MACHINE_START( bigfghtr )
 {
 	bigfghtr_state *state = machine->driver_data<bigfghtr_state>();
 
-	state_save_register_global(machine, state->fg_scrollx);
-	state_save_register_global(machine, state->fg_scrolly);
-	state_save_register_global(machine, state->scroll_x);
-	state_save_register_global(machine, state->scroll_y);
-	state_save_register_global(machine, state->vreg);
-	state_save_register_global(machine, state->read_latch);
+	state->save_item(NAME(state->fg_scrollx));
+	state->save_item(NAME(state->fg_scrolly));
+	state->save_item(NAME(state->scroll_x));
+	state->save_item(NAME(state->scroll_y));
+	state->save_item(NAME(state->vreg));
+	state->save_item(NAME(state->read_latch));
 }
 
 static MACHINE_RESET( bigfghtr )

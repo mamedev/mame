@@ -379,11 +379,11 @@ static MACHINE_START( junofrst )
 	state->filter_0_1 = machine->device("filter.0.1");
 	state->filter_0_2 = machine->device("filter.0.2");
 
-	state_save_register_global(machine, state->i8039_status);
-	state_save_register_global(machine, state->last_irq);
-	state_save_register_global(machine, state->flip_x);
-	state_save_register_global(machine, state->flip_y);
-	state_save_register_global_array(machine, state->blitterdata);
+	state->save_item(NAME(state->i8039_status));
+	state->save_item(NAME(state->last_irq));
+	state->save_item(NAME(state->flip_x));
+	state->save_item(NAME(state->flip_y));
+	state->save_item(NAME(state->blitterdata));
 }
 
 static MACHINE_RESET( junofrst )

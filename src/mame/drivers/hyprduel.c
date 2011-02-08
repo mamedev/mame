@@ -657,10 +657,10 @@ static MACHINE_START( hyprduel )
 	state->maincpu = machine->device("maincpu");
 	state->subcpu = machine->device("sub");
 
-	state_save_register_global(machine, state->blitter_bit);
-	state_save_register_global(machine, state->requested_int);
-	state_save_register_global(machine, state->subcpu_resetline);
-	state_save_register_global(machine, state->cpu_trigger);
+	state->save_item(NAME(state->blitter_bit));
+	state->save_item(NAME(state->requested_int));
+	state->save_item(NAME(state->subcpu_resetline));
+	state->save_item(NAME(state->cpu_trigger));
 }
 
 static MACHINE_START( magerror )

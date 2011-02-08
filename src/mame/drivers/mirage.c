@@ -370,7 +370,7 @@ static MACHINE_START( mirage )
 {
 	mirage_state *state = machine->driver_data<mirage_state>();
 
-	state_save_register_global(machine, state->mux_data);
+	state->save_item(NAME(state->mux_data));
 }
 
 static MACHINE_RESET( mirage )

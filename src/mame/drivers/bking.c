@@ -407,23 +407,23 @@ static MACHINE_START( bking )
 	state->audiocpu = machine->device("audiocpu");
 
 	/* video */
-	state_save_register_global_array(machine, state->pc3259_output);
-	state_save_register_global(machine, state->pc3259_mask);
-	state_save_register_global(machine, state->xld1);
-	state_save_register_global(machine, state->xld2);
-	state_save_register_global(machine, state->xld3);
-	state_save_register_global(machine, state->yld1);
-	state_save_register_global(machine, state->yld2);
-	state_save_register_global(machine, state->yld3);
-	state_save_register_global(machine, state->ball1_pic);
-	state_save_register_global(machine, state->ball2_pic);
-	state_save_register_global(machine, state->crow_pic);
-	state_save_register_global(machine, state->crow_flip);
-	state_save_register_global(machine, state->palette_bank);
-	state_save_register_global(machine, state->controller);
-	state_save_register_global(machine, state->hit);
+	state->save_item(NAME(state->pc3259_output));
+	state->save_item(NAME(state->pc3259_mask));
+	state->save_item(NAME(state->xld1));
+	state->save_item(NAME(state->xld2));
+	state->save_item(NAME(state->xld3));
+	state->save_item(NAME(state->yld1));
+	state->save_item(NAME(state->yld2));
+	state->save_item(NAME(state->yld3));
+	state->save_item(NAME(state->ball1_pic));
+	state->save_item(NAME(state->ball2_pic));
+	state->save_item(NAME(state->crow_pic));
+	state->save_item(NAME(state->crow_flip));
+	state->save_item(NAME(state->palette_bank));
+	state->save_item(NAME(state->controller));
+	state->save_item(NAME(state->hit));
 	/* sound */
-	state_save_register_global(machine, state->sound_nmi_enable);
+	state->save_item(NAME(state->sound_nmi_enable));
 }
 
 static MACHINE_START( bking3 )
@@ -433,8 +433,8 @@ static MACHINE_START( bking3 )
 	MACHINE_START_CALL(bking);
 
 	/* misc */
-	state_save_register_global(machine, state->addr_h);
-	state_save_register_global(machine, state->addr_l);
+	state->save_item(NAME(state->addr_h));
+	state->save_item(NAME(state->addr_l));
 
 }
 

@@ -35,8 +35,8 @@ VIDEO_START( fgoal )
 	state->fgbitmap = machine->primary_screen->alloc_compatible_bitmap();
 	state->bgbitmap = machine->primary_screen->alloc_compatible_bitmap();
 
-	state_save_register_global_bitmap(machine, state->fgbitmap);
-	state_save_register_global_bitmap(machine, state->bgbitmap);
+	state->save_item(NAME(*state->fgbitmap));
+	state->save_item(NAME(*state->bgbitmap));
 }
 
 

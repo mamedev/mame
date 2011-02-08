@@ -258,11 +258,11 @@ static MACHINE_START( ddribble )
 	state->filter2 = machine->device("filter2");
 	state->filter3 = machine->device("filter3");
 
-	state_save_register_global(machine, state->int_enable_0);
-	state_save_register_global(machine, state->int_enable_1);
-	state_save_register_global_array(machine, state->vregs[0]);
-	state_save_register_global_array(machine, state->vregs[1]);
-	state_save_register_global_array(machine, state->charbank);
+	state->save_item(NAME(state->int_enable_0));
+	state->save_item(NAME(state->int_enable_1));
+	state->save_item(NAME(state->vregs[0]));
+	state->save_item(NAME(state->vregs[1]));
+	state->save_item(NAME(state->charbank));
 }
 
 static MACHINE_RESET( ddribble )

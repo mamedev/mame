@@ -311,9 +311,9 @@ static MACHINE_START( popper )
 
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->flipscreen);
-	state_save_register_global(machine, state->e002);
-	state_save_register_global(machine, state->gfx_bank);
+	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->e002));
+	state->save_item(NAME(state->gfx_bank));
 }
 
 static MACHINE_RESET( popper )

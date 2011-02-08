@@ -259,7 +259,7 @@ static MACHINE_START( pbaction )
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->scroll);
+	state->save_item(NAME(state->scroll));
 }
 
 static MACHINE_RESET( pbaction )

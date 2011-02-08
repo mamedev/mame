@@ -79,7 +79,7 @@ VIDEO_START( badlands )
 	atarimo_init(machine, 0, &modesc);
 
 	/* save states */
-	state_save_register_global(machine, state->playfield_tile_bank);
+	state->save_item(NAME(state->playfield_tile_bank));
 }
 
 

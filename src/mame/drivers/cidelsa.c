@@ -447,7 +447,7 @@ static MACHINE_START( cidelsa )
 	cidelsa_state *state = machine->driver_data<cidelsa_state>();
 
 	/* register for state saving */
-	state_save_register_global(machine, state->m_reset);
+	state->save_item(NAME(state->m_reset));
 }
 
 static MACHINE_START( draco )
@@ -461,8 +461,8 @@ static MACHINE_START( draco )
 	memory_set_bank(machine, "bank1", 0);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->m_draco_sound);
-	state_save_register_global(machine, state->m_draco_ay_latch);
+	state->save_item(NAME(state->m_draco_sound));
+	state->save_item(NAME(state->m_draco_ay_latch));
 }
 
 /* Machine Reset */

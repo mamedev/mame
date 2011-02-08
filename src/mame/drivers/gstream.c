@@ -523,14 +523,14 @@ static MACHINE_START( gstream )
 {
 	gstream_state *state = machine->driver_data<gstream_state>();
 
-	state_save_register_global(machine, state->tmap1_scrollx);
-	state_save_register_global(machine, state->tmap2_scrollx);
-	state_save_register_global(machine, state->tmap3_scrollx);
-	state_save_register_global(machine, state->tmap1_scrolly);
-	state_save_register_global(machine, state->tmap2_scrolly);
-	state_save_register_global(machine, state->tmap3_scrolly);
-	state_save_register_global(machine, state->oki_bank_0);
-	state_save_register_global(machine, state->oki_bank_1);
+	state->save_item(NAME(state->tmap1_scrollx));
+	state->save_item(NAME(state->tmap2_scrollx));
+	state->save_item(NAME(state->tmap3_scrollx));
+	state->save_item(NAME(state->tmap1_scrolly));
+	state->save_item(NAME(state->tmap2_scrolly));
+	state->save_item(NAME(state->tmap3_scrolly));
+	state->save_item(NAME(state->oki_bank_0));
+	state->save_item(NAME(state->oki_bank_1));
 }
 
 static MACHINE_RESET( gstream )

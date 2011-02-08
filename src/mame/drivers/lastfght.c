@@ -105,9 +105,9 @@ static VIDEO_START( lastfght )
 
 	state->colorram = auto_alloc_array(machine, UINT8, 256 * 3);
 
-	state_save_register_global_bitmap(machine, state->bitmap[0]);
-	state_save_register_global_bitmap(machine, state->bitmap[1]);
-	state_save_register_global_pointer(machine, state->colorram, 256 * 3);
+	state->save_item(NAME(*state->bitmap[0]));
+	state->save_item(NAME(*state->bitmap[1]));
+	state->save_pointer(NAME(state->colorram), 256 * 3);
 }
 
 
@@ -529,22 +529,22 @@ static MACHINE_START( lastfght )
 
 	state->maincpu = machine->device("maincpu");
 
-	state_save_register_global(machine, state->clr_offset);
-	state_save_register_global(machine, state->dest);
-	state_save_register_global(machine, state->hi);
-	state_save_register_global(machine, state->sx);
-	state_save_register_global(machine, state->sx1);
-	state_save_register_global(machine, state->dsx);
-	state_save_register_global(machine, state->sy);
-	state_save_register_global(machine, state->sy1);
-	state_save_register_global(machine, state->dsy);
-	state_save_register_global(machine, state->sp);
-	state_save_register_global(machine, state->sr);
-	state_save_register_global(machine, state->x);
-	state_save_register_global(machine, state->y);
-	state_save_register_global(machine, state->w);
-	state_save_register_global(machine, state->h);
-	state_save_register_global(machine, state->c00006);
+	state->save_item(NAME(state->clr_offset));
+	state->save_item(NAME(state->dest));
+	state->save_item(NAME(state->hi));
+	state->save_item(NAME(state->sx));
+	state->save_item(NAME(state->sx1));
+	state->save_item(NAME(state->dsx));
+	state->save_item(NAME(state->sy));
+	state->save_item(NAME(state->sy1));
+	state->save_item(NAME(state->dsy));
+	state->save_item(NAME(state->sp));
+	state->save_item(NAME(state->sr));
+	state->save_item(NAME(state->x));
+	state->save_item(NAME(state->y));
+	state->save_item(NAME(state->w));
+	state->save_item(NAME(state->h));
+	state->save_item(NAME(state->c00006));
 }
 
 static MACHINE_RESET( lastfght )

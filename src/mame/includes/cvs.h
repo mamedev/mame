@@ -29,9 +29,6 @@ public:
 	UINT8 *    cvs_4_bit_dac_data;
 	UINT8 *    tms5110_ctl_data;
 	UINT8 *    dac3_state;
-	UINT8 *    color_ram;
-	UINT8 *    palette_ram;
-	UINT8 *    character_ram;
 	UINT8 *    effectram;	// quasar
 
 	/* video-related */
@@ -65,6 +62,13 @@ public:
 	device_t *s2636_0;
 	device_t *s2636_1;
 	device_t *s2636_2;
+
+	/* memory */
+	UINT8      color_ram[0x400];
+	UINT8      palette_ram[0x10];
+  	UINT8      character_ram[3 * 0x800];	/* only half is used, but
+                                               by allocating twice the amount,
+                                               we can use the same gfx_layout */
 };
 
 /*----------- defined in drivers/cvs.c -----------*/

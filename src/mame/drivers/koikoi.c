@@ -336,10 +336,10 @@ static MACHINE_START( koikoi )
 {
 	koikoi_state *state = machine->driver_data<koikoi_state>();
 
-	state_save_register_global(machine, state->inputcnt);
-	state_save_register_global(machine, state->inputval);
-	state_save_register_global(machine, state->inputlen);
-	state_save_register_global_array(machine, state->ioram);
+	state->save_item(NAME(state->inputcnt));
+	state->save_item(NAME(state->inputval));
+	state->save_item(NAME(state->inputlen));
+	state->save_item(NAME(state->ioram));
 }
 
 static MACHINE_RESET( koikoi )

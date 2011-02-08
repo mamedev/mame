@@ -348,10 +348,10 @@ static MACHINE_START( dbz )
 	state->k053246 = machine->device("k053246");
 	state->k053251 = machine->device("k053251");
 
-	state_save_register_global(machine, state->control);
-	state_save_register_global(machine, state->sprite_colorbase);
-	state_save_register_global_array(machine, state->layerpri);
-	state_save_register_global_array(machine, state->layer_colorbase);
+	state->save_item(NAME(state->control));
+	state->save_item(NAME(state->sprite_colorbase));
+	state->save_item(NAME(state->layerpri));
+	state->save_item(NAME(state->layer_colorbase));
 }
 
 static MACHINE_RESET( dbz )

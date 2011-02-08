@@ -256,9 +256,9 @@ static MACHINE_START( amspdwy )
 
 	state->audiocpu = machine->device("audiocpu");
 
-	state_save_register_global(machine, state->flipscreen);
-	state_save_register_global_array(machine, state->wheel_old);
-	state_save_register_global_array(machine, state->wheel_return);
+	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->wheel_old));
+	state->save_item(NAME(state->wheel_return));
 }
 
 static MACHINE_RESET( amspdwy )
