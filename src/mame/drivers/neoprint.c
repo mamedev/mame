@@ -14,6 +14,7 @@
     - printer/camera devices;
     - lamps;
     - upd4990a returns 4 years less than expected?
+    - nprsp: paletteram has 0x40000 palette entries, kludged to work.
 
 *******************************************************************************************/
 
