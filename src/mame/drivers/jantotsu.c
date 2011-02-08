@@ -9,8 +9,6 @@ Notes:
  Mode is for adjusting these screens (to not let the human opponent to read your tiles).
 
 TODO:
--Video buffering? If you coin up, you can see the "credit 1" msg that gets build into the
- video bitmaps...
 -According to the flyer, color bitplanes might be wrong on the A-N mahjong charset, might be
  a BTANB however...
 -I need schematics / pcb photos (component + solder sides) to understand if the background
@@ -108,6 +106,7 @@ public:
 	/* video-related */
 	UINT8    *bitmap;
 	UINT8    vram_bank, col_bank;
+	UINT8    display_on;
 
 	/* sound-related */
 	UINT32   adpcm_pos;
@@ -139,6 +138,9 @@ static VIDEO_UPDATE(jantotsu)
 	jantotsu_state *state = screen->machine->driver_data<jantotsu_state>();
 	int x, y, i;
 	int count = 0;
+
+	if(!state->display_on)
+		return 0;
 
 	for (y = 0; y < 256; y++)
 	{
@@ -187,12 +189,13 @@ static WRITE8_HANDLER( bankaddr_w )
 {
 	jantotsu_state *state = space->machine->driver_data<jantotsu_state>();
 
-	state->vram_bank = ((data & 0xc0) >> 6); // top 2 bits?
+	state->vram_bank = ((data & 0xc0) >> 6);
 
-	// looks like the top 2 bits and bottom 2 bits are used..
-	// multiple buffers? different read / write ?
+	state->display_on = (data & 2);
 
-	//  printf("%02x\n",data & 0x03);
+	/* bit 0 is unknown */
+	if(data & 0x3c)
+		logerror("I/O port $07 write trips %02x\n",data);
 }
 
 static PALETTE_INIT( jantotsu )
@@ -573,4 +576,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, jantotsu,  0,    jantotsu, jantotsu,  0, ROT270, "Sanritsu", "4nin-uchi Mahjong Jantotsu", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1983, jantotsu,  0,    jantotsu, jantotsu,  0, ROT270, "Sanritsu", "4nin-uchi Mahjong Jantotsu", GAME_SUPPORTS_SAVE )
