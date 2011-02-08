@@ -1,6 +1,6 @@
 /**********************************************************************************************
  *
- *  Streaming singe channel ADPCM core for the ES8712 chip
+ *  Streaming single channel ADPCM core for the ES8712 chip
  *  Chip is branded by Excellent Systems, probably OEM'd.
  *
  *  Samples are currently looped, but whether they should and how, is unknown.
