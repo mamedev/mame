@@ -379,22 +379,21 @@ void screen_device::device_start()
 	if (overname != NULL && strcmp(overname, "none") != 0)
 		load_effect_overlay(overname);
 
-	state_save_register_device_item(this, 0, m_width);
-	state_save_register_device_item(this, 0, m_height);
-	state_save_register_device_item(this, 0, m_visarea.min_x);
-	state_save_register_device_item(this, 0, m_visarea.min_y);
-	state_save_register_device_item(this, 0, m_visarea.max_x);
-	state_save_register_device_item(this, 0, m_visarea.max_y);
-	state_save_register_device_item(this, 0, m_last_partial_scan);
-	state_save_register_device_item(this, 0, m_frame_period);
-	state_save_register_device_item(this, 0, m_scantime);
-	state_save_register_device_item(this, 0, m_pixeltime);
-	state_save_register_device_item(this, 0, m_vblank_period);
-	state_save_register_device_item(this, 0, m_vblank_start_time.seconds);
-	state_save_register_device_item(this, 0, m_vblank_start_time.attoseconds);
-	state_save_register_device_item(this, 0, m_vblank_end_time.seconds);
-	state_save_register_device_item(this, 0, m_vblank_end_time.attoseconds);
-	state_save_register_device_item(this, 0, m_frame_number);
+	// register items for saving
+	save_item(NAME(m_width));
+	save_item(NAME(m_height));
+	save_item(NAME(m_visarea.min_x));
+	save_item(NAME(m_visarea.min_y));
+	save_item(NAME(m_visarea.max_x));
+	save_item(NAME(m_visarea.max_y));
+	save_item(NAME(m_last_partial_scan));
+	save_item(NAME(m_frame_period));
+	save_item(NAME(m_scantime));
+	save_item(NAME(m_pixeltime));
+	save_item(NAME(m_vblank_period));
+	save_item(NAME(m_vblank_start_time));
+	save_item(NAME(m_vblank_end_time));
+	save_item(NAME(m_frame_number));
 }
 
 

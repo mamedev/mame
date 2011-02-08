@@ -924,7 +924,7 @@ MACHINE_START( schaser_sh )
 	state_save_register_global(machine, state->schaser_effect_555_is_low);
 	state_save_register_global(machine, state->schaser_effect_555_time_remain_savable);
 	state_save_register_global(machine, state->port_2_last_extra);
-	state_save_register_postload(machine, schaser_reinit_555_time_remain, NULL);
+	machine->state().register_postload(schaser_reinit_555_time_remain, NULL);
 }
 
 

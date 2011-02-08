@@ -565,7 +565,7 @@ static MACHINE_START( vegas )
 	state_save_register_global(machine, sio_led_state);
 	state_save_register_global(machine, pending_analog_read);
 	state_save_register_global(machine, cmos_unlocked);
-	state_save_register_postload(machine, vegas_postload, NULL);
+	machine->state().register_postload(vegas_postload, NULL);
 }
 
 

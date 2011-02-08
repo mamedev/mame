@@ -259,7 +259,7 @@ static CPU_INIT(h8bit)
 	state_save_register_device_item(device, 0, h8->h8TSTR);
 	state_save_register_device_item_array(device, 0, h8->h8TCNT);
 
-	state_save_register_postload(h8->device->machine, h8_onstateload, h8);
+	h8->device->machine->state().register_postload(h8_onstateload, h8);
 }
 
 static CPU_RESET(h8bit)

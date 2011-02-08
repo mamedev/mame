@@ -265,7 +265,7 @@ static MACHINE_START( renegade )
 	state_save_register_global(machine, mcu_key);
 
 	state_save_register_global(machine, bank);
-	state_save_register_postload(machine, renegade_postload, NULL);
+	machine->state().register_postload(renegade_postload, NULL);
 }
 
 static DRIVER_INIT( renegade )

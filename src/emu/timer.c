@@ -286,7 +286,7 @@ void timer_device::device_start()
 	m_timer = timer_alloc();
 
 	// register for save states
-	state_save_register_device_item(this, 0, m_first_time);
+	save_item(NAME(m_first_time));
 }
 
 

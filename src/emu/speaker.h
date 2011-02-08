@@ -85,6 +85,7 @@ public:
 	virtual device_t *alloc_device(running_machine &machine) const;
 
 	// inline configuration helpers
+	speaker_device_config *next_speaker() const { return downcast<speaker_device_config *>(typenext()); }
 	static void static_set_position(device_config *device, double x, double y, double z);
 
 protected:
@@ -109,6 +110,9 @@ class speaker_device : public device_t,
 	virtual ~speaker_device();
 
 public:
+	// getters
+	speaker_device *next_speaker() const { return downcast<speaker_device *>(typenext()); }
+
 	// internally for use by the sound system
 	void mix(INT32 *leftmix, INT32 *rightmix, int &samples_this_update, bool suppress);
 
@@ -133,55 +137,6 @@ protected:
 
 // device type definition
 extern const device_type SPEAKER;
-
-
-
-//**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  speaker_first - return the first speaker
-//  device config in a machine_config
-//-------------------------------------------------
-
-inline const speaker_device_config *speaker_first(const machine_config &config)
-{
-	return downcast<speaker_device_config *>(config.m_devicelist.first(SPEAKER));
-}
-
-
-//-------------------------------------------------
-//  speaker_next - return the next speaker
-//  device config in a machine_config
-//-------------------------------------------------
-
-inline const speaker_device_config *speaker_next(const speaker_device_config *previous)
-{
-	return downcast<speaker_device_config *>(previous->typenext());
-}
-
-
-//-------------------------------------------------
-//  speaker_first - return the first speaker
-//  device in a machine
-//-------------------------------------------------
-
-inline speaker_device *speaker_first(running_machine &machine)
-{
-	return downcast<speaker_device *>(machine.m_devicelist.first(SPEAKER));
-}
-
-
-//-------------------------------------------------
-//  speaker_next - return the next speaker
-//  device in a machine
-//-------------------------------------------------
-
-inline speaker_device *speaker_next(speaker_device *previous)
-{
-	return downcast<speaker_device *>(previous->typenext());
-}
 
 
 #endif	/* __SOUND_H__ */

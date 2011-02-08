@@ -2746,7 +2746,7 @@ static DEVICE_START( k052109 )
 	state_save_register_device_item_array(device, 0, k052109->dx);
 	state_save_register_device_item_array(device, 0, k052109->dy);
 	state_save_register_device_item(device, 0, k052109->has_extra_video_ram);
-	state_save_register_postload(device->machine, k052109_tileflip_reset, k052109);
+	device->machine->state().register_postload(k052109_tileflip_reset, k052109);
 }
 
 static DEVICE_RESET( k052109 )
@@ -5757,7 +5757,7 @@ static DEVICE_START( k053251 )
 	state_save_register_device_item(device, 0, k053251->tilemaps_set);
 	state_save_register_device_item_array(device, 0, k053251->dirty_tmap);
 
-	state_save_register_postload(device->machine, k053251_reset_indexes, k053251);
+	device->machine->state().register_postload(k053251_reset_indexes, k053251);
 }
 
 static DEVICE_RESET( k053251 )
@@ -8003,7 +8003,7 @@ static DEVICE_START( k056832 )
 		state_save_register_device_item(device, i, k056832->last_colorbase[i]);
 	}
 
-	state_save_register_postload(device->machine, k056832_postload, k056832);
+	device->machine->state().register_postload(k056832_postload, k056832);
 }
 
 /***************************************************************************/

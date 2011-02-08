@@ -713,7 +713,7 @@ MACHINE_START( tnzs )
 	state_save_register_global(machine, state->bank1);
 	state_save_register_global(machine, state->bank2);
 
-	state_save_register_postload(machine, tnzs_postload, NULL);
+	machine->state().register_postload(tnzs_postload, NULL);
 }
 
 MACHINE_START( jpopnics )
@@ -735,7 +735,7 @@ MACHINE_START( jpopnics )
 	state_save_register_global(machine, state->bank1);
 	state_save_register_global(machine, state->bank2);
 
-	state_save_register_postload(machine, tnzs_postload, NULL);
+	machine->state().register_postload(tnzs_postload, NULL);
 }
 
 

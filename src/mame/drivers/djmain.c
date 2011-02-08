@@ -1442,7 +1442,7 @@ static MACHINE_START( djmain )
 	state_save_register_global(machine, v_ctrl);
 	state_save_register_global_array(machine, obj_regs);
 
-	state_save_register_postload(machine, djmain_postload, NULL);
+	machine->state().register_postload(djmain_postload, NULL);
 }
 
 

@@ -430,7 +430,7 @@ static void init_common(int isdsp, legacy_cpu_device *device, device_irq_callbac
 	state_save_register_device_item_array(device, 0, jaguar->a);
 	state_save_register_device_item_array(device, 0, jaguar->ctrl);
 	state_save_register_device_item(device, 0, jaguar->ppc);
-	state_save_register_postload(device->machine, jaguar_postload, (void *)device);
+	device->machine->state().register_postload(jaguar_postload, (void *)device);
 }
 
 

@@ -283,12 +283,9 @@ void emu_timer::register_save()
 	// save the bits
 	state_save_register_item(m_machine, "timer", name, index, m_param);
 	state_save_register_item(m_machine, "timer", name, index, m_enabled);
-	state_save_register_item(m_machine, "timer", name, index, m_period.seconds);
-	state_save_register_item(m_machine, "timer", name, index, m_period.attoseconds);
-	state_save_register_item(m_machine, "timer", name, index, m_start.seconds);
-	state_save_register_item(m_machine, "timer", name, index, m_start.attoseconds);
-	state_save_register_item(m_machine, "timer", name, index, m_expire.seconds);
-	state_save_register_item(m_machine, "timer", name, index, m_expire.attoseconds);
+	state_save_register_item(m_machine, "timer", name, index, m_period);
+	state_save_register_item(m_machine, "timer", name, index, m_start);
+	state_save_register_item(m_machine, "timer", name, index, m_expire);
 }
 
 
@@ -336,16 +333,10 @@ device_scheduler::device_scheduler(running_machine &machine) :
 	// append a single never-expiring timer so there is always one in the list
 	m_timer_list = &m_timer_allocator.alloc()->init(m_machine, NULL, NULL, NULL, true);
 	m_timer_list->adjust(attotime::never);
-}
 
-
-// remove me once save state registration is embedded
-void device_scheduler::register_for_save()
-{
 	// register global states
-	state_save_register_item(&m_machine, "timer", NULL, 0, m_basetime.seconds);
-	state_save_register_item(&m_machine, "timer", NULL, 0, m_basetime.attoseconds);
-	state_save_register_postload(&m_machine, &state_postload_stub<device_scheduler, &device_scheduler::postload>, this);
+	state_save_register_item(&m_machine, "timer", NULL, 0, m_basetime);
+	m_machine.state().register_postload(&state_postload_stub<device_scheduler, &device_scheduler::postload>, this);
 }
 
 

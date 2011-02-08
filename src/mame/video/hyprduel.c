@@ -381,7 +381,7 @@ static VIDEO_START( common_14220 )
 	/* Set up save state */
 	state_save_register_global(machine, state->sprite_xoffs);
 	state_save_register_global(machine, state->sprite_yoffs);
-	state_save_register_postload(machine, hyprduel_postload, NULL);
+	machine->state().register_postload(hyprduel_postload, NULL);
 }
 
 VIDEO_START( hyprduel_14220 )

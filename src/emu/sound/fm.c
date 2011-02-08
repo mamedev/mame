@@ -1704,8 +1704,7 @@ static void FMsave_state_channel(device_t *device,FM_CH *CH,int num_ch)
 static void FMsave_state_st(device_t *device,FM_ST *ST)
 {
 #if FM_BUSY_FLAG_SUPPORT
-	state_save_register_device_item(device, 0, ST->busy_expiry_time.seconds );
-	state_save_register_device_item(device, 0, ST->busy_expiry_time.attoseconds );
+	state_save_register_device_item(device, 0, ST->busy_expiry_time );
 #endif
 	state_save_register_device_item(device, 0, ST->address );
 	state_save_register_device_item(device, 0, ST->irq     );

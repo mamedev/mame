@@ -898,7 +898,7 @@ static MACHINE_START( taitox )
 
 	state->taitox_banknum = -1;
 	state_save_register_global(machine, state->taitox_banknum);
-	state_save_register_postload(machine, taitox_postload, NULL);
+	machine->state().register_postload(taitox_postload, NULL);
 }
 
 static const tc0140syt_interface taitox_tc0140syt_intf =

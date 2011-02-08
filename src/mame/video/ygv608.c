@@ -492,7 +492,7 @@ static void ygv608_register_state_save(running_machine *machine)
 	state_save_register_item_2d_array(machine, "ygv608", NULL, 0, ygv608.scroll_data_table);
 	state_save_register_item_2d_array(machine, "ygv608", NULL, 0, ygv608.colour_palette);
 
-	state_save_register_postload(machine, ygv608_postload, NULL);
+	machine->state().register_postload(ygv608_postload, NULL);
 }
 
 static void ygv608_exit(running_machine &machine)

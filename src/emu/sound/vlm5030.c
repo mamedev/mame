@@ -726,7 +726,7 @@ static DEVICE_START( vlm5030 )
 	state_save_register_device_item(device,0,chip->target_pitch);
 	state_save_register_device_item_array(device,0,chip->target_k);
 	state_save_register_device_item_array(device,0,chip->x);
-	state_save_register_postload(device->machine, vlm5030_restore_state, chip);
+	device->machine->state().register_postload(vlm5030_restore_state, chip);
 }
 
 

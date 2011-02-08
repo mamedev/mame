@@ -338,7 +338,7 @@ static MACHINE_START( 20pacgal )
 
 	state_save_register_global(machine, state->game_selected);
 	state_save_register_global_pointer(machine, state->ram_48000, 0x2000);
-	state_save_register_postload(machine, postload_20pacgal, NULL);
+	machine->state().register_postload(postload_20pacgal, NULL);
 }
 
 static MACHINE_RESET( 20pacgal )

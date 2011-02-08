@@ -233,7 +233,7 @@ static MACHINE_START( m92 )
 	state_save_register_global(machine, state->irqvector);
 	state_save_register_global(machine, state->sound_status);
 	state_save_register_global(machine, state->bankaddress);
-	state_save_register_postload(machine, m92_postload, NULL);
+	machine->state().register_postload(m92_postload, NULL);
 
 	state->scanline_timer = machine->scheduler().timer_alloc(FUNC(m92_scanline_interrupt));
 }

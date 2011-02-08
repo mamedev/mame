@@ -258,8 +258,7 @@ static TIMER_CALLBACK( reset_timer )
 static void pic_register_state(running_machine *machine)
 {
 	state_save_register_global(machine, pic.latch);
-	state_save_register_global(machine, pic.latch_expire_time.seconds);
-	state_save_register_global(machine, pic.latch_expire_time.attoseconds);
+	state_save_register_global(machine, pic.latch_expire_time);
 	state_save_register_global(machine, pic.state);
 	state_save_register_global(machine, pic.index);
 	state_save_register_global(machine, pic.total);

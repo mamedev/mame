@@ -437,6 +437,12 @@ public:
 	void synchronize(device_timer_id id = 0, int param = 0, void *ptr = NULL) { timer_set(attotime::zero, id, param, ptr); }
 	void timer_expired(emu_timer &timer, device_timer_id id, int param, void *ptr) { device_timer(timer, id, param, ptr); }
 
+	// state saving interfaces
+	template<typename T>
+	void save_item(T &value, const char *valname, int index = 0) { m_state_manager.save_item(name(), tag(), index, value, valname); }
+	template<typename T>
+	void save_pointer(T *value, const char *valname, UINT32 count, int index = 0) { m_state_manager.save_pointer(name(), tag(), index, value, valname); }
+
 	// debugging
 	device_debug *debug() const { return m_debug; }
 
@@ -475,6 +481,7 @@ protected:
 	//------------------- end derived class overrides
 
 	running_machine &		m_machine;
+	state_manager &			m_state_manager;
 	device_debug *			m_debug;
 
 	// for speed

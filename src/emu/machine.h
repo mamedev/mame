@@ -187,7 +187,6 @@ class video_manager;
 class debug_view_manager;
 class osd_interface;
 
-typedef struct _state_private state_private;
 typedef struct _memory_private memory_private;
 typedef struct _palette_private palette_private;
 typedef struct _tilemap_private tilemap_private;
@@ -356,6 +355,7 @@ public:
 	bool exit_pending() const { return m_exit_pending; }
 	bool new_driver_pending() const { return (m_new_driver_pending != NULL); }
 	const char *new_driver_name() const { return m_new_driver_pending->name; }
+	state_manager &state() { return m_state; }
 	device_scheduler &scheduler() { return m_scheduler; }
 	osd_interface &osd() const { return m_osd; }
 	screen_device *first_screen() const { return primary_screen; }
@@ -440,7 +440,6 @@ public:
 	generic_pointers		generic;			// generic pointers
 
 	// internal core information
-	state_private *			state_data;			// internal data from state.c
 	memory_private *		memory_data;		// internal data from memory.c
 	palette_private *		palette_data;		// internal data from palette.c
 	tilemap_private *		tilemap_data;		// internal data from tilemap.c
@@ -486,6 +485,7 @@ private:
 	};
 	logerror_callback_item *m_logerror_list;
 
+	state_manager			m_state;			// state manager
 	device_scheduler		m_scheduler;		// scheduler object
 	core_options &			m_options;
 	osd_interface &			m_osd;

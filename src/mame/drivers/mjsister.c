@@ -467,7 +467,7 @@ static MACHINE_START( mjsister )
 	state_save_register_global(machine, state->dac_bank);
 	state_save_register_global(machine, state->dac_adr_s);
 	state_save_register_global(machine, state->dac_adr_e);
-	state_save_register_postload(machine, mjsister_redraw, 0);
+	machine->state().register_postload(mjsister_redraw, 0);
 }
 
 static MACHINE_RESET( mjsister )

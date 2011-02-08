@@ -146,9 +146,9 @@ void liberatr_state::machine_start()
 {
 	atarigen_state::machine_start();
 
-	state_save_register_device_item(this, 0, m_trackball_offset);
-	state_save_register_device_item(this, 0, m_ctrld);
-	state_save_register_device_item_array(this, 0, m_videoram);
+	save_item(NAME(m_trackball_offset));
+	save_item(NAME(m_ctrld));
+	save_item(NAME(m_videoram));
 }
 
 

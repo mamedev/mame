@@ -900,7 +900,7 @@ static MACHINE_START( maze )
 
 	/* setup for save states */
 	state_save_register_global(machine, state->maze_tone_timing_state);
-	state_save_register_postload(machine, maze_update_discrete, NULL);
+	machine->state().register_postload(maze_update_discrete, NULL);
 
 	MACHINE_START_CALL(mw8080bw);
 }

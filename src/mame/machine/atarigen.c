@@ -165,7 +165,7 @@ void atarigen_init(running_machine *machine)
 	state_save_register_global(machine, state->playfield2_latch);
 
 	/* need a postload to reset the state */
-	state_save_register_postload(machine, slapstic_postload, NULL);
+	machine->state().register_postload(slapstic_postload, NULL);
 }
 
 

@@ -940,24 +940,16 @@ static CPU_INIT( m37710 )
 	state_save_register_device_item(device, 0, cpustate->irq_level);
 	state_save_register_device_item(device, 0, cpustate->stopped);
 	state_save_register_device_item_array(device, 0, cpustate->m37710_regs);
-	state_save_register_device_item(device, 0, cpustate->reload[0].seconds);
-	state_save_register_device_item(device, 0, cpustate->reload[0].attoseconds);
-	state_save_register_device_item(device, 0, cpustate->reload[1].seconds);
-	state_save_register_device_item(device, 0, cpustate->reload[1].attoseconds);
-	state_save_register_device_item(device, 0, cpustate->reload[2].seconds);
-	state_save_register_device_item(device, 0, cpustate->reload[2].attoseconds);
-	state_save_register_device_item(device, 0, cpustate->reload[3].seconds);
-	state_save_register_device_item(device, 0, cpustate->reload[3].attoseconds);
-	state_save_register_device_item(device, 0, cpustate->reload[4].seconds);
-	state_save_register_device_item(device, 0, cpustate->reload[4].attoseconds);
-	state_save_register_device_item(device, 0, cpustate->reload[5].seconds);
-	state_save_register_device_item(device, 0, cpustate->reload[5].attoseconds);
-	state_save_register_device_item(device, 0, cpustate->reload[6].seconds);
-	state_save_register_device_item(device, 0, cpustate->reload[6].attoseconds);
-	state_save_register_device_item(device, 0, cpustate->reload[7].seconds);
-	state_save_register_device_item(device, 0, cpustate->reload[7].attoseconds);
+	state_save_register_device_item(device, 0, cpustate->reload[0]);
+	state_save_register_device_item(device, 0, cpustate->reload[1]);
+	state_save_register_device_item(device, 0, cpustate->reload[2]);
+	state_save_register_device_item(device, 0, cpustate->reload[3]);
+	state_save_register_device_item(device, 0, cpustate->reload[4]);
+	state_save_register_device_item(device, 0, cpustate->reload[5]);
+	state_save_register_device_item(device, 0, cpustate->reload[6]);
+	state_save_register_device_item(device, 0, cpustate->reload[7]);
 
-	state_save_register_postload(device->machine, m37710_restore_state, cpustate);
+	device->machine->state().register_postload(m37710_restore_state, cpustate);
 }
 
 /**************************************************************************

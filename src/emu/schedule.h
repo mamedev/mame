@@ -155,7 +155,6 @@ public:
 	// construction/destruction
 	device_scheduler(running_machine &machine);
 	~device_scheduler();
-	void register_for_save();
 
 	// getters
 	attotime time() const;

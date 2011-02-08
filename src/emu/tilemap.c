@@ -411,7 +411,7 @@ static tilemap_t *tilemap_create_common(running_machine *machine, void *get_info
 	machine->tilemap_data->instance++;
 
 	/* reset everything after a load */
-	state_save_register_postload(machine, tilemap_postload, tmap);
+	machine->state().register_postload(tilemap_postload, tmap);
 	return tmap;
 }
 

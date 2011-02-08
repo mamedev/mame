@@ -198,6 +198,9 @@ inline void operator--(_Type &value) { value = (_Type)((int)value - 1); } \
 inline void operator--(_Type &value, int) { value = (_Type)((int)value - 1); }
 
 
+// this macro passes an item followed by a string version of itself as two consecutive parameters
+#define NAME(x) x, #x
+
 // this macro wraps a function 'x' and can be used to pass a function followed by its name
 #define FUNC(x) x, #x
 

@@ -1105,8 +1105,7 @@ static void common_start( device_t *device, int device_type ) {
 		state_save_register_device_item(device, timerno, timer->null_count);
 		state_save_register_device_item(device, timerno, timer->phase);
 		state_save_register_device_item(device, timerno, timer->cycles_to_output);
-		state_save_register_device_item(device, timerno, timer->last_updated.seconds);
-		state_save_register_device_item(device, timerno, timer->last_updated.attoseconds);
+		state_save_register_device_item(device, timerno, timer->last_updated);
 		state_save_register_device_item(device, timerno, timer->clock);
 	}
 }

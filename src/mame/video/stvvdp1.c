@@ -2130,6 +2130,6 @@ int stv_vdp1_start ( running_machine *machine )
 	state_save_register_global(machine, stv_vdp1_clear_framebuffer_on_next_frame);
 	state_save_register_global(machine, stvvdp1_local_x);
 	state_save_register_global(machine, stvvdp1_local_y);
-	state_save_register_postload(machine, stv_vdp1_state_save_postload, NULL);
+	machine->state().register_postload(stv_vdp1_state_save_postload, NULL);
 	return 0;
 }

@@ -1021,7 +1021,7 @@ static DEVICE_START( pc080sn )
 
 	state_save_register_device_item_pointer(device, 0, pc080sn->ram, PC080SN_RAM_SIZE / 2);
 	state_save_register_device_item_array(device, 0, pc080sn->ctrl);
-	state_save_register_postload(device->machine, pc080sn_restore_scroll, pc080sn);
+	device->machine->state().register_postload(pc080sn_restore_scroll, pc080sn);
 }
 
 
@@ -1907,7 +1907,7 @@ static DEVICE_START( tc0080vco )
 	device->machine->gfx[tc0080vco->tx_gfx] = gfx_element_alloc(device->machine, &tc0080vco_charlayout, (UINT8 *)tc0080vco->char_ram, 64, 0);
 
 	state_save_register_device_item_pointer(device, 0, tc0080vco->ram, TC0080VCO_RAM_SIZE / 2);
-	state_save_register_postload(device->machine, tc0080vco_postload, tc0080vco);
+	device->machine->state().register_postload(tc0080vco_postload, tc0080vco);
 }
 
 /***************************************************************************/
@@ -2517,7 +2517,7 @@ static DEVICE_START( tc0100scn )
 	state_save_register_device_item_array(device, 0, tc0100scn->ctrl);
 	state_save_register_device_item(device, 0, tc0100scn->dblwidth);
 	state_save_register_device_item(device, 0, tc0100scn->gfxbank);
-	state_save_register_postload(device->machine, tc0100scn_postload, tc0100scn);
+	device->machine->state().register_postload(tc0100scn_postload, tc0100scn);
 }
 
 
@@ -3727,7 +3727,7 @@ static DEVICE_START( tc0480scp )
 	state_save_register_device_item_pointer(device, 0, tc0480scp->ram, TC0480SCP_RAM_SIZE / 2);
 	state_save_register_device_item_array(device, 0, tc0480scp->ctrl);
 	state_save_register_device_item(device, 0, tc0480scp->dblwidth);
-	state_save_register_postload(device->machine, tc0480scp_postload, tc0480scp);
+	device->machine->state().register_postload(tc0480scp_postload, tc0480scp);
 }
 
 static DEVICE_RESET( tc0480scp )
@@ -4760,7 +4760,7 @@ static DEVICE_START( tc0110pcr )
 
 	state_save_register_device_item_pointer(device, 0, tc0110pcr->ram, TC0110PCR_RAM_SIZE);
 	state_save_register_device_item(device, 0, tc0110pcr->type);
-	state_save_register_postload(device->machine, tc0110pcr_restore_colors, tc0110pcr);
+	device->machine->state().register_postload(tc0110pcr_restore_colors, tc0110pcr);
 }
 
 static DEVICE_RESET( tc0110pcr )

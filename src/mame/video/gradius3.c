@@ -88,7 +88,7 @@ VIDEO_START( gradius3 )
 
 	gfx_element_set_source(machine->gfx[0], (UINT8 *)state->gfxram);
 
-	state_save_register_postload(machine, gradius3_postload, NULL);
+	machine->state().register_postload(gradius3_postload, NULL);
 }
 
 

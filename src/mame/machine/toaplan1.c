@@ -439,7 +439,7 @@ void demonwld_driver_savestate(running_machine *machine)
 	state_save_register_global(machine, state->main_ram_seg);
 	state_save_register_global(machine, state->dsp_BIO);
 	state_save_register_global(machine, state->dsp_execute);
-	state_save_register_postload(machine, demonwld_restore_dsp, NULL);
+	machine->state().register_postload(demonwld_restore_dsp, NULL);
 }
 
 MACHINE_RESET( vimana )

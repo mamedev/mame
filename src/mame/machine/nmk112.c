@@ -140,7 +140,7 @@ static DEVICE_START( nmk112 )
 	nmk112->page_mask = ~intf->disable_page_mask;
 
 	state_save_register_device_item_array(device, 0, nmk112->current_bank);
-	state_save_register_postload(device->machine, nmk112_postload_bankswitch, nmk112);
+	device->machine->state().register_postload(nmk112_postload_bankswitch, nmk112);
 }
 
 static DEVICE_RESET( nmk112 )

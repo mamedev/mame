@@ -656,7 +656,7 @@ static void init_save_state(device_t *device)
 	voodoo_state *v = get_safe_token(device);
 	int index, subindex;
 
-	state_save_register_postload(device->machine, voodoo_postload, v);
+	device->machine->state().register_postload(voodoo_postload, v);
 
 	/* register states: core */
 	state_save_register_device_item(device, 0, v->extra_cycles);
@@ -669,8 +669,7 @@ static void init_save_state(device_t *device)
 	state_save_register_device_item(device, 0, v->pci.init_enable);
 	state_save_register_device_item(device, 0, v->pci.stall_state);
 	state_save_register_device_item(device, 0, v->pci.op_pending);
-	state_save_register_device_item(device, 0, v->pci.op_end_time.seconds);
-	state_save_register_device_item(device, 0, v->pci.op_end_time.attoseconds);
+	state_save_register_device_item(device, 0, v->pci.op_end_time);
 	state_save_register_device_item_array(device, 0, v->pci.fifo_mem);
 
 	/* register states: dac */

@@ -507,7 +507,7 @@ VIDEO_START( pangpang )
 	state->sprite_xoffset = -1;
 	state->sprite_yoffset = 0;
 
-	state_save_register_postload(machine, tumbleb_tilemap_redraw, NULL);
+	machine->state().register_postload(tumbleb_tilemap_redraw, NULL);
 }
 
 
@@ -525,7 +525,7 @@ VIDEO_START( tumblepb )
 	state->sprite_xoffset = -1;
 	state->sprite_yoffset = 0;
 
-	state_save_register_postload(machine, tumbleb_tilemap_redraw, NULL);
+	machine->state().register_postload(tumbleb_tilemap_redraw, NULL);
 }
 
 VIDEO_START( sdfight )
@@ -543,7 +543,7 @@ VIDEO_START( sdfight )
 	state->sprite_xoffset = 0;
 	state->sprite_yoffset = 1;
 
-	state_save_register_postload(machine, tumbleb_tilemap_redraw, NULL);
+	machine->state().register_postload(tumbleb_tilemap_redraw, NULL);
 }
 
 VIDEO_START( fncywld )
@@ -560,7 +560,7 @@ VIDEO_START( fncywld )
 	state->sprite_xoffset = -1;
 	state->sprite_yoffset = 0;
 
-	state_save_register_postload(machine, tumbleb_tilemap_redraw, NULL);
+	machine->state().register_postload(tumbleb_tilemap_redraw, NULL);
 }
 
 VIDEO_START( jumppop )
@@ -583,7 +583,7 @@ VIDEO_START( jumppop )
 	state->sprite_xoffset = -1;
 	state->sprite_yoffset = 0;
 
-	state_save_register_postload(machine, tumbleb_tilemap_redraw, NULL);
+	machine->state().register_postload(tumbleb_tilemap_redraw, NULL);
 }
 
 
@@ -597,7 +597,7 @@ VIDEO_START( suprtrio )
 
 	tilemap_set_transparent_pen(state->pf1_alt_tilemap, 0);
 
-	state_save_register_postload(machine, tumbleb_tilemap_redraw, NULL);
+	machine->state().register_postload(tumbleb_tilemap_redraw, NULL);
 }
 
 /******************************************************************************/

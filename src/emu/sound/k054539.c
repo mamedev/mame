@@ -674,7 +674,7 @@ static DEVICE_START( k054539 )
 
 	k054539_init_chip(device, info);
 
-	state_save_register_postload(device->machine, reset_zones, info);
+	device->machine->state().register_postload(reset_zones, info);
 }
 
 

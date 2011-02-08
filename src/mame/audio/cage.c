@@ -183,8 +183,7 @@ void cage_init(running_machine *machine, offs_t speedup)
 
 	state_save_register_global(machine, cpu_to_cage_ready);
 	state_save_register_global(machine, cage_to_cpu_ready);
-	state_save_register_global(machine, serial_period_per_word.seconds);
-	state_save_register_global(machine, serial_period_per_word.attoseconds);
+	state_save_register_global(machine, serial_period_per_word);
 	state_save_register_global(machine, dma_enabled);
 	state_save_register_global(machine, dma_timer_enabled);
 	state_save_register_global_array(machine, cage_timer_enabled);

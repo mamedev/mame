@@ -123,7 +123,7 @@ VIDEO_START( fortyl )
 	state_save_register_global_bitmap(machine, state->tmp_bitmap1);
 	state_save_register_global_bitmap(machine, state->tmp_bitmap2);
 	state_save_register_global(machine, state->pixram_sel);
-	state_save_register_postload(machine, redraw_pixels, NULL);
+	machine->state().register_postload(redraw_pixels, NULL);
 }
 
 

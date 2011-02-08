@@ -330,7 +330,7 @@ static MACHINE_START( xmen )
 	state_save_register_global(machine, state->sprite_colorbase);
 	state_save_register_global_array(machine, state->layer_colorbase);
 	state_save_register_global_array(machine, state->layerpri);
-	state_save_register_postload(machine, xmen_postload, NULL);
+	machine->state().register_postload(xmen_postload, NULL);
 }
 
 static MACHINE_RESET( xmen )

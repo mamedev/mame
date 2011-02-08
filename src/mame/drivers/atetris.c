@@ -119,7 +119,7 @@ static MACHINE_START( atetris )
 	/* Set up save state */
 	state_save_register_global(machine, state->current_bank);
 	state_save_register_global(machine, state->nvram_write_enable);
-	state_save_register_postload(machine, atetris_postload, NULL);
+	machine->state().register_postload(atetris_postload, NULL);
 }
 
 

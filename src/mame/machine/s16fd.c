@@ -228,5 +228,5 @@ void fd1094_driver_init(running_machine *machine, const char* tag, void (*set_de
 
 	state_save_register_global(machine, fd1094_selected_state);
 	state_save_register_global(machine, fd1094_state);
-	state_save_register_postload(machine, fd1094_postload, NULL);
+	machine->state().register_postload(fd1094_postload, NULL);
 }

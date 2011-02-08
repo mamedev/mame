@@ -605,7 +605,7 @@ static CPU_INIT( i386 )
 	state_save_register_device_item(device, 0, cpustate->ldtr.flags);
 	state_save_register_device_item(device, 0,  cpustate->irq_state);
 	state_save_register_device_item(device, 0, cpustate->performed_intersegment_jump);
-	state_save_register_postload(device->machine, i386_postload, (void *)device);
+	device->machine->state().register_postload(i386_postload, (void *)device);
 }
 
 static void build_opcode_table(i386_state *cpustate, UINT32 features)

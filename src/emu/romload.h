@@ -123,6 +123,8 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
+class machine_config;
+
 typedef device_config rom_source;
 
 

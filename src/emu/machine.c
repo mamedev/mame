@@ -154,7 +154,6 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 	  sample_rate(options_get_int(&options, OPTION_SAMPLERATE)),
 	  debug_flags(0),
       ui_active(false),
-	  state_data(NULL),
 	  memory_data(NULL),
 	  palette_data(NULL),
 	  tilemap_data(NULL),
@@ -167,6 +166,7 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 	  generic_video_data(NULL),
 	  generic_audio_data(NULL),
 	  m_logerror_list(NULL),
+	  m_state(*this),
 	  m_scheduler(*this),
 	  m_options(options),
 	  m_osd(osd),
@@ -264,15 +264,11 @@ void running_machine::start()
 	config_init(this);
 	input_init(this);
 	output_init(this);
-	state_init(this);
-	state_save_allow_registration(this, true);
 	palette_init(this);
 	m_render = auto_alloc(this, render_manager(*this));
 	generic_machine_init(this);
 	generic_sound_init(this);
 	
-	m_scheduler.register_for_save();
-
 	// allocate a soft_reset timer
 	m_soft_reset_timer = m_scheduler.timer_alloc(MSTUB(timer_expired, running_machine, soft_reset), this);
 
@@ -344,7 +340,7 @@ void running_machine::start()
 	m_cheat = auto_alloc(this, cheat_manager(*this));
 
 	// disallow save state registrations starting here
-	state_save_allow_registration(this, false);
+	m_state.allow_registration(false);
 }
 
 
@@ -798,7 +794,7 @@ void running_machine::handle_saveload()
 		astring fullname(mame_file_full_name(file));
 
 		// read/write the save state
-		state_save_error staterr = (m_saveload_schedule == SLS_LOAD) ? state_save_read_file(this, file) : state_save_write_file(this, file);
+		state_save_error staterr = (m_saveload_schedule == SLS_LOAD) ? m_state.read_file(file) : m_state.write_file(file);
 
 		// handle the result
 		switch (staterr)

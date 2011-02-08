@@ -589,12 +589,9 @@ static void register_for_save(pokey_state *chip, device_t *device)
 	state_save_register_device_item(device, 0, chip->r9);
 	state_save_register_device_item(device, 0, chip->r17);
 	state_save_register_device_item(device, 0, chip->clockmult);
-	state_save_register_device_item(device, 0, chip->timer_period[0].seconds);
-	state_save_register_device_item(device, 0, chip->timer_period[0].attoseconds);
-	state_save_register_device_item(device, 0, chip->timer_period[1].seconds);
-	state_save_register_device_item(device, 0, chip->timer_period[1].attoseconds);
-	state_save_register_device_item(device, 0, chip->timer_period[2].seconds);
-	state_save_register_device_item(device, 0, chip->timer_period[2].attoseconds);
+	state_save_register_device_item(device, 0, chip->timer_period[0]);
+	state_save_register_device_item(device, 0, chip->timer_period[1]);
+	state_save_register_device_item(device, 0, chip->timer_period[2]);
 	state_save_register_device_item_array(device, 0, chip->timer_param);
 	state_save_register_device_item_array(device, 0, chip->AUDF);
 	state_save_register_device_item_array(device, 0, chip->AUDC);

@@ -534,7 +534,7 @@ static MACHINE_START( taitoh )
 	state->tc0080vco = machine->device("tc0080vco");
 
 	state_save_register_global(machine, state->banknum);
-	state_save_register_postload(machine, taitoh_postload, NULL);
+	machine->state().register_postload(taitoh_postload, NULL);
 }
 
 

@@ -345,7 +345,7 @@ void twincobr_driver_savestate(running_machine *machine)
 	state_save_register_global(machine, twincobr_dsp_BIO);
 	state_save_register_global(machine, dsp_execute);
 	state_save_register_global(machine, fsharkbt_8741);
-	state_save_register_postload(machine, twincobr_restore_dsp, NULL);
+	machine->state().register_postload(twincobr_restore_dsp, NULL);
 }
 
 MACHINE_RESET( wardner )
@@ -369,6 +369,6 @@ void wardner_driver_savestate(running_machine *machine)
 	state_save_register_global(machine, twincobr_dsp_BIO);
 	state_save_register_global(machine, dsp_execute);
 	state_save_register_global(machine, wardner_membank);
-	state_save_register_postload(machine, wardner_restore_bank, NULL);	/* Restore the Main CPU bank */
-	state_save_register_postload(machine, twincobr_restore_dsp, NULL);
+	machine->state().register_postload(wardner_restore_bank, NULL);	/* Restore the Main CPU bank */
+	machine->state().register_postload(twincobr_restore_dsp, NULL);
 }

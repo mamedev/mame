@@ -662,7 +662,7 @@ static MACHINE_START( topspeed )
 	state_save_register_global(machine, state->cpua_ctrl);
 	state_save_register_global(machine, state->ioc220_port);
 	state_save_register_global(machine, state->banknum);
-	state_save_register_postload(machine, topspeed_postload, NULL);
+	machine->state().register_postload(topspeed_postload, NULL);
 }
 
 static MACHINE_RESET( topspeed )

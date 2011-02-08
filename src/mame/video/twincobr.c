@@ -161,7 +161,7 @@ VIDEO_START( toaplan0 )
 	state_save_register_global(machine, twincobr_bg_ram_bank);
 	state_save_register_global(machine, twincobr_flip_screen);
 	state_save_register_global(machine, wardner_sprite_hack);
-	state_save_register_postload(machine, twincobr_restore_screen, NULL);
+	machine->state().register_postload(twincobr_restore_screen, NULL);
 }
 
 static STATE_POSTLOAD( twincobr_restore_screen )

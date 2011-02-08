@@ -112,7 +112,7 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 	astring state_tag;
 	state_tag.printf("%d", m_device.machine->sound().m_stream_list.count());
 	state_save_register_item(m_device.machine, "stream", state_tag, 0, m_sample_rate);
-	state_save_register_postload(m_device.machine, state_postload_stub<sound_stream, &sound_stream::postload>, this);
+	m_device.machine->state().register_postload(state_postload_stub<sound_stream, &sound_stream::postload>, this);
 
 	// save the gain of each input and output
 	for (int inputnum = 0; inputnum < m_inputs; inputnum++)
@@ -806,8 +806,7 @@ sound_manager::sound_manager(running_machine &machine)
 	machine.add_notifier(MACHINE_NOTIFY_RESET, &sound_manager::reset);
 
 	// register global states
-	state_save_register_global(&machine, m_last_update.seconds);
-	state_save_register_global(&machine, m_last_update.attoseconds);
+	state_save_register_global(&machine, m_last_update);
 
 	// set the starting attenuation
 	set_attenuation(options_get_int(machine.options(), OPTION_VOLUME));
@@ -863,7 +862,7 @@ void sound_manager::set_attenuation(int attenuation)
 bool sound_manager::indexed_speaker_input(int index, speaker_input &info) const
 {
 	// scan through the speakers until we find the indexed input
-	for (info.speaker = downcast<speaker_device *>(m_machine.m_devicelist.first(SPEAKER)); info.speaker != NULL; info.speaker = downcast<speaker_device *>(info.speaker->typenext()))
+	for (info.speaker = downcast<speaker_device *>(m_machine.m_devicelist.first(SPEAKER)); info.speaker != NULL; info.speaker = info.speaker->next_speaker())
 	{
 		if (index < info.speaker->inputs())
 		{
@@ -1004,7 +1003,7 @@ void sound_manager::update()
 
 	// force all the speaker streams to generate the proper number of samples
 	int samples_this_update = 0;
-	for (speaker_device *speaker = downcast<speaker_device *>(m_machine.m_devicelist.first(SPEAKER)); speaker != NULL; speaker = downcast<speaker_device *>(speaker->typenext()))
+	for (speaker_device *speaker = downcast<speaker_device *>(m_machine.m_devicelist.first(SPEAKER)); speaker != NULL; speaker = speaker->next_speaker())
 		speaker->mix(m_leftmix, m_rightmix, samples_this_update, (m_muted & MUTE_REASON_SYSTEM));
 
 	// now downmix the final result

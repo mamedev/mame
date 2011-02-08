@@ -275,7 +275,7 @@ static void cquestsnd_state_register(device_t *device)
 	state_save_register_device_item(device, 0, cpustate->prev_ipram);
 	state_save_register_device_item(device, 0, cpustate->prev_ipwrt);
 
-	state_save_register_postload(device->machine, cquestsnd_postload, (void *)device);
+	device->machine->state().register_postload(cquestsnd_postload, (void *)device);
 }
 
 static CPU_INIT( cquestsnd )
@@ -349,7 +349,7 @@ static void cquestrot_state_register(device_t *device)
 	state_save_register_device_item_pointer(device, 0, cpustate->dram, 16384);
 	state_save_register_device_item_pointer(device, 0, cpustate->sram, 2048);
 
-	state_save_register_postload(device->machine, cquestrot_postload, (void *)device);
+	device->machine->state().register_postload(cquestrot_postload, (void *)device);
 }
 
 static CPU_INIT( cquestrot )
@@ -433,7 +433,7 @@ static void cquestlin_state_register(device_t *device)
 	state_save_register_device_item_pointer(device, 0, cpustate->e_stack, 32768);
 	state_save_register_device_item_pointer(device, 0, cpustate->o_stack, 32768);
 
-	state_save_register_postload(device->machine, cquestlin_postload, (void *)device);
+	device->machine->state().register_postload(cquestlin_postload, (void *)device);
 }
 
 static CPU_INIT( cquestlin )

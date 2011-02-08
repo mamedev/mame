@@ -365,7 +365,7 @@ static CPU_INIT( g65816 )
 	state_save_register_device_item(device, 0, cpustate->irq_delay);
 	state_save_register_device_item(device, 0, cpustate->stopped);
 
-	state_save_register_postload(device->machine, g65816_restore_state, cpustate);
+	device->machine->state().register_postload(g65816_restore_state, cpustate);
 }
 
 /**************************************************************************

@@ -210,8 +210,7 @@ MACHINE_START( vertigo )
 {
 	state_save_register_global(machine, irq_state);
 	state_save_register_global(machine, adc_result);
-	state_save_register_global(machine, irq4_time.seconds);
-	state_save_register_global(machine, irq4_time.attoseconds);
+	state_save_register_global(machine, irq4_time);
 
 	vertigo_vproc_init(machine);
 }

@@ -547,7 +547,7 @@ static MACHINE_START( slapshot )
 
 	state->banknum = 0;
 	state_save_register_global(machine, state->banknum);
-	state_save_register_postload(machine, slapshot_postload, NULL);
+	machine->state().register_postload(slapshot_postload, NULL);
 }
 
 

@@ -413,7 +413,7 @@ static void init_save_state(device_t *device)
 {
 	naomibd_state *v = get_safe_token(device);
 
-	state_save_register_postload(device->machine, naomibd_postload, v);
+	device->machine->state().register_postload(naomibd_postload, v);
 
 	/* register states */
 	state_save_register_device_item(device, 0, v->rom_offset);

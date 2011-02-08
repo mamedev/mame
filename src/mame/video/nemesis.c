@@ -330,7 +330,7 @@ VIDEO_START( nemesis )
 	gfx_element_set_source(machine->gfx[7], (UINT8 *)state->charram);
 
 	/* Set up save state */
-	state_save_register_postload(machine, nemesis_postload, NULL);
+	machine->state().register_postload(nemesis_postload, NULL);
 }
 
 

@@ -769,8 +769,8 @@ static CPU_INIT( m68k )
 	state_save_register_device_item(device, 0, m68k->save_halted);
 	state_save_register_device_item(device, 0, m68k->pref_addr);
 	state_save_register_device_item(device, 0, m68k->pref_data);
-	state_save_register_presave(device->machine, m68k_presave, m68k);
-	state_save_register_postload(device->machine, m68k_postload, m68k);
+	device->machine->state().register_presave(m68k_presave, m68k);
+	device->machine->state().register_postload(m68k_postload, m68k);
 }
 
 /* Pulse the RESET line on the CPU */

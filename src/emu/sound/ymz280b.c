@@ -694,7 +694,7 @@ static DEVICE_START( ymz280b )
 		}
 	}
 
-	state_save_register_postload(device->machine, YMZ280B_state_save_update_step, chip);
+	device->machine->state().register_postload(YMZ280B_state_save_update_step, chip);
 
 #if MAKE_WAVS
 	chip->wavresample = wav_open("resamp.wav", INTERNAL_SAMPLE_RATE, 2);

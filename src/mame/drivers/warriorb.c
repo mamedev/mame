@@ -558,7 +558,7 @@ static MACHINE_START( warriorb )
 
 	state_save_register_global(machine, state->banknum);
 	state_save_register_global_array(machine, state->pandata);
-	state_save_register_postload(machine, warriorb_postload, NULL);
+	machine->state().register_postload(warriorb_postload, NULL);
 }
 
 static MACHINE_RESET( taito_dualscreen )

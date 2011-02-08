@@ -5744,7 +5744,7 @@ static DRIVER_INIT( driveout )
 	state_save_register_global(machine, state->driveout_sound_latch);
 	state_save_register_global(machine, state->oki_bank);
 	state_save_register_global(machine, state->nibble);
-	state_save_register_postload(machine, driveout_postload, NULL);
+	machine->state().register_postload(driveout_postload, NULL);
 }
 
 

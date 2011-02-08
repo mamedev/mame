@@ -569,8 +569,7 @@ void device_execute_interface::interface_pre_start()
 	state_save_register_device_item(&m_device, 0, m_nexteatcycles);
 	state_save_register_device_item(&m_device, 0, m_trigger);
 	state_save_register_device_item(&m_device, 0, m_totalcycles);
-	state_save_register_device_item(&m_device, 0, m_localtime.seconds);
-	state_save_register_device_item(&m_device, 0, m_localtime.attoseconds);
+	state_save_register_device_item(&m_device, 0, m_localtime);
 	state_save_register_device_item(&m_device, 0, m_iloops);
 }
 

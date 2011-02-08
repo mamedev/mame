@@ -134,8 +134,8 @@ void device_list::start_all()
 	m_machine->add_notifier(MACHINE_NOTIFY_EXIT, static_exit);
 
 	// add pre-save and post-load callbacks
-	state_save_register_presave(m_machine, static_pre_save, this);
-	state_save_register_postload(m_machine, static_post_load, this);
+	m_machine->state().register_presave(static_pre_save, this);
+	m_machine->state().register_postload(static_post_load, this);
 
 	// iterate over devices to start them
 	device_t *nextdevice;
@@ -535,6 +535,7 @@ void device_interface::interface_debug_setup()
 device_t::device_t(running_machine &_machine, const device_config &config)
 	: machine(&_machine),
 	  m_machine(_machine),
+	  m_state_manager(_machine.state()),
 	  m_debug(NULL),
 	  m_execute(NULL),
 	  m_memory(NULL),
@@ -724,13 +725,13 @@ void device_t::start()
 		intf->interface_pre_start();
 
 	// remember the number of state registrations
-	int state_registrations = state_save_get_reg_count(machine);
+	int state_registrations = machine->state().registration_count();
 
 	// start the device
 	device_start();
 
 	// complain if nothing was registered by the device
-	state_registrations = state_save_get_reg_count(machine) - state_registrations;
+	state_registrations = machine->state().registration_count() - state_registrations;
 	device_execute_interface *exec;
 	device_sound_interface *sound;
 	if (state_registrations == 0 && (interface(exec) || interface(sound)))

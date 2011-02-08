@@ -347,7 +347,7 @@ poly_manager *poly_alloc(running_machine *machine, int max_polys, size_t extra_d
 		poly->queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_MULTI | WORK_QUEUE_FLAG_HIGH_FREQ);
 
 	/* request a pre-save callback for synchronization */
-	state_save_register_presave(machine, poly_state_presave, poly);
+	machine->state().register_presave(poly_state_presave, poly);
 	return poly;
 }
 

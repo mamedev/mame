@@ -909,7 +909,7 @@ static void common_start(device_t *device, int device_type)
 	mc6845->vert_char_total = 0x7f;
 
 	/* register for state saving */
-	state_save_register_postload(device->machine, mc6845_state_save_postload, mc6845);
+	device->machine->state().register_postload(mc6845_state_save_postload, mc6845);
 
 	state_save_register_device_item(device, 0, mc6845->clock);
 	state_save_register_device_item(device, 0, mc6845->hpixels_per_column);

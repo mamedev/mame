@@ -4933,7 +4933,7 @@ static MACHINE_START( tenkai )
 {
 	MACHINE_START_CALL(dynax);
 
-	state_save_register_postload(machine, tenkai_bank_postload, NULL);
+	machine->state().register_postload(tenkai_bank_postload, NULL);
 }
 
 static MACHINE_CONFIG_START( tenkai, dynax_state )
@@ -4996,7 +4996,7 @@ static MACHINE_START( gekisha )
 {
 	MACHINE_START_CALL(dynax);
 
-	state_save_register_postload(machine, gekisha_bank_postload, NULL);
+	machine->state().register_postload(gekisha_bank_postload, NULL);
 }
 
 static MACHINE_RESET( gekisha )

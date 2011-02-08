@@ -535,7 +535,6 @@ static CPU_INIT( arm )
 	state_save_register_device_item_array(device, 0, cpustate->coproRegister);
 	state_save_register_device_item(device, 0, cpustate->pendingIrq);
 	state_save_register_device_item(device, 0, cpustate->pendingFiq);
-	state_save_register_device_item(device, 0, cpustate->endian);
 }
 
 
@@ -552,7 +551,6 @@ static CPU_INIT( arm_be )
 	state_save_register_device_item_array(device, 0, cpustate->coproRegister);
 	state_save_register_device_item(device, 0, cpustate->pendingIrq);
 	state_save_register_device_item(device, 0, cpustate->pendingFiq);
-	state_save_register_device_item(device, 0, cpustate->endian);
 }
 
 

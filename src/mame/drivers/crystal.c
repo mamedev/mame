@@ -585,7 +585,7 @@ static MACHINE_START( crystal )
 	state_save_register_global(machine, state->PIO);
 	state_save_register_global_array(machine, state->DMActrl);
 	state_save_register_global(machine, state->OldPort4);
-	state_save_register_postload(machine, crystal_banksw_postload, NULL);
+	machine->state().register_postload(crystal_banksw_postload, NULL);
 }
 
 static MACHINE_RESET( crystal )

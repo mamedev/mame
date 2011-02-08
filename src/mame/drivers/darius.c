@@ -899,7 +899,7 @@ static MACHINE_START( darius )
 	state_save_register_global(machine, state->nmi_enable);
 	state_save_register_global_array(machine, state->vol);
 	state_save_register_global_array(machine, state->pan);
-	state_save_register_postload(machine, darius_postload, NULL);
+	machine->state().register_postload(darius_postload, NULL);
 }
 
 

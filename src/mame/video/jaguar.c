@@ -915,7 +915,7 @@ VIDEO_START( cojag )
 	state_save_register_global_array(machine, blitter_regs);
 	state_save_register_global_array(machine, gpu_regs);
 	state_save_register_global(machine, cpu_irq_state);
-	state_save_register_postload(machine, cojag_postload, NULL);
+	machine->state().register_postload(cojag_postload, NULL);
 }
 
 

@@ -101,7 +101,7 @@ MACHINE_START( simpsons )
 	state_save_register_global_pointer(machine, machine->generic.paletteram.u8, 0x1000);
 	state_save_register_global_pointer(machine, state->xtraram, 0x1000);
 	state_save_register_global_pointer(machine, state->spriteram, 0x1000 / 2);
-	state_save_register_postload(machine, simpsons_postload, NULL);
+	machine->state().register_postload(simpsons_postload, NULL);
 }
 
 MACHINE_RESET( simpsons )

@@ -1102,7 +1102,7 @@ static MACHINE_START( neogeo )
 	state_save_register_global(machine, state->led2_value);
 	state_save_register_global(machine, state->recurse);
 
-	state_save_register_postload(machine, neogeo_postload, NULL);
+	machine->state().register_postload(neogeo_postload, NULL);
 }
 
 

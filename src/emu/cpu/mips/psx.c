@@ -1627,7 +1627,7 @@ static void mips_state_register( const char *type, legacy_cpu_device *device )
 	state_save_register_device_item( device, 0, psxcpu->multiplier_operation );
 	state_save_register_device_item( device, 0, psxcpu->multiplier_operand1 );
 	state_save_register_device_item( device, 0, psxcpu->multiplier_operand2 );
-	state_save_register_postload( device->machine, mips_postload, psxcpu );
+	device->machine->state().register_postload( mips_postload, psxcpu );
 }
 
 static CPU_INIT( psxcpu )

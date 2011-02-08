@@ -294,10 +294,8 @@ static MACHINE_START( gottlieb )
 		state_save_register_global_pointer(machine, laserdisc_audio_buffer, AUDIORAM_SIZE);
 		state_save_register_global(machine, laserdisc_audio_address);
 		state_save_register_global_array(machine, laserdisc_last_samples);
-		state_save_register_global(machine, laserdisc_last_time.seconds);
-		state_save_register_global(machine, laserdisc_last_time.attoseconds);
-		state_save_register_global(machine, laserdisc_last_clock.seconds);
-		state_save_register_global(machine, laserdisc_last_clock.attoseconds);
+		state_save_register_global(machine, laserdisc_last_time);
+		state_save_register_global(machine, laserdisc_last_clock);
 		state_save_register_global(machine, laserdisc_zero_seen);
 		state_save_register_global(machine, laserdisc_audio_bits);
 		state_save_register_global(machine, laserdisc_audio_bit_count);

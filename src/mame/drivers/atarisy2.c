@@ -230,7 +230,7 @@ static MACHINE_START( atarisy2 )
 	state_save_register_global(machine, state->which_adc);
 	state_save_register_global(machine, state->p2portwr_state);
 	state_save_register_global(machine, state->p2portrd_state);
-	state_save_register_postload(machine, bankselect_postload, NULL);
+	machine->state().register_postload(bankselect_postload, NULL);
 	state_save_register_global(machine, state->sound_reset_state);
 }
 

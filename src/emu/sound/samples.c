@@ -501,7 +501,7 @@ static DEVICE_START( samples )
         state_save_register_device_item(device, i, info->channel[i].loop);
         state_save_register_device_item(device, i, info->channel[i].paused);
 	}
-	state_save_register_postload(device->machine, samples_postload, info);
+	device->machine->state().register_postload(samples_postload, info);
 
 	/* initialize any custom handlers */
 	if (intf->start)

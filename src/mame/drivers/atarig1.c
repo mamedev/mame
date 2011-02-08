@@ -1176,7 +1176,7 @@ static void init_g1_common(running_machine *machine, offs_t slapstic_base, int s
 		pitfightb_cheap_slapstic_init(machine);
 		state_save_register_global(machine, state->bslapstic_bank);
 		state_save_register_global(machine, state->bslapstic_primed);
-		state_save_register_postload(machine, pitfightb_state_postload, NULL);
+		machine->state().register_postload(pitfightb_state_postload, NULL);
 	}
 	else if (slapstic != 0)
 		atarigen_slapstic_init(machine->device("maincpu"), slapstic_base, 0, slapstic);

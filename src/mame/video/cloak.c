@@ -192,7 +192,7 @@ VIDEO_START( cloak )
 	state_save_register_global_pointer(machine, state->bitmap_videoram1, 256*256);
 	state_save_register_global_pointer(machine, state->bitmap_videoram2, 256*256);
 	state_save_register_global_pointer(machine, state->palette_ram, NUM_PENS);
-	state_save_register_postload(machine, cloak_postload, NULL);
+	machine->state().register_postload(cloak_postload, NULL);
 }
 
 static void draw_bitmap(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)

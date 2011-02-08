@@ -292,7 +292,7 @@ static DEVICE_START( pci_bus )
 	state_save_register_device_item(device, 0, pcibus->devicenum);
 	state_save_register_device_item(device, 0, pcibus->busnum);
 
-	state_save_register_postload(device->machine, pci_bus_postload, pcibus);
+	device->machine->state().register_postload(pci_bus_postload, pcibus);
 }
 
 
