@@ -372,5 +372,40 @@ ROM_START( ddribble )
 	ROM_LOAD( "pal10l8-007553.bin", 0x0000, 0x002c, CRC(0ae5a161) SHA1(87571addf434b332019ea0e22372eb24b4fd0197) )
 ROM_END
 
+ROM_START( ddribblep )
+	ROM_REGION( 0x1a000, "maincpu", 0 ) /* 64K CPU #0 + 40K for Banked ROMS */
+	ROM_LOAD( "ebs_11-19.c19",	0x10000, 0x0a000, CRC(0a81c926) SHA1(1ecd30f0d352cf6c96d246bb443b5a6738624b9b) )
+	ROM_CONTINUE(			0x0a000, 0x06000 )
 
-GAME( 1986, ddribble, 0, ddribble, ddribble, 0, ROT0, "Konami", "Double Dribble", GAME_SUPPORTS_SAVE )
+	ROM_REGION( 0x10000, "cpu1", 0 ) /* 64 for the CPU #1 */
+	ROM_LOAD( "eb_11-19.c12", 0x08000, 0x08000, CRC(22130292) SHA1(a5f9bf3f63ff85d171f096867433513419458b0e) )
+
+	ROM_REGION( 0x10000, "cpu2", 0 )	/* 64k for the SOUND CPU */
+	ROM_LOAD( "master_sound.a6", 0x08000, 0x08000, CRC(090e3a31) SHA1(4c645b55d52abb859354ea2ea401e4ab99f5d493) )
+
+	ROM_REGION( 0x40000, "gfx1", 0 ) /* same content as parent */
+	ROM_LOAD16_BYTE( "v1a.e12",	0x00000, 0x10000, CRC(53724765) SHA1(55a45ab71f7bf55ed805d4dc2345cadc4171f323) )	/* characters & objects */
+	ROM_LOAD16_BYTE( "01a.e11",	0x20000, 0x10000, CRC(1ae5d725) SHA1(d8dd41cc1872c6d218cc425d1cd03f8d8eefe3e3) )	/* characters & objects */
+	ROM_LOAD16_BYTE( "v1b.e13",	0x00001, 0x10000, CRC(d9dc6f1a) SHA1(f50169525c5109ba65acdccbb01dddb92926462a) )
+	ROM_LOAD16_BYTE( "01b.d14",	0x20001, 0x10000, CRC(054c5242) SHA1(411389e36d33fd27e13ffc6a7d4b295a42f08869) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 ) /* same content as parent */
+	ROM_LOAD16_BYTE( "v2a00.i13",         0x00000, 0x10000, CRC(a33f7d6d) SHA1(c2b9a9a66e4712785250cad69a5e43338af60a82) )	/* characters */
+	ROM_LOAD16_BYTE( "v2a10.h13",         0x20000, 0x10000, CRC(8fbc7454) SHA1(93782d148afe64b14fa46deb4d227ef167030c94) )	/* characters */
+	ROM_LOAD16_BYTE( "v2b00.i12",         0x00001, 0x10000, CRC(e63759bb) SHA1(df7e94f40266aa8995509346cdfdce08a885de16) )
+	ROM_LOAD16_BYTE( "v2b10.h12",         0x20001, 0x10000, CRC(8a7d4062) SHA1(5b5eb4edc765f0e13e22f9de62ddae7380ba3790) )
+	ROM_LOAD16_BYTE( "02a00.i11",         0x40000, 0x10000, CRC(6751a942) SHA1(a71c9cbbf1fba92664144d571d49cf2c15f45408) )	/* objects */
+	ROM_LOAD16_BYTE( "02a10.h11",         0x60000, 0x10000, CRC(bc5ff11c) SHA1(b02296982298e1a659ce05606b291eda9a605cc8) )	/* objects */
+	ROM_LOAD16_BYTE( "02b00_11-4.i8.bin", 0x40001, 0x10000, CRC(460aa7b4) SHA1(9e928d6150e7a91d411c0510198e80d523a88272) )
+	ROM_LOAD16_BYTE( "02b10.h8",          0x60001, 0x10000, CRC(2cc7ee28) SHA1(c96890383dbef755953f851a43449cf563e2e1a5) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "6301-1.i15", 0x0000, 0x0100, CRC(f34617ad) SHA1(79ceba6fe204472a5a659641ac4f14bb1f0ee3f6) )	/* sprite lookup table */
+
+	ROM_REGION( 0x20000, "vlm", 0 )	 /* same content as parent */ /* 128k for the VLM5030 data */
+	ROM_LOAD( "voice_00.e7", 0x00000, 0x10000, CRC(8bd0fcf7) SHA1(d55644f8b33eff6f960725f00ba842e0253e3b36) )
+	ROM_LOAD( "voice_10.d7", 0x10000, 0x10000, CRC(b4c97494) SHA1(93f7c3c93f6f790c3f480e183da0105b5ac3593b) )
+ROM_END
+
+GAME( 1986, ddribble,  0,        ddribble, ddribble, 0, ROT0, "Konami", "Double Dribble", GAME_SUPPORTS_SAVE )
+GAME( 1986, ddribblep, ddribble, ddribble, ddribble, 0, ROT0, "Konami", "Double Dribble (prototype?)", GAME_SUPPORTS_SAVE )

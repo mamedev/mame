@@ -2664,6 +2664,7 @@ V-V                           TP-027
 	DRIVER( 1943j )		/*  6/1987 (c) 1987 (Japan) */
 	DRIVER( 1943b )		/* bootleg */
 	DRIVER( blktiger )	/*  8/1987 (c) 1987 (US) */
+	DRIVER( blktigera )	/*  8/1987 (c) 1987 (US) */
 	DRIVER( blktigerb1 )/* bootleg */
 	DRIVER( blktigerb2 )/* bootleg */
 	DRIVER( blkdrgon )	/*  8/1987 (c) 1987 (Japan) */
@@ -5533,6 +5534,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( jackalj )	/* GX631 (c) 1986 (Japan) */
 	DRIVER( topgunbl )	/* bootleg */
 	DRIVER( ddribble )	/* GX690 (c) 1986 */
+	DRIVER( ddribblep )	/* GX690 (c) 1986 */
 	DRIVER( contra )	/* GX633 (c) 1987 */
 	DRIVER( contra1 )	/* GX633 (c) 1987 */
 	DRIVER( contrab )	/* bootleg */
@@ -5767,6 +5769,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( viostormub )	/* GX168 (c) 1993 (US) */
 	DRIVER( viostormj )	/* GX168 (c) 1993 (Japan) */
 	DRIVER( viostorma )	/* GX168 (c) 1993 (Asia) */
+	DRIVER( viostormab )/* GX168 (c) 1993 (Asia) */
 	DRIVER( mmaulers )	/* GX170 (c) 1993 (Europe) */
 	DRIVER( dadandrn )	/* GX170 (c) 1993 (Japan) */
 	DRIVER( metamrph )	/* GX224 (c) 1993 (Europe) */
@@ -7575,6 +7578,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( scudhamm )	/* (c) 1994 Jaleco */
 	DRIVER( tetrisp2 )	/* (c) 1997 Jaleco */
 	DRIVER( tetrisp2j )	/* (c) 1997 Jaleco */
+	DRIVER( tetrisp2ja )/* (c) 1997 Jaleco */
 	DRIVER( nndmseal )	/* (c) 1997 I'Max/Jaleco */
 	DRIVER( stepstag )	/* (c) 1999 Jaleco */
 	DRIVER( step3 )		/* (c) 1999 Jaleco */

@@ -413,6 +413,42 @@ ROM_START( blktiger )
 	ROM_LOAD( "bd04.11l",  0x0300, 0x0100, CRC(e5490b68) SHA1(40f9f92efe7dd97b49144aec02eb509834056915) )
 ROM_END
 
+ROM_START( blktigera )
+	ROM_REGION( 0x50000, "maincpu", 0 )	/* 64k for code + banked ROMs images */
+	ROM_LOAD( "bdu-01.5e",  0x00000, 0x08000, CRC(47b13922) SHA1(a722048d48171b68119b7ef1af6e06953c238ad6) )	/* CODE */
+	ROM_LOAD( "bdu-02.6e",  0x10000, 0x10000, CRC(2e0daf1b) SHA1(dbcaf2bb1b2c9cd4b2ca1d52b81d6e33b5c7eee9) )	/* 0+1 */
+	ROM_LOAD( "bdu-03.8e",  0x20000, 0x10000, CRC(3b67dfec) SHA1(f9d83f2bb1fbf05d80f6870d91411e9b7bbea917) )	/* 2+3 */
+	ROM_LOAD( "bd-04.9e",    0x30000, 0x10000, CRC(ed6af6ec) SHA1(bed303c51bcddf233ad0701306d557a60ce9f5a5) )	/* 4+5 */
+	ROM_LOAD( "bd-05.10e",   0x40000, 0x10000, CRC(ae59b72e) SHA1(6e72214b71f2f337af236c8be891a18570cb6fbb) )	/* 6+7 */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "bd-06.1l",  0x0000, 0x8000, CRC(2cf54274) SHA1(87df100c65999ba1e9d358ffd0fe4bba23ae0efb) )
+
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "bd.6k",  0x0000, 0x1000, CRC(ac7d14f1) SHA1(46fd6b43f10312e3e8d3c9e0c0fd616af98fdbad) )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_LOAD( "bd-15.2n",  0x00000, 0x08000, CRC(70175d78) SHA1(2f02be2785d1824002145ea20db79821d0393929) )	/* characters */
+
+	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_LOAD( "bd-12.5b",  0x00000, 0x10000, CRC(c4524993) SHA1(9aa6c58004ca1117e5ac44ba8fc51e9128b921b8) )	/* tiles */
+	ROM_LOAD( "bd-11.4b",  0x10000, 0x10000, CRC(7932c86f) SHA1(b3b1bc1e2b0db5c2eb8772f8a2c35129cc80d511) )
+	ROM_LOAD( "bd-14.9b",  0x20000, 0x10000, CRC(dc49593a) SHA1(e4ef42ba9f238fd43c8217657c92896f31d3912c) )
+	ROM_LOAD( "bd-13.8b",  0x30000, 0x10000, CRC(7ed7a122) SHA1(3acc6d4c9731db0609c2e26e3bd255847149ca33) )
+
+	ROM_REGION( 0x40000, "gfx3", 0 )
+	ROM_LOAD( "bd-08.5a",   0x00000, 0x10000, CRC(e2f17438) SHA1(3e5fdae07d40febedc59c7c7c4d9c6f0d72b58b5) )	/* sprites */
+	ROM_LOAD( "bd-07.4a",   0x10000, 0x10000, CRC(5fccbd27) SHA1(33c55aa9c12b3121ca5c3b4c39a9b152b6946461) )
+	ROM_LOAD( "bd-10.9a",   0x20000, 0x10000, CRC(fc33ccc6) SHA1(d492626a88565c2626f98ecb1d74535f1ad68e4c) )
+	ROM_LOAD( "bd-09.8a",   0x30000, 0x10000, CRC(f449de01) SHA1(f6b40e9eb2471b89c42ab84f4214295d284db0c3) )
+
+	ROM_REGION( 0x0400, "proms", 0 )	/* PROMs (function unknown) */
+	ROM_LOAD( "bd01.8j",   0x0000, 0x0100, CRC(29b459e5) SHA1(0034734a533df3dea16b7b48e072485d7f26f850) )
+	ROM_LOAD( "bd02.9j",   0x0100, 0x0100, CRC(8b741e66) SHA1(6c1fda59936a7217b05949f5c54b1f91f4b49dbe) )
+	ROM_LOAD( "bd03.11k",  0x0200, 0x0100, CRC(27201c75) SHA1(c54d87f06bfe0b0908389c005014d97156e272c2) )
+	ROM_LOAD( "bd04.11l",  0x0300, 0x0100, CRC(e5490b68) SHA1(40f9f92efe7dd97b49144aec02eb509834056915) )
+ROM_END
+
 ROM_START( blktigerb1 )
 	ROM_REGION( 0x50000, "maincpu", 0 )	/* 64k for code + banked ROMs images */
 	ROM_LOAD( "btiger1.f6",   0x00000, 0x08000, CRC(9d8464e8) SHA1(c847ee9a22b8b636e85427214747e6bd779023e8) )	/* CODE */
@@ -550,6 +586,7 @@ ROM_END
 
 
 GAME( 1987, blktiger,   0,        blktiger,   blktiger, 0, ROT0, "Capcom",  "Black Tiger",                 GAME_SUPPORTS_SAVE )
+GAME( 1987, blktigera,  blktiger, blktiger,   blktiger, 0, ROT0, "Capcom",  "Black Tiger (older)",         GAME_SUPPORTS_SAVE )
 GAME( 1987, blktigerb1, blktiger, blktigerbl, blktiger, 0, ROT0, "bootleg", "Black Tiger (bootleg set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1987, blktigerb2, blktiger, blktigerbl, blktiger, 0, ROT0, "bootleg", "Black Tiger (bootleg set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1987, blkdrgon,   blktiger, blktiger,   blktiger, 0, ROT0, "Capcom",  "Black Dragon",                GAME_SUPPORTS_SAVE )

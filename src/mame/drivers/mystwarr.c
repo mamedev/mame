@@ -1397,6 +1397,42 @@ ROM_START( viostorma )
 	ROM_LOAD( "viostorma.nv", 0x0000, 0x080, CRC(2cfbf966) SHA1(fb9c4a47bac20a7f820a1fa178fc9f9079101cb8) )
 ROM_END
 
+ROM_START( viostormab )
+	/* main program */
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "168aab02.15h", 0x000001, 0x80000, CRC(14f78423) SHA1(13a44e13b9dc1e31e8268485cded3385a84e3482) )
+	ROM_LOAD16_BYTE( "168aab01.15f", 0x000000, 0x80000, CRC(3dd1cc83) SHA1(f0d289912994a5dbfc0711fe9aa0a2969f7f8d8e) )
+
+	/* sound program */
+	ROM_REGION( 0x030000, "soundcpu", 0 )
+	ROM_LOAD("168a05.7c", 0x000000, 0x020000, CRC(507fb3eb) SHA1(a4f676e3caaafe86918c76ded08d0c202969adf6) )
+	ROM_RELOAD(         0x010000, 0x020000 )
+
+	/* tiles */
+	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00 )
+	ROM_LOADTILE_WORD( "168a09.1h", 0x000000, 2*1024*1024, CRC(1b34a881) SHA1(5de20f7ee7f90d4f6dea349ca5000bfcf74253b1) )
+	ROM_LOADTILE_WORD( "168a08.1k", 0x000002, 2*1024*1024, CRC(db0ce743) SHA1(dfe24a1e3e72da188a92668928e79afd6c5d22ee) )
+
+	/* sprites */
+	ROM_REGION( 0x800000, "gfx2", ROMREGION_ERASE00 )
+	ROM_LOAD64_WORD( "168a10.22k", 0x000000, 2*1024*1024, CRC(bd2bbdea) SHA1(54faf2ded16e66d675bbbec4ebd42b4708edfaef) )
+	ROM_LOAD64_WORD( "168a11.19k", 0x000002, 2*1024*1024, CRC(7a57c9e7) SHA1(8763c310f7b515aef52d4e007bc949e8803690f4) )
+	ROM_LOAD64_WORD( "168a12.20k", 0x000004, 2*1024*1024, CRC(b6b1c4ef) SHA1(064ab4db884c8f98ab9e631b7034996d4b92ab7b) )
+	ROM_LOAD64_WORD( "168a13.17k", 0x000006, 2*1024*1024, CRC(cdec3650) SHA1(949bc06bb38a2d5315ee4f6db19e043655b90e6e) )
+
+	/* road generator */
+	ROM_REGION( 0x40000, "gfx3", ROMREGION_ERASE00 )
+
+	/* sound data */
+	ROM_REGION( 0x400000, "shared", 0 )
+	ROM_LOAD( "168a06.1c", 0x000000, 2*1024*1024, CRC(25404fd7) SHA1(282cf523728b38d0bf14d765dd7257aa1fb2af39) )
+	ROM_LOAD( "168a07.1e", 0x200000, 2*1024*1024, CRC(fdbbf8cc) SHA1(a8adf72a25fe2b9c4c338350d02c92deb5f8c8e9) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "viostormab.nv", 0x0000, 0x080, CRC(38ffce43) SHA1(f0666198562ae7c07c8f805088e882a10c79bcf3) )
+ROM_END
+
+
 ROM_START( viostormj )
 	/* main program */
 	ROM_REGION( 0x200000, "maincpu", 0 )
@@ -1991,6 +2027,7 @@ GAME( 1993, viostormu, viostorm, viostorm, viostorm, 0,        ROT0,  "Konami", 
 GAME( 1993, viostormub,viostorm, viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver UAB)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, viostormj, viostorm, viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver JAC)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, viostorma, viostorm, viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver AAC)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, viostormab, viostorm, viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver AAB)", GAME_IMPERFECT_GRAPHICS )
 
 GAME( 1993, metamrph,  0,        metamrph, metamrph, metamrph, ROT0,  "Konami", "Metamorphic Force (ver EAA)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, metamrphu, metamrph, metamrph, metamrph, metamrph, ROT0,  "Konami", "Metamorphic Force (ver UAA)", GAME_IMPERFECT_GRAPHICS )

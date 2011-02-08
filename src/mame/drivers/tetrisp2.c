@@ -648,7 +648,9 @@ static INPUT_PORTS_START( tetrisp2j )
 	PORT_DIPNAME( 0x0080, 0x0080, "Unknown 1-8" ) PORT_DIPLOCATION("SW1:8") /* Test Mode in "World" set */
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPUNUSED_DIPLOC( 0x0800, 0x0010, "SW2:4" ) /* Language Select in "World" set */
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Language ) ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(      0x0800, DEF_STR( Japanese ) )
+	PORT_DIPSETTING(      0x0000, "English (buggy, breaks game)" )
 	PORT_DIPNAME( 0x1000, 0x1000, "Unknown 2-5" ) PORT_DIPLOCATION("SW2:5") /* F.B.I. Logo in "World" set */
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1317,8 +1319,8 @@ Japan Set:
 
 ROM_START( tetrisp2 ) /* Version 2.8 */
 	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
-	ROM_LOAD16_BYTE( "tet2_4_ver2.8.ic65", 0x000000, 0x080000, CRC(e67f9c51) SHA1(d8b2937699d648267b163c7c3f591426877f3701) )
-	ROM_LOAD16_BYTE( "tet2_1_ver2.8.ic59", 0x000001, 0x080000, CRC(5020a4ed) SHA1(9c0f02fe3700761771ac026a2e375144e86e5eb7) )
+	ROM_LOAD16_BYTE( "tet2_4_ver2.8.ic59", 0x000000, 0x080000, CRC(e67f9c51) SHA1(d8b2937699d648267b163c7c3f591426877f3701) )
+	ROM_LOAD16_BYTE( "tet2_1_ver2.8.ic65", 0x000001, 0x080000, CRC(5020a4ed) SHA1(9c0f02fe3700761771ac026a2e375144e86e5eb7) )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )	/* 8x8x8 (Sprites) */
 	ROM_LOAD32_WORD( "96019-01.9", 0x000000, 0x400000, CRC(06f7dc64) SHA1(722c51b707b9854c0293afdff18b27ec7cae6719) )
@@ -1343,8 +1345,31 @@ ROM_END
 
 ROM_START( tetrisp2j ) /* Version 2.2 */
 	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
-	ROM_LOAD16_BYTE( "tet2_4_ver2.2.ic65", 0x000000, 0x080000, CRC(5bfa32c8) SHA1(55fb2872695fcfbad13f5c0723302e72da69e44a) )
-	ROM_LOAD16_BYTE( "tet2_1_ver2.2.ic59", 0x000001, 0x080000, CRC(919116d0) SHA1(3e1c0fd4c9175b2900a4717fbb9e8b591c5f534d) )
+	ROM_LOAD16_BYTE( "tet2_4_ver2.2.ic59", 0x000000, 0x080000, CRC(5bfa32c8) SHA1(55fb2872695fcfbad13f5c0723302e72da69e44a) )
+	ROM_LOAD16_BYTE( "tet2_1_ver2.2.ic65", 0x000001, 0x080000, CRC(919116d0) SHA1(3e1c0fd4c9175b2900a4717fbb9e8b591c5f534d) )
+
+	ROM_REGION( 0x800000, "gfx1", 0 )	/* 8x8x8 (Sprites) */
+	ROM_LOAD32_WORD( "96019-01.9", 0x000000, 0x400000, CRC(06f7dc64) SHA1(722c51b707b9854c0293afdff18b27ec7cae6719) )
+	ROM_LOAD32_WORD( "96019-02.8", 0x000002, 0x400000, CRC(3e613bed) SHA1(038b5e43fa3d69654107c8093126eeb2e8fa4ddc) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )	/* 16x16x8 (Background) */
+	ROM_LOAD( "96019-06.13", 0x000000, 0x400000, CRC(16f7093c) SHA1(2be77c6a692c5d762f5553ae24e8c415ab194cc6) )
+
+	ROM_REGION( 0x100000, "gfx3", 0 )	/* 16x16x8 (Rotation) */
+	ROM_LOAD( "96019-04.6",  0x000000, 0x100000, CRC(b849dec9) SHA1(fa7ac00fbe587a74c3fb8c74a0f91f7afeb8682f) )
+
+	ROM_REGION( 0x080000, "gfx4", 0 )	/* 8x8x8 (Foreground) */
+	ROM_LOAD( "tetp2-10.ic27", 0x000000, 0x080000, CRC(34dd1bad) SHA1(9bdf1dde11f82839676400de5dd7acb06ea8cdb2) )	// 11111xxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x400000, "ymz", 0 )	/* Samples */
+	ROM_LOAD( "96019-07.7", 0x000000, 0x400000, CRC(a8a61954) SHA1(86c3db10b348ba1f44ff696877b8b20845fa53de) )
+ROM_END
+
+ROM_START( tetrisp2ja ) /* Version 2.1 */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
+	// yes, only one rom of the interleaved pair differs to the 2.2 revision?!
+	ROM_LOAD16_BYTE( "tet2_ic4_ver2.1.ic59", 0x000000, 0x080000, CRC(5bfa32c8) SHA1(55fb2872695fcfbad13f5c0723302e72da69e44a) )
+	ROM_LOAD16_BYTE( "tet2_ic1_ver2.1.ic65", 0x000001, 0x080000, CRC(5b5f8377) SHA1(75e17d628a1fd6da5616eea3e1e137f000824f14) )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )	/* 8x8x8 (Sprites) */
 	ROM_LOAD32_WORD( "96019-01.9", 0x000000, 0x400000, CRC(06f7dc64) SHA1(722c51b707b9854c0293afdff18b27ec7cae6719) )
@@ -1813,8 +1838,9 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1997, tetrisp2,  0,        tetrisp2, tetrisp2,  0,     ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (World)",           GAME_SUPPORTS_SAVE )
-GAME( 1997, tetrisp2j, tetrisp2, tetrisp2, tetrisp2j, 0,     ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan)",           GAME_SUPPORTS_SAVE )
+GAME( 1997, tetrisp2,  0,        tetrisp2, tetrisp2, 0,     ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (World)",           GAME_SUPPORTS_SAVE )
+GAME( 1997, tetrisp2j, tetrisp2, tetrisp2, tetrisp2j,0,     ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.2)",     GAME_SUPPORTS_SAVE )
+GAME( 1997, tetrisp2ja,tetrisp2, tetrisp2, tetrisp2j,0,     ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.1)",     GAME_SUPPORTS_SAVE )
 
 GAME( 1997, nndmseal, 0,        nndmseal, nndmseal, rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai",       GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 
