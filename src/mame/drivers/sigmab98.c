@@ -1305,8 +1305,7 @@ ROM_START( animalc )
 	ROM_COPY( "samples", 0x1c0000, 0x00000, 0x40000 )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
-	// tiles end abruptly at 1A00, but a few tiles above that are needed
-	ROM_LOAD( "vx2301l01.u016", 0x00000, 0x200000, BAD_DUMP CRC(c3a9ca47) SHA1(812bbcfe3b789eadb5adb4c8141303fc046d52c9) )	// 1xxxxxxxxxxxxxxxxxxxx = 0x00
+	ROM_LOAD( "vx2301l01.u016", 0x00000, 0x200000, CRC(4ae14ff9) SHA1(1273d15ea642452fecacff572655cd3ab47a5884) )	// 1xxxxxxxxxxxxxxxxxxxx = 0x00
 ROM_END
 
 static DRIVER_INIT( animalc )
@@ -1322,13 +1321,6 @@ static DRIVER_INIT( animalc )
 	machine->generic.spriteram_size = 0x1000;
 	memory_configure_bank(machine, "sprbank", 0, 5, machine->generic.spriteram.u8, 0x1000);
 	memory_set_bank(machine, "sprbank", 0);
-
-#if 0
-	// uncomment to show used tiles missing from the dump
-	UINT8 *gfx = machine->region("sprites")->base();
-	for (int i = 0x1a00*(16*16*4/8); i < 0x100000; i++)
-		gfx[i] = i*7;
-#endif
 }
 
 /***************************************************************************
@@ -1468,7 +1460,7 @@ ROM_END
 
 GAME( 1997, gegege,   0, gegege,   gegege,   gegege,   ROT0, "Banpresto / Sigma", "GeGeGe no Kitarou Youkai Slot", 0             )
 // Sammy Medal Games:
-GAME( 2000, animalc,  0, animalc,  sammymdl, animalc,  ROT0, "Sammy",             "Animal Catch",                  GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 2000, animalc,  0, animalc,  sammymdl, animalc,  ROT0, "Sammy",             "Animal Catch",                  GAME_NO_SOUND )
 GAME( 2000, itazuram, 0, itazuram, sammymdl, itazuram, ROT0, "Sammy",             "Itazura Monkey",                GAME_NO_SOUND )
 GAME( 2000, pyenaget, 0, animalc,  sammymdl, 0,        ROT0, "Sammy",             "Pye-nage Taikai",               GAME_NO_SOUND | GAME_NOT_WORKING )
 GAME( 2002, haekaka,  0, animalc,  sammymdl, 0,        ROT0, "Sammy",             "Hae Hae Ka Ka Ka",              GAME_NO_SOUND | GAME_NOT_WORKING )
