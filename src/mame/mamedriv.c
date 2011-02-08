@@ -10645,6 +10645,7 @@ Other Sun games
 	DRIVER( avtbingo )	/* (c) 1985 AVT */
 	DRIVER( avtnfl )	/* (c) 1989 AVT */
 
+	DRIVER( dfruit )
 
 	// allied.c
 	DRIVER( allied )

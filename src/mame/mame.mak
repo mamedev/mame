@@ -1614,6 +1614,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/cubeqst.o \
 	$(DRIVERS)/cybertnk.o \
 	$(DRIVERS)/dcheese.o $(VIDEO)/dcheese.o \
+	$(DRIVERS)/dfruit.o \
 	$(DRIVERS)/dgpix.o \
 	$(DRIVERS)/discoboy.o \
 	$(DRIVERS)/dominob.o \

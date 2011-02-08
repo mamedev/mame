@@ -1716,6 +1716,7 @@ src/mame/drivers/decocass.c svneol=native#text/plain
 src/mame/drivers/deniam.c svneol=native#text/plain
 src/mame/drivers/deshoros.c svneol=native#text/plain
 src/mame/drivers/destroyr.c svneol=native#text/plain
+src/mame/drivers/dfruit.c svneol=native#text/plain
 src/mame/drivers/dgpix.c svneol=native#text/plain
 src/mame/drivers/dietgo.c svneol=native#text/plain
 src/mame/drivers/discoboy.c svneol=native#text/plain
