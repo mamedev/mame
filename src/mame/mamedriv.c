@@ -4617,7 +4617,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mt_sonia )	/* ^^ */
 	DRIVER( mt_fshrk )	/* 53 */
 	DRIVER( mt_spman )	/* 54 */
-						/* 55 */
+	DRIVER( mt_calga )	/* 55? */
 						/* 56 */
 	DRIVER( mt_gaxe2 )	/* 57 */
 	DRIVER( mt_stf )	/* 58 */
@@ -4625,8 +4625,6 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mt_kcham )	/* 60 */
 	DRIVER( mt_tout )	/* 61 */
 	DRIVER( mt_soni2 )	/* 62 */
-	//DRIVER( mt_comp1 )    /* ?? */
-	//DRIVER( mt_comp2 )    /* ?? */
 
 	/* Sega MegaPlay */
 	DRIVER( megaplay )

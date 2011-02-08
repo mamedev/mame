@@ -591,6 +591,21 @@
     </part>
   </software>
 
+  <!-- Game 55? : California Games -->
+  <software name="mt_calga">
+    <description>California Games</description>
+    <year>1991</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="megatech_cart">
+      <feature name="pcb_type" value="genesis" />
+      <dataarea name="rom" size="0x400000">
+        <rom name="epr-14494.ic1"   size="0x040000" crc="cbe58b1b" sha1="ea067fc08e644c993f8d13731425c9296c1a2a75" offset="0x000000" loadflag="load16_byte"/>
+        <rom name="epr-14495.ic2"   size="0x040000" crc="cb956f4f" sha1="3574c496b79aefdec7d02975490ebe3bb373bc60" offset="0x000001" loadflag="load16_byte"/>
+        <rom name="epr-12368-55.ic3" size="0x008000" crc="6f7dd8f5" sha1="a6cb1aa8c3635738dd9e4d3e0d729d089fd9b599" offset="0x300000" loadflag="load16_byte"/>
+      </dataarea>
+    </part>
+  </software>
+
   <!-- Game 57 : Golden Axe II -->
   <software name="mt_gaxe2">
     <description>Golden Axe II</description>

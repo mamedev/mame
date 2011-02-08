@@ -1122,6 +1122,19 @@ ROM_START( mt_spman ) /* Spiderman */
 ROM_END
 
 
+/* Game 55? (the cart shows a 610-0239-55 marking on the label) - California Games */
+ROM_START( mt_calga ) /* California Games */
+	MEGATECH_BIOS
+
+	ROM_REGION16_BE( 0x400000, "game0", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "epr-14494.ic1", 0x000001, 0x040000, CRC(cbe58b1b) SHA1(ea067fc08e644c993f8d13731425c9296c1a2a75) )
+	ROM_LOAD16_BYTE( "epr-14495.ic2", 0x000000, 0x040000, CRC(cb956f4f) SHA1(3574c496b79aefdec7d02975490ebe3bb373bc60) )
+	ROM_LOAD16_BYTE( "epr-12368-55.ic3", 0x300001, 0x08000, CRC(6f7dd8f5) SHA1(a6cb1aa8c3635738dd9e4d3e0d729d089fd9b599) )
+
+	ROM_REGION( 0x01, "sms_pin", ROMREGION_ERASE00 )
+ROM_END
+
+
 /* Game 57 - Golden Axe 2 (Genesis) */
 ROM_START( mt_gaxe2 ) /* Golden Axe 2 */
 	MEGATECH_BIOS
@@ -1255,7 +1268,7 @@ ROM_END
 /*    */ GAME( 1991, mt_sonia, mt_sonic, megatech, megatech, mt_crt, ROT0, "Sega",                  "Sonic The Hedgehog (Mega-Tech, set 2)", GAME_NOT_WORKING )
 /* 53 */ GAME( 1990, mt_fshrk, megatech, megatech, megatech, mt_crt, ROT0, "Toaplan / Sega",        "Fire Shark (Mega-Tech)", GAME_NOT_WORKING )
 /* 54 */ GAME( 1991, mt_spman, megatech, megatech, megatech, mt_crt, ROT0, "Marvel / Sega",         "Spider-Man vs The Kingpin (Mega-Tech)", GAME_NOT_WORKING )
-/* 55 */ // unknown
+/* 55?*/ GAME( 1991, mt_calga, megatech, megatech, megatech, mt_crt, ROT0, "Sega",                  "California Games (Mega-Tech)", GAME_NOT_WORKING )
 /* 56 */ // unknown
 /* 57 */ GAME( 1991, mt_gaxe2, megatech, megatech, megatech, mt_crt, ROT0, "Sega",                  "Golden Axe II (Mega-Tech)", GAME_NOT_WORKING )
 /* 58 */ GAME( 1991, mt_stf,   megatech, megatech, megatech, mt_crt, ROT0, "Sega",                  "Joe Montana II: Sports Talk Football (Mega-Tech)", GAME_NOT_WORKING )
@@ -1263,5 +1276,6 @@ ROM_END
 /* 60 */ GAME( 1992, mt_kcham, megatech, megatech, megatech, mt_crt, ROT0, "Sega",                  "Kid Chameleon (Mega-Tech)", GAME_NOT_WORKING )
 /* 61 */ GAME( 1992, mt_tout,  megatech, megatech, megatech, mt_crt, ROT0, "Sega",                  "Turbo Outrun (Mega-Tech)", GAME_NOT_WORKING )
 /* 62 */ GAME( 1992, mt_soni2, megatech, megatech, megatech, mt_crt, ROT0, "Sega",                  "Sonic The Hedgehog 2 (Mega-Tech)", GAME_NOT_WORKING )
+
 
 /* more? */
