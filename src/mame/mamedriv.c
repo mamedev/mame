@@ -3324,7 +3324,7 @@ V-V                           TP-027
 	DRIVER( pocketrc )	/* 1997.03 Pocket Racer (PKR1/VER.B, Japan) */
 	DRIVER( starswep )	/* 1997.07 Star Sweep (STP1/VER.A, Japan) */
 	DRIVER( myangel3 )	/* 1998.03 Kosodate Quiz My Angel 3 (KQT1/VER.A, Japan) */
-	DRIVER( ptblnk2a )	/* 1999.?? Point Blank 2 (GNB3/VER.A) */
+	DRIVER( ptblank2a )	/* 1999.?? Point Blank 2 (GNB3/VER.A) */
 						/* 1999.02 Gunbaarl (GNB1, Japan) */
 
 	/* Namco System 12 */
