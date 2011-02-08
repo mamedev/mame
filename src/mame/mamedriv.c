@@ -2717,9 +2717,10 @@ V-V                           TP-027
 	DRIVER( dynwar )	/*  4/1989 (c) 1989 (USA) */
 	DRIVER( dynwara )	/*  4/1989 (c) 1989 (USA) */
 	DRIVER( dynwarj )	/*  4/1989 (c) 1989 (Japan) */
+	DRIVER( dynwarjr )	/*  4/1989 (c) 1989 (Japan) */
 	DRIVER( willow )	/*  6/1989 (c) 1989 (USA) */
+	DRIVER( willowo )	/*  6/1989 (c) 1989 (USA) */
 	DRIVER( willowj )	/*  6/1989 (c) 1989 (Japan) */
-	DRIVER( willowje )	/*  6/1989 (c) 1989 (Japan) */
 	DRIVER( unsquad )	/*  8/1989 (c) 1989 (USA) */
 	DRIVER( area88 )	/*  8/1989 (c) 1989 (Japan) */
 	DRIVER( area88r )	/*  8/1989 (c) 1989 (Japan) */
