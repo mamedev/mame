@@ -42,7 +42,7 @@ xxxx xxxx xxxx xxxx [2] scroll Y, signed
 ---- ---- --?? ??xx [6] map register
 */
 
-static void draw_layer(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int layer)
+static void draw_layer(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int layer,int data_shift)
 {
 	int i, y, x;
 	const gfx_element *gfx = machine->gfx[0];
@@ -59,8 +59,8 @@ static void draw_layer(running_machine *machine, bitmap_t *bitmap,const rectangl
 	{
 		for (x=0;x<32;x++)
 		{
-			UINT16 dat = npvidram[i*2]>>2;
-			UINT16 color = ((npvidram[i*2+1] & 0xff00) >> 8)*4;
+			UINT16 dat = npvidram[i*2] >> data_shift; // a video register?
+			UINT16 color = ((npvidram[i*2+1] & 0xff00) >> 8);
 			UINT8 fx = (npvidram[i*2+1] & 0x0040);
 			UINT8 fy = (npvidram[i*2+1] & 0x0080);
 
@@ -79,8 +79,18 @@ VIDEO_UPDATE(neoprint)
 {
 	bitmap_fill(bitmap, cliprect, 0);
 
-	draw_layer(screen->machine,bitmap,cliprect,1);
-	draw_layer(screen->machine,bitmap,cliprect,0);
+	draw_layer(screen->machine,bitmap,cliprect,1,2);
+	draw_layer(screen->machine,bitmap,cliprect,0,2);
+
+	return 0;
+}
+
+VIDEO_UPDATE(nprsp)
+{
+	bitmap_fill(bitmap, cliprect, 0);
+
+	draw_layer(screen->machine,bitmap,cliprect,1,0);
+	draw_layer(screen->machine,bitmap,cliprect,0,0);
 
 	return 0;
 }
@@ -190,6 +200,45 @@ static ADDRESS_MAP_START( neoprint_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700000, 0x70001b) AM_RAM AM_BASE(&npvidregs)
 
 	AM_RANGE(0x70001e, 0x70001f) AM_WRITENOP //watchdog
+ADDRESS_MAP_END
+
+static WRITE16_HANDLER( nprsp_palette_w )
+{
+	UINT8 r,g,b,i;
+
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+
+	g = (space->machine->generic.paletteram.u16[offset & ~1] & 0xf800) >> 8;
+	r = (space->machine->generic.paletteram.u16[offset & ~1] & 0x00f8) >> 0;
+	i = (space->machine->generic.paletteram.u16[offset | 1] & 0x1c00) >> 10;
+	b = (space->machine->generic.paletteram.u16[offset | 1] & 0x00f8) >> 0;
+	r |= i;
+	g |= i;
+	b |= i;
+
+	palette_set_color(space->machine, (offset/2), MAKE_RGB(r,g,b));
+}
+
+static ADDRESS_MAP_START( nprsp_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x200000, 0x200001) AM_READWRITE(neoprint_audio_result_r,audio_command_w)
+	AM_RANGE(0x200002, 0x200003) AM_READWRITE(neoprint_calendar_r,neoprint_calendar_w)
+	AM_RANGE(0x200004, 0x200005) AM_READ_PORT("SYSTEM") AM_WRITENOP
+	AM_RANGE(0x200006, 0x200007) AM_READ_PORT("IN") AM_WRITENOP
+	AM_RANGE(0x200008, 0x200009) AM_READ_PORT("DSW1")
+	AM_RANGE(0x20000a, 0x20000b) AM_READ8(neoprint_unk_r,0xff00)
+	AM_RANGE(0x20000c, 0x20000d) AM_READ_PORT("DSW2")
+	AM_RANGE(0x20000e, 0x20000f) AM_WRITENOP
+
+	AM_RANGE(0x240000, 0x24001b) AM_RAM AM_BASE(&npvidregs)
+	AM_RANGE(0x24001e, 0x24001f) AM_WRITENOP //watchdog
+
+	AM_RANGE(0x300000, 0x33ffff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x380000, 0x38ffff) AM_RAM
+	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_BASE(&npvidram)
+	AM_RANGE(0x500000, 0x51ffff) AM_RAM_WRITE(nprsp_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x520000, 0x57ffff) AM_RAM //more paletteram?
+
 ADDRESS_MAP_END
 
 /*************************************
@@ -324,9 +373,9 @@ INPUT_PORTS_END
 static const gfx_layout neoprint_layout =
 {
 	16,16,
-	RGN_FRAC(1,2),
-	4,
-	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2)+0, RGN_FRAC(0,2)+8, RGN_FRAC(0,2)+0 },
+	RGN_FRAC(1,3),
+	6,
+	{ RGN_FRAC(2,3)+8, RGN_FRAC(2,3)+0, RGN_FRAC(1,3)+8, RGN_FRAC(1,3)+0, RGN_FRAC(0,3)+8, RGN_FRAC(0,3)+0  },
 	{ 0,1,2,3,4,5,6,7, 256,257,258,259,260,261,262,263 },
 	{ 0*16,1*16,2*16,3*16,4*16,5*16,6*16,7*16,8*16,9*16,10*16,11*16,12*16,13*16,14*16,15*16 },
 	32*16,
@@ -391,6 +440,43 @@ static MACHINE_CONFIG_START( neoprint, neoprint_state )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( nprsp, neoprint_state )
+	MCFG_CPU_ADD("maincpu", M68000, 12000000)
+	MCFG_CPU_PROGRAM_MAP(nprsp_map)
+	MCFG_CPU_PERIODIC_INT(irq3_line_hold,45) /* camera / printer irq, unknown timing */
+	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold) // lv1,2,3 valid?
+
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
+	MCFG_CPU_PROGRAM_MAP(neoprint_audio_map)
+	MCFG_CPU_IO_MAP(neoprint_audio_io_map)
+
+	MCFG_UPD4990A_ADD("upd4990a")
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_GFXDECODE(neoprint)
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 30*8-1)
+
+	MCFG_PALETTE_LENGTH(0x10000)
+
+	MCFG_VIDEO_START(neoprint)
+	MCFG_VIDEO_UPDATE(nprsp)
+
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_SOUND_ADD("ymsnd", YM2610, 24000000 / 3)
+	MCFG_SOUND_CONFIG(ym2610_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker",  0.60)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.60)
+	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
+	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
+MACHINE_CONFIG_END
+
 
 ROM_START( npcartv1 )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
@@ -403,7 +489,7 @@ ROM_START( npcartv1 )
 	ROM_REGION( 0x080000, "ymsnd", 0 ) /* Samples */
 	ROM_LOAD( "v1.bin", 0x00000, 0x80000, CRC(2d6608f9) SHA1(7dbde1c305ab3438b7fe7417816427c682371bd4) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_REGION( 0x180000, "gfx1", ROMREGION_ERASE00 )
 	ROM_LOAD( "c1.bin", 0x00000, 0x80000, CRC(b89f1fb6) SHA1(e711f91a7872b2e0edc3f42a726d969096d684f2) )
 	ROM_LOAD( "c2.bin", 0x80000, 0x80000, CRC(7ce39dc2) SHA1(c5be90657350258b670b55dd9c77f7899133ced3) )
 ROM_END
@@ -424,11 +510,27 @@ ROM_START( 98best44 )
 	ROM_REGION( 0x200000, "ymsnd", 0 ) /* Samples */
 	ROM_LOAD( "pt004-v1", 0x000000, 0x200000, CRC(118a84fd) SHA1(9059297a42a329eca47a82327c301853219013bd) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x300000, "gfx1", ROMREGION_ERASE00 )
 	ROM_LOAD( "pt060-c1", 0x000000, 0x100000, CRC(22a23090) SHA1(0e219fcfea6ca2ddf4b7b4197aac8bc55a29d5cf) )
 	ROM_LOAD( "pt060-c2", 0x100000, 0x100000, CRC(66a8e56a) SHA1(adfd1e52d52806a785f1e9b1ae2ac969b6ed60af) )
 ROM_END
 
+ROM_START( nprsp )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "s038a-ep1.bin", 0x000000, 0x080000, CRC(529fb4fa) SHA1(f31ba8998bb01458f43df1934222995f22d590a1) )
+	ROM_LOAD16_WORD_SWAP( "s046-ep2.bin",  0x080000, 0x080000, CRC(846ae929) SHA1(e5544cde32794865e17d7dffd4e603ad5418d91e) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
+	ROM_LOAD( "s046-m1",	 0x00000, 0x20000, BAD_DUMP CRC(6d77cdaa) SHA1(f88a93b3085b18b6663b4e51fccaa41958aafae1) )
+
+	ROM_REGION( 0x200000, "ymsnd", 0 ) /* Samples */
+	ROM_LOAD( "s001-v1.bin", 0x000000, 0x100000, CRC(13d63625) SHA1(4a9e3b1192a4a7e405becfd5d2a95ffc14ae6e79)  )
+
+	ROM_REGION( 0x600000, "gfx1", 0 )
+	ROM_LOAD( "s046-c1.bin", 0x000000, 0x200000, CRC(06fffce0) SHA1(0d9bb9d3107b1efb66ee82341c3f80ec093d5987) )
+	ROM_LOAD( "s046-c2.bin", 0x200000, 0x200000, CRC(7cc353e7) SHA1(5c4fa9fdf90bd0d03608becaa174d68735f28bbb) )
+	ROM_LOAD( "s046-c3.bin", 0x400000, 0x200000, CRC(f68f0f6f) SHA1(2fc105953a17259353f74376661c442658f9a644) )
+ROM_END
 
 /* FIXME: get rid of these two, probably something to do with irq3 and camera / printer devices */
 static DRIVER_INIT( npcartv1 )
@@ -450,3 +552,4 @@ static DRIVER_INIT( 98best44 )
 
 GAME( 1996, npcartv1,    0,        neoprint,    neoprint,   npcartv1, ROT0, "SNK", "Neo Print V1 (World)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 GAME( 1998, 98best44,    0,        neoprint,    neoprint,   98best44, ROT0, "SNK", "Neo Print - '98 NeoPri Best 44 (Japan)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS |  GAME_NOT_WORKING )
+GAME( 1996, nprsp,       0,        nprsp,       neoprint,   0,        ROT0, "SNK", "NeopriSP Retro Collection (Japan)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )

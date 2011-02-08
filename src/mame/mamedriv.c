@@ -3137,7 +3137,9 @@ V-V                           TP-027
 
 	/* Capcom CPS3 games */
 	DRIVER( redearth )	/* 21/11/1996 (c) 1996 (Euro) */
+	DRIVER( redeartha ) /* 23/10/1996 (c) 1996 (Euro) */
 	DRIVER( warzard )	/* 21/11/1996 (c) 1996 (Japan) */
+	DRIVER( warzarda )	/* 23/10/1996 (c) 1996 (Japan) */
 	DRIVER( sfiii )	/* 04/02/1997 (c) 1997 (USA) */
 	DRIVER( sfiiij )	/* 04/02/1997 (c) 1997 (Japan) */
 	DRIVER( sfiii2 )	/* 30/09/1997 (c) 1997 (USA) */
@@ -3150,7 +3152,6 @@ V-V                           TP-027
 	DRIVER( sfiii3a )	/* 12/05/1999 (c) 1999 (USA) */
 	DRIVER( jojoba )	/* 13/09/1999 (c) 1999 (Japan) */
 
-	DRIVER( redeartn )	/* 21/11/1996 (c) 1996 (?) */
 	DRIVER( sfiiin )	/* 04/02/1997 (c) 1997 (Asia) */
 	DRIVER( sfiii2n )	/* 30/09/1997 (c) 1997 (Asia) */
 	DRIVER( jojon )	/* 08/01/1999 (c) 1998 (Asia) */
@@ -6849,6 +6850,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* Neo Print */
 	DRIVER( npcartv1 )
 	DRIVER( 98best44 )
+	DRIVER( nprsp )
 
 	/* Alpha Denshi games */
 	DRIVER( shougi )	/* (c) 1982 (Arcade TV Game List - P.80, Left, 9 from top) */
