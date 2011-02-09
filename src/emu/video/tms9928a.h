@@ -6,20 +6,20 @@
 
 /*
 
-	Model			Video		Hz
+    Model           Video       Hz
 
-	TMS9918			NTSC		60
-	TMS9918A		NTSC		60
-	TMS9118			NTSC		60
-	V9938
-	V9958
-	V9990
+    TMS9918         NTSC        60
+    TMS9918A        NTSC        60
+    TMS9118         NTSC        60
+    V9938
+    V9958
+    V9990
 
-	TMS9928A		YPbPr		60
-	TMS9128			YPbPr		60
+    TMS9928A        YPbPr       60
+    TMS9128         YPbPr       60
 
-	TMS9929A		YPbPr		50
-	TMS9129			YPbPr		50
+    TMS9929A        YPbPr       50
+    TMS9129         YPbPr       50
 
 */
 

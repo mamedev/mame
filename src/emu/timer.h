@@ -108,7 +108,7 @@ typedef void (*timer_device_fired_func)(timer_device &timer, void *ptr, INT32 pa
 class timer_device_config : public device_config
 {
 	friend class timer_device;
-	
+
 	// construction/destruction
 	timer_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
 

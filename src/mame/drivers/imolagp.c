@@ -187,7 +187,7 @@ static void initialize_colors( running_machine *machine )
 static VIDEO_START( imolagp )
 {
 	imolagp_state *state = machine->driver_data<imolagp_state>();
-	
+
 	memset(state->videoram, 0, sizeof(state->videoram));
 	state->save_item(NAME(state->videoram));
 

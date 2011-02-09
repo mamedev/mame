@@ -1,9 +1,9 @@
 /***************************************************************************
 
     32031ops.c
-    
+
     TMS32031/2 emulator
-    
+
 ****************************************************************************
 
     Copyright Aaron Giles
@@ -84,8 +84,8 @@
 #define OR_V_ADD(a,b,r)		do { UINT32 temp = ((~((a) ^ (b)) & ((a) ^ (r))) >> 30) & VFLAG; IREG(TMR_ST) |= temp | (temp << 4); } while (0)
 #define OR_C_SUB(a,b,r)		do { IREG(TMR_ST) |= ((UINT32)(b) > (UINT32)(a)); } while (0)
 #define OR_C_ADD(a,b,r)		do { IREG(TMR_ST) |= ((UINT32)(~(a)) < (UINT32)(b)); } while (0)
-#define OR_NZCV_SUB(a,b,r) 	do { OR_V_SUB(a,b,r); OR_C_SUB(a,b,r); OR_NZ(r); } while (0)
-#define OR_NZCV_ADD(a,b,r) 	do { OR_V_ADD(a,b,r); OR_C_ADD(a,b,r); OR_NZ(r); } while (0)
+#define OR_NZCV_SUB(a,b,r)	do { OR_V_SUB(a,b,r); OR_C_SUB(a,b,r); OR_NZ(r); } while (0)
+#define OR_NZCV_ADD(a,b,r)	do { OR_V_ADD(a,b,r); OR_C_ADD(a,b,r); OR_NZ(r); } while (0)
 
 #define OVM()				(IREG(TMR_ST) & OVMFLAG)
 
@@ -6346,26 +6346,26 @@ void tms3203x_device::xor3sti(UINT32 op)
 
 UINT32 (tms3203x_device::*const tms3203x_device::s_indirect_d[0x20])(UINT32, UINT8) =
 {
-	&tms3203x_device::mod00_d,		&tms3203x_device::mod01_d,		&tms3203x_device::mod02_d,		&tms3203x_device::mod03_d,	
+	&tms3203x_device::mod00_d,		&tms3203x_device::mod01_d,		&tms3203x_device::mod02_d,		&tms3203x_device::mod03_d,
 	&tms3203x_device::mod04_d,		&tms3203x_device::mod05_d,		&tms3203x_device::mod06_d,		&tms3203x_device::mod07_d,
-	&tms3203x_device::mod08,		&tms3203x_device::mod09,		&tms3203x_device::mod0a,		&tms3203x_device::mod0b,		
+	&tms3203x_device::mod08,		&tms3203x_device::mod09,		&tms3203x_device::mod0a,		&tms3203x_device::mod0b,
 	&tms3203x_device::mod0c,		&tms3203x_device::mod0d,		&tms3203x_device::mod0e,		&tms3203x_device::mod0f,
-	&tms3203x_device::mod10,		&tms3203x_device::mod11,		&tms3203x_device::mod12,		&tms3203x_device::mod13,		
+	&tms3203x_device::mod10,		&tms3203x_device::mod11,		&tms3203x_device::mod12,		&tms3203x_device::mod13,
 	&tms3203x_device::mod14,		&tms3203x_device::mod15,		&tms3203x_device::mod16,		&tms3203x_device::mod17,
-	&tms3203x_device::mod18,		&tms3203x_device::mod19,		&tms3203x_device::modillegal,	&tms3203x_device::modillegal,	
+	&tms3203x_device::mod18,		&tms3203x_device::mod19,		&tms3203x_device::modillegal,	&tms3203x_device::modillegal,
 	&tms3203x_device::modillegal,	&tms3203x_device::modillegal,	&tms3203x_device::modillegal,	&tms3203x_device::modillegal
 };
 
 
 UINT32 (tms3203x_device::*const tms3203x_device::s_indirect_1[0x20])(UINT32, UINT8) =
 {
-	&tms3203x_device::mod00_1,		&tms3203x_device::mod01_1,		&tms3203x_device::mod02_1,		&tms3203x_device::mod03_1,	
+	&tms3203x_device::mod00_1,		&tms3203x_device::mod01_1,		&tms3203x_device::mod02_1,		&tms3203x_device::mod03_1,
 	&tms3203x_device::mod04_1,		&tms3203x_device::mod05_1,		&tms3203x_device::mod06_1,		&tms3203x_device::mod07_1,
-	&tms3203x_device::mod08,		&tms3203x_device::mod09,		&tms3203x_device::mod0a,		&tms3203x_device::mod0b,		
+	&tms3203x_device::mod08,		&tms3203x_device::mod09,		&tms3203x_device::mod0a,		&tms3203x_device::mod0b,
 	&tms3203x_device::mod0c,		&tms3203x_device::mod0d,		&tms3203x_device::mod0e,		&tms3203x_device::mod0f,
-	&tms3203x_device::mod10,		&tms3203x_device::mod11,		&tms3203x_device::mod12,		&tms3203x_device::mod13,		
+	&tms3203x_device::mod10,		&tms3203x_device::mod11,		&tms3203x_device::mod12,		&tms3203x_device::mod13,
 	&tms3203x_device::mod14,		&tms3203x_device::mod15,		&tms3203x_device::mod16,		&tms3203x_device::mod17,
-	&tms3203x_device::mod18,		&tms3203x_device::mod19,		&tms3203x_device::modillegal,	&tms3203x_device::modillegal,	
+	&tms3203x_device::mod18,		&tms3203x_device::mod19,		&tms3203x_device::modillegal,	&tms3203x_device::modillegal,
 	&tms3203x_device::modillegal,	&tms3203x_device::modillegal,	&tms3203x_device::modillegal,	&tms3203x_device::modillegal
 };
 
@@ -6374,11 +6374,11 @@ UINT32 (tms3203x_device::*const tms3203x_device::s_indirect_1_def[0x20])(UINT32,
 {
 	&tms3203x_device::mod00_1_def,	&tms3203x_device::mod01_1_def,	&tms3203x_device::mod02_1_def,	&tms3203x_device::mod03_1_def,
 	&tms3203x_device::mod04_1_def,	&tms3203x_device::mod05_1_def,	&tms3203x_device::mod06_1_def,	&tms3203x_device::mod07_1_def,
-	&tms3203x_device::mod08_def,	&tms3203x_device::mod09_def,	&tms3203x_device::mod0a_def,	&tms3203x_device::mod0b_def,	
+	&tms3203x_device::mod08_def,	&tms3203x_device::mod09_def,	&tms3203x_device::mod0a_def,	&tms3203x_device::mod0b_def,
 	&tms3203x_device::mod0c_def,	&tms3203x_device::mod0d_def,	&tms3203x_device::mod0e_def,	&tms3203x_device::mod0f_def,
-	&tms3203x_device::mod10_def,	&tms3203x_device::mod11_def,	&tms3203x_device::mod12_def,	&tms3203x_device::mod13_def,	
+	&tms3203x_device::mod10_def,	&tms3203x_device::mod11_def,	&tms3203x_device::mod12_def,	&tms3203x_device::mod13_def,
 	&tms3203x_device::mod14_def,	&tms3203x_device::mod15_def,	&tms3203x_device::mod16_def,	&tms3203x_device::mod17_def,
-	&tms3203x_device::mod18_def,	&tms3203x_device::mod19_def,	&tms3203x_device::modillegal_def,&tms3203x_device::modillegal_def,	
+	&tms3203x_device::mod18_def,	&tms3203x_device::mod19_def,	&tms3203x_device::modillegal_def,&tms3203x_device::modillegal_def,
 	&tms3203x_device::modillegal_def,&tms3203x_device::modillegal_def,&tms3203x_device::modillegal_def,&tms3203x_device::modillegal_def
 };
 

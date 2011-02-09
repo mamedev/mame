@@ -172,7 +172,7 @@ TODO:
       - Hook up OKIM6376 sound in The Mating Game
       - Get the BwB games running
         * They have a slightly different 68k memory map. The 6850 is at e00000 and the 6840 is at e01000
-		They appear to hang on the handshake with the MPU4 board
+        They appear to hang on the handshake with the MPU4 board
       - Find out what causes the games to reset in service mode (see jump taken at CPU1:c8e8)
       - Deal 'Em lockouts vary on certain cabinets (normally connected to AUX2, but not there?)
       - Deal 'Em has bad tiles (apostrophe, logo, bottom corner), black should actually be transparent
@@ -1098,7 +1098,7 @@ static READ16_HANDLER( ef9369_r )
 /******************************************
  *
  *  Brooktree Bt471 RAMDAC
- *  Implementation stolen from JPM 
+ *  Implementation stolen from JPM
  *  Impact, may not be 100% (that has a 477)
  ******************************************/
 
@@ -1160,7 +1160,7 @@ WRITE16_HANDLER( bt471_w )
 			break;
 		}
 
-//		default:
+//      default:
 		{
 			popmessage("Bt477: Unhandled write access (offset:%x, data:%x)", offset, val);
 		}
@@ -2075,7 +2075,7 @@ static ADDRESS_MAP_START( bwbvid_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_data_w, 0x00ff)
 	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_control_w, 0x00ff)
 	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE(ef9369_r, ef9369_w)
-//	AM_RANGE(0xa00000, 0xa0000f) AM_READWRITE(bt471_r,bt471_w) //Some games use this
+//  AM_RANGE(0xa00000, 0xa0000f) AM_READWRITE(bt471_r,bt471_w) //Some games use this
 /*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
 	AM_RANGE(0xb00000, 0xb0000f) AM_READWRITE(mpu4_vid_scn2674_r, mpu4_vid_scn2674_w)
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w)
@@ -2102,7 +2102,7 @@ static ADDRESS_MAP_START( bwbvid5_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xe02000, 0xe02007) AM_DEVREADWRITE8("pia_ic4ss", pia6821_r, pia6821_w, 0xff)
 	AM_RANGE(0xe03000, 0xe0300f) AM_DEVREADWRITE8("6840ptm_ic3ss", ptm6840_read, ptm6840_write, 0xff)
 ADDRESS_MAP_END
-//	
+//
 /* Deal 'Em */
 /* Deal 'Em was designed as an enhanced gamecard, to fit into an existing MPU4 cabinet
 It's an unoffical addon, and does all its work through the existing 6809 CPU.
@@ -2913,7 +2913,7 @@ ROM_START( renoreel )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("rr_27s__.a60",  0x00000, 0x10000,  CRC(44c9ff47) SHA1(93a3155144b233c113aa3b49bd4eb5969e400a68))
 
-	ROM_REGION( 0x800000, "video", 0 )	
+	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD16_BYTE( "rr______.a_1",  0x000000, 0x80000,  CRC(ff27d0ba) SHA1(85cce36495f00a05c1806ecde37274212680e466) )
 	ROM_LOAD16_BYTE( "rr______.a_2",  0x000001, 0x80000,  CRC(519b9ae1) SHA1(8ccfe8de0f2c85923df81af8cba6f20af43d2fe2) )
 

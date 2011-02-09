@@ -173,7 +173,7 @@ void dsp16_device::device_reset()
 
 void dsp16_device::state_import(const device_state_entry &entry)
 {
-    
+
 }
 
 
@@ -243,7 +243,7 @@ void dsp16_device::execute_run()
 
 		// instruction fetch
 		//UINT16 op = opcode_read();
-        
+
         m_icount--;
     } while (m_icount > 0);
 }

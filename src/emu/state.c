@@ -113,7 +113,7 @@ state_manager::state_manager(running_machine &machine)
 
 
 //-------------------------------------------------
-//  allow_registration - allow/disallow 
+//  allow_registration - allow/disallow
 //  registrations to happen
 //-------------------------------------------------
 
@@ -127,7 +127,7 @@ void state_manager::allow_registration(bool allowed)
 
 
 //-------------------------------------------------
-//  indexed_item - return an item with the given 
+//  indexed_item - return an item with the given
 //  index
 //-------------------------------------------------
 
@@ -136,17 +136,17 @@ const char *state_manager::indexed_item(int index, void *&base, UINT32 &valsize,
 	state_entry *entry = m_entry_list.find(index);
 	if (entry == NULL)
 		return NULL;
-	
+
 	base = entry->m_data;
 	valsize = entry->m_typesize;
 	valcount = entry->m_typecount;
-	
+
 	return entry->m_name;
 }
 
 
 //-------------------------------------------------
-//  register_presave - register a pre-save 
+//  register_presave - register a pre-save
 //  function callback
 //-------------------------------------------------
 
@@ -227,13 +227,13 @@ void state_manager::save_memory(const char *module, const char *tag, UINT32 inde
 			fatalerror("Duplicate save state registration entry (%s)", totalname.cstr());
 	}
 
-	// insert us into the list	
+	// insert us into the list
 	m_entry_list.insert_after(*auto_alloc(&m_machine, state_entry(val, totalname, valsize, valcount)), insert_after);
 }
 
 
 //-------------------------------------------------
-//  check_file - check if a file is a valid save 
+//  check_file - check if a file is a valid save
 //  state
 //-------------------------------------------------
 
@@ -372,7 +372,7 @@ UINT32 state_manager::signature() const
 
 
 //-------------------------------------------------
-//  dump_registry - dump the registry to the 
+//  dump_registry - dump the registry to the
 //  logfile
 //-------------------------------------------------
 

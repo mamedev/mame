@@ -133,7 +133,7 @@ public:
 		m_tail = tail;
 		m_count += count;
 	}
-	
+
 	// insert the given object after a particular object (NULL means prepend)
 	T &insert_after(T &object, T *insert_after)
 	{
@@ -271,13 +271,13 @@ public:
 	// reclaim an item by adding it to the free list
 	void reclaim(T *item) { if (item != NULL) m_freelist.append(*item); }
 	void reclaim(T &item) { m_freelist.append(item); }
-	
+
 	// reclaim all items from a list
 	void reclaim_all(simple_list<T> &list) { m_freelist.append_list(list); }
 
 private:
 	// internal state
-	simple_list<T> 	m_freelist;		// list of free objects
+	simple_list<T>	m_freelist;		// list of free objects
 };
 
 
@@ -373,7 +373,7 @@ public:
 private:
 	// internal state
 	simple_list<T>		m_list;
-	tagmap_t<T *> 		m_map;
+	tagmap_t<T *>		m_map;
 };
 
 

@@ -430,7 +430,7 @@ public:
 	void set_clock_scale(double clockscale);
 	attotime clocks_to_attotime(UINT64 clocks) const;
 	UINT64 attotime_to_clocks(attotime duration) const;
-	
+
 	// timer interfaces
 	emu_timer *timer_alloc(device_timer_id id = 0, void *ptr = NULL);
 	void timer_set(attotime duration, device_timer_id id = 0, int param = 0, void *ptr = NULL);

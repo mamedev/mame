@@ -104,7 +104,7 @@ public:
 	{
 	public:
 		sound_route(int output, int input, float gain, const char *target);
-		
+
 		const sound_route *next() const { return m_next; }
 
 		sound_route *		m_next;				// pointer to next route
@@ -161,7 +161,7 @@ protected:
 	virtual void interface_pre_start();
 	virtual void interface_post_start();
 	virtual void interface_pre_reset();
-	
+
 	// internal state
 	const device_config_sound_interface &m_sound_config;
 

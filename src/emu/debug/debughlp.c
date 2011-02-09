@@ -512,7 +512,7 @@ static const help_item static_help_list[] =
 		"\n"
 		"loadd harddriv.bin,3000,1000,3\n"
 		"  Loads data memory addresses 3000-3fff from CPU #3 from the binary file 'harddriv.bin'.\n"
-	},  
+	},
 	{
 		"step",
 		"\n"

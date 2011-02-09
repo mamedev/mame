@@ -458,7 +458,7 @@ void dsp32c_device::state_import(const device_state_entry &entry)
 	{
 		case STATE_GENFLAGS:
 			break;
-			
+
 		case DSP32_PCR:
 			update_pcr(m_iotemp);
 			break;
@@ -480,7 +480,7 @@ void dsp32c_device::state_export(const device_state_entry &entry)
 	{
 		case STATE_GENFLAGS:
 			// no actual flags register, so just make something up
-			m_iotemp = 	((zFLAG != 0) << 0) |
+			m_iotemp =	((zFLAG != 0) << 0) |
 						((nFLAG != 0) << 1) |
 						((cFLAG != 0) << 2) |
 						((vFLAG != 0) << 3) |
@@ -489,7 +489,7 @@ void dsp32c_device::state_export(const device_state_entry &entry)
 						((UFLAG != 0) << 6) |
 						((VFLAG != 0) << 7);
 			break;
-			
+
 		case DSP32_PCR:
 			m_iotemp = m_pcr;
 			break;

@@ -318,7 +318,7 @@ void debug_command_init(running_machine *machine)
 	debug_console_register_command(machine, "load",      CMDFLAG_NONE, ADDRESS_SPACE_PROGRAM, 3, 4, execute_load);
 	debug_console_register_command(machine, "loadd",     CMDFLAG_NONE, ADDRESS_SPACE_DATA, 3, 4, execute_load);
 	debug_console_register_command(machine, "loadi",     CMDFLAG_NONE, ADDRESS_SPACE_IO, 3, 4, execute_load);
-  
+
 	debug_console_register_command(machine, "dump",      CMDFLAG_NONE, ADDRESS_SPACE_PROGRAM, 3, 6, execute_dump);
 	debug_console_register_command(machine, "dumpd",     CMDFLAG_NONE, ADDRESS_SPACE_DATA, 3, 6, execute_dump);
 	debug_console_register_command(machine, "dumpi",     CMDFLAG_NONE, ADDRESS_SPACE_IO, 3, 6, execute_dump);
@@ -1588,7 +1588,7 @@ static void execute_load(running_machine *machine, int ref, int params, const ch
 	for (i = offset; i <= endoffset || endoffset == offset - 1 ; i++)
 	{
 		fread(&byte, 1, 1, f);
-		/* check if end of file has been reached and stop loading if it has */    
+		/* check if end of file has been reached and stop loading if it has */
 		if (feof(f))
 			break;
 		debug_write_byte(space, i, byte, TRUE);

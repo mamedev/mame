@@ -90,7 +90,7 @@
 #if EMULATE_MEMORY_LATENCY
 #define WWORD_DEFERRED(a,v)		do { int bufidx = m_mbuf_index & 3; m_mbufaddr[bufidx] = -(a); m_mbufdata[bufidx] = (v); } while (0)
 #define WLONG_DEFERRED(a,v)		do { int bufidx = m_mbuf_index & 3; m_mbufaddr[bufidx] = (a); m_mbufdata[bufidx] = (v); } while (0)
-#define PROCESS_DEFERRED_MEMORY() 									\
+#define PROCESS_DEFERRED_MEMORY()									\
 	if (m_mbufaddr[++m_mbuf_index & 3] != 1)					\
 	{																	\
 		int bufidx = m_mbuf_index & 3;								\

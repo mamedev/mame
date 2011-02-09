@@ -446,7 +446,7 @@ public:
 
 	int hyperbbc_lamp_strobe1;
 	int hyperbbc_lamp_strobe2;
-	
+
 	/* memory */
 	UINT8 atapi_regs[ATAPI_REG_MAX];
 	UINT8 atapi_data[ATAPI_DATA_SIZE];
@@ -2228,7 +2228,7 @@ static READ32_HANDLER( gx894pwbba_r )
 			// wants & c000 = 8000 (just after program upload?)
 			// write 0000 to +f4.w
 			// write 8000 to +f6.w
-			
+
 			/* fails if !8000 */
 			/* fails if  4000 */
 			/* fails if !2000 */

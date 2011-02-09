@@ -119,7 +119,7 @@ emu_timer &emu_timer::init(running_machine &machine, timer_expired_func callback
 	// if we're not temporary, register ourselves with the save state system
 	if (!m_temporary)
 		register_save();
-	
+
 	// insert into the list
 	machine.scheduler().timer_list_insert(*this);
 	return *this;
@@ -152,7 +152,7 @@ emu_timer &emu_timer::init(device_t &device, device_timer_id id, void *ptr, bool
 	// if we're not temporary, register ourselves with the save state system
 	if (!m_temporary)
 		register_save();
-	
+
 	// insert into the list
 	machine().scheduler().timer_list_insert(*this);
 	return *this;
@@ -194,8 +194,8 @@ bool emu_timer::enable(bool enable)
 
 
 //-------------------------------------------------
-//  adjust - adjust the time when this timer will 
-//  fire and specify a period for subsequent 
+//  adjust - adjust the time when this timer will
+//  fire and specify a period for subsequent
 //  firings
 //-------------------------------------------------
 
@@ -241,13 +241,13 @@ attotime emu_timer::elapsed() const
 
 
 //-------------------------------------------------
-//  remaining - return the amount of time 
+//  remaining - return the amount of time
 //  remaining until the timer expires
 //-------------------------------------------------
 
-attotime emu_timer::remaining() const 
+attotime emu_timer::remaining() const
 {
-	return m_expire - machine().time(); 
+	return m_expire - machine().time();
 }
 
 
@@ -261,7 +261,7 @@ void emu_timer::register_save()
 	// determine our instance number and name
 	int index = 0;
 	astring name;
-	
+
 	// for non-device timers, it is an index based on the callback function name
 	if (m_device == NULL)
 	{
@@ -270,7 +270,7 @@ void emu_timer::register_save()
 			if (!curtimer->m_temporary && curtimer->m_device == NULL && strcmp(curtimer->m_func, m_func) == 0)
 				index++;
 	}
-	
+
 	// for device timers, it is an index based on the device and timer ID
 	else
 	{
@@ -500,7 +500,7 @@ void device_scheduler::timeslice()
 
 
 //-------------------------------------------------
-//  abort_timeslice - abort execution for the 
+//  abort_timeslice - abort execution for the
 //  current timeslice
 //-------------------------------------------------
 
@@ -617,7 +617,7 @@ void device_scheduler::eat_all_cycles()
 
 
 //-------------------------------------------------
-//  timed_trigger - generate a trigger after a 
+//  timed_trigger - generate a trigger after a
 //  given amount of time
 //-------------------------------------------------
 
@@ -832,7 +832,7 @@ emu_timer &device_scheduler::timer_list_remove(emu_timer &timer)
 
 
 //-------------------------------------------------
-//  execute_timers - execute timers and update 
+//  execute_timers - execute timers and update
 //  scheduling quanta
 //-------------------------------------------------
 
@@ -890,15 +890,15 @@ void device_scheduler::execute_timers()
 
 
 //-------------------------------------------------
-//  add_scheduling_quantum - add a scheduling 
-//  quantum; the smallest active one is the one 
+//  add_scheduling_quantum - add a scheduling
+//  quantum; the smallest active one is the one
 //  that is in use
 //-------------------------------------------------
 
 void device_scheduler::add_scheduling_quantum(attotime quantum, attotime duration)
 {
 	assert(quantum.seconds == 0);
-	
+
 	attotime curtime = time();
 	attotime expire = curtime + duration;
 
@@ -911,16 +911,16 @@ void device_scheduler::add_scheduling_quantum(attotime quantum, attotime duratio
 		next = quant->next();
 		if (curtime >= quant->m_expire)
 			m_quantum_allocator.reclaim(m_quantum_list.detach(*quant));
-	
+
 		// if this quantum is shorter than us, we need to be inserted afterwards
 		else if (quant->m_requested <= quantum.attoseconds)
 			insert_after = quant;
 	}
-	
+
 	// if we found an exact match, just take the maximum expiry time
 	if (insert_after != NULL && insert_after->m_requested == quantum.attoseconds)
 		insert_after->m_expire = max(insert_after->m_expire, expire);
-	
+
 	// otherwise, allocate a new quantum and insert it after the one we picked
 	else
 	{

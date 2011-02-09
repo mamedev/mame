@@ -22,7 +22,7 @@ astring disasmF1Field(const UINT8& F1, const UINT8& D, const UINT8& S)
         case 0x0d: ret.printf("a%d = a%d + y", D, S); break;
         case 0x0e: ret.printf("a%d = a%d & y", D, S); break;
         case 0x0f: ret.printf("a%d = a%d - y", D, S); break;
-            
+
         default: return "UNKNOWN";
     }
     return ret;
@@ -41,18 +41,18 @@ astring disasmYField(const UINT8& Y)
         case 0x05: return "*r1++";
         case 0x06: return "*r1--";
         case 0x07: return "*r1++j";
-            
+
         case 0x08: return "*r2";
         case 0x09: return "*r2++";
         case 0x0a: return "*r2--";
         case 0x0b: return "*r2++j";
-            
+
         case 0x0c: return "*r3";
         case 0x0d: return "*r3++";
         case 0x0e: return "*r3--";
         case 0x0f: return "*r3++j";
 
-        default: return "UNKNOWN";               
+        default: return "UNKNOWN";
     }
     return "";
 }
@@ -81,7 +81,7 @@ astring disasmZField(const UINT8& Z)
         case 0x0e: return "*r3m2";
         case 0x0f: return "*r3jk";
 
-        default: return "UNKNOWN";               
+        default: return "UNKNOWN";
     }
     return "";
 }
@@ -136,7 +136,7 @@ astring disasmCONField(const UINT8& CON)
         case 0x0f: return "false";
         case 0x10: return "gt";
         case 0x11: return "le";
-        
+
         default: return "RESERVED";
     }
     return "";
@@ -154,7 +154,7 @@ astring disasmBField(const UINT8& B)
         case 0x05:
         case 0x06:
         case 0x07: return "RESERVED";
-        
+
         default: return "UNKNOWN";
     }
     return "";
@@ -172,7 +172,7 @@ astring disasmRImmediateField(const UINT8& R)
         case 0x05: return "r1";
         case 0x06: return "r2";
         case 0x07: return "r3";
-        
+
         default: return "UNKNOWN";
     }
     return "";
@@ -224,7 +224,7 @@ astring disasmIField(const UINT8& I)
         case 0x01: return "r1/k";
         case 0x02: return "r2/rb";
         case 0x03: return "r3/re";
-        
+
         default: return "UNKNOWN";
     }
     return "";
@@ -248,9 +248,9 @@ CPU_DISASSEMBLE( dsp16a )
     UINT32 dasmflags = 0;
     UINT16 op  = oprom[0] | (oprom[1] << 8);
     UINT16 op2 = oprom[2] | (oprom[3] << 8);
-    
+
     // TODO: Test for previous "if CON" instruction and tab the next instruction in?
-    
+
     const UINT8 opcode = (op >> 11) & 0x1f;
     switch(opcode)
     {
@@ -267,7 +267,7 @@ CPU_DISASSEMBLE( dsp16a )
             sprintf(buffer, "%s, %s", fString.cstr(), yString.cstr());
             break;
         }
-        case 0x04: case 0x1c: 
+        case 0x04: case 0x1c:
         {
             // F1 Y=a0[1] | F1 Y=a1[1]
             const UINT8 Y = (op & 0x000f);
@@ -334,7 +334,7 @@ CPU_DISASSEMBLE( dsp16a )
             sprintf(buffer, "%s, y = %s, x = %s", fString.cstr(), aString.cstr(), xString.cstr());
             if (Y != 0x00) sprintf(buffer, "UNKNOWN");
             break;
-        }         
+        }
         case 0x14:
         {
             // F1, Y = y[1]
@@ -411,9 +411,9 @@ CPU_DISASSEMBLE( dsp16a )
             sprintf(buffer, "%s, %s <=> %s", fString.cstr(), zString.cstr(), atString.cstr());
             break;
         }
-        
+
         // Format 3: Special Functions
-        case 0x12: 
+        case 0x12:
         case 0x13:
         {
             // if|ifc CON F2
@@ -427,7 +427,7 @@ CPU_DISASSEMBLE( dsp16a )
             else             sprintf(buffer, "ifc %s : %s", conString.cstr(), fString.cstr());
             break;
         }
-        
+
         // Format 4: Branch Direct Group
         case 0x00: case 0x01:
         case 0x10: case 0x11:
@@ -438,7 +438,7 @@ CPU_DISASSEMBLE( dsp16a )
             else             sprintf(buffer, "goto 0x%04x", JA);
             break;
         }
-        
+
         // Format 5: Branch Indirect Group
         case 0x18:
         {
@@ -448,7 +448,7 @@ CPU_DISASSEMBLE( dsp16a )
             sprintf(buffer, "%s", bString.cstr());
             break;
         }
-        
+
         // Format 6: Contitional Branch Qualifier/Software Interrupt (icall)
         case 0x1a:
         {
@@ -461,7 +461,7 @@ CPU_DISASSEMBLE( dsp16a )
             if (op == 0xd40e) sprintf(buffer, "icall");
             break;
         }
-        
+
         // Format 7: Data Move Group
         case 0x09: case 0x0b:
         {
@@ -472,7 +472,7 @@ CPU_DISASSEMBLE( dsp16a )
             sprintf(buffer, "%s = %s", rString.cstr(), (S ? "a1" : "a0"));
             break;
         }
-        case 0x08: 
+        case 0x08:
         {
             // aT = R
             const UINT8 R  = (op & 0x03f0) >> 4;
@@ -492,7 +492,7 @@ CPU_DISASSEMBLE( dsp16a )
             // TODO: Special case the R == [y, y1, or x] case
             break;
         }
-        case 0x0c: 
+        case 0x0c:
         {
             // Y = R
             const UINT8 Y = (op & 0x000f);
@@ -502,7 +502,7 @@ CPU_DISASSEMBLE( dsp16a )
             sprintf(buffer, "%s = %s", yString.cstr(), rString.cstr());
             break;
         }
-        case 0x0d: 
+        case 0x0d:
         {
             // Z : R
             const UINT8 Z = (op & 0x000f);
@@ -512,7 +512,7 @@ CPU_DISASSEMBLE( dsp16a )
             sprintf(buffer, "%s <=> %s", zString.cstr(), rString.cstr());
             break;
         }
-        
+
         // Format 8: Data Move (immediate operand - 2 words)
         case 0x0a:
         {
@@ -523,7 +523,7 @@ CPU_DISASSEMBLE( dsp16a )
             opSize = 2;
             break;
         }
-        
+
         // Format 9: Short Immediate Group
         case 0x02: case 0x03:
         {
@@ -534,7 +534,7 @@ CPU_DISASSEMBLE( dsp16a )
             sprintf(buffer, "%s = 0x%02x", rString.cstr(), M);
             break;
         }
-        
+
         // Format 10: do - redo
         case 0x0e:
         {
@@ -547,14 +547,14 @@ CPU_DISASSEMBLE( dsp16a )
                 sprintf(buffer, "redo %d\n", K);
             break;
         }
-        
+
         // RESERVED
         case 0x1e:
         {
             sprintf(buffer, "RESERVED");
             break;
         }
-        
+
         // UNKNOWN
         default:
         {
@@ -562,6 +562,6 @@ CPU_DISASSEMBLE( dsp16a )
             break;
         }
     }
-    
+
     return opSize | dasmflags | DASMFLAG_SUPPORTED;
 }

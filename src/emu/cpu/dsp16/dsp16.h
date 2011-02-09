@@ -17,7 +17,7 @@
 //**************************************************************************
 
 //#define MCFG_DSP16_CONFIG(_config)
-//	dsp16_device_config::static_set_config(device, _config);
+//  dsp16_device_config::static_set_config(device, _config);
 
 
 

@@ -1,9 +1,9 @@
 /***************************************************************************
 
     tms32031.c
-    
+
     TMS32031/2 emulator
-    
+
 ****************************************************************************
 
     Copyright Aaron Giles
@@ -291,7 +291,7 @@ float tms3203x_device::tmsreg::as_float() const
 		int exp = (exponent() + 127) << 23;
 		id.i[0] = exp + (mantissa() >> 8);
 	}
-	
+
 	// handle negative numbers
 	else
 	{
@@ -299,7 +299,7 @@ float tms3203x_device::tmsreg::as_float() const
 		INT32 man = -mantissa();
 		id.i[0] = 0x80000000 + exp + ((man >> 8) & 0x00ffffff);
 	}
-	
+
 	// return the converted float
 	return id.f[0];
 }
@@ -326,7 +326,7 @@ double tms3203x_device::tmsreg::as_double() const
 		id.i[BYTE_XOR_BE(0)] = exp + (mantissa() >> 11);
 		id.i[BYTE_XOR_BE(1)] = (mantissa() << 21) & 0xffe00000;
 	}
-	
+
 	// handle negative numbers
 	else
 	{
@@ -335,7 +335,7 @@ double tms3203x_device::tmsreg::as_double() const
 		id.i[BYTE_XOR_BE(0)] = 0x80000000 + exp + ((man >> 11) & 0x001fffff);
 		id.i[BYTE_XOR_BE(1)] = (man << 21) & 0xffe00000;
 	}
-	
+
 	// return the converted double
 	return id.d;
 }
@@ -360,7 +360,7 @@ void tms3203x_device::tmsreg::from_double(double val)
 		set_mantissa(0);
 		set_exponent(-128);
 	}
-	
+
 	// if we're too large, map to the maximum value
 	else if (exponent > 127)
 	{
@@ -370,21 +370,21 @@ void tms3203x_device::tmsreg::from_double(double val)
 			set_mantissa(0x80000001);
 		set_exponent(127);
 	}
-	
+
 	// if we're positive, map directly
 	else if ((INT32)id.i[BYTE_XOR_BE(0)] >= 0)
 	{
 		set_mantissa(mantissa);
 		set_exponent(exponent);
 	}
-	
+
 	// if we're negative with a non-zero mantissa, remove the leading sign bit
 	else if (mantissa != 0)
 	{
 		set_mantissa(0x80000000 | -mantissa);
 		set_exponent(exponent);
 	}
-	
+
 	// if we're negative with a zero mantissa, normalize
 	else
 	{
@@ -846,7 +846,7 @@ void tms3203x_device::execute_run()
 			execute_one();
 		}
 	}
-	
+
 	// debugging case
 	else
 	{

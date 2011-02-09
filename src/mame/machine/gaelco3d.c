@@ -275,7 +275,7 @@ static TIMER_CALLBACK( set_status_cb )
 
 static void set_status(gaelco_serial_state *state, UINT8 mask, UINT8 set, int wait)
 {
-	state->device->machine->scheduler().timer_set(attotime::from_hz(wait), FUNC(set_status_cb), (mask << 8)|set, 
+	state->device->machine->scheduler().timer_set(attotime::from_hz(wait), FUNC(set_status_cb), (mask << 8)|set,
 			state);
 }
 

@@ -1,9 +1,9 @@
 /***************************************************************************
 
     tms32031.h
-    
+
     TMS32031/2 emulator
-    
+
 ****************************************************************************
 
     Copyright Aaron Giles
@@ -211,21 +211,21 @@ class tms3203x_device : public cpu_device
 		tmsreg() { i32[0] = i32[1] = 0; }
 		tmsreg(double value) { from_double(value); }
 		tmsreg(INT32 mantissa, INT8 exponent) { set_mantissa(mantissa); set_exponent(exponent); }
-	
+
 		// getters
 		UINT32 integer() const { return i32[0]; }
 		INT32 mantissa() const { return i32[0]; }
 		INT8 exponent() const { return i32[1]; }
 		void set_mantissa(INT32 man) { i32[0] = man; }
 		void set_exponent(INT8 exp) { i32[1] = exp; }
-		
+
 		// exporters
 		float as_float() const;
 		double as_double() const;
-		
+
 		// importers
 		void from_double(double);
-	
+
 		UINT32		i32[2];
 	};
 
@@ -850,7 +850,7 @@ protected:
 	static UINT32 (tms3203x_device::*const s_indirect_1_def[0x20])(UINT32, UINT8, UINT32 *&);
 
 #if (TMS_3203X_LOG_OPCODE_USAGE)
-	UINT32 				m_hits[0x200*4];
+	UINT32				m_hits[0x200*4];
 #endif
 };
 

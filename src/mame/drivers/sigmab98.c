@@ -639,8 +639,8 @@ static READ8_HANDLER( sammymdl_coin_hopper_r )
 {
 	UINT8 ret = input_port_read(space->machine, "COIN");
 
-//	if ( !ticket_dispenser_r(space->machine->device("hopper"), 0) )
-//		ret &= ~0x01;
+//  if ( !ticket_dispenser_r(space->machine->device("hopper"), 0) )
+//      ret &= ~0x01;
 
 	return ret;
 }
@@ -747,7 +747,7 @@ static WRITE8_HANDLER( itazuram_rombank_w )
 					break;
 
 				// used in test mode:
-//				case 0x5c:	memory_set_bankptr(space->machine, "rombank", rom + 0x400 + 0x0000);	break;	// 3800 IS RAM! (8000 bytes)
+//              case 0x5c:  memory_set_bankptr(space->machine, "rombank", rom + 0x400 + 0x0000);    break;  // 3800 IS RAM! (8000 bytes)
 
 				case 0x5e:	// 3800 IS RAM! (1404 bytes)
 					memory_set_bankptr(space->machine, "rombank0", space->machine->generic.spriteram.u8 + 0x1000*1);
@@ -759,7 +759,7 @@ static WRITE8_HANDLER( itazuram_rombank_w )
 				case 0x6c:	// 3800 IS RAM! (1000 bytes) - SPRITERAM
 					memory_set_bankptr(space->machine, "rombank0", space->machine->generic.spriteram.u8);
 					memory_set_bankptr(space->machine, "sprbank0", space->machine->generic.spriteram.u8);
-//					memory_set_bankptr(space->machine, "sprbank1", space->machine->generic.spriteram.u8 + 0x1000*4);	// scratch
+//                  memory_set_bankptr(space->machine, "sprbank1", space->machine->generic.spriteram.u8 + 0x1000*4);    // scratch
 					break;
 
 				default:
@@ -856,7 +856,7 @@ static WRITE8_HANDLER( itazuram_nvram_palette_w )
 	if (rambank == 0x64)
 	{
 		paletteram_xRRRRRGGGGGBBBBB_be_w(space, offset, data);
-//		space->machine->generic.paletteram.u8[offset] = data;
+//      space->machine->generic.paletteram.u8[offset] = data;
 	}
 	else if (rambank == 0x52)
 	{
@@ -874,7 +874,7 @@ static WRITE8_HANDLER( itazuram_palette_w )
 	{
 		if (offset < 0x200)
 			paletteram_xRRRRRGGGGGBBBBB_be_w(space, offset, data);
-//			space->machine->generic.paletteram.u8[offset] = data;
+//          space->machine->generic.paletteram.u8[offset] = data;
 	}
 	else
 	{
@@ -1200,7 +1200,7 @@ static MACHINE_CONFIG_START( itazuram, driver_device )
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_UPDATE(sigmab98)
-//	MCFG_VIDEO_EOF(sammymdl)
+//  MCFG_VIDEO_EOF(sammymdl)
 
 	// sound hardware
 	// OKI MSM981x ?

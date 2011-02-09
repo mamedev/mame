@@ -152,7 +152,7 @@ static WRITE8_DEVICE_HANDLER( b_via_1_pb_w )
 {
 	beezer_timer1_w(device->machine->device("custom"), 0, data&0x80);
 	//if ((data&0x1f) != 0x01)
-	//	popmessage("via1 pb low write of 0x%02x is not supported! contact mamedev!", data&0x1f);
+	//  popmessage("via1 pb low write of 0x%02x is not supported! contact mamedev!", data&0x1f);
 }
 
 DRIVER_INIT( beezer )

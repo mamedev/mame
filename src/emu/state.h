@@ -141,7 +141,7 @@ public:
 	// getters
 	int registration_count() const { return m_entry_list.count(); }
 	bool registration_allowed() const { return m_reg_allowed; }
-	
+
 	// registration control
 	void allow_registration(bool allowed = true);
 	const char *indexed_item(int index, void *&base, UINT32 &valsize, UINT32 &valcount) const;
@@ -152,7 +152,7 @@ public:
 
 	// generic memory registration
 	void save_memory(const char *module, const char *tag, UINT32 index, const char *name, void *val, UINT32 valsize, UINT32 valcount = 1);
-	
+
 	// templatized wrapper for general objects
 	template<typename T>
 	void save_item(const char *module, const char *tag, int index, T &value, const char *valname)
@@ -161,7 +161,7 @@ public:
 		if (!type_checker<T>::is_atom) throw emu_fatalerror("Called save_item on a non-fundamental type!");
 		save_memory(module, tag, index, valname, &value, sizeof(value));
 	}
-	
+
 	// templatized wrapper for 1-dimensional arrays
 	template<typename T, std::size_t N>
 	void save_item(const char *module, const char *tag, int index, T (&value)[N], const char *valname)
@@ -169,7 +169,7 @@ public:
 		if (!type_checker<T>::is_atom) throw emu_fatalerror("Called save_item on a non-fundamental type!");
 		save_memory(module, tag, index, valname, &value[0], sizeof(value[0]), N);
 	}
-	
+
 	// templatized wrapper for 2-dimensional arrays
 	template<typename T, std::size_t M, std::size_t N>
 	void save_item(const char *module, const char *tag, int index, T (&value)[M][N], const char *valname)
@@ -177,7 +177,7 @@ public:
 		if (!type_checker<T>::is_atom) throw emu_fatalerror("Called save_item on a non-fundamental type!");
 		save_memory(module, tag, index, valname, &value[0][0], sizeof(value[0][0]), M * N);
 	}
-	
+
 	// templatized wrapper for pointers
 	template<typename T>
 	void save_pointer(const char *module, const char *tag, int index, T *value, const char *valname, UINT32 count)
@@ -185,18 +185,18 @@ public:
 		if (!type_checker<T>::is_atom) throw emu_fatalerror("Called save_item on a non-fundamental type!");
 		save_memory(module, tag, index, valname, value, sizeof(*value), count);
 	}
-	
+
 	// global memory registration
 	template<typename T>
 	void save_item(T &value, const char *valname, int index = 0) { save_item("global", NULL, index, value, valname); }
 	template<typename T>
 	void save_pointer(T *value, const char *valname, UINT32 count, int index = 0) { save_pointer("global", NULL, index, value, valname, count); }
-	
+
 	// file processing
 	static state_save_error check_file(running_machine *machine, mame_file *file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...));
 	state_save_error write_file(mame_file *file);
 	state_save_error read_file(mame_file *file);
-	
+
 private:
 	// internal helpers
 	UINT32 signature() const;
@@ -211,7 +211,7 @@ private:
 		state_callback(prepost_func callback, void *param);
 
 		// getters
-		state_callback *next() const { return m_next; }			 
+		state_callback *next() const { return m_next; }
 
 		// state
 		state_callback *	m_next;					// pointer to next entry
@@ -226,8 +226,8 @@ private:
 		state_entry(void *data, const char *name, UINT8 size, UINT32 count);
 
 		// getters
-		state_entry *next() const { return m_next; }			 
-		
+		state_entry *next() const { return m_next; }
+
 		// helpers
 		void flip_data();
 

@@ -199,10 +199,10 @@ IRQ line connected to CPU
 
 TODO: - Fix lamp timing, MAME doesn't update fast enough to see everything
       - Distinguish door switches using manual
-	  - Complete stubs for hoppers (needs slightly better 68681 emulation, and new 'hoppers' device)
-	  - Any reel using the remote meter drive (CB2) slips backwards due to timing mismatches, a better method
-	  is needed to combine the data. This eventually leads to spin alarms i.e Flo's move in Great Escape
-	  - Add a BwB game with characteriser.
+      - Complete stubs for hoppers (needs slightly better 68681 emulation, and new 'hoppers' device)
+      - Any reel using the remote meter drive (CB2) slips backwards due to timing mismatches, a better method
+      is needed to combine the data. This eventually leads to spin alarms i.e Flo's move in Great Escape
+      - Add a BwB game with characteriser.
 ***********************************************************************************************************/
 #include "emu.h"
 #include "machine/6821pia.h"
@@ -417,7 +417,7 @@ static void lamp_extend_small(int data)
 	column = data & 0x07;
 
 	lamp_strobe_ext = 0x1f - ((data & 0xf8) >> 3);
-	if ( lamp_strobe_ext ) 
+	if ( lamp_strobe_ext )
 	{
 		for (i = 0; i < 5; i++)
 		{
@@ -446,7 +446,7 @@ static void lamp_extend_largea(int data,int column,int active)
 		{
 	        lamp_sense = 1;
 		}
-		if ( active ) 
+		if ( active )
 		{
 			for (i = 0; i < 6; i++)
 			{
@@ -486,7 +486,7 @@ static void lamp_extend_largebc(int data,int column,int active)
 			}
 		}
 	last_b7 = byte7;
-	} 
+	}
 	else
 	{
 		card_live = 0;
@@ -857,8 +857,8 @@ static WRITE8_DEVICE_HANDLER( pia_ic4_portb_w )
 	if (reel_mux)
 	{
 		/* A write here connects one reel (and only one)
-		to the optic test circuit. This allows 8 reels
-		to be supported instead of 4. */
+        to the optic test circuit. This allows 8 reels
+        to be supported instead of 4. */
 		if (reel_mux == SEVEN_REEL)
 		{
 			active_reel= reel_mux_table7[(data >> 4) & 0x07];
@@ -901,7 +901,7 @@ static READ8_DEVICE_HANDLER( pia_ic4_portb_r )
 	{
 		if (stepper_optic_state(active_reel))
 		{
-			ic4_input_b |=  0x08; 
+			ic4_input_b |=  0x08;
 		}
 		else
 		{
@@ -913,7 +913,7 @@ static READ8_DEVICE_HANDLER( pia_ic4_portb_r )
 
 	if (ic4_input_b & 0x02)
 	{
-		ic4_input_b &= ~0x02; 
+		ic4_input_b &= ~0x02;
 	}
 	else
 	{
@@ -964,7 +964,7 @@ static READ8_DEVICE_HANDLER( pia_ic5_porta_r )
 	{
 		if (lamp_sense && ic23_active)
 		{
-			aux1_input |= 0x40; 
+			aux1_input |= 0x40;
 		}
 		else
 		{
@@ -973,14 +973,14 @@ static READ8_DEVICE_HANDLER( pia_ic5_porta_r )
 	}
 	if (hopper == HOPPER_NONDUART_A)
 	{
-/*		if (hopper1_active)
-		{
-			aux1_input |= 0x04;
-		}
-		else
-		{
-			aux1_input &= ~0x04; 
-		}*/
+/*      if (hopper1_active)
+        {
+            aux1_input |= 0x04;
+        }
+        else
+        {
+            aux1_input &= ~0x04;
+        }*/
 	}
 	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",device->machine->describe_context()));
 
@@ -1061,14 +1061,14 @@ static READ8_DEVICE_HANDLER( pia_ic5_portb_r )
 	device_t *pia_ic5 = device->machine->device("pia_ic5");
 	if (hopper == HOPPER_NONDUART_B)
 	{/*
-		if (hopper1_active)
-		{
-			aux2_input |= 0x08;
-		}
-		else
-		{
-			aux2_input &= ~0x08; 
-		}*/
+        if (hopper1_active)
+        {
+            aux2_input |= 0x08;
+        }
+        else
+        {
+            aux2_input &= ~0x08;
+        }*/
 	}
 
 	LOG(("%s: IC5 PIA Read of Port B (coin input AUX2)\n",device->machine->describe_context()));
@@ -1386,11 +1386,11 @@ static WRITE8_DEVICE_HANDLER( pia_ic8_portb_w )
 {
 	if (hopper == HOPPER_DUART_B)
 	{
-//		duart.drive_sensor(data & 0x04, data & 0x01, 0, 0);
+//      duart.drive_sensor(data & 0x04, data & 0x01, 0, 0);
 	}
 	else if (hopper == HOPPER_DUART_C)
 	{
-//		duart.drive_sensor(data & 0x04, data & 0x01, data & 0x04, data & 0x02);
+//      duart.drive_sensor(data & 0x04, data & 0x01, data & 0x04, data & 0x02);
 	}
 	int i;
 	LOG_IC8(("%s: IC8 PIA Port B Set to %2x (OUTPUT PORT, TRIACS)\n", device->machine->describe_context(),data));
@@ -1519,8 +1519,8 @@ sample rate changes (8Khz, 10.6 Khz, 16 KHz) by varying the clock.
 According to the BwB programmer's guide, the formula is:
 MSM6376 clock frequency:-
 freq = (1720000/((t3L+1)(t3H+1)))*[(t3H(T3L+1)+1)/(2(t1+1))]
-where [] means rounded up integer, 
-t3L is the LSB of Clock 3, 
+where [] means rounded up integer,
+t3L is the LSB of Clock 3,
 t3H is the MSB of Clock 3,
 and t1 is the figure added to clock 1.
 
@@ -1980,7 +1980,7 @@ static MACHINE_START( mpu4mod4 )
 /*
 Characteriser (CHR)
 
-As built, the CHR is a PAL which can perform basic bit manipulation according to 
+As built, the CHR is a PAL which can perform basic bit manipulation according to
 an as yet unknown unique key. However, the programmers decided to best use this protection device in read/write/compare
 cycles, storing almost the entire 'hidden' data table in the ROMs in plain sight. Only later rebuilds by BwB
 avoided this 'feature' of the development kit, and will need a different setup.
@@ -2205,7 +2205,7 @@ static TIMER_DEVICE_CALLBACK( gen_50hz )
 	update_lamps();
 	pia6821_ca1_w(timer.machine->device("pia_ic4"), signal_50hz);	/* signal is connected to IC4 CA1 */
 
-	if (signal_50hz) 
+	if (signal_50hz)
 	{
 		update_meters();
 	}

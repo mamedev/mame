@@ -2071,7 +2071,7 @@ static INPUT_PORTS_START( funcube4 )
 // Inverted this dip by default to allow game to be played
 
 	PORT_MODIFY("DEBUG")
- 	PORT_DIPNAME(    0x00400000, 0x00000000, "Debug 6" )
+	PORT_DIPNAME(    0x00400000, 0x00000000, "Debug 6" )
 	PORT_DIPSETTING( 0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00400000, DEF_STR( On ) )
 INPUT_PORTS_END

@@ -419,26 +419,26 @@ static TIMER_CALLBACK( tx_timer_callback )
 	if ((duart68681->duart_config->tx_callback) && ((duart68681->channel[ch].MR2&0xC0) != 0x80))
 		duart68681->duart_config->tx_callback(device, ch, duart68681->channel[ch].tx_data);
 
-  	// if local loopback is on, write the transmitted data as if a byte had been received
-  	if ((duart68681->channel[ch].MR2 & 0xC0) == 0x80)
-  	{
-  		if (duart68681->channel[ch].rx_fifo_num >= RX_FIFO_SIZE)
-  		{
-  			LOG(( "68681: FIFO overflow\n" ));
-  			duart68681->channel[ch].SR |= STATUS_OVERRUN_ERROR;
-  		}
-  		else
-  		{
-  			duart68681->channel[ch].rx_fifo[duart68681->channel[ch].rx_fifo_write_ptr++]
-  					= duart68681->channel[ch].tx_data;
-  			if (duart68681->channel[ch].rx_fifo_write_ptr == RX_FIFO_SIZE)
-  			{
-  				duart68681->channel[ch].rx_fifo_write_ptr = 0;
-  			}
-  			duart68681->channel[ch].rx_fifo_num++;
-  		}
-  	}
-  
+	// if local loopback is on, write the transmitted data as if a byte had been received
+	if ((duart68681->channel[ch].MR2 & 0xC0) == 0x80)
+	{
+		if (duart68681->channel[ch].rx_fifo_num >= RX_FIFO_SIZE)
+		{
+			LOG(( "68681: FIFO overflow\n" ));
+			duart68681->channel[ch].SR |= STATUS_OVERRUN_ERROR;
+		}
+		else
+		{
+			duart68681->channel[ch].rx_fifo[duart68681->channel[ch].rx_fifo_write_ptr++]
+					= duart68681->channel[ch].tx_data;
+			if (duart68681->channel[ch].rx_fifo_write_ptr == RX_FIFO_SIZE)
+			{
+				duart68681->channel[ch].rx_fifo_write_ptr = 0;
+			}
+			duart68681->channel[ch].rx_fifo_num++;
+		}
+	}
+
 	duart68681->channel[ch].tx_ready = 1;
 	duart68681->channel[ch].SR |= STATUS_TRANSMITTER_READY;
 

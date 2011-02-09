@@ -79,7 +79,7 @@ class sound_stream
 {
 	friend class simple_list<sound_stream>;
 	friend class sound_manager;
-	
+
 	typedef void (*stream_update_func)(device_t *device, sound_stream *stream, void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 	// stream output class
@@ -88,7 +88,7 @@ class sound_stream
 	public:
 		// construction/destruction
 		stream_output();
-		
+
 		// internal state
 		sound_stream *		m_stream;				// owning stream
 		stream_sample_t *	m_buffer;				// output buffer
@@ -102,7 +102,7 @@ class sound_stream
 	public:
 		// construction/destruction
 		stream_input();
-		
+
 		// internal state
 		stream_output *		m_source;				// pointer to the sound_output for this source
 		stream_sample_t *	m_resample;				// buffer for resampling to the stream's sample rate
@@ -117,7 +117,7 @@ class sound_stream
 	static const int OUTPUT_BUFFER_UPDATES		= 5;
 	static const UINT32 FRAC_BITS				= 22;
 	static const UINT32 FRAC_ONE				= 1 << FRAC_BITS;
-	static const UINT32 FRAC_MASK 				= FRAC_ONE - 1;
+	static const UINT32 FRAC_MASK				= FRAC_ONE - 1;
 
 	// construction/destruction
 	sound_stream(device_t &device, int inputs, int outputs, int sample_rate, void *param = NULL, stream_update_func callback = &sound_stream::device_stream_update_stub);
@@ -145,7 +145,7 @@ public:
 	void set_sample_rate(int sample_rate);
 	void set_input_gain(int inputnum, float gain);
 	void set_output_gain(int outputnum, float gain);
-	
+
 private:
 	// helpers called by our friends only
 	void update_with_accounting(bool second_tick);
@@ -218,26 +218,26 @@ public:
 	// construction/destruction
 	sound_manager(running_machine &machine);
 	~sound_manager();
-	
+
 	// getters
 	int attenuation() const { return m_attenuation; }
 	sound_stream *first_stream() const { return m_stream_list.first(); }
 	attotime last_update() const { return m_last_update; }
 	attoseconds_t update_attoseconds() const { return m_update_attoseconds; }
-	
+
 	// stream creation
 	sound_stream *stream_alloc(device_t &device, int inputs, int outputs, int sample_rate, void *param = NULL, sound_stream::stream_update_func callback = NULL);
-	
+
 	// global controls
 	void set_attenuation(int attenuation);
 	void ui_mute(bool turn_off = true) { mute(turn_off, MUTE_REASON_UI); }
 	void debugger_mute(bool turn_off = true) { mute(turn_off, MUTE_REASON_DEBUGGER); }
 	void system_mute(bool turn_off = true) { mute(turn_off, MUTE_REASON_SYSTEM); }
 	void system_enable(bool turn_on = true) { mute(!turn_on, MUTE_REASON_SYSTEM); }
-	
+
 	// user gain controls
 	bool indexed_speaker_input(int index, speaker_input &info) const;
-	
+
 private:
 	// internal helpers
 	void mute(bool mute, UINT8 reason);
@@ -254,17 +254,17 @@ private:
 	running_machine &	m_machine;				// reference to our machine
 	emu_timer *			m_update_timer;			// timer to drive periodic updates
 
-	UINT32 				m_finalmix_leftover;
+	UINT32				m_finalmix_leftover;
 	INT16 *				m_finalmix;
 	INT32 *				m_leftmix;
 	INT32 *				m_rightmix;
 
-	UINT8 				m_muted;
+	UINT8				m_muted;
 	int 				m_attenuation;
 	int 				m_nosound_mode;
 
 	wav_file *			m_wavfile;
-	
+
 	// streams data
 	simple_list<sound_stream> m_stream_list;	// list of streams
 	attoseconds_t		m_update_attoseconds;	// attoseconds between global updates

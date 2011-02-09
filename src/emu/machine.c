@@ -268,7 +268,7 @@ void running_machine::start()
 	m_render = auto_alloc(this, render_manager(*this));
 	generic_machine_init(this);
 	generic_sound_init(this);
-	
+
 	// allocate a soft_reset timer
 	m_soft_reset_timer = m_scheduler.timer_alloc(MSTUB(timer_expired, running_machine, soft_reset), this);
 

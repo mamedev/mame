@@ -173,7 +173,7 @@ device_sound_interface::~device_sound_interface()
 
 
 //-------------------------------------------------
-//  inputs - return the total number of inputs 
+//  inputs - return the total number of inputs
 //  for the given device
 //-------------------------------------------------
 
@@ -189,7 +189,7 @@ int device_sound_interface::inputs() const
 
 
 //-------------------------------------------------
-//  outputs - return the total number of outputs 
+//  outputs - return the total number of outputs
 //  for the given device
 //-------------------------------------------------
 
@@ -206,14 +206,14 @@ int device_sound_interface::outputs() const
 
 //-------------------------------------------------
 //  input_to_stream_input - convert a device's
-//	input index to a stream and the input index
+//  input index to a stream and the input index
 //  on that stream
 //-------------------------------------------------
 
 sound_stream *device_sound_interface::input_to_stream_input(int inputnum, int &stream_inputnum)
 {
 	assert(inputnum >= 0);
-	
+
 	// scan the list looking for streams owned by this device
 	for (sound_stream *stream = m_device.machine->sound().first_stream(); stream != NULL; stream = stream->next())
 		if (&stream->device() == &m_device)
@@ -225,7 +225,7 @@ sound_stream *device_sound_interface::input_to_stream_input(int inputnum, int &s
 			}
 			inputnum -= stream->input_count();
 		}
-	
+
 	// not found
 	return NULL;
 }
@@ -233,14 +233,14 @@ sound_stream *device_sound_interface::input_to_stream_input(int inputnum, int &s
 
 //-------------------------------------------------
 //  output_to_stream_output - convert a device's
-//	output index to a stream and the output index
+//  output index to a stream and the output index
 //  on that stream
 //-------------------------------------------------
 
 sound_stream *device_sound_interface::output_to_stream_output(int outputnum, int &stream_outputnum)
 {
 	assert(outputnum >= 0);
-	
+
 	// scan the list looking for streams owned by this device
 	for (sound_stream *stream = m_device.machine->sound().first_stream(); stream != NULL; stream = stream->next())
 		if (&stream->device() == &device())
@@ -252,7 +252,7 @@ sound_stream *device_sound_interface::output_to_stream_output(int outputnum, int
 			}
 			outputnum -= stream->output_count();
 		}
-	
+
 	// not found
 	return NULL;
 }
@@ -260,7 +260,7 @@ sound_stream *device_sound_interface::output_to_stream_output(int outputnum, int
 
 //-------------------------------------------------
 //  set_output_gain - set the gain on the given
-//	output index of the device
+//  output index of the device
 //-------------------------------------------------
 
 void device_sound_interface::set_output_gain(int outputnum, float gain)
@@ -273,7 +273,7 @@ void device_sound_interface::set_output_gain(int outputnum, float gain)
 				for (int outputnum = 0; outputnum < stream->output_count(); outputnum++)
 					stream->set_output_gain(outputnum, gain);
 	}
-	
+
 	// look up the stream and stream output index
 	else
 	{
@@ -305,7 +305,7 @@ void device_sound_interface::interface_pre_start()
 				throw device_missing_dependencies();
 		}
 	}
-	
+
 	// now iterate through devices again and assign any auto-allocated inputs
 	m_auto_allocated_inputs = 0;
 	for (bool gotone = m_device.machine->m_devicelist.first(sound); gotone; gotone = sound->next(sound))
@@ -371,7 +371,7 @@ void device_sound_interface::interface_post_start()
 
 
 //-------------------------------------------------
-//  interface_pre_reset - called prior to 
+//  interface_pre_reset - called prior to
 //  resetting the device
 //-------------------------------------------------
 

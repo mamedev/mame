@@ -180,51 +180,51 @@ static READ8_HANDLER( ss9601_reelram_lo_r )
 
 mtrain:
 
-80 = 00		40 = -		L0 = 8x8	L1 = 8x8	; title screen
-80 = 01		40 = -		L0 = REEL	L1 = 8x8	; gameplay (center reel)
-80 = 01		40 = -		L0 = REEL	L1 = 8x8	; girl slot (top, bottom reels)
+80 = 00     40 = -      L0 = 8x8    L1 = 8x8    ; title screen
+80 = 01     40 = -      L0 = REEL   L1 = 8x8    ; gameplay (center reel)
+80 = 01     40 = -      L0 = REEL   L1 = 8x8    ; girl slot (top, bottom reels)
 
 xtrain:
 
-80 = 00		40 = FD		L0 = -		L1 = 8x8	; ram test (disable = 01 -> L0 disabled)
-80 = 40		40 = FD		L0 = REEL	L1 = 8x8	; game play (center reel) as well as "BONUS" screen (top reel)
-80 = 40		40 = FD		L0 = REEL	L1 = 8x8	; lose/treasure slot (center reel)
-80 = 00		40 = BF		L0 = 8x8	L1 = 8x8	; car screen [L0 line scroll every 32]
-80 = 00		40 = EF		L0 = 8x8	L1 = 8x8	; title screen, L0 normal scroll (scrollram is 0) [L1 line scroll every 8]
-80 = 40		40 = 00		L0 = 8x16?	L1 = 8x8	; girl dancing
-80 = 00		40 = FF		L0 = 8x8	L1 = 8x8	; soft dsw screen
+80 = 00     40 = FD     L0 = -      L1 = 8x8    ; ram test (disable = 01 -> L0 disabled)
+80 = 40     40 = FD     L0 = REEL   L1 = 8x8    ; game play (center reel) as well as "BONUS" screen (top reel)
+80 = 40     40 = FD     L0 = REEL   L1 = 8x8    ; lose/treasure slot (center reel)
+80 = 00     40 = BF     L0 = 8x8    L1 = 8x8    ; car screen [L0 line scroll every 32]
+80 = 00     40 = EF     L0 = 8x8    L1 = 8x8    ; title screen, L0 normal scroll (scrollram is 0) [L1 line scroll every 8]
+80 = 40     40 = 00     L0 = 8x16?  L1 = 8x8    ; girl dancing
+80 = 00     40 = FF     L0 = 8x8    L1 = 8x8    ; soft dsw screen
 
 xplan:
 
-80 = 00		40 = FD		L0 = -		L1 = 8x8	; ram test (disable = 01 -> L0 disabled)
-80 = 40		40 = BF		L0 = 8x32	L1 = 8x8	; title screen [L0 line scroll every 32, L1 line scroll disabled?] / 3 planes with scrolling clouds (before title screen)
-80 = 00		40 = EF		L0 = 8x8	L1 = 8x8	; parachutist and cars demo [L1 line scroll every 8]
-80 = 70		40 = FF		L0 = 64x32	L1 = 8x8	; shoot'em up demo / gambling demo
-80 = 00		40 = FF		L0 = 8x8	L1 = 8x8	; test mode and stat screens
+80 = 00     40 = FD     L0 = -      L1 = 8x8    ; ram test (disable = 01 -> L0 disabled)
+80 = 40     40 = BF     L0 = 8x32   L1 = 8x8    ; title screen [L0 line scroll every 32, L1 line scroll disabled?] / 3 planes with scrolling clouds (before title screen)
+80 = 00     40 = EF     L0 = 8x8    L1 = 8x8    ; parachutist and cars demo [L1 line scroll every 8]
+80 = 70     40 = FF     L0 = 64x32  L1 = 8x8    ; shoot'em up demo / gambling demo
+80 = 00     40 = FF     L0 = 8x8    L1 = 8x8    ; test mode and stat screens
 
 bishjan:
 
-80 = 00		40 = FD		L0 = -		L1 = 8x8	; ram test (disable = 01 -> L0 disabled)
-80 = 00		40 = 0F		L0 = 8x8	L1 = 8x8	; soft dsw screen
-80 = 00		40 = 0x		L0 = 8x8	L1 = 8x8	; stat screens and gameplay (40 = 07/0d, seems a don't care)
+80 = 00     40 = FD     L0 = -      L1 = 8x8    ; ram test (disable = 01 -> L0 disabled)
+80 = 00     40 = 0F     L0 = 8x8    L1 = 8x8    ; soft dsw screen
+80 = 00     40 = 0x     L0 = 8x8    L1 = 8x8    ; stat screens and gameplay (40 = 07/0d, seems a don't care)
 
 saklove:
 
-80 = 00		40 = 0D		L0 = -		L1 = 8x8	; ram test (disable = 01 -> L0 disabled)
-80 = 00		40 = 0D		L0 = 8x8	L1 = 8x8	; gameplay / square of tiles screen
-80 = 00		40 = 0F		L0 = 8x8	L1 = 8x8	; title screen / instructions / double up screen
-80 = 00		40 = 07		L0 = 8x8	L1 = 8x8	; pool [L0 line scroll]
+80 = 00     40 = 0D     L0 = -      L1 = 8x8    ; ram test (disable = 01 -> L0 disabled)
+80 = 00     40 = 0D     L0 = 8x8    L1 = 8x8    ; gameplay / square of tiles screen
+80 = 00     40 = 0F     L0 = 8x8    L1 = 8x8    ; title screen / instructions / double up screen
+80 = 00     40 = 07     L0 = 8x8    L1 = 8x8    ; pool [L0 line scroll]
 
 -----
 
 More registers, at boot (never changed AFAICT):
 
-mtrain		saklove		xtrain,      expcard
+mtrain      saklove     xtrain,      expcard
                         xplan
-        
+
                          C0 = 0A     C0 = 0A
                          E0 = 18     E0 = 18
-        			            
+
 9100 = 13   200 = 13    200 = 13    200 = 13
 9101 = 20   201 = 20    201 = 20    201 = 20
 9102 = 20   202 = 20    202 = 20    202 = 20
@@ -260,10 +260,10 @@ mtrain		saklove		xtrain,      expcard
 9132 = 00   232 = FB    232 = FB    232 = FB
 9133 = 00   233 = FF    233 = FF    233 = FF
 9134 = 00   234 = 22    234 = 20    234 = 20
-9135 = 00   235 = 02                        
-9136 = 00                    	            
+9135 = 00   235 = 02
+9136 = 00
 9137 = 00   237 = 00    237 = 00    237 = 00
-                 		            
+
 9149 = FF   312 = FF    309 = FF    312 = FF
 914A = FF   311 = FF    30A = FF    311 = FF
 914B = FF   310 = FF    30B = FF    310 = FF
@@ -432,14 +432,14 @@ static VIDEO_START( subsino2 )
 	ss9601_reelrects = mtrain_reelrects;
 
 /*
-	state_save_register_global_pointer(machine, ss9601_reelrams[VRAM_HI], 0x2000);
-	state_save_register_global_pointer(machine, ss9601_reelrams[VRAM_LO], 0x2000);
+    state_save_register_global_pointer(machine, ss9601_reelrams[VRAM_HI], 0x2000);
+    state_save_register_global_pointer(machine, ss9601_reelrams[VRAM_LO], 0x2000);
 
-	state_save_register_global_pointer(machine, layers[0].scrollrams[VRAM_HI], 0x200);
-	state_save_register_global_pointer(machine, layers[0].scrollrams[VRAM_LO], 0x200);
+    state_save_register_global_pointer(machine, layers[0].scrollrams[VRAM_HI], 0x200);
+    state_save_register_global_pointer(machine, layers[0].scrollrams[VRAM_LO], 0x200);
 
-	state_save_register_global_pointer(machine, layers[1].scrollrams[VRAM_HI], 0x200);
-	state_save_register_global_pointer(machine, layers[1].scrollrams[VRAM_LO], 0x200);
+    state_save_register_global_pointer(machine, layers[1].scrollrams[VRAM_HI], 0x200);
+    state_save_register_global_pointer(machine, layers[1].scrollrams[VRAM_LO], 0x200);
 */
 }
 
@@ -571,7 +571,7 @@ static VIDEO_UPDATE( subsino2 )
 
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect, layers[1].tmap, 0, 0);
 
-//	popmessage("scrl: %03x,%03x - %03x,%03x dis: %02x siz: %02x ctrl: %02x", layers[0].scroll_x,layers[0].scroll_y, layers[1].scroll_x,layers[1].scroll_y, ss9601_disable, ss9601_tilesize, ss9601_scrollctrl);
+//  popmessage("scrl: %03x,%03x - %03x,%03x dis: %02x siz: %02x ctrl: %02x", layers[0].scroll_x,layers[0].scroll_y, layers[1].scroll_x,layers[1].scroll_y, ss9601_disable, ss9601_tilesize, ss9601_scrollctrl);
 
 	return 0;
 }
@@ -776,7 +776,7 @@ static WRITE16_HANDLER( bishjan_outputs_w )
 			break;
 	}
 
-//	popmessage("0: %04x", outputs16[0]);
+//  popmessage("0: %04x", outputs16[0]);
 }
 
 
@@ -834,7 +834,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( expcard_outputs_w )
 {
-	outputs[offset] = data;	
+	outputs[offset] = data;
 
 	switch (offset)
 	{
@@ -861,7 +861,7 @@ static WRITE8_HANDLER( expcard_outputs_w )
 			break;
 	}
 
-//	popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", outputs[0], outputs[1], outputs[2], outputs[3]);
+//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", outputs[0], outputs[1], outputs[2], outputs[3]);
 }
 
 /***************************************************************************
@@ -878,7 +878,7 @@ static WRITE8_HANDLER( mtrain_outputs_w )
 			coin_counter_w(space->machine, 0,	data & 0x01 );	// key in
 			coin_counter_w(space->machine, 1,	data & 0x02 );	// coin in
 			coin_counter_w(space->machine, 2,	data & 0x10 );	// pay out
-//			coin_counter_w(space->machine, 3,	data & 0x20 );	// hopper motor
+//          coin_counter_w(space->machine, 3,   data & 0x20 );  // hopper motor
 			break;
 
 		case 1:
@@ -896,7 +896,7 @@ static WRITE8_HANDLER( mtrain_outputs_w )
 			break;
 	}
 
-//	popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", outputs[0], outputs[1], outputs[2], outputs[3]);
+//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", outputs[0], outputs[1], outputs[2], outputs[3]);
 }
 
 static WRITE8_HANDLER( mtrain_videoram_w )
@@ -1020,7 +1020,7 @@ static WRITE8_HANDLER( saklove_outputs_w )
 			break;
 	}
 
-//	popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", outputs[0], outputs[1], outputs[2], outputs[3]);
+//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", outputs[0], outputs[1], outputs[2], outputs[3]);
 }
 
 static ADDRESS_MAP_START( saklove_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1110,7 +1110,7 @@ static WRITE8_HANDLER( xplan_outputs_w )
 			break;
 	}
 
-//	popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", outputs[0], outputs[1], outputs[2], outputs[3]);
+//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", outputs[0], outputs[1], outputs[2], outputs[3]);
 }
 
 static ADDRESS_MAP_START( xplan_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1184,7 +1184,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( xtrain_outputs_w )
 {
-	outputs[offset] = data;	
+	outputs[offset] = data;
 
 	switch (offset)
 	{
@@ -1213,7 +1213,7 @@ static WRITE8_HANDLER( xtrain_outputs_w )
 			break;
 	}
 
-//	popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", outputs[0], outputs[1], outputs[2], outputs[3]);
+//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", outputs[0], outputs[1], outputs[2], outputs[3]);
 }
 
 static ADDRESS_MAP_START( expcard_io, ADDRESS_SPACE_IO, 8 )
@@ -2198,11 +2198,11 @@ ROM_END
   0000-8100? is not encrypted
 
   rom     addr
-  8100 -> 0000	; after decryption (code start)
-  8200 -> 0100	; after decryption
-  8d97 -> 0c97	; after decryption
+  8100 -> 0000  ; after decryption (code start)
+  8200 -> 0100  ; after decryption
+  8d97 -> 0c97  ; after decryption
   1346 -> b346
-  ec40 -> 6b40	; after decryption
+  ec40 -> 6b40  ; after decryption
 
 ***************************************************************************/
 

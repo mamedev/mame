@@ -146,7 +146,7 @@ struct dsp32_config
 
 // ======================> dsp32c_device_config
 
-class dsp32c_device_config : 	public cpu_device_config,
+class dsp32c_device_config :	public cpu_device_config,
 								public dsp32_config
 {
 	friend class dsp32c_device;
@@ -449,7 +449,7 @@ protected:
 	void d5_ieee(UINT32 op);
 	void d5_dsp(UINT32 op);
 	void d5_seed(UINT32 op);
-	
+
 	// dma helpers
 	void dma_increment();
 	void dma_load();
@@ -495,7 +495,7 @@ protected:
 	UINT32			m_isr;
 	UINT32			m_obuf;
 	UINT32			m_osr;
-	
+
 	UINT32			m_iotemp;
 
 	// internal stuff

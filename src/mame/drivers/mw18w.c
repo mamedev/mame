@@ -6,10 +6,10 @@ driver todo:
 - lots of external artwork
 
 To diagnose game, turn on service mode and:
-- test RAM/ROM, leds, lamps:	reset with shifter in neutral
-- test sound and misc input:	turn on DSW 7 and reset with shifter in neutral
-- test accelerator:				reset with shifter in 1st gear
-- test steering wheel:			reset with shifter in 2nd gear
+- test RAM/ROM, leds, lamps:    reset with shifter in neutral
+- test sound and misc input:    turn on DSW 7 and reset with shifter in neutral
+- test accelerator:             reset with shifter in 1st gear
+- test steering wheel:          reset with shifter in 2nd gear
 
 */
 

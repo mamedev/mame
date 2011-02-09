@@ -121,11 +121,11 @@ public:
 	attotime()
 		: seconds(0),
 		  attoseconds(0) { }
-		  
+
 	attotime(seconds_t secs, attoseconds_t attos)
 		: seconds(secs),
 		  attoseconds(attos) { }
-	
+
 	// queries
 	bool is_zero() const { return (seconds == 0 && attoseconds == 0); }
 	bool is_never() const { return (seconds >= ATTOTIME_MAX_SECONDS); }
@@ -144,7 +144,7 @@ public:
 	static attotime from_usec(INT64 usec) { return attotime(usec / 1000000, (usec % 1000000) * (ATTOSECONDS_PER_SECOND / 1000000)); }
 	static attotime from_nsec(INT64 nsec) { return attotime(nsec / 1000000000, (nsec % 1000000000) * (ATTOSECONDS_PER_SECOND / 1000000000)); }
 	static attotime from_hz(double frequency) { return attotime(0, double(ATTOSECONDS_PER_SECOND) / frequency); }
-	
+
 	// math
 	attotime &operator+=(const attotime &right);
 	attotime &operator-=(const attotime &right);
@@ -167,7 +167,7 @@ public:
 //**************************************************************************
 
 //-------------------------------------------------
-//  operator+ - handle addition between two 
+//  operator+ - handle addition between two
 //  attotimes
 //-------------------------------------------------
 
@@ -221,7 +221,7 @@ inline attotime &attotime::operator+=(const attotime &right)
 
 
 //-------------------------------------------------
-//  operator- - handle subtraction between two 
+//  operator- - handle subtraction between two
 //  attotimes
 //-------------------------------------------------
 
@@ -295,7 +295,7 @@ inline attotime operator/(const attotime &left, UINT32 factor)
 
 
 //-------------------------------------------------
-//  operator== - handle comparisons between 
+//  operator== - handle comparisons between
 //  attotimes
 //-------------------------------------------------
 
@@ -397,7 +397,7 @@ inline UINT64 attotime::as_ticks(UINT32 frequency) const
 	UINT32 fracticks = (attotime(0, attoseconds) * frequency).seconds;
 	return mulu_32x32(seconds, frequency) + fracticks;
 }
-	
+
 
 //-------------------------------------------------
 //  from_ticks - create an attotime from a tick
@@ -415,7 +415,7 @@ inline attotime attotime::from_ticks(UINT64 ticks, UINT32 frequency)
 	INT32 secs = divu_64x32_rem(ticks, frequency, &remainder);
 	return attotime(secs, (UINT64)remainder * attos_per_tick);
 }
-	
+
 
 //-------------------------------------------------
 //  from_double - create an attotime from floating
@@ -429,6 +429,6 @@ inline attotime attotime::from_double(double _time)
 	attoseconds_t attos = DOUBLE_TO_ATTOSECONDS(_time);
 	return attotime(secs, attos);
 }
-	
+
 
 #endif	// __ATTOTIME_H__

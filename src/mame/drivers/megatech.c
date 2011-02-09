@@ -429,7 +429,7 @@ static DRIVER_INIT(mt_crt)
 {
 	UINT8* pin = machine->region("sms_pin")->base();
 	DRIVER_INIT_CALL(mt_slot);
-	
+
 	cart_is_genesis[0] = !pin[0] ? 1 : 0;;
 }
 
@@ -526,13 +526,13 @@ static DEVICE_IMAGE_LOAD( megatech_cart )
 {
 	const struct megatech_cart_region *mt_cart = &megatech_cart_table[0], *this_cart;
 	const char	*pcb_name;
-	
+
 	/* First, determine where this cart has to be loaded */
 	while (mt_cart->tag)
 	{
 		if (strcmp(mt_cart->tag, image.device().tag()) == 0)
 			break;
-		
+
 		mt_cart++;
 	}
 
@@ -558,7 +558,7 @@ static DEVICE_IMAGE_LOAD( megatech_cart )
 			cart_is_genesis[this_cart->slot] = 1;
 		}
 		else if (!mame_stricmp("sms", pcb_name))
-		{	
+		{
 			printf("%s is sms\n", mt_cart->tag);
 			cart_is_genesis[this_cart->slot] = 0;
 		}
@@ -615,7 +615,7 @@ ROM_START( megatech )
 	ROM_REGION16_BE( 0x400000, "game4", ROMREGION_ERASE00 )
 	ROM_REGION16_BE( 0x400000, "game5", ROMREGION_ERASE00 )
 	ROM_REGION16_BE( 0x400000, "game6", ROMREGION_ERASE00 )
-	ROM_REGION16_BE( 0x400000, "game7", ROMREGION_ERASE00 )	
+	ROM_REGION16_BE( 0x400000, "game7", ROMREGION_ERASE00 )
 ROM_END
 
 

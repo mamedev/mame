@@ -215,8 +215,8 @@ INLINE int sh6840_update_noise(beezer_sound_state *state, int clocks)
 		{
 			state->sh6840_LFSR_clocks = 0;
 			/* shift the LFSR. finally or in the result and see if we've
-			* had a 0->1 transition */
-			newxor = (((state->sh6840_LFSR&0x10000)?1:0) ^ ((state->sh6840_LFSR&0x2000)?1:0))?1:0; 
+            * had a 0->1 transition */
+			newxor = (((state->sh6840_LFSR&0x10000)?1:0) ^ ((state->sh6840_LFSR&0x2000)?1:0))?1:0;
 			state->sh6840_LFSR <<= 1;
 			state->sh6840_LFSR |= newxor;
 			/*printf("LFSR: %4x, %4x, %4x, %4x\n", sh6840_LFSR_3, sh6840_LFSR_2, sh6840_LFSR_1, sh6840_LFSR_0);*/
@@ -351,11 +351,11 @@ static STREAM_UPDATE( beezer_stream_update )
 
 		/* stash */
 		/* each sample feeds an xor bit on the sign bit of a sign-magnitude (NOT 2'S COMPLEMENT)
-		 * DAC. This requires some rather convoluted processing:
-		 * samplex*0x80 brings the sample to the sign bit
-		 * state->sh6840_volume[x]&0x80 pulls the sign bit from the dac sample
-		 * state->sh6840_volume[x]&0x7F pulls the magnitude from the dac sample
-		 */
+         * DAC. This requires some rather convoluted processing:
+         * samplex*0x80 brings the sample to the sign bit
+         * state->sh6840_volume[x]&0x80 pulls the sign bit from the dac sample
+         * state->sh6840_volume[x]&0x7F pulls the magnitude from the dac sample
+         */
 		sample += (((sample0*0x80)^(state->sh6840_volume[0]&0x80))?-1:1)*(state->sh6840_volume[0]&0x7F);
 		sample += (((sample1*0x80)^(state->sh6840_volume[1]&0x80))?-1:1)*(state->sh6840_volume[1]&0x7F);
 		sample += (((sample2*0x80)^(state->sh6840_volume[2]&0x80))?-1:1)*(state->sh6840_volume[2]&0x7F);

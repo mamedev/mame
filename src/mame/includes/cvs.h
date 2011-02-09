@@ -66,7 +66,7 @@ public:
 	/* memory */
 	UINT8      color_ram[0x400];
 	UINT8      palette_ram[0x10];
-  	UINT8      character_ram[3 * 0x800];	/* only half is used, but
+	UINT8      character_ram[3 * 0x800];	/* only half is used, but
                                                by allocating twice the amount,
                                                we can use the same gfx_layout */
 };

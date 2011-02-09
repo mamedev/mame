@@ -167,7 +167,7 @@ public:
 	void abort_timeslice();
 	void trigger(int trigid, attotime after = attotime::zero);
 	void boost_interleave(attotime timeslice_time, attotime boost_duration);
-	
+
 	// timers, specified by callback/name
 	emu_timer *timer_alloc(timer_expired_func callback, const char *name, void *ptr = NULL);
 	void timer_set(attotime duration, timer_expired_func callback, const char *name, int param = 0, void *ptr = NULL);
@@ -185,12 +185,12 @@ private:
 	// callbacks
 	void timed_trigger(running_machine &machine, INT32 param);
 	void postload();
-	
+
 	// scheduling helpers
 	void compute_perfect_interleave();
 	void rebuild_execute_list();
 	void add_scheduling_quantum(attotime quantum, attotime duration);
-	
+
 	// timer helpers
 	emu_timer &timer_list_insert(emu_timer &timer);
 	emu_timer &timer_list_remove(emu_timer &timer);
@@ -208,7 +208,7 @@ private:
 
 	// other internal states
 	emu_timer *					m_callback_timer;			// pointer to the current callback timer
-	bool						m_callback_timer_modified; 	// true if the current callback timer was modified
+	bool						m_callback_timer_modified;	// true if the current callback timer was modified
 	attotime					m_callback_timer_expire_time; // the original expiration time
 
 	// scheduling quanta
@@ -218,13 +218,13 @@ private:
 
 	public:
 		quantum_slot *next() const { return m_next; }
-	
+
 		quantum_slot *			m_next;
 		attoseconds_t			m_actual;					// actual duration of the quantum
 		attoseconds_t			m_requested;				// duration of the requested quantum
 		attotime				m_expire;					// absolute expiration time of this quantum
 	};
-	simple_list<quantum_slot> 	m_quantum_list;				// list of active quanta
+	simple_list<quantum_slot>	m_quantum_list;				// list of active quanta
 	fixed_allocator<quantum_slot> m_quantum_allocator;		// allocator for quanta
 	attoseconds_t				m_quantum_minimum;			// duration of minimum quantum
 };

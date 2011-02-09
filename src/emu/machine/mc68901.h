@@ -44,7 +44,7 @@
 
 
 //**************************************************************************
-//	MACROS / CONSTANTS
+//  MACROS / CONSTANTS
 //**************************************************************************
 
 
@@ -64,7 +64,7 @@
 
 
 //**************************************************************************
-//	TYPE DEFINITIONS
+//  TYPE DEFINITIONS
 //**************************************************************************
 
 // ======================> mc68901_interface
@@ -244,7 +244,7 @@ private:
 	emu_timer *m_timer[4]; /* counter timers */
 	emu_timer *m_rx_timer;					/* receive timer */
 	emu_timer *m_tx_timer;					/* transmit timer */
-	
+
 	const mc68901_device_config &m_config;
 };
 

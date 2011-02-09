@@ -280,7 +280,7 @@ void bsmt2000_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle update requests 
+//  sound_stream_update - handle update requests
 //  for our sound stream
 //-------------------------------------------------
 

@@ -1,5 +1,5 @@
 /***************************************************************************
- 
+
   Namco System 12 - Arcade Playstation-based Hardware
   ===================================================
   Driver by smf
@@ -11,11 +11,11 @@
     graphics are glitchy in some games.
 
     - golgo13 assumes the test switch is a switch, not a button - must hold down F2 to stay in test mode
- 
+
     - truckk doesn't boot: the H8/3002 never enters InitJVSBoards @ 1DE2.  1DE2 is referenced in a table of commands at 4032,
       which is called by the routine at 3FEA.  It is not clear how execution is intended to get to 3FEA - there are no direct
       branches to that location, and the bytes 3F EA don't appear at all in the program.
- 
+
 
 Namco System 12 - Arcade Playstation-based Hardware
 ===================================================
@@ -110,16 +110,16 @@ GUN I/F PCB - Used to connect and control the light guns. The board plugs in whe
               PCB directly, no extra gun hardware is needed. Used only on Ghoul Panic and Point Blank 2 so far.
 CDXA PCB    - Used on Truck Kyosokyoku to control the CDROM drive. The board plugs in where the CPU board would
               normally be, and the CPU board plugs into another connector on the CDXA PCB.
-V233 DECO PCB-This is the I/O board used by Truck Kyosokyoku. It contains a custom Namco C78 (Hitachi H8/3334) and one 
-              EPROM. A similar board might also be required for Attack Pla-Rail as it will not boot without some kind 
+V233 DECO PCB-This is the I/O board used by Truck Kyosokyoku. It contains a custom Namco C78 (Hitachi H8/3334) and one
+              EPROM. A similar board might also be required for Attack Pla-Rail as it will not boot without some kind
               of I/O board.
-              
+
 Each game has a 3 or 4 digit letter code assigned to it which is printed on a small sticker and placed on the underside
 of the main PCB.
 The 4 digit code is then proceeded by a number (generally 1, 2 or 3), then 'Rev.' then A/B/C/D/E which denotes the software
 revision, and in some cases a sub-revision such as 1 or 2 (usually only listed in the test mode).
-The first 1 denotes a Japanese version. 2 (and maybe 3) denotes a World version. For general use there are no other numbers 
-used other than 1, 2, or 3. There is one exception so far. Point Blank 2 was first produced on System 11 hardware. To 
+The first 1 denotes a Japanese version. 2 (and maybe 3) denotes a World version. For general use there are no other numbers
+used other than 1, 2, or 3. There is one exception so far. Point Blank 2 was first produced on System 11 hardware. To
 solve a naming conflict, the System 12 version uses a '4' to denote a Japanese version and a '5' to denote a World version.
 For World versions usually only the main program is changed, the rest of the ROMs are the Japanese region code '1' ROMs.
 See the Main PCB and ROM Daughterboard PCB texts below for more details on ROM naming specifics.
@@ -250,7 +250,7 @@ Notes:
                      Truck Kyosokyoku          TKK2 Ver.A   none             MOTHER(C) (ROMs serialised)
 
                      Note: Games with 'none' for S/W Revision have a date in the test menu in the 'OTHER' item
-                     
+
       PRG.2N/PRG.2R: Main program ROMs \ Intel 28F016S5 2M x8 FLASHROM (for 2N, TSOP40)
                                        / Intel 28F008SA 1M x8 FLASHROM (for 2R, TSOP40)
                      These ROMs are not populated on any System12 PCB dumped so far. Probably they are completely
@@ -940,7 +940,7 @@ Notes:
       Ghoul Panic (OB2/VER.A)
       Point Blank 2 (GNB5/VER.A)
 
-      
+
 CDXA PCB
 --------
 SYSTEM12 CDXA PCB 8661962101 (8661972101)
@@ -960,7 +960,7 @@ SYSTEM12 CDXA PCB 8661962101 (8661972101)
 |    | |        |        |    |------|   TC558128   |
 |    | |        |--------|                          |
 |    | |                                            |
-|    | |                                            |         
+|    | |                                            |
 |    |-|                                            |
 |        2061ASC-1        |------|                  |
 |                         |ALTERA|                  |
@@ -989,13 +989,13 @@ Notes:
 
       This PCB was found on the following games (so far)....
 
-      Truck Kyosokyoku (TKK2/VER.A) 
+      Truck Kyosokyoku (TKK2/VER.A)
       A CDROM drive and CDROM disc is also required
       The disc is labelled 'TKK2-A'
-      
-      
+
+
 I/O Board (for use with Truck Kyosokyoku)
----------      
+---------
 
 V233 DECO PCB
 2532960102 (2532970102)
@@ -2579,27 +2579,27 @@ ROM_END
 
 ROM_START( truckk )
 	ROM_REGION32_LE( 0x00400000, "user1", 0 ) /* main prg */
-	ROM_LOAD16_BYTE( "tkk2vera.2l",  0x000000, 0x200000, CRC(321344e0) SHA1(0273284d05707b76ca38fd160ef6f17572314a8b) ) 
-	ROM_LOAD16_BYTE( "tkk2vera.2p",  0x000001, 0x200000, CRC(a7b5e4ea) SHA1(f11eefd80559b4d42318a920088b77bd67b70cc3) ) 
+	ROM_LOAD16_BYTE( "tkk2vera.2l",  0x000000, 0x200000, CRC(321344e0) SHA1(0273284d05707b76ca38fd160ef6f17572314a8b) )
+	ROM_LOAD16_BYTE( "tkk2vera.2p",  0x000001, 0x200000, CRC(a7b5e4ea) SHA1(f11eefd80559b4d42318a920088b77bd67b70cc3) )
 
 	ROM_REGION32_LE( 0x3400000, "user2", 0 ) /* main data */
-	ROM_LOAD16_BYTE( "tkk1rom0l.ic10", 0x0000000, 0x800000, CRC(5e1c8660) SHA1(05fcfa9cc834f85c38e41610a32624464d67ee21) ) 
-	ROM_LOAD16_BYTE( "tkk1rom0u.ic14", 0x0000001, 0x800000, CRC(ee4e6566) SHA1(f3c7e227681003a3491a3996a90887e1091c0eed) ) 
-	ROM_LOAD16_BYTE( "tkk1rom1l.ic11", 0x1000000, 0x800000, CRC(fde2863c) SHA1(a01141df8c84730974c9f37fa2ee911e2f4e45f9) ) 
-	ROM_LOAD16_BYTE( "tkk1rom1u.ic15", 0x1000001, 0x800000, CRC(e51a56d7) SHA1(c5bad8df8edd5a5f352e5bf3bb93133503ca4ba0) ) 
-	ROM_LOAD16_BYTE( "tkk1rom2l.ic12", 0x2000000, 0x800000, CRC(029cf107) SHA1(30cbcf00ffb9c379c64718914874936ff32ed186) ) 
-	ROM_LOAD16_BYTE( "tkk1rom2u.ic16", 0x2000001, 0x800000, CRC(30c426dd) SHA1(2dae3d415715c779251c79006ea18e3bd14a1f51) ) 
-	ROM_LOAD16_BYTE( "tkk1fl3l.ic4", 0x3000000, 0x200000, CRC(b0e98cb2) SHA1(8c53037b8e20410a395db8d9bb9229b550ebf228) ) 
-	ROM_LOAD16_BYTE( "tkk1fl3u.ic5", 0x3000001, 0x200000, CRC(16d9ede7) SHA1(e989e0a6afbfca5e7ef81bf7c24e8e6b38a11eca) ) 
+	ROM_LOAD16_BYTE( "tkk1rom0l.ic10", 0x0000000, 0x800000, CRC(5e1c8660) SHA1(05fcfa9cc834f85c38e41610a32624464d67ee21) )
+	ROM_LOAD16_BYTE( "tkk1rom0u.ic14", 0x0000001, 0x800000, CRC(ee4e6566) SHA1(f3c7e227681003a3491a3996a90887e1091c0eed) )
+	ROM_LOAD16_BYTE( "tkk1rom1l.ic11", 0x1000000, 0x800000, CRC(fde2863c) SHA1(a01141df8c84730974c9f37fa2ee911e2f4e45f9) )
+	ROM_LOAD16_BYTE( "tkk1rom1u.ic15", 0x1000001, 0x800000, CRC(e51a56d7) SHA1(c5bad8df8edd5a5f352e5bf3bb93133503ca4ba0) )
+	ROM_LOAD16_BYTE( "tkk1rom2l.ic12", 0x2000000, 0x800000, CRC(029cf107) SHA1(30cbcf00ffb9c379c64718914874936ff32ed186) )
+	ROM_LOAD16_BYTE( "tkk1rom2u.ic16", 0x2000001, 0x800000, CRC(30c426dd) SHA1(2dae3d415715c779251c79006ea18e3bd14a1f51) )
+	ROM_LOAD16_BYTE( "tkk1fl3l.ic4", 0x3000000, 0x200000, CRC(b0e98cb2) SHA1(8c53037b8e20410a395db8d9bb9229b550ebf228) )
+	ROM_LOAD16_BYTE( "tkk1fl3u.ic5", 0x3000001, 0x200000, CRC(16d9ede7) SHA1(e989e0a6afbfca5e7ef81bf7c24e8e6b38a11eca) )
 
 	ROM_REGION( 0x0080000, "sub", 0 ) /* sound prg */
-	ROM_LOAD16_WORD_SWAP( "tkk2vera.11s", 0x000000, 0x080000, CRC(d3d0a46a) SHA1(20569462df49ad93ff1118b587d6d32edf9d851e) ) 
+	ROM_LOAD16_WORD_SWAP( "tkk2vera.11s", 0x000000, 0x080000, CRC(d3d0a46a) SHA1(20569462df49ad93ff1118b587d6d32edf9d851e) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
-	ROM_LOAD( "tkk1wave0.ic1", 0x000000, 0x800000, CRC(037d3095) SHA1(cc343bdd45d023c133964321e2df5cb1c91525ef) ) 
+	ROM_LOAD( "tkk1wave0.ic1", 0x000000, 0x800000, CRC(037d3095) SHA1(cc343bdd45d023c133964321e2df5cb1c91525ef) )
 
 	ROM_REGION( 0x20000, "ioboard", 0)	/* Truck K. I/O board */
-	ROM_LOAD( "tkk1prg0.ic7", 0x000000, 0x020000, CRC(11fd9c31) SHA1(068b8364ec0eb1e88f9f85f40b8b322876f6f3e2) ) 
+	ROM_LOAD( "tkk1prg0.ic7", 0x000000, 0x020000, CRC(11fd9c31) SHA1(068b8364ec0eb1e88f9f85f40b8b322876f6f3e2) )
 
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE( "tkk2-a", 0, SHA1(6b7c3686b22a508c44f67295b188504b757dd482) )

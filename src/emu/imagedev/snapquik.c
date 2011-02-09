@@ -151,7 +151,7 @@ static DEVICE_IMAGE_LOAD( snapquick )
 	token->load = (snapquick_load_func) reinterpret_cast<snapquick_load_func>(image.get_device_specific_call());
 
 	/* adjust the timer */
-	
+
 		token->timer->adjust(
 		attotime(config->delay_seconds, config->delay_attoseconds),
 		0);

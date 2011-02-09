@@ -139,7 +139,7 @@ attotime &attotime::operator/=(UINT32 factor)
 
 
 //-------------------------------------------------
-//  as_string - return a temporary printable 
+//  as_string - return a temporary printable
 //  string describing an attotime
 //-------------------------------------------------
 

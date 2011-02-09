@@ -1194,13 +1194,13 @@ ROM_START( evilngt )
 	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
 
 	ROM_REGION( 0x2000, "timekeep", 0 ) /* timekeeper SRAM */
-	ROM_LOAD( "m48t58y.9n",   0x000000, 0x002000, CRC(e887ca1f) SHA1(54205f01b1ceba1d5f4d979fc30be1add8116e90) ) 
+	ROM_LOAD( "m48t58y.9n",   0x000000, 0x002000, CRC(e887ca1f) SHA1(54205f01b1ceba1d5f4d979fc30be1add8116e90) )
 
 	ROM_REGION( 0x400000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
 	ROM_LOAD( "810a03.16h",  0x000000, 0x400000, CRC(4cd79d98) SHA1(12fea41cfc5c1b883ffbeda7e428dd1d1bf54d7f) )
 
 	ROM_REGION( 0x80, "eeprom", 0 )	/* EEPROM default contents */
-	ROM_LOAD( "93c46.7k",    0x000000, 0x000080, CRC(d7ba2e5e) SHA1(d729557555c6fc1cd433b14017952cc63ec73573) ) 
+	ROM_LOAD( "93c46.7k",    0x000000, 0x000080, CRC(d7ba2e5e) SHA1(d729557555c6fc1cd433b14017952cc63ec73573) )
 
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE( "810uba02", 0, SHA1(ca3b957e3e33435391fbf630f9ed89aa08a70c8f) )

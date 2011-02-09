@@ -48,7 +48,7 @@
 
 
 //**************************************************************************
-//	MACROS / CONSTANTS
+//  MACROS / CONSTANTS
 //**************************************************************************
 
 #define LOG 0
@@ -292,7 +292,7 @@ void mc68901_device_config::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-//		memset(&in_pa_func, 0, sizeof(in_pa_func));
+//      memset(&in_pa_func, 0, sizeof(in_pa_func));
 	}
 }
 
@@ -911,7 +911,7 @@ READ8_MEMBER( mc68901_device::read )
 {
 	switch (offset)
 	{
-	case REGISTER_GPIP:  
+	case REGISTER_GPIP:
 		m_gpip = devcb_call_read8(&m_in_gpio_func, 0);
 		return m_gpip;
 

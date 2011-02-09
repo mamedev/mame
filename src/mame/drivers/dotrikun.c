@@ -48,11 +48,11 @@ static WRITE8_HANDLER( dotrikun_color_w )
 {
 	dotrikun_state *state = space->machine->driver_data<dotrikun_state>();
 	/*
-	x--- ---- screen color swap?
-	---- -x-- B
-	---- --x- G
-	---- ---x R
-	*/
+    x--- ---- screen color swap?
+    ---- -x-- B
+    ---- --x- G
+    ---- ---x R
+    */
 
 	state->color = data;
 	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());

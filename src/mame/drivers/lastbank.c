@@ -1,11 +1,11 @@
 /***************************************************************************
 
-	Last Bank skeleton driver
+    Last Bank skeleton driver
 
-	Uses a TC0091LVC, a variant of the one used on Taito L HW
+    Uses a TC0091LVC, a variant of the one used on Taito L HW
 
-	TODO:
-	- somebody should port CPU core contents in a shared file;
+    TODO:
+    - somebody should port CPU core contents in a shared file;
 
 ***************************************************************************/
 
@@ -112,7 +112,7 @@ static MACHINE_CONFIG_START( lastbank, lastbank_state )
 	MCFG_CPU_PROGRAM_MAP(lastbank_map)
 	MCFG_CPU_IO_MAP(lastbank_io)
 
-//	MCFG_CPU_ADD("audiocpu",Z80,MASTER_CLOCK/4)
+//  MCFG_CPU_ADD("audiocpu",Z80,MASTER_CLOCK/4)
 
 	//MCFG_MACHINE_START(lastbank)
 	//MCFG_MACHINE_RESET(lastbank)

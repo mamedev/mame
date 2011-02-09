@@ -322,7 +322,7 @@ const UINT8 rtypeleo_decryption_table[256] = {
 	xxxx,xxxx,xxxx,xxxx,0x81,xxxx,0x79,xxxx,xxxx,0x24,0x23,xxxx,xxxx,0xb0,0x07,0xff, /* D0 */
 	xxxx,0xba,0xf6,0x51,xxxx,xxxx,xxxx,0xfe,xxxx,0x92,xxxx,xxxx,xxxx,xxxx,0xe9,xxxx, /* E0 */
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0xe8,0xd2,xxxx,0x18,xxxx,xxxx,xxxx,0xd1,xxxx,xxxx, /* F0 */
-//	                                                                 ^^^^
+//                                                                   ^^^^
 };
 // 0xf9 (0x18) opcode is right but arguments could be swapped
 // 0x80 (0x2b) not sure, could be 0x1b

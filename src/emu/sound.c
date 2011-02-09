@@ -103,7 +103,7 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 	device_sound_interface *sound;
 	if (!device.interface(sound))
 		throw emu_fatalerror("Attempted to create a sound_stream with a non-sound device");
-	
+
 	// this is also the implicit parameter if we are using our internal stub
 	if (m_callback == &sound_stream::device_stream_update_stub)
 		m_param = sound;
@@ -133,7 +133,7 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 
 
 //-------------------------------------------------
-//  sample_time - return the emulation time of the 
+//  sample_time - return the emulation time of the
 //  next sample to be generated on the stream
 //-------------------------------------------------
 
@@ -156,7 +156,7 @@ float sound_stream::input_gain(int inputnum) const
 
 
 //-------------------------------------------------
-//  initial_input_gain - return the original input 
+//  initial_input_gain - return the original input
 //  gain on a given stream's input
 //-------------------------------------------------
 
@@ -177,14 +177,14 @@ const char *sound_stream::input_name(int inputnum, astring &string) const
 	// start with our device name and tag
 	assert(inputnum >= 0 && inputnum < m_inputs);
 	string.printf("%s '%s': ", m_device.name(), m_device.tag());
-	
+
 	// if we have a source, indicate where the sound comes from by device name and tag
 	if (m_input[inputnum].m_source != NULL && m_input[inputnum].m_source->m_stream != NULL)
 	{
 		device_t &source = m_input[inputnum].m_source->m_stream->device();
 		string.catprintf("%s '%s'", source.name(), source.tag());
 
-		// get the sound interface; if there is more than 1 output we need to figure out which one		
+		// get the sound interface; if there is more than 1 output we need to figure out which one
 		device_sound_interface *sound;
 		if (source.interface(sound) && sound->outputs() > 1)
 		{
@@ -205,7 +205,7 @@ const char *sound_stream::input_name(int inputnum, astring &string) const
 
 
 //-------------------------------------------------
-//  output_gain - return the output gain on a 
+//  output_gain - return the output gain on a
 //  given stream's output
 //-------------------------------------------------
 
@@ -289,8 +289,8 @@ void sound_stream::update()
 
 
 //-------------------------------------------------
-//  output_since_last_update - return a pointer to 
-//  the output buffer and the number of samples 
+//  output_since_last_update - return a pointer to
+//  the output buffer and the number of samples
 //  since the last global update
 //-------------------------------------------------
 
@@ -306,7 +306,7 @@ const stream_sample_t *sound_stream::output_since_last_update(int outputnum, int
 
 
 //-------------------------------------------------
-//  set_sample_rate - set the sample rate on a 
+//  set_sample_rate - set the sample rate on a
 //  given stream
 //-------------------------------------------------
 
@@ -332,7 +332,7 @@ void sound_stream::set_input_gain(int inputnum, float gain)
 
 
 //-------------------------------------------------
-//  set_output_gain - set the output gain on a 
+//  set_output_gain - set the output gain on a
 //  given stream's output
 //-------------------------------------------------
 
@@ -398,7 +398,7 @@ void sound_stream::apply_sample_rate_changes()
 	// skip if nothing to do
 	if (m_new_sample_rate == 0)
 		return;
-		
+
 	// update to the new rate and remember the old rate
 	UINT32 old_rate = m_sample_rate;
 	m_sample_rate = m_new_sample_rate;
@@ -854,8 +854,8 @@ void sound_manager::set_attenuation(int attenuation)
 
 
 //-------------------------------------------------
-//  indexed_speaker_input - return the speaker 
-//  device and input index of the global speaker 
+//  indexed_speaker_input - return the speaker
+//  device and input index of the global speaker
 //  input
 //-------------------------------------------------
 
@@ -872,7 +872,7 @@ bool sound_manager::indexed_speaker_input(int index, speaker_input &info) const
 		}
 		index -= info.speaker->inputs();
 	}
-	
+
 	// didn't locate
 	return false;
 }
@@ -991,7 +991,7 @@ void sound_manager::config_save(running_machine *machine, int config_type, xml_d
 
 
 //-------------------------------------------------
-//  update - mix everything down to its final form 
+//  update - mix everything down to its final form
 //  and send it to the OSD layer
 //-------------------------------------------------
 

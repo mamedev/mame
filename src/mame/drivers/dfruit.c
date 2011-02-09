@@ -1,11 +1,11 @@
 /***************************************************************************
 
-	Dream Fruit skeleton driver
+    Dream Fruit skeleton driver
 
-	Uses a TC0091LVC, a variant of the one used on Taito L HW
+    Uses a TC0091LVC, a variant of the one used on Taito L HW
 
-	TODO:
-	- somebody should port CPU core contents in a shared file;
+    TODO:
+    - somebody should port CPU core contents in a shared file;
 
 ***************************************************************************/
 

@@ -1763,6 +1763,6 @@ void cave_get_sprite_info( running_machine *machine )
 static STATE_POSTLOAD( cave_sprite_postload )
 {
 	/* FIXME: this is probably not the best way to restore the sprites,
-	but it seems to work more or less (sprites may be wrong for one frame) */
+    but it seems to work more or less (sprites may be wrong for one frame) */
 	cave_get_sprite_info(machine);
 }
