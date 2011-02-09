@@ -353,6 +353,35 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 
 #define VERBOSE_LEVEL ( 0 )
 
+#define ATAPI_CYCLES_PER_SECTOR (5000)	// plenty of time to allow DMA setup etc.  BIOS requires this be at least 2000, individual games may vary.
+
+#define ATAPI_STAT_BSY	   0x80
+#define ATAPI_STAT_DRDY    0x40
+#define ATAPI_STAT_DMARDDF 0x20
+#define ATAPI_STAT_SERVDSC 0x10
+#define ATAPI_STAT_DRQ     0x08
+#define ATAPI_STAT_CORR    0x04
+#define ATAPI_STAT_CHECK   0x01
+
+#define ATAPI_INTREASON_COMMAND 0x01
+#define ATAPI_INTREASON_IO      0x02
+#define ATAPI_INTREASON_RELEASE 0x04
+
+#define ATAPI_REG_DATA		0
+#define ATAPI_REG_ERRFEAT	1
+#define ATAPI_REG_INTREASON	2
+#define ATAPI_REG_SAMTAG	3
+#define ATAPI_REG_COUNTLOW	4
+#define ATAPI_REG_COUNTHIGH	5
+#define ATAPI_REG_DRIVESEL	6
+#define ATAPI_REG_CMDSTATUS	7
+#define ATAPI_REG_MAX 16
+
+#define ATAPI_DATA_SIZE ( 64 * 1024 )
+
+#define MAX_TRANSFER_SIZE ( 63488 )
+
+
 class ksys573_state : public psx_state
 {
 public:
@@ -371,11 +400,9 @@ public:
 
 	UINT32 control;
 
-	UINT8 *atapi_regs;
 	emu_timer *atapi_timer;
 	SCSIInstance *inserted_cdrom;
 	SCSIInstance *available_cdroms[ 2 ];
-	UINT8 *atapi_data;
 	int atapi_data_ptr;
 	int atapi_data_len;
 	int atapi_xferlen;
@@ -419,6 +446,10 @@ public:
 
 	int hyperbbc_lamp_strobe1;
 	int hyperbbc_lamp_strobe2;
+	
+	/* memory */
+	UINT8 atapi_regs[ATAPI_REG_MAX];
+	UINT8 atapi_data[ATAPI_DATA_SIZE];
 };
 
 INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, const char *s_fmt, ... )
@@ -562,34 +593,6 @@ static WRITE32_HANDLER( control_w )
 		if( state->flash_bank != old_bank ) verboselog( space->machine, 1, "pccard4 %d\n", control & 7 );
 	}
 }
-
-#define ATAPI_CYCLES_PER_SECTOR (5000)	// plenty of time to allow DMA setup etc.  BIOS requires this be at least 2000, individual games may vary.
-
-#define ATAPI_STAT_BSY	   0x80
-#define ATAPI_STAT_DRDY    0x40
-#define ATAPI_STAT_DMARDDF 0x20
-#define ATAPI_STAT_SERVDSC 0x10
-#define ATAPI_STAT_DRQ     0x08
-#define ATAPI_STAT_CORR    0x04
-#define ATAPI_STAT_CHECK   0x01
-
-#define ATAPI_INTREASON_COMMAND 0x01
-#define ATAPI_INTREASON_IO      0x02
-#define ATAPI_INTREASON_RELEASE 0x04
-
-#define ATAPI_REG_DATA		0
-#define ATAPI_REG_ERRFEAT	1
-#define ATAPI_REG_INTREASON	2
-#define ATAPI_REG_SAMTAG	3
-#define ATAPI_REG_COUNTLOW	4
-#define ATAPI_REG_COUNTHIGH	5
-#define ATAPI_REG_DRIVESEL	6
-#define ATAPI_REG_CMDSTATUS	7
-#define ATAPI_REG_MAX 16
-
-#define ATAPI_DATA_SIZE ( 64 * 1024 )
-
-#define MAX_TRANSFER_SIZE ( 63488 )
 
 static TIMER_CALLBACK( atapi_xfer_end )
 {
@@ -1037,15 +1040,12 @@ static void atapi_exit(running_machine& machine)
 static void atapi_init(running_machine *machine)
 {
 	ksys573_state *state = machine->driver_data<ksys573_state>();
-	UINT8 *atapi_regs;
 	int i;
 
-	atapi_regs = state->atapi_regs = auto_alloc_array( machine, UINT8, ATAPI_REG_MAX );
-
-	atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
-	atapi_regs[ATAPI_REG_ERRFEAT] = 1;
-	atapi_regs[ATAPI_REG_COUNTLOW] = 0x14;
-	atapi_regs[ATAPI_REG_COUNTHIGH] = 0xeb;
+	state->atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
+	state->atapi_regs[ATAPI_REG_ERRFEAT] = 1;
+	state->atapi_regs[ATAPI_REG_COUNTLOW] = 0x14;
+	state->atapi_regs[ATAPI_REG_COUNTHIGH] = 0xeb;
 
 	state->atapi_data_ptr = 0;
 	state->atapi_data_len = 0;
@@ -1067,10 +1067,9 @@ static void atapi_init(running_machine *machine)
 	}
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, atapi_exit);
 
-	state->atapi_data = auto_alloc_array( machine, UINT8, ATAPI_DATA_SIZE );
 
-	state->save_pointer( NAME(state->atapi_regs), ATAPI_REG_MAX );
-	state->save_pointer( NAME(state->atapi_data), ATAPI_DATA_SIZE / 2 );
+	state->save_item( NAME(state->atapi_regs) );
+	state->save_item( NAME(state->atapi_data) );
 	state->save_item( NAME(state->atapi_data_ptr) );
 	state->save_item( NAME(state->atapi_data_len) );
 	state->save_item( NAME(state->atapi_xferlen) );

@@ -156,8 +156,8 @@ public:
 	ssingles_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 *colorram;
+	UINT8 videoram[VMEM_SIZE];
+	UINT8 colorram[VMEM_SIZE];
 	UINT8 prot_data;
 	pen_t pens[NUM_PENS];
 };
@@ -549,10 +549,8 @@ static DRIVER_INIT(ssingles)
 {
 	ssingles_state *state = machine->driver_data<ssingles_state>();
 
-	state->videoram=auto_alloc_array_clear(machine, UINT8, VMEM_SIZE);
-	state->colorram=auto_alloc_array_clear(machine, UINT8, VMEM_SIZE);
-	state->save_pointer(NAME(state->videoram), VMEM_SIZE);
-	state->save_pointer(NAME(state->colorram), VMEM_SIZE);
+	state->save_item(NAME(state->videoram));
+	state->save_item(NAME(state->colorram));
 }
 
 GAME( 1983, ssingles, 0, ssingles, ssingles, ssingles, ROT90, "Ent. Ent. Ltd", "Swinging Singles", GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )

@@ -8,9 +8,6 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *       rambanks;
-	UINT8 *       palette_ram;
-	UINT8 *       empty_ram;
 	UINT8 *       shared_ram;
 
 	/* video-related */
@@ -50,6 +47,11 @@ public:
 	/* devices */
 	device_t *maincpu;
 	device_t *audiocpu;
+
+	/* memory buffers */
+	UINT8         rambanks[0x1000 * 12];
+	UINT8         palette_ram[0x1000];
+	UINT8         empty_ram[0x1000];
 };
 
 /*----------- defined in video/taito_l.c -----------*/

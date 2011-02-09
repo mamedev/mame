@@ -654,11 +654,11 @@ static MACHINE_START( thunderx )
 	memory_configure_bank(machine, "bank1", 12, 4, &ROM[0x08000], 0x2000);
 	memory_set_bank(machine, "bank1", 0);
 
-	state->pmcram = auto_alloc_array_clear(machine, UINT8, 0x800);
+	memset(state->pmcram, 0, sizeof(state->pmcram));
 
 	MACHINE_START_CALL(scontra);
 
-	state->save_pointer(NAME(state->pmcram), 0x800);
+	state->save_item(NAME(state->pmcram));
 }
 
 static MACHINE_RESET( scontra )

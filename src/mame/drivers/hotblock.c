@@ -53,11 +53,13 @@ public:
 
 	/* memory pointers */
 	UINT8 *  vram;
-	UINT8 *  pal;
 
 	/* misc */
 	int      port0;
 	int      port4;
+
+	/* memory */
+	UINT8    pal[0x10000];
 };
 
 
@@ -133,8 +135,7 @@ ADDRESS_MAP_END
 static VIDEO_START(hotblock)
 {
 	hotblock_state *state = machine->driver_data<hotblock_state>();
-	state->pal = auto_alloc_array(machine, UINT8, 0x10000);
-	state->save_pointer(NAME(state->pal), 0x10000);
+	state->save_item(NAME(state->pal));
 }
 
 static VIDEO_UPDATE(hotblock)

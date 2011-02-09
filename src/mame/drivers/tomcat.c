@@ -45,7 +45,7 @@ public:
 
 	int control_num;
 	UINT16 *shared_ram;
-	UINT8 *nvram;
+	UINT8 nvram[0x800];
 	int dsp_BIO;
 	int dsp_idle;
 };
@@ -354,10 +354,9 @@ static MACHINE_START(tomcat)
 	((UINT16*)state->shared_ram)[0x0002] = 0xf600;
 	((UINT16*)state->shared_ram)[0x0003] = 0x0000;
 
-	state->nvram = auto_alloc_array(machine, UINT8, 0x800);
 	machine->device<nvram_device>("nvram")->set_base(state->nvram, 0x800);
 
-	state->save_pointer(NAME(state->nvram), 0x800);
+	state->save_item(NAME(state->nvram));
 	state->save_item(NAME(state->control_num));
 	state->save_item(NAME(state->dsp_BIO));
 	state->save_item(NAME(state->dsp_idle));

@@ -6,7 +6,6 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	INT16 *    sampledata;
 	UINT16 *   tmnt2_1c0800;
 	UINT16 *   sunset_104000;
 	UINT16 *   tmnt2_rom;
@@ -47,6 +46,9 @@ public:
 	device_t *k054000;
 	device_t *upd;
 	device_t *samples;
+
+	/* memory buffers */
+	INT16      sampledata[0x40000];
 };
 
 

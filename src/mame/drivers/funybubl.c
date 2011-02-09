@@ -207,8 +207,7 @@ static MACHINE_START( funybubl )
 
 	state->audiocpu = machine->device("audiocpu");
 
-	state->banked_vram = auto_alloc_array(machine, UINT8, 0x2000);
-	state->save_pointer(NAME(state->banked_vram), 0x2000);
+	state->save_item(NAME(state->banked_vram));
 
 	memory_configure_bank(machine, "bank1", 0, 2, &state->banked_vram[0x0000], 0x1000);
 	memory_configure_bank(machine, "bank2", 0, 0x10, &ROM[0x10000], 0x4000);

@@ -7,11 +7,13 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *    banked_vram;
 	UINT8 *    paletteram;
 
 	/* devices */
 	device_t *audiocpu;
+
+	/* memory */
+	UINT8      banked_vram[0x2000];
 };
 
 

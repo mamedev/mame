@@ -146,13 +146,9 @@ static MACHINE_START( taito_l )
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
 
-	state->rambanks = auto_alloc_array(machine, UINT8, 0x1000 * 12);
-	state->palette_ram = auto_alloc_array(machine, UINT8, 0x1000);
-	state->empty_ram = auto_alloc_array(machine, UINT8, 0x1000);
-
-	state->save_pointer(NAME(state->rambanks), 0x1000 * 12);
-	state->save_pointer(NAME(state->palette_ram), 0x1000);
-	state->save_pointer(NAME(state->empty_ram), 0x1000);
+	state->save_item(NAME(state->rambanks));
+	state->save_item(NAME(state->palette_ram));
+	state->save_item(NAME(state->empty_ram));
 
 	state_register(machine);
 }

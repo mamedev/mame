@@ -73,10 +73,6 @@ public:
 	lastfght_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	/* memory pointers */
-	UINT8 *  colorram;
-//  UINT8 *  nvram; // currently this uses generic nvram handling
-
 	/* video-related */
 	bitmap_t *bitmap[2];
 	int clr_offset;
@@ -89,6 +85,9 @@ public:
 
 	/* devices */
 	device_t *maincpu;
+
+	/* memory */
+	UINT8   colorram[256 * 3];
 };
 
 
@@ -103,11 +102,9 @@ static VIDEO_START( lastfght )
 	for (i = 0; i < 2; i++)
 		state->bitmap[i] = machine->primary_screen->alloc_compatible_bitmap();
 
-	state->colorram = auto_alloc_array(machine, UINT8, 256 * 3);
-
 	state->save_item(NAME(*state->bitmap[0]));
 	state->save_item(NAME(*state->bitmap[1]));
-	state->save_pointer(NAME(state->colorram), 256 * 3);
+	state->save_item(NAME(state->colorram));
 }
 
 

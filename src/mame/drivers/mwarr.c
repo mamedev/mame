@@ -53,7 +53,7 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *bg_videoram, *mlow_videoram, *mhigh_videoram, *tx_videoram, *sprites_buffer;
+	UINT16 *bg_videoram, *mlow_videoram, *mhigh_videoram, *tx_videoram;
 	UINT16 *bg_scrollram, *mlow_scrollram, *mhigh_scrollram, *vidattrram;
 	UINT16 *spriteram;
 //  UINT16 *paletteram;    // currently this uses generic palette handling
@@ -64,6 +64,8 @@ public:
 
 	/* misc */
 	int which;
+
+	UINT16 sprites_buffer[0x800];
 };
 
 
@@ -373,8 +375,6 @@ static VIDEO_START( mwarr )
 	state->mhigh_tilemap = tilemap_create(machine, get_mhigh_tile_info, tilemap_scan_cols, 16, 16, 64, 16);
 	state->tx_tilemap    = tilemap_create(machine, get_tx_tile_info,    tilemap_scan_rows,  8,  8, 64, 32);
 
-	state->sprites_buffer = auto_alloc_array(machine, UINT16, 0x800);
-
 	tilemap_set_transparent_pen(state->mlow_tilemap, 0);
 	tilemap_set_transparent_pen(state->mhigh_tilemap, 0);
 	tilemap_set_transparent_pen(state->tx_tilemap, 0);
@@ -383,7 +383,7 @@ static VIDEO_START( mwarr )
 	tilemap_set_scroll_rows(state->mlow_tilemap, 256);
 	tilemap_set_scroll_rows(state->mhigh_tilemap, 256);
 
-	state->save_pointer(NAME(state->sprites_buffer), 0x800);
+	state->save_item(NAME(state->sprites_buffer));
 }
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )

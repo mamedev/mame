@@ -301,8 +301,7 @@ static SAMPLES_START( tmnt_decode_sample )
 	int i;
 	UINT8 *source = machine->region("title")->base();
 
-	state->sampledata = auto_alloc_array(machine, INT16, 0x40000);
-	state->save_pointer(NAME(state->sampledata), 0x40000);
+	state->save_item(NAME(state->sampledata));
 
 	/*  Sound sample for TMNT.D05 is stored in the following mode (ym3012 format):
      *

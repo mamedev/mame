@@ -182,8 +182,6 @@ public:
 
 	/* Video related */
 
-	UINT8* vid;
-
 	int disp_enable;
 	int xor_paltype;
 	int xor_palette;
@@ -198,6 +196,7 @@ public:
 	UINT8 hopper_motor;
 	UINT8 hopper;
 
+	UINT8 vid[multfish_VIDRAM_SIZE];
 };
 
 static TILE_GET_INFO( get_multfish_tile_info )
@@ -231,9 +230,8 @@ static VIDEO_START(multfish)
 {
 	multfish_state *state = machine->driver_data<multfish_state>();
 
-	state->vid = auto_alloc_array(machine, UINT8, multfish_VIDRAM_SIZE);
-	memset(state->vid,0x00,multfish_VIDRAM_SIZE);
-	state->save_pointer(NAME(state->vid), multfish_VIDRAM_SIZE);
+	memset(state->vid,0x00,sizeof(state->vid));
+	state->save_item(NAME(state->vid));
 
 	state->tilemap = tilemap_create(machine,get_multfish_tile_info,tilemap_scan_rows,16,16, 64, 32);
 	tilemap_set_transparent_pen(state->tilemap,255);

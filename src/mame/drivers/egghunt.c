@@ -52,8 +52,6 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *   bgram;
-	UINT8 *   atram;
 	UINT8 *   spram;
 //  UINT8 *   paletteram;   // currently this uses generic palette handling
 
@@ -67,6 +65,10 @@ public:
 
 	/* devices */
 	device_t *audiocpu;
+
+	/* memory */
+	UINT8     bgram[0x1000];
+	UINT8     atram[0x1000];
 };
 
 
@@ -168,11 +170,9 @@ static VIDEO_START(egghunt)
 	egghunt_state *state = machine->driver_data<egghunt_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
-	state->bgram = auto_alloc_array(machine, UINT8, 0x1000);
-	state->spram = auto_alloc_array(machine, UINT8, 0x1000);
 
-	state->save_pointer(NAME(state->bgram), 0x1000);
-	state->save_pointer(NAME(state->spram), 0x1000);
+	state->save_item(NAME(state->bgram));
+	state->save_item(NAME(state->spram));
 }
 
 static VIDEO_UPDATE(egghunt)

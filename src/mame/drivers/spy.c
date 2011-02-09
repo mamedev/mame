@@ -514,7 +514,7 @@ static MACHINE_START( spy )
 	memory_configure_bank(machine, "bank1", 0, 12, &ROM[0x10000], 0x2000);
 
 	machine->generic.paletteram.u8 = auto_alloc_array_clear(machine, UINT8, 0x800);
-	state->pmcram = auto_alloc_array_clear(machine, UINT8, 0x800);
+	memset(state->pmcram, 0, sizeof(state->pmcram));
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -527,8 +527,8 @@ static MACHINE_START( spy )
 	state->save_item(NAME(state->pmcbank));
 	state->save_item(NAME(state->video_enable));
 	state->save_item(NAME(state->old_3f90));
-	state_save_register_global_pointer(machine, machine->generic.paletteram.u8, 0x800);
-	state->save_pointer(NAME(state->pmcram), 0x800);
+	state->save_pointer(NAME(machine->generic.paletteram.u8), 0x800);
+	state->save_item(NAME(state->pmcram));
 }
 
 static MACHINE_RESET( spy )

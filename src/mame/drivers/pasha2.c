@@ -83,14 +83,16 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *     bitmap0;
-	UINT16 *     bitmap1;
 	UINT16 *     paletteram;
 	UINT16 *     wram;
 
 	/* video-related */
 	int vbuffer;
 	int old_bank;
+
+	/* memory */
+	UINT16       bitmap0[0x40000/2];
+	UINT16       bitmap1[0x40000/2];
 };
 
 
@@ -325,11 +327,9 @@ INPUT_PORTS_END
 static VIDEO_START( pasha2 )
 {
 	pasha2_state *state = machine->driver_data<pasha2_state>();
-	state->bitmap0 = auto_alloc_array(machine, UINT16, 0x40000/2);
-	state->bitmap1 = auto_alloc_array(machine, UINT16, 0x40000/2);
 
-	state->save_pointer(NAME(state->bitmap0), 0x40000/2);
-	state->save_pointer(NAME(state->bitmap1), 0x40000/2);
+	state->save_item(NAME(state->bitmap0));
+	state->save_item(NAME(state->bitmap1));
 }
 
 static VIDEO_UPDATE( pasha2 )

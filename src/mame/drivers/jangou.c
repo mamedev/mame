@@ -40,11 +40,6 @@ public:
 	jangou_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	/* video-related */
-	UINT8        *blit_buffer;
-	UINT8        pen_data[0x10];
-	UINT8        blit_data[6];
-
 	/* sound-related */
 	// Jangou CVSD Sound
 	emu_timer    *cvsd_bit_timer;
@@ -63,6 +58,11 @@ public:
 	device_t *cpu_1;
 	device_t *cvsd;
 	device_t *nsc;
+
+	/* video-related */
+	UINT8        pen_data[0x10];
+	UINT8        blit_data[6];
+	UINT8        blit_buffer[256 * 256];
 };
 
 
@@ -116,8 +116,7 @@ static VIDEO_START( jangou )
 {
 	jangou_state *state = machine->driver_data<jangou_state>();
 
-	state->blit_buffer = auto_alloc_array(machine, UINT8, 256 * 256);
-	state->save_pointer(NAME(state->blit_buffer), 256 * 256);
+	state->save_item(NAME(state->blit_buffer));
 }
 
 static VIDEO_UPDATE( jangou )

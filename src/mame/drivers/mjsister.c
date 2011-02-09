@@ -21,9 +21,6 @@ public:
 	mjsister_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	/* memory pointers */
-	UINT8 *     videoram0, *videoram1;
-
 	/* video-related */
 	bitmap_t *tmpbitmap0, *tmpbitmap1;
 	int  flip_screen;
@@ -43,6 +40,10 @@ public:
 	/* devices */
 	device_t *maincpu;
 	device_t *dac;
+
+	/* memory */
+	UINT8 videoram0[0x8000];
+	UINT8 videoram1[0x8000];
 };
 
 
@@ -57,11 +58,9 @@ static VIDEO_START( mjsister )
 	mjsister_state *state = machine->driver_data<mjsister_state>();
 	state->tmpbitmap0 = auto_bitmap_alloc(machine, 256, 256, machine->primary_screen->format());
 	state->tmpbitmap1 = auto_bitmap_alloc(machine, 256, 256, machine->primary_screen->format());
-	state->videoram0 = auto_alloc_array(machine, UINT8, 0x8000);
-	state->videoram1 = auto_alloc_array(machine, UINT8, 0x8000);
 
-	state->save_pointer(NAME(state->videoram0), 0x8000);
-	state->save_pointer(NAME(state->videoram1), 0x8000);
+	state->save_item(NAME(state->videoram0));
+	state->save_item(NAME(state->videoram1));
 }
 
 static void mjsister_plot0( running_machine *machine, int offset, UINT8 data )

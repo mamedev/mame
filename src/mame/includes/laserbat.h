@@ -12,8 +12,6 @@ public:
 
 	/* video-related */
 	tilemap_t    *bg_tilemap;
-	UINT8      *videoram;
-	UINT8      *colorram;
 	int        video_page;
 
 	/* misc */
@@ -44,6 +42,10 @@ public:
 	device_t *tms2;
 	device_t *ay1;
 	device_t *ay2;
+
+	// memory
+	UINT8      videoram[0x400];
+	UINT8      colorram[0x400];
 };
 
 

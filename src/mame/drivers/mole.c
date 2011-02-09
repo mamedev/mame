@@ -59,12 +59,12 @@ public:
 	mole_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	/* memory pointers */
-	UINT16 *     tileram;
-
 	/* video-related */
 	tilemap_t    *bg_tilemap;
 	int          tile_bank;
+
+	/* memory */
+	UINT16       tileram[0x400];
 };
 
 
@@ -93,10 +93,10 @@ static TILE_GET_INFO( get_bg_tile_info )
 static VIDEO_START( mole )
 {
 	mole_state *state = machine->driver_data<mole_state>();
-	state->tileram = auto_alloc_array_clear(machine, UINT16, 0x400);
+	memset(state->tileram, 0, sizeof(state->tileram));
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 40, 25);
 
-	state->save_pointer(NAME(state->tileram), 0x400);
+	state->save_item(NAME(state->tileram));
 }
 
 static WRITE8_HANDLER( mole_videoram_w )

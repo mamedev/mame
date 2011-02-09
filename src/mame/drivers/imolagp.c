@@ -102,12 +102,14 @@ public:
 	UINT8 control;
 	UINT8 scroll;
 	UINT8 steerlatch;
-	UINT8 *videoram[3];
 	int   draw_mode;
 	int   oldsteer;
 
 	/* devices */
 	device_t *slavecpu;
+
+	/* memory */
+	UINT8  videoram[3][0x4000];
 };
 
 
@@ -185,16 +187,9 @@ static void initialize_colors( running_machine *machine )
 static VIDEO_START( imolagp )
 {
 	imolagp_state *state = machine->driver_data<imolagp_state>();
-	int i;
-	for (i = 0; i < 3; i++)
-	{
-		state->videoram[i] = auto_alloc_array(machine, UINT8, 0x4000);
-		memset(state->videoram[i], 0x00, 0x4000);
-	}
-
-	state->save_pointer(NAME(state->videoram[0]), 0x4000);
-	state->save_pointer(NAME(state->videoram[1]), 0x4000);
-	state->save_pointer(NAME(state->videoram[2]), 0x4000);
+	
+	memset(state->videoram, 0, sizeof(state->videoram));
+	state->save_item(NAME(state->videoram));
 
 	initialize_colors(machine);
 }

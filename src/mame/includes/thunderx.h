@@ -12,7 +12,7 @@ public:
 
 	/* memory pointers */
 	UINT8 *    ram;
-	UINT8 *    pmcram;
+	UINT8      pmcram[0x800];
 //  UINT8 *    paletteram;    // currently this uses generic palette handling
 
 	/* video-related */

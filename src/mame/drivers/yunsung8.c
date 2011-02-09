@@ -471,7 +471,6 @@ static MACHINE_START( yunsung8 )
 	UINT8 *MAIN = machine->region("maincpu")->base();
 	UINT8 *AUDIO = machine->region("audiocpu")->base();
 
-	state->videoram = auto_alloc_array(machine, UINT8, 0x4000);
 	state->videoram_0 = state->videoram + 0x0000;	// Ram is banked
 	state->videoram_1 = state->videoram + 0x2000;
 
@@ -482,7 +481,7 @@ static MACHINE_START( yunsung8 )
 
 	state->audiocpu = machine->device("audiocpu");
 
-	state->save_pointer(NAME(state->videoram), 0x4000);
+	state->save_item(NAME(state->videoram));
 	state->save_item(NAME(state->layers_ctrl));
 	state->save_item(NAME(state->videobank));
 	state->save_item(NAME(state->adpcm));

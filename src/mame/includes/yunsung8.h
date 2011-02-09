@@ -10,9 +10,6 @@ public:
 	yunsung8_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	/* memory pointers */
-	UINT8 *     videoram;
-
 	/* video-related */
 	tilemap_t     *tilemap_0, *tilemap_1;
 	UINT8       *videoram_0, *videoram_1;
@@ -25,6 +22,9 @@ public:
 
 	/* devices */
 	device_t *audiocpu;
+
+	/* memory */
+	UINT8      videoram[0x4000];
 };
 
 

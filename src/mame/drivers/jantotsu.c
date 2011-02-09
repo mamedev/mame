@@ -103,11 +103,6 @@ public:
 	jantotsu_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	/* video-related */
-	UINT8    *bitmap;
-	UINT8    vram_bank, col_bank;
-	UINT8    display_on;
-
 	/* sound-related */
 	UINT32   adpcm_pos;
 	UINT8    adpcm_idle;
@@ -116,6 +111,11 @@ public:
 
 	/* misc */
 	UINT8    mux_data;
+
+	/* video-related */
+	UINT8    vram_bank, col_bank;
+	UINT8    display_on;
+	UINT8    bitmap[0x8000];
 };
 
 
@@ -129,8 +129,7 @@ static VIDEO_START(jantotsu)
 {
 	jantotsu_state *state = machine->driver_data<jantotsu_state>();
 
-	state->bitmap = auto_alloc_array(machine, UINT8, 0x8000);
-	state->save_pointer(NAME(state->bitmap), 0x8000);
+	state->save_item(NAME(state->bitmap));
 }
 
 static VIDEO_UPDATE(jantotsu)
