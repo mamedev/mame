@@ -76,38 +76,6 @@ static INTERRUPT_GEN( srmp2_interrupt )
 	}
 }
 
-
-static DRIVER_INIT( srmp2 )
-{
-	UINT16 *RAM = (UINT16 *) machine->region("maincpu")->base();
-
-	/* Fix "ERROR BACK UP" and "ERROR IOX" */
-	RAM[0x20c80 / 2] = 0x4e75;								// RTS
-}
-
-static DRIVER_INIT( srmp3 )
-{
-	UINT8 *RAM = machine->region("maincpu")->base();
-
-	/* BANK ROM (0x08000 - 0x1ffff) Check skip [MAIN ROM side] */
-	RAM[0x00000 + 0x7b69] = 0x00;							// NOP
-	RAM[0x00000 + 0x7b6a] = 0x00;							// NOP
-
-	/* MAIN ROM (0x00000 - 0x07fff) Check skip [BANK ROM side] */
-	RAM[0x08000 + 0xc10b] = 0x00;							// NOP
-	RAM[0x08000 + 0xc10c] = 0x00;							// NOP
-	RAM[0x08000 + 0xc10d] = 0x00;							// NOP
-	RAM[0x08000 + 0xc10e] = 0x00;							// NOP
-	RAM[0x08000 + 0xc10f] = 0x00;							// NOP
-	RAM[0x08000 + 0xc110] = 0x00;							// NOP
-	RAM[0x08000 + 0xc111] = 0x00;							// NOP
-
-	/* "ERR IOX" Check skip [MAIN ROM side] */
-	RAM[0x00000 + 0x784e] = 0x00;							// NOP
-	RAM[0x00000 + 0x784f] = 0x00;							// NOP
-	RAM[0x00000 + 0x7850] = 0x00;							// NOP
-}
-
 static MACHINE_RESET( srmp2 )
 {
 	srmp2_state *state = machine->driver_data<srmp2_state>();
@@ -413,99 +381,97 @@ static ADDRESS_MAP_START( mjyuugi_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static READ8_HANDLER( srmp3_cchip_status_0_r )
+static READ8_HANDLER( vox_status_r )
 {
-	return 0x01;
+	return 1;
 }
 
-static READ8_HANDLER( srmp3_cchip_status_1_r )
+static UINT8 iox_data,iox_mux,iox_ff;
+
+static UINT8 iox_key_matrix_calc(running_machine *machine,UINT8 p_side)
 {
-	return 0x01;
-}
+	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7" };
+	int i, j, t;
 
-static WRITE8_HANDLER( srmp3_input_1_w )
-{
-/*
-    ---- --x- : Player 1 side flag ?
-    ---- -x-- : Player 2 side flag ?
-*/
-
-	srmp2_state *state = space->machine->driver_data<srmp2_state>();
-	logerror("PC:%04X DATA:%02X  srmp3_input_1_w\n", cpu_get_pc(space->cpu), data);
-
-	state->port_select = 0;
-
+	for (i = 0x00 ; i < 0x20 ; i += 8)
 	{
-		static int qqq01 = 0;
-		static int qqq02 = 0;
-		static int qqq49 = 0;
-		static int qqqzz = 0;
+		j = (i / 0x08);
 
-		if (data == 0x01) qqq01++;
-		else if (data == 0x02) qqq02++;
-		else if (data == 0x49) qqq49++;
-		else qqqzz++;
-
-//      popmessage("%04X %04X %04X %04X", qqq01, qqq02, qqq49, qqqzz);
-	}
-}
-
-static WRITE8_HANDLER( srmp3_input_2_w )
-{
-	srmp2_state *state = space->machine->driver_data<srmp2_state>();
-
-	/* Key matrix reading related ? */
-
-	logerror("PC:%04X DATA:%02X  srmp3_input_2_w\n", cpu_get_pc(space->cpu), data);
-
-	state->port_select = 1;
-
-}
-
-static READ8_HANDLER( srmp3_input_r )
-{
-/*
-    ---x xxxx : Key code
-    --x- ---- : Player 1 and 2 side flag
-*/
-
-	/* Currently I/O port of srmp3 is fully understood. */
-
-	int keydata = 0xff;
-	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
-
-	logerror("PC:%04X          srmp3_input_r\n", cpu_get_pc(space->cpu));
-
-	// PC:0x8903    ROM:0xC903
-	// PC:0x7805    ROM:0x7805
-
-	if ((cpu_get_pc(space->cpu) == 0x8903) || (cpu_get_pc(space->cpu) == 0x7805))	/* Panel keys */
-	{
-		int i, j, t;
-
-		for (i = 0x00 ; i < 0x20 ; i += 8)
+		for (t = 0 ; t < 8 ; t ++)
 		{
-			j = (i / 0x08);
-
-			for (t = 0 ; t < 8 ; t ++)
+			if (!(input_port_read(machine, keynames[j+p_side]) & ( 1 << t )))
 			{
-				if (!(input_port_read(space->machine, keynames[j]) & ( 1 << t )))
-				{
-					keydata = (i + t);
-				}
+				return (i + t) | (p_side ? 0x20 : 0x00);
 			}
 		}
 	}
 
-	// PC:0x8926    ROM:0xC926
-	// PC:0x7822    ROM:0x7822
+	return 0;
+}
 
-	if ((cpu_get_pc(space->cpu) == 0x8926) || (cpu_get_pc(space->cpu) == 0x7822))	/* Analizer and memory reset keys */
+static READ8_HANDLER( iox_mux_r )
+{
+	switch(iox_data)
 	{
-		keydata = input_port_read(space->machine, "SERVICE");
+		/* rmgoldyh */
+		case 0x43: return 0x9a;
+		case 0x45: return 0x00;
+		/* srmp3 */
+		case 0x49: return 0xc9;
+		case 0x4c: return 0x00;
+		case 0x1c: return 0x04;
 	}
 
-	return keydata;
+	if(iox_ff == 0)
+	{
+		if(iox_mux != 1 && iox_mux != 2 && iox_mux != 4) //unknown command
+			return 0xff;
+
+		/* both side checks */
+		if(iox_mux == 1)
+		{
+			UINT8 p1_side = iox_key_matrix_calc(space->machine,0);
+			UINT8 p2_side = iox_key_matrix_calc(space->machine,4);
+
+			if(p1_side != 0)
+				return p1_side;
+
+			return p2_side;
+		}
+
+		return iox_key_matrix_calc(space->machine,(iox_mux == 2) ? 0 : 4);
+	}
+
+	return input_port_read(space->machine,"SERVICE") & 0xff;
+}
+
+static READ8_HANDLER( iox_status_r )
+{
+	return 1;
+}
+
+static WRITE8_HANDLER( iox_command_w )
+{
+	/*
+	bit wise command port apparently
+	0x01: selects both sides
+	0x02: selects p1 side
+	0x04: selects p2 side
+	*/
+
+	iox_mux = data;
+	iox_ff = 0;
+}
+
+static WRITE8_HANDLER( iox_data_w )
+{
+	iox_data = data;
+
+	if(data == 0xc8) //resets device
+		iox_ff = 0;
+
+	if(data == 0xff || data == 0xef) // flip-flop command
+		iox_ff ^= 1;
 }
 
 static WRITE8_HANDLER( srmp3_flags_w )
@@ -540,14 +506,13 @@ static ADDRESS_MAP_START( srmp3_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x20, 0x20) AM_WRITENOP								/* elapsed interrupt signal */
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("SYSTEM")	AM_WRITE(srmp3_flags_w)	/* coin, service | GFX bank, counter, lockout */
 	AM_RANGE(0x60, 0x60) AM_WRITE(srmp3_rombank_w)						/* ROM bank select */
-	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE("msm", srmp3_adpcm_code_w)					/* ADPCM number */
-	AM_RANGE(0xa1, 0xa1) AM_READ(srmp3_cchip_status_0_r)				/* custom chip status ??? */
-	AM_RANGE(0xc0, 0xc0) AM_READWRITE(srmp3_input_r, srmp3_input_1_w)	/* key matrix | I/O ??? */
-	AM_RANGE(0xc1, 0xc1) AM_READWRITE(srmp3_cchip_status_1_r, srmp3_input_2_w)	/* custom chip status ??? | I/O ??? */
+	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE("msm", srmp3_adpcm_code_w)	/* ADPCM number */
+	AM_RANGE(0xa1, 0xa1) AM_READ(vox_status_r)				/* ADPCM voice status */
+	AM_RANGE(0xc0, 0xc0) AM_READWRITE(iox_mux_r, iox_command_w)	/* key matrix | I/O */
+	AM_RANGE(0xc1, 0xc1) AM_READWRITE(iox_status_r,iox_data_w)
 	AM_RANGE(0xe0, 0xe1) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xe2, 0xe2) AM_DEVREAD("aysnd", ay8910_r)
 ADDRESS_MAP_END
-
 
 static ADDRESS_MAP_START( rmgoldyh_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -558,11 +523,6 @@ static ADDRESS_MAP_START( rmgoldyh_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(srmp2_state,spriteram2.u8)			/* Sprites Code + X + Attr */
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE_MEMBER(srmp2_state,spriteram3.u8)
 ADDRESS_MAP_END
-
-static READ8_HANDLER( vox_status_r )
-{
-	return 1;
-}
 
 static WRITE8_HANDLER( rmgoldyh_rombank_w )
 {
@@ -583,85 +543,13 @@ static WRITE8_HANDLER( rmgoldyh_rombank_w )
 	memory_set_bankptr(space->machine, "bank1", &ROM[addr]);
 }
 
-static UINT8 iox_data,iox_mux,iox_ff;
-
-static UINT8 iox_key_matrix_calc(running_machine *machine,UINT8 p_side)
-{
-	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7" };
-	int i, j, t;
-
-	for (i = 0x00 ; i < 0x20 ; i += 8)
-	{
-		j = (i / 0x08);
-
-		for (t = 0 ; t < 8 ; t ++)
-		{
-			if (!(input_port_read(machine, keynames[j+p_side]) & ( 1 << t )))
-			{
-				return (i + t) | (p_side ? 0x20 : 0x00);
-			}
-		}
-	}
-
-	return 0xff;
-}
-
-static READ8_HANDLER( iox_mux_r )
-{
-	switch(iox_data)
-	{
-		case 0x43: return 0x9a;
-		case 0x45: return 0x00;
-	}
-
-	if(iox_ff == 0)
-	{
-		if(iox_mux != 2 && iox_mux != 4) //unknown command
-			return 0xff;
-
-		return iox_key_matrix_calc(space->machine,(iox_mux == 2) ? 0 : 4);
-	}
-
-	return input_port_read(space->machine,"SERVICE") & 0xff;
-}
-
-static READ8_HANDLER( iox_status_r )
-{
-	return 1;
-}
-
-static WRITE8_HANDLER( iox_command_w )
-{
-	iox_mux = data;
-	iox_ff = 0;
-}
-
-static WRITE8_HANDLER( iox_data_w )
-{
-	iox_data = data;
-
-	if(data == 0xc8) //resets device
-		iox_ff = 0;
-
-	if(data == 0xff)
-		iox_ff ^= 1;
-}
-
 static ADDRESS_MAP_START( rmgoldyh_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP /* watchdog */
-	AM_RANGE(0x20, 0x20) AM_WRITENOP								/* elapsed interrupt signal */
-	AM_RANGE(0x40, 0x40) AM_READ_PORT("SYSTEM")	AM_WRITE(srmp3_flags_w)	/* coin, service | GFX bank, counter, lockout */
 	AM_RANGE(0x60, 0x60) AM_WRITE(rmgoldyh_rombank_w)						/* ROM bank select */
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("DSW4")
 	AM_RANGE(0x81, 0x81) AM_READ_PORT("DSW3")
-	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE("msm", srmp3_adpcm_code_w)	/* ADPCM number */
-	AM_RANGE(0xa1, 0xa1) AM_READ(vox_status_r)				/* vox status */
-	AM_RANGE(0xc0, 0xc0) AM_READWRITE(iox_mux_r, iox_command_w)	/* key matrix | I/O */
-	AM_RANGE(0xc1, 0xc1) AM_READWRITE(iox_status_r,iox_data_w)
-	AM_RANGE(0xe0, 0xe1) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0xe2, 0xe2) AM_DEVREAD("aysnd", ay8910_r)
+	AM_IMPORT_FROM(srmp3_io_map)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -1704,10 +1592,17 @@ ROM_START( ponchina )
 	ROM_LOAD( "um2_1_10.u63", 0x080000, 0x080000, CRC(53e643e9) SHA1(3b221217e8f846ae96a9a47149037cea19d97549) )
 ROM_END
 
+static DRIVER_INIT( srmp2 )
+{
+	UINT16 *RAM = (UINT16 *) machine->region("maincpu")->base();
+
+	/* Fix "ERROR BACK UP" and "ERROR IOX" */
+	RAM[0x20c80 / 2] = 0x4e75;								// RTS
+}
 
 GAME( 1987, srmp1,     0,        srmp2,    srmp2,    0,       ROT0, "Seta",  				"Super Real Mahjong Part 1 (Japan)",  0 )
 GAME( 1987, srmp2,     0,        srmp2,    srmp2,    srmp2,   ROT0, "Seta",  				"Super Real Mahjong Part 2 (Japan)",  0 )
-GAME( 1988, srmp3,     0,        srmp3,    srmp3,    srmp3,   ROT0, "Seta",  				"Super Real Mahjong Part 3 (Japan)",  0 )
+GAME( 1988, srmp3,     0,        srmp3,    srmp3,    0,       ROT0, "Seta",  				"Super Real Mahjong Part 3 (Japan)",  0 )
 GAME( 1988, rmgoldyh,  srmp3,    rmgoldyh, rmgoldyh, 0,       ROT0, "Seta / Alba",	        "Real Mahjong Gold Yumehai (Japan)",  GAME_NOT_WORKING )
 GAME( 1990, mjyuugi,   0,        mjyuugi,  mjyuugi,  0,       ROT0, "Visco", 				"Mahjong Yuugi (Japan set 1)",        0 )
 GAME( 1990, mjyuugia,  mjyuugi,  mjyuugi,  mjyuugi,  0,       ROT0, "Visco", 				"Mahjong Yuugi (Japan set 2)",        0 )
