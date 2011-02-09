@@ -7918,7 +7918,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( sengekis )	/* 1997.?? (c) 1997 Kaneko / Warashi (Asia) */
 	DRIVER( sengekisj )	/* 1997.07 (c) 1997 Kaneko / Warashi (Japan) */
 	DRIVER( jjparad2 )	/* 1997.12 (c) 1997 Electro Design Co. (Japan) */
-	DRIVER( cyvern )	/* 1998.02 (c) 1998 Kaneko (Japan) */
+	DRIVER( cyvern )	/* 1998.02 (c) 1998 Kaneko (US) */
+	DRIVER( cyvernj )	/* 1998.02 (c) 1998 Kaneko (Japan) */
 	DRIVER( ryouran )	/* 1998.07 (c) 1998 Electro Design Co. (Japan) */
 	DRIVER( puzzloop )	/* 1998.?? (c) 1998 Mitchell (Europe) */
 	DRIVER( puzzloopj )	/* 1998.12 (c) 1998 Mitchell (Japan) */

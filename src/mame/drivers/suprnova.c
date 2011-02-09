@@ -13,8 +13,6 @@ Mainboard + Cart combo
     Green      = Asia
     Red        = Korean
 
- There is a USA version of Cyvern known to exist, but not dumped. The cart color is Black.
-
   Credits (in no particular order):
    Olivier Galibert for all the assistance and information he's provided
    R.Belmont for working on the SH2 timers so sound worked
@@ -27,56 +25,16 @@ Puzz Loop is currently the only game dumped for all known regions.  This game is
    ROM-2-BOARD using EPROMs labeled for the ROM 4 BOARD, but inserted in sockets at U8 & U10
 
 ToDo:
-   Priorities
-   Transparency effects (each pen has a transparent flag, there are seperate r,g,b alpha values to be used for these pens)
-   Idle skipping on other games + bios ..
-   Fix gaps between zoomed sprites (See Gals Panic 4 continue screen and timer)
-   Fix broken games
 
-Alpha pens:
-   galpanis uses them to white in/out the bg's during attract? Solid white atm.
+galpanis: Are the priorities correct on the KANEKO logo at the start, the invisible faded logo obscures the rotating white lines
 
-Priorities:
-   Puzzloop appears to use the priorities, the other games might use alpha effects to disable a layer instead ..
-     *they don't appear to use alpha, so how should it work, senknow intro, galpanis attract,  cyvern level 4?
+video:   Sprite Zooming - the current algorithm is leaving gaps, most noticable in Gals Panic 4, and Jackie Chan which is sharing
+         the video code.
 
-Ram-Based Tiles:
-   The front layer in galpanic games
-   The kaneko logo in galpanis
-   The Bios
+video:   Sprite positions still kludged slightly (see skns_sprite_kludge)
 
-Sprite Zoom:
-   Used all over the place in the Gals Panic games, check the bit in galpani4 attract where if you hammer the button the ballon expands until it bursts.
-   Puzz Loop main logo
+general: bios is still being skipped, gets stuck at last bios screen if we run it (see #define BIOS_SKIP)   
 
-Roz:
-   Should be used on galpani4 bg's, but for some reason incxx,incxy,incyx,incyy are always 1,0,0,1 resp. Maybe a timer problem, input problem or core problem. Who knows?
-      Update, rand() was returning a 15-bit number under mingw. Top bit seemed to determine whether it rotated or not.
-   To zoom the skull in the senknow attract mode
-   To zoom the girl at the end of a level in galpanis
-   To zoom the kaneko logo in galpanis
-
-Linescroll:
-   Puzzloop intro, the screen covered in 'puzz loop' of varying sizes, the little ones go left and the big ones right.
-   Puzzloop title screen uses it just to scroll the bg up.
-   Also used behind the hi-score table on puzzloop...
-   Galpani4/galpanis use it for 2P mode on both bg A and bg B.
-
-R,G,B Brightness:
-   The Electro Design games have this set darker than 0xff for sprites and bg's anyway.
-   Galpanis uses it to dim the bg's in attract on the stats screens for the characters (bg's hidden by white pen atm).
-Lots of games use them to fade, haven't seen r,g,b used independently yet but you never know.
-
-etc.etc.
-
--pjp/dh
-
-gutsn Crash Reason
-the routine at 401d8c8 calls 40249e0 with r14 as a parameter, which points where the return pr on the stack is
-param is 60ffbc0, pr is at 60ffbcc, but 40249e0 writes more than 12 bytes
-Gutsn now works in 0.69, timing/sh2 fixes??
-
-Motherboard Layout
 ------------------
 
 SUPER-KANEKO-NOVA-SYSTEM
@@ -1052,7 +1010,33 @@ ROM_START( skns )
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) /* Samples */
 ROM_END
 
+
 ROM_START( cyvern )
+	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
+	ROM_LOAD       ( "sknsu1.u10",   0x000000, 0x080000, CRC(384d21ec) SHA1(a27e8a18099d9cea64fa32db28d01101c2a78815) ) /* US BIOS */
+
+	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
+	ROM_LOAD16_BYTE( "cv-usa.u10", 0x000000, 0x100000, CRC(1023ddca) SHA1(7967e3e876cdb797bdaa2eb5136a33cd43941501) )
+	ROM_LOAD16_BYTE( "cv-usa.u8",  0x000001, 0x100000, CRC(f696f6be) SHA1(d9e66173ca12693255d2bb0982da2fb96bfd155d) )
+
+	ROM_REGION( 0x800000, "gfx1", 0 ) /* Sprites */
+	ROM_LOAD( "cv100-00.u24", 0x000000, 0x400000, CRC(cd4ae88a) SHA1(925f4ae01a6ad3633be2a61be69e163f05401cf6) )
+	ROM_LOAD( "cv101-00.u20", 0x400000, 0x400000, CRC(a6cb3f0b) SHA1(8d83f44a096ca0a70962ca4c602c4331874c8560) )
+
+	ROM_REGION( 0x800000, "gfx2", 0 ) /* Tiles Plane A */
+	ROM_LOAD( "cv200-00.u16", 0x000000, 0x400000, CRC(ddc8c67e) SHA1(9b99e87e69e88011e6d693d19ac5e115b4fa50b0) )
+	ROM_LOAD( "cv201-00.u13", 0x400000, 0x400000, CRC(65863321) SHA1(b8b75f50406068ffc3fca3887d2f0a653ca491c9) )
+
+	ROM_REGION( 0x800000, "gfx3", ROMREGION_ERASE00 ) /* Tiles Plane B */
+	/* First 0x040000 bytes (0x03ff Tiles) are RAM Based Tiles */
+	/* 0x040000 - 0x3fffff empty? */
+	ROM_LOAD( "cv210-00.u18", 0x400000, 0x400000, CRC(7486bf3a) SHA1(3b4285ca570e9c5ad396c615bfc054372d1b0162) )
+
+	ROM_REGION( 0x400000, "ymz", 0 ) /* Samples */
+	ROM_LOAD( "cv300-00.u4", 0x000000, 0x400000, CRC(fbeda465) SHA1(4d5066a22f4589b6b7f85b3e77c348d900ac4bdd) )
+ROM_END
+
+ROM_START( cyvernj )
 	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
 	ROM_LOAD       ( "sknsj1.u10",   0x000000, 0x080000, CRC(7e2b836c) SHA1(92c5a7a2472496028bff0e5980d41dd294f42144) ) /* Japan BIOS */
 
@@ -1696,7 +1680,8 @@ GAME( 1997, sengekis,  skns,     skns, skns,     sengekis,  ROT90, "Kaneko / War
 GAME( 1997, sengekisj, sengekis, skns, skns,     sengekij,  ROT90, "Kaneko / Warashi", "Sengeki Striker (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, vblokbrk,  skns,     skns, vblokbrk, sarukani,  ROT0,  "Kaneko / Mediaworks", "VS Block Breaker (Asia)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, sarukani,  vblokbrk, skns, vblokbrk, sarukani,  ROT0,  "Kaneko / Mediaworks", "Saru-Kani-Hamu-Zou (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, cyvern,    skns,     skns, cyvern,   cyvern,    ROT90, "Kaneko", "Cyvern (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, cyvern,    skns,     skns, cyvern,   cyvern,    ROT90, "Kaneko", "Cyvern (US)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, cyvernj,   cyvern,   skns, cyvern,   cyvern,    ROT90, "Kaneko", "Cyvern (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, puzzloop,  skns,     skns, puzzloop, puzzloop,  ROT0,  "Mitchell", "Puzz Loop (Europe)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, puzzloopj, puzzloop, skns, puzzloop, puzzloopj, ROT0,  "Mitchell", "Puzz Loop (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, puzzloopa, puzzloop, skns, puzzloop, puzzloopa, ROT0,  "Mitchell", "Puzz Loop (Asia)", GAME_IMPERFECT_GRAPHICS )
