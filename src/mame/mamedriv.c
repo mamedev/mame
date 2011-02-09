@@ -11320,6 +11320,7 @@ Other Sun games
 	DRIVER( tsptr_l3 )
 	DRIVER( whirl_l3 )
 	DRIVER( whirl_l2 )
+	DRIVER( whirl_lg3 )
 
 
 	// s11c.c
