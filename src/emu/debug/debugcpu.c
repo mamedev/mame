@@ -91,6 +91,7 @@ struct _debugcpu_private
 	bool			debugger_access;
 
 	int				execution_state;
+	device_t *		m_stop_when_not_device;		// stop execution when the device ceases to be this
 
 	UINT32			bpindex;
 	UINT32			wpindex;
@@ -1093,6 +1094,7 @@ static void reset_transient_flags(running_machine &machine)
 	/* loop over CPUs and reset the transient flags */
 	for (device_t *device = machine.m_devicelist.first(); device != NULL; device = device->next())
 		device->debug()->reset_transient_flag();
+	machine.debugcpu_data->m_stop_when_not_device = NULL;
 }
 
 
@@ -1749,6 +1751,14 @@ void device_debug::start_hook(attotime endtime)
 	assert(global->livecpu == NULL);
 	global->livecpu = &m_device;
 
+	// if we're a new device, stop now
+	if (global->m_stop_when_not_device != NULL && global->m_stop_when_not_device != &m_device)
+	{
+		global->m_stop_when_not_device = NULL;
+		global->execution_state = EXECUTION_STATE_STOPPED;
+		reset_transient_flags(*m_device.machine);
+	}
+
 	// update the target execution end time
 	m_endexectime = endtime;
 
@@ -1803,13 +1813,6 @@ void device_debug::stop_hook()
 	debugcpu_private *global = m_device.machine->debugcpu_data;
 
 	assert(global->livecpu == &m_device);
-
-	// if we're stopping on a context switch, handle it now
-	if (m_flags & DEBUG_FLAG_STOP_CONTEXT)
-	{
-		global->execution_state = EXECUTION_STATE_STOPPED;
-		reset_transient_flags(*m_device.machine);
-	}
 
 	// clear the live CPU
 	global->livecpu = NULL;
@@ -2239,7 +2242,7 @@ void device_debug::go_next_device()
 
 	assert(m_exec != NULL);
 
-	m_flags |= DEBUG_FLAG_STOP_CONTEXT;
+	global->m_stop_when_not_device = &m_device;
 	global->execution_state = EXECUTION_STATE_RUNNING;
 }
 

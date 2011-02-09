@@ -349,7 +349,6 @@ private:
 	static const UINT32 DEBUG_FLAG_STEPPING_OVER	= 0x00000040;		// CPU is stepping over a function
 	static const UINT32 DEBUG_FLAG_STEPPING_OUT		= 0x00000080;		// CPU is stepping out of a function
 	static const UINT32 DEBUG_FLAG_STOP_PC			= 0x00000100;		// there is a pending stop at cpu->breakpc
-	static const UINT32 DEBUG_FLAG_STOP_CONTEXT		= 0x00000200;		// there is a pending stop on next context switch
 	static const UINT32 DEBUG_FLAG_STOP_INTERRUPT	= 0x00000400;		// there is a pending stop on the next interrupt
 	static const UINT32 DEBUG_FLAG_STOP_EXCEPTION	= 0x00000800;		// there is a pending stop on the next exception
 	static const UINT32 DEBUG_FLAG_STOP_VBLANK		= 0x00001000;		// there is a pending stop on the next VBLANK
@@ -358,7 +357,7 @@ private:
 
 	static const UINT32 DEBUG_FLAG_STEPPING_ANY		= DEBUG_FLAG_STEPPING | DEBUG_FLAG_STEPPING_OVER | DEBUG_FLAG_STEPPING_OUT;
 	static const UINT32 DEBUG_FLAG_TRACING_ANY		= DEBUG_FLAG_TRACING | DEBUG_FLAG_TRACING_OVER;
-	static const UINT32 DEBUG_FLAG_TRANSIENT		= DEBUG_FLAG_STEPPING_ANY | DEBUG_FLAG_STOP_PC | DEBUG_FLAG_STOP_CONTEXT |
+	static const UINT32 DEBUG_FLAG_TRANSIENT		= DEBUG_FLAG_STEPPING_ANY | DEBUG_FLAG_STOP_PC | 
 			DEBUG_FLAG_STOP_INTERRUPT | DEBUG_FLAG_STOP_EXCEPTION | DEBUG_FLAG_STOP_VBLANK | DEBUG_FLAG_STOP_TIME;
 };
 
