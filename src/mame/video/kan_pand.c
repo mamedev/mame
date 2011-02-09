@@ -311,9 +311,9 @@ static DEVICE_START( kaneko_pandora )
 
 	pandora->sprites_bitmap = pandora->screen->alloc_compatible_bitmap();
 
-	state_save_register_device_item(device, 0, pandora->clear_bitmap);
-	state_save_register_device_item_pointer(device, 0, pandora->spriteram, 0x1000);
-	state_save_register_device_item_bitmap(device, 0, pandora->sprites_bitmap);
+	device->save_item(NAME(pandora->clear_bitmap));
+	device->save_pointer(NAME(pandora->spriteram), 0x1000);
+	device->save_item(NAME(*pandora->sprites_bitmap));
 }
 
 static DEVICE_RESET( kaneko_pandora )

@@ -334,14 +334,14 @@ static void base_init(legacy_cpu_device *device, device_irq_callback irqcallback
 	cpustate->irq_line = CLEAR_LINE;
 	cpustate->nmi_line = CLEAR_LINE;
 
-	state_save_register_device_item_array(device, 0, cpustate->reg);
-	state_save_register_device_item(device, 0, cpustate->irq_line);
-	state_save_register_device_item(device, 0, cpustate->nmi_line);
-	state_save_register_device_item(device, 0, cpustate->PPC);
-	state_save_register_device_item(device, 0, cpustate->_CY);
-	state_save_register_device_item(device, 0, cpustate->_OV);
-	state_save_register_device_item(device, 0, cpustate->_S);
-	state_save_register_device_item(device, 0, cpustate->_Z);
+	device->save_item(NAME(cpustate->reg));
+	device->save_item(NAME(cpustate->irq_line));
+	device->save_item(NAME(cpustate->nmi_line));
+	device->save_item(NAME(cpustate->PPC));
+	device->save_item(NAME(cpustate->_CY));
+	device->save_item(NAME(cpustate->_OV));
+	device->save_item(NAME(cpustate->_S));
+	device->save_item(NAME(cpustate->_Z));
 }
 
 static CPU_INIT( v60 )

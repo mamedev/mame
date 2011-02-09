@@ -416,16 +416,16 @@ static void init_save_state(device_t *device)
 	device->machine->state().register_postload(naomibd_postload, v);
 
 	/* register states */
-	state_save_register_device_item(device, 0, v->rom_offset);
-	state_save_register_device_item(device, 0, v->rom_offset_flags);
-	state_save_register_device_item(device, 0, v->dma_count);
-	state_save_register_device_item(device, 0, v->dma_offset);
-	state_save_register_device_item(device, 0, v->dma_offset_flags);
-	state_save_register_device_item(device, 0, v->prot_offset);
-	state_save_register_device_item(device, 0, v->prot_key);
-	state_save_register_device_item(device, 0, v->aw_offset);
-	state_save_register_device_item(device, 0, v->aw_file_base);
-	state_save_register_device_item(device, 0, v->aw_file_offset);
+	device->save_item(NAME(v->rom_offset));
+	device->save_item(NAME(v->rom_offset_flags));
+	device->save_item(NAME(v->dma_count));
+	device->save_item(NAME(v->dma_offset));
+	device->save_item(NAME(v->dma_offset_flags));
+	device->save_item(NAME(v->prot_offset));
+	device->save_item(NAME(v->prot_key));
+	device->save_item(NAME(v->aw_offset));
+	device->save_item(NAME(v->aw_file_base));
+	device->save_item(NAME(v->aw_file_offset));
 }
 
 

@@ -676,57 +676,57 @@ static void ymf278b_register_save_state(device_t *device, YMF278BChip *chip)
 {
 	int i;
 
-	state_save_register_device_item(device, 0, chip->lsitest0);
-	state_save_register_device_item(device, 0, chip->lsitest1);
-	state_save_register_device_item(device, 0, chip->wavetblhdr);
-	state_save_register_device_item(device, 0, chip->memmode);
-	state_save_register_device_item(device, 0, chip->memadr);
-	state_save_register_device_item(device, 0, chip->fm_l);
-	state_save_register_device_item(device, 0, chip->fm_r);
-	state_save_register_device_item(device, 0, chip->pcm_l);
-	state_save_register_device_item(device, 0, chip->pcm_r);
-	state_save_register_device_item(device, 0, chip->timer_a_count);
-	state_save_register_device_item(device, 0, chip->timer_b_count);
-	state_save_register_device_item(device, 0, chip->enable);
-	state_save_register_device_item(device, 0, chip->current_irq);
-	state_save_register_device_item(device, 0, chip->irq_line);
-	state_save_register_device_item(device, 0, chip->port_A);
-	state_save_register_device_item(device, 0, chip->port_B);
-	state_save_register_device_item(device, 0, chip->port_C);
+	device->save_item(NAME(chip->lsitest0));
+	device->save_item(NAME(chip->lsitest1));
+	device->save_item(NAME(chip->wavetblhdr));
+	device->save_item(NAME(chip->memmode));
+	device->save_item(NAME(chip->memadr));
+	device->save_item(NAME(chip->fm_l));
+	device->save_item(NAME(chip->fm_r));
+	device->save_item(NAME(chip->pcm_l));
+	device->save_item(NAME(chip->pcm_r));
+	device->save_item(NAME(chip->timer_a_count));
+	device->save_item(NAME(chip->timer_b_count));
+	device->save_item(NAME(chip->enable));
+	device->save_item(NAME(chip->current_irq));
+	device->save_item(NAME(chip->irq_line));
+	device->save_item(NAME(chip->port_A));
+	device->save_item(NAME(chip->port_B));
+	device->save_item(NAME(chip->port_C));
 
 	for (i = 0; i < 24; ++i)
 	{
-		state_save_register_device_item(device, i, chip->slots[i].wave);
-		state_save_register_device_item(device, i, chip->slots[i].FN);
-		state_save_register_device_item(device, i, chip->slots[i].OCT);
-		state_save_register_device_item(device, i, chip->slots[i].PRVB);
-		state_save_register_device_item(device, i, chip->slots[i].LD);
-		state_save_register_device_item(device, i, chip->slots[i].TL);
-		state_save_register_device_item(device, i, chip->slots[i].pan);
-		state_save_register_device_item(device, i, chip->slots[i].lfo);
-		state_save_register_device_item(device, i, chip->slots[i].vib);
-		state_save_register_device_item(device, i, chip->slots[i].AM);
+		device->save_item(NAME(chip->slots[i].wave), i);
+		device->save_item(NAME(chip->slots[i].FN), i);
+		device->save_item(NAME(chip->slots[i].OCT), i);
+		device->save_item(NAME(chip->slots[i].PRVB), i);
+		device->save_item(NAME(chip->slots[i].LD), i);
+		device->save_item(NAME(chip->slots[i].TL), i);
+		device->save_item(NAME(chip->slots[i].pan), i);
+		device->save_item(NAME(chip->slots[i].lfo), i);
+		device->save_item(NAME(chip->slots[i].vib), i);
+		device->save_item(NAME(chip->slots[i].AM), i);
 
-		state_save_register_device_item(device, i, chip->slots[i].AR);
-		state_save_register_device_item(device, i, chip->slots[i].D1R);
-		state_save_register_device_item(device, i, chip->slots[i].DL);
-		state_save_register_device_item(device, i, chip->slots[i].D2R);
-		state_save_register_device_item(device, i, chip->slots[i].RC);
-		state_save_register_device_item(device, i, chip->slots[i].RR);
+		device->save_item(NAME(chip->slots[i].AR), i);
+		device->save_item(NAME(chip->slots[i].D1R), i);
+		device->save_item(NAME(chip->slots[i].DL), i);
+		device->save_item(NAME(chip->slots[i].D2R), i);
+		device->save_item(NAME(chip->slots[i].RC), i);
+		device->save_item(NAME(chip->slots[i].RR), i);
 
-		state_save_register_device_item(device, i, chip->slots[i].step);
-		state_save_register_device_item(device, i, chip->slots[i].stepptr);
+		device->save_item(NAME(chip->slots[i].step), i);
+		device->save_item(NAME(chip->slots[i].stepptr), i);
 
-		state_save_register_device_item(device, i, chip->slots[i].active);
-		state_save_register_device_item(device, i, chip->slots[i].bits);
-		state_save_register_device_item(device, i, chip->slots[i].startaddr);
-		state_save_register_device_item(device, i, chip->slots[i].loopaddr);
-		state_save_register_device_item(device, i, chip->slots[i].endaddr);
+		device->save_item(NAME(chip->slots[i].active), i);
+		device->save_item(NAME(chip->slots[i].bits), i);
+		device->save_item(NAME(chip->slots[i].startaddr), i);
+		device->save_item(NAME(chip->slots[i].loopaddr), i);
+		device->save_item(NAME(chip->slots[i].endaddr), i);
 
-		state_save_register_device_item(device, i, chip->slots[i].env_step);
-		state_save_register_device_item(device, i, chip->slots[i].env_vol);
-		state_save_register_device_item(device, i, chip->slots[i].env_vol_step);
-		state_save_register_device_item(device, i, chip->slots[i].env_vol_lim);
+		device->save_item(NAME(chip->slots[i].env_step), i);
+		device->save_item(NAME(chip->slots[i].env_vol), i);
+		device->save_item(NAME(chip->slots[i].env_vol_step), i);
+		device->save_item(NAME(chip->slots[i].env_vol_lim), i);
 	}
 }
 

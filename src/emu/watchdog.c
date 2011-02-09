@@ -44,8 +44,8 @@ void watchdog_init(running_machine *machine)
 	machine->add_notifier(MACHINE_NOTIFY_RESET, watchdog_internal_reset);
 
 	/* save some stuff in the default tag */
-	state_save_register_item(machine, "watchdog", NULL, 0, watchdog_enabled);
-	state_save_register_item(machine, "watchdog", NULL, 0, watchdog_counter);
+	machine->state().save_item(NAME(watchdog_enabled));
+	machine->state().save_item(NAME(watchdog_counter));
 }
 
 

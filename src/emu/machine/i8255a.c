@@ -859,15 +859,15 @@ static DEVICE_START( i8255a )
 	devcb_resolve_write8(&i8255a->out_port_func[PORT_C], &intf->out_pc_func, device);
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, i8255a->control);
-	state_save_register_device_item_array(device, 0, i8255a->output);
-	state_save_register_device_item_array(device, 0, i8255a->input);
-	state_save_register_device_item_array(device, 0, i8255a->ibf);
-	state_save_register_device_item_array(device, 0, i8255a->obf);
-	state_save_register_device_item_array(device, 0, i8255a->inte);
-	state_save_register_device_item(device, 0, i8255a->inte1);
-	state_save_register_device_item(device, 0, i8255a->inte2);
-	state_save_register_device_item_array(device, 0, i8255a->intr);
+	device->save_item(NAME(i8255a->control));
+	device->save_item(NAME(i8255a->output));
+	device->save_item(NAME(i8255a->input));
+	device->save_item(NAME(i8255a->ibf));
+	device->save_item(NAME(i8255a->obf));
+	device->save_item(NAME(i8255a->inte));
+	device->save_item(NAME(i8255a->inte1));
+	device->save_item(NAME(i8255a->inte2));
+	device->save_item(NAME(i8255a->intr));
 }
 
 /*-------------------------------------------------

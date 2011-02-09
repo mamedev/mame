@@ -3391,17 +3391,17 @@ static CPU_INIT( cp1610 )
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
 
-	state_save_register_device_item_array(device, 0, cpustate->r);
-	state_save_register_device_item(device, 0, cpustate->flags);
-	state_save_register_device_item(device, 0, cpustate->intr_enabled);
-	state_save_register_device_item(device, 0, cpustate->intr_vector);
-	state_save_register_device_item(device, 0, cpustate->reset_state);
-	state_save_register_device_item(device, 0, cpustate->intr_state);
-	state_save_register_device_item(device, 0, cpustate->intrm_state);
-	state_save_register_device_item(device, 0, cpustate->reset_pending);
-	state_save_register_device_item(device, 0, cpustate->intr_pending);
-	state_save_register_device_item(device, 0, cpustate->intrm_pending);
-	state_save_register_device_item(device, 0, cpustate->mask_interrupts);
+	device->save_item(NAME(cpustate->r));
+	device->save_item(NAME(cpustate->flags));
+	device->save_item(NAME(cpustate->intr_enabled));
+	device->save_item(NAME(cpustate->intr_vector));
+	device->save_item(NAME(cpustate->reset_state));
+	device->save_item(NAME(cpustate->intr_state));
+	device->save_item(NAME(cpustate->intrm_state));
+	device->save_item(NAME(cpustate->reset_pending));
+	device->save_item(NAME(cpustate->intr_pending));
+	device->save_item(NAME(cpustate->intrm_pending));
+	device->save_item(NAME(cpustate->mask_interrupts));
 }
 
 static void cp1610_set_irq_line(cp1610_state *cpustate, UINT32 irqline, int state)

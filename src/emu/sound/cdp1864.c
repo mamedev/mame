@@ -454,17 +454,17 @@ static DEVICE_START( cdp1864 )
 	cdp1864->dma_timer = device->machine->scheduler().timer_alloc(FUNC(cdp1864_dma_tick), (void *)device);
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, cdp1864->disp);
-	state_save_register_device_item(device, 0, cdp1864->dmaout);
-	state_save_register_device_item(device, 0, cdp1864->bgcolor);
-	state_save_register_device_item(device, 0, cdp1864->con);
+	device->save_item(NAME(cdp1864->disp));
+	device->save_item(NAME(cdp1864->dmaout));
+	device->save_item(NAME(cdp1864->bgcolor));
+	device->save_item(NAME(cdp1864->con));
 
-	state_save_register_device_item(device, 0, cdp1864->aoe);
-	state_save_register_device_item(device, 0, cdp1864->latch);
-	state_save_register_device_item(device, 0, cdp1864->signal);
-	state_save_register_device_item(device, 0, cdp1864->incr);
+	device->save_item(NAME(cdp1864->aoe));
+	device->save_item(NAME(cdp1864->latch));
+	device->save_item(NAME(cdp1864->signal));
+	device->save_item(NAME(cdp1864->incr));
 
-	state_save_register_device_item_bitmap(device, 0, cdp1864->bitmap);
+	device->save_item(NAME(*cdp1864->bitmap));
 }
 
 /*-------------------------------------------------

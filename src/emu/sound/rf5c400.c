@@ -323,26 +323,26 @@ static void rf5c400_init_chip(device_t *device, rf5c400_state *info)
 
 	for (i = 0; i < ARRAY_LENGTH(info->channels); i++)
 	{
-		state_save_register_device_item(device, i, info->channels[i].startH);
-		state_save_register_device_item(device, i, info->channels[i].startL);
-		state_save_register_device_item(device, i, info->channels[i].freq);
-		state_save_register_device_item(device, i, info->channels[i].endL);
-		state_save_register_device_item(device, i, info->channels[i].endHloopH);
-		state_save_register_device_item(device, i, info->channels[i].loopL);
-		state_save_register_device_item(device, i, info->channels[i].pan);
-		state_save_register_device_item(device, i, info->channels[i].effect);
-		state_save_register_device_item(device, i, info->channels[i].volume);
-		state_save_register_device_item(device, i, info->channels[i].attack);
-		state_save_register_device_item(device, i, info->channels[i].decay);
-		state_save_register_device_item(device, i, info->channels[i].release);
-		state_save_register_device_item(device, i, info->channels[i].cutoff);
-		state_save_register_device_item(device, i, info->channels[i].pos);
-		state_save_register_device_item(device, i, info->channels[i].step);
-		state_save_register_device_item(device, i, info->channels[i].keyon);
-		state_save_register_device_item(device, i, info->channels[i].env_phase);
-		state_save_register_device_item(device, i, info->channels[i].env_level);
-		state_save_register_device_item(device, i, info->channels[i].env_step);
-		state_save_register_device_item(device, i, info->channels[i].env_scale);
+		device->save_item(NAME(info->channels[i].startH), i);
+		device->save_item(NAME(info->channels[i].startL), i);
+		device->save_item(NAME(info->channels[i].freq), i);
+		device->save_item(NAME(info->channels[i].endL), i);
+		device->save_item(NAME(info->channels[i].endHloopH), i);
+		device->save_item(NAME(info->channels[i].loopL), i);
+		device->save_item(NAME(info->channels[i].pan), i);
+		device->save_item(NAME(info->channels[i].effect), i);
+		device->save_item(NAME(info->channels[i].volume), i);
+		device->save_item(NAME(info->channels[i].attack), i);
+		device->save_item(NAME(info->channels[i].decay), i);
+		device->save_item(NAME(info->channels[i].release), i);
+		device->save_item(NAME(info->channels[i].cutoff), i);
+		device->save_item(NAME(info->channels[i].pos), i);
+		device->save_item(NAME(info->channels[i].step), i);
+		device->save_item(NAME(info->channels[i].keyon), i);
+		device->save_item(NAME(info->channels[i].env_phase), i);
+		device->save_item(NAME(info->channels[i].env_level), i);
+		device->save_item(NAME(info->channels[i].env_step), i);
+		device->save_item(NAME(info->channels[i].env_scale), i);
 	}
 
 	info->stream = device->machine->sound().stream_alloc(*device, 0, 2, device->clock()/384, info, rf5c400_update);

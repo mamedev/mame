@@ -62,7 +62,7 @@ static DEVICE_START( timeplt_audio )
 	state->filter_1_2 = machine->device("filter.1.2");
 
 	state->last_irq_state = 0;
-	state_save_register_device_item(device, 0, state->last_irq_state);
+	device->save_item(NAME(state->last_irq_state));
 }
 
 

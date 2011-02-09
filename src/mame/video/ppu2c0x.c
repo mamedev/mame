@@ -1319,27 +1319,27 @@ static DEVICE_START( ppu2c0x )
 	ppu2c0x->colortable = auto_alloc_array(device->machine, pen_t, ARRAY_LENGTH(default_colortable));
 	ppu2c0x->colortable_mono = auto_alloc_array(device->machine, pen_t, ARRAY_LENGTH(default_colortable_mono));
 
-	state_save_register_device_item(device, 0, ppu2c0x->scanline);
-	state_save_register_device_item(device, 0, ppu2c0x->refresh_data);
-	state_save_register_device_item(device, 0, ppu2c0x->refresh_latch);
-	state_save_register_device_item(device, 0, ppu2c0x->x_fine);
-	state_save_register_device_item(device, 0, ppu2c0x->toggle);
-	state_save_register_device_item(device, 0, ppu2c0x->add);
-	state_save_register_device_item(device, 0, ppu2c0x->videomem_addr);
-	state_save_register_device_item(device, 0, ppu2c0x->addr_latch);
-	state_save_register_device_item(device, 0, ppu2c0x->data_latch);
-	state_save_register_device_item(device, 0, ppu2c0x->buffered_data);
-	state_save_register_device_item(device, 0, ppu2c0x->tile_page);
-	state_save_register_device_item(device, 0, ppu2c0x->sprite_page);
-	state_save_register_device_item(device, 0, ppu2c0x->back_color);
-	state_save_register_device_item(device, 0, ppu2c0x->scan_scale);
-	state_save_register_device_item(device, 0, ppu2c0x->scanlines_per_frame);
-	state_save_register_device_item_array(device, 0, ppu2c0x->regs);
-	state_save_register_device_item_array(device, 0, ppu2c0x->palette_ram);
-	state_save_register_device_item_pointer(device, 0, ppu2c0x->spriteram, SPRITERAM_SIZE);
-	state_save_register_device_item_pointer(device, 0, ppu2c0x->colortable, ARRAY_LENGTH(default_colortable));
-	state_save_register_device_item_pointer(device, 0, ppu2c0x->colortable_mono, ARRAY_LENGTH(default_colortable_mono));
-	state_save_register_device_item_bitmap(device, 0, ppu2c0x->bitmap);
+	device->save_item(NAME(ppu2c0x->scanline));
+	device->save_item(NAME(ppu2c0x->refresh_data));
+	device->save_item(NAME(ppu2c0x->refresh_latch));
+	device->save_item(NAME(ppu2c0x->x_fine));
+	device->save_item(NAME(ppu2c0x->toggle));
+	device->save_item(NAME(ppu2c0x->add));
+	device->save_item(NAME(ppu2c0x->videomem_addr));
+	device->save_item(NAME(ppu2c0x->addr_latch));
+	device->save_item(NAME(ppu2c0x->data_latch));
+	device->save_item(NAME(ppu2c0x->buffered_data));
+	device->save_item(NAME(ppu2c0x->tile_page));
+	device->save_item(NAME(ppu2c0x->sprite_page));
+	device->save_item(NAME(ppu2c0x->back_color));
+	device->save_item(NAME(ppu2c0x->scan_scale));
+	device->save_item(NAME(ppu2c0x->scanlines_per_frame));
+	device->save_item(NAME(ppu2c0x->regs));
+	device->save_item(NAME(ppu2c0x->palette_ram));
+	device->save_pointer(NAME(ppu2c0x->spriteram), SPRITERAM_SIZE);
+	device->save_pointer(NAME(ppu2c0x->colortable), ARRAY_LENGTH(default_colortable));
+	device->save_pointer(NAME(ppu2c0x->colortable_mono), ARRAY_LENGTH(default_colortable_mono));
+	device->save_item(NAME(*ppu2c0x->bitmap));
 }
 
 /*************************************

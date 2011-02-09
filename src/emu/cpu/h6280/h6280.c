@@ -132,32 +132,32 @@ static CPU_INIT( h6280 )
 {
 	h6280_Regs* cpustate = get_safe_token(device);
 
-	state_save_register_device_item(device, 0, cpustate->ppc.w.l);
-	state_save_register_device_item(device, 0, cpustate->pc.w.l);
-	state_save_register_device_item(device, 0, cpustate->sp.w.l);
-	state_save_register_device_item(device, 0, cpustate->zp.w.l);
-	state_save_register_device_item(device, 0, cpustate->ea.w.l);
-	state_save_register_device_item(device, 0, cpustate->a);
-	state_save_register_device_item(device, 0, cpustate->x);
-	state_save_register_device_item(device, 0, cpustate->y);
-	state_save_register_device_item(device, 0, cpustate->p);
-	state_save_register_device_item_array(device, 0, cpustate->mmr);
-	state_save_register_device_item(device, 0, cpustate->irq_mask);
-	state_save_register_device_item(device, 0, cpustate->timer_status);
-	state_save_register_device_item(device, 0, cpustate->timer_ack);
-	state_save_register_device_item(device, 0, cpustate->clocks_per_cycle);
-	state_save_register_device_item(device, 0, cpustate->timer_value);
-	state_save_register_device_item(device, 0, cpustate->timer_load);
-	state_save_register_device_item(device, 0, cpustate->nmi_state);
-	state_save_register_device_item(device, 0, cpustate->irq_state[0]);
-	state_save_register_device_item(device, 0, cpustate->irq_state[1]);
-	state_save_register_device_item(device, 0, cpustate->irq_state[2]);
-	state_save_register_device_item(device, 0, cpustate->irq_pending);
+	device->save_item(NAME(cpustate->ppc.w.l));
+	device->save_item(NAME(cpustate->pc.w.l));
+	device->save_item(NAME(cpustate->sp.w.l));
+	device->save_item(NAME(cpustate->zp.w.l));
+	device->save_item(NAME(cpustate->ea.w.l));
+	device->save_item(NAME(cpustate->a));
+	device->save_item(NAME(cpustate->x));
+	device->save_item(NAME(cpustate->y));
+	device->save_item(NAME(cpustate->p));
+	device->save_item(NAME(cpustate->mmr));
+	device->save_item(NAME(cpustate->irq_mask));
+	device->save_item(NAME(cpustate->timer_status));
+	device->save_item(NAME(cpustate->timer_ack));
+	device->save_item(NAME(cpustate->clocks_per_cycle));
+	device->save_item(NAME(cpustate->timer_value));
+	device->save_item(NAME(cpustate->timer_load));
+	device->save_item(NAME(cpustate->nmi_state));
+	device->save_item(NAME(cpustate->irq_state[0]));
+	device->save_item(NAME(cpustate->irq_state[1]));
+	device->save_item(NAME(cpustate->irq_state[2]));
+	device->save_item(NAME(cpustate->irq_pending));
 
 	#if LAZY_FLAGS
-	state_save_register_device_item(device, 0, cpustate->NZ);
+	device->save_item(NAME(cpustate->NZ));
 	#endif
-	state_save_register_device_item(device, 0, cpustate->io_buffer);
+	device->save_item(NAME(cpustate->io_buffer));
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;

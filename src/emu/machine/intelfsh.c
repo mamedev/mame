@@ -270,9 +270,9 @@ void intelfsh_device::device_start()
 {
 	m_timer = timer_alloc();
 
-	state_save_register_device_item( this, 0, m_status );
-	state_save_register_device_item( this, 0, m_flash_mode );
-	state_save_register_device_item( this, 0, m_flash_master_lock );
+	save_item( NAME(m_status) );
+	save_item( NAME(m_flash_mode) );
+	save_item( NAME(m_flash_master_lock) );
 }
 
 

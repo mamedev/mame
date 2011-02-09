@@ -338,24 +338,24 @@ static void nec_init(legacy_cpu_device *device, device_irq_callback irqcallback,
 
 	memset(nec_state, 0, sizeof(nec_state));
 
-	state_save_register_device_item_array(device, 0, nec_state->regs.w);
-	state_save_register_device_item_array(device, 0, nec_state->sregs);
+	device->save_item(NAME(nec_state->regs.w));
+	device->save_item(NAME(nec_state->sregs));
 
-	state_save_register_device_item(device, 0, nec_state->ip);
-	state_save_register_device_item(device, 0, nec_state->TF);
-	state_save_register_device_item(device, 0, nec_state->IF);
-	state_save_register_device_item(device, 0, nec_state->DF);
-	state_save_register_device_item(device, 0, nec_state->MF);
-	state_save_register_device_item(device, 0, nec_state->SignVal);
-	state_save_register_device_item(device, 0, nec_state->AuxVal);
-	state_save_register_device_item(device, 0, nec_state->OverVal);
-	state_save_register_device_item(device, 0, nec_state->ZeroVal);
-	state_save_register_device_item(device, 0, nec_state->CarryVal);
-	state_save_register_device_item(device, 0, nec_state->ParityVal);
-	state_save_register_device_item(device, 0, nec_state->pending_irq);
-	state_save_register_device_item(device, 0, nec_state->nmi_state);
-	state_save_register_device_item(device, 0, nec_state->irq_state);
-	state_save_register_device_item(device, 0, nec_state->poll_state);
+	device->save_item(NAME(nec_state->ip));
+	device->save_item(NAME(nec_state->TF));
+	device->save_item(NAME(nec_state->IF));
+	device->save_item(NAME(nec_state->DF));
+	device->save_item(NAME(nec_state->MF));
+	device->save_item(NAME(nec_state->SignVal));
+	device->save_item(NAME(nec_state->AuxVal));
+	device->save_item(NAME(nec_state->OverVal));
+	device->save_item(NAME(nec_state->ZeroVal));
+	device->save_item(NAME(nec_state->CarryVal));
+	device->save_item(NAME(nec_state->ParityVal));
+	device->save_item(NAME(nec_state->pending_irq));
+	device->save_item(NAME(nec_state->nmi_state));
+	device->save_item(NAME(nec_state->irq_state));
+	device->save_item(NAME(nec_state->poll_state));
 
 	nec_state->irq_callback = irqcallback;
 	nec_state->device = device;

@@ -242,34 +242,34 @@ static void sh6840_register_state_globals(device_t *device)
 {
 	beezer_sound_state *state = get_safe_token(device);
 
-	state_save_register_device_item_array(device, 0, state->sh6840_volume);
-	state_save_register_device_item(device, 0, state->sh6840_MSB_latch);
-	state_save_register_device_item(device, 0, state->sh6840_LSB_latch);
-	state_save_register_device_item(device, 0, state->sh6840_LFSR);
-	state_save_register_device_item(device, 0, state->sh6840_LFSR_clocks);
-	state_save_register_device_item(device, 0, state->sh6840_clock_count);
-	state_save_register_device_item(device, 0, state->sh6840_latchwrite);
-	state_save_register_device_item(device, 0, state->sh6840_latchwriteold);
-	state_save_register_device_item(device, 0, state->sh6840_noiselatch1);
-	state_save_register_device_item(device, 0, state->sh6840_noiselatch3);
-	state_save_register_device_item(device, 0, state->sh6840_timer[0].cr);
-	state_save_register_device_item(device, 0, state->sh6840_timer[0].state);
-	state_save_register_device_item(device, 0, state->sh6840_timer[0].leftovers);
-	state_save_register_device_item(device, 0, state->sh6840_timer[0].timer);
-	state_save_register_device_item(device, 0, state->sh6840_timer[0].clocks);
-	state_save_register_device_item(device, 0, state->sh6840_timer[0].counter.w);
-	state_save_register_device_item(device, 0, state->sh6840_timer[1].cr);
-	state_save_register_device_item(device, 0, state->sh6840_timer[1].state);
-	state_save_register_device_item(device, 0, state->sh6840_timer[1].leftovers);
-	state_save_register_device_item(device, 0, state->sh6840_timer[1].timer);
-	state_save_register_device_item(device, 0, state->sh6840_timer[1].clocks);
-	state_save_register_device_item(device, 0, state->sh6840_timer[1].counter.w);
-	state_save_register_device_item(device, 0, state->sh6840_timer[2].cr);
-	state_save_register_device_item(device, 0, state->sh6840_timer[2].state);
-	state_save_register_device_item(device, 0, state->sh6840_timer[2].leftovers);
-	state_save_register_device_item(device, 0, state->sh6840_timer[2].timer);
-	state_save_register_device_item(device, 0, state->sh6840_timer[2].clocks);
-	state_save_register_device_item(device, 0, state->sh6840_timer[2].counter.w);
+	device->save_item(NAME(state->sh6840_volume));
+	device->save_item(NAME(state->sh6840_MSB_latch));
+	device->save_item(NAME(state->sh6840_LSB_latch));
+	device->save_item(NAME(state->sh6840_LFSR));
+	device->save_item(NAME(state->sh6840_LFSR_clocks));
+	device->save_item(NAME(state->sh6840_clock_count));
+	device->save_item(NAME(state->sh6840_latchwrite));
+	device->save_item(NAME(state->sh6840_latchwriteold));
+	device->save_item(NAME(state->sh6840_noiselatch1));
+	device->save_item(NAME(state->sh6840_noiselatch3));
+	device->save_item(NAME(state->sh6840_timer[0].cr));
+	device->save_item(NAME(state->sh6840_timer[0].state));
+	device->save_item(NAME(state->sh6840_timer[0].leftovers));
+	device->save_item(NAME(state->sh6840_timer[0].timer));
+	device->save_item(NAME(state->sh6840_timer[0].clocks));
+	device->save_item(NAME(state->sh6840_timer[0].counter.w));
+	device->save_item(NAME(state->sh6840_timer[1].cr));
+	device->save_item(NAME(state->sh6840_timer[1].state));
+	device->save_item(NAME(state->sh6840_timer[1].leftovers));
+	device->save_item(NAME(state->sh6840_timer[1].timer));
+	device->save_item(NAME(state->sh6840_timer[1].clocks));
+	device->save_item(NAME(state->sh6840_timer[1].counter.w));
+	device->save_item(NAME(state->sh6840_timer[2].cr));
+	device->save_item(NAME(state->sh6840_timer[2].state));
+	device->save_item(NAME(state->sh6840_timer[2].leftovers));
+	device->save_item(NAME(state->sh6840_timer[2].timer));
+	device->save_item(NAME(state->sh6840_timer[2].clocks));
+	device->save_item(NAME(state->sh6840_timer[2].counter.w));
 }
 
 

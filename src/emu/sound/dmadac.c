@@ -115,12 +115,12 @@ static DEVICE_START( dmadac )
 	info->channel = device->machine->sound().stream_alloc(*device, 0, 1, DEFAULT_SAMPLE_RATE, info, dmadac_update);
 
 	/* register with the save state system */
-	state_save_register_device_item(device, 0, info->bufin);
-	state_save_register_device_item(device, 0, info->bufout);
-	state_save_register_device_item(device, 0, info->volume);
-	state_save_register_device_item(device, 0, info->enabled);
-	state_save_register_device_item(device, 0, info->frequency);
-	state_save_register_device_item_pointer(device, 0, info->buffer, BUFFER_SIZE);
+	device->save_item(NAME(info->bufin));
+	device->save_item(NAME(info->bufout));
+	device->save_item(NAME(info->volume));
+	device->save_item(NAME(info->enabled));
+	device->save_item(NAME(info->frequency));
+	device->save_pointer(NAME(info->buffer), BUFFER_SIZE);
 }
 
 

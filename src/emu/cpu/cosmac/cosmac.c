@@ -393,27 +393,27 @@ void cosmac_device::device_start()
 	devcb_resolve_write_line(&m_out_tpb_func, &m_config.m_out_tpb_func, this);
 
 	// register our state for saving
-	state_save_register_device_item(this, 0, m_op);
-	state_save_register_device_item(this, 0, m_flagsio);
-	state_save_register_device_item(this, 0, m_state);
-	state_save_register_device_item(this, 0, m_mode);
-	state_save_register_device_item(this, 0, m_pmode);
-	state_save_register_device_item(this, 0, m_irq);
-	state_save_register_device_item(this, 0, m_dmain);
-	state_save_register_device_item(this, 0, m_dmaout);
-	state_save_register_device_item_array(this, 0, m_ef);
-	state_save_register_device_item(this, 0, m_d);
-	state_save_register_device_item(this, 0, m_b);
-	state_save_register_device_item_array(this, 0, m_r);
-	state_save_register_device_item(this, 0, m_p);
-	state_save_register_device_item(this, 0, m_x);
-	state_save_register_device_item(this, 0, m_n);
-	state_save_register_device_item(this, 0, m_i);
-	state_save_register_device_item(this, 0, m_t);
-	state_save_register_device_item(this, 0, m_df);
-	state_save_register_device_item(this, 0, m_ie);
-	state_save_register_device_item(this, 0, m_q);
-	state_save_register_device_item(this, 0, m_icount);
+	save_item(NAME(m_op));
+	save_item(NAME(m_flagsio));
+	save_item(NAME(m_state));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_pmode));
+	save_item(NAME(m_irq));
+	save_item(NAME(m_dmain));
+	save_item(NAME(m_dmaout));
+	save_item(NAME(m_ef));
+	save_item(NAME(m_d));
+	save_item(NAME(m_b));
+	save_item(NAME(m_r));
+	save_item(NAME(m_p));
+	save_item(NAME(m_x));
+	save_item(NAME(m_n));
+	save_item(NAME(m_i));
+	save_item(NAME(m_t));
+	save_item(NAME(m_df));
+	save_item(NAME(m_ie));
+	save_item(NAME(m_q));
+	save_item(NAME(m_icount));
 
 	// set our instruction counter
 	m_icountptr = &m_icount;

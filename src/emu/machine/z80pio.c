@@ -332,20 +332,20 @@ void z80pio_device::pio_port::start(z80pio_device *device, int index, const devc
 	devcb_resolve_write_line(&m_out_rdy_func, &rdyfunc, m_device);
 
 	// register for state saving
-	state_save_register_device_item(m_device, m_index, m_mode);
-	state_save_register_device_item(m_device, m_index, m_next_control_word);
-	state_save_register_device_item(m_device, m_index, m_input);
-	state_save_register_device_item(m_device, m_index, m_output);
-	state_save_register_device_item(m_device, m_index, m_ior);
-	state_save_register_device_item(m_device, m_index, m_rdy);
-	state_save_register_device_item(m_device, m_index, m_stb);
-	state_save_register_device_item(m_device, m_index, m_ie);
-	state_save_register_device_item(m_device, m_index, m_ip);
-	state_save_register_device_item(m_device, m_index, m_ius);
-	state_save_register_device_item(m_device, m_index, m_icw);
-	state_save_register_device_item(m_device, m_index, m_vector);
-	state_save_register_device_item(m_device, m_index, m_mask);
-	state_save_register_device_item(m_device, m_index, m_match);
+	m_device->save_item(NAME(m_mode), m_index);
+	m_device->save_item(NAME(m_next_control_word), m_index);
+	m_device->save_item(NAME(m_input), m_index);
+	m_device->save_item(NAME(m_output), m_index);
+	m_device->save_item(NAME(m_ior), m_index);
+	m_device->save_item(NAME(m_rdy), m_index);
+	m_device->save_item(NAME(m_stb), m_index);
+	m_device->save_item(NAME(m_ie), m_index);
+	m_device->save_item(NAME(m_ip), m_index);
+	m_device->save_item(NAME(m_ius), m_index);
+	m_device->save_item(NAME(m_icw), m_index);
+	m_device->save_item(NAME(m_vector), m_index);
+	m_device->save_item(NAME(m_mask), m_index);
+	m_device->save_item(NAME(m_match), m_index);
 }
 
 

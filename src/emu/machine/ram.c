@@ -117,8 +117,8 @@ static DEVICE_START( ram )
 	memset(ram->ram, config->default_value, ram->size);
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, ram->size);
-	state_save_register_device_item_pointer(device, 0, ram->ram, ram->size);
+	device->save_item(NAME(ram->size));
+	device->save_pointer(NAME(ram->ram), ram->size);
 }
 
 static DEVICE_VALIDITY_CHECK( ram )

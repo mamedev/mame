@@ -658,17 +658,17 @@ static CPU_INIT( tms34010 )
 	/* allocate the shiftreg */
 	tms->shiftreg = auto_alloc_array(device->machine, UINT16, SHIFTREG_SIZE/2);
 
-	state_save_register_device_item(device, 0, tms->pc);
-	state_save_register_device_item(device, 0, tms->st);
-	state_save_register_device_item(device, 0, tms->reset_deferred);
-	state_save_register_device_item_pointer(device, 0, tms->shiftreg, SHIFTREG_SIZE / 2);
-	state_save_register_device_item_array(device, 0, tms->IOregs);
-	state_save_register_device_item(device, 0, tms->convsp);
-	state_save_register_device_item(device, 0, tms->convdp);
-	state_save_register_device_item(device, 0, tms->convmp);
-	state_save_register_device_item(device, 0, tms->pixelshift);
-	state_save_register_device_item(device, 0, tms->gfxcycles);
-	state_save_register_device_item_pointer(device, 0, (&tms->regs[0].reg), ARRAY_LENGTH(tms->regs));
+	device->save_item(NAME(tms->pc));
+	device->save_item(NAME(tms->st));
+	device->save_item(NAME(tms->reset_deferred));
+	device->save_pointer(NAME(tms->shiftreg), SHIFTREG_SIZE / 2);
+	device->save_item(NAME(tms->IOregs));
+	device->save_item(NAME(tms->convsp));
+	device->save_item(NAME(tms->convdp));
+	device->save_item(NAME(tms->convmp));
+	device->save_item(NAME(tms->pixelshift));
+	device->save_item(NAME(tms->gfxcycles));
+	device->save_pointer(NAME(&tms->regs[0].reg), ARRAY_LENGTH(tms->regs));
 	device->machine->state().register_postload(tms34010_state_postload, tms);
 }
 

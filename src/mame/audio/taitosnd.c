@@ -293,13 +293,13 @@ static DEVICE_START( tc0140syt )
 	tc0140syt->mastercpu = device->machine->device(intf->master);
 	tc0140syt->slavecpu = device->machine->device(intf->slave);
 
-	state_save_register_device_item(device, 0, tc0140syt->mainmode);
-	state_save_register_device_item(device, 0, tc0140syt->submode);
-	state_save_register_device_item(device, 0, tc0140syt->status);
-	state_save_register_device_item(device, 0, tc0140syt->nmi_enabled);
-	state_save_register_device_item(device, 0, tc0140syt->nmi_req);
-	state_save_register_device_item_array(device, 0, tc0140syt->slavedata);
-	state_save_register_device_item_array(device, 0, tc0140syt->masterdata);
+	device->save_item(NAME(tc0140syt->mainmode));
+	device->save_item(NAME(tc0140syt->submode));
+	device->save_item(NAME(tc0140syt->status));
+	device->save_item(NAME(tc0140syt->nmi_enabled));
+	device->save_item(NAME(tc0140syt->nmi_req));
+	device->save_item(NAME(tc0140syt->slavedata));
+	device->save_item(NAME(tc0140syt->masterdata));
 }
 
 static DEVICE_RESET( tc0140syt )

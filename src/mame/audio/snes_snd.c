@@ -1261,46 +1261,46 @@ static void state_register( device_t *device )
 	snes_sound_state *spc700 = get_safe_token(device);
 	int v;
 
-	state_save_register_device_item_array(device, 0, spc700->dsp_regs);
-	state_save_register_device_item_array(device, 0, spc700->ipl_region);
+	device->save_item(NAME(spc700->dsp_regs));
+	device->save_item(NAME(spc700->ipl_region));
 
-	state_save_register_device_item(device, 0, spc700->keyed_on);
-	state_save_register_device_item(device, 0, spc700->keys);
+	device->save_item(NAME(spc700->keyed_on));
+	device->save_item(NAME(spc700->keys));
 
-	state_save_register_device_item(device, 0, spc700->noise_cnt);
-	state_save_register_device_item(device, 0, spc700->noise_lev);
+	device->save_item(NAME(spc700->noise_cnt));
+	device->save_item(NAME(spc700->noise_lev));
 
 #ifndef NO_ECHO
-	state_save_register_device_item_array(device, 0, spc700->fir_lbuf);
-	state_save_register_device_item_array(device, 0, spc700->fir_rbuf);
-	state_save_register_device_item(device, 0, spc700->fir_ptr);
-	state_save_register_device_item(device, 0, spc700->echo_ptr);
+	device->save_item(NAME(spc700->fir_lbuf));
+	device->save_item(NAME(spc700->fir_rbuf));
+	device->save_item(NAME(spc700->fir_ptr));
+	device->save_item(NAME(spc700->echo_ptr));
 #endif
 
-	state_save_register_device_item_array(device, 0, spc700->enabled);
-	state_save_register_device_item_array(device, 0, spc700->counter);
-	state_save_register_device_item_array(device, 0, spc700->port_in);
-	state_save_register_device_item_array(device, 0, spc700->port_out);
+	device->save_item(NAME(spc700->enabled));
+	device->save_item(NAME(spc700->counter));
+	device->save_item(NAME(spc700->port_in));
+	device->save_item(NAME(spc700->port_out));
 
 	for (v = 0; v < 8; v++)
 	{
-		state_save_register_device_item(device, v, spc700->voice_state[v].mem_ptr);
-		state_save_register_device_item(device, v, spc700->voice_state[v].end);
-		state_save_register_device_item(device, v, spc700->voice_state[v].envcnt);
-		state_save_register_device_item(device, v, spc700->voice_state[v].envstate);
-		state_save_register_device_item(device, v, spc700->voice_state[v].envx);
-		state_save_register_device_item(device, v, spc700->voice_state[v].filter);
-		state_save_register_device_item(device, v, spc700->voice_state[v].half);
-		state_save_register_device_item(device, v, spc700->voice_state[v].header_cnt);
-		state_save_register_device_item(device, v, spc700->voice_state[v].mixfrac);
-		state_save_register_device_item(device, v, spc700->voice_state[v].on_cnt);
-		state_save_register_device_item(device, v, spc700->voice_state[v].pitch);
-		state_save_register_device_item(device, v, spc700->voice_state[v].range);
-		state_save_register_device_item(device, v, spc700->voice_state[v].samp_id);
-		state_save_register_device_item(device, v, spc700->voice_state[v].sampptr);
-		state_save_register_device_item(device, v, spc700->voice_state[v].smp1);
-		state_save_register_device_item(device, v, spc700->voice_state[v].smp2);
-		state_save_register_device_item_array(device, v, spc700->voice_state[v].sampbuf);
+		device->save_item(NAME(spc700->voice_state[v].mem_ptr), v);
+		device->save_item(NAME(spc700->voice_state[v].end), v);
+		device->save_item(NAME(spc700->voice_state[v].envcnt), v);
+		device->save_item(NAME(spc700->voice_state[v].envstate), v);
+		device->save_item(NAME(spc700->voice_state[v].envx), v);
+		device->save_item(NAME(spc700->voice_state[v].filter), v);
+		device->save_item(NAME(spc700->voice_state[v].half), v);
+		device->save_item(NAME(spc700->voice_state[v].header_cnt), v);
+		device->save_item(NAME(spc700->voice_state[v].mixfrac), v);
+		device->save_item(NAME(spc700->voice_state[v].on_cnt), v);
+		device->save_item(NAME(spc700->voice_state[v].pitch), v);
+		device->save_item(NAME(spc700->voice_state[v].range), v);
+		device->save_item(NAME(spc700->voice_state[v].samp_id), v);
+		device->save_item(NAME(spc700->voice_state[v].sampptr), v);
+		device->save_item(NAME(spc700->voice_state[v].smp1), v);
+		device->save_item(NAME(spc700->voice_state[v].smp2), v);
+		device->save_item(NAME(spc700->voice_state[v].sampbuf), v);
 	}
 }
 
@@ -1331,7 +1331,7 @@ static DEVICE_START( snes_sound )
 	spc700->timer[2]->enable(false);
 
 	state_register(device);
-	state_save_register_device_item_pointer(device, 0, spc700->ram, SNES_SPCRAM_SIZE);
+	device->save_pointer(NAME(spc700->ram), SNES_SPCRAM_SIZE);
 }
 
 static DEVICE_RESET( snes_sound )

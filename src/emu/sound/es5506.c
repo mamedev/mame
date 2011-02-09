@@ -943,44 +943,44 @@ static void es5506_start_common(device_t *device, const void *config, device_typ
 	chip->scratch = auto_alloc_array(device->machine, INT32, 2 * MAX_SAMPLE_CHUNK);
 
 	/* register save */
-	state_save_register_device_item(device, 0, chip->sample_rate);
-	state_save_register_device_item(device, 0, chip->write_latch);
-	state_save_register_device_item(device, 0, chip->read_latch);
+	device->save_item(NAME(chip->sample_rate));
+	device->save_item(NAME(chip->write_latch));
+	device->save_item(NAME(chip->read_latch));
 
-	state_save_register_device_item(device, 0, chip->current_page);
-	state_save_register_device_item(device, 0, chip->active_voices);
-	state_save_register_device_item(device, 0, chip->mode);
-	state_save_register_device_item(device, 0, chip->wst);
-	state_save_register_device_item(device, 0, chip->wend);
-	state_save_register_device_item(device, 0, chip->lrend);
-	state_save_register_device_item(device, 0, chip->irqv);
+	device->save_item(NAME(chip->current_page));
+	device->save_item(NAME(chip->active_voices));
+	device->save_item(NAME(chip->mode));
+	device->save_item(NAME(chip->wst));
+	device->save_item(NAME(chip->wend));
+	device->save_item(NAME(chip->lrend));
+	device->save_item(NAME(chip->irqv));
 
-	state_save_register_device_item_pointer(device, 0, chip->scratch, 2 * MAX_SAMPLE_CHUNK);
+	device->save_pointer(NAME(chip->scratch), 2 * MAX_SAMPLE_CHUNK);
 
 	for (j = 0; j < 32; j++)
 	{
-		state_save_register_device_item(device, j, chip->voice[j].control);
-		state_save_register_device_item(device, j, chip->voice[j].freqcount);
-		state_save_register_device_item(device, j, chip->voice[j].start);
-		state_save_register_device_item(device, j, chip->voice[j].lvol);
-		state_save_register_device_item(device, j, chip->voice[j].end);
-		state_save_register_device_item(device, j, chip->voice[j].lvramp);
-		state_save_register_device_item(device, j, chip->voice[j].accum);
-		state_save_register_device_item(device, j, chip->voice[j].rvol);
-		state_save_register_device_item(device, j, chip->voice[j].rvramp);
-		state_save_register_device_item(device, j, chip->voice[j].ecount);
-		state_save_register_device_item(device, j, chip->voice[j].k2);
-		state_save_register_device_item(device, j, chip->voice[j].k2ramp);
-		state_save_register_device_item(device, j, chip->voice[j].k1);
-		state_save_register_device_item(device, j, chip->voice[j].k1ramp);
-		state_save_register_device_item(device, j, chip->voice[j].o4n1);
-		state_save_register_device_item(device, j, chip->voice[j].o3n1);
-		state_save_register_device_item(device, j, chip->voice[j].o3n2);
-		state_save_register_device_item(device, j, chip->voice[j].o2n1);
-		state_save_register_device_item(device, j, chip->voice[j].o2n2);
-		state_save_register_device_item(device, j, chip->voice[j].o1n1);
-		state_save_register_device_item(device, j, chip->voice[j].exbank);
-		state_save_register_device_item(device, j, chip->voice[j].filtcount);
+		device->save_item(NAME(chip->voice[j].control), j);
+		device->save_item(NAME(chip->voice[j].freqcount), j);
+		device->save_item(NAME(chip->voice[j].start), j);
+		device->save_item(NAME(chip->voice[j].lvol), j);
+		device->save_item(NAME(chip->voice[j].end), j);
+		device->save_item(NAME(chip->voice[j].lvramp), j);
+		device->save_item(NAME(chip->voice[j].accum), j);
+		device->save_item(NAME(chip->voice[j].rvol), j);
+		device->save_item(NAME(chip->voice[j].rvramp), j);
+		device->save_item(NAME(chip->voice[j].ecount), j);
+		device->save_item(NAME(chip->voice[j].k2), j);
+		device->save_item(NAME(chip->voice[j].k2ramp), j);
+		device->save_item(NAME(chip->voice[j].k1), j);
+		device->save_item(NAME(chip->voice[j].k1ramp), j);
+		device->save_item(NAME(chip->voice[j].o4n1), j);
+		device->save_item(NAME(chip->voice[j].o3n1), j);
+		device->save_item(NAME(chip->voice[j].o3n2), j);
+		device->save_item(NAME(chip->voice[j].o2n1), j);
+		device->save_item(NAME(chip->voice[j].o2n2), j);
+		device->save_item(NAME(chip->voice[j].o1n1), j);
+		device->save_item(NAME(chip->voice[j].exbank), j);
+		device->save_item(NAME(chip->voice[j].filtcount), j);
 	}
 
 	/* success */

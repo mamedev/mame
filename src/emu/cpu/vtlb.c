@@ -77,17 +77,17 @@ vtlb_state *vtlb_alloc(device_t *cpu, int space, int fixed_entries, int dynamic_
 
 	/* allocate the entry array */
 	vtlb->live = auto_alloc_array_clear(cpu->machine, offs_t, fixed_entries + dynamic_entries);
-	state_save_register_device_item_pointer(cpu, space, vtlb->live, fixed_entries + dynamic_entries);
+	cpu->save_pointer(NAME(vtlb->live), fixed_entries + dynamic_entries, space);
 
 	/* allocate the lookup table */
 	vtlb->table = auto_alloc_array_clear(cpu->machine, vtlb_entry, (size_t) 1 << (vtlb->addrwidth - vtlb->pageshift));
-	state_save_register_device_item_pointer(cpu, space, vtlb->table, 1 << (vtlb->addrwidth - vtlb->pageshift));
+	cpu->save_pointer(NAME(vtlb->table), 1 << (vtlb->addrwidth - vtlb->pageshift), space);
 
 	/* allocate the fixed page count array */
 	if (fixed_entries > 0)
 	{
 		vtlb->fixedpages = auto_alloc_array_clear(cpu->machine, int, fixed_entries);
-		state_save_register_device_item_pointer(cpu, space, vtlb->fixedpages, fixed_entries);
+		cpu->save_pointer(NAME(vtlb->fixedpages), fixed_entries, space);
 	}
 	return vtlb;
 }

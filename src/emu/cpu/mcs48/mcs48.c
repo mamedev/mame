@@ -897,32 +897,32 @@ static void mcs48_init(legacy_cpu_device *device, device_irq_callback irqcallbac
 	/* ensure that regptr is valid before get_info gets called */
 	update_regptr(cpustate);
 
-	state_save_register_device_item(device, 0, cpustate->prevpc);
-	state_save_register_device_item(device, 0, cpustate->pc);
+	device->save_item(NAME(cpustate->prevpc));
+	device->save_item(NAME(cpustate->pc));
 
-	state_save_register_device_item(device, 0, cpustate->a);
-	state_save_register_device_item(device, 0, cpustate->psw);
-	state_save_register_device_item(device, 0, cpustate->p1);
-	state_save_register_device_item(device, 0, cpustate->p2);
-	state_save_register_device_item(device, 0, cpustate->ea);
-	state_save_register_device_item(device, 0, cpustate->timer);
-	state_save_register_device_item(device, 0, cpustate->prescaler);
-	state_save_register_device_item(device, 0, cpustate->t1_history);
-	state_save_register_device_item(device, 0, cpustate->sts);
-	state_save_register_device_item(device, 0, cpustate->dbbi);
-	state_save_register_device_item(device, 0, cpustate->dbbo);
+	device->save_item(NAME(cpustate->a));
+	device->save_item(NAME(cpustate->psw));
+	device->save_item(NAME(cpustate->p1));
+	device->save_item(NAME(cpustate->p2));
+	device->save_item(NAME(cpustate->ea));
+	device->save_item(NAME(cpustate->timer));
+	device->save_item(NAME(cpustate->prescaler));
+	device->save_item(NAME(cpustate->t1_history));
+	device->save_item(NAME(cpustate->sts));
+	device->save_item(NAME(cpustate->dbbi));
+	device->save_item(NAME(cpustate->dbbo));
 
-	state_save_register_device_item(device, 0, cpustate->irq_state);
-	state_save_register_device_item(device, 0, cpustate->irq_in_progress);
-	state_save_register_device_item(device, 0, cpustate->timer_overflow);
-	state_save_register_device_item(device, 0, cpustate->timer_flag);
-	state_save_register_device_item(device, 0, cpustate->tirq_enabled);
-	state_save_register_device_item(device, 0, cpustate->xirq_enabled);
-	state_save_register_device_item(device, 0, cpustate->timecount_enabled);
-	state_save_register_device_item(device, 0, cpustate->flags_enabled);
-	state_save_register_device_item(device, 0, cpustate->dma_enabled);
+	device->save_item(NAME(cpustate->irq_state));
+	device->save_item(NAME(cpustate->irq_in_progress));
+	device->save_item(NAME(cpustate->timer_overflow));
+	device->save_item(NAME(cpustate->timer_flag));
+	device->save_item(NAME(cpustate->tirq_enabled));
+	device->save_item(NAME(cpustate->xirq_enabled));
+	device->save_item(NAME(cpustate->timecount_enabled));
+	device->save_item(NAME(cpustate->flags_enabled));
+	device->save_item(NAME(cpustate->dma_enabled));
 
-	state_save_register_device_item(device, 0, cpustate->a11);
+	device->save_item(NAME(cpustate->a11));
 }
 
 

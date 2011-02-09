@@ -46,9 +46,9 @@ static DEVICE_START( trackfld_audio )
 	state->vlm = device->machine->device("vlm");
 
 	/* sound */
-	state_save_register_device_item(device, 0, state->SN76496_latch);
-	state_save_register_device_item(device, 0, state->last_addr);
-	state_save_register_device_item(device, 0, state->last_irq);
+	device->save_item(NAME(state->SN76496_latch));
+	device->save_item(NAME(state->last_addr));
+	device->save_item(NAME(state->last_irq));
 }
 
 static DEVICE_RESET( trackfld_audio )

@@ -521,15 +521,15 @@ static DEVICE_START( namcoio )
 	devcb_resolve_write8(&namcoio->out[0], &intf->out[0], device);
 	devcb_resolve_write8(&namcoio->out[1], &intf->out[1], device);
 
-	state_save_register_device_item_array(device, 0, namcoio->ram);
-	state_save_register_device_item(device, 0, namcoio->reset);
-	state_save_register_device_item(device, 0, namcoio->lastcoins);
-	state_save_register_device_item(device, 0, namcoio->lastbuttons);
-	state_save_register_device_item(device, 0, namcoio->credits);
-	state_save_register_device_item_array(device, 0, namcoio->coins);
-	state_save_register_device_item_array(device, 0, namcoio->coins_per_cred);
-	state_save_register_device_item_array(device, 0, namcoio->creds_per_coin);
-	state_save_register_device_item(device, 0, namcoio->in_count);
+	device->save_item(NAME(namcoio->ram));
+	device->save_item(NAME(namcoio->reset));
+	device->save_item(NAME(namcoio->lastcoins));
+	device->save_item(NAME(namcoio->lastbuttons));
+	device->save_item(NAME(namcoio->credits));
+	device->save_item(NAME(namcoio->coins));
+	device->save_item(NAME(namcoio->coins_per_cred));
+	device->save_item(NAME(namcoio->creds_per_coin));
+	device->save_item(NAME(namcoio->in_count));
 
 }
 

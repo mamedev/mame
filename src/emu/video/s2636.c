@@ -363,11 +363,11 @@ static DEVICE_START( s2636 )
 	s2636->bitmap = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED16);
 	s2636->collision_bitmap = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED16);
 
-	state_save_register_device_item(device, 0, s2636->x_offset);
-	state_save_register_device_item(device, 0, s2636->y_offset);
-	state_save_register_device_item_pointer(device, 0, s2636->work_ram, s2636->work_ram_size);
-	state_save_register_device_item_bitmap(device, 0, s2636->bitmap);
-	state_save_register_device_item_bitmap(device, 0, s2636->collision_bitmap);
+	device->save_item(NAME(s2636->x_offset));
+	device->save_item(NAME(s2636->y_offset));
+	device->save_pointer(NAME(s2636->work_ram), s2636->work_ram_size);
+	device->save_item(NAME(*s2636->bitmap));
+	device->save_item(NAME(*s2636->collision_bitmap));
 }
 
 static const char DEVTEMPLATE_SOURCE[] = __FILE__;

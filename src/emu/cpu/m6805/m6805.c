@@ -462,13 +462,13 @@ static void Interrupt( m6805_Regs *cpustate )
 
 static void state_register(m6805_Regs *cpustate, const char *type, legacy_cpu_device *device)
 {
-	state_save_register_device_item(device, 0, A);
-	state_save_register_device_item(device, 0, PC);
-	state_save_register_device_item(device, 0, S);
-	state_save_register_device_item(device, 0, X);
-	state_save_register_device_item(device, 0, CC);
-	state_save_register_device_item(device, 0, cpustate->pending_interrupts);
-	state_save_register_device_item_array(device, 0, cpustate->irq_state);
+	device->save_item(NAME(A));
+	device->save_item(NAME(PC));
+	device->save_item(NAME(S));
+	device->save_item(NAME(X));
+	device->save_item(NAME(CC));
+	device->save_item(NAME(cpustate->pending_interrupts));
+	device->save_item(NAME(cpustate->irq_state));
 }
 
 static CPU_INIT( m6805 )

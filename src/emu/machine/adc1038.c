@@ -139,13 +139,13 @@ static DEVICE_START( adc1038 )
 	adc1038->gticlub_hack = intf->gticlub_hack;
 	adc1038->input_callback_r = intf->input_callback_r;
 
-	state_save_register_device_item(device, 0, adc1038->cycle);
-	state_save_register_device_item(device, 0, adc1038->clk);
-	state_save_register_device_item(device, 0, adc1038->adr);
-	state_save_register_device_item(device, 0, adc1038->data_in);
-	state_save_register_device_item(device, 0, adc1038->data_out);
-	state_save_register_device_item(device, 0, adc1038->adc_data);
-	state_save_register_device_item(device, 0, adc1038->sars);
+	device->save_item(NAME(adc1038->cycle));
+	device->save_item(NAME(adc1038->clk));
+	device->save_item(NAME(adc1038->adr));
+	device->save_item(NAME(adc1038->data_in));
+	device->save_item(NAME(adc1038->data_out));
+	device->save_item(NAME(adc1038->adc_data));
+	device->save_item(NAME(adc1038->sars));
 }
 
 static DEVICE_RESET( adc1038 )

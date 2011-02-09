@@ -3421,32 +3421,32 @@ static CPU_INIT( z80 )
 		if( (i & 0x0f) == 0x0f ) SZHV_dec[i] |= HF;
 	}
 
-	state_save_register_device_item(device, 0, z80->prvpc.w.l);
-	state_save_register_device_item(device, 0, z80->PC);
-	state_save_register_device_item(device, 0, z80->SP);
-	state_save_register_device_item(device, 0, z80->AF);
-	state_save_register_device_item(device, 0, z80->BC);
-	state_save_register_device_item(device, 0, z80->DE);
-	state_save_register_device_item(device, 0, z80->HL);
-	state_save_register_device_item(device, 0, z80->IX);
-	state_save_register_device_item(device, 0, z80->IY);
-	state_save_register_device_item(device, 0, z80->WZ);
-	state_save_register_device_item(device, 0, z80->af2.w.l);
-	state_save_register_device_item(device, 0, z80->bc2.w.l);
-	state_save_register_device_item(device, 0, z80->de2.w.l);
-	state_save_register_device_item(device, 0, z80->hl2.w.l);
-	state_save_register_device_item(device, 0, z80->r);
-	state_save_register_device_item(device, 0, z80->r2);
-	state_save_register_device_item(device, 0, z80->iff1);
-	state_save_register_device_item(device, 0, z80->iff2);
-	state_save_register_device_item(device, 0, z80->halt);
-	state_save_register_device_item(device, 0, z80->im);
-	state_save_register_device_item(device, 0, z80->i);
-	state_save_register_device_item(device, 0, z80->nmi_state);
-	state_save_register_device_item(device, 0, z80->nmi_pending);
-	state_save_register_device_item(device, 0, z80->irq_state);
-	state_save_register_device_item(device, 0, z80->after_ei);
-	state_save_register_device_item(device, 0, z80->after_ldair);
+	device->save_item(NAME(z80->prvpc.w.l));
+	device->save_item(NAME(z80->PC));
+	device->save_item(NAME(z80->SP));
+	device->save_item(NAME(z80->AF));
+	device->save_item(NAME(z80->BC));
+	device->save_item(NAME(z80->DE));
+	device->save_item(NAME(z80->HL));
+	device->save_item(NAME(z80->IX));
+	device->save_item(NAME(z80->IY));
+	device->save_item(NAME(z80->WZ));
+	device->save_item(NAME(z80->af2.w.l));
+	device->save_item(NAME(z80->bc2.w.l));
+	device->save_item(NAME(z80->de2.w.l));
+	device->save_item(NAME(z80->hl2.w.l));
+	device->save_item(NAME(z80->r));
+	device->save_item(NAME(z80->r2));
+	device->save_item(NAME(z80->iff1));
+	device->save_item(NAME(z80->iff2));
+	device->save_item(NAME(z80->halt));
+	device->save_item(NAME(z80->im));
+	device->save_item(NAME(z80->i));
+	device->save_item(NAME(z80->nmi_state));
+	device->save_item(NAME(z80->nmi_pending));
+	device->save_item(NAME(z80->irq_state));
+	device->save_item(NAME(z80->after_ei));
+	device->save_item(NAME(z80->after_ldair));
 
 	/* Reset registers to their initial values */
 	z80->PRVPC = 0;
@@ -3535,7 +3535,7 @@ static CPU_INIT( z80 )
 static CPU_INIT( nsc800 )
 {
 	z80_state *z80 = get_safe_token(device);
-	state_save_register_device_item_array(device, 0, z80->nsc800_irq_state);
+	device->save_item(NAME(z80->nsc800_irq_state));
 	CPU_INIT_CALL (z80);
 }
 

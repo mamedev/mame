@@ -267,20 +267,20 @@ static STREAM_UPDATE( okim6376_update )
 
 static void adpcm_state_save_register(struct ADPCMVoice *voice, device_t *device, int index)
 {
-	state_save_register_device_item(device, index, voice->playing);
-	state_save_register_device_item(device, index, voice->sample);
-	state_save_register_device_item(device, index, voice->count);
-	state_save_register_device_item(device, index, voice->signal);
-	state_save_register_device_item(device, index, voice->step);
-	state_save_register_device_item(device, index, voice->volume);
-	state_save_register_device_item(device, index, voice->base_offset);
+	device->save_item(NAME(voice->playing), index);
+	device->save_item(NAME(voice->sample), index);
+	device->save_item(NAME(voice->count), index);
+	device->save_item(NAME(voice->signal), index);
+	device->save_item(NAME(voice->step), index);
+	device->save_item(NAME(voice->volume), index);
+	device->save_item(NAME(voice->base_offset), index);
 }
 
 static void okim6376_state_save_register(okim6376_state *info, device_t *device)
 {
 	int j;
 
-	state_save_register_device_item(device, 0, info->command);
+	device->save_item(NAME(info->command));
 	for (j = 0; j < OKIM6376_VOICES; j++)
 		adpcm_state_save_register(&info->voice[j], device, j);
 }

@@ -136,25 +136,25 @@ static CPU_INIT( ccpu )
 	cpustate->data = device->space(AS_DATA);
 	cpustate->io = device->space(AS_IO);
 
-	state_save_register_device_item(device, 0, cpustate->PC);
-	state_save_register_device_item(device, 0, cpustate->A);
-	state_save_register_device_item(device, 0, cpustate->B);
-	state_save_register_device_item(device, 0, cpustate->I);
-	state_save_register_device_item(device, 0, cpustate->J);
-	state_save_register_device_item(device, 0, cpustate->P);
-	state_save_register_device_item(device, 0, cpustate->X);
-	state_save_register_device_item(device, 0, cpustate->Y);
-	state_save_register_device_item(device, 0, cpustate->T);
-	state_save_register_device_item(device, 0, cpustate->a0flag);
-	state_save_register_device_item(device, 0, cpustate->ncflag);
-	state_save_register_device_item(device, 0, cpustate->cmpacc);
-	state_save_register_device_item(device, 0, cpustate->cmpval);
-	state_save_register_device_item(device, 0, cpustate->miflag);
-	state_save_register_device_item(device, 0, cpustate->nextmiflag);
-	state_save_register_device_item(device, 0, cpustate->nextnextmiflag);
-	state_save_register_device_item(device, 0, cpustate->drflag);
-	state_save_register_device_item(device, 0, cpustate->waiting);
-	state_save_register_device_item(device, 0, cpustate->watchdog);
+	device->save_item(NAME(cpustate->PC));
+	device->save_item(NAME(cpustate->A));
+	device->save_item(NAME(cpustate->B));
+	device->save_item(NAME(cpustate->I));
+	device->save_item(NAME(cpustate->J));
+	device->save_item(NAME(cpustate->P));
+	device->save_item(NAME(cpustate->X));
+	device->save_item(NAME(cpustate->Y));
+	device->save_item(NAME(cpustate->T));
+	device->save_item(NAME(cpustate->a0flag));
+	device->save_item(NAME(cpustate->ncflag));
+	device->save_item(NAME(cpustate->cmpacc));
+	device->save_item(NAME(cpustate->cmpval));
+	device->save_item(NAME(cpustate->miflag));
+	device->save_item(NAME(cpustate->nextmiflag));
+	device->save_item(NAME(cpustate->nextnextmiflag));
+	device->save_item(NAME(cpustate->drflag));
+	device->save_item(NAME(cpustate->waiting));
+	device->save_item(NAME(cpustate->watchdog));
 }
 
 

@@ -659,38 +659,38 @@ static DEVICE_START( ymz280b )
 	/* state save */
 	{
 		int j;
-		state_save_register_device_item(device, 0, chip->current_register);
-		state_save_register_device_item(device, 0, chip->status_register);
-		state_save_register_device_item(device, 0, chip->irq_state);
-		state_save_register_device_item(device, 0, chip->irq_mask);
-		state_save_register_device_item(device, 0, chip->irq_enable);
-		state_save_register_device_item(device, 0, chip->keyon_enable);
-		state_save_register_device_item(device, 0, chip->rom_readback_addr);
+		device->save_item(NAME(chip->current_register));
+		device->save_item(NAME(chip->status_register));
+		device->save_item(NAME(chip->irq_state));
+		device->save_item(NAME(chip->irq_mask));
+		device->save_item(NAME(chip->irq_enable));
+		device->save_item(NAME(chip->keyon_enable));
+		device->save_item(NAME(chip->rom_readback_addr));
 		for (j = 0; j < 8; j++)
 		{
-			state_save_register_device_item(device, j, chip->voice[j].playing);
-			state_save_register_device_item(device, j, chip->voice[j].keyon);
-			state_save_register_device_item(device, j, chip->voice[j].looping);
-			state_save_register_device_item(device, j, chip->voice[j].mode);
-			state_save_register_device_item(device, j, chip->voice[j].fnum);
-			state_save_register_device_item(device, j, chip->voice[j].level);
-			state_save_register_device_item(device, j, chip->voice[j].pan);
-			state_save_register_device_item(device, j, chip->voice[j].start);
-			state_save_register_device_item(device, j, chip->voice[j].stop);
-			state_save_register_device_item(device, j, chip->voice[j].loop_start);
-			state_save_register_device_item(device, j, chip->voice[j].loop_end);
-			state_save_register_device_item(device, j, chip->voice[j].position);
-			state_save_register_device_item(device, j, chip->voice[j].signal);
-			state_save_register_device_item(device, j, chip->voice[j].step);
-			state_save_register_device_item(device, j, chip->voice[j].loop_signal);
-			state_save_register_device_item(device, j, chip->voice[j].loop_step);
-			state_save_register_device_item(device, j, chip->voice[j].loop_count);
-			state_save_register_device_item(device, j, chip->voice[j].output_left);
-			state_save_register_device_item(device, j, chip->voice[j].output_right);
-			state_save_register_device_item(device, j, chip->voice[j].output_pos);
-			state_save_register_device_item(device, j, chip->voice[j].last_sample);
-			state_save_register_device_item(device, j, chip->voice[j].curr_sample);
-			state_save_register_device_item(device, j, chip->voice[j].irq_schedule);
+			device->save_item(NAME(chip->voice[j].playing), j);
+			device->save_item(NAME(chip->voice[j].keyon), j);
+			device->save_item(NAME(chip->voice[j].looping), j);
+			device->save_item(NAME(chip->voice[j].mode), j);
+			device->save_item(NAME(chip->voice[j].fnum), j);
+			device->save_item(NAME(chip->voice[j].level), j);
+			device->save_item(NAME(chip->voice[j].pan), j);
+			device->save_item(NAME(chip->voice[j].start), j);
+			device->save_item(NAME(chip->voice[j].stop), j);
+			device->save_item(NAME(chip->voice[j].loop_start), j);
+			device->save_item(NAME(chip->voice[j].loop_end), j);
+			device->save_item(NAME(chip->voice[j].position), j);
+			device->save_item(NAME(chip->voice[j].signal), j);
+			device->save_item(NAME(chip->voice[j].step), j);
+			device->save_item(NAME(chip->voice[j].loop_signal), j);
+			device->save_item(NAME(chip->voice[j].loop_step), j);
+			device->save_item(NAME(chip->voice[j].loop_count), j);
+			device->save_item(NAME(chip->voice[j].output_left), j);
+			device->save_item(NAME(chip->voice[j].output_right), j);
+			device->save_item(NAME(chip->voice[j].output_pos), j);
+			device->save_item(NAME(chip->voice[j].last_sample), j);
+			device->save_item(NAME(chip->voice[j].curr_sample), j);
+			device->save_item(NAME(chip->voice[j].irq_schedule), j);
 		}
 	}
 

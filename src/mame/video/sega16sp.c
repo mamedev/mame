@@ -1663,14 +1663,14 @@ static DEVICE_START( sega16sp )
 		sega16sp->buffer = auto_alloc_array(device->machine, UINT16, sega16sp->ramsize/2);
 
 
-	state_save_register_device_item(device, 0, sega16sp->flip);
-	state_save_register_device_item(device, 0, sega16sp->shadow);
-	state_save_register_device_item_array(device, 0, sega16sp->bank);
-	state_save_register_device_item(device, 0, sega16sp->colorbase);
-	state_save_register_device_item(device, 0, sega16sp->xoffs);
+	device->save_item(NAME(sega16sp->flip));
+	device->save_item(NAME(sega16sp->shadow));
+	device->save_item(NAME(sega16sp->bank));
+	device->save_item(NAME(sega16sp->colorbase));
+	device->save_item(NAME(sega16sp->xoffs));
 
 	if (intf->buffer)
-		state_save_register_device_item_pointer(device, 0, ((UINT8 *) sega16sp->buffer), sega16sp->ramsize);
+		device->save_pointer(NAME(((UINT8 *) sega16sp->buffer)), sega16sp->ramsize);
 
 
 }

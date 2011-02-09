@@ -4143,7 +4143,7 @@ memory_bank::memory_bank(address_space &space, int index, offs_t bytestart, offs
 	}
 
 	if (!m_anonymous && space.m_machine.state().registration_allowed())
-		state_save_register_item(&space.m_machine, "memory", m_tag, 0, m_curentry);
+		space.m_machine.state().save_item("memory", m_tag, 0, NAME(m_curentry));
 }
 
 

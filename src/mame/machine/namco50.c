@@ -286,9 +286,9 @@ static DEVICE_START( namco_50xx )
 	state->cpu = device->subdevice("mcu");
 	assert(state->cpu != NULL);
 
-	state_save_register_device_item(device, 0, state->latched_cmd);
-	state_save_register_device_item(device, 0, state->latched_rw);
-	state_save_register_device_item(device, 0, state->portO);
+	device->save_item(NAME(state->latched_cmd));
+	device->save_item(NAME(state->latched_rw));
+	device->save_item(NAME(state->portO));
 }
 
 

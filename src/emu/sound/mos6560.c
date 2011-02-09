@@ -847,43 +847,43 @@ static DEVICE_START( mos6560 )
 
 	mos6560_sound_start(device);
 
-	state_save_register_device_item(device, 0, mos6560->lightpenreadtime);
-	state_save_register_device_item(device, 0, mos6560->rasterline);
-	state_save_register_device_item(device, 0, mos6560->lastline);
+	device->save_item(NAME(mos6560->lightpenreadtime));
+	device->save_item(NAME(mos6560->rasterline));
+	device->save_item(NAME(mos6560->lastline));
 
-	state_save_register_device_item(device, 0, mos6560->charheight);
-	state_save_register_device_item(device, 0, mos6560->matrix8x16);
-	state_save_register_device_item(device, 0, mos6560->inverted);
-	state_save_register_device_item(device, 0, mos6560->chars_x);
-	state_save_register_device_item(device, 0, mos6560->chars_y);
-	state_save_register_device_item(device, 0, mos6560->xsize);
-	state_save_register_device_item(device, 0, mos6560->ysize);
-	state_save_register_device_item(device, 0, mos6560->xpos);
-	state_save_register_device_item(device, 0, mos6560->ypos);
-	state_save_register_device_item(device, 0, mos6560->chargenaddr);
-	state_save_register_device_item(device, 0, mos6560->videoaddr);
+	device->save_item(NAME(mos6560->charheight));
+	device->save_item(NAME(mos6560->matrix8x16));
+	device->save_item(NAME(mos6560->inverted));
+	device->save_item(NAME(mos6560->chars_x));
+	device->save_item(NAME(mos6560->chars_y));
+	device->save_item(NAME(mos6560->xsize));
+	device->save_item(NAME(mos6560->ysize));
+	device->save_item(NAME(mos6560->xpos));
+	device->save_item(NAME(mos6560->ypos));
+	device->save_item(NAME(mos6560->chargenaddr));
+	device->save_item(NAME(mos6560->videoaddr));
 
-	state_save_register_device_item(device, 0, mos6560->backgroundcolor);
-	state_save_register_device_item(device, 0, mos6560->framecolor);
-	state_save_register_device_item(device, 0, mos6560->helpercolor);
+	device->save_item(NAME(mos6560->backgroundcolor));
+	device->save_item(NAME(mos6560->framecolor));
+	device->save_item(NAME(mos6560->helpercolor));
 
-	state_save_register_device_item_array(device, 0, mos6560->reg);
+	device->save_item(NAME(mos6560->reg));
 
-	state_save_register_device_item_array(device, 0, mos6560->mono);
-	state_save_register_device_item_array(device, 0, mos6560->monoinverted);
-	state_save_register_device_item_array(device, 0, mos6560->multi);
-	state_save_register_device_item_array(device, 0, mos6560->multiinverted);
+	device->save_item(NAME(mos6560->mono));
+	device->save_item(NAME(mos6560->monoinverted));
+	device->save_item(NAME(mos6560->multi));
+	device->save_item(NAME(mos6560->multiinverted));
 
-	state_save_register_device_item_bitmap(device, 0, mos6560->bitmap);
+	device->save_item(NAME(*mos6560->bitmap));
 
-	state_save_register_device_item(device, 0, mos6560->tone1pos);
-	state_save_register_device_item(device, 0, mos6560->tone2pos);
-	state_save_register_device_item(device, 0, mos6560->tone3pos);
-	state_save_register_device_item(device, 0, mos6560->tone1samples);
-	state_save_register_device_item(device, 0, mos6560->tone2samples);
-	state_save_register_device_item(device, 0, mos6560->tone3samples);
-	state_save_register_device_item(device, 0, mos6560->noisepos);
-	state_save_register_device_item(device, 0, mos6560->noisesamples);
+	device->save_item(NAME(mos6560->tone1pos));
+	device->save_item(NAME(mos6560->tone2pos));
+	device->save_item(NAME(mos6560->tone3pos));
+	device->save_item(NAME(mos6560->tone1samples));
+	device->save_item(NAME(mos6560->tone2samples));
+	device->save_item(NAME(mos6560->tone3samples));
+	device->save_item(NAME(mos6560->noisepos));
+	device->save_item(NAME(mos6560->noisesamples));
 }
 
 /*-------------------------------------------------

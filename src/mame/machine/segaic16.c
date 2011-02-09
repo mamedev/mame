@@ -465,7 +465,7 @@ static DEVICE_START( ic_315_5248 )
 {
 	ic_315_5248_state *ic_315_5248 = _315_5248_get_safe_token(device);
 
-	state_save_register_device_item_array(device, 0, ic_315_5248->regs);
+	device->save_item(NAME(ic_315_5248->regs));
 }
 
 static DEVICE_RESET( ic_315_5248 )
@@ -619,7 +619,7 @@ static DEVICE_START( ic_315_5249 )
 {
 	ic_315_5249_state *ic_315_5249 = _315_5249_get_safe_token(device);
 
-	state_save_register_device_item_array(device, 0, ic_315_5249->regs);
+	device->save_item(NAME(ic_315_5249->regs));
 }
 
 static DEVICE_RESET( ic_315_5249 )
@@ -792,9 +792,9 @@ static DEVICE_START( ic_315_5250 )
 	ic_315_5250->sound_w = intf->sound_write_callback;
 	ic_315_5250->timer_ack = intf->timer_ack_callback;
 
-	state_save_register_device_item(device, 0, ic_315_5250->counter);
-	state_save_register_device_item(device, 0, ic_315_5250->bit);
-	state_save_register_device_item_array(device, 0, ic_315_5250->regs);
+	device->save_item(NAME(ic_315_5250->counter));
+	device->save_item(NAME(ic_315_5250->bit));
+	device->save_item(NAME(ic_315_5250->regs));
 }
 
 static DEVICE_RESET( ic_315_5250 )

@@ -1258,69 +1258,69 @@ static void OPLL_init_save(YM2413 *chip, device_t *device)
 {
 	int chnum;
 
-	state_save_register_device_item_array(device, 0, chip->instvol_r);
-	state_save_register_device_item(device, 0, chip->eg_cnt);
-	state_save_register_device_item(device, 0, chip->eg_timer);
-	state_save_register_device_item(device, 0, chip->eg_timer_add);
-	state_save_register_device_item(device, 0, chip->eg_timer_overflow);
-	state_save_register_device_item(device, 0, chip->rhythm);
-	state_save_register_device_item(device, 0, chip->lfo_am_cnt);
-	state_save_register_device_item(device, 0, chip->lfo_am_inc);
-	state_save_register_device_item(device, 0, chip->lfo_pm_cnt);
-	state_save_register_device_item(device, 0, chip->lfo_pm_inc);
-	state_save_register_device_item(device, 0, chip->noise_rng);
-	state_save_register_device_item(device, 0, chip->noise_p);
-	state_save_register_device_item(device, 0, chip->noise_f);
-	state_save_register_device_item_2d_array(device, 0, chip->inst_tab);
-	state_save_register_device_item(device, 0, chip->address);
-	state_save_register_device_item(device, 0, chip->status);
+	device->save_item(NAME(chip->instvol_r));
+	device->save_item(NAME(chip->eg_cnt));
+	device->save_item(NAME(chip->eg_timer));
+	device->save_item(NAME(chip->eg_timer_add));
+	device->save_item(NAME(chip->eg_timer_overflow));
+	device->save_item(NAME(chip->rhythm));
+	device->save_item(NAME(chip->lfo_am_cnt));
+	device->save_item(NAME(chip->lfo_am_inc));
+	device->save_item(NAME(chip->lfo_pm_cnt));
+	device->save_item(NAME(chip->lfo_pm_inc));
+	device->save_item(NAME(chip->noise_rng));
+	device->save_item(NAME(chip->noise_p));
+	device->save_item(NAME(chip->noise_f));
+	device->save_item(NAME(chip->inst_tab));
+	device->save_item(NAME(chip->address));
+	device->save_item(NAME(chip->status));
 
 	for (chnum = 0; chnum < ARRAY_LENGTH(chip->P_CH); chnum++)
 	{
 		OPLL_CH *ch = &chip->P_CH[chnum];
 		int slotnum;
 
-		state_save_register_device_item(device, chnum, ch->block_fnum);
-		state_save_register_device_item(device, chnum, ch->fc);
-		state_save_register_device_item(device, chnum, ch->ksl_base);
-		state_save_register_device_item(device, chnum, ch->kcode);
-		state_save_register_device_item(device, chnum, ch->sus);
+		device->save_item(NAME(ch->block_fnum), chnum);
+		device->save_item(NAME(ch->fc), chnum);
+		device->save_item(NAME(ch->ksl_base), chnum);
+		device->save_item(NAME(ch->kcode), chnum);
+		device->save_item(NAME(ch->sus), chnum);
 
 		for (slotnum = 0; slotnum < ARRAY_LENGTH(ch->SLOT); slotnum++)
 		{
 			OPLL_SLOT *sl = &ch->SLOT[slotnum];
 
-			state_save_register_device_item(device, chnum * ARRAY_LENGTH(ch->SLOT) + slotnum, sl->ar);
-			state_save_register_device_item(device, chnum * ARRAY_LENGTH(ch->SLOT) + slotnum, sl->dr);
-			state_save_register_device_item(device, chnum * ARRAY_LENGTH(ch->SLOT) + slotnum, sl->rr);
-			state_save_register_device_item(device, chnum * ARRAY_LENGTH(ch->SLOT) + slotnum, sl->KSR);
-			state_save_register_device_item(device, chnum * ARRAY_LENGTH(ch->SLOT) + slotnum, sl->ksl);
-			state_save_register_device_item(device, chnum * ARRAY_LENGTH(ch->SLOT) + slotnum, sl->ksr);
-			state_save_register_device_item(device, chnum * ARRAY_LENGTH(ch->SLOT) + slotnum, sl->mul);
-			state_save_register_device_item(device, chnum * ARRAY_LENGTH(ch->SLOT) + slotnum, sl->phase);
-			state_save_register_device_item(device, chnum * ARRAY_LENGTH(ch->SLOT) + slotnum, sl->freq);
-			state_save_register_device_item(device, chnum * ARRAY_LENGTH(ch->SLOT) + slotnum, sl->fb_shift);
-			state_save_register_device_item_array(device, chnum * ARRAY_LENGTH(ch->SLOT) + slotnum, sl->op1_out);
-			state_save_register_device_item(device, chnum * ARRAY_LENGTH(ch->SLOT) + slotnum, sl->eg_type);
-			state_save_register_device_item(device, chnum * ARRAY_LENGTH(ch->SLOT) + slotnum, sl->state);
-			state_save_register_device_item(device, chnum * ARRAY_LENGTH(ch->SLOT) + slotnum, sl->TL);
-			state_save_register_device_item(device, chnum * ARRAY_LENGTH(ch->SLOT) + slotnum, sl->TLL);
-			state_save_register_device_item(device, chnum * ARRAY_LENGTH(ch->SLOT) + slotnum, sl->volume);
-			state_save_register_device_item(device, chnum * ARRAY_LENGTH(ch->SLOT) + slotnum, sl->sl);
-			state_save_register_device_item(device, chnum * ARRAY_LENGTH(ch->SLOT) + slotnum, sl->eg_sh_dp);
-			state_save_register_device_item(device, chnum * ARRAY_LENGTH(ch->SLOT) + slotnum, sl->eg_sel_dp);
-			state_save_register_device_item(device, chnum * ARRAY_LENGTH(ch->SLOT) + slotnum, sl->eg_sh_ar);
-			state_save_register_device_item(device, chnum * ARRAY_LENGTH(ch->SLOT) + slotnum, sl->eg_sel_ar);
-			state_save_register_device_item(device, chnum * ARRAY_LENGTH(ch->SLOT) + slotnum, sl->eg_sh_dr);
-			state_save_register_device_item(device, chnum * ARRAY_LENGTH(ch->SLOT) + slotnum, sl->eg_sel_dr);
-			state_save_register_device_item(device, chnum * ARRAY_LENGTH(ch->SLOT) + slotnum, sl->eg_sh_rr);
-			state_save_register_device_item(device, chnum * ARRAY_LENGTH(ch->SLOT) + slotnum, sl->eg_sel_rr);
-			state_save_register_device_item(device, chnum * ARRAY_LENGTH(ch->SLOT) + slotnum, sl->eg_sh_rs);
-			state_save_register_device_item(device, chnum * ARRAY_LENGTH(ch->SLOT) + slotnum, sl->eg_sel_rs);
-			state_save_register_device_item(device, chnum * ARRAY_LENGTH(ch->SLOT) + slotnum, sl->key);
-			state_save_register_device_item(device, chnum * ARRAY_LENGTH(ch->SLOT) + slotnum, sl->AMmask);
-			state_save_register_device_item(device, chnum * ARRAY_LENGTH(ch->SLOT) + slotnum, sl->vib);
-			state_save_register_device_item(device, chnum * ARRAY_LENGTH(ch->SLOT) + slotnum, sl->wavetable);
+			device->save_item(NAME(sl->ar), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
+			device->save_item(NAME(sl->dr), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
+			device->save_item(NAME(sl->rr), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
+			device->save_item(NAME(sl->KSR), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
+			device->save_item(NAME(sl->ksl), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
+			device->save_item(NAME(sl->ksr), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
+			device->save_item(NAME(sl->mul), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
+			device->save_item(NAME(sl->phase), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
+			device->save_item(NAME(sl->freq), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
+			device->save_item(NAME(sl->fb_shift), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
+			device->save_item(NAME(sl->op1_out), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
+			device->save_item(NAME(sl->eg_type), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
+			device->save_item(NAME(sl->state), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
+			device->save_item(NAME(sl->TL), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
+			device->save_item(NAME(sl->TLL), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
+			device->save_item(NAME(sl->volume), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
+			device->save_item(NAME(sl->sl), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
+			device->save_item(NAME(sl->eg_sh_dp), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
+			device->save_item(NAME(sl->eg_sel_dp), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
+			device->save_item(NAME(sl->eg_sh_ar), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
+			device->save_item(NAME(sl->eg_sel_ar), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
+			device->save_item(NAME(sl->eg_sh_dr), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
+			device->save_item(NAME(sl->eg_sel_dr), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
+			device->save_item(NAME(sl->eg_sh_rr), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
+			device->save_item(NAME(sl->eg_sel_rr), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
+			device->save_item(NAME(sl->eg_sh_rs), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
+			device->save_item(NAME(sl->eg_sel_rs), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
+			device->save_item(NAME(sl->key), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
+			device->save_item(NAME(sl->AMmask), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
+			device->save_item(NAME(sl->vib), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
+			device->save_item(NAME(sl->wavetable), chnum * ARRAY_LENGTH(ch->SLOT) + slotnum);
 		}
 	}
 }

@@ -193,19 +193,19 @@ static DEVICE_START( buggychl_mcu )
 
 	state->mcu = device->machine->device("mcu");
 
-	state_save_register_device_item(device, 0, state->from_main);
-	state_save_register_device_item(device, 0, state->from_mcu);
-	state_save_register_device_item(device, 0, state->mcu_sent);
-	state_save_register_device_item(device, 0, state->main_sent);
-	state_save_register_device_item(device, 0, state->port_a_in);
-	state_save_register_device_item(device, 0, state->port_a_out);
-	state_save_register_device_item(device, 0, state->ddr_a);
-	state_save_register_device_item(device, 0, state->port_b_in);
-	state_save_register_device_item(device, 0, state->port_b_out);
-	state_save_register_device_item(device, 0, state->ddr_b);
-	state_save_register_device_item(device, 0, state->port_c_in);
-	state_save_register_device_item(device, 0, state->port_c_out);
-	state_save_register_device_item(device, 0, state->ddr_c);
+	device->save_item(NAME(state->from_main));
+	device->save_item(NAME(state->from_mcu));
+	device->save_item(NAME(state->mcu_sent));
+	device->save_item(NAME(state->main_sent));
+	device->save_item(NAME(state->port_a_in));
+	device->save_item(NAME(state->port_a_out));
+	device->save_item(NAME(state->ddr_a));
+	device->save_item(NAME(state->port_b_in));
+	device->save_item(NAME(state->port_b_out));
+	device->save_item(NAME(state->ddr_b));
+	device->save_item(NAME(state->port_c_in));
+	device->save_item(NAME(state->port_c_out));
+	device->save_item(NAME(state->ddr_c));
 }
 
 static DEVICE_RESET( buggychl_mcu )

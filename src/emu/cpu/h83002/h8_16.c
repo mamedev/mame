@@ -224,18 +224,18 @@ static CPU_INIT(h8)
 	h8->direct = &h8->program->direct();
 	h8->io = device->space(AS_IO);
 
-	state_save_register_device_item(device, 0, h8->h8err);
-	state_save_register_device_item_array(device, 0, h8->regs);
-	state_save_register_device_item(device, 0, h8->pc);
-	state_save_register_device_item(device, 0, h8->ppc);
-	state_save_register_device_item(device, 0, h8->h8_IRQrequestH);
-	state_save_register_device_item(device, 0, h8->h8_IRQrequestL);
-	state_save_register_device_item(device, 0, h8->ccr);
-	state_save_register_device_item(device, 0, h8->mode_8bit);
+	device->save_item(NAME(h8->h8err));
+	device->save_item(NAME(h8->regs));
+	device->save_item(NAME(h8->pc));
+	device->save_item(NAME(h8->ppc));
+	device->save_item(NAME(h8->h8_IRQrequestH));
+	device->save_item(NAME(h8->h8_IRQrequestL));
+	device->save_item(NAME(h8->ccr));
+	device->save_item(NAME(h8->mode_8bit));
 
-	state_save_register_device_item_array(device, 0, h8->per_regs);
-	state_save_register_device_item(device, 0, h8->h8TSTR);
-	state_save_register_device_item_array(device, 0, h8->h8TCNT);
+	device->save_item(NAME(h8->per_regs));
+	device->save_item(NAME(h8->h8TSTR));
+	device->save_item(NAME(h8->h8TCNT));
 
 	device->machine->state().register_postload(h8_onstateload, h8);
 

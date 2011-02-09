@@ -193,19 +193,19 @@ i2cmem_device::i2cmem_device( running_machine &_machine, const i2cmem_device_con
 
 void i2cmem_device::device_start()
 {
-	state_save_register_device_item( this, 0, m_scl );
-	state_save_register_device_item( this, 0, m_sdaw );
-	state_save_register_device_item( this, 0, m_e0 );
-	state_save_register_device_item( this, 0, m_e1 );
-	state_save_register_device_item( this, 0, m_e2 );
-	state_save_register_device_item( this, 0, m_wc );
-	state_save_register_device_item( this, 0, m_sdar );
-	state_save_register_device_item( this, 0, m_state );
-	state_save_register_device_item( this, 0, m_bits );
-	state_save_register_device_item( this, 0, m_shift );
-	state_save_register_device_item( this, 0, m_devsel );
-	state_save_register_device_item( this, 0, m_byteaddr );
-	state_save_register_device_item_pointer( this, 0, m_page, m_config.m_page_size );
+	save_item( NAME(m_scl) );
+	save_item( NAME(m_sdaw) );
+	save_item( NAME(m_e0) );
+	save_item( NAME(m_e1) );
+	save_item( NAME(m_e2) );
+	save_item( NAME(m_wc) );
+	save_item( NAME(m_sdar) );
+	save_item( NAME(m_state) );
+	save_item( NAME(m_bits) );
+	save_item( NAME(m_shift) );
+	save_item( NAME(m_devsel) );
+	save_item( NAME(m_byteaddr) );
+	save_pointer( NAME(m_page), m_config.m_page_size );
 }
 
 

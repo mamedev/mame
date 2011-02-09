@@ -60,14 +60,14 @@ static DEVICE_START( cdda )
 
 	info->stream = device->machine->sound().stream_alloc(*device, 0, 2, 44100, info, cdda_update);
 
-	state_save_register_device_item( device, 0, info->audio_playing );
-	state_save_register_device_item( device, 0, info->audio_pause );
-	state_save_register_device_item( device, 0, info->audio_ended_normally );
-	state_save_register_device_item( device, 0, info->audio_lba );
-	state_save_register_device_item( device, 0, info->audio_length );
-	state_save_register_device_item_pointer( device, 0, info->audio_cache, CD_MAX_SECTOR_DATA * MAX_SECTORS );
-	state_save_register_device_item( device, 0, info->audio_samples );
-	state_save_register_device_item( device, 0, info->audio_bptr );
+	device->save_item( NAME(info->audio_playing) );
+	device->save_item( NAME(info->audio_pause) );
+	device->save_item( NAME(info->audio_ended_normally) );
+	device->save_item( NAME(info->audio_lba) );
+	device->save_item( NAME(info->audio_length) );
+	device->save_pointer( NAME(info->audio_cache), CD_MAX_SECTOR_DATA * MAX_SECTORS );
+	device->save_item( NAME(info->audio_samples) );
+	device->save_item( NAME(info->audio_bptr) );
 }
 
 

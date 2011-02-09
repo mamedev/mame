@@ -190,19 +190,19 @@ static STREAM_UPDATE( es8712_update )
 
 static void es8712_state_save_register(es8712_state *chip, device_t *device)
 {
-	state_save_register_device_item(device, 0, chip->bank_offset);
+	device->save_item(NAME(chip->bank_offset));
 
-	state_save_register_device_item(device, 0, chip->playing);
-	state_save_register_device_item(device, 0, chip->sample);
-	state_save_register_device_item(device, 0, chip->count);
-	state_save_register_device_item(device, 0, chip->signal);
-	state_save_register_device_item(device, 0, chip->step);
+	device->save_item(NAME(chip->playing));
+	device->save_item(NAME(chip->sample));
+	device->save_item(NAME(chip->count));
+	device->save_item(NAME(chip->signal));
+	device->save_item(NAME(chip->step));
 
-	state_save_register_device_item(device, 0, chip->base_offset);
+	device->save_item(NAME(chip->base_offset));
 
-	state_save_register_device_item(device, 0, chip->start);
-	state_save_register_device_item(device, 0, chip->end);
-	state_save_register_device_item(device, 0, chip->repeat);
+	device->save_item(NAME(chip->start));
+	device->save_item(NAME(chip->end));
+	device->save_item(NAME(chip->repeat));
 }
 
 

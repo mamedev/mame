@@ -355,30 +355,30 @@ void gp9001vdp_device::device_start()
 
 	create_tilemaps(m_gfxregion);
 
-	state_save_register_device_item_pointer(this, 0, sp.vram16, GP9001_SPRITERAM_SIZE/2);
-	state_save_register_device_item_pointer(this, 0, sp.vram16_buffer, GP9001_SPRITERAM_SIZE/2);
-	state_save_register_device_item_pointer(this, 0, top.vram16, GP9001_TOP_VRAM_SIZE/2);
-	state_save_register_device_item_pointer(this, 0, fg.vram16, GP9001_FG_VRAM_SIZE/2);
-	state_save_register_device_item_pointer(this, 0, bg.vram16, GP9001_BG_VRAM_SIZE/2);
+	save_pointer(NAME(sp.vram16), GP9001_SPRITERAM_SIZE/2);
+	save_pointer(NAME(sp.vram16_buffer), GP9001_SPRITERAM_SIZE/2);
+	save_pointer(NAME(top.vram16), GP9001_TOP_VRAM_SIZE/2);
+	save_pointer(NAME(fg.vram16), GP9001_FG_VRAM_SIZE/2);
+	save_pointer(NAME(bg.vram16), GP9001_BG_VRAM_SIZE/2);
 
-	state_save_register_device_item(this,0, gp9001_scroll_reg);
-	state_save_register_device_item(this,0, gp9001_voffs);
-	state_save_register_device_item(this,0, bg.scrollx);
-	state_save_register_device_item(this,0, bg.scrolly);
-	state_save_register_device_item(this,0, fg.scrollx);
-	state_save_register_device_item(this,0, fg.scrolly);
-	state_save_register_device_item(this,0, top.scrollx);
-	state_save_register_device_item(this,0, top.scrolly);
-	state_save_register_device_item(this,0, sp.scrollx);
-	state_save_register_device_item(this,0, sp.scrolly);
-	state_save_register_device_item(this,0, bg.flip);
-	state_save_register_device_item(this,0, fg.flip);
-	state_save_register_device_item(this,0, top.flip);
-	state_save_register_device_item(this,0, sp.flip);
+	save_item(NAME(gp9001_scroll_reg));
+	save_item(NAME(gp9001_voffs));
+	save_item(NAME(bg.scrollx));
+	save_item(NAME(bg.scrolly));
+	save_item(NAME(fg.scrollx));
+	save_item(NAME(fg.scrolly));
+	save_item(NAME(top.scrollx));
+	save_item(NAME(top.scrolly));
+	save_item(NAME(sp.scrollx));
+	save_item(NAME(sp.scrolly));
+	save_item(NAME(bg.flip));
+	save_item(NAME(fg.flip));
+	save_item(NAME(top.flip));
+	save_item(NAME(sp.flip));
 
 	gp9001_gfxrom_is_banked = 0;
 	gp9001_gfxrom_bank_dirty = 0;
-	state_save_register_device_item_array(this,0,gp9001_gfxrom_bank);
+	save_item(NAME(gp9001_gfxrom_bank));
 
 	// default layer offsets used by all original games
 	bg.extra_xoffset.normal  = -0x1d6;

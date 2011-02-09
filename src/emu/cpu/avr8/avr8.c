@@ -193,7 +193,7 @@ static CPU_INIT( avr8 )
 
     WRITE_IO_8(cpustate, AVR8_IO_SREG, 0);
 
-	state_save_register_device_item(device, 0, cpustate->pc);
+	device->save_item(NAME(cpustate->pc));
 }
 
 static CPU_EXIT( avr8 )

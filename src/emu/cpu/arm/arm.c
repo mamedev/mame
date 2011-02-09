@@ -531,10 +531,10 @@ static CPU_INIT( arm )
 	cpustate->program = device->space(AS_PROGRAM);
 	cpustate->endian = ENDIANNESS_LITTLE;
 
-	state_save_register_device_item_array(device, 0, cpustate->sArmRegister);
-	state_save_register_device_item_array(device, 0, cpustate->coproRegister);
-	state_save_register_device_item(device, 0, cpustate->pendingIrq);
-	state_save_register_device_item(device, 0, cpustate->pendingFiq);
+	device->save_item(NAME(cpustate->sArmRegister));
+	device->save_item(NAME(cpustate->coproRegister));
+	device->save_item(NAME(cpustate->pendingIrq));
+	device->save_item(NAME(cpustate->pendingFiq));
 }
 
 
@@ -547,10 +547,10 @@ static CPU_INIT( arm_be )
 	cpustate->program = device->space(AS_PROGRAM);
 	cpustate->endian = ENDIANNESS_BIG;
 
-	state_save_register_device_item_array(device, 0, cpustate->sArmRegister);
-	state_save_register_device_item_array(device, 0, cpustate->coproRegister);
-	state_save_register_device_item(device, 0, cpustate->pendingIrq);
-	state_save_register_device_item(device, 0, cpustate->pendingFiq);
+	device->save_item(NAME(cpustate->sArmRegister));
+	device->save_item(NAME(cpustate->coproRegister));
+	device->save_item(NAME(cpustate->pendingIrq));
+	device->save_item(NAME(cpustate->pendingFiq));
 }
 
 

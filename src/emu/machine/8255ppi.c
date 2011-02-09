@@ -161,24 +161,24 @@ void ppi8255_device::device_start()
 	devcb_resolve_write8(&m_port_write[2], &m_config.m_port_c_write, this);
 
 	/* register for state saving */
-	state_save_register_device_item(this, 0, m_group_a_mode);
-	state_save_register_device_item(this, 0, m_group_b_mode);
-	state_save_register_device_item(this, 0, m_port_a_dir);
-	state_save_register_device_item(this, 0, m_port_b_dir);
-	state_save_register_device_item(this, 0, m_port_ch_dir);
-	state_save_register_device_item(this, 0, m_port_cl_dir);
-	state_save_register_device_item(this, 0, m_obf_a);
-	state_save_register_device_item(this, 0, m_obf_b);
-	state_save_register_device_item(this, 0, m_ibf_a);
-	state_save_register_device_item(this, 0, m_ibf_b);
-	state_save_register_device_item(this, 0, m_inte_a);
-	state_save_register_device_item(this, 0, m_inte_b);
-	state_save_register_device_item(this, 0, m_inte_1);
-	state_save_register_device_item(this, 0, m_inte_2);
-	state_save_register_device_item_array(this, 0, m_in_mask);
-	state_save_register_device_item_array(this, 0, m_out_mask);
-	state_save_register_device_item_array(this, 0, m_read);
-	state_save_register_device_item_array(this, 0, m_latch);
+	save_item(NAME(m_group_a_mode));
+	save_item(NAME(m_group_b_mode));
+	save_item(NAME(m_port_a_dir));
+	save_item(NAME(m_port_b_dir));
+	save_item(NAME(m_port_ch_dir));
+	save_item(NAME(m_port_cl_dir));
+	save_item(NAME(m_obf_a));
+	save_item(NAME(m_obf_b));
+	save_item(NAME(m_ibf_a));
+	save_item(NAME(m_ibf_b));
+	save_item(NAME(m_inte_a));
+	save_item(NAME(m_inte_b));
+	save_item(NAME(m_inte_1));
+	save_item(NAME(m_inte_2));
+	save_item(NAME(m_in_mask));
+	save_item(NAME(m_out_mask));
+	save_item(NAME(m_read));
+	save_item(NAME(m_latch));
 }
 
 

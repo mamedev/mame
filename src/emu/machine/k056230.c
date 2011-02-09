@@ -76,7 +76,7 @@ void k056230_device::device_start()
 
 	m_ram = auto_alloc_array(&m_machine, UINT32, 0x2000);
 
-	state_save_register_device_item_pointer(this, 0, m_ram, 0x2000);
+	save_pointer(NAME(m_ram), 0x2000);
 }
 
 

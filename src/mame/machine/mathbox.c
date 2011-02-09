@@ -324,8 +324,8 @@ static DEVICE_START( mathbox )
 	mb->device = device;
 
 	/* register for save states */
-	state_save_register_device_item(device, 0, mb->result);
-	state_save_register_device_item_array(device, 0, mb->reg);
+	device->save_item(NAME(mb->result));
+	device->save_item(NAME(mb->reg));
 }
 
 

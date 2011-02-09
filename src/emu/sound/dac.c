@@ -113,7 +113,7 @@ static DEVICE_START( dac )
 	info->channel = device->machine->sound().stream_alloc(*device,0,1,device->clock() ? device->clock() : DEFAULT_SAMPLE_RATE,info,DAC_update);
 	info->output = 0;
 
-	state_save_register_device_item(device, 0, info->output);
+	device->save_item(NAME(info->output));
 }
 
 

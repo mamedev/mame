@@ -939,24 +939,24 @@ static void nec_init(legacy_cpu_device *device, device_irq_callback irqcallback,
 
 	const nec_config *config = &default_config;
 
-	state_save_register_device_item_array(device, 0, cpustate->regs.w);
-	state_save_register_device_item_array(device, 0, cpustate->sregs);
+	device->save_item(NAME(cpustate->regs.w));
+	device->save_item(NAME(cpustate->sregs));
 
-	state_save_register_device_item(device, 0, cpustate->ip);
-	state_save_register_device_item(device, 0, cpustate->TF);
-	state_save_register_device_item(device, 0, cpustate->IF);
-	state_save_register_device_item(device, 0, cpustate->DF);
-	state_save_register_device_item(device, 0, cpustate->MF);
-	state_save_register_device_item(device, 0, cpustate->SignVal);
-	state_save_register_device_item(device, 0, cpustate->int_vector);
-	state_save_register_device_item(device, 0, cpustate->pending_irq);
-	state_save_register_device_item(device, 0, cpustate->nmi_state);
-	state_save_register_device_item(device, 0, cpustate->irq_state);
-	state_save_register_device_item(device, 0, cpustate->AuxVal);
-	state_save_register_device_item(device, 0, cpustate->OverVal);
-	state_save_register_device_item(device, 0, cpustate->ZeroVal);
-	state_save_register_device_item(device, 0, cpustate->CarryVal);
-	state_save_register_device_item(device, 0, cpustate->ParityVal);
+	device->save_item(NAME(cpustate->ip));
+	device->save_item(NAME(cpustate->TF));
+	device->save_item(NAME(cpustate->IF));
+	device->save_item(NAME(cpustate->DF));
+	device->save_item(NAME(cpustate->MF));
+	device->save_item(NAME(cpustate->SignVal));
+	device->save_item(NAME(cpustate->int_vector));
+	device->save_item(NAME(cpustate->pending_irq));
+	device->save_item(NAME(cpustate->nmi_state));
+	device->save_item(NAME(cpustate->irq_state));
+	device->save_item(NAME(cpustate->AuxVal));
+	device->save_item(NAME(cpustate->OverVal));
+	device->save_item(NAME(cpustate->ZeroVal));
+	device->save_item(NAME(cpustate->CarryVal));
+	device->save_item(NAME(cpustate->ParityVal));
 
 	cpustate->config = config;
 	cpustate->irq_callback = irqcallback;

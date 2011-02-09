@@ -659,114 +659,114 @@ static void init_save_state(device_t *device)
 	device->machine->state().register_postload(voodoo_postload, v);
 
 	/* register states: core */
-	state_save_register_device_item(device, 0, v->extra_cycles);
-	state_save_register_device_item_pointer(device, 0, (&v->reg[0].u), ARRAY_LENGTH(v->reg));
-	state_save_register_device_item(device, 0, v->alt_regmap);
+	device->save_item(NAME(v->extra_cycles));
+	device->save_pointer(NAME(&v->reg[0].u), ARRAY_LENGTH(v->reg));
+	device->save_item(NAME(v->alt_regmap));
 
 	/* register states: pci */
-	state_save_register_device_item(device, 0, v->pci.fifo.in);
-	state_save_register_device_item(device, 0, v->pci.fifo.out);
-	state_save_register_device_item(device, 0, v->pci.init_enable);
-	state_save_register_device_item(device, 0, v->pci.stall_state);
-	state_save_register_device_item(device, 0, v->pci.op_pending);
-	state_save_register_device_item(device, 0, v->pci.op_end_time);
-	state_save_register_device_item_array(device, 0, v->pci.fifo_mem);
+	device->save_item(NAME(v->pci.fifo.in));
+	device->save_item(NAME(v->pci.fifo.out));
+	device->save_item(NAME(v->pci.init_enable));
+	device->save_item(NAME(v->pci.stall_state));
+	device->save_item(NAME(v->pci.op_pending));
+	device->save_item(NAME(v->pci.op_end_time));
+	device->save_item(NAME(v->pci.fifo_mem));
 
 	/* register states: dac */
-	state_save_register_device_item_array(device, 0, v->dac.reg);
-	state_save_register_device_item(device, 0, v->dac.read_result);
+	device->save_item(NAME(v->dac.reg));
+	device->save_item(NAME(v->dac.read_result));
 
 	/* register states: fbi */
-	state_save_register_device_item_pointer(device, 0, v->fbi.ram, v->fbi.mask + 1);
-	state_save_register_device_item_array(device, 0, v->fbi.rgboffs);
-	state_save_register_device_item(device, 0, v->fbi.auxoffs);
-	state_save_register_device_item(device, 0, v->fbi.frontbuf);
-	state_save_register_device_item(device, 0, v->fbi.backbuf);
-	state_save_register_device_item(device, 0, v->fbi.swaps_pending);
-	state_save_register_device_item(device, 0, v->fbi.video_changed);
-	state_save_register_device_item(device, 0, v->fbi.yorigin);
-	state_save_register_device_item(device, 0, v->fbi.lfb_base);
-	state_save_register_device_item(device, 0, v->fbi.lfb_stride);
-	state_save_register_device_item(device, 0, v->fbi.width);
-	state_save_register_device_item(device, 0, v->fbi.height);
-	state_save_register_device_item(device, 0, v->fbi.xoffs);
-	state_save_register_device_item(device, 0, v->fbi.yoffs);
-	state_save_register_device_item(device, 0, v->fbi.vsyncscan);
-	state_save_register_device_item(device, 0, v->fbi.rowpixels);
-	state_save_register_device_item(device, 0, v->fbi.vblank);
-	state_save_register_device_item(device, 0, v->fbi.vblank_count);
-	state_save_register_device_item(device, 0, v->fbi.vblank_swap_pending);
-	state_save_register_device_item(device, 0, v->fbi.vblank_swap);
-	state_save_register_device_item(device, 0, v->fbi.vblank_dont_swap);
-	state_save_register_device_item(device, 0, v->fbi.cheating_allowed);
-	state_save_register_device_item(device, 0, v->fbi.sign);
-	state_save_register_device_item(device, 0, v->fbi.ax);
-	state_save_register_device_item(device, 0, v->fbi.ay);
-	state_save_register_device_item(device, 0, v->fbi.bx);
-	state_save_register_device_item(device, 0, v->fbi.by);
-	state_save_register_device_item(device, 0, v->fbi.cx);
-	state_save_register_device_item(device, 0, v->fbi.cy);
-	state_save_register_device_item(device, 0, v->fbi.startr);
-	state_save_register_device_item(device, 0, v->fbi.startg);
-	state_save_register_device_item(device, 0, v->fbi.startb);
-	state_save_register_device_item(device, 0, v->fbi.starta);
-	state_save_register_device_item(device, 0, v->fbi.startz);
-	state_save_register_device_item(device, 0, v->fbi.startw);
-	state_save_register_device_item(device, 0, v->fbi.drdx);
-	state_save_register_device_item(device, 0, v->fbi.dgdx);
-	state_save_register_device_item(device, 0, v->fbi.dbdx);
-	state_save_register_device_item(device, 0, v->fbi.dadx);
-	state_save_register_device_item(device, 0, v->fbi.dzdx);
-	state_save_register_device_item(device, 0, v->fbi.dwdx);
-	state_save_register_device_item(device, 0, v->fbi.drdy);
-	state_save_register_device_item(device, 0, v->fbi.dgdy);
-	state_save_register_device_item(device, 0, v->fbi.dbdy);
-	state_save_register_device_item(device, 0, v->fbi.dady);
-	state_save_register_device_item(device, 0, v->fbi.dzdy);
-	state_save_register_device_item(device, 0, v->fbi.dwdy);
-	state_save_register_device_item(device, 0, v->fbi.lfb_stats.pixels_in);
-	state_save_register_device_item(device, 0, v->fbi.lfb_stats.pixels_out);
-	state_save_register_device_item(device, 0, v->fbi.lfb_stats.chroma_fail);
-	state_save_register_device_item(device, 0, v->fbi.lfb_stats.zfunc_fail);
-	state_save_register_device_item(device, 0, v->fbi.lfb_stats.afunc_fail);
-	state_save_register_device_item(device, 0, v->fbi.lfb_stats.clip_fail);
-	state_save_register_device_item(device, 0, v->fbi.lfb_stats.stipple_count);
-	state_save_register_device_item(device, 0, v->fbi.sverts);
+	device->save_pointer(NAME(v->fbi.ram), v->fbi.mask + 1);
+	device->save_item(NAME(v->fbi.rgboffs));
+	device->save_item(NAME(v->fbi.auxoffs));
+	device->save_item(NAME(v->fbi.frontbuf));
+	device->save_item(NAME(v->fbi.backbuf));
+	device->save_item(NAME(v->fbi.swaps_pending));
+	device->save_item(NAME(v->fbi.video_changed));
+	device->save_item(NAME(v->fbi.yorigin));
+	device->save_item(NAME(v->fbi.lfb_base));
+	device->save_item(NAME(v->fbi.lfb_stride));
+	device->save_item(NAME(v->fbi.width));
+	device->save_item(NAME(v->fbi.height));
+	device->save_item(NAME(v->fbi.xoffs));
+	device->save_item(NAME(v->fbi.yoffs));
+	device->save_item(NAME(v->fbi.vsyncscan));
+	device->save_item(NAME(v->fbi.rowpixels));
+	device->save_item(NAME(v->fbi.vblank));
+	device->save_item(NAME(v->fbi.vblank_count));
+	device->save_item(NAME(v->fbi.vblank_swap_pending));
+	device->save_item(NAME(v->fbi.vblank_swap));
+	device->save_item(NAME(v->fbi.vblank_dont_swap));
+	device->save_item(NAME(v->fbi.cheating_allowed));
+	device->save_item(NAME(v->fbi.sign));
+	device->save_item(NAME(v->fbi.ax));
+	device->save_item(NAME(v->fbi.ay));
+	device->save_item(NAME(v->fbi.bx));
+	device->save_item(NAME(v->fbi.by));
+	device->save_item(NAME(v->fbi.cx));
+	device->save_item(NAME(v->fbi.cy));
+	device->save_item(NAME(v->fbi.startr));
+	device->save_item(NAME(v->fbi.startg));
+	device->save_item(NAME(v->fbi.startb));
+	device->save_item(NAME(v->fbi.starta));
+	device->save_item(NAME(v->fbi.startz));
+	device->save_item(NAME(v->fbi.startw));
+	device->save_item(NAME(v->fbi.drdx));
+	device->save_item(NAME(v->fbi.dgdx));
+	device->save_item(NAME(v->fbi.dbdx));
+	device->save_item(NAME(v->fbi.dadx));
+	device->save_item(NAME(v->fbi.dzdx));
+	device->save_item(NAME(v->fbi.dwdx));
+	device->save_item(NAME(v->fbi.drdy));
+	device->save_item(NAME(v->fbi.dgdy));
+	device->save_item(NAME(v->fbi.dbdy));
+	device->save_item(NAME(v->fbi.dady));
+	device->save_item(NAME(v->fbi.dzdy));
+	device->save_item(NAME(v->fbi.dwdy));
+	device->save_item(NAME(v->fbi.lfb_stats.pixels_in));
+	device->save_item(NAME(v->fbi.lfb_stats.pixels_out));
+	device->save_item(NAME(v->fbi.lfb_stats.chroma_fail));
+	device->save_item(NAME(v->fbi.lfb_stats.zfunc_fail));
+	device->save_item(NAME(v->fbi.lfb_stats.afunc_fail));
+	device->save_item(NAME(v->fbi.lfb_stats.clip_fail));
+	device->save_item(NAME(v->fbi.lfb_stats.stipple_count));
+	device->save_item(NAME(v->fbi.sverts));
 	for (index = 0; index < ARRAY_LENGTH(v->fbi.svert); index++)
 	{
-		state_save_register_device_item(device, index, v->fbi.svert[index].x);
-		state_save_register_device_item(device, index, v->fbi.svert[index].y);
-		state_save_register_device_item(device, index, v->fbi.svert[index].a);
-		state_save_register_device_item(device, index, v->fbi.svert[index].r);
-		state_save_register_device_item(device, index, v->fbi.svert[index].g);
-		state_save_register_device_item(device, index, v->fbi.svert[index].b);
-		state_save_register_device_item(device, index, v->fbi.svert[index].z);
-		state_save_register_device_item(device, index, v->fbi.svert[index].wb);
-		state_save_register_device_item(device, index, v->fbi.svert[index].w0);
-		state_save_register_device_item(device, index, v->fbi.svert[index].s0);
-		state_save_register_device_item(device, index, v->fbi.svert[index].t0);
-		state_save_register_device_item(device, index, v->fbi.svert[index].w1);
-		state_save_register_device_item(device, index, v->fbi.svert[index].s1);
-		state_save_register_device_item(device, index, v->fbi.svert[index].t1);
+		device->save_item(NAME(v->fbi.svert[index].x), index);
+		device->save_item(NAME(v->fbi.svert[index].y), index);
+		device->save_item(NAME(v->fbi.svert[index].a), index);
+		device->save_item(NAME(v->fbi.svert[index].r), index);
+		device->save_item(NAME(v->fbi.svert[index].g), index);
+		device->save_item(NAME(v->fbi.svert[index].b), index);
+		device->save_item(NAME(v->fbi.svert[index].z), index);
+		device->save_item(NAME(v->fbi.svert[index].wb), index);
+		device->save_item(NAME(v->fbi.svert[index].w0), index);
+		device->save_item(NAME(v->fbi.svert[index].s0), index);
+		device->save_item(NAME(v->fbi.svert[index].t0), index);
+		device->save_item(NAME(v->fbi.svert[index].w1), index);
+		device->save_item(NAME(v->fbi.svert[index].s1), index);
+		device->save_item(NAME(v->fbi.svert[index].t1), index);
 	}
-	state_save_register_device_item(device, 0, v->fbi.fifo.size);
-	state_save_register_device_item(device, 0, v->fbi.fifo.in);
-	state_save_register_device_item(device, 0, v->fbi.fifo.out);
+	device->save_item(NAME(v->fbi.fifo.size));
+	device->save_item(NAME(v->fbi.fifo.in));
+	device->save_item(NAME(v->fbi.fifo.out));
 	for (index = 0; index < ARRAY_LENGTH(v->fbi.cmdfifo); index++)
 	{
-		state_save_register_device_item(device, index, v->fbi.cmdfifo[index].enable);
-		state_save_register_device_item(device, index, v->fbi.cmdfifo[index].count_holes);
-		state_save_register_device_item(device, index, v->fbi.cmdfifo[index].base);
-		state_save_register_device_item(device, index, v->fbi.cmdfifo[index].end);
-		state_save_register_device_item(device, index, v->fbi.cmdfifo[index].rdptr);
-		state_save_register_device_item(device, index, v->fbi.cmdfifo[index].amin);
-		state_save_register_device_item(device, index, v->fbi.cmdfifo[index].amax);
-		state_save_register_device_item(device, index, v->fbi.cmdfifo[index].depth);
-		state_save_register_device_item(device, index, v->fbi.cmdfifo[index].holes);
+		device->save_item(NAME(v->fbi.cmdfifo[index].enable), index);
+		device->save_item(NAME(v->fbi.cmdfifo[index].count_holes), index);
+		device->save_item(NAME(v->fbi.cmdfifo[index].base), index);
+		device->save_item(NAME(v->fbi.cmdfifo[index].end), index);
+		device->save_item(NAME(v->fbi.cmdfifo[index].rdptr), index);
+		device->save_item(NAME(v->fbi.cmdfifo[index].amin), index);
+		device->save_item(NAME(v->fbi.cmdfifo[index].amax), index);
+		device->save_item(NAME(v->fbi.cmdfifo[index].depth), index);
+		device->save_item(NAME(v->fbi.cmdfifo[index].holes), index);
 	}
-	state_save_register_device_item_array(device, 0, v->fbi.fogblend);
-	state_save_register_device_item_array(device, 0, v->fbi.fogdelta);
-	state_save_register_device_item_array(device, 0, v->fbi.clut);
+	device->save_item(NAME(v->fbi.fogblend));
+	device->save_item(NAME(v->fbi.fogdelta));
+	device->save_item(NAME(v->fbi.clut));
 
 	/* register states: tmu */
 	for (index = 0; index < ARRAY_LENGTH(v->tmu); index++)
@@ -775,39 +775,39 @@ static void init_save_state(device_t *device)
 		if (tmu->ram == NULL)
 			continue;
 		if (tmu->ram != v->fbi.ram)
-			state_save_register_device_item_pointer(device, index, tmu->ram, tmu->mask + 1);
-		state_save_register_device_item(device, index, tmu->starts);
-		state_save_register_device_item(device, index, tmu->startt);
-		state_save_register_device_item(device, index, tmu->startw);
-		state_save_register_device_item(device, index, tmu->dsdx);
-		state_save_register_device_item(device, index, tmu->dtdx);
-		state_save_register_device_item(device, index, tmu->dwdx);
-		state_save_register_device_item(device, index, tmu->dsdy);
-		state_save_register_device_item(device, index, tmu->dtdy);
-		state_save_register_device_item(device, index, tmu->dwdy);
+			device->save_pointer(NAME(tmu->ram), tmu->mask + 1, index);
+		device->save_item(NAME(tmu->starts), index);
+		device->save_item(NAME(tmu->startt), index);
+		device->save_item(NAME(tmu->startw), index);
+		device->save_item(NAME(tmu->dsdx), index);
+		device->save_item(NAME(tmu->dtdx), index);
+		device->save_item(NAME(tmu->dwdx), index);
+		device->save_item(NAME(tmu->dsdy), index);
+		device->save_item(NAME(tmu->dtdy), index);
+		device->save_item(NAME(tmu->dwdy), index);
 		for (subindex = 0; subindex < ARRAY_LENGTH(tmu->ncc); subindex++)
 		{
-			state_save_register_device_item_array(device, index * ARRAY_LENGTH(tmu->ncc) + subindex, tmu->ncc[subindex].ir);
-			state_save_register_device_item_array(device, index * ARRAY_LENGTH(tmu->ncc) + subindex, tmu->ncc[subindex].ig);
-			state_save_register_device_item_array(device, index * ARRAY_LENGTH(tmu->ncc) + subindex, tmu->ncc[subindex].ib);
-			state_save_register_device_item_array(device, index * ARRAY_LENGTH(tmu->ncc) + subindex, tmu->ncc[subindex].qr);
-			state_save_register_device_item_array(device, index * ARRAY_LENGTH(tmu->ncc) + subindex, tmu->ncc[subindex].qg);
-			state_save_register_device_item_array(device, index * ARRAY_LENGTH(tmu->ncc) + subindex, tmu->ncc[subindex].qb);
-			state_save_register_device_item_array(device, index * ARRAY_LENGTH(tmu->ncc) + subindex, tmu->ncc[subindex].y);
+			device->save_item(NAME(tmu->ncc[subindex].ir), index * ARRAY_LENGTH(tmu->ncc) + subindex);
+			device->save_item(NAME(tmu->ncc[subindex].ig), index * ARRAY_LENGTH(tmu->ncc) + subindex);
+			device->save_item(NAME(tmu->ncc[subindex].ib), index * ARRAY_LENGTH(tmu->ncc) + subindex);
+			device->save_item(NAME(tmu->ncc[subindex].qr), index * ARRAY_LENGTH(tmu->ncc) + subindex);
+			device->save_item(NAME(tmu->ncc[subindex].qg), index * ARRAY_LENGTH(tmu->ncc) + subindex);
+			device->save_item(NAME(tmu->ncc[subindex].qb), index * ARRAY_LENGTH(tmu->ncc) + subindex);
+			device->save_item(NAME(tmu->ncc[subindex].y), index * ARRAY_LENGTH(tmu->ncc) + subindex);
 		}
 	}
 
 	/* register states: banshee */
 	if (v->type >= VOODOO_BANSHEE)
 	{
-		state_save_register_device_item_array(device, 0, v->banshee.io);
-		state_save_register_device_item_array(device, 0, v->banshee.agp);
-		state_save_register_device_item_array(device, 0, v->banshee.vga);
-		state_save_register_device_item_array(device, 0, v->banshee.crtc);
-		state_save_register_device_item_array(device, 0, v->banshee.seq);
-		state_save_register_device_item_array(device, 0, v->banshee.gc);
-		state_save_register_device_item_array(device, 0, v->banshee.att);
-		state_save_register_device_item(device, 0, v->banshee.attff);
+		device->save_item(NAME(v->banshee.io));
+		device->save_item(NAME(v->banshee.agp));
+		device->save_item(NAME(v->banshee.vga));
+		device->save_item(NAME(v->banshee.crtc));
+		device->save_item(NAME(v->banshee.seq));
+		device->save_item(NAME(v->banshee.gc));
+		device->save_item(NAME(v->banshee.att));
+		device->save_item(NAME(v->banshee.attff));
 	}
 }
 

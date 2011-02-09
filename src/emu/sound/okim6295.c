@@ -179,17 +179,17 @@ void okim6295_device::device_start()
 	int divisor = m_config.m_pin7 ? 132 : 165;
 	m_stream = m_machine.sound().stream_alloc(*this, 0, 1, clock() / divisor);
 
-	state_save_register_device_item(this, 0, m_command);
-	state_save_register_device_item(this, 0, m_bank_offs);
+	save_item(NAME(m_command));
+	save_item(NAME(m_bank_offs));
 	for (int voicenum = 0; voicenum < OKIM6295_VOICES; voicenum++)
 	{
-		state_save_register_device_item(this, voicenum, m_voice[voicenum].m_playing);
-		state_save_register_device_item(this, voicenum, m_voice[voicenum].m_sample);
-		state_save_register_device_item(this, voicenum, m_voice[voicenum].m_count);
-		state_save_register_device_item(this, voicenum, m_voice[voicenum].m_adpcm.m_signal);
-		state_save_register_device_item(this, voicenum, m_voice[voicenum].m_adpcm.m_step);
-		state_save_register_device_item(this, voicenum, m_voice[voicenum].m_volume);
-		state_save_register_device_item(this, voicenum, m_voice[voicenum].m_base_offset);
+		save_item(NAME(m_voice[voicenum].m_playing), voicenum);
+		save_item(NAME(m_voice[voicenum].m_sample), voicenum);
+		save_item(NAME(m_voice[voicenum].m_count), voicenum);
+		save_item(NAME(m_voice[voicenum].m_adpcm.m_signal), voicenum);
+		save_item(NAME(m_voice[voicenum].m_adpcm.m_step), voicenum);
+		save_item(NAME(m_voice[voicenum].m_volume), voicenum);
+		save_item(NAME(m_voice[voicenum].m_base_offset), voicenum);
 	}
 }
 

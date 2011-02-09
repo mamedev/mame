@@ -1211,76 +1211,76 @@ static void set_flag1(tms99xx_state *cpustate, int val);
 static void register_for_save_state(device_t *device)
 {
 	tms99xx_state *cpustate = get_safe_token(device);
-	state_save_register_device_item(device, 0, cpustate->WP);
-	state_save_register_device_item(device, 0, cpustate->PC);
-	state_save_register_device_item(device, 0, cpustate->STATUS);
-	state_save_register_device_item(device, 0, cpustate->interrupt_pending);
+	device->save_item(NAME(cpustate->WP));
+	device->save_item(NAME(cpustate->PC));
+	device->save_item(NAME(cpustate->STATUS));
+	device->save_item(NAME(cpustate->interrupt_pending));
 
 #if ! ((TMS99XX_MODEL == TMS9940_ID) || (TMS99XX_MODEL == TMS9985_ID))
-	state_save_register_device_item(device, 0, cpustate->load_state);
+	device->save_item(NAME(cpustate->load_state));
 #endif
 
 #if (TMS99XX_MODEL == TI990_10_ID) || (TMS99XX_MODEL == TMS9900_ID) || (TMS99XX_MODEL == TMS9980_ID)
-	state_save_register_device_item(device, 0, cpustate->irq_level);
-	state_save_register_device_item(device, 0, cpustate->irq_state);
+	device->save_item(NAME(cpustate->irq_level));
+	device->save_item(NAME(cpustate->irq_state));
 #elif (TMS99XX_MODEL == TMS9995_ID)
-	state_save_register_device_item(device, 0, cpustate->irq_level);
-	state_save_register_device_item(device, 0, cpustate->int_state);
-	state_save_register_device_item(device, 0, cpustate->int_latch);
+	device->save_item(NAME(cpustate->irq_level));
+	device->save_item(NAME(cpustate->int_state));
+	device->save_item(NAME(cpustate->int_latch));
 #endif
 
-	state_save_register_device_item(device, 0, cpustate->IDLE);
+	device->save_item(NAME(cpustate->IDLE));
 
 #if HAS_MAPPING
-	state_save_register_device_item(device, 0, cpustate->mapping_on);
-	state_save_register_device_item_array(device, 0, cpustate->map_files[0].L);
-	state_save_register_device_item_array(device, 0, cpustate->map_files[0].B);
-	state_save_register_device_item_array(device, 0, cpustate->map_files[0].limit);
-	state_save_register_device_item_array(device, 0, cpustate->map_files[0].bias);
-	state_save_register_device_item_array(device, 0, cpustate->map_files[1].L);
-	state_save_register_device_item_array(device, 0, cpustate->map_files[1].B);
-	state_save_register_device_item_array(device, 0, cpustate->map_files[1].limit);
-	state_save_register_device_item_array(device, 0, cpustate->map_files[1].bias);
-	state_save_register_device_item_array(device, 0, cpustate->map_files[2].L);
-	state_save_register_device_item_array(device, 0, cpustate->map_files[2].B);
-	state_save_register_device_item_array(device, 0, cpustate->map_files[2].limit);
-	state_save_register_device_item_array(device, 0, cpustate->map_files[2].bias);
-	state_save_register_device_item(device, 0, cpustate->cur_map);
-	state_save_register_device_item(device, 0, cpustate->cur_src_map);
-	state_save_register_device_item(device, 0, cpustate->cur_dst_map);
+	device->save_item(NAME(cpustate->mapping_on));
+	device->save_item(NAME(cpustate->map_files[0].L));
+	device->save_item(NAME(cpustate->map_files[0].B));
+	device->save_item(NAME(cpustate->map_files[0].limit));
+	device->save_item(NAME(cpustate->map_files[0].bias));
+	device->save_item(NAME(cpustate->map_files[1].L));
+	device->save_item(NAME(cpustate->map_files[1].B));
+	device->save_item(NAME(cpustate->map_files[1].limit));
+	device->save_item(NAME(cpustate->map_files[1].bias));
+	device->save_item(NAME(cpustate->map_files[2].L));
+	device->save_item(NAME(cpustate->map_files[2].B));
+	device->save_item(NAME(cpustate->map_files[2].limit));
+	device->save_item(NAME(cpustate->map_files[2].bias));
+	device->save_item(NAME(cpustate->cur_map));
+	device->save_item(NAME(cpustate->cur_src_map));
+	device->save_item(NAME(cpustate->cur_dst_map));
 
 #if (TMS99XX_MODEL == TI990_10_ID)
-	state_save_register_device_item(device, 0, cpustate->reset_maperr);
-	state_save_register_device_item(device, 0, cpustate->mapper_address_latch);
-	state_save_register_device_item(device, 0, cpustate->mapper_cru_read_register);
-	state_save_register_device_item(device, 0, cpustate->diaglat);
-	state_save_register_device_item_array(device, 0, cpustate->latch_control);
+	device->save_item(NAME(cpustate->reset_maperr));
+	device->save_item(NAME(cpustate->mapper_address_latch));
+	device->save_item(NAME(cpustate->mapper_cru_read_register));
+	device->save_item(NAME(cpustate->diaglat));
+	device->save_item(NAME(cpustate->latch_control));
 #endif
 #endif
 
 #if (TMS99XX_MODEL == TI990_10_ID)
-	state_save_register_device_item(device, 0, cpustate->error_interrupt_register);
+	device->save_item(NAME(cpustate->error_interrupt_register));
 #endif
 
 #if (TMS99XX_MODEL == TMS9985_ID) || (TMS99XX_MODEL == TMS9995_ID)
-	state_save_register_device_item_array(device, 0, cpustate->RAM);
+	device->save_item(NAME(cpustate->RAM));
 #endif
 
 #if (TMS99XX_MODEL == TMS9940_ID) || (TMS99XX_MODEL == TMS9985_ID) || (TMS99XX_MODEL == TMS9995_ID)
-	state_save_register_device_item(device, 0, cpustate->decrementer_enabled);
-	state_save_register_device_item(device, 0, cpustate->decrementer_interval);
-	state_save_register_device_item(device, 0, cpustate->decrementer_count);
+	device->save_item(NAME(cpustate->decrementer_enabled));
+	device->save_item(NAME(cpustate->decrementer_interval));
+	device->save_item(NAME(cpustate->decrementer_count));
 #endif
 
 #if (TMS99XX_MODEL == TMS9995_ID)
-	state_save_register_device_item(device, 0, cpustate->flag);
-	state_save_register_device_item(device, 0, cpustate->MID_flag);
-	state_save_register_device_item(device, 0, cpustate->memory_wait_states_byte);
-	state_save_register_device_item(device, 0, cpustate->memory_wait_states_word);
-	state_save_register_device_item(device, 0, cpustate->is_mp9537);
+	device->save_item(NAME(cpustate->flag));
+	device->save_item(NAME(cpustate->MID_flag));
+	device->save_item(NAME(cpustate->memory_wait_states_byte));
+	device->save_item(NAME(cpustate->memory_wait_states_word));
+	device->save_item(NAME(cpustate->is_mp9537));
 #endif
 
-	state_save_register_device_item(device, 0, cpustate->disable_interrupt_recognition);
+	device->save_item(NAME(cpustate->disable_interrupt_recognition));
 }
 
 

@@ -563,14 +563,14 @@ void device_execute_interface::interface_pre_start()
 		m_timedint_timer = device().machine->scheduler().timer_alloc(FUNC(static_trigger_periodic_interrupt), (void *)this);
 
 	// register for save states
-	state_save_register_device_item(&m_device, 0, m_suspend);
-	state_save_register_device_item(&m_device, 0, m_nextsuspend);
-	state_save_register_device_item(&m_device, 0, m_eatcycles);
-	state_save_register_device_item(&m_device, 0, m_nexteatcycles);
-	state_save_register_device_item(&m_device, 0, m_trigger);
-	state_save_register_device_item(&m_device, 0, m_totalcycles);
-	state_save_register_device_item(&m_device, 0, m_localtime);
-	state_save_register_device_item(&m_device, 0, m_iloops);
+	m_device.save_item(NAME(m_suspend));
+	m_device.save_item(NAME(m_nextsuspend));
+	m_device.save_item(NAME(m_eatcycles));
+	m_device.save_item(NAME(m_nexteatcycles));
+	m_device.save_item(NAME(m_trigger));
+	m_device.save_item(NAME(m_totalcycles));
+	m_device.save_item(NAME(m_localtime));
+	m_device.save_item(NAME(m_iloops));
 }
 
 
@@ -856,9 +856,9 @@ void device_execute_interface::device_input::start(device_execute_interface *exe
 
 	reset();
 
-	state_save_register_device_item(m_device, m_linenum, m_stored_vector);
-	state_save_register_device_item(m_device, m_linenum, m_curvector);
-	state_save_register_device_item(m_device, m_linenum, m_curstate);
+	m_device->save_item(NAME(m_stored_vector), m_linenum);
+	m_device->save_item(NAME(m_curvector), m_linenum);
+	m_device->save_item(NAME(m_curstate), m_linenum);
 }
 
 

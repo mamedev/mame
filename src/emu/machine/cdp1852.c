@@ -170,11 +170,11 @@ static DEVICE_START( cdp1852 )
 	}
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, cdp1852->new_data);
-	state_save_register_device_item(device, 0, cdp1852->data);
-	state_save_register_device_item(device, 0, cdp1852->next_data);
-	state_save_register_device_item(device, 0, cdp1852->sr);
-	state_save_register_device_item(device, 0, cdp1852->next_sr);
+	device->save_item(NAME(cdp1852->new_data));
+	device->save_item(NAME(cdp1852->data));
+	device->save_item(NAME(cdp1852->next_data));
+	device->save_item(NAME(cdp1852->sr));
+	device->save_item(NAME(cdp1852->next_sr));
 }
 
 /*-------------------------------------------------

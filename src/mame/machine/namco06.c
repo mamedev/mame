@@ -273,7 +273,7 @@ static DEVICE_START( namco_06xx )
 	/* allocate a timer */
 	state->nmi_timer = device->machine->scheduler().timer_alloc(FUNC(nmi_generate), (void *)device);
 
-	state_save_register_device_item(device, 0, state->control);
+	device->save_item(NAME(state->control));
 }
 
 

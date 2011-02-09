@@ -987,54 +987,54 @@ static TIMER_CALLBACK( sci_tick )
  ****************************************************************************/
 static void state_register(m6800_state *cpustate, const char *type)
 {
-	state_save_register_device_item(cpustate->device, 0, cpustate->ppc.w.l);
-	state_save_register_device_item(cpustate->device, 0, cpustate->pc.w.l);
-	state_save_register_device_item(cpustate->device, 0, cpustate->s.w.l);
-	state_save_register_device_item(cpustate->device, 0, cpustate->x.w.l);
-	state_save_register_device_item(cpustate->device, 0, cpustate->d.w.l);
-	state_save_register_device_item(cpustate->device, 0, cpustate->cc);
-	state_save_register_device_item(cpustate->device, 0, cpustate->wai_state);
-	state_save_register_device_item(cpustate->device, 0, cpustate->nmi_state);
-	state_save_register_device_item(cpustate->device, 0, cpustate->nmi_pending);
-	state_save_register_device_item_array(cpustate->device, 0, cpustate->irq_state);
-	state_save_register_device_item(cpustate->device, 0, cpustate->ic_eddge);
+	cpustate->device->save_item(NAME(cpustate->ppc.w.l));
+	cpustate->device->save_item(NAME(cpustate->pc.w.l));
+	cpustate->device->save_item(NAME(cpustate->s.w.l));
+	cpustate->device->save_item(NAME(cpustate->x.w.l));
+	cpustate->device->save_item(NAME(cpustate->d.w.l));
+	cpustate->device->save_item(NAME(cpustate->cc));
+	cpustate->device->save_item(NAME(cpustate->wai_state));
+	cpustate->device->save_item(NAME(cpustate->nmi_state));
+	cpustate->device->save_item(NAME(cpustate->nmi_pending));
+	cpustate->device->save_item(NAME(cpustate->irq_state));
+	cpustate->device->save_item(NAME(cpustate->ic_eddge));
 
-	state_save_register_device_item(cpustate->device, 0, cpustate->port1_ddr);
-	state_save_register_device_item(cpustate->device, 0, cpustate->port2_ddr);
-	state_save_register_device_item(cpustate->device, 0, cpustate->port3_ddr);
-	state_save_register_device_item(cpustate->device, 0, cpustate->port4_ddr);
-	state_save_register_device_item(cpustate->device, 0, cpustate->port1_data);
-	state_save_register_device_item(cpustate->device, 0, cpustate->port2_data);
-	state_save_register_device_item(cpustate->device, 0, cpustate->port3_data);
-	state_save_register_device_item(cpustate->device, 0, cpustate->port4_data);
-	state_save_register_device_item(cpustate->device, 0, cpustate->port2_written);
-	state_save_register_device_item(cpustate->device, 0, cpustate->port3_latched);
-	state_save_register_device_item(cpustate->device, 0, cpustate->p3csr);
-	state_save_register_device_item(cpustate->device, 0, cpustate->p3csr_is3_flag_read);
-	state_save_register_device_item(cpustate->device, 0, cpustate->tcsr);
-	state_save_register_device_item(cpustate->device, 0, cpustate->pending_tcsr);
-	state_save_register_device_item(cpustate->device, 0, cpustate->irq2);
-	state_save_register_device_item(cpustate->device, 0, cpustate->ram_ctrl);
+	cpustate->device->save_item(NAME(cpustate->port1_ddr));
+	cpustate->device->save_item(NAME(cpustate->port2_ddr));
+	cpustate->device->save_item(NAME(cpustate->port3_ddr));
+	cpustate->device->save_item(NAME(cpustate->port4_ddr));
+	cpustate->device->save_item(NAME(cpustate->port1_data));
+	cpustate->device->save_item(NAME(cpustate->port2_data));
+	cpustate->device->save_item(NAME(cpustate->port3_data));
+	cpustate->device->save_item(NAME(cpustate->port4_data));
+	cpustate->device->save_item(NAME(cpustate->port2_written));
+	cpustate->device->save_item(NAME(cpustate->port3_latched));
+	cpustate->device->save_item(NAME(cpustate->p3csr));
+	cpustate->device->save_item(NAME(cpustate->p3csr_is3_flag_read));
+	cpustate->device->save_item(NAME(cpustate->tcsr));
+	cpustate->device->save_item(NAME(cpustate->pending_tcsr));
+	cpustate->device->save_item(NAME(cpustate->irq2));
+	cpustate->device->save_item(NAME(cpustate->ram_ctrl));
 
-	state_save_register_device_item(cpustate->device, 0, cpustate->counter.d);
-	state_save_register_device_item(cpustate->device, 0, cpustate->output_compare.d);
-	state_save_register_device_item(cpustate->device, 0, cpustate->input_capture);
-	state_save_register_device_item(cpustate->device, 0, cpustate->timer_over.d);
+	cpustate->device->save_item(NAME(cpustate->counter.d));
+	cpustate->device->save_item(NAME(cpustate->output_compare.d));
+	cpustate->device->save_item(NAME(cpustate->input_capture));
+	cpustate->device->save_item(NAME(cpustate->timer_over.d));
 
-	state_save_register_device_item(cpustate->device, 0, cpustate->clock);
-	state_save_register_device_item(cpustate->device, 0, cpustate->trcsr);
-	state_save_register_device_item(cpustate->device, 0, cpustate->rmcr);
-	state_save_register_device_item(cpustate->device, 0, cpustate->rdr);
-	state_save_register_device_item(cpustate->device, 0, cpustate->tdr);
-	state_save_register_device_item(cpustate->device, 0, cpustate->rsr);
-	state_save_register_device_item(cpustate->device, 0, cpustate->tsr);
-	state_save_register_device_item(cpustate->device, 0, cpustate->rxbits);
-	state_save_register_device_item(cpustate->device, 0, cpustate->txbits);
-	state_save_register_device_item(cpustate->device, 0, cpustate->txstate);
-	state_save_register_device_item(cpustate->device, 0, cpustate->trcsr_read_tdre);
-	state_save_register_device_item(cpustate->device, 0, cpustate->trcsr_read_orfe);
-	state_save_register_device_item(cpustate->device, 0, cpustate->trcsr_read_rdrf);
-	state_save_register_device_item(cpustate->device, 0, cpustate->tx);
+	cpustate->device->save_item(NAME(cpustate->clock));
+	cpustate->device->save_item(NAME(cpustate->trcsr));
+	cpustate->device->save_item(NAME(cpustate->rmcr));
+	cpustate->device->save_item(NAME(cpustate->rdr));
+	cpustate->device->save_item(NAME(cpustate->tdr));
+	cpustate->device->save_item(NAME(cpustate->rsr));
+	cpustate->device->save_item(NAME(cpustate->tsr));
+	cpustate->device->save_item(NAME(cpustate->rxbits));
+	cpustate->device->save_item(NAME(cpustate->txbits));
+	cpustate->device->save_item(NAME(cpustate->txstate));
+	cpustate->device->save_item(NAME(cpustate->trcsr_read_tdre));
+	cpustate->device->save_item(NAME(cpustate->trcsr_read_orfe));
+	cpustate->device->save_item(NAME(cpustate->trcsr_read_rdrf));
+	cpustate->device->save_item(NAME(cpustate->tx));
 }
 
 static CPU_INIT( m6800 )

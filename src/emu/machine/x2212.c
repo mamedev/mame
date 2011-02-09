@@ -114,8 +114,8 @@ x2212_device::x2212_device(running_machine &_machine, const x2212_device_config 
 
 void x2212_device::device_start()
 {
-	state_save_register_device_item(this, 0, m_store);
-	state_save_register_device_item(this, 0, m_array_recall);
+	save_item(NAME(m_store));
+	save_item(NAME(m_array_recall));
 
 	m_sram = m_addrspace[0];
 	m_e2prom = m_addrspace[1];

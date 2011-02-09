@@ -1531,15 +1531,15 @@ static void hyperstone_init(legacy_cpu_device *device, device_irq_callback irqca
 {
 	hyperstone_state *cpustate = get_safe_token(device);
 
-	state_save_register_device_item_array(device, 0, cpustate->global_regs);
-	state_save_register_device_item_array(device, 0, cpustate->local_regs);
-	state_save_register_device_item(device, 0, cpustate->ppc);
-	state_save_register_device_item(device, 0, cpustate->trap_entry);
-	state_save_register_device_item(device, 0, cpustate->delay.delay_pc);
-	state_save_register_device_item(device, 0, cpustate->instruction_length);
-	state_save_register_device_item(device, 0, cpustate->intblock);
-	state_save_register_device_item(device, 0, cpustate->delay.delay_cmd);
-	state_save_register_device_item(device, 0, cpustate->tr_clocks_per_tick);
+	device->save_item(NAME(cpustate->global_regs));
+	device->save_item(NAME(cpustate->local_regs));
+	device->save_item(NAME(cpustate->ppc));
+	device->save_item(NAME(cpustate->trap_entry));
+	device->save_item(NAME(cpustate->delay.delay_pc));
+	device->save_item(NAME(cpustate->instruction_length));
+	device->save_item(NAME(cpustate->intblock));
+	device->save_item(NAME(cpustate->delay.delay_cmd));
+	device->save_item(NAME(cpustate->tr_clocks_per_tick));
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;

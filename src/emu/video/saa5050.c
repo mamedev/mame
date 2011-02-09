@@ -353,13 +353,13 @@ static DEVICE_START( saa5050 )
 
 	saa5050->videoram = auto_alloc_array(device->machine, UINT8, 0x800);
 
-	state_save_register_device_item_pointer(device, 0, saa5050->videoram, 0x800);
-	state_save_register_device_item(device, 0, saa5050->flags);
-	state_save_register_device_item(device, 0, saa5050->forecol);
-	state_save_register_device_item(device, 0, saa5050->backcol);
-	state_save_register_device_item(device, 0, saa5050->prvcol);
-	state_save_register_device_item(device, 0, saa5050->prvchr);
-	state_save_register_device_item(device, 0, saa5050->frame_count);
+	device->save_pointer(NAME(saa5050->videoram), 0x800);
+	device->save_item(NAME(saa5050->flags));
+	device->save_item(NAME(saa5050->forecol));
+	device->save_item(NAME(saa5050->backcol));
+	device->save_item(NAME(saa5050->prvcol));
+	device->save_item(NAME(saa5050->prvchr));
+	device->save_item(NAME(saa5050->frame_count));
 }
 
 static DEVICE_RESET( saa5050 )

@@ -1561,8 +1561,8 @@ static DEVICE_START( k007121 )
 {
 	k007121_state *k007121 = k007121_get_safe_token(device);
 
-	state_save_register_device_item_array(device, 0, k007121->ctrlram);
-	state_save_register_device_item(device, 0, k007121->flipscreen);
+	device->save_item(NAME(k007121->ctrlram));
+	device->save_item(NAME(k007121->flipscreen));
 }
 
 static DEVICE_RESET( k007121 )
@@ -1842,13 +1842,13 @@ static DEVICE_START( k007342 )
 	tilemap_set_transparent_pen(k007342->tilemap[0], 0);
 	tilemap_set_transparent_pen(k007342->tilemap[1], 0);
 
-	state_save_register_device_item_pointer(device, 0, k007342->ram, 0x2000);
-	state_save_register_device_item_pointer(device, 0, k007342->scroll_ram, 0x0200);
-	state_save_register_device_item(device, 0, k007342->int_enabled);
-	state_save_register_device_item(device, 0, k007342->flipscreen);
-	state_save_register_device_item_array(device, 0, k007342->scrollx);
-	state_save_register_device_item_array(device, 0, k007342->scrolly);
-	state_save_register_device_item_array(device, 0, k007342->regs);
+	device->save_pointer(NAME(k007342->ram), 0x2000);
+	device->save_pointer(NAME(k007342->scroll_ram), 0x0200);
+	device->save_item(NAME(k007342->int_enabled));
+	device->save_item(NAME(k007342->flipscreen));
+	device->save_item(NAME(k007342->scrollx));
+	device->save_item(NAME(k007342->scrolly));
+	device->save_item(NAME(k007342->regs));
 }
 
 static DEVICE_RESET( k007342 )
@@ -2111,9 +2111,9 @@ static DEVICE_START( k007420 )
 
 	k007420->ram = auto_alloc_array(device->machine, UINT8, 0x200);
 
-	state_save_register_device_item_pointer(device, 0, k007420->ram, 0x200);
-	state_save_register_device_item(device, 0, k007420->flipscreen);	// current one uses 7342 one
-	state_save_register_device_item_array(device, 0, k007420->regs);	// current one uses 7342 ones
+	device->save_pointer(NAME(k007420->ram), 0x200);
+	device->save_item(NAME(k007420->flipscreen));	// current one uses 7342 one
+	device->save_item(NAME(k007420->regs));	// current one uses 7342 ones
 }
 
 static DEVICE_RESET( k007420 )
@@ -2736,16 +2736,16 @@ static DEVICE_START( k052109 )
 	tilemap_set_transparent_pen(k052109->tilemap[1], 0);
 	tilemap_set_transparent_pen(k052109->tilemap[2], 0);
 
-	state_save_register_device_item_pointer(device, 0, k052109->ram, 0x6000);
-	state_save_register_device_item(device, 0, k052109->rmrd_line);
-	state_save_register_device_item(device, 0, k052109->romsubbank);
-	state_save_register_device_item(device, 0, k052109->scrollctrl);
-	state_save_register_device_item(device, 0, k052109->irq_enabled);
-	state_save_register_device_item_array(device, 0, k052109->charrombank);
-	state_save_register_device_item_array(device, 0, k052109->charrombank_2);
-	state_save_register_device_item_array(device, 0, k052109->dx);
-	state_save_register_device_item_array(device, 0, k052109->dy);
-	state_save_register_device_item(device, 0, k052109->has_extra_video_ram);
+	device->save_pointer(NAME(k052109->ram), 0x6000);
+	device->save_item(NAME(k052109->rmrd_line));
+	device->save_item(NAME(k052109->romsubbank));
+	device->save_item(NAME(k052109->scrollctrl));
+	device->save_item(NAME(k052109->irq_enabled));
+	device->save_item(NAME(k052109->charrombank));
+	device->save_item(NAME(k052109->charrombank_2));
+	device->save_item(NAME(k052109->dx));
+	device->save_item(NAME(k052109->dy));
+	device->save_item(NAME(k052109->has_extra_video_ram));
 	device->machine->state().register_postload(k052109_tileflip_reset, k052109);
 }
 
@@ -3277,17 +3277,17 @@ static DEVICE_START( k051960 )
 	k051960->callback = intf->callback;
 	k051960->ram = auto_alloc_array_clear(machine, UINT8, 0x400);
 
-	state_save_register_device_item(device, 0, k051960->romoffset);
-	state_save_register_device_item(device, 0, k051960->spriteflip);
-	state_save_register_device_item(device, 0, k051960->readroms);
-	state_save_register_device_item_array(device, 0, k051960->spriterombank);
-	state_save_register_device_item_pointer(device, 0, k051960->ram, 0x400);
-	state_save_register_device_item(device, 0, k051960->irq_enabled);
-	state_save_register_device_item(device, 0, k051960->nmi_enabled);
-	state_save_register_device_item(device, 0, k051960->dx);
-	state_save_register_device_item(device, 0, k051960->dy);
+	device->save_item(NAME(k051960->romoffset));
+	device->save_item(NAME(k051960->spriteflip));
+	device->save_item(NAME(k051960->readroms));
+	device->save_item(NAME(k051960->spriterombank));
+	device->save_pointer(NAME(k051960->ram), 0x400);
+	device->save_item(NAME(k051960->irq_enabled));
+	device->save_item(NAME(k051960->nmi_enabled));
+	device->save_item(NAME(k051960->dx));
+	device->save_item(NAME(k051960->dy));
 
-	state_save_register_device_item(device, 0, k051960->k051937_counter);
+	device->save_item(NAME(k051960->k051937_counter));
 }
 
 static DEVICE_RESET( k051960 )
@@ -4085,11 +4085,11 @@ static DEVICE_START( k05324x )
 
 	k05324x->buffer = auto_alloc_array(machine, UINT16, k05324x->ramsize / 2);
 
-	state_save_register_device_item_pointer(device, 0, k05324x->ram, k05324x->ramsize / 2);
-	state_save_register_device_item_pointer(device, 0, k05324x->buffer, k05324x->ramsize / 2);
-	state_save_register_device_item(device, 0, k05324x->rombank);
-	state_save_register_device_item(device, 0, k05324x->z_rejection);
-	state_save_register_device_item_array(device, 0, k05324x->regs);
+	device->save_pointer(NAME(k05324x->ram), k05324x->ramsize / 2);
+	device->save_pointer(NAME(k05324x->buffer), k05324x->ramsize / 2);
+	device->save_item(NAME(k05324x->rombank));
+	device->save_item(NAME(k05324x->z_rejection));
+	device->save_item(NAME(k05324x->regs));
 }
 
 static DEVICE_RESET( k05324x )
@@ -4926,12 +4926,12 @@ static DEVICE_START( k053247 )
 
 	k053247->ram = auto_alloc_array_clear(machine, UINT16, 0x1000 / 2);
 
-	state_save_register_device_item_pointer(device, 0, k053247->ram, 0x1000 / 2);
-	state_save_register_device_item_array(device, 0, k053247->kx46_regs);
-	state_save_register_device_item_array(device, 0, k053247->kx47_regs);
-	state_save_register_device_item(device, 0, k053247->objcha_line);
-	state_save_register_device_item(device, 0, k053247->wraparound);
-	state_save_register_device_item(device, 0, k053247->z_rejection);
+	device->save_pointer(NAME(k053247->ram), 0x1000 / 2);
+	device->save_item(NAME(k053247->kx46_regs));
+	device->save_item(NAME(k053247->kx47_regs));
+	device->save_item(NAME(k053247->objcha_line));
+	device->save_item(NAME(k053247->wraparound));
+	device->save_item(NAME(k053247->z_rejection));
 }
 
 /* K055673 used with the 54246 in PreGX/Run and Gun/System GX games */
@@ -5049,12 +5049,12 @@ static DEVICE_START( k055673 )
 
 	k053247->ram = auto_alloc_array(machine, UINT16, 0x1000 / 2);
 
-	state_save_register_device_item_pointer(device, 0, k053247->ram, 0x800);
-	state_save_register_device_item_array(device, 0, k053247->kx46_regs);
-	state_save_register_device_item_array(device, 0, k053247->kx47_regs);
-	state_save_register_device_item(device, 0, k053247->objcha_line);
-	state_save_register_device_item(device, 0, k053247->wraparound);
-	state_save_register_device_item(device, 0, k053247->z_rejection);
+	device->save_pointer(NAME(k053247->ram), 0x800);
+	device->save_item(NAME(k053247->kx46_regs));
+	device->save_item(NAME(k053247->kx47_regs));
+	device->save_item(NAME(k053247->objcha_line));
+	device->save_item(NAME(k053247->wraparound));
+	device->save_item(NAME(k053247->z_rejection));
 }
 
 static DEVICE_RESET( k053247 )
@@ -5381,9 +5381,9 @@ static DEVICE_START( k051316 )
 	k051316->offset[0] = intf->xoffs;
 	k051316->offset[1] = intf->yoffs;
 
-	state_save_register_device_item_pointer(device, 0, k051316->ram, 0x800);
-	state_save_register_device_item_array(device, 0, k051316->ctrlram);
-	state_save_register_device_item(device, 0, k051316->wraparound);
+	device->save_pointer(NAME(k051316->ram), 0x800);
+	device->save_item(NAME(k051316->ctrlram));
+	device->save_item(NAME(k051316->wraparound));
 }
 
 static DEVICE_RESET( k051316 )
@@ -5607,8 +5607,8 @@ static DEVICE_START( k053936 )
 	k053936->offset[0] = intf->xoff;
 	k053936->offset[1] = intf->yoff;
 
-	state_save_register_device_item_pointer(device, 0, k053936->ctrl, 0x20);
-	state_save_register_device_item_pointer(device, 0, k053936->linectrl, 0x4000);
+	device->save_pointer(NAME(k053936->ctrl), 0x20);
+	device->save_pointer(NAME(k053936->linectrl), 0x4000);
 }
 
 static DEVICE_RESET( k053936 )
@@ -5753,9 +5753,9 @@ static DEVICE_START( k053251 )
 {
 	k053251_state *k053251 = k053251_get_safe_token(device);
 
-	state_save_register_device_item_array(device, 0, k053251->ram);
-	state_save_register_device_item(device, 0, k053251->tilemaps_set);
-	state_save_register_device_item_array(device, 0, k053251->dirty_tmap);
+	device->save_item(NAME(k053251->ram));
+	device->save_item(NAME(k053251->tilemaps_set));
+	device->save_item(NAME(k053251->dirty_tmap));
 
 	device->machine->state().register_postload(k053251_reset_indexes, k053251);
 }
@@ -5873,7 +5873,7 @@ static DEVICE_START( k054000 )
 {
 	k054000_state *k054000 = k054000_get_safe_token(device);
 
-	state_save_register_device_item_array(device, 0, k054000->regs);
+	device->save_item(NAME(k054000->regs));
 }
 
 static DEVICE_RESET( k054000 )
@@ -6023,7 +6023,7 @@ static DEVICE_START( k051733 )
 {
 	k051733_state *k051733 = k051733_get_safe_token(device);
 
-	state_save_register_device_item_array(device, 0, k051733->ram);
+	device->save_item(NAME(k051733->ram));
 }
 
 static DEVICE_RESET( k051733 )
@@ -7968,39 +7968,39 @@ static DEVICE_START( k056832 )
 	k056832_change_rambank(k056832);
 	k056832_change_rombank(k056832);
 
-	state_save_register_device_item_pointer(device, 0, k056832->videoram, 0x10000);
-	state_save_register_device_item_array(device, 0, k056832->regs);
-	state_save_register_device_item_array(device, 0, k056832->regsb);
-	state_save_register_device_item_array(device, 0, k056832->x);
-	state_save_register_device_item_array(device, 0, k056832->y);
-	state_save_register_device_item_array(device, 0, k056832->w);
-	state_save_register_device_item_array(device, 0, k056832->h);
-	state_save_register_device_item_array(device, 0, k056832->dx);
-	state_save_register_device_item_array(device, 0, k056832->dy);
-	state_save_register_device_item_array(device, 0, k056832->layer_tile_mode);
+	device->save_pointer(NAME(k056832->videoram), 0x10000);
+	device->save_item(NAME(k056832->regs));
+	device->save_item(NAME(k056832->regsb));
+	device->save_item(NAME(k056832->x));
+	device->save_item(NAME(k056832->y));
+	device->save_item(NAME(k056832->w));
+	device->save_item(NAME(k056832->h));
+	device->save_item(NAME(k056832->dx));
+	device->save_item(NAME(k056832->dy));
+	device->save_item(NAME(k056832->layer_tile_mode));
 
-	state_save_register_device_item(device, 0, k056832->default_layer_association);
-	state_save_register_device_item(device, 0, k056832->active_layer);
-	state_save_register_device_item(device, 0, k056832->linemap_enabled);
-	state_save_register_device_item(device, 0, k056832->use_ext_linescroll);
-	state_save_register_device_item(device, 0, k056832->uses_tile_banks);
-	state_save_register_device_item(device, 0, k056832->cur_tile_bank);
-	state_save_register_device_item(device, 0, k056832->rom_half);
-	state_save_register_device_item_array(device, 0, k056832->all_lines_dirty);
-	state_save_register_device_item_array(device, 0, k056832->page_tile_mode);
+	device->save_item(NAME(k056832->default_layer_association));
+	device->save_item(NAME(k056832->active_layer));
+	device->save_item(NAME(k056832->linemap_enabled));
+	device->save_item(NAME(k056832->use_ext_linescroll));
+	device->save_item(NAME(k056832->uses_tile_banks));
+	device->save_item(NAME(k056832->cur_tile_bank));
+	device->save_item(NAME(k056832->rom_half));
+	device->save_item(NAME(k056832->all_lines_dirty));
+	device->save_item(NAME(k056832->page_tile_mode));
 
 	for (i = 0; i < 8; i++)
 	{
-		state_save_register_device_item_array(device, i, k056832->layer_offs[i]);
-		state_save_register_device_item_array(device, i, k056832->lsram_page[i]);
+		device->save_item(NAME(k056832->layer_offs[i]), i);
+		device->save_item(NAME(k056832->lsram_page[i]), i);
 	}
 
 	for (i = 0; i < K056832_PAGE_COUNT; i++)
 	{
-		state_save_register_device_item_array(device, i, k056832->line_dirty[i]);
-		state_save_register_device_item(device, i, k056832->all_lines_dirty[i]);
-		state_save_register_device_item(device, i, k056832->page_tile_mode[i]);
-		state_save_register_device_item(device, i, k056832->last_colorbase[i]);
+		device->save_item(NAME(k056832->line_dirty[i]), i);
+		device->save_item(NAME(k056832->all_lines_dirty[i]), i);
+		device->save_item(NAME(k056832->page_tile_mode[i]), i);
+		device->save_item(NAME(k056832->last_colorbase[i]), i);
 	}
 
 	device->machine->state().register_postload(k056832_postload, k056832);
@@ -8116,7 +8116,7 @@ int k055555_get_palette_index( device_t *device, int idx )
 static DEVICE_START( k055555 )
 {
 	k055555_state *k055555 = k055555_get_safe_token(device);
-	state_save_register_device_item_array(device, 0, k055555->regs);
+	device->save_item(NAME(k055555->regs));
 }
 
 static DEVICE_RESET( k055555 )
@@ -8418,8 +8418,8 @@ static DEVICE_START( k054338 )
 
 	k054338->alphainverted = intf->alpha_inv;
 
-	state_save_register_device_item_array(device, 0, k054338->regs);
-	state_save_register_device_item_array(device, 0, k054338->shd_rgb);
+	device->save_item(NAME(k054338->regs));
+	device->save_item(NAME(k054338->shd_rgb));
 }
 
 static DEVICE_RESET( k054338 )
@@ -8962,10 +8962,10 @@ static DEVICE_START( k053250 )
 	/* unpack graphics */
 	k053250_unpack_pixels(device->machine, intf->gfx_memory_region);
 
-	state_save_register_device_item_pointer(device, 0, k053250->ram, 0x6000 / 2);
-	state_save_register_device_item_array(device, 0, k053250->regs);
-	state_save_register_device_item(device, 0, k053250->page);
-	state_save_register_device_item(device, 0, k053250->frame);
+	device->save_pointer(NAME(k053250->ram), 0x6000 / 2);
+	device->save_item(NAME(k053250->regs));
+	device->save_item(NAME(k053250->page));
+	device->save_item(NAME(k053250->frame));
 }
 
 static DEVICE_RESET( k053250 )
@@ -9037,7 +9037,7 @@ static DEVICE_START( k053252 )
 {
 	k053252_state *k053252 = k053252_get_safe_token(device);
 
-	state_save_register_device_item_array(device, 0, k053252->regs);
+	device->save_item(NAME(k053252->regs));
 }
 
 static DEVICE_RESET( k053252 )
@@ -9209,11 +9209,11 @@ static DEVICE_START( k001006 )
 
 	k001006->gfx_region = intf->gfx_region;
 
-	state_save_register_device_item_pointer(device, 0, k001006->pal_ram, 0x800*sizeof(UINT16));
-	state_save_register_device_item_pointer(device, 0, k001006->unknown_ram, 0x1000*sizeof(UINT16));
-	state_save_register_device_item_pointer(device, 0, k001006->palette, 0x800*sizeof(UINT32));
-	state_save_register_device_item(device, 0, k001006->device_sel);
-	state_save_register_device_item(device, 0, k001006->addr);
+	device->save_pointer(NAME(k001006->pal_ram), 0x800*sizeof(UINT16));
+	device->save_pointer(NAME(k001006->unknown_ram), 0x1000*sizeof(UINT16));
+	device->save_pointer(NAME(k001006->palette), 0x800*sizeof(UINT32));
+	device->save_item(NAME(k001006->device_sel));
+	device->save_item(NAME(k001006->addr));
 }
 
 static DEVICE_RESET( k001006 )
@@ -10114,21 +10114,21 @@ static DEVICE_START( k001005 )
 	}
 
 
-	state_save_register_device_item_pointer(device, 0, k001005->texture, 0x800000);
-	state_save_register_device_item_pointer(device, 0, k001005->ram[0], 0x140000);
-	state_save_register_device_item_pointer(device, 0, k001005->ram[1], 0x140000);
-	state_save_register_device_item_pointer(device, 0, k001005->fifo, 0x800);
-	state_save_register_device_item_pointer(device, 0, k001005->_3d_fifo, 0x10000);
-	state_save_register_device_item(device, 0, k001005->status);
-	state_save_register_device_item(device, 0, k001005->ram_ptr);
-	state_save_register_device_item(device, 0, k001005->fifo_read_ptr);
-	state_save_register_device_item(device, 0, k001005->fifo_write_ptr);
-	state_save_register_device_item(device, 0, k001005->_3d_fifo_ptr);
-	state_save_register_device_item(device, 0, k001005->bitmap_page);
-	state_save_register_device_item(device, 0, k001005->prev_poly_type);
-	state_save_register_device_item_bitmap(device, 0, k001005->bitmap[0]);
-	state_save_register_device_item_bitmap(device, 0, k001005->bitmap[1]);
-	state_save_register_device_item_bitmap(device, 0, k001005->zbuffer);
+	device->save_pointer(NAME(k001005->texture), 0x800000);
+	device->save_pointer(NAME(k001005->ram[0]), 0x140000);
+	device->save_pointer(NAME(k001005->ram[1]), 0x140000);
+	device->save_pointer(NAME(k001005->fifo), 0x800);
+	device->save_pointer(NAME(k001005->_3d_fifo), 0x10000);
+	device->save_item(NAME(k001005->status));
+	device->save_item(NAME(k001005->ram_ptr));
+	device->save_item(NAME(k001005->fifo_read_ptr));
+	device->save_item(NAME(k001005->fifo_write_ptr));
+	device->save_item(NAME(k001005->_3d_fifo_ptr));
+	device->save_item(NAME(k001005->bitmap_page));
+	device->save_item(NAME(k001005->prev_poly_type));
+	device->save_item(NAME(*k001005->bitmap[0]));
+	device->save_item(NAME(*k001005->bitmap[1]));
+	device->save_item(NAME(*k001005->zbuffer));
 
 	// FIXME: shall we save poly as well?
 }
@@ -10557,9 +10557,9 @@ static DEVICE_START( k001604 )
 	device->machine->gfx[k001604->gfx_index[0]] = gfx_element_alloc(device->machine, &k001604_char_layout_layer_8x8, (UINT8*)&k001604->char_ram[0], device->machine->total_colors() / 16, 0);
 	device->machine->gfx[k001604->gfx_index[1]] = gfx_element_alloc(device->machine, &k001604_char_layout_layer_16x16, (UINT8*)&k001604->char_ram[0], device->machine->total_colors() / 16, 0);
 
-	state_save_register_device_item_pointer(device, 0, k001604->reg, 0x400 / 4);
-	state_save_register_device_item_pointer(device, 0, k001604->char_ram, 0x200000 / 4);
-	state_save_register_device_item_pointer(device, 0, k001604->tile_ram, 0x20000 / 4);
+	device->save_pointer(NAME(k001604->reg), 0x400 / 4);
+	device->save_pointer(NAME(k001604->char_ram), 0x200000 / 4);
+	device->save_pointer(NAME(k001604->tile_ram), 0x20000 / 4);
 }
 
 static DEVICE_RESET( k001604 )
@@ -10798,9 +10798,9 @@ static DEVICE_START( k037122 )
 
 	device->machine->gfx[k037122->gfx_index] = gfx_element_alloc(device->machine, &k037122_char_layout, (UINT8*)k037122->char_ram, device->machine->total_colors() / 16, 0);
 
-	state_save_register_device_item_pointer(device, 0, k037122->reg, 0x400 / 4);
-	state_save_register_device_item_pointer(device, 0, k037122->char_ram, 0x200000 / 4);
-	state_save_register_device_item_pointer(device, 0, k037122->tile_ram, 0x20000 / 4);
+	device->save_pointer(NAME(k037122->reg), 0x400 / 4);
+	device->save_pointer(NAME(k037122->char_ram), 0x200000 / 4);
+	device->save_pointer(NAME(k037122->tile_ram), 0x20000 / 4);
 }
 
 static DEVICE_RESET( k037122 )

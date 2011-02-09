@@ -99,13 +99,13 @@ void ins8154_device::device_start()
 	devcb_resolve_write_line(&m_out_irq_func, &m_config.m_out_irq_func, this);
 
 	/* register for state saving */
-	state_save_register_device_item(this, 0, m_in_a);
-	state_save_register_device_item(this, 0, m_in_b);
-	state_save_register_device_item(this, 0, m_out_a);
-	state_save_register_device_item(this, 0, m_out_b);
-	state_save_register_device_item(this, 0, m_mdr);
-	state_save_register_device_item(this, 0, m_odra);
-	state_save_register_device_item(this, 0, m_odrb);
+	save_item(NAME(m_in_a));
+	save_item(NAME(m_in_b));
+	save_item(NAME(m_out_a));
+	save_item(NAME(m_out_b));
+	save_item(NAME(m_mdr));
+	save_item(NAME(m_odra));
+	save_item(NAME(m_odrb));
 }
 
 

@@ -404,16 +404,16 @@ static DEVICE_START( namco_51xx )
 	INT32 in_count;
 	INT32 mode,coincred_mode,remap_joy;
 #endif
-	state_save_register_device_item(device, 0, state->lastcoins);
-	state_save_register_device_item(device, 0, state->lastbuttons);
-	state_save_register_device_item(device, 0, state->credits);
-	state_save_register_device_item_array(device, 0, state->coins);
-	state_save_register_device_item_array(device, 0, state->coins_per_cred);
-	state_save_register_device_item_array(device, 0, state->creds_per_coin);
-	state_save_register_device_item(device, 0, state->in_count);
-	state_save_register_device_item(device, 0, state->mode);
-	state_save_register_device_item(device, 0, state->coincred_mode);
-	state_save_register_device_item(device, 0, state->remap_joy);
+	device->save_item(NAME(state->lastcoins));
+	device->save_item(NAME(state->lastbuttons));
+	device->save_item(NAME(state->credits));
+	device->save_item(NAME(state->coins));
+	device->save_item(NAME(state->coins_per_cred));
+	device->save_item(NAME(state->creds_per_coin));
+	device->save_item(NAME(state->in_count));
+	device->save_item(NAME(state->mode));
+	device->save_item(NAME(state->coincred_mode));
+	device->save_item(NAME(state->remap_joy));
 }
 
 

@@ -102,15 +102,15 @@ void pcu_init(dsp56k_core* cpustate, device_t *device)
 	dsp56k_irq_table_init();
 
 	/* save states - dsp56k_pcu members */
-	state_save_register_device_item(device, 0, cpustate->PCU.pc);
-	state_save_register_device_item(device, 0, cpustate->PCU.la);
-	state_save_register_device_item(device, 0, cpustate->PCU.lc);
-	state_save_register_device_item(device, 0, cpustate->PCU.sr);
-	state_save_register_device_item(device, 0, cpustate->PCU.omr);
-	state_save_register_device_item(device, 0, cpustate->PCU.sp);
-	state_save_register_device_item_array(device, 0, cpustate->PCU.ss);
-	state_save_register_device_item_array(device, 0, cpustate->PCU.pending_interrupts);
-	state_save_register_device_item(device, 0, cpustate->PCU.reset_vector);
+	device->save_item(NAME(cpustate->PCU.pc));
+	device->save_item(NAME(cpustate->PCU.la));
+	device->save_item(NAME(cpustate->PCU.lc));
+	device->save_item(NAME(cpustate->PCU.sr));
+	device->save_item(NAME(cpustate->PCU.omr));
+	device->save_item(NAME(cpustate->PCU.sp));
+	device->save_item(NAME(cpustate->PCU.ss));
+	device->save_item(NAME(cpustate->PCU.pending_interrupts));
+	device->save_item(NAME(cpustate->PCU.reset_vector));
 }
 
 void pcu_reset(dsp56k_core* cpustate)

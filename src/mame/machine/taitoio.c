@@ -188,8 +188,8 @@ static DEVICE_START( tc0220ioc )
 	devcb_resolve_read8(&tc0220ioc->read_3, &intf->read_3, device);
 	devcb_resolve_read8(&tc0220ioc->read_7, &intf->read_7, device);
 
-	state_save_register_device_item_array(device, 0, tc0220ioc->regs);
-	state_save_register_device_item(device, 0, tc0220ioc->port);
+	device->save_item(NAME(tc0220ioc->regs));
+	device->save_item(NAME(tc0220ioc->port));
 }
 
 static DEVICE_RESET( tc0220ioc )
@@ -343,7 +343,7 @@ static DEVICE_START( tc0510nio )
 	devcb_resolve_read8(&tc0510nio->read_3, &intf->read_3, device);
 	devcb_resolve_read8(&tc0510nio->read_7, &intf->read_7, device);
 
-	state_save_register_device_item_array(device, 0, tc0510nio->regs);
+	device->save_item(NAME(tc0510nio->regs));
 }
 
 static DEVICE_RESET( tc0510nio )
@@ -498,7 +498,7 @@ static DEVICE_START( tc0640fio )
 	devcb_resolve_read8(&tc0640fio->read_3, &intf->read_3, device);
 	devcb_resolve_read8(&tc0640fio->read_7, &intf->read_7, device);
 
-	state_save_register_device_item_array(device, 0, tc0640fio->regs);
+	device->save_item(NAME(tc0640fio->regs));
 }
 
 static DEVICE_RESET( tc0640fio )

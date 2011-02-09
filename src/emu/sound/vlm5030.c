@@ -707,25 +707,25 @@ static DEVICE_START( vlm5030 )
 
 	/* don't restore "UINT8 *chip->rom" when use vlm5030_set_rom() */
 
-	state_save_register_device_item(device,0,chip->address);
-	state_save_register_device_item(device,0,chip->pin_BSY);
-	state_save_register_device_item(device,0,chip->pin_ST);
-	state_save_register_device_item(device,0,chip->pin_VCU);
-	state_save_register_device_item(device,0,chip->pin_RST);
-	state_save_register_device_item(device,0,chip->latch_data);
-	state_save_register_device_item(device,0,chip->vcu_addr_h);
-	state_save_register_device_item(device,0,chip->parameter);
-	state_save_register_device_item(device,0,chip->phase);
-	state_save_register_device_item(device,0,chip->interp_count);
-	state_save_register_device_item(device,0,chip->sample_count);
-	state_save_register_device_item(device,0,chip->pitch_count);
-	state_save_register_device_item(device,0,chip->old_energy);
-	state_save_register_device_item(device,0,chip->old_pitch);
-	state_save_register_device_item_array(device,0,chip->old_k);
-	state_save_register_device_item(device,0,chip->target_energy);
-	state_save_register_device_item(device,0,chip->target_pitch);
-	state_save_register_device_item_array(device,0,chip->target_k);
-	state_save_register_device_item_array(device,0,chip->x);
+	device->save_item(NAME(chip->address));
+	device->save_item(NAME(chip->pin_BSY));
+	device->save_item(NAME(chip->pin_ST));
+	device->save_item(NAME(chip->pin_VCU));
+	device->save_item(NAME(chip->pin_RST));
+	device->save_item(NAME(chip->latch_data));
+	device->save_item(NAME(chip->vcu_addr_h));
+	device->save_item(NAME(chip->parameter));
+	device->save_item(NAME(chip->phase));
+	device->save_item(NAME(chip->interp_count));
+	device->save_item(NAME(chip->sample_count));
+	device->save_item(NAME(chip->pitch_count));
+	device->save_item(NAME(chip->old_energy));
+	device->save_item(NAME(chip->old_pitch));
+	device->save_item(NAME(chip->old_k));
+	device->save_item(NAME(chip->target_energy));
+	device->save_item(NAME(chip->target_pitch));
+	device->save_item(NAME(chip->target_k));
+	device->save_item(NAME(chip->x));
 	device->machine->state().register_postload(vlm5030_restore_state, chip);
 }
 

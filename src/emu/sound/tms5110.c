@@ -281,45 +281,45 @@ static UINT8 new_int_read(tms5110_state *tms)
 
 static void register_for_save_states(tms5110_state *tms)
 {
-	state_save_register_device_item_array(tms->device, 0, tms->fifo);
-	state_save_register_device_item(tms->device, 0, tms->fifo_head);
-	state_save_register_device_item(tms->device, 0, tms->fifo_tail);
-	state_save_register_device_item(tms->device, 0, tms->fifo_count);
+	tms->device->save_item(NAME(tms->fifo));
+	tms->device->save_item(NAME(tms->fifo_head));
+	tms->device->save_item(NAME(tms->fifo_tail));
+	tms->device->save_item(NAME(tms->fifo_count));
 
-	state_save_register_device_item(tms->device, 0, tms->PDC);
-	state_save_register_device_item(tms->device, 0, tms->CTL_pins);
-	state_save_register_device_item(tms->device, 0, tms->speaking_now);
-	state_save_register_device_item(tms->device, 0, tms->talk_status);
-	state_save_register_device_item(tms->device, 0, tms->state);
+	tms->device->save_item(NAME(tms->PDC));
+	tms->device->save_item(NAME(tms->CTL_pins));
+	tms->device->save_item(NAME(tms->speaking_now));
+	tms->device->save_item(NAME(tms->talk_status));
+	tms->device->save_item(NAME(tms->state));
 
-	state_save_register_device_item(tms->device, 0, tms->old_energy);
-	state_save_register_device_item(tms->device, 0, tms->old_pitch);
-	state_save_register_device_item_array(tms->device, 0, tms->old_k);
+	tms->device->save_item(NAME(tms->old_energy));
+	tms->device->save_item(NAME(tms->old_pitch));
+	tms->device->save_item(NAME(tms->old_k));
 
-	state_save_register_device_item(tms->device, 0, tms->new_energy);
-	state_save_register_device_item(tms->device, 0, tms->new_pitch);
-	state_save_register_device_item_array(tms->device, 0, tms->new_k);
+	tms->device->save_item(NAME(tms->new_energy));
+	tms->device->save_item(NAME(tms->new_pitch));
+	tms->device->save_item(NAME(tms->new_k));
 
-	state_save_register_device_item(tms->device, 0, tms->current_energy);
-	state_save_register_device_item(tms->device, 0, tms->current_pitch);
-	state_save_register_device_item_array(tms->device, 0, tms->current_k);
+	tms->device->save_item(NAME(tms->current_energy));
+	tms->device->save_item(NAME(tms->current_pitch));
+	tms->device->save_item(NAME(tms->current_k));
 
-	state_save_register_device_item(tms->device, 0, tms->target_energy);
-	state_save_register_device_item(tms->device, 0, tms->target_pitch);
-	state_save_register_device_item_array(tms->device, 0, tms->target_k);
+	tms->device->save_item(NAME(tms->target_energy));
+	tms->device->save_item(NAME(tms->target_pitch));
+	tms->device->save_item(NAME(tms->target_k));
 
-	state_save_register_device_item(tms->device, 0, tms->interp_count);
-	state_save_register_device_item(tms->device, 0, tms->sample_count);
-	state_save_register_device_item(tms->device, 0, tms->pitch_count);
+	tms->device->save_item(NAME(tms->interp_count));
+	tms->device->save_item(NAME(tms->sample_count));
+	tms->device->save_item(NAME(tms->pitch_count));
 
-	state_save_register_device_item(tms->device, 0, tms->next_is_address);
-	state_save_register_device_item(tms->device, 0, tms->address);
-	state_save_register_device_item(tms->device, 0, tms->schedule_dummy_read);
-	state_save_register_device_item(tms->device, 0, tms->addr_bit);
+	tms->device->save_item(NAME(tms->next_is_address));
+	tms->device->save_item(NAME(tms->address));
+	tms->device->save_item(NAME(tms->schedule_dummy_read));
+	tms->device->save_item(NAME(tms->addr_bit));
 
-	state_save_register_device_item_array(tms->device, 0, tms->x);
+	tms->device->save_item(NAME(tms->x));
 
-	state_save_register_device_item(tms->device, 0, tms->RNG);
+	tms->device->save_item(NAME(tms->RNG));
 }
 
 
@@ -1352,12 +1352,12 @@ void tms5110_set_frequency(device_t *device, int frequency)
 
 static void register_for_save_states_prom(tmsprom_state *tms)
 {
-	state_save_register_device_item(tms->device, 0, tms->address);
-	state_save_register_device_item(tms->device, 0, tms->base_address);
-	state_save_register_device_item(tms->device, 0, tms->bit);
-	state_save_register_device_item(tms->device, 0, tms->enable);
-	state_save_register_device_item(tms->device, 0, tms->prom_cnt);
-	state_save_register_device_item(tms->device, 0, tms->m0);
+	tms->device->save_item(NAME(tms->address));
+	tms->device->save_item(NAME(tms->base_address));
+	tms->device->save_item(NAME(tms->bit));
+	tms->device->save_item(NAME(tms->enable));
+	tms->device->save_item(NAME(tms->prom_cnt));
+	tms->device->save_item(NAME(tms->m0));
 }
 
 

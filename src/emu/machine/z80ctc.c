@@ -173,7 +173,7 @@ void z80ctc_device::device_start()
 	m_channel[3].start(this, 3, (m_config.m_notimer & NOTIMER_3) != 0, NULL);
 
 	// register for save states
-    state_save_register_device_item(this, 0, m_vector);
+    save_item(NAME(m_vector));
 }
 
 
@@ -339,11 +339,11 @@ void z80ctc_device::ctc_channel::start(z80ctc_device *device, int index, bool no
 	m_timer = m_device->machine->scheduler().timer_alloc(FUNC(static_timer_callback), this);
 
 	// register for save states
-    state_save_register_device_item(m_device, m_index, m_mode);
-    state_save_register_device_item(m_device, m_index, m_tconst);
-    state_save_register_device_item(m_device, m_index, m_down);
-    state_save_register_device_item(m_device, m_index, m_extclk);
-    state_save_register_device_item(m_device, m_index, m_int_state);
+    m_device->save_item(NAME(m_mode), m_index);
+    m_device->save_item(NAME(m_tconst), m_index);
+    m_device->save_item(NAME(m_down), m_index);
+    m_device->save_item(NAME(m_extclk), m_index);
+    m_device->save_item(NAME(m_int_state), m_index);
 }
 
 

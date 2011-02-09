@@ -804,14 +804,14 @@ static CPU_INIT( apexc )
 	cpustate->program = device->space(AS_PROGRAM);
 	cpustate->io = device->space(AS_IO);
 
-	state_save_register_device_item(device, 0, cpustate->a);
-	state_save_register_device_item(device, 0, cpustate->r);
-	state_save_register_device_item(device, 0, cpustate->cr);
-	state_save_register_device_item(device, 0, cpustate->ml);
-	state_save_register_device_item(device, 0, cpustate->working_store);
-	state_save_register_device_item(device, 0, cpustate->current_word);
-	state_save_register_device_item(device, 0, cpustate->running);
-	state_save_register_device_item(device, 0, cpustate->pc);
+	device->save_item(NAME(cpustate->a));
+	device->save_item(NAME(cpustate->r));
+	device->save_item(NAME(cpustate->cr));
+	device->save_item(NAME(cpustate->ml));
+	device->save_item(NAME(cpustate->working_store));
+	device->save_item(NAME(cpustate->current_word));
+	device->save_item(NAME(cpustate->running));
+	device->save_item(NAME(cpustate->pc));
 }
 
 static CPU_RESET( apexc )

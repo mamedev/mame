@@ -1903,18 +1903,18 @@ static CPU_INIT( f8 )
 	cpustate->direct = &cpustate->program->direct();
 	cpustate->iospace = device->space(AS_IO);
 
-	state_save_register_device_item(device, 0, cpustate->pc0);
-	state_save_register_device_item(device, 0, cpustate->pc1);
-	state_save_register_device_item(device, 0, cpustate->dc0);
-	state_save_register_device_item(device, 0, cpustate->dc1);
-	state_save_register_device_item(device, 0, cpustate->a);
-	state_save_register_device_item(device, 0, cpustate->w);
-	state_save_register_device_item(device, 0, cpustate->is);
-	state_save_register_device_item(device, 0, cpustate->dbus);
-	state_save_register_device_item(device, 0, cpustate->io);
-	state_save_register_device_item(device, 0, cpustate->irq_vector);
-	state_save_register_device_item(device, 0, cpustate->irq_request);
-	state_save_register_device_item_array(device, 0, cpustate->r);
+	device->save_item(NAME(cpustate->pc0));
+	device->save_item(NAME(cpustate->pc1));
+	device->save_item(NAME(cpustate->dc0));
+	device->save_item(NAME(cpustate->dc1));
+	device->save_item(NAME(cpustate->a));
+	device->save_item(NAME(cpustate->w));
+	device->save_item(NAME(cpustate->is));
+	device->save_item(NAME(cpustate->dbus));
+	device->save_item(NAME(cpustate->io));
+	device->save_item(NAME(cpustate->irq_vector));
+	device->save_item(NAME(cpustate->irq_request));
+	device->save_item(NAME(cpustate->r));
 }
 
 static CPU_SET_INFO( f8 )

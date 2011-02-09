@@ -456,13 +456,13 @@ void YM_DELTAT_postload(YM_DELTAT *DELTAT,UINT8 *regs)
 void YM_DELTAT_savestate(device_t *device,YM_DELTAT *DELTAT)
 {
 #ifdef __STATE_H__
-	state_save_register_device_item(device, 0, DELTAT->portstate);
-	state_save_register_device_item(device, 0, DELTAT->now_addr);
-	state_save_register_device_item(device, 0, DELTAT->now_step);
-	state_save_register_device_item(device, 0, DELTAT->acc);
-	state_save_register_device_item(device, 0, DELTAT->prev_acc);
-	state_save_register_device_item(device, 0, DELTAT->adpcmd);
-	state_save_register_device_item(device, 0, DELTAT->adpcml);
+	device->save_item(NAME(DELTAT->portstate));
+	device->save_item(NAME(DELTAT->now_addr));
+	device->save_item(NAME(DELTAT->now_step));
+	device->save_item(NAME(DELTAT->acc));
+	device->save_item(NAME(DELTAT->prev_acc));
+	device->save_item(NAME(DELTAT->adpcmd));
+	device->save_item(NAME(DELTAT->adpcml));
 #endif
 }
 

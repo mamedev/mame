@@ -238,22 +238,22 @@ static DEVICE_START( k053260 )
 	InitDeltaTable( ic, rate, device->clock() );
 
 	/* register with the save state system */
-	state_save_register_device_item(device, 0, ic->mode);
-	state_save_register_device_item_array(device, 0, ic->regs);
+	device->save_item(NAME(ic->mode));
+	device->save_item(NAME(ic->regs));
 
 	for ( i = 0; i < 4; i++ )
 	{
-		state_save_register_device_item(device, i, ic->channels[i].rate);
-		state_save_register_device_item(device, i, ic->channels[i].size);
-		state_save_register_device_item(device, i, ic->channels[i].start);
-		state_save_register_device_item(device, i, ic->channels[i].bank);
-		state_save_register_device_item(device, i, ic->channels[i].volume);
-		state_save_register_device_item(device, i, ic->channels[i].play);
-		state_save_register_device_item(device, i, ic->channels[i].pan);
-		state_save_register_device_item(device, i, ic->channels[i].pos);
-		state_save_register_device_item(device, i, ic->channels[i].loop);
-		state_save_register_device_item(device, i, ic->channels[i].ppcm);
-		state_save_register_device_item(device, i, ic->channels[i].ppcm_data);
+		device->save_item(NAME(ic->channels[i].rate), i);
+		device->save_item(NAME(ic->channels[i].size), i);
+		device->save_item(NAME(ic->channels[i].start), i);
+		device->save_item(NAME(ic->channels[i].bank), i);
+		device->save_item(NAME(ic->channels[i].volume), i);
+		device->save_item(NAME(ic->channels[i].play), i);
+		device->save_item(NAME(ic->channels[i].pan), i);
+		device->save_item(NAME(ic->channels[i].pos), i);
+		device->save_item(NAME(ic->channels[i].loop), i);
+		device->save_item(NAME(ic->channels[i].ppcm), i);
+		device->save_item(NAME(ic->channels[i].ppcm_data), i);
 	}
 
 	/* setup SH1 timer if necessary */

@@ -264,25 +264,25 @@ void z80sti_device::device_start()
 	}
 
 	// register for state saving
-	state_save_register_device_item(this, 0, m_gpip);
-	state_save_register_device_item(this, 0, m_aer);
-	state_save_register_device_item(this, 0, m_ddr);
-	state_save_register_device_item(this, 0, m_ier);
-	state_save_register_device_item(this, 0, m_ipr);
-	state_save_register_device_item(this, 0, m_isr);
-	state_save_register_device_item(this, 0, m_imr);
-	state_save_register_device_item(this, 0, m_pvr);
-	state_save_register_device_item_array(this, 0, m_int_state);
-	state_save_register_device_item(this, 0, m_tabc);
-	state_save_register_device_item(this, 0, m_tcdc);
-	state_save_register_device_item_array(this, 0, m_tdr);
-	state_save_register_device_item_array(this, 0, m_tmc);
-	state_save_register_device_item_array(this, 0, m_to);
-	state_save_register_device_item(this, 0, m_scr);
-	state_save_register_device_item(this, 0, m_ucr);
-	state_save_register_device_item(this, 0, m_rsr);
-	state_save_register_device_item(this, 0, m_tsr);
-	state_save_register_device_item(this, 0, m_udr);
+	save_item(NAME(m_gpip));
+	save_item(NAME(m_aer));
+	save_item(NAME(m_ddr));
+	save_item(NAME(m_ier));
+	save_item(NAME(m_ipr));
+	save_item(NAME(m_isr));
+	save_item(NAME(m_imr));
+	save_item(NAME(m_pvr));
+	save_item(NAME(m_int_state));
+	save_item(NAME(m_tabc));
+	save_item(NAME(m_tcdc));
+	save_item(NAME(m_tdr));
+	save_item(NAME(m_tmc));
+	save_item(NAME(m_to));
+	save_item(NAME(m_scr));
+	save_item(NAME(m_ucr));
+	save_item(NAME(m_rsr));
+	save_item(NAME(m_tsr));
+	save_item(NAME(m_udr));
 
 }
 

@@ -114,9 +114,9 @@ void ttl74123_device::device_start()
 	m_clear = m_config.m_clear;
 
 	/* register for state saving */
-	state_save_register_device_item(this, 0, m_a);
-	state_save_register_device_item(this, 0, m_b);
-	state_save_register_device_item(this, 0, m_clear);
+	save_item(NAME(m_a));
+	save_item(NAME(m_b));
+	save_item(NAME(m_clear));
 }
 
 

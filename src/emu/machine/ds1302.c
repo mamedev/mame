@@ -97,12 +97,12 @@ ds1302_device::ds1302_device(running_machine &_machine, const ds1302_device_conf
 
 void ds1302_device::device_start()
 {
-	state_save_register_device_item(this, 0, m_shift_in);
-	state_save_register_device_item(this, 0, m_shift_out);
-	state_save_register_device_item(this, 0, m_icount);
-	state_save_register_device_item(this, 0, m_last_clk);
-	state_save_register_device_item(this, 0, m_last_cmd);
-	state_save_register_device_item_array(this, 0, m_sram);
+	save_item(NAME(m_shift_in));
+	save_item(NAME(m_shift_out));
+	save_item(NAME(m_icount));
+	save_item(NAME(m_last_clk));
+	save_item(NAME(m_last_cmd));
+	save_item(NAME(m_sram));
 }
 
 

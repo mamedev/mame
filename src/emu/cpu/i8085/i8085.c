@@ -1017,21 +1017,21 @@ static void init_808x_common(legacy_cpu_device *device, device_irq_callback irqc
 	devcb_resolve_write_line(&cpustate->out_sod_func, &cpustate->config.out_sod_func, device);
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, cpustate->PC.w.l);
-	state_save_register_device_item(device, 0, cpustate->SP.w.l);
-	state_save_register_device_item(device, 0, cpustate->AF.w.l);
-	state_save_register_device_item(device, 0, cpustate->BC.w.l);
-	state_save_register_device_item(device, 0, cpustate->DE.w.l);
-	state_save_register_device_item(device, 0, cpustate->HL.w.l);
-	state_save_register_device_item(device, 0, cpustate->HALT);
-	state_save_register_device_item(device, 0, cpustate->IM);
-	state_save_register_device_item(device, 0, cpustate->STATUS);
-	state_save_register_device_item(device, 0, cpustate->after_ei);
-	state_save_register_device_item(device, 0, cpustate->nmi_state);
-	state_save_register_device_item_array(device, 0, cpustate->irq_state);
-	state_save_register_device_item(device, 0, cpustate->trap_pending);
-	state_save_register_device_item(device, 0, cpustate->trap_im_copy);
-	state_save_register_device_item(device, 0, cpustate->sod_state);
+	device->save_item(NAME(cpustate->PC.w.l));
+	device->save_item(NAME(cpustate->SP.w.l));
+	device->save_item(NAME(cpustate->AF.w.l));
+	device->save_item(NAME(cpustate->BC.w.l));
+	device->save_item(NAME(cpustate->DE.w.l));
+	device->save_item(NAME(cpustate->HL.w.l));
+	device->save_item(NAME(cpustate->HALT));
+	device->save_item(NAME(cpustate->IM));
+	device->save_item(NAME(cpustate->STATUS));
+	device->save_item(NAME(cpustate->after_ei));
+	device->save_item(NAME(cpustate->nmi_state));
+	device->save_item(NAME(cpustate->irq_state));
+	device->save_item(NAME(cpustate->trap_pending));
+	device->save_item(NAME(cpustate->trap_im_copy));
+	device->save_item(NAME(cpustate->sod_state));
 }
 
 static CPU_INIT( i8080 )

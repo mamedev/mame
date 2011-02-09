@@ -70,9 +70,9 @@ void k033906_device::device_start()
 
 	m_reg_set = 0;
 
-	state_save_register_device_item_pointer(this, 0, m_reg, 256);
-	state_save_register_device_item_pointer(this, 0, m_ram, 32768);
-	state_save_register_device_item(this, 0, m_reg_set);
+	save_pointer(NAME(m_reg), 256);
+	save_pointer(NAME(m_ram), 32768);
+	save_item(NAME(m_reg_set));
 }
 
 

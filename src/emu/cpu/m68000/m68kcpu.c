@@ -752,23 +752,23 @@ static CPU_INIT( m68k )
 	}
 
 	/* Note, D covers A because the dar array is common, REG_A=REG_D+8 */
-	state_save_register_device_item_array(device, 0, REG_D);
-	state_save_register_device_item(device, 0, REG_PPC);
-	state_save_register_device_item(device, 0, REG_PC);
-	state_save_register_device_item(device, 0, REG_USP);
-	state_save_register_device_item(device, 0, REG_ISP);
-	state_save_register_device_item(device, 0, REG_MSP);
-	state_save_register_device_item(device, 0, m68k->vbr);
-	state_save_register_device_item(device, 0, m68k->sfc);
-	state_save_register_device_item(device, 0, m68k->dfc);
-	state_save_register_device_item(device, 0, m68k->cacr);
-	state_save_register_device_item(device, 0, m68k->caar);
-	state_save_register_device_item(device, 0, m68k->save_sr);
-	state_save_register_device_item(device, 0, m68k->int_level);
-	state_save_register_device_item(device, 0, m68k->save_stopped);
-	state_save_register_device_item(device, 0, m68k->save_halted);
-	state_save_register_device_item(device, 0, m68k->pref_addr);
-	state_save_register_device_item(device, 0, m68k->pref_data);
+	device->save_item(NAME(REG_D));
+	device->save_item(NAME(REG_PPC));
+	device->save_item(NAME(REG_PC));
+	device->save_item(NAME(REG_USP));
+	device->save_item(NAME(REG_ISP));
+	device->save_item(NAME(REG_MSP));
+	device->save_item(NAME(m68k->vbr));
+	device->save_item(NAME(m68k->sfc));
+	device->save_item(NAME(m68k->dfc));
+	device->save_item(NAME(m68k->cacr));
+	device->save_item(NAME(m68k->caar));
+	device->save_item(NAME(m68k->save_sr));
+	device->save_item(NAME(m68k->int_level));
+	device->save_item(NAME(m68k->save_stopped));
+	device->save_item(NAME(m68k->save_halted));
+	device->save_item(NAME(m68k->pref_addr));
+	device->save_item(NAME(m68k->pref_data));
 	device->machine->state().register_presave(m68k_presave, m68k);
 	device->machine->state().register_postload(m68k_postload, m68k);
 }

@@ -221,7 +221,7 @@ static DEVICE_START( latch8 )
 			latch8->has_read = 1;
 		}
 
-	state_save_register_device_item(device, 0, latch8->value);
+	device->save_item(NAME(latch8->value));
 }
 
 

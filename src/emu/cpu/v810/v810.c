@@ -1026,11 +1026,11 @@ static CPU_INIT( v810 )
 	cpustate->direct = &cpustate->program->direct();
 	cpustate->io = device->space(AS_IO);
 
-	state_save_register_device_item_array(device, 0, cpustate->reg);
-	state_save_register_device_item(device, 0, cpustate->irq_line);
-	state_save_register_device_item(device, 0, cpustate->irq_state);
-	state_save_register_device_item(device, 0, cpustate->nmi_line);
-	state_save_register_device_item(device, 0, cpustate->PPC);
+	device->save_item(NAME(cpustate->reg));
+	device->save_item(NAME(cpustate->irq_line));
+	device->save_item(NAME(cpustate->irq_state));
+	device->save_item(NAME(cpustate->nmi_line));
+	device->save_item(NAME(cpustate->PPC));
 
 }
 

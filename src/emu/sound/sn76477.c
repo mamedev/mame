@@ -2329,58 +2329,58 @@ static STREAM_UPDATE( SN76477_update )
 
 static void state_save_register(device_t *device, sn76477_state *sn)
 {
-	state_save_register_device_item(device, 0, sn->enable);
-	state_save_register_device_item(device, 0, sn->envelope_mode);
-	state_save_register_device_item(device, 0, sn->vco_mode);
-	state_save_register_device_item(device, 0, sn->mixer_mode);
+	device->save_item(NAME(sn->enable));
+	device->save_item(NAME(sn->envelope_mode));
+	device->save_item(NAME(sn->vco_mode));
+	device->save_item(NAME(sn->mixer_mode));
 
-	state_save_register_device_item(device, 0, sn->one_shot_res);
-	state_save_register_device_item(device, 0, sn->one_shot_cap);
-	state_save_register_device_item(device, 0, sn->one_shot_cap_voltage_ext);
+	device->save_item(NAME(sn->one_shot_res));
+	device->save_item(NAME(sn->one_shot_cap));
+	device->save_item(NAME(sn->one_shot_cap_voltage_ext));
 
-	state_save_register_device_item(device, 0, sn->slf_res);
-	state_save_register_device_item(device, 0, sn->slf_cap);
-	state_save_register_device_item(device, 0, sn->slf_cap_voltage_ext);
+	device->save_item(NAME(sn->slf_res));
+	device->save_item(NAME(sn->slf_cap));
+	device->save_item(NAME(sn->slf_cap_voltage_ext));
 
-	state_save_register_device_item(device, 0, sn->vco_voltage);
-	state_save_register_device_item(device, 0, sn->vco_res);
-	state_save_register_device_item(device, 0, sn->vco_cap);
-	state_save_register_device_item(device, 0, sn->vco_cap_voltage_ext);
+	device->save_item(NAME(sn->vco_voltage));
+	device->save_item(NAME(sn->vco_res));
+	device->save_item(NAME(sn->vco_cap));
+	device->save_item(NAME(sn->vco_cap_voltage_ext));
 
-	state_save_register_device_item(device, 0, sn->noise_clock_res);
-	state_save_register_device_item(device, 0, sn->noise_clock_ext);
-	state_save_register_device_item(device, 0, sn->noise_clock);
-	state_save_register_device_item(device, 0, sn->noise_filter_res);
-	state_save_register_device_item(device, 0, sn->noise_filter_cap);
-	state_save_register_device_item(device, 0, sn->noise_filter_cap_voltage_ext);
+	device->save_item(NAME(sn->noise_clock_res));
+	device->save_item(NAME(sn->noise_clock_ext));
+	device->save_item(NAME(sn->noise_clock));
+	device->save_item(NAME(sn->noise_filter_res));
+	device->save_item(NAME(sn->noise_filter_cap));
+	device->save_item(NAME(sn->noise_filter_cap_voltage_ext));
 
-	state_save_register_device_item(device, 0, sn->attack_res);
-	state_save_register_device_item(device, 0, sn->decay_res);
-	state_save_register_device_item(device, 0, sn->attack_decay_cap);
-	state_save_register_device_item(device, 0, sn->attack_decay_cap_voltage_ext);
+	device->save_item(NAME(sn->attack_res));
+	device->save_item(NAME(sn->decay_res));
+	device->save_item(NAME(sn->attack_decay_cap));
+	device->save_item(NAME(sn->attack_decay_cap_voltage_ext));
 
-	state_save_register_device_item(device, 0, sn->amplitude_res);
-	state_save_register_device_item(device, 0, sn->feedback_res);
-	state_save_register_device_item(device, 0, sn->pitch_voltage);
+	device->save_item(NAME(sn->amplitude_res));
+	device->save_item(NAME(sn->feedback_res));
+	device->save_item(NAME(sn->pitch_voltage));
 
-	state_save_register_device_item(device, 0, sn->one_shot_cap_voltage);
-	state_save_register_device_item(device, 0, sn->one_shot_running_ff);
+	device->save_item(NAME(sn->one_shot_cap_voltage));
+	device->save_item(NAME(sn->one_shot_running_ff));
 
-	state_save_register_device_item(device, 0, sn->slf_cap_voltage);
-	state_save_register_device_item(device, 0, sn->slf_out_ff);
+	device->save_item(NAME(sn->slf_cap_voltage));
+	device->save_item(NAME(sn->slf_out_ff));
 
-	state_save_register_device_item(device, 0, sn->vco_cap_voltage);
-	state_save_register_device_item(device, 0, sn->vco_out_ff);
-	state_save_register_device_item(device, 0, sn->vco_alt_pos_edge_ff);
+	device->save_item(NAME(sn->vco_cap_voltage));
+	device->save_item(NAME(sn->vco_out_ff));
+	device->save_item(NAME(sn->vco_alt_pos_edge_ff));
 
-	state_save_register_device_item(device, 0, sn->noise_filter_cap_voltage);
-	state_save_register_device_item(device, 0, sn->real_noise_bit_ff);
-	state_save_register_device_item(device, 0, sn->filtered_noise_bit_ff);
-	state_save_register_device_item(device, 0, sn->noise_gen_count);
+	device->save_item(NAME(sn->noise_filter_cap_voltage));
+	device->save_item(NAME(sn->real_noise_bit_ff));
+	device->save_item(NAME(sn->filtered_noise_bit_ff));
+	device->save_item(NAME(sn->noise_gen_count));
 
-	state_save_register_device_item(device, 0, sn->attack_decay_cap_voltage);
+	device->save_item(NAME(sn->attack_decay_cap_voltage));
 
-	state_save_register_device_item(device, 0, sn->rng);
+	device->save_item(NAME(sn->rng));
 }
 
 

@@ -704,25 +704,25 @@ static void build_mixer_table(ay8910_context *psg)
 
 static void ay8910_statesave(ay8910_context *psg, device_t *device)
 {
-	state_save_register_device_item(device, 0, psg->register_latch);
-	state_save_register_device_item_array(device, 0, psg->regs);
-	state_save_register_device_item(device, 0, psg->last_enable);
+	device->save_item(NAME(psg->register_latch));
+	device->save_item(NAME(psg->regs));
+	device->save_item(NAME(psg->last_enable));
 
-	state_save_register_device_item_array(device, 0, psg->count);
-	state_save_register_device_item(device, 0, psg->count_noise);
-	state_save_register_device_item(device, 0, psg->count_env);
+	device->save_item(NAME(psg->count));
+	device->save_item(NAME(psg->count_noise));
+	device->save_item(NAME(psg->count_env));
 
-	state_save_register_device_item(device, 0, psg->env_volume);
+	device->save_item(NAME(psg->env_volume));
 
-	state_save_register_device_item_array(device, 0, psg->output);
-	state_save_register_device_item(device, 0, psg->output_noise);
+	device->save_item(NAME(psg->output));
+	device->save_item(NAME(psg->output_noise));
 
-	state_save_register_device_item(device, 0, psg->env_step);
-	state_save_register_device_item(device, 0, psg->hold);
-	state_save_register_device_item(device, 0, psg->alternate);
-	state_save_register_device_item(device, 0, psg->attack);
-	state_save_register_device_item(device, 0, psg->holding);
-	state_save_register_device_item(device, 0, psg->rng);
+	device->save_item(NAME(psg->env_step));
+	device->save_item(NAME(psg->hold));
+	device->save_item(NAME(psg->alternate));
+	device->save_item(NAME(psg->attack));
+	device->save_item(NAME(psg->holding));
+	device->save_item(NAME(psg->rng));
 }
 
 /*************************************

@@ -27,9 +27,9 @@ static DEVICE_START( hyprolyb_adpcm )
 
 	state->space = cputag_get_address_space(device->machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
 	state->msm = device->machine->device("msm");
-	state_save_register_device_item(device, 0, state->adpcm_ready);	// only bootlegs
-	state_save_register_device_item(device, 0, state->adpcm_busy);
-	state_save_register_device_item(device, 0, state->vck_ready);
+	device->save_item(NAME(state->adpcm_ready));	// only bootlegs
+	device->save_item(NAME(state->adpcm_busy));
+	device->save_item(NAME(state->vck_ready));
 }
 
 

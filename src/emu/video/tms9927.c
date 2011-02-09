@@ -285,11 +285,11 @@ static DEVICE_START( tms9927 )
 	/* register for state saving */
 	device->machine->state().register_postload(tms9927_state_save_postload, tms);
 
-	state_save_register_device_item(device, 0, tms->clock);
-	state_save_register_device_item_array(device, 0, tms->reg);
-	state_save_register_device_item(device, 0, tms->start_datarow);
-	state_save_register_device_item(device, 0, tms->reset);
-	state_save_register_device_item(device, 0, tms->hpixels_per_column);
+	device->save_item(NAME(tms->clock));
+	device->save_item(NAME(tms->reg));
+	device->save_item(NAME(tms->start_datarow));
+	device->save_item(NAME(tms->reset));
+	device->save_item(NAME(tms->hpixels_per_column));
 }
 
 

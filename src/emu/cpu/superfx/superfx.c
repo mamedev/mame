@@ -673,51 +673,51 @@ static void superfx_register_save( legacy_cpu_device *device )
 	superfx_state *cpustate = get_safe_token(device);
 	int i;
 
-	state_save_register_device_item(device, 0, cpustate->pipeline);
-	state_save_register_device_item(device, 0, cpustate->ramaddr);
+	device->save_item(NAME(cpustate->pipeline));
+	device->save_item(NAME(cpustate->ramaddr));
 
-	state_save_register_device_item_array(device, 0, cpustate->r);
-	state_save_register_device_item(device, 0, cpustate->sfr);
-	state_save_register_device_item(device, 0, cpustate->pbr);
-	state_save_register_device_item(device, 0, cpustate->rombr);
-	state_save_register_device_item(device, 0, cpustate->rambr);
-	state_save_register_device_item(device, 0, cpustate->cbr);
-	state_save_register_device_item(device, 0, cpustate->scbr);
-	state_save_register_device_item(device, 0, cpustate->scmr);
-	state_save_register_device_item(device, 0, cpustate->colr);
-	state_save_register_device_item(device, 0, cpustate->por);
-	state_save_register_device_item(device, 0, cpustate->bramr);
-	state_save_register_device_item(device, 0, cpustate->vcr);
-	state_save_register_device_item(device, 0, cpustate->cfgr);
-	state_save_register_device_item(device, 0, cpustate->clsr);
+	device->save_item(NAME(cpustate->r));
+	device->save_item(NAME(cpustate->sfr));
+	device->save_item(NAME(cpustate->pbr));
+	device->save_item(NAME(cpustate->rombr));
+	device->save_item(NAME(cpustate->rambr));
+	device->save_item(NAME(cpustate->cbr));
+	device->save_item(NAME(cpustate->scbr));
+	device->save_item(NAME(cpustate->scmr));
+	device->save_item(NAME(cpustate->colr));
+	device->save_item(NAME(cpustate->por));
+	device->save_item(NAME(cpustate->bramr));
+	device->save_item(NAME(cpustate->vcr));
+	device->save_item(NAME(cpustate->cfgr));
+	device->save_item(NAME(cpustate->clsr));
 
-	state_save_register_device_item(device, 0, cpustate->romcl);
-	state_save_register_device_item(device, 0, cpustate->romdr);
+	device->save_item(NAME(cpustate->romcl));
+	device->save_item(NAME(cpustate->romdr));
 
-	state_save_register_device_item(device, 0, cpustate->ramcl);
-	state_save_register_device_item(device, 0, cpustate->ramar);
-	state_save_register_device_item(device, 0, cpustate->ramdr);
+	device->save_item(NAME(cpustate->ramcl));
+	device->save_item(NAME(cpustate->ramar));
+	device->save_item(NAME(cpustate->ramdr));
 
-	state_save_register_device_item(device, 0, cpustate->sreg_idx);
-	state_save_register_device_item(device, 0, cpustate->dreg_idx);
-	state_save_register_device_item(device, 0, cpustate->r15_modified);
+	device->save_item(NAME(cpustate->sreg_idx));
+	device->save_item(NAME(cpustate->dreg_idx));
+	device->save_item(NAME(cpustate->r15_modified));
 
-	state_save_register_device_item(device, 0, cpustate->irq);
+	device->save_item(NAME(cpustate->irq));
 
-	state_save_register_device_item(device, 0, cpustate->cache_access_speed);
-	state_save_register_device_item(device, 0, cpustate->memory_access_speed);
+	device->save_item(NAME(cpustate->cache_access_speed));
+	device->save_item(NAME(cpustate->memory_access_speed));
 
-	state_save_register_device_item_array(device, 0, cpustate->cache.buffer);
-	state_save_register_device_item_array(device, 0, cpustate->cache.valid);
+	device->save_item(NAME(cpustate->cache.buffer));
+	device->save_item(NAME(cpustate->cache.valid));
 
 	for (i = 0; i < 2; i++)
 	{
-		state_save_register_device_item(device, i, cpustate->pixelcache[i].offset);
-		state_save_register_device_item(device, i, cpustate->pixelcache[i].bitpend);
-		state_save_register_device_item_array(device, i, cpustate->pixelcache[i].data);
+		device->save_item(NAME(cpustate->pixelcache[i].offset), i);
+		device->save_item(NAME(cpustate->pixelcache[i].bitpend), i);
+		device->save_item(NAME(cpustate->pixelcache[i].data), i);
 	}
 
-	state_save_register_device_item(device, 0, cpustate->icount);
+	device->save_item(NAME(cpustate->icount));
 }
 
 static CPU_INIT( superfx )

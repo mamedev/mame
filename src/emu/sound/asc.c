@@ -135,17 +135,17 @@ void asc_device::device_start()
 
 	m_sync_timer = this->machine->scheduler().timer_alloc(FUNC(sync_timer_cb), this);
 
-	state_save_register_device_item(this, 0, m_fifo_a_rdptr);
-	state_save_register_device_item(this, 0, m_fifo_b_rdptr);
-	state_save_register_device_item(this, 0, m_fifo_a_wrptr);
-	state_save_register_device_item(this, 0, m_fifo_b_wrptr);
-	state_save_register_device_item(this, 0, m_fifo_cap_a);
-	state_save_register_device_item(this, 0, m_fifo_cap_b);
-	state_save_register_device_item_array(this, 0, m_fifo_a);
-	state_save_register_device_item_array(this, 0, m_fifo_b);
-	state_save_register_device_item_array(this, 0, m_regs);
-	state_save_register_device_item_array(this, 0, m_phase);
-	state_save_register_device_item_array(this, 0, m_incr);
+	save_item(NAME(m_fifo_a_rdptr));
+	save_item(NAME(m_fifo_b_rdptr));
+	save_item(NAME(m_fifo_a_wrptr));
+	save_item(NAME(m_fifo_b_wrptr));
+	save_item(NAME(m_fifo_cap_a));
+	save_item(NAME(m_fifo_cap_b));
+	save_item(NAME(m_fifo_a));
+	save_item(NAME(m_fifo_b));
+	save_item(NAME(m_regs));
+	save_item(NAME(m_phase));
+	save_item(NAME(m_incr));
 }
 
 

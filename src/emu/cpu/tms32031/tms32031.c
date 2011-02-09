@@ -491,15 +491,15 @@ void tms3203x_device::device_start()
 	m_direct = &m_program->direct();
 
 	// save state
-	state_save_register_device_item(this, 0, m_pc);
+	save_item(NAME(m_pc));
 	for (int regnum = 0; regnum < 36; regnum++)
-		state_save_register_device_item_array(this, regnum, m_r[regnum].i32);
-	state_save_register_device_item(this, 0, m_bkmask);
-	state_save_register_device_item(this, 0, m_irq_state);
-	state_save_register_device_item(this, 0, m_delayed);
-	state_save_register_device_item(this, 0, m_irq_pending);
-	state_save_register_device_item(this, 0, m_mcu_mode);
-	state_save_register_device_item(this, 0, m_is_idling);
+		save_item(NAME(m_r[regnum].i32), regnum);
+	save_item(NAME(m_bkmask));
+	save_item(NAME(m_irq_state));
+	save_item(NAME(m_delayed));
+	save_item(NAME(m_irq_pending));
+	save_item(NAME(m_mcu_mode));
+	save_item(NAME(m_is_idling));
 
 	// register our state for the debugger
 	state_add(TMS3203X_PC,      "PC",        m_pc);

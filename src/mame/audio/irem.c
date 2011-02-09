@@ -48,8 +48,8 @@ static DEVICE_START( irem_audio )
 	state->ay1 = machine->device("ay1");
 	state->ay2 = machine->device("ay2");
 
-	state_save_register_device_item(device, 0, state->port1);
-	state_save_register_device_item(device, 0, state->port2);
+	device->save_item(NAME(state->port1));
+	device->save_item(NAME(state->port2));
 }
 
 

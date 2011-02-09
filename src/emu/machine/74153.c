@@ -140,18 +140,18 @@ static DEVICE_START( ttl74153 )
 	ttl74153_state *state = get_safe_token(device);
     state->output_cb = config->output_cb;
 
-    state_save_register_device_item_array(device, 0, state->enable);
-    state_save_register_device_item_array(device, 0, state->last_output);
-    state_save_register_device_item(device, 0, state->input_lines[0][0]);
-    state_save_register_device_item(device, 0, state->input_lines[0][1]);
-    state_save_register_device_item(device, 0, state->input_lines[0][2]);
-    state_save_register_device_item(device, 0, state->input_lines[0][3]);
-    state_save_register_device_item(device, 0, state->input_lines[1][0]);
-    state_save_register_device_item(device, 0, state->input_lines[1][1]);
-    state_save_register_device_item(device, 0, state->input_lines[1][2]);
-    state_save_register_device_item(device, 0, state->input_lines[1][3]);
-    state_save_register_device_item(device, 0, state->a);
-    state_save_register_device_item(device, 0, state->b);
+    device->save_item(NAME(state->enable));
+    device->save_item(NAME(state->last_output));
+    device->save_item(NAME(state->input_lines[0][0]));
+    device->save_item(NAME(state->input_lines[0][1]));
+    device->save_item(NAME(state->input_lines[0][2]));
+    device->save_item(NAME(state->input_lines[0][3]));
+    device->save_item(NAME(state->input_lines[1][0]));
+    device->save_item(NAME(state->input_lines[1][1]));
+    device->save_item(NAME(state->input_lines[1][2]));
+    device->save_item(NAME(state->input_lines[1][3]));
+    device->save_item(NAME(state->a));
+    device->save_item(NAME(state->b));
 }
 
 

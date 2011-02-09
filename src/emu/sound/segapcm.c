@@ -129,8 +129,8 @@ static DEVICE_START( segapcm )
 
 	spcm->stream = device->machine->sound().stream_alloc(*device, 0, 2, device->clock() / 128, spcm, SEGAPCM_update);
 
-	state_save_register_device_item_array(device, 0, spcm->low);
-	state_save_register_device_item_pointer(device, 0, spcm->ram, 0x800);
+	device->save_item(NAME(spcm->low));
+	device->save_pointer(NAME(spcm->ram), 0x800);
 }
 
 

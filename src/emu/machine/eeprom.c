@@ -223,16 +223,16 @@ eeprom_device::eeprom_device(running_machine &_machine, const eeprom_device_conf
 
 void eeprom_device::device_start()
 {
-	state_save_register_device_item_pointer(this, 0, m_serial_buffer, SERIAL_BUFFER_LENGTH);
-	state_save_register_device_item(this, 0, m_clock_line);
-	state_save_register_device_item(this, 0, m_reset_line);
-	state_save_register_device_item(this, 0, m_locked);
-	state_save_register_device_item(this, 0, m_serial_count);
-	state_save_register_device_item(this, 0, m_latch);
-	state_save_register_device_item(this, 0, m_reset_delay);
-	state_save_register_device_item(this, 0, m_clock_count);
-	state_save_register_device_item(this, 0, m_data_bits);
-	state_save_register_device_item(this, 0, m_read_address);
+	save_pointer(NAME(m_serial_buffer), SERIAL_BUFFER_LENGTH);
+	save_item(NAME(m_clock_line));
+	save_item(NAME(m_reset_line));
+	save_item(NAME(m_locked));
+	save_item(NAME(m_serial_count));
+	save_item(NAME(m_latch));
+	save_item(NAME(m_reset_delay));
+	save_item(NAME(m_clock_count));
+	save_item(NAME(m_data_bits));
+	save_item(NAME(m_read_address));
 }
 
 

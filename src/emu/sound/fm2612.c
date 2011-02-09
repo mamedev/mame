@@ -1691,15 +1691,15 @@ static void FMsave_state_channel(device_t *device,FM_CH *CH,int num_ch)
 	for(ch=0;ch<num_ch;ch++,CH++)
 	{
 		/* channel */
-		state_save_register_device_item_array(device, ch, CH->op1_out);
-		state_save_register_device_item(device, ch, CH->fc);
+		device->save_item(NAME(CH->op1_out), ch);
+		device->save_item(NAME(CH->fc), ch);
 		/* slots */
 		for(slot=0;slot<4;slot++)
 		{
 			FM_SLOT *SLOT = &CH->SLOT[slot];
-			state_save_register_device_item(device, ch * 4 + slot, SLOT->phase);
-			state_save_register_device_item(device, ch * 4 + slot, SLOT->state);
-			state_save_register_device_item(device, ch * 4 + slot, SLOT->volume);
+			device->save_item(NAME(SLOT->phase), ch * 4 + slot);
+			device->save_item(NAME(SLOT->state), ch * 4 + slot);
+			device->save_item(NAME(SLOT->volume), ch * 4 + slot);
 		}
 	}
 }
@@ -1707,19 +1707,19 @@ static void FMsave_state_channel(device_t *device,FM_CH *CH,int num_ch)
 static void FMsave_state_st(device_t *device,FM_ST *ST)
 {
 #if FM_BUSY_FLAG_SUPPORT
-	state_save_register_device_item(device, 0, ST->busy_expiry_time );
+	device->save_item(NAME(ST->busy_expiry_time) );
 #endif
-	state_save_register_device_item(device, 0, ST->address );
-	state_save_register_device_item(device, 0, ST->irq     );
-	state_save_register_device_item(device, 0, ST->irqmask );
-	state_save_register_device_item(device, 0, ST->status  );
-	state_save_register_device_item(device, 0, ST->mode    );
-	state_save_register_device_item(device, 0, ST->prescaler_sel );
-	state_save_register_device_item(device, 0, ST->fn_h );
-	state_save_register_device_item(device, 0, ST->TA   );
-	state_save_register_device_item(device, 0, ST->TAC  );
-	state_save_register_device_item(device, 0, ST->TB  );
-	state_save_register_device_item(device, 0, ST->TBC  );
+	device->save_item(NAME(ST->address) );
+	device->save_item(NAME(ST->irq)     );
+	device->save_item(NAME(ST->irqmask) );
+	device->save_item(NAME(ST->status)  );
+	device->save_item(NAME(ST->mode)    );
+	device->save_item(NAME(ST->prescaler_sel) );
+	device->save_item(NAME(ST->fn_h) );
+	device->save_item(NAME(ST->TA)   );
+	device->save_item(NAME(ST->TAC)  );
+	device->save_item(NAME(ST->TB)  );
+	device->save_item(NAME(ST->TBC)  );
 }
 #endif /* _STATE_H */
 
@@ -2350,15 +2350,15 @@ void ym2612_postload(void *chip)
 
 static void YM2612_save_state(YM2612 *F2612, device_t *device)
 {
-	state_save_register_device_item_array(device, 0, F2612->REGS);
+	device->save_item(NAME(F2612->REGS));
 	FMsave_state_st(device,&F2612->OPN.ST);
 	FMsave_state_channel(device,F2612->CH,6);
 	/* 3slots */
-	state_save_register_device_item_array(device, 0, F2612->OPN.SL3.fc);
-	state_save_register_device_item(device, 0, F2612->OPN.SL3.fn_h);
-	state_save_register_device_item_array(device, 0, F2612->OPN.SL3.kcode);
+	device->save_item(NAME(F2612->OPN.SL3.fc));
+	device->save_item(NAME(F2612->OPN.SL3.fn_h));
+	device->save_item(NAME(F2612->OPN.SL3.kcode));
 	/* address register1 */
-	state_save_register_device_item(device, 0, F2612->addr_A1);
+	device->save_item(NAME(F2612->addr_A1));
 }
 #endif /* _STATE_H */
 

@@ -249,18 +249,18 @@ static DEVICE_START( iremga20 )
 
 	chip->stream = device->machine->sound().stream_alloc( *device, 0, 2, device->clock()/4, chip, IremGA20_update );
 
-	state_save_register_device_item_array(device, 0, chip->regs);
+	device->save_item(NAME(chip->regs));
 	for (i = 0; i < 4; i++)
 	{
-		state_save_register_device_item(device, i, chip->channel[i].rate);
-		state_save_register_device_item(device, i, chip->channel[i].size);
-		state_save_register_device_item(device, i, chip->channel[i].start);
-		state_save_register_device_item(device, i, chip->channel[i].pos);
-		state_save_register_device_item(device, i, chip->channel[i].end);
-		state_save_register_device_item(device, i, chip->channel[i].volume);
-		state_save_register_device_item(device, i, chip->channel[i].pan);
-		state_save_register_device_item(device, i, chip->channel[i].effect);
-		state_save_register_device_item(device, i, chip->channel[i].play);
+		device->save_item(NAME(chip->channel[i].rate), i);
+		device->save_item(NAME(chip->channel[i].size), i);
+		device->save_item(NAME(chip->channel[i].start), i);
+		device->save_item(NAME(chip->channel[i].pos), i);
+		device->save_item(NAME(chip->channel[i].end), i);
+		device->save_item(NAME(chip->channel[i].volume), i);
+		device->save_item(NAME(chip->channel[i].pan), i);
+		device->save_item(NAME(chip->channel[i].effect), i);
+		device->save_item(NAME(chip->channel[i].play), i);
 	}
 }
 

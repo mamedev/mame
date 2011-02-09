@@ -470,29 +470,29 @@ static DEVICE_START( upd4990a )
 	upd4990a->weekday = systime->local_time.weekday;
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, upd4990a->seconds);
-	state_save_register_device_item(device, 0, upd4990a->minutes);
-	state_save_register_device_item(device, 0, upd4990a->hours);
-	state_save_register_device_item(device, 0, upd4990a->days);
-	state_save_register_device_item(device, 0, upd4990a->month);
-	state_save_register_device_item(device, 0, upd4990a->year);
-	state_save_register_device_item(device, 0, upd4990a->weekday);
+	device->save_item(NAME(upd4990a->seconds));
+	device->save_item(NAME(upd4990a->minutes));
+	device->save_item(NAME(upd4990a->hours));
+	device->save_item(NAME(upd4990a->days));
+	device->save_item(NAME(upd4990a->month));
+	device->save_item(NAME(upd4990a->year));
+	device->save_item(NAME(upd4990a->weekday));
 
-	state_save_register_device_item(device, 0, upd4990a->shiftlo);
-	state_save_register_device_item(device, 0, upd4990a->shifthi);
+	device->save_item(NAME(upd4990a->shiftlo));
+	device->save_item(NAME(upd4990a->shifthi));
 
-	state_save_register_device_item(device, 0, upd4990a->retraces);
-	state_save_register_device_item(device, 0, upd4990a->testwaits);
-	state_save_register_device_item(device, 0, upd4990a->maxwaits);
-	state_save_register_device_item(device, 0, upd4990a->testbit);
+	device->save_item(NAME(upd4990a->retraces));
+	device->save_item(NAME(upd4990a->testwaits));
+	device->save_item(NAME(upd4990a->maxwaits));
+	device->save_item(NAME(upd4990a->testbit));
 
-	state_save_register_device_item(device, 0, upd4990a->outputbit);
-	state_save_register_device_item(device, 0, upd4990a->bitno);
-	state_save_register_device_item(device, 0, upd4990a->reading);
-	state_save_register_device_item(device, 0, upd4990a->writing);
+	device->save_item(NAME(upd4990a->outputbit));
+	device->save_item(NAME(upd4990a->bitno));
+	device->save_item(NAME(upd4990a->reading));
+	device->save_item(NAME(upd4990a->writing));
 
-	state_save_register_device_item(device, 0, upd4990a->clock_line);
-	state_save_register_device_item(device, 0, upd4990a->command_line);
+	device->save_item(NAME(upd4990a->clock_line));
+	device->save_item(NAME(upd4990a->command_line));
 }
 
 

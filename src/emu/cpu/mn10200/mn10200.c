@@ -278,20 +278,20 @@ static CPU_INIT(mn10200)
 	cpustate->program = device->space(AS_PROGRAM);
 	cpustate->io = device->space(AS_IO);
 
-	state_save_register_device_item(device, 0, cpustate->pc);
-	state_save_register_device_item_array(device, 0, cpustate->d);
-	state_save_register_device_item_array(device, 0, cpustate->a);
-	state_save_register_device_item(device, 0, cpustate->nmicr);
-	state_save_register_device_item(device, 0, cpustate->iagr);
-	state_save_register_device_item_array(device, 0, cpustate->icrl);
-	state_save_register_device_item_array(device, 0, cpustate->icrh);
-	state_save_register_device_item(device, 0, cpustate->psw);
-	state_save_register_device_item(device, 0, cpustate->mdr);
-//  state_save_register_device_item_array(device, 0, cpustate->simple_timer);
-//  state_save_register_device_item_array(device, 0, cpustate->prescaler);
-//  state_save_register_device_item_array(device, 0, cpustate->dma);
-//  state_save_register_device_item_array(device, 0, cpustate->serial);
-	state_save_register_device_item_array(device, 0, cpustate->ddr);
+	device->save_item(NAME(cpustate->pc));
+	device->save_item(NAME(cpustate->d));
+	device->save_item(NAME(cpustate->a));
+	device->save_item(NAME(cpustate->nmicr));
+	device->save_item(NAME(cpustate->iagr));
+	device->save_item(NAME(cpustate->icrl));
+	device->save_item(NAME(cpustate->icrh));
+	device->save_item(NAME(cpustate->psw));
+	device->save_item(NAME(cpustate->mdr));
+//  device->save_item(NAME(cpustate->simple_timer));
+//  device->save_item(NAME(cpustate->prescaler));
+//  device->save_item(NAME(cpustate->dma));
+//  device->save_item(NAME(cpustate->serial));
+	device->save_item(NAME(cpustate->ddr));
 
 	for (tmr = 0; tmr < NUM_TIMERS_8BIT; tmr++)
 	{

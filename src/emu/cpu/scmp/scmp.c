@@ -525,13 +525,13 @@ static CPU_INIT( scmp )
 	devcb_resolve_read_line(&cpustate->senseb_func, &cpustate->config.senseb_func, device);
 	devcb_resolve_write_line(&cpustate->halt_func, &cpustate->config.halt_func, device);
 
-	state_save_register_device_item(device, 0, cpustate->PC);
-	state_save_register_device_item(device, 0, cpustate->P1);
-	state_save_register_device_item(device, 0, cpustate->P2);
-	state_save_register_device_item(device, 0, cpustate->P3);
-	state_save_register_device_item(device, 0, cpustate->AC);
-	state_save_register_device_item(device, 0, cpustate->ER);
-	state_save_register_device_item(device, 0, cpustate->SR);
+	device->save_item(NAME(cpustate->PC));
+	device->save_item(NAME(cpustate->P1));
+	device->save_item(NAME(cpustate->P2));
+	device->save_item(NAME(cpustate->P3));
+	device->save_item(NAME(cpustate->AC));
+	device->save_item(NAME(cpustate->ER));
+	device->save_item(NAME(cpustate->SR));
 }
 
 

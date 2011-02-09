@@ -673,11 +673,11 @@ static CPU_INIT( z8 )
 	cpustate->t1_timer = device->machine->scheduler().timer_alloc(FUNC(t1_tick), cpustate);
 
 	/* register for state saving */
-	state_save_register_device_item(device, 0, cpustate->pc);
-	state_save_register_device_item_array(device, 0, cpustate->r);
-	state_save_register_device_item_array(device, 0, cpustate->input);
-	state_save_register_device_item_array(device, 0, cpustate->output);
-	state_save_register_device_item_array(device, 0, cpustate->irq);
+	device->save_item(NAME(cpustate->pc));
+	device->save_item(NAME(cpustate->r));
+	device->save_item(NAME(cpustate->input));
+	device->save_item(NAME(cpustate->output));
+	device->save_item(NAME(cpustate->irq));
 }
 
 /***************************************************************************

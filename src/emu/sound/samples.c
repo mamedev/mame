@@ -493,13 +493,13 @@ static DEVICE_START( samples )
 		info->channel[i].paused = 0;
 
 		/* register with the save state system */
-        state_save_register_device_item(device, i, info->channel[i].source_length);
-        state_save_register_device_item(device, i, info->channel[i].source_num);
-        state_save_register_device_item(device, i, info->channel[i].pos);
-        state_save_register_device_item(device, i, info->channel[i].frac);
-        state_save_register_device_item(device, i, info->channel[i].step);
-        state_save_register_device_item(device, i, info->channel[i].loop);
-        state_save_register_device_item(device, i, info->channel[i].paused);
+        device->save_item(NAME(info->channel[i].source_length), i);
+        device->save_item(NAME(info->channel[i].source_num), i);
+        device->save_item(NAME(info->channel[i].pos), i);
+        device->save_item(NAME(info->channel[i].frac), i);
+        device->save_item(NAME(info->channel[i].step), i);
+        device->save_item(NAME(info->channel[i].loop), i);
+        device->save_item(NAME(info->channel[i].paused), i);
 	}
 	device->machine->state().register_postload(samples_postload, info);
 

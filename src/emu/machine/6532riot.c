@@ -537,21 +537,21 @@ void riot6532_device::device_start()
 	m_timer = m_machine.scheduler().timer_alloc(FUNC(timer_end_callback), (void *)this);
 
 	/* register for save states */
-	state_save_register_device_item(this, 0, m_port[0].m_in);
-	state_save_register_device_item(this, 0, m_port[0].m_out);
-	state_save_register_device_item(this, 0, m_port[0].m_ddr);
-	state_save_register_device_item(this, 0, m_port[1].m_in);
-	state_save_register_device_item(this, 0, m_port[1].m_out);
-	state_save_register_device_item(this, 0, m_port[1].m_ddr);
+	save_item(NAME(m_port[0].m_in));
+	save_item(NAME(m_port[0].m_out));
+	save_item(NAME(m_port[0].m_ddr));
+	save_item(NAME(m_port[1].m_in));
+	save_item(NAME(m_port[1].m_out));
+	save_item(NAME(m_port[1].m_ddr));
 
-	state_save_register_device_item(this, 0, m_irqstate);
-	state_save_register_device_item(this, 0, m_irqenable);
+	save_item(NAME(m_irqstate));
+	save_item(NAME(m_irqenable));
 
-	state_save_register_device_item(this, 0, m_pa7dir);
-	state_save_register_device_item(this, 0, m_pa7prev);
+	save_item(NAME(m_pa7dir));
+	save_item(NAME(m_pa7prev));
 
-	state_save_register_device_item(this, 0, m_timershift);
-	state_save_register_device_item(this, 0, m_timerstate);
+	save_item(NAME(m_timershift));
+	save_item(NAME(m_timerstate));
 }
 
 

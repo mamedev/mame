@@ -135,8 +135,8 @@ static DEVICE_START( ticket )
 
 	state->timer				= device->machine->scheduler().timer_alloc(FUNC(ticket_dispenser_toggle), (void *)device);
 
-	state_save_register_device_item(device, 0, state->status);
-	state_save_register_device_item(device, 0, state->power);
+	device->save_item(NAME(state->status));
+	device->save_item(NAME(state->power));
 }
 
 

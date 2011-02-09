@@ -129,9 +129,9 @@ er2055_device::er2055_device(running_machine &_machine, const er2055_device_conf
 
 void er2055_device::device_start()
 {
-	state_save_register_device_item(this, 0, m_control_state);
-	state_save_register_device_item(this, 0, m_address);
-	state_save_register_device_item(this, 0, m_data);
+	save_item(NAME(m_control_state));
+	save_item(NAME(m_address));
+	save_item(NAME(m_data));
 
 	m_control_state = 0;
 }

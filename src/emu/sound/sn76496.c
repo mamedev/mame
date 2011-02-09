@@ -395,23 +395,23 @@ static void generic_start(device_t *device, int feedbackmask, int noisetap1, int
 	chip->ClockDivider = clockdivider;
 	chip->CurrentClock = clockdivider-1;
 
-	state_save_register_device_item_array(device, 0, chip->VolTable);
-	state_save_register_device_item_array(device, 0, chip->Register);
-	state_save_register_device_item(device, 0, chip->LastRegister);
-	state_save_register_device_item_array(device, 0, chip->Volume);
-	state_save_register_device_item(device, 0, chip->RNG);
-	state_save_register_device_item(device, 0, chip->ClockDivider);
-	state_save_register_device_item(device, 0, chip->CurrentClock);
-	state_save_register_device_item(device, 0, chip->FeedbackMask);
-	state_save_register_device_item(device, 0, chip->WhitenoiseTap1);
-	state_save_register_device_item(device, 0, chip->WhitenoiseTap2);
-	state_save_register_device_item(device, 0, chip->Negate);
-	state_save_register_device_item(device, 0, chip->Stereo);
-	state_save_register_device_item(device, 0, chip->StereoMask);
-	state_save_register_device_item_array(device, 0, chip->Period);
-	state_save_register_device_item_array(device, 0, chip->Count);
-	state_save_register_device_item_array(device, 0, chip->Output);
-	state_save_register_device_item(device, 0, chip->CyclestoREADY);
+	device->save_item(NAME(chip->VolTable));
+	device->save_item(NAME(chip->Register));
+	device->save_item(NAME(chip->LastRegister));
+	device->save_item(NAME(chip->Volume));
+	device->save_item(NAME(chip->RNG));
+	device->save_item(NAME(chip->ClockDivider));
+	device->save_item(NAME(chip->CurrentClock));
+	device->save_item(NAME(chip->FeedbackMask));
+	device->save_item(NAME(chip->WhitenoiseTap1));
+	device->save_item(NAME(chip->WhitenoiseTap2));
+	device->save_item(NAME(chip->Negate));
+	device->save_item(NAME(chip->Stereo));
+	device->save_item(NAME(chip->StereoMask));
+	device->save_item(NAME(chip->Period));
+	device->save_item(NAME(chip->Count));
+	device->save_item(NAME(chip->Output));
+	device->save_item(NAME(chip->CyclestoREADY));
 }
 
 // function parameters: device, feedback destination tap, feedback source taps,

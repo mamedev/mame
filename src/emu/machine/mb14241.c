@@ -56,8 +56,8 @@ static DEVICE_START( mb14241 )
 {
 	mb14241_state *mb14241 = get_safe_token(device);
 
-	state_save_register_device_item(device, 0, mb14241->shift_data);
-	state_save_register_device_item(device, 0, mb14241->shift_count);
+	device->save_item(NAME(mb14241->shift_data));
+	device->save_item(NAME(mb14241->shift_count));
 }
 
 static DEVICE_RESET( mb14241 )

@@ -77,40 +77,40 @@ void ics2115_device::device_start()
         m_ulaw[i] = (i & 0x80) ? -value : value;
 	}
 
-	state_save_register_device_item(this, 0, m_timer[0].period);
-	state_save_register_device_item(this, 0, m_timer[0].scale);
-	state_save_register_device_item(this, 0, m_timer[0].preset);
-	state_save_register_device_item(this, 0, m_timer[1].period);
-	state_save_register_device_item(this, 0, m_timer[1].scale);
-	state_save_register_device_item(this, 0, m_timer[1].preset);
-	state_save_register_device_item(this, 0, m_reg_select);
-	state_save_register_device_item(this, 0, m_osc_select);
-	state_save_register_device_item(this, 0, m_irq_enabled);
-	state_save_register_device_item(this, 0, m_irq_pending);
-	state_save_register_device_item(this, 0, m_irq_on);
-	state_save_register_device_item(this, 0, m_active_osc);
-	state_save_register_device_item(this, 0, m_vmode);
+	save_item(NAME(m_timer[0].period));
+	save_item(NAME(m_timer[0].scale));
+	save_item(NAME(m_timer[0].preset));
+	save_item(NAME(m_timer[1].period));
+	save_item(NAME(m_timer[1].scale));
+	save_item(NAME(m_timer[1].preset));
+	save_item(NAME(m_reg_select));
+	save_item(NAME(m_osc_select));
+	save_item(NAME(m_irq_enabled));
+	save_item(NAME(m_irq_pending));
+	save_item(NAME(m_irq_on));
+	save_item(NAME(m_active_osc));
+	save_item(NAME(m_vmode));
 
 	for(int i = 0; i < 32; i++) {
-		state_save_register_device_item(this, i, m_voice[i].osc_conf.value);
-		state_save_register_device_item(this, i, m_voice[i].state.value);
-		state_save_register_device_item(this, i, m_voice[i].vol_ctrl.value);
-		state_save_register_device_item(this, i, m_voice[i].osc.left);
-		state_save_register_device_item(this, i, m_voice[i].osc.acc);
-		state_save_register_device_item(this, i, m_voice[i].osc.start);
-		state_save_register_device_item(this, i, m_voice[i].osc.end);
-		state_save_register_device_item(this, i, m_voice[i].osc.fc);
-		state_save_register_device_item(this, i, m_voice[i].osc.ctl);
-		state_save_register_device_item(this, i, m_voice[i].osc.saddr);
-		state_save_register_device_item(this, i, m_voice[i].vol.left);
-		state_save_register_device_item(this, i, m_voice[i].vol.add);
-		state_save_register_device_item(this, i, m_voice[i].vol.start);
-		state_save_register_device_item(this, i, m_voice[i].vol.end);
-		state_save_register_device_item(this, i, m_voice[i].vol.acc);
-		state_save_register_device_item(this, i, m_voice[i].vol.regacc);
-		state_save_register_device_item(this, i, m_voice[i].vol.incr);
-		state_save_register_device_item(this, i, m_voice[i].vol.pan);
-		state_save_register_device_item(this, i, m_voice[i].vol.mode);
+		save_item(NAME(m_voice[i].osc_conf.value), i);
+		save_item(NAME(m_voice[i].state.value), i);
+		save_item(NAME(m_voice[i].vol_ctrl.value), i);
+		save_item(NAME(m_voice[i].osc.left), i);
+		save_item(NAME(m_voice[i].osc.acc), i);
+		save_item(NAME(m_voice[i].osc.start), i);
+		save_item(NAME(m_voice[i].osc.end), i);
+		save_item(NAME(m_voice[i].osc.fc), i);
+		save_item(NAME(m_voice[i].osc.ctl), i);
+		save_item(NAME(m_voice[i].osc.saddr), i);
+		save_item(NAME(m_voice[i].vol.left), i);
+		save_item(NAME(m_voice[i].vol.add), i);
+		save_item(NAME(m_voice[i].vol.start), i);
+		save_item(NAME(m_voice[i].vol.end), i);
+		save_item(NAME(m_voice[i].vol.acc), i);
+		save_item(NAME(m_voice[i].vol.regacc), i);
+		save_item(NAME(m_voice[i].vol.incr), i);
+		save_item(NAME(m_voice[i].vol.pan), i);
+		save_item(NAME(m_voice[i].vol.mode), i);
 	}
 }
 

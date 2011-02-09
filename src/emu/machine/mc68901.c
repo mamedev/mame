@@ -819,40 +819,40 @@ void mc68901_device::device_start()
 	}
 
 	/* register for state saving */
-	state_save_register_device_item(this, 0, m_gpip);
-	state_save_register_device_item(this, 0, m_aer);
-	state_save_register_device_item(this, 0, m_ddr);
-	state_save_register_device_item(this, 0, m_ier);
-	state_save_register_device_item(this, 0, m_ipr);
-	state_save_register_device_item(this, 0, m_isr);
-	state_save_register_device_item(this, 0, m_imr);
-	state_save_register_device_item(this, 0, m_vr);
-	state_save_register_device_item(this, 0, m_tacr);
-	state_save_register_device_item(this, 0, m_tbcr);
-	state_save_register_device_item(this, 0, m_tcdcr);
-	state_save_register_device_item_array(this, 0, m_tdr);
-	state_save_register_device_item_array(this, 0, m_tmc);
-	state_save_register_device_item_array(this, 0, m_to);
-	state_save_register_device_item_array(this, 0, m_ti);
-	state_save_register_device_item(this, 0, m_scr);
-	state_save_register_device_item(this, 0, m_ucr);
-	state_save_register_device_item(this, 0, m_rsr);
-	state_save_register_device_item(this, 0, m_tsr);
-	state_save_register_device_item(this, 0, m_udr);
-	state_save_register_device_item(this, 0, m_rx_bits);
-	state_save_register_device_item(this, 0, m_tx_bits);
-	state_save_register_device_item(this, 0, m_rx_parity);
-	state_save_register_device_item(this, 0, m_tx_parity);
-	state_save_register_device_item(this, 0, m_rx_state);
-	state_save_register_device_item(this, 0, m_tx_state);
-	state_save_register_device_item(this, 0, m_rx_buffer);
-	state_save_register_device_item(this, 0, m_tx_buffer);
-	state_save_register_device_item(this, 0, m_xmit_state);
-	state_save_register_device_item(this, 0, m_rxtx_word);
-	state_save_register_device_item(this, 0, m_rxtx_start);
-	state_save_register_device_item(this, 0, m_rxtx_stop);
-	state_save_register_device_item(this, 0, m_rsr_read);
-	state_save_register_device_item(this, 0, m_next_rsr);
+	save_item(NAME(m_gpip));
+	save_item(NAME(m_aer));
+	save_item(NAME(m_ddr));
+	save_item(NAME(m_ier));
+	save_item(NAME(m_ipr));
+	save_item(NAME(m_isr));
+	save_item(NAME(m_imr));
+	save_item(NAME(m_vr));
+	save_item(NAME(m_tacr));
+	save_item(NAME(m_tbcr));
+	save_item(NAME(m_tcdcr));
+	save_item(NAME(m_tdr));
+	save_item(NAME(m_tmc));
+	save_item(NAME(m_to));
+	save_item(NAME(m_ti));
+	save_item(NAME(m_scr));
+	save_item(NAME(m_ucr));
+	save_item(NAME(m_rsr));
+	save_item(NAME(m_tsr));
+	save_item(NAME(m_udr));
+	save_item(NAME(m_rx_bits));
+	save_item(NAME(m_tx_bits));
+	save_item(NAME(m_rx_parity));
+	save_item(NAME(m_tx_parity));
+	save_item(NAME(m_rx_state));
+	save_item(NAME(m_tx_state));
+	save_item(NAME(m_rx_buffer));
+	save_item(NAME(m_tx_buffer));
+	save_item(NAME(m_xmit_state));
+	save_item(NAME(m_rxtx_word));
+	save_item(NAME(m_rxtx_start));
+	save_item(NAME(m_rxtx_stop));
+	save_item(NAME(m_rsr_read));
+	save_item(NAME(m_next_rsr));
 }
 
 

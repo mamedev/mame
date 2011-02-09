@@ -229,34 +229,34 @@ void via6522_device::device_start()
     }
 
 	/* save state register */
-    state_save_register_device_item(this, 0, m_in_a);
-    state_save_register_device_item(this, 0, m_in_ca1);
-    state_save_register_device_item(this, 0, m_in_ca2);
-    state_save_register_device_item(this, 0, m_out_a);
-    state_save_register_device_item(this, 0, m_out_ca2);
-    state_save_register_device_item(this, 0, m_ddr_a);
-    state_save_register_device_item(this, 0, m_in_b);
-    state_save_register_device_item(this, 0, m_in_cb1);
-    state_save_register_device_item(this, 0, m_in_cb2);
-    state_save_register_device_item(this, 0, m_out_b);
-    state_save_register_device_item(this, 0, m_out_cb2);
-    state_save_register_device_item(this, 0, m_ddr_b);
-    state_save_register_device_item(this, 0, m_t1cl);
-    state_save_register_device_item(this, 0, m_t1ch);
-    state_save_register_device_item(this, 0, m_t1ll);
-    state_save_register_device_item(this, 0, m_t1lh);
-    state_save_register_device_item(this, 0, m_t2cl);
-    state_save_register_device_item(this, 0, m_t2ch);
-    state_save_register_device_item(this, 0, m_t2ll);
-    state_save_register_device_item(this, 0, m_t2lh);
-    state_save_register_device_item(this, 0, m_sr);
-    state_save_register_device_item(this, 0, m_pcr);
-    state_save_register_device_item(this, 0, m_acr);
-    state_save_register_device_item(this, 0, m_ier);
-    state_save_register_device_item(this, 0, m_ifr);
-    state_save_register_device_item(this, 0, m_t1_active);
-    state_save_register_device_item(this, 0, m_t2_active);
-    state_save_register_device_item(this, 0, m_shift_counter);
+    save_item(NAME(m_in_a));
+    save_item(NAME(m_in_ca1));
+    save_item(NAME(m_in_ca2));
+    save_item(NAME(m_out_a));
+    save_item(NAME(m_out_ca2));
+    save_item(NAME(m_ddr_a));
+    save_item(NAME(m_in_b));
+    save_item(NAME(m_in_cb1));
+    save_item(NAME(m_in_cb2));
+    save_item(NAME(m_out_b));
+    save_item(NAME(m_out_cb2));
+    save_item(NAME(m_ddr_b));
+    save_item(NAME(m_t1cl));
+    save_item(NAME(m_t1ch));
+    save_item(NAME(m_t1ll));
+    save_item(NAME(m_t1lh));
+    save_item(NAME(m_t2cl));
+    save_item(NAME(m_t2ch));
+    save_item(NAME(m_t2ll));
+    save_item(NAME(m_t2lh));
+    save_item(NAME(m_sr));
+    save_item(NAME(m_pcr));
+    save_item(NAME(m_acr));
+    save_item(NAME(m_ier));
+    save_item(NAME(m_ifr));
+    save_item(NAME(m_t1_active));
+    save_item(NAME(m_t2_active));
+    save_item(NAME(m_shift_counter));
 }
 
 

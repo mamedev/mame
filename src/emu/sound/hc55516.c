@@ -78,15 +78,15 @@ static void start_common(device_t *device, UINT8 _shiftreg_mask, int _active_clo
 	/* create the stream */
 	chip->channel = device->machine->sound().stream_alloc(*device, 0, 1, SAMPLE_RATE, chip, hc55516_update);
 
-	state_save_register_device_item(device, 0, chip->last_clock_state);
-	state_save_register_device_item(device, 0, chip->digit);
-	state_save_register_device_item(device, 0, chip->new_digit);
-	state_save_register_device_item(device, 0, chip->shiftreg);
-	state_save_register_device_item(device, 0, chip->curr_sample);
-	state_save_register_device_item(device, 0, chip->next_sample);
-	state_save_register_device_item(device, 0, chip->update_count);
-	state_save_register_device_item(device, 0, chip->filter);
-	state_save_register_device_item(device, 0, chip->integrator);
+	device->save_item(NAME(chip->last_clock_state));
+	device->save_item(NAME(chip->digit));
+	device->save_item(NAME(chip->new_digit));
+	device->save_item(NAME(chip->shiftreg));
+	device->save_item(NAME(chip->curr_sample));
+	device->save_item(NAME(chip->next_sample));
+	device->save_item(NAME(chip->update_count));
+	device->save_item(NAME(chip->filter));
+	device->save_item(NAME(chip->integrator));
 }
 
 

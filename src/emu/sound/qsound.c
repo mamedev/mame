@@ -139,18 +139,18 @@ static DEVICE_START( qsound )
 	/* state save */
 	for (i=0; i<QSOUND_CHANNELS; i++)
 	{
-		state_save_register_device_item(device, i, chip->channel[i].bank);
-		state_save_register_device_item(device, i, chip->channel[i].address);
-		state_save_register_device_item(device, i, chip->channel[i].pitch);
-		state_save_register_device_item(device, i, chip->channel[i].loop);
-		state_save_register_device_item(device, i, chip->channel[i].end);
-		state_save_register_device_item(device, i, chip->channel[i].vol);
-		state_save_register_device_item(device, i, chip->channel[i].pan);
-		state_save_register_device_item(device, i, chip->channel[i].key);
-		state_save_register_device_item(device, i, chip->channel[i].lvol);
-		state_save_register_device_item(device, i, chip->channel[i].rvol);
-		state_save_register_device_item(device, i, chip->channel[i].lastdt);
-		state_save_register_device_item(device, i, chip->channel[i].offset);
+		device->save_item(NAME(chip->channel[i].bank), i);
+		device->save_item(NAME(chip->channel[i].address), i);
+		device->save_item(NAME(chip->channel[i].pitch), i);
+		device->save_item(NAME(chip->channel[i].loop), i);
+		device->save_item(NAME(chip->channel[i].end), i);
+		device->save_item(NAME(chip->channel[i].vol), i);
+		device->save_item(NAME(chip->channel[i].pan), i);
+		device->save_item(NAME(chip->channel[i].key), i);
+		device->save_item(NAME(chip->channel[i].lvol), i);
+		device->save_item(NAME(chip->channel[i].rvol), i);
+		device->save_item(NAME(chip->channel[i].lastdt), i);
+		device->save_item(NAME(chip->channel[i].offset), i);
 	}
 }
 

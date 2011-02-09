@@ -188,7 +188,7 @@ static DEVICE_START( namco_53xx )
 	devcb_resolve_read8(&state->in[3], &config->in[3], device);
 	devcb_resolve_write8(&state->p, &config->p, device);
 
-	state_save_register_device_item(device, 0, state->portO);
+	device->save_item(NAME(state->portO));
 }
 
 

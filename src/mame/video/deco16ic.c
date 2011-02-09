@@ -1308,31 +1308,31 @@ static DEVICE_START( deco16ic )
 	deco16ic->pf12_control = auto_alloc_array_clear(device->machine, UINT16, 0x10 / 2);
 	deco16ic->pf34_control = auto_alloc_array_clear(device->machine, UINT16, 0x10 / 2);
 
-	state_save_register_device_item(device, 0, deco16ic->priority);
-	state_save_register_device_item(device, 0, deco16ic->raster_display_position);
-	state_save_register_device_item(device, 0, deco16ic->use_custom_pf1);
-	state_save_register_device_item(device, 0, deco16ic->use_custom_pf2);
-	state_save_register_device_item(device, 0, deco16ic->use_custom_pf3);
-	state_save_register_device_item(device, 0, deco16ic->use_custom_pf4);
-	state_save_register_device_item(device, 0, deco16ic->pf1_bank);
-	state_save_register_device_item(device, 0, deco16ic->pf2_bank);
-	state_save_register_device_item(device, 0, deco16ic->pf3_bank);
-	state_save_register_device_item(device, 0, deco16ic->pf4_bank);
-	state_save_register_device_item(device, 0, deco16ic->pf12_8x8_gfx_bank);
-	state_save_register_device_item(device, 0, deco16ic->pf12_16x16_gfx_bank);
-	state_save_register_device_item(device, 0, deco16ic->pf34_16x16_gfx_bank);
-	state_save_register_device_item(device, 0, deco16ic->pf12_last_small);
-	state_save_register_device_item(device, 0, deco16ic->pf12_last_big);
-	state_save_register_device_item(device, 0, deco16ic->pf34_last_big);
+	device->save_item(NAME(deco16ic->priority));
+	device->save_item(NAME(deco16ic->raster_display_position));
+	device->save_item(NAME(deco16ic->use_custom_pf1));
+	device->save_item(NAME(deco16ic->use_custom_pf2));
+	device->save_item(NAME(deco16ic->use_custom_pf3));
+	device->save_item(NAME(deco16ic->use_custom_pf4));
+	device->save_item(NAME(deco16ic->pf1_bank));
+	device->save_item(NAME(deco16ic->pf2_bank));
+	device->save_item(NAME(deco16ic->pf3_bank));
+	device->save_item(NAME(deco16ic->pf4_bank));
+	device->save_item(NAME(deco16ic->pf12_8x8_gfx_bank));
+	device->save_item(NAME(deco16ic->pf12_16x16_gfx_bank));
+	device->save_item(NAME(deco16ic->pf34_16x16_gfx_bank));
+	device->save_item(NAME(deco16ic->pf12_last_small));
+	device->save_item(NAME(deco16ic->pf12_last_big));
+	device->save_item(NAME(deco16ic->pf34_last_big));
 
-	state_save_register_device_item_pointer(device, 0, deco16ic->dirty_palette, 4096);
-	state_save_register_device_item_pointer(device, 0, deco16ic->raster_display_list, 20 * 256 / 2);
-	state_save_register_device_item_pointer(device, 0, deco16ic->pf1_data, 0x2000 / 2);
-	state_save_register_device_item_pointer(device, 0, deco16ic->pf2_data, 0x2000 / 2);
-	state_save_register_device_item_pointer(device, 0, deco16ic->pf3_data, 0x2000 / 2);
-	state_save_register_device_item_pointer(device, 0, deco16ic->pf4_data, 0x2000 / 2);
-	state_save_register_device_item_pointer(device, 0, deco16ic->pf12_control, 0x10 / 2);
-	state_save_register_device_item_pointer(device, 0, deco16ic->pf34_control, 0x10 / 2);
+	device->save_pointer(NAME(deco16ic->dirty_palette), 4096);
+	device->save_pointer(NAME(deco16ic->raster_display_list), 20 * 256 / 2);
+	device->save_pointer(NAME(deco16ic->pf1_data), 0x2000 / 2);
+	device->save_pointer(NAME(deco16ic->pf2_data), 0x2000 / 2);
+	device->save_pointer(NAME(deco16ic->pf3_data), 0x2000 / 2);
+	device->save_pointer(NAME(deco16ic->pf4_data), 0x2000 / 2);
+	device->save_pointer(NAME(deco16ic->pf12_control), 0x10 / 2);
+	device->save_pointer(NAME(deco16ic->pf34_control), 0x10 / 2);
 }
 
 static DEVICE_RESET( deco16ic )

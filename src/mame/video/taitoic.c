@@ -1019,8 +1019,8 @@ static DEVICE_START( pc080sn )
 	pc080sn->bgscroll_ram[0] = pc080sn->ram + 0x4000 /2;
 	pc080sn->bgscroll_ram[1] = pc080sn->ram + 0xc000 /2;
 
-	state_save_register_device_item_pointer(device, 0, pc080sn->ram, PC080SN_RAM_SIZE / 2);
-	state_save_register_device_item_array(device, 0, pc080sn->ctrl);
+	device->save_pointer(NAME(pc080sn->ram), PC080SN_RAM_SIZE / 2);
+	device->save_item(NAME(pc080sn->ctrl));
 	device->machine->state().register_postload(pc080sn_restore_scroll, pc080sn);
 }
 
@@ -1205,10 +1205,10 @@ static DEVICE_START( pc090oj )
 	pc090oj->ram = auto_alloc_array_clear(device->machine, UINT16, PC090OJ_RAM_SIZE / 2);
 	pc090oj->ram_buffered = auto_alloc_array_clear(device->machine, UINT16, PC090OJ_RAM_SIZE / 2);
 
-	state_save_register_device_item_pointer(device, 0, pc090oj->ram, PC090OJ_RAM_SIZE / 2);
-	state_save_register_device_item_pointer(device, 0, pc090oj->ram_buffered, PC090OJ_RAM_SIZE / 2);
-	state_save_register_device_item(device, 0, pc090oj->ctrl);
-	state_save_register_device_item(device, 0, pc090oj->sprite_ctrl);	// should this be set in intf?!?
+	device->save_pointer(NAME(pc090oj->ram), PC090OJ_RAM_SIZE / 2);
+	device->save_pointer(NAME(pc090oj->ram_buffered), PC090OJ_RAM_SIZE / 2);
+	device->save_item(NAME(pc090oj->ctrl));
+	device->save_item(NAME(pc090oj->sprite_ctrl));	// should this be set in intf?!?
 }
 
 static DEVICE_RESET( pc090oj )
@@ -1906,7 +1906,7 @@ static DEVICE_START( tc0080vco )
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	device->machine->gfx[tc0080vco->tx_gfx] = gfx_element_alloc(device->machine, &tc0080vco_charlayout, (UINT8 *)tc0080vco->char_ram, 64, 0);
 
-	state_save_register_device_item_pointer(device, 0, tc0080vco->ram, TC0080VCO_RAM_SIZE / 2);
+	device->save_pointer(NAME(tc0080vco->ram), TC0080VCO_RAM_SIZE / 2);
 	device->machine->state().register_postload(tc0080vco_postload, tc0080vco);
 }
 
@@ -2513,10 +2513,10 @@ static DEVICE_START( tc0100scn )
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	device->machine->gfx[tc0100scn->tx_gfx] = gfx_element_alloc(device->machine, &tc0100scn_charlayout, (UINT8 *)tc0100scn->char_ram, 64, 0);
 
-	state_save_register_device_item_pointer(device, 0, tc0100scn->ram, TC0100SCN_RAM_SIZE / 2);
-	state_save_register_device_item_array(device, 0, tc0100scn->ctrl);
-	state_save_register_device_item(device, 0, tc0100scn->dblwidth);
-	state_save_register_device_item(device, 0, tc0100scn->gfxbank);
+	device->save_pointer(NAME(tc0100scn->ram), TC0100SCN_RAM_SIZE / 2);
+	device->save_item(NAME(tc0100scn->ctrl));
+	device->save_item(NAME(tc0100scn->dblwidth));
+	device->save_item(NAME(tc0100scn->gfxbank));
 	device->machine->state().register_postload(tc0100scn_postload, tc0100scn);
 }
 
@@ -2698,8 +2698,8 @@ static DEVICE_START( tc0280grd )
 
 	tc0280grd->ram = auto_alloc_array(device->machine, UINT16, TC0280GRD_RAM_SIZE / 2);
 
-	state_save_register_device_item_pointer(device, 0, tc0280grd->ram, TC0280GRD_RAM_SIZE / 2);
-	state_save_register_device_item_array(device, 0, tc0280grd->ctrl);
+	device->save_pointer(NAME(tc0280grd->ram), TC0280GRD_RAM_SIZE / 2);
+	device->save_item(NAME(tc0280grd->ctrl));
 }
 
 static DEVICE_RESET( tc0280grd )
@@ -2769,7 +2769,7 @@ READ8_DEVICE_HANDLER( tc0360pri_r )
 static DEVICE_START( tc0360pri )
 {
 	tc0360pri_state *tc0360pri = tc0360pri_get_safe_token(device);
-	state_save_register_device_item_array(device, 0, tc0360pri->regs);
+	device->save_item(NAME(tc0360pri->regs));
 }
 
 static DEVICE_RESET( tc0360pri )
@@ -3724,9 +3724,9 @@ static DEVICE_START( tc0480scp )
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	device->machine->gfx[tc0480scp->tx_gfx] = gfx_element_alloc(device->machine, &tc0480scp_charlayout, (UINT8 *)tc0480scp->char_ram, 64, 0);
 
-	state_save_register_device_item_pointer(device, 0, tc0480scp->ram, TC0480SCP_RAM_SIZE / 2);
-	state_save_register_device_item_array(device, 0, tc0480scp->ctrl);
-	state_save_register_device_item(device, 0, tc0480scp->dblwidth);
+	device->save_pointer(NAME(tc0480scp->ram), TC0480SCP_RAM_SIZE / 2);
+	device->save_item(NAME(tc0480scp->ctrl));
+	device->save_item(NAME(tc0480scp->dblwidth));
 	device->machine->state().register_postload(tc0480scp_postload, tc0480scp);
 }
 
@@ -4546,7 +4546,7 @@ static DEVICE_START( tc0150rod )
 
 	tc0150rod->ram = auto_alloc_array(device->machine, UINT16, TC0150ROD_RAM_SIZE / 2);
 
-	state_save_register_device_item_pointer(device, 0, tc0150rod->ram, TC0150ROD_RAM_SIZE / 2);
+	device->save_pointer(NAME(tc0150rod->ram), TC0150ROD_RAM_SIZE / 2);
 
 }
 
@@ -4758,8 +4758,8 @@ static DEVICE_START( tc0110pcr )
 
 	tc0110pcr->ram = auto_alloc_array(device->machine, UINT16, TC0110PCR_RAM_SIZE);
 
-	state_save_register_device_item_pointer(device, 0, tc0110pcr->ram, TC0110PCR_RAM_SIZE);
-	state_save_register_device_item(device, 0, tc0110pcr->type);
+	device->save_pointer(NAME(tc0110pcr->ram), TC0110PCR_RAM_SIZE);
+	device->save_item(NAME(tc0110pcr->type));
 	device->machine->state().register_postload(tc0110pcr_restore_colors, tc0110pcr);
 }
 
@@ -5093,17 +5093,17 @@ static DEVICE_START( tc0180vcu )
 	tc0180vcu->ram = auto_alloc_array_clear(device->machine, UINT16, TC0180VCU_RAM_SIZE / 2);
 	tc0180vcu->scrollram = auto_alloc_array_clear(device->machine, UINT16, TC0180VCU_SCROLLRAM_SIZE / 2);
 
-	state_save_register_device_item_pointer(device, 0, tc0180vcu->ram, TC0180VCU_RAM_SIZE / 2);
-	state_save_register_device_item_pointer(device, 0, tc0180vcu->scrollram, TC0180VCU_SCROLLRAM_SIZE / 2);
+	device->save_pointer(NAME(tc0180vcu->ram), TC0180VCU_RAM_SIZE / 2);
+	device->save_pointer(NAME(tc0180vcu->scrollram), TC0180VCU_SCROLLRAM_SIZE / 2);
 
-	state_save_register_device_item_array(device, 0, tc0180vcu->bg_rambank);
-	state_save_register_device_item_array(device, 0, tc0180vcu->fg_rambank);
-	state_save_register_device_item(device, 0, tc0180vcu->tx_rambank);
+	device->save_item(NAME(tc0180vcu->bg_rambank));
+	device->save_item(NAME(tc0180vcu->fg_rambank));
+	device->save_item(NAME(tc0180vcu->tx_rambank));
 
-	state_save_register_device_item(device, 0, tc0180vcu->framebuffer_page);
+	device->save_item(NAME(tc0180vcu->framebuffer_page));
 
-	state_save_register_device_item(device, 0, tc0180vcu->video_control);
-	state_save_register_device_item_array(device, 0, tc0180vcu->ctrl);
+	device->save_item(NAME(tc0180vcu->video_control));
+	device->save_item(NAME(tc0180vcu->ctrl));
 }
 
 static DEVICE_RESET( tc0180vcu )

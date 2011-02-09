@@ -481,61 +481,61 @@ static void tms5220_set_variant(tms5220_state *tms, int variant)
 
 static void register_for_save_states(tms5220_state *tms)
 {
-	state_save_register_device_item_array(tms->device, 0, tms->fifo);
-	state_save_register_device_item(tms->device, 0, tms->fifo_head);
-	state_save_register_device_item(tms->device, 0, tms->fifo_tail);
-	state_save_register_device_item(tms->device, 0, tms->fifo_count);
-	state_save_register_device_item(tms->device, 0, tms->fifo_bits_taken);
+	tms->device->save_item(NAME(tms->fifo));
+	tms->device->save_item(NAME(tms->fifo_head));
+	tms->device->save_item(NAME(tms->fifo_tail));
+	tms->device->save_item(NAME(tms->fifo_count));
+	tms->device->save_item(NAME(tms->fifo_bits_taken));
 
-	state_save_register_device_item(tms->device, 0, tms->speaking_now);
-	state_save_register_device_item(tms->device, 0, tms->speak_external);
-	state_save_register_device_item(tms->device, 0, tms->talk_status);
-	state_save_register_device_item(tms->device, 0, tms->buffer_low);
-	state_save_register_device_item(tms->device, 0, tms->buffer_empty);
-	state_save_register_device_item(tms->device, 0, tms->irq_pin);
-	state_save_register_device_item(tms->device, 0, tms->ready_pin);
+	tms->device->save_item(NAME(tms->speaking_now));
+	tms->device->save_item(NAME(tms->speak_external));
+	tms->device->save_item(NAME(tms->talk_status));
+	tms->device->save_item(NAME(tms->buffer_low));
+	tms->device->save_item(NAME(tms->buffer_empty));
+	tms->device->save_item(NAME(tms->irq_pin));
+	tms->device->save_item(NAME(tms->ready_pin));
 
-	state_save_register_device_item(tms->device, 0, tms->OLDE);
-	state_save_register_device_item(tms->device, 0, tms->OLDP);
+	tms->device->save_item(NAME(tms->OLDE));
+	tms->device->save_item(NAME(tms->OLDP));
 
-	state_save_register_device_item(tms->device, 0, tms->new_frame_energy_idx);
-	state_save_register_device_item(tms->device, 0, tms->new_frame_pitch_idx);
-	state_save_register_device_item_array(tms->device, 0, tms->new_frame_k_idx);
+	tms->device->save_item(NAME(tms->new_frame_energy_idx));
+	tms->device->save_item(NAME(tms->new_frame_pitch_idx));
+	tms->device->save_item(NAME(tms->new_frame_k_idx));
 #ifdef PERFECT_INTERPOLATION_HACK
-	state_save_register_device_item(tms->device, 0, tms->old_frame_energy_idx);
-	state_save_register_device_item(tms->device, 0, tms->old_frame_pitch_idx);
-	state_save_register_device_item_array(tms->device, 0, tms->old_frame_k_idx);
+	tms->device->save_item(NAME(tms->old_frame_energy_idx));
+	tms->device->save_item(NAME(tms->old_frame_pitch_idx));
+	tms->device->save_item(NAME(tms->old_frame_k_idx));
 #endif
-	state_save_register_device_item(tms->device, 0, tms->current_energy);
-	state_save_register_device_item(tms->device, 0, tms->current_pitch);
-	state_save_register_device_item_array(tms->device, 0, tms->current_k);
+	tms->device->save_item(NAME(tms->current_energy));
+	tms->device->save_item(NAME(tms->current_pitch));
+	tms->device->save_item(NAME(tms->current_k));
 
-	state_save_register_device_item(tms->device, 0, tms->target_energy);
-	state_save_register_device_item(tms->device, 0, tms->target_pitch);
-	state_save_register_device_item_array(tms->device, 0, tms->target_k);
+	tms->device->save_item(NAME(tms->target_energy));
+	tms->device->save_item(NAME(tms->target_pitch));
+	tms->device->save_item(NAME(tms->target_k));
 
-	state_save_register_device_item(tms->device, 0, tms->previous_energy);
+	tms->device->save_item(NAME(tms->previous_energy));
 
-	state_save_register_device_item(tms->device, 0, tms->subcycle);
-	state_save_register_device_item(tms->device, 0, tms->subc_reload);
-	state_save_register_device_item(tms->device, 0, tms->PC);
-	state_save_register_device_item(tms->device, 0, tms->interp_period);
-	state_save_register_device_item(tms->device, 0, tms->inhibit);
-	state_save_register_device_item(tms->device, 0, tms->tms5220c_rate);
-	state_save_register_device_item(tms->device, 0, tms->pitch_count);
+	tms->device->save_item(NAME(tms->subcycle));
+	tms->device->save_item(NAME(tms->subc_reload));
+	tms->device->save_item(NAME(tms->PC));
+	tms->device->save_item(NAME(tms->interp_period));
+	tms->device->save_item(NAME(tms->inhibit));
+	tms->device->save_item(NAME(tms->tms5220c_rate));
+	tms->device->save_item(NAME(tms->pitch_count));
 
-	state_save_register_device_item_array(tms->device, 0, tms->u);
-	state_save_register_device_item_array(tms->device, 0, tms->x);
+	tms->device->save_item(NAME(tms->u));
+	tms->device->save_item(NAME(tms->x));
 
-	state_save_register_device_item(tms->device, 0, tms->RNG);
-	state_save_register_device_item(tms->device, 0, tms->excitation_data);
+	tms->device->save_item(NAME(tms->RNG));
+	tms->device->save_item(NAME(tms->excitation_data));
 
-	state_save_register_device_item(tms->device, 0, tms->schedule_dummy_read);
-	state_save_register_device_item(tms->device, 0, tms->data_register);
-	state_save_register_device_item(tms->device, 0, tms->RDB_flag);
-	state_save_register_device_item(tms->device, 0, tms->digital_select);
+	tms->device->save_item(NAME(tms->schedule_dummy_read));
+	tms->device->save_item(NAME(tms->data_register));
+	tms->device->save_item(NAME(tms->RDB_flag));
+	tms->device->save_item(NAME(tms->digital_select));
 
-	state_save_register_device_item(tms->device, 0, tms->io_ready);
+	tms->device->save_item(NAME(tms->io_ready));
 }
 
 

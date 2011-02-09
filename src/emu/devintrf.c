@@ -756,9 +756,9 @@ void device_t::start()
 	}
 
 	// register our save states
-	state_save_register_device_item(this, 0, m_clock);
-	state_save_register_device_item(this, 0, m_unscaled_clock);
-	state_save_register_device_item(this, 0, m_clock_scale);
+	save_item(NAME(m_clock));
+	save_item(NAME(m_unscaled_clock));
+	save_item(NAME(m_clock_scale));
 
 	// we're now officially started
 	m_started = true;

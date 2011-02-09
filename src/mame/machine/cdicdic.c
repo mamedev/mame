@@ -1271,20 +1271,20 @@ void cdicdic_device::init()
 
 void cdicdic_device::register_globals()
 {
-    state_save_register_device_item(this, 0, m_command);
-    state_save_register_device_item(this, 0, m_time);
-    state_save_register_device_item(this, 0, m_file);
-    state_save_register_device_item(this, 0, m_channel);
-    state_save_register_device_item(this, 0, m_audio_channel);
-    state_save_register_device_item(this, 0, m_audio_buffer);
-    state_save_register_device_item(this, 0, m_x_buffer);
-    state_save_register_device_item(this, 0, m_dma_control);
-    state_save_register_device_item(this, 0, m_z_buffer);
-    state_save_register_device_item(this, 0, m_interrupt_vector);
-    state_save_register_device_item(this, 0, m_data_buffer);
+    save_item(NAME(m_command));
+    save_item(NAME(m_time));
+    save_item(NAME(m_file));
+    save_item(NAME(m_channel));
+    save_item(NAME(m_audio_channel));
+    save_item(NAME(m_audio_buffer));
+    save_item(NAME(m_x_buffer));
+    save_item(NAME(m_dma_control));
+    save_item(NAME(m_z_buffer));
+    save_item(NAME(m_interrupt_vector));
+    save_item(NAME(m_data_buffer));
 
-    state_save_register_device_item(this, 0, m_audio_sample_freq);
-    state_save_register_device_item(this, 0, m_audio_sample_size);
+    save_item(NAME(m_audio_sample_freq));
+    save_item(NAME(m_audio_sample_size));
 }
 
 WRITE16_DEVICE_HANDLER( cdic_ram_w )

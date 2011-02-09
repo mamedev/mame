@@ -173,23 +173,23 @@ static CPU_INIT( tms7000 )
 	memset(cpustate->rf, 0, 0x80);
 
 	/* Save register state */
-	state_save_register_device_item(device, 0, pPC);
-	state_save_register_device_item(device, 0, pSP);
-	state_save_register_device_item(device, 0, pSR);
+	device->save_item(NAME(pPC));
+	device->save_item(NAME(pSP));
+	device->save_item(NAME(pSR));
 
 	/* Save Interrupt state */
-	state_save_register_device_item_array(device, 0, cpustate->irq_state);
+	device->save_item(NAME(cpustate->irq_state));
 
 	/* Save register and perpherial file state */
-	state_save_register_device_item_array(device, 0, cpustate->rf);
-	state_save_register_device_item_array(device, 0, cpustate->pf);
+	device->save_item(NAME(cpustate->rf));
+	device->save_item(NAME(cpustate->pf));
 
 	/* Save timer state */
-	state_save_register_device_item(device, 0, cpustate->t1_prescaler);
-	state_save_register_device_item(device, 0, cpustate->t1_capture_latch);
-	state_save_register_device_item(device, 0, cpustate->t1_decrementer);
+	device->save_item(NAME(cpustate->t1_prescaler));
+	device->save_item(NAME(cpustate->t1_capture_latch));
+	device->save_item(NAME(cpustate->t1_decrementer));
 
-	state_save_register_device_item(device, 0, cpustate->idle_state);
+	device->save_item(NAME(cpustate->idle_state));
 }
 
 static CPU_RESET( tms7000 )

@@ -248,11 +248,11 @@ static DEVICE_START( mb87078 )
 
 	mb87078->gain_changed_cb = intf->gain_changed_cb;
 
-	state_save_register_device_item(device, 0, mb87078->channel_latch);
-	state_save_register_device_item(device, 0, mb87078->reset_comp);
-	state_save_register_device_item_array(device, 0, mb87078->latch[0]);
-	state_save_register_device_item_array(device, 0, mb87078->latch[1]);
-	state_save_register_device_item_array(device, 0, mb87078->gain);
+	device->save_item(NAME(mb87078->channel_latch));
+	device->save_item(NAME(mb87078->reset_comp));
+	device->save_item(NAME(mb87078->latch[0]));
+	device->save_item(NAME(mb87078->latch[1]));
+	device->save_item(NAME(mb87078->gain));
 }
 
 static DEVICE_RESET( mb87078 )

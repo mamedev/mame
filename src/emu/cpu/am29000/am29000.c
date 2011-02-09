@@ -162,52 +162,52 @@ static CPU_INIT( am29000 )
 	am29000->cfg = (PRL_AM29000 | PRL_REV_D) << CFG_PRL_SHIFT;
 
 	/* Register state for saving */
-	state_save_register_device_item(device, 0, am29000->icount);
-	state_save_register_device_item(device, 0, am29000->pc);
-	state_save_register_device_item_array(device, 0, am29000->r);
-	state_save_register_device_item_array(device, 0, am29000->tlb);
+	device->save_item(NAME(am29000->icount));
+	device->save_item(NAME(am29000->pc));
+	device->save_item(NAME(am29000->r));
+	device->save_item(NAME(am29000->tlb));
 
-	state_save_register_device_item(device, 0, am29000->vab);
-	state_save_register_device_item(device, 0, am29000->ops);
-	state_save_register_device_item(device, 0, am29000->cps);
-	state_save_register_device_item(device, 0, am29000->cfg);
-	state_save_register_device_item(device, 0, am29000->cha);
-	state_save_register_device_item(device, 0, am29000->chd);
-	state_save_register_device_item(device, 0, am29000->chc);
-	state_save_register_device_item(device, 0, am29000->rbp);
-	state_save_register_device_item(device, 0, am29000->tmc);
-	state_save_register_device_item(device, 0, am29000->tmr);
-	state_save_register_device_item(device, 0, am29000->pc0);
-	state_save_register_device_item(device, 0, am29000->pc1);
-	state_save_register_device_item(device, 0, am29000->pc2);
-	state_save_register_device_item(device, 0, am29000->mmu);
-	state_save_register_device_item(device, 0, am29000->lru);
+	device->save_item(NAME(am29000->vab));
+	device->save_item(NAME(am29000->ops));
+	device->save_item(NAME(am29000->cps));
+	device->save_item(NAME(am29000->cfg));
+	device->save_item(NAME(am29000->cha));
+	device->save_item(NAME(am29000->chd));
+	device->save_item(NAME(am29000->chc));
+	device->save_item(NAME(am29000->rbp));
+	device->save_item(NAME(am29000->tmc));
+	device->save_item(NAME(am29000->tmr));
+	device->save_item(NAME(am29000->pc0));
+	device->save_item(NAME(am29000->pc1));
+	device->save_item(NAME(am29000->pc2));
+	device->save_item(NAME(am29000->mmu));
+	device->save_item(NAME(am29000->lru));
 
-	state_save_register_device_item(device, 0, am29000->ipc);
-	state_save_register_device_item(device, 0, am29000->ipa);
-	state_save_register_device_item(device, 0, am29000->ipb);
-	state_save_register_device_item(device, 0, am29000->q);
+	device->save_item(NAME(am29000->ipc));
+	device->save_item(NAME(am29000->ipa));
+	device->save_item(NAME(am29000->ipb));
+	device->save_item(NAME(am29000->q));
 
-	state_save_register_device_item(device, 0, am29000->alu);
-	state_save_register_device_item(device, 0, am29000->fpe);
-	state_save_register_device_item(device, 0, am29000->inte);
-	state_save_register_device_item(device, 0, am29000->fps);
+	device->save_item(NAME(am29000->alu));
+	device->save_item(NAME(am29000->fpe));
+	device->save_item(NAME(am29000->inte));
+	device->save_item(NAME(am29000->fps));
 
-	state_save_register_device_item(device, 0, am29000->exceptions);
-	state_save_register_device_item_array(device, 0, am29000->exception_queue);
+	device->save_item(NAME(am29000->exceptions));
+	device->save_item(NAME(am29000->exception_queue));
 
-	state_save_register_device_item(device, 0, am29000->irq_active);
-	state_save_register_device_item(device, 0, am29000->irq_lines);
+	device->save_item(NAME(am29000->irq_active));
+	device->save_item(NAME(am29000->irq_lines));
 
-	state_save_register_device_item(device, 0, am29000->exec_ir);
-	state_save_register_device_item(device, 0, am29000->next_ir);
+	device->save_item(NAME(am29000->exec_ir));
+	device->save_item(NAME(am29000->next_ir));
 
-	state_save_register_device_item(device, 0, am29000->pl_flags);
-	state_save_register_device_item(device, 0, am29000->next_pl_flags);
+	device->save_item(NAME(am29000->pl_flags));
+	device->save_item(NAME(am29000->next_pl_flags));
 
-	state_save_register_device_item(device, 0, am29000->iret_pc);
-	state_save_register_device_item(device, 0, am29000->exec_pc);
-	state_save_register_device_item(device, 0, am29000->next_pc);
+	device->save_item(NAME(am29000->iret_pc));
+	device->save_item(NAME(am29000->exec_pc));
+	device->save_item(NAME(am29000->next_pc));
 }
 
 static CPU_RESET( am29000 )

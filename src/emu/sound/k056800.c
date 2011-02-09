@@ -149,9 +149,9 @@ static DEVICE_START( k056800 )
 	k056800->sound_cpu_timer = device->machine->scheduler().timer_alloc(FUNC(k056800_sound_cpu_timer_tick), k056800);
 	k056800->sound_cpu_timer->adjust(timer_period, 0, timer_period);
 
-	state_save_register_device_item_array(device, 0, k056800->host_reg);
-	state_save_register_device_item_array(device, 0, k056800->sound_reg);
-	state_save_register_device_item(device, 0, k056800->sound_cpu_irq1_enable);
+	device->save_item(NAME(k056800->host_reg));
+	device->save_item(NAME(k056800->sound_reg));
+	device->save_item(NAME(k056800->sound_cpu_irq1_enable));
 }
 
 static DEVICE_RESET( k056800 )

@@ -800,40 +800,40 @@ static DEVICE_START( msm5232 )
 
 	/* register with the save state system */
 	device->machine->state().register_postload(msm5232_postload, chip);
-	state_save_register_device_item_array(device, 0, chip->EN_out16);
-	state_save_register_device_item_array(device, 0, chip->EN_out8);
-	state_save_register_device_item_array(device, 0, chip->EN_out4);
-	state_save_register_device_item_array(device, 0, chip->EN_out2);
-	state_save_register_device_item(device, 0, chip->noise_cnt);
-	state_save_register_device_item(device, 0, chip->noise_rng);
-	state_save_register_device_item(device, 0, chip->noise_clocks);
-	state_save_register_device_item(device, 0, chip->control1);
-	state_save_register_device_item(device, 0, chip->control2);
-	state_save_register_device_item(device, 0, chip->gate);
-	state_save_register_device_item(device, 0, chip->clock);
-	state_save_register_device_item(device, 0, chip->rate);
+	device->save_item(NAME(chip->EN_out16));
+	device->save_item(NAME(chip->EN_out8));
+	device->save_item(NAME(chip->EN_out4));
+	device->save_item(NAME(chip->EN_out2));
+	device->save_item(NAME(chip->noise_cnt));
+	device->save_item(NAME(chip->noise_rng));
+	device->save_item(NAME(chip->noise_clocks));
+	device->save_item(NAME(chip->control1));
+	device->save_item(NAME(chip->control2));
+	device->save_item(NAME(chip->gate));
+	device->save_item(NAME(chip->clock));
+	device->save_item(NAME(chip->rate));
 
 	/* register voice-specific data for save states */
 	for (voicenum = 0; voicenum < 8; voicenum++)
 	{
 		VOICE *voice = &chip->voi[voicenum];
 
-		state_save_register_device_item(device, voicenum, voice->mode);
-		state_save_register_device_item(device, voicenum, voice->TG_count_period);
-		state_save_register_device_item(device, voicenum, voice->TG_cnt);
-		state_save_register_device_item(device, voicenum, voice->TG_out16);
-		state_save_register_device_item(device, voicenum, voice->TG_out8);
-		state_save_register_device_item(device, voicenum, voice->TG_out4);
-		state_save_register_device_item(device, voicenum, voice->TG_out2);
-		state_save_register_device_item(device, voicenum, voice->egvol);
-		state_save_register_device_item(device, voicenum, voice->eg_sect);
-		state_save_register_device_item(device, voicenum, voice->counter);
-		state_save_register_device_item(device, voicenum, voice->eg);
-		state_save_register_device_item(device, voicenum, voice->eg_arm);
-		state_save_register_device_item(device, voicenum, voice->ar_rate);
-		state_save_register_device_item(device, voicenum, voice->dr_rate);
-		state_save_register_device_item(device, voicenum, voice->pitch);
-		state_save_register_device_item(device, voicenum, voice->GF);
+		device->save_item(NAME(voice->mode), voicenum);
+		device->save_item(NAME(voice->TG_count_period), voicenum);
+		device->save_item(NAME(voice->TG_cnt), voicenum);
+		device->save_item(NAME(voice->TG_out16), voicenum);
+		device->save_item(NAME(voice->TG_out8), voicenum);
+		device->save_item(NAME(voice->TG_out4), voicenum);
+		device->save_item(NAME(voice->TG_out2), voicenum);
+		device->save_item(NAME(voice->egvol), voicenum);
+		device->save_item(NAME(voice->eg_sect), voicenum);
+		device->save_item(NAME(voice->counter), voicenum);
+		device->save_item(NAME(voice->eg), voicenum);
+		device->save_item(NAME(voice->eg_arm), voicenum);
+		device->save_item(NAME(voice->ar_rate), voicenum);
+		device->save_item(NAME(voice->dr_rate), voicenum);
+		device->save_item(NAME(voice->pitch), voicenum);
+		device->save_item(NAME(voice->GF), voicenum);
 	}
 }
 

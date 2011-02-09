@@ -146,7 +146,7 @@ void dsp16_device::device_start()
 	m_program = space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 
-	state_save_register_device_item(this, 0, m_pc);
+	save_item(NAME(m_pc));
 
 	// register state with the debugger
 	state_add(DSP16_PC,      "PC",        m_pc);

@@ -288,9 +288,9 @@ static DEVICE_START( pci_bus )
 		pci_add_sibling(device->machine, (char *)pcibus->config->father, (char *)device->tag());
 
 	/* register pci states */
-	state_save_register_device_item(device, 0, pcibus->address);
-	state_save_register_device_item(device, 0, pcibus->devicenum);
-	state_save_register_device_item(device, 0, pcibus->busnum);
+	device->save_item(NAME(pcibus->address));
+	device->save_item(NAME(pcibus->devicenum));
+	device->save_item(NAME(pcibus->busnum));
 
 	device->machine->state().register_postload(pci_bus_postload, pcibus);
 }

@@ -171,13 +171,13 @@ static STREAM_UPDATE( okim6258_update )
 
 static void okim6258_state_save_register(okim6258_state *info, device_t *device)
 {
-	state_save_register_device_item(device, 0, info->status);
-	state_save_register_device_item(device, 0, info->master_clock);
-	state_save_register_device_item(device, 0, info->divider);
-	state_save_register_device_item(device, 0, info->data_in);
-	state_save_register_device_item(device, 0, info->nibble_shift);
-	state_save_register_device_item(device, 0, info->signal);
-	state_save_register_device_item(device, 0, info->step);
+	device->save_item(NAME(info->status));
+	device->save_item(NAME(info->master_clock));
+	device->save_item(NAME(info->divider));
+	device->save_item(NAME(info->data_in));
+	device->save_item(NAME(info->nibble_shift));
+	device->save_item(NAME(info->signal));
+	device->save_item(NAME(info->step));
 }
 
 

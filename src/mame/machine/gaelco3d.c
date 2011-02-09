@@ -468,8 +468,8 @@ static DEVICE_START( gaelco_serial )
 	state->sync_timer = device->machine->scheduler().timer_alloc(FUNC(link_cb), state);
 
 	/* register for save states */
-	//state_save_register_device_item(device, 0, earom->offset);
-	//state_save_register_device_item(device, 0, earom->data);
+	//device->save_item(NAME(earom->offset));
+	//device->save_item(NAME(earom->data));
 
 #ifdef SHARED_MEM_DRIVER
 	state->sync_timer->adjust(attotime::zero,0,attotime::from_hz(SYNC_FREQ));

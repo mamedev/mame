@@ -258,22 +258,22 @@ static STATE_POSTLOAD( cquestsnd_postload )
 static void cquestsnd_state_register(device_t *device)
 {
 	cquestsnd_state *cpustate = get_safe_token_snd(device);
-	state_save_register_device_item_array(device, 0, cpustate->ram);
-	state_save_register_device_item(device, 0, cpustate->q);
-	state_save_register_device_item(device, 0, cpustate->f);
-	state_save_register_device_item(device, 0, cpustate->y);
-	state_save_register_device_item(device, 0, cpustate->cflag);
-	state_save_register_device_item(device, 0, cpustate->vflag);
+	device->save_item(NAME(cpustate->ram));
+	device->save_item(NAME(cpustate->q));
+	device->save_item(NAME(cpustate->f));
+	device->save_item(NAME(cpustate->y));
+	device->save_item(NAME(cpustate->cflag));
+	device->save_item(NAME(cpustate->vflag));
 
-	state_save_register_device_item(device, 0, cpustate->pc);
-	state_save_register_device_item(device, 0, cpustate->platch);
-	state_save_register_device_item(device, 0, cpustate->rtnlatch);
-	state_save_register_device_item(device, 0, cpustate->adrcntr);
-	state_save_register_device_item(device, 0, cpustate->adrlatch);
-	state_save_register_device_item(device, 0, cpustate->dinlatch);
-	state_save_register_device_item(device, 0, cpustate->ramwlatch);
-	state_save_register_device_item(device, 0, cpustate->prev_ipram);
-	state_save_register_device_item(device, 0, cpustate->prev_ipwrt);
+	device->save_item(NAME(cpustate->pc));
+	device->save_item(NAME(cpustate->platch));
+	device->save_item(NAME(cpustate->rtnlatch));
+	device->save_item(NAME(cpustate->adrcntr));
+	device->save_item(NAME(cpustate->adrlatch));
+	device->save_item(NAME(cpustate->dinlatch));
+	device->save_item(NAME(cpustate->ramwlatch));
+	device->save_item(NAME(cpustate->prev_ipram));
+	device->save_item(NAME(cpustate->prev_ipwrt));
 
 	device->machine->state().register_postload(cquestsnd_postload, (void *)device);
 }
@@ -323,31 +323,31 @@ static STATE_POSTLOAD( cquestrot_postload )
 static void cquestrot_state_register(device_t *device)
 {
 	cquestrot_state *cpustate = get_safe_token_rot(device);
-	state_save_register_device_item_array(device, 0, cpustate->ram);
-	state_save_register_device_item(device, 0, cpustate->q);
-	state_save_register_device_item(device, 0, cpustate->f);
-	state_save_register_device_item(device, 0, cpustate->y);
-	state_save_register_device_item(device, 0, cpustate->cflag);
-	state_save_register_device_item(device, 0, cpustate->vflag);
+	device->save_item(NAME(cpustate->ram));
+	device->save_item(NAME(cpustate->q));
+	device->save_item(NAME(cpustate->f));
+	device->save_item(NAME(cpustate->y));
+	device->save_item(NAME(cpustate->cflag));
+	device->save_item(NAME(cpustate->vflag));
 
-	state_save_register_device_item(device, 0, cpustate->pc);
-	state_save_register_device_item(device, 0, cpustate->seqcnt);
-	state_save_register_device_item(device, 0, cpustate->dsrclatch);
-	state_save_register_device_item(device, 0, cpustate->rsrclatch);
-	state_save_register_device_item(device, 0, cpustate->dynaddr);
-	state_save_register_device_item(device, 0, cpustate->dyndata);
-	state_save_register_device_item(device, 0, cpustate->yrlatch);
-	state_save_register_device_item(device, 0, cpustate->ydlatch);
-	state_save_register_device_item(device, 0, cpustate->dinlatch);
-	state_save_register_device_item(device, 0, cpustate->divreg);
-	state_save_register_device_item(device, 0, cpustate->linedata);
-	state_save_register_device_item(device, 0, cpustate->lineaddr);
-	state_save_register_device_item(device, 0, cpustate->prev_dred);
-	state_save_register_device_item(device, 0, cpustate->prev_dwrt);
-	state_save_register_device_item(device, 0, cpustate->wc);
+	device->save_item(NAME(cpustate->pc));
+	device->save_item(NAME(cpustate->seqcnt));
+	device->save_item(NAME(cpustate->dsrclatch));
+	device->save_item(NAME(cpustate->rsrclatch));
+	device->save_item(NAME(cpustate->dynaddr));
+	device->save_item(NAME(cpustate->dyndata));
+	device->save_item(NAME(cpustate->yrlatch));
+	device->save_item(NAME(cpustate->ydlatch));
+	device->save_item(NAME(cpustate->dinlatch));
+	device->save_item(NAME(cpustate->divreg));
+	device->save_item(NAME(cpustate->linedata));
+	device->save_item(NAME(cpustate->lineaddr));
+	device->save_item(NAME(cpustate->prev_dred));
+	device->save_item(NAME(cpustate->prev_dwrt));
+	device->save_item(NAME(cpustate->wc));
 
-	state_save_register_device_item_pointer(device, 0, cpustate->dram, 16384);
-	state_save_register_device_item_pointer(device, 0, cpustate->sram, 2048);
+	device->save_pointer(NAME(cpustate->dram), 16384);
+	device->save_pointer(NAME(cpustate->sram), 2048);
 
 	device->machine->state().register_postload(cquestrot_postload, (void *)device);
 }
@@ -403,35 +403,35 @@ static void cquestlin_state_register(device_t *device)
 {
 	cquestlin_state *cpustate = get_safe_token_lin(device);
 
-	state_save_register_device_item_array(device, 0, cpustate->ram);
-	state_save_register_device_item(device, 0, cpustate->q);
-	state_save_register_device_item(device, 0, cpustate->f);
-	state_save_register_device_item(device, 0, cpustate->y);
-	state_save_register_device_item(device, 0, cpustate->cflag);
-	state_save_register_device_item(device, 0, cpustate->vflag);
+	device->save_item(NAME(cpustate->ram));
+	device->save_item(NAME(cpustate->q));
+	device->save_item(NAME(cpustate->f));
+	device->save_item(NAME(cpustate->y));
+	device->save_item(NAME(cpustate->cflag));
+	device->save_item(NAME(cpustate->vflag));
 
-	state_save_register_device_item(device, 0, cpustate->pc[0]);
-	state_save_register_device_item(device, 0, cpustate->pc[1]);
-	state_save_register_device_item(device, 0, cpustate->seqcnt);
-	state_save_register_device_item(device, 0, cpustate->clatch);
-	state_save_register_device_item(device, 0, cpustate->zlatch);
-	state_save_register_device_item(device, 0, cpustate->xcnt);
-	state_save_register_device_item(device, 0, cpustate->ycnt);
-	state_save_register_device_item(device, 0, cpustate->sreg);
-	state_save_register_device_item(device, 0, cpustate->fadlatch);
-	state_save_register_device_item(device, 0, cpustate->badlatch);
-	state_save_register_device_item(device, 0, cpustate->sramdlatch);
-	state_save_register_device_item(device, 0, cpustate->fglatch);
-	state_save_register_device_item(device, 0, cpustate->bglatch);
-	state_save_register_device_item(device, 0, cpustate->gt0reg);
-	state_save_register_device_item(device, 0, cpustate->fdxreg);
-	state_save_register_device_item(device, 0, cpustate->field);
-	state_save_register_device_item(device, 0, cpustate->clkcnt);
+	device->save_item(NAME(cpustate->pc[0]));
+	device->save_item(NAME(cpustate->pc[1]));
+	device->save_item(NAME(cpustate->seqcnt));
+	device->save_item(NAME(cpustate->clatch));
+	device->save_item(NAME(cpustate->zlatch));
+	device->save_item(NAME(cpustate->xcnt));
+	device->save_item(NAME(cpustate->ycnt));
+	device->save_item(NAME(cpustate->sreg));
+	device->save_item(NAME(cpustate->fadlatch));
+	device->save_item(NAME(cpustate->badlatch));
+	device->save_item(NAME(cpustate->sramdlatch));
+	device->save_item(NAME(cpustate->fglatch));
+	device->save_item(NAME(cpustate->bglatch));
+	device->save_item(NAME(cpustate->gt0reg));
+	device->save_item(NAME(cpustate->fdxreg));
+	device->save_item(NAME(cpustate->field));
+	device->save_item(NAME(cpustate->clkcnt));
 
-	state_save_register_device_item_pointer(device, 0, cpustate->sram, 4096);
-	state_save_register_device_item_pointer(device, 0, cpustate->ptr_ram, 1024);
-	state_save_register_device_item_pointer(device, 0, cpustate->e_stack, 32768);
-	state_save_register_device_item_pointer(device, 0, cpustate->o_stack, 32768);
+	device->save_pointer(NAME(cpustate->sram), 4096);
+	device->save_pointer(NAME(cpustate->ptr_ram), 1024);
+	device->save_pointer(NAME(cpustate->e_stack), 32768);
+	device->save_pointer(NAME(cpustate->o_stack), 32768);
 
 	device->machine->state().register_postload(cquestlin_postload, (void *)device);
 }

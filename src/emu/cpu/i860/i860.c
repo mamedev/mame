@@ -36,10 +36,10 @@ static CPU_INIT( i860 )
 	i860_set_pin(device, DEC_PIN_RESET, 0);
 	cpustate->single_stepping = 0;
 
-	state_save_register_device_item_array(device, 0, cpustate->iregs);
-	state_save_register_device_item_array(device, 0, cpustate->cregs);
-	state_save_register_device_item_array(device, 0, cpustate->frg);
-	state_save_register_device_item(device, 0, cpustate->pc);
+	device->save_item(NAME(cpustate->iregs));
+	device->save_item(NAME(cpustate->cregs));
+	device->save_item(NAME(cpustate->frg));
+	device->save_item(NAME(cpustate->pc));
 }
 
 static CPU_RESET( i860 )

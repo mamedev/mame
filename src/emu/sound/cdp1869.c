@@ -437,28 +437,28 @@ void cdp1869_device::device_start()
 	m_stream = m_machine.sound().stream_alloc(*this, 0, 1, m_machine.sample_rate);
 
 	// register for state saving
-	state_save_register_device_item(this, 0, m_prd);
-	state_save_register_device_item(this, 0, m_dispoff);
-	state_save_register_device_item(this, 0, m_fresvert);
-	state_save_register_device_item(this, 0, m_freshorz);
-	state_save_register_device_item(this, 0, m_cmem);
-	state_save_register_device_item(this, 0, m_dblpage);
-	state_save_register_device_item(this, 0, m_line16);
-	state_save_register_device_item(this, 0, m_line9);
-	state_save_register_device_item(this, 0, m_cfc);
-	state_save_register_device_item(this, 0, m_col);
-	state_save_register_device_item(this, 0, m_bkg);
-	state_save_register_device_item(this, 0, m_pma);
-	state_save_register_device_item(this, 0, m_hma);
-	state_save_register_device_item(this, 0, m_signal);
-	state_save_register_device_item(this, 0, m_incr);
-	state_save_register_device_item(this, 0, m_toneoff);
-	state_save_register_device_item(this, 0, m_wnoff);
-	state_save_register_device_item(this, 0, m_tonediv);
-	state_save_register_device_item(this, 0, m_tonefreq);
-	state_save_register_device_item(this, 0, m_toneamp);
-	state_save_register_device_item(this, 0, m_wnfreq);
-	state_save_register_device_item(this, 0, m_wnamp);
+	save_item(NAME(m_prd));
+	save_item(NAME(m_dispoff));
+	save_item(NAME(m_fresvert));
+	save_item(NAME(m_freshorz));
+	save_item(NAME(m_cmem));
+	save_item(NAME(m_dblpage));
+	save_item(NAME(m_line16));
+	save_item(NAME(m_line9));
+	save_item(NAME(m_cfc));
+	save_item(NAME(m_col));
+	save_item(NAME(m_bkg));
+	save_item(NAME(m_pma));
+	save_item(NAME(m_hma));
+	save_item(NAME(m_signal));
+	save_item(NAME(m_incr));
+	save_item(NAME(m_toneoff));
+	save_item(NAME(m_wnoff));
+	save_item(NAME(m_tonediv));
+	save_item(NAME(m_tonefreq));
+	save_item(NAME(m_toneamp));
+	save_item(NAME(m_wnfreq));
+	save_item(NAME(m_wnamp));
 }
 
 

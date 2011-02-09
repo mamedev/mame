@@ -532,20 +532,20 @@ static CPU_INIT( hd6309 )
 	m68_state->regTable[2] = &(B);
 	m68_state->regTable[3] = &m68_state->dummy_byte;
 
-	state_save_register_device_item(device, 0, PC);
-	state_save_register_device_item(device, 0, U);
-	state_save_register_device_item(device, 0, S);
-	state_save_register_device_item(device, 0, X);
-	state_save_register_device_item(device, 0, Y);
-	state_save_register_device_item(device, 0, V);
-	state_save_register_device_item(device, 0, DP);
-	state_save_register_device_item(device, 0, CC);
-	state_save_register_device_item(device, 0, MD);
+	device->save_item(NAME(PC));
+	device->save_item(NAME(U));
+	device->save_item(NAME(S));
+	device->save_item(NAME(X));
+	device->save_item(NAME(Y));
+	device->save_item(NAME(V));
+	device->save_item(NAME(DP));
+	device->save_item(NAME(CC));
+	device->save_item(NAME(MD));
 	device->machine->state().register_postload(hd6309_postload, (void *) device);
-	state_save_register_device_item(device, 0, m68_state->int_state);
-	state_save_register_device_item(device, 0, m68_state->nmi_state);
-	state_save_register_device_item(device, 0, m68_state->irq_state[0]);
-	state_save_register_device_item(device, 0, m68_state->irq_state[1]);
+	device->save_item(NAME(m68_state->int_state));
+	device->save_item(NAME(m68_state->nmi_state));
+	device->save_item(NAME(m68_state->irq_state[0]));
+	device->save_item(NAME(m68_state->irq_state[1]));
 }
 
 /****************************************************************************/

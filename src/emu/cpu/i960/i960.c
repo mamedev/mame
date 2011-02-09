@@ -2071,16 +2071,16 @@ static CPU_INIT( i960 )
 	i960->program = device->space(AS_PROGRAM);
 	i960->direct = &i960->program->direct();
 
-	state_save_register_device_item(device, 0, i960->PIP);
-	state_save_register_device_item(device, 0, i960->SAT);
-	state_save_register_device_item(device, 0, i960->PRCB);
-	state_save_register_device_item(device, 0, i960->PC);
-	state_save_register_device_item(device, 0, i960->AC);
-	state_save_register_device_item(device, 0, i960->ICR);
-	state_save_register_device_item_array(device, 0, i960->r);
-	state_save_register_device_item_array(device, 0, i960->fp);
-	state_save_register_device_item_2d_array(device, 0, i960->rcache);
-	state_save_register_device_item_array(device, 0, i960->rcache_frame_addr);
+	device->save_item(NAME(i960->PIP));
+	device->save_item(NAME(i960->SAT));
+	device->save_item(NAME(i960->PRCB));
+	device->save_item(NAME(i960->PC));
+	device->save_item(NAME(i960->AC));
+	device->save_item(NAME(i960->ICR));
+	device->save_item(NAME(i960->r));
+	device->save_item(NAME(i960->fp));
+	device->save_item(NAME(i960->rcache));
+	device->save_item(NAME(i960->rcache_frame_addr));
 }
 
 static CPU_RESET( i960 )

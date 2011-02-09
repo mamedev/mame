@@ -1562,8 +1562,8 @@ void atarigen_state::machine_start()
 	// until everyone is converted to modern devices, call our parent
 	driver_device::machine_start();
 
-	state_save_register_device_item(this, 0, m_earom_data);
-	state_save_register_device_item(this, 0, m_earom_control);
+	save_item(NAME(m_earom_data));
+	save_item(NAME(m_earom_control));
 }
 
 

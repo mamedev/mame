@@ -519,50 +519,50 @@ void cdislave_device::init()
 
 void cdislave_device::register_globals()
 {
-    state_save_register_device_item(this, 0, m_channel[0].m_out_buf[0]);
-    state_save_register_device_item(this, 0, m_channel[0].m_out_buf[1]);
-    state_save_register_device_item(this, 0, m_channel[0].m_out_buf[2]);
-    state_save_register_device_item(this, 0, m_channel[0].m_out_buf[3]);
-    state_save_register_device_item(this, 0, m_channel[0].m_out_index);
-    state_save_register_device_item(this, 0, m_channel[0].m_out_count);
-    state_save_register_device_item(this, 0, m_channel[0].m_out_cmd);
-    state_save_register_device_item(this, 0, m_channel[1].m_out_buf[0]);
-    state_save_register_device_item(this, 0, m_channel[1].m_out_buf[1]);
-    state_save_register_device_item(this, 0, m_channel[1].m_out_buf[2]);
-    state_save_register_device_item(this, 0, m_channel[1].m_out_buf[3]);
-    state_save_register_device_item(this, 0, m_channel[1].m_out_index);
-    state_save_register_device_item(this, 0, m_channel[1].m_out_count);
-    state_save_register_device_item(this, 0, m_channel[1].m_out_cmd);
-    state_save_register_device_item(this, 0, m_channel[2].m_out_buf[0]);
-    state_save_register_device_item(this, 0, m_channel[2].m_out_buf[1]);
-    state_save_register_device_item(this, 0, m_channel[2].m_out_buf[2]);
-    state_save_register_device_item(this, 0, m_channel[2].m_out_buf[3]);
-    state_save_register_device_item(this, 0, m_channel[2].m_out_index);
-    state_save_register_device_item(this, 0, m_channel[2].m_out_count);
-    state_save_register_device_item(this, 0, m_channel[2].m_out_cmd);
-    state_save_register_device_item(this, 0, m_channel[3].m_out_buf[0]);
-    state_save_register_device_item(this, 0, m_channel[3].m_out_buf[1]);
-    state_save_register_device_item(this, 0, m_channel[3].m_out_buf[2]);
-    state_save_register_device_item(this, 0, m_channel[3].m_out_buf[3]);
-    state_save_register_device_item(this, 0, m_channel[3].m_out_index);
-    state_save_register_device_item(this, 0, m_channel[3].m_out_count);
-    state_save_register_device_item(this, 0, m_channel[3].m_out_cmd);
+    save_item(NAME(m_channel[0].m_out_buf[0]));
+    save_item(NAME(m_channel[0].m_out_buf[1]));
+    save_item(NAME(m_channel[0].m_out_buf[2]));
+    save_item(NAME(m_channel[0].m_out_buf[3]));
+    save_item(NAME(m_channel[0].m_out_index));
+    save_item(NAME(m_channel[0].m_out_count));
+    save_item(NAME(m_channel[0].m_out_cmd));
+    save_item(NAME(m_channel[1].m_out_buf[0]));
+    save_item(NAME(m_channel[1].m_out_buf[1]));
+    save_item(NAME(m_channel[1].m_out_buf[2]));
+    save_item(NAME(m_channel[1].m_out_buf[3]));
+    save_item(NAME(m_channel[1].m_out_index));
+    save_item(NAME(m_channel[1].m_out_count));
+    save_item(NAME(m_channel[1].m_out_cmd));
+    save_item(NAME(m_channel[2].m_out_buf[0]));
+    save_item(NAME(m_channel[2].m_out_buf[1]));
+    save_item(NAME(m_channel[2].m_out_buf[2]));
+    save_item(NAME(m_channel[2].m_out_buf[3]));
+    save_item(NAME(m_channel[2].m_out_index));
+    save_item(NAME(m_channel[2].m_out_count));
+    save_item(NAME(m_channel[2].m_out_cmd));
+    save_item(NAME(m_channel[3].m_out_buf[0]));
+    save_item(NAME(m_channel[3].m_out_buf[1]));
+    save_item(NAME(m_channel[3].m_out_buf[2]));
+    save_item(NAME(m_channel[3].m_out_buf[3]));
+    save_item(NAME(m_channel[3].m_out_index));
+    save_item(NAME(m_channel[3].m_out_count));
+    save_item(NAME(m_channel[3].m_out_cmd));
 
-    state_save_register_device_item_array(this, 0, m_in_buf);
-    state_save_register_device_item(this, 0, m_in_index);
-    state_save_register_device_item(this, 0, m_in_count);
+    save_item(NAME(m_in_buf));
+    save_item(NAME(m_in_index));
+    save_item(NAME(m_in_count));
 
-    state_save_register_device_item(this, 0, m_polling_active);
+    save_item(NAME(m_polling_active));
 
-    state_save_register_device_item(this, 0, m_xbus_interrupt_enable);
+    save_item(NAME(m_xbus_interrupt_enable));
 
-    state_save_register_device_item_array(this, 0, m_lcd_state);
+    save_item(NAME(m_lcd_state));
 
-    state_save_register_device_item(this, 0, m_real_mouse_x);
-    state_save_register_device_item(this, 0, m_real_mouse_y);
+    save_item(NAME(m_real_mouse_x));
+    save_item(NAME(m_real_mouse_y));
 
-    state_save_register_device_item(this, 0, m_fake_mouse_x);
-    state_save_register_device_item(this, 0, m_fake_mouse_y);
+    save_item(NAME(m_fake_mouse_x));
+    save_item(NAME(m_fake_mouse_y));
 }
 
 const device_type MACHINE_CDISLAVE = cdislave_device_config::static_alloc_device_config;

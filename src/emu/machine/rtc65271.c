@@ -693,11 +693,11 @@ static DEVICE_START( rtc65271 )
 	state->SQW_timer = device->machine->scheduler().timer_alloc(FUNC(rtc_SQW_callback), (void *)device);
 	state->interrupt_callback = config->interrupt_callback;
 
-	state_save_register_device_item_array(device, 0, state->regs);
-	state_save_register_device_item(device, 0, state->cur_reg);
-	state_save_register_device_item_array(device, 0, state->xram);
-	state_save_register_device_item(device, 0, state->cur_xram_page);
-	state_save_register_device_item(device, 0, state->SQW_internal_state);
+	device->save_item(NAME(state->regs));
+	device->save_item(NAME(state->cur_reg));
+	device->save_item(NAME(state->xram));
+	device->save_item(NAME(state->cur_xram_page));
+	device->save_item(NAME(state->SQW_internal_state));
 }
 
 

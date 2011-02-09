@@ -229,13 +229,13 @@ void bsmt2000_device::device_start()
 	m_stream = m_machine.sound().stream_alloc(*this, 0, 2, clock() / 128);
 
 	// register for save states
-	state_save_register_device_item(this, 0, m_register_select);
-	state_save_register_device_item(this, 0, m_write_data);
-	state_save_register_device_item(this, 0, m_rom_address);
-	state_save_register_device_item(this, 0, m_rom_bank);
-	state_save_register_device_item(this, 0, m_left_data);
-	state_save_register_device_item(this, 0, m_right_data);
-	state_save_register_device_item(this, 0, m_write_pending);
+	save_item(NAME(m_register_select));
+	save_item(NAME(m_write_data));
+	save_item(NAME(m_rom_address));
+	save_item(NAME(m_rom_bank));
+	save_item(NAME(m_left_data));
+	save_item(NAME(m_right_data));
+	save_item(NAME(m_write_pending));
 }
 
 

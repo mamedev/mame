@@ -225,32 +225,32 @@ static CPU_INIT( tlcs900 )
 	devcb_resolve_write8( &cpustate->to1, &cpustate->intf->to1, device );
 	devcb_resolve_write8( &cpustate->to3, &cpustate->intf->to3, device );
 
-	state_save_register_device_item_array( device, 0, cpustate->xwa );
-	state_save_register_device_item_array( device, 0, cpustate->xbc );
-	state_save_register_device_item_array( device, 0, cpustate->xde );
-	state_save_register_device_item_array( device, 0, cpustate->xhl );
-	state_save_register_device_item( device, 0, cpustate->xix );
-	state_save_register_device_item( device, 0, cpustate->xiy );
-	state_save_register_device_item( device, 0, cpustate->xiz );
-	state_save_register_device_item( device, 0, cpustate->xssp );
-	state_save_register_device_item( device, 0, cpustate->xnsp );
-	state_save_register_device_item( device, 0, cpustate->pc );
-	state_save_register_device_item( device, 0, cpustate->sr );
-	state_save_register_device_item( device, 0, cpustate->f2 );
-	state_save_register_device_item_array( device, 0, cpustate->dmas );
-	state_save_register_device_item_array( device, 0, cpustate->dmad );
-	state_save_register_device_item_array( device, 0, cpustate->dmac );
-	state_save_register_device_item_array( device, 0, cpustate->dmam );
-	state_save_register_device_item_array( device, 0, cpustate->reg );
-	state_save_register_device_item( device, 0, cpustate->timer_pre );
-	state_save_register_device_item_array( device, 0, cpustate->timer );
-	state_save_register_device_item( device, 0, cpustate->tff1 );
-	state_save_register_device_item( device, 0, cpustate->tff3 );
-	state_save_register_device_item_array( device, 0, cpustate->timer_change );
-	state_save_register_device_item_array( device, 0, cpustate->level );
-	state_save_register_device_item( device, 0, cpustate->check_irqs );
-	state_save_register_device_item( device, 0, cpustate->ad_cycles_left );
-	state_save_register_device_item( device, 0, cpustate->nmi_state );
+	device->save_item( NAME(cpustate->xwa) );
+	device->save_item( NAME(cpustate->xbc) );
+	device->save_item( NAME(cpustate->xde) );
+	device->save_item( NAME(cpustate->xhl) );
+	device->save_item( NAME(cpustate->xix) );
+	device->save_item( NAME(cpustate->xiy) );
+	device->save_item( NAME(cpustate->xiz) );
+	device->save_item( NAME(cpustate->xssp) );
+	device->save_item( NAME(cpustate->xnsp) );
+	device->save_item( NAME(cpustate->pc) );
+	device->save_item( NAME(cpustate->sr) );
+	device->save_item( NAME(cpustate->f2) );
+	device->save_item( NAME(cpustate->dmas) );
+	device->save_item( NAME(cpustate->dmad) );
+	device->save_item( NAME(cpustate->dmac) );
+	device->save_item( NAME(cpustate->dmam) );
+	device->save_item( NAME(cpustate->reg) );
+	device->save_item( NAME(cpustate->timer_pre) );
+	device->save_item( NAME(cpustate->timer) );
+	device->save_item( NAME(cpustate->tff1) );
+	device->save_item( NAME(cpustate->tff3) );
+	device->save_item( NAME(cpustate->timer_change) );
+	device->save_item( NAME(cpustate->level) );
+	device->save_item( NAME(cpustate->check_irqs) );
+	device->save_item( NAME(cpustate->ad_cycles_left) );
+	device->save_item( NAME(cpustate->nmi_state) );
 }
 
 

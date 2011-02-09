@@ -151,30 +151,30 @@ static CPU_INIT( mb88 )
 
 	cpustate->serial = device->machine->scheduler().timer_alloc(FUNC(serial_timer), (void *)device);
 
-	state_save_register_device_item(device, 0, cpustate->PC);
-	state_save_register_device_item(device, 0, cpustate->PA);
-	state_save_register_device_item(device, 0, cpustate->SP[0]);
-	state_save_register_device_item(device, 0, cpustate->SP[1]);
-	state_save_register_device_item(device, 0, cpustate->SP[2]);
-	state_save_register_device_item(device, 0, cpustate->SP[3]);
-	state_save_register_device_item(device, 0, cpustate->SI);
-	state_save_register_device_item(device, 0, cpustate->A);
-	state_save_register_device_item(device, 0, cpustate->X);
-	state_save_register_device_item(device, 0, cpustate->Y);
-	state_save_register_device_item(device, 0, cpustate->st);
-	state_save_register_device_item(device, 0, cpustate->zf);
-	state_save_register_device_item(device, 0, cpustate->cf);
-	state_save_register_device_item(device, 0, cpustate->vf);
-	state_save_register_device_item(device, 0, cpustate->sf);
-	state_save_register_device_item(device, 0, cpustate->nf);
-	state_save_register_device_item(device, 0, cpustate->pio);
-	state_save_register_device_item(device, 0, cpustate->TH);
-	state_save_register_device_item(device, 0, cpustate->TL);
-	state_save_register_device_item(device, 0, cpustate->TP);
-	state_save_register_device_item(device, 0, cpustate->ctr);
-	state_save_register_device_item(device, 0, cpustate->SB);
-	state_save_register_device_item(device, 0, cpustate->SBcount);
-	state_save_register_device_item(device, 0, cpustate->pending_interrupt);
+	device->save_item(NAME(cpustate->PC));
+	device->save_item(NAME(cpustate->PA));
+	device->save_item(NAME(cpustate->SP[0]));
+	device->save_item(NAME(cpustate->SP[1]));
+	device->save_item(NAME(cpustate->SP[2]));
+	device->save_item(NAME(cpustate->SP[3]));
+	device->save_item(NAME(cpustate->SI));
+	device->save_item(NAME(cpustate->A));
+	device->save_item(NAME(cpustate->X));
+	device->save_item(NAME(cpustate->Y));
+	device->save_item(NAME(cpustate->st));
+	device->save_item(NAME(cpustate->zf));
+	device->save_item(NAME(cpustate->cf));
+	device->save_item(NAME(cpustate->vf));
+	device->save_item(NAME(cpustate->sf));
+	device->save_item(NAME(cpustate->nf));
+	device->save_item(NAME(cpustate->pio));
+	device->save_item(NAME(cpustate->TH));
+	device->save_item(NAME(cpustate->TL));
+	device->save_item(NAME(cpustate->TP));
+	device->save_item(NAME(cpustate->ctr));
+	device->save_item(NAME(cpustate->SB));
+	device->save_item(NAME(cpustate->SBcount));
+	device->save_item(NAME(cpustate->pending_interrupt));
 }
 
 static CPU_RESET( mb88 )

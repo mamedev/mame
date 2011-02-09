@@ -108,7 +108,7 @@ void mb3773_device::device_start()
 	m_watchdog_timer = m_machine.scheduler().timer_alloc( FUNC(watchdog_timeout), this );
 	reset_timer();
 
-	state_save_register_device_item( this, 0, m_ck );
+	save_item( NAME(m_ck) );
 }
 
 

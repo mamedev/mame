@@ -524,15 +524,15 @@ static DEVICE_START( smc91c9x )
 	smc->irq_handler = config->interrupt;
 
 	/* register ide states */
-	state_save_register_device_item_array(device, 0, smc->reg);
-	state_save_register_device_item_array(device, 0, smc->regmask);
-	state_save_register_device_item(device, 0, smc->irq_state);
-	state_save_register_device_item(device, 0, smc->alloc_count);
-	state_save_register_device_item(device, 0, smc->fifo_count);
-	state_save_register_device_item_array(device, 0, smc->rx);
-	state_save_register_device_item_array(device, 0, smc->tx);
-	state_save_register_device_item(device, 0, smc->sent);
-	state_save_register_device_item(device, 0, smc->recd);
+	device->save_item(NAME(smc->reg));
+	device->save_item(NAME(smc->regmask));
+	device->save_item(NAME(smc->irq_state));
+	device->save_item(NAME(smc->alloc_count));
+	device->save_item(NAME(smc->fifo_count));
+	device->save_item(NAME(smc->rx));
+	device->save_item(NAME(smc->tx));
+	device->save_item(NAME(smc->sent));
+	device->save_item(NAME(smc->recd));
 }
 
 

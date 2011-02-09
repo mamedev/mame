@@ -2050,46 +2050,46 @@ static CPU_INIT( z180 )
 		state->state_add(Z180_IOCR,       "IOCR",      cpustate->IO_IOCR);
 	}
 
-	state_save_register_device_item(device, 0, cpustate->AF.w.l);
-	state_save_register_device_item(device, 0, cpustate->BC.w.l);
-	state_save_register_device_item(device, 0, cpustate->DE.w.l);
-	state_save_register_device_item(device, 0, cpustate->HL.w.l);
-	state_save_register_device_item(device, 0, cpustate->IX.w.l);
-	state_save_register_device_item(device, 0, cpustate->IY.w.l);
-	state_save_register_device_item(device, 0, cpustate->PC.w.l);
-	state_save_register_device_item(device, 0, cpustate->SP.w.l);
-	state_save_register_device_item(device, 0, cpustate->AF2.w.l);
-	state_save_register_device_item(device, 0, cpustate->BC2.w.l);
-	state_save_register_device_item(device, 0, cpustate->DE2.w.l);
-	state_save_register_device_item(device, 0, cpustate->HL2.w.l);
-	state_save_register_device_item(device, 0, cpustate->R);
-	state_save_register_device_item(device, 0, cpustate->R2);
-	state_save_register_device_item(device, 0, cpustate->IFF1);
-	state_save_register_device_item(device, 0, cpustate->IFF2);
-	state_save_register_device_item(device, 0, cpustate->HALT);
-	state_save_register_device_item(device, 0, cpustate->IM);
-	state_save_register_device_item(device, 0, cpustate->I);
-	state_save_register_device_item(device, 0, cpustate->nmi_state);
-	state_save_register_device_item(device, 0, cpustate->nmi_pending);
-	state_save_register_device_item_array(device, 0, cpustate->irq_state);
-	state_save_register_device_item_array(device, 0, cpustate->int_pending);
-	state_save_register_device_item(device, 0, cpustate->timer_cnt);
-	state_save_register_device_item(device, 0, cpustate->dma0_cnt);
-	state_save_register_device_item(device, 0, cpustate->dma1_cnt);
-	state_save_register_device_item(device, 0, cpustate->after_EI);
+	device->save_item(NAME(cpustate->AF.w.l));
+	device->save_item(NAME(cpustate->BC.w.l));
+	device->save_item(NAME(cpustate->DE.w.l));
+	device->save_item(NAME(cpustate->HL.w.l));
+	device->save_item(NAME(cpustate->IX.w.l));
+	device->save_item(NAME(cpustate->IY.w.l));
+	device->save_item(NAME(cpustate->PC.w.l));
+	device->save_item(NAME(cpustate->SP.w.l));
+	device->save_item(NAME(cpustate->AF2.w.l));
+	device->save_item(NAME(cpustate->BC2.w.l));
+	device->save_item(NAME(cpustate->DE2.w.l));
+	device->save_item(NAME(cpustate->HL2.w.l));
+	device->save_item(NAME(cpustate->R));
+	device->save_item(NAME(cpustate->R2));
+	device->save_item(NAME(cpustate->IFF1));
+	device->save_item(NAME(cpustate->IFF2));
+	device->save_item(NAME(cpustate->HALT));
+	device->save_item(NAME(cpustate->IM));
+	device->save_item(NAME(cpustate->I));
+	device->save_item(NAME(cpustate->nmi_state));
+	device->save_item(NAME(cpustate->nmi_pending));
+	device->save_item(NAME(cpustate->irq_state));
+	device->save_item(NAME(cpustate->int_pending));
+	device->save_item(NAME(cpustate->timer_cnt));
+	device->save_item(NAME(cpustate->dma0_cnt));
+	device->save_item(NAME(cpustate->dma1_cnt));
+	device->save_item(NAME(cpustate->after_EI));
 
-	state_save_register_device_item_array(device, 0, cpustate->tif);
+	device->save_item(NAME(cpustate->tif));
 
-	state_save_register_device_item_array(device, 0, cpustate->read_tcr_tmdr);
-	state_save_register_device_item_array(device, 0, cpustate->tmdr_value);
-	state_save_register_device_item_array(device, 0, cpustate->tmdrh);
-	state_save_register_device_item(device, 0, cpustate->tmdr_latch);
+	device->save_item(NAME(cpustate->read_tcr_tmdr));
+	device->save_item(NAME(cpustate->tmdr_value));
+	device->save_item(NAME(cpustate->tmdrh));
+	device->save_item(NAME(cpustate->tmdr_latch));
 
-	state_save_register_device_item_array(device, 0, cpustate->io);
-	state_save_register_device_item(device, 0, cpustate->iol);
-	state_save_register_device_item(device, 0, cpustate->ioltemp);
+	device->save_item(NAME(cpustate->io));
+	device->save_item(NAME(cpustate->iol));
+	device->save_item(NAME(cpustate->ioltemp));
 
-	state_save_register_device_item_array(device, 0, cpustate->mmu);
+	device->save_item(NAME(cpustate->mmu));
 
 }
 

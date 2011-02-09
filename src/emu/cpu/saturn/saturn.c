@@ -118,29 +118,29 @@ static CPU_INIT( saturn )
 	cpustate->program = device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
 
-	state_save_register_device_item_array(device, 0,cpustate->reg[R0]);
-	state_save_register_device_item_array(device, 0,cpustate->reg[R1]);
-	state_save_register_device_item_array(device, 0,cpustate->reg[R2]);
-	state_save_register_device_item_array(device, 0,cpustate->reg[R3]);
-	state_save_register_device_item_array(device, 0,cpustate->reg[R4]);
-	state_save_register_device_item_array(device, 0,cpustate->reg[A]);
-	state_save_register_device_item_array(device, 0,cpustate->reg[B]);
-	state_save_register_device_item_array(device, 0,cpustate->reg[C]);
-	state_save_register_device_item_array(device, 0,cpustate->reg[D]);
-	state_save_register_device_item_array(device, 0,cpustate->d);
-	state_save_register_device_item(device, 0,cpustate->pc);
-	state_save_register_device_item(device, 0,cpustate->oldpc);
-	state_save_register_device_item_array(device, 0,cpustate->rstk);
-	state_save_register_device_item(device, 0,cpustate->out);
-	state_save_register_device_item(device, 0,cpustate->carry);
-	state_save_register_device_item(device, 0,cpustate->st);
-	state_save_register_device_item(device, 0,cpustate->hst);
-	state_save_register_device_item(device, 0,cpustate->nmi_state);
-	state_save_register_device_item(device, 0,cpustate->irq_state);
-	state_save_register_device_item(device, 0,cpustate->irq_enable);
-	state_save_register_device_item(device, 0,cpustate->in_irq);
-	state_save_register_device_item(device, 0,cpustate->pending_irq);
-	state_save_register_device_item(device, 0,cpustate->sleeping);
+	device->save_item(NAME(cpustate->reg[R0]));
+	device->save_item(NAME(cpustate->reg[R1]));
+	device->save_item(NAME(cpustate->reg[R2]));
+	device->save_item(NAME(cpustate->reg[R3]));
+	device->save_item(NAME(cpustate->reg[R4]));
+	device->save_item(NAME(cpustate->reg[A]));
+	device->save_item(NAME(cpustate->reg[B]));
+	device->save_item(NAME(cpustate->reg[C]));
+	device->save_item(NAME(cpustate->reg[D]));
+	device->save_item(NAME(cpustate->d));
+	device->save_item(NAME(cpustate->pc));
+	device->save_item(NAME(cpustate->oldpc));
+	device->save_item(NAME(cpustate->rstk));
+	device->save_item(NAME(cpustate->out));
+	device->save_item(NAME(cpustate->carry));
+	device->save_item(NAME(cpustate->st));
+	device->save_item(NAME(cpustate->hst));
+	device->save_item(NAME(cpustate->nmi_state));
+	device->save_item(NAME(cpustate->irq_state));
+	device->save_item(NAME(cpustate->irq_enable));
+	device->save_item(NAME(cpustate->in_irq));
+	device->save_item(NAME(cpustate->pending_irq));
+	device->save_item(NAME(cpustate->sleeping));
 }
 
 static CPU_RESET( saturn )

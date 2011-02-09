@@ -468,24 +468,24 @@ static CPU_INIT( i4004 )
 	cpustate->data = device->space(AS_DATA);
 	cpustate->io = device->space(AS_IO);
 
-	state_save_register_device_item(device, 0, cpustate->PC);
-	state_save_register_device_item(device, 0, cpustate->A);
-	state_save_register_device_item(device, 0, cpustate->C);
-	state_save_register_device_item(device, 0, cpustate->TEST);
-	state_save_register_device_item(device, 0, cpustate->pc_pos);
-	state_save_register_device_item(device, 0, cpustate->ADDR[0]);
-	state_save_register_device_item(device, 0, cpustate->ADDR[1]);
-	state_save_register_device_item(device, 0, cpustate->ADDR[2]);
-	state_save_register_device_item(device, 0, cpustate->ADDR[3]);
-	state_save_register_device_item(device, 0, cpustate->R[0]);
-	state_save_register_device_item(device, 0, cpustate->R[1]);
-	state_save_register_device_item(device, 0, cpustate->R[2]);
-	state_save_register_device_item(device, 0, cpustate->R[3]);
-	state_save_register_device_item(device, 0, cpustate->R[4]);
-	state_save_register_device_item(device, 0, cpustate->R[5]);
-	state_save_register_device_item(device, 0, cpustate->R[6]);
-	state_save_register_device_item(device, 0, cpustate->R[7]);
-	state_save_register_device_item(device, 0, cpustate->RAM);
+	device->save_item(NAME(cpustate->PC));
+	device->save_item(NAME(cpustate->A));
+	device->save_item(NAME(cpustate->C));
+	device->save_item(NAME(cpustate->TEST));
+	device->save_item(NAME(cpustate->pc_pos));
+	device->save_item(NAME(cpustate->ADDR[0]));
+	device->save_item(NAME(cpustate->ADDR[1]));
+	device->save_item(NAME(cpustate->ADDR[2]));
+	device->save_item(NAME(cpustate->ADDR[3]));
+	device->save_item(NAME(cpustate->R[0]));
+	device->save_item(NAME(cpustate->R[1]));
+	device->save_item(NAME(cpustate->R[2]));
+	device->save_item(NAME(cpustate->R[3]));
+	device->save_item(NAME(cpustate->R[4]));
+	device->save_item(NAME(cpustate->R[5]));
+	device->save_item(NAME(cpustate->R[6]));
+	device->save_item(NAME(cpustate->R[7]));
+	device->save_item(NAME(cpustate->RAM));
 }
 
 

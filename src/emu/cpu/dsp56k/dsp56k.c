@@ -165,28 +165,28 @@ static void set_irq_line(dsp56k_core* cpustate, int irqline, int state)
 static void agu_init(dsp56k_core* cpustate, device_t *device)
 {
 	/* save states - dsp56k_agu members */
-	state_save_register_device_item(device, 0, cpustate->AGU.r0);
-	state_save_register_device_item(device, 0, cpustate->AGU.r1);
-	state_save_register_device_item(device, 0, cpustate->AGU.r2);
-	state_save_register_device_item(device, 0, cpustate->AGU.r3);
-	state_save_register_device_item(device, 0, cpustate->AGU.n0);
-	state_save_register_device_item(device, 0, cpustate->AGU.n1);
-	state_save_register_device_item(device, 0, cpustate->AGU.n2);
-	state_save_register_device_item(device, 0, cpustate->AGU.n3);
-	state_save_register_device_item(device, 0, cpustate->AGU.m0);
-	state_save_register_device_item(device, 0, cpustate->AGU.m1);
-	state_save_register_device_item(device, 0, cpustate->AGU.m2);
-	state_save_register_device_item(device, 0, cpustate->AGU.m3);
-	state_save_register_device_item(device, 0, cpustate->AGU.temp);
+	device->save_item(NAME(cpustate->AGU.r0));
+	device->save_item(NAME(cpustate->AGU.r1));
+	device->save_item(NAME(cpustate->AGU.r2));
+	device->save_item(NAME(cpustate->AGU.r3));
+	device->save_item(NAME(cpustate->AGU.n0));
+	device->save_item(NAME(cpustate->AGU.n1));
+	device->save_item(NAME(cpustate->AGU.n2));
+	device->save_item(NAME(cpustate->AGU.n3));
+	device->save_item(NAME(cpustate->AGU.m0));
+	device->save_item(NAME(cpustate->AGU.m1));
+	device->save_item(NAME(cpustate->AGU.m2));
+	device->save_item(NAME(cpustate->AGU.m3));
+	device->save_item(NAME(cpustate->AGU.temp));
 }
 
 static void alu_init(dsp56k_core* cpustate, device_t *device)
 {
 	/* save states - dsp56k_alu members */
-	state_save_register_device_item(device, 0, cpustate->ALU.x);
-	state_save_register_device_item(device, 0, cpustate->ALU.y);
-	state_save_register_device_item(device, 0, cpustate->ALU.a);
-	state_save_register_device_item(device, 0, cpustate->ALU.b);
+	device->save_item(NAME(cpustate->ALU.x));
+	device->save_item(NAME(cpustate->ALU.y));
+	device->save_item(NAME(cpustate->ALU.a));
+	device->save_item(NAME(cpustate->ALU.b));
 }
 
 static CPU_INIT( dsp56k )
@@ -208,26 +208,26 @@ static CPU_INIT( dsp56k )
 	cpustate->reset_state = FALSE;
 
 	/* save states - dsp56k_core members */
-	state_save_register_device_item(device, 0, cpustate->modA_state);
-	state_save_register_device_item(device, 0, cpustate->modB_state);
-	state_save_register_device_item(device, 0, cpustate->modC_state);
-	state_save_register_device_item(device, 0, cpustate->reset_state);
-	state_save_register_device_item(device, 0, cpustate->bootstrap_mode);
-	state_save_register_device_item(device, 0, cpustate->repFlag);
-	state_save_register_device_item(device, 0, cpustate->repAddr);
-	state_save_register_device_item(device, 0, cpustate->icount);
-	state_save_register_device_item(device, 0, cpustate->ppc);
-	state_save_register_device_item(device, 0, cpustate->op);
-	state_save_register_device_item(device, 0, cpustate->interrupt_cycles);
+	device->save_item(NAME(cpustate->modA_state));
+	device->save_item(NAME(cpustate->modB_state));
+	device->save_item(NAME(cpustate->modC_state));
+	device->save_item(NAME(cpustate->reset_state));
+	device->save_item(NAME(cpustate->bootstrap_mode));
+	device->save_item(NAME(cpustate->repFlag));
+	device->save_item(NAME(cpustate->repAddr));
+	device->save_item(NAME(cpustate->icount));
+	device->save_item(NAME(cpustate->ppc));
+	device->save_item(NAME(cpustate->op));
+	device->save_item(NAME(cpustate->interrupt_cycles));
 
 	/* save states - dsp56k_host_interface members */
-	state_save_register_device_item(device, 0, cpustate->HI.icr);
-	state_save_register_device_item(device, 0, cpustate->HI.cvr);
-	state_save_register_device_item(device, 0, cpustate->HI.isr);
-	state_save_register_device_item(device, 0, cpustate->HI.ivr);
-	state_save_register_device_item(device, 0, cpustate->HI.trxh);
-	state_save_register_device_item(device, 0, cpustate->HI.trxl);
-	state_save_register_device_item(device, 0, cpustate->HI.bootstrap_offset);
+	device->save_item(NAME(cpustate->HI.icr));
+	device->save_item(NAME(cpustate->HI.cvr));
+	device->save_item(NAME(cpustate->HI.isr));
+	device->save_item(NAME(cpustate->HI.ivr));
+	device->save_item(NAME(cpustate->HI.trxh));
+	device->save_item(NAME(cpustate->HI.trxl));
+	device->save_item(NAME(cpustate->HI.bootstrap_offset));
 
 	//cpustate->config = device->baseconfig().static_config();
 	//cpustate->irq_callback = irqcallback;

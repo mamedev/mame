@@ -396,15 +396,14 @@ static DEVICE_START( namco )
 	chip->sound_enable = 1;
 
 	/* register with the save state system */
-	state_save_register_device_item_pointer(device, 0, chip->soundregs, 0x400);
+	device->save_pointer(NAME(chip->soundregs), 0x400);
 
 	if (device->region() == NULL)
-		state_save_register_device_item_pointer(device, 0, chip->wavedata, 0x400);
+		device->save_pointer(NAME(chip->wavedata), 0x400);
 
-	state_save_register_device_item(device, 0, chip->num_voices);
-	state_save_register_device_item(device, 0, chip->sound_enable);
-	state_save_register_device_item_pointer(device, 0, chip->waveform[0],
-										 MAX_VOLUME * 32 * 8 * (1+chip->wave_size));
+	device->save_item(NAME(chip->num_voices));
+	device->save_item(NAME(chip->sound_enable));
+	device->save_pointer(NAME(chip->waveform[0]), MAX_VOLUME * 32 * 8 * (1+chip->wave_size));
 
 	/* reset all the voices */
 	for (voice = chip->channel_list; voice < chip->last_channel; voice++)
@@ -422,15 +421,15 @@ static DEVICE_START( namco )
 		voice->noise_hold = 0;
 
 		/* register with the save state system */
-		state_save_register_device_item(device, voicenum, voice->frequency);
-		state_save_register_device_item(device, voicenum, voice->counter);
-		state_save_register_device_item_array(device, voicenum, voice->volume);
-		state_save_register_device_item(device, voicenum, voice->noise_sw);
-		state_save_register_device_item(device, voicenum, voice->noise_state);
-		state_save_register_device_item(device, voicenum, voice->noise_seed);
-		state_save_register_device_item(device, voicenum, voice->noise_hold);
-		state_save_register_device_item(device, voicenum, voice->noise_counter);
-		state_save_register_device_item(device, voicenum, voice->waveform_select);
+		device->save_item(NAME(voice->frequency), voicenum);
+		device->save_item(NAME(voice->counter), voicenum);
+		device->save_item(NAME(voice->volume), voicenum);
+		device->save_item(NAME(voice->noise_sw), voicenum);
+		device->save_item(NAME(voice->noise_state), voicenum);
+		device->save_item(NAME(voice->noise_seed), voicenum);
+		device->save_item(NAME(voice->noise_hold), voicenum);
+		device->save_item(NAME(voice->noise_counter), voicenum);
+		device->save_item(NAME(voice->waveform_select), voicenum);
 	}
 }
 

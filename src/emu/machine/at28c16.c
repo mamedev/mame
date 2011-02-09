@@ -131,9 +131,9 @@ void at28c16_device::device_start()
 {
 	m_write_timer = m_machine.scheduler().timer_alloc( FUNC(write_finished), this );
 
-	state_save_register_device_item( this, 0, m_a9_12v );
-	state_save_register_device_item( this, 0, m_oe_12v );
-	state_save_register_device_item( this, 0, m_last_write );
+	save_item( NAME(m_a9_12v) );
+	save_item( NAME(m_oe_12v) );
+	save_item( NAME(m_last_write) );
 }
 
 

@@ -235,22 +235,22 @@ static DEVICE_RESET( astrocade )
 
 static void astrocade_state_save_register(astrocade_state *chip, device_t *device)
 {
-	state_save_register_device_item_array(device, 0, chip->reg);
+	device->save_item(NAME(chip->reg));
 
-	state_save_register_device_item(device, 0, chip->master_count);
-	state_save_register_device_item(device, 0, chip->vibrato_clock);
+	device->save_item(NAME(chip->master_count));
+	device->save_item(NAME(chip->vibrato_clock));
 
-	state_save_register_device_item(device, 0, chip->noise_clock);
-	state_save_register_device_item(device, 0, chip->noise_state);
+	device->save_item(NAME(chip->noise_clock));
+	device->save_item(NAME(chip->noise_state));
 
-	state_save_register_device_item(device, 0, chip->a_count);
-	state_save_register_device_item(device, 0, chip->a_state);
+	device->save_item(NAME(chip->a_count));
+	device->save_item(NAME(chip->a_state));
 
-	state_save_register_device_item(device, 0, chip->b_count);
-	state_save_register_device_item(device, 0, chip->b_state);
+	device->save_item(NAME(chip->b_count));
+	device->save_item(NAME(chip->b_state));
 
-	state_save_register_device_item(device, 0, chip->c_count);
-	state_save_register_device_item(device, 0, chip->c_state);
+	device->save_item(NAME(chip->c_count));
+	device->save_item(NAME(chip->c_state));
 }
 
 

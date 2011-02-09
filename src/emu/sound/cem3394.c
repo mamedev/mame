@@ -343,18 +343,18 @@ static DEVICE_START( cem3394 )
 	chip->mixer_buffer = auto_alloc_array(device->machine, INT16, chip->sample_rate);
 	chip->external_buffer = auto_alloc_array(device->machine, INT16, chip->sample_rate);
 
-	state_save_register_device_item_array(device, 0, chip->values);
-	state_save_register_device_item(device, 0, chip->wave_select);
-	state_save_register_device_item(device, 0, chip->volume);
-	state_save_register_device_item(device, 0, chip->mixer_internal);
-	state_save_register_device_item(device, 0, chip->mixer_external);
-	state_save_register_device_item(device, 0, chip->position);
-	state_save_register_device_item(device, 0, chip->step);
-	state_save_register_device_item(device, 0, chip->filter_position);
-	state_save_register_device_item(device, 0, chip->filter_step);
-	state_save_register_device_item(device, 0, chip->modulation_depth);
-	state_save_register_device_item(device, 0, chip->last_ext);
-	state_save_register_device_item(device, 0, chip->pulse_width);
+	device->save_item(NAME(chip->values));
+	device->save_item(NAME(chip->wave_select));
+	device->save_item(NAME(chip->volume));
+	device->save_item(NAME(chip->mixer_internal));
+	device->save_item(NAME(chip->mixer_external));
+	device->save_item(NAME(chip->position));
+	device->save_item(NAME(chip->step));
+	device->save_item(NAME(chip->filter_position));
+	device->save_item(NAME(chip->filter_step));
+	device->save_item(NAME(chip->modulation_depth));
+	device->save_item(NAME(chip->last_ext));
+	device->save_item(NAME(chip->pulse_width));
 }
 
 

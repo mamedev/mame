@@ -172,20 +172,20 @@ void hd61700_cpu_device::device_start()
 	m_sec_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 
 	// save state
-	state_save_register_device_item(this, 0, m_ppc);
-	state_save_register_device_item(this, 0, m_curpc);
-	state_save_register_device_item(this, 0, m_pc);
-	state_save_register_device_item(this, 0, m_flags);
-	state_save_register_device_item(this, 0, m_fetch_addr);
-	state_save_register_device_item(this, 0, m_irq_status);
-	state_save_register_device_item(this, 0, m_state);
-	state_save_register_device_item(this, 0, prev_ua);
-	state_save_register_device_item(this, 0, m_icount);
-	state_save_register_device_item_array(this, 0, m_regsir);
-	state_save_register_device_item_array(this, 0, m_reg8bit);
-	state_save_register_device_item_array(this, 0, m_reg16bit);
-	state_save_register_device_item_array(this, 0, m_regmain);
-	state_save_register_device_item_array(this, 0, m_lines_status);
+	save_item(NAME(m_ppc));
+	save_item(NAME(m_curpc));
+	save_item(NAME(m_pc));
+	save_item(NAME(m_flags));
+	save_item(NAME(m_fetch_addr));
+	save_item(NAME(m_irq_status));
+	save_item(NAME(m_state));
+	save_item(NAME(prev_ua));
+	save_item(NAME(m_icount));
+	save_item(NAME(m_regsir));
+	save_item(NAME(m_reg8bit));
+	save_item(NAME(m_reg16bit));
+	save_item(NAME(m_regmain));
+	save_item(NAME(m_lines_status));
 
 	// register state for debugger
 	state_add(HD61700_PC, "pc",   m_pc).callimport().callexport().formatstr("%04X");

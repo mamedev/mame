@@ -383,18 +383,18 @@ static CPU_INIT( m6809 )
 
 	/* setup regtable */
 
-	state_save_register_device_item(device, 0, PC);
-	state_save_register_device_item(device, 0, PPC);
-	state_save_register_device_item(device, 0, D);
-	state_save_register_device_item(device, 0, DP);
-	state_save_register_device_item(device, 0, U);
-	state_save_register_device_item(device, 0, S);
-	state_save_register_device_item(device, 0, X);
-	state_save_register_device_item(device, 0, Y);
-	state_save_register_device_item(device, 0, CC);
-	state_save_register_device_item_array(device, 0, m68_state->irq_state);
-	state_save_register_device_item(device, 0, m68_state->int_state);
-	state_save_register_device_item(device, 0, m68_state->nmi_state);
+	device->save_item(NAME(PC));
+	device->save_item(NAME(PPC));
+	device->save_item(NAME(D));
+	device->save_item(NAME(DP));
+	device->save_item(NAME(U));
+	device->save_item(NAME(S));
+	device->save_item(NAME(X));
+	device->save_item(NAME(Y));
+	device->save_item(NAME(CC));
+	device->save_item(NAME(m68_state->irq_state));
+	device->save_item(NAME(m68_state->int_state));
+	device->save_item(NAME(m68_state->nmi_state));
 
 }
 

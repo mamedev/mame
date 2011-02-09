@@ -1401,89 +1401,89 @@ static void ym2151_state_save_register( YM2151 *chip, device_t *device )
 
 		op = &chip->oper[(j&7)*4+(j>>3)];
 
-		state_save_register_device_item(device, j, op->phase);
-		state_save_register_device_item(device, j, op->freq);
-		state_save_register_device_item(device, j, op->dt1);
-		state_save_register_device_item(device, j, op->mul);
-		state_save_register_device_item(device, j, op->dt1_i);
-		state_save_register_device_item(device, j, op->dt2);
+		device->save_item(NAME(op->phase), j);
+		device->save_item(NAME(op->freq), j);
+		device->save_item(NAME(op->dt1), j);
+		device->save_item(NAME(op->mul), j);
+		device->save_item(NAME(op->dt1_i), j);
+		device->save_item(NAME(op->dt2), j);
 		/* operators connection is saved in chip data block */
-		state_save_register_device_item(device, j, op->mem_value);
+		device->save_item(NAME(op->mem_value), j);
 
-		state_save_register_device_item(device, j, op->fb_shift);
-		state_save_register_device_item(device, j, op->fb_out_curr);
-		state_save_register_device_item(device, j, op->fb_out_prev);
-		state_save_register_device_item(device, j, op->kc);
-		state_save_register_device_item(device, j, op->kc_i);
-		state_save_register_device_item(device, j, op->pms);
-		state_save_register_device_item(device, j, op->ams);
-		state_save_register_device_item(device, j, op->AMmask);
+		device->save_item(NAME(op->fb_shift), j);
+		device->save_item(NAME(op->fb_out_curr), j);
+		device->save_item(NAME(op->fb_out_prev), j);
+		device->save_item(NAME(op->kc), j);
+		device->save_item(NAME(op->kc_i), j);
+		device->save_item(NAME(op->pms), j);
+		device->save_item(NAME(op->ams), j);
+		device->save_item(NAME(op->AMmask), j);
 
-		state_save_register_device_item(device, j, op->state);
-		state_save_register_device_item(device, j, op->eg_sh_ar);
-		state_save_register_device_item(device, j, op->eg_sel_ar);
-		state_save_register_device_item(device, j, op->tl);
-		state_save_register_device_item(device, j, op->volume);
-		state_save_register_device_item(device, j, op->eg_sh_d1r);
-		state_save_register_device_item(device, j, op->eg_sel_d1r);
-		state_save_register_device_item(device, j, op->d1l);
-		state_save_register_device_item(device, j, op->eg_sh_d2r);
-		state_save_register_device_item(device, j, op->eg_sel_d2r);
-		state_save_register_device_item(device, j, op->eg_sh_rr);
-		state_save_register_device_item(device, j, op->eg_sel_rr);
+		device->save_item(NAME(op->state), j);
+		device->save_item(NAME(op->eg_sh_ar), j);
+		device->save_item(NAME(op->eg_sel_ar), j);
+		device->save_item(NAME(op->tl), j);
+		device->save_item(NAME(op->volume), j);
+		device->save_item(NAME(op->eg_sh_d1r), j);
+		device->save_item(NAME(op->eg_sel_d1r), j);
+		device->save_item(NAME(op->d1l), j);
+		device->save_item(NAME(op->eg_sh_d2r), j);
+		device->save_item(NAME(op->eg_sel_d2r), j);
+		device->save_item(NAME(op->eg_sh_rr), j);
+		device->save_item(NAME(op->eg_sel_rr), j);
 
-		state_save_register_device_item(device, j, op->key);
-		state_save_register_device_item(device, j, op->ks);
-		state_save_register_device_item(device, j, op->ar);
-		state_save_register_device_item(device, j, op->d1r);
-		state_save_register_device_item(device, j, op->d2r);
-		state_save_register_device_item(device, j, op->rr);
+		device->save_item(NAME(op->key), j);
+		device->save_item(NAME(op->ks), j);
+		device->save_item(NAME(op->ar), j);
+		device->save_item(NAME(op->d1r), j);
+		device->save_item(NAME(op->d2r), j);
+		device->save_item(NAME(op->rr), j);
 
-		state_save_register_device_item(device, j, op->reserved0);
-		state_save_register_device_item(device, j, op->reserved1);
+		device->save_item(NAME(op->reserved0), j);
+		device->save_item(NAME(op->reserved1), j);
 	}
 
-	state_save_register_device_item_array(device, 0, chip->pan);
+	device->save_item(NAME(chip->pan));
 
-	state_save_register_device_item(device, 0, chip->eg_cnt);
-	state_save_register_device_item(device, 0, chip->eg_timer);
-	state_save_register_device_item(device, 0, chip->eg_timer_add);
-	state_save_register_device_item(device, 0, chip->eg_timer_overflow);
+	device->save_item(NAME(chip->eg_cnt));
+	device->save_item(NAME(chip->eg_timer));
+	device->save_item(NAME(chip->eg_timer_add));
+	device->save_item(NAME(chip->eg_timer_overflow));
 
-	state_save_register_device_item(device, 0, chip->lfo_phase);
-	state_save_register_device_item(device, 0, chip->lfo_timer);
-	state_save_register_device_item(device, 0, chip->lfo_timer_add);
-	state_save_register_device_item(device, 0, chip->lfo_overflow);
-	state_save_register_device_item(device, 0, chip->lfo_counter);
-	state_save_register_device_item(device, 0, chip->lfo_counter_add);
-	state_save_register_device_item(device, 0, chip->lfo_wsel);
-	state_save_register_device_item(device, 0, chip->amd);
-	state_save_register_device_item(device, 0, chip->pmd);
-	state_save_register_device_item(device, 0, chip->lfa);
-	state_save_register_device_item(device, 0, chip->lfp);
+	device->save_item(NAME(chip->lfo_phase));
+	device->save_item(NAME(chip->lfo_timer));
+	device->save_item(NAME(chip->lfo_timer_add));
+	device->save_item(NAME(chip->lfo_overflow));
+	device->save_item(NAME(chip->lfo_counter));
+	device->save_item(NAME(chip->lfo_counter_add));
+	device->save_item(NAME(chip->lfo_wsel));
+	device->save_item(NAME(chip->amd));
+	device->save_item(NAME(chip->pmd));
+	device->save_item(NAME(chip->lfa));
+	device->save_item(NAME(chip->lfp));
 
-	state_save_register_device_item(device, 0, chip->test);
-	state_save_register_device_item(device, 0, chip->ct);
+	device->save_item(NAME(chip->test));
+	device->save_item(NAME(chip->ct));
 
-	state_save_register_device_item(device, 0, chip->noise);
-	state_save_register_device_item(device, 0, chip->noise_rng);
-	state_save_register_device_item(device, 0, chip->noise_p);
-	state_save_register_device_item(device, 0, chip->noise_f);
+	device->save_item(NAME(chip->noise));
+	device->save_item(NAME(chip->noise_rng));
+	device->save_item(NAME(chip->noise_p));
+	device->save_item(NAME(chip->noise_f));
 
-	state_save_register_device_item(device, 0, chip->csm_req);
-	state_save_register_device_item(device, 0, chip->irq_enable);
-	state_save_register_device_item(device, 0, chip->status);
+	device->save_item(NAME(chip->csm_req));
+	device->save_item(NAME(chip->irq_enable));
+	device->save_item(NAME(chip->status));
 
-	state_save_register_device_item(device, 0, chip->timer_A_index);
-	state_save_register_device_item(device, 0, chip->timer_B_index);
-	state_save_register_device_item(device, 0, chip->timer_A_index_old);
-	state_save_register_device_item(device, 0, chip->timer_B_index_old);
+	device->save_item(NAME(chip->timer_A_index));
+	device->save_item(NAME(chip->timer_B_index));
+	device->save_item(NAME(chip->timer_A_index_old));
+	device->save_item(NAME(chip->timer_B_index_old));
 
 #ifdef USE_MAME_TIMERS
-	state_save_register_device_item(device, 0, chip->irqlinestate);
+	device->save_item(NAME(chip->irqlinestate));
 #endif
 
-	state_save_register_device_item_array(device, 0, chip->connect);
+	device->save_item(NAME(chip->connect));
 
 	device->machine->state().register_postload(ym2151_postload, chip);
 }

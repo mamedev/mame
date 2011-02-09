@@ -475,20 +475,20 @@ static DEVICE_START( adc0831 )
 	adc083x->input_callback_r = intf->input_callback_r;
 
 	/* register for state saving */
-	state_save_register_device_item( device, 0, adc083x->cs );
-	state_save_register_device_item( device, 0, adc083x->clk );
-	state_save_register_device_item( device, 0, adc083x->di );
-	state_save_register_device_item( device, 0, adc083x->se );
-	state_save_register_device_item( device, 0, adc083x->sars );
-	state_save_register_device_item( device, 0, adc083x->_do );
-	state_save_register_device_item( device, 0, adc083x->sgl );
-	state_save_register_device_item( device, 0, adc083x->odd );
-	state_save_register_device_item( device, 0, adc083x->sel1 );
-	state_save_register_device_item( device, 0, adc083x->sel0 );
-	state_save_register_device_item( device, 0, adc083x->state );
-	state_save_register_device_item( device, 0, adc083x->bit );
-	state_save_register_device_item( device, 0, adc083x->output );
-	state_save_register_device_item( device, 0, adc083x->mux_bits );
+	device->save_item( NAME(adc083x->cs) );
+	device->save_item( NAME(adc083x->clk) );
+	device->save_item( NAME(adc083x->di) );
+	device->save_item( NAME(adc083x->se) );
+	device->save_item( NAME(adc083x->sars) );
+	device->save_item( NAME(adc083x->_do) );
+	device->save_item( NAME(adc083x->sgl) );
+	device->save_item( NAME(adc083x->odd) );
+	device->save_item( NAME(adc083x->sel1) );
+	device->save_item( NAME(adc083x->sel0) );
+	device->save_item( NAME(adc083x->state) );
+	device->save_item( NAME(adc083x->bit) );
+	device->save_item( NAME(adc083x->output) );
+	device->save_item( NAME(adc083x->mux_bits) );
 }
 
 

@@ -849,42 +849,42 @@ static CPU_INIT( pic16c62x )
 
 	build_opcode_table();
 
-	state_save_register_device_item(device, 0, cpustate->W);
-	state_save_register_device_item(device, 0, cpustate->ALU);
-	state_save_register_device_item(device, 0, cpustate->OPTION);
-	state_save_register_device_item(device, 0, cpustate->PCLATH);
-	state_save_register_device_item(device, 0, cpustate->TMR0);
-	state_save_register_device_item(device, 0, cpustate->PCL);
-	state_save_register_device_item(device, 0, cpustate->STATUS);
-	state_save_register_device_item(device, 0, cpustate->FSR);
-	state_save_register_device_item(device, 0, cpustate->PORTA);
-	state_save_register_device_item(device, 0, cpustate->PORTB);
-	state_save_register_device_item(device, 0, cpustate->TRISA);
-	state_save_register_device_item(device, 0, cpustate->TRISB);
-	state_save_register_device_item(device, 0, cpustate->old_T0);
-	state_save_register_device_item(device, 0, cpustate->old_data);
-	state_save_register_device_item(device, 0, cpustate->picRAMmask);
-	state_save_register_device_item(device, 0, cpustate->WDT);
-	state_save_register_device_item(device, 0, cpustate->prescaler);
-	state_save_register_device_item(device, 0, cpustate->STACK[0]);
-	state_save_register_device_item(device, 0, cpustate->STACK[1]);
-	state_save_register_device_item(device, 0, cpustate->STACK[2]);
-	state_save_register_device_item(device, 0, cpustate->STACK[3]);
-	state_save_register_device_item(device, 0, cpustate->STACK[4]);
-	state_save_register_device_item(device, 0, cpustate->STACK[5]);
-	state_save_register_device_item(device, 0, cpustate->STACK[6]);
-	state_save_register_device_item(device, 0, cpustate->STACK[7]);
-	state_save_register_device_item(device, 0, cpustate->PC);
-	state_save_register_device_item(device, 0, cpustate->PREVPC);
-	state_save_register_device_item(device, 0, cpustate->CONFIG);
-	state_save_register_device_item(device, 0, cpustate->opcode.d);
-	state_save_register_device_item(device, 0, cpustate->delay_timer);
-	state_save_register_device_item(device, 0, cpustate->picmodel);
-	state_save_register_device_item(device, 0, cpustate->reset_vector);
+	device->save_item(NAME(cpustate->W));
+	device->save_item(NAME(cpustate->ALU));
+	device->save_item(NAME(cpustate->OPTION));
+	device->save_item(NAME(cpustate->PCLATH));
+	device->save_item(NAME(cpustate->TMR0));
+	device->save_item(NAME(cpustate->PCL));
+	device->save_item(NAME(cpustate->STATUS));
+	device->save_item(NAME(cpustate->FSR));
+	device->save_item(NAME(cpustate->PORTA));
+	device->save_item(NAME(cpustate->PORTB));
+	device->save_item(NAME(cpustate->TRISA));
+	device->save_item(NAME(cpustate->TRISB));
+	device->save_item(NAME(cpustate->old_T0));
+	device->save_item(NAME(cpustate->old_data));
+	device->save_item(NAME(cpustate->picRAMmask));
+	device->save_item(NAME(cpustate->WDT));
+	device->save_item(NAME(cpustate->prescaler));
+	device->save_item(NAME(cpustate->STACK[0]));
+	device->save_item(NAME(cpustate->STACK[1]));
+	device->save_item(NAME(cpustate->STACK[2]));
+	device->save_item(NAME(cpustate->STACK[3]));
+	device->save_item(NAME(cpustate->STACK[4]));
+	device->save_item(NAME(cpustate->STACK[5]));
+	device->save_item(NAME(cpustate->STACK[6]));
+	device->save_item(NAME(cpustate->STACK[7]));
+	device->save_item(NAME(cpustate->PC));
+	device->save_item(NAME(cpustate->PREVPC));
+	device->save_item(NAME(cpustate->CONFIG));
+	device->save_item(NAME(cpustate->opcode.d));
+	device->save_item(NAME(cpustate->delay_timer));
+	device->save_item(NAME(cpustate->picmodel));
+	device->save_item(NAME(cpustate->reset_vector));
 
-	state_save_register_device_item(device, 0, cpustate->icount);
-	state_save_register_device_item(device, 0, cpustate->temp_config);
-	state_save_register_device_item(device, 0, cpustate->inst_cycles);
+	device->save_item(NAME(cpustate->icount));
+	device->save_item(NAME(cpustate->temp_config));
+	device->save_item(NAME(cpustate->inst_cycles));
 }
 
 

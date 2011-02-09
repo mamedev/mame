@@ -136,13 +136,13 @@ void f3853_device::device_start()
 
 	m_timer = m_machine.scheduler().timer_alloc(FUNC(f3853_timer_callback), (void *)this );
 
-	state_save_register_device_item(this, 0, m_high );
-	state_save_register_device_item(this, 0, m_low );
-	state_save_register_device_item(this, 0, m_external_enable );
-	state_save_register_device_item(this, 0, m_timer_enable );
-	state_save_register_device_item(this, 0, m_request_flipflop );
-	state_save_register_device_item(this, 0, m_priority_line );
-	state_save_register_device_item(this, 0, m_external_interrupt_line );
+	save_item(NAME(m_high) );
+	save_item(NAME(m_low) );
+	save_item(NAME(m_external_enable) );
+	save_item(NAME(m_timer_enable) );
+	save_item(NAME(m_request_flipflop) );
+	save_item(NAME(m_priority_line) );
+	save_item(NAME(m_external_interrupt_line) );
 }
 
 

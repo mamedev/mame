@@ -281,11 +281,11 @@ void emu_timer::register_save()
 	}
 
 	// save the bits
-	state_save_register_item(m_machine, "timer", name, index, m_param);
-	state_save_register_item(m_machine, "timer", name, index, m_enabled);
-	state_save_register_item(m_machine, "timer", name, index, m_period);
-	state_save_register_item(m_machine, "timer", name, index, m_start);
-	state_save_register_item(m_machine, "timer", name, index, m_expire);
+	m_machine->state().save_item("timer", name, index, NAME(m_param));
+	m_machine->state().save_item("timer", name, index, NAME(m_enabled));
+	m_machine->state().save_item("timer", name, index, NAME(m_period));
+	m_machine->state().save_item("timer", name, index, NAME(m_start));
+	m_machine->state().save_item("timer", name, index, NAME(m_expire));
 }
 
 
@@ -335,7 +335,7 @@ device_scheduler::device_scheduler(running_machine &machine) :
 	m_timer_list->adjust(attotime::never);
 
 	// register global states
-	state_save_register_item(&m_machine, "timer", NULL, 0, m_basetime);
+	m_machine.state().save_item(NAME(m_basetime));
 	m_machine.state().register_postload(&state_postload_stub<device_scheduler, &device_scheduler::postload>, this);
 }
 

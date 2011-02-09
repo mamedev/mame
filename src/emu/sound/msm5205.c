@@ -194,14 +194,14 @@ static DEVICE_START( msm5205 )
 	DEVICE_RESET_CALL(msm5205);
 
 	/* register for save states */
-	state_save_register_device_item(device, 0, voice->clock);
-	state_save_register_device_item(device, 0, voice->data);
-	state_save_register_device_item(device, 0, voice->vclk);
-	state_save_register_device_item(device, 0, voice->reset);
-	state_save_register_device_item(device, 0, voice->prescaler);
-	state_save_register_device_item(device, 0, voice->bitwidth);
-	state_save_register_device_item(device, 0, voice->signal);
-	state_save_register_device_item(device, 0, voice->step);
+	device->save_item(NAME(voice->clock));
+	device->save_item(NAME(voice->data));
+	device->save_item(NAME(voice->vclk));
+	device->save_item(NAME(voice->reset));
+	device->save_item(NAME(voice->prescaler));
+	device->save_item(NAME(voice->bitwidth));
+	device->save_item(NAME(voice->signal));
+	device->save_item(NAME(voice->step));
 }
 
 /*

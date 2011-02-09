@@ -516,23 +516,23 @@ static void c352_init(c352_state *info, device_t *device)
 	// register save state info
 	for (i = 0; i < 32; i++)
 	{
-		state_save_register_device_item(device, i, info->c352_ch[i].vol_l);
-		state_save_register_device_item(device, i, info->c352_ch[i].vol_r);
-		state_save_register_device_item(device, i, info->c352_ch[i].vol_l2);
-		state_save_register_device_item(device, i, info->c352_ch[i].vol_r2);
-		state_save_register_device_item(device, i, info->c352_ch[i].bank);
-		state_save_register_device_item(device, i, info->c352_ch[i].noise);
-		state_save_register_device_item(device, i, info->c352_ch[i].noisebuf);
-		state_save_register_device_item(device, i, info->c352_ch[i].noisecnt);
-		state_save_register_device_item(device, i, info->c352_ch[i].pitch);
-		state_save_register_device_item(device, i, info->c352_ch[i].start_addr);
-		state_save_register_device_item(device, i, info->c352_ch[i].end_addr);
-		state_save_register_device_item(device, i, info->c352_ch[i].repeat_addr);
-		state_save_register_device_item(device, i, info->c352_ch[i].flag);
-		state_save_register_device_item(device, i, info->c352_ch[i].start);
-		state_save_register_device_item(device, i, info->c352_ch[i].repeat);
-		state_save_register_device_item(device, i, info->c352_ch[i].current_addr);
-		state_save_register_device_item(device, i, info->c352_ch[i].pos);
+		device->save_item(NAME(info->c352_ch[i].vol_l), i);
+		device->save_item(NAME(info->c352_ch[i].vol_r), i);
+		device->save_item(NAME(info->c352_ch[i].vol_l2), i);
+		device->save_item(NAME(info->c352_ch[i].vol_r2), i);
+		device->save_item(NAME(info->c352_ch[i].bank), i);
+		device->save_item(NAME(info->c352_ch[i].noise), i);
+		device->save_item(NAME(info->c352_ch[i].noisebuf), i);
+		device->save_item(NAME(info->c352_ch[i].noisecnt), i);
+		device->save_item(NAME(info->c352_ch[i].pitch), i);
+		device->save_item(NAME(info->c352_ch[i].start_addr), i);
+		device->save_item(NAME(info->c352_ch[i].end_addr), i);
+		device->save_item(NAME(info->c352_ch[i].repeat_addr), i);
+		device->save_item(NAME(info->c352_ch[i].flag), i);
+		device->save_item(NAME(info->c352_ch[i].start), i);
+		device->save_item(NAME(info->c352_ch[i].repeat), i);
+		device->save_item(NAME(info->c352_ch[i].current_addr), i);
+		device->save_item(NAME(info->c352_ch[i].pos), i);
 	}
 }
 

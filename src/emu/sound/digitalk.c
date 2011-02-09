@@ -621,27 +621,27 @@ static int digitalker_intr_r(digitalker *dg)
 
 static void digitalker_register_for_save(digitalker *dg)
 {
-	state_save_register_device_item(dg->device, 0, dg->data);
-	state_save_register_device_item(dg->device, 0, dg->cs);
-	state_save_register_device_item(dg->device, 0, dg->cms);
-	state_save_register_device_item(dg->device, 0, dg->wr);
-	state_save_register_device_item(dg->device, 0, dg->intr);
-	state_save_register_device_item(dg->device, 0, dg->bpos);
-	state_save_register_device_item(dg->device, 0, dg->apos);
-	state_save_register_device_item(dg->device, 0, dg->mode);
-	state_save_register_device_item(dg->device, 0, dg->cur_segment);
-	state_save_register_device_item(dg->device, 0, dg->cur_repeat);
-	state_save_register_device_item(dg->device, 0, dg->segments);
-	state_save_register_device_item(dg->device, 0, dg->repeats);
-	state_save_register_device_item(dg->device, 0, dg->prev_pitch);
-	state_save_register_device_item(dg->device, 0, dg->pitch);
-	state_save_register_device_item(dg->device, 0, dg->pitch_pos);
-	state_save_register_device_item(dg->device, 0, dg->stop_after);
-	state_save_register_device_item(dg->device, 0, dg->cur_dac);
-	state_save_register_device_item(dg->device, 0, dg->cur_bits);
-	state_save_register_device_item(dg->device, 0, dg->zero_count);
-	state_save_register_device_item(dg->device, 0, dg->dac_index);
-	state_save_register_device_item_array(dg->device, 0, dg->dac);
+	dg->device->save_item(NAME(dg->data));
+	dg->device->save_item(NAME(dg->cs));
+	dg->device->save_item(NAME(dg->cms));
+	dg->device->save_item(NAME(dg->wr));
+	dg->device->save_item(NAME(dg->intr));
+	dg->device->save_item(NAME(dg->bpos));
+	dg->device->save_item(NAME(dg->apos));
+	dg->device->save_item(NAME(dg->mode));
+	dg->device->save_item(NAME(dg->cur_segment));
+	dg->device->save_item(NAME(dg->cur_repeat));
+	dg->device->save_item(NAME(dg->segments));
+	dg->device->save_item(NAME(dg->repeats));
+	dg->device->save_item(NAME(dg->prev_pitch));
+	dg->device->save_item(NAME(dg->pitch));
+	dg->device->save_item(NAME(dg->pitch_pos));
+	dg->device->save_item(NAME(dg->stop_after));
+	dg->device->save_item(NAME(dg->cur_dac));
+	dg->device->save_item(NAME(dg->cur_bits));
+	dg->device->save_item(NAME(dg->zero_count));
+	dg->device->save_item(NAME(dg->dac_index));
+	dg->device->save_item(NAME(dg->dac));
 }
 
 static DEVICE_START(digitalker)

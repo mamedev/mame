@@ -574,38 +574,38 @@ static void rand_init(UINT8 *rng, int size, int left, int right, int add)
 
 static void register_for_save(pokey_state *chip, device_t *device)
 {
-	state_save_register_device_item_array(device, 0, chip->counter);
-	state_save_register_device_item_array(device, 0, chip->divisor);
-	state_save_register_device_item_array(device, 0, chip->volume);
-	state_save_register_device_item_array(device, 0, chip->output);
-	state_save_register_device_item_array(device, 0, chip->audible);
-	state_save_register_device_item(device, 0, chip->samplepos_fract);
-	state_save_register_device_item(device, 0, chip->samplepos_whole);
-	state_save_register_device_item(device, 0, chip->polyadjust);
-	state_save_register_device_item(device, 0, chip->p4);
-	state_save_register_device_item(device, 0, chip->p5);
-	state_save_register_device_item(device, 0, chip->p9);
-	state_save_register_device_item(device, 0, chip->p17);
-	state_save_register_device_item(device, 0, chip->r9);
-	state_save_register_device_item(device, 0, chip->r17);
-	state_save_register_device_item(device, 0, chip->clockmult);
-	state_save_register_device_item(device, 0, chip->timer_period[0]);
-	state_save_register_device_item(device, 0, chip->timer_period[1]);
-	state_save_register_device_item(device, 0, chip->timer_period[2]);
-	state_save_register_device_item_array(device, 0, chip->timer_param);
-	state_save_register_device_item_array(device, 0, chip->AUDF);
-	state_save_register_device_item_array(device, 0, chip->AUDC);
-	state_save_register_device_item_array(device, 0, chip->POTx);
-	state_save_register_device_item(device, 0, chip->AUDCTL);
-	state_save_register_device_item(device, 0, chip->ALLPOT);
-	state_save_register_device_item(device, 0, chip->KBCODE);
-	state_save_register_device_item(device, 0, chip->RANDOM);
-	state_save_register_device_item(device, 0, chip->SERIN);
-	state_save_register_device_item(device, 0, chip->SEROUT);
-	state_save_register_device_item(device, 0, chip->IRQST);
-	state_save_register_device_item(device, 0, chip->IRQEN);
-	state_save_register_device_item(device, 0, chip->SKSTAT);
-	state_save_register_device_item(device, 0, chip->SKCTL);
+	device->save_item(NAME(chip->counter));
+	device->save_item(NAME(chip->divisor));
+	device->save_item(NAME(chip->volume));
+	device->save_item(NAME(chip->output));
+	device->save_item(NAME(chip->audible));
+	device->save_item(NAME(chip->samplepos_fract));
+	device->save_item(NAME(chip->samplepos_whole));
+	device->save_item(NAME(chip->polyadjust));
+	device->save_item(NAME(chip->p4));
+	device->save_item(NAME(chip->p5));
+	device->save_item(NAME(chip->p9));
+	device->save_item(NAME(chip->p17));
+	device->save_item(NAME(chip->r9));
+	device->save_item(NAME(chip->r17));
+	device->save_item(NAME(chip->clockmult));
+	device->save_item(NAME(chip->timer_period[0]));
+	device->save_item(NAME(chip->timer_period[1]));
+	device->save_item(NAME(chip->timer_period[2]));
+	device->save_item(NAME(chip->timer_param));
+	device->save_item(NAME(chip->AUDF));
+	device->save_item(NAME(chip->AUDC));
+	device->save_item(NAME(chip->POTx));
+	device->save_item(NAME(chip->AUDCTL));
+	device->save_item(NAME(chip->ALLPOT));
+	device->save_item(NAME(chip->KBCODE));
+	device->save_item(NAME(chip->RANDOM));
+	device->save_item(NAME(chip->SERIN));
+	device->save_item(NAME(chip->SEROUT));
+	device->save_item(NAME(chip->IRQST));
+	device->save_item(NAME(chip->IRQEN));
+	device->save_item(NAME(chip->SKSTAT));
+	device->save_item(NAME(chip->SKCTL));
 }
 
 

@@ -114,29 +114,29 @@ static UINT8 parity_table[256];
 static void i8086_state_register(device_t *device)
 {
 	i8086_state *cpustate = get_safe_token(device);
-	state_save_register_device_item_array(device, 0, cpustate->regs.w);
-	state_save_register_device_item(device, 0, cpustate->pc);
-	state_save_register_device_item(device, 0, cpustate->prevpc);
-	state_save_register_device_item_array(device, 0, cpustate->base);
-	state_save_register_device_item_array(device, 0, cpustate->sregs);
-	state_save_register_device_item(device, 0, cpustate->flags);
-	state_save_register_device_item(device, 0, cpustate->AuxVal);
-	state_save_register_device_item(device, 0, cpustate->OverVal);
-	state_save_register_device_item(device, 0, cpustate->SignVal);
-	state_save_register_device_item(device, 0, cpustate->ZeroVal);
-	state_save_register_device_item(device, 0, cpustate->CarryVal);
-	state_save_register_device_item(device, 0, cpustate->DirVal);
-	state_save_register_device_item(device, 0, cpustate->ParityVal);
-	state_save_register_device_item(device, 0, cpustate->TF);
-	state_save_register_device_item(device, 0, cpustate->IF);
-	state_save_register_device_item(device, 0, cpustate->MF);
-	state_save_register_device_item(device, 0, cpustate->int_vector);
-	state_save_register_device_item(device, 0, cpustate->nmi_state);
-	state_save_register_device_item(device, 0, cpustate->irq_state);
-	state_save_register_device_item(device, 0, cpustate->extra_cycles);
-	state_save_register_device_item(device, 0, cpustate->halted);
-	state_save_register_device_item(device, 0, cpustate->test_state);	/* PJB 03/05 */
-	state_save_register_device_item(device, 0, cpustate->rep_in_progress);	/* PJB 03/05 */
+	device->save_item(NAME(cpustate->regs.w));
+	device->save_item(NAME(cpustate->pc));
+	device->save_item(NAME(cpustate->prevpc));
+	device->save_item(NAME(cpustate->base));
+	device->save_item(NAME(cpustate->sregs));
+	device->save_item(NAME(cpustate->flags));
+	device->save_item(NAME(cpustate->AuxVal));
+	device->save_item(NAME(cpustate->OverVal));
+	device->save_item(NAME(cpustate->SignVal));
+	device->save_item(NAME(cpustate->ZeroVal));
+	device->save_item(NAME(cpustate->CarryVal));
+	device->save_item(NAME(cpustate->DirVal));
+	device->save_item(NAME(cpustate->ParityVal));
+	device->save_item(NAME(cpustate->TF));
+	device->save_item(NAME(cpustate->IF));
+	device->save_item(NAME(cpustate->MF));
+	device->save_item(NAME(cpustate->int_vector));
+	device->save_item(NAME(cpustate->nmi_state));
+	device->save_item(NAME(cpustate->irq_state));
+	device->save_item(NAME(cpustate->extra_cycles));
+	device->save_item(NAME(cpustate->halted));
+	device->save_item(NAME(cpustate->test_state));	/* PJB 03/05 */
+	device->save_item(NAME(cpustate->rep_in_progress));	/* PJB 03/05 */
 }
 
 static CPU_INIT( i8086 )

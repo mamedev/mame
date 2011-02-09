@@ -1840,50 +1840,50 @@ static DEVICE_START( ide_controller )
 	ide->reset_timer = device->machine->scheduler().timer_alloc(FUNC(reset_callback), (void *)device);
 
 	/* register ide states */
-	state_save_register_device_item(device, 0, ide->adapter_control);
-	state_save_register_device_item(device, 0, ide->status);
-	state_save_register_device_item(device, 0, ide->error);
-	state_save_register_device_item(device, 0, ide->command);
-	state_save_register_device_item(device, 0, ide->interrupt_pending);
-	state_save_register_device_item(device, 0, ide->precomp_offset);
+	device->save_item(NAME(ide->adapter_control));
+	device->save_item(NAME(ide->status));
+	device->save_item(NAME(ide->error));
+	device->save_item(NAME(ide->command));
+	device->save_item(NAME(ide->interrupt_pending));
+	device->save_item(NAME(ide->precomp_offset));
 
-	state_save_register_device_item_array(device, 0, ide->buffer);
-	state_save_register_device_item_array(device, 0, ide->features);
-	state_save_register_device_item(device, 0, ide->buffer_offset);
-	state_save_register_device_item(device, 0, ide->sector_count);
+	device->save_item(NAME(ide->buffer));
+	device->save_item(NAME(ide->features));
+	device->save_item(NAME(ide->buffer_offset));
+	device->save_item(NAME(ide->sector_count));
 
-	state_save_register_device_item(device, 0, ide->block_count);
-	state_save_register_device_item(device, 0, ide->sectors_until_int);
+	device->save_item(NAME(ide->block_count));
+	device->save_item(NAME(ide->sectors_until_int));
 
-	state_save_register_device_item(device, 0, ide->dma_active);
-	state_save_register_device_item(device, 0, ide->dma_last_buffer);
-	state_save_register_device_item(device, 0, ide->dma_address);
-	state_save_register_device_item(device, 0, ide->dma_descriptor);
-	state_save_register_device_item(device, 0, ide->dma_bytes_left);
+	device->save_item(NAME(ide->dma_active));
+	device->save_item(NAME(ide->dma_last_buffer));
+	device->save_item(NAME(ide->dma_address));
+	device->save_item(NAME(ide->dma_descriptor));
+	device->save_item(NAME(ide->dma_bytes_left));
 
-	state_save_register_device_item(device, 0, ide->bus_master_command);
-	state_save_register_device_item(device, 0, ide->bus_master_status);
-	state_save_register_device_item(device, 0, ide->bus_master_descriptor);
+	device->save_item(NAME(ide->bus_master_command));
+	device->save_item(NAME(ide->bus_master_status));
+	device->save_item(NAME(ide->bus_master_descriptor));
 
-	state_save_register_device_item(device, 0, ide->cur_cylinder);
-	state_save_register_device_item(device, 0, ide->cur_sector);
-	state_save_register_device_item(device, 0, ide->cur_head);
-	state_save_register_device_item(device, 0, ide->cur_head_reg);
+	device->save_item(NAME(ide->cur_cylinder));
+	device->save_item(NAME(ide->cur_sector));
+	device->save_item(NAME(ide->cur_head));
+	device->save_item(NAME(ide->cur_head_reg));
 
-	state_save_register_device_item(device, 0, ide->cur_lba);
+	device->save_item(NAME(ide->cur_lba));
 
-	state_save_register_device_item(device, 0, ide->num_cylinders);
-	state_save_register_device_item(device, 0, ide->num_sectors);
-	state_save_register_device_item(device, 0, ide->num_heads);
+	device->save_item(NAME(ide->num_cylinders));
+	device->save_item(NAME(ide->num_sectors));
+	device->save_item(NAME(ide->num_heads));
 
-	state_save_register_device_item(device, 0, ide->config_unknown);
-	state_save_register_device_item_array(device, 0, ide->config_register);
-	state_save_register_device_item(device, 0, ide->config_register_num);
+	device->save_item(NAME(ide->config_unknown));
+	device->save_item(NAME(ide->config_register));
+	device->save_item(NAME(ide->config_register_num));
 
-	state_save_register_device_item(device, 0, ide->master_password_enable);
-	state_save_register_device_item(device, 0, ide->user_password_enable);
+	device->save_item(NAME(ide->master_password_enable));
+	device->save_item(NAME(ide->user_password_enable));
 
-	state_save_register_device_item(device, 0, ide->gnetreadlock);
+	device->save_item(NAME(ide->gnetreadlock));
 }
 
 

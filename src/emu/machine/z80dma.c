@@ -241,23 +241,23 @@ void z80dma_device::device_start()
 	m_timer = m_machine.scheduler().timer_alloc(FUNC(static_timerproc), (void *)this);
 
 	// register for state saving
-	state_save_register_device_item_array(this, 0, m_regs);
-	state_save_register_device_item_array(this, 0, m_regs_follow);
-	state_save_register_device_item(this, 0, m_num_follow);
-	state_save_register_device_item(this, 0, m_cur_follow);
-	state_save_register_device_item(this, 0, m_status);
-	state_save_register_device_item(this, 0, m_dma_enabled);
-	state_save_register_device_item(this, 0, m_vector);
-	state_save_register_device_item(this, 0, m_ip);
-	state_save_register_device_item(this, 0, m_ius);
-	state_save_register_device_item(this, 0, m_addressA);
-	state_save_register_device_item(this, 0, m_addressB);
-	state_save_register_device_item(this, 0, m_count);
-	state_save_register_device_item(this, 0, m_rdy);
-	state_save_register_device_item(this, 0, m_force_ready);
-	state_save_register_device_item(this, 0, m_is_read);
-	state_save_register_device_item(this, 0, m_cur_cycle);
-	state_save_register_device_item(this, 0, m_latch);
+	save_item(NAME(m_regs));
+	save_item(NAME(m_regs_follow));
+	save_item(NAME(m_num_follow));
+	save_item(NAME(m_cur_follow));
+	save_item(NAME(m_status));
+	save_item(NAME(m_dma_enabled));
+	save_item(NAME(m_vector));
+	save_item(NAME(m_ip));
+	save_item(NAME(m_ius));
+	save_item(NAME(m_addressA));
+	save_item(NAME(m_addressB));
+	save_item(NAME(m_count));
+	save_item(NAME(m_rdy));
+	save_item(NAME(m_force_ready));
+	save_item(NAME(m_is_read));
+	save_item(NAME(m_cur_cycle));
+	save_item(NAME(m_latch));
 }
 
 

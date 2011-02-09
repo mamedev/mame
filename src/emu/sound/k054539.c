@@ -474,9 +474,9 @@ static void k054539_init_chip(device_t *device, k054539_state *info)
 
 	info->stream = device->machine->sound().stream_alloc(*device, 0, 2, device->clock(), info, k054539_update);
 
-	state_save_register_device_item_array(device, 0, info->regs);
-	state_save_register_device_item_pointer(device, 0, info->ram,  0x4000);
-	state_save_register_device_item(device, 0, info->cur_ptr);
+	device->save_item(NAME(info->regs));
+	device->save_pointer(NAME(info->ram), 0x4000);
+	device->save_item(NAME(info->cur_ptr));
 }
 
 WRITE8_DEVICE_HANDLER( k054539_w )

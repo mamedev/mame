@@ -141,15 +141,15 @@ void i8257_device::device_start()
 	m_msbflip_timer = timer_alloc(TIMER_MSBFLIP);
 
 	/* register for state saving */
-	state_save_register_device_item_array(this, 0, m_address);
-	state_save_register_device_item_array(this, 0, m_count);
-	state_save_register_device_item_array(this, 0, m_rwmode);
-	state_save_register_device_item_array(this, 0, m_registers);
-	state_save_register_device_item(this, 0, m_mode);
-	state_save_register_device_item(this, 0, m_rr);
-	state_save_register_device_item(this, 0, m_msb);
-	state_save_register_device_item(this, 0, m_drq);
-	state_save_register_device_item(this, 0, m_status);
+	save_item(NAME(m_address));
+	save_item(NAME(m_count));
+	save_item(NAME(m_rwmode));
+	save_item(NAME(m_registers));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_rr));
+	save_item(NAME(m_msb));
+	save_item(NAME(m_drq));
+	save_item(NAME(m_status));
 }
 
 

@@ -104,24 +104,6 @@ void state_postload_stub(running_machine *machine, void *param)
 
 
 
-// register device items
-#define state_save_register_device_item(_dev, _index, _val) \
-	(_dev)->machine->state().save_item((_dev)->name(), (_dev)->tag(), _index, _val, #_val)
-
-#define state_save_register_device_item_pointer(_dev, _index, _val, _count) \
-	(_dev)->machine->state().save_pointer((_dev)->name(), (_dev)->tag(), _index, _val, #_val, _count)
-
-#define state_save_register_device_item_array(_dev, _index, _val) \
-	(_dev)->machine->state().save_item((_dev)->name(), (_dev)->tag(), _index, _val, #_val)
-
-#define state_save_register_device_item_2d_array(_dev, _index, _val) \
-	(_dev)->machine->state().save_item((_dev)->name(), (_dev)->tag(), _index, _val, #_val)
-
-#define state_save_register_device_item_bitmap(_dev, _index, _val) \
-	(_dev)->machine->state().save_item((_dev)->name(), (_dev)->tag(), _index, *(_val), #_val)
-
-
-
 // register global items
 #define state_save_register_global(_mach, _val) \
 	(_mach)->state().save_item(_val, #_val)

@@ -127,10 +127,10 @@ static DEVICE_START( snkwave )
 	chip->waveform_position = 0;
 
 	/* register with the save state system */
-	state_save_register_device_item(device, 0, chip->frequency);
-	state_save_register_device_item(device, 0, chip->counter);
-	state_save_register_device_item(device, 0, chip->waveform_position);
-	state_save_register_device_item_pointer(device, 0, chip->waveform, WAVEFORM_LENGTH);
+	device->save_item(NAME(chip->frequency));
+	device->save_item(NAME(chip->counter));
+	device->save_item(NAME(chip->waveform_position));
+	device->save_pointer(NAME(chip->waveform), WAVEFORM_LENGTH);
 }
 
 

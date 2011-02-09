@@ -125,29 +125,29 @@ void acia6850_device::device_start()
 	m_rx_timer->reset();
 	m_tx_timer->reset();
 
-	state_save_register_device_item(this, 0, m_ctrl);
-	state_save_register_device_item(this, 0, m_status);
-	state_save_register_device_item(this, 0, m_rx_clock);
-	state_save_register_device_item(this, 0, m_tx_clock);
-	state_save_register_device_item(this, 0, m_rx_counter);
-	state_save_register_device_item(this, 0, m_tx_counter);
-	state_save_register_device_item(this, 0, m_rx_shift);
-	state_save_register_device_item(this, 0, m_tx_shift);
-	state_save_register_device_item(this, 0, m_rdr);
-	state_save_register_device_item(this, 0, m_tdr);
-	state_save_register_device_item(this, 0, m_rx_bits);
-	state_save_register_device_item(this, 0, m_tx_bits);
-	state_save_register_device_item(this, 0, m_rx_parity);
-	state_save_register_device_item(this, 0, m_tx_parity);
-	state_save_register_device_item(this, 0, m_tx_int);
+	save_item(NAME(m_ctrl));
+	save_item(NAME(m_status));
+	save_item(NAME(m_rx_clock));
+	save_item(NAME(m_tx_clock));
+	save_item(NAME(m_rx_counter));
+	save_item(NAME(m_tx_counter));
+	save_item(NAME(m_rx_shift));
+	save_item(NAME(m_tx_shift));
+	save_item(NAME(m_rdr));
+	save_item(NAME(m_tdr));
+	save_item(NAME(m_rx_bits));
+	save_item(NAME(m_tx_bits));
+	save_item(NAME(m_rx_parity));
+	save_item(NAME(m_tx_parity));
+	save_item(NAME(m_tx_int));
 
-	state_save_register_device_item(this, 0, m_divide);
-	state_save_register_device_item(this, 0, m_overrun);
-	state_save_register_device_item(this, 0, m_reset);
-	state_save_register_device_item(this, 0, m_first_reset);
-	state_save_register_device_item(this, 0, m_rts);
-	state_save_register_device_item(this, 0, m_brk);
-	state_save_register_device_item(this, 0, m_status_read);
+	save_item(NAME(m_divide));
+	save_item(NAME(m_overrun));
+	save_item(NAME(m_reset));
+	save_item(NAME(m_first_reset));
+	save_item(NAME(m_rts));
+	save_item(NAME(m_brk));
+	save_item(NAME(m_status_read));
 }
 
 

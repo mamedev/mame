@@ -116,8 +116,8 @@ static DEVICE_START( atari_vg_earom )
 	earom->device = device;
 
 	/* register for save states */
-	state_save_register_device_item(device, 0, earom->offset);
-	state_save_register_device_item(device, 0, earom->data);
+	device->save_item(NAME(earom->offset));
+	device->save_item(NAME(earom->data));
 }
 
 

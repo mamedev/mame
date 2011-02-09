@@ -343,15 +343,15 @@ static CPU_INIT( pps4 )
 	cpustate->data = device->space(AS_DATA);
 	cpustate->io = device->space(AS_IO);
 
-	state_save_register_device_item(device, 0, cpustate->A);
-	state_save_register_device_item(device, 0, cpustate->X);
-	state_save_register_device_item(device, 0, cpustate->P);
-	state_save_register_device_item(device, 0, cpustate->SA);
-	state_save_register_device_item(device, 0, cpustate->SB);
-	state_save_register_device_item(device, 0, cpustate->B);
-	state_save_register_device_item(device, 0, cpustate->C);
-	state_save_register_device_item(device, 0, cpustate->FF1);
-	state_save_register_device_item(device, 0, cpustate->FF2);
+	device->save_item(NAME(cpustate->A));
+	device->save_item(NAME(cpustate->X));
+	device->save_item(NAME(cpustate->P));
+	device->save_item(NAME(cpustate->SA));
+	device->save_item(NAME(cpustate->SB));
+	device->save_item(NAME(cpustate->B));
+	device->save_item(NAME(cpustate->C));
+	device->save_item(NAME(cpustate->FF1));
+	device->save_item(NAME(cpustate->FF2));
 }
 
 /***************************************************************************

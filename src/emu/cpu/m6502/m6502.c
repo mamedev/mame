@@ -159,22 +159,22 @@ static void m6502_common_init(legacy_cpu_device *device, device_irq_callback irq
 			cpustate->port_write = intf->port_write_func;
 	}
 
-	state_save_register_device_item(device, 0, cpustate->pc.w.l);
-	state_save_register_device_item(device, 0, cpustate->sp.w.l);
-	state_save_register_device_item(device, 0, cpustate->p);
-	state_save_register_device_item(device, 0, cpustate->a);
-	state_save_register_device_item(device, 0, cpustate->x);
-	state_save_register_device_item(device, 0, cpustate->y);
-	state_save_register_device_item(device, 0, cpustate->pending_irq);
-	state_save_register_device_item(device, 0, cpustate->after_cli);
-	state_save_register_device_item(device, 0, cpustate->nmi_state);
-	state_save_register_device_item(device, 0, cpustate->irq_state);
-	state_save_register_device_item(device, 0, cpustate->so_state);
+	device->save_item(NAME(cpustate->pc.w.l));
+	device->save_item(NAME(cpustate->sp.w.l));
+	device->save_item(NAME(cpustate->p));
+	device->save_item(NAME(cpustate->a));
+	device->save_item(NAME(cpustate->x));
+	device->save_item(NAME(cpustate->y));
+	device->save_item(NAME(cpustate->pending_irq));
+	device->save_item(NAME(cpustate->after_cli));
+	device->save_item(NAME(cpustate->nmi_state));
+	device->save_item(NAME(cpustate->irq_state));
+	device->save_item(NAME(cpustate->so_state));
 
 	if (subtype == SUBTYPE_6510)
 	{
-		state_save_register_device_item(device, 0, cpustate->port);
-		state_save_register_device_item(device, 0, cpustate->ddr);
+		device->save_item(NAME(cpustate->port));
+		device->save_item(NAME(cpustate->ddr));
 	}
 }
 

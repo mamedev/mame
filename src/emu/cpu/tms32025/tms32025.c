@@ -1727,45 +1727,45 @@ static CPU_INIT( tms32025 )
 	cpustate->data = device->space(AS_DATA);
 	cpustate->io = device->space(AS_IO);
 
-	state_save_register_device_item(device, 0, cpustate->PC);
-	state_save_register_device_item(device, 0, cpustate->STR0);
-	state_save_register_device_item(device, 0, cpustate->STR1);
-	state_save_register_device_item(device, 0, cpustate->PFC);
-	state_save_register_device_item(device, 0, cpustate->IFR);
-	state_save_register_device_item(device, 0, cpustate->RPTC);
-	state_save_register_device_item(device, 0, cpustate->ACC.d);
-	state_save_register_device_item(device, 0, cpustate->ALU.d);
-	state_save_register_device_item(device, 0, cpustate->Preg.d);
-	state_save_register_device_item(device, 0, cpustate->Treg);
-	state_save_register_device_item(device, 0, cpustate->AR[0]);
-	state_save_register_device_item(device, 0, cpustate->AR[1]);
-	state_save_register_device_item(device, 0, cpustate->AR[2]);
-	state_save_register_device_item(device, 0, cpustate->AR[3]);
-	state_save_register_device_item(device, 0, cpustate->AR[4]);
-	state_save_register_device_item(device, 0, cpustate->AR[5]);
-	state_save_register_device_item(device, 0, cpustate->AR[6]);
-	state_save_register_device_item(device, 0, cpustate->AR[7]);
-	state_save_register_device_item(device, 0, cpustate->STACK[0]);
-	state_save_register_device_item(device, 0, cpustate->STACK[1]);
-	state_save_register_device_item(device, 0, cpustate->STACK[2]);
-	state_save_register_device_item(device, 0, cpustate->STACK[3]);
-	state_save_register_device_item(device, 0, cpustate->STACK[4]);
-	state_save_register_device_item(device, 0, cpustate->STACK[5]);
-	state_save_register_device_item(device, 0, cpustate->STACK[6]);
-	state_save_register_device_item(device, 0, cpustate->STACK[7]);
+	device->save_item(NAME(cpustate->PC));
+	device->save_item(NAME(cpustate->STR0));
+	device->save_item(NAME(cpustate->STR1));
+	device->save_item(NAME(cpustate->PFC));
+	device->save_item(NAME(cpustate->IFR));
+	device->save_item(NAME(cpustate->RPTC));
+	device->save_item(NAME(cpustate->ACC.d));
+	device->save_item(NAME(cpustate->ALU.d));
+	device->save_item(NAME(cpustate->Preg.d));
+	device->save_item(NAME(cpustate->Treg));
+	device->save_item(NAME(cpustate->AR[0]));
+	device->save_item(NAME(cpustate->AR[1]));
+	device->save_item(NAME(cpustate->AR[2]));
+	device->save_item(NAME(cpustate->AR[3]));
+	device->save_item(NAME(cpustate->AR[4]));
+	device->save_item(NAME(cpustate->AR[5]));
+	device->save_item(NAME(cpustate->AR[6]));
+	device->save_item(NAME(cpustate->AR[7]));
+	device->save_item(NAME(cpustate->STACK[0]));
+	device->save_item(NAME(cpustate->STACK[1]));
+	device->save_item(NAME(cpustate->STACK[2]));
+	device->save_item(NAME(cpustate->STACK[3]));
+	device->save_item(NAME(cpustate->STACK[4]));
+	device->save_item(NAME(cpustate->STACK[5]));
+	device->save_item(NAME(cpustate->STACK[6]));
+	device->save_item(NAME(cpustate->STACK[7]));
 
-	state_save_register_device_item(device, 0, cpustate->oldacc);
-	state_save_register_device_item(device, 0, cpustate->memaccess);
-	state_save_register_device_item(device, 0, cpustate->icount);
-	state_save_register_device_item(device, 0, cpustate->mHackIgnoreARP);
+	device->save_item(NAME(cpustate->oldacc));
+	device->save_item(NAME(cpustate->memaccess));
+	device->save_item(NAME(cpustate->icount));
+	device->save_item(NAME(cpustate->mHackIgnoreARP));
 
-	state_save_register_device_item(device, 0, cpustate->idle);
-	state_save_register_device_item(device, 0, cpustate->hold);
-	state_save_register_device_item(device, 0, cpustate->external_mem_access);
-	state_save_register_device_item(device, 0, cpustate->init_load_addr);
-	state_save_register_device_item(device, 0, cpustate->PREVPC);
+	device->save_item(NAME(cpustate->idle));
+	device->save_item(NAME(cpustate->hold));
+	device->save_item(NAME(cpustate->external_mem_access));
+	device->save_item(NAME(cpustate->init_load_addr));
+	device->save_item(NAME(cpustate->PREVPC));
 
-//  state_save_register_device_item_pointer(device, 0, cpustate->intRAM, 0x800*2);
+//  device->save_pointer(NAME(cpustate->intRAM), 0x800*2);
 }
 
 /****************************************************************************

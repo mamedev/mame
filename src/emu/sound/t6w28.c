@@ -355,14 +355,14 @@ static DEVICE_START( t6w28 )
 	chip->WhitenoiseTaps = 0x06;
 	chip->WhitenoiseInvert = FALSE;
 
-	state_save_register_device_item_array(device, 0, chip->Register);
-	state_save_register_device_item_array(device, 0, chip->LastRegister);
-	state_save_register_device_item_array(device, 0, chip->Volume);
-	state_save_register_device_item_array(device, 0, chip->RNG);
-	state_save_register_device_item_array(device, 0, chip->NoiseMode);
-	state_save_register_device_item_array(device, 0, chip->Period);
-	state_save_register_device_item_array(device, 0, chip->Count);
-	state_save_register_device_item_array(device, 0, chip->Output);
+	device->save_item(NAME(chip->Register));
+	device->save_item(NAME(chip->LastRegister));
+	device->save_item(NAME(chip->Volume));
+	device->save_item(NAME(chip->RNG));
+	device->save_item(NAME(chip->NoiseMode));
+	device->save_item(NAME(chip->Period));
+	device->save_item(NAME(chip->Count));
+	device->save_item(NAME(chip->Output));
 }
 
 

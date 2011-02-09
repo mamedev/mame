@@ -1089,24 +1089,24 @@ static void common_start( device_t *device, int device_type ) {
 		devcb_resolve_write_line(&timer->out_out_func, &pit8253->config->timer[timerno].out_out_func, device);
 
 		/* set up state save values */
-		state_save_register_device_item(device, timerno, timer->clockin);
-		state_save_register_device_item(device, timerno, timer->control);
-		state_save_register_device_item(device, timerno, timer->status);
-		state_save_register_device_item(device, timerno, timer->lowcount);
-		state_save_register_device_item(device, timerno, timer->latch);
-		state_save_register_device_item(device, timerno, timer->count);
-		state_save_register_device_item(device, timerno, timer->value);
-		state_save_register_device_item(device, timerno, timer->wmsb);
-		state_save_register_device_item(device, timerno, timer->rmsb);
-		state_save_register_device_item(device, timerno, timer->output);
-		state_save_register_device_item(device, timerno, timer->gate);
-		state_save_register_device_item(device, timerno, timer->latched_count);
-		state_save_register_device_item(device, timerno, timer->latched_status);
-		state_save_register_device_item(device, timerno, timer->null_count);
-		state_save_register_device_item(device, timerno, timer->phase);
-		state_save_register_device_item(device, timerno, timer->cycles_to_output);
-		state_save_register_device_item(device, timerno, timer->last_updated);
-		state_save_register_device_item(device, timerno, timer->clock);
+		device->save_item(NAME(timer->clockin), timerno);
+		device->save_item(NAME(timer->control), timerno);
+		device->save_item(NAME(timer->status), timerno);
+		device->save_item(NAME(timer->lowcount), timerno);
+		device->save_item(NAME(timer->latch), timerno);
+		device->save_item(NAME(timer->count), timerno);
+		device->save_item(NAME(timer->value), timerno);
+		device->save_item(NAME(timer->wmsb), timerno);
+		device->save_item(NAME(timer->rmsb), timerno);
+		device->save_item(NAME(timer->output), timerno);
+		device->save_item(NAME(timer->gate), timerno);
+		device->save_item(NAME(timer->latched_count), timerno);
+		device->save_item(NAME(timer->latched_status), timerno);
+		device->save_item(NAME(timer->null_count), timerno);
+		device->save_item(NAME(timer->phase), timerno);
+		device->save_item(NAME(timer->cycles_to_output), timerno);
+		device->save_item(NAME(timer->last_updated), timerno);
+		device->save_item(NAME(timer->clock), timerno);
 	}
 }
 

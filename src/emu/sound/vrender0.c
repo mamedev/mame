@@ -112,7 +112,7 @@ static DEVICE_START( vrender0 )
 
 	VR0->stream = device->machine->sound().stream_alloc(*device, 0, 2, 44100, VR0, VR0_Update);
 
-	state_save_register_device_item_array(device, 0, VR0->SOUNDREGS);
+	device->save_item(NAME(VR0->SOUNDREGS));
 }
 
 WRITE32_DEVICE_HANDLER(vr0_snd_write)

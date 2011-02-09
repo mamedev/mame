@@ -1564,9 +1564,9 @@ static DEVICE_START( hd63484 )
 	hd63484->skattva_hack = intf->skattva_hack;
 	hd63484->ram = auto_alloc_array_clear(device->machine, UINT16, HD63484_RAM_SIZE);
 
-//  state_save_register_device_item(device, 0, hd63484->clear_bitmap);
-//  state_save_register_device_item_pointer(device, 0, hd63484->spriteram, 0x1000);
-//  state_save_register_device_item_bitmap(device, 0, hd63484->sprites_bitmap);
+//  device->save_item(NAME(hd63484->clear_bitmap));
+//  device->save_pointer(NAME(hd63484->spriteram), 0x1000);
+//  device->save_item(NAME(*hd63484->sprites_bitmap));
 }
 
 static DEVICE_RESET( hd63484 )

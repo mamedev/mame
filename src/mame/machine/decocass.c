@@ -2211,9 +2211,9 @@ static DEVICE_START( decocass_tape )
 	}
 
 	/* register states */
-	state_save_register_device_item(device, 0, tape->speed);
-	state_save_register_device_item(device, 0, tape->bitnum);
-	state_save_register_device_item(device, 0, tape->clockpos);
+	device->save_item(NAME(tape->speed));
+	device->save_item(NAME(tape->bitnum));
+	device->save_item(NAME(tape->clockpos));
 }
 
 

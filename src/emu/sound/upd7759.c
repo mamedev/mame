@@ -601,33 +601,33 @@ static STATE_POSTLOAD( upd7759_postload )
 
 static void register_for_save(upd7759_state *chip, device_t *device)
 {
-	state_save_register_device_item(device, 0, chip->pos);
-	state_save_register_device_item(device, 0, chip->step);
+	device->save_item(NAME(chip->pos));
+	device->save_item(NAME(chip->step));
 
-	state_save_register_device_item(device, 0, chip->fifo_in);
-	state_save_register_device_item(device, 0, chip->reset);
-	state_save_register_device_item(device, 0, chip->start);
-	state_save_register_device_item(device, 0, chip->drq);
+	device->save_item(NAME(chip->fifo_in));
+	device->save_item(NAME(chip->reset));
+	device->save_item(NAME(chip->start));
+	device->save_item(NAME(chip->drq));
 
-	state_save_register_device_item(device, 0, chip->state);
-	state_save_register_device_item(device, 0, chip->clocks_left);
-	state_save_register_device_item(device, 0, chip->nibbles_left);
-	state_save_register_device_item(device, 0, chip->repeat_count);
-	state_save_register_device_item(device, 0, chip->post_drq_state);
-	state_save_register_device_item(device, 0, chip->post_drq_clocks);
-	state_save_register_device_item(device, 0, chip->req_sample);
-	state_save_register_device_item(device, 0, chip->last_sample);
-	state_save_register_device_item(device, 0, chip->block_header);
-	state_save_register_device_item(device, 0, chip->sample_rate);
-	state_save_register_device_item(device, 0, chip->first_valid_header);
-	state_save_register_device_item(device, 0, chip->offset);
-	state_save_register_device_item(device, 0, chip->repeat_offset);
+	device->save_item(NAME(chip->state));
+	device->save_item(NAME(chip->clocks_left));
+	device->save_item(NAME(chip->nibbles_left));
+	device->save_item(NAME(chip->repeat_count));
+	device->save_item(NAME(chip->post_drq_state));
+	device->save_item(NAME(chip->post_drq_clocks));
+	device->save_item(NAME(chip->req_sample));
+	device->save_item(NAME(chip->last_sample));
+	device->save_item(NAME(chip->block_header));
+	device->save_item(NAME(chip->sample_rate));
+	device->save_item(NAME(chip->first_valid_header));
+	device->save_item(NAME(chip->offset));
+	device->save_item(NAME(chip->repeat_offset));
 
-	state_save_register_device_item(device, 0, chip->adpcm_state);
-	state_save_register_device_item(device, 0, chip->adpcm_data);
-	state_save_register_device_item(device, 0, chip->sample);
+	device->save_item(NAME(chip->adpcm_state));
+	device->save_item(NAME(chip->adpcm_data));
+	device->save_item(NAME(chip->sample));
 
-	state_save_register_device_item(device, 0, chip->romoffset);
+	device->save_item(NAME(chip->romoffset));
 	device->machine->state().register_postload(upd7759_postload, chip);
 }
 

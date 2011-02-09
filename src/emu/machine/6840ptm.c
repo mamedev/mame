@@ -144,25 +144,25 @@ void ptm6840_device::device_start()
 	devcb_resolve_write_line(&m_irq_func, &m_config.m_irq_func, this);
 
 	/* register for state saving */
-	state_save_register_device_item(this, 0, m_lsb_buffer);
-	state_save_register_device_item(this, 0, m_msb_buffer);
-	state_save_register_device_item(this, 0, m_status_read_since_int);
-	state_save_register_device_item(this, 0, m_status_reg);
-	state_save_register_device_item(this, 0, m_t3_divisor);
-	state_save_register_device_item(this, 0, m_t3_scaler);
-	state_save_register_device_item(this, 0, m_internal_clock);
-	state_save_register_device_item(this, 0, m_IRQ);
+	save_item(NAME(m_lsb_buffer));
+	save_item(NAME(m_msb_buffer));
+	save_item(NAME(m_status_read_since_int));
+	save_item(NAME(m_status_reg));
+	save_item(NAME(m_t3_divisor));
+	save_item(NAME(m_t3_scaler));
+	save_item(NAME(m_internal_clock));
+	save_item(NAME(m_IRQ));
 
-	state_save_register_device_item_array(this, 0, m_control_reg);
-	state_save_register_device_item_array(this, 0, m_output);
-	state_save_register_device_item_array(this, 0, m_gate);
-	state_save_register_device_item_array(this, 0, m_clk);
-	state_save_register_device_item_array(this, 0, m_mode);
-	state_save_register_device_item_array(this, 0, m_fired);
-	state_save_register_device_item_array(this, 0, m_enabled);
-	state_save_register_device_item_array(this, 0, m_external_clock);
-	state_save_register_device_item_array(this, 0, m_counter);
-	state_save_register_device_item_array(this, 0, m_latch);
+	save_item(NAME(m_control_reg));
+	save_item(NAME(m_output));
+	save_item(NAME(m_gate));
+	save_item(NAME(m_clk));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_fired));
+	save_item(NAME(m_enabled));
+	save_item(NAME(m_external_clock));
+	save_item(NAME(m_counter));
+	save_item(NAME(m_latch));
 }
 
 

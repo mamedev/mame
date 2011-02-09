@@ -2091,18 +2091,18 @@ static CPU_INIT( mcs51 )
 
 	/* Save states */
 
-	state_save_register_device_item(device, 0, mcs51_state->ppc);
-	state_save_register_device_item(device, 0, mcs51_state->pc);
-	state_save_register_device_item(device, 0, mcs51_state->rwm );
-	state_save_register_device_item(device, 0, mcs51_state->cur_irq_prio );
-	state_save_register_device_item(device, 0, mcs51_state->last_line_state );
-	state_save_register_device_item(device, 0, mcs51_state->t0_cnt );
-	state_save_register_device_item(device, 0, mcs51_state->t1_cnt );
-	state_save_register_device_item(device, 0, mcs51_state->t2_cnt );
-	state_save_register_device_item(device, 0, mcs51_state->t2ex_cnt );
-	state_save_register_device_item(device, 0, mcs51_state->recalc_parity );
-	state_save_register_device_item_array(device, 0, mcs51_state->irq_prio );
-	state_save_register_device_item(device, 0, mcs51_state->irq_active );
+	device->save_item(NAME(mcs51_state->ppc));
+	device->save_item(NAME(mcs51_state->pc));
+	device->save_item(NAME(mcs51_state->rwm) );
+	device->save_item(NAME(mcs51_state->cur_irq_prio) );
+	device->save_item(NAME(mcs51_state->last_line_state) );
+	device->save_item(NAME(mcs51_state->t0_cnt) );
+	device->save_item(NAME(mcs51_state->t1_cnt) );
+	device->save_item(NAME(mcs51_state->t2_cnt) );
+	device->save_item(NAME(mcs51_state->t2ex_cnt) );
+	device->save_item(NAME(mcs51_state->recalc_parity) );
+	device->save_item(NAME(mcs51_state->irq_prio) );
+	device->save_item(NAME(mcs51_state->irq_active) );
 }
 
 static CPU_INIT( i80c51 )
@@ -2395,9 +2395,9 @@ static CPU_INIT( ds5002fp )
 	mcs51_state->sfr_read = ds5002fp_sfr_read;
 	mcs51_state->sfr_write = ds5002fp_sfr_write;
 
-	state_save_register_device_item(device, 0, mcs51_state->ds5002fp.previous_ta );
-	state_save_register_device_item(device, 0, mcs51_state->ds5002fp.ta_window );
-	state_save_register_device_item(device, 0, mcs51_state->ds5002fp.range );
+	device->save_item(NAME(mcs51_state->ds5002fp.previous_ta) );
+	device->save_item(NAME(mcs51_state->ds5002fp.ta_window) );
+	device->save_item(NAME(mcs51_state->ds5002fp.range) );
 
 }
 

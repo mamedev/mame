@@ -800,18 +800,18 @@ static CPU_INIT( s2650 )
 	s2650c->direct = &s2650c->program->direct();
 	s2650c->io = device->space(AS_IO);
 
-	state_save_register_device_item(device, 0, s2650c->ppc);
-	state_save_register_device_item(device, 0, s2650c->page);
-	state_save_register_device_item(device, 0, s2650c->iar);
-	state_save_register_device_item(device, 0, s2650c->ea);
-	state_save_register_device_item(device, 0, s2650c->psl);
-	state_save_register_device_item(device, 0, s2650c->psu);
-	state_save_register_device_item(device, 0, s2650c->r);
-	state_save_register_device_item_array(device, 0, s2650c->reg);
-	state_save_register_device_item(device, 0, s2650c->halt);
-	state_save_register_device_item(device, 0, s2650c->ir);
-	state_save_register_device_item_array(device, 0, s2650c->ras);
-	state_save_register_device_item(device, 0, s2650c->irq_state);
+	device->save_item(NAME(s2650c->ppc));
+	device->save_item(NAME(s2650c->page));
+	device->save_item(NAME(s2650c->iar));
+	device->save_item(NAME(s2650c->ea));
+	device->save_item(NAME(s2650c->psl));
+	device->save_item(NAME(s2650c->psu));
+	device->save_item(NAME(s2650c->r));
+	device->save_item(NAME(s2650c->reg));
+	device->save_item(NAME(s2650c->halt));
+	device->save_item(NAME(s2650c->ir));
+	device->save_item(NAME(s2650c->ras));
+	device->save_item(NAME(s2650c->irq_state));
 }
 
 static CPU_RESET( s2650 )

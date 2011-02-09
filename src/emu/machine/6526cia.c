@@ -212,39 +212,39 @@ void mos6526_device::device_start()
 	}
 
 	/* state save support */
-	state_save_register_device_item(this, 0, m_port[0].m_ddr);
-	state_save_register_device_item(this, 0, m_port[0].m_latch);
-	state_save_register_device_item(this, 0, m_port[0].m_in);
-	state_save_register_device_item(this, 0, m_port[0].m_out);
-	state_save_register_device_item(this, 0, m_port[0].m_mask_value);
-	state_save_register_device_item(this, 0, m_port[1].m_ddr);
-	state_save_register_device_item(this, 0, m_port[1].m_latch);
-	state_save_register_device_item(this, 0, m_port[1].m_in);
-	state_save_register_device_item(this, 0, m_port[1].m_out);
-	state_save_register_device_item(this, 0, m_port[1].m_mask_value);
-	state_save_register_device_item(this, 0, m_timer[0].m_latch);
-	state_save_register_device_item(this, 0, m_timer[0].m_count);
-	state_save_register_device_item(this, 0, m_timer[0].m_mode);
-	state_save_register_device_item(this, 0, m_timer[0].m_irq);
-	state_save_register_device_item(this, 0, m_timer[1].m_latch);
-	state_save_register_device_item(this, 0, m_timer[1].m_count);
-	state_save_register_device_item(this, 0, m_timer[1].m_mode);
-	state_save_register_device_item(this, 0, m_timer[1].m_irq);
-	state_save_register_device_item(this, 0, m_tod);
-	state_save_register_device_item(this, 0, m_tod_latch);
-	state_save_register_device_item(this, 0, m_tod_latched);
-	state_save_register_device_item(this, 0, m_tod_running);
-	state_save_register_device_item(this, 0, m_alarm);
-	state_save_register_device_item(this, 0, m_icr);
-	state_save_register_device_item(this, 0, m_ics);
-	state_save_register_device_item(this, 0, m_irq);
-	state_save_register_device_item(this, 0, m_flag);
-	state_save_register_device_item(this, 0, m_loaded);
-	state_save_register_device_item(this, 0, m_sdr);
-	state_save_register_device_item(this, 0, m_sp);
-	state_save_register_device_item(this, 0, m_cnt);
-	state_save_register_device_item(this, 0, m_shift);
-	state_save_register_device_item(this, 0, m_serial);
+	save_item(NAME(m_port[0].m_ddr));
+	save_item(NAME(m_port[0].m_latch));
+	save_item(NAME(m_port[0].m_in));
+	save_item(NAME(m_port[0].m_out));
+	save_item(NAME(m_port[0].m_mask_value));
+	save_item(NAME(m_port[1].m_ddr));
+	save_item(NAME(m_port[1].m_latch));
+	save_item(NAME(m_port[1].m_in));
+	save_item(NAME(m_port[1].m_out));
+	save_item(NAME(m_port[1].m_mask_value));
+	save_item(NAME(m_timer[0].m_latch));
+	save_item(NAME(m_timer[0].m_count));
+	save_item(NAME(m_timer[0].m_mode));
+	save_item(NAME(m_timer[0].m_irq));
+	save_item(NAME(m_timer[1].m_latch));
+	save_item(NAME(m_timer[1].m_count));
+	save_item(NAME(m_timer[1].m_mode));
+	save_item(NAME(m_timer[1].m_irq));
+	save_item(NAME(m_tod));
+	save_item(NAME(m_tod_latch));
+	save_item(NAME(m_tod_latched));
+	save_item(NAME(m_tod_running));
+	save_item(NAME(m_alarm));
+	save_item(NAME(m_icr));
+	save_item(NAME(m_ics));
+	save_item(NAME(m_irq));
+	save_item(NAME(m_flag));
+	save_item(NAME(m_loaded));
+	save_item(NAME(m_sdr));
+	save_item(NAME(m_sp));
+	save_item(NAME(m_cnt));
+	save_item(NAME(m_shift));
+	save_item(NAME(m_serial));
 }
 
 

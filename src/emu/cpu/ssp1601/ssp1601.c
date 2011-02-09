@@ -513,17 +513,17 @@ static CPU_INIT( ssp1601 )
 {
 	ssp1601_state_t *ssp1601_state = get_safe_token(device);
 
-	state_save_register_device_item(device, 0, rX);
-	state_save_register_device_item(device, 0, rY);
-	state_save_register_device_item(device, 0, rA32);
-	state_save_register_device_item(device, 0, rST);
-	state_save_register_device_item(device, 0, rSTACK);
-	state_save_register_device_item(device, 0, rPC);
-	state_save_register_device_item(device, 0, rP.d);
-	state_save_register_device_item(device, 0, PPC);
-	state_save_register_device_item_array(device, 0, ssp1601_state->stack);
-	state_save_register_device_item_array(device, 0, ssp1601_state->r);
-	state_save_register_device_item_array(device, 0, ssp1601_state->RAM);
+	device->save_item(NAME(rX));
+	device->save_item(NAME(rY));
+	device->save_item(NAME(rA32));
+	device->save_item(NAME(rST));
+	device->save_item(NAME(rSTACK));
+	device->save_item(NAME(rPC));
+	device->save_item(NAME(rP.d));
+	device->save_item(NAME(PPC));
+	device->save_item(NAME(ssp1601_state->stack));
+	device->save_item(NAME(ssp1601_state->r));
+	device->save_item(NAME(ssp1601_state->RAM));
 
 	/* clear the state */
 	memset(ssp1601_state, 0, sizeof(ssp1601_state_t));
