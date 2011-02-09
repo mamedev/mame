@@ -999,12 +999,28 @@ static const gfx_layout charlayout =
 	16*16*2
 };
 
+static const gfx_layout tilelayout =
+{
+	16, 16,
+	RGN_FRAC(1,3),
+	3,
+	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
+	{ STEP8(0,1), STEP8(8*8,1) },
+	{ STEP8(0,8), STEP8(16*8,8) },
+	16*16
+};
+
 static GFXDECODE_START( srmp2 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 64 )
 GFXDECODE_END
 
 static GFXDECODE_START( srmp3 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 32 )
+GFXDECODE_END
+
+static GFXDECODE_START( rmgoldyh )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 32 )
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0, 64 )
 GFXDECODE_END
 
 
@@ -1084,6 +1100,11 @@ static MACHINE_CONFIG_START( srmp3, srmp2_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( rmgoldyh, srmp3 )
+
+	MCFG_GFXDECODE(rmgoldyh)
+
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mjyuugi, srmp2_state )
 
@@ -1233,6 +1254,84 @@ ROM_START( srmp3 )
 	ROM_LOAD( "za0-13.prm", 0x000200, 0x000200, CRC(4ea3d2fe) SHA1(c7d18b9c1331e08faadf33e52033c658bf2b16fc) )
 ROM_END
 
+/***************************************************************************
+
+Real Mahjong Gold Yumehai
+(c)1988? Alba
+The game is BET version of Super Real Mahjong P3,
+but the PCB is totally different.
+
+PO-064A
+
+CPU: Z80
+Sound: AY-3-8910, M5205
+OSC: 16.000MHz (X1), 10.000MHz (X3)
+
+Custom chips:
+X1-001
+X1-002
+X2-003 x3
+X1-004 x2
+X0-005
+X1-007
+
+ROMs:
+ZF0_001_001.U2 [ce5b0ba0] \
+ZF0_002_002.U3 [e2226425] -- Main programs
+
+ZF0_1.U70    [78ba5d05] \
+ZF0_2.U71    [b0f548e6] |-- tiles?
+ZF0_3.U72    [771c27a1] /
+
+ZA0-1.U52 \
+ZA0-2.U51 |
+ZA0-3.U50 |
+ZA0-4.U49 |
+ZA0-5.U48 |- Sprites (same as srmp3)
+ZA0-6.U47 |
+ZA0-7.U46 |
+ZA0-8.U45 /
+
+ZA0-11.U16 - Samples (same as srmp3)
+
+ZF0-12.U58   [1ac5387c] \
+ZF0-13.U59   [4ea3d2fe] -- Color PROM
+
+ZF0-5.U35 - PAL16L8A-2CN(not dumped)
+
+Others:
+CR2032 battery
+***************************************************************************/
+
+ROM_START( rmgoldyh )
+	ROM_REGION( 0x048000, "maincpu", 0 )					/* 68000 Code */
+	ROM_LOAD( "zf0_001_001.u2", 0x000000, 0x008000, CRC(ce5b0ba0) SHA1(c499e7dc0e3ffe783204e930356c91ea228baf62) )
+	ROM_CONTINUE(               0x010000, 0x018000 )
+	ROM_LOAD( "zf0_002_002.u3", 0x028000, 0x020000, CRC(e2226425) SHA1(36925c68492a3ea4af19d611a455eae688aaab62) )
+
+	ROM_REGION( 0x400000, "gfx1", 0 )	/* Sprites */
+	ROM_LOAD16_BYTE( "za0-02.u51", 0x000000, 0x080000, CRC(85691946) SHA1(8b91210b1b6671ba2c9ec6722e5dc40bdf44e4b5) )
+	ROM_LOAD16_BYTE( "za0-04.u49", 0x000001, 0x080000, CRC(c06e7a96) SHA1(a2dfb81004ea72bfa21724374eb8533af606a5df) )
+	ROM_LOAD16_BYTE( "za0-01.u52", 0x100000, 0x080000, CRC(95e0d87c) SHA1(34e6c0a95e63cf092092e27c7ba2f649ebf56507) )
+	ROM_LOAD16_BYTE( "za0-03.u50", 0x100001, 0x080000, CRC(7c98570e) SHA1(26e28e67bca9954d62d72260370ea872c6058a10) )
+	ROM_LOAD16_BYTE( "za0-06.u47", 0x200000, 0x080000, CRC(8b874b0a) SHA1(27fe1ccc2938e1703e484e2925a2f073064cf019) )
+	ROM_LOAD16_BYTE( "za0-08.u45", 0x200001, 0x080000, CRC(3de89d88) SHA1(1e6dabe6aeee6a2613feab26b871c235bf491bfa) )
+	ROM_LOAD16_BYTE( "za0-05.u48", 0x300000, 0x080000, CRC(80d3b4e6) SHA1(d31d3f904ee8463c1efbb1d106eeb3dc0dc42ab8) )
+	ROM_LOAD16_BYTE( "za0-07.u46", 0x300001, 0x080000, CRC(39d15129) SHA1(62b71a82cfc39e6dab3175e03eca5ff92e854f13) )
+
+	ROM_REGION( 0x18000, "gfx2", 0 )	/* Tiles */
+	ROM_LOAD( "zf0_1.u70", 0x00000, 0x8000, CRC(78ba5d05) SHA1(21cd5ecbd55a5beaece82c974752dac4281b467a) )
+	ROM_LOAD( "zf0_2.u71", 0x08000, 0x8000, CRC(b0f548e6) SHA1(84e3acb10ae3669bf65bd8c93273acacb5136737) )
+	ROM_LOAD( "zf0_3.u72", 0x10000, 0x8000, CRC(771c27a1) SHA1(5c95edcd5e155cbb4448888bba62c98cf8d4b577) )
+
+	ROM_REGION( 0x080000, "adpcm", 0 )				/* Samples */
+	ROM_LOAD( "za0-11.u16", 0x000000, 0x080000, CRC(2248c23f) SHA1(35591b51bb23dfd7fa81a05026e9ec0789bb0dde) )
+
+	ROM_REGION( 0x000400, "proms", 0 )					/* Color PROMs */
+	ROM_LOAD( "zf0-12.u58", 0x000000, 0x000200, CRC(1ac5387c) SHA1(022f204dbe2374478279b586451673a08ee489c8) )
+	ROM_LOAD( "zf0-13.u59", 0x000200, 0x000200, CRC(4ea3d2fe) SHA1(c7d18b9c1331e08faadf33e52033c658bf2b16fc) )
+ROM_END
+
 ROM_START( mjyuugi )
 	ROM_REGION( 0x080000, "maincpu", 0 )					/* 68000 Code */
 	ROM_LOAD16_BYTE( "um001.001", 0x000000, 0x020000, CRC(28d5340f) SHA1(683d89987b8b794695fdb6104d8e6ff5204afafb) )
@@ -1314,12 +1413,13 @@ ROM_START( ponchina )
 ROM_END
 
 
-GAME( 1987, srmp1,     0,        srmp2,    srmp2,    0,       ROT0, "Seta",  "Super Real Mahjong Part 1 (Japan)",  0 )
-GAME( 1987, srmp2,     0,        srmp2,    srmp2,    srmp2,   ROT0, "Seta",  "Super Real Mahjong Part 2 (Japan)",  0 )
-GAME( 1988, srmp3,     0,        srmp3,    srmp3,    srmp3,   ROT0, "Seta",  "Super Real Mahjong Part 3 (Japan)",  0 )
-GAME( 1990, mjyuugi,   0,        mjyuugi,  mjyuugi,  0,       ROT0, "Visco", "Mahjong Yuugi (Japan set 1)",        0 )
-GAME( 1990, mjyuugia,  mjyuugi,  mjyuugi,  mjyuugi,  0,       ROT0, "Visco", "Mahjong Yuugi (Japan set 2)",        0 )
-GAME( 1991, ponchin,   0,        mjyuugi,  ponchin,  0,       ROT0, "Visco", "Mahjong Pon Chin Kan (Japan set 1)", 0 )
-GAME( 1991, ponchina,  ponchin,  mjyuugi,  ponchin,  0,       ROT0, "Visco", "Mahjong Pon Chin Kan (Japan set 2)", 0 )
+GAME( 1987, srmp1,     0,        srmp2,    srmp2,    0,       ROT0, "Seta",  				"Super Real Mahjong Part 1 (Japan)",  0 )
+GAME( 1987, srmp2,     0,        srmp2,    srmp2,    srmp2,   ROT0, "Seta",  				"Super Real Mahjong Part 2 (Japan)",  0 )
+GAME( 1988, srmp3,     0,        srmp3,    srmp3,    srmp3,   ROT0, "Seta",  				"Super Real Mahjong Part 3 (Japan)",  0 )
+GAME( 1988, rmgoldyh,  srmp3,    rmgoldyh, srmp3,    0,       ROT0, "Seta / Alba",	        "Real Mahjong Gold Yumehai (Japan)",  GAME_NOT_WORKING )
+GAME( 1990, mjyuugi,   0,        mjyuugi,  mjyuugi,  0,       ROT0, "Visco", 				"Mahjong Yuugi (Japan set 1)",        0 )
+GAME( 1990, mjyuugia,  mjyuugi,  mjyuugi,  mjyuugi,  0,       ROT0, "Visco", 				"Mahjong Yuugi (Japan set 2)",        0 )
+GAME( 1991, ponchin,   0,        mjyuugi,  ponchin,  0,       ROT0, "Visco", 				"Mahjong Pon Chin Kan (Japan set 1)", 0 )
+GAME( 1991, ponchina,  ponchin,  mjyuugi,  ponchin,  0,       ROT0, "Visco", 				"Mahjong Pon Chin Kan (Japan set 2)", 0 )
 
 

@@ -7935,16 +7935,19 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( gutsn )		/* 2000.06 (c) 2000 Kaneko / Kouyousha (Japan) */
 	DRIVER( galpans3 )	/* 2002.07 (c) 2002 Kaneko (Japan) */
 
-	/* Seta games (seta.c) */
+	/* Seta games */
 	DRIVER( hanaawas )	/* (c) SetaKikaku */
 	DRIVER( speedatk )	/* CB-0 (c) SetaKikaku */
 	DRIVER( srmp1 )		/* UB or UC?? (c) 1987 */
 	DRIVER( srmp2 )		/* UB or UC?? (c) 1987 */
 	DRIVER( srmp3 )		/* ZA-0? (c) 1988 */
+	DRIVER( rmgoldyh )	/* ZF-0? (c) 1988 */
 	DRIVER( mjyuugi )	/* (c) 1990 Visco */
 	DRIVER( mjyuugia )	/* (c) 1990 Visco */
 	DRIVER( ponchin )	/* (c) 1991 Visco */
 	DRIVER( ponchina )	/* (c) 1991 Visco */
+
+	/* Seta 1st Generation HW (seta.c) */
 	DRIVER( tndrcade )	/* UA-0 (c) 1987 Taito */
 	DRIVER( tndrcadej )	/* UA-0 (c) 1987 Taito */
 	DRIVER( twineagl )	/* UA-2 (c) 1988 + Taito license */
@@ -8000,7 +8003,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( inttoote )	/* (c) 1998 Coinmaster */
 	DRIVER( inttootea )	/* (c) 1998 Coinmaster */
 
-	/* Seta games (seta2.c) */
+	/* Seta 2nd Generation HW (seta2.c) */
 	DRIVER( gundamex )	/* (c) 1994 Banpresto */
 	DRIVER( grdians )	/* (c) 1995 Banpresto */
 	DRIVER( mj4simai )	/* (c) 1996 Maboroshi Ware */
@@ -8054,7 +8057,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( jclub2o )	/* (c) 199? Seta */
 	DRIVER( darkhors )	/* bootleg of Jockey Club II */
 
-	/* ST-0016 based games (ST-0016 is a z80 / gfx / sound all in one) */
+	/* ST-0016 based games (ST-0016 is a SoC Z80-based HW) */
 	/* plain ST-0016 */
 	DRIVER( renju )		/* (c) 1994 Visco */
 	DRIVER( koikois )	/* (c) 1995 Seta */
