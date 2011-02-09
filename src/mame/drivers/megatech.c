@@ -62,6 +62,7 @@ Bonanza Bros.              171-5782    837-6963-49       610-0239-49         MPR
 Streets of Rage            171-5782    837-6963-51       610-0239-51         MPR-14125-SM   (uPD23C4000)  EPR-12368-51   (27C256)  n/a
 Sonic The Hedgehog         171-5782    837-6963-52       610-0239-52         MPR-13913-F    (834200A)     EPR-12368-52   (27C256)  n/a
 Spider-Man                 171-5782    837-6963-54       610-0239-54         MPR-14027-SM   (uPD23C4000)  EPR-12368-54   (27C256)  n/a
+California Game            171-5834    837-6963-55-01    610-0239-55         EPR-14494      (27C020)      EPR-14495      (27C020)  EPR-12368-55 (27C256)
 Mario Lemeux Hockey        171-5782    837-6963-59       610-0239-59         MPR-14376-H    (234000)      EPR-12368-59   (27256)   n/a
 Turbo Outrun               171-5782    837-6963-61       610-0239-61         MPR-14674      (uPD23C4000)  EPR-12368-61   (27256)   n/a
 Sonic Hedgehog 2           171-6215A   837-6963-62       610-0239-62         MPR-15000A-F   (838200)      EPR-12368-62   (27256)   n/a
@@ -1122,7 +1123,7 @@ ROM_START( mt_spman ) /* Spiderman */
 ROM_END
 
 
-/* Game 55? (the cart shows a 610-0239-55 marking on the label) - California Games */
+/* Game 55 - California Games */
 ROM_START( mt_calga ) /* California Games */
 	MEGATECH_BIOS
 
@@ -1268,7 +1269,7 @@ ROM_END
 /*    */ GAME( 1991, mt_sonia, mt_sonic, megatech, megatech, mt_crt, ROT0, "Sega",                  "Sonic The Hedgehog (Mega-Tech, set 2)", GAME_NOT_WORKING )
 /* 53 */ GAME( 1990, mt_fshrk, megatech, megatech, megatech, mt_crt, ROT0, "Toaplan / Sega",        "Fire Shark (Mega-Tech)", GAME_NOT_WORKING )
 /* 54 */ GAME( 1991, mt_spman, megatech, megatech, megatech, mt_crt, ROT0, "Marvel / Sega",         "Spider-Man vs The Kingpin (Mega-Tech)", GAME_NOT_WORKING )
-/* 55?*/ GAME( 1991, mt_calga, megatech, megatech, megatech, mt_crt, ROT0, "Sega",                  "California Games (Mega-Tech)", GAME_NOT_WORKING )
+/* 55 */ GAME( 1991, mt_calga, megatech, megatech, megatech, mt_crt, ROT0, "Sega",                  "California Games (Mega-Tech)", GAME_NOT_WORKING )
 /* 56 */ // unknown
 /* 57 */ GAME( 1991, mt_gaxe2, megatech, megatech, megatech, mt_crt, ROT0, "Sega",                  "Golden Axe II (Mega-Tech)", GAME_NOT_WORKING )
 /* 58 */ GAME( 1991, mt_stf,   megatech, megatech, megatech, mt_crt, ROT0, "Sega",                  "Joe Montana II: Sports Talk Football (Mega-Tech)", GAME_NOT_WORKING )

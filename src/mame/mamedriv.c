@@ -4620,7 +4620,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mt_sonia )	/* ^^ */
 	DRIVER( mt_fshrk )	/* 53 */
 	DRIVER( mt_spman )	/* 54 */
-	DRIVER( mt_calga )	/* 55? */
+	DRIVER( mt_calga )	/* 55 */
 						/* 56 */
 	DRIVER( mt_gaxe2 )	/* 57 */
 	DRIVER( mt_stf )	/* 58 */
