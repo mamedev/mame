@@ -1895,7 +1895,7 @@ static int process_IRQs(tms32025_state *cpustate)
 			return cpustate->tms32025_irq_cycles;
 		}
 		if ((cpustate->IFR & 0x10) && (IMR & 0x10)) {		/* Serial port receive IRQ (internal) */
-//          logerror("TMS32025:  Active RINT (Serial recieve)\n");
+//          logerror("TMS32025:  Active RINT (Serial receive)\n");
 			DRR = S_IN(TMS32025_DR);
 			SET_PC(0x001A);
 			cpustate->idle = 0;

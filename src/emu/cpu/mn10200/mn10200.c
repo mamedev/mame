@@ -1923,7 +1923,7 @@ static void mn10200_w(mn102_info *mn102, UINT32 adr, UINT32 data, int type)
   case 0x181: case 0x191: {
     int ser = (adr-0x180) >> 4;
     mn102->serial[ser].ctrlh = data;
-//    log_event("MN102", "Serial %d transmit=%s, recieve=%s, break=%s, proto=%s, order=%s",
+//    log_event("MN102", "Serial %d transmit=%s, receive=%s, break=%s, proto=%s, order=%s",
 //        ser,
 //        data & 0x80 ? "on" : "off", data & 0x40 ? "on" : "off",
 //        data & 0x20 ? "on" : "off", data & 8 ? "sync" : "async",

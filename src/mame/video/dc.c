@@ -1439,7 +1439,7 @@ static void process_ta_fifo(running_machine* machine)
 		mame_printf_verbose("\n");
 		#endif
 
-		// set type of list currently being recieved
+		// set type of list currently being received
 		if ((state_ta.paratype == 4) || (state_ta.paratype == 5) || (state_ta.paratype == 6))
 		{
 			if (state_ta.tafifo_listtype < 0)

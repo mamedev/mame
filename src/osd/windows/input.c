@@ -1692,7 +1692,7 @@ static void rawinput_init(running_machine *machine)
 			rawinput_mouse_enum(machine, device);
 	}
 
-	// finally, register to recieve raw input WM_INPUT messages
+	// finally, register to receive raw input WM_INPUT messages
 	regcount = 0;
 	if (keyboard_list != NULL)
 	{
