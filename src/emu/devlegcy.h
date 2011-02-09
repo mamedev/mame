@@ -42,7 +42,7 @@
 #ifndef __DEVLEGCY_H__
 #define __DEVLEGCY_H__
 
-
+#include <stddef.h>
 
 //**************************************************************************
 //  CONSTANTS
