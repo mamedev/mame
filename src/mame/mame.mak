@@ -640,6 +640,7 @@ $(MAMEOBJ)/excelent.a: \
 	$(DRIVERS)/aquarium.o $(VIDEO)/aquarium.o \
 	$(DRIVERS)/d9final.o \
 	$(DRIVERS)/gcpinbal.o $(VIDEO)/gcpinbal.o \
+	$(DRIVERS)/lastbank.o \
 	$(DRIVERS)/vmetal.o \
 
 $(MAMEOBJ)/exidy.a: \

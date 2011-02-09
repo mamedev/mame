@@ -1964,6 +1964,7 @@ src/mame/drivers/ladyfrog.c svneol=native#text/plain
 src/mame/drivers/laserbas.c svneol=native#text/plain
 src/mame/drivers/laserbat.c svneol=native#text/plain
 src/mame/drivers/lasso.c svneol=native#text/plain
+src/mame/drivers/lastbank.c svneol=native#text/plain
 src/mame/drivers/lastduel.c svneol=native#text/plain
 src/mame/drivers/lastfght.c svneol=native#text/plain
 src/mame/drivers/lazercmd.c svneol=native#text/plain
