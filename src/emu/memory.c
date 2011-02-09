@@ -4832,7 +4832,7 @@ void handler_entry_write::set_delegate(write32_delegate delegate, UINT64 mask)
 	// if mismatched bus width, configure a stub
 	if (m_datawidth != 32)
 	{
-		configure_subunits(mask, 16);
+		configure_subunits(mask, 32);
 		if (m_datawidth == 64)
 			set_delegate(write64_delegate(write64_proto_delegate::_create_member<handler_entry_write, &handler_entry_write::write_stub_64_from_32>(delegate.name()), *this));
 	}
