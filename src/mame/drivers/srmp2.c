@@ -38,6 +38,7 @@ Known issues :
 ===============
  - IOX might be either a shared component between PCBs or every game have its own configuration.
    For now I've opted for the latter solution, until an HW test will be done ...
+ - IOX might be a MCU of some sort.
  - AY-3-8910 sound may be wrong.
  - CPU clock of srmp3 does not match the real machine.
  - MSM5205 clock frequency in srmp3 is wrong.
@@ -764,9 +765,7 @@ static INPUT_PORTS_START( rmgoldyh )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SERVICE")
-	PORT_DIPNAME( 0x01, 0x01, "SERVICE" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Payout")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Memory Clear")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Mode")
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Analyzer")
@@ -779,7 +778,7 @@ static INPUT_PORTS_START( rmgoldyh )
 	PORT_INCLUDE( seta_mjctrl )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "DSWC" )
+	PORT_DIPNAME( 0x01, 0x01, "DSW1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -805,7 +804,7 @@ static INPUT_PORTS_START( rmgoldyh )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "DSWC" )
+	PORT_DIPNAME( 0x01, 0x01, "DSW2" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -831,7 +830,7 @@ static INPUT_PORTS_START( rmgoldyh )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, "DSWC" )
+	PORT_DIPNAME( 0x01, 0x01, "DSW3" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -857,7 +856,7 @@ static INPUT_PORTS_START( rmgoldyh )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW4")
-	PORT_DIPNAME( 0x01, 0x01, "DSWC" )
+	PORT_DIPNAME( 0x01, 0x01, "DSW4" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -866,9 +865,9 @@ static INPUT_PORTS_START( rmgoldyh )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Game Title" )
+	PORT_DIPSETTING(    0x08, "Real Mahjong Gold Yumehai" )
+	PORT_DIPSETTING(    0x00, "Super Real Mahjong GOLD part.2" )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1131,17 +1130,6 @@ static const gfx_layout charlayout =
 	16*16*2
 };
 
-static const gfx_layout tilelayout =
-{
-	16, 16,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
-	{ STEP8(0,1), STEP8(8*8,1) },
-	{ STEP8(0,8), STEP8(16*8,8) },
-	16*16
-};
-
 static GFXDECODE_START( srmp2 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 64 )
 GFXDECODE_END
@@ -1151,8 +1139,8 @@ static GFXDECODE_START( srmp3 )
 GFXDECODE_END
 
 static GFXDECODE_START( rmgoldyh )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 32 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0, 64 )
+	GFXDECODE_ENTRY( "gfx1",        0, charlayout, 0, 32 )
+	GFXDECODE_ENTRY( "gfx_ex",      0, charlayout, 0, 32 )
 GFXDECODE_END
 
 
@@ -1447,20 +1435,23 @@ ROM_START( rmgoldyh )
 	ROM_CONTINUE(               0x010000, 0x018000 )
 	ROM_LOAD( "zf0_002_002.u3", 0x028000, 0x020000, CRC(e2226425) SHA1(36925c68492a3ea4af19d611a455eae688aaab62) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )	/* Sprites */
+	ROM_REGION( 0x20000, "gfx_ex", ROMREGION_ERASE00 )	/* extra sprite roms */
+	/* socket 4 is empty */
+	ROM_LOAD16_BYTE( "zf0_3.u72",  0x00001, 0x08000, CRC(771c27a1) SHA1(5c95edcd5e155cbb4448888bba62c98cf8d4b577) )
+	ROM_LOAD16_BYTE( "zf0_2.u71",  0x10000, 0x08000, CRC(b0f548e6) SHA1(84e3acb10ae3669bf65bd8c93273acacb5136737) )
+	ROM_LOAD16_BYTE( "zf0_1.u70",  0x10001, 0x08000, CRC(78ba5d05) SHA1(21cd5ecbd55a5beaece82c974752dac4281b467a) )
+
+	ROM_REGION( 0x800000, "gfx1", 0 )	/* Sprites */
 	ROM_LOAD16_BYTE( "za0-02.u51", 0x000000, 0x080000, CRC(85691946) SHA1(8b91210b1b6671ba2c9ec6722e5dc40bdf44e4b5) )
 	ROM_LOAD16_BYTE( "za0-04.u49", 0x000001, 0x080000, CRC(c06e7a96) SHA1(a2dfb81004ea72bfa21724374eb8533af606a5df) )
 	ROM_LOAD16_BYTE( "za0-01.u52", 0x100000, 0x080000, CRC(95e0d87c) SHA1(34e6c0a95e63cf092092e27c7ba2f649ebf56507) )
 	ROM_LOAD16_BYTE( "za0-03.u50", 0x100001, 0x080000, CRC(7c98570e) SHA1(26e28e67bca9954d62d72260370ea872c6058a10) )
-	ROM_LOAD16_BYTE( "za0-06.u47", 0x200000, 0x080000, CRC(8b874b0a) SHA1(27fe1ccc2938e1703e484e2925a2f073064cf019) )
-	ROM_LOAD16_BYTE( "za0-08.u45", 0x200001, 0x080000, CRC(3de89d88) SHA1(1e6dabe6aeee6a2613feab26b871c235bf491bfa) )
-	ROM_LOAD16_BYTE( "za0-05.u48", 0x300000, 0x080000, CRC(80d3b4e6) SHA1(d31d3f904ee8463c1efbb1d106eeb3dc0dc42ab8) )
-	ROM_LOAD16_BYTE( "za0-07.u46", 0x300001, 0x080000, CRC(39d15129) SHA1(62b71a82cfc39e6dab3175e03eca5ff92e854f13) )
-
-	ROM_REGION( 0x18000, "gfx2", 0 )	/* Tiles */
-	ROM_LOAD( "zf0_1.u70", 0x00000, 0x8000, CRC(78ba5d05) SHA1(21cd5ecbd55a5beaece82c974752dac4281b467a) )
-	ROM_LOAD( "zf0_2.u71", 0x08000, 0x8000, CRC(b0f548e6) SHA1(84e3acb10ae3669bf65bd8c93273acacb5136737) )
-	ROM_LOAD( "zf0_3.u72", 0x10000, 0x8000, CRC(771c27a1) SHA1(5c95edcd5e155cbb4448888bba62c98cf8d4b577) )
+	ROM_COPY( "gfx_ex",   0x00000, 0x200000, 0x010000 )
+	ROM_LOAD16_BYTE( "za0-06.u47", 0x400000, 0x080000, CRC(8b874b0a) SHA1(27fe1ccc2938e1703e484e2925a2f073064cf019) )
+	ROM_LOAD16_BYTE( "za0-08.u45", 0x400001, 0x080000, CRC(3de89d88) SHA1(1e6dabe6aeee6a2613feab26b871c235bf491bfa) )
+	ROM_LOAD16_BYTE( "za0-05.u48", 0x500000, 0x080000, CRC(80d3b4e6) SHA1(d31d3f904ee8463c1efbb1d106eeb3dc0dc42ab8) )
+	ROM_LOAD16_BYTE( "za0-07.u46", 0x500001, 0x080000, CRC(39d15129) SHA1(62b71a82cfc39e6dab3175e03eca5ff92e854f13) )
+	ROM_COPY( "gfx_ex",   0x10000, 0x600000, 0x010000 )
 
 	ROM_REGION( 0x080000, "adpcm", 0 )				/* Samples */
 	ROM_LOAD( "za0-11.u16", 0x000000, 0x080000, CRC(2248c23f) SHA1(35591b51bb23dfd7fa81a05026e9ec0789bb0dde) )
@@ -1555,7 +1546,7 @@ ROM_END
 GAME( 1987, srmp1,     0,        srmp2,    srmp2,    0,       ROT0, "Seta",  				"Super Real Mahjong Part 1 (Japan)",  0 )
 GAME( 1987, srmp2,     0,        srmp2,    srmp2,    0,       ROT0, "Seta",  				"Super Real Mahjong Part 2 (Japan)",  0 )
 GAME( 1988, srmp3,     0,        srmp3,    srmp3,    0,       ROT0, "Seta",  				"Super Real Mahjong Part 3 (Japan)",  0 )
-GAME( 1988, rmgoldyh,  srmp3,    rmgoldyh, rmgoldyh, 0,       ROT0, "Seta / Alba",	        "Real Mahjong Gold Yumehai (Japan)",  GAME_NOT_WORKING )
+GAME( 1988, rmgoldyh,  srmp3,    rmgoldyh, rmgoldyh, 0,       ROT0, "[Seta] / Alba",	    "Real Mahjong Gold Yumehai / Super Real Mahjong GOLD part.2 [BET] (Japan)",  0 )
 GAME( 1990, mjyuugi,   0,        mjyuugi,  mjyuugi,  0,       ROT0, "Visco", 				"Mahjong Yuugi (Japan set 1)",        0 )
 GAME( 1990, mjyuugia,  mjyuugi,  mjyuugi,  mjyuugi,  0,       ROT0, "Visco", 				"Mahjong Yuugi (Japan set 2)",        0 )
 GAME( 1991, ponchin,   0,        mjyuugi,  ponchin,  0,       ROT0, "Visco", 				"Mahjong Pon Chin Kan (Japan set 1)", 0 )
