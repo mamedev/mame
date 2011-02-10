@@ -273,11 +273,14 @@ struct rom_entry
 
 /* ----- ROM processing ----- */
 
-/* load the ROMs and open the disk  images associated with the given machine */
+/* load the ROMs and open the disk images associated with the given machine */
 void rom_init(running_machine *machine);
 
 /* return the number of warnings we generated */
 int rom_load_warnings(running_machine *machine);
+
+/* return the number of BAD_DUMP/NO_DUMP warnings we generated */
+int rom_load_knownbad(running_machine *machine);
 
 
 /* ----- Helpers ----- */

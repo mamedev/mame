@@ -912,7 +912,7 @@ static astring &warnings_string(running_machine *machine, astring &string)
 	string.reset();
 
 	/* if no warnings, nothing to return */
-	if (rom_load_warnings(machine) == 0 && !(machine->gamedrv->flags & WARNING_FLAGS))
+	if (rom_load_warnings(machine) == 0 && rom_load_knownbad(machine) == 0 && !(machine->gamedrv->flags & WARNING_FLAGS))
 		return string;
 
 	/* add a warning if any ROMs were loaded with warnings */
@@ -924,9 +924,13 @@ static astring &warnings_string(running_machine *machine, astring &string)
 	}
 
 	/* if we have at least one warning flag, print the general header */
-	if (machine->gamedrv->flags & WARNING_FLAGS)
+	if ((machine->gamedrv->flags & WARNING_FLAGS) || rom_load_knownbad(machine) > 0)
 	{
 		string.cat("There are known problems with this " GAMENOUN "\n\n");
+
+		/* add a warning if any ROMs are flagged BAD_DUMP/NO_DUMP */
+		if (rom_load_knownbad(machine) > 0)
+			string.cat("One or more ROMs/CHDs for this "  GAMENOUN " are known to be bad or missing.  As a result the " GAMENOUN " may not work correctly.  You may be missing graphics, sound or other essential gameplay elements until the proper data is found.\n");
 
 		/* add one line per warning flag */
 		if (input_machine_has_keyboard(machine))

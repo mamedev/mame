@@ -53,6 +53,7 @@ struct _romload_private
 	int				system_bios;		/* the system BIOS we wish to load */
 
 	int				warnings;			/* warning count during processing */
+	int				knownbad;			/* BAD_DUMP/NO_DUMP count during processing */
 	int				errors;				/* error count during processing */
 
 	int				romsloaded;			/* current ROMs loaded count */
@@ -431,7 +432,7 @@ static void handle_missing_file(rom_load_data *romdata, const rom_entry *romp)
 	else if (ROM_NOGOODDUMP(romp))
 	{
 		romdata->errorstring.catprintf("%s NOT FOUND (NO GOOD DUMP KNOWN)\n", ROM_GETNAME(romp));
-		romdata->warnings++;
+		romdata->knownbad++;
 	}
 
 	/* anything else is bad */
@@ -521,7 +522,7 @@ static void verify_length_and_hash(rom_load_data *romdata, const char *name, UIN
 	if (hash_data_has_info(hash, HASH_INFO_NO_DUMP))
 	{
 		romdata->errorstring.catprintf("%s NO GOOD DUMP KNOWN\n", name);
-		romdata->warnings++;
+		romdata->knownbad++;
 	}
 	/* verify checksums */
 	else if (!hash_data_is_equal(hash, acthash, 0))
@@ -537,7 +538,7 @@ static void verify_length_and_hash(rom_load_data *romdata, const char *name, UIN
 	else if (hash_data_has_info(hash, HASH_INFO_BAD_DUMP))
 	{
 		romdata->errorstring.catprintf("%s ROM NEEDS REDUMP\n",name);
-		romdata->warnings++;
+		romdata->knownbad++;
 	}
 }
 
@@ -581,7 +582,7 @@ static void display_rom_load_results(rom_load_data *romdata)
 	}
 
 	/* if we had warnings, output them, but continue */
-	if (romdata->warnings)
+	if ((romdata-> warnings) || (romdata->knownbad))
 	{
 		romdata->errorstring.cat("WARNING: the "GAMENOUN" might not run correctly.");
 		mame_printf_warning("%s\n", romdata->errorstring.cstr());
@@ -1275,7 +1276,9 @@ static void process_disk_entries(rom_load_data *romdata, const char *regiontag, 
 					romdata->errorstring.catprintf("%s CHD ERROR: %s\n", filename.cstr(), chd_error_string(err));
 
 				/* if this is NO_DUMP, keep going, though the system may not be able to handle it */
-				if (hash_data_has_info(ROM_GETHASHDATA(romp), HASH_INFO_NO_DUMP) || DISK_ISOPTIONAL(romp))
+				if (hash_data_has_info(ROM_GETHASHDATA(romp), HASH_INFO_NO_DUMP))
+					romdata->knownbad++;
+				else if (DISK_ISOPTIONAL(romp))
 					romdata->warnings++;
 				else
 					romdata->errors++;
@@ -1297,7 +1300,7 @@ static void process_disk_entries(rom_load_data *romdata, const char *regiontag, 
 			else if (hash_data_has_info(ROM_GETHASHDATA(romp), HASH_INFO_BAD_DUMP))
 			{
 				romdata->errorstring.catprintf("%s CHD NEEDS REDUMP\n", filename.cstr());
-				romdata->warnings++;
+				romdata->knownbad++;
 			}
 
 			/* if not read-only, make the diff file */
@@ -1607,4 +1610,15 @@ static void rom_exit(running_machine &machine)
 int rom_load_warnings(running_machine *machine)
 {
 	return machine->romload_data->warnings;
+}
+
+
+/*-------------------------------------------------
+    rom_load_knownbad - return the number of
+    BAD_DUMP/NO_DUMP warnings we generated
+-------------------------------------------------*/
+
+int rom_load_knownbad(running_machine *machine)
+{
+	return machine->romload_data->knownbad;
 }
