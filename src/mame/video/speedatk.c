@@ -5,29 +5,8 @@
 *****************************************************************************************/
 #include "emu.h"
 #include "includes/speedatk.h"
+#include "video/mc6845.h"
 
-
-/*
-
-Color prom dump(only 0x00-0x10 range has valid data)
-0:---- ---- 0x00 Black
-1:---- -x-- 0x04
-2:---- -xxx 0x07
-3:x-x- -xxx 0xa7
-4:--x- x--- 0x28
-5:xxxx x--- 0xf8
-6:--xx xxxx 0x3f
-7:xxxx xxxx 0xff White
-8:x--- -x-- 0x84
-9:x-x- xx-x 0xad
-a:--x- -x-x 0x25
-b:-xxx xxx- 0x7e
-c:--x- xxxx 0x2f
-d:xx-- ---- 0xc0
-e:--xx -xx- 0x36
-f:xxx- x--- 0xe8
-
-*/
 
 PALETTE_INIT( speedatk )
 {
@@ -78,7 +57,6 @@ WRITE8_HANDLER( speedatk_videoram_w )
 	speedatk_state *state = space->machine->driver_data<speedatk_state>();
 
 	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( speedatk_colorram_w )
@@ -86,32 +64,57 @@ WRITE8_HANDLER( speedatk_colorram_w )
 	speedatk_state *state = space->machine->driver_data<speedatk_state>();
 
 	state->colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
-}
-
-static TILE_GET_INFO( get_tile_info )
-{
-	speedatk_state *state = machine->driver_data<speedatk_state>();
-	int code, color, region;
-
-	code = state->videoram[tile_index] + ((state->colorram[tile_index] & 0xe0) << 3);
-	color = state->colorram[tile_index] & 0x1f;
-	region = (state->colorram[tile_index] & 0x10) >> 4;
-
-	SET_TILE_INFO(region, code, color, 0);
 }
 
 VIDEO_START( speedatk )
 {
-	speedatk_state *state = machine->driver_data<speedatk_state>();
 
-	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 34, 30);
+}
+
+WRITE8_HANDLER( speedatk_6845_w )
+{
+	speedatk_state *state = space->machine->driver_data<speedatk_state>();
+
+	if(offset == 0)
+	{
+		state->crtc_index = data;
+		mc6845_address_w(space->machine->device("crtc"),0,data);
+	}
+	else
+	{
+		state->crtc_vreg[state->crtc_index] = data;
+		mc6845_register_w(space->machine->device("crtc"),0,data);
+	}
 }
 
 VIDEO_UPDATE( speedatk )
 {
 	speedatk_state *state = screen->machine->driver_data<speedatk_state>();
+	int x,y;
+	int count;
+	UINT16 tile;
+	UINT8 color, region;
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	bitmap_fill(bitmap, cliprect, 0);
+
+	count = (state->crtc_vreg[0x0c]<<8)|(state->crtc_vreg[0x0d] & 0xff);
+
+	if(state->flip_scr) { count = 0x3ff - count; }
+
+	for(y=0;y<state->crtc_vreg[6];y++)
+	{
+		for(x=0;x<state->crtc_vreg[1];x++)
+		{
+			tile = state->videoram[count] + ((state->colorram[count] & 0xe0) << 3);
+			color = state->colorram[count] & 0x1f;
+			region = (state->colorram[count] & 0x10) >> 4;
+
+			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[region],tile,color,state->flip_scr,state->flip_scr,x*8,y*8);
+
+			count = (state->flip_scr) ? count-1 : count+1;
+			count&=0x3ff;
+		}
+	}
+
 	return 0;
 }

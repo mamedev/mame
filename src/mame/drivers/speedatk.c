@@ -188,7 +188,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( speedatk_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0x00, 0x01) AM_WRITE( speedatk_6845_w)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE("crtc", mc6845_register_w)
 	AM_RANGE(0x24, 0x24) AM_WRITE(watchdog_reset_w)  //watchdog
 	AM_RANGE(0x40, 0x40) AM_DEVREAD("aysnd", ay8910_r)
@@ -308,10 +308,12 @@ static const mc6845_interface mc6845_intf =
 
 static WRITE8_DEVICE_HANDLER( speedatk_output_w )
 {
-	//flip_screen_set(device->machine, data & 0x80);
+	speedatk_state *state = device->machine->driver_data<speedatk_state>();
 
-	//if((data & 0x7f) != 0x7f)
-	//popmessage("%02x",data);
+	state->flip_scr = data & 0x80;
+
+	if((data & 0x7f) != 0x7f)
+		logerror("%02x\n",data);
 }
 
 static const ay8910_interface ay8910_config =
@@ -379,5 +381,5 @@ ROM_START( speedatk )
 	ROM_LOAD( "cb2.bpr",      0x0020, 0x0100, CRC(a604cf96) SHA1(a4ef6e77dcd3abe4c27e8e636222a5ee711a51f5) ) /* lookup table */
 ROM_END
 
-GAME( 1984, speedatk, 0, speedatk, speedatk, 0, ROT0, "Seta Kikaku Corp.", "Speed Attack! (Japan)", GAME_NO_COCKTAIL )
+GAME( 1984, speedatk, 0, speedatk, speedatk, 0, ROT0, "Seta Kikaku Corp.", "Speed Attack! (Japan)", 0 )
 

@@ -6,7 +6,8 @@ public:
 
 	UINT8 *videoram;
 	UINT8 *colorram;
-	tilemap_t *bg_tilemap;
+	UINT8 crtc_vreg[0x100],crtc_index;
+	UINT8 flip_scr;
 
 	UINT8 mux_data;
 	UINT8 km_status;
@@ -19,6 +20,7 @@ public:
 
 WRITE8_HANDLER( speedatk_videoram_w );
 WRITE8_HANDLER( speedatk_colorram_w );
+WRITE8_HANDLER( speedatk_6845_w );
 PALETTE_INIT( speedatk );
 VIDEO_START( speedatk );
 VIDEO_UPDATE( speedatk );
