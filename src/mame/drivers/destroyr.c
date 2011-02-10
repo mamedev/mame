@@ -81,10 +81,11 @@ static VIDEO_UPDATE( destroyr )
 	/* draw minor objects */
 	for (i = 0; i < 2; i++)
 	{
+		int num = i << 4 | (state->minor_obj_ram[i + 0] & 0xf);
 		int horz = 256 - state->minor_obj_ram[i + 2];
 		int vert = 256 - state->minor_obj_ram[i + 4];
 
-		drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1], state->minor_obj_ram[i + 0], 0, 0, 0, horz, vert, 0);
+		drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1], num, 0, 0, 0, horz, vert, 0);
 	}
 
 	/* draw waves */
@@ -228,9 +229,13 @@ static WRITE8_HANDLER( destroyr_output_w )
 static READ8_HANDLER( destroyr_input_r )
 {
 	destroyr_state *state = space->machine->driver_data<destroyr_state>();
-	offset &= 0x0f;
 
-	if (offset == 0)
+	if (offset & 1)
+	{
+		return input_port_read(space->machine, "IN1");
+	}
+
+	else
 	{
 		UINT8 ret = input_port_read(space->machine, "IN0");
 
@@ -241,15 +246,6 @@ static READ8_HANDLER( destroyr_input_r )
 
 		return ret;
 	}
-
-	if (offset == 1)
-	{
-		return input_port_read(space->machine, "IN1");
-	}
-
-	logerror("unmapped input port %d\n", offset);
-
-	return 0;
 }
 
 
@@ -264,11 +260,11 @@ static ADDRESS_MAP_START( destroyr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0xf00) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(destroyr_input_r, destroyr_output_w)
 	AM_RANGE(0x2000, 0x2fff) AM_READ_PORT("IN2")
-	AM_RANGE(0x3000, 0x30ff) AM_WRITEONLY AM_BASE_MEMBER(destroyr_state, alpha_num_ram)
-	AM_RANGE(0x4000, 0x401f) AM_WRITEONLY AM_BASE_MEMBER(destroyr_state, major_obj_ram)
-	AM_RANGE(0x5000, 0x5000) AM_WRITE(destroyr_cursor_load_w)
-	AM_RANGE(0x5001, 0x5001) AM_WRITE(destroyr_interrupt_ack_w)
-	AM_RANGE(0x5002, 0x5007) AM_WRITEONLY AM_BASE_MEMBER(destroyr_state, minor_obj_ram)
+	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0xf00) AM_WRITEONLY AM_BASE_MEMBER(destroyr_state, alpha_num_ram)
+	AM_RANGE(0x4000, 0x401f) AM_MIRROR(0xfe0) AM_WRITEONLY AM_BASE_MEMBER(destroyr_state, major_obj_ram)
+	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xf80) AM_WRITE(destroyr_cursor_load_w)
+	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xf80) AM_WRITE(destroyr_interrupt_ack_w)
+	AM_RANGE(0x5002, 0x5007) AM_MIRROR(0xf80) AM_WRITEONLY AM_BASE_MEMBER(destroyr_state, minor_obj_ram)
 	AM_RANGE(0x6000, 0x6fff) AM_READ(destroyr_scanline_r)
 	AM_RANGE(0x7000, 0x77ff) AM_NOP				/* missing translation ROMs */
 	AM_RANGE(0x7800, 0x7fff) AM_ROM				/* program */
@@ -342,7 +338,7 @@ static const gfx_layout destroyr_alpha_num_layout =
 static const gfx_layout destroyr_minor_object_layout =
 {
 	16, 16,   /* width, height */
-	16,       /* total         */
+	32,       /* total         */
 	1,        /* planes        */
 	{ 0 },    /* plane offsets */
 	{
@@ -473,25 +469,52 @@ MACHINE_CONFIG_END
 
 
 ROM_START( destroyr )
-	ROM_REGION( 0x8000, "maincpu", 0 )                  /* program code */
+	ROM_REGION( 0x8000, "maincpu", 0 )	/* program code */
 	ROM_LOAD( "30146-01.c3", 0x7800, 0x0800, CRC(e560c712) SHA1(0505ab57eee5421b4ff4e87d14505e02b18fd54c) )
 
-	ROM_REGION( 0x0400, "gfx1", 0 )   /* alpha numerics */
+	ROM_REGION( 0x0400, "gfx1", 0 )		/* alpha numerics */
 	ROM_LOAD( "30135-01.p4", 0x0000, 0x0400, CRC(184824cf) SHA1(713cfd1d41ef7b1c345ea0038b652c4ba3f08301) )
 
-	ROM_REGION( 0x0400, "gfx2", 0 )   /* minor objects */
+	ROM_REGION( 0x0800, "gfx2", 0 )		/* minor objects */
 	ROM_LOAD( "30132-01.f4", 0x0000, 0x0400, CRC(e09d3d55) SHA1(b26013397ef2cb32d0416ecb118387b9c2dffa9a) )
+	ROM_LOAD( "30132-01.k4", 0x0400, 0x0400, CRC(e09d3d55) SHA1(b26013397ef2cb32d0416ecb118387b9c2dffa9a) )
 
-	ROM_REGION( 0x0400, "gfx3", 0 )   /* major objects */
+	ROM_REGION( 0x0400, "gfx3", 0 )		/* major objects */
 	ROM_LOAD_NIB_HIGH( "30134-01.p8", 0x0000, 0x0400, CRC(6259e007) SHA1(049f5f7160305cb4f4b499dd113cb11eea73fc95) )
 	ROM_LOAD_NIB_LOW ( "30133-01.n8", 0x0000, 0x0400, CRC(108d3e2c) SHA1(8c993369d37c6713670483af78e6d04d38f4b4fc) )
 
-	ROM_REGION( 0x0020, "gfx4", 0 )   /* waves */
+	ROM_REGION( 0x0020, "gfx4", 0 )		/* waves */
 	ROM_LOAD( "30136-01.k2", 0x0000, 0x0020, CRC(532c11b1) SHA1(18ab5369a3f2cfcc9a44f38fa8649524bea5b203) )
 
-	ROM_REGION( 0x0100, "user1", 0 )                  /* sync (unused) */
+	ROM_REGION( 0x0100, "user1", 0 )	/* sync (unused) */
+	ROM_LOAD( "30131-01.m1", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )
+ROM_END
+
+ROM_START( destroyr1 )
+	ROM_REGION( 0x8000, "maincpu", 0 )	/* program code */
+	ROM_LOAD_NIB_HIGH( "30142-01.f3", 0x7800, 0x0400, CRC(9e9a08d3) SHA1(eb31bab1537caf43ab8c3d23a6c9cc2009fcb98e) )
+	ROM_LOAD_NIB_LOW ( "30141-01.e2", 0x7800, 0x0400, CRC(c924fbce) SHA1(53aa9a3c4c6e90fb94500ddfa6c2ae3076eee2ef) )
+	ROM_LOAD_NIB_HIGH( "30144-01.j3", 0x7c00, 0x0400, CRC(0c7135c6) SHA1(6a0180353a0a6f34639dadc23179f6323aae8d62) )
+	ROM_LOAD_NIB_LOW ( "30143-01.h2", 0x7c00, 0x0400, CRC(b946e6f0) SHA1(b906024bb0e03a644fff1d5516637c24916b096e) )
+
+	ROM_REGION( 0x0400, "gfx1", 0 )		/* alpha numerics */
+	ROM_LOAD( "30135-01.p4", 0x0000, 0x0400, CRC(184824cf) SHA1(713cfd1d41ef7b1c345ea0038b652c4ba3f08301) )
+
+	ROM_REGION( 0x0800, "gfx2", 0 )		/* minor objects */
+	ROM_LOAD( "30132-01.f4", 0x0000, 0x0400, CRC(e09d3d55) SHA1(b26013397ef2cb32d0416ecb118387b9c2dffa9a) )
+	ROM_LOAD( "30132-01.k4", 0x0400, 0x0400, CRC(e09d3d55) SHA1(b26013397ef2cb32d0416ecb118387b9c2dffa9a) )
+
+	ROM_REGION( 0x0400, "gfx3", 0 )		/* major objects */
+	ROM_LOAD_NIB_HIGH( "30134-01.p8", 0x0000, 0x0400, CRC(6259e007) SHA1(049f5f7160305cb4f4b499dd113cb11eea73fc95) )
+	ROM_LOAD_NIB_LOW ( "30133-01.n8", 0x0000, 0x0400, CRC(108d3e2c) SHA1(8c993369d37c6713670483af78e6d04d38f4b4fc) )
+
+	ROM_REGION( 0x0020, "gfx4", 0 )		/* waves */
+	ROM_LOAD( "30136-01.k2", 0x0000, 0x0020, CRC(532c11b1) SHA1(18ab5369a3f2cfcc9a44f38fa8649524bea5b203) )
+
+	ROM_REGION( 0x0100, "user1", 0 )	/* sync (unused) */
 	ROM_LOAD( "30131-01.m1", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )
 ROM_END
 
 
-GAME( 1977, destroyr, 0, destroyr, destroyr, 0, ORIENTATION_FLIP_X, "Atari", "Destroyer", GAME_NO_SOUND )
+GAME( 1977, destroyr,  0,        destroyr, destroyr, 0, ORIENTATION_FLIP_X, "Atari", "Destroyer (version O2)", GAME_NO_SOUND )
+GAME( 1977, destroyr1, destroyr, destroyr, destroyr, 0, ORIENTATION_FLIP_X, "Atari", "Destroyer (version O1)", GAME_NO_SOUND )
