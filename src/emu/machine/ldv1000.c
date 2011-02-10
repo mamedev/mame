@@ -195,6 +195,7 @@ const ldplayer_interface ldv1000_interface =
 	LASERDISC_TYPE_PIONEER_LDV1000,				/* type of the player */
 	sizeof(ldplayer_data),						/* size of the state */
 	"Pioneer LD-V1000",							/* name of the player */
+	"ldv1000",									/* shortname of the player */
 	ROM_NAME(ldv1000),							/* pointer to ROM region information */
 	MACHINE_CONFIG_NAME(ldv1000),				/* pointer to machine configuration */
 	ldv1000_init,								/* initialization callback */

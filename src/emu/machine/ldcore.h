@@ -147,6 +147,7 @@ struct _ldplayer_interface
 	int						type;					/* type of the player */
 	size_t					statesize;				/* size of the state */
 	const char *			name;					/* name of the player */
+	const char *			shortname;				/* shortname of the player */
 	const rom_entry *		romregion;				/* pointer to ROM region information */
 	machine_config_constructor machine_config;		/* pointer to machine configuration */
 	laserdisc_init_func		init;					/* initialization callback */

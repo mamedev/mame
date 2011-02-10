@@ -99,7 +99,7 @@ const INT32 cdicdic_device::s_cdic_adpcm_filter_coef[5][2] =
 //-------------------------------------------------
 
 cdicdic_device_config::cdicdic_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-    : device_config(mconfig, static_alloc_device_config, "CDICDIC", tag, owner, clock)
+    : device_config(mconfig, static_alloc_device_config, "CDICDIC", "cdicdic", tag, owner, clock)
 {
 
 }

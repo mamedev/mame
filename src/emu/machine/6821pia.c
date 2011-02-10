@@ -44,7 +44,7 @@
 //-------------------------------------------------
 
 pia6821_device_config::pia6821_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-    : device_config(mconfig, static_alloc_device_config, "6822 PIA", tag, owner, clock)
+    : device_config(mconfig, static_alloc_device_config, "6822 PIA", "6821pia", tag, owner, clock)
 {
 }
 

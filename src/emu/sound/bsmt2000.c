@@ -107,7 +107,7 @@ ROM_END
 //-------------------------------------------------
 
 bsmt2000_device_config::bsmt2000_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "BSMT2000", tag, owner, clock),
+	: device_config(mconfig, static_alloc_device_config, "BSMT2000", "bsmt2000", tag, owner, clock),
 	  device_config_sound_interface(mconfig, *this),
 	  device_config_memory_interface(mconfig, *this),
 	  m_space_config("samples", ENDIANNESS_LITTLE, 8, 32, 0, NULL, *ADDRESS_MAP_NAME(bsmt2000)),

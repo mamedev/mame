@@ -189,7 +189,7 @@ littlerb_vdp_device::littlerb_vdp_device(running_machine &_machine, const little
 }
 
 littlerb_vdp_device_config::littlerb_vdp_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "LITTLERBVDP", tag, owner, clock),
+	: device_config(mconfig, static_alloc_device_config, "LITTLERBVDP", "littlerb", tag, owner, clock),
 	  device_config_memory_interface(mconfig, *this),
 	  m_space_config("littlerb_vdp", ENDIANNESS_LITTLE, 16,32, 0, NULL, *ADDRESS_MAP_NAME(littlerb_vdp_map8))
 {

@@ -171,7 +171,7 @@ const asap_device::ophandler asap_device::s_conditiontable[16] =
 //-------------------------------------------------
 
 asap_device_config::asap_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: cpu_device_config(mconfig, static_alloc_device_config, "ASAP", tag, owner, clock),
+	: cpu_device_config(mconfig, static_alloc_device_config, "ASAP", "asap", tag, owner, clock),
 	  m_program_config("program", ENDIANNESS_LITTLE, 32, 32)
 {
 }

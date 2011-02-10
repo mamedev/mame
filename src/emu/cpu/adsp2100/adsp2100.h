@@ -276,7 +276,7 @@ protected:
 	};
 
 	// construction/destruction
-	adsp21xx_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock, UINT32 chiptype);
+	adsp21xx_device_config(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, const device_config *owner, UINT32 clock, UINT32 chiptype);
 
 public:
 	// inline configuration helpers
@@ -605,7 +605,7 @@ class adsp2101_device_config : public adsp21xx_device_config
 
 protected:
 	// construction/destruction
-	adsp2101_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock, UINT32 chiptype);
+	adsp2101_device_config(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, const device_config *owner, UINT32 clock, UINT32 chiptype);
 
 public:
 	// allocators

@@ -298,6 +298,7 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET | DT_HAS_INLINE_CONFIG
 #define DEVTEMPLATE_NAME		"Namco 06xx"
 #define DEVTEMPLATE_FAMILY		"Namco I/O"
+#define DEVTEMPLATE_SHORTNAME   "namco06xx"
 #include "devtempl.h"
 
 

@@ -139,7 +139,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 tms3203x_device_config::tms3203x_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock, UINT32 chiptype, address_map_constructor internal_map)
-	: cpu_device_config(mconfig, type, name, tag, owner, clock),
+	: cpu_device_config(mconfig, type, name, "tms32031", tag, owner, clock),
 	  m_program_config("program", ENDIANNESS_LITTLE, 32, 24, -2, internal_map),
 	  m_chip_type(chiptype)
 {

@@ -217,6 +217,9 @@ DEVICE_GET_INFO( DEVTEMPLATE_ID(,) )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:					strcpy(info->s, DEVTEMPLATE_NAME);								break;
+#ifdef DEVTEMPLATE_SHORTNAME
+		case DEVINFO_STR_SHORTNAME:				strcpy(info->s, DEVTEMPLATE_SHORTNAME);								break;
+#endif
 	}
 }
 

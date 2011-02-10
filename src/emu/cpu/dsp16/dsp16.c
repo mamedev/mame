@@ -23,7 +23,7 @@ const device_type DSP16 = dsp16_device_config::static_alloc_device_config;
 //**************************************************************************
 
 dsp16_device_config::dsp16_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: cpu_device_config(mconfig, static_alloc_device_config, "DSP16", tag, owner, clock),
+	: cpu_device_config(mconfig, static_alloc_device_config, "DSP16", "dsp16", tag, owner, clock),
 	  m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1)
 { }
 

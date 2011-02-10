@@ -29,7 +29,7 @@ const device_type UPD96050 = upd96050_device_config::static_alloc_device_config;
 //-------------------------------------------------
 
 necdsp_device_config::necdsp_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock, UINT32 abits, UINT32 dbits, const char *name)
-	: cpu_device_config(mconfig, static_alloc_device_config, name, tag, owner, clock),
+	: cpu_device_config(mconfig, static_alloc_device_config, name, "necdsp", tag, owner, clock),
 	  m_program_config("program", ENDIANNESS_BIG, 32, abits, -2),	// data bus width, address bus width, -2 means DWORD-addressable
 	  m_data_config("data", ENDIANNESS_BIG, 16, dbits, -1)	// -1 for WORD-addressable
 {

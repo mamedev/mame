@@ -36,10 +36,10 @@ ADDRESS_MAP_END
 //  at28c16_device_config - constructor
 //-------------------------------------------------
 
-at28c16_device_config::at28c16_device_config( const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock ) :
-	device_config( mconfig, static_alloc_device_config, "AT28C16", tag, owner, clock),
-	device_config_memory_interface(mconfig, *this),
-	device_config_nvram_interface(mconfig, *this)
+at28c16_device_config::at28c16_device_config( const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock )
+	: device_config(mconfig, static_alloc_device_config, "AT28C16", "at28c16", tag, owner, clock),
+	  device_config_memory_interface(mconfig, *this),
+	  device_config_nvram_interface(mconfig, *this)
 {
 }
 

@@ -109,7 +109,7 @@
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-GENERIC_DEVICE_CONFIG_SETUP(via6522, "6522 VIA")
+GENERIC_DEVICE_CONFIG_SETUP(via6522, "6522 VIA", "6522via")
 
 //-------------------------------------------------
 //  device_config_complete - perform any

@@ -307,6 +307,7 @@ const ldplayer_interface pr8210_interface =
 	LASERDISC_TYPE_PIONEER_PR8210,				/* type of the player */
 	sizeof(ldplayer_data),						/* size of the state */
 	"Pioneer PR-8210",							/* name of the player */
+	"pr8210",									/* shortname of the player */
 	ROM_NAME(pr8210),							/* pointer to ROM region information */
 	MACHINE_CONFIG_NAME(pr8210),				/* pointer to machine configuration */
 	pr8210_init,								/* initialization callback */
@@ -1022,6 +1023,7 @@ const ldplayer_interface simutrek_interface =
 	LASERDISC_TYPE_SIMUTREK_SPECIAL,			/* type of the player */
 	sizeof(ldplayer_data),						/* size of the state */
 	"Simutrek Modified PR-8210",				/* name of the player */
+	"mpr8210",									/* shortname of the player */
 	ROM_NAME(simutrek),							/* pointer to ROM region information */
 	MACHINE_CONFIG_NAME(simutrek),				/* pointer to machine configuration */
 	simutrek_init,								/* initialization callback */

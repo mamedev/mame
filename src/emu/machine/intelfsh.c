@@ -45,13 +45,13 @@ enum
 //**************************************************************************
 
 // 8-bit variants
-DEFINE_TRIVIAL_DERIVED_DEVICE(intel_28f016s5_device_config, intelfsh8_device_config, intel_28f016s5_device, intelfsh8_device, "Sharp LH28F400 Flash", intelfsh_device_config::FLASH_SHARP_LH28F400)
-DEFINE_TRIVIAL_DERIVED_DEVICE(fujitsu_29f016a_device_config, intelfsh8_device_config, fujitsu_29f016a_device, intelfsh8_device, "Fujitsu 29F016A Flash", intelfsh_device_config::FLASH_FUJITSU_29F016A)
-DEFINE_TRIVIAL_DERIVED_DEVICE(sharp_lh28f016s_device_config, intelfsh8_device_config, sharp_lh28f016s_device, intelfsh8_device, "Sharp LH28F016S Flash", intelfsh_device_config::FLASH_SHARP_LH28F016S)
-DEFINE_TRIVIAL_DERIVED_DEVICE(intel_e28f008sa_device_config, intelfsh8_device_config, intel_e28f008sa_device, intelfsh8_device, "Intel E28F008SA Flash", intelfsh_device_config::FLASH_INTEL_E28F008SA)
-DEFINE_TRIVIAL_DERIVED_DEVICE(macronix_29l001mc_device_config, intelfsh8_device_config, macronix_29l001mc_device, intelfsh8_device, "Macronix 29L001MC Flash", intelfsh_device_config::FLASH_MACRONIX_29L001MC)
-DEFINE_TRIVIAL_DERIVED_DEVICE(panasonic_mn63f805mnp_device_config, intelfsh8_device_config, panasonic_mn63f805mnp_device, intelfsh8_device, "Panasonic MN63F805MNP Flash", intelfsh_device_config::FLASH_PANASONIC_MN63F805MNP)
-DEFINE_TRIVIAL_DERIVED_DEVICE(sanyo_le26fv10n1ts_device_config, intelfsh8_device_config, sanyo_le26fv10n1ts_device, intelfsh8_device, "Sanyo LE26FV10N1TS Flash", intelfsh_device_config::FLASH_SANYO_LE26FV10N1TS)
+DEFINE_TRIVIAL_DERIVED_DEVICE(intel_28f016s5_device_config, intelfsh8_device_config, intel_28f016s5_device, intelfsh8_device, "Sharp LH28F400 Flash", "lh28f400", intelfsh_device_config::FLASH_SHARP_LH28F400)
+DEFINE_TRIVIAL_DERIVED_DEVICE(fujitsu_29f016a_device_config, intelfsh8_device_config, fujitsu_29f016a_device, intelfsh8_device, "Fujitsu 29F016A Flash", "29f016a", intelfsh_device_config::FLASH_FUJITSU_29F016A)
+DEFINE_TRIVIAL_DERIVED_DEVICE(sharp_lh28f016s_device_config, intelfsh8_device_config, sharp_lh28f016s_device, intelfsh8_device, "Sharp LH28F016S Flash", "lh28f016s", intelfsh_device_config::FLASH_SHARP_LH28F016S)
+DEFINE_TRIVIAL_DERIVED_DEVICE(intel_e28f008sa_device_config, intelfsh8_device_config, intel_e28f008sa_device, intelfsh8_device, "Intel E28F008SA Flash", "e28f008sa", intelfsh_device_config::FLASH_INTEL_E28F008SA)
+DEFINE_TRIVIAL_DERIVED_DEVICE(macronix_29l001mc_device_config, intelfsh8_device_config, macronix_29l001mc_device, intelfsh8_device, "Macronix 29L001MC Flash", "29l001mc", intelfsh_device_config::FLASH_MACRONIX_29L001MC)
+DEFINE_TRIVIAL_DERIVED_DEVICE(panasonic_mn63f805mnp_device_config, intelfsh8_device_config, panasonic_mn63f805mnp_device, intelfsh8_device, "Panasonic MN63F805MNP Flash", "mn63f805mnp", intelfsh_device_config::FLASH_PANASONIC_MN63F805MNP)
+DEFINE_TRIVIAL_DERIVED_DEVICE(sanyo_le26fv10n1ts_device_config, intelfsh8_device_config, sanyo_le26fv10n1ts_device, intelfsh8_device, "Sanyo LE26FV10N1TS Flash", "le26fv10n1ts", intelfsh_device_config::FLASH_SANYO_LE26FV10N1TS)
 
 const device_type INTEL_28F016S5 = intel_28f016s5_device_config::static_alloc_device_config;
 const device_type SHARP_LH28F016S = sharp_lh28f016s_device_config::static_alloc_device_config;
@@ -63,10 +63,10 @@ const device_type SANYO_LE26FV10N1TS = sanyo_le26fv10n1ts_device_config::static_
 
 
 // 16-bit variants
-DEFINE_TRIVIAL_DERIVED_DEVICE(sharp_lh28f400_device_config, intelfsh16_device_config, sharp_lh28f400_device, intelfsh16_device, "Sharp LH28F400 Flash", intelfsh_device_config::FLASH_SHARP_LH28F400)
-DEFINE_TRIVIAL_DERIVED_DEVICE(intel_te28f160_device_config, intelfsh16_device_config, intel_te28f160_device, intelfsh16_device, "Intel TE28F160 Flash", intelfsh_device_config::FLASH_INTEL_TE28F160)
-DEFINE_TRIVIAL_DERIVED_DEVICE(intel_e28f400_device_config, intelfsh16_device_config, intel_e28f400_device, intelfsh16_device, "Intel E28F400 Flash", intelfsh_device_config::FLASH_INTEL_E28F400)
-DEFINE_TRIVIAL_DERIVED_DEVICE(sharp_unk128mbit_device_config, intelfsh16_device_config, sharp_unk128mbit_device, intelfsh16_device, "Sharp Unknown 128Mb Flash", intelfsh_device_config::FLASH_SHARP_UNK128MBIT)
+DEFINE_TRIVIAL_DERIVED_DEVICE(sharp_lh28f400_device_config, intelfsh16_device_config, sharp_lh28f400_device, intelfsh16_device, "Sharp LH28F400 Flash", "lh28f400", intelfsh_device_config::FLASH_SHARP_LH28F400)
+DEFINE_TRIVIAL_DERIVED_DEVICE(intel_te28f160_device_config, intelfsh16_device_config, intel_te28f160_device, intelfsh16_device, "Intel TE28F160 Flash", "te28f160", intelfsh_device_config::FLASH_INTEL_TE28F160)
+DEFINE_TRIVIAL_DERIVED_DEVICE(intel_e28f400_device_config, intelfsh16_device_config, intel_e28f400_device, intelfsh16_device, "Intel E28F400 Flash", "e28f400", intelfsh_device_config::FLASH_INTEL_E28F400)
+DEFINE_TRIVIAL_DERIVED_DEVICE(sharp_unk128mbit_device_config, intelfsh16_device_config, sharp_unk128mbit_device, intelfsh16_device, "Sharp Unknown 128Mb Flash", "unk128mb", intelfsh_device_config::FLASH_SHARP_UNK128MBIT)
 
 const device_type SHARP_LH28F400 = sharp_lh28f400_device_config::static_alloc_device_config;
 const device_type INTEL_TE28F160 = intel_te28f160_device_config::static_alloc_device_config;
@@ -118,8 +118,8 @@ ADDRESS_MAP_END
 //  intelfsh_device_config - constructor
 //-------------------------------------------------
 
-intelfsh_device_config::intelfsh_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock, UINT32 variant)
-	: device_config(mconfig, type, name, tag, owner, clock),
+intelfsh_device_config::intelfsh_device_config(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, const device_config *owner, UINT32 clock, UINT32 variant)
+	: device_config(mconfig, type, name, shortname, tag, owner, clock),
 	  device_config_memory_interface(mconfig, *this),
 	  device_config_nvram_interface(mconfig, *this),
 	  m_type(variant),
@@ -210,13 +210,13 @@ intelfsh_device_config::intelfsh_device_config(const machine_config &mconfig, de
 	m_space_config = address_space_config("flash", ENDIANNESS_BIG, m_bits, addrbits, (m_bits == 8) ? 0 : -1, map);
 }
 
-intelfsh8_device_config::intelfsh8_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock, UINT32 variant)
-	: intelfsh_device_config(mconfig, type, name, tag, owner, clock, variant)
+intelfsh8_device_config::intelfsh8_device_config(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, const device_config *owner, UINT32 clock, UINT32 variant)
+	: intelfsh_device_config(mconfig, type, name, shortname, tag, owner, clock, variant)
 {
 }
 
-intelfsh16_device_config::intelfsh16_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock, UINT32 variant)
-	: intelfsh_device_config(mconfig, type, name, tag, owner, clock, variant)
+intelfsh16_device_config::intelfsh16_device_config(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, const device_config *owner, UINT32 clock, UINT32 variant)
+	: intelfsh_device_config(mconfig, type, name, shortname, tag, owner, clock, variant)
 {
 }
 

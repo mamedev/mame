@@ -51,7 +51,7 @@ INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt,
 //-------------------------------------------------
 
 cdislave_device_config::cdislave_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-    : device_config(mconfig, static_alloc_device_config, "CDISLAVE", tag, owner, clock)
+    : device_config(mconfig, static_alloc_device_config, "CDISLAVE", "cdislave", tag, owner, clock)
 {
 
 }

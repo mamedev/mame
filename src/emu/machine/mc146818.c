@@ -117,7 +117,7 @@ const device_type MC146818 = mc146818_device_config::static_alloc_device_config;
 //-------------------------------------------------
 
 mc146818_device_config::mc146818_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "NVRAM", tag, owner, clock),
+	: device_config(mconfig, static_alloc_device_config, "NVRAM", "mc146818", tag, owner, clock),
 	  device_config_nvram_interface(mconfig, *this),
 	  m_type(MC146818_STANDARD)
 {

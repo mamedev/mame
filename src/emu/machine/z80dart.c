@@ -198,7 +198,7 @@ const int WR5_DTR					= 0x80;
 //-------------------------------------------------
 
 z80dart_device_config::z80dart_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "Zilog Z80 DART", tag, owner, clock),
+	: device_config(mconfig, static_alloc_device_config, "Zilog Z80 DART", "z80dart", tag, owner, clock),
 	  device_config_z80daisy_interface(mconfig, *this)
 {
 }

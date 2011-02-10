@@ -828,13 +828,13 @@ void discrete_device_config::static_set_intf(device_config *device, const discre
 //-------------------------------------------------
 //  discrete_device_config - constructor
 //-------------------------------------------------
-discrete_device_config::discrete_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, type, name, tag, owner, clock), m_intf(NULL)
+discrete_device_config::discrete_device_config(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, type, name, shortname, tag, owner, clock), m_intf(NULL)
 {
 }
 
 discrete_sound_device_config::discrete_sound_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: discrete_device_config(mconfig, static_alloc_device_config, "DISCRETE", tag, owner, clock),
+	: discrete_device_config(mconfig, static_alloc_device_config, "DISCRETE", "discrete", tag, owner, clock),
 	  device_config_sound_interface(mconfig, *this)
 {
 }
@@ -846,7 +846,7 @@ discrete_sound_device_config::discrete_sound_device_config(const machine_config 
 
 device_config *discrete_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
-	return global_alloc(discrete_device_config(mconfig, static_alloc_device_config, "PUREDISC", tag, owner, clock));
+	return global_alloc(discrete_device_config(mconfig, static_alloc_device_config, "PUREDISC", "puredisc", tag, owner, clock));
 }
 
 device_config *discrete_sound_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)

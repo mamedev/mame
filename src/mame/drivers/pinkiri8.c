@@ -94,7 +94,7 @@ protected:
 const device_type JANSHIVDP = janshi_vdp_device_config::static_alloc_device_config;
 
 janshi_vdp_device_config::janshi_vdp_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "JANSHIVDP", tag, owner, clock),
+	: device_config(mconfig, static_alloc_device_config, "JANSHIVDP", "janshvdp", tag, owner, clock),
 	  device_config_memory_interface(mconfig, *this),
 	  m_space_config("janshi_vdp", ENDIANNESS_LITTLE, 8,24, 0, NULL, *ADDRESS_MAP_NAME(janshi_vdp_map8))
 {

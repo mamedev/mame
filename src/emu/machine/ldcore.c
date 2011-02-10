@@ -1653,6 +1653,7 @@ DEVICE_GET_INFO( laserdisc )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:					intf = get_interface(device); strcpy(info->s, (intf != NULL) ? intf->name : "Unknown Laserdisc Player");	break;
+		case DEVINFO_STR_SHORTNAME:				intf = get_interface(device); strcpy(info->s, (intf != NULL) ? intf->shortname : "unkldplay");	break;
 		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Laserdisc Player");				break;
 		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");								break;
 		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);							break;

@@ -85,7 +85,7 @@ const int WAITING_FOR_TRIG	= 0x100;
 //-------------------------------------------------
 
 z80ctc_device_config::z80ctc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "Zilog Z80 CTC", tag, owner, clock),
+	: device_config(mconfig, static_alloc_device_config, "Zilog Z80 CTC", "z80ctc", tag, owner, clock),
 	  device_config_z80daisy_interface(mconfig, *this)
 {
 }

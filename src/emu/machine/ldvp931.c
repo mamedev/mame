@@ -156,6 +156,7 @@ const ldplayer_interface vp931_interface =
 	LASERDISC_TYPE_PHILLIPS_22VP931,			/* type of the player */
 	sizeof(ldplayer_data),						/* size of the state */
 	"Phillips 22VP931",							/* name of the player */
+	"22vp931",									/* shortname of the player */
 	ROM_NAME(vp931),							/* pointer to ROM region information */
 	MACHINE_CONFIG_NAME(vp931),					/* pointer to machine configuration */
 	vp931_init,									/* initialization callback */

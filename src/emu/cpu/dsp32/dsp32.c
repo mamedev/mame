@@ -178,7 +178,7 @@ const device_type DSP32C = dsp32c_device_config::static_alloc_device_config;
 //-------------------------------------------------
 
 dsp32c_device_config::dsp32c_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: cpu_device_config(mconfig, static_alloc_device_config, "DSP32C", tag, owner, clock),
+	: cpu_device_config(mconfig, static_alloc_device_config, "DSP32C", "dsp32", tag, owner, clock),
 	  m_program_config("program", ENDIANNESS_LITTLE, 32, 24)
 {
 	m_output_pins_changed = NULL;

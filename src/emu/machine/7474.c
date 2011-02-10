@@ -58,7 +58,7 @@ const device_type MACHINE_TTL7474 = ttl7474_device_config::static_alloc_device_c
 //-------------------------------------------------
 
 ttl7474_device_config::ttl7474_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-    : device_config(mconfig, static_alloc_device_config, "7474", tag, owner, clock)
+    : device_config(mconfig, static_alloc_device_config, "7474", "7474", tag, owner, clock)
 {
 }
 

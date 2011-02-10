@@ -38,9 +38,9 @@
 	{ return downcast<devname##_device *>(device)->funcname(state); } \
 	void devname##_device::funcname(UINT8 state)
 
-#define GENERIC_DEVICE_CONFIG_SETUP(devname, devtag) \
+#define GENERIC_DEVICE_CONFIG_SETUP(devname, devtag, shortname) \
 	devname##_device_config::devname##_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock) \
-	    : device_config(mconfig, static_alloc_device_config, devtag, tag, owner, clock) \
+	    : device_config(mconfig, static_alloc_device_config, devtag, shortname, tag, owner, clock) \
 	{ } \
 	\
 	device_config *devname##_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock) \

@@ -190,7 +190,7 @@ const cosmac_device::ophandler cosmac_device::s_opcodetable[256] =
 //-------------------------------------------------
 
 cosmac_device_config::cosmac_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: cpu_device_config(mconfig, static_alloc_device_config, "COSMAC", tag, owner, clock),
+	: cpu_device_config(mconfig, static_alloc_device_config, "COSMAC", "cosmac", tag, owner, clock),
 	  m_program_config("program", ENDIANNESS_LITTLE, 8, 16),
 	  m_io_config("io", ENDIANNESS_LITTLE, 8, 3)
 {
