@@ -82,10 +82,28 @@ PS / PD :  key matrix
 
 #define MASTER_CLOCK XTAL_12MHz
 
-/* This "key matrix" device maps some buttons with multiple bit activations,for        *
- * example pressing button A + button B it causes an output of button C.               *
- * This function converts the bit inputs of this game into the usual way MAME does,and *
- * it handles the multiplexer device between player one and two.                       */
+static UINT8 iox_key_matrix_calc(running_machine *machine, UINT8 p_side)
+{
+	static const char *const keynames[] = { "P1_ROW0", "P1_ROW1", "P2_ROW0", "P2_ROW1" };
+
+	int i, j, t;
+
+	for (i = 0x00 ; i < 0x10 ; i += 8)
+	{
+		j = (i / 0x08);
+
+		for (t = 0 ; t < 8 ; t ++)
+		{
+			if (!(input_port_read(machine, keynames[j+p_side]) & ( 1 << t )))
+			{
+				return (i + t) | (p_side ? 0x20 : 0x00);
+			}
+		}
+	}
+
+	return 0;
+}
+
 static READ8_HANDLER( key_matrix_r )
 {
 	speedatk_state *state = space->machine->driver_data<speedatk_state>();
@@ -103,48 +121,23 @@ static READ8_HANDLER( key_matrix_r )
 		return 0x80;
 	}
 
-	switch(state->mux_data)
+	if(state->mux_data != 1 && state->mux_data != 2 && state->mux_data != 4)
+		return 0xff; //unknown command
+
+	/* both side checks */
+	if(state->mux_data == 1)
 	{
-		case 0x02:
-		{
-			switch(input_port_read(space->machine, "P1"))
-			{
-				case 0x002: return 0x02;
-				case 0x001: return 0x01;
-				case 0x004: return 0x03;
-				case 0x008: return 0x04;
-				case 0x010: return 0x07;
-				case 0x020: return 0x08;
-				case 0x040: return 0x09;
-				case 0x080: return 0x0a;
-				case 0x100: return 0x10;
-				case 0x200: return 0x20;
-				case 0x400: return 0x40;
-				default:	return 0x00;
-			}
-		}
-		case 0x04:
-		{
-			switch(input_port_read(space->machine, "P2"))
-			{
-				case 0x002: return 0x02;
-				case 0x001: return 0x01;
-				case 0x004: return 0x03;
-				case 0x008: return 0x04;
-				case 0x010: return 0x07;
-				case 0x020: return 0x08;
-				case 0x040: return 0x09;
-				case 0x080: return 0x0a;
-				case 0x100: return 0x10;
-				case 0x200: return 0x20;
-				case 0x400: return 0x40;
-				default:	return 0x00;
-			}
-		}
-		default: logerror("Input reads with mux_data = %x\n", state->mux_data);
+		UINT8 p1_side = iox_key_matrix_calc(space->machine,0);
+		UINT8 p2_side = iox_key_matrix_calc(space->machine,2);
+
+		if(p1_side != 0)
+			return p1_side;
+
+		return p2_side;
 	}
 
-	return 0x00;
+	/* check individual input side */
+	return iox_key_matrix_calc(space->machine,(state->mux_data == 2) ? 0 : 2);
 }
 
 static WRITE8_HANDLER( key_matrix_w )
@@ -159,7 +152,7 @@ static READ8_HANDLER( key_matrix_status_r )
 {
 	speedatk_state *state = space->machine->driver_data<speedatk_state>();
 
-	/*bit 0: busy flag,active low*/
+	/* bit 0: busy flag,active low */
 	return (state->km_status & 0xfe) | 1;
 }
 
@@ -192,6 +185,7 @@ static ADDRESS_MAP_START( speedatk_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(speedatk_colorram_w) AM_BASE_MEMBER(speedatk_state, colorram)
 ADDRESS_MAP_END
 
+
 static ADDRESS_MAP_START( speedatk_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_address_w)
@@ -199,7 +193,7 @@ static ADDRESS_MAP_START( speedatk_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x24, 0x24) AM_WRITE(watchdog_reset_w)  //watchdog
 	AM_RANGE(0x40, 0x40) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	//what's 60-6f for? Seems used only in attract mode...
+	//what's 60-6f for? Seems used only in attract mode and read back when a 2p play ends ...
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( speedatk )
@@ -225,31 +219,45 @@ static INPUT_PORTS_START( speedatk )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0xc0, "1 Coin/10 Credits" )
 
-	PORT_START("P1")
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 A") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 B") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 C") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 D") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("P1 Left") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("P1 Right") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME("P1 Turn") PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_START("P1_ROW0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 B") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 A") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 C") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 D") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("P1 Left") PORT_CODE(KEYCODE_A)
 
-	PORT_START("P2")
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 A")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 B")
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 C")
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 D")
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("P2 Left")
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME("P2 Right")
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(2) PORT_NAME("P2 Turn")
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_START("P1_ROW1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("P1 Right") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME("P1 Turn") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P2_ROW0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 B")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 A")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 C")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 D")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("P2 Left")
+
+	PORT_START("P2_ROW1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME("P2 Right")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2) PORT_NAME("P2 Turn")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("COINS")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
