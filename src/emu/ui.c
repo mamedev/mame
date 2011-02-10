@@ -930,7 +930,7 @@ static astring &warnings_string(running_machine *machine, astring &string)
 
 		/* add a warning if any ROMs are flagged BAD_DUMP/NO_DUMP */
 		if (rom_load_knownbad(machine) > 0)
-			string.cat("One or more ROMs/CHDs for this "  GAMENOUN " are known to be bad or missing.  As a result the " GAMENOUN " may not work correctly.  You may be missing graphics, sound or other essential gameplay elements until the proper data is found.\n");
+			string.cat("One or more ROMs/CHDs for this "  GAMENOUN " have not been correctly dumped.\n");
 
 		/* add one line per warning flag */
 		if (input_machine_has_keyboard(machine))
