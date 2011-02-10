@@ -325,6 +325,7 @@ const game_driver * const drivers[] =
 	DRIVER( losttombh )	/* (c) 1982 Stern */
 	DRIVER( superbon )	/* bootleg */
 	DRIVER( hustler )	/* GX343 (c) 1981 Konami */
+	DRIVER( hustlerd )	/* GX343 (c) 1981 Konami + Dynamo Games license */
 	DRIVER( billiard )	/* bootleg */
 	DRIVER( hustlerb )	/* bootleg */
 	DRIVER( hustlerb2 )	/* bootleg */

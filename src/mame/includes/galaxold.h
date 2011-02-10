@@ -153,6 +153,7 @@ DRIVER_INIT( mimonscr );
 DRIVER_INIT( rescue );
 DRIVER_INIT( minefld );
 DRIVER_INIT( hustler );
+DRIVER_INIT( hustlerd );
 DRIVER_INIT( billiard );
 DRIVER_INIT( mrkougar );
 DRIVER_INIT( mrkougb );
