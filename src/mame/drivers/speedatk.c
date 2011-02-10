@@ -308,7 +308,7 @@ static const mc6845_interface mc6845_intf =
 
 static WRITE8_DEVICE_HANDLER( speedatk_output_w )
 {
-	//flip_screen_set(device->machine, data & 0x80); //breaks the video emulation?
+	//flip_screen_set(device->machine, data & 0x80);
 
 	//if((data & 0x7f) != 0x7f)
 	//popmessage("%02x",data);
