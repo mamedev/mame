@@ -37,6 +37,8 @@ System specs :
 Known issues :
 ===============
  - Update IOX handling in all games with the one hooked up in rmgoldyh and remove ROM patches.
+ - IOX might be either a shared component between PCBs or every game have its own configuration.
+   For now I've opted for the latter solution, until an HW test will be done ...
  - AY-3-8910 sound may be wrong.
  - CPU clock of srmp3 does not match the real machine.
  - MSM5205 clock frequency in srmp3 is wrong.
@@ -60,6 +62,10 @@ Note:
 #include "includes/srmp2.h"
 #include "machine/nvram.h"
 
+static struct
+{
+	int reset,ff_event,ff_1,protcheck[4],protlatch[4];
+}iox;
 
 /***************************************************************************
 
@@ -74,6 +80,45 @@ static INTERRUPT_GEN( srmp2_interrupt )
 		case 0:		cpu_set_input_line(device, 4, HOLD_LINE);	break;	/* vblank */
 		default:	cpu_set_input_line(device, 2, HOLD_LINE);	break;	/* sound */
 	}
+}
+
+/***************************************************************************
+
+  Configure IOX
+
+***************************************************************************/
+
+static MACHINE_START( srmp2 )
+{
+	iox.reset = 0x1f;
+	iox.ff_event = -1;
+	iox.ff_1 = 0x00;
+	iox.protcheck[0] = 0x60; iox.protlatch[0] = 0x2a;
+	iox.protcheck[1] = -1;   iox.protlatch[1] = -1;
+	iox.protcheck[2] = -1;   iox.protlatch[2] = -1;
+	iox.protcheck[3] = -1;   iox.protlatch[3] = -1;
+}
+
+static MACHINE_START( srmp3 )
+{
+	iox.reset = 0xc8;
+	iox.ff_event = 0xef;
+	iox.ff_1 = -1;
+	iox.protcheck[0] = 0x49; iox.protlatch[0] = 0xc9;
+	iox.protcheck[1] = 0x4c; iox.protlatch[1] = 0x00;
+	iox.protcheck[2] = 0x1c; iox.protlatch[2] = 0x04;
+	iox.protcheck[3] = 0x45; iox.protlatch[3] = 0x00;
+}
+
+static MACHINE_START( rmgoldyh )
+{
+	iox.reset = 0xc8;
+	iox.ff_event = 0xff;
+	iox.ff_1 = -1;
+	iox.protcheck[0] = 0x43; iox.protlatch[0] = 0x9a;
+	iox.protcheck[1] = 0x45; iox.protlatch[1] = 0x00;
+	iox.protcheck[2] = -1;   iox.protlatch[2] = -1;
+	iox.protcheck[3] = -1;   iox.protlatch[3] = -1;
 }
 
 static MACHINE_RESET( srmp2 )
@@ -305,6 +350,109 @@ static WRITE16_HANDLER( srmp2_input_2_w )
 	state->port_select = (data == 0x0000) ? 2 : 0;
 }
 
+static READ8_HANDLER( vox_status_r )
+{
+	return 1;
+}
+
+static UINT8 iox_data,iox_mux,iox_ff;
+
+static UINT8 iox_key_matrix_calc(running_machine *machine,UINT8 p_side)
+{
+	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7" };
+	int i, j, t;
+
+	for (i = 0x00 ; i < 0x20 ; i += 8)
+	{
+		j = (i / 0x08);
+
+		for (t = 0 ; t < 8 ; t ++)
+		{
+			if (!(input_port_read(machine, keynames[j+p_side]) & ( 1 << t )))
+			{
+				return (i + t) | (p_side ? 0x20 : 0x00);
+			}
+		}
+	}
+
+	return 0;
+}
+
+static READ8_HANDLER( iox_mux_r )
+{
+	//printf("%02x %02x\n",iox_data,iox_mux);
+
+	/* first off check any pending protection value */
+	{
+		static int i;
+
+		for(i=0;i<4;i++)
+		{
+			if(iox.protcheck[i] == -1)
+				continue; //skip
+
+			if(iox_data == iox.protcheck[i])
+			{
+				iox_data = 0; //clear write latch
+				return iox.protlatch[i];
+			}
+		}
+	}
+
+	if(iox_ff == 0)
+	{
+		if(iox_mux != 1 && iox_mux != 2 && iox_mux != 4)
+			return 0xff; //unknown command
+
+		/* both side checks */
+		if(iox_mux == 1)
+		{
+			UINT8 p1_side = iox_key_matrix_calc(space->machine,0);
+			UINT8 p2_side = iox_key_matrix_calc(space->machine,4);
+
+			if(p1_side != 0)
+				return p1_side;
+
+			return p2_side;
+		}
+
+		return iox_key_matrix_calc(space->machine,(iox_mux == 2) ? 0 : 4);
+	}
+
+	return input_port_read(space->machine,"SERVICE") & 0xff;
+}
+
+static READ8_HANDLER( iox_status_r )
+{
+	return 1;
+}
+
+static WRITE8_HANDLER( iox_command_w )
+{
+	/*
+	bit wise command port apparently
+	0x01: selects both sides
+	0x02: selects p1 side
+	0x04: selects p2 side
+	*/
+
+	iox_mux = data;
+	iox_ff = 0; // this also set flip flop back to 0
+}
+
+static WRITE8_HANDLER( iox_data_w )
+{
+	iox_data = data;
+
+	if(data == iox.reset && iox.reset != -1) //resets device
+		iox_ff = 0;
+
+	if(data == iox.ff_event && iox.ff_event != -1) // flip flop event
+		iox_ff ^= 1;
+
+	if(data == iox.ff_1 && iox.ff_1 != -1) // set flip flop to 1
+		iox_ff = 1;
+}
 
 static WRITE8_HANDLER( srmp3_rombank_w )
 {
@@ -341,11 +489,10 @@ static ADDRESS_MAP_START( srmp2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(srmp2_flags_w)			/* ADPCM bank, Color bank, etc. */
 	AM_RANGE(0x900000, 0x900001) AM_READ_PORT("SYSTEM")				/* Coinage */
 	AM_RANGE(0x900000, 0x900001) AM_WRITENOP						/* ??? */
-	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE(srmp2_input_1_r,srmp2_input_1_w)	/* I/O port 1 */
-	AM_RANGE(0xa00002, 0xa00003) AM_READWRITE(srmp2_input_2_r,srmp2_input_2_w)	/* I/O port 2 */
-	AM_RANGE(0xb00000, 0xb00001) AM_READ(srmp2_cchip_status_0_r)	/* Custom chip status ??? */
+	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE8(iox_mux_r, iox_command_w,0x00ff)	/* key matrix | I/O */
+	AM_RANGE(0xa00002, 0xa00003) AM_READWRITE8(iox_status_r,iox_data_w,0x00ff)
 	AM_RANGE(0xb00000, 0xb00001) AM_DEVWRITE("msm", srmp2_adpcm_code_w)	/* ADPCM number */
-	AM_RANGE(0xb00002, 0xb00003) AM_READ(srmp2_cchip_status_1_r)	/* Custom chip status ??? */
+	AM_RANGE(0xb00002, 0xb00003) AM_READ8(vox_status_r,0x00ff)		/* ADPCM voice status */
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP						/* ??? */
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITENOP						/* ??? */
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP						/* ??? */
@@ -379,100 +526,6 @@ static ADDRESS_MAP_START( mjyuugi_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_BASE_MEMBER(srmp2_state,spriteram2.u16)	/* Sprites Code + X + Attr */
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
-
-
-static READ8_HANDLER( vox_status_r )
-{
-	return 1;
-}
-
-static UINT8 iox_data,iox_mux,iox_ff;
-
-static UINT8 iox_key_matrix_calc(running_machine *machine,UINT8 p_side)
-{
-	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7" };
-	int i, j, t;
-
-	for (i = 0x00 ; i < 0x20 ; i += 8)
-	{
-		j = (i / 0x08);
-
-		for (t = 0 ; t < 8 ; t ++)
-		{
-			if (!(input_port_read(machine, keynames[j+p_side]) & ( 1 << t )))
-			{
-				return (i + t) | (p_side ? 0x20 : 0x00);
-			}
-		}
-	}
-
-	return 0;
-}
-
-static READ8_HANDLER( iox_mux_r )
-{
-	switch(iox_data)
-	{
-		/* rmgoldyh */
-		case 0x43: return 0x9a;
-		case 0x45: return 0x00;
-		/* srmp3 */
-		case 0x49: return 0xc9;
-		case 0x4c: return 0x00;
-		case 0x1c: return 0x04;
-	}
-
-	if(iox_ff == 0)
-	{
-		if(iox_mux != 1 && iox_mux != 2 && iox_mux != 4) //unknown command
-			return 0xff;
-
-		/* both side checks */
-		if(iox_mux == 1)
-		{
-			UINT8 p1_side = iox_key_matrix_calc(space->machine,0);
-			UINT8 p2_side = iox_key_matrix_calc(space->machine,4);
-
-			if(p1_side != 0)
-				return p1_side;
-
-			return p2_side;
-		}
-
-		return iox_key_matrix_calc(space->machine,(iox_mux == 2) ? 0 : 4);
-	}
-
-	return input_port_read(space->machine,"SERVICE") & 0xff;
-}
-
-static READ8_HANDLER( iox_status_r )
-{
-	return 1;
-}
-
-static WRITE8_HANDLER( iox_command_w )
-{
-	/*
-	bit wise command port apparently
-	0x01: selects both sides
-	0x02: selects p1 side
-	0x04: selects p2 side
-	*/
-
-	iox_mux = data;
-	iox_ff = 0;
-}
-
-static WRITE8_HANDLER( iox_data_w )
-{
-	iox_data = data;
-
-	if(data == 0xc8) //resets device
-		iox_ff = 0;
-
-	if(data == 0xff || data == 0xef) // flip-flop command
-		iox_ff ^= 1;
-}
 
 static WRITE8_HANDLER( srmp3_flags_w )
 {
@@ -1208,6 +1261,7 @@ static MACHINE_CONFIG_START( srmp2, srmp2_state )
 	MCFG_CPU_PROGRAM_MAP(srmp2_map)
 	MCFG_CPU_VBLANK_INT_HACK(srmp2_interrupt,16)		/* Interrupt times is not understood */
 
+	MCFG_MACHINE_START(srmp2)
 	MCFG_MACHINE_RESET(srmp2)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1248,6 +1302,7 @@ static MACHINE_CONFIG_START( srmp3, srmp2_state )
 	MCFG_CPU_IO_MAP(srmp3_io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
+	MCFG_MACHINE_START(srmp3)
 	MCFG_MACHINE_RESET(srmp3)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1282,6 +1337,8 @@ static MACHINE_CONFIG_DERIVED( rmgoldyh, srmp3 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rmgoldyh_map)
 	MCFG_CPU_IO_MAP(rmgoldyh_io_map)
+
+	MCFG_MACHINE_START(rmgoldyh)
 
 	MCFG_GFXDECODE(rmgoldyh)
 MACHINE_CONFIG_END
@@ -1592,16 +1649,10 @@ ROM_START( ponchina )
 	ROM_LOAD( "um2_1_10.u63", 0x080000, 0x080000, CRC(53e643e9) SHA1(3b221217e8f846ae96a9a47149037cea19d97549) )
 ROM_END
 
-static DRIVER_INIT( srmp2 )
-{
-	UINT16 *RAM = (UINT16 *) machine->region("maincpu")->base();
 
-	/* Fix "ERROR BACK UP" and "ERROR IOX" */
-	RAM[0x20c80 / 2] = 0x4e75;								// RTS
-}
 
 GAME( 1987, srmp1,     0,        srmp2,    srmp2,    0,       ROT0, "Seta",  				"Super Real Mahjong Part 1 (Japan)",  0 )
-GAME( 1987, srmp2,     0,        srmp2,    srmp2,    srmp2,   ROT0, "Seta",  				"Super Real Mahjong Part 2 (Japan)",  0 )
+GAME( 1987, srmp2,     0,        srmp2,    srmp2,    0,       ROT0, "Seta",  				"Super Real Mahjong Part 2 (Japan)",  0 )
 GAME( 1988, srmp3,     0,        srmp3,    srmp3,    0,       ROT0, "Seta",  				"Super Real Mahjong Part 3 (Japan)",  0 )
 GAME( 1988, rmgoldyh,  srmp3,    rmgoldyh, rmgoldyh, 0,       ROT0, "Seta / Alba",	        "Real Mahjong Gold Yumehai (Japan)",  GAME_NOT_WORKING )
 GAME( 1990, mjyuugi,   0,        mjyuugi,  mjyuugi,  0,       ROT0, "Visco", 				"Mahjong Yuugi (Japan set 1)",        0 )
