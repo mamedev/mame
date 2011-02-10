@@ -188,8 +188,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( speedatk_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_WRITE(speedatk_6845_w)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("crtc", mc6845_register_w)
+	AM_RANGE(0x00, 0x01) AM_WRITE(speedatk_6845_w) //h46505 address / data routing
 	AM_RANGE(0x24, 0x24) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x40, 0x40) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_address_data_w)
