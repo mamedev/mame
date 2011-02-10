@@ -36,7 +36,6 @@ System specs :
 
 Known issues :
 ===============
- - Update IOX handling in all games with the one hooked up in rmgoldyh and remove ROM patches.
  - IOX might be either a shared component between PCBs or every game have its own configuration.
    For now I've opted for the latter solution, until an HW test will be done ...
  - AY-3-8910 sound may be wrong.
@@ -93,6 +92,7 @@ static MACHINE_START( srmp2 )
 	iox.reset = 0x1f;
 	iox.ff_event = -1;
 	iox.ff_1 = 0x00;
+	/* note: protection in srmp1/mjyuugi/ponchin is never checked, assume to be the same */
 	iox.protcheck[0] = 0x60; iox.protlatch[0] = 0x2a;
 	iox.protcheck[1] = -1;   iox.protlatch[1] = -1;
 	iox.protcheck[2] = -1;   iox.protlatch[2] = -1;
@@ -120,21 +120,6 @@ static MACHINE_START( rmgoldyh )
 	iox.protcheck[2] = -1;   iox.protlatch[2] = -1;
 	iox.protcheck[3] = -1;   iox.protlatch[3] = -1;
 }
-
-static MACHINE_RESET( srmp2 )
-{
-	srmp2_state *state = machine->driver_data<srmp2_state>();
-
-	state->port_select = 0;
-}
-
-static MACHINE_RESET( srmp3 )
-{
-	srmp2_state *state = machine->driver_data<srmp2_state>();
-
-	state->port_select = 0;
-}
-
 
 /***************************************************************************
 
@@ -269,87 +254,6 @@ static void srmp2_adpcm_int(device_t *device)
 	}
 }
 
-
-static READ16_HANDLER( srmp2_cchip_status_0_r )
-{
-	return 0x01;
-}
-
-
-static READ16_HANDLER( srmp2_cchip_status_1_r )
-{
-	return 0x01;
-}
-
-
-static READ16_HANDLER( srmp2_input_1_r )
-{
-/*
-    ---x xxxx : Key code
-    --x- ---- : Player 1 and 2 side flag
-*/
-
-	srmp2_state *state = space->machine->driver_data<srmp2_state>();
-	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
-
-	if (!ACCESSING_BITS_0_7)
-	{
-		return 0xffff;
-	}
-
-	if (state->port_select != 2)			/* Panel keys */
-	{
-		int i, j, t;
-
-		for (i = 0x00 ; i < 0x20 ; i += 8)
-		{
-			j = (i / 0x08);
-
-			for (t = 0 ; t < 8 ; t ++)
-			{
-				if (!(input_port_read(space->machine, keynames[j]) & ( 1 << t )))
-				{
-					return (i + t);
-				}
-			}
-		}
-	}
-	else								/* Analizer and memory reset keys */
-	{
-		return input_port_read(space->machine, "SERVICE");
-	}
-
-	return 0xffff;
-}
-
-
-static READ16_HANDLER( srmp2_input_2_r )
-{
-	if (!ACCESSING_BITS_0_7)
-	{
-		return 0x0001;
-	}
-
-	/* Always return 1, otherwise freeze. Maybe read I/O status */
-	return 0x0001;
-}
-
-
-static WRITE16_HANDLER( srmp2_input_1_w )
-{
-	srmp2_state *state = space->machine->driver_data<srmp2_state>();
-
-	state->port_select = (data != 0x0000) ? 1 : 0;
-}
-
-
-static WRITE16_HANDLER( srmp2_input_2_w )
-{
-	srmp2_state *state = space->machine->driver_data<srmp2_state>();
-
-	state->port_select = (data == 0x0000) ? 2 : 0;
-}
-
 static READ8_HANDLER( vox_status_r )
 {
 	return 1;
@@ -380,8 +284,6 @@ static UINT8 iox_key_matrix_calc(running_machine *machine,UINT8 p_side)
 
 static READ8_HANDLER( iox_mux_r )
 {
-	//printf("%02x %02x\n",iox_data,iox_mux);
-
 	/* first off check any pending protection value */
 	{
 		static int i;
@@ -416,6 +318,7 @@ static READ8_HANDLER( iox_mux_r )
 			return p2_side;
 		}
 
+		/* check individual input side */
 		return iox_key_matrix_calc(space->machine,(iox_mux == 2) ? 0 : 4);
 	}
 
@@ -513,11 +416,10 @@ static ADDRESS_MAP_START( mjyuugi_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500010, 0x500011) AM_READ_PORT("DSW3-2")				/* DSW 3-2 */
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x800000, 0x800001) AM_READNOP				/* ??? */
-	AM_RANGE(0x900000, 0x900001) AM_READWRITE(srmp2_input_1_r,srmp2_input_1_w)		/* I/O port 1 */
-	AM_RANGE(0x900002, 0x900003) AM_READWRITE(srmp2_input_2_r,srmp2_input_2_w)		/* I/O port 2 */
-	AM_RANGE(0xa00000, 0xa00001) AM_READ(srmp2_cchip_status_0_r)	/* custom chip status ??? */
+	AM_RANGE(0x900000, 0x900001) AM_READWRITE8(iox_mux_r, iox_command_w,0x00ff)	/* key matrix | I/O */
+	AM_RANGE(0x900002, 0x900003) AM_READWRITE8(iox_status_r,iox_data_w,0x00ff)
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE("msm", srmp2_adpcm_code_w)			/* ADPCM number */
-	AM_RANGE(0xa00002, 0xa00003) AM_READ(srmp2_cchip_status_1_r)	/* custom chip status ??? */
+	AM_RANGE(0xb00002, 0xb00003) AM_READ8(vox_status_r,0x00ff)		/* ADPCM voice status */
 	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD8("aysnd", ay8910_r, 0x00ff)
 	AM_RANGE(0xb00000, 0xb00003) AM_DEVWRITE8("aysnd", ay8910_address_data_w, 0x00ff)
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP					/* ??? */
@@ -1262,7 +1164,6 @@ static MACHINE_CONFIG_START( srmp2, srmp2_state )
 	MCFG_CPU_VBLANK_INT_HACK(srmp2_interrupt,16)		/* Interrupt times is not understood */
 
 	MCFG_MACHINE_START(srmp2)
-	MCFG_MACHINE_RESET(srmp2)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -1303,7 +1204,6 @@ static MACHINE_CONFIG_START( srmp3, srmp2_state )
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MCFG_MACHINE_START(srmp3)
-	MCFG_MACHINE_RESET(srmp3)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -1350,7 +1250,8 @@ static MACHINE_CONFIG_START( mjyuugi, srmp2_state )
 	MCFG_CPU_PROGRAM_MAP(mjyuugi_map)
 	MCFG_CPU_VBLANK_INT_HACK(srmp2_interrupt,16)		/* Interrupt times is not understood */
 
-	MCFG_MACHINE_RESET(srmp2)
+	MCFG_MACHINE_START(srmp2)
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
