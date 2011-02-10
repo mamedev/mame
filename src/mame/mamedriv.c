@@ -3630,6 +3630,7 @@ V-V                           TP-027
 	DRIVER( pairs )		/* (c) 1994 Strata/Incredible Technologies */
 	DRIVER( pairsa )	/* (c) 1994 Strata/Incredible Technologies */
 	DRIVER( hotmemry )	/* (c) 1994 Tuning/Incredible Technologies */
+	DRIVER( hotmemry11 )	/* (c) 1994 Tuning/Incredible Technologies */
 	DRIVER( drivedge )	/* (c) 1994 Strata/Incredible Technologies */
 	DRIVER( wcbowl )	/* (c) 1995 Incredible Technologies */
 	DRIVER( wcbowl165 )	/* (c) 1995 Incredible Technologies */
