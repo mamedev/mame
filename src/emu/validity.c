@@ -1098,7 +1098,6 @@ static bool validate_devices(const machine_config &config, const ioport_list &po
 
 		if (devconfig->rom_region()!=NULL && (strcmp(devconfig->shortname(),"") == 0)) {
 			mame_printf_warning("Device %s does not have short name defined\n", devconfig->name());
-			break;
 		}
 		/* check for device-specific validity check */
 		if (devconfig->validity_check(driver))
