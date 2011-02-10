@@ -376,6 +376,10 @@ ifneq ($(filter OKIM6258,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/okim6258.o
 endif
 
+ifneq ($(filter OKIM9810,$(SOUNDS)),)
+SOUNDOBJS += $(SOUNDOBJ)/okim9810.o
+endif
+
 
 
 #-------------------------------------------------

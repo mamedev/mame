@@ -535,6 +535,7 @@ The same H8/3007 code "FC21 IOPR-0" at U49 is used for FUNCUBE 2,3,4 & 5
 #include "cpu/h83002/h8.h"
 #include "machine/eeprom.h"
 #include "sound/x1_010.h"
+#include "sound/okim9810.h"
 #include "includes/seta2.h"
 #include "machine/nvram.h"
 
@@ -959,6 +960,20 @@ static READ32_HANDLER( funcube_debug_r )
 	return ret;
 }
 
+static WRITE32_DEVICE_HANDLER( oki_write )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+        const UINT8 tmp = (data & 0x000000ff);
+		downcast<okim9810_device *>(device)->write_TMP_register(tmp);
+	}
+    else if (ACCESSING_BITS_16_23)
+    {
+        const UINT8 cmd = (data & 0x00ff0000) >> 16;
+		downcast<okim9810_device *>(device)->write_command(cmd);
+    }
+}
+
 
 static ADDRESS_MAP_START( funcube_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE( 0x00000000, 0x0007ffff ) AM_ROM
@@ -967,7 +982,7 @@ static ADDRESS_MAP_START( funcube_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE( 0x00500000, 0x00500003 ) AM_READ( funcube_debug_r )
 	AM_RANGE( 0x00500004, 0x00500007 ) AM_READ( watchdog_reset32_r ) AM_WRITENOP
 
-	AM_RANGE( 0x00600000, 0x00600003 ) AM_WRITENOP	// sound chip
+	AM_RANGE( 0x00600000, 0x00600003 ) AM_DEVWRITE("oki", oki_write)
 
 	AM_RANGE( 0x00800000, 0x0083ffff ) AM_READWRITE( spriteram32_dword_r,  spriteram32_dword_w  ) AM_BASE_SIZE_MEMBER(seta2_state, spriteram, spriteram_size)
 	AM_RANGE( 0x00840000, 0x0084ffff ) AM_READWRITE( paletteram32_dword_r, paletteram32_dword_w ) AM_BASE_GENERIC(paletteram)
@@ -2494,9 +2509,11 @@ static MACHINE_CONFIG_START( funcube, seta2_state )
 	MCFG_VIDEO_EOF(seta2)
 
 	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	// MSM9810B
-
+	MCFG_OKIM9810_ADD("oki", XTAL_14_7456MHz/10/10/10)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
 
@@ -2804,8 +2821,8 @@ ROM_START( funcube2 )
 	ROM_LOAD32_WORD( "fc21_obj-0.u43", 0x000000, 0x400000, CRC(08cfe6d9) SHA1(d10f362dcde01f7a9855d8f76af3084b5dd1573a) )
 	ROM_LOAD32_WORD( "fc21_obj-1.u42", 0x000002, 0x400000, CRC(4c1fbc20) SHA1(ff83691c19ce3600b31c494eaec26d2ac79e0028) )
 
-	ROM_REGION( 0x400000, "samples", 0 )
-	ROM_LOAD( "fc21_voi0.u47", 0x00000, 0x400000, CRC(25b5fc3f) SHA1(18b16a14e9ee62f3fea382e9d3fdcd43bdb165f5) )
+	ROM_REGION( 0x1000000, "oki", 0 )
+	ROM_LOAD( "fc21_voi0.u47", 0x000000, 0x400000, CRC(25b5fc3f) SHA1(18b16a14e9ee62f3fea382e9d3fdcd43bdb165f5) )
 ROM_END
 
 ROM_START( funcube4 )
@@ -2822,8 +2839,8 @@ ROM_START( funcube4 )
 	ROM_LOAD32_WORD( "fc41_obj-0.u43", 0x000000, 0x400000, CRC(9ff029d5) SHA1(e057f4929aa745ecaf9d4ff7e39974c82e440146) )
 	ROM_LOAD32_WORD( "fc41_obj-1.u42", 0x000002, 0x400000, CRC(5ab7b087) SHA1(c600158b2358cdf947357170044dda2deacd4f37) )
 
-	ROM_REGION( 0x400000, "samples", 0 )
-	ROM_LOAD( "fc41_snd0.u47", 0x00000, 0x400000, CRC(48337257) SHA1(d1755024b824100070b489f48f6ae921765329e8) )
+	ROM_REGION( 0x1000000, "oki", 0 )
+	ROM_LOAD( "fc41_snd0.u47", 0x000000, 0x400000, CRC(48337257) SHA1(d1755024b824100070b489f48f6ae921765329e8) )
 ROM_END
 
 static DRIVER_INIT( funcube2 )
@@ -2841,8 +2858,15 @@ static DRIVER_INIT( funcube2 )
 	main_cpu[0xa8c/4] = 0x4e7141f9;
 
 	// Sub CPU
-
 	sub_cpu[0x4d4/2] = 0x5470;	// rte -> rts
+
+    // Audio
+    // The first half of the rom appears to be a dupe of the second half with 0xffs destructively interleaved
+	UINT8* oki = (UINT8*) machine->region("oki")->base();
+    for (int i = 0; i < 0x200000; i++)
+    {
+        oki[i] = oki[i+0x200000];
+    }
 }
 
 // Note: same as funcube2
@@ -2861,8 +2885,15 @@ static DRIVER_INIT( funcube4 )
 	main_cpu[0xa8c/4] = 0x4e7141f9;
 
 	// Sub CPU
-
 	sub_cpu[0x4d4/2] = 0x5470;	// rte -> rts
+    
+    // Audio
+    // The first half of the rom appears to be a dupe of the second half with 0xffs destructively interleaved
+	UINT8* oki = (UINT8*) machine->region("oki")->base();
+    for (int i = 0; i < 0x200000; i++)
+    {
+        oki[i] = oki[i+0x200000];
+    }
 }
 
 GAME( 1994, gundamex, 0,        gundamex, gundamex, 0,        ROT0, "Banpresto",             "Mobile Suit Gundam EX Revue",                  0 )
