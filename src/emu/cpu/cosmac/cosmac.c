@@ -22,6 +22,11 @@
 
 */
 
+// permit our enums to be saved
+ALLOW_SAVE_TYPE(cosmac_device::cosmac_mode);
+ALLOW_SAVE_TYPE(cosmac_device::cosmac_state);
+
+
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
