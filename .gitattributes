@@ -857,6 +857,7 @@ src/emu/machine/scsidev.c svneol=native#text/plain
 src/emu/machine/scsidev.h svneol=native#text/plain
 src/emu/machine/scsihd.c svneol=native#text/plain
 src/emu/machine/scsihd.h svneol=native#text/plain
+src/emu/machine/secflash.c svneol=native#text/plain
 src/emu/machine/smc91c9x.c svneol=native#text/plain
 src/emu/machine/smc91c9x.h svneol=native#text/plain
 src/emu/machine/timekpr.c svneol=native#text/plain
