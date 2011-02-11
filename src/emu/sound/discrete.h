@@ -4303,7 +4303,7 @@ class discrete_device_config :	public device_config
 
 protected:
 	// construction/destruction
-	discrete_device_config(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, const device_config *owner, UINT32 clock);
+	discrete_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock);
 
 public:
 	// allocators

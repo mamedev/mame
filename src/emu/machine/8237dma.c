@@ -48,7 +48,7 @@
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-GENERIC_DEVICE_CONFIG_SETUP(i8237, "Intel 8237", "8237dma")
+GENERIC_DEVICE_CONFIG_SETUP(i8237, "Intel 8237")
 
 //-------------------------------------------------
 //  device_config_complete - perform any

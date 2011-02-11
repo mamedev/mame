@@ -148,9 +148,9 @@ const device_type ADSP2181 = adsp2181_device_config::static_alloc_device_config;
 //  TRIVIAL IMPLEMENTATIONS
 //**************************************************************************
 
-DEFINE_TRIVIAL_DERIVED_DEVICE(adsp2104_device_config, adsp2101_device_config, adsp2104_device, adsp2101_device, "ADSP-2104", "adsp2104", CHIP_TYPE_ADSP2104)
-DEFINE_TRIVIAL_DERIVED_DEVICE(adsp2105_device_config, adsp2101_device_config, adsp2105_device, adsp2101_device, "ADSP-2105", "adsp2105", CHIP_TYPE_ADSP2105)
-DEFINE_TRIVIAL_DERIVED_DEVICE(adsp2115_device_config, adsp2101_device_config, adsp2115_device, adsp2101_device, "ADSP-2115", "adsp2115", CHIP_TYPE_ADSP2115)
+DEFINE_TRIVIAL_DERIVED_DEVICE(adsp2104_device_config, adsp2101_device_config, adsp2104_device, adsp2101_device, "ADSP-2104", CHIP_TYPE_ADSP2104)
+DEFINE_TRIVIAL_DERIVED_DEVICE(adsp2105_device_config, adsp2101_device_config, adsp2105_device, adsp2101_device, "ADSP-2105", CHIP_TYPE_ADSP2105)
+DEFINE_TRIVIAL_DERIVED_DEVICE(adsp2115_device_config, adsp2101_device_config, adsp2115_device, adsp2101_device, "ADSP-2115", CHIP_TYPE_ADSP2115)
 
 
 
@@ -162,8 +162,8 @@ DEFINE_TRIVIAL_DERIVED_DEVICE(adsp2115_device_config, adsp2101_device_config, ad
 //  adsp21xx_device_config - constructor
 //-------------------------------------------------
 
-adsp21xx_device_config::adsp21xx_device_config(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, const device_config *owner, UINT32 clock, UINT32 chiptype)
-	: cpu_device_config(mconfig, type, name, shortname, tag, owner, clock),
+adsp21xx_device_config::adsp21xx_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock, UINT32 chiptype)
+	: cpu_device_config(mconfig, type, name, tag, owner, clock),
 	  m_program_config("program", ENDIANNESS_LITTLE, 32, 14, -2),
 	  m_data_config("data", ENDIANNESS_LITTLE, 16, 14, -1),
 	  m_chip_type(chiptype)
@@ -174,13 +174,13 @@ adsp21xx_device_config::adsp21xx_device_config(const machine_config &mconfig, de
 }
 
 adsp2100_device_config::adsp2100_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: adsp21xx_device_config(mconfig, static_alloc_device_config, "ADSP-2100", "adsp2100", tag, owner, clock, CHIP_TYPE_ADSP2100) { }
+	: adsp21xx_device_config(mconfig, static_alloc_device_config, "ADSP-2100", tag, owner, clock, CHIP_TYPE_ADSP2100) { }
 
-adsp2101_device_config::adsp2101_device_config(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, const device_config *owner, UINT32 clock, UINT32 chiptype)
-	: adsp21xx_device_config(mconfig, type, name, shortname, tag, owner, clock, chiptype) { }
+adsp2101_device_config::adsp2101_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock, UINT32 chiptype)
+	: adsp21xx_device_config(mconfig, type, name, tag, owner, clock, chiptype) { }
 
 adsp2181_device_config::adsp2181_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: adsp21xx_device_config(mconfig, static_alloc_device_config, "ADSP-2181", "adsp2181", tag, owner, clock, CHIP_TYPE_ADSP2181),
+	: adsp21xx_device_config(mconfig, static_alloc_device_config, "ADSP-2181", tag, owner, clock, CHIP_TYPE_ADSP2181),
 	  m_io_config("I/O", ENDIANNESS_LITTLE, 16, 11, -1) { }
 
 
@@ -196,7 +196,7 @@ device_config *adsp2100_device_config::static_alloc_device_config(const machine_
 
 device_config *adsp2101_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
-	return global_alloc(adsp2101_device_config(mconfig, static_alloc_device_config, "ADSP-2101", "adsp2101", tag, owner, clock, CHIP_TYPE_ADSP2101));
+	return global_alloc(adsp2101_device_config(mconfig, static_alloc_device_config, "ADSP-2101", tag, owner, clock, CHIP_TYPE_ADSP2101));
 }
 
 device_config *adsp2181_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)

@@ -72,7 +72,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 i2cmem_device_config::i2cmem_device_config( const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock )
-	: device_config(mconfig, static_alloc_device_config, "I2CMEM", "i2cmem", tag, owner, clock),
+	: device_config(mconfig, static_alloc_device_config, "I2CMEM", tag, owner, clock),
 	  device_config_memory_interface(mconfig, *this),
 	  device_config_nvram_interface(mconfig, *this)
 {

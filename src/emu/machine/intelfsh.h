@@ -81,7 +81,7 @@ protected:
 	};
 
 	// construction/destruction
-	intelfsh_device_config(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, const device_config *owner, UINT32 clock, UINT32 variant);
+	intelfsh_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock, UINT32 variant);
 
 	// device_config_memory_interface overrides
 	virtual const address_space_config *memory_space_config(int spacenum = 0) const;
@@ -143,7 +143,7 @@ class intelfsh8_device_config : public intelfsh_device_config
 
 protected:
 	// construction/destruction
-	intelfsh8_device_config(const machine_config &mconfig, device_type type, const char *name, const char *sharename, const char *tag, const device_config *owner, UINT32 clock, UINT32 variant);
+	intelfsh8_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock, UINT32 variant);
 };
 
 
@@ -182,7 +182,7 @@ class intelfsh16_device_config : public intelfsh_device_config
 
 protected:
 	// construction/destruction
-	intelfsh16_device_config(const machine_config &mconfig, device_type type, const char *name, const char *sharename, const char *tag, const device_config *owner, UINT32 clock, UINT32 variant);
+	intelfsh16_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock, UINT32 variant);
 };
 
 

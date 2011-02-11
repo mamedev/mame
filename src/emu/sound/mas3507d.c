@@ -9,7 +9,7 @@ const device_type MAS3507D = mas3507d_device_config::static_alloc_device_config;
 
 
 mas3507d_device_config::mas3507d_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "MAS3507D", "mas3507d", tag, owner, clock),
+	: device_config(mconfig, static_alloc_device_config, "MAS3507D", tag, owner, clock),
 	  device_config_sound_interface(mconfig, *this)
 {
 }

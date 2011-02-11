@@ -21,7 +21,7 @@ void ics2115_device_config::static_set_irqf(device_config *device, void (*irqf)(
 }
 
 ics2115_device_config::ics2115_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "ICS2115", "ics2115", tag, owner, clock),
+	: device_config(mconfig, static_alloc_device_config, "ICS2115", tag, owner, clock),
 	  device_config_sound_interface(mconfig, *this)
 {
 }

@@ -105,7 +105,7 @@ const device_type HD61700 = hd61700_cpu_device_config::static_alloc_device_confi
 //-------------------------------------------------
 
 hd61700_cpu_device_config::hd61700_cpu_device_config(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock)
-	: cpu_device_config(mconfig, type, "HD61700", "hd61700", tag, owner, clock),
+	: cpu_device_config(mconfig, type, "HD61700", tag, owner, clock),
 	 m_program_config("program", ENDIANNESS_BIG, 16, 18, -1)
 {
 }

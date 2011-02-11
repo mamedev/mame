@@ -33,7 +33,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 okim9810_device_config::okim9810_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "OKI9810", "oki9810", tag, owner, clock),
+	: device_config(mconfig, static_alloc_device_config, "OKI9810", tag, owner, clock),
 	  device_config_sound_interface(mconfig, *this),
 	  device_config_memory_interface(mconfig, *this),
 	  m_space_config("samples", ENDIANNESS_BIG, 8, 24, 0, NULL, *ADDRESS_MAP_NAME(okim9810))

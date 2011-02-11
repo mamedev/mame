@@ -14,7 +14,7 @@
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-GENERIC_DEVICE_CONFIG_SETUP(k033906, "Konami 033906", "k033906")
+GENERIC_DEVICE_CONFIG_SETUP(k033906, "Konami 033906")
 
 //-------------------------------------------------
 //  device_config_complete - perform any

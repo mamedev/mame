@@ -51,7 +51,7 @@
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-GENERIC_DEVICE_CONFIG_SETUP(i8257, "DMA8257", "8257dma")
+GENERIC_DEVICE_CONFIG_SETUP(i8257, "DMA8257")
 
 //-------------------------------------------------
 //  device_config_complete - perform any

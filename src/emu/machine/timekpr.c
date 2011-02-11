@@ -50,7 +50,7 @@
 
 #define TIMEKPR_DEVCFG_DERIVED_CTOR(devtype, name, shortname) \
 	devtype##_device_config::devtype##_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock) \
-    : timekeeper_device_config(mconfig, name, shortname, tag, owner, clock) \
+    : timekeeper_device_config(mconfig, name, tag, owner, clock) \
 	{ }
 
 #define TIMEKPR_DEVCFG_DERIVED_STATIC_ALLOC(devtype) \
@@ -76,8 +76,8 @@
 //  timekeeper_device_config - constructor
 //-------------------------------------------------
 
-timekeeper_device_config::timekeeper_device_config(const machine_config &mconfig, const char *type, const char *shortname, const char *tag, const device_config *owner, UINT32 clock)
-    : device_config(mconfig, static_alloc_device_config, type, shortname, tag, owner, clock),
+timekeeper_device_config::timekeeper_device_config(const machine_config &mconfig, const char *type, const char *tag, const device_config *owner, UINT32 clock)
+    : device_config(mconfig, static_alloc_device_config, type, tag, owner, clock),
 	  device_config_nvram_interface(mconfig, *this)
 {
 
@@ -91,7 +91,7 @@ timekeeper_device_config::timekeeper_device_config(const machine_config &mconfig
 
 device_config *timekeeper_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
-    return global_alloc(timekeeper_device_config(mconfig, "TIMEKEEPER", "timekpr", tag, owner, clock));
+    return global_alloc(timekeeper_device_config(mconfig, "TIMEKEEPER", tag, owner, clock));
 }
 
 

@@ -30,7 +30,7 @@ const device_type TTL74123 = ttl74123_device_config::static_alloc_device_config;
 //-------------------------------------------------
 
 ttl74123_device_config::ttl74123_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "TTL74123", "74123", tag, owner, clock)
+	: device_config(mconfig, static_alloc_device_config, "TTL74123", tag, owner, clock)
 {
 }
 

@@ -212,7 +212,7 @@ ADDRESS_MAP_END
 
 
 gp9001vdp_device_config::gp9001vdp_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "gp9001vdp_", "gp9001", tag, owner, clock),
+	: device_config(mconfig, static_alloc_device_config, "gp9001vdp_", tag, owner, clock),
 	  device_config_memory_interface(mconfig, *this),
 	  m_space_config("gp9001vdp", ENDIANNESS_BIG, 16,14, 0, NULL, *ADDRESS_MAP_NAME(gp9001vdp_map))
 {

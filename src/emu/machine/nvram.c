@@ -59,7 +59,7 @@ const device_type NVRAM = nvram_device_config::static_alloc_device_config;
 //-------------------------------------------------
 
 nvram_device_config::nvram_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "NVRAM", "nvram", tag, owner, clock),
+	: device_config(mconfig, static_alloc_device_config, "NVRAM", tag, owner, clock),
 	  device_config_nvram_interface(mconfig, *this),
 	  m_default_value(DEFAULT_ALL_1)
 {

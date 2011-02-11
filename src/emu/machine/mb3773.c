@@ -31,7 +31,7 @@ const device_type MB3773 = mb3773_device_config::static_alloc_device_config;
 //-------------------------------------------------
 
 mb3773_device_config::mb3773_device_config( const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock )
-	: device_config(mconfig, static_alloc_device_config, "MB3773", "mb3773", tag, owner, clock)
+	: device_config(mconfig, static_alloc_device_config, "MB3773", tag, owner, clock)
 {
 }
 

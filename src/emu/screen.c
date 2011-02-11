@@ -72,7 +72,7 @@ const attotime screen_device::DEFAULT_FRAME_PERIOD(attotime::from_hz(DEFAULT_FRA
 //-------------------------------------------------
 
 screen_device_config::screen_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "Video Screen", "video", tag, owner, clock),
+	: device_config(mconfig, static_alloc_device_config, "Video Screen", tag, owner, clock),
 	  m_type(SCREEN_TYPE_RASTER),
 	  m_width(0),
 	  m_height(0),

@@ -50,8 +50,8 @@
 //  cpu_device_config - constructor
 //-------------------------------------------------
 
-cpu_device_config::cpu_device_config(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, type, name, shortname, tag, owner, clock),
+cpu_device_config::cpu_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, type, name, tag, owner, clock),
 	  device_config_execute_interface(mconfig, *this),
 	  device_config_memory_interface(mconfig, *this),
 	  device_config_state_interface(mconfig, *this),
@@ -65,7 +65,7 @@ cpu_device_config::cpu_device_config(const machine_config &mconfig, device_type 
 //-------------------------------------------------
 
 legacy_cpu_device_config::legacy_cpu_device_config(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock, cpu_get_info_func get_info)
-	: cpu_device_config(mconfig, type, "CPU", "cpu", tag, owner, clock),
+	: cpu_device_config(mconfig, type, "CPU", tag, owner, clock),
 	  m_get_info(get_info)
 {
 	// build up our address spaces; legacy devices don't have logical spaces

@@ -273,7 +273,7 @@ const device_type MC68901 = mc68901_device_config::static_alloc_device_config;
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-GENERIC_DEVICE_CONFIG_SETUP(mc68901, "Motorola MC68901", "mc68901")
+GENERIC_DEVICE_CONFIG_SETUP(mc68901, "Motorola MC68901")
 
 
 //-------------------------------------------------

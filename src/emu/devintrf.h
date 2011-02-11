@@ -76,9 +76,9 @@ public: 																				\
 };																						\
 
 // use this macro to define the actual implementation in the source file
-#define DEFINE_TRIVIAL_DERIVED_DEVICE(_ConfigClass, _ConfigBase, _DeviceClass, _DeviceBase, _Name, _ShortName, _Param) \
+#define DEFINE_TRIVIAL_DERIVED_DEVICE(_ConfigClass, _ConfigBase, _DeviceClass, _DeviceBase, _Name, _Param) \
 _ConfigClass::_ConfigClass(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock, UINT32 param) \
-	: _ConfigBase(mconfig, static_alloc_device_config, _Name, _ShortName, tag, owner, clock, param)	\
+	: _ConfigBase(mconfig, static_alloc_device_config, _Name, tag, owner, clock, param)	\
 {																						\
 }																						\
 																						\
@@ -257,7 +257,7 @@ class device_config
 
 protected:
 	// construction/destruction
-	device_config(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, const device_config *owner, UINT32 clock, UINT32 param = 0);
+	device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock, UINT32 param = 0);
 	virtual ~device_config();
 
 public:

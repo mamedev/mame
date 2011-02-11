@@ -38,7 +38,7 @@ enum
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-GENERIC_DEVICE_CONFIG_SETUP(ins8154, "INS8154", "ins8154")
+GENERIC_DEVICE_CONFIG_SETUP(ins8154, "INS8154")
 
 //-------------------------------------------------
 //  device_config_complete - perform any

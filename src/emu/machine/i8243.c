@@ -16,7 +16,7 @@
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-GENERIC_DEVICE_CONFIG_SETUP(i8243, "I8243", "i8243")
+GENERIC_DEVICE_CONFIG_SETUP(i8243, "I8243")
 
 //-------------------------------------------------
 //  static_set_read_handler - configuration helper

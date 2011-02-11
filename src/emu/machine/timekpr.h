@@ -64,7 +64,7 @@ class timekeeper_device_config :	public device_config,
 
 protected:
 	// construction/destruction
-	timekeeper_device_config(const machine_config &mconfig, const char *type, const char *shortname, const char *tag, const device_config *owner, UINT32 clock);
+	timekeeper_device_config(const machine_config &mconfig, const char *type, const char *tag, const device_config *owner, UINT32 clock);
 
 public:
 	// allocators

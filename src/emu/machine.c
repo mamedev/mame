@@ -942,7 +942,7 @@ running_machine::logerror_callback_item::logerror_callback_item(logerror_callbac
 //-------------------------------------------------
 
 driver_device_config_base::driver_device_config_base(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner)
-	: device_config(mconfig, type, "Driver Device", "driver", tag, owner, 0),
+	: device_config(mconfig, type, "Driver Device", tag, owner, 0),
 	  m_game(NULL),
 	  m_palette_init(NULL),
 	  m_video_update(NULL)

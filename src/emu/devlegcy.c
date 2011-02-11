@@ -50,7 +50,7 @@
 //-------------------------------------------------
 
 legacy_device_config_base::legacy_device_config_base(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock, device_get_config_func get_config)
-	: device_config(mconfig, type, "Legacy Device", "legacy", tag, owner, clock),
+	: device_config(mconfig, type, "Legacy Device", tag, owner, clock),
 	  m_get_config_func(get_config),
 	  m_inline_config(NULL)
 {
