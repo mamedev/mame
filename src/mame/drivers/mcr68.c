@@ -1471,6 +1471,33 @@ ROM_START( pigskin ) /* Initial boot screen reports KIT CODE REV 1.1K 8/01/90 */
 ROM_END
 
 
+ROM_START( pigskina ) /* Initial boot screen reports REV 2.0 7/06/90 */
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "pigskin_la2.a5",  0x00000, 0x10000, CRC(f75d36dd) SHA1(6afc8fbc900e17f9281ee214097d8ebd651d9291) )
+	ROM_LOAD16_BYTE( "pigskin_la2.b5",  0x00001, 0x10000, CRC(c5ffdfad) SHA1(3b234f3629c8f21199f4845df7f44c43fd775c9b) )
+	ROM_LOAD16_BYTE( "pigskin_la2.a6",  0x20000, 0x10000, CRC(2fc91002) SHA1(64d270b78c69d3f4fb36d1233a1632d6ba3d87a5) )
+	ROM_LOAD16_BYTE( "pigskin_la2.b6",  0x20001, 0x10000, CRC(0b93dc66) SHA1(f3b516a1d1e4abd7b0d56243949e9cd7ac79178b) )
+
+	ROM_REGION( 0x90000, "cvsdcpu", 0 )  /* Audio System board */
+	ROM_LOAD( "pigskin_sl1.u4",  0x10000, 0x10000, CRC(6daf2d37) SHA1(4c8098520fe44e36b01389bcfcfe3ad1d027cbde) )
+	ROM_RELOAD(                  0x20000, 0x10000 )
+	ROM_LOAD( "pigskin_sl1.u19", 0x30000, 0x10000, CRC(56fd16a3) SHA1(b91aabdbd3185355f2b7177fc4d3a86fa110f51d) )
+	ROM_RELOAD(                  0x40000, 0x10000 )
+	ROM_LOAD( "pigskin_sl1.u20", 0x50000, 0x10000, CRC(5d032fb8) SHA1(a236cdc64856637e560bec7119b051fac13efbe0) )
+	ROM_RELOAD(                  0x60000, 0x10000 )
+
+	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
+	ROM_LOAD( "pigskin_la1.e2",  0x00000, 0x10000, CRC(12d5737b) SHA1(73040233bb86eaa42257112e2f0540de1206e310) )
+	ROM_LOAD( "pigskin_la1.e1",  0x10000, 0x10000, CRC(460202a9) SHA1(8c2f7ae3615519e13e750c99b89ccb28e9946bb8) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "pigskin_la1.h15", 0x00000, 0x20000, CRC(e43d5d93) SHA1(e7592ba11601f2d20d54d52f436a239671c4d3ac) )
+	ROM_LOAD( "pigskin_la1.h17", 0x20000, 0x20000, CRC(6b780f1e) SHA1(a0689feb38ad31eff5604d80562d9a936b30a011) )
+	ROM_LOAD( "pigskin_la1.h18", 0x40000, 0x20000, CRC(5e50f940) SHA1(c9593b11934fd6da2b6c971859c0581fd92a915f) )
+	ROM_LOAD( "pigskin_la1.h14", 0x60000, 0x20000, CRC(f26279f4) SHA1(9a8cd5aa359f408c93aa7f322b6eac17be52f3d3) )
+ROM_END
+
+
 ROM_START( trisport )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "la3.a5",  0x00000, 0x10000, CRC(fe1e9e37) SHA1(583f18531583e038ca57a592b6a6c305896bf2c5) )
@@ -1654,3 +1681,4 @@ GAME( 1989, archrivl, 0,        archrivl, archrivl, archrivl, ROT0,   "Bally Mid
 GAME( 1989, archrivl2,archrivl, archrivl, archrivl, archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 2.0 5/03/89)", GAME_SUPPORTS_SAVE )
 GAME( 1989, trisport, 0,        trisport, trisport, trisport, ROT270, "Bally Midway", "Tri-Sports", GAME_SUPPORTS_SAVE )
 GAME( 1990, pigskin,  0,        pigskin,  pigskin,  pigskin,  ROT0,   "Midway", "Pigskin 621AD (rev 1.1K 8/01/90)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pigskina, pigskin,  pigskin,  pigskin,  pigskin,  ROT0,   "Midway", "Pigskin 621AD (rev 2.0 7/06/90)", GAME_SUPPORTS_SAVE )

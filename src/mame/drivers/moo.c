@@ -610,11 +610,11 @@ MACHINE_CONFIG_END
 
 
 
-ROM_START( moo ) /* Version EA - Euro Ver A */
+ROM_START( moomesa ) /* Version EA - Euro Ver A */
 	ROM_REGION( 0x180000, "maincpu", 0 )
 	/* main program */
-	ROM_LOAD16_BYTE( "151b01",    0x000000,  0x40000, CRC(fb2fa298) SHA1(f03b24681a2b329ba797fd2780ac9a3cf862ebcb) )
-	ROM_LOAD16_BYTE( "151b02.ea", 0x000001,  0x40000, CRC(37b30c01) SHA1(cb91739097a4a36f8f8d92998d822ffc851e1279) )
+	ROM_LOAD16_BYTE( "151_b01",    0x000000,  0x40000, CRC(fb2fa298) SHA1(f03b24681a2b329ba797fd2780ac9a3cf862ebcb) )
+	ROM_LOAD16_BYTE( "151_ea_b02", 0x000001,  0x40000, CRC(37b30c01) SHA1(cb91739097a4a36f8f8d92998d822ffc851e1279) )
 
 	/* data */
 	ROM_LOAD16_BYTE( "151a03", 0x100000,  0x40000, CRC(c896d3ea) SHA1(ea83c63e2c3dbc4f1e1d49f1852a78ffc1f0ea4b) )
@@ -645,11 +645,11 @@ ROM_START( moo ) /* Version EA - Euro Ver A */
 	ROM_LOAD( "moo.nv", 0x0000, 0x080, CRC(7bd904a8) SHA1(8747c5c62d1832e290be8ace73c61b1f228c0bec) )
 ROM_END
 
-ROM_START( mooua ) /* Version UA - USA Ver A */
+ROM_START( moomesau ) /* Version UA - USA Ver A */
 	ROM_REGION( 0x180000, "maincpu", 0 )
 	/* main program */
-	ROM_LOAD16_BYTE( "151b01",    0x000000,  0x40000, CRC(fb2fa298) SHA1(f03b24681a2b329ba797fd2780ac9a3cf862ebcb) )
-	ROM_LOAD16_BYTE( "151b02.ua", 0x000001,  0x40000, CRC(3d9f4d59) SHA1(db47044bd4935fce94ec659242c9819c30eb6d0f) )
+	ROM_LOAD16_BYTE( "151_c01",    0x000000,  0x40000, CRC(10555732) SHA1(b67cb756c250ddd6f3291683b3f3449e13a2ee83) ) /* Version UAC? */
+	ROM_LOAD16_BYTE( "151_ua_c02", 0x000001,  0x40000, CRC(52ae87b0) SHA1(552d41a2ddd040f92c6a3cfdc07f9d6e751ac9c1) )
 
 	/* data */
 	ROM_LOAD16_BYTE( "151a03", 0x100000,  0x40000, CRC(c896d3ea) SHA1(ea83c63e2c3dbc4f1e1d49f1852a78ffc1f0ea4b) )
@@ -680,11 +680,46 @@ ROM_START( mooua ) /* Version UA - USA Ver A */
 	ROM_LOAD( "moou.nv", 0x0000, 0x080, CRC(a5cb137a) SHA1(119df859d6b5c366481305b1433eea0deadc3fa9) )
 ROM_END
 
-ROM_START( mooaa ) /* Version AA - Asia Ver A */
+ROM_START( moomesaua ) /* Version UA - USA Ver A */
 	ROM_REGION( 0x180000, "maincpu", 0 )
 	/* main program */
-	ROM_LOAD16_BYTE( "151b01",    0x000000,  0x40000, CRC(fb2fa298) SHA1(f03b24681a2b329ba797fd2780ac9a3cf862ebcb) )
-	ROM_LOAD16_BYTE( "151b02.aa", 0x000001,  0x40000, CRC(2162d593) SHA1(a6cfe4a57b3f22b2aa0f04f91acefe3b7bea9e76) )
+	ROM_LOAD16_BYTE( "151_b01",    0x000000,  0x40000, CRC(fb2fa298) SHA1(f03b24681a2b329ba797fd2780ac9a3cf862ebcb) ) /* Version UAB? */
+	ROM_LOAD16_BYTE( "151_ua_b02", 0x000001,  0x40000, CRC(3d9f4d59) SHA1(db47044bd4935fce94ec659242c9819c30eb6d0f) )
+
+	/* data */
+	ROM_LOAD16_BYTE( "151a03", 0x100000,  0x40000, CRC(c896d3ea) SHA1(ea83c63e2c3dbc4f1e1d49f1852a78ffc1f0ea4b) )
+	ROM_LOAD16_BYTE( "151a04", 0x100001,  0x40000, CRC(3b24706a) SHA1(c2a77944284e35ff57f0774fa7b67e53d3b63e1f) )
+
+	ROM_REGION( 0x050000, "soundcpu", 0 )
+	/* Z80 sound program */
+	ROM_LOAD( "151a07", 0x000000, 0x040000, CRC(cde247fc) SHA1(cdee0228db55d53ae43d7cd2d9001dadd20c2c61) )
+	ROM_RELOAD(         0x010000, 0x040000 )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	/* tilemaps */
+	ROM_LOAD( "151a05", 0x000000, 0x100000, CRC(bc616249) SHA1(58c1f1a03ce9bead8f79d12ce4b2d342432b24b5) )
+	ROM_LOAD( "151a06", 0x100000, 0x100000, CRC(38dbcac1) SHA1(c357779733921695b20ac586db5b475f5b2b8f4c) )
+
+	ROM_REGION( 0x800000, "gfx2", 0 )
+	/* sprites */
+	ROM_LOAD( "151a10", 0x000000, 0x200000, CRC(376c64f1) SHA1(eb69c5a27f9795e28f04a503955132f0a9e4de12) )
+	ROM_LOAD( "151a11", 0x200000, 0x200000, CRC(e7f49225) SHA1(1255b214f29b6507540dad5892c60a7ae2aafc5c) )
+	ROM_LOAD( "151a12", 0x400000, 0x200000, CRC(4978555f) SHA1(d9871f21d0c8a512b408e137e2e80e9392c2bf6f) )
+	ROM_LOAD( "151a13", 0x600000, 0x200000, CRC(4771f525) SHA1(218d86b6230919b5db0304dac00513eb6b27ba9a) )
+
+	ROM_REGION( 0x200000, "k054539", 0 )
+	/* K054539 samples */
+	ROM_LOAD( "151a08", 0x000000, 0x200000, CRC(962251d7) SHA1(32dccf515d2ca8eeffb45cada3dcc60089991b77) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "moou.nv", 0x0000, 0x080, CRC(a5cb137a) SHA1(119df859d6b5c366481305b1433eea0deadc3fa9) )
+ROM_END
+
+ROM_START( moomesaa ) /* Version AA - Asia Ver A */
+	ROM_REGION( 0x180000, "maincpu", 0 )
+	/* main program */
+	ROM_LOAD16_BYTE( "151_b01",    0x000000,  0x40000, CRC(fb2fa298) SHA1(f03b24681a2b329ba797fd2780ac9a3cf862ebcb) )
+	ROM_LOAD16_BYTE( "151_ua_b02", 0x000001,  0x40000, CRC(2162d593) SHA1(a6cfe4a57b3f22b2aa0f04f91acefe3b7bea9e76) )
 
 	/* data */
 	ROM_LOAD16_BYTE( "151a03", 0x100000,  0x40000, CRC(c896d3ea) SHA1(ea83c63e2c3dbc4f1e1d49f1852a78ffc1f0ea4b) )
@@ -824,7 +859,7 @@ ROM_START( buckyaa )
 ROM_END
 
 
-ROM_START( moobl )
+ROM_START( moomesabl )
 	ROM_REGION( 0x180000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "moo03.rom", 0x000000, 0x80000, CRC(fed6a1cb) SHA1(be58e266973930d643b5e15dcc974a82e1a3ae35) )
 	ROM_LOAD16_WORD_SWAP( "moo04.rom", 0x100000, 0x80000, CRC(ec45892a) SHA1(594330cbbfbca87e61ddf519e565018b6eaf5a20) )
@@ -885,10 +920,11 @@ static DRIVER_INIT( moo )
 }
 
 
-GAME( 1992, moo,     0,       moo,     moo,     moo,      ROT0, "Konami", "Wild West C.O.W.-Boys of Moo Mesa (ver EA)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1992, mooua,   moo,     moo,     moo,     moo,      ROT0, "Konami", "Wild West C.O.W.-Boys of Moo Mesa (ver UA)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1992, mooaa,   moo,     moo,     moo,     moo,      ROT0, "Konami", "Wild West C.O.W.-Boys of Moo Mesa (ver AA)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1992, moobl,   moo,     moobl,   moo,     moo,      ROT0, "bootleg", "Wild West C.O.W.-Boys of Moo Mesa (bootleg ver AA)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1992, bucky,   0,       bucky,   bucky,   moo,      ROT0, "Konami", "Bucky O'Hare (ver EA)", GAME_SUPPORTS_SAVE )
-GAME( 1992, buckyua, bucky,   bucky,   bucky,   moo,      ROT0, "Konami", "Bucky O'Hare (ver UA)", GAME_SUPPORTS_SAVE )
-GAME( 1992, buckyaa, bucky,   bucky,   bucky,   moo,      ROT0, "Konami", "Bucky O'Hare (ver AA)", GAME_SUPPORTS_SAVE )
+GAME( 1992, moomesa,  0,       moo,     moo,     moo,      ROT0, "Konami", "Wild West C.O.W.-Boys of Moo Mesa (ver EA)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1992, moomesau, moomesa, moo,     moo,     moo,      ROT0, "Konami", "Wild West C.O.W.-Boys of Moo Mesa (ver UA, set 1)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1992, moomesaua,moomesa, moo,     moo,     moo,      ROT0, "Konami", "Wild West C.O.W.-Boys of Moo Mesa (ver UA, set 2)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1992, moomesaa, moomesa, moo,     moo,     moo,      ROT0, "Konami", "Wild West C.O.W.-Boys of Moo Mesa (ver AA)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1992, moomesabl,moomesa, moobl,   moo,     moo,      ROT0, "bootleg", "Wild West C.O.W.-Boys of Moo Mesa (bootleg ver AA)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1992, bucky,    0,       bucky,   bucky,   moo,      ROT0, "Konami", "Bucky O'Hare (ver EA)", GAME_SUPPORTS_SAVE )
+GAME( 1992, buckyua,  bucky,   bucky,   bucky,   moo,      ROT0, "Konami", "Bucky O'Hare (ver UA)", GAME_SUPPORTS_SAVE )
+GAME( 1992, buckyaa,  bucky,   bucky,   bucky,   moo,      ROT0, "Konami", "Bucky O'Hare (ver AA)", GAME_SUPPORTS_SAVE )

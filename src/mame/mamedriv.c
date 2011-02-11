@@ -1494,6 +1494,7 @@ const game_driver * const drivers[] =
 	DRIVER( archrivl2 )	/* (c) 1989 */
 	DRIVER( trisport )	/* (c) 1989 */
 	DRIVER( pigskin )	/* (c) 1990 */
+	DRIVER( pigskina )	/* (c) 1990 */
 
 	/* Bally / Sente games */
 	DRIVER( sentetst )
@@ -5752,10 +5753,11 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( prmrsocr )	/* GX101 (c) 1993 (Europe) */
 	DRIVER( prmrsocrj )	/* GX101 (c) 1993 (Japan) */
 	DRIVER( qgakumon )	/* GX248 (c) 1993 (Japan) */
-	DRIVER( moo )		/* GX151 (c) 1992 (World) */
-	DRIVER( mooua )		/* GX151 (c) 1992 (US) */
-	DRIVER( mooaa )		/* GX151 (c) 1992 (US) */
-	DRIVER( moobl )		/* bootleg */
+	DRIVER( moomesa )	/* GX151 (c) 1992 (World) */
+	DRIVER( moomesau )	/* GX151 (c) 1992 (US) */
+	DRIVER( moomesaua )	/* GX151 (c) 1992 (US) */
+	DRIVER( moomesaa )	/* GX151 (c) 1992 (Asia) */
+	DRIVER( moomesabl )	/* bootleg */
 	DRIVER( bucky )		/* GX173 (c) 1992 (World) */
 	DRIVER( buckyua )	/* GX173 (c) 1992 (US) */
 	DRIVER( buckyaa )	/* GX173 (c) 1992 (Asia) */
