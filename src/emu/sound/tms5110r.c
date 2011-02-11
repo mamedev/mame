@@ -24,11 +24,12 @@
  * (remember, 1 is the FIRST entry!)
  *
  * Instead,  { 1, 8, 8, 8, 4, 4, 4, 2 }
- * will calculate those coefficients and this has been used below.
- * LN:
- * The real chip uses shifters and not true division to achieve those factors,
- * so they have been replaced by the shifting coefficients:
- * { 0, 3, 3, 3, 2, 2, 2, 1 }
+ * will calculate those coefficients.
+ * Howeever, after simulating the actual circuit from the patent in pspice,
+ * the { 1, 8, 8, 8, 4, 4, 2, 2 } pattern is revealed as the correct one.
+ * Since the real chip uses shifters and not true division to achieve those
+ * factors, they have been replaced by the shifting coefficients:
+ * { 0, 3, 3, 3, 2, 2, 1, 1 }
  */
 
  /* quick note on derivative analysis:
@@ -124,7 +125,7 @@ static const struct tms5100_coeffs pat4209836_coeff =
 	    1,  0,    0,  0,   0,  0,  0,  0,
 	    0,  0,    0,  0 },
 	/* interpolation coefficients */
-	{ 3, 3, 3, 2, 2, 2, 1, 0 }
+	{ 3, 3, 3, 2, 2, 1, 1, 0 }
 };
 
 /* The following CD2802 coefficients come from US Patents 4,403,965 and 4,946,391; They have not yet been verified using derivatives. The M58817 seems to work best with these coefficients, so its possible the engineers of that chip copied them from the TI patents.
@@ -188,7 +189,7 @@ static const struct tms5100_coeffs pat4403965_coeff =
 	    1,  0,    0,  0,  0,  0,  0,  0,
 	    0,  0,    0,  0 },
 	/* interpolation coefficients */
-	{ 3, 3, 3, 2, 2, 2, 1, 0 }
+	{ 3, 3, 3, 2, 2, 1, 1, 0 }
 };
 
 /* The following TMS5110A LPC coefficients were directly read from an actual TMS5110A chip by Jarek Burczynski using the PROMOUT pin, and can be regarded as established fact. However, the chirp table and the interpolation coefficients still come from the patents as there doesn't seem to be an easy way to read those out from the chip without decapping it.
@@ -251,7 +252,7 @@ static const struct tms5100_coeffs tms5110a_coeff =
 	    1,  0,    0,  0,   0,  0,  0,  0,
 	    0,  0,    0,  0 },
 	/* interpolation coefficients */
-	{ 3, 3, 3, 2, 2, 2, 1, 0 }
+	{ 3, 3, 3, 2, 2, 1, 1, 0 }
 };
 
 /* The following coefficients come from US Patent 4,335,277 and 4,581,757. However, the K10 row of coefficients are entirely missing from both of those patents.
@@ -320,7 +321,7 @@ static const struct tms5100_coeffs pat4335277_coeff =
 	    1,  0,    0,  0,   0,  0,  0,  0,
 	    0,  0,    0,  0 },
 	/* interpolation coefficients */
-	{ 3, 3, 3, 2, 2, 2, 1, 0 }
+	{ 3, 3, 3, 2, 2, 1, 1, 0 }
 };
 
 /* The following TMS5200/TMC0285 coefficients were directly read from an actual TMS5200 chip by Lord Nightmare using the PROMOUT pin, and can be regarded as established fact. However, the chirp table and the interpolation coefficients still come from the patents as there doesn't seem to be an easy way to read those out from the chip without decapping it.
@@ -388,7 +389,7 @@ static const struct tms5100_coeffs tms5200_coeff =
 	    1,  0,    0,  0,   0,  0,  0,  0,
 	    0,  0,    0,  0 },
 	/* interpolation coefficients */
-	{ 0, 3, 3, 3, 2, 2, 2, 1 }
+	{ 0, 3, 3, 3, 2, 2, 1, 1 }
 };
 
 /* The following TMS5220 coefficients were directly read from an actual TMS5220 chip by Lord Nightmare using the PROMOUT pin, and can be regarded as established fact. However, the chirp table and the interpolation coefficients still come from the patents as there doesn't seem to be an easy way to read those out from the chip without decapping it.
@@ -457,7 +458,7 @@ static const struct tms5100_coeffs tms5220_coeff =
 	    1,  0,    0,  0,   0,  0,  0,  0,
 	    0,  0,    0,  0 },
 	/* interpolation coefficients */
-	{ 0, 3, 3, 3, 2, 2, 2, 1 }
+	{ 0, 3, 3, 3, 2, 2, 1, 1 }
 };
 
 /* The following TMS5220C coefficients come from the tables in QBOXPRO, a program written at least in part by George "Larry" Brantingham of Quadravox, formerly of Texas Instruments, who had laid out the silicon for the TMS5100/TMC0280/CD2801. It is the same as the TMS5220 but has a change in the energy table (is this actually correct? or is this one correct for both 5220s? or is this the wrong table and the TMS5220 one correct for both?)
@@ -530,5 +531,5 @@ static const struct tms5100_coeffs tms5220c_coeff =
 	    1,  0,    0,  0,   0,  0,  0,  0,
 	    0,  0,    0,  0 },
 	/* interpolation coefficients */
-	{ 0, 3, 3, 3, 2, 2, 2, 1 }
+	{ 0, 3, 3, 3, 2, 2, 1, 1 }
 };
