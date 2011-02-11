@@ -89,6 +89,7 @@ INLINE m6502_Regs *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == M6502 ||
+		   device->type() == M6504 ||
 		   device->type() == M6510 ||
 		   device->type() == M6510T ||
 		   device->type() == M7501 ||
