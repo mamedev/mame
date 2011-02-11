@@ -135,28 +135,29 @@ EMUDRIVEROBJS = \
 
 EMUMACHINEOBJS = \
 	$(EMUMACHINE)/53c810.o \
-	$(EMUMACHINE)/6532riot.o \
 	$(EMUMACHINE)/6522via.o \
 	$(EMUMACHINE)/6526cia.o \
+	$(EMUMACHINE)/6532riot.o \
 	$(EMUMACHINE)/6821pia.o \
 	$(EMUMACHINE)/6840ptm.o \
 	$(EMUMACHINE)/6850acia.o \
 	$(EMUMACHINE)/68681.o \
-	$(EMUMACHINE)/7474.o \
 	$(EMUMACHINE)/74123.o \
 	$(EMUMACHINE)/74148.o \
 	$(EMUMACHINE)/74153.o \
 	$(EMUMACHINE)/74181.o \
+	$(EMUMACHINE)/7474.o \
 	$(EMUMACHINE)/8042kbdc.o \
 	$(EMUMACHINE)/8237dma.o \
-	$(EMUMACHINE)/8257dma.o \
 	$(EMUMACHINE)/8255ppi.o \
+	$(EMUMACHINE)/8257dma.o \
 	$(EMUMACHINE)/adc083x.o \
 	$(EMUMACHINE)/adc1038.o \
 	$(EMUMACHINE)/adc1213x.o \
 	$(EMUMACHINE)/am53cf96.o \
 	$(EMUMACHINE)/at28c16.o \
 	$(EMUMACHINE)/cdp1852.o \
+	$(EMUMACHINE)/cr589.o \
 	$(EMUMACHINE)/ds1302.o \
 	$(EMUMACHINE)/ds2401.o \
 	$(EMUMACHINE)/ds2404.o \
@@ -164,9 +165,9 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/er2055.o \
 	$(EMUMACHINE)/f3853.o \
 	$(EMUMACHINE)/generic.o \
+	$(EMUMACHINE)/i2cmem.o \
 	$(EMUMACHINE)/i8243.o \
 	$(EMUMACHINE)/i8255a.o \
-	$(EMUMACHINE)/i2cmem.o \
 	$(EMUMACHINE)/idectrl.o \
 	$(EMUMACHINE)/ins8154.o	\
 	$(EMUMACHINE)/ins8250.o \
@@ -188,9 +189,9 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/nvram.o \
 	$(EMUMACHINE)/pc16552d.o \
 	$(EMUMACHINE)/pci.o \
+	$(EMUMACHINE)/pd4990a.o \
 	$(EMUMACHINE)/pic8259.o \
 	$(EMUMACHINE)/pit8253.o \
-	$(EMUMACHINE)/pd4990a.o \
 	$(EMUMACHINE)/ram.o \
 	$(EMUMACHINE)/roc10937.o \
 	$(EMUMACHINE)/rp5h01.o \
@@ -202,7 +203,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/scsicd.o \
 	$(EMUMACHINE)/scsidev.o \
 	$(EMUMACHINE)/scsihd.o \
-	$(EMUMACHINE)/cr589.o \
+	$(EMUMACHINE)/secflash.o \
 	$(EMUMACHINE)/smc91c9x.o \
 	$(EMUMACHINE)/timekpr.o \
 	$(EMUMACHINE)/tmp68301.o \

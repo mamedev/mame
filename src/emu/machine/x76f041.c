@@ -14,246 +14,167 @@
 #include "emu.h"
 #include "machine/x76f041.h"
 
-#define VERBOSE_LEVEL ( 0 )
+#define VERBOSE_LEVEL 0
 
-INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, const char *s_fmt, ... )
+inline void ATTR_PRINTF(3,4) x76f041_device::verboselog(int n_level, const char *s_fmt, ...)
 {
-	if( VERBOSE_LEVEL >= n_level )
+	if(VERBOSE_LEVEL >= n_level)
 	{
 		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		logerror( "%s: %s", machine->describe_context(), buf );
+		char buf[32768];
+		va_start(v, s_fmt);
+		vsprintf(buf, s_fmt, v);
+		va_end(v);
+		logerror("x76f041 %s %s: %s", config.tag(), machine->describe_context(), buf);
 	}
 }
 
-#define SIZE_WRITE_BUFFER ( 8 )
+const device_type X76F041 = x76f041_device_config::static_alloc_device_config;
 
-struct x76f041_chip
+x76f041_device_config::x76f041_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_secure_serial_flash_config(mconfig, static_alloc_device_config, "X76F041", tag, owner, clock)
 {
-	int cs;
-	int rst;
-	int scl;
-	int sdaw;
-	int sdar;
-	int state;
-	int shift;
-	int bit;
-	int byte;
-	int command;
-	int address;
-	UINT8 write_buffer[ SIZE_WRITE_BUFFER ];
-	UINT8 *response_to_reset;
-	UINT8 *write_password;
-	UINT8 *read_password;
-	UINT8 *configuration_password;
-	UINT8 *configuration_registers;
-	UINT8 *data;
-};
-
-#define SIZE_RESPONSE_TO_RESET ( 4 )
-#define SIZE_WRITE_PASSWORD ( SIZE_WRITE_BUFFER )
-#define SIZE_READ_PASSWORD ( SIZE_WRITE_BUFFER )
-#define SIZE_CONFIGURATION_PASSWORD ( SIZE_WRITE_BUFFER )
-#define SIZE_CONFIGURATION_REGISTERS ( SIZE_WRITE_BUFFER )
-#define SIZE_DATA ( 512 )
-
-#define CONFIG_BCR1 ( 0 )
-#define CONFIG_BCR2 ( 1 )
-#define CONFIG_CR ( 2 )
-#define CONFIG_RR ( 3 )
-#define CONFIG_RC ( 4 )
-
-#define BCR_X ( 8 )
-#define BCR_Y ( 4 )
-#define BCR_Z ( 2 )
-#define BCR_T ( 1 )
-
-static struct x76f041_chip x76f041[ X76F041_MAXCHIP ];
-
-#define COMMAND_WRITE ( 0x00 )
-#define COMMAND_READ ( 0x20 )
-#define COMMAND_WRITE_USE_CONFIGURATION_PASSWORD ( 0x40 )
-#define COMMAND_READ_USE_CONFIGURATION_PASSWORD ( 0x60 )
-#define COMMAND_CONFIGURATION ( 0x80 )
-
-#define CONFIGURATION_PROGRAM_WRITE_PASSWORD ( 0x00 )
-#define CONFIGURATION_PROGRAM_READ_PASSWORD ( 0x10 )
-#define CONFIGURATION_PROGRAM_CONFIGURATION_PASSWORD ( 0x20 )
-#define CONFIGURATION_RESET_WRITE_PASSWORD ( 0x30 )
-#define CONFIGURATION_RESET_READ_PASSWORD ( 0x40 )
-#define CONFIGURATION_PROGRAM_CONFIGURATION_REGISTERS ( 0x50 )
-#define CONFIGURATION_READ_CONFIGURATION_REGISTERS ( 0x60 )
-#define CONFIGURATION_MASS_PROGRAM ( 0x70 )
-#define CONFIGURATION_MASS_ERASE ( 0x80 )
-
-#define STATE_STOP ( 0 )
-#define STATE_RESPONSE_TO_RESET ( 1 )
-#define STATE_LOAD_COMMAND ( 2 )
-#define STATE_LOAD_ADDRESS ( 3 )
-#define STATE_LOAD_PASSWORD ( 4 )
-#define STATE_VERIFY_PASSWORD ( 5 )
-#define STATE_READ_DATA ( 6 )
-#define STATE_WRITE_DATA ( 7 )
-#define STATE_READ_CONFIGURATION_REGISTERS ( 8 )
-#define STATE_WRITE_CONFIGURATION_REGISTERS ( 9 )
-
-void x76f041_init( running_machine *machine, int chip, UINT8 *data )
-{
-	int offset;
-	struct x76f041_chip *c;
-
-	if( chip >= X76F041_MAXCHIP )
-	{
-		verboselog( machine, 0, "x76f041_init( %d ) chip out of range\n", chip );
-		return;
-	}
-
-	c = &x76f041[ chip ];
-
-	if( data == NULL )
-	{
-		data = auto_alloc_array( machine, UINT8,
-			SIZE_RESPONSE_TO_RESET +
-			SIZE_READ_PASSWORD +
-			SIZE_WRITE_PASSWORD +
-			SIZE_CONFIGURATION_PASSWORD +
-			SIZE_CONFIGURATION_REGISTERS +
-			SIZE_DATA );
-	}
-
-	c->cs = 0;
-	c->rst = 0;
-	c->scl = 0;
-	c->sdaw = 0;
-	c->sdar = 0;
-	c->state = STATE_STOP;
-	c->shift = 0;
-	c->bit = 0;
-	c->byte = 0;
-	c->command = 0;
-	c->address = 0;
-	memset( c->write_buffer, 0, SIZE_WRITE_BUFFER );
-
-	offset = 0;
-	c->response_to_reset = &data[ offset ]; offset += SIZE_RESPONSE_TO_RESET;
-	c->write_password = &data[ offset ]; offset += SIZE_WRITE_PASSWORD;
-	c->read_password = &data[ offset ]; offset += SIZE_READ_PASSWORD;
-	c->configuration_password = &data[ offset ]; offset += SIZE_CONFIGURATION_PASSWORD;
-	c->configuration_registers = &data[ offset ]; offset += SIZE_CONFIGURATION_REGISTERS;
-	c->data = &data[ offset ]; offset += SIZE_DATA;
-
-	state_save_register_item( machine, "x76f041", NULL, chip, c->cs );
-	state_save_register_item( machine, "x76f041", NULL, chip, c->rst );
-	state_save_register_item( machine, "x76f041", NULL, chip, c->scl );
-	state_save_register_item( machine, "x76f041", NULL, chip, c->sdaw );
-	state_save_register_item( machine, "x76f041", NULL, chip, c->sdar );
-	state_save_register_item( machine, "x76f041", NULL, chip, c->state );
-	state_save_register_item( machine, "x76f041", NULL, chip, c->shift );
-	state_save_register_item( machine, "x76f041", NULL, chip, c->bit );
-	state_save_register_item( machine, "x76f041", NULL, chip, c->byte );
-	state_save_register_item( machine, "x76f041", NULL, chip, c->command );
-	state_save_register_item( machine, "x76f041", NULL, chip, c->address );
-	state_save_register_item_array( machine, "x76f041", NULL, chip, c->write_buffer );
-	state_save_register_item_pointer( machine, "x76f041", NULL, chip, c->response_to_reset, SIZE_RESPONSE_TO_RESET );
-	state_save_register_item_pointer( machine, "x76f041", NULL, chip, c->write_password, SIZE_WRITE_PASSWORD );
-	state_save_register_item_pointer( machine, "x76f041", NULL, chip, c->read_password, SIZE_READ_PASSWORD );
-	state_save_register_item_pointer( machine, "x76f041", NULL, chip, c->configuration_password, SIZE_CONFIGURATION_PASSWORD );
-	state_save_register_item_pointer( machine, "x76f041", NULL, chip, c->configuration_registers, SIZE_CONFIGURATION_REGISTERS );
-	state_save_register_item_pointer( machine, "x76f041", NULL, chip, c->data, SIZE_DATA );
 }
 
-void x76f041_cs_write( running_machine *machine, int chip, int cs )
+device_config *x76f041_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
-	struct x76f041_chip *c;
-
-	if( chip >= X76F041_MAXCHIP )
-	{
-		verboselog( machine, 0, "x76f041_cs_write( %d ) chip out of range\n", chip );
-		return;
-	}
-
-	c = &x76f041[ chip ];
-
-	if( c->cs != cs )
-	{
-		verboselog( machine, 2, "x76f041(%d) cs=%d\n", chip, cs );
-	}
-	if( c->cs != 0 && cs == 0 )
-	{
-		/* enable chip */
-		c->state = STATE_STOP;
-	}
-	if( c->cs == 0 && cs != 0 )
-	{
-		/* disable chip */
-		c->state = STATE_STOP;
-		/* high impendence? */
-		c->sdar = 0;
-	}
-	c->cs = cs;
+	return global_alloc(x76f041_device_config(mconfig, tag, owner, clock));
 }
 
-void x76f041_rst_write( running_machine *machine, int chip, int rst )
+device_t *x76f041_device_config::alloc_device(running_machine &machine) const
 {
-	struct x76f041_chip *c;
-
-	if( chip >= X76F041_MAXCHIP )
-	{
-		verboselog( machine, 0, "x76f041_rst_write( %d ) chip out of range\n", chip );
-		return;
-	}
-
-	c = &x76f041[ chip ];
-
-	if( c->rst != rst )
-	{
-		verboselog( machine, 2, "x76f041(%d) rst=%d\n", chip, rst );
-	}
-	if( c->rst == 0 && rst != 0 && c->cs == 0 )
-	{
-		verboselog( machine, 1, "x76f041(%d) goto response to reset\n", chip );
-		c->state = STATE_RESPONSE_TO_RESET;
-		c->bit = 0;
-		c->byte = 0;
-	}
-	c->rst = rst;
+	return auto_alloc(&machine, x76f041_device(machine, *this));
 }
 
-static UINT8 *x76f041_password( struct x76f041_chip *c )
+x76f041_device::x76f041_device(running_machine &_machine, const x76f041_device_config &_config)
+	: device_secure_serial_flash(_machine, _config),
+	  config(_config)
 {
-	switch( c->command & 0xe0 )
+}
+
+void x76f041_device::device_start()
+{
+	device_secure_serial_flash::device_start();
+	save_item(NAME(state));
+	save_item(NAME(shift));
+	save_item(NAME(bit));
+	save_item(NAME(byte));
+	save_item(NAME(command));
+	save_item(NAME(address));
+	save_item(NAME(write_buffer));
+	save_item(NAME(response_to_reset));
+	save_item(NAME(write_password));
+	save_item(NAME(read_password));
+	save_item(NAME(configuration_password));
+	save_item(NAME(configuration_registers));
+	save_item(NAME(data));
+}
+
+void x76f041_device::device_reset()
+{
+	device_secure_serial_flash::device_reset();
+	state = STATE_STOP;
+	shift = 0;
+	bit = 0;
+	byte = 0;
+	command = 0;
+	address = 0;
+	memset(write_buffer, 0, SIZE_WRITE_BUFFER);
+}
+
+void x76f041_device::nvram_default()
+{
+	// region always wins
+	if(m_region)
 	{
+		// Ensure the size is correct though
+		if(m_region->bytes() != SIZE_RESPONSE_TO_RESET+SIZE_WRITE_PASSWORD+
+		   SIZE_READ_PASSWORD+SIZE_CONFIGURATION_PASSWORD+SIZE_CONFIGURATION_REGISTERS+SIZE_DATA)
+			logerror("X76F041: Wrong region length for initialization data, expected 0x%x, got 0x%x\n",
+					 SIZE_RESPONSE_TO_RESET+SIZE_WRITE_PASSWORD+
+					 SIZE_READ_PASSWORD+SIZE_CONFIGURATION_PASSWORD+SIZE_CONFIGURATION_REGISTERS+SIZE_DATA,
+					 m_region->bytes());
+		else {
+			UINT8 *rb = m_region->base();
+			int offset = 0;
+			memcpy(response_to_reset,       rb + offset, SIZE_RESPONSE_TO_RESET); offset += SIZE_RESPONSE_TO_RESET;
+			memcpy(write_password,          rb + offset, SIZE_WRITE_PASSWORD); offset += SIZE_WRITE_PASSWORD;
+			memcpy(read_password,           rb + offset, SIZE_READ_PASSWORD); offset += SIZE_READ_PASSWORD;
+			memcpy(configuration_password,  rb + offset, SIZE_CONFIGURATION_PASSWORD); offset += SIZE_CONFIGURATION_PASSWORD;
+			memcpy(configuration_registers, rb + offset, SIZE_CONFIGURATION_REGISTERS); offset += SIZE_CONFIGURATION_REGISTERS;
+			memcpy(data,                    rb + offset, SIZE_DATA); offset += SIZE_DATA;
+			return;
+		}
+	}
+
+	// That chip isn't really usable without the passwords, so bitch
+	// if there's no region
+	logerror("X76F041: Warning, no default data provided, chip is unusable.\n");
+	memset(response_to_reset,       0, SIZE_RESPONSE_TO_RESET);
+	memset(write_password,          0, SIZE_WRITE_PASSWORD);
+	memset(read_password,           0, SIZE_READ_PASSWORD);
+	memset(configuration_password,  0, SIZE_CONFIGURATION_PASSWORD);
+	memset(configuration_registers, 0, SIZE_CONFIGURATION_REGISTERS);
+	memset(data,                    0, SIZE_DATA);
+}
+
+void x76f041_device::cs_0()
+{
+	/* enable chip */
+	state = STATE_STOP;
+}
+
+void x76f041_device::cs_1()
+{
+	/* disable chip */
+	state = STATE_STOP;
+	/* high impendence? */
+	sdar = false;
+}
+
+void x76f041_device::rst_0()
+{
+}
+
+void x76f041_device::rst_1()
+{
+	if(!cs) {
+		verboselog(1, "goto response to reset\n");
+		state = STATE_RESPONSE_TO_RESET;
+		bit = 0;
+		byte = 0;
+	}
+}
+
+UINT8 *x76f041_device::password()
+{
+	switch(command & 0xe0) {
 	case COMMAND_WRITE:
-		return c->write_password;
+		return write_password;
 	case COMMAND_READ:
-		return c->read_password;
+		return read_password;
 	default:
-		return c->configuration_password;
+		return configuration_password;
 	}
 }
 
-static void x76f041_password_ok( struct x76f041_chip *c )
+void x76f041_device::password_ok()
 {
-	switch( c->command & 0xe0 )
-	{
+	switch(command & 0xe0) {
 	case COMMAND_WRITE:
-		c->state = STATE_WRITE_DATA;
+		state = STATE_WRITE_DATA;
 		break;
 	case COMMAND_READ:
-		c->state = STATE_READ_DATA;
+		state = STATE_READ_DATA;
 		break;
 	case COMMAND_WRITE_USE_CONFIGURATION_PASSWORD:
-		c->state = STATE_WRITE_DATA;
+		state = STATE_WRITE_DATA;
 		break;
 	case COMMAND_READ_USE_CONFIGURATION_PASSWORD:
-		c->state = STATE_READ_DATA;
+		state = STATE_READ_DATA;
 		break;
 	case COMMAND_CONFIGURATION:
-		switch( c->address )
-		{
+		switch( address ) {
 		case CONFIGURATION_PROGRAM_WRITE_PASSWORD:
 			break;
 		case CONFIGURATION_PROGRAM_READ_PASSWORD:
@@ -265,12 +186,12 @@ static void x76f041_password_ok( struct x76f041_chip *c )
 		case CONFIGURATION_RESET_READ_PASSWORD:
 			break;
 		case CONFIGURATION_PROGRAM_CONFIGURATION_REGISTERS:
-			c->state = STATE_WRITE_CONFIGURATION_REGISTERS;
-			c->byte = 0;
+			state = STATE_WRITE_CONFIGURATION_REGISTERS;
+			byte = 0;
 			break;
 		case CONFIGURATION_READ_CONFIGURATION_REGISTERS:
-			c->state = STATE_READ_CONFIGURATION_REGISTERS;
-			c->byte = 0;
+			state = STATE_READ_CONFIGURATION_REGISTERS;
+			byte = 0;
 			break;
 		case CONFIGURATION_MASS_PROGRAM:
 			break;
@@ -282,98 +203,77 @@ static void x76f041_password_ok( struct x76f041_chip *c )
 	}
 }
 
-static void x76f041_load_address( running_machine *machine, int chip )
+void x76f041_device::load_address()
 {
 	/* todo: handle other bcr bits */
-	struct x76f041_chip *c = &x76f041[ chip ];
 	int bcr;
 
-	c->address = c->shift;
+	address = shift;
 
-	verboselog( machine, 1, "x76f041(%d) -> address: %02x\n", chip, c->address );
+	verboselog(1, "-> address: %02x\n", address);
 
-	if( ( c->command & 1 ) == 0 )
-	{
-		bcr = c->configuration_registers[ CONFIG_BCR1 ];
-	}
+	if(!(command & 1 ))
+		bcr = configuration_registers[CONFIG_BCR1];
 	else
-	{
-		bcr = c->configuration_registers[ CONFIG_BCR2 ];
-	}
-	if( ( c->address & 0x80 ) != 0 )
-	{
+		bcr = configuration_registers[CONFIG_BCR2];
+
+	if(address & 0x80)
 		bcr >>= 4;
-	}
 
-	if( ( ( c->command & 0xe0 ) == COMMAND_READ && ( bcr & BCR_Z ) != 0 && ( bcr & BCR_T ) != 0 ) ||
-		( ( c->command & 0xe0 ) == COMMAND_WRITE && ( bcr & BCR_Z ) != 0 ) )
-	{
+	if(((command & 0xe0) == COMMAND_READ && (bcr & BCR_Z) && (bcr & BCR_T)) ||
+	   ((command & 0xe0) == COMMAND_WRITE && (bcr & BCR_Z))) {
 		/* todo: find out when this is really checked. */
-		verboselog( machine, 1, "x76f041(%d) command not allowed\n", chip );
-		c->state = STATE_STOP;
-		c->sdar = 0;
-	}
-	else if( ( ( c->command & 0xe0 ) == COMMAND_WRITE && ( bcr & BCR_X ) == 0 ) ||
-		( ( c->command & 0xe0 ) == COMMAND_READ && ( bcr & BCR_Y ) == 0 ) )
-	{
-		verboselog( machine, 1, "x76f041(%d) password not required\n", chip );
-		x76f041_password_ok( c );
-	}
-	else
-	{
-		verboselog( machine, 1, "x76f041(%d) send password\n", chip );
-		c->state = STATE_LOAD_PASSWORD;
-		c->byte = 0;
+		verboselog(1, "command not allowed\n");
+		state = STATE_STOP;
+		sdar = false;
+
+	} else if(((command & 0xe0) == COMMAND_WRITE && !(bcr & BCR_X)) ||
+			  ((command & 0xe0) == COMMAND_READ && !(bcr & BCR_Y))) {
+		verboselog(1, "password not required\n");
+		password_ok();
+
+	} else {
+		verboselog(1, "send password\n");
+		state = STATE_LOAD_PASSWORD;
+		byte = 0;
 	}
 }
 
-static int x76f041_data_offset( struct x76f041_chip *c )
+int x76f041_device::data_offset()
 {
-	int block_offset = ( ( c->command & 1 ) << 8 ) + c->address;
+	int block_offset = ((command & 1) << 8) + address;
 
 	// TODO: confirm block_start doesn't wrap.
 
-	return ( block_offset & 0x180 ) | ( ( block_offset + c->byte ) & 0x7f );
+	return (block_offset & 0x180) | ((block_offset + byte) & 0x7f);
 }
 
-void x76f041_scl_write( running_machine *machine, int chip, int scl )
+void x76f041_device::scl_0()
 {
-	struct x76f041_chip *c;
-
-	if( chip >= X76F041_MAXCHIP )
-	{
-		verboselog( machine, 0, "x76f041_scl_write( %d ) chip out of range\n", chip );
-		return;
+	if(!cs) {
+		switch(state) {
+		case STATE_RESPONSE_TO_RESET:
+			sdar = (response_to_reset[byte] >> bit) & 1;
+			verboselog(2, "in response to reset %d (%d/%d)\n", sdar, byte, bit);
+			bit++;
+			if(bit == 8) {
+				bit = 0;
+				byte++;
+				if( byte == 4 )
+					byte = 0;
+			}
+			break;
+		}
 	}
+}
 
-	c = &x76f041[ chip ];
-
-	if( c->scl != scl )
-	{
-		verboselog( machine, 2, "x76f041(%d) scl=%d\n", chip, scl );
-	}
-	if( c->cs == 0 )
-	{
-		switch( c->state )
-		{
+void x76f041_device::scl_1()
+{
+	if(!cs) {
+		switch(state) {
 		case STATE_STOP:
 			break;
 		case STATE_RESPONSE_TO_RESET:
-			if( c->scl != 0 && scl == 0 )
-			{
-				c->sdar = ( c->response_to_reset[ c->byte ] >> c->bit ) & 1;
-				verboselog( machine, 2, "x76f041(%d) in response to reset %d (%d/%d)\n", chip, c->sdar, c->byte, c->bit );
-				c->bit++;
-				if( c->bit == 8 )
-				{
-					c->bit = 0;
-					c->byte++;
-					if( c->byte == 4 )
-					{
-						c->byte = 0;
-					}
-				}
-			}
 			break;
 		case STATE_LOAD_COMMAND:
 		case STATE_LOAD_ADDRESS:
@@ -381,236 +281,151 @@ void x76f041_scl_write( running_machine *machine, int chip, int scl )
 		case STATE_VERIFY_PASSWORD:
 		case STATE_WRITE_DATA:
 		case STATE_WRITE_CONFIGURATION_REGISTERS:
-			if( c->scl == 0 && scl != 0 )
-			{
-				if( c->bit < 8 )
-				{
-					verboselog( machine, 2, "x76f041(%d) clock\n", chip );
-					c->shift <<= 1;
-					if( c->sdaw != 0 )
-					{
-						c->shift |= 1;
+			if(bit < 8) {
+				verboselog(2, "clock\n");
+				shift <<= 1;
+				if(sdaw)
+					shift |= 1;
+				bit++;
+			} else {
+				sdar = false;
+
+				switch(state) {
+				case STATE_LOAD_COMMAND:
+					command = shift;
+					verboselog(1, "-> command: %02x\n", command);
+					/* todo: verify command is valid? */
+					state = STATE_LOAD_ADDRESS;
+					break;
+				case STATE_LOAD_ADDRESS:
+					load_address();
+					break;
+				case STATE_LOAD_PASSWORD:
+					verboselog(1, "-> password: %02x\n", shift );
+					write_buffer[byte++] = shift;
+					if(byte == SIZE_WRITE_BUFFER)
+						state = STATE_VERIFY_PASSWORD;
+					break;
+				case STATE_VERIFY_PASSWORD:
+					verboselog(1, "-> verify password: %02x\n", shift);
+					/* todo: this should probably be handled as a command */
+					if(shift == 0xc0) {
+						/* todo: this should take 10ms before it returns ok. */
+						if(!memcmp(password(), write_buffer, SIZE_WRITE_BUFFER))
+							password_ok();
+						else
+							sdar = true;
 					}
-					c->bit++;
-				}
-				else
-				{
-					c->sdar = 0;
-
-					switch( c->state )
-					{
-					case STATE_LOAD_COMMAND:
-						c->command = c->shift;
-						verboselog( machine, 1, "x76f041(%d) -> command: %02x\n", chip, c->command );
-						/* todo: verify command is valid? */
-						c->state = STATE_LOAD_ADDRESS;
-						break;
-					case STATE_LOAD_ADDRESS:
-						x76f041_load_address( machine, chip );
-						break;
-					case STATE_LOAD_PASSWORD:
-						verboselog( machine, 1, "x76f041(%d) -> password: %02x\n", chip, c->shift );
-						c->write_buffer[ c->byte++ ] = c->shift;
-						if( c->byte == SIZE_WRITE_BUFFER )
-						{
-							c->state = STATE_VERIFY_PASSWORD;
-						}
-						break;
-					case STATE_VERIFY_PASSWORD:
-						verboselog( machine, 1, "x76f041(%d) -> verify password: %02x\n", chip, c->shift );
-						/* todo: this should probably be handled as a command */
-						if( c->shift == 0xc0 )
-						{
-							/* todo: this should take 10ms before it returns ok. */
-							if( memcmp( x76f041_password( c ), c->write_buffer, SIZE_WRITE_BUFFER ) == 0 )
-							{
-								x76f041_password_ok( c );
-							}
-							else
-							{
-								c->sdar = 1;
-							}
-						}
-						break;
-					case STATE_WRITE_DATA:
-						verboselog( machine, 1, "x76f041(%d) -> data: %02x\n", chip, c->shift );
-						c->write_buffer[ c->byte++ ] = c->shift;
-						if( c->byte == SIZE_WRITE_BUFFER )
-						{
-							for( c->byte = 0; c->byte < SIZE_WRITE_BUFFER; c->byte++ )
-							{
-								c->data[ x76f041_data_offset( c ) ] = c->write_buffer[ c->byte ];
-							}
-							c->byte = 0;
-
-							verboselog( machine, 1, "x76f041(%d) data flushed\n", chip );
-						}
-						break;
-					case STATE_WRITE_CONFIGURATION_REGISTERS:
-						verboselog( machine, 1, "x76f041(%d) -> configuration register: %02x\n", chip, c->shift );
-						/* todo: write after all bytes received? */
-						c->configuration_registers[ c->byte++ ] = c->shift;
-						if( c->byte == SIZE_CONFIGURATION_REGISTERS )
-						{
-							c->byte = 0;
-						}
-						break;
+					break;
+				case STATE_WRITE_DATA:
+					verboselog(1, "-> data: %02x\n", shift);
+					write_buffer[byte++] = shift;
+					if(byte == SIZE_WRITE_BUFFER) {
+						for(byte = 0; byte < SIZE_WRITE_BUFFER; byte++)
+							data[data_offset()] = write_buffer[byte];
+						byte = 0;
+						verboselog(1, "data flushed\n");
 					}
-
-					c->bit = 0;
-					c->shift = 0;
+					break;
+				case STATE_WRITE_CONFIGURATION_REGISTERS:
+					verboselog(1, "-> configuration register: %02x\n", shift);
+					/* todo: write after all bytes received? */
+					configuration_registers[byte++] = shift;
+					if(byte == SIZE_CONFIGURATION_REGISTERS)
+						byte = 0;
+					break;
 				}
+					
+				bit = 0;
+				shift = 0;
 			}
 			break;
 		case STATE_READ_DATA:
 		case STATE_READ_CONFIGURATION_REGISTERS:
-			if( c->scl == 0 && scl != 0 )
-			{
-				if( c->bit < 8 )
-				{
-					if( c->bit == 0 )
-					{
-						switch( c->state )
-						{
-						case STATE_READ_DATA:
-							c->shift = c->data[ x76f041_data_offset( c ) ];
-							verboselog( machine, 1, "x76f041(%d) <- data: %02x\n", chip, c->shift );
-							break;
-						case STATE_READ_CONFIGURATION_REGISTERS:
-							c->shift = c->configuration_registers[ c->byte & 7 ];
-							verboselog( machine, 1, "x76f041(%d) <- configuration register: %02x\n", chip, c->shift );
-							break;
-						}
+			if(bit < 8) {
+				if(bit == 0) {
+					switch(state) {
+					case STATE_READ_DATA:
+						shift = data[data_offset()];
+						verboselog(1, "<- data: %02x\n", shift);
+						break;
+					case STATE_READ_CONFIGURATION_REGISTERS:
+						shift = configuration_registers[byte & 7];
+						verboselog(1, "<- configuration register: %02x\n", shift );
+						break;
 					}
-					c->sdar = ( c->shift >> 7 ) & 1;
-					c->shift <<= 1;
-					c->bit++;
 				}
-				else
-				{
-					c->bit = 0;
-					c->sdar = 0;
-					if( c->sdaw == 0 )
-					{
-						verboselog( machine, 2, "x76f041(%d) ack <-\n", chip );
-						c->byte++;
-					}
-					else
-					{
-						verboselog( machine, 2, "x76f041(%d) nak <-\n", chip );
-					}
+				sdar = ( shift >> 7 ) & 1;
+				shift <<= 1;
+				bit++;
+			} else {
+				bit = 0;
+				sdar = false;
+				if(!sdaw) {
+					verboselog(2, "ack <-\n");
+					byte++;
+				} else {
+					verboselog(2, "nak <-\n");
 				}
 			}
 			break;
 		}
 	}
-	c->scl = scl;
 }
 
-void x76f041_sda_write( running_machine *machine, int chip, int sda )
+void x76f041_device::sda_0()
 {
-	struct x76f041_chip *c;
-
-	if( chip >= X76F041_MAXCHIP )
-	{
-		verboselog( machine, 0, "x76f041_sda_write( %d ) chip out of range\n", chip );
-		return;
-	}
-
-	c = &x76f041[ chip ];
-
-	if( c->sdaw != sda )
-	{
-		verboselog( machine, 2, "x76f041(%d) sdaw=%d\n", chip, sda );
-	}
-	if( c->cs == 0 && c->scl != 0 )
-	{
-		if( c->sdaw == 0 && sda != 0 )
-		{
-			verboselog( machine, 1, "x76f041(%d) goto stop\n", chip );
-			c->state = STATE_STOP;
-			c->sdar = 0;
+	if(!cs && scl) {
+		switch(state) {
+		case STATE_STOP:
+			verboselog(1, "goto start (1)\n");
+			state = STATE_LOAD_COMMAND;
+			break;
+		case STATE_LOAD_PASSWORD:
+			/* todo: this will be the 0xc0 command, but it's not handled as a command yet. */
+			verboselog(1, "goto start (2)\n");
+			break;
+		case STATE_READ_DATA:
+			verboselog(1, "goto load address\n");
+			state = STATE_LOAD_ADDRESS;
+			break;
+		default:
+			verboselog(1, "skipped start (default)\n");
+			break;
 		}
-		if( c->sdaw != 0 && sda == 0 )
-		{
-			switch( c->state )
-			{
-			case STATE_STOP:
-				verboselog( machine, 1, "x76f041(%d) goto start\n", chip );
-				c->state = STATE_LOAD_COMMAND;
-				break;
-			case STATE_LOAD_PASSWORD:
-				/* todo: this will be the 0xc0 command, but it's not handled as a command yet. */
-				verboselog( machine, 1, "x76f041(%d) goto start\n", chip );
-				break;
-			case STATE_READ_DATA:
-				verboselog( machine, 1, "x76f041(%d) goto load address\n", chip );
-				c->state = STATE_LOAD_ADDRESS;
-				break;
-			default:
-				verboselog( machine, 1, "x76f041(%d) skipped start (default)\n", chip );
-				break;
-			}
 
-			c->bit = 0;
-			c->byte = 0;
-			c->shift = 0;
-			c->sdar = 0;
-		}
+		bit = 0;
+		byte = 0;
+		shift = 0;
+		sdar = false;
 	}
-	c->sdaw = sda;
 }
 
-int x76f041_sda_read( running_machine *machine, int chip )
+void x76f041_device::sda_1()
 {
-	struct x76f041_chip *c;
-
-	if( chip >= X76F041_MAXCHIP )
-	{
-		verboselog( machine, 0, "x76f041_sda_read( %d ) chip out of range\n", chip );
-		return 1;
+	if(!cs && scl) {
+		verboselog(1, "goto stop\n");
+		state = STATE_STOP;
+		sdar = false;
 	}
-
-	c = &x76f041[ chip ];
-
-	if( c->cs != 0 )
-	{
-		verboselog( machine, 2, "x76f041(%d) not selected\n", chip );
-		return 1;
-	}
-	verboselog( machine, 2, "x76f041(%d) sdar=%d\n", chip, c->sdar );
-	return c->sdar;
 }
 
-static void nvram_handler_x76f041( running_machine *machine, mame_file *file, int read_or_write, int chip )
+void x76f041_device::nvram_read(mame_file &file)
 {
-	struct x76f041_chip *c;
-
-	if( chip >= X76F041_MAXCHIP )
-	{
-		verboselog( machine, 0, "nvram_handler_x76f041( %d ) chip out of range\n", chip );
-		return;
-	}
-
-	c = &x76f041[ chip ];
-
-	if( read_or_write )
-	{
-		mame_fwrite( file, c->write_password, SIZE_WRITE_PASSWORD );
-		mame_fwrite( file, c->read_password, SIZE_READ_PASSWORD );
-		mame_fwrite( file, c->configuration_password, SIZE_CONFIGURATION_PASSWORD );
-		mame_fwrite( file, c->configuration_registers, SIZE_CONFIGURATION_REGISTERS );
-		mame_fwrite( file, c->data, SIZE_DATA );
-	}
-	else if( file )
-	{
-		mame_fread( file, c->write_password, SIZE_WRITE_PASSWORD );
-		mame_fread( file, c->read_password, SIZE_READ_PASSWORD );
-		mame_fread( file, c->configuration_password, SIZE_CONFIGURATION_PASSWORD );
-		mame_fread( file, c->configuration_registers, SIZE_CONFIGURATION_REGISTERS );
-		mame_fread( file, c->data, SIZE_DATA );
-	}
+	mame_fread(&file, response_to_reset, SIZE_RESPONSE_TO_RESET);
+	mame_fread(&file, write_password, SIZE_WRITE_PASSWORD);
+	mame_fread(&file, read_password, SIZE_READ_PASSWORD);
+	mame_fread(&file, configuration_password, SIZE_CONFIGURATION_PASSWORD);
+	mame_fread(&file, configuration_registers, SIZE_CONFIGURATION_REGISTERS);
+	mame_fread(&file, data, SIZE_DATA);
 }
 
-NVRAM_HANDLER( x76f041_0 ) { nvram_handler_x76f041( machine, file, read_or_write, 0 ); }
-NVRAM_HANDLER( x76f041_1 ) { nvram_handler_x76f041( machine, file, read_or_write, 1 ); }
+void x76f041_device::nvram_write(mame_file &file)
+{
+	mame_fwrite(&file, response_to_reset, SIZE_RESPONSE_TO_RESET);
+	mame_fwrite(&file, write_password, SIZE_WRITE_PASSWORD);
+	mame_fwrite(&file, read_password, SIZE_READ_PASSWORD);
+	mame_fwrite(&file, configuration_password, SIZE_CONFIGURATION_PASSWORD);
+	mame_fwrite(&file, configuration_registers, SIZE_CONFIGURATION_REGISTERS);
+	mame_fwrite(&file, data, SIZE_DATA);
+}

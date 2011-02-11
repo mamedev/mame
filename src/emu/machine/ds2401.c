@@ -9,213 +9,210 @@
 #include "emu.h"
 #include "machine/ds2401.h"
 
-#define VERBOSE_LEVEL ( 0 )
+#define VERBOSE_LEVEL 0
 
-INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, const char *s_fmt, ... )
+inline void ATTR_PRINTF(3,4) ds2401_device::verboselog(int n_level, const char *s_fmt, ...)
 {
-	if( VERBOSE_LEVEL >= n_level )
+	if(VERBOSE_LEVEL >= n_level)
 	{
 		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		logerror( "%s: %s", machine->describe_context(), buf );
+		char buf[32768];
+		va_start(v, s_fmt);
+		vsprintf(buf, s_fmt, v);
+		va_end(v);
+		logerror("ds2401 %s %s: %s", config.tag(), machine->describe_context(), buf);
 	}
 }
 
-struct ds2401_chip
+const device_type DS2401 = ds2401_device_config::static_alloc_device_config;
+
+ds2401_device_config::ds2401_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, static_alloc_device_config, "DS2401", tag, owner, clock)
 {
-	int state;
-	int bit;
-	int byte;
-	int shift;
-	int rx;
-	int tx;
-	const UINT8 *data;
-	emu_timer *timer;
-	emu_timer *reset_timer;
-	attotime t_samp;
-	attotime t_rdv;
-	attotime t_rstl;
-	attotime t_pdh;
-	attotime t_pdl;
-};
-
-#define SIZE_DATA ( 8 )
-
-#define STATE_IDLE ( 0 )
-#define STATE_RESET ( 1 )
-#define STATE_RESET1 ( 2 )
-#define STATE_RESET2 ( 3 )
-#define STATE_COMMAND ( 4 )
-#define STATE_READROM ( 5 )
-
-#define COMMAND_READROM ( 0x33 )
-
-static struct ds2401_chip ds2401[ DS2401_MAXCHIP ];
-
-static TIMER_CALLBACK( ds2401_reset )
-{
-	int which = param;
-	struct ds2401_chip *c = &ds2401[ which ];
-
-	verboselog( machine, 1, "ds2401_reset(%d)\n", which );
-
-	c->state = STATE_RESET;
-	c->timer->adjust( attotime::never, which );
 }
 
-static TIMER_CALLBACK( ds2401_tick )
+device_config *ds2401_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
-	int which = param;
-	struct ds2401_chip *c = &ds2401[ which ];
+	return global_alloc(ds2401_device_config(mconfig, tag, owner, clock));
+}
 
-	switch( c->state )
+device_t *ds2401_device_config::alloc_device(running_machine &machine) const
+{
+	return auto_alloc(&machine, ds2401_device(machine, *this));
+}
+
+ds2401_device::ds2401_device(running_machine &_machine, const ds2401_device_config &_config)
+	: device_t(_machine, _config),
+	  config(_config)
+{
+}
+
+void ds2401_device::device_start()
+{
+	t_samp = attotime::from_usec( 15);
+	t_rdv  = attotime::from_usec( 15);
+	t_rstl = attotime::from_usec(480);
+	t_pdh  = attotime::from_usec( 15);
+	t_pdl  = attotime::from_usec( 60);
+
+	save_item(NAME(state));
+	save_item(NAME(bit));
+	save_item(NAME(byte));
+	save_item(NAME(shift));
+	save_item(NAME(rx));
+	save_item(NAME(tx));
+
+	timer_main  = timer_alloc(TIMER_MAIN);
+	timer_reset = timer_alloc(TIMER_RESET);
+}
+
+void ds2401_device::device_reset()
+{
+	state = STATE_IDLE;
+	bit = 0;
+	byte = 0;
+	shift = 0;
+	rx = true;
+	tx = true;
+
+	if(m_region)
 	{
-	case STATE_RESET1:
-		verboselog( machine, 2, "ds2401_tick(%d) state_reset1 %d\n", which, c->rx );
-		c->tx = 0;
-		c->state = STATE_RESET2;
-		c->timer->adjust( c->t_pdl, which );
-		break;
-	case STATE_RESET2:
-		verboselog( machine, 2, "ds2401_tick(%d) state_reset2 %d\n", which, c->rx );
-		c->tx = 1;
-		c->bit = 0;
-		c->shift = 0;
-		c->state = STATE_COMMAND;
-		break;
-	case STATE_COMMAND:
-		verboselog( machine, 2, "ds2401_tick(%d) state_command %d\n", which, c->rx );
-		c->shift >>= 1;
-		if( c->rx != 0 )
-		{
-			c->shift |= 0x80;
+		// Ensure the size is correct though
+		if(m_region->bytes() != SIZE_DATA)
+			logerror("ds2401 %s: Wrong region length for id data, expected 0x%x, got 0x%x\n",
+					 config.tag(),
+					 SIZE_DATA,
+					 m_region->bytes());
+		else {
+			UINT8 *rb = m_region->base();
+			memcpy(data, rb, SIZE_DATA);
+			return;
 		}
-		c->bit++;
-		if( c->bit == 8 )
-		{
-			switch( c->shift )
-			{
-			case COMMAND_READROM:
-				verboselog( machine, 1, "ds2401_tick(%d) readrom\n", which );
-				c->bit = 0;
-				c->byte = 0;
-				c->state = STATE_READROM;
-				break;
-			default:
-				verboselog( machine, 0, "ds2401_tick(%d) command not handled %02x\n", which, c->shift );
-				c->state = STATE_IDLE;
-				break;
+	}
+
+	// That chip is useless without an id, so bitch if there
+	// isn't one
+	logerror("ds2401 %s: Warning, no id provided, answer will be all zeroes.\n", config.tag());
+	memset(data, 0, SIZE_DATA);
+}
+
+void ds2401_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch(id) {
+	case TIMER_RESET:
+		verboselog(1, "timer_reset\n");
+		state = STATE_RESET;
+		timer_reset->adjust(attotime::never);
+		break;
+
+	case TIMER_MAIN:
+		switch(state) {
+		case STATE_RESET1:
+			verboselog(2, "timer_main state_reset1 %d\n", rx);
+			tx = false;
+			state = STATE_RESET2;
+			timer_main->adjust(t_pdl);
+			break;
+
+		case STATE_RESET2:
+			verboselog(2, "timer_main state_reset2 %d\n", rx);
+			tx = true;
+			bit = 0;
+			shift = 0;
+			state = STATE_COMMAND;
+			break;
+
+		case STATE_COMMAND:
+			verboselog(2, "timer_main state_command %d\n", rx);
+			shift >>= 1;
+			if(rx)
+				shift |= 0x80;
+			bit++;
+			if(bit == 8) {
+				switch(shift) {
+				case COMMAND_READROM:
+					verboselog(1, "timer_main readrom\n");
+					bit = 0;
+					byte = 0;
+					state = STATE_READROM;
+					break;
+				default:
+					verboselog(0, "timer_main command not handled %02x\n", shift);
+					state = STATE_IDLE;
+					break;
+				}
 			}
+			break;
+
+		case STATE_READROM:
+			tx = true;
+			if(byte == SIZE_DATA) {
+				verboselog(1, "timer_main readrom finished\n");
+				state = STATE_IDLE;
+			} else {
+				verboselog(2, "timer_main readrom window closed\n");
+			}
+			break;
+		default:
+			verboselog(0, "timer_main state not handled: %d\n", state);
+			break;
 		}
-		break;
-	case STATE_READROM:
-		c->tx = 1;
-		if( c->byte == 8 )
-		{
-			verboselog( machine, 1, "ds2401_tick(%d) readrom finished\n", which );
-			c->state = STATE_IDLE;
-		}
-		else
-		{
-			verboselog( machine, 2, "ds2401_tick(%d) readrom window closed\n", which );
-		}
-		break;
-	default:
-		verboselog( machine, 0, "ds2401_tick(%d) state not handled: %d\n", which, c->state );
-		break;
 	}
 }
 
-void ds2401_init( running_machine *machine, int which, const UINT8 *data )
+void ds2401_device::write(bool line)
 {
-	struct ds2401_chip *c = &ds2401[ which ];
+	verboselog(1, "write(%d)\n", line);
 
-	c->state = STATE_IDLE;
-	c->bit = 0;
-	c->byte = 0;
-	c->shift = 0;
-	c->rx = 1;
-	c->tx = 1;
-	c->data = data;
-	c->t_samp = attotime::from_usec( 15 );
-	c->t_rdv = attotime::from_usec( 15 );
-	c->t_rstl = attotime::from_usec( 480 );
-	c->t_pdh = attotime::from_usec( 15 );
-	c->t_pdl = attotime::from_usec( 60 );
-
-	state_save_register_item(machine,  "ds2401", NULL, which, c->state );
-	state_save_register_item(machine,  "ds2401", NULL, which, c->bit );
-	state_save_register_item(machine,  "ds2401", NULL, which, c->byte );
-	state_save_register_item(machine,  "ds2401", NULL, which, c->shift );
-	state_save_register_item(machine,  "ds2401", NULL, which, c->rx );
-	state_save_register_item(machine,  "ds2401", NULL, which, c->tx );
-
-	c->timer = machine->scheduler().timer_alloc(FUNC(ds2401_tick ));
-	c->reset_timer = machine->scheduler().timer_alloc(FUNC(ds2401_reset ));
-}
-
-void ds2401_write( running_machine *machine, int which, int data )
-{
-	struct ds2401_chip *c = &ds2401[ which ];
-
-	verboselog( machine, 1, "ds2401_write( %d, %d )\n", which, data );
-
-	if( data == 0 && c->rx != 0 )
-	{
-		switch( c->state )
-		{
+	if(!line && rx) {
+		switch(state) {
 		case STATE_IDLE:
 			break;
 		case STATE_COMMAND:
-			verboselog( machine, 2, "ds2401_write(%d) state_command\n", which );
-			c->timer->adjust( c->t_samp, which );
+			verboselog(2, "state_command\n");
+			timer_main->adjust(t_samp);
 			break;
 		case STATE_READROM:
-			if( c->bit == 0 )
-			{
-				c->shift = c->data[ 7 - c->byte ];
-				verboselog( machine, 1, "ds2401_write(%d) <- data %02x\n", which, c->shift );
+			if(!bit) {
+				shift = data[7 - byte];
+				verboselog(1, "<- data %02x\n", shift);
 			}
-			c->tx = c->shift & 1;
-			c->shift >>= 1;
-			c->bit++;
-			if( c->bit == 8 )
-			{
-				c->bit = 0;
-				c->byte++;
+			tx = shift & 1;
+			shift >>= 1;
+			bit++;
+			if(bit == 8) {
+				bit = 0;
+				byte++;
 			}
-			verboselog( machine, 2, "ds2401_write(%d) state_readrom %d\n", which, c->tx );
-			c->timer->adjust( c->t_rdv, which );
+			verboselog(2, "state_readrom %d\n", tx);
+			timer_main->adjust(t_rdv);
 			break;
 		default:
-			verboselog( machine, 0, "ds2401_write(%d) state not handled: %d\n", which, c->state );
+			verboselog(0, "state not handled: %d\n", state );
 			break;
 		}
-		c->reset_timer->adjust( c->t_rstl, which );
-	}
-	else if( data == 1 && c->rx == 0 )
-	{
-		switch( c->state )
-		{
+		timer_reset->adjust(t_rstl);
+	} else if(line && !rx) {
+		switch(state) {
 		case STATE_RESET:
-			c->state = STATE_RESET1;
-			c->timer->adjust( c->t_pdh, which );
+			state = STATE_RESET1;
+			timer_main->adjust(t_pdh);
 			break;
 		}
-		c->reset_timer->adjust( attotime::never, which );
+		timer_reset->adjust(attotime::never);
 	}
-	c->rx = data;
+	rx = line;
 }
 
-int ds2401_read( running_machine *machine, int which )
+bool ds2401_device::read()
 {
-	struct ds2401_chip *c = &ds2401[ which ];
+	verboselog(2, "read %d\n", tx && rx);
+	return tx && rx;
+}
 
-	verboselog( machine, 2, "ds2401_read( %d ) %d\n", which, c->tx & c->rx );
-	return c->tx & c->rx;
+UINT8 ds2401_device::direct_read(int index)
+{
+	return data[index];
 }
 
 /*

@@ -580,7 +580,7 @@ READ64_DEVICE_HANDLER( naomibd_r )
 	{
 		UINT64 ret;
 
-		ret = x76f100_sda_read( device->machine, 0 ) << 15;
+		ret = device->machine->device<x76f100_device>("naomibd_eeprom")->sda_r() << 15;
 
 		return ret << 32;
 	}
@@ -903,13 +903,12 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 		{
 			if(ACCESSING_BITS_0_15)
 			{
-				running_machine *machine = device->machine;
-
+				x76f100_device *x76f100 = device->machine->device<x76f100_device>("naomibd_eeprom");
 				// NAOMI_BOARDID_WRITE
-				x76f100_cs_write(machine, 0, (data >> 2) & 1 );
-				x76f100_rst_write(machine, 0, (data >> 3) & 1 );
-				x76f100_scl_write(machine, 0, (data >> 1) & 1 );
-				x76f100_sda_write(machine, 0, (data >> 0) & 1 );
+				x76f100->cs_w((data >> 2) & 1);
+				x76f100->rst_w((data >> 3) & 1);
+				x76f100->scl_w((data >> 1) & 1);
+				x76f100->sda_w((data >> 0) & 1);
 			}
 		}
 		break;
@@ -1850,46 +1849,6 @@ static DEVICE_RESET( naomibd )
 
 
 /*-------------------------------------------------
-    device nvram callback
--------------------------------------------------*/
-
-
-static DEVICE_NVRAM( naomibd )
-{
-	//naomibd_state *v = get_safe_token(device);
-	static const UINT8 eeprom_romboard[20+48] =
-	{
-		0x19,0x00,0xaa,0x55,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x69,0x79,0x68,0x6b,0x74,0x6d,0x68,0x6d,
-		0xa1,0x09,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,
-		0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,
-		0x30,0x30,0x30,0x30,0x30,0x30,0x30,0x30,0x30,0x30,0x30,0x30,0x30,0x30,0x30,0x30
-	};
-	UINT8 *games_contents;
-
-	if (read_or_write)
-		/*eeprom_save(file)*/;
-	else
-	{
-		/*if (file)
-            eeprom_load(file);
-        else*/
-		games_contents = device->machine->region("naomibd_eeprom")->base();
-
-		if (games_contents)
-		{
-			x76f100_init( device->machine, 0, games_contents );
-		}
-		else
-		{
-			UINT8 *eeprom = auto_alloc_array_clear(device->machine, UINT8, 0x84);
-			memcpy(eeprom, eeprom_romboard, sizeof(eeprom_romboard));
-			x76f100_init( device->machine, 0, eeprom );
-		}
-
-	}
-}
-
-/*-------------------------------------------------
     device get info callback
 -------------------------------------------------*/
 
@@ -1910,7 +1869,6 @@ DEVICE_GET_INFO( naomibd )
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(naomibd);		break;
 		case DEVINFO_FCT_STOP:					info->stop = DEVICE_STOP_NAME(naomibd);			break;
 		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(naomibd);		break;
-		case DEVINFO_FCT_NVRAM:					info->nvram = DEVICE_NVRAM_NAME(naomibd);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:
@@ -1930,4 +1888,4 @@ DEVICE_GET_INFO( naomibd )
 }
 
 
-DEFINE_LEGACY_NVRAM_DEVICE(NAOMI_BOARD, naomibd);
+DEFINE_LEGACY_DEVICE(NAOMI_BOARD, naomibd);

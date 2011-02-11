@@ -9,187 +9,133 @@
 
 #include "emu.h"
 #include "machine/zs01.h"
+#include "machine/ds2401.h"
 
-#define VERBOSE_LEVEL ( 0 )
+#define VERBOSE_LEVEL 0
 
-INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, const char *s_fmt, ... )
+inline void ATTR_PRINTF(3,4) zs01_device::verboselog(int n_level, const char *s_fmt, ...)
 {
-	if( VERBOSE_LEVEL >= n_level )
+	if(VERBOSE_LEVEL >= n_level)
 	{
 		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		logerror( "%s: %s", machine->describe_context(), buf );
+		char buf[32768];
+		va_start(v, s_fmt);
+		vsprintf(buf, s_fmt, v);
+		va_end(v);
+		logerror("zs01 %s %s: %s", config.tag(), machine->describe_context(), buf);
 	}
 }
 
-#define SIZE_WRITE_BUFFER ( 12 )
-#define SIZE_READ_BUFFER ( 12 )
-#define SIZE_DATA_BUFFER ( 8 )
+const device_type ZS01 = zs01_device_config::static_alloc_device_config;
 
-#define SIZE_RESPONSE_TO_RESET ( 4 )
-#define SIZE_KEY ( 8 )
-#define SIZE_DATA ( 4096 )
-
-struct zs01_chip
+zs01_device_config::zs01_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_secure_serial_flash_config(mconfig, static_alloc_device_config, "ZS01", tag, owner, clock)
 {
-	int cs;
-	int rst;
-	int scl;
-	int sdaw;
-	int sdar;
-	int state;
-	int shift;
-	int bit;
-	int byte;
-	UINT8 write_buffer[ SIZE_WRITE_BUFFER ];
-	UINT8 read_buffer[ SIZE_READ_BUFFER ];
-	UINT8 response_key[ SIZE_KEY ];
-	UINT8 *response_to_reset;
-	UINT8 *command_key;
-	UINT8 *data_key;
-	UINT8 *data;
-	UINT8 *ds2401;
-	zs01_write_handler write;
-	zs01_read_handler read;
-};
-
-static struct zs01_chip zs01[ ZS01_MAXCHIP ];
-
-#define COMMAND_WRITE ( 0x00 )
-#define COMMAND_READ ( 0x01 )
-
-#define STATE_STOP ( 0 )
-#define STATE_RESPONSE_TO_RESET ( 1 )
-#define STATE_LOAD_COMMAND ( 2 )
-#define STATE_READ_DATA ( 3 )
-
-void zs01_init( running_machine *machine, int chip, UINT8 *data, zs01_write_handler write, zs01_read_handler read, UINT8 *ds2401 )
-{
-	int offset;
-	struct zs01_chip *c;
-
-	if( chip >= ZS01_MAXCHIP )
-	{
-		verboselog( machine, 0, "zs01_init( %d ) chip out of range\n", chip );
-		return;
-	}
-
-	c = &zs01[ chip ];
-
-	if( data == NULL )
-	{
-		data = auto_alloc_array(machine, UINT8,
-			SIZE_RESPONSE_TO_RESET +
-			SIZE_KEY +
-			SIZE_KEY +
-			SIZE_DATA );
-	}
-
-	if( ds2401 == NULL )
-	{
-		ds2401 = auto_alloc_array(machine, UINT8,  SIZE_DATA_BUFFER );
-	}
-
-	c->cs = 0;
-	c->rst = 0;
-	c->scl = 0;
-	c->sdaw = 0;
-	c->sdar = 0;
-	c->state = STATE_STOP;
-	c->shift = 0;
-	c->bit = 0;
-	c->byte = 0;
-	memset( c->write_buffer, 0, SIZE_WRITE_BUFFER );
-	memset( c->read_buffer, 0, SIZE_READ_BUFFER );
-	memset( c->response_key, 0, SIZE_KEY );
-
-	offset = 0;
-	c->response_to_reset = &data[ offset ]; offset += SIZE_RESPONSE_TO_RESET;
-	c->command_key = &data[ offset ]; offset += SIZE_KEY;
-	c->data_key = &data[ offset ]; offset += SIZE_KEY;
-	c->data = &data[ offset ]; offset += SIZE_DATA;
-	c->ds2401 = ds2401;
-	c->write = write;
-	c->read = read;
-
-	state_save_register_item( machine, "zs01", NULL, chip, c->cs );
-	state_save_register_item( machine, "zs01", NULL, chip, c->rst );
-	state_save_register_item( machine, "zs01", NULL, chip, c->scl );
-	state_save_register_item( machine, "zs01", NULL, chip, c->sdaw );
-	state_save_register_item( machine, "zs01", NULL, chip, c->sdar );
-	state_save_register_item( machine, "zs01", NULL, chip, c->state );
-	state_save_register_item( machine, "zs01", NULL, chip, c->shift );
-	state_save_register_item( machine, "zs01", NULL, chip, c->bit );
-	state_save_register_item( machine, "zs01", NULL, chip, c->byte );
-	state_save_register_item_array( machine, "zs01", NULL, chip, c->write_buffer );
-	state_save_register_item_array( machine, "zs01", NULL, chip, c->read_buffer );
-	state_save_register_item_array( machine, "zs01", NULL, chip, c->response_key );
-	state_save_register_item_pointer( machine, "zs01", NULL, chip, c->response_to_reset, SIZE_RESPONSE_TO_RESET );
-	state_save_register_item_pointer( machine, "zs01", NULL, chip, c->command_key, SIZE_KEY );
-	state_save_register_item_pointer( machine, "zs01", NULL, chip, c->data_key, SIZE_DATA );
 }
 
-void zs01_rst_write( running_machine *machine, int chip, int rst )
+void zs01_device_config::static_set_ds2401_tag(device_config *device, const char *ds2401_tag)
 {
-	struct zs01_chip *c;
-
-	if( chip >= ZS01_MAXCHIP )
-	{
-		verboselog( machine, 0, "zs01_rst_write( %d ) chip out of range\n", chip );
-		return;
-	}
-
-	c = &zs01[ chip ];
-
-	if( c->rst != rst )
-	{
-		verboselog( machine, 2, "zs01(%d) rst=%d\n", chip, rst );
-	}
-	if( c->rst == 0 && rst != 0 && c->cs == 0 )
-	{
-		verboselog( machine, 1, "zs01(%d) goto response to reset\n", chip );
-		c->state = STATE_RESPONSE_TO_RESET;
-		c->bit = 0;
-		c->byte = 0;
-	}
-	c->rst = rst;
+	zs01_device_config *zs01 = downcast<zs01_device_config *>(device);
+	zs01->ds2401_tag = ds2401_tag;
 }
 
-void zs01_cs_write( running_machine *machine, int chip, int cs )
+device_config *zs01_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
-	struct zs01_chip *c;
-
-	if( chip >= ZS01_MAXCHIP )
-	{
-		verboselog( machine, 0, "zs01_cs_write( %d ) chip out of range\n", chip );
-		return;
-	}
-
-	c = &zs01[ chip ];
-
-	if( c->cs != cs )
-	{
-		verboselog( machine, 2, "zs01(%d) cs=%d\n", chip, cs );
-	}
-//  if( c->cs != 0 && cs == 0 )
-//  {
-//      /* enable chip */
-//      c->state = STATE_STOP;
-//  }
-//  if( c->cs == 0 && cs != 0 )
-//  {
-//      /* disable chip */
-//      c->state = STATE_STOP;
-//      /* high impendence? */
-//      c->sdar = 0;
-//  }
-	c->cs = cs;
+	return global_alloc(zs01_device_config(mconfig, tag, owner, clock));
 }
 
-static void zs01_decrypt( UINT8 *destination, UINT8 *source, int length, UINT8 *key, UINT8 previous_byte )
+device_t *zs01_device_config::alloc_device(running_machine &machine) const
+{
+	return auto_alloc(&machine, zs01_device(machine, *this));
+}
+
+zs01_device::zs01_device(running_machine &_machine, const zs01_device_config &_config)
+	: device_secure_serial_flash(_machine, _config),
+	  config(_config)
+{
+}
+
+void zs01_device::device_start()
+{
+	device_secure_serial_flash::device_start();
+	save_item(NAME(state));
+	save_item(NAME(shift));
+	save_item(NAME(bit));
+	save_item(NAME(byte));
+	save_item(NAME(write_buffer));
+	save_item(NAME(read_buffer));
+	save_item(NAME(response_key));
+	save_item(NAME(response_to_reset));
+	save_item(NAME(command_key));
+	save_item(NAME(data_key));
+}
+
+void zs01_device::device_reset()
+{
+	device_secure_serial_flash::device_reset();
+	state = STATE_STOP;
+	shift = 0;
+	bit = 0;
+	byte = 0;
+	memset(write_buffer, 0, SIZE_WRITE_BUFFER);
+	memset(read_buffer, 0, SIZE_READ_BUFFER);
+	memset(response_key, 0, SIZE_KEY);
+}
+
+void zs01_device::nvram_default()
+{
+	// region always wins
+	if(m_region)
+	{
+		// Ensure the size is correct though
+		if(m_region->bytes() != SIZE_RESPONSE_TO_RESET+SIZE_KEY+SIZE_KEY+SIZE_DATA)
+			logerror("zs01 %s: Wrong region length for initialization data, expected 0x%x, got 0x%x\n",
+					 config.tag(),
+					 SIZE_RESPONSE_TO_RESET+SIZE_KEY+SIZE_KEY+SIZE_DATA,
+					 m_region->bytes());
+		else {
+			UINT8 *rb = m_region->base();
+			int offset = 0;
+			memcpy(response_to_reset, rb + offset, SIZE_RESPONSE_TO_RESET); offset += SIZE_RESPONSE_TO_RESET;
+			memcpy(command_key,       rb + offset, SIZE_KEY); offset += SIZE_KEY;
+			memcpy(data_key,          rb + offset, SIZE_KEY); offset += SIZE_KEY;
+			memcpy(data,              rb + offset, SIZE_DATA); offset += SIZE_DATA;
+			return;
+		}
+	}
+
+	// That chip isn't really usable without the passwords, so bitch
+	// if there's no region
+	logerror("zs01 %s: Warning, no default data provided, chip is unusable.\n", config.tag());
+	memset(response_to_reset, 0, SIZE_RESPONSE_TO_RESET);
+	memset(command_key,       0, SIZE_KEY);
+	memset(data_key,          0, SIZE_KEY);
+	memset(data,              0, SIZE_DATA);
+}
+
+void zs01_device::cs_0()
+{
+}
+
+void zs01_device::cs_1()
+{
+}
+
+void zs01_device::rst_0()
+{
+}
+
+void zs01_device::rst_1()
+{
+	if(!cs) {
+		verboselog(1, "goto response to reset\n");
+		state = STATE_RESPONSE_TO_RESET;
+		bit = 0;
+		byte = 0;
+	}
+}
+
+void zs01_device::decrypt(UINT8 *destination, UINT8 *source, int length, UINT8 *key, UINT8 previous_byte)
 {
 	UINT32 a0;
 	UINT32 v1;
@@ -236,7 +182,7 @@ static void zs01_decrypt( UINT8 *destination, UINT8 *source, int length, UINT8 *
 	}
 }
 
-static void zs01_decrypt2( UINT8 *destination, UINT8 *source, int length, UINT8 *key, UINT8 previous_byte )
+void zs01_device::decrypt2(UINT8 *destination, UINT8 *source, int length, UINT8 *key, UINT8 previous_byte)
 {
 	UINT32 a0;
 	UINT32 v1;
@@ -284,7 +230,7 @@ static void zs01_decrypt2( UINT8 *destination, UINT8 *source, int length, UINT8 
 	}
 }
 
-static void zs01_encrypt( UINT8 *destination, UINT8 *source, int length, UINT8 *key, UINT32 previous_byte )
+void zs01_device::encrypt(UINT8 *destination, UINT8 *source, int length, UINT8 *key, UINT32 previous_byte)
 {
 	UINT32 t0;
 	UINT32 v0;
@@ -332,7 +278,7 @@ static void zs01_encrypt( UINT8 *destination, UINT8 *source, int length, UINT8 *
 	}
 }
 
-static UINT16 zs01_crc( UINT8 *buffer, UINT32 length )
+UINT16 zs01_device::do_crc(UINT8 *buffer, UINT32 length)
 {
 	UINT32 v1;
 	UINT32 a3;
@@ -380,311 +326,223 @@ static UINT16 zs01_crc( UINT8 *buffer, UINT32 length )
 	return v0;
 }
 
-static int zs01_data_offset( struct zs01_chip *c )
+int zs01_device::data_offset()
 {
-	int block = ( ( c->write_buffer[ 0 ] & 2 ) << 7 ) | c->write_buffer[ 1 ];
+	int block = ( (write_buffer[0] & 2 ) << 7 ) | write_buffer[1];
 
 	return block * SIZE_DATA_BUFFER;
 }
 
-void zs01_scl_write( running_machine *machine, int chip, int scl )
+void zs01_device::scl_0()
 {
-	struct zs01_chip *c;
-
-	if( chip >= ZS01_MAXCHIP )
-	{
-		verboselog( machine, 0, "zs01_scl_write( %d ) chip out of range\n", chip );
-		return;
-	}
-
-	c = &zs01[ chip ];
-
-	if( c->scl != scl )
-	{
-		verboselog( machine, 2, "zs01(%d) scl=%d\n", chip, scl );
-	}
-	if( c->cs == 0 )
-	{
-		switch( c->state )
-		{
+	if(!cs) {
+		switch(state) {
 		case STATE_STOP:
 			break;
 
 		case STATE_RESPONSE_TO_RESET:
-			if( c->scl != 0 && scl == 0 )
-			{
-				if( c->bit == 0 )
-				{
-					c->shift = c->response_to_reset[ c->byte ];
-					verboselog( machine, 1, "zs01(%d) <- response_to_reset[%d]: %02x\n", chip, c->byte, c->shift );
-				}
+			if(!bit) {
+				shift = response_to_reset[byte];
+				verboselog(1, "<- response_to_reset[%d]: %02x\n", byte, shift);
+			}
 
-				c->sdar = ( c->shift >> 7 ) & 1;
-				c->shift <<= 1;
-				c->bit++;
+			sdar = (shift >> 7) & 1;
+			shift <<= 1;
+			bit++;
 
-				if( c->bit == 8 )
-				{
-					c->bit = 0;
-					c->byte++;
-					if( c->byte == 4 )
-					{
-						c->sdar = 1;
-						verboselog( machine, 1, "zs01(%d) goto stop\n", chip );
-						c->state = STATE_STOP;
-					}
+			if( bit == 8 ) {
+				bit = 0;
+				byte++;
+				if( byte == 4 ) {
+					sdar = true;
+					verboselog(1, "goto stop\n");
+					state = STATE_STOP;
 				}
 			}
 			break;
 
 		case STATE_LOAD_COMMAND:
-			if( c->scl == 0 && scl != 0 )
-			{
-				if( c->bit < 8 )
-				{
-					verboselog( machine, 2, "zs01(%d) clock\n", chip );
-					c->shift <<= 1;
-					if( c->sdaw != 0 )
-					{
-						c->shift |= 1;
-					}
-					c->bit++;
-				}
-				else
-				{
-					c->sdar = 0;
+			break;
 
-					switch( c->state )
-					{
-					case STATE_LOAD_COMMAND:
-						c->write_buffer[ c->byte ] = c->shift;
-						verboselog( machine, 2, "zs01(%d) -> write_buffer[%d]: %02x\n", chip, c->byte, c->write_buffer[ c->byte ] );
+		case STATE_READ_DATA:
+			break;
+		}
+	}
+}
 
-						c->byte++;
-						if( c->byte == SIZE_WRITE_BUFFER )
-						{
-							UINT16 crc;
+void zs01_device::scl_1()
+{
+	if(!cs) {
+		switch(state) {
+		case STATE_STOP:
+			break;
 
-							zs01_decrypt( c->write_buffer, c->write_buffer, SIZE_WRITE_BUFFER, c->command_key, 0xff );
+		case STATE_RESPONSE_TO_RESET:
+			break;
 
-							if( ( c->write_buffer[ 0 ] & 4 ) != 0 )
-							{
-								zs01_decrypt2( &c->write_buffer[ 2 ], &c->write_buffer[ 2 ], SIZE_DATA_BUFFER, c->data_key, 0x00 );
-							}
+		case STATE_LOAD_COMMAND:
+			if(bit < 8) {
+				shift <<= 1;
+				if(sdaw)
+					shift |= 1;
+				bit++;
+				verboselog(2, "clock %d %02x\n", bit, shift);
+			} else {
+				sdar = false;
 
-							crc = zs01_crc( c->write_buffer, 10 );
+				switch(state) {
+				case STATE_LOAD_COMMAND:
+					write_buffer[byte] = shift;
+					verboselog(2, "-> write_buffer[%d]: %02x\n", byte, write_buffer[byte]);
+					byte++;
+					if(byte == SIZE_WRITE_BUFFER) {
+						UINT16 crc;
 
-							if( crc == ( ( c->write_buffer[ 10 ] << 8 ) | c->write_buffer[ 11 ] ) )
-							{
-								verboselog( machine, 1, "zs01(%d) -> command: %02x\n", chip, c->write_buffer[ 0 ] );
-								verboselog( machine, 1, "zs01(%d) -> address: %02x\n", chip, c->write_buffer[ 1 ] );
-								verboselog( machine, 1, "zs01(%d) -> data: %02x%02x%02x%02x%02x%02x%02x%02x\n", chip,
-									c->write_buffer[ 2 ], c->write_buffer[ 3 ], c->write_buffer[ 4 ], c->write_buffer[ 5 ],
-									c->write_buffer[ 6 ], c->write_buffer[ 7 ], c->write_buffer[ 8 ], c->write_buffer[ 9 ] );
-								verboselog( machine, 1, "zs01(%d) -> crc: %02x%02x\n", chip, c->write_buffer[ 10 ], c->write_buffer[ 11 ] );
+						decrypt(write_buffer, write_buffer, SIZE_WRITE_BUFFER, command_key, 0xff);
 
-								switch( c->write_buffer[ 0 ] & 1 )
-								{
-								case COMMAND_WRITE:
-									memcpy( &c->data[ zs01_data_offset( c ) ], &c->write_buffer[ 2 ], SIZE_DATA_BUFFER );
+						if(write_buffer[0] & 4)
+							decrypt2(&write_buffer[2], &write_buffer[2], SIZE_DATA_BUFFER, data_key, 0x00);
 
-									/* todo: find out what should be returned. */
-									memset( &c->read_buffer[ 0 ], 0, SIZE_WRITE_BUFFER );
-									break;
+						crc = do_crc(write_buffer, 10);
 
-								case COMMAND_READ:
-									/* todo: find out what should be returned. */
-									memset( &c->read_buffer[ 0 ], 0, 2 );
+						if(crc == ((write_buffer[10] << 8) | write_buffer[11])) {
+							verboselog(1, "-> command: %02x\n", write_buffer[0]);
+							verboselog(1, "-> address: %02x\n", write_buffer[1]);
+							verboselog(1, "-> data: %02x%02x%02x%02x%02x%02x%02x%02x\n",
+										write_buffer[2], write_buffer[3], write_buffer[4], write_buffer[5],
+										write_buffer[6], write_buffer[7], write_buffer[8], write_buffer[9]);
+							verboselog(1, "-> crc: %02x%02x\n", write_buffer[10], write_buffer[11]);
+							switch(write_buffer[0] & 1) {
+							case COMMAND_WRITE:
+								memcpy(&data[data_offset()], &write_buffer[2], SIZE_DATA_BUFFER);
+								
+								/* todo: find out what should be returned. */
+								memset(&read_buffer[0] , 0, SIZE_WRITE_BUFFER);
+								break;
 
-									switch( c->write_buffer[ 1 ] )
-									{
-									case 0xfd:
-										{
-											/* TODO: use read/write to talk to the ds2401, which will require a timer. */
-											int i;
-											for( i = 0; i < SIZE_DATA_BUFFER; i++ )
-											{
-												c->read_buffer[ 2 + i ] = c->ds2401[ SIZE_DATA_BUFFER - i - 1 ];
-											}
-										}
-										break;
-									default:
-										memcpy( &c->read_buffer[ 2 ], &c->data[ zs01_data_offset( c ) ], SIZE_DATA_BUFFER );
-										break;
-									}
+							case COMMAND_READ:
+								/* todo: find out what should be returned. */
+								memset(&read_buffer[0], 0, 2);
 
-									memcpy( c->response_key, &c->write_buffer[ 2 ], SIZE_KEY );
+								switch(write_buffer[1]) {
+								case 0xfd: {
+									/* TODO: use read/write to talk to the ds2401, which will require a timer. */
+									ds2401_device *ds2401 = machine->device<ds2401_device>(config.ds2401_tag);
+									for(int i = 0; i < SIZE_DATA_BUFFER; i++)
+										read_buffer[2+i] = ds2401->direct_read(SIZE_DATA_BUFFER-i-1);
 									break;
 								}
+								default:
+									memcpy(&read_buffer[2], &data[data_offset()], SIZE_DATA_BUFFER);
+									break;
+								}
+
+								memcpy(response_key, &write_buffer[2], SIZE_KEY);
+								break;
 							}
-							else
-							{
-								verboselog( machine, 0, "zs01(%d) bad crc\n", chip );
-
-								/* todo: find out what should be returned. */
-								memset( &c->read_buffer[ 0 ], 0xff, 2 );
-							}
-
-							verboselog( machine, 1, "zs01(%d) <- status: %02x%02x\n", chip,
-								c->read_buffer[ 0 ], c->read_buffer[ 1 ] );
-
-							verboselog( machine, 1, "zs01(%d) <- data: %02x%02x%02x%02x%02x%02x%02x%02x\n", chip,
-								c->read_buffer[ 2 ], c->read_buffer[ 3 ], c->read_buffer[ 4 ], c->read_buffer[ 5 ],
-								c->read_buffer[ 6 ], c->read_buffer[ 7 ], c->read_buffer[ 8 ], c->read_buffer[ 9 ] );
-
-							crc = zs01_crc( c->read_buffer, 10 );
-							c->read_buffer[ 10 ] = crc >> 8;
-							c->read_buffer[ 11 ] = crc & 255;
-
-							zs01_encrypt( c->read_buffer, c->read_buffer, SIZE_READ_BUFFER, c->response_key, 0xff );
-
-							c->byte = 0;
-							c->state = STATE_READ_DATA;
+						} else {
+							verboselog(0, "bad crc\n");
+							/* todo: find out what should be returned. */
+							memset(&read_buffer[0], 0xff, 2 );
 						}
-						break;
-					}
 
-					c->bit = 0;
-					c->shift = 0;
+						verboselog(1, "<- status: %02x%02x\n",
+								   read_buffer[0], read_buffer[1]);
+
+						verboselog(1, "<- data: %02x%02x%02x%02x%02x%02x%02x%02x\n",
+								   read_buffer[2], read_buffer[3], read_buffer[4], read_buffer[5],
+								   read_buffer[6], read_buffer[7], read_buffer[8], read_buffer[9]);
+
+						crc = do_crc(read_buffer, 10);
+						read_buffer[10] = crc >> 8;
+						read_buffer[11] = crc & 255;
+
+						encrypt(read_buffer, read_buffer, SIZE_READ_BUFFER, response_key, 0xff);
+
+						byte = 0;
+						state = STATE_READ_DATA;
+					}
+					break;
 				}
+
+				bit = 0;
+				shift = 0;
 			}
 			break;
 
 		case STATE_READ_DATA:
-			if( c->scl == 0 && scl != 0 )
-			{
-				if( c->bit < 8 )
-				{
-					if( c->bit == 0 )
-					{
-						switch( c->state )
-						{
-						case STATE_READ_DATA:
-							c->shift = c->read_buffer[ c->byte ];
-							verboselog( machine, 2, "zs01(%d) <- read_buffer[%d]: %02x\n", chip, c->byte, c->shift );
-							break;
-						}
+			if(bit < 8) {
+				if(bit == 0) {
+					switch(state) {
+					case STATE_READ_DATA:
+						shift = read_buffer[byte];
+						verboselog(2, "<- read_buffer[%d]: %02x\n", byte, shift);
+						break;
 					}
-					c->sdar = ( c->shift >> 7 ) & 1;
-					c->shift <<= 1;
-					c->bit++;
 				}
-				else
-				{
-					c->bit = 0;
-					c->sdar = 0;
-					if( c->sdaw == 0 )
-					{
-						verboselog( machine, 2, "zs01(%d) ack <-\n", chip );
-						c->byte++;
-						if( c->byte == SIZE_READ_BUFFER )
-						{
-							c->byte = 0;
-							c->sdar = 1;
-							c->state = STATE_LOAD_COMMAND;
-						}
+				sdar = (shift >> 7) & 1;
+				shift <<= 1;
+				bit++;
+			} else {
+				bit = 0;
+				sdar = false;
+				if(!sdaw) {
+					verboselog(2, "ack <-\n");
+					byte++;
+					if(byte == SIZE_READ_BUFFER) {
+						byte = 0;
+						sdar = true;
+						state = STATE_LOAD_COMMAND;
 					}
-					else
-					{
-						verboselog( machine, 2, "zs01(%d) nak <-\n", chip );
-					}
+				} else {
+					verboselog(2, "nak <-\n");
 				}
 			}
 			break;
 		}
 	}
-	c->scl = scl;
 }
 
-void zs01_sda_write( running_machine *machine, int chip, int sda )
+void zs01_device::sda_1()
 {
-	struct zs01_chip *c;
-
-	if( chip >= ZS01_MAXCHIP )
-	{
-		verboselog( machine, 0, "zs01_sda_write( %d ) chip out of range\n", chip );
-		return;
+	if(!cs && scl){
+//      state = STATE_STOP;
+//      sdar = false;
 	}
+}
 
-	c = &zs01[ chip ];
-
-	if( c->sdaw != sda )
-	{
-		verboselog( machine, 2, "zs01(%d) sdaw=%d\n", chip, sda );
-	}
-	if( c->cs == 0 && c->scl != 0 )
-	{
-//      if( c->sdaw == 0 && sda != 0 )
-//      {
-//          verboselog( machine, 1, "zs01(%d) goto stop\n", chip );
-//          c->state = STATE_STOP;
-//          c->sdar = 0;
-//      }
-		if( c->sdaw != 0 && sda == 0 )
-		{
-			switch( c->state )
-			{
-			case STATE_STOP:
-				verboselog( machine, 1, "zs01(%d) goto start\n", chip );
-				c->state = STATE_LOAD_COMMAND;
-				break;
-
-//          default:
-//              verboselog( machine, 1, "zs01(%d) skipped start (default)\n", chip );
-//              break;
-			}
-
-			c->bit = 0;
-			c->byte = 0;
-			c->shift = 0;
-			c->sdar = 0;
+void zs01_device::sda_0()
+{
+	if(!cs && scl) {
+		switch(state) {
+		case STATE_STOP:
+			verboselog(1, "goto start\n");
+			state = STATE_LOAD_COMMAND;
+			break;
+			//	default:
+			//		verboselog(1, "skipped start (default)\n");
+			//		break;
 		}
+
+		bit = 0;
+		byte = 0;
+		shift = 0;
+		sdar = false;
 	}
-	c->sdaw = sda;
 }
 
-int zs01_sda_read( running_machine *machine, int chip )
+void zs01_device::nvram_read(mame_file &file)
 {
-	struct zs01_chip *c;
-
-	if( chip >= ZS01_MAXCHIP )
-	{
-		verboselog( machine, 0, "zs01_sda_read( %d ) chip out of range\n", chip );
-		return 1;
-	}
-
-	c = &zs01[ chip ];
-	if( c->cs != 0 )
-	{
-		verboselog( machine, 2, "zs01(%d) not selected\n", chip );
-		return 1;
-	}
-	verboselog( machine, 2, "zs01(%d) sdar=%d\n", chip, c->sdar );
-
-	return c->sdar;
+	mame_fread(&file, response_to_reset, SIZE_RESPONSE_TO_RESET);
+	mame_fread(&file, command_key,       SIZE_KEY);
+	mame_fread(&file, data_key,          SIZE_KEY);
+	mame_fread(&file, data,              SIZE_DATA);
 }
 
-static void nvram_handler_zs01( running_machine *machine, mame_file *file, int read_or_write, int chip )
+void zs01_device::nvram_write(mame_file &file)
 {
-	struct zs01_chip *c;
-
-	if( chip >= ZS01_MAXCHIP )
-	{
-		verboselog( machine, 0, "nvram_handler_zs01( %d ) chip out of range\n", chip );
-		return;
-	}
-
-	c = &zs01[ chip ];
-
-	if( read_or_write )
-	{
-		mame_fwrite( file, c->data, SIZE_DATA );
-	}
-	else if( file )
-	{
-		mame_fread( file, c->data, SIZE_DATA );
-	}
+	mame_fwrite(&file, response_to_reset, SIZE_RESPONSE_TO_RESET);
+	mame_fwrite(&file, command_key,       SIZE_KEY);
+	mame_fwrite(&file, data_key,          SIZE_KEY);
+	mame_fwrite(&file, data,              SIZE_DATA);
 }
-
-NVRAM_HANDLER( zs01_0 ) { nvram_handler_zs01( machine, file, read_or_write, 0 ); }
-NVRAM_HANDLER( zs01_1 ) { nvram_handler_zs01( machine, file, read_or_write, 1 ); }

@@ -94,4 +94,4 @@ WRITE64_DEVICE_HANDLER( naomibd_w );
 
 /* ----- device interface ----- */
 
-DECLARE_LEGACY_NVRAM_DEVICE(NAOMI_BOARD, naomibd);
+DECLARE_LEGACY_DEVICE(NAOMI_BOARD, naomibd);

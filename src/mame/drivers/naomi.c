@@ -1342,6 +1342,7 @@ Notes:
 #include "cpu/arm7/arm7.h"
 #include "machine/eeprom.h"
 #include "machine/intelfsh.h"
+#include "machine/x76f100.h"
 #include "includes/naomibd.h"
 #include "includes/naomi.h"
 #include "cpu/sh4/sh4.h"
@@ -2063,6 +2064,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( naomi, naomi_base )
 	MCFG_NAOMI_ROM_BOARD_ADD("rom_board", "user1")
+	MCFG_X76F100_ADD("naomibd_eeprom")
 MACHINE_CONFIG_END
 
 /*
@@ -2071,6 +2073,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( naomigd, naomi_base )
 	MCFG_NAOMI_DIMM_BOARD_ADD("rom_board", "gdrom", "user1", "picreturn")
+	MCFG_X76F100_ADD("naomibd_eeprom")
 MACHINE_CONFIG_END
 
 /*
@@ -2095,6 +2098,7 @@ static MACHINE_CONFIG_DERIVED( aw, naomi_base )
 	MCFG_CPU_PROGRAM_MAP(aw_map)
 	MCFG_MACRONIX_29L001MC_ADD("awflash")
 	MCFG_AW_ROM_BOARD_ADD("rom_board", "user1")
+	MCFG_X76F100_ADD("naomibd_eeprom")
 MACHINE_CONFIG_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
@@ -2320,6 +2324,13 @@ Region byte encoding is as follows:
 
 /* default EEPROM values, same works for all games */
 #define NAOMI_DEFAULT_EEPROM \
+	ROM_REGION16_BE( 0x80, "main_eeprom", 0 ) \
+	ROM_LOAD16_WORD("eeprom-naomi-main-default.bin", 0x0000, 0x0080, CRC(fea29cbb) SHA1(4099f1747aafa07db34f6e072cd9bfaa83bae10e) ) \
+	ROM_REGION( 0x84, "naomibd_eeprom", 0 ) \
+	ROM_LOAD("eeprom-naomi-x76f100-default.bin", 0x0000, 0x0084, CRC(3ea24b6a) SHA1(3a730ebcf56e0060fef6b1b02eb2eb7cfb7e61dc) )
+
+/* Version without the default x76f100 eeprom */
+#define NAOMI_DEFAULT_EEPROM_NO_BD	\
 	ROM_REGION16_BE( 0x80, "main_eeprom", 0 ) \
 	ROM_LOAD16_WORD("eeprom-naomi-main-default.bin", 0x0000, 0x0080, CRC(fea29cbb) SHA1(4099f1747aafa07db34f6e072cd9bfaa83bae10e) )
 
@@ -2613,7 +2624,7 @@ IC21    64M     002C    8ECA
 ROM_START( doa2 )
 	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
-	NAOMI_DEFAULT_EEPROM
+	NAOMI_DEFAULT_EEPROM_NO_BD
 
 	ROM_REGION( 0xb000000, "user1", ROMREGION_ERASEFF)
 	ROM_LOAD("epr-22121.ic22",0x0000000, 0x0400000,  CRC(30f93b5e) SHA1(0e33383e7ab9a721dab4708b063598f2e9c9f2e7) ) // partially encrypted
@@ -2641,7 +2652,7 @@ ROM_START( doa2 )
 	ROM_LOAD("mpr-22120.ic21",0xa800000, 0x0800000, CRC(a30facb4) SHA1(70415ca34095c795297486bce1f956f6a8d4817f) )
 
 	// on-cart X76F100 eeprom contents
-	ROM_REGION( 0x100, "naomibd_eeprom", ROMREGION_ERASE00 )
+	ROM_REGION( 0x84, "naomibd_eeprom", 0 )
 	ROM_LOAD( "841-0003.sf",  0x000000, 0x000084, CRC(3a119a17) SHA1(d37a092cca7c9cfc5f2637b355af90a65d04013e) )
 
 	// trojaned protection data (filename is word offset)
@@ -2702,7 +2713,7 @@ Serial: BALH-13A0175
 ROM_START( doa2m )
 	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
-	NAOMI_DEFAULT_EEPROM
+	NAOMI_DEFAULT_EEPROM_NO_BD
 
 	ROM_REGION( 0xb000000, "user1", ROMREGION_ERASEFF)
 	ROM_LOAD("doa2verm.ic22", 0x0000000, 0x0400000,  CRC(94b16f08) SHA1(225cd3e5dd5f21facf0a1d5e66fa17db8497573d) )
@@ -2730,7 +2741,7 @@ ROM_START( doa2m )
 	ROM_LOAD("mpr-22120.ic21",0xa800000, 0x0800000, CRC(a30facb4) SHA1(70415ca34095c795297486bce1f956f6a8d4817f) )
 
 	// on-cart X76F100 eeprom contents
-	ROM_REGION( 0x100, "naomibd_eeprom", ROMREGION_ERASE00 )
+	ROM_REGION( 0x84, "naomibd_eeprom", 0 )
 	ROM_LOAD( "841-0003.sf",  0x000000, 0x000084, CRC(3a119a17) SHA1(d37a092cca7c9cfc5f2637b355af90a65d04013e) )
 
 	// trojaned protection data (filename is word offset)
@@ -3134,7 +3145,7 @@ ROM_END
 ROM_START( alpiltdx )
 	ROM_REGION( 0x200000, "maincpu", 0)
 	AIRLINE_BIOS
-	NAOMI_DEFAULT_EEPROM
+	NAOMI_DEFAULT_EEPROM_NO_BD
 
 	ROM_REGION( 0xb000000, "user1", ROMREGION_ERASEFF)
 	ROM_LOAD( "epr-21787b.ic22", 0x0000000, 0x400000, CRC(56893156) SHA1(8e56e0633f92b1f50105421b7eb8428f51a78b27) )
@@ -3151,7 +3162,7 @@ ROM_START( alpiltdx )
 	ROM_LOAD( "mpr-21738.ic11", 0x5800000, 0x800000, CRC(95a592e8) SHA1(862dce467e8805381bab001df68262f1baf3c498) )
 
 	// on-cart X76F100 eeprom contents
-	ROM_REGION( 0x100, "naomibd_eeprom", ROMREGION_ERASE00 )
+	ROM_REGION( 0x84, "naomibd_eeprom", 0 )
 	ROM_LOAD( "airlinepdx.sf",  0x000000, 0x000084, CRC(404b2add) SHA1(540c8474806775646ace111a2993397b1419fee3) )
 ROM_END
 
@@ -5089,7 +5100,7 @@ GAME( 1998, naomi,    0,        naomi,    naomi,    naomi, ROT0, "Sega",        
 
 /* games on Namco custom ROM board */
 /* ???????? */ GAME( 2000, wldkicks,  naomi,    naomi,    naomi,    naomi,    ROT0, "Capcom / Namco",  "World Kicks", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 25709801 */ GAME( 2001, gunsur2,  naomi,    naomi,    naomi,    naomi,    ROT0, "Capcom / Namco",  "Gun Survivor 2: Bio Hazard Code Veronica", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 25709801 */ GAME( 2001, gunsur2,   naomi,    naomi,    naomi,    naomi,    ROT0, "Capcom / Namco",  "Gun Survivor 2: Bio Hazard Code Veronica", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 
 /* Games with game specific bios sets */
 /*    BIOS   */ GAME( 1998, hod2bios, 0,         naomi,    naomi,    0,     ROT0, "Sega",  "Naomi House of the Dead 2 Bios", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
@@ -5273,8 +5284,6 @@ ROM_START( moeru )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0013", 0, SHA1(c8869069c28bc8eec96d820886bc388d69d46143) )
 
@@ -5291,8 +5300,6 @@ ROM_END
 ROM_START( chocomk )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0014a", 0, SHA1(f88d8203c8692f51c9492d5549a3ad7d9583dc6f) )
@@ -5311,8 +5318,6 @@ ROM_START( quizqgd )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0017", 0, SHA1(94a9319633388968611892e36691b45c94b4f83f) )
 
@@ -5329,8 +5334,6 @@ ROM_START( azumanga )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0018", 0, SHA1(3e40ca7d43173fe7048d199fdc127b9411e10360) )
 
@@ -5343,8 +5346,6 @@ ROM_END
 ROM_START( ggxxrl )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0019a", 0, SHA1(d44906505ff698eda6feee6c2b9402e19f64e5d3) )
@@ -5363,8 +5364,6 @@ ROM_START( tetkiwam )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0020", 0, SHA1(7b2ef47ca2038d6a93615b760b03e8f7cb1b83c2) )
 
@@ -5381,8 +5380,6 @@ ROM_END
 ROM_START( shikgam2 )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0021", 0, SHA1(f5036711a28a211e8d71400a8322db3172c5733f) )
@@ -5401,8 +5398,6 @@ ROM_START( usagui )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0022", 0, SHA1(45deba05a12abbf6390c0fc0e4cdeaedfa7d2ca5) )
 
@@ -5419,8 +5414,6 @@ ROM_END
 ROM_START( bdrdown )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0023a", 0, SHA1(caac915104d61f2122f5afe27da1ef5fa9cf9f9a) )
@@ -5440,8 +5433,6 @@ ROM_START( psyvar2 )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0024", 0,  SHA1(d346762036fb1c40a261a434b50e63459f306f14) )
 
@@ -5459,11 +5450,8 @@ ROM_START( cfield )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0025", 0, SHA1(be0d88eb4f48403a2ceaa7ef588ed60b96ba93bf) )
-
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//ROM_LOAD("317-5102-com.data", 0x00, 0x50, CRC(32adf2eb) SHA1(d86752e6fe9ccac093c512828fca5b7ae62a3ff2) )
@@ -5479,11 +5467,8 @@ ROM_START( trizeal )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0026", 0, SHA1(e4c1e51292a7923b25bfc61d38fe386bf596002a) )
-
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//ROM_LOAD("317-5103-jpn.data", 0x00, 0x50,  CRC(3affbf82) SHA1(268746e86e7546f4bab54bdd268f7b58f10c1aaf) )
@@ -5498,8 +5483,6 @@ ROM_END
 ROM_START( meltybld )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0028c", 0, SHA1(66de09738551e351784cc9695a58b35fdf6b6c4b) )
@@ -5518,8 +5501,6 @@ ROM_START( senko )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0030a", 0,  SHA1(1f7ade47e37a0026451b5baf3ba746400de8d156) )
 
@@ -5535,8 +5516,6 @@ ROM_END
 ROM_START( senkoo )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0030", 0,  SHA1(c7f25c05f47a490c5da9369c588b6136e93c280e) )
@@ -7278,7 +7257,7 @@ GAME( 2005, samsptk,  awbios,   aw,    aw,    samsptk,  ROT0, "Sammy / SNK Playm
 GAME( 2005, kofxi,    awbios,   aw,    aw,    kofxi,    ROT0, "Sammy / SNK Playmore",            "The King of Fighters XI", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2005, fotns,    awbios,   aw,    aw,    fotns,    ROT0, "Sega / Arc System Works",         "Fist Of The North Star", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2005, kofnw,    awbios,   aw,    aw,    kofnw,    ROT0, "Sammy / SNK Playmore",            "The King of Fighters Neowave", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-GAME( 2005, kofnwj,   kofnw,   aw,    aw,    kofnw,    ROT0, "Sammy / SNK Playmore",            "The King of Fighters Neowave (Japan)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2005, kofnwj,   kofnw,    aw,    aw,    kofnw,    ROT0, "Sammy / SNK Playmore",            "The King of Fighters Neowave (Japan)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2005, xtrmhunt, awbios,   aw,    aw,    xtrmhunt, ROT0, "Sammy",                           "Extreme Hunting", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2006, mslug6,   awbios,   aw,    aw,    mslug6,   ROT0, "Sega / SNK Playmore",             "Metal Slug 6", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 2006, xtrmhnt2, awbios,   aw,    aw,    xtrmhnt2, ROT0, "Sega",                            "Extreme Hunting 2", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
