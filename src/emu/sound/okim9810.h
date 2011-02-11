@@ -153,6 +153,8 @@ protected:
 
 	static const int OKIM9810_VOICES = 8;
 	okim_voice m_voice[OKIM9810_VOICES];
+
+	static const UINT8 s_volume_table[16];
 };
 
 

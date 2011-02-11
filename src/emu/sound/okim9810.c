@@ -18,6 +18,28 @@
 const device_type OKIM9810 = okim9810_device_config::static_alloc_device_config;
 
 
+// volume lookup table. The manual lists a full 16 steps, 2dB per step. 
+// Given the dB values, that seems to map to a 7-bit volume control.
+const UINT8 okim9810_device::s_volume_table[16] =
+{
+	0x80,	//  0 dB
+	0x65,	// -2 dB
+	0x50,	// -4 dB
+	0x40,	// -6 dB
+	0x32,	// -8.0 dB
+	0x28,	// -10.5 dB
+	0x20,	// -12.0 dB
+	0x19,	// -14.5 dB
+	0x14,	// -16.0 dB
+	0x10,	// -18.0 dB
+	0x0c,	// -20.0 dB
+	0x0a,	// -22.0 dB
+	0x08,	// -24.0 dB
+	0x06,	// -26.0 dB
+	0x05,	// -28.0 dB
+	0x04,	// -30.0 dB
+};
+
 // default address map
 static ADDRESS_MAP_START( okim9810, 0, 8 )
     AM_RANGE(0x000000, 0xffffff) AM_ROM
@@ -293,10 +315,9 @@ void okim9810_device::write_command(UINT8 data)
         case 0x07:  // CVOL (channel volume)
         {
             mame_printf_verbose("CVOL  channel %d volume level %02x\n", channel, m_TMP_register); 
-            mame_printf_verbose("\tChannel %d -> volume %d.\n", channel, m_TMP_register);
+            mame_printf_verbose("\tChannel %d -> volume %d.\n", channel, s_volume_table[m_TMP_register & 0x0f]);
 
-            // TODO: Use the proper volume table p37
-            m_voice[channel].m_volume = m_TMP_register;
+            m_voice[channel].m_volume = s_volume_table[m_TMP_register & 0x0f];
             break;
         }
         case 0x08:  // PAN
@@ -373,8 +394,8 @@ void okim9810_device::okim_voice::generate_adpcm(direct_read_data &direct, strea
 		int nibble = direct.read_raw_byte(m_base_offset + m_sample / 2) >> (((m_sample & 1) << 2) ^ 4);
 
 		// output to the buffer, scaling by the volume
-		// signal in range -2048..2047, volume in range 2..32 => signal * volume / 2 in range -32768..32767
-		*buffer++ += m_adpcm.clock(nibble); //TODO * m_volume / 2;
+		// signal in range -2048..2047, volume in range 2..128 => signal * volume / 8 in range -32768..32767
+		*buffer++ += (INT32)m_adpcm.clock(nibble) * (INT32)m_volume / 8;
 
 		// next!
 		if (++m_sample >= m_count)
