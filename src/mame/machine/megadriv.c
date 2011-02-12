@@ -3832,13 +3832,13 @@ int segacd_ret = 0;
 #define REG_R_DBCH   (0x3)
 #define REG_R_HEAD0  (0x4)
 #define REG_R_HEAD1  (0x5)
-#define REG_R_HEAD2  (0x6)		
-#define REG_R_HEAD3  (0x7)		
-#define REG_R_PTL    (0x8)		
-#define REG_R_PTH    (0x9)	
-#define REG_R_WAL    (0xa)		
-#define REG_R_WAH    (0xb)	
-#define REG_R_STAT0  (0xc)	
+#define REG_R_HEAD2  (0x6)
+#define REG_R_HEAD3  (0x7)
+#define REG_R_PTL    (0x8)
+#define REG_R_PTH    (0x9)
+#define REG_R_WAL    (0xa)
+#define REG_R_WAH    (0xb)
+#define REG_R_STAT0  (0xc)
 #define REG_R_STAT1  (0xd)
 #define REG_R_STAT2  (0xe)
 #define REG_R_STAT3  (0xf)
@@ -3861,11 +3861,11 @@ int segacd_ret = 0;
 //                   (0xf)
 
 
-#define TOCCMD_CURPOS    (0x0)			
-#define TOCCMD_TRKPOS 	 (0x1)				
-#define TOCCMD_CURTRK    (0x2)			
-#define TOCCMD_LENGTH    (0x3)		
-#define TOCCMD_FIRSTLAST (0x4)				
+#define TOCCMD_CURPOS    (0x0)
+#define TOCCMD_TRKPOS 	 (0x1)
+#define TOCCMD_CURTRK    (0x2)
+#define TOCCMD_LENGTH    (0x3)
+#define TOCCMD_FIRSTLAST (0x4)
 #define TOCCMD_TRACKADDR (0x5)
 
 struct segacd_t
@@ -3922,7 +3922,7 @@ segacd_t segacd;
 
 
 
-INLINE int to_bcd(int val, bool byte)	
+INLINE int to_bcd(int val, bool byte)
 {
 	if (val > 99) val = 99;
 
@@ -3997,7 +3997,7 @@ static void set_data_audio_mode(void)
 
 void CDD_DoChecksum(void)
 {
-	int checksum = 
+	int checksum =
 		CDD_RX[0] +
 		CDD_RX[1] +
 		CDD_RX[2] +
@@ -4058,7 +4058,7 @@ void scd_ctrl_checks(running_machine* machine)
 
 	(CDC_CTRLB0 & 0x10) ? (CDC_STATB2 = CDC_CTRLB1 & 0x08) : (CDC_STATB2 = CDC_CTRLB1 & 0x0C);
 	(CDC_CTRLB0 & 0x02) ? (CDC_STATB3 = 0x20) : (CDC_STATB3 = 0x00);
-	
+
 	if (CDC_IFCTRL & 0x20)
 	{
 		CHECK_SCD_LV5_INTERRUPT
@@ -4070,7 +4070,7 @@ void scd_ctrl_checks(running_machine* machine)
 void scd_advance_current_readpos(void)
 {
 	SCD_CURLBA++;
-		
+
 	CDC_WA += SECTOR_SIZE;
 	CDC_PT += SECTOR_SIZE;
 
@@ -4085,9 +4085,9 @@ int Read_LBA_To_Buffer(running_machine* machine)
 
 	if (data_track)
 		cdrom_read_data(segacd.cd, SCD_CURLBA, SCD_BUFFER, CD_TRACK_MODE1);
-		
+
 	CDC_UpdateHEAD();
-	
+
 	if (!data_track)
 	{
 		scd_advance_current_readpos();
@@ -4112,11 +4112,11 @@ int Read_LBA_To_Buffer(running_machine* machine)
 				memcpy(&CDC_BUFFER[CDC_PT], SCD_BUFFER, SECTOR_SIZE);
 			}
 		}
-		
+
 		scd_ctrl_checks(machine);
 	}
 
-	
+
 	return 0;
 }
 
@@ -4128,9 +4128,9 @@ static void CheckCommand(running_machine* machine)
 		CDD_Export();
 		CHECK_SCD_LV4_INTERRUPT
 	}
-	
+
 	if (SCD_READ_ENABLED)
-	{	
+	{
 		set_data_audio_mode();
 		Read_LBA_To_Buffer(machine);
 	}
@@ -4161,6 +4161,8 @@ void CDD_GetPos(void)
 	CLEAR_CDD_RESULT
 	UINT32 msf;
 	CDD_STATUS &= 0xFF;
+	if(segacd.cd == NULL) // no cd is there, bail out
+		return;
 	CDD_STATUS |= SCD_STATUS;
 	msf = lba_to_msf_alt(SCD_CURLBA+150);
 	CDD_MIN = to_bcd(((msf & 0x00ff0000)>>16),false);
@@ -4174,6 +4176,8 @@ void CDD_GetTrackPos(void)
 	int elapsedlba;
 	UINT32 msf;
 	CDD_STATUS &= 0xFF;
+	if(segacd.cd == NULL) // no cd is there, bail out
+		return;
 	CDD_STATUS |= SCD_STATUS;
 	elapsedlba = SCD_CURLBA - cdrom_get_track_start(segacd.cd, SCD_CURTRK);
 	msf = lba_to_msf_alt (elapsedlba+150);
@@ -4183,9 +4187,11 @@ void CDD_GetTrackPos(void)
 }
 
 void CDD_GetTrack(void)
-{	
+{
 	CLEAR_CDD_RESULT
 	CDD_STATUS &= 0xFF;
+	if(segacd.cd == NULL) // no cd is there, bail out
+		return;
 	CDD_STATUS |= SCD_STATUS;
 	SCD_CURTRK = cdrom_get_track(segacd.cd, SCD_CURLBA)+1;
 	CDD_MIN = to_bcd(SCD_CURTRK, false);
@@ -4195,6 +4201,8 @@ void CDD_Length(void)
 {
 	CLEAR_CDD_RESULT
 	CDD_STATUS &= 0xFF;
+	if(segacd.cd == NULL) // no cd is there, bail out
+		return;
 	CDD_STATUS |= SCD_STATUS;
 	CDD_MIN = 259; 	// HACK!!!!
 	CDD_SEC = 258; 	// HACK!!!!
@@ -4206,6 +4214,8 @@ void CDD_FirstLast(void)
 {
 	CLEAR_CDD_RESULT
 	CDD_STATUS &= 0xFF;
+	if(segacd.cd == NULL) // no cd is there, bail out
+		return;
 	CDD_STATUS |= SCD_STATUS;
 	CDD_MIN = 1; // first 	// HACK!!!!
 	CDD_SEC = 1; // last    // HACK!!!!
@@ -4219,14 +4229,16 @@ void CDD_GetTrackAdr(void)
 	int last_track = cdrom_get_last_track(segacd.cd)+1;
 
 	CDD_STATUS &= 0xFF;
+	if(segacd.cd == NULL) // no cd is there, bail out
+		return;
 	CDD_STATUS |= SCD_STATUS;
-	
+
 	if (track > last_track)
 		track = last_track;
-	
+
 	if (track < 1)
 		track = 1;
-	
+
 	UINT32 startlba = (segacd.toc->tracks[track-1].physframeofs);
 	UINT32 startmsf = lba_to_msf_alt( startlba+150 );
 
@@ -4234,7 +4246,7 @@ void CDD_GetTrackAdr(void)
 	CDD_SEC = to_bcd((startmsf&0x0000ff00)>>8,false);
 	CDD_FRAME = to_bcd((startmsf&0x000000ff)>>0,false);
 	CDD_EXT = track % 10;
-	
+
 	if (segacd.toc->tracks[track - 1].trktype != CD_TRACK_AUDIO)
 		CDD_FRAME |= 0x0800;
 }
@@ -4243,7 +4255,7 @@ static UINT32 getmsf_from_regs(void)
 {
 	UINT32 msf = 0;
 
-	msf  = ((CDD_TX[2] & 0xF) + (CDD_TX[3] & 0xF) * 10) << 16; 
+	msf  = ((CDD_TX[2] & 0xF) + (CDD_TX[3] & 0xF) * 10) << 16;
 	msf |= ((CDD_TX[4] & 0xF) + (CDD_TX[5] & 0xF) * 10) << 8;
 	msf |= ((CDD_TX[6] & 0xF) + (CDD_TX[7] & 0xF) * 10) << 0;
 
@@ -4347,12 +4359,12 @@ static void CDD_Reset(void)
 {
 	CLEAR_CDD_RESULT
 	CDD_CONTROL = CDD_STATUS = 0;
-	
+
 	for (int i = 0; i < 10; i++)
 		CDD_RX[i] = CDD_TX[i] = 0;
-	
+
 	CDD_DoChecksum();
-	
+
 	SCD_CURTRK = SCD_CURLBA = 0;
 	SCD_STATUS = CDD_READY;
 }
@@ -4361,7 +4373,7 @@ static void CDC_Reset(void)
 {
 	memset(CDC_BUFFER, 0x00, ((16 * 1024 * 2) + SECTOR_SIZE));
 	CDC_UpdateHEAD();
-	
+
 	CDC_DMA_ADDRC = CDC_DMACNT = CDC_PT = CDC_SBOUT = CDC_IFCTRL = CDC_CTRLB0 = CDC_CTRLB1 =
 		CDC_CTRLB2 = CDC_HEADB1 = CDC_HEADB2 = CDC_HEADB3 = CDC_STATB0 = CDC_STATB1 = CDC_STATB2 = CDC_DECODE = 0;
 
@@ -4376,7 +4388,7 @@ void lc89510_Reset(void)
 {
 	CDD_Reset();
 	CDC_Reset();
-	
+
 	CDC_REG0 = CDC_REG1 = CDC_DMA_ADDR = SCD_STATUS_CDC = CDD_DONE = 0;
 }
 
@@ -4386,7 +4398,7 @@ void CDC_End_Transfer(running_machine* machine)
 	CDC_REG0 |= 0x8000;
 	CDC_REG0 &= ~0x4000;
 	CDC_IFSTAT |= 0x08;
-	
+
 	if (CDC_IFCTRL & 0x40)
 	{
 		CDC_IFSTAT &= ~0x40;
@@ -4416,8 +4428,8 @@ void CDC_Do_DMA(running_machine* machine, int rate)
 	}
 	else
 		length = rate;
-		
-	
+
+
 	int dmacount = length;
 	dstoffset = (CDC_DMA_ADDR & 0xFFFF) << 3;
 	int srcoffset = 0;
@@ -4425,7 +4437,7 @@ void CDC_Do_DMA(running_machine* machine, int rate)
 	while (dmacount--)
 	{
 		UINT16 data = (CDC_BUFFER[CDC_DMA_ADDRC+srcoffset]<<8) | CDC_BUFFER[CDC_DMA_ADDRC+srcoffset+1];
-				
+
 		if (destination==DMA_PRG)
 		{
 			dest = (UINT8 *) segacd_4meg_prgram;
@@ -4446,11 +4458,11 @@ void CDC_Do_DMA(running_machine* machine, int rate)
 		}
 		else if (destination==DMA_PCM)
 		{
-			fatalerror("PCM RAM DMA unimplemented!\n");	
+			fatalerror("PCM RAM DMA unimplemented!\n");
 		}
 		else
 		{
-			fatalerror("Unknown DMA Destination!!\n");	
+			fatalerror("Unknown DMA Destination!!\n");
 		}
 
 		dest[dstoffset+1] = data >>8;
@@ -4481,7 +4493,7 @@ UINT16 CDC_Host_r(running_machine* machine, UINT16 type)
 		if (destination == type)
 		{
 			CDC_DMACNT -= 2;
-		
+
 			if (CDC_DMACNT <= 0)
 			{
 				if (type==READ_SUB) CDC_DMACNT = 0;
@@ -4495,7 +4507,7 @@ UINT16 CDC_Host_r(running_machine* machine, UINT16 type)
 			return data;
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -4542,7 +4554,7 @@ UINT8 CDC_Reg_r(void)
 			}
 			break;
 	}
-	
+
 	return ret;
 }
 
@@ -4560,10 +4572,10 @@ void CDC_Reg_w(UINT8 data)
 	case REG_W_SBOUT:
 			CDC_SBOUT = data;
 			break;
-		
+
 	case REG_W_IFCTRL:
 			CDC_IFCTRL = data;
-			
+
 			if (!(CDC_IFCTRL & 0x02))
 			{
 				CDC_DMACNT = 0;
@@ -4571,12 +4583,12 @@ void CDC_Reg_w(UINT8 data)
 				CDC_IFSTAT |= 0x08;
 			}
 			break;
-		
+
 	case REG_W_DBCL: CDC_DMACNT = (CDC_DMACNT &~ 0x00ff) | (data & 0x00ff) << 0; break;
 	case REG_W_DBCH: CDC_DMACNT = (CDC_DMACNT &~ 0xff00) | (data & 0x00ff) << 8; break;
 	case REG_W_DACL: CDC_DMA_ADDRC = (CDC_DMA_ADDRC &~ 0x00ff) | (data & 0x00ff) << 0; break;
 	case REG_W_DACH: CDC_DMA_ADDRC = (CDC_DMA_ADDRC &~ 0xff00) | (data & 0x00ff) << 8; break;
-	
+
 	case REG_W_DTTRG:
 			if (CDC_IFCTRL & 0x02)
 			{
@@ -4585,7 +4597,7 @@ void CDC_Reg_w(UINT8 data)
 				CDC_REG0 &= ~0x8000;
 			}
 			break;
-		
+
 	case REG_W_DTACK: CDC_IFSTAT |= 0x40; break;
 	case REG_W_WAL: CDC_WA = (CDC_WA &~ 0x00ff) | (data & 0x00ff) << 0; break;
 	case REG_W_WAH:	CDC_WA = (CDC_WA &~ 0xff00) | (data & 0x00ff) << 8;	break;
@@ -4627,7 +4639,7 @@ void CDD_Import(running_machine* machine)
 	{
 		case CMD_STATUS:	CDD_GetStatus();	       break;
 		case CMD_STOPALL:	CDD_Stop();	               break;
-		case CMD_GETTOC:	CDD_Handle_TOC_Commands(); break;	
+		case CMD_GETTOC:	CDD_Handle_TOC_Commands(); break;
 		case CMD_READ:		CDD_Play();                break;
 		case CMD_SEEK:		CDD_Seek();	               break;
 		case CMD_STOP:		CDD_Pause();	           break;
@@ -5756,7 +5768,7 @@ void segacd_init_main_cpu( running_machine* machine )
 	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12002, 0xa12003, 0, 0, scd_a12002_memory_mode_r, scd_a12002_memory_mode_w); // memory mode / write protect
 	//memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12004, 0xa12005, 0, 0, segacd_cdc_mode_address_r, segacd_cdc_mode_address_w);
 	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12006, 0xa12007, 0, 0, scd_a12006_hint_register_r, scd_a12006_hint_register_w); // where HINT points on main CPU
-	//memory_install_read16_handler     (cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12008, 0xa12009, 0, 0, cdc_data_main_r); 
+	//memory_install_read16_handler     (cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12008, 0xa12009, 0, 0, cdc_data_main_r);
 
 
 
@@ -6012,7 +6024,7 @@ static WRITE16_HANDLER( segacd_irq_mask_w )
 			}
 		}
 	}
-	
+
 	segacd_irq_mask = data & 0x7e;
 }
 
@@ -6793,7 +6805,7 @@ static void svp_init(running_machine *machine)
 	state->emu_status = 0;
 	state->XST = 0;
 	state->XST2 = 0;
-	
+
 	/* SVP stuff */
 	state->dram = auto_alloc_array(machine, UINT8, 0x20000);
 	memory_install_ram(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x300000, 0x31ffff, 0, 0, state->dram);
@@ -8745,7 +8757,7 @@ static TIMER_DEVICE_CALLBACK( render_timer_callback )
 	if (genesis_scanline_counter>=0 && genesis_scanline_counter<megadrive_visible_scanlines)
 	{
 		genesis_render_scanline(timer.machine, genesis_scanline_counter);
-		
+
 		// put this one a timer instead?
 		#define RATE 256
 		if (sega_cd_connected)
