@@ -692,6 +692,10 @@ ifdef MAP
 	@echo Deleting $(FULLNAME).map...
 	$(RM) $(FULLNAME).map
 endif
+ifdef SYMBOLS
+	@echo Deleting $(FULLNAME).sym...
+	$(RM) $(FULLNAME).sym
+endif
 
 checkautodetect:
 	@echo TARGETOS=$(TARGETOS) 
