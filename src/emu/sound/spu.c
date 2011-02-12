@@ -958,13 +958,11 @@ signed short *adpcm_decoder::decode_packet(adpcm_packet *ap, signed short *dp)
 					bh=(b>>4)<<12;
 
 		bl=(bl>>shift)+(((l0*f0)+(l1*f1)+32)>>6);
-		if (bl<-32768) bl=-32768; else if (bl>32767) bl=32767;
 		*dp++=bl;
 		l1=l0;
 		l0=bl;
 
 		bh=(bh>>shift)+(((l0*f0)+(l1*f1)+32)>>6);
-		if (bh<-32768) bh=-32768; else if (bh>32767) bh=32767;
 		*dp++=bh;
 		l1=l0;
 		l0=bh;
