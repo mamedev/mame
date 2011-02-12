@@ -1642,7 +1642,7 @@ void spu_device::update_voice_loop(const unsigned int v)
 {
 //	voicereg *vr=&spureg.voice[v];
 	voiceinfo *vi=&voice[v];
-	unsigned int ra;
+	unsigned int ra = 0;
 
 	// Check for looping using the voices repeat address register and get
 	// a pointer to the loop position if enabled
