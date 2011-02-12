@@ -92,9 +92,9 @@ const char *multicart_error_text(multicart_open_error error);
 ***************************************************************************/
 
 /* opens a multicart */
-multicart_open_error multicart_open(const char *filename, const char *drvname, multicart_load_flags load_flags, multicart_t **cart);
+multicart_open_error multicart_open(core_options &options, const char *filename, const char *drvname, multicart_load_flags load_flags, multicart_t **cart);
 
 /* closes a multicart */
-void multicart_close(multicart_t *cart);
+void multicart_close(core_options &options, multicart_t *cart);
 
 #endif /* __MULTCART_H__ */

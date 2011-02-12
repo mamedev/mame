@@ -303,7 +303,7 @@ static DEVICE_IMAGE_LOAD( cartslot )
 		return (*config->device_load)(image);
 
 	/* try opening this as if it were a multicart */
-	multicart_open(image.filename(), device->machine->gamedrv->name, MULTICART_FLAGS_LOAD_RESOURCES, &cart->mc);
+	multicart_open(device->machine->options(), image.filename(), device->machine->gamedrv->name, MULTICART_FLAGS_LOAD_RESOURCES, &cart->mc);
 	if (cart->mc == NULL)
 	{
 
@@ -337,7 +337,7 @@ static DEVICE_IMAGE_UNLOAD( cartslot )
 
 	if (cart->mc != NULL)
 	{
-		multicart_close(cart->mc);
+		multicart_close(device->machine->options(), cart->mc);
 		cart->mc = NULL;
 	}
 
@@ -360,12 +360,12 @@ static const cartslot_pcb_type *identify_pcb(device_image_interface &image)
 	if (image.software_entry() == NULL && image.exists())
 	{
 		/* try opening this as if it were a multicart */
-		multicart_open_error me = multicart_open(image.filename(), image.device().machine->gamedrv->name, MULTICART_FLAGS_DONT_LOAD_RESOURCES, &mc);
+		multicart_open_error me = multicart_open(image.device().machine->options(), image.filename(), image.device().machine->gamedrv->name, MULTICART_FLAGS_DONT_LOAD_RESOURCES, &mc);
 		if (me == MCERR_NONE)
 		{
 			/* this was a multicart - read from it */
 			astring_cpyc(&pcb_name, mc->pcb_type);
-			multicart_close(mc);
+			multicart_close(image.device().machine->options(), mc);
 		}
 		else
 		{

@@ -487,7 +487,7 @@ void main()
 void Load(char *name,byte *buffer,int from, int length)
 {
 /*
-	emu_file file(*mame_options(), NULL, OPEN_FLAG_READ);
+	emu_file file(options, NULL, OPEN_FLAG_READ);
 	file_error filerr = file.open(name);
 	if (filerr != FILERR_NONE)
 		return;

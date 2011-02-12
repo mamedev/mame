@@ -6,12 +6,12 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "multcart.h"
 #include "pool.h"
 #include "unzip.h"
 #include "corestr.h"
 #include "xmlfile.h"
-#include "emu.h"
 #include "hash.h"
 #include "machine/ram.h"
 
@@ -212,7 +212,7 @@ static multicart_open_error load_rom_resource(multicart_load_state *state, xml_d
     load_ram_resource
 -------------------------------------------------*/
 
-static multicart_open_error load_ram_resource(multicart_load_state *state, xml_data_node *resource_node,
+static multicart_open_error load_ram_resource(core_options &options, multicart_load_state *state, xml_data_node *resource_node,
 	multicart_resource *resource)
 {
 	const char *length_string;
@@ -258,7 +258,7 @@ static multicart_open_error load_ram_resource(multicart_load_state *state, xml_d
 			if (resource->filename == NULL)
 				return MCERR_OUT_OF_MEMORY;
 
-			image_battery_load_by_name(*mame_options(), resource->filename, resource->ptr, resource->length, 0x00);
+			image_battery_load_by_name(options, resource->filename, resource->ptr, resource->length, 0x00);
 		}
 		/* else this type is volatile, in which case we just have
             a memory expansion */
@@ -271,7 +271,7 @@ static multicart_open_error load_ram_resource(multicart_load_state *state, xml_d
     load_resource
 -------------------------------------------------*/
 
-static multicart_open_error load_resource(multicart_load_state *state, xml_data_node *resource_node,
+static multicart_open_error load_resource(core_options &options, multicart_load_state *state, xml_data_node *resource_node,
 	multicart_resource_type resource_type)
 {
 	const char *id;
@@ -305,7 +305,7 @@ static multicart_open_error load_resource(multicart_load_state *state, xml_data_
 			break;
 
 		case MULTICART_RESOURCE_TYPE_RAM:
-			err = load_ram_resource(state, resource_node, resource);
+			err = load_ram_resource(options, state, resource_node, resource);
 			if (err != MCERR_NONE)
 				return err;
 			break;
@@ -327,7 +327,7 @@ static multicart_open_error load_resource(multicart_load_state *state, xml_data_
     load_all_resources
 -------------------------------------------------*/
 
-static multicart_open_error load_all_resources(multicart_load_state *state)
+static multicart_open_error load_all_resources(core_options &options, multicart_load_state *state)
 {
 	multicart_open_error err;
 	xml_data_node *resource_node;
@@ -338,7 +338,7 @@ static multicart_open_error load_all_resources(multicart_load_state *state)
 		resource_type = get_resource_type(resource_node->name);
 		if (resource_type != MULTICART_RESOURCE_TYPE_INVALID)
 		{
-			err = load_resource(state, resource_node, resource_type);
+			err = load_resource(options, state, resource_node, resource_type);
 			if (err != MCERR_NONE)
 				return err;
 		}
@@ -354,7 +354,7 @@ static multicart_open_error load_all_resources(multicart_load_state *state)
     be freed on multicart_close.
 -------------------------------------------------*/
 
-static multicart_open_error save_ram_resources(multicart_t *cart)
+static multicart_open_error save_ram_resources(core_options &options, multicart_t *cart)
 {
 	const multicart_resource *resource;
 
@@ -362,7 +362,7 @@ static multicart_open_error save_ram_resources(multicart_t *cart)
 	{
 		if ((resource->type == MULTICART_RESOURCE_TYPE_RAM) && (resource->filename != NULL))
 		{
-			image_battery_save_by_name(*mame_options(), resource->filename, resource->ptr, resource->length);
+			image_battery_save_by_name(options, resource->filename, resource->ptr, resource->length);
 		}
 	}
 	return MCERR_NONE;
@@ -460,7 +460,7 @@ static multicart_open_error load_all_sockets(multicart_load_state *state)
     multicart_open - opens a multicart
 -------------------------------------------------*/
 
-multicart_open_error multicart_open(const char *filename, const char *gamedrv, multicart_load_flags load_flags, multicart_t **cart)
+multicart_open_error multicart_open(core_options &options, const char *filename, const char *gamedrv, multicart_load_flags load_flags, multicart_t **cart)
 {
 	multicart_open_error err;
 	zip_error ziperr;
@@ -565,7 +565,7 @@ multicart_open_error multicart_open(const char *filename, const char *gamedrv, m
 	/* do we have to load resources? */
 	if (load_flags & MULTICART_FLAGS_LOAD_RESOURCES)
 	{
-		err = load_all_resources(&state);
+		err = load_all_resources(options, &state);
 		if (err != MCERR_NONE)
 			goto done;
 
@@ -588,7 +588,7 @@ done:
 
 	if ((err != MCERR_NONE) && (state.multicart != NULL))
 	{
-		multicart_close(state.multicart);
+		multicart_close(options, state.multicart);
 		state.multicart = NULL;
 	}
 	*cart = state.multicart;
@@ -600,8 +600,8 @@ done:
     multicart_close - closes a multicart
 -------------------------------------------------*/
 
-void multicart_close(multicart_t *cart)
+void multicart_close(core_options &options, multicart_t *cart)
 {
-	save_ram_resources(cart);
+	save_ram_resources(options, cart);
 	pool_free_lib(cart->data->pool);
 }
