@@ -99,6 +99,7 @@ enum
 	SUBTYPE_M6802,
 	SUBTYPE_M6803,
 	SUBTYPE_M6808,
+	SUBTYPE_HD6301,
 	SUBTYPE_HD63701,
 	SUBTYPE_NSC8105
 };
@@ -176,6 +177,7 @@ INLINE m6800_state *get_safe_token(device_t *device)
 		   device->type() == M6802 ||
 		   device->type() == M6803 ||
 		   device->type() == M6808 ||
+		   device->type() == HD6301 ||
 		   device->type() == HD63701 ||
 		   device->type() == NSC8105);
 	return (m6800_state *)downcast<legacy_cpu_device *>(device)->token();
@@ -1291,7 +1293,31 @@ static CPU_INIT( m6808 )
 }
 
 /****************************************************************************
- * HD63701 similiar to the M6800
+ * HD6301 similiar to the M6800
+ ****************************************************************************/
+
+static CPU_INIT( hd6301 )
+{
+	m6800_state *cpustate = get_safe_token(device);
+	//  cpustate->subtype = SUBTYPE_HD6301;
+	cpustate->insn = hd63701_insn;
+	cpustate->cycles = cycles_63701;
+	cpustate->irq_callback = irqcallback;
+	cpustate->device = device;
+
+	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
+	cpustate->data = device->space(AS_DATA);
+	cpustate->io = device->space(AS_IO);
+
+	cpustate->clock = device->clock() / 4;
+	cpustate->sci_timer = device->machine->scheduler().timer_alloc(FUNC(sci_tick), cpustate);
+
+	state_register(cpustate, "hd6301");
+}
+
+/****************************************************************************
+ * HD63701 similiar to the HD6301
  ****************************************************************************/
 
 static CPU_INIT( hd63701 )
@@ -2004,6 +2030,30 @@ CPU_GET_INFO( m6808 )
  * CPU-specific set_info
  **************************************************************************/
 
+CPU_GET_INFO( hd6301 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case CPUINFO_INT_CLOCK_DIVIDER:							info->i = 4;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 9;					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(hd6301);				break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(hd6301);		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "HD6301");				break;
+
+		default:										CPU_GET_INFO_CALL(m6800);				break;
+	}
+}
+
+/**************************************************************************
+ * CPU-specific set_info
+ **************************************************************************/
+
 CPU_GET_INFO( hd63701 )
 {
 	switch (state)
@@ -2052,5 +2102,6 @@ DEFINE_LEGACY_CPU_DEVICE(M6801, m6801);
 DEFINE_LEGACY_CPU_DEVICE(M6802, m6802);
 DEFINE_LEGACY_CPU_DEVICE(M6803, m6803);
 DEFINE_LEGACY_CPU_DEVICE(M6808, m6808);
+DEFINE_LEGACY_CPU_DEVICE(HD6301, hd6301);
 DEFINE_LEGACY_CPU_DEVICE(HD63701, hd63701);
 DEFINE_LEGACY_CPU_DEVICE(NSC8105, nsc8105);

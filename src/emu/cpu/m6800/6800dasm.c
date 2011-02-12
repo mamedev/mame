@@ -264,6 +264,11 @@ CPU_DISASSEMBLE( m6808 )
 	return Dasm680x(6808,buffer,pc,oprom,opram);
 }
 
+CPU_DISASSEMBLE( hd6301 )
+{
+	return Dasm680x(6301,buffer,pc,oprom,opram);
+}
+
 CPU_DISASSEMBLE( hd63701 )
 {
 	return Dasm680x(63701,buffer,pc,oprom,opram);
