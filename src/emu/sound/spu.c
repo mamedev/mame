@@ -161,7 +161,7 @@ static const int filter_coef[5][2]=
 //
 //
 
-#ifdef debug_spu
+#ifdef debug_spu_registers
 	#define _voice_registers(_voice)	\
 	  "voice"#_voice".voll",		\
 		"voice"#_voice".volr",		\
@@ -2299,7 +2299,14 @@ bool spu_device::update_envelope(const int v)
 			case 4: // release
 				voice[v].env_level=mindb(1.0f,maxdb(0.0f,voice[v].env_level));
 				voice[v].env_delta=voice[v].env_rr;
-				voice[v].envsamples=(unsigned int)(voice[v].env_level/-voice[v].env_rr);
+				if (voice[v].env_rr == -0.0f)	// 0.0 release means infinite time
+				{
+					voice[v].envsamples=infinity;
+				}
+				else
+				{
+					voice[v].envsamples=(unsigned int)(voice[v].env_level/-voice[v].env_rr);
+				}
 				break;
 
 			case 5: // release end
