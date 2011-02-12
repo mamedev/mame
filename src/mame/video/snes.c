@@ -81,7 +81,7 @@
 #define SNES_CLIP_OUT      2
 #define SNES_CLIP_ALWAYS   3
 
-#ifdef SNES_LAYER_DEBUG
+#if SNES_LAYER_DEBUG
 struct DEBUGOPTS
 {
 	UINT8 bg_disabled[5];
@@ -210,7 +210,7 @@ INLINE void snes_draw_bgtile_lores( UINT8 layer, INT16 ii, UINT8 colour, UINT16 
 				UINT8 clr = colour;
 				UINT8 clipmask = snes_ppu.clipmasks[layer][ii];
 
-#ifdef SNES_LAYER_DEBUG
+#if SNES_LAYER_DEBUG
 				if (debug_options.windows_disabled)
 					clipmask = 0xff;
 #endif /* SNES_LAYER_DEBUG */
@@ -245,7 +245,7 @@ INLINE void snes_draw_bgtile_hires( UINT8 layer, INT16 ii, UINT8 colour, UINT16 
 				UINT8 clr = colour;
 				UINT8 clipmask = snes_ppu.clipmasks[layer][ii >> 1];
 
-#ifdef SNES_LAYER_DEBUG
+#if SNES_LAYER_DEBUG
 				if (debug_options.windows_disabled)
 					clipmask = 0xff;
 #endif /* SNES_LAYER_DEBUG */
@@ -279,7 +279,7 @@ INLINE void snes_draw_oamtile( INT16 ii, UINT8 colour, UINT16 pal, UINT8 priorit
 			UINT8 clr = colour;
 			UINT8 clipmask = snes_ppu.clipmasks[SNES_OAM][pos];
 
-#ifdef SNES_LAYER_DEBUG
+#if SNES_LAYER_DEBUG
 			if (debug_options.windows_disabled)
 				clipmask = 0xff;
 #endif /* SNES_LAYER_DEBUG */
@@ -325,7 +325,7 @@ INLINE void snes_draw_tile( UINT8 planes, UINT8 layer, UINT32 tileaddr, INT16 x,
 		UINT8 colour = 0;
 		UINT8 mosaic = snes_ppu.layer[layer].mosaic_enabled;
 
-#ifdef SNES_LAYER_DEBUG
+#if SNES_LAYER_DEBUG
 		if (debug_options.mosaic_disabled)
 			mosaic = 0;
 #endif /* SNES_LAYER_DEBUG */
@@ -428,7 +428,7 @@ INLINE void snes_update_line( UINT16 curline, UINT8 layer, UINT8 priority_b, UIN
 	/* below we cheat to simplify the code: 8BPP should have 0 pal offset, not 0x100 (but we take care of this by later using pal % FIXED_COLOUR) */
 	UINT8 color_shift = 2 << color_depth;
 
-#ifdef SNES_LAYER_DEBUG
+#if SNES_LAYER_DEBUG
 	if (debug_options.bg_disabled[layer])
 		return;
 #endif /* SNES_LAYER_DEBUG */
@@ -529,7 +529,7 @@ INLINE void snes_update_line( UINT16 curline, UINT8 layer, UINT8 priority_b, UIN
 			pal += (layer << 5);
 		}
 
-#ifdef SNES_LAYER_DEBUG
+#if SNES_LAYER_DEBUG
 		/* if we want to draw only one of the priorities of this layer */
 		if (((debug_options.select_pri[layer] & 0x01) && (priority == priority_a)) ||
 			((debug_options.select_pri[layer] & 0x02) && (priority == priority_b)))
@@ -610,7 +610,7 @@ static void snes_update_line_mode7( UINT16 curline, UINT8 layer, UINT8 priority_
 	UINT16 c;
 	int screen;
 
-#ifdef SNES_LAYER_DEBUG
+#if SNES_LAYER_DEBUG
 	if (debug_options.bg_disabled[layer])
 		return;
 #endif /* SNES_LAYER_DEBUG */
@@ -672,7 +672,7 @@ static void snes_update_line_mode7( UINT16 curline, UINT8 layer, UINT8 priority_
 		mosaic_y =  snes_ppu.mosaic_table[snes_ppu.layer[SNES_BG1].mosaic_enabled ? snes_ppu.mosaic_size : 0];
 	}
 
-#ifdef SNES_LAYER_DEBUG
+#if SNES_LAYER_DEBUG
 	if (debug_options.mosaic_disabled)
 	{
 		mosaic_x =  snes_ppu.mosaic_table[0];
@@ -724,7 +724,7 @@ static void snes_update_line_mode7( UINT16 curline, UINT8 layer, UINT8 priority_
 			priority = ((colour & 0x80) >> 7) ? priority_a : priority_b;
 			colour &= 0x7f;
 
-#ifdef SNES_LAYER_DEBUG
+#if SNES_LAYER_DEBUG
 		/* if we want to draw only one of the priorities of this layer */
 		if (((debug_options.select_pri[layer] & 0x01) && (priority == priority_a)) ||
 			((debug_options.select_pri[layer] & 0x02) && (priority == priority_b)))
@@ -739,7 +739,7 @@ static void snes_update_line_mode7( UINT16 curline, UINT8 layer, UINT8 priority_
 				UINT8 clr = colour;
 				UINT8 clipmask = snes_ppu.clipmasks[layer][xpos];
 
-#ifdef SNES_LAYER_DEBUG
+#if SNES_LAYER_DEBUG
 				if (debug_options.windows_disabled)
 					clipmask = 0xff;
 #endif /* SNES_LAYER_DEBUG */
@@ -1074,7 +1074,7 @@ static void snes_update_objects( UINT8 priority_oam0, UINT8 priority_oam1, UINT8
 	UINT32 charaddr;
 	int ii;
 
-#ifdef SNES_LAYER_DEBUG
+#if SNES_LAYER_DEBUG
 	if (debug_options.bg_disabled[SNES_OAM])
 		return;
 #endif /* SNES_LAYER_DEBUG */
@@ -1098,7 +1098,7 @@ static void snes_update_objects( UINT8 priority_oam0, UINT8 priority_oam1, UINT8
 	for (ii = 0; ii < 34; ii++)
 	{
 		int tile = ii;
-#ifdef SNES_LAYER_DEBUG
+#if SNES_LAYER_DEBUG
 		if (debug_options.sprite_reversed)
 			tile = 33 - ii;
 #endif /* SNES_LAYER_DEBUG */
@@ -1108,7 +1108,7 @@ static void snes_update_objects( UINT8 priority_oam0, UINT8 priority_oam1, UINT8
 
 		pri = priority[oam_tilelist[tile].priority];
 
-#ifdef SNES_LAYER_DEBUG
+#if SNES_LAYER_DEBUG
 		if (debug_options.select_pri[SNES_OAM])
 		{
 			int oam_draw = debug_options.select_pri[SNES_OAM] - 1;
@@ -1131,7 +1131,7 @@ static void snes_update_objects( UINT8 priority_oam0, UINT8 priority_oam1, UINT8
 
 static void snes_update_mode_0( UINT16 curline )
 {
-#ifdef SNES_LAYER_DEBUG
+#if SNES_LAYER_DEBUG
 	if (debug_options.mode_disabled[0])
 		return;
 #endif /* SNES_LAYER_DEBUG */
@@ -1145,7 +1145,7 @@ static void snes_update_mode_0( UINT16 curline )
 
 static void snes_update_mode_1( UINT16 curline )
 {
-#ifdef SNES_LAYER_DEBUG
+#if SNES_LAYER_DEBUG
 	if (debug_options.mode_disabled[1])
 		return;
 #endif /* SNES_LAYER_DEBUG */
@@ -1168,7 +1168,7 @@ static void snes_update_mode_1( UINT16 curline )
 
 static void snes_update_mode_2( UINT16 curline )
 {
-#ifdef SNES_LAYER_DEBUG
+#if SNES_LAYER_DEBUG
 	if (debug_options.mode_disabled[2])
 		return;
 #endif /* SNES_LAYER_DEBUG */
@@ -1180,7 +1180,7 @@ static void snes_update_mode_2( UINT16 curline )
 
 static void snes_update_mode_3( UINT16 curline )
 {
-#ifdef SNES_LAYER_DEBUG
+#if SNES_LAYER_DEBUG
 	if (debug_options.mode_disabled[3])
 		return;
 #endif /* SNES_LAYER_DEBUG */
@@ -1192,7 +1192,7 @@ static void snes_update_mode_3( UINT16 curline )
 
 static void snes_update_mode_4( UINT16 curline )
 {
-#ifdef SNES_LAYER_DEBUG
+#if SNES_LAYER_DEBUG
 	if (debug_options.mode_disabled[4])
 		return;
 #endif /* SNES_LAYER_DEBUG */
@@ -1204,7 +1204,7 @@ static void snes_update_mode_4( UINT16 curline )
 
 static void snes_update_mode_5( UINT16 curline )
 {
-#ifdef SNES_LAYER_DEBUG
+#if SNES_LAYER_DEBUG
 	if (debug_options.mode_disabled[5])
 		return;
 #endif /* SNES_LAYER_DEBUG */
@@ -1216,7 +1216,7 @@ static void snes_update_mode_5( UINT16 curline )
 
 static void snes_update_mode_6( UINT16 curline )
 {
-#ifdef SNES_LAYER_DEBUG
+#if SNES_LAYER_DEBUG
 	if (debug_options.mode_disabled[6])
 		return;
 #endif /* SNES_LAYER_DEBUG */
@@ -1227,7 +1227,7 @@ static void snes_update_mode_6( UINT16 curline )
 
 static void snes_update_mode_7( UINT16 curline )
 {
-#ifdef SNES_LAYER_DEBUG
+#if SNES_LAYER_DEBUG
 	if (debug_options.mode_disabled[7])
 		return;
 #endif /* SNES_LAYER_DEBUG */
@@ -1372,7 +1372,7 @@ static void snes_update_offsets( void )
 
 INLINE void snes_draw_blend( UINT16 offset, UINT16 *colour, UINT8 prevent_color_math, UINT8 black_pen_clip, int switch_screens )
 {
-#ifdef SNES_LAYER_DEBUG
+#if SNES_LAYER_DEBUG
 	if (debug_options.colormath_disabled)
 		return;
 #endif /* SNES_LAYER_DEBUG */
@@ -1398,7 +1398,7 @@ INLINE void snes_draw_blend( UINT16 offset, UINT16 *colour, UINT8 prevent_color_
 		struct SCANLINE *subscreen;
 		int clip_max = 0;	// if add then clip to 0x1f, if sub then clip to 0
 
-#ifdef SNES_LAYER_DEBUG
+#if SNES_LAYER_DEBUG
 		/* Toggle drawing of SNES_SUBSCREEN or SNES_MAINSCREEN */
 		if (debug_options.draw_subscreen)
 		{
@@ -1553,7 +1553,7 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 
 		snes_update_obsel();
 
-#ifdef SNES_LAYER_DEBUG
+#if SNES_LAYER_DEBUG
 		if (snes_dbg_video(machine, curline))
 		{
 			g_profiler.stop();
@@ -1661,7 +1661,7 @@ VIDEO_START( snes )
 {
 	int i,j;
 
-#ifdef SNES_LAYER_DEBUG
+#if SNES_LAYER_DEBUG
 	memset(&debug_options, 0, sizeof(debug_options));
 #endif
 
@@ -2644,7 +2644,7 @@ WRITE8_HANDLER( snes_ppu_write )
 
 /***** Debug Functions *****/
 
-#ifdef SNES_LAYER_DEBUG
+#if SNES_LAYER_DEBUG
 
 #define DEBUG_TOGGLE(bit, debug_settings, MSG1, MSG2) \
 	if (BIT(toggles, bit) && !debug_settings)       \
