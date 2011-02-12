@@ -164,8 +164,11 @@ static DEVICE_START( rf5c68 )
 READ8_DEVICE_HANDLER( rf5c68_r )
 {
 	rf5c68_state *chip = get_safe_token(device);
-
-	return (chip->chan[(offset & 0x1c) >> 2].addr) >> ((offset & 3) >> 8);
+	UINT8 shift;
+	chip->stream->update();
+	shift = (offset & 2) * 8;
+	shift|= (~offset & 1) * 8;
+	return (chip->chan[(offset & 0x1c) >> 2].addr) >> (shift);
 }
 
 WRITE8_DEVICE_HANDLER( rf5c68_w )
