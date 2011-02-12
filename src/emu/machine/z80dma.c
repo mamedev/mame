@@ -823,6 +823,8 @@ void z80dma_device::write(UINT8 data)
 					fatalerror("Z80DMA '%s' Unknown WR6 command %02x", tag(), data);
 			}
 		}
+		else if(data == 0x8e) //newtype on Sharp X1, unknown purpose
+			printf("Z80DMA '%s' Unknown base register %02x\n", tag(), data);
 		else
 			fatalerror("Z80DMA '%s' Unknown base register %02x", tag(), data);
 		m_cur_follow = 0;
