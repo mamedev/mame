@@ -232,7 +232,7 @@ Notes:
 #include "machine/rtc65271.h"
 #include "machine/i2cmem.h"
 #include "machine/idectrl.h"
-#include "sound/psx.h"
+#include "sound/spu.h"
 #include "sound/cdda.h"
 #include "sound/rf5c400.h"
 
@@ -650,7 +650,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f801008, 0x1f80100b) AM_RAM /* ?? */
 	AM_RANGE(0x1f80100c, 0x1f80100f) AM_WRITENOP
 	AM_RANGE(0x1f801010, 0x1f801013) AM_READNOP
-	AM_RANGE(0x1f801014, 0x1f801017) AM_DEVREAD("spu", psx_spu_delay_r)
+	AM_RANGE(0x1f801014, 0x1f801017) AM_RAM
 	AM_RANGE(0x1f801020, 0x1f801023) AM_READWRITE(twinkle_unknown_r, twinkle_unknown_w)
 	AM_RANGE(0x1f801040, 0x1f80105f) AM_READWRITE(psx_sio_r, psx_sio_w)
 	AM_RANGE(0x1f801060, 0x1f80106f) AM_WRITENOP
@@ -659,7 +659,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f801100, 0x1f80112f) AM_READWRITE(psx_counter_r, psx_counter_w)
 	AM_RANGE(0x1f801810, 0x1f801817) AM_READWRITE(psx_gpu_r, psx_gpu_w)
 	AM_RANGE(0x1f801820, 0x1f801827) AM_READWRITE(psx_mdec_r, psx_mdec_w)
-	AM_RANGE(0x1f801c00, 0x1f801dff) AM_DEVREADWRITE("spu", psx_spu_r, psx_spu_w)
+	AM_RANGE(0x1f801c00, 0x1f801dff) AM_READWRITE16(spu_r, spu_w, 0xffffffff)
 	AM_RANGE(0x1f802020, 0x1f802033) AM_RAM /* ?? */
 	AM_RANGE(0x1f802040, 0x1f802043) AM_WRITENOP
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE("share2") AM_REGION("user1", 0) /* bios */
@@ -909,13 +909,6 @@ static void spu_irq(device_t *device, UINT32 data)
 	psx_irq_set(device->machine, data);
 }
 
-static const psx_spu_interface twinkle_psxspu_interface =
-{
-	spu_irq,
-	psx_dma_install_read_handler,
-	psx_dma_install_write_handler
-};
-
 static const i2cmem_interface i2cmem_interface =
 {
 	I2CMEM_SLAVE_ADDRESS, 0, 0x100
@@ -955,8 +948,7 @@ static MACHINE_CONFIG_START( twinkle, twinkle_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("speakerleft", "speakerright")
 
-	MCFG_SOUND_ADD( "spu", PSXSPU, 0 )
-	MCFG_SOUND_CONFIG( twinkle_psxspu_interface )
+	MCFG_SPU_ADD( "spu", XTAL_67_7376MHz/2, &spu_irq )
 	MCFG_SOUND_ROUTE( 0, "speakerleft", 0.75 )
 	MCFG_SOUND_ROUTE( 1, "speakerright", 0.75 )
 

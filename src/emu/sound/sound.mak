@@ -503,10 +503,9 @@ endif
 # Sony custom sound chips
 #-------------------------------------------------
 
-ifneq ($(filter PSXSPU,$(SOUNDS)),)
-SOUNDOBJS += $(SOUNDOBJ)/psx.o
+ifneq ($(filter SPU,$(SOUNDS)),)
+SOUNDOBJS += $(SOUNDOBJ)/spu.o $(SOUNDOBJ)/spu_tables.o $(SOUNDOBJ)/spureverb.o
 endif
-
 
 
 #-------------------------------------------------

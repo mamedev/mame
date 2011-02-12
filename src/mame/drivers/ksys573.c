@@ -347,7 +347,7 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 #include "machine/x76f041.h"
 #include "machine/x76f100.h"
 #include "machine/zs01.h"
-#include "sound/psx.h"
+#include "sound/spu.h"
 #include "sound/cdda.h"
 #include "sound/mas3507d.h"
 
@@ -1404,7 +1404,7 @@ static ADDRESS_MAP_START( konami573_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f801008, 0x1f80100b) AM_RAM /* ?? */
 	AM_RANGE(0x1f80100c, 0x1f80102f) AM_WRITENOP
 	AM_RANGE(0x1f801010, 0x1f801013) AM_READNOP
-	AM_RANGE(0x1f801014, 0x1f801017) AM_DEVREAD("spu", psx_spu_delay_r)
+	AM_RANGE(0x1f801014, 0x1f801017) AM_RAM
 	AM_RANGE(0x1f801040, 0x1f80105f) AM_READWRITE(psx_sio_r, psx_sio_w)
 	AM_RANGE(0x1f801060, 0x1f80106f) AM_WRITENOP
 	AM_RANGE(0x1f801070, 0x1f801077) AM_READWRITE(psx_irq_r, psx_irq_w)
@@ -1412,7 +1412,7 @@ static ADDRESS_MAP_START( konami573_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f801100, 0x1f80112f) AM_READWRITE(k573_counter_r, k573_counter_w)
 	AM_RANGE(0x1f801810, 0x1f801817) AM_READWRITE(psx_gpu_r, psx_gpu_w)
 	AM_RANGE(0x1f801820, 0x1f801827) AM_READWRITE(psx_mdec_r, psx_mdec_w)
-	AM_RANGE(0x1f801c00, 0x1f801dff) AM_DEVREADWRITE("spu", psx_spu_r, psx_spu_w)
+	AM_RANGE(0x1f801c00, 0x1f801dff) AM_READWRITE16(spu_r, spu_w, 0xffffffff)
 	AM_RANGE(0x1f802020, 0x1f802033) AM_RAM /* ?? */
 	AM_RANGE(0x1f802040, 0x1f802043) AM_WRITENOP
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE("share2") AM_REGION("bios", 0)
@@ -1494,13 +1494,6 @@ static void spu_irq(device_t *device, UINT32 data)
 {
 	psx_irq_set(device->machine, data);
 }
-
-static const psx_spu_interface konami573_psxspu_interface =
-{
-	spu_irq,
-	psx_dma_install_read_handler,
-	psx_dma_install_write_handler
-};
 
 static void update_mode( running_machine *machine )
 {
@@ -2859,8 +2852,7 @@ static MACHINE_CONFIG_START( konami573, ksys573_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD( "spu", PSXSPU, 0 )
-	MCFG_SOUND_CONFIG( konami573_psxspu_interface )
+	MCFG_SPU_ADD( "spu", XTAL_67_7376MHz/2, &spu_irq )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.0 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.0 )
 
