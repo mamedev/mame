@@ -30,6 +30,9 @@ MACHINE_CONFIG_EXTERN( megdsvp );
 MACHINE_CONFIG_EXTERN( genesis_32x );
 MACHINE_CONFIG_EXTERN( genesis_32x_pal );
 MACHINE_CONFIG_EXTERN( genesis_scd );
+MACHINE_CONFIG_EXTERN( genesis_scd_scd );
+MACHINE_CONFIG_EXTERN( genesis_scd_mcd );
+MACHINE_CONFIG_EXTERN( genesis_scd_mcdj );
 MACHINE_CONFIG_EXTERN( genesis_32x_scd );
 MACHINE_CONFIG_EXTERN( md_bootleg );	// for topshoot.c & hshavoc.c
 

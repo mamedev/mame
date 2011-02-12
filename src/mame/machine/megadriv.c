@@ -272,6 +272,7 @@ a tilemap-like structure, from which data is copied)
 #include "imagedev/chd_cd.h"
 #include "includes/megadriv.h"
 
+
 #define MEGADRIV_VDP_VRAM(address) megadrive_vdp_vram[(address)&0x7fff]
 
 #define HAZE_MD 0 // to make appear / disappear the Region DipSwitch
@@ -388,28 +389,12 @@ static bitmap_t* render_bitmap;
 
 /* Sega CD stuff */
 static int sega_cd_connected = 0x00;
-static UINT16 segacd_irq_mask;
-static UINT8 segacd_cdd_rx[10];
-static UINT8 segacd_cdd_tx[10];
-static struct
-{
-	UINT8 buffer[5];
-	UINT8 ctrl;
-	UINT8 scd_status; // SCSI status?
-}segacd_cdd;
-#ifdef MESS
-static struct
-{
-	UINT32	current_frame;
-	UINT32	end_frame;
-	UINT32	last_frame;
-	UINT8	first_track;
-	UINT8	last_track;
+UINT16 segacd_irq_mask;
 
-	cdrom_file	*cd;
-	const cdrom_toc*	toc;
-}segacd;
-#endif
+
+
+
+
 
 static void segacd_mark_tiles_dirty(running_machine* machine, int offset);
 
@@ -3807,7 +3792,861 @@ ADDRESS_MAP_END
  Sega CD related
 *************************************************************************************************/
 
-static UINT16* segacd_4meg_prgram;  // pointer to SubCPU PrgRAM
+static UINT8 segacd_ram_writeprotect_bits;
+int segacd_ram_mode;
+static int segacd_ram_mode_old;
+
+//static int segacd_maincpu_has_ram_access = 0;
+static int segacd_4meg_prgbank = 0; // which bank the MainCPU can see of the SubCPU PrgRAM
+static int segacd_memory_priority_mode = 0;
+static int segacd_stampsize;
+int segacd_dmna = 0;
+int segacd_ret = 0;
+
+#define READ_MAIN (0x0200)
+#define READ_SUB  (0x0300)
+#define DMA_PCM  (0x0400)
+#define DMA_PRG  (0x0500)
+#define DMA_WRAM (0x0700)
+
+#define REG_W_SBOUT  (0x0)
+#define REG_W_IFCTRL (0x1)
+#define REG_W_DBCL   (0x2)
+#define REG_W_DBCH   (0x3)
+#define REG_W_DACL   (0x4)
+#define REG_W_DACH   (0x5)
+#define REG_W_DTTRG  (0x6)
+#define REG_W_DTACK  (0x7)
+#define REG_W_WAL    (0x8)
+#define REG_W_WAH    (0x9)
+#define REG_W_CTRL0  (0xA)
+#define REG_W_CTRL1  (0xB)
+#define REG_W_PTL    (0xC)
+#define REG_W_PTH    (0xD)
+#define REG_W_CTRL2  (0xE)
+#define REG_W_RESET  (0xF)
+
+#define REG_R_COMIN  (0x0)
+#define REG_R_IFSTAT (0x1)
+#define REG_R_DBCL   (0x2)
+#define REG_R_DBCH   (0x3)
+#define REG_R_HEAD0  (0x4)
+#define REG_R_HEAD1  (0x5)
+#define REG_R_HEAD2  (0x6)		
+#define REG_R_HEAD3  (0x7)		
+#define REG_R_PTL    (0x8)		
+#define REG_R_PTH    (0x9)	
+#define REG_R_WAL    (0xa)		
+#define REG_R_WAH    (0xb)	
+#define REG_R_STAT0  (0xc)	
+#define REG_R_STAT1  (0xd)
+#define REG_R_STAT2  (0xe)
+#define REG_R_STAT3  (0xf)
+
+#define CMD_STATUS   (0x0)
+#define CMD_STOPALL  (0x1)
+#define CMD_GETTOC   (0x2)
+#define CMD_READ     (0x3)
+#define CMD_SEEK     (0x4)
+//                   (0x5)
+#define CMD_STOP     (0x6)
+#define CMD_RESUME   (0x7)
+#define CMD_FF       (0x8)
+#define CMD_RW       (0x9)
+#define CMD_INIT     (0xa)
+//                   (0xb)
+#define CMD_CLOSE    (0xc)
+#define CMD_OPEN     (0xd)
+//                   (0xe)
+//                   (0xf)
+
+
+#define TOCCMD_CURPOS    (0x0)			
+#define TOCCMD_TRKPOS 	 (0x1)				
+#define TOCCMD_CURTRK    (0x2)			
+#define TOCCMD_LENGTH    (0x3)		
+#define TOCCMD_FIRSTLAST (0x4)				
+#define TOCCMD_TRACKADDR (0x5)
+
+struct segacd_t
+{
+	cdrom_file	*cd;
+	const cdrom_toc   *toc;
+};
+
+segacd_t segacd;
+
+#define SECTOR_SIZE (2352)
+
+#define SET_CDD_DATA_MODE \
+	CDD_CONTROL |= 0x0100; \
+
+#define SET_CDD_AUDIO_MODE \
+	CDD_CONTROL &= ~0x0100; \
+
+#define STOP_CDC_READ \
+	SCD_STATUS_CDC &= ~0x01; \
+
+#define SET_CDC_READ \
+	SCD_STATUS_CDC |= 0x01; \
+
+#define SET_CDC_DMA \
+	SCD_STATUS_CDC |= 0x08; \
+
+#define STOP_CDC_DMA \
+	SCD_STATUS_CDC &= ~0x08; \
+
+#define SCD_READ_ENABLED \
+	(SCD_STATUS_CDC & 1)
+
+#define SCD_DMA_ENABLED \
+	(SCD_STATUS_CDC & 0x08)
+
+#define CLEAR_CDD_RESULT \
+	CDD_MIN = CDD_SEC = CDD_FRAME = CDD_EXT = 0; \
+
+#define CHECK_SCD_LV5_INTERRUPT \
+	if (segacd_irq_mask & 0x20) \
+	{ \
+		cputag_set_input_line(machine, "segacd_68k", 5, HOLD_LINE); \
+	} \
+
+#define CHECK_SCD_LV4_INTERRUPT \
+	if (segacd_irq_mask & 0x10) \
+	{ \
+		cputag_set_input_line(machine, "segacd_68k", 4, HOLD_LINE); \
+	} \
+
+#define CURRENT_TRACK_IS_DATA \
+	(segacd.toc->tracks[SCD_CURTRK - 1].trktype != CD_TRACK_AUDIO) \
+
+
+
+INLINE int to_bcd(int val, bool byte)	
+{
+	if (val > 99) val = 99;
+
+	if (byte) return (((val) / 10) << 4) + ((val) % 10);
+	else return (((val) / 10) << 8) + ((val) % 10);
+}
+
+
+
+UINT16* segacd_4meg_prgram;  // pointer to SubCPU PrgRAM
+UINT16* segacd_dataram;
+static UINT16* segacd_dataram2;
+
+UINT8    SCD_BUFFER[2560];
+UINT32   SCD_STATUS;
+UINT32   SCD_STATUS_CDC;
+INT32    SCD_CURLBA;
+UINT8    SCD_CURTRK;
+
+UINT16 CDC_DECODE;
+INT16 CDC_DMACNT; // can go negative
+UINT16 CDC_DMA_ADDRC;
+UINT16 CDC_PT;
+UINT16 CDC_WA;
+UINT16 CDC_REG0;
+UINT16 CDC_REG1;
+UINT16 CDC_DMA_ADDR;
+UINT16 CDC_IFSTAT;
+UINT8 CDC_HEADB0;
+UINT8 CDC_HEADB1;
+UINT8 CDC_HEADB2;
+UINT8 CDC_HEADB3;
+UINT8 CDC_STATB0;
+UINT8 CDC_STATB1;
+UINT8 CDC_STATB2;
+UINT8 CDC_STATB3;
+UINT16 CDC_SBOUT;
+UINT16 CDC_IFCTRL;
+UINT8 CDC_CTRLB0;
+UINT8 CDC_CTRLB1;
+UINT8 CDC_CTRLB2;
+UINT8 CDC_BUFFER[(32 * 1024 * 2) + SECTOR_SIZE];
+
+UINT32 CDD_STATUS;
+UINT32 CDD_MIN;
+UINT32 CDD_SEC;
+
+UINT8 CDD_RX[10];
+UINT8 CDD_TX[10];
+UINT32 CDD_FRAME;
+UINT32 CDD_EXT;
+UINT16 CDD_CONTROL;
+INT16  CDD_DONE;
+
+static void set_data_audio_mode(void)
+{
+	if (CURRENT_TRACK_IS_DATA)
+	{
+		SET_CDD_DATA_MODE
+	}
+	else
+	{
+		SET_CDD_AUDIO_MODE
+		fatalerror("CDDA unsupported\n");
+	}
+}
+
+
+#define CDD_PLAYINGCDDA	0x0100
+#define CDD_READY		0x0400
+#define CDD_STOPPED		0x0900
+
+void CDD_DoChecksum(void)
+{
+	int checksum = 
+		CDD_RX[0] +
+		CDD_RX[1] +
+		CDD_RX[2] +
+		CDD_RX[3] +
+		CDD_RX[4] +
+		CDD_RX[5] +
+		CDD_RX[6] +
+		CDD_RX[7] +
+		CDD_RX[9];
+
+	checksum &= 0xf;
+	checksum ^= 0xf;
+
+	CDD_RX[8] = checksum;
+}
+
+void CDD_Export(void)
+{
+	CDD_RX[0] = (CDD_STATUS  & 0x00ff)>>0;
+	CDD_RX[1] = (CDD_STATUS  & 0xff00)>>8;
+	CDD_RX[2] = (CDD_MIN  & 0x00ff)>>0;
+	CDD_RX[3] = (CDD_MIN  & 0xff00)>>8;
+	CDD_RX[4] = (CDD_SEC & 0x00ff)>>0;
+	CDD_RX[5] = (CDD_SEC & 0xff00)>>8;
+	CDD_RX[6] = (CDD_FRAME   & 0x00ff)>>0;
+	CDD_RX[7] = (CDD_FRAME   & 0xff00)>>8;
+	/* 8 = checksum */
+	CDD_RX[9] = (CDD_EXT     & 0x00ff)>>0;
+
+	CDD_DoChecksum();
+
+	CDD_CONTROL &= 0xff03;
+
+}
+
+
+
+void CDC_UpdateHEAD(void)
+{
+	if (CDC_CTRLB1 & 0x01)
+	{
+		CDC_HEADB0 = CDC_HEADB1 = CDC_HEADB2 = CDC_HEADB3 = 0x00;
+	}
+	else
+	{
+		UINT32 msf = lba_to_msf_alt(SCD_CURLBA+150);
+		CDC_HEADB0 = to_bcd (((msf & 0x00ff0000)>>16), true);
+		CDC_HEADB1 = to_bcd (((msf & 0x0000ff00)>>8), true);
+		CDC_HEADB2 = to_bcd (((msf & 0x000000ff)>>0), true);
+		CDC_HEADB3 = 0x01;
+	}
+}
+
+
+void scd_ctrl_checks(running_machine* machine)
+{
+	CDC_STATB0 = 0x80;
+
+	(CDC_CTRLB0 & 0x10) ? (CDC_STATB2 = CDC_CTRLB1 & 0x08) : (CDC_STATB2 = CDC_CTRLB1 & 0x0C);
+	(CDC_CTRLB0 & 0x02) ? (CDC_STATB3 = 0x20) : (CDC_STATB3 = 0x00);
+	
+	if (CDC_IFCTRL & 0x20)
+	{
+		CHECK_SCD_LV5_INTERRUPT
+		CDC_IFSTAT &= ~0x20;
+		CDC_DECODE = 0;
+	}
+}
+
+void scd_advance_current_readpos(void)
+{
+	SCD_CURLBA++;
+		
+	CDC_WA += SECTOR_SIZE;
+	CDC_PT += SECTOR_SIZE;
+
+	CDC_WA &= 0x7fff;
+	CDC_PT &= 0x7fff;
+}
+
+int Read_LBA_To_Buffer(running_machine* machine)
+{
+	bool data_track = false;
+	if (CDD_CONTROL & 0x0100) data_track = true;
+
+	if (data_track)
+		cdrom_read_data(segacd.cd, SCD_CURLBA, SCD_BUFFER, CD_TRACK_MODE1);
+		
+	CDC_UpdateHEAD();
+	
+	if (!data_track)
+	{
+		scd_advance_current_readpos();
+	}
+
+	if (CDC_CTRLB0 & 0x80)
+	{
+		if (CDC_CTRLB0 & 0x04)
+		{
+			if (data_track)
+			{
+				scd_advance_current_readpos();
+
+				memcpy(&CDC_BUFFER[CDC_PT + 4], SCD_BUFFER, 2048);
+				CDC_BUFFER[CDC_PT+0] = CDC_HEADB0;
+				CDC_BUFFER[CDC_PT+1] = CDC_HEADB1;
+				CDC_BUFFER[CDC_PT+2] = CDC_HEADB2;
+				CDC_BUFFER[CDC_PT+3] = CDC_HEADB3;
+			}
+			else
+			{
+				memcpy(&CDC_BUFFER[CDC_PT], SCD_BUFFER, SECTOR_SIZE);
+			}
+		}
+		
+		scd_ctrl_checks(machine);
+	}
+
+	
+	return 0;
+}
+
+static void CheckCommand(running_machine* machine)
+{
+	if (CDD_DONE)
+	{
+		CDD_DONE = 0;
+		CDD_Export();
+		CHECK_SCD_LV4_INTERRUPT
+	}
+	
+	if (SCD_READ_ENABLED)
+	{	
+		set_data_audio_mode();
+		Read_LBA_To_Buffer(machine);
+	}
+}
+
+
+void CDD_GetStatus(void)
+{
+	UINT16 s = (CDD_STATUS & 0x0f00);
+
+	if ((s == 0x0200) || (s == 0x0700) || (s == 0x0e00))
+		CDD_STATUS = (SCD_STATUS & 0xff00) | (CDD_STATUS & 0x00ff);
+}
+
+
+void CDD_Stop(void)
+{
+	CLEAR_CDD_RESULT
+	STOP_CDC_READ
+	SCD_STATUS = CDD_STOPPED;
+	CDD_STATUS = 0x0000;
+	SET_CDD_DATA_MODE
+}
+
+
+void CDD_GetPos(void)
+{
+	CLEAR_CDD_RESULT
+	UINT32 msf;
+	CDD_STATUS &= 0xFF;
+	CDD_STATUS |= SCD_STATUS;
+	msf = lba_to_msf_alt(SCD_CURLBA+150);
+	CDD_MIN = to_bcd(((msf & 0x00ff0000)>>16),false);
+	CDD_SEC = to_bcd(((msf & 0x0000ff00)>>8),false);
+	CDD_FRAME = to_bcd(((msf & 0x000000ff)>>0),false);
+}
+
+void CDD_GetTrackPos(void)
+{
+	CLEAR_CDD_RESULT
+	int elapsedlba;
+	UINT32 msf;
+	CDD_STATUS &= 0xFF;
+	CDD_STATUS |= SCD_STATUS;
+	elapsedlba = SCD_CURLBA - cdrom_get_track_start(segacd.cd, SCD_CURTRK);
+	msf = lba_to_msf_alt (elapsedlba+150);
+	CDD_MIN = to_bcd(((msf & 0x00ff0000)>>16),false);
+	CDD_SEC = to_bcd(((msf & 0x0000ff00)>>8),false);
+	CDD_FRAME = to_bcd(((msf & 0x000000ff)>>0),false);
+}
+
+void CDD_GetTrack(void)
+{	
+	CLEAR_CDD_RESULT
+	CDD_STATUS &= 0xFF;
+	CDD_STATUS |= SCD_STATUS;
+	SCD_CURTRK = cdrom_get_track(segacd.cd, SCD_CURLBA)+1;
+	CDD_MIN = to_bcd(SCD_CURTRK, false);
+}
+
+void CDD_Length(void)
+{
+	CLEAR_CDD_RESULT
+	CDD_STATUS &= 0xFF;
+	CDD_STATUS |= SCD_STATUS;
+	CDD_MIN = 259; 	// HACK!!!!
+	CDD_SEC = 258; 	// HACK!!!!
+	CDD_FRAME = 257; 	// HACK!!!!
+}
+
+
+void CDD_FirstLast(void)
+{
+	CLEAR_CDD_RESULT
+	CDD_STATUS &= 0xFF;
+	CDD_STATUS |= SCD_STATUS;
+	CDD_MIN = 1; // first 	// HACK!!!!
+	CDD_SEC = 1; // last    // HACK!!!!
+}
+
+void CDD_GetTrackAdr(void)
+{
+	CLEAR_CDD_RESULT
+
+	int track = (CDD_TX[4] & 0xF) + (CDD_TX[5] & 0xF) * 10;
+	int last_track = cdrom_get_last_track(segacd.cd)+1;
+
+	CDD_STATUS &= 0xFF;
+	CDD_STATUS |= SCD_STATUS;
+	
+	if (track > last_track)
+		track = last_track;
+	
+	if (track < 1)
+		track = 1;
+	
+	UINT32 startlba = (segacd.toc->tracks[track-1].physframeofs);
+	UINT32 startmsf = lba_to_msf_alt( startlba+150 );
+
+	CDD_MIN = to_bcd((startmsf&0x00ff0000)>>16,false);
+	CDD_SEC = to_bcd((startmsf&0x0000ff00)>>8,false);
+	CDD_FRAME = to_bcd((startmsf&0x000000ff)>>0,false);
+	CDD_EXT = track % 10;
+	
+	if (segacd.toc->tracks[track - 1].trktype != CD_TRACK_AUDIO)
+		CDD_FRAME |= 0x0800;
+}
+
+static UINT32 getmsf_from_regs(void)
+{
+	UINT32 msf = 0;
+
+	msf  = ((CDD_TX[2] & 0xF) + (CDD_TX[3] & 0xF) * 10) << 16; 
+	msf |= ((CDD_TX[4] & 0xF) + (CDD_TX[5] & 0xF) * 10) << 8;
+	msf |= ((CDD_TX[6] & 0xF) + (CDD_TX[7] & 0xF) * 10) << 0;
+
+	return msf;
+}
+
+void CDD_Play(void)
+{
+	CLEAR_CDD_RESULT
+	UINT32 msf = getmsf_from_regs();
+	SCD_CURLBA = msf_to_lba(msf)-150;
+	SCD_CURTRK = cdrom_get_track(segacd.cd, SCD_CURLBA)+1;
+	CDC_UpdateHEAD();
+	SCD_STATUS = CDD_PLAYINGCDDA;
+	CDD_STATUS = 0x0102;
+	set_data_audio_mode();
+	CDD_MIN = to_bcd(SCD_CURTRK, false);
+	SET_CDC_READ
+}
+
+
+void CDD_Seek(void)
+{
+	CLEAR_CDD_RESULT
+	UINT32 msf = getmsf_from_regs();
+	SCD_CURLBA = msf_to_lba(msf)-150;
+	SCD_CURTRK = cdrom_get_track(segacd.cd, SCD_CURLBA)+1;
+	CDC_UpdateHEAD();
+	STOP_CDC_READ
+	SCD_STATUS = CDD_READY;
+	CDD_STATUS = 0x0200;
+	set_data_audio_mode();
+}
+
+
+void CDD_Pause(void)
+{
+	CLEAR_CDD_RESULT
+	STOP_CDC_READ
+	SCD_STATUS = CDD_READY;
+	CDD_STATUS = SCD_STATUS;
+	SET_CDD_DATA_MODE
+}
+
+void CDD_Resume(void)
+{
+	CLEAR_CDD_RESULT
+	STOP_CDC_READ
+	SCD_CURTRK = cdrom_get_track(segacd.cd, SCD_CURLBA)+1;
+	SCD_STATUS = CDD_PLAYINGCDDA;
+	CDD_STATUS = 0x0102;
+	set_data_audio_mode();
+	CDD_MIN = to_bcd (SCD_CURTRK, false);
+	SET_CDC_READ
+}
+
+
+void CDD_FF(void)
+{
+	fatalerror("Fast Forward unsupported\n");
+}
+
+
+void CDD_RW(void)
+{
+	fatalerror("Fast Rewind unsupported\n");
+}
+
+
+void CDD_Open(void)
+{
+	fatalerror("Close Tray unsupported\n");
+}
+
+
+void CDD_Close(void)
+{
+	fatalerror("Open Tray unsupported\n");
+}
+
+
+void CDD_Init(void)
+{
+	CLEAR_CDD_RESULT
+	STOP_CDC_READ
+	SCD_STATUS = CDD_READY;
+	CDD_STATUS = SCD_STATUS;
+	CDD_SEC = 1;
+	CDD_FRAME = 1;
+}
+
+
+void CDD_Default(void)
+{
+	CLEAR_CDD_RESULT
+	CDD_STATUS = SCD_STATUS;
+}
+
+
+static void CDD_Reset(void)
+{
+	CLEAR_CDD_RESULT
+	CDD_CONTROL = CDD_STATUS = 0;
+	
+	for (int i = 0; i < 10; i++)
+		CDD_RX[i] = CDD_TX[i] = 0;
+	
+	CDD_DoChecksum();
+	
+	SCD_CURTRK = SCD_CURLBA = 0;
+	SCD_STATUS = CDD_READY;
+}
+
+static void CDC_Reset(void)
+{
+	memset(CDC_BUFFER, 0x00, ((16 * 1024 * 2) + SECTOR_SIZE));
+	CDC_UpdateHEAD();
+	
+	CDC_DMA_ADDRC = CDC_DMACNT = CDC_PT = CDC_SBOUT = CDC_IFCTRL = CDC_CTRLB0 = CDC_CTRLB1 =
+		CDC_CTRLB2 = CDC_HEADB1 = CDC_HEADB2 = CDC_HEADB3 = CDC_STATB0 = CDC_STATB1 = CDC_STATB2 = CDC_DECODE = 0;
+
+	CDC_IFSTAT = 0xFF;
+	CDC_WA = SECTOR_SIZE * 2;
+	CDC_HEADB0 = 0x01;
+	CDC_STATB3 = 0x80;
+}
+
+
+void lc89510_Reset(void)
+{
+	CDD_Reset();
+	CDC_Reset();
+	
+	CDC_REG0 = CDC_REG1 = CDC_DMA_ADDR = SCD_STATUS_CDC = CDD_DONE = 0;
+}
+
+void CDC_End_Transfer(running_machine* machine)
+{
+	STOP_CDC_DMA
+	CDC_REG0 |= 0x8000;
+	CDC_REG0 &= ~0x4000;
+	CDC_IFSTAT |= 0x08;
+	
+	if (CDC_IFCTRL & 0x40)
+	{
+		CDC_IFSTAT &= ~0x40;
+		CHECK_SCD_LV5_INTERRUPT
+	}
+}
+
+void CDC_Do_DMA(running_machine* machine, int rate)
+{
+	UINT32 dstoffset, length;
+	UINT8 *dest;
+	UINT16 destination = CDC_REG0 & 0x0700;
+
+	if (!(SCD_DMA_ENABLED))
+		return;
+
+	if ((destination == READ_MAIN) || (destination==READ_SUB))
+	{
+		CDC_REG0 |= 0x4000;
+		return;
+	}
+
+	if (CDC_DMACNT <= (rate * 2))
+	{
+		length = (CDC_DMACNT + 1) >> 1;
+		CDC_End_Transfer(machine);
+	}
+	else
+		length = rate;
+		
+	
+	int dmacount = length;
+	dstoffset = (CDC_DMA_ADDR & 0xFFFF) << 3;
+	int srcoffset = 0;
+
+	while (dmacount--)
+	{
+		UINT16 data = (CDC_BUFFER[CDC_DMA_ADDRC+srcoffset]<<8) | CDC_BUFFER[CDC_DMA_ADDRC+srcoffset+1];
+				
+		if (destination==DMA_PRG)
+		{
+			dest = (UINT8 *) segacd_4meg_prgram;
+		}
+		else if (destination==DMA_WRAM)
+		{
+			dest = (UINT8*)segacd_dataram;
+
+			if (segacd_ram_mode)
+			{
+				dstoffset &= 0x1ffff;
+				if (!(segacd_ret & 1)) dest += 0x20000;
+			}
+			else
+			{
+				dstoffset &= 0x3ffff;
+			}
+		}
+		else if (destination==DMA_PCM)
+		{
+			fatalerror("PCM RAM DMA unimplemented!\n");	
+		}
+		else
+		{
+			fatalerror("Unknown DMA Destination!!\n");	
+		}
+
+		dest[dstoffset+1] = data >>8;
+		dest[dstoffset+0] = data&0xff;
+
+		srcoffset += 2;
+		dstoffset += 2;
+	}
+
+	CDC_DMA_ADDR += length >> 2;
+	CDC_DMA_ADDRC += length*2;
+
+	if (SCD_DMA_ENABLED)
+		CDC_DMACNT -= length*2;
+	else
+		CDC_DMACNT = 0;
+}
+
+
+
+
+UINT16 CDC_Host_r(running_machine* machine, UINT16 type)
+{
+	UINT16 destination = CDC_REG0 & 0x0700;
+
+	if (SCD_DMA_ENABLED)
+	{
+		if (destination == type)
+		{
+			CDC_DMACNT -= 2;
+		
+			if (CDC_DMACNT <= 0)
+			{
+				if (type==READ_SUB) CDC_DMACNT = 0;
+
+				CDC_End_Transfer(machine);
+			}
+
+			UINT16 data = (CDC_BUFFER[CDC_DMA_ADDRC]<<8) | CDC_BUFFER[CDC_DMA_ADDRC+1];
+			CDC_DMA_ADDRC += 2;
+
+			return data;
+		}
+	}
+	
+	return 0;
+}
+
+
+UINT8 CDC_Reg_r(void)
+{
+	int reg = CDC_REG0 & 0xF;
+	UINT8 ret = 0;
+	int decode[0x10] = { 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0 };
+
+	if (decode[reg])
+		CDC_DECODE |= (1 << reg);
+
+	if (reg!=REG_R_STAT3)
+		CDC_REG0 = (CDC_REG0 & 0xFFF0) | (reg+1);
+
+
+	switch (reg)
+	{
+		case REG_R_COMIN:  ret = 0/*COMIN*/;            break;
+		case REG_R_IFSTAT: ret = CDC_IFSTAT;           break;
+		case REG_R_DBCL:   ret = CDC_DMACNT & 0xff;       break;
+		case REG_R_DBCH:   ret = (CDC_DMACNT >>8) & 0xff; break;
+		case REG_R_HEAD0:  ret = CDC_HEADB0;           break;
+		case REG_R_HEAD1:  ret = CDC_HEADB1;           break;
+		case REG_R_HEAD2:  ret = CDC_HEADB2;           break;
+		case REG_R_HEAD3:  ret = CDC_HEADB3;           break;
+		case REG_R_PTL:	   ret = CDC_PT & 0xff;        break;
+		case REG_R_PTH:	   ret = (CDC_PT >>8) & 0xff;  break;
+		case REG_R_WAL:    ret = CDC_WA & 0xff;        break;
+		case REG_R_WAH:    ret = (CDC_WA >>8) & 0xff;  break;
+		case REG_R_STAT0:  ret = CDC_STATB0;           break;
+		case REG_R_STAT1:  ret = CDC_STATB1;           break;
+		case REG_R_STAT2:  ret = CDC_STATB2;           break;
+		case REG_R_STAT3:  ret = CDC_STATB3;
+
+			CDC_IFSTAT |= 0x20;
+
+			// ??
+			if ((CDC_CTRLB0 & 0x80) && (CDC_IFCTRL & 0x20))
+			{
+				if ((CDC_DECODE & 0x73F2) == 0x73F2)
+				CDC_STATB3 = 0x80;
+			}
+			break;
+	}
+	
+	return ret;
+}
+
+void CDC_Reg_w(UINT8 data)
+{
+	int reg = CDC_REG0 & 0xF;
+
+	int changers0[0x10] = { 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0};
+
+	if (changers0[reg])
+		CDC_REG0 = (CDC_REG0 & 0xFFF0) | (reg+1);
+
+	switch (reg)
+	{
+	case REG_W_SBOUT:
+			CDC_SBOUT = data;
+			break;
+		
+	case REG_W_IFCTRL:
+			CDC_IFCTRL = data;
+			
+			if (!(CDC_IFCTRL & 0x02))
+			{
+				CDC_DMACNT = 0;
+				STOP_CDC_DMA;
+				CDC_IFSTAT |= 0x08;
+			}
+			break;
+		
+	case REG_W_DBCL: CDC_DMACNT = (CDC_DMACNT &~ 0x00ff) | (data & 0x00ff) << 0; break;
+	case REG_W_DBCH: CDC_DMACNT = (CDC_DMACNT &~ 0xff00) | (data & 0x00ff) << 8; break;
+	case REG_W_DACL: CDC_DMA_ADDRC = (CDC_DMA_ADDRC &~ 0x00ff) | (data & 0x00ff) << 0; break;
+	case REG_W_DACH: CDC_DMA_ADDRC = (CDC_DMA_ADDRC &~ 0xff00) | (data & 0x00ff) << 8; break;
+	
+	case REG_W_DTTRG:
+			if (CDC_IFCTRL & 0x02)
+			{
+				CDC_IFSTAT &= ~0x08;
+				SET_CDC_DMA;
+				CDC_REG0 &= ~0x8000;
+			}
+			break;
+		
+	case REG_W_DTACK: CDC_IFSTAT |= 0x40; break;
+	case REG_W_WAL: CDC_WA = (CDC_WA &~ 0x00ff) | (data & 0x00ff) << 0; break;
+	case REG_W_WAH:	CDC_WA = (CDC_WA &~ 0xff00) | (data & 0x00ff) << 8;	break;
+	case REG_W_CTRL0: CDC_CTRLB0 = data; break;
+	case REG_W_CTRL1: CDC_CTRLB1 = data; break;
+	case REG_W_PTL: CDC_PT = (CDC_PT &~ 0x00ff) | (data & 0x00ff) << 0; break;
+	case REG_W_PTH: CDC_PT = (CDC_PT &~ 0xff00) | (data & 0x00ff) << 8;	break;
+	case REG_W_CTRL2: CDC_CTRLB2 = data; break;
+	case REG_W_RESET: CDC_Reset();       break;
+	}
+}
+
+void CDD_Process(running_machine* machine, int reason)
+{
+	CDD_Export();
+	CHECK_SCD_LV4_INTERRUPT
+}
+
+void CDD_Handle_TOC_Commands(void)
+{
+	int subcmd = CDD_TX[2];
+	CDD_STATUS = (CDD_STATUS & 0xFF00) | subcmd;
+
+	switch (subcmd)
+	{
+		case TOCCMD_CURPOS:	   CDD_GetPos();	  break;
+		case TOCCMD_TRKPOS:	   CDD_GetTrackPos(); break;
+		case TOCCMD_CURTRK:    CDD_GetTrack ();   break;
+		case TOCCMD_LENGTH:    CDD_Length();      break;
+		case TOCCMD_FIRSTLAST: CDD_FirstLast();   break;
+		case TOCCMD_TRACKADDR: CDD_GetTrackAdr(); break;
+		default:               CDD_GetStatus();   break;
+	}
+}
+
+void CDD_Import(running_machine* machine)
+{
+	switch (CDD_TX[1])
+	{
+		case CMD_STATUS:	CDD_GetStatus();	       break;
+		case CMD_STOPALL:	CDD_Stop();	               break;
+		case CMD_GETTOC:	CDD_Handle_TOC_Commands(); break;	
+		case CMD_READ:		CDD_Play();                break;
+		case CMD_SEEK:		CDD_Seek();	               break;
+		case CMD_STOP:		CDD_Pause();	           break;
+		case CMD_RESUME:	CDD_Resume();              break;
+		case CMD_FF:		CDD_FF();                  break;
+		case CMD_RW:		CDD_RW();                  break;
+		case CMD_INIT:		CDD_Init();	               break;
+		case CMD_CLOSE:		CDD_Open();                break;
+		case CMD_OPEN:		CDD_Close();	           break;
+		default:			CDD_Default();	           break;
+	}
+
+	CDD_DONE = 1;
+}
+
+
+
+
+
 static UINT16 segacd_hint_register;
 static UINT16 segacd_imagebuffer_vdot_size;
 static UINT16 segacd_imagebuffer_vcell_size;
@@ -3874,8 +4713,7 @@ static READ16_HANDLER( scd_a12000_halt_reset_r )
 // so probably don't change instantly...
 //
 
-int segacd_dmna = 0;
-int segacd_ret = 0;
+
 
 static TIMER_CALLBACK( segacd_dmna_ret_timer_callback )
 {
@@ -3909,14 +4747,6 @@ static TIMER_CALLBACK( segacd_dmna_ret_timer_callback )
 }
 
 
-static UINT8 segacd_ram_writeprotect_bits;
-static int segacd_ram_mode;
-static int segacd_ram_mode_old;
-
-//static int segacd_maincpu_has_ram_access = 0;
-static int segacd_4meg_prgbank = 0; // which bank the MainCPU can see of the SubCPU PrgRAM
-static int segacd_memory_priority_mode = 0;
-static int segacd_stampsize;
 
 
 static READ16_HANDLER( scd_a12002_memory_mode_r )
@@ -3989,7 +4819,7 @@ static WRITE16_HANDLER( scd_a12002_memory_mode_w )
 					{
 						//printf("main dmna\n");
 						segacd_dmna = 1;
-						segacd_dmna_ret_timer->adjust(attotime::from_usec(100));
+						segacd_dmna_ret_timer->adjust(attotime::from_usec(1));
 					}
 				}
 			}
@@ -4058,7 +4888,7 @@ static WRITE16_HANDLER( segacd_sub_memory_mode_w )
 					//  printf("sub ret\n");
 					//  segacd_ret = 1;
 					//  segacd_dmna = 0;
-						segacd_dmna_ret_timer->adjust(attotime::from_usec(100));
+						segacd_dmna_ret_timer->adjust(attotime::from_usec(1));
 					}
 				}
 			}
@@ -4265,101 +5095,38 @@ static WRITE16_HANDLER( segacd_comms_sub_part2_w )
  CDC Stuff ********
 **************************************************************/
 
-static int segacd_cdc_regaddress;
-static int segacd_cdc_destination_device;
-static UINT8 segacd_cdc_registers[0x10];
 
 
 static WRITE16_HANDLER( segacd_cdc_mode_address_w )
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		segacd_cdc_regaddress = data & 0x0f;
-		if (data & 0xf0) printf("unknown bits set in register address write %04x\n", data);
-
-		printf("CDC register address set to %02x\n" , segacd_cdc_regaddress);
-	}
-
-	if (ACCESSING_BITS_8_15)
-	{
-		segacd_cdc_destination_device = (data & 0x0700)>>8;
-		if (data & 0xf800) printf("unknown bits set in destination address write %04x\n",data);
-
-		printf("destination set to: ");
-		switch (segacd_cdc_destination_device&0x7)
-		{
-			case 0x00: printf("Illegal\n"); break;
-			case 0x01: printf("Illegal\n"); break;
-			case 0x02: printf("Main Cpu Read\n"); break;
-			case 0x03: printf("Sub Cpu Read\n"); break;
-			case 0x04: printf("RFC5164 PCM\n"); break;
-			case 0x05: printf("PRG RAM\n"); break;
-			case 0x06: printf("Illegal\n"); break;
-			case 0x07: printf("2M AM (2M Mode) / SUB CPU 1H RAM\n"); break;
-		}
-	}
+	COMBINE_DATA(&CDC_REG0);
 }
 
 static READ16_HANDLER( segacd_cdc_mode_address_r )
 {
-	UINT16 retdata = 0x0000;
-
-	if (ACCESSING_BITS_0_7)
-	{
-		retdata |= segacd_cdc_regaddress;
-	}
-
-	if (ACCESSING_BITS_8_15)
-	{
-		retdata |= segacd_cdc_destination_device << 8;
-
-		// todo: hook them up
-		int data_set_ready = 0;
-		int end_of_data_transfer = 0;
-
-		if (data_set_ready) retdata |= 0x4000;
-		if (end_of_data_transfer) retdata |= 0x8000;
-
-	}
-
-	return retdata;
+	return CDC_REG0;
 }
 
 static WRITE16_HANDLER( segacd_cdc_data_w )
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		segacd_cdc_registers[segacd_cdc_regaddress] = data;
-		printf("CDC Register %02x set to %02x\n", segacd_cdc_regaddress, data & 0xff);
-	}
+	COMBINE_DATA(&CDC_REG1);
 
-	if (ACCESSING_BITS_8_15)
-	{
-		// nothing here?
-	}
+	if (ACCESSING_BITS_0_7)
+		CDC_Reg_w(data);
 }
 
 static READ16_HANDLER( segacd_cdc_data_r )
 {
-	UINT16 retdata = 0x0000;
+	UINT16 retdat = 0x0000;
 
 	if (ACCESSING_BITS_0_7)
-	{
-		retdata |= segacd_cdc_registers[segacd_cdc_regaddress];
-		printf("CDC Register %02x Read\n", segacd_cdc_regaddress);
-	}
+		retdat |= CDC_Reg_r();
 
-	if (ACCESSING_BITS_8_15)
-	{
-		// nothing here?
-	}
-
-	return retdata;
+	return retdat;
 }
 
 
-static UINT16* segacd_dataram;
-static UINT16* segacd_dataram2;
+
 
 
 static READ16_HANDLER( segacd_main_dataram_part1_r )
@@ -4951,39 +5718,19 @@ INLINE UINT8 get_stampmap_32x32_16x16_tile_info_pixel(running_machine* machine, 
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
 
-
-static TIMER_CALLBACK( segacd_hock_callback )
+static TIMER_CALLBACK( segacd_access_timer_callback )
 {
-	int i,cdd_crc;
+	CheckCommand(machine);
+}
 
-	if(hock_cmd)
-	{
-//      segacd_cdd.ctrl &= ~4; // clear HOCK flag
+READ16_HANDLER( cdc_data_sub_r )
+{
+	return CDC_Host_r(space->machine, READ_SUB);
+}
 
-		segacd_cdd_rx[0] = (segacd_cdd.buffer[0] & 0xf0) >> 4;
-		segacd_cdd_rx[1] = (segacd_cdd.buffer[0] & 0x0f) >> 0;
-		segacd_cdd_rx[2] = (segacd_cdd.buffer[1] & 0xf0) >> 4;
-		segacd_cdd_rx[3] = (segacd_cdd.buffer[1] & 0x0f) >> 0;
-		segacd_cdd_rx[4] = (segacd_cdd.buffer[2] & 0xf0) >> 4;
-		segacd_cdd_rx[5] = (segacd_cdd.buffer[2] & 0x0f) >> 0;
-		segacd_cdd_rx[6] = (segacd_cdd.buffer[3] & 0xf0) >> 4;
-		segacd_cdd_rx[7] = (segacd_cdd.buffer[3] & 0x0f) >> 0;
-		segacd_cdd_rx[8] = (segacd_cdd.buffer[4] & 0x0f) >> 0;
-
-		/* Do checksum calculation of the above registers */
-		cdd_crc = 0;
-		for(i=0;i<9;i++)
-			cdd_crc += segacd_cdd_rx[i];
-
-		segacd_cdd_rx[9] = ((cdd_crc & 0xf) ^ 0xf);
-
-		if(segacd_irq_mask & 0x10)
-			cputag_set_input_line(machine, "segacd_68k", 4, HOLD_LINE);
-
-		hock_cmd = 0;
-	}
-
-	segacd_hock_timer->adjust(attotime::from_hz(75));
+READ16_HANDLER( cdc_data_main_r )
+{
+	return CDC_Host_r(space->machine, READ_MAIN);
 }
 
 
@@ -5007,8 +5754,10 @@ void segacd_init_main_cpu( running_machine* machine )
 
 	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12000, 0xa12001, 0, 0, scd_a12000_halt_reset_r, scd_a12000_halt_reset_w); // sub-cpu control
 	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12002, 0xa12003, 0, 0, scd_a12002_memory_mode_r, scd_a12002_memory_mode_w); // memory mode / write protect
-
+	//memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12004, 0xa12005, 0, 0, segacd_cdc_mode_address_r, segacd_cdc_mode_address_w);
 	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12006, 0xa12007, 0, 0, scd_a12006_hint_register_r, scd_a12006_hint_register_w); // where HINT points on main CPU
+	//memory_install_read16_handler     (cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12008, 0xa12009, 0, 0, cdc_data_main_r); 
+
 
 
 	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa1200e, 0xa1200f, 0, 0, segacd_comms_flags_r, segacd_comms_flags_maincpu_w); // communication flags block
@@ -5027,8 +5776,8 @@ void segacd_init_main_cpu( running_machine* machine )
 	segacd_dmna_ret_timer = machine->scheduler().timer_alloc(FUNC(segacd_dmna_ret_timer_callback));
 	segacd_gfx_conversion_timer->adjust(attotime::never);
 
-	segacd_hock_timer = machine->scheduler().timer_alloc(FUNC(segacd_hock_callback));
-	segacd_hock_timer->adjust(attotime::never);
+	segacd_hock_timer = machine->scheduler().timer_alloc(FUNC(segacd_access_timer_callback));
+	segacd_hock_timer->adjust( attotime::from_nsec(5000000), 0, attotime::from_nsec(5000000));
 
 	segacd_irq3_timer = machine->scheduler().timer_alloc(FUNC(segacd_irq3_timer_callback));
 	segacd_irq3_timer->adjust(attotime::never);
@@ -5054,11 +5803,6 @@ void segacd_init_main_cpu( running_machine* machine )
 	machine->gfx[14]= gfx_element_alloc(machine, &sega_32x32_r10_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
 	machine->gfx[15]= gfx_element_alloc(machine, &sega_32x32_r11_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
 
-	/* as a temporary measure we use the MAME tilemaps, this is hideously inefficient as we have to mark the active one as
-       dirty before each operation due to the RAM based tiles.  For the larger tilemaps this means we have to re-render a 4096x4096
-       bitmap to the tilemap cache on each blit operation just to copy the few needed tiles out of it, needless to say, this is SLOW.
-       Eventually the tilemaps will be replaced with a get_pixel function which will perform all the needed lookups on a per-pixel
-       basis instead of re-rendering the whole thing */
 	segacd_stampmap[0] = tilemap_create(machine, get_stampmap_16x16_1x1_tile_info, tilemap_scan_rows, 16, 16, 16, 16);
 	segacd_stampmap[1] = tilemap_create(machine, get_stampmap_32x32_1x1_tile_info, tilemap_scan_rows, 32, 32, 8, 8);
 	segacd_stampmap[2] = tilemap_create(machine, get_stampmap_16x16_16x16_tile_info, tilemap_scan_rows, 16, 16, 256, 256); // 128kb!
@@ -5069,22 +5813,15 @@ void segacd_init_main_cpu( running_machine* machine )
 
 static MACHINE_RESET( segacd )
 {
-	int i;
 	cpu_set_input_line(_segacd_68k_cpu, INPUT_LINE_RESET, ASSERT_LINE);
 	cpu_set_input_line(_segacd_68k_cpu, INPUT_LINE_HALT, ASSERT_LINE);
 
 	segacd_hint_register = 0xffff; // -1
 
-	for(i=0;i<10;i++)
-	{
-		segacd_cdd_rx[i] = 0;
-	}
-
-	segacd_cdd_rx[9] = 0xf; // default checksum
-
 	/* init cd-rom device */
 
-	#ifdef MESS
+	lc89510_Reset();
+
 	{
 		device_t *device;
 
@@ -5096,15 +5833,13 @@ static MACHINE_RESET( segacd )
 			{
 				segacd.toc = cdrom_get_toc( segacd.cd );
 				cdda_set_cdrom( machine->device("cdda"), segacd.cd );
-				segacd.last_frame = cdrom_get_track_start( segacd.cd, cdrom_get_last_track( segacd.cd ) - 1 );
-				segacd.last_frame += segacd.toc->tracks[ cdrom_get_last_track( segacd.cd ) - 1 ].frames;
-				segacd.end_frame = segacd.last_frame;
 			}
 		}
-
-		segacd_cdd.scd_status = 0x00; // initial state
 	}
-	#endif
+
+
+	if (segacd.cd)
+		printf("cd found\n");
 
 	segacd_dmna = 0;
 	segacd_ret = 0;
@@ -5113,7 +5848,7 @@ static MACHINE_RESET( segacd )
 	segacd_ram_mode_old = 0;
 
 	segacd_dmna_ret_timer->adjust(attotime::zero);
-	segacd_hock_timer->adjust(attotime::zero);
+
 	hock_cmd = 0;
 }
 
@@ -5253,16 +5988,6 @@ static WRITE16_HANDLER( segacd_sub_dataram_part2_w )
 }
 
 
-#if 0
-static void cdd_hock_irq(running_machine *machine,UINT8 dir)
-{
-	if((segacd_cdd.ctrl & 4 || dir) && segacd_irq_mask & 0x10) // export status, check if bit 2 (HOst ClocK) and irq is enabled
-	{
-		segacd_cdd.ctrl |= 4; // enable Hock bit if it isn't already active
-		machine->scheduler().timer_set(attotime::from_hz(75), FUNC(execute_hock_irq)); // 1 / 75th of a second
-	}
-}
-#endif
 
 static READ16_HANDLER( segacd_irq_mask_r )
 {
@@ -5271,305 +5996,67 @@ static READ16_HANDLER( segacd_irq_mask_r )
 
 static WRITE16_HANDLER( segacd_irq_mask_w )
 {
-	segacd_irq_mask = data & 0x7e;
+	UINT16 control = CDD_CONTROL;
 
-	// TODO: check here pending IRQs
+//	printf("segacd_irq_mask_w %04x %04x (CDD control is %04x)\n",data, mem_mask, control);
+
+	if (data & 0x10)
+	{
+		if (control & 0x04)
+		{
+			if (!segacd_irq_mask & 0x10)
+			{
+				segacd_irq_mask = data & 0x7e;
+				CDD_Process(space->machine, 0);
+				return;
+			}
+		}
+	}
+	
+	segacd_irq_mask = data & 0x7e;
 }
 
 static READ16_HANDLER( segacd_cdd_ctrl_r )
 {
-	return segacd_cdd.ctrl;
+	return CDD_CONTROL;
 }
+
 
 static WRITE16_HANDLER( segacd_cdd_ctrl_w )
 {
-	segacd_cdd.ctrl = data;
+	UINT16 control = CDD_CONTROL;
 
-	hock_cmd = (data & 4) >> 2;
+	printf("segacd_cdd_ctrl_w %04x %04x (control %04x irq %04x\n", data, mem_mask, control, segacd_irq_mask);
 
-	if(data & 4) // enable Hock timer
-		segacd_hock_timer->adjust(attotime::from_hz(75));
-	else
-		segacd_hock_timer->adjust(attotime::never);
-}
-
-/* 68k <- CDD communication comms are 4-bit wide */
-static READ8_HANDLER( segacd_cdd_rx_r )
-{
-	return (segacd_cdd_rx[offset] & 0xf);
-}
-
-static const char *const segacd_cdd_cmd[] =
-{
-	"Status",
-	"Stop All",
-	"Get TOC Info",
-	"Play",
-	"Seek",
-	"Pause/Stop",
-	"Resume",
-	"Fast Forward",
-	"Fast Rewind",
-	"Recover Initial state",
-	"Close Tray",
-	"Open Tray",
-	"Unknown 0xE",
-	"Unknown 0xF"
-};
-
-static const char *const segacd_cdd_get_toc_cmd[] =
-{
-	"Get Current Position",
-	"Get Elapsed Time of Current Track",
-	"Get Current Track",
-	"Get Total Length",
-	"Get First and Last Track Number",
-	"Get Track Addresses",
-	"Invalid 0x6",
-	"Invalid 0x7",
-	"Invalid 0x8",
-	"Invalid 0x9",
-	"Invalid 0xA",
-	"Invalid 0xB",
-	"Invalid 0xC",
-	"Invalid 0xD",
-	"Invalid 0xE",
-	"Invalid 0xF",
-};
-
-#ifdef MESS
-
-#define LOG_CDD 1
-
-static void segacd_cdd_get_status(running_machine *machine)
-{
-	//segacd_cdd.buffer[0] = 0;
-	//segacd_cdd.buffer[1] = 0;
-	//segacd_cdd.buffer[2] = 0;
-	//segacd_cdd.buffer[3] = 0;
-	//segacd_cdd.buffer[4] = 0;
-
-	hock_cmd = 1;
-}
-
-static void segacd_cdd_stop_all(running_machine *machine)
-{
-	segacd_cdd.ctrl |= 0x100;
-
-	segacd_cdd.buffer[0] = 0;
-	segacd_cdd.buffer[1] = 0;
-	segacd_cdd.buffer[2] = 0;
-	segacd_cdd.buffer[3] = 0;
-	segacd_cdd.buffer[4] = 0;
-
-	hock_cmd = 1;
-}
-
-
-static void segacd_cdd_get_toc_info(running_machine *machine)
-{
-	segacd_cdd.buffer[0] = (segacd_cdd_tx[3] & 0xf) | (segacd_cdd.scd_status & 0xf0); // TODO: remove me
-
-	#if LOG_CDD
-	if(segacd_cdd_tx[3] >= 6)
-		printf("CDD: TOC command %s issued\n",segacd_cdd_get_toc_cmd[segacd_cdd_tx[3] & 0xf]);
-	#endif
-
-	// TODO: check if tray is open
-
-	if ( ! segacd.cd ) // no cd is present
+	if (data & 0x4)
 	{
-		segacd_cdd.scd_status = 0x00;
-		segacd_cdd.buffer[0] = (0) | (segacd_cdd.scd_status & 0xf0);
-		segacd_cdd.buffer[1] = 0;
-		segacd_cdd.buffer[2] = 0;
-		segacd_cdd.buffer[3] = 0;
-		segacd_cdd.buffer[4] = 0;
-
-		hock_cmd = 1;
-		return;
-	}
-	else
-	{
-		switch(segacd_cdd_tx[3] & 0xf)
+		if (!(control & 0x4))
 		{
-			case 0x0: //Get Current Position
+			if (segacd_irq_mask&0x10)
 			{
-				UINT32 msf;
-
-				segacd_cdd.scd_status = 0x40; //TODO: check this
-
-				msf = lba_to_msf( segacd.current_frame );
-				segacd_cdd.buffer[0] = (0x0 & 0xf) | (segacd_cdd.scd_status & 0xf0);
-				segacd_cdd.buffer[1] = dec_2_bcd( msf >> 16 ) & 0xff;
-				segacd_cdd.buffer[2] = dec_2_bcd( msf >> 8 ) & 0xff;
-				segacd_cdd.buffer[3] = dec_2_bcd( msf >> 0 ) & 0xff;
-				segacd_cdd.buffer[4] = 0;
-
-				hock_cmd = 1;
-				return;
+				CDD_Process(space->machine, 1);
 			}
-			case 0x1: //Get Elapsed Time of Current Track
-			{
-				UINT32 msf;
-				UINT32 end_frame_track;
-
-				segacd_cdd.scd_status = 0x40; //TODO: check this
-
-				end_frame_track = segacd.toc->tracks[ cdrom_get_track(segacd.cd, segacd.current_frame) + 1 ].physframeofs; // correct?
-
-				msf = lba_to_msf( end_frame_track - segacd.current_frame );
-
-				segacd_cdd.buffer[0] = (0x1 & 0xf) | (segacd_cdd.scd_status & 0xf0);
-				segacd_cdd.buffer[1] = dec_2_bcd( msf >> 16 ) & 0xff;
-				segacd_cdd.buffer[2] = dec_2_bcd( msf >> 8 ) & 0xff;
-				segacd_cdd.buffer[3] = dec_2_bcd( msf >> 0 ) & 0xff;
-				segacd_cdd.buffer[4] = 0;
-
-				hock_cmd = 1;
-				return;
-			}
-			case 0x2: //Get Current Track
-			{
-				segacd_cdd.buffer[0] = (0x2 & 0xf) | (segacd_cdd.buffer[0] & 0xf0);
-
-				segacd_cdd.buffer[1] = cdrom_get_track(segacd.cd, segacd.current_frame);
-				segacd_cdd.buffer[2] = 0;
-				segacd_cdd.buffer[3] = 0;
-				segacd_cdd.buffer[4] = 0;
-
-				hock_cmd = 1;
-				return;
-			}
-			case 0x3: //Get Total Length (in MSF)
-			{
-				UINT32 frame,msf;
-
-				frame = segacd.toc->tracks[segacd.toc->numtrks-1].physframeofs;
-				frame += segacd.toc->tracks[segacd.toc->numtrks-1].frames;
-				frame += 150; // 2 seconds of pre-gap
-				msf = lba_to_msf( frame );
-
-				segacd_cdd.buffer[0] = (0x3 & 0xf) | (segacd_cdd.scd_status & 0xf0);
-				segacd_cdd.buffer[1] = ((msf >> 16) & 0xff);
-				segacd_cdd.buffer[2] = ((msf >> 8) & 0xff);
-				segacd_cdd.buffer[3] = ((msf >> 0) & 0xff);
-				segacd_cdd.buffer[4] = 0;
-
-				printf("%02x %02x %02x %02x %02x\n",segacd_cdd.buffer[0],segacd_cdd.buffer[1],segacd_cdd.buffer[2],segacd_cdd.buffer[3],segacd_cdd.buffer[4]);
-
-				hock_cmd = 1;
-				return;
-
-			}
-			case 0x4: //Get First and Last Track Number
-			{
-				segacd_cdd.scd_status = 0x40;
-				segacd_cdd.buffer[0] = (0x4 & 0xf) | (segacd_cdd.scd_status & 0xf0);
-				segacd.first_track = dec_2_bcd(1);
-				segacd.last_track = dec_2_bcd(segacd.toc->numtrks - 1);
-				segacd_cdd.buffer[1] = segacd.first_track;
-				segacd_cdd.buffer[2] = segacd.last_track;
-				segacd_cdd.buffer[3] = 0;
-				segacd_cdd.buffer[4] = 0;
-
-				printf("%02x %02x %02x %02x %02x\n",segacd_cdd.buffer[0],segacd_cdd.buffer[1],segacd_cdd.buffer[2],segacd_cdd.buffer[3],segacd_cdd.buffer[4]);
-
-				hock_cmd = 1;
-				return;
-			}
-			case 0x5: //Get Track Addresses
-			{
-				UINT8 track_num;
-				UINT32 start_frame,frame,msf;
-
-				track_num = ((segacd_cdd_tx[4] & 0xf) * 10) | (segacd_cdd_tx[5] & 0x0f);
-
-				if(track_num > segacd.last_track)
-					track_num = segacd.last_track;
-				if(track_num < segacd.first_track)
-					track_num = segacd.first_track;
-				start_frame = segacd.toc->tracks[ bcd_2_dec( track_num - 1 ) ].physframeofs;
-				//end_frame = segacd.toc->tracks[ bcd_2_dec( track_num ) ].physframeofs;
-				frame = start_frame;
-				msf = lba_to_msf( frame );
-
-				segacd_cdd.buffer[0] = (0x5 & 0xf) | (segacd_cdd.scd_status & 0xf0);
-				segacd_cdd.buffer[1] = ((msf >> 16) & 0xff);
-				segacd_cdd.buffer[2] = ((msf >> 8) & 0xff);
-				segacd_cdd.buffer[3] = ((msf >> 0) & 0xff);
-				segacd_cdd.buffer[4] = ((track_num) % 10) | (( segacd.toc->tracks[track_num-1].trktype == CD_TRACK_AUDIO ) ? 0x80 : 0x00);
-
-				printf("%02x %02x %02x %02x %02x\n",segacd_cdd.buffer[0],segacd_cdd.buffer[1],segacd_cdd.buffer[2],segacd_cdd.buffer[3],segacd_cdd.buffer[4]);
-
-				hock_cmd = 1;
-				return;
-			}
-			//default: logerror("CDD: unhandled TOC command %s issued\n",segacd_cdd_get_toc_cmd[segacd_cdd_tx[3] & 0xf]);
 		}
 	}
 
-	hock_cmd = 1;
+	CDD_CONTROL |= data;
 }
 
-static void segacd_cdd_seek(running_machine *machine)
+
+
+static READ8_HANDLER( segacd_cdd_rx_r )
 {
-	UINT8 m,s,f;
-	UINT8 track_num;
-	UINT32 frame;
-
-	// TODO: check if tray is open or CD isn't there and throw an error if so
-
-	segacd_cdd.scd_status = 0x20; //READY flag
-
-	m = ((segacd_cdd_tx[2] & 0xf) * 10) | (segacd_cdd_tx[3] & 0x0f);
-	s = ((segacd_cdd_tx[4] & 0xf) * 10) | (segacd_cdd_tx[5] & 0x0f);
-	f = ((segacd_cdd_tx[6] & 0xf) * 10) | (segacd_cdd_tx[7] & 0x0f);
-
-	frame = (m << 16) | (s << 8) | (f);
-
-	track_num = cdrom_get_track(segacd.cd, frame);
-	segacd.current_frame = frame;
-//  printf("%02x %02x %02x %02x\n",m,s,f,track_num);
-
-	segacd_cdd.ctrl &= 0xfeff;
-	segacd_cdd.ctrl |= (( segacd.toc->tracks[track_num-1].trktype == CD_TRACK_AUDIO ) ? 0x000 : 0x100);
-
-	segacd_cdd.buffer[0] = segacd_cdd.scd_status & 0x20; // set READY
-	segacd_cdd.buffer[1] = 0;
-	segacd_cdd.buffer[2] = 0;
-	segacd_cdd.buffer[3] = 0;
-	segacd_cdd.buffer[4] = 0;
-
-	hock_cmd = 1;
+	return CDD_RX[offset^1];
 }
-
-#endif
 
 static WRITE8_HANDLER( segacd_cdd_tx_w )
 {
-	//printf("CDD Communication write %02x -> [%02x]\n",data,offset);
-	segacd_cdd_tx[offset] = data & 0xf;
+	CDD_TX[offset^1] = data;
 
-	#ifdef MESS
-	if(offset == 9) //execute the command when crc is sent (TODO: I wonder if we need to check if crc is valid. Plus obviously this shouldn't be instant)
+	if(offset == 9)
 	{
-		#if LOG_CDD
-		if(segacd_cdd_tx[0] != 0 && segacd_cdd_tx[0] != 2)
-			printf("CDD: command %s issued\n",segacd_cdd_cmd[segacd_cdd_tx[0] & 0xf]);
-		#endif
-
-		switch(segacd_cdd_tx[0] & 0xf)
-		{
-			case 0x0: segacd_cdd_get_status(space->machine); break;
-			case 0x1: segacd_cdd_stop_all(space->machine); break;
-			case 0x2: segacd_cdd_get_toc_info(space->machine); break;
-			//case 0x3: segacd_cdd_play(space->machine); break;
-			case 0x4: segacd_cdd_seek(space->machine); break;
-			//default: logerror("CDD: unhandled command %s issued\n",segacd_cdd_cmd[segacd_cdd_tx[0] & 0xf]);
-		}
+		CDD_Import(space->machine);
 	}
-	#endif
 }
 
 
@@ -5588,28 +6075,28 @@ static READ16_HANDLER( segacd_stampsize_r )
 
 static WRITE16_HANDLER( segacd_stampsize_w )
 {
-	printf("segacd_stampsize_w %04x %04x\n",data, mem_mask);
+	//printf("segacd_stampsize_w %04x %04x\n",data, mem_mask);
 	if (ACCESSING_BITS_0_7)
 	{
 		segacd_stampsize = data & 0x07;
-		if (data & 0xf8)
-			printf("    unused bits (LSB) set in stampsize!\n");
+		//if (data & 0xf8)
+		//	printf("    unused bits (LSB) set in stampsize!\n");
 
-		if (data&1) printf("    Repeat On\n");
-		else printf("    Repeat Off\n");
+		//if (data&1) printf("    Repeat On\n");
+		//else printf("    Repeat Off\n");
 
-		if (data&2) printf("    32x32 dots\n");
-		else printf("    16x16 dots\n");
+		//if (data&2) printf("    32x32 dots\n");
+		//else printf("    16x16 dots\n");
 
-		if (data&4) printf("    16x16 screens\n");
-		else printf("    1x1 screen\n");
+		//if (data&4) printf("    16x16 screens\n");
+		//else printf("    1x1 screen\n");
 
 
 	}
 
 	if (ACCESSING_BITS_8_15)
 	{
-		if (data&0xff00) printf("    unused bits (MSB) set in stampsize!\n");
+		//if (data&0xff00) printf("    unused bits (MSB) set in stampsize!\n");
 	}
 }
 
@@ -5724,7 +6211,8 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 		segacd_conversion_active = 1;
 
 		// todo: proper time calculation
-		segacd_gfx_conversion_timer->adjust(attotime::from_hz(500));
+		segacd_gfx_conversion_timer->adjust(attotime::from_nsec(5000000));
+
 
 
 		int line;
@@ -5831,7 +6319,7 @@ static READ16_HANDLER( segacd_imagebuffer_offset_r )
 static WRITE16_HANDLER( segacd_imagebuffer_offset_w )
 {
 	COMBINE_DATA(&segacd_imagebuffer_offset);
-	printf("segacd_imagebuffer_offset_w %04x\n", segacd_imagebuffer_offset);
+//	printf("segacd_imagebuffer_offset_w %04x\n", segacd_imagebuffer_offset);
 }
 
 static READ16_HANDLER( segacd_imagebuffer_vcell_size_r )
@@ -5877,9 +6365,11 @@ static WRITE16_HANDLER( segacd_irq3timer_w )
 		else
 			segacd_irq3_timer->adjust(attotime::never);
 
-		printf("segacd_irq3timer_w %02x\n", segacd_irq3_timer_reg);
+		//printf("segacd_irq3timer_w %02x\n", segacd_irq3_timer_reg);
 	}
 }
+
+
 
 static TIMER_CALLBACK( segacd_irq3_timer_callback )
 {
@@ -5889,6 +6379,26 @@ static TIMER_CALLBACK( segacd_irq3_timer_callback )
 	segacd_irq3_timer->adjust(SEGACD_IRQ3_TIMER_SPEED);
 }
 
+
+WRITE16_HANDLER( segacd_stopwatch_timer_w )
+{
+
+}
+
+READ16_HANDLER( segacd_stopwatch_timer_r )
+{
+	return space->machine->rand();
+}
+
+READ16_HANDLER( cdc_dmaaddr_r )
+{
+	return CDC_DMA_ADDR;
+}
+
+WRITE16_HANDLER( cdc_dmaaddr_w )
+{
+	COMBINE_DATA(&CDC_DMA_ADDR);
+}
 
 static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE(&segacd_4meg_prgram)
@@ -5907,9 +6417,9 @@ static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0xff8004 ,0xff8005) AM_READWRITE(segacd_cdc_mode_address_r, segacd_cdc_mode_address_w)
 	AM_RANGE(0xff8006 ,0xff8007) AM_READWRITE(segacd_cdc_data_r, segacd_cdc_data_w)
-//  AM_RANGE(0xff8008, 0xff8009) // CDC Host Data
-//  AM_RANGE(0xff800a, 0xff800b) // CDC DMA Address
-//  AM_RANGE(0xff800c, 0xff800d) // Stopwatch timer
+	AM_RANGE(0xff8008, 0xff8009) AM_READ(cdc_data_sub_r)
+	AM_RANGE(0xff800a, 0xff800b) AM_READWRITE(cdc_dmaaddr_r,cdc_dmaaddr_w) // CDC DMA Address
+	AM_RANGE(0xff800c, 0xff800d) AM_READWRITE(segacd_stopwatch_timer_r, segacd_stopwatch_timer_w)// Stopwatch timer
 	AM_RANGE(0xff800e ,0xff800f) AM_READWRITE(segacd_comms_flags_r, segacd_comms_flags_subcpu_w)
 	AM_RANGE(0xff8010 ,0xff801f) AM_READWRITE(segacd_comms_sub_part1_r, segacd_comms_sub_part1_w)
 	AM_RANGE(0xff8020 ,0xff802f) AM_READWRITE(segacd_comms_sub_part2_r, segacd_comms_sub_part2_w)
@@ -5966,7 +6476,7 @@ ADDRESS_MAP_END
  *
  * Depending on GPO bits in status register, PM0, PM1, PM2 and XST can act as
  * external status registers, os as programmable memory registers. PM4 always
- * acts as PM register (independend on GPO bits).
+ * acts as PM register (independent on GPO bits).
  */
 
 #include "cpu/ssp1601/ssp1601.h"
@@ -8231,6 +8741,11 @@ static TIMER_DEVICE_CALLBACK( render_timer_callback )
 	if (genesis_scanline_counter>=0 && genesis_scanline_counter<megadrive_visible_scanlines)
 	{
 		genesis_render_scanline(timer.machine, genesis_scanline_counter);
+		
+		// put this one a timer instead?
+		#define RATE 256
+		if (sega_cd_connected)
+			CDC_Do_DMA(timer.machine, RATE);
 	}
 }
 
@@ -8889,9 +9404,28 @@ MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.25 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.25 )
 
-	#ifdef MESS
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+
+
+MACHINE_CONFIG_END
+
+/* Different Softlists for different regions (for now at least) */
+MACHINE_CONFIG_DERIVED( genesis_scd_scd, genesis_scd )
 	MCFG_CDROM_ADD( "cdrom" )
-	#endif
+	MCFG_CDROM_INTERFACE("scd_cdrom")
+	MCFG_SOFTWARE_LIST_ADD("cd_list","segacd")
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_DERIVED( genesis_scd_mcd, genesis_scd )
+	MCFG_CDROM_ADD( "cdrom" )
+	MCFG_CDROM_INTERFACE("scd_cdrom")
+	MCFG_SOFTWARE_LIST_ADD("cd_list","megacd")
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_DERIVED( genesis_scd_mcdj, genesis_scd )
+	MCFG_CDROM_ADD( "cdrom" )
+	MCFG_CDROM_INTERFACE("scd_cdrom")
+	MCFG_SOFTWARE_LIST_ADD("cd_list","megacdj")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( genesis_32x_scd, genesis_32x )
@@ -8907,9 +9441,7 @@ MACHINE_CONFIG_DERIVED( genesis_32x_scd, genesis_32x )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.25 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.25 )
 
-	#ifdef MESS
 	MCFG_CDROM_ADD( "cdrom" )
-	#endif
 MACHINE_CONFIG_END
 
 

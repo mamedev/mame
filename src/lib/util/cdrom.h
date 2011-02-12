@@ -160,6 +160,11 @@ chd_error cdrom_write_metadata(chd_file *chd, const cdrom_toc *toc);
     INLINE FUNCTIONS
 ***************************************************************************/
 
+INLINE UINT32 msf_to_lba(UINT32 msf)
+{
+	return ( ((msf&0x00ff0000)>>16) * 60 * 75) + (((msf&0x0000ff00)>>8) * 75) + ((msf&0x000000ff)>>0);
+}
+
 INLINE UINT32 lba_to_msf(UINT32 lba)
 {
 	UINT8 m, s, f;
@@ -173,5 +178,22 @@ INLINE UINT32 lba_to_msf(UINT32 lba)
 	       ((s / 10) << 12) | ((s % 10) <<  8) |
 	       ((f / 10) <<  4) | ((f % 10) <<  0);
 }
+
+// segacd needs it like this.. investigate
+// Angelo also says PCE tracks often start playing at the 
+// wrong address.. related?
+INLINE UINT32 lba_to_msf_alt(int lba)
+{
+	UINT32 ret = 0;
+	
+	ret |= ((lba / (60 * 75))&0xff)<<16;
+	ret |= (((lba / 75) % 60)&0xff)<<8;
+	ret |= ((lba % 75)&0xff)<<0;
+
+	return ret;
+}
+
+
+
 
 #endif	// __CDROM_H__
