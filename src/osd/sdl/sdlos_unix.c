@@ -154,9 +154,9 @@ char *osd_get_clipboard_text(void)
 	if ( info.subsystem != SDL_SYSWM_X11 )
 		return NULL;
 #if (SDL_VERSION_ATLEAST(1,3,0))
-	if ( (display = info.x11.display) == NULL )
+	if ( (display = info.info.x11.display) == NULL )
 		return NULL;
-	if ( (our_win = info.x11.window) == None )
+	if ( (our_win = info.info.x11.window) == None )
 		return NULL;
 #else
 	if ( (display = info.info.x11.display) == NULL )

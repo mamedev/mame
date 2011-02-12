@@ -38,6 +38,13 @@
 
 typedef struct _sdl_scale_mode sdl_scale_mode;
 
+// FIXME: Only until there is a final decision from SAM on scalemodes
+#if (SDL_VERSION_ATLEAST(1,3,0))
+#define	SDL_SCALEMODE_NONE	(0)
+#define	SDL_SCALEMODE_FAST	(0)
+#define	SDL_SCALEMODE_BEST	(0)
+#endif
+
 /* sdl_info is the information about SDL for the current screen */
 typedef struct _sdl_info sdl_info;
 struct _sdl_info
@@ -46,7 +53,7 @@ struct _sdl_info
 	UINT32				extra_flags;
 
 #if (SDL_VERSION_ATLEAST(1,3,0))
-	SDL_TextureID		texture_id;
+	SDL_Texture			*texture_id;
 #else
 	// SDL surface
 	SDL_Surface 		*sdlsurf;
@@ -82,7 +89,8 @@ struct _sdl_scale_mode
 #if (!SDL_VERSION_ATLEAST(1,3,0))
 	int				extra_flags;		/* Texture/surface flags */
 #else
-	SDL_ScaleMode	sdl_scale_mode;		/* sdl 1.3 scale mode    */
+	//SDL_ScaleMode	sdl_scale_mode;		/* sdl 1.3 scale mode    */
+	int				sdl_scale_mode;		/* got removed recently - trying to get it in again */
 #endif
 	int				pixel_format;		/* Pixel/Overlay format  */
 	void    		(*yuv_blit)(UINT16 *bitmap, sdl_info *sdl, UINT8 *ptr, int pitch);
@@ -283,16 +291,16 @@ static void setup_texture(sdl_window_info *window, int tempwidth, int tempheight
 		int w = sdl->hw_scale_width * sdl_sm->mult_w;
 		int h = sdl->hw_scale_height * sdl_sm->mult_h;
 
-		sdl->texture_id = SDL_CreateTexture(fmt, SDL_TEXTUREACCESS_STREAMING, w, h);
+		sdl->texture_id = SDL_CreateTexture(window->sdl_renderer, fmt, SDL_TEXTUREACCESS_STREAMING, w, h);
 
 	}
 	else
 	{
-		sdl->texture_id = SDL_CreateTexture(fmt, SDL_TEXTUREACCESS_STREAMING,
+		sdl->texture_id = SDL_CreateTexture(window->sdl_renderer,fmt, SDL_TEXTUREACCESS_STREAMING,
 				tempwidth, tempheight);
 	}
 
-	SDL_SetTextureScaleMode(sdl->texture_id, sdl_sm->sdl_scale_mode);
+	//SDL_SetTextureScaleMode(window->sdl_renderer,sdl->texture_id, sdl_sm->sdl_scale_mode);
 
 }
 #endif
@@ -365,11 +373,13 @@ static void	drawsdl_show_info(sdl_window_info *window, struct SDL_RendererInfo *
 		const char *name;
 	} rflist[] =
 		{
+#if 0
 			RF_ENTRY(SDL_RENDERER_SINGLEBUFFER),
 			RF_ENTRY(SDL_RENDERER_PRESENTCOPY),
 			RF_ENTRY(SDL_RENDERER_PRESENTFLIP2),
 			RF_ENTRY(SDL_RENDERER_PRESENTFLIP3),
 			RF_ENTRY(SDL_RENDERER_PRESENTDISCARD),
+#endif
 			RF_ENTRY(SDL_RENDERER_PRESENTVSYNC),
 			RF_ENTRY(SDL_RENDERER_ACCELERATED),
 			{-1, NULL}
@@ -434,15 +444,15 @@ static int drawsdl_window_create(sdl_window_info *window, int width, int height)
 	// create a texture
 
 	if (video_config.waitvsync)
-		SDL_CreateRenderer(window->sdl_window, -1, SDL_RENDERER_PRESENTFLIP2 | SDL_RENDERER_PRESENTDISCARD | SDL_RENDERER_PRESENTVSYNC);
+		window->sdl_renderer = SDL_CreateRenderer(window->sdl_window, -1, /*SDL_RENDERER_PRESENTFLIP2 | SDL_RENDERER_PRESENTDISCARD |*/ SDL_RENDERER_PRESENTVSYNC);
 	else
-		SDL_CreateRenderer(window->sdl_window, -1, SDL_RENDERER_PRESENTFLIP2 | SDL_RENDERER_PRESENTDISCARD);
+		window->sdl_renderer = SDL_CreateRenderer(window->sdl_window, -1, /*SDL_RENDERER_PRESENTFLIP2 | SDL_RENDERER_PRESENTDISCARD*/ 0);
 
-    SDL_SelectRenderer(window->sdl_window);
+    //SDL_SelectRenderer(window->sdl_window);
 
     {
         struct SDL_RendererInfo render_info;
-    	SDL_GetRendererInfo(&render_info);
+    	SDL_GetRendererInfo(window->sdl_renderer, &render_info);
 
     	drawsdl_show_info(window, &render_info);
 
@@ -543,7 +553,7 @@ static void drawsdl_window_destroy(sdl_window_info *window)
 		return;
 
 #if (SDL_VERSION_ATLEAST(1,3,0))
-	SDL_SelectRenderer(window->sdl_window);
+	//SDL_SelectRenderer(window->sdl_window);
 	SDL_DestroyTexture(sdl->texture_id);
 	//SDL_DestroyRenderer(window->sdl_window);
 	SDL_DestroyWindow(window->sdl_window);
@@ -696,7 +706,7 @@ static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	else
 		surfptr = (UINT8 *)sdl->sdlsurf->pixels;
 #else
-	SDL_SelectRenderer(window->sdl_window);
+	//SDL_SelectRenderer(window->sdl_window);
 
 	if (window->blitwidth != sdl->old_blitwidth || window->blitheight != sdl->old_blitheight)
 	{
@@ -720,13 +730,13 @@ static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	if (sdl->blittimer > 0)
 	{
 		/* SDL Underlays need alpha = 0 ! */
-		SDL_SetRenderDrawColor(0,0,0,0);
-		SDL_RenderFillRect(NULL);
+		SDL_SetRenderDrawColor(window->sdl_renderer,0,0,0,0);
+		SDL_RenderFillRect(window->sdl_renderer,NULL);
 		//SDL_RenderFill(0,0,0,0 /*255*/,NULL);
 		sdl->blittimer--;
 	}
 
-	SDL_LockTexture(sdl->texture_id, NULL, 1, (void **) &surfptr, &pitch);
+	SDL_LockTexture(sdl->texture_id, NULL, (void **) &surfptr, &pitch);
 
 #endif
 	// get ready to center the image
@@ -856,8 +866,8 @@ static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 		r.h=blitheight;
 		//printf("blitwidth %d %d - %d %d\n", blitwidth, blitheight, window->width, window->height);
 		//SDL_UpdateTexture(sdl->sdltex, NULL, sdl->sdlsurf->pixels, pitch);
-		SDL_RenderCopy(sdl->texture_id, NULL, &r);
-		SDL_RenderPresent();
+		SDL_RenderCopy(window->sdl_renderer,sdl->texture_id, NULL, &r);
+		SDL_RenderPresent(window->sdl_renderer);
 	}
 #endif
 	return 0;
