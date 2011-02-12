@@ -17,46 +17,9 @@ class micro3d_state : public driver_device
 public:
 	micro3d_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
-
-	struct
-	{
-		union
-		{
-			struct
-			{
-				UINT8 gpdr;
-				UINT8 aer;
-				UINT8 ddr;
-				UINT8 iera;
-				UINT8 ierb;
-				UINT8 ipra;
-				UINT8 iprb;
-				UINT8 isra;
-				UINT8 isrb;
-				UINT8 imra;
-				UINT8 imrb;
-				UINT8 vr;
-				UINT8 tacr;
-				UINT8 tbcr;
-				UINT8 tcdcr;
-				UINT8 tadr;
-				UINT8 tbdr;
-				UINT8 tcdr;
-				UINT8 tddr;
-				UINT8 scr;
-				UINT8 ucr;
-				UINT8 rsr;
-				UINT8 tsr;
-				UINT8 udr;
-			};
-			UINT8 regs[24];
-		};
-
-		emu_timer *timer_a;
-	} mc68901;
-
+	
 	UINT16				*shared_ram;
-	device_t		*duart68681;
+	device_t			*duart68681;
 	UINT8				m68681_tx0;
 
 	/* Sound */
@@ -118,9 +81,6 @@ typedef struct _micro3d_vtx_
 
 
 /*----------- defined in machine/micro3d.c -----------*/
-
-READ16_HANDLER( micro3d_mc68901_r );
-WRITE16_HANDLER( micro3d_mc68901_w );
 
 READ16_HANDLER( micro3d_ti_uart_r );
 WRITE16_HANDLER( micro3d_ti_uart_w );

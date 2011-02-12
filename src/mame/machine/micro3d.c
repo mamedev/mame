@@ -88,126 +88,6 @@ void micro3d_duart_output_w(device_t *device, UINT8 data)
 
 /*************************************
  *
- *  68901
- *
- *************************************/
-
-enum
-{
-	TMRB = 0,
-	TXERR,
-	TBE,
-	RXERR,
-	RBF,
-	TMRA,
-	GPIP6,
-	GPIP7,
-	GPIP0,
-	GPIP1,
-	GPIP2,
-	GPIP3,
-	TMRD,
-	TMRC,
-	GPIP4,
-	GPIP5
-};
-
-
-static void micro3d_mc68901_int_gen(running_machine *machine, int source)
-{
-	micro3d_state *state = machine->driver_data<micro3d_state>();
-	UINT8 *ien = source & 8 ? &state->mc68901.ierb : &state->mc68901.iera;
-	UINT8 *ipend = source & 8 ? &state->mc68901.iprb : &state->mc68901.ipra;
-	UINT8 *imask = source & 8 ? &state->mc68901.imrb : &state->mc68901.imra;
-	int bit = source & 7;
-
-	if (*ien & (1 << bit))
-	{
-		*ipend |= (1 << bit);
-	}
-
-	if (*imask & (1 << bit))
-	{
-		cputag_set_input_line(machine, "maincpu", 4, HOLD_LINE);
-	}
-}
-
-static TIMER_CALLBACK( mfp_timer_a_cb )
-{
-	micro3d_mc68901_int_gen(machine, TMRA);
-}
-
-READ16_HANDLER( micro3d_mc68901_r )
-{
-	micro3d_state *state = space->machine->driver_data<micro3d_state>();
-	UINT16 val = 0;
-
-	switch (offset)
-	{
-		case 0:
-			val = 0xff;
-			break;
-		default:
-			val = state->mc68901.regs[offset] << 8;
-	}
-
-	return val;
-}
-
-WRITE16_HANDLER( micro3d_mc68901_w )
-{
-	micro3d_state *state = space->machine->driver_data<micro3d_state>();
-
-	data >>= 8;
-	state->mc68901.regs[offset] = data;
-
-	switch (offset)
-	{
-		case 0x0f:
-		{
-			int mode = state->mc68901.tacr & 0xf;
-
-			state->mc68901.tadr = data;
-
-			/* Timer stopped */
-			if (mode == 0)
-			{
-				state->mc68901.timer_a->enable(false);
-			}
-			else if (mode < 8)
-			{
-				int divisor = 1;
-				attotime period;
-
-				switch (mode)
-				{
-					case 1: divisor = 4; break;
-					case 2: divisor = 10; break;
-					case 3: divisor = 16; break;
-					case 4: divisor = 50; break;
-					case 5: divisor = 64; break;
-					case 6: divisor = 100; break;
-					case 7: divisor = 200; break;
-				}
-
-				period = attotime::from_hz(4000000 / divisor) * data;
-
-				state->mc68901.timer_a->adjust(period, 0, period);
-			}
-			else
-			{
-				fatalerror("MC68901: Unsupported Timer A mode! (%x)", state->mc68901.tadr);
-			}
-			break;
-		}
-		default:
-			state->mc68901.regs[offset] = data;
-	}
-}
-
-
-/*************************************
- *
  *  SCN2651 (TMS34010)
  *
  *************************************/
@@ -756,8 +636,6 @@ DRIVER_INIT( micro3d )
 	/* The Am29000 program seems to rely on RAM from 0x00470000 onwards being
     non-zero on a reset, otherwise the 3D object data doesn't get uploaded! */
 	space->write_dword(0x00470000, 0xa5a5a5a5);
-
-	state->mc68901.timer_a = machine->scheduler().timer_alloc(FUNC(mfp_timer_a_cb));
 
 	/* TODO? BOTSS crashes when starting the final stage because the 68000
     overwrites memory in use by the Am29000. Slowing down the 68000 slightly

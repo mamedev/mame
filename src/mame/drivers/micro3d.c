@@ -26,6 +26,7 @@
 #include "cpu/am29000/am29000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/68681.h"
+#include "machine/mc68901.h"
 #include "sound/2151intf.h"
 #include "sound/upd7759.h"
 #include "machine/nvram.h"
@@ -206,7 +207,7 @@ static ADDRESS_MAP_START( hostmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x980000, 0x980001) AM_READWRITE(micro3d_adc_r, micro3d_adc_w)
 	AM_RANGE(0x9a0000, 0x9a0007) AM_READWRITE(micro3d_tms_host_r, micro3d_tms_host_w)
 	AM_RANGE(0x9c0000, 0x9c0001) AM_NOP					/* Lamps */
-	AM_RANGE(0x9e0000, 0x9e002f) AM_READWRITE(micro3d_mc68901_r, micro3d_mc68901_w)
+	AM_RANGE(0x9e0000, 0x9e002f) AM_DEVREADWRITE8_MODERN("mc68901", mc68901_device, read, write, 0xff00)
 	AM_RANGE(0xa00000, 0xa0003f) AM_DEVREADWRITE8("duart68681", duart68681_r, duart68681_w, 0xff00)
 	AM_RANGE(0xa20000, 0xa20001) AM_READ(micro3d_encoder_h_r)
 	AM_RANGE(0xa40002, 0xa40003) AM_READ(micro3d_encoder_l_r)
@@ -306,6 +307,22 @@ static const duart68681_config micro3d_duart68681_config =
 	micro3d_duart_output_w
 };
 
+static MC68901_INTERFACE( mfp_intf )
+{
+	4000000,											/* timer clock */
+	0,													/* receive clock */
+	0,													/* transmit clock */
+	DEVCB_CPU_INPUT_LINE("maincpu", M68K_IRQ_4),		/* interrupt */
+	DEVCB_NULL,											/* GPIO read */
+	DEVCB_NULL,											/* GPIO write */
+	DEVCB_NULL,											/* TAO */
+	DEVCB_NULL,											/* TBO */
+	DEVCB_NULL,											/* TCO */
+	DEVCB_NULL,											/* TDO */
+	DEVCB_NULL,											/* serial input */
+	DEVCB_NULL											/* serial output */
+};
+
 
 /*************************************
  *
@@ -332,6 +349,7 @@ static MACHINE_CONFIG_START( micro3d, micro3d_state )
 	MCFG_CPU_IO_MAP(soundmem_io)
 
 	MCFG_DUART68681_ADD("duart68681", XTAL_3_6864MHz, micro3d_duart68681_config)
+	MCFG_MC68901_ADD("mc68901", 4000000, mfp_intf)
 
 	MCFG_MACHINE_RESET(micro3d)
 	MCFG_NVRAM_ADD_0FILL("nvram")
