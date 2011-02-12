@@ -6449,11 +6449,6 @@ ADDRESS_MAP_END
 
 
 
-
-
-
-
-
 /****************************************** SVP related *****************************************/
 
 /*
@@ -6481,19 +6476,8 @@ ADDRESS_MAP_END
 
 #include "cpu/ssp1601/ssp1601.h"
 
-static struct svp_vars
-{
-	UINT8 *iram; // IRAM (0-0x7ff)
-	UINT8 *dram; // [0x20000];
-	UINT32 pmac_read[6];	// read modes/addrs for PM0-PM5
-	UINT32 pmac_write[6];	// write ...
-	PAIR pmc;
-	#define SSP_PMC_HAVE_ADDR  1  // address written to PMAC, waiting for mode
-	#define SSP_PMC_SET        2  // PMAC is set, PMx can be programmed
-	UINT32 emu_status;
-	UINT16 XST;		// external status, mapped at a15000 and a15002 on 68k side.
-	UINT16 XST2;		// status of XST (bit1 set when 68k writes to XST)
-} svp;
+#define SSP_PMC_HAVE_ADDR  1  // address written to PMAC, waiting for mode
+#define SSP_PMC_SET        2  // PMAC is set, PMx can be programmed
 
 static int get_inc(int mode)
 {
@@ -6516,46 +6500,47 @@ INLINE void overwrite_write(UINT16 *dst, UINT16 d)
 
 static UINT32 pm_io(address_space *space, int reg, int write, UINT32 d)
 {
-	if (svp.emu_status & SSP_PMC_SET)
+	mdsvp_state *state = space->machine->driver_data<mdsvp_state>();
+	if (state->emu_status & SSP_PMC_SET)
 	{
-		svp.pmac_read[write ? reg + 6 : reg] = svp.pmc.d;
-		svp.emu_status &= ~SSP_PMC_SET;
+		state->pmac_read[write ? reg + 6 : reg] = state->pmc.d;
+		state->emu_status &= ~SSP_PMC_SET;
 		return 0;
 	}
 
 	// just in case
-	if (svp.emu_status & SSP_PMC_HAVE_ADDR) {
-		svp.emu_status &= ~SSP_PMC_HAVE_ADDR;
+	if (state->emu_status & SSP_PMC_HAVE_ADDR) {
+		state->emu_status &= ~SSP_PMC_HAVE_ADDR;
 	}
 
 	if (reg == 4 || (cpu_get_reg(space->cpu, SSP_ST) & 0x60))
 	{
 		#define CADDR ((((mode<<16)&0x7f0000)|addr)<<1)
-		UINT16 *dram = (UINT16 *)svp.dram;
+		UINT16 *dram = (UINT16 *)state->dram;
 		if (write)
 		{
-			int mode = svp.pmac_write[reg]>>16;
-			int addr = svp.pmac_write[reg]&0xffff;
+			int mode = state->pmac_write[reg]>>16;
+			int addr = state->pmac_write[reg]&0xffff;
 			if      ((mode & 0x43ff) == 0x0018) // DRAM
 			{
 				int inc = get_inc(mode);
 				if (mode & 0x0400) {
 				       overwrite_write(&dram[addr], d);
 				} else dram[addr] = d;
-				svp.pmac_write[reg] += inc;
+				state->pmac_write[reg] += inc;
 			}
 			else if ((mode & 0xfbff) == 0x4018) // DRAM, cell inc
 			{
 				if (mode & 0x0400) {
 				       overwrite_write(&dram[addr], d);
 				} else dram[addr] = d;
-				svp.pmac_write[reg] += (addr&1) ? 31 : 1;
+				state->pmac_write[reg] += (addr&1) ? 31 : 1;
 			}
 			else if ((mode & 0x47ff) == 0x001c) // IRAM
 			{
 				int inc = get_inc(mode);
-				((UINT16 *)svp.iram)[addr&0x3ff] = d;
-				svp.pmac_write[reg] += inc;
+				((UINT16 *)state->iram)[addr&0x3ff] = d;
+				state->pmac_write[reg] += inc;
 			}
 			else
 			{
@@ -6565,19 +6550,19 @@ static UINT32 pm_io(address_space *space, int reg, int write, UINT32 d)
 		}
 		else
 		{
-			int mode = svp.pmac_read[reg]>>16;
-			int addr = svp.pmac_read[reg]&0xffff;
+			int mode = state->pmac_read[reg]>>16;
+			int addr = state->pmac_read[reg]&0xffff;
 			if      ((mode & 0xfff0) == 0x0800) // ROM, inc 1, verified to be correct
 			{
 				UINT16 *ROM = (UINT16 *) space->machine->region("maincpu")->base();
-				svp.pmac_read[reg] += 1;
+				state->pmac_read[reg] += 1;
 				d = ROM[addr|((mode&0xf)<<16)];
 			}
 			else if ((mode & 0x47ff) == 0x0018) // DRAM
 			{
 				int inc = get_inc(mode);
 				d = dram[addr];
-				svp.pmac_read[reg] += inc;
+				state->pmac_read[reg] += inc;
 			}
 			else
 			{
@@ -6588,7 +6573,7 @@ static UINT32 pm_io(address_space *space, int reg, int write, UINT32 d)
 		}
 
 		// PMC value corresponds to last PMR accessed (not sure).
-		svp.pmc.d = svp.pmac_read[write ? reg + 6 : reg];
+		state->pmc.d = state->pmac_read[write ? reg + 6 : reg];
 
 		return d;
 	}
@@ -6598,18 +6583,20 @@ static UINT32 pm_io(address_space *space, int reg, int write, UINT32 d)
 
 static READ16_HANDLER( read_PM0 )
 {
+	mdsvp_state *state = space->machine->driver_data<mdsvp_state>();
 	UINT32 d = pm_io(space, 0, 0, 0);
 	if (d != (UINT32)-1) return d;
-	d = svp.XST2;
-	svp.XST2 &= ~2; // ?
+	d = state->XST2;
+	state->XST2 &= ~2; // ?
 	return d;
 }
 
 static WRITE16_HANDLER( write_PM0 )
 {
+	mdsvp_state *state = space->machine->driver_data<mdsvp_state>();
 	UINT32 r = pm_io(space, 0, 1, data);
 	if (r != (UINT32)-1) return;
-	svp.XST2 = data; // ?
+	state->XST2 = data; // ?
 }
 
 static READ16_HANDLER( read_PM1 )
@@ -6644,19 +6631,21 @@ static WRITE16_HANDLER( write_PM2 )
 
 static READ16_HANDLER( read_XST )
 {
+	mdsvp_state *state = space->machine->driver_data<mdsvp_state>();
 	UINT32 d = pm_io(space, 3, 0, 0);
 	if (d != (UINT32)-1) return d;
 
-	return svp.XST;
+	return state->XST;
 }
 
 static WRITE16_HANDLER( write_XST )
 {
+	mdsvp_state *state = space->machine->driver_data<mdsvp_state>();
 	UINT32 r = pm_io(space, 3, 1, data);
 	if (r != (UINT32)-1) return;
 
-	svp.XST2 |= 1;
-	svp.XST = data;
+	state->XST2 |= 1;
+	state->XST = data;
 }
 
 static READ16_HANDLER( read_PM4 )
@@ -6671,31 +6660,34 @@ static WRITE16_HANDLER( write_PM4 )
 
 static READ16_HANDLER( read_PMC )
 {
-	if (svp.emu_status & SSP_PMC_HAVE_ADDR) {
-		svp.emu_status |= SSP_PMC_SET;
-		svp.emu_status &= ~SSP_PMC_HAVE_ADDR;
-		return ((svp.pmc.w.l << 4) & 0xfff0) | ((svp.pmc.w.l >> 4) & 0xf);
+	mdsvp_state *state = space->machine->driver_data<mdsvp_state>();
+	if (state->emu_status & SSP_PMC_HAVE_ADDR) {
+		state->emu_status |= SSP_PMC_SET;
+		state->emu_status &= ~SSP_PMC_HAVE_ADDR;
+		return ((state->pmc.w.l << 4) & 0xfff0) | ((state->pmc.w.l >> 4) & 0xf);
 	} else {
-		svp.emu_status |= SSP_PMC_HAVE_ADDR;
-		return svp.pmc.w.l;
+		state->emu_status |= SSP_PMC_HAVE_ADDR;
+		return state->pmc.w.l;
 	}
 }
 
 static WRITE16_HANDLER( write_PMC )
 {
-	if (svp.emu_status & SSP_PMC_HAVE_ADDR) {
-		svp.emu_status |= SSP_PMC_SET;
-		svp.emu_status &= ~SSP_PMC_HAVE_ADDR;
-		svp.pmc.w.h = data;
+	mdsvp_state *state = space->machine->driver_data<mdsvp_state>();
+	if (state->emu_status & SSP_PMC_HAVE_ADDR) {
+		state->emu_status |= SSP_PMC_SET;
+		state->emu_status &= ~SSP_PMC_HAVE_ADDR;
+		state->pmc.w.h = data;
 	} else {
-		svp.emu_status |= SSP_PMC_HAVE_ADDR;
-		svp.pmc.w.l = data;
+		state->emu_status |= SSP_PMC_HAVE_ADDR;
+		state->pmc.w.l = data;
 	}
 }
 
 static READ16_HANDLER( read_AL )
 {
-	svp.emu_status &= ~(SSP_PMC_SET|SSP_PMC_HAVE_ADDR);
+	mdsvp_state *state = space->machine->driver_data<mdsvp_state>();
+	state->emu_status &= ~(SSP_PMC_SET|SSP_PMC_HAVE_ADDR);
 	return 0;
 }
 
@@ -6707,14 +6699,15 @@ static WRITE16_HANDLER( write_AL )
 
 static READ16_HANDLER( svp_68k_io_r )
 {
+	mdsvp_state *state = space->machine->driver_data<mdsvp_state>();
 	UINT32 d;
 	switch (offset)
 	{
 		// 0xa15000, 0xa15002
 		case 0:
-		case 1:  return svp.XST;
+		case 1:  return state->XST;
 		// 0xa15004
-		case 2:  d = svp.XST2; svp.XST2 &= ~1; return d;
+		case 2:  d = state->XST2; state->XST2 &= ~1; return d;
 		default: logerror("unhandled SVP reg read @ %x\n", offset<<1);
 	}
 	return 0;
@@ -6722,11 +6715,12 @@ static READ16_HANDLER( svp_68k_io_r )
 
 static WRITE16_HANDLER( svp_68k_io_w )
 {
+	mdsvp_state *state = space->machine->driver_data<mdsvp_state>();
 	switch (offset)
 	{
 		// 0xa15000, 0xa15002
 		case 0:
-		case 1:  svp.XST = data; svp.XST2 |= 2; break;
+		case 1:  state->XST = data; state->XST2 |= 2; break;
 		// 0xa15006
 		case 3:  break; // possibly halts SSP1601
 		default: logerror("unhandled SVP reg write %04x @ %x\n", data, offset<<1);
@@ -6736,17 +6730,19 @@ static WRITE16_HANDLER( svp_68k_io_w )
 static READ16_HANDLER( svp_68k_cell1_r )
 {
 	// this is rewritten 68k test code
+	mdsvp_state *state = space->machine->driver_data<mdsvp_state>();
 	UINT32 a1 = offset;
 	a1 = (a1 & 0x7001) | ((a1 & 0x3e) << 6) | ((a1 & 0xfc0) >> 5);
-	return ((UINT16 *)svp.dram)[a1];
+	return ((UINT16 *)state->dram)[a1];
 }
 
 static READ16_HANDLER( svp_68k_cell2_r )
 {
 	// this is rewritten 68k test code
+	mdsvp_state *state = space->machine->driver_data<mdsvp_state>();
 	UINT32 a1 = offset;
 	a1 = (a1 & 0x7801) | ((a1 & 0x1e) << 6) | ((a1 & 0x7e0) >> 4);
-	return ((UINT16 *)svp.dram)[a1];
+	return ((UINT16 *)state->dram)[a1];
 }
 
 static ADDRESS_MAP_START( svp_ssp_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -6786,13 +6782,21 @@ static READ16_HANDLER( svp_speedup_r )
 
 static void svp_init(running_machine *machine)
 {
+	mdsvp_state *state = machine->driver_data<mdsvp_state>();
 	UINT8 *ROM;
 
-	memset(&svp, 0, sizeof(svp));
-
+	memset(state->pmac_read, 0, ARRAY_LENGTH(state->pmac_read));
+	memset(state->pmac_write, 0, ARRAY_LENGTH(state->pmac_write));
+	state->pmc.d = 0;
+	state->pmc.w.l = 0;
+	state->pmc.w.h = 0;
+	state->emu_status = 0;
+	state->XST = 0;
+	state->XST2 = 0;
+	
 	/* SVP stuff */
-	svp.dram = auto_alloc_array(machine, UINT8, 0x20000);
-	memory_install_ram(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x300000, 0x31ffff, 0, 0, svp.dram);
+	state->dram = auto_alloc_array(machine, UINT8, 0x20000);
+	memory_install_ram(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x300000, 0x31ffff, 0, 0, state->dram);
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15000, 0xa150ff, 0, 0, svp_68k_io_r, svp_68k_io_w);
 	// "cell arrange" 1 and 2
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x390000, 0x39ffff, 0, 0, svp_68k_cell1_r);
@@ -6800,11 +6804,11 @@ static void svp_init(running_machine *machine)
 
 	memory_install_read16_handler(cputag_get_address_space(machine, "svp", ADDRESS_SPACE_PROGRAM), 0x438, 0x438, 0, 0, svp_speedup_r);
 
-	svp.iram = auto_alloc_array(machine, UINT8, 0x800);
-	memory_set_bankptr(machine,  "bank3", svp.iram );
+	state->iram = auto_alloc_array(machine, UINT8, 0x800);
+	memory_set_bankptr(machine,  "bank3", state->iram);
 	/* SVP ROM just shares m68k region.. */
 	ROM = machine->region("maincpu")->base();
-	memory_set_bankptr(machine,  "bank4", ROM + 0x800 );
+	memory_set_bankptr(machine,  "bank4", ROM + 0x800);
 
 	megadrive_io_read_data_port_ptr	= megadrive_io_read_data_port_svp;
 }

@@ -235,11 +235,20 @@ public:
 	UINT8 page_register;
 };
 
-class mdsvp_state : public md_base_state
+class mdsvp_state : public md_cons_state
 {
 public:
 	mdsvp_state(running_machine &machine, const driver_device_config_base &config)
-	: md_base_state(machine, config) { }
+	: md_cons_state(machine, config) { }
+
+	UINT8 *iram; // IRAM (0-0x7ff)
+	UINT8 *dram; // [0x20000];
+	UINT32 pmac_read[6];	// read modes/addrs for PM0-PM5
+	UINT32 pmac_write[6];	// write ...
+	PAIR pmc;
+	UINT32 emu_status;
+	UINT16 XST;		// external status, mapped at a15000 and a15002 on 68k side.
+	UINT16 XST2;		// status of XST (bit1 set when 68k writes to XST)
 };
 
 class _32x_state : public md_base_state

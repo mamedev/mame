@@ -591,7 +591,7 @@ static MACHINE_CONFIG_START( ms_megadpal, md_cons_state )
 	MCFG_FRAGMENT_ADD( genesis_cartslot )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ms_megdsvp, md_cons_state )
+static MACHINE_CONFIG_START( ms_megdsvp, mdsvp_state )
 	MCFG_FRAGMENT_ADD( md_ntsc )
 	MCFG_FRAGMENT_ADD( md_svp )
 
