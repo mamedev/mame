@@ -164,7 +164,8 @@ static ADDRESS_MAP_START( puckpkmna_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x70001c, 0x70001d) AM_READ(puckpkmna_70001c_r)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_DERIVED( puckpkmn, megadriv )
+static MACHINE_CONFIG_START( puckpkmn, md_boot_state )
+	MCFG_FRAGMENT_ADD(md_ntsc)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(puckpkmn_map)
@@ -259,8 +260,8 @@ Screenshots available on my site at http://guru.mameworld.info/oldnews2001.html 
 
 static DRIVER_INIT( puckpkmn )
 {
-	UINT8 *rom	=	machine->region("maincpu")->base();
-	size_t len		=	machine->region("maincpu")->bytes();
+	UINT8 *rom = machine->region("maincpu")->base();
+	size_t len = machine->region("maincpu")->bytes();
 	int i;
 
 	for (i = 0; i < len; i++)

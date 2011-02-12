@@ -6310,6 +6310,12 @@ INPUT_PORTS_START( megdsvp )
 	PORT_DIPSETTING( 0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
+MACHINE_CONFIG_FRAGMENT( md_svp )
+	MCFG_CPU_ADD("svp", SSP1601, MASTER_CLOCK_NTSC / 7 * 3) /* ~23 MHz (guessed) */
+	MCFG_CPU_PROGRAM_MAP(svp_ssp_map)
+	MCFG_CPU_IO_MAP(svp_ext_map)
+MACHINE_CONFIG_END
+
 MACHINE_CONFIG_DERIVED( megdsvp, megadriv )
 
 	MCFG_CPU_ADD("svp", SSP1601, MASTER_CLOCK_NTSC / 7 * 3) /* ~23 MHz (guessed) */
@@ -8652,7 +8658,7 @@ MACHINE_CONFIG_FRAGMENT( megadriv_timers )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START( megadriv, driver_device )
+MACHINE_CONFIG_FRAGMENT( md_ntsc )
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_NTSC / 7) /* 7.67 MHz */
 	MCFG_CPU_PROGRAM_MAP(megadriv_map)
 	/* IRQs are handled via the timers */
@@ -8697,9 +8703,13 @@ MACHINE_CONFIG_START( megadriv, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START( megadriv, driver_device )
+	MCFG_FRAGMENT_ADD(md_ntsc)
+MACHINE_CONFIG_END
+
 /************ PAL hardware has a different master clock *************/
 
-MACHINE_CONFIG_START( megadpal, driver_device )
+MACHINE_CONFIG_FRAGMENT( md_pal )
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_PAL / 7) /* 7.67 MHz */
 	MCFG_CPU_PROGRAM_MAP(megadriv_map)
 	/* IRQs are handled via the timers */
@@ -8744,6 +8754,9 @@ MACHINE_CONFIG_START( megadpal, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START( megadpal, driver_device )
+	MCFG_FRAGMENT_ADD(md_pal)
+MACHINE_CONFIG_END
 
 
 static int _32x_fifo_available_callback(UINT32 src, UINT32 dst, UINT32 data, int size)

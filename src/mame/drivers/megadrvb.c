@@ -278,14 +278,13 @@ static WRITE16_HANDLER( aladmdb_w )
 
 static READ16_HANDLER( aladmdb_r )
 {
+	md_boot_state *state = space->machine->driver_data<md_boot_state>();
 	if (cpu_get_pc(space->cpu)==0x1b2a56)
 	{
-		static UINT16 mcu_port;
+		state->aladmdb_mcu_port = input_port_read(space->machine, "MCU");
 
-		mcu_port = input_port_read(space->machine, "MCU");
-
-		if(mcu_port & 0x100)
-			return ((mcu_port & 0x0f) | 0x100); // coin inserted, calculate the number of coins
+		if (state->aladmdb_mcu_port & 0x100)
+			return ((state->aladmdb_mcu_port & 0x0f) | 0x100); // coin inserted, calculate the number of coins
 		else
 			return (0x100); //MCU status, needed if you fall into a pitfall
 	}
@@ -316,7 +315,7 @@ static READ16_HANDLER( srmdb_dsw_r )
 	return input_port_read(space->machine, dswname[offset]);
 }
 
-static READ16_HANDLER(topshoot_200051_r)
+static READ16_HANDLER( topshoot_200051_r )
 {
 	return -0x5b;
 }
@@ -572,6 +571,16 @@ INPUT_PORTS_END
 
 /*************************************
  *
+ *  Machine Configuration
+ *
+ *************************************/
+
+static MACHINE_CONFIG_START( megadrvb, md_boot_state )
+	MCFG_FRAGMENT_ADD(md_ntsc)
+MACHINE_CONFIG_END
+
+/*************************************
+ *
  *  ROM definition(s)
  *
  *************************************/
@@ -658,6 +667,7 @@ static DRIVER_INIT( aladmdb )
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x220000, 0x220001, 0, 0, aladmdb_w);
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x330000, 0x330001, 0, 0, aladmdb_r);
 
+	megadrive_6buttons_pad = 0;
 	DRIVER_INIT_CALL(megadrij);
 }
 
@@ -665,28 +675,27 @@ static DRIVER_INIT( aladmdb )
 // after this decode look like intentional changes
 static DRIVER_INIT( mk3mdb )
 {
-	int x;
 	UINT8 *rom = machine->region("maincpu")->base();
 
-	for (x=0x000001;x<0x100001;x+=2)
+	for (int x = 0x000001; x < 0x100001; x += 2)
 	{
-		if (x&0x80000)
+		if (x & 0x80000)
 		{
-			rom[x] = rom[x]^0xff;
+			rom[x] = rom[x] ^ 0xff;
 			rom[x] = BITSWAP8(rom[x], 0,3,2,5,4,6,7,1);
 		}
 		else
 		{
-			rom[x] = rom[x]^0xff;
+			rom[x] = rom[x] ^ 0xff;
 			rom[x] = BITSWAP8(rom[x], 4,0,7,1,3,6,2,5);
 		}
 	}
 
-	for (x=0x100001;x<0x400000;x+=2)
+	for (int x = 0x100001; x < 0x400000; x += 2)
 	{
-		if (x&0x80000)
+		if (x & 0x80000)
 		{
-			rom[x] = rom[x]^0xff;
+			rom[x] = rom[x] ^ 0xff;
 			rom[x] = BITSWAP8(rom[x], 2,7,5,4,1,0,3,6);
 		}
 		else
@@ -708,7 +717,6 @@ static DRIVER_INIT( mk3mdb )
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x770070, 0x770075, 0, 0, mk3mdb_dsw_r );
 
 	megadrive_6buttons_pad = 1;
-
 	DRIVER_INIT_CALL(megadriv);
 }
 
@@ -723,35 +731,33 @@ static DRIVER_INIT( ssf2mdb )
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x770070, 0x770075, 0, 0, ssf2mdb_dsw_r );
 
 	megadrive_6buttons_pad = 1;
-
 	DRIVER_INIT_CALL(megadrij);
 }
 
 static DRIVER_INIT( srmdb )
 {
-	int x;
 	UINT8* rom = machine->region("maincpu")->base();
 
 	/* todo, reduce bitswaps to single swap */
-	for (x=0x00001;x<0x40000;x+=2)
+	for (int x = 0x00001; x < 0x40000; x += 2)
 	{
 		rom[x] = rom[x] ^ 0xff;
-		rom[x] = BITSWAP8(rom[x], 7,6,5,4,3,2,1,0 );
-		rom[x] = BITSWAP8(rom[x], 1,6,5,4,3,2,7,0 );
-		rom[x] = BITSWAP8(rom[x], 7,6,5,3,4,2,1,0 );
-		rom[x] = BITSWAP8(rom[x], 7,6,5,2,3,4,1,0 );
-		rom[x] = BITSWAP8(rom[x], 5,6,7,4,3,2,1,0 );
-		rom[x] = BITSWAP8(rom[x], 7,5,6,4,3,2,1,0 );
+		rom[x] = BITSWAP8(rom[x], 7,6,5,4,3,2,1,0);
+		rom[x] = BITSWAP8(rom[x], 1,6,5,4,3,2,7,0);
+		rom[x] = BITSWAP8(rom[x], 7,6,5,3,4,2,1,0);
+		rom[x] = BITSWAP8(rom[x], 7,6,5,2,3,4,1,0);
+		rom[x] = BITSWAP8(rom[x], 5,6,7,4,3,2,1,0);
+		rom[x] = BITSWAP8(rom[x], 7,5,6,4,3,2,1,0);
 	}
 
-	for (x=0x40001;x<0x80000;x+=2)
+	for (int x = 0x40001; x < 0x80000; x += 2)
 	{
-		rom[x] = BITSWAP8(rom[x], 7,6,5,4,3,2,1,0 );
-		rom[x] = BITSWAP8(rom[x], 7,6,1,4,3,2,5,0 );
-		rom[x] = BITSWAP8(rom[x], 7,6,5,4,0,2,1,3 );
-		rom[x] = BITSWAP8(rom[x], 2,6,5,4,3,7,1,0 );
-		rom[x] = BITSWAP8(rom[x], 7,6,5,0,3,2,1,4 );
-		rom[x] = BITSWAP8(rom[x], 7,6,5,1,3,2,4,0 );
+		rom[x] = BITSWAP8(rom[x], 7,6,5,4,3,2,1,0);
+		rom[x] = BITSWAP8(rom[x], 7,6,1,4,3,2,5,0);
+		rom[x] = BITSWAP8(rom[x], 7,6,5,4,0,2,1,3);
+		rom[x] = BITSWAP8(rom[x], 2,6,5,4,3,7,1,0);
+		rom[x] = BITSWAP8(rom[x], 7,6,5,0,3,2,1,4);
+		rom[x] = BITSWAP8(rom[x], 7,6,5,1,3,2,4,0);
 
 	}
 
@@ -766,6 +772,7 @@ static DRIVER_INIT( srmdb )
 
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x770070, 0x770075, 0, 0, srmdb_dsw_r );
 
+	megadrive_6buttons_pad = 0;
 	DRIVER_INIT_CALL(megadriv);
 }
 
@@ -777,6 +784,7 @@ static DRIVER_INIT(topshoot)
 	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200046, 0x200047, 0, 0, "IN2");
 	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200048, 0x200049, 0, 0, "IN3");
 
+	megadrive_6buttons_pad = 0;
 	DRIVER_INIT_CALL(megadriv);
 }
 
@@ -786,8 +794,8 @@ static DRIVER_INIT(topshoot)
  *
  *************************************/
 
-GAME( 1993, aladmdb,  0, megadriv,   aladmdb,  aladmdb,  ROT0, "bootleg / Sega",   "Aladdin (bootleg of Japanese Megadrive version)", 0)
-GAME( 1996, mk3mdb,   0, megadriv,   mk3mdb,   mk3mdb,   ROT0, "bootleg / Midway", "Mortal Kombat 3 (bootleg of Megadrive version)", 0)
-GAME( 1994, ssf2mdb,  0, megadriv,   ssf2mdb,  ssf2mdb,  ROT0, "bootleg / Capcom", "Super Street Fighter II - The New Challengers (bootleg of Japanese MegaDrive version)", 0)
-GAME( 1993, srmdb,    0, megadriv,   srmdb,    srmdb,    ROT0, "bootleg / Konami", "Sunset Riders (bootleg of Megadrive version)", 0)
+GAME( 1993, aladmdb,  0, megadrvb,   aladmdb,  aladmdb,  ROT0, "bootleg / Sega",   "Aladdin (bootleg of Japanese Megadrive version)", 0)
+GAME( 1996, mk3mdb,   0, megadrvb,   mk3mdb,   mk3mdb,   ROT0, "bootleg / Midway", "Mortal Kombat 3 (bootleg of Megadrive version)", 0)
+GAME( 1994, ssf2mdb,  0, megadrvb,   ssf2mdb,  ssf2mdb,  ROT0, "bootleg / Capcom", "Super Street Fighter II - The New Challengers (bootleg of Japanese MegaDrive version)", 0)
+GAME( 1993, srmdb,    0, megadrvb,   srmdb,    srmdb,    ROT0, "bootleg / Konami", "Sunset Riders (bootleg of Megadrive version)", 0)
 GAME( 1995, topshoot, 0, md_bootleg, topshoot, topshoot, ROT0, "Sun Mixing",       "Top Shooter", 0)

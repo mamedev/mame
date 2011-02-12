@@ -86,31 +86,7 @@
 #define LOG_IOCHIP			0
 
 
-static void recompute_palette_tables(void);
-static int segac2_enable_display;
-
-/******************************************************************************
-    Global variables
-******************************************************************************/
-
-/* internal states */
-static UINT8		misc_io_data[0x10];	/* holds values written to the I/O chip */
-
-/* protection-related tracking */
-static int (*prot_func)(int in);		/* emulation of protection chip */
-static UINT8		prot_write_buf;		/* remembers what was written */
-static UINT8		prot_read_buf;		/* remembers what was returned */
-
-/* palette-related variables */
-static UINT8		segac2_alt_palette_mode;
-static UINT8		palbank;
-static UINT8		bg_palbase;
-static UINT8		sp_palbase;
-
-/* sound-related variables */
-static UINT8		sound_banks;		/* number of sound banks */
-
-
+static void recompute_palette_tables( running_machine *machine );
 
 /******************************************************************************
     Machine init
@@ -123,41 +99,39 @@ static UINT8		sound_banks;		/* number of sound banks */
 
 static MACHINE_START( segac2 )
 {
-	state_save_register_global_array(machine, misc_io_data);
-	state_save_register_global(machine, prot_write_buf);
-	state_save_register_global(machine, prot_read_buf);
+	segac2_state *state = machine->driver_data<segac2_state>();
 
-//  MACHINE_START_CALL(genesis);
+	state_save_register_global_array(machine, state->misc_io_data);
+	state_save_register_global(machine, state->prot_write_buf);
+	state_save_register_global(machine, state->prot_read_buf);
 }
 
 
 static MACHINE_RESET( segac2 )
 {
+	segac2_state *state = machine->driver_data<segac2_state>();
 	megadrive_ram = reinterpret_cast<UINT16 *>(memory_get_shared(*machine, "nvram"));
 
 	/* set up interrupts and such */
 	MACHINE_RESET_CALL(megadriv);
 
-
 	/* determine how many sound banks */
-	sound_banks = 0;
+	state->sound_banks = 0;
 	if (machine->region("upd")->base())
-		sound_banks = machine->region("upd")->bytes() / 0x20000;
+		state->sound_banks = machine->region("upd")->bytes() / 0x20000;
 
 	/* reset the protection */
-	prot_write_buf = 0;
-	prot_read_buf = 0;
-	segac2_alt_palette_mode = 0;
+	state->prot_write_buf = 0;
+	state->prot_read_buf = 0;
+	state->segac2_alt_palette_mode = 0;
 
-	palbank = 0;
-	bg_palbase = 0;
-	sp_palbase = 0;
+	state->palbank = 0;
+	state->bg_palbase = 0;
+	state->sp_palbase = 0;
 
-	recompute_palette_tables();
+	recompute_palette_tables(machine);
 
 }
-
-
 
 
 /******************************************************************************
@@ -176,8 +150,10 @@ static MACHINE_RESET( segac2 )
 /* handle writes to the UPD7759 */
 static WRITE16_DEVICE_HANDLER( segac2_upd7759_w )
 {
+	segac2_state *state = device->machine->driver_data<segac2_state>();
+
 	/* make sure we have a UPD chip */
-	if (!sound_banks)
+	if (!state->sound_banks)
 		return;
 
 	/* only works if we're accessing the low byte */
@@ -188,7 +164,6 @@ static WRITE16_DEVICE_HANDLER( segac2_upd7759_w )
 		upd7759_start_w(device, 1);
 	}
 }
-
 
 
 /******************************************************************************
@@ -211,27 +186,30 @@ static WRITE16_DEVICE_HANDLER( segac2_upd7759_w )
 /* handle reads from the paletteram */
 static READ16_HANDLER( palette_r )
 {
+	segac2_state *state = space->machine->driver_data<segac2_state>();
 	offset &= 0x1ff;
-	if (segac2_alt_palette_mode)
+	if (state->segac2_alt_palette_mode)
 		offset = ((offset << 1) & 0x100) | ((offset << 2) & 0x80) | ((~offset >> 2) & 0x40) | ((offset >> 1) & 0x20) | (offset & 0x1f);
-	return space->machine->generic.paletteram.u16[offset + palbank * 0x200];
+
+	return state->paletteram[offset + state->palbank * 0x200];
 }
 
 /* handle writes to the paletteram */
 static WRITE16_HANDLER( palette_w )
 {
-	int r,g,b,newword;
-	int tmpr,tmpg,tmpb;
+	segac2_state *state = space->machine->driver_data<segac2_state>();
+	int r, g, b, newword;
+	int tmpr, tmpg, tmpb;
 
 	/* adjust for the palette bank */
 	offset &= 0x1ff;
-	if (segac2_alt_palette_mode)
+	if (state->segac2_alt_palette_mode)
 		offset = ((offset << 1) & 0x100) | ((offset << 2) & 0x80) | ((~offset >> 2) & 0x40) | ((offset >> 1) & 0x20) | (offset & 0x1f);
-	offset += palbank * 0x200;
+	offset += state->palbank * 0x200;
 
 	/* combine data */
-	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
-	newword = space->machine->generic.paletteram.u16[offset];
+	COMBINE_DATA(&state->paletteram[offset]);
+	newword = state->paletteram[offset];
 
 	/* up to 8 bits */
 	r = ((newword << 1) & 0x1e) | ((newword >> 12) & 0x01);
@@ -241,17 +219,20 @@ static WRITE16_HANDLER( palette_w )
 	/* set the color */
 	palette_set_color_rgb(space->machine, offset, pal5bit(r), pal5bit(g), pal5bit(b));
 
-	megadrive_vdp_palette_lookup[offset] = (b) | (g<<5) | (r<<10);
-	megadrive_vdp_palette_lookup_sprite[offset] = (b) | (g<<5) | (r<<10);
+	megadrive_vdp_palette_lookup[offset] = (b) | (g << 5) | (r << 10);
+	megadrive_vdp_palette_lookup_sprite[offset] = (b) | (g << 5) | (r << 10);
 
-	tmpr = r>>1;tmpg=g>>1;tmpb=b>>1;
-	megadrive_vdp_palette_lookup_shadow[offset] = (tmpb) | (tmpg<<5) | (tmpr<<10);
+	tmpr = r >> 1;
+	tmpg = g >> 1;
+	tmpb = b >> 1;
+	megadrive_vdp_palette_lookup_shadow[offset] = (tmpb) | (tmpg << 5) | (tmpr << 10);
 
 	// how is it calculated on c2?
-	tmpr = tmpr|0x10;	tmpg = tmpg|0x10;	tmpb = tmpb|0x10;
-	megadrive_vdp_palette_lookup_highlight[offset] = (tmpb) | (tmpg<<5) | (tmpr<<10);
+	tmpr = tmpr | 0x10;	
+	tmpg = tmpg | 0x10;	
+	tmpb = tmpb | 0x10;
+	megadrive_vdp_palette_lookup_highlight[offset] = (tmpb) | (tmpg << 5) | (tmpr << 10);
 }
-
 
 
 /******************************************************************************
@@ -284,29 +265,29 @@ static WRITE16_HANDLER( palette_w )
 
 ******************************************************************************/
 
-static void recompute_palette_tables(void)
+static void recompute_palette_tables( running_machine *machine )
 {
+	segac2_state *state = machine->driver_data<segac2_state>();
 	int i;
 
 	for (i = 0; i < 4; i++)
 	{
-		int bgpal = 0x000 + bg_palbase * 0x40 + i * 0x10;
-		int sppal = 0x100 + sp_palbase * 0x40 + i * 0x10;
+		int bgpal = 0x000 + state->bg_palbase * 0x40 + i * 0x10;
+		int sppal = 0x100 + state->sp_palbase * 0x40 + i * 0x10;
 
-		if (!segac2_alt_palette_mode)
+		if (!state->segac2_alt_palette_mode)
 		{
-			segac2_bg_pal_lookup[i] = 0x200 * palbank + bgpal;
-			segac2_sp_pal_lookup[i] = 0x200 * palbank + sppal;
+			segac2_bg_pal_lookup[i] = 0x200 * state->palbank + bgpal;
+			segac2_sp_pal_lookup[i] = 0x200 * state->palbank + sppal;
 		}
 		else
 		{
-			segac2_bg_pal_lookup[i] = 0x200 * palbank + ((bgpal << 1) & 0x180) + ((~bgpal >> 2) & 0x40) + (bgpal & 0x30);
-			segac2_sp_pal_lookup[i] = 0x200 * palbank + ((~sppal << 2) & 0x100) + ((sppal << 2) & 0x80) + ((~sppal >> 2) & 0x40) + ((sppal >> 2) & 0x20) + (sppal & 0x10);
+			segac2_bg_pal_lookup[i] = 0x200 * state->palbank + ((bgpal << 1) & 0x180) + ((~bgpal >> 2) & 0x40) + (bgpal & 0x30);
+			segac2_sp_pal_lookup[i] = 0x200 * state->palbank + ((~sppal << 2) & 0x100) + ((sppal << 2) & 0x80) + ((~sppal >> 2) & 0x40) + ((sppal >> 2) & 0x20) + (sppal & 0x10);
 		}
 	}
 
 }
-
 
 
 /******************************************************************************
@@ -323,6 +304,7 @@ static void recompute_palette_tables(void)
 
 static READ16_HANDLER( io_chip_r )
 {
+	segac2_state *state = space->machine->driver_data<segac2_state>();
 	static const char *const portnames[] = { "P1", "P2", "PORTC", "PORTD", "SERVICE", "COINAGE", "DSW", "PORTH" };
 	offset &= 0x1f/2;
 
@@ -338,11 +320,11 @@ static READ16_HANDLER( io_chip_r )
 		case 0x0c/2:
 		case 0x0e/2:
 			/* if the port is configured as an output, return the last thing written */
-			if (misc_io_data[0x1e/2] & (1 << offset))
-				return misc_io_data[offset];
+			if (state->misc_io_data[0x1e/2] & (1 << offset))
+				return state->misc_io_data[offset];
 
 			/* otherwise, return an input port */
-			if (offset == 0x04/2 && sound_banks)
+			if (offset == 0x04/2 && state->sound_banks)
 				return (input_port_read(space->machine, portnames[offset]) & 0xbf) | (upd7759_busy_r(space->machine->device("upd")) << 6);
 			return input_port_read(space->machine, portnames[offset]);
 
@@ -359,12 +341,12 @@ static READ16_HANDLER( io_chip_r )
 		/* CNT register & mirror */
 		case 0x18/2:
 		case 0x1c/2:
-			return misc_io_data[0x1c/2];
+			return state->misc_io_data[0x1c/2];
 
 		/* port direction register & mirror */
 		case 0x1a/2:
 		case 0x1e/2:
-			return misc_io_data[0x1e/2];
+			return state->misc_io_data[0x1e/2];
 	}
 	return 0xffff;
 }
@@ -372,13 +354,14 @@ static READ16_HANDLER( io_chip_r )
 
 static WRITE16_HANDLER( io_chip_w )
 {
+	segac2_state *state = space->machine->driver_data<segac2_state>();
 	UINT8 newbank;
 	UINT8 old;
 
 	/* generic implementation */
 	offset &= 0x1f/2;
-	old = misc_io_data[offset];
-	misc_io_data[offset] = data;
+	old = state->misc_io_data[offset];
+	state->misc_io_data[offset] = data;
 
 	switch (offset)
 	{
@@ -422,23 +405,23 @@ static WRITE16_HANDLER( io_chip_w )
              D0 : To A9 of color RAM
             */
 			newbank = data & 3;
-			if (newbank != palbank)
+			if (newbank != state->palbank)
 			{
 				//space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos() + 1);
-				palbank = newbank;
-				recompute_palette_tables();
+				state->palbank = newbank;
+				recompute_palette_tables(space->machine);
 			}
-			if (sound_banks > 1)
+			if (state->sound_banks > 1)
 			{
 				device_t *upd = space->machine->device("upd");
-				newbank = (data >> 2) & (sound_banks - 1);
+				newbank = (data >> 2) & (state->sound_banks - 1);
 				upd7759_set_bank_base(upd, newbank * 0x20000);
 			}
 			break;
 
 		/* CNT register */
 		case 0x1c/2:
-			if (sound_banks > 1)
+			if (state->sound_banks > 1)
 			{
 				device_t *upd = space->machine->device("upd");
 				upd7759_reset_w(upd, (data >> 1) & 1);
@@ -446,7 +429,6 @@ static WRITE16_HANDLER( io_chip_w )
 			break;
 	}
 }
-
 
 
 /******************************************************************************
@@ -461,6 +443,7 @@ static WRITE16_HANDLER( io_chip_w )
 
 static WRITE16_HANDLER( control_w )
 {
+	segac2_state *state = space->machine->driver_data<segac2_state>();
 	/* skip if not LSB */
 	if (!ACCESSING_BITS_0_7)
 		return;
@@ -468,17 +451,16 @@ static WRITE16_HANDLER( control_w )
 
 	/* bit 0 controls display enable */
 	//segac2_enable_display(space->machine, ~data & 1);
-	segac2_enable_display = ~data & 1;
+	state->segac2_enable_display = ~data & 1;
 
 	/* bit 1 resets the protection */
 	if (!(data & 2))
-		prot_write_buf = prot_read_buf = 0;
+		state->prot_write_buf = state->prot_read_buf = 0;
 
 	/* bit 2 controls palette shuffling; only ribbit and twinsqua use this feature */
-	segac2_alt_palette_mode = ((~data & 4) >> 2);
-	recompute_palette_tables();
+	state->segac2_alt_palette_mode = ((~data & 4) >> 2);
+	recompute_palette_tables(space->machine);
 }
-
 
 
 /******************************************************************************
@@ -497,14 +479,16 @@ static WRITE16_HANDLER( control_w )
 /* protection chip reads */
 static READ16_HANDLER( prot_r )
 {
-	if (LOG_PROTECTION) logerror("%06X:protection r=%02X\n", cpu_get_previouspc(space->cpu), prot_func ? prot_read_buf : 0xff);
-	return prot_read_buf | 0xf0;
+	segac2_state *state = space->machine->driver_data<segac2_state>();
+	if (LOG_PROTECTION) logerror("%06X:protection r=%02X\n", cpu_get_previouspc(space->cpu), state->prot_func ? state->prot_read_buf : 0xff);
+	return state->prot_read_buf | 0xf0;
 }
 
 
 /* protection chip writes */
 static WRITE16_HANDLER( prot_w )
 {
+	segac2_state *state = space->machine->driver_data<segac2_state>();
 	int new_sp_palbase = (data >> 2) & 3;
 	int new_bg_palbase = data & 3;
 	int table_index;
@@ -514,27 +498,26 @@ static WRITE16_HANDLER( prot_w )
 		return;
 
 	/* compute the table index */
-	table_index = (prot_write_buf << 4) | prot_read_buf;
+	table_index = (state->prot_write_buf << 4) | state->prot_read_buf;
 
 	/* keep track of the last write for the next table lookup */
-	prot_write_buf = data & 0x0f;
+	state->prot_write_buf = data & 0x0f;
 
 	/* determine the value to return, should a read occur */
-	if (prot_func)
-		prot_read_buf = prot_func(table_index);
-	if (LOG_PROTECTION) logerror("%06X:protection w=%02X, new result=%02X\n", cpu_get_previouspc(space->cpu), data & 0x0f, prot_read_buf);
+	if (state->prot_func)
+		state->prot_read_buf = state->prot_func(table_index);
+	if (LOG_PROTECTION) logerror("%06X:protection w=%02X, new result=%02X\n", cpu_get_previouspc(space->cpu), data & 0x0f, state->prot_read_buf);
 
 	/* if the palette changed, force an update */
-	if (new_sp_palbase != sp_palbase || new_bg_palbase != bg_palbase)
+	if (new_sp_palbase != state->sp_palbase || new_bg_palbase != state->bg_palbase)
 	{
 		//space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos() + 1);
-		sp_palbase = new_sp_palbase;
-		bg_palbase = new_bg_palbase;
-		recompute_palette_tables();
-		if (LOG_PALETTE) logerror("Set palbank: %d/%d (scan=%d)\n", bg_palbase, sp_palbase, space->machine->primary_screen->vpos());
+		state->sp_palbase = new_sp_palbase;
+		state->bg_palbase = new_bg_palbase;
+		recompute_palette_tables(space->machine);
+		if (LOG_PALETTE) logerror("Set palbank: %d/%d (scan=%d)\n", state->bg_palbase, state->sp_palbase, space->machine->primary_screen->vpos());
 	}
 }
-
 
 
 /******************************************************************************
@@ -588,7 +571,6 @@ static WRITE16_HANDLER( counter_timer_w )
 }
 
 
-
 /******************************************************************************
     Print Club camera handling
 *******************************************************************************
@@ -597,19 +579,17 @@ static WRITE16_HANDLER( counter_timer_w )
 
 ******************************************************************************/
 
-static int cam_data;
-
 static READ16_HANDLER( printer_r )
 {
-	return cam_data;
+	segac2_state *state = space->machine->driver_data<segac2_state>();
+	return state->cam_data;
 }
 
 static WRITE16_HANDLER( print_club_camera_w )
 {
-	cam_data = data;
+	segac2_state *state = space->machine->driver_data<segac2_state>();
+	state->cam_data = data;
 }
-
-
 
 
 /******************************************************************************
@@ -629,11 +609,10 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x840000, 0x84001f) AM_MIRROR(0x13fee0) AM_READWRITE(io_chip_r, io_chip_w)
 	AM_RANGE(0x840100, 0x840107) AM_MIRROR(0x13fef8) AM_DEVREADWRITE8("ymsnd", ym3438_r, ym3438_w, 0x00ff)
 	AM_RANGE(0x880100, 0x880101) AM_MIRROR(0x13fefe) AM_WRITE(counter_timer_w)
-	AM_RANGE(0x8c0000, 0x8c0fff) AM_MIRROR(0x13f000) AM_READWRITE(palette_r, palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x8c0000, 0x8c0fff) AM_MIRROR(0x13f000) AM_READWRITE(palette_r, palette_w) AM_BASE_MEMBER(segac2_state, paletteram)
 	AM_RANGE(0xc00000, 0xc0001f) AM_MIRROR(0x18ff00) AM_READWRITE(megadriv_vdp_r, megadriv_vdp_w)
 	AM_RANGE(0xe00000, 0xe0ffff) AM_MIRROR(0x1f0000) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
-
 
 
 /******************************************************************************
@@ -1325,7 +1304,6 @@ static const ym3438_interface ym3438_intf =
 };
 
 
-
 /******************************************************************************
     Machine Drivers
 *******************************************************************************
@@ -1342,7 +1320,6 @@ static VIDEO_START(segac2_new)
 {
 	VIDEO_START_CALL(megadriv);
 
-
 	megadrive_vdp_palette_lookup = auto_alloc_array(machine, UINT16, 0x1000/2);
 	megadrive_vdp_palette_lookup_sprite = auto_alloc_array(machine, UINT16, 0x1000/2);
 	megadrive_vdp_palette_lookup_shadow = auto_alloc_array(machine, UINT16, 0x1000/2);
@@ -1351,7 +1328,8 @@ static VIDEO_START(segac2_new)
 
 static VIDEO_UPDATE(segac2_new)
 {
-	if (!segac2_enable_display)
+	segac2_state *state = screen->machine->driver_data<segac2_state>();
+	if (!state->segac2_enable_display)
 	{
 		bitmap_fill(bitmap, NULL, get_black_pen(screen->machine));
 		return 0;
@@ -1362,7 +1340,7 @@ static VIDEO_UPDATE(segac2_new)
 }
 
 
-static MACHINE_CONFIG_START( segac, driver_device )
+static MACHINE_CONFIG_START( segac, segac2_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XL2_CLOCK/6)
@@ -1834,11 +1812,12 @@ it should be, otherwise I don't see how the formula could be computed.
 
 static void segac2_common_init(running_machine* machine, int (*func)(int in))
 {
+	segac2_state *state = machine->driver_data<segac2_state>();
 	device_t *upd = machine->device("upd");
 
 	DRIVER_INIT_CALL( megadriv_c2 );
 
-	prot_func = func;
+	state->prot_func = func;
 
 	genvdp_use_cram = 0;
 	genesis_always_irq6 = 1;
@@ -2167,7 +2146,6 @@ static DRIVER_INIT( ichirj )
 
 static DRIVER_INIT( ichirjbl )
 {
-
 	/* when did this actually work? - the protection is patched but the new check fails? */
 	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
 	rom[0x390/2] = 0x6600;

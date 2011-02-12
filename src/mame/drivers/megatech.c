@@ -62,7 +62,7 @@ Bonanza Bros.              171-5782    837-6963-49       610-0239-49         MPR
 Streets of Rage            171-5782    837-6963-51       610-0239-51         MPR-14125-SM   (uPD23C4000)  EPR-12368-51   (27C256)  n/a
 Sonic The Hedgehog         171-5782    837-6963-52       610-0239-52         MPR-13913-F    (834200A)     EPR-12368-52   (27C256)  n/a
 Spider-Man                 171-5782    837-6963-54       610-0239-54         MPR-14027-SM   (uPD23C4000)  EPR-12368-54   (27C256)  n/a
-California Game            171-5834    837-6963-55-01    610-0239-55         EPR-14494      (27C020)      EPR-14495      (27C020)  EPR-12368-55 (27C256)
+California Games           171-5834    837-6963-55-01    610-0239-55         EPR-14494      (27C020)      EPR-14495      (27C020)  EPR-12368-55 (27C256)
 Mario Lemeux Hockey        171-5782    837-6963-59       610-0239-59         MPR-14376-H    (234000)      EPR-12368-59   (27256)   n/a
 Turbo Outrun               171-5782    837-6963-61       610-0239-61         MPR-14674      (uPD23C4000)  EPR-12368-61   (27256)   n/a
 Sonic Hedgehog 2           171-6215A   837-6963-62       610-0239-62         MPR-15000A-F   (838200)      EPR-12368-62   (27256)   n/a
@@ -76,12 +76,6 @@ Sonic Hedgehog 2           171-6215A   837-6963-62       610-0239-62         MPR
 #include "includes/segamsys.h"
 #include "includes/megadriv.h"
 #include "imagedev/cartslot.h"
-
-static struct _mtech_bios mtech_bios;
-static int cart_is_genesis[8];
-
-/* Megatech BIOS specific */
-static UINT8* megatech_banked_ram;
 
 #define MASTER_CLOCK		53693100
 
@@ -215,13 +209,15 @@ INPUT_PORTS_END
 /* MEGATECH specific */
 static READ8_HANDLER( megatech_cart_select_r )
 {
-	return mtech_bios.mt_cart_select_reg;
+	mtech_state *state = space->machine->driver_data<mtech_state>();
+	return state->mt_cart_select_reg;
 }
 
 
 
 static TIMER_CALLBACK( megatech_z80_run_state )
 {
+	mtech_state *state = machine->driver_data<mtech_state>();
 	char tempname[20];
 	UINT8* game_region;
 
@@ -230,18 +226,18 @@ static TIMER_CALLBACK( megatech_z80_run_state )
 
 	memcpy(machine->region("maincpu")->base(), game_region, 0x400000);
 
-	if (!cart_is_genesis[param])
+	if (!state->cart_is_genesis[param])
 	{
 		printf("enabling SMS Z80\n");
-		mtech_bios.current_game_is_sms = 1;
+		state->current_game_is_sms = 1;
 		megatech_set_genz80_as_sms_standard_map(machine, "genesis_snd_z80", MAPPER_STANDARD);
 		//cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_HALT, CLEAR_LINE);
 		cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_RESET, CLEAR_LINE);
 	}
 	else
 	{
-		mtech_bios.current_game_is_sms = 0;
 		printf("disabling SMS Z80\n");
+		state->current_game_is_sms = 0;
 		megatech_set_megadrive_z80_as_megadrive_z80(machine, "genesis_snd_z80");
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, CLEAR_LINE);
 		//cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
@@ -264,7 +260,6 @@ static TIMER_CALLBACK( megatech_z80_stop_state )
 	//cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_HALT, ASSERT_LINE);
 	devtag_reset(machine, "ymsnd");
 
-
 	megadriv_stop_scanline_timer();// stop the scanline timer for the genesis vdp... it can be restarted in video eof when needed
 	segae_md_sms_stop_scanline_timer();// stop the scanline timer for the sms vdp
 
@@ -273,7 +268,7 @@ static TIMER_CALLBACK( megatech_z80_stop_state )
 	if (game_region)
 	{
 		{
-			machine->scheduler().timer_set( attotime::zero, FUNC(megatech_z80_run_state ), param);
+			machine->scheduler().timer_set(attotime::zero, FUNC(megatech_z80_run_state), param);
 		}
 	}
 	else
@@ -288,7 +283,7 @@ static TIMER_CALLBACK( megatech_z80_stop_state )
 
 static void megatech_select_game(running_machine *machine, int gameno)
 {
-	machine->scheduler().timer_set( attotime::zero, FUNC(megatech_z80_stop_state ), gameno);
+	machine->scheduler().timer_set(attotime::zero, FUNC(megatech_z80_stop_state), gameno);
 }
 
 static WRITE8_HANDLER( megatech_cart_select_w )
@@ -297,32 +292,33 @@ static WRITE8_HANDLER( megatech_cart_select_w )
       but it stores something in (banked?) ram
       because it always seems to show the
       same instructions ... */
+	mtech_state *state = space->machine->driver_data<mtech_state>();
+	state->mt_cart_select_reg = data;
 
-	mtech_bios.mt_cart_select_reg = data;
-
-
-	megatech_select_game(space->machine, mtech_bios.mt_cart_select_reg);
+	megatech_select_game(space->machine, state->mt_cart_select_reg);
 }
 
 
 static READ8_HANDLER( bios_ctrl_r )
 {
+	mtech_state *state = space->machine->driver_data<mtech_state>();
 
-	if(offset == 0)
+	if (offset == 0)
 		return 0;
-	if(offset == 2)
-		return mtech_bios.bios_ctrl[offset] & 0xfe;
+	if (offset == 2)
+		return state->bios_ctrl[offset] & 0xfe;
 
-	return mtech_bios.bios_ctrl[offset];
+	return state->bios_ctrl[offset];
 }
 
 static WRITE8_HANDLER( bios_ctrl_w )
 {
-	if(offset == 1)
+	mtech_state *state = space->machine->driver_data<mtech_state>();
+	if (offset == 1)
 	{
-		mtech_bios.bios_ctrl_inputs = data & 0x04;  // Genesis/SMS input ports disable bit
+		state->bios_ctrl_inputs = data & 0x04;  // Genesis/SMS input ports disable bit
 	}
-	mtech_bios.bios_ctrl[offset] = data;
+	state->bios_ctrl[offset] = data;
 }
 
 /* this sets 0x300000 which may indicate that the 68k can see the instruction rom
@@ -330,36 +326,40 @@ static WRITE8_HANDLER( bios_ctrl_w )
 
 static READ8_HANDLER( megatech_z80_read_68k_banked_data )
 {
+	mtech_state *state = space->machine->driver_data<mtech_state>();
 	address_space *space68k = space->machine->device<legacy_cpu_device>("maincpu")->space();
-	UINT8 ret = space68k->read_byte(mtech_bios.mt_bank_addr+offset);
+	UINT8 ret = space68k->read_byte(state->mt_bank_addr + offset);
 	return ret;
 }
 
 static WRITE8_HANDLER( megatech_z80_write_68k_banked_data )
 {
+	mtech_state *state = space->machine->driver_data<mtech_state>();
 	address_space *space68k = space->machine->device<legacy_cpu_device>("maincpu")->space();
-	space68k->write_byte(mtech_bios.mt_bank_addr+offset,data);
+	space68k->write_byte(state->mt_bank_addr + offset,data);
 }
 
-
-static void megatech_z80_bank_w(UINT16 data)
+static void megatech_z80_bank_w(running_machine *machine, UINT16 data)
 {
-	mtech_bios.mt_bank_addr = ( ( mtech_bios.mt_bank_addr >> 1 ) | ( data << 23 ) ) & 0xff8000;
+	mtech_state *state = machine->driver_data<mtech_state>();
+	state->mt_bank_addr = ((state->mt_bank_addr >> 1) | (data << 23)) & 0xff8000;
 }
 
-static WRITE8_HANDLER (mt_z80_bank_w)
+static WRITE8_HANDLER( mt_z80_bank_w )
 {
-	megatech_z80_bank_w(data&1);
+	megatech_z80_bank_w(space->machine, data & 1);
 }
 
 static READ8_HANDLER( megatech_banked_ram_r )
 {
-	return megatech_banked_ram[offset + 0x1000 * (mtech_bios.mt_cart_select_reg & 0x07)];
+	mtech_state *state = space->machine->driver_data<mtech_state>();
+	return state->megatech_banked_ram[offset + 0x1000 * (state->mt_cart_select_reg & 0x07)];
 }
 
 static WRITE8_HANDLER( megatech_banked_ram_w )
 {
-	megatech_banked_ram[offset + 0x1000 * (mtech_bios.mt_cart_select_reg & 0x07)] = data;
+	mtech_state *state = space->machine->driver_data<mtech_state>();
+	state->megatech_banked_ram[offset + 0x1000 * (state->mt_cart_select_reg & 0x07)] = data;
 }
 
 
@@ -382,17 +382,17 @@ static ADDRESS_MAP_START( megatech_bios_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static WRITE8_HANDLER (megatech_bios_port_ctrl_w)
+static WRITE8_HANDLER( megatech_bios_port_ctrl_w )
 {
-	mtech_bios.bios_port_ctrl = data;
+	mtech_state *state = space->machine->driver_data<mtech_state>();
+	state->bios_port_ctrl = data;
 }
 
-static READ8_HANDLER (megatech_bios_joypad_r)
+static READ8_HANDLER( megatech_bios_joypad_r )
 {
-	return megatech_bios_port_cc_dc_r(space->machine, offset, mtech_bios.bios_port_ctrl);
+	mtech_state *state = space->machine->driver_data<mtech_state>();
+	return megatech_bios_port_cc_dc_r(space->machine, offset, state->bios_port_ctrl);
 }
-
-
 
 static WRITE8_HANDLER (megatech_bios_port_7f_w)
 {
@@ -416,54 +416,66 @@ ADDRESS_MAP_END
 
 static DRIVER_INIT(mt_slot)
 {
-	megatech_banked_ram = auto_alloc_array(machine, UINT8, 0x1000*8);
+	mtech_state *state = machine->driver_data<mtech_state>();
+	state->megatech_banked_ram = auto_alloc_array(machine, UINT8, 0x1000*8);
 
 	DRIVER_INIT_CALL(megadriv);
 	DRIVER_INIT_CALL(megatech_bios);
 
 	// this gets set in DEVICE_IMAGE_LOAD
-	memset(cart_is_genesis, 0, ARRAY_LENGTH(cart_is_genesis));
+	memset(state->cart_is_genesis, 0, ARRAY_LENGTH(state->cart_is_genesis));
 }
 
 static DRIVER_INIT(mt_crt)
 {
+	mtech_state *state = machine->driver_data<mtech_state>();
 	UINT8* pin = machine->region("sms_pin")->base();
 	DRIVER_INIT_CALL(mt_slot);
 
-	cart_is_genesis[0] = !pin[0] ? 1 : 0;;
+	state->cart_is_genesis[0] = !pin[0] ? 1 : 0;;
 }
 
 static VIDEO_START(mtnew)
 {
-	init_for_megadrive(machine); // create an sms vdp too, for comptibility mode
+	init_for_megadrive(machine); // create an sms vdp too, for compatibility mode
 	VIDEO_START_CALL(megadriv);
 }
+
 //attotime::never
 static VIDEO_UPDATE(mtnew)
 {
+	mtech_state *state = screen->machine->driver_data<mtech_state>();
 	device_t *megadriv_screen = screen->machine->device("megadriv");
-	device_t *menu_screen     = screen->machine->device("menu");
+	device_t *menu_screen = screen->machine->device("menu");
 
 	if (screen == megadriv_screen)
 	{
 		/* if we're running an sms game then use the SMS update.. maybe this should be moved to the megadrive emulation core as compatibility mode is a feature of the chip */
-		if (!mtech_bios.current_game_is_sms) VIDEO_UPDATE_CALL(megadriv);
-		else VIDEO_UPDATE_CALL(megatech_md_sms);
+		if (!state->current_game_is_sms)
+			VIDEO_UPDATE_CALL(megadriv);
+		else
+			VIDEO_UPDATE_CALL(megatech_md_sms);
 	}
-	else if (screen == menu_screen) VIDEO_UPDATE_CALL(megatech_bios);
+	else if (screen == menu_screen)
+		VIDEO_UPDATE_CALL(megatech_bios);
 	return 0;
 }
 
 static VIDEO_EOF(mtnew)
 {
-	if (!mtech_bios.current_game_is_sms) VIDEO_EOF_CALL(megadriv);
-	else VIDEO_EOF_CALL(megatech_md_sms);
+	mtech_state *state = machine->driver_data<mtech_state>();
+	if (!state->current_game_is_sms)
+		VIDEO_EOF_CALL(megadriv);
+	else
+		VIDEO_EOF_CALL(megatech_md_sms);
+
 	VIDEO_EOF_CALL(megatech_bios);
 }
 
 static MACHINE_RESET(mtnew)
 {
-	mtech_bios.mt_bank_addr = 0;
+	mtech_state *state = machine->driver_data<mtech_state>();
+	state->mt_bank_addr = 0;
 
 	MACHINE_RESET_CALL(megadriv);
 	MACHINE_RESET_CALL(megatech_bios);
@@ -471,9 +483,9 @@ static MACHINE_RESET(mtnew)
 	megatech_select_game(machine, 0);
 }
 
-static MACHINE_CONFIG_DERIVED( megatech, megadriv )
-
+static MACHINE_CONFIG_START( megatech, mtech_state )
 	/* basic machine hardware */
+	MCFG_FRAGMENT_ADD(md_ntsc)
 
 	/* Megatech has an extra SMS based bios *and* an additional screen */
 	MCFG_CPU_ADD("mtbios", Z80, MASTER_CLOCK / 15) /* ?? */
@@ -524,6 +536,7 @@ static const struct megatech_cart_region megatech_cart_table[] =
 
 static DEVICE_IMAGE_LOAD( megatech_cart )
 {
+	mtech_state *state = image.device().machine->driver_data<mtech_state>();
 	const struct megatech_cart_region *mt_cart = &megatech_cart_table[0], *this_cart;
 	const char	*pcb_name;
 
@@ -555,12 +568,12 @@ static DEVICE_IMAGE_LOAD( megatech_cart )
 		if (!mame_stricmp("genesis", pcb_name))
 		{
 			printf("%s is genesis\n", mt_cart->tag);
-			cart_is_genesis[this_cart->slot] = 1;
+			state->cart_is_genesis[this_cart->slot] = 1;
 		}
 		else if (!mame_stricmp("sms", pcb_name))
 		{
 			printf("%s is sms\n", mt_cart->tag);
-			cart_is_genesis[this_cart->slot] = 0;
+			state->cart_is_genesis[this_cart->slot] = 0;
 		}
 		else
 		{
@@ -1277,6 +1290,5 @@ ROM_END
 /* 60 */ GAME( 1992, mt_kcham, megatech, megatech, megatech, mt_crt, ROT0, "Sega",                  "Kid Chameleon (Mega-Tech)", GAME_NOT_WORKING )
 /* 61 */ GAME( 1992, mt_tout,  megatech, megatech, megatech, mt_crt, ROT0, "Sega",                  "Turbo Outrun (Mega-Tech)", GAME_NOT_WORKING )
 /* 62 */ GAME( 1992, mt_soni2, megatech, megatech, megatech, mt_crt, ROT0, "Sega",                  "Sonic The Hedgehog 2 (Mega-Tech)", GAME_NOT_WORKING )
-
 
 /* more? */

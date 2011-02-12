@@ -249,34 +249,31 @@ a tilemap-like structure, from which data is copied)
  *************************************/
 
 /* We need to always initialize 6 buttons pad */
-static emu_timer *mess_io_timeout[3];
-static int mess_io_stage[3];
-
 static TIMER_CALLBACK( mess_io_timeout_timer_callback )
 {
-	mess_io_stage[(int)(FPTR)ptr] = -1;
+	md_cons_state *state = machine->driver_data<md_cons_state>();
+	state->mess_io_stage[(int)(FPTR)ptr] = -1;
 }
 
 /* J-Cart controller port */
-
-static UINT8	jcart_io_data[2];
-
 WRITE16_HANDLER( jcart_ctrl_w )
 {
-	jcart_io_data[0] = (data & 1) << 6;
-	jcart_io_data[1] = (data & 1) << 6;
+	md_cons_state *state = space->machine->driver_data<md_cons_state>();
+	state->jcart_io_data[0] = (data & 1) << 6;
+	state->jcart_io_data[1] = (data & 1) << 6;
 }
 
 READ16_HANDLER( jcart_ctrl_r )
 {
-	UINT16	retdata = 0;
-	UINT8		joy[2];
+	md_cons_state *state = space->machine->driver_data<md_cons_state>();
+	UINT16 retdata = 0;
+	UINT8 joy[2];
 
-	if (jcart_io_data[0] & 0x40)
+	if (state->jcart_io_data[0] & 0x40)
 	{
 		joy[0] = input_port_read_safe(space->machine, "JCART3_3B", 0);
 		joy[1] = input_port_read_safe(space->machine, "JCART4_3B", 0);
-		retdata = (jcart_io_data[0] & 0x40) | joy[0] | (joy[1] << 8);
+		retdata = (state->jcart_io_data[0] & 0x40) | joy[0] | (joy[1] << 8);
 	}
 	else
 	{
@@ -284,19 +281,20 @@ READ16_HANDLER( jcart_ctrl_r )
 		  (input_port_read_safe(space->machine, "JCART3_3B", 0) & 0x03);
 		joy[1] = ((input_port_read_safe(space->machine, "JCART4_3B", 0) & 0xc0) >> 2) |
 		  (input_port_read_safe(space->machine, "JCART4_3B", 0) & 0x03);
-		retdata = (jcart_io_data[0] & 0x40) | joy[0] | (joy[1] << 8);
+		retdata = (state->jcart_io_data[0] & 0x40) | joy[0] | (joy[1] << 8);
 	}
 	return retdata;
 }
 
 static void mess_init_6buttons_pad(running_machine *machine)
 {
+	md_cons_state *state = machine->driver_data<md_cons_state>();
 	int i;
 
 	for (i = 0; i < 3; i++)
 	{
-		mess_io_timeout[i] = machine->scheduler().timer_alloc(FUNC(mess_io_timeout_timer_callback), (void*)(FPTR)i);
-		mess_io_stage[i] = -1;
+		state->mess_io_timeout[i] = machine->scheduler().timer_alloc(FUNC(mess_io_timeout_timer_callback), (void*)(FPTR)i);
+		state->mess_io_stage[i] = -1;
 	}
 }
 
@@ -304,6 +302,7 @@ static void mess_init_6buttons_pad(running_machine *machine)
 /* They're needed to give the users the choice between different controllers */
 static UINT8 mess_md_io_read_data_port(running_machine *machine, int portnum)
 {
+	md_cons_state *state = machine->driver_data<md_cons_state>();
 	static const char *const pad6names[2][4] = {
 		{ "PAD1_6B", "PAD2_6B", "UNUSED", "UNUSED" },
 		{ "EXTRA1", "EXTRA2", "UNUSED", "UNUSED" }
@@ -335,7 +334,7 @@ static UINT8 mess_md_io_read_data_port(running_machine *machine, int portnum)
 	{
 		if (megadrive_io_data_regs[portnum] & 0x40)
 		{
-			if (mess_io_stage[portnum] == 2)
+			if (state->mess_io_stage[portnum] == 2)
 			{
 				/* here we read B, C & the additional buttons */
 				retdata = (megadrive_io_data_regs[portnum] & helper_6b) |
@@ -351,13 +350,13 @@ static UINT8 mess_md_io_read_data_port(running_machine *machine, int portnum)
 		}
 		else
 		{
-			if (mess_io_stage[portnum] == 1)
+			if (state->mess_io_stage[portnum] == 1)
 			{
 				/* here we read ((Start & A) >> 2) | 0x00 */
 				retdata = (megadrive_io_data_regs[portnum] & helper_6b) |
 							(((input_port_read_safe(machine, pad6names[0][portnum], 0) & 0xc0) >> 2) & ~helper_6b);
 			}
-			else if (mess_io_stage[portnum]==2)
+			else if (state->mess_io_stage[portnum]==2)
 			{
 				/* here we read ((Start & A) >> 2) | 0x0f */
 				retdata = (megadrive_io_data_regs[portnum] & helper_6b) |
@@ -400,6 +399,7 @@ static UINT8 mess_md_io_read_data_port(running_machine *machine, int portnum)
 
 static void mess_md_io_write_data_port(running_machine *machine, int portnum, UINT16 data)
 {
+	md_cons_state *state = machine->driver_data<md_cons_state>();
 	int controller;
 
 	switch (portnum)
@@ -423,8 +423,8 @@ static void mess_md_io_write_data_port(running_machine *machine, int portnum, UI
 		{
 			if (((megadrive_io_data_regs[portnum] & 0x40) == 0x00) && ((data & 0x40) == 0x40))
 			{
-				mess_io_stage[portnum]++;
-				mess_io_timeout[portnum]->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(8192));
+				state->mess_io_stage[portnum]++;
+				state->mess_io_timeout[portnum]->adjust(machine->device<cpu_device>("maincpu")->cycles_to_attotime(8192));
 			}
 
 		}
@@ -573,7 +573,8 @@ static MACHINE_RESET( ms_megadriv )
 	MACHINE_RESET_CALL( megadriv );
 }
 
-static MACHINE_CONFIG_DERIVED( ms_megadriv, megadriv )
+static MACHINE_CONFIG_START( ms_megadriv, md_cons_state )
+	MCFG_FRAGMENT_ADD( md_ntsc )
 
 	MCFG_MACHINE_START( ms_megadriv )
 	MCFG_MACHINE_RESET( ms_megadriv )
@@ -581,7 +582,8 @@ static MACHINE_CONFIG_DERIVED( ms_megadriv, megadriv )
 	MCFG_FRAGMENT_ADD( genesis_cartslot )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ms_megadpal, megadpal )
+static MACHINE_CONFIG_START( ms_megadpal, md_cons_state )
+	MCFG_FRAGMENT_ADD( md_pal )
 
 	MCFG_MACHINE_START( ms_megadriv )
 	MCFG_MACHINE_RESET( ms_megadriv )
@@ -589,7 +591,9 @@ static MACHINE_CONFIG_DERIVED( ms_megadpal, megadpal )
 	MCFG_FRAGMENT_ADD( genesis_cartslot )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ms_megdsvp, megdsvp )
+static MACHINE_CONFIG_START( ms_megdsvp, md_cons_state )
+	MCFG_FRAGMENT_ADD( md_ntsc )
+	MCFG_FRAGMENT_ADD( md_svp )
 
 	MCFG_MACHINE_START( ms_megadriv )
 	MCFG_MACHINE_RESET( ms_megadriv )
@@ -879,44 +883,42 @@ ROM_END
 
 static UINT16 pico_read_penpos(running_machine *machine, int pen)
 {
-  UINT16 penpos = 0;
+	UINT16 penpos = 0;
 
-  switch (pen)
+	switch (pen)
     {
-    case PICO_PENX:
-      penpos = input_port_read_safe(machine, "PENX", 0);
-      penpos |= 0x6;
-      penpos = penpos * 320 / 255;
-      penpos += 0x3d;
-      break;
-    case PICO_PENY:
-      penpos = input_port_read_safe(machine, "PENY", 0);
-      penpos |= 0x6;
-      penpos = penpos * 251 / 255;
-      penpos += 0x1fc;
-      break;
+		case PICO_PENX:
+			penpos = input_port_read_safe(machine, "PENX", 0);
+			penpos |= 0x6;
+			penpos = penpos * 320 / 255;
+			penpos += 0x3d;
+			break;
+		case PICO_PENY:
+			penpos = input_port_read_safe(machine, "PENY", 0);
+			penpos |= 0x6;
+			penpos = penpos * 251 / 255;
+			penpos += 0x1fc;
+			break;
     }
-  return penpos;
+
+	return penpos;
 }
 
 static READ16_HANDLER( pico_68k_io_read )
 {
-	UINT8 retdata;
-	static UINT8 page_register = 0;
-
-
-	retdata = 0;
+	pico_state *state = space->machine->driver_data<pico_state>();
+	UINT8 retdata = 0;
 
 	switch (offset)
-	  {
-	  case 0:	/* Version register ?XX?????? where XX is 00 for japan, 01 for europe and 10 for USA*/
-		retdata = (megadrive_region_export << 6) | (megadrive_region_pal << 5);
-	    break;
-	  case 1:
-	    retdata = input_port_read_safe(space->machine, "PAD", 0);
-	    break;
+	{
+		case 0:	/* Version register ?XX?????? where XX is 00 for japan, 01 for europe and 10 for USA*/
+			retdata = (megadrive_region_export << 6) | (megadrive_region_pal << 5);
+			break;
+		case 1:
+			retdata = input_port_read_safe(space->machine, "PAD", 0);
+			break;
 
-	    /*
+			/*
            Still notes from notaz for the pen :
 
            The pen can be used to 'draw' either on the drawing pad or on the storyware
@@ -926,61 +928,60 @@ static READ16_HANDLER( pico_68k_io_read )
            x: 0x03c - 0x17c
            y: 0x1fc - 0x2f7 (drawing pad)
               0x2f8 - 0x3f3 (storyware)
-         */
-	  case 2:
-	    retdata = pico_read_penpos(space->machine, PICO_PENX) >> 8;
-	    break;
-	  case 3:
-	    retdata = pico_read_penpos(space->machine, PICO_PENX) & 0x00ff;
-	    break;
-	  case 4:
-	    retdata = pico_read_penpos(space->machine, PICO_PENY) >> 8;
-	    break;
-	  case 5:
-	    retdata = pico_read_penpos(space->machine, PICO_PENY) & 0x00ff;
-	    break;
-	  case 6:
+           */
+		case 2:
+			retdata = pico_read_penpos(space->machine, PICO_PENX) >> 8;
+			break;
+		case 3:
+			retdata = pico_read_penpos(space->machine, PICO_PENX) & 0x00ff;
+			break;
+		case 4:
+			retdata = pico_read_penpos(space->machine, PICO_PENY) >> 8;
+			break;
+		case 5:
+			retdata = pico_read_penpos(space->machine, PICO_PENY) & 0x00ff;
+			break;
+		case 6:
 	    /* Page register :
            00 - storyware closed
            01, 03, 07, 0f, 1f, 3f - pages 1-6
            either page 5 or page 6 is often unused.
         */
-	    {
-	      UINT8 tmp;
-
-	      tmp = input_port_read_safe(space->machine, "PAGE", 0);
-	      if (tmp == 2 && page_register != 0x3f)
-		{
-		  page_register <<= 1;
-		  page_register |= 1;
-		}
-	      if (tmp == 1 && page_register != 0x00)
-		page_register >>= 1;
-	      retdata = page_register;
-	      break;
-	    }
-	  case 7:
-	    /* Returns free bytes left in the PCM FIFO buffer */
-	    retdata = 0x00;
-	    break;
-	  case 8:
+			{
+				UINT8 tmp = input_port_read_safe(space->machine, "PAGE", 0);
+				if (tmp == 2 && state->page_register != 0x3f)
+				{
+					state->page_register <<= 1;
+					state->page_register |= 1;
+				}
+				if (tmp == 1 && state->page_register != 0x00)
+					state->page_register >>= 1;
+				retdata = state->page_register;
+				break;
+			}
+		case 7:
+			/* Returns free bytes left in the PCM FIFO buffer */
+			retdata = 0x00;
+			break;
+		case 8:
 	    /*
            For reads, if bit 15 is cleared, it means PCM is 'busy' or
            something like that, as games sometimes wait for it to become 1.
         */
-	    retdata = 0x00;
-	  }
-	return retdata | retdata <<8;
+			retdata = 0x00;
+	}
+
+	return retdata | retdata << 8;
 }
 
 static WRITE16_HANDLER( pico_68k_io_write )
 {
 	switch (offset)
-	  {
-	  }
+	{
+	}
 }
 
-static ADDRESS_MAP_START( _pico_mem, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( pico_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 
 	AM_RANGE(0x800000, 0x80001f) AM_READWRITE(pico_68k_io_read, pico_68k_io_write)
@@ -1019,10 +1020,11 @@ static INPUT_PORTS_START( pico )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( pico, megadriv )
+static MACHINE_CONFIG_START( pico, pico_state )
+	MCFG_FRAGMENT_ADD( md_ntsc )
 
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(_pico_mem)
+	MCFG_CPU_PROGRAM_MAP(pico_mem)
 
 	MCFG_DEVICE_REMOVE("genesis_snd_z80")
 
@@ -1031,10 +1033,11 @@ static MACHINE_CONFIG_DERIVED( pico, megadriv )
 	MCFG_FRAGMENT_ADD( pico_cartslot )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( picopal, megadpal )
+static MACHINE_CONFIG_START( picopal, pico_state )
+	MCFG_FRAGMENT_ADD( md_pal )
 
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(_pico_mem)
+	MCFG_CPU_PROGRAM_MAP(pico_mem)
 
 	MCFG_DEVICE_REMOVE("genesis_snd_z80")
 
