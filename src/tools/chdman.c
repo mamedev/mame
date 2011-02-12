@@ -183,7 +183,7 @@ static int usage(void)
 	printf("   or: chdman -createhd inputhd.raw output.chd [ident.bin] [inputoffs [cylinders heads sectors [sectorsize [hunksize]]]]\n");
 	printf("   or: chdman -createuncomphd inputhd.raw output.chd [ident.bin] [inputoffs [cylinders heads sectors [sectorsize [hunksize]]]]\n");
 	printf("   or: chdman -createblankhd output.chd cylinders heads sectors [sectorsize [hunksize]]\n");
-	printf("   or: chdman -createcd input.(toc/cue/gdi) output.chd\n");
+	printf("   or: chdman -createcd input.(toc/cue/nrg/gdi) output.chd\n");
 	printf("   or: chdman -createav input.avi output.chd [firstframe [numframes]]\n");
 	printf("   or: chdman -copydata input.chd output.chd\n");
 	printf("   or: chdman -extract input.chd output.raw\n");

@@ -249,6 +249,183 @@ static UINT32 parse_wav_sample(char *filename, UINT32 *dataoffs)
 	return length;
 }
 
+UINT16 read_uint16(FILE *infile)
+{
+	UINT16 res = 0;
+	unsigned char buffer[2];
+
+	fread(buffer, 2, 1, infile);
+
+	res = buffer[1] | buffer[0]<<8;
+
+	return res;
+}
+
+UINT32 read_uint32(FILE *infile)
+{
+	UINT32 res = 0;
+	unsigned char buffer[4];
+
+	fread(buffer, 4, 1, infile);
+
+	res = buffer[3] | buffer[2]<<8 | buffer[1]<<16 | buffer[0]<<24;
+
+	return res;
+}
+
+UINT64 read_uint64(FILE *infile)
+{
+	UINT64 res0 = U64(0), res1 = U64(0);
+	UINT64 res;
+	unsigned char buffer[8];
+
+	fread(buffer, 8, 1, infile);
+
+	res0 = buffer[3] | buffer[2]<<8 | buffer[1]<<16 | buffer[0]<<24;
+	res1 = buffer[7] | buffer[6]<<8 | buffer[5]<<16 | buffer[4]<<24;
+
+	res = res0<<32 | res1;
+
+	return res;
+}
+
+/*-------------------------------------------------
+    chdcd_parse_toc - parse a CDRWin format CUE file
+-------------------------------------------------*/
+
+chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc *outtoc, chdcd_track_input_info *outinfo)
+{
+	FILE *infile;
+	unsigned char buffer[12];
+	UINT32 chain_offs, chunk_size;
+	int done = 0;
+
+	infile = fopen(tocfname, "rt");
+
+	if (infile == (FILE *)NULL)
+	{
+		return CHDERR_FILE_NOT_FOUND;
+	}
+
+	/* clear structures */
+	memset(outtoc, 0, sizeof(cdrom_toc));
+	memset(outinfo, 0, sizeof(chdcd_track_input_info));
+
+	// seek to 12 bytes before the end
+	fseek(infile, -12, SEEK_END);
+	fread(buffer, 12, 1, infile);
+
+	if (memcmp(buffer, "NER5", 4))
+	{
+		printf("ERROR: Not a Nero 5.5 or later image!\n");
+		return CHDERR_FILE_NOT_FOUND;
+	}
+
+	chain_offs = buffer[11] | (buffer[10]<<8) | (buffer[9]<<16) | (buffer[8]<<24);
+
+	if ((buffer[7] != 0) || (buffer[6] != 0) || (buffer[5] != 0) || (buffer[4] != 0))
+	{
+		printf("ERROR: File size is > 4GB, this version of CHDMAN cannot handle it.");
+		return CHDERR_FILE_NOT_FOUND;
+	}
+
+//	printf("NER5 detected, chain offset: %x\n", chain_offs);
+
+	while (!done)
+	{
+		UINT32 toc_type, offset;
+		UINT8 start, end;
+		int track;
+
+		fseek(infile, chain_offs, SEEK_SET);
+		fread(buffer, 8, 1, infile);
+
+		chunk_size = (buffer[7] | buffer[6]<<8 | buffer[5]<<16 | buffer[4]<<24);
+
+//		printf("Chunk type: %c%c%c%c, size %x\n", buffer[0], buffer[1], buffer[2], buffer[3], chunk_size);
+
+		// we want the DAOX chunk, which has the TOC information
+		if (!memcmp(buffer, "DAOX", 4))
+		{
+			// skip second chunk size and UPC code
+			fseek(infile, 16, SEEK_CUR);
+
+			toc_type = read_uint32(infile);
+			fread(&start, 1, 1, infile);
+			fread(&end, 1, 1, infile);
+
+//			printf("TOC type: %08x.  Start track %d  End track: %d\n", toc_type, start, end);
+
+			outtoc->numtrks = (end-start) + 1;
+
+			offset = 0;
+			for (track = start; track <= end; track++)
+			{
+				UINT32 size, mode;
+				UINT64 index0, index1, index2;
+
+				fseek(infile, 12, SEEK_CUR);	// skip ISRC code
+				size = read_uint16(infile);
+				mode = read_uint32(infile);
+				index0 = read_uint64(infile);
+				index1 = read_uint64(infile);
+				index2 = read_uint64(infile);
+
+//				printf("Track %d: sector size %d mode %x index0 %llx index1 %llx index2 %llx (pregap %d sectors, length %d sectors)\n", track, size, mode, index0, index1, index2, (UINT32)(index1-index0)/size, (UINT32)(index2-index1)/size);
+
+				strcpy(outinfo->fname[track-1], tocfname);
+				outinfo->offset[track-1] = offset + (UINT32)(index1-index0);
+				outinfo->idx0offs[track-1] = 0;
+				outinfo->idx1offs[track-1] = 0;
+
+				switch (mode)
+				{
+					case 1:	// 2048 byte data
+						outtoc->tracks[track-1].trktype = CD_TRACK_MODE1;
+						outinfo->swap[track-1] = 0;
+						break;
+
+					case 0x7000001:	// 2352 byte audio
+						outtoc->tracks[track-1].trktype = CD_TRACK_AUDIO;
+						outinfo->swap[track-1] = 1;
+						break;
+
+					default:
+						printf("ERROR: Unknown track type %x, contact MAMEDEV!\n", mode);
+						break;
+				}
+
+				outtoc->tracks[track-1].datasize = size;
+
+				outtoc->tracks[track-1].subtype = CD_SUB_NONE;
+				outtoc->tracks[track-1].subsize = 0;
+
+				outtoc->tracks[track-1].pregap = (UINT32)(index1-index0)/size;
+				outtoc->tracks[track-1].frames = (UINT32)(index2-index1)/size;
+				outtoc->tracks[track-1].postgap = 0;
+				outtoc->tracks[track-1].pgtype = 0;
+				outtoc->tracks[track-1].pgsub = CD_SUB_NONE;
+				outtoc->tracks[track-1].pgdatasize = 0;
+				outtoc->tracks[track-1].pgsubsize = 0;
+
+				offset += (UINT32)index2-index1;
+			}
+		}
+
+		if (!memcmp(buffer, "END!", 4))
+		{
+			done = 1;
+		}
+		else
+		{
+			chain_offs += chunk_size + 8;
+		}
+	}
+
+
+	return CHDERR_NONE;
+}
+
 /*-------------------------------------------------
     chdcd_parse_gdi - parse a Sega GD-ROM rip
 -------------------------------------------------*/
@@ -640,6 +817,11 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 	if (strstr(tocfname,".cue"))
 	{
 		return chdcd_parse_cue(tocfname, outtoc, outinfo);
+	}
+
+	if (strstr(tocfname,".nrg"))
+	{
+		return chdcd_parse_nero(tocfname, outtoc, outinfo);
 	}
 
 	infile = fopen(tocfname, "rt");
