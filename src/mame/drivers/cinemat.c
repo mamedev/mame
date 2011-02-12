@@ -43,17 +43,6 @@
 #define MASTER_CLOCK			XTAL_19_923MHz
 
 
-
-static UINT16 *rambase;
-
-static UINT8 coin_detected;
-static UINT8 coin_last_reset;
-
-static UINT8 mux_select;
-static int gear;
-
-
-
 /*************************************
  *
  *  General machine init
@@ -62,20 +51,22 @@ static int gear;
 
 static MACHINE_START( cinemat )
 {
-	state_save_register_global(machine, coin_detected);
-	state_save_register_global(machine, coin_last_reset);
-	state_save_register_global(machine, mux_select);
+	cinemat_state *state = machine->driver_data<cinemat_state>();
+	state_save_register_global(machine, state->coin_detected);
+	state_save_register_global(machine, state->coin_last_reset);
+	state_save_register_global(machine, state->mux_select);
 }
 
 
 MACHINE_RESET( cinemat )
 {
+	cinemat_state *state = machine->driver_data<cinemat_state>();
 	/* reset the coin states */
-	coin_detected = 0;
-	coin_last_reset = 0;
+	state->coin_detected = 0;
+	state->coin_last_reset = 0;
 
 	/* reset mux select */
-	mux_select = 0;
+	state->mux_select = 0;
 }
 
 
@@ -108,15 +99,17 @@ static READ8_HANDLER( switches_r )
 
 static INPUT_CHANGED( coin_inserted )
 {
+	cinemat_state *state = field->port->machine->driver_data<cinemat_state>();
 	/* on the falling edge of a new coin, set the coin_detected flag */
 	if (newval == 0)
-		coin_detected = 1;
+		state->coin_detected = 1;
 }
 
 
 static READ8_HANDLER( coin_input_r )
 {
-	return !coin_detected;
+	cinemat_state *state = space->machine->driver_data<cinemat_state>();
+	return !state->coin_detected;
 }
 
 
@@ -129,16 +122,18 @@ static READ8_HANDLER( coin_input_r )
 
 static WRITE8_HANDLER( coin_reset_w )
 {
+	cinemat_state *state = space->machine->driver_data<cinemat_state>();
 	/* on the rising edge of a coin reset, clear the coin_detected flag */
-	if (coin_last_reset != data && data != 0)
-		coin_detected = 0;
-	coin_last_reset = data;
+	if (state->coin_last_reset != data && data != 0)
+		state->coin_detected = 0;
+	state->coin_last_reset = data;
 }
 
 
 static WRITE8_HANDLER( mux_select_w )
 {
-	mux_select = data;
+	cinemat_state *state = space->machine->driver_data<cinemat_state>();
+	state->mux_select = data;
 	cinemat_sound_control_w(space, 0x07, data);
 }
 
@@ -152,12 +147,13 @@ static WRITE8_HANDLER( mux_select_w )
 
 static UINT8 joystick_read(device_t *device)
 {
+	cinemat_state *state = device->machine->driver_data<cinemat_state>();
 	if (device->machine->phase() != MACHINE_PHASE_RUNNING)
 		return 0;
 	else
 	{
 		int xval = (INT16)(cpu_get_reg(device, CCPU_X) << 4) >> 4;
-		return (input_port_read_safe(device->machine, mux_select ? "ANALOGX" : "ANALOGY", 0) - xval) < 0x800;
+		return (input_port_read_safe(device->machine, state->mux_select ? "ANALOGX" : "ANALOGY", 0) - xval) < 0x800;
 	}
 }
 
@@ -187,17 +183,18 @@ static READ8_HANDLER( speedfrk_wheel_r )
 
 static READ8_HANDLER( speedfrk_gear_r )
 {
+	cinemat_state *state = space->machine->driver_data<cinemat_state>();
 	int gearval = input_port_read(space->machine, "GEAR");
 
 	/* check the fake gear input port and determine the bit settings for the gear */
 	if ((gearval & 0x0f) != 0x0f)
-        gear = gearval & 0x0f;
+        state->gear = gearval & 0x0f;
 
-	/* add the start key into the mix -- note that it overlaps 4th gear */
+	/* add the start key into the mix -- note that it overlaps 4th state->gear */
 	if (!(input_port_read(space->machine, "INPUTS") & 0x80))
-        gear &= ~0x08;
+        state->gear &= ~0x08;
 
-	return (gear >> offset) & 1;
+	return (state->gear >> offset) & 1;
 }
 
 
@@ -255,8 +252,9 @@ static READ8_HANDLER( sundance_inputs_r )
 
 static READ8_HANDLER( boxingb_dial_r )
 {
+	cinemat_state *state = space->machine->driver_data<cinemat_state>();
 	int value = input_port_read(space->machine, "DIAL");
-	if (!mux_select) offset += 4;
+	if (!state->mux_select) offset += 4;
 	return (value >> offset) & 1;
 }
 
@@ -319,7 +317,7 @@ static ADDRESS_MAP_START( data_map, ADDRESS_SPACE_DATA, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( data_map_qb3, ADDRESS_SPACE_DATA, 16 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("bank1") AM_BASE(&rambase)
+	AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("bank1") AM_BASE_MEMBER(cinemat_state, rambase)
 ADDRESS_MAP_END
 
 
@@ -992,7 +990,7 @@ static const ccpu_config config_jmi =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( cinemat_nojmi_4k, driver_device )
+static MACHINE_CONFIG_START( cinemat_nojmi_4k, cinemat_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", CCPU, MASTER_CLOCK/4)
@@ -1459,7 +1457,8 @@ ROM_END
 
 static DRIVER_INIT( speedfrk )
 {
-	gear = 0xe;
+	cinemat_state *state = machine->driver_data<cinemat_state>();
+	state->gear = 0xe;
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x00, 0x03, 0, 0, speedfrk_wheel_r);
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x04, 0x06, 0, 0, speedfrk_gear_r);
 }
@@ -1486,10 +1485,11 @@ static DRIVER_INIT( boxingb )
 
 static DRIVER_INIT( qb3 )
 {
+	cinemat_state *state = machine->driver_data<cinemat_state>();
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x0f, 0x0f, 0, 0, qb3_frame_r);
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x00, 0x00, 0, 0, qb3_ram_bank_w);
 
-	memory_configure_bank(machine, "bank1", 0, 4, rambase, 0x100*2);
+	memory_configure_bank(machine, "bank1", 0, 4, state->rambase, 0x100*2);
 }
 
 

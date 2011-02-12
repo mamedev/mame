@@ -97,27 +97,14 @@ Todo:
 #include "emu.h"
 #include "includes/dec0.h"
 
-static tilemap_t *pf1_tilemap_0,*pf1_tilemap_1,*pf1_tilemap_2;
-static tilemap_t *pf2_tilemap_0,*pf2_tilemap_1,*pf2_tilemap_2;
-static tilemap_t *pf3_tilemap_0,*pf3_tilemap_1,*pf3_tilemap_2;
 
-UINT16 *dec0_pf1_data,*dec0_pf2_data,*dec0_pf3_data;
-UINT16 *dec0_pf1_rowscroll,*dec0_pf2_rowscroll,*dec0_pf3_rowscroll;
-UINT16 *dec0_pf1_colscroll,*dec0_pf2_colscroll,*dec0_pf3_colscroll;
-static UINT16 dec0_pf1_control_0[4];
-static UINT16 dec0_pf1_control_1[4];
-static UINT16 dec0_pf2_control_0[4];
-static UINT16 dec0_pf2_control_1[4];
-static UINT16 dec0_pf3_control_0[4];
-static UINT16 dec0_pf3_control_1[4];
-static UINT16 *dec0_spriteram;
-static UINT16 dec0_pri;
 
 /******************************************************************************/
 
 WRITE16_HANDLER( dec0_update_sprites_w )
 {
-	memcpy(dec0_spriteram,space->machine->generic.spriteram.u16,0x800);
+	dec0_state *state = space->machine->driver_data<dec0_state>();
+	memcpy(state->spriteram,space->machine->generic.spriteram.u16,0x800);
 }
 
 /******************************************************************************/
@@ -149,16 +136,17 @@ WRITE16_HANDLER( dec0_paletteram_b_w )
 
 static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectangle *cliprect,int pri_mask,int pri_val)
 {
+	dec0_state *state = machine->driver_data<dec0_state>();
 	int offs;
 
 	for (offs = 0;offs < 0x400;offs += 4)
 	{
 		int x,y,sprite,colour,multi,fx,fy,inc,flash,mult;
 
-		y = dec0_spriteram[offs];
+		y = state->spriteram[offs];
 		if ((y&0x8000) == 0) continue;
 
-		x = dec0_spriteram[offs+2];
+		x = state->spriteram[offs+2];
 		colour = x >> 12;
 		if ((colour & pri_mask) != pri_val) continue;
 
@@ -170,7 +158,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectan
 		multi = (1 << ((y & 0x1800) >> 11)) - 1;	/* 1x, 2x, 4x, 8x height */
 											/* multi = 0   1   3   7 */
 
-		sprite = dec0_spriteram[offs+1] & 0x0fff;
+		sprite = state->spriteram[offs+1] & 0x0fff;
 
 		x = x & 0x01ff;
 		y = y & 0x01ff;
@@ -299,48 +287,51 @@ static void custom_tilemap_draw(running_machine *machine,
 
 static void dec0_pf1_draw(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int flags)
 {
-	switch (dec0_pf1_control_0[3]&0x3) {
+	dec0_state *state = machine->driver_data<dec0_state>();
+	switch (state->pf1_control_0[3]&0x3) {
 		case 0:	/* 4x1 */
-			custom_tilemap_draw(machine,bitmap,cliprect,pf1_tilemap_0,dec0_pf1_rowscroll,dec0_pf1_colscroll,dec0_pf1_control_0,dec0_pf1_control_1,flags);
+			custom_tilemap_draw(machine,bitmap,cliprect,state->pf1_tilemap_0,state->pf1_rowscroll,state->pf1_colscroll,state->pf1_control_0,state->pf1_control_1,flags);
 			break;
 		case 1:	/* 2x2 */
 		default:
-			custom_tilemap_draw(machine,bitmap,cliprect,pf1_tilemap_1,dec0_pf1_rowscroll,dec0_pf1_colscroll,dec0_pf1_control_0,dec0_pf1_control_1,flags);
+			custom_tilemap_draw(machine,bitmap,cliprect,state->pf1_tilemap_1,state->pf1_rowscroll,state->pf1_colscroll,state->pf1_control_0,state->pf1_control_1,flags);
 			break;
 		case 2:	/* 1x4 */
-			custom_tilemap_draw(machine,bitmap,cliprect,pf1_tilemap_2,dec0_pf1_rowscroll,dec0_pf1_colscroll,dec0_pf1_control_0,dec0_pf1_control_1,flags);
+			custom_tilemap_draw(machine,bitmap,cliprect,state->pf1_tilemap_2,state->pf1_rowscroll,state->pf1_colscroll,state->pf1_control_0,state->pf1_control_1,flags);
 			break;
 	};
 }
 
 static void dec0_pf2_draw(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int flags)
 {
-	switch (dec0_pf2_control_0[3]&0x3) {
+	dec0_state *state = machine->driver_data<dec0_state>();
+	switch (state->pf2_control_0[3]&0x3) {
 		case 0:	/* 4x1 */
-			custom_tilemap_draw(machine,bitmap,cliprect,pf2_tilemap_0,dec0_pf2_rowscroll,dec0_pf2_colscroll,dec0_pf2_control_0,dec0_pf2_control_1,flags);
+			custom_tilemap_draw(machine,bitmap,cliprect,state->pf2_tilemap_0,state->pf2_rowscroll,state->pf2_colscroll,state->pf2_control_0,state->pf2_control_1,flags);
 			break;
 		case 1:	/* 2x2 */
 		default:
-			custom_tilemap_draw(machine,bitmap,cliprect,pf2_tilemap_1,dec0_pf2_rowscroll,dec0_pf2_colscroll,dec0_pf2_control_0,dec0_pf2_control_1,flags);
+			custom_tilemap_draw(machine,bitmap,cliprect,state->pf2_tilemap_1,state->pf2_rowscroll,state->pf2_colscroll,state->pf2_control_0,state->pf2_control_1,flags);
 			break;
 		case 2:	/* 1x4 */
-			custom_tilemap_draw(machine,bitmap,cliprect,pf2_tilemap_2,dec0_pf2_rowscroll,dec0_pf2_colscroll,dec0_pf2_control_0,dec0_pf2_control_1,flags);
+			custom_tilemap_draw(machine,bitmap,cliprect,state->pf2_tilemap_2,state->pf2_rowscroll,state->pf2_colscroll,state->pf2_control_0,state->pf2_control_1,flags);
 			break;
 	};
 }
 
 static void dec0_pf3_draw(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int flags)
 {
-	switch (dec0_pf3_control_0[3]&0x3) {
+	dec0_state *state = machine->driver_data<dec0_state>();
+	switch (state->pf3_control_0[3]&0x3) {
 		case 0:	/* 4x1 */
-			custom_tilemap_draw(machine,bitmap,cliprect,pf3_tilemap_0,dec0_pf3_rowscroll,dec0_pf3_colscroll,dec0_pf3_control_0,dec0_pf3_control_1,flags);
+			custom_tilemap_draw(machine,bitmap,cliprect,state->pf3_tilemap_0,state->pf3_rowscroll,state->pf3_colscroll,state->pf3_control_0,state->pf3_control_1,flags);
 			break;
 		case 1:	/* 2x2 */
 		default:
-			custom_tilemap_draw(machine,bitmap,cliprect,pf3_tilemap_1,dec0_pf3_rowscroll,dec0_pf3_colscroll,dec0_pf3_control_0,dec0_pf3_control_1,flags);
+			custom_tilemap_draw(machine,bitmap,cliprect,state->pf3_tilemap_1,state->pf3_rowscroll,state->pf3_colscroll,state->pf3_control_0,state->pf3_control_1,flags);
 			break;
 		case 2:	/* 1x4 */
-			custom_tilemap_draw(machine,bitmap,cliprect,pf3_tilemap_2,dec0_pf3_rowscroll,dec0_pf3_colscroll,dec0_pf3_control_0,dec0_pf3_control_1,flags);
+			custom_tilemap_draw(machine,bitmap,cliprect,state->pf3_tilemap_2,state->pf3_rowscroll,state->pf3_colscroll,state->pf3_control_0,state->pf3_control_1,flags);
 			break;
 	};
 }
@@ -349,7 +340,8 @@ static void dec0_pf3_draw(running_machine *machine,bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( hbarrel )
 {
-	flip_screen_set(screen->machine, dec0_pf1_control_0[0]&0x80);
+	dec0_state *state = screen->machine->driver_data<dec0_state>();
+	flip_screen_set(screen->machine, state->pf1_control_0[0]&0x80);
 
 	dec0_pf3_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE);
 	draw_sprites(screen->machine,bitmap,cliprect,0x08,0x08);
@@ -366,20 +358,21 @@ VIDEO_UPDATE( hbarrel )
 
 VIDEO_UPDATE( baddudes )
 {
-	flip_screen_set(screen->machine, dec0_pf1_control_0[0]&0x80);
+	dec0_state *state = screen->machine->driver_data<dec0_state>();
+	flip_screen_set(screen->machine, state->pf1_control_0[0]&0x80);
 
 	/* WARNING: inverted wrt Midnight Resistance */
-	if ((dec0_pri & 0x01) == 0)
+	if ((state->pri & 0x01) == 0)
 	{
 		dec0_pf2_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE);
 		dec0_pf3_draw(screen->machine,bitmap,cliprect,0);
 
-		if (dec0_pri & 2)
+		if (state->pri & 2)
 			dec0_pf2_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_LAYER0); /* Foreground pens only */
 
 		draw_sprites(screen->machine,bitmap,cliprect,0x00,0x00);
 
-		if (dec0_pri & 4)
+		if (state->pri & 4)
 			dec0_pf3_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_LAYER0); /* Foreground pens only */
 	}
 	else
@@ -387,12 +380,12 @@ VIDEO_UPDATE( baddudes )
 		dec0_pf3_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE);
 		dec0_pf2_draw(screen->machine,bitmap,cliprect,0);
 
-		if (dec0_pri & 2)
+		if (state->pri & 2)
 			dec0_pf3_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_LAYER0); /* Foreground pens only */
 
 		draw_sprites(screen->machine,bitmap,cliprect,0x00,0x00);
 
-		if (dec0_pri & 4)
+		if (state->pri & 4)
 			dec0_pf2_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_LAYER0); /* Foreground pens only */
 	}
 
@@ -404,16 +397,17 @@ VIDEO_UPDATE( baddudes )
 
 VIDEO_UPDATE( robocop )
 {
+	dec0_state *state = screen->machine->driver_data<dec0_state>();
 	int trans;
 
-	flip_screen_set(screen->machine, dec0_pf1_control_0[0]&0x80);
+	flip_screen_set(screen->machine, state->pf1_control_0[0]&0x80);
 
-	if (dec0_pri & 0x04)
+	if (state->pri & 0x04)
 		trans = 0x08;
 	else
 		trans = 0x00;
 
-	if (dec0_pri & 0x01)
+	if (state->pri & 0x01)
 	{
 		/* WARNING: inverted wrt Midnight Resistance */
 		/* Robocop uses it only for the title screen, so this might be just */
@@ -421,7 +415,7 @@ VIDEO_UPDATE( robocop )
 		/* something (they are 0x80 in midres, 0x00 here) */
 		dec0_pf2_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_LAYER1|TILEMAP_DRAW_OPAQUE);
 
-		if (dec0_pri & 0x02)
+		if (state->pri & 0x02)
 			draw_sprites(screen->machine,bitmap,cliprect,0x08,trans);
 
 		dec0_pf3_draw(screen->machine,bitmap,cliprect,0);
@@ -430,13 +424,13 @@ VIDEO_UPDATE( robocop )
 	{
 		dec0_pf3_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE);
 
-		if (dec0_pri & 0x02)
+		if (state->pri & 0x02)
 			draw_sprites(screen->machine,bitmap,cliprect,0x08,trans);
 
 		dec0_pf2_draw(screen->machine,bitmap,cliprect,0);
 	}
 
-	if (dec0_pri & 0x02)
+	if (state->pri & 0x02)
 		draw_sprites(screen->machine,bitmap,cliprect,0x08,trans ^ 0x08);
 	else
 		draw_sprites(screen->machine,bitmap,cliprect,0x00,0x00);
@@ -449,7 +443,8 @@ VIDEO_UPDATE( robocop )
 
 VIDEO_UPDATE( birdtry )
 {
-	flip_screen_set(screen->machine, dec0_pf1_control_0[0]&0x80);
+	dec0_state *state = screen->machine->driver_data<dec0_state>();
+	flip_screen_set(screen->machine, state->pf1_control_0[0]&0x80);
 
 	/* This game doesn't have the extra playfield chip on the game board, but
     the palette does show through. */
@@ -464,9 +459,10 @@ VIDEO_UPDATE( birdtry )
 
 VIDEO_UPDATE( hippodrm )
 {
-	flip_screen_set(screen->machine, dec0_pf1_control_0[0]&0x80);
+	dec0_state *state = screen->machine->driver_data<dec0_state>();
+	flip_screen_set(screen->machine, state->pf1_control_0[0]&0x80);
 
-	if (dec0_pri & 0x01)
+	if (state->pri & 0x01)
 	{
 		dec0_pf2_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE);
 		dec0_pf3_draw(screen->machine,bitmap,cliprect,0);
@@ -486,7 +482,8 @@ VIDEO_UPDATE( hippodrm )
 
 VIDEO_UPDATE( slyspy )
 {
-	flip_screen_set(screen->machine, dec0_pf1_control_0[0]&0x80);
+	dec0_state *state = screen->machine->driver_data<dec0_state>();
+	flip_screen_set(screen->machine, state->pf1_control_0[0]&0x80);
 
 	dec0_pf3_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE);
 	dec0_pf2_draw(screen->machine,bitmap,cliprect,0);
@@ -494,7 +491,7 @@ VIDEO_UPDATE( slyspy )
 	draw_sprites(screen->machine,bitmap,cliprect,0x00,0x00);
 
 	/* Redraw top 8 pens of top 8 palettes over sprites */
-	if (dec0_pri&0x80)
+	if (state->pri&0x80)
 		dec0_pf2_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_LAYER0);
 
 	dec0_pf1_draw(screen->machine,bitmap,cliprect,0);
@@ -505,19 +502,20 @@ VIDEO_UPDATE( slyspy )
 
 VIDEO_UPDATE( midres )
 {
+	dec0_state *state = screen->machine->driver_data<dec0_state>();
 	int trans;
 
-	flip_screen_set(screen->machine, dec0_pf1_control_0[0]&0x80);
+	flip_screen_set(screen->machine, state->pf1_control_0[0]&0x80);
 
-	if (dec0_pri & 0x04)
+	if (state->pri & 0x04)
 		trans = 0x00;
 	else trans = 0x08;
 
-	if (dec0_pri & 0x01)
+	if (state->pri & 0x01)
 	{
 		dec0_pf2_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE);
 
-		if (dec0_pri & 0x02)
+		if (state->pri & 0x02)
 			draw_sprites(screen->machine,bitmap,cliprect,0x08,trans);
 
 		dec0_pf3_draw(screen->machine,bitmap,cliprect,0);
@@ -526,13 +524,13 @@ VIDEO_UPDATE( midres )
 	{
 		dec0_pf3_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE);
 
-		if (dec0_pri & 0x02)
+		if (state->pri & 0x02)
 			draw_sprites(screen->machine,bitmap,cliprect,0x08,trans);
 
 		dec0_pf2_draw(screen->machine,bitmap,cliprect,0);
 	}
 
-	if (dec0_pri & 0x02)
+	if (state->pri & 0x02)
 		draw_sprites(screen->machine,bitmap,cliprect,0x08,trans ^ 0x08);
 	else
 		draw_sprites(screen->machine,bitmap,cliprect,0x00,0x00);
@@ -545,73 +543,83 @@ VIDEO_UPDATE( midres )
 
 WRITE16_HANDLER( dec0_pf1_control_0_w )
 {
-	COMBINE_DATA(&dec0_pf1_control_0[offset]);
+	dec0_state *state = space->machine->driver_data<dec0_state>();
+	COMBINE_DATA(&state->pf1_control_0[offset]);
 }
 
 WRITE16_HANDLER( dec0_pf1_control_1_w )
 {
-	COMBINE_DATA(&dec0_pf1_control_1[offset]);
+	dec0_state *state = space->machine->driver_data<dec0_state>();
+	COMBINE_DATA(&state->pf1_control_1[offset]);
 }
 
 WRITE16_HANDLER( dec0_pf1_data_w )
 {
-	COMBINE_DATA(&dec0_pf1_data[offset]);
-	tilemap_mark_tile_dirty(pf1_tilemap_0,offset);
-	tilemap_mark_tile_dirty(pf1_tilemap_1,offset);
-	tilemap_mark_tile_dirty(pf1_tilemap_2,offset);
+	dec0_state *state = space->machine->driver_data<dec0_state>();
+	COMBINE_DATA(&state->pf1_data[offset]);
+	tilemap_mark_tile_dirty(state->pf1_tilemap_0,offset);
+	tilemap_mark_tile_dirty(state->pf1_tilemap_1,offset);
+	tilemap_mark_tile_dirty(state->pf1_tilemap_2,offset);
 }
 
 WRITE16_HANDLER( dec0_pf2_control_0_w )
 {
-	COMBINE_DATA(&dec0_pf2_control_0[offset]);
+	dec0_state *state = space->machine->driver_data<dec0_state>();
+	COMBINE_DATA(&state->pf2_control_0[offset]);
 }
 
 WRITE16_HANDLER( dec0_pf2_control_1_w )
 {
-	COMBINE_DATA(&dec0_pf2_control_1[offset]);
+	dec0_state *state = space->machine->driver_data<dec0_state>();
+	COMBINE_DATA(&state->pf2_control_1[offset]);
 }
 
 WRITE16_HANDLER( dec0_pf2_data_w )
 {
-	COMBINE_DATA(&dec0_pf2_data[offset]);
-	tilemap_mark_tile_dirty(pf2_tilemap_0,offset);
-	tilemap_mark_tile_dirty(pf2_tilemap_1,offset);
-	tilemap_mark_tile_dirty(pf2_tilemap_2,offset);
+	dec0_state *state = space->machine->driver_data<dec0_state>();
+	COMBINE_DATA(&state->pf2_data[offset]);
+	tilemap_mark_tile_dirty(state->pf2_tilemap_0,offset);
+	tilemap_mark_tile_dirty(state->pf2_tilemap_1,offset);
+	tilemap_mark_tile_dirty(state->pf2_tilemap_2,offset);
 }
 
 WRITE16_HANDLER( dec0_pf3_control_0_w )
 {
-	COMBINE_DATA(&dec0_pf3_control_0[offset]);
+	dec0_state *state = space->machine->driver_data<dec0_state>();
+	COMBINE_DATA(&state->pf3_control_0[offset]);
 }
 
 WRITE16_HANDLER( dec0_pf3_control_1_w )
 {
-	COMBINE_DATA(&dec0_pf3_control_1[offset]);
+	dec0_state *state = space->machine->driver_data<dec0_state>();
+	COMBINE_DATA(&state->pf3_control_1[offset]);
 }
 
 WRITE16_HANDLER( dec0_pf3_data_w )
 {
-	COMBINE_DATA(&dec0_pf3_data[offset]);
-	tilemap_mark_tile_dirty(pf3_tilemap_0,offset);
-	tilemap_mark_tile_dirty(pf3_tilemap_1,offset);
-	tilemap_mark_tile_dirty(pf3_tilemap_2,offset);
+	dec0_state *state = space->machine->driver_data<dec0_state>();
+	COMBINE_DATA(&state->pf3_data[offset]);
+	tilemap_mark_tile_dirty(state->pf3_tilemap_0,offset);
+	tilemap_mark_tile_dirty(state->pf3_tilemap_1,offset);
+	tilemap_mark_tile_dirty(state->pf3_tilemap_2,offset);
 }
 
 WRITE16_HANDLER( dec0_priority_w )
 {
-	COMBINE_DATA(&dec0_pri);
+	dec0_state *state = space->machine->driver_data<dec0_state>();
+	COMBINE_DATA(&state->pri);
 }
 
 WRITE8_HANDLER( dec0_pf3_control_8bit_w )
 {
-	static int buffer[0x20];
+	dec0_state *state = space->machine->driver_data<dec0_state>();
 	UINT16 myword;
 
-	buffer[offset]=data;
+	state->buffer[offset]=data;
 
 	/* Rearrange little endian bytes from H6280 into big endian words for 68k */
 	offset&=0xffe;
-	myword=buffer[offset] + (buffer[offset+1]<<8);
+	myword=state->buffer[offset] + (state->buffer[offset+1]<<8);
 
 	if (offset<0x10) dec0_pf3_control_0_w(space,offset/2,myword,0xffff);
 	else dec0_pf3_control_1_w(space,(offset-0x10)/2,myword,0xffff);
@@ -619,27 +627,29 @@ WRITE8_HANDLER( dec0_pf3_control_8bit_w )
 
 WRITE8_HANDLER( dec0_pf3_data_8bit_w )
 {
+	dec0_state *state = space->machine->driver_data<dec0_state>();
 	if (offset&1) { /* MSB has changed */
-		UINT16 lsb=dec0_pf3_data[offset>>1];
+		UINT16 lsb=state->pf3_data[offset>>1];
 		UINT16 newword=(lsb&0xff) | (data<<8);
-		dec0_pf3_data[offset>>1]=newword;
+		state->pf3_data[offset>>1]=newword;
 	}
 	else { /* LSB has changed */
-		UINT16 msb=dec0_pf3_data[offset>>1];
+		UINT16 msb=state->pf3_data[offset>>1];
 		UINT16 newword=(msb&0xff00) | data;
-		dec0_pf3_data[offset>>1]=newword;
+		state->pf3_data[offset>>1]=newword;
 	}
-	tilemap_mark_tile_dirty(pf3_tilemap_0,offset>>1);
-	tilemap_mark_tile_dirty(pf3_tilemap_1,offset>>1);
-	tilemap_mark_tile_dirty(pf3_tilemap_2,offset>>1);
+	tilemap_mark_tile_dirty(state->pf3_tilemap_0,offset>>1);
+	tilemap_mark_tile_dirty(state->pf3_tilemap_1,offset>>1);
+	tilemap_mark_tile_dirty(state->pf3_tilemap_2,offset>>1);
 }
 
 READ8_HANDLER( dec0_pf3_data_8bit_r )
 {
+	dec0_state *state = space->machine->driver_data<dec0_state>();
 	if (offset&1) /* MSB */
-		return dec0_pf3_data[offset>>1]>>8;
+		return state->pf3_data[offset>>1]>>8;
 
-	return dec0_pf3_data[offset>>1]&0xff;
+	return state->pf3_data[offset>>1]&0xff;
 }
 
 /******************************************************************************/
@@ -676,13 +686,15 @@ static TILEMAP_MAPPER( tile_shape2_8x8_scan )
 
 static TILE_GET_INFO( get_pf1_tile_info )
 {
-	int tile=dec0_pf1_data[tile_index];
+	dec0_state *state = machine->driver_data<dec0_state>();
+	int tile=state->pf1_data[tile_index];
 	SET_TILE_INFO(0,tile&0xfff,tile>>12,0);
 }
 
 static TILE_GET_INFO( get_pf2_tile_info )
 {
-	int tile=dec0_pf2_data[tile_index];
+	dec0_state *state = machine->driver_data<dec0_state>();
+	int tile=state->pf2_data[tile_index];
 	int pri=((tile>>12)>7);
 	SET_TILE_INFO(1,tile&0xfff,tile>>12,0);
 	tileinfo->group = pri;
@@ -690,7 +702,8 @@ static TILE_GET_INFO( get_pf2_tile_info )
 
 static TILE_GET_INFO( get_pf3_tile_info )
 {
-	int tile=dec0_pf3_data[tile_index];
+	dec0_state *state = machine->driver_data<dec0_state>();
+	int tile=state->pf3_data[tile_index];
 	int pri=((tile>>12)>7);
 	SET_TILE_INFO(2,tile&0xfff,tile>>12,0);
 	tileinfo->group = pri;
@@ -698,23 +711,25 @@ static TILE_GET_INFO( get_pf3_tile_info )
 
 VIDEO_START( dec0_nodma )
 {
-	pf1_tilemap_0 = tilemap_create(machine, get_pf1_tile_info,tile_shape0_8x8_scan, 8, 8,128, 32);
-	pf1_tilemap_1 = tilemap_create(machine, get_pf1_tile_info,tile_shape1_8x8_scan, 8, 8, 64, 64);
-	pf1_tilemap_2 = tilemap_create(machine, get_pf1_tile_info,tile_shape2_8x8_scan, 8, 8, 32,128);
-	pf2_tilemap_0 = tilemap_create(machine, get_pf2_tile_info,tile_shape0_scan,    16,16, 64, 16);
-	pf2_tilemap_1 = tilemap_create(machine, get_pf2_tile_info,tile_shape1_scan,    16,16, 32, 32);
-	pf2_tilemap_2 = tilemap_create(machine, get_pf2_tile_info,tile_shape2_scan,    16,16, 16, 64);
-	pf3_tilemap_0 = tilemap_create(machine, get_pf3_tile_info,tile_shape0_scan,    16,16, 64, 16);
-	pf3_tilemap_1 = tilemap_create(machine, get_pf3_tile_info,tile_shape1_scan,    16,16, 32, 32);
-	pf3_tilemap_2 = tilemap_create(machine, get_pf3_tile_info,tile_shape2_scan,    16,16, 16, 64);
+	dec0_state *state = machine->driver_data<dec0_state>();
+	state->pf1_tilemap_0 = tilemap_create(machine, get_pf1_tile_info,tile_shape0_8x8_scan, 8, 8,128, 32);
+	state->pf1_tilemap_1 = tilemap_create(machine, get_pf1_tile_info,tile_shape1_8x8_scan, 8, 8, 64, 64);
+	state->pf1_tilemap_2 = tilemap_create(machine, get_pf1_tile_info,tile_shape2_8x8_scan, 8, 8, 32,128);
+	state->pf2_tilemap_0 = tilemap_create(machine, get_pf2_tile_info,tile_shape0_scan,    16,16, 64, 16);
+	state->pf2_tilemap_1 = tilemap_create(machine, get_pf2_tile_info,tile_shape1_scan,    16,16, 32, 32);
+	state->pf2_tilemap_2 = tilemap_create(machine, get_pf2_tile_info,tile_shape2_scan,    16,16, 16, 64);
+	state->pf3_tilemap_0 = tilemap_create(machine, get_pf3_tile_info,tile_shape0_scan,    16,16, 64, 16);
+	state->pf3_tilemap_1 = tilemap_create(machine, get_pf3_tile_info,tile_shape1_scan,    16,16, 32, 32);
+	state->pf3_tilemap_2 = tilemap_create(machine, get_pf3_tile_info,tile_shape2_scan,    16,16, 16, 64);
 
-	dec0_spriteram=machine->generic.spriteram.u16;
+	state->spriteram=machine->generic.spriteram.u16;
 }
 
 VIDEO_START( dec0 )
 {
+	dec0_state *state = machine->driver_data<dec0_state>();
 	VIDEO_START_CALL(dec0_nodma);
-	dec0_spriteram=auto_alloc_array(machine, UINT16, 0x800/2);
+	state->spriteram=auto_alloc_array(machine, UINT16, 0x800/2);
 }
 
 /******************************************************************************/

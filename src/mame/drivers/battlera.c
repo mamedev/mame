@@ -28,7 +28,6 @@
 #include "sound/c6280.h"
 #include "includes/battlera.h"
 
-static int control_port_select;
 
 /******************************************************************************/
 
@@ -45,12 +44,14 @@ static WRITE8_HANDLER( battlera_sound_w )
 
 static WRITE8_HANDLER( control_data_w )
 {
-	control_port_select=data;
+	battlera_state *state = space->machine->driver_data<battlera_state>();
+	state->control_port_select=data;
 }
 
 static READ8_HANDLER( control_data_r )
 {
-	switch (control_port_select)
+	battlera_state *state = space->machine->driver_data<battlera_state>();
+	switch (state->control_port_select)
 	{
 		case 0xfe: return input_port_read(space->machine, "IN0"); /* Player 1 */
 		case 0xfd: return input_port_read(space->machine, "IN1"); /* Player 2 */
@@ -83,23 +84,23 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static int msm5205next;
 
 static void battlera_adpcm_int(device_t *device)
 {
-	static int toggle;
+	battlera_state *state = device->machine->driver_data<battlera_state>();
 
-	msm5205_data_w(device,msm5205next >> 4);
-	msm5205next <<= 4;
+	msm5205_data_w(device,state->msm5205next >> 4);
+	state->msm5205next <<= 4;
 
-	toggle = 1 - toggle;
-	if (toggle)
+	state->toggle = 1 - state->toggle;
+	if (state->toggle)
 		cputag_set_input_line(device->machine, "audiocpu", 1, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( battlera_adpcm_data_w )
 {
-	msm5205next = data;
+	battlera_state *state = space->machine->driver_data<battlera_state>();
+	state->msm5205next = data;
 }
 
 static WRITE8_DEVICE_HANDLER( battlera_adpcm_reset_w )
@@ -229,7 +230,7 @@ static const c6280_interface c6280_config =
 	"audiocpu"
 };
 
-static MACHINE_CONFIG_START( battlera, driver_device )
+static MACHINE_CONFIG_START( battlera, battlera_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280,21477200/3)

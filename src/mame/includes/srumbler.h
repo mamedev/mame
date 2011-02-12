@@ -1,6 +1,18 @@
-/*----------- defined in video/srumbler.c -----------*/
+class srumbler_state : public driver_device
+{
+public:
+	srumbler_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-extern UINT8 *srumbler_backgroundram,*srumbler_foregroundram;
+	UINT8 *backgroundram;
+	UINT8 *foregroundram;
+	tilemap_t *bg_tilemap;
+	tilemap_t *fg_tilemap;
+	int scroll[4];
+};
+
+
+/*----------- defined in video/srumbler.c -----------*/
 
 WRITE8_HANDLER( srumbler_background_w );
 WRITE8_HANDLER( srumbler_foreground_w );

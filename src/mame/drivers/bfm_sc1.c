@@ -93,6 +93,39 @@ Optional (on expansion card) (Viper)
 #include "sound/upd7759.h"
 #include "machine/nvram.h"
 #include "bfm_sc1.lh"
+
+
+class bfm_sc1_state : public driver_device
+{
+public:
+	bfm_sc1_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	int mmtr_latch;
+	int triac_latch;
+	int vfd_latch;
+	int irq_status;
+	int optic_pattern;
+	int acia_status;
+	int locked;
+	int is_timer_enabled;
+	int reel_changed;
+	int coin_inhibits;
+	int mux1_outputlatch;
+	int mux1_datalo;
+	int mux1_datahi;
+	int mux1_input;
+	int mux2_outputlatch;
+	int mux2_datalo;
+	int mux2_datahi;
+	int mux2_input;
+	int watchdog_cnt;
+	int watchdog_kicked;
+	UINT8 Lamps[256];
+	UINT8 sc1_Inputs[64];
+	UINT8 codec_data[256];
+};
+
 #define VFD_RESET  0x20
 #define VFD_CLOCK1 0x80
 #define VFD_DATA   0x40
@@ -102,49 +135,27 @@ Optional (on expansion card) (Viper)
 
 // local vars /////////////////////////////////////////////////////////////
 
-static int mmtr_latch;		  // mechanical meter latch
-static int triac_latch;		  // payslide triac latch
-static int vfd_latch;		  // vfd latch
-static int irq_status;		  // custom chip IRQ status
-static int optic_pattern;     // reel optics
-static int acia_status;		  // MC6850 status
-static int locked;			  // hardware lock/unlock status (0=unlocked)
-static int is_timer_enabled;
-static int reel_changed;
-static int coin_inhibits;
-static int mux1_outputlatch;
-static int mux1_datalo;
-static int mux1_datahi;
-static int mux1_input;
 
-static int mux2_outputlatch;
-static int mux2_datalo;
-static int mux2_datahi;
-static int mux2_input;
 
-static int watchdog_cnt;
-static int watchdog_kicked;
 
 // user interface stuff ///////////////////////////////////////////////////
 
-static UINT8 Lamps[256];		  // 256 multiplexed lamps
-static UINT8 sc1_Inputs[64];		  // 64? multiplexed inputs
 
 ///////////////////////////////////////////////////////////////////////////
 
-static void Scorpion1_SetSwitchState(int strobe, int data, int state)
+static void Scorpion1_SetSwitchState(bfm_sc1_state *drvstate, int strobe, int data, int state)
 {
-	if ( state ) sc1_Inputs[strobe] |=  (1<<data);
-	else		 sc1_Inputs[strobe] &= ~(1<<data);
+	if ( state ) drvstate->sc1_Inputs[strobe] |=  (1<<data);
+	else		 drvstate->sc1_Inputs[strobe] &= ~(1<<data);
 }
 
 ///////////////////////////////////////////////////////////////////////////
 #ifdef UNUSED_FUNCTION
-static int Scorpion1_GetSwitchState(int strobe, int data)
+static int Scorpion1_GetSwitchState(bfm_sc1_state *drvstate, int strobe, int data)
 {
 	int state = 0;
 
-	if ( strobe < 7 && data < 8 ) state = (sc1_Inputs[strobe] & (1<<data))?1:0;
+	if ( strobe < 7 && data < 8 ) state = (drvstate->sc1_Inputs[strobe] & (1<<data))?1:0;
 
 	return state;
 }
@@ -160,26 +171,27 @@ static WRITE8_HANDLER( bankswitch_w )
 
 static INTERRUPT_GEN( timer_irq )
 {
-	if ( watchdog_kicked )
+	bfm_sc1_state *state = device->machine->driver_data<bfm_sc1_state>();
+	if ( state->watchdog_kicked )
 	{
-		watchdog_cnt    = 0;
-		watchdog_kicked = 0;
+		state->watchdog_cnt    = 0;
+		state->watchdog_kicked = 0;
 	}
 	else
 	{
-		watchdog_cnt++;
-		if ( watchdog_cnt > 2 )	// this is a hack, i don't know what the watchdog timeout is, 3 IRQ's works fine
+		state->watchdog_cnt++;
+		if ( state->watchdog_cnt > 2 )	// this is a hack, i don't know what the watchdog timeout is, 3 IRQ's works fine
 		{  // reset board
 			device->machine->schedule_soft_reset();// reset entire machine. CPU 0 should be enough, but that doesn't seem to work !!
 			return;
 		}
 	}
 
-	if ( is_timer_enabled )
+	if ( state->is_timer_enabled )
 	{
-		irq_status = 0x01 |0x02; //0xff;
+		state->irq_status = 0x01 |0x02; //0xff;
 
-	    sc1_Inputs[2] = input_port_read(device->machine,"STROBE0");
+	    state->sc1_Inputs[2] = input_port_read(device->machine,"STROBE0");
 
 		generic_pulse_irq_line(device->machine->device("maincpu"), M6809_IRQ_LINE);
 	}
@@ -189,9 +201,10 @@ static INTERRUPT_GEN( timer_irq )
 
 static READ8_HANDLER( irqlatch_r )
 {
-	int result = irq_status | 0x02;
+	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	int result = state->irq_status | 0x02;
 
-	irq_status = 0;
+	state->irq_status = 0;
 
 	return result;
 }
@@ -200,19 +213,20 @@ static READ8_HANDLER( irqlatch_r )
 
 static WRITE8_HANDLER( reel12_w )
 {
-	if ( locked & 0x01 )
-	{	// hardware is still locked,
-		if ( data == 0x46 ) locked &= ~0x01;
+	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	if ( state->locked & 0x01 )
+	{	// hardware is still state->locked,
+		if ( data == 0x46 ) state->locked &= ~0x01;
 	}
 	else
 	{
-		if ( stepper_update(0, data>>4) ) reel_changed |= 0x01;
-		if ( stepper_update(1, data   ) ) reel_changed |= 0x02;
+		if ( stepper_update(0, data>>4) ) state->reel_changed |= 0x01;
+		if ( stepper_update(1, data   ) ) state->reel_changed |= 0x02;
 
-		if ( stepper_optic_state(0) ) optic_pattern |=  0x01;
-		else                          optic_pattern &= ~0x01;
-		if ( stepper_optic_state(1) ) optic_pattern |=  0x02;
-		else                          optic_pattern &= ~0x02;
+		if ( stepper_optic_state(0) ) state->optic_pattern |=  0x01;
+		else                          state->optic_pattern &= ~0x01;
+		if ( stepper_optic_state(1) ) state->optic_pattern |=  0x02;
+		else                          state->optic_pattern &= ~0x02;
 	}
 	awp_draw_reel(0);
 	awp_draw_reel(1);
@@ -222,19 +236,20 @@ static WRITE8_HANDLER( reel12_w )
 
 static WRITE8_HANDLER( reel34_w )
 {
-	if ( locked & 0x02 )
-	{	// hardware is still locked,
-		if ( data == 0x42 ) locked &= ~0x02;
+	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	if ( state->locked & 0x02 )
+	{	// hardware is still state->locked,
+		if ( data == 0x42 ) state->locked &= ~0x02;
 	}
 	else
 	{
-		if ( stepper_update(2, data>>4) ) reel_changed |= 0x04;
-		if ( stepper_update(3, data   ) ) reel_changed |= 0x08;
+		if ( stepper_update(2, data>>4) ) state->reel_changed |= 0x04;
+		if ( stepper_update(3, data   ) ) state->reel_changed |= 0x08;
 
-		if ( stepper_optic_state(2) ) optic_pattern |=  0x04;
-		else                          optic_pattern &= ~0x04;
-		if ( stepper_optic_state(3) ) optic_pattern |=  0x08;
-		else                          optic_pattern &= ~0x08;
+		if ( stepper_optic_state(2) ) state->optic_pattern |=  0x04;
+		else                          state->optic_pattern &= ~0x04;
+		if ( stepper_optic_state(3) ) state->optic_pattern |=  0x08;
+		else                          state->optic_pattern &= ~0x08;
 	}
 	awp_draw_reel(2);
 	awp_draw_reel(3);
@@ -244,13 +259,14 @@ static WRITE8_HANDLER( reel34_w )
 
 static WRITE8_HANDLER( reel56_w )
 {
-	if ( stepper_update(4, data>>4) ) reel_changed |= 0x10;
-	if ( stepper_update(5, data   ) ) reel_changed |= 0x20;
+	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	if ( stepper_update(4, data>>4) ) state->reel_changed |= 0x10;
+	if ( stepper_update(5, data   ) ) state->reel_changed |= 0x20;
 
-	if ( stepper_optic_state(4) ) optic_pattern |=  0x10;
-	else                          optic_pattern &= ~0x10;
-	if ( stepper_optic_state(5) ) optic_pattern |=  0x20;
-	else                          optic_pattern &= ~0x20;
+	if ( stepper_optic_state(4) ) state->optic_pattern |=  0x10;
+	else                          state->optic_pattern &= ~0x10;
+	if ( stepper_optic_state(5) ) state->optic_pattern |=  0x20;
+	else                          state->optic_pattern &= ~0x20;
 	awp_draw_reel(5);
 	awp_draw_reel(6);
 }
@@ -261,16 +277,17 @@ static WRITE8_HANDLER( reel56_w )
 
 static WRITE8_HANDLER( mmtr_w )
 {
+	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
 	int i;
-	if ( locked & 0x04 )
-	{	// hardware is still locked,
-		locked &= ~0x04;
+	if ( state->locked & 0x04 )
+	{	// hardware is still state->locked,
+		state->locked &= ~0x04;
 	}
 	else
 	{
-		int  changed = mmtr_latch ^ data;
+		int  changed = state->mmtr_latch ^ data;
 
-		mmtr_latch = data;
+		state->mmtr_latch = data;
 
 		for (i=0; i<8; i++)
 		{
@@ -287,7 +304,8 @@ static WRITE8_HANDLER( mmtr_w )
 
 static READ8_HANDLER( mmtr_r )
 {
-	return mmtr_latch;
+	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	return state->mmtr_latch;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -308,9 +326,10 @@ static READ8_DEVICE_HANDLER( nec_r )
 
 static WRITE8_HANDLER( vfd_w )
 {
-	int changed = vfd_latch ^ data;
+	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	int changed = state->vfd_latch ^ data;
 
-	vfd_latch = data;
+	state->vfd_latch = data;
 
 	if ( changed )
 	{
@@ -388,7 +407,8 @@ static int receive_from_adder(void)
 
 static READ8_HANDLER( mux1latch_r )
 {
-	return mux1_input;
+	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	return state->mux1_input;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -409,9 +429,10 @@ static READ8_HANDLER( mux1dathi_r )
 
 static WRITE8_HANDLER( mux1latch_w )
 {
-	int changed = mux1_outputlatch ^ data;
+	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	int changed = state->mux1_outputlatch ^ data;
 	static const char *const portnames[] = { "STROBE0", "STROBE1", "STROBE2", "STROBE3", "STROBE4", "STROBE5", "STROBE6", "STROBE7" };
-	mux1_outputlatch = data;
+	state->mux1_outputlatch = data;
 
 	if ( changed & 0x08 )
 	{ // clock changed
@@ -427,8 +448,8 @@ static WRITE8_HANDLER( mux1latch_w )
 
 			for ( i = 0; i < 8; i++ )
 			{
-				Lamps[ BFM_strcnv[offset  ] ] = mux1_datalo & pattern?1:0;
-				Lamps[ BFM_strcnv[offset+8] ] = mux1_datahi & pattern?1:0;
+				state->Lamps[ BFM_strcnv[offset  ] ] = state->mux1_datalo & pattern?1:0;
+				state->Lamps[ BFM_strcnv[offset+8] ] = state->mux1_datahi & pattern?1:0;
 				pattern<<=1;
 				offset++;
 			}
@@ -437,16 +458,16 @@ static WRITE8_HANDLER( mux1latch_w )
 			{
 				for ( i = 0; i < 256; i++ )
 				{
-					output_set_lamp_value(i, Lamps[i]);
+					output_set_lamp_value(i, state->Lamps[i]);
 				}
 			}
 		}
 
 		if ( !(data & 0x08) )
 		{
-			sc1_Inputs[ input_strobe ] = input_port_read(space->machine,portnames[input_strobe]);
+			state->sc1_Inputs[ input_strobe ] = input_port_read(space->machine,portnames[input_strobe]);
 
-			mux1_input = sc1_Inputs[ input_strobe ];
+			state->mux1_input = state->sc1_Inputs[ input_strobe ];
 		}
 	}
 }
@@ -455,21 +476,24 @@ static WRITE8_HANDLER( mux1latch_w )
 
 static WRITE8_HANDLER( mux1datlo_w )
 {
-	mux1_datalo = data;
+	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	state->mux1_datalo = data;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
 static WRITE8_HANDLER( mux1dathi_w )
 {
-	mux1_datahi = data;
+	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	state->mux1_datahi = data;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
 static READ8_HANDLER( mux2latch_r )
 {
-	return mux2_input;
+	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	return state->mux2_input;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -490,9 +514,10 @@ static READ8_HANDLER( mux2dathi_r )
 
 static WRITE8_HANDLER( mux2latch_w )
 {
-	int changed = mux2_outputlatch ^ data;
+	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	int changed = state->mux2_outputlatch ^ data;
 
-	mux2_outputlatch = data;
+	state->mux2_outputlatch = data;
 
 	if ( changed & 0x08 )
 	{ // clock changed
@@ -507,8 +532,8 @@ static WRITE8_HANDLER( mux2latch_w )
 
 			for ( i = 0; i < 8; i++ )
 			{
-				Lamps[ BFM_strcnv[offset  ] ] = mux2_datalo & pattern?1:0;
-				Lamps[ BFM_strcnv[offset+8] ] = mux2_datahi & pattern?1:0;
+				state->Lamps[ BFM_strcnv[offset  ] ] = state->mux2_datalo & pattern?1:0;
+				state->Lamps[ BFM_strcnv[offset+8] ] = state->mux2_datahi & pattern?1:0;
 				pattern<<=1;
 				offset++;
 			}
@@ -516,7 +541,7 @@ static WRITE8_HANDLER( mux2latch_w )
 
 		if ( !(data & 0x08) )
 		{
-			mux2_input = 0x3F ^ optic_pattern;
+			state->mux2_input = 0x3F ^ state->optic_pattern;
 		}
 	}
 }
@@ -525,21 +550,24 @@ static WRITE8_HANDLER( mux2latch_w )
 
 static WRITE8_HANDLER( mux2datlo_w )
 {
-	mux2_datalo = data;
+	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	state->mux2_datalo = data;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
 static WRITE8_HANDLER( mux2dathi_w )
 {
-	mux2_datahi = data;
+	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	state->mux2_datahi = data;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
 static WRITE8_HANDLER( watchdog_w )
 {
-	watchdog_kicked = 1;
+	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	state->watchdog_kicked = 1;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -560,7 +588,8 @@ static WRITE8_HANDLER( aciadata_w )
 
 static READ8_HANDLER( aciastat_r )
 {
-	return acia_status;
+	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	return state->acia_status;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -576,14 +605,16 @@ static READ8_HANDLER( aciadata_r )
 
 static WRITE8_HANDLER( triac_w )
 {
-	triac_latch = data;
+	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	state->triac_latch = data;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
 static READ8_HANDLER( triac_r )
 {
-	return triac_latch;
+	bfm_sc1_state *state = space->machine->driver_data<bfm_sc1_state>();
+	return state->triac_latch;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -653,11 +684,11 @@ static const UINT8 DataDecode[]=
 	0
 };
 
-static UINT8 codec_data[256];
 
 
 static void decode_sc1(running_machine *machine,const char *rom_region)
 {
+	bfm_sc1_state *state = machine->driver_data<bfm_sc1_state>();
 	UINT8 *tmp, *rom;
 
 	rom = machine->region(rom_region)->base();
@@ -685,7 +716,7 @@ static void decode_sc1(running_machine *machine,const char *rom_region)
 				pattern <<= 1;
 			} while ( *(++tab) );
 
-		codec_data[i] = newdata;
+		state->codec_data[i] = newdata;
 		}
 
 		for ( address = 0; address < 0x10000; address++)
@@ -702,7 +733,7 @@ static void decode_sc1(running_machine *machine,const char *rom_region)
 				pattern <<= 1;
 			} while ( *(++tab) );
 
-			rom[newaddress] = codec_data[ tmp[address] ];
+			rom[newaddress] = state->codec_data[ tmp[address] ];
 		}
 		auto_free( machine, tmp );
 	}
@@ -711,21 +742,22 @@ static void decode_sc1(running_machine *machine,const char *rom_region)
 
 static MACHINE_RESET( bfm_sc1 )
 {
+	bfm_sc1_state *state = machine->driver_data<bfm_sc1_state>();
 	BFM_BD1_init(0);
-	vfd_latch         = 0;
-	mmtr_latch        = 0;
-	triac_latch       = 0;
-	irq_status        = 0;
-	is_timer_enabled  = 1;
-	coin_inhibits     = 0;
-	mux1_outputlatch  = 0x08;	// clock HIGH
-	mux1_datalo       = 0;
-	mux1_datahi		  = 0;
-	mux1_input        = 0;
-	mux2_outputlatch  = 0x08;	// clock HIGH
-	mux2_datalo       = 0;
-	mux2_datahi		  = 0;
-	mux2_input        = 0;
+	state->vfd_latch         = 0;
+	state->mmtr_latch        = 0;
+	state->triac_latch       = 0;
+	state->irq_status        = 0;
+	state->is_timer_enabled  = 1;
+	state->coin_inhibits     = 0;
+	state->mux1_outputlatch  = 0x08;	// clock HIGH
+	state->mux1_datalo       = 0;
+	state->mux1_datahi		  = 0;
+	state->mux1_input        = 0;
+	state->mux2_outputlatch  = 0x08;	// clock HIGH
+	state->mux2_datalo       = 0;
+	state->mux2_datahi		  = 0;
+	state->mux2_input        = 0;
 
 	BFM_BD1_reset(0);	// reset display1
 	BFM_BD1_reset(1);	// reset display2
@@ -741,12 +773,12 @@ static MACHINE_RESET( bfm_sc1 )
 			if ( stepper_optic_state(i) ) pattern |= 1<<i;
 		}
 
-		optic_pattern = pattern;
+		state->optic_pattern = pattern;
 
 	}
 
-	acia_status   = 0x02; // MC6850 transmit buffer empty !!!
-	locked		  = 0x07; // hardware is locked
+	state->acia_status   = 0x02; // MC6850 transmit buffer empty !!!
+	state->locked		  = 0x07; // hardware is state->locked
 
 // init rom bank ////////////////////////////////////////////////////////////////////
 	{
@@ -1240,7 +1272,7 @@ INPUT_PORTS_END
 // machine driver for scorpion1 board ///////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-static MACHINE_CONFIG_START( scorpion1, driver_device )
+static MACHINE_CONFIG_START( scorpion1, bfm_sc1_state )
 	MCFG_MACHINE_RESET(bfm_sc1)							// main scorpion1 board initialisation
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)			// 6809 CPU at 1 Mhz
 	MCFG_CPU_PROGRAM_MAP(memmap)						// setup read and write memorymap
@@ -1335,6 +1367,7 @@ ROM_END
 
 static void sc1_common_init(running_machine *machine, int reels, int decrypt)
 {
+	bfm_sc1_state *state = machine->driver_data<bfm_sc1_state>();
 	UINT8 *rom, i;
 
 	rom = machine->region("maincpu")->base();
@@ -1343,7 +1376,7 @@ static void sc1_common_init(running_machine *machine, int reels, int decrypt)
 		memcpy(&rom[0x10000], &rom[0x00000], 0x2000);
 	}
 
-	memset(sc1_Inputs, 0, sizeof(sc1_Inputs));
+	memset(state->sc1_Inputs, 0, sizeof(state->sc1_Inputs));
 
 	// setup n default 96 half step reels ///////////////////////////////////////////
 	for ( i = 0; i < reels; i++ )
@@ -1389,15 +1422,16 @@ static DRIVER_INIT(rou029)
 
 static DRIVER_INIT(clatt)
 {
+	bfm_sc1_state *state = machine->driver_data<bfm_sc1_state>();
 	sc1_common_init(machine,6,1);
 	MechMtr_config(machine,8);
 
 	BFM_BD1_init(0);
 
-	Scorpion1_SetSwitchState(3,2,1);
-	Scorpion1_SetSwitchState(3,3,1);
-	Scorpion1_SetSwitchState(3,6,1);
-	Scorpion1_SetSwitchState(4,1,1);
+	Scorpion1_SetSwitchState(state,3,2,1);
+	Scorpion1_SetSwitchState(state,3,3,1);
+	Scorpion1_SetSwitchState(state,3,6,1);
+	Scorpion1_SetSwitchState(state,4,1,1);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

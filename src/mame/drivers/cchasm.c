@@ -38,7 +38,7 @@ static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x060000, 0x060001) AM_READ_PORT("DSW") AM_WRITE(cchasm_led_w)
 	AM_RANGE(0x070000, 0x070001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xf80000, 0xf800ff) AM_READWRITE(cchasm_io_r,cchasm_io_w)
-	AM_RANGE(0xffb000, 0xffffff) AM_RAM AM_BASE(&cchasm_ram)
+	AM_RANGE(0xffb000, 0xffffff) AM_RAM AM_BASE_MEMBER(cchasm_state, ram)
 ADDRESS_MAP_END
 
 /*************************************
@@ -153,7 +153,7 @@ static const z80_daisy_config daisy_chain[] =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( cchasm, driver_device )
+static MACHINE_CONFIG_START( cchasm, cchasm_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,CCHASM_68K_CLOCK)	/* 8 MHz (from schematics) */

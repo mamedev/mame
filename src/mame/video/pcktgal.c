@@ -1,7 +1,6 @@
 #include "emu.h"
 #include "includes/pcktgal.h"
 
-static tilemap_t *bg_tilemap;
 
 PALETTE_INIT( pcktgal )
 {
@@ -36,7 +35,7 @@ WRITE8_HANDLER( pcktgal_videoram_w )
 	pcktgal_state *state = space->machine->driver_data<pcktgal_state>();
 	UINT8 *videoram = state->videoram;
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
 }
 
 WRITE8_HANDLER( pcktgal_flipscreen_w )
@@ -60,7 +59,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( pcktgal )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
+	pcktgal_state *state = machine->driver_data<pcktgal_state>();
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
 }
 
@@ -99,7 +99,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( pcktgal )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	pcktgal_state *state = screen->machine->driver_data<pcktgal_state>();
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

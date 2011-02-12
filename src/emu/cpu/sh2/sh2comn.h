@@ -148,8 +148,8 @@ typedef struct
 	UINT32 active_dma_count[2];
 
 	int     is_slave, cpu_type;
-	int  (*dma_callback_kludge)(UINT32 src, UINT32 dst, UINT32 data, int size);
-	int  (*dma_callback_fifo_data_available)(UINT32 src, UINT32 dst, UINT32 data, int size);
+	int  (*dma_callback_kludge)(device_t *device, UINT32 src, UINT32 dst, UINT32 data, int size);
+	int  (*dma_callback_fifo_data_available)(device_t *device, UINT32 src, UINT32 dst, UINT32 data, int size);
 
 	void	(*ftcsr_read_callback)(UINT32 data);
 

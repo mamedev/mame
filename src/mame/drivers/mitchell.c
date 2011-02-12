@@ -93,22 +93,20 @@ static const eeprom_interface eeprom_intf =
 	"0111"	/* erase command */
 };
 
-static UINT8 *nvram;
-static size_t nvram_size;
-
 static NVRAM_HANDLER( mitchell )
 {
+	mitchell_state *state = machine->driver_data<mitchell_state>();
 	if (read_or_write)
 	{
-		if (nvram_size)	/* Super Pang, Block Block */
-			file->write(nvram,nvram_size);	/* NVRAM */
+		if (state->nvram_size)	/* Super Pang, Block Block */
+			file->write(state->nvram,state->nvram_size);	/* NVRAM */
 	}
 	else
 	{
 		if (file)
 		{
-			if (nvram_size)	/* Super Pang, Block Block */
-				file->read(nvram,nvram_size);	/* NVRAM */
+			if (state->nvram_size)	/* Super Pang, Block Block */
+				file->read(state->nvram,state->nvram_size);	/* NVRAM */
 		}
 	}
 }
@@ -2117,7 +2115,7 @@ static DRIVER_INIT( dokaben )
 {
 	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 0;
-	nvram_size = 0;
+	state->nvram_size = 0;
 	mgakuen2_decode(machine);
 	configure_banks(machine);
 }
@@ -2125,7 +2123,7 @@ static DRIVER_INIT( pang )
 {
 	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 0;
-	nvram_size = 0;
+	state->nvram_size = 0;
 	pang_decode(machine);
 	configure_banks(machine);
 }
@@ -2133,7 +2131,7 @@ static DRIVER_INIT( pangb )
 {
 	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 0;
-	nvram_size = 0;
+	state->nvram_size = 0;
 	bootleg_decode(machine);
 	configure_banks(machine);
 }
@@ -2141,7 +2139,7 @@ static DRIVER_INIT( cworld )
 {
 	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 0;
-	nvram_size = 0;
+	state->nvram_size = 0;
 	cworld_decode(machine);
 	configure_banks(machine);
 }
@@ -2149,7 +2147,7 @@ static DRIVER_INIT( hatena )
 {
 	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 0;
-	nvram_size = 0;
+	state->nvram_size = 0;
 	hatena_decode(machine);
 	configure_banks(machine);
 }
@@ -2157,8 +2155,8 @@ static DRIVER_INIT( spang )
 {
 	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 3;
-	nvram_size = 0x80;
-	nvram = &machine->region("maincpu")->base()[0xe000];	/* NVRAM */
+	state->nvram_size = 0x80;
+	state->nvram = &machine->region("maincpu")->base()[0xe000];	/* NVRAM */
 	spang_decode(machine);
 	configure_banks(machine);
 }
@@ -2167,8 +2165,8 @@ static DRIVER_INIT( spangbl )
 {
 	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 3;
-	nvram_size = 0x80;
-	nvram = &machine->region("maincpu")->base()[0xe000];	/* NVRAM */
+	state->nvram_size = 0x80;
+	state->nvram = &machine->region("maincpu")->base()[0xe000];	/* NVRAM */
 	bootleg_decode(machine);
 	configure_banks(machine);
 }
@@ -2177,8 +2175,8 @@ static DRIVER_INIT( spangj )
 {
 	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 3;
-	nvram_size = 0x80;
-	nvram = &machine->region("maincpu")->base()[0xe000];	/* NVRAM */
+	state->nvram_size = 0x80;
+	state->nvram = &machine->region("maincpu")->base()[0xe000];	/* NVRAM */
 	spangj_decode(machine);
 	configure_banks(machine);
 }
@@ -2186,8 +2184,8 @@ static DRIVER_INIT( sbbros )
 {
 	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 3;
-	nvram_size = 0x80;
-	nvram = &machine->region("maincpu")->base()[0xe000];	/* NVRAM */
+	state->nvram_size = 0x80;
+	state->nvram = &machine->region("maincpu")->base()[0xe000];	/* NVRAM */
 	sbbros_decode(machine);
 	configure_banks(machine);
 }
@@ -2195,7 +2193,7 @@ static DRIVER_INIT( qtono1 )
 {
 	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 0;
-	nvram_size = 0;
+	state->nvram_size = 0;
 	qtono1_decode(machine);
 	configure_banks(machine);
 }
@@ -2203,7 +2201,7 @@ static DRIVER_INIT( qsangoku )
 {
 	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 0;
-	nvram_size = 0;
+	state->nvram_size = 0;
 	qsangoku_decode(machine);
 	configure_banks(machine);
 }
@@ -2219,7 +2217,7 @@ static DRIVER_INIT( mgakuen2 )
 {
 	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 1;
-	nvram_size = 0;
+	state->nvram_size = 0;
 	mgakuen2_decode(machine);
 	configure_banks(machine);
 }
@@ -2227,7 +2225,7 @@ static DRIVER_INIT( pkladies )
 {
 	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 1;
-	nvram_size = 0;
+	state->nvram_size = 0;
 	mgakuen2_decode(machine);
 	configure_banks(machine);
 }
@@ -2235,7 +2233,7 @@ static DRIVER_INIT( pkladiesbl )
 {
 	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 1;
-	nvram_size = 0;
+	state->nvram_size = 0;
 	bootleg_decode(machine);
 	configure_banks(machine);
 }
@@ -2243,7 +2241,7 @@ static DRIVER_INIT( marukin )
 {
 	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 1;
-	nvram_size = 0;
+	state->nvram_size = 0;
 	marukin_decode(machine);
 	configure_banks(machine);
 }
@@ -2251,8 +2249,8 @@ static DRIVER_INIT( block )
 {
 	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 2;
-	nvram_size = 0x80;
-	nvram = &machine->region("maincpu")->base()[0xff80];	/* NVRAM */
+	state->nvram_size = 0x80;
+	state->nvram = &machine->region("maincpu")->base()[0xff80];	/* NVRAM */
 	block_decode(machine);
 	configure_banks(machine);
 }
@@ -2260,8 +2258,8 @@ static DRIVER_INIT( blockbl )
 {
 	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 2;
-	nvram_size = 0x80;
-	nvram = &machine->region("maincpu")->base()[0xff80];	/* NVRAM */
+	state->nvram_size = 0x80;
+	state->nvram = &machine->region("maincpu")->base()[0xff80];	/* NVRAM */
 	bootleg_decode(machine);
 	configure_banks(machine);
 }

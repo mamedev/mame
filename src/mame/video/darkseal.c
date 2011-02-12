@@ -88,14 +88,8 @@ Sprites - Data East custom chip 52
 #include "emu.h"
 #include "includes/darkseal.h"
 
-UINT16 *darkseal_pf12_row,*darkseal_pf34_row;
-UINT16 *darkseal_pf1_data,*darkseal_pf2_data,*darkseal_pf3_data;
 
-static UINT16 darkseal_control_0[8];
-static UINT16 darkseal_control_1[8];
 
-static tilemap_t *pf1_tilemap,*pf2_tilemap,*pf3_tilemap;
-static int flipscreen;
 
 /***************************************************************************/
 
@@ -121,12 +115,22 @@ INLINE void get_bg_tile_info(running_machine *machine,tile_data *tileinfo,int ti
 			0);
 }
 
-static TILE_GET_INFO( get_bg_tile_info2 ) { get_bg_tile_info(machine,tileinfo,tile_index,1,darkseal_pf2_data); }
-static TILE_GET_INFO( get_bg_tile_info3 ) { get_bg_tile_info(machine,tileinfo,tile_index,2,darkseal_pf3_data); }
+static TILE_GET_INFO( get_bg_tile_info2 )
+{
+	darkseal_state *state = machine->driver_data<darkseal_state>();
+	get_bg_tile_info(machine,tileinfo,tile_index,1,state->pf2_data);
+}
+
+static TILE_GET_INFO( get_bg_tile_info3 )
+{
+	darkseal_state *state = machine->driver_data<darkseal_state>();
+	get_bg_tile_info(machine,tileinfo,tile_index,2,state->pf3_data);
+}
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int tile=darkseal_pf1_data[tile_index];
+	darkseal_state *state = machine->driver_data<darkseal_state>();
+	int tile=state->pf1_data[tile_index];
 	int color=tile >> 12;
 
 	tile=tile&0xfff;
@@ -166,6 +170,7 @@ WRITE16_HANDLER( darkseal_palette_24bit_b_w )
 
 static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	darkseal_state *state = machine->driver_data<darkseal_state>();
 	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
 	int offs;
 
@@ -206,7 +211,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 			inc = 1;
 		}
 
-		if (flipscreen)
+		if (state->flipscreen)
 		{
 			y=240-y;
 			x=240-x;
@@ -233,20 +238,23 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 
 WRITE16_HANDLER( darkseal_pf1_data_w )
 {
-	COMBINE_DATA(&darkseal_pf1_data[offset]);
-	tilemap_mark_tile_dirty(pf1_tilemap,offset);
+	darkseal_state *state = space->machine->driver_data<darkseal_state>();
+	COMBINE_DATA(&state->pf1_data[offset]);
+	tilemap_mark_tile_dirty(state->pf1_tilemap,offset);
 }
 
 WRITE16_HANDLER( darkseal_pf2_data_w )
 {
-	COMBINE_DATA(&darkseal_pf2_data[offset]);
-	tilemap_mark_tile_dirty(pf2_tilemap,offset);
+	darkseal_state *state = space->machine->driver_data<darkseal_state>();
+	COMBINE_DATA(&state->pf2_data[offset]);
+	tilemap_mark_tile_dirty(state->pf2_tilemap,offset);
 }
 
 WRITE16_HANDLER( darkseal_pf3_data_w )
 {
-	COMBINE_DATA(&darkseal_pf3_data[offset]);
-	tilemap_mark_tile_dirty(pf3_tilemap,offset);
+	darkseal_state *state = space->machine->driver_data<darkseal_state>();
+	COMBINE_DATA(&state->pf3_data[offset]);
+	tilemap_mark_tile_dirty(state->pf3_tilemap,offset);
 }
 
 WRITE16_HANDLER( darkseal_pf3b_data_w ) /* Mirror */
@@ -256,56 +264,60 @@ WRITE16_HANDLER( darkseal_pf3b_data_w ) /* Mirror */
 
 WRITE16_HANDLER( darkseal_control_0_w )
 {
-	COMBINE_DATA(&darkseal_control_0[offset]);
+	darkseal_state *state = space->machine->driver_data<darkseal_state>();
+	COMBINE_DATA(&state->control_0[offset]);
 }
 
 WRITE16_HANDLER( darkseal_control_1_w )
 {
-	COMBINE_DATA(&darkseal_control_1[offset]);
+	darkseal_state *state = space->machine->driver_data<darkseal_state>();
+	COMBINE_DATA(&state->control_1[offset]);
 }
 
 /******************************************************************************/
 
 VIDEO_START( darkseal )
 {
-	pf1_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8,64,64);
-	pf2_tilemap = tilemap_create(machine, get_bg_tile_info2,darkseal_scan,    16,16,64,64);
-	pf3_tilemap = tilemap_create(machine, get_bg_tile_info3,darkseal_scan,         16,16,64,64);
+	darkseal_state *state = machine->driver_data<darkseal_state>();
+	state->pf1_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8,64,64);
+	state->pf2_tilemap = tilemap_create(machine, get_bg_tile_info2,darkseal_scan,    16,16,64,64);
+	state->pf3_tilemap = tilemap_create(machine, get_bg_tile_info3,darkseal_scan,         16,16,64,64);
 
-	tilemap_set_transparent_pen(pf1_tilemap,0);
-	tilemap_set_transparent_pen(pf2_tilemap,0);
+	tilemap_set_transparent_pen(state->pf1_tilemap,0);
+	tilemap_set_transparent_pen(state->pf2_tilemap,0);
 }
 
 /******************************************************************************/
 
 VIDEO_UPDATE( darkseal )
 {
-	flipscreen=!(darkseal_control_0[0]&0x80);
-	tilemap_set_flip_all(screen->machine,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	darkseal_state *state = screen->machine->driver_data<darkseal_state>();
+	state->flipscreen=!(state->control_0[0]&0x80);
+	tilemap_set_flip_all(screen->machine,state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	/* Update scroll registers */
-	tilemap_set_scrollx( pf1_tilemap,0, darkseal_control_1[3] );
-	tilemap_set_scrolly( pf1_tilemap,0, darkseal_control_1[4] );
-	tilemap_set_scrollx( pf2_tilemap,0, darkseal_control_1[1]);
-	tilemap_set_scrolly( pf2_tilemap,0, darkseal_control_1[2] );
+	tilemap_set_scrollx( state->pf1_tilemap,0, state->control_1[3] );
+	tilemap_set_scrolly( state->pf1_tilemap,0, state->control_1[4] );
+	tilemap_set_scrollx( state->pf2_tilemap,0, state->control_1[1]);
+	tilemap_set_scrolly( state->pf2_tilemap,0, state->control_1[2] );
 
-	if (darkseal_control_0[6]&0x4000) { /* Rowscroll enable */
-		int offs,scrollx=darkseal_control_0[3];
+	if (state->control_0[6]&0x4000) { /* Rowscroll enable */
+		int offs,scrollx=state->control_0[3];
 
-		tilemap_set_scroll_rows(pf3_tilemap,512);
+		tilemap_set_scroll_rows(state->pf3_tilemap,512);
 		for (offs = 0;offs < 512;offs++)
-			tilemap_set_scrollx( pf3_tilemap,offs, scrollx + darkseal_pf34_row[offs+0x40] );
+			tilemap_set_scrollx( state->pf3_tilemap,offs, scrollx + state->pf34_row[offs+0x40] );
 	}
 	else {
-		tilemap_set_scroll_rows(pf3_tilemap,1);
-		tilemap_set_scrollx( pf3_tilemap,0, darkseal_control_0[3] );
+		tilemap_set_scroll_rows(state->pf3_tilemap,1);
+		tilemap_set_scrollx( state->pf3_tilemap,0, state->control_0[3] );
 	}
-	tilemap_set_scrolly( pf3_tilemap,0, darkseal_control_0[4] );
+	tilemap_set_scrolly( state->pf3_tilemap,0, state->control_0[4] );
 
-	tilemap_draw(bitmap,cliprect,pf3_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,pf2_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->pf3_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->pf2_tilemap,0,0);
 	draw_sprites(screen->machine,bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->pf1_tilemap,0,0);
 	return 0;
 }
 

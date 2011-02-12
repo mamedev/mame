@@ -43,18 +43,18 @@ TODO:
 
 ***************************************************************************/
 
-static int oki_bank;
 
 static WRITE16_HANDLER( powerins_okibank_w )
 {
+	powerins_state *state = space->machine->driver_data<powerins_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		UINT8 *RAM = space->machine->region("oki1")->base();
 		int new_bank = data & 0x7;
 
-		if (new_bank != oki_bank)
+		if (new_bank != state->oki_bank)
 		{
-			oki_bank = new_bank;
+			state->oki_bank = new_bank;
 			memcpy(&RAM[0x30000],&RAM[0x40000 + 0x10000*new_bank],0x10000);
 		}
 	}
@@ -84,9 +84,9 @@ static ADDRESS_MAP_START( powerins_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x10001e, 0x10001f) AM_WRITE(powerins_soundlatch_w)								// Sound Latch
 	AM_RANGE(0x100030, 0x100031) AM_WRITE(powerins_okibank_w)									// Sound
 	AM_RANGE(0x120000, 0x120fff) AM_RAM_WRITE(powerins_paletteram16_w) AM_BASE_GENERIC(paletteram)	// Palette
-	AM_RANGE(0x130000, 0x130007) AM_RAM AM_BASE(&powerins_vctrl_0)								// VRAM 0 Control
-	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE(powerins_vram_0_w) AM_BASE(&powerins_vram_0)		// VRAM 0
-	AM_RANGE(0x170000, 0x170fff) AM_RAM_WRITE(powerins_vram_1_w) AM_BASE(&powerins_vram_1)		// VRAM 1
+	AM_RANGE(0x130000, 0x130007) AM_RAM AM_BASE_MEMBER(powerins_state, vctrl_0)								// VRAM 0 Control
+	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE(powerins_vram_0_w) AM_BASE_MEMBER(powerins_state, vram_0)		// VRAM 0
+	AM_RANGE(0x170000, 0x170fff) AM_RAM_WRITE(powerins_vram_1_w) AM_BASE_MEMBER(powerins_state, vram_1)		// VRAM 1
 	AM_RANGE(0x171000, 0x171fff) AM_WRITE(powerins_vram_1_w)									// Mirror of VRAM 1?
 	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_BASE_GENERIC(spriteram)									// RAM + Sprites
 ADDRESS_MAP_END
@@ -105,9 +105,9 @@ static ADDRESS_MAP_START( powerina_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100030, 0x100031) AM_WRITE(powerins_okibank_w)									// Sound
 	AM_RANGE(0x10003e, 0x10003f) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x00ff)		// (used by powerina)
 	AM_RANGE(0x120000, 0x120fff) AM_RAM_WRITE(powerins_paletteram16_w) AM_BASE_GENERIC(paletteram)	// Palette
-	AM_RANGE(0x130000, 0x130007) AM_RAM AM_BASE(&powerins_vctrl_0)								// VRAM 0 Control
-	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE(powerins_vram_0_w) AM_BASE(&powerins_vram_0)		// VRAM 0
-	AM_RANGE(0x170000, 0x170fff) AM_RAM_WRITE(powerins_vram_1_w) AM_BASE(&powerins_vram_1)		// VRAM 1
+	AM_RANGE(0x130000, 0x130007) AM_RAM AM_BASE_MEMBER(powerins_state, vctrl_0)								// VRAM 0 Control
+	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE(powerins_vram_0_w) AM_BASE_MEMBER(powerins_state, vram_0)		// VRAM 0
+	AM_RANGE(0x170000, 0x170fff) AM_RAM_WRITE(powerins_vram_1_w) AM_BASE_MEMBER(powerins_state, vram_1)		// VRAM 1
 	AM_RANGE(0x171000, 0x171fff) AM_WRITE(powerins_vram_1_w)									// Mirror of VRAM 1?
 	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_BASE_GENERIC(spriteram)									// RAM + Sprites
 ADDRESS_MAP_END
@@ -315,7 +315,8 @@ GFXDECODE_END
 
 static MACHINE_RESET( powerins )
 {
-	oki_bank = -1;	// samples bank "unitialised"
+	powerins_state *state = machine->driver_data<powerins_state>();
+	state->oki_bank = -1;	// samples bank "unitialised"
 }
 
 static void irqhandler(device_t *device, int irq)
@@ -339,7 +340,7 @@ static const nmk112_interface powerins_nmk112_intf =
 };
 
 
-static MACHINE_CONFIG_START( powerins, driver_device )
+static MACHINE_CONFIG_START( powerins, powerins_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)	/* 12MHz */

@@ -51,6 +51,10 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	laserdisc_device *laserdisc;
+	UINT8 last_misc;
+	UINT8 laserdisc_type;
+	UINT8 laserdisc_data;
 };
 
 
@@ -76,11 +80,7 @@ public:
  *
  *************************************/
 
-static laserdisc_device *laserdisc;
-static UINT8 last_misc;
 
-static UINT8 laserdisc_type;
-static UINT8 laserdisc_data;
 
 static const UINT8 led_map[16] =
 	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x77,0x7c,0x39,0x5e,0x79,0x00 };
@@ -101,15 +101,17 @@ static void dleuro_interrupt(device_t *device, int state)
 
 static WRITE8_DEVICE_HANDLER( serial_transmit )
 {
-	laserdisc_data_w(laserdisc, data);
+	dlair_state *state = device->machine->driver_data<dlair_state>();
+	laserdisc_data_w(state->laserdisc, data);
 }
 
 
 static int serial_receive(device_t *device, int channel)
 {
+	dlair_state *state = device->machine->driver_data<dlair_state>();
 	/* if we still have data to send, do it now */
-	if (channel == 0 && laserdisc_line_r(laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
-		return laserdisc_data_r(laserdisc);
+	if (channel == 0 && laserdisc_line_r(state->laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
+		return laserdisc_data_r(state->laserdisc);
 
 	return -1;
 }
@@ -197,17 +199,19 @@ static VIDEO_UPDATE( dleuro )
 
 static MACHINE_START( dlair )
 {
-	laserdisc = machine->device<laserdisc_device>("laserdisc");
+	dlair_state *state = machine->driver_data<dlair_state>();
+	state->laserdisc = machine->device<laserdisc_device>("laserdisc");
 }
 
 
 static MACHINE_RESET( dlair )
 {
+	dlair_state *state = machine->driver_data<dlair_state>();
 	/* determine the laserdisc player from the DIP switches */
-	if (laserdisc_type == LASERDISC_TYPE_VARIABLE)
+	if (state->laserdisc_type == LASERDISC_TYPE_VARIABLE)
 	{
 		int newtype = (input_port_read(machine, "DSW2") & 0x08) ? LASERDISC_TYPE_PIONEER_LDV1000 : LASERDISC_TYPE_PIONEER_PR7820;
-		laserdisc_set_type(laserdisc, newtype);
+		laserdisc_set_type(state->laserdisc, newtype);
 	}
 }
 
@@ -241,6 +245,7 @@ static INTERRUPT_GEN( vblank_callback )
 
 static WRITE8_HANDLER( misc_w )
 {
+	dlair_state *state = space->machine->driver_data<dlair_state>();
 	/*
         D0-D3 = B0-B3
            D4 = coin counter
@@ -248,22 +253,23 @@ static WRITE8_HANDLER( misc_w )
            D6 = ENTER
            D7 = INT/EXT
     */
-	UINT8 diff = data ^ last_misc;
-	last_misc = data;
+	UINT8 diff = data ^ state->last_misc;
+	state->last_misc = data;
 
 	coin_counter_w(space->machine, 0, (~data >> 4) & 1);
 
 	/* on bit 5 going low, push the data out to the laserdisc player */
 	if ((diff & 0x20) && !(data & 0x20))
-		laserdisc_data_w(laserdisc, laserdisc_data);
+		laserdisc_data_w(state->laserdisc, state->laserdisc_data);
 
 	/* on bit 6 going low, we need to signal enter */
-	laserdisc_line_w(laserdisc, LASERDISC_LINE_ENTER, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+	laserdisc_line_w(state->laserdisc, LASERDISC_LINE_ENTER, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
 static WRITE8_HANDLER( dleuro_misc_w )
 {
+	dlair_state *state = space->machine->driver_data<dlair_state>();
 	/*
            D0 = CHAR GEN ON+
            D1 = KILL VIDEO+
@@ -274,18 +280,18 @@ static WRITE8_HANDLER( dleuro_misc_w )
            D6 = ENTER
            D7 = INT/EXT
     */
-	UINT8 diff = data ^ last_misc;
-	last_misc = data;
+	UINT8 diff = data ^ state->last_misc;
+	state->last_misc = data;
 
 	coin_counter_w(space->machine, 1, (~data >> 3) & 1);
 	coin_counter_w(space->machine, 0, (~data >> 4) & 1);
 
 	/* on bit 5 going low, push the data out to the laserdisc player */
 	if ((diff & 0x20) && !(data & 0x20))
-		laserdisc_data_w(laserdisc, laserdisc_data);
+		laserdisc_data_w(state->laserdisc, state->laserdisc_data);
 
 	/* on bit 6 going low, we need to signal enter */
-	laserdisc_line_w(laserdisc, LASERDISC_LINE_ENTER, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+	laserdisc_line_w(state->laserdisc, LASERDISC_LINE_ENTER, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -310,13 +316,14 @@ static WRITE8_HANDLER( led_den2_w )
 
 static CUSTOM_INPUT( laserdisc_status_r )
 {
-	switch (laserdisc_get_type(laserdisc))
+	dlair_state *state = field->port->machine->driver_data<dlair_state>();
+	switch (laserdisc_get_type(state->laserdisc))
 	{
 		case LASERDISC_TYPE_PIONEER_PR7820:
 			return 0;
 
 		case LASERDISC_TYPE_PIONEER_LDV1000:
-			return (laserdisc_line_r(laserdisc, LASERDISC_LINE_STATUS) == ASSERT_LINE) ? 0 : 1;
+			return (laserdisc_line_r(state->laserdisc, LASERDISC_LINE_STATUS) == ASSERT_LINE) ? 0 : 1;
 
 		case LASERDISC_TYPE_PHILLIPS_22VP932:
 			return 0;
@@ -327,13 +334,14 @@ static CUSTOM_INPUT( laserdisc_status_r )
 
 static CUSTOM_INPUT( laserdisc_command_r )
 {
-	switch (laserdisc_get_type(laserdisc))
+	dlair_state *state = field->port->machine->driver_data<dlair_state>();
+	switch (laserdisc_get_type(state->laserdisc))
 	{
 		case LASERDISC_TYPE_PIONEER_PR7820:
-			return (laserdisc_line_r(laserdisc, LASERDISC_LINE_READY) == ASSERT_LINE) ? 0 : 1;
+			return (laserdisc_line_r(state->laserdisc, LASERDISC_LINE_READY) == ASSERT_LINE) ? 0 : 1;
 
 		case LASERDISC_TYPE_PIONEER_LDV1000:
-			return (laserdisc_line_r(laserdisc, LASERDISC_LINE_COMMAND) == ASSERT_LINE) ? 0 : 1;
+			return (laserdisc_line_r(state->laserdisc, LASERDISC_LINE_COMMAND) == ASSERT_LINE) ? 0 : 1;
 
 		case LASERDISC_TYPE_PHILLIPS_22VP932:
 			return 0;
@@ -344,7 +352,8 @@ static CUSTOM_INPUT( laserdisc_command_r )
 
 static READ8_HANDLER( laserdisc_r )
 {
-	UINT8 result = laserdisc_data_r(laserdisc);
+	dlair_state *state = space->machine->driver_data<dlair_state>();
+	UINT8 result = laserdisc_data_r(state->laserdisc);
 	mame_printf_debug("laserdisc_r = %02X\n", result);
 	return result;
 }
@@ -352,7 +361,8 @@ static READ8_HANDLER( laserdisc_r )
 
 static WRITE8_HANDLER( laserdisc_w )
 {
-	laserdisc_data = data;
+	dlair_state *state = space->machine->driver_data<dlair_state>();
+	state->laserdisc_data = data;
 }
 
 
@@ -939,13 +949,15 @@ ROM_END
 
 static DRIVER_INIT( fixed )
 {
-	laserdisc_type = LASERDISC_TYPE_FIXED;
+	dlair_state *state = machine->driver_data<dlair_state>();
+	state->laserdisc_type = LASERDISC_TYPE_FIXED;
 }
 
 
 static DRIVER_INIT( variable )
 {
-	laserdisc_type = LASERDISC_TYPE_VARIABLE;
+	dlair_state *state = machine->driver_data<dlair_state>();
+	state->laserdisc_type = LASERDISC_TYPE_VARIABLE;
 }
 
 

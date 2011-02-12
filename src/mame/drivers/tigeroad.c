@@ -27,7 +27,6 @@ Memory Overview:
 #include "includes/tigeroad.h"
 
 
-static UINT16 *ram16;
 
 /*
  F1 Dream protection code written by Eric Hustvedt (hustvedt@ma.ultranet.com).
@@ -82,6 +81,7 @@ static const int f1dream_2450_lookup[32] = {
 
 static void f1dream_protection_w(address_space *space)
 {
+	tigeroad_state *state = space->machine->driver_data<tigeroad_state>();
 	int indx;
 	int value = 255;
 	int prevpc = cpu_get_previouspc(space->cpu);
@@ -89,63 +89,64 @@ static void f1dream_protection_w(address_space *space)
 	if (prevpc == 0x244c)
 	{
 		/* Called once, when a race is started.*/
-		indx = ram16[0x3ff0/2];
-		ram16[0x3fe6/2] = f1dream_2450_lookup[indx];
-		ram16[0x3fe8/2] = f1dream_2450_lookup[++indx];
-		ram16[0x3fea/2] = f1dream_2450_lookup[++indx];
-		ram16[0x3fec/2] = f1dream_2450_lookup[++indx];
+		indx = state->ram16[0x3ff0/2];
+		state->ram16[0x3fe6/2] = f1dream_2450_lookup[indx];
+		state->ram16[0x3fe8/2] = f1dream_2450_lookup[++indx];
+		state->ram16[0x3fea/2] = f1dream_2450_lookup[++indx];
+		state->ram16[0x3fec/2] = f1dream_2450_lookup[++indx];
 	}
 	else if (prevpc == 0x613a)
 	{
 		/* Called for every sprite on-screen.*/
-		if (ram16[0x3ff6/2] < 15)
+		if (state->ram16[0x3ff6/2] < 15)
 		{
-			indx = f1dream_613ea_lookup[ram16[0x3ff6/2]] - ram16[0x3ff4/2];
+			indx = f1dream_613ea_lookup[state->ram16[0x3ff6/2]] - state->ram16[0x3ff4/2];
 			if (indx > 255)
 			{
 				indx <<= 4;
-				indx += ram16[0x3ff6/2] & 0x00ff;
+				indx += state->ram16[0x3ff6/2] & 0x00ff;
 				value = f1dream_613eb_lookup[indx];
 			}
 		}
 
-		ram16[0x3ff2/2] = value;
+		state->ram16[0x3ff2/2] = value;
 	}
 	else if (prevpc == 0x17b70)
 	{
 		/* Called only before a real race, not a time trial.*/
-		if (ram16[0x3ff0/2] >= 0x04) indx = 128;
-		else if (ram16[0x3ff0/2] > 0x02) indx = 96;
-		else if (ram16[0x3ff0/2] == 0x02) indx = 64;
-		else if (ram16[0x3ff0/2] == 0x01) indx = 32;
+		if (state->ram16[0x3ff0/2] >= 0x04) indx = 128;
+		else if (state->ram16[0x3ff0/2] > 0x02) indx = 96;
+		else if (state->ram16[0x3ff0/2] == 0x02) indx = 64;
+		else if (state->ram16[0x3ff0/2] == 0x01) indx = 32;
 		else indx = 0;
 
-		indx += ram16[0x3fee/2];
+		indx += state->ram16[0x3fee/2];
 		if (indx < 128)
 		{
-			ram16[0x3fe6/2] = f1dream_17b74_lookup[indx];
-			ram16[0x3fe8/2] = f1dream_17b74_lookup[++indx];
-			ram16[0x3fea/2] = f1dream_17b74_lookup[++indx];
-			ram16[0x3fec/2] = f1dream_17b74_lookup[++indx];
+			state->ram16[0x3fe6/2] = f1dream_17b74_lookup[indx];
+			state->ram16[0x3fe8/2] = f1dream_17b74_lookup[++indx];
+			state->ram16[0x3fea/2] = f1dream_17b74_lookup[++indx];
+			state->ram16[0x3fec/2] = f1dream_17b74_lookup[++indx];
 		}
 		else
 		{
-			ram16[0x3fe6/2] = 0x00ff;
-			ram16[0x3fe8/2] = 0x00ff;
-			ram16[0x3fea/2] = 0x00ff;
-			ram16[0x3fec/2] = 0x00ff;
+			state->ram16[0x3fe6/2] = 0x00ff;
+			state->ram16[0x3fe8/2] = 0x00ff;
+			state->ram16[0x3fea/2] = 0x00ff;
+			state->ram16[0x3fec/2] = 0x00ff;
 		}
 	}
 	else if ((prevpc == 0x27f8) || (prevpc == 0x511a) || (prevpc == 0x5142) || (prevpc == 0x516a))
 	{
 		/* The main CPU stuffs the byte for the soundlatch into 0xfffffd.*/
-		soundlatch_w(space,2,ram16[0x3ffc/2]);
+		soundlatch_w(space,2,state->ram16[0x3ffc/2]);
 	}
 }
 
 static WRITE16_HANDLER( f1dream_control_w )
 {
-	logerror("protection write, PC: %04x  FFE1 Value:%01x\n",cpu_get_pc(space->cpu), ram16[0x3fe0/2]);
+	tigeroad_state *state = space->machine->driver_data<tigeroad_state>();
+	logerror("protection write, PC: %04x  FFE1 Value:%01x\n",cpu_get_pc(space->cpu), state->ram16[0x3fe0/2]);
 	f1dream_protection_w(space);
 }
 
@@ -178,7 +179,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfe8000, 0xfe8003) AM_WRITE(tigeroad_scroll_w)
 	AM_RANGE(0xfe800e, 0xfe800f) AM_WRITEONLY    /* fe800e = watchdog or IRQ acknowledge */
 	AM_RANGE(0xff8200, 0xff867f) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_BASE(&ram16)
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_BASE_MEMBER(tigeroad_state, ram16)
 ADDRESS_MAP_END
 
 

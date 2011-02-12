@@ -104,11 +104,6 @@
 #include "cpu/sh2/sh2.h"
 #include "includes/deco_mlc.h"
 
-static UINT32 *mlc_ram, *irq_ram;
-static timer_device *raster_irq_timer;
-static int mainCpuIsArm;
-static int mlc_raster_table[9][256];
-static UINT32 vbl_i;
 
 /***************************************************************************/
 
@@ -158,10 +153,11 @@ static WRITE32_HANDLER( avengrs_palette_w )
 
 static READ32_HANDLER( decomlc_vbl_r )
 {
-	vbl_i ^=0xffffffff;
+	deco_mlc_state *state = space->machine->driver_data<deco_mlc_state>();
+	state->vbl_i ^=0xffffffff;
 //logerror("vbl r %08x\n", cpu_get_pc(space->cpu));
 	// Todo: Vblank probably in $10
-	return vbl_i;
+	return state->vbl_i;
 }
 
 static READ32_HANDLER( mlc_scanline_r )
@@ -172,24 +168,25 @@ static READ32_HANDLER( mlc_scanline_r )
 
 static TIMER_DEVICE_CALLBACK( interrupt_gen )
 {
+	deco_mlc_state *state = timer.machine->driver_data<deco_mlc_state>();
 //  logerror("hit scanline IRQ %d (%08x)\n", machine->primary_screen->vpos(), info.i);
-	cputag_set_input_line(timer.machine, "maincpu", mainCpuIsArm ? ARM_IRQ_LINE : 1, HOLD_LINE);
+	cputag_set_input_line(timer.machine, "maincpu", state->mainCpuIsArm ? ARM_IRQ_LINE : 1, HOLD_LINE);
 }
 
 static WRITE32_HANDLER( mlc_irq_w )
 {
-	static int lastScanline[9]={ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	deco_mlc_state *state = space->machine->driver_data<deco_mlc_state>();
 	int scanline=space->machine->primary_screen->vpos();
-	irq_ram[offset]=data&0xffff;
+	state->irq_ram[offset]=data&0xffff;
 
 	switch (offset*4)
 	{
 	case 0x10: /* IRQ ack.  Value written doesn't matter */
-		cputag_set_input_line(space->machine, "maincpu", mainCpuIsArm ? ARM_IRQ_LINE : 1, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", state->mainCpuIsArm ? ARM_IRQ_LINE : 1, CLEAR_LINE);
 		return;
 	case 0x14: /* Prepare scanline interrupt */
-		raster_irq_timer->adjust(space->machine->primary_screen->time_until_pos(irq_ram[0x14/4]));
-		//logerror("prepare scanline to fire at %d (currently on %d)\n", irq_ram[0x14/4], space->machine->primary_screen->vpos());
+		state->raster_irq_timer->adjust(space->machine->primary_screen->time_until_pos(state->irq_ram[0x14/4]));
+		//logerror("prepare scanline to fire at %d (currently on %d)\n", state->irq_ram[0x14/4], space->machine->primary_screen->vpos());
 		return;
 	case 0x18:
 	case 0x1c:
@@ -203,17 +200,17 @@ static WRITE32_HANDLER( mlc_irq_w )
 		if (scanline > 255)
 			scanline = 255;
 		/* Update scanlines up to present line */
-		while (lastScanline[offset-6]<scanline)
+		while (state->lastScanline[offset-6]<scanline)
 		{
-			mlc_raster_table[offset-6][lastScanline[offset-6]+1]=mlc_raster_table[offset-6][lastScanline[offset-6]];
-			lastScanline[offset-6]++;
+			state->mlc_raster_table[offset-6][state->lastScanline[offset-6]+1]=state->mlc_raster_table[offset-6][state->lastScanline[offset-6]];
+			state->lastScanline[offset-6]++;
 		}
 
-		if (lastScanline[offset-6] > scanline)
-			lastScanline[offset-6]=0;
+		if (state->lastScanline[offset-6] > scanline)
+			state->lastScanline[offset-6]=0;
 
 		/* Set current scanline value */
-		mlc_raster_table[offset-6][scanline]=data&0xffff;
+		state->mlc_raster_table[offset-6][scanline]=data&0xffff;
 		break;
 
 	default:
@@ -230,7 +227,8 @@ static READ32_HANDLER(mlc_spriteram_r)
 
 static READ32_HANDLER(mlc_vram_r)
 {
-	return mlc_vram[offset]&0xffff;
+	deco_mlc_state *state = space->machine->driver_data<deco_mlc_state>();
+	return state->mlc_vram[offset]&0xffff;
 }
 
 static READ32_HANDLER(stadhr96_prot_146_r)
@@ -262,15 +260,15 @@ static READ32_HANDLER(stadhr96_prot_146_r)
 
 static ADDRESS_MAP_START( decomlc_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x0000000, 0x00fffff) AM_ROM AM_MIRROR(0xff000000)
-	AM_RANGE(0x0100000, 0x011ffff) AM_RAM AM_BASE(&mlc_ram) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0100000, 0x011ffff) AM_RAM AM_BASE_MEMBER(deco_mlc_state, mlc_ram) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0200000, 0x020000f) AM_READNOP AM_MIRROR(0xff000000)/* IRQ control? */
 	AM_RANGE(0x0200070, 0x0200073) AM_READ(decomlc_vbl_r) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0200074, 0x0200077) AM_READ(mlc_scanline_r) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0200078, 0x020007f) AM_READ(test2_r)	AM_MIRROR(0xff000000)
-	AM_RANGE(0x0200000, 0x020007f) AM_WRITE(mlc_irq_w) AM_BASE(&irq_ram) AM_MIRROR(0xff000000)
-	AM_RANGE(0x0200080, 0x02000ff) AM_RAM AM_BASE(&mlc_clip_ram) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0200000, 0x020007f) AM_WRITE(mlc_irq_w) AM_BASE_MEMBER(deco_mlc_state, irq_ram) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0200080, 0x02000ff) AM_RAM AM_BASE_MEMBER(deco_mlc_state, mlc_clip_ram) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0204000, 0x0206fff) AM_RAM_READ(mlc_spriteram_r) AM_BASE_SIZE_GENERIC(spriteram) AM_MIRROR(0xff000000)
-	AM_RANGE(0x0280000, 0x029ffff) AM_RAM_READ(mlc_vram_r) AM_BASE(&mlc_vram) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0280000, 0x029ffff) AM_RAM_READ(mlc_vram_r) AM_BASE_MEMBER(deco_mlc_state, mlc_vram) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0300000, 0x0307fff) AM_RAM_WRITE(avengrs_palette_w) AM_BASE_GENERIC(paletteram) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0400000, 0x0400003) AM_READ_PORT("INPUTS") AM_MIRROR(0xff000000)
 	AM_RANGE(0x0440000, 0x044001f) AM_READ(test3_r)	AM_MIRROR(0xff000000)
@@ -374,11 +372,12 @@ GFXDECODE_END
 
 static MACHINE_RESET( mlc )
 {
-	vbl_i = 0xffffffff;
-	raster_irq_timer = machine->device<timer_device>("int_timer");
+	deco_mlc_state *state = machine->driver_data<deco_mlc_state>();
+	state->vbl_i = 0xffffffff;
+	state->raster_irq_timer = machine->device<timer_device>("int_timer");
 }
 
-static MACHINE_CONFIG_START( avengrgs, driver_device )
+static MACHINE_CONFIG_START( avengrgs, deco_mlc_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2,42000000/2) /* 21 MHz clock confirmed on real board */
@@ -411,7 +410,7 @@ static MACHINE_CONFIG_START( avengrgs, driver_device )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mlc, driver_device )
+static MACHINE_CONFIG_START( mlc, deco_mlc_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM,42000000/6) /* 42 MHz -> 7MHz clock confirmed on real board */
@@ -725,7 +724,8 @@ static void descramble_sound( running_machine *machine )
 
 static READ32_HANDLER( avengrgs_speedup_r )
 {
-	UINT32 a=mlc_ram[0x89a0/4];
+	deco_mlc_state *state = space->machine->driver_data<deco_mlc_state>();
+	UINT32 a=state->mlc_ram[0x89a0/4];
 	UINT32 p=cpu_get_pc(space->cpu);
 
 	if ((p==0x3234 || p==0x32dc) && (a&1)) cpu_spinuntil_int(space->cpu);
@@ -735,6 +735,7 @@ static READ32_HANDLER( avengrgs_speedup_r )
 
 static DRIVER_INIT( avengrgs )
 {
+	deco_mlc_state *state = machine->driver_data<deco_mlc_state>();
 	// init options
 	sh2drc_set_options(machine->device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 
@@ -742,18 +743,19 @@ static DRIVER_INIT( avengrgs )
 	sh2drc_add_pcflush(machine->device("maincpu"), 0x3234);
 	sh2drc_add_pcflush(machine->device("maincpu"), 0x32dc);
 
-	mainCpuIsArm = 0;
+	state->mainCpuIsArm = 0;
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01089a0, 0x01089a3, 0, 0, avengrgs_speedup_r );
 	descramble_sound(machine);
 }
 
 static DRIVER_INIT( mlc )
 {
+	deco_mlc_state *state = machine->driver_data<deco_mlc_state>();
 	/* The timing in the ARM core isn't as accurate as it should be, so bump up the
         effective clock rate here to compensate otherwise we have slowdowns in
         Skull Fung where there probably shouldn't be. */
 	machine->device("maincpu")->set_clock_scale(2.0f);
-	mainCpuIsArm = 1;
+	state->mainCpuIsArm = 1;
 	deco156_decrypt(machine);
 	descramble_sound(machine);
 }

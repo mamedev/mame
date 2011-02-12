@@ -5,6 +5,9 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	int msm5205next;
+	int toggle;
+	tilemap_t *bg_tilemap;
 };
 
 

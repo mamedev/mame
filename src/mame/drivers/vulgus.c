@@ -63,13 +63,13 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_w)
-	AM_RANGE(0xc802, 0xc803) AM_RAM AM_BASE(&vulgus_scroll_low)
+	AM_RANGE(0xc802, 0xc803) AM_RAM AM_BASE_MEMBER(vulgus_state, scroll_low)
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(vulgus_c804_w)
 	AM_RANGE(0xc805, 0xc805) AM_WRITE(vulgus_palette_bank_w)
-	AM_RANGE(0xc902, 0xc903) AM_RAM AM_BASE(&vulgus_scroll_high)
+	AM_RANGE(0xc902, 0xc903) AM_RAM AM_BASE_MEMBER(vulgus_state, scroll_high)
 	AM_RANGE(0xcc00, 0xcc7f) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(vulgus_fgvideoram_w) AM_BASE(&vulgus_fgvideoram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(vulgus_bgvideoram_w) AM_BASE(&vulgus_bgvideoram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(vulgus_fgvideoram_w) AM_BASE_MEMBER(vulgus_state, fgvideoram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(vulgus_bgvideoram_w) AM_BASE_MEMBER(vulgus_state, bgvideoram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
@@ -217,7 +217,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( vulgus, driver_device )
+static MACHINE_CONFIG_START( vulgus, vulgus_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz (?) */

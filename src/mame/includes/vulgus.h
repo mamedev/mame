@@ -1,8 +1,20 @@
-/*----------- defined in video/vulgus.c -----------*/
+class vulgus_state : public driver_device
+{
+public:
+	vulgus_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-extern UINT8 *vulgus_fgvideoram;
-extern UINT8 *vulgus_bgvideoram;
-extern UINT8 *vulgus_scroll_low,*vulgus_scroll_high;
+	UINT8 *fgvideoram;
+	UINT8 *bgvideoram;
+	UINT8 *scroll_low;
+	UINT8 *scroll_high;
+	int palette_bank;
+	tilemap_t *fg_tilemap;
+	tilemap_t *bg_tilemap;
+};
+
+
+/*----------- defined in video/vulgus.c -----------*/
 
 WRITE8_HANDLER( vulgus_fgvideoram_w );
 WRITE8_HANDLER( vulgus_bgvideoram_w );

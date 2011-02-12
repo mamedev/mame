@@ -888,8 +888,6 @@ static READ8_HANDLER( prot_io_r )
 	return 0x00;
 }
 
-static UINT8 semicom_prot_offset = 0x00;
-static UINT16 protbase = 0x0000;
 
 // probably not endian safe
 static WRITE8_HANDLER( prot_io_w )
@@ -900,25 +898,25 @@ static WRITE8_HANDLER( prot_io_w )
 	{
 		case 0x00:
 		{
-			UINT16 word = state->mainram[(protbase/2) + semicom_prot_offset];
+			UINT16 word = state->mainram[(state->protbase/2) + state->semicom_prot_offset];
 			word = (word & 0xff00) | (data << 0);
-			state->mainram[(protbase/2) + semicom_prot_offset] = word;
+			state->mainram[(state->protbase/2) + state->semicom_prot_offset] = word;
 
 			break;
 		}
 
 		case 0x01:
 		{
-			UINT16 word = state->mainram[(protbase/2) + semicom_prot_offset];
+			UINT16 word = state->mainram[(state->protbase/2) + state->semicom_prot_offset];
 			word = (word & 0x00ff) | (data << 8);
-			state->mainram[(protbase/2) + semicom_prot_offset] = word;
+			state->mainram[(state->protbase/2) + state->semicom_prot_offset] = word;
 
 			break;
 		}
 
 		case 0x02: // offset
 		{
-			semicom_prot_offset = data;
+			state->semicom_prot_offset = data;
 			break;
 		}
 
@@ -3443,7 +3441,7 @@ static DRIVER_INIT( htchctch )
 	int i, len = machine->region("user1")->bytes();
 	/* simulate RAM initialization done by the protection MCU */
 	/* verified on real hardware */
-//  static UINT16 htchctch_mcu68k[] =
+//  static const UINT16 htchctch_mcu68k[] =
 //  {
 //      /* moved to protdata.bin file .. */
 //  };
@@ -3744,18 +3742,20 @@ static DRIVER_INIT( chokchok )
 
 static DRIVER_INIT( wlstar )
 {
+	tumbleb_state *state = machine->driver_data<tumbleb_state>();
 	tumblepb_gfx1_rearrange(machine);
 
 	/* slightly different banking */
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x100002, 0x100003, 0, 0, wlstar_tilebank_w);
 
-	protbase = 0x0000;
+	state->protbase = 0x0000;
 }
 
 static DRIVER_INIT( wondl96 )
 {
+	tumbleb_state *state = machine->driver_data<tumbleb_state>();
 	DRIVER_INIT_CALL( wlstar );
-	protbase = 0x0200;
+	state->protbase = 0x0200;
 }
 
 static DRIVER_INIT ( dquizgo )

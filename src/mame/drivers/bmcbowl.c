@@ -107,14 +107,24 @@ Main board:
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 
-static UINT16 *bmcbowl_vid1;
-static UINT16 *bmcbowl_vid2;
-static UINT8 *bmc_colorram;
 
-static UINT8 *stats_ram;
-static size_t	stats_ram_size;
-static int clr_offset=0;
-static int bmc_input=0;
+class bmcbowl_state : public driver_device
+{
+public:
+	bmcbowl_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16 *vid1;
+	UINT16 *vid2;
+	UINT8 *bmc_colorram;
+	UINT8 *stats_ram;
+	size_t stats_ram_size;
+	int clr_offset;
+	int bmc_input;
+};
+
+
+
 
 #define NVRAM_HACK
 
@@ -124,6 +134,7 @@ static VIDEO_START( bmcbowl )
 
 static VIDEO_UPDATE( bmcbowl )
 {
+	bmcbowl_state *state = screen->machine->driver_data<bmcbowl_state>();
 /*
       280x230,4 bitmap layers, 8bpp,
         missing scroll and priorities   (maybe fixed ones)
@@ -137,28 +148,28 @@ static VIDEO_UPDATE( bmcbowl )
 	{
 		for (x=0;x<280;x+=2)
 		{
-			pixdat = bmcbowl_vid2[0x8000+z];
+			pixdat = state->vid2[0x8000+z];
 
 			if(pixdat&0xff)
 				*BITMAP_ADDR16(bitmap, y, x+1) = (pixdat&0xff);
 			if(pixdat>>8)
 				*BITMAP_ADDR16(bitmap, y, x) = (pixdat>>8);
 
-			pixdat = bmcbowl_vid2[z];
+			pixdat = state->vid2[z];
 
 			if(pixdat&0xff)
 				*BITMAP_ADDR16(bitmap, y, x+1) = (pixdat&0xff);
 			if(pixdat>>8)
 				*BITMAP_ADDR16(bitmap, y, x) = (pixdat>>8);
 
-			pixdat = bmcbowl_vid1[0x8000+z];
+			pixdat = state->vid1[0x8000+z];
 
 			if(pixdat&0xff)
 				*BITMAP_ADDR16(bitmap, y, x+1) = (pixdat&0xff);
 			if(pixdat>>8)
 				*BITMAP_ADDR16(bitmap, y, x) = (pixdat>>8);
 
-			pixdat = bmcbowl_vid1[z];
+			pixdat = state->vid1[z];
 
 			if(pixdat&0xff)
 				*BITMAP_ADDR16(bitmap, y, x+1) = (pixdat&0xff);
@@ -195,14 +206,16 @@ static READ16_HANDLER( bmc_protection_r )
 
 static WRITE16_HANDLER( bmc_RAMDAC_offset_w )
 {
-	clr_offset=data*3;
+	bmcbowl_state *state = space->machine->driver_data<bmcbowl_state>();
+	state->clr_offset=data*3;
 }
 
 static WRITE16_HANDLER( bmc_RAMDAC_color_w )
 {
-	bmc_colorram[clr_offset]=data;
-	palette_set_color_rgb(space->machine,clr_offset/3,pal6bit(bmc_colorram[(clr_offset/3)*3]),pal6bit(bmc_colorram[(clr_offset/3)*3+1]),pal6bit(bmc_colorram[(clr_offset/3)*3+2]));
-	clr_offset=(clr_offset+1)%768;
+	bmcbowl_state *state = space->machine->driver_data<bmcbowl_state>();
+	state->bmc_colorram[state->clr_offset]=data;
+	palette_set_color_rgb(space->machine,state->clr_offset/3,pal6bit(state->bmc_colorram[(state->clr_offset/3)*3]),pal6bit(state->bmc_colorram[(state->clr_offset/3)*3+1]),pal6bit(state->bmc_colorram[(state->clr_offset/3)*3+2]));
+	state->clr_offset=(state->clr_offset+1)%768;
 }
 
 static WRITE16_HANDLER( scroll_w )
@@ -276,36 +289,37 @@ static const UINT8 bmc_nv3[]=
 };
 
 
-static void init_stats(const UINT8 *table, int table_len, int address)
+static void init_stats(bmcbowl_state *state, const UINT8 *table, int table_len, int address)
 {
 	int i;
 	for (i=0; i<table_len; i++)
-		stats_ram[address+2*i]=table[i];
+		state->stats_ram[address+2*i]=table[i];
 }
 #endif
 
 static NVRAM_HANDLER( bmcbowl )
 {
+	bmcbowl_state *state = machine->driver_data<bmcbowl_state>();
 	int i;
 
 	if (read_or_write)
-		file->write(stats_ram, stats_ram_size);
+		file->write(state->stats_ram, state->stats_ram_size);
 	else
 
 #ifdef NVRAM_HACK
-	for (i = 0; i < stats_ram_size; i++)
-		stats_ram[i] = 0xff;
+	for (i = 0; i < state->stats_ram_size; i++)
+		state->stats_ram[i] = 0xff;
 
-	init_stats(bmc_nv1,ARRAY_LENGTH(bmc_nv1),0);
-	init_stats(bmc_nv2,ARRAY_LENGTH(bmc_nv2),0x3b0);
-	init_stats(bmc_nv3,ARRAY_LENGTH(bmc_nv3),0xfe2);
+	init_stats(state,bmc_nv1,ARRAY_LENGTH(bmc_nv1),0);
+	init_stats(state,bmc_nv2,ARRAY_LENGTH(bmc_nv2),0x3b0);
+	init_stats(state,bmc_nv3,ARRAY_LENGTH(bmc_nv3),0xfe2);
 #else
 	if (file)
-		file->read(stats_ram, stats_ram_size);
+		file->read(state->stats_ram, state->stats_ram_size);
 	else
 
-		for (i = 0; i < stats_ram_size; i++)
-			stats_ram[i] = 0xff;
+		for (i = 0; i < state->stats_ram_size; i++)
+			state->stats_ram[i] = 0xff;
 #endif
 
 }
@@ -327,12 +341,12 @@ static ADDRESS_MAP_START( bmcbowl_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x092800, 0x092803) AM_DEVWRITE8("aysnd", ay8910_data_address_w, 0xff00)
 	AM_RANGE(0x092802, 0x092803) AM_DEVREAD8("aysnd", ay8910_r, 0xff00)
 	AM_RANGE(0x093802, 0x093803) AM_READ_PORT("IN0")
-	AM_RANGE(0x095000, 0x095fff) AM_RAM AM_BASE((UINT16 **)&stats_ram) AM_SIZE(&stats_ram_size) /* 8 bit */
+	AM_RANGE(0x095000, 0x095fff) AM_RAM AM_BASE_MEMBER(bmcbowl_state, stats_ram) AM_SIZE_MEMBER(bmcbowl_state, stats_ram_size) /* 8 bit */
 	AM_RANGE(0x097000, 0x097001) AM_READNOP
 	AM_RANGE(0x140000, 0x1bffff) AM_ROM
-	AM_RANGE(0x1c0000, 0x1effff) AM_RAM AM_BASE(&bmcbowl_vid1)
+	AM_RANGE(0x1c0000, 0x1effff) AM_RAM AM_BASE_MEMBER(bmcbowl_state, vid1)
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE(&bmcbowl_vid2)
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE_MEMBER(bmcbowl_state, vid2)
 
 	AM_RANGE(0x28c000, 0x28c001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0xff00)
 
@@ -432,19 +446,21 @@ INPUT_PORTS_END
 
 static READ8_DEVICE_HANDLER(dips1_r)
 {
-	switch(bmc_input)
+	bmcbowl_state *state = device->machine->driver_data<bmcbowl_state>();
+	switch(state->bmc_input)
 	{
 			case 0x00:	return  input_port_read(device->machine, "IN1");
 			case 0x40:	return  input_port_read(device->machine, "IN2");
 	}
-	logerror("%s:unknown input - %X\n",device->machine->describe_context(),bmc_input);
+	logerror("%s:unknown input - %X\n",device->machine->describe_context(),state->bmc_input);
 	return 0xff;
 }
 
 
 static WRITE8_DEVICE_HANDLER(input_mux_w)
 {
-	bmc_input=data;
+	bmcbowl_state *state = device->machine->driver_data<bmcbowl_state>();
+	state->bmc_input=data;
 }
 
 
@@ -480,7 +496,7 @@ static INTERRUPT_GEN( bmc_interrupt )
 		cpu_set_input_line(device, 2, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( bmcbowl, driver_device )
+static MACHINE_CONFIG_START( bmcbowl, bmcbowl_state )
 	MCFG_CPU_ADD("maincpu", M68000, 21477270/2 )
 	MCFG_CPU_PROGRAM_MAP(bmcbowl_mem)
 	MCFG_CPU_VBLANK_INT_HACK(bmc_interrupt,2)
@@ -536,7 +552,8 @@ ROM_END
 
 static DRIVER_INIT(bmcbowl)
 {
-	bmc_colorram = auto_alloc_array(machine, UINT8, 768);
+	bmcbowl_state *state = machine->driver_data<bmcbowl_state>();
+	state->bmc_colorram = auto_alloc_array(machine, UINT8, 768);
 }
 
 GAME( 1994, bmcbowl,    0, bmcbowl,    bmcbowl,    bmcbowl, ROT0,  "BMC", "BMC Bowling", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )

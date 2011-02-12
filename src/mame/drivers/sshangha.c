@@ -60,15 +60,14 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 #define SSHANGHA_HACK	0
 
-static UINT16 *sshangha_prot_data;
 
-static UINT16 *sshangha_sound_shared_ram;
 
 /******************************************************************************/
 
 static WRITE16_HANDLER( sshangha_protection16_w )
 {
-	COMBINE_DATA(&sshangha_prot_data[offset]);
+	sshangha_state *state = space->machine->driver_data<sshangha_state>();
+	COMBINE_DATA(&state->prot_data[offset]);
 
 	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %04x\n",cpu_get_pc(space->cpu),offset<<1,data);
 }
@@ -76,6 +75,7 @@ static WRITE16_HANDLER( sshangha_protection16_w )
 /* Protection/IO chip 146 */
 static READ16_HANDLER( sshangha_protection16_r )
 {
+	sshangha_state *state = space->machine->driver_data<sshangha_state>();
 	switch (offset)
 	{
 		case 0x050 >> 1:
@@ -89,11 +89,12 @@ static READ16_HANDLER( sshangha_protection16_r )
 	}
 
 	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n",cpu_get_pc(space->cpu),offset<<1);
-	return sshangha_prot_data[offset];
+	return state->prot_data[offset];
 }
 
 static READ16_HANDLER( sshanghb_protection16_r )
 {
+	sshangha_state *state = space->machine->driver_data<sshangha_state>();
 	switch (offset)
 	{
 		case 0x050 >> 1:
@@ -104,7 +105,7 @@ static READ16_HANDLER( sshanghb_protection16_r )
 			return input_port_read(space->machine, "DSW");
 	}
 
-	return sshangha_prot_data[offset];
+	return state->prot_data[offset];
 }
 
 /* Probably returns 0xffff when sprite DMA is complete, the game waits on it */
@@ -131,12 +132,12 @@ static MACHINE_RESET( sshangha )
 
 static ADDRESS_MAP_START( sshangha_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10000f) AM_RAM AM_BASE(&sshangha_sound_shared_ram)
+	AM_RANGE(0x100000, 0x10000f) AM_RAM AM_BASE_MEMBER(sshangha_state, sound_shared_ram)
 
-	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(sshangha_pf1_data_w) AM_BASE(&sshangha_pf1_data)
-	AM_RANGE(0x202000, 0x203fff) AM_RAM_WRITE(sshangha_pf2_data_w) AM_BASE(&sshangha_pf2_data)
-	AM_RANGE(0x204000, 0x2047ff) AM_RAM AM_BASE(&sshangha_pf1_rowscroll)
-	AM_RANGE(0x206000, 0x2067ff) AM_RAM AM_BASE(&sshangha_pf2_rowscroll)
+	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(sshangha_pf1_data_w) AM_BASE_MEMBER(sshangha_state, pf1_data)
+	AM_RANGE(0x202000, 0x203fff) AM_RAM_WRITE(sshangha_pf2_data_w) AM_BASE_MEMBER(sshangha_state, pf2_data)
+	AM_RANGE(0x204000, 0x2047ff) AM_RAM AM_BASE_MEMBER(sshangha_state, pf1_rowscroll)
+	AM_RANGE(0x206000, 0x2067ff) AM_RAM AM_BASE_MEMBER(sshangha_state, pf2_rowscroll)
 	AM_RANGE(0x206800, 0x207fff) AM_RAM
 	AM_RANGE(0x300000, 0x30000f) AM_WRITE(sshangha_control_0_w)
 	AM_RANGE(0x320000, 0x320001) AM_WRITE(sshangha_video_w)
@@ -152,18 +153,18 @@ static ADDRESS_MAP_START( sshangha_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x380000, 0x383fff) AM_RAM_WRITE(paletteram16_xbgr_word_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x3c0000, 0x3c0fff) AM_RAM	/* Sprite ram buffer on bootleg only?? */
 	AM_RANGE(0xfec000, 0xff3fff) AM_RAM
-	AM_RANGE(0xff4000, 0xff47ff) AM_READWRITE(sshangha_protection16_r,sshangha_protection16_w) AM_BASE(&sshangha_prot_data)
+	AM_RANGE(0xff4000, 0xff47ff) AM_READWRITE(sshangha_protection16_r,sshangha_protection16_w) AM_BASE_MEMBER(sshangha_state, prot_data)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sshanghb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x084000, 0x0847ff) AM_READ(sshanghb_protection16_r)
-	AM_RANGE(0x101000, 0x10100f) AM_RAM AM_BASE(&sshangha_sound_shared_ram) /* the bootleg writes here */
+	AM_RANGE(0x101000, 0x10100f) AM_RAM AM_BASE_MEMBER(sshangha_state, sound_shared_ram) /* the bootleg writes here */
 
-	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(sshangha_pf1_data_w) AM_BASE(&sshangha_pf1_data)
-	AM_RANGE(0x202000, 0x203fff) AM_RAM_WRITE(sshangha_pf2_data_w) AM_BASE(&sshangha_pf2_data)
-	AM_RANGE(0x204000, 0x2047ff) AM_RAM AM_BASE(&sshangha_pf1_rowscroll)
-	AM_RANGE(0x206000, 0x2067ff) AM_RAM AM_BASE(&sshangha_pf2_rowscroll)
+	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(sshangha_pf1_data_w) AM_BASE_MEMBER(sshangha_state, pf1_data)
+	AM_RANGE(0x202000, 0x203fff) AM_RAM_WRITE(sshangha_pf2_data_w) AM_BASE_MEMBER(sshangha_state, pf2_data)
+	AM_RANGE(0x204000, 0x2047ff) AM_RAM AM_BASE_MEMBER(sshangha_state, pf1_rowscroll)
+	AM_RANGE(0x206000, 0x2067ff) AM_RAM AM_BASE_MEMBER(sshangha_state, pf2_rowscroll)
 	AM_RANGE(0x206800, 0x207fff) AM_RAM
 	AM_RANGE(0x300000, 0x30000f) AM_WRITE(sshangha_control_0_w)
 	AM_RANGE(0x320000, 0x320001) AM_WRITE(sshangha_video_w)
@@ -188,12 +189,14 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(sshangha_sound_shared_r)
 {
-	return sshangha_sound_shared_ram[offset] & 0xff;
+	sshangha_state *state = space->machine->driver_data<sshangha_state>();
+	return state->sound_shared_ram[offset] & 0xff;
 }
 
 static WRITE8_HANDLER(sshangha_sound_shared_w)
 {
-	sshangha_sound_shared_ram[offset] = data & 0xff;
+	sshangha_state *state = space->machine->driver_data<sshangha_state>();
+	state->sound_shared_ram[offset] = data & 0xff;
 }
 
 /* Note: there's rom data after 0x8000 but the game never seem to call a rom bank, left-over? */
@@ -342,7 +345,7 @@ static const ym2203_interface ym2203_config =
 	irqhandler
 };
 
-static MACHINE_CONFIG_START( sshangha, driver_device )
+static MACHINE_CONFIG_START( sshangha, sshangha_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 28000000/2)

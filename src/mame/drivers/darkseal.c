@@ -21,7 +21,6 @@
 #include "sound/okim6295.h"
 #include "includes/darkseal.h"
 
-static UINT16 *darkseal_ram;
 
 /******************************************************************************/
 
@@ -61,18 +60,18 @@ static READ16_HANDLER( darkseal_control_r )
 
 static ADDRESS_MAP_START( darkseal_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_BASE(&darkseal_ram)
+	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_BASE_MEMBER(darkseal_state, ram)
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE(darkseal_palette_24bit_rg_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x141000, 0x141fff) AM_RAM_WRITE(darkseal_palette_24bit_b_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0x180000, 0x18000f) AM_READWRITE(darkseal_control_r, darkseal_control_w)
 	AM_RANGE(0x200000, 0x200fff) AM_WRITE(darkseal_pf3b_data_w) /* 2nd half of pf3, only used on last level */
-	AM_RANGE(0x202000, 0x203fff) AM_WRITE(darkseal_pf3_data_w) AM_BASE(&darkseal_pf3_data)
-	AM_RANGE(0x220000, 0x220fff) AM_RAM AM_BASE(&darkseal_pf12_row)
-	AM_RANGE(0x222000, 0x222fff) AM_RAM AM_BASE(&darkseal_pf34_row)
+	AM_RANGE(0x202000, 0x203fff) AM_WRITE(darkseal_pf3_data_w) AM_BASE_MEMBER(darkseal_state, pf3_data)
+	AM_RANGE(0x220000, 0x220fff) AM_RAM AM_BASE_MEMBER(darkseal_state, pf12_row)
+	AM_RANGE(0x222000, 0x222fff) AM_RAM AM_BASE_MEMBER(darkseal_state, pf34_row)
 	AM_RANGE(0x240000, 0x24000f) AM_WRITE(darkseal_control_0_w)
-	AM_RANGE(0x260000, 0x261fff) AM_WRITE(darkseal_pf2_data_w) AM_BASE(&darkseal_pf2_data)
-	AM_RANGE(0x262000, 0x263fff) AM_WRITE(darkseal_pf1_data_w) AM_BASE(&darkseal_pf1_data)
+	AM_RANGE(0x260000, 0x261fff) AM_WRITE(darkseal_pf2_data_w) AM_BASE_MEMBER(darkseal_state, pf2_data)
+	AM_RANGE(0x262000, 0x263fff) AM_WRITE(darkseal_pf1_data_w) AM_BASE_MEMBER(darkseal_state, pf1_data)
 	AM_RANGE(0x2a0000, 0x2a000f) AM_WRITE(darkseal_control_1_w)
 ADDRESS_MAP_END
 
@@ -227,7 +226,7 @@ static const ym2151_interface ym2151_config =
 	sound_irq
 };
 
-static MACHINE_CONFIG_START( darkseal, driver_device )
+static MACHINE_CONFIG_START( darkseal, darkseal_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,12000000) /* Custom chip 59 */

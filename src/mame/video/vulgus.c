@@ -9,12 +9,6 @@
 #include "emu.h"
 #include "includes/vulgus.h"
 
-UINT8 *vulgus_fgvideoram,*vulgus_bgvideoram;
-UINT8 *vulgus_scroll_low,*vulgus_scroll_high;
-
-static int vulgus_palette_bank;
-static tilemap_t *fg_tilemap, *bg_tilemap;
-
 
 /***************************************************************************
 
@@ -84,10 +78,11 @@ PALETTE_INIT( vulgus )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
+	vulgus_state *state = machine->driver_data<vulgus_state>();
 	int code, color;
 
-	code = vulgus_fgvideoram[tile_index];
-	color = vulgus_fgvideoram[tile_index + 0x400];
+	code = state->fgvideoram[tile_index];
+	color = state->fgvideoram[tile_index + 0x400];
 	SET_TILE_INFO(
 			0,
 			code + ((color & 0x80) << 1),
@@ -98,14 +93,15 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
+	vulgus_state *state = machine->driver_data<vulgus_state>();
 	int code, color;
 
-	code = vulgus_bgvideoram[tile_index];
-	color = vulgus_bgvideoram[tile_index + 0x400];
+	code = state->bgvideoram[tile_index];
+	color = state->bgvideoram[tile_index + 0x400];
 	SET_TILE_INFO(
 			1,
 			code + ((color & 0x80) << 1),
-			(color & 0x1f) + (0x20 * vulgus_palette_bank),
+			(color & 0x1f) + (0x20 * state->palette_bank),
 			TILE_FLIPYX((color & 0x60) >> 5));
 }
 
@@ -118,10 +114,11 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( vulgus )
 {
-	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows, 8, 8,32,32);
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_cols,16,16,32,32);
+	vulgus_state *state = machine->driver_data<vulgus_state>();
+	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows, 8, 8,32,32);
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_cols,16,16,32,32);
 
-	colortable_configure_tilemap_groups(machine->colortable, fg_tilemap, machine->gfx[0], 47);
+	colortable_configure_tilemap_groups(machine->colortable, state->fg_tilemap, machine->gfx[0], 47);
 }
 
 
@@ -133,14 +130,16 @@ VIDEO_START( vulgus )
 
 WRITE8_HANDLER( vulgus_fgvideoram_w )
 {
-	vulgus_fgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap,offset & 0x3ff);
+	vulgus_state *state = space->machine->driver_data<vulgus_state>();
+	state->fgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(state->fg_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( vulgus_bgvideoram_w )
 {
-	vulgus_bgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap,offset & 0x3ff);
+	vulgus_state *state = space->machine->driver_data<vulgus_state>();
+	state->bgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap,offset & 0x3ff);
 }
 
 
@@ -157,10 +156,11 @@ WRITE8_HANDLER( vulgus_c804_w )
 
 WRITE8_HANDLER( vulgus_palette_bank_w )
 {
-	if (vulgus_palette_bank != (data & 3))
+	vulgus_state *state = space->machine->driver_data<vulgus_state>();
+	if (state->palette_bank != (data & 3))
 	{
-		vulgus_palette_bank = data & 3;
-		tilemap_mark_all_tiles_dirty(bg_tilemap);
+		state->palette_bank = data & 3;
+		tilemap_mark_all_tiles_dirty(state->bg_tilemap);
 	}
 }
 
@@ -218,11 +218,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( vulgus )
 {
-	tilemap_set_scrollx(bg_tilemap, 0, vulgus_scroll_low[1] + 256 * vulgus_scroll_high[1]);
-	tilemap_set_scrolly(bg_tilemap, 0, vulgus_scroll_low[0] + 256 * vulgus_scroll_high[0]);
+	vulgus_state *state = screen->machine->driver_data<vulgus_state>();
+	tilemap_set_scrollx(state->bg_tilemap, 0, state->scroll_low[1] + 256 * state->scroll_high[1]);
+	tilemap_set_scrolly(state->bg_tilemap, 0, state->scroll_low[0] + 256 * state->scroll_high[0]);
 
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
 	draw_sprites(screen->machine, bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,0);
 	return 0;
 }

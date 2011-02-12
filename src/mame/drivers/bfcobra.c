@@ -81,43 +81,48 @@
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
 
+
+class bfcobra_state : public driver_device
+{
+public:
+	bfcobra_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 bank_data[4];
+	UINT8 *work_ram;
+	UINT8 *video_ram;
+	UINT8 h_scroll;
+	UINT8 v_scroll;
+	UINT8 flip_8;
+	UINT8 flip_22;
+	UINT8 videomode;
+	UINT8 z80_m6809_line;
+	UINT8 m6809_z80_line;
+	UINT8 data_r;
+	UINT8 data_t;
+	int irq_state;
+	int acia_irq;
+	int vblank_irq;
+	int blitter_irq;
+	UINT8 z80_int;
+	UINT8 z80_inten;
+	UINT32 meter_latch;
+	UINT32 mux_input;
+	UINT32 mux_outputlatch;
+	UINT8 col4bit[16];
+	UINT8 col3bit[16];
+	UINT8 col8bit[256];
+	UINT8 col7bit[256];
+	UINT8 col6bit[256];
+};
+
+
 /*
     Defines
 */
 #define Z80_XTAL	5910000		/* Unconfirmed */
 #define M6809_XTAL	1000000
 
-
-/*
-    Globals
-*/
-static UINT8 bank_data[4];
-static UINT8 *work_ram;
-static UINT8 *video_ram;
-static UINT8 h_scroll;
-static UINT8 v_scroll;
-static UINT8 flip_8;
-static UINT8 flip_22;
-static UINT8 videomode;
-
-/* UART source/sinks */
-static UINT8 z80_m6809_line;
-static UINT8 m6809_z80_line;
-static UINT8 data_r;
-static UINT8 data_t;
-
-static int irq_state;
-static int acia_irq;
-static int vblank_irq;
-static int blitter_irq;
-
-static UINT8 z80_int;
-static UINT8 z80_inten;
-
-/* EM and lamps stuff */
-static UINT32 meter_latch;
-static UINT32 mux_input;
-static UINT32 mux_outputlatch;
 
 /*
     Function prototypes
@@ -127,12 +132,13 @@ INLINE void z80_bank(running_machine *machine, int num, int data);
 
 static void update_irqs(running_machine *machine)
 {
-	int newstate = blitter_irq || vblank_irq || acia_irq;
+	bfcobra_state *state = machine->driver_data<bfcobra_state>();
+	int newstate = state->blitter_irq || state->vblank_irq || state->acia_irq;
 
-	if (newstate != irq_state)
+	if (newstate != state->irq_state)
 	{
-		irq_state = newstate;
-		cputag_set_input_line(machine, "maincpu", 0, irq_state ? ASSERT_LINE : CLEAR_LINE);
+		state->irq_state = newstate;
+		cputag_set_input_line(machine, "maincpu", 0, state->irq_state ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -292,37 +298,34 @@ static const UINT8 col3bit_default[16]=
 	RED_7 | GREEN_7 | BLUE_3
 };
 
-static UINT8 col4bit[16];
-static UINT8 col3bit[16];
-static UINT8 col8bit[256];
-static UINT8 col7bit[256];
-static UINT8 col6bit[256];
 static const UINT8 col76index[] = {0, 2, 4, 7};
 
 
 static VIDEO_START( bfcobra )
 {
+	bfcobra_state *state = machine->driver_data<bfcobra_state>();
 	int i;
 
-	memcpy(col4bit, col4bit_default, sizeof(col4bit));
-	memcpy(col3bit, col3bit_default, sizeof(col3bit));
+	memcpy(state->col4bit, col4bit_default, sizeof(state->col4bit));
+	memcpy(state->col3bit, col3bit_default, sizeof(state->col3bit));
 	for (i = 0; i < 256; ++i)
 	{
 		UINT8 col;
 
-		col8bit[i] = i;
+		state->col8bit[i] = i;
 		col = i & 0x7f;
 		col = (col & 0x1f) | (col76index[ ( (col & 0x60) >> 5 ) & 3] << 5);
-		col7bit[i] = col;
+		state->col7bit[i] = col;
 
 		col = (col & 3) | (col76index[( (col & 0x0c) >> 2) & 3] << 2 ) |
 			  (col76index[( (col & 0x30) >> 4) & 3] << 5 );
-		col6bit[i] = col;
+		state->col6bit[i] = col;
 	}
 }
 
 static VIDEO_UPDATE( bfcobra )
 {
+	bfcobra_state *state = screen->machine->driver_data<bfcobra_state>();
 	int x, y;
 	UINT8  *src;
 	UINT32 *dest;
@@ -332,39 +335,39 @@ static VIDEO_UPDATE( bfcobra )
 
 	/* Select screen has to be programmed into two registers */
 	/* No idea what happens if the registers are different */
-	if (flip_8 & 0x40 && flip_22 & 0x40)
+	if (state->flip_8 & 0x40 && state->flip_22 & 0x40)
 		offset = 0x10000;
 	else
 		offset = 0;
 
-	if(videomode & 0x20)
+	if(state->videomode & 0x20)
 	{
-		hirescol = col3bit;
-		lorescol = col7bit;
+		hirescol = state->col3bit;
+		lorescol = state->col7bit;
 	}
-	else if(videomode & 0x40)
+	else if(state->videomode & 0x40)
 	{
-		hirescol = col4bit;
-		lorescol = col6bit;
+		hirescol = state->col4bit;
+		lorescol = state->col6bit;
 	}
 	else
 	{
-		hirescol = col4bit;
-		lorescol = col8bit;
+		hirescol = state->col4bit;
+		lorescol = state->col8bit;
 	}
 
 	for (y = cliprect->min_y; y <= cliprect->max_y; ++y)
 	{
-		UINT16 y_offset = (y + v_scroll) * 256;
-		src = &video_ram[offset + y_offset];
+		UINT16 y_offset = (y + state->v_scroll) * 256;
+		src = &state->video_ram[offset + y_offset];
 		dest = BITMAP_ADDR32(bitmap, y, 0);
 
 		for (x = cliprect->min_x; x <= cliprect->max_x / 2; ++x)
 		{
-			UINT8 x_offset = x + h_scroll;
+			UINT8 x_offset = x + state->h_scroll;
 			UINT8 pen = *(src + x_offset);
 
-			if ( ( videomode & 0x81 ) == 1 || (videomode & 0x80 && pen & 0x80) )
+			if ( ( state->videomode & 0x81 ) == 1 || (state->videomode & 0x80 && pen & 0x80) )
 			{
 				*dest++ = screen->machine->pens[hirescol[pen & 0x0f]];
 				*dest++ = screen->machine->pens[hirescol[(pen >> 4) & 0x0f]];
@@ -382,6 +385,7 @@ static VIDEO_UPDATE( bfcobra )
 
 INLINE UINT8* blitter_get_addr(running_machine *machine, UINT32 addr)
 {
+	bfcobra_state *state = machine->driver_data<bfcobra_state>();
 	if (addr < 0x10000)
 	{
 		/* Is this region fixed? */
@@ -390,17 +394,17 @@ INLINE UINT8* blitter_get_addr(running_machine *machine, UINT32 addr)
 	else if(addr < 0x20000)
 	{
 		addr &= 0xffff;
-		addr += (bank_data[0] & 1) ? 0x10000 : 0;
+		addr += (state->bank_data[0] & 1) ? 0x10000 : 0;
 
-		return (UINT8*)(machine->region("user1")->base() + addr + ((bank_data[0] >> 1) * 0x20000));
+		return (UINT8*)(machine->region("user1")->base() + addr + ((state->bank_data[0] >> 1) * 0x20000));
 	}
 	else if (addr >= 0x20000 && addr < 0x40000)
 	{
-		return (UINT8*)&video_ram[addr - 0x20000];
+		return (UINT8*)&state->video_ram[addr - 0x20000];
 	}
 	else
 	{
-		return (UINT8*)&work_ram[addr - 0x40000];
+		return (UINT8*)&state->work_ram[addr - 0x40000];
 	}
 }
 
@@ -823,6 +827,7 @@ static WRITE8_HANDLER( ramdac_w )
 
 static READ8_HANDLER( chipset_r )
 {
+	bfcobra_state *state = space->machine->driver_data<bfcobra_state>();
 	UINT8 val = 0xff;
 
 	switch(offset)
@@ -831,18 +836,18 @@ static READ8_HANDLER( chipset_r )
 		case 2:
 		case 3:
 		{
-			val = bank_data[offset];
+			val = state->bank_data[offset];
 			break;
 		}
 		case 6:
 		{
 			/* TODO */
-			val = vblank_irq << 4;
+			val = state->vblank_irq << 4;
 			break;
 		}
 		case 7:
 		{
-			vblank_irq = 0;
+			state->vblank_irq = 0;
 			val = 0x1;
 
 			/* TODO */
@@ -877,6 +882,7 @@ static READ8_HANDLER( chipset_r )
 
 static WRITE8_HANDLER( chipset_w )
 {
+	bfcobra_state *state = space->machine->driver_data<bfcobra_state>();
 	switch (offset)
 	{
 		case 0x01:
@@ -887,42 +893,42 @@ static WRITE8_HANDLER( chipset_w )
 				popmessage("%x: Unusual bank access (%x)\n", cpu_get_previouspc(space->cpu), data);
 
 			data &= 0x3f;
-			bank_data[offset] = data;
+			state->bank_data[offset] = data;
 			z80_bank(space->machine, offset, data);
 			break;
 		}
 
 		case 0x08:
 		{
-			flip_8 = data;
+			state->flip_8 = data;
 			break;
 		}
 		case 9:
-			videomode = data;
+			state->videomode = data;
 			break;
 
 		case 0x0B:
 		{
-			h_scroll = data;
+			state->h_scroll = data;
 			break;
 		}
 		case 0x0C:
 		{
-			v_scroll = data;
+			state->v_scroll = data;
 			break;
 		}
 		case 0x0E:
 		{
-			col4bit[5] = data;
-			col3bit[5] = data;
-			col3bit[5 + 8] = data;
+			state->col4bit[5] = data;
+			state->col3bit[5] = data;
+			state->col3bit[5 + 8] = data;
 			break;
 		}
 		case 0x0f:
 		{
-			col4bit[6] = data;
-			col3bit[6] = data;
-			col3bit[6 + 8] = data;
+			state->col4bit[6] = data;
+			state->col3bit[6] = data;
+			state->col3bit[6 + 8] = data;
 			break;
 		}
 		case 0x18:
@@ -953,7 +959,7 @@ static WRITE8_HANDLER( chipset_w )
 		}
 		case 0x22:
 		{
-			flip_22 = data;
+			state->flip_22 = data;
 			break;
 		}
 		default:
@@ -965,30 +971,32 @@ static WRITE8_HANDLER( chipset_w )
 
 INLINE void z80_bank(running_machine *machine, int num, int data)
 {
+	bfcobra_state *state = machine->driver_data<bfcobra_state>();
 	static const char * const bank_names[] = { "bank1", "bank2", "bank3" };
 
 	if (data < 0x08)
 	{
-		UINT32 offset = ((bank_data[0] >> 1) * 0x20000) + ((0x4000 * data) ^ ((bank_data[0] & 1) ? 0 : 0x10000));
+		UINT32 offset = ((state->bank_data[0] >> 1) * 0x20000) + ((0x4000 * data) ^ ((state->bank_data[0] & 1) ? 0 : 0x10000));
 
 		memory_set_bankptr(machine, bank_names[num - 1], machine->region("user1")->base() + offset);
 	}
 	else if (data < 0x10)
 	{
-		memory_set_bankptr(machine, bank_names[num - 1], &video_ram[(data - 0x08) * 0x4000]);
+		memory_set_bankptr(machine, bank_names[num - 1], &state->video_ram[(data - 0x08) * 0x4000]);
 	}
 	else
 	{
-		memory_set_bankptr(machine, bank_names[num - 1], &work_ram[(data - 0x10) * 0x4000]);
+		memory_set_bankptr(machine, bank_names[num - 1], &state->work_ram[(data - 0x10) * 0x4000]);
 	}
 }
 
 static WRITE8_HANDLER( rombank_w )
 {
-	bank_data[0] = data;
-	z80_bank(space->machine, 1, bank_data[1]);
-	z80_bank(space->machine, 2, bank_data[2]);
-	z80_bank(space->machine, 3, bank_data[3]);
+	bfcobra_state *state = space->machine->driver_data<bfcobra_state>();
+	state->bank_data[0] = data;
+	z80_bank(space->machine, 1, state->bank_data[1]);
+	z80_bank(space->machine, 2, state->bank_data[2]);
+	z80_bank(space->machine, 3, state->bank_data[3]);
 }
 
 
@@ -1281,6 +1289,7 @@ WRITE8_HANDLER( fd_ctrl_w )
 
 static MACHINE_RESET( bfcobra )
 {
+	bfcobra_state *state = machine->driver_data<bfcobra_state>();
 	unsigned int pal;
 
 	for (pal = 0; pal < 256; ++pal)
@@ -1288,11 +1297,11 @@ static MACHINE_RESET( bfcobra )
 		palette_set_color_rgb(machine, pal, pal3bit((pal>>5)&7), pal3bit((pal>>2)&7), pal2bit(pal&3));
 	}
 
-	bank_data[0] = 1;
+	state->bank_data[0] = 1;
 	memset(&ramdac, 0, sizeof(ramdac));
 	reset_fdc();
 
-	irq_state = blitter_irq = vblank_irq = acia_irq = 0;
+	state->irq_state = state->blitter_irq = state->vblank_irq = state->acia_irq = 0;
 }
 
 /***************************************************************************
@@ -1352,16 +1361,18 @@ static READ8_HANDLER( int_latch_r )
 /* TODO */
 static READ8_HANDLER( meter_r )
 {
-	return meter_latch;
+	bfcobra_state *state = space->machine->driver_data<bfcobra_state>();
+	return state->meter_latch;
 }
 
 /* TODO: This is borrowed from Scorpion 1 */
 static WRITE8_HANDLER( meter_w )
 {
+	bfcobra_state *state = space->machine->driver_data<bfcobra_state>();
 	int i;
-	int  changed = meter_latch ^ data;
+	int  changed = state->meter_latch ^ data;
 
-	meter_latch = data;
+	state->meter_latch = data;
 
 	/*
         When a meter is triggered, the current drawn is sensed. If a meter
@@ -1380,20 +1391,22 @@ static WRITE8_HANDLER( meter_w )
 /* TODO */
 static READ8_HANDLER( latch_r )
 {
-	return mux_input;
+	bfcobra_state *state = space->machine->driver_data<bfcobra_state>();
+	return state->mux_input;
 }
 
 static WRITE8_HANDLER( latch_w )
 {
+	bfcobra_state *state = space->machine->driver_data<bfcobra_state>();
 	/* TODO: This is borrowed from Scorpion 1 */
 	switch(offset)
 	{
 		case 0:
 		{
-			int changed = mux_outputlatch ^ data;
+			int changed = state->mux_outputlatch ^ data;
 			static const char *const port[] = { "STROBE0", "STROBE1", "STROBE2", "STROBE3", "STROBE4", "STROBE5", "STROBE6", "STROBE7" };
 
-			mux_outputlatch = data;
+			state->mux_outputlatch = data;
 
 			/* Clock has changed */
 			if (changed & 0x08)
@@ -1402,7 +1415,7 @@ static WRITE8_HANDLER( latch_w )
 
 				/* Clock is low */
 				if (!(data & 0x08))
-					mux_input = input_port_read(space->machine, port[input_strobe]);
+					state->mux_input = input_port_read(space->machine, port[input_strobe]);
 			}
 			break;
 		}
@@ -1561,11 +1574,12 @@ INPUT_PORTS_END
 */
 static void init_ram(running_machine *machine)
 {
+	bfcobra_state *state = machine->driver_data<bfcobra_state>();
 	/* 768kB work RAM */
-	work_ram = auto_alloc_array_clear(machine, UINT8, 0xC0000);
+	state->work_ram = auto_alloc_array_clear(machine, UINT8, 0xC0000);
 
 	/* 128kB video RAM */
-	video_ram = auto_alloc_array_clear(machine, UINT8, 0x20000);
+	state->video_ram = auto_alloc_array_clear(machine, UINT8, 0x20000);
 }
 
 /*
@@ -1574,17 +1588,20 @@ static void init_ram(running_machine *machine)
 
 static READ_LINE_DEVICE_HANDLER( z80_acia_rx_r )
 {
-	return m6809_z80_line;
+	bfcobra_state *state = device->machine->driver_data<bfcobra_state>();
+	return state->m6809_z80_line;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( z80_acia_tx_w )
 {
-	z80_m6809_line = state;
+	bfcobra_state *drvstate = device->machine->driver_data<bfcobra_state>();
+	drvstate->z80_m6809_line = state;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( z80_acia_irq )
 {
-	acia_irq = state ? CLEAR_LINE : ASSERT_LINE;
+	bfcobra_state *drvstate = device->machine->driver_data<bfcobra_state>();
+	drvstate->acia_irq = state ? CLEAR_LINE : ASSERT_LINE;
 	update_irqs(device->machine);
 }
 
@@ -1602,12 +1619,14 @@ static ACIA6850_INTERFACE( z80_acia_if )
 
 static READ_LINE_DEVICE_HANDLER( m6809_acia_rx_r )
 {
-	return z80_m6809_line;
+	bfcobra_state *state = device->machine->driver_data<bfcobra_state>();
+	return state->z80_m6809_line;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( m6809_acia_tx_w )
 {
-	m6809_z80_line = state;
+	bfcobra_state *drvstate = device->machine->driver_data<bfcobra_state>();
+	drvstate->m6809_z80_line = state;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( m6809_data_irq )
@@ -1629,12 +1648,14 @@ static ACIA6850_INTERFACE( m6809_acia_if )
 
 static READ_LINE_DEVICE_HANDLER( data_acia_rx_r )
 {
-	return data_r;
+	bfcobra_state *state = device->machine->driver_data<bfcobra_state>();
+	return state->data_r;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( data_acia_tx_w )
 {
-	 data_t = state;
+	bfcobra_state *drvstate = device->machine->driver_data<bfcobra_state>();
+	 drvstate->data_t = state;
 }
 
 
@@ -1654,6 +1675,7 @@ static ACIA6850_INTERFACE( data_acia_if )
 /* TODO: Driver vs Machine Init */
 static DRIVER_INIT( bfcobra )
 {
+	bfcobra_state *state = machine->driver_data<bfcobra_state>();
 	/*
         6809 ROM address and data lines are scrambled.
         This is the same scrambling as Scorpion 2.
@@ -1689,31 +1711,31 @@ static DRIVER_INIT( bfcobra )
 
 	init_ram(machine);
 
-	bank_data[0] = 1;
-	bank_data[1] = 0;
-	bank_data[2] = 0;
-	bank_data[3] = 0;
+	state->bank_data[0] = 1;
+	state->bank_data[1] = 0;
+	state->bank_data[2] = 0;
+	state->bank_data[3] = 0;
 
 	/* Fixed 16kB ROM region */
 	memory_set_bankptr(machine, "bank4", machine->region("user1")->base());
 
 	/* TODO: Properly sort out the data ACIA */
-	data_r = 1;
+	state->data_r = 1;
 
 	/* Finish this */
-	state_save_register_global(machine, z80_m6809_line);
-	state_save_register_global(machine, m6809_z80_line);
-	state_save_register_global(machine, data_r);
-	state_save_register_global(machine, data_t);
-	state_save_register_global(machine, h_scroll);
-	state_save_register_global(machine, v_scroll);
-	state_save_register_global(machine, flip_8);
-	state_save_register_global(machine, flip_22);
-	state_save_register_global(machine, z80_int);
-	state_save_register_global(machine, z80_inten);
-	state_save_register_global_array(machine, bank_data);
-	state_save_register_global_pointer(machine, work_ram, 0xc0000);
-	state_save_register_global_pointer(machine, video_ram, 0x20000);
+	state_save_register_global(machine, state->z80_m6809_line);
+	state_save_register_global(machine, state->m6809_z80_line);
+	state_save_register_global(machine, state->data_r);
+	state_save_register_global(machine, state->data_t);
+	state_save_register_global(machine, state->h_scroll);
+	state_save_register_global(machine, state->v_scroll);
+	state_save_register_global(machine, state->flip_8);
+	state_save_register_global(machine, state->flip_22);
+	state_save_register_global(machine, state->z80_int);
+	state_save_register_global(machine, state->z80_inten);
+	state_save_register_global_array(machine, state->bank_data);
+	state_save_register_global_pointer(machine, state->work_ram, 0xc0000);
+	state_save_register_global_pointer(machine, state->video_ram, 0x20000);
 }
 
 /* TODO */
@@ -1725,11 +1747,12 @@ static INTERRUPT_GEN( timer_irq )
 /* TODO */
 static INTERRUPT_GEN( vblank_gen )
 {
-	vblank_irq = 1;
+	bfcobra_state *state = device->machine->driver_data<bfcobra_state>();
+	state->vblank_irq = 1;
 	update_irqs(device->machine);
 }
 
-static MACHINE_CONFIG_START( bfcobra, driver_device )
+static MACHINE_CONFIG_START( bfcobra, bfcobra_state )
 	MCFG_CPU_ADD("maincpu", Z80, Z80_XTAL)
 	MCFG_CPU_PROGRAM_MAP(z80_prog_map)
 	MCFG_CPU_IO_MAP(z80_io_map)

@@ -2147,8 +2147,8 @@ static CPU_RESET( sh2 )
 	sh2_state *sh2 = get_safe_token(device);
 	emu_timer *tsave, *tsaved0, *tsaved1;
 	UINT32 *m;
-	int  (*dma_callback_kludge)(UINT32 src, UINT32 dst, UINT32 data, int size);
-	int  (*dma_callback_fifo_data_available)(UINT32 src, UINT32 dst, UINT32 data, int size);
+	int  (*dma_callback_kludge)(device_t *device, UINT32 src, UINT32 dst, UINT32 data, int size);
+	int  (*dma_callback_fifo_data_available)(device_t *device, UINT32 src, UINT32 dst, UINT32 data, int size);
 	int save_is_slave;
 
 	void (*f)(UINT32 data);

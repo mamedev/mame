@@ -31,6 +31,8 @@ public:
 	device_t *maincpu;
 	device_t *audiocpu;
 	device_t *oki;
+	UINT8 semicom_prot_offset;
+	UINT16 protbase;
 };
 
 /*----------- defined in video/tumbleb.c -----------*/

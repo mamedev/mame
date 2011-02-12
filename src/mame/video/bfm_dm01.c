@@ -38,8 +38,8 @@ Standard dm01 memorymap
 #include "bfm_dm01.h"
 // local prototypes ///////////////////////////////////////////////////////
 
-extern void Scorpion2_SetSwitchState(int strobe, int data, int state);
-extern int  Scorpion2_GetSwitchState(int strobe, int data);
+extern void Scorpion2_SetSwitchState(running_machine *machine, int strobe, int data, int state);
+extern int  Scorpion2_GetSwitchState(running_machine *machine, int strobe, int data);
 
 // local vars /////////////////////////////////////////////////////////////
 
@@ -110,7 +110,7 @@ static WRITE8_HANDLER( control_w )
 		if ( data & 8 )	  busy = 0;
 		else			  busy = 1;
 
-		Scorpion2_SetSwitchState(FEEDBACK_STROBE,FEEDBACK_DATA, busy?0:1);
+		Scorpion2_SetSwitchState(space->machine, FEEDBACK_STROBE,FEEDBACK_DATA, busy?0:1);
 	}
 }
 
@@ -247,12 +247,12 @@ int BFM_dm01_busy(void)
 	return data_avail;
 }
 
-void BFM_dm01_reset(void)
+void BFM_dm01_reset(running_machine *machine)
 {
 	busy     = 0;
 	control  = 0;
 	xcounter = 0;
 	data_avail = 0;
 
-	Scorpion2_SetSwitchState(FEEDBACK_STROBE,FEEDBACK_DATA, busy?0:1);
+	Scorpion2_SetSwitchState(machine, FEEDBACK_STROBE,FEEDBACK_DATA, busy?0:1);
 }

@@ -11,12 +11,12 @@ Data East machine functions - Bryan McPhail, mish@tendril.co.uk
 #include "cpu/h6280/h6280.h"
 #include "cpu/mcs51/mcs51.h"
 
-static int GAME,i8751_return,i8751_command,slyspy_state;
 
 /******************************************************************************/
 
 READ16_HANDLER( dec0_controls_r )
 {
+	dec0_state *state = space->machine->driver_data<dec0_state>();
 	switch (offset<<1)
 	{
 		case 0: /* Player 1 & 2 joystick & buttons */
@@ -29,8 +29,8 @@ READ16_HANDLER( dec0_controls_r )
 			return input_port_read(space->machine, "DSW");
 
 		case 8: /* Intel 8751 mc, Bad Dudes & Heavy Barrel only */
-			//logerror("CPU #0 PC %06x: warning - read i8751 %06x - %04x\n", cpu_get_pc(space->cpu), 0x30c000+offset, i8751_return);
-			return i8751_return;
+			//logerror("CPU #0 PC %06x: warning - read i8751 %06x - %04x\n", cpu_get_pc(space->cpu), 0x30c000+offset, state->i8751_return);
+			return state->i8751_return;
 	}
 
 	logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n", cpu_get_pc(space->cpu), 0x30c000+offset);
@@ -154,19 +154,22 @@ READ16_HANDLER( slyspy_protection_r )
 
 WRITE16_HANDLER( slyspy_state_w )
 {
-	slyspy_state=0;
+	dec0_state *state = space->machine->driver_data<dec0_state>();
+	state->slyspy_state=0;
 }
 
 READ16_HANDLER( slyspy_state_r )
 {
-	slyspy_state++;
-	slyspy_state=slyspy_state%4;
+	dec0_state *state = space->machine->driver_data<dec0_state>();
+	state->slyspy_state++;
+	state->slyspy_state=state->slyspy_state%4;
 	return 0; /* Value doesn't mater */
 }
 
 WRITE16_HANDLER( slyspy_240000_w )
 {
-	switch (slyspy_state) {
+	dec0_state *state = space->machine->driver_data<dec0_state>();
+	switch (state->slyspy_state) {
 		case 0x3:
 			dec0_pf1_data_w(space,offset,data,mem_mask);
 			return;
@@ -178,36 +181,39 @@ WRITE16_HANDLER( slyspy_240000_w )
 			else if (offset<0x10) dec0_pf2_control_1_w(space,offset-0x8,data,mem_mask);
 			return;
 	}
-	logerror("Wrote to 240000 %02x at %04x %04x (Trap %02x)\n",offset,cpu_get_pc(space->cpu),data,slyspy_state);
+	logerror("Wrote to 240000 %02x at %04x %04x (Trap %02x)\n",offset,cpu_get_pc(space->cpu),data,state->slyspy_state);
 }
 
 WRITE16_HANDLER( slyspy_242000_w )
 {
-	switch (slyspy_state) {
+	dec0_state *state = space->machine->driver_data<dec0_state>();
+	switch (state->slyspy_state) {
 		case 0x2: /* Trap A */
 			dec0_pf1_data_w(space,offset,data,mem_mask);
 			return;
 		case 0x0: /* Trap C */
-			if (offset<0x40) COMBINE_DATA(&dec0_pf2_colscroll[offset]);
-			else if (offset<0x300) COMBINE_DATA(&dec0_pf2_rowscroll[offset-0x200]);
+			if (offset<0x40) COMBINE_DATA(&state->pf2_colscroll[offset]);
+			else if (offset<0x300) COMBINE_DATA(&state->pf2_rowscroll[offset-0x200]);
 			return;
 	}
-	logerror("Wrote to 242000 %02x at %04x %04x (Trap %02x)\n",offset,cpu_get_pc(space->cpu),data,slyspy_state);
+	logerror("Wrote to 242000 %02x at %04x %04x (Trap %02x)\n",offset,cpu_get_pc(space->cpu),data,state->slyspy_state);
 }
 
 WRITE16_HANDLER( slyspy_246000_w )
 {
-	switch (slyspy_state) {
+	dec0_state *state = space->machine->driver_data<dec0_state>();
+	switch (state->slyspy_state) {
 		case 0x0:
 			dec0_pf2_data_w(space,offset,data,mem_mask);
 			return;
 	}
-	logerror("Wrote to 246000 %02x at %04x %04x (Trap %02x)\n",offset,cpu_get_pc(space->cpu),data,slyspy_state);
+	logerror("Wrote to 246000 %02x at %04x %04x (Trap %02x)\n",offset,cpu_get_pc(space->cpu),data,state->slyspy_state);
 }
 
 WRITE16_HANDLER( slyspy_248000_w )
 {
-	switch (slyspy_state) {
+	dec0_state *state = space->machine->driver_data<dec0_state>();
+	switch (state->slyspy_state) {
 		case 0x1:
 			dec0_pf1_data_w(space,offset,data,mem_mask);
 			return;
@@ -219,75 +225,81 @@ WRITE16_HANDLER( slyspy_248000_w )
 			else if (offset<0x10) dec0_pf1_control_1_w(space,offset-0x8,data,mem_mask);
 			return;
 	}
-	logerror("Wrote to 248000 %02x at %04x %04x (Trap %02x)\n",offset,cpu_get_pc(space->cpu),data,slyspy_state);
+	logerror("Wrote to 248000 %02x at %04x %04x (Trap %02x)\n",offset,cpu_get_pc(space->cpu),data,state->slyspy_state);
 }
 
 WRITE16_HANDLER( slyspy_24c000_w )
 {
-	switch (slyspy_state) {
+	dec0_state *state = space->machine->driver_data<dec0_state>();
+	switch (state->slyspy_state) {
 		case 0x1: /* Trap 9 */
 			dec0_pf2_data_w(space,offset,data,mem_mask);
 			return;
 		case 0x0: /* Trap C */
-			if (offset<0x40) COMBINE_DATA(&dec0_pf1_colscroll[offset]);
-			else if (offset<0x300) COMBINE_DATA(&dec0_pf1_rowscroll[offset-0x200]);
+			if (offset<0x40) COMBINE_DATA(&state->pf1_colscroll[offset]);
+			else if (offset<0x300) COMBINE_DATA(&state->pf1_rowscroll[offset-0x200]);
 			return;
 	}
-	logerror("Wrote to 24c000 %02x at %04x %04x (Trap %02x)\n",offset,cpu_get_pc(space->cpu),data,slyspy_state);
+	logerror("Wrote to 24c000 %02x at %04x %04x (Trap %02x)\n",offset,cpu_get_pc(space->cpu),data,state->slyspy_state);
 }
 
 WRITE16_HANDLER( slyspy_24e000_w )
 {
-	switch (slyspy_state) {
+	dec0_state *state = space->machine->driver_data<dec0_state>();
+	switch (state->slyspy_state) {
 		case 0x2:
 		case 0x0:
 			dec0_pf1_data_w(space,offset,data,mem_mask);
 			return;
 	}
-	logerror("Wrote to 24e000 %02x at %04x %04x (Trap %02x)\n",offset,cpu_get_pc(space->cpu),data,slyspy_state);
+	logerror("Wrote to 24e000 %02x at %04x %04x (Trap %02x)\n",offset,cpu_get_pc(space->cpu),data,state->slyspy_state);
 }
 
 /******************************************************************************/
 
-static int share[0xff];
-static int hippodrm_msb,hippodrm_lsb;
 
 READ8_HANDLER( hippodrm_prot_r )
 {
+	dec0_state *state = space->machine->driver_data<dec0_state>();
 //logerror("6280 PC %06x - Read %06x\n",cpu_getpc(),offset+0x1d0000);
-	if (hippodrm_lsb==0x45) return 0x4e;
-	if (hippodrm_lsb==0x92) return 0x15;
+	if (state->hippodrm_lsb==0x45) return 0x4e;
+	if (state->hippodrm_lsb==0x92) return 0x15;
 	return 0;
 }
 
 WRITE8_HANDLER( hippodrm_prot_w )
 {
+	dec0_state *state = space->machine->driver_data<dec0_state>();
 	switch (offset) {
-		case 4:	hippodrm_msb=data; break;
-		case 5:	hippodrm_lsb=data; break;
+		case 4:	state->hippodrm_msb=data; break;
+		case 5:	state->hippodrm_lsb=data; break;
 	}
 //logerror("6280 PC %06x - Wrote %06x to %04x\n",cpu_getpc(),data,offset+0x1d0000);
 }
 
 READ8_HANDLER( hippodrm_shared_r )
 {
-	return share[offset];
+	dec0_state *state = space->machine->driver_data<dec0_state>();
+	return state->share[offset];
 }
 
 WRITE8_HANDLER( hippodrm_shared_w )
 {
-	share[offset]=data;
+	dec0_state *state = space->machine->driver_data<dec0_state>();
+	state->share[offset]=data;
 }
 
 static READ16_HANDLER( hippodrm_68000_share_r )
 {
+	dec0_state *state = space->machine->driver_data<dec0_state>();
 	if (offset==0) cpu_yield(space->cpu); /* A wee helper */
-	return share[offset]&0xff;
+	return state->share[offset]&0xff;
 }
 
 static WRITE16_HANDLER( hippodrm_68000_share_w )
 {
-	share[offset]=data&0xff;
+	dec0_state *state = space->machine->driver_data<dec0_state>();
+	state->share[offset]=data&0xff;
 }
 
 /******************************************************************************/
@@ -326,23 +338,23 @@ static WRITE16_HANDLER( hippodrm_68000_share_w )
     values are not known to change after bootup.
 */
 
-static UINT8 i8751_ports[4];
 
 READ8_HANDLER(dec0_mcu_port_r )
 {
-	int latchEnable=i8751_ports[2]>>4;
+	dec0_state *state = space->machine->driver_data<dec0_state>();
+	int latchEnable=state->i8751_ports[2]>>4;
 
 	// P0 connected to 4 latches
 	if (offset==0)
 	{
 		if ((latchEnable&1)==0)
-			return i8751_command>>8;
+			return state->i8751_command>>8;
 		else if ((latchEnable&2)==0)
-			return i8751_command&0xff;
+			return state->i8751_command&0xff;
 		else if ((latchEnable&4)==0)
-			return i8751_return>>8;
+			return state->i8751_return>>8;
 		else if ((latchEnable&8)==0)
-			return i8751_return&0xff;
+			return state->i8751_return&0xff;
 	}
 
 	return 0xff;
@@ -350,7 +362,8 @@ READ8_HANDLER(dec0_mcu_port_r )
 
 WRITE8_HANDLER(dec0_mcu_port_w )
 {
-	i8751_ports[offset]=data;
+	dec0_state *state = space->machine->driver_data<dec0_state>();
+	state->i8751_ports[offset]=data;
 
 	if (offset==2)
 	{
@@ -359,58 +372,60 @@ WRITE8_HANDLER(dec0_mcu_port_w )
 		if ((data&0x8)==0)
 			cputag_set_input_line(space->machine, "mcu", MCS51_INT1_LINE, CLEAR_LINE);
 		if ((data&0x40)==0)
-			i8751_return=(i8751_return&0xff00)|(i8751_ports[0]);
+			state->i8751_return=(state->i8751_return&0xff00)|(state->i8751_ports[0]);
 		if ((data&0x80)==0)
-			i8751_return=(i8751_return&0xff)|(i8751_ports[0]<<8);
+			state->i8751_return=(state->i8751_return&0xff)|(state->i8751_ports[0]<<8);
 	}
 }
 
 static void baddudes_i8751_write(running_machine *machine, int data)
 {
-	i8751_return=0;
+	dec0_state *state = machine->driver_data<dec0_state>();
+	state->i8751_return=0;
 
 	switch (data&0xffff) {
-		case 0x714: i8751_return=0x700; break;
-		case 0x73b: i8751_return=0x701; break;
-		case 0x72c: i8751_return=0x702; break;
-		case 0x73f: i8751_return=0x703; break;
-		case 0x755: i8751_return=0x704; break;
-		case 0x722: i8751_return=0x705; break;
-		case 0x72b: i8751_return=0x706; break;
-		case 0x724: i8751_return=0x707; break;
-		case 0x728: i8751_return=0x708; break;
-		case 0x735: i8751_return=0x709; break;
-		case 0x71d: i8751_return=0x70a; break;
-		case 0x721: i8751_return=0x70b; break;
-		case 0x73e: i8751_return=0x70c; break;
-		case 0x761: i8751_return=0x70d; break;
-		case 0x753: i8751_return=0x70e; break;
-		case 0x75b: i8751_return=0x70f; break;
+		case 0x714: state->i8751_return=0x700; break;
+		case 0x73b: state->i8751_return=0x701; break;
+		case 0x72c: state->i8751_return=0x702; break;
+		case 0x73f: state->i8751_return=0x703; break;
+		case 0x755: state->i8751_return=0x704; break;
+		case 0x722: state->i8751_return=0x705; break;
+		case 0x72b: state->i8751_return=0x706; break;
+		case 0x724: state->i8751_return=0x707; break;
+		case 0x728: state->i8751_return=0x708; break;
+		case 0x735: state->i8751_return=0x709; break;
+		case 0x71d: state->i8751_return=0x70a; break;
+		case 0x721: state->i8751_return=0x70b; break;
+		case 0x73e: state->i8751_return=0x70c; break;
+		case 0x761: state->i8751_return=0x70d; break;
+		case 0x753: state->i8751_return=0x70e; break;
+		case 0x75b: state->i8751_return=0x70f; break;
 	}
 
-	if (!i8751_return) logerror("%s: warning - write unknown command %02x to 8571\n",machine->describe_context(),data);
+	if (!state->i8751_return) logerror("%s: warning - write unknown command %02x to 8571\n",machine->describe_context(),data);
 	cputag_set_input_line(machine, "maincpu", 5, HOLD_LINE);
 }
 
 static void birdtry_i8751_write(running_machine *machine, int data)
 {
+	dec0_state *state = machine->driver_data<dec0_state>();
 	static int	pwr,
 				hgt;
 
-	i8751_return=0;
+	state->i8751_return=0;
 
 	switch(data&0xffff) {
 		/*"Sprite control"*/
-		case 0x22a:	i8751_return = 0x200;	  break;
+		case 0x22a:	state->i8751_return = 0x200;	  break;
 
 		/* Gives an O.B. otherwise (it must be > 0xb0 )*/
-		case 0x3c7:	i8751_return = 0x7ff;	  break;
+		case 0x3c7:	state->i8751_return = 0x7ff;	  break;
 
 		/*Enables shot checks*/
-		case 0x33c: i8751_return = 0x200;     break;
+		case 0x33c: state->i8751_return = 0x200;     break;
 
 		/*Used on the title screen only(???)*/
-		case 0x31e: i8751_return = 0x200;     break;
+		case 0x31e: state->i8751_return = 0x200;     break;
 
 /*  0x100-0x10d values are for club power meters(1W=0x100<<-->>PT=0x10d).    *
  *  Returned value to i8751 doesn't matter,but send the result to 0x481.     *
@@ -429,7 +444,7 @@ static void birdtry_i8751_write(running_machine *machine, int data)
 		case 0x10b: pwr = 0x5c; 			break; /*PW*/
 		case 0x10c: pwr = 0x60; 			break; /*SW*/
 		case 0x10d: pwr = 0x80; 			break; /*PT*/
-		case 0x481: i8751_return = pwr;     break; /*Power meter*/
+		case 0x481: state->i8751_return = pwr;     break; /*Power meter*/
 
 /*  0x200-0x20f values are for shot height(STRONG=0x200<<-->>WEAK=0x20f).    *
  *  Returned value to i8751 doesn't matter,but send the result to 0x534.     *
@@ -450,14 +465,14 @@ static void birdtry_i8751_write(running_machine *machine, int data)
 		case 0x20d: hgt = 0x280;			break; /*|*/
 		case 0x20e: hgt = 0x240;			break; /*|*/
 		case 0x20f: hgt = 0x200;			break; /*L*/
-		case 0x534: i8751_return = hgt; 	break; /*Shot height*/
+		case 0x534: state->i8751_return = hgt; 	break; /*Shot height*/
 
 		/*At the ending screen(???)*/
-		//case 0x3b4: i8751_return = 0;       break;
+		//case 0x3b4: state->i8751_return = 0;       break;
 
 		/*These are activated after a shot (???)*/
-		case 0x6ca: i8751_return = 0xff;      break;
-		case 0x7ff: i8751_return = 0x200;     break;
+		case 0x6ca: state->i8751_return = 0xff;      break;
+		case 0x7ff: state->i8751_return = 0x200;     break;
 		default: logerror("%s: warning - write unknown command %02x to 8571\n",machine->describe_context(),data);
 	}
 	cputag_set_input_line(machine, "maincpu", 5, HOLD_LINE);
@@ -465,19 +480,21 @@ static void birdtry_i8751_write(running_machine *machine, int data)
 
 void dec0_i8751_write(running_machine *machine, int data)
 {
-	i8751_command=data;
+	dec0_state *state = machine->driver_data<dec0_state>();
+	state->i8751_command=data;
 
 	/* Writes to this address cause an IRQ to the i8751 microcontroller */
-	if (GAME == 1) cputag_set_input_line(machine, "mcu", MCS51_INT1_LINE, ASSERT_LINE);
-	if (GAME == 2) baddudes_i8751_write(machine, data);
-	if (GAME == 3) birdtry_i8751_write(machine, data);
+	if (state->GAME == 1) cputag_set_input_line(machine, "mcu", MCS51_INT1_LINE, ASSERT_LINE);
+	if (state->GAME == 2) baddudes_i8751_write(machine, data);
+	if (state->GAME == 3) birdtry_i8751_write(machine, data);
 
 	//logerror("%s: warning - write %02x to i8751\n",machine->describe_context(),data);
 }
 
-void dec0_i8751_reset(void)
+void dec0_i8751_reset(running_machine *machine)
 {
-	i8751_return=i8751_command=0;
+	dec0_state *state = machine->driver_data<dec0_state>();
+	state->i8751_return=state->i8751_command=0;
 }
 
 /******************************************************************************/
@@ -491,16 +508,18 @@ static WRITE16_HANDLER( sprite_mirror_w )
 
 static READ16_HANDLER( robocop_68000_share_r )
 {
+	dec0_state *state = space->machine->driver_data<dec0_state>();
 //logerror("%08x: Share read %04x\n",cpu_get_pc(space->cpu),offset);
 
-	return robocop_shared_ram[offset];
+	return state->robocop_shared_ram[offset];
 }
 
 static WRITE16_HANDLER( robocop_68000_share_w )
 {
+	dec0_state *state = space->machine->driver_data<dec0_state>();
 //  logerror("%08x: Share write %04x %04x\n",cpu_get_pc(space->cpu),offset,data);
 
-	robocop_shared_ram[offset]=data&0xff;
+	state->robocop_shared_ram[offset]=data&0xff;
 
 	if (offset == 0x7ff) /* A control address - not standard ram */
 		cputag_set_input_line(space->machine, "sub", 0, HOLD_LINE);
@@ -552,20 +571,23 @@ DRIVER_INIT( robocop )
 
 DRIVER_INIT( baddudes )
 {
-	GAME = 2;
+	dec0_state *state = machine->driver_data<dec0_state>();
+	state->GAME = 2;
 }
 
 DRIVER_INIT( hbarrel )
 {
-	GAME = 1;
+	dec0_state *state = machine->driver_data<dec0_state>();
+	state->GAME = 1;
 }
 
 DRIVER_INIT( birdtry )
 {
+	dec0_state *state = machine->driver_data<dec0_state>();
 	UINT8 *src, tmp;
 	int i, j, k;
 
-	GAME=3;
+	state->GAME=3;
 
 	src = machine->region("gfx4")->base();
 

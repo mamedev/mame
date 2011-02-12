@@ -5,12 +5,16 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	UINT8 *gfx_control;
+	tilemap_t *fg_tilemap;
+	tilemap_t *bg_tilemap;
+	UINT8 vram_bank;
+	UINT8 *vram;
+	UINT8 *vram_gfx;
 };
 
 
 /*----------- defined in video/tryout.c -----------*/
-
-extern UINT8 *tryout_gfx_control;
 
 READ8_HANDLER( tryout_vram_r );
 WRITE8_HANDLER( tryout_videoram_w );

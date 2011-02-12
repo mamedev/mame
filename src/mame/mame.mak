@@ -381,9 +381,9 @@ $(MAMEOBJ)/amiga.a: \
 
 $(MAMEOBJ)/aristocr.a: \
 	$(DRIVERS)/86lions.o \
-	$(DRIVERS)/caswin.o \
 	$(DRIVERS)/aristmk4.o \
 	$(DRIVERS)/aristmk5.o \
+	$(DRIVERS)/caswin.o \
 	$(MACHINE)/archimds.o \
 	$(VIDEO)/archimds.o \
 
@@ -514,10 +514,10 @@ $(MAMEOBJ)/capcom.a: \
 	$(DRIVERS)/cps2.o \
 	$(DRIVERS)/cps3.o $(AUDIO)/cps3.o \
 	$(DRIVERS)/egghunt.o \
+	$(DRIVERS)/exedexes.o $(VIDEO)/exedexes.o \
 	$(DRIVERS)/fcrash.o \
 	$(DRIVERS)/gng.o $(VIDEO)/gng.o \
 	$(DRIVERS)/gunsmoke.o $(VIDEO)/gunsmoke.o \
-	$(DRIVERS)/exedexes.o $(VIDEO)/exedexes.o \
 	$(DRIVERS)/higemaru.o $(VIDEO)/higemaru.o \
 	$(DRIVERS)/lastduel.o $(VIDEO)/lastduel.o \
 	$(DRIVERS)/lwings.o $(VIDEO)/lwings.o \
@@ -526,8 +526,8 @@ $(MAMEOBJ)/capcom.a: \
 	$(DRIVERS)/sidearms.o $(VIDEO)/sidearms.o \
 	$(DRIVERS)/sonson.o $(VIDEO)/sonson.o \
 	$(DRIVERS)/srumbler.o $(VIDEO)/srumbler.o \
-	$(DRIVERS)/vulgus.o $(VIDEO)/vulgus.o \
 	$(DRIVERS)/tigeroad.o $(VIDEO)/tigeroad.o \
+	$(DRIVERS)/vulgus.o $(VIDEO)/vulgus.o \
 	$(DRIVERS)/zn.o $(MACHINE)/znsec.o \
 	$(DRIVERS)/taitogn.o \
 	$(MACHINE)/cps2crpt.o \
@@ -560,10 +560,9 @@ $(MAMEOBJ)/dataeast.a: \
 	$(DRIVERS)/boogwing.o $(VIDEO)/boogwing.o \
 	$(DRIVERS)/brkthru.o $(VIDEO)/brkthru.o \
 	$(DRIVERS)/btime.o $(MACHINE)/btime.o $(VIDEO)/btime.o \
-	$(DRIVERS)/chanbara.o \
 	$(DRIVERS)/bwing.o $(VIDEO)/bwing.o \
-	$(DRIVERS)/deshoros.o \
 	$(DRIVERS)/cbuster.o $(VIDEO)/cbuster.o \
+	$(DRIVERS)/chanbara.o \
 	$(DRIVERS)/cninja.o $(VIDEO)/cninja.o \
 	$(DRIVERS)/cntsteer.o \
 	$(DRIVERS)/compgolf.o $(VIDEO)/compgolf.o \
@@ -577,6 +576,7 @@ $(MAMEOBJ)/dataeast.a: \
 	$(DRIVERS)/deco156.o $(MACHINE)/deco156.o \
 	$(DRIVERS)/deco32.o $(VIDEO)/deco32.o \
 	$(DRIVERS)/decocass.o $(MACHINE)/decocass.o $(VIDEO)/decocass.o \
+	$(DRIVERS)/deshoros.o \
 	$(DRIVERS)/dietgo.o $(VIDEO)/dietgo.o \
 	$(DRIVERS)/exprraid.o $(VIDEO)/exprraid.o \
 	$(DRIVERS)/firetrap.o $(VIDEO)/firetrap.o \

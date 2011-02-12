@@ -39,6 +39,8 @@ public:
 	/* devices */
 	optional_device<cpu_device> audiocpu;
 	optional_device<okim6295_device> oki;
+	UINT8 *nvram;
+	size_t nvram_size;
 };
 
 

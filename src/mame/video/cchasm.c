@@ -17,9 +17,7 @@
 #define POSX   6
 #define LENGTH 7
 
-UINT16 *cchasm_ram;
 
-static int xcenter, ycenter;
 
 static TIMER_CALLBACK( cchasm_refresh_end )
 {
@@ -28,6 +26,7 @@ static TIMER_CALLBACK( cchasm_refresh_end )
 
 static void cchasm_refresh (running_machine *machine)
 {
+	cchasm_state *state = machine->driver_data<cchasm_state>();
 
 	int pc = 0;
     int done = 0;
@@ -42,7 +41,7 @@ static void cchasm_refresh (running_machine *machine)
 
 	while (!done)
 	{
-        data = cchasm_ram[pc];
+        data = state->ram[pc];
 		opcode = data >> 12;
         data &= 0xfff;
         if ((opcode > COLOR) && (data & 0x800))
@@ -67,14 +66,14 @@ static void cchasm_refresh (running_machine *machine)
             break;
         case POSY:
             move = 1;
-            currenty = ycenter + (data << 16);
+            currenty = state->ycenter + (data << 16);
             break;
         case SCALEX:
             scalex = data << 5;
             break;
         case POSX:
             move = 1;
-            currentx = xcenter - (data << 16);
+            currentx = state->xcenter - (data << 16);
             break;
         case LENGTH:
             if (move)
@@ -122,10 +121,11 @@ WRITE16_HANDLER( cchasm_refresh_control_w )
 
 VIDEO_START( cchasm )
 {
+	cchasm_state *state = machine->driver_data<cchasm_state>();
 	const rectangle &visarea = machine->primary_screen->visible_area();
 
-	xcenter=((visarea.max_x + visarea.min_x)/2) << 16;
-	ycenter=((visarea.max_y + visarea.min_y)/2) << 16;
+	state->xcenter=((visarea.max_x + visarea.min_x)/2) << 16;
+	state->ycenter=((visarea.max_y + visarea.min_y)/2) << 16;
 
 	VIDEO_START_CALL(vector);
 }

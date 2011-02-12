@@ -43,23 +43,23 @@ static WRITE8_HANDLER( pcktgal_sound_w )
 	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static int msm5205next;
 
 static void pcktgal_adpcm_int(device_t *device)
 {
-	static int toggle;
+	pcktgal_state *state = device->machine->driver_data<pcktgal_state>();
 
-	msm5205_data_w(device,msm5205next >> 4);
-	msm5205next<<=4;
+	msm5205_data_w(device,state->msm5205next >> 4);
+	state->msm5205next<<=4;
 
-	toggle = 1 - toggle;
-	if (toggle)
+	state->toggle = 1 - state->toggle;
+	if (state->toggle)
 		cputag_set_input_line(device->machine, "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( pcktgal_adpcm_data_w )
 {
-	msm5205next=data;
+	pcktgal_state *state = space->machine->driver_data<pcktgal_state>();
+	state->msm5205next=data;
 }
 
 static READ8_DEVICE_HANDLER( pcktgal_adpcm_reset_r )
