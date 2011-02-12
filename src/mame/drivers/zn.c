@@ -487,7 +487,10 @@ static void zn_driver_init( running_machine *machine )
 
 static void psx_spu_irq(device_t *device, UINT32 data)
 {
-	psx_irq_set(device->machine, data);
+	if (data)
+	{
+		psx_irq_set(device->machine, 1<<9);
+	}
 }
 
 static void zn_machine_init( running_machine *machine )

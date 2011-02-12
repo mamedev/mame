@@ -906,7 +906,10 @@ static MACHINE_RESET( twinkle )
 
 static void spu_irq(device_t *device, UINT32 data)
 {
-	psx_irq_set(device->machine, data);
+	if (data)
+	{
+		psx_irq_set(device->machine, 1<<9);
+	}
 }
 
 static const i2cmem_interface i2cmem_interface =
