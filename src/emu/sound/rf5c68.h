@@ -10,6 +10,7 @@
 #include "devlegcy.h"
 
 /******************************************/
+READ8_DEVICE_HANDLER( rf5c68_r );
 WRITE8_DEVICE_HANDLER( rf5c68_w );
 
 READ8_DEVICE_HANDLER( rf5c68_mem_r );

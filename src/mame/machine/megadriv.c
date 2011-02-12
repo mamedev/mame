@@ -6421,6 +6421,7 @@ static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfe0000, 0xfe3fff) AM_RAM // backup RAM, odd bytes only!
 
 	AM_RANGE(0xff0000, 0xff001f) AM_DEVWRITE8("rfsnd", rf5c68_w, 0x00ff)  // PCM, RF5C164
+	AM_RANGE(0xff0020, 0xff003f) AM_DEVREAD8("rfsnd", rf5c68_r, 0xffff)
 	AM_RANGE(0xff2000, 0xff3fff) AM_DEVREADWRITE8("rfsnd", rf5c68_mem_r, rf5c68_mem_w,0x00ff)  // PCM, RF5C164
 
 

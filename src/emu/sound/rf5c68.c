@@ -161,6 +161,13 @@ static DEVICE_START( rf5c68 )
 /*    RF5C68 write register                     */
 /************************************************/
 
+READ8_DEVICE_HANDLER( rf5c68_r )
+{
+	rf5c68_state *chip = get_safe_token(device);
+
+	return (chip->chan[(offset & 0x1c) >> 2].addr) >> ((offset & 3) >> 8);
+}
+
 WRITE8_DEVICE_HANDLER( rf5c68_w )
 {
 	rf5c68_state *chip = get_safe_token(device);
