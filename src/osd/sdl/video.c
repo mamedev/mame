@@ -88,7 +88,7 @@ static sdl_monitor_info *sdl_monitor_list;
 
 static void video_exit(running_machine &machine);
 static void init_monitors(void);
-static sdl_monitor_info *pick_monitor(int index);
+static sdl_monitor_info *pick_monitor(core_options &options, int index);
 
 static void check_osd_inputs(running_machine *machine);
 
@@ -817,8 +817,8 @@ static void extract_video_config(running_machine *machine)
 
 static float get_aspect(core_options &options, const char *name, int report_error)
 {
-	const char *defdata = options_get_string(options, SDLOPTION_ASPECT(""));
-	const char *data = options_get_string(options, name);
+	const char *defdata = options_get_string(&options, SDLOPTION_ASPECT(""));
+	const char *data = options_get_string(&options, name);
 	int num = 0, den = 1;
 
 	if (strcmp(data, SDLOPTVAL_AUTO) == 0)
@@ -839,8 +839,8 @@ static float get_aspect(core_options &options, const char *name, int report_erro
 
 static void get_resolution(core_options &options, const char *name, sdl_window_config *config, int report_error)
 {
-	const char *defdata = options_get_string(options, SDLOPTION_RESOLUTION(""));
-	const char *data = options_get_string(options, name);
+	const char *defdata = options_get_string(&options, SDLOPTION_RESOLUTION(""));
+	const char *data = options_get_string(&options, name);
 
 	config->width = config->height = config->depth = config->refresh = 0;
 	if (strcmp(data, SDLOPTVAL_AUTO) == 0)

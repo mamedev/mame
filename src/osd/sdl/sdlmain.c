@@ -2,7 +2,7 @@
 //
 //  sdlmain.c - main file for SDLMAME.
 //
-//  Copyright (c) 1996-2010, Nicola Salmoria and the MAME Team.
+//  Copyright (c) 1996-2011, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
@@ -527,24 +527,24 @@ void sdl_osd_interface::init(running_machine &machine)
 	const char *stemp;
 
 	// determine if we are benchmarking, and adjust options appropriately
-	int bench = options_get_int(machine.options(), SDLOPTION_BENCH);
+	int bench = options_get_int(&machine.options(), SDLOPTION_BENCH);
 	if (bench > 0)
 	{
-		options_set_bool(machine.options(), OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM);
-		options_set_bool(machine.options(), OPTION_SOUND, false, OPTION_PRIORITY_MAXIMUM);
-		options_set_string(machine.options(), SDLOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM);
-		options_set_int(machine.options(), OPTION_SECONDS_TO_RUN, bench, OPTION_PRIORITY_MAXIMUM);
+		options_set_bool(&machine.options(), OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM);
+		options_set_bool(&machine.options(), OPTION_SOUND, false, OPTION_PRIORITY_MAXIMUM);
+		options_set_string(&machine.options(), SDLOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM);
+		options_set_int(&machine.options(), OPTION_SECONDS_TO_RUN, bench, OPTION_PRIORITY_MAXIMUM);
 	}
 
 	// Some driver options - must be before audio init!
-	stemp = options_get_string(machine.options(), SDLOPTION_AUDIODRIVER);
+	stemp = options_get_string(&machine.options(), SDLOPTION_AUDIODRIVER);
 	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
 	{
 		mame_printf_verbose("Setting SDL audiodriver '%s' ...\n", stemp);
 		osd_setenv(SDLENV_AUDIODRIVER, stemp, 1);
 	}
 
-	stemp = options_get_string(machine.options(), SDLOPTION_VIDEODRIVER);
+	stemp = options_get_string(&machine.options(), SDLOPTION_VIDEODRIVER);
 	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
 	{
 		mame_printf_verbose("Setting SDL videodriver '%s' ...\n", stemp);
@@ -553,7 +553,7 @@ void sdl_osd_interface::init(running_machine &machine)
 
 	if (SDL_VERSION_ATLEAST(1,3,0))
 	{
-		stemp = options_get_string(machine.options(), SDLOPTION_RENDERDRIVER);
+		stemp = options_get_string(&machine.options(), SDLOPTION_RENDERDRIVER);
 		if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
 		{
 			mame_printf_verbose("Setting SDL renderdriver '%s' ...\n", stemp);
@@ -566,7 +566,7 @@ void sdl_osd_interface::init(running_machine &machine)
      */
 	/* FIXME: move lib loading code from drawogl.c here */
 
-	stemp = options_get_string(machine.options(), SDLOPTION_GL_LIB);
+	stemp = options_get_string(&machine.options(), SDLOPTION_GL_LIB);
 	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
 	{
 		osd_setenv("SDL_VIDEO_GL_DRIVER", stemp, 1);
@@ -574,7 +574,7 @@ void sdl_osd_interface::init(running_machine &machine)
 	}
 
 	/* get number of processors */
-	stemp = options_get_string(machine.options(), SDLOPTION_NUMPROCESSORS);
+	stemp = options_get_string(&machine.options(), SDLOPTION_NUMPROCESSORS);
 
 	sdl_num_processors = 0;
 
@@ -630,13 +630,13 @@ void sdl_osd_interface::init(running_machine &machine)
 
 	sdloutput_init(&machine);
 
-	if (options_get_bool(machine.options(), SDLOPTION_OSLOG))
+	if (options_get_bool(&machine.options(), SDLOPTION_OSLOG))
 		machine.add_logerror_callback(output_oslog);
 
 	/* now setup watchdog */
 
-	int watchdog_timeout = options_get_int(machine.options(), SDLOPTION_WATCHDOG);
-	int str = options_get_int(machine.options(), OPTION_SECONDS_TO_RUN);
+	int watchdog_timeout = options_get_int(&machine.options(), SDLOPTION_WATCHDOG);
+	int str = options_get_int(&machine.options(), OPTION_SECONDS_TO_RUN);
 
 	/* only enable watchdog if seconds_to_run is enabled *and* relatively short (time taken from ui.c) */
 	if ((watchdog_timeout != 0) && (str > 0) && (str < 60*5 ))

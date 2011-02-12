@@ -2,7 +2,7 @@
 //
 //  input.c - SDL implementation of MAME input routines
 //
-//  Copyright (c) 1996-2010, Nicola Salmoria and the MAME Team.
+//  Copyright (c) 1996-2011, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
@@ -1602,7 +1602,7 @@ void sdl_osd_interface::customize_input_type_list(input_type_desc *typelist)
 		{
 			// configurable UI mode switch
 			case IPT_UI_TOGGLE_UI:
-				uimode = (const char *)options_get_string(machine().options(), SDLOPTION_UIMODEKEY);
+				uimode = (const char *)options_get_string(&machine().options(), SDLOPTION_UIMODEKEY);
 				if(!strcmp(uimode,"auto")) {
 					#if defined(__APPLE__) && defined(__MACH__)
 					mameid_code = lookup_mame_code("ITEM_ID_INSERT");

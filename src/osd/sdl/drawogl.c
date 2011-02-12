@@ -2,7 +2,7 @@
 //
 //  drawogl.c - SDL software and OpenGL implementation
 //
-//  Copyright (c) 1996-2010, Nicola Salmoria and the MAME Team.
+//  Copyright (c) 1996-2011, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
@@ -513,7 +513,7 @@ static void load_gl_lib(running_machine &machine)
          */
 		const char *stemp;
 
-		stemp = options_get_string(machine.options(), SDLOPTION_GL_LIB);
+		stemp = options_get_string(&machine.options(), SDLOPTION_GL_LIB);
 		if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) == 0)
 			stemp = NULL;
 
