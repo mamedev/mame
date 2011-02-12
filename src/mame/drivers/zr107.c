@@ -176,7 +176,22 @@ Check gticlub.c for details on the bottom board.
 #include "video/konicdev.h"
 #include "video/gticlub.h"
 
-static UINT8 led_reg0, led_reg1;
+
+class zr107_state : public driver_device
+{
+public:
+	zr107_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 led_reg0;
+	UINT8 led_reg1;
+	int ccu_vcth;
+	int ccu_vctl;
+	UINT32 *workram;
+	UINT32 *sharc_dataram;
+};
+
+
 
 
 
@@ -189,6 +204,7 @@ static VIDEO_START( jetwave )
 
 static VIDEO_UPDATE( jetwave )
 {
+	zr107_state *state = screen->machine->driver_data<zr107_state>();
 	device_t *k001604 = screen->machine->device("k001604");
 
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
@@ -197,8 +213,8 @@ static VIDEO_UPDATE( jetwave )
 
 	k001604_draw_front_layer(k001604, bitmap, cliprect);
 
-	draw_7segment_led(bitmap, 3, 3, led_reg0);
-	draw_7segment_led(bitmap, 9, 3, led_reg1);
+	draw_7segment_led(bitmap, 3, 3, state->led_reg0);
+	draw_7segment_led(bitmap, 9, 3, state->led_reg1);
 
 	sharc_set_flag_input(screen->machine->device("dsp"), 1, ASSERT_LINE);
 	return 0;
@@ -241,6 +257,7 @@ static VIDEO_START( zr107 )
 
 static VIDEO_UPDATE( zr107 )
 {
+	zr107_state *state = screen->machine->driver_data<zr107_state>();
 	device_t *k056832 = screen->machine->device("k056832");
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
 
@@ -248,8 +265,8 @@ static VIDEO_UPDATE( zr107 )
 	K001005_draw(bitmap, cliprect);
 	k056832_tilemap_draw(k056832, bitmap, cliprect, 0, 0, 0);
 
-	draw_7segment_led(bitmap, 3, 3, led_reg0);
-	draw_7segment_led(bitmap, 9, 3, led_reg1);
+	draw_7segment_led(bitmap, 3, 3, state->led_reg0);
+	draw_7segment_led(bitmap, 9, 3, state->led_reg1);
 
 	sharc_set_flag_input(screen->machine->device("dsp"), 1, ASSERT_LINE);
 	return 0;
@@ -280,14 +297,15 @@ static READ8_HANDLER( sysreg_r )
 
 static WRITE8_HANDLER( sysreg_w )
 {
+	zr107_state *state = space->machine->driver_data<zr107_state>();
 	switch (offset)
 	{
 		case 0:	/* LED Register 0 */
-			led_reg0 = data;
+			state->led_reg0 = data;
 			break;
 
 		case 1:	/* LED Register 1 */
-			led_reg1 = data;
+			state->led_reg1 = data;
 			break;
 
 		case 2: /* Parallel data register */
@@ -341,10 +359,9 @@ static WRITE8_HANDLER( sysreg_w )
 	}
 }
 
-static int ccu_vcth = 0;
-static int ccu_vctl = 0;
 static READ32_HANDLER( ccu_r )
 {
+	zr107_state *state = space->machine->driver_data<zr107_state>();
 	UINT32 r = 0;
 	switch (offset)
 	{
@@ -353,14 +370,14 @@ static READ32_HANDLER( ccu_r )
 			// Midnight Run polls the vertical counter in vblank
 			if (ACCESSING_BITS_24_31)
 			{
-				ccu_vcth ^= 0xff;
-				r |= ccu_vcth << 24;
+				state->ccu_vcth ^= 0xff;
+				r |= state->ccu_vcth << 24;
 			}
 			if (ACCESSING_BITS_8_15)
 			{
-				ccu_vctl++;
-				ccu_vctl &= 0x1ff;
-				r |= (ccu_vctl >> 2) << 8;
+				state->ccu_vctl++;
+				state->ccu_vctl &= 0x1ff;
+				r |= (state->ccu_vctl >> 2) << 8;
 			}
 		}
 	}
@@ -375,18 +392,18 @@ static WRITE32_HANDLER( ccu_w )
 
 /******************************************************************/
 
-static UINT32 *workram;
 static MACHINE_START( zr107 )
 {
+	zr107_state *state = machine->driver_data<zr107_state>();
 	/* set conservative DRC options */
 	ppcdrc_set_options(machine->device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine->device("maincpu"), 0x00000000, 0x000fffff, FALSE, workram);
+	ppcdrc_add_fastram(machine->device("maincpu"), 0x00000000, 0x000fffff, FALSE, state->workram);
 }
 
 static ADDRESS_MAP_START( zr107_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x000fffff) AM_RAM	AM_BASE(&workram)	/* Work RAM */
+	AM_RANGE(0x00000000, 0x000fffff) AM_RAM	AM_BASE_MEMBER(zr107_state, workram)	/* Work RAM */
 	AM_RANGE(0x74000000, 0x74003fff) AM_DEVREADWRITE("k056832", k056832_ram_long_r, k056832_ram_long_w)
 	AM_RANGE(0x74020000, 0x7402003f) AM_DEVREADWRITE("k056832", k056832_long_r, k056832_long_w)
 	AM_RANGE(0x74060000, 0x7406003f) AM_READWRITE(ccu_r, ccu_w)
@@ -474,16 +491,17 @@ static const k054539_interface k054539_config =
 
 /*****************************************************************************/
 
-static UINT32 *sharc_dataram;
 
 static READ32_HANDLER( dsp_dataram_r )
 {
-	return sharc_dataram[offset] & 0xffff;
+	zr107_state *state = space->machine->driver_data<zr107_state>();
+	return state->sharc_dataram[offset] & 0xffff;
 }
 
 static WRITE32_HANDLER( dsp_dataram_w )
 {
-	sharc_dataram[offset] = data;
+	zr107_state *state = space->machine->driver_data<zr107_state>();
+	state->sharc_dataram[offset] = data;
 }
 
 static ADDRESS_MAP_START( sharc_map, ADDRESS_SPACE_DATA, 32 )
@@ -717,7 +735,7 @@ static MACHINE_RESET( zr107 )
 	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( zr107, driver_device )
+static MACHINE_CONFIG_START( zr107, zr107_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
@@ -778,7 +796,7 @@ static const k001604_interface jetwave_k001604_intf =
 	0		/* slrasslt hack */
 };
 
-static MACHINE_CONFIG_START( jetwave, driver_device )
+static MACHINE_CONFIG_START( jetwave, zr107_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
@@ -835,9 +853,10 @@ MACHINE_CONFIG_END
 
 static void init_zr107(running_machine *machine)
 {
-	sharc_dataram = auto_alloc_array(machine, UINT32, 0x100000/4);
-	led_reg0 = led_reg1 = 0x7f;
-	ccu_vcth = ccu_vctl = 0;
+	zr107_state *state = machine->driver_data<zr107_state>();
+	state->sharc_dataram = auto_alloc_array(machine, UINT32, 0x100000/4);
+	state->led_reg0 = state->led_reg1 = 0x7f;
+	state->ccu_vcth = state->ccu_vctl = 0;
 
 	K001005_preprocess_texture_data(machine->region("gfx1")->base(), machine->region("gfx1")->bytes(), 0);
 }

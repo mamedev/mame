@@ -627,7 +627,6 @@ Notes:
 #include "emu.h"
 #include "cpu/v60/v60.h"
 #include "deprecat.h"
-#include "includes/system16.h"
 #include "video/segaic24.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/mb86233/mb86233.h"
@@ -636,10 +635,7 @@ Notes:
 #include "machine/nvram.h"
 #include "includes/model1.h"
 
-static int model1_sound_irq;
 
-#define FIFO_SIZE	(8)
-static int to_68k[FIFO_SIZE], fifo_wptr, fifo_rptr;
 
 static READ16_HANDLER( io_r )
 {
@@ -683,19 +679,20 @@ static WRITE16_HANDLER( bank_w )
 }
 
 
-static int last_irq;
 
 static void irq_raise(running_machine *machine, int level)
 {
+	model1_state *state = machine->driver_data<model1_state>();
 	//  logerror("irq: raising %d\n", level);
 	//  irq_status |= (1 << level);
-	last_irq = level;
+	state->last_irq = level;
 	cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 }
 
 static IRQ_CALLBACK(irq_callback)
 {
-	return last_irq;
+	model1_state *state = device->machine->driver_data<model1_state>();
+	return state->last_irq;
 }
 // vf
 // 1 = fe3ed4
@@ -719,16 +716,17 @@ static void irq_init(running_machine *machine)
 
 static INTERRUPT_GEN(model1_interrupt)
 {
+	model1_state *state = device->machine->driver_data<model1_state>();
 	if (cpu_getiloops(device))
 	{
 		irq_raise(device->machine, 1);
 	}
 	else
 	{
-		irq_raise(device->machine, model1_sound_irq);
+		irq_raise(device->machine, state->sound_irq);
 
 		// if the FIFO has something in it, signal the 68k too
-		if (fifo_rptr != fifo_wptr)
+		if (state->fifo_rptr != state->fifo_wptr)
 		{
 			cputag_set_input_line(device->machine, "audiocpu", 2, HOLD_LINE);
 		}
@@ -737,33 +735,35 @@ static INTERRUPT_GEN(model1_interrupt)
 
 static MACHINE_RESET(model1)
 {
+	model1_state *state = machine->driver_data<model1_state>();
 	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x1000000);
 	irq_init(machine);
 	model1_tgp_reset(machine, !strcmp(machine->gamedrv->name, "swa") || !strcmp(machine->gamedrv->name, "wingwar") || !strcmp(machine->gamedrv->name, "wingwaru") || !strcmp(machine->gamedrv->name, "wingwarj"));
 	if (!strcmp(machine->gamedrv->name, "swa"))
 	{
-		model1_sound_irq = 0;
+		state->sound_irq = 0;
 	}
 	else
 	{
-		model1_sound_irq = 3;
+		state->sound_irq = 3;
 	}
 
 	// init the sound FIFO
-	fifo_rptr = fifo_wptr = 0;
-	memset(to_68k, 0, sizeof(to_68k));
+	state->fifo_rptr = state->fifo_wptr = 0;
+	memset(state->to_68k, 0, sizeof(state->to_68k));
 }
 
 static MACHINE_RESET(model1_vr)
 {
+	model1_state *state = machine->driver_data<model1_state>();
 	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x1000000);
 	irq_init(machine);
 	model1_vr_tgp_reset(machine);
-	model1_sound_irq = 3;
+	state->sound_irq = 3;
 
 	// init the sound FIFO
-	fifo_rptr = fifo_wptr = 0;
-	memset(to_68k, 0, sizeof(to_68k));
+	state->fifo_rptr = state->fifo_wptr = 0;
+	memset(state->to_68k, 0, sizeof(state->to_68k));
 }
 
 static READ16_HANDLER( network_ctl_r )
@@ -780,19 +780,21 @@ static WRITE16_HANDLER( network_ctl_w )
 
 static WRITE16_HANDLER(md1_w)
 {
-	COMBINE_DATA(model1_display_list1+offset);
+	model1_state *state = space->machine->driver_data<model1_state>();
+	COMBINE_DATA(state->display_list1+offset);
 	if(0 && offset)
 		return;
-	if(1 && model1_dump)
+	if(1 && state->dump)
 		logerror("TGP: md1_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu));
 }
 
 static WRITE16_HANDLER(md0_w)
 {
-	COMBINE_DATA(model1_display_list0+offset);
+	model1_state *state = space->machine->driver_data<model1_state>();
+	COMBINE_DATA(state->display_list0+offset);
 	if(0 && offset)
 		return;
-	if(1 && model1_dump)
+	if(1 && state->dump)
 		logerror("TGP: md0_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu));
 }
 
@@ -804,37 +806,37 @@ static WRITE16_HANDLER(p_w)
 		logerror("XVIDEO: p_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu));
 }
 
-static UINT16 *mr;
 static WRITE16_HANDLER(mr_w)
 {
-	COMBINE_DATA(mr+offset);
+	model1_state *state = space->machine->driver_data<model1_state>();
+	COMBINE_DATA(state->mr+offset);
 	if(0 && offset == 0x1138/2)
 		logerror("MR.w %x, %04x @ %04x (%x)\n", offset*2+0x500000, data, mem_mask, cpu_get_pc(space->cpu));
 }
 
-static UINT16 *mr2;
 static WRITE16_HANDLER(mr2_w)
 {
-	COMBINE_DATA(mr2+offset);
+	model1_state *state = space->machine->driver_data<model1_state>();
+	COMBINE_DATA(state->mr2+offset);
 #if 0
 	if(0 && offset == 0x6e8/2) {
 		logerror("MR.w %x, %04x @ %04x (%x)\n", offset*2+0x400000, data, mem_mask, cpu_get_pc(space->cpu));
 	}
 	if(offset/2 == 0x3680/4)
-		logerror("MW f80[r25], %04x%04x (%x)\n", mr2[0x3680/2+1], mr2[0x3680/2], cpu_get_pc(space->cpu));
+		logerror("MW f80[r25], %04x%04x (%x)\n", state->mr2[0x3680/2+1], state->mr2[0x3680/2], cpu_get_pc(space->cpu));
 	if(offset/2 == 0x06ca/4)
-		logerror("MW fca[r19], %04x%04x (%x)\n", mr2[0x06ca/2+1], mr2[0x06ca/2], cpu_get_pc(space->cpu));
+		logerror("MW fca[r19], %04x%04x (%x)\n", state->mr2[0x06ca/2+1], state->mr2[0x06ca/2], cpu_get_pc(space->cpu));
 	if(offset/2 == 0x1eca/4)
-		logerror("MW fca[r22], %04x%04x (%x)\n", mr2[0x1eca/2+1], mr2[0x1eca/2], cpu_get_pc(space->cpu));
+		logerror("MW fca[r22], %04x%04x (%x)\n", state->mr2[0x1eca/2+1], state->mr2[0x1eca/2], cpu_get_pc(space->cpu));
 #endif
 
 	// wingwar scene position, pc=e1ce -> d735
 	if(offset/2 == 0x1f08/4)
-		logerror("MW  8[r10], %f (%x)\n", *(float *)(mr2+0x1f08/2), cpu_get_pc(space->cpu));
+		logerror("MW  8[r10], %f (%x)\n", *(float *)(state->mr2+0x1f08/2), cpu_get_pc(space->cpu));
 	if(offset/2 == 0x1f0c/4)
-		logerror("MW  c[r10], %f (%x)\n", *(float *)(mr2+0x1f0c/2), cpu_get_pc(space->cpu));
+		logerror("MW  c[r10], %f (%x)\n", *(float *)(state->mr2+0x1f0c/2), cpu_get_pc(space->cpu));
 	if(offset/2 == 0x1f10/4)
-		logerror("MW 10[r10], %f (%x)\n", *(float *)(mr2+0x1f10/2), cpu_get_pc(space->cpu));
+		logerror("MW 10[r10], %f (%x)\n", *(float *)(state->mr2+0x1f10/2), cpu_get_pc(space->cpu));
 }
 
 static READ16_HANDLER( snd_68k_ready_r )
@@ -852,9 +854,10 @@ static READ16_HANDLER( snd_68k_ready_r )
 
 static WRITE16_HANDLER( snd_latch_to_68k_w )
 {
-	to_68k[fifo_wptr] = data;
-	fifo_wptr++;
-	if (fifo_wptr >= FIFO_SIZE) fifo_wptr = 0;
+	model1_state *state = space->machine->driver_data<model1_state>();
+	state->to_68k[state->fifo_wptr] = data;
+	state->fifo_wptr++;
+	if (state->fifo_wptr >= ARRAY_LENGTH(state->to_68k)) state->fifo_wptr = 0;
 
 	// signal the 68000 that there's data waiting
 	cputag_set_input_line(space->machine, "audiocpu", 2, HOLD_LINE);
@@ -867,11 +870,11 @@ static ADDRESS_MAP_START( model1_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x200000, 0x2fffff) AM_ROM
 
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(mr2_w) AM_BASE(&mr2)
-	AM_RANGE(0x500000, 0x53ffff) AM_RAM_WRITE(mr_w)  AM_BASE(&mr)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(mr2_w) AM_BASE_MEMBER(model1_state, mr2)
+	AM_RANGE(0x500000, 0x53ffff) AM_RAM_WRITE(mr_w)  AM_BASE_MEMBER(model1_state, mr)
 
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(md0_w) AM_BASE(&model1_display_list0)
-	AM_RANGE(0x610000, 0x61ffff) AM_RAM_WRITE(md1_w) AM_BASE(&model1_display_list1)
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(md0_w) AM_BASE_MEMBER(model1_state, display_list0)
+	AM_RANGE(0x610000, 0x61ffff) AM_RAM_WRITE(md1_w) AM_BASE_MEMBER(model1_state, display_list1)
 	AM_RANGE(0x680000, 0x680003) AM_READWRITE(model1_listctl_r, model1_listctl_w)
 
 	AM_RANGE(0x700000, 0x70ffff) AM_READWRITE(sys24_tile_r, sys24_tile_w)
@@ -882,7 +885,7 @@ static ADDRESS_MAP_START( model1_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x780000, 0x7fffff) AM_READWRITE(sys24_char_r, sys24_char_w)
 
 	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(p_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x910000, 0x91bfff) AM_RAM  AM_BASE(&model1_color_xlat)
+	AM_RANGE(0x910000, 0x91bfff) AM_RAM  AM_BASE_MEMBER(model1_state, color_xlat)
 
 	AM_RANGE(0xc00000, 0xc0003f) AM_READ(io_r) AM_WRITENOP
 
@@ -915,11 +918,11 @@ static ADDRESS_MAP_START( model1_vr_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x200000, 0x2fffff) AM_ROM
 
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(mr2_w) AM_BASE(&mr2)
-	AM_RANGE(0x500000, 0x53ffff) AM_RAM_WRITE(mr_w)  AM_BASE(&mr)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(mr2_w) AM_BASE_MEMBER(model1_state, mr2)
+	AM_RANGE(0x500000, 0x53ffff) AM_RAM_WRITE(mr_w)  AM_BASE_MEMBER(model1_state, mr)
 
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(md0_w) AM_BASE(&model1_display_list0)
-	AM_RANGE(0x610000, 0x61ffff) AM_RAM_WRITE(md1_w) AM_BASE(&model1_display_list1)
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(md0_w) AM_BASE_MEMBER(model1_state, display_list0)
+	AM_RANGE(0x610000, 0x61ffff) AM_RAM_WRITE(md1_w) AM_BASE_MEMBER(model1_state, display_list1)
 	AM_RANGE(0x680000, 0x680003) AM_READWRITE(model1_listctl_r, model1_listctl_w)
 
 	AM_RANGE(0x700000, 0x70ffff) AM_READWRITE(sys24_tile_r, sys24_tile_w)
@@ -930,7 +933,7 @@ static ADDRESS_MAP_START( model1_vr_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x780000, 0x7fffff) AM_READWRITE(sys24_char_r, sys24_char_w)
 
 	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(p_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x910000, 0x91bfff) AM_RAM  AM_BASE(&model1_color_xlat)
+	AM_RANGE(0x910000, 0x91bfff) AM_RAM  AM_BASE_MEMBER(model1_state, color_xlat)
 
 	AM_RANGE(0xc00000, 0xc0003f) AM_READ(io_r) AM_WRITENOP
 
@@ -960,12 +963,13 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( m1_snd_68k_latch_r )
 {
+	model1_state *state = space->machine->driver_data<model1_state>();
 	UINT16 retval;
 
-	retval = to_68k[fifo_rptr];
+	retval = state->to_68k[state->fifo_rptr];
 
-	fifo_rptr++;
-	if (fifo_rptr >= FIFO_SIZE) fifo_rptr = 0;
+	state->fifo_rptr++;
+	if (state->fifo_rptr >= ARRAY_LENGTH(state->to_68k)) state->fifo_rptr = 0;
 
 	return retval;
 }
@@ -1497,7 +1501,7 @@ ROM_START( wingwarj )
 ROM_END
 
 
-static MACHINE_CONFIG_START( model1, driver_device )
+static MACHINE_CONFIG_START( model1, model1_state )
 	MCFG_CPU_ADD("maincpu", V60, 16000000)
 	MCFG_CPU_PROGRAM_MAP(model1_mem)
 	MCFG_CPU_IO_MAP(model1_io)
@@ -1537,7 +1541,7 @@ static MACHINE_CONFIG_START( model1, driver_device )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( model1_vr, driver_device )
+static MACHINE_CONFIG_START( model1_vr, model1_state )
 	MCFG_CPU_ADD("maincpu", V60, 16000000)
 	MCFG_CPU_PROGRAM_MAP(model1_vr_mem)
 	MCFG_CPU_IO_MAP(model1_vr_io)

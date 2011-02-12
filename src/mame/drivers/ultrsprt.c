@@ -17,14 +17,25 @@ TODO:
 #include "sound/k056800.h"
 
 
-static UINT32 *vram;
-static UINT32 *workram;
+class ultrsprt_state : public driver_device
+{
+public:
+	ultrsprt_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT32 *vram;
+	UINT32 *workram;
+};
+
+
+
 
 static VIDEO_UPDATE( ultrsprt )
 {
+	ultrsprt_state *state = screen->machine->driver_data<ultrsprt_state>();
 	int i, j;
 
-	UINT8 *ram = (UINT8 *)vram;
+	UINT8 *ram = (UINT8 *)state->vram;
 
 	for (j=0; j < 400; j++)
 	{
@@ -82,25 +93,26 @@ static WRITE32_HANDLER( int_ack_w )
 
 static MACHINE_START( ultrsprt )
 {
+	ultrsprt_state *state = machine->driver_data<ultrsprt_state>();
 	/* set conservative DRC options */
 	ppcdrc_set_options(machine->device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine->device("maincpu"), 0x80000000, 0x8007ffff, FALSE, vram);
-	ppcdrc_add_fastram(machine->device("maincpu"), 0xff000000, 0xff01ffff, FALSE, workram);
+	ppcdrc_add_fastram(machine->device("maincpu"), 0x80000000, 0x8007ffff, FALSE, state->vram);
+	ppcdrc_add_fastram(machine->device("maincpu"), 0xff000000, 0xff01ffff, FALSE, state->workram);
 }
 
 
 
 static ADDRESS_MAP_START( ultrsprt_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE(&vram)
+	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE_MEMBER(ultrsprt_state, vram)
 	AM_RANGE(0x70000000, 0x70000003) AM_READWRITE(eeprom_r, eeprom_w)
 	AM_RANGE(0x70000020, 0x70000023) AM_READ_PORT("P1")
 	AM_RANGE(0x70000040, 0x70000043) AM_READ_PORT("P2")
 	AM_RANGE(0x70000080, 0x70000087) AM_DEVWRITE("k056800", k056800_host_w)
 	AM_RANGE(0x70000088, 0x7000008f) AM_DEVREAD("k056800", k056800_host_r)
 	AM_RANGE(0x700000e0, 0x700000e3) AM_WRITE(int_ack_w)
-	AM_RANGE(0x7f000000, 0x7f01ffff) AM_RAM AM_BASE(&workram)
+	AM_RANGE(0x7f000000, 0x7f01ffff) AM_RAM AM_BASE_MEMBER(ultrsprt_state, workram)
 	AM_RANGE(0x7f700000, 0x7f703fff) AM_RAM_WRITE(palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x7f800000, 0x7f9fffff) AM_MIRROR(0x00600000) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
@@ -201,7 +213,7 @@ static const k056800_interface ultrsprt_k056800_interface =
 };
 
 
-static MACHINE_CONFIG_START( ultrsprt, driver_device )
+static MACHINE_CONFIG_START( ultrsprt, ultrsprt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GA, 25000000)		/* PowerPC 403GA 25MHz */
 	MCFG_CPU_PROGRAM_MAP(ultrsprt_map)

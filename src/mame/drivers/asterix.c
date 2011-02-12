@@ -134,15 +134,14 @@ static WRITE16_HANDLER( protection_w )
 }
 #endif
 
-static UINT16 prot[2];
-
 static WRITE16_HANDLER( protection_w )
 {
-	COMBINE_DATA(prot + offset);
+	asterix_state *state = space->machine->driver_data<asterix_state>();
+	COMBINE_DATA(state->prot + offset);
 
 	if (offset == 1)
 	{
-		UINT32 cmd = (prot[0] << 16) | prot[1];
+		UINT32 cmd = (state->prot[0] << 16) | state->prot[1];
 		switch (cmd >> 24)
 		{
 		case 0x64:

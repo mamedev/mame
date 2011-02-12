@@ -121,7 +121,6 @@
 #include "firebeat.lh"
 
 
-
 typedef struct
 {
 	UINT32 *vram;
@@ -130,26 +129,72 @@ typedef struct
 	UINT32 visible_area;
 } GCU_REGS;
 
-static UINT8 extend_board_irq_enable;
-static UINT8 extend_board_irq_active;
+typedef struct
+{
+	UINT8 identifier[8];
+	UINT8 password[8];
+	UINT8 data[0x30];
+} IBUTTON_SUBKEY;
 
-static emu_timer *keyboard_timer;
+typedef struct
+{
+	IBUTTON_SUBKEY subkey[3];
+} IBUTTON;
 
-static fujitsu_29f016a_device *flash[3];
 
-static GCU_REGS gcu[2];
+
+class firebeat_state : public driver_device
+{
+public:
+	firebeat_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 extend_board_irq_enable;
+	UINT8 extend_board_irq_active;
+	emu_timer *keyboard_timer;
+	fujitsu_29f016a_device *flash[3];
+	GCU_REGS gcu[2];
+	int tick;
+	int layer;
+	UINT8 atapi_regs[16];
+	SCSIInstance *atapi_device_data[2];
+	UINT16 atapi_data[32*1024];
+	UINT8 atapi_scsi_packet[32*1024];
+	int atapi_data_ptr;
+	int atapi_xferlen;
+	int atapi_xfermod;
+	int atapi_cdata_wait;
+	int atapi_drivesel;
+	UINT8 temp_data[64*1024];
+	int cab_data_ptr;
+	const int * cur_cab_data;
+	int keyboard_state[2];
+	UINT8 spu_shared_ram[0x400];
+	UINT32 *work_ram;
+	IBUTTON ibutton;
+	int ibutton_state;
+	int ibutton_read_subkey_ptr;
+	UINT8 ibutton_subkey_data[0x40];
+};
+
+
+
+
+
 
 static VIDEO_START(firebeat)
 {
-	gcu[0].vram = auto_alloc_array(machine, UINT32, 0x2000000/4);
-	gcu[1].vram = auto_alloc_array(machine, UINT32, 0x2000000/4);
-	memset(gcu[0].vram, 0, 0x2000000);
-	memset(gcu[1].vram, 0, 0x2000000);
+	firebeat_state *state = machine->driver_data<firebeat_state>();
+	state->gcu[0].vram = auto_alloc_array(machine, UINT32, 0x2000000/4);
+	state->gcu[1].vram = auto_alloc_array(machine, UINT32, 0x2000000/4);
+	memset(state->gcu[0].vram, 0, 0x2000000);
+	memset(state->gcu[1].vram, 0, 0x2000000);
 }
 
 
-static void gcu_draw_object(int chip, bitmap_t *bitmap, const rectangle *cliprect, UINT32 *cmd)
+static void gcu_draw_object(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int chip, UINT32 *cmd)
 {
+	firebeat_state *state = machine->driver_data<firebeat_state>();
 	// 0x00: xxx----- -------- -------- --------   command type
 	// 0x00: -------- xxxxxxxx xxxxxxxx xxxxxxxx   object data address in vram
 
@@ -179,7 +224,7 @@ static void gcu_draw_object(int chip, bitmap_t *bitmap, const rectangle *cliprec
 
 	int i, j;
 	int u, v;
-	UINT16 *vr = (UINT16*)gcu[chip].vram;
+	UINT16 *vr = (UINT16*)state->gcu[chip].vram;
 
 	if (xscale == 0 || yscale == 0)
 	{
@@ -348,8 +393,9 @@ static void gcu_fill_rect(bitmap_t *bitmap, const rectangle *cliprect, UINT32 *c
 	}
 }
 
-static void gcu_draw_character(int chip, bitmap_t *bitmap, const rectangle *cliprect, UINT32 *cmd)
+static void gcu_draw_character(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int chip, UINT32 *cmd)
 {
+	firebeat_state *state = machine->driver_data<firebeat_state>();
 	// 0x00: xxx----- -------- -------- --------   command type
 	// 0x00: -------- xxxxxxxx xxxxxxxx xxxxxxxx   character data address in vram
 
@@ -368,7 +414,7 @@ static void gcu_draw_character(int chip, bitmap_t *bitmap, const rectangle *clip
 	UINT32 address		= cmd[0] & 0xffffff;
 	UINT16 color[4];
 
-	UINT16 *vr = (UINT16*)gcu[chip].vram;
+	UINT16 *vr = (UINT16*)state->gcu[chip].vram;
 
 	color[0] = (cmd[2] >> 16) & 0xffff;
 	color[1] = (cmd[2] >>  0) & 0xffff;
@@ -396,8 +442,9 @@ static void gcu_draw_character(int chip, bitmap_t *bitmap, const rectangle *clip
 	}
 }
 
-static void gcu_exec_display_list(int chip, bitmap_t *bitmap, const rectangle *cliprect, UINT32 address)
+static void gcu_exec_display_list(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int chip, UINT32 address)
 {
+	firebeat_state *state = machine->driver_data<firebeat_state>();
 	int counter = 0;
 	int end = 0;
 
@@ -407,10 +454,10 @@ static void gcu_exec_display_list(int chip, bitmap_t *bitmap, const rectangle *c
 	{
 		int command;
 		UINT32 cmd[4];
-		cmd[0] = gcu[chip].vram[i+0];
-		cmd[1] = gcu[chip].vram[i+1];
-		cmd[2] = gcu[chip].vram[i+2];
-		cmd[3] = gcu[chip].vram[i+3];
+		cmd[0] = state->gcu[chip].vram[i+0];
+		cmd[1] = state->gcu[chip].vram[i+1];
+		cmd[2] = state->gcu[chip].vram[i+2];
+		cmd[3] = state->gcu[chip].vram[i+3];
 
 		command = (cmd[0] >> 29) & 0x7;
 
@@ -423,7 +470,7 @@ static void gcu_exec_display_list(int chip, bitmap_t *bitmap, const rectangle *c
 
 			case 0x1:		// Branch
 			{
-				gcu_exec_display_list(chip, bitmap, cliprect, cmd[0] & 0xffffff);
+				gcu_exec_display_list(machine, bitmap, cliprect, chip, cmd[0] & 0xffffff);
 				break;
 			}
 
@@ -446,13 +493,13 @@ static void gcu_exec_display_list(int chip, bitmap_t *bitmap, const rectangle *c
 
 			case 0x5:		// Draw object
 			{
-				gcu_draw_object(chip, bitmap, cliprect, cmd);
+				gcu_draw_object(machine, bitmap, cliprect, chip, cmd);
 				break;
 			}
 
 			case 0x7:		// Draw 8x8 Character (2-bits per pixel)
 			{
-				gcu_draw_character(chip, bitmap, cliprect, cmd);
+				gcu_draw_character(machine, bitmap, cliprect, chip, cmd);
 				break;
 			}
 
@@ -466,10 +513,9 @@ static void gcu_exec_display_list(int chip, bitmap_t *bitmap, const rectangle *c
 	};
 }
 
-static int tick = 0;
-static int layer = 0;
 static VIDEO_UPDATE(firebeat)
 {
+	firebeat_state *state = screen->machine->driver_data<firebeat_state>();
 	int chip;
 
 	if (screen == screen->machine->m_devicelist.find(SCREEN, 0))
@@ -481,40 +527,40 @@ static VIDEO_UPDATE(firebeat)
 
 	if (mame_stricmp(screen->machine->gamedrv->name, "popn7") == 0)
 	{
-		gcu_exec_display_list(chip, bitmap, cliprect, 0x1f80000);
+		gcu_exec_display_list(screen->machine, bitmap, cliprect, chip, 0x1f80000);
 	}
 	else
 	{
-		if (layer >= 2)
+		if (state->layer >= 2)
 		{
-			gcu_exec_display_list(chip, bitmap, cliprect, 0x8000);
-			gcu_exec_display_list(chip, bitmap, cliprect, 0x0000);
-			gcu_exec_display_list(chip, bitmap, cliprect, 0x10000);
+			gcu_exec_display_list(screen->machine, bitmap, cliprect, chip, 0x8000);
+			gcu_exec_display_list(screen->machine, bitmap, cliprect, chip, 0x0000);
+			gcu_exec_display_list(screen->machine, bitmap, cliprect, chip, 0x10000);
 		}
-		else if (layer == 0)
+		else if (state->layer == 0)
 		{
-			gcu_exec_display_list(chip, bitmap, cliprect, 0x200000);
+			gcu_exec_display_list(screen->machine, bitmap, cliprect, chip, 0x200000);
 
-			//gcu_exec_display_list(chip, bitmap, cliprect, 0x186040);
+			//gcu_exec_display_list(screen->machine, bitmap, cliprect, chip, 0x186040);
 		}
-		else if (layer == 1)
+		else if (state->layer == 1)
 		{
-			gcu_exec_display_list(chip, bitmap, cliprect, 0x1d0800);
+			gcu_exec_display_list(screen->machine, bitmap, cliprect, chip, 0x1d0800);
 
-			gcu_exec_display_list(chip, bitmap, cliprect, 0x1a9440);
+			gcu_exec_display_list(screen->machine, bitmap, cliprect, chip, 0x1a9440);
 		}
 	}
 
-	tick++;
-	if (tick >= 5)
+	state->tick++;
+	if (state->tick >= 5)
 	{
-		tick = 0;
+		state->tick = 0;
 		if (input_code_pressed(screen->machine, KEYCODE_0))
 		{
-			layer++;
-			if (layer > 2)
+			state->layer++;
+			if (state->layer > 2)
 			{
-				layer = 0;
+				state->layer = 0;
 			}
 		}
 
@@ -526,10 +572,10 @@ static VIDEO_UPDATE(firebeat)
 
             for (i=0; i < 0x2000000/4; i++)
             {
-                fputc((gcu[0].vram[i] >> 24) & 0xff, file);
-                fputc((gcu[0].vram[i] >> 16) & 0xff, file);
-                fputc((gcu[0].vram[i] >> 8) & 0xff, file);
-                fputc((gcu[0].vram[i] >> 0) & 0xff, file);
+                fputc((state->gcu[0].vram[i] >> 24) & 0xff, file);
+                fputc((state->gcu[0].vram[i] >> 16) & 0xff, file);
+                fputc((state->gcu[0].vram[i] >> 8) & 0xff, file);
+                fputc((state->gcu[0].vram[i] >> 0) & 0xff, file);
             }
 
             fclose(file);
@@ -537,10 +583,10 @@ static VIDEO_UPDATE(firebeat)
 
             for (i=0; i < 0x2000000/4; i++)
             {
-                fputc((gcu[1].vram[i] >> 24) & 0xff, file);
-                fputc((gcu[1].vram[i] >> 16) & 0xff, file);
-                fputc((gcu[1].vram[i] >> 8) & 0xff, file);
-                fputc((gcu[1].vram[i] >> 0) & 0xff, file);
+                fputc((state->gcu[1].vram[i] >> 24) & 0xff, file);
+                fputc((state->gcu[1].vram[i] >> 16) & 0xff, file);
+                fputc((state->gcu[1].vram[i] >> 8) & 0xff, file);
+                fputc((state->gcu[1].vram[i] >> 0) & 0xff, file);
             }
 
             fclose(file);
@@ -551,14 +597,15 @@ static VIDEO_UPDATE(firebeat)
 	return 0;
 }
 
-static UINT32 GCU_r(int chip, UINT32 offset, UINT32 mem_mask)
+static UINT32 GCU_r(running_machine *machine, int chip, UINT32 offset, UINT32 mem_mask)
 {
+	firebeat_state *state = machine->driver_data<firebeat_state>();
 	int reg = offset * 4;
 
 	/* VRAM Read */
 	if (reg >= 0x80 && reg < 0x100)
 	{
-		return gcu[chip].vram[gcu[chip].vram_read_address + ((reg/4) - 0x20)];
+		return state->gcu[chip].vram[state->gcu[chip].vram_read_address + ((reg/4) - 0x20)];
 	}
 
 	switch(reg)
@@ -576,12 +623,13 @@ static UINT32 GCU_r(int chip, UINT32 offset, UINT32 mem_mask)
 
 static void GCU_w(running_machine *machine, int chip, UINT32 offset, UINT32 data, UINT32 mem_mask)
 {
+	firebeat_state *state = machine->driver_data<firebeat_state>();
 	int reg = offset * 4;
 
 	if (reg != 0x70 && chip == 0)
 	{
-		//printf("%s:gcu%d_w: %08X, %08X, %08X at %08X\n", machine->describe_context(), chip, data, offset, mem_mask);
-		//logerror("%s:gcu%d_w: %08X, %08X, %08X at %08X\n", cmachine->describe_context(), hip, data, offset, mem_mask);
+		//printf("%s:state->gcu%d_w: %08X, %08X, %08X at %08X\n", machine->describe_context(), chip, data, offset, mem_mask);
+		//logerror("%s:state->gcu%d_w: %08X, %08X, %08X at %08X\n", cmachine->describe_context(), hip, data, offset, mem_mask);
 	}
 
 	switch(reg)
@@ -598,7 +646,7 @@ static void GCU_w(running_machine *machine, int chip, UINT32 offset, UINT32 data
 		//case 0x38:
 		//case 0x3c:
 		{
-			COMBINE_DATA( &gcu[chip].visible_area );
+			COMBINE_DATA( &state->gcu[chip].visible_area );
 			if (ACCESSING_BITS_0_15)
 			{
 				screen_device *screen = downcast<screen_device *>(machine->m_devicelist.find(SCREEN, chip));
@@ -608,8 +656,8 @@ static void GCU_w(running_machine *machine, int chip, UINT32 offset, UINT32 data
 					rectangle visarea = screen->visible_area();
 					int width, height;
 
-					width = (gcu[chip].visible_area & 0xffff);
-					height = (gcu[chip].visible_area >> 16) & 0xffff;
+					width = (state->gcu[chip].visible_area & 0xffff);
+					height = (state->gcu[chip].visible_area >> 16) & 0xffff;
 
 					visarea.max_x = width-1;
 					visarea.max_y = height-1;
@@ -627,11 +675,11 @@ static void GCU_w(running_machine *machine, int chip, UINT32 offset, UINT32 data
 		//  break;
 
 		case 0x5c:		/* VRAM Read Address */
-			gcu[chip].vram_read_address = (data & 0xffffff) / 2;
+			state->gcu[chip].vram_read_address = (data & 0xffffff) / 2;
 			break;
 
 		case 0x60:		/* VRAM FIFO Write Address */
-			gcu[chip].vram_write_fifo_address = (data & 0xffffff) / 2;
+			state->gcu[chip].vram_write_fifo_address = (data & 0xffffff) / 2;
 
 	//      printf("gcu%d_w: %08X, %08X, %08X\n", chip, data, offset, mem_mask);
 			break;
@@ -642,8 +690,8 @@ static void GCU_w(running_machine *machine, int chip, UINT32 offset, UINT32 data
 		}
 
 		case 0x70:		/* VRAM FIFO Write */
-			gcu[chip].vram[gcu[chip].vram_write_fifo_address] = data;
-			gcu[chip].vram_write_fifo_address++;
+			state->gcu[chip].vram[state->gcu[chip].vram_write_fifo_address] = data;
+			state->gcu[chip].vram_write_fifo_address++;
 			break;
 
 		default:
@@ -654,7 +702,7 @@ static void GCU_w(running_machine *machine, int chip, UINT32 offset, UINT32 data
 
 static READ32_HANDLER(gcu0_r)
 {
-	return GCU_r(0, offset, mem_mask);
+	return GCU_r(space->machine, 0, offset, mem_mask);
 }
 
 static WRITE32_HANDLER(gcu0_w)
@@ -664,7 +712,7 @@ static WRITE32_HANDLER(gcu0_w)
 
 static READ32_HANDLER(gcu1_r)
 {
-	return GCU_r(1, offset, mem_mask);
+	return GCU_r(space->machine, 1, offset, mem_mask);
 }
 
 static WRITE32_HANDLER(gcu1_w)
@@ -708,57 +756,60 @@ static READ32_HANDLER( sensor_r )
 
 static READ32_HANDLER(flashram_r)
 {
+	firebeat_state *state = space->machine->driver_data<firebeat_state>();
 	UINT32 r = 0;
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= (flash[0]->read((offset*4)+0) & 0xff) << 24;
+		r |= (state->flash[0]->read((offset*4)+0) & 0xff) << 24;
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		r |= (flash[0]->read((offset*4)+1) & 0xff) << 16;
+		r |= (state->flash[0]->read((offset*4)+1) & 0xff) << 16;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		r |= (flash[0]->read((offset*4)+2) & 0xff) << 8;
+		r |= (state->flash[0]->read((offset*4)+2) & 0xff) << 8;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= (flash[0]->read((offset*4)+3) & 0xff) << 0;
+		r |= (state->flash[0]->read((offset*4)+3) & 0xff) << 0;
 	}
 	return r;
 }
 
 static WRITE32_HANDLER(flashram_w)
 {
+	firebeat_state *state = space->machine->driver_data<firebeat_state>();
 	if (ACCESSING_BITS_24_31)
 	{
-		flash[0]->write((offset*4)+0, (data >> 24) & 0xff);
+		state->flash[0]->write((offset*4)+0, (data >> 24) & 0xff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		flash[0]->write((offset*4)+1, (data >> 16) & 0xff);
+		state->flash[0]->write((offset*4)+1, (data >> 16) & 0xff);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		flash[0]->write((offset*4)+2, (data >> 8) & 0xff);
+		state->flash[0]->write((offset*4)+2, (data >> 8) & 0xff);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		flash[0]->write((offset*4)+3, (data >> 0) & 0xff);
+		state->flash[0]->write((offset*4)+3, (data >> 0) & 0xff);
 	}
 }
 
 static READ32_HANDLER(soundflash_r)
 {
+	firebeat_state *state = space->machine->driver_data<firebeat_state>();
 	UINT32 r = 0;
 	fujitsu_29f016a_device *chip;
 	if (offset >= 0 && offset < 0x200000/4)
 	{
-		chip = flash[1];
+		chip = state->flash[1];
 	}
 	else
 	{
-		chip = flash[2];
+		chip = state->flash[2];
 	}
 
 	offset &= 0x7ffff;
@@ -784,14 +835,15 @@ static READ32_HANDLER(soundflash_r)
 
 static WRITE32_HANDLER(soundflash_w)
 {
+	firebeat_state *state = space->machine->driver_data<firebeat_state>();
 	fujitsu_29f016a_device *chip;
 	if (offset >= 0 && offset < 0x200000/4)
 	{
-		chip = flash[1];
+		chip = state->flash[1];
 	}
 	else
 	{
-		chip = flash[2];
+		chip = state->flash[2];
 	}
 
 	offset &= 0x7ffff;
@@ -827,8 +879,6 @@ static WRITE32_HANDLER(soundflash_w)
 
 #define ATAPI_CYCLES_PER_SECTOR (32000)	// plenty of time to allow DMA setup etc.  BIOS requires this be at least 2000, individual games may vary.
 
-static UINT8 atapi_regs[16];
-static SCSIInstance *atapi_device_data[2];
 
 #define ATAPI_STAT_BSY	   0x80
 #define ATAPI_STAT_DRDY    0x40
@@ -851,10 +901,6 @@ static SCSIInstance *atapi_device_data[2];
 #define ATAPI_REG_DRIVESEL	6
 #define ATAPI_REG_CMDSTATUS	7
 
-static UINT16 atapi_data[32*1024];
-static UINT8  atapi_scsi_packet[32*1024];
-static int atapi_data_ptr, atapi_xferlen, atapi_xfermod, atapi_cdata_wait;
-static int atapi_drivesel;
 
 static void atapi_cause_irq(running_machine *machine)
 {
@@ -868,96 +914,99 @@ static void atapi_clear_irq(running_machine *machine)
 
 static void atapi_exit(running_machine& machine)
 {
-	SCSIDeleteInstance(atapi_device_data[1]);
-	SCSIDeleteInstance(atapi_device_data[0]);
+	firebeat_state *state = machine.driver_data<firebeat_state>();
+	SCSIDeleteInstance(state->atapi_device_data[1]);
+	SCSIDeleteInstance(state->atapi_device_data[0]);
 }
 
 static void atapi_init(running_machine *machine)
 {
-	memset(atapi_regs, 0, sizeof(atapi_regs));
+	firebeat_state *state = machine->driver_data<firebeat_state>();
+	memset(state->atapi_regs, 0, sizeof(state->atapi_regs));
 
-	atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
-	atapi_regs[ATAPI_REG_ERRFEAT] = 1;
-	atapi_regs[ATAPI_REG_COUNTLOW] = 0x14;
-	atapi_regs[ATAPI_REG_COUNTHIGH] = 0xeb;
+	state->atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
+	state->atapi_regs[ATAPI_REG_ERRFEAT] = 1;
+	state->atapi_regs[ATAPI_REG_COUNTLOW] = 0x14;
+	state->atapi_regs[ATAPI_REG_COUNTHIGH] = 0xeb;
 
-	atapi_data_ptr = 0;
-	atapi_cdata_wait = 0;
+	state->atapi_data_ptr = 0;
+	state->atapi_cdata_wait = 0;
 
 	// allocate two SCSI CD-ROM devices
-	SCSIAllocInstance( machine, SCSI_DEVICE_CDROM, &atapi_device_data[0], "scsi0" );
+	SCSIAllocInstance( machine, SCSI_DEVICE_CDROM, &state->atapi_device_data[0], "scsi0" );
 	// TODO: the slave drive can be either CD-ROM, DVD-ROM or HDD
-	SCSIAllocInstance( machine, SCSI_DEVICE_CDROM, &atapi_device_data[1], "scsi1" );
+	SCSIAllocInstance( machine, SCSI_DEVICE_CDROM, &state->atapi_device_data[1], "scsi1" );
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, atapi_exit);
 }
 
-static void atapi_reset(void)
+static void atapi_reset(running_machine *machine)
 {
+	firebeat_state *state = machine->driver_data<firebeat_state>();
 	logerror("ATAPI reset\n");
 
-	atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
-	atapi_regs[ATAPI_REG_ERRFEAT] = 1;
-	atapi_regs[ATAPI_REG_COUNTLOW] = 0x14;
-	atapi_regs[ATAPI_REG_COUNTHIGH] = 0xeb;
+	state->atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
+	state->atapi_regs[ATAPI_REG_ERRFEAT] = 1;
+	state->atapi_regs[ATAPI_REG_COUNTLOW] = 0x14;
+	state->atapi_regs[ATAPI_REG_COUNTHIGH] = 0xeb;
 
-	atapi_data_ptr = 0;
-	atapi_cdata_wait = 0;
+	state->atapi_data_ptr = 0;
+	state->atapi_cdata_wait = 0;
 }
 
 
 
 static UINT16 atapi_command_reg_r(running_machine *machine, int reg)
 {
+	firebeat_state *state = machine->driver_data<firebeat_state>();
 	int i, data;
-	static UINT8 temp_data[64*1024];
 
 //  printf("ATAPI: Command reg read %d\n", reg);
 
 	if (reg == ATAPI_REG_DATA)
 	{
 		// assert IRQ and drop DRQ
-		if (atapi_data_ptr == 0)
+		if (state->atapi_data_ptr == 0)
 		{
 			//printf("ATAPI: dropping DRQ\n");
 			atapi_cause_irq(machine);
-			atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
+			state->atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 
 			// get the data from the device
-			SCSIReadData( atapi_device_data[atapi_drivesel], temp_data, atapi_xferlen );
+			SCSIReadData( state->atapi_device_data[state->atapi_drivesel], state->temp_data, state->atapi_xferlen );
 
 			// fix it up in an endian-safe way
-			for (i = 0; i < atapi_xferlen; i += 2)
+			for (i = 0; i < state->atapi_xferlen; i += 2)
 			{
-				atapi_data[i/2] = temp_data[i+0] | temp_data[i+1]<<8;
+				state->atapi_data[i/2] = state->temp_data[i+0] | state->temp_data[i+1]<<8;
 			}
 		}
 
-		data = atapi_data[atapi_data_ptr];
-//      printf("ATAPI: %d, packet read = %04x\n", atapi_data_ptr, atapi_data[atapi_data_ptr]);
-		atapi_data_ptr++;
+		data = state->atapi_data[state->atapi_data_ptr];
+//      printf("ATAPI: %d, packet read = %04x\n", state->atapi_data_ptr, state->atapi_data[state->atapi_data_ptr]);
+		state->atapi_data_ptr++;
 
-		if (atapi_xfermod && atapi_data_ptr == (atapi_xferlen/2))
+		if (state->atapi_xfermod && state->atapi_data_ptr == (state->atapi_xferlen/2))
 		{
 			//printf("ATAPI: DRQ interrupt\n");
 			atapi_cause_irq(machine);
-			atapi_regs[ATAPI_REG_CMDSTATUS] |= ATAPI_STAT_DRQ;
-			atapi_data_ptr = 0;
+			state->atapi_regs[ATAPI_REG_CMDSTATUS] |= ATAPI_STAT_DRQ;
+			state->atapi_data_ptr = 0;
 
-			if (atapi_xfermod > 63488)
+			if (state->atapi_xfermod > 63488)
 			{
-				atapi_xfermod = atapi_xfermod - 63488;
-				atapi_xferlen = 63488;
+				state->atapi_xfermod = state->atapi_xfermod - 63488;
+				state->atapi_xferlen = 63488;
 			}
 			else
 			{
-				atapi_xferlen = atapi_xfermod;
-				atapi_xfermod = 0;
+				state->atapi_xferlen = state->atapi_xfermod;
+				state->atapi_xfermod = 0;
 			}
 
-			//printf("ATAPI Transfer: %d, %d, %d\n", atapi_transfer_length, atapi_xfermod, atapi_xferlen);
+			//printf("ATAPI Transfer: %d, %d, %d\n", atapi_transfer_length, state->atapi_xfermod, state->atapi_xferlen);
 
-			atapi_regs[ATAPI_REG_COUNTLOW] = atapi_xferlen & 0xff;
-			atapi_regs[ATAPI_REG_COUNTHIGH] = (atapi_xferlen>>8)&0xff;
+			state->atapi_regs[ATAPI_REG_COUNTLOW] = state->atapi_xferlen & 0xff;
+			state->atapi_regs[ATAPI_REG_COUNTHIGH] = (state->atapi_xferlen>>8)&0xff;
 		}
 		return data;
 	}
@@ -965,51 +1014,52 @@ static UINT16 atapi_command_reg_r(running_machine *machine, int reg)
 	{
 		if (reg == ATAPI_REG_CMDSTATUS)
 			atapi_clear_irq(machine);
-		return atapi_regs[reg];
+		return state->atapi_regs[reg];
 	}
 }
 
 static void atapi_command_reg_w(running_machine *machine, int reg, UINT16 data)
 {
+	firebeat_state *state = machine->driver_data<firebeat_state>();
 	int i;
 
 	if (reg == ATAPI_REG_DATA)
 	{
 //      printf("%s:ATAPI: packet write %04x\n", device->machine->describe_context(), data);
-		atapi_data[atapi_data_ptr] = data;
-		atapi_data_ptr++;
+		state->atapi_data[state->atapi_data_ptr] = data;
+		state->atapi_data_ptr++;
 
-		if (atapi_cdata_wait)
+		if (state->atapi_cdata_wait)
 		{
-//          printf("ATAPI: waiting, ptr %d wait %d\n", atapi_data_ptr, atapi_cdata_wait);
-			if (atapi_data_ptr == atapi_cdata_wait)
+//          printf("ATAPI: waiting, ptr %d wait %d\n", state->atapi_data_ptr, state->atapi_cdata_wait);
+			if (state->atapi_data_ptr == state->atapi_cdata_wait)
 			{
 				// decompose SCSI packet into proper byte order
-				for (i = 0; i < atapi_cdata_wait; i += 2)
+				for (i = 0; i < state->atapi_cdata_wait; i += 2)
 				{
-					atapi_scsi_packet[i] = atapi_data[i/2]&0xff;
-					atapi_scsi_packet[i+1] = atapi_data[i/2]>>8;
+					state->atapi_scsi_packet[i] = state->atapi_data[i/2]&0xff;
+					state->atapi_scsi_packet[i+1] = state->atapi_data[i/2]>>8;
 				}
 
 				// send it to the device
-				SCSIWriteData( atapi_device_data[atapi_drivesel], atapi_scsi_packet, atapi_cdata_wait );
+				SCSIWriteData( state->atapi_device_data[state->atapi_drivesel], state->atapi_scsi_packet, state->atapi_cdata_wait );
 
 				// assert IRQ
 				atapi_cause_irq(machine);
 
 				// not sure here, but clear DRQ at least?
-				atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
+				state->atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 			}
 		}
 
-		if ((!atapi_cdata_wait) && (atapi_data_ptr == 6))
+		if ((!state->atapi_cdata_wait) && (state->atapi_data_ptr == 6))
 		{
 			int phase;
 
 			// reset data pointer for reading SCSI results
-			atapi_data_ptr = 0;
+			state->atapi_data_ptr = 0;
 
-			atapi_regs[ATAPI_REG_CMDSTATUS] |= ATAPI_STAT_BSY;
+			state->atapi_regs[ATAPI_REG_CMDSTATUS] |= ATAPI_STAT_BSY;
 
 			// assert IRQ
 			atapi_cause_irq(machine);
@@ -1017,50 +1067,50 @@ static void atapi_command_reg_w(running_machine *machine, int reg, UINT16 data)
 			// decompose SCSI packet into proper byte order
 			for (i = 0; i < 16; i += 2)
 			{
-				atapi_scsi_packet[i+0] = atapi_data[i/2]&0xff;
-				atapi_scsi_packet[i+1] = atapi_data[i/2]>>8;
+				state->atapi_scsi_packet[i+0] = state->atapi_data[i/2]&0xff;
+				state->atapi_scsi_packet[i+1] = state->atapi_data[i/2]>>8;
 			}
 
 			// send it to the SCSI device
-			SCSISetCommand( atapi_device_data[atapi_drivesel], atapi_scsi_packet, 12 );
-			SCSIExecCommand( atapi_device_data[atapi_drivesel], &atapi_xferlen );
-			SCSIGetPhase( atapi_device_data[atapi_drivesel], &phase );
+			SCSISetCommand( state->atapi_device_data[state->atapi_drivesel], state->atapi_scsi_packet, 12 );
+			SCSIExecCommand( state->atapi_device_data[state->atapi_drivesel], &state->atapi_xferlen );
+			SCSIGetPhase( state->atapi_device_data[state->atapi_drivesel], &phase );
 
-			if (atapi_xferlen != -1)
+			if (state->atapi_xferlen != -1)
 			{
-				logerror("ATAPI: SCSI command %02x returned %d bytes from the device\n", atapi_data[0]&0xff, atapi_xferlen);
+				logerror("ATAPI: SCSI command %02x returned %d bytes from the device\n", state->atapi_data[0]&0xff, state->atapi_xferlen);
 
 				// store the returned command length in the ATAPI regs, splitting into
 				// multiple transfers if necessary
 
-				atapi_xfermod = 0;
-				if (atapi_xferlen > 63488)
+				state->atapi_xfermod = 0;
+				if (state->atapi_xferlen > 63488)
 				{
-					atapi_xfermod = atapi_xferlen - 63488;
-					atapi_xferlen = 63488;
+					state->atapi_xfermod = state->atapi_xferlen - 63488;
+					state->atapi_xferlen = 63488;
 				}
 
-//              printf("ATAPI Transfer: %d, %d\n", atapi_xfermod, atapi_xferlen);
+//              printf("ATAPI Transfer: %d, %d\n", state->atapi_xfermod, state->atapi_xferlen);
 
-				atapi_regs[ATAPI_REG_COUNTLOW] = atapi_xferlen & 0xff;
-				atapi_regs[ATAPI_REG_COUNTHIGH] = (atapi_xferlen>>8)&0xff;
+				state->atapi_regs[ATAPI_REG_COUNTLOW] = state->atapi_xferlen & 0xff;
+				state->atapi_regs[ATAPI_REG_COUNTHIGH] = (state->atapi_xferlen>>8)&0xff;
 
 				switch( phase )
 				{
 				case SCSI_PHASE_DATAOUT:
-					atapi_data_ptr = 0;
-					atapi_cdata_wait = atapi_xferlen;
-					logerror("ATAPI: Waiting for %x bytes of data\n", atapi_cdata_wait);
+					state->atapi_data_ptr = 0;
+					state->atapi_cdata_wait = state->atapi_xferlen;
+					logerror("ATAPI: Waiting for %x bytes of data\n", state->atapi_cdata_wait);
 					break;
 				}
 
 				// perform special ATAPI processing of certain commands
-				switch (atapi_data[0]&0xff)
+				switch (state->atapi_data[0]&0xff)
 				{
 					case 0xa8:	// READ (12)
 						// indicate data ready: set DRQ and DMA ready, and IO in INTREASON
-						atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC;
-						atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
+						state->atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC;
+						state->atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
 
 						fatalerror("ATAPI: DMA read command attempted\n");
 						break;
@@ -1070,7 +1120,7 @@ static void atapi_command_reg_w(running_machine *machine, int reg, UINT16 data)
 					case 0xa5: // PLAY AUDIO
 					case 0x1b:
 					case 0x4e:
-						atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
+						state->atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 						break;
 				}
 			}
@@ -1078,23 +1128,23 @@ static void atapi_command_reg_w(running_machine *machine, int reg, UINT16 data)
 			{
 //              printf("ATAPI: SCSI device returned error!\n");
 
-				atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_CHECK;
-				atapi_regs[ATAPI_REG_ERRFEAT] = 0x50;	// sense key = ILLEGAL REQUEST
-				atapi_regs[ATAPI_REG_COUNTLOW] = 0;
-				atapi_regs[ATAPI_REG_COUNTHIGH] = 0;
+				state->atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_CHECK;
+				state->atapi_regs[ATAPI_REG_ERRFEAT] = 0x50;	// sense key = ILLEGAL REQUEST
+				state->atapi_regs[ATAPI_REG_COUNTLOW] = 0;
+				state->atapi_regs[ATAPI_REG_COUNTHIGH] = 0;
 			}
 		}
 	}
 	else
 	{
 		data &= 0xff;
-		atapi_regs[reg] = data;
+		state->atapi_regs[reg] = data;
 //      printf("ATAPI: Command reg %d = %02X\n", reg, data);
 
 		switch(reg)
 		{
 			case ATAPI_REG_DRIVESEL:
-				atapi_drivesel = (data >> 4) & 0x1;
+				state->atapi_drivesel = (data >> 4) & 0x1;
 				break;
 
 			case ATAPI_REG_CMDSTATUS:
@@ -1106,15 +1156,15 @@ static void atapi_command_reg_w(running_machine *machine, int reg, UINT16 data)
 						break;
 
 					case 0x08:		/* ATAPI Soft Reset */
-						atapi_reset();
+						atapi_reset(machine);
 						break;
 
 					case 0xa0:		/* ATAPI Packet */
-						atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_BSY | ATAPI_STAT_DRQ;
-						atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_COMMAND;
+						state->atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_BSY | ATAPI_STAT_DRQ;
+						state->atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_COMMAND;
 
-						atapi_data_ptr = 0;
-						atapi_cdata_wait = 0;
+						state->atapi_data_ptr = 0;
+						state->atapi_cdata_wait = 0;
 						break;
 
 					default:
@@ -1125,17 +1175,18 @@ static void atapi_command_reg_w(running_machine *machine, int reg, UINT16 data)
 	}
 }
 
-static UINT16 atapi_control_reg_r(int reg)
+static UINT16 atapi_control_reg_r(running_machine *machine, int reg)
 {
+	firebeat_state *state = machine->driver_data<firebeat_state>();
 	UINT16 value;
 	switch(reg)
 	{
 		case 0x6:
 		{
-			value = atapi_regs[ATAPI_REG_CMDSTATUS];
-			if (atapi_regs[ATAPI_REG_CMDSTATUS] & ATAPI_STAT_BSY)
+			value = state->atapi_regs[ATAPI_REG_CMDSTATUS];
+			if (state->atapi_regs[ATAPI_REG_CMDSTATUS] & ATAPI_STAT_BSY)
 			{
-				atapi_regs[ATAPI_REG_CMDSTATUS] ^= ATAPI_STAT_BSY;
+				state->atapi_regs[ATAPI_REG_CMDSTATUS] ^= ATAPI_STAT_BSY;
 			}
 			return value;
 		}
@@ -1148,7 +1199,7 @@ static UINT16 atapi_control_reg_r(int reg)
 	return 0;
 }
 
-static void atapi_control_reg_w(int reg, UINT16 data)
+static void atapi_control_reg_w(running_machine *machine, int reg, UINT16 data)
 {
 	switch(reg)
 	{
@@ -1156,7 +1207,7 @@ static void atapi_control_reg_w(int reg, UINT16 data)
 		{
 			if (data & 0x4)
 			{
-				atapi_reset();
+				atapi_reset(machine);
 			}
 			break;
 		}
@@ -1206,12 +1257,12 @@ static READ32_HANDLER( atapi_control_r )
 
 	if (ACCESSING_BITS_16_31)
 	{
-		r = atapi_control_reg_r(offset*2);
+		r = atapi_control_reg_r(space->machine, offset*2);
 		return ATAPI_ENDIAN(r) << 16;
 	}
 	else
 	{
-		r = atapi_control_reg_r((offset*2) + 1);
+		r = atapi_control_reg_r(space->machine, (offset*2) + 1);
 		return ATAPI_ENDIAN(r) << 0;
 	}
 }
@@ -1220,11 +1271,11 @@ static WRITE32_HANDLER( atapi_control_w )
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		atapi_control_reg_w(offset*2, ATAPI_ENDIAN(data >> 16) & 0xff);
+		atapi_control_reg_w(space->machine, offset*2, ATAPI_ENDIAN(data >> 16) & 0xff);
 	}
 	else
 	{
-		atapi_control_reg_w((offset*2) + 1, ATAPI_ENDIAN(data >> 0) & 0xff);
+		atapi_control_reg_w(space->machine, (offset*2) + 1, ATAPI_ENDIAN(data >> 0) & 0xff);
 	}
 }
 
@@ -1286,11 +1337,10 @@ static void comm_uart_irq_callback(running_machine *machine, int channel, int va
 static const int cab_data[2] = { 0x0, 0x8 };
 static const int kbm_cab_data[2] = { 0x2, 0x8 };
 static const int ppd_cab_data[2] = { 0x1, 0x9 };
-static int cab_data_ptr = 0;
-static const int * cur_cab_data;
 
 static READ32_HANDLER( cabinet_r )
 {
+	firebeat_state *state = space->machine->driver_data<firebeat_state>();
 	UINT32 r = 0;
 
 //  printf("cabinet_r: %08X, %08X\n", offset, mem_mask);
@@ -1299,8 +1349,8 @@ static READ32_HANDLER( cabinet_r )
 	{
 		case 0:
 		{
-			r = cur_cab_data[cab_data_ptr & 1] << 28;
-			cab_data_ptr++;
+			r = state->cur_cab_data[state->cab_data_ptr & 1] << 28;
+			state->cab_data_ptr++;
 			return r;
 		}
 		case 2:		return 0x00000000;
@@ -1348,11 +1398,12 @@ static WRITE32_HANDLER( midi_uart_w )
 
 static void midi_uart_irq_callback(running_machine *machine, int channel, int value)
 {
+	firebeat_state *state = machine->driver_data<firebeat_state>();
 	if (channel == 0)
 	{
-		if ((extend_board_irq_enable & 0x02) == 0 && value != CLEAR_LINE)
+		if ((state->extend_board_irq_enable & 0x02) == 0 && value != CLEAR_LINE)
 		{
-			extend_board_irq_active |= 0x02;
+			state->extend_board_irq_active |= 0x02;
 			cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ1, ASSERT_LINE);
 		}
 		else
@@ -1360,9 +1411,9 @@ static void midi_uart_irq_callback(running_machine *machine, int channel, int va
 	}
 	else
 	{
-		if ((extend_board_irq_enable & 0x01) == 0 && value != CLEAR_LINE)
+		if ((state->extend_board_irq_enable & 0x01) == 0 && value != CLEAR_LINE)
 		{
-			extend_board_irq_active |= 0x01;
+			state->extend_board_irq_active |= 0x01;
 			cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ1, ASSERT_LINE);
 		}
 		else
@@ -1370,7 +1421,6 @@ static void midi_uart_irq_callback(running_machine *machine, int channel, int va
 	}
 }
 
-static int keyboard_state[2] = { 0, 0 };
 
 static const int keyboard_notes[24] =
 {
@@ -1402,6 +1452,7 @@ static const int keyboard_notes[24] =
 
 static TIMER_CALLBACK( keyboard_timer_callback )
 {
+	firebeat_state *state = machine->driver_data<firebeat_state>();
 	static const int kb_uart_channel[2] = { 1, 0 };
 	static const char *const keynames[] = { "KEYBOARD_P1", "KEYBOARD_P2" };
 	int keyboard;
@@ -1412,20 +1463,20 @@ static TIMER_CALLBACK( keyboard_timer_callback )
 		UINT32 kbstate = input_port_read(machine, keynames[keyboard]);
 		int uart_channel = kb_uart_channel[keyboard];
 
-		if (kbstate != keyboard_state[keyboard])
+		if (kbstate != state->keyboard_state[keyboard])
 		{
 			for (i=0; i < 24; i++)
 			{
 				int kbnote = keyboard_notes[i];
 
-				if ((keyboard_state[keyboard] & (1 << i)) != 0 && (kbstate & (1 << i)) == 0)
+				if ((state->keyboard_state[keyboard] & (1 << i)) != 0 && (kbstate & (1 << i)) == 0)
 				{
 					// key was on, now off -> send Note Off message
 					pc16552d_rx_data(machine, 1, uart_channel, 0x80);
 					pc16552d_rx_data(machine, 1, uart_channel, kbnote);
 					pc16552d_rx_data(machine, 1, uart_channel, 0x7f);
 				}
-				else if ((keyboard_state[keyboard] & (1 << i)) == 0 && (kbstate & (1 << i)) != 0)
+				else if ((state->keyboard_state[keyboard] & (1 << i)) == 0 && (kbstate & (1 << i)) != 0)
 				{
 					// key was off, now on -> send Note On message
 					pc16552d_rx_data(machine, 1, uart_channel, 0x90);
@@ -1440,7 +1491,7 @@ static TIMER_CALLBACK( keyboard_timer_callback )
 			pc16552d_rx_data(machine, 1, uart_channel, 0xfe);
 		}
 
-		keyboard_state[keyboard] = kbstate;
+		state->keyboard_state[keyboard] = kbstate;
 	}
 }
 
@@ -1454,11 +1505,12 @@ static TIMER_CALLBACK( keyboard_timer_callback )
 
 static READ32_HANDLER( extend_board_irq_r)
 {
+	firebeat_state *state = space->machine->driver_data<firebeat_state>();
 	UINT32 r = 0;
 
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= (~extend_board_irq_active) << 24;
+		r |= (~state->extend_board_irq_active) << 24;
 	}
 
 	return r;
@@ -1466,13 +1518,14 @@ static READ32_HANDLER( extend_board_irq_r)
 
 static WRITE32_HANDLER( extend_board_irq_w )
 {
+	firebeat_state *state = space->machine->driver_data<firebeat_state>();
 //  printf("extend_board_irq_w: %08X, %08X, %08X\n", data, offset, mem_mask);
 
 	if (ACCESSING_BITS_24_31)
 	{
-		extend_board_irq_active &= ~((data >> 24) & 0xff);
+		state->extend_board_irq_active &= ~((data >> 24) & 0xff);
 
-		extend_board_irq_enable = (data >> 24) & 0xff;
+		state->extend_board_irq_enable = (data >> 24) & 0xff;
 	}
 }
 
@@ -1616,27 +1669,27 @@ static WRITE32_HANDLER( lamp_output3_ppp_w )
 
 /*****************************************************************************/
 
-static UINT8 spu_shared_ram[0x400];
 
 static READ32_HANDLER(ppc_spu_share_r)
 {
+	firebeat_state *state = space->machine->driver_data<firebeat_state>();
 	UINT32 r = 0;
 
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= spu_shared_ram[(offset * 4) + 0] << 24;
+		r |= state->spu_shared_ram[(offset * 4) + 0] << 24;
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		r |= spu_shared_ram[(offset * 4) + 1] << 16;
+		r |= state->spu_shared_ram[(offset * 4) + 1] << 16;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		r |= spu_shared_ram[(offset * 4) + 2] <<  8;
+		r |= state->spu_shared_ram[(offset * 4) + 2] <<  8;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= spu_shared_ram[(offset * 4) + 3] <<  0;
+		r |= state->spu_shared_ram[(offset * 4) + 3] <<  0;
 	}
 
 	return r;
@@ -1644,33 +1697,36 @@ static READ32_HANDLER(ppc_spu_share_r)
 
 static WRITE32_HANDLER(ppc_spu_share_w)
 {
+	firebeat_state *state = space->machine->driver_data<firebeat_state>();
 	if (ACCESSING_BITS_24_31)
 	{
-		spu_shared_ram[(offset * 4) + 0] = (data >> 24) & 0xff;
+		state->spu_shared_ram[(offset * 4) + 0] = (data >> 24) & 0xff;
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		spu_shared_ram[(offset * 4) + 1] = (data >> 16) & 0xff;
+		state->spu_shared_ram[(offset * 4) + 1] = (data >> 16) & 0xff;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		spu_shared_ram[(offset * 4) + 2] = (data >>  8) & 0xff;
+		state->spu_shared_ram[(offset * 4) + 2] = (data >>  8) & 0xff;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		spu_shared_ram[(offset * 4) + 3] = (data >>  0) & 0xff;
+		state->spu_shared_ram[(offset * 4) + 3] = (data >>  0) & 0xff;
 	}
 }
 
 #ifdef UNUSED_FUNCTION
 static READ16_HANDLER(m68k_spu_share_r)
 {
-	return spu_shared_ram[offset] << 8;
+	firebeat_state *state = space->machine->driver_data<firebeat_state>();
+	return state->spu_shared_ram[offset] << 8;
 }
 
 static WRITE16_HANDLER(m68k_spu_share_w)
 {
-	spu_shared_ram[offset] = (data >> 8) & 0xff;
+	firebeat_state *state = space->machine->driver_data<firebeat_state>();
+	state->spu_shared_ram[offset] = (data >> 8) & 0xff;
 }
 #endif
 
@@ -1681,22 +1737,22 @@ static READ16_HANDLER(spu_unk_r)
 
 /*****************************************************************************/
 
-static UINT32 *work_ram;
 static MACHINE_START( firebeat )
 {
+	firebeat_state *state = machine->driver_data<firebeat_state>();
 	/* set conservative DRC options */
 	ppcdrc_set_options(machine->device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine->device("maincpu"), 0x00000000, 0x01ffffff, FALSE, work_ram);
+	ppcdrc_add_fastram(machine->device("maincpu"), 0x00000000, 0x01ffffff, FALSE, state->work_ram);
 
-	flash[0] = machine->device<fujitsu_29f016a_device>("flash0");
-	flash[1] = machine->device<fujitsu_29f016a_device>("flash1");
-	flash[2] = machine->device<fujitsu_29f016a_device>("flash2");
+	state->flash[0] = machine->device<fujitsu_29f016a_device>("flash0");
+	state->flash[1] = machine->device<fujitsu_29f016a_device>("flash1");
+	state->flash[2] = machine->device<fujitsu_29f016a_device>("flash2");
 }
 
 static ADDRESS_MAP_START( firebeat_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM AM_BASE(&work_ram)
+	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM AM_BASE_MEMBER(firebeat_state, work_ram)
 	AM_RANGE(0x70000000, 0x70000fff) AM_READWRITE(midi_uart_r, midi_uart_w)
 	AM_RANGE(0x70006000, 0x70006003) AM_WRITE(extend_board_irq_w)
 	AM_RANGE(0x70008000, 0x7000800f) AM_READ(keyboard_wheel_r)
@@ -1728,13 +1784,14 @@ ADDRESS_MAP_END
 
 static READ8_DEVICE_HANDLER( soundram_r )
 {
+	firebeat_state *state = device->machine->driver_data<firebeat_state>();
 	if (offset >= 0 && offset < 0x200000)
 	{
-		return flash[1]->read(offset & 0x1fffff);
+		return state->flash[1]->read(offset & 0x1fffff);
 	}
 	else if (offset >= 0x200000 && offset < 0x400000)
 	{
-		return flash[2]->read(offset & 0x1fffff);
+		return state->flash[2]->read(offset & 0x1fffff);
 	}
 	return 0;
 }
@@ -1897,21 +1954,22 @@ static INTERRUPT_GEN(firebeat_interrupt)
 
 static MACHINE_RESET( firebeat )
 {
+	firebeat_state *state = machine->driver_data<firebeat_state>();
 	void *cd;
 	int i;
 	UINT8 *sound = machine->region("ymz")->base();
 
 	for (i=0; i < 0x200000; i++)
 	{
-		sound[i] = flash[1]->read(i);
-		sound[i+0x200000] = flash[2]->read(i);
+		sound[i] = state->flash[1]->read(i);
+		sound[i+0x200000] = state->flash[2]->read(i);
 	}
 
-	SCSIGetDevice( atapi_device_data[1], &cd );
+	SCSIGetDevice( state->atapi_device_data[1], &cd );
 	cdda_set_cdrom(machine->device("cdda"), cd);
 }
 
-static MACHINE_CONFIG_START( firebeat, driver_device )
+static MACHINE_CONFIG_START( firebeat, firebeat_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GCX, 66000000)
@@ -1955,7 +2013,7 @@ static MACHINE_CONFIG_START( firebeat, driver_device )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( firebeat2, driver_device )
+static MACHINE_CONFIG_START( firebeat2, firebeat_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GCX, 66000000)
@@ -2015,32 +2073,16 @@ MACHINE_CONFIG_END
 /*****************************************************************************/
 /* Security dongle is a Dallas DS1411 RS232 Adapter with a DS1991 Multikey iButton */
 
-typedef struct
-{
-	UINT8 identifier[8];
-	UINT8 password[8];
-	UINT8 data[0x30];
-} IBUTTON_SUBKEY;
-
-typedef struct
-{
-	IBUTTON_SUBKEY subkey[3];
-} IBUTTON;
-
 enum
 {
 	DS1991_STATE_NORMAL,
 	DS1991_STATE_READ_SUBKEY,
 };
 
-static IBUTTON ibutton;
 
-static int ibutton_state = DS1991_STATE_NORMAL;
-static int ibutton_read_subkey_ptr = 0;
 
-static UINT8 ibutton_subkey_data[0x40];
 
-static void set_ibutton(UINT8 *data)
+static void set_ibutton(firebeat_state *state, UINT8 *data)
 {
 	int i, j;
 
@@ -2049,28 +2091,29 @@ static void set_ibutton(UINT8 *data)
 		// identifier
 		for (j=0; j < 8; j++)
 		{
-			ibutton.subkey[i].identifier[j] = *data++;
+			state->ibutton.subkey[i].identifier[j] = *data++;
 		}
 
 		// password
 		for (j=0; j < 8; j++)
 		{
-			ibutton.subkey[i].password[j] = *data++;
+			state->ibutton.subkey[i].password[j] = *data++;
 		}
 
 		// data
 		for (j=0; j < 48; j++)
 		{
-			ibutton.subkey[i].data[j] = *data++;
+			state->ibutton.subkey[i].data[j] = *data++;
 		}
 	}
 }
 
-static int ibutton_w(UINT8 data)
+static int ibutton_w(running_machine *machine, UINT8 data)
 {
+	firebeat_state *state = machine->driver_data<firebeat_state>();
 	int r = -1;
 
-	switch (ibutton_state)
+	switch (state->ibutton_state)
 	{
 		case DS1991_STATE_NORMAL:
 		{
@@ -2099,14 +2142,14 @@ static int ibutton_w(UINT8 data)
 				case 0x66:			// DS1991 Read SubKey
 				{
 					r = 0x66;
-					ibutton_state = DS1991_STATE_READ_SUBKEY;
-					ibutton_read_subkey_ptr = 0;
+					state->ibutton_state = DS1991_STATE_READ_SUBKEY;
+					state->ibutton_read_subkey_ptr = 0;
 					break;
 				}
 				case 0xcc:			// DS1991 skip rom
 				{
 					r = 0xcc;
-					ibutton_state = DS1991_STATE_NORMAL;
+					state->ibutton_state = DS1991_STATE_NORMAL;
 					break;
 				}
 				default:
@@ -2120,7 +2163,7 @@ static int ibutton_w(UINT8 data)
 
 		case DS1991_STATE_READ_SUBKEY:
 		{
-			if (ibutton_read_subkey_ptr == 0)		// Read SubKey, 2nd command byte
+			if (state->ibutton_read_subkey_ptr == 0)		// Read SubKey, 2nd command byte
 			{
 				int subkey = (data >> 6) & 0x3;
 		//      printf("iButton SubKey %d\n", subkey);
@@ -2128,27 +2171,27 @@ static int ibutton_w(UINT8 data)
 
 				if (subkey < 3)
 				{
-					memcpy(&ibutton_subkey_data[0],  ibutton.subkey[subkey].identifier, 8);
-					memcpy(&ibutton_subkey_data[8],  ibutton.subkey[subkey].password, 8);
-					memcpy(&ibutton_subkey_data[16], ibutton.subkey[subkey].data, 0x30);
+					memcpy(&state->ibutton_subkey_data[0],  state->ibutton.subkey[subkey].identifier, 8);
+					memcpy(&state->ibutton_subkey_data[8],  state->ibutton.subkey[subkey].password, 8);
+					memcpy(&state->ibutton_subkey_data[16], state->ibutton.subkey[subkey].data, 0x30);
 				}
 				else
 				{
-					memset(&ibutton_subkey_data[0], 0, 0x40);
+					memset(&state->ibutton_subkey_data[0], 0, 0x40);
 				}
 			}
-			else if (ibutton_read_subkey_ptr == 1)	// Read SubKey, 3rd command byte
+			else if (state->ibutton_read_subkey_ptr == 1)	// Read SubKey, 3rd command byte
 			{
 				r = data;
 			}
 			else
 			{
-				r = ibutton_subkey_data[ibutton_read_subkey_ptr-2];
+				r = state->ibutton_subkey_data[state->ibutton_read_subkey_ptr-2];
 			}
-			ibutton_read_subkey_ptr++;
-			if (ibutton_read_subkey_ptr >= 0x42)
+			state->ibutton_read_subkey_ptr++;
+			if (state->ibutton_read_subkey_ptr >= 0x42)
 			{
-				ibutton_state = DS1991_STATE_NORMAL;
+				state->ibutton_state = DS1991_STATE_NORMAL;
 			}
 			break;
 		}
@@ -2159,7 +2202,7 @@ static int ibutton_w(UINT8 data)
 
 static void security_w(device_t *device, UINT8 data)
 {
-	int r = ibutton_w(data);
+	int r = ibutton_w(device->machine, data);
 	if (r >= 0)
 		ppc4xx_spu_receive_byte(device->machine->device("maincpu"), r);
 }
@@ -2179,6 +2222,7 @@ static void init_lights(running_machine *machine, write32_space_func out1, write
 
 static void init_firebeat(running_machine *machine)
 {
+	firebeat_state *state = machine->driver_data<firebeat_state>();
 	UINT8 *rom = machine->region("user2")->base();
 
 	atapi_init(machine);
@@ -2186,14 +2230,14 @@ static void init_firebeat(running_machine *machine)
 	pc16552d_init(machine, 0, 19660800, comm_uart_irq_callback, 0);		// Network UART
 	pc16552d_init(machine, 1, 24000000, midi_uart_irq_callback, 0);		// MIDI UART
 
-	extend_board_irq_enable = 0x3f;
-	extend_board_irq_active = 0x00;
+	state->extend_board_irq_enable = 0x3f;
+	state->extend_board_irq_active = 0x00;
 
-	cur_cab_data = cab_data;
+	state->cur_cab_data = cab_data;
 
 	ppc4xx_spu_set_tx_handler(machine->device("maincpu"), security_w);
 
-	set_ibutton(rom);
+	set_ibutton(state, rom);
 
 	init_lights(machine, NULL, NULL, NULL);
 }
@@ -2206,27 +2250,30 @@ static DRIVER_INIT(ppp)
 
 static DRIVER_INIT(ppd)
 {
+	firebeat_state *state = machine->driver_data<firebeat_state>();
 	init_firebeat(machine);
 	init_lights(machine, lamp_output_ppp_w, lamp_output2_ppp_w, lamp_output3_ppp_w);
 
-	cur_cab_data = ppd_cab_data;
+	state->cur_cab_data = ppd_cab_data;
 }
 
 static void init_keyboard(running_machine *machine)
 {
+	firebeat_state *state = machine->driver_data<firebeat_state>();
 	// set keyboard timer
-	keyboard_timer = machine->scheduler().timer_alloc(FUNC(keyboard_timer_callback));
-	keyboard_timer->adjust(attotime::from_msec(10), 0, attotime::from_msec(10));
+	state->keyboard_timer = machine->scheduler().timer_alloc(FUNC(keyboard_timer_callback));
+	state->keyboard_timer->adjust(attotime::from_msec(10), 0, attotime::from_msec(10));
 }
 
 static DRIVER_INIT(kbm)
 {
+	firebeat_state *state = machine->driver_data<firebeat_state>();
 	init_firebeat(machine);
 	init_lights(machine, lamp_output_kbm_w, NULL, NULL);
 
 	init_keyboard(machine);
 
-	cur_cab_data = kbm_cab_data;
+	state->cur_cab_data = kbm_cab_data;
 }
 
 

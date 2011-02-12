@@ -33,6 +33,17 @@ SOUND : YM2151 uPD7759C
 #include "sound/2151intf.h"
 #include "sound/upd7759.h"
 
+
+class bingoc_state : public driver_device
+{
+public:
+	bingoc_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 x;
+};
+
+
 #define SOUND_TEST 0
 
 static VIDEO_START(bingoc)
@@ -59,19 +70,19 @@ static READ16_HANDLER( bingoc_rand_r )
 */
 static READ8_HANDLER( sound_test_r )
 {
-	static UINT8 x;
+	bingoc_state *state = space->machine->driver_data<bingoc_state>();
 
 	if(input_code_pressed_once(space->machine, KEYCODE_Z))
-		x++;
+		state->x++;
 
 	if(input_code_pressed_once(space->machine, KEYCODE_X))
-		x--;
+		state->x--;
 
 	if(input_code_pressed_once(space->machine, KEYCODE_A))
 		return 0xff;
 
-	popmessage("%02x",x);
-	return x;
+	popmessage("%02x",state->x);
+	return state->x;
 }
 #else
 static WRITE16_HANDLER( main_sound_latch_w )
@@ -125,7 +136,7 @@ static INPUT_PORTS_START( bingoc )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( bingoc, driver_device )
+static MACHINE_CONFIG_START( bingoc, bingoc_state )
 
 	MCFG_CPU_ADD("maincpu", M68000,8000000)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)

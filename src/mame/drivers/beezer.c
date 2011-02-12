@@ -13,9 +13,6 @@
 #include "sound/dac.h"
 #include "includes/beezer.h"
 
-extern const via6522_interface b_via_0_interface;
-extern const via6522_interface b_via_1_interface;
-
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE_MEMBER(beezer_state, videoram)
 	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK("bank1")

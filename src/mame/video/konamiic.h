@@ -144,7 +144,7 @@ void K053245_set_SpriteOffset(int chip,int offsx, int offsy);
 #define K055673_LAYOUT_GX6 3
 
 void K055673_vh_start(running_machine *machine, const char *gfx_memory_region, int alt_layout, int dx, int dy,
-		void (*callback)(int *code,int *color,int *priority));
+		void (*callback)(running_machine *machine, int *code,int *color,int *priority));
 READ16_HANDLER( K055673_rom_word_r );
 READ16_HANDLER( K055673_GX6bpp_rom_word_r );
 
@@ -179,7 +179,7 @@ void K053247_set_SpriteOffset(int offsx, int offsy);
 void K053247_wraparound_enable(int status);
 void K05324x_set_z_rejection(int zcode); // common to K053245/6/7
 #endif
-void K053247_export_config(UINT16 **ram, gfx_element **gfx, void (**callback)(int *, int *, int *), int *dx, int *dy);
+void K053247_export_config(UINT16 **ram, gfx_element **gfx, void (**callback)(running_machine *, int *, int *, int *), int *dx, int *dy);
 
 #ifdef UNUSED_FUNCTION
 READ8_HANDLER( K053246_r );
@@ -280,7 +280,7 @@ void K056832_SetExtLinescroll(void);	/* Lethal Enforcers */
 
 void K056832_vh_start(running_machine *machine, const char *gfx_memory_region, int bpp, int big,
 			int (*scrolld)[4][2],
-			void (*callback)(int layer, int *code, int *color, int *flags),
+			void (*callback)(running_machine *machine, int layer, int *code, int *color, int *flags),
 			int djmain_hack);
 READ16_HANDLER( K056832_ram_word_r );
 WRITE16_HANDLER( K056832_ram_word_w );

@@ -218,7 +218,7 @@ static INTERRUPT_GEN( hexion_interrupt )
 		cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( hexion, driver_device )
+static MACHINE_CONFIG_START( hexion, hexion_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,24000000/4)	/* Z80B 6 MHz */

@@ -322,13 +322,27 @@
 #include "video/konicdev.h"
 #include "rendlay.h"
 
-static UINT8 led_reg0, led_reg1;
-static UINT32 *workram;
-static UINT32 *sharc_dataram[2];
-static UINT8 *jvs_sdata;
-static UINT32 jvs_sdata_ptr = 0;
 
-static emu_timer *sound_irq_timer;
+class hornet_state : public driver_device
+{
+public:
+	hornet_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 led_reg0;
+	UINT8 led_reg1;
+	UINT32 *workram;
+	UINT32 *sharc_dataram[2];
+	UINT8 *jvs_sdata;
+	UINT32 jvs_sdata_ptr;
+	emu_timer *sound_irq_timer;
+	UINT16 gn680_latch;
+	UINT16 gn680_ret0;
+	UINT16 gn680_ret1;
+};
+
+
+
 
 static READ32_HANDLER( hornet_k037122_sram_r )
 {
@@ -379,6 +393,7 @@ static void voodoo_vblank_1(device_t *device, int param)
 
 static VIDEO_UPDATE( hornet )
 {
+	hornet_state *state = screen->machine->driver_data<hornet_state>();
 	device_t *voodoo = screen->machine->device("voodoo0");
 	device_t *k037122 = screen->machine->device("k037122_1");
 
@@ -386,13 +401,14 @@ static VIDEO_UPDATE( hornet )
 
 	k037122_tile_draw(k037122, bitmap, cliprect);
 
-	draw_7segment_led(bitmap, 3, 3, led_reg0);
-	draw_7segment_led(bitmap, 9, 3, led_reg1);
+	draw_7segment_led(bitmap, 3, 3, state->led_reg0);
+	draw_7segment_led(bitmap, 9, 3, state->led_reg1);
 	return 0;
 }
 
 static VIDEO_UPDATE( hornet_2board )
 {
+	hornet_state *state = screen->machine->driver_data<hornet_state>();
 	if (strcmp(screen->tag(), "lscreen") == 0)
 	{
 		device_t *k037122 = screen->machine->device("k037122_1");
@@ -412,8 +428,8 @@ static VIDEO_UPDATE( hornet_2board )
 		k037122_tile_draw(k037122, bitmap, cliprect);
 	}
 
-	draw_7segment_led(bitmap, 3, 3, led_reg0);
-	draw_7segment_led(bitmap, 9, 3, led_reg1);
+	draw_7segment_led(bitmap, 3, 3, state->led_reg0);
+	draw_7segment_led(bitmap, 9, 3, state->led_reg1);
 	return 0;
 }
 
@@ -457,16 +473,17 @@ static READ8_HANDLER( sysreg_r )
 
 static WRITE8_HANDLER( sysreg_w )
 {
+	hornet_state *state = space->machine->driver_data<hornet_state>();
 	device_t *adc12138 = space->machine->device("adc12138");
 
 	switch (offset)
 	{
 		case 0:	/* LED Register 0 */
-			led_reg0 = data;
+			state->led_reg0 = data;
 			break;
 
 		case 1:	/* LED Register 1 */
-			led_reg1 = data;
+			state->led_reg1 = data;
 			break;
 
 		case 2: /* Parallel data register */
@@ -568,18 +585,19 @@ static READ32_HANDLER( comm0_unk_r )
 	return 0xffffffff;
 }
 
-static UINT16 gn680_latch, gn680_ret0, gn680_ret1;
 
 static READ32_HANDLER(gun_r)
 {
-	return gn680_ret0<<16 | gn680_ret1;
+	hornet_state *state = space->machine->driver_data<hornet_state>();
+	return state->gn680_ret0<<16 | state->gn680_ret1;
 }
 
 static WRITE32_HANDLER(gun_w)
 {
+	hornet_state *state = space->machine->driver_data<hornet_state>();
 	if (mem_mask == 0xffff0000)
 	{
-		gn680_latch = data>>16;
+		state->gn680_latch = data>>16;
 		cputag_set_input_line(space->machine, "gn680", M68K_IRQ_6, HOLD_LINE);
 	}
 }
@@ -587,7 +605,7 @@ static WRITE32_HANDLER(gun_w)
 /*****************************************************************************/
 
 static ADDRESS_MAP_START( hornet_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE(&workram)		/* Work RAM */
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE_MEMBER(hornet_state, workram)		/* Work RAM */
 	AM_RANGE(0x74000000, 0x740000ff) AM_READWRITE(hornet_k037122_reg_r, hornet_k037122_reg_w)
 	AM_RANGE(0x74020000, 0x7403ffff) AM_READWRITE(hornet_k037122_sram_r, hornet_k037122_sram_w)
 	AM_RANGE(0x74040000, 0x7407ffff) AM_READWRITE(hornet_k037122_char_r, hornet_k037122_char_w)
@@ -631,20 +649,22 @@ static WRITE16_HANDLER(gn680_sysctrl)
 
 static READ16_HANDLER(gn680_latch_r)
 {
+	hornet_state *state = space->machine->driver_data<hornet_state>();
 	cputag_set_input_line(space->machine, "gn680", M68K_IRQ_6, CLEAR_LINE);
 
-	return gn680_latch;
+	return state->gn680_latch;
 }
 
 static WRITE16_HANDLER(gn680_latch_w)
 {
+	hornet_state *state = space->machine->driver_data<hornet_state>();
 	if (offset)
 	{
-		gn680_ret1 = data;
+		state->gn680_ret1 = data;
 	}
 	else
 	{
-		gn680_ret0 = data;
+		state->gn680_ret0 = data;
 	}
 }
 
@@ -664,27 +684,31 @@ ADDRESS_MAP_END
 
 static READ32_HANDLER( dsp_dataram0_r )
 {
-	return sharc_dataram[0][offset] & 0xffff;
+	hornet_state *state = space->machine->driver_data<hornet_state>();
+	return state->sharc_dataram[0][offset] & 0xffff;
 }
 
 static WRITE32_HANDLER( dsp_dataram0_w )
 {
-	sharc_dataram[0][offset] = data;
+	hornet_state *state = space->machine->driver_data<hornet_state>();
+	state->sharc_dataram[0][offset] = data;
 }
 
 static READ32_HANDLER( dsp_dataram1_r )
 {
-	return sharc_dataram[1][offset] & 0xffff;
+	hornet_state *state = space->machine->driver_data<hornet_state>();
+	return state->sharc_dataram[1][offset] & 0xffff;
 }
 
 static WRITE32_HANDLER( dsp_dataram1_w )
 {
-	sharc_dataram[1][offset] = data;
+	hornet_state *state = space->machine->driver_data<hornet_state>();
+	state->sharc_dataram[1][offset] = data;
 }
 
 static ADDRESS_MAP_START( sharc0_map, ADDRESS_SPACE_DATA, 32 )
 	AM_RANGE(0x0400000, 0x041ffff) AM_READWRITE(cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
-	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram0_r, dsp_dataram0_w) AM_BASE(&sharc_dataram[0])
+	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram0_r, dsp_dataram0_w) AM_BASE_MEMBER(hornet_state, sharc_dataram[0])
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
 	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE("voodoo0", voodoo_r, voodoo_w)
 	AM_RANGE(0x3400000, 0x34000ff) AM_READWRITE(cgboard_0_comm_sharc_r, cgboard_0_comm_sharc_w)
@@ -694,7 +718,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sharc1_map, ADDRESS_SPACE_DATA, 32 )
 	AM_RANGE(0x0400000, 0x041ffff) AM_READWRITE(cgboard_1_shared_sharc_r, cgboard_1_shared_sharc_w)
-	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram1_r, dsp_dataram1_w) AM_BASE(&sharc_dataram[1])
+	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram1_r, dsp_dataram1_w) AM_BASE_MEMBER(hornet_state, sharc_dataram[1])
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
 	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE("voodoo1", voodoo_r, voodoo_w)
 	AM_RANGE(0x3400000, 0x34000ff) AM_READWRITE(cgboard_1_comm_sharc_r, cgboard_1_comm_sharc_w)
@@ -834,21 +858,22 @@ static TIMER_CALLBACK( irq_off );
 
 static MACHINE_START( hornet )
 {
-	jvs_sdata_ptr = 0;
-	jvs_sdata = auto_alloc_array_clear(machine, UINT8, 1024);
+	hornet_state *state = machine->driver_data<hornet_state>();
+	state->jvs_sdata_ptr = 0;
+	state->jvs_sdata = auto_alloc_array_clear(machine, UINT8, 1024);
 
 	/* set conservative DRC options */
 	ppcdrc_set_options(machine->device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine->device("maincpu"), 0x00000000, 0x003fffff, FALSE, workram);
+	ppcdrc_add_fastram(machine->device("maincpu"), 0x00000000, 0x003fffff, FALSE, state->workram);
 
-	state_save_register_global(machine, led_reg0);
-	state_save_register_global(machine, led_reg1);
-	state_save_register_global_pointer(machine, jvs_sdata, 1024);
-	state_save_register_global(machine, jvs_sdata_ptr);
+	state_save_register_global(machine, state->led_reg0);
+	state_save_register_global(machine, state->led_reg1);
+	state_save_register_global_pointer(machine, state->jvs_sdata, 1024);
+	state_save_register_global(machine, state->jvs_sdata_ptr);
 
-    sound_irq_timer = machine->scheduler().timer_alloc(FUNC(irq_off));
+	state->sound_irq_timer = machine->scheduler().timer_alloc(FUNC(irq_off));
 }
 
 static MACHINE_RESET( hornet )
@@ -883,10 +908,11 @@ static TIMER_CALLBACK( irq_off )
 
 static void sound_irq_callback( running_machine *machine, int irq )
 {
+	hornet_state *state = machine->driver_data<hornet_state>();
 	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
 
 	cputag_set_input_line(machine, "audiocpu", line, ASSERT_LINE);
-    sound_irq_timer->adjust(attotime::from_usec(1), line);
+    state->sound_irq_timer->adjust(attotime::from_usec(1), line);
 }
 
 static const k056800_interface hornet_k056800_interface =
@@ -919,7 +945,7 @@ static const k037122_interface hornet_k037122_intf_r =
 	"rscreen", 1
 };
 
-static MACHINE_CONFIG_START( hornet, driver_device )
+static MACHINE_CONFIG_START( hornet, hornet_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
@@ -1063,12 +1089,13 @@ static void jamma_jvs_cmd_exec(running_machine *machine);
 
 static void jamma_jvs_w(device_t *device, UINT8 data)
 {
-	if (jvs_sdata_ptr == 0 && data != 0xe0)
+	hornet_state *state = device->machine->driver_data<hornet_state>();
+	if (state->jvs_sdata_ptr == 0 && data != 0xe0)
 		return;
-	jvs_sdata[jvs_sdata_ptr] = data;
-	jvs_sdata_ptr++;
+	state->jvs_sdata[state->jvs_sdata_ptr] = data;
+	state->jvs_sdata_ptr++;
 
-	if (jvs_sdata_ptr >= 3 && jvs_sdata_ptr >= 3 + jvs_sdata[2])
+	if (state->jvs_sdata_ptr >= 3 && state->jvs_sdata_ptr >= 3 + state->jvs_sdata[2])
 		jamma_jvs_cmd_exec(device->machine);
 }
 
@@ -1125,6 +1152,7 @@ static int jvs_decode_data(UINT8 *in, UINT8 *out, int length)
 
 static void jamma_jvs_cmd_exec(running_machine *machine)
 {
+	hornet_state *state = machine->driver_data<hornet_state>();
 	UINT8 sync, node, byte_num;
 	UINT8 data[1024], rdata[1024];
 #if 0
@@ -1133,19 +1161,19 @@ static void jamma_jvs_cmd_exec(running_machine *machine)
 	int rdata_ptr;
 	int sum;
 
-	sync = jvs_sdata[0];
-	node = jvs_sdata[1];
-	byte_num = jvs_sdata[2];
+	sync = state->jvs_sdata[0];
+	node = state->jvs_sdata[1];
+	byte_num = state->jvs_sdata[2];
 
 #if 0
 	length =
 #endif
-		jvs_decode_data(&jvs_sdata[3], data, byte_num-1);
+		jvs_decode_data(&state->jvs_sdata[3], data, byte_num-1);
 #if 0
     printf("jvs input data:\n");
     for (i=0; i < byte_num; i++)
     {
-        printf("%02X ", jvs_sdata[3+i]);
+        printf("%02X ", state->jvs_sdata[3+i]);
     }
     printf("\n");
 
@@ -1194,7 +1222,7 @@ static void jamma_jvs_cmd_exec(running_machine *machine)
 	sum += jvs_encode_data(machine, rdata, rdata_ptr);
 	ppc4xx_spu_receive_byte(machine->device("maincpu"), sum - 1);		// checksum
 
-	jvs_sdata_ptr = 0;
+	state->jvs_sdata_ptr = 0;
 }
 
 /*****************************************************************************/
@@ -1202,21 +1230,23 @@ static void jamma_jvs_cmd_exec(running_machine *machine)
 
 static DRIVER_INIT(hornet)
 {
+	hornet_state *state = machine->driver_data<hornet_state>();
 	init_konami_cgboard(machine, 1, CGBOARD_TYPE_HORNET);
 	set_cgboard_texture_bank(machine, 0, "bank5", machine->region("user5")->base());
 
-	led_reg0 = led_reg1 = 0x7f;
+	state->led_reg0 = state->led_reg1 = 0x7f;
 
 	ppc4xx_spu_set_tx_handler(machine->device("maincpu"), jamma_jvs_w);
 }
 
 static DRIVER_INIT(hornet_2board)
 {
+	hornet_state *state = machine->driver_data<hornet_state>();
 	init_konami_cgboard(machine, 2, CGBOARD_TYPE_HORNET);
 	set_cgboard_texture_bank(machine, 0, "bank5", machine->region("user5")->base());
 	set_cgboard_texture_bank(machine, 1, "bank6", machine->region("user5")->base());
 
-	led_reg0 = led_reg1 = 0x7f;
+	state->led_reg0 = state->led_reg1 = 0x7f;
 
 	ppc4xx_spu_set_tx_handler(machine->device("maincpu"), jamma_jvs_w);
 }

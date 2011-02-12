@@ -10,11 +10,11 @@
 #define NUM_SPRITES	(0x800 / 16)
 #define NUM_LAYERS	2
 
-UINT32 *djmain_obj_ram;
 
 
 static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	djmain_state *state = machine->driver_data<djmain_state>();
 	device_t *k055555 = machine->device("k055555");
 	int offs, pri_code;
 	int sortedlist[NUM_SPRITES];
@@ -27,12 +27,12 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 	/* prebuild a sorted table */
 	for (offs = 0; offs < NUM_SPRITES * 4; offs += 4)
 	{
-		if (djmain_obj_ram[offs] & 0x00008000)
+		if (state->obj_ram[offs] & 0x00008000)
 		{
-			if (djmain_obj_ram[offs] & 0x80000000)
+			if (state->obj_ram[offs] & 0x80000000)
 				continue;
 
-			pri_code = djmain_obj_ram[offs] & (NUM_SPRITES - 1);
+			pri_code = state->obj_ram[offs] & (NUM_SPRITES - 1);
 			sortedlist[pri_code] = offs;
 		}
 	}
@@ -53,16 +53,16 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 		offs = sortedlist[pri_code];
 		if (offs == -1) continue;
 
-		code = djmain_obj_ram[offs] >> 16;
-		flipx = (djmain_obj_ram[offs] >> 10) & 1;
-		flipy = (djmain_obj_ram[offs] >> 11) & 1;
-		size = sizetab[(djmain_obj_ram[offs] >> 8) & 3];
+		code = state->obj_ram[offs] >> 16;
+		flipx = (state->obj_ram[offs] >> 10) & 1;
+		flipy = (state->obj_ram[offs] >> 11) & 1;
+		size = sizetab[(state->obj_ram[offs] >> 8) & 3];
 
-		ox = (INT16)(djmain_obj_ram[offs + 1] & 0xffff);
-		oy = (INT16)(djmain_obj_ram[offs + 1] >> 16);
+		ox = (INT16)(state->obj_ram[offs + 1] & 0xffff);
+		oy = (INT16)(state->obj_ram[offs + 1] >> 16);
 
-		xscale = djmain_obj_ram[offs + 2] >> 16;
-		yscale = djmain_obj_ram[offs + 2] & 0xffff;
+		xscale = state->obj_ram[offs + 2] >> 16;
+		yscale = state->obj_ram[offs + 2] & 0xffff;
 
 		if (!xscale || !yscale)
 			continue;
@@ -72,7 +72,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 		ox -= (size * xscale) >> 13;
 		oy -= (size * yscale) >> 13;
 
-		color = (djmain_obj_ram[offs + 3] >> 16) & 15;
+		color = (state->obj_ram[offs + 3] >> 16) & 15;
 
 		for (x = 0; x < size; x++)
 			for (y = 0; y < size; y++)

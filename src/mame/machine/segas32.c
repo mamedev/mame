@@ -56,7 +56,8 @@ WRITE16_HANDLER( ga2_dpram_w )
 
 READ16_HANDLER( ga2_dpram_r )
 {
-	return (ga2_dpram[offset])|(ga2_dpram[offset+1]<<8);
+	segas32_state *state = space->machine->driver_data<segas32_state>();
+	return (state->ga2_dpram[offset])|(state->ga2_dpram[offset+1]<<8);
 }
 
 
@@ -102,26 +103,27 @@ READ16_HANDLER(ga2_wakeup_protection_r)
 
 WRITE16_HANDLER(sonic_level_load_protection)
 {
+	segas32_state *state = space->machine->driver_data<segas32_state>();
 	UINT16 level;
 //Perform write
-	system32_workram[CLEARED_LEVELS / 2] = (data & mem_mask) | (system32_workram[CLEARED_LEVELS / 2] & ~mem_mask);
+	state->system32_workram[CLEARED_LEVELS / 2] = (data & mem_mask) | (state->system32_workram[CLEARED_LEVELS / 2] & ~mem_mask);
 
 //Refresh current level
-		if (system32_workram[CLEARED_LEVELS / 2] == 0)
+		if (state->system32_workram[CLEARED_LEVELS / 2] == 0)
 		{
 			level = 0x0007;
 		}
 		else
 		{
 			const UINT8 *ROM = space->machine->region("maincpu")->base();
-			level =  *((ROM + LEVEL_ORDER_ARRAY) + (system32_workram[CLEARED_LEVELS / 2] * 2) - 1);
-			level |= *((ROM + LEVEL_ORDER_ARRAY) + (system32_workram[CLEARED_LEVELS / 2] * 2) - 2) << 8;
+			level =  *((ROM + LEVEL_ORDER_ARRAY) + (state->system32_workram[CLEARED_LEVELS / 2] * 2) - 1);
+			level |= *((ROM + LEVEL_ORDER_ARRAY) + (state->system32_workram[CLEARED_LEVELS / 2] * 2) - 2) << 8;
 		}
-		system32_workram[CURRENT_LEVEL / 2] = level;
+		state->system32_workram[CURRENT_LEVEL / 2] = level;
 
 //Reset level status
-		system32_workram[CURRENT_LEVEL_STATUS / 2] = 0x0000;
-		system32_workram[(CURRENT_LEVEL_STATUS + 2) / 2] = 0x0000;
+		state->system32_workram[CURRENT_LEVEL_STATUS / 2] = 0x0000;
+		state->system32_workram[(CURRENT_LEVEL_STATUS + 2) / 2] = 0x0000;
 }
 
 
@@ -136,6 +138,7 @@ WRITE16_HANDLER(sonic_level_load_protection)
 // and can write things into work RAM.  we simulate that here for burning rival.
 READ16_HANDLER(brival_protection_r)
 {
+	segas32_state *state = space->machine->driver_data<segas32_state>();
 	if (mem_mask == 0xffff)	// only trap on word-wide reads
 	{
 		switch (offset)
@@ -147,11 +150,12 @@ READ16_HANDLER(brival_protection_r)
 		}
 	}
 
-	return system32_workram[0xba00/2 + offset];
+	return state->system32_workram[0xba00/2 + offset];
 }
 
 WRITE16_HANDLER(brival_protection_w)
 {
+	segas32_state *state = space->machine->driver_data<segas32_state>();
 	static const int protAddress[6][2] =
 	{
 		{ 0x109517, 0x00/2 },
@@ -195,7 +199,7 @@ WRITE16_HANDLER(brival_protection_w)
 	memcpy(ret, &ROM[protAddress[curProtType][0]], 16);
 	ret[16] = '\0';
 
-	memcpy(&system32_protram[protAddress[curProtType][1]], ret, 16);
+	memcpy(&state->system32_protram[protAddress[curProtType][1]], ret, 16);
 }
 
 
@@ -303,7 +307,8 @@ READ16_HANDLER(arf_wakeup_protection_r)
  ******************************************************************************/
 WRITE16_HANDLER( jleague_protection_w )
 {
-	COMBINE_DATA( &system32_workram[0xf700/2 + offset ] );
+	segas32_state *state = space->machine->driver_data<segas32_state>();
+	COMBINE_DATA( &state->system32_workram[0xf700/2 + offset ] );
 
 	switch( offset )
 	{
@@ -343,13 +348,13 @@ WRITE16_HANDLER( jleague_protection_w )
     99.99% of the dsp code is unused because the V60 ROM is hardcoded as part of a twin set,
     maybe the standalone board was for dev only? nop the 3 bytes at 0x06023A for standalone. (centred intro text)
 */
-static UINT16 arescue_dsp_io[6] = {0,0,0,0,0,0};
 
 READ16_HANDLER( arescue_dsp_r )
 {
+	segas32_state *state = space->machine->driver_data<segas32_state>();
 	if( offset == 4/2 )
 	{
-		switch( arescue_dsp_io[0] )
+		switch( state->arescue_dsp_io[0] )
 		{
 			case 0:
 			case 1:
@@ -357,25 +362,26 @@ READ16_HANDLER( arescue_dsp_r )
 				break;
 
 			case 3:
-				arescue_dsp_io[0] = 0x8000;
-				arescue_dsp_io[2/2] = 0x0001;
+				state->arescue_dsp_io[0] = 0x8000;
+				state->arescue_dsp_io[2/2] = 0x0001;
 				break;
 
 			case 6:
-				arescue_dsp_io[0] = 4 * arescue_dsp_io[2/2];
+				state->arescue_dsp_io[0] = 4 * state->arescue_dsp_io[2/2];
 				break;
 
 			default:
-				logerror("Unhandled DSP cmd %04x (%04x).\n", arescue_dsp_io[0], arescue_dsp_io[1] );
+				logerror("Unhandled DSP cmd %04x (%04x).\n", state->arescue_dsp_io[0], state->arescue_dsp_io[1] );
 				break;
 		}
 	}
 
-	return arescue_dsp_io[offset];
+	return state->arescue_dsp_io[offset];
 }
 
 WRITE16_HANDLER( arescue_dsp_w )
 {
-	COMBINE_DATA(&arescue_dsp_io[offset]);
+	segas32_state *state = space->machine->driver_data<segas32_state>();
+	COMBINE_DATA(&state->arescue_dsp_io[offset]);
 }
 

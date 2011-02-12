@@ -7,31 +7,33 @@
 
 #define LOG_TGP(x)	do { if (LOG_TGP_VIDEO) logerror x; } while (0)
 
-UINT16 *model1_display_list0, *model1_display_list1;
-UINT16 *model1_color_xlat;
-static UINT16 listctl[2];
-static UINT16 *glist;
 
 // Model 1 geometrizer TGP and rasterizer simulation
 enum { FRAC_SHIFT = 16 };
+enum { MOIRE = 0x00010000 };
 
-static int render_done;
-static UINT16 *tgp_ram;
-static float trans_mat[12];
-static UINT16 *paletteram16;
 
-static float vxx, vyy, vzz, ayy, ayyc, ayys;
 
 struct vector {
 	float x, y, z;
 };
 
-static struct {
+struct lightparam {
+	float a;
+	float d;
+	float s;
+	int p;
+};
+
+struct view {
 	int xc, yc, x1, y1, x2, y2;
 	float zoomx, zoomy, transx, transy;
 	float a_bottom, a_top, a_left, a_right;
+	float vxx, vyy, vzz, ayy, ayyc, ayys;
+	float trans_mat[12];
 	struct vector light;
-} view;
+	struct lightparam lightparams[32];
+};
 
 struct spoint {
 	INT32 x, y;
@@ -43,15 +45,6 @@ struct point {
 	struct spoint s;
 };
 
-static struct lightparam
-{
-	float a;
-	float d;
-	float s;
-	int p;
-} lightparams[32];
-
-enum { MOIRE = 0x00010000 };
 
 struct quad_m1 {
 	struct point *p[4];
@@ -59,11 +52,7 @@ struct quad_m1 {
 	int col;
 };
 
-static struct point *pointdb, *pointpt;
-static struct quad_m1 *quaddb, *quadpt;
-static struct quad_m1 **quadind;
 
-static UINT32 *poly_rom,*poly_ram;
 
 static UINT32 readi(const UINT16 *adr)
 {
@@ -80,23 +69,25 @@ static float readf(const UINT16 *adr)
 	return u2f(readi(adr));
 }
 
-static void transform_point(struct point *p)
+static void transform_point(struct view *view, struct point *p)
 {
 	struct point q = *p;
+	float *trans = view->trans_mat;
 	float xx, zz;
-	xx = trans_mat[0]*q.x+trans_mat[3]*q.y+trans_mat[6]*q.z+trans_mat[9]+vxx;
-	p->y = trans_mat[1]*q.x+trans_mat[4]*q.y+trans_mat[7]*q.z+trans_mat[10]+vyy;
-	zz = trans_mat[2]*q.x+trans_mat[5]*q.y+trans_mat[8]*q.z+trans_mat[11]+vzz;
-	p->x = ayyc*xx-ayys*zz;
-	p->z = ayys*xx+ayyc*zz;
+	xx = trans[0]*q.x+trans[3]*q.y+trans[6]*q.z+trans[9]+view->vxx;
+	p->y = trans[1]*q.x+trans[4]*q.y+trans[7]*q.z+trans[10]+view->vyy;
+	zz = trans[2]*q.x+trans[5]*q.y+trans[8]*q.z+trans[11]+view->vzz;
+	p->x = view->ayyc*xx-view->ayys*zz;
+	p->z = view->ayys*xx+view->ayyc*zz;
 }
 
-static void transform_vector(struct vector *p)
+static void transform_vector(struct view *view, struct vector *p)
 {
 	struct vector q = *p;
-	p->x = trans_mat[0]*q.x+trans_mat[3]*q.y+trans_mat[6]*q.z;
-	p->y = trans_mat[1]*q.x+trans_mat[4]*q.y+trans_mat[7]*q.z;
-	p->z = trans_mat[2]*q.x+trans_mat[5]*q.y+trans_mat[8]*q.z;
+	float *trans = view->trans_mat;
+	p->x = trans[0]*q.x+trans[3]*q.y+trans[6]*q.z;
+	p->y = trans[1]*q.x+trans[4]*q.y+trans[7]*q.z;
+	p->z = trans[2]*q.x+trans[5]*q.y+trans[8]*q.z;
 }
 
 static void normalize_vector(struct vector *p)
@@ -127,20 +118,20 @@ static float view_determinant(const struct point *p1, const struct point *p2, co
 }
 
 
-static void project_point(struct point *p)
+static void project_point(struct view *view, struct point *p)
 {
 	p->xx = p->x / p->z;
 	p->yy = p->y / p->z;
-	p->s.x = view.xc+(p->xx*view.zoomx+view.transx);
-	p->s.y = view.yc-(p->yy*view.zoomy+view.transy);
+	p->s.x = view->xc+(p->xx*view->zoomx+view->transx);
+	p->s.y = view->yc-(p->yy*view->zoomy+view->transy);
 }
 
-static void project_point_direct(struct point *p)
+static void project_point_direct(struct view *view, struct point *p)
 {
 	p->xx = p->x /*/ p->z*/;
 	p->yy = p->y /*/ p->z*/;
-	p->s.x = view.xc+(p->xx);
-	p->s.y = view.yc-(p->yy);
+	p->s.x = view->xc+(p->xx);
+	p->s.y = view->yc-(p->yy);
 }
 
 
@@ -163,26 +154,26 @@ static void draw_hline_moired(bitmap_t *bitmap, int x1, int x2, int y, int color
 	}
 }
 
-static void fill_slope(bitmap_t *bitmap, int color, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2)
+static void fill_slope(bitmap_t *bitmap, struct view *view, int color, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2)
 {
-	if(y1 > view.y2)
+	if(y1 > view->y2)
 		return;
 
-	if(y2 <= view.y1) {
+	if(y2 <= view->y1) {
 		int delta = y2-y1;
 		*nx1 = x1+delta*sl1;
 		*nx2 = x2+delta*sl2;
 		return;
 	}
 
-	if(y2 > view.y2)
-		y2 = view.y2+1;
+	if(y2 > view->y2)
+		y2 = view->y2+1;
 
-	if(y1 < view.y1) {
-		int delta = view.y1 - y1;
+	if(y1 < view->y1) {
+		int delta = view->y1 - y1;
 		x1 += delta*sl1;
 		x2 += delta*sl2;
-		y1 = view.y1;
+		y1 = view->y1;
 	}
 
 	if(x1 > x2 || (x1==x2 && sl1 > sl2)) {
@@ -199,14 +190,14 @@ static void fill_slope(bitmap_t *bitmap, int color, INT32 x1, INT32 x2, INT32 sl
 	}
 
 	while(y1 < y2) {
-		if(y1 >= view.y1) {
+		if(y1 >= view->y1) {
 			int xx1 = x1>>FRAC_SHIFT;
 			int xx2 = x2>>FRAC_SHIFT;
-			if(xx1 <= view.x2 || xx2 >= view.x1) {
-				if(xx1 < view.x1)
-					xx1 = view.x1;
-				if(xx2 > view.x2)
-					xx2 = view.x2;
+			if(xx1 <= view->x2 || xx2 >= view->x1) {
+				if(xx1 < view->x1)
+					xx1 = view->x1;
+				if(xx2 > view->x2)
+					xx2 = view->x2;
 
 				if(color & MOIRE)
 					draw_hline_moired(bitmap, xx1, xx2, y1, color);
@@ -223,19 +214,19 @@ static void fill_slope(bitmap_t *bitmap, int color, INT32 x1, INT32 x2, INT32 sl
 	*nx2 = x2;
 }
 
-static void fill_line(bitmap_t *bitmap, int color, INT32 y, INT32 x1, INT32 x2)
+static void fill_line(bitmap_t *bitmap, struct view *view, int color, INT32 y, INT32 x1, INT32 x2)
 {
 	int xx1 = x1>>FRAC_SHIFT;
 	int xx2 = x2>>FRAC_SHIFT;
 
-	if(y > view.y2 || y < view.y1)
+	if(y > view->y2 || y < view->y1)
 		return;
 
-	if(xx1 <= view.x2 || xx2 >= view.x1) {
-		if(xx1 < view.x1)
-			xx1 = view.x1;
-		if(xx2 > view.x2)
-			xx2 = view.x2;
+	if(xx1 <= view->x2 || xx2 >= view->x1) {
+		if(xx1 < view->x1)
+			xx1 = view->x1;
+		if(xx2 > view->x2)
+			xx2 = view->x2;
 
 		if(color & MOIRE)
 			draw_hline_moired(bitmap, xx1, xx2, y, color);
@@ -244,7 +235,7 @@ static void fill_line(bitmap_t *bitmap, int color, INT32 y, INT32 x1, INT32 x2)
 	}
 }
 
-static void fill_quad(bitmap_t *bitmap, const struct quad_m1 *q)
+static void fill_quad(bitmap_t *bitmap, struct view *view, const struct quad_m1 *q)
 {
 	INT32 sl1, sl2, cury, limy, x1, x2;
 	int pmin, pmax, i, ps1, ps2;
@@ -284,17 +275,17 @@ static void fill_quad(bitmap_t *bitmap, const struct quad_m1 *q)
 			if(p[i].x > x2)
 				x2 = p[i].x;
 		}
-		fill_line(bitmap, color, cury, x1, x2);
+		fill_line(bitmap, view, color, cury, x1, x2);
 		return;
 	}
 
-	if(cury > view.y2)
+	if(cury > view->y2)
 		return;
-	if(limy <= view.y1)
+	if(limy <= view->y1)
 		return;
 
-	if(limy > view.y2)
-		limy = view.y2;
+	if(limy > view->y2)
+		limy = view->y2;
 
 	ps1 = pmin+4;
 	ps2 = pmin;
@@ -303,7 +294,7 @@ static void fill_quad(bitmap_t *bitmap, const struct quad_m1 *q)
 
 	for(;;) {
 		if(p[ps1-1].y == p[ps2+1].y) {
-			fill_slope(bitmap, color, x1, x2, sl1, sl2, cury, p[ps1-1].y, &x1, &x2);
+			fill_slope(bitmap, view, color, x1, x2, sl1, sl2, cury, p[ps1-1].y, &x1, &x2);
 			cury = p[ps1-1].y;
 			if(cury >= limy)
 				break;
@@ -320,7 +311,7 @@ static void fill_quad(bitmap_t *bitmap, const struct quad_m1 *q)
 			sl1 = (x1-p[ps1-1].x)/(cury-p[ps1-1].y);
 			sl2 = (x2-p[ps2+1].x)/(cury-p[ps2+1].y);
 		} else if(p[ps1-1].y < p[ps2+1].y) {
-			fill_slope(bitmap, color, x1, x2, sl1, sl2, cury, p[ps1-1].y, &x1, &x2);
+			fill_slope(bitmap, view, color, x1, x2, sl1, sl2, cury, p[ps1-1].y, &x1, &x2);
 			cury = p[ps1-1].y;
 			if(cury >= limy)
 				break;
@@ -330,7 +321,7 @@ static void fill_quad(bitmap_t *bitmap, const struct quad_m1 *q)
 			x1 = p[ps1].x;
 			sl1 = (x1-p[ps1-1].x)/(cury-p[ps1-1].y);
 		} else {
-			fill_slope(bitmap, color, x1, x2, sl1, sl2, cury, p[ps2+1].y, &x1, &x2);
+			fill_slope(bitmap, view, color, x1, x2, sl1, sl2, cury, p[ps2+1].y, &x1, &x2);
 			cury = p[ps2+1].y;
 			if(cury >= limy)
 				break;
@@ -342,20 +333,20 @@ static void fill_quad(bitmap_t *bitmap, const struct quad_m1 *q)
 		}
 	}
 	if(cury == limy)
-		fill_line(bitmap, color, cury, x1, x2);
+		fill_line(bitmap, view, color, cury, x1, x2);
 }
 #if 0
-static void draw_line(bitmap_t *bitmap, int color, int x1, int y1, int x2, int y2)
+static void draw_line(bitmap_t *bitmap, struct view *view, int color, int x1, int y1, int x2, int y2)
 {
 	int s1x, s1y, s2x, s2y;
 	int d1, d2;
 	int cur;
 	int x, y;
 
-	if((x1 < view.x1 && x2 < view.x1) ||
-	   (x1 > view.x2 && x2 > view.x2) ||
-	   (y1 < view.y1 && y2 < view.y1) ||
-	   (y1 > view.y2 && y2 > view.y2))
+	if((x1 < view->x1 && x2 < view->x1) ||
+	   (x1 > view->x2 && x2 > view->x2) ||
+	   (y1 < view->y1 && y2 < view->y1) ||
+	   (y1 > view->y2 && y2 > view->y2))
 		return;
 
 	x = x1;
@@ -393,7 +384,7 @@ static void draw_line(bitmap_t *bitmap, int color, int x1, int y1, int x2, int y
 
 	cur = 0;
 	while(x != x2 || y != y2) {
-		if(x>=view.x1 && x<=view.x2 && y>=view.y1 && y<=view.y2)
+		if(x>=view->x1 && x<=view->x2 && y>=view->y1 && y<=view->y2)
 			*BITMAP_ADDR16(bitmap, y, x) = color;
 		x += s1x;
 		y += s1y;
@@ -404,7 +395,7 @@ static void draw_line(bitmap_t *bitmap, int color, int x1, int y1, int x2, int y
 			y += s2y;
 		}
 	}
-	if(x>=view.x1 && x<=view.x2 && y>=view.y1 && y<=view.y2)
+	if(x>=view->x1 && x<=view->x2 && y>=view->y1 && y<=view->y2)
 		*BITMAP_ADDR16(bitmap, y, x) = color;
 }
 #endif
@@ -418,49 +409,50 @@ static int comp_quads(const void *q1, const void *q2)
 	if(z1>z2)
 		return -1;
 
-	if (*(const struct quad_m1 **)q1 - quaddb < *(const struct quad_m1 **)q2 - quaddb)
+	if (*(const struct quad_m1 **)q1 - *(const struct quad_m1 **)q2 < 0)
 		return -1;
 
 	return +1;
 }
 
-static void sort_quads(void)
+static void sort_quads(model1_state *state)
 {
-	int count = quadpt - quaddb;
+	int count = state->quadpt - state->quaddb;
 	int i;
 	for(i=0; i<count; i++)
-		quadind[i] = quaddb+i;
-	qsort(quadind, count, sizeof(struct quad_m1 *), comp_quads);
+		state->quadind[i] = state->quaddb+i;
+	qsort(state->quadind, count, sizeof(struct quad_m1 *), comp_quads);
 }
 
-static void unsort_quads(void)
+static void unsort_quads(model1_state *state)
 {
-	int count = quadpt - quaddb;
+	int count = state->quadpt - state->quaddb;
 	int i;
 	for(i=0; i<count; i++)
-		quadind[i] = quaddb+i;
+		state->quadind[i] = state->quaddb+i;
 }
 
 
-static void draw_quads(bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_quads(model1_state *state, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	int count = quadpt - quaddb;
+	struct view *view = state->view;
+	int count = state->quadpt - state->quaddb;
 	int i;
 
 	/* clip to the cliprect */
-	int save_x1 = view.x1;
-	int save_x2 = view.x2;
-	int save_y1 = view.y1;
-	int save_y2 = view.y2;
-	view.x1 = MAX(view.x1, cliprect->min_x);
-	view.x2 = MIN(view.x2, cliprect->max_x);
-	view.y1 = MAX(view.y1, cliprect->min_y);
-	view.y2 = MIN(view.y2, cliprect->max_y);
+	int save_x1 = view->x1;
+	int save_x2 = view->x2;
+	int save_y1 = view->y1;
+	int save_y2 = view->y2;
+	view->x1 = MAX(view->x1, cliprect->min_x);
+	view->x2 = MIN(view->x2, cliprect->max_x);
+	view->y1 = MAX(view->y1, cliprect->min_y);
+	view->y2 = MIN(view->y2, cliprect->max_y);
 
 	for(i=0; i<count; i++) {
-		struct quad_m1 *q = quadind[i];
+		struct quad_m1 *q = state->quadind[i];
 
-		fill_quad(bitmap, q);
+		fill_quad(bitmap, view, q);
 #if 0
 		draw_line(bitmap, get_black_pen(screen->machine), q->p[0]->s.x, q->p[0]->s.y, q->p[1]->s.x, q->p[1]->s.y);
 		draw_line(bitmap, get_black_pen(screen->machine), q->p[1]->s.x, q->p[1]->s.y, q->p[2]->s.x, q->p[2]->s.y);
@@ -469,10 +461,10 @@ static void draw_quads(bitmap_t *bitmap, const rectangle *cliprect)
 #endif
 	}
 
-	view.x1 = save_x1;
-	view.x2 = save_x2;
-	view.y1 = save_y1;
-	view.y2 = save_y2;
+	view->x1 = save_x1;
+	view->x2 = save_x2;
+	view->y1 = save_y1;
+	view->y2 = save_y2;
 }
 #if 0
 static UINT16 scale_color(UINT16 color, float level)
@@ -500,77 +492,73 @@ static UINT16 scale_color(UINT16 color, float level)
 // => t*(x1-x2+a*(z2-z1) = -x2+a*z2
 // => t = (z2*a-x2)/((z2-z1)*a-(x2-x1))
 
-static void recompute_frustrum(void)
+static void recompute_frustrum(struct view *view)
 {
-	view.a_left   = ( view.x1-view.xc-view.transx)/view.zoomx;
-	view.a_right  = ( view.x2-view.xc-view.transx)/view.zoomx;
-	view.a_bottom = (-view.y1+view.yc-view.transy)/view.zoomy;
-	view.a_top    = (-view.y2+view.yc-view.transy)/view.zoomy;
+	view->a_left   = ( view->x1-view->xc-view->transx)/view->zoomx;
+	view->a_right  = ( view->x2-view->xc-view->transx)/view->zoomx;
+	view->a_bottom = (-view->y1+view->yc-view->transy)/view->zoomy;
+	view->a_top    = (-view->y2+view->yc-view->transy)/view->zoomy;
 }
 
-static int fclip_isc_bottom(struct point *p)
+static int fclip_isc_bottom(struct view *view, struct point *p)
 {
-	return p->y > p->z*view.a_bottom;
+	return p->y > p->z*view->a_bottom;
 }
 
-static struct point *fclip_clip_bottom(struct point *p1, struct point *p2)
+static void fclip_clip_bottom(struct view *view, struct point *pt, struct point *p1, struct point *p2)
 {
-	float t = (p2->z*view.a_bottom-p2->y)/((p2->z-p1->z)*view.a_bottom-(p2->y-p1->y));
-	pointpt->x = p1->x*t + p2->x*(1-t);
-	pointpt->y = p1->y*t + p2->y*(1-t);
-	pointpt->z = p1->z*t + p2->z*(1-t);
-	project_point(pointpt);
-	return pointpt++;
+	float t = (p2->z*view->a_bottom-p2->y)/((p2->z-p1->z)*view->a_bottom-(p2->y-p1->y));
+	pt->x = p1->x*t + p2->x*(1-t);
+	pt->y = p1->y*t + p2->y*(1-t);
+	pt->z = p1->z*t + p2->z*(1-t);
+	project_point(view, pt);
 }
 
-static int fclip_isc_top(struct point *p)
+static int fclip_isc_top(struct view *view, struct point *p)
 {
-	return p->y < p->z*view.a_top;
+	return p->y < p->z*view->a_top;
 }
 
-static struct point *fclip_clip_top(struct point *p1, struct point *p2)
+static void fclip_clip_top(struct view *view, struct point *pt, struct point *p1, struct point *p2)
 {
-	float t = (p2->z*view.a_top-p2->y)/((p2->z-p1->z)*view.a_top-(p2->y-p1->y));
-	pointpt->x = p1->x*t + p2->x*(1-t);
-	pointpt->y = p1->y*t + p2->y*(1-t);
-	pointpt->z = p1->z*t + p2->z*(1-t);
-	project_point(pointpt);
-	return pointpt++;
+	float t = (p2->z*view->a_top-p2->y)/((p2->z-p1->z)*view->a_top-(p2->y-p1->y));
+	pt->x = p1->x*t + p2->x*(1-t);
+	pt->y = p1->y*t + p2->y*(1-t);
+	pt->z = p1->z*t + p2->z*(1-t);
+	project_point(view, pt);
 }
 
-static int fclip_isc_left(struct point *p)
+static int fclip_isc_left(struct view *view, struct point *p)
 {
-	return p->x < p->z*view.a_left;
+	return p->x < p->z*view->a_left;
 }
 
-static struct point *fclip_clip_left(struct point *p1, struct point *p2)
+static void fclip_clip_left(struct view *view, struct point *pt, struct point *p1, struct point *p2)
 {
-	float t = (p2->z*view.a_left-p2->x)/((p2->z-p1->z)*view.a_left-(p2->x-p1->x));
-	pointpt->x = p1->x*t + p2->x*(1-t);
-	pointpt->y = p1->y*t + p2->y*(1-t);
-	pointpt->z = p1->z*t + p2->z*(1-t);
-	project_point(pointpt);
-	return pointpt++;
+	float t = (p2->z*view->a_left-p2->x)/((p2->z-p1->z)*view->a_left-(p2->x-p1->x));
+	pt->x = p1->x*t + p2->x*(1-t);
+	pt->y = p1->y*t + p2->y*(1-t);
+	pt->z = p1->z*t + p2->z*(1-t);
+	project_point(view, pt);
 }
 
-static int fclip_isc_right(struct point *p)
+static int fclip_isc_right(struct view *view, struct point *p)
 {
-	return p->x > p->z*view.a_right;
+	return p->x > p->z*view->a_right;
 }
 
-static struct point *fclip_clip_right(struct point *p1, struct point *p2)
+static void fclip_clip_right(struct view *view, struct point *pt, struct point *p1, struct point *p2)
 {
-	float t = (p2->z*view.a_right-p2->x)/((p2->z-p1->z)*view.a_right-(p2->x-p1->x));
-	pointpt->x = p1->x*t + p2->x*(1-t);
-	pointpt->y = p1->y*t + p2->y*(1-t);
-	pointpt->z = p1->z*t + p2->z*(1-t);
-	project_point(pointpt);
-	return pointpt++;
+	float t = (p2->z*view->a_right-p2->x)/((p2->z-p1->z)*view->a_right-(p2->x-p1->x));
+	pt->x = p1->x*t + p2->x*(1-t);
+	pt->y = p1->y*t + p2->y*(1-t);
+	pt->z = p1->z*t + p2->z*(1-t);
+	project_point(view, pt);
 }
 
 static const struct {
-	int (*isclipped)(struct point *p);
-	struct point *(*clip)(struct point *p1, struct point *p2);
+	int (*isclipped)(struct view *view, struct point *p);
+	void (*clip)(struct view *view, struct point *pt, struct point *p1, struct point *p2);
 } clipfn[4] = {
 	{ fclip_isc_bottom, fclip_clip_bottom },
 	{ fclip_isc_top,    fclip_clip_top },
@@ -578,9 +566,9 @@ static const struct {
 	{ fclip_isc_right,  fclip_clip_right },
 };
 
-static void fclip_push_quad(int level, struct quad_m1 *q);
+static void fclip_push_quad(model1_state *state, int level, struct quad_m1 *q);
 
-static void fclip_push_quad_next(int level, struct quad_m1 *q,
+static void fclip_push_quad_next(model1_state *state, int level, struct quad_m1 *q,
 								 struct point *p1, struct point *p2, struct point *p3, struct point *p4)
 {
 	struct quad_m1 q2;
@@ -591,28 +579,29 @@ static void fclip_push_quad_next(int level, struct quad_m1 *q,
 	q2.p[2] = p3;
 	q2.p[3] = p4;
 
-	fclip_push_quad(level+1, &q2);
+	fclip_push_quad(state, level+1, &q2);
 }
 
-static void fclip_push_quad(int level, struct quad_m1 *q)
+static void fclip_push_quad(model1_state *state, int level, struct quad_m1 *q)
 {
+	struct view *view = state->view;
 	int i, j;
 	struct point *pt[4], *pi1, *pi2;
 	int is_out[4], is_out2[4];
-	struct point *(*fclip_point)(struct point *p1, struct point *p2);
+	void (*fclip_point)(struct view *view, struct point *pt, struct point *p1, struct point *p2);
 
 	if(level == 4) {
 		LOG_TGP(("VIDEOCQ %d", level));
 		for(i=0; i<4; i++)
 			LOG_TGP((" (%f, %f, %f)", q->p[i]->x, q->p[i]->y, q->p[i]->z));
 		LOG_TGP(("\n"));
-		*quadpt = *q;
-		quadpt++;
+		*state->quadpt = *q;
+		state->quadpt++;
 		return;
 	}
 
 	for(i=0; i<4; i++)
-		is_out[i] = clipfn[level].isclipped(q->p[i]);
+		is_out[i] = clipfn[level].isclipped(view, q->p[i]);
 
 	LOG_TGP(("VIDEOCQ %d", level));
 	for(i=0; i<4; i++)
@@ -621,7 +610,7 @@ static void fclip_push_quad(int level, struct quad_m1 *q)
 
 	// No clipping
 	if(!is_out[0] && !is_out[1] && !is_out[2] && !is_out[3]) {
-		fclip_push_quad(level+1, q);
+		fclip_push_quad(state, level+1, q);
 		return;
 	}
 
@@ -645,30 +634,40 @@ static void fclip_push_quad(int level, struct quad_m1 *q)
 	if(is_out2[1])
 		if(is_out2[2]) {
 			// pt 0,1,2 clipped out, one triangle left
-			pi1 = fclip_point(pt[2], pt[3]);
-			pi2 = fclip_point(pt[3], pt[0]);
-			fclip_push_quad_next(level, q, pi1, pt[3], pi2, pi2);
+			fclip_point(view, state->pointpt, pt[2], pt[3]);
+			pi1 = state->pointpt++;
+			fclip_point(view, state->pointpt, pt[3], pt[0]);
+			pi2 = state->pointpt++;
+			fclip_push_quad_next(state, level, q, pi1, pt[3], pi2, pi2);
 		} else {
 			// pt 0,1 clipped out, one quad left
-			pi1 = fclip_point(pt[1], pt[2]);
-			pi2 = fclip_point(pt[3], pt[0]);
-			fclip_push_quad_next(level, q, pi1, pt[2], pt[3], pi2);
+			fclip_point(view, state->pointpt, pt[1], pt[2]);
+			pi1 = state->pointpt++;
+			fclip_point(view, state->pointpt, pt[3], pt[0]);
+			pi2 = state->pointpt++;
+			fclip_push_quad_next(state, level, q, pi1, pt[2], pt[3], pi2);
 		}
 	else
 		if(is_out2[2]) {
 			// pt 0,2 clipped out, shouldn't happen, two triangles
-			pi1 = fclip_point(pt[0], pt[1]);
-			pi2 = fclip_point(pt[1], pt[2]);
-			fclip_push_quad_next(level, q, pi1, pt[1], pi2, pi2);
-			pi1 = fclip_point(pt[2], pt[3]);
-			pi2 = fclip_point(pt[3], pt[0]);
-			fclip_push_quad_next(level, q, pi1, pt[3], pi2, pi2);
+			fclip_point(view, state->pointpt, pt[0], pt[1]);
+			pi1 = state->pointpt++;
+			fclip_point(view, state->pointpt, pt[1], pt[2]);
+			pi2 = state->pointpt++;
+			fclip_push_quad_next(state, level, q, pi1, pt[1], pi2, pi2);
+			fclip_point(view, state->pointpt, pt[2], pt[3]);
+			pi1 = state->pointpt++;
+			fclip_point(view, state->pointpt, pt[3], pt[0]);
+			pi2 = state->pointpt++;
+			fclip_push_quad_next(state, level, q, pi1, pt[3], pi2, pi2);
 		} else {
 			// pt 0 clipped out, one decagon left, split in quad+tri
-			pi1 = fclip_point(pt[0], pt[1]);
-			pi2 = fclip_point(pt[3], pt[0]);
-			fclip_push_quad_next(level, q, pi1, pt[1], pt[2], pt[3]);
-			fclip_push_quad_next(level, q, pt[3], pi2, pi1, pi1);
+			fclip_point(view, state->pointpt, pt[0], pt[1]);
+			pi1 = state->pointpt++;
+			fclip_point(view, state->pointpt, pt[3], pt[0]);
+			pi2 = state->pointpt++;
+			fclip_push_quad_next(state, level, q, pi1, pt[1], pt[2], pt[3]);
+			fclip_push_quad_next(state, level, q, pt[3], pi2, pi1, pi1);
 		}
 }
 
@@ -703,9 +702,9 @@ static float compute_specular(struct vector *normal, struct vector *light,float 
 {
 #if 0
 	float s;
-	int p=lightparams[lmode].p&7;
+	int p=view->lightparams[lmode].p&7;
 	int i;
-	float sv=lightparams[lmode].s;
+	float sv=view->lightparams[lmode].s;
 
 	//This is how it should be according to model2 geo program, but doesn't work fine
 	s=2*(diffuse*normal->z-light->z);
@@ -727,6 +726,8 @@ static float compute_specular(struct vector *normal, struct vector *light,float 
 
 static void push_object(running_machine *machine, UINT32 tex_adr, UINT32 poly_adr, UINT32 size)
 {
+	model1_state *state = machine->driver_data<model1_state>();
+	struct view *view = state->view;
 	int i;
 	UINT32 flags;
 	struct point *old_p0, *old_p1, *p0, *p1;
@@ -741,9 +742,9 @@ static void push_object(running_machine *machine, UINT32 tex_adr, UINT32 poly_ad
 	float *poly_data;
 
 	if(poly_adr & 0x800000)
-		poly_data=(float *) poly_ram;
+		poly_data=(float *) state->poly_ram;
 	else
-		poly_data=(float *) poly_rom;
+		poly_data=(float *) state->poly_rom;
 
 	poly_adr &= 0x7fffff;
 #if 0
@@ -772,8 +773,8 @@ static void push_object(running_machine *machine, UINT32 tex_adr, UINT32 poly_ad
 	if(!size)
 		size = 0xffffffff;
 
-	old_p0 = pointpt++;
-	old_p1 = pointpt++;
+	old_p0 = state->pointpt++;
+	old_p1 = state->pointpt++;
 
 	old_p0->x = poly_data[poly_adr+0];
 	old_p0->y = poly_data[poly_adr+1];
@@ -781,14 +782,14 @@ static void push_object(running_machine *machine, UINT32 tex_adr, UINT32 poly_ad
 	old_p1->x = poly_data[poly_adr+3];
 	old_p1->y = poly_data[poly_adr+4];
 	old_p1->z = poly_data[poly_adr+5];
-	transform_point(old_p0);
-	transform_point(old_p1);
+	transform_point(view, old_p0);
+	transform_point(view, old_p1);
 	if(old_p0->z > 0)
-		project_point(old_p0);
+		project_point(view, old_p0);
 	else
 		old_p0->s.x = old_p0->s.y = 0;
 	if(old_p1->z > 0)
-		project_point(old_p1);
+		project_point(view, old_p1);
 	else
 		old_p1->s.x = old_p1->s.y = 0;
 
@@ -814,8 +815,8 @@ static void push_object(running_machine *machine, UINT32 tex_adr, UINT32 poly_ad
 			tex_adr ++;
 		lightmode=(flags>>17)&15;
 
-		p0 = pointpt++;
-		p1 = pointpt++;
+		p0 = state->pointpt++;
+		p1 = state->pointpt++;
 
 		vn.x = poly_data[poly_adr+1];
 		vn.y = poly_data[poly_adr+2];
@@ -829,16 +830,16 @@ static void push_object(running_machine *machine, UINT32 tex_adr, UINT32 poly_ad
 
 		link = (flags >> 8) & 3;
 
-		transform_vector(&vn);
+		transform_vector(view, &vn);
 
-		transform_point(p0);
-		transform_point(p1);
+		transform_point(view, p0);
+		transform_point(view, p1);
 		if(p0->z > 0)
-			project_point(p0);
+			project_point(view, p0);
 		else
 			p0->s.x = p0->s.y = 0;
 		if(p1->z > 0)
-			project_point(p1);
+			project_point(view, p1);
 		else
 			p1->s.x = p1->s.y = 0;
 
@@ -892,32 +893,33 @@ static void push_object(running_machine *machine, UINT32 tex_adr, UINT32 poly_ad
 		}
 
 		{
-			/*float dif=mult_vector(&vn, &view.light);
-            float ln=lightparams[lightmode].a + lightparams[lightmode].d*MAX(0.0,dif);
-            cquad.col = scale_color(machine->pens[0x1000|(tgp_ram[tex_adr-0x40000] & 0x3ff)], MIN(1.0,ln));
-            cquad.col = scale_color(machine->pens[0x1000|(tgp_ram[tex_adr-0x40000] & 0x3ff)], MIN(1.0,ln));
-            */
-			float dif=mult_vector(&vn, &view.light);
-			float spec=compute_specular(&vn,&view.light,dif,lightmode);
-			float ln=lightparams[lightmode].a + lightparams[lightmode].d*MAX(0.0,dif) + spec;
+#if 0
+			float dif=mult_vector(&vn, &view->light);
+			float ln=view->lightparams[lightmode].a + view->lightparams[lightmode].d*MAX(0.0,dif);
+			cquad.col = scale_color(machine->pens[0x1000|(state->tgp_ram[tex_adr-0x40000] & 0x3ff)], MIN(1.0,ln));
+			cquad.col = scale_color(machine->pens[0x1000|(state->tgp_ram[tex_adr-0x40000] & 0x3ff)], MIN(1.0,ln));
+#endif
+			float dif=mult_vector(&vn, &view->light);
+			float spec=compute_specular(&vn,&view->light,dif,lightmode);
+			float ln=view->lightparams[lightmode].a + view->lightparams[lightmode].d*MAX(0.0,dif) + spec;
 			int lumval=255.0*MIN(1.0,ln);
-			int color=paletteram16[0x1000|(tgp_ram[tex_adr-0x40000] & 0x3ff)];
+			int color=state->paletteram16[0x1000|(state->tgp_ram[tex_adr-0x40000] & 0x3ff)];
 			int r=(color>>0x0)&0x1f;
 			int g=(color>>0x5)&0x1f;
 			int b=(color>>0xA)&0x1f;
 			lumval>>=2;	//there must be a luma translation table somewhere
 			if(lumval>0x3f) lumval=0x3f;
 			else if(lumval<0) lumval=0;
-			r=(model1_color_xlat[(r<<8)|lumval|0x0]>>3)&0x1f;
-			g=(model1_color_xlat[(g<<8)|lumval|0x2000]>>3)&0x1f;
-			b=(model1_color_xlat[(b<<8)|lumval|0x4000]>>3)&0x1f;
+			r=(state->color_xlat[(r<<8)|lumval|0x0]>>3)&0x1f;
+			g=(state->color_xlat[(g<<8)|lumval|0x2000]>>3)&0x1f;
+			b=(state->color_xlat[(b<<8)|lumval|0x4000]>>3)&0x1f;
 			cquad.col=(r<<10)|(g<<5)|(b<<0);
 		}
 
 		if(flags & 0x00002000)
 			cquad.col |= MOIRE;
 
-		fclip_push_quad(0, &cquad);
+		fclip_push_quad(state, 0, &cquad);
 
 	next:
 		poly_adr += 10;
@@ -937,8 +939,9 @@ static void push_object(running_machine *machine, UINT32 tex_adr, UINT32 poly_ad
 	}
 }
 
-static UINT16 *push_direct(UINT16 *list)
+static UINT16 *push_direct(model1_state *state, UINT16 *list)
 {
+	struct view *view = state->view;
 	UINT32 flags;
 	UINT32 tex_adr, lum, v1, v2;
 	struct point *old_p0, *old_p1, *p0, *p1;
@@ -950,8 +953,8 @@ static UINT16 *push_direct(UINT16 *list)
 	v1      = readi(list+2);
 	v2      = readi(list+10);
 
-	old_p0 = pointpt++;
-	old_p1 = pointpt++;
+	old_p0 = state->pointpt++;
+	old_p1 = state->pointpt++;
 
 	old_p0->x = readf(list+4);
 	old_p0->y = readf(list+6);
@@ -965,14 +968,14 @@ static UINT16 *push_direct(UINT16 *list)
 			 old_p0->x, old_p0->y, old_p0->z,
 			 old_p1->x, old_p1->y, old_p1->z));
 
-//  transform_point(old_p0);
-//  transform_point(old_p1);
+	//transform_point(view, old_p0);
+	//transform_point(view, old_p1);
 	if(old_p0->z > 0)
-		project_point_direct(old_p0);
+		project_point_direct(view, old_p0);
 	else
 		old_p0->s.x = old_p0->s.y = 0;
 	if(old_p1->z > 0)
-		project_point_direct(old_p1);
+		project_point_direct(view, old_p1);
 	else
 		old_p1->s.x = old_p1->s.y = 0;
 
@@ -992,8 +995,8 @@ static UINT16 *push_direct(UINT16 *list)
 		// list+4 is 0?
 		// list+12 is z?
 
-		p0 = pointpt++;
-		p1 = pointpt++;
+		p0 = state->pointpt++;
+		p1 = state->pointpt++;
 
 		lum   = readi(list+2);
 		v1    = readi(list+4);
@@ -1025,12 +1028,12 @@ static UINT16 *push_direct(UINT16 *list)
 
 		link = (flags >> 8) & 3;
 
-//      transform_point(p0);
-//      transform_point(p1);
+		//transform_point(view, p0);
+		//transform_point(view, p1);
 		if(p0->z > 0)
-			project_point_direct(p0);
+			project_point_direct(view, p0);
 		if(p1->z > 0)
-			project_point_direct(p1);
+			project_point_direct(view, p1);
 
 #if 1
 		if(old_p0 && old_p1)
@@ -1058,23 +1061,23 @@ static UINT16 *push_direct(UINT16 *list)
 		cquad.z    = z;
 		{
 			int lumval=((float) (lum>>24)) * 2.0;
-			int color=paletteram16[0x1000|(tgp_ram[tex_adr-0x40000] & 0x3ff)];
+			int color=state->paletteram16[0x1000|(state->tgp_ram[tex_adr-0x40000] & 0x3ff)];
 			int r=(color>>0x0)&0x1f;
 			int g=(color>>0x5)&0x1f;
 			int b=(color>>0xA)&0x1f;
 			lumval>>=2;	//there must be a luma translation table somewhere
 			if(lumval>0x3f) lumval=0x3f;
 			else if(lumval<0) lumval=0;
-			r=(model1_color_xlat[(r<<8)|lumval|0x0]>>3)&0x1f;
-			g=(model1_color_xlat[(g<<8)|lumval|0x2000]>>3)&0x1f;
-			b=(model1_color_xlat[(b<<8)|lumval|0x4000]>>3)&0x1f;
+			r=(state->color_xlat[(r<<8)|lumval|0x0]>>3)&0x1f;
+			g=(state->color_xlat[(g<<8)|lumval|0x2000]>>3)&0x1f;
+			b=(state->color_xlat[(b<<8)|lumval|0x4000]>>3)&0x1f;
 			cquad.col=(r<<10)|(g<<5)|(b<<0);
 		}
-		//cquad.col  = scale_color(machine->pens[0x1000|(tgp_ram[tex_adr-0x40000] & 0x3ff)],((float) (lum>>24)) / 128.0);
+		//cquad.col  = scale_color(machine->pens[0x1000|(state->tgp_ram[tex_adr-0x40000] & 0x3ff)],((float) (lum>>24)) / 128.0);
 		if(flags & 0x00002000)
 			cquad.col |= MOIRE;
 
-		fclip_push_quad(0, &cquad);
+		fclip_push_quad(state, 0, &cquad);
 
 	next:
 		switch(link) {
@@ -1116,84 +1119,89 @@ static UINT16 *skip_direct(UINT16 *list)
 	return list+2;
 }
 
-static void draw_objects(bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_objects(model1_state *state, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	if(quadpt != quaddb) {
+	if(state->quadpt != state->quaddb) {
 		LOG_TGP(("VIDEO: sort&draw\n"));
-		sort_quads();
-		draw_quads(bitmap, cliprect);
+		sort_quads(state);
+		draw_quads(state, bitmap, cliprect);
 	}
 
-	quadpt = quaddb;
-	pointpt = pointdb;
+	state->quadpt = state->quaddb;
+	state->pointpt = state->pointdb;
 }
 
-static UINT16 *draw_direct(UINT16 *list, bitmap_t *bitmap, const rectangle *cliprect)
+static UINT16 *draw_direct(model1_state *state, bitmap_t *bitmap, const rectangle *cliprect, UINT16 *list)
 {
 	UINT16 *res;
 
 	LOG_TGP(("VIDEO:   draw direct %x\n", readi(list)));
 
-	draw_objects(bitmap, cliprect);
-	res = push_direct(list);
-	unsort_quads();
-	draw_quads(bitmap, cliprect);
+	draw_objects(state, bitmap, cliprect);
+	res = push_direct(state, list);
+	unsort_quads(state);
+	draw_quads(state, bitmap, cliprect);
 
-	quadpt = quaddb;
-	pointpt = pointdb;
+	state->quadpt = state->quaddb;
+	state->pointpt = state->pointdb;
 	return res;
 }
 
-static UINT16 *get_list(void)
+static UINT16 *get_list(model1_state *state)
 {
-	if(!(listctl[0] & 4))
-		listctl[0] = (listctl[0] & ~0x40) | (listctl[0] & 8 ? 0x40 : 0);
-	return listctl[0] & 0x40 ? model1_display_list1 : model1_display_list0;
+	if(!(state->listctl[0] & 4))
+		state->listctl[0] = (state->listctl[0] & ~0x40) | (state->listctl[0] & 8 ? 0x40 : 0);
+	return state->listctl[0] & 0x40 ? state->display_list1 : state->display_list0;
 }
 
-static int get_list_number(void)
+static int get_list_number(model1_state *state)
 {
-	if(!(listctl[0] & 4))
-		listctl[0] = (listctl[0] & ~0x40) | (listctl[0] & 8 ? 0x40 : 0);
-	return listctl[0] & 0x40 ? 0 : 1;
+	if(!(state->listctl[0] & 4))
+		state->listctl[0] = (state->listctl[0] & ~0x40) | (state->listctl[0] & 8 ? 0x40 : 0);
+	return state->listctl[0] & 0x40 ? 0 : 1;
 }
 
 static void end_frame(running_machine *machine)
 {
-	if((listctl[0] & 4) && (machine->primary_screen->frame_number() & 1))
-		listctl[0] ^= 0x40;
+	model1_state *state = machine->driver_data<model1_state>();
+	if((state->listctl[0] & 4) && (machine->primary_screen->frame_number() & 1))
+		state->listctl[0] ^= 0x40;
 }
 
 READ16_HANDLER( model1_listctl_r )
 {
+	model1_state *state = space->machine->driver_data<model1_state>();
 	if(!offset)
-		return listctl[0] | 0x30;
+		return state->listctl[0] | 0x30;
 	else
-		return listctl[1];
+		return state->listctl[1];
 }
 
 WRITE16_HANDLER( model1_listctl_w )
 {
-	COMBINE_DATA(listctl+offset);
-	LOG_TGP(("VIDEO: control=%08x\n", (listctl[1]<<16)|listctl[0]));
+	model1_state *state = space->machine->driver_data<model1_state>();
+	COMBINE_DATA(state->listctl+offset);
+	LOG_TGP(("VIDEO: control=%08x\n", (state->listctl[1]<<16)|state->listctl[0]));
 }
 
 static void tgp_render(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	render_done = 1;
-	if((listctl[1] & 0x1f) == 0x1f) {
-		UINT16 *list = get_list();
+	model1_state *state = machine->driver_data<model1_state>();
+	struct view *view = state->view;
+	state->render_done = 1;
+	if((state->listctl[1] & 0x1f) == 0x1f) {
+		UINT16 *list = get_list(state);
 		int zz = 0;
-		LOG_TGP(("VIDEO: render list %d\n", get_list_number()));
+		LOG_TGP(("VIDEO: render list %d\n", get_list_number(state)));
 
-		memset(trans_mat, 0, sizeof(trans_mat));
-		trans_mat[0] = 1.0;
-		trans_mat[4] = 1.0;
-		trans_mat[8] = 1.0;
+		memset(view->trans_mat, 0, sizeof(view->trans_mat));
+		view->trans_mat[0] = 1.0;
+		view->trans_mat[4] = 1.0;
+		view->trans_mat[8] = 1.0;
 
 		for(;;) {
 			int type = (list[1]<<16)|list[0];
-			glist=list;
+			state->glist=list;
 			switch(type & 15) {
 			case 0:
 				list += 2;
@@ -1211,7 +1219,7 @@ static void tgp_render(running_machine *machine, bitmap_t *bitmap, const rectang
 				list += 8;
 				break;
 			case 2:
-				list = draw_direct(list+2, bitmap, cliprect);
+				list = draw_direct(state, bitmap, cliprect, list+2);
 				break;
 			case 3:
 				LOG_TGP(("VIDEO:   viewport (%d, %d, %d, %d, %d, %d, %d)\n",
@@ -1219,16 +1227,16 @@ static void tgp_render(running_machine *machine, bitmap_t *bitmap, const rectang
 						 readi16(list+4), readi16(list+6), readi16(list+8),
 						 readi16(list+10), readi16(list+12), readi16(list+14)));
 
-				draw_objects(bitmap, cliprect);
+				draw_objects(state, bitmap, cliprect);
 
-				view.xc = readi16(list+4);
-				view.yc = 383-(readi16(list+6)-39);
-				view.x1 = readi16(list+8);
-				view.y2 = 383-(readi16(list+10)-39);
-				view.x2 = readi16(list+12);
-				view.y1 = 383-(readi16(list+14)-39);
+				view->xc = readi16(list+4);
+				view->yc = 383-(readi16(list+6)-39);
+				view->x1 = readi16(list+8);
+				view->y2 = 383-(readi16(list+10)-39);
+				view->x2 = readi16(list+12);
+				view->y1 = 383-(readi16(list+14)-39);
 
-				recompute_frustrum();
+				recompute_frustrum(view);
 
 				list += 16;
 				break;
@@ -1238,7 +1246,7 @@ static void tgp_render(running_machine *machine, bitmap_t *bitmap, const rectang
 				int i;
 				LOG_TGP(("ZVIDEO:   color write, adr=%x, len=%x\n", adr, len));
 				for(i=0; i<len; i++)
-					tgp_ram[adr-0x40000+i] = list[6+2*i];
+					state->tgp_ram[adr-0x40000+i] = list[6+2*i];
 				list += 6+len*2;
 				break;
 			}
@@ -1249,7 +1257,7 @@ static void tgp_render(running_machine *machine, bitmap_t *bitmap, const rectang
 					int i;
 					for(i=0;i<len;++i)
 					{
-						poly_ram[adr-0x800000+i]=readi(list+2*i+6);
+						state->poly_ram[adr-0x800000+i]=readi(list+2*i+6);
 					}
 					list+=6+len*2;
 				}
@@ -1262,10 +1270,10 @@ static void tgp_render(running_machine *machine, bitmap_t *bitmap, const rectang
 				for(i=0;i<len;++i)
 				{
 					int v=readi(list+6+i*2);
-					lightparams[i+adr].d=((float) (v&0xff))/255.0;
-					lightparams[i+adr].a=((float) ((v>>8)&0xff))/255.0;
-					lightparams[i+adr].s=((float) ((v>>16)&0xff))/255.0;
-					lightparams[i+adr].p=(v>>24)&0xff;
+					view->lightparams[i+adr].d=((float) (v&0xff))/255.0;
+					view->lightparams[i+adr].a=((float) ((v>>8)&0xff))/255.0;
+					view->lightparams[i+adr].s=((float) ((v>>16)&0xff))/255.0;
+					view->lightparams[i+adr].p=(v>>24)&0xff;
 				}
 				list += 6+len*2;
 				break;
@@ -1281,19 +1289,19 @@ static void tgp_render(running_machine *machine, bitmap_t *bitmap, const rectang
 				break;
 			case 9:
 				LOG_TGP(("VIDEO:   zoom (%f, %f)\n", readf(list+2), readf(list+4)));
-				view.zoomx = readf(list+2)*4;
-				view.zoomy = readf(list+4)*4;
+				view->zoomx = readf(list+2)*4;
+				view->zoomy = readf(list+4)*4;
 
-				recompute_frustrum();
+				recompute_frustrum(view);
 
 				list += 6;
 				break;
 			case 0xa:
 				LOG_TGP(("VIDEO:   light vector (%f, %f, %f)\n", readf(list+2), readf(list+4), readf(list+6)));
-				view.light.x = readf(list+2);
-				view.light.y = readf(list+4);
-				view.light.z = readf(list+6);
-				normalize_vector(&view.light);
+				view->light.x = readf(list+2);
+				view->light.y = readf(list+4);
+				view->light.z = readf(list+6);
+				normalize_vector(&view->light);
 				list += 8;
 				break;
 			case 0xb: {
@@ -1304,16 +1312,16 @@ static void tgp_render(running_machine *machine, bitmap_t *bitmap, const rectang
 						 readf(list+14), readf(list+16), readf(list+18),
 						 readf(list+20), readf(list+22), readf(list+24)));
 				for(i=0; i<12; i++)
-					trans_mat[i] = readf(list+2+2*i);
+					view->trans_mat[i] = readf(list+2+2*i);
 				list += 26;
 				break;
 			}
 			case 0xc:
 				LOG_TGP(("VIDEO:   trans (%f, %f)\n", readf(list+2), readf(list+4)));
-				view.transx = readf(list+2);
-				view.transy = readf(list+4);
+				view->transx = readf(list+2);
+				view->transy = readf(list+4);
 
-				recompute_frustrum();
+				recompute_frustrum(view);
 
 				list += 6;
 				break;
@@ -1326,29 +1334,31 @@ static void tgp_render(running_machine *machine, bitmap_t *bitmap, const rectang
 			}
 		}
 	end:
-		draw_objects(bitmap, cliprect);
+		draw_objects(state, bitmap, cliprect);
 	}
 }
 
-static void tgp_scan(void)
+static void tgp_scan(running_machine *machine)
 {
+	model1_state *state = machine->driver_data<model1_state>();
+	struct view *view = state->view;
 #if 0
 	if (input_code_pressed_once(machine, KEYCODE_F))
         {
-			FILE *fp;
-			fp=fopen("tgp-ram.bin", "w+b");
-			if (fp)
+		FILE *fp;
+		fp=fopen("tgp-ram.bin", "w+b");
+		if (fp)
                 {
-					fwrite(tgp_ram, (0x100000-0x40000)*2, 1, fp);
-					fclose(fp);
+			fwrite(state->tgp_ram, (0x100000-0x40000)*2, 1, fp);
+			fclose(fp);
                 }
-			exit(0);
+		exit(0);
         }
 #endif
-	if(!render_done && (listctl[1] & 0x1f) == 0x1f) {
-		UINT16 *list = get_list();
+	if(!state->render_done && (state->listctl[1] & 0x1f) == 0x1f) {
+		UINT16 *list = get_list(state);
 		// Skip everything but the data uploads
-		LOG_TGP(("VIDEO: scan list %d\n", get_list_number()));
+		LOG_TGP(("VIDEO: scan list %d\n", get_list_number(state)));
 		for(;;) {
 			int type = (list[1]<<16)|list[0];
 			switch(type) {
@@ -1370,7 +1380,7 @@ static void tgp_scan(void)
 				int i;
 				LOG_TGP(("ZVIDEO:   scan color write, adr=%x, len=%x\n", adr, len));
 				for(i=0; i<len; i++)
-					tgp_ram[adr-0x40000+i] = list[6+2*i];
+					state->tgp_ram[adr-0x40000+i] = list[6+2*i];
 				list += 6+len*2;
 				break;
 			}
@@ -1381,7 +1391,7 @@ static void tgp_scan(void)
 					int i;
 					for(i=0;i<len;++i)
 					{
-						poly_ram[adr-0x800000+i]=readi(list+2*i+6);
+						state->poly_ram[adr-0x800000+i]=readi(list+2*i+6);
 					}
 					list+=6+len*2;
 				}
@@ -1394,10 +1404,10 @@ static void tgp_scan(void)
 				for(i=0;i<len;++i)
 				{
 					int v=readi(list+6+i*2);
-					lightparams[i+adr].d=((float) (v&0xff))/255.0;
-					lightparams[i+adr].a=((float) ((v>>8)&0xff))/255.0;
-					lightparams[i+adr].s=((float) ((v>>16)&0xff))/255.0;
-					lightparams[i+adr].p=(v>>24)&0xff;
+					view->lightparams[i+adr].d=((float) (v&0xff))/255.0;
+					view->lightparams[i+adr].a=((float) ((v>>8)&0xff))/255.0;
+					view->lightparams[i+adr].s=((float) ((v>>16)&0xff))/255.0;
+					view->lightparams[i+adr].p=(v>>24)&0xff;
 					//LOG_TGP(("         %02X\n",v));
 				}
 				list += 6+len*2;
@@ -1432,36 +1442,38 @@ static void tgp_scan(void)
 	end:
 		;
 	}
-	render_done = 0;
+	state->render_done = 0;
 }
 
 VIDEO_START(model1)
 {
-	paletteram16 = machine->generic.paletteram.u16;
+	model1_state *state = machine->driver_data<model1_state>();
+	state->paletteram16 = machine->generic.paletteram.u16;
 
-	vxx=vyy=vzz=0;
-	ayy = 0;
+	state->view = auto_alloc_clear(machine, struct view);
 
 	sys24_tile_vh_start(machine, 0x3fff);
 
-	poly_rom = (UINT32 *)machine->region("user1")->base();
-	poly_ram = auto_alloc_array_clear(machine, UINT32, 0x400000);
-	tgp_ram = auto_alloc_array_clear(machine, UINT16, 0x100000-0x40000);
-	pointdb = auto_alloc_array_clear(machine, struct point, 1000000*2);
-	quaddb  = auto_alloc_array_clear(machine, struct quad_m1, 1000000);
-	quadind = auto_alloc_array_clear(machine, struct quad_m1 *, 1000000);
+	state->poly_rom = (UINT32 *)machine->region("user1")->base();
+	state->poly_ram = auto_alloc_array_clear(machine, UINT32, 0x400000);
+	state->tgp_ram = auto_alloc_array_clear(machine, UINT16, 0x100000-0x40000);
+	state->pointdb = auto_alloc_array_clear(machine, struct point, 1000000*2);
+	state->quaddb  = auto_alloc_array_clear(machine, struct quad_m1, 1000000);
+	state->quadind = auto_alloc_array_clear(machine, struct quad_m1 *, 1000000);
 
-	pointpt = pointdb;
-	quadpt = quaddb;
-	listctl[0] = listctl[1] = 0;
+	state->pointpt = state->pointdb;
+	state->quadpt = state->quaddb;
+	state->listctl[0] = state->listctl[1] = 0;
 
-	state_save_register_global_pointer(machine, tgp_ram, 0x100000-0x40000);
-	state_save_register_global_pointer(machine, poly_ram, 0x40000);
-	state_save_register_global_array(machine, listctl);
+	state_save_register_global_pointer(machine, state->tgp_ram, 0x100000-0x40000);
+	state_save_register_global_pointer(machine, state->poly_ram, 0x40000);
+	state_save_register_global_array(machine, state->listctl);
 }
 
 VIDEO_UPDATE(model1)
 {
+	model1_state *state = screen->machine->driver_data<model1_state>();
+	struct view *view = state->view;
 #if 0
 	{
 		int mod = 0;
@@ -1470,43 +1482,43 @@ VIDEO_UPDATE(model1)
 
 		if(input_code_pressed(screen->machine, KEYCODE_F)) {
 			mod = 1;
-			vxx -= delta;
+			view->vxx -= delta;
 		}
 		if(input_code_pressed(screen->machine, KEYCODE_G)) {
 			mod = 1;
-			vxx += delta;
+			view->vxx += delta;
 		}
 		if(input_code_pressed(screen->machine, KEYCODE_H)) {
 			mod = 1;
-			vyy -= delta;
+			view->vyy -= delta;
 		}
 		if(input_code_pressed(screen->machine, KEYCODE_J)) {
 			mod = 1;
-			vyy += delta;
+			view->vyy += delta;
 		}
 		if(input_code_pressed(screen->machine, KEYCODE_K)) {
 			mod = 1;
-			vzz -= delta;
+			view->vzz -= delta;
 		}
 		if(input_code_pressed(screen->machine, KEYCODE_L)) {
 			mod = 1;
-			vzz += delta;
+			view->vzz += delta;
 		}
 		if(input_code_pressed(screen->machine, KEYCODE_U)) {
 			mod = 1;
-			ayy -= 0.05;
+			view->ayy -= 0.05;
 		}
 		if(input_code_pressed(screen->machine, KEYCODE_I)) {
 			mod = 1;
-			ayy += 0.05;
+			view->ayy += 0.05;
 		}
 		if(mod)
-			popmessage("%g,%g,%g:%g", vxx, vyy, vzz, ayy);
+			popmessage("%g,%g,%g:%g", view->vxx, view->vyy, view->vzz, view->ayy);
 	}
 #endif
 
-	ayyc = cos(ayy);
-	ayys = sin(ayy);
+	view->ayyc = cos(view->ayy);
+	view->ayys = sin(view->ayy);
 
 	bitmap_fill(screen->machine->priority_bitmap, NULL, 0);
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
@@ -1528,7 +1540,7 @@ VIDEO_UPDATE(model1)
 
 VIDEO_EOF(model1)
 {
-	tgp_scan();
+	tgp_scan(machine);
 	end_frame(machine);
 	LOG_TGP(("TGP: vsync\n"));
 }

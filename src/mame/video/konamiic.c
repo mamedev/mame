@@ -3721,10 +3721,10 @@ static UINT8  K053246_regs[8];
 static UINT16 K053247_regs[16];
 static UINT16 *K053247_ram=0;
 static gfx_element *K053247_gfx;
-static void (*K053247_callback)(int *code,int *color,int *priority);
+static void (*K053247_callback)(running_machine *machine, int *code,int *color,int *priority);
 static UINT8 K053246_OBJCHA_line;
 
-void K053247_export_config(UINT16 **ram, gfx_element **gfx, void (**callback)(int *, int *, int *), int *dx, int *dy)
+void K053247_export_config(UINT16 **ram, gfx_element **gfx, void (**callback)(running_machine *, int *, int *, int *), int *dx, int *dy)
 {
 	if(ram)
 		*ram = K053247_ram;
@@ -3841,7 +3841,7 @@ void K053247_vh_start(running_machine *machine, const char *gfx_memory_region, i
 #endif
 
 /* K055673 used with the 54246 in PreGX/Run and Gun/System GX games */
-void K055673_vh_start(running_machine *machine, const char *gfx_memory_region, int layout, int dx, int dy, void (*callback)(int *code,int *color,int *priority))
+void K055673_vh_start(running_machine *machine, const char *gfx_memory_region, int layout, int dx, int dy, void (*callback)(running_machine *machine, int *code,int *color,int *priority))
 {
 	int gfx_index;
 	UINT32 total;
@@ -5542,7 +5542,7 @@ int K056832_get_lookup(int bits)
 }
 #endif
 
-static void (*K056832_callback)(int layer, int *code, int *color, int *flags);
+static void (*K056832_callback)(running_machine *machine, int layer, int *code, int *color, int *flags);
 
 INLINE void K056832_get_tile_info( running_machine *machine, tile_data *tileinfo, int tile_index, int pageIndex )
 {
@@ -5579,7 +5579,7 @@ INLINE void K056832_get_tile_info( running_machine *machine, tile_data *tileinfo
 	color = (attr & smptr->palm1) | (attr>>smptr->pals2 & smptr->palm2);
 	flags = TILE_FLIPYX(flip);
 
-	(*K056832_callback)(layer, &code, &color, &flags);
+	(*K056832_callback)(machine, layer, &code, &color, &flags);
 
 	SET_TILE_INFO(K056832_gfxnum,
 			code,
@@ -5678,7 +5678,7 @@ static STATE_POSTLOAD( K056832_postload )
 
 void K056832_vh_start(running_machine *machine, const char *gfx_memory_region, int bpp, int big,
 	int (*scrolld)[4][2],
-	void (*callback)(int layer, int *code, int *color, int *flags),
+	void (*callback)(running_machine *machine, int layer, int *code, int *color, int *flags),
 	int djmain_hack)
 {
 	tilemap_t *tmap;

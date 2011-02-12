@@ -39,6 +39,17 @@ Notes/Tidbits:
 #include "includes/galaxold.h"
 #include "sound/ay8910.h"
 
+
+class scobra_state : public driver_device
+{
+public:
+	scobra_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *soundram;
+};
+
+
 static const gfx_layout scobra_charlayout =
 {
 	8,8,
@@ -302,22 +313,23 @@ static ADDRESS_MAP_START( anteatgb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfe00, 0xfe03) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 ADDRESS_MAP_END
 
-static UINT8 *scobra_soundram;
 
 static READ8_HANDLER(scobra_soundram_r)
 {
-	return scobra_soundram[offset & 0x03ff];
+	scobra_state *state = space->machine->driver_data<scobra_state>();
+	return state->soundram[offset & 0x03ff];
 }
 
 static WRITE8_HANDLER(scobra_soundram_w)
 {
-	scobra_soundram[offset & 0x03ff] = data;
+	scobra_state *state = space->machine->driver_data<scobra_state>();
+	state->soundram[offset & 0x03ff] = data;
 }
 
 static ADDRESS_MAP_START( scobra_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(scobra_soundram_r, scobra_soundram_w)
-	AM_RANGE(0x8000, 0x83ff) AM_WRITENOP AM_BASE(&scobra_soundram)  /* only here to initialize pointer */
+	AM_RANGE(0x8000, 0x83ff) AM_WRITENOP AM_BASE_MEMBER(scobra_state, soundram)  /* only here to initialize pointer */
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(scramble_filter_w)
 ADDRESS_MAP_END
 
@@ -325,7 +337,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hustlerb_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_WRITE(frogger_filter_w)
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_READ(scobra_soundram_r) AM_BASE(&scobra_soundram)  /* only here to initialize pointer */
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_READ(scobra_soundram_r) AM_BASE_MEMBER(scobra_state, soundram)  /* only here to initialize pointer */
 ADDRESS_MAP_END
 
 
@@ -850,7 +862,7 @@ static const ay8910_interface scobra_ay8910_interface_2 =
 };
 
 
-static MACHINE_CONFIG_START( type1, driver_device )
+static MACHINE_CONFIG_START( type1, scobra_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
@@ -975,7 +987,7 @@ static MACHINE_CONFIG_DERIVED( darkplnt, type2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( hustler, driver_device )
+static MACHINE_CONFIG_START( hustler, scobra_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */

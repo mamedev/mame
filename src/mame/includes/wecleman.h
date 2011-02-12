@@ -1,13 +1,45 @@
-/*----------- defined in drivers/wecleman.c -----------*/
+class wecleman_state : public driver_device
+{
+public:
+	wecleman_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-extern int wecleman_selected_ip, wecleman_irqctrl;
+	UINT16 *blitter_regs;
+	int multiply_reg[2];
+	UINT16 *protection_ram;
+	int spr_color_offs;
+	int prot_state;
+	int selected_ip;
+	int irqctrl;
+	UINT16 *videostatus;
+	UINT16 *pageram;
+	UINT16 *txtram;
+	UINT16 *roadram;
+	size_t roadram_size;
+	int bgpage[4];
+	int fgpage[4];
+	const int *gfx_bank;
+	tilemap_t *bg_tilemap;
+	tilemap_t *fg_tilemap;
+	tilemap_t *txt_tilemap;
+	int *spr_idx_list;
+	int *spr_pri_list;
+	int *t32x32pm;
+	int gameid;
+	int spr_offsx;
+	int spr_offsy;
+	int spr_count;
+	UINT16 *rgb_half;
+	int cloud_blend;
+	int cloud_ds;
+	int cloud_visible;
+	pen_t black_pen;
+	struct sprite *sprite_list;
+	struct sprite **spr_ptr_list;
+};
 
 
 /*----------- defined in video/wecleman.c -----------*/
-
-extern UINT16 *wecleman_videostatus;
-extern UINT16 *wecleman_pageram, *wecleman_txtram, *wecleman_roadram;
-extern size_t wecleman_roadram_size;
 
 WRITE16_HANDLER( hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w );
 WRITE16_HANDLER( wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w );

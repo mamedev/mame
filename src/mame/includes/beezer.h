@@ -1,3 +1,5 @@
+#include "machine/6522via.h"
+
 class beezer_state : public driver_device
 {
 public:
@@ -5,13 +7,16 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	int pbus;
+	int banklatch;
+	int scanline;
 };
 
 
 /*----------- defined in machine/beezer.c -----------*/
 
-//extern const via6522_interface b_via_0_interface;
-//extern const via6522_interface b_via_1_interface;
+extern const via6522_interface b_via_0_interface;
+extern const via6522_interface b_via_1_interface;
 
 DRIVER_INIT( beezer );
 WRITE8_HANDLER( beezer_bankswitch_w );

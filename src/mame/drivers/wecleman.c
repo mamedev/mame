@@ -280,14 +280,6 @@ TODO:
 #include "wecleman.lh"
 #include "includes/wecleman.h"
 
-/* Variables only used here: */
-static UINT16 *blitter_regs;
-static int multiply_reg[2];
-static UINT16 *wecleman_protection_ram;
-static int spr_color_offs;
-
-/* Variables that video has acces to: */
-int wecleman_selected_ip, wecleman_irqctrl;
 
 /***************************************************************************
                             Common Routines
@@ -295,11 +287,12 @@ int wecleman_selected_ip, wecleman_irqctrl;
 
 static READ16_HANDLER( wecleman_protection_r )
 {
+	wecleman_state *state = space->machine->driver_data<wecleman_state>();
 	int blend, data0, data1, r0, g0, b0, r1, g1, b1;
 
-	data0 = wecleman_protection_ram[0];
-	blend = wecleman_protection_ram[2];
-	data1 = wecleman_protection_ram[1];
+	data0 = state->protection_ram[0];
+	blend = state->protection_ram[2];
+	data1 = state->protection_ram[1];
 	blend &= 0x3ff;
 
 	// a precalculated table will take an astronomical 4096^2(colors) x 1024(steps) x 2(word) bytes
@@ -321,10 +314,9 @@ static READ16_HANDLER( wecleman_protection_r )
 
 static WRITE16_HANDLER( wecleman_protection_w )
 {
-	static int state = 0;
-
-	if (offset == 2) state = data & 0x2000;
-	if (!state) COMBINE_DATA(wecleman_protection_ram + offset);
+	wecleman_state *state = space->machine->driver_data<wecleman_state>();
+	if (offset == 2) state->prot_state = data & 0x2000;
+	if (!state->prot_state) COMBINE_DATA(state->protection_ram + offset);
 }
 
 
@@ -350,12 +342,13 @@ static WRITE16_HANDLER( wecleman_protection_w )
 */
 static WRITE16_HANDLER( irqctrl_w )
 {
+	wecleman_state *state = space->machine->driver_data<wecleman_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		// logerror("CPU #0 - PC = %06X - $140005 <- %02X (old value: %02X)\n",cpu_get_pc(space->cpu), data&0xFF, old_data&0xFF);
 
 		// Bit 0 : SUBINT
-		if ( (wecleman_irqctrl & 1) && (!(data & 1)) )	// 1->0 transition
+		if ( (state->irqctrl & 1) && (!(data & 1)) )	// 1->0 transition
 			cputag_set_input_line(space->machine, "sub", 4, HOLD_LINE);
 
 		// Bit 1 : NSUBRST
@@ -369,7 +362,7 @@ static WRITE16_HANDLER( irqctrl_w )
 		// Bit 4 : SCR-HCNT
 		// Bit 5 : SCR-VCNT
 		// Bit 6 : TV-KILL
-		wecleman_irqctrl = data;	// latch the value
+		state->irqctrl = data;	// latch the value
 	}
 }
 
@@ -386,13 +379,15 @@ static WRITE16_HANDLER( irqctrl_w )
 */
 static WRITE16_HANDLER( selected_ip_w )
 {
-	if (ACCESSING_BITS_0_7) wecleman_selected_ip = data & 0xff;	// latch the value
+	wecleman_state *state = space->machine->driver_data<wecleman_state>();
+	if (ACCESSING_BITS_0_7) state->selected_ip = data & 0xff;	// latch the value
 }
 
 /* $140021.b - Return the previously selected input port's value */
 static READ16_HANDLER( selected_ip_r )
 {
-	switch ( (wecleman_selected_ip >> 5) & 3 )
+	wecleman_state *state = space->machine->driver_data<wecleman_state>();
+	switch ( (state->selected_ip >> 5) & 3 )
 	{																	// From WEC Le Mans Schems:
 		case 0:  return input_port_read(space->machine, "ACCEL");		// Accel - Schems: Accelevr
 		case 1:  return ~0;												// ????? - Schems: Not Used
@@ -439,32 +434,33 @@ static READ16_HANDLER( selected_ip_r )
 */
 static WRITE16_HANDLER( blitter_w )
 {
-	COMBINE_DATA(&blitter_regs[offset]);
+	wecleman_state *state = space->machine->driver_data<wecleman_state>();
+	COMBINE_DATA(&state->blitter_regs[offset]);
 
 	/* do a blit if $80010.b has been written */
 	if ( (offset == 0x10/2) && (ACCESSING_BITS_8_15) )
 	{
 		/* 80000.b = ?? usually 0 - other values: 02 ; 00 - ? logic function ? */
 		/* 80001.b = ?? usually 0 - other values: 3f ; 01 - ? height ? */
-		int minterm  = ( blitter_regs[0x0/2] & 0xFF00 ) >> 8;
-		int list_len = ( blitter_regs[0x0/2] & 0x00FF ) >> 0;
+		int minterm  = ( state->blitter_regs[0x0/2] & 0xFF00 ) >> 8;
+		int list_len = ( state->blitter_regs[0x0/2] & 0x00FF ) >> 0;
 
 		/* 80002.w = ?? always 0 - ? increment per horizontal line ? */
 		/* no proof at all, it's always 0 */
-		//int srcdisp = blitter_regs[0x2/2] & 0xFF00;
-		//int destdisp = blitter_regs[0x2/2] & 0x00FF;
+		//int srcdisp = state->blitter_regs[0x2/2] & 0xFF00;
+		//int destdisp = state->blitter_regs[0x2/2] & 0x00FF;
 
 		/* 80004.l = source data address */
-		int src  = ( blitter_regs[0x4/2] << 16 ) + blitter_regs[0x6/2];
+		int src  = ( state->blitter_regs[0x4/2] << 16 ) + state->blitter_regs[0x6/2];
 
 		/* 80008.l = list of blits address */
-		int list = ( blitter_regs[0x8/2] << 16 ) + blitter_regs[0xA/2];
+		int list = ( state->blitter_regs[0x8/2] << 16 ) + state->blitter_regs[0xA/2];
 
 		/* 8000C.l = destination address */
-		int dest = ( blitter_regs[0xC/2] << 16 ) + blitter_regs[0xE/2];
+		int dest = ( state->blitter_regs[0xC/2] << 16 ) + state->blitter_regs[0xE/2];
 
 		/* 80010.b = number of words to move */
-		int size = ( blitter_regs[0x10/2] ) & 0x00FF;
+		int size = ( state->blitter_regs[0x10/2] ) & 0x00FF;
 
 		/* Word aligned transfers only ?? */
 		src  &= (~1);   list &= (~1);    dest &= (~1);
@@ -497,7 +493,7 @@ static WRITE16_HANDLER( blitter_w )
 					space->write_word(destptr, space->read_word(i));
 
 				destptr = dest + 14;
-				i = space->read_word(list) + spr_color_offs;
+				i = space->read_word(list) + state->spr_color_offs;
 				space->write_word(destptr, i);
 
 				dest += 16;
@@ -519,13 +515,13 @@ static WRITE16_HANDLER( wecleman_soundlatch_w );
 
 static ADDRESS_MAP_START( wecleman_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM	// ROM (03c000-03ffff used as RAM sometimes!)
-	AM_RANGE(0x040494, 0x040495) AM_WRITE(wecleman_videostatus_w) AM_BASE(&wecleman_videostatus)	// cloud blending control (HACK)
+	AM_RANGE(0x040494, 0x040495) AM_WRITE(wecleman_videostatus_w) AM_BASE_MEMBER(wecleman_state, videostatus)	// cloud blending control (HACK)
 	AM_RANGE(0x040000, 0x043fff) AM_RAM	// RAM
-	AM_RANGE(0x060000, 0x060005) AM_WRITE(wecleman_protection_w) AM_BASE(&wecleman_protection_ram)
+	AM_RANGE(0x060000, 0x060005) AM_WRITE(wecleman_protection_w) AM_BASE_MEMBER(wecleman_state, protection_ram)
 	AM_RANGE(0x060006, 0x060007) AM_READ(wecleman_protection_r)	// MCU read
-	AM_RANGE(0x080000, 0x080011) AM_RAM_WRITE(blitter_w) AM_BASE(&blitter_regs)	// Blitter
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(wecleman_pageram_w) AM_BASE(&wecleman_pageram)	// Background Layers
-	AM_RANGE(0x108000, 0x108fff) AM_RAM_WRITE(wecleman_txtram_w) AM_BASE(&wecleman_txtram)	// Text Layer
+	AM_RANGE(0x080000, 0x080011) AM_RAM_WRITE(blitter_w) AM_BASE_MEMBER(wecleman_state, blitter_regs)	// Blitter
+	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(wecleman_pageram_w) AM_BASE_MEMBER(wecleman_state, pageram)	// Background Layers
+	AM_RANGE(0x108000, 0x108fff) AM_RAM_WRITE(wecleman_txtram_w) AM_BASE_MEMBER(wecleman_state, txtram)	// Text Layer
 	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x124000, 0x127fff) AM_RAM AM_SHARE("share1")	// Shared with main CPU
 	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_BASE_GENERIC(spriteram)	// Sprites
@@ -552,7 +548,7 @@ static WRITE16_HANDLER( hotchase_soundlatch_w );
 static ADDRESS_MAP_START( hotchase_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x063fff) AM_RAM										// RAM (weird size!?)
-	AM_RANGE(0x080000, 0x080011) AM_RAM_WRITE(blitter_w) AM_BASE(&blitter_regs)	// Blitter
+	AM_RANGE(0x080000, 0x080011) AM_RAM_WRITE(blitter_w) AM_BASE_MEMBER(wecleman_state, blitter_regs)	// Blitter
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE8("k051316_1", k051316_r, k051316_w, 0x00ff)	// Background
 	AM_RANGE(0x101000, 0x10101f) AM_DEVWRITE8("k051316_1", k051316_ctrl_w, 0x00ff)	// Background Ctrl
 	AM_RANGE(0x102000, 0x102fff) AM_DEVREADWRITE8("k051316_2", k051316_r, k051316_w, 0x00ff)	// Foreground
@@ -581,7 +577,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wecleman_sub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM	// ROM
-	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE(&wecleman_roadram) AM_SIZE(&wecleman_roadram_size)	// Road
+	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE_MEMBER(wecleman_state, roadram) AM_SIZE_MEMBER(wecleman_state, roadram_size)	// Road
 	AM_RANGE(0x070000, 0x073fff) AM_RAM AM_SHARE("share1")	// RAM (Shared with main CPU)
 ADDRESS_MAP_END
 
@@ -592,7 +588,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotchase_sub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM	// ROM
-	AM_RANGE(0x020000, 0x020fff) AM_RAM AM_BASE(&wecleman_roadram) AM_SIZE(&wecleman_roadram_size)	// Road
+	AM_RANGE(0x020000, 0x020fff) AM_RAM AM_BASE_MEMBER(wecleman_state, roadram) AM_SIZE_MEMBER(wecleman_state, roadram_size)	// Road
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("share1")	// Shared with main CPU
 	AM_RANGE(0x060000, 0x060fff) AM_RAM				// RAM
 ADDRESS_MAP_END
@@ -615,12 +611,14 @@ WRITE16_HANDLER( wecleman_soundlatch_w )
 /* Protection - an external multiplyer connected to the sound CPU */
 static READ8_HANDLER( multiply_r )
 {
-	return (multiply_reg[0] * multiply_reg[1]) & 0xFF;
+	wecleman_state *state = space->machine->driver_data<wecleman_state>();
+	return (state->multiply_reg[0] * state->multiply_reg[1]) & 0xFF;
 }
 
 static WRITE8_HANDLER( multiply_w )
 {
-	multiply_reg[offset] = data;
+	wecleman_state *state = space->machine->driver_data<wecleman_state>();
+	state->multiply_reg[offset] = data;
 }
 
 /*      K007232 registers reminder:
@@ -1033,7 +1031,7 @@ static MACHINE_RESET( wecleman )
 	k007232_set_bank( machine->device("konami"), 0, 1 );
 }
 
-static MACHINE_CONFIG_START( wecleman, driver_device )
+static MACHINE_CONFIG_START( wecleman, wecleman_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)	/* Schems show 10MHz */
@@ -1104,7 +1102,7 @@ static const k051316_interface hotchase_k051316_intf_1 =
 	hotchase_zoom_callback_1
 };
 
-static MACHINE_CONFIG_START( hotchase, driver_device )
+static MACHINE_CONFIG_START( hotchase, wecleman_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)	/* 10 MHz - PCB is drawn in one set's readme */
@@ -1245,6 +1243,7 @@ static void bitswap(running_machine *machine,UINT8 *src,size_t len,int _14,int _
 /* Unpack sprites data and do some patching */
 static DRIVER_INIT( wecleman )
 {
+	wecleman_state *state = machine->driver_data<wecleman_state>();
 	int i, len;
 	UINT8 *RAM;
 //  UINT16 *RAM1 = (UINT16 *) machine->region("maincpu")->base();   /* Main CPU patches */
@@ -1281,7 +1280,7 @@ static DRIVER_INIT( wecleman )
 	bitswap(machine, machine->region("gfx3")->base(), machine->region("gfx3")->bytes(),
 			20,19,18,17,16,15,14,7,12,4,2,5,6,13,8,9,11,3,10,1,0);
 
-	spr_color_offs = 0x40;
+	state->spr_color_offs = 0x40;
 }
 
 
@@ -1388,6 +1387,7 @@ static void hotchase_sprite_decode( running_machine *machine, int num16_banks, i
 /* Unpack sprites data and do some patching */
 static DRIVER_INIT( hotchase )
 {
+	wecleman_state *state = machine->driver_data<wecleman_state>();
 //  UINT16 *RAM1 = (UINT16) machine->region("maincpu")->base(); /* Main CPU patches */
 //  RAM[0x1140/2] = 0x0015; RAM[0x195c/2] = 0x601A; // faster self test
 
@@ -1405,7 +1405,7 @@ static DRIVER_INIT( hotchase )
 	RAM = machine->region("gfx3")->base();
 	memcpy(&RAM[0], &RAM[0x10000/2], 0x10000/2);
 
-	spr_color_offs = 0;
+	state->spr_color_offs = 0;
 }
 
 

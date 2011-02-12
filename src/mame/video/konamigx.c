@@ -72,7 +72,7 @@ static bitmap_t *gxtype1_roz_dstbitmap;
 static bitmap_t *gxtype1_roz_dstbitmap2;
 static rectangle gxtype1_roz_dstbitmapclip;
 
-static void (*game_tile_callback)(int layer, int *code, int *color, int *flags);
+static void (*game_tile_callback)(running_machine *machine, int layer, int *code, int *color, int *flags);
 
 // Localized K053936/ROZ+
 #define K053936_MAX_CHIPS 2
@@ -923,7 +923,7 @@ INLINE int K055555GX_decode_inpri(int c18) // (see p.59 7.2.2)
 	return(c18 | op);
 }
 
-static void konamigx_type2_sprite_callback(int *code, int *color, int *priority)
+static void konamigx_type2_sprite_callback(running_machine *machine, int *code, int *color, int *priority)
 {
 	int num = *code;
 	int c18 = *color;
@@ -934,7 +934,7 @@ static void konamigx_type2_sprite_callback(int *code, int *color, int *priority)
 	*priority = K055555GX_decode_inpri(c18);
 }
 
-static void konamigx_dragoonj_sprite_callback(int *code, int *color, int *priority)
+static void konamigx_dragoonj_sprite_callback(running_machine *machine, int *code, int *color, int *priority)
 {
 	int num, op, pri, c18;
 
@@ -952,7 +952,7 @@ static void konamigx_dragoonj_sprite_callback(int *code, int *color, int *priori
 	*color = K055555GX_decode_objcolor(c18);
 }
 
-static void konamigx_salmndr2_sprite_callback(int *code, int *color, int *priority)
+static void konamigx_salmndr2_sprite_callback(running_machine *machine, int *code, int *color, int *priority)
 {
 	int num, op, pri, c18;
 
@@ -970,7 +970,7 @@ static void konamigx_salmndr2_sprite_callback(int *code, int *color, int *priori
 	*color = K055555GX_decode_objcolor(c18);
 }
 
-static void konamigx_le2_sprite_callback(int *code, int *color, int *priority)
+static void konamigx_le2_sprite_callback(running_machine *machine, int *code, int *color, int *priority)
 {
 	int num, op, pri;
 
@@ -1116,7 +1116,7 @@ static int gx_objdma, gx_primode;
 // mirrored K053247 and K054338 settings
 UINT16 *K053247_ram;
 static gfx_element *K053247_gfx;
-static void (*K053247_callback)(int *code,int *color,int *priority);
+static void (*K053247_callback)(running_machine *machine, int *code,int *color,int *priority);
 static int K053247_dx, K053247_dy;
 
 static int *K054338_shdRGB;
@@ -1362,7 +1362,7 @@ void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle 
 		color = k = gx_spriteram[offs+6];
 		l     = gx_spriteram[offs+7];
 
-		(*K053247_callback)(&code, &color, &pri);
+		(*K053247_callback)(machine, &code, &color, &pri);
 
 		/*
             shadow = shadow code
@@ -1955,7 +1955,7 @@ static TILE_GET_INFO( get_gx_psac1b_tile_info )
 	SET_TILE_INFO(0, tileno, colour, flip);
 }
 
-static void konamigx_type2_tile_callback(int layer, int *code, int *color, int *flags)
+static void konamigx_type2_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags)
 {
 	int d = *code;
 
@@ -1963,7 +1963,7 @@ static void konamigx_type2_tile_callback(int layer, int *code, int *color, int *
 	K055555GX_decode_vmixcolor(layer, color);
 }
 
-static void konamigx_alpha_tile_callback(int layer, int *code, int *color, int *flags)
+static void konamigx_alpha_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags)
 {
 	int mixcode;
 	int d = *code;

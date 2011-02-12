@@ -237,9 +237,6 @@ Hang Pilot (uses an unknown but similar video board)                12W         
 
 static UINT32 *work_ram;
 
-UINT8 gticlub_led_reg0;
-UINT8 gticlub_led_reg1;
-
 
 static WRITE32_HANDLER( paletteram32_w )
 {
@@ -256,39 +253,6 @@ static void voodoo_vblank_0(device_t *device, int param)
 static void voodoo_vblank_1(device_t *device, int param)
 {
 	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_IRQ1, param ? ASSERT_LINE : CLEAR_LINE);
-}
-
-static VIDEO_UPDATE( hangplt )
-{
-	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
-
-	if (strcmp(screen->tag(), "lscreen") == 0)
-	{
-		device_t *k001604 = screen->machine->device("k001604_1");
-		device_t *voodoo = screen->machine->device("voodoo0");
-
-	//  k001604_draw_back_layer(k001604, bitmap, cliprect);
-
-		voodoo_update(voodoo, bitmap, cliprect);
-
-		k001604_draw_front_layer(k001604, bitmap, cliprect);
-	}
-	else if (strcmp(screen->tag(), "rscreen") == 0)
-	{
-		device_t *k001604 = screen->machine->device("k001604_2");
-		device_t *voodoo = screen->machine->device("voodoo1");
-
-	//  k001604_draw_back_layer(k001604, bitmap, cliprect);
-
-		voodoo_update(voodoo, bitmap, cliprect);
-
-		k001604_draw_front_layer(k001604, bitmap, cliprect);
-	}
-
-	draw_7segment_led(bitmap, 3, 3, gticlub_led_reg0);
-	draw_7segment_led(bitmap, 9, 3, gticlub_led_reg1);
-
-	return 0;
 }
 
 static READ32_HANDLER( gticlub_k001604_tile_r )
@@ -389,11 +353,8 @@ static WRITE8_HANDLER( sysreg_w )
 	switch (offset)
 	{
 		case 0:
-			gticlub_led_reg0 = data;
-			break;
-
 		case 1:
-			gticlub_led_reg1 = data;
+			gticlub_led_setreg(offset, data);
 			break;
 
 		case 3:
@@ -1182,7 +1143,6 @@ static DRIVER_INIT(gticlub)
 	init_konami_cgboard(machine, 1, CGBOARD_TYPE_GTICLUB);
 
 	sharc_dataram_0 = auto_alloc_array(machine, UINT32, 0x100000/4);
-	gticlub_led_reg0 = gticlub_led_reg1 = 0x7f;
 
 	K001005_preprocess_texture_data(machine->region("gfx1")->base(), machine->region("gfx1")->bytes(), 1);
 }
@@ -1195,7 +1155,6 @@ static DRIVER_INIT(hangplt)
 
 	sharc_dataram_0 = auto_alloc_array(machine, UINT32, 0x100000/4);
 	sharc_dataram_1 = auto_alloc_array(machine, UINT32, 0x100000/4);
-	gticlub_led_reg0 = gticlub_led_reg1 = 0x7f;
 }
 
 /*************************************************************************/

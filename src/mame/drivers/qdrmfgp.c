@@ -28,11 +28,6 @@ GP1 HDD data contents:
 #include "machine/nvram.h"
 #include "includes/qdrmfgp.h"
 
-static UINT8 *sndram;
-static UINT16 *workram;
-static UINT16 control;
-static INT32 qdrmfgp_pal;
-static INT32 gp2_irq_control;
 
 /*************************************
  *
@@ -42,9 +37,10 @@ static INT32 gp2_irq_control;
 
 static CUSTOM_INPUT( inputs_r )
 {
+	qdrmfgp_state *state = field->port->machine->driver_data<qdrmfgp_state>();
 	const char *tag1 = (const char *)param;
 	const char *tag2 = tag1 + strlen(tag1) + 1;
-	return input_port_read(field->port->machine, (control & 0x0080) ? tag1 : tag2);
+	return input_port_read(field->port->machine, (state->control & 0x0080) ? tag1 : tag2);
 }
 
 static CUSTOM_INPUT( battery_sensor_r )
@@ -54,13 +50,10 @@ static CUSTOM_INPUT( battery_sensor_r )
 }
 
 
-int qdrmfgp_get_palette(void)
-{
-	return qdrmfgp_pal;
-}
-
 static WRITE16_HANDLER( gp_control_w )
 {
+	qdrmfgp_state *state = space->machine->driver_data<qdrmfgp_state>();
+
 	/* bit 0        enable irq 1 (sound) */
 	/* bit 1        enable irq 2 (not used) */
 	/* bit 2        enable irq 3 (vblank) */
@@ -73,10 +66,10 @@ static WRITE16_HANDLER( gp_control_w )
 	/* bit 11       headphone volume: 1=up, 0=down */
 	/* bit 15       gfxrom bankswitch */
 
-	COMBINE_DATA(&control);
-	qdrmfgp_pal = control & 0x70;
+	COMBINE_DATA(&state->control);
+	state->pal = state->control & 0x70;
 
-	if (control & 0x0100)
+	if (state->control & 0x0100)
 	{
 		qdrmfgp_state *state = space->machine->driver_data<qdrmfgp_state>();
 		int vol = state->m_nvram[0x10] & 0xff;
@@ -94,6 +87,8 @@ static WRITE16_HANDLER( gp_control_w )
 
 static WRITE16_HANDLER( gp2_control_w )
 {
+	qdrmfgp_state *state = space->machine->driver_data<qdrmfgp_state>();
+
 	/* bit 2        enable irq 3 (sound) */
 	/* bit 3        enable irq 4 (vblank) */
 	/* bit 4        enable irq 5 (hdd) */
@@ -104,10 +99,10 @@ static WRITE16_HANDLER( gp2_control_w )
 	/* bit 11       headphone volume: 1=up, 0=down */
 	/* bit 15       gfxrom bankswitch */
 
-	COMBINE_DATA(&control);
-	qdrmfgp_pal = 0;
+	COMBINE_DATA(&state->control);
+	state->pal = 0;
 
-	if (control & 0x0100)
+	if (state->control & 0x0100)
 	{
 		qdrmfgp_state *state = space->machine->driver_data<qdrmfgp_state>();
 		int vol = state->m_nvram[0x8] & 0xff;
@@ -126,13 +121,14 @@ static WRITE16_HANDLER( gp2_control_w )
 
 static READ16_HANDLER( v_rom_r )
 {
+	qdrmfgp_state *state = space->machine->driver_data<qdrmfgp_state>();
 	device_t *k056832 = space->machine->device("k056832");
 	UINT8 *mem8 = space->machine->region("gfx1")->base();
 	int bank = k056832_word_r(k056832, 0x34/2, 0xffff);
 
 	offset += bank * 0x800 * 4;
 
-	if (control & 0x8000)
+	if (state->control & 0x8000)
 		offset += 0x800 * 2;
 
 	return (mem8[offset + 1] << 8) + mem8[offset];
@@ -184,19 +180,21 @@ static WRITE16_HANDLER( gp2_vram_mirror_w )
 
 static READ16_HANDLER( sndram_r )
 {
+	qdrmfgp_state *state = space->machine->driver_data<qdrmfgp_state>();
 	if (ACCESSING_BITS_0_7)
-		return sndram[offset];
+		return state->sndram[offset];
 
 	return 0;
 }
 
 static WRITE16_HANDLER( sndram_w )
 {
+	qdrmfgp_state *state = space->machine->driver_data<qdrmfgp_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		sndram[offset] = data & 0xff;
+		state->sndram[offset] = data & 0xff;
 		if (offset >= 0x40000)
-			sndram[offset+0xc00000-0x900000] = data & 0xff;
+			state->sndram[offset+0xc00000-0x900000] = data & 0xff;
 	}
 }
 
@@ -238,6 +236,7 @@ static WRITE16_DEVICE_HANDLER( ide_alt_w )
 
 static READ16_HANDLER( gp2_ide_std_r )
 {
+	qdrmfgp_state *state = space->machine->driver_data<qdrmfgp_state>();
 	device_t *device = space->machine->device("ide");
 	if (offset & 0x01)
 	{
@@ -246,11 +245,11 @@ static READ16_HANDLER( gp2_ide_std_r )
 			switch (cpu_get_previouspc(space->cpu))
 			{
 				case 0xdb4c:
-					if ((workram[0x5fa4/2] - cpu_get_reg(space->cpu, M68K_D0)) <= 0x10)
-						gp2_irq_control = 1;
+					if ((state->workram[0x5fa4/2] - cpu_get_reg(space->cpu, M68K_D0)) <= 0x10)
+						state->gp2_irq_control = 1;
 					break;
 				case 0xdec2:
-					gp2_irq_control = 1;
+					state->gp2_irq_control = 1;
 				default:
 					break;
 			}
@@ -270,16 +269,17 @@ static READ16_HANDLER( gp2_ide_std_r )
 
 static INTERRUPT_GEN(qdrmfgp_interrupt)
 {
+	qdrmfgp_state *state = device->machine->driver_data<qdrmfgp_state>();
 	switch (cpu_getiloops(device))
 	{
 		case 0:
-			if (control & 0x0001)
+			if (state->control & 0x0001)
 				cpu_set_input_line(device, 1, HOLD_LINE);
 			break;
 
 		case 1:
 			/* trigger V-blank interrupt */
-			if (control & 0x0004)
+			if (state->control & 0x0004)
 				cpu_set_input_line(device, 3, HOLD_LINE);
 			break;
 	}
@@ -287,7 +287,8 @@ static INTERRUPT_GEN(qdrmfgp_interrupt)
 
 static void ide_interrupt(device_t *device, int state)
 {
-	if (control & 0x0008)
+	qdrmfgp_state *drvstate = device->machine->driver_data<qdrmfgp_state>();
+	if (drvstate->control & 0x0008)
 	{
 		if (state != CLEAR_LINE)
 			cputag_set_input_line(device->machine, "maincpu", 4, HOLD_LINE);
@@ -300,25 +301,28 @@ static void ide_interrupt(device_t *device, int state)
 
 static TIMER_CALLBACK( gp2_timer_callback )
 {
-	if (control & 0x0004)
+	qdrmfgp_state *state = machine->driver_data<qdrmfgp_state>();
+	if (state->control & 0x0004)
 		cputag_set_input_line(machine, "maincpu", 3, HOLD_LINE);
 }
 
 static INTERRUPT_GEN(qdrmfgp2_interrupt)
 {
+	qdrmfgp_state *state = device->machine->driver_data<qdrmfgp_state>();
 	/* trigger V-blank interrupt */
-	if (control & 0x0008)
+	if (state->control & 0x0008)
 		cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
 static void gp2_ide_interrupt(device_t *device, int state)
 {
-	if (control & 0x0010)
+	qdrmfgp_state *drvstate = device->machine->driver_data<qdrmfgp_state>();
+	if (drvstate->control & 0x0010)
 	{
 		if (state != CLEAR_LINE)
 		{
-			if (gp2_irq_control)
-				gp2_irq_control = 0;
+			if (drvstate->gp2_irq_control)
+				drvstate->gp2_irq_control = 0;
 			else
 				cputag_set_input_line(device->machine, "maincpu", 5, HOLD_LINE);
 		}
@@ -338,7 +342,7 @@ static void gp2_ide_interrupt(device_t *device, int state)
 
 static ADDRESS_MAP_START( qdrmfgp_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE(&workram)										/* work ram */
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE_MEMBER(qdrmfgp_state, workram)										/* work ram */
 	AM_RANGE(0x180000, 0x183fff) AM_RAM AM_SHARE("nvram")	/* backup ram */
 	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x300000, 0x30003f) AM_DEVWRITE("k056832", k056832_word_w)										/* video reg */
@@ -361,7 +365,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( qdrmfgp2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x110fff) AM_RAM AM_BASE(&workram)										/* work ram */
+	AM_RANGE(0x100000, 0x110fff) AM_RAM AM_BASE_MEMBER(qdrmfgp_state, workram)										/* work ram */
 	AM_RANGE(0x180000, 0x183fff) AM_RAM AM_SHARE("nvram")	/* backup ram */
 	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x300000, 0x30003f) AM_DEVWRITE("k056832", k056832_word_w)										/* video reg */
@@ -570,7 +574,8 @@ INPUT_PORTS_END
 
 static void sound_irq(device_t *device)
 {
-	if (control & 0x0001)
+	qdrmfgp_state *state = device->machine->driver_data<qdrmfgp_state>();
+	if (state->control & 0x0001)
 		cputag_set_input_line(device->machine, "maincpu", 1, HOLD_LINE);
 }
 
@@ -608,9 +613,10 @@ static const k056832_interface qdrmfgp2_k056832_intf =
 
 static MACHINE_START( qdrmfgp )
 {
-	state_save_register_global(machine, control);
-	state_save_register_global(machine, qdrmfgp_pal);
-	state_save_register_global(machine, gp2_irq_control);
+	qdrmfgp_state *state = machine->driver_data<qdrmfgp_state>();
+	state_save_register_global(machine, state->control);
+	state_save_register_global(machine, state->pal);
+	state_save_register_global(machine, state->gp2_irq_control);
 }
 
 static MACHINE_START( qdrmfgp2 )
@@ -623,10 +629,11 @@ static MACHINE_START( qdrmfgp2 )
 
 static MACHINE_RESET( qdrmfgp )
 {
-	sndram = machine->region("konami")->base() + 0x100000;
+	qdrmfgp_state *state = machine->driver_data<qdrmfgp_state>();
+	state->sndram = machine->region("konami")->base() + 0x100000;
 
 	/* reset the IDE controller */
-	gp2_irq_control = 0;
+	state->gp2_irq_control = 0;
 	devtag_reset(machine, "ide");
 }
 

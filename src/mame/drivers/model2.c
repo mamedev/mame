@@ -101,22 +101,6 @@
 #include "sound/2612intf.h"
 #include "includes/model2.h"
 
-UINT32 *model2_bufferram, *model2_colorxlat;
-static UINT32 *model2_workram;
-UINT32 *model2_textureram0, *model2_textureram1, *model2_lumaram;
-UINT32 *model2_paletteram32;
-static UINT32 model2_intreq;
-static UINT32 model2_intena;
-static UINT32 model2_coproctl, model2_coprocnt, model2_geoctl, model2_geocnt;
-static UINT16 *model2_soundram = NULL;
-
-static UINT32 model2_timervals[4], model2_timerorig[4];
-static int      model2_timerrun[4];
-static timer_device *model2_timers[4];
-static int model2_ctrlmode;
-static int analog_channel;
-
-static UINT32 *tgp_program;
 
 enum {
 	DSP_TYPE_TGP	= 1,
@@ -124,38 +108,33 @@ enum {
 	DSP_TYPE_TGPX4	= 3,
 };
 
-static int dsp_type;
-
-
 
 #define COPRO_FIFOIN_SIZE	32000
-static int copro_fifoin_rpos, copro_fifoin_wpos;
-static UINT32 copro_fifoin_data[COPRO_FIFOIN_SIZE];
-static int copro_fifoin_num = 0;
 static int copro_fifoin_pop(device_t *device, UINT32 *result)
 {
+	model2_state *state = device->machine->driver_data<model2_state>();
 	UINT32 r;
 
-	if (copro_fifoin_num == 0)
+	if (state->copro_fifoin_num == 0)
 	{
-		if (dsp_type == DSP_TYPE_TGP)
+		if (state->dsp_type == DSP_TYPE_TGP)
 			return 0;
 
 		fatalerror("Copro FIFOIN underflow (at %08X)", cpu_get_pc(device));
 		return 0;
 	}
 
-	r = copro_fifoin_data[copro_fifoin_rpos++];
+	r = state->copro_fifoin_data[state->copro_fifoin_rpos++];
 
-	if (copro_fifoin_rpos == COPRO_FIFOIN_SIZE)
+	if (state->copro_fifoin_rpos == COPRO_FIFOIN_SIZE)
 	{
-		copro_fifoin_rpos = 0;
+		state->copro_fifoin_rpos = 0;
 	}
 
-	copro_fifoin_num--;
-	if (dsp_type == DSP_TYPE_SHARC)
+	state->copro_fifoin_num--;
+	if (state->dsp_type == DSP_TYPE_SHARC)
 	{
-		if (copro_fifoin_num == 0)
+		if (state->copro_fifoin_num == 0)
 		{
 			sharc_set_flag_input(device, 0, ASSERT_LINE);
 		}
@@ -172,7 +151,8 @@ static int copro_fifoin_pop(device_t *device, UINT32 *result)
 
 static void copro_fifoin_push(device_t *device, UINT32 data)
 {
-	if (copro_fifoin_num == COPRO_FIFOIN_SIZE)
+	model2_state *state = device->machine->driver_data<model2_state>();
+	if (state->copro_fifoin_num == COPRO_FIFOIN_SIZE)
 	{
 		fatalerror("Copro FIFOIN overflow (at %08X)", cpu_get_pc(device));
 		return;
@@ -180,16 +160,16 @@ static void copro_fifoin_push(device_t *device, UINT32 data)
 
 	//mame_printf_debug("COPRO FIFOIN at %08X, %08X, %f\n", cpu_get_pc(device), data, *(float*)&data);
 
-	copro_fifoin_data[copro_fifoin_wpos++] = data;
-	if (copro_fifoin_wpos == COPRO_FIFOIN_SIZE)
+	state->copro_fifoin_data[state->copro_fifoin_wpos++] = data;
+	if (state->copro_fifoin_wpos == COPRO_FIFOIN_SIZE)
 	{
-		copro_fifoin_wpos = 0;
+		state->copro_fifoin_wpos = 0;
 	}
 
-	copro_fifoin_num++;
+	state->copro_fifoin_num++;
 
 	// clear FIFO empty flag on SHARC
-	if (dsp_type == DSP_TYPE_SHARC)
+	if (state->dsp_type == DSP_TYPE_SHARC)
 	{
 		sharc_set_flag_input(device, 0, CLEAR_LINE);
 	}
@@ -197,14 +177,12 @@ static void copro_fifoin_push(device_t *device, UINT32 data)
 
 
 #define COPRO_FIFOOUT_SIZE	32000
-static int copro_fifoout_rpos, copro_fifoout_wpos;
-static UINT32 copro_fifoout_data[COPRO_FIFOOUT_SIZE];
-static int copro_fifoout_num = 0;
 static UINT32 copro_fifoout_pop(address_space *space)
 {
+	model2_state *state = space->machine->driver_data<model2_state>();
 	UINT32 r;
 
-	if (copro_fifoout_num == 0)
+	if (state->copro_fifoout_num == 0)
 	{
 		/* Reading from empty FIFO causes the i960 to enter wait state */
 		i960_stall(space->cpu);
@@ -215,21 +193,21 @@ static UINT32 copro_fifoout_pop(address_space *space)
 		return 0;
 	}
 
-	r = copro_fifoout_data[copro_fifoout_rpos++];
+	r = state->copro_fifoout_data[state->copro_fifoout_rpos++];
 
-	if (copro_fifoout_rpos == COPRO_FIFOOUT_SIZE)
+	if (state->copro_fifoout_rpos == COPRO_FIFOOUT_SIZE)
 	{
-		copro_fifoout_rpos = 0;
+		state->copro_fifoout_rpos = 0;
 	}
 
-	copro_fifoout_num--;
+	state->copro_fifoout_num--;
 
-//  logerror("COPRO FIFOOUT POP %08X, %f, %d\n", r, *(float*)&r,copro_fifoout_num);
+//  logerror("COPRO FIFOOUT POP %08X, %f, %d\n", r, *(float*)&r,state->copro_fifoout_num);
 
 	// set SHARC flag 1: 0 if space available, 1 if FIFO full
-	if (dsp_type == DSP_TYPE_SHARC)
+	if (state->dsp_type == DSP_TYPE_SHARC)
 	{
-		if (copro_fifoout_num == COPRO_FIFOOUT_SIZE)
+		if (state->copro_fifoout_num == COPRO_FIFOOUT_SIZE)
 		{
 			sharc_set_flag_input(space->machine->device("dsp"), 1, ASSERT_LINE);
 		}
@@ -244,27 +222,28 @@ static UINT32 copro_fifoout_pop(address_space *space)
 
 static void copro_fifoout_push(device_t *device, UINT32 data)
 {
-	//if (copro_fifoout_wpos == copro_fifoout_rpos)
-	if (copro_fifoout_num == COPRO_FIFOOUT_SIZE)
+	model2_state *state = device->machine->driver_data<model2_state>();
+	//if (state->copro_fifoout_wpos == state->copro_fifoout_rpos)
+	if (state->copro_fifoout_num == COPRO_FIFOOUT_SIZE)
 	{
 		fatalerror("Copro FIFOOUT overflow (at %08X)", cpu_get_pc(device));
 		return;
 	}
 
-//  logerror("COPRO FIFOOUT PUSH %08X, %f, %d\n", data, *(float*)&data,copro_fifoout_num);
+//  logerror("COPRO FIFOOUT PUSH %08X, %f, %d\n", data, *(float*)&data,state->copro_fifoout_num);
 
-	copro_fifoout_data[copro_fifoout_wpos++] = data;
-	if (copro_fifoout_wpos == COPRO_FIFOOUT_SIZE)
+	state->copro_fifoout_data[state->copro_fifoout_wpos++] = data;
+	if (state->copro_fifoout_wpos == COPRO_FIFOOUT_SIZE)
 	{
-		copro_fifoout_wpos = 0;
+		state->copro_fifoout_wpos = 0;
 	}
 
-	copro_fifoout_num++;
+	state->copro_fifoout_num++;
 
 	// set SHARC flag 1: 0 if space available, 1 if FIFO full
-	if (dsp_type == DSP_TYPE_SHARC)
+	if (state->dsp_type == DSP_TYPE_SHARC)
 	{
-		if (copro_fifoout_num == COPRO_FIFOOUT_SIZE)
+		if (state->copro_fifoout_num == COPRO_FIFOOUT_SIZE)
 		{
 			sharc_set_flag_input(device, 1, ASSERT_LINE);
 
@@ -282,112 +261,127 @@ static void copro_fifoout_push(device_t *device, UINT32 data)
 /* Timers - these count down at 25 MHz and pull IRQ2 when they hit 0 */
 static READ32_HANDLER( timers_r )
 {
+	model2_state *state = space->machine->driver_data<model2_state>();
 	i960_noburst(space->cpu);
 
 	// if timer is running, calculate current value
-	if (model2_timerrun[offset])
+	if (state->timerrun[offset])
 	{
 		// get elapsed time, convert to units of 25 MHz
-		UINT32 cur = (model2_timers[offset]->time_elapsed() * 25000000).as_double();
+		UINT32 cur = (state->timers[offset]->time_elapsed() * 25000000).as_double();
 
 		// subtract units from starting value
-		model2_timervals[offset] = model2_timerorig[offset] - cur;
+		state->timervals[offset] = state->timerorig[offset] - cur;
 	}
 
-	return model2_timervals[offset];
+	return state->timervals[offset];
 }
 
 static WRITE32_HANDLER( timers_w )
 {
+	model2_state *state = space->machine->driver_data<model2_state>();
 	attotime period;
 
 	i960_noburst(space->cpu);
-	COMBINE_DATA(&model2_timervals[offset]);
+	COMBINE_DATA(&state->timervals[offset]);
 
-	model2_timerorig[offset] = model2_timervals[offset];
-	period = attotime::from_hz(25000000) * model2_timerorig[offset];
-	model2_timers[offset]->adjust(period);
-	model2_timerrun[offset] = 1;
+	state->timerorig[offset] = state->timervals[offset];
+	period = attotime::from_hz(25000000) * state->timerorig[offset];
+	state->timers[offset]->adjust(period);
+	state->timerrun[offset] = 1;
 }
 
 static TIMER_DEVICE_CALLBACK( model2_timer_cb )
 {
+	model2_state *state = timer.machine->driver_data<model2_state>();
 	int tnum = (int)(FPTR)ptr;
 	int bit = tnum + 2;
 
-	model2_timers[tnum]->reset();
+	state->timers[tnum]->reset();
 
-	model2_intreq |= (1<<bit);
-	if (model2_intena & (1<<bit))
+	state->intreq |= (1<<bit);
+	if (state->intena & (1<<bit))
 	{
 		cputag_set_input_line(timer.machine, "maincpu", I960_IRQ2, ASSERT_LINE);
 	}
 
-	model2_timervals[tnum] = 0;
-	model2_timerrun[tnum] = 0;
+	state->timervals[tnum] = 0;
+	state->timerrun[tnum] = 0;
+}
+
+static MACHINE_START(model2)
+{
+	model2_state *state = machine->driver_data<model2_state>();
+	state->copro_fifoin_data = auto_alloc_array_clear(machine, UINT32, COPRO_FIFOIN_SIZE);
+	state->copro_fifoout_data = auto_alloc_array_clear(machine, UINT32, COPRO_FIFOOUT_SIZE);
 }
 
 static MACHINE_RESET(model2_common)
 {
+	model2_state *state = machine->driver_data<model2_state>();
 	int i;
 
-	model2_intreq = 0;
-	model2_intena = 0;
-	model2_coproctl = 0;
-	model2_coprocnt = 0;
-	model2_geoctl = 0;
-	model2_geocnt = 0;
-	model2_ctrlmode = 0;
-	analog_channel = 0;
+	state->intreq = 0;
+	state->intena = 0;
+	state->coproctl = 0;
+	state->coprocnt = 0;
+	state->geoctl = 0;
+	state->geocnt = 0;
+	state->ctrlmode = 0;
+	state->analog_channel = 0;
 
-	model2_timervals[0] = 0xfffff;
-	model2_timervals[1] = 0xfffff;
-	model2_timervals[2] = 0xfffff;
-	model2_timervals[3] = 0xfffff;
+	state->timervals[0] = 0xfffff;
+	state->timervals[1] = 0xfffff;
+	state->timervals[2] = 0xfffff;
+	state->timervals[3] = 0xfffff;
 
-	model2_timerrun[0] = model2_timerrun[1] = model2_timerrun[2] = model2_timerrun[3] = 0;
+	state->timerrun[0] = state->timerrun[1] = state->timerrun[2] = state->timerrun[3] = 0;
 
-	model2_timers[0] = machine->device<timer_device>("timer0");
-	model2_timers[1] = machine->device<timer_device>("timer1");
-	model2_timers[2] = machine->device<timer_device>("timer2");
-	model2_timers[3] = machine->device<timer_device>("timer3");
+	state->timers[0] = machine->device<timer_device>("timer0");
+	state->timers[1] = machine->device<timer_device>("timer1");
+	state->timers[2] = machine->device<timer_device>("timer2");
+	state->timers[3] = machine->device<timer_device>("timer3");
 	for (i=0; i<4; i++)
-		model2_timers[i]->reset();
+		state->timers[i]->reset();
 }
 
 static MACHINE_RESET(model2o)
 {
+	model2_state *state = machine->driver_data<model2_state>();
 	MACHINE_RESET_CALL(model2_common);
 
 	// hold TGP in halt until we have code
 	cputag_set_input_line(machine, "tgp", INPUT_LINE_HALT, ASSERT_LINE);
 
-	dsp_type = DSP_TYPE_TGP;
+	state->dsp_type = DSP_TYPE_TGP;
 }
 
 static MACHINE_RESET(model2_scsp)
 {
+	model2_state *state = machine->driver_data<model2_state>();
 	memory_set_bankptr(machine, "bank4", machine->region("scsp")->base() + 0x200000);
 	memory_set_bankptr(machine, "bank5", machine->region("scsp")->base() + 0x600000);
 
 	// copy the 68k vector table into RAM
-	memcpy(model2_soundram, machine->region("audiocpu")->base() + 0x80000, 16);
+	memcpy(state->soundram, machine->region("audiocpu")->base() + 0x80000, 16);
 	machine->device("audiocpu")->reset();
 }
 
 static MACHINE_RESET(model2)
 {
+	model2_state *state = machine->driver_data<model2_state>();
 	MACHINE_RESET_CALL(model2_common);
 	MACHINE_RESET_CALL(model2_scsp);
 
 	// hold TGP in halt until we have code
 	cputag_set_input_line(machine, "tgp", INPUT_LINE_HALT, ASSERT_LINE);
 
-	dsp_type = DSP_TYPE_TGP;
+	state->dsp_type = DSP_TYPE_TGP;
 }
 
 static MACHINE_RESET(model2b)
 {
+	model2_state *state = machine->driver_data<model2_state>();
 	MACHINE_RESET_CALL(model2_common);
 	MACHINE_RESET_CALL(model2_scsp);
 
@@ -398,15 +392,16 @@ static MACHINE_RESET(model2b)
 	// clear FIFOOUT buffer full flag on SHARC
 	cputag_set_input_line(machine, "dsp", SHARC_INPUT_FLAG1, CLEAR_LINE);
 
-	dsp_type = DSP_TYPE_SHARC;
+	state->dsp_type = DSP_TYPE_SHARC;
 }
 
 static MACHINE_RESET(model2c)
 {
+	model2_state *state = machine->driver_data<model2_state>();
 	MACHINE_RESET_CALL(model2_common);
 	MACHINE_RESET_CALL(model2_scsp);
 
-	dsp_type = DSP_TYPE_TGPX4;
+	state->dsp_type = DSP_TYPE_TGPX4;
 }
 
 static void chcolor(running_machine *machine, pen_t color, UINT16 data)
@@ -416,19 +411,21 @@ static void chcolor(running_machine *machine, pen_t color, UINT16 data)
 
 static WRITE32_HANDLER( pal32_w )
 {
-	COMBINE_DATA(model2_paletteram32 + offset);
+	model2_state *state = space->machine->driver_data<model2_state>();
+	COMBINE_DATA(state->paletteram32 + offset);
 	if(ACCESSING_BITS_0_15)
-		chcolor(space->machine, offset * 2, model2_paletteram32[offset]);
+		chcolor(space->machine, offset * 2, state->paletteram32[offset]);
 	if(ACCESSING_BITS_16_31)
-		chcolor(space->machine, offset * 2 + 1, model2_paletteram32[offset] >> 16);
+		chcolor(space->machine, offset * 2 + 1, state->paletteram32[offset] >> 16);
 }
 
 static WRITE32_HANDLER( ctrl0_w )
 {
+	model2_state *state = space->machine->driver_data<model2_state>();
 	if(ACCESSING_BITS_0_7)
 	{
 		eeprom_device *device = space->machine->device<eeprom_device>("eeprom");
-		model2_ctrlmode = data & 0x01;
+		state->ctrlmode = data & 0x01;
 		eeprom_write_bit(device, data & 0x20);
 		eeprom_set_clock_line(device, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 		eeprom_set_cs_line(device, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
@@ -437,15 +434,17 @@ static WRITE32_HANDLER( ctrl0_w )
 
 static WRITE32_HANDLER( analog_2b_w )
 {
-	analog_channel = (data >> 16) & 0x07;
+	model2_state *state = space->machine->driver_data<model2_state>();
+	state->analog_channel = (data >> 16) & 0x07;
 }
 
 
 static READ32_HANDLER( fifoctl_r )
 {
+	model2_state *state = space->machine->driver_data<model2_state>();
 	UINT32 r = 0;
 
-	if (copro_fifoout_num == 0)
+	if (state->copro_fifoout_num == 0)
 	{
 		r |= 1;
 	}
@@ -461,9 +460,10 @@ static READ32_HANDLER( videoctl_r )
 
 static CUSTOM_INPUT( _1c00000_r )
 {
+	model2_state *state = field->port->machine->driver_data<model2_state>();
 	UINT32 ret = input_port_read(field->port->machine, "IN0");
 
-	if(model2_ctrlmode == 0)
+	if(state->ctrlmode == 0)
 	{
 		return ret;
 	}
@@ -476,12 +476,13 @@ static CUSTOM_INPUT( _1c00000_r )
 
 static CUSTOM_INPUT( _1c0001c_r )
 {
+	model2_state *state = field->port->machine->driver_data<model2_state>();
 	UINT32 iptval = 0x00ff;
-	if(analog_channel < 4)
+	if(state->analog_channel < 4)
 	{
 		static const char *const ports[] = { "ANA0", "ANA1", "ANA2", "ANA3" };
-		iptval = input_port_read_safe(field->port->machine, ports[analog_channel], 0);
-		++analog_channel;
+		iptval = input_port_read_safe(field->port->machine, ports[state->analog_channel], 0);
+		++state->analog_channel;
 	}
 	return iptval;
 }
@@ -555,7 +556,6 @@ static CUSTOM_INPUT( _1c0001c_r )
 
 */
 
-static UINT16 cmd_data;
 
 static CUSTOM_INPUT( rchase2_devices_r )
 {
@@ -564,19 +564,20 @@ static CUSTOM_INPUT( rchase2_devices_r )
 
 static WRITE32_HANDLER( rchase2_devices_w )
 {
+	model2_state *state = space->machine->driver_data<model2_state>();
 	/*
     0x00040000 start 1 lamp
     0x00080000 start 2 lamp
     */
 
 	if(mem_mask == 0x0000ffff)
-		cmd_data = data;
+		state->cmd_data = data;
 }
 
-static UINT8 driveio_comm_data;
 
 static WRITE32_HANDLER( srallyc_devices_w )
 {
+	model2_state *state = space->machine->driver_data<model2_state>();
 	/*
     0x00040000 start 1 lamp
     0x00200000 vr lamp
@@ -585,7 +586,7 @@ static WRITE32_HANDLER( srallyc_devices_w )
 
 	if(mem_mask == 0x000000ff || mem_mask == 0x0000ffff)
 	{
-		driveio_comm_data = data & 0xff;
+		state->driveio_comm_data = data & 0xff;
 		cputag_set_input_line(space->machine, "drivecpu", 0, HOLD_LINE);
 	}
 }
@@ -601,10 +602,11 @@ static READ32_HANDLER(copro_prg_r)
 
 static WRITE32_HANDLER(copro_prg_w)
 {
-	if (model2_coproctl & 0x80000000)
+	model2_state *state = space->machine->driver_data<model2_state>();
+	if (state->coproctl & 0x80000000)
 	{
-		logerror("copro_prg_w: %08X:   %08X\n", model2_coprocnt, data);
-		model2_coprocnt++;
+		logerror("copro_prg_w: %08X:   %08X\n", state->coprocnt, data);
+		state->coprocnt++;
 	}
 	else
 	{
@@ -614,20 +616,21 @@ static WRITE32_HANDLER(copro_prg_w)
 
 static WRITE32_HANDLER( copro_ctl1_w )
 {
+	model2_state *state = space->machine->driver_data<model2_state>();
 	// did hi bit change?
-	if ((data ^ model2_coproctl) == 0x80000000)
+	if ((data ^ state->coproctl) == 0x80000000)
 	{
 		if (data & 0x80000000)
 		{
 			logerror("Start copro upload\n");
-			model2_coprocnt = 0;
+			state->coprocnt = 0;
 		}
 		else
 		{
-			logerror("Boot copro, %d dwords\n", model2_coprocnt);
-			if (dsp_type != DSP_TYPE_TGPX4)
+			logerror("Boot copro, %d dwords\n", state->coprocnt);
+			if (state->dsp_type != DSP_TYPE_TGPX4)
 			{
-				if (dsp_type == DSP_TYPE_SHARC)
+				if (state->dsp_type == DSP_TYPE_SHARC)
 					cputag_set_input_line(space->machine, "dsp", INPUT_LINE_HALT, CLEAR_LINE);
 				else
 					cputag_set_input_line(space->machine, "tgp", INPUT_LINE_HALT, CLEAR_LINE);
@@ -635,17 +638,18 @@ static WRITE32_HANDLER( copro_ctl1_w )
 		}
 	}
 
-	model2_coproctl = data;
+	state->coproctl = data;
 }
 
 static WRITE32_HANDLER(copro_function_port_w)
 {
+	model2_state *state = space->machine->driver_data<model2_state>();
 	UINT32 d = data & 0x800fffff;
 	UINT32 a = (offset >> 2) & 0xff;
 	d |= a << 23;
 
 	//logerror("copro_function_port_w: %08X, %08X, %08X\n", data, offset, mem_mask);
-	if (dsp_type == DSP_TYPE_SHARC)
+	if (state->dsp_type == DSP_TYPE_SHARC)
 		copro_fifoin_push(space->machine->device("dsp"), d);
 	else
 		copro_fifoin_push(space->machine->device("tgp"), d);
@@ -659,33 +663,33 @@ static READ32_HANDLER(copro_fifo_r)
 
 static WRITE32_HANDLER(copro_fifo_w)
 {
-	if (model2_coproctl & 0x80000000)
+	model2_state *state = space->machine->driver_data<model2_state>();
+	if (state->coproctl & 0x80000000)
 	{
-		if (dsp_type == DSP_TYPE_SHARC)
+		if (state->dsp_type == DSP_TYPE_SHARC)
 		{
-			sharc_external_dma_write(space->machine->device("dsp"), model2_coprocnt, data & 0xffff);
+			sharc_external_dma_write(space->machine->device("dsp"), state->coprocnt, data & 0xffff);
 		}
-		else if (dsp_type == DSP_TYPE_TGP)
+		else if (state->dsp_type == DSP_TYPE_TGP)
 		{
-			tgp_program[model2_coprocnt] = data;
+			state->tgp_program[state->coprocnt] = data;
 		}
 
-		model2_coprocnt++;
+		state->coprocnt++;
 	}
 	else
 	{
 		//mame_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
-		if (dsp_type == DSP_TYPE_SHARC)
+		if (state->dsp_type == DSP_TYPE_SHARC)
 			copro_fifoin_push(space->machine->device("dsp"), data);
 		else
 			copro_fifoin_push(space->machine->device("tgp"), data);
 	}
 }
 
-static int iop_write_num = 0;
-static UINT32 iop_data = 0;
 static WRITE32_HANDLER(copro_sharc_iop_w)
 {
+	model2_state *state = space->machine->driver_data<model2_state>();
 	/* FIXME: clean this up */
 	if ((strcmp(space->machine->gamedrv->name, "schamp" ) == 0) ||
 		(strcmp(space->machine->gamedrv->name, "sfight" ) == 0) ||
@@ -701,16 +705,16 @@ static WRITE32_HANDLER(copro_sharc_iop_w)
 	}
 	else
 	{
-		if ((iop_write_num & 1) == 0)
+		if ((state->iop_write_num & 1) == 0)
 		{
-			iop_data = data & 0xffff;
+			state->iop_data = data & 0xffff;
 		}
 		else
 		{
-			iop_data |= (data & 0xffff) << 16;
-			sharc_external_iop_write(space->machine->device("dsp"), offset, iop_data);
+			state->iop_data |= (data & 0xffff) << 16;
+			sharc_external_iop_write(space->machine->device("dsp"), offset, state->iop_data);
 		}
-		iop_write_num++;
+		state->iop_write_num++;
 	}
 }
 
@@ -721,49 +725,49 @@ static WRITE32_HANDLER(copro_sharc_iop_w)
 /*****************************************************************************/
 /* GEO */
 
-UINT32 geo_read_start_address = 0;
-UINT32 geo_write_start_address = 0;
 
 static WRITE32_HANDLER( geo_ctl1_w )
 {
+	model2_state *state = space->machine->driver_data<model2_state>();
 	// did hi bit change?
-	if ((data ^ model2_geoctl) == 0x80000000)
+	if ((data ^ state->geoctl) == 0x80000000)
 	{
 		if (data & 0x80000000)
 		{
-			logerror("Start geo upload\n");
-			model2_geocnt = 0;
+			logerror("Start state->geo upload\n");
+			state->geocnt = 0;
 		}
 		else
 		{
-			logerror("Boot geo, %d dwords\n", model2_geocnt);
+			logerror("Boot state->geo, %d dwords\n", state->geocnt);
 		}
 	}
 
-	model2_geoctl = data;
+	state->geoctl = data;
 }
 
 
 #ifdef UNUSED_FUNCTION
 static WRITE32_HANDLER( geo_sharc_ctl1_w )
 {
+	model2_state *state = space->machine->driver_data<model2_state>();
     // did hi bit change?
-    if ((data ^ model2_geoctl) == 0x80000000)
+    if ((data ^ state->geoctl) == 0x80000000)
     {
         if (data & 0x80000000)
         {
-            logerror("Start geo upload\n");
-            model2_geocnt = 0;
+            logerror("Start state->geo upload\n");
+            state->geocnt = 0;
         }
         else
         {
-            logerror("Boot geo, %d dwords\n", model2_geocnt);
+            logerror("Boot state->geo, %d dwords\n", state->geocnt);
             cputag_set_input_line(space->machine, "dsp2", INPUT_LINE_HALT, CLEAR_LINE);
             //cpu_spinuntil_time(space->cpu, attotime::from_usec(1000));       // Give the SHARC enough time to boot itself
         }
     }
 
-    model2_geoctl = data;
+    state->geoctl = data;
 }
 
 static READ32_HANDLER(geo_sharc_fifo_r)
@@ -781,11 +785,12 @@ static READ32_HANDLER(geo_sharc_fifo_r)
 
 static WRITE32_HANDLER(geo_sharc_fifo_w)
 {
-    if (model2_geoctl & 0x80000000)
+	model2_state *state = space->machine->driver_data<model2_state>();
+    if (state->geoctl & 0x80000000)
     {
-        sharc_external_dma_write(space->machine->device("dsp2"), model2_geocnt, data & 0xffff);
+        sharc_external_dma_write(space->machine->device("dsp2"), state->geocnt, data & 0xffff);
 
-        model2_geocnt++;
+        state->geocnt++;
     }
     else
     {
@@ -793,36 +798,35 @@ static WRITE32_HANDLER(geo_sharc_fifo_w)
     }
 }
 
-static int geo_iop_write_num = 0;
-static UINT32 geo_iop_data = 0;
 static WRITE32_HANDLER(geo_sharc_iop_w)
 {
+	model2_state *state = space->machine->driver_data<model2_state>();
     if ((strcmp(space->machine->gamedrv->name, "schamp" ) == 0))
     {
         sharc_external_iop_write(space->machine->device("dsp2"), offset, data);
     }
     else
     {
-        if ((geo_iop_write_num & 1) == 0)
+        if ((state->geo_iop_write_num & 1) == 0)
         {
-            geo_iop_data = data & 0xffff;
+            state->geo_iop_data = data & 0xffff;
         }
         else
         {
-            geo_iop_data |= (data & 0xffff) << 16;
-            sharc_external_iop_write(space->machine->device("dsp2"), offset, geo_iop_data);
+            state->geo_iop_data |= (data & 0xffff) << 16;
+            sharc_external_iop_write(space->machine->device("dsp2"), offset, state->geo_iop_data);
         }
-        geo_iop_write_num++;
+        state->geo_iop_write_num++;
     }
 }
 #endif
 
 
-static void push_geo_data(UINT32 data)
+static void push_geo_data(model2_state *state, UINT32 data)
 {
-	//mame_printf_debug("push_geo_data: %08X: %08X\n", 0x900000+geo_write_start_address, data);
-	model2_bufferram[geo_write_start_address/4] = data;
-	geo_write_start_address += 4;
+	//mame_printf_debug("push_geo_data: %08X: %08X\n", 0x900000+state->geo_write_start_address, data);
+	state->bufferram[state->geo_write_start_address/4] = data;
+	state->geo_write_start_address += 4;
 }
 
 static READ32_HANDLER(geo_prg_r)
@@ -832,28 +836,30 @@ static READ32_HANDLER(geo_prg_r)
 
 static WRITE32_HANDLER(geo_prg_w)
 {
-	if (model2_geoctl & 0x80000000)
+	model2_state *state = space->machine->driver_data<model2_state>();
+	if (state->geoctl & 0x80000000)
 	{
-		//logerror("geo_prg_w: %08X:   %08X\n", model2_geocnt, data);
-		model2_geocnt++;
+		//logerror("geo_prg_w: %08X:   %08X\n", state->geocnt, data);
+		state->geocnt++;
 	}
 	else
 	{
-		//mame_printf_debug("GEO: %08X: push %08X\n", geo_write_start_address, data);
-		push_geo_data(data);
+		//mame_printf_debug("GEO: %08X: push %08X\n", state->geo_write_start_address, data);
+		push_geo_data(state, data);
 	}
 }
 
 static READ32_HANDLER( geo_r )
 {
+	model2_state *state = space->machine->driver_data<model2_state>();
 	int address = offset * 4;
 	if (address == 0x2008)
 	{
-		return geo_write_start_address;
+		return state->geo_write_start_address;
 	}
 	else if (address == 0x3008)
 	{
-		return geo_read_start_address;
+		return state->geo_read_start_address;
 	}
 
 //  fatalerror("geo_r: %08X, %08X\n", address, mem_mask);
@@ -864,6 +870,7 @@ static READ32_HANDLER( geo_r )
 
 static WRITE32_HANDLER( geo_w )
 {
+	model2_state *state = space->machine->driver_data<model2_state>();
 	int address = offset * 4;
 
 	if (address < 0x1000)
@@ -877,7 +884,7 @@ static WRITE32_HANDLER( geo_w )
             for (i=0; i < 4; i++)
             {
                 mame_printf_debug("   %08X: %08X %08X %08X %08X\n", 0x900000+(a*4)+(i*16),
-                    model2_bufferram[a+(i*4)+0], model2_bufferram[a+(i*4)+1], model2_bufferram[a+(i*4)+2], model2_bufferram[a+(i*4)+3]);
+                    state->bufferram[a+(i*4)+0], state->bufferram[a+(i*4)+1], state->bufferram[a+(i*4)+2], state->bufferram[a+(i*4)+3]);
             }
         }
         else
@@ -901,7 +908,7 @@ static WRITE32_HANDLER( geo_w )
 			UINT32 r = 0;
 			r |= data & 0x800fffff;
 			r |= ((address >> 4) & 0x3f) << 23;
-			push_geo_data(r);
+			push_geo_data(state, r);
 		}
 		else
 		{
@@ -910,19 +917,19 @@ static WRITE32_HANDLER( geo_w )
 				UINT32 r = 0;
 				r |= data & 0x000fffff;
 				r |= ((address >> 4) & 0x3f) << 23;
-				push_geo_data(r);
+				push_geo_data(state, r);
 			}
 		}
 	}
 	else if (address == 0x1008)
 	{
 		//mame_printf_debug("GEO: Write Start Address: %08X\n", data);
-		geo_write_start_address = data & 0xfffff;
+		state->geo_write_start_address = data & 0xfffff;
 	}
 	else if (address == 0x3008)
 	{
 		//mame_printf_debug("GEO: Read Start Address: %08X\n", data);
-		geo_read_start_address = data & 0xfffff;
+		state->geo_read_start_address = data & 0xfffff;
 	}
 	else
 	{
@@ -960,30 +967,31 @@ static READ32_HANDLER(desert_unk_r)
 
 static READ32_HANDLER(model2_irq_r)
 {
+	model2_state *state = space->machine->driver_data<model2_state>();
 	i960_noburst(space->cpu);
 
 	if (offset)
 	{
-		return model2_intena;
+		return state->intena;
 	}
 
-	return model2_intreq;
+	return state->intreq;
 }
 
 static WRITE32_HANDLER(model2_irq_w)
 {
+	model2_state *state = space->machine->driver_data<model2_state>();
 	i960_noburst(space->cpu);
 
 	if (offset)
 	{
-		COMBINE_DATA(&model2_intena);
+		COMBINE_DATA(&state->intena);
 		return;
 	}
 
-	model2_intreq &= data;
+	state->intreq &= data;
 }
 
-static int to_68k;
 
 static int snd_68k_ready_r(address_space *space)
 {
@@ -1000,12 +1008,13 @@ static int snd_68k_ready_r(address_space *space)
 
 static void snd_latch_to_68k_w(address_space *space, int data)
 {
+	model2_state *state = space->machine->driver_data<model2_state>();
 	if (!snd_68k_ready_r(space))
 	{
 		cpu_spinuntil_time(space->cpu, attotime::from_usec(40));
 	}
 
-	to_68k = data;
+	state->to_68k = data;
 
 	cputag_set_input_line(space->machine, "audiocpu", 2, HOLD_LINE);
 
@@ -1059,12 +1068,10 @@ static const UINT8 DCOPKey1326[]=
 {
 	0x43,0x66,0x54,0x11,0x99,0xfe,0xcc,0x8e,0xdd,0x87,0x11,0x89,0x22,0xdf,0x44,0x09
 };
-static int protstate, protpos;
-static UINT8 protram[256];
 
 static READ32_HANDLER( model2_prot_r )
 {
-	static int a = 0;
+	model2_state *state = space->machine->driver_data<model2_state>();
 	UINT32 retval = 0;
 
 	if (offset == 0x10000/4)
@@ -1074,19 +1081,19 @@ static READ32_HANDLER( model2_prot_r )
 	}
 	else if (offset == 0x1000e/4)
 	{
-		retval = protram[protstate+1] | protram[protstate]<<8;
+		retval = state->protram[state->protstate+1] | state->protram[state->protstate]<<8;
 		retval <<= 16;
-		protstate+=2;
+		state->protstate+=2;
 	}
 	else if (offset == 0x7ff8/4)
 	{
-		retval = protram[protstate+1] | protram[protstate]<<8;
-		protstate+=2;
+		retval = state->protram[state->protstate+1] | state->protram[state->protstate]<<8;
+		state->protstate+=2;
 	}
 	else if (offset == 0x400c/4)
 	{
-		a = !a;
-		if (a)
+		state->prot_a = !state->prot_a;
+		if (state->prot_a)
 			return 0xffff;
 		else
 			return 0xfff0;
@@ -1098,6 +1105,7 @@ static READ32_HANDLER( model2_prot_r )
 
 static WRITE32_HANDLER( model2_prot_w )
 {
+	model2_state *state = space->machine->driver_data<model2_state>();
 	if (mem_mask == 0xffff0000)
 	{
 		data >>= 16;
@@ -1105,7 +1113,7 @@ static WRITE32_HANDLER( model2_prot_w )
 
 	if (offset == 0x10008/4)
 	{
-		protpos = data;
+		state->protpos = data;
 	}
 	else if (offset == 0x1000c/4)
 	{
@@ -1113,13 +1121,13 @@ static WRITE32_HANDLER( model2_prot_w )
 		{
 			// dynamcop
 			case 0x7700:
-				strcpy((char *)protram+2, "UCHIDA MOMOKA   ");
+				strcpy((char *)state->protram+2, "UCHIDA MOMOKA   ");
 				break;
 
 			// dynamcop
 			case 0x1326:
-				protstate = 0;
-				memcpy(protram+2, DCOPKey1326, sizeof(DCOPKey1326));
+				state->protstate = 0;
+				memcpy(state->protram+2, DCOPKey1326, sizeof(DCOPKey1326));
 				break;
 
 			// zerogun
@@ -1138,18 +1146,18 @@ static WRITE32_HANDLER( model2_prot_w )
 			case 0x98CC:
 			case 0x3422:
 			case 0x10:
-				protstate = 0;
-				memcpy(protram+2, ZGUNProt+((2*protpos)/12)*8, sizeof(ZGUNProt));
+				state->protstate = 0;
+				memcpy(state->protram+2, ZGUNProt+((2*state->protpos)/12)*8, sizeof(ZGUNProt));
 				break;
 
 			// pltkids
 			case 0x7140:
-				protstate = 0;
-				strcpy((char *)protram+2, "98-PILOT  ");
+				state->protstate = 0;
+				strcpy((char *)state->protram+2, "98-PILOT  ");
 				break;
 
 			default:
-				protstate = 0;
+				state->protstate = 0;
 				break;
 		}
 	}
@@ -1157,8 +1165,8 @@ static WRITE32_HANDLER( model2_prot_w )
 	{
 		if (data == 0)
 		{
-			protstate = 0;
-			strcpy((char *)protram, "  TECMO LTD.  DEAD OR ALIVE  1996.10.22  VER. 1.00");
+			state->protstate = 0;
+			strcpy((char *)state->protram, "  TECMO LTD.  DEAD OR ALIVE  1996.10.22  VER. 1.00");
 		}
 	}
 	else logerror("Unhandled Protection WRITE %x @ %x mask %x (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
@@ -1167,10 +1175,10 @@ static WRITE32_HANDLER( model2_prot_w )
 
 /* Daytona "To The MAXX" PIC protection simulation */
 
-static int model2_maxxstate = 0;
 
 static READ32_HANDLER( maxx_r )
 {
+	model2_state *state = space->machine->driver_data<model2_state>();
 	UINT32 *ROM = (UINT32 *)space->machine->region("maincpu")->base();
 
 	if (offset <= 0x1f/4)
@@ -1179,15 +1187,15 @@ static READ32_HANDLER( maxx_r )
 		if (mem_mask == 0xffff0000)
 		{
 			// 16-bit protection reads
-			model2_maxxstate++;
-			model2_maxxstate &= 0xf;
-			if (!model2_maxxstate)
+			state->maxxstate++;
+			state->maxxstate &= 0xf;
+			if (!state->maxxstate)
 			{
 				return 0x00070000;
 			}
 			else
 			{
-				if (model2_maxxstate & 0x2)
+				if (state->maxxstate & 0x2)
 				{
 					return 0;
 				}
@@ -1212,12 +1220,11 @@ static READ32_HANDLER( maxx_r )
 
 /* Network board emulation */
 
-static UINT32 model2_netram[0x8000/4];
 
-static int zflagi, zflag, sysres;
 
 static READ32_HANDLER( network_r )
 {
+	model2_state *state = space->machine->driver_data<model2_state>();
 	if ((mem_mask == 0xffffffff) || (mem_mask == 0x0000ffff) || (mem_mask == 0xffff0000))
 	{
 		return 0xffffffff;
@@ -1225,16 +1232,16 @@ static READ32_HANDLER( network_r )
 
 	if (offset < 0x4000/4)
 	{
-		return model2_netram[offset];
+		return state->netram[offset];
 	}
 
 	if (mem_mask == 0x00ff0000)
 	{
-		return sysres<<16;
+		return state->sysres<<16;
 	}
 	else if (mem_mask == 0x000000ff)
 	{
-		return zflagi;
+		return state->zflagi;
 	}
 
 	return 0xffffffff;
@@ -1242,28 +1249,29 @@ static READ32_HANDLER( network_r )
 
 static WRITE32_HANDLER( network_w )
 {
+	model2_state *state = space->machine->driver_data<model2_state>();
 	if ((mem_mask == 0xffffffff) || (mem_mask == 0x0000ffff) || (mem_mask == 0xffff0000))
 	{
-		COMBINE_DATA(&model2_netram[offset+0x4000/4]);
+		COMBINE_DATA(&state->netram[offset+0x4000/4]);
 		return;
 	}
 
 	if (offset < 0x4000/4)
 	{
-		COMBINE_DATA(&model2_netram[offset]);
+		COMBINE_DATA(&state->netram[offset]);
 		return;
 	}
 
 	if (mem_mask == 0x00ff0000)
 	{
-		sysres = data>>16;
+		state->sysres = data>>16;
 	}
 	else if (mem_mask == 0x000000ff)
 	{
-		zflagi = data;
-		zflag = 0;
-		if (data & 0x01) zflag |= 0x80;
-		if (data & 0x80) zflag |= 0x01;
+		state->zflagi = data;
+		state->zflag = 0;
+		if (data & 0x01) state->zflag |= 0x80;
+		if (data & 0x80) state->zflag |= 0x01;
 	}
 }
 
@@ -1294,56 +1302,59 @@ static WRITE32_HANDLER(mode_w)
 
 static WRITE32_HANDLER(model2o_tex_w0)
 {
+	model2_state *state = space->machine->driver_data<model2_state>();
 	if ( (offset & 1) == 0 )
 	{
-		model2_textureram0[offset>>1] &= 0xffff0000;
-		model2_textureram0[offset>>1] |= data & 0xffff;
+		state->textureram0[offset>>1] &= 0xffff0000;
+		state->textureram0[offset>>1] |= data & 0xffff;
 	}
 	else
 	{
-		model2_textureram0[offset>>1] &= 0x0000ffff;
-		model2_textureram0[offset>>1] |= (data & 0xffff) << 16;
+		state->textureram0[offset>>1] &= 0x0000ffff;
+		state->textureram0[offset>>1] |= (data & 0xffff) << 16;
 	}
 }
 
 static WRITE32_HANDLER(model2o_tex_w1)
 {
+	model2_state *state = space->machine->driver_data<model2_state>();
 	if ( (offset & 1) == 0 )
 	{
-		model2_textureram1[offset>>1] &= 0xffff0000;
-		model2_textureram1[offset>>1] |= data & 0xffff;
+		state->textureram1[offset>>1] &= 0xffff0000;
+		state->textureram1[offset>>1] |= data & 0xffff;
 	}
 	else
 	{
-		model2_textureram1[offset>>1] &= 0x0000ffff;
-		model2_textureram1[offset>>1] |= (data & 0xffff) << 16;
+		state->textureram1[offset>>1] &= 0x0000ffff;
+		state->textureram1[offset>>1] |= (data & 0xffff) << 16;
 	}
 }
 
 static WRITE32_HANDLER(model2o_luma_w)
 {
+	model2_state *state = space->machine->driver_data<model2_state>();
 	if ( (offset & 1) == 0 )
 	{
-		model2_lumaram[offset>>1] &= 0xffff0000;
-		model2_lumaram[offset>>1] |= data & 0xffff;
+		state->lumaram[offset>>1] &= 0xffff0000;
+		state->lumaram[offset>>1] |= data & 0xffff;
 	}
 	else
 	{
-		model2_lumaram[offset>>1] &= 0x0000ffff;
-		model2_lumaram[offset>>1] |= (data & 0xffff) << 16;
+		state->lumaram[offset>>1] &= 0x0000ffff;
+		state->lumaram[offset>>1] |= (data & 0xffff) << 16;
 	}
 }
 
 static WRITE32_HANDLER(model2_3d_zclip_w)
 {
-	model2_3d_set_zclip( data & 0xFF );
+	model2_3d_set_zclip( space->machine, data & 0xFF );
 }
 
 /* common map for all Model 2 versions */
 static ADDRESS_MAP_START( model2_base_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_WRITENOP
 
-	AM_RANGE(0x00500000, 0x005fffff) AM_RAM AM_BASE(&model2_workram)
+	AM_RANGE(0x00500000, 0x005fffff) AM_RAM AM_BASE_MEMBER(model2_state, workram)
 
 	AM_RANGE(0x00800000, 0x00803fff) AM_READWRITE(geo_r, geo_w)
 	//AM_RANGE(0x00800010, 0x00800013) AM_WRITENOP
@@ -1352,7 +1363,7 @@ static ADDRESS_MAP_START( model2_base_mem, ADDRESS_SPACE_PROGRAM, 32 )
 
 	//AM_RANGE(0x00880000, 0x00883fff) AM_WRITE(copro_w)
 
-	AM_RANGE(0x00900000, 0x0097ffff) AM_RAM AM_BASE(&model2_bufferram)
+	AM_RANGE(0x00900000, 0x0097ffff) AM_RAM AM_BASE_MEMBER(model2_state, bufferram)
 
 
 	AM_RANGE(0x00980004, 0x00980007) AM_READ(fifoctl_r)
@@ -1371,8 +1382,8 @@ static ADDRESS_MAP_START( model2_base_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x01100000, 0x0110ffff) AM_READWRITE(sys24_tile32_r, sys24_tile32_w) AM_MIRROR(0x10000)
 	AM_RANGE(0x01180000, 0x011fffff) AM_READWRITE(sys24_char32_r, sys24_char32_w) AM_MIRROR(0x100000)
 
-	AM_RANGE(0x01800000, 0x01803fff) AM_RAM_WRITE(pal32_w) AM_BASE(&model2_paletteram32)
-	AM_RANGE(0x01810000, 0x0181bfff) AM_RAM AM_BASE(&model2_colorxlat)
+	AM_RANGE(0x01800000, 0x01803fff) AM_RAM_WRITE(pal32_w) AM_BASE_MEMBER(model2_state, paletteram32)
+	AM_RANGE(0x01810000, 0x0181bfff) AM_RAM AM_BASE_MEMBER(model2_state, colorxlat)
 	AM_RANGE(0x0181c000, 0x0181c003) AM_WRITE(model2_3d_zclip_w)
 	AM_RANGE(0x01a10000, 0x01a1ffff) AM_READWRITE(network_r, network_w)
 	AM_RANGE(0x01d00000, 0x01d03fff) AM_RAM AM_SHARE("backup1") // Backup sram
@@ -1402,9 +1413,9 @@ static ADDRESS_MAP_START( model2o_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE( geo_ctl1_w )
 	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE( model2_serial_r, model2o_serial_w )
 
-	AM_RANGE(0x12000000, 0x121fffff) AM_RAM_WRITE(model2o_tex_w0) AM_MIRROR(0x200000) AM_BASE(&model2_textureram0)	// texture RAM 0
-	AM_RANGE(0x12400000, 0x125fffff) AM_RAM_WRITE(model2o_tex_w1) AM_MIRROR(0x200000) AM_BASE(&model2_textureram1)	// texture RAM 1
-	AM_RANGE(0x12800000, 0x1281ffff) AM_RAM_WRITE(model2o_luma_w) AM_BASE(&model2_lumaram) // polygon "luma" RAM
+	AM_RANGE(0x12000000, 0x121fffff) AM_RAM_WRITE(model2o_tex_w0) AM_MIRROR(0x200000) AM_BASE_MEMBER(model2_state, textureram0)	// texture RAM 0
+	AM_RANGE(0x12400000, 0x125fffff) AM_RAM_WRITE(model2o_tex_w1) AM_MIRROR(0x200000) AM_BASE_MEMBER(model2_state, textureram1)	// texture RAM 1
+	AM_RANGE(0x12800000, 0x1281ffff) AM_RAM_WRITE(model2o_luma_w) AM_BASE_MEMBER(model2_state, lumaram) // polygon "luma" RAM
 
 	AM_RANGE(0x01c00000, 0x01c00003) AM_READ_PORT("1c00000")
 	AM_RANGE(0x01c00004, 0x01c00007) AM_READ_PORT("1c00004")
@@ -1432,9 +1443,9 @@ static ADDRESS_MAP_START( model2a_crx_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE( geo_ctl1_w )
 	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE( model2_serial_r, model2_serial_w )
 
-	AM_RANGE(0x12000000, 0x121fffff) AM_RAM_WRITE(model2o_tex_w0) AM_MIRROR(0x200000) AM_BASE(&model2_textureram0)	// texture RAM 0
-	AM_RANGE(0x12400000, 0x125fffff) AM_RAM_WRITE(model2o_tex_w1) AM_MIRROR(0x200000) AM_BASE(&model2_textureram1)	// texture RAM 1
-	AM_RANGE(0x12800000, 0x1281ffff) AM_RAM_WRITE(model2o_luma_w) AM_BASE(&model2_lumaram) // polygon "luma" RAM
+	AM_RANGE(0x12000000, 0x121fffff) AM_RAM_WRITE(model2o_tex_w0) AM_MIRROR(0x200000) AM_BASE_MEMBER(model2_state, textureram0)	// texture RAM 0
+	AM_RANGE(0x12400000, 0x125fffff) AM_RAM_WRITE(model2o_tex_w1) AM_MIRROR(0x200000) AM_BASE_MEMBER(model2_state, textureram1)	// texture RAM 1
+	AM_RANGE(0x12800000, 0x1281ffff) AM_RAM_WRITE(model2o_luma_w) AM_BASE_MEMBER(model2_state, lumaram) // polygon "luma" RAM
 
 	AM_RANGE(0x01c00000, 0x01c00003) AM_READ_PORT("1c00000") AM_WRITE( ctrl0_w )
 	AM_RANGE(0x01c00004, 0x01c00007) AM_READ_PORT("1c00004")
@@ -1466,9 +1477,9 @@ static ADDRESS_MAP_START( model2b_crx_mem, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE( model2_serial_r, model2_serial_w )
 
-	AM_RANGE(0x11000000, 0x111fffff) AM_RAM	AM_BASE(&model2_textureram0)	// texture RAM 0 (2b/2c)
-	AM_RANGE(0x11200000, 0x113fffff) AM_RAM	AM_BASE(&model2_textureram1)	// texture RAM 1 (2b/2c)
-	AM_RANGE(0x11400000, 0x1140ffff) AM_RAM	AM_BASE(&model2_lumaram)		// polygon "luma" RAM (2b/2c)
+	AM_RANGE(0x11000000, 0x111fffff) AM_RAM	AM_BASE_MEMBER(model2_state, textureram0)	// texture RAM 0 (2b/2c)
+	AM_RANGE(0x11200000, 0x113fffff) AM_RAM	AM_BASE_MEMBER(model2_state, textureram1)	// texture RAM 1 (2b/2c)
+	AM_RANGE(0x11400000, 0x1140ffff) AM_RAM	AM_BASE_MEMBER(model2_state, lumaram)		// polygon "luma" RAM (2b/2c)
 
 
 	AM_RANGE(0x01c00000, 0x01c00003) AM_READ_PORT("1c00000") AM_WRITE( ctrl0_w )
@@ -1493,9 +1504,9 @@ static ADDRESS_MAP_START( model2c_crx_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE( geo_ctl1_w )
 	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE( model2_serial_r, model2_serial_w )
 
-	AM_RANGE(0x11000000, 0x111fffff) AM_RAM	AM_BASE(&model2_textureram0)	// texture RAM 0 (2b/2c)
-	AM_RANGE(0x11200000, 0x113fffff) AM_RAM	AM_BASE(&model2_textureram1)	// texture RAM 1 (2b/2c)
-	AM_RANGE(0x11400000, 0x1140ffff) AM_RAM	AM_BASE(&model2_lumaram)		// polygon "luma" RAM (2b/2c)
+	AM_RANGE(0x11000000, 0x111fffff) AM_RAM	AM_BASE_MEMBER(model2_state, textureram0)	// texture RAM 0 (2b/2c)
+	AM_RANGE(0x11200000, 0x113fffff) AM_RAM	AM_BASE_MEMBER(model2_state, textureram1)	// texture RAM 1 (2b/2c)
+	AM_RANGE(0x11400000, 0x1140ffff) AM_RAM	AM_BASE_MEMBER(model2_state, lumaram)		// polygon "luma" RAM (2b/2c)
 
 	AM_RANGE(0x01c00000, 0x01c00003) AM_READ_PORT("1c00000") AM_WRITE( ctrl0_w )
 	AM_RANGE(0x01c00004, 0x01c00007) AM_READ_PORT("1c00004")
@@ -1777,18 +1788,19 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN(model2_interrupt)
 {
+	model2_state *state = device->machine->driver_data<model2_state>();
 	switch (cpu_getiloops(device))
 	{
 		case 0:
-			model2_intreq |= (1<<10);
-			if (model2_intena & (1<<10))
+			state->intreq |= (1<<10);
+			if (state->intena & (1<<10))
 			{
 				cpu_set_input_line(device, I960_IRQ3, ASSERT_LINE);
 			}
 			break;
 		case 1:
-			model2_intreq |= (1<<0);
-			if (model2_intena & (1<<0))
+			state->intreq |= (1<<0);
+			if (state->intena & (1<<0))
 			{
 				cpu_set_input_line(device, I960_IRQ0, ASSERT_LINE);
 			}
@@ -1798,22 +1810,23 @@ static INTERRUPT_GEN(model2_interrupt)
 
 static INTERRUPT_GEN(model2c_interrupt)
 {
+	model2_state *state = device->machine->driver_data<model2_state>();
 	switch (cpu_getiloops(device))
 	{
 		case 0:
-			model2_intreq |= (1<<10);
-			if (model2_intena & (1<<10))
+			state->intreq |= (1<<10);
+			if (state->intena & (1<<10))
 				cpu_set_input_line(device, I960_IRQ3, ASSERT_LINE);
 			break;
 		case 1:
-			model2_intreq |= (1<<2);
-			if (model2_intena & (1<<2))
+			state->intreq |= (1<<2);
+			if (state->intena & (1<<2))
 				cpu_set_input_line(device, I960_IRQ2, ASSERT_LINE);
 
 			break;
 		case 2:
-			model2_intreq |= (1<<0);
-			if (model2_intena & (1<<0))
+			state->intreq |= (1<<0);
+			if (state->intena & (1<<0))
 				cpu_set_input_line(device, I960_IRQ0, ASSERT_LINE);
 			break;
 	}
@@ -1823,7 +1836,8 @@ static INTERRUPT_GEN(model2c_interrupt)
 
 static READ16_HANDLER( m1_snd_68k_latch_r )
 {
-	return to_68k;
+	model2_state *state = space->machine->driver_data<model2_state>();
+	return state->to_68k;
 }
 
 static READ16_HANDLER( m1_snd_v60_ready_r )
@@ -1880,7 +1894,7 @@ static WRITE16_HANDLER( model2snd_ctrl )
 }
 
 static ADDRESS_MAP_START( model2_snd, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION("audiocpu", 0) AM_BASE(&model2_soundram)
+	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION("audiocpu", 0) AM_BASE_MEMBER(model2_state, soundram)
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("scsp", scsp_r, scsp_w)
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(model2snd_ctrl)
 	AM_RANGE(0x600000, 0x67ffff) AM_ROM AM_REGION("audiocpu", 0x80000)
@@ -1889,13 +1903,13 @@ static ADDRESS_MAP_START( model2_snd, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xe00000, 0xffffff) AM_ROMBANK("bank5")
 ADDRESS_MAP_END
 
-static int scsp_last_line = 0;
 
 static void scsp_irq(device_t *device, int irq)
 {
+	model2_state *state = device->machine->driver_data<model2_state>();
 	if (irq > 0)
 	{
-		scsp_last_line = irq;
+		state->scsp_last_line = irq;
 		cputag_set_input_line(device->machine, "audiocpu", irq, ASSERT_LINE);
 	}
 	else
@@ -1930,13 +1944,15 @@ static WRITE32_HANDLER(copro_sharc_output_fifo_w)
 
 static READ32_HANDLER(copro_sharc_buffer_r)
 {
-	return model2_bufferram[offset & 0x7fff];
+	model2_state *state = space->machine->driver_data<model2_state>();
+	return state->bufferram[offset & 0x7fff];
 }
 
 static WRITE32_HANDLER(copro_sharc_buffer_w)
 {
+	model2_state *state = space->machine->driver_data<model2_state>();
 	//mame_printf_debug("sharc_buffer_w: %08X at %08X, %08X, %f\n", offset, cpu_get_pc(space->cpu), data, *(float*)&data);
-	model2_bufferram[offset & 0x7fff] = data;
+	state->bufferram[offset & 0x7fff] = data;
 }
 
 static ADDRESS_MAP_START( copro_sharc_map, ADDRESS_SPACE_DATA, 32 )
@@ -1956,16 +1972,18 @@ ADDRESS_MAP_END
 
 static READ32_HANDLER(copro_tgp_buffer_r)
 {
-	return model2_bufferram[offset & 0x7fff];
+	model2_state *state = space->machine->driver_data<model2_state>();
+	return state->bufferram[offset & 0x7fff];
 }
 
 static WRITE32_HANDLER(copro_tgp_buffer_w)
 {
-	model2_bufferram[offset&0x7fff] = data;
+	model2_state *state = space->machine->driver_data<model2_state>();
+	state->bufferram[offset&0x7fff] = data;
 }
 
 static ADDRESS_MAP_START( copro_tgp_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x00007fff) AM_RAM AM_BASE(&tgp_program)
+	AM_RANGE(0x00000000, 0x00007fff) AM_RAM AM_BASE_MEMBER(model2_state, tgp_program)
 	AM_RANGE(0x00400000, 0x00407fff) AM_READWRITE(copro_tgp_buffer_r, copro_tgp_buffer_w)
 	AM_RANGE(0xff800000, 0xff9fffff) AM_ROM AM_REGION("tgp", 0)
 ADDRESS_MAP_END
@@ -1982,7 +2000,7 @@ static const mb86233_cpu_core tgp_config =
 
 
 /* original Model 2 */
-static MACHINE_CONFIG_START( model2o, driver_device )
+static MACHINE_CONFIG_START( model2o, model2_state )
 	MCFG_CPU_ADD("maincpu", I960, 25000000)
 	MCFG_CPU_PROGRAM_MAP(model2o_mem)
 	MCFG_CPU_VBLANK_INT_HACK(model2_interrupt,2)
@@ -1994,6 +2012,7 @@ static MACHINE_CONFIG_START( model2o, driver_device )
 	MCFG_CPU_CONFIG(tgp_config)
 	MCFG_CPU_PROGRAM_MAP(copro_tgp_map)
 
+	MCFG_MACHINE_START(model2)
 	MCFG_MACHINE_RESET(model2o)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
@@ -2039,7 +2058,7 @@ static MACHINE_CONFIG_START( model2o, driver_device )
 MACHINE_CONFIG_END
 
 /* 2A-CRX */
-static MACHINE_CONFIG_START( model2a, driver_device )
+static MACHINE_CONFIG_START( model2a, model2_state )
 	MCFG_CPU_ADD("maincpu", I960, 25000000)
 	MCFG_CPU_PROGRAM_MAP(model2a_crx_mem)
 	MCFG_CPU_VBLANK_INT_HACK(model2_interrupt,2)
@@ -2051,6 +2070,7 @@ static MACHINE_CONFIG_START( model2a, driver_device )
 	MCFG_CPU_CONFIG(tgp_config)
 	MCFG_CPU_PROGRAM_MAP(copro_tgp_map)
 
+	MCFG_MACHINE_START(model2)
 	MCFG_MACHINE_RESET(model2)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
@@ -2089,7 +2109,8 @@ MACHINE_CONFIG_END
 
 static READ8_HANDLER( driveio_port_r )
 {
-	return driveio_comm_data;
+	model2_state *state = space->machine->driver_data<model2_state>();
+	return state->driveio_comm_data;
 }
 
 static WRITE8_HANDLER( driveio_port_w )
@@ -2134,7 +2155,7 @@ static const sharc_config sharc_cfg =
 };
 
 /* 2B-CRX */
-static MACHINE_CONFIG_START( model2b, driver_device )
+static MACHINE_CONFIG_START( model2b, model2_state )
 	MCFG_CPU_ADD("maincpu", I960, 25000000)
 	MCFG_CPU_PROGRAM_MAP(model2b_crx_mem)
 	MCFG_CPU_VBLANK_INT_HACK(model2_interrupt,2)
@@ -2152,6 +2173,7 @@ static MACHINE_CONFIG_START( model2b, driver_device )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(18000))
 
+	MCFG_MACHINE_START(model2)
 	MCFG_MACHINE_RESET(model2b)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
@@ -2189,7 +2211,7 @@ static MACHINE_CONFIG_START( model2b, driver_device )
 MACHINE_CONFIG_END
 
 /* 2C-CRX */
-static MACHINE_CONFIG_START( model2c, driver_device )
+static MACHINE_CONFIG_START( model2c, model2_state )
 	MCFG_CPU_ADD("maincpu", I960, 25000000)
 	MCFG_CPU_PROGRAM_MAP(model2c_crx_mem)
 	MCFG_CPU_VBLANK_INT_HACK(model2c_interrupt,3)
@@ -2197,6 +2219,7 @@ static MACHINE_CONFIG_START( model2c, driver_device )
 	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(model2_snd)
 
+	MCFG_MACHINE_START(model2)
 	MCFG_MACHINE_RESET(model2c)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
@@ -4971,16 +4994,18 @@ ROM_END
 
 static DRIVER_INIT( genprot )
 {
+	model2_state *state = machine->driver_data<model2_state>();
 	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
-	protstate = protpos = 0;
+	state->protstate = state->protpos = 0;
 }
 
 static DRIVER_INIT( pltkids )
 {
+	model2_state *state = machine->driver_data<model2_state>();
 	UINT32 *ROM = (UINT32 *)machine->region("maincpu")->base();
 
 	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
-	protstate = protpos = 0;
+	state->protstate = state->protpos = 0;
 
 	// fix bug in program: it destroys the interrupt table and never fixes it
 	ROM[0x730/4] = 0x08000004;
@@ -4988,10 +5013,11 @@ static DRIVER_INIT( pltkids )
 
 static DRIVER_INIT( zerogun )
 {
+	model2_state *state = machine->driver_data<model2_state>();
 	UINT32 *ROM = (UINT32 *)machine->region("maincpu")->base();
 
 	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
-	protstate = protpos = 0;
+	state->protstate = state->protpos = 0;
 
 	// fix bug in program: it destroys the interrupt table and never fixes it
 	ROM[0x700/4] = 0x08000004;
@@ -5003,40 +5029,42 @@ static DRIVER_INIT( daytonam )
 }
 
 /* very crude support for let the game set itself into stand-alone mode */
-static int jnet_time_out;
 
 static READ32_HANDLER( jaleco_network_r )
 {
+	model2_state *state = space->machine->driver_data<model2_state>();
 	if(offset == 0x4000/4)
 	{
-		if(model2_netram[offset] == 0x00000000)
-			jnet_time_out = 0;
+		if(state->netram[offset] == 0x00000000)
+			state->jnet_time_out = 0;
 
-		if((model2_netram[offset] & 0xffff) == 0x0001)
-			jnet_time_out++;
+		if((state->netram[offset] & 0xffff) == 0x0001)
+			state->jnet_time_out++;
 
-		if(jnet_time_out > 0x80)
-			model2_netram[offset]|= 0x00800000;
+		if(state->jnet_time_out > 0x80)
+			state->netram[offset]|= 0x00800000;
 
-		return model2_netram[offset];
+		return state->netram[offset];
 	}
 
-	return model2_netram[offset];
+	return state->netram[offset];
 }
 
 static WRITE32_HANDLER( jaleco_network_w )
 {
-	COMBINE_DATA(&model2_netram[offset]);
+	model2_state *state = space->machine->driver_data<model2_state>();
+	COMBINE_DATA(&state->netram[offset]);
 }
 
 static DRIVER_INIT( sgt24h )
 {
+	model2_state *state = machine->driver_data<model2_state>();
 	UINT32 *ROM = (UINT32 *)machine->region("maincpu")->base();
 
 	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01a10000, 0x01a1ffff, 0, 0, jaleco_network_r, jaleco_network_w);
 
-	protstate = protpos = 0;
+	state->protstate = state->protpos = 0;
 
 	ROM[0x56578/4] = 0x08000004;
 	ROM[0x5b3e8/4] = 0x08000004;
@@ -5052,10 +5080,11 @@ static DRIVER_INIT( overrev )
 
 static DRIVER_INIT( doa )
 {
+	model2_state *state = machine->driver_data<model2_state>();
 	UINT32 *ROM = (UINT32 *)machine->region("maincpu")->base();
 
 	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
-	protstate = protpos = 0;
+	state->protstate = state->protpos = 0;
 
 	ROM[0x630/4] = 0x08000004;
 	ROM[0x808/4] = 0x08000004;

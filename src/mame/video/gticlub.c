@@ -1,6 +1,7 @@
 #include "emu.h"
 #include "cpu/sharc/sharc.h"
 #include "machine/konppc.h"
+#include "video/voodoo.h"
 #include "video/poly.h"
 #include "video/konicdev.h"
 #include "video/gticlub.h"
@@ -17,8 +18,12 @@ struct _poly_extra_data
 	int texture_mirror_y;
 };
 
-extern UINT8 gticlub_led_reg0;
-extern UINT8 gticlub_led_reg1;
+static UINT8 gticlub_led_reg[2];
+
+void gticlub_led_setreg(int offset, UINT8 data)
+{
+	gticlub_led_reg[offset] = data;
+}
 
 
 /*****************************************************************************/
@@ -967,6 +972,7 @@ static int debug_tex_palette = 0;
 
 VIDEO_START( gticlub )
 {
+	gticlub_led_reg[0] = gticlub_led_reg[1] = 0x7f;
 	tick = 0;
 	debug_tex_page = 0;
 	debug_tex_palette = 0;
@@ -1035,11 +1041,44 @@ VIDEO_UPDATE( gticlub )
     }
 #endif
 
-	draw_7segment_led(bitmap, 3, 3, gticlub_led_reg0);
-	draw_7segment_led(bitmap, 9, 3, gticlub_led_reg1);
+	draw_7segment_led(bitmap, 3, 3, gticlub_led_reg[0]);
+	draw_7segment_led(bitmap, 9, 3, gticlub_led_reg[1]);
 
 	//cputag_set_input_line(screen->machine, "dsp", SHARC_INPUT_FLAG1, ASSERT_LINE);
 	sharc_set_flag_input(screen->machine->device("dsp"), 1, ASSERT_LINE);
+	return 0;
+}
+
+VIDEO_UPDATE( hangplt )
+{
+	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
+
+	if (strcmp(screen->tag(), "lscreen") == 0)
+	{
+		device_t *k001604 = screen->machine->device("k001604_1");
+		device_t *voodoo = screen->machine->device("voodoo0");
+
+	//  k001604_draw_back_layer(k001604, bitmap, cliprect);
+
+		voodoo_update(voodoo, bitmap, cliprect);
+
+		k001604_draw_front_layer(k001604, bitmap, cliprect);
+	}
+	else if (strcmp(screen->tag(), "rscreen") == 0)
+	{
+		device_t *k001604 = screen->machine->device("k001604_2");
+		device_t *voodoo = screen->machine->device("voodoo1");
+
+	//  k001604_draw_back_layer(k001604, bitmap, cliprect);
+
+		voodoo_update(voodoo, bitmap, cliprect);
+
+		k001604_draw_front_layer(k001604, bitmap, cliprect);
+	}
+
+	draw_7segment_led(bitmap, 3, 3, gticlub_led_reg[0]);
+	draw_7segment_led(bitmap, 9, 3, gticlub_led_reg[1]);
+
 	return 0;
 }
 

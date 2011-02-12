@@ -1,3 +1,26 @@
+class mystwarr_state : public driver_device
+{
+public:
+	mystwarr_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16 *gx_workram;
+	UINT8 mw_irq_control;
+	int cur_sound_region;
+	int layer_colorbase[6];
+	int oinprion;
+	int cbparam;
+	int sprite_colorbase;
+	int sub1_colorbase;
+	int last_psac_colorbase;
+	int gametype;
+	int roz_enable;
+	int roz_rombank;
+	tilemap_t *ult_936_tilemap;
+	UINT16 clip;
+};
+
+
 /*----------- defined in video/mystwarr.c -----------*/
 
 VIDEO_START( gaiapols );

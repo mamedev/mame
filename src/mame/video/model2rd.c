@@ -58,15 +58,16 @@ static void MODEL2_FUNC_NAME(void *dest, INT32 scanline, const poly_extent *exte
 {
 #if !defined( MODEL2_TRANSLUCENT)
 	const poly_extra_data *extra = (const poly_extra_data *)extradata;
+	model2_state *state = extra->state;
 	bitmap_t *destmap = (bitmap_t *)dest;
 	UINT32 *p = BITMAP_ADDR32(destmap, scanline, 0);
 
 	/* extract color information */
-	const UINT16 *colortable_r = (const UINT16 *)&model2_colorxlat[0x0000/4];
-	const UINT16 *colortable_g = (const UINT16 *)&model2_colorxlat[0x4000/4];
-	const UINT16 *colortable_b = (const UINT16 *)&model2_colorxlat[0x8000/4];
-	const UINT16 *lumaram = (const UINT16 *)model2_lumaram;
-	const UINT16 *palram = (const UINT16 *)model2_paletteram32;
+	const UINT16 *colortable_r = (const UINT16 *)&state->colorxlat[0x0000/4];
+	const UINT16 *colortable_g = (const UINT16 *)&state->colorxlat[0x4000/4];
+	const UINT16 *colortable_b = (const UINT16 *)&state->colorxlat[0x8000/4];
+	const UINT16 *lumaram = (const UINT16 *)state->lumaram;
+	const UINT16 *palram = (const UINT16 *)state->paletteram32;
 	UINT32	lumabase = extra->lumabase;
 	UINT32	color = extra->colorbase;
 	UINT8	luma;
@@ -110,6 +111,7 @@ static void MODEL2_FUNC_NAME(void *dest, INT32 scanline, const poly_extent *exte
 static void MODEL2_FUNC_NAME(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = (const poly_extra_data *)extradata;
+	model2_state *state = extra->state;
 	bitmap_t *destmap = (bitmap_t *)dest;
 	UINT32 *p = BITMAP_ADDR32(destmap, scanline, 0);
 
@@ -117,11 +119,11 @@ static void MODEL2_FUNC_NAME(void *dest, INT32 scanline, const poly_extent *exte
 	UINT32	tex_height = extra->texheight;
 
 	/* extract color information */
-	const UINT16 *colortable_r = (const UINT16 *)&model2_colorxlat[0x0000/4];
-	const UINT16 *colortable_g = (const UINT16 *)&model2_colorxlat[0x4000/4];
-	const UINT16 *colortable_b = (const UINT16 *)&model2_colorxlat[0x8000/4];
-	const UINT16 *lumaram = (const UINT16 *)model2_lumaram;
-	const UINT16 *palram = (const UINT16 *)model2_paletteram32;
+	const UINT16 *colortable_r = (const UINT16 *)&state->colorxlat[0x0000/4];
+	const UINT16 *colortable_g = (const UINT16 *)&state->colorxlat[0x4000/4];
+	const UINT16 *colortable_b = (const UINT16 *)&state->colorxlat[0x8000/4];
+	const UINT16 *lumaram = (const UINT16 *)state->lumaram;
+	const UINT16 *palram = (const UINT16 *)state->paletteram32;
 	UINT32	colorbase = extra->colorbase;
 	UINT32	lumabase = extra->lumabase;
 	UINT32	tex_x = extra->texx;

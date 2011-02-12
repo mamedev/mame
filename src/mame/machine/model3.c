@@ -7,7 +7,6 @@
 #include "emu.h"
 #include "includes/model3.h"
 
-static int m3_step;
 
 /******************************************************************/
 /* Real3D TAP Port                                                */
@@ -20,9 +19,8 @@ static int m3_step;
  * 167 of the 3D-RAM manual.
  */
 
-#define NEXT(new_state) fsm[state][new_state]
+#define NEXT(new_state) fsm[state->tap_state][new_state]
 
-static INT32  state;  // current state
 static const INT32 fsm[][2] = {
                             {  1,  0 },  // 0  Test-Logic/Reset
                             {  1,  2 },  // 1  Run-Test/Idle
@@ -42,18 +40,6 @@ static const INT32 fsm[][2] = {
                             {  1,  2 }   // 15 Update-IR
 };
 
-/*
- * TAP Registers
- */
-
-static UINT64   current_instruction;    // latched IR (not always equal to IR)
-static UINT64   ir;                     // instruction register (46 bits)
-
-static UINT8    id_data[32];            // ASIC ID code data buffer
-static INT32      id_size;                // size of ID data in bits
-//static INT32      ptr;                    // current bit ptr for data
-
-static int      tdo;                    // bit shifted out to TDO
 
 /*
  * insert_bit():
@@ -78,12 +64,12 @@ static void insert_bit(UINT8 *buf, INT32 bit_num, INT32 bit)
  * Inserts a 32-bit ID code into the ID bit field.
  */
 
-static void insert_id(UINT32 id, INT32 start_bit)
+static void insert_id(model3_state *state, UINT32 id, INT32 start_bit)
 {
     INT32 i;
 
     for (i = 31; i >= 0; i--)
-        insert_bit(id_data, start_bit++, (id >> i) & 1);
+        insert_bit(state->id_data, start_bit++, (id >> i) & 1);
 }
 
 /*
@@ -136,9 +122,10 @@ static int shift(UINT8 *data, INT32 num_bits)
  *      TDO.
  */
 
-int model3_tap_read(void)
+int model3_tap_read(running_machine *machine)
 {
-    return tdo;
+	model3_state *state = machine->driver_data<model3_state>();
+    return state->tdo;
 }
 
 /*
@@ -154,14 +141,15 @@ int model3_tap_read(void)
  *      trst = Reset.
  */
 
-void model3_tap_write(int tck, int tms, int tdi, int trst)
+void model3_tap_write(running_machine *machine, int tck, int tms, int tdi, int trst)
 {
+	model3_state *state = machine->driver_data<model3_state>();
     if (!tck)
         return;
 
-    state = NEXT(tms);
+    state->tap_state = NEXT(tms);
 
-    switch (state)
+    switch (state->tap_state)
     {
     case 3:     // Capture-DR
 
@@ -187,39 +175,39 @@ void model3_tap_write(int tck, int tms, int tdi, int trst)
          * data on TAP reset and when the instruction is issued.
          */
 
-        if (m3_step == 0x10)
+        if (state->m3_step == 0x10)
         {
-            insert_id(0x116C7057, 1 + 0 * 32);
-            insert_id(0x216C3057, 1 + 1 * 32);
-            insert_id(0x116C4057, 1 + 2 * 32);
-            insert_id(0x216C5057, 1 + 3 * 32);
-            insert_id(0x116C6057, 1 + 4 * 32 + 1);
-            insert_id(0x116C6057, 1 + 5 * 32 + 1);
+            insert_id(state, 0x116C7057, 1 + 0 * 32);
+            insert_id(state, 0x216C3057, 1 + 1 * 32);
+            insert_id(state, 0x116C4057, 1 + 2 * 32);
+            insert_id(state, 0x216C5057, 1 + 3 * 32);
+            insert_id(state, 0x116C6057, 1 + 4 * 32 + 1);
+            insert_id(state, 0x116C6057, 1 + 5 * 32 + 1);
         }
-        else if (m3_step == 0x15)
+        else if (state->m3_step == 0x15)
         {
-            insert_id(0x316C7057, 1 + 0 * 32);
-            insert_id(0x316C3057, 1 + 1 * 32);
-            insert_id(0x216C4057, 1 + 2 * 32);      // Lost World may to use 0x016C4057
-            insert_id(0x316C5057, 1 + 3 * 32);
-            insert_id(0x216C6057, 1 + 4 * 32 + 1);
-            insert_id(0x216C6057, 1 + 5 * 32 + 1);
+            insert_id(state, 0x316C7057, 1 + 0 * 32);
+            insert_id(state, 0x316C3057, 1 + 1 * 32);
+            insert_id(state, 0x216C4057, 1 + 2 * 32);      // Lost World may to use 0x016C4057
+            insert_id(state, 0x316C5057, 1 + 3 * 32);
+            insert_id(state, 0x216C6057, 1 + 4 * 32 + 1);
+            insert_id(state, 0x216C6057, 1 + 5 * 32 + 1);
         }
-        else if (m3_step >= 0x20)
+        else if (state->m3_step >= 0x20)
         {
-            insert_id(0x416C7057, 1 + 0 * 32);
-            insert_id(0x416C3057, 1 + 1 * 32);
-            insert_id(0x316C4057, 1 + 2 * 32);
-            insert_id(0x416C5057, 1 + 3 * 32);
-            insert_id(0x316C6057, 1 + 4 * 32 + 1);
-            insert_id(0x316C6057, 1 + 5 * 32 + 1);
+            insert_id(state, 0x416C7057, 1 + 0 * 32);
+            insert_id(state, 0x416C3057, 1 + 1 * 32);
+            insert_id(state, 0x316C4057, 1 + 2 * 32);
+            insert_id(state, 0x416C5057, 1 + 3 * 32);
+            insert_id(state, 0x316C6057, 1 + 4 * 32 + 1);
+            insert_id(state, 0x316C6057, 1 + 5 * 32 + 1);
         }
 
         break;
 
     case 4:     // Shift-DR
 
-        tdo = shift(id_data, id_size);
+        state->tdo = shift(state->id_data, state->id_size);
         break;
 
     case 10:    // Capture-IR
@@ -228,7 +216,7 @@ void model3_tap_write(int tck, int tms, int tdi, int trst)
          * Load lower 2 bits with 01 as per IEEE 1149.1-1990
          */
 
-        ir = 1;
+        state->ir = 1;
         break;
 
     case 11:    // Shift-IR
@@ -237,9 +225,9 @@ void model3_tap_write(int tck, int tms, int tdi, int trst)
          * Shift IR towards output and load in new data from TDI
          */
 
-        tdo = ir & 1;   // shift LSB to output
-        ir >>= 1;
-        ir |= ((UINT64) tdi << 45);
+        state->tdo = state->ir & 1;   // shift LSB to output
+        state->ir >>= 1;
+        state->ir |= ((UINT64) tdi << 45);
         break;
 
     case 15:    // Update-IR
@@ -249,8 +237,7 @@ void model3_tap_write(int tck, int tms, int tdi, int trst)
          * TCK)
          */
 
-        ir &= U64(0x3fffffffffff);
-        current_instruction = ir;
+        state->ir &= U64(0x3fffffffffff);
         break;
 
     default:
@@ -265,11 +252,12 @@ void model3_tap_write(int tck, int tms, int tdi, int trst)
  * Resets the TAP (simulating a power up or SCAN_RST signal.)
  */
 
-void model3_tap_reset(void)
+void model3_tap_reset(running_machine *machine)
 {
-    id_size = 197;  // 197 bits
+	model3_state *state = machine->driver_data<model3_state>();
+    state->id_size = 197;  // 197 bits
 
-    state = 0;  // test-logic/reset
+    state->tap_state = 0;  // test-logic/reset
 }
 
 /*
@@ -279,9 +267,10 @@ void model3_tap_reset(void)
  *
  */
 
-void model3_machine_init(int step)
+void model3_machine_init(running_machine *machine, int step)
 {
-	m3_step = step;
+	model3_state *state = machine->driver_data<model3_state>();
+	state->m3_step = step;
 }
 
 /*****************************************************************************/

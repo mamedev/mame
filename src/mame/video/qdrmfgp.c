@@ -12,7 +12,8 @@
 
 void qdrmfgp_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags)
 {
-	*color = ((*color>>2) & 0x0f) | qdrmfgp_get_palette();
+	qdrmfgp_state *state = machine->driver_data<qdrmfgp_state>();
+	*color = ((*color>>2) & 0x0f) | state->pal;
 }
 
 void qdrmfgp2_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags)

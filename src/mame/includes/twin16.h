@@ -5,17 +5,31 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT16 *videoram;
+	UINT16 CPUA_register;
+	UINT16 CPUB_register;
+	UINT16 sound_command;
+	int cuebrickj_nvram_bank;
+	UINT16 cuebrickj_nvram[0x400*0x20];
+	UINT16 custom_video;
+	UINT16 *gfx_rom;
+	UINT16 *text_ram;
+	UINT16 *sprite_gfx_ram;
+	UINT16 *tile_gfx_ram;
+	UINT16 sprite_buffer[0x800];
+	emu_timer *sprite_timer;
+	int sprite_busy;
+	int need_process_spriteram;
+	UINT16 gfx_bank;
+	UINT16 scrollx[3];
+	UINT16 scrolly[3];
+	UINT16 video_register;
+	tilemap_t *text_tilemap;
 };
 
 
 /*----------- defined in drivers/twin16.c -----------*/
 
-extern UINT16 twin16_custom_video;
-extern UINT16 *twin16_gfx_rom;
-extern UINT16 *twin16_text_ram;
-extern UINT16 *twin16_sprite_gfx_ram;
-extern UINT16 *twin16_tile_gfx_ram;
-int twin16_spriteram_process_enable( void );
+int twin16_spriteram_process_enable( running_machine *machine );
 
 
 /*----------- defined in video/twin16.c -----------*/
@@ -30,4 +44,4 @@ VIDEO_START( twin16 );
 VIDEO_UPDATE( twin16 );
 VIDEO_EOF( twin16 );
 
-void twin16_spriteram_process( running_machine* );
+void twin16_spriteram_process( running_machine *machine );

@@ -33,9 +33,7 @@
 #include "includes/konamipt.h"
 #include "includes/mystwarr.h"
 
-static UINT16 *gx_workram;
 
-static UINT8 mw_irq_control;
 
 static const eeprom_interface eeprom_intf =
 {
@@ -108,7 +106,8 @@ static WRITE16_HANDLER( mmeeprom_w )
 
 static INTERRUPT_GEN(mystwarr_interrupt)
 {
-	if (!(mw_irq_control & 0x01)) return;
+	mystwarr_state *state = device->machine->driver_data<mystwarr_state>();
+	if (!(state->mw_irq_control & 0x01)) return;
 
 	switch (cpu_getiloops(device))
 	{
@@ -146,7 +145,8 @@ static INTERRUPT_GEN(metamrph_interrupt)
 
 static INTERRUPT_GEN(mchamp_interrupt)
 {
-	if (!(mw_irq_control & 0x02)) return;
+	mystwarr_state *state = device->machine->driver_data<mystwarr_state>();
+	if (!(state->mw_irq_control & 0x02)) return;
 
 	switch (cpu_getiloops(device))
 	{
@@ -215,11 +215,12 @@ static READ16_HANDLER( sound_status_msb_r )
 
 static WRITE16_HANDLER( irq_ack_w )
 {
+	mystwarr_state *state = space->machine->driver_data<mystwarr_state>();
 	K056832_b_word_w(space, offset, data, mem_mask);
 
 	if (offset == 3 && ACCESSING_BITS_0_7)
 	{
-		mw_irq_control = data&0xff;
+		state->mw_irq_control = data&0xff;
 
 //      if ((data &0xf0) != 0xd0) logerror("Unknown write to IRQ reg: %x\n", data);
 
@@ -258,7 +259,7 @@ static WRITE16_HANDLER( K053247_scattered_word_w )
 /* Mystic Warriors */
 static ADDRESS_MAP_START( mystwarr_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM	// main program
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(&gx_workram)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE_MEMBER(mystwarr_state, gx_workram)
 	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(K053247_scattered_word_r,K053247_scattered_word_w) AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x480000, 0x4800ff) AM_WRITE(K055555_word_w)
 	AM_RANGE(0x482000, 0x48200f) AM_READ(K055673_rom_word_r)
@@ -296,7 +297,7 @@ ADDRESS_MAP_END
 /* Metamorphic Force */
 static ADDRESS_MAP_START( metamrph_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM	// main program
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(&gx_workram)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE_MEMBER(mystwarr_state, gx_workram)
 	AM_RANGE(0x210000, 0x210fff) AM_READWRITE(K053247_word_r,K053247_word_w)
 	AM_RANGE(0x211000, 0x21ffff) AM_RAM
 	AM_RANGE(0x240000, 0x240007) AM_WRITE(K053246_word_w)
@@ -339,7 +340,7 @@ ADDRESS_MAP_END
 /* Violent Storm */
 static ADDRESS_MAP_START( viostorm_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM		// main program
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(&gx_workram)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE_MEMBER(mystwarr_state, gx_workram)
 	AM_RANGE(0x210000, 0x210fff) AM_READWRITE(K053247_word_r,K053247_word_w)
 	AM_RANGE(0x211000, 0x21ffff) AM_RAM
 	AM_RANGE(0x240000, 0x240007) AM_WRITE(K053246_word_w)
@@ -408,14 +409,16 @@ static WRITE16_HANDLER( K053247_martchmp_word_w )
 
 static READ16_HANDLER( mccontrol_r )
 {
-	return mw_irq_control<<8;
+	mystwarr_state *state = space->machine->driver_data<mystwarr_state>();
+	return state->mw_irq_control<<8;
 }
 
 static WRITE16_HANDLER( mccontrol_w )
 {
+	mystwarr_state *state = space->machine->driver_data<mystwarr_state>();
 	if (ACCESSING_BITS_8_15)
 	{
-		mw_irq_control = data>>8;
+		state->mw_irq_control = data>>8;
 		// bit 0 = watchdog
 		// bit 1 = IRQ enable
 		// bit 2 = OBJCHA
@@ -433,7 +436,7 @@ static WRITE16_HANDLER( mccontrol_w )
 /* Martial Champion */
 static ADDRESS_MAP_START( martchmp_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM									// main program
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE(&gx_workram)			// work RAM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE_MEMBER(mystwarr_state, gx_workram)			// work RAM
 	AM_RANGE(0x300000, 0x3fffff) AM_ROM									// data ROM
 	AM_RANGE(0x400000, 0x4000ff) AM_WRITE(K055555_word_w)				// PCU2
 	AM_RANGE(0x402000, 0x40200f) AM_READ(K055673_rom_word_r)			// sprite ROM readback
@@ -496,7 +499,7 @@ static ADDRESS_MAP_START( dadandrn_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x48c000, 0x48c01f) AM_WRITE(K054338_word_w)
 	AM_RANGE(0x48e000, 0x48e001) AM_READ_PORT("IN0_P1")	// bit 3 (0x8) is test switch
 	AM_RANGE(0x48e020, 0x48e021) AM_READ(dddeeprom_r)
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE(&gx_workram)
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_MEMBER(mystwarr_state, gx_workram)
 	AM_RANGE(0x680000, 0x68003f) AM_READWRITE(K055550_word_r,K055550_word_w)
 	AM_RANGE(0x6a0000, 0x6a0001) AM_WRITE(mmeeprom_w)
 	AM_RANGE(0x6c0000, 0x6c0001) AM_WRITE(ddd_053936_enable_w)
@@ -544,7 +547,7 @@ static ADDRESS_MAP_START( gaiapols_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x48c000, 0x48c01f) AM_WRITE(K054338_word_w)
 	AM_RANGE(0x48e000, 0x48e001) AM_READ_PORT("IN0_P1")				// bit 3 (0x8) is test switch
 	AM_RANGE(0x48e020, 0x48e021) AM_READ(dddeeprom_r)
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE(&gx_workram)
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_MEMBER(mystwarr_state, gx_workram)
 	AM_RANGE(0x660000, 0x6600ff) AM_READWRITE(K054000_lsb_r,K054000_lsb_w)
 	AM_RANGE(0x6a0000, 0x6a0001) AM_WRITE(mmeeprom_w)
 	AM_RANGE(0x6c0000, 0x6c0001) AM_WRITE(ddd_053936_enable_w)
@@ -566,16 +569,17 @@ ADDRESS_MAP_END
 
 /**********************************************************************************/
 
-static int cur_sound_region;
 
 static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr(machine, "bank2", machine->region("soundcpu")->base() + 0x10000 + cur_sound_region*0x4000);
+	mystwarr_state *state = machine->driver_data<mystwarr_state>();
+	memory_set_bankptr(machine, "bank2", machine->region("soundcpu")->base() + 0x10000 + state->cur_sound_region*0x4000);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	cur_sound_region = (data & 0xf);
+	mystwarr_state *state = space->machine->driver_data<mystwarr_state>();
+	state->cur_sound_region = (data & 0xf);
 	reset_sound_region(space->machine);
 }
 
@@ -857,14 +861,15 @@ static STATE_POSTLOAD( mystwarr_postload )
 
 static MACHINE_START( mystwarr )
 {
+	mystwarr_state *state = machine->driver_data<mystwarr_state>();
 	/* set default bankswitch */
-	cur_sound_region = 2;
+	state->cur_sound_region = 2;
 	reset_sound_region(machine);
 
-	mw_irq_control = 0;
+	state->mw_irq_control = 0;
 
-	state_save_register_global(machine, mw_irq_control);
-	state_save_register_global(machine, cur_sound_region);
+	state_save_register_global(machine, state->mw_irq_control);
+	state_save_register_global(machine, state->cur_sound_region);
 	machine->state().register_postload(mystwarr_postload, NULL);
 }
 
@@ -939,7 +944,7 @@ static MACHINE_RESET(gaiapols)
 	for (i=5; i<=7; i++) k054539_set_gain(k054539_1, i, 2.0);
 }
 
-static MACHINE_CONFIG_START( mystwarr, driver_device )
+static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz (confirmed) */

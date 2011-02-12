@@ -15,9 +15,6 @@
 #define IRQ_CLOCK			(U34_CLOCK/0x1f788)	/* 40Hz interrupt */
 
 
-UINT8 *segag80v_vectorram;
-size_t segag80v_vectorram_size;
-static int min_x, min_y;
 
 
 /*
@@ -79,7 +76,7 @@ static int min_x, min_y;
 */
 
 
-INLINE int adjust_xy(int rawx, int rawy, int *outx, int *outy)
+INLINE int adjust_xy(segag80v_state *state, int rawx, int rawy, int *outx, int *outy)
 {
 	int clipped = FALSE;
 
@@ -104,18 +101,19 @@ INLINE int adjust_xy(int rawx, int rawy, int *outx, int *outy)
 		*outy &= 0x3ff;
 
 	/* convert into .16 values */
-	*outx = (*outx - (min_x - 512)) << 16;
-	*outy = (*outy - (min_y - 512)) << 16;
+	*outx = (*outx - (state->min_x - 512)) << 16;
+	*outy = (*outy - (state->min_y - 512)) << 16;
 	return clipped;
 }
 
 
 static void sega_generate_vector_list(running_machine *machine)
 {
+	segag80v_state *state = machine->driver_data<segag80v_state>();
 	UINT8 *sintable = machine->region("proms")->base();
 	double total_time = 1.0 / (double)IRQ_CLOCK;
 	UINT16 symaddr = 0;
-	UINT8 *vectorram = segag80v_vectorram;
+	UINT8 *vectorram = state->vectorram;
 
 	vector_clear_list();
 
@@ -178,7 +176,7 @@ static void sega_generate_vector_list(running_machine *machine)
 			int adjx, adjy, clipped;
 
 			/* Add a starting point to the vector list. */
-			clipped = adjust_xy(curx, cury, &adjx, &adjy);
+			clipped = adjust_xy(state, curx, cury, &adjx, &adjy);
 			if (!clipped)
 				vector_add_point(machine, adjx, adjy, 0, 0);
 
@@ -244,7 +242,7 @@ static void sega_generate_vector_list(running_machine *machine)
 					intensity = 0;
 
 				/* Loop over the length of the vector. */
-				clipped = adjust_xy(curx, cury, &adjx, &adjy);
+				clipped = adjust_xy(state, curx, cury, &adjx, &adjy);
 				xaccum = yaccum = 0;
 				while (length-- != 0 && total_time > 0)
 				{
@@ -283,7 +281,7 @@ static void sega_generate_vector_list(running_machine *machine)
 					/* Apply the clipping from the DAC circuit. If the values clip */
 					/* the beam is turned off, but the computations continue right */
 					/* on going. */
-					newclip = adjust_xy(curx, cury, &adjx, &adjy);
+					newclip = adjust_xy(state, curx, cury, &adjx, &adjy);
 					if (newclip != clipped)
 					{
 						/* if we're just becoming unclipped, add an empty point */
@@ -327,10 +325,11 @@ static void sega_generate_vector_list(running_machine *machine)
 
 VIDEO_START( segag80v )
 {
-	assert_always(segag80v_vectorram_size != 0, "segag80v_vectorram==0");
+	segag80v_state *state = machine->driver_data<segag80v_state>();
+	assert_always(state->vectorram_size != 0, "vectorram==0");
 
-	min_x =machine->primary_screen->visible_area().min_x;
-	min_y =machine->primary_screen->visible_area().min_y;
+	state->min_x =machine->primary_screen->visible_area().min_x;
+	state->min_y =machine->primary_screen->visible_area().min_y;
 
 	VIDEO_START_CALL(vector);
 }
