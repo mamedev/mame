@@ -2653,6 +2653,7 @@ static void I386OP(group0F00_32)(i386_state *cpustate)			// Opcode 0x0f 00
 	UINT32 address, ea;
 	UINT8 modrm = FETCH(cpustate);
 	I386_SREG seg;
+	UINT8 result;
 
 	switch( (modrm >> 3) & 0x7 )
 	{
@@ -2697,18 +2698,19 @@ static void I386OP(group0F00_32)(i386_state *cpustate)			// Opcode 0x0f 00
 			{
 				if( modrm >= 0xc0 ) {
 					address = LOAD_RM32(modrm);
-					ea = i386_translate(cpustate, CS, address );
+					cpustate->ldtr.segment = address;
 					CYCLES(cpustate,CYCLES_LLDT_REG);
 				} else {
 					ea = GetEA(cpustate,modrm);
+					cpustate->ldtr.segment = READ32(cpustate,ea);
 					CYCLES(cpustate,CYCLES_LLDT_MEM);
 				}
-				cpustate->ldtr.segment = READ32(cpustate,ea);
 				memset(&seg, 0, sizeof(seg));
 				seg.selector = cpustate->ldtr.segment;
 				i386_load_protected_mode_segment(cpustate,&seg);
 				cpustate->ldtr.limit = seg.limit;
 				cpustate->ldtr.base = seg.base;
+				cpustate->ldtr.flags = seg.flags;
 			}
 			else
 			{
@@ -2721,17 +2723,144 @@ static void I386OP(group0F00_32)(i386_state *cpustate)			// Opcode 0x0f 00
 			{
 				if( modrm >= 0xc0 ) {
 					address = LOAD_RM32(modrm);
-					ea = i386_translate(cpustate, CS, address );
+					cpustate->task.segment = address;
 					CYCLES(cpustate,CYCLES_LTR_REG);
 				} else {
 					ea = GetEA(cpustate,modrm);
+					cpustate->task.segment = READ32(cpustate,ea);
 					CYCLES(cpustate,CYCLES_LTR_MEM);
 				}
-				cpustate->task.segment = READ32(cpustate,ea);
+				memset(&seg, 0, sizeof(seg));
+				seg.selector = cpustate->task.segment;
+				i386_load_protected_mode_segment(cpustate,&seg);
+				cpustate->task.limit = seg.limit;
+				cpustate->task.base = seg.base;
+				cpustate->task.flags = seg.flags;
 			}
 			else
 			{
 				i386_trap(cpustate,6, 0);
+			}
+			break;
+
+		case 4:  /* VERR */
+			if ( PROTECTED_MODE && !V8086_MODE )
+			{
+				result = 1;
+				if( modrm >= 0xc0 ) {
+					address = LOAD_RM32(modrm);
+					CYCLES(cpustate,CYCLES_VERR_REG);
+				} else {
+					ea = GetEA(cpustate,modrm);
+					address = READ32(cpustate,ea);
+					CYCLES(cpustate,CYCLES_VERR_MEM);
+				}
+				memset(&seg, 0, sizeof(seg));
+				seg.selector = address;
+				i386_load_protected_mode_segment(cpustate,&seg);
+				// check if the segment is within the bounds of the GDT or LDT
+				if(seg.selector & 0x04)
+				{  // LDT
+					if((seg.selector & 0xf8) > cpustate->ldtr.limit)
+					{
+						result = 0;
+					}
+				}
+				else
+				{  // GDT
+					if((seg.selector & 0xf8) > cpustate->gdtr.limit)
+					{
+						result = 0;
+					}
+				}
+				// check if the segment is a code or data segment (not a special segment type, like a TSS, gate, LDT...)
+				if(!(seg.flags & 0x10))
+					result = 0;
+				// check that the segment is readable
+				if(seg.flags & 0x10)  // is code or data segment
+				{
+					if(seg.flags & 0x08)  // is code segment, so check if it's readable
+					{
+						if(!(seg.flags & 0x02))
+						{
+							result = 0;
+						}
+						else
+						{  // check if conforming, these are always readable, regardless of privilege
+							if(!(seg.flags & 0x04))
+							{
+								// if not conforming, then we must check privilege levels (TODO: current privilege level check)
+								if(((seg.flags >> 5) & 0x03) < (address & 0x03))
+									result = 0;
+							}
+						}
+					}
+				}
+				// check that the descriptor privilege is greater or equal to the selector's privilege level and the current privilege (TODO)
+				SetZF(result);
+			}
+			else
+			{
+				i386_trap(cpustate,6, 0);
+				logerror("i386: VERR: Exception - Running in real mode or virtual 8086 mode.\n");
+			}
+			break;
+
+		case 5:  /* VERW */
+			if ( PROTECTED_MODE && !V8086_MODE )
+			{
+				result = 1;
+				if( modrm >= 0xc0 ) {
+					address = LOAD_RM16(modrm);
+					CYCLES(cpustate,CYCLES_VERW_REG);
+				} else {
+					ea = GetEA(cpustate,modrm);
+					address = READ16(cpustate,ea);
+					CYCLES(cpustate,CYCLES_VERW_MEM);
+				}
+				memset(&seg, 0, sizeof(seg));
+				seg.selector = address;
+				i386_load_protected_mode_segment(cpustate,&seg);
+				// check if the segment is within the bounds of the GDT or LDT
+				if(seg.selector & 0x04)
+				{  // LDT
+					if((seg.selector & 0xf8) > cpustate->ldtr.limit)
+					{
+						result = 0;
+					}
+				}
+				else
+				{  // GDT
+					if((seg.selector & 0xf8) > cpustate->gdtr.limit)
+					{
+						result = 0;
+					}
+				}
+				// check if the segment is a code or data segment (not a special segment type, like a TSS, gate, LDT...)
+				if(!(seg.flags & 0x10))
+					result = 0;
+				// check that the segment is writable
+				if(seg.flags & 0x10)  // is code or data segment
+				{
+					if(seg.flags & 0x08)  // is code segment (and thus, not writable)
+					{
+						result = 0;
+					}
+					else
+					{  // is data segment
+						if(!(seg.flags & 0x02))
+							result = 0;
+					}
+				}
+				// check that the descriptor privilege is greater or equal to the selector's privilege level and the current privilege (TODO)
+				if(((seg.flags >> 5) & 0x03) < (address & 0x03))
+					result = 0;
+				SetZF(result);
+			}
+			else
+			{
+				i386_trap(cpustate,6, 0);
+				logerror("i386: VERW: Exception - Running in real mode or virtual 8086 mode.\n");
 			}
 			break;
 
@@ -2926,6 +3055,64 @@ static void I386OP(group0FBA_32)(i386_state *cpustate)		// Opcode 0x0f ba
 		default:
 			fatalerror("i386: group0FBA_32 /%d unknown", (modrm >> 3) & 0x7);
 			break;
+	}
+}
+
+static void I386OP(lar_r32_rm32)(i386_state *cpustate)  // Opcode 0x0f 0x02
+{
+	UINT8 modrm = FETCH(cpustate);
+	I386_SREG seg;
+	UINT8 type;
+
+	if(PROTECTED_MODE && !V8086_MODE)
+	{
+		memset(&seg,0,sizeof(seg));
+		if(modrm >= 0xc0)
+		{
+			seg.selector = LOAD_RM32(modrm);
+			CYCLES(cpustate,CYCLES_LAR_REG);
+		}
+		else
+		{
+			UINT32 ea = GetEA(cpustate,modrm);
+			seg.selector = READ32(cpustate,ea);
+			CYCLES(cpustate,CYCLES_LAR_MEM);
+		}
+		if(seg.selector == 0)
+		{
+			SetZF(0);  // not a valid segment
+		}
+		else
+		{
+			i386_load_protected_mode_segment(cpustate,&seg);
+			if(!(seg.flags & 0x10))  // special segment
+			{
+				// check for invalid segment types
+				type = seg.flags & 0x000f;
+				if(type == 0x00 || type == 0x08 || type == 0x0a || type == 0x0d)
+				{
+					SetZF(0);  // invalid segment type
+				}
+				else
+				{
+					// TODO: check current privilege level
+					STORE_REG32(modrm,(seg.flags << 8) & 0x00ffff00);
+					SetZF(1);
+				}
+			}
+			else
+			{
+				// TODO: check current privilege level
+				STORE_REG32(modrm,(seg.flags << 8) & 0x00ffff00);
+				SetZF(1);
+			}
+		}
+	}
+	else
+	{
+		// illegal opcode
+		i386_trap(cpustate,6,0);
+		logerror("i386: LAR: Exception - running in real mode or virtual 8086 mode.\n");
 	}
 }
 
