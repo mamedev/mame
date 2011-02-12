@@ -42,7 +42,6 @@
 
 #include "machine/nvram.h"
 #include "video/atarimo.h"
-#include "video/atarirle.h"
 #include "machine/er2055.h"
 
 

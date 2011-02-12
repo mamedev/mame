@@ -27,6 +27,8 @@ public:
 	UINT8			playfield_tile_bank;
 	UINT16			playfield_xscroll;
 	UINT16			playfield_yscroll;
+
+	device_t *		rle;
 };
 
 
@@ -35,6 +37,7 @@ public:
 WRITE16_HANDLER( atarig1_mo_control_w );
 
 VIDEO_START( atarig1 );
+VIDEO_EOF( atarig1 );
 VIDEO_UPDATE( atarig1 );
 
 void atarig1_scanline_update(screen_device &screen, int scanline);

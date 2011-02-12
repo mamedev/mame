@@ -20,7 +20,7 @@
 
 
 #include "emu.h"
-#include "machine/atarigen.h"
+#include "video/atarirle.h"
 #include "includes/atarig42.h"
 
 
@@ -69,29 +69,7 @@ static TILEMAP_MAPPER( atarig42_playfield_scan )
 
 VIDEO_START( atarig42 )
 {
-	static const atarirle_desc modesc =
-	{
-		"gfx3",		/* region where the GFX data lives */
-		256,		/* number of entries in sprite RAM */
-		0,			/* left clip coordinate */
-		0,			/* right clip coordinate */
-
-		0x000,		/* base palette entry */
-		0x400,		/* maximum number of colors */
-
-		{{ 0x7fff,0,0,0,0,0,0,0 }},	/* mask for the code index */
-		{{ 0,0x03f0,0,0,0,0,0,0 }},	/* mask for the color */
-		{{ 0,0,0xffc0,0,0,0,0,0 }},	/* mask for the X position */
-		{{ 0,0,0,0xffc0,0,0,0,0 }},	/* mask for the Y position */
-		{{ 0,0,0,0,0xffff,0,0,0 }},	/* mask for the scale factor */
-		{{ 0x8000,0,0,0,0,0,0,0 }},	/* mask for the horizontal flip */
-		{{ 0,0,0,0,0,0,0x00ff,0 }},	/* mask for the order */
-		{{ 0,0x0e00,0,0,0,0,0,0 }},	/* mask for the priority */
-		{{ 0 }}						/* mask for the VRAM target */
-	};
 	atarig42_state *state = machine->driver_data<atarig42_state>();
-	atarirle_desc adjusted_modesc = modesc;
-	int i;
 
 	/* blend the playfields and free the temporary one */
 	atarigen_blend_gfx(machine, 0, 2, 0x0f, 0x30);
@@ -100,10 +78,7 @@ VIDEO_START( atarig42 )
 	state->playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, atarig42_playfield_scan,  8,8, 128,64);
 
 	/* initialize the motion objects */
-	adjusted_modesc.palettebase = state->motion_object_base;
-	for (i = 0; i < 8; i++)
-		adjusted_modesc.colormask.data[i] &= state->motion_object_mask;
-	atarirle_init(machine, 0, &adjusted_modesc);
+	state->rle = machine->device("rle");
 
 	/* initialize the alphanumerics */
 	state->alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
@@ -223,7 +198,7 @@ VIDEO_UPDATE( atarig42 )
 
 	/* copy the motion objects on top */
 	{
-		bitmap_t *mo_bitmap = atarirle_get_vram(0, 0);
+		bitmap_t *mo_bitmap = atarirle_get_vram(state->rle, 0);
 		int left	= cliprect->min_x;
 		int top		= cliprect->min_y;
 		int right	= cliprect->max_x + 1;
@@ -250,4 +225,11 @@ VIDEO_UPDATE( atarig42 )
 	/* add the alpha on top */
 	tilemap_draw(bitmap, cliprect, state->alpha_tilemap, 0, 0);
 	return 0;
+}
+
+VIDEO_EOF( atarig42 )
+{
+	atarig42_state *state = machine->driver_data<atarig42_state>();
+
+	atarirle_eof(state->rle);
 }

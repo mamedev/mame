@@ -196,8 +196,10 @@ static WRITE32_HANDLER( latch_w )
 	/* upper byte */
 	if (ACCESSING_BITS_24_31)
 	{
+		atarigt_state *state = space->machine->driver_data<atarigt_state>();
+
 		/* bits 13-11 are the MO control bits */
-		atarirle_control_w(space->machine, 0, (data >> 27) & 7);
+		atarirle_control_w(state->rle, (data >> 27) & 7);
 	}
 
 	if (ACCESSING_BITS_16_23)
@@ -214,7 +216,7 @@ static WRITE32_HANDLER( mo_command_w )
 	atarigt_state *state = space->machine->driver_data<atarigt_state>();
 	COMBINE_DATA(state->mo_command);
 	if (ACCESSING_BITS_0_15)
-		atarirle_command_w(0, ((data & 0xffff) == 2) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
+		atarirle_command_w(state->rle, ((data & 0xffff) == 2) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
 }
 
 
@@ -610,7 +612,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xd40000, 0xd4ffff) AM_WRITE(atarigen_eeprom_enable32_w)
 	AM_RANGE(0xd72000, 0xd75fff) AM_WRITE(atarigen_playfield32_w) AM_BASE_MEMBER(atarigt_state, playfield32)
 	AM_RANGE(0xd76000, 0xd76fff) AM_WRITE(atarigen_alpha32_w) AM_BASE_MEMBER(atarigt_state, alpha32)
-	AM_RANGE(0xd78000, 0xd78fff) AM_WRITE(atarirle_0_spriteram32_w) AM_BASE(&atarirle_0_spriteram32)
+	AM_RANGE(0xd78000, 0xd78fff) AM_DEVREADWRITE("rle", atarirle_spriteram32_r, atarirle_spriteram32_w)
 	AM_RANGE(0xd7a200, 0xd7a203) AM_WRITE(mo_command_w) AM_BASE_MEMBER(atarigt_state, mo_command)
 	AM_RANGE(0xd70000, 0xd7ffff) AM_RAM
 	AM_RANGE(0xd80000, 0xdfffff) AM_READWRITE(colorram_protection_r, colorram_protection_w) AM_BASE_MEMBER(atarigt_state, colorram)
@@ -780,6 +782,28 @@ static GFXDECODE_START( atarigt )
 GFXDECODE_END
 
 
+static const atarirle_desc modesc =
+{
+	"gfx3",		/* region where the GFX data lives */
+	256,		/* number of entries in sprite RAM */
+	0,			/* left clip coordinate */
+	0,			/* right clip coordinate */
+
+	0x0000,		/* base palette entry */
+	0x1000,		/* maximum number of colors */
+
+	{{ 0x7fff,0,0,0,0,0,0,0 }},	/* mask for the code index */
+	{{ 0,0x0ff0,0,0,0,0,0,0 }},	/* mask for the color */
+	{{ 0,0,0xffc0,0,0,0,0,0 }},	/* mask for the X position */
+	{{ 0,0,0,0xffc0,0,0,0,0 }},	/* mask for the Y position */
+	{{ 0,0,0,0,0xffff,0,0,0 }},	/* mask for the scale factor */
+	{{ 0x8000,0,0,0,0,0,0,0 }},	/* mask for the horizontal flip */
+	{{ 0,0,0,0,0,0,0x00ff,0 }},	/* mask for the order */
+	{{ 0,0x0e00,0,0,0,0,0,0 }},	/* mask for the priority */
+	{{ 0,0x8000,0,0,0,0,0,0 }}	/* mask for the VRAM target */
+};
+
+
 
 /*************************************
  *
@@ -811,8 +835,10 @@ static MACHINE_CONFIG_START( atarigt, atarigt_state )
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 
 	MCFG_VIDEO_START(atarigt)
-	MCFG_VIDEO_EOF(atarirle)
+	MCFG_VIDEO_EOF(atarigt)
 	MCFG_VIDEO_UPDATE(atarigt)
+
+	MCFG_ATARIRLE_ADD("rle", modesc)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(cage)

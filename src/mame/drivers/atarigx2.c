@@ -117,8 +117,10 @@ static WRITE32_HANDLER( latch_w )
 	/* upper byte */
 	if (ACCESSING_BITS_24_31)
 	{
+		atarigx2_state *state = space->machine->driver_data<atarigx2_state>();
+
 		/* bits 13-11 are the MO control bits */
-		atarirle_control_w(space->machine,0, (data >> 27) & 7);
+		atarirle_control_w(state->rle, (data >> 27) & 7);
 	}
 
 	/* lower byte */
@@ -132,7 +134,7 @@ static WRITE32_HANDLER( mo_command_w )
 	atarigx2_state *state = space->machine->driver_data<atarigx2_state>();
 	COMBINE_DATA(state->mo_command);
 	if (ACCESSING_BITS_0_15)
-		atarirle_command_w(0, ((data & 0xffff) == 2) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
+		atarirle_command_w(state->rle, ((data & 0xffff) == 2) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
 }
 
 
@@ -1157,7 +1159,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xd40000, 0xd40fff) AM_RAM_WRITE(atarigen_666_paletteram32_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xd72000, 0xd75fff) AM_WRITE(atarigen_playfield32_w) AM_BASE_MEMBER(atarigx2_state, playfield32)
 	AM_RANGE(0xd76000, 0xd76fff) AM_WRITE(atarigen_alpha32_w) AM_BASE_MEMBER(atarigx2_state, alpha32)
-	AM_RANGE(0xd78000, 0xd78fff) AM_WRITE(atarirle_0_spriteram32_w) AM_BASE(&atarirle_0_spriteram32)
+	AM_RANGE(0xd78000, 0xd78fff) AM_DEVREADWRITE("rle", atarirle_spriteram32_r, atarirle_spriteram32_w)
 	AM_RANGE(0xd7a200, 0xd7a203) AM_WRITE(mo_command_w) AM_BASE_MEMBER(atarigx2_state, mo_command)
 	AM_RANGE(0xd70000, 0xd7ffff) AM_RAM
 	AM_RANGE(0xd80000, 0xd9ffff) AM_WRITE(atarigen_eeprom_enable32_w)
@@ -1380,6 +1382,48 @@ static GFXDECODE_START( atarigx2 )
 	GFXDECODE_ENTRY( "gfx1", 0, pftoplayout, 0x000, 64 )
 GFXDECODE_END
 
+static const atarirle_desc modesc_0x200 =
+{
+	"gfx3",		/* region where the GFX data lives */
+	256,		/* number of entries in sprite RAM */
+	0,			/* left clip coordinate */
+	0,			/* right clip coordinate */
+
+	0x200,		/* base palette entry */
+	0x400,		/* maximum number of colors */
+
+	{{ 0x7fff,0,0,0,0,0,0,0 }},	/* mask for the code index */
+	{{ 0,0x01f0,0,0,0,0,0,0 }},	/* mask for the color */
+	{{ 0,0,0xffc0,0,0,0,0,0 }},	/* mask for the X position */
+	{{ 0,0,0,0xffc0,0,0,0,0 }},	/* mask for the Y position */
+	{{ 0,0,0,0,0xffff,0,0,0 }},	/* mask for the scale factor */
+	{{ 0x8000,0,0,0,0,0,0,0 }},	/* mask for the horizontal flip */
+	{{ 0,0,0,0,0,0,0x00ff,0 }},	/* mask for the order */
+	{{ 0,0x0e00,0,0,0,0,0,0 }},	/* mask for the priority */
+	{{ 0 }}						/* mask for the VRAM target */
+};
+
+static const atarirle_desc modesc_0x400 =
+{
+	"gfx3",		/* region where the GFX data lives */
+	256,		/* number of entries in sprite RAM */
+	0,			/* left clip coordinate */
+	0,			/* right clip coordinate */
+
+	0x400,		/* base palette entry */
+	0x400,		/* maximum number of colors */
+
+	{{ 0x7fff,0,0,0,0,0,0,0 }},	/* mask for the code index */
+	{{ 0,0x03f0,0,0,0,0,0,0 }},	/* mask for the color */
+	{{ 0,0,0xffc0,0,0,0,0,0 }},	/* mask for the X position */
+	{{ 0,0,0,0xffc0,0,0,0,0 }},	/* mask for the Y position */
+	{{ 0,0,0,0,0xffff,0,0,0 }},	/* mask for the scale factor */
+	{{ 0x8000,0,0,0,0,0,0,0 }},	/* mask for the horizontal flip */
+	{{ 0,0,0,0,0,0,0x00ff,0 }},	/* mask for the order */
+	{{ 0,0x0e00,0,0,0,0,0,0 }},	/* mask for the priority */
+	{{ 0 }}						/* mask for the VRAM target */
+};
+
 
 
 /*************************************
@@ -1411,7 +1455,7 @@ static MACHINE_CONFIG_START( atarigx2, atarigx2_state )
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 
 	MCFG_VIDEO_START(atarigx2)
-	MCFG_VIDEO_EOF(atarirle)
+	MCFG_VIDEO_EOF(atarigx2)
 	MCFG_VIDEO_UPDATE(atarigx2)
 
 	/* sound hardware */
@@ -1419,6 +1463,13 @@ static MACHINE_CONFIG_START( atarigx2, atarigx2_state )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_DERIVED( atarigx2_0x200, atarigx2 )
+	MCFG_ATARIRLE_ADD( "rle", modesc_0x200 )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( atarigx2_0x400, atarigx2 )
+	MCFG_ATARIRLE_ADD( "rle", modesc_0x400 )
+MACHINE_CONFIG_END
 
 /*************************************
  *
@@ -2148,8 +2199,6 @@ static DRIVER_INIT( spclords )
 	atarijsa_init(machine, "SERVICE", 0x0040);
 
 	state->playfield_base = 0x000;
-	state->motion_object_base = 0x400;
-	state->motion_object_mask = 0x3ff;
 }
 
 
@@ -2160,8 +2209,6 @@ static DRIVER_INIT( motofren )
 	atarijsa_init(machine, "SERVICE", 0x0040);
 
 	state->playfield_base = 0x400;
-	state->motion_object_base = 0x200;
-	state->motion_object_mask = 0x1ff;
 /*
 L/W=!68.A23*!E.A22*!E.A21                                       = 000x xxxx = 000000-1fffff
    +68.A23*E.A22*E.A21*68.A20*68.A19*68.A18*68.A17              = 1111 111x = fe0000-ffffff
@@ -2198,8 +2245,6 @@ static DRIVER_INIT( rrreveng )
 	atarijsa_init(machine, "SERVICE", 0x0040);
 
 	state->playfield_base = 0x000;
-	state->motion_object_base = 0x400;
-	state->motion_object_mask = 0x3ff;
 
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xca0fc0, 0xca0fc3, 0, 0, rrreveng_prot_r);
 }
@@ -2212,16 +2257,16 @@ static DRIVER_INIT( rrreveng )
  *
  *************************************/
 
-GAME( 1992, spclords,  0,        atarigx2, spclords, spclords, ROT0, "Atari Games", "Space Lords (rev C)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1992, spclordsb, spclords, atarigx2, spclords, spclords, ROT0, "Atari Games", "Space Lords (rev B)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1992, spclordsg, spclords, atarigx2, spclords, spclords, ROT0, "Atari Games", "Space Lords (rev A, German)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1992, spclordsa, spclords, atarigx2, spclords, spclords, ROT0, "Atari Games", "Space Lords (rev A)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, spclords,  0,        atarigx2_0x400, spclords, spclords, ROT0, "Atari Games", "Space Lords (rev C)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, spclordsb, spclords, atarigx2_0x400, spclords, spclords, ROT0, "Atari Games", "Space Lords (rev B)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, spclordsg, spclords, atarigx2_0x400, spclords, spclords, ROT0, "Atari Games", "Space Lords (rev A, German)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, spclordsa, spclords, atarigx2_0x400, spclords, spclords, ROT0, "Atari Games", "Space Lords (rev A)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 
-GAME( 1992, motofren,   0,        atarigx2, motofren, motofren, ROT0, "Atari Games", "Moto Frenzy", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1992, motofrenmd, motofren, atarigx2, motofren, motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1992, motofrenft, motofren, atarigx2, motofren, motofren, ROT0, "Atari Games", "Moto Frenzy (Field Test Version)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1992, motofrenmf, motofren, atarigx2, motofren, motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe Field Test Version)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, motofren,   0,        atarigx2_0x200, motofren, motofren, ROT0, "Atari Games", "Moto Frenzy", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, motofrenmd, motofren, atarigx2_0x200, motofren, motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, motofrenft, motofren, atarigx2_0x200, motofren, motofren, ROT0, "Atari Games", "Moto Frenzy (Field Test Version)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, motofrenmf, motofren, atarigx2_0x200, motofren, motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe Field Test Version)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 
-GAME( 1993, rrreveng,  0,        atarigx2, rrreveng, rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Sep 06, 1994)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1993, rrrevenga, rrreveng, atarigx2, rrreveng, rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 1)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1993, rrrevengb, rrreveng, atarigx2, rrreveng, rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 2)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1993, rrreveng,  0,        atarigx2_0x400, rrreveng, rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Sep 06, 1994)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1993, rrrevenga, rrreveng, atarigx2_0x400, rrreveng, rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 1)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1993, rrrevengb, rrreveng, atarigx2_0x400, rrreveng, rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 2)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )

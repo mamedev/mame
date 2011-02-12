@@ -102,11 +102,13 @@ static WRITE16_HANDLER( io_latch_w )
 	/* upper byte */
 	if (ACCESSING_BITS_8_15)
 	{
+		atarig42_state *state = space->machine->driver_data<atarig42_state>();
+
 		/* bit 14 controls the ASIC65 reset line */
 		asic65_reset(space->machine, (~data >> 14) & 1);
 
 		/* bits 13-11 are the MO control bits */
-		atarirle_control_w(space->machine, 0, (data >> 11) & 7);
+		atarirle_control_w(state->rle, (data >> 11) & 7);
 	}
 
 	/* lower byte */
@@ -127,7 +129,7 @@ static WRITE16_HANDLER( mo_command_w )
 {
 	atarig42_state *state = space->machine->driver_data<atarig42_state>();
 	COMBINE_DATA(state->mo_command);
-	atarirle_command_w(0, (data == 0) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
+	atarirle_command_w(state->rle, (data == 0) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
 }
 
 
@@ -365,7 +367,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xf80000, 0xf80003) AM_WRITE(asic65_data_w)
 	AM_RANGE(0xfa0000, 0xfa0fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0xfc0000, 0xfc0fff) AM_RAM_WRITE(atarigen_666_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xff0000, 0xff0fff) AM_WRITE(atarirle_0_spriteram_w) AM_BASE(&atarirle_0_spriteram)
+	AM_RANGE(0xff0000, 0xff0fff) AM_DEVREADWRITE("rle", atarirle_spriteram_r, atarirle_spriteram_w)
 	AM_RANGE(0xff2000, 0xff5fff) AM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(atarig42_state, playfield)
 	AM_RANGE(0xff6000, 0xff6fff) AM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(atarig42_state, alpha)
 	AM_RANGE(0xff7000, 0xff7001) AM_WRITE(mo_command_w) AM_BASE_MEMBER(atarig42_state, mo_command)
@@ -505,6 +507,50 @@ static GFXDECODE_START( atarig42 )
 GFXDECODE_END
 
 
+static const atarirle_desc modesc_0x200 =
+{
+	"gfx3",		/* region where the GFX data lives */
+	256,		/* number of entries in sprite RAM */
+	0,			/* left clip coordinate */
+	0,			/* right clip coordinate */
+
+	0x200,		/* base palette entry */
+	0x400,		/* maximum number of colors */
+
+	{{ 0x7fff,0,0,0,0,0,0,0 }},	/* mask for the code index */
+	{{ 0,0x01f0,0,0,0,0,0,0 }},	/* mask for the color */
+	{{ 0,0,0xffc0,0,0,0,0,0 }},	/* mask for the X position */
+	{{ 0,0,0,0xffc0,0,0,0,0 }},	/* mask for the Y position */
+	{{ 0,0,0,0,0xffff,0,0,0 }},	/* mask for the scale factor */
+	{{ 0x8000,0,0,0,0,0,0,0 }},	/* mask for the horizontal flip */
+	{{ 0,0,0,0,0,0,0x00ff,0 }},	/* mask for the order */
+	{{ 0,0x0e00,0,0,0,0,0,0 }},	/* mask for the priority */
+	{{ 0 }}						/* mask for the VRAM target */
+};
+
+
+static const atarirle_desc modesc_0x400 =
+{
+	"gfx3",		/* region where the GFX data lives */
+	256,		/* number of entries in sprite RAM */
+	0,			/* left clip coordinate */
+	0,			/* right clip coordinate */
+
+	0x400,		/* base palette entry */
+	0x400,		/* maximum number of colors */
+
+	{{ 0x7fff,0,0,0,0,0,0,0 }},	/* mask for the code index */
+	{{ 0,0x03f0,0,0,0,0,0,0 }},	/* mask for the color */
+	{{ 0,0,0xffc0,0,0,0,0,0 }},	/* mask for the X position */
+	{{ 0,0,0,0xffc0,0,0,0,0 }},	/* mask for the Y position */
+	{{ 0,0,0,0,0xffff,0,0,0 }},	/* mask for the scale factor */
+	{{ 0x8000,0,0,0,0,0,0,0 }},	/* mask for the horizontal flip */
+	{{ 0,0,0,0,0,0,0x00ff,0 }},	/* mask for the order */
+	{{ 0,0x0e00,0,0,0,0,0,0 }},	/* mask for the priority */
+	{{ 0 }}						/* mask for the VRAM target */
+};
+
+
 
 /*************************************
  *
@@ -538,12 +584,21 @@ static MACHINE_CONFIG_START( atarig42, atarig42_state )
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 
 	MCFG_VIDEO_START(atarig42)
-	MCFG_VIDEO_EOF(atarirle)
+	MCFG_VIDEO_EOF(atarig42)
 	MCFG_VIDEO_UPDATE(atarig42)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(jsa_iii_mono)
 MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( atarig42_0x200, atarig42 )
+	MCFG_ATARIRLE_ADD( "rle", modesc_0x200 )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( atarig42_0x400, atarig42 )
+	MCFG_ATARIRLE_ADD( "rle", modesc_0x400 )
+MACHINE_CONFIG_END
+
 
 
 
@@ -744,8 +799,6 @@ static DRIVER_INIT( roadriot )
 	atarijsa_init(machine, "IN2", 0x0040);
 
 	state->playfield_base = 0x400;
-	state->motion_object_base = 0x200;
-	state->motion_object_mask = 0x1ff;
 
 	address_space *main = machine->device<m68000_device>("maincpu")->space(AS_PROGRAM);
 	state->sloop_base = memory_install_readwrite16_handler(main, 0x000000, 0x07ffff, 0, 0, roadriot_sloop_data_r, roadriot_sloop_data_w);
@@ -781,8 +834,6 @@ static DRIVER_INIT( guardian )
 	atarijsa_init(machine, "IN2", 0x0040);
 
 	state->playfield_base = 0x000;
-	state->motion_object_base = 0x400;
-	state->motion_object_mask = 0x3ff;
 
 	/* it looks like they jsr to $80000 as some kind of protection */
 	/* put an RTS there so we don't die */
@@ -823,6 +874,6 @@ static DRIVER_INIT( guardian )
  *
  *************************************/
 
-GAME( 1991, roadriot, 0,        atarig42, roadriot, roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 1, 13 Nov 1991)", GAME_UNEMULATED_PROTECTION )
-GAME( 1991, roadrioto,roadriot, atarig42, roadriot, roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 2, 04 Jun 1991)", GAME_UNEMULATED_PROTECTION )
-GAME( 1992, guardian, 0,        atarig42, guardian, guardian, ROT0, "Atari Games", "Guardians of the 'Hood", 0 )
+GAME( 1991, roadriot, 0,        atarig42_0x200, roadriot, roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 1, 13 Nov 1991)", GAME_UNEMULATED_PROTECTION )
+GAME( 1991, roadrioto,roadriot, atarig42_0x200, roadriot, roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 2, 04 Jun 1991)", GAME_UNEMULATED_PROTECTION )
+GAME( 1992, guardian, 0,        atarig42_0x400, guardian, guardian, ROT0, "Atari Games", "Guardians of the 'Hood", 0 )

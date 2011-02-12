@@ -15,9 +15,6 @@
     CONSTANTS
 ***************************************************************************/
 
-/* maximum number of motion object processors */
-#define ATARIRLE_MAX				1
-
 #define ATARIRLE_PRIORITY_SHIFT		12
 #define ATARIRLE_BANK_SHIFT			15
 #define ATARIRLE_PRIORITY_MASK		((~0 << ATARIRLE_PRIORITY_SHIFT) & 0xffff)
@@ -73,28 +70,24 @@ struct atarirle_desc
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-/* setup/shutdown */
-void atarirle_init(running_machine *machine, int map, const atarirle_desc *desc);
+DECLARE_LEGACY_DEVICE(ATARIRLE, atarirle);
+#define MCFG_ATARIRLE_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, ATARIRLE, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
+
 
 /* control handlers */
-void atarirle_control_w(running_machine *machine, int map, UINT8 bits);
-void atarirle_command_w(int map, UINT8 command);
-VIDEO_EOF( atarirle );
+void atarirle_control_w(device_t *device, UINT8 bits);
+void atarirle_command_w(device_t *device, UINT8 command);
 
-/* write handlers */
-WRITE16_HANDLER( atarirle_0_spriteram_w );
-WRITE32_HANDLER( atarirle_0_spriteram32_w );
+/* read/write handlers */
+READ16_DEVICE_HANDLER( atarirle_spriteram_r );
+READ32_DEVICE_HANDLER( atarirle_spriteram32_r );
+WRITE16_DEVICE_HANDLER( atarirle_spriteram_w );
+WRITE32_DEVICE_HANDLER( atarirle_spriteram32_w );
 
 /* render helpers */
-bitmap_t *atarirle_get_vram(int map, int idx);
-
-
-
-/***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
-
-extern UINT16 *atarirle_0_spriteram;
-extern UINT32 *atarirle_0_spriteram32;
+void atarirle_eof(device_t *device);
+bitmap_t *atarirle_get_vram(device_t *device, int idx);
 
 #endif

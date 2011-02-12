@@ -20,7 +20,7 @@
 
 
 #include "emu.h"
-#include "machine/atarigen.h"
+#include "video/atarirle.h"
 #include "includes/atarigt.h"
 
 
@@ -78,28 +78,7 @@ static TILEMAP_MAPPER( atarigt_playfield_scan )
 
 VIDEO_START( atarigt )
 {
-	static const atarirle_desc modesc =
-	{
-		"gfx3",		/* region where the GFX data lives */
-		256,		/* number of entries in sprite RAM */
-		0,			/* left clip coordinate */
-		0,			/* right clip coordinate */
-
-		0x0000,		/* base palette entry */
-		0x1000,		/* maximum number of colors */
-
-		{{ 0x7fff,0,0,0,0,0,0,0 }},	/* mask for the code index */
-		{{ 0,0x0ff0,0,0,0,0,0,0 }},	/* mask for the color */
-		{{ 0,0,0xffc0,0,0,0,0,0 }},	/* mask for the X position */
-		{{ 0,0,0,0xffc0,0,0,0,0 }},	/* mask for the Y position */
-		{{ 0,0,0,0,0xffff,0,0,0 }},	/* mask for the scale factor */
-		{{ 0x8000,0,0,0,0,0,0,0 }},	/* mask for the horizontal flip */
-		{{ 0,0,0,0,0,0,0x00ff,0 }},	/* mask for the order */
-		{{ 0,0x0e00,0,0,0,0,0,0 }},	/* mask for the priority */
-		{{ 0,0x8000,0,0,0,0,0,0 }}	/* mask for the VRAM target */
-	};
 	atarigt_state *state = machine->driver_data<atarigt_state>();
-	atarirle_desc adjusted_modesc = modesc;
 	pen_t *substitute_pens;
 	int i, width, height;
 
@@ -110,7 +89,7 @@ VIDEO_START( atarigt )
 	state->playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, atarigt_playfield_scan,  8,8, 128,64);
 
 	/* initialize the motion objects */
-	atarirle_init(machine, 0, &adjusted_modesc);
+	state->rle = machine->device("rle");
 
 	/* initialize the alphanumerics */
 	state->alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
@@ -530,8 +509,8 @@ PrimRage GALs:
 VIDEO_UPDATE( atarigt )
 {
 	atarigt_state *state = screen->machine->driver_data<atarigt_state>();
-	bitmap_t *mo_bitmap = atarirle_get_vram(0, 0);
-	bitmap_t *tm_bitmap = atarirle_get_vram(0, 1);
+	bitmap_t *mo_bitmap = atarirle_get_vram(state->rle, 0);
+	bitmap_t *tm_bitmap = atarirle_get_vram(state->rle, 1);
 	UINT16 *cram, *tram;
 	int color_latch;
 	UINT32 *mram;
@@ -651,4 +630,11 @@ VIDEO_UPDATE( atarigt )
 		}
 	}
 	return 0;
+}
+
+VIDEO_EOF( atarigt )
+{
+	atarigt_state *state = machine->driver_data<atarigt_state>();
+
+	atarirle_eof(state->rle);
 }

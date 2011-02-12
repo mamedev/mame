@@ -13,8 +13,6 @@ public:
 		: atarigen_state(machine, config) { }
 
 	UINT16			playfield_base;
-	UINT16			motion_object_base;
-	UINT16			motion_object_mask;
 
 	UINT32 *		mo_command;
 	UINT32 *		protection_base;
@@ -27,12 +25,15 @@ public:
 
 	UINT16			last_write;
 	UINT16			last_write_offset;
+
+	device_t *		rle;
 };
 
 
 /*----------- defined in video/atarigx2.c -----------*/
 
 VIDEO_START( atarigx2 );
+VIDEO_EOF( atarigx2 );
 VIDEO_UPDATE( atarigx2 );
 
 WRITE16_HANDLER( atarigx2_mo_control_w );

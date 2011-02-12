@@ -5,7 +5,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "machine/atarigen.h"
+#include "video/atarirle.h"
 #include "includes/atarig1.h"
 
 
@@ -46,47 +46,6 @@ static TILE_GET_INFO( get_playfield_tile_info )
 
 VIDEO_START( atarig1 )
 {
-	static const atarirle_desc modesc_hydra =
-	{
-		"gfx3",		/* region where the GFX data lives */
-		256,		/* number of entries in sprite RAM */
-		0,			/* left clip coordinate */
-		255,		/* right clip coordinate */
-
-		0x200,		/* base palette entry */
-		0x100,		/* maximum number of colors */
-
-		{{ 0x7fff,0,0,0,0,0,0,0 }},	/* mask for the code index */
-		{{ 0,0x00f0,0,0,0,0,0,0 }},	/* mask for the color */
-		{{ 0,0,0xffc0,0,0,0,0,0 }},	/* mask for the X position */
-		{{ 0,0,0,0xffc0,0,0,0,0 }},	/* mask for the Y position */
-		{{ 0,0,0,0,0xffff,0,0,0 }},	/* mask for the scale factor */
-		{{ 0x8000,0,0,0,0,0,0,0 }},	/* mask for the horizontal flip */
-		{{ 0,0,0,0,0,0x00ff,0,0 }},	/* mask for the order */
-		{{ 0 }},					/* mask for the priority */
-		{{ 0 }}						/* mask for the VRAM target */
-	};
-
-	static const atarirle_desc modesc_pitfight =
-	{
-		"gfx3",		/* region where the GFX data lives */
-		256,		/* number of entries in sprite RAM */
-		40,			/* left clip coordinate */
-		295,		/* right clip coordinate */
-
-		0x200,		/* base palette entry */
-		0x100,		/* maximum number of colors */
-
-		{{ 0x7fff,0,0,0,0,0,0,0 }},	/* mask for the code index */
-		{{ 0,0x00f0,0,0,0,0,0,0 }},	/* mask for the color */
-		{{ 0,0,0xffc0,0,0,0,0,0 }},	/* mask for the X position */
-		{{ 0,0,0,0xffc0,0,0,0,0 }},	/* mask for the Y position */
-		{{ 0,0,0,0,0xffff,0,0,0 }},	/* mask for the scale factor */
-		{{ 0x8000,0,0,0,0,0,0,0 }},	/* mask for the horizontal flip */
-		{{ 0,0,0,0,0,0,0x00ff,0 }},	/* mask for the order */
-		{{ 0 }},					/* mask for the priority */
-		{{ 0 }}						/* mask for the VRAM target */
-	};
 	atarig1_state *state = machine->driver_data<atarig1_state>();
 
 	/* blend the playfields and free the temporary one */
@@ -96,7 +55,7 @@ VIDEO_START( atarig1 )
 	state->playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_rows,  8,8, 64,64);
 
 	/* initialize the motion objects */
-	atarirle_init(machine, 0, state->is_pitfight ? &modesc_pitfight : &modesc_hydra);
+	state->rle = machine->device("rle");
 
 	/* initialize the alphanumerics */
 	state->alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
@@ -200,9 +159,16 @@ VIDEO_UPDATE( atarig1 )
 	tilemap_draw(bitmap, cliprect, state->playfield_tilemap, 0, 0);
 
 	/* copy the motion objects on top */
-	copybitmap_trans(bitmap, atarirle_get_vram(0, 0), 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, atarirle_get_vram(state->rle, 0), 0, 0, 0, 0, cliprect, 0);
 
 	/* add the alpha on top */
 	tilemap_draw(bitmap, cliprect, state->alpha_tilemap, 0, 0);
 	return 0;
+}
+
+VIDEO_EOF( atarig1 )
+{
+	atarig1_state *state = machine->driver_data<atarig1_state>();
+
+	atarirle_eof(state->rle);
 }

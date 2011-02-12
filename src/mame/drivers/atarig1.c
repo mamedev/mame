@@ -70,7 +70,10 @@ static MACHINE_RESET( atarig1 )
 static WRITE16_HANDLER( mo_control_w )
 {
 	if (ACCESSING_BITS_0_7)
-		atarirle_control_w(space->machine, 0, data & 7);
+	{
+		atarig1_state *state = space->machine->driver_data<atarig1_state>();
+		atarirle_control_w(state->rle, data & 7);
+	}
 }
 
 
@@ -78,7 +81,7 @@ static WRITE16_HANDLER( mo_command_w )
 {
 	atarig1_state *state = space->machine->driver_data<atarig1_state>();
 	COMBINE_DATA(state->mo_command);
-	atarirle_command_w(0, (data == 0 && state->is_pitfight) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
+	atarirle_command_w(state->rle, (data == 0 && state->is_pitfight) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
 }
 
 
@@ -224,7 +227,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfd8000, 0xfdffff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 /*  AM_RANGE(0xfe0000, 0xfe7fff) AM_READ(from_r)*/
 	AM_RANGE(0xfe8000, 0xfe89ff) AM_RAM_WRITE(atarigen_666_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xff0000, 0xff0fff) AM_WRITE(atarirle_0_spriteram_w) AM_BASE(&atarirle_0_spriteram)
+	AM_RANGE(0xff0000, 0xff0fff) AM_DEVREADWRITE("rle", atarirle_spriteram_r, atarirle_spriteram_w)
 	AM_RANGE(0xff2000, 0xff2001) AM_WRITE(mo_command_w) AM_BASE_MEMBER(atarig1_state, mo_command)
 	AM_RANGE(0xff4000, 0xff5fff) AM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(atarig1_state, playfield)
 	AM_RANGE(0xff6000, 0xff6fff) AM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(atarig1_state, alpha)
@@ -401,6 +404,48 @@ GFXDECODE_END
 
 
 
+static const atarirle_desc modesc_hydra =
+{
+	"gfx3",		/* region where the GFX data lives */
+	256,		/* number of entries in sprite RAM */
+	0,			/* left clip coordinate */
+	255,		/* right clip coordinate */
+
+	0x200,		/* base palette entry */
+	0x100,		/* maximum number of colors */
+
+	{{ 0x7fff,0,0,0,0,0,0,0 }},	/* mask for the code index */
+	{{ 0,0x00f0,0,0,0,0,0,0 }},	/* mask for the color */
+	{{ 0,0,0xffc0,0,0,0,0,0 }},	/* mask for the X position */
+	{{ 0,0,0,0xffc0,0,0,0,0 }},	/* mask for the Y position */
+	{{ 0,0,0,0,0xffff,0,0,0 }},	/* mask for the scale factor */
+	{{ 0x8000,0,0,0,0,0,0,0 }},	/* mask for the horizontal flip */
+	{{ 0,0,0,0,0,0x00ff,0,0 }},	/* mask for the order */
+	{{ 0 }},					/* mask for the priority */
+	{{ 0 }}						/* mask for the VRAM target */
+};
+
+static const atarirle_desc modesc_pitfight =
+{
+	"gfx3",		/* region where the GFX data lives */
+	256,		/* number of entries in sprite RAM */
+	40,			/* left clip coordinate */
+	295,		/* right clip coordinate */
+
+	0x200,		/* base palette entry */
+	0x100,		/* maximum number of colors */
+
+	{{ 0x7fff,0,0,0,0,0,0,0 }},	/* mask for the code index */
+	{{ 0,0x00f0,0,0,0,0,0,0 }},	/* mask for the color */
+	{{ 0,0,0xffc0,0,0,0,0,0 }},	/* mask for the X position */
+	{{ 0,0,0,0xffc0,0,0,0,0 }},	/* mask for the Y position */
+	{{ 0,0,0,0,0xffff,0,0,0 }},	/* mask for the scale factor */
+	{{ 0x8000,0,0,0,0,0,0,0 }},	/* mask for the horizontal flip */
+	{{ 0,0,0,0,0,0,0x00ff,0 }},	/* mask for the order */
+	{{ 0 }},					/* mask for the priority */
+	{{ 0 }}						/* mask for the VRAM target */
+};
+
 /*************************************
  *
  *  Machine driver
@@ -429,13 +474,20 @@ static MACHINE_CONFIG_START( atarig1, atarig1_state )
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 
 	MCFG_VIDEO_START(atarig1)
-	MCFG_VIDEO_EOF(atarirle)
+	MCFG_VIDEO_EOF(atarig1)
 	MCFG_VIDEO_UPDATE(atarig1)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(jsa_ii_mono)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( hydra, atarig1 )
+	MCFG_ATARIRLE_ADD( "rle", modesc_hydra )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( pitfight, atarig1 )
+	MCFG_ATARIRLE_ADD( "rle", modesc_pitfight )
+MACHINE_CONFIG_END
 
 
 /*************************************
@@ -1201,15 +1253,15 @@ static DRIVER_INIT( pitfightb ) { init_g1_common(machine, 0x038000,  -1, 1); }
  *
  *************************************/
 
-GAME( 1990, hydra,    0,        atarig1, hydra,    hydra,    ROT0, "Atari Games", "Hydra", GAME_SUPPORTS_SAVE )
-GAME( 1990, hydrap,   hydra,    atarig1, hydra,    hydrap,   ROT0, "Atari Games", "Hydra (prototype 5/14/90)", GAME_SUPPORTS_SAVE )
-GAME( 1990, hydrap2,  hydra,    atarig1, hydra,    hydrap,   ROT0, "Atari Games", "Hydra (prototype 5/25/90)", GAME_SUPPORTS_SAVE )
+GAME( 1990, hydra,    0,        hydra, hydra,    hydra,    ROT0, "Atari Games", "Hydra", GAME_SUPPORTS_SAVE )
+GAME( 1990, hydrap,   hydra,    hydra, hydra,    hydrap,   ROT0, "Atari Games", "Hydra (prototype 5/14/90)", GAME_SUPPORTS_SAVE )
+GAME( 1990, hydrap2,  hydra,    hydra, hydra,    hydrap,   ROT0, "Atari Games", "Hydra (prototype 5/25/90)", GAME_SUPPORTS_SAVE )
 
-GAME( 1990, pitfight,  0,        atarig1, pitfight, pitfight9, ROT0, "Atari Games", "Pit Fighter (rev 9)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pitfight7, pitfight, atarig1, pitfight, pitfight7, ROT0, "Atari Games", "Pit Fighter (rev 7)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pitfight6, pitfight, atarig1, pitfight, pitfightj, ROT0, "Atari Games", "Pit Fighter (rev 6)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pitfight5, pitfight, atarig1, pitfight, pitfight7, ROT0, "Atari Games", "Pit Fighter (rev 5)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pitfight4, pitfight, atarig1, pitfight, pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 4)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pitfight3, pitfight, atarig1, pitfight, pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 3)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pitfightj, pitfight, atarig1, pitfightj,pitfightj, ROT0, "Atari Games", "Pit Fighter (Japan, 2 players)", GAME_SUPPORTS_SAVE )
-GAME( 1990, pitfightb, pitfight, atarig1, pitfight, pitfightb, ROT0, "bootleg",     "Pit Fighter (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfight,  0,        pitfight, pitfight, pitfight9, ROT0, "Atari Games", "Pit Fighter (rev 9)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfight7, pitfight, pitfight, pitfight, pitfight7, ROT0, "Atari Games", "Pit Fighter (rev 7)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfight6, pitfight, pitfight, pitfight, pitfightj, ROT0, "Atari Games", "Pit Fighter (rev 6)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfight5, pitfight, pitfight, pitfight, pitfight7, ROT0, "Atari Games", "Pit Fighter (rev 5)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfight4, pitfight, pitfight, pitfight, pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 4)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfight3, pitfight, pitfight, pitfight, pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 3)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfightj, pitfight, pitfight, pitfightj,pitfightj, ROT0, "Atari Games", "Pit Fighter (Japan, 2 players)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pitfightb, pitfight, pitfight, pitfight, pitfightb, ROT0, "bootleg",     "Pit Fighter (bootleg)", GAME_SUPPORTS_SAVE )

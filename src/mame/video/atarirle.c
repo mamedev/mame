@@ -96,6 +96,7 @@ struct atarirle_data
 	UINT8			command;			/* current command */
 	UINT8			is32bit;			/* 32-bit or 16-bit? */
 	UINT16			checksums[256];		/* checksums for each 0x40000 bytes */
+	UINT16			ram[0x1000/2];
 };
 
 
@@ -108,23 +109,13 @@ struct atarirle_data
 #define EXTRACT_DATA(_input, _mask) (((_input)->data[(_mask).word] >> (_mask).shift) & (_mask).mask)
 
 
-
-/***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
-
-UINT16 *atarirle_0_spriteram;
-UINT32 *atarirle_0_spriteram32;
-
-static int atarirle_hilite_index = -1;
+enum { atarirle_hilite_index = -1 };
 
 
 
 /***************************************************************************
     STATIC VARIABLES
 ***************************************************************************/
-
-static atarirle_data atarirle[ATARIRLE_MAX];
 
 static UINT8 rle_bpp[8];
 static UINT16 *rle_table[8];
@@ -154,6 +145,15 @@ static void draw_rle_zoom_hflip(bitmap_t *bitmap, const atarirle_info *gfx,
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
+
+INLINE atarirle_data *get_safe_token(device_t *device)
+{
+	assert(device != NULL);
+	assert(device->type() == ATARIRLE);
+
+	return (atarirle_data *)downcast<legacy_device_base *>(device)->token();
+}
+
 
 /*---------------------------------------------------------------
     compute_log: Computes the number of bits necessary to
@@ -268,14 +268,13 @@ INLINE int convert_mask(const atarirle_entry *input, atarirle_mask *result)
     the attribute lookup table.
 ---------------------------------------------------------------*/
 
-void atarirle_init(running_machine *machine, int map, const atarirle_desc *desc)
+static DEVICE_START( atarirle )
 {
+	atarirle_data *mo = get_safe_token(device);
+	running_machine *machine = device->machine;
+	const atarirle_desc *desc = (const atarirle_desc *)device->baseconfig().static_config();
 	const UINT16 *base = (const UINT16 *)machine->region(desc->region)->base();
-	atarirle_data *mo = &atarirle[map];
 	int i, width, height;
-
-	/* verify the map index */
-	assert_always(map >= 0 && map < ATARIRLE_MAX, "Invalid map index");
 
 	/* build and allocate the generic tables */
 	build_rle_tables(machine);
@@ -356,31 +355,51 @@ void atarirle_init(running_machine *machine, int map, const atarirle_desc *desc)
 	mo->partial_scanline = -1;
 
 	/* register for save states */
-	state_save_register_item_pointer(machine, "atarirle", NULL, map, mo->spriteram[0].data, ARRAY_LENGTH(mo->spriteram[0].data) * mo->spriteramsize);
-	state_save_register_item_bitmap(machine, "atarirle", NULL, map, mo->vram[0][0]);
-	state_save_register_item_bitmap(machine, "atarirle", NULL, map, mo->vram[0][1]);
+	device->save_pointer(NAME(mo->spriteram[0].data), ARRAY_LENGTH(mo->spriteram[0].data) * mo->spriteramsize);
+	device->save_item(NAME(*mo->vram[0][0]));
+	device->save_item(NAME(*mo->vram[0][1]));
 	if (mo->vrammask.mask != 0)
 	{
-		state_save_register_item_bitmap(machine, "atarirle", NULL, map, mo->vram[1][0]);
-		state_save_register_item_bitmap(machine, "atarirle", NULL, map, mo->vram[1][1]);
+		device->save_item(NAME(*mo->vram[1][0]));
+		device->save_item(NAME(*mo->vram[1][1]));
 	}
-	state_save_register_item(machine, "atarirle", NULL, map, mo->partial_scanline);
-	state_save_register_item(machine, "atarirle", NULL, map, mo->control_bits);
-	state_save_register_item(machine, "atarirle", NULL, map, mo->command);
-	state_save_register_item(machine, "atarirle", NULL, map, mo->is32bit);
-	state_save_register_item_array(machine, "atarirle", NULL, map, mo->checksums);
+	device->save_item(NAME(mo->partial_scanline));
+	device->save_item(NAME(mo->control_bits));
+	device->save_item(NAME(mo->command));
+	device->save_item(NAME(mo->is32bit));
+	device->save_item(NAME(mo->checksums));
 }
 
 
+DEVICE_GET_INFO( atarirle )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(atarirle_data);					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(atarirle);		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:					strcpy(info->s, "Atari RLE");				break;
+		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Atari RLE Video IC");					break;
+		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright MAME Team");			break;
+	}
+}
+
+DEFINE_LEGACY_DEVICE(ATARIRLE, atarirle);
 
 /*---------------------------------------------------------------
     atarirle_control_w: Write handler for MO control bits.
 ---------------------------------------------------------------*/
 
-void atarirle_control_w(running_machine *machine, int map, UINT8 bits)
+void atarirle_control_w(device_t *device, UINT8 bits)
 {
-	atarirle_data *mo = &atarirle[map];
-	int scanline = machine->primary_screen->vpos();
+	atarirle_data *mo = get_safe_token(device);
+	int scanline = device->machine->primary_screen->vpos();
 	int oldbits = mo->control_bits;
 
 //logerror("atarirle_control_w(%d)\n", bits);
@@ -390,7 +409,7 @@ void atarirle_control_w(running_machine *machine, int map, UINT8 bits)
 		return;
 
 	/* force a partial update first */
-	machine->primary_screen->update_partial(scanline);
+	device->machine->primary_screen->update_partial(scanline);
 
 	/* if the erase flag was set, erase the front map */
 	if (oldbits & ATARIRLE_CONTROL_ERASE)
@@ -418,7 +437,7 @@ void atarirle_control_w(running_machine *machine, int map, UINT8 bits)
 	if (!(oldbits & ATARIRLE_CONTROL_MOGO) && (bits & ATARIRLE_CONTROL_MOGO))
 	{
 		if (mo->command == ATARIRLE_COMMAND_DRAW)
-			sort_and_render(machine, mo);
+			sort_and_render(device->machine, mo);
 		else if (mo->command == ATARIRLE_COMMAND_CHECKSUM)
 			compute_checksum(mo);
 	}
@@ -433,28 +452,22 @@ void atarirle_control_w(running_machine *machine, int map, UINT8 bits)
     atarirle_command_w: Write handler for MO command bits.
 ---------------------------------------------------------------*/
 
-void atarirle_command_w(int map, UINT8 command)
+void atarirle_command_w(device_t *device, UINT8 command)
 {
-	atarirle_data *mo = &atarirle[map];
+	atarirle_data *mo = get_safe_token(device);
 	mo->command = command;
 }
 
 
 
 /*---------------------------------------------------------------
-    VIDEO_EOF(atarirle): Flush remaining changes.
+    atarirle_eof: Flush remaining changes.
 ---------------------------------------------------------------*/
 
-VIDEO_EOF( atarirle )
+void atarirle_eof(device_t *device)
 {
-	int i;
-
-//logerror("VIDEO_EOF(atarirle)\n");
-
-	/* loop over all RLE handlers */
-	for (i = 0; i < ATARIRLE_MAX; i++)
 	{
-		atarirle_data *mo = &atarirle[i];
+		atarirle_data *mo = get_safe_token(device);
 
 		/* if the erase flag is set, erase to the end of the screen */
 		if (mo->control_bits & ATARIRLE_CONTROL_ERASE)
@@ -481,40 +494,70 @@ VIDEO_EOF( atarirle )
 
 
 /*---------------------------------------------------------------
-    atarirle_0_spriteram_w: Write handler for the spriteram.
+    atarirle_spriteram_r: Read handler for the spriteram.
 ---------------------------------------------------------------*/
 
-WRITE16_HANDLER( atarirle_0_spriteram_w )
+READ16_DEVICE_HANDLER( atarirle_spriteram_r )
 {
-	int entry = (offset >> 3) & atarirle[0].spriterammask;
-	int idx = offset & 7;
+	atarirle_data *mo = get_safe_token(device);
 
-	/* combine raw data */
-	COMBINE_DATA(&atarirle_0_spriteram[offset]);
-
-	/* store a copy in our local spriteram */
-	atarirle[0].spriteram[entry].data[idx] = atarirle_0_spriteram[offset];
-	atarirle[0].is32bit = 0;
+	return mo->ram[offset];
 }
 
 
 
 /*---------------------------------------------------------------
-    atarirle_0_spriteram32_w: Write handler for the spriteram.
+    atarirle_spriteram_w: Write handler for the spriteram.
 ---------------------------------------------------------------*/
 
-WRITE32_HANDLER( atarirle_0_spriteram32_w )
+WRITE16_DEVICE_HANDLER( atarirle_spriteram_w )
 {
-	int entry = (offset >> 2) & atarirle[0].spriterammask;
+	atarirle_data *mo = get_safe_token(device);
+	int entry = (offset >> 3) & mo->spriterammask;
+	int idx = offset & 7;
+
+	/* combine raw data */
+	COMBINE_DATA(&mo->ram[offset]);
+
+	/* store a copy in our local spriteram */
+	mo->spriteram[entry].data[idx] = mo->ram[offset];
+	mo->is32bit = 0;
+}
+
+
+
+/*---------------------------------------------------------------
+    atarirle_spriteram32_r: Read handler for the spriteram.
+---------------------------------------------------------------*/
+
+READ32_DEVICE_HANDLER( atarirle_spriteram32_r )
+{
+	atarirle_data *mo = get_safe_token(device);
+	UINT32 *ram = (UINT32 *)mo->ram;
+
+	return ram[offset];
+}
+
+
+
+/*---------------------------------------------------------------
+    atarirle_spriteram32_w: Write handler for the spriteram.
+---------------------------------------------------------------*/
+
+WRITE32_DEVICE_HANDLER( atarirle_spriteram32_w )
+{
+	atarirle_data *mo = get_safe_token(device);
+	UINT32 *ram = (UINT32 *)mo->ram;
+	int entry = (offset >> 2) & mo->spriterammask;
 	int idx = 2 * (offset & 3);
 
 	/* combine raw data */
-	COMBINE_DATA(&atarirle_0_spriteram32[offset]);
+	COMBINE_DATA(&ram[offset]);
 
 	/* store a copy in our local spriteram */
-	atarirle[0].spriteram[entry].data[idx+0] = atarirle_0_spriteram32[offset] >> 16;
-	atarirle[0].spriteram[entry].data[idx+1] = atarirle_0_spriteram32[offset];
-	atarirle[0].is32bit = 1;
+	mo->spriteram[entry].data[idx+0] = ram[offset] >> 16;
+	mo->spriteram[entry].data[idx+1] = ram[offset];
+	mo->is32bit = 1;
 }
 
 
@@ -523,9 +566,9 @@ WRITE32_HANDLER( atarirle_0_spriteram32_w )
     atarirle_get_vram: Return the VRAM bitmap.
 ---------------------------------------------------------------*/
 
-bitmap_t *atarirle_get_vram(int map, int idx)
+bitmap_t *atarirle_get_vram(device_t *device, int idx)
 {
-	atarirle_data *mo = &atarirle[map];
+	atarirle_data *mo = get_safe_token(device);
 //logerror("atarirle_get_vram (frame %d)\n", (mo->control_bits & ATARIRLE_CONTROL_FRAME) >> 2);
 	return mo->vram[idx][(mo->control_bits & ATARIRLE_CONTROL_FRAME) >> 2];
 }
@@ -712,15 +755,16 @@ static void compute_checksum(atarirle_data *mo)
 	if (!mo->is32bit)
 	{
 		for (i = 0; i < reqsums; i++)
-			atarirle_0_spriteram[i] = mo->checksums[i];
+			mo->ram[i] = mo->checksums[i];
 	}
 	else
 	{
+		UINT32 *ram = (UINT32 *)mo->ram;
 		for (i = 0; i < reqsums; i++)
 			if (i & 1)
-				atarirle_0_spriteram32[i/2] = (atarirle_0_spriteram32[i/2] & 0xffff0000) | mo->checksums[i];
+				ram[i/2] = (ram[i/2] & 0xffff0000) | mo->checksums[i];
 			else
-				atarirle_0_spriteram32[i/2] = (atarirle_0_spriteram32[i/2] & 0x0000ffff) | (mo->checksums[i] << 16);
+				ram[i/2] = (ram[i/2] & 0x0000ffff) | (mo->checksums[i] << 16);
 	}
 }
 
