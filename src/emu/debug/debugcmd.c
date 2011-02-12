@@ -372,7 +372,7 @@ void debug_command_init(running_machine *machine)
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, debug_command_exit);
 
 	/* set up the initial debugscript if specified */
-	name = options_get_string(machine->options(), OPTION_DEBUGSCRIPT);
+	name = options_get_string(&machine->options(), OPTION_DEBUGSCRIPT);
 	if (name[0] != 0)
 		debug_cpu_source_script(machine, name);
 }
@@ -2489,8 +2489,6 @@ static void execute_snap(running_machine *machine, int ref, int params, const ch
 	/* otherwise, we have to open the file ourselves */
 	else
 	{
-		file_error filerr;
-		mame_file *fp;
 		const char *filename = param[0];
 		int scrnum = (params > 1) ? atoi(param[1]) : 0;
 
@@ -2505,7 +2503,8 @@ static void execute_snap(running_machine *machine, int ref, int params, const ch
 		astring fname(filename);
 		if (fname.find(0, ".png") == -1)
 			fname.cat(".png");
-		filerr = mame_fopen(SEARCHPATH_SCREENSHOT, fname, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &fp);
+		emu_file file(machine->options(), SEARCHPATH_SCREENSHOT, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+		file_error filerr = file.open(fname);
 
 		if (filerr != FILERR_NONE)
 		{
@@ -2513,8 +2512,7 @@ static void execute_snap(running_machine *machine, int ref, int params, const ch
 			return;
 		}
 
-		screen->machine->video().save_snapshot(screen, *fp);
-		mame_fclose(fp);
+		screen->machine->video().save_snapshot(screen, file);
 		debug_console_printf(machine, "Saved screen #%d snapshot as '%s'\n", scrnum, filename);
 	}
 }

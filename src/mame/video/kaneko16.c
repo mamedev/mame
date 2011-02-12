@@ -55,6 +55,7 @@ UINT16 kaneko16_sprite_xoffs, kaneko16_sprite_flipx;
 UINT16 kaneko16_sprite_yoffs, kaneko16_sprite_flipy;
 UINT16 *kaneko16_sprites_regs;
 
+UINT8 kaneko16_nvram_save[128];
 
 UINT16 *kaneko16_bg15_select, *kaneko16_bg15_reg;
 static bitmap_t *kaneko16_bg15_bitmap;

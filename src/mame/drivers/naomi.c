@@ -1418,14 +1418,14 @@ static NVRAM_HANDLER( naomi_eeproms )
 	if (read_or_write)
 	{
 		/* JVS 'eeprom' */
-		mame_fwrite(file,maple0x86data1,0x80);
+		file->write(maple0x86data1,0x80);
 	}
 	else
 	{
 		if (file)
 		{
 			/* JVS 'eeprom' */
-			mame_fread(file,maple0x86data1,0x80);
+			file->read(maple0x86data1,0x80);
 		}
     	else
 		{

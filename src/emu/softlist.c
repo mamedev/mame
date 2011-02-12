@@ -41,7 +41,7 @@ typedef struct _parse_state
 
 struct _software_list
 {
-	mame_file	*file;
+	emu_file	*file;
 	object_pool	*pool;
 	parse_state	state;
 	const char *description;
@@ -824,9 +824,9 @@ static int software_list_get_count(software_list *swlist)
     parent software, if any
  -------------------------------------------------*/
 
-const char *software_get_clone(char *swlist, const char *swname)
+const char *software_get_clone(core_options &options, char *swlist, const char *swname)
 {
-	software_list *software_list_ptr = software_list_open(mame_options(), swlist, FALSE, NULL);
+	software_list *software_list_ptr = software_list_open(options, swlist, FALSE, NULL);
 	const char *retval = NULL;
 	if (software_list_ptr)
 	{
@@ -844,9 +844,9 @@ const char *software_get_clone(char *swlist, const char *swname)
     the software
  -------------------------------------------------*/
 
-UINT32 software_get_support(char *swlist, const char *swname)
+UINT32 software_get_support(core_options &options, char *swlist, const char *swname)
 {
-	software_list *software_list_ptr = software_list_open(mame_options(), swlist, FALSE, NULL);
+	software_list *software_list_ptr = software_list_open(options, swlist, FALSE, NULL);
 	UINT32 retval = 0;
 
 	if (software_list_ptr)
@@ -872,7 +872,7 @@ void software_list_parse(software_list *swlist,
 	UINT32 len;
 	XML_Memory_Handling_Suite memcallbacks;
 
-	mame_fseek(swlist->file, 0, SEEK_SET);
+	swlist->file->seek(0, SEEK_SET);
 
 	memset(&swlist->state, 0, sizeof(swlist->state));
 	swlist->state.error_proc = error_proc;
@@ -892,8 +892,8 @@ void software_list_parse(software_list *swlist,
 
 	while(!swlist->state.done)
 	{
-		len = mame_fread(swlist->file, buf, sizeof(buf));
-		swlist->state.done = mame_feof(swlist->file);
+		len = swlist->file->read(buf, sizeof(buf));
+		swlist->state.done = swlist->file->eof();
 		if (XML_Parse(swlist->state.parser, buf, len, swlist->state.done) == XML_STATUS_ERROR)
 		{
 			parse_error(&swlist->state, "[%lu:%lu]: %s\n",
@@ -917,13 +917,12 @@ done:
     software_list_open
 -------------------------------------------------*/
 
-software_list *software_list_open(core_options *options, const char *listname, int is_preload,
+software_list *software_list_open(core_options &options, const char *listname, int is_preload,
 	void (*error_proc)(const char *message))
 {
-	file_error filerr;
-	astring *fname;
 	software_list *swlist = NULL;
 	object_pool *pool = NULL;
+	file_error filerr;
 
 	/* create a pool for this software list file */
 	pool = pool_alloc_lib(error_proc);
@@ -941,10 +940,8 @@ software_list *software_list_open(core_options *options, const char *listname, i
 	swlist->error_proc = error_proc;
 
 	/* open a file */
-	fname = astring_assemble_2(astring_alloc(), listname, ".xml");
-	filerr = mame_fopen_options(options, SEARCHPATH_HASH, astring_c(fname), OPEN_FLAG_READ, &swlist->file);
-	astring_free(fname);
-
+	swlist->file = global_alloc(emu_file(options, SEARCHPATH_HASH, OPEN_FLAG_READ));
+	filerr = swlist->file->open(listname, ".xml");
 	if (filerr != FILERR_NONE)
 		goto error;
 
@@ -972,8 +969,8 @@ void software_list_close(software_list *swlist)
 	if (swlist == NULL)
 		return;
 
-	if (swlist->file)
-		mame_fclose(swlist->file);
+	if (swlist->file != NULL)
+		global_free(swlist->file);
 	pool_free_lib(swlist->pool);
 }
 
@@ -1290,7 +1287,7 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 	if ( swlist_name )
 	{
 		/* Try to open the software list xml file explicitly named by the user */
-		software_list_ptr = software_list_open( mame_options(), swlist_name, FALSE, NULL );
+		software_list_ptr = software_list_open( image->device().machine->options(), swlist_name, FALSE, NULL );
 
 		if ( software_list_ptr )
 		{
@@ -1562,10 +1559,7 @@ static DEVICE_VALIDITY_CHECK( software_list )
 	{
 		if (swlist->list_name[i])
 		{
-			if (mame_options() == NULL)
-				return FALSE;
-
-			software_list *list = software_list_open(mame_options(), swlist->list_name[i], FALSE, NULL);
+			software_list *list = software_list_open(options, swlist->list_name[i], FALSE, NULL);
 
 			/* if no .xml list is found, then return (this happens e.g. if you moved/renamed the xml list) */
 			if (list == NULL)
@@ -1904,7 +1898,7 @@ void ui_mess_menu_software_list(running_machine *machine, ui_menu *menu, void *p
 	{
 		device_image_interface *image = sw_state->image;
 		software_entry_state *entry = (software_entry_state *) event->itemref;
-		software_list *tmp_list = software_list_open(mame_options(), sw_state->list_name, FALSE, NULL);
+		software_list *tmp_list = software_list_open(machine->options(), sw_state->list_name, FALSE, NULL);
 		software_info *tmp_info = software_list_find(tmp_list, entry->short_name, NULL);
 
 		// if the selected software has multiple parts that can be loaded, open the submenu
@@ -1944,7 +1938,7 @@ static void ui_mess_menu_populate_software_list(running_machine *machine, ui_men
 		{
 			if (swlist->list_name[i] && (swlist->list_type == SOFTWARE_LIST_ORIGINAL_SYSTEM))
 			{
-				software_list *list = software_list_open(mame_options(), swlist->list_name[i], FALSE, NULL);
+				software_list *list = software_list_open(machine->options(), swlist->list_name[i], FALSE, NULL);
 
 				if (list)
 				{
@@ -1974,7 +1968,7 @@ static void ui_mess_menu_populate_software_list(running_machine *machine, ui_men
 		{
 			if (swlist->list_name[i] && (swlist->list_type == SOFTWARE_LIST_COMPATIBLE_SYSTEM))
 			{
-				software_list *list = software_list_open(mame_options(), swlist->list_name[i], FALSE, NULL);
+				software_list *list = software_list_open(machine->options(), swlist->list_name[i], FALSE, NULL);
 
 				if (list)
 				{

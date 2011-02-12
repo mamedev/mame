@@ -175,7 +175,7 @@ int mame_execute(osd_interface &osd, core_options *options)
 		}
 
 		// otherwise, perform validity checks before anything else
-		else if (mame_validitychecks(driver) != 0)
+		else if (mame_validitychecks(*options, driver) != 0)
 			return MAMERR_FAILED_VALIDITY;
 
 		firstgame = false;
@@ -567,27 +567,22 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
 
 static int parse_ini_file(core_options *options, const char *name, int priority)
 {
-	file_error filerr;
-	mame_file *file;
-
 	/* update game name so depending callback options could be added */
-	if (priority==OPTION_PRIORITY_DRIVER_INI || priority==OPTION_PRIORITY_SOURCE_INI) {
+	if (priority == OPTION_PRIORITY_DRIVER_INI || priority == OPTION_PRIORITY_SOURCE_INI)
 		options_force_option_callback(options, OPTION_GAMENAME, name, priority);
-	}
 
 	/* don't parse if it has been disabled */
 	if (!options_get_bool(options, OPTION_READCONFIG))
 		return FALSE;
 
 	/* open the file; if we fail, that's ok */
-	astring fname(name, ".ini");
-	filerr = mame_fopen_options(options, SEARCHPATH_INI, fname, OPEN_FLAG_READ, &file);
+	emu_file file(*options, SEARCHPATH_INI, OPEN_FLAG_READ);
+	file_error filerr = file.open(name, ".ini");
 	if (filerr != FILERR_NONE)
 		return FALSE;
 
 	/* parse the file and close it */
 	mame_printf_verbose("Parsing %s.ini\n", name);
-	options_parse_ini_file(options, mame_core_file(file), priority, OPTION_PRIORITY_DRIVER_INI);
-	mame_fclose(file);
+	options_parse_ini_file(options, file, priority, OPTION_PRIORITY_DRIVER_INI);
 	return TRUE;
 }

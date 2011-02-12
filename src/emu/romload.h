@@ -285,8 +285,8 @@ int rom_load_knownbad(running_machine *machine);
 
 /* ----- Helpers ----- */
 
-file_error common_process_file_options(core_options *options, const char *location, const char *ext, const rom_entry *romp, mame_file **image_file);
-file_error common_process_file(const char *location, bool has_crc, UINT32 crc, const rom_entry *romp, mame_file **image_file);
+file_error common_process_file(core_options &options, const char *location, const char *ext, const rom_entry *romp, emu_file **image_file);
+file_error common_process_file(core_options &options, const char *location, bool has_crc, UINT32 crc, const rom_entry *romp, emu_file **image_file);
 
 
 /* ----- ROM iteration ----- */
@@ -323,16 +323,13 @@ astring &rom_region_name(astring &result, const game_driver *drv, const rom_sour
 /* ----- disk handling ----- */
 
 /* open a disk image, searching up the parent and loading by checksum */
-chd_error open_disk_image(const game_driver *gamedrv, const rom_entry *romp, mame_file **image_file, chd_file **image_chd,const char *locationtag);
-
-/* open a disk image, searching up the parent and loading by checksum */
-chd_error open_disk_image_options(core_options *options, const game_driver *gamedrv, const rom_entry *romp, mame_file **image_file, chd_file **image_chd,const char *locationtag);
+chd_error open_disk_image(core_options &options, const game_driver *gamedrv, const rom_entry *romp, emu_file **image_file, chd_file **image_chd,const char *locationtag);
 
 /* return a pointer to the CHD file associated with the given region */
 chd_file *get_disk_handle(running_machine *machine, const char *region);
 
 /* set a pointer to the CHD file associated with the given region */
-void set_disk_handle(running_machine *machine, const char *region, mame_file *file, chd_file *chd);
+void set_disk_handle(running_machine &machine, const char *region, emu_file &file, chd_file &chdfile);
 
 void load_software_part_region(device_t *device, char *swlist, char *swname, rom_entry *start_region);
 

@@ -193,40 +193,40 @@ static UINT8 BCD_to_binary(UINT8 data)
 /*
     load the SRAM and register contents from file
 */
-static int rtc65271_file_load(device_t *device, mame_file *file)
+static int rtc65271_file_load(device_t *device, emu_file &file)
 {
 	rtc65271_state *state = get_safe_token(device);
 	UINT8 buf;
 
 
 	/* version flag */
-	if (mame_fread(file, & buf, 1) != 1)
+	if (file.read(&buf, 1) != 1)
 		return 1;
 	if (buf != 0)
 		return 1;
 
 	/* control registers */
-	if (mame_fread(file, &buf, 1) != 1)
+	if (file.read(&buf, 1) != 1)
 		return 1;
 	state->regs[reg_A] = buf & (reg_A_DV /*| reg_A_RS*/);
-	if (mame_fread(file, &buf, 1) != 1)
+	if (file.read(&buf, 1) != 1)
 		return 1;
 	state->regs[reg_B] = buf & (reg_B_SET | reg_B_DM | reg_B_24h | reg_B_DSE);
 
 	/* alarm registers */
-	if (mame_fread(file, &state->regs[reg_alarm_second], 1) != 1)
+	if (file.read(&state->regs[reg_alarm_second], 1) != 1)
 		return 1;
-	if (mame_fread(file, &state->regs[reg_alarm_minute], 1) != 1)
+	if (file.read(&state->regs[reg_alarm_minute], 1) != 1)
 		return 1;
-	if (mame_fread(file, &state->regs[reg_alarm_hour], 1) != 1)
+	if (file.read(&state->regs[reg_alarm_hour], 1) != 1)
 		return 1;
 
 	/* user RAM */
-	if (mame_fread(file, state->regs+14, 50) != 50)
+	if (file.read(state->regs+14, 50) != 50)
 		return 1;
 
 	/* extended RAM */
-	if (mame_fread(file, state->xram, 4096) != 4096)
+	if (file.read(state->xram, 4096) != 4096)
 		return 1;
 
 	state->regs[reg_D] |= reg_D_VRT;	/* the data was backed up successfully */
@@ -277,7 +277,7 @@ static int rtc65271_file_load(device_t *device, mame_file *file)
 /*
     save the SRAM and register contents to file
 */
-static int rtc65271_file_save(device_t *device, mame_file *file)
+static int rtc65271_file_save(device_t *device, emu_file &file)
 {
 	rtc65271_state *state = get_safe_token(device);
 	UINT8 buf;
@@ -285,31 +285,31 @@ static int rtc65271_file_save(device_t *device, mame_file *file)
 
 	/* version flag */
 	buf = 0;
-	if (mame_fwrite(file, & buf, 1) != 1)
+	if (file.write(& buf, 1) != 1)
 		return 1;
 
 	/* control registers */
 	buf = state->regs[reg_A] & (reg_A_DV | reg_A_RS);
-	if (mame_fwrite(file, &buf, 1) != 1)
+	if (file.write(&buf, 1) != 1)
 		return 1;
 	buf = state->regs[reg_B] & (reg_B_SET | reg_B_DM | reg_B_24h | reg_B_DSE);
-	if (mame_fwrite(file, &buf, 1) != 1)
+	if (file.write(&buf, 1) != 1)
 		return 1;
 
 	/* alarm registers */
-	if (mame_fwrite(file, &state->regs[reg_alarm_second], 1) != 1)
+	if (file.write(&state->regs[reg_alarm_second], 1) != 1)
 		return 1;
-	if (mame_fwrite(file, &state->regs[reg_alarm_minute], 1) != 1)
+	if (file.write(&state->regs[reg_alarm_minute], 1) != 1)
 		return 1;
-	if (mame_fwrite(file, &state->regs[reg_alarm_hour], 1) != 1)
+	if (file.write(&state->regs[reg_alarm_hour], 1) != 1)
 		return 1;
 
 	/* user RAM */
-	if (mame_fwrite(file, state->regs+14, 50) != 50)
+	if (file.write(state->regs+14, 50) != 50)
 		return 1;
 
 	/* extended RAM */
-	if (mame_fwrite(file, state->xram, 4096) != 4096)
+	if (file.write(state->xram, 4096) != 4096)
 		return 1;
 
 	return 0;
@@ -704,9 +704,9 @@ static DEVICE_START( rtc65271 )
 static DEVICE_NVRAM( rtc65271 )
 {
 	if (read_or_write)
-		rtc65271_file_save(device, file);
+		rtc65271_file_save(device, *file);
 	else if (file)
-		rtc65271_file_load(device, file);
+		rtc65271_file_load(device, *file);
 }
 
 

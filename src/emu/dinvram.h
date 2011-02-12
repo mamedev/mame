@@ -80,14 +80,14 @@ public:
 
 	// public accessors... for now
 	void nvram_reset() { nvram_default(); }
-	void nvram_load(mame_file &file) { nvram_read(file); }
-	void nvram_save(mame_file &file) { nvram_write(file); }
+	void nvram_load(emu_file &file) { nvram_read(file); }
+	void nvram_save(emu_file &file) { nvram_write(file); }
 
 protected:
 	// derived class overrides
 	virtual void nvram_default() = 0;
-	virtual void nvram_read(mame_file &file) = 0;
-	virtual void nvram_write(mame_file &file) = 0;
+	virtual void nvram_read(emu_file &file) = 0;
+	virtual void nvram_write(emu_file &file) = 0;
 
 	// configuration
 	const device_config_nvram_interface &m_nvram_config;	// reference to our device_config_execute_interface

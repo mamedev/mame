@@ -89,52 +89,48 @@ static void free_string(running_machine &machine)
 
 static chd_file *get_disc(device_t *device)
 {
-	mame_file *image_file = NULL;
+	emu_file *image_file = NULL;
 	chd_file *image_chd = NULL;
-	mame_path *path;
 
 	/* open a path to the ROMs and find the first CHD file */
-	path = mame_openpath(device->machine->options(), OPTION_ROMPATH);
-	if (path != NULL)
+	file_enumerator path(device->machine->options(), OPTION_ROMPATH);
+	const osd_directory_entry *dir;
+
+	/* iterate while we get new objects */
+	while ((dir = path.next()) != NULL)
 	{
-		const osd_directory_entry *dir;
+		int length = strlen(dir->name);
 
-		/* iterate while we get new objects */
-		while ((dir = mame_readpath(path)) != NULL)
+		/* look for files ending in .chd */
+		if (length > 4 &&
+			dir->name[length - 4] == '.' &&
+			tolower(dir->name[length - 3]) == 'c' &&
+			tolower(dir->name[length - 2]) == 'h' &&
+			tolower(dir->name[length - 1]) == 'd')
 		{
-			int length = strlen(dir->name);
+			file_error filerr;
+			chd_error chderr;
 
-			/* look for files ending in .chd */
-			if (length > 4 &&
-				dir->name[length - 4] == '.' &&
-				tolower(dir->name[length - 3]) == 'c' &&
-				tolower(dir->name[length - 2]) == 'h' &&
-				tolower(dir->name[length - 1]) == 'd')
+			/* open the file itself via our search path */
+			image_file = auto_alloc(device->machine, emu_file(device->machine->options(), SEARCHPATH_IMAGE, OPEN_FLAG_READ));
+			filerr = image_file->open(dir->name);
+			if (filerr == FILERR_NONE)
 			{
-				file_error filerr;
-				chd_error chderr;
-
-				/* open the file itself via our search path */
-				filerr = mame_fopen(SEARCHPATH_IMAGE, dir->name, OPEN_FLAG_READ, &image_file);
-				if (filerr == FILERR_NONE)
+				/* try to open the CHD */
+				chderr = chd_open_file(image_file, CHD_OPEN_READ, NULL, &image_chd);
+				if (chderr == CHDERR_NONE)
 				{
-					/* try to open the CHD */
-					chderr = chd_open_file(mame_core_file(image_file), CHD_OPEN_READ, NULL, &image_chd);
-					if (chderr == CHDERR_NONE)
-					{
-						set_disk_handle(device->machine, "laserdisc", image_file, image_chd);
-						filename.cpy(dir->name);
-						device->machine->add_notifier(MACHINE_NOTIFY_EXIT, free_string);
-						break;
-					}
-
-					/* close the file on failure */
-					mame_fclose(image_file);
-					image_file = NULL;
+					set_disk_handle(*device->machine, "laserdisc", *image_file, *image_chd);
+					filename.cpy(dir->name);
+					device->machine->add_notifier(MACHINE_NOTIFY_EXIT, free_string);
+					break;
 				}
 			}
+
+			/* close the file on failure */
+			auto_free(device->machine, image_file);
+			image_file = NULL;
 		}
-		mame_closepath(path);
 	}
 
 	/* if we failed, pop a message and exit */

@@ -289,7 +289,7 @@ static NVRAM_HANDLER( bmcbowl )
 	int i;
 
 	if (read_or_write)
-		mame_fwrite(file, stats_ram, stats_ram_size);
+		file->write(stats_ram, stats_ram_size);
 	else
 
 #ifdef NVRAM_HACK
@@ -301,7 +301,7 @@ static NVRAM_HANDLER( bmcbowl )
 	init_stats(bmc_nv3,ARRAY_LENGTH(bmc_nv3),0xfe2);
 #else
 	if (file)
-		mame_fread(file, stats_ram, stats_ram_size);
+		file->read(stats_ram, stats_ram_size);
 	else
 
 		for (i = 0; i < stats_ram_size; i++)

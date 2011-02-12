@@ -242,7 +242,7 @@ static NVRAM_HANDLER( gal3 )
 			data[1] = (dword&0x00ff0000)>>16;
 			data[2] = (dword&0x0000ff00)>>8;
 			data[3] = dword&0xff;
-			mame_fwrite( file, data, 4 );
+			file->write( data, 4 );
 		}
 	}
 	else
@@ -251,7 +251,7 @@ static NVRAM_HANDLER( gal3 )
 		{
 			for( i=0; i<gal3_nvmem_size/4; i++ )
 			{
-				mame_fread( file, data, 4 );
+				file->read( data, 4 );
 				gal3_nvmem[i] = (data[0]<<24)|(data[1]<<16)|(data[2]<<8)|data[3];
 			}
 		}

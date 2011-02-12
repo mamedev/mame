@@ -721,9 +721,9 @@ render_container::render_container(render_manager &manager, screen_device *scree
 	{
 		// set the initial orientation and brightness/contrast/gamma
 		m_user.m_orientation = manager.machine().gamedrv->flags & ORIENTATION_MASK;
-		m_user.m_brightness = options_get_float(manager.machine().options(), OPTION_BRIGHTNESS);
-		m_user.m_contrast = options_get_float(manager.machine().options(), OPTION_CONTRAST);
-		m_user.m_gamma = options_get_float(manager.machine().options(), OPTION_GAMMA);
+		m_user.m_brightness = options_get_float(&manager.machine().options(), OPTION_BRIGHTNESS);
+		m_user.m_contrast = options_get_float(&manager.machine().options(), OPTION_CONTRAST);
+		m_user.m_gamma = options_get_float(&manager.machine().options(), OPTION_GAMMA);
 	}
 
 	// allocate a client to the main palette
@@ -1066,26 +1066,26 @@ render_target::render_target(render_manager &manager, const char *layoutfile, UI
 	  m_debug_containers(manager.machine().m_respool)
 {
 	// determine the base layer configuration based on options
-	m_base_layerconfig.set_backdrops_enabled(options_get_bool(manager.machine().options(), OPTION_USE_BACKDROPS));
-	m_base_layerconfig.set_overlays_enabled(options_get_bool(manager.machine().options(), OPTION_USE_OVERLAYS));
-	m_base_layerconfig.set_bezels_enabled(options_get_bool(manager.machine().options(), OPTION_USE_BEZELS));
-	m_base_layerconfig.set_zoom_to_screen(options_get_bool(manager.machine().options(), OPTION_ARTWORK_CROP));
+	m_base_layerconfig.set_backdrops_enabled(options_get_bool(&manager.machine().options(), OPTION_USE_BACKDROPS));
+	m_base_layerconfig.set_overlays_enabled(options_get_bool(&manager.machine().options(), OPTION_USE_OVERLAYS));
+	m_base_layerconfig.set_bezels_enabled(options_get_bool(&manager.machine().options(), OPTION_USE_BEZELS));
+	m_base_layerconfig.set_zoom_to_screen(options_get_bool(&manager.machine().options(), OPTION_ARTWORK_CROP));
 
 	// determine the base orientation based on options
 	m_orientation = ROT0;
-	if (!options_get_bool(manager.machine().options(), OPTION_ROTATE))
+	if (!options_get_bool(&manager.machine().options(), OPTION_ROTATE))
 		m_base_orientation = orientation_reverse(manager.machine().gamedrv->flags & ORIENTATION_MASK);
 
 	// rotate left/right
-	if (options_get_bool(manager.machine().options(), OPTION_ROR) || (options_get_bool(manager.machine().options(), OPTION_AUTOROR) && (manager.machine().gamedrv->flags & ORIENTATION_SWAP_XY)))
+	if (options_get_bool(&manager.machine().options(), OPTION_ROR) || (options_get_bool(&manager.machine().options(), OPTION_AUTOROR) && (manager.machine().gamedrv->flags & ORIENTATION_SWAP_XY)))
 		m_base_orientation = orientation_add(ROT90, m_base_orientation);
-	if (options_get_bool(manager.machine().options(), OPTION_ROL) || (options_get_bool(manager.machine().options(), OPTION_AUTOROL) && (manager.machine().gamedrv->flags & ORIENTATION_SWAP_XY)))
+	if (options_get_bool(&manager.machine().options(), OPTION_ROL) || (options_get_bool(&manager.machine().options(), OPTION_AUTOROL) && (manager.machine().gamedrv->flags & ORIENTATION_SWAP_XY)))
 		m_base_orientation = orientation_add(ROT270, m_base_orientation);
 
 	// flip X/Y
-	if (options_get_bool(manager.machine().options(), OPTION_FLIPX))
+	if (options_get_bool(&manager.machine().options(), OPTION_FLIPX))
 		m_base_orientation ^= ORIENTATION_FLIP_X;
-	if (options_get_bool(manager.machine().options(), OPTION_FLIPY))
+	if (options_get_bool(&manager.machine().options(), OPTION_FLIPY))
 		m_base_orientation ^= ORIENTATION_FLIP_Y;
 
 	// set the orientation and layerconfig equal to the base
@@ -1680,14 +1680,13 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 			fname.ins(0, PATH_SEPARATOR).ins(0, dirname);
 
 		// attempt to open the file; bail if we can't
-		mame_file *layoutfile;
-		file_error filerr = mame_fopen(SEARCHPATH_ARTWORK, fname, OPEN_FLAG_READ, &layoutfile);
+		emu_file layoutfile(manager().machine().options(), SEARCHPATH_ARTWORK, OPEN_FLAG_READ);
+		file_error filerr = layoutfile.open(fname);
 		if (filerr != FILERR_NONE)
 			return false;
 
 		// read the file
-		rootnode = xml_file_read(mame_core_file(layoutfile), NULL);
-		mame_fclose(layoutfile);
+		rootnode = xml_file_read(layoutfile, NULL);
 	}
 
 	// if we didn't get a properly-formatted XML file, record a warning and exit
@@ -2797,19 +2796,19 @@ void render_manager::config_save(int config_type, xml_data_node *parentnode)
 			container->get_user_settings(settings);
 
 			// output the color controls
-			if (settings.m_brightness != options_get_float(m_machine.options(), OPTION_BRIGHTNESS))
+			if (settings.m_brightness != options_get_float(&m_machine.options(), OPTION_BRIGHTNESS))
 			{
 				xml_set_attribute_float(screennode, "brightness", settings.m_brightness);
 				changed = true;
 			}
 
-			if (settings.m_contrast != options_get_float(m_machine.options(), OPTION_CONTRAST))
+			if (settings.m_contrast != options_get_float(&m_machine.options(), OPTION_CONTRAST))
 			{
 				xml_set_attribute_float(screennode, "contrast", settings.m_contrast);
 				changed = true;
 			}
 
-			if (settings.m_gamma != options_get_float(m_machine.options(), OPTION_GAMMA))
+			if (settings.m_gamma != options_get_float(&m_machine.options(), OPTION_GAMMA))
 			{
 				xml_set_attribute_float(screennode, "gamma", settings.m_gamma);
 				changed = true;

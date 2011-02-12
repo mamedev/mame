@@ -333,10 +333,10 @@ void intelfsh_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void intelfsh_device::nvram_read(mame_file &file)
+void intelfsh_device::nvram_read(emu_file &file)
 {
 	UINT8 *buffer = global_alloc_array(UINT8, m_config.m_size);
-	mame_fread(&file, buffer, m_config.m_size);
+	file.read(buffer, m_config.m_size);
 	for (int byte = 0; byte < m_config.m_size; byte++)
 		m_addrspace[0]->write_byte(byte, buffer[byte]);
 	global_free(buffer);
@@ -348,12 +348,12 @@ void intelfsh_device::nvram_read(mame_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void intelfsh_device::nvram_write(mame_file &file)
+void intelfsh_device::nvram_write(emu_file &file)
 {
 	UINT8 *buffer = global_alloc_array(UINT8, m_config.m_size);
 	for (int byte = 0; byte < m_config.m_size; byte++)
 		buffer[byte] = m_addrspace[0]->read_byte(byte);
-	mame_fwrite(&file, buffer, m_config.m_size);
+	file.write(buffer, m_config.m_size);
 	global_free(buffer);
 }
 

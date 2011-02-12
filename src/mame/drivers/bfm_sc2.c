@@ -438,13 +438,13 @@ static NVRAM_HANDLER( bfm_sc2 )
 	static const UINT8 init_e2ram[10] = { 1, 4, 10, 20, 0, 1, 1, 4, 10, 20 };
 	if ( read_or_write )
 	{	// writing
-		mame_fwrite(file,e2ram,sizeof(e2ram));
+		file->write(e2ram,sizeof(e2ram));
 	}
 	else
 	{ // reading
 		if ( file )
 		{
-			mame_fread(file,e2ram,sizeof(e2ram));
+			file->read(e2ram,sizeof(e2ram));
 		}
 		else
 		{

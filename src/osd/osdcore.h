@@ -117,7 +117,7 @@ typedef struct _osd_file osd_file;
 
     Notes:
 
-        This function is called by mame_fopen and several other places in
+        This function is called by core_fopen and several other places in
         the core to access files. These functions will construct paths by
         concatenating various search paths held in the options.c options
         database with partial paths specified by the core. The core assumes

@@ -581,18 +581,14 @@ static void set_default_key_params(running_machine *machine)
 
 static void load_overlay_file(running_machine *machine)
 {
-	char filename[20];
-	file_error filerr;
-	mame_file *file;
 	int pcaddr;
 
 	/* determine the filename and open the file */
-	sprintf(filename, "%s.kov", machine->gamedrv->name);
-	filerr = mame_fopen(SEARCHPATH_RAW, filename, OPEN_FLAG_READ, &file);
+	emu_file file(machine->options(), SEARCHPATH_RAW, OPEN_FLAG_READ);
+	file_error filerr = file.open(machine->gamedrv->name, ".kov");
 	if (filerr == FILERR_NONE)
 	{
-		mame_fread(file, keystatus, keystatus_words * 2);
-		mame_fclose(file);
+		file.read(keystatus, keystatus_words * 2);
 
 		/* convert from big-endian */
 		for (pcaddr = 0; pcaddr < keystatus_words; pcaddr++)
@@ -611,14 +607,11 @@ static void load_overlay_file(running_machine *machine)
 
 static void save_overlay_file(running_machine *machine)
 {
-	char filename[20];
-	file_error filerr;
-	mame_file *file;
 	int pcaddr;
 
 	/* determin the filename and open the file */
-	sprintf(filename, "%s.kov", machine->gamedrv->name);
-	filerr = mame_fopen(SEARCHPATH_RAW, filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &file);
+	emu_file file(machine->options(), SEARCHPATH_RAW, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
+	file_error filerr = file.open(machine->gamedrv->name, ".kov");
 	if (filerr == FILERR_NONE)
 	{
 		/* convert to big-endian */
@@ -626,8 +619,7 @@ static void save_overlay_file(running_machine *machine)
 			keystatus[pcaddr] = BIG_ENDIANIZE_INT16(keystatus[pcaddr]);
 
 		/* write the data */
-		mame_fwrite(file, keystatus, keystatus_words * 2);
-		mame_fclose(file);
+		file.write(keystatus, keystatus_words * 2);
 
 		/* convert from big-endian */
 		for (pcaddr = 0; pcaddr < keystatus_words; pcaddr++)
@@ -756,20 +748,16 @@ static void execute_fdsave(running_machine *machine, int ref, int params, const 
 
 static void execute_fdoutput(running_machine *machine, int ref, int params, const char **param)
 {
-	file_error filerr;
-	mame_file *file;
-
 	/* make sure we're up-to-date */
 	if (keydirty)
 		fd1094_regenerate_key(machine);
 
 	/* determin the filename and open the file */
-	filerr = mame_fopen(SEARCHPATH_RAW, param[0], OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &file);
+	emu_file file(machine->options(), SEARCHPATH_RAW, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
+	file_error filerr = file.open(param[0]);
 	if (filerr == FILERR_NONE)
-	{
-		mame_fwrite(file, keyregion, KEY_SIZE);
-		mame_fclose(file);
-	}
+		file.write(keyregion, KEY_SIZE);
+
 	debug_console_printf(machine, "File '%s' saved\n", param[0]);
 }
 
@@ -1182,15 +1170,14 @@ static void execute_fddasm(running_machine *machine, int ref, int params, const 
 	int origstate = fd1094_set_state(keyregion, -1);
 	const char *filename;
 	int skipped = FALSE;
-	file_error filerr;
-	mame_file *file;
 	UINT32 pcaddr;
 
 	/* extract the parameters */
 	filename = param[0];
 
 	/* open the file */
-	filerr = mame_fopen(SEARCHPATH_RAW, filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &file);
+	emu_file file(machine->options(), SEARCHPATH_RAW, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
+	file_error filerr = file.open(filename);
 	if (filerr != FILERR_NONE)
 	{
 		debug_console_printf(machine, "Unable to create file '%s'\n", filename);
@@ -1243,9 +1230,9 @@ static void execute_fddasm(running_machine *machine, int ref, int params, const 
 
 		/* print the line */
 		if (skipped)
-			mame_fprintf(file, "\n");
+			file.printf("\n");
 		skipped = FALSE;
-		mame_fprintf(file, " %02X %06X:", keystatus[pcaddr] >> 8, pcaddr * 2);
+		file.printf(" %02X %06X:", keystatus[pcaddr] >> 8, pcaddr * 2);
 		for (pcoffs = 0; pcoffs < 5; pcoffs++)
 		{
 			if (pcoffs < length)
@@ -1254,12 +1241,12 @@ static void execute_fddasm(running_machine *machine, int ref, int params, const 
 				int keystat = keystatus[pcaddr + pcoffs] & STATUS_MASK;
 				if (keystat != STATUS_LOCKED && keystat != STATUS_NOCHANGE)
 					unknowns = TRUE;
-				mame_fprintf(file, " %02X%02X%c", instrbuffer[pcoffs*2+0], instrbuffer[pcoffs*2+1], statchar[keystat]);
+				file.printf(" %02X%02X%c", instrbuffer[pcoffs*2+0], instrbuffer[pcoffs*2+1], statchar[keystat]);
 			}
 			else
-				mame_fprintf(file, "      ");
+				file.printf("      ");
 		}
-		mame_fprintf(file, "%s\n", disasm);
+		file.printf("%s\n", disasm);
 
 		/* if we have unknowns, display them as well */
 		if (unknowns > 0)
@@ -1269,13 +1256,13 @@ static void execute_fddasm(running_machine *machine, int ref, int params, const 
 			for (pnum = 0; pnum < posscount; pnum++)
 				if (strcmp(disasm, posslist[pnum].dasm) != 0)
 				{
-					mame_fprintf(file, "          :");
+					file.printf("          :");
 					for (pcoffs = 0; pcoffs < 5; pcoffs++)
 						if (pcoffs < posslist[pnum].length)
-							mame_fprintf(file, " %02X%02X ", posslist[pnum].instrbuffer[pcoffs*2+0], posslist[pnum].instrbuffer[pcoffs*2+1]);
+							file.printf(" %02X%02X ", posslist[pnum].instrbuffer[pcoffs*2+0], posslist[pnum].instrbuffer[pcoffs*2+1]);
 						else
-							mame_fprintf(file, "      ");
-					mame_fprintf(file, "%s\n", posslist[pnum].dasm);
+							file.printf("      ");
+					file.printf("%s\n", posslist[pnum].dasm);
 				}
 		}
 
@@ -1284,7 +1271,6 @@ static void execute_fddasm(running_machine *machine, int ref, int params, const 
 	}
 
 	/* close the file */
-	mame_fclose(file);
 	fd1094_set_state(keyregion, origstate);
 }
 

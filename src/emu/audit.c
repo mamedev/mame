@@ -192,28 +192,19 @@ int audit_samples(core_options *options, const game_driver *gamedrv, audit_recor
 						sharedname = &intf->samplenames[sampnum][1];
 					else
 					{
-						file_error filerr;
-						mame_file *file;
-
 						/* attempt to access the file from the game driver name */
-						astring fname(gamedrv->name, PATH_SEPARATOR, intf->samplenames[sampnum]);
-						filerr = mame_fopen_options(options, SEARCHPATH_SAMPLE, fname, OPEN_FLAG_READ | OPEN_FLAG_NO_PRELOAD, &file);
+						emu_file file(*options, SEARCHPATH_SAMPLE, OPEN_FLAG_READ | OPEN_FLAG_NO_PRELOAD);
+						file_error filerr = file.open(gamedrv->name, PATH_SEPARATOR, intf->samplenames[sampnum]);
 
 						/* attempt to access the file from the shared driver name */
 						if (filerr != FILERR_NONE && sharedname != NULL)
-						{
-							fname.cpy(sharedname).cat(PATH_SEPARATOR).cat(intf->samplenames[sampnum]);
-							filerr = mame_fopen_options(options, SEARCHPATH_SAMPLE, fname, OPEN_FLAG_READ | OPEN_FLAG_NO_PRELOAD, &file);
-						}
+							filerr = file.open(sharedname, PATH_SEPARATOR, intf->samplenames[sampnum]);
 
 						/* fill in the record */
 						record->type = AUDIT_FILE_SAMPLE;
 						record->name = intf->samplenames[sampnum];
 						if (filerr == FILERR_NONE)
-						{
 							set_status(record++, AUDIT_STATUS_GOOD, SUBSTATUS_GOOD);
-							mame_fclose(file);
-						}
 						else
 							set_status(record++, AUDIT_STATUS_NOT_FOUND, SUBSTATUS_NOT_FOUND);
 					}
@@ -350,22 +341,18 @@ static void audit_one_rom(core_options *options, const rom_entry *rom, const cha
 	/* find the file and checksum it, getting the file length along the way */
 	for (drv = gamedrv; drv != NULL; drv = driver_get_clone(drv))
 	{
-		file_error filerr;
-		mame_file *file;
+		emu_file file(*options, SEARCHPATH_ROM, OPEN_FLAG_READ | OPEN_FLAG_NO_PRELOAD);
 
 		/* open the file if we can */
-		astring fname(drv->name, PATH_SEPARATOR, ROM_GETNAME(rom));
-	    if (has_crc)
-			filerr = mame_fopen_crc_options(options, SEARCHPATH_ROM, fname, crc, OPEN_FLAG_READ | OPEN_FLAG_NO_PRELOAD, &file);
+		file_error filerr;
+		if (has_crc)
+			filerr = file.open(drv->name, PATH_SEPARATOR, ROM_GETNAME(rom), crc);
 		else
-			filerr = mame_fopen_options(options, SEARCHPATH_ROM, fname, OPEN_FLAG_READ | OPEN_FLAG_NO_PRELOAD, &file);
-
-		/* if we got it, extract the hash and length */
+			filerr = file.open(drv->name, PATH_SEPARATOR, ROM_GETNAME(rom));
 		if (filerr == FILERR_NONE)
 		{
-			hash_data_copy(record->hash, mame_fhash(file, validation));
-			record->length = (UINT32)mame_fsize(file);
-			mame_fclose(file);
+			hash_data_copy(record->hash, file.hash_string(validation));
+			record->length = (UINT32)file.size();
 			break;
 		}
 	}
@@ -373,22 +360,18 @@ static void audit_one_rom(core_options *options, const rom_entry *rom, const cha
 	/* if not found, check the region as a backup */
 	if (record->length == 0 && regiontag != NULL)
 	{
-		file_error filerr;
-		mame_file *file;
+		emu_file file(*options, SEARCHPATH_ROM, OPEN_FLAG_READ | OPEN_FLAG_NO_PRELOAD);
 
 		/* open the file if we can */
-		astring fname(regiontag, PATH_SEPARATOR, ROM_GETNAME(rom));
+	    file_error filerr;
 	    if (has_crc)
-			filerr = mame_fopen_crc_options(options, SEARCHPATH_ROM, fname, crc, OPEN_FLAG_READ | OPEN_FLAG_NO_PRELOAD, &file);
-		else
-			filerr = mame_fopen_options(options, SEARCHPATH_ROM, fname, OPEN_FLAG_READ | OPEN_FLAG_NO_PRELOAD, &file);
-
-		/* if we got it, extract the hash and length */
+	    	filerr = file.open(regiontag, PATH_SEPARATOR, ROM_GETNAME(rom), crc);
+	    else
+	    	filerr = file.open(regiontag, PATH_SEPARATOR, ROM_GETNAME(rom));
 		if (filerr == FILERR_NONE)
 		{
-			hash_data_copy(record->hash, mame_fhash(file, validation));
-			record->length = (UINT32)mame_fsize(file);
-			mame_fclose(file);
+			hash_data_copy(record->hash, file.hash_string(validation));
+			record->length = (UINT32)file.size();
 		}
 	}
 
@@ -446,7 +429,7 @@ static void audit_one_rom(core_options *options, const rom_entry *rom, const cha
 
 static void audit_one_disk(core_options *options, const rom_entry *rom, const game_driver *gamedrv, UINT32 validation, audit_record *record)
 {
-	mame_file *source_file;
+	emu_file *source_file;
 	chd_file *source;
 	chd_error err;
 
@@ -456,7 +439,7 @@ static void audit_one_disk(core_options *options, const rom_entry *rom, const ga
 	record->exphash = ROM_GETHASHDATA(rom);
 
 	/* open the disk */
-	err = open_disk_image_options(options, gamedrv, rom, &source_file, &source, NULL);
+	err = open_disk_image(*options, gamedrv, rom, &source_file, &source, NULL);
 
 	/* if we failed, report the error */
 	if (err != CHDERR_NONE)
@@ -507,7 +490,7 @@ static void audit_one_disk(core_options *options, const rom_entry *rom, const ga
 			set_status(record, AUDIT_STATUS_GOOD, SUBSTATUS_GOOD);
 
 		chd_close(source);
-		mame_fclose(source_file);
+		global_free(source_file);
 	}
 }
 

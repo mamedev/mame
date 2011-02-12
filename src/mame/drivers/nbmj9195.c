@@ -50,10 +50,10 @@ static size_t nbmj9195_nvram_size;
 static NVRAM_HANDLER( nbmj9195 )
 {
 	if (read_or_write)
-		mame_fwrite(file, nbmj9195_nvram, nbmj9195_nvram_size);
+		file->write(nbmj9195_nvram, nbmj9195_nvram_size);
 	else {
 		if (file)
-			mame_fread(file, nbmj9195_nvram, nbmj9195_nvram_size);
+			file->read(nbmj9195_nvram, nbmj9195_nvram_size);
 		else
 			memset(nbmj9195_nvram, 0, nbmj9195_nvram_size);
 	}

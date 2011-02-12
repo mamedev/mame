@@ -164,7 +164,7 @@ void eeprom_device_config::static_set_default_value(device_config *device, UINT1
 //  on this device
 //-------------------------------------------------
 
-bool eeprom_device_config::device_validity_check(const game_driver &driver) const
+bool eeprom_device_config::device_validity_check(core_options &options, const game_driver &driver) const
 {
 	bool error = false;
 
@@ -297,13 +297,13 @@ void eeprom_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void eeprom_device::nvram_read(mame_file &file)
+void eeprom_device::nvram_read(emu_file &file)
 {
 	UINT32 eeprom_length = 1 << m_config.m_address_bits;
 	UINT32 eeprom_bytes = eeprom_length * m_config.m_data_bits / 8;
 
 	UINT8 *buffer = auto_alloc_array(&m_machine, UINT8, eeprom_bytes);
-	mame_fread(&file, buffer, eeprom_bytes);
+	file.read(buffer, eeprom_bytes);
 	for (offs_t offs = 0; offs < eeprom_bytes; offs++)
 		m_addrspace[0]->write_byte(offs, buffer[offs]);
 	auto_free(&m_machine, buffer);
@@ -315,7 +315,7 @@ void eeprom_device::nvram_read(mame_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void eeprom_device::nvram_write(mame_file &file)
+void eeprom_device::nvram_write(emu_file &file)
 {
 	UINT32 eeprom_length = 1 << m_config.m_address_bits;
 	UINT32 eeprom_bytes = eeprom_length * m_config.m_data_bits / 8;
@@ -323,7 +323,7 @@ void eeprom_device::nvram_write(mame_file &file)
 	UINT8 *buffer = auto_alloc_array(&m_machine, UINT8, eeprom_bytes);
 	for (offs_t offs = 0; offs < eeprom_bytes; offs++)
 		buffer[offs] = m_addrspace[0]->read_byte(offs);
-	mame_fwrite(&file, buffer, eeprom_bytes);
+	file.write(buffer, eeprom_bytes);
 	auto_free(&m_machine, buffer);
 }
 

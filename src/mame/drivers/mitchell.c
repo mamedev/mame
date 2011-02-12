@@ -101,14 +101,14 @@ static NVRAM_HANDLER( mitchell )
 	if (read_or_write)
 	{
 		if (nvram_size)	/* Super Pang, Block Block */
-			mame_fwrite(file,nvram,nvram_size);	/* NVRAM */
+			file->write(nvram,nvram_size);	/* NVRAM */
 	}
 	else
 	{
 		if (file)
 		{
 			if (nvram_size)	/* Super Pang, Block Block */
-				mame_fread(file,nvram,nvram_size);	/* NVRAM */
+				file->read(nvram,nvram_size);	/* NVRAM */
 		}
 	}
 }

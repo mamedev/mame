@@ -773,15 +773,15 @@ sound_manager::sound_manager(running_machine &machine)
 	  m_rightmix(NULL),
 	  m_muted(0),
 	  m_attenuation(0),
-	  m_nosound_mode(!options_get_bool(machine.options(), OPTION_SOUND)),
+	  m_nosound_mode(!options_get_bool(&machine.options(), OPTION_SOUND)),
 	  m_wavfile(NULL),
 	  m_stream_list(machine.m_respool),
 	  m_update_attoseconds(STREAMS_UPDATE_ATTOTIME.attoseconds),
 	  m_last_update(attotime::zero)
 {
 	// get filename for WAV file or AVI file if specified
-	const char *wavfile = options_get_string(machine.options(), OPTION_WAVWRITE);
-	const char *avifile = options_get_string(machine.options(), OPTION_AVIWRITE);
+	const char *wavfile = options_get_string(&machine.options(), OPTION_WAVWRITE);
+	const char *avifile = options_get_string(&machine.options(), OPTION_AVIWRITE);
 
 	// handle -nosound and lower sample rate if not recording WAV or AVI
 	if (m_nosound_mode && wavfile[0] == 0 && avifile[0] == 0)
@@ -809,7 +809,7 @@ sound_manager::sound_manager(running_machine &machine)
 	state_save_register_global(&machine, m_last_update);
 
 	// set the starting attenuation
-	set_attenuation(options_get_int(machine.options(), OPTION_VOLUME));
+	set_attenuation(options_get_int(&machine.options(), OPTION_VOLUME));
 
 	// start the periodic update flushing timer
 	m_update_timer->adjust(STREAMS_UPDATE_ATTOTIME, 0, STREAMS_UPDATE_ATTOTIME);

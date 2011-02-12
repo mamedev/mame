@@ -46,8 +46,8 @@ static config_type *typelist;
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static int config_load_xml(running_machine *machine, mame_file *file, int type);
-static int config_save_xml(running_machine *machine, mame_file *file, int type);
+static int config_load_xml(running_machine *machine, emu_file &file, int type);
+static int config_save_xml(running_machine *machine, emu_file &file, int type);
 
 
 
@@ -102,10 +102,8 @@ void config_register(running_machine *machine, const char *nodename, config_call
 
 int config_load_settings(running_machine *machine)
 {
-	const char *controller = options_get_string(machine->options(), OPTION_CTRLR);
-	file_error filerr;
+	const char *controller = options_get_string(&machine->options(), OPTION_CTRLR);
 	config_type *type;
-	mame_file *file;
 	int loaded = 0;
 
 	/* loop over all registrants and call their init function */
@@ -116,8 +114,8 @@ int config_load_settings(running_machine *machine)
 	if (controller[0] != 0)
 	{
 		/* open the config file */
-		astring fname(controller, ".cfg");
-		filerr = mame_fopen(SEARCHPATH_CTRLR, fname, OPEN_FLAG_READ, &file);
+		emu_file file(machine->options(), SEARCHPATH_CTRLR, OPEN_FLAG_READ);
+		file_error filerr = file.open(controller, ".cfg");
 
 		if (filerr != FILERR_NONE)
 			throw emu_fatalerror("Could not load controller file %s.cfg", controller);
@@ -125,26 +123,18 @@ int config_load_settings(running_machine *machine)
 		/* load the XML */
 		if (!config_load_xml(machine, file, CONFIG_TYPE_CONTROLLER))
 			throw emu_fatalerror("Could not load controller file %s.cfg", controller);
-		mame_fclose(file);
 	}
 
 	/* next load the defaults file */
-	filerr = mame_fopen(SEARCHPATH_CONFIG, "default.cfg", OPEN_FLAG_READ, &file);
+	emu_file file(machine->options(), SEARCHPATH_CONFIG, OPEN_FLAG_READ);
+	file_error filerr = file.open("default.cfg");
 	if (filerr == FILERR_NONE)
-	{
 		config_load_xml(machine, file, CONFIG_TYPE_DEFAULT);
-		mame_fclose(file);
-	}
 
 	/* finally, load the game-specific file */
-	astring fname(machine->basename(), ".cfg");
-	filerr = mame_fopen(SEARCHPATH_CONFIG, fname, OPEN_FLAG_READ, &file);
-
+	filerr = file.open(machine->basename(), ".cfg");
 	if (filerr == FILERR_NONE)
-	{
 		loaded = config_load_xml(machine, file, CONFIG_TYPE_GAME);
-		mame_fclose(file);
-	}
 
 	/* loop over all registrants and call their final function */
 	for (type = typelist; type; type = type->next)
@@ -158,31 +148,22 @@ int config_load_settings(running_machine *machine)
 
 void config_save_settings(running_machine *machine)
 {
-	file_error filerr;
 	config_type *type;
-	mame_file *file;
 
 	/* loop over all registrants and call their init function */
 	for (type = typelist; type; type = type->next)
 		(*type->save)(machine, CONFIG_TYPE_INIT, NULL);
 
 	/* save the defaults file */
-	filerr = mame_fopen(SEARCHPATH_CONFIG, "default.cfg", OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
+	emu_file file(machine->options(), SEARCHPATH_CONFIG, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	file_error filerr = file.open("default.cfg");
 	if (filerr == FILERR_NONE)
-	{
 		config_save_xml(machine, file, CONFIG_TYPE_DEFAULT);
-		mame_fclose(file);
-	}
 
 	/* finally, save the game-specific file */
-	astring fname(machine->basename(), ".cfg");
-	filerr = mame_fopen(SEARCHPATH_CONFIG, fname, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
-
+	filerr = file.open(machine->basename(), ".cfg");
 	if (filerr == FILERR_NONE)
-	{
 		config_save_xml(machine, file, CONFIG_TYPE_GAME);
-		mame_fclose(file);
-	}
 
 	/* loop over all registrants and call their final function */
 	for (type = typelist; type; type = type->next)
@@ -197,7 +178,7 @@ void config_save_settings(running_machine *machine)
  *
  *************************************/
 
-static int config_load_xml(running_machine *machine, mame_file *file, int which_type)
+static int config_load_xml(running_machine *machine, emu_file &file, int which_type)
 {
 	xml_data_node *root, *confignode, *systemnode;
 	config_type *type;
@@ -205,7 +186,7 @@ static int config_load_xml(running_machine *machine, mame_file *file, int which_
 	int version, count;
 
 	/* read the file */
-	root = xml_file_read(mame_core_file(file), NULL);
+	root = xml_file_read(file, NULL);
 	if (!root)
 		goto error;
 
@@ -298,7 +279,7 @@ error:
  *
  *************************************/
 
-static int config_save_xml(running_machine *machine, mame_file *file, int which_type)
+static int config_save_xml(running_machine *machine, emu_file &file, int which_type)
 {
 	xml_data_node *root = xml_file_create();
 	xml_data_node *confignode, *systemnode;
@@ -335,7 +316,7 @@ static int config_save_xml(running_machine *machine, mame_file *file, int which_
 	}
 
 	/* flush the file */
-	xml_file_write(root, mame_core_file(file));
+	xml_file_write(root, file);
 
 	/* free and get out of here */
 	xml_file_free(root);

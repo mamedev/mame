@@ -192,11 +192,11 @@ void legacy_device_config_base::static_set_inline_float(device_config *device, U
 //  checks on a device configuration
 //-------------------------------------------------
 
-bool legacy_device_config_base::device_validity_check(const game_driver &driver) const
+bool legacy_device_config_base::device_validity_check(core_options &options, const game_driver &driver) const
 {
 	device_validity_check_func validity_func = reinterpret_cast<device_validity_check_func>(get_legacy_config_fct(DEVINFO_FCT_VALIDITY_CHECK));
 	if (validity_func != NULL)
-		return (*validity_func)(&driver, this);
+		return (*validity_func)(&driver, this, options);
 	return false;
 }
 
@@ -402,7 +402,7 @@ void legacy_nvram_device_base::nvram_default()
 //  nvram_read - read NVRAM from the given file
 //-------------------------------------------------
 
-void legacy_nvram_device_base::nvram_read(mame_file &file)
+void legacy_nvram_device_base::nvram_read(emu_file &file)
 {
 	device_nvram_func nvram_func = reinterpret_cast<device_nvram_func>(m_config.get_legacy_config_fct(DEVINFO_FCT_NVRAM));
 	(*nvram_func)(this, &file, FALSE);
@@ -413,7 +413,7 @@ void legacy_nvram_device_base::nvram_read(mame_file &file)
 //  nvram_write - write NVRAM to the given file
 //-------------------------------------------------
 
-void legacy_nvram_device_base::nvram_write(mame_file &file)
+void legacy_nvram_device_base::nvram_write(emu_file &file)
 {
 	device_nvram_func nvram_func = reinterpret_cast<device_nvram_func>(m_config.get_legacy_config_fct(DEVINFO_FCT_NVRAM));
 	(*nvram_func)(this, &file, TRUE);

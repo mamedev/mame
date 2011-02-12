@@ -1824,7 +1824,7 @@ static MACHINE_CONFIG_START( berlwall, driver_device )
 	MCFG_PALETTE_INIT(berlwall)
 	MCFG_VIDEO_START(berlwall)
 	MCFG_VIDEO_UPDATE(berlwall)
-
+	
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1961,6 +1961,7 @@ static MACHINE_CONFIG_START( gtmr, driver_device )
 	MCFG_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
 
 	MCFG_MACHINE_RESET(gtmr)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -3842,12 +3843,14 @@ ROM_END
 
 static DRIVER_INIT( bloodwar )
 {
+	machine->device<nvram_device>("nvram")->set_base(kaneko16_nvram_save, sizeof(kaneko16_nvram_save));
 	DRIVER_INIT_CALL(samplebank);
 	DRIVER_INIT_CALL(decrypt_toybox_rom);
 }
 
 static DRIVER_INIT( gtmr2 )
 {
+	machine->device<nvram_device>("nvram")->set_base(kaneko16_nvram_save, sizeof(kaneko16_nvram_save));
 	DRIVER_INIT_CALL(samplebank);
 	DRIVER_INIT_CALL(decrypt_toybox_rom_alt);
 }

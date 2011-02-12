@@ -114,6 +114,7 @@
 #include "uiinput.h"
 #include "crsshair.h"
 #include "validity.h"
+#include "unzip.h"
 #include "debug/debugcon.h"
 
 #include <time.h>
@@ -260,7 +261,6 @@ const char *running_machine::describe_context()
 void running_machine::start()
 {
 	// initialize basic can't-fail systems here
-	fileio_init(this);
 	config_init(this);
 	input_init(this);
 	output_init(this);
@@ -361,7 +361,8 @@ int running_machine::run(bool firstrun)
 		// if we have a logfile, set up the callback
 		if (options_get_bool(&m_options, OPTION_LOG))
 		{
-			file_error filerr = mame_fopen(SEARCHPATH_DEBUGLOG, "error.log", OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &m_logfile);
+			m_logfile = auto_alloc(this, emu_file(m_options, SEARCHPATH_DEBUGLOG, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS));
+			file_error filerr = m_logfile->open("error.log");
 			assert_always(filerr == FILERR_NONE, "unable to open log file");
 			add_logerror_callback(logfile_callback);
 		}
@@ -429,10 +430,10 @@ int running_machine::run(bool firstrun)
 
 	// call all exit callbacks registered
 	call_notifiers(MACHINE_NOTIFY_EXIT);
+	zip_file_cache_clear();
 
 	// close the logfile
-	if (m_logfile != NULL)
-		mame_fclose(m_logfile);
+	auto_free(this, m_logfile);
 	return error;
 }
 
@@ -770,6 +771,7 @@ void running_machine::handle_saveload()
 	file_error filerr = FILERR_NONE;
 
 	// if no name, bail
+	emu_file file(m_options, m_saveload_searchpath, openflags);
 	if (!m_saveload_pending_file)
 		goto cancel;
 
@@ -787,12 +789,9 @@ void running_machine::handle_saveload()
 	}
 
 	// open the file
-	mame_file *file;
-	filerr = mame_fopen(m_saveload_searchpath, m_saveload_pending_file, openflags, &file);
+	filerr = file.open(m_saveload_pending_file);
 	if (filerr == FILERR_NONE)
 	{
-		astring fullname(mame_file_full_name(file));
-
 		// read/write the save state
 		state_save_error staterr = (m_saveload_schedule == SLS_LOAD) ? m_state.read_file(file) : m_state.write_file(file);
 
@@ -828,9 +827,8 @@ void running_machine::handle_saveload()
 		}
 
 		// close and perhaps delete the file
-		mame_fclose(file);
 		if (staterr != STATERR_NONE && m_saveload_schedule == SLS_SAVE)
-			osd_rmfile(fullname);
+			file.remove_on_close();
 	}
 	else
 		popmessage("Error: Failed to open file for %s operation.", opname);
@@ -871,7 +869,7 @@ void running_machine::soft_reset(running_machine &machine, int param)
 void running_machine::logfile_callback(running_machine &machine, const char *buffer)
 {
 	if (machine.m_logfile != NULL)
-		mame_fputs(machine.m_logfile, buffer);
+		machine.m_logfile->puts(buffer);
 }
 
 

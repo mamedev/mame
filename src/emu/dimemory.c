@@ -164,7 +164,7 @@ void device_config_memory_interface::static_set_addrmap(device_config *device, i
 //  checks on the memory configuration
 //-------------------------------------------------
 
-bool device_config_memory_interface::interface_validity_check(const game_driver &driver) const
+bool device_config_memory_interface::interface_validity_check(core_options &options, const game_driver &driver) const
 {
 	const device_config *devconfig = crosscast<const device_config *>(this);
 	bool detected_overlap = DETECT_OVERLAPPING_MEMORY ? false : true;

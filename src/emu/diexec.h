@@ -177,7 +177,7 @@ protected:
 	virtual UINT32 execute_default_irq_vector() const;
 
 	// optional operation overrides
-	virtual bool interface_validity_check(const game_driver &driver) const;
+	virtual bool interface_validity_check(core_options &options, const game_driver &driver) const;
 
 	bool					m_disabled;
 	device_interrupt_func	m_vblank_interrupt;				// for interrupts tied to VBLANK

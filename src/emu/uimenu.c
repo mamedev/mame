@@ -1405,7 +1405,7 @@ UINT32 ui_slider_ui_handler(running_machine *machine, render_container *containe
 
 void ui_menu_force_game_select(running_machine *machine, render_container *container)
 {
-	char *gamename = (char *)options_get_string(machine->options(), OPTION_GAMENAME);
+	char *gamename = (char *)options_get_string(&machine->options(), OPTION_GAMENAME);
 
 	/* reset the menu stack */
 	ui_menu_stack_reset(machine);
@@ -1570,7 +1570,7 @@ static void menu_main_populate(running_machine *machine, ui_menu *menu, void *st
 		ui_menu_item_append(menu, "Crosshair Options", NULL, 0, (void *)menu_crosshair);
 
 	/* add cheat menu */
-	if (options_get_bool(machine->options(), OPTION_CHEAT) && machine->cheat().first() != NULL)
+	if (options_get_bool(&machine->options(), OPTION_CHEAT) && machine->cheat().first() != NULL)
 		ui_menu_item_append(menu, "Cheat", NULL, 0, (void *)menu_cheat);
 
 	/* add memory card menu */
@@ -3254,7 +3254,6 @@ static void menu_crosshair_populate(running_machine *machine, ui_menu *menu)
 	int player;
 	UINT8 use_auto = FALSE;
 	UINT32 flags = 0;
-	mame_path *path;
 
 	/* loop over player and add the manual items */
 	for (player = 0; player < MAX_PLAYERS; player++)
@@ -3300,76 +3299,72 @@ static void menu_crosshair_populate(running_machine *machine, ui_menu *menu)
 			/* search for crosshair graphics */
 
 			/* open a path to the crosshairs */
-			path = mame_openpath(machine->options(), OPTION_CROSSHAIRPATH);
-			if (path != NULL)
+			file_enumerator path(machine->options(), OPTION_CROSSHAIRPATH);
+			const osd_directory_entry *dir;
+			/* reset search flags */
+			int using_default = FALSE;
+			int finished = FALSE;
+			int found = FALSE;
+
+			/* if we are using the default, then we just need to find the first in the list */
+			if (strlen(settings.name) == 0)
+				using_default = TRUE;
+
+			/* look for the current name, then remember the name before */
+			/* and find the next name */
+			while (((dir = path.next()) != NULL) && !finished)
 			{
-				const osd_directory_entry *dir;
+				int length = strlen(dir->name);
 
-				/* reset search flags */
-				int using_default = FALSE;
-				int finished = FALSE;
-				int found = FALSE;
+				/* look for files ending in .png with a name not larger then 9 chars*/
+				if ((length > 4) && (length <= CROSSHAIR_PIC_NAME_LENGTH + 4) &&
+					dir->name[length - 4] == '.' &&
+					tolower((UINT8)dir->name[length - 3]) == 'p' &&
+					tolower((UINT8)dir->name[length - 2]) == 'n' &&
+					tolower((UINT8)dir->name[length - 1]) == 'g')
 
-				/* if we are using the default, then we just need to find the first in the list */
-				if (strlen(settings.name) == 0)
-					using_default = TRUE;
-
-				/* look for the current name, then remember the name before */
-				/* and find the next name */
-				while (((dir = mame_readpath(path)) != NULL) && !finished)
 				{
-					int length = strlen(dir->name);
+					/* remove .png from length */
+					length -= 4;
 
-					/* look for files ending in .png with a name not larger then 9 chars*/
-					if ((length > 4) && (length <= CROSSHAIR_PIC_NAME_LENGTH + 4) &&
-						dir->name[length - 4] == '.' &&
-						tolower((UINT8)dir->name[length - 3]) == 'p' &&
-						tolower((UINT8)dir->name[length - 2]) == 'n' &&
-						tolower((UINT8)dir->name[length - 1]) == 'g')
-
+					if (found || using_default)
 					{
-						/* remove .png from length */
-						length -= 4;
-
-						if (found || using_default)
-						{
-							/* get the next name */
-							strncpy(data->next_name, dir->name, length);
-							data->next_name[length] = 0;
-							finished = TRUE;
-						}
-						else if (!strncmp(dir->name, settings.name, length))
-						{
-							/* we found the current name */
-							/* so loop once more to find the next name */
-							found = TRUE;
-						}
-						else
-							/* remember last name */
-							/* we will do it here in case files get added to the directory */
-						{
-							strncpy(data->last_name, dir->name, length);
-							data->last_name[length] = 0;
-						}
+						/* get the next name */
+						strncpy(data->next_name, dir->name, length);
+						data->next_name[length] = 0;
+						finished = TRUE;
+					}
+					else if (!strncmp(dir->name, settings.name, length))
+					{
+						/* we found the current name */
+						/* so loop once more to find the next name */
+						found = TRUE;
+					}
+					else
+						/* remember last name */
+						/* we will do it here in case files get added to the directory */
+					{
+						strncpy(data->last_name, dir->name, length);
+						data->last_name[length] = 0;
 					}
 				}
-				/* if name not found then next item is DEFAULT */
-				if (!found && !using_default)
-				{
-					data->next_name[0] = 0;
-					finished = TRUE;
-				}
-				/* setup the selection flags */
-				flags = 0;
-				if (finished)
-					flags |= MENU_FLAG_RIGHT_ARROW;
-				if (found)
-					flags |= MENU_FLAG_LEFT_ARROW;
-
-				/* add CROSSHAIR_ITEM_PIC menu */
-				sprintf(temp_text, "P%d Crosshair", player + 1);
-				ui_menu_item_append(menu, temp_text, using_default ? "DEFAULT" : settings.name, flags, data);
 			}
+			/* if name not found then next item is DEFAULT */
+			if (!found && !using_default)
+			{
+				data->next_name[0] = 0;
+				finished = TRUE;
+			}
+			/* setup the selection flags */
+			flags = 0;
+			if (finished)
+				flags |= MENU_FLAG_RIGHT_ARROW;
+			if (found)
+				flags |= MENU_FLAG_LEFT_ARROW;
+
+			/* add CROSSHAIR_ITEM_PIC menu */
+			sprintf(temp_text, "P%d Crosshair", player + 1);
+			ui_menu_item_append(menu, temp_text, using_default ? "DEFAULT" : settings.name, flags, data);
 		}
 	}
 	if (use_auto)
@@ -3467,7 +3462,7 @@ static void menu_select_game(running_machine *machine, ui_menu *menu, void *para
 				int audit_result;
 
 				/* audit the game first to see if we're going to work */
-				audit_records = audit_images(menu->machine->options(), driver, AUDIT_VALIDATE_FAST, &audit);
+				audit_records = audit_images(&menu->machine->options(), driver, AUDIT_VALIDATE_FAST, &audit);
 				audit_result = audit_summary(driver, audit_records, audit, FALSE);
 				if (audit_records > 0)
 					global_free(audit);
@@ -3608,7 +3603,6 @@ static void menu_select_game_build_driver_list(ui_menu *menu, select_game_state 
 {
 	int driver_count = driver_list_get_count(drivers);
 	int drivnum, listnum;
-	mame_path *path;
 	UINT8 *found;
 
 	/* create a sorted copy of the main driver list */
@@ -3620,39 +3614,35 @@ static void menu_select_game_build_driver_list(ui_menu *menu, select_game_state 
 	memset(found, 0, (driver_count + 7) / 8);
 
 	/* open a path to the ROMs and find them in the array */
-	path = mame_openpath(menu->machine->options(), OPTION_ROMPATH);
-	if (path != NULL)
+	file_enumerator path(menu->machine->options(), OPTION_ROMPATH);
+	const osd_directory_entry *dir;
+
+	/* iterate while we get new objects */
+	while ((dir = path.next()) != NULL)
 	{
-		const osd_directory_entry *dir;
+		game_driver tempdriver;
+		game_driver *tempdriver_ptr;
+		const game_driver **found_driver;
+		char drivername[50];
+		char *dst = drivername;
+		const char *src;
 
-		/* iterate while we get new objects */
-		while ((dir = mame_readpath(path)) != NULL)
+		/* build a name for it */
+		for (src = dir->name; *src != 0 && *src != '.' && dst < &drivername[ARRAY_LENGTH(drivername) - 1]; src++)
+			*dst++ = tolower((UINT8)*src);
+		*dst = 0;
+
+		/* find it in the array */
+		tempdriver.name = drivername;
+		tempdriver_ptr = &tempdriver;
+		found_driver = (const game_driver **)bsearch(&tempdriver_ptr, menustate->driverlist, driver_count, sizeof(*menustate->driverlist), menu_select_game_driver_compare);
+
+		/* if found, mark the corresponding entry in the array */
+		if (found_driver != NULL)
 		{
-			game_driver tempdriver;
-			game_driver *tempdriver_ptr;
-			const game_driver **found_driver;
-			char drivername[50];
-			char *dst = drivername;
-			const char *src;
-
-			/* build a name for it */
-			for (src = dir->name; *src != 0 && *src != '.' && dst < &drivername[ARRAY_LENGTH(drivername) - 1]; src++)
-				*dst++ = tolower((UINT8)*src);
-			*dst = 0;
-
-			/* find it in the array */
-			tempdriver.name = drivername;
-			tempdriver_ptr = &tempdriver;
-			found_driver = (const game_driver **)bsearch(&tempdriver_ptr, menustate->driverlist, driver_count, sizeof(*menustate->driverlist), menu_select_game_driver_compare);
-
-			/* if found, mark the corresponding entry in the array */
-			if (found_driver != NULL)
-			{
-				int index = found_driver - menustate->driverlist;
-				found[index / 8] |= 1 << (index % 8);
-			}
+			int index = found_driver - menustate->driverlist;
+			found[index / 8] |= 1 << (index % 8);
 		}
-		mame_closepath(path);
 	}
 
 	/* now build the final list */

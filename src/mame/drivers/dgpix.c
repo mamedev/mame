@@ -216,7 +216,7 @@ static NVRAM_HANDLER( flashroms )
 		for( i = 0; i < 0x40000; i++ )
 			tmp[i] = rom[WORD_XOR_BE(i)];
 
-		mame_fwrite( file, tmp, 0x40000 );
+		file->write( tmp, 0x40000 );
 	}
 	else if (file)
 	{
@@ -225,7 +225,7 @@ static NVRAM_HANDLER( flashroms )
 		UINT8 tmp[0x40000];
 		int i;
 
-		mame_fread( file, tmp, 0x40000 );
+		file->read( tmp, 0x40000 );
 
 		// overlap the default settings with the saved ones
 		for( i = 0; i < 0x40000; i++ )

@@ -102,8 +102,8 @@ protected:
 
 	// device_nvram_interface overrides
 	virtual void nvram_default();
-	virtual void nvram_read(mame_file &file);
-	virtual void nvram_write(mame_file &file);
+	virtual void nvram_read(emu_file &file);
+	virtual void nvram_write(emu_file &file);
 
 	static TIMER_CALLBACK( ds2404_tick_callback );
 

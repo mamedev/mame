@@ -560,11 +560,9 @@ void render_line_to_quad(const render_bounds *bounds, float width, render_bounds
     bitmap_t
 -------------------------------------------------*/
 
-bitmap_t *render_load_png(const char *path, const char *dirname, const char *filename, bitmap_t *alphadest, bool *hasalpha)
+bitmap_t *render_load_png(emu_file &file, const char *dirname, const char *filename, bitmap_t *alphadest, bool *hasalpha)
 {
 	bitmap_t *bitmap = NULL;
-	file_error filerr;
-	mame_file *file;
 	png_info png;
 	png_error result;
 
@@ -574,13 +572,13 @@ bitmap_t *render_load_png(const char *path, const char *dirname, const char *fil
 		fname.cpy(filename);
 	else
 		fname.cpy(dirname).cat(PATH_SEPARATOR).cat(filename);
-	filerr = mame_fopen(path, fname, OPEN_FLAG_READ, &file);
+	file_error filerr = file.open(fname);
 	if (filerr != FILERR_NONE)
 		return NULL;
 
 	/* read the PNG data */
-	result = png_read_file(mame_core_file(file), &png);
-	mame_fclose(file);
+	result = png_read_file(file, &png);
+	file.close();
 	if (result != PNGERR_NONE)
 		return NULL;
 

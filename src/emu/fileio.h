@@ -4,8 +4,36 @@
 
     Core file I/O interface functions and definitions.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
+****************************************************************************
+
+    Copyright Aaron Giles
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************/
 
@@ -15,14 +43,15 @@
 #define __FILEIO_H__
 
 #include "corefile.h"
+#include "hash.h"
 
 
 
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
+//**************************************************************************
+//  CONSTANTS
+//**************************************************************************
 
-/* search paths */
+// search paths
 #define SEARCHPATH_RAW             NULL
 #define SEARCHPATH_LANGUAGE        NULL
 #define SEARCHPATH_DEBUGLOG        NULL
@@ -50,126 +79,136 @@
 
 
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
-typedef struct _mame_file mame_file;
-typedef struct _mame_path mame_path;
-
+// forward declarations
 typedef struct _core_options core_options;
+typedef struct _zip_file_header zip_file_header;
+typedef struct _zip_file zip_file;
+
+
+// ======================> path_iterator
+
+// helper class for iterating over configured paths
+class path_iterator
+{
+public:
+	// construction/destruction
+	path_iterator(core_options &options, const char *searchpath = "");
+	
+	// getters
+	bool next(astring &buffer);
+	
+	// reset
+	void reset() { m_current = m_base; m_index = 0; }
+
+private:
+	// internal state
+	const char *	m_base;
+	const char *	m_current;
+	int				m_index;
+};
 
 
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
+// ======================> file_enumerator
 
+// iterate over all files in all paths specified in the searchpath
+class file_enumerator
+{
+public:
+	// construction/destruction
+	file_enumerator(core_options &opts, const char *searchpath);
+	~file_enumerator();
 
-/* ----- core initialization ----- */
+	// iterator
+	const osd_directory_entry *next();
 
-/* initialize the fileio system */
-void fileio_init(running_machine *machine);
-
-
-
-/* ----- file open/close ----- */
-
-/* open a file in the given search path with the specified filename */
-file_error mame_fopen(const char *searchpath, const char *filename, UINT32 openflags, mame_file **file);
-
-/* open a file in the given search path with the specified filename or a matching CRC */
-file_error mame_fopen_crc(const char *searchpath, const char *filename, UINT32 crc, UINT32 openflags, mame_file **file);
-
-/* open a file in the given search path with the specified filename, using the specified options */
-file_error mame_fopen_options(core_options *opts, const char *searchpath, const char *filename, UINT32 openflags, mame_file **file);
-
-/* open a file in the given search path with the specified filename or a matching CRC, using the specified options */
-file_error mame_fopen_crc_options(core_options *opts, const char *searchpath, const char *filename, UINT32 crc, UINT32 openflags, mame_file **file);
-
-/* open a "file" which is actually data in RAM */
-file_error mame_fopen_ram(const void *data, UINT32 length, UINT32 openflags, mame_file **file);
-
-/* close an open file */
-void mame_fclose(mame_file *file);
-
-/* close an open file, and open the next entry in the original searchpath*/
-file_error mame_fclose_and_open_next(mame_file **file, const char *filename, UINT32 openflags);
-
-/* enable/disable streaming file compression via zlib; level is 0 to disable compression, or up to 9 for max compression */
-file_error mame_fcompress(mame_file *file, int compress);
+private:
+	// internal state
+	path_iterator	m_iterator;
+	osd_directory *	m_curdir;
+	astring			m_pathbuffer;
+	int				m_buflen;
+};
 
 
 
-/* ----- file positioning ----- */
+// ======================> emu_file
 
-/* adjust the file pointer within the file */
-int mame_fseek(mame_file *file, INT64 offset, int whence);
+class emu_file
+{
+public:
+	// file open/creation
+	emu_file(core_options &options, const char *searchpath, UINT32 openflags);
+	virtual ~emu_file();
 
-/* return the current file pointer */
-UINT64 mame_ftell(mame_file *file);
+	// getters	
+	operator core_file *();
+	bool open() const { return (m_file != NULL); }
+	const char *filename() const { return m_filename; }
+	const char *fullpath() const { return m_fullpath; }
+	UINT32 openflags() const { return m_openflags; }
+	const char *hash_string(UINT32 functions);
 
-/* return true if we are at the EOF */
-int mame_feof(mame_file *file);
+	// setters
+	void remove_on_close() { m_remove_on_close = true; }
+	void set_openflags(UINT32 openflags) { assert(m_file == NULL); m_openflags = openflags; }
 
-/* return the total size of the file */
-UINT64 mame_fsize(mame_file *file);
-
-
-
-/* ----- file read ----- */
-
-/* standard binary read from a file */
-UINT32 mame_fread(mame_file *file, void *buffer, UINT32 length);
-
-/* read one character from the file */
-int mame_fgetc(mame_file *file);
-
-/* put back one character from the file */
-int mame_ungetc(int c, mame_file *file);
-
-/* read a full line of text from the file */
-char *mame_fgets(char *s, int n, mame_file *file);
-
-
-
-/* ----- file write ----- */
-
-/* standard binary write to a file */
-UINT32 mame_fwrite(mame_file *file, const void *buffer, UINT32 length);
-
-/* write a line of text to the file */
-int mame_fputs(mame_file *f, const char *s);
-
-/* printf-style text write to a file */
-int CLIB_DECL mame_fprintf(mame_file *f, const char *fmt, ...) ATTR_PRINTF(2,3);
-
-
-
-/* ----- file enumeration ----- */
-
-/* open a search path (multiple directories) for iteration */
-mame_path *mame_openpath(core_options *opts, const char *searchpath);
-
-/* return information about the next file in the search path */
-const osd_directory_entry *mame_readpath(mame_path *path);
-
-/* close an open seach path */
-void mame_closepath(mame_path *path);
-
-
-
-/* ----- file misc ----- */
-
-/* return the core_file underneath the mame_file */
-core_file *mame_core_file(mame_file *file);
-
-/* return the full filename for a given mame_file */
-const astring &mame_file_full_name(mame_file *file);
-
-/* return a hash string for the file with the given functions */
-const char *mame_fhash(mame_file *file, UINT32 functions);
-
+	// open/close
+	file_error open(const char *name);
+	file_error open(const char *name1, const char *name2);
+	file_error open(const char *name1, const char *name2, const char *name3);
+	file_error open(const char *name1, const char *name2, const char *name3, const char *name4);
+	file_error open(const char *name, UINT32 crc);
+	file_error open(const char *name1, const char *name2, UINT32 crc);
+	file_error open(const char *name1, const char *name2, const char *name3, UINT32 crc);
+	file_error open(const char *name1, const char *name2, const char *name3, const char *name4, UINT32 crc);
+	file_error open_next();
+	file_error open_ram(const void *data, UINT32 length);
+	void close();
+	
+	// control
+	file_error compress(int compress);
+	int seek(INT64 offset, int whence);
+	UINT64 tell();
+	bool eof();
+	UINT64 size();
+	
+	// reading
+	UINT32 read(void *buffer, UINT32 length);
+	int getc();
+	int ungetc(int c);
+	char *gets(char *s, int n);
+	
+	// writing
+	UINT32 write(const void *buffer, UINT32 length);
+	int puts(const char *s);
+	int vprintf(const char *fmt, va_list va);
+	int printf(const char *fmt, ...);
+	
+private:
+	// internal helpers
+	file_error attempt_zipped();
+	file_error load_zipped_file();
+	bool zip_filename_match(const zip_file_header &header, const astring &filename);
+	bool zip_header_is_path(const zip_file_header &header);
+	
+	// internal state
+	astring			m_filename;						// original filename provided
+	astring			m_fullpath;						// full filename
+	core_file *		m_file;							// core file pointer
+	path_iterator	m_iterator;						// iterator for paths
+	UINT32			m_crc;							// iterator for paths
+	UINT32			m_openflags;					// flags we used for the open
+	char			m_hash[HASH_BUF_SIZE];			// hash data for the file
+	zip_file *		m_zipfile;						// ZIP file pointer
+	UINT8 *			m_zipdata;						// ZIP file data
+	UINT64			m_ziplength;					// ZIP file length
+	bool			m_remove_on_close;				// flag: remove the file when closing
+};
 
 
 #endif	/* __FILEIO_H__ */

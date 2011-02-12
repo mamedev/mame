@@ -1700,12 +1700,12 @@ static NVRAM_HANDLER( sms )
 	if (smsgg_backupram!=NULL)
 	{
 		if (read_or_write)
-			mame_fwrite(file, smsgg_backupram, 0x2000);
+			file->write(smsgg_backupram, 0x2000);
 		else
 		{
 			if (file)
 			{
-				mame_fread(file, smsgg_backupram, 0x2000);
+				file->read(smsgg_backupram, 0x2000);
 			}
 		}
 	}

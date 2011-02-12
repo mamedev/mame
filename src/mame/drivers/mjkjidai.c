@@ -158,9 +158,9 @@ static NVRAM_HANDLER( mjkjidai )
 	mjkjidai_state *state = machine->driver_data<mjkjidai_state>();
 
 	if (read_or_write)
-		mame_fwrite(file, state->nvram, state->nvram_size);
+		file->write(state->nvram, state->nvram_size);
 	else if (file)
-		mame_fread(file, state->nvram, state->nvram_size);
+		file->read(state->nvram, state->nvram_size);
 	else
 	{
 		state->nvram_init_count = 1;

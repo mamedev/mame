@@ -8624,12 +8624,12 @@ static NVRAM_HANDLER( megadriv )
 	if (megadriv_backupram!=NULL)
 	{
 		if (read_or_write)
-			mame_fwrite(file, megadriv_backupram, megadriv_backupram_length);
+			file->write(megadriv_backupram, megadriv_backupram_length);
 		else
 		{
 			if (file)
 			{
-				mame_fread(file, megadriv_backupram, megadriv_backupram_length);
+				file->read(megadriv_backupram, megadriv_backupram_length);
 			}
 			else
 			{

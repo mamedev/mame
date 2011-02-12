@@ -87,8 +87,8 @@ protected:
 
 	// device_mc146818_interface overrides
 	virtual void nvram_default();
-	virtual void nvram_read(mame_file &file);
-	virtual void nvram_write(mame_file &file);
+	virtual void nvram_read(emu_file &file);
+	virtual void nvram_write(emu_file &file);
 
 	// internal helpers
 	int dec_2_local(int a);

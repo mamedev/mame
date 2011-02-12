@@ -167,10 +167,10 @@ void er2055_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void er2055_device::nvram_read(mame_file &file)
+void er2055_device::nvram_read(emu_file &file)
 {
 	UINT8 buffer[SIZE_DATA];
-	mame_fread(&file, buffer, sizeof(buffer));
+	file.read(buffer, sizeof(buffer));
 	for (int byte = 0; byte < SIZE_DATA; byte++)
 		m_addrspace[0]->write_byte(byte, buffer[byte]);
 }
@@ -181,12 +181,12 @@ void er2055_device::nvram_read(mame_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void er2055_device::nvram_write(mame_file &file)
+void er2055_device::nvram_write(emu_file &file)
 {
 	UINT8 buffer[SIZE_DATA];
 	for (int byte = 0; byte < SIZE_DATA; byte++)
 		buffer[byte] = m_addrspace[0]->read_byte(byte);
-	mame_fwrite(&file, buffer, sizeof(buffer));
+	file.write(buffer, sizeof(buffer));
 }
 
 

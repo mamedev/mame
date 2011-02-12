@@ -125,10 +125,8 @@ static void image_dirs_save(running_machine *machine, int config_type, xml_data_
     INI files
 -------------------------------------------------*/
 
-static int write_config(const char *filename, const game_driver *gamedrv)
+static int write_config(core_options &options, const char *filename, const game_driver *gamedrv)
 {
-	file_error filerr;
-	mame_file *f;
 	char buffer[128];
 	int retval = 1;
 
@@ -138,16 +136,13 @@ static int write_config(const char *filename, const game_driver *gamedrv)
 		filename = buffer;
 	}
 
-	filerr = mame_fopen(SEARCHPATH_INI, buffer, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &f);
-	if (filerr != FILERR_NONE)
-		goto done;
-
-	options_output_ini_file(mame_options(), mame_core_file(f));
-	retval = 0;
-
-done:
-	if (f != NULL)
-		mame_fclose(f);
+	emu_file file(options, SEARCHPATH_INI, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
+	file_error filerr = file.open(filename);
+	if (filerr == FILERR_NONE)
+	{
+		options_output_ini_file(&options, file);
+		retval = 0;
+	}
 	return retval;
 }
 
@@ -159,7 +154,7 @@ done:
 static void image_options_extract(running_machine *machine)
 {
 	/* only extract the device options if we've added them */
-	if (options_get_bool(machine->options(), OPTION_ADDED_DEVICE_OPTIONS)) {
+	if (options_get_bool(&machine->options(), OPTION_ADDED_DEVICE_OPTIONS)) {
 		int index = 0;
 		device_image_interface *image = NULL;
 
@@ -168,15 +163,15 @@ static void image_options_extract(running_machine *machine)
 			const char *filename = image->filename();
 
 			/* and set the option */
-			options_set_string(machine->options(), image->image_config().instance_name() , filename ? filename : "", OPTION_PRIORITY_CMDLINE);
+			options_set_string(&machine->options(), image->image_config().instance_name() , filename ? filename : "", OPTION_PRIORITY_CMDLINE);
 
 			index++;
 		}
 	}
 
 	/* write the config, if appropriate */
-	if (options_get_bool(machine->options(), OPTION_WRITECONFIG))
-		write_config(NULL, machine->gamedrv);
+	if (options_get_bool(&machine->options(), OPTION_WRITECONFIG))
+		write_config(machine->options(), NULL, machine->gamedrv);
 }
 
 /*-------------------------------------------------
@@ -302,18 +297,6 @@ void image_init(running_machine *machine)
   These functions provide transparent access to battery-backed RAM on an
   image; typically for cartridges.
 ****************************************************************************/
-
-/*-------------------------------------------------
-    open_battery_file_by_name - opens the battery backed
-    NVRAM file for an image
--------------------------------------------------*/
-
-static file_error open_battery_file_by_name(const char *filename, UINT32 openflags, mame_file **file)
-{
-    file_error filerr;
-    filerr = mame_fopen(SEARCHPATH_NVRAM, filename, openflags, file);
-    return filerr;
-}
 
 static char *stripspace(const char *src)
 {
@@ -444,21 +427,18 @@ astring *image_info_astring(running_machine *machine, astring *string)
     to the function.
 -------------------------------------------------*/
 
-void image_battery_load_by_name(const char *filename, void *buffer, int length, int fill)
+void image_battery_load_by_name(core_options &options, const char *filename, void *buffer, int length, int fill)
 {
     file_error filerr;
-    mame_file *file;
     int bytes_read = 0;
 
     assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
 
     /* try to open the battery file and read it in, if possible */
-    filerr = open_battery_file_by_name(filename, OPEN_FLAG_READ, &file);
+    emu_file file(options, SEARCHPATH_NVRAM, OPEN_FLAG_READ);
+    filerr = file.open(filename);
     if (filerr == FILERR_NONE)
-    {
-        bytes_read = mame_fread(file, buffer, length);
-        mame_fclose(file);
-    }
+        bytes_read = file.read(buffer, length);
 
     /* fill remaining bytes (if necessary) */
     memset(((char *) buffer) + bytes_read, fill, length - bytes_read);
@@ -469,20 +449,15 @@ void image_battery_load_by_name(const char *filename, void *buffer, int length, 
     backed RAM for an image. A filename may be supplied
     to the function.
 -------------------------------------------------*/
-void image_battery_save_by_name(const char *filename, const void *buffer, int length)
+void image_battery_save_by_name(core_options &options, const char *filename, const void *buffer, int length)
 {
-    file_error filerr;
-    mame_file *file;
-
     assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
 
     /* try to open the battery file and write it out, if possible */
-    filerr = open_battery_file_by_name(filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
+    emu_file file(options, SEARCHPATH_NVRAM, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+    file_error filerr = file.open(filename);
     if (filerr == FILERR_NONE)
-    {
-        mame_fwrite(file, buffer, length);
-        mame_fclose(file);
-    }
+        file.write(buffer, length);
 }
 
 /*-------------------------------------------------

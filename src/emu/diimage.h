@@ -295,7 +295,7 @@ protected:
 
     /* variables that are only non-zero when an image is mounted */
 	core_file *m_file;
-	mame_file *m_mame_file;
+	emu_file *m_mame_file;
 	astring m_name;
 	astring m_basename;
 	astring m_basename_noext;

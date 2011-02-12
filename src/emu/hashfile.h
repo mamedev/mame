@@ -40,11 +40,7 @@ typedef void (*hashfile_error_func)(const char *message);
 ***************************************************************************/
 
 /* opens a hash file; if is_preload is non-zero, the entire file is preloaded */
-hash_file *hashfile_open(const char *sysname, int is_preload, hashfile_error_func error_proc);
-
-/* opens a hash file; if is_preload is non-zero, the entire file is preloaded */
-hash_file *hashfile_open_options(core_options *opts, const char *sysname, int is_preload,
-	hashfile_error_func error_proc);
+hash_file *hashfile_open(core_options &options, const char *sysname, int is_preload, hashfile_error_func error_proc);
 
 /* closes a hash file and associated resources */
 void hashfile_close(hash_file *hashfile);

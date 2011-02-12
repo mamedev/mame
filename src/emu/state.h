@@ -202,9 +202,9 @@ public:
 	void save_pointer(T *value, const char *valname, UINT32 count, int index = 0) { save_pointer("global", NULL, index, value, valname, count); }
 
 	// file processing
-	static state_save_error check_file(running_machine *machine, mame_file *file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...));
-	state_save_error write_file(mame_file *file);
-	state_save_error read_file(mame_file *file);
+	static state_save_error check_file(running_machine *machine, emu_file &file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...));
+	state_save_error write_file(emu_file &file);
+	state_save_error read_file(emu_file &file);
 
 private:
 	// internal helpers

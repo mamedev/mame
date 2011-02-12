@@ -155,10 +155,10 @@ void x2212_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void x2212_device::nvram_read(mame_file &file)
+void x2212_device::nvram_read(emu_file &file)
 {
 	UINT8 buffer[SIZE_DATA];
-	mame_fread(&file, buffer, sizeof(buffer));
+	file.read(buffer, sizeof(buffer));
 	for (int byte = 0; byte < SIZE_DATA; byte++)
 	{
 		m_sram->write_byte(byte, 0xff);
@@ -172,7 +172,7 @@ void x2212_device::nvram_read(mame_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void x2212_device::nvram_write(mame_file &file)
+void x2212_device::nvram_write(emu_file &file)
 {
 	// auto-save causes an implicit store prior to exiting (writing)
 	if (m_config.m_auto_save)
@@ -181,7 +181,7 @@ void x2212_device::nvram_write(mame_file &file)
 	UINT8 buffer[SIZE_DATA];
 	for (int byte = 0; byte < SIZE_DATA; byte++)
 		buffer[byte] = m_e2prom->read_byte(byte);
-	mame_fwrite(&file, buffer, sizeof(buffer));
+	file.write(buffer, sizeof(buffer));
 }
 
 

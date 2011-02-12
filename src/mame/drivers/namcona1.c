@@ -209,13 +209,13 @@ static NVRAM_HANDLER( namcosna1 )
 {
 	if( read_or_write )
 	{
-		mame_fwrite( file, namcona1_nvmem, NA1_NVRAM_SIZE );
+		file->write( namcona1_nvmem, NA1_NVRAM_SIZE );
 	}
 	else
 	{
 		if (file)
 		{
-			mame_fread( file, namcona1_nvmem, NA1_NVRAM_SIZE );
+			file->read( namcona1_nvmem, NA1_NVRAM_SIZE );
 		}
 		else
 		{

@@ -112,13 +112,13 @@ video_manager::video_manager(running_machine &machine)
 	  m_overall_real_ticks(0),
 	  m_overall_emutime(attotime::zero),
 	  m_overall_valid_counter(0),
-	  m_throttle(options_get_bool(machine.options(), OPTION_THROTTLE)),
+	  m_throttle(options_get_bool(&machine.options(), OPTION_THROTTLE)),
 	  m_fastforward(false),
-	  m_seconds_to_run(options_get_int(machine.options(), OPTION_SECONDS_TO_RUN)),
-	  m_auto_frameskip(options_get_bool(machine.options(), OPTION_AUTOFRAMESKIP)),
+	  m_seconds_to_run(options_get_int(&machine.options(), OPTION_SECONDS_TO_RUN)),
+	  m_auto_frameskip(options_get_bool(&machine.options(), OPTION_AUTOFRAMESKIP)),
 	  m_speed(original_speed_setting()),
 	  m_empty_skip_count(0),
-	  m_frameskip_level(options_get_int(machine.options(), OPTION_FRAMESKIP)),
+	  m_frameskip_level(options_get_int(&machine.options(), OPTION_FRAMESKIP)),
 	  m_frameskip_counter(0),
 	  m_frameskip_adjust(0),
 	  m_skipping_this_frame(false),
@@ -142,7 +142,7 @@ video_manager::video_manager(running_machine &machine)
 	update_refresh_speed();
 
 	// create a render target for snapshots
-	const char *viewname = options_get_string(machine.options(), OPTION_SNAPVIEW);
+	const char *viewname = options_get_string(&machine.options(), OPTION_SNAPVIEW);
 	m_snap_native = (machine.primary_screen != NULL && (viewname[0] == 0 || strcmp(viewname, "native") == 0));
 
 	// the native target is hard-coded to our internal layout and has all options disabled
@@ -165,15 +165,15 @@ video_manager::video_manager(running_machine &machine)
 	}
 
 	// extract snap resolution if present
-	if (sscanf(options_get_string(machine.options(), OPTION_SNAPSIZE), "%dx%d", &m_snap_width, &m_snap_height) != 2)
+	if (sscanf(options_get_string(&machine.options(), OPTION_SNAPSIZE), "%dx%d", &m_snap_width, &m_snap_height) != 2)
 		m_snap_width = m_snap_height = 0;
 
 	// start recording movie if specified
-	const char *filename = options_get_string(machine.options(), OPTION_MNGWRITE);
+	const char *filename = options_get_string(&machine.options(), OPTION_MNGWRITE);
 	if (filename[0] != 0)
 		begin_recording(filename, MF_MNG);
 
-	filename = options_get_string(machine.options(), OPTION_AVIWRITE);
+	filename = options_get_string(&machine.options(), OPTION_AVIWRITE);
 	if (filename[0] != 0)
 		begin_recording(filename, MF_AVI);
 
@@ -220,7 +220,7 @@ void video_manager::frame_update(bool debug)
 	// only render sound and video if we're in the running phase
 	int phase = m_machine.phase();
 	bool skipped_it = m_skipping_this_frame;
-	if (phase == MACHINE_PHASE_RUNNING && (!m_machine.paused() || options_get_bool(m_machine.options(), OPTION_UPDATEINPAUSE)))
+	if (phase == MACHINE_PHASE_RUNNING && (!m_machine.paused() || options_get_bool(&m_machine.options(), OPTION_UPDATEINPAUSE)))
 	{
 		bool anything_changed = finish_screen_updates();
 
@@ -325,7 +325,7 @@ astring &video_manager::speed_text(astring &string)
 //  file handle
 //-------------------------------------------------
 
-void video_manager::save_snapshot(screen_device *screen, mame_file &fp)
+void video_manager::save_snapshot(screen_device *screen, emu_file &file)
 {
 	// validate
 	assert(!m_snap_native || screen != NULL);
@@ -342,7 +342,7 @@ void video_manager::save_snapshot(screen_device *screen, mame_file &fp)
 
 	// now do the actual work
 	const rgb_t *palette = (m_machine.palette != NULL) ? palette_entry_list_adjusted(m_machine.palette) : NULL;
-	png_error error = png_write_bitmap(mame_core_file(&fp), &pnginfo, m_snap_bitmap, m_machine.total_colors(), palette);
+	png_error error = png_write_bitmap(file, &pnginfo, m_snap_bitmap, m_machine.total_colors(), palette);
 	if (error != PNGERR_NONE)
 		mame_printf_error("Error generating PNG for snapshot: png_error = %d\n", error);
 
@@ -365,26 +365,20 @@ void video_manager::save_active_screen_snapshots()
 		for (screen_device *screen = m_machine.first_screen(); screen != NULL; screen = screen->next_screen())
 			if (m_machine.render().is_live(*screen))
 			{
-				mame_file *fp;
-				file_error filerr = mame_fopen_next(SEARCHPATH_SCREENSHOT, "png", fp);
+				emu_file file(m_machine.options(), SEARCHPATH_SCREENSHOT, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+				file_error filerr = open_next(file, "png");
 				if (filerr == FILERR_NONE)
-				{
-					save_snapshot(screen, *fp);
-					mame_fclose(fp);
-				}
+					save_snapshot(screen, file);
 			}
 	}
 
 	// otherwise, just write a single snapshot
 	else
 	{
-		mame_file *fp;
-		file_error filerr = mame_fopen_next(SEARCHPATH_SCREENSHOT, "png", fp);
+		emu_file file(m_machine.options(), SEARCHPATH_SCREENSHOT, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+		file_error filerr = open_next(file, "png");
 		if (filerr == FILERR_NONE)
-		{
-			save_snapshot(NULL, *fp);
-			mame_fclose(fp);
-		}
+			save_snapshot(NULL, file);
 	}
 }
 
@@ -427,24 +421,27 @@ void video_manager::begin_recording(const char *name, movie_format format)
 		info.audio_samplerate = m_machine.sample_rate;
 
 		// create a new temporary movie file
-		mame_file *tempfile;
 		file_error filerr;
-		if (name != NULL)
-			filerr = mame_fopen(SEARCHPATH_MOVIE, name, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &tempfile);
-		else
-			filerr = mame_fopen_next(SEARCHPATH_MOVIE, "avi", tempfile);
+		astring fullpath;
+		{
+			emu_file tempfile(m_machine.options(), SEARCHPATH_MOVIE, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+			if (name != NULL)
+				filerr = tempfile.open(name);
+			else
+				filerr = open_next(tempfile, "avi");
 
-		// compute the frame time
-		m_movie_frame_period = attotime::from_seconds(1000) / info.video_timescale;
+			// compute the frame time
+			m_movie_frame_period = attotime::from_seconds(1000) / info.video_timescale;
 
-		// if we succeeded, make a copy of the name and create the real file over top
+			// if we succeeded, make a copy of the name and create the real file over top
+			if (filerr == FILERR_NONE)
+				fullpath = tempfile.fullpath();
+		}
+
 		if (filerr == FILERR_NONE)
 		{
-			astring fullname(mame_file_full_name(tempfile));
-			mame_fclose(tempfile);
-
 			// create the file and free the string
-			avi_error avierr = avi_create(fullname, &info, &m_avifile);
+			avi_error avierr = avi_create(fullpath, &info, &m_avifile);
 			if (avierr != AVIERR_NONE)
 				mame_printf_error("Error creating AVI: %s\n", avi_error_string(avierr));
 		}
@@ -454,20 +451,30 @@ void video_manager::begin_recording(const char *name, movie_format format)
 	else if (format == MF_MNG)
 	{
 		// create a new movie file and start recording
+		m_mngfile = auto_alloc(&m_machine, emu_file(m_machine.options(), SEARCHPATH_MOVIE, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS));
 		file_error filerr;
 		if (name != NULL)
-			filerr = mame_fopen(SEARCHPATH_MOVIE, name, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &m_mngfile);
+			filerr = m_mngfile->open(name);
 		else
-			filerr = mame_fopen_next(SEARCHPATH_MOVIE, "mng", m_mngfile);
+			filerr = open_next(*m_mngfile, "mng");
+			
+		if (filerr == FILERR_NONE)
+		{
+			// start the capture
+			int rate = (m_machine.primary_screen != NULL) ? ATTOSECONDS_TO_HZ(m_machine.primary_screen->frame_period().attoseconds) : screen_device::DEFAULT_FRAME_RATE;
+			png_error pngerr = mng_capture_start(*m_mngfile, m_snap_bitmap, rate);
+			if (pngerr != PNGERR_NONE)
+				return end_recording();
 
-		// start the capture
-		int rate = (m_machine.primary_screen != NULL) ? ATTOSECONDS_TO_HZ(m_machine.primary_screen->frame_period().attoseconds) : screen_device::DEFAULT_FRAME_RATE;
-		png_error pngerr = mng_capture_start(mame_core_file(m_mngfile), m_snap_bitmap, rate);
-		if (pngerr != PNGERR_NONE)
-			return end_recording();
-
-		// compute the frame time
-		m_movie_frame_period = attotime::from_hz(rate);
+			// compute the frame time
+			m_movie_frame_period = attotime::from_hz(rate);
+		}
+		else
+		{
+			mame_printf_error("Error creating MNG\n");
+			global_free(m_mngfile);
+			m_mngfile = NULL;
+		}
 	}
 }
 
@@ -488,8 +495,8 @@ void video_manager::end_recording()
 	// close the file if it exists
 	if (m_mngfile != NULL)
 	{
-		mng_capture_stop(mame_core_file(m_mngfile));
-		mame_fclose(m_mngfile);
+		mng_capture_stop(*m_mngfile);
+		auto_free(&m_machine, m_mngfile);
 		m_mngfile = NULL;
 	}
 
@@ -642,7 +649,7 @@ inline bool video_manager::effective_throttle() const
 
 inline int video_manager::original_speed_setting() const
 {
-	return options_get_float(mame_options(), OPTION_SPEED) * 100.0 + 0.5;
+	return options_get_float(&m_machine.options(), OPTION_SPEED) * 100.0 + 0.5;
 }
 
 
@@ -842,7 +849,7 @@ osd_ticks_t video_manager::throttle_until_ticks(osd_ticks_t target_ticks)
 	// we're allowed to sleep via the OSD code only if we're configured to do so
     // and we're not frameskipping due to autoframeskip, or if we're paused
 	bool allowed_to_sleep = false;
-    if (options_get_bool(m_machine.options(), OPTION_SLEEP) && (!effective_autoframeskip() || effective_frameskip() == 0))
+    if (options_get_bool(&m_machine.options(), OPTION_SLEEP) && (!effective_autoframeskip() || effective_frameskip() == 0))
     	allowed_to_sleep = true;
     if (m_machine.paused())
     	allowed_to_sleep = true;
@@ -948,7 +955,7 @@ void video_manager::update_frameskip()
 void video_manager::update_refresh_speed()
 {
 	// only do this if the refreshspeed option is used
-	if (options_get_bool(m_machine.options(), OPTION_REFRESHSPEED))
+	if (options_get_bool(&m_machine.options(), OPTION_REFRESHSPEED))
 	{
 		float minrefresh = m_machine.render().max_update_rate();
 		if (minrefresh != 0)
@@ -1034,16 +1041,11 @@ void video_manager::recompute_speed(attotime emutime)
 	{
 		if (m_machine.primary_screen != NULL)
 		{
-			astring fname(m_machine.basename(), PATH_SEPARATOR "final.png");
-
 			// create a final screenshot
-			mame_file *file;
-			file_error filerr = mame_fopen(SEARCHPATH_SCREENSHOT, fname, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
+			emu_file file(m_machine.options(), SEARCHPATH_SCREENSHOT, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+			file_error filerr = file.open(m_machine.basename(), PATH_SEPARATOR "final.png");
 			if (filerr == FILERR_NONE)
-			{
-				save_snapshot(m_machine.primary_screen, *file);
-				mame_fclose(file);
-			}
+				save_snapshot(m_machine.primary_screen, file);
 		}
 
 		// schedule our demise
@@ -1092,15 +1094,17 @@ void video_manager::create_snapshot_bitmap(device_t *screen)
 
 
 //-------------------------------------------------
-//  mame_fopen_next - open the next non-existing
-//  file of type filetype according to our
-//  numbering scheme
+//  open_next - open the next non-existing file of
+//  type filetype according to our numbering 
+//  scheme
 //-------------------------------------------------
 
-file_error video_manager::mame_fopen_next(const char *pathoption, const char *extension, mame_file *&file)
+file_error video_manager::open_next(emu_file &file, const char *extension)
 {
+	UINT32 origflags = file.openflags();
+
 	// handle defaults
-	const char *snapname = options_get_string(m_machine.options(), OPTION_SNAPNAME);
+	const char *snapname = options_get_string(&m_machine.options(), OPTION_SNAPNAME);
 
 	if (snapname == NULL || snapname[0] == 0)
 		snapname = "%g/%i";
@@ -1204,15 +1208,16 @@ file_error video_manager::mame_fopen_next(const char *pathoption, const char *ex
 			fname.cpy(snapstr).replace(0, "%i", seqtext.format("%04d", seq).cstr());
 
 			// try to open the file; stop when we fail
-			file_error filerr = mame_fopen(pathoption, fname, OPEN_FLAG_READ, &file);
+			file.set_openflags(OPEN_FLAG_READ);
+			file_error filerr = file.open(fname);
 			if (filerr != FILERR_NONE)
 				break;
-			mame_fclose(file);
 		}
 	}
 
 	// create the final file
-    return mame_fopen(pathoption, fname, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
+	file.set_openflags(origflags);
+    return file.open(fname);
 }
 
 
@@ -1264,7 +1269,7 @@ void video_manager::record_frame()
 
 			// write the next frame
 			const rgb_t *palette = (m_machine.palette != NULL) ? palette_entry_list_adjusted(m_machine.palette) : NULL;
-			png_error error = mng_capture_frame(mame_core_file(m_mngfile), &pnginfo, m_snap_bitmap, m_machine.total_colors(), palette);
+			png_error error = mng_capture_frame(*m_mngfile, &pnginfo, m_snap_bitmap, m_machine.total_colors(), palette);
 			png_free(&pnginfo);
 			if (error != PNGERR_NONE)
 			{

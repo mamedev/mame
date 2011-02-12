@@ -348,9 +348,9 @@ void mc146818_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void mc146818_device::nvram_read(mame_file &file)
+void mc146818_device::nvram_read(emu_file &file)
 {
-	mame_fread(&file, m_data, sizeof(m_data));
+	file.read(m_data, sizeof(m_data));
 	set_base_datetime();
 }
 
@@ -360,9 +360,9 @@ void mc146818_device::nvram_read(mame_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void mc146818_device::nvram_write(mame_file &file)
+void mc146818_device::nvram_write(emu_file &file)
 {
-	mame_fwrite(&file, m_data, sizeof(m_data));
+	file.write(m_data, sizeof(m_data));
 }
 
 

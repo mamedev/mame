@@ -518,33 +518,33 @@ void windows_osd_interface::init(running_machine &machine)
 	const char *stemp;
 
 	// determine if we are benchmarking, and adjust options appropriately
-	int bench = options_get_int(machine.options(), WINOPTION_BENCH);
+	int bench = options_get_int(&machine.options(), WINOPTION_BENCH);
 	if (bench > 0)
 	{
-		options_set_bool(machine.options(), OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM);
-		options_set_bool(machine.options(), OPTION_SOUND, false, OPTION_PRIORITY_MAXIMUM);
-		options_set_string(machine.options(), WINOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM);
-		options_set_int(machine.options(), OPTION_SECONDS_TO_RUN, bench, OPTION_PRIORITY_MAXIMUM);
+		options_set_bool(&machine.options(), OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM);
+		options_set_bool(&machine.options(), OPTION_SOUND, false, OPTION_PRIORITY_MAXIMUM);
+		options_set_string(&machine.options(), WINOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM);
+		options_set_int(&machine.options(), OPTION_SECONDS_TO_RUN, bench, OPTION_PRIORITY_MAXIMUM);
 	}
 
 	// determine if we are profiling, and adjust options appropriately
-	int profile = options_get_int(machine.options(), WINOPTION_PROFILE);
+	int profile = options_get_int(&machine.options(), WINOPTION_PROFILE);
 	if (profile > 0)
 	{
-		options_set_bool(machine.options(), OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM);
-		options_set_bool(machine.options(), WINOPTION_MULTITHREADING, false, OPTION_PRIORITY_MAXIMUM);
-		options_set_int(machine.options(), WINOPTION_NUMPROCESSORS, 1, OPTION_PRIORITY_MAXIMUM);
+		options_set_bool(&machine.options(), OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM);
+		options_set_bool(&machine.options(), WINOPTION_MULTITHREADING, false, OPTION_PRIORITY_MAXIMUM);
+		options_set_int(&machine.options(), WINOPTION_NUMPROCESSORS, 1, OPTION_PRIORITY_MAXIMUM);
 	}
 
 	// thread priority
 	if (!(machine.debug_flags & DEBUG_FLAG_OSD_ENABLED))
-		SetThreadPriority(GetCurrentThread(), options_get_int(machine.options(), WINOPTION_PRIORITY));
+		SetThreadPriority(GetCurrentThread(), options_get_int(&machine.options(), WINOPTION_PRIORITY));
 
 	// ensure we get called on the way out
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, osd_exit);
 
 	// get number of processors
-	stemp = options_get_string(machine.options(), WINOPTION_NUMPROCESSORS);
+	stemp = options_get_string(&machine.options(), WINOPTION_NUMPROCESSORS);
 
 	osd_num_processors = 0;
 
@@ -573,7 +573,7 @@ void windows_osd_interface::init(running_machine &machine)
 	}
 
 	// hook up the debugger log
-	if (options_get_bool(machine.options(), WINOPTION_OSLOG))
+	if (options_get_bool(&machine.options(), WINOPTION_OSLOG))
 		machine.add_logerror_callback(output_oslog);
 
 	// crank up the multimedia timer resolution to its max
@@ -587,7 +587,7 @@ void windows_osd_interface::init(running_machine &machine)
 //          mm_task = (*av_set_mm_thread_characteristics)(TEXT("Playback"), &task_index);
 
 	// if a watchdog thread is requested, create one
-	int watchdog = options_get_int(machine.options(), WINOPTION_WATCHDOG);
+	int watchdog = options_get_int(&machine.options(), WINOPTION_WATCHDOG);
 	if (watchdog != 0)
 	{
 		watchdog_reset_event = CreateEvent(NULL, FALSE, FALSE, NULL);

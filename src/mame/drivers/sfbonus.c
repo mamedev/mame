@@ -1225,13 +1225,13 @@ static MACHINE_RESET( sfbonus )
 static NVRAM_HANDLER( sfbonus )
 {
 	if (read_or_write)
-		mame_fwrite(file,nvram,nvram_size);
+		file->write(nvram,nvram_size);
 	else
 	{
 		if (file)
 		{
 			memset(nvram,0x00,nvram_size);
-			mame_fread(file,nvram,nvram_size);
+			file->read(nvram,nvram_size);
 		}
 		else
 		{

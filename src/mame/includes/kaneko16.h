@@ -4,9 +4,12 @@
 
 ***************************************************************************/
 
+#include "machine/nvram.h"
+
 /*----------- defined in machine/kaneko16.c -----------*/
 
 extern UINT16 *kaneko16_mcu_ram; /* for calc3 and toybox */
+extern UINT8 kaneko16_nvram_save[128];
 
 READ16_HANDLER( galpanib_calc_r );
 WRITE16_HANDLER( galpanib_calc_w );

@@ -2447,24 +2447,14 @@ void bloodwar_mcu_run(running_machine *machine)
 	{
 		case 0x02:	// Read from NVRAM
 		{
-			mame_file *f;
-			if ((f = nvram_fopen(machine, OPEN_FLAG_READ)) != 0)
-			{
-				mame_fread(f,&kaneko16_mcu_ram[mcu_offset], 128);
-				mame_fclose(f);
-			}
+			memcpy(&kaneko16_mcu_ram[mcu_offset], kaneko16_nvram_save, sizeof(kaneko16_nvram_save));
 			logerror("%s : MCU executed command: %04X %04X (load NVRAM settings)\n", machine->describe_context(), mcu_command, mcu_offset*2);
 		}
 		break;
 
 		case 0x42:	// Write to NVRAM
 		{
-			mame_file *f;
-			if ((f = nvram_fopen(machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS)) != 0)
-			{
-				mame_fwrite(f,&kaneko16_mcu_ram[mcu_offset], 128);
-				mame_fclose(f);
-			}
+			memcpy(kaneko16_nvram_save, &kaneko16_mcu_ram[mcu_offset], sizeof(kaneko16_nvram_save));
 			logerror("%s : MCU executed command: %04X %04X (save NVRAM settings)\n", machine->describe_context(), mcu_command, mcu_offset*2);
 		}
 		break;
@@ -2506,36 +2496,21 @@ void bonkadv_mcu_run(running_machine *machine)
 
 		case 0x02:	// Read from NVRAM
 		{
-			mame_file *f;
-			if ((f = nvram_fopen(machine, OPEN_FLAG_READ)) != 0)
-			{
-				mame_fread(f,&kaneko16_mcu_ram[mcu_offset], 128);
-				mame_fclose(f);
-			}
+			memcpy(&kaneko16_mcu_ram[mcu_offset], kaneko16_nvram_save, sizeof(kaneko16_nvram_save));
 			logerror("%s : MCU executed command: %04X %04X (load NVRAM settings)\n", machine->describe_context(), mcu_command, mcu_offset*2);
 		}
 		break;
 
 		case 0x42:	// Write to NVRAM
 		{
-			mame_file *f;
-			if ((f = nvram_fopen(machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS)) != 0)
-			{
-				mame_fwrite(f,&kaneko16_mcu_ram[mcu_offset], 128);
-				mame_fclose(f);
-			}
+			memcpy(kaneko16_nvram_save, &kaneko16_mcu_ram[mcu_offset], sizeof(kaneko16_nvram_save));
 			logerror("%s : MCU executed command: %04X %04X (save NVRAM settings)\n", machine->describe_context(), mcu_command, mcu_offset*2);
 		}
 		break;
 
 		case 0x43:	// Initialize NVRAM - MCU writes Default Data Set directly to NVRAM
 		{
-			mame_file *f;
-			if ((f = nvram_fopen(machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS)) != 0)
-			{
-				mame_fwrite(f, bonkadv_mcu_43, sizeof(bonkadv_mcu_43));
-				mame_fclose(f);
-			}
+			memcpy(kaneko16_nvram_save, bonkadv_mcu_43, sizeof(bonkadv_mcu_43));
 			logerror("%s : MCU executed command: %04X %04X (restore default NVRAM settings)\n", machine->describe_context(), mcu_command, mcu_offset*2);
 		}
 		break;
@@ -2601,23 +2576,13 @@ void gtmr_mcu_run(running_machine *machine)
 
 		case 0x02:	// Read from NVRAM
 		{
-			mame_file *f;
-			if ((f = nvram_fopen(machine, OPEN_FLAG_READ)) != 0)
-			{
-				mame_fread(f,&kaneko16_mcu_ram[mcu_offset], 128);
-				mame_fclose(f);
-			}
+			memcpy(&kaneko16_mcu_ram[mcu_offset], kaneko16_nvram_save, sizeof(kaneko16_nvram_save));
 		}
 		break;
 
 		case 0x42:	// Write to NVRAM
 		{
-			mame_file *f;
-			if ((f = nvram_fopen(machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS)) != 0)
-			{
-				mame_fwrite(f,&kaneko16_mcu_ram[mcu_offset], 128);
-				mame_fclose(f);
-			}
+			memcpy(kaneko16_nvram_save, &kaneko16_mcu_ram[mcu_offset], sizeof(kaneko16_nvram_save));
 		}
 		break;
 

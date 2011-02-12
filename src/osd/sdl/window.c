@@ -206,7 +206,7 @@ int sdlwindow_init(running_machine *machine)
 {
 	mame_printf_verbose("Enter sdlwindow_init\n");
 	// determine if we are using multithreading or not
-	multithreading_enabled = options_get_bool(machine->options(), SDLOPTION_MULTITHREADING);
+	multithreading_enabled = options_get_bool(&machine->options(), SDLOPTION_MULTITHREADING);
 
 	// get the main thread ID before anything else
 	main_threadid = SDL_ThreadID();
@@ -234,14 +234,14 @@ int sdlwindow_init(running_machine *machine)
 #if USE_OPENGL
 	if (video_config.mode == VIDEO_MODE_OPENGL)
 	{
-		if (drawogl_init(&draw))
+		if (drawogl_init(*machine, &draw))
 			video_config.mode = VIDEO_MODE_SOFT;
 	}
 #endif
 #if	SDL_VERSION_ATLEAST(1,3,0)
 	if (video_config.mode == VIDEO_MODE_SDL13)
 	{
-		if (draw13_init(&draw))
+		if (draw13_init(*machine, &draw))
 			video_config.mode = VIDEO_MODE_SOFT;
 	}
 #endif
@@ -676,7 +676,7 @@ int sdlwindow_video_window_create(running_machine *machine, int index, sdl_monit
 
 	// set the initial maximized state
 	// FIXME: Does not belong here
-	window->startmaximized = options_get_bool(machine->options(), SDLOPTION_MAXIMIZE);
+	window->startmaximized = options_get_bool(&machine->options(), SDLOPTION_MAXIMIZE);
 
 	if (!window->fullscreen)
 	{
@@ -699,7 +699,7 @@ int sdlwindow_video_window_create(running_machine *machine, int index, sdl_monit
 
 	// set the specific view
 	sprintf(option, SDLOPTION_VIEW("%d"), index);
-	set_starting_view(machine, index, window, options_get_string(machine->options(), option));
+	set_starting_view(machine, index, window, options_get_string(&machine->options(), option));
 
 	// make the window title
 	if (video_config.numscreens == 1)
@@ -1012,7 +1012,7 @@ void sdlwindow_video_window_update(running_machine *machine, sdl_window_info *wi
 
 static void set_starting_view(running_machine *machine, int index, sdl_window_info *window, const char *view)
 {
-	const char *defview = options_get_string(machine->options(), SDLOPTION_VIEW( ));
+	const char *defview = options_get_string(&machine->options(), SDLOPTION_VIEW( ));
 	int viewindex;
 
 	ASSERT_MAIN_THREAD();

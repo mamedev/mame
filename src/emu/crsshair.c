@@ -158,21 +158,22 @@ static void create_bitmap(running_machine *machine, int player)
 	global_free(global.bitmap[player]);
 	machine->render().texture_free(global.texture[player]);
 
+	emu_file crossfile(machine->options(), OPTION_CROSSHAIRPATH, OPEN_FLAG_READ);
 	if (global.name[player][0] != 0)
 	{
 		/* look for user specified file */
 		sprintf(filename, "%s.png", global.name[player]);
-		global.bitmap[player] = render_load_png(OPTION_CROSSHAIRPATH, NULL, filename, NULL, NULL);
+		global.bitmap[player] = render_load_png(crossfile, NULL, filename, NULL, NULL);
 	}
 	else
 	{
 		/* look for default cross?.png in crsshair\game dir */
 		sprintf(filename, "cross%d.png", player + 1);
-		global.bitmap[player] = render_load_png(OPTION_CROSSHAIRPATH, machine->gamedrv->name, filename, NULL, NULL);
+		global.bitmap[player] = render_load_png(crossfile, machine->gamedrv->name, filename, NULL, NULL);
 
 		/* look for default cross?.png in crsshair dir */
 		if (global.bitmap[player] == NULL)
-			global.bitmap[player] = render_load_png(OPTION_CROSSHAIRPATH, NULL, filename, NULL, NULL);
+			global.bitmap[player] = render_load_png(crossfile, NULL, filename, NULL, NULL);
 	}
 
 	/* if that didn't work, use the built-in one */

@@ -1071,9 +1071,9 @@ static NVRAM_HANDLER(system24)
 	if(!track_size || !file)
 		return;
 	if(read_or_write)
-		mame_fwrite(file, machine->region("floppy")->base(), 2*track_size);
+		file->write(machine->region("floppy")->base(), 2*track_size);
 	else
-		mame_fread(file, machine->region("floppy")->base(), 2*track_size);
+		file->read(machine->region("floppy")->base(), 2*track_size);
 }
 
 static MACHINE_START( system24 )

@@ -116,8 +116,8 @@ protected:
 
 	// device_config_nvram_interface overrides
 	virtual void nvram_default();
-	virtual void nvram_read(mame_file &file);
-	virtual void nvram_write(mame_file &file);
+	virtual void nvram_read(emu_file &file);
+	virtual void nvram_write(emu_file &file);
 
 	// derived helpers
 	UINT32 read_full(UINT32 offset);

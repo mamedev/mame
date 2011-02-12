@@ -247,7 +247,7 @@ int ui_init(running_machine *machine)
 	single_step = FALSE;
 	ui_set_handler(handler_messagebox, 0);
 	/* retrieve options */
-	ui_use_natural_keyboard = options_get_bool(machine->options(), OPTION_NATURAL_KEYBOARD);
+	ui_use_natural_keyboard = options_get_bool(&machine->options(), OPTION_NATURAL_KEYBOARD);
 
 	return 0;
 }
@@ -273,8 +273,8 @@ static void ui_exit(running_machine &machine)
 int ui_display_startup_screens(running_machine *machine, int first_time, int show_disclaimer)
 {
 	const int maxstate = 3;
-	int str = options_get_int(machine->options(), OPTION_SECONDS_TO_RUN);
-	int show_gameinfo = !options_get_bool(machine->options(), OPTION_SKIP_GAMEINFO);
+	int str = options_get_int(&machine->options(), OPTION_SECONDS_TO_RUN);
+	int show_gameinfo = !options_get_bool(&machine->options(), OPTION_SKIP_GAMEINFO);
 	int show_warnings = TRUE;
 	int state;
 
@@ -375,7 +375,7 @@ void ui_update_and_render(running_machine *machine, render_container *container)
 	/* if we're paused, dim the whole screen */
 	if (machine->phase() >= MACHINE_PHASE_RESET && (single_step || machine->paused()))
 	{
-		int alpha = (1.0f - options_get_float(machine->options(), OPTION_PAUSE_BRIGHTNESS)) * 255.0f;
+		int alpha = (1.0f - options_get_float(&machine->options(), OPTION_PAUSE_BRIGHTNESS)) * 255.0f;
 		if (ui_menu_is_force_game_select())
 			alpha = 255;
 		if (alpha > 255)
@@ -412,7 +412,7 @@ render_font *ui_get_font(running_machine &machine)
 {
 	/* allocate the font and messagebox string */
 	if (ui_font == NULL)
-		ui_font = machine.render().font_alloc(options_get_string(machine.options(), OPTION_UI_FONT));
+		ui_font = machine.render().font_alloc(options_get_string(&machine.options(), OPTION_UI_FONT));
 	return ui_font;
 }
 
@@ -1640,7 +1640,7 @@ static slider_state *slider_init(running_machine *machine)
 			}
 
 	/* add CPU overclocking (cheat only) */
-	if (options_get_bool(machine->options(), OPTION_CHEAT))
+	if (options_get_bool(&machine->options(), OPTION_CHEAT))
 	{
 		device_execute_interface *exec = NULL;
 		for (bool gotone = machine->m_devicelist.first(exec); gotone; gotone = exec->next(exec))
@@ -1662,7 +1662,7 @@ static slider_state *slider_init(running_machine *machine)
 		void *param = (void *)screen;
 
 		/* add refresh rate tweaker */
-		if (options_get_bool(machine->options(), OPTION_CHEAT))
+		if (options_get_bool(&machine->options(), OPTION_CHEAT))
 		{
 			string.printf("%s Refresh Rate", slider_get_screen_desc(*screen));
 			*tailptr = slider_alloc(machine, string, -10000, 0, 10000, 1000, slider_refresh, param);
@@ -2214,6 +2214,6 @@ int ui_get_use_natural_keyboard(running_machine *machine)
 void ui_set_use_natural_keyboard(running_machine *machine, int use_natural_keyboard)
 {
 	ui_use_natural_keyboard = use_natural_keyboard;
-	options_set_bool(machine->options(), OPTION_NATURAL_KEYBOARD, use_natural_keyboard, OPTION_PRIORITY_CMDLINE);
+	options_set_bool(&machine->options(), OPTION_NATURAL_KEYBOARD, use_natural_keyboard, OPTION_PRIORITY_CMDLINE);
 }
 

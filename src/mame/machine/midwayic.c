@@ -520,9 +520,9 @@ void midway_serial_pic2_w(address_space *space, UINT8 data)
 NVRAM_HANDLER( midway_serial_pic2 )
 {
 	if (read_or_write)
-		mame_fwrite(file, pic.nvram, sizeof(pic.nvram));
+		file->write(pic.nvram, sizeof(pic.nvram));
 	else if (file)
-		mame_fread(file, pic.nvram, sizeof(pic.nvram));
+		file->read(pic.nvram, sizeof(pic.nvram));
 	else
 		memcpy(pic.nvram, pic.default_nvram, sizeof(pic.nvram));
 }

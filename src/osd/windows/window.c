@@ -69,10 +69,10 @@
 #include "config.h"
 #include "winutf8.h"
 
-extern int drawnone_init(win_draw_callbacks *callbacks);
-extern int drawgdi_init(win_draw_callbacks *callbacks);
-extern int drawdd_init(win_draw_callbacks *callbacks);
-extern int drawd3d_init(win_draw_callbacks *callbacks);
+extern int drawnone_init(running_machine &machine, win_draw_callbacks *callbacks);
+extern int drawgdi_init(running_machine &machine, win_draw_callbacks *callbacks);
+extern int drawdd_init(running_machine &machine, win_draw_callbacks *callbacks);
+extern int drawd3d_init(running_machine &machine, win_draw_callbacks *callbacks);
 
 
 //============================================================
@@ -224,7 +224,7 @@ void winwindow_init(running_machine *machine)
 	size_t temp;
 
 	// determine if we are using multithreading or not
-	multithreading_enabled = options_get_bool(machine->options(), WINOPTION_MULTITHREADING);
+	multithreading_enabled = options_get_bool(&machine->options(), WINOPTION_MULTITHREADING);
 
 	// get the main thread ID before anything else
 	main_threadid = GetCurrentThreadId();
@@ -268,18 +268,18 @@ void winwindow_init(running_machine *machine)
 	// initialize the drawers
 	if (video_config.mode == VIDEO_MODE_D3D)
 	{
-		if (drawd3d_init(&draw))
+		if (drawd3d_init(*machine, &draw))
 			video_config.mode = VIDEO_MODE_GDI;
 	}
 	if (video_config.mode == VIDEO_MODE_DDRAW)
 	{
-		if (drawdd_init(&draw))
+		if (drawdd_init(*machine, &draw))
 			video_config.mode = VIDEO_MODE_GDI;
 	}
 	if (video_config.mode == VIDEO_MODE_GDI)
-		drawgdi_init(&draw);
+		drawgdi_init(*machine, &draw);
 	if (video_config.mode == VIDEO_MODE_NONE)
-		drawnone_init(&draw);
+		drawnone_init(*machine, &draw);
 
 	// set up the window list
 	last_window_ptr = &win_window_list;
@@ -636,7 +636,7 @@ void winwindow_video_window_create(running_machine *machine, int index, win_moni
 
 	// set the specific view
 	sprintf(option, "view%d", index);
-	set_starting_view(index, window, options_get_string(machine->options(), option));
+	set_starting_view(index, window, options_get_string(&machine->options(), option));
 
 	// remember the current values in case they change
 	window->targetview = window->target->view();
@@ -650,7 +650,7 @@ void winwindow_video_window_create(running_machine *machine, int index, win_moni
 		sprintf(window->title, APPNAME ": %s [%s] - Screen %d", machine->gamedrv->description, machine->gamedrv->name, index);
 
 	// set the initial maximized state
-	window->startmaximized = options_get_bool(machine->options(), WINOPTION_MAXIMIZE);
+	window->startmaximized = options_get_bool(&machine->options(), WINOPTION_MAXIMIZE);
 
 	// finish the window creation on the window thread
 	if (multithreading_enabled)
@@ -850,7 +850,7 @@ static void create_window_class(void)
 
 static void set_starting_view(int index, win_window_info *window, const char *view)
 {
-	const char *defview = options_get_string(mame_options(), WINOPTION_VIEW);
+	const char *defview = options_get_string(&window->machine->options(), WINOPTION_VIEW);
 	int viewindex;
 
 	assert(GetCurrentThreadId() == main_threadid);
@@ -1121,7 +1121,7 @@ static int complete_create(win_window_info *window)
 	monitorbounds = window->monitor->info.rcMonitor;
 
 	// create the window menu if needed
-	if (options_get_bool(mame_options(), "menu")) {
+	if (options_get_bool(&window->machine->options(), "menu")) {
 		if (win_create_menu(window->machine, &menu))
 			return 1;
 	}

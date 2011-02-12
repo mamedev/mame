@@ -540,12 +540,12 @@ static NVRAM_HANDLER( neogeo )
 {
 	if (read_or_write)
 		/* save the SRAM settings */
-		mame_fwrite(file, save_ram, 0x2000);
+		file->write(save_ram, 0x2000);
 	else
 	{
 		/* load the SRAM settings */
 		if (file)
-			mame_fread(file, save_ram, 0x2000);
+			file->read(save_ram, 0x2000);
 		else
 			memset(save_ram, 0, 0x10000);
 	}
@@ -615,15 +615,15 @@ static MEMCARD_HANDLER( neogeo )
 	{
 	case MEMCARD_CREATE:
 		memset(memcard_data, 0, MEMCARD_SIZE);
-		mame_fwrite(file, memcard_data, MEMCARD_SIZE);
+		file.write(memcard_data, MEMCARD_SIZE);
 		break;
 
 	case MEMCARD_INSERT:
-		mame_fread(file, memcard_data, MEMCARD_SIZE);
+		file.read(memcard_data, MEMCARD_SIZE);
 		break;
 
 	case MEMCARD_EJECT:
-		mame_fwrite(file, memcard_data, MEMCARD_SIZE);
+		file.write(memcard_data, MEMCARD_SIZE);
 		break;
 	}
 }

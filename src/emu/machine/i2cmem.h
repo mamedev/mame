@@ -67,7 +67,7 @@ public:
 protected:
 	// device_config overrides
 	virtual void device_config_complete();
-	virtual bool device_validity_check( const game_driver &driver ) const;
+	virtual bool device_validity_check( core_options &options, const game_driver &driver ) const;
 
 	// device_config_memory_interface overrides
 	virtual const address_space_config *memory_space_config( int spacenum = 0 ) const;
@@ -107,8 +107,8 @@ protected:
 
 	// device_nvram_interface overrides
 	virtual void nvram_default();
-	virtual void nvram_read( mame_file &file );
-	virtual void nvram_write( mame_file &file );
+	virtual void nvram_read( emu_file &file );
+	virtual void nvram_write( emu_file &file );
 
 	// internal helpers
 	int address_mask();

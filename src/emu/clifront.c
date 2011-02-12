@@ -253,7 +253,7 @@ static int execute_simple_commands(core_options *options, const char *exename)
 	if (options_get_bool(options, CLIOPTION_VALIDATE))
 	{
 		set_mame_options(options);
-		return mame_validitychecks(NULL);
+		return mame_validitychecks(*options, NULL);
 	}
 
 	return -1;
@@ -293,14 +293,13 @@ static int execute_commands(core_options *options, const char *exename, const ga
 	/* createconfig? */
 	if (options_get_bool(options, CLIOPTION_CREATECONFIG))
 	{
-		file_error filerr;
-		mame_file *file;
+		emu_file file(*options, NULL, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 
 		/* parse any relevant INI files before proceeding */
 		mame_parse_ini_files(options, driver);
 
 		/* make the output filename */
-		filerr = mame_fopen_options(options, NULL, CONFIGNAME ".ini", OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
+		file_error filerr = file.open(CONFIGNAME ".ini");
 
 		/* error if unable to create the file */
 		if (filerr != FILERR_NONE)
@@ -310,8 +309,7 @@ static int execute_commands(core_options *options, const char *exename, const ga
 		}
 
 		/* output the configuration and exit cleanly */
-		options_output_ini_file(options, mame_core_file(file));
-		mame_fclose(file);
+		options_output_ini_file(options, file);
 		return MAMERR_NONE;
 	}
 
@@ -905,7 +903,7 @@ static int info_listsoftware(core_options *options, const char *gamename)
 				{
 					if ( swlist->list_name[i] && *swlist->list_name[i] && (swlist->list_type == SOFTWARE_LIST_ORIGINAL_SYSTEM))
 					{
-						software_list *list = software_list_open( options, swlist->list_name[i], FALSE, NULL );
+						software_list *list = software_list_open( *options, swlist->list_name[i], FALSE, NULL );
 
 						if ( list )
 						{
@@ -1103,7 +1101,7 @@ static void softlist_match_roms(core_options *options, const char *hash, int len
 			{
 				if ( swlist->list_name[i] )
 				{
-					software_list *list = software_list_open( options, swlist->list_name[i], FALSE, NULL );
+					software_list *list = software_list_open( *options, swlist->list_name[i], FALSE, NULL );
 
 					for ( software_info *swinfo = software_list_find( list, "*", NULL ); swinfo != NULL; swinfo = software_list_find( list, "*", swinfo ) )
 					{

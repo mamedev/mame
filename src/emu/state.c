@@ -237,7 +237,7 @@ void state_manager::save_memory(const char *module, const char *tag, UINT32 inde
 //  state
 //-------------------------------------------------
 
-state_save_error state_manager::check_file(running_machine *machine, mame_file *file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...))
+state_save_error state_manager::check_file(running_machine *machine, emu_file &file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...))
 {
 	// if we want to validate the signature, compute it
 	UINT32 sig = 0;
@@ -245,10 +245,10 @@ state_save_error state_manager::check_file(running_machine *machine, mame_file *
 		sig = machine->state().signature();
 
 	// seek to the beginning and read the header
-	mame_fcompress(file, FCOMPRESS_NONE);
-	mame_fseek(file, 0, SEEK_SET);
+	file.compress(FCOMPRESS_NONE);
+	file.seek(0, SEEK_SET);
 	UINT8 header[HEADER_SIZE];
-	if (mame_fread(file, header, sizeof(header)) != sizeof(header))
+	if (file.read(header, sizeof(header)) != sizeof(header))
 	{
 		if (errormsg != NULL)
 			(*errormsg)("Could not read " APPNAME " save file header");
@@ -264,19 +264,19 @@ state_save_error state_manager::check_file(running_machine *machine, mame_file *
 //  read_file - read the data from a file
 //-------------------------------------------------
 
-state_save_error state_manager::read_file(mame_file *file)
+state_save_error state_manager::read_file(emu_file &file)
 {
 	// if we have illegal registrations, return an error
 	if (m_illegal_regs > 0)
 		return STATERR_ILLEGAL_REGISTRATIONS;
 
 	// read the header and turn on compression for the rest of the file
-	mame_fcompress(file, FCOMPRESS_NONE);
-	mame_fseek(file, 0, SEEK_SET);
+	file.compress(FCOMPRESS_NONE);
+	file.seek(0, SEEK_SET);
 	UINT8 header[HEADER_SIZE];
-	if (mame_fread(file, header, sizeof(header)) != sizeof(header))
+	if (file.read(header, sizeof(header)) != sizeof(header))
 		return STATERR_READ_ERROR;
-	mame_fcompress(file, FCOMPRESS_MEDIUM);
+	file.compress(FCOMPRESS_MEDIUM);
 
 	// verify the header and report an error if it doesn't match
 	UINT32 sig = signature();
@@ -290,7 +290,7 @@ state_save_error state_manager::read_file(mame_file *file)
 	for (state_entry *entry = m_entry_list.first(); entry != NULL; entry = entry->next())
 	{
 		UINT32 totalsize = entry->m_typesize * entry->m_typecount;
-		if (mame_fread(file, entry->m_data, totalsize) != totalsize)
+		if (file.read(entry->m_data, totalsize) != totalsize)
 			return STATERR_READ_ERROR;
 
 		// handle flipping
@@ -310,7 +310,7 @@ state_save_error state_manager::read_file(mame_file *file)
 //  write_file - writes the data to a file
 //-------------------------------------------------
 
-state_save_error state_manager::write_file(mame_file *file)
+state_save_error state_manager::write_file(emu_file &file)
 {
 	// if we have illegal registrations, return an error
 	if (m_illegal_regs > 0)
@@ -326,11 +326,11 @@ state_save_error state_manager::write_file(mame_file *file)
 	*(UINT32 *)&header[0x1c] = LITTLE_ENDIANIZE_INT32(sig);
 
 	// write the header and turn on compression for the rest of the file
-	mame_fcompress(file, FCOMPRESS_NONE);
-	mame_fseek(file, 0, SEEK_SET);
-	if (mame_fwrite(file, header, sizeof(header)) != sizeof(header))
+	file.compress(FCOMPRESS_NONE);
+	file.seek(0, SEEK_SET);
+	if (file.write(header, sizeof(header)) != sizeof(header))
 		return STATERR_WRITE_ERROR;
-	mame_fcompress(file, FCOMPRESS_MEDIUM);
+	file.compress(FCOMPRESS_MEDIUM);
 
 	// call the pre-save functions
 	for (state_callback *func = m_presave_list.first(); func != NULL; func = func->next())
@@ -340,7 +340,7 @@ state_save_error state_manager::write_file(mame_file *file)
 	for (state_entry *entry = m_entry_list.first(); entry != NULL; entry = entry->next())
 	{
 		UINT32 totalsize = entry->m_typesize * entry->m_typecount;
-		if (mame_fwrite(file, entry->m_data, totalsize) != totalsize)
+		if (file.write(entry->m_data, totalsize) != totalsize)
 			return STATERR_WRITE_ERROR;
 	}
 	return STATERR_NONE;

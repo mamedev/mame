@@ -68,7 +68,7 @@ static int drawnone_window_draw(win_window_info *window, HDC dc, int update);
 //  drawnone_init
 //============================================================
 
-int drawnone_init(win_draw_callbacks *callbacks)
+int drawnone_init(running_machine &machine, win_draw_callbacks *callbacks)
 {
 	// fill in the callbacks
 	callbacks->exit = drawnone_exit;

@@ -56,11 +56,11 @@ static NVRAM_HANDLER( seicross )
 	size_t nvram_size = state->nvram_size;
 
 	if (read_or_write)
-		mame_fwrite(file,nvram,nvram_size);
+		file->write(nvram,nvram_size);
 	else
 	{
 		if (file)
-			mame_fread(file,nvram,nvram_size);
+			file->read(nvram,nvram_size);
 		else
 		{
 			/* fill in the default values */

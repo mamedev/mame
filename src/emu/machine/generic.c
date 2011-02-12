@@ -312,22 +312,6 @@ void coin_lockout_global_w(running_machine *machine, int on)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    nvram_fopen - open an NVRAM file directly
--------------------------------------------------*/
-
-mame_file *nvram_fopen(running_machine *machine, UINT32 openflags)
-{
-	file_error filerr;
-	mame_file *file;
-
-	astring fname(machine->basename(), ".nv");
-	filerr = mame_fopen(SEARCHPATH_NVRAM, fname, openflags, &file);
-
-	return (filerr == FILERR_NONE) ? file : NULL;
-}
-
-
-/*-------------------------------------------------
     nvram_load - load a system's NVRAM
 -------------------------------------------------*/
 
@@ -339,19 +323,16 @@ void nvram_load(running_machine *machine)
 		return;
 
 	// open the file; if it exists, call everyone to read from it
-	mame_file *nvram_file = nvram_fopen(machine, OPEN_FLAG_READ);
-	if (nvram_file != NULL)
+	emu_file file(machine->options(), SEARCHPATH_NVRAM, OPEN_FLAG_READ);
+	if (file.open(machine->basename(), ".nv") == FILERR_NONE)
 	{
 		// read data from general NVRAM handler first
 		if (machine->config->m_nvram_handler != NULL)
-			(*machine->config->m_nvram_handler)(machine, nvram_file, FALSE);
+			(*machine->config->m_nvram_handler)(machine, &file, FALSE);
 
 		// find all devices with NVRAM handlers, and read from them next
 		for (bool gotone = (nvram != NULL); gotone; gotone = nvram->next(nvram))
-			nvram->nvram_load(*nvram_file);
-
-		// close the file
-		mame_fclose(nvram_file);
+			nvram->nvram_load(file);
 	}
 
 	// otherwise, tell everyone to initialize their NVRAM areas
@@ -380,19 +361,16 @@ void nvram_save(running_machine *machine)
 		return;
 
 	// open the file; if it exists, call everyone to read from it
-	mame_file *nvram_file = nvram_fopen(machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	if (nvram_file != NULL)
+	emu_file file(machine->options(), SEARCHPATH_NVRAM, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	if (file.open(machine->basename(), ".nv") == FILERR_NONE)
 	{
 		// write data via general NVRAM handler first
 		if (machine->config->m_nvram_handler != NULL)
-			(*machine->config->m_nvram_handler)(machine, nvram_file, TRUE);
+			(*machine->config->m_nvram_handler)(machine, &file, TRUE);
 
 		// find all devices with NVRAM handlers, and tell them to write next
 		for (bool gotone = (nvram != NULL); gotone; gotone = nvram->next(nvram))
-			nvram->nvram_save(*nvram_file);
-
-		// close the file
-		mame_fclose(nvram_file);
+			nvram->nvram_save(file);
 	}
 }
 
@@ -420,8 +398,6 @@ INLINE void memcard_name(int index, char *buffer)
 
 int memcard_create(running_machine *machine, int index, int overwrite)
 {
-	file_error filerr;
-	mame_file *file;
 	char name[16];
 
 	/* create a name */
@@ -431,16 +407,14 @@ int memcard_create(running_machine *machine, int index, int overwrite)
 	astring fname(machine->basename(), PATH_SEPARATOR, name);
 	if (!overwrite)
 	{
-		filerr = mame_fopen(SEARCHPATH_MEMCARD, fname, OPEN_FLAG_READ, &file);
-		if (filerr == FILERR_NONE)
-		{
-			mame_fclose(file);
+		emu_file testfile(machine->options(), SEARCHPATH_MEMCARD, OPEN_FLAG_READ);
+		if (testfile.open(fname) == FILERR_NONE)
 			return 1;
-		}
 	}
 
 	/* create a new file */
-	filerr = mame_fopen(SEARCHPATH_MEMCARD, fname, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
+	emu_file file(machine->options(), SEARCHPATH_MEMCARD, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	file_error filerr = file.open(fname);
 	if (filerr != FILERR_NONE)
 		return 1;
 
@@ -449,7 +423,6 @@ int memcard_create(running_machine *machine, int index, int overwrite)
 		(*machine->config->m_memcard_handler)(machine, file, MEMCARD_CREATE);
 
 	/* close the file */
-	mame_fclose(file);
 	return 0;
 }
 
@@ -462,8 +435,6 @@ int memcard_create(running_machine *machine, int index, int overwrite)
 int memcard_insert(running_machine *machine, int index)
 {
 	generic_machine_private *state = machine->generic_machine_data;
-	file_error filerr;
-	mame_file *file;
 	char name[16];
 
 	/* if a card is already inserted, eject it first */
@@ -473,10 +444,10 @@ int memcard_insert(running_machine *machine, int index)
 
 	/* create a name */
 	memcard_name(index, name);
-	astring fname(machine->basename(), PATH_SEPARATOR, name);
 
 	/* open the file; if we can't, it's an error */
-	filerr = mame_fopen(SEARCHPATH_MEMCARD, fname, OPEN_FLAG_READ, &file);
+	emu_file file(machine->options(), SEARCHPATH_MEMCARD, OPEN_FLAG_READ);
+	file_error filerr = file.open(machine->basename(), PATH_SEPARATOR, name);
 	if (filerr != FILERR_NONE)
 		return 1;
 
@@ -485,7 +456,6 @@ int memcard_insert(running_machine *machine, int index)
 		(*machine->config->m_memcard_handler)(machine, file, MEMCARD_INSERT);
 
 	/* close the file */
-	mame_fclose(file);
 	state->memcard_inserted = index;
 	return 0;
 }
@@ -499,8 +469,6 @@ int memcard_insert(running_machine *machine, int index)
 void memcard_eject(running_machine &machine)
 {
 	generic_machine_private *state = machine.generic_machine_data;
-	file_error filerr;
-	mame_file *file;
 	char name[16];
 
 	/* if no card is preset, just ignore */
@@ -509,22 +477,18 @@ void memcard_eject(running_machine &machine)
 
 	/* create a name */
 	memcard_name(state->memcard_inserted, name);
-	astring fname(machine.basename(), PATH_SEPARATOR, name);
 
 	/* open the file; if we can't, it's an error */
-	filerr = mame_fopen(SEARCHPATH_MEMCARD, fname, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
+	emu_file file(machine.options(), SEARCHPATH_MEMCARD, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	file_error filerr = file.open(machine.basename(), PATH_SEPARATOR, name);
 	if (filerr != FILERR_NONE)
-	{
-		mame_fclose(file);
 		return;
-	}
 
 	/* initialize and then load the card */
 	if (machine.m_config.m_memcard_handler)
 		(*machine.m_config.m_memcard_handler)(&machine, file, MEMCARD_EJECT);
 
 	/* close the file */
-	mame_fclose(file);
 	state->memcard_inserted = -1;
 }
 

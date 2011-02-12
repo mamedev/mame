@@ -326,18 +326,18 @@ void x76f100_device::sda_1()
 	sdar = false;
 }
 
-void x76f100_device::nvram_read(mame_file &file)
+void x76f100_device::nvram_read(emu_file &file)
 {
-	mame_fread(&file, response_to_reset, SIZE_RESPONSE_TO_RESET);
-	mame_fread(&file, write_password,    SIZE_WRITE_PASSWORD);
-	mame_fread(&file, read_password,     SIZE_READ_PASSWORD);
-	mame_fread(&file, data,              SIZE_DATA);
+	file.read(response_to_reset, SIZE_RESPONSE_TO_RESET);
+	file.read(write_password,    SIZE_WRITE_PASSWORD);
+	file.read(read_password,     SIZE_READ_PASSWORD);
+	file.read(data,              SIZE_DATA);
 }
 
-void x76f100_device::nvram_write(mame_file &file)
+void x76f100_device::nvram_write(emu_file &file)
 {
-	mame_fwrite(&file, response_to_reset, SIZE_RESPONSE_TO_RESET);
-	mame_fwrite(&file, write_password,    SIZE_WRITE_PASSWORD);
-	mame_fwrite(&file, read_password,     SIZE_READ_PASSWORD);
-	mame_fwrite(&file, data,              SIZE_DATA);
+	file.write(response_to_reset, SIZE_RESPONSE_TO_RESET);
+	file.write(write_password,    SIZE_WRITE_PASSWORD);
+	file.write(read_password,     SIZE_READ_PASSWORD);
+	file.write(data,              SIZE_DATA);
 }

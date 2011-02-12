@@ -486,7 +486,7 @@ static void expand_copy_info(copy_info *list)
 	}
 }
 
-int draw13_init(sdl_draw_info *callbacks)
+int draw13_init(running_machine &machine, sdl_draw_info *callbacks)
 {
 	const char *stemp;
 
@@ -503,7 +503,7 @@ int draw13_init(sdl_draw_info *callbacks)
 
 	// Load the GL library now - else MT will fail
 
-	stemp = options_get_string(mame_options(), SDLOPTION_GL_LIB);
+	stemp = options_get_string(machine.options(), SDLOPTION_GL_LIB);
 	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) == 0)
 		stemp = NULL;
 

@@ -291,7 +291,7 @@ public:
 
 	// methods that wrap both interface-level and device-level behavior
 	void config_complete();
-	bool validity_check(const game_driver &driver) const;
+	bool validity_check(core_options &options, const game_driver &driver) const;
 
 	// configuration helpers
 	static void static_set_clock(device_config *device, UINT32 clock) { device->m_clock = clock; }
@@ -305,7 +305,7 @@ public:
 	// optional operation overrides
 protected:
 	virtual void device_config_complete();
-	virtual bool device_validity_check(const game_driver &driver) const;
+	virtual bool device_validity_check(core_options &options, const game_driver &driver) const;
 
 public:
 	// optional information overrides
@@ -359,7 +359,7 @@ public:
 
 	// optional operation overrides
 	virtual void interface_config_complete();
-	virtual bool interface_validity_check(const game_driver &driver) const;
+	virtual bool interface_validity_check(core_options &options, const game_driver &driver) const;
 
 protected:
 	const device_config &		m_device_config;

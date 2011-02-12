@@ -471,9 +471,9 @@ void timekeeper_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void timekeeper_device::nvram_read(mame_file &file)
+void timekeeper_device::nvram_read(emu_file &file)
 {
-	mame_fread( &file, m_data, m_size );
+	file.read( m_data, m_size );
 
 	counters_to_ram();
 }
@@ -484,9 +484,9 @@ void timekeeper_device::nvram_read(mame_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void timekeeper_device::nvram_write(mame_file &file)
+void timekeeper_device::nvram_write(emu_file &file)
 {
-	mame_fwrite( &file, m_data, m_size );
+	file.write( m_data, m_size );
 }
 
 

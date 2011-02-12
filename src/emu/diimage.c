@@ -531,7 +531,7 @@ int device_image_interface::read_hash_config(const char *sysname)
     const hash_info *info = NULL;
 
     /* open the hash file */
-    hashfile = hashfile_open(sysname, FALSE, NULL);
+    hashfile = hashfile_open(device().machine->options(), sysname, FALSE, NULL);
     if (!hashfile)
         goto done;
 
@@ -652,7 +652,7 @@ void device_image_interface::battery_load(void *buffer, int length, int fill)
 {
     astring *fname = astring_assemble_4(astring_alloc(), device().machine->gamedrv->name, PATH_SEPARATOR, m_basename_noext, ".nv");
 
-    image_battery_load_by_name(astring_c(fname), buffer, length, fill);
+    image_battery_load_by_name(device().machine->options(), astring_c(fname), buffer, length, fill);
     astring_free(fname);
 }
 
@@ -666,7 +666,7 @@ void device_image_interface::battery_save(const void *buffer, int length)
 {
     astring *fname = astring_assemble_4(astring_alloc(), device().machine->gamedrv->name, PATH_SEPARATOR, m_basename_noext, ".nv");
 
-    image_battery_save_by_name(astring_c(fname), buffer, length);
+    image_battery_save_by_name(device().machine->options(), astring_c(fname), buffer, length);
     astring_free(fname);
 }
 

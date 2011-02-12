@@ -247,7 +247,7 @@ const device_type name = configclass::static_alloc_device_config
 #define DEVICE_GET_INFO_CALL(name)	DEVICE_GET_INFO_NAME(name)(device, state, info)
 
 #define DEVICE_VALIDITY_CHECK_NAME(name)	device_validity_check_##name
-#define DEVICE_VALIDITY_CHECK(name)			int DEVICE_VALIDITY_CHECK_NAME(name)(const game_driver *driver, const device_config *device)
+#define DEVICE_VALIDITY_CHECK(name)			int DEVICE_VALIDITY_CHECK_NAME(name)(const game_driver *driver, const device_config *device, core_options &options)
 #define DEVICE_VALIDITY_CHECK_CALL(name)	DEVICE_VALIDITY_CHECK_NAME(name)(driver, device)
 
 #define DEVICE_START_NAME(name)		device_start_##name
@@ -267,7 +267,7 @@ const device_type name = configclass::static_alloc_device_config
 #define DEVICE_EXECUTE_CALL(name)	DEVICE_EXECUTE_NAME(name)(device, clocks)
 
 #define DEVICE_NVRAM_NAME(name)		device_nvram_##name
-#define DEVICE_NVRAM(name)			void DEVICE_NVRAM_NAME(name)(device_t *device, mame_file *file, int read_or_write)
+#define DEVICE_NVRAM(name)			void DEVICE_NVRAM_NAME(name)(device_t *device, emu_file *file, int read_or_write)
 #define DEVICE_NVRAM_CALL(name)		DEVICE_NVRAM_NAME(name)(device, file, read_or_write)
 
 
@@ -382,13 +382,13 @@ resource_pool &machine_get_pool(running_machine &machine);
 
 // device interface function types
 typedef void (*device_get_config_func)(const device_config *device, UINT32 state, deviceinfo *info);
-typedef int (*device_validity_check_func)(const game_driver *driver, const device_config *device);
+typedef int (*device_validity_check_func)(const game_driver *driver, const device_config *device, core_options &options);
 
 typedef void (*device_start_func)(device_t *device);
 typedef void (*device_stop_func)(device_t *device);
 typedef INT32 (*device_execute_func)(device_t *device, INT32 clocks);
 typedef void (*device_reset_func)(device_t *device);
-typedef void (*device_nvram_func)(device_t *device, mame_file *file, int read_or_write);
+typedef void (*device_nvram_func)(device_t *device, emu_file *file, int read_or_write);
 
 // the actual deviceinfo union
 union deviceinfo
@@ -447,7 +447,7 @@ public:
 
 protected:
 	// overrides
-	virtual bool device_validity_check(const game_driver &driver) const;
+	virtual bool device_validity_check(core_options &options, const game_driver &driver) const;
 
 	// access to legacy configuration info
 	INT64 get_legacy_config_int(UINT32 state) const;
@@ -577,8 +577,8 @@ protected:
 
 	// device_nvram_interface overrides
 	virtual void nvram_default();
-	virtual void nvram_read(mame_file &file);
-	virtual void nvram_write(mame_file &file);
+	virtual void nvram_read(emu_file &file);
+	virtual void nvram_write(emu_file &file);
 };
 
 // ======================> legacy_image_device_config

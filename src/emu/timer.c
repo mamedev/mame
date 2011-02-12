@@ -200,7 +200,7 @@ void timer_device_config::static_set_ptr(device_config *device, void *ptr)
 //  configuration
 //-------------------------------------------------
 
-bool timer_device_config::device_validity_check(const game_driver &driver) const
+bool timer_device_config::device_validity_check(core_options &options, const game_driver &driver) const
 {
 	bool error = false;
 

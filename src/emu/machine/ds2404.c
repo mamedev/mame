@@ -409,9 +409,9 @@ void ds2404_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void ds2404_device::nvram_read(mame_file &file)
+void ds2404_device::nvram_read(emu_file &file)
 {
-	mame_fread(&file, m_sram, sizeof(m_sram));
+	file.read(m_sram, sizeof(m_sram));
 }
 
 
@@ -420,7 +420,7 @@ void ds2404_device::nvram_read(mame_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void ds2404_device::nvram_write(mame_file &file)
+void ds2404_device::nvram_write(emu_file &file)
 {
-	mame_fwrite(&file, m_sram, sizeof(m_sram));
+	file.write(m_sram, sizeof(m_sram));
 }

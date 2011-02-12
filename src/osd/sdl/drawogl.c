@@ -353,7 +353,7 @@ static render_primitive_list &drawogl_window_get_primitives(sdl_window_info *win
 static void drawogl_destroy_all_textures(sdl_window_info *window);
 static void drawogl_window_clear(sdl_window_info *window);
 static int drawogl_xy_to_render_target(sdl_window_info *window, int x, int y, int *xt, int *yt);
-static void load_gl_lib(void);
+static void load_gl_lib(running_machine &machine);
 
 
 
@@ -429,7 +429,7 @@ static int dll_loaded = 0;
 //  drawogl_init
 //============================================================
 
-int drawogl_init(sdl_draw_info *callbacks)
+int drawogl_init(running_machine &machine, sdl_draw_info *callbacks)
 {
 	// fill in the callbacks
 	callbacks->exit = drawogl_exit;
@@ -443,7 +443,7 @@ int drawogl_init(sdl_draw_info *callbacks)
 		mame_printf_verbose("Using SDL single-window OpenGL driver (SDL 1.2)\n");
 
 #if (SDL_VERSION_ATLEAST(1,3,0))
-	load_gl_lib();
+	load_gl_lib(machine);
 #endif
 
 	return 0;
@@ -502,7 +502,7 @@ static void loadgl_functions(void)
 // Load GL library
 //============================================================
 
-static void load_gl_lib(void)
+static void load_gl_lib(running_machine &machine)
 {
 #ifdef USE_DISPATCH_GL
 	if (!dll_loaded)
@@ -513,7 +513,7 @@ static void load_gl_lib(void)
          */
 		const char *stemp;
 
-		stemp = options_get_string(mame_options(), SDLOPTION_GL_LIB);
+		stemp = options_get_string(machine.options(), SDLOPTION_GL_LIB);
 		if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) == 0)
 			stemp = NULL;
 
@@ -553,7 +553,7 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 
 	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 	//Moved into init
-	//load_gl_lib();
+	//load_gl_lib(*window->machine);
 
 	// create the SDL window
 	SDL_SelectVideoDisplay(window->monitor->handle);
@@ -603,7 +603,7 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, video_config.waitvsync ? 1 : 0);
 	#endif
 
-	load_gl_lib();
+	load_gl_lib(*window->machine);
 
 	// create the SDL surface (which creates the window in windowed mode)
 	sdl->sdlsurf = SDL_SetVideoMode(width, height,
@@ -1241,7 +1241,7 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 		// we're doing nothing 3d, so the Z-buffer is currently not interesting
 		glDisable(GL_DEPTH_TEST);
 
-		if (options_get_bool(window->machine->options(), OPTION_ANTIALIAS))
+		if (options_get_bool(&window->machine->options(), OPTION_ANTIALIAS))
 		{
 			// enable antialiasing for lines
 			glEnable(GL_LINE_SMOOTH);
@@ -2960,9 +2960,9 @@ static void texture_shader_update(sdl_window_info *window, texture_info *texture
 			container->get_user_settings(settings);
 			//FIXME: Intended behaviour
 #if 1
-			vid_attributes[0] = options_get_float(window->machine->options(), OPTION_GAMMA);
-			vid_attributes[1] = options_get_float(window->machine->options(), OPTION_CONTRAST);
-			vid_attributes[2] = options_get_float(window->machine->options(), OPTION_BRIGHTNESS);
+			vid_attributes[0] = options_get_float(&window->machine->options(), OPTION_GAMMA);
+			vid_attributes[1] = options_get_float(&window->machine->options(), OPTION_CONTRAST);
+			vid_attributes[2] = options_get_float(&window->machine->options(), OPTION_BRIGHTNESS);
 #else
 			vid_attributes[0] = settings.gamma;
 			vid_attributes[1] = settings.contrast;

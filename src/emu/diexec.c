@@ -211,7 +211,7 @@ UINT32 device_config_execute_interface::execute_default_irq_vector() const
 //  constructed
 //-------------------------------------------------
 
-bool device_config_execute_interface::interface_validity_check(const game_driver &driver) const
+bool device_config_execute_interface::interface_validity_check(core_options &options, const game_driver &driver) const
 {
 	const device_config *devconfig = crosscast<const device_config *>(this);
 	bool error = false;

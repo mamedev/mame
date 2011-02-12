@@ -596,6 +596,7 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 	  m_type(CTYPE_INVALID),
 	  m_state(0),
 	  m_bitmap(NULL),
+	  m_file(NULL),
 	  m_hasalpha(false)
 {
 	// fetch common data
@@ -610,6 +611,7 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 		m_dirname = dirname;
 		m_imagefile = xml_get_attribute_string_with_subst(machine, compnode, "file", "");
 		m_alphafile = xml_get_attribute_string_with_subst(machine, compnode, "alphafile", "");
+		m_file = global_alloc(emu_file(machine.options(), OPTION_ARTPATH, OPEN_FLAG_READ));
 	}
 
 	// text nodes
@@ -663,6 +665,7 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 
 layout_element::component::~component()
 {
+	global_free(m_file);
 	global_free(m_bitmap);
 }
 
@@ -898,11 +901,12 @@ void layout_element::component::draw_text(running_machine &machine, bitmap_t &de
 bitmap_t *layout_element::component::load_bitmap()
 {
 	// load the basic bitmap
-	bitmap_t *bitmap = render_load_png(OPTION_ARTPATH, m_dirname, m_imagefile, NULL, &m_hasalpha);
+	assert(m_file != NULL);
+	bitmap_t *bitmap = render_load_png(*m_file, m_dirname, m_imagefile, NULL, &m_hasalpha);
 	if (bitmap != NULL && m_alphafile)
 
 		// load the alpha bitmap if specified
-		if (render_load_png(OPTION_ARTPATH, m_dirname, m_alphafile, bitmap, &m_hasalpha) == NULL)
+		if (render_load_png(*m_file, m_dirname, m_alphafile, bitmap, &m_hasalpha) == NULL)
 		{
 			global_free(bitmap);
 			bitmap = NULL;

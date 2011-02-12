@@ -486,15 +486,14 @@ void main()
 
 void Load(char *name,byte *buffer,int from, int length)
 {
-	file_error filerr;
-	mame_file *file;
-
-	filerr = mame_fopen(NULL, name, OPEN_FLAG_READ, &file);
+/*
+	emu_file file(*mame_options(), NULL, OPEN_FLAG_READ);
+	file_error filerr = file.open(name);
 	if (filerr != FILERR_NONE)
 		return;
 	while (length--)
-		buffer[from++]=mame_fgetc(file);
-	mame_fclose(file);
+		buffer[from++]=file->getc();
+*/
 }
 
 void CreateJrDecodeTable(byte *x, int length)

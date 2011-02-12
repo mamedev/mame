@@ -670,9 +670,9 @@ static READ32_HANDLER( timekeeper_r )
 static NVRAM_HANDLER( timekeeper_save )
 {
 	if (read_or_write)
-		mame_fwrite(file, timekeeper_nvram, timekeeper_nvram_size);
+		file->write(timekeeper_nvram, timekeeper_nvram_size);
 	else if (file)
-		mame_fread(file, timekeeper_nvram, timekeeper_nvram_size);
+		file->read(timekeeper_nvram, timekeeper_nvram_size);
 	else
 		memset(timekeeper_nvram, 0xff, timekeeper_nvram_size);
 }

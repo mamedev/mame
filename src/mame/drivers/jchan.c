@@ -170,6 +170,7 @@ there are 9 PALS on the pcb (not dumped)
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
+#include "machine/nvram.h"
 #include "sound/ymz280b.h"
 #include "includes/suprnova.h"
 #include "includes/kaneko16.h"
@@ -190,6 +191,9 @@ static UINT16 *jchan_spriteram_2;
 static UINT16* jchan_sprregs_2;
 
 static UINT16 *mainsub_shared_ram;
+
+static UINT8 nvram_data[128];
+
 
 /***************************************************************************
 
@@ -239,24 +243,14 @@ static void jchan_mcu_run(running_machine *machine)
 
 		case 0x02: /* load game settings from 93C46 EEPROM ($1090-$10dc) */
 		{
-			mame_file *f;
-			if ((f = nvram_fopen(machine, OPEN_FLAG_READ)) != 0)
-			{
-				mame_fread(f,&mcu_ram[mcu_offset], 128);
-				mame_fclose(f);
-			}
+			memcpy(&mcu_ram[mcu_offset], nvram_data, sizeof(nvram_data));
 			logerror("(load NVRAM settings)\n");
 		}
 		break;
 
 		case 0x42: /* save game settings to 93C46 EEPROM ($50d4) */
 		{
-			mame_file *f;
-			if ((f = nvram_fopen(machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS)) != 0)
-			{
-				mame_fwrite(f,&mcu_ram[mcu_offset], 128);
-				mame_fclose(f);
-			}
+			memcpy(nvram_data, &mcu_ram[mcu_offset], sizeof(nvram_data));
 			logerror("(save NVRAM settings)\n");
 		}
 		break;
@@ -678,6 +672,8 @@ static MACHINE_CONFIG_START( jchan, driver_device )
 
 	MCFG_VIDEO_START(jchan)
 	MCFG_VIDEO_UPDATE(jchan)
+	
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -778,6 +774,8 @@ static DRIVER_INIT( jchan )
 
 
 	memset(jchan_mcu_com, 0, 4 * sizeof( UINT16 ) );
+	
+	machine->device<nvram_device>("nvram")->set_base(nvram_data, sizeof(nvram_data));
 }
 
 

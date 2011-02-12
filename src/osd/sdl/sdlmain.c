@@ -941,13 +941,11 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 
 	if (!font)
 	{
-		mame_file *t;
-
 		mame_printf_verbose("Searching font %s in -%s\n", name.cstr(), SEARCHPATH_FONT);
-		if (mame_fopen(SEARCHPATH_FONT, name.cstr(), OPEN_FLAG_READ, &t) == FILERR_NONE)
+		emu_file file(machine().options(), SEARCHPATH_FONT, OPEN_FLAG_READ);
+		if (file.open(name) == FILERR_NONE)
 		{
-			astring full_name = mame_file_full_name(t);
-			mame_fclose(t);
+			astring full_name = file.fullpath();
 			font = TTF_OpenFont(full_name.cstr(), POINT_SIZE);
 			if (font)
 				mame_printf_verbose("Found font %s\n", full_name.cstr());

@@ -104,7 +104,7 @@ void device_config_sound_interface::static_reset_routes(device_config *device)
 //  constructed
 //-------------------------------------------------
 
-bool device_config_sound_interface::interface_validity_check(const game_driver &driver) const
+bool device_config_sound_interface::interface_validity_check(core_options &options, const game_driver &driver) const
 {
 	bool error = false;
 

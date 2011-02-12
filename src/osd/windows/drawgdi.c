@@ -87,7 +87,7 @@ static void drawgdi_rgb888_draw_primitives(const render_primitive_list &primlist
 //  drawgdi_init
 //============================================================
 
-int drawgdi_init(win_draw_callbacks *callbacks)
+int drawgdi_init(running_machine &machine, win_draw_callbacks *callbacks)
 {
 	// fill in the callbacks
 	callbacks->exit = drawgdi_exit;

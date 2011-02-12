@@ -48,7 +48,7 @@ INLINE samples_info *get_safe_token(device_t *device)
     read_wav_sample - read a WAV file as a sample
 -------------------------------------------------*/
 
-static int read_wav_sample(running_machine *machine, mame_file *f, loaded_sample *sample)
+static int read_wav_sample(running_machine *machine, emu_file &file, loaded_sample *sample)
 {
 	unsigned long offset = 0;
 	UINT32 length, rate, filesize;
@@ -57,20 +57,20 @@ static int read_wav_sample(running_machine *machine, mame_file *f, loaded_sample
 	UINT32 sindex;
 
 	/* read the core header and make sure it's a WAVE file */
-	offset += mame_fread(f, buf, 4);
+	offset += file.read(buf, 4);
 	if (offset < 4)
 		return 0;
 	if (memcmp(&buf[0], "RIFF", 4) != 0)
 		return 0;
 
 	/* get the total size */
-	offset += mame_fread(f, &filesize, 4);
+	offset += file.read(&filesize, 4);
 	if (offset < 8)
 		return 0;
 	filesize = LITTLE_ENDIANIZE_INT32(filesize);
 
 	/* read the RIFF file type and make sure it's a WAVE file */
-	offset += mame_fread(f, buf, 4);
+	offset += file.read(buf, 4);
 	if (offset < 12)
 		return 0;
 	if (memcmp(&buf[0], "WAVE", 4) != 0)
@@ -79,59 +79,59 @@ static int read_wav_sample(running_machine *machine, mame_file *f, loaded_sample
 	/* seek until we find a format tag */
 	while (1)
 	{
-		offset += mame_fread(f, buf, 4);
-		offset += mame_fread(f, &length, 4);
+		offset += file.read(buf, 4);
+		offset += file.read(&length, 4);
 		length = LITTLE_ENDIANIZE_INT32(length);
 		if (memcmp(&buf[0], "fmt ", 4) == 0)
 			break;
 
 		/* seek to the next block */
-		mame_fseek(f, length, SEEK_CUR);
+		file.seek(length, SEEK_CUR);
 		offset += length;
 		if (offset >= filesize)
 			return 0;
 	}
 
 	/* read the format -- make sure it is PCM */
-	offset += mame_fread(f, &temp16, 2);
+	offset += file.read(&temp16, 2);
 	temp16 = LITTLE_ENDIANIZE_INT16(temp16);
 	if (temp16 != 1)
 		return 0;
 
 	/* number of channels -- only mono is supported */
-	offset += mame_fread(f, &temp16, 2);
+	offset += file.read(&temp16, 2);
 	temp16 = LITTLE_ENDIANIZE_INT16(temp16);
 	if (temp16 != 1)
 		return 0;
 
 	/* sample rate */
-	offset += mame_fread(f, &rate, 4);
+	offset += file.read(&rate, 4);
 	rate = LITTLE_ENDIANIZE_INT32(rate);
 
 	/* bytes/second and block alignment are ignored */
-	offset += mame_fread(f, buf, 6);
+	offset += file.read(buf, 6);
 
 	/* bits/sample */
-	offset += mame_fread(f, &bits, 2);
+	offset += file.read(&bits, 2);
 	bits = LITTLE_ENDIANIZE_INT16(bits);
 	if (bits != 8 && bits != 16)
 		return 0;
 
 	/* seek past any extra data */
-	mame_fseek(f, length - 16, SEEK_CUR);
+	file.seek(length - 16, SEEK_CUR);
 	offset += length - 16;
 
 	/* seek until we find a data tag */
 	while (1)
 	{
-		offset += mame_fread(f, buf, 4);
-		offset += mame_fread(f, &length, 4);
+		offset += file.read(buf, 4);
+		offset += file.read(&length, 4);
 		length = LITTLE_ENDIANIZE_INT32(length);
 		if (memcmp(&buf[0], "data", 4) == 0)
 			break;
 
 		/* seek to the next block */
-		mame_fseek(f, length, SEEK_CUR);
+		file.seek(length, SEEK_CUR);
 		offset += length;
 		if (offset >= filesize)
 			return 0;
@@ -152,7 +152,7 @@ static int read_wav_sample(running_machine *machine, mame_file *f, loaded_sample
 		int sindex;
 
 		sample->data = auto_alloc_array(machine, INT16, length);
-		mame_fread(f, sample->data, length);
+		file.read(sample->data, length);
 
 		/* convert 8-bit data to signed samples */
 		tempptr = (unsigned char *)sample->data;
@@ -163,7 +163,7 @@ static int read_wav_sample(running_machine *machine, mame_file *f, loaded_sample
 	{
 		/* 16-bit data is fine as-is */
 		sample->data = auto_alloc_array(machine, INT16, length/2);
-		mame_fread(f, sample->data, length);
+		file.read(sample->data, length);
 		sample->length /= 2;
 		if (ENDIANNESS_NATIVE != ENDIANNESS_LITTLE)
 			for (sindex = 0; sindex < sample->length; sindex++)
@@ -184,7 +184,7 @@ loaded_samples *readsamples(running_machine *machine, const char *const *samplen
 	int i;
 
 	/* if the user doesn't want to use samples, bail */
-	if (!options_get_bool(machine->options(), OPTION_SAMPLES))
+	if (!options_get_bool(&machine->options(), OPTION_SAMPLES))
 		return NULL;
 	if (samplenames == 0 || samplenames[0] == 0)
 		return NULL;
@@ -206,22 +206,14 @@ loaded_samples *readsamples(running_machine *machine, const char *const *samplen
 	for (i = 0; i < samples->total; i++)
 		if (samplenames[i+skipfirst][0])
 		{
-			file_error filerr;
-			mame_file *f;
+			emu_file file(machine->options(), SEARCHPATH_SAMPLE, OPEN_FLAG_READ);
 
-			astring fname(basename, PATH_SEPARATOR, samplenames[i+skipfirst]);
-			filerr = mame_fopen(SEARCHPATH_SAMPLE, fname, OPEN_FLAG_READ, &f);
-
+			file_error filerr = file.open(basename, PATH_SEPARATOR, samplenames[i+skipfirst]);
 			if (filerr != FILERR_NONE && skipfirst)
-			{
-				astring fname(samplenames[0] + 1, PATH_SEPARATOR, samplenames[i+skipfirst]);
-				filerr = mame_fopen(SEARCHPATH_SAMPLE, fname, OPEN_FLAG_READ, &f);
-			}
+				filerr = file.open(samplenames[0] + 1, PATH_SEPARATOR, samplenames[i+skipfirst]);
+
 			if (filerr == FILERR_NONE)
-			{
-				read_wav_sample(machine, f, &samples->sample[i]);
-				mame_fclose(f);
-			}
+				read_wav_sample(machine, file, &samples->sample[i]);
 		}
 
 	return samples;

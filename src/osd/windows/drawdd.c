@@ -216,7 +216,7 @@ static void drawdd_rgb555_nr_draw_primitives(const render_primitive_list &primli
 //  drawdd_init
 //============================================================
 
-int drawdd_init(win_draw_callbacks *callbacks)
+int drawdd_init(running_machine &machine, win_draw_callbacks *callbacks)
 {
 	// dynamically grab the create function from ddraw.dll
 	dllhandle = LoadLibrary(TEXT("ddraw.dll"));
@@ -613,9 +613,9 @@ static int ddraw_create_surfaces(win_window_info *window)
 	if (window->fullscreen)
 	{
 		// only set the gamma if it's not 1.0f
-		float brightness = options_get_float(mame_options(), WINOPTION_FULLSCREENBRIGHTNESS);
-		float contrast = options_get_float(mame_options(), WINOPTION_FULLLSCREENCONTRAST);
-		float gamma = options_get_float(mame_options(), WINOPTION_FULLSCREENGAMMA);
+		float brightness = options_get_float(&window->machine->options(), WINOPTION_FULLSCREENBRIGHTNESS);
+		float contrast = options_get_float(&window->machine->options(), WINOPTION_FULLLSCREENCONTRAST);
+		float gamma = options_get_float(&window->machine->options(), WINOPTION_FULLSCREENGAMMA);
 		if (brightness != 1.0f || contrast != 1.0f || gamma != 1.0f)
 		{
 			// see if we can get a GammaControl object

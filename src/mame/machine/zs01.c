@@ -531,18 +531,18 @@ void zs01_device::sda_0()
 	}
 }
 
-void zs01_device::nvram_read(mame_file &file)
+void zs01_device::nvram_read(emu_file &file)
 {
-	mame_fread(&file, response_to_reset, SIZE_RESPONSE_TO_RESET);
-	mame_fread(&file, command_key,       SIZE_KEY);
-	mame_fread(&file, data_key,          SIZE_KEY);
-	mame_fread(&file, data,              SIZE_DATA);
+	file.read(response_to_reset, SIZE_RESPONSE_TO_RESET);
+	file.read(command_key,       SIZE_KEY);
+	file.read(data_key,          SIZE_KEY);
+	file.read(data,              SIZE_DATA);
 }
 
-void zs01_device::nvram_write(mame_file &file)
+void zs01_device::nvram_write(emu_file &file)
 {
-	mame_fwrite(&file, response_to_reset, SIZE_RESPONSE_TO_RESET);
-	mame_fwrite(&file, command_key,       SIZE_KEY);
-	mame_fwrite(&file, data_key,          SIZE_KEY);
-	mame_fwrite(&file, data,              SIZE_DATA);
+	file.write(response_to_reset, SIZE_RESPONSE_TO_RESET);
+	file.write(command_key,       SIZE_KEY);
+	file.write(data_key,          SIZE_KEY);
+	file.write(data,              SIZE_DATA);
 }

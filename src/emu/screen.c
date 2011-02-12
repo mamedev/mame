@@ -226,7 +226,7 @@ void screen_device_config::static_set_default_position(device_config *device, do
 //  configuration
 //-------------------------------------------------
 
-bool screen_device_config::device_validity_check(const game_driver &driver) const
+bool screen_device_config::device_validity_check(core_options &options, const game_driver &driver) const
 {
 	bool error = false;
 
@@ -363,10 +363,10 @@ void screen_device::device_start()
 		m_scanline_timer->adjust(time_until_pos(0));
 
 	// create burn-in bitmap
-	if (options_get_int(machine->options(), OPTION_BURNIN) > 0)
+	if (options_get_int(&machine->options(), OPTION_BURNIN) > 0)
 	{
 		int width, height;
-		if (sscanf(options_get_string(machine->options(), OPTION_SNAPSIZE), "%dx%d", &width, &height) != 2 || width == 0 || height == 0)
+		if (sscanf(options_get_string(&machine->options(), OPTION_SNAPSIZE), "%dx%d", &width, &height) != 2 || width == 0 || height == 0)
 			width = height = 300;
 		m_burnin = auto_alloc(machine, bitmap_t(width, height, BITMAP_FORMAT_INDEXED64));
 		if (m_burnin == NULL)
@@ -375,7 +375,7 @@ void screen_device::device_start()
 	}
 
 	// load the effect overlay
-	const char *overname = options_get_string(machine->options(), OPTION_EFFECT);
+	const char *overname = options_get_string(&machine->options(), OPTION_EFFECT);
 	if (overname != NULL && strcmp(overname, "none") != 0)
 		load_effect_overlay(overname);
 
@@ -1027,10 +1027,8 @@ void screen_device::finalize_burnin()
 	// write the final PNG
 
 	// compute the name and create the file
-	astring fname;
-	fname.printf("%s" PATH_SEPARATOR "burnin-%s.png", machine->basename(), tag());
-	mame_file *file;
-	file_error filerr = mame_fopen(SEARCHPATH_SCREENSHOT, fname, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
+	emu_file file(m_machine.options(), SEARCHPATH_SCREENSHOT, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	file_error filerr = file.open(machine->basename(), PATH_SEPARATOR "burnin-", tag());
 	if (filerr == FILERR_NONE)
 	{
 		png_info pnginfo = { 0 };
@@ -1044,11 +1042,10 @@ void screen_device::finalize_burnin()
 		png_add_text(&pnginfo, "System", text);
 
 		// now do the actual work
-		pngerr = png_write_bitmap(mame_core_file(file), &pnginfo, finalmap, 0, NULL);
+		pngerr = png_write_bitmap(file, &pnginfo, finalmap, 0, NULL);
 
 		// free any data allocated
 		png_free(&pnginfo);
-		mame_fclose(file);
 	}
 }
 
@@ -1067,7 +1064,8 @@ void screen_device::load_effect_overlay(const char *filename)
 	fullname.cat(".png");
 
 	// load the file
-	m_screen_overlay_bitmap = render_load_png(OPTION_ARTPATH, NULL, fullname, NULL, NULL);
+	emu_file file(m_machine.options(), OPTION_ARTPATH, OPEN_FLAG_READ);
+	m_screen_overlay_bitmap = render_load_png(file, NULL, fullname, NULL, NULL);
 	if (m_screen_overlay_bitmap != NULL)
 		m_container->set_overlay(m_screen_overlay_bitmap);
 	else

@@ -347,7 +347,7 @@ public:
 
 	// getters
 	const char *basename() const { return m_basename; }
-	core_options *options() const { return &m_options; }
+	core_options &options() const { return m_options; }
 	machine_phase phase() const { return m_current_phase; }
 	bool paused() const { return m_paused || (m_current_phase != MACHINE_PHASE_RUNNING); }
 	bool scheduled_event_pending() const { return m_exit_pending || m_hard_reset_pending; }
@@ -500,7 +500,7 @@ private:
 	bool					m_exit_to_game_select;
 	const game_driver *		m_new_driver_pending;
 	emu_timer *				m_soft_reset_timer;
-	mame_file *				m_logfile;
+	emu_file *				m_logfile;
 
 	// load/save
 	enum saveload_schedule

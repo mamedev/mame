@@ -359,15 +359,10 @@ bool debug_comment_save(running_machine *machine)
 		// flush the file
 		if (found_comments)
 		{
-			astring fname(machine->basename(), ".cmt");
-			mame_file *fp;
-			file_error filerr = mame_fopen(SEARCHPATH_COMMENT, fname, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &fp);
-
+			emu_file file(machine->options(), SEARCHPATH_COMMENT, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+			file_error filerr = file.open(machine->basename(), ".cmt");
 			if (filerr == FILERR_NONE)
-			{
-				xml_file_write(root, mame_core_file(fp));
-				mame_fclose(fp);
-			}
+				xml_file_write(root, file);
 		}
 	}
 	catch (emu_exception &)
@@ -390,16 +385,15 @@ bool debug_comment_save(running_machine *machine)
 bool debug_comment_load(running_machine *machine)
 {
 	// open the file
-	astring fname(machine->basename(), ".cmt");
-	mame_file *fp;
-	file_error filerr = mame_fopen(SEARCHPATH_COMMENT, fname, OPEN_FLAG_READ, &fp);
+	emu_file file(machine->options(), SEARCHPATH_COMMENT, OPEN_FLAG_READ);
+	file_error filerr = file.open(machine->basename(), ".cmt");
 
 	// if an error, just return false
 	if (filerr != FILERR_NONE)
 		return false;
 
 	// wrap in a try/catch to handle errors
-	xml_data_node *root = xml_file_read(mame_core_file(fp), NULL);
+	xml_data_node *root = xml_file_read(file, NULL);
 	try
 	{
 		// read the file
@@ -436,13 +430,11 @@ bool debug_comment_load(running_machine *machine)
 		// clean up in case of error
 		if (root != NULL)
 			xml_file_free(root);
-		mame_fclose(fp);
 		return false;
 	}
 
 	// free the parser
 	xml_file_free(root);
-	mame_fclose(fp);
 	return true;
 }
 

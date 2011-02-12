@@ -93,9 +93,9 @@ static DEVICE_NVRAM( atari_vg_earom )
 	atari_vg_earom_state *earom = get_safe_token(device);
 
 	if (read_or_write)
-		mame_fwrite(file,earom->rom,EAROM_SIZE);
+		file->write(earom->rom,EAROM_SIZE);
 	else if (file)
-		mame_fread(file,earom->rom,EAROM_SIZE);
+		file->read(earom->rom,EAROM_SIZE);
 	else
 		memset(earom,0,EAROM_SIZE);
 }

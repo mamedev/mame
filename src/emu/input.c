@@ -591,24 +591,24 @@ void input_init(running_machine *machine)
 
 	/* read input enable options */
 	device_list[DEVICE_CLASS_KEYBOARD].enabled = TRUE;
-	device_list[DEVICE_CLASS_MOUSE].enabled = options_get_bool(machine->options(), OPTION_MOUSE);
-	device_list[DEVICE_CLASS_LIGHTGUN].enabled = options_get_bool(machine->options(), OPTION_LIGHTGUN);
-	device_list[DEVICE_CLASS_JOYSTICK].enabled = options_get_bool(machine->options(), OPTION_JOYSTICK);
+	device_list[DEVICE_CLASS_MOUSE].enabled = options_get_bool(&machine->options(), OPTION_MOUSE);
+	device_list[DEVICE_CLASS_LIGHTGUN].enabled = options_get_bool(&machine->options(), OPTION_LIGHTGUN);
+	device_list[DEVICE_CLASS_JOYSTICK].enabled = options_get_bool(&machine->options(), OPTION_JOYSTICK);
 
 	/* read input device multi options */
-	device_list[DEVICE_CLASS_KEYBOARD].multi = options_get_bool(machine->options(), OPTION_MULTIKEYBOARD);
-	device_list[DEVICE_CLASS_MOUSE].multi = options_get_bool(machine->options(), OPTION_MULTIMOUSE);
+	device_list[DEVICE_CLASS_KEYBOARD].multi = options_get_bool(&machine->options(), OPTION_MULTIKEYBOARD);
+	device_list[DEVICE_CLASS_MOUSE].multi = options_get_bool(&machine->options(), OPTION_MULTIMOUSE);
 	device_list[DEVICE_CLASS_LIGHTGUN].multi = TRUE;
 	device_list[DEVICE_CLASS_JOYSTICK].multi = TRUE;
 
 	/* read other input options */
-	state->steadykey_enabled = options_get_bool(machine->options(), OPTION_STEADYKEY);
-	state->lightgun_reload_button = options_get_bool(machine->options(), OPTION_OFFSCREEN_RELOAD);
-	state->joystick_deadzone = (INT32)(options_get_float(machine->options(), OPTION_JOYSTICK_DEADZONE) * INPUT_ABSOLUTE_MAX);
-	state->joystick_saturation = (INT32)(options_get_float(machine->options(), OPTION_JOYSTICK_SATURATION) * INPUT_ABSOLUTE_MAX);
+	state->steadykey_enabled = options_get_bool(&machine->options(), OPTION_STEADYKEY);
+	state->lightgun_reload_button = options_get_bool(&machine->options(), OPTION_OFFSCREEN_RELOAD);
+	state->joystick_deadzone = (INT32)(options_get_float(&machine->options(), OPTION_JOYSTICK_DEADZONE) * INPUT_ABSOLUTE_MAX);
+	state->joystick_saturation = (INT32)(options_get_float(&machine->options(), OPTION_JOYSTICK_SATURATION) * INPUT_ABSOLUTE_MAX);
 
 	/* get the default joystick map */
-	state->joystick_map_default = options_get_string(machine->options(), OPTION_JOYSTICK_MAP);
+	state->joystick_map_default = options_get_string(&machine->options(), OPTION_JOYSTICK_MAP);
 	if (state->joystick_map_default[0] == 0 || strcmp(state->joystick_map_default, "auto") == 0)
 		state->joystick_map_default = joystick_map_8way;
 	if (!joystick_map_parse(state->joystick_map_default, &map))

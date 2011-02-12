@@ -16,7 +16,7 @@
 
 struct _hash_file
 {
-	mame_file *file;
+	emu_file *file;
 	object_pool *pool;
 	unsigned int functions[IO_COUNT];
 
@@ -341,7 +341,7 @@ static void hashfile_parse(hash_file *hashfile,
 	UINT32 len;
 	XML_Memory_Handling_Suite memcallbacks;
 
-	mame_fseek(hashfile->file, 0, SEEK_SET);
+	hashfile->file->seek(0, SEEK_SET);
 
 	memset(&state, 0, sizeof(state));
 	state.hashfile = hashfile;
@@ -364,8 +364,8 @@ static void hashfile_parse(hash_file *hashfile,
 
 	while(!state.done)
 	{
-		len = mame_fread(hashfile->file, buf, sizeof(buf));
-		state.done = mame_feof(hashfile->file);
+		len = hashfile->file->read(buf, sizeof(buf));
+		state.done = hashfile->file->eof();
 		if (XML_Parse(state.parser, buf, len, state.done) == XML_STATUS_ERROR)
 		{
 			parse_error(&state, "[%lu:%lu]: %s\n",
@@ -403,16 +403,15 @@ static void preload_use_proc(hash_file *hashfile, void *param, hash_info *hi)
 
 
 /*-------------------------------------------------
-    hashfile_open_options
+    hashfile_open
 -------------------------------------------------*/
 
-hash_file *hashfile_open_options(core_options *opts, const char *sysname, int is_preload,
+hash_file *hashfile_open(core_options &options, const char *sysname, int is_preload,
 	void (*error_proc)(const char *message))
 {
-	file_error filerr;
-	astring *fname;
 	hash_file *hashfile = NULL;
 	object_pool *pool = NULL;
+	file_error filerr;
 
 	/* create a pool for this hash file */
 	pool = pool_alloc_lib(error_proc);
@@ -430,12 +429,14 @@ hash_file *hashfile_open_options(core_options *opts, const char *sysname, int is
 	hashfile->error_proc = error_proc;
 
 	/* open a file */
-	fname = astring_assemble_2(astring_alloc(), sysname, ".hsi");
-	filerr = mame_fopen_options(opts, SEARCHPATH_HASH, astring_c(fname), OPEN_FLAG_READ, &hashfile->file);
-	astring_free(fname);
-
+	hashfile->file = global_alloc(emu_file(options, SEARCHPATH_HASH, OPEN_FLAG_READ));
+	filerr = hashfile->file->open(sysname, ".hsi");
 	if (filerr != FILERR_NONE)
+	{
+		global_free(hashfile->file);
+		hashfile->file = NULL;
 		goto error;
+	}
 
 	if (is_preload)
 		hashfile_parse(hashfile, NULL, preload_use_proc, hashfile->error_proc, NULL);
@@ -451,25 +452,12 @@ error:
 
 
 /*-------------------------------------------------
-    hashfile_open
--------------------------------------------------*/
-
-hash_file *hashfile_open(const char *sysname, int is_preload,
-	void (*error_proc)(const char *message))
-{
-	return hashfile_open_options(mame_options(), sysname, is_preload, error_proc);
-}
-
-
-
-/*-------------------------------------------------
     hashfile_close
 -------------------------------------------------*/
 
 void hashfile_close(hash_file *hashfile)
 {
-	if (hashfile->file)
-		mame_fclose(hashfile->file);
+	global_free(hashfile->file);
 	pool_free_lib(hashfile->pool);
 }
 
@@ -548,11 +536,11 @@ unsigned int hashfile_functions_used(hash_file *hashfile, iodevice_t devtype)
     hashfile_verify
 -------------------------------------------------*/
 
-int hashfile_verify(const char *sysname, void (*my_error_proc)(const char *message))
+int hashfile_verify(core_options &options, const char *sysname, void (*my_error_proc)(const char *message))
 {
 	hash_file *hashfile;
 
-	hashfile = hashfile_open(sysname, FALSE, my_error_proc);
+	hashfile = hashfile_open(options, sysname, FALSE, my_error_proc);
 	if (!hashfile)
 		return -1;
 

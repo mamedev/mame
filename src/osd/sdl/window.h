@@ -146,12 +146,12 @@ int drawsdl_scale_mode(const char *s);
 // PROTOTYPES - drawogl.c
 //============================================================
 
-int drawogl_init(sdl_draw_info *callbacks);
+int drawogl_init(running_machine &machine, sdl_draw_info *callbacks);
 
 //============================================================
 // PROTOTYPES - draw13.c
 //============================================================
 
-int draw13_init(sdl_draw_info *callbacks);
+int draw13_init(running_machine &machine, sdl_draw_info *callbacks);
 
 #endif /* __SDLWINDOW__ */
