@@ -4546,7 +4546,7 @@ ROM_START( salarymc )
 	ROM_LOAD( "gca18jaa.u6",  0x000000, 0x000008, CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "a18ja", 0, BAD_DUMP SHA1(bb147b9a4871f1ddd108e3e503479221d87ec545) )
+	DISK_IMAGE_READONLY( "gca18jaa", 0, SHA1(8adcc8ef76cbfb9f47fec5702b0b200565b5c561) )
 ROM_END
 
 // System 573 BIOS (we're missing the later version that boots up with a pseudo-GUI)
