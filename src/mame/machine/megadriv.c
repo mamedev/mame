@@ -4268,8 +4268,8 @@ void CDD_Play(running_machine *machine)
 {
 	CLEAR_CDD_RESULT
 	UINT32 msf = getmsf_from_regs();
-	UINT32 end_msf = segacd.toc->tracks[ cdrom_get_track(segacd.cd, SCD_CURLBA) + 1 ].physframeofs;
 	SCD_CURLBA = msf_to_lba(msf)-150;
+	UINT32 end_msf = segacd.toc->tracks[ cdrom_get_track(segacd.cd, SCD_CURLBA) + 1 ].physframeofs;
 	SCD_CURTRK = cdrom_get_track(segacd.cd, SCD_CURLBA)+1;
 	CDC_UpdateHEAD();
 	SCD_STATUS = CDD_PLAYINGCDDA;
