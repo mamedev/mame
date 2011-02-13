@@ -3872,6 +3872,7 @@ struct segacd_t
 {
 	cdrom_file	*cd;
 	const cdrom_toc   *toc;
+	UINT32 current_frame;
 };
 
 segacd_t segacd;
@@ -3986,7 +3987,7 @@ static void set_data_audio_mode(void)
 	else
 	{
 		SET_CDD_AUDIO_MODE
-		fatalerror("CDDA unsupported\n");
+		//fatalerror("CDDA unsupported\n");
 	}
 }
 
@@ -4146,13 +4147,14 @@ void CDD_GetStatus(void)
 }
 
 
-void CDD_Stop(void)
+void CDD_Stop(running_machine *machine)
 {
 	CLEAR_CDD_RESULT
 	STOP_CDC_READ
 	SCD_STATUS = CDD_STOPPED;
 	CDD_STATUS = 0x0000;
 	SET_CDD_DATA_MODE
+	cdda_stop_audio( machine->device( "cdda" ) ); //stop any pending CD-DA
 }
 
 
@@ -4262,10 +4264,11 @@ static UINT32 getmsf_from_regs(void)
 	return msf;
 }
 
-void CDD_Play(void)
+void CDD_Play(running_machine *machine)
 {
 	CLEAR_CDD_RESULT
 	UINT32 msf = getmsf_from_regs();
+	UINT32 end_msf = segacd.toc->tracks[ cdrom_get_track(segacd.cd, SCD_CURLBA) + 1 ].physframeofs;
 	SCD_CURLBA = msf_to_lba(msf)-150;
 	SCD_CURTRK = cdrom_get_track(segacd.cd, SCD_CURLBA)+1;
 	CDC_UpdateHEAD();
@@ -4273,6 +4276,8 @@ void CDD_Play(void)
 	CDD_STATUS = 0x0102;
 	set_data_audio_mode();
 	CDD_MIN = to_bcd(SCD_CURTRK, false);
+	if(!(CURRENT_TRACK_IS_DATA))
+		cdda_start_audio( machine->device( "cdda" ), msf, end_msf - msf );
 	SET_CDC_READ
 }
 
@@ -4291,16 +4296,20 @@ void CDD_Seek(void)
 }
 
 
-void CDD_Pause(void)
+void CDD_Pause(running_machine *machine)
 {
 	CLEAR_CDD_RESULT
 	STOP_CDC_READ
 	SCD_STATUS = CDD_READY;
 	CDD_STATUS = SCD_STATUS;
 	SET_CDD_DATA_MODE
+
+	//segacd.current_frame = cdda_get_audio_lba( machine->device( "cdda" ) );
+	if(!(CURRENT_TRACK_IS_DATA))
+		cdda_pause_audio( machine->device( "cdda" ), 1 );
 }
 
-void CDD_Resume(void)
+void CDD_Resume(running_machine *machine)
 {
 	CLEAR_CDD_RESULT
 	STOP_CDC_READ
@@ -4310,6 +4319,8 @@ void CDD_Resume(void)
 	set_data_audio_mode();
 	CDD_MIN = to_bcd (SCD_CURTRK, false);
 	SET_CDC_READ
+	if(!(CURRENT_TRACK_IS_DATA))
+		cdda_pause_audio( machine->device( "cdda" ), 0 );
 }
 
 
@@ -4328,12 +4339,14 @@ void CDD_RW(void)
 void CDD_Open(void)
 {
 	fatalerror("Close Tray unsupported\n");
+	/* TODO: re-read CD-ROM buffer here (Mega CD has multi disc games iirc?) */
 }
 
 
 void CDD_Close(void)
 {
 	fatalerror("Open Tray unsupported\n");
+	/* TODO: clear CD-ROM buffer here */
 }
 
 
@@ -4633,19 +4646,42 @@ void CDD_Handle_TOC_Commands(void)
 	}
 }
 
+static const char *const CDD_import_cmdnames[] =
+{
+	"Get Status",			// 0
+	"Stop ALL",				// 1
+	"Handle TOC", 			// 2
+	"Play",					// 3
+	"Seek",					// 4
+	"<undefined>",			// 5
+	"Pause",				// 6
+	"Resume",				// 7
+	"FF",					// 8
+	"RWD",					// 9
+	"INIT",					// A
+	"<undefined>",			// B
+	"Close Tray",			// C
+	"Open Tray",			// D
+	"<undefined>",			// E
+	"<undefined>"			// F
+};
+
 void CDD_Import(running_machine* machine)
 {
+	if(CDD_TX[1] != 2 && CDD_TX[1] != 0)
+		printf("%s\n",CDD_import_cmdnames[CDD_TX[1]]);
+
 	switch (CDD_TX[1])
 	{
 		case CMD_STATUS:	CDD_GetStatus();	       break;
-		case CMD_STOPALL:	CDD_Stop();	               break;
+		case CMD_STOPALL:	CDD_Stop(machine);		   break;
 		case CMD_GETTOC:	CDD_Handle_TOC_Commands(); break;
-		case CMD_READ:		CDD_Play();                break;
+		case CMD_READ:		CDD_Play(machine);         break;
 		case CMD_SEEK:		CDD_Seek();	               break;
-		case CMD_STOP:		CDD_Pause();	           break;
-		case CMD_RESUME:	CDD_Resume();              break;
-		case CMD_FF:		CDD_FF();                  break;
-		case CMD_RW:		CDD_RW();                  break;
+		case CMD_STOP:		CDD_Pause(machine);	       break;
+		case CMD_RESUME:	CDD_Resume(machine);       break;
+		case CMD_FF:		CDD_FF(machine);           break;
+		case CMD_RW:		CDD_RW(machine);           break;
 		case CMD_INIT:		CDD_Init();	               break;
 		case CMD_CLOSE:		CDD_Open();                break;
 		case CMD_OPEN:		CDD_Close();	           break;
@@ -4909,7 +4945,7 @@ static WRITE16_HANDLER( segacd_sub_memory_mode_w )
 				// in mode 1 this changes the word ram 1 to main cpu and word ram 0 to sub cpu?
 				// but should be proceeded by a dmna request? is this only valid if dmna has been
 				// set to 1 by the main CPU first?
-				printf("ret bit in mode 1\n");
+				//printf("ret bit in mode 1\n");
 				segacd_ret = 1;
 			}
 		}
@@ -6016,7 +6052,7 @@ static WRITE16_HANDLER( segacd_irq_mask_w )
 	{
 		if (control & 0x04)
 		{
-			if (!segacd_irq_mask & 0x10)
+			if (!(segacd_irq_mask & 0x10))
 			{
 				segacd_irq_mask = data & 0x7e;
 				CDD_Process(space->machine, 0);
@@ -6421,7 +6457,7 @@ static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfe0000, 0xfe3fff) AM_RAM // backup RAM, odd bytes only!
 
 	AM_RANGE(0xff0000, 0xff001f) AM_DEVWRITE8("rfsnd", rf5c68_w, 0x00ff)  // PCM, RF5C164
-	AM_RANGE(0xff0020, 0xff003f) AM_DEVREAD8("rfsnd", rf5c68_r, 0xffff)
+	AM_RANGE(0xff0020, 0xff003f) AM_DEVREAD8("rfsnd", rf5c68_r, 0x00ff)
 	AM_RANGE(0xff2000, 0xff3fff) AM_DEVREADWRITE8("rfsnd", rf5c68_mem_r, rf5c68_mem_w,0x00ff)  // PCM, RF5C164
 
 
@@ -9291,7 +9327,7 @@ MACHINE_CONFIG_START( megadpal, driver_device )
 MACHINE_CONFIG_END
 
 
-static int _32x_fifo_available_callback(device_t *device, UINT32 src, UINT32 dst, UINT32 data, int size)
+static int _32x_fifo_available_callback(UINT32 src, UINT32 dst, UINT32 data, int size)
 {
 	if (src==0x4012)
 	{
