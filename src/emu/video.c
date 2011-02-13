@@ -1202,13 +1202,13 @@ file_error video_manager::open_next(emu_file &file, const char *extension)
 	{
 		// try until we succeed
 		astring seqtext;
+		file.set_openflags(OPEN_FLAG_READ);
 		for (int seq = 0; ; seq++)
 		{
 			// build up the filename
 			fname.cpy(snapstr).replace(0, "%i", seqtext.format("%04d", seq).cstr());
 
 			// try to open the file; stop when we fail
-			file.set_openflags(OPEN_FLAG_READ);
 			file_error filerr = file.open(fname);
 			if (filerr != FILERR_NONE)
 				break;
