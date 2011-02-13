@@ -9328,7 +9328,7 @@ MACHINE_CONFIG_START( megadpal, driver_device )
 MACHINE_CONFIG_END
 
 
-static int _32x_fifo_available_callback(UINT32 src, UINT32 dst, UINT32 data, int size)
+static int _32x_fifo_available_callback(device_t *device, UINT32 src, UINT32 dst, UINT32 data, int size)
 {
 	if (src==0x4012)
 	{
