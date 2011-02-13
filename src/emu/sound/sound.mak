@@ -356,6 +356,10 @@ endif
 # OKI ADPCM sample players
 #-------------------------------------------------
 
+ifneq ($(filter OKIM6258 OKIM9810,$(SOUNDS)),)
+SOUNDOBJS += $(SOUNDOBJ)/okiadpcm.o
+endif
+
 ifneq ($(filter MSM5205,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/msm5205.o
 endif

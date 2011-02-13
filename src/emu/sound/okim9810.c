@@ -177,7 +177,7 @@ void okim9810_device::sound_stream_update(sound_stream &stream, stream_sample_t 
     
 	// iterate over voices and accumulate sample data
 	for (int voicenum = 0; voicenum < OKIM9810_VOICES; voicenum++)
-		m_voice[voicenum].generate_adpcm(*m_direct, outputs[0], samples);
+		m_voice[voicenum].generate_audio(*m_direct, outputs[0], samples);
 }
 
 
@@ -294,15 +294,21 @@ void okim9810_device::write_command(UINT8 data)
             endAddr |= m_direct->read_raw_byte(base + 6) << 8;
             endAddr |= m_direct->read_raw_byte(base + 7) << 0;
 
-            // Note: flags might be (& 0x30 => voice synthesis algorithm) (& 0x0f => sampling frequency)
             mame_printf_verbose("FADR  channel %d phrase offset %02x => ", channel, m_TMP_register);
             mame_printf_verbose("\tstartFlags(%02x) startAddr(%06x) endFlags(%02x) endAddr(%06x) bytes(%d)\n", startFlags, startAddr, endFlags, endAddr, endAddr-startAddr);
+            m_voice[channel].m_sample = 0;
             m_voice[channel].m_startFlags = startFlags;
             m_voice[channel].m_base_offset = startAddr;
             m_voice[channel].m_endFlags = endFlags;
-            m_voice[channel].m_sample = 0;
-            // TODO: Sample count (m_count) changes based on decoding mode
-            m_voice[channel].m_count = 2 * ((endAddr-startAddr) + 1); // TODO: Explain the +1
+            m_voice[channel].m_playbackAlgo = (startFlags & 0x30) >> 4;     // Guess
+            // debug printf("%02x %d\n", startFlags, m_voice[channel].m_playbackAlgo);
+            // TODO: Sampling frequency is very likely : (startFlags & 0x0f)
+            m_voice[channel].m_count = (endAddr-startAddr) + 1;
+            if (m_voice[channel].m_playbackAlgo == OKIM9810_ADPCM_PLAYBACK || 
+                m_voice[channel].m_playbackAlgo == OKIM9810_ADPCM2_PLAYBACK)
+                m_voice[channel].m_count *= 2;
+            else
+                mame_printf_warning("UNIMPLEMENTED PLAYBACK METHOD %d\n", m_voice[channel].m_playbackAlgo);
             break;
         }
 
@@ -365,7 +371,8 @@ WRITE8_MEMBER( okim9810_device::write_TMP_register )
 //-------------------------------------------------
 
 okim9810_device::okim_voice::okim_voice()
-	: m_playing(false),
+	: m_playbackAlgo(OKIM9810_ADPCM2_PLAYBACK),
+      m_playing(false),
 	  m_looping(false),
 	  m_startFlags(0),
 	  m_endFlags(0),
@@ -377,11 +384,11 @@ okim9810_device::okim_voice::okim_voice()
 }
 
 //-------------------------------------------------
-//  generate_adpcm - generate ADPCM samples and
+//  generate_audio - generate audio samples and
 //  add them to an output stream
 //-------------------------------------------------
 
-void okim9810_device::okim_voice::generate_adpcm(direct_read_data &direct, stream_sample_t *buffer, int samples)
+void okim9810_device::okim_voice::generate_audio(direct_read_data &direct, stream_sample_t *buffer, int samples)
 {
 	// skip if not active
 	if (!m_playing)
@@ -395,8 +402,18 @@ void okim9810_device::okim_voice::generate_adpcm(direct_read_data &direct, strea
 
 		// output to the buffer, scaling by the volume
 		// signal in range -2048..2047, volume in range 2..128 => signal * volume / 8 in range -32768..32767
-		*buffer++ += (INT32)m_adpcm.clock(nibble) * (INT32)m_volume / 8;
-
+        switch (m_playbackAlgo)
+        { 
+            case OKIM9810_ADPCM_PLAYBACK:
+        		*buffer++ += (INT32)m_adpcm.clock(nibble) * (INT32)m_volume / 8; 
+                break;
+            case OKIM9810_ADPCM2_PLAYBACK:
+        		*buffer++ += (INT32)m_adpcm2.clock(nibble) * (INT32)m_volume / 8; 
+                break;
+            default:
+                break;
+        }
+                    
 		// next!
 		if (++m_sample >= m_count)
 		{
@@ -405,95 +422,6 @@ void okim9810_device::okim_voice::generate_adpcm(direct_read_data &direct, strea
             else
                 m_sample = 0;
 			break;
-		}
-	}
-}
-
-
-//**************************************************************************
-//  ADPCM STATE HELPER
-//**************************************************************************
-
-// ADPCM state and tables
-bool adpcm_stateCopy::s_tables_computed = false;
-const INT8 adpcm_stateCopy::s_index_shift[8] = { -1, -1, -1, -1, 2, 4, 6, 8 };
-int adpcm_stateCopy::s_diff_lookup[49*16];
-
-//-------------------------------------------------
-//  reset - reset the ADPCM state
-//-------------------------------------------------
-
-void adpcm_stateCopy::reset()
-{
-	// reset the signal/step
-	m_signal = -2;
-	m_step = 0;
-}
-
-
-//-------------------------------------------------
-//  device_clock_changed - called if the clock
-//  changes
-//-------------------------------------------------
-
-INT16 adpcm_stateCopy::clock(UINT8 nibble)
-{
-	// update the signal
-	m_signal += s_diff_lookup[m_step * 16 + (nibble & 15)];
-
-	// clamp to the maximum
-	if (m_signal > 2047)
-		m_signal = 2047;
-	else if (m_signal < -2048)
-		m_signal = -2048;
-
-	// adjust the step size and clamp
-	m_step += s_index_shift[nibble & 7];
-	if (m_step > 48)
-		m_step = 48;
-	else if (m_step < 0)
-		m_step = 0;
-
-	// return the signal
-	return m_signal;
-}
-
-
-//-------------------------------------------------
-//  compute_tables - precompute tables for faster
-//  sound generation
-//-------------------------------------------------
-
-void adpcm_stateCopy::compute_tables()
-{
-	// skip if we already did it
-	if (s_tables_computed)
-		return;
-	s_tables_computed = true;
-
-	// nibble to bit map
-	static const INT8 nbl2bit[16][4] =
-	{
-		{ 1, 0, 0, 0}, { 1, 0, 0, 1}, { 1, 0, 1, 0}, { 1, 0, 1, 1},
-		{ 1, 1, 0, 0}, { 1, 1, 0, 1}, { 1, 1, 1, 0}, { 1, 1, 1, 1},
-		{-1, 0, 0, 0}, {-1, 0, 0, 1}, {-1, 0, 1, 0}, {-1, 0, 1, 1},
-		{-1, 1, 0, 0}, {-1, 1, 0, 1}, {-1, 1, 1, 0}, {-1, 1, 1, 1}
-	};
-
-	// loop over all possible steps
-	for (int step = 0; step <= 48; step++)
-	{
-		// compute the step value
-		int stepval = floor(16.0 * pow(11.0 / 10.0, (double)step));
-
-		// loop over all nibbles and compute the difference
-		for (int nib = 0; nib < 16; nib++)
-		{
-			s_diff_lookup[step*16 + nib] = nbl2bit[nib][0] *
-				(stepval   * nbl2bit[nib][1] +
-				 stepval/2 * nbl2bit[nib][2] +
-				 stepval/4 * nbl2bit[nib][3] +
-				 stepval/8);
 		}
 	}
 }

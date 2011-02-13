@@ -11,6 +11,8 @@
 #ifndef __OKIM9810_H__
 #define __OKIM9810_H__
 
+#include "okiadpcm.h"
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -23,6 +25,13 @@ enum
     // etc
 };
 
+enum
+{
+	OKIM9810_ADPCM_PLAYBACK = 0,
+	OKIM9810_ADPCM2_PLAYBACK = 1,
+	OKIM9810_STRAIGHT8_PLAYBACK = 2,
+    OKIM9810_NONLINEAR8_PLAYBACK = 3
+};
 
 
 //**************************************************************************
@@ -40,28 +49,6 @@ enum
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// ======================> adpcm_stateCopy
-
-// Internal ADPCM state, used by external ADPCM generators with compatible specs to the OKIM 6295.
-class adpcm_stateCopy
-{
-public:
-	adpcm_stateCopy() { compute_tables(); reset(); }
-
-	void reset();
-	INT16 clock(UINT8 nibble);
-
-	INT32	m_signal;
-	INT32	m_step;
-
-private:
-	static const INT8 s_index_shift[8];
-	static int s_diff_lookup[49*16];
-
-	static void compute_tables();
-	static bool s_tables_computed;
-};
 
 
 // ======================> okim9810_device_config
@@ -126,16 +113,18 @@ protected:
 	{
 	public:
 		okim_voice();
-		void generate_adpcm(direct_read_data &direct, stream_sample_t *buffer, int samples);
+		void generate_audio(direct_read_data &direct, stream_sample_t *buffer, int samples);
 
-		adpcm_stateCopy m_adpcm;			// current ADPCM state
+		oki_adpcm_state m_adpcm;		// current ADPCM state
+		oki_adpcm2_state m_adpcm2;		// current ADPCM2 state
+		UINT8		m_playbackAlgo;		// current playback method
 		bool		m_playing;
 		bool		m_looping;
 		UINT8		m_startFlags;
 		UINT8		m_endFlags;
 		offs_t		m_base_offset;		// pointer to the base memory location
 		UINT32		m_sample;			// current sample number
-		UINT32		m_count;			// total bytes to play
+		UINT32		m_count;			// total samples to play
 
 		INT8		m_volume;			// output volume
 		// TODO:	m_volume_left;      // stereo volume
