@@ -85,6 +85,7 @@ enum
 	XTAL_9_8304MHz		= 9830400,		/* Epson PX-8 */
 	XTAL_9_987MHz		= 9987000,		/* Crazy Balloon */
 	XTAL_10MHz  		= 10000000,
+	XTAL_10_245MHz		= 10245000,		/* PES Speech box */
 	XTAL_10_595MHz  	= 10595000,		/* Mad Alien */
 	XTAL_10_6875MHz 	= 10687500,		/* BBC Bridge Companion */
 	XTAL_10_69425MHz	= 10694250,		/* Xerox 820 */
