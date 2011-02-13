@@ -682,7 +682,7 @@ static void I386OP(imul_r16_rm16_i8)(i386_state *cpustate)	// Opcode 0x6b
 static void I386OP(in_ax_i8)(i386_state *cpustate)			// Opcode 0xe5
 {
 	UINT16 port = FETCH(cpustate);
-	UINT16 data = READPORT16(port);
+	UINT16 data = READPORT16(cpustate, port);
 	REG16(AX) = data;
 	CYCLES(cpustate,CYCLES_IN_VAR);
 }
@@ -690,7 +690,7 @@ static void I386OP(in_ax_i8)(i386_state *cpustate)			// Opcode 0xe5
 static void I386OP(in_ax_dx)(i386_state *cpustate)			// Opcode 0xed
 {
 	UINT16 port = REG16(DX);
-	UINT16 data = READPORT16(port);
+	UINT16 data = READPORT16(cpustate, port);
 	REG16(AX) = data;
 	CYCLES(cpustate,CYCLES_IN);
 }
@@ -1476,7 +1476,7 @@ static void I386OP(out_ax_i8)(i386_state *cpustate)			// Opcode 0xe7
 {
 	UINT16 port = FETCH(cpustate);
 	UINT16 data = REG16(AX);
-	WRITEPORT16(port, data);
+	WRITEPORT16(cpustate, port, data);
 	CYCLES(cpustate,CYCLES_OUT_VAR);
 }
 
@@ -1484,7 +1484,7 @@ static void I386OP(out_ax_dx)(i386_state *cpustate)			// Opcode 0xef
 {
 	UINT16 port = REG16(DX);
 	UINT16 data = REG16(AX);
-	WRITEPORT16(port, data);
+	WRITEPORT16(cpustate, port, data);
 	CYCLES(cpustate,CYCLES_OUT);
 }
 

@@ -354,7 +354,7 @@ static void I386OP(cmpsb)(i386_state *cpustate)				// Opcode 0xa6
 static void I386OP(in_al_i8)(i386_state *cpustate)			// Opcode 0xe4
 {
 	UINT16 port = FETCH(cpustate);
-	UINT8 data = READPORT8(port);
+	UINT8 data = READPORT8(cpustate, port);
 	REG8(AL) = data;
 	CYCLES(cpustate,CYCLES_IN_VAR);
 }
@@ -362,7 +362,7 @@ static void I386OP(in_al_i8)(i386_state *cpustate)			// Opcode 0xe4
 static void I386OP(in_al_dx)(i386_state *cpustate)			// Opcode 0xec
 {
 	UINT16 port = REG16(DX);
-	UINT8 data = READPORT8(port);
+	UINT8 data = READPORT8(cpustate, port);
 	REG8(AL) = data;
 	CYCLES(cpustate,CYCLES_IN);
 }
@@ -876,7 +876,7 @@ static void I386OP(out_al_i8)(i386_state *cpustate)			// Opcode 0xe6
 {
 	UINT16 port = FETCH(cpustate);
 	UINT8 data = REG8(AL);
-	WRITEPORT8(port, data);
+	WRITEPORT8(cpustate, port, data);
 	CYCLES(cpustate,CYCLES_OUT_VAR);
 }
 
@@ -884,7 +884,7 @@ static void I386OP(out_al_dx)(i386_state *cpustate)			// Opcode 0xee
 {
 	UINT16 port = REG16(DX);
 	UINT8 data = REG8(AL);
-	WRITEPORT8(port, data);
+	WRITEPORT8(cpustate, port, data);
 	CYCLES(cpustate,CYCLES_OUT);
 }
 
@@ -934,15 +934,15 @@ static void I386OP(ins_generic)(i386_state *cpustate, int size)
 
 	switch(size) {
 	case 1:
-		vb = READPORT8(REG16(DX));
+		vb = READPORT8(cpustate, REG16(DX));
 		WRITE8(cpustate,ead, vb);
 		break;
 	case 2:
-		vw = READPORT16(REG16(DX));
+		vw = READPORT16(cpustate, REG16(DX));
 		WRITE16(cpustate,ead, vw);
 		break;
 	case 4:
-		vd = READPORT32(REG16(DX));
+		vd = READPORT32(cpustate, REG16(DX));
 		WRITE32(cpustate,ead, vd);
 		break;
 	}
@@ -982,15 +982,15 @@ static void I386OP(outs_generic)(i386_state *cpustate, int size)
 	switch(size) {
 	case 1:
 		vb = READ8(cpustate,eas);
-		WRITEPORT8(REG16(DX), vb);
+		WRITEPORT8(cpustate, REG16(DX), vb);
 		break;
 	case 2:
 		vw = READ16(cpustate,eas);
-		WRITEPORT16(REG16(DX), vw);
+		WRITEPORT16(cpustate, REG16(DX), vw);
 		break;
 	case 4:
 		vd = READ32(cpustate,eas);
-		WRITEPORT32(REG16(DX), vd);
+		WRITEPORT32(cpustate, REG16(DX), vd);
 		break;
 	}
 

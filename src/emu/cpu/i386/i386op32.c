@@ -667,7 +667,7 @@ static void I386OP(imul_r32_rm32_i8)(i386_state *cpustate)	// Opcode 0x6b
 static void I386OP(in_eax_i8)(i386_state *cpustate)			// Opcode 0xe5
 {
 	UINT16 port = FETCH(cpustate);
-	UINT32 data = READPORT32(port);
+	UINT32 data = READPORT32(cpustate, port);
 	REG32(EAX) = data;
 	CYCLES(cpustate,CYCLES_IN_VAR);
 }
@@ -675,7 +675,7 @@ static void I386OP(in_eax_i8)(i386_state *cpustate)			// Opcode 0xe5
 static void I386OP(in_eax_dx)(i386_state *cpustate)			// Opcode 0xed
 {
 	UINT16 port = REG16(DX);
-	UINT32 data = READPORT32(port);
+	UINT32 data = READPORT32(cpustate, port);
 	REG32(EAX) = data;
 	CYCLES(cpustate,CYCLES_IN);
 }
@@ -1342,7 +1342,7 @@ static void I386OP(out_eax_i8)(i386_state *cpustate)		// Opcode 0xe7
 {
 	UINT16 port = FETCH(cpustate);
 	UINT32 data = REG32(EAX);
-	WRITEPORT32(port, data);
+	WRITEPORT32(cpustate, port, data);
 	CYCLES(cpustate,CYCLES_OUT_VAR);
 }
 
@@ -1350,7 +1350,7 @@ static void I386OP(out_eax_dx)(i386_state *cpustate)		// Opcode 0xef
 {
 	UINT16 port = REG16(DX);
 	UINT32 data = REG32(EAX);
-	WRITEPORT32(port, data);
+	WRITEPORT32(cpustate, port, data);
 	CYCLES(cpustate,CYCLES_OUT);
 }
 

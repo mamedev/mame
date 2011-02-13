@@ -891,17 +891,75 @@ INLINE void BUMP_DI(i386_state *cpustate,int adjustment)
 
 
 
-/***********************************************************************************/
+/***********************************************************************************
+	I/O ACCESS
+***********************************************************************************/
 
-#define READPORT8(port)		    	(cpustate->io->read_byte(port))
-#define READPORT16(port)	    	(READPORT8(port) | (READPORT8(port+1) << 8))
-#define READPORT32(port)	    	(READPORT8(port) | (READPORT8(port+1) << 8) | (READPORT8(port+2) << 16) | (READPORT8(port+3) << 24))
-#define WRITEPORT8(port, value)		(cpustate->io->write_byte(port, value))
-#define WRITEPORT16(port, value)	WRITEPORT8(port,value & 0xff); \
-									(WRITEPORT8(port+1,(value >> 8) & 0xff))
-#define WRITEPORT32(port, value)	WRITEPORT8(port,value & 0xff); \
-									(WRITEPORT8(port+1,(value >> 8) & 0xff)); \
-									(WRITEPORT8(port+2,(value >> 16) & 0xff)); \
-									(WRITEPORT8(port+3,(value >> 24) & 0xff))
+INLINE UINT8 READPORT8(i386_state *cpustate, offs_t port)
+{
+	return cpustate->io->read_byte(port);
+}
+
+INLINE void WRITEPORT8(i386_state *cpustate, offs_t port, UINT8 value)
+{
+	cpustate->io->write_byte(port, value);
+}
+
+INLINE UINT16 READPORT16(i386_state *cpustate, offs_t port)
+{
+	if (port & 1)
+	{
+		return  READPORT8(cpustate, port) |
+		       (READPORT8(cpustate, port + 1) << 8);
+	}
+	else
+	{
+		return cpustate->io->read_word(port);
+	}
+}
+
+INLINE void WRITEPORT16(i386_state *cpustate, offs_t port, UINT16 value)
+{
+	if (port & 1)
+	{
+		WRITEPORT8(cpustate, port, value & 0xff);
+		WRITEPORT8(cpustate, port + 1, (value >> 8) & 0xff);
+	}
+	else
+	{
+		cpustate->io->write_word(port, value);
+	}
+}
+
+INLINE UINT32 READPORT32(i386_state *cpustate, offs_t port)
+{
+	if (port & 3)
+	{
+		return  READPORT8(cpustate, port) |
+		       (READPORT8(cpustate, port + 1) << 8) |
+		       (READPORT8(cpustate, port + 2) << 16) |
+		       (READPORT8(cpustate, port + 3) << 24);
+	}
+	else
+	{
+		return cpustate->io->read_dword(port);
+	}
+}
+
+INLINE void WRITEPORT32(i386_state *cpustate, offs_t port, UINT32 value)
+{
+	if (port & 3)
+	{
+		WRITEPORT8(cpustate, port, value & 0xff);
+		WRITEPORT8(cpustate, port + 1, (value >> 8) & 0xff);
+		WRITEPORT8(cpustate, port + 2, (value >> 16) & 0xff);
+		WRITEPORT8(cpustate, port + 3, (value >> 24) & 0xff);
+	}
+	else
+	{
+		cpustate->io->write_dword(port, value);
+	}
+}
+
 
 #endif /* __I386_H__ */
