@@ -4324,13 +4324,13 @@ void CDD_Resume(running_machine *machine)
 }
 
 
-void CDD_FF(void)
+void CDD_FF(running_machine *machine)
 {
 	fatalerror("Fast Forward unsupported\n");
 }
 
 
-void CDD_RW(void)
+void CDD_RW(running_machine *machine)
 {
 	fatalerror("Fast Rewind unsupported\n");
 }
