@@ -4219,8 +4219,8 @@ void CDD_FirstLast(void)
 	if(segacd.cd == NULL) // no cd is there, bail out
 		return;
 	CDD_STATUS |= SCD_STATUS;
-	CDD_MIN = 1; // first 	// HACK!!!!
-	CDD_SEC = 1; // last    // HACK!!!!
+	CDD_MIN = 1; // first
+	CDD_SEC = to_bcd(cdrom_get_last_track(segacd.cd)+1,false); // last
 }
 
 void CDD_GetTrackAdr(void)
@@ -4275,9 +4275,10 @@ void CDD_Play(running_machine *machine)
 	SCD_STATUS = CDD_PLAYINGCDDA;
 	CDD_STATUS = 0x0102;
 	set_data_audio_mode();
+	printf("%d Track played\n",SCD_CURTRK);
 	CDD_MIN = to_bcd(SCD_CURTRK, false);
 	if(!(CURRENT_TRACK_IS_DATA))
-		cdda_start_audio( machine->device( "cdda" ), msf, end_msf - msf );
+		cdda_start_audio( machine->device( "cdda" ), SCD_CURLBA, end_msf - SCD_CURLBA );
 	SET_CDC_READ
 }
 
