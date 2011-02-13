@@ -74,15 +74,20 @@ To Do:
   to "coin" (it probably changes the number of reads from port $C0).
   I guess the reset_delay mechanism should be implemented with a timer in eeprom.c.
 
+Notes:
+
+- "BACKUP RAM NG" error: in test mode, choose "SET MODE" -> "RAM CLEAR" and keep the button pressed for long.
+
 *************************************************************************************************************/
 
 #include "emu.h"
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
+#include "sound/okim9810.h"
 #include "sound/ymz280b.h"
 #include "machine/eeprom.h"
-#include "machine/ticket.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
 
 /***************************************************************************
 
@@ -168,9 +173,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		dx		=	(dx & 0x1ff) - (dx & 0x200);
 		dy		=	(dy & 0x1ff) - (dy & 0x200);
 
-		// Add shift
-		sx		+=	dx;
-		sy		+=	dy;
+		// Add shift (negated, as it seems more correct in haekaka)
+		sx		-=	dx;
+		sy		-=	dy;
 
 		// Use fixed point values (16.16), for accuracy
 		sx		<<=	16;
@@ -631,10 +636,6 @@ static WRITE8_HANDLER( sammymdl_hopper_w )
 	show_3_outputs();
 }
 
-static WRITE8_HANDLER( sammymdl_sound_w )
-{
-}
-
 static READ8_HANDLER( sammymdl_coin_hopper_r )
 {
 	UINT8 ret = input_port_read(space->machine, "COIN");
@@ -643,6 +644,20 @@ static READ8_HANDLER( sammymdl_coin_hopper_r )
 //      ret &= ~0x01;
 
 	return ret;
+}
+
+// Sound
+static WRITE8_DEVICE_HANDLER( sammymdl_sound_w )
+{
+	if (offset)
+		downcast<okim9810_device *>(device)->write_TMP_register(data);
+    else
+		downcast<okim9810_device *>(device)->write_command(data);
+}
+static READ8_DEVICE_HANDLER( sammymdl_sound_r )
+{
+	// Needed for haekaka (Oki read status is not implemented yet)
+	return device->machine->rand();
 }
 
 static UINT8 *nvram;
@@ -656,7 +671,7 @@ static ADDRESS_MAP_START( animalc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0xb000, 0xbfff ) AM_RAMBANK("sprbank")
 
 	AM_RANGE( 0xd000, 0xd1ff ) AM_RAM_WRITE( paletteram_xRRRRRGGGGGBBBBB_be_w ) AM_BASE_GENERIC( paletteram )
-	AM_RANGE( 0xd800, 0xd87f ) AM_RAM	// ?
+	AM_RANGE( 0xd800, 0xd87f ) AM_RAM	// table?
 
 	AM_RANGE( 0xe011, 0xe011 ) AM_WRITENOP	// IRQ Enable? Screen disable?
 	AM_RANGE( 0xe013, 0xe013 ) AM_READWRITE( vblank_r, vblank_w )	// IRQ Ack?
@@ -675,7 +690,229 @@ static ADDRESS_MAP_START( animalc_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x31, 0x31 ) AM_WRITE( sammymdl_coin_w )
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE( sammymdl_leds_w )
 	AM_RANGE( 0x34, 0x34 ) AM_READ( unk_34_r )
-	AM_RANGE( 0x90, 0x91 ) AM_WRITE( sammymdl_sound_w )
+	AM_RANGE( 0x90, 0x91 ) AM_DEVWRITE("oki", sammymdl_sound_w )
+	AM_RANGE( 0x92, 0x92 ) AM_DEVWRITE("oki", sammymdl_sound_r )
+	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE( sammymdl_hopper_w )
+	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE( watchdog_reset_w )	// 1
+ADDRESS_MAP_END
+
+/***************************************************************************
+                             Hae Hae Ka Ka Ka
+***************************************************************************/
+
+// rombank
+static WRITE8_HANDLER( haekaka_rombank_w )
+{
+	if (offset == 0)
+	{
+		reg = data;
+		return;
+	}
+
+	switch ( reg )
+	{
+		case 0x2b:
+			rombank = data;
+			switch (data)
+			{
+				case 0x10:	// ROM
+				case 0x11:	// ROM
+				case 0x13:	// ROM
+				case 0x15:	// ROM
+				case 0x17:	// ROM
+				case 0x19:	// ROM
+				case 0x1b:	// ROM
+				case 0x65:	// SPRITERAM
+				case 0x67:	// PALETTE RAM + TABLE + REGS
+					break;
+
+				default:
+					logerror("%s: unknown rom bank = %02x, reg = %02x\n", space->machine->describe_context(), data, reg);
+			}
+			break;
+
+		default:
+			logerror("%s: unknown reg written: %02x = %02x\n", space->machine->describe_context(), reg, data);
+	}
+}
+static READ8_HANDLER( haekaka_rombank_r )
+{
+	if (offset == 0)
+		return reg;
+
+	switch ( reg )
+	{
+		case 0x2b:
+			return rombank;
+
+		default:
+			logerror("%s: unknown reg read: %02x\n", space->machine->describe_context(), reg);
+			return 0x00;
+	}
+}
+
+// rambank
+static WRITE8_HANDLER( haekaka_rambank_w )
+{
+	if (offset == 0)
+	{
+		reg2 = data;
+		return;
+	}
+
+	switch ( reg2 )
+	{
+		case 0x33:
+			rambank = data;
+			switch (data)
+			{
+				case 0x53:
+					break;
+
+				default:
+					logerror("%s: unknown ram bank = %02x, reg2 = %02x\n", space->machine->describe_context(), data, reg2);
+			}
+			break;
+
+		default:
+			logerror("%s: unknown reg2 written: %02x = %02x\n", space->machine->describe_context(), reg2, data);
+	}
+}
+static READ8_HANDLER( haekaka_rambank_r )
+{
+	if (offset == 0)
+		return reg2;
+
+	switch ( reg2 )
+	{
+		case 0x33:
+			return rambank;
+
+		default:
+			logerror("%s: unknown reg2 read: %02x\n", space->machine->describe_context(), reg2);
+			return 0x00;
+	}
+}
+
+static READ8_HANDLER( haekaka_vblank_r )
+{
+	return space->machine->primary_screen->vblank() ? 0 : 0x1c;
+}
+
+static READ8_HANDLER( haekaka_b000_r )
+{
+	switch (rombank)
+	{
+		case 0x10:	// ROM
+			return space->machine->region("maincpu")->base()[offset + 0xb400];
+
+		case 0x11:	// ROM
+			return space->machine->region("maincpu")->base()[offset + 0xc400];
+
+		case 0x15:	// ROM
+			return space->machine->region("maincpu")->base()[offset + 0x10400];
+
+		case 0x17:	// ROM
+			return space->machine->region("maincpu")->base()[offset + 0x12400];
+
+		case 0x19:	// ROM
+			return space->machine->region("maincpu")->base()[offset + 0x14400];
+
+		case 0x1b:	// ROM
+			return space->machine->region("maincpu")->base()[offset + 0x16400];
+
+		case 0x65:	// SPRITERAM
+			if (offset < 0x1000)
+				return space->machine->generic.spriteram.u8[offset];
+			
+		case 0x67:	// PALETTERAM + TABLE? + REGS
+			if (offset < 0x200)
+				return space->machine->generic.paletteram.u8[offset];
+			else if (offset == (0xc013-0xb000))
+				return haekaka_vblank_r(space, offset);
+			break;
+	}
+
+	logerror("%s: unknown read from %02x with rombank = %02x\n", space->machine->describe_context(), offset+0xb000, rombank);
+	return 0x00;
+}
+
+static WRITE8_HANDLER( haekaka_b000_w )
+{
+	switch (rombank)
+	{
+		case 0x65:	// SPRITERAM
+			if (offset < 0x1000)
+			{
+				space->machine->generic.spriteram.u8[offset] = data;
+				return;
+			}
+			break;
+			
+		case 0x67:	// PALETTERAM + TABLE? + REGS
+			if (offset < 0x200)
+			{
+				paletteram_xRRRRRGGGGGBBBBB_be_w(space, offset, data);
+//				space->machine->generic.paletteram.u8[offset] = data;
+				return;
+			}
+			else if ((offset >= 0x800) && (offset < 0x880))
+			{
+				// table?
+				return;
+			}
+			break;
+	}
+
+	logerror("%s: unknown write to %02x = %02x with rombank = %02x\n", space->machine->describe_context(), offset+0xb000, data, rombank);
+}
+
+static WRITE8_HANDLER( haekaka_leds_w )
+{
+	// All used
+	set_led_status(space->machine, 0,	data & 0x01);
+	set_led_status(space->machine, 1,	data & 0x02);
+	set_led_status(space->machine, 2,	data & 0x04);
+	set_led_status(space->machine, 3,	data & 0x08);
+	set_led_status(space->machine, 4,	data & 0x10);
+	set_led_status(space->machine, 5,	data & 0x20);
+	set_led_status(space->machine, 6,	data & 0x40);
+	set_led_status(space->machine, 7,	data & 0x80);
+
+	out[1] = data;
+	show_3_outputs();
+}
+
+static WRITE8_HANDLER( haekaka_coin_w )
+{
+	set_led_status(space->machine, 8,	data & 0x01);
+//										data & 0x02 ?
+//										data & 0x04 ?
+//										data & 0x10 ?
+
+	out[0] = data;
+	show_3_outputs();
+}
+
+static ADDRESS_MAP_START( haekaka_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
+	AM_RANGE( 0xb000, 0xcfff ) AM_READWRITE( haekaka_b000_r, haekaka_b000_w )
+	AM_RANGE( 0xd000, 0xefff ) AM_RAM AM_SHARE( "nvram" ) AM_BASE( &nvram )
+	AM_RANGE( 0xfe00, 0xffff ) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( haekaka_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE( 0x02, 0x03 ) AM_READWRITE( haekaka_rombank_r, haekaka_rombank_w )
+	AM_RANGE( 0x04, 0x05 ) AM_READWRITE( haekaka_rambank_r, haekaka_rambank_w )
+
+	AM_RANGE( 0x2c, 0x2c ) AM_DEVREADWRITE( "eeprom", sammymdl_eeprom_r, sammymdl_eeprom_w )
+	AM_RANGE( 0x2e, 0x2e ) AM_READ( sammymdl_coin_hopper_r )
+	AM_RANGE( 0x30, 0x30 ) AM_READ_PORT( "BUTTON" )
+	AM_RANGE( 0x31, 0x31 ) AM_WRITE( haekaka_coin_w )
+	AM_RANGE( 0x32, 0x32 ) AM_WRITE( haekaka_leds_w )
+	AM_RANGE( 0x90, 0x91 ) AM_DEVWRITE("oki", sammymdl_sound_w )
+	AM_RANGE( 0x92, 0x92 ) AM_DEVWRITE("oki", sammymdl_sound_r )
 	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE( sammymdl_hopper_w )
 	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE( watchdog_reset_w )	// 1
 ADDRESS_MAP_END
@@ -892,7 +1129,7 @@ static ADDRESS_MAP_START( itazuram_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x4800, 0x57ff ) AM_READ_BANK( "rombank1" ) AM_WRITE_BANK( "sprbank1" )
 
 	AM_RANGE( 0x5800, 0x59ff ) AM_READWRITE( itazuram_palette_r, itazuram_palette_w )
-	AM_RANGE( 0x6000, 0x607f ) AM_RAM	// ?
+	AM_RANGE( 0x6000, 0x607f ) AM_RAM	// table?
 
 	AM_RANGE( 0x6811, 0x6811 ) AM_WRITENOP	// IRQ Enable? Screen disable?
 	AM_RANGE( 0x6813, 0x6813 ) AM_WRITENOP	// IRQ Ack?
@@ -911,7 +1148,8 @@ static ADDRESS_MAP_START( itazuram_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x30, 0x30 ) AM_READ_PORT( "BUTTON" )
 	AM_RANGE( 0x31, 0x31 ) AM_WRITE( sammymdl_coin_w )
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE( sammymdl_leds_w )
-	AM_RANGE( 0x90, 0x91 ) AM_WRITE( sammymdl_sound_w )	// sound
+	AM_RANGE( 0x90, 0x91 ) AM_DEVWRITE("oki", sammymdl_sound_w )
+	AM_RANGE( 0x92, 0x92 ) AM_DEVWRITE("oki", sammymdl_sound_r )
 	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE( sammymdl_hopper_w )
 	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE( watchdog_reset_w )	// 1
 ADDRESS_MAP_END
@@ -1018,6 +1256,28 @@ static INPUT_PORTS_START( sammymdl )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("hopper", ticket_dispenser_line_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( haekaka )
+	PORT_START("BUTTON")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1   ) PORT_IMPULSE(5)	// medal in
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE  )	// test sw
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON1  )	// button
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL  ) PORT_READ_LINE_DEVICE("hopper", ticket_dispenser_line_r)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_SERVICE1 )	// service coin / set in test mode
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 INPUT_PORTS_END
 
 
@@ -1150,7 +1410,69 @@ static MACHINE_CONFIG_START( animalc, driver_device )
 	MCFG_VIDEO_EOF(sammymdl)
 
 	// sound hardware
-	// OKI MSM981x ?
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_OKIM9810_ADD("oki", 16000)	// OKI MSM981x? Clock?
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
+MACHINE_CONFIG_END
+
+/***************************************************************************
+                             Hae Hae Ka Ka Ka
+***************************************************************************/
+
+static INTERRUPT_GEN( haekaka )
+{
+	switch (cpu_getiloops(device))
+	{
+		case 0:
+			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x04);
+			break;
+
+		case 1:
+			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x1a);
+			break;
+
+		case 2:
+			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x1c);
+			break;
+	}
+}
+
+// Everything here is a guess:
+static MACHINE_CONFIG_START( haekaka, driver_device )
+	MCFG_CPU_ADD("maincpu", Z80, 8000000)	// ???
+	MCFG_CPU_PROGRAM_MAP( haekaka_map )
+	MCFG_CPU_IO_MAP( haekaka_io )
+	MCFG_CPU_VBLANK_INT_HACK(haekaka, 3) // IM 2 needs a vector on the data bus
+
+	MCFG_MACHINE_RESET( sammymdl )
+
+	MCFG_NVRAM_ADD_0FILL("nvram")	// battery
+	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit)
+
+	MCFG_TICKET_DISPENSER_ADD("hopper", 200, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
+
+	// video hardware
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// game reads vblank state
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(0x140, 0x100)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xf0-1)
+
+	MCFG_GFXDECODE(sigmab98)
+	MCFG_PALETTE_LENGTH(0x100)
+
+	MCFG_VIDEO_UPDATE(sigmab98)
+//	MCFG_VIDEO_EOF(sammymdl)
+
+	// sound hardware
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_OKIM9810_ADD("oki", 16000/2)	// OKI MSM981x? Clock?
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -1203,7 +1525,11 @@ static MACHINE_CONFIG_START( itazuram, driver_device )
 //  MCFG_VIDEO_EOF(sammymdl)
 
 	// sound hardware
-	// OKI MSM981x ?
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_OKIM9810_ADD("oki", 16000)	// OKI MSM981x? Clock?
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
 
@@ -1298,11 +1624,11 @@ static DRIVER_INIT( gegege )
 ***************************************************************************/
 
 ROM_START( animalc )
-	ROM_REGION( 0x200000, "samples", 0 )
+	ROM_REGION( 0x1000000, "oki", 0 )
 	ROM_LOAD( "vx2302l01.u021", 0x00000, 0x200000, CRC(84cf123b) SHA1(d8b425c93ff1a560e3f92c70d7eb93a05c3581af) )
 
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_COPY( "samples", 0x1c0000, 0x00000, 0x40000 )
+	ROM_COPY( "oki", 0x1c0000, 0x00000, 0x40000 )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "vx2301l01.u016", 0x00000, 0x200000, CRC(4ae14ff9) SHA1(1273d15ea642452fecacff572655cd3ab47a5884) )	// 1xxxxxxxxxxxxxxxxxxxx = 0x00
@@ -1333,11 +1659,11 @@ static DRIVER_INIT( animalc )
 ***************************************************************************/
 
 ROM_START( itazuram )
-	ROM_REGION( 0x200000, "samples", 0 )
+	ROM_REGION( 0x1000000, "oki", 0 )
 	ROM_LOAD( "vx2002l01.u021", 0x00000, 0x200000, CRC(ddbdd2f3) SHA1(91f67a938929be0261442e066e3d2c03b5e9f06a) )
 
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_COPY( "samples", 0x1c0000, 0x00000, 0x40000 )
+	ROM_COPY( "oki", 0x1c0000, 0x00000, 0x40000 )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "vx2001l01.u016", 0x00000, 0x200000, CRC(9ee95222) SHA1(7154d43ef312a48a882207ca37e1c61e8b215a9b) )
@@ -1388,11 +1714,11 @@ static DRIVER_INIT( itazuram )
 ***************************************************************************/
 
 ROM_START( tdoboon )
-	ROM_REGION( 0x200000, "samples", 0 )
+	ROM_REGION( 0x1000000, "oki", 0 )
 	ROM_LOAD( "em4210l01.u021.bin", 0x00000, 0x200000, CRC(3523e314) SHA1(d07c5d17d3f285be4cde810547f427e84f98968f) )
 
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_COPY( "samples", 0x1c0000, 0x00000, 0x40000 )
+	ROM_COPY( "oki", 0x1c0000, 0x00000, 0x40000 )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "em4209l01.u016.bin", 0x00000, 0x200000, CRC(aca220fa) SHA1(7db441add16af554700e597fd9926b6ccd19d628) )	// 1xxxxxxxxxxxxxxxxxxxx = 0xFF
@@ -1408,11 +1734,11 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( pyenaget )
-	ROM_REGION( 0x200000, "samples", 0 )
+	ROM_REGION( 0x1000000, "oki", 0 )
 	ROM_LOAD( "vx1802l01.u021", 0x00000, 0x200000, CRC(7a22a657) SHA1(2a98085862fd958209253c5401e41eae4f7c06ea) )
 
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_COPY( "samples", 0x1c0000, 0x00000, 0x40000 )
+	ROM_COPY( "oki", 0x1c0000, 0x00000, 0x40000 )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "vx1801l01.u016", 0x00000, 0x200000, CRC(c4607403) SHA1(f4f4699442afccc5ed4354447f91b1bee36ae3e5) )
@@ -1442,15 +1768,29 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( haekaka )
-	ROM_REGION( 0x200000, "samples", 0 )
+	ROM_REGION( 0x1000000, "oki", 0 )
 	ROM_LOAD( "em4208l01.u021.bin", 0x00000, 0x200000, CRC(d23bb748) SHA1(38d5b6c4b2cd470b3a68574aeca3f9fa9032245e) )
 
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_COPY( "samples", 0x1c0000, 0x00000, 0x40000 )
+	ROM_COPY( "oki", 0x1c0000, 0x00000, 0x40000 )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "em4207l01.u016.bin", 0x00000, 0x200000, CRC(3876961c) SHA1(3d842c1f63ea5aa7e799967928b86c5fabb4e65e) )
 ROM_END
+
+static DRIVER_INIT( haekaka )
+{
+	// RAM banks
+	machine->generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x200);
+	memset(machine->generic.paletteram.u8, 0, 0x200);
+
+	machine->generic.spriteram.u8 = auto_alloc_array(machine, UINT8, 0x1000);
+	memset(machine->generic.spriteram.u8, 0, 0x1000);
+	machine->generic.spriteram_size = 0x1000;
+
+	rombank = 0x65;
+	rambank = 0x53;
+}
 
 /***************************************************************************
 
@@ -1458,10 +1798,10 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1997, gegege,   0, gegege,   gegege,   gegege,   ROT0, "Banpresto / Sigma", "GeGeGe no Kitarou Youkai Slot", 0             )
+GAME( 1997, gegege,   0, gegege,   gegege,   gegege,   ROT0, "Banpresto / Sigma", "GeGeGe no Kitarou Youkai Slot", 0                    )
 // Sammy Medal Games:
-GAME( 2000, animalc,  0, animalc,  sammymdl, animalc,  ROT0, "Sammy",             "Animal Catch",                  GAME_NO_SOUND )
-GAME( 2000, itazuram, 0, itazuram, sammymdl, itazuram, ROT0, "Sammy",             "Itazura Monkey",                GAME_NO_SOUND )
-GAME( 2000, pyenaget, 0, animalc,  sammymdl, 0,        ROT0, "Sammy",             "Pye-nage Taikai",               GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 2002, haekaka,  0, animalc,  sammymdl, 0,        ROT0, "Sammy",             "Hae Hae Ka Ka Ka",              GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 2002, tdoboon,  0, animalc,  sammymdl, 0,        ROT0, "Sammy",             "Taihou de Doboon",              GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2000, animalc,  0, animalc,  sammymdl, animalc,  ROT0, "Sammy",             "Animal Catch",                  GAME_IMPERFECT_SOUND )
+GAME( 2000, itazuram, 0, itazuram, sammymdl, itazuram, ROT0, "Sammy",             "Itazura Monkey",                GAME_IMPERFECT_SOUND )
+GAME( 2000, pyenaget, 0, animalc,  sammymdl, 0,        ROT0, "Sammy",             "Pye-nage Taikai",               GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 2001, haekaka,  0, haekaka,  haekaka,  haekaka,  ROT0, "Sammy",             "Hae Hae Ka Ka Ka",              GAME_IMPERFECT_SOUND )
+GAME( 2002, tdoboon,  0, animalc,  sammymdl, 0,        ROT0, "Sammy",             "Taihou de Doboon",              GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
