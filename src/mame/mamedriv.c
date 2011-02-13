@@ -8527,13 +8527,13 @@ Other Sun games
 	DRIVER( jwildb52a )	/* (c) 199? Sigma */
 	DRIVER( jwildb52h )	/* (c) 199? Sigma */
 
-	/* Sigma B98 */
+	/* Sigma B98 / Sammy Medal Games */
 	DRIVER( gegege )	/* (c) 1997 Banpresto / Sigma */
 	DRIVER( animalc )	/* (c) 2000 Sammy */
 	DRIVER( itazuram )	/* (c) 2000 Sammy */
 	DRIVER( pyenaget )	/* (c) 2000 Sammy */
+	DRIVER( tdoboon )	/* (c) 2000 Sammy */
 	DRIVER( haekaka )	/* (c) 2001 Sammy */
-	DRIVER( tdoboon )	/* (c) 2002 Sammy */
 
 	/* IGS games ( www.igs.com.tw ) */
 	DRIVER( goldstar )	/* (c) 198? IGS */

@@ -107,7 +107,7 @@ Notes:
                 -6-- ----     256 Color Sprite
                 --5- ----
                 ---4 ----     Flip X
-                ---- 3---
+                ---- 3---     Flip Y
                 ---- -2--     Draw Sprite
                 ---- --10     Priority (0 = Front .. 3 = Back)
     2                         Tile Code (High)
@@ -190,7 +190,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		if (scale & 0xffff)	scale += (1<<16) / 0x10;
 
 		flipx	=	s[ 0x01 ] & 0x10;
-		flipy	=	0;	// ?
+		flipy	=	s[ 0x01 ] & 0x08;
 
 		if ( flipx )	{	x0 = nx - 1;	x1 = -1;	dx = -1;	}
 		else			{	x0 = 0;			x1 = nx;	dx = +1;	}
@@ -345,7 +345,7 @@ static UINT8 c0,c4,c6,c8;
 static void show_outputs()
 {
 #ifdef MAME_DEBUG
-	popmessage("0: %02X  4: %02X  6: %02X  8: %02X",c0,c4,c6,c8);
+//	popmessage("0: %02X  4: %02X  6: %02X  8: %02X",c0,c4,c6,c8);
 #endif
 }
 
@@ -598,7 +598,7 @@ static UINT8 out[3];
 static void show_3_outputs()
 {
 #ifdef MAME_DEBUG
-	popmessage("COIN: %02X  LED: %02X  HOP: %02X", out[0], out[1], out[2]);
+//	popmessage("COIN: %02X  LED: %02X  HOP: %02X", out[0], out[1], out[2]);
 #endif
 }
 // Port 31
@@ -608,9 +608,9 @@ static WRITE8_HANDLER( sammymdl_coin_w )
 	coin_counter_w(space->machine, 1,   data  & 0x02 );	// coin2 in
 	coin_counter_w(space->machine, 2,   data  & 0x04 );	// medal in
 
-	coin_lockout_w(space->machine, 1, (~data) & 0x08 );	// coin2 lockout?
-	coin_lockout_w(space->machine, 0, (~data) & 0x10 );	// coin1 lockout
-	coin_lockout_w(space->machine, 2, (~data) & 0x20 );	// medal lockout?
+//	coin_lockout_w(space->machine, 1, (~data) & 0x08 );	// coin2 lockout?
+//	coin_lockout_w(space->machine, 0, (~data) & 0x10 );	// coin1 lockout
+//	coin_lockout_w(space->machine, 2, (~data) & 0x20 );	// medal lockout?
 
 	out[0] = data;
 	show_3_outputs();
@@ -716,12 +716,22 @@ static WRITE8_HANDLER( haekaka_rombank_w )
 			switch (data)
 			{
 				case 0x10:	// ROM
-				case 0x11:	// ROM
-				case 0x13:	// ROM
-				case 0x15:	// ROM
-				case 0x17:	// ROM
-				case 0x19:	// ROM
-				case 0x1b:	// ROM
+				case 0x11:
+				case 0x12:
+				case 0x13:
+				case 0x14:
+				case 0x15:
+				case 0x16:
+				case 0x17:
+				case 0x18:
+				case 0x19:
+				case 0x1a:
+				case 0x1b:
+				case 0x1c:
+				case 0x1d:
+				case 0x1e:
+				case 0x1f:
+
 				case 0x65:	// SPRITERAM
 				case 0x67:	// PALETTE RAM + TABLE + REGS
 					break;
@@ -804,22 +814,22 @@ static READ8_HANDLER( haekaka_b000_r )
 	switch (rombank)
 	{
 		case 0x10:	// ROM
-			return space->machine->region("maincpu")->base()[offset + 0xb400];
-
-		case 0x11:	// ROM
-			return space->machine->region("maincpu")->base()[offset + 0xc400];
-
-		case 0x15:	// ROM
-			return space->machine->region("maincpu")->base()[offset + 0x10400];
-
-		case 0x17:	// ROM
-			return space->machine->region("maincpu")->base()[offset + 0x12400];
-
-		case 0x19:	// ROM
-			return space->machine->region("maincpu")->base()[offset + 0x14400];
-
-		case 0x1b:	// ROM
-			return space->machine->region("maincpu")->base()[offset + 0x16400];
+		case 0x11:
+		case 0x12:
+		case 0x13:
+		case 0x14:
+		case 0x15:
+		case 0x16:
+		case 0x17:
+		case 0x18:
+		case 0x19:
+		case 0x1a:
+		case 0x1b:
+		case 0x1c:
+		case 0x1d:
+		case 0x1e:
+		case 0x1f:
+			return space->machine->region("maincpu")->base()[offset + 0xb400 + 0x1000 * (rombank-0x10)];
 
 		case 0x65:	// SPRITERAM
 			if (offset < 0x1000)
@@ -885,7 +895,7 @@ static WRITE8_HANDLER( haekaka_leds_w )
 
 static WRITE8_HANDLER( haekaka_coin_w )
 {
-	set_led_status(space->machine, 8,	data & 0x01);
+	coin_counter_w(space->machine, 0,   data & 0x01 );	// medal out
 //										data & 0x02 ?
 //										data & 0x04 ?
 //										data & 0x10 ?
@@ -1155,6 +1165,220 @@ static ADDRESS_MAP_START( itazuram_io, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 /***************************************************************************
+                             Pye-nage Taikai
+***************************************************************************/
+
+static ADDRESS_MAP_START( pyenaget_io, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE( 0x31, 0x31 ) AM_WRITE( sammymdl_coin_w )
+	AM_IMPORT_FROM( haekaka_io )
+ADDRESS_MAP_END
+
+/***************************************************************************
+                             Taihou de Doboon
+***************************************************************************/
+
+// rombank
+static WRITE8_HANDLER( tdoboon_rombank_w )
+{
+	if (offset == 0)
+	{
+		reg = data;
+		return;
+	}
+
+	switch ( reg )
+	{
+		case 0x2f:
+			rombank = data;
+			switch (data)
+			{
+				case 0x10:	// ROM
+				case 0x11:
+				case 0x12:
+				case 0x13:
+				case 0x14:
+				case 0x15:
+				case 0x16:
+				case 0x17:
+				case 0x18:
+				case 0x19:
+				case 0x1a:
+				case 0x1b:
+				case 0x1c:
+				case 0x1d:
+				case 0x1e:
+				case 0x1f:
+
+				case 0x64:	// SPRITERAM
+				case 0x66:	// PALETTE RAM + TABLE
+				case 0x67:	// REGS
+					break;
+
+				default:
+					logerror("%s: unknown rom bank = %02x, reg = %02x\n", space->machine->describe_context(), data, reg);
+			}
+			break;
+
+		default:
+			logerror("%s: unknown reg written: %02x = %02x\n", space->machine->describe_context(), reg, data);
+	}
+}
+static READ8_HANDLER( tdoboon_rombank_r )
+{
+	if (offset == 0)
+		return reg;
+
+	switch ( reg )
+	{
+		case 0x2f:
+			return rombank;
+
+		default:
+			logerror("%s: unknown reg read: %02x\n", space->machine->describe_context(), reg);
+			return 0x00;
+	}
+}
+
+// rambank
+static WRITE8_HANDLER( tdoboon_rambank_w )
+{
+	if (offset == 0)
+	{
+		reg2 = data;
+		return;
+	}
+
+	switch ( reg2 )
+	{
+		case 0x33:
+			rambank = data;
+			switch (data)
+			{
+				case 0x53:
+					break;
+
+				default:
+					logerror("%s: unknown ram bank = %02x, reg2 = %02x\n", space->machine->describe_context(), data, reg2);
+			}
+			break;
+
+		default:
+			logerror("%s: unknown reg2 written: %02x = %02x\n", space->machine->describe_context(), reg2, data);
+	}
+}
+static READ8_HANDLER( tdoboon_rambank_r )
+{
+	if (offset == 0)
+		return reg2;
+
+	switch ( reg2 )
+	{
+		case 0x33:
+			return rambank;
+
+		default:
+			logerror("%s: unknown reg2 read: %02x\n", space->machine->describe_context(), reg2);
+			return 0x00;
+	}
+}
+
+static READ8_HANDLER( tdoboon_c000_r )
+{
+	switch (rombank)
+	{
+		case 0x10:	// ROM
+		case 0x11:
+		case 0x12:
+		case 0x13:
+		case 0x14:
+		case 0x15:
+		case 0x16:
+		case 0x17:
+		case 0x18:
+		case 0x19:
+		case 0x1a:
+		case 0x1b:
+		case 0x1c:
+		case 0x1d:
+		case 0x1e:
+		case 0x1f:
+			return space->machine->region("maincpu")->base()[offset + 0xc400 + 0x1000 * (rombank-0x10)];
+
+		case 0x64:	// SPRITERAM
+			if (offset < 0x1000)
+				return space->machine->generic.spriteram.u8[offset];
+			break;
+
+		case 0x66:	// PALETTERAM + TABLE?
+			if (offset < 0x200)
+				return space->machine->generic.paletteram.u8[offset];
+			break;
+
+		case 0x67:	// REGS
+			if (offset == (0xc013-0xc000))
+				return haekaka_vblank_r(space, offset);
+			break;
+	}
+
+	logerror("%s: unknown read from %02x with rombank = %02x\n", space->machine->describe_context(), offset+0xc000, rombank);
+	return 0x00;
+}
+
+static WRITE8_HANDLER( tdoboon_c000_w )
+{
+	switch (rombank)
+	{
+		case 0x64:	// SPRITERAM
+			if (offset < 0x1000)
+			{
+				space->machine->generic.spriteram.u8[offset] = data;
+				return;
+			}
+			break;
+			
+		case 0x66:	// PALETTERAM + TABLE?
+			if (offset < 0x200)
+			{
+				paletteram_xRRRRRGGGGGBBBBB_be_w(space, offset, data);
+//				space->machine->generic.paletteram.u8[offset] = data;
+				return;
+			}
+			else if ((offset >= 0x800) && (offset < 0x880))
+			{
+				// table?
+				return;
+			}
+			break;
+	}
+
+	logerror("%s: unknown write to %02x = %02x with rombank = %02x\n", space->machine->describe_context(), offset+0xc000, data, rombank);
+}
+
+static ADDRESS_MAP_START( tdoboon_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE( 0x0000, 0xbfff ) AM_ROM
+	AM_RANGE( 0xc000, 0xcfff ) AM_READWRITE( tdoboon_c000_r, tdoboon_c000_w )
+	AM_RANGE( 0xd000, 0xefff ) AM_RAM AM_SHARE( "nvram" ) AM_BASE( &nvram )
+	AM_RANGE( 0xfe00, 0xffff ) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( tdoboon_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE( 0x02, 0x03 ) AM_READWRITE( tdoboon_rombank_r, tdoboon_rombank_w )
+	AM_RANGE( 0x04, 0x05 ) AM_READWRITE( tdoboon_rambank_r, tdoboon_rambank_w )
+
+	AM_RANGE( 0x2c, 0x2c ) AM_DEVREADWRITE( "eeprom", sammymdl_eeprom_r, sammymdl_eeprom_w )
+	AM_RANGE( 0x2e, 0x2e ) AM_READ( sammymdl_coin_hopper_r )
+	AM_RANGE( 0x30, 0x30 ) AM_READ_PORT( "BUTTON" )
+	AM_RANGE( 0x31, 0x31 ) AM_WRITE( sammymdl_coin_w )
+	AM_RANGE( 0x32, 0x32 ) AM_WRITE( sammymdl_leds_w )
+	AM_RANGE( 0x90, 0x91 ) AM_DEVWRITE("oki", sammymdl_sound_w )
+	AM_RANGE( 0x92, 0x92 ) AM_DEVWRITE("oki", sammymdl_sound_r )
+	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE( sammymdl_hopper_w )
+	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE( watchdog_reset_w )	// 1
+ADDRESS_MAP_END
+
+
+/***************************************************************************
 
     Graphics Layout
 
@@ -1212,7 +1436,7 @@ static INPUT_PORTS_START( gegege )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN2   ) PORT_IMPULSE(5)	// ? (coin error, pulses mask 4 of port c6)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN1   ) PORT_IMPULSE(5)	// coin/medal in (coin error)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN1   ) PORT_IMPULSE(5) PORT_NAME("Medal")	// coin/medal in (coin error)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("hopper", ticket_dispenser_line_r)
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_NAME("Bet")	// bet / select in test menu
@@ -1250,7 +1474,7 @@ static INPUT_PORTS_START( sammymdl )
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1   ) PORT_IMPULSE(5)	// coin1 in
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2   ) PORT_IMPULSE(5)	// coin2 in
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_COIN3   ) PORT_IMPULSE(5)	// medal in
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_COIN3   ) PORT_IMPULSE(5) PORT_NAME("Medal")	// medal in
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE )	// test sw
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("hopper", ticket_dispenser_line_r)
@@ -1260,7 +1484,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( haekaka )
 	PORT_START("BUTTON")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1   ) PORT_IMPULSE(5)	// medal in
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1   ) PORT_IMPULSE(5) PORT_NAME( "Medal" )	// medal in ("chacker")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1341,7 +1565,7 @@ static MACHINE_CONFIG_START( gegege, driver_device )
 MACHINE_CONFIG_END
 
 /***************************************************************************
-                                 Animal Catch
+                             Sammy Medal Games
 ***************************************************************************/
 
 static const eeprom_interface eeprom_interface_93C46_8bit =
@@ -1364,30 +1588,9 @@ static MACHINE_RESET( sammymdl )
 	cpu_set_reg(machine->device("maincpu"), Z80_PC, 0x400);	// code starts at 400 ??? (000 = cart header)
 }
 
-static INTERRUPT_GEN( animalc )
-{
-	switch (cpu_getiloops(device))
-	{
-		case 0:
-			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x00);	// increment counter
-			break;
-
-		case 1:
-			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x1c);	// read hopper state
-			break;
-
-		case 2:
-			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x1e);	// drive hopper motor
-			break;
-	}
-}
-
 // Everything here is a guess:
-static MACHINE_CONFIG_START( animalc, driver_device )
+static MACHINE_CONFIG_START( sammymdl, driver_device )
 	MCFG_CPU_ADD("maincpu", Z80, 8000000)	// ???
-	MCFG_CPU_PROGRAM_MAP( animalc_map )
-	MCFG_CPU_IO_MAP( animalc_io )
-	MCFG_CPU_VBLANK_INT_HACK(animalc, 3) // IM 2 needs a vector on the data bus
 
 	MCFG_MACHINE_RESET( sammymdl )
 
@@ -1417,6 +1620,36 @@ static MACHINE_CONFIG_START( animalc, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
+
+/***************************************************************************
+                                 Animal Catch
+***************************************************************************/
+
+static INTERRUPT_GEN( animalc )
+{
+	switch (cpu_getiloops(device))
+	{
+		case 0:
+			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x00);	// increment counter
+			break;
+
+		case 1:
+			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x1c);	// read hopper state
+			break;
+
+		case 2:
+			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x1e);	// drive hopper motor
+			break;
+	}
+}
+
+static MACHINE_CONFIG_DERIVED( animalc, sammymdl )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP( animalc_map )
+	MCFG_CPU_IO_MAP( animalc_io )
+	MCFG_CPU_VBLANK_INT_HACK(animalc, 3) // IM 2 needs a vector on the data bus
+MACHINE_CONFIG_END
+
 /***************************************************************************
                              Hae Hae Ka Ka Ka
 ***************************************************************************/
@@ -1439,40 +1672,11 @@ static INTERRUPT_GEN( haekaka )
 	}
 }
 
-// Everything here is a guess:
-static MACHINE_CONFIG_START( haekaka, driver_device )
-	MCFG_CPU_ADD("maincpu", Z80, 8000000)	// ???
+static MACHINE_CONFIG_DERIVED( haekaka, sammymdl )
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( haekaka_map )
 	MCFG_CPU_IO_MAP( haekaka_io )
 	MCFG_CPU_VBLANK_INT_HACK(haekaka, 3) // IM 2 needs a vector on the data bus
-
-	MCFG_MACHINE_RESET( sammymdl )
-
-	MCFG_NVRAM_ADD_0FILL("nvram")	// battery
-	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit)
-
-	MCFG_TICKET_DISPENSER_ADD("hopper", 200, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
-
-	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// game reads vblank state
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(0x140, 0x100)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xf0-1)
-
-	MCFG_GFXDECODE(sigmab98)
-	MCFG_PALETTE_LENGTH(0x100)
-
-	MCFG_VIDEO_UPDATE(sigmab98)
-//	MCFG_VIDEO_EOF(sammymdl)
-
-	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_OKIM9810_ADD("oki", 16000/2)	// OKI MSM981x? Clock?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -1497,39 +1701,36 @@ static INTERRUPT_GEN( itazuram )
 	}
 }
 
-// Everything here is a guess:
-static MACHINE_CONFIG_START( itazuram, driver_device )
-	MCFG_CPU_ADD("maincpu", Z80, 8000000)	// ???
+static MACHINE_CONFIG_DERIVED( itazuram, sammymdl )
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( itazuram_map )
 	MCFG_CPU_IO_MAP( itazuram_io )
 	MCFG_CPU_VBLANK_INT_HACK(itazuram, 3) // IM 2 needs a vector on the data bus
+MACHINE_CONFIG_END
 
-	MCFG_MACHINE_RESET( sammymdl )
+/***************************************************************************
+                             Pye-nage Taikai
+***************************************************************************/
 
-	MCFG_NVRAM_ADD_0FILL("nvram")	// battery
-	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit)
+static MACHINE_CONFIG_DERIVED( pyenaget, sammymdl )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP( haekaka_map )
+	MCFG_CPU_IO_MAP( pyenaget_io )
+	MCFG_CPU_VBLANK_INT_HACK(haekaka, 3) // IM 2 needs a vector on the data bus
+MACHINE_CONFIG_END
 
-	MCFG_TICKET_DISPENSER_ADD("hopper", 200, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
+/***************************************************************************
+                             Taihou de Doboon
+***************************************************************************/
 
-	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(0x140, 0x100)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xf0-1)
+static MACHINE_CONFIG_DERIVED( tdoboon, sammymdl )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP( tdoboon_map )
+	MCFG_CPU_IO_MAP( tdoboon_io )
+	MCFG_CPU_VBLANK_INT_HACK(haekaka, 3) // IM 2 needs a vector on the data bus
 
-	MCFG_GFXDECODE(sigmab98)
-	MCFG_PALETTE_LENGTH(0x100)
-
-	MCFG_VIDEO_UPDATE(sigmab98)
-//  MCFG_VIDEO_EOF(sammymdl)
-
-	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_OKIM9810_ADD("oki", 16000)	// OKI MSM981x? Clock?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0,0x140-1, 0+4,0xf0+4-1)
 MACHINE_CONFIG_END
 
 
@@ -1792,6 +1993,7 @@ static DRIVER_INIT( haekaka )
 	rambank = 0x53;
 }
 
+
 /***************************************************************************
 
     Game Drivers
@@ -1802,6 +2004,6 @@ GAME( 1997, gegege,   0, gegege,   gegege,   gegege,   ROT0, "Banpresto / Sigma"
 // Sammy Medal Games:
 GAME( 2000, animalc,  0, animalc,  sammymdl, animalc,  ROT0, "Sammy",             "Animal Catch",                  GAME_IMPERFECT_SOUND )
 GAME( 2000, itazuram, 0, itazuram, sammymdl, itazuram, ROT0, "Sammy",             "Itazura Monkey",                GAME_IMPERFECT_SOUND )
-GAME( 2000, pyenaget, 0, animalc,  sammymdl, 0,        ROT0, "Sammy",             "Pye-nage Taikai",               GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 2000, pyenaget, 0, pyenaget, sammymdl, haekaka,  ROT0, "Sammy",             "Pye-nage Taikai",               GAME_IMPERFECT_SOUND )
+GAME( 2000, tdoboon,  0, tdoboon,  haekaka,  haekaka,  ROT0, "Sammy",             "Taihou de Doboon",              GAME_IMPERFECT_SOUND )
 GAME( 2001, haekaka,  0, haekaka,  haekaka,  haekaka,  ROT0, "Sammy",             "Hae Hae Ka Ka Ka",              GAME_IMPERFECT_SOUND )
-GAME( 2002, tdoboon,  0, animalc,  sammymdl, 0,        ROT0, "Sammy",             "Taihou de Doboon",              GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
