@@ -596,10 +596,10 @@ static void draw_mode3 (device_t *screen, bitmap_t *bitmap, const rectangle *cli
 			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+1) = fg;
 			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+2) = fg;
 			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+3) = fg;
-			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+4) = fg;
-			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+5) = fg;
-			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+6) = fg;
-			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+7) = fg;
+			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+4) = bg;
+			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+5) = bg;
+			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+6) = bg;
+			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+7) = bg;
                 }
             }
         }
@@ -627,10 +627,10 @@ static void draw_mode23 (device_t *screen, bitmap_t *bitmap, const rectangle *cl
 			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+1) = fg;
 			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+2) = fg;
 			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+3) = fg;
-			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+4) = fg;
-			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+5) = fg;
-			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+6) = fg;
-			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+7) = fg;
+			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+4) = bg;
+			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+5) = bg;
+			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+6) = bg;
+			*BITMAP_ADDR16(bitmap, y*8+yy*4+yyy, x*8+7) = bg;
                 }
             }
         }
