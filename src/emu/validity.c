@@ -955,11 +955,22 @@ static bool validate_inputs(const machine_config &config, int_map &defstr_map, i
 		return FALSE;
 
 	/* allocate the input ports */
-	input_port_list_init(portlist, driver.ipt, errorbuf, sizeof(errorbuf), FALSE);
+	input_port_list_init(portlist, driver.ipt, errorbuf, sizeof(errorbuf), FALSE, NULL);
 	if (errorbuf[0] != 0)
 	{
 		mame_printf_error("%s: %s has input port errors:\n%s\n", driver.source_file, driver.name, errorbuf);
 		error = true;
+	}
+	for (device_config *cfg = config.m_devicelist.first(); cfg != NULL; cfg = cfg->next())
+	{
+		if (cfg->input_ports()!=NULL) {
+			input_port_list_init(portlist, cfg->input_ports(), errorbuf, sizeof(errorbuf), FALSE, cfg);
+			if (errorbuf[0] != 0)
+			{
+				mame_printf_error("%s: %s has input port errors:\n%s\n", driver.source_file, driver.name, errorbuf);
+				error = true;
+			}
+		}
 	}
 
 	/* check for duplicate tags */

@@ -401,6 +401,17 @@ machine_config_constructor device_config::machine_config_additions() const
 
 
 
+//-------------------------------------------------
+//  input_ports - return a pointer to the implicit
+//  input ports description for this device
+//-------------------------------------------------
+
+const input_port_token *device_config::input_ports() const
+{
+	return NULL;
+}
+
+
 //**************************************************************************
 //  LIVE DEVICE INTERFACES
 //**************************************************************************

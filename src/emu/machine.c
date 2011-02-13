@@ -285,7 +285,7 @@ void running_machine::start()
 	// initialize the input system and input ports for the game
 	// this must be done before memory_init in order to allow specifying
 	// callbacks based on input port tags
-	time_t newbase = input_port_init(this, m_game.ipt);
+	time_t newbase = input_port_init(this, m_game.ipt, m_config.m_devicelist);
 	if (newbase != 0)
 		m_base_time = newbase;
 

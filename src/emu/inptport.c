@@ -788,7 +788,7 @@ static void frame_update_analog_field(running_machine *machine, analog_field_sta
 static int frame_get_digital_field_state(const input_field_config *field, int mouse_down);
 
 /* port configuration helpers */
-static void port_config_detokenize(ioport_list &portlist, const input_port_token *ipt, char *errorbuf, int errorbuflen);
+static void port_config_detokenize(ioport_list &portlist, const input_port_token *ipt, char *errorbuf, int errorbuflen, device_config *owner);
 static input_field_config *field_config_alloc(input_port_config *port, int type, input_port_value defvalue, input_port_value maskbits);
 static void field_config_insert(input_field_config *field, input_port_value *disallowedbits, char *errorbuf, int errorbuflen);
 static void field_config_free(input_field_config **fieldptr);
@@ -973,7 +973,7 @@ static WRITE_LINE_DEVICE_HANDLER( changed_write_line_device )
     system
 -------------------------------------------------*/
 
-time_t input_port_init(running_machine *machine, const input_port_token *tokens)
+time_t input_port_init(running_machine *machine, const input_port_token *tokens, const device_config_list &devicelist)
 {
 	//input_port_private *portdata;
 	char errorbuf[1024];
@@ -993,12 +993,21 @@ time_t input_port_init(running_machine *machine, const input_port_token *tokens)
 	/* if we have a token list, proceed */
 	if (tokens != NULL)
 	{
-		input_port_list_init(machine->m_portlist, tokens, errorbuf, sizeof(errorbuf), TRUE);
+		input_port_list_init(machine->m_portlist, tokens, errorbuf, sizeof(errorbuf), TRUE, NULL);
 		if (errorbuf[0] != 0)
 			mame_printf_error("Input port errors:\n%s", errorbuf);
-		init_port_state(machine);
 	}
 
+	for (device_config *config = devicelist.first(); config != NULL; config = config->next())
+	{
+		if (config->input_ports()!=NULL) {
+			input_port_list_init(machine->m_portlist, config->input_ports(), errorbuf, sizeof(errorbuf), TRUE, config);
+			if (errorbuf[0] != 0)
+				mame_printf_error("Input port errors:\n%s", errorbuf);			
+		}
+	}
+
+	init_port_state(machine);
 	/* register callbacks for when we load configurations */
 	config_register(machine, "input", load_config_callback, save_config_callback);
 
@@ -1034,7 +1043,7 @@ static void input_port_exit(running_machine &machine)
     according to the given tokens
 -------------------------------------------------*/
 
-void input_port_list_init(ioport_list &portlist, const input_port_token *tokens, char *errorbuf, int errorbuflen, int allocmap)
+void input_port_list_init(ioport_list &portlist, const input_port_token *tokens, char *errorbuf, int errorbuflen, int allocmap, device_config *owner)
 {
 	/* no tokens, no list */
 	if (tokens == NULL)
@@ -1045,7 +1054,7 @@ void input_port_list_init(ioport_list &portlist, const input_port_token *tokens,
 		*errorbuf = 0;
 
 	/* detokenize into the list */
-	port_config_detokenize(portlist, tokens, errorbuf, errorbuflen);
+	port_config_detokenize(portlist, tokens, errorbuf, errorbuflen, owner);
 }
 
 
@@ -2866,13 +2875,15 @@ static int frame_get_digital_field_state(const input_field_config *field, int mo
     detokenize a series of input port tokens
 -------------------------------------------------*/
 
-static void port_config_detokenize(ioport_list &portlist, const input_port_token *ipt, char *errorbuf, int errorbuflen)
+static void port_config_detokenize(ioport_list &portlist, const input_port_token *ipt, char *errorbuf, int errorbuflen, device_config *owner)
 {
 	UINT32 entrytype = INPUT_TOKEN_INVALID;
 	input_setting_config *cursetting = NULL;
 	input_field_config *curfield = NULL;
 	input_port_config *curport = NULL;
 	input_port_value maskbits = 0;
+	astring tempstring;
+	const char *fulltag = NULL;
 	UINT16 category;	/* (MESS-specific) category */
 
 	/* loop over tokens until we hit the end */
@@ -2899,7 +2910,7 @@ static void port_config_detokenize(ioport_list &portlist, const input_port_token
 					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
 				maskbits = 0;
 
-				port_config_detokenize(portlist, TOKEN_GET_PTR(ipt, tokenptr), errorbuf, errorbuflen);
+				port_config_detokenize(portlist, TOKEN_GET_PTR(ipt, tokenptr), errorbuf, errorbuflen, owner);
 				curport = NULL;
 				curfield = NULL;
 				cursetting = NULL;
@@ -2911,8 +2922,13 @@ static void port_config_detokenize(ioport_list &portlist, const input_port_token
 					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
 				maskbits = 0;
 
-				string = TOKEN_GET_STRING(ipt);
-				curport = &portlist.append(string, *global_alloc(input_port_config(string)));
+				string = TOKEN_GET_STRING(ipt);								
+				if (owner!=NULL) {
+					fulltag = core_strdup(owner->subtag(tempstring, string));
+				} else {
+					fulltag = string;
+				}
+				curport = &portlist.append(fulltag, *global_alloc(input_port_config(fulltag)));
 				curfield = NULL;
 				cursetting = NULL;
 				break;

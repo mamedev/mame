@@ -423,6 +423,7 @@ public:
 	// basic information getters
 	virtual const rom_entry *rom_region() const { return reinterpret_cast<const rom_entry *>(get_legacy_config_ptr(DEVINFO_PTR_ROM_REGION)); }
 	virtual machine_config_constructor machine_config_additions() const { return reinterpret_cast<machine_config_constructor>(get_legacy_config_ptr(DEVINFO_PTR_MACHINE_CONFIG)); }
+	virtual const input_port_token *input_ports() const { return reinterpret_cast<const input_port_token *>(get_legacy_config_ptr(DEVINFO_PTR_INPUT_PORTS)); }
 
 protected:
 	// device_config_execute_interface overrides

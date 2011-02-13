@@ -127,6 +127,7 @@ class device_state_interface;
 struct rom_entry;
 class machine_config;
 class emu_timer;
+typedef union _input_port_token input_port_token;
 
 
 // exception classes
@@ -311,6 +312,7 @@ public:
 	// optional information overrides
 	virtual const rom_entry *rom_region() const;
 	virtual machine_config_constructor machine_config_additions() const;
+	virtual const input_port_token *input_ports() const;
 
 	//------------------- end derived class overrides
 
@@ -455,6 +457,7 @@ public:
 	// machine and ROM configuration getters ... pass through to underlying config
 	const rom_entry *rom_region() const { return m_baseconfig.rom_region(); }
 	machine_config_constructor machine_config_additions() const { return m_baseconfig.machine_config_additions(); }
+	const input_port_token *input_ports() const { return m_baseconfig.input_ports(); }
 
 public:
 	running_machine *		machine;

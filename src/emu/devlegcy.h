@@ -88,6 +88,7 @@ enum
 
 		DEVINFO_PTR_ROM_REGION = DEVINFO_PTR_FIRST,		// R/O: pointer to device-specific ROM region
 		DEVINFO_PTR_MACHINE_CONFIG,						// R/O: pointer to device-specific machine config
+		DEVINFO_PTR_INPUT_PORTS,
 
 		DEVINFO_PTR_INTERNAL_MEMORY_MAP,				// R/O: address_map_constructor map
 		DEVINFO_PTR_INTERNAL_MEMORY_MAP_0 = DEVINFO_PTR_INTERNAL_MEMORY_MAP + 0,
@@ -405,6 +406,7 @@ union deviceinfo
 	device_nvram_func		nvram;						// DEVINFO_FCT_NVRAM
 	const rom_entry *		romregion;					// DEVINFO_PTR_ROM_REGION
 	machine_config_constructor machine_config;			// DEVINFO_PTR_MACHINE_CONFIG
+	const input_port_token *ipt;						// DEVINFO_PTR_INPUT_PORTS
 	address_map_constructor	internal_map8;				// DEVINFO_PTR_INTERNAL_MEMORY_MAP
 	address_map_constructor	internal_map16;				// DEVINFO_PTR_INTERNAL_MEMORY_MAP
 	address_map_constructor	internal_map32;				// DEVINFO_PTR_INTERNAL_MEMORY_MAP
@@ -436,6 +438,7 @@ protected:
 public:
 	virtual const rom_entry *rom_region() const { return reinterpret_cast<const rom_entry *>(get_legacy_config_ptr(DEVINFO_PTR_ROM_REGION)); }
 	virtual machine_config_constructor machine_config_additions() const { return reinterpret_cast<machine_config_constructor>(get_legacy_config_ptr(DEVINFO_PTR_MACHINE_CONFIG)); }
+	virtual const input_port_token *input_ports() const { return reinterpret_cast<const input_port_token *>(get_legacy_config_ptr(DEVINFO_PTR_INPUT_PORTS)); }
 
 	// access to legacy inline configuartion
 	void *inline_config() const { return m_inline_config; }
