@@ -208,7 +208,7 @@ DRIVER_INIT(cotton2)
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(50);
+	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(10);
 }
 
 DRIVER_INIT(dnmtdeka)
@@ -343,7 +343,7 @@ DRIVER_INIT(grdforce)
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(50);
+	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(10);
 }
 
 DRIVER_INIT(batmanfr)
@@ -415,7 +415,7 @@ DRIVER_INIT(othellos)
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(50);
+	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(10);
 }
 
 DRIVER_INIT(sasissu)
@@ -493,7 +493,7 @@ DRIVER_INIT(maruchan)
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(50);
+	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(10);
 }
 
 DRIVER_INIT(pblbeach)
