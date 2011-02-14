@@ -434,6 +434,19 @@ WRITE32_HANDLER( psx_dma_w )
 					(*dma->fn_read)( space->machine, n_address, n_size );
 					dma_finished( p_psx, n_channel );
 				}
+				else if( dma->n_channelcontrol == 0x11000000 &&	// CD DMA
+					dma->fn_read != NULL )
+				{
+					verboselog( p_psx, 1, "dma %d read block %08x %08x\n", n_channel, n_address, n_size );
+
+					// pSX's CD DMA size calc formula
+					int oursize = (dma->n_blockcontrol>>16);
+					oursize = (oursize > 1) ? oursize : 1;
+					oursize *= (dma->n_blockcontrol&0xffff);
+
+					(*dma->fn_read)( space->machine, n_address, oursize );
+					dma_finished( p_psx, n_channel );
+				}
 				else if( dma->n_channelcontrol == 0x01000200 &&
 					dma->fn_read != NULL )
 				{
@@ -501,7 +514,7 @@ WRITE32_HANDLER( psx_dma_w )
 				}
 				else
 				{
-					verboselog( p_psx, 0, "dma %d unknown mode %08x\n", n_channel, dma->n_channelcontrol );
+					verboselog( p_psx, 1, "dma %d unknown mode %08x\n", n_channel, dma->n_channelcontrol );
 				}
 			}
 			else if( dma->n_channelcontrol != 0 )
@@ -523,17 +536,12 @@ WRITE32_HANDLER( psx_dma_w )
 			p_psx->n_dpcp = ( p_psx->n_dpcp & ~mem_mask ) | data;
 			break;
 		case 0x1:
-			p_psx->n_dicr = ( p_psx->n_dicr & ~mem_mask ) |
-				( mem_mask & 0x80000000 & p_psx->n_dicr ) |
-				( ~data & mem_mask & 0x7f000000 & p_psx->n_dicr ) |
-				( data & mem_mask & 0x00ffffff );
-#if 0
-			/* todo: find out whether to do this instead of dma_interrupt_update() */
-			if( ( p_psx->n_dicr & 0x7f000000 ) != 0 )
-			{
-				p_psx->n_dicr &= ~0x80000000;
-			}
-#endif
+            if (data & 0x80000000)
+            {
+                p_psx->n_dicr = ((p_psx->n_dicr &~ data) & 0xff000000) | (p_psx->n_dicr & 0x00ffffff);
+            }
+			p_psx->n_dicr = data & 0x00ffffff;
+
 			verboselog( p_psx, 1, "psx_dma_w( %04x, %08x, %08x ) dicr -> %08x\n", offset, data, mem_mask, p_psx->n_dicr );
 			dma_interrupt_update(p_psx);
 			break;
