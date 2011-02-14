@@ -670,7 +670,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 									return;
 
 								strcpy( s_name, str_name );
-								sprintf( hashdata, "c:%s#s:%s#%s", str_crc, str_sha1, ( nodump ? NO_DUMP : ( baddump ? BAD_DUMP : "" ) ) );
+								sprintf( hashdata, "%c%s%c%s%s", hash_collection::HASH_CRC, str_crc, hash_collection::HASH_SHA1, str_sha1, ( nodump ? NO_DUMP : ( baddump ? BAD_DUMP : "" ) ) );
 
 								/* Handle loadflag attribute */
 								if ( str_loadflag && !strcmp(str_loadflag, "load16_word_swap") )
@@ -1689,7 +1689,8 @@ static DEVICE_VALIDITY_CHECK( software_list )
 								}
 
 							/* make sure the hash is valid */
-							if (!hash_verify_string(data->_hashdata))
+							hash_collection hashes;
+							if (!hashes.from_internal_string(data->_hashdata))
 							{
 								mame_printf_error("%s: %s has rom '%s' with an invalid hash string '%s'\n", swlist->list_name[i], swinfo->shortname, data->_name, data->_hashdata);
 								error = TRUE;

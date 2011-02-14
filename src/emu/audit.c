@@ -22,9 +22,9 @@
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void audit_one_rom(core_options *options, const rom_entry *rom, const char *regiontag, const game_driver *gamedrv, UINT32 validation, audit_record *record);
-static void audit_one_disk(core_options *options, const rom_entry *rom, const game_driver *gamedrv, UINT32 validation, audit_record *record);
-static int rom_used_by_parent(const game_driver *gamedrv, const rom_entry *romentry, const game_driver **parent);
+static void audit_one_rom(core_options *options, const rom_entry *rom, const char *regiontag, const game_driver *gamedrv, const char *validation, audit_record *record);
+static void audit_one_disk(core_options *options, const rom_entry *rom, const game_driver *gamedrv, const char *validation, audit_record *record);
+static int rom_used_by_parent(const game_driver *gamedrv, const hash_collection &romhashes, const game_driver **parent);
 
 
 
@@ -54,7 +54,7 @@ INLINE void set_status(audit_record *record, UINT8 status, UINT8 substatus)
     images for a game
 -------------------------------------------------*/
 
-int audit_images(core_options *options, const game_driver *gamedrv, UINT32 validation, audit_record **audit)
+int audit_images(core_options *options, const game_driver *gamedrv, const char *validation, audit_record **audit)
 {
 	machine_config config(*gamedrv);
 	const rom_entry *region, *rom;
@@ -74,12 +74,16 @@ int audit_images(core_options *options, const game_driver *gamedrv, UINT32 valid
 			for (rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom))
 				if (ROMREGION_ISROMDATA(region) || ROMREGION_ISDISKDATA(region))
 				{
-					if (source_is_gamedrv && !ROM_ISOPTIONAL(rom) && !ROM_NOGOODDUMP(rom))
+					if (source_is_gamedrv && !ROM_ISOPTIONAL(rom))
 					{
-						anyrequired = TRUE;
+						hash_collection hashes(ROM_GETHASHDATA(rom));
+						if (!hashes.flag(hash_collection::FLAG_NO_DUMP))
+						{
+							anyrequired = TRUE;
 
-						if (allshared && !rom_used_by_parent(gamedrv, rom, NULL))
-							allshared = FALSE;
+							if (allshared && !rom_used_by_parent(gamedrv, hashes, NULL))
+								allshared = FALSE;
+						}
 					}
 					records++;
 				}
@@ -119,7 +123,7 @@ int audit_images(core_options *options, const game_driver *gamedrv, UINT32 valid
 						continue;
 					}
 
-					if (source_is_gamedrv && record->status != AUDIT_STATUS_NOT_FOUND && (allshared || !rom_used_by_parent(gamedrv, rom, NULL)))
+					if (source_is_gamedrv && record->status != AUDIT_STATUS_NOT_FOUND && (allshared || !rom_used_by_parent(gamedrv, record->exphashes, NULL)))
 						anyfound = TRUE;
 
 					record++;
@@ -265,13 +269,10 @@ int audit_summary(const game_driver *gamedrv, int count, const audit_record *rec
 			case SUBSTATUS_FOUND_BAD_CHECKSUM:
 				if (output)
 				{
-					char hashbuf[512];
-
+					astring tempstr;
 					mame_printf_info("INCORRECT CHECKSUM:\n");
-					hash_data_print(record->exphash, 0, hashbuf);
-					mame_printf_info("EXPECTED: %s\n", hashbuf);
-					hash_data_print(record->hash, 0, hashbuf);
-					mame_printf_info("   FOUND: %s\n", hashbuf);
+					mame_printf_info("EXPECTED: %s\n", record->exphashes.macro_string(tempstr));
+					mame_printf_info("   FOUND: %s\n", record->hashes.macro_string(tempstr));
 				}
 				break;
 
@@ -319,24 +320,20 @@ int audit_summary(const game_driver *gamedrv, int count, const audit_record *rec
     audit_one_rom - validate a single ROM entry
 -------------------------------------------------*/
 
-static void audit_one_rom(core_options *options, const rom_entry *rom, const char *regiontag, const game_driver *gamedrv, UINT32 validation, audit_record *record)
+static void audit_one_rom(core_options *options, const rom_entry *rom, const char *regiontag, const game_driver *gamedrv, const char *validation, audit_record *record)
 {
 	const game_driver *drv;
 	UINT32 crc = 0;
-	UINT8 crcs[4];
-	int has_crc;
 
 	/* fill in the record basics */
 	record->type = AUDIT_FILE_ROM;
 	record->name = ROM_GETNAME(rom);
-	record->exphash = ROM_GETHASHDATA(rom);
+	record->exphashes.from_internal_string(ROM_GETHASHDATA(rom));
 	record->length = 0;
 	record->explength = rom_file_size(rom);
 
 	/* see if we have a CRC and extract it if so */
-	has_crc = hash_data_extract_binary_checksum(record->exphash, HASH_CRC, crcs);
-	if (has_crc)
-		crc = (crcs[0] << 24) | (crcs[1] << 16) | (crcs[2] << 8) | crcs[3];
+	bool has_crc = record->exphashes.crc(crc);
 
 	/* find the file and checksum it, getting the file length along the way */
 	for (drv = gamedrv; drv != NULL; drv = driver_get_clone(drv))
@@ -351,7 +348,7 @@ static void audit_one_rom(core_options *options, const rom_entry *rom, const cha
 			filerr = file.open(drv->name, PATH_SEPARATOR, ROM_GETNAME(rom));
 		if (filerr == FILERR_NONE)
 		{
-			hash_data_copy(record->hash, file.hash_string(validation));
+			record->hashes = file.hashes(validation);
 			record->length = (UINT32)file.size();
 			break;
 		}
@@ -370,7 +367,7 @@ static void audit_one_rom(core_options *options, const rom_entry *rom, const cha
 	    	filerr = file.open(regiontag, PATH_SEPARATOR, ROM_GETNAME(rom));
 		if (filerr == FILERR_NONE)
 		{
-			hash_data_copy(record->hash, file.hash_string(validation));
+			record->hashes = file.hashes(validation);
 			record->length = (UINT32)file.size();
 		}
 	}
@@ -381,7 +378,7 @@ static void audit_one_rom(core_options *options, const rom_entry *rom, const cha
 		const game_driver *parent;
 
 		/* no good dump */
-		if (hash_data_has_info(record->exphash, HASH_INFO_NO_DUMP))
+		if (record->exphashes.flag(hash_collection::FLAG_NO_DUMP))
 			set_status(record, AUDIT_STATUS_NOT_FOUND, SUBSTATUS_NOT_FOUND_NODUMP);
 
 		/* optional ROM */
@@ -389,7 +386,7 @@ static void audit_one_rom(core_options *options, const rom_entry *rom, const cha
 			set_status(record, AUDIT_STATUS_NOT_FOUND, SUBSTATUS_NOT_FOUND_OPTIONAL);
 
 		/* not found and used by parent */
-		else if (rom_used_by_parent(gamedrv, rom, &parent))
+		else if (rom_used_by_parent(gamedrv, record->exphashes, &parent))
 			set_status(record, AUDIT_STATUS_NOT_FOUND, (parent->flags & GAME_IS_BIOS_ROOT) ? SUBSTATUS_NOT_FOUND_BIOS : SUBSTATUS_NOT_FOUND_PARENT);
 
 		/* just plain old not found */
@@ -405,15 +402,15 @@ static void audit_one_rom(core_options *options, const rom_entry *rom, const cha
 			set_status(record, AUDIT_STATUS_FOUND_INVALID, SUBSTATUS_FOUND_WRONG_LENGTH);
 
 		/* found but needs a dump */
-		else if (hash_data_has_info(record->exphash, HASH_INFO_NO_DUMP))
+		else if (record->exphashes.flag(hash_collection::FLAG_NO_DUMP))
 			set_status(record, AUDIT_STATUS_GOOD, SUBSTATUS_FOUND_NODUMP);
 
 		/* incorrect hash */
-		else if (!hash_data_is_equal(record->exphash, record->hash, 0))
+		else if (record->exphashes != record->hashes)
 			set_status(record, AUDIT_STATUS_FOUND_INVALID, SUBSTATUS_FOUND_BAD_CHECKSUM);
 
 		/* correct hash but needs a redump */
-		else if (hash_data_has_info(record->exphash, HASH_INFO_BAD_DUMP))
+		else if (record->exphashes.flag(hash_collection::FLAG_BAD_DUMP))
 			set_status(record, AUDIT_STATUS_GOOD, SUBSTATUS_GOOD_NEEDS_REDUMP);
 
 		/* just plain old good */
@@ -427,7 +424,7 @@ static void audit_one_rom(core_options *options, const rom_entry *rom, const cha
     audit_one_disk - validate a single disk entry
 -------------------------------------------------*/
 
-static void audit_one_disk(core_options *options, const rom_entry *rom, const game_driver *gamedrv, UINT32 validation, audit_record *record)
+static void audit_one_disk(core_options *options, const rom_entry *rom, const game_driver *gamedrv, const char *validation, audit_record *record)
 {
 	emu_file *source_file;
 	chd_file *source;
@@ -436,7 +433,7 @@ static void audit_one_disk(core_options *options, const rom_entry *rom, const ga
 	/* fill in the record basics */
 	record->type = AUDIT_FILE_DISK;
 	record->name = ROM_GETNAME(rom);
-	record->exphash = ROM_GETHASHDATA(rom);
+	record->exphashes.from_internal_string(ROM_GETHASHDATA(rom));
 
 	/* open the disk */
 	err = open_disk_image(*options, gamedrv, rom, &source_file, &source, NULL);
@@ -449,7 +446,7 @@ static void audit_one_disk(core_options *options, const rom_entry *rom, const ga
 			set_status(record, AUDIT_STATUS_ERROR, SUBSTATUS_ERROR);
 
 		/* not found but it's not good anyway */
-		else if (hash_data_has_info(record->exphash, HASH_INFO_NO_DUMP))
+		else if (record->exphashes.flag(hash_collection::FLAG_NO_DUMP))
 			set_status(record, AUDIT_STATUS_NOT_FOUND, SUBSTATUS_NOT_FOUND_NODUMP);
 
 		/* not found but optional */
@@ -464,25 +461,25 @@ static void audit_one_disk(core_options *options, const rom_entry *rom, const ga
 	/* if we succeeded, validate it */
 	else
 	{
-		static const UINT8 nullhash[HASH_BUF_SIZE] = { 0 };
+		static const UINT8 nullhash[20] = { 0 };
 		chd_header header = *chd_get_header(source);
 
 		/* if there's an MD5 or SHA1 hash, add them to the output hash */
 		if (memcmp(nullhash, header.md5, sizeof(header.md5)) != 0)
-			hash_data_insert_binary_checksum(record->hash, HASH_MD5, header.md5);
+			record->hashes.add_from_buffer(hash_collection::HASH_MD5, header.md5, sizeof(header.md5));
 		if (memcmp(nullhash, header.sha1, sizeof(header.sha1)) != 0)
-			hash_data_insert_binary_checksum(record->hash, HASH_SHA1, header.sha1);
+			record->hashes.add_from_buffer(hash_collection::HASH_SHA1, header.sha1, sizeof(header.sha1));
 
 		/* found but needs a dump */
-		if (hash_data_has_info(record->exphash, HASH_INFO_NO_DUMP))
+		if (record->exphashes.flag(hash_collection::FLAG_NO_DUMP))
 			set_status(record, AUDIT_STATUS_GOOD, SUBSTATUS_FOUND_NODUMP);
 
 		/* incorrect hash */
-		else if (!hash_data_is_equal(record->exphash, record->hash, 0))
+		else if (record->exphashes != record->hashes)
 			set_status(record, AUDIT_STATUS_FOUND_INVALID, SUBSTATUS_FOUND_BAD_CHECKSUM);
 
 		/* correct hash but needs a redump */
-		else if (hash_data_has_info(record->exphash, HASH_INFO_BAD_DUMP))
+		else if (record->exphashes.flag(hash_collection::FLAG_BAD_DUMP))
 			set_status(record, AUDIT_STATUS_GOOD, SUBSTATUS_GOOD_NEEDS_REDUMP);
 
 		/* just plain good */
@@ -500,9 +497,8 @@ static void audit_one_disk(core_options *options, const rom_entry *rom, const ga
     ROM is also used by the parent
 -------------------------------------------------*/
 
-static int rom_used_by_parent(const game_driver *gamedrv, const rom_entry *romentry, const game_driver **parent)
+static int rom_used_by_parent(const game_driver *gamedrv, const hash_collection &romhashes, const game_driver **parent)
 {
-	const char *hash = ROM_GETHASHDATA(romentry);
 	const game_driver *drv;
 
 	/* iterate up the parent chain */
@@ -516,7 +512,7 @@ static int rom_used_by_parent(const game_driver *gamedrv, const rom_entry *romen
 		for (const rom_source *source = rom_first_source(config); source != NULL; source = rom_next_source(*source))
 			for (region = rom_first_region(*source); region; region = rom_next_region(region))
 				for (rom = rom_first_file(region); rom; rom = rom_next_file(rom))
-					if (hash_data_is_equal(ROM_GETHASHDATA(rom), hash, 0))
+					if (hash_collection(ROM_GETHASHDATA(rom)) == romhashes)
 					{
 						if (parent != NULL)
 							*parent = drv;

@@ -113,7 +113,7 @@ typedef int (*device_image_load_func)(device_image_interface &image);
 typedef int (*device_image_create_func)(device_image_interface &image, int format_type, option_resolution *format_options);
 typedef void (*device_image_unload_func)(device_image_interface &image);
 typedef void (*device_image_display_func)(device_image_interface &image);
-typedef void (*device_image_partialhash_func)(char *, const unsigned char *, unsigned long, unsigned int);
+typedef void (*device_image_partialhash_func)(hash_collection &, const unsigned char *, unsigned long, const char *);
 typedef void (*device_image_get_devices_func)(device_image_interface &device);
 typedef bool (*device_image_softlist_load_func)(device_image_interface &image, char *swlist, char *swname, rom_entry *start_entry);
 
@@ -178,7 +178,7 @@ public:
 	static iodevice_t device_typeid(const char *name);
 
 	virtual device_image_partialhash_func get_partial_hash() const = 0;
-	virtual void device_compute_hash(char *dest, const void *data, size_t length, unsigned int functions) const;
+	virtual void device_compute_hash(hash_collection &hashes, const void *data, size_t length, const char *types) const;
 protected:
 	static const image_device_type_info *find_device_type(iodevice_t type);
 	static const image_device_type_info m_device_info_array[];
@@ -282,7 +282,7 @@ protected:
 	bool try_change_working_directory(const char *subdir);
 
 	int read_hash_config(const char *sysname);
-	void run_hash(void (*partialhash)(char *, const unsigned char *, unsigned long, unsigned int), char *dest, unsigned int hash_functions);
+	void run_hash(void (*partialhash)(hash_collection &, const unsigned char *, unsigned long, const char *), hash_collection &hashes, const char *types);
 	void image_checkhash();
 	// derived class overrides
 
@@ -328,7 +328,7 @@ protected:
 
 	object_pool *m_mempool;
 
-	astring m_hash;
+	hash_collection m_hash;
 };
 
 

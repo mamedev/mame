@@ -206,27 +206,39 @@ emu_file::operator core_file *()
 //  hash - returns the hash for a file
 //-------------------------------------------------
 
-const char *emu_file::hash_string(UINT32 functions)
+hash_collection &emu_file::hashes(const char *types)
 {
-	// if we already have the functions we need, just return
-	UINT32 wehave = hash_data_used_functions(m_hash);
-	if ((wehave & functions) == functions)
-		return m_hash;
-
-	// load the ZIP file now if we haven't yet
+	// determine which hashes we need
+	astring needed;
+	for (const char *scan = types; *scan != 0; scan++)
+		if (m_hashes.hash(*scan) == NULL)
+			needed.cat(*scan);
+	
+	// if we need nothing, skip it
+	if (!needed)
+		return m_hashes;
+	
+	// load the ZIP file if needed
 	if (m_zipfile != NULL && load_zipped_file() != FILERR_NONE)
-		return m_hash;
+		return m_hashes;
 	if (m_file == NULL)
-		return m_hash;
+		return m_hashes;
+
+	// if we have ZIP data, just hash that directly
+	if (m_zipdata != NULL)
+	{
+		m_hashes.compute(m_zipdata, m_ziplength, needed);
+		return m_hashes;
+	}
 
 	// read the data if we can
 	const UINT8 *filedata = (const UINT8 *)core_fbuffer(m_file);
 	if (filedata == NULL)
-		return m_hash;
+		return m_hashes;
 
 	// compute the hash
-	hash_compute(m_hash, filedata, core_fsize(m_file), wehave | functions);
-	return m_hash;
+	m_hashes.compute(filedata, core_fsize(m_file), needed);
+	return m_hashes;
 }
 
 
@@ -377,6 +389,10 @@ void emu_file::close()
 	if (m_remove_on_close)
 		osd_rmfile(m_fullpath);
 	m_remove_on_close = false;
+	
+	// reset our hashes and path as well
+	m_hashes.reset();
+	m_fullpath.reset();
 }
 
 
@@ -652,14 +668,8 @@ file_error emu_file::attempt_zipped()
 			m_ziplength = header->uncompressed_length;
 
 			// build a hash with just the CRC
-			hash_data_clear(m_hash);
-			UINT8 crcs[4];
-			crcs[0] = header->crc >> 24;
-			crcs[1] = header->crc >> 16;
-			crcs[2] = header->crc >> 8;
-			crcs[3] = header->crc >> 0;
-			hash_data_insert_binary_checksum(m_hash, HASH_CRC, crcs);
-
+			m_hashes.reset();
+			m_hashes.add_crc(header->crc);
 			return (m_openflags & OPEN_FLAG_NO_PRELOAD) ? FILERR_NONE : load_zipped_file();
 		}
 

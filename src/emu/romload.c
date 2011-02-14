@@ -434,7 +434,7 @@ static void handle_missing_file(rom_load_data *romdata, const rom_entry *romp)
 	}
 
 	/* no good dumps are okay */
-	else if (ROM_NOGOODDUMP(romp))
+	else if (hash_collection(ROM_GETHASHDATA(romp)).flag(hash_collection::FLAG_NO_DUMP))
 	{
 		romdata->errorstring.catprintf("%s NOT FOUND (NO GOOD DUMP KNOWN)\n", ROM_GETNAME(romp));
 		romdata->knownbad++;
@@ -455,46 +455,19 @@ static void handle_missing_file(rom_load_data *romdata, const rom_entry *romp)
     correct checksums for a given ROM
 -------------------------------------------------*/
 
-static void dump_wrong_and_correct_checksums(rom_load_data *romdata, const char *hash, const char *acthash)
+static void dump_wrong_and_correct_checksums(rom_load_data *romdata, const hash_collection &hashes, const hash_collection &acthashes)
 {
-	unsigned i;
-	char chksum[256];
-	unsigned found_functions;
-	unsigned wrong_functions;
+	astring tempstr;
+	romdata->errorstring.catprintf("    EXPECTED: %s\n", hashes.macro_string(tempstr));
+	romdata->errorstring.catprintf("       FOUND: %s\n", acthashes.macro_string(tempstr));
 
-	found_functions = hash_data_used_functions(hash) & hash_data_used_functions(acthash);
-
-	hash_data_print(hash, found_functions, chksum);
-	romdata->errorstring.catprintf("    EXPECTED: %s\n", chksum);
-
-	/* We dump informations only of the functions for which MAME provided
-        a correct checksum. Other functions we might have calculated are
-        useless here */
-	hash_data_print(acthash, found_functions, chksum);
-	romdata->errorstring.catprintf("       FOUND: %s\n", chksum);
-
-	/* For debugging purposes, we check if the checksums available in the
-       driver are correctly specified or not. This can be done by checking
-       the return value of one of the extract functions. Maybe we want to
-       activate this only in debug buils, but many developers only use
-       release builds, so I keep it as is for now. */
-	wrong_functions = 0;
-	for (i = 0; i < HASH_NUM_FUNCTIONS; i++)
-		if (hash_data_extract_printable_checksum(hash, 1 << i, chksum) == 2)
-			wrong_functions |= 1 << i;
-
-	if (wrong_functions)
-	{
-		for (i = 0; i < HASH_NUM_FUNCTIONS; i++)
-			if (wrong_functions & (1 << i))
-			{
-				romdata->errorstring.catprintf(
-					"\tInvalid %s checksum treated as 0 (check leading zeros)\n",
-					hash_function_name(1 << i));
-
-				romdata->warnings++;
-			}
-	}
+	// warn about any ill-formed hashes	
+	for (hash_base *hash = hashes.first(); hash != NULL; hash = hash->next())
+		if (hash->parse_error())
+		{
+			romdata->errorstring.catprintf("\tInvalid %s checksum treated as 0 (check leading zeros)\n", hash->name());
+			romdata->warnings++;
+		}
 }
 
 
@@ -503,20 +476,14 @@ static void dump_wrong_and_correct_checksums(rom_load_data *romdata, const char 
     and hash signatures of a file
 -------------------------------------------------*/
 
-static void verify_length_and_hash(rom_load_data *romdata, const char *name, UINT32 explength, const char *hash)
+static void verify_length_and_hash(rom_load_data *romdata, const char *name, UINT32 explength, const hash_collection &hashes)
 {
-	UINT32 actlength;
-	const char* acthash;
-
 	/* we've already complained if there is no file */
 	if (romdata->file == NULL)
 		return;
 
-	/* get the length and CRC from the file */
-	actlength = romdata->file->size();
-	acthash = romdata->file->hash_string(hash_data_used_functions(hash));
-
 	/* verify length */
+	UINT32 actlength = romdata->file->size();
 	if (explength != actlength)
 	{
 		romdata->errorstring.catprintf("%s WRONG LENGTH (expected: %08x found: %08x)\n", name, explength, actlength);
@@ -524,23 +491,23 @@ static void verify_length_and_hash(rom_load_data *romdata, const char *name, UIN
 	}
 
 	/* If there is no good dump known, write it */
-	if (hash_data_has_info(hash, HASH_INFO_NO_DUMP))
+	astring tempstr;
+	hash_collection &acthashes = romdata->file->hashes(hashes.hash_types(tempstr));
+	if (hashes.flag(hash_collection::FLAG_NO_DUMP))
 	{
 		romdata->errorstring.catprintf("%s NO GOOD DUMP KNOWN\n", name);
 		romdata->knownbad++;
 	}
 	/* verify checksums */
-	else if (!hash_data_is_equal(hash, acthash, 0))
+	else if (hashes != acthashes)
 	{
 		/* otherwise, it's just bad */
 		romdata->errorstring.catprintf("%s WRONG CHECKSUMS:\n", name);
-
-		dump_wrong_and_correct_checksums(romdata, hash, acthash);
-
+		dump_wrong_and_correct_checksums(romdata, hashes, acthashes);
 		romdata->warnings++;
 	}
 	/* If it matches, but it is actually a bad dump, write it */
-	else if (hash_data_has_info(hash, HASH_INFO_BAD_DUMP))
+	else if (hashes.flag(hash_collection::FLAG_BAD_DUMP))
 	{
 		romdata->errorstring.catprintf("%s ROM NEEDS REDUMP\n",name);
 		romdata->knownbad++;
@@ -646,17 +613,13 @@ static int open_rom_file(rom_load_data *romdata, const char *regiontag, const ro
 	file_error filerr = FILERR_NOT_FOUND;
 	UINT32 romsize = rom_file_size(romp);
 	const game_driver *drv;
-	int has_crc = FALSE;
-	UINT8 crcbytes[4];
-	UINT32 crc = 0;
 
 	/* update status display */
 	display_loading_rom_message(romdata, ROM_GETNAME(romp));
 
 	/* extract CRC to use for searching */
-	has_crc = hash_data_extract_binary_checksum(ROM_GETHASHDATA(romp), HASH_CRC, crcbytes);
-	if (has_crc)
-		crc = (crcbytes[0] << 24) | (crcbytes[1] << 16) | (crcbytes[2] << 8) | crcbytes[3];
+	UINT32 crc = 0;
+	bool has_crc = hash_collection(ROM_GETHASHDATA(romp)).crc(crc);
 
 	/* attempt reading up the chain through the parents. It automatically also
      attempts any kind of load by checksum supported by the archives. */
@@ -1006,7 +969,7 @@ static void process_rom_entries(rom_load_data *romdata, const char *regiontag, c
 				if (baserom)
 				{
 					LOG(("Verifying length (%X) and checksums\n", explength));
-					verify_length_and_hash(romdata, ROM_GETNAME(baserom), explength, ROM_GETHASHDATA(baserom));
+					verify_length_and_hash(romdata, ROM_GETNAME(baserom), explength, hash_collection(ROM_GETHASHDATA(baserom)));
 					LOG(("Verify finished\n"));
 				}
 
@@ -1148,6 +1111,7 @@ chd_error open_disk_image(core_options &options, const game_driver *gamedrv, con
 
 	/* otherwise, look at our parents for a CHD with an identical checksum */
 	/* and try to open that */
+	hash_collection romphashes(ROM_GETHASHDATA(romp));
 	for (drv = gamedrv; drv != NULL; drv = driver_get_clone(drv))
 	{
 		machine_config config(*drv);
@@ -1158,7 +1122,7 @@ chd_error open_disk_image(core_options &options, const game_driver *gamedrv, con
 
 						/* look for a differing name but with the same hash data */
 						if (strcmp(ROM_GETNAME(romp), ROM_GETNAME(rom)) != 0 &&
-							hash_data_is_equal(ROM_GETHASHDATA(romp), ROM_GETHASHDATA(rom), 0))
+							romphashes == hash_collection(ROM_GETHASHDATA(rom)))
 						{
 							/* attempt to open the properly named file, scanning up through parent directories */
 							filerr = FILERR_NOT_FOUND;
@@ -1249,7 +1213,7 @@ static void process_disk_entries(rom_load_data *romdata, const char *regiontag, 
 		/* handle files */
 		if (ROMENTRY_ISFILE(romp))
 		{
-			char acthash[HASH_BUF_SIZE];
+			hash_collection hashes(ROM_GETHASHDATA(romp));
 			open_chd chd = { 0 };
 			chd_header header;
 			chd_error err;
@@ -1271,7 +1235,7 @@ static void process_disk_entries(rom_load_data *romdata, const char *regiontag, 
 					romdata->errorstring.catprintf("%s CHD ERROR: %s\n", filename.cstr(), chd_error_string(err));
 
 				/* if this is NO_DUMP, keep going, though the system may not be able to handle it */
-				if (hash_data_has_info(ROM_GETHASHDATA(romp), HASH_INFO_NO_DUMP))
+				if (hashes.flag(hash_collection::FLAG_NO_DUMP))
 					romdata->knownbad++;
 				else if (DISK_ISOPTIONAL(romp))
 					romdata->warnings++;
@@ -1282,17 +1246,17 @@ static void process_disk_entries(rom_load_data *romdata, const char *regiontag, 
 
 			/* get the header and extract the MD5/SHA1 */
 			header = *chd_get_header(chd.origchd);
-			hash_data_clear(acthash);
-			hash_data_insert_binary_checksum(acthash, HASH_SHA1, header.sha1);
+			hash_collection acthashes;
+			acthashes.add_from_buffer(hash_collection::HASH_SHA1, header.sha1, sizeof(header.sha1));
 
 			/* verify the hash */
-			if (!hash_data_is_equal(ROM_GETHASHDATA(romp), acthash, 0))
+			if (hashes != acthashes)
 			{
 				romdata->errorstring.catprintf("%s WRONG CHECKSUMS:\n", filename.cstr());
-				dump_wrong_and_correct_checksums(romdata, ROM_GETHASHDATA(romp), acthash);
+				dump_wrong_and_correct_checksums(romdata, hashes, acthashes);
 				romdata->warnings++;
 			}
-			else if (hash_data_has_info(ROM_GETHASHDATA(romp), HASH_INFO_BAD_DUMP))
+			else if (hashes.flag(hash_collection::FLAG_BAD_DUMP))
 			{
 				romdata->errorstring.catprintf("%s CHD NEEDS REDUMP\n", filename.cstr());
 				romdata->knownbad++;

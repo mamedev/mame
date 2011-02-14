@@ -23,8 +23,8 @@
 ***************************************************************************/
 
 /* hashes to use for validation */
-#define AUDIT_VALIDATE_FAST				(HASH_CRC)
-#define AUDIT_VALIDATE_FULL				(HASH_CRC | HASH_SHA)
+#define AUDIT_VALIDATE_FAST				"R"		/* CRC only */
+#define AUDIT_VALIDATE_FULL				"RS"	/* CRC + SHA1 */
 
 /* return values from audit_verify_roms and audit_verify_samples */
 enum
@@ -83,8 +83,8 @@ struct _audit_record
 	const char *	name;					/* name of item */
 	UINT32			explength;				/* expected length of item */
 	UINT32			length;					/* actual length of item */
-	const char *	exphash;        		/* expected hash data */
-	char			hash[HASH_BUF_SIZE];	/* actual hash information */
+	hash_collection	exphashes;        		/* expected hash data */
+	hash_collection	hashes;					/* actual hash information */
 };
 
 
@@ -93,7 +93,7 @@ struct _audit_record
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-int audit_images(core_options *options, const game_driver *gamedrv, UINT32 validation, audit_record **audit);
+int audit_images(core_options *options, const game_driver *gamedrv, const char *validation, audit_record **audit);
 int audit_samples(core_options *options, const game_driver *gamedrv, audit_record **audit);
 int audit_summary(const game_driver *gamedrv, int count, const audit_record *records, int output);
 

@@ -142,16 +142,16 @@ iodevice_t device_config_image_interface::device_typeid(const char *name)
     using this device's partial hash if appropriate
 -------------------------------------------------*/
 
-void device_config_image_interface::device_compute_hash(char *dest, const void *data, size_t length, unsigned int functions) const
+void device_config_image_interface::device_compute_hash(hash_collection &hashes, const void *data, size_t length, const char *types) const
 {
 	/* retrieve the partial hash func */
 	device_image_partialhash_func partialhash = get_partial_hash();
 
 	/* compute the hash */
 	if (partialhash)
-		partialhash(dest, (const unsigned char*)data, length, functions);
+		partialhash(hashes, (const unsigned char*)data, length, types);
 	else
-		hash_compute(dest, (const unsigned char*)data, length, functions);
+		hashes.compute(reinterpret_cast<const UINT8 *>(data), length, types);
 }
 
 
@@ -505,26 +505,6 @@ void device_image_interface::image_freeptr(void *ptr)
   to be loaded
 ****************************************************************************/
 
-/*-------------------------------------------------
-    hash_data_extract_crc32 - extract crc32 value
-    from hash string
--------------------------------------------------*/
-
-static UINT32 hash_data_extract_crc32(const char *d)
-{
-	UINT32 crc = 0;
-	UINT8 crc_bytes[4];
-
-	if (hash_data_extract_binary_checksum(d, HASH_CRC, crc_bytes) == 1)
-	{
-		crc = (((UINT32) crc_bytes[0]) << 24)
-			| (((UINT32) crc_bytes[1]) << 16)
-			| (((UINT32) crc_bytes[2]) << 8)
-			| (((UINT32) crc_bytes[3]) << 0);
-	}
-	return crc;
-}
-
 int device_image_interface::read_hash_config(const char *sysname)
 {
     hash_file *hashfile = NULL;
@@ -536,7 +516,7 @@ int device_image_interface::read_hash_config(const char *sysname)
         goto done;
 
     /* look up this entry in the hash file */
-    info = hashfile_lookup(hashfile, m_hash.cstr());
+    info = hashfile_lookup(hashfile, m_hash);
 
     if (!info)
         goto done;
@@ -557,13 +537,13 @@ done:
 
 
 
-void device_image_interface::run_hash(void (*partialhash)(char *, const unsigned char *, unsigned long, unsigned int),
-    char *dest, unsigned int hash_functions)
+void device_image_interface::run_hash(void (*partialhash)(hash_collection &, const unsigned char *, unsigned long, const char *),
+    hash_collection &hashes, const char *types)
 {
     UINT32 size;
     UINT8 *buf = NULL;
 
-    *dest = '\0';
+    hashes.reset();
     size = (UINT32) length();
 
     buf = (UINT8*)malloc(size);
@@ -574,9 +554,9 @@ void device_image_interface::run_hash(void (*partialhash)(char *, const unsigned
     fread(buf, size);
 
     if (partialhash)
-        partialhash(dest, buf, size, hash_functions);
+        partialhash(hashes, buf, size, types);
     else
-        hash_compute(dest, buf, size, hash_functions);
+        hashes.compute(buf, size, types);
 
     /* cleanup */
     free(buf);
@@ -588,12 +568,11 @@ void device_image_interface::run_hash(void (*partialhash)(char *, const unsigned
 void device_image_interface::image_checkhash()
 {
     const game_driver *drv;
-    char hash_string[HASH_BUF_SIZE];
     device_image_partialhash_func partialhash;
     int rc;
 
     /* only calculate CRC if it hasn't been calculated, and the open_mode is read only */
-    if (!m_hash && !m_writeable && !m_created)
+    if (m_hash.first() == NULL && !m_writeable && !m_created)
     {
         /* do not cause a linear read of 600 megs please */
         /* TODO: use SHA/MD5 in the CHD header as the hash */
@@ -607,9 +586,7 @@ void device_image_interface::image_checkhash()
         /* retrieve the partial hash func */
         partialhash = get_partial_hash();
 
-        run_hash(partialhash, hash_string, HASH_CRC | HASH_MD5 | HASH_SHA1);
-
-        m_hash = hash_string;
+        run_hash(partialhash, m_hash, hash_collection::HASH_TYPES_ALL);
 
         /* now read the hash file */
         drv = device().machine->gamedrv;
@@ -628,8 +605,7 @@ UINT32 device_image_interface::crc()
     UINT32 crc = 0;
 
 	image_checkhash();
-    if (m_hash)
-        crc = hash_data_extract_crc32(m_hash.cstr());
+    m_hash.crc(crc);
 
     return crc;
 }

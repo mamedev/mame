@@ -189,7 +189,6 @@ struct rom_entry
 #define ROM_GETBITSHIFT(r)			((ROM_GETFLAGS(r) & ROM_BITSHIFTMASK) >> 20)
 #define ROM_INHERITSFLAGS(r)		((ROM_GETFLAGS(r) & ROM_INHERITFLAGSMASK) == ROM_INHERITFLAGS)
 #define ROM_GETBIOSFLAGS(r)			((ROM_GETFLAGS(r) & ROM_BIOSFLAGSMASK) >> 24)
-#define ROM_NOGOODDUMP(r)			(hash_data_has_info((r)->_hashdata, HASH_INFO_NO_DUMP))
 
 
 /* ----- per-disk macros ----- */
@@ -255,14 +254,6 @@ struct rom_entry
 #define DISK_IMAGE(name,idx,hash)					ROMX_LOAD(name, idx, 0, hash, DISK_READWRITE)
 #define DISK_IMAGE_READONLY(name,idx,hash)			ROMX_LOAD(name, idx, 0, hash, DISK_READONLY)
 #define DISK_IMAGE_READONLY_OPTIONAL(name,idx,hash)	ROMX_LOAD(name, idx, 0, hash, DISK_READONLY | ROM_OPTIONAL)
-
-
-/* ----- hash macros ----- */
-#define CRC(x)										"c:" #x "#"
-#define SHA1(x)										"s:" #x "#"
-#define MD5(x)										"m:" #x "#"
-#define NO_DUMP										"$ND$"
-#define BAD_DUMP									"$BD$"
 
 
 

@@ -193,12 +193,13 @@ static multicart_open_error load_rom_resource(multicart_load_state *state, xml_d
 	/* check SHA1 now */
 	if ((sha1 = xml_get_attribute_string(resource_node, "sha1", NULL)))
 	{
-		char calc_sha[256];
+		hash_collection actual_hashes;
+		actual_hashes.compute((const UINT8 *)resource->ptr, resource->length, hash_collection::HASH_TYPES_CRC_SHA1);
+		
+		hash_collection expected_hashes;
+		expected_hashes.add_from_string(hash_collection::HASH_SHA1, sha1, strlen(sha1));
 
-		memset(calc_sha, 0, sizeof(calc_sha));
-		hash_compute(&calc_sha[0], (const unsigned char*)resource->ptr, resource->length, HASH_SHA1);
-
-		if ((strncmp(sha1, &calc_sha[2], 20)))
+		if (actual_hashes != expected_hashes)
 		{
 			return MCERR_INVALID_FILE_REF;
 		}

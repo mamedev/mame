@@ -18,7 +18,7 @@ struct _hash_file
 {
 	emu_file *file;
 	object_pool *pool;
-	unsigned int functions[IO_COUNT];
+	astring functions[IO_COUNT];
 
 	hash_info **preloaded_hashes;
 	int preloaded_hash_count;
@@ -43,7 +43,7 @@ struct hash_parse_state
 	hash_file *hashfile;
 	int done;
 
-	int (*selector_proc)(hash_file *hashfile, void *param, const char *name, const char *hash);
+	int (*selector_proc)(hash_file *hashfile, void *param, const char *name, const hash_collection &hashes);
 	void (*use_proc)(hash_file *hashfile, void *param, hash_info *hi);
 	void (*error_proc)(const char *message);
 	void *param;
@@ -142,8 +142,9 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 	const char *name;
 	hash_info *hi;
 	char **text_dest;
-	char hash_string[HASH_BUF_SIZE];
-	unsigned int functions, all_functions;
+	hash_collection hashes;
+	astring all_functions;
+	char functions;
 	iodevice_t device;
 	int i;
 
@@ -164,8 +165,6 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 			{
 				// we are now examining a hash tag
 				name = NULL;
-				memset(hash_string, 0, sizeof(hash_string));
-				all_functions = 0;
 				device = IO_COUNT;
 
 				while(attributes[0])
@@ -179,17 +178,17 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					else if (!strcmp(attributes[0], "crc32"))
 					{
 						/* crc32 attribute */
-						functions = HASH_CRC;
+						functions = hash_collection::HASH_CRC;
 					}
 					else if (!strcmp(attributes[0], "md5"))
 					{
 						/* md5 attribute */
-						functions = HASH_MD5;
+						functions = hash_collection::HASH_MD5;
 					}
 					else if (!strcmp(attributes[0], "sha1"))
 					{
 						/* sha1 attribute */
-						functions = HASH_SHA1;
+						functions = hash_collection::HASH_SHA1;
 					}
 					else if (!strcmp(attributes[0], "type"))
 					{
@@ -208,23 +207,19 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 
 					if (functions)
 					{
-						hash_data_insert_printable_checksum(hash_string, functions, attributes[1]);
-						all_functions |= functions;
+						hashes.add_from_string(functions, attributes[1], strlen(attributes[1]));
+						all_functions.cat(functions);
 					}
 
 					attributes += 2;
 				}
 
-				if (device == IO_COUNT)
-				{
-					for (i = 0; i < IO_COUNT; i++)
-						state->hashfile->functions[i] |= all_functions;
-				}
-				else
-					state->hashfile->functions[device] |= all_functions;
+				for (i = 0; i < IO_COUNT; i++)
+					if (i == device || device == IO_COUNT)
+						state->hashfile->functions[i] = all_functions;
 
 				/* do we use this hash? */
-				if (!state->selector_proc || state->selector_proc(state->hashfile, state->param, name, hash_string))
+				if (!state->selector_proc || state->selector_proc(state->hashfile, state->param, name, hashes))
 				{
 					hi = (hash_info*)pool_malloc_lib(state->hashfile->pool, sizeof(hash_info));
 					if (!hi)
@@ -235,7 +230,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					if (!hi->longname)
 						return;
 
-					strcpy(hi->hash, hash_string);
+					hi->hashes = hashes;
 					state->hi = hi;
 				}
 			}
@@ -331,7 +326,7 @@ static void data_handler(void *data, const XML_Char *s, int len)
 -------------------------------------------------*/
 
 static void hashfile_parse(hash_file *hashfile,
-	int (*selector_proc)(hash_file *hashfile, void *param, const char *name, const char *hash),
+	int (*selector_proc)(hash_file *hashfile, void *param, const char *name, const hash_collection &hashes),
 	void (*use_proc)(hash_file *hashfile, void *param, hash_info *hi),
 	void (*error_proc)(const char *message),
 	void *param)
@@ -469,15 +464,14 @@ void hashfile_close(hash_file *hashfile)
 
 struct hashlookup_params
 {
-	const char *hash;
+	hash_collection hashes;
 	hash_info *hi;
 };
 
-static int singular_selector_proc(hash_file *hashfile, void *param, const char *name, const char *hash)
+static int singular_selector_proc(hash_file *hashfile, void *param, const char *name, const hash_collection &hashes)
 {
 	struct hashlookup_params *hlparams = (struct hashlookup_params *) param;
-	return hash_data_is_equal(hash, hlparams->hash,
-		hash_data_used_functions(hash)) == 1;
+	return (hashes == hlparams->hashes);
 }
 
 
@@ -498,17 +492,17 @@ static void singular_use_proc(hash_file *hashfile, void *param, hash_info *hi)
     hashfile_lookup
 -------------------------------------------------*/
 
-const hash_info *hashfile_lookup(hash_file *hashfile, const char *hash)
+const hash_info *hashfile_lookup(hash_file *hashfile, const hash_collection &hashes)
 {
 	struct hashlookup_params param;
 	int i;
 
-	param.hash = hash;
+	param.hashes = hashes;
 	param.hi = NULL;
 
 	for (i = 0; i < hashfile->preloaded_hash_count; i++)
 	{
-		if (singular_selector_proc(hashfile, &param, NULL, hashfile->preloaded_hashes[i]->hash))
+		if (singular_selector_proc(hashfile, &param, NULL, hashfile->preloaded_hashes[i]->hashes))
 			return hashfile->preloaded_hashes[i];
 	}
 
@@ -523,7 +517,7 @@ const hash_info *hashfile_lookup(hash_file *hashfile, const char *hash)
     hashfile_functions_used
 -------------------------------------------------*/
 
-unsigned int hashfile_functions_used(hash_file *hashfile, iodevice_t devtype)
+const char *hashfile_functions_used(hash_file *hashfile, iodevice_t devtype)
 {
 	assert(devtype >= 0);
 	assert(devtype < IO_COUNT);

@@ -20,7 +20,7 @@
 typedef struct _hash_info hash_info;
 struct _hash_info
 {
-	char hash[HASH_BUF_SIZE];
+	hash_collection hashes;
 	const char *longname;
 	const char *manufacturer;
 	const char *year;
@@ -46,13 +46,13 @@ hash_file *hashfile_open(core_options &options, const char *sysname, int is_prel
 void hashfile_close(hash_file *hashfile);
 
 /* looks up information in a hash file */
-const hash_info *hashfile_lookup(hash_file *hashfile, const char *hash);
+const hash_info *hashfile_lookup(hash_file *hashfile, const hash_collection &hashes);
 
 /* performs a syntax check on a hash file */
 int hashfile_verify(const char *sysname, void (*error_proc)(const char *message));
 
 /* returns the functions used in this hash file */
-unsigned int hashfile_functions_used(hash_file *hashfile, iodevice_t devtype);
+const char *hashfile_functions_used(hash_file *hashfile, iodevice_t devtype);
 
 
 #endif /* __HASHFILE_H__ */

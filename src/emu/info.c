@@ -452,11 +452,11 @@ static void print_game_bios(FILE *out, const game_driver *game)
     parent set
 -------------------------------------------------*/
 
-static const char *get_merge_name(const rom_entry *rom, int parents, const parent_info **pinfoarray)
+static const char *get_merge_name(const hash_collection &romhashes, int parents, const parent_info **pinfoarray)
 {
 	int parent;
 	const char *merge_name = NULL;
-
+	
 	for (parent = 0; parent < parents; ++parent)
 	{
 		const machine_config *pconfig = &pinfoarray[parent]->mconfig;
@@ -467,7 +467,7 @@ static const char *get_merge_name(const rom_entry *rom, int parents, const paren
 		for (psource = rom_first_source(*pconfig); psource != NULL; psource = rom_next_source(*psource))
 			for (pregion = rom_first_region(*psource); pregion != NULL; pregion = rom_next_region(pregion))
 				for (prom = rom_first_file(pregion); prom != NULL; prom = rom_next_file(prom))
-					if (hash_data_is_equal(ROM_GETHASHDATA(rom), ROM_GETHASHDATA(prom), 0))
+					if (romhashes == hash_collection(ROM_GETHASHDATA(prom)))
 					{
 						merge_name = ROM_GETNAME(prom);
 						break;
@@ -528,9 +528,10 @@ static void print_game_rom(FILE *out, const game_driver *game, const machine_con
 						continue;
 
 					/* if we have a valid ROM and we are a clone, see if we can find the parent ROM */
-					if (!ROM_NOGOODDUMP(rom) && parents > 0)
+					hash_collection hashes(ROM_GETHASHDATA(rom));
+					if (!hashes.flag(hash_collection::FLAG_NO_DUMP) && parents > 0)
 					{
-						merge_name = get_merge_name(rom, parents, pinfoarray);
+						merge_name = get_merge_name(hashes, parents, pinfoarray);
 					}
 
 					/* scan for a BIOS name */
@@ -565,24 +566,21 @@ static void print_game_rom(FILE *out, const game_driver *game, const machine_con
 						fprintf(out, " size=\"%d\"", rom_file_size(rom));
 
 					/* dump checksum information only if there is a known dump */
-					if (!hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_NO_DUMP))
+					if (!hashes.flag(hash_collection::FLAG_NO_DUMP))
 					{
-						char checksum[HASH_BUF_SIZE];
-						int hashtype;
-
 						/* iterate over hash function types and print out their values */
-						for (hashtype = 0; hashtype < HASH_NUM_FUNCTIONS; hashtype++)
-							if (hash_data_extract_printable_checksum(ROM_GETHASHDATA(rom), 1 << hashtype, checksum))
-								fprintf(out, " %s=\"%s\"", hash_function_name(1 << hashtype), checksum);
+						astring tempstr;
+						for (hash_base *hash = hashes.first(); hash != NULL; hash = hash->next())
+							fprintf(out, " %s=\"%s\"", hash->name(), hash->string(tempstr));
 					}
 
 					/* append a region name */
 					fprintf(out, " region=\"%s\"", ROMREGION_GETTAG(region));
 
 					/* add nodump/baddump flags */
-					if (hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_NO_DUMP))
+					if (hashes.flag(hash_collection::FLAG_NO_DUMP))
 						fprintf(out, " status=\"nodump\"");
-					if (hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_BAD_DUMP))
+					if (hashes.flag(hash_collection::FLAG_BAD_DUMP))
 						fprintf(out, " status=\"baddump\"");
 
 					/* for non-disk entries, print offset */

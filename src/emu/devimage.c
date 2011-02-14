@@ -313,13 +313,10 @@ bool legacy_image_device_base::load_software(char *swlist, char *swname, rom_ent
 			/* handle files */
 			if (ROMENTRY_ISFILE(romp))
 			{
-				UINT32 crc = 0;
-				UINT8 crcbytes[4];
 				file_error filerr = FILERR_NOT_FOUND;
 
-				bool has_crc = hash_data_extract_binary_checksum(ROM_GETHASHDATA(romp), HASH_CRC, crcbytes);
-				if (has_crc)
-					crc = (crcbytes[0] << 24) | (crcbytes[1] << 16) | (crcbytes[2] << 8) | crcbytes[3];
+				UINT32 crc = 0;
+				bool has_crc = hash_collection(ROM_GETHASHDATA(romp)).crc(crc);
 
 				// attempt reading up the chain through the parents and create a locationtag astring in the format
 				// " swlist % clonename % parentname "

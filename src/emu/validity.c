@@ -523,7 +523,6 @@ static bool validate_roms(const machine_config &config, region_array *rgninfo, g
 			/* if this is a file, make sure it is properly formatted */
 			else if (ROMENTRY_ISFILE(romp))
 			{
-				const char *hash;
 				const char *s;
 
 				items_since_region++;
@@ -541,10 +540,10 @@ static bool validate_roms(const machine_config &config, region_array *rgninfo, g
 					}
 
 				/* make sure the hash is valid */
-				hash = ROM_GETHASHDATA(romp);
-				if (!hash_verify_string(hash))
+				hash_collection hashes;
+				if (!hashes.from_internal_string(ROM_GETHASHDATA(romp)))
 				{
-					mame_printf_error("%s: rom '%s' has an invalid hash string '%s'\n", driver.name, last_name, hash);
+					mame_printf_error("%s: rom '%s' has an invalid hash string '%s'\n", driver.name, last_name, ROM_GETHASHDATA(romp));
 					error = true;
 				}
 			}

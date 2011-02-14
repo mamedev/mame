@@ -62,6 +62,7 @@
 
 // emulator-specific utilities
 #include "attotime.h"
+#include "hash.h"
 #include "fileio.h" // remove me once NVRAM is implemented as device
 #include "tokenize.h"
 #include "delegate.h"

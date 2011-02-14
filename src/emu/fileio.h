@@ -151,7 +151,7 @@ public:
 	const char *filename() const { return m_filename; }
 	const char *fullpath() const { return m_fullpath; }
 	UINT32 openflags() const { return m_openflags; }
-	const char *hash_string(UINT32 functions);
+	hash_collection &hashes(const char *types);
 
 	// setters
 	void remove_on_close() { m_remove_on_close = true; }
@@ -203,7 +203,7 @@ private:
 	path_iterator	m_iterator;						// iterator for paths
 	UINT32			m_crc;							// iterator for paths
 	UINT32			m_openflags;					// flags we used for the open
-	char			m_hash[HASH_BUF_SIZE];			// hash data for the file
+	hash_collection m_hashes;						// collection of hashes
 	zip_file *		m_zipfile;						// ZIP file pointer
 	UINT8 *			m_zipdata;						// ZIP file data
 	UINT64			m_ziplength;					// ZIP file length
