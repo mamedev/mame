@@ -114,7 +114,6 @@ DRIVER_INIT(prikura)
 
 	minit_boost = sinit_boost = 0;
 	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(50);
-
 }
 
 DRIVER_INIT(hanagumi)
@@ -272,7 +271,6 @@ DRIVER_INIT( danchih )
 	DRIVER_INIT_CALL(stv);
 
 	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(5);
-
 }
 
 /*
@@ -336,7 +334,6 @@ DRIVER_INIT(sandor)
 
 	DRIVER_INIT_CALL(stv);
 	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(1);
-
 }
 
 DRIVER_INIT(grdforce)
@@ -367,7 +364,6 @@ DRIVER_INIT(colmns97)
 	DRIVER_INIT_CALL(stv);
 
 	minit_boost = sinit_boost = 0;
-
 }
 
 DRIVER_INIT(winterht)
@@ -420,7 +416,6 @@ DRIVER_INIT(othellos)
 	DRIVER_INIT_CALL(stv);
 
 	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(50);
-
 }
 
 DRIVER_INIT(sasissu)
@@ -489,7 +484,6 @@ DRIVER_INIT(finlarch)
 	sh2drc_add_pcflush(machine->device("maincpu"), 0x6064d60);
 
 	DRIVER_INIT_CALL(stv);
-
 }
 
 DRIVER_INIT(maruchan)
@@ -525,7 +519,6 @@ DRIVER_INIT(elandore)
 
 	DRIVER_INIT_CALL(stv);
 	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(0);
-
 }
 
 DRIVER_INIT(rsgun)
@@ -537,8 +530,7 @@ DRIVER_INIT(rsgun)
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(20);
-
+	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(10);
 }
 
 DRIVER_INIT(ffreveng)
