@@ -41,7 +41,6 @@
 #include "ui.h"
 #include "pool.h"
 #include "zippath.h"
-#include "hashfile.h"
 
 
 //**************************************************************************
@@ -505,38 +504,6 @@ void device_image_interface::image_freeptr(void *ptr)
   to be loaded
 ****************************************************************************/
 
-int device_image_interface::read_hash_config(const char *sysname)
-{
-    hash_file *hashfile = NULL;
-    const hash_info *info = NULL;
-
-    /* open the hash file */
-    hashfile = hashfile_open(device().machine->options(), sysname, FALSE, NULL);
-    if (!hashfile)
-        goto done;
-
-    /* look up this entry in the hash file */
-    info = hashfile_lookup(hashfile, m_hash);
-
-    if (!info)
-        goto done;
-
-    /* copy the relevant entries */
-    m_longname     = info->longname        ? astring(info->longname)	  : "";
-    m_manufacturer = info->manufacturer    ? astring(info->manufacturer)  : "";
-    m_year         = info->year            ? astring(info->year)          : "";
-    m_playable     = info->playable        ? astring(info->playable)      : "";
-    m_pcb          = info->pcb             ? astring(info->pcb)           : "";
-    m_extrainfo    = info->extrainfo       ? astring(info->extrainfo)     : "";
-
-done:
-    if (hashfile != NULL)
-        hashfile_close(hashfile);
-    return !hashfile || !info;
-}
-
-
-
 void device_image_interface::run_hash(void (*partialhash)(hash_collection &, const unsigned char *, unsigned long, const char *),
     hash_collection &hashes, const char *types)
 {
@@ -567,9 +534,7 @@ void device_image_interface::run_hash(void (*partialhash)(hash_collection &, con
 
 void device_image_interface::image_checkhash()
 {
-    const game_driver *drv;
     device_image_partialhash_func partialhash;
-    int rc;
 
     /* only calculate CRC if it hasn't been calculated, and the open_mode is read only */
     if (m_hash.first() == NULL && !m_writeable && !m_created)
@@ -587,15 +552,6 @@ void device_image_interface::image_checkhash()
         partialhash = get_partial_hash();
 
         run_hash(partialhash, m_hash, hash_collection::HASH_TYPES_ALL);
-
-        /* now read the hash file */
-        drv = device().machine->gamedrv;
-        do
-        {
-            rc = read_hash_config(drv->name);
-            drv = driver_get_compatible(drv);
-        }
-        while(rc && (drv != NULL));
     }
     return;
 }

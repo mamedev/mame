@@ -404,10 +404,12 @@ astring *image_info_astring(running_machine *machine, astring *string)
 				astring_catprintf(string,"\n");
 			}
 
-			/* display playable information, if available */
-			info = image->playable();
-			if (info != NULL)
-				astring_catprintf(string, "%s\n", info);
+			/* display supported information, if available */
+			switch(image->supported()) {
+				case SOFTWARE_SUPPORTED_NO : astring_catprintf(string, "Not supported\n"); break;
+				case SOFTWARE_SUPPORTED_PARTIAL : astring_catprintf(string, "Partialy supported\n"); break;
+				default : break;
+			}
 
 			if (base_filename_noextension != NULL)
 				free(base_filename_noextension);

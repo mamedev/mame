@@ -248,9 +248,7 @@ public:
 	const char* longname() { return m_longname; }
 	const char* manufacturer() { return m_manufacturer; }
 	const char* year() { return m_year; }
-	const char* playable() { return m_playable; }
-	const char* pcb() { return m_pcb; }
-	const char* extrainfo() { return m_extrainfo; }
+	UINT32 supported() { return m_supported; }
 
 	const software_info *software_entry() { return m_software_info_ptr; }
 	const software_part *part_entry() { return m_software_part_ptr; }
@@ -268,6 +266,7 @@ public:
 	void image_freeptr(void *ptr);
 
 	UINT32 crc();
+	hash_collection& hash() { return m_hash; }
 
 	void battery_load(void *buffer, int length, int fill);
 	void battery_save(const void *buffer, int length);
@@ -313,9 +312,7 @@ protected:
 	astring m_longname;
 	astring m_manufacturer;
 	astring m_year;
-	astring m_playable;
-    astring m_pcb;
-    astring m_extrainfo;
+	UINT32  m_supported;
 
     /* flags */
     bool m_writeable;

@@ -41,7 +41,6 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "devlegcy.h"
-#include "hashfile.h"
 #include "zippath.h"
 
 
@@ -603,8 +602,6 @@ void legacy_image_device_base::clear()
     m_longname.reset();
     m_manufacturer.reset();
     m_year.reset();
-    m_playable.reset();
-    m_extrainfo.reset();
 	m_basename.reset();
     m_basename_noext.reset();
 	m_filetype.reset();
