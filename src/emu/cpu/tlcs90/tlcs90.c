@@ -21,6 +21,7 @@ typedef enum	{
 	MODE_MI16,	MODE_MR16,	MODE_MR16D8,	MODE_MR16R8,
 	MODE_R16D8,	MODE_R16R8
 }	e_mode;
+ALLOW_SAVE_TYPE(e_mode); // allow save_item on a non-fundamental type
 
 typedef UINT16 e_r;
 
