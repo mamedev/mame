@@ -49,6 +49,7 @@ struct _Sample
 };
 
 typedef enum {ATTACK,DECAY1,DECAY2,RELEASE} _STATE;
+ALLOW_SAVE_TYPE(_STATE); // allow save_item on a non-fundamental type
 struct _EG
 {
 	int volume;	//
