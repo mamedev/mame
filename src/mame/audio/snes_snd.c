@@ -165,6 +165,8 @@ typedef enum                        /* ADSR state type              */
 	RELEASE
 } env_state_t32;
 
+ALLOW_SAVE_TYPE(env_state_t32);
+
 typedef struct                      /* Voice state type             */
 {
 	UINT16          mem_ptr;        /* Sample data memory pointer   */
@@ -181,8 +183,8 @@ typedef struct                      /* Voice state type             */
 	int             range;          /* Last header's range          */
 	UINT32          samp_id;        /* Sample ID#                   */
 	int             sampptr;        /* Where in sampbuf we are      */
-	signed long     smp1;           /* Last sample (for BRR filter) */
-	signed long     smp2;           /* Second-to-last sample decoded*/
+	INT32           smp1;           /* Last sample (for BRR filter) */
+	INT32           smp2;           /* Second-to-last sample decoded*/
 	short           sampbuf[4];   /* Buffer for Gaussian interp   */
 } voice_state_type;
 
