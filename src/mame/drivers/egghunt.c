@@ -51,10 +51,6 @@ public:
 	egghunt_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	/* memory pointers */
-	UINT8 *   spram;
-//  UINT8 *   paletteram;   // currently this uses generic palette handling
-
 	/* video-related */
 	tilemap_t   *bg_tilemap;
 	UINT8     vidram_bank;
@@ -67,8 +63,9 @@ public:
 	device_t *audiocpu;
 
 	/* memory */
+	UINT8 *   atram;
 	UINT8     bgram[0x1000];
-	UINT8     atram[0x1000];
+	UINT8     spram[0x1000];
 };
 
 
