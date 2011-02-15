@@ -271,6 +271,7 @@ a tilemap-like structure, from which data is copied)
 #include "sound/sn76496.h"
 #include "imagedev/chd_cd.h"
 #include "includes/megadriv.h"
+#include "machine/nvram.h"
 
 
 #define MEGADRIV_VDP_VRAM(address) megadrive_vdp_vram[(address)&0x7fff]
@@ -390,8 +391,10 @@ static bitmap_t* render_bitmap;
 /* Sega CD stuff */
 static int sega_cd_connected = 0x00;
 UINT16 segacd_irq_mask;
-
-
+static UINT16 *segacd_backupram;
+static timer_device *stopwatch_timer;
+static UINT8 segacd_font_color;
+static UINT16* segacd_font_bits;
 
 
 
@@ -5036,30 +5039,35 @@ static READ16_HANDLER( segacd_comms_flags_r )
 
 static WRITE16_HANDLER( segacd_comms_flags_subcpu_w )
 {
+	if (ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15)
+	{
+		printf("sub cpu attempting to word write data to comms flags %04x!\n",data);
+	}
+
 	if (ACCESSING_BITS_0_7)
 	{
 		segacd_comms_flags = (segacd_comms_flags & 0xff00) | (data & 0x00ff);
 		space->machine->scheduler().synchronize();
 	}
 
-	if (ACCESSING_BITS_8_15)
+	if (ACCESSING_BITS_8_15) // Dragon's Lair
 	{
-		if (data & 0xff00)
-		{
-			printf("sub cpu attempting to write non-zero data to read-only comms flags!\n");
-		}
+		segacd_comms_flags = (segacd_comms_flags & 0xff00) | ((data >> 8) & 0x00ff);
+		space->machine->scheduler().synchronize();
 	}
 }
 
 static WRITE16_HANDLER( segacd_comms_flags_maincpu_w )
 {
+	if (ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15)
+	{
+		printf("main cpu attempting to word write data to comms flags %04x!\n",data);
+	}
+
 	if (ACCESSING_BITS_0_7)
 	{
-		if (data & 0x00ff)
-		{
-			printf("main cpu attempting to write non-zero data to read-only comms flags!\n");
-		}
-
+		segacd_comms_flags = (segacd_comms_flags & 0x00ff) | ((data << 8) & 0xff00);
+		space->machine->scheduler().synchronize();
 	}
 
 	if (ACCESSING_BITS_8_15)
@@ -5907,6 +5915,7 @@ static MACHINE_RESET( segacd )
 	segacd_dmna_ret_timer->adjust(attotime::zero);
 
 	hock_cmd = 0;
+	stopwatch_timer = machine->device<timer_device>("sw_timer");
 }
 
 
@@ -6439,14 +6448,17 @@ static TIMER_CALLBACK( segacd_irq3_timer_callback )
 
 WRITE16_HANDLER( segacd_stopwatch_timer_w )
 {
-	printf("Stopwatch timer %04x\n",data);
+	if(data == 0)
+		stopwatch_timer->reset();
+	else
+		printf("Stopwatch timer %04x\n",data);
 }
 
 READ16_HANDLER( segacd_stopwatch_timer_r )
 {
-	printf("Stopwatch timer read\n");
+	INT32 result = (stopwatch_timer->time_elapsed() * ATTOSECONDS_TO_HZ(ATTOSECONDS_IN_USEC(30.72))).as_double();
 
-	return space->machine->rand();
+	return result & 0xfff;
 }
 
 READ16_HANDLER( cdc_dmaaddr_r )
@@ -6482,13 +6494,61 @@ WRITE16_HANDLER( segacd_cdfader_w )
 	cdda_set_volume(space->machine->device("cdda"), cdfader_vol);
 }
 
+READ16_HANDLER( segacd_backupram_r )
+{
+	if(ACCESSING_BITS_8_15 && !(space->debugger_access()))
+		printf("Warning: read to backupram even bytes! [%04x]\n",offset);
+
+	return segacd_backupram[offset] & 0xff;
+}
+
+WRITE16_HANDLER( segacd_backupram_w )
+{
+	if(ACCESSING_BITS_0_7)
+		segacd_backupram[offset] = data;
+
+	if(ACCESSING_BITS_8_15 && !(space->debugger_access()))
+		printf("Warning: write to backupram even bytes! [%04x] %02x\n",offset,data);
+}
+
+READ16_HANDLER( segacd_font_color_r )
+{
+	return segacd_font_color;
+}
+
+WRITE16_HANDLER( segacd_font_color_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		segacd_font_color = data & 0xff;
+	}
+}
+
+READ16_HANDLER( segacd_font_converted_r )
+{
+	int scbg = (segacd_font_color & 0x0f);
+	int scfg = (segacd_font_color & 0xf0)>>4;
+	UINT16 retdata = 0;
+	int bit;
+
+	for (bit=0;bit<4;bit++)
+	{
+		if (*segacd_font_bits&((0x1000>>offset*4)<<bit))
+			retdata |= scfg << (bit*4);
+		else
+			retdata |= scbg << (bit*4);
+	}
+
+	return retdata;
+}
+
 static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE(&segacd_4meg_prgram)
 
 	AM_RANGE(0x080000, 0x0bffff) AM_READWRITE(segacd_sub_dataram_part1_r, segacd_sub_dataram_part1_w) AM_BASE(&segacd_dataram)
 	AM_RANGE(0x0c0000, 0x0dffff) AM_READWRITE(segacd_sub_dataram_part2_r, segacd_sub_dataram_part2_w) AM_BASE(&segacd_dataram2)
 
-	AM_RANGE(0xfe0000, 0xfe3fff) AM_RAM // backup RAM, odd bytes only!
+	AM_RANGE(0xfe0000, 0xfe3fff) AM_READWRITE(segacd_backupram_r,segacd_backupram_w) AM_SHARE("backupram") AM_BASE(&segacd_backupram)// backup RAM, odd bytes only!
 
 	AM_RANGE(0xff0000, 0xff001f) AM_DEVWRITE8("rfsnd", rf5c68_w, 0x00ff)  // PCM, RF5C164
 	AM_RANGE(0xff0020, 0xff003f) AM_DEVREAD8("rfsnd", rf5c68_r, 0x00ff)
@@ -6512,9 +6572,9 @@ static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8036, 0xff8037) AM_READWRITE(segacd_cdd_ctrl_r,segacd_cdd_ctrl_w)
 	AM_RANGE(0xff8038, 0xff8041) AM_READ8(segacd_cdd_rx_r,0xffff)
 	AM_RANGE(0xff8042, 0xff804b) AM_WRITE8(segacd_cdd_tx_w,0xffff)
-//  AM_RANGE(0xff804c, 0xff804d) // Font Color
-//  AM_RANGE(0xff804e, 0xff804f) // Font bit
-//  AM_RANGE(0xff8050, 0xff8057) // Font data (read only)
+	AM_RANGE(0xff804c, 0xff804d) AM_READWRITE(segacd_font_color_r, segacd_font_color_w)
+	AM_RANGE(0xff804e, 0xff804f) AM_RAM AM_BASE(&segacd_font_bits)
+	AM_RANGE(0xff8050, 0xff8057) AM_READ(segacd_font_converted_r)
 	AM_RANGE(0xff8058, 0xff8059) AM_READWRITE(segacd_stampsize_r, segacd_stampsize_w) // Stamp size
 	AM_RANGE(0xff805a, 0xff805b) AM_READWRITE(segacd_stampmap_base_address_r, segacd_stampmap_base_address_w) // Stamp map base address
 	AM_RANGE(0xff805c, 0xff805d) AM_READWRITE(segacd_imagebuffer_vcell_size_r, segacd_imagebuffer_vcell_size_w)// Image buffer V cell size
@@ -9482,6 +9542,10 @@ MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
 
 	MCFG_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(segacd_map)
+
+	MCFG_TIMER_ADD("sw_timer", NULL) //stopwatch timer
+
+	MCFG_NVRAM_ADD_0FILL("backupram")
 
 	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.50 ) // TODO: accurate volume balance
