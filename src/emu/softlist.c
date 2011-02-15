@@ -726,7 +726,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 							return;
 
 						strcpy( s_name, str_name );
-						sprintf( hashdata, "s:%s#%s", str_sha1, ( nodump ? NO_DUMP : ( baddump ? BAD_DUMP : "" ) ) );
+						sprintf( hashdata, "%c%s%s", hash_collection::HASH_SHA1, str_sha1, ( nodump ? NO_DUMP : ( baddump ? BAD_DUMP : "" ) ) );
 
 						add_rom_entry( swlist, s_name, hashdata, 0, 0, ROMENTRYTYPE_ROM | (writeable ? DISK_READWRITE : DISK_READONLY ) );
 					}
