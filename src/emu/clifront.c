@@ -1542,9 +1542,9 @@ static void match_roms(core_options *options, const hash_collection &hashes, int
 				for (rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 				{
 					hash_collection romhashes(ROM_GETHASHDATA(rom));
-					if (hashes == romhashes)
+					if (!romhashes.flag(hash_collection::FLAG_NO_DUMP) && hashes == romhashes)
 					{
-						bool baddump = romhashes.flag(hash_collection::FLAG_NO_DUMP);
+						bool baddump = romhashes.flag(hash_collection::FLAG_BAD_DUMP);
 
 						/* output information about the match */
 						if (*found != 0)
