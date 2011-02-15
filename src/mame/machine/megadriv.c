@@ -4178,11 +4178,13 @@ void CDD_GetTrackPos(void)
 	int elapsedlba;
 	UINT32 msf;
 	CDD_STATUS &= 0xFF;
+	//	UINT32 end_msf = ;
 	if(segacd.cd == NULL) // no cd is there, bail out
 		return;
 	CDD_STATUS |= SCD_STATUS;
-	elapsedlba = SCD_CURLBA - cdrom_get_track_start(segacd.cd, SCD_CURTRK);
-	msf = lba_to_msf_alt (elapsedlba+150);
+	elapsedlba = SCD_CURLBA - segacd.toc->tracks[ cdrom_get_track(segacd.cd, SCD_CURLBA) ].physframeofs;
+	msf = lba_to_msf_alt (elapsedlba);
+	//popmessage("%08x %08x",SCD_CURLBA,segacd.toc->tracks[ cdrom_get_track(segacd.cd, SCD_CURLBA) + 1 ].physframeofs);
 	CDD_MIN = to_bcd(((msf & 0x00ff0000)>>16),false);
 	CDD_SEC = to_bcd(((msf & 0x0000ff00)>>8),false);
 	CDD_FRAME = to_bcd(((msf & 0x000000ff)>>0),false);
@@ -4206,9 +4208,13 @@ void CDD_Length(void)
 	if(segacd.cd == NULL) // no cd is there, bail out
 		return;
 	CDD_STATUS |= SCD_STATUS;
-	CDD_MIN = 259; 	// HACK!!!!
-	CDD_SEC = 258; 	// HACK!!!!
-	CDD_FRAME = 257; 	// HACK!!!!
+
+	UINT32 startlba = (segacd.toc->tracks[cdrom_get_last_track(segacd.cd)].physframeofs);
+	UINT32 startmsf = lba_to_msf_alt( startlba );
+
+	CDD_MIN = to_bcd((startmsf&0x00ff0000)>>16,false);
+	CDD_SEC = to_bcd((startmsf&0x0000ff00)>>8,false);
+	CDD_FRAME = to_bcd((startmsf&0x000000ff)>>0,false);
 }
 
 
@@ -4220,7 +4226,7 @@ void CDD_FirstLast(void)
 		return;
 	CDD_STATUS |= SCD_STATUS;
 	CDD_MIN = 1; // first
-	CDD_SEC = to_bcd(cdrom_get_last_track(segacd.cd)+1,false); // last
+	CDD_SEC = to_bcd(cdrom_get_last_track(segacd.cd),false); // last
 }
 
 void CDD_GetTrackAdr(void)
@@ -4228,7 +4234,7 @@ void CDD_GetTrackAdr(void)
 	CLEAR_CDD_RESULT
 
 	int track = (CDD_TX[4] & 0xF) + (CDD_TX[5] & 0xF) * 10;
-	int last_track = cdrom_get_last_track(segacd.cd)+1;
+	int last_track = cdrom_get_last_track(segacd.cd);
 
 	CDD_STATUS &= 0xFF;
 	if(segacd.cd == NULL) // no cd is there, bail out
@@ -4306,8 +4312,8 @@ void CDD_Pause(running_machine *machine)
 	SET_CDD_DATA_MODE
 
 	//segacd.current_frame = cdda_get_audio_lba( machine->device( "cdda" ) );
-	if(!(CURRENT_TRACK_IS_DATA))
-		cdda_pause_audio( machine->device( "cdda" ), 1 );
+	//if(!(CURRENT_TRACK_IS_DATA))
+	cdda_pause_audio( machine->device( "cdda" ), 1 );
 }
 
 void CDD_Resume(running_machine *machine)
@@ -4320,8 +4326,8 @@ void CDD_Resume(running_machine *machine)
 	set_data_audio_mode();
 	CDD_MIN = to_bcd (SCD_CURTRK, false);
 	SET_CDC_READ
-	if(!(CURRENT_TRACK_IS_DATA))
-		cdda_pause_audio( machine->device( "cdda" ), 0 );
+	//if(!(CURRENT_TRACK_IS_DATA))
+	cdda_pause_audio( machine->device( "cdda" ), 0 );
 }
 
 
@@ -4639,7 +4645,7 @@ void CDD_Handle_TOC_Commands(void)
 	{
 		case TOCCMD_CURPOS:	   CDD_GetPos();	  break;
 		case TOCCMD_TRKPOS:	   CDD_GetTrackPos(); break;
-		case TOCCMD_CURTRK:    CDD_GetTrack ();   break;
+		case TOCCMD_CURTRK:    CDD_GetTrack();   break;
 		case TOCCMD_LENGTH:    CDD_Length();      break;
 		case TOCCMD_FIRSTLAST: CDD_FirstLast();   break;
 		case TOCCMD_TRACKADDR: CDD_GetTrackAdr(); break;
@@ -5826,7 +5832,8 @@ void segacd_init_main_cpu( running_machine* machine )
 	segacd_gfx_conversion_timer->adjust(attotime::never);
 
 	segacd_hock_timer = machine->scheduler().timer_alloc(FUNC(segacd_access_timer_callback));
-	segacd_hock_timer->adjust( attotime::from_nsec(5000000), 0, attotime::from_nsec(5000000));
+//	segacd_hock_timer->adjust( attotime::from_nsec(20000000), 0, attotime::from_nsec(20000000));
+	segacd_hock_timer->adjust( attotime::from_hz(75),0, attotime::from_hz(75));
 
 	segacd_irq3_timer = machine->scheduler().timer_alloc(FUNC(segacd_irq3_timer_callback));
 	segacd_irq3_timer->adjust(attotime::never);
@@ -5882,6 +5889,7 @@ static MACHINE_RESET( segacd )
 			{
 				segacd.toc = cdrom_get_toc( segacd.cd );
 				cdda_set_cdrom( machine->device("cdda"), segacd.cd );
+				cdda_stop_audio( machine->device( "cdda" ) ); //stop any pending CD-DA
 			}
 		}
 	}
@@ -6431,11 +6439,13 @@ static TIMER_CALLBACK( segacd_irq3_timer_callback )
 
 WRITE16_HANDLER( segacd_stopwatch_timer_w )
 {
-
+	printf("Stopwatch timer %04x\n",data);
 }
 
 READ16_HANDLER( segacd_stopwatch_timer_r )
 {
+	printf("Stopwatch timer read\n");
+
 	return space->machine->rand();
 }
 
@@ -6447,6 +6457,29 @@ READ16_HANDLER( cdc_dmaaddr_r )
 WRITE16_HANDLER( cdc_dmaaddr_w )
 {
 	COMBINE_DATA(&CDC_DMA_ADDR);
+}
+
+READ16_HANDLER( segacd_cdfader_r )
+{
+	return 0;
+}
+
+WRITE16_HANDLER( segacd_cdfader_w )
+{
+	static double cdfader_vol;
+	if(data & 0x800f)
+		printf("CD Fader register write %04x\n",data);
+
+	cdfader_vol = (double)((data & 0x3ff0) >> 4);
+
+	if(data & 0x4000)
+		cdfader_vol = 100.0;
+	else
+		cdfader_vol = (cdfader_vol / 1024.0) * 100.0;
+
+	printf("%f\n",cdfader_vol);
+
+	cdda_set_volume(space->machine->device("cdda"), cdfader_vol);
 }
 
 static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -6475,7 +6508,7 @@ static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8020 ,0xff802f) AM_READWRITE(segacd_comms_sub_part2_r, segacd_comms_sub_part2_w)
 	AM_RANGE(0xff8030, 0xff8031) AM_READWRITE(segacd_irq3timer_r, segacd_irq3timer_w) // Timer W/INT3
 	AM_RANGE(0xff8032, 0xff8033) AM_READWRITE(segacd_irq_mask_r,segacd_irq_mask_w)
-	AM_RANGE(0xff8034, 0xff8035) AM_NOP // CD Fader
+	AM_RANGE(0xff8034, 0xff8035) AM_READWRITE(segacd_cdfader_r,segacd_cdfader_w) // CD Fader
 	AM_RANGE(0xff8036, 0xff8037) AM_READWRITE(segacd_cdd_ctrl_r,segacd_cdd_ctrl_w)
 	AM_RANGE(0xff8038, 0xff8041) AM_READ8(segacd_cdd_rx_r,0xffff)
 	AM_RANGE(0xff8042, 0xff804b) AM_WRITE8(segacd_cdd_tx_w,0xffff)
@@ -9451,16 +9484,14 @@ MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
 	MCFG_CPU_PROGRAM_MAP(segacd_map)
 
 	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
-	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
-	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
+	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.50 ) // TODO: accurate volume balance
+	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.50 )
 
 	MCFG_SOUND_ADD("rfsnd", RF5C68, SEGACD_CLOCK) // RF5C164!
-	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.25 )
-	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.25 )
+	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.50 )
+	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.50 )
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
-
-
 MACHINE_CONFIG_END
 
 /* Different Softlists for different regions (for now at least) */
@@ -9488,8 +9519,8 @@ MACHINE_CONFIG_DERIVED( genesis_32x_scd, genesis_32x )
 	MCFG_CPU_PROGRAM_MAP(segacd_map)
 
 	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
-	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
-	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
+	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.50 )
+	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.50 )
 
 	MCFG_SOUND_ADD("rfsnd", RF5C68, SEGACD_CLOCK) // RF5C164
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.25 )
