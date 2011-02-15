@@ -54,17 +54,13 @@ D000      Paddle Position and Interrupt Reset
 #include "circus.lh"
 #include "crash.lh"
 
-#if 0
-static READ8_HANDLER( ripcord_IN2_r )
+
+static READ8_HANDLER( circus_paddle_r )
 {
-	circus_state *state = space->machine->driver_data<circus_state>();
-	state->interrupt++;
-	logerror("circus_int: %02x\n", state->interrupt);
-	return readinputport (2);
+	// also clears irq
+	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	return input_port_read(space->machine, "PADDLE");
 }
-#endif
-
-
 
 static ADDRESS_MAP_START( circus_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
@@ -75,8 +71,7 @@ static ADDRESS_MAP_START( circus_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8000) AM_RAM_WRITE(circus_clown_z_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSW")
-	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("PADDLE")
-//  AM_RANGE(0xd000, 0xd000) AM_READ(ripcord_IN2_r)
+	AM_RANGE(0xd000, 0xd000) AM_READ(circus_paddle_r)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -269,13 +264,6 @@ GFXDECODE_END
 /***************************************************************************
   Machine drivers
 ***************************************************************************/
-#if 0
-static INTERRUPT_GEN( ripcord_interrupt )
-{
-	state->interrupt = 0;
-}
-#endif
-
 static MACHINE_START( circus )
 {
 	circus_state *state = machine->driver_data<circus_state>();
@@ -304,7 +292,6 @@ static MACHINE_CONFIG_START( circus, circus_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
 	MCFG_CPU_PROGRAM_MAP(circus_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MCFG_MACHINE_START(circus)
 	MCFG_MACHINE_RESET(circus)
@@ -344,7 +331,7 @@ static MACHINE_CONFIG_START( robotbwl, circus_state )
 
 	/* driver data */
 	MCFG_CPU_PROGRAM_MAP(circus_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	// does not generate irq!
 
 	MCFG_MACHINE_START(circus)
 	MCFG_MACHINE_RESET(circus)
@@ -381,7 +368,8 @@ static MACHINE_CONFIG_START( crash, circus_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
 	MCFG_CPU_PROGRAM_MAP(circus_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
+	// irq: one at vblank start, one at vblank end
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_assert,2) // but not like this :P
 
 	MCFG_MACHINE_START(circus)
 	MCFG_MACHINE_RESET(circus)
@@ -418,7 +406,6 @@ static MACHINE_CONFIG_START( ripcord, circus_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
 	MCFG_CPU_PROGRAM_MAP(circus_map)
-	//MCFG_CPU_VBLANK_INT("screen", ripcord_interrupt) //AT
 
 	MCFG_MACHINE_START(circus)
 	MCFG_MACHINE_RESET(circus)
@@ -462,7 +449,7 @@ ROM_START( circus )
 	ROM_LOAD( "9009.7a",    0x1a00, 0x0200, CRC(585f633e) SHA1(46133409f42e8cbc095dde576ce07d97b235972d) )
 	ROM_LOAD( "9010.8a",    0x1c00, 0x0200, CRC(69cc409f) SHA1(b77289e62313e8535ce40686df7238aa9c0035bc) )
 	ROM_LOAD( "9011.9a",    0x1e00, 0x0200, CRC(aff835eb) SHA1(d6d95510d4a046f48358fef01103bcc760eb71ed) )
-	ROM_RELOAD(               0xfe00, 0x0200 ) /* for the reset and interrupt vectors */
+	ROM_RELOAD(             0xfe00, 0x0200 ) /* for the reset and interrupt vectors */
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "9003.4c",    0x0000, 0x0200, CRC(6efc315a) SHA1(d5a4a64a901853fff56df3c65512afea8336aad2) )  /* Character Set */
@@ -484,7 +471,7 @@ ROM_START( circusse )
 	ROM_LOAD( "93448.7a",    0x1a00, 0x0200, CRC(585f633e) SHA1(46133409f42e8cbc095dde576ce07d97b235972d) )
 	ROM_LOAD( "93448.8a",    0x1c00, 0x0200, CRC(d7c0dc05) SHA1(cc6f7d16ca4be74370c305c34aa1a2e338d2c41f) )
 	ROM_LOAD( "93448.9a",    0x1e00, 0x0200, CRC(aff835eb) SHA1(d6d95510d4a046f48358fef01103bcc760eb71ed) )
-	ROM_RELOAD(               0xfe00, 0x0200 ) /* for the reset and interrupt vectors */
+	ROM_RELOAD(              0xfe00, 0x0200 ) /* for the reset and interrupt vectors */
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "93448.4c",    0x0000, 0x0200, CRC(6efc315a) SHA1(d5a4a64a901853fff56df3c65512afea8336aad2) )  /* Character Set */

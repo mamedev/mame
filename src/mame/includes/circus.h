@@ -26,9 +26,6 @@ public:
 
 	/* game id */
 	int      game_id;
-#if 0
-	int      interrupt;	// dead code for ripcord. shall we remove it?
-#endif
 };
 
 
