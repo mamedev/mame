@@ -5232,8 +5232,27 @@ static READ16_HANDLER( segacd_main_dataram_part1_r )
 		}
 		else
 		{
-			printf("Unspported: segacd_main_dataram_part1_r (Cell rearranged RAM) in mode 1\n");
-			return 0x0000;
+			// converts data stored in bitmap format (in dataram) to be read out as tiles (for dma->vram purposes)
+			// used by Heart of the Alien
+
+			if(offset<0x30000/2)		/* 0x20000 - 0x2ffff */ // 512x256 bitmap -> tiles
+				offset = BITSWAP24(offset,23,22,21,20,19,18,17,16,15,8,7,6,5,4,3,2,1,14,13,12,11,10,9,0);
+			else if(offset<0x38000/2)	/* 0x30000 - 0x37fff */  // 512x128 bitmap -> tiles
+				offset = BITSWAP24(offset,23,22,21,20,19,18,17,16,15,14,7,6,5,4,3,2,1,13,12,11,10,9,8,0);
+			else if(offset<0x3c000/2)	/* 0x38000 - 0x3bfff */  // 512x64 bitmap -> tiles
+				offset = BITSWAP24(offset,23,22,21,20,19,18,17,16,15,14,13,6,5,4,3,2,1,12,11,10,9,8,7,0);
+			else  /* 0x3c000 - 0x3dfff and 0x3e000 - 0x3ffff */  // 512x32 bitmap (x2) -> tiles
+				offset = BITSWAP24(offset,23,22,21,20,19,18,17,16,15,14,13,12,5,4,3,2,1,11,10,9,8,7,6,0);
+
+			// do we care about the ret bit?? HOTA is missing some startup screens...
+			//if (!segacd_ret)
+			//{
+			//	return segacd_dataram[offset+0x20000/2];
+			//}
+			//else
+			{
+				return segacd_dataram[offset+0x00000/2];
+			}
 		}
 	}
 
@@ -5318,6 +5337,10 @@ static TIMER_CALLBACK( segacd_gfx_conversion_timer_callback )
 		cputag_set_input_line(machine, "segacd_68k", 1, HOLD_LINE);
 
 	segacd_conversion_active = 0;
+
+	// this ends up as 0 after processing (soniccd bonus stage)
+	segacd_imagebuffer_vdot_size = 0;
+
 }
 
 
@@ -5669,6 +5692,9 @@ INLINE UINT8 get_stampmap_16x16_1x1_tile_info_pixel(running_machine* machine, in
 
 	const gfx_element *gfx = machine->gfx[tile_region];
 	tileno %= gfx->total_elements;
+
+	if (tileno==0) return 0x00;
+
 	const UINT8* srcdata = gfx_element_get_data(gfx, tileno);
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
@@ -5705,6 +5731,9 @@ INLINE UINT8 get_stampmap_32x32_1x1_tile_info_pixel(running_machine* machine, in
 
 	const gfx_element *gfx = machine->gfx[tile_region];
 	tileno %= gfx->total_elements;
+
+	if (tileno==0) return 0x00; // does this apply in this mode?
+
 	const UINT8* srcdata = gfx_element_get_data(gfx, tileno);
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
@@ -5741,6 +5770,9 @@ INLINE UINT8 get_stampmap_16x16_16x16_tile_info_pixel(running_machine* machine, 
 
 	const gfx_element *gfx = machine->gfx[tile_region];
 	tileno %= gfx->total_elements;
+
+	if (tileno==0) return 0x00; // does this apply in this mode
+
 	const UINT8* srcdata = gfx_element_get_data(gfx, tileno);
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
@@ -5777,6 +5809,9 @@ INLINE UINT8 get_stampmap_32x32_16x16_tile_info_pixel(running_machine* machine, 
 
 	const gfx_element *gfx = machine->gfx[tile_region];
 	tileno %= gfx->total_elements;
+
+	if (tileno==0) return 0x00;
+
 	const UINT8* srcdata = gfx_element_get_data(gfx, tileno);
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
@@ -5854,18 +5889,18 @@ void segacd_init_main_cpu( running_machine* machine )
 	machine->gfx[2] = gfx_element_alloc(machine, &sega_16x16_r10_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
 	machine->gfx[3] = gfx_element_alloc(machine, &sega_16x16_r11_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
 	machine->gfx[4] = gfx_element_alloc(machine, &sega_16x16_r00_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine->gfx[5] = gfx_element_alloc(machine, &sega_16x16_r01_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine->gfx[5] = gfx_element_alloc(machine, &sega_16x16_r11_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
 	machine->gfx[6] = gfx_element_alloc(machine, &sega_16x16_r10_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine->gfx[7] = gfx_element_alloc(machine, &sega_16x16_r11_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine->gfx[7] = gfx_element_alloc(machine, &sega_16x16_r01_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
 
 	machine->gfx[8] = gfx_element_alloc(machine, &sega_32x32_r00_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
 	machine->gfx[9] = gfx_element_alloc(machine, &sega_32x32_r01_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
 	machine->gfx[10]= gfx_element_alloc(machine, &sega_32x32_r10_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
 	machine->gfx[11]= gfx_element_alloc(machine, &sega_32x32_r11_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
 	machine->gfx[12]= gfx_element_alloc(machine, &sega_32x32_r00_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine->gfx[13]= gfx_element_alloc(machine, &sega_32x32_r01_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine->gfx[13]= gfx_element_alloc(machine, &sega_32x32_r11_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
 	machine->gfx[14]= gfx_element_alloc(machine, &sega_32x32_r10_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
-	machine->gfx[15]= gfx_element_alloc(machine, &sega_32x32_r11_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine->gfx[15]= gfx_element_alloc(machine, &sega_32x32_r01_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
 
 	segacd_stampmap[0] = tilemap_create(machine, get_stampmap_16x16_1x1_tile_info, tilemap_scan_rows, 16, 16, 16, 16);
 	segacd_stampmap[1] = tilemap_create(machine, get_stampmap_32x32_1x1_tile_info, tilemap_scan_rows, 32, 32, 8, 8);
