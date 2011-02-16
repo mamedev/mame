@@ -955,6 +955,6 @@ GAME(1995,	waterwld2,	waterwld,	gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Waterwor
 GAME(1993,	wipeout,	0,			gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Wipeout (rev.2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1994,	wcsoccer,	0,			gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"World Challenge Soccer (rev.1)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1994,	wcsoccerd2,	wcsoccer,	gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"World Challenge Soccer (disp.rev.2)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(19??,	tt_game,	0,			gts3,	gts3,	gts3,	ROT0,	"Toptronic",			"Unnamed game",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(19??,	tt_game,	0,			gts3,	gts3,	gts3,	ROT0,	"Toptronic",			"unknown Toptronic pinball game",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1995,	snspares,	0,			gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Strikes n' Spares (rev.6)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1995,	snspares1,	snspares,	gts3,	gts3,	gts3,	ROT0,	"Gottlieb",				"Strikes n' Spares (rev.1)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
