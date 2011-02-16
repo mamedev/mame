@@ -1,11 +1,5 @@
 #include "sound/discrete.h"
 
-#define GAME_IS_CIRCUS		(state->game_id == 1)
-#define GAME_IS_ROBOTBWL	(state->game_id == 2)
-#define GAME_IS_CRASH		(state->game_id == 3)
-#define GAME_IS_RIPCORD		(state->game_id == 4)
-
-
 class circus_state : public driver_device
 {
 public:
@@ -13,11 +7,11 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *  videoram;
+	UINT8 * videoram;
 
 	/* video-related */
 	tilemap_t  *bg_tilemap;
-	int      clown_x, clown_y, clown_z;
+	int clown_x, clown_y, clown_z;
 
 	/* devices */
 	device_t *maincpu;
@@ -25,7 +19,7 @@ public:
 	device_t *discrete;
 
 	/* game id */
-	int      game_id;
+	int game_id;
 };
 
 
@@ -53,4 +47,4 @@ extern VIDEO_START( circus );
 extern VIDEO_UPDATE( crash );
 extern VIDEO_UPDATE( circus );
 extern VIDEO_UPDATE( robotbwl );
-extern VIDEO_UPDATE( ripcord ); //AT
+extern VIDEO_UPDATE( ripcord );

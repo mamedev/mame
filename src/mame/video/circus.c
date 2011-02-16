@@ -1,12 +1,8 @@
 /***************************************************************************
 
-  video.c
+  circus.c video
 
   Functions to emulate the video hardware of the machine.
-
-  CHANGES:
-  MAB 05 MAR 99 - changed overlay support to use artwork functions
-  AAT 12 MAY 02 - rewrote Ripcord and added pixel-wise collision
 
 ***************************************************************************/
 
@@ -71,7 +67,7 @@ static void draw_sprite( running_machine *machine, bitmap_t *bitmap, const recta
 {
 	circus_state *state = machine->driver_data<circus_state>();
 	const gfx_element *gfx;
-	const UINT8  *src_lineptr, *src_pixptr;
+	const UINT8 *src_lineptr, *src_pixptr;
 	UINT16 *dst_lineptr, *dst_lineend;
 	UINT32 code;
 	int sx, sy;
@@ -174,14 +170,14 @@ static void robotbwl_draw_box( bitmap_t *bitmap, const rectangle *cliprect, int 
 	int ex = x + 24;
 	int ey = y + 26;
 
-	draw_line(bitmap, cliprect, x, y, ex, y, 0);       /* Top */
-	draw_line(bitmap, cliprect, x, ey, ex, ey, 0);     /* Bottom */
-	draw_line(bitmap, cliprect, x, y, x, ey, 0);       /* Left */
-	draw_line(bitmap, cliprect, ex, y, ex, ey, 0);     /* Right */
+	draw_line(bitmap, cliprect, x, y, ex, y, 0);		/* Top */
+	draw_line(bitmap, cliprect, x, ey, ex, ey, 0);		/* Bottom */
+	draw_line(bitmap, cliprect, x, y, x, ey, 0);		/* Left */
+	draw_line(bitmap, cliprect, ex, y, ex, ey, 0);		/* Right */
 
 	/* Score Grid */
 	ey = y + 10;
-	draw_line(bitmap, cliprect, x + 8, ey, ex, ey, 0);   /* Horizontal Divide Line */
+	draw_line(bitmap, cliprect, x + 8, ey, ex, ey, 0);	/* Horizontal Divide Line */
 	draw_line(bitmap, cliprect, x + 8, y, x + 8, ey, 0);
 	draw_line(bitmap, cliprect, x + 16, y, x + 16, ey, 0);
 }
@@ -204,8 +200,8 @@ static void robotbwl_draw_scoreboard( bitmap_t *bitmap, const rectangle *cliprec
 		robotbwl_draw_box(bitmap, cliprect, offs + 152, 95);
 	}
 
-	robotbwl_draw_box(bitmap, cliprect, 39, 127);                 /* 10th Frame */
-	draw_line(bitmap, cliprect, 39, 137, 47, 137, 0);          /* Extra digit box */
+	robotbwl_draw_box(bitmap, cliprect, 39, 127);		/* 10th Frame */
+	draw_line(bitmap, cliprect, 39, 137, 47, 137, 0);	/* Extra digit box */
 
 	robotbwl_draw_box(bitmap, cliprect, 39 + 152, 127);
 	draw_line(bitmap, cliprect, 39 + 152, 137, 47 + 152, 137, 0);
