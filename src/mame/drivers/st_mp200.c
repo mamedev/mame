@@ -361,4 +361,4 @@ GAME(1980,	stargzr,	0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern",				"Starga
 GAME(1981,	viperp,		0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Stern",				"Viper (Pinball)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1985,	gamatron,	flight2k,	st_mp200,	st_mp200,	st_mp200,	ROT0,	"Pinstar",				"Gamatron",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1978,	blkshpsq,	0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Astro",				"Black Sheep Squadron",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(198?,	st_game,	0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"Unknown Manufacturer",	"Unknown Game",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(198?,	st_game,	0,			st_mp200,	st_mp200,	st_mp200,	ROT0,	"<unknown>",			"Unknown pinball game",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
