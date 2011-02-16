@@ -1,4 +1,6 @@
-/* Rotary Fighter
+/* Rotary Fighter, 01/1979, Kasco (Kansai Seiki Seisakusho Co.)
+ board KIV-101 CPU: xtal(??mhz), i8085A, 40 pin IC(i8255?), 6*ROM, 1*RAM, DIP(8 switches), ..
+ board KIV-101 CRT: 2*RAM, lots of 74xx TTL
 
 driver by Barry Rodewald
  based on Initial work by David Haywood
@@ -151,7 +153,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( rotaryf, driver_device )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A,4000000) /* 8080? */ /* 2 MHz? */
+	MCFG_CPU_ADD("maincpu",I8085A,4000000) /* ?? MHz */
 	MCFG_CPU_PROGRAM_MAP(rotaryf_map)
 	MCFG_CPU_IO_MAP(rotaryf_io_map)
 	MCFG_CPU_VBLANK_INT_HACK(rotaryf_interrupt,5)
@@ -179,4 +181,4 @@ ROM_START( rotaryf )
 ROM_END
 
 
-GAME( 19??, rotaryf, 0, rotaryf, rotaryf, 0, ROT270, "<unknown>", "Rotary Fighter", GAME_NO_SOUND )
+GAME( 1979, rotaryf, 0, rotaryf, rotaryf, 0, ROT270, "Kasco", "Rotary Fighter", GAME_NO_SOUND )
