@@ -211,7 +211,7 @@ WRITE8_HANDLER( circus_clown_z_w )
 					break;
 
 				case 7 : /* Circus = not used; Rip Cord = Whistle */
-					if GAME_IS_RIPCORD
+					if (state->game_id == 4)
 						sample_start(state->samples, 3, 3, 0);
 					break;
 			}
