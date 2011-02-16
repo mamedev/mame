@@ -9052,9 +9052,7 @@ MACHINE_RESET( megadriv )
 	/* default state of z80 = reset, with bus */
 	mame_printf_debug("Resetting Megadrive / Genesis\n");
 
-
-
-	switch (input_port_read_safe(machine, "REGION", 0x00))
+	switch (input_port_read_safe(machine, "REGION", 0xff))
 	{
 
 		case 1: // US
@@ -9078,11 +9076,15 @@ MACHINE_RESET( megadriv )
 		mame_printf_debug("Using Region = EUROPE\n");
 		break;
 
-		default: // as chosen by driver
+		case 0: // as chosen by driver
 		megadrive_region_export = hazemdchoice_megadrive_region_export;
 		megadrive_region_pal = hazemdchoice_megadrive_region_pal;
 		megadriv_framerate = hazemdchoice_megadriv_framerate;
 		mame_printf_debug("Using Region = DEFAULT\n");
+		break;
+
+		default:
+		megadriv_framerate = hazemdchoice_megadriv_framerate;
 		break;
 	}
 

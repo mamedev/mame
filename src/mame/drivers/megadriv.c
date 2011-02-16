@@ -649,24 +649,32 @@ static DRIVER_INIT( genesis )
 {
 	DRIVER_INIT_CALL(megadriv);
 	DRIVER_INIT_CALL(mess_md_common);
+	megadrive_region_export = 1;
+	megadrive_region_pal = 0;
 }
 
 static DRIVER_INIT( gensvp )
 {
 	DRIVER_INIT_CALL(megadriv);
 	DRIVER_INIT_CALL(mess_md_common);
+	megadrive_region_export = 1;
+	megadrive_region_pal = 0;
 }
 
 static DRIVER_INIT( md_eur )
 {
 	DRIVER_INIT_CALL(megadrie);
 	DRIVER_INIT_CALL(mess_md_common);
+	megadrive_region_export = 1;
+	megadrive_region_pal = 1;
 }
 
 static DRIVER_INIT( md_jpn )
 {
 	DRIVER_INIT_CALL(megadrij);
 	DRIVER_INIT_CALL(mess_md_common);
+	megadrive_region_export = 0;
+	megadrive_region_pal = 0;
 }
 
 /****************************************** SegaCD & 32X emulation ****************************************/
