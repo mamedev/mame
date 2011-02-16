@@ -94,6 +94,15 @@ emu_timer::emu_timer()
 
 
 //-------------------------------------------------
+//  ~emu_timer - destructor
+//-------------------------------------------------
+
+emu_timer::~emu_timer()
+{
+}
+
+
+//-------------------------------------------------
 //  init - completely initialize the state when
 //  re-allocated as a non-device timer
 //-------------------------------------------------

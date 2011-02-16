@@ -89,9 +89,11 @@ class emu_timer
 	friend class device_scheduler;
 	friend class simple_list<emu_timer>;
 	friend class fixed_allocator<emu_timer>;
+	friend class resource_pool_object<emu_timer>;
 
 	// construction/destruction
 	emu_timer();
+	~emu_timer();
 
 	// allocation and re-use
 	emu_timer &init(running_machine &machine, timer_expired_func callback, const char *name, void *ptr, bool temporary);
