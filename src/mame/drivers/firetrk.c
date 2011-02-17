@@ -51,8 +51,6 @@ static INPUT_CHANGED( gear_changed )
 static INTERRUPT_GEN( firetrk_interrupt )
 {
 	firetrk_state *state = device->machine->driver_data<firetrk_state>();
-	/* Super Bug - ASR - when is this used and what is an ASR? */
-//  discrete_sound_w(device->machine->device("discrete"), SUPERBUG_ASR_EN, 0);
 
 	/* NMI interrupts are disabled during service mode in firetrk and montecar */
 	if (!state->in_service_mode)
@@ -370,7 +368,7 @@ static ADDRESS_MAP_START( superbug_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x01c0, 0x01c0) AM_MIRROR(0x001f) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x01e0, 0x01e0) AM_MIRROR(0x001f) AM_WRITE(blink_on_w) AM_BASE_MEMBER(firetrk_state, blink)
 	AM_RANGE(0x0200, 0x0207) AM_MIRROR(0x0018) AM_READ(firetrk_input_r)
-	AM_RANGE(0x0220, 0x0220) AM_MIRROR(0x001f) AM_DEVWRITE("discrete", superbug_asr_w)
+	AM_RANGE(0x0220, 0x0220) AM_MIRROR(0x001f) AM_DEVWRITE("discrete", firetrk_xtndply_w)
 	AM_RANGE(0x0240, 0x0243) AM_MIRROR(0x001c) AM_READ(firetrk_dip_r)
 	AM_RANGE(0x0260, 0x026f) AM_MIRROR(0x0010) AM_WRITE(superbug_output_w)
 	AM_RANGE(0x0280, 0x0280) AM_MIRROR(0x001f) AM_DEVWRITE("discrete", superbug_motor_snd_w)

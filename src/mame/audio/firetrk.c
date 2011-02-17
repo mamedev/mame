@@ -58,14 +58,8 @@ WRITE8_DEVICE_HANDLER( superbug_motor_snd_w )
 
 WRITE8_DEVICE_HANDLER( firetrk_xtndply_w )
 {
+	// also SUPERBUG_ASR_EN (extended play)
 	discrete_sound_w(device, FIRETRUCK_XTNDPLY_EN, data);
-}
-
-
-WRITE8_DEVICE_HANDLER( superbug_asr_w )
-{
-popmessage("ASR");
-		discrete_sound_w(device, SUPERBUG_ASR_EN, 1);	/* ASR */
 }
 
 
