@@ -303,7 +303,7 @@ INLINE HashT texture_compute_hash(const render_texinfo *texture, UINT32 flags)
 #else
 INLINE HashT texture_compute_hash(const render_texinfo *texture, UINT32 flags)
 {
-	HashT h = (HashT)texture ^ (flags & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK));
+	HashT h = (HashT)texture->base ^ (flags & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK));
 	//printf("hash %d\n", (int) h % HASH_SIZE);
 	return (h >> 8) % HASH_SIZE;
 }
@@ -1767,7 +1767,9 @@ static void texture_compute_type_subroutine(sdl_info *sdl, const render_texinfo 
 	     (
 		 texture->format==SDL_TEXFORMAT_PALETTE16 ||       // glsl idx16 lut
 	         texture->format==SDL_TEXFORMAT_RGB32_PALETTED ||  // glsl rgb32 lut/direct
-	         texture->format==SDL_TEXFORMAT_RGB15_PALETTED     // glsl rgb15 lut/direct
+             texture->format==SDL_TEXFORMAT_RGB32 ||
+             texture->format==SDL_TEXFORMAT_RGB15_PALETTED ||    // glsl rgb15 lut/direct
+             texture->format==SDL_TEXFORMAT_RGB15
 	     ) &&
 	     texture->xprescale == 1 && texture->yprescale == 1 &&
 	     texsource->rowpixels <= sdl->texture_max_width
@@ -2052,12 +2054,14 @@ static int texture_shader_create(sdl_window_info *window,
 	switch(texture->format)
 	{
 		case SDL_TEXFORMAT_RGB32_PALETTED:
+		case SDL_TEXFORMAT_RGB32:
 			glsl_shader_type          = glsl_shader_type_rgb32;
 			texture->lut_table_width  = 1 << 8; // 8 bits per component
 			texture->lut_table_width *= 3;      // BGR ..
 			break;
 
 		case SDL_TEXFORMAT_RGB15_PALETTED:
+		case SDL_TEXFORMAT_RGB15:
 			glsl_shader_type          = glsl_shader_type_rgb32;
 			texture->lut_table_width  = 1 << 5; // 5 bits per component
 			texture->lut_table_width *= 3;      // BGR ..
@@ -2087,17 +2091,26 @@ static int texture_shader_create(sdl_window_info *window,
      *
      * Shape the lut texture to achieve texture max size compliance and equal 2D partitioning
      */
-	lut_texture_width  = sqrt((double)(texture->lut_table_width));
-	lut_texture_width  = get_valid_pow2_value (lut_texture_width, 1);
-
-	texture->lut_table_height = texture->lut_table_width / lut_texture_width;
-
-	if ( lut_texture_width*texture->lut_table_height < texture->lut_table_width )
+	#
+	if ( texture->format == SDL_TEXFORMAT_PALETTE16 )
 	{
-		texture->lut_table_height  += 1;
+		lut_texture_width  = sqrt((double)(texture->lut_table_width));
+		lut_texture_width  = get_valid_pow2_value (lut_texture_width, 1);
+		
+		texture->lut_table_height = texture->lut_table_width / lut_texture_width;
+		
+		if ( lut_texture_width*texture->lut_table_height < texture->lut_table_width )
+		{
+			texture->lut_table_height  += 1;
+		}
+		
+		texture->lut_table_width   = lut_texture_width;
+	} 
+	else
+	{
+		lut_texture_width = texture->lut_table_width;
+		texture->lut_table_height = 1;
 	}
-
-	texture->lut_table_width   = lut_texture_width;
 
 	/**
      * always use pow2 for LUT, to minimize the chance for floating point arithmetic errors
