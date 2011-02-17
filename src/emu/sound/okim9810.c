@@ -40,6 +40,27 @@ const UINT8 okim9810_device::s_volume_table[16] =
 	0x04,	// -30.0 dB
 };
 
+// sampling frequency lookup table.
+const UINT32 okim9810_device::s_sampling_freq_table[16] = 
+{
+    4000,
+    8000,
+    16000,
+    32000,
+    0,
+    6400,
+    12800,
+    25600,
+    0,
+    5300,
+    10600,
+    21200,
+    0,
+    0,
+    0,
+    0
+};
+
 // default address map
 static ADDRESS_MAP_START( okim9810, 0, 8 )
     AM_RANGE(0x000000, 0xffffff) AM_ROM
@@ -294,6 +315,20 @@ void okim9810_device::write_command(UINT8 data)
             endAddr |= m_direct->read_raw_byte(base + 6) << 8;
             endAddr |= m_direct->read_raw_byte(base + 7) << 0;
 
+			// Sub-table
+            if (startFlags & 0x80)
+            {
+                // TODO: Offset (oldStart+0) and (oldStart+4) are currently ignored - can the chaining continue?
+                offs_t oldStart = startAddr;
+                startAddr  = m_direct->read_raw_byte(oldStart + 1) << 16;
+                startAddr |= m_direct->read_raw_byte(oldStart + 2) << 8;
+                startAddr |= m_direct->read_raw_byte(oldStart + 3) << 0;
+                
+                endAddr  = m_direct->read_raw_byte(oldStart + 5) << 16;
+                endAddr |= m_direct->read_raw_byte(oldStart + 6) << 8;
+                endAddr |= m_direct->read_raw_byte(oldStart + 7) << 0;
+            }
+
             mame_printf_verbose("FADR  channel %d phrase offset %02x => ", channel, m_TMP_register);
             mame_printf_verbose("\tstartFlags(%02x) startAddr(%06x) endFlags(%02x) endAddr(%06x) bytes(%d)\n", startFlags, startAddr, endFlags, endAddr, endAddr-startAddr);
             m_voice[channel].m_sample = 0;
@@ -314,13 +349,13 @@ void okim9810_device::write_command(UINT8 data)
 
         case 0x06:  // DADR (direct address playback)
         {
-            mame_printf_warning("DADR  channel %d complex data %02x\n", channel, m_TMP_register); 
+            mame_printf_warning("DADR  channel %d complex data %02x\n", channel, m_TMP_register);
             mame_printf_warning("MSM9810: UNIMPLEMENTED COMMAND!\n");
             break;
         }
         case 0x07:  // CVOL (channel volume)
         {
-            mame_printf_verbose("CVOL  channel %d volume level %02x\n", channel, m_TMP_register); 
+            mame_printf_verbose("CVOL  channel %d volume level %02x\n", channel, m_TMP_register);
             mame_printf_verbose("\tChannel %d -> volume %d.\n", channel, s_volume_table[m_TMP_register & 0x0f]);
 
             m_voice[channel].m_volume = s_volume_table[m_TMP_register & 0x0f];

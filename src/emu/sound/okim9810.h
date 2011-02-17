@@ -33,6 +33,20 @@ enum
     OKIM9810_NONLINEAR8_PLAYBACK = 3
 };
 
+enum
+{
+	OKIM9810_SECONDARY_FILTER = 0,
+	OKIM9810_PRIMARY_FILTER = 1,
+    OKIM9810_NO_FILTER = 2,
+    OKIM9810_NO_FILTER2 = 3
+};
+
+enum
+{
+	OKIM9810_OUTPUT_TO_DIRECT_DAC = 0,
+	OKIM9810_OUTPUT_TO_VOLTAGE_FOLLOWER = 1
+};
+
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -144,6 +158,7 @@ protected:
 	okim_voice m_voice[OKIM9810_VOICES];
 
 	static const UINT8 s_volume_table[16];
+    static const UINT32 s_sampling_freq_table[16];
 };
 
 
