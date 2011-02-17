@@ -27,79 +27,79 @@
  *
  *************************************/
 
-#define VIDEO_UNKNOWN00			itech32_video[0x00/2]	/* $0087 at startup */
-#define VIDEO_STATUS			itech32_video[0x00/2]
-#define VIDEO_INTSTATE			itech32_video[0x02/2]
-#define VIDEO_INTACK			itech32_video[0x02/2]
-#define VIDEO_TRANSFER			itech32_video[0x04/2]
-#define VIDEO_TRANSFER_FLAGS	itech32_video[0x06/2]	/* $5080 at startup (kept at $1512) */
-#define VIDEO_COMMAND			itech32_video[0x08/2]	/* $0005 at startup */
-#define VIDEO_INTENABLE			itech32_video[0x0a/2]	/* $0144 at startup (kept at $1514) */
-#define VIDEO_TRANSFER_HEIGHT	itech32_video[0x0c/2]
-#define VIDEO_TRANSFER_WIDTH	itech32_video[0x0e/2]
-#define VIDEO_TRANSFER_ADDRLO	itech32_video[0x10/2]
-#define VIDEO_TRANSFER_X		itech32_video[0x12/2]
-#define VIDEO_TRANSFER_Y		itech32_video[0x14/2]
-#define VIDEO_SRC_YSTEP			itech32_video[0x16/2]	/* $0011 at startup */
-#define VIDEO_SRC_XSTEP			itech32_video[0x18/2]
-#define VIDEO_DST_XSTEP			itech32_video[0x1a/2]
-#define VIDEO_DST_YSTEP			itech32_video[0x1c/2]
-#define VIDEO_YSTEP_PER_X		itech32_video[0x1e/2]
-#define VIDEO_XSTEP_PER_Y		itech32_video[0x20/2]
-#define VIDEO_UNKNOWN22			itech32_video[0x22/2]	/* $0033 at startup */
-#define VIDEO_LEFTCLIP			itech32_video[0x24/2]
-#define VIDEO_RIGHTCLIP			itech32_video[0x26/2]
-#define VIDEO_TOPCLIP			itech32_video[0x28/2]
-#define VIDEO_BOTTOMCLIP		itech32_video[0x2a/2]
-#define VIDEO_INTSCANLINE		itech32_video[0x2c/2]	/* $00ef at startup */
-#define VIDEO_TRANSFER_ADDRHI	itech32_video[0x2e/2]	/* $0000 at startup */
+#define VIDEO_UNKNOWN00			state->video[0x00/2]	/* $0087 at startup */
+#define VIDEO_STATUS			state->video[0x00/2]
+#define VIDEO_INTSTATE			state->video[0x02/2]
+#define VIDEO_INTACK			state->video[0x02/2]
+#define VIDEO_TRANSFER			state->video[0x04/2]
+#define VIDEO_TRANSFER_FLAGS	state->video[0x06/2]	/* $5080 at startup (kept at $1512) */
+#define VIDEO_COMMAND			state->video[0x08/2]	/* $0005 at startup */
+#define VIDEO_INTENABLE			state->video[0x0a/2]	/* $0144 at startup (kept at $1514) */
+#define VIDEO_TRANSFER_HEIGHT	state->video[0x0c/2]
+#define VIDEO_TRANSFER_WIDTH	state->video[0x0e/2]
+#define VIDEO_TRANSFER_ADDRLO	state->video[0x10/2]
+#define VIDEO_TRANSFER_X		state->video[0x12/2]
+#define VIDEO_TRANSFER_Y		state->video[0x14/2]
+#define VIDEO_SRC_YSTEP			state->video[0x16/2]	/* $0011 at startup */
+#define VIDEO_SRC_XSTEP			state->video[0x18/2]
+#define VIDEO_DST_XSTEP			state->video[0x1a/2]
+#define VIDEO_DST_YSTEP			state->video[0x1c/2]
+#define VIDEO_YSTEP_PER_X		state->video[0x1e/2]
+#define VIDEO_XSTEP_PER_Y		state->video[0x20/2]
+#define VIDEO_UNKNOWN22			state->video[0x22/2]	/* $0033 at startup */
+#define VIDEO_LEFTCLIP			state->video[0x24/2]
+#define VIDEO_RIGHTCLIP			state->video[0x26/2]
+#define VIDEO_TOPCLIP			state->video[0x28/2]
+#define VIDEO_BOTTOMCLIP		state->video[0x2a/2]
+#define VIDEO_INTSCANLINE		state->video[0x2c/2]	/* $00ef at startup */
+#define VIDEO_TRANSFER_ADDRHI	state->video[0x2e/2]	/* $0000 at startup */
 
-#define VIDEO_UNKNOWN30			itech32_video[0x30/2]	/* $0040 at startup */
-#define VIDEO_VTOTAL			itech32_video[0x32/2]	/* $0106 at startup */
-#define VIDEO_VSYNC				itech32_video[0x34/2]	/* $0101 at startup */
-#define VIDEO_VBLANK_START		itech32_video[0x36/2]	/* $00f3 at startup */
-#define VIDEO_VBLANK_END		itech32_video[0x38/2]	/* $0003 at startup */
-#define VIDEO_HTOTAL			itech32_video[0x3a/2]	/* $01fc at startup */
-#define VIDEO_HSYNC				itech32_video[0x3c/2]	/* $01e4 at startup */
-#define VIDEO_HBLANK_START		itech32_video[0x3e/2]	/* $01b2 at startup */
-#define VIDEO_HBLANK_END		itech32_video[0x40/2]	/* $0032 at startup */
-#define VIDEO_UNKNOWN42			itech32_video[0x42/2]	/* $0015 at startup */
-#define VIDEO_DISPLAY_YORIGIN1	itech32_video[0x44/2]	/* $0000 at startup */
-#define VIDEO_DISPLAY_YORIGIN2	itech32_video[0x46/2]	/* $0000 at startup */
-#define VIDEO_DISPLAY_YSCROLL2	itech32_video[0x48/2]	/* $0000 at startup */
-#define VIDEO_UNKNOWN4a			itech32_video[0x4a/2]	/* $0000 at startup */
-#define VIDEO_DISPLAY_XORIGIN1	itech32_video[0x4c/2]	/* $0000 at startup */
-#define VIDEO_DISPLAY_XORIGIN2	itech32_video[0x4e/2]	/* $0000 at startup */
-#define VIDEO_DISPLAY_XSCROLL2	itech32_video[0x50/2]	/* $0000 at startup */
-#define VIDEO_UNKNOWN52			itech32_video[0x52/2]	/* $0000 at startup */
-#define VIDEO_UNKNOWN54			itech32_video[0x54/2]	/* $0080 at startup */
-#define VIDEO_UNKNOWN56			itech32_video[0x56/2]	/* $00c0 at startup */
-#define VIDEO_UNKNOWN58			itech32_video[0x58/2]	/* $01c0 at startup */
-#define VIDEO_UNKNOWN5a			itech32_video[0x5a/2]	/* $01c0 at startup */
-#define VIDEO_UNKNOWN5c			itech32_video[0x5c/2]	/* $01cf at startup */
-#define VIDEO_UNKNOWN5e			itech32_video[0x5e/2]	/* $01cf at startup */
-#define VIDEO_UNKNOWN60			itech32_video[0x60/2]	/* $01e3 at startup */
-#define VIDEO_UNKNOWN62			itech32_video[0x62/2]	/* $01cf at startup */
-#define VIDEO_UNKNOWN64			itech32_video[0x64/2]	/* $01ff at startup */
-#define VIDEO_UNKNOWN66			itech32_video[0x66/2]	/* $0183 at startup */
-#define VIDEO_UNKNOWN68			itech32_video[0x68/2]	/* $01ff at startup */
-#define VIDEO_UNKNOWN6a			itech32_video[0x6a/2]	/* $000f at startup */
-#define VIDEO_UNKNOWN6c			itech32_video[0x6c/2]	/* $018f at startup */
-#define VIDEO_UNKNOWN6e			itech32_video[0x6e/2]	/* $01ff at startup */
-#define VIDEO_UNKNOWN70			itech32_video[0x70/2]	/* $000f at startup */
-#define VIDEO_UNKNOWN72			itech32_video[0x72/2]	/* $000f at startup */
-#define VIDEO_UNKNOWN74			itech32_video[0x74/2]	/* $01ff at startup */
-#define VIDEO_UNKNOWN76			itech32_video[0x76/2]	/* $01ff at startup */
-#define VIDEO_UNKNOWN78			itech32_video[0x78/2]	/* $01ff at startup */
-#define VIDEO_UNKNOWN7a			itech32_video[0x7a/2]	/* $01ff at startup */
-#define VIDEO_UNKNOWN7c			itech32_video[0x7c/2]	/* $0820 at startup */
-#define VIDEO_UNKNOWN7e			itech32_video[0x7e/2]	/* $0100 at startup */
+#define VIDEO_UNKNOWN30			state->video[0x30/2]	/* $0040 at startup */
+#define VIDEO_VTOTAL			state->video[0x32/2]	/* $0106 at startup */
+#define VIDEO_VSYNC				state->video[0x34/2]	/* $0101 at startup */
+#define VIDEO_VBLANK_START		state->video[0x36/2]	/* $00f3 at startup */
+#define VIDEO_VBLANK_END		state->video[0x38/2]	/* $0003 at startup */
+#define VIDEO_HTOTAL			state->video[0x3a/2]	/* $01fc at startup */
+#define VIDEO_HSYNC				state->video[0x3c/2]	/* $01e4 at startup */
+#define VIDEO_HBLANK_START		state->video[0x3e/2]	/* $01b2 at startup */
+#define VIDEO_HBLANK_END		state->video[0x40/2]	/* $0032 at startup */
+#define VIDEO_UNKNOWN42			state->video[0x42/2]	/* $0015 at startup */
+#define VIDEO_DISPLAY_YORIGIN1	state->video[0x44/2]	/* $0000 at startup */
+#define VIDEO_DISPLAY_YORIGIN2	state->video[0x46/2]	/* $0000 at startup */
+#define VIDEO_DISPLAY_YSCROLL2	state->video[0x48/2]	/* $0000 at startup */
+#define VIDEO_UNKNOWN4a			state->video[0x4a/2]	/* $0000 at startup */
+#define VIDEO_DISPLAY_XORIGIN1	state->video[0x4c/2]	/* $0000 at startup */
+#define VIDEO_DISPLAY_XORIGIN2	state->video[0x4e/2]	/* $0000 at startup */
+#define VIDEO_DISPLAY_XSCROLL2	state->video[0x50/2]	/* $0000 at startup */
+#define VIDEO_UNKNOWN52			state->video[0x52/2]	/* $0000 at startup */
+#define VIDEO_UNKNOWN54			state->video[0x54/2]	/* $0080 at startup */
+#define VIDEO_UNKNOWN56			state->video[0x56/2]	/* $00c0 at startup */
+#define VIDEO_UNKNOWN58			state->video[0x58/2]	/* $01c0 at startup */
+#define VIDEO_UNKNOWN5a			state->video[0x5a/2]	/* $01c0 at startup */
+#define VIDEO_UNKNOWN5c			state->video[0x5c/2]	/* $01cf at startup */
+#define VIDEO_UNKNOWN5e			state->video[0x5e/2]	/* $01cf at startup */
+#define VIDEO_UNKNOWN60			state->video[0x60/2]	/* $01e3 at startup */
+#define VIDEO_UNKNOWN62			state->video[0x62/2]	/* $01cf at startup */
+#define VIDEO_UNKNOWN64			state->video[0x64/2]	/* $01ff at startup */
+#define VIDEO_UNKNOWN66			state->video[0x66/2]	/* $0183 at startup */
+#define VIDEO_UNKNOWN68			state->video[0x68/2]	/* $01ff at startup */
+#define VIDEO_UNKNOWN6a			state->video[0x6a/2]	/* $000f at startup */
+#define VIDEO_UNKNOWN6c			state->video[0x6c/2]	/* $018f at startup */
+#define VIDEO_UNKNOWN6e			state->video[0x6e/2]	/* $01ff at startup */
+#define VIDEO_UNKNOWN70			state->video[0x70/2]	/* $000f at startup */
+#define VIDEO_UNKNOWN72			state->video[0x72/2]	/* $000f at startup */
+#define VIDEO_UNKNOWN74			state->video[0x74/2]	/* $01ff at startup */
+#define VIDEO_UNKNOWN76			state->video[0x76/2]	/* $01ff at startup */
+#define VIDEO_UNKNOWN78			state->video[0x78/2]	/* $01ff at startup */
+#define VIDEO_UNKNOWN7a			state->video[0x7a/2]	/* $01ff at startup */
+#define VIDEO_UNKNOWN7c			state->video[0x7c/2]	/* $0820 at startup */
+#define VIDEO_UNKNOWN7e			state->video[0x7e/2]	/* $0100 at startup */
 
-#define VIDEO_STARTSTEP			itech32_video[0x80/2]	/* drivedge only? */
-#define VIDEO_LEFTSTEPLO		itech32_video[0x82/2]	/* drivedge only? */
-#define VIDEO_LEFTSTEPHI		itech32_video[0x84/2]	/* drivedge only? */
-#define VIDEO_RIGHTSTEPLO		itech32_video[0x86/2]	/* drivedge only? */
-#define VIDEO_RIGHTSTEPHI		itech32_video[0x88/2]	/* drivedge only? */
+#define VIDEO_STARTSTEP			state->video[0x80/2]	/* drivedge only? */
+#define VIDEO_LEFTSTEPLO		state->video[0x82/2]	/* drivedge only? */
+#define VIDEO_LEFTSTEPHI		state->video[0x84/2]	/* drivedge only? */
+#define VIDEO_RIGHTSTEPLO		state->video[0x86/2]	/* drivedge only? */
+#define VIDEO_RIGHTSTEPHI		state->video[0x88/2]	/* drivedge only? */
 
 #define VIDEOINT_SCANLINE		0x0004
 #define VIDEOINT_BLITTER		0x0040
@@ -120,39 +120,6 @@
 
 
 
-/*************************************
- *
- *  Global variables
- *
- *************************************/
-
-UINT16 *itech32_video;
-UINT32 *drivedge_zbuf_control;
-UINT8 itech32_planes;
-UINT16 itech32_vram_height;
-
-static UINT16 xfer_xcount, xfer_ycount;
-static UINT16 xfer_xcur, xfer_ycur;
-
-static rectangle clip_rect, scaled_clip_rect;
-static rectangle clip_save;
-
-static emu_timer *scanline_timer;
-
-static UINT8 *grom_base;
-static UINT32 grom_size;
-static UINT32 grom_bank;
-static UINT32 grom_bank_mask;
-
-static UINT16 color_latch[2];
-static UINT8 enable_latch[2];
-
-static UINT16 *videoplane[2];
-static UINT32 vram_mask;
-static UINT32 vram_xmask, vram_ymask;
-
-static int is_drivedge;
-
 static TIMER_CALLBACK( scanline_interrupt );
 
 
@@ -165,30 +132,30 @@ static TIMER_CALLBACK( scanline_interrupt );
 
 #define ADJUSTED_HEIGHT(x) ((((x) >> 1) & 0x100) | ((x) & 0xff))
 
-INLINE offs_t compute_safe_address(int x, int y)
+INLINE offs_t compute_safe_address(itech32_state *state, int x, int y)
 {
-	return ((y & vram_ymask) * 512) + (x & vram_xmask);
+	return ((y & state->vram_ymask) * 512) + (x & state->vram_xmask);
 }
 
-INLINE void disable_clipping(void)
+INLINE void disable_clipping(itech32_state *state)
 {
-	clip_save = clip_rect;
+	state->clip_save = state->clip_rect;
 
-	clip_rect.min_x = clip_rect.min_y = 0;
-	clip_rect.max_x = clip_rect.max_y = 0xfff;
+	state->clip_rect.min_x = state->clip_rect.min_y = 0;
+	state->clip_rect.max_x = state->clip_rect.max_y = 0xfff;
 
-	scaled_clip_rect.min_x = scaled_clip_rect.min_y = 0;
-	scaled_clip_rect.max_x = scaled_clip_rect.max_y = 0xfff << 8;
+	state->scaled_clip_rect.min_x = state->scaled_clip_rect.min_y = 0;
+	state->scaled_clip_rect.max_x = state->scaled_clip_rect.max_y = 0xfff << 8;
 }
 
-INLINE void enable_clipping(void)
+INLINE void enable_clipping(itech32_state *state)
 {
-	clip_rect = clip_save;
+	state->clip_rect = state->clip_save;
 
-	scaled_clip_rect.min_x = clip_rect.min_x << 8;
-	scaled_clip_rect.max_x = clip_rect.max_x << 8;
-	scaled_clip_rect.min_y = clip_rect.min_y << 8;
-	scaled_clip_rect.max_y = clip_rect.max_y << 8;
+	state->scaled_clip_rect.min_x = state->clip_rect.min_x << 8;
+	state->scaled_clip_rect.max_x = state->clip_rect.max_x << 8;
+	state->scaled_clip_rect.min_y = state->clip_rect.min_y << 8;
+	state->scaled_clip_rect.max_y = state->clip_rect.max_y << 8;
 }
 
 
@@ -205,38 +172,36 @@ VIDEO_START( itech32 )
 	int i;
 
 	/* allocate memory */
-	state->videoram = auto_alloc_array(machine, UINT16, VRAM_WIDTH * (itech32_vram_height + 16) * 2);
-	memset(state->videoram, 0xff, VRAM_WIDTH * (itech32_vram_height + 16) * 2 * 2);
+	state->videoram = auto_alloc_array(machine, UINT16, VRAM_WIDTH * (state->vram_height + 16) * 2);
+	memset(state->videoram, 0xff, VRAM_WIDTH * (state->vram_height + 16) * 2 * 2);
 
 	/* videoplane[0] is the foreground; videoplane[1] is the background */
-	videoplane[0] = &state->videoram[0 * VRAM_WIDTH * (itech32_vram_height + 16) + 8 * VRAM_WIDTH];
-	videoplane[1] = &state->videoram[1 * VRAM_WIDTH * (itech32_vram_height + 16) + 8 * VRAM_WIDTH];
+	state->videoplane[0] = &state->videoram[0 * VRAM_WIDTH * (state->vram_height + 16) + 8 * VRAM_WIDTH];
+	state->videoplane[1] = &state->videoram[1 * VRAM_WIDTH * (state->vram_height + 16) + 8 * VRAM_WIDTH];
 
 	/* set the masks */
-	vram_mask = VRAM_WIDTH * itech32_vram_height - 1;
-	vram_xmask = VRAM_WIDTH - 1;
-	vram_ymask = itech32_vram_height - 1;
+	state->vram_mask = VRAM_WIDTH * state->vram_height - 1;
+	state->vram_xmask = VRAM_WIDTH - 1;
+	state->vram_ymask = state->vram_height - 1;
 
 	/* clear the planes initially */
-	for (i = 0; i < VRAM_WIDTH * itech32_vram_height; i++)
-		videoplane[0][i] = videoplane[1][i] = 0xff;
+	for (i = 0; i < VRAM_WIDTH * state->vram_height; i++)
+		state->videoplane[0][i] = state->videoplane[1][i] = 0xff;
 
 	/* fetch the GROM base */
-	grom_base = machine->region("gfx1")->base();
-	grom_size = machine->region("gfx1")->bytes();
-	grom_bank = 0;
-	grom_bank_mask = grom_size >> 24;
-	if (grom_bank_mask == 2)
-		grom_bank_mask = 3;
+	state->grom_base = machine->region("gfx1")->base();
+	state->grom_size = machine->region("gfx1")->bytes();
+	state->grom_bank = 0;
+	state->grom_bank_mask = state->grom_size >> 24;
+	if (state->grom_bank_mask == 2)
+		state->grom_bank_mask = 3;
 
 	/* reset statics */
-	memset(itech32_video, 0, 0x80);
+	memset(state->video, 0, 0x80);
 
-	scanline_timer = machine->scheduler().timer_alloc(FUNC(scanline_interrupt));
-	enable_latch[0] = 1;
-	enable_latch[1] = (itech32_planes > 1) ? 1 : 0;
-
-	is_drivedge = 0;
+	state->scanline_timer = machine->scheduler().timer_alloc(FUNC(scanline_interrupt));
+	state->enable_latch[0] = 1;
+	state->enable_latch[1] = (state->planes > 1) ? 1 : 0;
 }
 
 
@@ -249,19 +214,21 @@ VIDEO_START( itech32 )
 
 WRITE16_HANDLER( timekill_colora_w )
 {
+	itech32_state *state = space->machine->driver_data<itech32_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		enable_latch[0] = (~data >> 5) & 1;
-		enable_latch[1] = (~data >> 7) & 1;
-		color_latch[0] = (data & 0x0f) << 8;
+		state->enable_latch[0] = (~data >> 5) & 1;
+		state->enable_latch[1] = (~data >> 7) & 1;
+		state->color_latch[0] = (data & 0x0f) << 8;
 	}
 }
 
 
 WRITE16_HANDLER( timekill_colorbc_w )
 {
+	itech32_state *state = space->machine->driver_data<itech32_state>();
 	if (ACCESSING_BITS_0_7)
-		color_latch[1] = ((data & 0xf0) << 4) | 0x1000;
+		state->color_latch[1] = ((data & 0xf0) << 4) | 0x1000;
 }
 
 
@@ -279,56 +246,63 @@ WRITE16_HANDLER( timekill_intensity_w )
 
 WRITE16_HANDLER( bloodstm_color1_w )
 {
+	itech32_state *state = space->machine->driver_data<itech32_state>();
 	if (ACCESSING_BITS_0_7)
-		color_latch[0] = (data & 0x7f) << 8;
+		state->color_latch[0] = (data & 0x7f) << 8;
 }
 
 
 WRITE16_HANDLER( bloodstm_color2_w )
 {
+	itech32_state *state = space->machine->driver_data<itech32_state>();
 	if (ACCESSING_BITS_0_7)
-		color_latch[1] = (data & 0x7f) << 8;
+		state->color_latch[1] = (data & 0x7f) << 8;
 }
 
 
 WRITE16_HANDLER( bloodstm_plane_w )
 {
+	itech32_state *state = space->machine->driver_data<itech32_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		enable_latch[0] = (~data >> 1) & 1;
-		enable_latch[1] = (~data >> 2) & 1;
+		state->enable_latch[0] = (~data >> 1) & 1;
+		state->enable_latch[1] = (~data >> 2) & 1;
 	}
 }
 
 
 WRITE32_HANDLER( drivedge_color0_w )
 {
+	itech32_state *state = space->machine->driver_data<itech32_state>();
 	if (ACCESSING_BITS_16_23)
-		color_latch[0] = ((data >> 16) & 0x7f) << 8;
+		state->color_latch[0] = ((data >> 16) & 0x7f) << 8;
 }
 
 
 WRITE32_HANDLER( itech020_color1_w )
 {
+	itech32_state *state = space->machine->driver_data<itech32_state>();
 	if (ACCESSING_BITS_0_7)
-		color_latch[1] = (data & 0x7f) << 8;
+		state->color_latch[1] = (data & 0x7f) << 8;
 }
 
 
 WRITE32_HANDLER( itech020_color2_w )
 {
+	itech32_state *state = space->machine->driver_data<itech32_state>();
 	if (ACCESSING_BITS_0_7)
-		color_latch[0] = (data & 0x7f) << 8;
+		state->color_latch[0] = (data & 0x7f) << 8;
 }
 
 
 WRITE32_HANDLER( itech020_plane_w )
 {
+	itech32_state *state = space->machine->driver_data<itech32_state>();
 	if (ACCESSING_BITS_8_15)
 	{
-		enable_latch[0] = (~data >> 9) & 1;
-		enable_latch[1] = (~data >> 10) & 1;
-		grom_bank = ((data >> 14) & grom_bank_mask) << 24;
+		state->enable_latch[0] = (~data >> 9) & 1;
+		state->enable_latch[1] = (~data >> 10) & 1;
+		state->grom_bank = ((data >> 14) & state->grom_bank_mask) << 24;
 	}
 }
 
@@ -408,31 +382,32 @@ WRITE32_HANDLER( itech020_paletteram_w )
 
 static void logblit(running_machine *machine, const char *tag)
 {
+	itech32_state *state = machine->driver_data<itech32_state>();
 	if (!input_code_pressed(machine, KEYCODE_L))
 		return;
-	if (is_drivedge && VIDEO_TRANSFER_FLAGS == 0x5490)
+	if (state->is_drivedge && VIDEO_TRANSFER_FLAGS == 0x5490)
 	{
 		/* polygon drawing */
 		logerror("%s: e=%d%d f=%04x s=(%03x-%03x,%03x) w=%03x h=%03x b=%02x%04x c=%02x%02x ss=%04x,%04x ds=%04x,%04x ls=%04x%04x rs=%04x%04x u80=%04x", tag,
-			enable_latch[0], enable_latch[1],
+			state->enable_latch[0], state->enable_latch[1],
 			VIDEO_TRANSFER_FLAGS,
 			VIDEO_TRANSFER_X, VIDEO_RIGHTCLIP, VIDEO_TRANSFER_Y, VIDEO_TRANSFER_WIDTH, VIDEO_TRANSFER_HEIGHT,
 			VIDEO_TRANSFER_ADDRHI, VIDEO_TRANSFER_ADDRLO,
-			color_latch[0] >> 8, color_latch[1] >> 8,
+			state->color_latch[0] >> 8, state->color_latch[1] >> 8,
 			VIDEO_SRC_XSTEP, VIDEO_SRC_YSTEP,
 			VIDEO_DST_XSTEP, VIDEO_DST_YSTEP,
 			VIDEO_LEFTSTEPHI, VIDEO_LEFTSTEPLO, VIDEO_RIGHTSTEPHI, VIDEO_RIGHTSTEPLO,
 			VIDEO_STARTSTEP);
 	}
 
-	else if (itech32_video[0x16/2] == 0x100 && itech32_video[0x18/2] == 0x100 &&
-		itech32_video[0x1a/2] == 0x000 && itech32_video[0x1c/2] == 0x100 &&
-		itech32_video[0x1e/2] == 0x000 && itech32_video[0x20/2] == 0x000)
+	else if (state->video[0x16/2] == 0x100 && state->video[0x18/2] == 0x100 &&
+		state->video[0x1a/2] == 0x000 && state->video[0x1c/2] == 0x100 &&
+		state->video[0x1e/2] == 0x000 && state->video[0x20/2] == 0x000)
 	{
 		logerror("%s: e=%d%d f=%04x c=%02x%02x %02x%04x -> (%03x,%03x) %3dx%3dc=(%03x,%03x)-(%03x,%03x)", tag,
-				enable_latch[0], enable_latch[1],
+				state->enable_latch[0], state->enable_latch[1],
 				VIDEO_TRANSFER_FLAGS,
-				color_latch[0] >> 8, color_latch[1] >> 8,
+				state->color_latch[0] >> 8, state->color_latch[1] >> 8,
 				VIDEO_TRANSFER_ADDRHI, VIDEO_TRANSFER_ADDRLO,
 				VIDEO_TRANSFER_X, VIDEO_TRANSFER_Y,
 				VIDEO_TRANSFER_WIDTH, ADJUSTED_HEIGHT(VIDEO_TRANSFER_HEIGHT),
@@ -441,17 +416,17 @@ static void logblit(running_machine *machine, const char *tag)
 	else
 	{
 		logerror("%s: e=%d%d f=%04x c=%02x%02x %02x%04x -> (%03x,%03x) %3dx%3d c=(%03x,%03x)-(%03x,%03x) s=%04x %04x %04x %04x %04x %04x", tag,
-				enable_latch[0], enable_latch[1],
+				state->enable_latch[0], state->enable_latch[1],
 				VIDEO_TRANSFER_FLAGS,
-				color_latch[0] >> 8, color_latch[1] >> 8,
+				state->color_latch[0] >> 8, state->color_latch[1] >> 8,
 				VIDEO_TRANSFER_ADDRHI, VIDEO_TRANSFER_ADDRLO,
 				VIDEO_TRANSFER_X, VIDEO_TRANSFER_Y,
 				VIDEO_TRANSFER_WIDTH, ADJUSTED_HEIGHT(VIDEO_TRANSFER_HEIGHT),
 				VIDEO_LEFTCLIP, VIDEO_TOPCLIP, VIDEO_RIGHTCLIP, VIDEO_BOTTOMCLIP,
-				itech32_video[0x16/2], itech32_video[0x18/2], itech32_video[0x1a/2],
-				itech32_video[0x1c/2], itech32_video[0x1e/2], itech32_video[0x20/2]);
+				state->video[0x16/2], state->video[0x18/2], state->video[0x1a/2],
+				state->video[0x1c/2], state->video[0x1e/2], state->video[0x20/2]);
 	}
-	if (is_drivedge) logerror(" v0=%08x v1=%08x v2=%08x v3=%08x", drivedge_zbuf_control[0], drivedge_zbuf_control[1], drivedge_zbuf_control[2], drivedge_zbuf_control[3]);
+	if (state->is_drivedge) logerror(" v0=%08x v1=%08x v2=%08x v3=%08x", state->drivedge_zbuf_control[0], state->drivedge_zbuf_control[1], state->drivedge_zbuf_control[2], state->drivedge_zbuf_control[3]);
 	logerror("\n");
 }
 
@@ -465,6 +440,7 @@ static void logblit(running_machine *machine, const char *tag)
 
 static void update_interrupts(running_machine *machine, int fast)
 {
+	itech32_state *state = machine->driver_data<itech32_state>();
 	int scanline_state = 0, blitter_state = 0;
 
 	if (VIDEO_INTSTATE & VIDEO_INTENABLE & VIDEOINT_SCANLINE)
@@ -478,8 +454,9 @@ static void update_interrupts(running_machine *machine, int fast)
 
 static TIMER_CALLBACK( scanline_interrupt )
 {
+	itech32_state *state = machine->driver_data<itech32_state>();
 	/* set timer for next frame */
-	scanline_timer->adjust(machine->primary_screen->time_until_pos(VIDEO_INTSCANLINE));
+	state->scanline_timer->adjust(machine->primary_screen->time_until_pos(VIDEO_INTSCANLINE));
 
 	/* set the interrupt bit in the status reg */
 	logerror("-------------- (DISPLAY INT @ %d) ----------------\n", machine->primary_screen->vpos());
@@ -497,9 +474,9 @@ static TIMER_CALLBACK( scanline_interrupt )
  *
  *************************************/
 
-static void draw_raw(UINT16 *base, UINT16 color)
+static void draw_raw(itech32_state *state, UINT16 *base, UINT16 color)
 {
-	UINT8 *src = &grom_base[(grom_bank | ((VIDEO_TRANSFER_ADDRHI & 0xff) << 16) | VIDEO_TRANSFER_ADDRLO) % grom_size];
+	UINT8 *src = &state->grom_base[(state->grom_bank | ((VIDEO_TRANSFER_ADDRHI & 0xff) << 16) | VIDEO_TRANSFER_ADDRLO) % state->grom_size];
 	int transparent_pen = (VIDEO_TRANSFER_FLAGS & XFERFLAG_TRANSPARENT) ? 0xff : -1;
 	int width = VIDEO_TRANSFER_WIDTH << 8;
 	int height = ADJUSTED_HEIGHT(VIDEO_TRANSFER_HEIGHT) << 8;
@@ -513,7 +490,7 @@ static void draw_raw(UINT16 *base, UINT16 color)
 
 	/* adjust for (lack of) clipping */
 	if (!(VIDEO_TRANSFER_FLAGS & XFERFLAG_CLIP))
-		disable_clipping();
+		disable_clipping(state);
 
 	/* adjust for scaling */
 	if (VIDEO_TRANSFER_FLAGS & XFERFLAG_DSTXSCALE)
@@ -534,7 +511,7 @@ static void draw_raw(UINT16 *base, UINT16 color)
 		if (VIDEO_YSTEP_PER_X == 0)
 		{
 			/* clip in the Y direction */
-			if (sy >= scaled_clip_rect.min_y && sy < scaled_clip_rect.max_y)
+			if (sy >= state->scaled_clip_rect.min_y && sy < state->scaled_clip_rect.max_y)
 			{
 				UINT32 dstoffs;
 
@@ -543,33 +520,33 @@ static void draw_raw(UINT16 *base, UINT16 color)
 				if (xdststep > 0)
 				{
 					/* skip left pixels */
-					for (x = 0; x < width && sx < scaled_clip_rect.min_x; x += xsrcstep, sx += xdststep) ;
+					for (x = 0; x < width && sx < state->scaled_clip_rect.min_x; x += xsrcstep, sx += xdststep) ;
 
 					/* compute the address */
-					dstoffs = compute_safe_address(sx >> 8, sy >> 8) - (sx >> 8);
+					dstoffs = compute_safe_address(state, sx >> 8, sy >> 8) - (sx >> 8);
 
 					/* render middle pixels */
-					for ( ; x < width && sx < scaled_clip_rect.max_x; x += xsrcstep, sx += xdststep)
+					for ( ; x < width && sx < state->scaled_clip_rect.max_x; x += xsrcstep, sx += xdststep)
 					{
 						int pixel = rowsrc[x >> 8];
 						if (pixel != transparent_pen)
-							base[(dstoffs + (sx >> 8)) & vram_mask] = pixel | color;
+							base[(dstoffs + (sx >> 8)) & state->vram_mask] = pixel | color;
 					}
 				}
 				else
 				{
 					/* skip right pixels */
-					for (x = 0; x < width && sx >= scaled_clip_rect.max_x; x += xsrcstep, sx += xdststep) ;
+					for (x = 0; x < width && sx >= state->scaled_clip_rect.max_x; x += xsrcstep, sx += xdststep) ;
 
 					/* compute the address */
-					dstoffs = compute_safe_address(sx >> 8, sy >> 8) - (sx >> 8);
+					dstoffs = compute_safe_address(state, sx >> 8, sy >> 8) - (sx >> 8);
 
 					/* render middle pixels */
-					for ( ; x < width && sx >= scaled_clip_rect.min_x; x += xsrcstep, sx += xdststep)
+					for ( ; x < width && sx >= state->scaled_clip_rect.min_x; x += xsrcstep, sx += xdststep)
 					{
 						int pixel = rowsrc[x >> 8];
 						if (pixel != transparent_pen)
-							base[(dstoffs + (sx >> 8)) & vram_mask] = pixel | color;
+							base[(dstoffs + (sx >> 8)) & state->vram_mask] = pixel | color;
 					}
 				}
 			}
@@ -583,13 +560,13 @@ static void draw_raw(UINT16 *base, UINT16 color)
 
 			/* render all pixels */
 			sx = startx;
-			for (x = 0; x < width && sx < scaled_clip_rect.max_x; x += xsrcstep, sx += xdststep, ty += ystep)
-				if (ty >= scaled_clip_rect.min_y && ty < scaled_clip_rect.max_y &&
-					sx >= scaled_clip_rect.min_x && sx < scaled_clip_rect.max_x)
+			for (x = 0; x < width && sx < state->scaled_clip_rect.max_x; x += xsrcstep, sx += xdststep, ty += ystep)
+				if (ty >= state->scaled_clip_rect.min_y && ty < state->scaled_clip_rect.max_y &&
+					sx >= state->scaled_clip_rect.min_x && sx < state->scaled_clip_rect.max_x)
 				{
 					int pixel = rowsrc[x >> 8];
 					if (pixel != transparent_pen)
-						base[compute_safe_address(sx >> 8, ty >> 8)] = pixel | color;
+						base[compute_safe_address(state, sx >> 8, ty >> 8)] = pixel | color;
 				}
 		}
 
@@ -602,13 +579,13 @@ static void draw_raw(UINT16 *base, UINT16 color)
 
 	/* restore cliprects */
 	if (!(VIDEO_TRANSFER_FLAGS & XFERFLAG_CLIP))
-		enable_clipping();
+		enable_clipping(state);
 }
 
 
-static void draw_raw_drivedge(UINT16 *base, UINT16 *zbase, UINT16 color)
+static void draw_raw_drivedge(itech32_state *state, UINT16 *base, UINT16 *zbase, UINT16 color)
 {
-	UINT8 *src = &grom_base[(grom_bank | ((VIDEO_TRANSFER_ADDRHI & 0xff) << 16) | VIDEO_TRANSFER_ADDRLO) % grom_size];
+	UINT8 *src = &state->grom_base[(state->grom_bank | ((VIDEO_TRANSFER_ADDRHI & 0xff) << 16) | VIDEO_TRANSFER_ADDRLO) % state->grom_size];
 	int transparent_pen = (VIDEO_TRANSFER_FLAGS & XFERFLAG_TRANSPARENT) ? 0xff : -1;
 	int width = VIDEO_TRANSFER_WIDTH << 8;
 	int height = ADJUSTED_HEIGHT(VIDEO_TRANSFER_HEIGHT) << 8;
@@ -618,14 +595,14 @@ static void draw_raw_drivedge(UINT16 *base, UINT16 *zbase, UINT16 color)
 	int startx = ((VIDEO_TRANSFER_X & 0xfff) << 8) + 0x80;
 	int xdststep = 0x100;
 	int ydststep = VIDEO_DST_YSTEP;
-	INT32 z0 = drivedge_zbuf_control[2] & 0x7ff00;
-	INT32 zmatch = (drivedge_zbuf_control[2] & 0x1f) << 11;
+	INT32 z0 = state->drivedge_zbuf_control[2] & 0x7ff00;
+	INT32 zmatch = (state->drivedge_zbuf_control[2] & 0x1f) << 11;
 	INT32 srcdelta = 0;
 	int x, y;
 
 	/* adjust for (lack of) clipping */
 	if (!(VIDEO_TRANSFER_FLAGS & XFERFLAG_CLIP))
-		disable_clipping();
+		disable_clipping(state);
 
 	/* adjust for scaling */
 	if (VIDEO_TRANSFER_FLAGS & XFERFLAG_DSTXSCALE)
@@ -652,7 +629,7 @@ static void draw_raw_drivedge(UINT16 *base, UINT16 *zbase, UINT16 color)
 		if (VIDEO_YSTEP_PER_X == 0)
 		{
 			/* clip in the Y direction */
-			if (sy >= scaled_clip_rect.min_y && sy < scaled_clip_rect.max_y)
+			if (sy >= state->scaled_clip_rect.min_y && sy < state->scaled_clip_rect.max_y)
 			{
 				UINT32 dstoffs, zbufoffs;
 				INT32 z = z0;
@@ -662,96 +639,96 @@ static void draw_raw_drivedge(UINT16 *base, UINT16 *zbase, UINT16 color)
 				if (xdststep > 0)
 				{
 					/* skip left pixels */
-					for (x = 0; x < width && sx < scaled_clip_rect.min_x; x += xsrcstep, sx += xdststep)
-						z += (INT32)drivedge_zbuf_control[0];
+					for (x = 0; x < width && sx < state->scaled_clip_rect.min_x; x += xsrcstep, sx += xdststep)
+						z += (INT32)state->drivedge_zbuf_control[0];
 
 					/* compute the address */
-					dstoffs = compute_safe_address(sx >> 8, sy >> 8) - (sx >> 8);
-					zbufoffs = compute_safe_address(sx >> 8, sy >> 8) - (sx >> 8);
+					dstoffs = compute_safe_address(state, sx >> 8, sy >> 8) - (sx >> 8);
+					zbufoffs = compute_safe_address(state, sx >> 8, sy >> 8) - (sx >> 8);
 
 					/* render middle pixels */
-					if (drivedge_zbuf_control[3] & 0x8000)
+					if (state->drivedge_zbuf_control[3] & 0x8000)
 					{
-						for ( ; x < width && sx < scaled_clip_rect.max_x; x += xsrcstep, sx += xdststep)
+						for ( ; x < width && sx < state->scaled_clip_rect.max_x; x += xsrcstep, sx += xdststep)
 						{
 							int pixel = rowsrc[x >> 8];
 							if (pixel != transparent_pen)
 							{
-								base[(dstoffs + (sx >> 8)) & vram_mask] = pixel | color;
-								zbase[(zbufoffs + (sx >> 8)) & vram_mask] = (z >> 8) | zmatch;
+								base[(dstoffs + (sx >> 8)) & state->vram_mask] = pixel | color;
+								zbase[(zbufoffs + (sx >> 8)) & state->vram_mask] = (z >> 8) | zmatch;
 							}
-							z += (INT32)drivedge_zbuf_control[0];
+							z += (INT32)state->drivedge_zbuf_control[0];
 						}
 					}
-					else if (drivedge_zbuf_control[3] & 0x4000)
+					else if (state->drivedge_zbuf_control[3] & 0x4000)
 					{
-						for ( ; x < width && sx < scaled_clip_rect.max_x; x += xsrcstep, sx += xdststep)
+						for ( ; x < width && sx < state->scaled_clip_rect.max_x; x += xsrcstep, sx += xdststep)
 						{
 							int pixel = rowsrc[x >> 8];
-							if (pixel != transparent_pen && zmatch == (zbase[(zbufoffs + (sx >> 8)) & vram_mask] & (0x1f << 11)))
-								base[(dstoffs + (sx >> 8)) & vram_mask] = pixel | color;
-							z += (INT32)drivedge_zbuf_control[0];
+							if (pixel != transparent_pen && zmatch == (zbase[(zbufoffs + (sx >> 8)) & state->vram_mask] & (0x1f << 11)))
+								base[(dstoffs + (sx >> 8)) & state->vram_mask] = pixel | color;
+							z += (INT32)state->drivedge_zbuf_control[0];
 						}
 					}
 					else
 					{
-						for ( ; x < width && sx < scaled_clip_rect.max_x; x += xsrcstep, sx += xdststep)
+						for ( ; x < width && sx < state->scaled_clip_rect.max_x; x += xsrcstep, sx += xdststep)
 						{
 							int pixel = rowsrc[x >> 8];
-							if (pixel != transparent_pen && ((z >> 8) <= (zbase[(zbufoffs + (sx >> 8)) & vram_mask] & 0x7ff)))
+							if (pixel != transparent_pen && ((z >> 8) <= (zbase[(zbufoffs + (sx >> 8)) & state->vram_mask] & 0x7ff)))
 							{
-								base[(dstoffs + (sx >> 8)) & vram_mask] = pixel | color;
-								zbase[(zbufoffs + (sx >> 8)) & vram_mask] = (z >> 8) | zmatch;
+								base[(dstoffs + (sx >> 8)) & state->vram_mask] = pixel | color;
+								zbase[(zbufoffs + (sx >> 8)) & state->vram_mask] = (z >> 8) | zmatch;
 							}
-							z += (INT32)drivedge_zbuf_control[0];
+							z += (INT32)state->drivedge_zbuf_control[0];
 						}
 					}
 				}
 				else
 				{
 					/* skip right pixels */
-					for (x = 0; x < width && sx >= scaled_clip_rect.max_x; x += xsrcstep, sx += xdststep)
-						z += (INT32)drivedge_zbuf_control[0];
+					for (x = 0; x < width && sx >= state->scaled_clip_rect.max_x; x += xsrcstep, sx += xdststep)
+						z += (INT32)state->drivedge_zbuf_control[0];
 
 					/* compute the address */
-					dstoffs = compute_safe_address(sx >> 8, sy >> 8) - (sx >> 8);
-					zbufoffs = compute_safe_address(sx >> 8, sy >> 8) - (sx >> 8);
+					dstoffs = compute_safe_address(state, sx >> 8, sy >> 8) - (sx >> 8);
+					zbufoffs = compute_safe_address(state, sx >> 8, sy >> 8) - (sx >> 8);
 
 					/* render middle pixels */
-					if (drivedge_zbuf_control[3] & 0x8000)
+					if (state->drivedge_zbuf_control[3] & 0x8000)
 					{
-						for ( ; x < width && sx >= scaled_clip_rect.min_x; x += xsrcstep, sx += xdststep)
+						for ( ; x < width && sx >= state->scaled_clip_rect.min_x; x += xsrcstep, sx += xdststep)
 						{
 							int pixel = rowsrc[x >> 8];
 							if (pixel != transparent_pen)
 							{
-								base[(dstoffs + (sx >> 8)) & vram_mask] = pixel | color;
-								zbase[(zbufoffs + (sx >> 8)) & vram_mask] = (z >> 8) | zmatch;
+								base[(dstoffs + (sx >> 8)) & state->vram_mask] = pixel | color;
+								zbase[(zbufoffs + (sx >> 8)) & state->vram_mask] = (z >> 8) | zmatch;
 							}
-							z += (INT32)drivedge_zbuf_control[0];
+							z += (INT32)state->drivedge_zbuf_control[0];
 						}
 					}
-					else if (drivedge_zbuf_control[3] & 0x4000)
+					else if (state->drivedge_zbuf_control[3] & 0x4000)
 					{
-						for ( ; x < width && sx >= scaled_clip_rect.min_x; x += xsrcstep, sx += xdststep)
+						for ( ; x < width && sx >= state->scaled_clip_rect.min_x; x += xsrcstep, sx += xdststep)
 						{
 							int pixel = rowsrc[x >> 8];
-							if (pixel != transparent_pen && zmatch == (zbase[(zbufoffs + (sx >> 8)) & vram_mask] & (0x1f << 11)))
-								base[(dstoffs + (sx >> 8)) & vram_mask] = pixel | color;
-							z += (INT32)drivedge_zbuf_control[0];
+							if (pixel != transparent_pen && zmatch == (zbase[(zbufoffs + (sx >> 8)) & state->vram_mask] & (0x1f << 11)))
+								base[(dstoffs + (sx >> 8)) & state->vram_mask] = pixel | color;
+							z += (INT32)state->drivedge_zbuf_control[0];
 						}
 					}
 					else
 					{
-						for ( ; x < width && sx >= scaled_clip_rect.min_x; x += xsrcstep, sx += xdststep)
+						for ( ; x < width && sx >= state->scaled_clip_rect.min_x; x += xsrcstep, sx += xdststep)
 						{
 							int pixel = rowsrc[x >> 8];
-							if (pixel != transparent_pen && ((z >> 8) <= (zbase[(zbufoffs + (sx >> 8)) & vram_mask] & 0x7ff)))
+							if (pixel != transparent_pen && ((z >> 8) <= (zbase[(zbufoffs + (sx >> 8)) & state->vram_mask] & 0x7ff)))
 							{
-								base[(dstoffs + (sx >> 8)) & vram_mask] = pixel | color;
-								zbase[(zbufoffs + (sx >> 8)) & vram_mask] = (z >> 8) | zmatch;
+								base[(dstoffs + (sx >> 8)) & state->vram_mask] = pixel | color;
+								zbase[(zbufoffs + (sx >> 8)) & state->vram_mask] = (z >> 8) | zmatch;
 							}
-							z += (INT32)drivedge_zbuf_control[0];
+							z += (INT32)state->drivedge_zbuf_control[0];
 						}
 					}
 				}
@@ -767,51 +744,51 @@ static void draw_raw_drivedge(UINT16 *base, UINT16 *zbase, UINT16 color)
 
 			/* render all pixels */
 			sx = startx;
-			if (drivedge_zbuf_control[3] & 0x8000)
+			if (state->drivedge_zbuf_control[3] & 0x8000)
 			{
-				for (x = 0; x < width && sx < scaled_clip_rect.max_x; x += xsrcstep, sx += xdststep, ty += ystep)
-					if (ty >= scaled_clip_rect.min_y && ty < scaled_clip_rect.max_y &&
-						sx >= scaled_clip_rect.min_x && sx < scaled_clip_rect.max_x)
+				for (x = 0; x < width && sx < state->scaled_clip_rect.max_x; x += xsrcstep, sx += xdststep, ty += ystep)
+					if (ty >= state->scaled_clip_rect.min_y && ty < state->scaled_clip_rect.max_y &&
+						sx >= state->scaled_clip_rect.min_x && sx < state->scaled_clip_rect.max_x)
 					{
 						int pixel = rowsrc[x >> 8];
 						if (pixel != transparent_pen)
 						{
-							base[compute_safe_address(sx >> 8, ty >> 8)] = pixel | color;
-							zbase[compute_safe_address(sx >> 8, ty >> 8)] = (z >> 8) | zmatch;
+							base[compute_safe_address(state, sx >> 8, ty >> 8)] = pixel | color;
+							zbase[compute_safe_address(state, sx >> 8, ty >> 8)] = (z >> 8) | zmatch;
 						}
-						z += (INT32)drivedge_zbuf_control[0];
+						z += (INT32)state->drivedge_zbuf_control[0];
 					}
 			}
-			else if (drivedge_zbuf_control[3] & 0x4000)
+			else if (state->drivedge_zbuf_control[3] & 0x4000)
 			{
-				for (x = 0; x < width && sx < scaled_clip_rect.max_x; x += xsrcstep, sx += xdststep, ty += ystep)
-					if (ty >= scaled_clip_rect.min_y && ty < scaled_clip_rect.max_y &&
-						sx >= scaled_clip_rect.min_x && sx < scaled_clip_rect.max_x)
+				for (x = 0; x < width && sx < state->scaled_clip_rect.max_x; x += xsrcstep, sx += xdststep, ty += ystep)
+					if (ty >= state->scaled_clip_rect.min_y && ty < state->scaled_clip_rect.max_y &&
+						sx >= state->scaled_clip_rect.min_x && sx < state->scaled_clip_rect.max_x)
 					{
 						int pixel = rowsrc[x >> 8];
-						UINT16 *zbuf = &zbase[compute_safe_address(sx >> 8, ty >> 8)];
+						UINT16 *zbuf = &zbase[compute_safe_address(state, sx >> 8, ty >> 8)];
 						if (pixel != transparent_pen && zmatch == (*zbuf & (0x1f << 11)))
 						{
-							base[compute_safe_address(sx >> 8, ty >> 8)] = pixel | color;
+							base[compute_safe_address(state, sx >> 8, ty >> 8)] = pixel | color;
 							*zbuf = (z >> 8) | zmatch;
 						}
-						z += (INT32)drivedge_zbuf_control[0];
+						z += (INT32)state->drivedge_zbuf_control[0];
 					}
 			}
 			else
 			{
-				for (x = 0; x < width && sx < scaled_clip_rect.max_x; x += xsrcstep, sx += xdststep, ty += ystep)
-					if (ty >= scaled_clip_rect.min_y && ty < scaled_clip_rect.max_y &&
-						sx >= scaled_clip_rect.min_x && sx < scaled_clip_rect.max_x)
+				for (x = 0; x < width && sx < state->scaled_clip_rect.max_x; x += xsrcstep, sx += xdststep, ty += ystep)
+					if (ty >= state->scaled_clip_rect.min_y && ty < state->scaled_clip_rect.max_y &&
+						sx >= state->scaled_clip_rect.min_x && sx < state->scaled_clip_rect.max_x)
 					{
 						int pixel = rowsrc[x >> 8];
-						UINT16 *zbuf = &zbase[compute_safe_address(sx >> 8, ty >> 8)];
+						UINT16 *zbuf = &zbase[compute_safe_address(state, sx >> 8, ty >> 8)];
 						if (pixel != transparent_pen && ((z >> 8) <= (*zbuf & 0x7ff)))
 						{
-							base[compute_safe_address(sx >> 8, ty >> 8)] = pixel | color;
+							base[compute_safe_address(state, sx >> 8, ty >> 8)] = pixel | color;
 							*zbuf = (z >> 8) | zmatch;
 						}
-						z += (INT32)drivedge_zbuf_control[0];
+						z += (INT32)state->drivedge_zbuf_control[0];
 					}
 			}
 		}
@@ -826,23 +803,23 @@ static void draw_raw_drivedge(UINT16 *base, UINT16 *zbase, UINT16 color)
 		if (VIDEO_TRANSFER_FLAGS == 0x5490)
 		{
 			startx += (INT32)((VIDEO_LEFTSTEPHI << 16) | VIDEO_LEFTSTEPLO);
-			scaled_clip_rect.max_x += (INT32)((VIDEO_RIGHTSTEPHI << 16) | VIDEO_RIGHTSTEPLO);
+			state->scaled_clip_rect.max_x += (INT32)((VIDEO_RIGHTSTEPHI << 16) | VIDEO_RIGHTSTEPLO);
 			srcdelta += (INT16)VIDEO_STARTSTEP;
 		}
-		z0 += (INT32)drivedge_zbuf_control[1];
+		z0 += (INT32)state->drivedge_zbuf_control[1];
 	}
 
 	/* restore cliprects */
 	if (!(VIDEO_TRANSFER_FLAGS & XFERFLAG_CLIP))
-		enable_clipping();
+		enable_clipping(state);
 
 	/* reflect the final values into registers */
 	VIDEO_TRANSFER_X = (VIDEO_TRANSFER_X & ~0xfff) | (startx >> 8);
-	VIDEO_RIGHTCLIP = (VIDEO_RIGHTCLIP & ~0xfff) | (scaled_clip_rect.max_x >> 8);
+	VIDEO_RIGHTCLIP = (VIDEO_RIGHTCLIP & ~0xfff) | (state->scaled_clip_rect.max_x >> 8);
 	VIDEO_TRANSFER_Y = (VIDEO_TRANSFER_Y & ~0xfff) | ((VIDEO_TRANSFER_Y + (y >> 8)) & 0xfff);
 	VIDEO_TRANSFER_ADDRLO += srcdelta >> 8;
 
-	drivedge_zbuf_control[2] = (drivedge_zbuf_control[2] & ~0x7ff00) | (z0 & 0x7ff00);
+	state->drivedge_zbuf_control[2] = (state->drivedge_zbuf_control[2] & ~0x7ff00) | (z0 & 0x7ff00);
 }
 
 
@@ -891,9 +868,9 @@ do {												\
  *
  *************************************/
 
-INLINE void draw_rle_fast(UINT16 *base, UINT16 color)
+INLINE void draw_rle_fast(itech32_state *state, UINT16 *base, UINT16 color)
 {
-	UINT8 *src = &grom_base[(grom_bank | ((VIDEO_TRANSFER_ADDRHI & 0xff) << 16) | VIDEO_TRANSFER_ADDRLO) % grom_size];
+	UINT8 *src = &state->grom_base[(state->grom_bank | ((VIDEO_TRANSFER_ADDRHI & 0xff) << 16) | VIDEO_TRANSFER_ADDRLO) % state->grom_size];
 	int transparent_pen = (VIDEO_TRANSFER_FLAGS & XFERFLAG_TRANSPARENT) ? 0xff : -1;
 	int width = VIDEO_TRANSFER_WIDTH;
 	int height = ADJUSTED_HEIGHT(VIDEO_TRANSFER_HEIGHT);
@@ -904,9 +881,9 @@ INLINE void draw_rle_fast(UINT16 *base, UINT16 color)
 	int lclip, rclip;
 
 	/* determine clipping */
-	lclip = clip_rect.min_x - sx;
+	lclip = state->clip_rect.min_x - sx;
 	if (lclip < 0) lclip = 0;
-	rclip = sx + width - clip_rect.max_x;
+	rclip = sx + width - state->clip_rect.max_x;
 	if (rclip < 0) rclip = 0;
 	width -= lclip + rclip;
 	sx += lclip;
@@ -921,14 +898,14 @@ INLINE void draw_rle_fast(UINT16 *base, UINT16 color)
 		UINT32 dstoffs;
 
 		/* clip in the Y direction */
-		if (sy < scaled_clip_rect.min_y || sy >= scaled_clip_rect.max_y)
+		if (sy < state->scaled_clip_rect.min_y || sy >= state->scaled_clip_rect.max_y)
 		{
 			SKIP_RLE(width + lclip + rclip, xleft, count, innercount, src);
 			continue;
 		}
 
 		/* compute the address */
-		dstoffs = compute_safe_address(sx, sy >> 8);
+		dstoffs = compute_safe_address(state, sx, sy >> 8);
 
 		/* left clip */
 		SKIP_RLE(lclip, xleft, count, innercount, src);
@@ -945,7 +922,7 @@ INLINE void draw_rle_fast(UINT16 *base, UINT16 color)
 				{
 					int pixel = *src++;
 					if (pixel != transparent_pen)
-						base[dstoffs & vram_mask] = color | pixel;
+						base[dstoffs & state->vram_mask] = color | pixel;
 					dstoffs++;
 				}
 
@@ -954,7 +931,7 @@ INLINE void draw_rle_fast(UINT16 *base, UINT16 color)
 			{
 				val |= color;
 				while (innercount--)
-					base[dstoffs++ & vram_mask] = val;
+					base[dstoffs++ & state->vram_mask] = val;
 			}
 
 			/* run of transparent repeats */
@@ -968,9 +945,9 @@ INLINE void draw_rle_fast(UINT16 *base, UINT16 color)
 }
 
 
-INLINE void draw_rle_fast_xflip(UINT16 *base, UINT16 color)
+INLINE void draw_rle_fast_xflip(itech32_state *state, UINT16 *base, UINT16 color)
 {
-	UINT8 *src = &grom_base[(grom_bank | ((VIDEO_TRANSFER_ADDRHI & 0xff) << 16) | VIDEO_TRANSFER_ADDRLO) % grom_size];
+	UINT8 *src = &state->grom_base[(state->grom_bank | ((VIDEO_TRANSFER_ADDRHI & 0xff) << 16) | VIDEO_TRANSFER_ADDRLO) % state->grom_size];
 	int transparent_pen = (VIDEO_TRANSFER_FLAGS & XFERFLAG_TRANSPARENT) ? 0xff : -1;
 	int width = VIDEO_TRANSFER_WIDTH;
 	int height = ADJUSTED_HEIGHT(VIDEO_TRANSFER_HEIGHT);
@@ -981,9 +958,9 @@ INLINE void draw_rle_fast_xflip(UINT16 *base, UINT16 color)
 	int lclip, rclip;
 
 	/* determine clipping */
-	lclip = sx - clip_rect.max_x;
+	lclip = sx - state->clip_rect.max_x;
 	if (lclip < 0) lclip = 0;
-	rclip = clip_rect.min_x - (sx - width);
+	rclip = state->clip_rect.min_x - (sx - width);
 	if (rclip < 0) rclip = 0;
 	width -= lclip + rclip;
 	sx -= lclip;
@@ -998,14 +975,14 @@ INLINE void draw_rle_fast_xflip(UINT16 *base, UINT16 color)
 		UINT32 dstoffs;
 
 		/* clip in the Y direction */
-		if (sy < scaled_clip_rect.min_y || sy >= scaled_clip_rect.max_y)
+		if (sy < state->scaled_clip_rect.min_y || sy >= state->scaled_clip_rect.max_y)
 		{
 			SKIP_RLE(width + lclip + rclip, xleft, count, innercount, src);
 			continue;
 		}
 
 		/* compute the address */
-		dstoffs = compute_safe_address(sx, sy >> 8);
+		dstoffs = compute_safe_address(state, sx, sy >> 8);
 
 		/* left clip */
 		SKIP_RLE(lclip, xleft, count, innercount, src);
@@ -1022,7 +999,7 @@ INLINE void draw_rle_fast_xflip(UINT16 *base, UINT16 color)
 				{
 					int pixel = *src++;
 					if (pixel != transparent_pen)
-						base[dstoffs & vram_mask] = color | pixel;
+						base[dstoffs & state->vram_mask] = color | pixel;
 					dstoffs--;
 				}
 
@@ -1031,7 +1008,7 @@ INLINE void draw_rle_fast_xflip(UINT16 *base, UINT16 color)
 			{
 				val |= color;
 				while (innercount--)
-					base[dstoffs-- & vram_mask] = val;
+					base[dstoffs-- & state->vram_mask] = val;
 			}
 
 			/* run of transparent repeats */
@@ -1052,9 +1029,9 @@ INLINE void draw_rle_fast_xflip(UINT16 *base, UINT16 color)
  *
  *************************************/
 
-INLINE void draw_rle_slow(UINT16 *base, UINT16 color)
+INLINE void draw_rle_slow(itech32_state *state, UINT16 *base, UINT16 color)
 {
-	UINT8 *src = &grom_base[(grom_bank | ((VIDEO_TRANSFER_ADDRHI & 0xff) << 16) | VIDEO_TRANSFER_ADDRLO) % grom_size];
+	UINT8 *src = &state->grom_base[(state->grom_bank | ((VIDEO_TRANSFER_ADDRHI & 0xff) << 16) | VIDEO_TRANSFER_ADDRLO) % state->grom_size];
 	int transparent_pen = (VIDEO_TRANSFER_FLAGS & XFERFLAG_TRANSPARENT) ? 0xff : -1;
 	int width = VIDEO_TRANSFER_WIDTH;
 	int height = ADJUSTED_HEIGHT(VIDEO_TRANSFER_HEIGHT);
@@ -1080,7 +1057,7 @@ INLINE void draw_rle_slow(UINT16 *base, UINT16 color)
 		UINT32 dstoffs;
 
 		/* clip in the Y direction */
-		if (sy < scaled_clip_rect.min_y || sy >= scaled_clip_rect.max_y)
+		if (sy < state->scaled_clip_rect.min_y || sy >= state->scaled_clip_rect.max_y)
 		{
 			SKIP_RLE(width, xleft, count, innercount, src);
 			continue;
@@ -1088,7 +1065,7 @@ INLINE void draw_rle_slow(UINT16 *base, UINT16 color)
 
 		/* compute the address */
 		sx = startx;
-		dstoffs = compute_safe_address(clip_rect.min_x, sy >> 8) - clip_rect.min_x;
+		dstoffs = compute_safe_address(state, state->clip_rect.min_x, sy >> 8) - state->clip_rect.min_x;
 
 		/* loop until gone */
 		for (xleft = width; xleft > 0; )
@@ -1102,8 +1079,8 @@ INLINE void draw_rle_slow(UINT16 *base, UINT16 color)
 				{
 					int pixel = *src++;
 					if (pixel != transparent_pen)
-						if (sx >= scaled_clip_rect.min_x && sx < scaled_clip_rect.max_x)
-							base[(dstoffs + (sx >> 8)) & vram_mask] = color | pixel;
+						if (sx >= state->scaled_clip_rect.min_x && sx < state->scaled_clip_rect.max_x)
+							base[(dstoffs + (sx >> 8)) & state->vram_mask] = color | pixel;
 				}
 
 			/* run of non-transparent repeats */
@@ -1111,8 +1088,8 @@ INLINE void draw_rle_slow(UINT16 *base, UINT16 color)
 			{
 				val |= color;
 				for ( ; innercount--; sx += xdststep)
-					if (sx >= scaled_clip_rect.min_x && sx < scaled_clip_rect.max_x)
-						base[(dstoffs + (sx >> 8)) & vram_mask] = val;
+					if (sx >= state->scaled_clip_rect.min_x && sx < state->scaled_clip_rect.max_x)
+						base[(dstoffs + (sx >> 8)) & state->vram_mask] = val;
 			}
 
 			/* run of transparent repeats */
@@ -1130,25 +1107,25 @@ INLINE void draw_rle_slow(UINT16 *base, UINT16 color)
 
 
 
-static void draw_rle(UINT16 *base, UINT16 color)
+static void draw_rle(itech32_state *state, UINT16 *base, UINT16 color)
 {
 	/* adjust for (lack of) clipping */
 	if (!(VIDEO_TRANSFER_FLAGS & XFERFLAG_CLIP))
-		disable_clipping();
+		disable_clipping(state);
 
 	/* if we have an X scale, draw it slow */
 	if (((VIDEO_TRANSFER_FLAGS & XFERFLAG_DSTXSCALE) && VIDEO_DST_XSTEP != 0x100) || VIDEO_XSTEP_PER_Y)
-		draw_rle_slow(base, color);
+		draw_rle_slow(state, base, color);
 
 	/* else draw it fast */
 	else if (VIDEO_TRANSFER_FLAGS & XFERFLAG_XFLIP)
-		draw_rle_fast_xflip(base, color);
+		draw_rle_fast_xflip(state, base, color);
 	else
-		draw_rle_fast(base, color);
+		draw_rle_fast(state, base, color);
 
 	/* restore cliprects */
 	if (!(VIDEO_TRANSFER_FLAGS & XFERFLAG_CLIP))
-		enable_clipping();
+		enable_clipping(state);
 }
 
 
@@ -1159,7 +1136,7 @@ static void draw_rle(UINT16 *base, UINT16 color)
  *
  *************************************/
 
-static void shiftreg_clear(UINT16 *base, UINT16 *zbase)
+static void shiftreg_clear(itech32_state *state, UINT16 *base, UINT16 *zbase)
 {
 	int ydir = (VIDEO_TRANSFER_FLAGS & XFERFLAG_YFLIP) ? -1 : 1;
 	int height = ADJUSTED_HEIGHT(VIDEO_TRANSFER_HEIGHT);
@@ -1169,17 +1146,17 @@ static void shiftreg_clear(UINT16 *base, UINT16 *zbase)
 	int y;
 
 	/* first line is the source */
-	src = &base[compute_safe_address(sx, sy)];
+	src = &base[compute_safe_address(state, sx, sy)];
 	sy += ydir;
 
 	/* loop over height */
 	for (y = 1; y < height; y++)
 	{
-		memcpy(&base[compute_safe_address(sx, sy)], src, 512*2);
+		memcpy(&base[compute_safe_address(state, sx, sy)], src, 512*2);
 		if (zbase)
 		{
-			UINT16 zval = ((drivedge_zbuf_control[2] >> 8) & 0x7ff) | ((drivedge_zbuf_control[2] & 0x1f) << 11);
-			UINT16 *dst = &zbase[compute_safe_address(sx, sy)];
+			UINT16 zval = ((state->drivedge_zbuf_control[2] >> 8) & 0x7ff) | ((state->drivedge_zbuf_control[2] & 0x1f) << 11);
+			UINT16 *dst = &zbase[compute_safe_address(state, sx, sy)];
 			int x;
 			for (x = 0; x < 512; x++)
 				*dst++ = zval;
@@ -1198,6 +1175,7 @@ static void shiftreg_clear(UINT16 *base, UINT16 *zbase)
 
 static void handle_video_command(running_machine *machine)
 {
+	itech32_state *state = machine->driver_data<itech32_state>();
 	/* only 6 known commands */
 	switch (VIDEO_COMMAND)
 	{
@@ -1206,14 +1184,14 @@ static void handle_video_command(running_machine *machine)
 			g_profiler.start(PROFILER_USER1);
 			if (BLIT_LOGGING) logblit(machine, "Blit Raw");
 
-			if (is_drivedge)
+			if (state->is_drivedge)
 			{
-				if (enable_latch[0]) draw_raw_drivedge(videoplane[0], videoplane[1], color_latch[0]);
+				if (state->enable_latch[0]) draw_raw_drivedge(state, state->videoplane[0], state->videoplane[1], state->color_latch[0]);
 			}
 			else
 			{
-				if (enable_latch[0]) draw_raw(videoplane[0], color_latch[0]);
-				if (enable_latch[1]) draw_raw(videoplane[1], color_latch[1]);
+				if (state->enable_latch[0]) draw_raw(state, state->videoplane[0], state->color_latch[0]);
+				if (state->enable_latch[1]) draw_raw(state, state->videoplane[1], state->color_latch[1]);
 			}
 
 			g_profiler.stop();
@@ -1224,8 +1202,8 @@ static void handle_video_command(running_machine *machine)
 			g_profiler.start(PROFILER_USER2);
 			if (BLIT_LOGGING) logblit(machine, "Blit RLE");
 
-			if (enable_latch[0]) draw_rle(videoplane[0], color_latch[0]);
-			if (enable_latch[1]) draw_rle(videoplane[1], color_latch[1]);
+			if (state->enable_latch[0]) draw_rle(state, state->videoplane[0], state->color_latch[0]);
+			if (state->enable_latch[1]) draw_rle(state, state->videoplane[1], state->color_latch[1]);
 
 			g_profiler.stop();
 			break;
@@ -1233,10 +1211,10 @@ static void handle_video_command(running_machine *machine)
 		/* command 3: set up raw data transfer */
 		case 3:
 			if (BLIT_LOGGING) logblit(machine, "Raw Xfer");
-			xfer_xcount = VIDEO_TRANSFER_WIDTH;
-			xfer_ycount = ADJUSTED_HEIGHT(VIDEO_TRANSFER_HEIGHT);
-			xfer_xcur = VIDEO_TRANSFER_X & 0xfff;
-			xfer_ycur = VIDEO_TRANSFER_Y & 0xfff;
+			state->xfer_xcount = VIDEO_TRANSFER_WIDTH;
+			state->xfer_ycount = ADJUSTED_HEIGHT(VIDEO_TRANSFER_HEIGHT);
+			state->xfer_xcur = VIDEO_TRANSFER_X & 0xfff;
+			state->xfer_ycur = VIDEO_TRANSFER_Y & 0xfff;
 			break;
 
 		/* command 4: flush? */
@@ -1252,14 +1230,14 @@ static void handle_video_command(running_machine *machine)
 			g_profiler.start(PROFILER_USER3);
 			if (BLIT_LOGGING) logblit(machine, "ShiftReg");
 
-			if (is_drivedge)
+			if (state->is_drivedge)
 			{
-				if (enable_latch[0]) shiftreg_clear(videoplane[0], videoplane[1]);
+				if (state->enable_latch[0]) shiftreg_clear(state, state->videoplane[0], state->videoplane[1]);
 			}
 			else
 			{
-				if (enable_latch[0]) shiftreg_clear(videoplane[0], NULL);
-				if (enable_latch[1]) shiftreg_clear(videoplane[1], NULL);
+				if (state->enable_latch[0]) shiftreg_clear(state, state->videoplane[0], NULL);
+				if (state->enable_latch[1]) shiftreg_clear(state, state->videoplane[1], NULL);
 			}
 
 			g_profiler.stop();
@@ -1285,10 +1263,11 @@ static void handle_video_command(running_machine *machine)
 
 WRITE16_HANDLER( itech32_video_w )
 {
+	itech32_state *state = space->machine->driver_data<itech32_state>();
 	rectangle visarea;
 
-	int old = itech32_video[offset];
-	COMBINE_DATA(&itech32_video[offset]);
+	int old = state->video[offset];
+	COMBINE_DATA(&state->video[offset]);
 
 	switch (offset)
 	{
@@ -1298,23 +1277,23 @@ WRITE16_HANDLER( itech32_video_w )
 			break;
 
 		case 0x04/2:	/* VIDEO_TRANSFER */
-			if (VIDEO_COMMAND == 3 && xfer_ycount)
+			if (VIDEO_COMMAND == 3 && state->xfer_ycount)
 			{
-				offs_t addr = compute_safe_address(xfer_xcur, xfer_ycur);
-				if (enable_latch[0])
+				offs_t addr = compute_safe_address(state, state->xfer_xcur, state->xfer_ycur);
+				if (state->enable_latch[0])
 				{
-					VIDEO_TRANSFER = videoplane[0][addr];
-					videoplane[0][addr] = (data & 0xff) | color_latch[0];
+					VIDEO_TRANSFER = state->videoplane[0][addr];
+					state->videoplane[0][addr] = (data & 0xff) | state->color_latch[0];
 				}
-				if (enable_latch[1])
+				if (state->enable_latch[1])
 				{
-					VIDEO_TRANSFER = videoplane[1][addr];
-					videoplane[1][addr] = (data & 0xff) | color_latch[1];
+					VIDEO_TRANSFER = state->videoplane[1][addr];
+					state->videoplane[1][addr] = (data & 0xff) | state->color_latch[1];
 				}
-				if (--xfer_xcount)
-					xfer_xcur++;
-				else if (--xfer_ycount)
-					xfer_xcur = VIDEO_TRANSFER_X, xfer_xcount = VIDEO_TRANSFER_WIDTH, xfer_ycur++;
+				if (--state->xfer_xcount)
+					state->xfer_xcur++;
+				else if (--state->xfer_ycount)
+					state->xfer_xcur = VIDEO_TRANSFER_X, state->xfer_xcount = VIDEO_TRANSFER_WIDTH, state->xfer_ycur++;
 			}
 			break;
 
@@ -1327,27 +1306,27 @@ WRITE16_HANDLER( itech32_video_w )
 			break;
 
 		case 0x24/2:	/* VIDEO_LEFTCLIP */
-			clip_rect.min_x = VIDEO_LEFTCLIP;
-			scaled_clip_rect.min_x = VIDEO_LEFTCLIP << 8;
+			state->clip_rect.min_x = VIDEO_LEFTCLIP;
+			state->scaled_clip_rect.min_x = VIDEO_LEFTCLIP << 8;
 			break;
 
 		case 0x26/2:	/* VIDEO_RIGHTCLIP */
-			clip_rect.max_x = VIDEO_RIGHTCLIP;
-			scaled_clip_rect.max_x = VIDEO_RIGHTCLIP << 8;
+			state->clip_rect.max_x = VIDEO_RIGHTCLIP;
+			state->scaled_clip_rect.max_x = VIDEO_RIGHTCLIP << 8;
 			break;
 
 		case 0x28/2:	/* VIDEO_TOPCLIP */
-			clip_rect.min_y = VIDEO_TOPCLIP;
-			scaled_clip_rect.min_y = VIDEO_TOPCLIP << 8;
+			state->clip_rect.min_y = VIDEO_TOPCLIP;
+			state->scaled_clip_rect.min_y = VIDEO_TOPCLIP << 8;
 			break;
 
 		case 0x2a/2:	/* VIDEO_BOTTOMCLIP */
-			clip_rect.max_y = VIDEO_BOTTOMCLIP;
-			scaled_clip_rect.max_y = VIDEO_BOTTOMCLIP << 8;
+			state->clip_rect.max_y = VIDEO_BOTTOMCLIP;
+			state->scaled_clip_rect.max_y = VIDEO_BOTTOMCLIP << 8;
 			break;
 
 		case 0x2c/2:	/* VIDEO_INTSCANLINE */
-			scanline_timer->adjust(space->machine->primary_screen->time_until_pos(VIDEO_INTSCANLINE));
+			state->scanline_timer->adjust(space->machine->primary_screen->time_until_pos(VIDEO_INTSCANLINE));
 			break;
 
 		case 0x32/2:	/* VIDEO_VTOTAL */
@@ -1388,16 +1367,17 @@ WRITE16_HANDLER( itech32_video_w )
 
 READ16_HANDLER( itech32_video_r )
 {
+	itech32_state *state = space->machine->driver_data<itech32_state>();
 	if (offset == 0)
 	{
-		return (itech32_video[offset] & ~0x08) | 0x04 | 0x01;
+		return (state->video[offset] & ~0x08) | 0x04 | 0x01;
 	}
 	else if (offset == 3)
 	{
 		return 0xef;/*space->machine->primary_screen->vpos() - 1;*/
 	}
 
-	return itech32_video[offset];
+	return state->video[offset];
 }
 
 
@@ -1431,8 +1411,8 @@ WRITE32_HANDLER( itech020_video_w )
 
 WRITE32_HANDLER( drivedge_zbuf_control_w )
 {
-	COMBINE_DATA(&drivedge_zbuf_control[offset]);
-	is_drivedge = 1;
+	itech32_state *state = space->machine->driver_data<itech32_state>();
+	COMBINE_DATA(&state->drivedge_zbuf_control[offset]);
 }
 
 
@@ -1452,17 +1432,18 @@ READ32_HANDLER( itech020_video_r )
 
 VIDEO_UPDATE( itech32 )
 {
+	itech32_state *state = screen->machine->driver_data<itech32_state>();
 	int y;
 
 	/* loop over height */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		UINT16 *src1 = &videoplane[0][compute_safe_address(VIDEO_DISPLAY_XORIGIN1, VIDEO_DISPLAY_YORIGIN1 + y)];
+		UINT16 *src1 = &state->videoplane[0][compute_safe_address(state, VIDEO_DISPLAY_XORIGIN1, VIDEO_DISPLAY_YORIGIN1 + y)];
 
 		/* handle multi-plane case */
-		if (itech32_planes > 1)
+		if (state->planes > 1)
 		{
-			UINT16 *src2 = &videoplane[1][compute_safe_address(VIDEO_DISPLAY_XORIGIN2 + VIDEO_DISPLAY_XSCROLL2, VIDEO_DISPLAY_YORIGIN2 + VIDEO_DISPLAY_YSCROLL2 + y)];
+			UINT16 *src2 = &state->videoplane[1][compute_safe_address(state, VIDEO_DISPLAY_XORIGIN2 + VIDEO_DISPLAY_XSCROLL2, VIDEO_DISPLAY_YORIGIN2 + VIDEO_DISPLAY_YSCROLL2 + y)];
 			UINT16 scanline[384];
 			int x;
 

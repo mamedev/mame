@@ -4,10 +4,25 @@
 
 *************************************************************************/
 
-/*----------- defined in video/exterm.c -----------*/
+class exterm_state : public driver_device
+{
+public:
+	exterm_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-extern UINT16 *exterm_master_videoram;
-extern UINT16 *exterm_slave_videoram;
+	UINT8 aimpos[2];
+	UINT8 trackball_old[2];
+	UINT8 master_sound_latch;
+	UINT8 slave_sound_latch;
+	UINT8 sound_control;
+	UINT8 dac_value[2];
+	UINT16 last;
+	UINT16 *master_videoram;
+	UINT16 *slave_videoram;
+};
+
+
+/*----------- defined in video/exterm.c -----------*/
 
 PALETTE_INIT( exterm );
 void exterm_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params);

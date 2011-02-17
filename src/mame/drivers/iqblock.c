@@ -57,20 +57,21 @@ Grndtour:
 #include "includes/iqblock.h"
 #include "sound/2413intf.h"
 
-static UINT8 *rambase;
 
 static WRITE8_HANDLER( iqblock_prot_w )
 {
-    rambase[0xe26] = data;
-    rambase[0xe27] = data;
-    rambase[0xe1c] = data;
+	iqblock_state *state = space->machine->driver_data<iqblock_state>();
+    state->rambase[0xe26] = data;
+    state->rambase[0xe27] = data;
+    state->rambase[0xe1c] = data;
 }
 
 static WRITE8_HANDLER( grndtour_prot_w )
 {
-	rambase[0xe39] = data;
-    rambase[0xe3a] = data;
-    rambase[0xe2f] = data;
+	iqblock_state *state = space->machine->driver_data<iqblock_state>();
+	state->rambase[0xe39] = data;
+    state->rambase[0xe3a] = data;
+    state->rambase[0xe2f] = data;
 
 }
 
@@ -96,10 +97,11 @@ static READ8_HANDLER( extrarom_r )
 
 static WRITE8_DEVICE_HANDLER( port_C_w )
 {
+	iqblock_state *state = device->machine->driver_data<iqblock_state>();
 	/* bit 4 unknown; it is pulsed at the end of every NMI */
 
 	/* bit 5 seems to be 0 during screen redraw */
-	iqblock_videoenable = data & 0x20;
+	state->videoenable = data & 0x20;
 
 	/* bit 6 is coin counter */
 	coin_counter_w(device->machine, 0,data & 0x40);
@@ -120,7 +122,7 @@ static const ppi8255_interface ppi8255_intf =
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE(&rambase)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_MEMBER(iqblock_state, rambase)
 ADDRESS_MAP_END
 
 
@@ -265,7 +267,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( iqblock, driver_device )
+static MACHINE_CONFIG_START( iqblock, iqblock_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)	/* 6 MHz */
@@ -425,6 +427,7 @@ ROM_END
 
 static DRIVER_INIT( iqblock )
 {
+	iqblock_state *state = machine->driver_data<iqblock_state>();
 	UINT8 *rom = machine->region("maincpu")->base();
 	int i;
 
@@ -439,14 +442,15 @@ static DRIVER_INIT( iqblock )
 	/* initialize pointers for I/O mapped RAM */
 	machine->generic.paletteram.u8         = rom + 0x12000;
 	machine->generic.paletteram2.u8       = rom + 0x12800;
-	iqblock_fgvideoram = rom + 0x16800;
-	iqblock_bgvideoram = rom + 0x17000;
+	state->fgvideoram = rom + 0x16800;
+	state->bgvideoram = rom + 0x17000;
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfe26, 0xfe26, 0, 0, iqblock_prot_w);
-	iqblock_video_type=1;
+	state->video_type=1;
 }
 
 static DRIVER_INIT( grndtour )
 {
+	iqblock_state *state = machine->driver_data<iqblock_state>();
 	UINT8 *rom = machine->region("maincpu")->base();
 	int i;
 
@@ -461,10 +465,10 @@ static DRIVER_INIT( grndtour )
 	/* initialize pointers for I/O mapped RAM */
 	machine->generic.paletteram.u8         = rom + 0x12000;
 	machine->generic.paletteram2.u8       = rom + 0x12800;
-	iqblock_fgvideoram = rom + 0x16800;
-	iqblock_bgvideoram = rom + 0x17000;
+	state->fgvideoram = rom + 0x16800;
+	state->bgvideoram = rom + 0x17000;
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfe39, 0xfe39, 0, 0, grndtour_prot_w);
-	iqblock_video_type=0;
+	state->video_type=0;
 }
 
 

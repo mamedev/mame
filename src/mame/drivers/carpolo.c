@@ -34,8 +34,8 @@
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x3000, 0x30ff) AM_WRITEONLY AM_BASE(&carpolo_alpharam)
-	AM_RANGE(0x4000, 0x400f) AM_WRITEONLY AM_BASE(&carpolo_spriteram)
+	AM_RANGE(0x3000, 0x30ff) AM_WRITEONLY AM_BASE_MEMBER(carpolo_state, alpharam)
+	AM_RANGE(0x4000, 0x400f) AM_WRITEONLY AM_BASE_MEMBER(carpolo_state, spriteram)
 	AM_RANGE(0x5400, 0x5403) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
 	AM_RANGE(0x5800, 0x5803) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(carpolo_ball_screen_collision_cause_r)
@@ -230,7 +230,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( carpolo, driver_device )
+static MACHINE_CONFIG_START( carpolo, carpolo_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_11_289MHz/12)		/* 940.75 kHz */

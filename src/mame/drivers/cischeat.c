@@ -175,8 +175,6 @@ Cisco Heat.
 #include "includes/megasys1.h"
 #include "includes/cischeat.h"
 
-static UINT16 *rom_1, *rom_2, *rom_3;
-static UINT16 *sharedram1, *sharedram2;
 
 
 
@@ -188,15 +186,22 @@ static UINT16 *sharedram1, *sharedram2;
 
 **************************************************************************/
 
-static READ16_HANDLER( sharedram1_r )  {return sharedram1[offset];}
-static READ16_HANDLER( sharedram2_r )  {return sharedram2[offset];}
+static READ16_HANDLER( sharedram1_r )  {
+	cischeat_state *state = space->machine->driver_data<cischeat_state>();return state->sharedram1[offset];}
+static READ16_HANDLER( sharedram2_r )  {
+	cischeat_state *state = space->machine->driver_data<cischeat_state>();return state->sharedram2[offset];}
 
-static WRITE16_HANDLER( sharedram1_w ) {COMBINE_DATA(&sharedram1[offset]);}
-static WRITE16_HANDLER( sharedram2_w ) {COMBINE_DATA(&sharedram2[offset]);}
+static WRITE16_HANDLER( sharedram1_w ) {
+	cischeat_state *state = space->machine->driver_data<cischeat_state>();COMBINE_DATA(&state->sharedram1[offset]);}
+static WRITE16_HANDLER( sharedram2_w ) {
+	cischeat_state *state = space->machine->driver_data<cischeat_state>();COMBINE_DATA(&state->sharedram2[offset]);}
 
-static READ16_HANDLER( rom_1_r ) {return rom_1[offset];}
-static READ16_HANDLER( rom_2_r ) {return rom_2[offset];}
-static READ16_HANDLER( rom_3_r ) {return rom_3[offset];}
+static READ16_HANDLER( rom_1_r ) {
+	cischeat_state *state = space->machine->driver_data<cischeat_state>();return state->rom_1[offset];}
+static READ16_HANDLER( rom_2_r ) {
+	cischeat_state *state = space->machine->driver_data<cischeat_state>();return state->rom_2[offset];}
+static READ16_HANDLER( rom_3_r ) {
+	cischeat_state *state = space->machine->driver_data<cischeat_state>();return state->rom_3[offset];}
 
 
 /**************************************************************************
@@ -228,8 +233,8 @@ static ADDRESS_MAP_START( bigrun_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																	// ROM
 	AM_RANGE(0x080000, 0x083fff) AM_READWRITE(bigrun_vregs_r, bigrun_vregs_w) AM_BASE(&megasys1_vregs)	// Vregs
 	AM_RANGE(0x084000, 0x087fff) AM_RAM													// Linking with other units
-	AM_RANGE(0x088000, 0x08bfff) AM_READWRITE(sharedram2_r, sharedram2_w) AM_BASE(&sharedram2)			// Sharedram with sub CPU#2
-	AM_RANGE(0x08c000, 0x08ffff) AM_READWRITE(sharedram1_r, sharedram1_w) AM_BASE(&sharedram1)			// Sharedram with sub CPU#1
+	AM_RANGE(0x088000, 0x08bfff) AM_READWRITE(sharedram2_r, sharedram2_w) AM_BASE_MEMBER(cischeat_state, sharedram2)			// Sharedram with sub CPU#2
+	AM_RANGE(0x08c000, 0x08ffff) AM_READWRITE(sharedram1_r, sharedram1_w) AM_BASE_MEMBER(cischeat_state, sharedram1)			// Sharedram with sub CPU#1
 
 	/* Only writes to the first 0x40000 bytes affect the tilemaps:             */
 	/* either these games support larger tilemaps or have more ram than needed */
@@ -288,8 +293,8 @@ static ADDRESS_MAP_START( cischeat_map, ADDRESS_SPACE_PROGRAM, 16 )
     No mem access error from the other CPU's, though.. */
 
 	/* this is the right order of sharedram's */
-	AM_RANGE(0x090000, 0x097fff) AM_READWRITE(sharedram2_r, sharedram2_w) AM_BASE(&sharedram2)				// Sharedram with sub CPU#2
-	AM_RANGE(0x098000, 0x09ffff) AM_READWRITE(sharedram1_r, sharedram1_w) AM_BASE(&sharedram1)				// Sharedram with sub CPU#1
+	AM_RANGE(0x090000, 0x097fff) AM_READWRITE(sharedram2_r, sharedram2_w) AM_BASE_MEMBER(cischeat_state, sharedram2)				// Sharedram with sub CPU#2
+	AM_RANGE(0x098000, 0x09ffff) AM_READWRITE(sharedram1_r, sharedram1_w) AM_BASE_MEMBER(cischeat_state, sharedram1)				// Sharedram with sub CPU#1
 
 	/* Only writes to the first 0x40000 bytes affect the tilemaps:             */
 	/* either these games support larger tilemaps or have more ram than needed */
@@ -342,8 +347,8 @@ static ADDRESS_MAP_START( f1gpstar_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x087fff) AM_READWRITE(f1gpstar_vregs_r, f1gpstar_vregs_w) AM_BASE(&megasys1_vregs)	// Vregs
 	AM_RANGE(0x088000, 0x088fff) AM_RAM																		// Linking with other units
 
-	AM_RANGE(0x090000, 0x097fff) AM_READWRITE(sharedram2_r, sharedram2_w) AM_BASE(&sharedram2)				// Sharedram with sub CPU#2
-	AM_RANGE(0x098000, 0x09ffff) AM_READWRITE(sharedram1_r, sharedram1_w) AM_BASE(&sharedram1)				// Sharedram with sub CPU#1
+	AM_RANGE(0x090000, 0x097fff) AM_READWRITE(sharedram2_r, sharedram2_w) AM_BASE_MEMBER(cischeat_state, sharedram2)				// Sharedram with sub CPU#2
+	AM_RANGE(0x098000, 0x09ffff) AM_READWRITE(sharedram1_r, sharedram1_w) AM_BASE_MEMBER(cischeat_state, sharedram1)				// Sharedram with sub CPU#1
 
 	/* Only writes to the first 0x40000 bytes affect the tilemaps:             */
 	/* either these games support larger tilemaps or have more ram than needed */
@@ -368,8 +373,8 @@ static ADDRESS_MAP_START( f1gpstr2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x087fff) AM_READWRITE(f1gpstr2_vregs_r, f1gpstr2_vregs_w) AM_BASE(&megasys1_vregs)	// Vregs (slightly different from f1gpstar)
 	AM_RANGE(0x088000, 0x088fff) AM_RAM																		// Linking with other units
 
-	AM_RANGE(0x090000, 0x097fff) AM_READWRITE(sharedram2_r, sharedram2_w) AM_BASE(&sharedram2)				// Sharedram with sub CPU#2
-	AM_RANGE(0x098000, 0x09ffff) AM_READWRITE(sharedram2_r, sharedram1_w) AM_BASE(&sharedram1)				// Sharedram with sub CPU#1
+	AM_RANGE(0x090000, 0x097fff) AM_READWRITE(sharedram2_r, sharedram2_w) AM_BASE_MEMBER(cischeat_state, sharedram2)				// Sharedram with sub CPU#2
+	AM_RANGE(0x098000, 0x09ffff) AM_READWRITE(sharedram2_r, sharedram1_w) AM_BASE_MEMBER(cischeat_state, sharedram1)				// Sharedram with sub CPU#1
 
 	/* Only writes to the first 0x40000 bytes affect the tilemaps:             */
 	/* either these games support larger tilemaps or have more ram than needed */
@@ -405,7 +410,6 @@ static WRITE16_HANDLER( scudhamm_paletteram16_w )
 }
 
 
-UINT16 scudhamm_motor_command;
 
 /*  Motor Status.
 
@@ -417,7 +421,8 @@ UINT16 scudhamm_motor_command;
 
 READ16_HANDLER( scudhamm_motor_status_r )
 {
-	return scudhamm_motor_command;	// Motor Status
+	cischeat_state *state = space->machine->driver_data<cischeat_state>();
+	return state->scudhamm_motor_command;	// Motor Status
 }
 
 
@@ -437,22 +442,23 @@ READ16_HANDLER( scudhamm_motor_pos_r )
 
 static WRITE16_HANDLER( scudhamm_motor_command_w )
 {
-	COMBINE_DATA( &scudhamm_motor_command );
+	cischeat_state *state = space->machine->driver_data<cischeat_state>();
+	COMBINE_DATA( &state->scudhamm_motor_command );
 }
 
 
 READ16_HANDLER( scudhamm_analog_r )
 {
-	static int prev=0;
+	cischeat_state *state = space->machine->driver_data<cischeat_state>();
 	int i=input_port_read(space->machine, "IN1"),j;
 
-	if ((i^prev)&0x4000) {
-		if (i<prev) prev-=0x8000;
-		else prev+=0x8000;
+	if ((i^state->prev)&0x4000) {
+		if (i<state->prev) state->prev-=0x8000;
+		else state->prev+=0x8000;
 	}
 
-	j=i-prev;
-	prev=i;
+	j=i-state->prev;
+	state->prev=i;
 
 	/* effect of hammer collision 'accelerometer':
     $00 - $09 - no hit
@@ -535,18 +541,19 @@ static READ16_HANDLER( armchmp2_motor_status_r )
 
 static WRITE16_HANDLER( armchmp2_motor_command_w )
 {
-	COMBINE_DATA( &scudhamm_motor_command );
+	cischeat_state *state = space->machine->driver_data<cischeat_state>();
+	COMBINE_DATA( &state->scudhamm_motor_command );
 }
 
 static READ16_HANDLER( armchmp2_analog_r )
 {
+	cischeat_state *state = space->machine->driver_data<cischeat_state>();
 	int armdelta;
-	static int armold = 0;
 
-	armdelta = input_port_read(space->machine, "IN1") - armold;
-	armold = input_port_read(space->machine, "IN1");
+	armdelta = input_port_read(space->machine, "IN1") - state->armold;
+	state->armold = input_port_read(space->machine, "IN1");
 
-	return ~( scudhamm_motor_command + armdelta );	// + x : x<=0 and player loses, x>0 and player wins
+	return ~( state->scudhamm_motor_command + armdelta );	// + x : x<=0 and player loses, x>0 and player wins
 }
 
 static READ16_HANDLER( armchmp2_buttons_r )
@@ -619,14 +626,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bigrun_map2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM 									// ROM
 	AM_RANGE(0x040000, 0x047fff) AM_READWRITE(sharedram1_r, sharedram1_w)	// Shared RAM (with Main CPU)
-	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_BASE(&cischeat_roadram[0])		// Road RAM
+	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_BASE_MEMBER(cischeat_state, roadram[0])		// Road RAM
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM 									// RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bigrun_map3, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM										// ROM
 	AM_RANGE(0x040000, 0x047fff) AM_READWRITE(sharedram2_r, sharedram2_w)	// Shared RAM (with Main CPU)
-	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_BASE(&cischeat_roadram[1])		// Road RAM
+	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_BASE_MEMBER(cischeat_state, roadram[1])		// Road RAM
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM										// RAM
 ADDRESS_MAP_END
 
@@ -638,7 +645,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cischeat_map2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM										// ROM
 	AM_RANGE(0x040000, 0x047fff) AM_READWRITE(sharedram1_r, sharedram1_w)	// Shared RAM (with Main CPU)
-	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_BASE(&cischeat_roadram[0])		// Road RAM
+	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_BASE_MEMBER(cischeat_state, roadram[0])		// Road RAM
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM										// RAM
 	AM_RANGE(0x100000, 0x100001) AM_WRITENOP							// watchdog
 	AM_RANGE(0x200000, 0x23ffff) AM_READ(rom_2_r)							// ROM
@@ -647,7 +654,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cischeat_map3, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM										// ROM
 	AM_RANGE(0x040000, 0x047fff) AM_READWRITE(sharedram2_r, sharedram2_w)	// Shared RAM (with Main CPU)
-	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_BASE(&cischeat_roadram[1])		// Road RAM
+	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_BASE_MEMBER(cischeat_state, roadram[1])		// Road RAM
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM										// RAM
 	AM_RANGE(0x100000, 0x100001) AM_WRITENOP							// watchdog
 	AM_RANGE(0x200000, 0x23ffff) AM_READ(rom_3_r)							// ROM
@@ -662,7 +669,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( f1gpstar_map2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM										// ROM
 	AM_RANGE(0x080000, 0x0807ff) AM_READWRITE(sharedram1_r, sharedram1_w)	// Shared RAM (with Main CPU)
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_BASE(&cischeat_roadram[0])		// Road RAM
+	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_BASE_MEMBER(cischeat_state, roadram[0])		// Road RAM
 	AM_RANGE(0x180000, 0x183fff) AM_RAM										// RAM
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP							// watchdog
 ADDRESS_MAP_END
@@ -670,7 +677,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( f1gpstar_map3, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM										// ROM
 	AM_RANGE(0x080000, 0x0807ff) AM_READWRITE(sharedram2_r, sharedram2_w)	// Shared RAM (with Main CPU)
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_BASE(&cischeat_roadram[1])		// Road RAM
+	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_BASE_MEMBER(cischeat_state, roadram[1])		// Road RAM
 	AM_RANGE(0x180000, 0x183fff) AM_RAM										// RAM
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP							// watchdog
 ADDRESS_MAP_END
@@ -782,7 +789,7 @@ static WRITE16_HANDLER( f1gpstr2_io_w )	{ COMBINE_DATA(&megasys1_vregs[offset + 
 static ADDRESS_MAP_START( f1gpstr2_io_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM											// ROM
 	AM_RANGE(0x080000, 0x080fff) AM_READWRITE(f1gpstr2_io_r, f1gpstr2_io_w)		//
-	AM_RANGE(0x100000, 0x100001) AM_WRITEONLY AM_BASE(&f1gpstr2_ioready)	//
+	AM_RANGE(0x100000, 0x100001) AM_WRITEONLY AM_BASE_MEMBER(cischeat_state, f1gpstr2_ioready)	//
 	AM_RANGE(0x180000, 0x183fff) AM_RAM											// RAM
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP								//
 ADDRESS_MAP_END
@@ -1565,7 +1572,7 @@ static INTERRUPT_GEN( cischeat_interrupt )
 
 
 
-static MACHINE_CONFIG_START( bigrun, driver_device )
+static MACHINE_CONFIG_START( bigrun, cischeat_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cpu1", M68000, 10000000)
@@ -1710,7 +1717,7 @@ static INTERRUPT_GEN( interrupt_scudhamm )
 }
 
 
-static MACHINE_CONFIG_START( scudhamm, driver_device )
+static MACHINE_CONFIG_START( scudhamm, cischeat_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, 12000000)
@@ -1945,8 +1952,9 @@ ROM_END
 
 static DRIVER_INIT( bigrun )
 {
+	cischeat_state *state = machine->driver_data<cischeat_state>();
 	/* Split ROMs */
-	rom_1 = (UINT16 *) machine->region("user1")->base();
+	state->rom_1 = (UINT16 *) machine->region("user1")->base();
 
 	cischeat_untangle_sprites(machine, "gfx4");	// Untangle sprites
 	phantasm_rom_decode(machine, "soundcpu");					// Decrypt sound cpu code
@@ -2067,18 +2075,19 @@ ROM_END
 
 static DRIVER_INIT( cischeat )
 {
+	cischeat_state *state = machine->driver_data<cischeat_state>();
 	/* Split ROMs */
-	rom_1 = (UINT16 *) (machine->region("user1")->base() + 0x00000);
-	rom_2 = (UINT16 *) (machine->region("cpu2")->base()  + 0x40000);
-	rom_3 = (UINT16 *) (machine->region("cpu3")->base()  + 0x40000);
+	state->rom_1 = (UINT16 *) (machine->region("user1")->base() + 0x00000);
+	state->rom_2 = (UINT16 *) (machine->region("cpu2")->base()  + 0x40000);
+	state->rom_3 = (UINT16 *) (machine->region("cpu3")->base()  + 0x40000);
 
-	memcpy(machine->region("user1")->base() + 0x80000, rom_2, 0x40000);
-	memset(rom_2, 0, 0x40000);
-	rom_2 = (UINT16 *) (machine->region("user1")->base() + 0x80000);
+	memcpy(machine->region("user1")->base() + 0x80000, state->rom_2, 0x40000);
+	memset(state->rom_2, 0, 0x40000);
+	state->rom_2 = (UINT16 *) (machine->region("user1")->base() + 0x80000);
 
-	memcpy(machine->region("user1")->base() + 0xc0000, rom_3, 0x40000);
-	memset(rom_3, 0, 0x40000);
-	rom_3 = (UINT16 *) (machine->region("user1")->base() + 0xc0000);
+	memcpy(machine->region("user1")->base() + 0xc0000, state->rom_3, 0x40000);
+	memset(state->rom_3, 0, 0x40000);
+	state->rom_3 = (UINT16 *) (machine->region("user1")->base() + 0xc0000);
 
 	cischeat_untangle_sprites(machine, "gfx4");	// Untangle sprites
 	astyanax_rom_decode(machine, "soundcpu");					// Decrypt sound cpu code
@@ -2294,8 +2303,9 @@ ROM_END
 
 static DRIVER_INIT( f1gpstar )
 {
+	cischeat_state *state = machine->driver_data<cischeat_state>();
 	/* Split ROMs */
-	rom_1 = (UINT16 *) machine->region("user1")->base();
+	state->rom_1 = (UINT16 *) machine->region("user1")->base();
 
 	cischeat_untangle_sprites(machine, "gfx4");
 }

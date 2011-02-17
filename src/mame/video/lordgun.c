@@ -38,18 +38,6 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 #include "emu.h"
 #include "includes/lordgun.h"
 
-// Variables needed by driver:
-
-UINT16 *lordgun_priority_ram, lordgun_priority;
-
-UINT16 *lordgun_vram_0, *lordgun_scroll_x_0, *lordgun_scroll_y_0;
-UINT16 *lordgun_vram_1, *lordgun_scroll_x_1, *lordgun_scroll_y_1;
-UINT16 *lordgun_vram_2, *lordgun_scroll_x_2, *lordgun_scroll_y_2;
-UINT16 *lordgun_vram_3, *lordgun_scroll_x_3, *lordgun_scroll_y_3;
-UINT16 *lordgun_scrollram;
-int lordgun_whitescreen;
-
-lordgun_gun_data lordgun_gun[2];
 
 /***************************************************************************
 
@@ -72,62 +60,69 @@ WRITE16_HANDLER( lordgun_paletteram_w )
 
 ***************************************************************************/
 
-static tilemap_t *tilemap_0, *tilemap_1, *tilemap_2, *tilemap_3;
 
 static TILE_GET_INFO( get_tile_info_0 )
 {
-	UINT16 attr = lordgun_vram_0[ tile_index * 2 + 0 ];
-	UINT16 code = lordgun_vram_0[ tile_index * 2 + 1 ];
+	lordgun_state *state = machine->driver_data<lordgun_state>();
+	UINT16 attr = state->vram_0[ tile_index * 2 + 0 ];
+	UINT16 code = state->vram_0[ tile_index * 2 + 1 ];
 	UINT16 pri  = (attr & 0x0e00) >> 9;
 	SET_TILE_INFO( 0, code, ((attr & 0x0030) >> 4)+0x500/0x40+pri*0x800/0x40, TILE_FLIPXY(attr >> 14));
 }
 
 static TILE_GET_INFO( get_tile_info_1 )
 {
-	UINT16 attr = lordgun_vram_1[ tile_index * 2 + 0 ];
-	UINT16 code = lordgun_vram_1[ tile_index * 2 + 1 ];
+	lordgun_state *state = machine->driver_data<lordgun_state>();
+	UINT16 attr = state->vram_1[ tile_index * 2 + 0 ];
+	UINT16 code = state->vram_1[ tile_index * 2 + 1 ];
 	UINT16 pri  = (attr & 0x0e00) >> 9;
 	SET_TILE_INFO( 1, code, ((attr & 0x0070) >> 4)+0x600/0x40+pri*0x800/0x40, TILE_FLIPXY(attr >> 14));
 }
 
 static TILE_GET_INFO( get_tile_info_2 )
 {
-	UINT16 attr = lordgun_vram_2[ tile_index * 2 + 0 ];
-	UINT16 code = lordgun_vram_2[ tile_index * 2 + 1 ];
+	lordgun_state *state = machine->driver_data<lordgun_state>();
+	UINT16 attr = state->vram_2[ tile_index * 2 + 0 ];
+	UINT16 code = state->vram_2[ tile_index * 2 + 1 ];
 	UINT16 pri  = (attr & 0x0e00) >> 9;
 	SET_TILE_INFO( 2, code, ((attr & 0x0030) >> 4)+0x700/0x40+pri*0x800/0x40, TILE_FLIPXY(attr >> 14));
 }
 
 static TILE_GET_INFO( get_tile_info_3 )
 {
-	UINT16 attr = lordgun_vram_3[ tile_index * 2 + 0 ];
-	UINT16 code = lordgun_vram_3[ tile_index * 2 + 1 ];
+	lordgun_state *state = machine->driver_data<lordgun_state>();
+	UINT16 attr = state->vram_3[ tile_index * 2 + 0 ];
+	UINT16 code = state->vram_3[ tile_index * 2 + 1 ];
 	UINT16 pri  = (attr & 0x0e00) >> 9;
 	SET_TILE_INFO( 3, code, ((attr & 0x00f0) >> 4)+0x400/0x40+pri*0x800/0x40, TILE_FLIPXY(attr >> 14));
 }
 
 WRITE16_HANDLER( lordgun_vram_0_w )
 {
-	COMBINE_DATA(&lordgun_vram_0[offset]);
-	tilemap_mark_tile_dirty(tilemap_0, offset/2);
+	lordgun_state *state = space->machine->driver_data<lordgun_state>();
+	COMBINE_DATA(&state->vram_0[offset]);
+	tilemap_mark_tile_dirty(state->tilemap_0, offset/2);
 }
 
 WRITE16_HANDLER( lordgun_vram_1_w )
 {
-	COMBINE_DATA(&lordgun_vram_1[offset]);
-	tilemap_mark_tile_dirty(tilemap_1, offset/2);
+	lordgun_state *state = space->machine->driver_data<lordgun_state>();
+	COMBINE_DATA(&state->vram_1[offset]);
+	tilemap_mark_tile_dirty(state->tilemap_1, offset/2);
 }
 
 WRITE16_HANDLER( lordgun_vram_2_w )
 {
-	COMBINE_DATA(&lordgun_vram_2[offset]);
-	tilemap_mark_tile_dirty(tilemap_2, offset/2);
+	lordgun_state *state = space->machine->driver_data<lordgun_state>();
+	COMBINE_DATA(&state->vram_2[offset]);
+	tilemap_mark_tile_dirty(state->tilemap_2, offset/2);
 }
 
 WRITE16_HANDLER( lordgun_vram_3_w )
 {
-	COMBINE_DATA(&lordgun_vram_3[offset]);
-	tilemap_mark_tile_dirty(tilemap_3, offset/2);
+	lordgun_state *state = space->machine->driver_data<lordgun_state>();
+	COMBINE_DATA(&state->vram_3[offset]);
+	tilemap_mark_tile_dirty(state->tilemap_3, offset/2);
 }
 
 /***************************************************************************
@@ -136,50 +131,50 @@ WRITE16_HANDLER( lordgun_vram_3_w )
 
 ***************************************************************************/
 
-static bitmap_t *bitmaps[5];
 
 VIDEO_START( lordgun )
 {
+	lordgun_state *state = machine->driver_data<lordgun_state>();
 	int i;
 	int w = machine->primary_screen->width();
 	int h = machine->primary_screen->height();
 
 	// 0x800 x 200
-	tilemap_0 = tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
+	state->tilemap_0 = tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
 								 8,8, 0x100, 0x40 );
 
 	// 0x800 x 200
-	tilemap_1 = tilemap_create(	machine, get_tile_info_1, tilemap_scan_rows,
+	state->tilemap_1 = tilemap_create(	machine, get_tile_info_1, tilemap_scan_rows,
 								 16,16, 0x80,0x20 );
 
 	// 0x800 x 200
-	tilemap_2 = tilemap_create(	machine, get_tile_info_2, tilemap_scan_rows,
+	state->tilemap_2 = tilemap_create(	machine, get_tile_info_2, tilemap_scan_rows,
 								 32,32, 0x40,0x10 );
 
 	// 0x200 x 100
-	tilemap_3 = tilemap_create(	machine, get_tile_info_3, tilemap_scan_rows,
+	state->tilemap_3 = tilemap_create(	machine, get_tile_info_3, tilemap_scan_rows,
 								 8,8, 0x40,0x20 );
 
-	tilemap_set_scroll_rows(tilemap_0,1);
-	tilemap_set_scroll_cols(tilemap_0,1);
-	tilemap_set_transparent_pen(tilemap_0,0x3f);
+	tilemap_set_scroll_rows(state->tilemap_0,1);
+	tilemap_set_scroll_cols(state->tilemap_0,1);
+	tilemap_set_transparent_pen(state->tilemap_0,0x3f);
 
 	// Has line scroll
-	tilemap_set_scroll_rows(tilemap_1,0x200);
-	tilemap_set_scroll_cols(tilemap_1,1);
-	tilemap_set_transparent_pen(tilemap_1,0x3f);
+	tilemap_set_scroll_rows(state->tilemap_1,0x200);
+	tilemap_set_scroll_cols(state->tilemap_1,1);
+	tilemap_set_transparent_pen(state->tilemap_1,0x3f);
 
-	tilemap_set_scroll_rows(tilemap_2,1);
-	tilemap_set_scroll_cols(tilemap_2,1);
-	tilemap_set_transparent_pen(tilemap_2,0x3f);
+	tilemap_set_scroll_rows(state->tilemap_2,1);
+	tilemap_set_scroll_cols(state->tilemap_2,1);
+	tilemap_set_transparent_pen(state->tilemap_2,0x3f);
 
-	tilemap_set_scroll_rows(tilemap_3,1);
-	tilemap_set_scroll_cols(tilemap_3,1);
-	tilemap_set_transparent_pen(tilemap_3,0x3f);
+	tilemap_set_scroll_rows(state->tilemap_3,1);
+	tilemap_set_scroll_cols(state->tilemap_3,1);
+	tilemap_set_transparent_pen(state->tilemap_3,0x3f);
 
-	// Buffer bitmaps for 4 tilemaps (0-3) + sprites (4)
+	// Buffer state->bitmaps for 4 tilemaps (0-3) + sprites (4)
 	for (i = 0; i < 5; i++)
-		bitmaps[i] = auto_bitmap_alloc(machine, w, h, BITMAP_FORMAT_INDEXED16);
+		state->bitmaps[i] = auto_bitmap_alloc(machine, w, h, BITMAP_FORMAT_INDEXED16);
 }
 
 /***************************************************************************
@@ -232,6 +227,7 @@ float lordgun_crosshair_mapper(const input_field_config *field, float linear_val
 
 static void lorddgun_calc_gun_scr(running_machine *machine, int i)
 {
+	lordgun_state *state = machine->driver_data<lordgun_state>();
 //  popmessage("%03x, %02x", input_port_read(machine, "LIGHT0_X"), input_port_read(machine, "LIGHT0_Y"));
 
 	int x = input_port_read(machine, gunnames[i]) - 0x3c;
@@ -239,24 +235,25 @@ static void lorddgun_calc_gun_scr(running_machine *machine, int i)
 	if ( (x < 0) || (x > sizeof(lordgun_gun_x_table)/sizeof(lordgun_gun_x_table[0])) )
 		x = 0;
 
-	lordgun_gun[i].scr_x = lordgun_gun_x_table[x];
-	lordgun_gun[i].scr_y = input_port_read(machine, gunnames[i+2]);
+	state->gun[i].scr_x = lordgun_gun_x_table[x];
+	state->gun[i].scr_y = input_port_read(machine, gunnames[i+2]);
 }
 
 void lordgun_update_gun(running_machine *machine, int i)
 {
+	lordgun_state *state = machine->driver_data<lordgun_state>();
 	const rectangle &visarea = machine->primary_screen->visible_area();
 
-	lordgun_gun[i].hw_x = input_port_read(machine, gunnames[i]);
-	lordgun_gun[i].hw_y = input_port_read(machine, gunnames[i+2]);
+	state->gun[i].hw_x = input_port_read(machine, gunnames[i]);
+	state->gun[i].hw_y = input_port_read(machine, gunnames[i+2]);
 
 	lorddgun_calc_gun_scr(machine, i);
 
-	if (	(lordgun_gun[i].scr_x < visarea.min_x)	||
-			(lordgun_gun[i].scr_x > visarea.max_x)	||
-			(lordgun_gun[i].scr_y < visarea.min_y)	||
-			(lordgun_gun[i].scr_y > visarea.max_y)	)
-		lordgun_gun[i].hw_x = lordgun_gun[i].hw_y = 0;
+	if (	(state->gun[i].scr_x < visarea.min_x)	||
+			(state->gun[i].scr_x > visarea.max_x)	||
+			(state->gun[i].scr_y < visarea.min_y)	||
+			(state->gun[i].scr_y > visarea.max_y)	)
+		state->gun[i].hw_x = state->gun[i].hw_y = 0;
 }
 
 
@@ -367,6 +364,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( lordgun )
 {
+	lordgun_state *state = screen->machine->driver_data<lordgun_state>();
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
@@ -383,7 +381,7 @@ VIDEO_UPDATE( lordgun )
 	}
 #endif
 
-	if (lordgun_whitescreen)
+	if (state->whitescreen)
 	{
 		bitmap_fill(bitmap, cliprect, get_white_pen(screen->machine));
 		return 0;
@@ -393,18 +391,18 @@ VIDEO_UPDATE( lordgun )
 
 	int x, y;
 
-	tilemap_set_scrollx( tilemap_0, 0, *lordgun_scroll_x_0 );
-	tilemap_set_scrolly( tilemap_0, 0, *lordgun_scroll_y_0 );
+	tilemap_set_scrollx( state->tilemap_0, 0, *state->scroll_x_0 );
+	tilemap_set_scrolly( state->tilemap_0, 0, *state->scroll_y_0 );
 
 	for (y = 0; y < 0x200; y++)
-		tilemap_set_scrollx( tilemap_1, y, (*lordgun_scroll_x_1) + lordgun_scrollram[y * 4/2 + 2/2]);
-	tilemap_set_scrolly( tilemap_1, 0, *lordgun_scroll_y_1 );
+		tilemap_set_scrollx( state->tilemap_1, y, (*state->scroll_x_1) + state->scrollram[y * 4/2 + 2/2]);
+	tilemap_set_scrolly( state->tilemap_1, 0, *state->scroll_y_1 );
 
-	tilemap_set_scrollx( tilemap_2, 0, *lordgun_scroll_x_2 );
-	tilemap_set_scrolly( tilemap_2, 0, *lordgun_scroll_y_2 );
+	tilemap_set_scrollx( state->tilemap_2, 0, *state->scroll_x_2 );
+	tilemap_set_scrolly( state->tilemap_2, 0, *state->scroll_y_2 );
 
-	tilemap_set_scrollx( tilemap_3, 0, *lordgun_scroll_x_3 );
-	tilemap_set_scrolly( tilemap_3, 0, *lordgun_scroll_y_3 );
+	tilemap_set_scrollx( state->tilemap_3, 0, *state->scroll_x_3 );
+	tilemap_set_scrolly( state->tilemap_3, 0, *state->scroll_y_3 );
 
 	// Rendering:
 
@@ -415,13 +413,13 @@ VIDEO_UPDATE( lordgun )
 
 	int l;
 	for (l = 0; l < 5; l++)
-		bitmap_fill(bitmaps[l], cliprect, trans_pen);
+		bitmap_fill(state->bitmaps[l], cliprect, trans_pen);
 
-	if (layers_ctrl & 1)	tilemap_draw(bitmaps[0], cliprect, tilemap_0, 0, 0);
-	if (layers_ctrl & 2)	tilemap_draw(bitmaps[1], cliprect, tilemap_1, 0, 0);
-	if (layers_ctrl & 4)	tilemap_draw(bitmaps[2], cliprect, tilemap_2, 0, 0);
-	if (layers_ctrl & 8)	tilemap_draw(bitmaps[3], cliprect, tilemap_3, 0, 0);
-	if (layers_ctrl & 16)	draw_sprites(screen->machine, bitmaps[4], cliprect);
+	if (layers_ctrl & 1)	tilemap_draw(state->bitmaps[0], cliprect, state->tilemap_0, 0, 0);
+	if (layers_ctrl & 2)	tilemap_draw(state->bitmaps[1], cliprect, state->tilemap_1, 0, 0);
+	if (layers_ctrl & 4)	tilemap_draw(state->bitmaps[2], cliprect, state->tilemap_2, 0, 0);
+	if (layers_ctrl & 8)	tilemap_draw(state->bitmaps[3], cliprect, state->tilemap_3, 0, 0);
+	if (layers_ctrl & 16)	draw_sprites(screen->machine, state->bitmaps[4], cliprect);
 
 	// copy to screen bitmap
 
@@ -441,7 +439,7 @@ VIDEO_UPDATE( lordgun )
 			// bits 0-4: layer transparency
 			for (l = 0; l < 5; l++)
 			{
-				pens[l] = *BITMAP_ADDR16(bitmaps[l], y, x);
+				pens[l] = *BITMAP_ADDR16(state->bitmaps[l], y, x);
 				if (pens[l] == trans_pen)
 					pri_addr |= 1 << layer2bit[l];
 			}
@@ -457,7 +455,7 @@ VIDEO_UPDATE( lordgun )
 
 			pri_addr &= 0x7fff;
 
-			l	=	pri2layer[lordgun_priority_ram[pri_addr] & 7];
+			l	=	pri2layer[state->priority_ram[pri_addr] & 7];
 
 			*BITMAP_ADDR16(bitmap, y, x) = pens[l];
 		}

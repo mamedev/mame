@@ -64,12 +64,12 @@ void atari_interrupt_cb(device_t *device, int mask)
 
 READ8_DEVICE_HANDLER(atari_pia_pa_r)
 {
-	return atari_input_disabled() ? 0xFF : input_port_read_safe(device->machine, "djoy_0_1", 0);
+	return atari_input_disabled(device->machine) ? 0xFF : input_port_read_safe(device->machine, "djoy_0_1", 0);
 }
 
 READ8_DEVICE_HANDLER(atari_pia_pb_r)
 {
-	return atari_input_disabled() ? 0xFF : input_port_read_safe(device->machine, "djoy_2_3", 0);
+	return atari_input_disabled(device->machine) ? 0xFF : input_port_read_safe(device->machine, "djoy_2_3", 0);
 }
 
 WRITE8_DEVICE_HANDLER(a600xl_pia_pb_w) { a600xl_mmu(device->machine, data); }

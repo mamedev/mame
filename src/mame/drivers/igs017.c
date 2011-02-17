@@ -50,18 +50,45 @@ Notes:
 #include "sound/2413intf.h"
 #include "sound/okim6295.h"
 
-static int toggle, debug_addr, debug_width;
+
+class igs017_state : public driver_device
+{
+public:
+	igs017_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	int toggle;
+	int debug_addr;
+	int debug_width;
+	UINT8 video_disable;
+	UINT8 *fg_videoram;
+	UINT8 *bg_videoram;
+	tilemap_t *fg_tilemap;
+	tilemap_t *bg_tilemap;
+	UINT8 *sprites_gfx;
+	int sprites_gfx_size;
+	int nmi_enable;
+	int irq_enable;
+	UINT8 input_select;
+	UINT8 hopper;
+	UINT16 igs_magic[2];
+	UINT8 scramble_data;
+	int irq1_enable;
+	int irq2_enable;
+};
+
+
 
 /***************************************************************************
                                 Video Hardware
 ***************************************************************************/
 
-static UINT8 video_disable;
 static WRITE8_HANDLER( video_disable_w )
 {
-	video_disable = data & 1;
+	igs017_state *state = space->machine->driver_data<igs017_state>();
+	state->video_disable = data & 1;
 	if (data & (~1))
-		logerror("PC %06X: unknown bits of video_disable written = %02x\n",cpu_get_pc(space->cpu),data);
+		logerror("PC %06X: unknown bits of state->video_disable written = %02x\n",cpu_get_pc(space->cpu),data);
 //  popmessage("VIDEO %02X",data);
 }
 static WRITE16_HANDLER( video_disable_lsb_w )
@@ -72,44 +99,48 @@ static WRITE16_HANDLER( video_disable_lsb_w )
 
 static VIDEO_RESET( igs017 )
 {
-	video_disable = 0;
+	igs017_state *state = machine->driver_data<igs017_state>();
+	state->video_disable = 0;
 }
 
-static UINT8 *fg_videoram, *bg_videoram;
-static tilemap_t *fg_tilemap, *bg_tilemap;
 
 #define COLOR(_X)	(((_X)>>2)&7)
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int code = fg_videoram[tile_index*4+0] + (fg_videoram[tile_index*4+1] << 8);
-	int attr = fg_videoram[tile_index*4+2] + (fg_videoram[tile_index*4+3] << 8);
+	igs017_state *state = machine->driver_data<igs017_state>();
+	int code = state->fg_videoram[tile_index*4+0] + (state->fg_videoram[tile_index*4+1] << 8);
+	int attr = state->fg_videoram[tile_index*4+2] + (state->fg_videoram[tile_index*4+3] << 8);
 	SET_TILE_INFO(0, code, COLOR(attr), TILE_FLIPXY( attr >> 5 ));
 }
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = bg_videoram[tile_index*4+0] + (bg_videoram[tile_index*4+1] << 8);
-	int attr = bg_videoram[tile_index*4+2] + (bg_videoram[tile_index*4+3] << 8);
+	igs017_state *state = machine->driver_data<igs017_state>();
+	int code = state->bg_videoram[tile_index*4+0] + (state->bg_videoram[tile_index*4+1] << 8);
+	int attr = state->bg_videoram[tile_index*4+2] + (state->bg_videoram[tile_index*4+3] << 8);
 	SET_TILE_INFO(0, code, COLOR(attr)+8, TILE_FLIPXY( attr >> 5 ));
 }
 
 static WRITE8_HANDLER( fg_w )
 {
-	fg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap,offset/4);
+	igs017_state *state = space->machine->driver_data<igs017_state>();
+	state->fg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->fg_tilemap,offset/4);
 }
 
 static WRITE8_HANDLER( bg_w )
 {
-	bg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap,offset/4);
+	igs017_state *state = space->machine->driver_data<igs017_state>();
+	state->bg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap,offset/4);
 }
 
 // 16-bit handlers for an 8-bit chip
 
 static READ16_HANDLER( fg_lsb_r )
 {
-	return fg_videoram[offset];
+	igs017_state *state = space->machine->driver_data<igs017_state>();
+	return state->fg_videoram[offset];
 }
 static WRITE16_HANDLER( fg_lsb_w )
 {
@@ -119,7 +150,8 @@ static WRITE16_HANDLER( fg_lsb_w )
 
 static READ16_HANDLER( bg_lsb_r )
 {
-	return bg_videoram[offset];
+	igs017_state *state = space->machine->driver_data<igs017_state>();
+	return state->bg_videoram[offset];
 }
 static WRITE16_HANDLER( bg_lsb_w )
 {
@@ -138,41 +170,41 @@ static WRITE16_HANDLER( spriteram_lsb_w )
 }
 
 
-static UINT8 *sprites_gfx;
-static int sprites_gfx_size;
 
 // Eeach 16 bit word in the sprites gfx roms contains three 5 bit pens: x-22222-11111-00000.
 // This routine expands each word into three bytes.
 static void expand_sprites(running_machine *machine)
 {
+	igs017_state *state = machine->driver_data<igs017_state>();
 	UINT8 *rom	=	machine->region("sprites")->base();
 	int size	=	machine->region("sprites")->bytes();
 	int i;
 
-	sprites_gfx_size	=	size / 2 * 3;
-	sprites_gfx			=	auto_alloc_array(machine, UINT8, sprites_gfx_size);
+	state->sprites_gfx_size	=	size / 2 * 3;
+	state->sprites_gfx			=	auto_alloc_array(machine, UINT8, state->sprites_gfx_size);
 
 	for (i = 0; i < size / 2 ; i++)
 	{
 		UINT16 pens = (rom[i*2+1] << 8) | rom[i*2];
 
-		sprites_gfx[i * 3 + 0] = (pens >>  0) & 0x1f;
-		sprites_gfx[i * 3 + 1] = (pens >>  5) & 0x1f;
-		sprites_gfx[i * 3 + 2] = (pens >> 10) & 0x1f;
+		state->sprites_gfx[i * 3 + 0] = (pens >>  0) & 0x1f;
+		state->sprites_gfx[i * 3 + 1] = (pens >>  5) & 0x1f;
+		state->sprites_gfx[i * 3 + 2] = (pens >> 10) & 0x1f;
 	}
 }
 
 static VIDEO_START( igs017 )
 {
-	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,64,32);
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,8,8,64,32);
+	igs017_state *state = machine->driver_data<igs017_state>();
+	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,64,32);
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,8,8,64,32);
 
-	tilemap_set_transparent_pen(fg_tilemap,0xf);
-	tilemap_set_transparent_pen(bg_tilemap,0xf);
+	tilemap_set_transparent_pen(state->fg_tilemap,0xf);
+	tilemap_set_transparent_pen(state->bg_tilemap,0xf);
 
-	toggle = 0;
-	debug_addr = 0;
-	debug_width = 512;
+	state->toggle = 0;
+	state->debug_addr = 0;
+	state->debug_width = 512;
 
 	expand_sprites(machine);
 }
@@ -212,14 +244,15 @@ static VIDEO_START( igs017 )
 
 static void draw_sprite(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect, int sx, int sy, int dimx, int dimy, int flipx, int flipy, int color, int addr)
 {
+	igs017_state *state = machine->driver_data<igs017_state>();
 	// prepare GfxElement on the fly
 	gfx_element gfx;
 
 	// Bounds checking
-	if ( addr + dimx * dimy >= sprites_gfx_size )
+	if ( addr + dimx * dimy >= state->sprites_gfx_size )
 		return;
 
-	gfx_element_build_temporary(&gfx, machine, sprites_gfx + addr, dimx, dimy, dimx, 0x100, 32, 0);
+	gfx_element_build_temporary(&gfx, machine, state->sprites_gfx + addr, dimx, dimy, dimx, 0x100, 32, 0);
 
 	drawgfx_transpen(	bitmap,cliprect, &gfx,
 				0, color,
@@ -265,9 +298,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 static int debug_viewer(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 #ifdef MAME_DEBUG
-	if (input_code_pressed_once(machine, KEYCODE_T))	toggle = 1-toggle;
-	if (toggle)	{
-		int h = 256, w = debug_width, a = debug_addr;
+	igs017_state *state = machine->driver_data<igs017_state>();
+	if (input_code_pressed_once(machine, KEYCODE_T))	state->toggle = 1-state->toggle;
+	if (state->toggle)	{
+		int h = 256, w = state->debug_width, a = state->debug_addr;
 
 		if (input_code_pressed(machine, KEYCODE_O))		w += 1;
 		if (input_code_pressed(machine, KEYCODE_I))		w -= 1;
@@ -285,7 +319,7 @@ static int debug_viewer(running_machine *machine, bitmap_t *bitmap,const rectang
 		if (input_code_pressed(machine, KEYCODE_PGUP))	a -= w * h;
 
 		if (a < 0)		a = 0;
-		if (a > sprites_gfx_size)	a = sprites_gfx_size;
+		if (a > state->sprites_gfx_size)	a = state->sprites_gfx_size;
 
 		if (w <= 0)		w = 0;
 		if (w > 1024)	w = 1024;
@@ -294,9 +328,9 @@ static int debug_viewer(running_machine *machine, bitmap_t *bitmap,const rectang
 
 		draw_sprite(machine, bitmap, cliprect, 0,0, w,h, 0,0, 0, a);
 
-		popmessage("a: %08X w: %03X p: %02X-%02x-%02x",a,w,sprites_gfx[a/3*3+0],sprites_gfx[a/3*3+1],sprites_gfx[a/3*3+2]);
-		debug_addr = a;
-		debug_width = w;
+		popmessage("a: %08X w: %03X p: %02X-%02x-%02x",a,w,state->sprites_gfx[a/3*3+0],state->sprites_gfx[a/3*3+1],state->sprites_gfx[a/3*3+2]);
+		state->debug_addr = a;
+		state->debug_width = w;
 		osd_sleep(200000);
 		return 1;
 	}
@@ -306,6 +340,7 @@ static int debug_viewer(running_machine *machine, bitmap_t *bitmap,const rectang
 
 static VIDEO_UPDATE( igs017 )
 {
+	igs017_state *state = screen->machine->driver_data<igs017_state>();
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
@@ -324,14 +359,14 @@ static VIDEO_UPDATE( igs017 )
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
-	if (video_disable)
+	if (state->video_disable)
 		return 0;
 
-	if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
+	if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 
 	if (layers_ctrl & 4)	draw_sprites(screen->machine, bitmap, cliprect);
 
-	if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
+	if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 
 	return 0;
 }
@@ -1041,31 +1076,32 @@ static ADDRESS_MAP_START( iqblocka_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x10000, 0x3ffff ) AM_ROM
 ADDRESS_MAP_END
 
-static int nmi_enable;
 static WRITE8_HANDLER( nmi_enable_w )
 {
-	nmi_enable = data & 1;
+	igs017_state *state = space->machine->driver_data<igs017_state>();
+	state->nmi_enable = data & 1;
 	if (data & (~1))
-		logerror("PC %06X: nmi_enable = %02x\n",cpu_get_pc(space->cpu),data);
+		logerror("PC %06X: state->nmi_enable = %02x\n",cpu_get_pc(space->cpu),data);
 }
 
-static int irq_enable;
 static WRITE8_HANDLER( irq_enable_w )
 {
-	irq_enable = data & 1;
+	igs017_state *state = space->machine->driver_data<igs017_state>();
+	state->irq_enable = data & 1;
 	if (data & (~1))
-		logerror("PC %06X: irq_enable = %02x\n",cpu_get_pc(space->cpu),data);
+		logerror("PC %06X: state->irq_enable = %02x\n",cpu_get_pc(space->cpu),data);
 }
 
-static UINT8 input_select, hopper;
 static WRITE8_HANDLER( input_select_w )
 {
-	input_select = data;
+	igs017_state *state = space->machine->driver_data<igs017_state>();
+	state->input_select = data;
 }
 
 static READ8_HANDLER( input_r )
 {
-	switch (input_select)
+	igs017_state *state = space->machine->driver_data<igs017_state>();
+	switch (state->input_select)
 	{
 		case 0x00:	return input_port_read(space->machine, "PLAYER1");
 		case 0x01:	return input_port_read(space->machine, "PLAYER2");
@@ -1096,7 +1132,7 @@ static READ8_HANDLER( input_r )
 		case 0x34:	return 0x32;
 
 		default:
-			logerror("PC %06X: input %02x read\n",cpu_get_pc(space->cpu),input_select);
+			logerror("PC %06X: input %02x read\n",cpu_get_pc(space->cpu),state->input_select);
 			return 0xff;
 	}
 }
@@ -1116,8 +1152,8 @@ static ADDRESS_MAP_START( iqblocka_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x2014, 0x2014 ) AM_WRITE( nmi_enable_w )
 	AM_RANGE( 0x2015, 0x2015 ) AM_WRITE( irq_enable_w )
 
-	AM_RANGE( 0x4000, 0x5fff ) AM_RAM_WRITE( fg_w ) AM_BASE( &fg_videoram )
-	AM_RANGE( 0x6000, 0x7fff ) AM_RAM_WRITE( bg_w ) AM_BASE( &bg_videoram )
+	AM_RANGE( 0x4000, 0x5fff ) AM_RAM_WRITE( fg_w ) AM_BASE_MEMBER(igs017_state, fg_videoram )
+	AM_RANGE( 0x6000, 0x7fff ) AM_RAM_WRITE( bg_w ) AM_BASE_MEMBER(igs017_state, bg_videoram )
 
 	AM_RANGE( 0x8000, 0x8000 ) AM_WRITE( input_select_w )
 	AM_RANGE( 0x8001, 0x8001 ) AM_READ ( input_r )
@@ -1132,32 +1168,31 @@ ADDRESS_MAP_END
 
 // mgcs
 
-static UINT16 igs_magic[2];
-static UINT8 scramble_data;
 
 static WRITE16_HANDLER( mgcs_magic_w )
 {
-	COMBINE_DATA(&igs_magic[offset]);
+	igs017_state *state = space->machine->driver_data<igs017_state>();
+	COMBINE_DATA(&state->igs_magic[offset]);
 
 	if (offset == 0)
 		return;
 
-	switch(igs_magic[0])
+	switch(state->igs_magic[0])
 	{
 		case 0x00:
 			if (ACCESSING_BITS_0_7)
 			{
-				input_select = data & 0xff;
+				state->input_select = data & 0xff;
 			}
 
-			if ( input_select & ~0xf8 )
-				logerror("%06x: warning, unknown bits written in input_select = %02x\n", cpu_get_pc(space->cpu), input_select);
+			if ( state->input_select & ~0xf8 )
+				logerror("%06x: warning, unknown bits written in state->input_select = %02x\n", cpu_get_pc(space->cpu), state->input_select);
 			break;
 
 		case 0x01:
 			if (ACCESSING_BITS_0_7)
 			{
-				scramble_data = data & 0xff;
+				state->scramble_data = data & 0xff;
 			}
 			break;
 
@@ -1165,19 +1200,20 @@ static WRITE16_HANDLER( mgcs_magic_w )
 		// case 0x03: ?
 
 		default:
-			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", cpu_get_pc(space->cpu), igs_magic[0], data);
+			logerror("%06x: warning, writing to state->igs_magic %02x = %02x\n", cpu_get_pc(space->cpu), state->igs_magic[0], data);
 	}
 }
 
 static READ16_HANDLER( mgcs_magic_r )
 {
-	switch(igs_magic[0])
+	igs017_state *state = space->machine->driver_data<igs017_state>();
+	switch(state->igs_magic[0])
 	{
 		case 0x01:
-			return BITSWAP8(scramble_data, 4,5,6,7, 0,1,2,3);
+			return BITSWAP8(state->scramble_data, 4,5,6,7, 0,1,2,3);
 
 		default:
-			logerror("%06x: warning, reading with igs_magic = %02x\n", cpu_get_pc(space->cpu), igs_magic[0]);
+			logerror("%06x: warning, reading with state->igs_magic = %02x\n", cpu_get_pc(space->cpu), state->igs_magic[0]);
 			break;
 	}
 
@@ -1186,34 +1222,35 @@ static READ16_HANDLER( mgcs_magic_r )
 
 static READ8_DEVICE_HANDLER( mgcs_keys_r )
 {
-	if (~input_select & 0x08)	return input_port_read(device->machine, "KEY0");
-	if (~input_select & 0x10)	return input_port_read(device->machine, "KEY1");
-	if (~input_select & 0x20)	return input_port_read(device->machine, "KEY2");
-	if (~input_select & 0x40)	return input_port_read(device->machine, "KEY3");
-	if (~input_select & 0x80)	return input_port_read(device->machine, "KEY4");
+	igs017_state *state = device->machine->driver_data<igs017_state>();
+	if (~state->input_select & 0x08)	return input_port_read(device->machine, "KEY0");
+	if (~state->input_select & 0x10)	return input_port_read(device->machine, "KEY1");
+	if (~state->input_select & 0x20)	return input_port_read(device->machine, "KEY2");
+	if (~state->input_select & 0x40)	return input_port_read(device->machine, "KEY3");
+	if (~state->input_select & 0x80)	return input_port_read(device->machine, "KEY4");
 
-	logerror("%s: warning, reading key with input_select = %02x\n", device->machine->describe_context(), input_select);
+	logerror("%s: warning, reading key with state->input_select = %02x\n", device->machine->describe_context(), state->input_select);
 	return 0xff;
 }
 
-static int irq1_enable;
 static WRITE16_HANDLER( irq1_enable_w )
 {
+	igs017_state *state = space->machine->driver_data<igs017_state>();
 	if (ACCESSING_BITS_0_7)
-		irq1_enable = data & 1;
+		state->irq1_enable = data & 1;
 
 	if (data != 0 && data != 0xff)
-		logerror("PC %06X: irq1_enable = %04x\n",cpu_get_pc(space->cpu),data);
+		logerror("PC %06X: state->irq1_enable = %04x\n",cpu_get_pc(space->cpu),data);
 }
 
-static int irq2_enable;
 static WRITE16_HANDLER( irq2_enable_w )
 {
+	igs017_state *state = space->machine->driver_data<igs017_state>();
 	if (ACCESSING_BITS_0_7)
-		irq2_enable = data & 1;
+		state->irq2_enable = data & 1;
 
 	if (data != 0 && data != 0xff)
-		logerror("PC %06X: irq2_enable = %04x\n",cpu_get_pc(space->cpu),data);
+		logerror("PC %06X: state->irq2_enable = %04x\n",cpu_get_pc(space->cpu),data);
 }
 
 static WRITE16_HANDLER( mgcs_paletteram_xRRRRRGGGGGBBBBB_w )
@@ -1241,8 +1278,8 @@ static ADDRESS_MAP_START( mgcs, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0xa04024, 0xa04025 ) AM_WRITE( video_disable_lsb_w )
 	AM_RANGE( 0xa04028, 0xa04029 ) AM_WRITE( irq2_enable_w )
 	AM_RANGE( 0xa0402a, 0xa0402b ) AM_WRITE( irq1_enable_w )
-	AM_RANGE( 0xa08000, 0xa0bfff ) AM_READWRITE( fg_lsb_r, fg_lsb_w ) AM_BASE( (UINT16**)&fg_videoram )
-	AM_RANGE( 0xa0c000, 0xa0ffff ) AM_READWRITE( bg_lsb_r, bg_lsb_w ) AM_BASE( (UINT16**)&bg_videoram )
+	AM_RANGE( 0xa08000, 0xa0bfff ) AM_READWRITE( fg_lsb_r, fg_lsb_w ) AM_BASE_MEMBER(igs017_state, fg_videoram )
+	AM_RANGE( 0xa0c000, 0xa0ffff ) AM_READWRITE( bg_lsb_r, bg_lsb_w ) AM_BASE_MEMBER(igs017_state, bg_videoram )
 	AM_RANGE( 0xa12000, 0xa12001 ) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff )
 	// oki banking through protection (code at $1a350)?
 ADDRESS_MAP_END
@@ -1263,36 +1300,38 @@ static WRITE16_HANDLER( sdmg2_paletteram_xRRRRRGGGGGBBBBB_w )
 
 static READ8_HANDLER( sdmg2_keys_r )
 {
-	if (~input_select & 0x01)	return input_port_read(space->machine, "KEY0");
-	if (~input_select & 0x02)	return input_port_read(space->machine, "KEY1");
-	if (~input_select & 0x04)	return input_port_read(space->machine, "KEY2");
-	if (~input_select & 0x08)	return input_port_read(space->machine, "KEY3");
-	if (~input_select & 0x10)	return input_port_read(space->machine, "KEY4");
+	igs017_state *state = space->machine->driver_data<igs017_state>();
+	if (~state->input_select & 0x01)	return input_port_read(space->machine, "KEY0");
+	if (~state->input_select & 0x02)	return input_port_read(space->machine, "KEY1");
+	if (~state->input_select & 0x04)	return input_port_read(space->machine, "KEY2");
+	if (~state->input_select & 0x08)	return input_port_read(space->machine, "KEY3");
+	if (~state->input_select & 0x10)	return input_port_read(space->machine, "KEY4");
 
-	if (input_select == 0x1f)	return input_port_read(space->machine, "KEY0");	// in joystick mode
+	if (state->input_select == 0x1f)	return input_port_read(space->machine, "KEY0");	// in joystick mode
 
-	logerror("%s: warning, reading key with input_select = %02x\n", space->machine->describe_context(), input_select);
+	logerror("%s: warning, reading key with state->input_select = %02x\n", space->machine->describe_context(), state->input_select);
 	return 0xff;
 }
 
 static WRITE16_HANDLER( sdmg2_magic_w )
 {
-	COMBINE_DATA(&igs_magic[offset]);
+	igs017_state *state = space->machine->driver_data<igs017_state>();
+	COMBINE_DATA(&state->igs_magic[offset]);
 
 	if (offset == 0)
 		return;
 
-	switch(igs_magic[0])
+	switch(state->igs_magic[0])
 	{
 		// case 0x00: ? 0x80
 
 		case 0x01:
 			if (ACCESSING_BITS_0_7)
 			{
-				input_select	=	data & 0x1f;
+				state->input_select	=	data & 0x1f;
 				coin_counter_w(space->machine, 0,	data & 0x20);
 				//  coin out        data & 0x40
-				hopper			=	data & 0x80;
+				state->hopper			=	data & 0x80;
 			}
 			break;
 
@@ -1305,17 +1344,18 @@ static WRITE16_HANDLER( sdmg2_magic_w )
 			break;
 
 		default:
-			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", cpu_get_pc(space->cpu), igs_magic[0], data);
+			logerror("%06x: warning, writing to state->igs_magic %02x = %02x\n", cpu_get_pc(space->cpu), state->igs_magic[0], data);
 	}
 }
 
 static READ16_HANDLER( sdmg2_magic_r )
 {
-	switch(igs_magic[0])
+	igs017_state *state = space->machine->driver_data<igs017_state>();
+	switch(state->igs_magic[0])
 	{
 		case 0x00:
 		{
-			UINT16 hopper_bit = (hopper && ((space->machine->primary_screen->frame_number()/10)&1)) ? 0x0000 : 0x0001;
+			UINT16 hopper_bit = (state->hopper && ((space->machine->primary_screen->frame_number()/10)&1)) ? 0x0000 : 0x0001;
 			return input_port_read(space->machine, "COINS") | hopper_bit;
 		}
 
@@ -1323,7 +1363,7 @@ static READ16_HANDLER( sdmg2_magic_r )
 			return sdmg2_keys_r(space, 0);
 
 		default:
-			logerror("%06x: warning, reading with igs_magic = %02x\n", cpu_get_pc(space->cpu), igs_magic[0]);
+			logerror("%06x: warning, reading with state->igs_magic = %02x\n", cpu_get_pc(space->cpu), state->igs_magic[0]);
 			break;
 	}
 
@@ -1339,8 +1379,8 @@ static ADDRESS_MAP_START( sdmg2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x204024, 0x204025) AM_WRITE( video_disable_lsb_w )
 	AM_RANGE(0x204028, 0x204029) AM_WRITE( irq2_enable_w )
 	AM_RANGE(0x20402a, 0x20402b) AM_WRITE( irq1_enable_w )
-	AM_RANGE(0x208000, 0x20bfff) AM_READWRITE( fg_lsb_r, fg_lsb_w ) AM_BASE( (UINT16**)&fg_videoram )
-	AM_RANGE(0x20c000, 0x20ffff) AM_READWRITE( bg_lsb_r, bg_lsb_w ) AM_BASE( (UINT16**)&bg_videoram )
+	AM_RANGE(0x208000, 0x20bfff) AM_READWRITE( fg_lsb_r, fg_lsb_w ) AM_BASE_MEMBER(igs017_state, fg_videoram )
+	AM_RANGE(0x20c000, 0x20ffff) AM_READWRITE( bg_lsb_r, bg_lsb_w ) AM_BASE_MEMBER(igs017_state, bg_videoram )
 	AM_RANGE(0x210000, 0x210001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff )
 	AM_RANGE(0x300000, 0x300003) AM_WRITE( sdmg2_magic_w )
 	AM_RANGE(0x300002, 0x300003) AM_READ ( sdmg2_magic_r )
@@ -1351,26 +1391,28 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( mgdh_keys_r )
 {
-	if (~input_select & 0x04)	return input_port_read(space->machine, "KEY0");
-	if (~input_select & 0x08)	return input_port_read(space->machine, "KEY1");
-	if (~input_select & 0x10)	return input_port_read(space->machine, "KEY2");
-	if (~input_select & 0x20)	return input_port_read(space->machine, "KEY3");
-	if (~input_select & 0x40)	return input_port_read(space->machine, "KEY4");
+	igs017_state *state = space->machine->driver_data<igs017_state>();
+	if (~state->input_select & 0x04)	return input_port_read(space->machine, "KEY0");
+	if (~state->input_select & 0x08)	return input_port_read(space->machine, "KEY1");
+	if (~state->input_select & 0x10)	return input_port_read(space->machine, "KEY2");
+	if (~state->input_select & 0x20)	return input_port_read(space->machine, "KEY3");
+	if (~state->input_select & 0x40)	return input_port_read(space->machine, "KEY4");
 
-	if ((input_select & 0xfc) == 0xfc)	return input_port_read(space->machine, "DSW1");
+	if ((state->input_select & 0xfc) == 0xfc)	return input_port_read(space->machine, "DSW1");
 
-	logerror("%s: warning, reading key with input_select = %02x\n", space->machine->describe_context(), input_select);
+	logerror("%s: warning, reading key with state->input_select = %02x\n", space->machine->describe_context(), state->input_select);
 	return 0xff;
 }
 
 static WRITE16_HANDLER( mgdha_magic_w )
 {
-	COMBINE_DATA(&igs_magic[offset]);
+	igs017_state *state = space->machine->driver_data<igs017_state>();
+	COMBINE_DATA(&state->igs_magic[offset]);
 
 	if (offset == 0)
 		return;
 
-	switch(igs_magic[0])
+	switch(state->igs_magic[0])
 	{
 		case 0x00:
 			if (ACCESSING_BITS_0_7)
@@ -1380,19 +1422,19 @@ static WRITE16_HANDLER( mgdha_magic_w )
 			}
 
 			if ( data & ~0xc0 )
-				logerror("%06x: warning, unknown bits written to igs_magic 00 = %02x\n", cpu_get_pc(space->cpu), data);
+				logerror("%06x: warning, unknown bits written to state->igs_magic 00 = %02x\n", cpu_get_pc(space->cpu), data);
 
 			break;
 
 		case 0x01:
 			if (ACCESSING_BITS_0_7)
 			{
-				input_select = data & 0xff;
-				hopper = data & 0x01;
+				state->input_select = data & 0xff;
+				state->hopper = data & 0x01;
 			}
 
-			if ( input_select & ~0xfd )
-				logerror("%06x: warning, unknown bits written in input_select = %02x\n", cpu_get_pc(space->cpu), input_select);
+			if ( state->input_select & ~0xfd )
+				logerror("%06x: warning, unknown bits written in state->input_select = %02x\n", cpu_get_pc(space->cpu), state->input_select);
 
 			break;
 
@@ -1407,23 +1449,24 @@ static WRITE16_HANDLER( mgdha_magic_w )
 
 		default:
 /*
-            04aba0: warning, writing to igs_magic 08 = d0
-            04abb0: warning, writing to igs_magic 09 = 76
-            04abc0: warning, writing to igs_magic 0a = 97
-            04abd0: warning, writing to igs_magic 0b = bf
-            04abe0: warning, writing to igs_magic 0c = ff
-            04abf0: warning, writing to igs_magic 04 = 3f
-            04ac00: warning, writing to igs_magic 05 = 82
-            04ac10: warning, writing to igs_magic 06 = ff
-            04ac20: warning, writing to igs_magic 07 = 3f
+            04aba0: warning, writing to state->igs_magic 08 = d0
+            04abb0: warning, writing to state->igs_magic 09 = 76
+            04abc0: warning, writing to state->igs_magic 0a = 97
+            04abd0: warning, writing to state->igs_magic 0b = bf
+            04abe0: warning, writing to state->igs_magic 0c = ff
+            04abf0: warning, writing to state->igs_magic 04 = 3f
+            04ac00: warning, writing to state->igs_magic 05 = 82
+            04ac10: warning, writing to state->igs_magic 06 = ff
+            04ac20: warning, writing to state->igs_magic 07 = 3f
 */
-			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", cpu_get_pc(space->cpu), igs_magic[0], data);
+			logerror("%06x: warning, writing to state->igs_magic %02x = %02x\n", cpu_get_pc(space->cpu), state->igs_magic[0], data);
 	}
 }
 
 static READ16_HANDLER( mgdha_magic_r )
 {
-	switch(igs_magic[0])
+	igs017_state *state = space->machine->driver_data<igs017_state>();
+	switch(state->igs_magic[0])
 	{
 		case 0x00:
 			return mgdh_keys_r(space, 0);
@@ -1436,12 +1479,12 @@ static READ16_HANDLER( mgdha_magic_r )
 
 		case 0x03:
 		{
-			UINT16 hopper_bit = (hopper && ((space->machine->primary_screen->frame_number()/10)&1)) ? 0x0000 : 0x0001;
+			UINT16 hopper_bit = (state->hopper && ((space->machine->primary_screen->frame_number()/10)&1)) ? 0x0000 : 0x0001;
 			return input_port_read(space->machine, "COINS") | hopper_bit;
 		}
 
 		default:
-			logerror("%06x: warning, reading with igs_magic = %02x\n", cpu_get_pc(space->cpu), igs_magic[0]);
+			logerror("%06x: warning, reading with state->igs_magic = %02x\n", cpu_get_pc(space->cpu), state->igs_magic[0]);
 			break;
 	}
 
@@ -1460,8 +1503,8 @@ static ADDRESS_MAP_START( mgdha_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa04024, 0xa04025) AM_WRITE( video_disable_lsb_w )
 	AM_RANGE(0xa04028, 0xa04029) AM_WRITE( irq2_enable_w )
 	AM_RANGE(0xa0402a, 0xa0402b) AM_WRITE( irq1_enable_w )
-	AM_RANGE(0xa08000, 0xa0bfff) AM_READWRITE( fg_lsb_r, fg_lsb_w ) AM_BASE( (UINT16**)&fg_videoram )
-	AM_RANGE(0xa0c000, 0xa0ffff) AM_READWRITE( bg_lsb_r, bg_lsb_w ) AM_BASE( (UINT16**)&bg_videoram )
+	AM_RANGE(0xa08000, 0xa0bfff) AM_READWRITE( fg_lsb_r, fg_lsb_w ) AM_BASE_MEMBER(igs017_state, fg_videoram )
+	AM_RANGE(0xa0c000, 0xa0ffff) AM_READWRITE( bg_lsb_r, bg_lsb_w ) AM_BASE_MEMBER(igs017_state, bg_videoram )
 	AM_RANGE(0xa10000, 0xa10001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff )
 ADDRESS_MAP_END
 
@@ -2019,14 +2062,15 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( iqblocka_interrupt )
 {
+	igs017_state *state = device->machine->driver_data<igs017_state>();
 	if (cpu_getiloops(device) & 1)
 	{
-		 if (nmi_enable)
+		 if (state->nmi_enable)
 			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
 	{
-		 if (irq_enable)
+		 if (state->irq_enable)
 			cpu_set_input_line(device, 0, HOLD_LINE);
 	}
 }
@@ -2045,12 +2089,13 @@ static const ppi8255_interface iqblocka_ppi8255_intf =
 
 static MACHINE_RESET( iqblocka )
 {
-	nmi_enable = 0;
-	irq_enable = 0;
-	input_select = 0;
+	igs017_state *state = machine->driver_data<igs017_state>();
+	state->nmi_enable = 0;
+	state->irq_enable = 0;
+	state->input_select = 0;
 }
 
-static MACHINE_CONFIG_START( iqblocka, driver_device )
+static MACHINE_CONFIG_START( iqblocka, igs017_state )
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(iqblocka_map)
 	MCFG_CPU_IO_MAP(iqblocka_io)
@@ -2090,25 +2135,27 @@ MACHINE_CONFIG_END
 
 static INTERRUPT_GEN( mgcs_interrupt )
 {
+	igs017_state *state = device->machine->driver_data<igs017_state>();
 	if (cpu_getiloops(device) & 1)
 	{
-		 if (irq2_enable)
+		 if (state->irq2_enable)
 			cpu_set_input_line(device, 2, HOLD_LINE);
 	}
 	else
 	{
-		 if (irq1_enable)
+		 if (state->irq1_enable)
 			cpu_set_input_line(device, 1, HOLD_LINE);
 	}
 }
 
 static MACHINE_RESET( mgcs )
 {
+	igs017_state *state = machine->driver_data<igs017_state>();
 	MACHINE_RESET_CALL( iqblocka );
-	irq1_enable = 0;
-	irq2_enable = 0;
-	scramble_data = 0;
-	memset(igs_magic, 0, sizeof(igs_magic));
+	state->irq1_enable = 0;
+	state->irq2_enable = 0;
+	state->scramble_data = 0;
+	memset(state->igs_magic, 0, sizeof(state->igs_magic));
 }
 
 static const ppi8255_interface mgcs_ppi8255_intf =
@@ -2122,7 +2169,7 @@ static const ppi8255_interface mgcs_ppi8255_intf =
 	DEVCB_NULL					// Port C write
 };
 
-static MACHINE_CONFIG_START( mgcs, driver_device )
+static MACHINE_CONFIG_START( mgcs, igs017_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(mgcs)
 	MCFG_CPU_VBLANK_INT_HACK(mgcs_interrupt,2)
@@ -2167,7 +2214,7 @@ static const ppi8255_interface sdmg2_ppi8255_intf =
 	DEVCB_NULL					// Port C write
 };
 
-static MACHINE_CONFIG_START( sdmg2, driver_device )
+static MACHINE_CONFIG_START( sdmg2, igs017_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz/2)
 	MCFG_CPU_PROGRAM_MAP(sdmg2)
 	MCFG_CPU_VBLANK_INT_HACK(mgcs_interrupt,2)
@@ -2202,14 +2249,15 @@ MACHINE_CONFIG_END
 
 static INTERRUPT_GEN( mgdh_interrupt )
 {
+	igs017_state *state = device->machine->driver_data<igs017_state>();
 	if (cpu_getiloops(device) & 1)
 	{
-		 if (irq2_enable)
+		 if (state->irq2_enable)
 			cpu_set_input_line(device, 3, HOLD_LINE);	// lev 3 instead of 2
 	}
 	else
 	{
-		 if (irq1_enable)
+		 if (state->irq1_enable)
 			cpu_set_input_line(device, 1, HOLD_LINE);
 	}
 }
@@ -2225,7 +2273,7 @@ static const ppi8255_interface mgdh_ppi8255_intf =
 	DEVCB_NULL					// Port C write
 };
 
-static MACHINE_CONFIG_START( mgdha, driver_device )
+static MACHINE_CONFIG_START( mgdha, igs017_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(mgdha_map)
 	MCFG_CPU_VBLANK_INT_HACK(mgdh_interrupt,2)

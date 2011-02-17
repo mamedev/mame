@@ -18,12 +18,23 @@
 #include "machine/at28c16.h"
 #include "includes/eolithsp.h"
 
-static UINT32 *vega_vram;
-static UINT8 vega_vbuffer = 0;
+
+class vegaeo_state : public driver_device
+{
+public:
+	vegaeo_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT32 *vega_vram;
+	UINT8 vega_vbuffer;
+};
+
+
 
 
 static WRITE32_HANDLER( vega_vram_w )
 {
+	vegaeo_state *state = space->machine->driver_data<vegaeo_state>();
 	switch(mem_mask)
 	{
 		case 0xffffffff:
@@ -49,12 +60,13 @@ static WRITE32_HANDLER( vega_vram_w )
 				return;
 	}
 
-	COMBINE_DATA(&vega_vram[offset + vega_vbuffer * (0x14000/4)]);
+	COMBINE_DATA(&state->vega_vram[offset + state->vega_vbuffer * (0x14000/4)]);
 }
 
 static READ32_HANDLER( vega_vram_r )
 {
-	return vega_vram[offset + (0x14000/4) * vega_vbuffer];
+	vegaeo_state *state = space->machine->driver_data<vegaeo_state>();
+	return state->vega_vram[offset + (0x14000/4) * state->vega_vbuffer];
 }
 
 static WRITE32_HANDLER( vega_palette_w )
@@ -69,9 +81,10 @@ static WRITE32_HANDLER( vega_palette_w )
 
 static WRITE32_HANDLER( vega_misc_w )
 {
+	vegaeo_state *state = space->machine->driver_data<vegaeo_state>();
 	// other bits ???
 
-	vega_vbuffer = data & 1;
+	state->vega_vbuffer = data & 1;
 }
 
 
@@ -130,11 +143,13 @@ INPUT_PORTS_END
 
 static VIDEO_START( vega )
 {
-	vega_vram = auto_alloc_array(machine, UINT32, 0x14000*2/4);
+	vegaeo_state *state = machine->driver_data<vegaeo_state>();
+	state->vega_vram = auto_alloc_array(machine, UINT32, 0x14000*2/4);
 }
 
 static VIDEO_UPDATE( vega )
 {
+	vegaeo_state *state = screen->machine->driver_data<vegaeo_state>();
 	int x,y,count;
 	int color;
 
@@ -143,16 +158,16 @@ static VIDEO_UPDATE( vega )
 	{
 		for (x=0;x < 320/4;x++)
 		{
-			color = vega_vram[count + (0x14000/4) * (vega_vbuffer ^ 1)] & 0xff;
+			color = state->vega_vram[count + (0x14000/4) * (state->vega_vbuffer ^ 1)] & 0xff;
 			*BITMAP_ADDR16(bitmap, y, x*4 + 3) = color;
 
-			color = (vega_vram[count + (0x14000/4) * (vega_vbuffer ^ 1)] & 0xff00) >> 8;
+			color = (state->vega_vram[count + (0x14000/4) * (state->vega_vbuffer ^ 1)] & 0xff00) >> 8;
 			*BITMAP_ADDR16(bitmap, y, x*4 + 2) = color;
 
-			color = (vega_vram[count + (0x14000/4) * (vega_vbuffer ^ 1)] & 0xff0000) >> 16;
+			color = (state->vega_vram[count + (0x14000/4) * (state->vega_vbuffer ^ 1)] & 0xff0000) >> 16;
 			*BITMAP_ADDR16(bitmap, y, x*4 + 1) = color;
 
-			color = (vega_vram[count + (0x14000/4) * (vega_vbuffer ^ 1)] & 0xff000000) >> 24;
+			color = (state->vega_vram[count + (0x14000/4) * (state->vega_vbuffer ^ 1)] & 0xff000000) >> 24;
 			*BITMAP_ADDR16(bitmap, y, x*4 + 0) = color;
 
 			count++;
@@ -162,7 +177,7 @@ static VIDEO_UPDATE( vega )
 }
 
 
-static MACHINE_CONFIG_START( vega, driver_device )
+static MACHINE_CONFIG_START( vega, vegaeo_state )
 	MCFG_CPU_ADD("maincpu", GMS30C2132, 55000000)	/* 55 MHz */
 	MCFG_CPU_PROGRAM_MAP(vega_map)
 	MCFG_CPU_VBLANK_INT_HACK(eolith_speedup,262)

@@ -58,8 +58,20 @@ Hopper, Ticket Counter, Prize System (Option)
 //#include "machine/smartmed.h"
 #include "machine/i2cmem.h"
 
-static UINT32 *system_memory;
-static UINT32 *steppingstone;
+
+class ghosteo_state : public driver_device
+{
+public:
+	ghosteo_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT32 *system_memory;
+	UINT32 *steppingstone;
+	int security_count;
+	UINT32 bballoon_port[20];
+};
+
+
 
 /*
 Power management:
@@ -83,10 +95,8 @@ NAND Flash Controller (4KB internal buffer)
 24-ch external interrupts Controller (Wake-up source 16-ch)
 */
 
-static int security_count = 0;
 static const UINT8 security_data[] = { 0x01, 0xC4, 0xFF, 0x22 };
 
-static UINT32 bballoon_port[20];
 
 enum nand_mode_t
 {
@@ -106,18 +116,19 @@ static struct nand_t nand;
 
 static UINT32 s3c2410_gpio_port_r( device_t *device, int port)
 {
-	UINT32 data = bballoon_port[port];
+	ghosteo_state *state = device->machine->driver_data<ghosteo_state>();
+	UINT32 data = state->bballoon_port[port];
 	switch (port)
 	{
 		case S3C2410_GPIO_PORT_F :
 		{
-			data = (data & ~0xFF) | security_data[security_count]; // bballoon security @ 0x3001BD68
+			data = (data & ~0xFF) | security_data[state->security_count]; // bballoon security @ 0x3001BD68
 		}
 		break;
 		case S3C2410_GPIO_PORT_G :
 		{
 			data = data ^ 0x20;
-			bballoon_port[port] = data;
+			state->bballoon_port[port] = data;
 		}
 		break;
 	}
@@ -126,16 +137,17 @@ static UINT32 s3c2410_gpio_port_r( device_t *device, int port)
 
 static void s3c2410_gpio_port_w( device_t *device, int port, UINT32 data)
 {
-	UINT32 old_value = bballoon_port[port];
-	bballoon_port[port] = data;
+	ghosteo_state *state = device->machine->driver_data<ghosteo_state>();
+	UINT32 old_value = state->bballoon_port[port];
+	state->bballoon_port[port] = data;
 	switch (port)
 	{
 		case S3C2410_GPIO_PORT_F :
 		{
 			switch (data)
 			{
-				case 0x04 : security_count = 0; break;
-				case 0x44 : security_count = 2; break;
+				case 0x04 : state->security_count = 0; break;
+				case 0x44 : state->security_count = 2; break;
 			}
 		}
 		break;
@@ -144,9 +156,9 @@ static void s3c2410_gpio_port_w( device_t *device, int port, UINT32 data)
 			// 0 -> 1
 			if (((data & 0x10) != 0) && ((old_value & 0x10) == 0))
 			{
-				logerror( "security_count %d -> %d\n", security_count, security_count + 1);
-				security_count++;
-				if (security_count > 7) security_count = 0;
+				logerror( "security_count %d -> %d\n", state->security_count, state->security_count + 1);
+				state->security_count++;
+				if (state->security_count > 7) state->security_count = 0;
 			}
 		}
 		break;
@@ -298,12 +310,12 @@ static WRITE32_HANDLER( sound_w )
 }
 
 static ADDRESS_MAP_START( bballoon_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x00000fff) AM_RAM AM_BASE(&steppingstone) AM_MIRROR(0x40000000)
+	AM_RANGE(0x00000000, 0x00000fff) AM_RAM AM_BASE_MEMBER(ghosteo_state, steppingstone) AM_MIRROR(0x40000000)
 	AM_RANGE(0x10000000, 0x10000003) AM_READ_PORT("10000000")
 	AM_RANGE(0x10100000, 0x10100003) AM_READ_PORT("10100000")
 	AM_RANGE(0x10200000, 0x10200003) AM_READ_PORT("10200000")
 	AM_RANGE(0x10300000, 0x10300003) AM_WRITE(sound_w)
-	AM_RANGE(0x30000000, 0x31ffffff) AM_RAM AM_BASE(&system_memory) AM_MIRROR(0x02000000)
+	AM_RANGE(0x30000000, 0x31ffffff) AM_RAM AM_BASE_MEMBER(ghosteo_state, system_memory) AM_MIRROR(0x02000000)
 ADDRESS_MAP_END
 
 /*
@@ -423,7 +435,7 @@ static MACHINE_RESET( bballoon )
 	s3c2410 = machine->device("s3c2410");
 }
 
-static MACHINE_CONFIG_START( bballoon, driver_device )
+static MACHINE_CONFIG_START( bballoon, ghosteo_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM9, 200000000)
@@ -531,7 +543,8 @@ ROM_END
 
 static DRIVER_INIT( bballoon )
 {
-	memcpy( steppingstone, machine->region( "user1")->base(), 4 * 1024);
+	ghosteo_state *state = machine->driver_data<ghosteo_state>();
+	memcpy( state->steppingstone, machine->region( "user1")->base(), 4 * 1024);
 }
 
 GAME( 2003, bballoon, 0, bballoon, bballoon, bballoon, ROT0, "Eolith", "BnB Arcade", GAME_NO_SOUND )

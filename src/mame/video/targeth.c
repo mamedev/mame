@@ -9,12 +9,6 @@
 #include "emu.h"
 #include "includes/targeth.h"
 
-UINT16 *targeth_spriteram;
-UINT16 *targeth_vregs;
-UINT16 *targeth_videoram;
-
-static tilemap_t *pant[2];
-
 
 /***************************************************************************
 
@@ -40,8 +34,9 @@ static tilemap_t *pant[2];
 
 static TILE_GET_INFO( get_tile_info_targeth_screen0 )
 {
-	int data = targeth_videoram[tile_index << 1];
-	int data2 = targeth_videoram[(tile_index << 1) + 1];
+	targeth_state *state = machine->driver_data<targeth_state>();
+	int data = state->videoram[tile_index << 1];
+	int data2 = state->videoram[(tile_index << 1) + 1];
 	int code = data & 0x3fff;
 
 	SET_TILE_INFO(0, code, data2 & 0x1f, TILE_FLIPXY((data2 >> 5) & 0x03));
@@ -49,8 +44,9 @@ static TILE_GET_INFO( get_tile_info_targeth_screen0 )
 
 static TILE_GET_INFO( get_tile_info_targeth_screen1 )
 {
-	int data = targeth_videoram[(0x2000/2) + (tile_index << 1)];
-	int data2 = targeth_videoram[(0x2000/2) + (tile_index << 1) + 1];
+	targeth_state *state = machine->driver_data<targeth_state>();
+	int data = state->videoram[(0x2000/2) + (tile_index << 1)];
+	int data2 = state->videoram[(0x2000/2) + (tile_index << 1) + 1];
 	int code = data & 0x3fff;
 
 	SET_TILE_INFO(0, code, data2 & 0x1f, TILE_FLIPXY((data2 >> 5) & 0x03));
@@ -64,8 +60,9 @@ static TILE_GET_INFO( get_tile_info_targeth_screen1 )
 
 WRITE16_HANDLER( targeth_vram_w )
 {
-	targeth_videoram[offset] = data;
-	tilemap_mark_tile_dirty(pant[(offset & 0x1fff) >> 12], ((offset << 1) & 0x1fff) >> 2);
+	targeth_state *state = space->machine->driver_data<targeth_state>();
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->pant[(offset & 0x1fff) >> 12], ((offset << 1) & 0x1fff) >> 2);
 }
 
 
@@ -77,10 +74,11 @@ WRITE16_HANDLER( targeth_vram_w )
 
 VIDEO_START( targeth )
 {
-	pant[0] = tilemap_create(machine, get_tile_info_targeth_screen0,tilemap_scan_rows,16,16,64,32);
-	pant[1] = tilemap_create(machine, get_tile_info_targeth_screen1,tilemap_scan_rows,16,16,64,32);
+	targeth_state *state = machine->driver_data<targeth_state>();
+	state->pant[0] = tilemap_create(machine, get_tile_info_targeth_screen0,tilemap_scan_rows,16,16,64,32);
+	state->pant[1] = tilemap_create(machine, get_tile_info_targeth_screen1,tilemap_scan_rows,16,16,64,32);
 
-	tilemap_set_transparent_pen(pant[0],0);
+	tilemap_set_transparent_pen(state->pant[0],0);
 }
 
 
@@ -109,15 +107,16 @@ VIDEO_START( targeth )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	targeth_state *state = machine->driver_data<targeth_state>();
 	int i;
 	const gfx_element *gfx = machine->gfx[0];
 
 	for (i = 3; i < (0x1000 - 6)/2; i += 4){
-		int sx = targeth_spriteram[i+2] & 0x03ff;
-		int sy = (240 - (targeth_spriteram[i] & 0x00ff)) & 0x00ff;
-		int number = targeth_spriteram[i+3] & 0x3fff;
-		int color = (targeth_spriteram[i+2] & 0x7c00) >> 10;
-		int attr = (targeth_spriteram[i] & 0xfe00) >> 9;
+		int sx = state->spriteram[i+2] & 0x03ff;
+		int sy = (240 - (state->spriteram[i] & 0x00ff)) & 0x00ff;
+		int number = state->spriteram[i+3] & 0x3fff;
+		int color = (state->spriteram[i+2] & 0x7c00) >> 10;
+		int attr = (state->spriteram[i] & 0xfe00) >> 9;
 
 		int xflip = attr & 0x20;
 		int yflip = attr & 0x40;
@@ -136,14 +135,15 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( targeth )
 {
+	targeth_state *state = screen->machine->driver_data<targeth_state>();
 	/* set scroll registers */
-	tilemap_set_scrolly(pant[0], 0, targeth_vregs[0]);
-	tilemap_set_scrollx(pant[0], 0, targeth_vregs[1] + 0x04);
-	tilemap_set_scrolly(pant[1], 0, targeth_vregs[2]);
-	tilemap_set_scrollx(pant[1], 0, targeth_vregs[3]);
+	tilemap_set_scrolly(state->pant[0], 0, state->vregs[0]);
+	tilemap_set_scrollx(state->pant[0], 0, state->vregs[1] + 0x04);
+	tilemap_set_scrolly(state->pant[1], 0, state->vregs[2]);
+	tilemap_set_scrollx(state->pant[1], 0, state->vregs[3]);
 
-	tilemap_draw(bitmap,cliprect,pant[1],0,0);
-	tilemap_draw(bitmap,cliprect,pant[0],0,0);
+	tilemap_draw(bitmap,cliprect,state->pant[1],0,0);
+	tilemap_draw(bitmap,cliprect,state->pant[0],0,0);
 	draw_sprites(screen->machine, bitmap,cliprect);
 
 	return 0;

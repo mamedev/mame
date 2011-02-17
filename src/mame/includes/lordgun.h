@@ -4,17 +4,6 @@
 
 *************************************************************************/
 
-/*----------- defined in video/lordgun.c -----------*/
-
-extern UINT16 *lordgun_priority_ram, lordgun_priority;
-
-extern UINT16 *lordgun_vram_0, *lordgun_scroll_x_0, *lordgun_scroll_y_0;
-extern UINT16 *lordgun_vram_1, *lordgun_scroll_x_1, *lordgun_scroll_y_1;
-extern UINT16 *lordgun_vram_2, *lordgun_scroll_x_2, *lordgun_scroll_y_2;
-extern UINT16 *lordgun_vram_3, *lordgun_scroll_x_3, *lordgun_scroll_y_3;
-extern UINT16 *lordgun_scrollram;
-extern int lordgun_whitescreen;
-
 typedef struct _lordgun_gun_data lordgun_gun_data;
 struct _lordgun_gun_data
 {
@@ -22,7 +11,40 @@ struct _lordgun_gun_data
 	UINT16	hw_x,	hw_y;
 };
 
-extern lordgun_gun_data lordgun_gun[2];
+class lordgun_state : public driver_device
+{
+public:
+	lordgun_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 old;
+	UINT8 aliencha_dip_sel;
+	UINT16 *priority_ram;
+	UINT16 priority;
+	UINT16 *vram_0;
+	UINT16 *scroll_x_0;
+	UINT16 *scroll_y_0;
+	UINT16 *vram_1;
+	UINT16 *scroll_x_1;
+	UINT16 *scroll_y_1;
+	UINT16 *vram_2;
+	UINT16 *scroll_x_2;
+	UINT16 *scroll_y_2;
+	UINT16 *vram_3;
+	UINT16 *scroll_x_3;
+	UINT16 *scroll_y_3;
+	UINT16 *scrollram;
+	int whitescreen;
+	lordgun_gun_data gun[2];
+	tilemap_t *tilemap_0;
+	tilemap_t *tilemap_1;
+	tilemap_t *tilemap_2;
+	tilemap_t *tilemap_3;
+	bitmap_t *bitmaps[5];
+};
+
+
+/*----------- defined in video/lordgun.c -----------*/
 
 WRITE16_HANDLER( lordgun_paletteram_w );
 WRITE16_HANDLER( lordgun_vram_0_w );

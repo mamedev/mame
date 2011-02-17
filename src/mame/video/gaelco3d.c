@@ -12,11 +12,6 @@
 #include "video/rgbutil.h"
 #include "video/poly.h"
 
-UINT8 *gaelco3d_texture;
-UINT8 *gaelco3d_texmask;
-UINT32 gaelco3d_texture_size;
-UINT32 gaelco3d_texmask_size;
-
 
 #define MAX_POLYGONS		4096
 #define MAX_POLYDATA		(MAX_POLYGONS * 21)
@@ -29,22 +24,10 @@ UINT32 gaelco3d_texmask_size;
 #define IS_POLYEND(x)		(((x) ^ ((x) >> 1)) & 0x4000)
 
 
-static bitmap_t *screenbits;
-static bitmap_t *zbuffer;
-static rgb_t *palette;
-static UINT32 *polydata_buffer;
-static UINT32 polydata_count;
-
-static int polygons;
-static int lastscan;
-static int video_changed;
-
-static poly_manager *poly;
-
-
 typedef struct _poly_extra_data poly_extra_data;
 struct _poly_extra_data
 {
+	running_machine *machine;
 	UINT32 tex, color;
 	float ooz_dx, ooz_dy, ooz_base;
 	float uoz_dx, uoz_dy, uoz_base;
@@ -67,37 +50,39 @@ static void render_alphablend(void *dest, INT32 scanline, const poly_extent *ext
 
 static void gaelco3d_exit(running_machine &machine)
 {
-	poly_free(poly);
+	gaelco3d_state *state = machine.driver_data<gaelco3d_state>();
+	poly_free(state->poly);
 }
 
 
 VIDEO_START( gaelco3d )
 {
+	gaelco3d_state *state = machine->driver_data<gaelco3d_state>();
 	int width, height;
 
-	poly = poly_alloc(machine, 2000, sizeof(poly_extra_data), 0);
+	state->poly = poly_alloc(machine, 2000, sizeof(poly_extra_data), 0);
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, gaelco3d_exit);
 
-	screenbits = machine->primary_screen->alloc_compatible_bitmap();
+	state->screenbits = machine->primary_screen->alloc_compatible_bitmap();
 
 	width = machine->primary_screen->width();
 	height = machine->primary_screen->height();
-	zbuffer = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	state->zbuffer = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 
-	palette = auto_alloc_array(machine, rgb_t, 32768);
-	polydata_buffer = auto_alloc_array(machine, UINT32, MAX_POLYDATA);
+	state->palette = auto_alloc_array(machine, rgb_t, 32768);
+	state->polydata_buffer = auto_alloc_array(machine, UINT32, MAX_POLYDATA);
 
 	/* save states */
 
-	state_save_register_global_pointer(machine, palette, 32768);
-	state_save_register_global_pointer(machine, polydata_buffer, MAX_POLYDATA);
-	state_save_register_global(machine, polydata_count);
+	state_save_register_global_pointer(machine, state->palette, 32768);
+	state_save_register_global_pointer(machine, state->polydata_buffer, MAX_POLYDATA);
+	state_save_register_global(machine, state->polydata_count);
 
-	state_save_register_global(machine, polygons);
-	state_save_register_global(machine, lastscan);
+	state_save_register_global(machine, state->polygons);
+	state_save_register_global(machine, state->lastscan);
 
-	state_save_register_global_bitmap(machine, screenbits);
-	state_save_register_global_bitmap(machine, zbuffer);
+	state_save_register_global_bitmap(machine, state->screenbits);
+	state_save_register_global_bitmap(machine, state->zbuffer);
 }
 
 
@@ -131,6 +116,7 @@ VIDEO_START( gaelco3d )
 
 static void render_poly(screen_device &screen, UINT32 *polydata)
 {
+	gaelco3d_state *state = screen.machine->driver_data<gaelco3d_state>();
 	float midx = screen.width() / 2;
 	float midy = screen.height() / 2;
 	float z0 = tms3203x_device::fp_to_float(polydata[0]);
@@ -143,7 +129,7 @@ static void render_poly(screen_device &screen, UINT32 *polydata)
 	float voz_base = tms3203x_device::fp_to_float(polydata[7]) * 256.0f - midx * voz_dx - midy * voz_dy;
 	float ooz_base = tms3203x_device::fp_to_float(polydata[8]) - midx * ooz_dx - midy * ooz_dy;
 	float uoz_base = tms3203x_device::fp_to_float(polydata[9]) * 256.0f - midx * uoz_dx - midy * uoz_dy;
-	poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(poly);
+	poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(state->poly);
 	int color = (polydata[10] & 0x7f) << 8;
 	poly_vertex vert[MAX_VERTICES];
 	UINT32 data;
@@ -174,6 +160,7 @@ static void render_poly(screen_device &screen, UINT32 *polydata)
 	}
 
 	/* fill in extra data */
+	extra->machine = screen.machine;
 	extra->tex = polydata[11];
 	extra->color = color;
 	extra->ooz_dx = ooz_dx;
@@ -204,17 +191,17 @@ static void render_poly(screen_device &screen, UINT32 *polydata)
 
 		/* special case: no Z buffering and no perspective correction */
 		if (color != 0x7f00 && z0 < 0 && ooz_dx == 0 && ooz_dy == 0)
-			poly_render_triangle_fan(poly, screenbits, &visarea, render_noz_noperspective, 0, vertnum, &vert[0]);
+			poly_render_triangle_fan(state->poly, state->screenbits, &visarea, render_noz_noperspective, 0, vertnum, &vert[0]);
 
 		/* general case: non-alpha blended */
 		else if (color != 0x7f00)
-			poly_render_triangle_fan(poly, screenbits, &visarea, render_normal, 0, vertnum, &vert[0]);
+			poly_render_triangle_fan(state->poly, state->screenbits, &visarea, render_normal, 0, vertnum, &vert[0]);
 
 		/* color 0x7f seems to be hard-coded as a 50% alpha blend */
 		else
-			poly_render_triangle_fan(poly, screenbits, &visarea, render_alphablend, 0, vertnum, &vert[0]);
+			poly_render_triangle_fan(state->poly, state->screenbits, &visarea, render_alphablend, 0, vertnum, &vert[0]);
 
-		polygons += vertnum - 2;
+		state->polygons += vertnum - 2;
 	}
 }
 
@@ -223,16 +210,17 @@ static void render_poly(screen_device &screen, UINT32 *polydata)
 static void render_noz_noperspective(void *destbase, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = (const poly_extra_data *)extradata;
+	gaelco3d_state *state = extra->machine->driver_data<gaelco3d_state>();
 	bitmap_t *bitmap = (bitmap_t *)destbase;
 	float zbase = recip_approx(extra->ooz_base);
 	float uoz_step = extra->uoz_dx * zbase;
 	float voz_step = extra->voz_dx * zbase;
 	int zbufval = (int)(-extra->z0 * zbase);
-	offs_t endmask = gaelco3d_texture_size - 1;
-	const rgb_t *palsource = palette + extra->color;
+	offs_t endmask = state->texture_size - 1;
+	const rgb_t *palsource = state->palette + extra->color;
 	UINT32 tex = extra->tex;
 	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
-	UINT16 *zbuf = BITMAP_ADDR16(zbuffer, scanline, 0);
+	UINT16 *zbuf = BITMAP_ADDR16(state->zbuffer, scanline, 0);
 	int startx = extent->startx;
 	float uoz = (extra->uoz_base + scanline * extra->uoz_dy + startx * extra->uoz_dx) * zbase;
 	float voz = (extra->voz_base + scanline * extra->voz_dy + startx * extra->voz_dx) * zbase;
@@ -243,12 +231,12 @@ static void render_noz_noperspective(void *destbase, INT32 scanline, const poly_
 		int u = (int)uoz;
 		int v = (int)voz;
 		int pixeloffs = (tex + (v >> 8) * 4096 + (u >> 8)) & endmask;
-		if (pixeloffs >= gaelco3d_texmask_size || !gaelco3d_texmask[pixeloffs])
+		if (pixeloffs >= state->texmask_size || !state->texmask[pixeloffs])
 		{
-			rgb_t rgb00 = palsource[gaelco3d_texture[pixeloffs]];
-			rgb_t rgb01 = palsource[gaelco3d_texture[(pixeloffs + 1) & endmask]];
-			rgb_t rgb10 = palsource[gaelco3d_texture[(pixeloffs + 4096) & endmask]];
-			rgb_t rgb11 = palsource[gaelco3d_texture[(pixeloffs + 4097) & endmask]];
+			rgb_t rgb00 = palsource[state->texture[pixeloffs]];
+			rgb_t rgb01 = palsource[state->texture[(pixeloffs + 1) & endmask]];
+			rgb_t rgb10 = palsource[state->texture[(pixeloffs + 4096) & endmask]];
+			rgb_t rgb11 = palsource[state->texture[(pixeloffs + 4097) & endmask]];
 			rgb_t filtered = rgb_bilinear_filter(rgb00, rgb01, rgb10, rgb11, u, v);
 			dest[x] = (filtered & 0x1f) | ((filtered & 0x1ff800) >> 6);
 			zbuf[x] = zbufval;
@@ -264,16 +252,17 @@ static void render_noz_noperspective(void *destbase, INT32 scanline, const poly_
 static void render_normal(void *destbase, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = (const poly_extra_data *)extradata;
+	gaelco3d_state *state = extra->machine->driver_data<gaelco3d_state>();
 	bitmap_t *bitmap = (bitmap_t *)destbase;
 	float ooz_dx = extra->ooz_dx;
 	float uoz_dx = extra->uoz_dx;
 	float voz_dx = extra->voz_dx;
-	offs_t endmask = gaelco3d_texture_size - 1;
-	const rgb_t *palsource = palette + extra->color;
+	offs_t endmask = state->texture_size - 1;
+	const rgb_t *palsource = state->palette + extra->color;
 	UINT32 tex = extra->tex;
 	float z0 = extra->z0;
 	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
-	UINT16 *zbuf = BITMAP_ADDR16(zbuffer, scanline, 0);
+	UINT16 *zbuf = BITMAP_ADDR16(state->zbuffer, scanline, 0);
 	int startx = extent->startx;
 	float ooz = extra->ooz_base + scanline * extra->ooz_dy + startx * ooz_dx;
 	float uoz = extra->uoz_base + scanline * extra->uoz_dy + startx * uoz_dx;
@@ -292,12 +281,12 @@ static void render_normal(void *destbase, INT32 scanline, const poly_extent *ext
 				int u = (int)(uoz * z);
 				int v = (int)(voz * z);
 				int pixeloffs = (tex + (v >> 8) * 4096 + (u >> 8)) & endmask;
-				if (pixeloffs >= gaelco3d_texmask_size || !gaelco3d_texmask[pixeloffs])
+				if (pixeloffs >= state->texmask_size || !state->texmask[pixeloffs])
 				{
-					rgb_t rgb00 = palsource[gaelco3d_texture[pixeloffs]];
-					rgb_t rgb01 = palsource[gaelco3d_texture[(pixeloffs + 1) & endmask]];
-					rgb_t rgb10 = palsource[gaelco3d_texture[(pixeloffs + 4096) & endmask]];
-					rgb_t rgb11 = palsource[gaelco3d_texture[(pixeloffs + 4097) & endmask]];
+					rgb_t rgb00 = palsource[state->texture[pixeloffs]];
+					rgb_t rgb01 = palsource[state->texture[(pixeloffs + 1) & endmask]];
+					rgb_t rgb10 = palsource[state->texture[(pixeloffs + 4096) & endmask]];
+					rgb_t rgb11 = palsource[state->texture[(pixeloffs + 4097) & endmask]];
 					rgb_t filtered = rgb_bilinear_filter(rgb00, rgb01, rgb10, rgb11, u, v);
 					dest[x] = (filtered & 0x1f) | ((filtered & 0x1ff800) >> 6);
 					zbuf[x] = (zbufval < 0) ? -zbufval : zbufval;
@@ -316,16 +305,17 @@ static void render_normal(void *destbase, INT32 scanline, const poly_extent *ext
 static void render_alphablend(void *destbase, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = (const poly_extra_data *)extradata;
+	gaelco3d_state *state = extra->machine->driver_data<gaelco3d_state>();
 	bitmap_t *bitmap = (bitmap_t *)destbase;
 	float ooz_dx = extra->ooz_dx;
 	float uoz_dx = extra->uoz_dx;
 	float voz_dx = extra->voz_dx;
-	offs_t endmask = gaelco3d_texture_size - 1;
-	const rgb_t *palsource = palette + extra->color;
+	offs_t endmask = state->texture_size - 1;
+	const rgb_t *palsource = state->palette + extra->color;
 	UINT32 tex = extra->tex;
 	float z0 = extra->z0;
 	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
-	UINT16 *zbuf = BITMAP_ADDR16(zbuffer, scanline, 0);
+	UINT16 *zbuf = BITMAP_ADDR16(state->zbuffer, scanline, 0);
 	int startx = extent->startx;
 	float ooz = extra->ooz_base + extra->ooz_dy * scanline + startx * ooz_dx;
 	float uoz = extra->uoz_base + extra->uoz_dy * scanline + startx * uoz_dx;
@@ -344,12 +334,12 @@ static void render_alphablend(void *destbase, INT32 scanline, const poly_extent 
 				int u = (int)(uoz * z);
 				int v = (int)(voz * z);
 				int pixeloffs = (tex + (v >> 8) * 4096 + (u >> 8)) & endmask;
-				if (pixeloffs >= gaelco3d_texmask_size || !gaelco3d_texmask[pixeloffs])
+				if (pixeloffs >= state->texmask_size || !state->texmask[pixeloffs])
 				{
-					rgb_t rgb00 = palsource[gaelco3d_texture[pixeloffs]];
-					rgb_t rgb01 = palsource[gaelco3d_texture[(pixeloffs + 1) & endmask]];
-					rgb_t rgb10 = palsource[gaelco3d_texture[(pixeloffs + 4096) & endmask]];
-					rgb_t rgb11 = palsource[gaelco3d_texture[(pixeloffs + 4097) & endmask]];
+					rgb_t rgb00 = palsource[state->texture[pixeloffs]];
+					rgb_t rgb01 = palsource[state->texture[(pixeloffs + 1) & endmask]];
+					rgb_t rgb10 = palsource[state->texture[(pixeloffs + 4096) & endmask]];
+					rgb_t rgb11 = palsource[state->texture[(pixeloffs + 4097) & endmask]];
 					rgb_t filtered = rgb_bilinear_filter(rgb00, rgb01, rgb10, rgb11, u, v) >> 1;
 					dest[x] = ((filtered & 0x0f) | ((filtered & 0x0f7800) >> 6)) + ((dest[x] >> 1) & 0x3def);
 					zbuf[x] = (zbufval < 0) ? -zbufval : zbufval;
@@ -373,19 +363,20 @@ static void render_alphablend(void *destbase, INT32 scanline, const poly_extent 
 
 void gaelco3d_render(screen_device &screen)
 {
+	gaelco3d_state *state = screen.machine->driver_data<gaelco3d_state>();
 	/* wait for any queued stuff to complete */
-	poly_wait(poly, "Time to render");
+	poly_wait(state->poly, "Time to render");
 
 #if DISPLAY_STATS
 {
 	int scan = screen.vpos();
-	popmessage("Polys = %4d  Timeleft = %3d", polygons, (lastscan < scan) ? (scan - lastscan) : (scan + (lastscan - screen.visible_area().max_y)));
+	popmessage("Polys = %4d  Timeleft = %3d", state->polygons, (state->lastscan < scan) ? (scan - state->lastscan) : (scan + (state->lastscan - screen.visible_area().max_y)));
 }
 #endif
 
-	polydata_count = 0;
-	polygons = 0;
-	lastscan = -1;
+	state->polydata_count = 0;
+	state->polygons = 0;
+	state->lastscan = -1;
 }
 
 
@@ -398,24 +389,25 @@ void gaelco3d_render(screen_device &screen)
 
 WRITE32_HANDLER( gaelco3d_render_w )
 {
+	gaelco3d_state *state = space->machine->driver_data<gaelco3d_state>();
 	/* append the data to our buffer */
-	polydata_buffer[polydata_count++] = data;
-	if (polydata_count >= MAX_POLYDATA)
+	state->polydata_buffer[state->polydata_count++] = data;
+	if (state->polydata_count >= MAX_POLYDATA)
 		fatalerror("Out of polygon buffer space!");
 
-	/* if we've accumulated a completed poly set of data, queue it */
+	/* if we've accumulated a completed state->poly set of data, queue it */
 	if (!space->machine->video().skip_this_frame())
 	{
-		if (polydata_count >= 18 && (polydata_count % 2) == 1 && IS_POLYEND(polydata_buffer[polydata_count - 2]))
+		if (state->polydata_count >= 18 && (state->polydata_count % 2) == 1 && IS_POLYEND(state->polydata_buffer[state->polydata_count - 2]))
 		{
-			render_poly(*space->machine->primary_screen, &polydata_buffer[0]);
-			polydata_count = 0;
+			render_poly(*space->machine->primary_screen, &state->polydata_buffer[0]);
+			state->polydata_count = 0;
 		}
-		video_changed = TRUE;
+		state->video_changed = TRUE;
 	}
 
 #if DISPLAY_STATS
-	lastscan = space->machine->primary_screen->vpos();
+	state->lastscan = space->machine->primary_screen->vpos();
 #endif
 }
 
@@ -429,18 +421,20 @@ WRITE32_HANDLER( gaelco3d_render_w )
 
 WRITE16_HANDLER( gaelco3d_paletteram_w )
 {
-	poly_wait(poly, "Palette change");
+	gaelco3d_state *state = space->machine->driver_data<gaelco3d_state>();
+	poly_wait(state->poly, "Palette change");
 	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
-	palette[offset] = ((space->machine->generic.paletteram.u16[offset] & 0x7fe0) << 6) | (space->machine->generic.paletteram.u16[offset] & 0x1f);
+	state->palette[offset] = ((space->machine->generic.paletteram.u16[offset] & 0x7fe0) << 6) | (space->machine->generic.paletteram.u16[offset] & 0x1f);
 }
 
 
 WRITE32_HANDLER( gaelco3d_paletteram_020_w )
 {
-	poly_wait(poly, "Palette change");
+	gaelco3d_state *state = space->machine->driver_data<gaelco3d_state>();
+	poly_wait(state->poly, "Palette change");
 	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
-	palette[offset*2+0] = ((space->machine->generic.paletteram.u32[offset] & 0x7fe00000) >> 10) | ((space->machine->generic.paletteram.u32[offset] & 0x1f0000) >> 16);
-	palette[offset*2+1] = ((space->machine->generic.paletteram.u32[offset] & 0x7fe0) << 6) | (space->machine->generic.paletteram.u32[offset] & 0x1f);
+	state->palette[offset*2+0] = ((space->machine->generic.paletteram.u32[offset] & 0x7fe00000) >> 10) | ((space->machine->generic.paletteram.u32[offset] & 0x1f0000) >> 16);
+	state->palette[offset*2+1] = ((space->machine->generic.paletteram.u32[offset] & 0x7fe0) << 6) | (space->machine->generic.paletteram.u32[offset] & 0x1f);
 }
 
 
@@ -453,18 +447,19 @@ WRITE32_HANDLER( gaelco3d_paletteram_020_w )
 
 VIDEO_UPDATE( gaelco3d )
 {
+	gaelco3d_state *state = screen->machine->driver_data<gaelco3d_state>();
 	int x, y, ret;
 
 	if (DISPLAY_TEXTURE && (input_code_pressed(screen->machine, KEYCODE_Z) || input_code_pressed(screen->machine, KEYCODE_X)))
 	{
 		static int xv = 0, yv = 0x1000;
-		UINT8 *base = gaelco3d_texture;
-		int length = gaelco3d_texture_size;
+		UINT8 *base = state->texture;
+		int length = state->texture_size;
 
 		if (input_code_pressed(screen->machine, KEYCODE_X))
 		{
-			base = gaelco3d_texmask;
-			length = gaelco3d_texmask_size;
+			base = state->texmask;
+			length = state->texmask_size;
 		}
 
 		if (input_code_pressed(screen->machine, KEYCODE_LEFT) && xv >= 4)
@@ -493,10 +488,10 @@ VIDEO_UPDATE( gaelco3d )
 	}
 	else
 	{
-		if (video_changed)
-			copybitmap(bitmap, screenbits, 0,1, 0,0, cliprect);
-		ret = video_changed;
-		video_changed = FALSE;
+		if (state->video_changed)
+			copybitmap(bitmap, state->screenbits, 0,1, 0,0, cliprect);
+		ret = state->video_changed;
+		state->video_changed = FALSE;
 	}
 
 	logerror("---update---\n");

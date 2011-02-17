@@ -57,7 +57,6 @@
 #include "machine/eeprom.h"
 #include "includes/eolith.h"
 
-static int coin_counter_bit = 0;
 
 #include "includes/eolithsp.h"
 
@@ -92,8 +91,9 @@ static READ32_HANDLER( eolith_custom_r )
 
 static WRITE32_HANDLER( systemcontrol_w )
 {
-	eolith_buffer = (data & 0x80) >> 7;
-	coin_counter_w(space->machine, 0, data & coin_counter_bit);
+	eolith_state *state = space->machine->driver_data<eolith_state>();
+	state->buffer = (data & 0x80) >> 7;
+	coin_counter_w(space->machine, 0, data & state->coin_counter_bit);
 	set_led_status(space->machine, 0, data & 1);
 
 	input_port_write(space->machine, "EEPROMOUT", data, 0xff);
@@ -331,7 +331,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( eolith45, driver_device )
+static MACHINE_CONFIG_START( eolith45, eolith_state )
 	MCFG_CPU_ADD("maincpu", E132N, 45000000)		 /* 45 MHz */
 	MCFG_CPU_PROGRAM_MAP(eolith_map)
 	MCFG_CPU_VBLANK_INT_HACK(eolith_speedup,262)
@@ -1110,19 +1110,21 @@ static DRIVER_INIT( eolith )
 
 static DRIVER_INIT( landbrk )
 {
-	coin_counter_bit = 0x1000;
+	eolith_state *state = machine->driver_data<eolith_state>();
+	state->coin_counter_bit = 0x1000;
 	init_eolith_speedup(machine);
 }
 
 static DRIVER_INIT( landbrka )
 {
+	eolith_state *state = machine->driver_data<eolith_state>();
 	//it fails compares with memories:
 	//$4002d338 -> $4002d348 .... $4002d33f -> $4002d34f
 	//related with bits 0x100 - 0x200 read at startup from input(0) ?
 	UINT32 *rombase = (UINT32*)machine->region("maincpu")->base();
 	rombase[0x14f00/4] = (rombase[0x14f00/4] & 0xffff) | 0x03000000; /* Change BR to NOP */
 
-	coin_counter_bit = 0x2000;
+	state->coin_counter_bit = 0x2000;
 	init_eolith_speedup(machine);
 }
 

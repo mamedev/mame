@@ -190,14 +190,14 @@ static ADDRESS_MAP_START( argus_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc200, 0xc200) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xc201, 0xc201) AM_WRITE(argus_flipscreen_w)
 	AM_RANGE(0xc202, 0xc202) AM_WRITE(argus_bankselect_w)
-	AM_RANGE(0xc300, 0xc301) AM_WRITE(argus_bg0_scrollx_w) AM_BASE(&argus_bg0_scrollx)
-	AM_RANGE(0xc302, 0xc303) AM_WRITE(argus_bg0_scrolly_w) AM_BASE(&argus_bg0_scrolly)
-	AM_RANGE(0xc308, 0xc309) AM_WRITE(argus_bg1_scrollx_w) AM_BASE(&argus_bg1_scrollx)
-	AM_RANGE(0xc30a, 0xc30b) AM_WRITE(argus_bg1_scrolly_w) AM_BASE(&argus_bg1_scrolly)
+	AM_RANGE(0xc300, 0xc301) AM_RAM AM_BASE_MEMBER(argus_state, bg0_scrollx)
+	AM_RANGE(0xc302, 0xc303) AM_RAM AM_BASE_MEMBER(argus_state, bg0_scrolly)
+	AM_RANGE(0xc308, 0xc309) AM_RAM AM_BASE_MEMBER(argus_state, bg1_scrollx)
+	AM_RANGE(0xc30a, 0xc30b) AM_RAM AM_BASE_MEMBER(argus_state, bg1_scrolly)
 	AM_RANGE(0xc30c, 0xc30c) AM_WRITE(argus_bg_status_w)
-	AM_RANGE(0xc400, 0xcfff) AM_READWRITE(argus_paletteram_r, argus_paletteram_w) AM_BASE(&argus_paletteram)
-	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(argus_txram_r, argus_txram_w) AM_BASE(&argus_txram)
-	AM_RANGE(0xd800, 0xdfff) AM_READWRITE(argus_bg1ram_r, argus_bg1ram_w) AM_BASE(&argus_bg1ram)
+	AM_RANGE(0xc400, 0xcfff) AM_READWRITE(argus_paletteram_r, argus_paletteram_w) AM_BASE_MEMBER(argus_state, paletteram)
+	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(argus_txram_r, argus_txram_w) AM_BASE_MEMBER(argus_state, txram)
+	AM_RANGE(0xd800, 0xdfff) AM_READWRITE(argus_bg1ram_r, argus_bg1ram_w) AM_BASE_MEMBER(argus_state, bg1ram)
 	AM_RANGE(0xe000, 0xf1ff) AM_RAM
 	AM_RANGE(0xf200, 0xf7ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
@@ -215,13 +215,13 @@ static ADDRESS_MAP_START( valtric_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc201, 0xc201) AM_WRITE(argus_flipscreen_w)
 	AM_RANGE(0xc202, 0xc202) AM_WRITE(argus_bankselect_w)
 	AM_RANGE(0xc300, 0xc300) AM_WRITE(valtric_unknown_w)
-	AM_RANGE(0xc308, 0xc309) AM_WRITE(argus_bg1_scrollx_w) AM_BASE(&argus_bg1_scrollx)
-	AM_RANGE(0xc30a, 0xc30b) AM_WRITE(argus_bg1_scrolly_w) AM_BASE(&argus_bg1_scrolly)
+	AM_RANGE(0xc308, 0xc309) AM_RAM AM_BASE_MEMBER(argus_state, bg1_scrollx)
+	AM_RANGE(0xc30a, 0xc30b) AM_RAM AM_BASE_MEMBER(argus_state, bg1_scrolly)
 	AM_RANGE(0xc30c, 0xc30c) AM_WRITE(valtric_bg_status_w)
 	AM_RANGE(0xc30d, 0xc30d) AM_WRITE(valtric_mosaic_w)
-	AM_RANGE(0xc400, 0xcfff) AM_READWRITE(argus_paletteram_r, valtric_paletteram_w) AM_BASE(&argus_paletteram)
-	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(argus_txram_r, argus_txram_w) AM_BASE(&argus_txram)
-	AM_RANGE(0xd800, 0xdfff) AM_READWRITE(argus_bg1ram_r, argus_bg1ram_w) AM_BASE(&argus_bg1ram)
+	AM_RANGE(0xc400, 0xcfff) AM_READWRITE(argus_paletteram_r, valtric_paletteram_w) AM_BASE_MEMBER(argus_state, paletteram)
+	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(argus_txram_r, argus_txram_w) AM_BASE_MEMBER(argus_state, txram)
+	AM_RANGE(0xd800, 0xdfff) AM_READWRITE(argus_bg1ram_r, argus_bg1ram_w) AM_BASE_MEMBER(argus_state, bg1ram)
 	AM_RANGE(0xe000, 0xf1ff) AM_RAM
 	AM_RANGE(0xf200, 0xf7ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
@@ -240,14 +240,14 @@ static ADDRESS_MAP_START( butasan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc201, 0xc201) AM_WRITE(argus_flipscreen_w)
 	AM_RANGE(0xc202, 0xc202) AM_WRITE(argus_bankselect_w)
 	AM_RANGE(0xc203, 0xc203) AM_WRITE(butasan_pageselect_w)
-	AM_RANGE(0xc300, 0xc301) AM_WRITE(argus_bg0_scrollx_w) AM_BASE(&argus_bg0_scrollx)
-	AM_RANGE(0xc302, 0xc303) AM_WRITE(argus_bg0_scrolly_w) AM_BASE(&argus_bg0_scrolly)
+	AM_RANGE(0xc300, 0xc301) AM_RAM AM_BASE_MEMBER(argus_state, bg0_scrollx)
+	AM_RANGE(0xc302, 0xc303) AM_RAM AM_BASE_MEMBER(argus_state, bg0_scrolly)
 	AM_RANGE(0xc304, 0xc304) AM_WRITE(butasan_bg0_status_w)
-	AM_RANGE(0xc308, 0xc309) AM_WRITE(argus_bg1_scrollx_w) AM_BASE(&argus_bg1_scrollx)
-	AM_RANGE(0xc30a, 0xc30b) AM_WRITE(argus_bg1_scrolly_w) AM_BASE(&argus_bg1_scrolly)
+	AM_RANGE(0xc308, 0xc309) AM_RAM AM_BASE_MEMBER(argus_state, bg1_scrollx)
+	AM_RANGE(0xc30a, 0xc30b) AM_RAM AM_BASE_MEMBER(argus_state, bg1_scrolly)
 	AM_RANGE(0xc30c, 0xc30c) AM_WRITE(butasan_bg1_status_w)
-	AM_RANGE(0xc400, 0xc7ff) AM_READWRITE(butasan_bg1ram_r, butasan_bg1ram_w) AM_BASE(&butasan_bg1ram)
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(argus_paletteram_r, butasan_paletteram_w) AM_BASE(&argus_paletteram)
+	AM_RANGE(0xc400, 0xc7ff) AM_READWRITE(butasan_bg1ram_r, butasan_bg1ram_w) AM_BASE_MEMBER(argus_state, butasan_bg1ram)
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(argus_paletteram_r, butasan_paletteram_w) AM_BASE_MEMBER(argus_state, paletteram)
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(butasan_pagedram_r, butasan_pagedram_w)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf67f) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
@@ -529,7 +529,7 @@ static GFXDECODE_START( butasan )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( argus, driver_device )
+static MACHINE_CONFIG_START( argus, argus_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)			/* 4 MHz */
@@ -587,7 +587,7 @@ static MACHINE_CONFIG_START( argus, driver_device )
 #endif
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( valtric, driver_device )
+static MACHINE_CONFIG_START( valtric, argus_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)			/* 5 MHz */
@@ -632,7 +632,7 @@ static MACHINE_CONFIG_START( valtric, driver_device )
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( butasan, driver_device )
+static MACHINE_CONFIG_START( butasan, argus_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)			/* 5 MHz */

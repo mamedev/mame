@@ -597,7 +597,7 @@ extern PALETTE_INIT( atari );
 
 /*----------- defined in drivers/maxaflex.c -----------*/
 
-int atari_input_disabled(void);
+int atari_input_disabled(running_machine *machine);
 
 #endif /* ATARI_H */
 

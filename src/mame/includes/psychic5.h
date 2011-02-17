@@ -1,3 +1,32 @@
+class psychic5_state : public driver_device
+{
+public:
+	psychic5_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 bank_latch;
+	UINT8 ps5_vram_page;
+	UINT8 bg_clip_mode;
+	UINT8 title_screen;
+	UINT8 bg_status;
+	UINT8 *ps5_pagedram[2];
+	UINT8 *bg_videoram;
+	UINT8 *ps5_dummy_bg_ram;
+	UINT8 *ps5_io_ram;
+	UINT8 *ps5_palette_ram;
+	UINT8 *fg_videoram;
+	tilemap_t *bg_tilemap;
+	tilemap_t *fg_tilemap;
+	int bg_palette_ram_base;
+	int bg_palette_base;
+	UINT16 palette_intensity;
+	UINT8 bombsa_unknown;
+	int sx1;
+	int sy1;
+	int sy2;
+};
+
+
 /*----------- defined in video/psychic5.c -----------*/
 
 WRITE8_HANDLER( psychic5_paged_ram_w );

@@ -315,11 +315,11 @@ The first sprite data is located at f20b,then f21b and so on.
 #include "sound/2203intf.h"
 #include "includes/psychic5.h"
 
-static UINT8 psychic5_bank_latch;
 
 static MACHINE_RESET( psychic5 )
 {
-	psychic5_bank_latch = 0xff;
+	psychic5_state *state = machine->driver_data<psychic5_state>();
+	state->bank_latch = 0xff;
 	flip_screen_set(machine, 0);
 }
 
@@ -346,17 +346,19 @@ static INTERRUPT_GEN( psychic5_interrupt )
 
 static READ8_HANDLER( psychic5_bankselect_r )
 {
-	return psychic5_bank_latch;
+	psychic5_state *state = space->machine->driver_data<psychic5_state>();
+	return state->bank_latch;
 }
 
 static WRITE8_HANDLER( psychic5_bankselect_w )
 {
+	psychic5_state *state = space->machine->driver_data<psychic5_state>();
 	UINT8 *RAM = space->machine->region("maincpu")->base();
 	int bankaddress;
 
-	if (psychic5_bank_latch != data)
+	if (state->bank_latch != data)
 	{
-		psychic5_bank_latch = data;
+		state->bank_latch = data;
 		bankaddress = 0x10000 + ((data & 3) * 0x4000);
 		memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);	 /* Select 4 banks of 16k */
 	}
@@ -364,12 +366,13 @@ static WRITE8_HANDLER( psychic5_bankselect_w )
 
 static WRITE8_HANDLER( bombsa_bankselect_w )
 {
+	psychic5_state *state = space->machine->driver_data<psychic5_state>();
 	UINT8 *RAM = space->machine->region("maincpu")->base();
 	int bankaddress;
 
-	if (psychic5_bank_latch != data)
+	if (state->bank_latch != data)
 	{
-		psychic5_bank_latch = data;
+		state->bank_latch = data;
 		bankaddress = 0x10000 + ((data & 7) * 0x4000);
 		memory_set_bankptr(space->machine, "bank1", &RAM[bankaddress]);	 /* Select 8 banks of 16k */
 	}
@@ -656,7 +659,7 @@ static const ym2203_interface ym2203_config =
 	irqhandler
 };
 
-static MACHINE_CONFIG_START( psychic5, driver_device )
+static MACHINE_CONFIG_START( psychic5, psychic5_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)
@@ -703,7 +706,7 @@ static MACHINE_CONFIG_START( psychic5, driver_device )
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bombsa, driver_device )
+static MACHINE_CONFIG_START( bombsa, psychic5_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2 ) /* 6 MHz */

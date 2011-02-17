@@ -87,15 +87,18 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	tilemap_t *fgmap;
+	tilemap_t *bgmap;
+	int bgbank;
+	int fgbank;
+	int bgpalette;
+	int fgpalette;
+	int bgcolor;
+	int nmi_main;
+	int nmi_sub;
 };
 
 
-static tilemap_t *pturn_fgmap,*pturn_bgmap;
-static int bgbank=0;
-static int fgbank=0;
-static int bgpalette=0;
-static int fgpalette=0;
-static int bgcolor=0;
 
 
 static const UINT8 tile_lookup[0x10]=
@@ -113,42 +116,45 @@ static TILE_GET_INFO( get_pturn_tile_info )
 	int tileno;
 	tileno = videoram[tile_index];
 
-	tileno=tile_lookup[tileno>>4]|(tileno&0xf)|(fgbank<<8);
+	tileno=tile_lookup[tileno>>4]|(tileno&0xf)|(state->fgbank<<8);
 
-	SET_TILE_INFO(0,tileno,fgpalette,0);
+	SET_TILE_INFO(0,tileno,state->fgpalette,0);
 }
 
 
 
 static TILE_GET_INFO( get_pturn_bg_tile_info )
 {
+	pturn_state *state = machine->driver_data<pturn_state>();
 	int tileno,palno;
 	tileno = machine->region("user1")->base()[tile_index];
-	palno=bgpalette;
+	palno=state->bgpalette;
 	if(palno==1)
 	{
 		palno=25;
 	}
-	SET_TILE_INFO(1,tileno+bgbank*256,palno,0);
+	SET_TILE_INFO(1,tileno+state->bgbank*256,palno,0);
 }
 
 static VIDEO_START(pturn)
 {
-	pturn_fgmap = tilemap_create(machine, get_pturn_tile_info,tilemap_scan_rows,8, 8,32,32);
-	tilemap_set_transparent_pen(pturn_fgmap,0);
-	pturn_bgmap = tilemap_create(machine, get_pturn_bg_tile_info,tilemap_scan_rows,8, 8,32,32*8);
-	tilemap_set_transparent_pen(pturn_bgmap,0);
+	pturn_state *state = machine->driver_data<pturn_state>();
+	state->fgmap = tilemap_create(machine, get_pturn_tile_info,tilemap_scan_rows,8, 8,32,32);
+	tilemap_set_transparent_pen(state->fgmap,0);
+	state->bgmap = tilemap_create(machine, get_pturn_bg_tile_info,tilemap_scan_rows,8, 8,32,32*8);
+	tilemap_set_transparent_pen(state->bgmap,0);
 }
 
 static VIDEO_UPDATE(pturn)
 {
+	pturn_state *state = screen->machine->driver_data<pturn_state>();
 	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
 	int offs;
 	int sx, sy;
 	int flipx, flipy;
 
-	bitmap_fill(bitmap, cliprect, bgcolor);
-	tilemap_draw(bitmap,cliprect,pturn_bgmap,0,0);
+	bitmap_fill(bitmap, cliprect, state->bgcolor);
+	tilemap_draw(bitmap,cliprect,state->bgmap,0,0);
 	for ( offs = 0x80-4 ; offs >=0 ; offs -= 4)
 	{
 		sy=256-spriteram[offs]-16 ;
@@ -179,7 +185,7 @@ static VIDEO_UPDATE(pturn)
 			sx,sy,0);
 		}
 	}
-	tilemap_draw(bitmap,cliprect,pturn_fgmap,0,0);
+	tilemap_draw(bitmap,cliprect,state->fgmap,0,0);
 	return 0;
 }
 
@@ -200,19 +206,20 @@ static WRITE8_HANDLER( pturn_videoram_w )
 	pturn_state *state = space->machine->driver_data<pturn_state>();
 	UINT8 *videoram = state->videoram;
 	videoram[offset]=data;
-	tilemap_mark_tile_dirty(pturn_fgmap,offset);
+	tilemap_mark_tile_dirty(state->fgmap,offset);
 }
 
-static int nmi_main, nmi_sub;
 
 static WRITE8_HANDLER( nmi_main_enable_w )
 {
-	nmi_main = data;
+	pturn_state *state = space->machine->driver_data<pturn_state>();
+	state->nmi_main = data;
 }
 
 static WRITE8_HANDLER( nmi_sub_enable_w )
 {
-	nmi_sub = data;
+	pturn_state *state = space->machine->driver_data<pturn_state>();
+	state->nmi_sub = data;
 }
 
 static WRITE8_HANDLER(sound_w)
@@ -223,37 +230,43 @@ static WRITE8_HANDLER(sound_w)
 
 static WRITE8_HANDLER(bgcolor_w)
 {
-	bgcolor=data;
+	pturn_state *state = space->machine->driver_data<pturn_state>();
+	state->bgcolor=data;
 }
 
 static WRITE8_HANDLER(bg_scrollx_w)
 {
-	tilemap_set_scrolly(pturn_bgmap, 0, (data>>5)*32*8);
-	bgpalette=data&0x1f;
-	tilemap_mark_all_tiles_dirty(pturn_bgmap);
+	pturn_state *state = space->machine->driver_data<pturn_state>();
+	tilemap_set_scrolly(state->bgmap, 0, (data>>5)*32*8);
+	state->bgpalette=data&0x1f;
+	tilemap_mark_all_tiles_dirty(state->bgmap);
 }
 
 static WRITE8_HANDLER(fgpalette_w)
 {
-	fgpalette=data&0x1f;
-	tilemap_mark_all_tiles_dirty(pturn_fgmap);
+	pturn_state *state = space->machine->driver_data<pturn_state>();
+	state->fgpalette=data&0x1f;
+	tilemap_mark_all_tiles_dirty(state->fgmap);
 }
 
 static WRITE8_HANDLER(bg_scrolly_w)
 {
-	tilemap_set_scrollx(pturn_bgmap, 0, data);
+	pturn_state *state = space->machine->driver_data<pturn_state>();
+	tilemap_set_scrollx(state->bgmap, 0, data);
 }
 
 static WRITE8_HANDLER(fgbank_w)
 {
-	fgbank=data&1;
-	tilemap_mark_all_tiles_dirty(pturn_fgmap);
+	pturn_state *state = space->machine->driver_data<pturn_state>();
+	state->fgbank=data&1;
+	tilemap_mark_all_tiles_dirty(state->fgmap);
 }
 
 static WRITE8_HANDLER(bgbank_w)
 {
-	bgbank=data&1;
-	tilemap_mark_all_tiles_dirty(pturn_bgmap);
+	pturn_state *state = space->machine->driver_data<pturn_state>();
+	state->bgbank=data&1;
+	tilemap_mark_all_tiles_dirty(state->bgmap);
 }
 
 static WRITE8_HANDLER(flip_w)
@@ -439,7 +452,8 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( pturn_sub_intgen )
 {
-	if(nmi_sub)
+	pturn_state *state = device->machine->driver_data<pturn_state>();
+	if(state->nmi_sub)
 	{
 		cpu_set_input_line(device,INPUT_LINE_NMI,PULSE_LINE);
 	}
@@ -447,7 +461,8 @@ static INTERRUPT_GEN( pturn_sub_intgen )
 
 static INTERRUPT_GEN( pturn_main_intgen )
 {
-	if (nmi_main)
+	pturn_state *state = device->machine->driver_data<pturn_state>();
+	if (state->nmi_main)
 	{
 		cpu_set_input_line(device,INPUT_LINE_NMI,PULSE_LINE);
 	}

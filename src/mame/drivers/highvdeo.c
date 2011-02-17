@@ -89,7 +89,20 @@ Game is V30 based, with rom banking (2Mb)
 #include "machine/nvram.h"
 #include "fashion.lh"
 
-static UINT16 *blit_ram;
+
+class highvdeo_state : public driver_device
+{
+public:
+	highvdeo_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16 *blit_ram;
+	UINT16 vblank_bit;
+	UINT16 brasil_prot_latch;
+	struct { int r,g,b,offs,offs_internal; } pal;
+};
+
+
 
 
 static VIDEO_START(tourvisn)
@@ -99,6 +112,7 @@ static VIDEO_START(tourvisn)
 
 static VIDEO_UPDATE(tourvisn)
 {
+	highvdeo_state *state = screen->machine->driver_data<highvdeo_state>();
 	int x,y,count;
 
 	count = (0/2);
@@ -109,12 +123,12 @@ static VIDEO_UPDATE(tourvisn)
 		{
 			UINT32 color;
 
-			color = ((blit_ram[count]) & 0x00ff)>>0;
+			color = ((state->blit_ram[count]) & 0x00ff)>>0;
 
 			if((x*2)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
 				*BITMAP_ADDR32(bitmap, y, (x*2)+0) = screen->machine->pens[color];
 
-			color = ((blit_ram[count]) & 0xff00)>>8;
+			color = ((state->blit_ram[count]) & 0xff00)>>8;
 
 			if(((x*2)+1)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
 				*BITMAP_ADDR32(bitmap, y, (x*2)+1) = screen->machine->pens[color];
@@ -129,6 +143,7 @@ static VIDEO_UPDATE(tourvisn)
 /*Later HW, RGB565 instead of RAM-based pens (+ ramdac).*/
 static VIDEO_UPDATE(brasil)
 {
+	highvdeo_state *state = screen->machine->driver_data<highvdeo_state>();
 	int x,y,count;
 
 	count = (0/2);
@@ -142,7 +157,7 @@ static VIDEO_UPDATE(brasil)
 			UINT32 g;
 			UINT32 r;
 
-			color = (blit_ram[count]) & 0xffff;
+			color = (state->blit_ram[count]) & 0xffff;
 
 			b = (color & 0x001f) << 3;
 			g = (color & 0x07e0) >> 3;
@@ -176,32 +191,31 @@ static READ16_HANDLER( read3_r )
 
 static WRITE16_HANDLER( tv_vcf_paletteram_w )
 {
-	static int pal_offs,r,g,b,internal_pal_offs;
-
+	highvdeo_state *state = space->machine->driver_data<highvdeo_state>();
 	switch(offset*2)
 	{
 		case 0:
-			pal_offs = data;
+			state->pal.offs = data;
 			break;
 		case 2:
-			internal_pal_offs = 0;
+			state->pal.offs_internal = 0;
 			break;
 		case 4:
-			switch(internal_pal_offs)
+			switch(state->pal.offs_internal)
 			{
 				case 0:
-					r = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					internal_pal_offs++;
+					state->pal.r = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+					state->pal.offs_internal++;
 					break;
 				case 1:
-					g = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					internal_pal_offs++;
+					state->pal.g = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+					state->pal.offs_internal++;
 					break;
 				case 2:
-					b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					palette_set_color(space->machine, pal_offs, MAKE_RGB(r, g, b));
-					internal_pal_offs = 0;
-					pal_offs++;
+					state->pal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+					palette_set_color(space->machine, state->pal.offs, MAKE_RGB(state->pal.r, state->pal.g, state->pal.b));
+					state->pal.offs_internal = 0;
+					state->pal.offs++;
 					break;
 			}
 
@@ -211,7 +225,7 @@ static WRITE16_HANDLER( tv_vcf_paletteram_w )
 
 static WRITE16_HANDLER( tv_vcf_bankselect_w )
 {
-	static UINT32 bankaddress;
+	UINT32 bankaddress;
 	UINT8 *ROM = space->machine->region("user1")->base();
 
 	/* bits 0, 1 select the ROM bank */
@@ -257,7 +271,7 @@ static WRITE16_HANDLER( write1_w )
 static ADDRESS_MAP_START( tv_vcf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x40000, 0x4ffff) AM_RAM AM_BASE(&blit_ram) /*blitter ram*/
+	AM_RANGE(0x40000, 0x4ffff) AM_RAM AM_BASE_MEMBER(highvdeo_state, blit_ram) /*blitter ram*/
 	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
@@ -296,7 +310,7 @@ static WRITE16_DEVICE_HANDLER( tv_ncf_oki6395_w )
 static ADDRESS_MAP_START( tv_ncf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x20000, 0x2ffff) AM_RAM AM_BASE(&blit_ram) /*blitter ram*/
+	AM_RANGE(0x20000, 0x2ffff) AM_RAM AM_BASE_MEMBER(highvdeo_state, blit_ram) /*blitter ram*/
 	AM_RANGE(0x40000, 0xbffff) AM_ROM AM_REGION("user1",0x40000)
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
@@ -327,7 +341,7 @@ static WRITE16_HANDLER( tv_tcf_paletteram_w )
 
 static WRITE16_HANDLER( tv_tcf_bankselect_w )
 {
-	static UINT32 bankaddress;
+	UINT32 bankaddress;
 	UINT8 *ROM = space->machine->region("user1")->base();
 
 	/* bits 0, 1, 2 select the ROM bank */
@@ -339,7 +353,7 @@ static WRITE16_HANDLER( tv_tcf_bankselect_w )
 static ADDRESS_MAP_START( tv_tcf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x40000, 0x5d4bf) AM_RAM AM_BASE(&blit_ram) /*blitter ram*/
+	AM_RANGE(0x40000, 0x5d4bf) AM_RAM AM_BASE_MEMBER(highvdeo_state, blit_ram) /*blitter ram*/
 	AM_RANGE(0x7fe00, 0x7ffff) AM_RAM_WRITE( tv_tcf_paletteram_w ) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
@@ -369,21 +383,22 @@ static READ16_HANDLER( newmcard_status_r )
 	return 0;
 }
 
-static UINT16 vblank_bit;
 
 static READ16_HANDLER( newmcard_vblank_r )
 {
-	return vblank_bit; //0x80
+	highvdeo_state *state = space->machine->driver_data<highvdeo_state>();
+	return state->vblank_bit; //0x80
 }
 
 static WRITE16_HANDLER( newmcard_vblank_w )
 {
-	vblank_bit = data;
+	highvdeo_state *state = space->machine->driver_data<highvdeo_state>();
+	state->vblank_bit = data;
 }
 
 static WRITE16_HANDLER( write2_w )
 {
-	static int i;
+	int i;
 
 //  popmessage("%04x",data);
 
@@ -397,7 +412,7 @@ static WRITE16_HANDLER( write2_w )
 static ADDRESS_MAP_START( newmcard_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x0ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x40000, 0x7ffff) AM_RAM AM_BASE(&blit_ram) /*blitter ram*/
+	AM_RANGE(0x40000, 0x7ffff) AM_RAM AM_BASE_MEMBER(highvdeo_state, blit_ram) /*blitter ram*/
 	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
@@ -422,10 +437,10 @@ ADDRESS_MAP_END
 *
 ****************************/
 
-static UINT16 brasil_prot_latch;
 
 static READ16_HANDLER( brasil_status_r )
 {
+	highvdeo_state *state = space->machine->driver_data<highvdeo_state>();
 	static UINT16 resetpulse;
 
 	switch(offset*2)
@@ -434,7 +449,7 @@ static READ16_HANDLER( brasil_status_r )
 		resetpulse^=0x10;
 
 		return 3 | resetpulse;
-		case 2: return (brasil_prot_latch & 3); //and 0x3f
+		case 2: return (state->brasil_prot_latch & 3); //and 0x3f
 	}
 
 	return 0;
@@ -445,14 +460,15 @@ static READ16_HANDLER( brasil_status_r )
 /*bankaddress might be incorrect.*/
 static WRITE16_HANDLER( brasil_status_w )
 {
-	static UINT32 bankaddress;
+	highvdeo_state *state = space->machine->driver_data<highvdeo_state>();
+	UINT32 bankaddress;
 	UINT8 *ROM = space->machine->region("user1")->base();
 
 	switch(data & 3) //data & 7?
 	{
-		case 0: brasil_prot_latch = 1; break;
-		case 1: brasil_prot_latch = 0; break;
-		case 2: brasil_prot_latch = 2; break;
+		case 0: state->brasil_prot_latch = 1; break;
+		case 1: state->brasil_prot_latch = 0; break;
+		case 2: state->brasil_prot_latch = 2; break;
 	}
 
 	bankaddress = (data & 0x07) * 0x40000;
@@ -465,7 +481,7 @@ static WRITE16_HANDLER( brasil_status_w )
 static ADDRESS_MAP_START( brasil_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x0ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x40000, 0x7ffff) AM_RAM AM_BASE(&blit_ram) /*blitter ram*/
+	AM_RANGE(0x40000, 0x7ffff) AM_RAM AM_BASE_MEMBER(highvdeo_state, blit_ram) /*blitter ram*/
 	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
@@ -866,7 +882,7 @@ static INTERRUPT_GEN( vblank_irq )
 	cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x08/4);
 }
 
-static MACHINE_CONFIG_START( tv_vcf, driver_device )
+static MACHINE_CONFIG_START( tv_vcf, highvdeo_state )
 	MCFG_CPU_ADD("maincpu", V30, XTAL_12MHz/2 )	// ?
 	MCFG_CPU_PROGRAM_MAP(tv_vcf_map)
 	MCFG_CPU_IO_MAP(tv_vcf_io)
@@ -933,7 +949,7 @@ static MACHINE_CONFIG_DERIVED( ciclone, tv_tcf )
 	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( brasil, driver_device )
+static MACHINE_CONFIG_START( brasil, highvdeo_state )
 	MCFG_CPU_ADD("maincpu", I80186, 20000000 )	// fashion doesn't like 20/2 Mhz
 	MCFG_CPU_PROGRAM_MAP(brasil_map)
 	MCFG_CPU_IO_MAP(brasil_io)
@@ -1200,7 +1216,7 @@ ROM_END
 
 static WRITE16_HANDLER( fashion_output_w )
 {
-	static int i;
+	int i;
 
 //  popmessage("%04x",data);
 

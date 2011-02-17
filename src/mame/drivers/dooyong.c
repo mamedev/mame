@@ -90,7 +90,7 @@ static ADDRESS_MAP_START( lastday_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc013, 0xc013) AM_READ_PORT("DSWA")
 	AM_RANGE(0xc014, 0xc014) AM_READ_PORT("DSWB")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_BASE(&dooyong_txvideoram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_BASE_MEMBER(dooyong_state, txvideoram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 ADDRESS_MAP_END
@@ -100,7 +100,7 @@ static ADDRESS_MAP_START( pollux_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_BASE(&dooyong_txvideoram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_BASE_MEMBER(dooyong_state, txvideoram)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSWA") AM_WRITE(lastday_bankswitch_w)
 	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("DSWB")
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("P1")
@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( gulfstrm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_BASE(&dooyong_txvideoram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_BASE_MEMBER(dooyong_state, txvideoram)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSWA")
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(lastday_bankswitch_w)
 	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("DSWB")
@@ -147,7 +147,7 @@ static ADDRESS_MAP_START( bluehawk_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc040, 0xc047) AM_WRITE(dooyong_bgscroll8_w)
 	AM_RANGE(0xc048, 0xc04f) AM_WRITE(dooyong_fgscroll8_w)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_BASE(&dooyong_txvideoram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_BASE_MEMBER(dooyong_state, txvideoram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -167,8 +167,8 @@ static ADDRESS_MAP_START( flytiger_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe020, 0xe020) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xe030, 0xe037) AM_WRITE(dooyong_bgscroll8_w)
 	AM_RANGE(0xe040, 0xe047) AM_WRITE(dooyong_fgscroll8_w)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_flytiger_w) AM_BASE(&paletteram_flytiger)
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_BASE(&dooyong_txvideoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_flytiger_w) AM_BASE_MEMBER(dooyong_state, paletteram_flytiger)
+	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_BASE_MEMBER(dooyong_state, txvideoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( primella_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -176,7 +176,7 @@ static ADDRESS_MAP_START( primella_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM /* what is this? looks like a palette? scratchpad RAM maybe? */
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_BASE(&dooyong_txvideoram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_BASE_MEMBER(dooyong_state, txvideoram)
 	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("DSWA")
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(primella_ctrl_w)	/* bank switch, flip screen etc */
@@ -808,7 +808,7 @@ static MACHINE_CONFIG_FRAGMENT( sound_2151_m68k )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( lastday, driver_device )
+static MACHINE_CONFIG_START( lastday, dooyong_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000)	/* ??? */
@@ -841,7 +841,7 @@ static MACHINE_CONFIG_START( lastday, driver_device )
 	MCFG_FRAGMENT_ADD( sound_2203 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gulfstrm, driver_device )
+static MACHINE_CONFIG_START( gulfstrm, dooyong_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000)	/* ??? */
@@ -874,7 +874,7 @@ static MACHINE_CONFIG_START( gulfstrm, driver_device )
 	MCFG_FRAGMENT_ADD( sound_2203 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pollux, driver_device )
+static MACHINE_CONFIG_START( pollux, dooyong_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000)	/* ??? */
@@ -907,7 +907,7 @@ static MACHINE_CONFIG_START( pollux, driver_device )
 	MCFG_FRAGMENT_ADD( sound_2203 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bluehawk, driver_device )
+static MACHINE_CONFIG_START( bluehawk, dooyong_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000)	/* ??? */
@@ -940,7 +940,7 @@ static MACHINE_CONFIG_START( bluehawk, driver_device )
 	MCFG_FRAGMENT_ADD( sound_2151 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( flytiger, driver_device )
+static MACHINE_CONFIG_START( flytiger, dooyong_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000)	/* ??? */
@@ -973,7 +973,7 @@ static MACHINE_CONFIG_START( flytiger, driver_device )
 	MCFG_FRAGMENT_ADD( sound_2151 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( primella, driver_device )
+static MACHINE_CONFIG_START( primella, dooyong_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000)	/* ??? */
@@ -1012,7 +1012,7 @@ static INTERRUPT_GEN( rshark_interrupt )
 		cpu_set_input_line(device, 6, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( rshark, driver_device )
+static MACHINE_CONFIG_START( rshark, dooyong_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)	/* measured on super-x */
@@ -1043,7 +1043,7 @@ static MACHINE_CONFIG_START( rshark, driver_device )
 	MCFG_FRAGMENT_ADD( sound_2151_m68k )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( superx, driver_device ) // dif mem map
+static MACHINE_CONFIG_START( superx, dooyong_state ) // dif mem map
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)	/* measured on super-x */
@@ -1074,7 +1074,7 @@ static MACHINE_CONFIG_START( superx, driver_device ) // dif mem map
 	MCFG_FRAGMENT_ADD( sound_2151_m68k )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( popbingo, driver_device )
+static MACHINE_CONFIG_START( popbingo, dooyong_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)

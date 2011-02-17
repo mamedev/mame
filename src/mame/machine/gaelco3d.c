@@ -134,9 +134,8 @@ static osd_shared_mem *osd_sharedmem_alloc(const char *path, int create, size_t 
 		memset(buf,0, size);
 
 		fd = open(path, O_RDWR | O_CREAT, S_IRWXU);
-        write(fd, buf, size);
-        os_shmem->creator = 1;
-
+		write(fd, buf, size);
+		os_shmem->creator = 1;
 	}
 	else
 	{
@@ -146,7 +145,7 @@ static osd_shared_mem *osd_sharedmem_alloc(const char *path, int create, size_t 
 			osd_free(os_shmem);
 			return NULL;
 		}
-        os_shmem->creator = 0;
+		os_shmem->creator = 0;
 	}
 	os_shmem->fn = (char *) osd_malloc(strlen(path)+1);
 	strcpy(os_shmem->fn, path);
@@ -154,7 +153,7 @@ static osd_shared_mem *osd_sharedmem_alloc(const char *path, int create, size_t 
 	assert(fd != -1);
 
 	os_shmem->ptr = mmap(NULL, size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-	os_shmem->size =size;
+	os_shmem->size = size;
 	close(fd);
 	return os_shmem;
 }
@@ -175,46 +174,18 @@ static void *osd_sharedmem_ptr(osd_shared_mem *os_shmem)
 #else
 static osd_shared_mem *osd_sharedmem_alloc(const char *path, int create, size_t size)
 {
-	int fd;
 	osd_shared_mem *os_shmem = (osd_shared_mem *) osd_malloc(sizeof(osd_shared_mem));
 
-	if (create)
-	{
-		char *buf = (char *) osd_malloc(size);
-		memset(buf,0, size);
-
-		fd = open(path, O_RDWR | O_CREAT, S_IRWXU);
-        write(fd, buf, size);
-        os_shmem->creator = 1;
-
-	}
-	else
-	{
-		fd = open(path, O_RDWR);
-		if (fd == -1)
-		{
-			osd_free(os_shmem);
-			return NULL;
-		}
-        os_shmem->creator = 0;
-	}
-	os_shmem->fn = (char *) osd_malloc(strlen(path)+1);
-	strcpy(os_shmem->fn, path);
-
-	assert(fd != -1);
+	os_shmem->creator = 0;
 
 	os_shmem->ptr = (void *) osd_malloc(size);
-	os_shmem->size =size;
-	close(fd);
+	os_shmem->size = size;
 	return os_shmem;
 }
 
 static void osd_sharedmem_free(osd_shared_mem *os_shmem)
 {
 	osd_free(os_shmem->ptr);
-	if (os_shmem->creator)
-		unlink(os_shmem->fn);
-	osd_free(os_shmem->fn);
 	osd_free(os_shmem);
 }
 

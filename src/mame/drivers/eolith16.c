@@ -16,8 +16,18 @@
 #include "sound/okim6295.h"
 #include "includes/eolithsp.h"
 
-static UINT16 *vram;
-static int vbuffer = 0;
+
+class eolith16_state : public driver_device
+{
+public:
+	eolith16_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16 *vram;
+	int vbuffer;
+};
+
+
 
 // It's configured for 512 bytes
 static const eeprom_interface eeprom_interface_93C66 =
@@ -33,7 +43,8 @@ static const eeprom_interface eeprom_interface_93C66 =
 
 static WRITE16_HANDLER( eeprom_w )
 {
-	vbuffer = (data & 0x80) >> 7;
+	eolith16_state *state = space->machine->driver_data<eolith16_state>();
+	state->vbuffer = (data & 0x80) >> 7;
 	coin_counter_w(space->machine, 0, data & 1);
 
 	input_port_write(space->machine, "EEPROMOUT", data, 0xff);
@@ -51,12 +62,14 @@ static READ16_HANDLER( eolith16_custom_r )
 
 static WRITE16_HANDLER( vram_w )
 {
-	COMBINE_DATA(&vram[offset + (0x10000/2) * vbuffer]);
+	eolith16_state *state = space->machine->driver_data<eolith16_state>();
+	COMBINE_DATA(&state->vram[offset + (0x10000/2) * state->vbuffer]);
 }
 
 static READ16_HANDLER( vram_r )
 {
-	return vram[offset + (0x10000/2) * vbuffer];
+	eolith16_state *state = space->machine->driver_data<eolith16_state>();
+	return state->vram[offset + (0x10000/2) * state->vbuffer];
 }
 
 static ADDRESS_MAP_START( eolith16_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -105,11 +118,13 @@ INPUT_PORTS_END
 
 static VIDEO_START( eolith16 )
 {
-	vram = auto_alloc_array(machine, UINT16, 0x10000);
+	eolith16_state *state = machine->driver_data<eolith16_state>();
+	state->vram = auto_alloc_array(machine, UINT16, 0x10000);
 }
 
 static VIDEO_UPDATE( eolith16 )
 {
+	eolith16_state *state = screen->machine->driver_data<eolith16_state>();
 	int x,y,count;
 	int color;
 
@@ -118,10 +133,10 @@ static VIDEO_UPDATE( eolith16 )
 	{
 		for (x=0;x < 320/2;x++)
 		{
-			color = vram[count + (0x10000/2) * (vbuffer ^ 1)] & 0xff;
+			color = state->vram[count + (0x10000/2) * (state->vbuffer ^ 1)] & 0xff;
 			*BITMAP_ADDR16(bitmap, y, x*2 + 0) = color;
 
-			color = (vram[count + (0x10000/2) * (vbuffer ^ 1)] & 0xff00) >> 8;
+			color = (state->vram[count + (0x10000/2) * (state->vbuffer ^ 1)] & 0xff00) >> 8;
 			*BITMAP_ADDR16(bitmap, y, x*2 + 1) = color;
 
 			count++;
@@ -157,7 +172,7 @@ static PALETTE_INIT( eolith16 )
 
 
 
-static MACHINE_CONFIG_START( eolith16, driver_device )
+static MACHINE_CONFIG_START( eolith16, eolith16_state )
 	MCFG_CPU_ADD("maincpu", E116T, 60000000)		/* no internal multiplier */
 	MCFG_CPU_PROGRAM_MAP(eolith16_map)
 	MCFG_CPU_VBLANK_INT_HACK(eolith_speedup,262)
