@@ -13,6 +13,7 @@
 
     Notes:
         * This hardware is a precursor to Phoenix
+        * Export license to Taito in 1980
 
           ----------------------------------
 
@@ -398,7 +399,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( safarir, safarir_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, 18000000/8)	/* 2.25 MHz ? */
+	MCFG_CPU_ADD("maincpu", I8080A, XTAL_18MHz/12)	/* 1.5 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	MCFG_MACHINE_START(safarir)
