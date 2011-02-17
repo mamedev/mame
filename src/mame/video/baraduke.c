@@ -1,12 +1,6 @@
 #include "emu.h"
 #include "includes/baraduke.h"
 
-UINT8 *baraduke_textram, *baraduke_videoram, *baraduke_spriteram;
-
-static tilemap_t *tx_tilemap, *bg_tilemap[2];
-static int xscroll[2], yscroll[2];
-
-
 
 /***************************************************************************
 
@@ -79,17 +73,19 @@ static TILEMAP_MAPPER( tx_tilemap_scan )
 
 static TILE_GET_INFO( tx_get_tile_info )
 {
+	baraduke_state *state = machine->driver_data<baraduke_state>();
 	SET_TILE_INFO(
 			0,
-			baraduke_textram[tile_index],
-			(baraduke_textram[tile_index+0x400] << 2) & 0x1ff,
+			state->textram[tile_index],
+			(state->textram[tile_index+0x400] << 2) & 0x1ff,
 			0);
 }
 
 static TILE_GET_INFO( get_tile_info0 )
 {
-	int code = baraduke_videoram[2*tile_index];
-	int attr = baraduke_videoram[2*tile_index + 1];
+	baraduke_state *state = machine->driver_data<baraduke_state>();
+	int code = state->videoram[2*tile_index];
+	int attr = state->videoram[2*tile_index + 1];
 
 	SET_TILE_INFO(
 			1,
@@ -100,8 +96,9 @@ static TILE_GET_INFO( get_tile_info0 )
 
 static TILE_GET_INFO( get_tile_info1 )
 {
-	int code = baraduke_videoram[0x1000 + 2*tile_index];
-	int attr = baraduke_videoram[0x1000 + 2*tile_index + 1];
+	baraduke_state *state = machine->driver_data<baraduke_state>();
+	int code = state->videoram[0x1000 + 2*tile_index];
+	int attr = state->videoram[0x1000 + 2*tile_index + 1];
 
 	SET_TILE_INFO(
 			2,
@@ -120,18 +117,19 @@ static TILE_GET_INFO( get_tile_info1 )
 
 VIDEO_START( baraduke )
 {
-	tx_tilemap = tilemap_create(machine, tx_get_tile_info,tx_tilemap_scan,8,8,36,28);
-	bg_tilemap[0] = tilemap_create(machine, get_tile_info0,tilemap_scan_rows,8,8,64,32);
-	bg_tilemap[1] = tilemap_create(machine, get_tile_info1,tilemap_scan_rows,8,8,64,32);
+	baraduke_state *state = machine->driver_data<baraduke_state>();
+	state->tx_tilemap = tilemap_create(machine, tx_get_tile_info,tx_tilemap_scan,8,8,36,28);
+	state->bg_tilemap[0] = tilemap_create(machine, get_tile_info0,tilemap_scan_rows,8,8,64,32);
+	state->bg_tilemap[1] = tilemap_create(machine, get_tile_info1,tilemap_scan_rows,8,8,64,32);
 
-	tilemap_set_transparent_pen(tx_tilemap,3);
-	tilemap_set_transparent_pen(bg_tilemap[0],7);
-	tilemap_set_transparent_pen(bg_tilemap[1],7);
+	tilemap_set_transparent_pen(state->tx_tilemap,3);
+	tilemap_set_transparent_pen(state->bg_tilemap[0],7);
+	tilemap_set_transparent_pen(state->bg_tilemap[1],7);
 
-	tilemap_set_scrolldx(tx_tilemap,0,512-288);
-	tilemap_set_scrolldy(tx_tilemap,16,16);
+	tilemap_set_scrolldx(state->tx_tilemap,0,512-288);
+	tilemap_set_scrolldy(state->tx_tilemap,16,16);
 
-	machine->generic.spriteram.u8 = baraduke_spriteram + 0x1800;
+	machine->generic.spriteram.u8 = state->spriteram + 0x1800;
 }
 
 
@@ -144,67 +142,73 @@ VIDEO_START( baraduke )
 
 READ8_HANDLER( baraduke_videoram_r )
 {
-	return baraduke_videoram[offset];
+	baraduke_state *state = space->machine->driver_data<baraduke_state>();
+	return state->videoram[offset];
 }
 
 WRITE8_HANDLER( baraduke_videoram_w )
 {
-	baraduke_videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap[offset/0x1000],(offset&0xfff)/2);
+	baraduke_state *state = space->machine->driver_data<baraduke_state>();
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap[offset/0x1000],(offset&0xfff)/2);
 }
 
 READ8_HANDLER( baraduke_textram_r )
 {
-	return baraduke_textram[offset];
+	baraduke_state *state = space->machine->driver_data<baraduke_state>();
+	return state->textram[offset];
 }
 
 WRITE8_HANDLER( baraduke_textram_w )
 {
-	baraduke_textram[offset] = data;
-	tilemap_mark_tile_dirty(tx_tilemap,offset & 0x3ff);
+	baraduke_state *state = space->machine->driver_data<baraduke_state>();
+	state->textram[offset] = data;
+	tilemap_mark_tile_dirty(state->tx_tilemap,offset & 0x3ff);
 }
 
 
-static void scroll_w(int layer,int offset,int data)
+static void scroll_w(address_space *space, int layer, int offset, int data)
 {
+	baraduke_state *state = space->machine->driver_data<baraduke_state>();
 	switch (offset)
 	{
 		case 0:	/* high scroll x */
-			xscroll[layer] = (xscroll[layer] & 0xff) | (data << 8);
+			state->xscroll[layer] = (state->xscroll[layer] & 0xff) | (data << 8);
 			break;
 		case 1:	/* low scroll x */
-			xscroll[layer] = (xscroll[layer] & 0xff00) | data;
+			state->xscroll[layer] = (state->xscroll[layer] & 0xff00) | data;
 			break;
 		case 2:	/* scroll y */
-			yscroll[layer] = data;
+			state->yscroll[layer] = data;
 			break;
 	}
 }
 
 WRITE8_HANDLER( baraduke_scroll0_w )
 {
-	scroll_w(0, offset, data);
+	scroll_w(space, 0, offset, data);
 }
 WRITE8_HANDLER( baraduke_scroll1_w )
 {
-	scroll_w(1, offset, data);
+	scroll_w(space, 1, offset, data);
 }
 
 
-static int copy_sprites;
 
 READ8_HANDLER( baraduke_spriteram_r )
 {
-	return baraduke_spriteram[offset];
+	baraduke_state *state = space->machine->driver_data<baraduke_state>();
+	return state->spriteram[offset];
 }
 
 WRITE8_HANDLER( baraduke_spriteram_w )
 {
-	baraduke_spriteram[offset] = data;
+	baraduke_state *state = space->machine->driver_data<baraduke_state>();
+	state->spriteram[offset] = data;
 
 	/* a write to this offset tells the sprite chip to buffer the sprite list */
 	if (offset == 0x1ff2)
-		copy_sprites = 1;
+		state->copy_sprites = 1;
 }
 
 
@@ -291,24 +295,26 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static void set_scroll(running_machine *machine, int layer)
 {
+	baraduke_state *state = machine->driver_data<baraduke_state>();
 	static const int xdisp[2] = { 26, 24 };
 	int scrollx, scrolly;
 
-	scrollx = xscroll[layer] + xdisp[layer];
-	scrolly = yscroll[layer] + 9;
+	scrollx = state->xscroll[layer] + xdisp[layer];
+	scrolly = state->yscroll[layer] + 9;
 	if (flip_screen_get(machine))
 	{
 		scrollx = -scrollx + 3;
 		scrolly = -scrolly;
 	}
 
-	tilemap_set_scrollx(bg_tilemap[layer], 0, scrollx);
-	tilemap_set_scrolly(bg_tilemap[layer], 0, scrolly);
+	tilemap_set_scrollx(state->bg_tilemap[layer], 0, scrollx);
+	tilemap_set_scrolly(state->bg_tilemap[layer], 0, scrolly);
 }
 
 
 VIDEO_UPDATE( baraduke )
 {
+	baraduke_state *state = screen->machine->driver_data<baraduke_state>();
 	int back;
 
 	/* flip screen is embedded in the sprite control registers */
@@ -318,24 +324,25 @@ VIDEO_UPDATE( baraduke )
 	set_scroll(screen->machine, 0);
 	set_scroll(screen->machine, 1);
 
-	if (((xscroll[0] & 0x0e00) >> 9) == 6)
+	if (((state->xscroll[0] & 0x0e00) >> 9) == 6)
 		back = 1;
 	else
 		back = 0;
 
-	tilemap_draw(bitmap,cliprect,bg_tilemap[back],TILEMAP_DRAW_OPAQUE,0);
+	tilemap_draw(bitmap,cliprect,state->bg_tilemap[back],TILEMAP_DRAW_OPAQUE,0);
 	draw_sprites(screen->machine, bitmap,cliprect,0);
-	tilemap_draw(bitmap,cliprect,bg_tilemap[back ^ 1],0,0);
+	tilemap_draw(bitmap,cliprect,state->bg_tilemap[back ^ 1],0,0);
 	draw_sprites(screen->machine, bitmap,cliprect,1);
 
-	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->tx_tilemap,0,0);
 	return 0;
 }
 
 
 VIDEO_EOF( baraduke )
 {
-	if (copy_sprites)
+	baraduke_state *state = machine->driver_data<baraduke_state>();
+	if (state->copy_sprites)
 	{
 		int i,j;
 
@@ -345,6 +352,6 @@ VIDEO_EOF( baraduke )
 				machine->generic.spriteram.u8[i+j] = machine->generic.spriteram.u8[i+j - 6];
 		}
 
-		copy_sprites = 0;
+		state->copy_sprites = 0;
 	}
 }

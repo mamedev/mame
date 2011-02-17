@@ -63,6 +63,17 @@
 #include "machine/nvram.h"
 #include "deprecat.h"
 
+
+class big10_state : public driver_device
+{
+public:
+	big10_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 mux_data;
+};
+
+
 #define VDP_MEM             0x40000
 
 
@@ -103,23 +114,24 @@ static MACHINE_RESET(big10)
 *  Input Ports Demux & Common Routines  *
 ****************************************/
 
-static UINT8 mux_data;
 
 static WRITE8_DEVICE_HANDLER( mux_w )
 {
-	mux_data = ~data;
+	big10_state *state = device->machine->driver_data<big10_state>();
+	state->mux_data = ~data;
 }
 
 static READ8_HANDLER( mux_r )
 {
-	switch(mux_data)
+	big10_state *state = space->machine->driver_data<big10_state>();
+	switch(state->mux_data)
 	{
 		case 1: return input_port_read(space->machine, "IN1");
 		case 2: return input_port_read(space->machine, "IN2");
 		case 4: return input_port_read(space->machine, "IN3");
 	}
 
-	return mux_data;
+	return state->mux_data;
 }
 
 
@@ -238,7 +250,7 @@ static const ay8910_interface ay8910_config =
 *           Machine Driver            *
 **************************************/
 
-static MACHINE_CONFIG_START( big10, driver_device )
+static MACHINE_CONFIG_START( big10, big10_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* guess */

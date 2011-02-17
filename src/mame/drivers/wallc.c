@@ -60,10 +60,10 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	tilemap_t *bg_tilemap;
 };
 
 
-static tilemap_t *bg_tilemap;
 
 /***************************************************************************
 
@@ -131,7 +131,7 @@ static WRITE8_HANDLER( wallc_videoram_w )
 	wallc_state *state = space->machine->driver_data<wallc_state>();
 	UINT8 *videoram = state->videoram;
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -143,12 +143,14 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( wallc )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols_flip_y,	8, 8, 32, 32);
+	wallc_state *state = machine->driver_data<wallc_state>();
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols_flip_y,	8, 8, 32, 32);
 }
 
 static VIDEO_UPDATE( wallc )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	wallc_state *state = screen->machine->driver_data<wallc_state>();
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
 }
 

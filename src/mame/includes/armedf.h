@@ -24,6 +24,7 @@ public:
 	UINT16   bg_scrollx, bg_scrolly;
 	int      scroll_type, sprite_offy, mcu_mode, old_mcu_mode;
 	int      waiting_msb;
+	int      oldmode;
 };
 
 

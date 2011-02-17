@@ -219,7 +219,7 @@ WRITE8_HANDLER( taitosj_68705_portB_w )
 	if (~data & 0x10)
 	{
 		address_space *cpu0space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-		LOG(("%04x: 68705 write %02x to state->address %04x\n",cpu_get_pc(space->cpu), state->portA_out, state->address));
+		LOG(("%04x: 68705 write %02x to address %04x\n",cpu_get_pc(space->cpu), state->portA_out, state->address));
 
 		cpu0space->write_byte(state->address, state->portA_out);
 
@@ -230,16 +230,16 @@ WRITE8_HANDLER( taitosj_68705_portB_w )
 	{
 		address_space *cpu0space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 		state->portA_in = cpu0space->read_byte(state->address);
-		LOG(("%04x: 68705 read %02x from state->address %04x\n", cpu_get_pc(space->cpu), state->portA_in, state->address));
+		LOG(("%04x: 68705 read %02x from address %04x\n", cpu_get_pc(space->cpu), state->portA_in, state->address));
 	}
 	if (~data & 0x40)
 	{
-		LOG(("%04x: 68705 state->address low %02x\n", cpu_get_pc(space->cpu), state->portA_out));
+		LOG(("%04x: 68705 address low %02x\n", cpu_get_pc(space->cpu), state->portA_out));
 		state->address = (state->address & 0xff00) | state->portA_out;
 	}
 	if (~data & 0x80)
 	{
-		LOG(("%04x: 68705 state->address high %02x\n", cpu_get_pc(space->cpu), state->portA_out));
+		LOG(("%04x: 68705 address high %02x\n", cpu_get_pc(space->cpu), state->portA_out));
 		state->address = (state->address & 0x00ff) | (state->portA_out << 8);
 	}
 }

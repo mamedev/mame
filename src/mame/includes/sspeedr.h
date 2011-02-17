@@ -1,3 +1,24 @@
+class sspeedr_state : public driver_device
+{
+public:
+	sspeedr_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 led_TIME[2];
+	UINT8 led_SCORE[24];
+	int toggle;
+	unsigned driver_horz;
+	unsigned driver_vert;
+	unsigned driver_pic;
+	unsigned drones_horz;
+	unsigned drones_vert[3];
+	unsigned drones_mask;
+	unsigned track_horz;
+	unsigned track_vert[2];
+	unsigned track_ice;
+};
+
+
 /*----------- defined in video/sspeedr.c -----------*/
 
 WRITE8_HANDLER( sspeedr_driver_horz_w );

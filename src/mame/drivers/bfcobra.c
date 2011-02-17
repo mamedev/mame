@@ -82,41 +82,6 @@
 #include "machine/nvram.h"
 
 
-class bfcobra_state : public driver_device
-{
-public:
-	bfcobra_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
-
-	UINT8 bank_data[4];
-	UINT8 *work_ram;
-	UINT8 *video_ram;
-	UINT8 h_scroll;
-	UINT8 v_scroll;
-	UINT8 flip_8;
-	UINT8 flip_22;
-	UINT8 videomode;
-	UINT8 z80_m6809_line;
-	UINT8 m6809_z80_line;
-	UINT8 data_r;
-	UINT8 data_t;
-	int irq_state;
-	int acia_irq;
-	int vblank_irq;
-	int blitter_irq;
-	UINT8 z80_int;
-	UINT8 z80_inten;
-	UINT32 meter_latch;
-	UINT32 mux_input;
-	UINT32 mux_outputlatch;
-	UINT8 col4bit[16];
-	UINT8 col3bit[16];
-	UINT8 col8bit[256];
-	UINT8 col7bit[256];
-	UINT8 col6bit[256];
-};
-
-
 /*
     Defines
 */
@@ -129,18 +94,6 @@ public:
 */
 INLINE void z80_bank(running_machine *machine, int num, int data);
 
-
-static void update_irqs(running_machine *machine)
-{
-	bfcobra_state *state = machine->driver_data<bfcobra_state>();
-	int newstate = state->blitter_irq || state->vblank_irq || state->acia_irq;
-
-	if (newstate != state->irq_state)
-	{
-		state->irq_state = newstate;
-		cputag_set_input_line(machine, "maincpu", 0, state->irq_state ? ASSERT_LINE : CLEAR_LINE);
-	}
-}
 
 /***************************************************************************
 
@@ -196,7 +149,7 @@ typedef union
 /*
     Blitter state
 */
-static struct
+struct blitter_t
 {
 	ADDR_REG	program;
 
@@ -213,14 +166,14 @@ static struct
 	UINT8		innercnt;
 	UINT8		step;
 	UINT8		pattern;
-} blitter;
+};
 
 #define LOOPTYPE ( ( blitter.command&0x60 ) >> 5 )
 
 /*
     MUSIC Semiconductor TR9C1710 RAMDAC or equivalent
 */
-static struct
+struct ramdac_t
 {
 	UINT8	addr_w;
 	UINT8	addr_r;
@@ -234,7 +187,32 @@ static struct
 	/* Access counts */
 	UINT8	count_r;
 	UINT8	count_w;
-} ramdac;
+};
+
+
+struct fdc_t
+{
+	UINT8	MSR;
+
+	int		side;
+	int		track;
+	int		sector;
+	int		number;
+	int		stop_track;
+	int		setup_read;
+
+	int		byte_pos;
+	int		offset;
+
+	int		phase;
+	int		next_phase;
+	int		cmd_len;
+	int		cmd_cnt;
+	int		res_len;
+	int		res_cnt;
+	UINT8	cmd[10];
+	UINT8	results[8];
+};
 
 
 #define BLUE_0 0
@@ -257,6 +235,44 @@ static struct
 #define RED_5 ( 5 << 5 )
 #define RED_6 ( 6 << 5 )
 #define RED_7 ( 7 << 5 )
+
+class bfcobra_state : public driver_device
+{
+public:
+	bfcobra_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 bank_data[4];
+	UINT8 *work_ram;
+	UINT8 *video_ram;
+	UINT8 h_scroll;
+	UINT8 v_scroll;
+	UINT8 flip_8;
+	UINT8 flip_22;
+	UINT8 videomode;
+	UINT8 z80_m6809_line;
+	UINT8 m6809_z80_line;
+	UINT8 data_r;
+	UINT8 data_t;
+	int irq_state;
+	int acia_irq;
+	int vblank_irq;
+	int blitter_irq;
+	UINT8 z80_int;
+	UINT8 z80_inten;
+	UINT32 meter_latch;
+	UINT32 mux_input;
+	UINT32 mux_outputlatch;
+	UINT8 col4bit[16];
+	UINT8 col3bit[16];
+	UINT8 col8bit[256];
+	UINT8 col7bit[256];
+	UINT8 col6bit[256];
+	struct blitter_t blitter;
+	struct ramdac_t ramdac;
+	struct fdc_t fdc;
+};
+
 
 static const UINT8 col4bit_default[16]=
 {
@@ -418,6 +434,8 @@ static void RunBlit(address_space *space)
 {
 #define BLITPRG_READ(x)		blitter.x = *(blitter_get_addr(space->machine, blitter.program.addr++))
 
+	bfcobra_state *state = space->machine->driver_data<bfcobra_state>();
+	struct blitter_t &blitter = state->blitter;
 	int cycles_used = 0;
 
 
@@ -702,6 +720,8 @@ static void RunBlit(address_space *space)
 
 static READ8_HANDLER( ramdac_r )
 {
+	bfcobra_state *state = space->machine->driver_data<bfcobra_state>();
+	struct ramdac_t &ramdac = state->ramdac;
 	UINT8 val = 0xff;
 
 	switch (offset & 3)
@@ -743,6 +763,8 @@ static READ8_HANDLER( ramdac_r )
 
 static WRITE8_HANDLER( ramdac_w )
 {
+	bfcobra_state *state = space->machine->driver_data<bfcobra_state>();
+	struct ramdac_t &ramdac = state->ramdac;
 
 	switch (offset & 3)
 	{
@@ -825,6 +847,18 @@ static WRITE8_HANDLER( ramdac_w )
 
 ***************************************************************************/
 
+static void update_irqs(running_machine *machine)
+{
+	bfcobra_state *state = machine->driver_data<bfcobra_state>();
+	int newstate = state->blitter_irq || state->vblank_irq || state->acia_irq;
+
+	if (newstate != state->irq_state)
+	{
+		state->irq_state = newstate;
+		cputag_set_input_line(machine, "maincpu", 0, state->irq_state ? ASSERT_LINE : CLEAR_LINE);
+	}
+}
+
 static READ8_HANDLER( chipset_r )
 {
 	bfcobra_state *state = space->machine->driver_data<bfcobra_state>();
@@ -863,7 +897,7 @@ static READ8_HANDLER( chipset_r )
 		case 0x20:
 		{
 			/* Seems correct - used during RLE pic decoding */
-			val = blitter.dest.addr0;
+			val = state->blitter.dest.addr0;
 			break;
 		}
 		case 0x22:
@@ -933,22 +967,22 @@ static WRITE8_HANDLER( chipset_w )
 		}
 		case 0x18:
 		{
-			blitter.program.addr0 = data;
+			state->blitter.program.addr0 = data;
 			break;
 		}
 		case 0x19:
 		{
-			blitter.program.addr1 = data;
+			state->blitter.program.addr1 = data;
 			break;
 		}
 		case 0x1A:
 		{
-			blitter.program.addr2 = data;
+			state->blitter.program.addr2 = data;
 			break;
 		}
 		case 0x20:
 		{
-			blitter.command = data;
+			state->blitter.command = data;
 
 			if (data & CMD_RUN)
 				RunBlit(space);
@@ -1010,7 +1044,7 @@ static WRITE8_HANDLER( rombank_w )
 
 ***************************************************************************/
 
-static void command_phase(UINT8 data);
+static void command_phase(struct fdc_t &fdc, UINT8 data);
 static void exec_w_phase(UINT8 data);
 //UINT8 exec_r_phase(void);
 
@@ -1045,50 +1079,29 @@ enum command
 	SCAN_HIGH_OR_EQUAL = 29
 };
 
-static struct
+static void reset_fdc(running_machine *machine)
 {
-	UINT8	MSR;
+	bfcobra_state *state = machine->driver_data<bfcobra_state>();
+	memset(&state->fdc, 0, sizeof(state->fdc));
 
-	int		side;
-	int		track;
-	int		sector;
-	int		number;
-	int		stop_track;
-	int		setup_read;
-
-	int		byte_pos;
-	int		offset;
-
-	int		phase;
-	int		next_phase;
-	int		cmd_len;
-	int		cmd_cnt;
-	int		res_len;
-	int		res_cnt;
-	UINT8	cmd[10];
-	UINT8	results[8];
-} fdc;
-
-
-static void reset_fdc(void)
-{
-	memset(&fdc, 0, sizeof(fdc));
-
-	fdc.MSR = 0x80;
-	fdc.phase = COMMAND;
+	state->fdc.MSR = 0x80;
+	state->fdc.phase = COMMAND;
 }
 
 static READ8_HANDLER( fdctrl_r )
 {
+	bfcobra_state *state = space->machine->driver_data<bfcobra_state>();
 	UINT8 val = 0;
 
-	val = fdc.MSR;
+	val = state->fdc.MSR;
 
 	return val;
 }
 
 static READ8_HANDLER( fddata_r )
 {
+	bfcobra_state *state = space->machine->driver_data<bfcobra_state>();
+	struct fdc_t &fdc = state->fdc;
 	#define	BPS		1024
 	#define SPT		10
 	#define BPT		1024*10
@@ -1161,11 +1174,13 @@ static READ8_HANDLER( fddata_r )
 
 static WRITE8_HANDLER( fdctrl_w )
 {
+	bfcobra_state *state = space->machine->driver_data<bfcobra_state>();
+	struct fdc_t &fdc = state->fdc;
 	switch (fdc.phase)
 	{
 		case COMMAND:
 		{
-			command_phase(data);
+			command_phase(fdc, data);
 			break;
 		}
 		case EXECUTION_W:
@@ -1180,7 +1195,7 @@ static WRITE8_HANDLER( fdctrl_w )
 	}
 }
 
-static void command_phase(UINT8 data)
+static void command_phase(struct fdc_t &fdc, UINT8 data)
 {
 	if (fdc.cmd_cnt == 0)
 	{
@@ -1298,8 +1313,8 @@ static MACHINE_RESET( bfcobra )
 	}
 
 	state->bank_data[0] = 1;
-	memset(&ramdac, 0, sizeof(ramdac));
-	reset_fdc();
+	memset(&state->ramdac, 0, sizeof(state->ramdac));
+	reset_fdc(machine);
 
 	state->irq_state = state->blitter_irq = state->vblank_irq = state->acia_irq = 0;
 }

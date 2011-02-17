@@ -734,12 +734,12 @@ static WRITE32_HANDLER( geo_ctl1_w )
 	{
 		if (data & 0x80000000)
 		{
-			logerror("Start state->geo upload\n");
+			logerror("Start geo upload\n");
 			state->geocnt = 0;
 		}
 		else
 		{
-			logerror("Boot state->geo, %d dwords\n", state->geocnt);
+			logerror("Boot geo, %d dwords\n", state->geocnt);
 		}
 	}
 
@@ -756,12 +756,12 @@ static WRITE32_HANDLER( geo_sharc_ctl1_w )
     {
         if (data & 0x80000000)
         {
-            logerror("Start state->geo upload\n");
+            logerror("Start geo upload\n");
             state->geocnt = 0;
         }
         else
         {
-            logerror("Boot state->geo, %d dwords\n", state->geocnt);
+            logerror("Boot geo, %d dwords\n", state->geocnt);
             cputag_set_input_line(space->machine, "dsp2", INPUT_LINE_HALT, CLEAR_LINE);
             //cpu_spinuntil_time(space->cpu, attotime::from_usec(1000));       // Give the SHARC enough time to boot itself
         }

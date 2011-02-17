@@ -131,17 +131,6 @@
 
 /*************************************
  *
- *  Local variables
- *
- *************************************/
-
-static UINT8 main_sense_state;
-static UINT8 audio_sense_state;
-
-
-
-/*************************************
- *
  *  Special input ports
  *
  *************************************/
@@ -176,13 +165,14 @@ static READ8_HANDLER( vsync_chain_lo_r )
 
 static WRITE8_HANDLER( meadows_audio_w )
 {
+	meadows_state *state = space->machine->driver_data<meadows_state>();
 	switch (offset)
 	{
 		case 0:
-			if (meadows_0c00 == data)
+			if (state->_0c00 == data)
 				break;
 			logerror("meadows_audio_w %d $%02x\n", offset, data);
-			meadows_0c00 = data;
+			state->_0c00 = data;
             break;
 
 		case 1:
@@ -222,9 +212,10 @@ static INPUT_CHANGED( coin_inserted )
 
 static INTERRUPT_GEN( meadows_interrupt )
 {
+	meadows_state *state = device->machine->driver_data<meadows_state>();
     /* fake something toggling the sense input line of the S2650 */
-	main_sense_state ^= 1;
-	cpu_set_input_line(device, 1, main_sense_state ? ASSERT_LINE : CLEAR_LINE);
+	state->main_sense_state ^= 1;
+	cpu_set_input_line(device, 1, state->main_sense_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -237,8 +228,9 @@ static INTERRUPT_GEN( meadows_interrupt )
 
 static INTERRUPT_GEN( minferno_interrupt )
 {
-	main_sense_state++;
-	cpu_set_input_line(device, 1, (main_sense_state & 0x40) ? ASSERT_LINE : CLEAR_LINE );
+	meadows_state *state = device->machine->driver_data<meadows_state>();
+	state->main_sense_state++;
+	cpu_set_input_line(device, 1, (state->main_sense_state & 0x40) ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
@@ -251,6 +243,7 @@ static INTERRUPT_GEN( minferno_interrupt )
 
 static WRITE8_HANDLER( audio_hardware_w )
 {
+	meadows_state *state = space->machine->driver_data<meadows_state>();
 	switch (offset & 3)
 	{
 		case 0: /* DAC */
@@ -258,26 +251,26 @@ static WRITE8_HANDLER( audio_hardware_w )
             break;
 
 		case 1: /* counter clk 5 MHz / 256 */
-			if (data == meadows_0c01)
+			if (data == state->_0c01)
 				break;
 			logerror("audio_w ctr1 preset $%x amp %d\n", data & 15, data >> 4);
-			meadows_0c01 = data;
+			state->_0c01 = data;
 			meadows_sh_update(space->machine);
 			break;
 
 		case 2: /* counter clk 5 MHz / 32 (/ 2 or / 4) */
-			if (data == meadows_0c02)
+			if (data == state->_0c02)
                 break;
 			logerror("audio_w ctr2 preset $%02x\n", data);
-			meadows_0c02 = data;
+			state->_0c02 = data;
 			meadows_sh_update(space->machine);
             break;
 
 		case 3: /* audio enable */
-			if (data == meadows_0c03)
+			if (data == state->_0c03)
                 break;
 			logerror("audio_w enable ctr2/2:%d ctr2:%d dac:%d ctr1:%d\n", data&1, (data>>1)&1, (data>>2)&1, (data>>3)&1);
-			meadows_0c03 = data;
+			state->_0c03 = data;
 			meadows_sh_update(space->machine);
             break;
 	}
@@ -293,12 +286,13 @@ static WRITE8_HANDLER( audio_hardware_w )
 
 static READ8_HANDLER( audio_hardware_r )
 {
+	meadows_state *state = space->machine->driver_data<meadows_state>();
 	int data = 0;
 
 	switch (offset)
 	{
 		case 0:
-			data = meadows_0c00;
+			data = state->_0c00;
             break;
 
 		case 1: break;
@@ -318,9 +312,10 @@ static READ8_HANDLER( audio_hardware_r )
 
 static INTERRUPT_GEN( audio_interrupt )
 {
+	meadows_state *state = device->machine->driver_data<meadows_state>();
     /* fake something toggling the sense input line of the S2650 */
-	audio_sense_state ^= 1;
-	cpu_set_input_line(device, 1, audio_sense_state ? ASSERT_LINE : CLEAR_LINE);
+	state->audio_sense_state ^= 1;
+	cpu_set_input_line(device, 1, state->audio_sense_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

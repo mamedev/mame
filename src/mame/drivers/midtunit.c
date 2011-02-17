@@ -25,6 +25,7 @@
 #include "audio/williams.h"
 #include "audio/dcs.h"
 #include "machine/nvram.h"
+#include "includes/midyunit.h"
 #include "includes/midtunit.h"
 
 

@@ -1,7 +1,17 @@
-/*----------- defined in video/galpanic.c -----------*/
+class galpanic_state : public driver_device
+{
+public:
+	galpanic_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-extern UINT16 *galpanic_bgvideoram,*galpanic_fgvideoram;
-extern size_t galpanic_fgvideoram_size;
+	UINT16 *bgvideoram;
+	UINT16 *fgvideoram;
+	size_t fgvideoram_size;
+	bitmap_t *sprites_bitmap;
+};
+
+
+/*----------- defined in video/galpanic.c -----------*/
 
 PALETTE_INIT( galpanic );
 WRITE16_HANDLER( galpanic_bgvideoram_w );

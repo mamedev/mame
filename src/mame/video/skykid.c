@@ -1,12 +1,6 @@
 #include "emu.h"
 #include "includes/skykid.h"
 
-UINT8 *skykid_textram, *skykid_videoram, *skykid_spriteram;
-
-static tilemap_t *bg_tilemap,*tx_tilemap;
-static UINT8 priority;
-static UINT16 scroll_x,scroll_y;
-
 
 /***************************************************************************
 
@@ -78,22 +72,24 @@ static TILEMAP_MAPPER( tx_tilemap_scan )
 
 static TILE_GET_INFO( tx_get_tile_info )
 {
+	skykid_state *state = machine->driver_data<skykid_state>();
 	/* the hardware has two character sets, one normal and one flipped. When
        screen is flipped, character flip is done by selecting the 2nd character set.
        We reproduce this here, but since the tilemap system automatically flips
        characters when screen is flipped, we have to flip them back. */
 	SET_TILE_INFO(
 			0,
-			skykid_textram[tile_index] | (flip_screen_get(machine) ? 0x100 : 0),
-			skykid_textram[tile_index + 0x400] & 0x3f,
+			state->textram[tile_index] | (flip_screen_get(machine) ? 0x100 : 0),
+			state->textram[tile_index + 0x400] & 0x3f,
 			flip_screen_get(machine) ? (TILE_FLIPY | TILE_FLIPX) : 0);
 }
 
 
 static TILE_GET_INFO( bg_get_tile_info )
 {
-	int code = skykid_videoram[tile_index];
-	int attr = skykid_videoram[tile_index+0x800];
+	skykid_state *state = machine->driver_data<skykid_state>();
+	int code = state->videoram[tile_index];
+	int attr = state->videoram[tile_index+0x800];
 
 	SET_TILE_INFO(
 			1,
@@ -112,14 +108,15 @@ static TILE_GET_INFO( bg_get_tile_info )
 
 VIDEO_START( skykid )
 {
-	tx_tilemap = tilemap_create(machine, tx_get_tile_info,tx_tilemap_scan,  8,8,36,28);
-	bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan_rows,     8,8,64,32);
+	skykid_state *state = machine->driver_data<skykid_state>();
+	state->tx_tilemap = tilemap_create(machine, tx_get_tile_info,tx_tilemap_scan,  8,8,36,28);
+	state->bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan_rows,     8,8,64,32);
 
-	tilemap_set_transparent_pen(tx_tilemap, 0);
+	tilemap_set_transparent_pen(state->tx_tilemap, 0);
 
-	state_save_register_global(machine, priority);
-	state_save_register_global(machine, scroll_x);
-	state_save_register_global(machine, scroll_y);
+	state_save_register_global(machine, state->priority);
+	state_save_register_global(machine, state->scroll_x);
+	state_save_register_global(machine, state->scroll_y);
 	//FIXME: flip_screen
 	//state_save_register_global(machine, flip_screen_x_get(machine));
 }
@@ -134,39 +131,46 @@ VIDEO_START( skykid )
 
 READ8_HANDLER( skykid_videoram_r )
 {
-	return skykid_videoram[offset];
+	skykid_state *state = space->machine->driver_data<skykid_state>();
+	return state->videoram[offset];
 }
 
 WRITE8_HANDLER( skykid_videoram_w )
 {
-	skykid_videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap,offset & 0x7ff);
+	skykid_state *state = space->machine->driver_data<skykid_state>();
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap,offset & 0x7ff);
 }
 
 READ8_HANDLER( skykid_textram_r )
 {
-	return skykid_textram[offset];
+	skykid_state *state = space->machine->driver_data<skykid_state>();
+	return state->textram[offset];
 }
 
 WRITE8_HANDLER( skykid_textram_w )
 {
-	skykid_textram[offset] = data;
-	tilemap_mark_tile_dirty(tx_tilemap,offset & 0x3ff);
+	skykid_state *state = space->machine->driver_data<skykid_state>();
+	state->textram[offset] = data;
+	tilemap_mark_tile_dirty(state->tx_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( skykid_scroll_x_w )
 {
-	scroll_x = offset;
+	skykid_state *state = space->machine->driver_data<skykid_state>();
+	state->scroll_x = offset;
 }
 
 WRITE8_HANDLER( skykid_scroll_y_w )
 {
-	scroll_y = offset;
+	skykid_state *state = space->machine->driver_data<skykid_state>();
+	state->scroll_y = offset;
 }
 
 WRITE8_HANDLER( skykid_flipscreen_priority_w )
 {
-	priority = data;
+	skykid_state *state = space->machine->driver_data<skykid_state>();
+	state->priority = data;
 	flip_screen_set(space->machine, offset & 1);
 }
 
@@ -181,7 +185,8 @@ WRITE8_HANDLER( skykid_flipscreen_priority_w )
 /* the sprite generator IC is the same as Mappy */
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	UINT8 *spriteram = skykid_spriteram + 0x780;
+	skykid_state *state = machine->driver_data<skykid_state>();
+	UINT8 *spriteram = state->spriteram + 0x780;
 	UINT8 *spriteram_2 = spriteram + 0x0800;
 	UINT8 *spriteram_3 = spriteram_2 + 0x0800;
 	int offs;
@@ -233,25 +238,26 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( skykid )
 {
+	skykid_state *state = screen->machine->driver_data<skykid_state>();
 	if (flip_screen_get(screen->machine))
 	{
-		tilemap_set_scrollx(bg_tilemap, 0, 189 - (scroll_x ^ 1));
-		tilemap_set_scrolly(bg_tilemap, 0, 7 - scroll_y);
+		tilemap_set_scrollx(state->bg_tilemap, 0, 189 - (state->scroll_x ^ 1));
+		tilemap_set_scrolly(state->bg_tilemap, 0, 7 - state->scroll_y);
 	}
 	else
 	{
-		tilemap_set_scrollx(bg_tilemap, 0, scroll_x + 35);
-		tilemap_set_scrolly(bg_tilemap, 0, scroll_y + 25);
+		tilemap_set_scrollx(state->bg_tilemap, 0, state->scroll_x + 35);
+		tilemap_set_scrolly(state->bg_tilemap, 0, state->scroll_y + 25);
 	}
 
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
 
-	if ((priority & 0xf0) != 0x50)
+	if ((state->priority & 0xf0) != 0x50)
 		draw_sprites(screen->machine, bitmap,cliprect);
 
-	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->tx_tilemap,0,0);
 
-	if ((priority & 0xf0) == 0x50)
+	if ((state->priority & 0xf0) == 0x50)
 		draw_sprites(screen->machine, bitmap,cliprect);
 	return 0;
 }

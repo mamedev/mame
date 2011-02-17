@@ -25,7 +25,17 @@ found/dumped yet. */
 #include "video/tms9928a.h"
 #include "sound/ay8910.h"
 
-static UINT8 forte2_input_mask;
+
+class forte2_state : public driver_device
+{
+public:
+	forte2_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 input_mask;
+};
+
+
 
 static ADDRESS_MAP_START( program_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
@@ -61,13 +71,15 @@ INPUT_PORTS_END
 
 static READ8_DEVICE_HANDLER(forte2_ay8910_read_input)
 {
-	return input_port_read(device->machine, "IN0") | (forte2_input_mask&0x3f);
+	forte2_state *state = device->machine->driver_data<forte2_state>();
+	return input_port_read(device->machine, "IN0") | (state->input_mask&0x3f);
 }
 
 static WRITE8_DEVICE_HANDLER( forte2_ay8910_set_input_mask )
 {
+	forte2_state *state = device->machine->driver_data<forte2_state>();
 	/* PSG reg 15, writes 0 at coin insert, 0xff at boot and game over */
-	forte2_input_mask = data;
+	state->input_mask = data;
 }
 
 static const ay8910_interface forte2_ay8910_interface =
@@ -101,12 +113,13 @@ static STATE_POSTLOAD ( forte2 )
 
 static MACHINE_START( forte2 )
 {
+	forte2_state *state = machine->driver_data<forte2_state>();
 	TMS9928A_configure(&tms9928a_interface);
 
-	forte2_input_mask = 0xff;
+	state->input_mask = 0xff;
 
 	/* register for save states */
-	state_save_register_global(machine, forte2_input_mask);
+	state_save_register_global(machine, state->input_mask);
 	machine->state().register_postload(forte2, NULL);
 }
 
@@ -121,7 +134,7 @@ static INTERRUPT_GEN( pesadelo_interrupt )
 }
 
 
-static MACHINE_CONFIG_START( pesadelo, driver_device )
+static MACHINE_CONFIG_START( pesadelo, forte2_state )
 
 	MCFG_CPU_ADD("maincpu", Z80, 3579545)		  /* 3.579545 Mhz */
 	MCFG_CPU_PROGRAM_MAP(program_mem)

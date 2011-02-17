@@ -13,6 +13,21 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	UINT8 dac;
+	int dac_enable;
+	int channel;
+	int freq1;
+	int freq2;
+	UINT8 latched_0c01;
+	UINT8 latched_0c02;
+	UINT8 latched_0c03;
+	UINT8 main_sense_state;
+	UINT8 audio_sense_state;
+	UINT8 _0c00;
+	UINT8 _0c01;
+	UINT8 _0c02;
+	UINT8 _0c03;
+	tilemap_t *bg_tilemap;
 };
 
 
@@ -21,10 +36,6 @@ public:
 SAMPLES_START( meadows_sh_start );
 void meadows_sh_dac_w(running_machine *machine, int data);
 void meadows_sh_update(running_machine *machine);
-extern UINT8 meadows_0c00;
-extern UINT8 meadows_0c01;
-extern UINT8 meadows_0c02;
-extern UINT8 meadows_0c03;
 
 
 /*----------- defined in video/meadows.c -----------*/

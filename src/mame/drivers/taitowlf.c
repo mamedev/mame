@@ -31,19 +31,16 @@ public:
 	int dma_channel;
 	UINT8 dma_offset[2][4];
 	UINT8 at_pages[0x10];
-};
 
-
-static void ide_interrupt(device_t *device, int state);
-
-
-static struct {
 	device_t	*pit8254;
 	device_t	*pic8259_1;
 	device_t	*pic8259_2;
 	device_t	*dma8237_1;
 	device_t	*dma8237_2;
-} taitowlf_devices;
+};
+
+
+static void ide_interrupt(device_t *device, int state);
 
 
 static const rgb_t cga_palette[16] =
@@ -564,24 +561,26 @@ INPUT_PORTS_END
 
 static IRQ_CALLBACK(irq_callback)
 {
+	taitowlf_state *state = device->machine->driver_data<taitowlf_state>();
 	int r = 0;
-	r = pic8259_acknowledge( taitowlf_devices.pic8259_2);
+	r = pic8259_acknowledge( state->pic8259_2);
 	if (r==0)
 	{
-		r = pic8259_acknowledge( taitowlf_devices.pic8259_1);
+		r = pic8259_acknowledge( state->pic8259_1);
 	}
 	return r;
 }
 
 static MACHINE_START(taitowlf)
 {
+	taitowlf_state *state = machine->driver_data<taitowlf_state>();
 	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
 
-	taitowlf_devices.pit8254 = machine->device( "pit8254" );
-	taitowlf_devices.pic8259_1 = machine->device( "pic8259_1" );
-	taitowlf_devices.pic8259_2 = machine->device( "pic8259_2" );
-	taitowlf_devices.dma8237_1 = machine->device( "dma8237_1" );
-	taitowlf_devices.dma8237_2 = machine->device( "dma8237_2" );
+	state->pit8254 = machine->device( "pit8254" );
+	state->pic8259_1 = machine->device( "pic8259_1" );
+	state->pic8259_2 = machine->device( "pic8259_2" );
+	state->dma8237_1 = machine->device( "dma8237_1" );
+	state->dma8237_2 = machine->device( "dma8237_2" );
 }
 
 static MACHINE_RESET(taitowlf)
@@ -688,17 +687,20 @@ static void set_gate_a20(running_machine *machine, int a20)
 
 static void keyboard_interrupt(running_machine *machine, int state)
 {
-	pic8259_ir1_w(taitowlf_devices.pic8259_1, state);
+	taitowlf_state *drvstate = machine->driver_data<taitowlf_state>();
+	pic8259_ir1_w(drvstate->pic8259_1, state);
 }
 
 static void ide_interrupt(device_t *device, int state)
 {
-	pic8259_ir6_w(taitowlf_devices.pic8259_2, state);
+	taitowlf_state *drvstate = device->machine->driver_data<taitowlf_state>();
+	pic8259_ir6_w(drvstate->pic8259_2, state);
 }
 
 static int taitowlf_get_out2(running_machine *machine)
 {
-	return pit8253_get_output(taitowlf_devices.pit8254, 2 );
+	taitowlf_state *state = machine->driver_data<taitowlf_state>();
+	return pit8253_get_output(state->pit8254, 2 );
 }
 
 static const struct kbdc8042_interface at8042 =
@@ -708,7 +710,8 @@ static const struct kbdc8042_interface at8042 =
 
 static void taitowlf_set_keyb_int(running_machine *machine, int state)
 {
-	pic8259_ir1_w(taitowlf_devices.pic8259_1, state);
+	taitowlf_state *drvstate = machine->driver_data<taitowlf_state>();
+	pic8259_ir1_w(drvstate->pic8259_1, state);
 }
 
 static DRIVER_INIT( taitowlf )

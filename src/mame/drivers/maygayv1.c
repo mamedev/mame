@@ -152,7 +152,6 @@ Find lamps/reels after UPD changes.
  *
  *************************************/
 
-static int vsync_latch_preset;
 
 #define VREG(a)		i82716.r[a]
 
@@ -192,23 +191,50 @@ enum
 
 static const UINT32 banks[4] = { 0, 0x40000/2, 0x20000/2, 0x60000/2 };
 
-static struct
-{
-	device_t *duart68681;
-} maygayv1_devices;
-
 #define DRAM_BANK_SEL		(banks[(VREG(DSBA) >> 7) & 3])
 
-static struct
+typedef struct
 {
 	UINT16	r[16];
 	UINT16	*dram;
 
 	UINT8	*line_buf;	// there's actually two
-} i82716;
+} i82716_t;
+
+
+typedef struct
+{
+	UINT8	command;
+	UINT8	mode;
+	UINT8	prescale;
+	UINT8	inhibit;
+	UINT8	clear;
+	UINT8	fifo[8];
+	UINT8	ram[16];
+} i8279_t;
+
+class maygayv1_state : public driver_device
+{
+public:
+	maygayv1_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	int vsync_latch_preset;
+	UINT8 p1;
+	UINT8 p3;
+	int d68681_val;
+	device_t *duart68681;
+	i82716_t i82716;
+	i8279_t i8279;
+};
+
+
+
 
 static WRITE16_HANDLER( i82716_w )
 {
+	maygayv1_state *state = space->machine->driver_data<maygayv1_state>();
+	i82716_t &i82716 = state->i82716;
 	// Accessing register window?
 	if ((VREG(RWBA) & 0xfff0) == (offset & 0xfff0))
 	{
@@ -227,6 +253,8 @@ static WRITE16_HANDLER( i82716_w )
 
 static READ16_HANDLER( i82716_r )
 {
+	maygayv1_state *state = space->machine->driver_data<maygayv1_state>();
+	i82716_t &i82716 = state->i82716;
 	// Accessing register window?
 	if ((VREG(RWBA) & ~0xf) == (offset & ~0xf))
 	{
@@ -254,10 +282,12 @@ static VIDEO_START( maygayv1 )
 
 static VIDEO_UPDATE( maygayv1 )
 {
+	maygayv1_state *state = screen->machine->driver_data<maygayv1_state>();
+	i82716_t &i82716 = state->i82716;
 	UINT16 *atable = &i82716.dram[VREG(ATBA)];
 	UINT16 *otable = &i82716.dram[VREG(ODTBA) & 0xfc00];  // both must be bank 0
 
-    int sl, sx;
+	int sl, sx;
 	int slmask = 0xffff;     // TODO: Save if using scanline callbacks
 	int xbound = (VREG(DWBA) & 0x3f8) | 7;
 
@@ -286,14 +316,14 @@ static VIDEO_UPDATE( maygayv1 )
 		/* 4bpp only ! */
 		memset(i82716.line_buf, 0x22, 512);
 
-    	/* Parse the list of 16 objects */
+		/* Parse the list of 16 objects */
 		for (obj = 0; obj < 16; ++obj)
 		{
 			int offs = obj * 4;
 
 			// Draw on this line?
 			if ( !BIT(slmask, obj) )
-            {
+			{
 				UINT32	objbase, trans, width, res, cspec;
 				INT32	x, xpos;
 				UINT16	w0, w1, w2;
@@ -302,7 +332,7 @@ static VIDEO_UPDATE( maygayv1 )
 
 				/* Get object table entry words */
 				w0 = otable[offs];
-                w1 = otable[offs + 1];
+				w1 = otable[offs + 1];
 				w2 = otable[offs + 2];
 
 				/* Blanked */
@@ -337,14 +367,14 @@ static VIDEO_UPDATE( maygayv1 )
 
 				/* First scanline? Clear current object entry address */
 				if ( BIT(slmask_old, obj) )
-                	otable[offs + 3] = 0;
+					otable[offs + 3] = 0;
 
 				/* Bitmap data pointer */
 				objbase = ((w0 & 0x00c0) << 10) | w2;
 				objptr = &i82716.dram[objbase + ((4 * width) * otable[offs + 3])];
 
 				// endian alert
-                bmpptr = (UINT8*)objptr;
+				bmpptr = (UINT8*)objptr;
 
 				// 4bpp
 				for (x = xpos; x < MIN(xbound, xpos + width * 8); ++x)
@@ -355,10 +385,10 @@ static VIDEO_UPDATE( maygayv1 )
 						UINT8 p2 = *bmpptr >> 4;
 
 						if (!trans || p1)
-					        i82716.line_buf[x] = p1;
+							i82716.line_buf[x] = p1;
 
 						if (!trans || p2)
-					        i82716.line_buf[x] |= p2 << 4;
+							i82716.line_buf[x] |= p2 << 4;
 					}
 					bmpptr++;
 				}
@@ -383,6 +413,8 @@ static VIDEO_UPDATE( maygayv1 )
 
 static VIDEO_EOF( maygayv1 )
 {
+	maygayv1_state *state = machine->driver_data<maygayv1_state>();
+	i82716_t &i82716 = state->i82716;
 	// UCF
 	if (VREG(VCR0) & VCR0_UCF)
 	{
@@ -393,8 +425,8 @@ static VIDEO_EOF( maygayv1 )
 	}
 	else
 	{
-    	VREG(VCR0) = i82716.dram[VCR0];
-    	VREG(ATBA) = i82716.dram[ATBA];
+		VREG(VCR0) = i82716.dram[VCR0];
+		VREG(ATBA) = i82716.dram[ATBA];
 	}
 
 	if (!(VREG(VCR0) & VCR0_DEI))
@@ -444,19 +476,8 @@ static READ16_HANDLER( read_odd )
 }
 
 
-static struct _i8279_state
-{
-	UINT8	command;
-	UINT8	mode;
-	UINT8	prescale;
-	UINT8	inhibit;
-	UINT8	clear;
-	UINT8	fifo[8];
-	UINT8	ram[16];
-} i8279;
-
 /* TODO */
-static void update_outputs(UINT16 which)
+static void update_outputs(i8279_t &i8279, UINT16 which)
 {
 	int i;
 
@@ -486,6 +507,8 @@ static void update_outputs(UINT16 which)
 
 static READ16_HANDLER( maygay_8279_r )
 {
+	maygayv1_state *state = space->machine->driver_data<maygayv1_state>();
+	i8279_t &i8279 = state->i8279;
 	static const char *const portnames[] = { "STROBE1","STROBE2","STROBE3","STROBE4","STROBE5","STROBE6","STROBE7","STROBE8" };
 	UINT8 result = 0xff;
 	UINT8 addr;
@@ -532,6 +555,8 @@ static READ16_HANDLER( maygay_8279_r )
 
 static WRITE16_HANDLER( maygay_8279_w )
 {
+	maygayv1_state *state = space->machine->driver_data<maygayv1_state>();
+	i8279_t &i8279 = state->i8279;
 	UINT8 addr;
 
 	data >>= 8;
@@ -550,7 +575,7 @@ static WRITE16_HANDLER( maygay_8279_w )
 					i8279.ram[addr] = (i8279.ram[addr] & 0xf0) | (data & 0x0f);
 				if (!(i8279.inhibit & 0x08))
 					i8279.ram[addr] = (i8279.ram[addr] & 0x0f) | (data & 0xf0);
-				update_outputs(1 << addr);
+				update_outputs(i8279, 1 << addr);
 
 				/* handle autoincrement */
 				if (i8279.command & 0x10)
@@ -608,7 +633,7 @@ static WRITE16_HANDLER( maygay_8279_w )
 			/* command 5: display write inhibit/blanking */
 			case 0xa0:
 				i8279.inhibit = data & 0x0f;
-				update_outputs(~0);
+				update_outputs(i8279, ~0);
 				logerror("8279: clock prescaler set to %02X\n", data & 0x1f);
 				break;
 
@@ -633,10 +658,11 @@ static WRITE16_HANDLER( maygay_8279_w )
 
 static WRITE16_HANDLER( vsync_int_ctrl )
 {
-	vsync_latch_preset = data & 0x0100;
+	maygayv1_state *state = space->machine->driver_data<maygayv1_state>();
+	state->vsync_latch_preset = data & 0x0100;
 
 	// Active low
-	if (!(vsync_latch_preset))
+	if (!(state->vsync_latch_preset))
 		cputag_set_input_line(space->machine, "maincpu", 3, CLEAR_LINE);
 }
 
@@ -688,16 +714,15 @@ ADDRESS_MAP_END
 
 
 */
-static UINT8 p1; // save state
-static UINT8 p3; // save state
 
 static READ8_HANDLER( mcu_r )
 {
+	maygayv1_state *state = space->machine->driver_data<maygayv1_state>();
 	switch (offset)
 	{
 		case 1:
 		{
-			if ( !BIT(p3, 4) )
+			if ( !BIT(state->p3, 4) )
 				return (input_port_read(space->machine, "REEL"));	// Reels???
 			else
 				return 0;
@@ -710,23 +735,24 @@ static READ8_HANDLER( mcu_r )
 
 static WRITE8_HANDLER( mcu_w )
 {
+	maygayv1_state *state = space->machine->driver_data<maygayv1_state>();
 			logerror("O %x D %x",offset,data);
 
 	switch (offset)
 	{
 		// Bottom nibble = UPD
 		case 1:
-			p1 = data;
+			state->p1 = data;
 //          upd7759_msg_w(0, data);//?
 			break;
 		case 3:
 			upd7759_reset_w (0, BIT(data, 2));
 			upd7759_start_w(0, BIT(data, 6));
 
-//          if ( !BIT(p3, 7) && BIT(data, 7) )
+//          if ( !BIT(state->p3, 7) && BIT(data, 7) )
 				// P1 propagates to outputs
 
-			p3 = data;
+			state->p3 = data;
 			break;
 	}
 }
@@ -900,13 +926,13 @@ static void duart_irq_handler(device_t *device, UINT8 vector)
 //  cputag_set_input_line(device->machine, "maincpu", 5, state ? ASSERT_LINE : CLEAR_LINE);
 };
 
-static int d68681_val;
 
 static void duart_tx(device_t *device, int channel, UINT8 data)
 {
+	maygayv1_state *state = device->machine->driver_data<maygayv1_state>();
 	if (channel == 0)
 	{
-		d68681_val = data;
+		state->d68681_val = data;
 		cputag_set_input_line(device->machine, "soundcpu", MCS51_RX_LINE, ASSERT_LINE);  // ?
 	}
 
@@ -923,12 +949,14 @@ static const duart68681_config maygayv1_duart68681_config =
 
 static int data_to_i8031(device_t *device)
 {
-	return d68681_val;
+	maygayv1_state *state = device->machine->driver_data<maygayv1_state>();
+	return state->d68681_val;
 }
 
 static void data_from_i8031(device_t *device, int data)
 {
-	duart68681_rx_data(maygayv1_devices.duart68681, 0, data);
+	maygayv1_state *state = device->machine->driver_data<maygayv1_state>();
+	duart68681_rx_data(state->duart68681, 0, data);
 }
 
 static READ8_DEVICE_HANDLER( b_read )
@@ -963,6 +991,8 @@ static const pia6821_interface pia_intf =
 
 static MACHINE_START( maygayv1 )
 {
+	maygayv1_state *state = machine->driver_data<maygayv1_state>();
+	i82716_t &i82716 = state->i82716;
 	i82716.dram = auto_alloc_array(machine, UINT16, 0x80000/2);   // ???
 	i82716.line_buf = auto_alloc_array(machine, UINT8, 512);
 
@@ -976,8 +1006,10 @@ static MACHINE_START( maygayv1 )
 
 static MACHINE_RESET( maygayv1 )
 {
+	maygayv1_state *state = machine->driver_data<maygayv1_state>();
+	i82716_t &i82716 = state->i82716;
 	// ?
-	maygayv1_devices.duart68681 = machine->device( "duart68681" );
+	state->duart68681 = machine->device( "duart68681" );
 	memset(i82716.dram, 0, 0x40000);
 	i82716.r[RWBA] = 0x0200;
 }
@@ -985,12 +1017,13 @@ static MACHINE_RESET( maygayv1 )
 
 static INTERRUPT_GEN( vsync_interrupt )
 {
-	if (vsync_latch_preset)
+	maygayv1_state *state = device->machine->driver_data<maygayv1_state>();
+	if (state->vsync_latch_preset)
 		cputag_set_input_line(device->machine, "maincpu", 3, ASSERT_LINE);
 }
 
 
-static MACHINE_CONFIG_START( maygayv1, driver_device )
+static MACHINE_CONFIG_START( maygayv1, maygayv1_state )
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT("screen", vsync_interrupt)
@@ -1104,7 +1137,8 @@ ROM_END
 
 static DRIVER_INIT( screenpl )
 {
-	p1 = p3 = 0xff;
+	maygayv1_state *state = machine->driver_data<maygayv1_state>();
+	state->p1 = state->p3 = 0xff;
 }
 
 GAME( 1991, screenpl, 0,        maygayv1, screenpl, screenpl, ROT0, "Maygay", "Screen Play (ver. 4.0)",               GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_REQUIRES_ARTWORK )

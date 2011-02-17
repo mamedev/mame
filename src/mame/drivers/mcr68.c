@@ -64,17 +64,6 @@
 
 /*************************************
  *
- *  Statics
- *
- *************************************/
-
-static UINT16 control_word;
-static UINT8 protection_data[5];
-
-
-
-/*************************************
- *
  *  Zwackery-specific handlers
  *
  *************************************/
@@ -112,9 +101,10 @@ static READ16_HANDLER( zwackery_6840_r )
 
 static WRITE16_HANDLER( xenophobe_control_w )
 {
-	COMBINE_DATA(&control_word);
-/*  soundsgood_reset_w(~control_word & 0x0020);*/
-	soundsgood_data_w(space, offset, ((control_word & 0x000f) << 1) | ((control_word & 0x0010) >> 4));
+	mcr68_state *state = space->machine->driver_data<mcr68_state>();
+	COMBINE_DATA(&state->control_word);
+/*  soundsgood_reset_w(~state->control_word & 0x0020);*/
+	soundsgood_data_w(space, offset, ((state->control_word & 0x000f) << 1) | ((state->control_word & 0x0010) >> 4));
 }
 
 
@@ -127,9 +117,10 @@ static WRITE16_HANDLER( xenophobe_control_w )
 
 static WRITE16_HANDLER( blasted_control_w )
 {
-	COMBINE_DATA(&control_word);
-/*  soundsgood_reset_w(~control_word & 0x0020);*/
-	soundsgood_data_w(space, offset, (control_word >> 8) & 0x1f);
+	mcr68_state *state = space->machine->driver_data<mcr68_state>();
+	COMBINE_DATA(&state->control_word);
+/*  soundsgood_reset_w(~state->control_word & 0x0020);*/
+	soundsgood_data_w(space, offset, (state->control_word >> 8) & 0x1f);
 }
 
 
@@ -142,9 +133,10 @@ static WRITE16_HANDLER( blasted_control_w )
 
 static READ16_HANDLER( spyhunt2_port_0_r )
 {
+	mcr68_state *state = space->machine->driver_data<mcr68_state>();
 	static const char *const portnames[] = { "AN1", "AN2", "AN3", "AN4" };
 	int result = input_port_read(space->machine, "IN0");
-	int which = (control_word >> 3) & 3;
+	int which = (state->control_word >> 3) & 3;
 	int analog = input_port_read(space->machine, portnames[which]);
 
 	return result | ((soundsgood_status_r(space, 0) & 1) << 5) | (analog << 8);
@@ -160,13 +152,14 @@ static READ16_HANDLER( spyhunt2_port_1_r )
 
 static WRITE16_HANDLER( spyhunt2_control_w )
 {
-	COMBINE_DATA(&control_word);
+	mcr68_state *state = space->machine->driver_data<mcr68_state>();
+	COMBINE_DATA(&state->control_word);
 
-/*  turbocs_reset_w(~control_word & 0x0080);*/
-	turbocs_data_w(space, offset, (control_word >> 8) & 0x001f);
+/*  turbocs_reset_w(~state->control_word & 0x0080);*/
+	turbocs_data_w(space, offset, (state->control_word >> 8) & 0x001f);
 
-	soundsgood_reset_w(space->machine, ~control_word & 0x2000);
-	soundsgood_data_w(space, offset, (control_word >> 8) & 0x001f);
+	soundsgood_reset_w(space->machine, ~state->control_word & 0x2000);
+	soundsgood_data_w(space, offset, (state->control_word >> 8) & 0x001f);
 }
 
 
@@ -215,9 +208,10 @@ static READ16_HANDLER( archrivl_port_1_r )
 
 static WRITE16_HANDLER( archrivl_control_w )
 {
-	COMBINE_DATA(&control_word);
-	williams_cvsd_reset_w(~control_word & 0x0400);
-	williams_cvsd_data_w(space->machine, control_word & 0x3ff);
+	mcr68_state *state = space->machine->driver_data<mcr68_state>();
+	COMBINE_DATA(&state->control_word);
+	williams_cvsd_reset_w(~state->control_word & 0x0400);
+	williams_cvsd_data_w(space->machine, state->control_word & 0x3ff);
 }
 
 
@@ -230,15 +224,16 @@ static WRITE16_HANDLER( archrivl_control_w )
 
 static WRITE16_HANDLER( pigskin_protection_w )
 {
+	mcr68_state *state = space->machine->driver_data<mcr68_state>();
 	/* ignore upper-byte only */
 	if (ACCESSING_BITS_0_7)
 	{
 		/* track the last 5 bytes */
-		protection_data[0] = protection_data[1];
-		protection_data[1] = protection_data[2];
-		protection_data[2] = protection_data[3];
-		protection_data[3] = protection_data[4];
-		protection_data[4] = data & 0xff;
+		state->protection_data[0] = state->protection_data[1];
+		state->protection_data[1] = state->protection_data[2];
+		state->protection_data[2] = state->protection_data[3];
+		state->protection_data[3] = state->protection_data[4];
+		state->protection_data[4] = data & 0xff;
 
 		logerror("%06X:protection_w=%02X\n", cpu_get_previouspc(space->cpu), data & 0xff);
 	}
@@ -247,19 +242,20 @@ static WRITE16_HANDLER( pigskin_protection_w )
 
 static READ16_HANDLER( pigskin_protection_r )
 {
+	mcr68_state *state = space->machine->driver_data<mcr68_state>();
 	/* based on the last 5 bytes return a value */
-	if (protection_data[4] == 0xe3 && protection_data[3] == 0x94)
+	if (state->protection_data[4] == 0xe3 && state->protection_data[3] == 0x94)
 		return 0x00;	/* must be <= 1 */
-	if (protection_data[4] == 0xc7 && protection_data[3] == 0x7b && protection_data[2] == 0x36)
+	if (state->protection_data[4] == 0xc7 && state->protection_data[3] == 0x7b && state->protection_data[2] == 0x36)
 		return 0x00;	/* must be <= 1 */
-	if (protection_data[4] == 0xc7 && protection_data[3] == 0x7b)
+	if (state->protection_data[4] == 0xc7 && state->protection_data[3] == 0x7b)
 		return 0x07;	/* must be > 5 */
-	if (protection_data[4] == 0xc7 && protection_data[3] == 0x1f && protection_data[2] == 0x03 &&
-		protection_data[1] == 0x25 && protection_data[0] == 0x36)
+	if (state->protection_data[4] == 0xc7 && state->protection_data[3] == 0x1f && state->protection_data[2] == 0x03 &&
+		state->protection_data[1] == 0x25 && state->protection_data[0] == 0x36)
 		return 0x00;	/* must be < 3 */
 
 	logerror("Protection read after unrecognized sequence: %02X %02X %02X %02X %02X\n",
-			protection_data[0], protection_data[1], protection_data[2], protection_data[3], protection_data[4]);
+			state->protection_data[0], state->protection_data[1], state->protection_data[2], state->protection_data[3], state->protection_data[4]);
 
 	return 0x00;
 }
@@ -1550,30 +1546,33 @@ ROM_END
 
 static void mcr68_common_init(running_machine *machine, int sound_board, int clip, int xoffset)
 {
+	mcr68_state *state = machine->driver_data<mcr68_state>();
 	mcr_sound_init(machine, sound_board);
 
-	mcr68_sprite_clip = clip;
-	mcr68_sprite_xoffset = xoffset;
+	state->sprite_clip = clip;
+	state->sprite_xoffset = xoffset;
 
-	state_save_register_global(machine, control_word);
+	state_save_register_global(machine, state->control_word);
 }
 
 
 static DRIVER_INIT( zwackery )
 {
+	mcr68_state *state = machine->driver_data<mcr68_state>();
 	mcr68_common_init(machine, MCR_CHIP_SQUEAK_DELUXE, 0, 0);
 
 	/* Zwackery doesn't care too much about this value; currently taken from Blasted */
-	mcr68_timing_factor = attotime::from_hz(cputag_get_clock(machine, "maincpu") / 10) * (256 + 16);
+	state->timing_factor = attotime::from_hz(cputag_get_clock(machine, "maincpu") / 10) * (256 + 16);
 }
 
 
 static DRIVER_INIT( xenophob )
 {
+	mcr68_state *state = machine->driver_data<mcr68_state>();
 	mcr68_common_init(machine, MCR_SOUNDS_GOOD, 0, -4);
 
 	/* Xenophobe doesn't care too much about this value; currently taken from Blasted */
-	mcr68_timing_factor = attotime::from_hz(cputag_get_clock(machine, "maincpu") / 10) * (256 + 16);
+	state->timing_factor = attotime::from_hz(cputag_get_clock(machine, "maincpu") / 10) * (256 + 16);
 
 	/* install control port handler */
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0c0000, 0x0cffff, 0, 0, xenophobe_control_w);
@@ -1582,10 +1581,11 @@ static DRIVER_INIT( xenophob )
 
 static DRIVER_INIT( spyhunt2 )
 {
+	mcr68_state *state = machine->driver_data<mcr68_state>();
 	mcr68_common_init(machine, MCR_TURBO_CHIP_SQUEAK | MCR_SOUNDS_GOOD, 0, -6);
 
 	/* Spy Hunter 2 doesn't care too much about this value; currently taken from Blasted */
-	mcr68_timing_factor = attotime::from_hz(cputag_get_clock(machine, "maincpu") / 10) * (256 + 16);
+	state->timing_factor = attotime::from_hz(cputag_get_clock(machine, "maincpu") / 10) * (256 + 16);
 
 	/* analog port handling is a bit tricky */
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0c0000, 0x0cffff, 0, 0, spyhunt2_control_w);
@@ -1596,12 +1596,13 @@ static DRIVER_INIT( spyhunt2 )
 
 static DRIVER_INIT( blasted )
 {
+	mcr68_state *state = machine->driver_data<mcr68_state>();
 	mcr68_common_init(machine, MCR_SOUNDS_GOOD, 0, 0);
 
 	/* Blasted checks the timing of VBLANK relative to the 493 interrupt */
 	/* VBLANK is required to come within 220-256 E clocks (i.e., 2200-2560 CPU clocks) */
 	/* after the 493; we also allow 16 E clocks for latency  */
-	mcr68_timing_factor = attotime::from_hz(cputag_get_clock(machine, "maincpu") / 10) * (256 + 16);
+	state->timing_factor = attotime::from_hz(cputag_get_clock(machine, "maincpu") / 10) * (256 + 16);
 
 	/* handle control writes */
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0c0000, 0x0cffff, 0, 0, blasted_control_w);
@@ -1612,10 +1613,11 @@ static DRIVER_INIT( blasted )
 
 static DRIVER_INIT( intlaser )
 {
+	mcr68_state *state = machine->driver_data<mcr68_state>();
 	mcr68_common_init(machine, MCR_SOUNDS_GOOD, 0, 0);
 
 	/* Copied from Blasted */
-	mcr68_timing_factor = attotime::from_hz(cputag_get_clock(machine, "maincpu") / 10) * (256 + 16);
+	state->timing_factor = attotime::from_hz(cputag_get_clock(machine, "maincpu") / 10) * (256 + 16);
 
 	/* handle control writes */
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0c0000, 0x0cffff, 0, 0, blasted_control_w);
@@ -1626,10 +1628,11 @@ static DRIVER_INIT( intlaser )
 
 static DRIVER_INIT( archrivl )
 {
+	mcr68_state *state = machine->driver_data<mcr68_state>();
 	mcr68_common_init(machine, MCR_WILLIAMS_SOUND, 16, 0);
 
 	/* Arch Rivals doesn't care too much about this value; currently taken from Blasted */
-	mcr68_timing_factor = attotime::from_hz(cputag_get_clock(machine, "maincpu") / 10) * (256 + 16);
+	state->timing_factor = attotime::from_hz(cputag_get_clock(machine, "maincpu") / 10) * (256 + 16);
 
 	/* handle control writes */
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0c0000, 0x0cffff, 0, 0, archrivl_control_w);
@@ -1644,23 +1647,25 @@ static DRIVER_INIT( archrivl )
 
 static DRIVER_INIT( pigskin )
 {
+	mcr68_state *state = machine->driver_data<mcr68_state>();
 	mcr68_common_init(machine, MCR_WILLIAMS_SOUND, 16, 0);
 
 	/* Pigskin doesn't care too much about this value; currently taken from Tri-Sports */
-	mcr68_timing_factor = attotime::from_hz(cputag_get_clock(machine, "maincpu") / 10) * 115;
+	state->timing_factor = attotime::from_hz(cputag_get_clock(machine, "maincpu") / 10) * 115;
 
-	state_save_register_global_array(machine, protection_data);
+	state_save_register_global_array(machine, state->protection_data);
 }
 
 
 static DRIVER_INIT( trisport )
 {
+	mcr68_state *state = machine->driver_data<mcr68_state>();
 	mcr68_common_init(machine, MCR_WILLIAMS_SOUND, 0, 0);
 
 	/* Tri-Sports checks the timing of VBLANK relative to the 493 interrupt */
 	/* VBLANK is required to come within 87-119 E clocks (i.e., 870-1190 CPU clocks) */
 	/* after the 493 */
-	mcr68_timing_factor = attotime::from_hz(cputag_get_clock(machine, "maincpu") / 10) * 115;
+	state->timing_factor = attotime::from_hz(cputag_get_clock(machine, "maincpu") / 10) * 115;
 }
 
 

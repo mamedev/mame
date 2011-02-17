@@ -89,6 +89,7 @@ Notes:
 #include "cpu/adsp2100/adsp2100.h"
 #include "audio/dcs.h"
 #include "machine/nvram.h"
+#include "includes/midtunit.h"
 #include "includes/midwunit.h"
 
 

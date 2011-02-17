@@ -45,21 +45,6 @@
 #define SHIFTREG2_FALLING_EDGE(bit)		FALLING_EDGE(bit, (state->last_shift2 ^ state->current_shift), state->current_shift)
 
 
-
-/*************************************
- *
- *  Global variables
- *
- *************************************/
-
-static void (*sound_handler)(running_machine *,UINT8 sound_val, UINT8 bits_changed);
-
-/* general shift register variables */
-
-/* Rockola sound variables */
-
-
-
 /*************************************
  *
  *  Generic sound write
@@ -75,8 +60,8 @@ WRITE8_HANDLER( cinemat_sound_control_w )
 	state->sound_control = (state->sound_control & ~(1 << offset)) | ((data & 1) << offset);
 
 	/* if something changed, call the sound subroutine */
-	if ((state->sound_control != oldval) && sound_handler)
-		(*sound_handler)(space->machine, state->sound_control, state->sound_control ^ oldval);
+	if ((state->sound_control != oldval) && state->sound_handler)
+		(*state->sound_handler)(space->machine, state->sound_control, state->sound_control ^ oldval);
 }
 
 
@@ -111,7 +96,7 @@ static void generic_init(running_machine *machine, void (*callback)(running_mach
 	MACHINE_RESET_CALL(cinemat);
 
 	/* set the sound handler */
-	sound_handler = callback;
+	state->sound_handler = callback;
 
 	/* reset sound control */
 	state->sound_control = 0x9f;

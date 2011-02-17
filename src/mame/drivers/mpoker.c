@@ -173,9 +173,17 @@
 #include "machine/nvram.h"
 #include "mpoker.lh"
 
-static UINT8 output[8];
 
-static UINT8* mpoker_video;
+class mpoker_state : public driver_device
+{
+public:
+	mpoker_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 output[8];
+	UINT8* video;
+	int mixdata;
+};
 
 
 static VIDEO_START(mpoker)
@@ -185,6 +193,7 @@ static VIDEO_START(mpoker)
 
 static VIDEO_UPDATE(mpoker)
 {
+	mpoker_state *state = screen->machine->driver_data<mpoker_state>();
 	int y,x;
 	int count;
 	const gfx_element *gfx = screen->machine->gfx[0];
@@ -194,8 +203,8 @@ static VIDEO_UPDATE(mpoker)
 	{
 		for (x=0;x<32;x++)
 		{
-			UINT16 dat = mpoker_video[count];
-			UINT16 col = mpoker_video[count+0x400] & 0x7f;
+			UINT16 dat = state->video[count];
+			UINT16 col = state->video[count+0x400] & 0x7f;
 			drawgfx_opaque(bitmap,cliprect,gfx,dat,col,0,0,x*16,y*16);
 			count++;
 		}
@@ -223,6 +232,7 @@ static PALETTE_INIT(mpoker)
 
 static READ8_HANDLER( mixport_r )
 {
+	mpoker_state *state = space->machine->driver_data<mpoker_state>();
 /*  - bits -
     7654 3210
     ---- ---x   Unknown.
@@ -236,11 +246,10 @@ static READ8_HANDLER( mixport_r )
     The line seems to be tied to a clock. We can't use XORed status due to the nested checks.
     If you change the status *every* read, the HW stucks.
 */
-	static int mixdata;
 
-	mixdata = (input_port_read(space->machine, "SW2") & 0xfd) | (space->machine->rand() & 0x02);
+	state->mixdata = (input_port_read(space->machine, "SW2") & 0xfd) | (space->machine->rand() & 0x02);
 
-	return mixdata;
+	return state->mixdata;
 }
 
 /***** Port 0158 *****
@@ -274,11 +283,12 @@ static READ8_HANDLER( mixport_r )
 
 static WRITE8_HANDLER( outport0_w )
 {
+	mpoker_state *state = space->machine->driver_data<mpoker_state>();
 	output_set_lamp_value(1, (data & 1));			/* Lamp 1 - BET */
 	output_set_lamp_value(5, (data >> 1) & 1);		/* Lamp 5 - HOLD 1 */
 
-	output[0] = data;
-	popmessage("outport0 : %02X %02X %02X %02X %02X %02X %02X %02X", output[0], output[1], output[2], output[3], output[4], output[5], output[6], output[7]);
+	state->output[0] = data;
+	popmessage("outport0 : %02X %02X %02X %02X %02X %02X %02X %02X", state->output[0], state->output[1], state->output[2], state->output[3], state->output[4], state->output[5], state->output[6], state->output[7]);
 }
 
 /***** Port 8001 *****
@@ -295,11 +305,12 @@ static WRITE8_HANDLER( outport0_w )
 
 static WRITE8_HANDLER( outport1_w )
 {
+	mpoker_state *state = space->machine->driver_data<mpoker_state>();
 	output_set_lamp_value(2, (data & 1));			/* Lamp 2 - DEAL */
 	output_set_lamp_value(6, (data >> 1) & 1);		/* Lamp 6 - HOLD 2 */
 
-	output[1] = data;
-	popmessage("outport1 : %02X %02X %02X %02X %02X %02X %02X %02X", output[0], output[1], output[2], output[3], output[4], output[5], output[6], output[7]);
+	state->output[1] = data;
+	popmessage("outport1 : %02X %02X %02X %02X %02X %02X %02X %02X", state->output[0], state->output[1], state->output[2], state->output[3], state->output[4], state->output[5], state->output[6], state->output[7]);
 }
 
 /***** Port 8002 *****
@@ -316,11 +327,12 @@ static WRITE8_HANDLER( outport1_w )
 
 static WRITE8_HANDLER( outport2_w )
 {
+	mpoker_state *state = space->machine->driver_data<mpoker_state>();
 	output_set_lamp_value(3, (data & 1));			/* Lamp 3 - CANCEL */
 	output_set_lamp_value(7, (data >> 1) & 1);		/* Lamp 7 - HOLD 3 */
 
-	output[2] = data;
-	popmessage("outport2 : %02X %02X %02X %02X %02X %02X %02X %02X", output[0], output[1], output[2], output[3], output[4], output[5], output[6], output[7]);
+	state->output[2] = data;
+	popmessage("outport2 : %02X %02X %02X %02X %02X %02X %02X %02X", state->output[0], state->output[1], state->output[2], state->output[3], state->output[4], state->output[5], state->output[6], state->output[7]);
 }
 
 /***** Port 8003 *****
@@ -337,11 +349,12 @@ static WRITE8_HANDLER( outport2_w )
 
 static WRITE8_HANDLER( outport3_w )
 {
+	mpoker_state *state = space->machine->driver_data<mpoker_state>();
 	output_set_lamp_value(4, (data & 1));			/* Lamp 4 - STAND */
 	output_set_lamp_value(8, (data >> 1) & 1);		/* Lamp 8 - HOLD 4 */
 
-	output[3] = data;
-	popmessage("outport3 : %02X %02X %02X %02X %02X %02X %02X %02X", output[0], output[1], output[2], output[3], output[4], output[5], output[6], output[7]);
+	state->output[3] = data;
+	popmessage("outport3 : %02X %02X %02X %02X %02X %02X %02X %02X", state->output[0], state->output[1], state->output[2], state->output[3], state->output[4], state->output[5], state->output[6], state->output[7]);
 }
 
 /***** Port 8004 *****
@@ -358,10 +371,11 @@ static WRITE8_HANDLER( outport3_w )
 
 static WRITE8_HANDLER( outport4_w )
 {
+	mpoker_state *state = space->machine->driver_data<mpoker_state>();
 	output_set_lamp_value(9, (data >> 1) & 1);		/* Lamp 9 - HOLD 5 */
 
-	output[4] = data;
-	popmessage("outport4 : %02X %02X %02X %02X %02X %02X %02X %02X", output[0], output[1], output[2], output[3], output[4], output[5], output[6], output[7]);
+	state->output[4] = data;
+	popmessage("outport4 : %02X %02X %02X %02X %02X %02X %02X %02X", state->output[0], state->output[1], state->output[2], state->output[3], state->output[4], state->output[5], state->output[6], state->output[7]);
 }
 
 /***** Port 8005 *****
@@ -378,8 +392,9 @@ static WRITE8_HANDLER( outport4_w )
 
 static WRITE8_HANDLER( outport5_w )
 {
-	output[5] = data;
-	popmessage("outport5 : %02X %02X %02X %02X %02X %02X %02X %02X", output[0], output[1], output[2], output[3], output[4], output[5], output[6], output[7]);
+	mpoker_state *state = space->machine->driver_data<mpoker_state>();
+	state->output[5] = data;
+	popmessage("outport5 : %02X %02X %02X %02X %02X %02X %02X %02X", state->output[0], state->output[1], state->output[2], state->output[3], state->output[4], state->output[5], state->output[6], state->output[7]);
 }
 
 /***** Port 8006 *****
@@ -396,10 +411,11 @@ static WRITE8_HANDLER( outport5_w )
 
 static WRITE8_HANDLER( outport6_w )
 {
+	mpoker_state *state = space->machine->driver_data<mpoker_state>();
 	coin_counter_w(space->machine, 1, data & 0x02);	/* Payout pulse */
 
-	output[6] = data;
-	popmessage("outport6 : %02X %02X %02X %02X %02X %02X %02X %02X", output[0], output[1], output[2], output[3], output[4], output[5], output[6], output[7]);
+	state->output[6] = data;
+	popmessage("outport6 : %02X %02X %02X %02X %02X %02X %02X %02X", state->output[0], state->output[1], state->output[2], state->output[3], state->output[4], state->output[5], state->output[6], state->output[7]);
 }
 
 /***** Port 8007 *****
@@ -416,10 +432,11 @@ static WRITE8_HANDLER( outport6_w )
 
 static WRITE8_HANDLER( outport7_w )
 {
+	mpoker_state *state = space->machine->driver_data<mpoker_state>();
 	coin_counter_w(space->machine, 0, data & 0x02);	/* Coin pulse */
 
-	output[7] = data;
-	popmessage("outport7 : %02X %02X %02X %02X %02X %02X %02X %02X", output[0], output[1], output[2], output[3], output[4], output[5], output[6], output[7]);
+	state->output[7] = data;
+	popmessage("outport7 : %02X %02X %02X %02X %02X %02X %02X %02X", state->output[0], state->output[1], state->output[2], state->output[3], state->output[4], state->output[5], state->output[6], state->output[7]);
 }
 
 
@@ -455,7 +472,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 //  AM_RANGE(0x0158, 0x0158) AM_WRITE (muxed_w)
 	AM_RANGE(0x3800, 0x38ff) AM_RAM AM_SHARE("nvram")	/* NVRAM = 2x SCM5101E */
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&mpoker_video)	/* 4x MM2114N-3 */
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_MEMBER(mpoker_state, video)	/* 4x MM2114N-3 */
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("SW1")
 	AM_RANGE(0x8001, 0x8001) AM_READ (mixport_r) /* DIP switch bank 2 + a sort of watchdog */
 	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN1")
@@ -560,7 +577,7 @@ static GFXDECODE_START( mpoker )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16_layout, 0, 0x100 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( mpoker, driver_device )
+static MACHINE_CONFIG_START( mpoker, mpoker_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/6)		 /* 3 MHz? */
 	MCFG_CPU_PROGRAM_MAP(main_map)

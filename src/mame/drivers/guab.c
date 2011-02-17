@@ -52,6 +52,38 @@ enum int_levels
 };
 
 
+struct ef9369
+{
+	UINT32 addr;
+	UINT16 clut[16];	/* 13-bits - a marking bit and a 444 color */
+};
+
+
+struct wd1770
+{
+	UINT32	status;
+	UINT8	cmd;
+	UINT8	data;
+
+	UINT32	side;
+	INT32	track;
+	INT32	sector;
+	UINT32	sptr;
+};
+
+
+class guab_state : public driver_device
+{
+public:
+	guab_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	struct ef9369 pal;
+	emu_timer *fdc_timer;
+	struct wd1770 fdc;
+};
+
+
 /*************************************
  *
  *  6840 PTM
@@ -142,16 +174,11 @@ static READ16_HANDLER( guab_tms34061_r )
  *  (16 colors from 4096)
  ****************************/
 
-static struct ef9369
-{
-	UINT32 addr;
-	UINT16 clut[16];	/* 13-bits - a marking bit and a 444 color */
-} pal;
-
-
 /* Non-multiplexed mode */
 static WRITE16_HANDLER( ef9369_w )
 {
+	guab_state *state = space->machine->driver_data<guab_state>();
+	struct ef9369 &pal = state->pal;
 	data &= 0x00ff;
 
 	/* Address register */
@@ -191,6 +218,8 @@ static WRITE16_HANDLER( ef9369_w )
 
 static READ16_HANDLER( ef9369_r )
 {
+	guab_state *state = space->machine->driver_data<guab_state>();
+	struct ef9369 &pal = state->pal;
 	if ((offset & 1) == 0)
 	{
 		UINT16 col = pal.clut[pal.addr >> 1];
@@ -254,20 +283,6 @@ static VIDEO_UPDATE( guab )
  *
  *************************************/
 
-static struct wd1770
-{
-	UINT32	status;
-	UINT8	cmd;
-	UINT8	data;
-
-	UINT32	side;
-	INT32	track;
-	INT32	sector;
-	UINT32	sptr;
-} fdc;
-
-static emu_timer *fdc_timer;
-
 #define USEC_DELAY			40
 #define DISK_SIDES			2
 #define DISK_TRACKS			80
@@ -295,6 +310,8 @@ enum wd1770_status
 
 static TIMER_CALLBACK( fdc_data_callback )
 {
+	guab_state *state = machine->driver_data<guab_state>();
+	struct wd1770 &fdc = state->fdc;
 	UINT8* disk = (UINT8*)machine->region("user1")->base();
 	int more_data = 0;
 
@@ -341,7 +358,7 @@ static TIMER_CALLBACK( fdc_data_callback )
 
 	if (more_data)
 	{
-		fdc_timer->adjust(attotime::from_usec(USEC_DELAY));
+		state->fdc_timer->adjust(attotime::from_usec(USEC_DELAY));
 	}
 	else
 	{
@@ -357,6 +374,8 @@ static TIMER_CALLBACK( fdc_data_callback )
 
 static WRITE16_HANDLER( wd1770_w )
 {
+	guab_state *state = space->machine->driver_data<guab_state>();
+	struct wd1770 &fdc = state->fdc;
 	data &= 0xff;
 
 	switch (offset)
@@ -426,7 +445,7 @@ static WRITE16_HANDLER( wd1770_w )
 															fdc.sector));
 
 					/* Set the data read timer */
-					fdc_timer->adjust(attotime::from_usec(USEC_DELAY));
+					state->fdc_timer->adjust(attotime::from_usec(USEC_DELAY));
 
 					break;
 				}
@@ -463,7 +482,7 @@ static WRITE16_HANDLER( wd1770_w )
 				case 13:
 				{
 					/* Stop any operation in progress */
-					fdc_timer->reset();
+					state->fdc_timer->reset();
 					fdc.status &= ~BUSY;
 					FDC_LOG(("Force Interrupt\n"));
 					break;
@@ -494,7 +513,7 @@ static WRITE16_HANDLER( wd1770_w )
 
 			/* Queue an event to write the data if write command was specified */
 			if (fdc.cmd & 0x20)
-				fdc_timer->adjust(attotime::from_usec(USEC_DELAY));
+				state->fdc_timer->adjust(attotime::from_usec(USEC_DELAY));
 
 			break;
 		}
@@ -503,6 +522,8 @@ static WRITE16_HANDLER( wd1770_w )
 
 static READ16_HANDLER( wd1770_r )
 {
+	guab_state *state = space->machine->driver_data<guab_state>();
+	struct wd1770 &fdc = state->fdc;
 	UINT16 retval = 0;
 
 	switch (offset)
@@ -589,6 +610,8 @@ static INPUT_CHANGED( coin_inserted )
 
 static WRITE16_HANDLER( io_w )
 {
+	guab_state *state = space->machine->driver_data<guab_state>();
+	struct wd1770 &fdc = state->fdc;
 	switch (offset)
 	{
 		case 0x10:
@@ -752,15 +775,17 @@ INPUT_PORTS_END
 
  static MACHINE_START( guab )
 {
-	fdc_timer = machine->scheduler().timer_alloc(FUNC(fdc_data_callback));
+	guab_state *state = machine->driver_data<guab_state>();
+	state->fdc_timer = machine->scheduler().timer_alloc(FUNC(fdc_data_callback));
 }
 
 static MACHINE_RESET( guab )
 {
-	memset(&fdc, 0, sizeof(fdc));
+	guab_state *state = machine->driver_data<guab_state>();
+	memset(&state->fdc, 0, sizeof(state->fdc));
 }
 
-static MACHINE_CONFIG_START( guab, driver_device )
+static MACHINE_CONFIG_START( guab, guab_state )
 	/* TODO: Verify clock */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(guab_map)

@@ -55,6 +55,7 @@ public:
 	UINT8 sprite_control_latched[8];
 	UINT8 sprite_control[8];
 	UINT32 *spriteram_32bit;
+	void (*system32_prot_vblank)(device_t *device);
 };
 
 

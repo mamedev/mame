@@ -369,33 +369,6 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 
 /*************************************
  *
- *  Global variables
- *
- *************************************/
-
-
-
-
-/*************************************
- *
- *  Statics
- *
- *************************************/
-
-
-/* V60 interrupt controller */
-
-/* sound interrupt controller */
-
-
-/* I/O chips and custom I/O */
-
-/* callbacks to handle output */
-static void (*system32_prot_vblank)(device_t *device);
-
-
-/*************************************
- *
  *  Prototypes
  *
  *************************************/
@@ -598,11 +571,12 @@ static TIMER_CALLBACK( end_of_vblank_int )
 
 static INTERRUPT_GEN( start_of_vblank_int )
 {
+	segas32_state *state = device->machine->driver_data<segas32_state>();
 	signal_v60_irq(device->machine, MAIN_IRQ_VBSTART);
 	system32_set_vblank(device->machine, 1);
 	device->machine->scheduler().timer_set(device->machine->primary_screen->time_until_pos(0), FUNC(end_of_vblank_int));
-	if (system32_prot_vblank)
-		(*system32_prot_vblank)(device);
+	if (state->system32_prot_vblank)
+		(*state->system32_prot_vblank)(device);
 }
 
 
@@ -3825,7 +3799,7 @@ static void segas32_common_init(running_machine *machine, read16_space_func cust
 	/* reset the custom handlers and other pointers */
 	state->custom_io_r[0] = custom_r;
 	state->custom_io_w[0] = custom_w;
-	system32_prot_vblank = NULL;
+	state->system32_prot_vblank = NULL;
 	state->sw1_output = NULL;
 	state->sw2_output = NULL;
 	state->sw3_output = NULL;
@@ -4072,11 +4046,12 @@ static DRIVER_INIT( brival )
 
 static DRIVER_INIT( darkedge )
 {
+	segas32_state *state = machine->driver_data<segas32_state>();
 	segas32_common_init(machine, extra_custom_io_r, NULL);
 
 	/* install protection handlers */
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa00000, 0xa7ffff, 0, 0, darkedge_protection_r, darkedge_protection_w);
-	system32_prot_vblank = darkedge_fd1149_vblank;
+	state->system32_prot_vblank = darkedge_fd1149_vblank;
 }
 
 static DRIVER_INIT( dbzvrvs )

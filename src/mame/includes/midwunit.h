@@ -4,8 +4,6 @@
 
 **************************************************************************/
 
-#include "midtunit.h"
-
 class midwxunit_state : public driver_device
 {
 public:

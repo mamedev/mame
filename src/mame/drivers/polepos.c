@@ -238,34 +238,27 @@ Todo:
 #define POLEPOS_TOGGLE	PORT_TOGGLE
 
 
-static UINT8 steer_last;
-static UINT8 steer_delta;
-static INT16 steer_accum;
-
-
 /*************************************************************************************/
 /* Pole Position II protection                                                       */
 /*************************************************************************************/
 
 static READ16_HANDLER( polepos2_ic25_r )
 {
+	polepos_state *state = space->machine->driver_data<polepos_state>();
 	int result;
 	/* protection states */
-	static INT16 last_result;
-	static INT8 last_signed;
-	static UINT8 last_unsigned;
 
 	offset = offset & 0x1ff;
 	if (offset < 0x100)
 	{
-		last_signed = offset & 0xff;
-		result = last_result & 0xff;
+		state->last_signed = offset & 0xff;
+		result = state->last_result & 0xff;
 	}
 	else
 	{
-		last_unsigned = offset & 0xff;
-		result = (last_result >> 8) & 0xff;
-		last_result = (INT8)last_signed * (UINT8)last_unsigned;
+		state->last_unsigned = offset & 0xff;
+		result = (state->last_result >> 8) & 0xff;
+		state->last_result = (INT8)state->last_signed * (UINT8)state->last_unsigned;
 	}
 
 //  logerror("%04X: read IC25 @ %04X = %02X\n", cpu_get_pc(space->cpu), offset, result);
@@ -276,13 +269,12 @@ static READ16_HANDLER( polepos2_ic25_r )
 
 
 
-static int adc_input;
-static int auto_start_mask;
 
 
 static READ8_HANDLER( polepos_adc_r )
 {
-	return input_port_read(space->machine, adc_input ? "ACCEL" : "BRAKE");
+	polepos_state *state = space->machine->driver_data<polepos_state>();
+	return input_port_read(space->machine, state->adc_input ? "ACCEL" : "BRAKE");
 }
 
 static READ8_HANDLER( polepos_ready_r )
@@ -300,6 +292,7 @@ static READ8_HANDLER( polepos_ready_r )
 
 static WRITE8_HANDLER( polepos_latch_w )
 {
+	polepos_state *state = space->machine->driver_data<polepos_state>();
 	int bit = data & 1;
 
 	switch (offset)
@@ -324,7 +317,7 @@ static WRITE8_HANDLER( polepos_latch_w )
 			break;
 
 		case 0x03:	/* GASEL */
-			adc_input = bit;
+			state->adc_input = bit;
 			break;
 
 		case 0x04:	/* RESB */
@@ -336,7 +329,7 @@ static WRITE8_HANDLER( polepos_latch_w )
 			break;
 
 		case 0x06:	/* SB0 */
-			auto_start_mask = !bit;
+			state->auto_start_mask = !bit;
 			break;
 
 		case 0x07:	/* CHACL */
@@ -357,7 +350,8 @@ static WRITE16_HANDLER( polepos_z8002_nvi_enable_w )
 
 static CUSTOM_INPUT( high_port_r ) { return input_port_read(field->port->machine, (const char *)param) >> 4; }
 static CUSTOM_INPUT( low_port_r ) { return input_port_read(field->port->machine, (const char *)param) & 0x0f; }
-static CUSTOM_INPUT( auto_start_r ) { return auto_start_mask; }
+static CUSTOM_INPUT( auto_start_r ) {
+	polepos_state *state = field->port->machine->driver_data<polepos_state>(); return state->auto_start_mask; }
 
 static WRITE8_DEVICE_HANDLER( out_0 )
 {
@@ -419,29 +413,31 @@ static READ8_DEVICE_HANDLER( namco_53xx_k_r )
 
 static READ8_DEVICE_HANDLER( steering_changed_r )
 {
+	polepos_state *state = device->machine->driver_data<polepos_state>();
 	/* read the current steering value and update our delta */
 	UINT8 steer_new = input_port_read(device->machine, "STEER");
-	steer_accum += (INT8)(steer_new - steer_last) * 2;
-	steer_last = steer_new;
+	state->steer_accum += (INT8)(steer_new - state->steer_last) * 2;
+	state->steer_last = steer_new;
 
 	/* if we have delta, clock things */
-	if (steer_accum < 0)
+	if (state->steer_accum < 0)
 	{
-		steer_delta = 0;
-		steer_accum++;
+		state->steer_delta = 0;
+		state->steer_accum++;
 	}
-	else if (steer_accum > 0)
+	else if (state->steer_accum > 0)
 	{
-		steer_delta = 1;
-		steer_accum--;
+		state->steer_delta = 1;
+		state->steer_accum--;
 	}
 
-	return steer_accum & 1;
+	return state->steer_accum & 1;
 }
 
 static READ8_DEVICE_HANDLER( steering_delta_r )
 {
-	return steer_delta;
+	polepos_state *state = device->machine->driver_data<polepos_state>();
+	return state->steer_delta;
 }
 
 static const namco_53xx_interface namco_53xx_intf =
@@ -508,10 +504,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( z8002_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x1ffe) AM_WRITE(polepos_z8002_nvi_enable_w)	/* NVI enable - *NOT* shared by the two CPUs */
-	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(polepos_sprite16_r, polepos_sprite16_w) AM_BASE(&polepos_sprite16_memory)	/* Motion Object */
-	AM_RANGE(0x9000, 0x97ff) AM_READWRITE(polepos_road16_r, polepos_road16_w) AM_BASE(&polepos_road16_memory)		/* Road Memory */
-	AM_RANGE(0x9800, 0x9fff) AM_READWRITE(polepos_alpha16_r, polepos_alpha16_w) AM_BASE(&polepos_alpha16_memory)	/* Alphanumeric (char ram) */
-	AM_RANGE(0xa000, 0xafff) AM_READWRITE(polepos_view16_r, polepos_view16_w) AM_BASE(&polepos_view16_memory)		/* Background memory */
+	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(polepos_sprite16_r, polepos_sprite16_w) AM_BASE_MEMBER(polepos_state, sprite16_memory)	/* Motion Object */
+	AM_RANGE(0x9000, 0x97ff) AM_READWRITE(polepos_road16_r, polepos_road16_w) AM_BASE_MEMBER(polepos_state, road16_memory)		/* Road Memory */
+	AM_RANGE(0x9800, 0x9fff) AM_READWRITE(polepos_alpha16_r, polepos_alpha16_w) AM_BASE_MEMBER(polepos_state, alpha16_memory)	/* Alphanumeric (char ram) */
+	AM_RANGE(0xa000, 0xafff) AM_READWRITE(polepos_view16_r, polepos_view16_w) AM_BASE_MEMBER(polepos_state, view16_memory)		/* Background memory */
 	AM_RANGE(0xc000, 0xc001) AM_MIRROR(0x38fe) AM_WRITE(polepos_view16_hscroll_w)						/* Background horz scroll position */
 	AM_RANGE(0xc100, 0xc101) AM_MIRROR(0x38fe) AM_WRITE(polepos_road16_vscroll_w)						/* Road vertical position */
 ADDRESS_MAP_END
@@ -864,7 +860,7 @@ static const namco_interface namco_config =
  * Machine driver
  *********************************************************************/
 
-static MACHINE_CONFIG_START( polepos, driver_device )
+static MACHINE_CONFIG_START( polepos, polepos_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)	/* 3.072 MHz */
@@ -950,7 +946,7 @@ static const namco_51xx_interface namco_51xx_bl_intf =
 };
 
 
-static MACHINE_CONFIG_START( topracern, driver_device )
+static MACHINE_CONFIG_START( topracern, polepos_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)	/* 3.072 MHz */

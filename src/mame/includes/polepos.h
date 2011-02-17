@@ -8,6 +8,33 @@
 #include "sound/discrete.h"
 
 
+class polepos_state : public driver_device
+{
+public:
+	polepos_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 steer_last;
+	UINT8 steer_delta;
+	INT16 steer_accum;
+	INT16 last_result;
+	INT8 last_signed;
+	UINT8 last_unsigned;
+	int adc_input;
+	int auto_start_mask;
+	UINT16 *view16_memory;
+	UINT16 *road16_memory;
+	UINT16 *alpha16_memory;
+	UINT16 *sprite16_memory;
+	UINT16 vertical_position_modifier[256];
+	UINT16 road16_vscroll;
+	tilemap_t *bg_tilemap;
+	tilemap_t *tx_tilemap;
+	int chacl;
+	UINT16 scroll;
+};
+
+
 /*----------- defined in audio/polepos.c -----------*/
 
 DECLARE_LEGACY_SOUND_DEVICE(POLEPOS, polepos_sound);
@@ -19,11 +46,6 @@ DISCRETE_SOUND_EXTERN( polepos );
 
 
 /*----------- defined in video/polepos.c -----------*/
-
-extern UINT16 *polepos_view16_memory;
-extern UINT16 *polepos_road16_memory;
-extern UINT16 *polepos_alpha16_memory;
-extern UINT16 *polepos_sprite16_memory;
 
 VIDEO_START( polepos );
 PALETTE_INIT( polepos );

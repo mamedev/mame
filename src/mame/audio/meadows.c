@@ -13,12 +13,6 @@
 #include "sound/dac.h"
 
 
-UINT8 meadows_0c00 = 0;
-UINT8 meadows_0c01 = 0;
-UINT8 meadows_0c02 = 0;
-UINT8 meadows_0c03 = 0;
-static UINT8 meadows_dac  = 0;
-static int dac_enable;
 
 #define BASE_CLOCK		5000000
 #define BASE_CTR1       (BASE_CLOCK / 256)
@@ -29,30 +23,25 @@ static int dac_enable;
 #define ENABLE_DAC      0x04
 #define ENABLE_CTR1     0x08
 
-static	int channel;
-static	int freq1;
-static	int freq2;
 static const INT16 waveform[2] = { -120*256, 120*256 };
-static  UINT8 latched_0c01 = 0;
-static	UINT8 latched_0c02 = 0;
-static	UINT8 latched_0c03 = 0;
 
 /************************************/
 /* Sound handler start              */
 /************************************/
 SAMPLES_START( meadows_sh_start )
 {
-	meadows_0c00 = meadows_0c01 = meadows_0c02 = meadows_0c03 = 0;
-	meadows_dac = 0;
-	dac_enable = 0;
-	channel = 0;
-	freq1 = freq2 = 1000;
-	latched_0c01 = latched_0c02 = latched_0c03 = 0;
+	meadows_state *state = device->machine->driver_data<meadows_state>();
+	state->_0c00 = state->_0c01 = state->_0c02 = state->_0c03 = 0;
+	state->dac = 0;
+	state->dac_enable = 0;
+	state->channel = 0;
+	state->freq1 = state->freq2 = 1000;
+	state->latched_0c01 = state->latched_0c02 = state->latched_0c03 = 0;
 
 	sample_set_volume(device,0,0);
-	sample_start_raw(device,0,waveform,ARRAY_LENGTH(waveform),freq1,1);
+	sample_start_raw(device,0,waveform,ARRAY_LENGTH(waveform),state->freq1,1);
 	sample_set_volume(device,1,0);
-	sample_start_raw(device,1,waveform,ARRAY_LENGTH(waveform),freq2,1);
+	sample_start_raw(device,1,waveform,ARRAY_LENGTH(waveform),state->freq2,1);
 }
 
 /************************************/
@@ -60,58 +49,59 @@ SAMPLES_START( meadows_sh_start )
 /************************************/
 void meadows_sh_update(running_machine *machine)
 {
+	meadows_state *state = machine->driver_data<meadows_state>();
 	device_t *samples = machine->device("samples");
 	int preset, amp;
 
-	if (latched_0c01 != meadows_0c01 || latched_0c03 != meadows_0c03)
+	if (state->latched_0c01 != state->_0c01 || state->latched_0c03 != state->_0c03)
 	{
 		/* amplitude is a combination of the upper 4 bits of 0c01 */
 		/* and bit 4 merged from S2650's flag output */
-		amp = ((meadows_0c03 & ENABLE_CTR1) == 0) ? 0 : (meadows_0c01 & 0xf0) >> 1;
+		amp = ((state->_0c03 & ENABLE_CTR1) == 0) ? 0 : (state->_0c01 & 0xf0) >> 1;
 		if( cpu_get_reg(machine->device("maincpu"), S2650_FO) )
 			amp += 0x80;
 		/* calculate frequency for counter #1 */
 		/* bit 0..3 of 0c01 are ctr preset */
-		preset = (meadows_0c01 & 15) ^ 15;
+		preset = (state->_0c01 & 15) ^ 15;
 		if (preset)
-			freq1 = BASE_CTR1 / (preset + 1);
+			state->freq1 = BASE_CTR1 / (preset + 1);
 		else amp = 0;
-		logerror("meadows ctr1 channel #%d preset:%3d freq:%5d amp:%d\n", channel, preset, freq1, amp);
-		sample_set_freq(samples, 0, freq1 * sizeof(waveform)/2);
+		logerror("meadows ctr1 channel #%d preset:%3d freq:%5d amp:%d\n", state->channel, preset, state->freq1, amp);
+		sample_set_freq(samples, 0, state->freq1 * sizeof(waveform)/2);
 		sample_set_volume(samples, 0,amp/255.0);
 	}
 
-	if (latched_0c02 != meadows_0c02 || latched_0c03 != meadows_0c03)
+	if (state->latched_0c02 != state->_0c02 || state->latched_0c03 != state->_0c03)
 	{
 		/* calculate frequency for counter #2 */
 		/* 0c02 is ctr preset, 0c03 bit 0 enables division by 2 */
-		amp = ((meadows_0c03 & ENABLE_CTR2) != 0) ? 0xa0 : 0;
-		preset = meadows_0c02 ^ 0xff;
+		amp = ((state->_0c03 & ENABLE_CTR2) != 0) ? 0xa0 : 0;
+		preset = state->_0c02 ^ 0xff;
 		if (preset)
 		{
-			freq2 = BASE_CTR2 / (preset + 1) / 2;
-			if ((meadows_0c03 & DIV2OR4_CTR2) == 0)
-				freq2 >>= 1;
+			state->freq2 = BASE_CTR2 / (preset + 1) / 2;
+			if ((state->_0c03 & DIV2OR4_CTR2) == 0)
+				state->freq2 >>= 1;
 		}
 		else amp = 0;
-		logerror("meadows ctr2 channel #%d preset:%3d freq:%5d amp:%d\n", channel+1, preset, freq2, amp);
-		sample_set_freq(samples, 1, freq2 * sizeof(waveform));
+		logerror("meadows ctr2 channel #%d preset:%3d freq:%5d amp:%d\n", state->channel+1, preset, state->freq2, amp);
+		sample_set_freq(samples, 1, state->freq2 * sizeof(waveform));
 		sample_set_volume(samples, 1,amp/255.0);
 	}
 
-	if (latched_0c03 != meadows_0c03)
+	if (state->latched_0c03 != state->_0c03)
 	{
-		dac_enable = meadows_0c03 & ENABLE_DAC;
+		state->dac_enable = state->_0c03 & ENABLE_DAC;
 
-		if (dac_enable)
-			dac_data_w(machine->device("dac"), meadows_dac);
+		if (state->dac_enable)
+			dac_data_w(machine->device("dac"), state->dac);
 		else
 			dac_data_w(machine->device("dac"), 0);
 	}
 
-	latched_0c01 = meadows_0c01;
-	latched_0c02 = meadows_0c02;
-	latched_0c03 = meadows_0c03;
+	state->latched_0c01 = state->_0c01;
+	state->latched_0c02 = state->_0c02;
+	state->latched_0c03 = state->_0c03;
 }
 
 /************************************/
@@ -119,9 +109,10 @@ void meadows_sh_update(running_machine *machine)
 /************************************/
 void meadows_sh_dac_w(running_machine *machine, int data)
 {
-	meadows_dac = data;
-	if (dac_enable)
-		dac_data_w(machine->device("dac"), meadows_dac);
+	meadows_state *state = machine->driver_data<meadows_state>();
+	state->dac = data;
+	if (state->dac_enable)
+		dac_data_w(machine->device("dac"), state->dac);
 	else
 		dac_data_w(machine->device("dac"), 0);
 }

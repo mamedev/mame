@@ -691,6 +691,9 @@ MACHINE_CONFIG_FRAGMENT( dcs2_audio_dsio )
 	MCFG_CPU_DATA_MAP(dsio_data_map)
 	MCFG_CPU_IO_MAP(dsio_io_map)
 
+	MCFG_TIMER_ADD("dcs_reg_timer", dcs_irq)
+	MCFG_TIMER_ADD("dcs_int_timer", internal_timer_callback)
+
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("dac1", DMADAC, 0)
@@ -714,6 +717,9 @@ MACHINE_CONFIG_FRAGMENT( dcs2_audio_denver )
 	MCFG_CPU_PROGRAM_MAP(denver_program_map)
 	MCFG_CPU_DATA_MAP(denver_data_map)
 	MCFG_CPU_IO_MAP(denver_io_map)
+
+	MCFG_TIMER_ADD("dcs_reg_timer", dcs_irq)
+	MCFG_TIMER_ADD("dcs_int_timer", internal_timer_callback)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

@@ -79,6 +79,21 @@ Is there another alt program rom set labeled 9 & 10?
 #include "sound/okim6295.h"
 #include "video/kan_pand.h"
 
+
+class sandscrp_state : public driver_device
+{
+public:
+	sandscrp_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 sprite_irq;
+	UINT8 unknown_irq;
+	UINT8 vblank_irq;
+	UINT8 latch1_full;
+	UINT8 latch2_full;
+};
+
+
 static MACHINE_RESET( sandscrp )
 {
 	kaneko16_sprite_type  = 0;
@@ -95,15 +110,13 @@ static MACHINE_RESET( sandscrp )
 
 /* Sand Scorpion */
 
-static UINT8 sprite_irq;
-static UINT8 unknown_irq;
-static UINT8 vblank_irq;
 
 
 /* Update the IRQ state based on all possible causes */
 static void update_irq_state(running_machine *machine)
 {
-	if (vblank_irq || sprite_irq || unknown_irq)
+	sandscrp_state *state = machine->driver_data<sandscrp_state>();
+	if (state->vblank_irq || state->sprite_irq || state->unknown_irq)
 		cputag_set_input_line(machine, "maincpu", 1, ASSERT_LINE);
 	else
 		cputag_set_input_line(machine, "maincpu", 1, CLEAR_LINE);
@@ -114,15 +127,17 @@ static void update_irq_state(running_machine *machine)
 /* Called once/frame to generate the VBLANK interrupt */
 static INTERRUPT_GEN( sandscrp_interrupt )
 {
-	vblank_irq = 1;
+	sandscrp_state *state = device->machine->driver_data<sandscrp_state>();
+	state->vblank_irq = 1;
 	update_irq_state(device->machine);
 }
 
 
 static VIDEO_EOF( sandscrp )
 {
+	sandscrp_state *state = machine->driver_data<sandscrp_state>();
 	device_t *pandora = machine->device("pandora");
-	sprite_irq = 1;
+	state->sprite_irq = 1;
 	update_irq_state(machine);
 	pandora_eof(pandora);
 }
@@ -130,23 +145,25 @@ static VIDEO_EOF( sandscrp )
 /* Reads the cause of the interrupt */
 static READ16_HANDLER( sandscrp_irq_cause_r )
 {
-	return	( sprite_irq  ?  0x08  : 0 ) |
-			( unknown_irq ?  0x10  : 0 ) |
-			( vblank_irq  ?  0x20  : 0 ) ;
+	sandscrp_state *state = space->machine->driver_data<sandscrp_state>();
+	return	( state->sprite_irq  ?  0x08  : 0 ) |
+			( state->unknown_irq ?  0x10  : 0 ) |
+			( state->vblank_irq  ?  0x20  : 0 ) ;
 }
 
 
 /* Clear the cause of the interrupt */
 static WRITE16_HANDLER( sandscrp_irq_cause_w )
 {
+	sandscrp_state *state = space->machine->driver_data<sandscrp_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		kaneko16_sprite_flipx	=	data & 1;
 		kaneko16_sprite_flipy	=	data & 1;
 
-		if (data & 0x08)	sprite_irq  = 0;
-		if (data & 0x10)	unknown_irq = 0;
-		if (data & 0x20)	vblank_irq  = 0;
+		if (data & 0x08)	state->sprite_irq  = 0;
+		if (data & 0x10)	state->unknown_irq = 0;
+		if (data & 0x20)	state->vblank_irq  = 0;
 	}
 
 	update_irq_state(space->machine);
@@ -167,35 +184,37 @@ static WRITE16_HANDLER( sandscrp_coin_counter_w )
 	}
 }
 
-static UINT8 latch1_full;
-static UINT8 latch2_full;
 
 static READ16_HANDLER( sandscrp_latchstatus_word_r )
 {
-	return	(latch1_full ? 0x80 : 0) |
-			(latch2_full ? 0x40 : 0) ;
+	sandscrp_state *state = space->machine->driver_data<sandscrp_state>();
+	return	(state->latch1_full ? 0x80 : 0) |
+			(state->latch2_full ? 0x40 : 0) ;
 }
 
 static WRITE16_HANDLER( sandscrp_latchstatus_word_w )
 {
+	sandscrp_state *state = space->machine->driver_data<sandscrp_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		latch1_full = data & 0x80;
-		latch2_full = data & 0x40;
+		state->latch1_full = data & 0x80;
+		state->latch2_full = data & 0x40;
 	}
 }
 
 static READ16_HANDLER( sandscrp_soundlatch_word_r )
 {
-	latch2_full = 0;
+	sandscrp_state *state = space->machine->driver_data<sandscrp_state>();
+	state->latch2_full = 0;
 	return soundlatch2_r(space,0);
 }
 
 static WRITE16_HANDLER( sandscrp_soundlatch_word_w )
 {
+	sandscrp_state *state = space->machine->driver_data<sandscrp_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		latch1_full = 1;
+		state->latch1_full = 1;
 		soundlatch_w(space, 0, data & 0xff);
 		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 		cpu_spinuntil_time(space->cpu, attotime::from_usec(100));	// Allow the other cpu to reply
@@ -247,19 +266,22 @@ static WRITE8_HANDLER( sandscrp_bankswitch_w )
 
 static READ8_HANDLER( sandscrp_latchstatus_r )
 {
-	return	(latch2_full ? 0x80 : 0) |	// swapped!?
-			(latch1_full ? 0x40 : 0) ;
+	sandscrp_state *state = space->machine->driver_data<sandscrp_state>();
+	return	(state->latch2_full ? 0x80 : 0) |	// swapped!?
+			(state->latch1_full ? 0x40 : 0) ;
 }
 
 static READ8_HANDLER( sandscrp_soundlatch_r )
 {
-	latch1_full = 0;
+	sandscrp_state *state = space->machine->driver_data<sandscrp_state>();
+	state->latch1_full = 0;
 	return soundlatch_r(space,0);
 }
 
 static WRITE8_HANDLER( sandscrp_soundlatch_w )
 {
-	latch2_full = 1;
+	sandscrp_state *state = space->machine->driver_data<sandscrp_state>();
+	state->latch2_full = 1;
 	soundlatch2_w(space,0,data);
 }
 
@@ -438,7 +460,7 @@ static const kaneko_pandora_interface sandscrp_pandora_config =
 	0, 0	/* x_offs, y_offs */
 };
 
-static MACHINE_CONFIG_START( sandscrp, driver_device )
+static MACHINE_CONFIG_START( sandscrp, sandscrp_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,12000000)	/* TMP68HC000N-12 */

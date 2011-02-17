@@ -27,33 +27,33 @@
 #include "machine/nvram.h"
 
 
-/*************************************
- *
- *  Globals
- *
- *************************************/
+enum state { IDLE, START, DATA, STOP1, STOP2 };
 
-static UINT8 palette[16][3];
-static int pal_addr;
-static int pal_idx;
+class jpmsys5_state : public driver_device
+{
+public:
+	jpmsys5_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-static enum state { IDLE, START, DATA, STOP1, STOP2 } touch_state;
-static emu_timer *touch_timer;
-static int touch_data_count;
-static int touch_data[3];
-static int touch_shift_cnt;
+	UINT8 palette[16][3];
+	int pal_addr;
+	int pal_idx;
+	int touch_state;
+	emu_timer *touch_timer;
+	int touch_data_count;
+	int touch_data[3];
+	int touch_shift_cnt;
+	UINT8 a0_acia_dcd;
+	UINT8 a0_data_out;
+	UINT8 a0_data_in;
+	UINT8 a1_acia_dcd;
+	UINT8 a1_data_out;
+	UINT8 a1_data_in;
+	UINT8 a2_acia_dcd;
+	UINT8 a2_data_out;
+	UINT8 a2_data_in;
+};
 
-static UINT8 a0_acia_dcd;
-static UINT8 a0_data_out;
-static UINT8 a0_data_in;
-
-static UINT8 a1_acia_dcd;
-static UINT8 a1_data_out;
-static UINT8 a1_data_in;
-
-static UINT8 a2_acia_dcd;
-static UINT8 a2_data_out;
-static UINT8 a2_data_in;
 
 
 /*************************************
@@ -144,21 +144,22 @@ static READ16_HANDLER( sys5_tms34061_r )
 
 static WRITE16_HANDLER( ramdac_w )
 {
+	jpmsys5_state *state = space->machine->driver_data<jpmsys5_state>();
 	if (offset == 0)
 	{
-		pal_addr = data;
-		pal_idx = 0;
+		state->pal_addr = data;
+		state->pal_idx = 0;
 	}
 	else if (offset == 1)
 	{
-		palette[pal_addr][pal_idx] = data;
+		state->palette[state->pal_addr][state->pal_idx] = data;
 
-		if (++pal_idx == 3)
+		if (++state->pal_idx == 3)
 		{
-			/* Update the MAME palette */
-			palette_set_color_rgb(space->machine, pal_addr, pal6bit(palette[pal_addr][0]), pal6bit(palette[pal_addr][1]), pal6bit(palette[pal_addr][2]));
-			pal_addr++;
-			pal_idx = 0;
+			/* Update the MAME state->palette */
+			palette_set_color_rgb(space->machine, state->pal_addr, pal6bit(state->palette[state->pal_addr][0]), pal6bit(state->palette[state->pal_addr][1]), pal6bit(state->palette[state->pal_addr][2]));
+			state->pal_addr++;
+			state->pal_idx = 0;
 		}
 	}
 	else
@@ -317,7 +318,8 @@ ADDRESS_MAP_END
 /* Serial bit transmission callback */
 static TIMER_CALLBACK( touch_cb )
 {
-	switch (touch_state)
+	jpmsys5_state *state = machine->driver_data<jpmsys5_state>();
+	switch (state->touch_state)
 	{
 		case IDLE:
 		{
@@ -325,38 +327,38 @@ static TIMER_CALLBACK( touch_cb )
 		}
 		case START:
 		{
-			touch_shift_cnt = 0;
-			a2_data_in = 0;
-			touch_state = DATA;
+			state->touch_shift_cnt = 0;
+			state->a2_data_in = 0;
+			state->touch_state = DATA;
 			break;
 		}
 		case DATA:
 		{
-			a2_data_in = (touch_data[touch_data_count] >> (touch_shift_cnt)) & 1;
+			state->a2_data_in = (state->touch_data[state->touch_data_count] >> (state->touch_shift_cnt)) & 1;
 
-			if (++touch_shift_cnt == 8)
-				touch_state = STOP1;
+			if (++state->touch_shift_cnt == 8)
+				state->touch_state = STOP1;
 
 			break;
 		}
 		case STOP1:
 		{
-			a2_data_in = 1;
-			touch_state = STOP2;
+			state->a2_data_in = 1;
+			state->touch_state = STOP2;
 			break;
 		}
 		case STOP2:
 		{
-			a2_data_in = 1;
+			state->a2_data_in = 1;
 
-			if (++touch_data_count == 3)
+			if (++state->touch_data_count == 3)
 			{
-				touch_timer->reset();
-				touch_state = IDLE;
+				state->touch_timer->reset();
+				state->touch_state = IDLE;
 			}
 			else
 			{
-				touch_state = START;
+				state->touch_state = START;
 			}
 
 			break;
@@ -366,19 +368,20 @@ static TIMER_CALLBACK( touch_cb )
 
 static INPUT_CHANGED( touchscreen_press )
 {
+	jpmsys5_state *state = field->port->machine->driver_data<jpmsys5_state>();
 	if (newval == 0)
 	{
 		attotime rx_period = attotime::from_hz(10000) * 16;
 
 		/* Each touch screen packet is 3 bytes */
-		touch_data[0] = 0x2a;
-		touch_data[1] = 0x7 - (input_port_read(field->port->machine, "TOUCH_Y") >> 5) + 0x30;
-		touch_data[2] = (input_port_read(field->port->machine, "TOUCH_X") >> 5) + 0x30;
+		state->touch_data[0] = 0x2a;
+		state->touch_data[1] = 0x7 - (input_port_read(field->port->machine, "TOUCH_Y") >> 5) + 0x30;
+		state->touch_data[2] = (input_port_read(field->port->machine, "TOUCH_X") >> 5) + 0x30;
 
 		/* Start sending the data to the 68000 serially */
-		touch_data_count = 0;
-		touch_state = START;
-		touch_timer->adjust(rx_period, 0, rx_period);
+		state->touch_data_count = 0;
+		state->touch_state = START;
+		state->touch_timer->adjust(rx_period, 0, rx_period);
 	}
 }
 
@@ -488,17 +491,20 @@ static WRITE_LINE_DEVICE_HANDLER( acia_irq )
 
 static READ_LINE_DEVICE_HANDLER( a0_rx_r )
 {
-	return a0_data_in;
+	jpmsys5_state *state = device->machine->driver_data<jpmsys5_state>();
+	return state->a0_data_in;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( a0_tx_w )
 {
-	a0_data_out = state;
+	jpmsys5_state *drvstate = device->machine->driver_data<jpmsys5_state>();
+	drvstate->a0_data_out = state;
 }
 
 static READ_LINE_DEVICE_HANDLER( a0_dcd_r )
 {
-	return a0_acia_dcd;
+	jpmsys5_state *state = device->machine->driver_data<jpmsys5_state>();
+	return state->a0_acia_dcd;
 }
 
 static ACIA6850_INTERFACE( acia0_if )
@@ -515,55 +521,61 @@ static ACIA6850_INTERFACE( acia0_if )
 
 static READ_LINE_DEVICE_HANDLER( a1_rx_r )
 {
-	return a1_data_in;
+	jpmsys5_state *state = device->machine->driver_data<jpmsys5_state>();
+	return state->a1_data_in;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( a1_tx_w )
 {
-	a1_data_out = state;
+	jpmsys5_state *drvstate = device->machine->driver_data<jpmsys5_state>();
+	drvstate->a1_data_out = state;
 }
 
 static READ_LINE_DEVICE_HANDLER( a1_dcd_r )
 {
-	return a1_acia_dcd;
+	jpmsys5_state *state = device->machine->driver_data<jpmsys5_state>();
+	return state->a1_acia_dcd;
 }
 
 static ACIA6850_INTERFACE( acia1_if )
 {
 	10000,
 	10000,
-	DEVCB_LINE(a1_rx_r), /*&a1_data_in,*/
-	DEVCB_LINE(a1_tx_w), /*&a1_data_out,*/
+	DEVCB_LINE(a1_rx_r), /*&state->a1_data_in,*/
+	DEVCB_LINE(a1_tx_w), /*&state->a1_data_out,*/
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(a1_dcd_r), /*&a1_acia_dcd,*/
+	DEVCB_LINE(a1_dcd_r), /*&state->a1_acia_dcd,*/
 	DEVCB_LINE(acia_irq)
 };
 
 static READ_LINE_DEVICE_HANDLER( a2_rx_r )
 {
-	return a2_data_in;
+	jpmsys5_state *state = device->machine->driver_data<jpmsys5_state>();
+	return state->a2_data_in;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( a2_tx_w )
 {
-	a2_data_out = state;
+	jpmsys5_state *drvstate = device->machine->driver_data<jpmsys5_state>();
+	drvstate->a2_data_out = state;
 }
 
 static READ_LINE_DEVICE_HANDLER( a2_dcd_r )
 {
-	return a2_acia_dcd;
+	jpmsys5_state *state = device->machine->driver_data<jpmsys5_state>();
+	return state->a2_acia_dcd;
 }
 
 static ACIA6850_INTERFACE( acia2_if )
 {
 	10000,
 	10000,
-	DEVCB_LINE(a2_rx_r), /*&a2_data_in,*/
-	DEVCB_LINE(a2_tx_w), /*&a2_data_out,*/
+	DEVCB_LINE(a2_rx_r), /*&state->a2_data_in,*/
+	DEVCB_LINE(a2_tx_w), /*&state->a2_data_out,*/
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(a2_dcd_r), /*&a2_acia_dcd,*/
+	DEVCB_LINE(a2_dcd_r), /*&state->a2_acia_dcd,*/
 	DEVCB_LINE(acia_irq)
 };
 
@@ -576,16 +588,18 @@ static ACIA6850_INTERFACE( acia2_if )
 
 static MACHINE_START( jpmsys5v )
 {
+	jpmsys5_state *state = machine->driver_data<jpmsys5_state>();
 	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base());
-	touch_timer = machine->scheduler().timer_alloc(FUNC(touch_cb));
+	state->touch_timer = machine->scheduler().timer_alloc(FUNC(touch_cb));
 }
 
 static MACHINE_RESET( jpmsys5v )
 {
-	touch_timer->reset();
-	touch_state = IDLE;
-	a2_data_in = 1;
-	a2_acia_dcd = 0;
+	jpmsys5_state *state = machine->driver_data<jpmsys5_state>();
+	state->touch_timer->reset();
+	state->touch_state = IDLE;
+	state->a2_data_in = 1;
+	state->a2_acia_dcd = 0;
 }
 
 
@@ -595,7 +609,7 @@ static MACHINE_RESET( jpmsys5v )
  *
  *************************************/
 
-static MACHINE_CONFIG_START( jpmsys5v, driver_device )
+static MACHINE_CONFIG_START( jpmsys5v, jpmsys5_state )
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(68000_map)
 

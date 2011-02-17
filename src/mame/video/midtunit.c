@@ -7,6 +7,7 @@
 #include "emu.h"
 #include "profiler.h"
 #include "cpu/tms34010/tms34010.h"
+#include "includes/midyunit.h"
 #include "includes/midtunit.h"
 
 

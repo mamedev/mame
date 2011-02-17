@@ -218,10 +218,10 @@ VIDEO_UPDATE( tsamurai )
 
 	/*
         This following isn't particularly efficient.  We'd be better off to
-        dynamically change every 8th palette to the state->background color, so we
-        could draw the state->background as an opaque tilemap.
+        dynamically change every 8th palette to the background color, so we
+        could draw the background as an opaque tilemap.
 
-        Note that the state->background color register isn't well understood
+        Note that the background color register isn't well understood
         (screenshots would be helpful)
     */
 	bitmap_fill(bitmap,cliprect,state->bgcolor);

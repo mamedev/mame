@@ -24,20 +24,18 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	tilemap_t *bg_tilemap;
+	UINT8 sound_flag;
+	UINT8 tile_bank;
 };
 
-
-static tilemap_t *bg_tilemap;
-static UINT8 sound_flag;
-static UINT8 tile_bank = 0;
-//static UINT8 player_mux = 0;
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	wink_state *state = machine->driver_data<wink_state>();
 	UINT8 *videoram = state->videoram;
 	int code = videoram[tile_index];
-	code |= 0x200 * tile_bank;
+	code |= 0x200 * state->tile_bank;
 
 	// the 2 parts of the screen use different tile banking
 	if(tile_index < 0x360)
@@ -50,12 +48,14 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( wink )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	wink_state *state = machine->driver_data<wink_state>();
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static VIDEO_UPDATE( wink )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	wink_state *state = screen->machine->driver_data<wink_state>();
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
 }
 
@@ -64,7 +64,7 @@ static WRITE8_HANDLER( bgram_w )
 	wink_state *state = space->machine->driver_data<wink_state>();
 	UINT8 *videoram = state->videoram;
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static WRITE8_HANDLER( player_mux_w )
@@ -75,8 +75,9 @@ static WRITE8_HANDLER( player_mux_w )
 
 static WRITE8_HANDLER( tile_banking_w )
 {
-	tile_bank = data & 1;
-	tilemap_mark_all_tiles_dirty(bg_tilemap);
+	wink_state *state = space->machine->driver_data<wink_state>();
+	state->tile_bank = data & 1;
+	tilemap_mark_all_tiles_dirty(state->bg_tilemap);
 }
 
 static WRITE8_HANDLER( wink_coin_counter_w )
@@ -303,7 +304,8 @@ GFXDECODE_END
 
 static READ8_DEVICE_HANDLER( sound_r )
 {
-	return sound_flag;
+	wink_state *state = device->machine->driver_data<wink_state>();
+	return state->sound_flag;
 }
 
 static const ay8910_interface ay8912_interface =
@@ -319,12 +321,14 @@ static const ay8910_interface ay8912_interface =
 //AY portA is fed by an input clock at 15625 Hz
 static INTERRUPT_GEN( wink_sound )
 {
-	sound_flag ^= 0x80;
+	wink_state *state = device->machine->driver_data<wink_state>();
+	state->sound_flag ^= 0x80;
 }
 
 static MACHINE_RESET( wink )
 {
-	sound_flag = 0;
+	wink_state *state = machine->driver_data<wink_state>();
+	state->sound_flag = 0;
 }
 
 static MACHINE_CONFIG_START( wink, wink_state )

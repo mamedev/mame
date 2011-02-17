@@ -9,8 +9,6 @@ Taito Super Speed Race driver
 #include "sspeedr.lh"
 #include "includes/sspeedr.h"
 
-static UINT8 led_TIME[2];
-static UINT8 led_SCORE[24];
 
 
 static PALETTE_INIT( sspeedr )
@@ -55,19 +53,21 @@ static const UINT8 ls48_map[16] =
 
 static WRITE8_HANDLER( sspeedr_time_w )
 {
+	sspeedr_state *state = space->machine->driver_data<sspeedr_state>();
 	data = data & 15;
 	output_set_digit_value(0x18 + offset, ls48_map[data]);
-	led_TIME[offset] = data;
+	state->led_TIME[offset] = data;
 }
 
 
 static WRITE8_HANDLER( sspeedr_score_w )
 {
+	sspeedr_state *state = space->machine->driver_data<sspeedr_state>();
 	char buf[20];
 	sprintf(buf, "LED%02d", offset);
 	data = ~data & 15;
 	output_set_digit_value(offset, ls48_map[data]);
-	led_SCORE[offset] = data;
+	state->led_SCORE[offset] = data;
 }
 
 
@@ -186,7 +186,7 @@ static GFXDECODE_START( sspeedr )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( sspeedr, driver_device )
+static MACHINE_CONFIG_START( sspeedr, sspeedr_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_19_968MHz/8)
