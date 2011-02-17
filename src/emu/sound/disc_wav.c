@@ -131,7 +131,7 @@ DISCRETE_STEP(dss_counter)
 		else
 		{
 			count -= inc;
-			while (count < m_min)
+			while (count < m_min || count > (0xffffffff - inc))
 			{
 				count += m_diff;
 			}
