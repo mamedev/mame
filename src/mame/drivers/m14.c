@@ -14,7 +14,8 @@ TODO:
 - Inputs are grossly mapped;
 
 Notes:
-- If you call a ron but you don't have the right hand you'll automatically lose the match;
+- Unlike most Arcade games, if you call a ron but you don't have a legit hand you'll automatically
+  lose the match. This is commonly named chombo in rii'chi mahjong rules;
 - If you make the timer to run out, you'll lose the turn but you don't get any visible message
   (presumably signaled by a sound effect);
 - As you could expect, the cpu hands are actually pre-determined, so you actually play alone
