@@ -108,12 +108,11 @@ DISCRETE_RESET(dst_comp_adder)
 
 	int i, bit;
 	int bit_length = info->length;
-	int length = 1 << bit_length;
 
-	assert(length <= 256);
+	assert(bit_length <= 8);
 
 	/* pre-calculate all possible values to speed up step routine */
-	for(i = 0; i < length; i++)
+	for(i = 0; i < 256; i++)
 	{
 		switch (info->type)
 		{
