@@ -2307,8 +2307,8 @@ static MACHINE_CONFIG_DERIVED( sfx, galaxian_base )
 	MCFG_PPI8255_ADD( "ppi8255_1", konami_ppi8255_1_intf )
 	MCFG_PPI8255_ADD( "ppi8255_2", sfx_ppi8255_2_intf )
 
-	/* port on 1st 8910 is used for communication */
-	MCFG_SOUND_MODIFY("8910.0")
+	/* port on 2nd 8910 is used for communication */
+	MCFG_SOUND_MODIFY("8910.1")
 	MCFG_SOUND_CONFIG(sfx_ay8910_interface)
 
 	/* DAC for the sample player */
