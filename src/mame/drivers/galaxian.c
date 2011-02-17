@@ -818,13 +818,13 @@ static WRITE8_DEVICE_HANDLER( sfx_sample_control_w )
 	/* the inverse of bit 0 clocks the flip flop to signal an INT */
 	/* it is automatically cleared on the acknowledge */
 	if ((old & 0x01) && !(data & 0x01))
-		cputag_set_input_line(device->machine, "audiocpu", 0, HOLD_LINE);
+		cputag_set_input_line(device->machine, "audio2", 0, HOLD_LINE);
 }
 
 
 static const ppi8255_interface sfx_ppi8255_2_intf =
 {
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, soundlatch2_r),	/* Port A read */
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, soundlatch2_r),/* Port A read */
 	DEVCB_NULL,												/* Port B read */
 	DEVCB_NULL,												/* Port C read */
 	DEVCB_NULL,												/* Port A write */
