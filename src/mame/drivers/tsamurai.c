@@ -1218,7 +1218,7 @@ GAME( 1984, ringfgt2, vsgongf,  vsgongf,  vsgongf,  0, ROT90, "Kaneko (Taito lic
 
 GAME( 1985, tsamurai, 0,        tsamurai, tsamurai, 0, ROT90, "Kaneko / Taito", "Samurai Nihon-ichi (set 1)", 0 )
 GAME( 1985, tsamurai2,tsamurai, tsamurai, tsamurai, 0, ROT90, "Kaneko / Taito", "Samurai Nihon-ichi (set 2)", 0 )
-GAME( 1985, tsamuraih,tsamurai, tsamurai, tsamurai, 0, ROT90, "Kaneko / Taito", "Samurai Nihon-ichi (set 3, harder)", 0 )
+GAME( 1985, tsamuraih,tsamurai, tsamurai, tsamurai, 0, ROT90, "bootleg", "Samurai Nihon-ichi (bootleg, harder)", 0 )
 
 GAME( 1985, ladymstr, 0,		tsamurai, tsamurai, 0, ROT90, "Kaneko / Taito", "Lady Master of Kung Fu", 0 )
 GAME( 1985, nunchaku, ladymstr, tsamurai, nunchaku, 0, ROT90, "Kaneko / Taito", "Nunchackun", GAME_IMPERFECT_COLORS )
