@@ -254,9 +254,6 @@ Logic:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/tms34010/tms34010.h"
-#include "cpu/dsp32/dsp32.h"
 #include "audio/cage.h"
 #include "includes/metalmx.h"
 

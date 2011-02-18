@@ -31,6 +31,7 @@ To Do:
 ***************************************************************************/
 
 #include "emu.h"
+#include "machine/ms32crpt.h"
 #include "includes/tetrisp2.h"
 
 
@@ -251,8 +252,6 @@ WRITE16_HANDLER( rocknms_sub_vram_rot_w )
 }
 
 
-
-extern void ms32_rearrange_sprites(running_machine *machine, const char *region);
 
 VIDEO_START( tetrisp2 )
 {

@@ -6,7 +6,6 @@
 
 #include "emu.h"
 #include "includes/eprom.h"
-#include "includes/thunderj.h"
 
 
 /*************************************
@@ -378,7 +377,7 @@ VIDEO_UPDATE( eprom )
 					{
 						/* if bit 2 is set, start setting high palette bits */
 						if (mo[x] & 2)
-							thunderj_mark_high_palette(bitmap, pf, mo, x, y);
+							atarimo_mark_high_palette(bitmap, pf, mo, x, y);
 					}
 
 					/* erase behind ourselves */
@@ -452,7 +451,7 @@ VIDEO_UPDATE( guts )
 					{
 						/* if bit 2 is set, start setting high palette bits */
 						if (mo[x] & 2)
-							thunderj_mark_high_palette(bitmap, pf, mo, x, y);
+							atarimo_mark_high_palette(bitmap, pf, mo, x, y);
 					}
 
 					/* erase behind ourselves */

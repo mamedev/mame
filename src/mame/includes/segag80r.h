@@ -4,6 +4,8 @@
 
 *************************************************************************/
 
+#include "machine/segag80.h"
+
 class segag80r_state : public driver_device
 {
 public:
@@ -11,14 +13,8 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	segag80_decrypt_func decrypt;
 };
-
-
-/*----------- defined in machine/segag80.c -----------*/
-
-extern UINT8 (*sega_decrypt)(offs_t, UINT8);
-
-void sega_security(int chip);
 
 
 /*----------- defined in audio/segag80r.c -----------*/

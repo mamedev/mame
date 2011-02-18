@@ -7,6 +7,51 @@
 #define RA_BGCHAR_BASE	4
 #define RA_SP_BASE	5
 
+/***************************************************************************
+
+  Convert the color PROMs into a more useable format.
+
+  Stinger has three 256x4 palette PROMs (one per gun).
+  The palette PROMs are connected to the RGB output this way:
+
+  bit 3 -- 100 ohm resistor  -- RED/GREEN/BLUE
+        -- 220 ohm resistor  -- RED/GREEN/BLUE
+        -- 470 ohm resistor  -- RED/GREEN/BLUE
+  bit 0 -- 1  kohm resistor  -- RED/GREEN/BLUE
+
+***************************************************************************/
+PALETTE_INIT( rollrace )
+{
+	int i;
+
+
+	for (i = 0;i < machine->total_colors();i++)
+	{
+		int bit0,bit1,bit2,bit3,r,g,b;
+
+
+		bit0 = (color_prom[0] >> 0) & 0x01;
+		bit1 = (color_prom[0] >> 1) & 0x01;
+		bit2 = (color_prom[0] >> 2) & 0x01;
+		bit3 = (color_prom[0] >> 3) & 0x01;
+		r = 0x0e * bit0 + 0x1f * bit1 + 0x42 * bit2 + 0x90 * bit3;
+		bit0 = (color_prom[machine->total_colors()] >> 0) & 0x01;
+		bit1 = (color_prom[machine->total_colors()] >> 1) & 0x01;
+		bit2 = (color_prom[machine->total_colors()] >> 2) & 0x01;
+		bit3 = (color_prom[machine->total_colors()] >> 3) & 0x01;
+		g = 0x0e * bit0 + 0x1f * bit1 + 0x42 * bit2 + 0x90 * bit3;
+		bit0 = (color_prom[2*machine->total_colors()] >> 0) & 0x01;
+		bit1 = (color_prom[2*machine->total_colors()] >> 1) & 0x01;
+		bit2 = (color_prom[2*machine->total_colors()] >> 2) & 0x01;
+		bit3 = (color_prom[2*machine->total_colors()] >> 3) & 0x01;
+		b = 0x0e * bit0 + 0x1f * bit1 + 0x42 * bit2 + 0x90 * bit3;
+
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+
+		color_prom++;
+	}
+}
+
 WRITE8_HANDLER( rollrace_charbank_w)
 {
 	rollrace_state *state = space->machine->driver_data<rollrace_state>();

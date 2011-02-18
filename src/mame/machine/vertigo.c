@@ -5,10 +5,10 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "includes/vertigo.h"
-#include "includes/exidy440.h"
 #include "machine/74148.h"
 #include "machine/pit8253.h"
+#include "audio/exidy440.h"
+#include "includes/vertigo.h"
 
 
 /*************************************

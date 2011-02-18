@@ -757,6 +757,7 @@ $(MAMEOBJ)/jaleco.a: \
 	$(DRIVERS)/skyfox.o $(VIDEO)/skyfox.o \
 	$(DRIVERS)/stepstag.o \
 	$(DRIVERS)/tetrisp2.o $(VIDEO)/tetrisp2.o \
+	$(MACHINE)/ms32crpt.o \
 
 $(MAMEOBJ)/jpm.a: \
 	$(DRIVERS)/guab.o \
@@ -1321,11 +1322,11 @@ $(MAMEOBJ)/taito.a: \
 	$(DRIVERS)/msisaac.o $(VIDEO)/msisaac.o \
 	$(DRIVERS)/ninjaw.o $(VIDEO)/ninjaw.o \
 	$(DRIVERS)/nycaptor.o $(MACHINE)/nycaptor.o $(VIDEO)/nycaptor.o \
-	$(DRIVERS)/opwolf.o $(MACHINE)/opwolf.o \
+	$(DRIVERS)/opwolf.o $(MACHINE)/opwolf.o $(VIDEO)/opwolf.o \
 	$(DRIVERS)/othunder.o $(VIDEO)/othunder.o \
 	$(DRIVERS)/pitnrun.o $(MACHINE)/pitnrun.o $(VIDEO)/pitnrun.o \
 	$(DRIVERS)/qix.o $(MACHINE)/qix.o $(AUDIO)/qix.o $(VIDEO)/qix.o \
-	$(DRIVERS)/rainbow.o $(MACHINE)/rainbow.o \
+	$(DRIVERS)/rainbow.o $(MACHINE)/rainbow.o $(VIDEO)/rainbow.o \
 	$(DRIVERS)/rastan.o $(VIDEO)/rastan.o \
 	$(DRIVERS)/retofinv.o $(MACHINE)/retofinv.o $(VIDEO)/retofinv.o \
 	$(DRIVERS)/rollrace.o $(VIDEO)/rollrace.o \

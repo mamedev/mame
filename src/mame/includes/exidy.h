@@ -4,8 +4,6 @@
 
 *************************************************************************/
 
-#include "devlegcy.h"
-
 #define EXIDY_MASTER_CLOCK				(XTAL_11_289MHz)
 #define EXIDY_CPU_CLOCK					(EXIDY_MASTER_CLOCK / 16)
 #define EXIDY_PIXEL_CLOCK				(EXIDY_MASTER_CLOCK / 2)
@@ -19,27 +17,6 @@
 #define EXIDY_VBSTART					(0x100)
 #define EXIDY_VSEND						(0x108)
 #define EXIDY_VSSTART					(0x100)
-
-
-/*----------- defined in audio/exidy.c -----------*/
-
-DECLARE_LEGACY_SOUND_DEVICE(EXIDY, exidy_sound);
-DECLARE_LEGACY_SOUND_DEVICE(EXIDY_VENTURE, venture_sound);
-DECLARE_LEGACY_SOUND_DEVICE(EXIDY_VICTORY, victory_sound);
-
-READ8_DEVICE_HANDLER( exidy_sh6840_r );
-WRITE8_DEVICE_HANDLER( exidy_sh6840_w );
-WRITE8_DEVICE_HANDLER( exidy_sfxctrl_w );
-
-MACHINE_CONFIG_EXTERN( venture_audio );
-
-MACHINE_CONFIG_EXTERN( mtrap_cvsd_audio );
-
-MACHINE_CONFIG_EXTERN( victory_audio );
-READ8_DEVICE_HANDLER( victory_sound_response_r );
-READ8_DEVICE_HANDLER( victory_sound_status_r );
-WRITE8_DEVICE_HANDLER( victory_sound_command_w );
-
 
 
 /*----------- defined in video/exidy.c -----------*/

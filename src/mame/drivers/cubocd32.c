@@ -326,10 +326,9 @@ routines :
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/cdda.h"
-#include "includes/amiga.h"
-#include "includes/cubocd32.h"
 #include "machine/6526cia.h"
 #include "machine/i2cmem.h"
+#include "includes/cubocd32.h"
 
 
 /* set to 0 to use control panel with only buttons (as in quiz games) - joy is default in dispenser setup */

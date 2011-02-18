@@ -4,6 +4,7 @@
 
 *************************************************************************/
 
+#include "machine/segag80.h"
 
 class segag80v_state : public driver_device
 {
@@ -18,6 +19,7 @@ public:
 	UINT8 spinner_select;
 	UINT8 spinner_sign;
 	UINT8 spinner_count;
+	segag80_decrypt_func decrypt;
 	UINT8 *vectorram;
 	size_t vectorram_size;
 	int min_x;

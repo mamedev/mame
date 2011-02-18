@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/wiping.h"
+#include "audio/wiping.h"
 
 
 /* 8 voices max */

@@ -233,8 +233,9 @@ Who Dunnit           1988  6809
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
-#include "includes/exidy440.h"
 #include "machine/nvram.h"
+#include "audio/exidy440.h"
+#include "includes/exidy440.h"
 
 
 /* constants */

@@ -32,6 +32,7 @@ public:
 
 /*----------- defined in video/sslam.c -----------*/
 
+WRITE16_HANDLER( sslam_paletteram_w );
 WRITE16_HANDLER( sslam_tx_tileram_w );
 WRITE16_HANDLER( sslam_md_tileram_w );
 WRITE16_HANDLER( sslam_bg_tileram_w );

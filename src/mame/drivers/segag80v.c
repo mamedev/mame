@@ -137,7 +137,7 @@
 #include "sound/ay8910.h"
 #include "sound/samples.h"
 #include "audio/segasnd.h"
-#include "includes/segag80r.h"
+#include "machine/segag80.h"
 #include "includes/segag80v.h"
 
 
@@ -196,20 +196,30 @@ static MACHINE_RESET( g80v )
 
 static offs_t decrypt_offset(address_space *space, offs_t offset)
 {
+	segag80v_state *state = space->machine->driver_data<segag80v_state>();
+
 	/* ignore anything but accesses via opcode $32 (LD $(XXYY),A) */
 	offs_t pc = cpu_get_previouspc(space->cpu);
 	if ((UINT16)pc == 0xffff || space->read_byte(pc) != 0x32)
 		return offset;
 
 	/* fetch the low byte of the address and munge it */
-	return (offset & 0xff00) | (*sega_decrypt)(pc, space->read_byte(pc + 1));
+	return (offset & 0xff00) | (*state->decrypt)(pc, space->read_byte(pc + 1));
 }
 
-static WRITE8_HANDLER( mainram_w ) {
-	segag80v_state *state = space->machine->driver_data<segag80v_state>(); state->mainram[decrypt_offset(space, offset)] = data; }
+static WRITE8_HANDLER( mainram_w )
+{
+	segag80v_state *state = space->machine->driver_data<segag80v_state>();
+	state->mainram[decrypt_offset(space, offset)] = data;
+}
+
 static WRITE8_HANDLER( usb_ram_w ) { sega_usb_ram_w(space, decrypt_offset(space, offset), data); }
-static WRITE8_HANDLER( vectorram_w ) {
-	segag80v_state *state = space->machine->driver_data<segag80v_state>(); state->vectorram[decrypt_offset(space, offset)] = data; }
+
+static WRITE8_HANDLER( vectorram_w )
+{
+	segag80v_state *state = space->machine->driver_data<segag80v_state>();
+	state->vectorram[decrypt_offset(space, offset)] = data;
+}
 
 
 
@@ -1305,7 +1315,7 @@ static DRIVER_INIT( elim2 )
 	address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 
 	/* configure security */
-	sega_security(70);
+	state->decrypt = segag80_security(70);
 
 	/* configure sound */
 	state->has_usb = FALSE;
@@ -1320,7 +1330,7 @@ static DRIVER_INIT( elim4 )
 	address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 
 	/* configure security */
-	sega_security(76);
+	state->decrypt = segag80_security(76);
 
 	/* configure sound */
 	state->has_usb = FALSE;
@@ -1339,7 +1349,7 @@ static DRIVER_INIT( spacfury )
 	address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 
 	/* configure security */
-	sega_security(64);
+	state->decrypt = segag80_security(64);
 
 	/* configure sound */
 	state->has_usb = FALSE;
@@ -1357,7 +1367,7 @@ static DRIVER_INIT( zektor )
 	device_t *ay = machine->device("aysnd");
 
 	/* configure security */
-	sega_security(82);
+	state->decrypt = segag80_security(82);
 
 	/* configure sound */
 	state->has_usb = FALSE;
@@ -1380,7 +1390,7 @@ static DRIVER_INIT( tacscan )
 	address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 
 	/* configure security */
-	sega_security(76);
+	state->decrypt = segag80_security(76);
 
 	/* configure sound */
 	state->has_usb = TRUE;
@@ -1400,7 +1410,7 @@ static DRIVER_INIT( startrek )
 	address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 
 	/* configure security */
-	sega_security(64);
+	state->decrypt = segag80_security(64);
 
 	/* configure sound */
 	state->has_usb = TRUE;

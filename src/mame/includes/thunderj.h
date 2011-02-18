@@ -20,5 +20,3 @@ public:
 
 VIDEO_START( thunderj );
 VIDEO_UPDATE( thunderj );
-
-void thunderj_mark_high_palette(bitmap_t *bitmap, UINT16 *pf, UINT16 *mo, int x, int y);

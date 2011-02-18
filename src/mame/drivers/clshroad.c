@@ -19,7 +19,7 @@ XTAL        :   18.432 MHz
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "includes/wiping.h"
+#include "audio/wiping.h"
 #include "includes/clshroad.h"
 
 static MACHINE_RESET( clshroad )

@@ -20,6 +20,7 @@ public:
 
 /*----------- defined in video/rollrace.c -----------*/
 
+PALETTE_INIT( rollrace );
 VIDEO_UPDATE( rollrace );
 
 WRITE8_HANDLER( rollrace_charbank_w );

@@ -17,6 +17,7 @@ public:
 
 /*----------- defined in video/mainsnk.c -----------*/
 
+PALETTE_INIT(mainsnk);
 WRITE8_HANDLER(mainsnk_c600_w);
 WRITE8_HANDLER(mainsnk_fgram_w);
 WRITE8_HANDLER(mainsnk_bgram_w);

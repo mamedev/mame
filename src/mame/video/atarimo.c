@@ -1075,3 +1075,28 @@ WRITE16_HANDLER( atarimo_1_slipram_w )
 {
 	COMBINE_DATA(&atarimo_1_slipram[offset]);
 }
+
+
+/*---------------------------------------------------------------
+    atarimo_mark_high_palette: Mark high palette bits
+    starting at the given X,Y and continuing until a stop
+    or the end of line.
+---------------------------------------------------------------*/
+
+void atarimo_mark_high_palette(bitmap_t *bitmap, UINT16 *pf, UINT16 *mo, int x, int y)
+{
+	#define START_MARKER	((4 << ATARIMO_PRIORITY_SHIFT) | 2)
+	#define END_MARKER		((4 << ATARIMO_PRIORITY_SHIFT) | 4)
+	int offnext = 0;
+
+	for ( ; x < bitmap->width; x++)
+	{
+		pf[x] |= 0x400;
+		if (offnext && (mo[x] & START_MARKER) != START_MARKER)
+			break;
+		offnext = ((mo[x] & END_MARKER) == END_MARKER);
+	}
+}
+
+
+

@@ -1,11 +1,10 @@
 #include "emu.h"
-#include "includes/amiga.h"
 #include "cdrom.h"
 #include "coreutil.h"
 #include "sound/cdda.h"
 #include "machine/i2cmem.h"
-#include "includes/cubocd32.h"
 #include "imagedev/chd_cd.h"
+#include "includes/cubocd32.h"
 
 
 /*********************************************************************************

@@ -370,7 +370,6 @@ Stephh's notes (based on the games Z80 code and some tests) for other games :
 #include "sound/sn76496.h"
 #include "sound/dac.h"
 #include "sound/flt_rc.h"
-#include "includes/cclimber.h"
 #include "includes/galaxian.h"
 
 

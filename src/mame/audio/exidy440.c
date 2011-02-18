@@ -9,14 +9,14 @@
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
-#include "includes/exidy440.h"
+#include "audio/exidy440.h"
 
 
 #define	SOUND_LOG		0
 #define	FADE_TO_ZERO	1
 
 
-#define EXIDY440_AUDIO_CLOCK	(EXIDY440_MASTER_CLOCK / 4 / 4)
+#define EXIDY440_AUDIO_CLOCK	(XTAL_12_9792MHz / 16)
 #define EXIDY440_MC3418_CLOCK	(EXIDY440_AUDIO_CLOCK / 16)
 #define EXIDY440_MC3417_CLOCK	(EXIDY440_AUDIO_CLOCK / 32)
 
@@ -946,7 +946,7 @@ MACHINE_CONFIG_FRAGMENT( exidy440_audio )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("custom", EXIDY440, EXIDY440_MASTER_CLOCK/256)
+	MCFG_SOUND_ADD("custom", EXIDY440, EXIDY440_AUDIO_CLOCK/16)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

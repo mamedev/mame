@@ -12,7 +12,7 @@
 #include "machine/6532riot.h"
 #include "sound/hc55516.h"
 #include "sound/tms5220.h"
-#include "includes/exidy.h"
+#include "audio/exidy.h"
 
 
 

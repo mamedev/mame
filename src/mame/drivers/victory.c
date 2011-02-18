@@ -96,7 +96,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "includes/exidy.h"
+#include "audio/exidy.h"
 #include "includes/victory.h"
 #include "machine/nvram.h"
 
@@ -224,7 +224,7 @@ static MACHINE_CONFIG_START( victory, driver_device )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* using the standard Exidy video parameters for now, needs to be confirmed */
-	MCFG_SCREEN_RAW_PARAMS(EXIDY_PIXEL_CLOCK, EXIDY_HTOTAL, EXIDY_HBEND, EXIDY_HBSTART, EXIDY_VTOTAL, EXIDY_VBEND, EXIDY_VBSTART)
+	MCFG_SCREEN_RAW_PARAMS(VICTORY_PIXEL_CLOCK, VICTORY_HTOTAL, VICTORY_HBEND, VICTORY_HBSTART, VICTORY_VTOTAL, VICTORY_VBEND, VICTORY_VBSTART)
 
 	MCFG_PALETTE_LENGTH(64)
 

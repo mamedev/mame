@@ -7,6 +7,14 @@
 
 #define VICTORY_MAIN_CPU_CLOCK		(XTAL_8MHz / 2)
 
+#define VICTORY_PIXEL_CLOCK				(XTAL_11_289MHz / 2)
+#define VICTORY_HTOTAL					(0x150)
+#define VICTORY_HBEND						(0x000)
+#define VICTORY_HBSTART					(0x100)
+#define VICTORY_VTOTAL					(0x118)
+#define VICTORY_VBEND						(0x000)
+#define VICTORY_VBSTART					(0x100)
+
 
 /*----------- defined in video/victory.c -----------*/
 

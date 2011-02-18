@@ -84,7 +84,6 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
-#include "includes/playmark.h"
 #include "includes/sslam.h"
 
 
@@ -394,7 +393,7 @@ static ADDRESS_MAP_START( sslam_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x108000, 0x10ffff) AM_RAM_WRITE(sslam_tx_tileram_w) AM_BASE_MEMBER(sslam_state,tx_tileram)
 	AM_RANGE(0x110000, 0x11000d) AM_RAM AM_BASE_MEMBER(sslam_state,regs)
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP
-	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(bigtwin_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(sslam_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_BASE_MEMBER(sslam_state,spriteram)
 	AM_RANGE(0x304000, 0x304001) AM_WRITENOP
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("IN0")
@@ -417,7 +416,7 @@ static ADDRESS_MAP_START( powerbls_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x110000, 0x11000d) AM_RAM AM_BASE_MEMBER(sslam_state,regs)
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP
 	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_BASE_MEMBER(sslam_state,spriteram)
-	AM_RANGE(0x280000, 0x2803ff) AM_RAM_WRITE(bigtwin_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x280000, 0x2803ff) AM_RAM_WRITE(sslam_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("IN0")
 	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("IN1")
 	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("IN2")

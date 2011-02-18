@@ -4,6 +4,24 @@
 #include "includes/sslam.h"
 
 
+WRITE16_HANDLER( sslam_paletteram_w )
+{
+	int r, g, b, val;
+
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+
+	val = space->machine->generic.paletteram.u16[offset];
+	r = (val >> 11) & 0x1e;
+	g = (val >>  7) & 0x1e;
+	b = (val >>  3) & 0x1e;
+
+	r |= ((val & 0x08) >> 3);
+	g |= ((val & 0x04) >> 2);
+	b |= ((val & 0x02) >> 1);
+
+	palette_set_color_rgb(space->machine, offset, pal5bit(r), pal5bit(g), pal5bit(b));
+}
+
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	sslam_state *state = machine->driver_data<sslam_state>();

@@ -11,7 +11,6 @@ Issues:
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "includes/wiz.h"
 #include "includes/rollrace.h"
 
 static READ8_HANDLER( ra_fake_d800_r )
@@ -219,7 +218,7 @@ static MACHINE_CONFIG_START( rollrace, rollrace_state )
 	MCFG_GFXDECODE(rollrace)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(wiz)
+	MCFG_PALETTE_INIT(rollrace)
 	MCFG_VIDEO_UPDATE(rollrace)
 
 	/* sound hardware */

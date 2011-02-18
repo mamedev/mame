@@ -22,10 +22,6 @@ public:
 
 /*----------- defined in video/seicross.c -----------*/
 
-extern UINT8 *seicross_videoram;
-extern UINT8 *seicross_colorram;
-extern UINT8 *seicross_row_scroll;
-
 WRITE8_HANDLER( seicross_videoram_w );
 WRITE8_HANDLER( seicross_colorram_w );
 

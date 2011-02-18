@@ -7,6 +7,8 @@ CuboCD32 definitions
 #ifndef __CUBOCD32_H__
 #define __CUBOCD32_H__
 
+#include "includes/amiga.h"
+
 class cubocd32_state : public amiga_state
 {
 public:

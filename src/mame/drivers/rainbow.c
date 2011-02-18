@@ -325,7 +325,6 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "audio/taitosnd.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
-#include "includes/rastan.h"
 #include "includes/rainbow.h"
 
 

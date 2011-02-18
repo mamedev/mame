@@ -130,7 +130,6 @@ better notes (complete chip lists) for each board still needed
 #include "cpu/tms32025/tms32025.h"
 #include "includes/namcoic.h"
 #include "sound/c140.h"
-#include "includes/namcos21.h"
 #include "rendlay.h"
 
 static UINT32 *mpSharedRAM0;

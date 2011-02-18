@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "includes/exidy.h"
+#include "audio/exidy.h"
 #include "machine/74181.h"
 #include "machine/nvram.h"
 #include "sound/s14001a.h"

@@ -109,7 +109,6 @@ cc_p14.j2 8192 0xedc6a1eb M5L2764k
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "includes/snk.h"
 #include "sound/ay8910.h"
 #include "includes/mainsnk.h"
 
@@ -413,7 +412,7 @@ static MACHINE_CONFIG_START( mainsnk, mainsnk_state )
 	MCFG_GFXDECODE(mainsnk)
 	MCFG_PALETTE_LENGTH(0x400)
 
-	MCFG_PALETTE_INIT(tnk3)
+	MCFG_PALETTE_INIT(mainsnk)
 	MCFG_VIDEO_START(mainsnk)
 	MCFG_VIDEO_UPDATE(mainsnk)
 

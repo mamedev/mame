@@ -92,7 +92,7 @@ ROMs    : MR96004-10.1  [125661cd] (IC5 - Samples)
 #include "deprecat.h"
 #include "sound/ymf271.h"
 #include "rendlay.h"
-#include "includes/ms32.h"
+#include "machine/ms32crpt.h"
 
 
 class bnstars_state : public driver_device

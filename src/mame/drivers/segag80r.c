@@ -107,14 +107,15 @@
 #include "emu.h"
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
-#include "machine/8255ppi.h"
-#include "machine/segacrpt.h"
-#include "audio/segasnd.h"
-#include "includes/segag80r.h"
 #include "sound/dac.h"
 #include "sound/sn76496.h"
 #include "sound/samples.h"
 #include "sound/sp0250.h"
+#include "audio/segasnd.h"
+#include "machine/8255ppi.h"
+#include "machine/segacrpt.h"
+#include "machine/segag80.h"
+#include "includes/segag80r.h"
 
 
 /*************************************
@@ -184,13 +185,15 @@ static MACHINE_RESET( pignewt )
 
 static offs_t decrypt_offset(address_space *space, offs_t offset)
 {
+	segag80r_state *state = space->machine->driver_data<segag80r_state>();
+
 	/* ignore anything but accesses via opcode $32 (LD $(XXYY),A) */
 	offs_t pc = cpu_get_previouspc(space->cpu);
 	if ((UINT16)pc == 0xffff || space->read_byte(pc) != 0x32)
 		return offset;
 
 	/* fetch the low byte of the address and munge it */
-	return (offset & 0xff00) | (*sega_decrypt)(pc, space->read_byte(pc + 1));
+	return (offset & 0xff00) | (*state->decrypt)(pc, space->read_byte(pc + 1));
 }
 
 static WRITE8_HANDLER( mainram_w )         { mainram[decrypt_offset(space, offset)] = data; }
@@ -1440,8 +1443,10 @@ static void monsterb_expand_gfx(running_machine *machine, const char *region)
 
 static DRIVER_INIT( astrob )
 {
+	segag80r_state *state = machine->driver_data<segag80r_state>();
+
 	/* configure the 315-0062 security chip */
-	sega_security(62);
+	state->decrypt = segag80_security(62);
 
 	/* configure video */
 	segag80r_background_pcb = G80_BACKGROUND_NONE;
@@ -1457,8 +1462,10 @@ static DRIVER_INIT( astrob )
 
 static DRIVER_INIT( 005 )
 {
+	segag80r_state *state = machine->driver_data<segag80r_state>();
+
 	/* configure the 315-0070 security chip */
-	sega_security(70);
+	state->decrypt = segag80_security(70);
 
 	/* configure video */
 	segag80r_background_pcb = G80_BACKGROUND_NONE;
@@ -1467,8 +1474,10 @@ static DRIVER_INIT( 005 )
 
 static DRIVER_INIT( spaceod )
 {
+	segag80r_state *state = machine->driver_data<segag80r_state>();
+
 	/* configure the 315-0063 security chip */
-	sega_security(63);
+	state->decrypt = segag80_security(63);
 
 	/* configure video */
 	segag80r_background_pcb = G80_BACKGROUND_SPACEOD;
@@ -1487,8 +1496,10 @@ static DRIVER_INIT( spaceod )
 
 static DRIVER_INIT( monsterb )
 {
+	segag80r_state *state = machine->driver_data<segag80r_state>();
+
 	/* configure the 315-0082 security chip */
-	sega_security(82);
+	state->decrypt = segag80_security(82);
 
 	/* configure video */
 	segag80r_background_pcb = G80_BACKGROUND_MONSTERB;
@@ -1502,9 +1513,11 @@ static DRIVER_INIT( monsterb )
 
 static DRIVER_INIT( monster2 )
 {
+	segag80r_state *state = machine->driver_data<segag80r_state>();
+
 	/* configure the 315-5006 security chip */
 	spatter_decode(machine, "maincpu");
-	sega_security(0);
+	state->decrypt = segag80_security(0);
 
 	/* configure video */
 	segag80r_background_pcb = G80_BACKGROUND_PIGNEWT;
@@ -1519,8 +1532,10 @@ static DRIVER_INIT( monster2 )
 
 static DRIVER_INIT( pignewt )
 {
+	segag80r_state *state = machine->driver_data<segag80r_state>();
+
 	/* configure the 315-0063? security chip */
-	sega_security(63);
+	state->decrypt = segag80_security(63);
 
 	/* configure video */
 	segag80r_background_pcb = G80_BACKGROUND_PIGNEWT;
@@ -1539,9 +1554,11 @@ static DRIVER_INIT( pignewt )
 
 static DRIVER_INIT( sindbadm )
 {
+	segag80r_state *state = machine->driver_data<segag80r_state>();
+
 	/* configure the encrypted Z80 */
 	sindbadm_decode(machine, "maincpu");
-	sega_security(0);
+	state->decrypt = segag80_security(0);
 
 	/* configure video */
 	segag80r_background_pcb = G80_BACKGROUND_SINDBADM;

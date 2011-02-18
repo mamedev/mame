@@ -144,9 +144,10 @@ Fax                  1982  6502   FXL, FLA
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "deprecat.h"
-#include "includes/exidy.h"
-#include "includes/targ.h"
 #include "machine/6821pia.h"
+#include "audio/exidy.h"
+#include "includes/targ.h"
+#include "includes/exidy.h"
 
 
 static UINT8 last_dial;

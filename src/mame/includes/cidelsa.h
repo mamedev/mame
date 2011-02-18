@@ -2,6 +2,7 @@
 #define __CIDELSA__
 
 #include "cpu/cosmac/cosmac.h"
+#include "sound/cdp1869.h"
 
 #define SCREEN_TAG	"screen"
 #define CDP1802_TAG	"cdp1802"
