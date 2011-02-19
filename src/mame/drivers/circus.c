@@ -35,7 +35,9 @@ D000      Paddle Position and Interrupt Reset (where applicable)
 
 	TODO:
 	- generic video timing (vsync, vblank, # of scanlines)
-	- circus/ripcord: collision detection is accurate?
+	- circus/ripcord collision detection:
+	  * is accurate?
+	  * move away from video update (fails with frameskipping)
 	- crash: irq timing
 	- improve discrete sound
 
