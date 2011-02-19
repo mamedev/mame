@@ -295,7 +295,10 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate)
 		/* 16-bit */
 		PUSH16(cpustate, get_flags(cpustate) & 0xffff );
 		PUSH16(cpustate, cpustate->sreg[CS].selector );
-		PUSH16(cpustate, cpustate->eip );
+		if(irq == 3 || irq == 4 || irq == 9 || irq_gate == 1)
+			PUSH16(cpustate, cpustate->eip );
+		else
+			PUSH16(cpustate, cpustate->prev_eip );
 
 		cpustate->sreg[CS].selector = READ16(cpustate, cpustate->idtr.base + entry + 2 );
 		cpustate->eip = READ16(cpustate, cpustate->idtr.base + entry );
@@ -325,13 +328,19 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate)
 		{
 			PUSH16(cpustate, get_flags(cpustate) & 0xffff );
 			PUSH16(cpustate, cpustate->sreg[CS].selector );
-			PUSH16(cpustate, cpustate->eip );
+			if(irq == 3 || irq == 4 || irq == 9 || irq_gate == 1)
+				PUSH16(cpustate, cpustate->eip );
+			else
+				PUSH16(cpustate, cpustate->prev_eip );
 		}
 		else
 		{
 			PUSH32(cpustate, get_flags(cpustate) & 0x00fcffff );
 			PUSH32(cpustate, cpustate->sreg[CS].selector );
-			PUSH32(cpustate, cpustate->eip );
+			if(irq == 3 || irq == 4 || irq == 9 || irq_gate == 1)
+				PUSH32(cpustate, cpustate->eip );
+			else
+				PUSH32(cpustate, cpustate->prev_eip );
 		}
 
 		cpustate->sreg[CS].selector = segment;
