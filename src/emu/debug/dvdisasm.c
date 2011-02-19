@@ -281,7 +281,7 @@ offs_t debug_view_disasm::find_pc_backwards(offs_t targetpc, int numinstrs)
 			if (debug_cpu_translate(source.m_space, TRANSLATE_FETCH, &physpcbyte))
 			{
 				char dasmbuffer[100];
-				instlen = source.m_disasmintf->disassemble(dasmbuffer, scanpc, &opbuf[1000 + scanpcbyte - targetpcbyte], &argbuf[1000 + scanpcbyte - targetpcbyte]) & DASMFLAG_LENGTHMASK;
+				instlen = source.m_device.debug()->disassemble(dasmbuffer, scanpc, &opbuf[1000 + scanpcbyte - targetpcbyte], &argbuf[1000 + scanpcbyte - targetpcbyte]) & DASMFLAG_LENGTHMASK;
 			}
 
 			// count this one
@@ -418,7 +418,7 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 			}
 
 			// disassemble the result
-			pc += numbytes = source.m_disasmintf->disassemble(buffer, pc & source.m_space->logaddrmask(), opbuf, argbuf) & DASMFLAG_LENGTHMASK;
+			pc += numbytes = source.m_device.debug()->disassemble(buffer, pc & source.m_space->logaddrmask(), opbuf, argbuf) & DASMFLAG_LENGTHMASK;
 		}
 		else
 			strcpy(buffer, "<unmapped>");
