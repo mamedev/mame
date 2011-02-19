@@ -55,7 +55,6 @@ public:
 	int         schaser_effect_555_is_low;
 	int         schaser_explosion;
 	int         schaser_last_effect;
-	UINT8       sfl_int;
 	UINT8       polaris_cloud_speed;
 	UINT8       polaris_cloud_pos;
 	UINT8       schaser_background_disable;

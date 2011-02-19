@@ -1148,22 +1148,6 @@ MACHINE_CONFIG_END
 /*                                                     */
 /*******************************************************/
 
-static CUSTOM_INPUT( sflush_80_r )
-{
-	mw8080bw_state *state = field->port->machine->driver_data<mw8080bw_state>();
-	state->sfl_int ^= 1;	/* vblank flag ? */
-
-	return state->sfl_int;
-}
-
-static MACHINE_START( sflush )
-{
-	mw8080bw_state *state = machine->driver_data<mw8080bw_state>();
-	state->save_item(NAME(state->sfl_int));
-
-	MACHINE_START_CALL(mw8080bw);
-}
-
 static ADDRESS_MAP_START( sflush_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_SIZE_MEMBER(mw8080bw_state, main_ram, main_ram_size)
@@ -1203,7 +1187,7 @@ static INPUT_PORTS_START( sflush )
 	PORT_DIPNAME( 0x40, 0x00, "Coinage Display" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(sflush_80_r, NULL)	/* vblank? */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK ) // ?
 
 	PORT_START("PADDLE")
 	PORT_BIT( 0xff, 0x6a, IPT_PADDLE ) PORT_MINMAX(0x16,0xbf) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_CENTERDELTA(0)
@@ -1216,7 +1200,7 @@ static MACHINE_CONFIG_DERIVED( sflush, mw8080bw_root )
 	MCFG_CPU_REPLACE("maincpu",M6800,2000000)   	/* ?? */
 	MCFG_CPU_PROGRAM_MAP(sflush_map)
 	MCFG_CPU_VBLANK_INT_HACK(irq0_line_pulse,2)
-	MCFG_MACHINE_START(sflush)
+	MCFG_MACHINE_START(mw8080bw)
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
