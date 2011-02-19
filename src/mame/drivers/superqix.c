@@ -131,12 +131,14 @@ static WRITE8_HANDLER( pbillian_sample_trigger_w )
 {
 	superqix_state *state = space->machine->driver_data<superqix_state>();
 	device_t *samples = space->machine->device("samples");
+	UINT8 *src = space->machine->region("samples")->base();
+	int len = space->machine->region("samples")->bytes();
 	int start,end;
 
 	start = data << 7;
 	/* look for end of sample marker */
 	end = start;
-	while (end < 0x8000 && state->samplebuf[end] != (0xff^0x80))
+	while (end < len && src[end] != 0xff)
 		end++;
 
 	sample_start_raw(samples, 0, state->samplebuf + start, end - start, 5000, 0); // 5khz ?
