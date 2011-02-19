@@ -33,6 +33,8 @@ public:
 	int fg_gfx;
 	int fg2_gfx;
 	int tx_tilemap_mode;
+	
+	int interrupt_line_1, interrupt_line_2;
 };
 
 

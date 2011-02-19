@@ -669,6 +669,8 @@ VIDEO_START( lastday )
 	state_save_register_global_array(machine, state->bgscroll8);
 	state_save_register_global_array(machine, state->fgscroll8);
 	state_save_register_global(machine, state->sprites_disabled);
+	state_save_register_global(machine, state->interrupt_line_1);
+	state_save_register_global(machine, state->interrupt_line_2);
 }
 
 VIDEO_START( gulfstrm )
@@ -706,6 +708,8 @@ VIDEO_START( gulfstrm )
 	/* Register for save/restore */
 	state_save_register_global_array(machine, state->bgscroll8);
 	state_save_register_global_array(machine, state->fgscroll8);
+	state_save_register_global(machine, state->interrupt_line_1);
+	state_save_register_global(machine, state->interrupt_line_2);
 }
 
 VIDEO_START( pollux )
@@ -740,6 +744,8 @@ VIDEO_START( pollux )
 	/* Register for save/restore */
 	state_save_register_global_array(machine, state->bgscroll8);
 	state_save_register_global_array(machine, state->fgscroll8);
+	state_save_register_global(machine, state->interrupt_line_1);
+	state_save_register_global(machine, state->interrupt_line_2);
 }
 
 VIDEO_START( bluehawk )
