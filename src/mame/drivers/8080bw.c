@@ -1148,6 +1148,11 @@ MACHINE_CONFIG_END
 /*                                                     */
 /*******************************************************/
 
+static CUSTOM_INPUT( sflush_80_r )
+{
+	return (field->port->machine->primary_screen->vpos() & 0x80) ? 1 : 0;
+}
+
 static ADDRESS_MAP_START( sflush_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_SIZE_MEMBER(mw8080bw_state, main_ram, main_ram_size)
@@ -1187,7 +1192,7 @@ static INPUT_PORTS_START( sflush )
 	PORT_DIPNAME( 0x40, 0x00, "Coinage Display" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK ) // ?
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(sflush_80_r, NULL) // 128V?
 
 	PORT_START("PADDLE")
 	PORT_BIT( 0xff, 0x6a, IPT_PADDLE ) PORT_MINMAX(0x16,0xbf) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_CENTERDELTA(0)
@@ -1197,7 +1202,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_DERIVED( sflush, mw8080bw_root )
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu",M6800,2000000)   	/* ?? */
+	MCFG_CPU_REPLACE("maincpu",M6800,1500000) // ?
 	MCFG_CPU_PROGRAM_MAP(sflush_map)
 	MCFG_CPU_VBLANK_INT_HACK(irq0_line_pulse,2)
 	MCFG_MACHINE_START(mw8080bw)
