@@ -4500,7 +4500,7 @@ void handler_entry_read::set_delegate(read32_delegate delegate, UINT64 mask)
 	// if mismatched bus width, configure a stub
 	if (m_datawidth != 32)
 	{
-		configure_subunits(mask, 16);
+		configure_subunits(mask, 32);
 		if (m_datawidth == 64)
 			set_delegate(read64_delegate(read64_proto_delegate::_create_member<handler_entry_read, &handler_entry_read::read_stub_64_from_32>(delegate.name()), *this));
 	}
