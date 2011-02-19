@@ -63,80 +63,38 @@ static void draw_line( bitmap_t *bitmap, const rectangle *cliprect, int x1, int 
 			*BITMAP_ADDR16(bitmap, y1, count) = 1;
 }
 
-static void draw_sprite( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprite_collision( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	circus_state *state = machine->driver_data<circus_state>();
-	const gfx_element *gfx;
-	const UINT8 *src_lineptr, *src_pixptr;
-	UINT16 *dst_lineptr, *dst_lineend;
-	UINT32 code;
-	int sx, sy;
-	int src_pitch, dst_width, dst_height, dst_pitch, dst_pixoffs, dst_pixend;
-	int collision, eax, edx;
-
-	gfx = machine->gfx[0];
-
-	code = state->clown_z;
-
-	sx = state->clown_y;
-	sy = state->clown_x - 1;
-	dst_width = 16;
-	dst_height = 16;
-	edx = 1;
-
-	gfx = machine->gfx[1];
-	src_lineptr = gfx_element_get_data(gfx, code);
-	src_pitch = gfx->line_modulo;
-	dst_pitch = bitmap->rowpixels;
-
-	dst_lineptr = BITMAP_ADDR16(bitmap, sy, 0);
-	dst_pixend = (sx + dst_width) & 0xff;
-	dst_lineend = dst_lineptr + dst_pitch * dst_height;
+	const gfx_element *sprite_gfx = machine->gfx[1];
+	const UINT8 *sprite_data = gfx_element_get_data(sprite_gfx, state->clown_z);
+	int sx, sy, dx, dy;
+	int pixel, collision = 0;
 
 	// draw sprite and check collision on a pixel basis
-	// probably not completely accurate yet?
-	collision = 0;
-	do
+	for (sy = 0; sy < 16; sy++)
 	{
-		src_pixptr = src_lineptr;
-		dst_pixoffs = sx;
-
-		do
+		dy = state->clown_x + sy-1;
+		if (dy>=0 && dy<bitmap->height)
 		{
-			eax = *src_pixptr;
-			src_pixptr++;
-			if (eax)
+			for (sx = 0; sx < 16; sx++)
 			{
-				eax = machine->pens[eax];
-				collision |= dst_lineptr[dst_pixoffs];
-				dst_lineptr[dst_pixoffs] = eax;
+				dx = state->clown_y + sx;
+				if (dx>=0 && dx<bitmap->width)
+				{
+					pixel = sprite_data[sy * sprite_gfx->line_modulo + sx];
+					if (pixel)
+					{
+						collision |= *BITMAP_ADDR16(bitmap, dy, dx);
+						*BITMAP_ADDR16(bitmap, dy, dx) = machine->pens[pixel];
+					}
+				}
 			}
-			dst_pixoffs += edx;
-
-		} while((dst_pixoffs &= 0xff) != dst_pixend);
-
-		src_lineptr += src_pitch;
-
-	} while((dst_lineptr += dst_pitch) != dst_lineend);
-
-	if (collision)
-	{
-		switch (state->game_id)
-		{
-			// circus
-			case 1:
-				cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);
-				break;
-
-			// ripcord: report collision only when the character is not blank and within display area
-			case 4:
-				if (code != 0xf && state->clown_x > 0 && state->clown_x < 240 && state->clown_y > -12 && state->clown_y < 240)
-					cpu_set_input_line(state->maincpu, 0, ASSERT_LINE); // interrupt accuracy is critical in Ripcord
-				break;
-
-			default: break;
 		}
 	}
+
+	if (collision)
+		cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);
 }
 
 static void circus_draw_fg( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
@@ -160,7 +118,7 @@ VIDEO_UPDATE( circus )
 	circus_state *state = screen->machine->driver_data<circus_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	circus_draw_fg(screen->machine, bitmap, cliprect);
-	draw_sprite(screen->machine, bitmap, cliprect);
+	draw_sprite_collision(screen->machine, bitmap, cliprect);
 	return 0;
 }
 
@@ -259,6 +217,6 @@ VIDEO_UPDATE( ripcord )
 {
 	circus_state *state = screen->machine->driver_data<circus_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	draw_sprite(screen->machine, bitmap, cliprect);
+	draw_sprite_collision(screen->machine, bitmap, cliprect);
 	return 0;
 }
