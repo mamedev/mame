@@ -35,7 +35,7 @@ static pen_t cosmica_map_color( running_machine *machine, UINT8 x, UINT8 y )
 	offs_t offs = (state->color_registers[0] << 9) | ((x >> 4) << 5) | (y >> 3);
 	pen_t pen = machine->region("user1")->base()[offs];
 
-	if (state->color_registers[0])		/* yes, 0 again according to the schematics */
+	if (state->color_registers[1]) // 0 according to the schematics, but that breaks alien formation colors
 		pen >>= 4;
 
 	return pen & 0x07;

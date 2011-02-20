@@ -23,16 +23,6 @@ a physical DSW B but only read when SWA:3,4 are both set to OFF. Currently,
 * In devzone, setting SWA:3,4 on anything but OFF,OFF results in no coins
     accepted at all
 
-TODO: Cosmic alien colors in-game are wrong;
-See http://www.andysarcade.net/pix/dumping/cosmic/
-The colors for the text on the "titlescreen" (with the 1979 universal
-copyright), and the status bars are correct in mame, but the sprite colors
-for the aliens when in formation are clearly wrong as compared to andy's pics.
-The shots on andy's page are the correct ones, as the aliens when 'breaking
-formation' in mame change to colors which match the ones in his pictures.
-There is probably a missing bit for color prom banking or for
-forcing all sprites on a row to have an added blue component.
-
 ***************************************************************************/
 
 
@@ -1622,9 +1612,9 @@ static DRIVER_INIT( panic )
 
 
 GAME( 1979, cosmicg,  0,       cosmicg,  cosmicg,  cosmicg, ROT270, "Universal", "Cosmic Guerilla", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1979, cosmica,  0,       cosmica,  cosmica,  cosmica, ROT270, "Universal", "Cosmic Alien (version II)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
-GAME( 1979, cosmica1, cosmica, cosmica,  cosmica,  cosmica, ROT270, "Universal", "Cosmic Alien (first version)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
-GAME( 1979, cosmica2, cosmica, cosmica,  cosmica,  cosmica, ROT270, "Universal", "Cosmic Alien (early version II?)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1979, cosmica,  0,       cosmica,  cosmica,  cosmica, ROT270, "Universal", "Cosmic Alien (version II)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1979, cosmica1, cosmica, cosmica,  cosmica,  cosmica, ROT270, "Universal", "Cosmic Alien (first version)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1979, cosmica2, cosmica, cosmica,  cosmica,  cosmica, ROT270, "Universal", "Cosmic Alien (early version II?)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1980, nomnlnd,  0,       nomnlnd,  nomnlnd,  nomnlnd, ROT270, "Universal", "No Man's Land", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1980, nomnlndg, nomnlnd, nomnlnd,  nomnlndg, nomnlnd, ROT270, "Universal (Gottlieb license)", "No Man's Land (Gottlieb)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1980, magspot,  0,       magspot,  magspot,  0,       ROT270, "Universal", "Magical Spot", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
