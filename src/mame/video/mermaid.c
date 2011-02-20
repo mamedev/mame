@@ -44,6 +44,37 @@ PALETTE_INIT( mermaid )
 	colortable_entry_set_value(machine->colortable, 0x43, 0x21);
 }
 
+PALETTE_INIT( rougien )
+{
+	int i;
+
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x41);
+
+	for (i = 0; i < 0x40; i++)
+	{
+		int r = 0x21 * BIT(color_prom[i], 0) + 0x47 * BIT(color_prom[i], 1) + 0x97 * BIT(color_prom[i], 2);
+		int g = 0x21 * BIT(color_prom[i], 3) + 0x47 * BIT(color_prom[i], 4) + 0x97 * BIT(color_prom[i], 5);
+		int b =                                0x47 * BIT(color_prom[i], 6) + 0x97 * BIT(color_prom[i], 7);
+
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+	}
+
+	/* blue background */
+	colortable_palette_set_color(machine->colortable, 0x40, MAKE_RGB(0, 0, 0));
+
+	/* char/sprite palette */
+	for (i = 0; i < 0x40; i++)
+		colortable_entry_set_value(machine->colortable, i, i);
+
+	/* background palette */
+	colortable_entry_set_value(machine->colortable, 0x40, 0x40);
+	colortable_entry_set_value(machine->colortable, 0x41, 0x00);
+	colortable_entry_set_value(machine->colortable, 0x42, 0x00);
+	colortable_entry_set_value(machine->colortable, 0x43, 0x02);
+}
+
+
 WRITE8_HANDLER( mermaid_videoram2_w )
 {
 	mermaid_state *state = space->machine->driver_data<mermaid_state>();
