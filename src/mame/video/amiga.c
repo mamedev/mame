@@ -259,18 +259,16 @@ int amiga_copper_execute_next(running_machine *machine, int xpos)
 		word0 = (word0 >> 1) & 0xff;
 		if (word0 >= min)
 		{
-			/* write it at the *end* of this instruction's cycles */
-			/* needed for Arcadia's Fast Break */
-			state->copper_pending_offset = word0;
-			state->copper_pending_data = word1;
-			if (delay[word0] == 0) // additional 2 cycles needed only for non-Agnus registers
+			if (delay[word0] == 1) 
 			{
 				if (LOG_COPPER)
-					logerror("%02X.%02X: Write to %s = %04x\n", state->last_scanline, xpos / 2,
-						 amiga_custom_names[state->copper_pending_offset & 0xff], state->copper_pending_data);
-				amiga_custom_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 
-					state->copper_pending_offset, state->copper_pending_data, 0xffff);
-				state->copper_pending_offset = 0;
+					logerror("%02X.%02X: Write to %s = %04x\n", state->last_scanline, xpos / 2, amiga_custom_names[word0 & 0xff], word1);
+				amiga_custom_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), word0, word1, 0xffff);
+			}
+			else	// additional 2 cycles needed for non-Agnus registers
+			{
+				state->copper_pending_offset = word0;
+				state->copper_pending_data = word1;
 			}
 		}
 
