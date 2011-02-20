@@ -3164,10 +3164,6 @@ WRITE16_HANDLER( spu_w )
 		spu->installed_dma_hooks = true;
 	}
 
-	if (mem_mask != 0xffff)
-	{
-		printf("SPU: ERROR, non-16-bit write %x!\n", mem_mask);
-	}
 	spu->write_word(offset*2, data);
 }
 
