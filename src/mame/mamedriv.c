@@ -3451,8 +3451,9 @@ V-V                           TP-027
 	DRIVER( fbaitmcj )	/* 1999 - Fisherman's Bait - Marlin Challenge (GX889 VER. JA) */
 	DRIVER( fbaitmca )	/* 1999 - Fisherman's Bait - Marlin Challenge (GX889 VER. AA) */
 	DRIVER( ddr2m )		/* 1999 - Dance Dance Revolution 2nd Mix (GN895 VER. JAA) */
+	DRIVER( ddr2ml )	/* 1999 - Dance Dance Revolution 2nd Mix - Link Ver (GE885 VER. JAB) */
+	DRIVER( ddr2mla )	/* 1999 - Dance Dance Revolution 2nd Mix - Link Ver (GE885 VER. JAA) */
 	DRIVER( ddrbocd )	/* 1999 - Dance Dance Revolution Best of Cool Dancers (GE892 VER. JAA) */
-	DRIVER( ddr2ml )	/* 1999 - Dance Dance Revolution 2nd Mix - Link Ver (GE885 VER. JAA) */
 	DRIVER( ddr2mc )	/* 1999 - Dance Dance Revolution 2nd Mix with beatmaniaIIDX CLUB VERSiON (GE896 VER. JAA) */
 	DRIVER( ddr2mc2 )	/* 1999 - Dance Dance Revolution 2nd Mix with beatmaniaIIDX substream CLUB VERSiON 2 (GE984 VER. JAA) */
 	DRIVER( gtrfrk2m )	/* 1999 - Guitar Freaks 2nd Mix Ver 1.01 (GQ883 VER. JAD) */
@@ -3474,15 +3475,24 @@ V-V                           TP-027
 	DRIVER( drmn2mpu )	/* 1999 - DrumMania 2nd Mix Session Power Up Kit (GE912 VER. JAB) */
 	DRIVER( dncfrks )	/* 2000 - Dance Freaks (G*874 VER. KAA) */
 	DRIVER( dmx )		/* 2000 - Dance Maniax (G*874 VER. JAA) */
+	DRIVER( gunmania )	/* 2000 - GunMania (GL906 VER. JAA) */
+	DRIVER( fghtmn )	/* 2000 - Fighting Mania (QG918 VER. EAA) */
+	DRIVER( fghtmna )	/* 2000 - Fighting Mania (QG918 VER. AAA) */
+	DRIVER( pnchmn )	/* 2000 - Punch Mania: Hokuto No Ken (GQ918 VER. JAB) */
+	DRIVER( pnchmna )	/* 2000 - Punch Mania: Hokuto No Ken (GQ918 VER. JAB, ALT CD) */
+	DRIVER( fghtmnk )	/* 2000 - Fighting Mania (QG918 VER. KAA) */
+	DRIVER( fghtmnu )	/* 2000 - Fighting Mania (QG918 VER. IAA) */
 	DRIVER( dsem )		/* 2000 - Dancing Stage Euro Mix (G*936 VER. EAA) */
 	DRIVER( gtrfrk3m )	/* 2000 - Guitar Freaks 3rd Mix (GE949 VER. JAC) */
 	DRIVER( gtfrk3ma )	/* 2000 - Guitar Freaks 3rd Mix (GE949 VER. JAB) */
 	DRIVER( gtfrk3mb )	/* 2000 - Guitar Freaks 3rd Mix - security cassette versionup (949JAZ02) */
+	DRIVER( pnchmn2 )	/* 2000 - Punch Mania 2: Hokuto No Ken (GQA09 JAA) */
 	DRIVER( salarymc )	/* 2000 - Salary Man Champ (G*A18 VER. JAA) */
 	DRIVER( ddr3mp )	/* 2000 - Dance Dance Revolution 3rd Mix Plus (G*A22 VER. JAA) */
 	DRIVER( pcnfrk3m )	/* 2000 - Percussion Freaks 3rd Mix (G*A23 VER. KAA) */
 	DRIVER( drmn3m )	/* 2000 - DrumMania 3rd Mix (G*A23 VER. JAA) */
 	DRIVER( gtrfrk4m )	/* 2000 - Guitar Freaks 4th Mix (G*A24 VER. JAA) */
+	DRIVER( drmn4m )	/* 2000 - DrumMania 4th Mix (G*A25 VER. JAA) */
 	DRIVER( ddr4m )		/* 2000 - Dance Dance Revolution 4th Mix (G*A33 VER. AAA) */
 	DRIVER( ddr4mj )	/* 2000 - Dance Dance Revolution 4th Mix (G*A33 VER. JAA) */
 	DRIVER( ddr4ms )	/* 2000 - Dance Dance Revolution Solo 4th Mix (G*A33 VER. ABA) */
@@ -3492,18 +3502,31 @@ V-V                           TP-027
 	DRIVER( ddr4mp )	/* 2000 - Dance Dance Revolution 4th Mix Plus (G*A34 VER. JAA) */
 	DRIVER( ddr4mps )	/* 2000 - Dance Dance Revolution 4th Mix Plus Solo (G*A34 VER. JAA) */
 	DRIVER( dmx2m )		/* 2000 - Dance Maniax 2nd Mix (G*A39 VER. JAA) */
-	DRIVER( fmania )	/* 2000 - Fighting Mania (918 xx B02) */
 	DRIVER( gtrfrk5m )	/* 2001 - Guitar Freaks 5th Mix (G*A26 VER. JAA) */
 	DRIVER( ddr5m )		/* 2001 - Dance Dance Revolution 5th Mix (G*A27 VER. JAA) */
 	DRIVER( dmx2majp )	/* 2001 - Dance Maniax 2nd Mix Append J-Paradise (G*A38 VER. JAA ) */
 	DRIVER( mamboagg )	/* 2001 - Mambo A Go-Go (GQA40 VER. JAB) */
+	DRIVER( drmn5m )	/* 2001 - DrumMania 5th Mix (G*B05 VER. JAA) */
 	DRIVER( gtrfrk6m )	/* 2001 - Guitar Freaks 6th Mix (G*B06 VER. JAA) */
-	DRIVER( gtrfrk7m )	/* 2001 - Guitar Freaks 6th Mix (G*B17 VER. JAA) */
+	DRIVER( drmn6m )	/* 2001 - DrumMania 6th Mix (G*B16 VER. JAA) */
+	DRIVER( gtrfrk7m )	/* 2001 - Guitar Freaks 7th Mix (G*B17 VER. JAA) */
 	DRIVER( ddrmax )	/* 2001 - DDR Max - Dance Dance Revolution 6th Mix (G*B19 VER. JAA) */
 	DRIVER( ddrmax2 )	/* 2002 - DDR Max 2 - Dance Dance Revolution 7th Mix (G*B20 VER. JAA) */
+	DRIVER( mrtlbeat )	/* 2002 - Martial Beat (Martial Beat (G*B47 VER. JBA) */
+	DRIVER( drmn7m )	/* 2002 - DrumMania 7th Mix power-up ver. (G*C07 VER. JBA) */
+	DRIVER( drmn7ma )	/* 2002 - DrumMania 7th Mix (G*C07 VER. JAA) */
+	DRIVER( gtrfrk8m )	/* 2002 - Guitar Freaks 8th Mix power-up ver. (G*C08 VER. JBA) */
+	DRIVER( gtrfrk8ma )	/* 2002 - Guitar Freaks 8th Mix (G*C08 VER. JAA) */
 	DRIVER( dsem2 )		/* 2002 - Dancing Stage Euro Mix 2 (G*C23 VER. EAA) */
 	DRIVER( ddrextrm )	/* 2002 - Dance Dance Revolution Extreme (G*C36 VER. JAA) */
+	DRIVER( drmn8m )	/* 2003 - DrumMania 8th Mix (G*C38 VER. JAA) */
+	DRIVER( gtrfrk9m )	/* 2003 - Guitar Freaks 9th Mix (G*C39 VER. JAA) */
+	DRIVER( drmn9m )	/* 2003 - DrumMania 9th Mix (G*D09 VER. JAA) */
+	DRIVER( gtfrk10m )	/* 2003 - Guitar Freaks 10th Mix (G*D10 VER. JAB) */
+	DRIVER( gtfrk10ma )	/* 2003 - Guitar Freaks 10th Mix (G*D10 VER. JAA) */
+	DRIVER( gtfrk10mb )	/* 2003 - Guitar Freaks 10th Mix eAmusement (G*D10 VER. JBA) */
 	DRIVER( gtfrk11m )	/* 2004 - Guitar Freaks 11th Mix (G*D39 VER. JAA) */
+	DRIVER( drmn10m )	/* 2004 - DrumMania 10th Mix (G*D40 VER. JAA) */
 
 	/* Konami Twinkle games */
 	DRIVER( gq863 )

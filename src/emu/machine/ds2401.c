@@ -49,11 +49,11 @@ ds2401_device::ds2401_device(running_machine &_machine, const ds2401_device_conf
 
 void ds2401_device::device_start()
 {
-	t_samp = attotime::from_usec( 15);
-	t_rdv  = attotime::from_usec( 15);
+	t_samp = attotime::from_usec( 30);
+	t_rdv  = attotime::from_usec( 30);
 	t_rstl = attotime::from_usec(480);
-	t_pdh  = attotime::from_usec( 15);
-	t_pdl  = attotime::from_usec( 60);
+	t_pdh  = attotime::from_usec( 30);
+	t_pdl  = attotime::from_usec(120);
 
 	save_item(NAME(state));
 	save_item(NAME(bit));

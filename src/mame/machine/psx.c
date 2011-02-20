@@ -286,17 +286,10 @@ static void dma_interrupt_update( psx_machine *p_psx )
 		p_psx->n_dicr |= 0x80000000;
 		psx_irq_set( p_psx->machine, PSX_IRQ_DMA );
 	}
-	else if( ( p_psx->n_dicr & 0x80000000 ) != 0 )
-	{
-		verboselog( p_psx, 2, "dma_interrupt_update( %02x, %02x ) interrupt cleared\n", n_int, n_mask );
-		p_psx->n_dicr &= ~0x80000000;
-	}
 	else if( n_int != 0 )
 	{
 		verboselog( p_psx, 2, "dma_interrupt_update( %02x, %02x ) interrupt not enabled\n", n_int, n_mask );
 	}
-
-	p_psx->n_dicr &= 0x00ffffff | ( p_psx->n_dicr << 8 );
 }
 
 static void dma_finished(psx_machine *p_psx, int n_channel)
@@ -536,14 +529,18 @@ WRITE32_HANDLER( psx_dma_w )
 			p_psx->n_dpcp = ( p_psx->n_dpcp & ~mem_mask ) | data;
 			break;
 		case 0x1:
-            if (data & 0x80000000)
-            {
-                p_psx->n_dicr = ((p_psx->n_dicr &~ data) & 0xff000000) | (p_psx->n_dicr & 0x00ffffff);
-            }
-			p_psx->n_dicr = data & 0x00ffffff;
+
+			p_psx->n_dicr = ( p_psx->n_dicr & ( 0x80000000 | ~mem_mask ) ) |
+				( p_psx->n_dicr & ~data & 0x7f000000 & mem_mask ) |
+				( data & 0x00ffffff & mem_mask );
+		
+			if( ( p_psx->n_dicr & 0x80000000 ) != 0 && ( p_psx->n_dicr & 0x7f000000 ) == 0 )
+			{
+				verboselog( p_psx, 2, "dma interrupt cleared\n" );
+				p_psx->n_dicr &= ~0x80000000;
+			}
 
 			verboselog( p_psx, 1, "psx_dma_w( %04x, %08x, %08x ) dicr -> %08x\n", offset, data, mem_mask, p_psx->n_dicr );
-			dma_interrupt_update(p_psx);
 			break;
 		default:
 			verboselog( p_psx, 0, "psx_dma_w( %04x, %08x, %08x ) Unknown dma control register\n", offset, data, mem_mask );
@@ -702,7 +699,7 @@ static TIMER_CALLBACK( root_finished )
 	if( ( root->n_mode & PSX_RC_IRQOVERFLOW ) != 0 ||
 		( root->n_mode & PSX_RC_IRQTARGET ) != 0 )
 	{
-		psx_irq_set( machine, (n_counter == 3) ? PSX_IRQ_ROOTCOUNTER3 : (PSX_IRQ_ROOTCOUNTER0 << n_counter) );
+		psx_irq_set( machine, PSX_IRQ_ROOTCOUNTER0 << n_counter );
 	}
 }
 
@@ -723,12 +720,14 @@ WRITE32_HANDLER( psx_counter_w )
 	case 1:
 		root->n_count = root_current( p_psx, n_counter );
 		root->n_start = psxcpu_gettotalcycles(p_psx);
-		root->n_mode = data;
 
-		if( ( root->n_mode & PSX_RC_RESET ) != 0 )
+		if( ( data & PSX_RC_RESET ) != 0 )
 		{
+			data &= ~( PSX_RC_RESET | PSX_RC_STOP );
 			root->n_count = 0;
 		}
+
+		root->n_mode = data;
 
 #if 0
 		if( ( data & 0xfca6 ) != 0 ||
