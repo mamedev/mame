@@ -4,6 +4,10 @@
 
     OKI MSM9810 ADCPM(2) sound chip.
 
+	Notes:
+	The master clock frequency for this chip can range from 3.5MHz to 4.5Mhz.
+      The typical oscillator is a 4.096Mhz crystal.
+
 ***************************************************************************/
 
 #pragma once
@@ -127,7 +131,10 @@ protected:
 	{
 	public:
 		okim_voice();
-		void generate_audio(direct_read_data &direct, stream_sample_t *buffer, int samples);
+		void generate_audio(direct_read_data &direct, 
+                			stream_sample_t *buffer, 
+                			int samples,
+			                const UINT8 global_volume_scale);
 
 		oki_adpcm_state m_adpcm;		// current ADPCM state
 		oki_adpcm2_state m_adpcm2;		// current ADPCM2 state
@@ -153,6 +160,11 @@ protected:
 	direct_read_data* m_direct;
 
     UINT8 m_TMP_register;
+    
+	UINT8 m_global_volume_scale;
+    bool  m_stereo_enabled;
+    UINT8 m_filter_type;
+	UINT8 m_output_level;
 
 	static const int OKIM9810_VOICES = 8;
 	okim_voice m_voice[OKIM9810_VOICES];

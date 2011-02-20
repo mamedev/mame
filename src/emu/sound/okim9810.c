@@ -131,7 +131,11 @@ okim9810_device::okim9810_device(running_machine &_machine, const okim9810_devic
 	  device_memory_interface(_machine, config, *this),
 	  m_config(config),
 	  m_stream(NULL),
-	  m_TMP_register(0x00)
+	  m_TMP_register(0x00),
+      m_global_volume_scale(0x00),
+      m_stereo_enabled(false),
+      m_filter_type(OKIM9810_SECONDARY_FILTER),
+      m_output_level(OKIM9810_OUTPUT_TO_DIRECT_DAC)
 {
 }
 
@@ -198,7 +202,7 @@ void okim9810_device::sound_stream_update(sound_stream &stream, stream_sample_t 
     
 	// iterate over voices and accumulate sample data
 	for (int voicenum = 0; voicenum < OKIM9810_VOICES; voicenum++)
-		m_voice[voicenum].generate_audio(*m_direct, outputs[0], samples);
+		m_voice[voicenum].generate_audio(*m_direct, outputs[0], samples, m_global_volume_scale);
 }
 
 
@@ -288,8 +292,13 @@ void okim9810_device::write_command(UINT8 data)
         }
         case 0x03:  // OPT (options)
         {
-            mame_printf_warning("OPT   complex data %02x\n", m_TMP_register);
-            mame_printf_warning("MSM9810: UNIMPLEMENTED COMMAND!\n");
+            mame_printf_verbose("OPT   complex data %02x\n", m_TMP_register);
+            m_global_volume_scale = (m_TMP_register & 0x18) >> 3;
+            m_filter_type =   (m_TMP_register & 0x06) >> 1;
+            m_output_level =  (m_TMP_register & 0x01);
+            mame_printf_verbose("\tOPT setting main volume scale to Vdd/%d\n", m_global_volume_scale+1);
+            mame_printf_verbose("\tOPT setting output filter type to %d\n", m_filter_type);
+            mame_printf_verbose("\tOPT setting output amp level to %d\n", m_output_level);
             break;
         }
         case 0x04:  // MUON (silence)
@@ -423,7 +432,10 @@ okim9810_device::okim_voice::okim_voice()
 //  add them to an output stream
 //-------------------------------------------------
 
-void okim9810_device::okim_voice::generate_audio(direct_read_data &direct, stream_sample_t *buffer, int samples)
+void okim9810_device::okim_voice::generate_audio(direct_read_data &direct, 
+        										 stream_sample_t *buffer, 
+        										 int samples,
+        										 const UINT8 global_volume_scale)
 {
 	// skip if not active
 	if (!m_playing)
@@ -440,11 +452,21 @@ void okim9810_device::okim_voice::generate_audio(direct_read_data &direct, strea
         switch (m_playbackAlgo)
         { 
             case OKIM9810_ADPCM_PLAYBACK:
-        		*buffer++ += (INT32)m_adpcm.clock(nibble) * (INT32)m_volume / 8; 
+            {
+                INT32 sample = (INT32)m_adpcm.clock(nibble);
+                sample = (sample * (INT32)m_volume) / 8;	// per-channel volume
+                sample >>= global_volume_scale;				// global volume
+        		*buffer++ += sample;
                 break;
+            }
             case OKIM9810_ADPCM2_PLAYBACK:
-        		*buffer++ += (INT32)m_adpcm2.clock(nibble) * (INT32)m_volume / 8; 
+            {
+                INT32 sample = (INT32)m_adpcm.clock(nibble);
+                sample = (sample * (INT32)m_volume) / 8;	// per-channel volume
+                sample >>= global_volume_scale;				// global volume
+        		*buffer++ += sample;
                 break;
+            }
             default:
                 break;
         }
