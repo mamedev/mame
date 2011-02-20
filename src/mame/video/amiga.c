@@ -259,7 +259,7 @@ int amiga_copper_execute_next(running_machine *machine, int xpos)
 		word0 = (word0 >> 1) & 0xff;
 		if (word0 >= min)
 		{
-			if (delay[word0] == 1) 
+			if (delay[word0] == 0) 
 			{
 				if (LOG_COPPER)
 					logerror("%02X.%02X: Write to %s = %04x\n", state->last_scanline, xpos / 2, amiga_custom_names[word0 & 0xff], word1);
