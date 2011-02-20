@@ -4,8 +4,8 @@
 
                                                  driver by Luca Elia
 
-CPU     :   Z80
-Custom  :   TAXAN KY-3211, TAXAN KY-80 (Yamaha)
+CPU     :   TAXAN KY-80 (Yamaha)
+Custom  :   TAXAN KY-3211
 Sound   :   YMZ280B
 NVRAM   :   93C46, Battery
 
@@ -17,10 +17,12 @@ Tiles can be 16x16x4 or 16x16x8.
 
 Sammy Kids Medal Series
 
-Cartridge based system. Carts contain just some flash roms.
-The main board is not available yet. Hardware unknown, but
-it the graphics chip and ROM/RAM banking is the same.
-The sound chip is different, an OKI MSM981x ?
+CPU     :   KL5C80A120FP (Z80 Compatible High Speed Microcontroller)
+Custom  :   TAXAN KY-3211 ?
+Sound   :   OKI M9810B
+NVRAM   :   93C46, Battery
+
+Cartridge based system. Carts contain just some 16Mb flash eeproms.
 
 Info from Tatsuya Fujita:
 
@@ -676,7 +678,7 @@ static ADDRESS_MAP_START( animalc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0xe011, 0xe011 ) AM_WRITENOP	// IRQ Enable? Screen disable?
 	AM_RANGE( 0xe013, 0xe013 ) AM_READWRITE( vblank_r, vblank_w )	// IRQ Ack?
 
-	AM_RANGE( 0xfe00, 0xffff ) AM_RAM
+	AM_RANGE( 0xfe00, 0xffff ) AM_RAM	// High speed internal RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( animalc_io, ADDRESS_SPACE_IO, 8 )
@@ -908,7 +910,7 @@ static ADDRESS_MAP_START( haekaka_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
 	AM_RANGE( 0xb000, 0xcfff ) AM_READWRITE( haekaka_b000_r, haekaka_b000_w )
 	AM_RANGE( 0xd000, 0xefff ) AM_RAM AM_SHARE( "nvram" ) AM_BASE( &nvram )
-	AM_RANGE( 0xfe00, 0xffff ) AM_RAM
+	AM_RANGE( 0xfe00, 0xffff ) AM_RAM	// High speed internal RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( haekaka_io, ADDRESS_SPACE_IO, 8 )
@@ -1145,7 +1147,7 @@ static ADDRESS_MAP_START( itazuram_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x6813, 0x6813 ) AM_WRITENOP	// IRQ Ack?
 	AM_RANGE( 0xdc00, 0xfdff ) AM_READ_BANK( "palbank" ) AM_WRITE( itazuram_nvram_palette_w ) AM_SHARE( "nvram" ) AM_BASE( &nvram )	// nvram | paletteram
 
-	AM_RANGE( 0xfe00, 0xffff ) AM_RAM
+	AM_RANGE( 0xfe00, 0xffff ) AM_RAM	// High speed internal RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( itazuram_io, ADDRESS_SPACE_IO, 8 )
@@ -1358,7 +1360,7 @@ static ADDRESS_MAP_START( tdoboon_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0xbfff ) AM_ROM
 	AM_RANGE( 0xc000, 0xcfff ) AM_READWRITE( tdoboon_c000_r, tdoboon_c000_w )
 	AM_RANGE( 0xd000, 0xefff ) AM_RAM AM_SHARE( "nvram" ) AM_BASE( &nvram )
-	AM_RANGE( 0xfe00, 0xffff ) AM_RAM
+	AM_RANGE( 0xfe00, 0xffff ) AM_RAM	// High speed internal RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tdoboon_io, ADDRESS_SPACE_IO, 8 )
@@ -1534,7 +1536,7 @@ static INTERRUPT_GEN( gegege_vblank_interrupt )
 }
 
 static MACHINE_CONFIG_START( gegege, driver_device )
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_27MHz / 4)	// ?
+	MCFG_CPU_ADD("maincpu", Z80, 10000000)	// !! TAXAN KY-80, clock @X1? !!
 	MCFG_CPU_PROGRAM_MAP(gegege_mem_map)
 	MCFG_CPU_IO_MAP(gegege_io_map)
 	MCFG_CPU_VBLANK_INT("screen", gegege_vblank_interrupt)
@@ -1559,7 +1561,7 @@ static MACHINE_CONFIG_START( gegege, driver_device )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_27MHz / 2)	// ?
+	MCFG_SOUND_ADD("ymz", YMZ280B, 16934400)	// clock @X2?
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1588,9 +1590,8 @@ static MACHINE_RESET( sammymdl )
 	cpu_set_reg(machine->device("maincpu"), Z80_PC, 0x400);	// code starts at 400 ??? (000 = cart header)
 }
 
-// Everything here is a guess:
 static MACHINE_CONFIG_START( sammymdl, driver_device )
-	MCFG_CPU_ADD("maincpu", Z80, 8000000)	// ???
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_20MHz / 2)	// !! KL5C80A120FP @ 10MHz? (actually 4 times faster than Z80) !!
 
 	MCFG_MACHINE_RESET( sammymdl )
 
@@ -1615,7 +1616,7 @@ static MACHINE_CONFIG_START( sammymdl, driver_device )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM9810_ADD("oki", 16000)	// OKI MSM981x? Clock?
+	MCFG_OKIM9810_ADD("oki", XTAL_4_096MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
@@ -1746,26 +1747,33 @@ MACHINE_CONFIG_END
 
   (C) 1997 Banpresto, Sigma
 
-  PCB B-98-1 / 970703 (c) 1997 Sigma:
+  PCB:
 
-  XTAL 27MHz
+    (c) 1997 Sigma B-98-1 MAIN PCB
+    970703 (Sticker)
 
-  Battery
+  CPU:
 
-  93C46 EEPROM
+    TAXAN KY-80 YAMAHA 9650 AZGC (@IC1)
+    XTAL ?? (@X1)
 
-  YMZ280B
+  Video:
 
-  TAXAN Japan
-  KY-3211
-  9722 AZGC
-  QFP(PULL), ASIC for TFT-LCD
+    TAXAN KY-3211 9722 AZGC (@IC11)
+    XTAL 27.000 MHz (@XOSC1)
+    M548262-60 (@IC24) - 262144-Word x 8-Bit Multiport DRAM
 
-  TAXAN
-  KY-80
-  YAMAHA
-  9650 AZGC
-  QFP(PULL) 50, Video IC for LCD
+  Sound:
+
+    YAMAHA YMZ280B-F (@IC14)
+    XTAL ?? (@X2)
+    Trimmer
+
+  Other:
+
+    93C46AN EEPROM (@IC5)
+    MAX232CPE (@IC6)
+    Battery (@BAT)
 
 ***************************************************************************/
 
@@ -1812,6 +1820,48 @@ static DRIVER_INIT( gegege )
 	memory_configure_bank(machine, "rambank", 0, 2, bankedram, 0x800);
 	memory_set_bank(machine, "rambank", 0);
 }
+
+
+/***************************************************************************
+
+  Sammy Medal Games
+
+  PCB:
+
+    Sammy AM3AHF-01 SC MAIN PCB VER2 (Etched)
+    MAIN PCB VER2 VM12-6001-0 (Sticker)
+
+  CPU:
+
+    KAWASAKI KL5C80A120FP (@U1) - Z80 Compatible High Speed Microcontroller
+    XTAL 20 MHz  (@X1)
+    MX29F040TC-12 VM1211L01 (@U2) - 4M-bit [512kx8] CMOS Equal Sector Flash Memory
+    BSI BS62LV256SC-70      (@U4) - Very Low Power/Voltage CMOS SRAM 32K X 8 bit
+
+  Video:
+
+    TAXAN KY-3211 ? (@U17)
+    M548262-60 (@U18) - 262144-Word x 8-Bit Multiport DRAM
+    XTAL 27 MHz (@X3)
+
+  Sound:
+
+    OKI M9810B (@U11)
+    XTAL 4.09 MHz (@X2)
+    Trimmer (@VR1)
+    Toshiba TA7252AP (@U16) - 5.9W Audio Power Amplifier
+
+  Other:
+
+    Xilinx XC9536 VM1212F01 (@U5) - In-System Programmable CPLD
+    MX29F0??C (@U3) - Empty 32 Pin ROM Socket
+    M93C46MN6T (@U11?) - Serial EEPROM
+    Cell Battery (@BAT)
+    25 Pin Edge Connector
+    56 Pin Cartridge Connector
+    6 Pin Connector
+
+***************************************************************************/
 
 
 /***************************************************************************

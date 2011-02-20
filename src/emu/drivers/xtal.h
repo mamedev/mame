@@ -55,6 +55,7 @@ enum
 	XTAL_3_6864MHz  	= 3686400,		/* CPS3 */
 	XTAL_4MHz   		= 4000000,
 	XTAL_4_028MHz		= 4028000,		/* Sony SMC-777 */
+	XTAL_4_096MHz		= 4096000,		/* Used to drive OKI M9810 chips */
 	XTAL_4_224MHz   	= 4224000,		/* Used to drive OKI M6295 chips, usually with /4 divider */
 	XTAL_4_41MHz		= 4410000,		/* Pioneer PR-8210 ldplayer */
 	XTAL_4_43361MHz		= 4433610,		/* Cidelsa Draco */
