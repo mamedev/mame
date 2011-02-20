@@ -41,7 +41,7 @@ static MACHINE_CONFIG_START( zac_1, zac_1_state )
 MACHINE_CONFIG_END
 
 /*--------------------------------
-/ Earth, Wind & Fire (04/81)
+/ Earth Wind Fire (04/81)
 /-------------------------------*/
 ROM_START(ewf)
 	ROM_REGION(0x8000, "maincpu", 0)
@@ -184,7 +184,7 @@ ROM_START(wsports)
 	ROM_LOAD ( "ws5.bin", 0x1000, 0x0400, CRC(5ef51ced) SHA1(390579d0482ceabf87924f7718ef33e336726d92))
 ROM_END
 
-GAME(1981,	ewf,		0,		zac_1,	zac_1,	zac_1,	ROT0,	"Zaccaria",				"Earth, Wind & Fire",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1981,	ewf,		0,		zac_1,	zac_1,	zac_1,	ROT0,	"Zaccaria",				"Earth Wind Fire",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1980,	firemntn,	0,		zac_1,	zac_1,	zac_1,	ROT0,	"Zaccaria",				"Fire Mountain",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1978,	futurwld,	0,		zac_1,	zac_1,	zac_1,	ROT0,	"Zaccaria",				"Future World",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1979,	hotwheel,	0,		zac_1,	zac_1,	zac_1,	ROT0,	"Zaccaria",				"Hot Wheels",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
