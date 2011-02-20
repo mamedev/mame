@@ -65,6 +65,27 @@ const UINT16 amiga_expand_byte[256] =
 	0x5540, 0x5541, 0x5544, 0x5545, 0x5550, 0x5551, 0x5554, 0x5555
 };
 
+const UINT16 delay[256] =
+{
+	1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,	/* 0x000 - 0x03e */
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,						/* 0x040 - 0x05e */
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,						/* 0x060 - 0x07e */
+	0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,						/* 0x080 - 0x09e */
+	1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,	/* 0x0a0 - 0x0de */
+	/* BPLxPTH/BPLxPTL */
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,						/* 0x0e0 - 0x0fe */
+	/* BPLCON0-3,BPLMOD1-2 */
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,						/* 0x100 - 0x11e */
+	/* SPRxPTH/SPRxPTL */
+	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,						/* 0x120 - 0x13e */
+	/* SPRxPOS/SPRxCTL/SPRxDATA/SPRxDATB */
+	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,	/* 0x140 - 0x17e */
+	/* COLORxx */
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,	/* 0x180 - 0x1be */
+	/* RESERVED */
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0	/* 0x1c0 - 0x1fe */
+};
+
 
 
 /*************************************
@@ -186,7 +207,6 @@ int amiga_copper_execute_next(running_machine *machine, int xpos)
 	{
 		if (LOG_COPPER)
 			logerror("%02X.%02X: Write to %s = %04x\n", state->last_scanline, xpos / 2, amiga_custom_names[state->copper_pending_offset & 0xff], state->copper_pending_data);
-
 		amiga_custom_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), state->copper_pending_offset, state->copper_pending_data, 0xffff);
 		state->copper_pending_offset = 0;
 	}
@@ -243,6 +263,15 @@ int amiga_copper_execute_next(running_machine *machine, int xpos)
 			/* needed for Arcadia's Fast Break */
 			state->copper_pending_offset = word0;
 			state->copper_pending_data = word1;
+			if (delay[word0] == 0) // additional 2 cycles needed only for non-Agnus registers
+			{
+				if (LOG_COPPER)
+					logerror("%02X.%02X: Write to %s = %04x\n", state->last_scanline, xpos / 2,
+						 amiga_custom_names[state->copper_pending_offset & 0xff], state->copper_pending_data);
+				amiga_custom_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 
+					state->copper_pending_offset, state->copper_pending_data, 0xffff);
+				state->copper_pending_offset = 0;
+			}
 		}
 
 		/* illegal writes suspend until next frame */
@@ -636,7 +665,7 @@ void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanl
 		CUSTOM_REG(REG_COLOR00) = state->genlock_color;
 
 	/* loop over the line */
-	next_copper_x = 2;
+	next_copper_x = 0;
 	for (x = 0; x < 0xe4*2; x++)
 	{
 		int sprpix;
@@ -982,3 +1011,4 @@ VIDEO_UPDATE( amiga )
 
 	return 0;
 }
+
