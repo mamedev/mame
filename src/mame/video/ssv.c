@@ -290,7 +290,7 @@ VIDEO_START( gdfs )
                 ---- ba98 ---- ---- ?                           0101 for all games
                 ---- ---- 7654 3210 signed global tilemap x offset
     1c0076-77   -e-- ---- ---- ---- global/local sprites coordinates
-                ---- ---- -6-- ---- shadow (2bits - 4bits)
+                ---- ---- 7--- ---- shadow (0 = 2 bits, 1 = 4 bits)
     1c0078-79   ---- ---- ---- ---- ?
     1c007a-7b   ---- ---- ---- ---- ?
                 ---- b--- ---- ---- sprite coordinate mode
@@ -1195,18 +1195,18 @@ VIDEO_UPDATE( ssv )
 
 	ssv_state *state = screen->machine->driver_data<ssv_state>();
 
+	// Shadow
 	if (state->scroll[0x76/2] & 0x0080)
 	{
 		// 4 bit shadows (mslider, stmblade)
-		state->shadow_pen_mask		=	0x1fff;
-		state->shadow_pen_shift	=	11;
+		state->shadow_pen_shift = 15-4;
 	}
 	else
 	{
 		// 2 bit shadows
-		state->shadow_pen_mask		=	0x3fff;
-		state->shadow_pen_shift	=	13;
+		state->shadow_pen_shift = 15-2;
 	}
+	state->shadow_pen_mask = (1 << state->shadow_pen_shift) - 1;
 
 	/* The background color is the first one in the palette */
 	bitmap_fill(bitmap,cliprect, 0);
