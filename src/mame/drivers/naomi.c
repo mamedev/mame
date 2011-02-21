@@ -39,8 +39,6 @@ ToDo:
 - all or almost all games seems to have issues with the sound loops, for example sfz3ugd keeps to say "This-This-This ..." at start-up
   instead of completing the phrase;
 
-- luptype: ARM crashes when you insert a coin;
-
 - suchie3: used to boot (at least go over the I/O test), it doesn't now, might be protection related.
 
 - ngdup23a, ngdup23c: missing DIMM emulation, hence they can't possibly work, emulate the DIMM means to add an extra SH-4 ...
@@ -6127,6 +6125,72 @@ ROM_START( luptype )
 
 ROM_END
 
+ROM_START( initdv2j )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0026b", 0,  SHA1(8ddc3ccd32ab3416fbe2921f6d6617d6c9f23203) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C622A (317-0345-JPN)
+	//(sticker 253-5508-0345J)
+	ROM_LOAD( "317-0345-jpn.pic", 0x000000, 0x004000, CRC(56e1274a) SHA1(735a6071226f3297de64bc0a38be741e87f5d023) ) 
+ROM_END
+
+ROM_START( initdv2jo )
+	NAOMI2_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0026", 0, SHA1(253acede106b7fbf49e24458e7fda868720e9549) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("gds-0026.rom", 0x00, 0x50, NO_DUMP) // file on GD-ROM is BFK.BIN , _NOT_ BEM.BIN which is for Initial D : Arcade Stage (Japan)
+ROM_END
+
+
+ROM_START( initdv2e )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0027", 0,  SHA1(44746f0ceb1a3bbcd1db11a35c78c93a030f02de) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C622A (317-0357-EXP)
+	ROM_LOAD( "317-0357-exp.pic", 0x000000, 0x004000, CRC(38f84b4d) SHA1(03c12d8580da1a4b3a554e62fd8b1f3447b7ebbd) ) 
+ROM_END
+
+ROM_START( initdv3j )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0032c", 0,  SHA1(005b93f9785c76a778f90f04d74d4b3cc1785a01) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C622A (317-????-JPN)
+	ROM_LOAD( "317-xxxx-jpn.pic", 0x000000, 0x004000, NO_DUMP )	// missing PIC
+ROM_END
+
+ROM_START( initdv3jb )
+	NAOMI2_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0032b", 0, SHA1(568411aa72ca308a03a6b5b61c79833464b88bc6) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("gds-0032_pic", 0x00, 0x50, NO_DUMP ) // PIC was missing
+ROM_END
+
 /*
 Title   THE_MAZE_OF_THE_KINGS
 Media ID    E3D0
@@ -6308,12 +6372,16 @@ GAME( 2001, ngdup23c,  naomigd,  naomigd,  naomi,    naomi,  ROT0, "Sega",      
 //GDS-0024 Virtua Fighter 4 Evolution (NAOMI 2)
 //GDS-0025 Initial D Arcade Stage (Export) (NAOMI 2)
 //GDS-0026 Initial D Arcade Stage Ver. 2 (Japan) (NAOMI 2)
-//GDS-0027 Initial D Arcade Stage Ver. 2 (Export) (NAOMI 2)
+GAME( 2002, initdv2j,  naomigd,  naomigd,  naomi,    naomi,  ROT0, "Sega",          "Initial D Arcade Stage Ver. 2 (Japan) (Rev. B) (GDS-0026B)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2002, initdv2jo, initdv2j, naomigd,  naomi,    naomi,  ROT0, "Sega",          "Initial D Arcade Stage Ver. 2 (Japan) (GDS-0026)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2002, initdv2e,  naomigd,  naomigd,  naomi,    naomi,  ROT0, "Sega",          "Initial D Arcade Stage Ver. 2 (Export) (GDS-0027)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 //GDS-0028
 //GDS-0029 Club Kart Cycraft Edition
 //GDS-0030
 GAME( 2003, puyofev,   naomigd,  naomigd,  naomi,    naomi,  ROT0, "Sega",          "Puyo Puyo Fever (GDS-0031)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 //GDS-0032 Initial D Arcade Stage Ver. 3 (Japan)
+GAME( 2004, initdv3j,  naomigd,  naomigd,  naomi,    naomi,  ROT0, "Sega",          "Initial D Arcade Stage Ver. 3 (Japan) (Rev. C) (GDS-0032C)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2004, initdv3jb, initdv3j, naomigd,  naomi,    naomi,  ROT0, "Sega",          "Initial D Arcade Stage Ver. 3 (Japan) (Rev. B) (GDS-0032B)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 //GDS-0033 Initial D Arcade Stage Ver. 3 (Export)
 //GDS-0034
 //GDS-0035
@@ -6592,17 +6660,6 @@ ROM_START( vf4evoa )
 	ROM_LOAD("317-0338-jpn.pic", 0x00, 0x4000, CRC(b177ba7d) SHA1(f751ec43a8e944a01eeda58c01b7bc73e5df749d) )
 ROM_END
 
-ROM_START( initdv2j )
-	NAOMI2_BIOS
-	NAOMI_DEFAULT_EEPROM
-
-	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gds-0026", 0, SHA1(253acede106b7fbf49e24458e7fda868720e9549) )
-
-	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	ROM_LOAD("gds-0026.rom", 0x00, 0x50, NO_DUMP) // file on GD-ROM is BFK.BIN , _NOT_ BEM.BIN which is for Initial D : Arcade Stage (Japan)
-ROM_END
-
 ROM_START( vf4tuned ) // are there multiple files on this GD-ROM? it only compresses to 500 meg when the rom file is closer to half tha
 	NAOMI2_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -6728,18 +6785,6 @@ ROM_START( initdexp )
 	ROM_LOAD("317-0343-com.pic", 0x00, 0x4000, CRC(80eea4eb) SHA1(5aedc0d52a2a8a2d186ca591094835d972574092) )
 ROM_END
 
-ROM_START( initdv3j )
-	NAOMI2_BIOS
-	NAOMI_DEFAULT_EEPROM
-
-	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gds-0032b", 0, SHA1(568411aa72ca308a03a6b5b61c79833464b88bc6) )
-
-	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	ROM_LOAD("gds-0032_pic", 0x00, 0x50, NO_DUMP ) // PIC was missing
-ROM_END
-
-
 GAME( 2001, naomi2,   0,        naomi,    naomi,    0, ROT0, "Sega",            "Naomi 2 Bios", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
 //Naomi 2 Cart Games
@@ -6763,8 +6808,6 @@ GAME( 2002, beachspi,naomi2,  naomigd,    naomi,    naomi2,  ROT0, "Sega",      
 GAME( 2002, initdexp,naomi2,  naomigd,    naomi,    naomi2,  ROT0, "Sega",          "Initial D Arcade Stage (Export) (GDS-0025)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2002, vf4evo,  naomi2,  naomigd,    naomi,    naomi2,  ROT0, "Sega",          "Virtua Fighter 4 Evolution (Rev B) (GDS-0024B)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2002, vf4evoa, vf4evo,  naomigd,    naomi,    naomi2,  ROT0, "Sega",          "Virtua Fighter 4 Evolution (Rev A) (GDS-0024A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-GAME( 2002, initdv2j,naomi2,  naomigd,    naomi,    naomi2,  ROT0, "Sega",          "Initial D : Arcade Stage Ver. 2 (Japan) (GDS-0026)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-GAME( 2004, initdv3j,naomi2,  naomigd,    naomi,    naomi2,  ROT0, "Sega",          "Initial D : Arcade Stage Ver. 3 (Japan) (Rev B) (GDS-0032B)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2004, vf4tuned,naomi2,  naomigd,    naomi,    naomi2,  ROT0, "Sega",          "Virtua Fighter 4 Final Tuned (Rev F) (GDS-0036F)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2004, vf4tunedd,vf4tuned,naomigd,   naomi,    naomi2,  ROT0, "Sega",          "Virtua Fighter 4 Final Tuned (Rev D) (GDS-0036D)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2004, vf4tuneda,vf4tuned,naomigd,   naomi,    naomi2,  ROT0, "Sega",          "Virtua Fighter 4 Final Tuned (Rev A) (GDS-0036A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
@@ -6879,6 +6922,7 @@ static const UINT32 kofxi_key    = 0xa4be3;
 static const UINT32 dirtypig_key = 0xc194f;
 static const UINT32 mslug6_key   = 0x53627;
 static const UINT32 samsptk_key  = 0xe935f;
+static const UINT32 ggx15_key    = 0x91257;
 
 static DRIVER_INIT( atomiswave )
 {
@@ -6930,6 +6974,7 @@ AW_DRIVER_INIT(ftspeed)
 AW_DRIVER_INIT(dirtypig)
 AW_DRIVER_INIT(mslug6)
 AW_DRIVER_INIT(samsptk)
+AW_DRIVER_INIT(ggx15)
 
 ROM_START( fotns )
 	ROM_REGION( 0x200000, "awflash", 0)
@@ -7237,11 +7282,27 @@ ROM_START( samsptk )
 	ROM_LOAD( "ax2907m01.mrom7", 0xd000000, 0x2000000, CRC(48015081) SHA1(3c0a0a6dc9ab7bf889579477699e612c3092f9bf) )
 ROM_END
 
+ROM_START( ggx15 )
+	ROM_REGION( 0x200000, "awflash", 0)
+	AW_BIOS
+
+	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
+        ROM_LOAD( "ax0801p01.ic18", 0x0000000, 0x0800000, CRC(d920c6bb) SHA1(ab34bbef3c71396447bc5322d8e8786041fc832a) ) 
+        ROM_LOAD( "ax0801m01.ic11", 0x1000000, 0x1000000, CRC(61879b2d) SHA1(9592fbd979cef9d8f465cd92d0f00b9c13ecf7ba) ) 
+        ROM_LOAD( "ax0802m01.ic12", 0x2000000, 0x1000000, CRC(c0ff124d) SHA1(dd403d10de2f097fbaa6b93bc311e2b9e893828d) ) 
+        ROM_LOAD( "ax0803m01.ic13", 0x3000000, 0x1000000, CRC(4400c89a) SHA1(4e13536c01103ecfbfc9e3e33746ceae7a91a520) ) 
+        ROM_LOAD( "ax0804m01.ic14", 0x4000000, 0x1000000, CRC(70f58ab4) SHA1(cd2def19bbad945c87567f8d28f3a2a179a7f7f6) ) 
+        ROM_LOAD( "ax0805m01.ic15", 0x5000000, 0x1000000, CRC(72740e45) SHA1(646eded89f10008c9176cd6772a8ac9d1bf4271a) ) 
+        ROM_LOAD( "ax0806m01.ic16", 0x6000000, 0x1000000, CRC(3bf8ecba) SHA1(43e7fbf21d8ee60bab72ce558640730fd9c3e3b8) ) 
+        ROM_LOAD( "ax0807m01.ic17", 0x7000000, 0x1000000, CRC(e397dd79) SHA1(5fec32dc19dd71ef0d451f8058186f998015723b) ) 
+ROM_END
+
 /* Atomiswave */
 GAME( 2001, awbios,   0,        aw,    aw,    atomiswave, ROT0, "Sammy",                           "Atomiswave Bios", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
 GAME( 2002, maxspeed, awbios,   aw,    aw,    maxspeed, ROT0, "Sammy",                           "Maximum Speed", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2002, sprtshot, awbios,   aw,    aw,    sprtshot, ROT0, "Sammy USA",                       "Sports Shooting USA", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2003, ggx15,    awbios,   aw,    aw,    ggx15,    ROT0, "Sammy / Arc System Works",        "Guilty Gear X ver. 1.5", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 2003, demofist, awbios,   aw,    aw,    demofist, ROT0, "Polygon Magic / Dimps",           "Demolish Fist", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2003, dolphin,  awbios,   aw,    aw,    dolphin,  ROT0, "Sammy",                           "Dolphin Blue", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 2003, ggisuka,  awbios,   aw,    aw,    ggisuka,  ROT0, "Sammy / Arc System Works",        "Guilty Gear Isuka", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )

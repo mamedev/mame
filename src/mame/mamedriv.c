@@ -4883,12 +4883,15 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( vf4evoct )	/* 2002.08 Virtua Fighter 4 Evolution (cartridge) */
 	DRIVER( vf4evoa )	/* 2002.08 Virtua Fighter 4 Evolution */
 						/* 2002.11 WCCF SERIE A 2001-2002 ver.1.2 */
-	DRIVER( initdv2j )	/* 2002.12 Initial D Arcade Stage ver.2 */
+	DRIVER( initdv2j )	/* 2002.12 Initial D Arcade Stage ver.2 rev. B*/
+	DRIVER( initdv2jo )	/* 2002.12 Initial D Arcade Stage ver.2 */
+	DRIVER( initdv2e )	/* 2002.12 Initial D Arcade Stage ver.2 */
 	DRIVER( vf4evo )	/* 2002.12 Virtua Fighter 4 Evolution ver.B */
 						/* 2003.03 WCCF SERIE A 2001-2002 ver.2.0 */
 						/* 2003.09 WCCF 2002-2003 SERIE A */
 						/* 2003.?? CYCRAFT Club Kart ver. */
-	DRIVER( initdv3j )	/* 2004.01 Initial D Arcade Stage ver.3 */
+	DRIVER( initdv3j )	/* 2004.01 Initial D Arcade Stage ver.3 rev. C */
+	DRIVER( initdv3jb )	/* 2004.01 Initial D Arcade Stage ver.3 rev. B */
 						/* 2004.?? Initial D Arcade Stage ver.3 for CYCRAFT */
 						/* 2004.06 WCCF 2002-2003 SERIE A ver.2.0 */
 						/* 2004.07 Virtua Fighter 4 Final Tuned */
@@ -4909,7 +4912,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( awbios )
 	DRIVER( maxspeed )	/* 2002.12 Maximum Speed */
 	DRIVER( sprtshot )	/* 2002.12 Sports Shooting USA */
-						/* 2003.03 Guilty Gear X ver.1.5 */
+	DRIVER( ggx15 )		/* 2003.03 Guilty Gear X ver.1.5 */
 	DRIVER( demofist )	/* 2003.06 Demolish Fist */
 	DRIVER( dolphin  )	/* 2003.08 Dolphin Blue */
 	DRIVER( ggisuka )	/* 2003.12 Guilty Gear Isuka */
