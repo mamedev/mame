@@ -632,9 +632,9 @@ static CPU_EXECUTE( m68k )
 			/* Call external hook to peek at CPU */
 			debugger_instruction_hook(device, REG_PC);
 
-			// FIXME: remove this
-//          void apollo_debug_instruction(device_t *device);
-//          apollo_debug_instruction(device);
+			/* call external instruction hook (independent of debug mode) */
+			if (m68k->instruction_hook != NULL)
+				m68k->instruction_hook(device, REG_PC);
 
 			/* Record previous program counter */
 			REG_PPC = REG_PC;
@@ -671,13 +671,6 @@ static CPU_EXECUTE( m68k )
 				if (m68k->mmu_tmp_buserror_occurred)
 				{
 					UINT32 sr;
-
-//                  const char * disassemble(m68ki_cpu_core *m68k, offs_t pc);
-//                  logerror(
-//                          "PMMU: pc=%08x sp=%08x va=%08x bus error: %s\n",
-//                          REG_PPC, REG_A[7], m68k->mmu_tmp_buserror_address,
-//                          (m68k->mmu_tmp_buserror_address == REG_PPC) ? "-"
-//                                  : disassemble(m68k, REG_PPC));
 
 					m68k->mmu_tmp_buserror_occurred = 0;
 
@@ -821,6 +814,15 @@ static CPU_RESET( m68k )
 
 	/* flush the MMU's cache */
 	pmmu_atc_flush(m68k);
+
+	if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type))
+	{
+		// clear instruction cache
+		m68ki_ic_clear(m68k);
+	}
+
+	// disable instruction hook
+	m68k->instruction_hook = NULL;
 }
 
 static CPU_DISASSEMBLE( m68k )

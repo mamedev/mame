@@ -1318,6 +1318,11 @@ static void fpgen_rm_reg(m68ki_cpu_core *m68k, UINT16 w2)
 			m68k->remaining_cycles -= 109;
 			break;
 		}
+//		case 0x0e:		// FSIN
+//		{
+//			// TODO
+//			break;
+//		}
 		case 0x18:		// FABS
 		{
 			REG_FP[dst] = source;
@@ -1365,11 +1370,24 @@ static void fpgen_rm_reg(m68ki_cpu_core *m68k, UINT16 w2)
 			m68k->remaining_cycles -= 11;
 			break;
 		}
+		case 0x24:		// FSGLDIV
+		{
+			REG_FP[dst] = floatx80_div(REG_FP[dst], source);
+			m68k->remaining_cycles -= 43; //  // ? (value is from FDIV)
+			break;
+		}
 		case 0x25:		// FREM
 		{
 			REG_FP[dst] = floatx80_rem(REG_FP[dst], source);
 			SET_CONDITION_CODES(m68k, REG_FP[dst]);
 			m68k->remaining_cycles -= 43;	// guess
+			break;
+		}
+		case 0x27:		// FSGLMUL
+		{
+			REG_FP[dst] = floatx80_mul(REG_FP[dst], source);
+			SET_CONDITION_CODES(m68k, REG_FP[dst]);
+			m68k->remaining_cycles -= 11; // ? (value is from FMUL)
 			break;
 		}
 		case 0x28:		// FSUB
@@ -1396,7 +1414,7 @@ static void fpgen_rm_reg(m68ki_cpu_core *m68k, UINT16 w2)
 			break;
 		}
 
-		default:	fatalerror("fpgen_rm_reg: unimplemented opmode %02X at %08X\n", opmode, REG_PC-4);
+		default:	fatalerror("fpgen_rm_reg: unimplemented opmode %02X at %08X\n", opmode, REG_PPC);
 	}
 }
 
@@ -1507,6 +1525,10 @@ static void fmovem(m68ki_cpu_core *m68k, UINT16 w2)
 	{
 		switch (mode)
 		{
+			case 1: // Dynamic register list, postincrement or control addressing mode.
+				// FIXME: not really tested, but seems to work
+				reglist = REG_D[(reglist >> 4) & 7];
+
 			case 0:		// Static register list, predecrement or control addressing mode
 			{
 				for (i=0; i < 8; i++)
@@ -1531,13 +1553,41 @@ static void fmovem(m68ki_cpu_core *m68k, UINT16 w2)
 				break;
 			}
 
-			default:	fatalerror("040fpu0: FMOVEM: mode %d unimplemented at %08X\n", mode, REG_PC-4);
+			case 2:		// Static register list, postdecrement or control addressing mode
+			{
+				for (i=0; i < 8; i++)
+				{
+					if (reglist & (1 << i))
+					{
+						switch (ea >> 3)
+						{
+							case 5:		// (d16, An)
+							case 6:		// (An) + (Xn) + d8
+								store_extended_float80(m68k, mem_addr, REG_FP[7-i]);
+								mem_addr += 12;
+								break;
+							default:
+								WRITE_EA_FPE(m68k, ea, REG_FP[7-i]);
+								break;
+						}
+
+						m68k->remaining_cycles -= 2;
+					}
+				}
+				break;
+			}
+
+			default:	fatalerror("M680x0: FMOVEM: mode %d unimplemented at %08X\n", mode, REG_PC-4);
 		}
 	}
 	else		// From mem to FP regs
 	{
 		switch (mode)
 		{
+			case 3: // Dynamic register list, predecrement addressing mode.
+				// FIXME: not really tested, but seems to work
+				reglist = REG_D[(reglist >> 4) & 7];
+
 			case 2:		// Static register list, postincrement or control addressing mode
 			{
 				for (i=0; i < 8; i++)
@@ -1561,9 +1611,18 @@ static void fmovem(m68ki_cpu_core *m68k, UINT16 w2)
 				break;
 			}
 
-			default:	fatalerror("040fpu0: FMOVEM: mode %d unimplemented at %08X\n", mode, REG_PC-4);
+			default:	fatalerror("M680x0: FMOVEM: mode %d unimplemented at %08X\n", mode, REG_PC-4);
 		}
 	}
+}
+
+static void fscc(m68ki_cpu_core *m68k)
+{
+	int ea = m68k->ir & 0x3f;
+	int condition = (INT16)(OPER_I_16(m68k));
+
+	WRITE_EA_8(m68k, ea, TEST_CONDITION(m68k, condition) ? 0xff : 0);
+	m68k->remaining_cycles -= 7; // ???
 }
 
 static void fbcc16(m68ki_cpu_core *m68k)
@@ -1646,15 +1705,15 @@ void m68040_fpu_op0(m68ki_cpu_core *m68k)
 
 		case 1:		// FBcc disp16
 		{
-			switch ((m68k->ir >> 3) & 0x3) {
+			switch ((m68k->ir >> 3) & 0x7) {
 			case 1: // FDBcc
 				// TODO:
 				break;
 			default: // FScc (?)
-				// TODO:
-				break;
+				fscc(m68k);
+				return;
 			}
-			fatalerror("M68kFPU: unimplemented main op %d with mode %d\n", (m68k->ir >> 6) & 0x3, (m68k->ir >> 3) & 0x7);
+			fatalerror("M68kFPU: unimplemented main op %d with mode %d at %08X\n", (m68k->ir >> 6) & 0x3, (m68k->ir >> 3) & 0x7, REG_PPC);
 		}
 
 		case 2:		// FBcc disp16

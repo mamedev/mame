@@ -199,13 +199,13 @@ INLINE UINT32 get_dt2_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 ptest
 	return tbl_entry;
 }
 
-INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 ptest)
+INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, UINT8 ptest)
 {
 	UINT32 tbl_entry2 = m68k->program->read_dword(tptr);
 	UINT32 tbl_entry = m68k->program->read_dword(tptr + 4);
 	UINT32 dt = tbl_entry2 & M68K_MMU_DF_DT;
 
-	m68k->mmu_tmp_sr |= tbl_entry2 & 0x0100 ? M68K_MMU_SR_SUPERVISOR_ONLY : 0;
+	m68k->mmu_tmp_sr |= ((tbl_entry2 & 0x0100) && !(fc & 4)) ? M68K_MMU_SR_SUPERVISOR_ONLY : 0;
 	m68k->mmu_tmp_sr |= tbl_entry2 & 0x0004 ? M68K_MMU_SR_WRITE_PROTECT : 0;
 
 	if (!ptest)
@@ -272,27 +272,35 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 ptest
 	// first see if this is already in the ATC
 	for (i = 0; i < MMU_ATC_ENTRIES; i++)
 	{
-		// if tag bits and function code match, we've got it
-		if (m68k->mmu_atc_tag[i] == atc_tag)
+		if (m68k->mmu_atc_tag[i] != atc_tag)
 		{
-			 if (m68k->mmu_tmp_rw || !(m68k->mmu_atc_data[i] & M68K_MMU_ATC_WRITE_PR))
-			 {
-				 // read access or write access and not write protected
-				 if (!m68k->mmu_tmp_rw && !ptest)
-				 {
-					 // FIXME: must set modified in PMMU tables as well
-					 m68k->mmu_atc_data[i] |= M68K_MMU_ATC_MODIFIED;
-				 }
-				 else
-				 {
-					 // FIXME: supervisor mode?
-					 m68k->mmu_tmp_sr = M68K_MMU_SR_MODIFIED;
-				 }
-				addr_out = (m68k->mmu_atc_data[i]<<8) | (addr_in & ~(~0 << ps));
-//              logerror("ATC[%2d] hit: log %08x -> phys %08x  pc=%08x fc=%d\n", i, addr_in, addr_out, REG_PPC, fc);
-//              pmmu_atc_count++;
-				return addr_out;
-			 }
+			// tag bits and function code don't match
+		}
+		else if (!m68k->mmu_tmp_rw && (m68k->mmu_atc_data[i] & M68K_MMU_ATC_WRITE_PR))
+		{
+			// write mode, but write protected
+		}
+		else if (!m68k->mmu_tmp_rw && !(m68k->mmu_atc_data[i] & M68K_MMU_ATC_MODIFIED))
+		{
+			// first write; must set modified in PMMU tables as well
+		}
+		else
+		{
+			// read access or write access and not write protected
+			if (!m68k->mmu_tmp_rw && !ptest)
+			{
+				// FIXME: must set modified in PMMU tables as well
+				m68k->mmu_atc_data[i] |= M68K_MMU_ATC_MODIFIED;
+			}
+			else
+			{
+				// FIXME: supervisor mode?
+				m68k->mmu_tmp_sr = M68K_MMU_SR_MODIFIED;
+			}
+			addr_out = (m68k->mmu_atc_data[i] << 8) | (addr_in & ~(~0 << ps));
+//          logerror("ATC[%2d] hit: log %08x -> phys %08x  pc=%08x fc=%d\n", i, addr_in, addr_out, REG_PPC, fc);
+//          pmmu_atc_count++;
+			return addr_out;
 		}
 	}
 
@@ -344,7 +352,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 ptest
 		case M68K_MMU_DF_DT3: // valid 8 byte descriptors
 			tofs *= 8;
 //          if (verbose) logerror("PMMU: reading table A entries at %08x\n", tofs + tptr);
-			tbl_entry = get_dt3_table_entry(m68k,  tofs + tptr,  ptest);
+			tbl_entry = get_dt3_table_entry(m68k,  tofs + tptr, fc,  ptest);
 			tamode = tbl_entry & M68K_MMU_DF_DT;
 //          if (verbose) logerror("PMMU: addr %08x entry %08x entry2 %08x mode %x tofs %x\n", addr_in, tbl_entry, tbl_entry2, tamode, tofs);
 			break;
@@ -377,7 +385,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 ptest
 		case M68K_MMU_DF_DT3: // 8-byte table B descriptor
 			tofs *= 8;
 //          if (verbose) logerror("PMMU: reading table B entries at %08x\n", tofs + tptr);
-			tbl_entry = get_dt3_table_entry(m68k, tptr + tofs,  ptest);
+			tbl_entry = get_dt3_table_entry(m68k, tptr + tofs, fc,  ptest);
 			tbmode = tbl_entry & M68K_MMU_DF_DT;
 			tbl_entry &= ~M68K_MMU_DF_DT;
 //          if (verbose) logerror("PMMU: addr %08x entry %08x entry2 %08x mode %x tofs %x\n", addr_in, tbl_entry, tbl_entry2, tbmode, tofs);
@@ -421,7 +429,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 ptest
 			case M68K_MMU_DF_DT3: // 8-byte table C descriptor
 				tofs *= 8;
 //              if (verbose) logerror("PMMU: reading table C entries at %08x\n", tofs + tptr);
-				tbl_entry = get_dt3_table_entry(m68k,  tptr+ tofs,  ptest);
+				tbl_entry = get_dt3_table_entry(m68k,  tptr+ tofs, fc,  ptest);
 				tcmode = tbl_entry & M68K_MMU_DF_DT;
 //              if (verbose) logerror("PMMU: addr %08x entry %08x entry2 %08x mode %x tofs %x\n", addr_in, tbl_entry, tbl_entry2, tcmode, tofs);
 				break;
@@ -470,7 +478,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 ptest
 				m68k->mmu_tmp_buserror_address = addr_in;
 			}
 		}
-		else if ((m68k->mmu_tmp_sr & M68K_MMU_SR_SUPERVISOR_ONLY) && !(fc & 4))
+		else if (m68k->mmu_tmp_sr & M68K_MMU_SR_SUPERVISOR_ONLY)
 		{
 			if (++m68k->mmu_tmp_buserror_occurred == 1)
 			{

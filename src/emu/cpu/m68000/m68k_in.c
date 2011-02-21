@@ -2634,17 +2634,20 @@ M68KMAKE_OP(bfexts, 32, ., .)
 		if(BIT_5(word2))
 			width = REG_D[width&7];
 
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0)
+		if(BIT_B(word2))
 		{
-			offset += 8;
-			ea--;
+			/* Offset is signed so we have to use ugly math =( */
+			ea += offset / 8;
+			offset %= 8;
+			if(offset < 0)
+			{
+				offset += 8;
+				ea--;
+			}
 		}
 		width = ((width-1) & 31) + 1;
 
-		data = m68ki_read_32(m68k, ea);
+		data = (offset+width) < 16 ? (m68ki_read_16(m68k, ea) << 16) : m68ki_read_32(m68k, ea);
 
 		data = MASK_OUT_ABOVE_32(data<<offset);
 
@@ -2716,17 +2719,20 @@ M68KMAKE_OP(bfextu, 32, ., .)
 		if(BIT_5(word2))
 			width = REG_D[width&7];
 
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0)
+		if(BIT_B(word2))
 		{
-			offset += 8;
-			ea--;
+			/* Offset is signed so we have to use ugly math =( */
+			ea += offset / 8;
+			offset %= 8;
+			if(offset < 0)
+			{
+				offset += 8;
+				ea--;
+			}
 		}
 		width = ((width-1) & 31) + 1;
 
-		data = m68ki_read_32(m68k, ea);
+		data = (offset+width) < 16 ? (m68ki_read_16(m68k, ea) << 16) : m68ki_read_32(m68k, ea);
 		data = MASK_OUT_ABOVE_32(data<<offset);
 
 		if((offset+width) > 32)
@@ -2813,7 +2819,7 @@ M68KMAKE_OP(bfffo, 32, ., .)
 		}
 		width = ((width-1) & 31) + 1;
 
-		data = m68ki_read_32(m68k, ea);
+		data = (offset+width) < 16 ? (m68ki_read_16(m68k, ea) << 16) : m68ki_read_32(m68k, ea);
 		data = MASK_OUT_ABOVE_32(data<<local_offset);
 
 		if((local_offset+width) > 32)
@@ -2902,13 +2908,16 @@ M68KMAKE_OP(bfins, 32, ., .)
 		if(BIT_5(word2))
 			width = REG_D[width&7];
 
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0)
+		if(BIT_B(word2))
 		{
-			offset += 8;
-			ea--;
+			/* Offset is signed so we have to use ugly math =( */
+			ea += offset / 8;
+			offset %= 8;
+			if(offset < 0)
+			{
+				offset += 8;
+				ea--;
+			}
 		}
 		width = ((width-1) & 31) + 1;
 
@@ -2920,11 +2929,18 @@ M68KMAKE_OP(bfins, 32, ., .)
 		m68k->not_z_flag = insert_base;
 		insert_long = insert_base >> offset;
 
-		data_long = m68ki_read_32(m68k, ea);
+		data_long = (offset+width) < 16 ? (m68ki_read_16(m68k, ea) << 16) : m68ki_read_32(m68k, ea);
 		m68k->v_flag = VFLAG_CLEAR;
 		m68k->c_flag = CFLAG_CLEAR;
 
-		m68ki_write_32(m68k, ea, (data_long & ~mask_long) | insert_long);
+		if((width + offset) < 16)
+		{
+			m68ki_write_16(m68k, ea, ((data_long & ~mask_long) | insert_long) >> 16);
+		}
+		else
+		{
+			m68ki_write_32(m68k, ea, (data_long & ~mask_long) | insert_long);
+		}
 
 		if((width + offset) > 32)
 		{
@@ -6683,6 +6699,12 @@ M68KMAKE_OP(movec, 32, rc, .)
 					else
 					{
 						m68k->cacr = REG_DA[(word2 >> 12) & 15] & 0x0f;
+					}
+
+//					logerror("movec to cacr=%04x\n", m68k->cacr);
+					if (m68k->cacr & (M68K_CACR_CI | M68K_CACR_CEI))
+					{
+						m68ki_ic_clear(m68k);
 					}
 					return;
 				}

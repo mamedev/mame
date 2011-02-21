@@ -103,6 +103,15 @@ typedef struct _m68ki_cpu_core m68ki_cpu_core;
 /* MMU constants */
 #define MMU_ATC_ENTRIES	(22)	// 68851 has 64, 030 has 22
 
+/* instruction cache constants */
+#define M68K_IC_SIZE 128
+
+#define M68K_CACR_IBE 0x10 // Instruction Burst Enable
+#define M68K_CACR_CI  0x08 // Clear Instruction Cache
+#define M68K_CACR_CEI 0x04 // Clear Entry in Instruction Cache
+#define M68K_CACR_FI  0x02 // Freeze Instruction Cache
+#define M68K_CACR_EI  0x01 // Enable Instruction Cache
+
 /* ======================================================================== */
 /* ================================ MACROS ================================ */
 /* ======================================================================== */
@@ -706,6 +715,13 @@ struct _m68ki_cpu_core
 	UINT16 mmu_tmp_rw;      /* temporary hack: read/write (1/0) for the mmu */
 	UINT32 mmu_tmp_buserror_address;   /* temporary hack: (first) bus error address */
 	UINT16 mmu_tmp_buserror_occurred;  /* temporary hack: flag that bus error has occurred from mmu */
+
+	UINT32 ic_address[M68K_IC_SIZE];   /* instruction cache address data */
+	UINT16 ic_data[M68K_IC_SIZE];      /* instruction cache content data */
+
+	/* external instruction hook (does not depend on debug mode) */
+	typedef int (*instruction_hook_t)(device_t *device, offs_t curpc);
+	instruction_hook_t instruction_hook;
 };
 
 
@@ -882,6 +898,43 @@ INLINE void m68kx_write_memory_32_pd(m68ki_cpu_core *m68k, unsigned int address,
 
 /* ---------------------------- Read Immediate ---------------------------- */
 
+// clear the instruction cache
+INLINE void m68ki_ic_clear(m68ki_cpu_core *m68k)
+{
+	int i;
+	for (i=0; i< M68K_IC_SIZE; i++) {
+		m68k->ic_address[i] = ~0;
+	}
+}
+
+// read immediate word using the instruction cache
+
+INLINE UINT32 m68ki_ic_readimm16(m68ki_cpu_core *m68k, UINT32 address)
+{
+	if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type) && (m68k->cacr & M68K_CACR_EI))
+	{
+		UINT32 ic_offset = (address >> 1) % M68K_IC_SIZE;
+		if (m68k->ic_address[ic_offset] == address)
+		{
+			return m68k->ic_data[ic_offset];
+		}
+		else
+		{
+			UINT32 data = m68k->memory.readimm16(address);
+			if (!m68k->mmu_tmp_buserror_occurred)
+			{
+				m68k->ic_data[ic_offset] = data;
+				m68k->ic_address[ic_offset] = address;
+			}
+			return data;
+		}
+	}
+	else
+	{
+		return m68k->memory.readimm16(address);
+	}
+}
+
 /* Handles all immediate reads, does address error check, function code setting,
  * and prefetching if they are enabled in m68kconf.h
  */
@@ -896,14 +949,14 @@ INLINE UINT32 m68ki_read_imm_16(m68ki_cpu_core *m68k)
 
 	if(REG_PC != m68k->pref_addr)
 	{
-		m68k->pref_data = m68k->memory.readimm16(REG_PC);
+		m68k->pref_data = m68ki_ic_readimm16(m68k, REG_PC);
 		m68k->pref_addr = m68k->mmu_tmp_buserror_occurred ? ~0 : REG_PC;
 	}
 	result = MASK_OUT_ABOVE_16(m68k->pref_data);
 	REG_PC += 2;
 	if (!m68k->mmu_tmp_buserror_occurred) {
 		// prefetch only if no bus error occurred in opcode fetch
-		m68k->pref_data = m68k->memory.readimm16(REG_PC);
+		m68k->pref_data = m68ki_ic_readimm16(m68k, REG_PC);
 		m68k->pref_addr = m68k->mmu_tmp_buserror_occurred ? ~0 : REG_PC;
 		// ignore bus error on prefetch
 		m68k->mmu_tmp_buserror_occurred = 0;
@@ -924,16 +977,16 @@ INLINE UINT32 m68ki_read_imm_32(m68ki_cpu_core *m68k)
 	if(REG_PC != m68k->pref_addr)
 	{
 		m68k->pref_addr = REG_PC;
-		m68k->pref_data = m68k->memory.readimm16(m68k->pref_addr);
+		m68k->pref_data = m68ki_ic_readimm16(m68k, m68k->pref_addr);
 	}
 	temp_val = MASK_OUT_ABOVE_16(m68k->pref_data);
 	REG_PC += 2;
 	m68k->pref_addr = REG_PC;
-	m68k->pref_data = m68k->memory.readimm16(m68k->pref_addr);
+	m68k->pref_data = m68ki_ic_readimm16(m68k, m68k->pref_addr);
 
 	temp_val = MASK_OUT_ABOVE_32((temp_val << 16) | MASK_OUT_ABOVE_16(m68k->pref_data));
 	REG_PC += 2;
-	m68k->pref_data = m68k->memory.readimm16(REG_PC);
+	m68k->pref_data = m68ki_ic_readimm16(m68k, REG_PC);
 	m68k->pref_addr = m68k->mmu_tmp_buserror_occurred ? ~0 : REG_PC;
 
 	return temp_val;
@@ -1543,7 +1596,9 @@ void m68ki_stack_frame_1010(m68ki_cpu_core *m68k, UINT32 sr, UINT32 vector, UINT
 	m68ki_push_16(m68k, 0);
 
 	/* SPECIAL STATUS REGISTER */
-	m68ki_push_16(m68k, 0);
+	// set bit for: Rerun Faulted bus Cycle, or run pending prefetch
+	// set FC
+	m68ki_push_16(m68k, 0x0100 | m68k->mmu_tmp_fc );
 
 	/* INTERNAL REGISTER */
 	m68ki_push_16(m68k, 0);
@@ -1590,7 +1645,7 @@ void m68ki_stack_frame_1011(m68ki_cpu_core *m68k, UINT32 sr, UINT32 vector, UINT
 	m68ki_push_32(m68k, 0);
 
 	/* STAGE B ADDRESS (2 words) */
-	m68ki_push_32(m68k, fault_address);
+	m68ki_push_32(m68k, 0);
 
 	/* INTERNAL REGISTER (4 words) */
 	m68ki_push_32(m68k, 0);
@@ -1606,7 +1661,7 @@ void m68ki_stack_frame_1011(m68ki_cpu_core *m68k, UINT32 sr, UINT32 vector, UINT
 	m68ki_push_16(m68k, 0);
 
 	/* DATA CYCLE FAULT ADDRESS (2 words) */
-	m68ki_push_32(m68k, 0);
+	m68ki_push_32(m68k, fault_address);
 
 	/* INSTRUCTION PIPE STAGE B */
 	m68ki_push_16(m68k, 0);
@@ -1615,7 +1670,7 @@ void m68ki_stack_frame_1011(m68ki_cpu_core *m68k, UINT32 sr, UINT32 vector, UINT
 	m68ki_push_16(m68k, 0);
 
 	/* SPECIAL STATUS REGISTER */
-	m68ki_push_16(m68k, 0);
+	m68ki_push_16(m68k, 0x0100 | m68k->mmu_tmp_fc);
 
 	/* INTERNAL REGISTER */
 	m68ki_push_16(m68k, 0);
