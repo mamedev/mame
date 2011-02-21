@@ -4431,6 +4431,8 @@ void CDC_End_Transfer(running_machine* machine)
 
 void CDC_Do_DMA(running_machine* machine, int rate)
 {
+	address_space* space = cputag_get_address_space(machine, "segacd_68k", ADDRESS_SPACE_PROGRAM);
+
 	UINT32 dstoffset, length;
 	UINT8 *dest;
 	UINT16 destination = CDC_REG0 & 0x0700;
@@ -4454,7 +4456,19 @@ void CDC_Do_DMA(running_machine* machine, int rate)
 
 
 	int dmacount = length;
-	dstoffset = (CDC_DMA_ADDR & 0xFFFF) << 3;
+
+	bool PCM_DMA = false;
+
+	if (destination==DMA_PCM)
+	{
+		dstoffset = (CDC_DMA_ADDR & 0x03FF) << 2;
+		PCM_DMA = true;
+	}
+	else
+	{
+		dstoffset = (CDC_DMA_ADDR & 0xFFFF) << 3;
+	}
+
 	int srcoffset = 0;
 
 	while (dmacount--)
@@ -4481,21 +4495,41 @@ void CDC_Do_DMA(running_machine* machine, int rate)
 		}
 		else if (destination==DMA_PCM)
 		{
-			fatalerror("PCM RAM DMA unimplemented!\n");
+			dest = 0;//fatalerror("PCM RAM DMA unimplemented!\n");
 		}
 		else
 		{
 			fatalerror("Unknown DMA Destination!!\n");
 		}
 
-		dest[dstoffset+1] = data >>8;
-		dest[dstoffset+0] = data&0xff;
+		if (PCM_DMA)
+		{
+			space->write_byte(0xff2000+(((dstoffset*2)+1)&0x1fff),data >> 8);
+			space->write_byte(0xff2000+(((dstoffset*2)+3)&0x1fff),data & 0xff);
+		//	printf("PCM_DMA writing %04x %04x\n",0xff2000+(dstoffset*2), data);
+		}
+		else
+		{
+			if (dest)
+			{
+				dest[dstoffset+1] = data >>8;
+				dest[dstoffset+0] = data&0xff;
+			}
+		}
 
 		srcoffset += 2;
 		dstoffset += 2;
 	}
 
-	CDC_DMA_ADDR += length >> 2;
+	if (PCM_DMA)
+	{
+		CDC_DMA_ADDR += length >> 1;
+	}
+	else
+	{
+		CDC_DMA_ADDR += length >> 2;
+	}
+
 	CDC_DMA_ADDRC += length*2;
 
 	if (SCD_DMA_ENABLED)
@@ -5039,40 +5073,32 @@ static READ16_HANDLER( segacd_comms_flags_r )
 
 static WRITE16_HANDLER( segacd_comms_flags_subcpu_w )
 {
-	if (ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15)
-	{
-		printf("sub cpu attempting to word write data to comms flags %04x!\n",data);
-	}
-
-	if (ACCESSING_BITS_0_7)
-	{
-		segacd_comms_flags = (segacd_comms_flags & 0xff00) | (data & 0x00ff);
-		space->machine->scheduler().synchronize();
-	}
-
 	if (ACCESSING_BITS_8_15) // Dragon's Lair
 	{
 		segacd_comms_flags = (segacd_comms_flags & 0xff00) | ((data >> 8) & 0x00ff);
+		space->machine->scheduler().synchronize();
+	}
+
+	// flashback needs low bits to take priority in word writes
+	if (ACCESSING_BITS_0_7)
+	{
+		segacd_comms_flags = (segacd_comms_flags & 0xff00) | (data & 0x00ff);
 		space->machine->scheduler().synchronize();
 	}
 }
 
 static WRITE16_HANDLER( segacd_comms_flags_maincpu_w )
 {
-	if (ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15)
-	{
-		printf("main cpu attempting to word write data to comms flags %04x!\n",data);
-	}
-
-	if (ACCESSING_BITS_0_7)
-	{
-		segacd_comms_flags = (segacd_comms_flags & 0x00ff) | ((data << 8) & 0xff00);
-		space->machine->scheduler().synchronize();
-	}
-
 	if (ACCESSING_BITS_8_15)
 	{
 		segacd_comms_flags = (segacd_comms_flags & 0x00ff) | (data & 0xff00);
+		space->machine->scheduler().synchronize();
+	}
+
+	// flashback needs low bits to take priority in word writes
+	if (ACCESSING_BITS_0_7)
+	{
+		segacd_comms_flags = (segacd_comms_flags & 0x00ff) | ((data << 8) & 0xff00);
 		space->machine->scheduler().synchronize();
 	}
 }
@@ -6312,7 +6338,7 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 		segacd_conversion_active = 1;
 
 		// todo: proper time calculation
-		segacd_gfx_conversion_timer->adjust(attotime::from_nsec(5000000));
+		segacd_gfx_conversion_timer->adjust(attotime::from_nsec(9000));
 
 
 
