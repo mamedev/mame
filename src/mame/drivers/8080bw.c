@@ -3298,7 +3298,7 @@ GAME( 1979, grescue,  lrescue,  lrescue,  lrescue,  0, ROT270, "Taito (Universal
 GAME( 1979, desterth, lrescue,  lrescue,  invrvnge, 0, ROT270, "bootleg", "Destination Earth", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1979, invadpt2, 0,        invadpt2, invadpt2, 0, ROT270, "Taito", "Space Invaders Part II (Taito)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1980, invaddlx, invadpt2, invaders, invadpt2, 0, ROT270, "Taito (Midway license)", "Space Invaders Deluxe", GAME_SUPPORTS_SAVE )
-GAME( 1980, vortex,   0,        vortex,   vortex, vortex, ROT270, "Zilec Electronics Ltd.", "Vortex", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) /* Encrypted 8080/IO */
+GAME( 1980, vortex,   0,        vortex,   vortex, vortex, ROT270, "Zilec Electronics", "Vortex", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) /* Encrypted 8080/IO */
 GAME( 1979, cosmo,    0,        cosmo,    cosmo,    0, ROT90,  "TDS & Mints", "Cosmo", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1979, schaser,  0,        schaser,  schaser,  0, ROT270, "Taito", "Space Chaser", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS )
 GAME( 1979, schasercv,schaser,  schasercv,schasercv,0, ROT270, "Taito", "Space Chaser (CV version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS )

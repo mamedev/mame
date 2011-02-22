@@ -7367,9 +7367,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( roundup )	/* (c) 1981 Amenip/Centuri */
 	DRIVER( fitter )	/* (c) 1981 Taito */
 	DRIVER( fitterbl )	/* bootleg */
-	DRIVER( thepit )	/* (c) 1982 Taito */
-	DRIVER( thepitc )	/* (c) 1982 Centuri */
-	DRIVER( thepitb )	/* bootleg */
+	DRIVER( thepit )	/* (c) 1982 Zilec */
+	DRIVER( thepitu )	/* (c) 1982 Centuri (licensed) */
+	DRIVER( thepitj )	/* (c) 1982 Taito (licensed) */
 	DRIVER( thepitm )	/* bootleg */
 	DRIVER( dockman )	/* (c) 1982 Taito Corp. */
 	DRIVER( portman )	/* (c) 1982 Nova Games Ltd. */

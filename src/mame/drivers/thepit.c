@@ -696,25 +696,24 @@ MACHINE_CONFIG_END
 
 ROM_START( thepit )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pit01.ic38",         0x0000, 0x1000, CRC(87c269bf) SHA1(78a85a637cbf0dcfde7ccaa9a2d543078655b566) )
-	ROM_LOAD( "pit02.ic39",         0x1000, 0x1000, CRC(e1dfd360) SHA1(fd18f12edd39574d20b1e053dd3e7131d49f3db2) )
-	ROM_LOAD( "pit03.ic40",         0x2000, 0x1000, CRC(3674ccac) SHA1(876de2994ffdbc1f2226b5d672b5e92125d879da) )
-	ROM_LOAD( "pit04.ic41",         0x3000, 0x1000, CRC(bddde829) SHA1(267fc2a65a906bcd5786a7a97af986adac0588c7) )
-	ROM_LOAD( "pit05.ic33",         0x4000, 0x1000, CRC(584d1546) SHA1(9758e4b012bf93c6d847cc2cac890febe5d8335e) )
+	ROM_LOAD( "pit1.bin",     0x0000, 0x1000, CRC(71affecc) SHA1(e64cb2f8d546f5d44dc10a4178f3d211882c45a9) )
+	ROM_LOAD( "pit2.bin",     0x1000, 0x1000, CRC(894063cd) SHA1(772ff81cf44d21981f9768f017af5cb81ff57be3) )
+	ROM_LOAD( "pit3.bin",     0x2000, 0x1000, CRC(1b488543) SHA1(8991c6424f008ddd15edac953635aecdba4ea696) )
+	ROM_LOAD( "pit4.bin",     0x3000, 0x1000, CRC(e941e848) SHA1(1dd9ded69121d28b674209abe1efd60afde6926d) )
+	ROM_LOAD( "pit5.bin",     0x4000, 0x1000, CRC(e0643c95) SHA1(bb5133784b2b6a5c217d9ea42641daba2a797fff) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "pit07.ic30",          0x0000, 0x0800, CRC(2d4881f9) SHA1(4773235d427ab88116e07599d0d5b130377548e7) )
-	ROM_LOAD( "pit06.ic31",          0x0800, 0x0800, CRC(c9d8c1cc) SHA1(66d0840182ede356c53cd1f930ea8abf86094ab7) )
+	ROM_LOAD( "pit6.bin",     0x0000, 0x0800, CRC(1b79dfb6) SHA1(ba78b035a91a67732414ba327640fb771d4323c5) )
 
 	ROM_REGION( 0x1800, "gfx1", 0 ) /* chars and sprites */
-	ROM_LOAD( "pit08.ic9",           0x0000, 0x0800, CRC(00dce65f) SHA1(ba0cce484d1f8693a85b85e0689d107588df9043) )
-	ROM_LOAD( "pit09.ic8",           0x1000, 0x0800, CRC(a2e2b218) SHA1(1aa293a9503f3cbbc2fbd84b6b1d30124ef462e7) )
+	ROM_LOAD( "pit8.bin",     0x0000, 0x0800, CRC(69502afc) SHA1(9baf094baab8325af659879cfb6984eeca0d94bd) )
+	ROM_LOAD( "pit7.bin",     0x1000, 0x0800, CRC(d901b353) SHA1(4a35dd857ca352e0260361376fe666af4b3315af) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "82s123.ic4",   0x0000, 0x0020, CRC(a758b567) SHA1(d188c90dba10fe3abaae92488786b555b35218c5) ) /* Color prom */
+	ROM_LOAD( "82s123.ic4",   0x0000, 0x0020, CRC(a758b567) SHA1(d188c90dba10fe3abaae92488786b555b35218c5) ) /* Color prom was a MMI6331 and is compatible with the 82s123 prom type */
 ROM_END
 
-ROM_START( thepitc )
+ROM_START( thepitu )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "p38b",         0x0000, 0x1000, CRC(7315e1bc) SHA1(a07f252efcc81b40ef273007e9ce74db140b1bee) )
 	ROM_LOAD( "p39b",         0x1000, 0x1000, CRC(c9cc30fe) SHA1(27938ebc27480e8cf40bfdd930a4899984cfeb83) )
@@ -733,23 +732,24 @@ ROM_START( thepitc )
 	ROM_LOAD( "82s123.ic4",   0x0000, 0x0020, CRC(a758b567) SHA1(d188c90dba10fe3abaae92488786b555b35218c5) ) /* Color prom */
 ROM_END
 
-ROM_START( thepitb ) /* Bootleg based on the Centuri version by AW Zilec Elc Ltd */
+ROM_START( thepitj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pit1.bin",     0x0000, 0x1000, CRC(71affecc) SHA1(e64cb2f8d546f5d44dc10a4178f3d211882c45a9) )
-	ROM_LOAD( "pit2.bin",     0x1000, 0x1000, CRC(894063cd) SHA1(772ff81cf44d21981f9768f017af5cb81ff57be3) )
-	ROM_LOAD( "pit3.bin",     0x2000, 0x1000, CRC(1b488543) SHA1(8991c6424f008ddd15edac953635aecdba4ea696) )
-	ROM_LOAD( "pit4.bin",     0x3000, 0x1000, CRC(e941e848) SHA1(1dd9ded69121d28b674209abe1efd60afde6926d) )
-	ROM_LOAD( "pit5.bin",     0x4000, 0x1000, CRC(e0643c95) SHA1(bb5133784b2b6a5c217d9ea42641daba2a797fff) )
+	ROM_LOAD( "pit01.ic38",         0x0000, 0x1000, CRC(87c269bf) SHA1(78a85a637cbf0dcfde7ccaa9a2d543078655b566) )
+	ROM_LOAD( "pit02.ic39",         0x1000, 0x1000, CRC(e1dfd360) SHA1(fd18f12edd39574d20b1e053dd3e7131d49f3db2) )
+	ROM_LOAD( "pit03.ic40",         0x2000, 0x1000, CRC(3674ccac) SHA1(876de2994ffdbc1f2226b5d672b5e92125d879da) )
+	ROM_LOAD( "pit04.ic41",         0x3000, 0x1000, CRC(bddde829) SHA1(267fc2a65a906bcd5786a7a97af986adac0588c7) )
+	ROM_LOAD( "pit05.ic33",         0x4000, 0x1000, CRC(584d1546) SHA1(9758e4b012bf93c6d847cc2cac890febe5d8335e) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "pit6.bin",     0x0000, 0x0800, CRC(1b79dfb6) SHA1(ba78b035a91a67732414ba327640fb771d4323c5) )
+	ROM_LOAD( "pit07.ic30",          0x0000, 0x0800, CRC(2d4881f9) SHA1(4773235d427ab88116e07599d0d5b130377548e7) )
+	ROM_LOAD( "pit06.ic31",          0x0800, 0x0800, CRC(c9d8c1cc) SHA1(66d0840182ede356c53cd1f930ea8abf86094ab7) )
 
 	ROM_REGION( 0x1800, "gfx1", 0 ) /* chars and sprites */
-	ROM_LOAD( "pit8.bin",     0x0000, 0x0800, CRC(69502afc) SHA1(9baf094baab8325af659879cfb6984eeca0d94bd) )
-	ROM_LOAD( "pit7.bin",     0x1000, 0x0800, CRC(d901b353) SHA1(4a35dd857ca352e0260361376fe666af4b3315af) )
+	ROM_LOAD( "pit08.ic9",           0x0000, 0x0800, CRC(00dce65f) SHA1(ba0cce484d1f8693a85b85e0689d107588df9043) )
+	ROM_LOAD( "pit09.ic8",           0x1000, 0x0800, CRC(a2e2b218) SHA1(1aa293a9503f3cbbc2fbd84b6b1d30124ef462e7) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "82s123.ic4",   0x0000, 0x0020, CRC(a758b567) SHA1(d188c90dba10fe3abaae92488786b555b35218c5) ) /* Color prom was a MMI6331 and is compatible with the 82s123 prom type */
+	ROM_LOAD( "82s123.ic4",   0x0000, 0x0020, CRC(a758b567) SHA1(d188c90dba10fe3abaae92488786b555b35218c5) ) /* Color prom */
 ROM_END
 
 ROM_START( roundup )
@@ -1053,9 +1053,9 @@ static DRIVER_INIT( rtriv )
 GAME( 1981, roundup,  0,        thepit,   roundup,  0,     ROT90, "Taito Corporation (Amenip/Centuri license)", "Round-Up", 0 )
 GAME( 1981, fitter,   roundup,  thepit,   fitter,   0,     ROT90, "Taito Corporation", "Fitter", 0 )
 GAME( 1981, fitterbl, roundup,  thepit,   fitter,   0,     ROT90, "bootleg", "Fitter (bootleg)", 0 )
-GAME( 1982, thepit,   0,        thepit,   thepit,   0,     ROT90, "Taito", "The Pit", 0 )
-GAME( 1982, thepitc,  thepit,   thepit,   thepit,   0,     ROT90, "Taito (Centuri license)", "The Pit (Centuri)", 0 )
-GAME( 1982, thepitb,  thepit,   thepit,   thepit,   0,     ROT90, "bootleg", "The Pit (bootleg)", 0 ) /* based off the Centuri version */
+GAME( 1982, thepit,   0,        thepit,   thepit,   0,     ROT90, "Zilec Electronics", "The Pit", 0 ) // AW == Andy Walker
+GAME( 1982, thepitu,  thepit,   thepit,   thepit,   0,     ROT90, "Zilec Electronics (Centuri license)", "The Pit (US)", 0 )
+GAME( 1982, thepitj,  thepit,   thepit,   thepit,   0,     ROT90, "Zilec Electronics (Taito license)", "The Pit (Japan)", 0 )
 GAME( 1982, dockman,  0,        intrepid, dockman,  0,     ROT90, "Taito Corporation", "Dock Man", 0 )
 GAME( 1982, portman,  dockman,  intrepid, dockman,  0,     ROT90, "Taito Corporation (Nova Games Ltd. license)", "Port Man", 0 )
 GAME( 1982, suprmous, 0,        suprmous, suprmous, 0,     ROT90, "Taito Corporation", "Super Mouse", 0 )
