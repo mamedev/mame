@@ -3646,7 +3646,6 @@ static MACHINE_CONFIG_DERIVED( gunfront, taito_f2_tc0510nio )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gunfront_map)
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // picky with sound
 
 	/* video hardware */
 	MCFG_VIDEO_START(taitof2_gunfront)
@@ -3960,7 +3959,6 @@ static MACHINE_CONFIG_DERIVED( driftout, taito_f2_tc0510nio )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(driftout_map)
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // picky with sound
 
 	/* video hardware */
 	MCFG_GFXDECODE(pivot)
