@@ -201,5 +201,5 @@ ROM_START( moneybnk )
 ROM_END
 
 
-GAME( 199?, kingtut,    0,        kongambl,    kongambl,    0, ROT0,  "Konami", "King Tut (NSW)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 199?, moneybnk,   0,        kongambl,    kongambl,    0, ROT0,  "Konami", "Money In The Bank (NSW)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, kingtut,    0,        kongambl,    kongambl,    0, ROT0,  "Konami", "King Tut (NSW, Australia)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, moneybnk,   0,        kongambl,    kongambl,    0, ROT0,  "Konami", "Money In The Bank (NSW, Australia)", GAME_NOT_WORKING | GAME_NO_SOUND )
