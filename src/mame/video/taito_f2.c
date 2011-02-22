@@ -676,18 +676,19 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			{
 				/* "Zoom" zx&y is pixel size horizontally and vertically
                    of our sprite chunk. So it is difference in x and y
-                   coords of our chunk and diagonally adjoining one. */
+                   coords of our chunk and diagonally adjoining one.
 
-// These calcs caused black lines between flames in Gunfront attract...
-//              x = xlatch + x_no * (0x100 - zoomx) / 16;
-//              y = ylatch + y_no * (0x100 - zoomy) / 16;
-//              zx = xlatch + (x_no + 1) * (0x100 - zoomx) / 16 - x;
-//              zy = ylatch + (y_no + 1) * (0x100 - zoomy) / 16 - y;
+                   Ideally, big_sprite should be zoomed as a whole, and not
+                   into chunks. The current implementation practically only has
+                   16 zoom levels instead of the 256 the hardware supports,
+                   resulting in a shaky and distorted zoom.
+                   (example: planet earth zooming in, in gunfront intro)
+                */
 
-				x = xlatch + (x_no * (0x100 - zoomx) + 12) / 16;    //ks
-				y = ylatch + (y_no * (0x100 - zoomy) + 12) / 16;    //ks
-				zx = xlatch + ((x_no + 1) * (0x100 - zoomx) + 12) / 16 - x;  //ks
-				zy = ylatch + ((y_no + 1) * (0x100 - zoomy) + 12) / 16 - y;  //ks
+				x = xlatch + (x_no * (0xff - zoomx) + 15) / 16;
+				y = ylatch + (y_no * (0xff - zoomy) + 15) / 16;
+				zx = xlatch + ((x_no + 1) * (0xff - zoomx) + 15) / 16 - x;
+				zy = ylatch + ((y_no + 1) * (0xff - zoomy) + 15) / 16 - y;
 			}
 		}
 		else

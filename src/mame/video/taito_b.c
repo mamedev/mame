@@ -212,10 +212,10 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			zoomx = zoomxlatch;
 			zoomy = zoomylatch;
 
-			x = xlatch + x_no * (0x100 - zoomx) / 16;
-			y = ylatch + y_no * (0x100 - zoomy) / 16;
-			zx = xlatch + (x_no + 1) * (0x100 - zoomx) / 16 - x;
-			zy = ylatch + (y_no + 1) * (0x100 - zoomy) / 16 - y;
+			x = xlatch + (x_no * (0xff - zoomx) + 15) / 16;
+			y = ylatch + (y_no * (0xff - zoomy) + 15) / 16;
+			zx = xlatch + ((x_no + 1) * (0xff - zoomx) + 15) / 16 - x;
+			zy = ylatch + ((y_no + 1) * (0xff - zoomy) + 15) / 16 - y;
 			y_no++;
 
 			if (y_no > y_num)
