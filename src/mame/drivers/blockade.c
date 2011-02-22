@@ -34,6 +34,8 @@
 #include "sound/samples.h"
 #include "sound/discrete.h"
 
+#include "blockade.lh"
+
 #define BLOCKADE_LOG 0
 #define MASTER_CLOCK XTAL_20_079MHz
 
@@ -439,22 +441,10 @@ static GFXDECODE_START( blasto )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, blasto_layout,   0, 1 )
 GFXDECODE_END
 
-
-static PALETTE_INIT( green )
+static PALETTE_INIT( blockade )
 {
 	palette_set_color(machine,0,MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
-	palette_set_color(machine,1,MAKE_RGB(0x00,0xff,0x00)); /* GREEN */     /* overlay (Blockade) */
-}
-
-static PALETTE_INIT( yellow )
-{
-	palette_set_color(machine,0,MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
-	palette_set_color(machine,1,MAKE_RGB(0xff,0xff,0x20)); /* YELLOW */     /* overlay (Hustle) */
-}
-static PALETTE_INIT( bw )
-{
-	palette_set_color(machine,0,MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
-	palette_set_color(machine,1,MAKE_RGB(0xff,0xff,0xff)); /* WHITE */     /* Comotion/Blasto */
+	palette_set_color(machine,1,MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
 }
 
 
@@ -502,7 +492,7 @@ static MACHINE_CONFIG_START( blockade, blockade_state )
 	MCFG_GFXDECODE(blockade)
 	MCFG_PALETTE_LENGTH(2)
 
-	MCFG_PALETTE_INIT(green)
+	MCFG_PALETTE_INIT(blockade)
 	MCFG_VIDEO_START(blockade)
 	MCFG_VIDEO_UPDATE(blockade)
 
@@ -518,18 +508,8 @@ static MACHINE_CONFIG_START( blockade, blockade_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( comotion, blockade )
-	MCFG_PALETTE_INIT(bw)
-MACHINE_CONFIG_END
-
 static MACHINE_CONFIG_DERIVED( blasto, blockade )
 	MCFG_GFXDECODE(blasto)
-	MCFG_PALETTE_INIT(bw)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( hustle, blockade )
-	MCFG_GFXDECODE(blasto)
-	MCFG_PALETTE_INIT(yellow)
 MACHINE_CONFIG_END
 
 /*************************************
@@ -610,9 +590,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1976, blockade,  0,        blockade, blockade, 0, ROT0, "Gremlin", "Blockade", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1976, comotion,  0,        comotion, comotion, 0, ROT0, "Gremlin", "Comotion", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1978, blasto,    0,        blasto,   blasto,   0, ROT0, "Gremlin", "Blasto", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1977, hustle,    0,        hustle,   hustle,   0, ROT0, "Gremlin", "Hustle", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAMEL(1976, blockade,  0,        blockade, blockade, 0, ROT0, "Gremlin", "Blockade", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_blockade )
+GAMEL(1976, comotion,  0,        blockade, comotion, 0, ROT0, "Gremlin", "Comotion", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_blockade )
+GAME( 1978, blasto,    0,        blasto,   blasto,   0, ROT0, "Gremlin", "Blasto", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // b/w, no overlay
+GAMEL(1977, hustle,    0,        blasto,   hustle,   0, ROT0, "Gremlin", "Hustle", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_blockade )
 GAME( 1977, mineswpr,  0,        blasto,   mineswpr, 0, ROT0, "Amutech", "Minesweeper", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1977, mineswpr4, mineswpr, blasto,   mineswpr4,0, ROT0, "Amutech", "Minesweeper (4-Player)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

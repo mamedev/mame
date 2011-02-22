@@ -1818,6 +1818,8 @@ $(DRIVERS)/bfm_sc2.o:	$(LAYOUT)/bfm_sc2.lh \
 						$(LAYOUT)/sltblgpo.lh \
 						$(LAYOUT)/sltblgtk.lh
 
+$(DRIVERS)/blockade.o:	$(LAYOUT)/blockade.lh
+
 $(DRIVERS)/buggychl.o:	$(LAYOUT)/buggychl.lh
 
 $(DRIVERS)/bzone.o:		$(LAYOUT)/bzone.lh

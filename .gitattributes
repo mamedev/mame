@@ -3312,6 +3312,7 @@ src/mame/layout/bfm_sc1.lay svneol=native#text/plain
 src/mame/layout/bfm_sc2.lay svneol=native#text/plain
 src/mame/layout/bigdeal.lay svneol=native#text/plain
 src/mame/layout/blckjack.lay svneol=native#text/plain
+src/mame/layout/blockade.lay svneol=native#text/plain
 src/mame/layout/buckrog.lay svneol=native#text/plain
 src/mame/layout/buggybjr.lay svneol=native#text/plain
 src/mame/layout/buggyboy.lay svneol=native#text/plain
