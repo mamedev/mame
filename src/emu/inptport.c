@@ -3503,6 +3503,13 @@ static void port_config_detokenize(ioport_list &portlist, const input_port_token
 					break;
 				}
 				curfield->read_device_name = TOKEN_GET_STRING(ipt);
+				if (!strcmp(curfield->read_device_name, DEVICE_SELF))
+				{
+					if (owner)
+						curfield->read_device_name = owner->tag();
+					else
+						error_buf_append(errorbuf, errorbuflen, "DEVICE_SELF used while not in device context\n");
+				}
 				curfield->read_line_device = TOKEN_GET_PTR(ipt, read_line_device);
 				break;
 
@@ -3516,6 +3523,13 @@ static void port_config_detokenize(ioport_list &portlist, const input_port_token
 					break;
 				}
 				curfield->write_device_name = TOKEN_GET_STRING(ipt);
+				if (!strcmp(curfield->write_device_name, DEVICE_SELF))
+				{
+					if (owner)
+						curfield->write_device_name = owner->tag();
+					else
+						error_buf_append(errorbuf, errorbuflen, "DEVICE_SELF used while not in device context\n");
+				}
 				curfield->write_line_device = TOKEN_GET_PTR(ipt, write_line_device);
 				break;
 

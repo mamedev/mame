@@ -742,6 +742,7 @@ public:
 	/* these two fields are only valid if the port is live */
 	input_port_state *			state;			/* live state of port (NULL if not live) */
 	running_machine *			machine;		/* machine if port is live */
+	device_config *				owner;			/* associated device, when appropriate */
 };
 
 
