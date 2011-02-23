@@ -134,22 +134,31 @@ protected:
 		void generate_audio(direct_read_data &direct, 
                 			stream_sample_t *buffer, 
                 			int samples,
-			                const UINT8 global_volume_scale);
+			                const UINT8 global_volume);
+
+        // computes volume scale from 3 volume numbers
+		UINT8 volume_scale(const UINT8 global_volume,
+						   const UINT8 channel_volume,
+                		   const UINT8 pan_volume) const;
 
 		oki_adpcm_state m_adpcm;		// current ADPCM state
 		oki_adpcm2_state m_adpcm2;		// current ADPCM2 state
 		UINT8		m_playbackAlgo;		// current playback method
-		bool		m_playing;
 		bool		m_looping;
 		UINT8		m_startFlags;
 		UINT8		m_endFlags;
 		offs_t		m_base_offset;		// pointer to the base memory location
-		UINT32		m_sample;			// current sample number
 		UINT32		m_count;			// total samples to play
+		UINT32		m_samplingFreq;		// voice sampling frequency
 
-		INT8		m_volume;			// output volume
-		// TODO:	m_volume_left;      // stereo volume
-		// TODO:	m_volume_right;     // stereo volume
+		bool		m_playing;			// playback state
+		UINT32		m_sample;			// current sample number
+
+		UINT8		m_channel_volume;	// volume set with the CVOL command
+		UINT8		m_pan_volume_left;  // volume set with the PAN command
+		UINT8		m_pan_volume_right; // volume set with the PAN command
+
+		static const UINT8 s_volume_table[16];
 	};
 
 
@@ -161,15 +170,13 @@ protected:
 
     UINT8 m_TMP_register;
     
-	UINT8 m_global_volume_scale;
-    bool  m_stereo_enabled;
+	UINT8 m_global_volume;		// volume set with the OPT command
     UINT8 m_filter_type;
 	UINT8 m_output_level;
 
 	static const int OKIM9810_VOICES = 8;
 	okim_voice m_voice[OKIM9810_VOICES];
 
-	static const UINT8 s_volume_table[16];
     static const UINT32 s_sampling_freq_table[16];
 };
 
