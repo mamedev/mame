@@ -305,9 +305,8 @@ static WRITE8_HANDLER( warpwarp_out3_w )
 
 static ADDRESS_MAP_START( geebee_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(geebee_videoram_w) AM_BASE(&geebee_videoram)
-	AM_RANGE(0x2400, 0x27ff) AM_WRITE(geebee_videoram_w) /* mirror used by kaiteik due to a bug */
-	AM_RANGE(0x3000, 0x37ff) AM_ROM	AM_REGION("gfx1", 0)		/* 3000-33ff in GeeBee */
+	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x400) AM_RAM_WRITE(geebee_videoram_w) AM_BASE(&geebee_videoram) // mirror used by kaitei due to a bug
+	AM_RANGE(0x3000, 0x37ff) AM_ROM	AM_REGION("gfx1", 0) // 3000-33ff in geebee
     AM_RANGE(0x4000, 0x40ff) AM_RAM
 	AM_RANGE(0x5000, 0x53ff) AM_READ(geebee_in_r)
 	AM_RANGE(0x6000, 0x6fff) AM_WRITE(geebee_out6_w)
@@ -752,13 +751,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( navarone, geebee )
 
 	/* basic machine hardware */
-
 	MCFG_GFXDECODE(2k)
-	MCFG_PALETTE_LENGTH(2*2+1)
+	MCFG_PALETTE_LENGTH(2*2)
 
 	MCFG_PALETTE_INIT(navarone)
 	MCFG_VIDEO_START(navarone)
-	MCFG_VIDEO_UPDATE(navarone)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( bombbee, driver_device )
@@ -778,7 +775,7 @@ static MACHINE_CONFIG_START( bombbee, driver_device )
 
 	MCFG_PALETTE_INIT(warpwarp)
 	MCFG_VIDEO_START(warpwarp)
-	MCFG_VIDEO_UPDATE(warpwarp)
+	MCFG_VIDEO_UPDATE(geebee)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -930,6 +927,7 @@ static DRIVER_INIT( geebee )
 	// is bit 0 of input port 2
 	geebee_handleoverlay = 1;
 
+	warpwarp_ball_pen = 1;
 	warpwarp_ball_sizex = 4;
 	warpwarp_ball_sizey = 4;
 }
@@ -939,6 +937,7 @@ static DRIVER_INIT( navarone )
 	handle_joystick = 1;
 	geebee_handleoverlay = 0;
 
+	warpwarp_ball_pen = 1;
 	warpwarp_ball_sizex = 4;
 	warpwarp_ball_sizey = 4;
 }
@@ -948,6 +947,7 @@ static DRIVER_INIT( kaitein )
 	handle_joystick = 1;
 	geebee_handleoverlay = 0;
 
+	warpwarp_ball_pen = 1;
 	warpwarp_ball_sizex = 1;
 	warpwarp_ball_sizey = 16;
 }
@@ -957,6 +957,7 @@ static DRIVER_INIT( kaitei )
 	handle_joystick = 0;
 	geebee_handleoverlay = 0;
 
+	warpwarp_ball_pen = 1;
 	warpwarp_ball_sizex = 1;
 	warpwarp_ball_sizey = 16;
 }
@@ -967,6 +968,7 @@ static DRIVER_INIT( sos )
 
 	geebee_handleoverlay = 0;
 
+	warpwarp_ball_pen = 0;
 	warpwarp_ball_sizex = 4;
 	warpwarp_ball_sizey = 2;
 }
@@ -976,6 +978,7 @@ static DRIVER_INIT( bombbee )
 	handle_joystick = 0;
 	geebee_handleoverlay = 0;
 
+	warpwarp_ball_pen = 0x200;
 	warpwarp_ball_sizex = 4;
 	warpwarp_ball_sizey = 4;
 }
@@ -985,15 +988,17 @@ static DRIVER_INIT( warpwarp )
 	handle_joystick = 1;
 	geebee_handleoverlay = 0;
 
+	warpwarp_ball_pen = 0x200;
 	warpwarp_ball_sizex = 4;
 	warpwarp_ball_sizey = 4;
 }
 
 
 /* B & W games */
-GAMEL(1978, geebee,   0,        geebee,   geebee,   geebee,   ROT90, "Namco", "Gee Bee", 0, layout_geebee )
-GAMEL(1978, geebeeb,  geebee,   geebee,   geebeeb,  geebee,   ROT90, "Namco (F.lli Bertolino license)", "Gee Bee (F.lli Bertolino license)", 0, layout_geebee )
-GAMEL(1978, geebeeg,  geebee,   geebee,   geebee,   geebee,   ROT90, "Namco (Gremlin license)", "Gee Bee (Gremlin)", 0, layout_geebee )
+GAMEL(1978, geebee,   0,        geebee,   geebee,   geebee,   ROT90, "Namco", "Gee Bee (Japan)", 0, layout_geebee )
+GAMEL(1978, geebeeb,  geebee,   geebee,   geebeeb,  geebee,   ROT90, "Namco (F.lli Bertolino license)", "Gee Bee (Europe)", 0, layout_geebee ) // Fratelli Bertolino
+GAMEL(1978, geebeeg,  geebee,   geebee,   geebee,   geebee,   ROT90, "Namco (Gremlin license)", "Gee Bee (US)", 0, layout_geebee )
+
 GAME( 1980, navarone, 0,        navarone, navarone, navarone, ROT90, "Namco", "Navarone", GAME_IMPERFECT_SOUND )
 GAME( 1980, kaitein,  kaitei,   navarone, kaitein,  kaitein,  ROT90, "K.K. Tokki (Namco license)", "Kaitei Takara Sagashi (Namco license)", 0 )
 GAME( 1980, kaitei,   0,        navarone, kaitei,   kaitei,   ROT90, "K.K. Tokki", "Kaitei Takara Sagashi", 0 )

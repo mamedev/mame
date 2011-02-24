@@ -16,7 +16,7 @@ int geebee_handleoverlay;
 int geebee_bgw;
 int warpwarp_ball_on;
 int warpwarp_ball_h,warpwarp_ball_v;
-int warpwarp_ball_sizex, warpwarp_ball_sizey;
+int warpwarp_ball_pen, warpwarp_ball_sizex, warpwarp_ball_sizey;
 
 static tilemap_t *bg_tilemap;
 
@@ -43,10 +43,9 @@ PALETTE_INIT( geebee )
 PALETTE_INIT( navarone )
 {
 	palette_set_color(machine, 0, geebee_palette[0]);
-	palette_set_color(machine, 1, geebee_palette[2]);
-	palette_set_color(machine, 2, geebee_palette[2]);
+	palette_set_color(machine, 1, geebee_palette[1]);
+	palette_set_color(machine, 2, geebee_palette[1]);
 	palette_set_color(machine, 3, geebee_palette[0]);
-	palette_set_color(machine, 4, geebee_palette[1]);
 }
 
 
@@ -246,24 +245,6 @@ VIDEO_UPDATE( geebee )
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
-	draw_ball(bitmap,cliprect,1);
-	return 0;
-}
-
-
-VIDEO_UPDATE( navarone )
-{
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-
-	draw_ball(bitmap,cliprect,4);
-	return 0;
-}
-
-
-VIDEO_UPDATE( warpwarp )
-{
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-
-	draw_ball(bitmap,cliprect,0x200);
+	draw_ball(bitmap,cliprect,warpwarp_ball_pen);
 	return 0;
 }
