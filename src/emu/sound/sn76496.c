@@ -2,6 +2,7 @@
 
   sn76496.c
   by Nicola Salmoria
+  with contributions by others
 
   Routines to emulate the:
   Texas Instruments SN76489, SN76489A, SN76494/SN76496
@@ -25,9 +26,11 @@
   ** SN76494 is the same as SN76489A but lacks the /8 divider on its clock input.
   ** SN76496 is identical in operation to the SN76489A, but the audio input is
   documented.
-  All the SN7xxxx chips have an audio input line which is mixed with the 4 channels
+  All the TI-made PSG chips have an audio input line which is mixed with the 4 channels
   of output. (It is undocumented and may not function properly on the sn76489, 76489a
   and 76494; the sn76489a input is mentioned in datasheets for the tms5200)
+  All the TI-made PSG chips act as if the frequency was set to 0x400 if 0 is
+  written to the frequency register.
   ** Sega Master System III/MD/Genesis PSG uses a 16-bit shift register with taps
   on bits C and F, output on F
   It uses a 16-bit ring buffer for periodic noise/arbitrary duty cycle.
@@ -39,6 +42,8 @@
   for bits 7  6  5  4  3  2  1  0
            L3 L2 L1 L0 R3 R2 R1 R0
   Noise is an XOR function, and audio output is negated before being output.
+  All the Sega-made PSG chips act as if the frequency was set to 0 if 0 is written
+  to the frequency register.
   ** NCR7496 (as used on the Tandy 1000) is similar to the SN76489 but with a
   different noise LFSR patttern: taps on bits A and E, output on E
   It uses a 15-bit ring buffer for periodic noise/arbitrary duty cycle.
@@ -94,12 +99,19 @@
   Fix phase of noise on sn94624 and sn76489; all chips use a standard XOR, the only inversion is the output itself - LN, Plgdavid
   Thanks to PlgDavid and Michael Zapf for providing samples which helped immensely here.
 
+  23/02/2011: Lord Nightmare & Enik
+  Made it so the Sega PSG chips have a frequency of 0 if 0 is written to the
+  frequency register, while the others have 0x400 as before. Should fix a bug
+  or two on sega games, particularly Vigilante on Sega Master System. Verified
+  on SMS hardware.
+  
   TODO: * Implement the TMS9919 - any difference to sn94624?
         * Implement the T6W28; has registers in a weird order, needs writes
           to be 'sanitized' first. Also is stereo, similar to game gear.
         * Test the NCR7496; Smspower says the whitenoise taps are A and E,
           but this needs verification on real hardware.
         * Factor out common code so that the SAA1099 can share some code.
+		* Convert to modern device
 ***************************************************************************/
 
 #include "emu.h"
@@ -131,6 +143,7 @@ struct _sn76496_state
 	INT32 Count[4];		/* Position within the waveform */
 	INT32 Output[4];	/* 1-bit output of each channel, pre-volume */
 	INT32 CyclestoREADY;/* number of cycles until the READY line goes active */
+	INT32 Freq0IsMax;	/* flag for if frequency zero acts as if it is one more than max (0x3ff+1) or if it acts like 0 */
 };
 
 
@@ -200,8 +213,9 @@ WRITE8_DEVICE_HANDLER( sn76496_w )
 		case 2:	/* tone 1 : frequency */
 		case 4:	/* tone 2 : frequency */
 		    if ((data & 0x80) == 0) R->Register[r] = (R->Register[r] & 0x0f) | ((data & 0x3f) << 4);
-			if (R->Register[r] != 0) R->Period[c] = R->Register[r];
+			if ((R->Register[r] != 0) || (R->Freq0IsMax == 0)) R->Period[c] = R->Register[r];
 			else R->Period[c] = 0x400;
+
 			if (r == 4)
 			{
 				/* update noise shift frequency */
@@ -371,6 +385,7 @@ static int SN76496_init(device_t *device, sn76496_state *R, int stereo)
 	R->Stereo = stereo; /* depends on init */
 	R->CyclestoREADY = 1; /* assume ready is not active immediately on init. is this correct?*/
 	R->StereoMask = 0xFF; /* all channels enabled */
+	R->Freq0IsMax = 1; /* frequency set to 0 results in freq = 0x400 rather than 0 */
 
 	R->RNG = R->FeedbackMask;
 	R->Output[3] = R->RNG & 1;
@@ -379,7 +394,7 @@ static int SN76496_init(device_t *device, sn76496_state *R, int stereo)
 }
 
 
-static void generic_start(device_t *device, int feedbackmask, int noisetap1, int noisetap2, int negate, int stereo, int clockdivider)
+static void generic_start(device_t *device, int feedbackmask, int noisetap1, int noisetap2, int negate, int stereo, int clockdivider, int freq0)
 {
 	sn76496_state *chip = get_safe_token(device);
 
@@ -394,6 +409,7 @@ static void generic_start(device_t *device, int feedbackmask, int noisetap1, int
 	chip->Stereo = stereo;
 	chip->ClockDivider = clockdivider;
 	chip->CurrentClock = clockdivider-1;
+	chip->Freq0IsMax = freq0;
 
 	device->save_item(NAME(chip->VolTable));
 	device->save_item(NAME(chip->Register));
@@ -412,6 +428,7 @@ static void generic_start(device_t *device, int feedbackmask, int noisetap1, int
 	device->save_item(NAME(chip->Count));
 	device->save_item(NAME(chip->Output));
 	device->save_item(NAME(chip->CyclestoREADY));
+	device->save_item(NAME(chip->Freq0IsMax));
 }
 
 // function parameters: device, feedback destination tap, feedback source taps,
@@ -419,42 +436,42 @@ static void generic_start(device_t *device, int feedbackmask, int noisetap1, int
 
 static DEVICE_START( sn76489 )
 {
-	generic_start(device, 0x4000, 0x01, 0x02, TRUE, FALSE, 8); // SN76489 not verified yet. todo: verify;
+	generic_start(device, 0x4000, 0x01, 0x02, TRUE, FALSE, 8, TRUE); // SN76489 not verified yet. todo: verify;
 }
 
 static DEVICE_START( sn76489a )
 {
-	generic_start(device, 0x10000, 0x04, 0x08, FALSE, FALSE, 8); // SN76489A: whitenoise verified, phase verified, periodic verified (by plgdavid)
+	generic_start(device, 0x10000, 0x04, 0x08, FALSE, FALSE, 8, TRUE); // SN76489A: whitenoise verified, phase verified, periodic verified (by plgdavid)
 }
 
 static DEVICE_START( sn76494 )
 {
-	generic_start(device, 0x10000, 0x04, 0x08, FALSE, FALSE, 1); // SN76494 not verified, (according to datasheet: same as sn76489a but without the /8 divider)
+	generic_start(device, 0x10000, 0x04, 0x08, FALSE, FALSE, 1, TRUE); // SN76494 not verified, (according to datasheet: same as sn76489a but without the /8 divider)
 }
 
 static DEVICE_START( sn76496 )
 {
-	generic_start(device, 0x10000, 0x04, 0x08, FALSE, FALSE, 8); // SN76496: Whitenoise verified, phase verified, periodic verified (by Michael Zapf)
+	generic_start(device, 0x10000, 0x04, 0x08, FALSE, FALSE, 8, TRUE); // SN76496: Whitenoise verified, phase verified, periodic verified (by Michael Zapf)
 }
 
 static DEVICE_START( sn94624 )
 {
-	generic_start(device, 0x4000, 0x01, 0x02, TRUE, FALSE, 1); // SN94624 whitenoise verified, phase verified, period verified; verified by PlgDavid
+	generic_start(device, 0x4000, 0x01, 0x02, TRUE, FALSE, 1, TRUE); // SN94624 whitenoise verified, phase verified, period verified; verified by PlgDavid
 }
 
 static DEVICE_START( ncr7496 )
 {
-	generic_start(device, 0x8000, 0x02, 0x20, FALSE, FALSE, 8); // NCR7496 not verified; info from smspower wiki
+	generic_start(device, 0x8000, 0x02, 0x20, FALSE, FALSE, 8, TRUE); // NCR7496 not verified; info from smspower wiki
 }
 
 static DEVICE_START( gamegear )
 {
-	generic_start(device, 0x8000, 0x01, 0x08, TRUE, TRUE, 8); // Verified by Justin Kerk
+	generic_start(device, 0x8000, 0x01, 0x08, TRUE, TRUE, 8, FALSE); // Verified by Justin Kerk
 }
 
 static DEVICE_START( smsiii )
 {
-	generic_start(device, 0x8000, 0x01, 0x08, TRUE, FALSE, 8); // todo: verify; from smspower wiki, assumed to have same invert as gamegear
+	generic_start(device, 0x8000, 0x01, 0x08, TRUE, FALSE, 8, FALSE); // todo: verify; from smspower wiki, assumed to have same invert as gamegear
 }
 
 
