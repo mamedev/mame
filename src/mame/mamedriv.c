@@ -8904,7 +8904,7 @@ Other Sun games
 	/* Other Amiga-based games */
 	DRIVER( upscope )	/* (c) 1986 Grand products */
 
-	DRIVER( cd32bios )	/* (c) 1993 */
+	DRIVER( cd32 )		/* (c) 1993 */
 	DRIVER( cndypuzl )	/* (c) 1995 */
 	DRIVER( haremchl )	/* (c) 1995 */
 	DRIVER( lsrquiz )	/* (c) 1995 */
