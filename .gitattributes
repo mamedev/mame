@@ -3367,6 +3367,7 @@ src/mame/layout/mpu4.lay svneol=native#text/plain
 src/mame/layout/mpu4ext.lay svneol=native#text/plain
 src/mame/layout/musicsrt.lay svneol=native#text/plain
 src/mame/layout/namcofl.lay svneol=native#text/plain
+src/mame/layout/navarone.lay svneol=native#text/plain
 src/mame/layout/nbmj8688.lay svneol=native#text/plain
 src/mame/layout/neogeo.lay svneol=native#text/plain
 src/mame/layout/noraut11.lay svneol=native#text/plain

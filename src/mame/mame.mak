@@ -2004,6 +2004,7 @@ $(DRIVERS)/videopkr.o:	$(LAYOUT)/videopkr.lh \
 						$(LAYOUT)/babydad.lh
 
 $(DRIVERS)/warpwarp.o:	$(LAYOUT)/geebee.lh \
+						$(LAYOUT)/navarone.lh \
 						$(LAYOUT)/sos.lh
 
 $(DRIVERS)/wecleman.o:	$(LAYOUT)/wecleman.lh

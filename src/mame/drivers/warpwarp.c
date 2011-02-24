@@ -123,14 +123,16 @@ Notes:
 
 TODO:
 - I arbitrarily assigned a uniform blue overlay to sos. I don't know how it's
-  supposed to be. navarone and kaitei are missing the overlay too.
+  supposed to be. kaitei is missing the overlay too.
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "includes/warpwarp.h"
+
 #include "geebee.lh"
+#include "navarone.lh"
 #include "sos.lh"
 
 #define MASTER_CLOCK		XTAL_18_432MHz
@@ -999,10 +1001,10 @@ GAMEL(1978, geebee,   0,        geebee,   geebee,   geebee,   ROT90, "Namco", "G
 GAMEL(1978, geebeeb,  geebee,   geebee,   geebeeb,  geebee,   ROT90, "Namco (F.lli Bertolino license)", "Gee Bee (Europe)", 0, layout_geebee ) // Fratelli Bertolino
 GAMEL(1978, geebeeg,  geebee,   geebee,   geebee,   geebee,   ROT90, "Namco (Gremlin license)", "Gee Bee (US)", 0, layout_geebee )
 
-GAME( 1980, navarone, 0,        navarone, navarone, navarone, ROT90, "Namco", "Navarone", GAME_IMPERFECT_SOUND )
+GAMEL(1980, navarone, 0,        navarone, navarone, navarone, ROT90, "Namco", "Navarone", GAME_IMPERFECT_SOUND, layout_navarone )
 GAME( 1980, kaitein,  kaitei,   navarone, kaitein,  kaitein,  ROT90, "K.K. Tokki (Namco license)", "Kaitei Takara Sagashi (Namco license)", 0 )
 GAME( 1980, kaitei,   0,        navarone, kaitei,   kaitei,   ROT90, "K.K. Tokki", "Kaitei Takara Sagashi", 0 )
-GAMEL(1980, sos,      0,        navarone, sos,      sos,      ROT90, "Namco", "SOS", GAME_IMPERFECT_SOUND, layout_sos )
+GAMEL(1980, sos,      0,        navarone, sos,      sos,      ROT90, "Namco", "SOS", GAME_IMPERFECT_SOUND, layout_sos ) // developed by Shoei?
 
 /* Color games */
 GAME( 1979, bombbee,    0,        bombbee,  bombbee,  bombbee,  ROT90, "Namco", "Bomb Bee", 0 )
