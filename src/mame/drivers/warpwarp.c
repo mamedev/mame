@@ -138,11 +138,6 @@ TODO:
 #define MASTER_CLOCK		XTAL_18_432MHz
 
 
-/*******************************************************
- *
- * Gee Bee overlay
- *
- *******************************************************/
 
 static int handle_joystick;
 
@@ -925,10 +920,6 @@ static DRIVER_INIT( geebee )
 {
 	handle_joystick = 0;
 
-	// turn off overlay in cocktail mode; this assumes that the cabinet dip switch
-	// is bit 0 of input port 2
-	geebee_handleoverlay = 1;
-
 	warpwarp_ball_pen = 1;
 	warpwarp_ball_sizex = 4;
 	warpwarp_ball_sizey = 4;
@@ -937,7 +928,6 @@ static DRIVER_INIT( geebee )
 static DRIVER_INIT( navarone )
 {
 	handle_joystick = 1;
-	geebee_handleoverlay = 0;
 
 	warpwarp_ball_pen = 1;
 	warpwarp_ball_sizex = 4;
@@ -947,7 +937,6 @@ static DRIVER_INIT( navarone )
 static DRIVER_INIT( kaitein )
 {
 	handle_joystick = 1;
-	geebee_handleoverlay = 0;
 
 	warpwarp_ball_pen = 1;
 	warpwarp_ball_sizex = 1;
@@ -957,7 +946,6 @@ static DRIVER_INIT( kaitein )
 static DRIVER_INIT( kaitei )
 {
 	handle_joystick = 0;
-	geebee_handleoverlay = 0;
 
 	warpwarp_ball_pen = 1;
 	warpwarp_ball_sizex = 1;
@@ -968,8 +956,6 @@ static DRIVER_INIT( sos )
 {
 	handle_joystick = 1;
 
-	geebee_handleoverlay = 0;
-
 	warpwarp_ball_pen = 0;
 	warpwarp_ball_sizex = 4;
 	warpwarp_ball_sizey = 2;
@@ -978,7 +964,6 @@ static DRIVER_INIT( sos )
 static DRIVER_INIT( bombbee )
 {
 	handle_joystick = 0;
-	geebee_handleoverlay = 0;
 
 	warpwarp_ball_pen = 0x200;
 	warpwarp_ball_sizex = 4;
@@ -988,7 +973,6 @@ static DRIVER_INIT( bombbee )
 static DRIVER_INIT( warpwarp )
 {
 	handle_joystick = 1;
-	geebee_handleoverlay = 0;
 
 	warpwarp_ball_pen = 0x200;
 	warpwarp_ball_sizex = 4;

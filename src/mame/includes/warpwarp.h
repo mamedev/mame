@@ -7,7 +7,6 @@ extern int geebee_bgw;
 extern int warpwarp_ball_on;
 extern int warpwarp_ball_h, warpwarp_ball_v;
 extern int warpwarp_ball_pen, warpwarp_ball_sizex, warpwarp_ball_sizey;
-extern int geebee_handleoverlay;
 
 PALETTE_INIT( geebee );
 PALETTE_INIT( navarone );

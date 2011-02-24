@@ -12,7 +12,6 @@
 
 
 UINT8 *geebee_videoram,*warpwarp_videoram;
-int geebee_handleoverlay;
 int geebee_bgw;
 int warpwarp_ball_on;
 int warpwarp_ball_h,warpwarp_ball_v;
@@ -239,10 +238,6 @@ static void draw_ball(bitmap_t *bitmap, const rectangle *cliprect,pen_t pen)
 
 SCREEN_UPDATE( geebee )
 {
-	/* use an overlay only in upright mode */
-	if (geebee_handleoverlay)
-		output_set_value("overlay", (input_port_read(screen->machine, "DSW2") & 0x01) == 0);
-
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
 	draw_ball(bitmap,cliprect,warpwarp_ball_pen);
