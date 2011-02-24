@@ -3385,7 +3385,7 @@ V-V                           TP-027
 	/* Namco System 10 */
 	DRIVER( mrdrilr2 )	/* 2000.07 Mr Driller 2 (DR21 Ver.A) */
 	DRIVER( mrdrlr2a )      /* 2000.?? Mr Driller 2 (DR22 Ver.A) */
-						/* 2000.12 Gunbarina */
+	DRIVER( ptblank3 ) 	/* 2000.12 Point Blank 3 / Gunbalina */
 						/* 2001.02 Photo Battole */
 						/* 2001.02 Taiko no Tatsujin */
 						/* 2001.03 Gahaha Ippatsudou */
@@ -3401,7 +3401,7 @@ V-V                           TP-027
 	DRIVER( startrgn )	/* 2002.07 Star Trigon (STT1 Ver.A) */
 						/* 2002.07 Tsukkomi Yousei Gips Nice Tsukkomi */
 	DRIVER( gamshara )	/* 2002.08 Gamshara (10021 Ver.A) */
-						/* 2002.10 Uchuu Daisakusen : Chocovader Contactee */
+	DRIVER( chocovdr )	/* 2002.10 Uchuu Daisakusen : Chocovader Contactee */
 						/* 2002.12 Taiko no Tatsujin 4 */
 						/* 2003.04 Seisyun Quiz Colorful High School */
 						/* 2003.10 Taiko no Tatsujin 5 */

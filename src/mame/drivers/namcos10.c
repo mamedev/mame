@@ -31,6 +31,7 @@ Mr Driller G (DRG1 Ver.A)                        (C) Namco, 2001
 *NFL Classic Football                            (C) Namco, 2003
 *Panicuru Panekuru (PPA1 Ver.A)                  (C) Namco, 2001
 *Photo Battole                                   (C) Namco, 2001
+Point Blank 3 / Gunbalina (GNN2 Ver. A)   		 (C) Namco, 2000
 *Ren-ai Quiz High School Angel                   (C) Namco, 2002
 *Seishun Quiz Colorful High School               (C) Namco, 2002
 Star Trigon (STT1 Ver.A)                         (C) Namco, 2002
@@ -41,7 +42,7 @@ Star Trigon (STT1 Ver.A)                         (C) Namco, 2002
 *Taiko No Tatsujin 5                             (C) Namco, 2003
 *Taiko No Tatsujin 6                             (C) Namco, 2004
 *Tsukkomi Yousei Gips Nice Tsukkomi              (C) Namco/Metro, 2002
-*Uchuu Daisakusen : Chocovader Contactee (CVC1 Ver.A) (C) Namco, 2002
+Uchuu Daisakusen : Chocovader Contactee (CVC1 Ver.A) (C) Namco, 2002
 
 * - denotes not dumped yet. If you can help with the remaining undumped S10 games,
     please contact me at http://guru.mameworld.info/
@@ -460,6 +461,18 @@ static DRIVER_INIT( gamshara )
 	decrypt_bios( machine, 0x5, 0x4, 0x7, 0x6, 0x0, 0x1, 0x3, 0x2, 0xd, 0xf, 0xc, 0xe, 0x8, 0x9, 0xa, 0xb );
 }
 
+static DRIVER_INIT( gunbalna )
+{
+	memn_driver_init(machine);
+	decrypt_bios( machine, 0x5, 0x4, 0x7, 0x6, 0x0, 0x1, 0x3, 0x2, 0xd, 0xf, 0xc, 0xe, 0x8, 0x9, 0xa, 0xb );
+}
+
+static DRIVER_INIT( chocovdr )
+{
+	memn_driver_init(machine);
+	decrypt_bios( machine, 0x5, 0x4, 0x7, 0x6, 0x0, 0x1, 0x3, 0x2, 0xd, 0xf, 0xc, 0xe, 0x8, 0x9, 0xa, 0xb );
+}
+
 static MACHINE_RESET( namcos10 )
 {
 	psx_machine_init(machine);
@@ -610,10 +623,33 @@ ROM_START( gamshara )
 	ROM_LOAD( "10021a.8d",    0x1080000, 0x1080000, CRC(73669ff7) SHA1(eb8bbf931f1f8a049208d081d040512a3ffa9c00) )
 ROM_END
 
+ROM_START( ptblank3 )
+	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* bios */
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION( 0x2100000, "user2", 0 ) /* main prg */
+	ROM_LOAD( "0.8e",         0x0000000, 0x1080000, CRC(31b39221) SHA1(7fcb14aaa26c531928a6cd704e746d0e3ae3e031) ) 
+	ROM_LOAD( "1.8d",         0x1080000, 0x1080000, CRC(82d2cfb5) SHA1(4b5e713a55e74a7b32b1b9b5811892df2df86256) ) 
+ROM_END
+
+ROM_START( chocovdr )
+	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* bios */
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION( 0x5280000, "user2", 0 ) /* main prg */
+	ROM_LOAD( "0.8e",         0x0000000, 0x1080000, CRC(f265b1b6) SHA1(f327e7bac0bc1bd31aa3362e36233130a6b240ea) ) 
+	ROM_LOAD( "1.8d",         0x1080000, 0x1080000, CRC(05d01cd2) SHA1(e9947ebea24d618e8b9a69f582ef0b9d97bb4cad) ) 
+	ROM_LOAD( "2.7e",         0x2100000, 0x1080000, CRC(2e308d20) SHA1(4ff072f0d488b12f77ef7d119822f89b5b5a6712) ) 
+	ROM_LOAD( "3.7d",         0x3180000, 0x1080000, CRC(126c9e6f) SHA1(32de87f01fd1c8c26a68bf42a062f5f44bcc5a3b) ) 
+	ROM_LOAD( "4.6e",         0x4200000, 0x1080000, CRC(6c18678d) SHA1(410a282397e4a4b5763467811080172b462bfcef) ) 
+ROM_END
+
 GAME( 2000, mrdrilr2,  0,        namcos10, namcos10, mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2000, mrdrlr2a,  mrdrilr2, namcos10, namcos10, mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Japan, DR22 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2000, ptblank3,  0,        namcos10, namcos10, gunbalna, ROT0, "Namco", "Point Blank 3 (GNN2 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2001, gjspace,   0,        namcos10, namcos10, gjspace,  ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2001, mrdrilrg,  0,        namcos10, namcos10, mrdrilrg, ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2001, knpuzzle,  0,        namcos10, namcos10, knpuzzle, ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2002, chocovdr,  0,        namcos10, namcos10, chocovdr, ROT0, "Namco", "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2002, startrgn,  0,        namcos10, namcos10, startrgn, ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2003, gamshara,  0,        namcos10, namcos10, gamshara, ROT0, "Mitchell", "Gamshara (10021 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
