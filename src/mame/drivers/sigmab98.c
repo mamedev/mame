@@ -648,20 +648,6 @@ static READ8_HANDLER( sammymdl_coin_hopper_r )
 	return ret;
 }
 
-// Sound
-static WRITE8_DEVICE_HANDLER( sammymdl_sound_w )
-{
-	if (offset)
-		downcast<okim9810_device *>(device)->write_TMP_register(data);
-    else
-		downcast<okim9810_device *>(device)->write_command(data);
-}
-static READ8_DEVICE_HANDLER( sammymdl_sound_r )
-{
-	// Needed for haekaka (Oki read status is not implemented yet)
-	return device->machine->rand();
-}
-
 static UINT8 *nvram;
 static ADDRESS_MAP_START( animalc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
@@ -692,8 +678,9 @@ static ADDRESS_MAP_START( animalc_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x31, 0x31 ) AM_WRITE( sammymdl_coin_w )
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE( sammymdl_leds_w )
 	AM_RANGE( 0x34, 0x34 ) AM_READ( unk_34_r )
-	AM_RANGE( 0x90, 0x91 ) AM_DEVWRITE("oki", sammymdl_sound_w )
-	AM_RANGE( 0x92, 0x92 ) AM_DEVWRITE("oki", sammymdl_sound_r )
+	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE_MODERN("oki", okim9810_device, write )
+	AM_RANGE( 0x90, 0x91 ) AM_DEVWRITE_MODERN("oki", okim9810_device, write_TMP_register )
+	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD_MODERN("oki", okim9810_device, read )
 	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE( sammymdl_hopper_w )
 	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE( watchdog_reset_w )	// 1
 ADDRESS_MAP_END
@@ -923,8 +910,9 @@ static ADDRESS_MAP_START( haekaka_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x30, 0x30 ) AM_READ_PORT( "BUTTON" )
 	AM_RANGE( 0x31, 0x31 ) AM_WRITE( haekaka_coin_w )
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE( haekaka_leds_w )
-	AM_RANGE( 0x90, 0x91 ) AM_DEVWRITE("oki", sammymdl_sound_w )
-	AM_RANGE( 0x92, 0x92 ) AM_DEVWRITE("oki", sammymdl_sound_r )
+	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE_MODERN("oki", okim9810_device, write )
+	AM_RANGE( 0x90, 0x91 ) AM_DEVWRITE_MODERN("oki", okim9810_device, write_TMP_register )
+	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD_MODERN("oki", okim9810_device, read )
 	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE( sammymdl_hopper_w )
 	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE( watchdog_reset_w )	// 1
 ADDRESS_MAP_END
@@ -1160,8 +1148,9 @@ static ADDRESS_MAP_START( itazuram_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x30, 0x30 ) AM_READ_PORT( "BUTTON" )
 	AM_RANGE( 0x31, 0x31 ) AM_WRITE( sammymdl_coin_w )
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE( sammymdl_leds_w )
-	AM_RANGE( 0x90, 0x91 ) AM_DEVWRITE("oki", sammymdl_sound_w )
-	AM_RANGE( 0x92, 0x92 ) AM_DEVWRITE("oki", sammymdl_sound_r )
+	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE_MODERN("oki", okim9810_device, write )
+	AM_RANGE( 0x90, 0x91 ) AM_DEVWRITE_MODERN("oki", okim9810_device, write_TMP_register )
+	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD_MODERN("oki", okim9810_device, read )
 	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE( sammymdl_hopper_w )
 	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE( watchdog_reset_w )	// 1
 ADDRESS_MAP_END
@@ -1373,8 +1362,9 @@ static ADDRESS_MAP_START( tdoboon_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x30, 0x30 ) AM_READ_PORT( "BUTTON" )
 	AM_RANGE( 0x31, 0x31 ) AM_WRITE( sammymdl_coin_w )
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE( sammymdl_leds_w )
-	AM_RANGE( 0x90, 0x91 ) AM_DEVWRITE("oki", sammymdl_sound_w )
-	AM_RANGE( 0x92, 0x92 ) AM_DEVWRITE("oki", sammymdl_sound_r )
+	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE_MODERN("oki", okim9810_device, write )
+	AM_RANGE( 0x90, 0x91 ) AM_DEVWRITE_MODERN("oki", okim9810_device, write_TMP_register )
+	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD_MODERN("oki", okim9810_device, read )
 	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE( sammymdl_hopper_w )
 	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE( watchdog_reset_w )	// 1
 ADDRESS_MAP_END

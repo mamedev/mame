@@ -38,6 +38,7 @@ private:
 // ======================> oki_adpcm2_state
 
 // Internal ADPCM2 state, used by external ADPCM generators with compatible specs to the OKI MSM9810.
+// TODO: not thoroughly tested: is the output 15 bit?
 class oki_adpcm2_state
 {
 public:
