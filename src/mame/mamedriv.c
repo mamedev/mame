@@ -9432,6 +9432,7 @@ Other Sun games
 	DRIVER( poizone )	/* (c) 1990 Sisteme */
 	DRIVER( ssfindo )	/* (c) 1999 Icarus */
 	DRIVER( ppcar )		/* (c) 1999 Icarus */
+	DRIVER( tetfight)	/* (c) 2001 Sego */
 	DRIVER( imolagp )	/* (c) 1981 Leante Games */
 	DRIVER( dambustr )	/* (c) 1981 South West Research */
 	DRIVER( dambustra )	/* (c) 1981 South West Research */

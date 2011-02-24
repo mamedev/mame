@@ -1,6 +1,10 @@
 /************************************************************************
+ 
+ 'RISC PC' hardware
+ 
  See See Find Out [Icarus 1999]
  Pang Pang Car [Icarus 1999]
+ Tetris Fighters [Sego Entertainment 2001]
 
  driver by
   Tomasz Slanina  analog[at]op.pl
@@ -519,6 +523,13 @@ static ADDRESS_MAP_START( ppcar_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x10000000, 0x10ffffff) AM_RAM AM_BASE (&vram)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( tetfight_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_REGION("user1", 0)
+	AM_RANGE(0x03200000, 0x032001ff) AM_READWRITE(PS7500_IO_r,PS7500_IO_w)
+	AM_RANGE(0x033c0000, 0x033c0003) AM_READ(io_r) AM_WRITE(io_w)
+	AM_RANGE(0x03400000, 0x03400003) AM_WRITE(FIFO_w)
+	AM_RANGE(0x10000000, 0x10ffffff) AM_RAM AM_BASE (&vram)
+ADDRESS_MAP_END
 
 static MACHINE_RESET( ssfindo )
 {
@@ -614,27 +625,19 @@ static MACHINE_CONFIG_START( ssfindo, driver_device )
 	MCFG_PALETTE_LENGTH(256)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ppcar, driver_device )
+static MACHINE_CONFIG_DERIVED( ppcar, ssfindo )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM7, 54000000) // guess...
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ppcar_map)
-
-	MCFG_CPU_VBLANK_INT("screen", ssfindo_interrupt)
-	MCFG_MACHINE_RESET(ssfindo)
-
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(320, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE(ssfindo)
-
-	MCFG_PALETTE_LENGTH(256)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( tetfight, ssfindo )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(tetfight_map)
+MACHINE_CONFIG_END
 
 ROM_START( ssfindo )
 	ROM_REGION(0x100000, "user1", 0 ) /* ARM 32 bit code */
@@ -660,7 +663,6 @@ ROM_START( ssfindo )
 	ROM_REGION(0x100000, "user6", 0 ) /* samples - same internal structure as qdsp samples  */
 	ROM_LOAD( "c.u12",		0x000000, 0x80000, CRC(d24b5e56) SHA1(d89983cf4b0a6e0e4137f3799bdbcfd72c7bebe4) )
 	ROM_LOAD( "d.u11",		0x080000, 0x80000, CRC(c0fdd82a) SHA1(a633045e0f5c144b4e24e04fb9446522fdb222f4) )
-
 ROM_END
 
 ROM_START( ppcar )
@@ -685,6 +687,27 @@ ROM_START( ppcar )
 	/* none */
 ROM_END
 
+ROM_START( tetfight )
+	ROM_REGION(0x200000, "user1", 0 ) /* ARM 32 bit code */
+	ROM_LOAD( "u42",		0x000000, 0x200000, CRC(9101c4d2) SHA1(39da953de734e687ebbf976c821bf1017830f36c) )
+
+	ROM_REGION(0x1000000, "user2", ROMREGION_ERASEFF ) /* flash roms */
+	/* nothing? */
+
+	ROM_REGION(0x100, "user3", 0 ) /* eeprom */
+	ROM_LOAD( "u1",		0x00, 0x100, CRC(dd207b40) SHA1(6689d9dfa980bdfbd4e4e6cef7973e22ebbfe22e) )
+
+	ROM_REGION(0x10000, "user4", 0 ) /* qdsp code */
+	ROM_LOAD( "u12",		0x000000, 0x10000, CRC(49976f7b) SHA1(eba5b97b81736f3c184ae0c19f1b10c5ae250d51) ) // = e.u14 on ssfindo
+
+	ROM_REGION(0x100000, "user5", ROMREGION_ERASE00 )/*  qdsp samples */
+	// probably the same, but wasn't dumped
+	//ROM_LOAD( "1008s-1.u16",	0x000000, 0x100000, CRC(9aef9545) SHA1(f23ef72c3e3667923768dfdd0c5b4951b23dcbcf) )
+
+	ROM_REGION(0x100000, "user6", 0 ) /* samples - same internal structure as qdsp samples  */
+	ROM_LOAD( "u11",		0x000000, 0x80000, CRC(073050f6) SHA1(07f362f3ba468bde2341a99e6b26931d11459a92) )
+	ROM_LOAD( "u15",		0x080000, 0x80000, CRC(477f8089) SHA1(8084facb254d60da7983d628d5945d27b9494e65) )
+ROM_END
 
 static DRIVER_INIT(ssfindo)
 {
@@ -702,3 +725,4 @@ static DRIVER_INIT(ppcar)
 
 GAME( 1999, ssfindo, 0,        ssfindo,  ssfindo,  ssfindo,	ROT0, "Icarus", "See See Find Out", GAME_NO_SOUND )
 GAME( 1999, ppcar,   0,        ppcar,    ppcar,    ppcar,	ROT0, "Icarus", "Pang Pang Car", GAME_NO_SOUND )
+GAME( 2001, tetfight,0,        tetfight, ssfindo,  ssfindo,	ROT0, "Sego", "Tetris Fighters", GAME_NO_SOUND|GAME_NOT_WORKING )
