@@ -8685,6 +8685,7 @@ Other Sun games
 	DRIVER( kov2106 )		/* (c) 2000 */
 	DRIVER( kov2103 )		/* (c) 2000 */
 	DRIVER( kov2102 )		/* (c) 2000 */
+	DRIVER( kov2101 )		/* (c) 2000 */
 	DRIVER( kov2100 )		/* (c) 2000 */
 	DRIVER( kov2p )			/* (c) 2000 */
 	DRIVER( kov2p205 )		/* (c) 2000 */

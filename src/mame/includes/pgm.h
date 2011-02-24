@@ -93,7 +93,6 @@ void pgm_oldsplus_decrypt(running_machine *machine);
 void pgm_kovshp_decrypt(running_machine *machine);
 void pgm_killbldp_decrypt(running_machine *machine);
 void pgm_svg_decrypt(running_machine *machine);
-void pgm_dw2001_decrypt(running_machine *machine);
 void pgm_ket_decrypt(running_machine *machine);
 void pgm_espgal_decrypt(running_machine *machine);
 
