@@ -311,6 +311,26 @@ static void PS7500_reset(void)
 		PS7500timer1->adjust( attotime::never);
 }
 
+typedef void (*ssfindo_speedup_func)(address_space *space);
+ssfindo_speedup_func ssfindo_speedup;
+
+static void ssfindo_speedups(address_space* space)
+{
+	if (cpu_get_pc(space->cpu)==0x2d6c8) // ssfindo
+		cpu_spinuntil_time(space->cpu, attotime::from_usec(20));
+	else if (cpu_get_pc(space->cpu)==0x2d6bc) // ssfindo
+		cpu_spinuntil_time(space->cpu, attotime::from_usec(20));
+}
+
+static void ppcar_speedups(address_space* space)
+{
+	if (cpu_get_pc(space->cpu)==0x000bc8) // ppcar
+		cpu_spinuntil_time(space->cpu, attotime::from_usec(20));
+	else if (cpu_get_pc(space->cpu)==0x000bbc) // ppcar
+		cpu_spinuntil_time(space->cpu, attotime::from_usec(20));
+}
+
+
 static READ32_HANDLER(PS7500_IO_r)
 {
 
@@ -336,6 +356,8 @@ static READ32_HANDLER(PS7500_IO_r)
 			return (PS7500_IO[IRQSTA] & PS7500_IO[IRQMSKA]) | 0x80;
 
 		case IOCR: //TODO: nINT1, OD[n] p.81
+			if (ssfindo_speedup) ssfindo_speedup(space);
+			//printf("IOCR %08x\n",cpu_get_pc(space->cpu));
 			return (input_port_read(space->machine, "PS7500") & 0x80) | 0x34 | 3;
 
 		case VIDCR:
@@ -709,20 +731,34 @@ ROM_START( tetfight )
 	ROM_LOAD( "u15",		0x080000, 0x80000, CRC(477f8089) SHA1(8084facb254d60da7983d628d5945d27b9494e65) )
 ROM_END
 
-static DRIVER_INIT(ssfindo)
+static DRIVER_INIT(common)
 {
-	flashType=0;
+	ssfindo_speedup = 0;
 	PS7500timer0 = machine->scheduler().timer_alloc(FUNC(PS7500_Timer0_callback));
 	PS7500timer1 = machine->scheduler().timer_alloc(FUNC(PS7500_Timer1_callback));
+
+}
+
+static DRIVER_INIT(ssfindo)
+{
+	DRIVER_INIT_CALL(common);
+	flashType=0;
+	ssfindo_speedup = ssfindo_speedups;
 }
 
 static DRIVER_INIT(ppcar)
 {
+	DRIVER_INIT_CALL(common);
 	flashType=1;
-	PS7500timer0 = machine->scheduler().timer_alloc(FUNC(PS7500_Timer0_callback));
-	PS7500timer1 = machine->scheduler().timer_alloc(FUNC(PS7500_Timer1_callback));
+	ssfindo_speedup = ppcar_speedups;
+}
+
+static DRIVER_INIT(tetfight)
+{
+	DRIVER_INIT_CALL(common);
+	flashType=0; //?
 }
 
 GAME( 1999, ssfindo, 0,        ssfindo,  ssfindo,  ssfindo,	ROT0, "Icarus", "See See Find Out", GAME_NO_SOUND )
 GAME( 1999, ppcar,   0,        ppcar,    ppcar,    ppcar,	ROT0, "Icarus", "Pang Pang Car", GAME_NO_SOUND )
-GAME( 2001, tetfight,0,        tetfight, ssfindo,  ssfindo,	ROT0, "Sego", "Tetris Fighters", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, tetfight,0,        tetfight, ssfindo,  tetfight,ROT0, "Sego", "Tetris Fighters", GAME_NO_SOUND|GAME_NOT_WORKING )
