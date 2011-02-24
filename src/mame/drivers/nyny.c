@@ -73,13 +73,13 @@
 #include "machine/nvram.h"
 
 
-#define MAIN_CPU_MASTER_CLOCK	        XTAL_11_2MHz
-#define PIXEL_CLOCK                   (MAIN_CPU_MASTER_CLOCK / 2)
-#define CRTC_CLOCK                    (MAIN_CPU_MASTER_CLOCK / 16)
-#define AUDIO_1_MASTER_CLOCK          XTAL_4MHz
-#define AUDIO_CPU_1_CLOCK             AUDIO_1_MASTER_CLOCK
-#define AUDIO_2_MASTER_CLOCK          XTAL_4MHz
-#define AUDIO_CPU_2_CLOCK             AUDIO_2_MASTER_CLOCK
+#define MAIN_CPU_MASTER_CLOCK		XTAL_11_2MHz
+#define PIXEL_CLOCK					(MAIN_CPU_MASTER_CLOCK / 2)
+#define CRTC_CLOCK					(MAIN_CPU_MASTER_CLOCK / 16)
+#define AUDIO_1_MASTER_CLOCK		XTAL_4MHz
+#define AUDIO_CPU_1_CLOCK			AUDIO_1_MASTER_CLOCK
+#define AUDIO_2_MASTER_CLOCK		XTAL_4MHz
+#define AUDIO_CPU_2_CLOCK			AUDIO_2_MASTER_CLOCK
 
 
 class nyny_state : public driver_device
@@ -173,14 +173,14 @@ static const pia6821_interface pia_1_intf =
 {
 	DEVCB_INPUT_PORT("IN0"),		/* port A in */
 	DEVCB_INPUT_PORT("IN1"),		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_NULL,		/* port A out */
-	DEVCB_NULL,		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_NULL,						/* line CA1 in */
+	DEVCB_NULL,						/* line CB1 in */
+	DEVCB_NULL,						/* line CA2 in */
+	DEVCB_NULL,						/* line CB2 in */
+	DEVCB_NULL,						/* port A out */
+	DEVCB_NULL,						/* port B out */
+	DEVCB_NULL,						/* line CA2 out */
+	DEVCB_NULL,						/* port CB2 out */
 	DEVCB_LINE(main_cpu_irq),		/* IRQA */
 	DEVCB_LINE(main_cpu_irq)		/* IRQB */
 };
@@ -217,16 +217,16 @@ static WRITE8_DEVICE_HANDLER( pia_2_port_b_w )
 
 static const pia6821_interface pia_2_intf =
 {
-	DEVCB_NULL,		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_HANDLER(pia_2_port_a_w),		/* port A out */
-	DEVCB_HANDLER(pia_2_port_b_w),		/* port B out */
-	DEVCB_LINE(flipscreen_w),			/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_NULL,						/* port A in */
+	DEVCB_NULL,						/* port B in */
+	DEVCB_NULL,						/* line CA1 in */
+	DEVCB_NULL,						/* line CB1 in */
+	DEVCB_NULL,						/* line CA2 in */
+	DEVCB_NULL,						/* line CB2 in */
+	DEVCB_HANDLER(pia_2_port_a_w),	/* port A out */
+	DEVCB_HANDLER(pia_2_port_b_w),	/* port B out */
+	DEVCB_LINE(flipscreen_w),		/* line CA2 out */
+	DEVCB_NULL,						/* port CB2 out */
 	DEVCB_LINE(main_cpu_firq),		/* IRQA */
 	DEVCB_LINE(main_cpu_irq)		/* IRQB */
 };
@@ -390,7 +390,7 @@ static MC6845_END_UPDATE( end_update )
 			{
 				UINT8 color = ((state->star_shift_reg & 0x0100) >>  8) |	/* R */
 							  ((state->star_shift_reg & 0x0400) >>  9) |	/* G */
-							  ((state->star_shift_reg & 0x1000) >> 10);	/* B */
+							  ((state->star_shift_reg & 0x1000) >> 10);		/* B */
 
 				*BITMAP_ADDR32(bitmap, y, x) = pens[color];
 			}
@@ -739,7 +739,6 @@ static MACHINE_CONFIG_START( nyny, nyny_state )
 	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
 
 	/* 74LS123 */
-
 	MCFG_TTL74123_ADD("ic48_1", ic48_1_config)
 
 	MCFG_PIA6821_ADD("pia1", pia_1_intf)
