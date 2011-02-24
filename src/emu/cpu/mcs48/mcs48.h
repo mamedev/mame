@@ -87,6 +87,9 @@ enum
     MACROS
 ***************************************************************************/
 
+#define MCS48_ALE_CLOCK(_clock) \
+	attotime::from_hz(_clock/(3*5)/16)
+
 /* Official Intel MCS-48 parts */
 DECLARE_LEGACY_CPU_DEVICE(I8021, i8021);			/* 1k internal ROM,      64 bytes internal RAM */
 DECLARE_LEGACY_CPU_DEVICE(I8022, i8022);			/* 2k internal ROM,     128 bytes internal RAM */
