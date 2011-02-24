@@ -384,7 +384,7 @@ static MC6845_END_UPDATE( end_update )
 		{
 			/* check if the star status */
 			if (state->star_enable &&
-			    (*BITMAP_ADDR32(bitmap, y, x) == 0) &&
+			    (*BITMAP_ADDR32(bitmap, y, x) == pens[0]) &&
 			    ((state->star_shift_reg & 0x80ff) == 0x00ff) &&
 			    (((y & 0x01) ^ state->flipscreen) ^ (((x & 0x08) >> 3) ^ state->flipscreen)))
 			{
