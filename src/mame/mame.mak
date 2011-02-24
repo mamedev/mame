@@ -375,7 +375,7 @@ $(MAMEOBJ)/amiga.a: \
 	$(DRIVERS)/alg.o \
 	$(MACHINE)/amiga.o $(AUDIO)/amiga.o $(VIDEO)/amiga.o $(VIDEO)/amigaaga.o\
 	$(DRIVERS)/arcadia.o \
-	$(DRIVERS)/cubocd32.o $(MACHINE)/cubocd32.o \
+	$(DRIVERS)/cd32.o $(MACHINE)/cd32.o \
 	$(DRIVERS)/mquake.o \
 	$(DRIVERS)/upscope.o \
 
