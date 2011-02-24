@@ -16,8 +16,8 @@ WRITE32_HANDLER( unico_vram32_2_w );
 WRITE32_HANDLER( unico_palette32_w );
 
 VIDEO_START( unico );
-VIDEO_UPDATE( unico );
+SCREEN_UPDATE( unico );
 
 VIDEO_START( zeropnt2 );
-VIDEO_UPDATE( zeropnt2 );
+SCREEN_UPDATE( zeropnt2 );
 

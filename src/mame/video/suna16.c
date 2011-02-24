@@ -221,7 +221,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 ***************************************************************************/
 
-VIDEO_UPDATE( suna16 )
+SCREEN_UPDATE( suna16 )
 {
 	suna16_state *state = screen->machine->driver_data<suna16_state>();
 
@@ -231,7 +231,7 @@ VIDEO_UPDATE( suna16 )
 	return 0;
 }
 
-VIDEO_UPDATE( bestbest )
+SCREEN_UPDATE( bestbest )
 {
 	suna16_state *state = screen->machine->driver_data<suna16_state>();
 	int layers_ctrl = -1;

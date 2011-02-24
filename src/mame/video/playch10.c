@@ -120,7 +120,7 @@ VIDEO_START( playch10_hboard )
 
 ***************************************************************************/
 
-VIDEO_UPDATE( playch10 )
+SCREEN_UPDATE( playch10 )
 {
 	device_t *ppu = screen->machine->device("ppu");
 

@@ -163,7 +163,7 @@ static VIDEO_START(igs_majhong)
 	logerror("Video START OK!\n");
 }
 
-static VIDEO_UPDATE(igs_majhong)
+static SCREEN_UPDATE(igs_majhong)
 {
 	igs_m027_state *state = screen->machine->driver_data<igs_m027_state>();
 	//??????????
@@ -404,11 +404,11 @@ static MACHINE_CONFIG_START( igs_majhong, igs_m027_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE( igs_majhong )
 
 	MCFG_PALETTE_LENGTH(0x200)
 
 	MCFG_VIDEO_START( igs_majhong )
-	MCFG_VIDEO_UPDATE( igs_majhong )
 
 	/* sound hardware */
 

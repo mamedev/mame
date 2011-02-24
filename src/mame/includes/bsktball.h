@@ -60,6 +60,6 @@ DISCRETE_SOUND_EXTERN( bsktball );
 /*----------- defined in video/bsktball.c -----------*/
 
 VIDEO_START( bsktball );
-VIDEO_UPDATE( bsktball );
+SCREEN_UPDATE( bsktball );
 WRITE8_HANDLER( bsktball_videoram_w );
 

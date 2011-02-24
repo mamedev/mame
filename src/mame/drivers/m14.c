@@ -120,7 +120,7 @@ static VIDEO_START( m14 )
 	state->m14_tilemap = tilemap_create(machine, m14_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
-static VIDEO_UPDATE( m14 )
+static SCREEN_UPDATE( m14 )
 {
 	m14_state *state = screen->machine->driver_data<m14_state>();
 
@@ -347,12 +347,12 @@ static MACHINE_CONFIG_START( m14, m14_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_UPDATE(m14)
 	MCFG_GFXDECODE(m14)
 	MCFG_PALETTE_LENGTH(0x20)
 	MCFG_PALETTE_INIT(m14)
 
 	MCFG_VIDEO_START(m14)
-	MCFG_VIDEO_UPDATE(m14)
 
 	/* sound hardware */
 //  MCFG_SPEAKER_STANDARD_MONO("mono")

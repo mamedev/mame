@@ -43,4 +43,4 @@ WRITE8_HANDLER( megazone_flipscreen_w );
 
 PALETTE_INIT( megazone );
 VIDEO_START( megazone );
-VIDEO_UPDATE( megazone );
+SCREEN_UPDATE( megazone );

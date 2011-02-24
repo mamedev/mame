@@ -1789,7 +1789,7 @@ VIDEO_START( snes )
 	state_save_register_global_pointer(machine, snes_oam, SNES_OAM_SIZE/2);
 }
 
-VIDEO_UPDATE( snes )
+SCREEN_UPDATE( snes )
 {
 	int y;
 

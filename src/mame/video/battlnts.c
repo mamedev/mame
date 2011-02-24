@@ -43,7 +43,7 @@ WRITE8_HANDLER( battlnts_spritebank_w )
 
 ***************************************************************************/
 
-VIDEO_UPDATE( battlnts )
+SCREEN_UPDATE( battlnts )
 {
 	battlnts_state *state = screen->machine->driver_data<battlnts_state>();
 

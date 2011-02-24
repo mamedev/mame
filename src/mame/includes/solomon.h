@@ -25,4 +25,4 @@ WRITE8_HANDLER( solomon_colorram2_w );
 WRITE8_HANDLER( solomon_flipscreen_w );
 
 VIDEO_START( solomon );
-VIDEO_UPDATE( solomon );
+SCREEN_UPDATE( solomon );

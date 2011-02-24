@@ -70,7 +70,7 @@ static VIDEO_START(funkball)
 {
 }
 
-static VIDEO_UPDATE(funkball)
+static SCREEN_UPDATE(funkball)
 {
 	return 0;
 }
@@ -97,10 +97,10 @@ static MACHINE_CONFIG_START( funkball, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 199)
+	MCFG_SCREEN_UPDATE(funkball)
 	MCFG_PALETTE_LENGTH(16)
 
 	MCFG_VIDEO_START(funkball)
-	MCFG_VIDEO_UPDATE(funkball)
 MACHINE_CONFIG_END
 
 ROM_START( funkball )

@@ -332,7 +332,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-static VIDEO_UPDATE( m63 )
+static SCREEN_UPDATE( m63 )
 {
 	m63_state *state = screen->machine->driver_data<m63_state>();
 
@@ -752,13 +752,13 @@ static MACHINE_CONFIG_START( m63, m63_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(m63)
 
 	MCFG_GFXDECODE(m63)
 	MCFG_PALETTE_LENGTH(256+4)
 
 	MCFG_PALETTE_INIT(m63)
 	MCFG_VIDEO_START(m63)
-	MCFG_VIDEO_UPDATE(m63)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono") /* ????? */
@@ -797,13 +797,13 @@ static MACHINE_CONFIG_START( fghtbskt, m63_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(m63)
 
 	MCFG_GFXDECODE(fghtbskt)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START(m63)
-	MCFG_VIDEO_UPDATE(m63)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

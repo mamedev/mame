@@ -1875,13 +1875,13 @@ static MACHINE_CONFIG_START( dfeveron, cave_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+	MCFG_SCREEN_UPDATE(cave)
 
 	MCFG_GFXDECODE(dfeveron)
 	MCFG_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT(dfeveron)
 
 	MCFG_VIDEO_START(cave_2_layers)
-	MCFG_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1918,13 +1918,13 @@ static MACHINE_CONFIG_START( ddonpach, cave_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+	MCFG_SCREEN_UPDATE(cave)
 
 	MCFG_GFXDECODE(ddonpach)
 	MCFG_PALETTE_LENGTH(0x8000 + 0x40*16)	// $400 extra entries for layers 1&2
 	MCFG_PALETTE_INIT(ddonpach)
 
 	MCFG_VIDEO_START(cave_3_layers)
-	MCFG_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1965,13 +1965,13 @@ static MACHINE_CONFIG_START( donpachi, cave_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+	MCFG_SCREEN_UPDATE(cave)
 
 	MCFG_GFXDECODE(donpachi)
 	MCFG_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT(dfeveron)
 
 	MCFG_VIDEO_START(cave_3_layers)
-	MCFG_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2012,13 +2012,13 @@ static MACHINE_CONFIG_START( esprade, cave_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+	MCFG_SCREEN_UPDATE(cave)
 
 	MCFG_GFXDECODE(esprade)
 	MCFG_PALETTE_LENGTH(0x8000)
 	MCFG_PALETTE_INIT(cave)
 
 	MCFG_VIDEO_START(cave_3_layers)
-	MCFG_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2053,13 +2053,13 @@ static MACHINE_CONFIG_START( gaia, cave_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
+	MCFG_SCREEN_UPDATE(cave)
 
 	MCFG_GFXDECODE(esprade)
 	MCFG_PALETTE_LENGTH(0x8000)
 	MCFG_PALETTE_INIT(cave)
 
 	MCFG_VIDEO_START(cave_3_layers)
-	MCFG_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2095,13 +2095,13 @@ static MACHINE_CONFIG_START( guwange, cave_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+	MCFG_SCREEN_UPDATE(cave)
 
 	MCFG_GFXDECODE(esprade)
 	MCFG_PALETTE_LENGTH(0x8000)
 	MCFG_PALETTE_INIT(cave)
 
 	MCFG_VIDEO_START(cave_3_layers)
-	MCFG_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2140,13 +2140,13 @@ static MACHINE_CONFIG_START( hotdogst, cave_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(384, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 240-1)
+	MCFG_SCREEN_UPDATE(cave)
 
 	MCFG_GFXDECODE(hotdogst)
 	MCFG_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT(dfeveron)
 
 	MCFG_VIDEO_START(cave_3_layers)
-	MCFG_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2193,13 +2193,13 @@ static MACHINE_CONFIG_START( korokoro, cave_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1-2, 0, 240-1-1)
+	MCFG_SCREEN_UPDATE(cave)
 
 	MCFG_GFXDECODE(korokoro)
 	MCFG_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT(korokoro)
 
 	MCFG_VIDEO_START(cave_1_layer)
-	MCFG_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2248,13 +2248,13 @@ static MACHINE_CONFIG_START( mazinger, cave_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(384, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 240-1)
+	MCFG_SCREEN_UPDATE(cave)
 
 	MCFG_GFXDECODE(mazinger)
 	MCFG_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT(mazinger)
 
 	MCFG_VIDEO_START(cave_2_layers)
-	MCFG_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2307,13 +2307,13 @@ static MACHINE_CONFIG_START( metmqstr, cave_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(0x200, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0x7d, 0x7d + 0x180-1, 0, 240-1)
+	MCFG_SCREEN_UPDATE(cave)
 
 	MCFG_GFXDECODE(donpachi)
 	MCFG_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT(dfeveron)
 
 	MCFG_VIDEO_START(cave_3_layers)
-	MCFG_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2363,13 +2363,13 @@ static MACHINE_CONFIG_START( pacslot, cave_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(0x200, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x140-1, 0, 240-1)
+	MCFG_SCREEN_UPDATE(cave)
 
 	MCFG_GFXDECODE(tjumpman)
 	MCFG_PALETTE_LENGTH(0x8000)
 	MCFG_PALETTE_INIT(cave)
 
 	MCFG_VIDEO_START(cave_1_layer)
-	MCFG_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2420,13 +2420,13 @@ static MACHINE_CONFIG_START( pwrinst2, cave_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(0x200, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0x70, 0x70 + 0x140-1, 0, 240-1)
+	MCFG_SCREEN_UPDATE(cave)
 
 	MCFG_GFXDECODE(pwrinst2)
 	MCFG_PALETTE_LENGTH(0x8000+0x2800)
 	MCFG_PALETTE_INIT(pwrinst2)
 
 	MCFG_VIDEO_START(cave_4_layers)
-	MCFG_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2484,13 +2484,13 @@ static MACHINE_CONFIG_START( sailormn, cave_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320+1, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0+1, 320+1-1, 0, 240-1)
+	MCFG_SCREEN_UPDATE(cave)
 
 	MCFG_GFXDECODE(sailormn)
 	MCFG_PALETTE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT(sailormn)	// 4 bit sprites, 6 bit tiles
 
 	MCFG_VIDEO_START(sailormn_3_layers)	/* Layer 2 has 1 banked ROM */
-	MCFG_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2539,13 +2539,13 @@ static MACHINE_CONFIG_START( tjumpman, cave_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(0x200, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x140-1, 0, 240-1)
+	MCFG_SCREEN_UPDATE(cave)
 
 	MCFG_GFXDECODE(tjumpman)
 	MCFG_PALETTE_LENGTH(0x8000)
 	MCFG_PALETTE_INIT(cave)
 
 	MCFG_VIDEO_START(cave_1_layer)
-	MCFG_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2581,13 +2581,13 @@ static MACHINE_CONFIG_START( uopoko, cave_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+	MCFG_SCREEN_UPDATE(cave)
 
 	MCFG_GFXDECODE(uopoko)
 	MCFG_PALETTE_LENGTH(0x8000)
 
 	MCFG_PALETTE_INIT(cave)
 	MCFG_VIDEO_START(cave_1_layer)
-	MCFG_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

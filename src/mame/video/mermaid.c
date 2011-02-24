@@ -239,7 +239,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( mermaid )
+SCREEN_UPDATE( mermaid )
 {
 	mermaid_state *state = screen->machine->driver_data<mermaid_state>();
 
@@ -271,7 +271,7 @@ static UINT8 collision_check( running_machine *machine, rectangle* rect )
 	return data;
 }
 
-VIDEO_EOF( mermaid )
+SCREEN_EOF( mermaid )
 {
 	mermaid_state *state = machine->driver_data<mermaid_state>();
 	const rectangle &visarea = machine->primary_screen->visible_area();

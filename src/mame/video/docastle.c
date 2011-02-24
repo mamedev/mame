@@ -224,7 +224,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( docastle )
+SCREEN_UPDATE( docastle )
 {
 	docastle_state *state = screen->machine->driver_data<docastle_state>();
 

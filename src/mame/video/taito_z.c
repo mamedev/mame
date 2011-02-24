@@ -842,7 +842,7 @@ WRITE16_HANDLER( contcirc_out_w )
 }
 
 
-VIDEO_UPDATE( contcirc )
+SCREEN_UPDATE( contcirc )
 {
 	taitoz_state *state = screen->machine->driver_data<taitoz_state>();
 	UINT8 layer[3];
@@ -869,7 +869,7 @@ VIDEO_UPDATE( contcirc )
 
 /* Nightstr and ChaseHQ */
 
-VIDEO_UPDATE( chasehq )
+SCREEN_UPDATE( chasehq )
 {
 	taitoz_state *state = screen->machine->driver_data<taitoz_state>();
 	UINT8 layer[3];
@@ -895,7 +895,7 @@ VIDEO_UPDATE( chasehq )
 }
 
 
-VIDEO_UPDATE( bshark )
+SCREEN_UPDATE( bshark )
 {
 	taitoz_state *state = screen->machine->driver_data<taitoz_state>();
 	UINT8 layer[3];
@@ -921,7 +921,7 @@ VIDEO_UPDATE( bshark )
 }
 
 
-VIDEO_UPDATE( sci )
+SCREEN_UPDATE( sci )
 {
 	taitoz_state *state = screen->machine->driver_data<taitoz_state>();
 	UINT8 layer[3];
@@ -947,7 +947,7 @@ VIDEO_UPDATE( sci )
 }
 
 
-VIDEO_UPDATE( aquajack )
+SCREEN_UPDATE( aquajack )
 {
 	taitoz_state *state = screen->machine->driver_data<taitoz_state>();
 	UINT8 layer[3];
@@ -973,7 +973,7 @@ VIDEO_UPDATE( aquajack )
 }
 
 
-VIDEO_UPDATE( spacegun )
+SCREEN_UPDATE( spacegun )
 {
 	taitoz_state *state = screen->machine->driver_data<taitoz_state>();
 	UINT8 layer[3];
@@ -999,7 +999,7 @@ VIDEO_UPDATE( spacegun )
 }
 
 
-VIDEO_UPDATE( dblaxle )
+SCREEN_UPDATE( dblaxle )
 {
 	taitoz_state *state = screen->machine->driver_data<taitoz_state>();
 	UINT8 layer[5];

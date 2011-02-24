@@ -386,13 +386,13 @@ static MACHINE_CONFIG_START( 4roses, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE((124+1)*4, (30+1)*8)				/* guess. taken from funworld games */
 	MCFG_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 29*8-1)	/* guess. taken from funworld games */
+	MCFG_SCREEN_UPDATE(funworld)
 
 	MCFG_GFXDECODE(4roses)
 
 	MCFG_PALETTE_LENGTH(0x1000)
 	MCFG_PALETTE_INIT(funworld)
 	MCFG_VIDEO_START(funworld)
-	MCFG_VIDEO_UPDATE(funworld)
 
 	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK/8, mc6845_intf) /* 2MHz, guess */
 

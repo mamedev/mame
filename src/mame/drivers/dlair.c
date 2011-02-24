@@ -172,7 +172,7 @@ static PALETTE_INIT( dleuro )
  *
  *************************************/
 
-static VIDEO_UPDATE( dleuro )
+static SCREEN_UPDATE( dleuro )
 {
 	dlair_state *state = screen->machine->driver_data<dlair_state>();
 	UINT8 *videoram = state->videoram;

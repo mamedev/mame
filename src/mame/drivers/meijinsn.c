@@ -277,7 +277,7 @@ static PALETTE_INIT( meijinsn )
 }
 
 
-static VIDEO_UPDATE(meijinsn)
+static SCREEN_UPDATE(meijinsn)
 {
 	meijinsn_state *state = screen->machine->driver_data<meijinsn_state>();
 	int offs;
@@ -359,12 +359,12 @@ static MACHINE_CONFIG_START( meijinsn, meijinsn_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(12, 243, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(meijinsn)
 
 	MCFG_PALETTE_LENGTH(32)
 	MCFG_PALETTE_INIT(meijinsn)
 
 	MCFG_VIDEO_START(meijinsn)
-	MCFG_VIDEO_UPDATE(meijinsn)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

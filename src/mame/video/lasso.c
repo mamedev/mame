@@ -365,7 +365,7 @@ static void draw_lasso( running_machine *machine, bitmap_t *bitmap, const rectan
 }
 
 
-VIDEO_UPDATE( lasso )
+SCREEN_UPDATE( lasso )
 {
 	lasso_state *state = screen->machine->driver_data<lasso_state>();
 	palette_set_color(screen->machine, 0, get_color(*state->back_color));
@@ -378,7 +378,7 @@ VIDEO_UPDATE( lasso )
 	return 0;
 }
 
-VIDEO_UPDATE( chameleo )
+SCREEN_UPDATE( chameleo )
 {
 	lasso_state *state = screen->machine->driver_data<lasso_state>();
 	palette_set_color(screen->machine, 0, get_color(*state->back_color));
@@ -391,7 +391,7 @@ VIDEO_UPDATE( chameleo )
 }
 
 
-VIDEO_UPDATE( wwjgtin )
+SCREEN_UPDATE( wwjgtin )
 {
 	lasso_state *state = screen->machine->driver_data<lasso_state>();
 	colortable_palette_set_color(screen->machine->colortable, 0, get_color(*state->back_color));
@@ -412,7 +412,7 @@ VIDEO_UPDATE( wwjgtin )
 }
 
 
-VIDEO_UPDATE( pinbo )
+SCREEN_UPDATE( pinbo )
 {
 	lasso_state *state = screen->machine->driver_data<lasso_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);

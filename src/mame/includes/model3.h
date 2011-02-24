@@ -128,7 +128,7 @@ READ64_HANDLER(model3_palette_r);
 WRITE64_HANDLER(model3_palette_w);
 
 VIDEO_START(model3);
-VIDEO_UPDATE(model3);
+SCREEN_UPDATE(model3);
 
 WRITE64_HANDLER(real3d_cmd_w);
 WRITE64_HANDLER(real3d_display_list_w);

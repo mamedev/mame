@@ -50,9 +50,9 @@ PALETTE_INIT( cosmicg );
 PALETTE_INIT( magspot );
 PALETTE_INIT( nomnlnd );
 
-VIDEO_UPDATE( panic );
-VIDEO_UPDATE( magspot );
-VIDEO_UPDATE( devzone );
-VIDEO_UPDATE( cosmica );
-VIDEO_UPDATE( cosmicg );
-VIDEO_UPDATE( nomnlnd );
+SCREEN_UPDATE( panic );
+SCREEN_UPDATE( magspot );
+SCREEN_UPDATE( devzone );
+SCREEN_UPDATE( cosmica );
+SCREEN_UPDATE( cosmicg );
+SCREEN_UPDATE( nomnlnd );

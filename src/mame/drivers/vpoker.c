@@ -128,7 +128,7 @@ static VIDEO_START( vpoker )
 	state->videoram = auto_alloc_array(machine, UINT8, 0x200);
 }
 
-static VIDEO_UPDATE( vpoker )
+static SCREEN_UPDATE( vpoker )
 {
 	vpoker_state *state = screen->machine->driver_data<vpoker_state>();
 	UINT8 *videoram = state->videoram;
@@ -663,12 +663,13 @@ static MACHINE_CONFIG_START( vpoker, vpoker_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 480-1, 0*8, 240-1)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 256-1)
+	MCFG_SCREEN_UPDATE(vpoker)
+
 	MCFG_GFXDECODE(vpoker)
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(vpoker)
 
 	MCFG_VIDEO_START(vpoker)
-	MCFG_VIDEO_UPDATE(vpoker)
 
 	/* 6840 PTM */
 	MCFG_PTM6840_ADD("6840ptm", ptm_intf)

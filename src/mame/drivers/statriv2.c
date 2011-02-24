@@ -180,7 +180,7 @@ static WRITE8_HANDLER( statriv2_videoram_w )
  *
  *************************************/
 
-static VIDEO_UPDATE( statriv2 )
+static SCREEN_UPDATE( statriv2 )
 {
 	if (tms9927_screen_reset(screen->machine->device("tms")))
 		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
@@ -602,6 +602,7 @@ static MACHINE_CONFIG_START( statriv2, statriv2_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 0, 320, 270, 0, 240)
+	MCFG_SCREEN_UPDATE(statriv2)
 
 	MCFG_TMS9927_ADD("tms", MASTER_CLOCK/2, tms9927_intf)
 
@@ -610,7 +611,6 @@ static MACHINE_CONFIG_START( statriv2, statriv2_state )
 
 	MCFG_PALETTE_INIT(statriv2)
 	MCFG_VIDEO_START(horizontal)
-	MCFG_VIDEO_UPDATE(statriv2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

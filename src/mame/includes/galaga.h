@@ -78,9 +78,9 @@ WRITE8_HANDLER( bosco_scrollx_w );
 WRITE8_HANDLER( bosco_scrolly_w );
 WRITE8_HANDLER( bosco_starclr_w );
 VIDEO_START( bosco );
-VIDEO_UPDATE( bosco );
+SCREEN_UPDATE( bosco );
 PALETTE_INIT( bosco );
-VIDEO_EOF( bosco );	/* update starfield */
+SCREEN_EOF( bosco );	/* update starfield */
 
 /*----------- defined in audio/galaga.c -----------*/
 
@@ -102,8 +102,8 @@ PALETTE_INIT( galaga );
 WRITE8_HANDLER( galaga_videoram_w );
 WRITE8_HANDLER( gatsbee_bank_w );
 VIDEO_START( galaga );
-VIDEO_UPDATE( galaga );
-VIDEO_EOF( galaga );	/* update starfield */
+SCREEN_UPDATE( galaga );
+SCREEN_EOF( galaga );	/* update starfield */
 
 /*----------- defined in video/xevious.c -----------*/
 
@@ -116,7 +116,7 @@ WRITE8_HANDLER( xevious_bs_w );
 READ8_HANDLER( xevious_bb_r );
 VIDEO_START( xevious );
 PALETTE_INIT( xevious );
-VIDEO_UPDATE( xevious );
+SCREEN_UPDATE( xevious );
 
 PALETTE_INIT( battles );
 
@@ -145,5 +145,5 @@ INTERRUPT_GEN( battles_interrupt_4 );
 WRITE8_HANDLER( digdug_videoram_w );
 WRITE8_HANDLER( digdug_PORT_w );
 VIDEO_START( digdug );
-VIDEO_UPDATE( digdug );
+SCREEN_UPDATE( digdug );
 PALETTE_INIT( digdug );

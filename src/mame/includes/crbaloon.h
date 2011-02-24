@@ -40,7 +40,7 @@ MACHINE_CONFIG_EXTERN( crbaloon_audio );
 
 PALETTE_INIT( crbaloon );
 VIDEO_START( crbaloon );
-VIDEO_UPDATE( crbaloon );
+SCREEN_UPDATE( crbaloon );
 
 WRITE8_HANDLER( crbaloon_videoram_w );
 WRITE8_HANDLER( crbaloon_colorram_w );

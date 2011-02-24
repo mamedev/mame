@@ -187,7 +187,7 @@ static void shangkid_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 	}
 }
 
-VIDEO_UPDATE( shangkid )
+SCREEN_UPDATE( shangkid )
 {
 	int flipscreen = shangkid_videoreg[1]&0x80;
 	tilemap_set_flip( background, flipscreen?(TILEMAP_FLIPX|TILEMAP_FLIPY):0 );
@@ -322,7 +322,7 @@ static void dynamski_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 	}
 }
 
-VIDEO_UPDATE( dynamski )
+SCREEN_UPDATE( dynamski )
 {
 	dynamski_draw_background(screen->machine, bitmap,cliprect, 0 );
 	dynamski_draw_sprites(screen->machine, bitmap,cliprect );

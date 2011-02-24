@@ -419,7 +419,7 @@ static void get_pens(running_machine *machine, pen_t *pens)
 }
 
 
-static VIDEO_UPDATE( berzerk )
+static SCREEN_UPDATE( berzerk )
 {
 	pen_t pens[NUM_PENS];
 	offs_t offs;
@@ -1058,11 +1058,11 @@ static MACHINE_CONFIG_START( berzerk, driver_device )
 
 	/* video hardware */
 	MCFG_VIDEO_START(berzerk)
-	MCFG_VIDEO_UPDATE(berzerk)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_UPDATE(berzerk)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

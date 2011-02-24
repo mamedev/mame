@@ -133,7 +133,7 @@ VIDEO_START( airbustr )
 }
 
 
-VIDEO_UPDATE( airbustr )
+SCREEN_UPDATE( airbustr )
 {
 	airbustr_state *state = screen->machine->driver_data<airbustr_state>();
 
@@ -146,7 +146,7 @@ VIDEO_UPDATE( airbustr )
 	return 0;
 }
 
-VIDEO_EOF( airbustr )
+SCREEN_EOF( airbustr )
 {
 	airbustr_state *state = machine->driver_data<airbustr_state>();
 

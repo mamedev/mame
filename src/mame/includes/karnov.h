@@ -53,4 +53,4 @@ void karnov_flipscreen_w(running_machine *machine, int data);
 PALETTE_INIT( karnov );
 VIDEO_START( karnov );
 VIDEO_START( wndrplnt );
-VIDEO_UPDATE( karnov );
+SCREEN_UPDATE( karnov );

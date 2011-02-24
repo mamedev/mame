@@ -788,9 +788,9 @@ static MACHINE_CONFIG_START( atarisy1, atarisy1_state )
 	/* note: these parameters are from published specs, not derived */
 	/* video timing comes from an 82S163 (H) and an 82S129 (V) */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
+	MCFG_SCREEN_UPDATE(atarisy1)
 
 	MCFG_VIDEO_START(atarisy1)
-	MCFG_VIDEO_UPDATE(atarisy1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

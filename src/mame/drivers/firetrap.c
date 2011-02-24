@@ -694,13 +694,13 @@ static MACHINE_CONFIG_START( firetrap, firetrap_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_UPDATE(firetrap)
 
 	MCFG_GFXDECODE(firetrap)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(firetrap)
 	MCFG_VIDEO_START(firetrap)
-	MCFG_VIDEO_UPDATE(firetrap)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -741,7 +741,7 @@ static MACHINE_CONFIG_START( firetrapbl, firetrap_state )
 
 	MCFG_PALETTE_INIT(firetrap)
 	MCFG_VIDEO_START(firetrap)
-	MCFG_VIDEO_UPDATE(firetrap)
+	MCFG_SCREEN_UPDATE(firetrap)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -259,7 +259,7 @@ static void voodoo_vblank_0(device_t *device, int param)
 }
 
 
-static VIDEO_UPDATE( nwktr )
+static SCREEN_UPDATE( nwktr )
 {
 	nwktr_state *state = screen->machine->driver_data<nwktr_state>();
 	device_t *voodoo = screen->machine->device("voodoo");
@@ -704,10 +704,9 @@ static MACHINE_CONFIG_START( nwktr, nwktr_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(512, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
+	MCFG_SCREEN_UPDATE(nwktr)
 
 	MCFG_PALETTE_LENGTH(65536)
-
-	MCFG_VIDEO_UPDATE(nwktr)
 
 	MCFG_K001604_ADD("k001604", racingj_k001604_intf)
 

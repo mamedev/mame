@@ -151,7 +151,7 @@ VIDEO_START( goal92 )
 	tilemap_set_transparent_pen(state->tx_layer, 15);
 }
 
-VIDEO_UPDATE( goal92 )
+SCREEN_UPDATE( goal92 )
 {
 	goal92_state *state = screen->machine->driver_data<goal92_state>();
 	tilemap_set_scrollx(state->bg_layer, 0, state->scrollram[0] + 60);
@@ -187,7 +187,7 @@ VIDEO_UPDATE( goal92 )
 	return 0;
 }
 
-VIDEO_EOF( goal92 )
+SCREEN_EOF( goal92 )
 {
 	memcpy(machine->generic.buffered_spriteram.u16, machine->generic.spriteram.u16, 0x400 * 2);
 }

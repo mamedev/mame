@@ -619,7 +619,7 @@ static GFXDECODE_START( ltcasino )
 GFXDECODE_END
 
 
-static VIDEO_UPDATE(ltcasino)
+static SCREEN_UPDATE(ltcasino)
 {
 	tilemap_draw(bitmap,cliprect,ltcasino_tilemap,0,0);
 	return 0;
@@ -639,12 +639,12 @@ static MACHINE_CONFIG_START( ltcasino, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(6*8, 58*8-1, 0, 32*8-1)
+	MCFG_SCREEN_UPDATE(ltcasino)
 
 	MCFG_GFXDECODE(ltcasino)
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(ltcasino)
-	MCFG_VIDEO_UPDATE(ltcasino)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

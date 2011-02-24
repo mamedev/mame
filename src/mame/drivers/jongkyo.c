@@ -59,7 +59,7 @@ static VIDEO_START( jongkyo )
 
 }
 
-static VIDEO_UPDATE( jongkyo )
+static SCREEN_UPDATE( jongkyo )
 {
 	jongkyo_state *state = screen->machine->driver_data<jongkyo_state>();
 	int y;
@@ -500,12 +500,12 @@ static MACHINE_CONFIG_START( jongkyo, jongkyo_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 8, 256-8-1)
+	MCFG_SCREEN_UPDATE(jongkyo)
 
 	MCFG_PALETTE_LENGTH(0x100)
 	MCFG_PALETTE_INIT(jongkyo)
 
 	MCFG_VIDEO_START(jongkyo)
-	MCFG_VIDEO_UPDATE(jongkyo)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, JONGKYO_CLOCK/8)

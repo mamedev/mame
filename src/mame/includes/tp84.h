@@ -27,4 +27,4 @@ READ8_HANDLER( tp84_scanline_r );
 
 PALETTE_INIT( tp84 );
 VIDEO_START( tp84 );
-VIDEO_UPDATE( tp84 );
+SCREEN_UPDATE( tp84 );

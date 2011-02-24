@@ -51,7 +51,7 @@ static VIDEO_START(ttchamp)
 {
 }
 
-static VIDEO_UPDATE(ttchamp)
+static SCREEN_UPDATE(ttchamp)
 {
 	int y,x,count;
 //  int i;
@@ -236,11 +236,11 @@ static MACHINE_CONFIG_START( ttchamp, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(1024,1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+	MCFG_SCREEN_UPDATE(ttchamp)
 
 	MCFG_PALETTE_LENGTH(0x8000)
 
 	MCFG_VIDEO_START(ttchamp)
-	MCFG_VIDEO_UPDATE(ttchamp)
 MACHINE_CONFIG_END
 
 ROM_START( ttchamp )

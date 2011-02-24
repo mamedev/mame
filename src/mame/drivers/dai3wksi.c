@@ -123,7 +123,7 @@ static void dai3wksi_get_pens(pen_t *pens)
 }
 
 
-static VIDEO_UPDATE( dai3wksi )
+static SCREEN_UPDATE( dai3wksi )
 {
 	dai3wksi_state *state = screen->machine->driver_data<dai3wksi_state>();
 	offs_t offs;
@@ -598,13 +598,12 @@ static MACHINE_CONFIG_START( dai3wksi, dai3wksi_state )
 	MCFG_MACHINE_RESET(dai3wksi)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(dai3wksi)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(4, 251, 8, 247)
 	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_UPDATE(dai3wksi)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

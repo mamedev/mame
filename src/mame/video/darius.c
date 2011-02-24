@@ -92,7 +92,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 
 
-VIDEO_UPDATE( darius )
+SCREEN_UPDATE( darius )
 {
 	darius_state *state = screen->machine->driver_data<darius_state>();
 	int xoffs = 0;

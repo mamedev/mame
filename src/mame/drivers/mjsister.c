@@ -113,7 +113,7 @@ static WRITE8_HANDLER( mjsister_videoram_w )
 	}
 }
 
-static VIDEO_UPDATE( mjsister )
+static SCREEN_UPDATE( mjsister )
 {
 	mjsister_state *state = screen->machine->driver_data<mjsister_state>();
 	int flip = state->flip_screen;
@@ -508,12 +508,12 @@ static MACHINE_CONFIG_START( mjsister, mjsister_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256+4, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255+4, 8, 247)
+	MCFG_SCREEN_UPDATE(mjsister)
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_VIDEO_START(mjsister)
-	MCFG_VIDEO_UPDATE(mjsister)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

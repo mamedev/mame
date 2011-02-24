@@ -53,7 +53,7 @@ static VIDEO_START(unclepoo)
 
 }
 
-static VIDEO_UPDATE(unclepoo)
+static SCREEN_UPDATE(unclepoo)
 {
 	int y,x;
 	int count;
@@ -330,13 +330,13 @@ static MACHINE_CONFIG_START( unclepoo, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1)
+	MCFG_SCREEN_UPDATE(unclepoo)
 
 	MCFG_GFXDECODE(unclepoo)
 	MCFG_PALETTE_LENGTH(0x100)
 	MCFG_PALETTE_INIT(unclepoo)
 
 	MCFG_VIDEO_START(unclepoo)
-	MCFG_VIDEO_UPDATE(unclepoo)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay", AY8910, 18000000/12) /* ? Mhz */

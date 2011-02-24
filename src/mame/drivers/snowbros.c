@@ -80,7 +80,7 @@ static WRITE16_HANDLER( snowbros_flipscreen_w )
 }
 
 
-static VIDEO_UPDATE( snowbros )
+static SCREEN_UPDATE( snowbros )
 {
 	device_t *pandora = screen->machine->device("pandora");
 
@@ -91,7 +91,7 @@ static VIDEO_UPDATE( snowbros )
 }
 
 
-static VIDEO_EOF( snowbros )
+static SCREEN_EOF( snowbros )
 {
 	device_t *pandora = machine->device("pandora");
 	pandora_eof(pandora);
@@ -1464,12 +1464,11 @@ static MACHINE_CONFIG_START( snowbros, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(snowbros)
+	MCFG_SCREEN_EOF(snowbros)
 
 	MCFG_GFXDECODE(snowbros)
 	MCFG_PALETTE_LENGTH(256)
-
-	MCFG_VIDEO_UPDATE(snowbros)
-	MCFG_VIDEO_EOF(snowbros)
 
 	MCFG_KANEKO_PANDORA_ADD("pandora", snowbros_pandora_config)
 
@@ -1493,8 +1492,8 @@ static MACHINE_CONFIG_DERIVED( wintbob, snowbros )
 
 	/* video hardware */
 	MCFG_GFXDECODE(wb)
-	MCFG_VIDEO_UPDATE(wintbob)
-	MCFG_VIDEO_EOF(0)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(wintbob)
 MACHINE_CONFIG_END
 
 
@@ -1575,11 +1574,10 @@ static MACHINE_CONFIG_START( honeydol, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(honeydol)
 
 	MCFG_GFXDECODE(honeydol)
 	MCFG_PALETTE_LENGTH(0x800/2)
-
-	MCFG_VIDEO_UPDATE(honeydol)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1614,11 +1612,10 @@ static MACHINE_CONFIG_START( twinadv, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(twinadv)
 
 	MCFG_GFXDECODE(twinadv)
 	MCFG_PALETTE_LENGTH(0x100)
-
-	MCFG_VIDEO_UPDATE(twinadv)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1688,11 +1685,10 @@ static MACHINE_CONFIG_START( snowbro3, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(snowbro3)
 
 	MCFG_GFXDECODE(sb3)
 	MCFG_PALETTE_LENGTH(512)
-
-	MCFG_VIDEO_UPDATE(snowbro3)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

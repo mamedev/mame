@@ -2883,12 +2883,12 @@ static MACHINE_CONFIG_START( stv, driver_device )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 400, 0, 320, 262, 0, 224)
+	MCFG_SCREEN_UPDATE(stv_vdp2)
 
 	MCFG_PALETTE_LENGTH(2048+(2048*2))//standard palette + extra memory for rgb brightness.
 	MCFG_GFXDECODE(stv)
 
 	MCFG_VIDEO_START(stv_vdp2)
-	MCFG_VIDEO_UPDATE(stv_vdp2)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

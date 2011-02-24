@@ -447,6 +447,7 @@ static MACHINE_CONFIG_START( gcpinbal, gcpinbal_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(gcpinbal)
 
 	MCFG_MACHINE_START(gcpinbal)
 	MCFG_MACHINE_RESET(gcpinbal)
@@ -455,7 +456,6 @@ static MACHINE_CONFIG_START( gcpinbal, gcpinbal_state )
 	MCFG_PALETTE_LENGTH(4096)
 
 	MCFG_VIDEO_START(gcpinbal)
-	MCFG_VIDEO_UPDATE(gcpinbal)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

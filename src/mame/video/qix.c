@@ -344,7 +344,7 @@ static MC6845_UPDATE_ROW( update_row )
  *
  *************************************/
 
-static VIDEO_UPDATE( qix )
+static SCREEN_UPDATE( qix )
 {
 	device_t *mc6845 = screen->machine->device(MC6845_TAG);
 	mc6845_update(mc6845, bitmap, cliprect);
@@ -448,13 +448,13 @@ MACHINE_CONFIG_FRAGMENT( qix_video )
 	MCFG_CPU_CONFIG(encryption_config)	// for kram3
 
 	MCFG_VIDEO_START(qix)
-	MCFG_VIDEO_UPDATE(qix)
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, QIX_CHARACTER_CLOCK, mc6845_intf)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(QIX_CHARACTER_CLOCK*8, 256, 0, 256, 256, 0, 256)	/* temporary, CRTC will configure screen */
+	MCFG_SCREEN_UPDATE(qix)
 MACHINE_CONFIG_END
 
 

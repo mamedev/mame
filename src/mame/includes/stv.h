@@ -96,5 +96,5 @@ WRITE32_HANDLER ( stv_vdp2_regs_w );
 READ32_HANDLER ( stv_vdp2_regs_r );
 
 VIDEO_START ( stv_vdp2 );
-VIDEO_UPDATE( stv_vdp2 );
+SCREEN_UPDATE( stv_vdp2 );
 

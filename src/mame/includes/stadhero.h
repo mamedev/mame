@@ -17,7 +17,7 @@ public:
 /*----------- defined in video/stadhero.c -----------*/
 
 VIDEO_START( stadhero );
-VIDEO_UPDATE( stadhero );
+SCREEN_UPDATE( stadhero );
 
 WRITE16_HANDLER( stadhero_pf1_data_w );
 READ16_HANDLER( stadhero_pf2_data_r );

@@ -49,7 +49,7 @@ PALETTE_INIT( galaxian );
 PALETTE_INIT( moonwar );
 
 VIDEO_START( galaxian );
-VIDEO_UPDATE( galaxian );
+SCREEN_UPDATE( galaxian );
 
 WRITE8_HANDLER( galaxian_videoram_w );
 WRITE8_HANDLER( galaxian_objram_w );

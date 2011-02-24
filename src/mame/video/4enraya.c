@@ -37,7 +37,7 @@ VIDEO_START( 4enraya )
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
-VIDEO_UPDATE( 4enraya )
+SCREEN_UPDATE( 4enraya )
 {
 	_4enraya_state *state = screen->machine->driver_data<_4enraya_state>();
 

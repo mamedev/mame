@@ -527,9 +527,9 @@ static MACHINE_CONFIG_START( badlands, badlands_state )
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
+	MCFG_SCREEN_UPDATE(badlands)
 
 	MCFG_VIDEO_START(badlands)
-	MCFG_VIDEO_UPDATE(badlands)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -736,9 +736,9 @@ static MACHINE_CONFIG_START( badlandsb, badlands_state )
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
+	MCFG_SCREEN_UPDATE(badlands)
 
 	MCFG_VIDEO_START(badlands)
-	MCFG_VIDEO_UPDATE(badlands)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

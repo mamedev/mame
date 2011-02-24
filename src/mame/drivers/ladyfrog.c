@@ -332,12 +332,12 @@ static MACHINE_CONFIG_START( ladyfrog, ladyfrog_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 29*8-1) // black borders in ladyfrog gameplay are correct
+	MCFG_SCREEN_UPDATE(ladyfrog)
 
 	MCFG_GFXDECODE(ladyfrog)
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_VIDEO_START(ladyfrog)
-	MCFG_VIDEO_UPDATE(ladyfrog)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

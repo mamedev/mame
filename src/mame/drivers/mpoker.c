@@ -191,7 +191,7 @@ static VIDEO_START(mpoker)
 
 }
 
-static VIDEO_UPDATE(mpoker)
+static SCREEN_UPDATE(mpoker)
 {
 	mpoker_state *state = screen->machine->driver_data<mpoker_state>();
 	int y,x;
@@ -592,13 +592,13 @@ static MACHINE_CONFIG_START( mpoker, mpoker_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE(mpoker)
 
 	MCFG_GFXDECODE(mpoker)
 	MCFG_PALETTE_LENGTH(0x200)
 
 	MCFG_PALETTE_INIT(mpoker)
 	MCFG_VIDEO_START(mpoker)
-	MCFG_VIDEO_UPDATE(mpoker)
 
 	/* sound hardware */
 //  MCFG_SPEAKER_STANDARD_MONO("mono")

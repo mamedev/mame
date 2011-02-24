@@ -122,7 +122,7 @@ static VIDEO_START( drtomy )
 	tilemap_set_transparent_pen(state->tilemap_fg, 0);
 }
 
-static VIDEO_UPDATE( drtomy )
+static SCREEN_UPDATE( drtomy )
 {
 	drtomy_state *state = screen->machine->driver_data<drtomy_state>();
 
@@ -307,12 +307,12 @@ static MACHINE_CONFIG_START( drtomy, drtomy_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
+	MCFG_SCREEN_UPDATE(drtomy)
 
 	MCFG_GFXDECODE(drtomy)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START(drtomy)
-	MCFG_VIDEO_UPDATE(drtomy)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

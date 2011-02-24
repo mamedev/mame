@@ -664,7 +664,7 @@ static void swimmer_draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, co
 }
 
 
-VIDEO_UPDATE( cclimber )
+SCREEN_UPDATE( cclimber )
 {
 	bitmap_fill(bitmap, cliprect, CCLIMBER_BG_PEN);
 	draw_playfield(bitmap, cliprect);
@@ -687,7 +687,7 @@ VIDEO_UPDATE( cclimber )
 }
 
 
-VIDEO_UPDATE( yamato )
+SCREEN_UPDATE( yamato )
 {
 	int i;
 	UINT8 *sky_rom = screen->machine->region("user1")->base() + 0x1200;
@@ -721,7 +721,7 @@ VIDEO_UPDATE( yamato )
 }
 
 
-VIDEO_UPDATE( swimmer )
+SCREEN_UPDATE( swimmer )
 {
 	swimmer_set_background_pen(screen->machine);
 
@@ -773,7 +773,7 @@ VIDEO_UPDATE( swimmer )
 }
 
 
-VIDEO_UPDATE( toprollr )
+SCREEN_UPDATE( toprollr )
 {
 	rectangle scroll_area_clip = *cliprect;
 	scroll_area_clip.min_x = 4*8;

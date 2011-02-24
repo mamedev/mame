@@ -2,7 +2,7 @@
 
 extern UINT8 *xain_charram, *xain_bgram0, *xain_bgram1, xain_pri;
 
-VIDEO_UPDATE( xain );
+SCREEN_UPDATE( xain );
 VIDEO_START( xain );
 WRITE8_HANDLER( xain_scrollxP0_w );
 WRITE8_HANDLER( xain_scrollyP0_w );

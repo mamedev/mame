@@ -151,7 +151,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( bogeyman )
+SCREEN_UPDATE( bogeyman )
 {
 	bogeyman_state *state = screen->machine->driver_data<bogeyman_state>();
 

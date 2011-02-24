@@ -51,13 +51,13 @@ public:
 /* Video emulation definitions */
 VIDEO_START( dec0 );
 VIDEO_START( dec0_nodma );
-VIDEO_UPDATE( hbarrel );
-VIDEO_UPDATE( baddudes );
-VIDEO_UPDATE( birdtry );
-VIDEO_UPDATE( robocop );
-VIDEO_UPDATE( hippodrm );
-VIDEO_UPDATE( slyspy );
-VIDEO_UPDATE( midres );
+SCREEN_UPDATE( hbarrel );
+SCREEN_UPDATE( baddudes );
+SCREEN_UPDATE( birdtry );
+SCREEN_UPDATE( robocop );
+SCREEN_UPDATE( hippodrm );
+SCREEN_UPDATE( slyspy );
+SCREEN_UPDATE( midres );
 
 
 WRITE16_HANDLER( dec0_pf1_control_0_w );

@@ -83,7 +83,9 @@ screen_device_config::screen_device_config(const machine_config &mconfig, const 
 	  m_xoffset(0.0f),
 	  m_yoffset(0.0f),
 	  m_xscale(1.0f),
-	  m_yscale(1.0f)
+	  m_yscale(1.0f),
+	  m_screen_update(NULL),
+	  m_screen_eof(NULL)
 {
 }
 
@@ -266,6 +268,34 @@ bool screen_device_config::device_validity_check(core_options &options, const ga
 		error = true;
 	}
 	return error;
+}
+
+
+
+
+//-------------------------------------------------
+//  static_set_screen_update - set the legacy
+//  screen update callback in the device
+//  configuration
+//-------------------------------------------------
+
+void screen_device_config::static_set_screen_update(device_config *device, screen_update_func callback)
+{
+	assert(device != NULL);
+	downcast<screen_device_config *>(device)->m_screen_update = callback;
+}
+
+
+//-------------------------------------------------
+//  static_set_screen_eof - set the legacy
+//  screen eof callback in the device
+//  configuration
+//-------------------------------------------------
+
+void screen_device_config::static_set_screen_eof(device_config *device, screen_eof_func callback)
+{
+	assert(device != NULL);
+	downcast<screen_device_config *>(device)->m_screen_eof = callback;
 }
 
 
@@ -619,7 +649,7 @@ bool screen_device::update_partial(int scanline)
 		g_profiler.start(PROFILER_VIDEO);
 		LOG_PARTIAL_UPDATES(("updating %d-%d\n", clip.min_y, clip.max_y));
 
-		flags = machine->driver_data<driver_device>()->video_update(*this, *m_bitmap[m_curbitmap], clip);
+		flags = screen_update(*m_bitmap[m_curbitmap], clip);
 		m_partial_updates_this_frame++;
 		g_profiler.stop();
 
@@ -1071,3 +1101,33 @@ void screen_device::load_effect_overlay(const char *filename)
 	else
 		mame_printf_warning("Unable to load effect PNG file '%s'\n", fullname.cstr());
 }
+
+//-------------------------------------------------
+//  screen_update - default implementation which
+//  calls to the legacy screen_update function
+//-------------------------------------------------
+
+bool screen_device::screen_update(bitmap_t &bitmap, const rectangle &cliprect)
+{
+	if (m_config.m_screen_update != NULL) {
+		return (*m_config.m_screen_update)(this, &bitmap, &cliprect);
+	} else {
+		m_machine.driver_data<driver_device>()->screen_update(*this, bitmap, cliprect);
+	}
+	return 0;
+}
+
+//-------------------------------------------------
+//  screen_eof - default implementation which
+//  calls to the legacy screen_update function
+//-------------------------------------------------
+
+void screen_device::screen_eof()
+{
+	if (m_config.m_screen_eof != NULL) {
+		return (*m_config.m_screen_eof)(this, machine);
+	} else {
+		m_machine.driver_data<driver_device>()->screen_eof();
+	}
+}
+

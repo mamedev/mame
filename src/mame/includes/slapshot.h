@@ -54,5 +54,5 @@ public:
 /*----------- defined in video/slapshot.c -----------*/
 
 VIDEO_START( slapshot );
-VIDEO_UPDATE( slapshot );
-VIDEO_EOF( taito_no_buffer );
+SCREEN_UPDATE( slapshot );
+SCREEN_EOF( taito_no_buffer );

@@ -929,7 +929,7 @@ VIDEO_START( lockon )
 	state->save_pointer(NAME(state->obj_pal_ram), 2048);
 }
 
-VIDEO_UPDATE( lockon )
+SCREEN_UPDATE( lockon )
 {
 	lockon_state *state = screen->machine->driver_data<lockon_state>();
 
@@ -952,7 +952,7 @@ VIDEO_UPDATE( lockon )
 	return 0;
 }
 
-VIDEO_EOF( lockon )
+SCREEN_EOF( lockon )
 {
 	lockon_state *state = machine->driver_data<lockon_state>();
 

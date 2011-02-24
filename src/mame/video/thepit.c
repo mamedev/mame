@@ -298,7 +298,7 @@ static void draw_sprites(running_machine *machine,
 }
 
 
-VIDEO_UPDATE( thepit )
+SCREEN_UPDATE( thepit )
 {
 	offs_t offs;
 

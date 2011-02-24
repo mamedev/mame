@@ -219,7 +219,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	}
 }
 
-VIDEO_UPDATE( xain )
+SCREEN_UPDATE( xain )
 {
 	switch (xain_pri&0x7)
 	{

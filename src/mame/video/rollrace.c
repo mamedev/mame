@@ -101,7 +101,7 @@ WRITE8_HANDLER( rollrace_flipx_w )
 	state->ra_flipx = data & 0x01;
 }
 
-VIDEO_UPDATE( rollrace )
+SCREEN_UPDATE( rollrace )
 {
 	rollrace_state *state = screen->machine->driver_data<rollrace_state>();
 	UINT8 *spriteram = screen->machine->generic.spriteram.u8;

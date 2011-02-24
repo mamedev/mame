@@ -138,7 +138,7 @@ static void draw_trapezoid(running_machine *machine, bitmap_t* dst, bitmap_t* sr
 }
 
 
-VIDEO_UPDATE( skyraid )
+SCREEN_UPDATE( skyraid )
 {
 	skyraid_state *state = screen->machine->driver_data<skyraid_state>();
 

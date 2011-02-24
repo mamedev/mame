@@ -339,7 +339,7 @@ static VIDEO_START( bfcobra )
 	}
 }
 
-static VIDEO_UPDATE( bfcobra )
+static SCREEN_UPDATE( bfcobra )
 {
 	bfcobra_state *state = screen->machine->driver_data<bfcobra_state>();
 	int x, y;
@@ -1788,6 +1788,8 @@ static MACHINE_CONFIG_START( bfcobra, bfcobra_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512 - 1, 0, 256 - 1)
+	MCFG_SCREEN_UPDATE(bfcobra)
+
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1799,7 +1801,6 @@ static MACHINE_CONFIG_START( bfcobra, bfcobra_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_VIDEO_START(bfcobra)
-	MCFG_VIDEO_UPDATE(bfcobra)
 
 	/* ACIAs */
 	MCFG_ACIA6850_ADD("acia6850_0", z80_acia_if)

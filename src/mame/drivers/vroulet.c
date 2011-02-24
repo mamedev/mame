@@ -94,7 +94,7 @@ static VIDEO_START(vroulet)
 		8, 8, 32, 32);
 }
 
-static VIDEO_UPDATE(vroulet)
+static SCREEN_UPDATE(vroulet)
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[0], 0x320, 1, 0, 0,
@@ -280,12 +280,12 @@ static MACHINE_CONFIG_START( vroulet, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(vroulet)
 
 	MCFG_GFXDECODE(vroulet)
 	MCFG_PALETTE_LENGTH(128*4)
 
 	MCFG_VIDEO_START(vroulet)
-	MCFG_VIDEO_UPDATE(vroulet)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -2253,7 +2253,7 @@ VIDEO_START( namcos22s )
    VIDEO_START_CALL(common);
 }
 
-VIDEO_UPDATE( namcos22s )
+SCREEN_UPDATE( namcos22s )
 {
 	UINT32 bgColor;
 	UpdateVideoMixer();
@@ -2306,7 +2306,7 @@ VIDEO_UPDATE( namcos22s )
 	return 0;
 }
 
-VIDEO_UPDATE( namcos22 )
+SCREEN_UPDATE( namcos22 )
 {
 	UpdateVideoMixer();
 	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine));

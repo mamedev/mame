@@ -251,7 +251,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 
 
-VIDEO_UPDATE( ppking )
+SCREEN_UPDATE( ppking )
 {
 	gladiatr_state *state = screen->machine->driver_data<gladiatr_state>();
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
@@ -287,7 +287,7 @@ VIDEO_UPDATE( ppking )
 	return 0;
 }
 
-VIDEO_UPDATE( gladiatr )
+SCREEN_UPDATE( gladiatr )
 {
 	gladiatr_state *state = screen->machine->driver_data<gladiatr_state>();
 	if (state->video_attributes & 0x20)

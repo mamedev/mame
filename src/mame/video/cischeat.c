@@ -1144,7 +1144,7 @@ if ( input_code_pressed(screen->machine, KEYCODE_Z) || input_code_pressed(screen
                                 Big Run
 **************************************************************************/
 
-VIDEO_UPDATE( bigrun )
+SCREEN_UPDATE( bigrun )
 {
 	int i;
 	int megasys1_active_layers1, flag;
@@ -1200,7 +1200,7 @@ VIDEO_UPDATE( bigrun )
                                 Cisco Heat
 **************************************************************************/
 
-VIDEO_UPDATE( cischeat )
+SCREEN_UPDATE( cischeat )
 {
 	int megasys1_active_layers1, flag;
 
@@ -1258,7 +1258,7 @@ VIDEO_UPDATE( cischeat )
                             F1 GrandPrix Star
 **************************************************************************/
 
-VIDEO_UPDATE( f1gpstar )
+SCREEN_UPDATE( f1gpstar )
 {
 	int megasys1_active_layers1, flag;
 
@@ -1320,7 +1320,7 @@ VIDEO_UPDATE( f1gpstar )
                                 Scud Hammer
 **************************************************************************/
 
-VIDEO_UPDATE( scudhamm )
+SCREEN_UPDATE( scudhamm )
 {
 	int megasys1_active_layers1, flag;
 	megasys1_active_layers1 = megasys1_active_layers;

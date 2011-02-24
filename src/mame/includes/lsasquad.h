@@ -55,5 +55,5 @@ READ8_HANDLER( daikaiju_mcu_status_r );
 
 /*----------- defined in video/lsasquad.c -----------*/
 
-VIDEO_UPDATE( lsasquad );
-VIDEO_UPDATE( daikaiju );
+SCREEN_UPDATE( lsasquad );
+SCREEN_UPDATE( daikaiju );

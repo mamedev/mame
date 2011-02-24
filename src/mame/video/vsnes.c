@@ -55,7 +55,7 @@ VIDEO_START( vsdual )
   Display refresh
 
 ***************************************************************************/
-VIDEO_UPDATE( vsnes )
+SCREEN_UPDATE( vsnes )
 {
 	/* render the ppu */
 	ppu2c0x_render( screen->machine->device("ppu1"), bitmap, 0, 0, 0, 0 );
@@ -63,16 +63,8 @@ VIDEO_UPDATE( vsnes )
 }
 
 
-VIDEO_UPDATE( vsdual )
+SCREEN_UPDATE( vsnes_bottom )
 {
-	device_t *top_screen = screen->machine->device("top");
-	device_t *bottom_screen = screen->machine->device("bottom");
-
-	/* render the ppu's */
-	if (screen == top_screen)
-		ppu2c0x_render(screen->machine->device("ppu1"), bitmap, 0, 0, 0, 0);
-	else if (screen == bottom_screen)
-		ppu2c0x_render(screen->machine->device("ppu2"), bitmap, 0, 0, 0, 0);
-
+	ppu2c0x_render(screen->machine->device("ppu2"), bitmap, 0, 0, 0, 0);
 	return 0;
 }

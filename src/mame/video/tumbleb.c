@@ -603,7 +603,7 @@ VIDEO_START( suprtrio )
 /******************************************************************************/
 
 
-VIDEO_UPDATE( tumblepb )
+SCREEN_UPDATE( tumblepb )
 {
 	tumbleb_state *state = screen->machine->driver_data<tumbleb_state>();
 	int offs, offs2;
@@ -639,7 +639,7 @@ VIDEO_UPDATE( tumblepb )
 	return 0;
 }
 
-VIDEO_UPDATE( jumpkids )
+SCREEN_UPDATE( jumpkids )
 {
 	tumbleb_state *state = screen->machine->driver_data<tumbleb_state>();
 	int offs, offs2;
@@ -675,7 +675,7 @@ VIDEO_UPDATE( jumpkids )
 	return 0;
 }
 
-VIDEO_UPDATE( semicom )
+SCREEN_UPDATE( semicom )
 {
 	tumbleb_state *state = screen->machine->driver_data<tumbleb_state>();
 	int offs, offs2;
@@ -711,7 +711,7 @@ VIDEO_UPDATE( semicom )
 	return 0;
 }
 
-VIDEO_UPDATE( semicom_altoffsets )
+SCREEN_UPDATE( semicom_altoffsets )
 {
 	tumbleb_state *state = screen->machine->driver_data<tumbleb_state>();
 	int offsx, offsy, offsx2;
@@ -740,7 +740,7 @@ VIDEO_UPDATE( semicom_altoffsets )
 	return 0;
 }
 
-VIDEO_UPDATE( bcstory )
+SCREEN_UPDATE( bcstory )
 {
 	tumbleb_state *state = screen->machine->driver_data<tumbleb_state>();
 	int offs, offs2;
@@ -778,7 +778,7 @@ VIDEO_UPDATE( bcstory )
 	return 0;
 }
 
-VIDEO_UPDATE( semibase )
+SCREEN_UPDATE( semibase )
 {
 	tumbleb_state *state = screen->machine->driver_data<tumbleb_state>();
 	int offs, offs2;
@@ -807,7 +807,7 @@ VIDEO_UPDATE( semibase )
 	return 0;
 }
 
-VIDEO_UPDATE( sdfight )
+SCREEN_UPDATE( sdfight )
 {
 	tumbleb_state *state = screen->machine->driver_data<tumbleb_state>();
 	int offs, offs2;
@@ -837,7 +837,7 @@ VIDEO_UPDATE( sdfight )
 
 
 
-VIDEO_UPDATE( fncywld )
+SCREEN_UPDATE( fncywld )
 {
 	tumbleb_state *state = screen->machine->driver_data<tumbleb_state>();
 	int offs, offs2;
@@ -874,7 +874,7 @@ VIDEO_UPDATE( fncywld )
 }
 
 
-VIDEO_UPDATE( jumppop )
+SCREEN_UPDATE( jumppop )
 {
 	tumbleb_state *state = screen->machine->driver_data<tumbleb_state>();
 
@@ -906,7 +906,7 @@ VIDEO_UPDATE( jumppop )
 }
 
 
-VIDEO_UPDATE( suprtrio )
+SCREEN_UPDATE( suprtrio )
 {
 	tumbleb_state *state = screen->machine->driver_data<tumbleb_state>();
 
@@ -934,7 +934,7 @@ popmessage("%04x %04x %04x %04x %04x %04x %04x %04x",
 	return 0;
 }
 
-VIDEO_UPDATE( pangpang )
+SCREEN_UPDATE( pangpang )
 {
 	tumbleb_state *state = screen->machine->driver_data<tumbleb_state>();
 	int offs, offs2;

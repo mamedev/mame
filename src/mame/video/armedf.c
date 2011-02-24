@@ -329,7 +329,7 @@ static void copy_textmap(running_machine *machine, int index)
 
 }
 
-VIDEO_UPDATE( armedf )
+SCREEN_UPDATE( armedf )
 {
 	armedf_state *state = screen->machine->driver_data<armedf_state>();
 	int sprite_enable = state->vreg & 0x200;
@@ -464,7 +464,7 @@ VIDEO_UPDATE( armedf )
 }
 
 
-VIDEO_EOF( armedf )
+SCREEN_EOF( armedf )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 

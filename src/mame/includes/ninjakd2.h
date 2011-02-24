@@ -23,10 +23,10 @@ extern VIDEO_START( mnight );
 extern VIDEO_START( arkarea );
 extern VIDEO_START( robokid );
 extern VIDEO_START( omegaf );
-extern VIDEO_UPDATE( ninjakd2 );
-extern VIDEO_UPDATE( robokid );
-extern VIDEO_UPDATE( omegaf );
-extern VIDEO_EOF( ninjakd2 );
+extern SCREEN_UPDATE( ninjakd2 );
+extern SCREEN_UPDATE( robokid );
+extern SCREEN_UPDATE( omegaf );
+extern SCREEN_EOF( ninjakd2 );
 
 extern UINT8* ninjakd2_bg_videoram;
 extern UINT8* ninjakd2_fg_videoram;

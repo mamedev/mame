@@ -131,7 +131,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-VIDEO_UPDATE( stlforce )
+SCREEN_UPDATE( stlforce )
 {
 	stlforce_state *state = screen->machine->driver_data<stlforce_state>();
 	int i;

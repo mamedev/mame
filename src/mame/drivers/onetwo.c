@@ -90,7 +90,7 @@ static VIDEO_START( onetwo )
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 }
 
-static VIDEO_UPDATE( onetwo )
+static SCREEN_UPDATE( onetwo )
 {
 	onetwo_state *state = screen->machine->driver_data<onetwo_state>();
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
@@ -372,12 +372,12 @@ static MACHINE_CONFIG_START( onetwo, onetwo_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE(onetwo)
 
 	MCFG_GFXDECODE(onetwo)
 	MCFG_PALETTE_LENGTH(0x80)
 
 	MCFG_VIDEO_START(onetwo)
-	MCFG_VIDEO_UPDATE(onetwo)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

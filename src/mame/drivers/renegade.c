@@ -940,12 +940,12 @@ static MACHINE_CONFIG_START( renegade, renegade_state )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(32*8, 32*8)
     MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0, 30*8-1)
+    MCFG_SCREEN_UPDATE(renegade)
 
     MCFG_GFXDECODE(renegade)
     MCFG_PALETTE_LENGTH(256)
 
     MCFG_VIDEO_START(renegade)
-    MCFG_VIDEO_UPDATE(renegade)
 
     /* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

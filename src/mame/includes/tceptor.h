@@ -32,8 +32,8 @@ public:
 
 PALETTE_INIT( tceptor );
 VIDEO_START( tceptor );
-VIDEO_UPDATE( tceptor );
-VIDEO_EOF( tceptor );
+SCREEN_UPDATE( tceptor );
+SCREEN_EOF( tceptor );
 
 WRITE8_HANDLER( tceptor_tile_ram_w );
 WRITE8_HANDLER( tceptor_tile_attr_w );

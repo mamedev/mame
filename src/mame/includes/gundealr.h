@@ -37,5 +37,5 @@ WRITE8_HANDLER( gundealr_fg_scroll_w );
 WRITE8_HANDLER( yamyam_fg_scroll_w );
 WRITE8_HANDLER( gundealr_flipscreen_w );
 
-VIDEO_UPDATE( gundealr );
+SCREEN_UPDATE( gundealr );
 VIDEO_START( gundealr );

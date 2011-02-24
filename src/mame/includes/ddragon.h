@@ -63,5 +63,5 @@ WRITE8_HANDLER( ddragon_fgvideoram_w );
 
 VIDEO_START( chinagat );
 VIDEO_START( ddragon );
-VIDEO_UPDATE( ddragon );
+SCREEN_UPDATE( ddragon );
 

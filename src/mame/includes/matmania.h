@@ -59,6 +59,6 @@ READ8_HANDLER( maniach_mcu_status_r );
 
 WRITE8_HANDLER( matmania_paletteram_w );
 PALETTE_INIT( matmania );
-VIDEO_UPDATE( maniach );
+SCREEN_UPDATE( maniach );
 VIDEO_START( matmania );
-VIDEO_UPDATE( matmania );
+SCREEN_UPDATE( matmania );

@@ -197,7 +197,7 @@ static void get_pens(pen_t *pens)
 }
 
 
-static VIDEO_UPDATE( enigma2 )
+static SCREEN_UPDATE( enigma2 )
 {
 	enigma2_state *state = screen->machine->driver_data<enigma2_state>();
 	pen_t pens[NUM_PENS];
@@ -285,7 +285,7 @@ static VIDEO_UPDATE( enigma2 )
 }
 
 
-static VIDEO_UPDATE( enigma2a )
+static SCREEN_UPDATE( enigma2a )
 {
 	enigma2_state *state = screen->machine->driver_data<enigma2_state>();
 	UINT8 x = 0;
@@ -615,11 +615,10 @@ static MACHINE_CONFIG_START( enigma2, enigma2_state )
 	MCFG_MACHINE_RESET(enigma2)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(enigma2)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_UPDATE(enigma2)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -645,11 +644,10 @@ static MACHINE_CONFIG_START( enigma2a, enigma2_state )
 	MCFG_MACHINE_RESET(enigma2)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(enigma2a)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_UPDATE(enigma2a)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

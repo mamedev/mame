@@ -6309,7 +6309,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	stv_sprite_priorities_usage_valid = 1;
 }
 
-VIDEO_UPDATE( stv_vdp2 )
+SCREEN_UPDATE( stv_vdp2 )
 {
 	static UINT8 pri;
 	video_update_vdp1(screen->machine);

@@ -547,7 +547,7 @@ VIDEO_START( fromanc4 )
 
 ******************************************************************************/
 
-VIDEO_UPDATE( fromanc2 )
+SCREEN_UPDATE( fromanc2 )
 {
 	fromanc2_state *state = screen->machine->driver_data<fromanc2_state>();
 	int i;

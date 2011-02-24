@@ -73,7 +73,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 }
 
 
-VIDEO_UPDATE(funybubl)
+SCREEN_UPDATE(funybubl)
 {
 	funybubl_state *state = screen->machine->driver_data<funybubl_state>();
 	int x, y, offs;

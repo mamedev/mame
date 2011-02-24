@@ -111,7 +111,7 @@ VIDEO_START( lvcards )
 		 8, 8, 32, 32);
 }
 
-VIDEO_UPDATE( lvcards )
+SCREEN_UPDATE( lvcards )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	return 0;

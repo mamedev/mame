@@ -38,7 +38,7 @@ static VIDEO_START(savquest)
 {
 }
 
-static VIDEO_UPDATE(savquest)
+static SCREEN_UPDATE(savquest)
 {
 	return 0;
 }
@@ -66,10 +66,10 @@ static MACHINE_CONFIG_START( savquest, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 199)
+	MCFG_SCREEN_UPDATE(savquest)
 	MCFG_PALETTE_LENGTH(16)
 
 	MCFG_VIDEO_START(savquest)
-	MCFG_VIDEO_UPDATE(savquest)
 MACHINE_CONFIG_END
 
 ROM_START( savquest )

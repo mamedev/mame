@@ -27,4 +27,4 @@ WRITE8_HANDLER( stfight_text_attr_w );
 WRITE8_HANDLER( stfight_vh_latch_w );
 WRITE8_HANDLER( stfight_sprite_bank_w );
 VIDEO_START( stfight );
-VIDEO_UPDATE( stfight );
+SCREEN_UPDATE( stfight );

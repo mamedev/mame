@@ -134,7 +134,7 @@ static void freekick_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 	}
 }
 
-VIDEO_UPDATE( gigas )
+SCREEN_UPDATE( gigas )
 {
 	freekick_state *state = screen->machine->driver_data<freekick_state>();
 	tilemap_draw(bitmap, cliprect, state->freek_tilemap, 0, 0);
@@ -142,7 +142,7 @@ VIDEO_UPDATE( gigas )
 	return 0;
 }
 
-VIDEO_UPDATE( pbillrd )
+SCREEN_UPDATE( pbillrd )
 {
 	freekick_state *state = screen->machine->driver_data<freekick_state>();
 	tilemap_draw(bitmap, cliprect, state->freek_tilemap, 0, 0);
@@ -150,7 +150,7 @@ VIDEO_UPDATE( pbillrd )
 	return 0;
 }
 
-VIDEO_UPDATE( freekick )
+SCREEN_UPDATE( freekick )
 {
 	freekick_state *state = screen->machine->driver_data<freekick_state>();
 	tilemap_draw(bitmap, cliprect, state->freek_tilemap, 0, 0);

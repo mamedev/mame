@@ -568,13 +568,13 @@ static MACHINE_CONFIG_START( shadfrce, shadfrce_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 432, 0, 320, 272, 8, 248)	/* HTOTAL and VTOTAL are guessed */
+	MCFG_SCREEN_UPDATE(shadfrce)
+	MCFG_SCREEN_EOF(shadfrce)
 
 	MCFG_GFXDECODE(shadfrce)
 	MCFG_PALETTE_LENGTH(0x4000)
 
 	MCFG_VIDEO_START(shadfrce)
-	MCFG_VIDEO_EOF(shadfrce)
-	MCFG_VIDEO_UPDATE(shadfrce)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

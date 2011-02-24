@@ -360,7 +360,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
  *
  *************************************/
 
-VIDEO_UPDATE( m52 )
+SCREEN_UPDATE( m52 )
 {
 	m52_state *state = screen->machine->driver_data<m52_state>();
 	int offs;

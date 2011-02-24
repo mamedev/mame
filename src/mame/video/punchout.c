@@ -369,7 +369,7 @@ static void punchout_copy_bot_palette(running_machine *machine, int bank)
 }
 
 
-VIDEO_UPDATE( punchout )
+SCREEN_UPDATE( punchout )
 {
 	device_t *top_screen    = screen->machine->device("top");
 	device_t *bottom_screen = screen->machine->device("bottom");
@@ -403,7 +403,7 @@ VIDEO_UPDATE( punchout )
 }
 
 
-VIDEO_UPDATE( armwrest )
+SCREEN_UPDATE( armwrest )
 {
 	device_t *top_screen    = screen->machine->device("top");
 	device_t *bottom_screen = screen->machine->device("bottom");

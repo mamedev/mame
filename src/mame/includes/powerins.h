@@ -26,4 +26,4 @@ WRITE16_HANDLER( powerins_vram_0_w );
 WRITE16_HANDLER( powerins_vram_1_w );
 
 VIDEO_START( powerins );
-VIDEO_UPDATE( powerins );
+SCREEN_UPDATE( powerins );

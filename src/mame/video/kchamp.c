@@ -127,7 +127,7 @@ static void kchampvs_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 }
 
 
-VIDEO_UPDATE( kchamp )
+SCREEN_UPDATE( kchamp )
 {
 	kchamp_state *state = screen->machine->driver_data<kchamp_state>();
 
@@ -136,7 +136,7 @@ VIDEO_UPDATE( kchamp )
 	return 0;
 }
 
-VIDEO_UPDATE( kchampvs )
+SCREEN_UPDATE( kchampvs )
 {
 	kchamp_state *state = screen->machine->driver_data<kchamp_state>();
 

@@ -44,7 +44,7 @@ static VIDEO_START(laserbas)
 	state->save_item(NAME(state->vram2));
 }
 
-static VIDEO_UPDATE(laserbas)
+static SCREEN_UPDATE(laserbas)
 {
 	laserbas_state *state = screen->machine->driver_data<laserbas_state>();
 	int x, y;
@@ -184,10 +184,10 @@ static MACHINE_CONFIG_START( laserbas, laserbas_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(laserbas)
 
 	MCFG_PALETTE_LENGTH(32)
 	MCFG_VIDEO_START(laserbas)
-	MCFG_VIDEO_UPDATE(laserbas)
 MACHINE_CONFIG_END
 
 /*

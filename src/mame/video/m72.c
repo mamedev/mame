@@ -521,7 +521,7 @@ static void majtitle_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 	}
 }
 
-VIDEO_UPDATE( m72 )
+SCREEN_UPDATE( m72 )
 {
 	m72_state *state = screen->machine->driver_data<m72_state>();
 	if (state->video_off)
@@ -544,7 +544,7 @@ VIDEO_UPDATE( m72 )
 	return 0;
 }
 
-VIDEO_UPDATE( majtitle )
+SCREEN_UPDATE( majtitle )
 {
 	m72_state *state = screen->machine->driver_data<m72_state>();
 	int i;

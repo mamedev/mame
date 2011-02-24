@@ -246,7 +246,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const recta
 	}
 }
 
-VIDEO_UPDATE( popper )
+SCREEN_UPDATE( popper )
 {
 	popper_state *state = screen->machine->driver_data<popper_state>();
 	rectangle finalclip = state->tilemap_clip;

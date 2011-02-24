@@ -221,9 +221,9 @@ static MACHINE_CONFIG_START( blstroid, blstroid_state )
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz, 456*2, 0, 320*2, 262, 0, 240)
+	MCFG_SCREEN_UPDATE(blstroid)
 
 	MCFG_VIDEO_START(blstroid)
-	MCFG_VIDEO_UPDATE(blstroid)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(jsa_i_stereo)

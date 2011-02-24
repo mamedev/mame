@@ -466,13 +466,13 @@ static void update_rohga( device_t *screen, bitmap_t *bitmap, const rectangle *c
 	deco16ic_tilemap_1_draw(state->deco16ic, bitmap, cliprect, 0, 0);
 }
 
-VIDEO_UPDATE( rohga )
+SCREEN_UPDATE( rohga )
 {
 	update_rohga(screen, bitmap, cliprect, 0);
 	return 0;
 }
 
-VIDEO_UPDATE( schmeisr )
+SCREEN_UPDATE( schmeisr )
 {
 	// The Schmeisr pcb has wire mods which seem to remap sprite palette indices.
 	// Otherwise video update is the same as Rohga.
@@ -480,7 +480,7 @@ VIDEO_UPDATE( schmeisr )
 	return 0;
 }
 
-VIDEO_UPDATE( wizdfire )
+SCREEN_UPDATE( wizdfire )
 {
 	rohga_state *state = screen->machine->driver_data<rohga_state>();
 	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);
@@ -513,7 +513,7 @@ VIDEO_UPDATE( wizdfire )
 	return 0;
 }
 
-VIDEO_UPDATE( nitrobal )
+SCREEN_UPDATE( nitrobal )
 {
 	rohga_state *state = screen->machine->driver_data<rohga_state>();
 	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);

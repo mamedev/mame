@@ -33,5 +33,5 @@ WRITE8_HANDLER( citycon_videoram_w );
 WRITE8_HANDLER( citycon_linecolor_w );
 WRITE8_HANDLER( citycon_background_w );
 
-VIDEO_UPDATE( citycon );
+SCREEN_UPDATE( citycon );
 VIDEO_START( citycon );

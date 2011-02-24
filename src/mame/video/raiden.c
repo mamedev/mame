@@ -148,7 +148,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	}
 }
 
-VIDEO_UPDATE( raiden )
+SCREEN_UPDATE( raiden )
 {
 	/* Setup the tilemaps, alternate version has different scroll positions */
 	if (!alternate) {

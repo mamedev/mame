@@ -76,7 +76,7 @@ WRITE8_HANDLER( exzisus_objectram_1_w )
   Screen refresh
 ***************************************************************************/
 
-VIDEO_UPDATE( exzisus )
+SCREEN_UPDATE( exzisus )
 {
 	exzisus_state *state = screen->machine->driver_data<exzisus_state>();
 	int offs;

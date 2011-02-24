@@ -17,7 +17,7 @@ INTERRUPT_GEN( beezer_interrupt )
 		cpu_set_input_line(device, M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
-VIDEO_UPDATE( beezer )
+SCREEN_UPDATE( beezer )
 {
 	beezer_state *state = screen->machine->driver_data<beezer_state>();
 	UINT8 *videoram = state->videoram;

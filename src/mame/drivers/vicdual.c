@@ -311,7 +311,8 @@ static MACHINE_CONFIG_DERIVED( depthch, vicdual_root )
 	MCFG_CPU_IO_MAP(depthch_io_map)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(vicdual_bw)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(vicdual_bw)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -398,7 +399,8 @@ static MACHINE_CONFIG_DERIVED( safari, vicdual_root )
 	MCFG_CPU_IO_MAP(safari_io_map)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(vicdual_bw)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(vicdual_bw)
 
 MACHINE_CONFIG_END
 
@@ -500,7 +502,8 @@ static MACHINE_CONFIG_DERIVED( frogs, vicdual_root )
 	MCFG_MACHINE_START(frogs_audio)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(vicdual_bw)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(vicdual_bw)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -687,7 +690,8 @@ static MACHINE_CONFIG_DERIVED( headon, vicdual_root )
 	MCFG_CPU_IO_MAP(headon_io_map)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(vicdual_bw_or_color)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(vicdual_bw_or_color)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -698,7 +702,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( headons, headon )
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(vicdual_bw) // no colour prom on PCB, must be bw?
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(vicdual_bw) // no colour prom on PCB, must be bw?
 MACHINE_CONFIG_END
 
 
@@ -711,7 +716,8 @@ static MACHINE_CONFIG_DERIVED( sspaceat, vicdual_root )
 	MCFG_CPU_IO_MAP(sspaceat_io_map)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(vicdual_bw_or_color)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(vicdual_bw_or_color)
 
 MACHINE_CONFIG_END
 
@@ -904,7 +910,8 @@ static MACHINE_CONFIG_DERIVED( headon2, vicdual_root )
 	MCFG_CPU_IO_MAP(headon2_io_map)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(vicdual_color)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(vicdual_color)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -916,7 +923,8 @@ static MACHINE_CONFIG_DERIVED( headon2bw, headon2 )
 
 	/* basic machine hardware */
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(vicdual_bw)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(vicdual_bw)
 MACHINE_CONFIG_END
 
 
@@ -928,7 +936,8 @@ static MACHINE_CONFIG_DERIVED( digger, vicdual_root )
 	MCFG_CPU_IO_MAP(digger_io_map)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(vicdual_color)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(vicdual_color)
 
 MACHINE_CONFIG_END
 
@@ -1911,7 +1920,8 @@ static MACHINE_CONFIG_DERIVED( vicdual_dualgame_root, vicdual_root )
 	MCFG_CPU_PROGRAM_MAP(vicdual_dualgame_map)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(vicdual_color)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(vicdual_color)
 
 MACHINE_CONFIG_END
 
@@ -2159,7 +2169,8 @@ static MACHINE_CONFIG_DERIVED( samurai, vicdual_root )
 	MCFG_CPU_IO_MAP(samurai_io_map)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(vicdual_color)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(vicdual_color)
 
 MACHINE_CONFIG_END
 
@@ -2253,7 +2264,8 @@ static MACHINE_CONFIG_DERIVED( nsub, vicdual_root )
 	MCFG_CPU_IO_MAP(nsub_io_map)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(vicdual_color)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(vicdual_color)
 
 MACHINE_CONFIG_END
 
@@ -2351,7 +2363,8 @@ static MACHINE_CONFIG_DERIVED( invinco, vicdual_root )
 	MCFG_CPU_IO_MAP(invinco_io_map)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(vicdual_color)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(vicdual_color)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

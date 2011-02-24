@@ -259,7 +259,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( 1943 )
+SCREEN_UPDATE( 1943 )
 {
 	_1943_state *state = screen->machine->driver_data<_1943_state>();
 	tilemap_set_scrollx(state->bg2_tilemap, 0, state->bgscrollx[0] + 256 * state->bgscrollx[1]);

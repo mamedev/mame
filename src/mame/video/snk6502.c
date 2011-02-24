@@ -203,7 +203,7 @@ VIDEO_START( pballoon )
 }
 
 
-VIDEO_UPDATE( snk6502 )
+SCREEN_UPDATE( snk6502 )
 {
 	snk6502_state *state = screen->machine->driver_data<snk6502_state>();
 

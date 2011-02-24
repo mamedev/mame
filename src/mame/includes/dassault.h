@@ -37,4 +37,4 @@ public:
 
 /*----------- defined in video/dassault.c -----------*/
 
-VIDEO_UPDATE( dassault );
+SCREEN_UPDATE( dassault );

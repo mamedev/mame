@@ -28,10 +28,10 @@ void seibuspi_rise11_sprite_decrypt_feversoc(UINT8 *rom, int romsize);
 extern UINT32 *spi_scrollram;
 
 VIDEO_START( spi );
-VIDEO_UPDATE( spi );
+SCREEN_UPDATE( spi );
 
 VIDEO_START( sys386f2 );
-VIDEO_UPDATE( sys386f2 );
+SCREEN_UPDATE( sys386f2 );
 
 READ32_HANDLER( spi_layer_bank_r );
 WRITE32_HANDLER( spi_layer_bank_w );

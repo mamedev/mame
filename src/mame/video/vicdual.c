@@ -31,7 +31,7 @@ WRITE8_HANDLER( vicdual_palette_bank_w )
 }
 
 
-VIDEO_UPDATE( vicdual_bw )
+SCREEN_UPDATE( vicdual_bw )
 {
 	UINT8 x = 0;
 	UINT8 y = cliprect->min_y;
@@ -81,7 +81,7 @@ VIDEO_UPDATE( vicdual_bw )
 }
 
 
-VIDEO_UPDATE( vicdual_color )
+SCREEN_UPDATE( vicdual_color )
 {
 	UINT8 *color_prom = (UINT8 *)screen->machine->region("proms")->base();
 	UINT8 x = 0;
@@ -139,12 +139,12 @@ VIDEO_UPDATE( vicdual_color )
 }
 
 
-VIDEO_UPDATE( vicdual_bw_or_color )
+SCREEN_UPDATE( vicdual_bw_or_color )
 {
 	if (vicdual_is_cabinet_color(screen->machine))
-		VIDEO_UPDATE_CALL(vicdual_color);
+		SCREEN_UPDATE_CALL(vicdual_color);
 	else
-		VIDEO_UPDATE_CALL(vicdual_bw);
+		SCREEN_UPDATE_CALL(vicdual_bw);
 
 	return 0;
 }

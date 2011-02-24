@@ -100,11 +100,11 @@ READ8_HANDLER( cvs_collision_clear );
 void cvs_scroll_stars(running_machine *machine);
 
 PALETTE_INIT( cvs );
-VIDEO_UPDATE( cvs );
+SCREEN_UPDATE( cvs );
 VIDEO_START( cvs );
 
 /*----------- defined in video/quasar.c -----------*/
 
 PALETTE_INIT( quasar );
-VIDEO_UPDATE( quasar );
+SCREEN_UPDATE( quasar );
 VIDEO_START( quasar );

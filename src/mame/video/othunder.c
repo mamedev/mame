@@ -200,7 +200,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
                 SCREEN REFRESH
 **************************************************************/
 
-VIDEO_UPDATE( othunder )
+SCREEN_UPDATE( othunder )
 {
 	othunder_state *state = screen->machine->driver_data<othunder_state>();
 	int layer[3];

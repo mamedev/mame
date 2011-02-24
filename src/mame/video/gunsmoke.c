@@ -174,7 +174,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( gunsmoke )
+SCREEN_UPDATE( gunsmoke )
 {
 	gunsmoke_state *state = screen->machine->driver_data<gunsmoke_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->scrollx[0] + 256 * state->scrollx[1]);

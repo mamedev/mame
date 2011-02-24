@@ -83,5 +83,5 @@ extern INT32 twincobr_bg_ram_bank;
 extern INT32 wardner_sprite_hack;
 
 VIDEO_START( toaplan0 );
-VIDEO_UPDATE( toaplan0 );
-VIDEO_EOF( toaplan0 );
+SCREEN_UPDATE( toaplan0 );
+SCREEN_EOF( toaplan0 );

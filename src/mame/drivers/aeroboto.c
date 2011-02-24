@@ -273,6 +273,7 @@ static MACHINE_CONFIG_START( formatz, aeroboto_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(aeroboto)
 
 	MCFG_GFXDECODE(aeroboto)
 
@@ -280,7 +281,6 @@ static MACHINE_CONFIG_START( formatz, aeroboto_state )
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START(aeroboto)
-	MCFG_VIDEO_UPDATE(aeroboto)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

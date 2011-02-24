@@ -220,7 +220,7 @@ VIDEO_START( wwfsstar )
 	tilemap_set_transparent_pen(state->fg0_tilemap,0);
 }
 
-VIDEO_UPDATE( wwfsstar )
+SCREEN_UPDATE( wwfsstar )
 {
 	wwfsstar_state *state = screen->machine->driver_data<wwfsstar_state>();
 

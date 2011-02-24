@@ -125,7 +125,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
  *                                   *
  *************************************/
 
-VIDEO_UPDATE( speedbal )
+SCREEN_UPDATE( speedbal )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, TILEMAP_DRAW_LAYER1, 0);

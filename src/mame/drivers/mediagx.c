@@ -343,7 +343,7 @@ static void draw_cga(running_machine *machine, bitmap_t *bitmap, const rectangle
 	}
 }
 
-static VIDEO_UPDATE(mediagx)
+static SCREEN_UPDATE(mediagx)
 {
 	mediagx_state *state = screen->machine->driver_data<mediagx_state>();
 	bitmap_fill(bitmap, cliprect, 0);
@@ -1133,12 +1133,12 @@ static MACHINE_CONFIG_START( mediagx, mediagx_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
+	MCFG_SCREEN_UPDATE(mediagx)
 
 	MCFG_GFXDECODE(CGA)
 	MCFG_PALETTE_LENGTH(16)
 
 	MCFG_VIDEO_START(mediagx)
-	MCFG_VIDEO_UPDATE(mediagx)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

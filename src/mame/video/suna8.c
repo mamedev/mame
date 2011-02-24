@@ -412,7 +412,7 @@ static void draw_text_sprites(running_machine *machine, bitmap_t *bitmap,const r
 
 ***************************************************************************/
 
-VIDEO_UPDATE( suna8 )
+SCREEN_UPDATE( suna8 )
 {
 	/* see hardhead, hardhea2 test mode (press button 2 for both players) */
 	bitmap_fill(bitmap,cliprect,0xff);

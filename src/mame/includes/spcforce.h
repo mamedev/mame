@@ -16,4 +16,4 @@ public:
 /*----------- defined in video/spcforce.c -----------*/
 
 WRITE8_HANDLER( spcforce_flip_screen_w );
-VIDEO_UPDATE( spcforce );
+SCREEN_UPDATE( spcforce );

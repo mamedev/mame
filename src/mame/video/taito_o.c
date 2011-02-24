@@ -138,7 +138,7 @@ static void parentj_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 }
 
 
-VIDEO_UPDATE( parentj )
+SCREEN_UPDATE( parentj )
 {
 	taitoo_state *state = screen->machine->driver_data<taitoo_state>();
 

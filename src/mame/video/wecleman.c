@@ -1022,7 +1022,7 @@ VIDEO_START( hotchase )
                             Video Updates
 ***************************************************************************/
 
-VIDEO_UPDATE ( wecleman )
+SCREEN_UPDATE( wecleman )
 {
 	wecleman_state *state = screen->machine->driver_data<wecleman_state>();
 	const pen_t *mrct;
@@ -1116,7 +1116,7 @@ VIDEO_UPDATE ( wecleman )
                                 Hot Chase
 ***************************************************************************/
 
-VIDEO_UPDATE( hotchase )
+SCREEN_UPDATE( hotchase )
 {
 	wecleman_state *state = screen->machine->driver_data<wecleman_state>();
 	device_t *k051316_1 = screen->machine->device("k051316_1");

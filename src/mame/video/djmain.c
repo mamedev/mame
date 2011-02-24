@@ -143,7 +143,7 @@ VIDEO_START( djmain )
 	k056832_set_layer_offs(k056832, 1, -88, -27);
 }
 
-VIDEO_UPDATE( djmain )
+SCREEN_UPDATE( djmain )
 {
 	device_t *k056832 = screen->machine->device("k056832");
 	device_t *k055555 = screen->machine->device("k055555");

@@ -315,7 +315,7 @@ void redclash_set_stars_enable( running_machine *machine, UINT8 on )
 }
 
 /* This sets up which starfield to draw and the offset, */
-/* To be called from VIDEO_EOF() */
+/* To be called from SCREEN_EOF() */
 
 void redclash_update_stars_state( running_machine *machine )
 {
@@ -418,12 +418,12 @@ void redclash_draw_stars( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_EOF( redclash )
+SCREEN_EOF( redclash )
 {
 	redclash_update_stars_state(machine);
 }
 
-VIDEO_UPDATE( redclash )
+SCREEN_UPDATE( redclash )
 {
 	ladybug_state *state = screen->machine->driver_data<ladybug_state>();
 

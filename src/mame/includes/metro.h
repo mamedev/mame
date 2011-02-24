@@ -102,6 +102,6 @@ VIDEO_START( metro_14300 );
 VIDEO_START( blzntrnd );
 VIDEO_START( gstrik2 );
 
-VIDEO_UPDATE( metro );
+SCREEN_UPDATE( metro );
 
 void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);

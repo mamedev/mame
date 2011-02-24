@@ -401,7 +401,7 @@ static void draw_objects(running_machine *machine, bitmap_t *bitmap, const recta
  *
  *************************************/
 
-VIDEO_UPDATE( spacefb )
+SCREEN_UPDATE( spacefb )
 {
 	draw_objects(screen->machine, bitmap, cliprect);
 	draw_starfield(*screen, bitmap, cliprect);

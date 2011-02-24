@@ -57,5 +57,5 @@ READ8_HANDLER( fortyl_pixram_r );
 WRITE8_HANDLER( fortyl_pixram_w );
 
 VIDEO_START( fortyl );
-VIDEO_UPDATE( fortyl );
+SCREEN_UPDATE( fortyl );
 PALETTE_INIT( fortyl );

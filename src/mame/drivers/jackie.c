@@ -171,7 +171,7 @@ static VIDEO_START(jackie)
 }
 
 
-static VIDEO_UPDATE(jackie)
+static SCREEN_UPDATE(jackie)
 {
 	jackie_state *state = screen->machine->driver_data<jackie_state>();
 	int i,j;
@@ -573,12 +573,12 @@ static MACHINE_CONFIG_START( jackie, jackie_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0, 32*8-1)
+	MCFG_SCREEN_UPDATE(jackie)
 
 	MCFG_GFXDECODE(jackie)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_VIDEO_START(jackie)
-	MCFG_VIDEO_UPDATE(jackie)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

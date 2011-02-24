@@ -85,7 +85,7 @@ public:
 };
 
 
-static VIDEO_UPDATE( srmp5 )
+static SCREEN_UPDATE( srmp5 )
 {
 	srmp5_state *state = screen->machine->driver_data<srmp5_state>();
 	int x,y,address,xs,xs2,ys,ys2,height,width,xw,yw,xb,yb,sizex,sizey;
@@ -573,13 +573,13 @@ static MACHINE_CONFIG_START( srmp5, srmp5_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(96*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 42*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(srmp5)
 
 	MCFG_PALETTE_LENGTH(0x1800)
 #ifdef DEBUG_CHAR
 	MCFG_GFXDECODE( srmp5 )
 #endif
 	MCFG_VIDEO_START(st0016)
-	MCFG_VIDEO_UPDATE(srmp5)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

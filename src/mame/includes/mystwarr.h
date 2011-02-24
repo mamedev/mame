@@ -29,10 +29,10 @@ VIDEO_START( viostorm );
 VIDEO_START( metamrph );
 VIDEO_START( martchmp );
 VIDEO_START( mystwarr );
-VIDEO_UPDATE( dadandrn );
-VIDEO_UPDATE( mystwarr );
-VIDEO_UPDATE( metamrph );
-VIDEO_UPDATE( martchmp );
+SCREEN_UPDATE( dadandrn );
+SCREEN_UPDATE( mystwarr );
+SCREEN_UPDATE( metamrph );
+SCREEN_UPDATE( martchmp );
 
 WRITE16_HANDLER( ddd_053936_enable_w );
 WRITE16_HANDLER( ddd_053936_clip_w );

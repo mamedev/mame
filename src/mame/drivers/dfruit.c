@@ -25,7 +25,7 @@ static VIDEO_START( dfruit )
 
 }
 
-static VIDEO_UPDATE( dfruit )
+static SCREEN_UPDATE( dfruit )
 {
 	return 0;
 }
@@ -126,13 +126,13 @@ static MACHINE_CONFIG_START( dfruit, dfruit_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(dfruit)
 
 
 	MCFG_GFXDECODE( dfruit )
 	MCFG_PALETTE_LENGTH(16)
 
 	MCFG_VIDEO_START(dfruit)
-	MCFG_VIDEO_UPDATE(dfruit)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

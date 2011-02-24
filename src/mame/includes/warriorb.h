@@ -36,4 +36,4 @@ public:
 /*----------- defined in video/warriorb.c -----------*/
 
 VIDEO_START( warriorb );
-VIDEO_UPDATE( warriorb );
+SCREEN_UPDATE( warriorb );

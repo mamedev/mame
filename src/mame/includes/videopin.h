@@ -43,5 +43,5 @@ WRITE8_HANDLER( videopin_video_ram_w );
 WRITE8_HANDLER( videopin_ball_w );
 
 VIDEO_START( videopin );
-VIDEO_UPDATE( videopin );
+SCREEN_UPDATE( videopin );
 

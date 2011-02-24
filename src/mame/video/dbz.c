@@ -97,7 +97,7 @@ VIDEO_START( dbz )
 	k053247_set_sprite_offs(state->k053246, -87, 32);
 }
 
-VIDEO_UPDATE( dbz )
+SCREEN_UPDATE( dbz )
 {
 	dbz_state *state = screen->machine->driver_data<dbz_state>();
 	static const int K053251_CI[6] = { K053251_CI3, K053251_CI4, K053251_CI4, K053251_CI4, K053251_CI2, K053251_CI1 };

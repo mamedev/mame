@@ -224,7 +224,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 	}
 }
 
-VIDEO_UPDATE( dynduke )
+SCREEN_UPDATE( dynduke )
 {
 	/* Setup the tilemaps */
 	tilemap_set_scrolly( fg_layer,0, ((dynduke_scroll_ram[0x11]&0x30)<<4)+((dynduke_scroll_ram[0x12]&0x7f)<<1)+((dynduke_scroll_ram[0x12]&0x80)>>7) );
@@ -246,7 +246,7 @@ VIDEO_UPDATE( dynduke )
 	return 0;
 }
 
-VIDEO_EOF( dynduke )
+SCREEN_EOF( dynduke )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 

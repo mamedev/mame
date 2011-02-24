@@ -62,7 +62,7 @@ VIDEO_START( calomega )
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 31);
 }
 
-VIDEO_UPDATE( calomega )
+SCREEN_UPDATE( calomega )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	return 0;

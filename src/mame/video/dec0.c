@@ -338,7 +338,7 @@ static void dec0_pf3_draw(running_machine *machine,bitmap_t *bitmap,const rectan
 
 /******************************************************************************/
 
-VIDEO_UPDATE( hbarrel )
+SCREEN_UPDATE( hbarrel )
 {
 	dec0_state *state = screen->machine->driver_data<dec0_state>();
 	flip_screen_set(screen->machine, state->pf1_control_0[0]&0x80);
@@ -356,7 +356,7 @@ VIDEO_UPDATE( hbarrel )
 
 /******************************************************************************/
 
-VIDEO_UPDATE( baddudes )
+SCREEN_UPDATE( baddudes )
 {
 	dec0_state *state = screen->machine->driver_data<dec0_state>();
 	flip_screen_set(screen->machine, state->pf1_control_0[0]&0x80);
@@ -395,7 +395,7 @@ VIDEO_UPDATE( baddudes )
 
 /******************************************************************************/
 
-VIDEO_UPDATE( robocop )
+SCREEN_UPDATE( robocop )
 {
 	dec0_state *state = screen->machine->driver_data<dec0_state>();
 	int trans;
@@ -441,7 +441,7 @@ VIDEO_UPDATE( robocop )
 
 /******************************************************************************/
 
-VIDEO_UPDATE( birdtry )
+SCREEN_UPDATE( birdtry )
 {
 	dec0_state *state = screen->machine->driver_data<dec0_state>();
 	flip_screen_set(screen->machine, state->pf1_control_0[0]&0x80);
@@ -457,7 +457,7 @@ VIDEO_UPDATE( birdtry )
 
 /******************************************************************************/
 
-VIDEO_UPDATE( hippodrm )
+SCREEN_UPDATE( hippodrm )
 {
 	dec0_state *state = screen->machine->driver_data<dec0_state>();
 	flip_screen_set(screen->machine, state->pf1_control_0[0]&0x80);
@@ -480,7 +480,7 @@ VIDEO_UPDATE( hippodrm )
 
 /******************************************************************************/
 
-VIDEO_UPDATE( slyspy )
+SCREEN_UPDATE( slyspy )
 {
 	dec0_state *state = screen->machine->driver_data<dec0_state>();
 	flip_screen_set(screen->machine, state->pf1_control_0[0]&0x80);
@@ -500,7 +500,7 @@ VIDEO_UPDATE( slyspy )
 
 /******************************************************************************/
 
-VIDEO_UPDATE( midres )
+SCREEN_UPDATE( midres )
 {
 	dec0_state *state = screen->machine->driver_data<dec0_state>();
 	int trans;

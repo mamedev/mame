@@ -333,7 +333,7 @@ VIDEO_START(martchmp)
 
 
 
-VIDEO_UPDATE(mystwarr)
+SCREEN_UPDATE(mystwarr)
 {
 	mystwarr_state *state = screen->machine->driver_data<mystwarr_state>();
 	int i, old, blendmode=0;
@@ -353,7 +353,7 @@ VIDEO_UPDATE(mystwarr)
 	return 0;
 }
 
-VIDEO_UPDATE(metamrph)
+SCREEN_UPDATE(metamrph)
 {
 	mystwarr_state *state = screen->machine->driver_data<mystwarr_state>();
 	int i, old;
@@ -371,7 +371,7 @@ VIDEO_UPDATE(metamrph)
 	return 0;
 }
 
-VIDEO_UPDATE(martchmp)
+SCREEN_UPDATE(martchmp)
 {
 	mystwarr_state *state = screen->machine->driver_data<mystwarr_state>();
 	int i, old, blendmode;
@@ -503,7 +503,7 @@ READ16_HANDLER(ddd_053936_tilerom_2_r)
 	return ROM[offset]<<8;
 }
 
-VIDEO_UPDATE(dadandrn) /* and gaiapols */
+SCREEN_UPDATE(dadandrn) /* and gaiapols */
 {
 	mystwarr_state *state = screen->machine->driver_data<mystwarr_state>();
 	int i, newbase, dirty, rozmode;

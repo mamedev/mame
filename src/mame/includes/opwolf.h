@@ -63,4 +63,4 @@ WRITE16_HANDLER( opwolf_cchip_bank_w );
 
 WRITE16_HANDLER( opwolf_spritectrl_w );
 
-VIDEO_UPDATE( opwolf );
+SCREEN_UPDATE( opwolf );

@@ -1499,7 +1499,7 @@ static MACHINE_RESET( init )
 	//BFM_dm01_reset(machine); No known video based game has a Matrix board
 }
 
-static VIDEO_UPDATE( addersc2 )
+static SCREEN_UPDATE( addersc2 )
 {
 	bfm_sc2_state *state = screen->machine->driver_data<bfm_sc2_state>();
 	if ( state->sc2_show_door )
@@ -1507,7 +1507,7 @@ static VIDEO_UPDATE( addersc2 )
 		output_set_value("door",( Scorpion2_GetSwitchState(screen->machine,state->sc2_door_state>>4, state->sc2_door_state & 0x0F) ) );
 	}
 
-	return VIDEO_UPDATE_CALL(adder2);
+	return SCREEN_UPDATE_CALL(adder2);
 }
 
 // memory map for scorpion2 board video addon /////////////////////////////
@@ -2238,10 +2238,10 @@ static MACHINE_CONFIG_START( scorpion2_vid, bfm_sc2_state )
 	MCFG_SCREEN_SIZE( 400, 280)
 	MCFG_SCREEN_VISIBLE_AREA(  0, 400-1, 0, 280-1)
 	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_UPDATE(addersc2)
 
 	MCFG_VIDEO_START( adder2)
 	MCFG_VIDEO_RESET( adder2)
-	MCFG_VIDEO_UPDATE(addersc2)
 
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT(adder2)

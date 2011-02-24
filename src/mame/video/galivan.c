@@ -377,7 +377,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 }
 
 
-VIDEO_UPDATE( galivan )
+SCREEN_UPDATE( galivan )
 {
 	galivan_state *state = screen->machine->driver_data<galivan_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->scrollx[0] + 256 * (state->scrollx[1] & 0x07));
@@ -404,7 +404,7 @@ VIDEO_UPDATE( galivan )
 	return 0;
 }
 
-VIDEO_UPDATE( ninjemak )
+SCREEN_UPDATE( ninjemak )
 {
 	galivan_state *state = screen->machine->driver_data<galivan_state>();
 

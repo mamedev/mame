@@ -33,7 +33,7 @@ public:
  *
  *************************************/
 
-static VIDEO_UPDATE( sstrangr )
+static SCREEN_UPDATE( sstrangr )
 {
 	sstrangr_state *state = screen->machine->driver_data<sstrangr_state>();
 	offs_t offs;
@@ -82,7 +82,7 @@ static void get_pens(pen_t *pens)
 }
 
 
-static VIDEO_UPDATE( sstrngr2 )
+static SCREEN_UPDATE( sstrngr2 )
 {
 	sstrangr_state *state = screen->machine->driver_data<sstrangr_state>();
 	pen_t pens[NUM_PENS];
@@ -200,13 +200,12 @@ static MACHINE_CONFIG_START( sstrangr, sstrangr_state )
 	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(sstrangr)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(32*8, 262)		/* vert size is a guess, taken from mw8080bw */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_UPDATE(sstrangr)
 
 	/* sound hardware */
 
@@ -268,7 +267,8 @@ static MACHINE_CONFIG_DERIVED( sstrngr2, sstrangr )
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(sstrngr2)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(sstrngr2)
 
 MACHINE_CONFIG_END
 

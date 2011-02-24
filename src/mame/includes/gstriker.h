@@ -72,7 +72,7 @@ extern tCG10103 CG10103[MAX_CG10103];
 #define CG10103_0_vram	(CG10103[0].vram)
 #define CG10103_1_vram	(CG10103[1].vram)
 
-VIDEO_UPDATE( gstriker );
+SCREEN_UPDATE( gstriker );
 VIDEO_START( gstriker );
 VIDEO_START( twrldc94 );
 VIDEO_START( vgoalsoc );

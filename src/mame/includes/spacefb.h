@@ -40,7 +40,7 @@ extern UINT8 *spacefb_videoram;
 extern size_t spacefb_videoram_size;
 
 VIDEO_START( spacefb );
-VIDEO_UPDATE( spacefb );
+SCREEN_UPDATE( spacefb );
 
 WRITE8_HANDLER( spacefb_port_0_w );
 WRITE8_HANDLER( spacefb_port_2_w );

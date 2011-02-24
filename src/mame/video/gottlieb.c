@@ -251,7 +251,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
  *
  *************************************/
 
-VIDEO_UPDATE( gottlieb )
+SCREEN_UPDATE( gottlieb )
 {
 	gottlieb_state *state = screen->machine->driver_data<gottlieb_state>();
 	/* if the background has lower priority, render it first, else clear the screen */

@@ -1,6 +1,6 @@
 /*----------- defined in video/nbmj8900.c -----------*/
 
-VIDEO_UPDATE( nbmj8900 );
+SCREEN_UPDATE( nbmj8900 );
 VIDEO_START( nbmj8900_2layer );
 
 READ8_HANDLER( nbmj8900_palette_type1_r );

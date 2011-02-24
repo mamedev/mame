@@ -53,5 +53,5 @@ WRITE8_HANDLER( msisaac_bg_videoram_w );
 WRITE8_HANDLER( msisaac_bg2_videoram_w );
 WRITE8_HANDLER( msisaac_fg_videoram_w );
 
-VIDEO_UPDATE( msisaac );
+SCREEN_UPDATE( msisaac );
 VIDEO_START( msisaac );

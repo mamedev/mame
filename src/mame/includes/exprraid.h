@@ -41,4 +41,4 @@ extern WRITE8_HANDLER( exprraid_scrollx_w );
 extern WRITE8_HANDLER( exprraid_scrolly_w );
 
 extern VIDEO_START( exprraid );
-extern VIDEO_UPDATE( exprraid );
+extern SCREEN_UPDATE( exprraid );

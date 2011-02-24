@@ -11,7 +11,7 @@ extern UINT8 *wc90b_scroll2y;
 extern UINT8 *wc90b_scroll_x_lo;
 
 VIDEO_START( wc90b );
-VIDEO_UPDATE( wc90b );
+SCREEN_UPDATE( wc90b );
 
 WRITE8_HANDLER( wc90b_bgvideoram_w );
 WRITE8_HANDLER( wc90b_fgvideoram_w );

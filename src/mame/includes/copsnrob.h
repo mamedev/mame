@@ -35,7 +35,7 @@ READ8_HANDLER( copsnrob_gun_position_r );
 
 /*----------- defined in video/copsnrob.c -----------*/
 
-VIDEO_UPDATE( copsnrob );
+SCREEN_UPDATE( copsnrob );
 
 
 /*----------- defined in audio/copsnrob.c -----------*/

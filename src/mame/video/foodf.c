@@ -114,7 +114,7 @@ WRITE16_HANDLER( foodf_paletteram_w )
  *
  *************************************/
 
-VIDEO_UPDATE( foodf )
+SCREEN_UPDATE( foodf )
 {
 	foodf_state *state = screen->machine->driver_data<foodf_state>();
 	int offs;

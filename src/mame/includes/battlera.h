@@ -28,7 +28,7 @@ public:
 
 /*----------- defined in video/battlera.c -----------*/
 
-VIDEO_UPDATE( battlera );
+SCREEN_UPDATE( battlera );
 VIDEO_START( battlera );
 INTERRUPT_GEN( battlera_interrupt );
 

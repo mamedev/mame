@@ -77,18 +77,18 @@ void fixeight_okisnd_w(device_t *device, int data);
 
 /*----------- defined in video/toaplan2.c -----------*/
 
-VIDEO_EOF( toaplan2 );
+SCREEN_EOF( toaplan2 );
 VIDEO_START( toaplan2 );
 VIDEO_START( truxton2 );
 VIDEO_START( fixeighb );
 VIDEO_START( bgaregga );
 VIDEO_START( batrider );
 
-VIDEO_UPDATE( toaplan2 );
-VIDEO_UPDATE( truxton2 );
-VIDEO_UPDATE( batrider );
-VIDEO_UPDATE( dogyuun );
-VIDEO_UPDATE( batsugun );
+SCREEN_UPDATE( toaplan2 );
+SCREEN_UPDATE( truxton2 );
+SCREEN_UPDATE( batrider );
+SCREEN_UPDATE( dogyuun );
+SCREEN_UPDATE( batsugun );
 
 /* non-vdp text layer */
 READ16_HANDLER ( toaplan2_txvideoram16_r );

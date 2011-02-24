@@ -5,6 +5,6 @@ extern int portrait_scroll;
 
 PALETTE_INIT( portrait );
 VIDEO_START( portrait );
-VIDEO_UPDATE( portrait );
+SCREEN_UPDATE( portrait );
 WRITE8_HANDLER( portrait_bgvideo_write );
 WRITE8_HANDLER( portrait_fgvideo_write );

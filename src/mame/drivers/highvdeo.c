@@ -110,7 +110,7 @@ static VIDEO_START(tourvisn)
 
 }
 
-static VIDEO_UPDATE(tourvisn)
+static SCREEN_UPDATE(tourvisn)
 {
 	highvdeo_state *state = screen->machine->driver_data<highvdeo_state>();
 	int x,y,count;
@@ -141,7 +141,7 @@ static VIDEO_UPDATE(tourvisn)
 }
 
 /*Later HW, RGB565 instead of RAM-based pens (+ ramdac).*/
-static VIDEO_UPDATE(brasil)
+static SCREEN_UPDATE(brasil)
 {
 	highvdeo_state *state = screen->machine->driver_data<highvdeo_state>();
 	int x,y,count;
@@ -896,11 +896,11 @@ static MACHINE_CONFIG_START( tv_vcf, highvdeo_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+	MCFG_SCREEN_UPDATE(tourvisn)
 
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(tourvisn)
-	MCFG_VIDEO_UPDATE(tourvisn)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -963,11 +963,11 @@ static MACHINE_CONFIG_START( brasil, highvdeo_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 300-1)
+	MCFG_SCREEN_UPDATE(brasil)
 
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(tourvisn)
-	MCFG_VIDEO_UPDATE(brasil)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

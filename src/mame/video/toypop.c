@@ -223,7 +223,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap)
 ***************************************************************************/
 
 
-VIDEO_UPDATE( toypop )
+SCREEN_UPDATE( toypop )
 {
 	toypop_state *state = screen->machine->driver_data<toypop_state>();
 	draw_background(screen->machine, bitmap);

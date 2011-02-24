@@ -503,7 +503,7 @@ static VIDEO_START( laserbat )
 	state->save_item(NAME(state->colorram));
 }
 
-static VIDEO_UPDATE( laserbat )
+static SCREEN_UPDATE( laserbat )
 {
 	laserbat_state *state = screen->machine->driver_data<laserbat_state>();
 	int y;
@@ -783,6 +783,7 @@ static MACHINE_CONFIG_START( laserbat, laserbat_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 29*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(laserbat)
 
 	MCFG_GFXDECODE(laserbat)
 	MCFG_PALETTE_LENGTH(1024)
@@ -792,7 +793,6 @@ static MACHINE_CONFIG_START( laserbat, laserbat_state )
 	MCFG_S2636_ADD("s2636_3", s2636_3_config)
 
 	MCFG_VIDEO_START(laserbat)
-	MCFG_VIDEO_UPDATE(laserbat)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -831,6 +831,7 @@ static MACHINE_CONFIG_START( catnmous, laserbat_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(laserbat)
 
 	MCFG_GFXDECODE(laserbat)
 	MCFG_PALETTE_LENGTH(1024)
@@ -840,7 +841,6 @@ static MACHINE_CONFIG_START( catnmous, laserbat_state )
 	MCFG_S2636_ADD("s2636_3", s2636_3_config)
 
 	MCFG_VIDEO_START(laserbat)
-	MCFG_VIDEO_UPDATE(laserbat)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

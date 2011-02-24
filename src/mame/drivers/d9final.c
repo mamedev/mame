@@ -57,7 +57,7 @@ static VIDEO_START(d9final)
 	state->sc0_tilemap = tilemap_create(machine, get_sc0_tile_info,tilemap_scan_rows,8,8,64,32);
 }
 
-static VIDEO_UPDATE(d9final)
+static SCREEN_UPDATE(d9final)
 {
 	d9final_state *state = screen->machine->driver_data<d9final_state>();
 	tilemap_draw(bitmap,cliprect,state->sc0_tilemap,0,0);
@@ -289,13 +289,13 @@ static MACHINE_CONFIG_START( d9final, d9final_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 256-16-1)
+	MCFG_SCREEN_UPDATE(d9final)
 
 	MCFG_GFXDECODE(d9final)
 	MCFG_PALETTE_LENGTH(0x400)
 	MCFG_PALETTE_INIT(all_black)
 
 	MCFG_VIDEO_START(d9final)
-	MCFG_VIDEO_UPDATE(d9final)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

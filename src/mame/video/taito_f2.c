@@ -894,7 +894,7 @@ static void taitof2_update_sprites_active_area( running_machine *machine )
 }
 
 
-VIDEO_EOF( taitof2_no_buffer )
+SCREEN_EOF( taitof2_no_buffer )
 {
 	taitof2_state *state = machine->driver_data<taitof2_state>();
 
@@ -903,7 +903,7 @@ VIDEO_EOF( taitof2_no_buffer )
 	state->prepare_sprites = 1;
 }
 
-VIDEO_EOF( taitof2_full_buffer_delayed )
+SCREEN_EOF( taitof2_full_buffer_delayed )
 {
 	taitof2_state *state = machine->driver_data<taitof2_state>();
 	UINT16 *spriteram = state->spriteram;
@@ -918,7 +918,7 @@ VIDEO_EOF( taitof2_full_buffer_delayed )
 	memcpy(state->spriteram_delayed, spriteram, state->spriteram_size);
 }
 
-VIDEO_EOF( taitof2_partial_buffer_delayed )
+SCREEN_EOF( taitof2_partial_buffer_delayed )
 {
 	taitof2_state *state = machine->driver_data<taitof2_state>();
 	UINT16 *spriteram = state->spriteram;
@@ -933,7 +933,7 @@ VIDEO_EOF( taitof2_partial_buffer_delayed )
 	memcpy(state->spriteram_delayed, spriteram, state->spriteram_size);
 }
 
-VIDEO_EOF( taitof2_partial_buffer_delayed_thundfox )
+SCREEN_EOF( taitof2_partial_buffer_delayed_thundfox )
 {
 	taitof2_state *state = machine->driver_data<taitof2_state>();
 	UINT16 *spriteram = state->spriteram;
@@ -952,7 +952,7 @@ VIDEO_EOF( taitof2_partial_buffer_delayed_thundfox )
 	memcpy(state->spriteram_delayed, spriteram, state->spriteram_size);
 }
 
-VIDEO_EOF( taitof2_partial_buffer_delayed_qzchikyu )
+SCREEN_EOF( taitof2_partial_buffer_delayed_qzchikyu )
 {
 	/* spriteram[2] and [3] are 1 frame behind...
        probably thundfox_eof_callback would work fine */
@@ -979,7 +979,7 @@ VIDEO_EOF( taitof2_partial_buffer_delayed_qzchikyu )
 
 
 /* SSI */
-VIDEO_UPDATE( taitof2_ssi )
+SCREEN_UPDATE( taitof2_ssi )
 {
 	taitof2_handle_sprite_buffering(screen->machine);
 
@@ -992,7 +992,7 @@ VIDEO_UPDATE( taitof2_ssi )
 }
 
 
-VIDEO_UPDATE( taitof2_yesnoj )
+SCREEN_UPDATE( taitof2_yesnoj )
 {
 	taitof2_state *state = screen->machine->driver_data<taitof2_state>();
 
@@ -1010,7 +1010,7 @@ VIDEO_UPDATE( taitof2_yesnoj )
 }
 
 
-VIDEO_UPDATE( taitof2 )
+SCREEN_UPDATE( taitof2 )
 {
 	taitof2_state *state = screen->machine->driver_data<taitof2_state>();
 
@@ -1028,7 +1028,7 @@ VIDEO_UPDATE( taitof2 )
 }
 
 
-VIDEO_UPDATE( taitof2_pri )
+SCREEN_UPDATE( taitof2_pri )
 {
 	taitof2_state *state = screen->machine->driver_data<taitof2_state>();
 	int layer[3];
@@ -1075,7 +1075,7 @@ static void draw_roz_layer( running_machine *machine, bitmap_t *bitmap, const re
 		tc0430grw_zoom_draw(state->tc0430grw, bitmap, cliprect, state->pivot_xdisp, state->pivot_ydisp, priority);
 }
 
-VIDEO_UPDATE( taitof2_pri_roz )
+SCREEN_UPDATE( taitof2_pri_roz )
 {
 	taitof2_state *state = screen->machine->driver_data<taitof2_state>();
 	int tilepri[3];
@@ -1144,7 +1144,7 @@ VIDEO_UPDATE( taitof2_pri_roz )
 
 
 /* Thunderfox */
-VIDEO_UPDATE( taitof2_thundfox )
+SCREEN_UPDATE( taitof2_thundfox )
 {
 	taitof2_state *state = screen->machine->driver_data<taitof2_state>();
 	int tilepri[2][3];
@@ -1281,7 +1281,7 @@ and it changes these (and the sprite pri settings) a lot.
 
 ********************************************************************/
 
-VIDEO_UPDATE( taitof2_metalb )
+SCREEN_UPDATE( taitof2_metalb )
 {
 	taitof2_state *state = screen->machine->driver_data<taitof2_state>();
 	UINT8 layer[5], invlayer[4];
@@ -1332,7 +1332,7 @@ VIDEO_UPDATE( taitof2_metalb )
 
 
 /* Deadconx, Footchmp */
-VIDEO_UPDATE( taitof2_deadconx )
+SCREEN_UPDATE( taitof2_deadconx )
 {
 	taitof2_state *state = screen->machine->driver_data<taitof2_state>();
 	UINT8 layer[5];

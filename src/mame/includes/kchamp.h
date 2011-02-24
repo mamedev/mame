@@ -39,5 +39,5 @@ WRITE8_HANDLER( kchamp_flipscreen_w );
 
 PALETTE_INIT( kchamp );
 VIDEO_START( kchamp );
-VIDEO_UPDATE( kchamp );
-VIDEO_UPDATE( kchampvs );
+SCREEN_UPDATE( kchamp );
+SCREEN_UPDATE( kchampvs );

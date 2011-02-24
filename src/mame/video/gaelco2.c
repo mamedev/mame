@@ -436,7 +436,7 @@ static void draw_sprites(screen_device *screen, bitmap_t *bitmap, const rectangl
 
 ***************************************************************************/
 
-VIDEO_UPDATE( gaelco2 )
+SCREEN_UPDATE( gaelco2 )
 {
 	gaelco2_state *state = screen->machine->driver_data<gaelco2_state>();
 	int i;
@@ -466,7 +466,7 @@ VIDEO_UPDATE( gaelco2 )
 	return 0;
 }
 
-VIDEO_UPDATE( gaelco2_dual )
+SCREEN_UPDATE( gaelco2_dual )
 {
 	gaelco2_state *state = screen->machine->driver_data<gaelco2_state>();
 	int i;
@@ -510,7 +510,7 @@ VIDEO_UPDATE( gaelco2_dual )
 }
 
 
-VIDEO_EOF( gaelco2 )
+SCREEN_EOF( gaelco2 )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 

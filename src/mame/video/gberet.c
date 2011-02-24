@@ -168,7 +168,7 @@ static void gberet_draw_sprites( running_machine *machine, bitmap_t *bitmap, con
 	}
 }
 
-VIDEO_UPDATE( gberet )
+SCREEN_UPDATE( gberet )
 {
 	gberet_state *state = screen->machine->driver_data<gberet_state>();
 
@@ -224,7 +224,7 @@ static void gberetb_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 	}
 }
 
-VIDEO_UPDATE( gberetb )
+SCREEN_UPDATE( gberetb )
 {
 	gberet_state *state = screen->machine->driver_data<gberet_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);

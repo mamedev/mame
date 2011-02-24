@@ -22,7 +22,7 @@ public:
 
 PALETTE_INIT( sidepckt );
 VIDEO_START( sidepckt );
-VIDEO_UPDATE( sidepckt );
+SCREEN_UPDATE( sidepckt );
 
 WRITE8_HANDLER( sidepckt_flipscreen_w );
 WRITE8_HANDLER( sidepckt_videoram_w );

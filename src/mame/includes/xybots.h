@@ -19,4 +19,4 @@ public:
 /*----------- defined in video/xybots.c -----------*/
 
 VIDEO_START( xybots );
-VIDEO_UPDATE( xybots );
+SCREEN_UPDATE( xybots );

@@ -313,9 +313,9 @@ static MACHINE_CONFIG_START( relief, relief_state )
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a VAD chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
+	MCFG_SCREEN_UPDATE(relief)
 
 	MCFG_VIDEO_START(relief)
-	MCFG_VIDEO_UPDATE(relief)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

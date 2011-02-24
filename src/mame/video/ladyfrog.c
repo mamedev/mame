@@ -173,7 +173,7 @@ VIDEO_START( toucheme )
 }
 
 
-VIDEO_UPDATE( ladyfrog )
+SCREEN_UPDATE( ladyfrog )
 {
 	ladyfrog_state *state = screen->machine->driver_data<ladyfrog_state>();
 

@@ -737,7 +737,7 @@ static const ay8910_interface ay8910_interface_2 =
 	DEVCB_NULL
 };
 
-static VIDEO_EOF( perfrman )
+static SCREEN_EOF( perfrman )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	buffer_spriteram_w(space, 0, 0);
@@ -768,14 +768,14 @@ static MACHINE_CONFIG_START( perfrman, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 34*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(perfrman)
+	MCFG_SCREEN_EOF(perfrman)
 
 	MCFG_GFXDECODE(perfrman)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START(perfrman)
-	MCFG_VIDEO_EOF(perfrman)
-	MCFG_VIDEO_UPDATE(perfrman)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -815,14 +815,14 @@ static MACHINE_CONFIG_START( tigerhb, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 36*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(slapfight)
+	MCFG_SCREEN_EOF(perfrman)
 
 	MCFG_GFXDECODE(slapfght)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START(slapfight)
-	MCFG_VIDEO_EOF(perfrman)
-	MCFG_VIDEO_UPDATE(slapfight)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -864,14 +864,14 @@ static MACHINE_CONFIG_START( tigerh, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 36*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(slapfight)
+	MCFG_SCREEN_EOF(perfrman)
 
 	MCFG_GFXDECODE(slapfght)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START(slapfight)
-	MCFG_VIDEO_EOF(perfrman)
-	MCFG_VIDEO_UPDATE(slapfight)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -914,14 +914,14 @@ static MACHINE_CONFIG_START( slapfigh, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 36*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(slapfight)
+	MCFG_SCREEN_EOF(perfrman)
 
 	MCFG_GFXDECODE(slapfght)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START(slapfight)
-	MCFG_VIDEO_EOF(perfrman)
-	MCFG_VIDEO_UPDATE(slapfight)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

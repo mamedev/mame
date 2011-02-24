@@ -44,4 +44,4 @@ WRITE8_HANDLER( kyugo_scroll_y_w );
 WRITE8_HANDLER( kyugo_flipscreen_w );
 
 VIDEO_START( kyugo );
-VIDEO_UPDATE( kyugo );
+SCREEN_UPDATE( kyugo );

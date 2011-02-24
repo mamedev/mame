@@ -232,7 +232,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 }
 
 
-VIDEO_UPDATE( espial )
+SCREEN_UPDATE( espial )
 {
 	espial_state *state = screen->machine->driver_data<espial_state>();
 

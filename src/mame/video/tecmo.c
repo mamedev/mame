@@ -241,7 +241,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 }
 
 
-VIDEO_UPDATE( tecmo )
+SCREEN_UPDATE( tecmo )
 {
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0x100);

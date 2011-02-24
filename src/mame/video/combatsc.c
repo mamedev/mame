@@ -403,7 +403,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 }
 
 
-VIDEO_UPDATE( combatsc )
+SCREEN_UPDATE( combatsc )
 {
 	combatsc_state *state = screen->machine->driver_data<combatsc_state>();
 	int i;
@@ -561,7 +561,7 @@ static void bootleg_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 	}
 }
 
-VIDEO_UPDATE( combatscb )
+SCREEN_UPDATE( combatscb )
 {
 	combatsc_state *state = screen->machine->driver_data<combatsc_state>();
 	int i;

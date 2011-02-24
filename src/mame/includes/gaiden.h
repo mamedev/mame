@@ -42,9 +42,9 @@ VIDEO_START( raiga );
 VIDEO_START( drgnbowl );
 VIDEO_START( mastninj );
 
-VIDEO_UPDATE( gaiden );
-VIDEO_UPDATE( raiga );
-VIDEO_UPDATE( drgnbowl );
+SCREEN_UPDATE( gaiden );
+SCREEN_UPDATE( raiga );
+SCREEN_UPDATE( drgnbowl );
 
 WRITE16_HANDLER( gaiden_videoram_w );
 WRITE16_HANDLER( gaiden_videoram2_w );

@@ -22,5 +22,5 @@ WRITE32_HANDLER ( skns_pal_regs_w );
 WRITE32_HANDLER ( skns_palette_ram_w );
 VIDEO_START(skns);
 VIDEO_RESET(skns);
-VIDEO_EOF(skns);
-VIDEO_UPDATE(skns);
+SCREEN_EOF(skns);
+SCREEN_UPDATE(skns);

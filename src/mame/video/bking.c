@@ -249,7 +249,7 @@ VIDEO_START( bking )
 }
 
 
-VIDEO_UPDATE( bking )
+SCREEN_UPDATE( bking )
 {
 	bking_state *state = screen->machine->driver_data<bking_state>();
 
@@ -278,7 +278,7 @@ VIDEO_UPDATE( bking )
 }
 
 
-VIDEO_EOF( bking )
+SCREEN_EOF( bking )
 {
 	bking_state *state = machine->driver_data<bking_state>();
 	static const rectangle rect = { 0, 7, 0, 15 };

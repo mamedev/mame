@@ -382,7 +382,7 @@ static const mc6845_interface mc6845_intf =
 };
 
 
-static VIDEO_UPDATE( r2dtank )
+static SCREEN_UPDATE( r2dtank )
 {
 	device_t *mc6845 = screen->machine->device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
@@ -527,11 +527,10 @@ static MACHINE_CONFIG_START( r2dtank, driver_device )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(r2dtank)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256)	/* temporary, CRTC will configure screen */
+	MCFG_SCREEN_UPDATE(r2dtank)
 
 	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
 

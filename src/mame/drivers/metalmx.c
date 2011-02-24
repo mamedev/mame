@@ -278,7 +278,7 @@ static VIDEO_START( metalmx )
 
 }
 
-static VIDEO_UPDATE( metalmx )
+static SCREEN_UPDATE( metalmx )
 {
 	/* TODO: TMS34020 should take care of this */
 	metalmx_state *state = screen->machine->driver_data<metalmx_state>();
@@ -766,12 +766,12 @@ static MACHINE_CONFIG_START( metalmx, metalmx_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
+	MCFG_SCREEN_UPDATE(metalmx)
 
 	MCFG_PALETTE_LENGTH(65536)
 	MCFG_PALETTE_INIT(RRRRR_GGGGGG_BBBBB)
 
 	MCFG_VIDEO_START(metalmx)
-	MCFG_VIDEO_UPDATE(metalmx)
 
 	MCFG_FRAGMENT_ADD(cage)
 MACHINE_CONFIG_END

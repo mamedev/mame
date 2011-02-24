@@ -33,7 +33,7 @@ VIDEO_START( videopin )
 }
 
 
-VIDEO_UPDATE( videopin )
+SCREEN_UPDATE( videopin )
 {
 	videopin_state *state = screen->machine->driver_data<videopin_state>();
 	int col;

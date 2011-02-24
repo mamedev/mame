@@ -535,7 +535,7 @@ static void phozon_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 }
 
 
-VIDEO_UPDATE( superpac )
+SCREEN_UPDATE( superpac )
 {
 	mappy_state *state = screen->machine->driver_data<mappy_state>();
 	bitmap_t *sprite_bitmap = state->sprite_bitmap;
@@ -565,7 +565,7 @@ VIDEO_UPDATE( superpac )
 	return 0;
 }
 
-VIDEO_UPDATE( phozon )
+SCREEN_UPDATE( phozon )
 {
 	mappy_state *state = screen->machine->driver_data<mappy_state>();
 
@@ -584,7 +584,7 @@ VIDEO_UPDATE( phozon )
 	return 0;
 }
 
-VIDEO_UPDATE( mappy )
+SCREEN_UPDATE( mappy )
 {
 	mappy_state *state = screen->machine->driver_data<mappy_state>();
 	int offs;

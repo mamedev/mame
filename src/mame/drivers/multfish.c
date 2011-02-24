@@ -241,7 +241,7 @@ static VIDEO_START(multfish)
 	tilemap_set_scroll_cols(state->reel_tilemap, 64);
 }
 
-static VIDEO_UPDATE(multfish)
+static SCREEN_UPDATE(multfish)
 {
 	multfish_state *state = screen->machine->driver_data<multfish_state>();
 	int i;
@@ -1036,11 +1036,11 @@ static MACHINE_CONFIG_START( multfish, multfish_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(17*16, 1024-16*7-1, 1*16, 32*16-1*16-1)
+	MCFG_SCREEN_UPDATE(multfish)
 	MCFG_GFXDECODE(multfish)
 	MCFG_PALETTE_LENGTH(0x1000)
 
 	MCFG_VIDEO_START(multfish)
-	MCFG_VIDEO_UPDATE(multfish)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, 6000000/4)

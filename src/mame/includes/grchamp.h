@@ -60,7 +60,7 @@ DISCRETE_SOUND_EXTERN( grchamp );
 
 PALETTE_INIT( grchamp );
 VIDEO_START( grchamp );
-VIDEO_UPDATE( grchamp );
+SCREEN_UPDATE( grchamp );
 WRITE8_HANDLER( grchamp_left_w );
 WRITE8_HANDLER( grchamp_center_w );
 WRITE8_HANDLER( grchamp_right_w );

@@ -16,4 +16,4 @@ public:
 /*----------- defined in video/spbactn.c -----------*/
 
 VIDEO_START( spbactn );
-VIDEO_UPDATE( spbactn );
+SCREEN_UPDATE( spbactn );

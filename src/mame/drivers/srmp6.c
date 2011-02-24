@@ -158,7 +158,7 @@ static VIDEO_START(srmp6)
 static int xixi=0;
 #endif
 
-static VIDEO_UPDATE(srmp6)
+static SCREEN_UPDATE(srmp6)
 {
 	srmp6_state *state = screen->machine->driver_data<srmp6_state>();
 	int alpha;
@@ -676,11 +676,11 @@ static MACHINE_CONFIG_START( srmp6, srmp6_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 42*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(srmp6)
 
 	MCFG_PALETTE_LENGTH(0x800)
 
 	MCFG_VIDEO_START(srmp6)
-	MCFG_VIDEO_UPDATE(srmp6)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

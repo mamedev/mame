@@ -981,7 +981,7 @@ VIDEO_START( gticlub )
 	K001005_init(machine);
 }
 
-VIDEO_UPDATE( gticlub )
+SCREEN_UPDATE( gticlub )
 {
 	device_t *k001604 = screen->machine->device("k001604_1");
 
@@ -1049,7 +1049,7 @@ VIDEO_UPDATE( gticlub )
 	return 0;
 }
 
-VIDEO_UPDATE( hangplt )
+SCREEN_UPDATE( hangplt )
 {
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
 

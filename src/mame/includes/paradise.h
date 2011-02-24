@@ -37,6 +37,6 @@ WRITE8_HANDLER( paradise_palbank_w );
 
 VIDEO_START( paradise );
 
-VIDEO_UPDATE( paradise );
-VIDEO_UPDATE( torus );
-VIDEO_UPDATE( madball );
+SCREEN_UPDATE( paradise );
+SCREEN_UPDATE( torus );
+SCREEN_UPDATE( madball );

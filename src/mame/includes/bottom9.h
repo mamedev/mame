@@ -38,4 +38,4 @@ extern void bottom9_sprite_callback(running_machine *machine, int *code,int *col
 extern void bottom9_zoom_callback(running_machine *machine, int *code,int *color,int *flags);
 
 VIDEO_START( bottom9 );
-VIDEO_UPDATE( bottom9 );
+SCREEN_UPDATE( bottom9 );

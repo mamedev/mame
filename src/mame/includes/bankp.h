@@ -38,6 +38,6 @@ WRITE8_HANDLER( bankp_out_w );
 
 PALETTE_INIT( bankp );
 VIDEO_START( bankp );
-VIDEO_UPDATE( bankp );
+SCREEN_UPDATE( bankp );
 
 

@@ -168,7 +168,7 @@ static VIDEO_START( pntnpuzl )
 	pntnpuzl_3a0000ram=auto_alloc_array(machine, UINT16, 0x100000/2);
 }
 
-static VIDEO_UPDATE( pntnpuzl )
+static SCREEN_UPDATE( pntnpuzl )
 {
 	int x,y;
 	int count;
@@ -450,11 +450,11 @@ static MACHINE_CONFIG_START( pntnpuzl, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 50*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(pntnpuzl)
 
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_VIDEO_START(pntnpuzl)
-	MCFG_VIDEO_UPDATE(pntnpuzl)
 MACHINE_CONFIG_END
 
 ROM_START( pntnpuzl )

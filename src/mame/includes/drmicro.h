@@ -31,6 +31,6 @@ public:
 
 PALETTE_INIT( drmicro );
 VIDEO_START( drmicro );
-VIDEO_UPDATE( drmicro );
+SCREEN_UPDATE( drmicro );
 
 WRITE8_HANDLER( drmicro_videoram_w );

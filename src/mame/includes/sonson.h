@@ -37,4 +37,4 @@ WRITE8_HANDLER( sonson_flipscreen_w );
 
 PALETTE_INIT( sonson );
 VIDEO_START( sonson );
-VIDEO_UPDATE( sonson );
+SCREEN_UPDATE( sonson );

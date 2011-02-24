@@ -119,7 +119,7 @@ static VIDEO_START( jangou )
 	state->save_item(NAME(state->blit_buffer));
 }
 
-static VIDEO_UPDATE( jangou )
+static SCREEN_UPDATE( jangou )
 {
 	jangou_state *state = screen->machine->driver_data<jangou_state>();
 	int x, y;
@@ -1001,11 +1001,11 @@ static MACHINE_CONFIG_START( jangou, jangou_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
+	MCFG_SCREEN_UPDATE(jangou)
 
 	MCFG_PALETTE_LENGTH(32)
 
 	MCFG_VIDEO_START(jangou)
-	MCFG_VIDEO_UPDATE(jangou)
 
 	/* sound hardware */
 	MCFG_SOUND_START(jangou)

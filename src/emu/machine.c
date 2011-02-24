@@ -942,8 +942,7 @@ running_machine::logerror_callback_item::logerror_callback_item(logerror_callbac
 driver_device_config_base::driver_device_config_base(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner)
 	: device_config(mconfig, type, "Driver Device", tag, owner, 0),
 	  m_game(NULL),
-	  m_palette_init(NULL),
-	  m_video_update(NULL)
+	  m_palette_init(NULL)
 {
 	memset(m_callbacks, 0, sizeof(m_callbacks));
 }
@@ -982,18 +981,6 @@ void driver_device_config_base::static_set_callback(device_config *device, callb
 void driver_device_config_base::static_set_palette_init(device_config *device, palette_init_func callback)
 {
 	downcast<driver_device_config_base *>(device)->m_palette_init = callback;
-}
-
-
-//-------------------------------------------------
-//  static_set_video_update - set the legacy
-//  video update callback in the device
-//  configuration
-//-------------------------------------------------
-
-void driver_device_config_base::static_set_video_update(device_config *device, video_update_func callback)
-{
-	downcast<driver_device_config_base *>(device)->m_video_update = callback;
 }
 
 
@@ -1130,10 +1117,8 @@ void driver_device::video_reset()
 //  calls to the legacy video_update function
 //-------------------------------------------------
 
-bool driver_device::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool driver_device::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	if (m_config.m_video_update != NULL)
-		return (*m_config.m_video_update)(&screen, &bitmap, &cliprect);
 	return 0;
 }
 
@@ -1143,10 +1128,8 @@ bool driver_device::video_update(screen_device &screen, bitmap_t &bitmap, const 
 //  calls to the legacy video_eof function
 //-------------------------------------------------
 
-void driver_device::video_eof()
+void driver_device::screen_eof()
 {
-	if (m_config.m_callbacks[driver_device_config_base::CB_VIDEO_EOF] != NULL)
-		(*m_config.m_callbacks[driver_device_config_base::CB_VIDEO_EOF])(&m_machine);
 }
 
 

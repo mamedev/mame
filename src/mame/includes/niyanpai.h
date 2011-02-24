@@ -1,6 +1,6 @@
 /*----------- defined in video/niyanpai.c -----------*/
 
-VIDEO_UPDATE( niyanpai );
+SCREEN_UPDATE( niyanpai );
 VIDEO_START( niyanpai );
 
 READ16_HANDLER( niyanpai_palette_r );

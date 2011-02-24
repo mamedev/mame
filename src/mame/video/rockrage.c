@@ -96,7 +96,7 @@ WRITE8_HANDLER( rockrage_vreg_w )
 
 ***************************************************************************/
 
-VIDEO_UPDATE( rockrage )
+SCREEN_UPDATE( rockrage )
 {
 	rockrage_state *state = screen->machine->driver_data<rockrage_state>();
 

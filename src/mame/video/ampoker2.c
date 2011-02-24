@@ -161,7 +161,7 @@ VIDEO_START(sigma2k)
 		 8, 8, 64, 32);
 }
 
-VIDEO_UPDATE(ampoker2)
+SCREEN_UPDATE(ampoker2)
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	return 0;

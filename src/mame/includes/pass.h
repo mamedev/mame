@@ -18,4 +18,4 @@ WRITE16_HANDLER( pass_fg_videoram_w );
 WRITE16_HANDLER( pass_bg_videoram_w );
 
 VIDEO_START( pass );
-VIDEO_UPDATE( pass );
+SCREEN_UPDATE( pass );

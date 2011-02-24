@@ -7,4 +7,4 @@ extern int taxidrvr_bghide;
 
 WRITE8_DEVICE_HANDLER( taxidrvr_spritectrl_w );
 
-VIDEO_UPDATE( taxidrvr );
+SCREEN_UPDATE( taxidrvr );

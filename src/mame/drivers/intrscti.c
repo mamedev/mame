@@ -57,7 +57,7 @@ static VIDEO_START(intrscti)
 {
 }
 
-static VIDEO_UPDATE(intrscti)
+static SCREEN_UPDATE(intrscti)
 {
 	int y,x;
 	int count;
@@ -94,12 +94,12 @@ static MACHINE_CONFIG_START( intrscti, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 512-1)
+	MCFG_SCREEN_UPDATE(intrscti)
 
 	MCFG_GFXDECODE(intrscti)
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(intrscti)
-	MCFG_VIDEO_UPDATE(intrscti)
 MACHINE_CONFIG_END
 
 

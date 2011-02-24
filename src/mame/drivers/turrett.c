@@ -69,7 +69,7 @@ static VIDEO_START(turrett)
 
 }
 
-static VIDEO_UPDATE(turrett)
+static SCREEN_UPDATE(turrett)
 {
 	return 0;
 }
@@ -116,11 +116,11 @@ static MACHINE_CONFIG_START( turrett, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(turrett)
 
 	MCFG_PALETTE_LENGTH(0x2000)
 
 	MCFG_VIDEO_START(turrett)
-	MCFG_VIDEO_UPDATE(turrett)
 MACHINE_CONFIG_END
 
 

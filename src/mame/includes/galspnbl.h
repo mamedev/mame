@@ -29,4 +29,4 @@ public:
 
 
 PALETTE_INIT( galspnbl );
-VIDEO_UPDATE( galspnbl );
+SCREEN_UPDATE( galspnbl );

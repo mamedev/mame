@@ -187,7 +187,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 ***************************************************************************/
 
-VIDEO_UPDATE( maniacsq )
+SCREEN_UPDATE( maniacsq )
 {
 	gaelco_state *state = screen->machine->driver_data<gaelco_state>();
 
@@ -216,7 +216,7 @@ VIDEO_UPDATE( maniacsq )
 	return 0;
 }
 
-VIDEO_UPDATE( bigkarnk )
+SCREEN_UPDATE( bigkarnk )
 {
 	gaelco_state *state = screen->machine->driver_data<gaelco_state>();
 

@@ -2322,13 +2322,13 @@ static MACHINE_CONFIG_START( mj4simai, seta2_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(0x200, 0x200)
 	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x80, 0x170-1)
+	MCFG_SCREEN_UPDATE(seta2)
+	MCFG_SCREEN_EOF(seta2)
 
 	MCFG_GFXDECODE(seta2)
 	MCFG_PALETTE_LENGTH(0x8000+0xf0)	/* extra 0xf0 because we might draw 256-color object with 16-color granularity */
 
 	MCFG_VIDEO_START(seta2)
-	MCFG_VIDEO_UPDATE(seta2)
-	MCFG_VIDEO_EOF(seta2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2500,13 +2500,13 @@ static MACHINE_CONFIG_START( funcube, seta2_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(0x200, 0x200)
 	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x140-1, 0x80, 0x170-1)
+	MCFG_SCREEN_UPDATE(seta2)
+	MCFG_SCREEN_EOF(seta2)
 
 	MCFG_GFXDECODE(funcube)
 	MCFG_PALETTE_LENGTH(0x8000+0xf0)	/* extra 0xf0 because we might draw 256-color object with 16-color granularity */
 
 	MCFG_VIDEO_START(seta2)
-	MCFG_VIDEO_UPDATE(seta2)
-	MCFG_VIDEO_EOF(seta2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -58,14 +58,14 @@ WRITE8_HANDLER( paletteram_flytiger_w );
 WRITE8_HANDLER( flytiger_ctrl_w );
 WRITE16_HANDLER( rshark_ctrl_w );
 
-VIDEO_UPDATE( lastday );
-VIDEO_UPDATE( gulfstrm );
-VIDEO_UPDATE( pollux );
-VIDEO_UPDATE( bluehawk );
-VIDEO_UPDATE( flytiger );
-VIDEO_UPDATE( primella );
-VIDEO_UPDATE( rshark );
-VIDEO_UPDATE( popbingo );
+SCREEN_UPDATE( lastday );
+SCREEN_UPDATE( gulfstrm );
+SCREEN_UPDATE( pollux );
+SCREEN_UPDATE( bluehawk );
+SCREEN_UPDATE( flytiger );
+SCREEN_UPDATE( primella );
+SCREEN_UPDATE( rshark );
+SCREEN_UPDATE( popbingo );
 
 VIDEO_START( lastday );
 VIDEO_START( gulfstrm );
@@ -76,5 +76,5 @@ VIDEO_START( primella );
 VIDEO_START( rshark );
 VIDEO_START( popbingo );
 
-VIDEO_EOF( dooyong );
-VIDEO_EOF( rshark );
+SCREEN_EOF( dooyong );
+SCREEN_EOF( rshark );

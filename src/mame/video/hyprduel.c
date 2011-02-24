@@ -671,7 +671,7 @@ static void dirty_tiles( running_machine *machine, int layer, UINT16 *vram )
 }
 
 
-VIDEO_UPDATE( hyprduel )
+SCREEN_UPDATE( hyprduel )
 {
 	hyprduel_state *state = screen->machine->driver_data<hyprduel_state>();
 	int i, pri, layers_ctrl = -1;

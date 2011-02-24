@@ -23,7 +23,7 @@ static VIDEO_START(tokyocop)
 {
 }
 
-static VIDEO_UPDATE(tokyocop)
+static SCREEN_UPDATE(tokyocop)
 {
 	return 0;
 }
@@ -48,11 +48,11 @@ static MACHINE_CONFIG_START( tokyocop, driver_device )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(tokyocop)
 
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(tokyocop)
-	MCFG_VIDEO_UPDATE(tokyocop)
 MACHINE_CONFIG_END
 
 

@@ -375,7 +375,7 @@ VIDEO_START( seta2_offset )
 	state->yoffset = 0x10;
 }
 
-VIDEO_UPDATE( seta2 )
+SCREEN_UPDATE( seta2 )
 {
 	seta2_state *state = screen->machine->driver_data<seta2_state>();
 
@@ -388,7 +388,7 @@ VIDEO_UPDATE( seta2 )
 	return 0;
 }
 
-VIDEO_EOF( seta2 )
+SCREEN_EOF( seta2 )
 {
 	seta2_state *state = machine->driver_data<seta2_state>();
 

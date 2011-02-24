@@ -76,9 +76,9 @@ DISCRETE_SOUND_EXTERN( abaseb );
 /*----------- defined in video/atarifb.c -----------*/
 
 VIDEO_START( atarifb );
-VIDEO_UPDATE( atarifb );
-VIDEO_UPDATE( abaseb );
-VIDEO_UPDATE( soccer );
+SCREEN_UPDATE( atarifb );
+SCREEN_UPDATE( abaseb );
+SCREEN_UPDATE( soccer );
 
 WRITE8_HANDLER( atarifb_alpha1_videoram_w );
 WRITE8_HANDLER( atarifb_alpha2_videoram_w );

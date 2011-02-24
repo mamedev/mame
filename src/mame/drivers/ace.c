@@ -82,7 +82,7 @@ static VIDEO_START( ace )
 	gfx_element_set_source(machine->gfx[4], state->scoreram);
 }
 
-static VIDEO_UPDATE( ace )
+static SCREEN_UPDATE( ace )
 {
 	ace_state *state = screen->machine->driver_data<ace_state>();
 	int offs;
@@ -357,12 +357,13 @@ static MACHINE_CONFIG_START( ace, ace_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 32*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(ace)
+
 	MCFG_GFXDECODE(ace)
 	MCFG_PALETTE_LENGTH(2)
 
 	MCFG_PALETTE_INIT(ace)
 	MCFG_VIDEO_START(ace)
-	MCFG_VIDEO_UPDATE(ace)
 
 	/* sound hardware */
 	/* ???? */

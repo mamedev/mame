@@ -36,4 +36,4 @@ WRITE8_HANDLER( zodiack_flipscreen_w );
 
 PALETTE_INIT( zodiack );
 VIDEO_START( zodiack );
-VIDEO_UPDATE( zodiack );
+SCREEN_UPDATE( zodiack );

@@ -44,5 +44,5 @@ WRITE8_HANDLER( actfancr_pf2_control_w );
 VIDEO_START( actfancr );
 VIDEO_START( triothep );
 
-VIDEO_UPDATE( actfancr );
-VIDEO_UPDATE( triothep );
+SCREEN_UPDATE( actfancr );
+SCREEN_UPDATE( triothep );

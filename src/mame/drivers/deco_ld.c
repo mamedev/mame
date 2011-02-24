@@ -122,7 +122,7 @@ public:
 
 
 
-static VIDEO_UPDATE( rblaster )
+static SCREEN_UPDATE( rblaster )
 {
 	deco_ld_state *state = screen->machine->driver_data<deco_ld_state>();
 	UINT8 *videoram = state->videoram;

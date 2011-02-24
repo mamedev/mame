@@ -185,7 +185,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-VIDEO_UPDATE( portrait )
+SCREEN_UPDATE( portrait )
 {
 	rectangle cliprect_scroll, cliprect_no_scroll;
 

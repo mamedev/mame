@@ -70,7 +70,7 @@ static VIDEO_START( feversoc )
 
 }
 
-static VIDEO_UPDATE( feversoc )
+static SCREEN_UPDATE( feversoc )
 {
 	UINT32 *spriteram32 = screen->machine->generic.spriteram.u32;
 	int offs,spr_offs,colour,sx,sy,h,w,dx,dy;
@@ -248,11 +248,12 @@ static MACHINE_CONFIG_START( feversoc, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1) //dynamic resolution?
+	MCFG_SCREEN_UPDATE(feversoc)
+
 	MCFG_GFXDECODE(feversoc)
 	MCFG_PALETTE_LENGTH(0x1000)
 
 	MCFG_VIDEO_START(feversoc)
-	MCFG_VIDEO_UPDATE(feversoc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

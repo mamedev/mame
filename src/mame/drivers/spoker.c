@@ -85,7 +85,7 @@ static VIDEO_START(spoker)
 	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 }
 
-static VIDEO_UPDATE(spoker)
+static SCREEN_UPDATE(spoker)
 {
 	spoker_state *state = screen->machine->driver_data<spoker_state>();
 
@@ -404,12 +404,12 @@ static MACHINE_CONFIG_START( spoker, spoker_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
+	MCFG_SCREEN_UPDATE(spoker)
 
 	MCFG_GFXDECODE(spoker)
 	MCFG_PALETTE_LENGTH(0x400)
 
 	MCFG_VIDEO_START(spoker)
-	MCFG_VIDEO_UPDATE(spoker)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

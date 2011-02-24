@@ -276,7 +276,7 @@ static void ttmjprd_draw_tilemap(running_machine *machine, bitmap_t *bitmap, con
 
 }
 
-static VIDEO_UPDATE( tmmjprd )
+static SCREEN_UPDATE( tmmjprd )
 {
 	tmmjprd_state *state = screen->machine->driver_data<tmmjprd_state>();
 	UINT8* gfxroms = screen->machine->region("gfx2")->base();
@@ -762,6 +762,7 @@ static MACHINE_CONFIG_START( tmmjprd, tmmjprd_state )
 	MCFG_SCREEN_SIZE(64*16, 64*16)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	//MCFG_SCREEN_VISIBLE_AREA(0*8, 64*16-1, 0*8, 64*16-1)
+	MCFG_SCREEN_UPDATE(tmmjprd)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -770,10 +771,9 @@ static MACHINE_CONFIG_START( tmmjprd, tmmjprd_state )
 	MCFG_SCREEN_SIZE(64*16, 64*16)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	//MCFG_SCREEN_VISIBLE_AREA(0*8, 64*16-1, 0*8, 64*16-1)
-
+	MCFG_SCREEN_UPDATE(tmmjprd)
 
 	MCFG_VIDEO_START(tmmjprd)
-	MCFG_VIDEO_UPDATE(tmmjprd)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tmpdoki, tmmjprd )

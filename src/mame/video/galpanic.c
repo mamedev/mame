@@ -99,7 +99,7 @@ static void draw_fgbitmap(running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( galpanic )
+SCREEN_UPDATE( galpanic )
 {
 	device_t *pandora = screen->machine->device("pandora");
 
@@ -113,7 +113,7 @@ VIDEO_UPDATE( galpanic )
 	return 0;
 }
 
-VIDEO_UPDATE( comad )
+SCREEN_UPDATE( comad )
 {
 	galpanic_state *state = screen->machine->driver_data<galpanic_state>();
 	/* copy the temporary bitmap to the screen */

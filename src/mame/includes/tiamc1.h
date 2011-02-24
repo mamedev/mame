@@ -13,7 +13,7 @@ WRITE8_DEVICE_HANDLER( tiamc1_timer1_gate_w );
 
 PALETTE_INIT( tiamc1 );
 VIDEO_START( tiamc1 );
-VIDEO_UPDATE( tiamc1 );
+SCREEN_UPDATE( tiamc1 );
 
 WRITE8_HANDLER( tiamc1_palette_w );
 WRITE8_HANDLER( tiamc1_videoram_w );

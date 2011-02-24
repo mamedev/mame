@@ -139,7 +139,7 @@ VIDEO_START( helifire )
 }
 
 
-VIDEO_UPDATE( spacefev )
+SCREEN_UPDATE( spacefev )
 {
 	n8080_state *state = screen->machine->driver_data<n8080_state>();
 	UINT8 mask = flip_screen_get(screen->machine) ? 0xff : 0x00;
@@ -209,7 +209,7 @@ VIDEO_UPDATE( spacefev )
 }
 
 
-VIDEO_UPDATE( sheriff )
+SCREEN_UPDATE( sheriff )
 {
 	n8080_state *state = screen->machine->driver_data<n8080_state>();
 	UINT8 mask = flip_screen_get(screen->machine) ? 0xff : 0x00;
@@ -252,7 +252,7 @@ VIDEO_UPDATE( sheriff )
 }
 
 
-VIDEO_UPDATE( helifire )
+SCREEN_UPDATE( helifire )
 {
 	n8080_state *state = screen->machine->driver_data<n8080_state>();
 	int SUN_BRIGHTNESS = input_port_read(screen->machine, "POT0");
@@ -352,7 +352,7 @@ VIDEO_UPDATE( helifire )
 }
 
 
-VIDEO_EOF( helifire )
+SCREEN_EOF( helifire )
 {
 	n8080_state *state = machine->driver_data<n8080_state>();
 	int n = (machine->primary_screen->frame_number() >> 1) % sizeof state->helifire_LSFR;

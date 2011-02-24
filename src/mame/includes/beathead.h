@@ -20,7 +20,7 @@ public:
 	virtual void machine_reset();
 
 	virtual void video_start();
-	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	required_device<asap_device> m_maincpu;
 

@@ -72,5 +72,5 @@ WRITE8_HANDLER( taitosj_characterram_w );
 WRITE8_HANDLER( junglhbr_characterram_w );
 WRITE8_HANDLER( taitosj_collision_reg_clear_w );
 VIDEO_START( taitosj );
-VIDEO_UPDATE( taitosj );
-VIDEO_UPDATE( kikstart );
+SCREEN_UPDATE( taitosj );
+SCREEN_UPDATE( kikstart );

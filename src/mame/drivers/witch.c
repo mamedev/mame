@@ -733,7 +733,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 }
 
-static VIDEO_UPDATE(witch)
+static SCREEN_UPDATE(witch)
 {
 	tilemap_set_scrollx( gfx1_tilemap, 0, scrollx-7 ); //offset to have it aligned with the sprites
 	tilemap_set_scrolly( gfx1_tilemap, 0, scrolly+8 );
@@ -777,12 +777,12 @@ static MACHINE_CONFIG_START( witch, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(8, 256-1-8, 8*4, 256-8*4-1)
+	MCFG_SCREEN_UPDATE(witch)
 
 	MCFG_GFXDECODE(witch)
 	MCFG_PALETTE_LENGTH(0x800)
 
 	MCFG_VIDEO_START(witch)
-	MCFG_VIDEO_UPDATE(witch)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

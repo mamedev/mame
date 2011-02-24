@@ -621,7 +621,7 @@ TIMER_DEVICE_CALLBACK( grmatch_palette_update )
  *
  *************************************/
 
-VIDEO_UPDATE( itech8_2layer )
+SCREEN_UPDATE( itech8_2layer )
 {
 	UINT32 page_offset;
 	int x, y;
@@ -657,7 +657,7 @@ VIDEO_UPDATE( itech8_2layer )
 }
 
 
-VIDEO_UPDATE( itech8_grmatch )
+SCREEN_UPDATE( itech8_grmatch )
 {
 	UINT32 page_offset;
 	int x, y;
@@ -704,7 +704,7 @@ VIDEO_UPDATE( itech8_grmatch )
 }
 
 
-VIDEO_UPDATE( itech8_2page )
+SCREEN_UPDATE( itech8_2page )
 {
 	UINT32 page_offset;
 	int x, y;
@@ -735,7 +735,7 @@ VIDEO_UPDATE( itech8_2page )
 }
 
 
-VIDEO_UPDATE( itech8_2page_large )
+SCREEN_UPDATE( itech8_2page_large )
 {
 	UINT32 page_offset;
 	int x, y;

@@ -891,13 +891,13 @@ static MACHINE_CONFIG_START( type1, scobra_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(galaxold)
 
 	MCFG_GFXDECODE(scobra)
 	MCFG_PALETTE_LENGTH(32+64+2+1)	/* 32 for characters, 64 for stars, 2 for bullets, 1 for background */
 
 	MCFG_PALETTE_INIT(scrambold)
 	MCFG_VIDEO_START(scrambold)
-	MCFG_VIDEO_UPDATE(galaxold)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1017,13 +1017,13 @@ static MACHINE_CONFIG_START( hustler, scobra_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(galaxold)
 
 	MCFG_GFXDECODE(scobra)
 	MCFG_PALETTE_LENGTH(32+64+2)	/* 32 for characters, 64 for stars, 2 for bullets */
 
 	MCFG_PALETTE_INIT(galaxold)
 	MCFG_VIDEO_START(scrambold)
-	MCFG_VIDEO_UPDATE(galaxold)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

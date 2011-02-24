@@ -58,7 +58,7 @@ DISCRETE_SOUND_EXTERN( subs );
 
 /*----------- defined in video/subs.c -----------*/
 
-VIDEO_UPDATE( subs );
+SCREEN_UPDATE( subs );
 
 WRITE8_HANDLER( subs_invert1_w );
 WRITE8_HANDLER( subs_invert2_w );

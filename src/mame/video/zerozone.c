@@ -46,7 +46,7 @@ VIDEO_START( zerozone )
 	state->zz_tilemap = tilemap_create(machine, get_zerozone_tile_info, tilemap_scan_cols, 8, 8, 64, 32);
 }
 
-VIDEO_UPDATE( zerozone )
+SCREEN_UPDATE( zerozone )
 {
 	zerozone_state *state = screen->machine->driver_data<zerozone_state>();
 

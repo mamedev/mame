@@ -246,7 +246,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	}
 }
 
-VIDEO_UPDATE( zaccaria )
+SCREEN_UPDATE( zaccaria )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 

@@ -37,4 +37,4 @@ WRITE8_HANDLER( arabian_videoram_w );
 
 PALETTE_INIT( arabian );
 VIDEO_START( arabian );
-VIDEO_UPDATE( arabian );
+SCREEN_UPDATE( arabian );

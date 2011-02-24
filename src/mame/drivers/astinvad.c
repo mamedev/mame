@@ -151,7 +151,7 @@ static void plot_byte( running_machine *machine, bitmap_t *bitmap, UINT8 y, UINT
 }
 
 
-static VIDEO_UPDATE( astinvad )
+static SCREEN_UPDATE( astinvad )
 {
 	astinvad_state *state = screen->machine->driver_data<astinvad_state>();
 	const UINT8 *color_prom = screen->machine->region("proms")->base();
@@ -171,7 +171,7 @@ static VIDEO_UPDATE( astinvad )
 }
 
 
-static VIDEO_UPDATE( spaceint )
+static SCREEN_UPDATE( spaceint )
 {
 	astinvad_state *state = screen->machine->driver_data<astinvad_state>();
 	const UINT8 *color_prom = screen->machine->region("proms")->base();
@@ -598,11 +598,10 @@ static MACHINE_CONFIG_START( kamikaze, astinvad_state )
 	MCFG_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(astinvad)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 320, 0, 256, 256, 32, 256)
+	MCFG_SCREEN_UPDATE(astinvad)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -634,13 +633,13 @@ static MACHINE_CONFIG_START( spaceint, astinvad_state )
 
 	/* video hardware */
 	MCFG_VIDEO_START(spaceint)
-	MCFG_VIDEO_UPDATE(spaceint)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_UPDATE(spaceint)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

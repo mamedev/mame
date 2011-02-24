@@ -34,7 +34,7 @@ public:
 
 PALETTE_INIT( dday );
 VIDEO_START( dday );
-VIDEO_UPDATE( dday );
+SCREEN_UPDATE( dday );
 
 WRITE8_HANDLER( dday_bgvideoram_w );
 WRITE8_HANDLER( dday_fgvideoram_w );

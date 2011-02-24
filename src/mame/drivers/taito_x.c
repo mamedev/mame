@@ -931,12 +931,12 @@ static MACHINE_CONFIG_START( superman, seta_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(52*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_UPDATE(seta_no_layers)
 
 	MCFG_GFXDECODE(superman)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_VIDEO_START(seta_no_layers)
-	MCFG_VIDEO_UPDATE(seta_no_layers)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -972,12 +972,12 @@ static MACHINE_CONFIG_START( daisenpu, seta_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(52*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(seta_no_layers)
 
 	MCFG_GFXDECODE(superman)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_VIDEO_START(seta_no_layers)
-	MCFG_VIDEO_UPDATE(seta_no_layers)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1011,12 +1011,12 @@ static MACHINE_CONFIG_START( gigandes, seta_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(52*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_UPDATE(seta_no_layers)
 
 	MCFG_GFXDECODE(superman)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_VIDEO_START(seta_no_layers)
-	MCFG_VIDEO_UPDATE(seta_no_layers)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1052,12 +1052,12 @@ static MACHINE_CONFIG_START( ballbros, seta_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(52*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_UPDATE(seta_no_layers)
 
 	MCFG_GFXDECODE(ballbros)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_VIDEO_START(seta_no_layers)
-	MCFG_VIDEO_UPDATE(seta_no_layers)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -475,7 +475,7 @@ static VIDEO_START(mastboy)
 	gfx_element_set_source(machine->gfx[0], mastboy_vram);
 }
 
-static VIDEO_UPDATE(mastboy)
+static SCREEN_UPDATE(mastboy)
 {
 	int y,x,i;
 	int count = 0x000;
@@ -886,12 +886,12 @@ static MACHINE_CONFIG_START( mastboy, mastboy_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
+	MCFG_SCREEN_UPDATE(mastboy)
 
 	MCFG_GFXDECODE(mastboy)
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(mastboy)
-	MCFG_VIDEO_UPDATE(mastboy)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

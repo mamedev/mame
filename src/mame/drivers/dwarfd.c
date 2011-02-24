@@ -741,7 +741,7 @@ static void drawCrt( running_machine *machine, bitmap_t *bitmap,const rectangle 
 }
 
 
-static VIDEO_UPDATE( dwarfd )
+static SCREEN_UPDATE( dwarfd )
 {
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	drawCrt(screen->machine, bitmap, cliprect);
@@ -978,13 +978,13 @@ static MACHINE_CONFIG_START( dwarfd, dwarfd_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(272*2, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 272*2-1, 0, 200-1)
+	MCFG_SCREEN_UPDATE(dwarfd)
 
 	MCFG_GFXDECODE(dwarfd)
 	MCFG_PALETTE_LENGTH(0x100)
 	MCFG_PALETTE_INIT(dwarfd)
 
 	MCFG_VIDEO_START(dwarfd)
-	MCFG_VIDEO_UPDATE(dwarfd)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, 1500000)

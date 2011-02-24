@@ -24,4 +24,4 @@ WRITE16_HANDLER( bsb_videoram_w );
 WRITE16_HANDLER( bsb_videoram2_w );
 WRITE16_HANDLER( bsb_videoram3_w );
 VIDEO_START(bigstrkb);
-VIDEO_UPDATE(bigstrkb);
+SCREEN_UPDATE(bigstrkb);

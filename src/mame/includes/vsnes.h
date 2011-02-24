@@ -2,9 +2,9 @@
 
 VIDEO_START( vsnes );
 PALETTE_INIT( vsnes );
-VIDEO_UPDATE( vsnes );
+SCREEN_UPDATE( vsnes );
 VIDEO_START( vsdual );
-VIDEO_UPDATE( vsdual );
+SCREEN_UPDATE( vsnes_bottom );
 PALETTE_INIT( vsdual );
 
 extern const ppu2c0x_interface vsnes_ppu_interface_1;

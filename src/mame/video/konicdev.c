@@ -8475,7 +8475,7 @@ INLINE const k053250_interface *k053250_get_interface( device_t *device )
     DEVICE HANDLERS
 *****************************************************************************/
 
-// The DMA process should be instantaneous but since rendering in MAME is performed at VIDEO_UPDATE()
+// The DMA process should be instantaneous but since rendering in MAME is performed at SCREEN_UPDATE()
 // the k053250 memory must be buffered to maintain visual integrity.
 void k053250_dma( device_t *device, int limiter )
 {

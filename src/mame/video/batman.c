@@ -193,7 +193,7 @@ void batman_scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-VIDEO_UPDATE( batman )
+SCREEN_UPDATE( batman )
 {
 	batman_state *state = screen->machine->driver_data<batman_state>();
 	bitmap_t *priority_bitmap = screen->machine->priority_bitmap;

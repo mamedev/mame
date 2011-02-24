@@ -1470,7 +1470,7 @@ VIDEO_START(model1)
 	state_save_register_global_array(machine, state->listctl);
 }
 
-VIDEO_UPDATE(model1)
+SCREEN_UPDATE(model1)
 {
 	model1_state *state = screen->machine->driver_data<model1_state>();
 	struct view *view = state->view;
@@ -1538,7 +1538,7 @@ VIDEO_UPDATE(model1)
 	return 0;
 }
 
-VIDEO_EOF(model1)
+SCREEN_EOF(model1)
 {
 	tgp_scan(machine);
 	end_frame(machine);

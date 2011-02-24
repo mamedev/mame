@@ -178,7 +178,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( cbasebal )
+SCREEN_UPDATE( cbasebal )
 {
 	cbasebal_state *state = screen->machine->driver_data<cbasebal_state>();
 

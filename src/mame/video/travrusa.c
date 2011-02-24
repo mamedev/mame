@@ -340,7 +340,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 }
 
 
-VIDEO_UPDATE( travrusa )
+SCREEN_UPDATE( travrusa )
 {
 	travrusa_state *state = screen->machine->driver_data<travrusa_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER1, 0);

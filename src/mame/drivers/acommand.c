@@ -216,7 +216,7 @@ static void draw_led(bitmap_t *bitmap, int x, int y,UINT8 value)
 
 static UINT16 led0,led1;
 
-static VIDEO_UPDATE( acommand )
+static SCREEN_UPDATE( acommand )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	draw_sprites(screen->machine,bitmap,cliprect,0,0);
@@ -579,11 +579,12 @@ static MACHINE_CONFIG_START( acommand, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(acommand)
+
 	MCFG_GFXDECODE(acommand)
 	MCFG_PALETTE_LENGTH(0x4000)
 
 	MCFG_VIDEO_START(acommand)
-	MCFG_VIDEO_UPDATE(acommand)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

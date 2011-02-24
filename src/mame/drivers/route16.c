@@ -610,14 +610,13 @@ static MACHINE_CONFIG_START( route16, driver_device )
 	MCFG_CPU_PROGRAM_MAP(route16_cpu2_map)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(route16)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 	MCFG_SCREEN_REFRESH_RATE(57)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	/* frames per second, vblank duration */
+	MCFG_SCREEN_UPDATE(route16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -644,7 +643,8 @@ static MACHINE_CONFIG_DERIVED( stratvox, route16 )
 	MCFG_CPU_PROGRAM_MAP(stratvox_cpu2_map)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(stratvox)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(stratvox)
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("ay8910")
@@ -682,7 +682,8 @@ static MACHINE_CONFIG_DERIVED( ttmahjng, route16 )
 	MCFG_CPU_IO_MAP(0)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(ttmahjng)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(ttmahjng)
 MACHINE_CONFIG_END
 
 

@@ -23,7 +23,7 @@ public:
 
 PALETTE_INIT( ultratnk );
 VIDEO_START( ultratnk );
-VIDEO_UPDATE( ultratnk );
-VIDEO_EOF( ultratnk );
+SCREEN_UPDATE( ultratnk );
+SCREEN_EOF( ultratnk );
 
 WRITE8_HANDLER( ultratnk_video_ram_w );

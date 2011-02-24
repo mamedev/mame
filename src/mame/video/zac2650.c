@@ -230,7 +230,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap)
 //  if(SpriteCollision(machine, 2,4)) CollisionSprite |= 0x01;   /* Not Used */
 }
 
-VIDEO_UPDATE( tinvader )
+SCREEN_UPDATE( tinvader )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap);

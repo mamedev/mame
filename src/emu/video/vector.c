@@ -254,7 +254,7 @@ void vector_clear_list (void)
 }
 
 
-VIDEO_UPDATE( vector )
+SCREEN_UPDATE( vector )
 {
 	UINT32 flags = PRIMFLAG_ANTIALIAS(options_get_bool(&screen->machine->options(), OPTION_ANTIALIAS) ? 1 : 0) | PRIMFLAG_BLENDMODE(BLENDMODE_ADD);
 	const rectangle &visarea = screen->visible_area();

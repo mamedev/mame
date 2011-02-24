@@ -116,7 +116,7 @@ VIDEO_START( dcheese )
  *
  *************************************/
 
-VIDEO_UPDATE( dcheese )
+SCREEN_UPDATE( dcheese )
 {
 	dcheese_state *state = screen->machine->driver_data<dcheese_state>();
 	int x, y;

@@ -27,4 +27,4 @@ public:
 
 /*----------- defined in video/funkyjet.c -----------*/
 
-VIDEO_UPDATE( funkyjet );
+SCREEN_UPDATE( funkyjet );

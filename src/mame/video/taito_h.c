@@ -391,7 +391,7 @@ static void taitoh_log_vram(running_machine *machine)
 
 /**************************************************************************/
 
-VIDEO_UPDATE( syvalion )
+SCREEN_UPDATE( syvalion )
 {
 	taitoh_state *state = screen->machine->driver_data<taitoh_state>();
 
@@ -410,7 +410,7 @@ VIDEO_UPDATE( syvalion )
 }
 
 
-VIDEO_UPDATE( recordbr )
+SCREEN_UPDATE( recordbr )
 {
 	taitoh_state *state = screen->machine->driver_data<taitoh_state>();
 
@@ -441,7 +441,7 @@ VIDEO_UPDATE( recordbr )
 }
 
 
-VIDEO_UPDATE( dleague )
+SCREEN_UPDATE( dleague )
 {
 	taitoh_state *state = screen->machine->driver_data<taitoh_state>();
 

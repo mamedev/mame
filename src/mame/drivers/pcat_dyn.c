@@ -101,7 +101,7 @@ static void cga_alphanumeric_tilemap(running_machine *machine, bitmap_t *bitmap,
 		}
 }
 
-static VIDEO_UPDATE(pcat_dyn)
+static SCREEN_UPDATE(pcat_dyn)
 {
 	cga_alphanumeric_tilemap(screen->machine,bitmap,cliprect,RES_640x200,0x10000/4,0);
 
@@ -522,6 +522,7 @@ static MACHINE_CONFIG_START( pcat_dyn, driver_device )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(pcat_dyn)
 	MCFG_GFXDECODE( pcat_dyn )
 
 	MCFG_MACHINE_START(pcat_dyn)
@@ -539,7 +540,6 @@ static MACHINE_CONFIG_START( pcat_dyn, driver_device )
 	MCFG_PALETTE_LENGTH(0x300)
 
 	MCFG_VIDEO_START(pcat_dyn)
-	MCFG_VIDEO_UPDATE(pcat_dyn)
 MACHINE_CONFIG_END
 
 /***************************************

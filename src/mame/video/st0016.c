@@ -596,7 +596,7 @@ static void draw_bgmap(running_machine *machine, bitmap_t *bitmap,const rectangl
 		*BITMAP_ADDR32(bitmap, y, x) = (b) | ((g)<<8) | ((r)<<16); \
 }
 
-VIDEO_UPDATE( st0016 )
+SCREEN_UPDATE( st0016 )
 {
 
 #ifdef MAME_DEBUG

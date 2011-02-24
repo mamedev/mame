@@ -25,5 +25,5 @@ extern UINT8 *polyplay_characterram;
 
 PALETTE_INIT( polyplay );
 VIDEO_START( polyplay );
-VIDEO_UPDATE( polyplay );
+SCREEN_UPDATE( polyplay );
 WRITE8_HANDLER( polyplay_characterram_w );

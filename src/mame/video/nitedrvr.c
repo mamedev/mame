@@ -73,7 +73,7 @@ static void draw_roadway( running_machine *machine, bitmap_t *bitmap )
 	}
 }
 
-VIDEO_UPDATE( nitedrvr )
+SCREEN_UPDATE( nitedrvr )
 {
 	nitedrvr_state *state = screen->machine->driver_data<nitedrvr_state>();
 

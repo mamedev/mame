@@ -17,8 +17,8 @@ WRITE8_HANDLER( punchout_spr2_videoram_w );
 
 VIDEO_START( punchout );
 VIDEO_START( armwrest );
-VIDEO_UPDATE( punchout );
-VIDEO_UPDATE( armwrest );
+SCREEN_UPDATE( punchout );
+SCREEN_UPDATE( armwrest );
 
 DRIVER_INIT( punchout );
 DRIVER_INIT( spnchout );

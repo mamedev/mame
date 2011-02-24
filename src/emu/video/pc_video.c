@@ -58,7 +58,7 @@ void pc_video_start(running_machine *machine,
 
 
 
-VIDEO_UPDATE( pc_video )
+SCREEN_UPDATE( pc_video )
 {
 	UINT32 rc = 0;
 	int w = 0, h = 0;

@@ -49,7 +49,7 @@ VIDEO_START( polyplay )
 }
 
 
-VIDEO_UPDATE( polyplay )
+SCREEN_UPDATE( polyplay )
 {
 	polyplay_state *state = screen->machine->driver_data<polyplay_state>();
 	UINT8 *videoram = state->videoram;

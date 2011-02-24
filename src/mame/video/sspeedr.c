@@ -258,7 +258,7 @@ VIDEO_START( sspeedr )
 }
 
 
-VIDEO_UPDATE( sspeedr )
+SCREEN_UPDATE( sspeedr )
 {
 	draw_track(screen->machine, bitmap);
 	draw_drones(screen->machine, bitmap, cliprect);
@@ -267,7 +267,7 @@ VIDEO_UPDATE( sspeedr )
 }
 
 
-VIDEO_EOF( sspeedr )
+SCREEN_EOF( sspeedr )
 {
 	sspeedr_state *state = machine->driver_data<sspeedr_state>();
 	state->toggle ^= 1;

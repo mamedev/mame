@@ -509,7 +509,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectan
 	}
 }
 
-VIDEO_EOF( mlc )
+SCREEN_EOF( mlc )
 {
 	deco_mlc_state *state = machine->driver_data<deco_mlc_state>();
 	/* Spriteram is definitely double buffered, as the vram lookup tables
@@ -520,7 +520,7 @@ VIDEO_EOF( mlc )
 	memcpy(state->mlc_buffered_spriteram, machine->generic.spriteram.u32, 0x3000);
 }
 
-VIDEO_UPDATE( mlc )
+SCREEN_UPDATE( mlc )
 {
 //  bitmap_fill(temp_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,screen->machine->pens[0]); /* Pen 0 fill colour confirmed from Skull Fang level 2 */

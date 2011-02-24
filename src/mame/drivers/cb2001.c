@@ -316,7 +316,7 @@ static const rectangle visible2 = { 0*8, (14+48)*8-1, 10*8, (10+7)*8-1 };
 static const rectangle visible3 = { 0*8, (14+48)*8-1, 17*8, (17+7)*8-1 };
 static int other1,other2;
 
-static VIDEO_UPDATE(cb2001)
+static SCREEN_UPDATE(cb2001)
 {
 	int count,x,y;
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
@@ -832,11 +832,11 @@ static MACHINE_CONFIG_START( cb2001, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
+	MCFG_SCREEN_UPDATE(cb2001)
 
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(cb2001)
-	MCFG_VIDEO_UPDATE(cb2001)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

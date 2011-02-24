@@ -463,7 +463,7 @@ static void splndrbt_copy_bg( running_machine *machine, bitmap_t *dst_bitmap, co
 
 
 
-VIDEO_UPDATE( equites )
+SCREEN_UPDATE( equites )
 {
 	equites_state *state = screen->machine->driver_data<equites_state>();
 	bitmap_fill(bitmap, cliprect, state->bgcolor);
@@ -477,7 +477,7 @@ VIDEO_UPDATE( equites )
 	return 0;
 }
 
-VIDEO_UPDATE( splndrbt )
+SCREEN_UPDATE( splndrbt )
 {
 	equites_state *state = screen->machine->driver_data<equites_state>();
 	bitmap_fill(bitmap, cliprect, state->bgcolor);

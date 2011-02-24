@@ -271,7 +271,7 @@ static VIDEO_START( trvmadns )
 	gfx_element_set_source(machine->gfx[0], trvmadns_gfxram);
 }
 
-static VIDEO_UPDATE( trvmadns )
+static SCREEN_UPDATE( trvmadns )
 {
 	int x,y,count;
 	const gfx_element *gfx = screen->machine->gfx[0];
@@ -337,12 +337,12 @@ static MACHINE_CONFIG_START( trvmadns, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(trvmadns)
 
 	MCFG_GFXDECODE(trvmadns)
 	MCFG_PALETTE_LENGTH(16)
 
 	MCFG_VIDEO_START(trvmadns)
-	MCFG_VIDEO_UPDATE(trvmadns)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

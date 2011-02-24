@@ -32,7 +32,7 @@ PALETTE_INIT( phoenix );
 PALETTE_INIT( survival );
 PALETTE_INIT( pleiads );
 VIDEO_START( phoenix );
-VIDEO_UPDATE( phoenix );
+SCREEN_UPDATE( phoenix );
 
 WRITE8_HANDLER( phoenix_videoram_w );
 WRITE8_HANDLER( phoenix_videoreg_w );

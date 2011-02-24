@@ -9,7 +9,7 @@ extern size_t thepit_spriteram_size;
 PALETTE_INIT( thepit );
 PALETTE_INIT( suprmous );
 VIDEO_START( thepit );
-VIDEO_UPDATE( thepit );
+SCREEN_UPDATE( thepit );
 WRITE8_HANDLER( thepit_videoram_w );
 WRITE8_HANDLER( thepit_colorram_w );
 WRITE8_HANDLER( thepit_flip_screen_x_w );

@@ -168,7 +168,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 }
 
 
-VIDEO_UPDATE(mainsnk)
+SCREEN_UPDATE(mainsnk)
 {
 	mainsnk_state *state = screen->machine->driver_data<mainsnk_state>();
 

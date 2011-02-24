@@ -427,7 +427,7 @@ static VIDEO_START( powerbal )
 	tilemap_set_scrolly(state->bg_tilemap, 0, state->bg_yoffset);
 }
 
-static VIDEO_UPDATE( powerbal )
+static SCREEN_UPDATE( powerbal )
 {
 	playmark_state *state = screen->machine->driver_data<playmark_state>();
 
@@ -500,12 +500,12 @@ static MACHINE_CONFIG_START( powerbal, playmark_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(128*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(powerbal)
 
 	MCFG_GFXDECODE(powerbal)
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_VIDEO_START(powerbal)
-	MCFG_VIDEO_UPDATE(powerbal)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -534,12 +534,12 @@ static MACHINE_CONFIG_START( magicstk, playmark_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(128*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(powerbal)
 
 	MCFG_GFXDECODE(powerbal)
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_VIDEO_START(powerbal)
-	MCFG_VIDEO_UPDATE(powerbal)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

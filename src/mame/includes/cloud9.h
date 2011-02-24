@@ -44,7 +44,7 @@ public:
 /*----------- defined in video/cloud9.c -----------*/
 
 VIDEO_START( cloud9 );
-VIDEO_UPDATE( cloud9 );
+SCREEN_UPDATE( cloud9 );
 
 WRITE8_HANDLER( cloud9_video_control_w );
 

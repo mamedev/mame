@@ -210,7 +210,7 @@ static void draw_one_sprite(running_machine *machine, bitmap_t *bitmap, const re
  *
  *************************************/
 
-VIDEO_UPDATE( balsente )
+SCREEN_UPDATE( balsente )
 {
 	balsente_state *state = screen->machine->driver_data<balsente_state>();
 	const pen_t *pens = &screen->machine->pens[state->palettebank_vis * 256];

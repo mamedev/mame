@@ -699,13 +699,13 @@ static MACHINE_CONFIG_START( wiz, wiz_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(wiz)
 
 	MCFG_GFXDECODE(wiz)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(wiz)
 	MCFG_VIDEO_START(wiz)
-	MCFG_VIDEO_UPDATE(wiz)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -730,7 +730,8 @@ static MACHINE_CONFIG_DERIVED( stinger, wiz )
 
 	/* video hardware */
 	MCFG_GFXDECODE(stinger)
-	MCFG_VIDEO_UPDATE(stinger)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(stinger)
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("8910.1")
@@ -764,7 +765,8 @@ static MACHINE_CONFIG_DERIVED( kungfut, wiz )
 
 	/* video hardware */
 	MCFG_GFXDECODE(stinger)
-	MCFG_VIDEO_UPDATE(kungfut)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(kungfut)
 
 MACHINE_CONFIG_END
 

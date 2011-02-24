@@ -76,7 +76,7 @@ READ8_HANDLER( twotiger_videoram_r );
 WRITE8_HANDLER( twotiger_videoram_w );
 WRITE8_HANDLER( mcr_91490_videoram_w );
 
-VIDEO_UPDATE( mcr );
+SCREEN_UPDATE( mcr );
 
 
 /*----------- defined in video/mcr3.c -----------*/
@@ -97,5 +97,5 @@ VIDEO_START( spyhunt );
 
 PALETTE_INIT( spyhunt );
 
-VIDEO_UPDATE( mcr3 );
-VIDEO_UPDATE( spyhunt );
+SCREEN_UPDATE( mcr3 );
+SCREEN_UPDATE( spyhunt );

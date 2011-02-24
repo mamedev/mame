@@ -39,4 +39,4 @@ extern void thunderx_tile_callback(running_machine *machine, int layer,int bank,
 extern void thunderx_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask,int *shadow);
 
 VIDEO_START( scontra );
-VIDEO_UPDATE( scontra );
+SCREEN_UPDATE( scontra );

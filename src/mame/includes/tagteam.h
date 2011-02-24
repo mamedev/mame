@@ -14,4 +14,4 @@ WRITE8_HANDLER( tagteam_flipscreen_w );
 
 PALETTE_INIT( tagteam );
 VIDEO_START( tagteam );
-VIDEO_UPDATE( tagteam );
+SCREEN_UPDATE( tagteam );

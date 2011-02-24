@@ -213,7 +213,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 #undef DRAW_SPRITE
 
 
-VIDEO_UPDATE( spdodgeb )
+SCREEN_UPDATE( spdodgeb )
 {
 	tilemap_set_scrollx(bg_tilemap,0,lastscroll+5);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);

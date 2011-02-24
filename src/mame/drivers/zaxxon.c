@@ -952,10 +952,10 @@ static MACHINE_CONFIG_START( root, zaxxon_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_UPDATE(zaxxon)
 
 	MCFG_PALETTE_INIT(zaxxon)
 	MCFG_VIDEO_START(zaxxon)
-	MCFG_VIDEO_UPDATE(zaxxon)
 MACHINE_CONFIG_END
 
 
@@ -970,7 +970,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( futspy, root )
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(futspy)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(futspy)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -984,7 +985,8 @@ static MACHINE_CONFIG_DERIVED( razmataz, root )
 
 	/* video hardware */
 	MCFG_VIDEO_START(razmataz)
-	MCFG_VIDEO_UPDATE(razmataz)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(razmataz)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1006,7 +1008,8 @@ static MACHINE_CONFIG_DERIVED( congo, root )
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(512)
 	MCFG_VIDEO_START(congo)
-	MCFG_VIDEO_UPDATE(congo)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(congo)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

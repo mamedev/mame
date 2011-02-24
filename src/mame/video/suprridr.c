@@ -165,7 +165,7 @@ WRITE8_HANDLER( suprridr_fgram_w )
  *
  *************************************/
 
-VIDEO_UPDATE( suprridr )
+SCREEN_UPDATE( suprridr )
 {
 	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
 	rectangle subclip;

@@ -232,7 +232,7 @@ static VIDEO_START( coinmvga )
 }
 
 
-static VIDEO_UPDATE( coinmvga )
+static SCREEN_UPDATE( coinmvga )
 {
 	const gfx_element *gfx = screen->machine->gfx[0];
 	int count = 0x04000/2;
@@ -670,6 +670,7 @@ static MACHINE_CONFIG_START( coinmvga, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640,480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_UPDATE(coinmvga)
 
 	MCFG_GFXDECODE(coinmvga)
 
@@ -677,7 +678,6 @@ static MACHINE_CONFIG_START( coinmvga, driver_device )
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_VIDEO_START(coinmvga)
-	MCFG_VIDEO_UPDATE(coinmvga)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

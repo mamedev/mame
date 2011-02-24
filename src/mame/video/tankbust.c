@@ -232,7 +232,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 }
 
 
-VIDEO_UPDATE( tankbust )
+SCREEN_UPDATE( tankbust )
 {
 #if 0
 	int i;

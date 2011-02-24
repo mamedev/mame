@@ -139,7 +139,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-VIDEO_UPDATE( wc90b )
+SCREEN_UPDATE( wc90b )
 {
 	tilemap_set_scrollx(bg_tilemap,0,8 * (wc90b_scroll2x[0] & 0x7f) + 256 - 4 + (wc90b_scroll_x_lo[0] & 0x07));
 	tilemap_set_scrolly(bg_tilemap,0,wc90b_scroll2y[0] + 1 + ((wc90b_scroll2x[0] & 0x80) ? 256 : 0));

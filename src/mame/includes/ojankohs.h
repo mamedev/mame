@@ -52,8 +52,8 @@ VIDEO_START( ojankohs );
 VIDEO_START( ojankoy );
 VIDEO_START( ojankoc );
 
-VIDEO_UPDATE( ojankohs );
-VIDEO_UPDATE( ojankoc );
+SCREEN_UPDATE( ojankohs );
+SCREEN_UPDATE( ojankoc );
 
 void ojankoc_flipscreen(address_space *space, int data);
 

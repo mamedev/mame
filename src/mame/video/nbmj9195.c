@@ -461,7 +461,7 @@ VIDEO_START( nbmj9195_nb22090 )
 
 
 ******************************************************************************/
-VIDEO_UPDATE( nbmj9195 )
+SCREEN_UPDATE( nbmj9195 )
 {
 	int i;
 	int x, y;

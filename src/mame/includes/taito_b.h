@@ -49,6 +49,6 @@ VIDEO_START( hitice );
 
 VIDEO_RESET( hitice );
 
-VIDEO_UPDATE( taitob );
+SCREEN_UPDATE( taitob );
 
-VIDEO_EOF( taitob );
+SCREEN_EOF( taitob );

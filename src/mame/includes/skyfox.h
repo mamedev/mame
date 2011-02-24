@@ -31,5 +31,5 @@ WRITE8_HANDLER( skyfox_vregs_w );
 
 PALETTE_INIT( skyfox );
 
-VIDEO_UPDATE( skyfox );
+SCREEN_UPDATE( skyfox );
 

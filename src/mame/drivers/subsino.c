@@ -414,7 +414,7 @@ static VIDEO_START( stisub )
 }
 
 
-static VIDEO_UPDATE( subsino )
+static SCREEN_UPDATE( subsino )
 {
 	bitmap_fill(bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect, tmap, 0, 0);
@@ -426,7 +426,7 @@ static const rectangle visible1 = { 0*8, (14+48)*8-1,  4*8,  (4+7)*8-1 };
 static const rectangle visible2 = { 0*8, (14+48)*8-1, 10*8, (10+7)*8-1 };
 static const rectangle visible3 = { 0*8, (14+48)*8-1, 18*8, (18+7)*8-1 };
 
-static VIDEO_UPDATE( subsino_reels )
+static SCREEN_UPDATE( subsino_reels )
 {
 	int i;
 	bitmap_fill(bitmap,cliprect,0);
@@ -455,7 +455,7 @@ static const rectangle stisub_visible2 = { 0, 511,  88, 143 };
 static const rectangle stisub_visible3 = { 0, 511,  144, 223 };
 
 
-static VIDEO_UPDATE( stisub_reels )
+static SCREEN_UPDATE( stisub_reels )
 {
 	int i;
 	bitmap_fill(bitmap,cliprect,0);
@@ -2547,6 +2547,7 @@ static MACHINE_CONFIG_START( victor21, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
+	MCFG_SCREEN_UPDATE(subsino)
 
 	MCFG_GFXDECODE(subsino_depth3)
 
@@ -2554,7 +2555,6 @@ static MACHINE_CONFIG_START( victor21, driver_device )
 	MCFG_PALETTE_INIT(subsino_2proms)
 
 	MCFG_VIDEO_START(subsino)
-	MCFG_VIDEO_UPDATE(subsino)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2588,6 +2588,7 @@ static MACHINE_CONFIG_START( crsbingo, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
+	MCFG_SCREEN_UPDATE(subsino)
 
 	MCFG_GFXDECODE(subsino_depth4)
 
@@ -2595,7 +2596,6 @@ static MACHINE_CONFIG_START( crsbingo, driver_device )
 	MCFG_PALETTE_INIT(subsino_2proms)
 
 	MCFG_VIDEO_START(subsino)
-	MCFG_VIDEO_UPDATE(subsino)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2618,6 +2618,7 @@ static MACHINE_CONFIG_START( srider, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
+	MCFG_SCREEN_UPDATE(subsino)
 
 	MCFG_GFXDECODE(subsino_depth4)
 
@@ -2625,8 +2626,7 @@ static MACHINE_CONFIG_START( srider, driver_device )
 	MCFG_PALETTE_INIT(subsino_3proms)
 
 	MCFG_VIDEO_START(subsino)
-	MCFG_VIDEO_UPDATE(subsino)
-
+	
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -2658,6 +2658,7 @@ static MACHINE_CONFIG_START( tisub, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
+	MCFG_SCREEN_UPDATE(subsino_reels)
 
 	MCFG_GFXDECODE(subsino_depth4_reels)
 
@@ -2665,7 +2666,6 @@ static MACHINE_CONFIG_START( tisub, driver_device )
 	MCFG_PALETTE_INIT(subsino_3proms)
 
 	MCFG_VIDEO_START(subsino_reels)
-	MCFG_VIDEO_UPDATE(subsino_reels)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2687,6 +2687,7 @@ static MACHINE_CONFIG_START( stisub, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
+	MCFG_SCREEN_UPDATE(stisub_reels)
 
 	MCFG_GFXDECODE(subsino_stisub)
 
@@ -2694,7 +2695,6 @@ static MACHINE_CONFIG_START( stisub, driver_device )
 	//MCFG_PALETTE_INIT(subsino_3proms)
 
 	MCFG_VIDEO_START(stisub)
-	MCFG_VIDEO_UPDATE(stisub_reels)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

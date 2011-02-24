@@ -5,7 +5,7 @@ extern UINT8 *xxmissio_fgram;
 extern UINT8 *xxmissio_spriteram;
 
 VIDEO_START( xxmissio );
-VIDEO_UPDATE( xxmissio );
+SCREEN_UPDATE( xxmissio );
 
 WRITE8_DEVICE_HANDLER( xxmissio_scroll_x_w );
 WRITE8_DEVICE_HANDLER( xxmissio_scroll_y_w );

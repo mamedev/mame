@@ -23,6 +23,6 @@ public:
 WRITE16_HANDLER( vindictr_paletteram_w );
 
 VIDEO_START( vindictr );
-VIDEO_UPDATE( vindictr );
+SCREEN_UPDATE( vindictr );
 
 void vindictr_scanline_update(screen_device &screen, int scanline);

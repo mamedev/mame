@@ -556,17 +556,17 @@ VIDEO_START( slikshot )
 
 /*************************************
  *
- *  VIDEO_UPDATE( slikshot )
+ *  SCREEN_UPDATE( slikshot )
  *
  *************************************/
 
-VIDEO_UPDATE( slikshot )
+SCREEN_UPDATE( slikshot )
 {
 	int totaldy, totaldx;
 	int temp, i;
 
 	/* draw the normal video first */
-	VIDEO_UPDATE_CALL(itech8_2page);
+	SCREEN_UPDATE_CALL(itech8_2page);
 
 	/* add the current X,Y positions to the list */
 	xbuffer[ybuffer_next % YBUFFER_COUNT] = input_port_read_safe(screen->machine, "FAKEX", 0);

@@ -27,9 +27,9 @@ public:
 /*----------- defined in video/wolfpack.c -----------*/
 
 PALETTE_INIT( wolfpack );
-VIDEO_UPDATE( wolfpack );
+SCREEN_UPDATE( wolfpack );
 VIDEO_START( wolfpack );
-VIDEO_EOF( wolfpack );
+SCREEN_EOF( wolfpack );
 
 WRITE8_HANDLER( wolfpack_video_invert_w );
 WRITE8_HANDLER( wolfpack_ship_reflect_w );

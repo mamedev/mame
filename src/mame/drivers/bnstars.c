@@ -512,7 +512,7 @@ static VIDEO_START(bnstars)
 
 
 
-static VIDEO_UPDATE(bnstars)
+static SCREEN_UPDATE(bnstars)
 {
 	bnstars_state *state = screen->machine->driver_data<bnstars_state>();
 	device_t *left_screen  = screen->machine->device("lscreen");
@@ -1379,6 +1379,7 @@ static MACHINE_CONFIG_START( bnstars, bnstars_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_UPDATE(bnstars)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1386,9 +1387,9 @@ static MACHINE_CONFIG_START( bnstars, bnstars_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_UPDATE(bnstars)
 
 	MCFG_VIDEO_START(bnstars)
-	MCFG_VIDEO_UPDATE(bnstars)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -182,7 +182,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-static VIDEO_UPDATE(kingdrby)
+static SCREEN_UPDATE(kingdrby)
 {
 	const rectangle &visarea = screen->visible_area();
 	rectangle clip;
@@ -999,9 +999,9 @@ static MACHINE_CONFIG_START( kingdrby, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)	/* controlled by CRTC */
+	MCFG_SCREEN_UPDATE(kingdrby)
 
 	MCFG_VIDEO_START(kingdrby)
-	MCFG_VIDEO_UPDATE(kingdrby)
 
 	MCFG_MC6845_ADD("crtc", MC6845, CLK_1/32, mc6845_intf)	/* 53.333 Hz. guess */
 

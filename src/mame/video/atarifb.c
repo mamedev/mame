@@ -180,7 +180,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 }
 
 
-VIDEO_UPDATE( atarifb )
+SCREEN_UPDATE( atarifb )
 {
 	draw_playfield_and_alpha(screen->machine, bitmap, cliprect, 0, 0);
 
@@ -190,7 +190,7 @@ VIDEO_UPDATE( atarifb )
 }
 
 
-VIDEO_UPDATE( abaseb )
+SCREEN_UPDATE( abaseb )
 {
 	draw_playfield_and_alpha(screen->machine, bitmap, cliprect, -8, 0);
 
@@ -200,7 +200,7 @@ VIDEO_UPDATE( abaseb )
 }
 
 
-VIDEO_UPDATE( soccer )
+SCREEN_UPDATE( soccer )
 {
 	draw_playfield_and_alpha(screen->machine, bitmap, cliprect, 0, 8);
 

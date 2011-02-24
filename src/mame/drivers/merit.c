@@ -1153,7 +1153,7 @@ static INPUT_PORTS_START( couplep )
 INPUT_PORTS_END
 
 
-static VIDEO_UPDATE( merit )
+static SCREEN_UPDATE( merit )
 {
 	device_t *mc6845 = screen->machine->device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
@@ -1238,10 +1238,10 @@ static MACHINE_CONFIG_START( pitboss, merit_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 512, 0, 512, 256, 0, 256)	/* temporary, CRTC will configure screen */
+	MCFG_SCREEN_UPDATE(merit)
 
 	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
 
-	MCFG_VIDEO_UPDATE(merit)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -89,7 +89,7 @@ static void astron_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 }
 
 
-static VIDEO_UPDATE( astron )
+static SCREEN_UPDATE( astron )
 {
 	bitmap_fill(bitmap, cliprect, 0);
 

@@ -17,4 +17,4 @@ WRITE8_HANDLER( strnskil_scrl_ctrl_w );
 
 PALETTE_INIT( strnskil );
 VIDEO_START( strnskil );
-VIDEO_UPDATE( strnskil );
+SCREEN_UPDATE( strnskil );

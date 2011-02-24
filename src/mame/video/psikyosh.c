@@ -1288,7 +1288,7 @@ VIDEO_START( psikyosh )
 }
 
 
-VIDEO_UPDATE( psikyosh ) /* Note the z-buffer on each sprite to get correct priority */
+SCREEN_UPDATE( psikyosh ) /* Note the z-buffer on each sprite to get correct priority */
 {
 	int i;
 	psikyosh_state *state = screen->machine->driver_data<psikyosh_state>();
@@ -1340,7 +1340,7 @@ popmessage   ("%08x %08x %08x %08x\n%08x %08x %08x %08x",
 	return 0;
 }
 
-VIDEO_EOF( psikyosh )
+SCREEN_EOF( psikyosh )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	buffer_spriteram32_w(space, 0, 0, 0xffffffff);

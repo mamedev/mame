@@ -425,7 +425,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 /******************************************************************************/
 
-VIDEO_UPDATE( nemesis )
+SCREEN_UPDATE( nemesis )
 {
 	nemesis_state *state = screen->machine->driver_data<nemesis_state>();
 	int offs;

@@ -216,7 +216,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	}
 }
 
-VIDEO_UPDATE( vulgus )
+SCREEN_UPDATE( vulgus )
 {
 	vulgus_state *state = screen->machine->driver_data<vulgus_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->scroll_low[1] + 256 * state->scroll_high[1]);

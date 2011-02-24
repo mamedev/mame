@@ -492,7 +492,7 @@ static VIDEO_START( marinedt )
 #define OBJ_FLIPX(a)	((state->pf & 0x02) == 0)
 #define OBJ_FLIPY(a)	((a) & 0x80)
 
-static VIDEO_UPDATE( marinedt )
+static SCREEN_UPDATE( marinedt )
 {
 	marinedt_state *state = screen->machine->driver_data<marinedt_state>();
 	int sx, sy;
@@ -661,13 +661,13 @@ static MACHINE_CONFIG_START( marinedt, marinedt_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(4*8+32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(marinedt)
 
 	MCFG_GFXDECODE(marinedt)
 	MCFG_PALETTE_LENGTH(64)
 
 	MCFG_PALETTE_INIT(marinedt)
 	MCFG_VIDEO_START(marinedt)
-	MCFG_VIDEO_UPDATE(marinedt)
 
 	/* sound hardware */
 	//discrete sound

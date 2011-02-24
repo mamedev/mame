@@ -41,7 +41,7 @@ static UINT8 ldp_latch2;
 static UINT8 z80_2_nmi_enable;
 
 /* VIDEO GOODS */
-static VIDEO_UPDATE( istellar )
+static SCREEN_UPDATE( istellar )
 {
 	int charx, chary;
 

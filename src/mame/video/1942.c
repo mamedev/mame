@@ -240,7 +240,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 }
 
-VIDEO_UPDATE( 1942 )
+SCREEN_UPDATE( 1942 )
 {
 	_1942_state *state = screen->machine->driver_data<_1942_state>();
 

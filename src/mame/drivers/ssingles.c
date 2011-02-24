@@ -254,7 +254,7 @@ static VIDEO_START(ssingles)
 }
 
 
-static VIDEO_UPDATE( ssingles )
+static SCREEN_UPDATE( ssingles )
 {
 	device_t *mc6845 = screen->machine->device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
@@ -419,11 +419,11 @@ static MACHINE_CONFIG_START( ssingles, ssingles_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(4000000, 256, 0, 256, 256, 0, 256)	/* temporary, CRTC will configure screen */
+	MCFG_SCREEN_UPDATE(ssingles)
 
 	MCFG_PALETTE_LENGTH(4) //guess
 
 	MCFG_VIDEO_START(ssingles)
-	MCFG_VIDEO_UPDATE(ssingles)
 
 	MCFG_MC6845_ADD("crtc", MC6845, 1000000 /* ? MHz */, mc6845_intf)
 

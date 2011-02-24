@@ -34,4 +34,4 @@ WRITE16_HANDLER( fof_mid_tileram_w );
 WRITE16_HANDLER( fof_txt_tileram_w );
 
 VIDEO_START(fitfight);
-VIDEO_UPDATE(fitfight);
+SCREEN_UPDATE(fitfight);

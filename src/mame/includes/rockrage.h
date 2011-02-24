@@ -28,7 +28,7 @@ public:
 
 WRITE8_HANDLER( rockrage_vreg_w );
 
-VIDEO_UPDATE( rockrage );
+SCREEN_UPDATE( rockrage );
 PALETTE_INIT( rockrage );
 
 void rockrage_tile_callback(running_machine *machine, int layer, int bank, int *code, int *color, int *flags);

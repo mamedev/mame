@@ -577,7 +577,7 @@ static TILE_GET_INFO( get_tile_info_pixel )
 
 /******************************************************************************/
 
-VIDEO_EOF( f3 )
+SCREEN_EOF( f3 )
 {
 	if (sprite_lag==2)
 	{
@@ -3231,7 +3231,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 /******************************************************************************/
 
-VIDEO_UPDATE( f3 )
+SCREEN_UPDATE( f3 )
 {
 	UINT32 sy_fix[5],sx_fix[5];
 

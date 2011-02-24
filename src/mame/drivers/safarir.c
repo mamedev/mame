@@ -193,7 +193,7 @@ static VIDEO_START( safarir )
 }
 
 
-static VIDEO_UPDATE( safarir )
+static SCREEN_UPDATE( safarir )
 {
 	safarir_state *state = screen->machine->driver_data<safarir_state>();
 
@@ -406,7 +406,6 @@ static MACHINE_CONFIG_START( safarir, safarir_state )
 
 	/* video hardware */
 	MCFG_VIDEO_START(safarir)
-	MCFG_VIDEO_UPDATE(safarir)
 	MCFG_PALETTE_INIT(safarir)
 	MCFG_PALETTE_LENGTH(2*8)
 	MCFG_GFXDECODE(safarir)
@@ -416,6 +415,7 @@ static MACHINE_CONFIG_START( safarir, safarir_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 26*8-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_UPDATE(safarir)
 
 	/* audio hardware */
 	MCFG_FRAGMENT_ADD(safarir_audio)

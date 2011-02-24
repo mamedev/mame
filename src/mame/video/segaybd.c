@@ -39,7 +39,7 @@ VIDEO_START( yboard )
  *
  *************************************/
 
-VIDEO_UPDATE( yboard )
+SCREEN_UPDATE( yboard )
 {
 	segas1x_state *state = screen->machine->driver_data<segas1x_state>();
 	rectangle yboard_clip;

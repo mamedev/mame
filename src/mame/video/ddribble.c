@@ -250,7 +250,7 @@ static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rect
 
 ***************************************************************************/
 
-VIDEO_UPDATE( ddribble )
+SCREEN_UPDATE( ddribble )
 {
 	ddribble_state *state = screen->machine->driver_data<ddribble_state>();
 	set_pens(screen->machine);

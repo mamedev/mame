@@ -32,4 +32,4 @@ READ8_HANDLER( vastar_bg1videoram_r );
 READ8_HANDLER( vastar_bg2videoram_r );
 
 VIDEO_START( vastar );
-VIDEO_UPDATE( vastar );
+SCREEN_UPDATE( vastar );

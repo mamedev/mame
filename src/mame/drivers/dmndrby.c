@@ -325,7 +325,7 @@ static VIDEO_START(dderby)
 
 }
 
-static VIDEO_UPDATE(dderby)
+static SCREEN_UPDATE(dderby)
 {
 	int x,y,count;
 	int off,scrolly;
@@ -507,13 +507,13 @@ static MACHINE_CONFIG_START( dderby, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
+	MCFG_SCREEN_UPDATE(dderby)
 
 	MCFG_GFXDECODE(dmndrby)
 	MCFG_PALETTE_LENGTH(0x300)
 	MCFG_PALETTE_INIT(dmnderby)
 
 	MCFG_VIDEO_START(dderby)
-	MCFG_VIDEO_UPDATE(dderby)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

@@ -16,7 +16,7 @@ WRITE8_HANDLER( spcforce_flip_screen_w )
 }
 
 
-VIDEO_UPDATE( spcforce )
+SCREEN_UPDATE( spcforce )
 {
 	spcforce_state *state = screen->machine->driver_data<spcforce_state>();
 	int offs;

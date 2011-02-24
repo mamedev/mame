@@ -389,13 +389,13 @@ static MACHINE_CONFIG_START( skydiver, skydiver_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_UPDATE(skydiver)
 
 	MCFG_GFXDECODE(skydiver)
 	MCFG_PALETTE_LENGTH(sizeof(colortable_source) / sizeof(colortable_source[0]))
 
 	MCFG_PALETTE_INIT(skydiver)
 	MCFG_VIDEO_START(skydiver)
-	MCFG_VIDEO_UPDATE(skydiver)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

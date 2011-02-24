@@ -44,7 +44,7 @@ static VIDEO_START( timetrv )
 
 }
 
-static VIDEO_UPDATE( timetrv )
+static SCREEN_UPDATE( timetrv )
 {
 	timetrv_state *state = screen->machine->driver_data<timetrv_state>();
 	popmessage("%s%s",state->led_vram_lo,state->led_vram_hi);
@@ -153,11 +153,11 @@ static MACHINE_CONFIG_START( timetrv, timetrv_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 512-1)
+	MCFG_SCREEN_UPDATE(timetrv)
+
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_VIDEO_START(timetrv)
-	MCFG_VIDEO_UPDATE(timetrv)
-
 	/* sound hardware */
 MACHINE_CONFIG_END
 

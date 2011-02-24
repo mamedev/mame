@@ -346,7 +346,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 
 
-VIDEO_UPDATE( namcos1 )
+SCREEN_UPDATE( namcos1 )
 {
 	int i, j, scrollx, scrolly, priority;
 	rectangle new_clip = *cliprect;
@@ -415,7 +415,7 @@ VIDEO_UPDATE( namcos1 )
 }
 
 
-VIDEO_EOF( namcos1 )
+SCREEN_EOF( namcos1 )
 {
 	if (copy_sprites)
 	{

@@ -96,7 +96,7 @@ static VIDEO_START(pangofun)
 {
 }
 
-static VIDEO_UPDATE(pangofun)
+static SCREEN_UPDATE(pangofun)
 {
 	return 0;
 }
@@ -122,11 +122,11 @@ static MACHINE_CONFIG_START( pangofun, driver_device )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(pangofun)
 
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(pangofun)
-	MCFG_VIDEO_UPDATE(pangofun)
 MACHINE_CONFIG_END
 
 

@@ -15,5 +15,5 @@ READ32_HANDLER(K001006_1_r);
 WRITE32_HANDLER(K001006_1_w);
 
 VIDEO_START( gticlub );
-VIDEO_UPDATE( gticlub );
-VIDEO_UPDATE( hangplt );
+SCREEN_UPDATE( gticlub );
+SCREEN_UPDATE( hangplt );

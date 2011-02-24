@@ -160,7 +160,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 }
 
 
-VIDEO_UPDATE( srumbler )
+SCREEN_UPDATE( srumbler )
 {
 	srumbler_state *state = screen->machine->driver_data<srumbler_state>();
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,TILEMAP_DRAW_LAYER1,0);
@@ -170,7 +170,7 @@ VIDEO_UPDATE( srumbler )
 	return 0;
 }
 
-VIDEO_EOF( srumbler )
+SCREEN_EOF( srumbler )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 

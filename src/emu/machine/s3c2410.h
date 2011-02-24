@@ -105,7 +105,7 @@ struct _s3c2410_interface
 DEVICE_GET_INFO( s3c2410 );
 
 VIDEO_START( s3c2410 );
-VIDEO_UPDATE( s3c2410 );
+SCREEN_UPDATE( s3c2410 );
 
 void s3c2410_uart_fifo_w( device_t *device, int uart, UINT8 data);
 void s3c2410_touch_screen( device_t *device, int state);

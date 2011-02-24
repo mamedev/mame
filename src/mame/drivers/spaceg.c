@@ -292,7 +292,7 @@ static READ8_HANDLER(spaceg_colorram_r)
 }
 
 
-static VIDEO_UPDATE( spaceg )
+static SCREEN_UPDATE( spaceg )
 {
 	spaceg_state *state = screen->machine->driver_data<spaceg_state>();
 	offs_t offs;
@@ -415,10 +415,10 @@ static MACHINE_CONFIG_START( spaceg, spaceg_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 32, 255)
+	MCFG_SCREEN_UPDATE( spaceg )
 
 	MCFG_PALETTE_LENGTH(16+128-16)
 	MCFG_PALETTE_INIT( spaceg )
-	MCFG_VIDEO_UPDATE( spaceg )
 
 	/* sound hardware */
 //  MCFG_SPEAKER_STANDARD_MONO("mono")

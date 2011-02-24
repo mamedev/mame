@@ -36,8 +36,8 @@ public:
 /*----------- defined in video/atarig42.c -----------*/
 
 VIDEO_START( atarig42 );
-VIDEO_EOF( atarig42 );
-VIDEO_UPDATE( atarig42 );
+SCREEN_EOF( atarig42 );
+SCREEN_UPDATE( atarig42 );
 
 WRITE16_HANDLER( atarig42_mo_control_w );
 

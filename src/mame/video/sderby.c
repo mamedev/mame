@@ -108,7 +108,7 @@ VIDEO_START( sderby )
 	tilemap_set_transparent_pen(state->fg_tilemap,0);
 }
 
-VIDEO_UPDATE( sderby )
+SCREEN_UPDATE( sderby )
 {
 	sderby_state *state = screen->machine->driver_data<sderby_state>();
 
@@ -119,7 +119,7 @@ VIDEO_UPDATE( sderby )
 	return 0;
 }
 
-VIDEO_UPDATE( pmroulet )
+SCREEN_UPDATE( pmroulet )
 {
 	sderby_state *state = screen->machine->driver_data<sderby_state>();
 

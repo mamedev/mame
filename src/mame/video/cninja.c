@@ -389,7 +389,7 @@ static void mutantf_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 
 /******************************************************************************/
 
-VIDEO_UPDATE( cninja )
+SCREEN_UPDATE( cninja )
 {
 	cninja_state *state = screen->machine->driver_data<cninja_state>();
 	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);
@@ -410,7 +410,7 @@ VIDEO_UPDATE( cninja )
 	return 0;
 }
 
-VIDEO_UPDATE( cninjabl )
+SCREEN_UPDATE( cninjabl )
 {
 	cninja_state *state = screen->machine->driver_data<cninja_state>();
 	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);
@@ -431,7 +431,7 @@ VIDEO_UPDATE( cninjabl )
 	return 0;
 }
 
-VIDEO_UPDATE( edrandy )
+SCREEN_UPDATE( edrandy )
 {
 	cninja_state *state = screen->machine->driver_data<cninja_state>();
 	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);
@@ -450,7 +450,7 @@ VIDEO_UPDATE( edrandy )
 	return 0;
 }
 
-VIDEO_UPDATE( robocop2 )
+SCREEN_UPDATE( robocop2 )
 {
 	cninja_state *state = screen->machine->driver_data<cninja_state>();
 	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);
@@ -501,7 +501,7 @@ VIDEO_UPDATE( robocop2 )
 	return 0;
 }
 
-VIDEO_UPDATE( mutantf )
+SCREEN_UPDATE( mutantf )
 {
 	cninja_state *state = screen->machine->driver_data<cninja_state>();
 	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);

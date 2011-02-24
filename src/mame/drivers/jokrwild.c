@@ -141,7 +141,7 @@ static VIDEO_START( jokrwild )
 }
 
 
-static VIDEO_UPDATE( jokrwild )
+static SCREEN_UPDATE( jokrwild )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	return 0;
@@ -474,12 +474,12 @@ static MACHINE_CONFIG_START( jokrwild, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE((32+1)*8, (32+1)*8)                  /* From MC6845, registers 00 & 04. (value-1) */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 24*8-1, 0*8, 26*8-1)    /* From MC6845, registers 01 & 06 */
+	MCFG_SCREEN_UPDATE(jokrwild)
 
 	MCFG_GFXDECODE(jokrwild)
 	MCFG_PALETTE_INIT(jokrwild)
 	MCFG_PALETTE_LENGTH(512)
 	MCFG_VIDEO_START(jokrwild)
-	MCFG_VIDEO_UPDATE(jokrwild)
 
 	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK/16, mc6845_intf) /* guess */
 

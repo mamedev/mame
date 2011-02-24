@@ -450,7 +450,7 @@ static void draw_characters( running_machine* machine, bitmap_t *bitmap, const r
 
 /******************************************************************************/
 
-VIDEO_UPDATE( cobracom )
+SCREEN_UPDATE( cobracom )
 {
 	dec8_state *state = screen->machine->driver_data<dec8_state>();
 	tilemap_set_scrollx(state->pf0_tilemap, 0, (state->pf0_control[0x10] << 8) + state->pf0_control[0x11]);
@@ -543,7 +543,7 @@ VIDEO_START( cobracom )
 
 /******************************************************************************/
 
-VIDEO_UPDATE( ghostb )
+SCREEN_UPDATE( ghostb )
 {
 	dec8_state *state = screen->machine->driver_data<dec8_state>();
 	if (state->pf0_control[0] & 0x4)
@@ -595,7 +595,7 @@ VIDEO_START( ghostb )
 
 /******************************************************************************/
 
-VIDEO_UPDATE( oscar )
+SCREEN_UPDATE( oscar )
 {
 	dec8_state *state = screen->machine->driver_data<dec8_state>();
 	tilemap_set_scrollx(state->pf0_tilemap,0, (state->pf0_control[0x10] << 8) + state->pf0_control[0x11]);
@@ -640,7 +640,7 @@ VIDEO_START( oscar )
 
 /******************************************************************************/
 
-VIDEO_UPDATE( lastmisn )
+SCREEN_UPDATE( lastmisn )
 {
 	dec8_state *state = screen->machine->driver_data<dec8_state>();
 	tilemap_set_scrollx(state->pf0_tilemap, 0, ((state->scroll2[0] << 8)+ state->scroll2[1]));
@@ -652,7 +652,7 @@ VIDEO_UPDATE( lastmisn )
 	return 0;
 }
 
-VIDEO_UPDATE( shackled )
+SCREEN_UPDATE( shackled )
 {
 	dec8_state *state = screen->machine->driver_data<dec8_state>();
 	tilemap_set_scrollx(state->pf0_tilemap, 0, ((state->scroll2[0] << 8) + state->scroll2[1]));
@@ -729,7 +729,7 @@ VIDEO_START( shackled )
 
 /******************************************************************************/
 
-VIDEO_UPDATE( srdarwin )
+SCREEN_UPDATE( srdarwin )
 {
 	dec8_state *state = screen->machine->driver_data<dec8_state>();
 	tilemap_set_scrollx(state->pf0_tilemap, 0, (state->scroll2[0] << 8) + state->scroll2[1]);
@@ -794,7 +794,7 @@ VIDEO_START( srdarwin )
 
 /******************************************************************************/
 
-VIDEO_UPDATE( gondo )
+SCREEN_UPDATE( gondo )
 {
 	dec8_state *state = screen->machine->driver_data<dec8_state>();
 	tilemap_set_scrollx(state->pf0_tilemap, 0, ((state->scroll2[0] << 8) + state->scroll2[1]));
@@ -808,7 +808,7 @@ VIDEO_UPDATE( gondo )
 	return 0;
 }
 
-VIDEO_UPDATE( garyoret )
+SCREEN_UPDATE( garyoret )
 {
 	dec8_state *state = screen->machine->driver_data<dec8_state>();
 	tilemap_set_scrollx(state->pf0_tilemap, 0, ((state->scroll2[0] << 8) + state->scroll2[1]));

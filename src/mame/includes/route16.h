@@ -6,6 +6,6 @@ extern size_t route16_videoram_size;
 
 WRITE8_HANDLER( route16_out0_w );
 WRITE8_HANDLER( route16_out1_w );
-VIDEO_UPDATE( route16 );
-VIDEO_UPDATE( stratvox );
-VIDEO_UPDATE( ttmahjng );
+SCREEN_UPDATE( route16 );
+SCREEN_UPDATE( stratvox );
+SCREEN_UPDATE( ttmahjng );

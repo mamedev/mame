@@ -422,7 +422,7 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 }
 
 
-VIDEO_UPDATE( btime )
+SCREEN_UPDATE( btime )
 {
 	btime_state *state = screen->machine->driver_data<btime_state>();
 	if (state->bnj_scroll1 & 0x10)
@@ -453,7 +453,7 @@ VIDEO_UPDATE( btime )
 }
 
 
-VIDEO_UPDATE( eggs )
+SCREEN_UPDATE( eggs )
 {
 	btime_state *state = screen->machine->driver_data<btime_state>();
 	draw_chars(screen->machine, bitmap, cliprect, FALSE, 0, -1);
@@ -463,7 +463,7 @@ VIDEO_UPDATE( eggs )
 }
 
 
-VIDEO_UPDATE( lnc )
+SCREEN_UPDATE( lnc )
 {
 	btime_state *state = screen->machine->driver_data<btime_state>();
 	draw_chars(screen->machine, bitmap, cliprect, FALSE, 0, -1);
@@ -473,7 +473,7 @@ VIDEO_UPDATE( lnc )
 }
 
 
-VIDEO_UPDATE( zoar )
+SCREEN_UPDATE( zoar )
 {
 	btime_state *state = screen->machine->driver_data<btime_state>();
 	if (state->bnj_scroll1 & 0x04)
@@ -492,7 +492,7 @@ VIDEO_UPDATE( zoar )
 }
 
 
-VIDEO_UPDATE( bnj )
+SCREEN_UPDATE( bnj )
 {
 	btime_state *state = screen->machine->driver_data<btime_state>();
 	if (state->bnj_scroll1)
@@ -542,7 +542,7 @@ VIDEO_UPDATE( bnj )
 }
 
 
-VIDEO_UPDATE( cookrace )
+SCREEN_UPDATE( cookrace )
 {
 	btime_state *state = screen->machine->driver_data<btime_state>();
 	int offs;
@@ -574,7 +574,7 @@ VIDEO_UPDATE( cookrace )
 }
 
 
-VIDEO_UPDATE( disco )
+SCREEN_UPDATE( disco )
 {
 	btime_state *state = screen->machine->driver_data<btime_state>();
 	draw_chars(screen->machine, bitmap, cliprect, FALSE, state->btime_palette, -1);

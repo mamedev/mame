@@ -134,7 +134,7 @@ WRITE8_HANDLER( fcombat_videoreg_w )
 
 
 
-VIDEO_UPDATE( fcombat )
+SCREEN_UPDATE( fcombat )
 {
 	fcombat_state *state = screen->machine->driver_data<fcombat_state>();
 	int sx, sy, offs, i;

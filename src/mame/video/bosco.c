@@ -273,7 +273,7 @@ static void draw_stars(running_machine *machine, bitmap_t *bitmap, const rectang
 }
 
 
-VIDEO_UPDATE( bosco )
+SCREEN_UPDATE( bosco )
 {
 	_galaga_state *state =  screen->machine->driver_data<_galaga_state>();
 
@@ -310,7 +310,7 @@ VIDEO_UPDATE( bosco )
 }
 
 
-VIDEO_EOF( bosco )
+SCREEN_EOF( bosco )
 {
 	_galaga_state *state =  machine->driver_data<_galaga_state>();
 	static const int speedsx[8] = { -1, -2, -3, 0, 3, 2, 1, 0 };

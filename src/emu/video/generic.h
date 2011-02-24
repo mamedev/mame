@@ -44,7 +44,7 @@ void generic_video_init(running_machine *machine);
 VIDEO_START( generic_bitmapped );
 
 /* generic video update to blit a temporary bitmap */
-VIDEO_UPDATE( generic_bitmapped );
+SCREEN_UPDATE( generic_bitmapped );
 
 
 

@@ -55,4 +55,4 @@ WRITE8_HANDLER( bwing_scrollram_w );
 READ8_HANDLER( bwing_scrollram_r );
 
 VIDEO_START( bwing );
-VIDEO_UPDATE( bwing );
+SCREEN_UPDATE( bwing );

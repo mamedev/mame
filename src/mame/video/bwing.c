@@ -288,7 +288,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bmp, const rectang
 }
 
 
-VIDEO_UPDATE( bwing )
+SCREEN_UPDATE( bwing )
 {
 	bwing_state *state = screen->machine->driver_data<bwing_state>();
 	unsigned x, y, shiftx;

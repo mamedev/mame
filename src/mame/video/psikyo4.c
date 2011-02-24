@@ -127,7 +127,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( psikyo4 )
+SCREEN_UPDATE( psikyo4 )
 {
 	device_t *left_screen  = screen->machine->device("lscreen");
 	device_t *right_screen = screen->machine->device("rscreen");

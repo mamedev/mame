@@ -404,7 +404,7 @@ static UINT32 turbo_get_sprite_bits(running_machine *machine, UINT8 road, sprite
  *
  *************************************/
 
-VIDEO_UPDATE( turbo )
+SCREEN_UPDATE( turbo )
 {
 	turbo_state *state = screen->machine->driver_data<turbo_state>();
 	bitmap_t *fgpixmap = tilemap_get_pixmap(state->fg_tilemap);
@@ -759,7 +759,7 @@ static UINT32 subroc3d_get_sprite_bits(running_machine *machine, sprite_info *sp
  *
  *************************************/
 
-VIDEO_UPDATE( subroc3d )
+SCREEN_UPDATE( subroc3d )
 {
 	turbo_state *state = screen->machine->driver_data<turbo_state>();
 	bitmap_t *fgpixmap = tilemap_get_pixmap(state->fg_tilemap);
@@ -979,7 +979,7 @@ static UINT32 buckrog_get_sprite_bits(running_machine *machine, sprite_info *spr
  *
  *************************************/
 
-VIDEO_UPDATE( buckrog )
+SCREEN_UPDATE( buckrog )
 {
 	turbo_state *state = screen->machine->driver_data<turbo_state>();
 	bitmap_t *fgpixmap = tilemap_get_pixmap(state->fg_tilemap);

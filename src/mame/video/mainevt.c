@@ -93,7 +93,7 @@ VIDEO_START( dv )
 
 /*****************************************************************************/
 
-VIDEO_UPDATE( mainevt )
+SCREEN_UPDATE( mainevt )
 {
 	mainevt_state *state = screen->machine->driver_data<mainevt_state>();
 
@@ -109,7 +109,7 @@ VIDEO_UPDATE( mainevt )
 	return 0;
 }
 
-VIDEO_UPDATE( dv )
+SCREEN_UPDATE( dv )
 {
 	mainevt_state *state = screen->machine->driver_data<mainevt_state>();
 

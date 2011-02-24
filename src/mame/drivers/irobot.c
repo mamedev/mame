@@ -305,13 +305,13 @@ static MACHINE_CONFIG_START( irobot, irobot_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 29*8-1)
+	MCFG_SCREEN_UPDATE(irobot)
 
 	MCFG_GFXDECODE(irobot)
 	MCFG_PALETTE_LENGTH(64 + 32)	/* 64 for polygons, 32 for text */
 
 	MCFG_PALETTE_INIT(irobot)
 	MCFG_VIDEO_START(irobot)
-	MCFG_VIDEO_UPDATE(irobot)
 
 	MCFG_TIMER_ADD("irvg_timer", irobot_irvg_done_callback)
 	MCFG_TIMER_ADD("irmb_timer", irobot_irmb_done_callback)

@@ -66,7 +66,7 @@ VIDEO_START( scontra )
 
 ***************************************************************************/
 
-VIDEO_UPDATE( scontra )
+SCREEN_UPDATE( scontra )
 {
 	thunderx_state *state = screen->machine->driver_data<thunderx_state>();
 

@@ -21,7 +21,7 @@ public:
 /*----------- defined in video/rollrace.c -----------*/
 
 PALETTE_INIT( rollrace );
-VIDEO_UPDATE( rollrace );
+SCREEN_UPDATE( rollrace );
 
 WRITE8_HANDLER( rollrace_charbank_w );
 WRITE8_HANDLER( rollrace_backgroundpage_w );

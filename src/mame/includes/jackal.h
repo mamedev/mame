@@ -35,4 +35,4 @@ void jackal_mark_tile_dirty(running_machine *machine, int offset);
 
 PALETTE_INIT( jackal );
 VIDEO_START( jackal );
-VIDEO_UPDATE( jackal );
+SCREEN_UPDATE( jackal );

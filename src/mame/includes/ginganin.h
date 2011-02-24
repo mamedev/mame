@@ -47,4 +47,4 @@ WRITE16_HANDLER( ginganin_txtram16_w );
 WRITE16_HANDLER( ginganin_vregs16_w );
 
 VIDEO_START( ginganin );
-VIDEO_UPDATE( ginganin );
+SCREEN_UPDATE( ginganin );

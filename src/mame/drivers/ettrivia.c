@@ -202,7 +202,7 @@ static VIDEO_START( ettrivia )
 	tilemap_set_transparent_pen(fg_tilemap,0);
 }
 
-static VIDEO_UPDATE( ettrivia )
+static SCREEN_UPDATE( ettrivia )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
@@ -253,13 +253,13 @@ static MACHINE_CONFIG_START( ettrivia, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_UPDATE(ettrivia)
 
 	MCFG_GFXDECODE(ettrivia)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(naughtyb)
 	MCFG_VIDEO_START(ettrivia)
-	MCFG_VIDEO_UPDATE(ettrivia)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

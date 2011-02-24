@@ -2,9 +2,9 @@
 
 void tubep_vblank_end(void);
 PALETTE_INIT( tubep );
-VIDEO_UPDATE( tubep );
+SCREEN_UPDATE( tubep );
 PALETTE_INIT( rjammer );
-VIDEO_UPDATE( rjammer );
+SCREEN_UPDATE( rjammer );
 VIDEO_START( tubep );
 VIDEO_RESET( tubep );
 

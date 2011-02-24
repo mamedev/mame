@@ -205,7 +205,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-VIDEO_UPDATE( gsword )
+SCREEN_UPDATE( gsword )
 {
 	gsword_state *state = screen->machine->driver_data<gsword_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);

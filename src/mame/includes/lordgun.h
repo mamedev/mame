@@ -56,4 +56,4 @@ float lordgun_crosshair_mapper(const input_field_config *field, float linear_val
 void lordgun_update_gun(running_machine *machine, int i);
 
 VIDEO_START( lordgun );
-VIDEO_UPDATE( lordgun );
+SCREEN_UPDATE( lordgun );

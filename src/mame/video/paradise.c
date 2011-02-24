@@ -230,7 +230,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 ***************************************************************************/
 
-VIDEO_UPDATE( paradise )
+SCREEN_UPDATE( paradise )
 {
 	paradise_state *state = screen->machine->driver_data<paradise_state>();
 	int layers_ctrl = -1;
@@ -281,7 +281,7 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 }
 
 /* no pix layer, no tilemap_0, different priority bits */
-VIDEO_UPDATE( torus )
+SCREEN_UPDATE( torus )
 {
 	paradise_state *state = screen->machine->driver_data<paradise_state>();
 
@@ -313,7 +313,7 @@ VIDEO_UPDATE( torus )
 }
 
 /* I don't know how the priority bits work on this one */
-VIDEO_UPDATE( madball )
+SCREEN_UPDATE( madball )
 {
 	paradise_state *state = screen->machine->driver_data<paradise_state>();
 

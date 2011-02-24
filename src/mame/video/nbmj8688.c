@@ -680,7 +680,7 @@ WRITE8_HANDLER( nbmj8688_HD61830B_both_data_w )
 ******************************************************************************/
 
 
-VIDEO_UPDATE( mbmj8688 )
+SCREEN_UPDATE( mbmj8688 )
 {
 	int x, y;
 
@@ -713,35 +713,32 @@ VIDEO_UPDATE( mbmj8688 )
 
 
 
-VIDEO_UPDATE( mbmj8688_LCD )
+SCREEN_UPDATE( mbmj8688_lcd0 )
 {
 	int x, y, b;
 
-	device_t *main_screen = screen->machine->device("screen");
-	device_t *lcd0_screen = screen->machine->device("lcd0");
-	device_t *lcd1_screen = screen->machine->device("lcd1");
+	for (y = 0;y < 64;y++)
+		for (x = 0;x < 60;x++)
+		{
+			int data = HD61830B_ram[0][y * 60 + x];
 
-	if (screen == main_screen) VIDEO_UPDATE_CALL(mbmj8688);
+			for (b = 0;b < 8;b++)
+				*BITMAP_ADDR16(bitmap, y, (8*x+b)) = (data & (1<<b)) ? 0x0000 : 0x18ff;
+		}
+	return 0;
+}
 
-	if (screen == lcd0_screen)
-		for (y = 0;y < 64;y++)
-			for (x = 0;x < 60;x++)
-			{
-				int data = HD61830B_ram[0][y * 60 + x];
+SCREEN_UPDATE( mbmj8688_lcd1 )
+{
+	int x, y, b;
 
-				for (b = 0;b < 8;b++)
-					*BITMAP_ADDR16(bitmap, y, (8*x+b)) = (data & (1<<b)) ? 0x0000 : 0x18ff;
-			}
+	for (y = 0;y < 64;y++)
+		for (x = 0;x < 60;x++)
+		{
+			int data = HD61830B_ram[1][y * 60 + x];
 
-	if (screen == lcd1_screen)
-		for (y = 0;y < 64;y++)
-			for (x = 0;x < 60;x++)
-			{
-				int data = HD61830B_ram[1][y * 60 + x];
-
-				for (b = 0;b < 8;b++)
-					*BITMAP_ADDR16(bitmap, y, (8*x+b)) = (data & (1<<b)) ? 0x0000 : 0x18ff;
-			}
-
+			for (b = 0;b < 8;b++)
+				*BITMAP_ADDR16(bitmap, y, (8*x+b)) = (data & (1<<b)) ? 0x0000 : 0x18ff;
+		}
 	return 0;
 }

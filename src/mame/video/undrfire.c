@@ -347,7 +347,7 @@ static void draw_sprites_cbombers(running_machine *machine, bitmap_t *bitmap,con
                 SCREEN REFRESH
 **************************************************************/
 
-VIDEO_UPDATE( undrfire )
+SCREEN_UPDATE( undrfire )
 {
 	device_t *tc0100scn = screen->machine->device("tc0100scn");
 	device_t *tc0480scp = screen->machine->device("tc0480scp");
@@ -490,7 +490,7 @@ VIDEO_UPDATE( undrfire )
 }
 
 
-VIDEO_UPDATE( cbombers )
+SCREEN_UPDATE( cbombers )
 {
 	device_t *tc0100scn = screen->machine->device("tc0100scn");
 	device_t *tc0480scp = screen->machine->device("tc0480scp");

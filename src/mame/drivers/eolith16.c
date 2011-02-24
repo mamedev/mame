@@ -122,7 +122,7 @@ static VIDEO_START( eolith16 )
 	state->vram = auto_alloc_array(machine, UINT16, 0x10000);
 }
 
-static VIDEO_UPDATE( eolith16 )
+static SCREEN_UPDATE( eolith16 )
 {
 	eolith16_state *state = screen->machine->driver_data<eolith16_state>();
 	int x,y,count;
@@ -186,12 +186,12 @@ static MACHINE_CONFIG_START( eolith16, eolith16_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 199)
+	MCFG_SCREEN_UPDATE(eolith16)
 
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(eolith16)
 	MCFG_VIDEO_START(eolith16)
-	MCFG_VIDEO_UPDATE(eolith16)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

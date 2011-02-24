@@ -222,7 +222,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	draw_sprites_region(machine, bitmap, cliprect, sr, 0x500, 1);
 }
 
-VIDEO_UPDATE( jackal )
+SCREEN_UPDATE( jackal )
 {
 	set_pens(screen->machine);
 	draw_background(screen->machine, bitmap, cliprect);

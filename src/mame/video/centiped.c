@@ -429,7 +429,7 @@ WRITE8_HANDLER( mazeinv_paletteram_w )
  *
  *************************************/
 
-VIDEO_UPDATE( centiped )
+SCREEN_UPDATE( centiped )
 {
 	centiped_state *state = screen->machine->driver_data<centiped_state>();
 	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
@@ -461,7 +461,7 @@ VIDEO_UPDATE( centiped )
 }
 
 
-VIDEO_UPDATE( warlords )
+SCREEN_UPDATE( warlords )
 {
 	centiped_state *state = screen->machine->driver_data<centiped_state>();
 	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
@@ -507,7 +507,7 @@ VIDEO_UPDATE( warlords )
 }
 
 
-VIDEO_UPDATE( bullsdrt )
+SCREEN_UPDATE( bullsdrt )
 {
 	centiped_state *state = screen->machine->driver_data<centiped_state>();
 	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
@@ -542,7 +542,7 @@ VIDEO_UPDATE( bullsdrt )
  * This varies from Centipede, in that flipx is not in
  * the data, but is determined by VIDROT value at 0x2506.
  */
-VIDEO_UPDATE( milliped )
+SCREEN_UPDATE( milliped )
 {
 	centiped_state *state = screen->machine->driver_data<centiped_state>();
 	UINT8 *spriteram = screen->machine->generic.spriteram.u8;

@@ -61,7 +61,7 @@ static INTERRUPT_GEN( acefruit_vblank )
 	acefruit_refresh_timer->adjust( attotime::zero );
 }
 
-static VIDEO_UPDATE( acefruit )
+static SCREEN_UPDATE( acefruit )
 {
 	int startrow = cliprect->min_y / 8;
 	int endrow = cliprect->max_y / 8;
@@ -564,13 +564,14 @@ static MACHINE_CONFIG_START( acefruit, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 255)
+	MCFG_SCREEN_UPDATE(acefruit)
+
 	MCFG_PALETTE_LENGTH(16)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_PALETTE_INIT(acefruit)
 	MCFG_VIDEO_START(acefruit)
-	MCFG_VIDEO_UPDATE(acefruit)
 
 	/* sound hardware */
 MACHINE_CONFIG_END

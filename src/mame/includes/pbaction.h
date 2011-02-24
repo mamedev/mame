@@ -40,4 +40,4 @@ extern WRITE8_HANDLER( pbaction_flipscreen_w );
 extern WRITE8_HANDLER( pbaction_scroll_w );
 
 extern VIDEO_START( pbaction );
-extern VIDEO_UPDATE( pbaction );
+extern SCREEN_UPDATE( pbaction );

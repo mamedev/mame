@@ -58,4 +58,4 @@ WRITE16_HANDLER( gaelco3d_paletteram_w );
 WRITE32_HANDLER( gaelco3d_paletteram_020_w );
 
 VIDEO_START( gaelco3d );
-VIDEO_UPDATE( gaelco3d );
+SCREEN_UPDATE( gaelco3d );

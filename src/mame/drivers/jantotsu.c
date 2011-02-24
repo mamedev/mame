@@ -132,7 +132,7 @@ static VIDEO_START(jantotsu)
 	state->save_item(NAME(state->bitmap));
 }
 
-static VIDEO_UPDATE(jantotsu)
+static SCREEN_UPDATE(jantotsu)
 {
 	jantotsu_state *state = screen->machine->driver_data<jantotsu_state>();
 	int x, y, i;
@@ -521,12 +521,12 @@ static MACHINE_CONFIG_START( jantotsu, jantotsu_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
+	MCFG_SCREEN_UPDATE(jantotsu)
 
 	MCFG_PALETTE_INIT(jantotsu)
 	MCFG_PALETTE_LENGTH(0x20)
 
 	MCFG_VIDEO_START(jantotsu)
-	MCFG_VIDEO_UPDATE(jantotsu)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

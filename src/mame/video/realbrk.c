@@ -496,7 +496,7 @@ WRITE16_HANDLER( realbrk_vregs_w )
 	}
 }
 
-VIDEO_UPDATE(realbrk)
+SCREEN_UPDATE(realbrk)
 {
 	realbrk_state *state = screen->machine->driver_data<realbrk_state>();
 	int layers_ctrl = -1;
@@ -539,7 +539,7 @@ if ( input_code_pressed(screen->machine, KEYCODE_Z) )
 }
 
 /* DaiDaiKakumei */
-VIDEO_UPDATE(dai2kaku)
+SCREEN_UPDATE(dai2kaku)
 {
 	realbrk_state *state = screen->machine->driver_data<realbrk_state>();
 	int layers_ctrl = -1;

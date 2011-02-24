@@ -57,6 +57,6 @@ WRITE16_HANDLER( cyberbal_paletteram_1_w );
 
 VIDEO_START( cyberbal );
 VIDEO_START( cyberbal2p );
-VIDEO_UPDATE( cyberbal );
+SCREEN_UPDATE( cyberbal );
 
 void cyberbal_scanline_update(screen_device &screen, int scanline);

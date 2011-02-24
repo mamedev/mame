@@ -120,7 +120,7 @@ static WRITE8_HANDLER( mole_flipscreen_w )
 	flip_screen_set(space->machine, data & 0x01);
 }
 
-static VIDEO_UPDATE( mole )
+static SCREEN_UPDATE( mole )
 {
 	mole_state *state = screen->machine->driver_data<mole_state>();
 
@@ -331,13 +331,13 @@ static MACHINE_CONFIG_START( mole, mole_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(40*8, 25*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 25*8-1)
+	MCFG_SCREEN_UPDATE(mole)
 
 	MCFG_GFXDECODE(mole)
 	MCFG_PALETTE_LENGTH(8)
 
 	MCFG_PALETTE_INIT(mole)
 	MCFG_VIDEO_START(mole)
-	MCFG_VIDEO_UPDATE(mole)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

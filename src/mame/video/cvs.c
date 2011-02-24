@@ -187,7 +187,7 @@ void cvs_scroll_stars( running_machine *machine )
 }
 
 
-VIDEO_UPDATE( cvs )
+SCREEN_UPDATE( cvs )
 {
 	cvs_state *state = screen->machine->driver_data<cvs_state>();
 	static const int ram_based_char_start_indices[] = { 0xe0, 0xc0, 0x100, 0x80 };

@@ -190,7 +190,7 @@ static TIMER_CALLBACK( tank8_collision_callback )
 }
 
 
-VIDEO_UPDATE( tank8 )
+SCREEN_UPDATE( tank8 )
 {
 	tank8_state *state = screen->machine->driver_data<tank8_state>();
 	set_pens(state, screen->machine->colortable);
@@ -202,7 +202,7 @@ VIDEO_UPDATE( tank8 )
 }
 
 
-VIDEO_EOF( tank8 )
+SCREEN_EOF( tank8 )
 {
 	tank8_state *state = machine->driver_data<tank8_state>();
 	int x;

@@ -566,7 +566,7 @@ static void draw_stars(running_machine *machine, bitmap_t *bitmap, const rectang
 	}
 }
 
-VIDEO_UPDATE( galaga )
+SCREEN_UPDATE( galaga )
 {
 	_galaga_state *state =  screen->machine->driver_data<_galaga_state>();
 
@@ -579,7 +579,7 @@ VIDEO_UPDATE( galaga )
 
 
 
-VIDEO_EOF( galaga )
+SCREEN_EOF( galaga )
 {
 	_galaga_state *state =  machine->driver_data<_galaga_state>();
 	/* this function is called by galaga_interrupt_1() */

@@ -838,7 +838,7 @@ static void wbbc97_draw_bitmap( running_machine *machine, bitmap_t *bitmap )
 }
 
 
-VIDEO_UPDATE( pspikes )
+SCREEN_UPDATE( pspikes )
 {
 	aerofgt_state *state = screen->machine->driver_data<aerofgt_state>();
 	int i, scrolly;
@@ -857,7 +857,7 @@ VIDEO_UPDATE( pspikes )
 	return 0;
 }
 
-VIDEO_UPDATE( pspikesb )
+SCREEN_UPDATE( pspikesb )
 {
 	aerofgt_state *state = screen->machine->driver_data<aerofgt_state>();
 	int i, scrolly;
@@ -873,7 +873,7 @@ VIDEO_UPDATE( pspikesb )
 	return 0;
 }
 
-VIDEO_UPDATE( spikes91 )
+SCREEN_UPDATE( spikes91 )
 {
 	aerofgt_state *state = screen->machine->driver_data<aerofgt_state>();
 	int i, scrolly;
@@ -914,7 +914,7 @@ VIDEO_UPDATE( spikes91 )
 	return 0;
 }
 
-VIDEO_UPDATE( karatblz )
+SCREEN_UPDATE( karatblz )
 {
 	aerofgt_state *state = screen->machine->driver_data<aerofgt_state>();
 	tilemap_set_scrollx(state->bg1_tilemap, 0, state->bg1scrollx - 8);
@@ -935,7 +935,7 @@ VIDEO_UPDATE( karatblz )
 	return 0;
 }
 
-VIDEO_UPDATE( spinlbrk )
+SCREEN_UPDATE( spinlbrk )
 {
 	aerofgt_state *state = screen->machine->driver_data<aerofgt_state>();
 	int i, scrolly;
@@ -961,7 +961,7 @@ VIDEO_UPDATE( spinlbrk )
 	return 0;
 }
 
-VIDEO_UPDATE( turbofrc )
+SCREEN_UPDATE( turbofrc )
 {
 	aerofgt_state *state = screen->machine->driver_data<aerofgt_state>();
 	int i, scrolly;
@@ -988,7 +988,7 @@ VIDEO_UPDATE( turbofrc )
 	return 0;
 }
 
-VIDEO_UPDATE( aerofgt )
+SCREEN_UPDATE( aerofgt )
 {
 	aerofgt_state *state = screen->machine->driver_data<aerofgt_state>();
 	tilemap_set_scrollx(state->bg1_tilemap, 0, state->rasterram[0x0000] - 18);
@@ -1011,7 +1011,7 @@ VIDEO_UPDATE( aerofgt )
 }
 
 
-VIDEO_UPDATE( aerfboot )
+SCREEN_UPDATE( aerfboot )
 {
 	aerofgt_state *state = screen->machine->driver_data<aerofgt_state>();
 	int i, scrolly;
@@ -1034,7 +1034,7 @@ VIDEO_UPDATE( aerfboot )
 	return 0;
 }
 
-VIDEO_UPDATE( aerfboo2 )
+SCREEN_UPDATE( aerfboo2 )
 {
 	aerofgt_state *state = screen->machine->driver_data<aerofgt_state>();
 	int i, scrolly;
@@ -1061,7 +1061,7 @@ VIDEO_UPDATE( aerfboo2 )
 	return 0;
 }
 
-VIDEO_UPDATE( wbbc97 )
+SCREEN_UPDATE( wbbc97 )
 {
 	aerofgt_state *state = screen->machine->driver_data<aerofgt_state>();
 	int i, scrolly;

@@ -122,7 +122,7 @@ void simpsons_video_banking( running_machine *machine, int bank )
 
 ***************************************************************************/
 
-VIDEO_UPDATE( simpsons )
+SCREEN_UPDATE( simpsons )
 {
 	simpsons_state *state = screen->machine->driver_data<simpsons_state>();
 	int layer[3], bg_colorbase;

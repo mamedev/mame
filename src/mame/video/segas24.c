@@ -21,7 +21,7 @@ static int layer_cmp(const void *pl1, const void *pl2)
 	return default_pri[l2] - default_pri[l1];
 }
 
-VIDEO_UPDATE(system24)
+SCREEN_UPDATE(system24)
 {
 	int i, level;
 	int order[12], spri[4];

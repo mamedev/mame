@@ -230,7 +230,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( blktiger )
+SCREEN_UPDATE( blktiger )
 {
 	blktiger_state *state = screen->machine->driver_data<blktiger_state>();
 
@@ -251,7 +251,7 @@ VIDEO_UPDATE( blktiger )
 	return 0;
 }
 
-VIDEO_EOF( blktiger )
+SCREEN_EOF( blktiger )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 

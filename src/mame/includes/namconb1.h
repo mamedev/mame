@@ -20,8 +20,8 @@ extern UINT32 *namconb1_tilebank32;
 #define NAMCONB1_SPRITEGFX		1
 #define NAMCONB1_ROTGFX			2
 
-VIDEO_UPDATE( namconb1 );
+SCREEN_UPDATE( namconb1 );
 VIDEO_START( namconb1 );
 
-VIDEO_UPDATE( namconb2 );
+SCREEN_UPDATE( namconb2 );
 VIDEO_START( namconb2 );

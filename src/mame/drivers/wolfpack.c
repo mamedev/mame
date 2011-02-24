@@ -302,13 +302,13 @@ static MACHINE_CONFIG_START( wolfpack, wolfpack_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 16, 239)
+	MCFG_SCREEN_UPDATE(wolfpack)
+	MCFG_SCREEN_EOF(wolfpack)
 
 	MCFG_GFXDECODE(wolfpack)
 	MCFG_PALETTE_LENGTH(12)
 	MCFG_PALETTE_INIT(wolfpack)
 	MCFG_VIDEO_START(wolfpack)
-	MCFG_VIDEO_UPDATE(wolfpack)
-	MCFG_VIDEO_EOF(wolfpack)
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("speech", S14001A, 20000) /* RC Clock (C=100pf, R=470K-670K ohms, adjustable) ranging from 14925.37313hz to 21276.59574hz, likely factory set to 20000hz since anything below 19500 is too slow */

@@ -1,7 +1,7 @@
 /*----------- defined in video/pastelg.c -----------*/
 
 PALETTE_INIT( pastelg );
-VIDEO_UPDATE( pastelg );
+SCREEN_UPDATE( pastelg );
 VIDEO_START( pastelg );
 
 WRITE8_HANDLER( pastelg_clut_w );

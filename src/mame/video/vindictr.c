@@ -217,7 +217,7 @@ void vindictr_scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-VIDEO_UPDATE( vindictr )
+SCREEN_UPDATE( vindictr )
 {
 	vindictr_state *state = screen->machine->driver_data<vindictr_state>();
 	atarimo_rect_list rectlist;

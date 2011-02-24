@@ -34,7 +34,7 @@ public:
 
 /*----------- defined in video/starfire.c -----------*/
 
-VIDEO_UPDATE( starfire );
+SCREEN_UPDATE( starfire );
 VIDEO_START( starfire );
 
 WRITE8_HANDLER( starfire_videoram_w );

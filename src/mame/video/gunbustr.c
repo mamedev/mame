@@ -202,7 +202,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
                 SCREEN REFRESH
 **************************************************************/
 
-VIDEO_UPDATE( gunbustr )
+SCREEN_UPDATE( gunbustr )
 {
 	device_t *tc0480scp = screen->machine->device("tc0480scp");
 	UINT8 layer[5];

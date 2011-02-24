@@ -190,7 +190,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-static VIDEO_UPDATE(dblewing)
+static SCREEN_UPDATE(dblewing)
 {
 	dblewing_state *state = screen->machine->driver_data<dblewing_state>();
 	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);
@@ -753,11 +753,10 @@ static MACHINE_CONFIG_START( dblewing, dblewing_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_UPDATE(dblewing)
 
 	MCFG_PALETTE_LENGTH(4096)
 	MCFG_GFXDECODE(dblewing)
-
-	MCFG_VIDEO_UPDATE(dblewing)
 
 	MCFG_DECO16IC_ADD("deco_custom", dblewing_deco16ic_intf)
 

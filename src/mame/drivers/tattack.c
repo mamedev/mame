@@ -43,7 +43,7 @@ static TILE_GET_INFO( get_tile_info )
 		0);
 }
 
-static VIDEO_UPDATE( tattack )
+static SCREEN_UPDATE( tattack )
 {
 	tilemap_mark_all_tiles_dirty(tmap);
 	tilemap_draw(bitmap,cliprect,tmap, 0,0);
@@ -194,12 +194,12 @@ static MACHINE_CONFIG_START( tattack, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(tattack)
 
 	MCFG_GFXDECODE(tattack)
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT(tattack )
 
-	MCFG_VIDEO_UPDATE(tattack)
 	MCFG_VIDEO_START(tattack)
 
 	/* sound hardware */

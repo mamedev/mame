@@ -112,7 +112,7 @@ static VIDEO_START ( pipeline )
 	tilemap_set_transparent_pen(tilemap2,0);
 }
 
-static VIDEO_UPDATE ( pipeline )
+static SCREEN_UPDATE( pipeline )
 {
 	tilemap_draw(bitmap,cliprect,tilemap1, 0,0);
 	tilemap_draw(bitmap,cliprect,tilemap2, 0,0);
@@ -388,6 +388,7 @@ static MACHINE_CONFIG_START( pipeline, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 16, 239)
+	MCFG_SCREEN_UPDATE(pipeline)
 
 	MCFG_GFXDECODE(pipeline)
 
@@ -395,7 +396,6 @@ static MACHINE_CONFIG_START( pipeline, driver_device )
 	MCFG_PALETTE_LENGTH(0x100+0x100)
 
 	MCFG_VIDEO_START(pipeline)
-	MCFG_VIDEO_UPDATE(pipeline)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

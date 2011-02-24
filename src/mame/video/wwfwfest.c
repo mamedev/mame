@@ -251,7 +251,7 @@ VIDEO_START( wwfwfstb )
 	bg1_dx[1] = -2;
 }
 
-VIDEO_UPDATE( wwfwfest )
+SCREEN_UPDATE( wwfwfest )
 {
 	if (wwfwfest_pri == 0x0078) {
 		tilemap_set_scrolly( bg0_tilemap, 0, wwfwfest_bg0_scrolly  );

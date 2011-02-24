@@ -1446,7 +1446,7 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
 
 #define IMPORTANT_DIRTY_TILEFLAG_MASK (0x0600)
 
-VIDEO_UPDATE( hng64 )
+SCREEN_UPDATE( hng64 )
 {
 	hng64_state *state = screen->machine->driver_data<hng64_state>();
 	UINT32 *hng64_videoregs = state->videoregs;

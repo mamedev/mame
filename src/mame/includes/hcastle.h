@@ -40,5 +40,5 @@ WRITE8_HANDLER( hcastle_pf1_control_w );
 WRITE8_HANDLER( hcastle_pf2_control_w );
 
 PALETTE_INIT( hcastle );
-VIDEO_UPDATE( hcastle );
+SCREEN_UPDATE( hcastle );
 VIDEO_START( hcastle );

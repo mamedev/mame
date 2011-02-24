@@ -62,7 +62,7 @@ static VIDEO_START(hitpoker)
 	colorram = auto_alloc_array(machine, UINT8, 0x2000);
 }
 
-static VIDEO_UPDATE(hitpoker)
+static SCREEN_UPDATE(hitpoker)
 {
 	int count = 0;
 	int y,x;
@@ -475,6 +475,7 @@ static MACHINE_CONFIG_START( hitpoker, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(648, 480) //setted by the CRTC
 	MCFG_SCREEN_VISIBLE_AREA(0, 648-1, 0, 240-1)
+	MCFG_SCREEN_UPDATE(hitpoker)
 
 	MCFG_MC6845_ADD("crtc", H46505, CRTC_CLOCK/2, mc6845_intf)	/* hand tuned to get ~60 fps */
 
@@ -482,7 +483,6 @@ static MACHINE_CONFIG_START( hitpoker, driver_device )
 	MCFG_PALETTE_LENGTH(0x800)
 
 	MCFG_VIDEO_START(hitpoker)
-	MCFG_VIDEO_UPDATE(hitpoker)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

@@ -193,7 +193,7 @@ static int gp3_is_alpha_pen(running_machine *machine, int pen)
 
 }
 
-static VIDEO_UPDATE(galpani3)
+static SCREEN_UPDATE(galpani3)
 {
 	galpani3_state *state = screen->machine->driver_data<galpani3_state>();
 	int x,y;
@@ -957,11 +957,11 @@ static MACHINE_CONFIG_START( galpani3, galpani3_state )
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	//MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 64*8-1)
+	MCFG_SCREEN_UPDATE(galpani3)
 
 	MCFG_PALETTE_LENGTH(0x4303)
 
 	MCFG_VIDEO_START(galpani3)
-	MCFG_VIDEO_UPDATE(galpani3)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

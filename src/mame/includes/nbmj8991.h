@@ -1,7 +1,7 @@
 /*----------- defined in video/nbmj8991.c -----------*/
 
-VIDEO_UPDATE( nbmj8991_type1 );
-VIDEO_UPDATE( nbmj8991_type2 );
+SCREEN_UPDATE( nbmj8991_type1 );
+SCREEN_UPDATE( nbmj8991_type2 );
 VIDEO_START( nbmj8991 );
 
 WRITE8_HANDLER( nbmj8991_palette_type1_w );

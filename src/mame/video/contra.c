@@ -316,7 +316,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	k007121_sprites_draw(k007121, bitmap, cliprect, machine->gfx[bank], machine->colortable, source, base_color, 40, 0, (UINT32)-1);
 }
 
-VIDEO_UPDATE( contra )
+SCREEN_UPDATE( contra )
 {
 	contra_state *state = screen->machine->driver_data<contra_state>();
 	UINT8 ctrl_1_0 = k007121_ctrlram_r(state->k007121_1, 0);

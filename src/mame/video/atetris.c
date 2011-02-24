@@ -64,7 +64,7 @@ VIDEO_START( atetris )
  *
  *************************************/
 
-VIDEO_UPDATE( atetris )
+SCREEN_UPDATE( atetris )
 {
 	atetris_state *state = screen->machine->driver_data<atetris_state>();
 

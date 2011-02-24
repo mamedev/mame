@@ -138,7 +138,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	}
 }
 
-VIDEO_UPDATE( fantland )
+SCREEN_UPDATE( fantland )
 {
 	bitmap_fill(bitmap,cliprect,0);
 	draw_sprites(screen->machine,bitmap,cliprect);

@@ -89,12 +89,12 @@ VIDEO_START( blswhstl );
 VIDEO_START( glfgreat );
 VIDEO_START( prmrsocr );
 
-VIDEO_UPDATE( mia );
-VIDEO_UPDATE( tmnt );
-VIDEO_UPDATE( punkshot );
-VIDEO_UPDATE( lgtnfght );
-VIDEO_UPDATE( glfgreat );
-VIDEO_UPDATE( tmnt2 );
-VIDEO_UPDATE( thndrx2 );
+SCREEN_UPDATE( mia );
+SCREEN_UPDATE( tmnt );
+SCREEN_UPDATE( punkshot );
+SCREEN_UPDATE( lgtnfght );
+SCREEN_UPDATE( glfgreat );
+SCREEN_UPDATE( tmnt2 );
+SCREEN_UPDATE( thndrx2 );
 
-VIDEO_EOF( blswhstl );
+SCREEN_EOF( blswhstl );

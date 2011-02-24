@@ -382,7 +382,7 @@ static void check_collision(running_machine *machine)
  *
  *************************************/
 
-VIDEO_UPDATE( exidy )
+SCREEN_UPDATE( exidy )
 {
 	/* refresh the colors from the palette (static or dynamic) */
 	set_colors(screen->machine);

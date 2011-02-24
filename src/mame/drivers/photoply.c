@@ -95,7 +95,7 @@ static void cga_alphanumeric_tilemap(running_machine *machine, bitmap_t *bitmap,
 }
 
 
-static VIDEO_UPDATE(photoply)
+static SCREEN_UPDATE(photoply)
 {
 	cga_alphanumeric_tilemap(screen->machine,bitmap,cliprect,RES_640x200,0x18000/4,0);
 
@@ -507,6 +507,7 @@ static MACHINE_CONFIG_START( photoply, driver_device )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(photoply)
 
 	MCFG_GFXDECODE( photoply )
 
@@ -525,7 +526,6 @@ static MACHINE_CONFIG_START( photoply, driver_device )
 	MCFG_PALETTE_LENGTH(0x300)
 
 	MCFG_VIDEO_START(photoply)
-	MCFG_VIDEO_UPDATE(photoply)
 MACHINE_CONFIG_END
 
 

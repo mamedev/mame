@@ -247,7 +247,7 @@ WRITE8_HANDLER( cloud9_bitmode_addr_w )
  *
  *************************************/
 
-VIDEO_UPDATE( cloud9 )
+SCREEN_UPDATE( cloud9 )
 {
 	cloud9_state *state = screen->machine->driver_data<cloud9_state>();
 	UINT8 *spriteaddr = state->spriteram;

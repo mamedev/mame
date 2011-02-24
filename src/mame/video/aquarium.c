@@ -158,7 +158,7 @@ VIDEO_START(aquarium)
 	tilemap_set_transparent_pen(state->mid_tilemap, 0);
 }
 
-VIDEO_UPDATE(aquarium)
+SCREEN_UPDATE(aquarium)
 {
 	aquarium_state *state = screen->machine->driver_data<aquarium_state>();
 	tilemap_set_scrollx(state->mid_tilemap, 0, state->scroll[0]);

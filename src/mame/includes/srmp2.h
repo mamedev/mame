@@ -25,7 +25,7 @@ public:
 /*----------- defined in video/srmp2.c -----------*/
 
 PALETTE_INIT( srmp2 );
-VIDEO_UPDATE( srmp2 );
+SCREEN_UPDATE( srmp2 );
 PALETTE_INIT( srmp3 );
-VIDEO_UPDATE( srmp3 );
-VIDEO_UPDATE( mjyuugi );
+SCREEN_UPDATE( srmp3 );
+SCREEN_UPDATE( mjyuugi );

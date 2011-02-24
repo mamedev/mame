@@ -202,7 +202,7 @@ static VIDEO_START( jetwave )
 }
 
 
-static VIDEO_UPDATE( jetwave )
+static SCREEN_UPDATE( jetwave )
 {
 	zr107_state *state = screen->machine->driver_data<zr107_state>();
 	device_t *k001604 = screen->machine->device("k001604");
@@ -255,7 +255,7 @@ static VIDEO_START( zr107 )
 	K001005_init(machine);
 }
 
-static VIDEO_UPDATE( zr107 )
+static SCREEN_UPDATE( zr107 )
 {
 	zr107_state *state = screen->machine->driver_data<zr107_state>();
 	device_t *k056832 = screen->machine->device("k056832");
@@ -763,11 +763,11 @@ static MACHINE_CONFIG_START( zr107, zr107_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(64*8, 48*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 48*8-1)
+	MCFG_SCREEN_UPDATE(zr107)
 
 	MCFG_PALETTE_LENGTH(65536)
 
 	MCFG_VIDEO_START(zr107)
-	MCFG_VIDEO_UPDATE(zr107)
 
 	MCFG_K056832_ADD("k056832", zr107_k056832_intf)
 
@@ -824,11 +824,11 @@ static MACHINE_CONFIG_START( jetwave, zr107_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(64*8, 48*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 48*8-1)
+	MCFG_SCREEN_UPDATE(jetwave)
 
 	MCFG_PALETTE_LENGTH(65536)
 
 	MCFG_VIDEO_START(jetwave)
-	MCFG_VIDEO_UPDATE(jetwave)
 
 	MCFG_K001604_ADD("k001604", jetwave_k001604_intf)
 

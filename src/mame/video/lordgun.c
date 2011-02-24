@@ -362,7 +362,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 ***************************************************************************/
 
-VIDEO_UPDATE( lordgun )
+SCREEN_UPDATE( lordgun )
 {
 	lordgun_state *state = screen->machine->driver_data<lordgun_state>();
 	int layers_ctrl = -1;

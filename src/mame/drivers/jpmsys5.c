@@ -173,7 +173,7 @@ static VIDEO_START( jpmsys5v )
 	tms34061_start(machine, &tms34061intf);
 }
 
-static VIDEO_UPDATE( jpmsys5v )
+static SCREEN_UPDATE( jpmsys5v )
 {
 	int x, y;
 	struct tms34061_display state;
@@ -625,9 +625,9 @@ static MACHINE_CONFIG_START( jpmsys5v, jpmsys5_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz / 4, 676, 20*4, 147*4, 256, 0, 254)
+	MCFG_SCREEN_UPDATE(jpmsys5v)
 
 	MCFG_VIDEO_START(jpmsys5v)
-	MCFG_VIDEO_UPDATE(jpmsys5v)
 
 	MCFG_PALETTE_LENGTH(16)
 

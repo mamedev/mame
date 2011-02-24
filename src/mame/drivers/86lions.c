@@ -49,7 +49,7 @@ static VIDEO_START(lions)
 {
 }
 
-static VIDEO_UPDATE(lions)
+static SCREEN_UPDATE(lions)
 {
 	_86lions_state *state = screen->machine->driver_data<_86lions_state>();
 	const gfx_element *gfx = screen->machine->gfx[0];
@@ -364,13 +364,13 @@ static MACHINE_CONFIG_START( lions, _86lions_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(304, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 304-1, 0, 216-1)	/* from the crtc registers... updated by crtc */
+	MCFG_SCREEN_UPDATE(lions)
 
 	MCFG_GFXDECODE(lions)
 	MCFG_PALETTE_LENGTH(64)
 	MCFG_PALETTE_INIT(lions)
 
 	MCFG_VIDEO_START(lions)
-	MCFG_VIDEO_UPDATE(lions)
 
 	MCFG_VIA6522_ADD("via6522_0", MAIN_CLOCK/12, via_interface)	/* 1 MHz.(only 1 or 2 MHz.are valid) */
 

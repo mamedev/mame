@@ -38,11 +38,11 @@ READ8_HANDLER( psychic5_vram_page_select_r );
 
 VIDEO_START( psychic5 );
 VIDEO_RESET( psychic5 );
-VIDEO_UPDATE( psychic5 );
+SCREEN_UPDATE( psychic5 );
 
 WRITE8_HANDLER( bombsa_paged_ram_w );
 WRITE8_HANDLER( bombsa_unknown_w );
 
 VIDEO_START( bombsa );
 VIDEO_RESET( bombsa );
-VIDEO_UPDATE( bombsa );
+SCREEN_UPDATE( bombsa );

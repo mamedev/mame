@@ -85,7 +85,7 @@ static VIDEO_START(quizpun2)
 	tilemap_set_transparent_pen(fg_tmap, 0);
 }
 
-static VIDEO_UPDATE(quizpun2)
+static SCREEN_UPDATE(quizpun2)
 {
 	int layers_ctrl = -1;
 
@@ -437,12 +437,12 @@ static MACHINE_CONFIG_START( quizpun2, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE(quizpun2)
 
 	MCFG_GFXDECODE(quizpun2)
 	MCFG_PALETTE_LENGTH(0x200)
 
 	MCFG_VIDEO_START(quizpun2)
-	MCFG_VIDEO_UPDATE(quizpun2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

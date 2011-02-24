@@ -485,7 +485,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
     Draw the game screen in the given bitmap_t.
 ***************************************************************************/
 
-VIDEO_UPDATE( toaplan0 )
+SCREEN_UPDATE( toaplan0 )
 {
 	twincobr_log_vram(screen->machine);
 
@@ -503,7 +503,7 @@ VIDEO_UPDATE( toaplan0 )
 }
 
 
-VIDEO_EOF( toaplan0 )
+SCREEN_EOF( toaplan0 )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 

@@ -448,7 +448,7 @@ static void draw_bitmap( running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-VIDEO_UPDATE( bigtwin )
+SCREEN_UPDATE( bigtwin )
 {
 	playmark_state *state = screen->machine->driver_data<playmark_state>();
 
@@ -462,7 +462,7 @@ VIDEO_UPDATE( bigtwin )
 	return 0;
 }
 
-VIDEO_UPDATE( excelsr )
+SCREEN_UPDATE( excelsr )
 {
 	playmark_state *state = screen->machine->driver_data<playmark_state>();
 
@@ -476,7 +476,7 @@ VIDEO_UPDATE( excelsr )
 	return 0;
 }
 
-VIDEO_UPDATE( wbeachvl )
+SCREEN_UPDATE( wbeachvl )
 {
 	playmark_state *state = screen->machine->driver_data<playmark_state>();
 
@@ -503,7 +503,7 @@ VIDEO_UPDATE( wbeachvl )
 	return 0;
 }
 
-VIDEO_UPDATE( hrdtimes )
+SCREEN_UPDATE( hrdtimes )
 {
 	playmark_state *state = screen->machine->driver_data<playmark_state>();
 

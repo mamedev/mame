@@ -105,7 +105,7 @@ VIDEO_START( lemmings )
 	state->save_pointer(NAME(state->sprite_triple_buffer_1), 0x800 / 2);
 }
 
-VIDEO_EOF( lemmings )
+SCREEN_EOF( lemmings )
 {
 	lemmings_state *state = machine->driver_data<lemmings_state>();
 
@@ -166,7 +166,7 @@ WRITE16_HANDLER( lemmings_vram_w )
 	tilemap_mark_tile_dirty(state->vram_tilemap, offset);
 }
 
-VIDEO_UPDATE( lemmings )
+SCREEN_UPDATE( lemmings )
 {
 	lemmings_state *state = screen->machine->driver_data<lemmings_state>();
 	int x1 = -state->control_data[0];

@@ -103,7 +103,7 @@ VIDEO_START( rng )
 	state->sprite_colorbase = 0x20;
 }
 
-VIDEO_UPDATE(rng)
+SCREEN_UPDATE(rng)
 {
 	rungun_state *state = screen->machine->driver_data<rungun_state>();
 

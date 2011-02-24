@@ -46,7 +46,7 @@ PALETTE_INIT( champbas );
 PALETTE_INIT( exctsccr );
 VIDEO_START( champbas );
 VIDEO_START( exctsccr );
-VIDEO_UPDATE( champbas );
-VIDEO_UPDATE( exctsccr );
+SCREEN_UPDATE( champbas );
+SCREEN_UPDATE( exctsccr );
 
 

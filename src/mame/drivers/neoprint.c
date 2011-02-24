@@ -81,7 +81,7 @@ static void draw_layer(running_machine *machine, bitmap_t *bitmap,const rectangl
 	}
 }
 
-VIDEO_UPDATE(neoprint)
+SCREEN_UPDATE(neoprint)
 {
 	bitmap_fill(bitmap, cliprect, 0);
 
@@ -91,7 +91,7 @@ VIDEO_UPDATE(neoprint)
 	return 0;
 }
 
-VIDEO_UPDATE(nprsp)
+SCREEN_UPDATE(nprsp)
 {
 	bitmap_fill(bitmap, cliprect, 0);
 
@@ -460,11 +460,11 @@ static MACHINE_CONFIG_START( neoprint, neoprint_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(neoprint)
 
 	MCFG_PALETTE_LENGTH(0x10000)
 
 	MCFG_VIDEO_START(neoprint)
-	MCFG_VIDEO_UPDATE(neoprint)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -502,13 +502,13 @@ static MACHINE_CONFIG_START( nprsp, neoprint_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(nprsp)
 
 	MCFG_MACHINE_RESET(nprsp)
 
 	MCFG_PALETTE_LENGTH(0x10000)
 
 	MCFG_VIDEO_START(neoprint)
-	MCFG_VIDEO_UPDATE(nprsp)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

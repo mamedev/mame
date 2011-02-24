@@ -60,5 +60,5 @@ READ8_HANDLER( mermaid_collision_r );
 PALETTE_INIT( mermaid );
 PALETTE_INIT( rougien );
 VIDEO_START( mermaid );
-VIDEO_UPDATE( mermaid );
-VIDEO_EOF( mermaid );
+SCREEN_UPDATE( mermaid );
+SCREEN_EOF( mermaid );

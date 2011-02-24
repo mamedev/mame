@@ -1262,13 +1262,13 @@ static MACHINE_CONFIG_START( scramble, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(galaxold)
 
 	MCFG_GFXDECODE(scramble)
 	MCFG_PALETTE_LENGTH(32+64+2+1)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 
 	MCFG_PALETTE_INIT(scrambold)
 	MCFG_VIDEO_START(scrambold)
-	MCFG_VIDEO_UPDATE(galaxold)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1483,13 +1483,13 @@ static MACHINE_CONFIG_START( ad2083, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(galaxold)
 
 	MCFG_GFXDECODE(ad2083)
 	MCFG_PALETTE_LENGTH(32+64+2+8)	/* 32 for characters, 64 for stars, 2 for bullets, 8 for background */
 
 	MCFG_PALETTE_INIT(turtles)
 	MCFG_VIDEO_START(ad2083)
-	MCFG_VIDEO_UPDATE(galaxold)
 
 	/* sound hardware */
 

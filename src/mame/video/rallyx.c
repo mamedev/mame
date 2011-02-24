@@ -627,7 +627,7 @@ static void locomotn_draw_bullets( running_machine *machine, bitmap_t *bitmap, c
 }
 
 
-VIDEO_UPDATE( rallyx )
+SCREEN_UPDATE( rallyx )
 {
 	rallyx_state *state = screen->machine->driver_data<rallyx_state>();
 	/* the radar tilemap is just 8x32. We rely on the tilemap code to repeat it across
@@ -661,7 +661,7 @@ VIDEO_UPDATE( rallyx )
 }
 
 
-VIDEO_UPDATE( jungler )
+SCREEN_UPDATE( jungler )
 {
 	rallyx_state *state = screen->machine->driver_data<rallyx_state>();
 	/* the radar tilemap is just 8x32. We rely on the tilemap code to repeat it across
@@ -699,7 +699,7 @@ VIDEO_UPDATE( jungler )
 }
 
 
-VIDEO_UPDATE( locomotn )
+SCREEN_UPDATE( locomotn )
 {
 	rallyx_state *state = screen->machine->driver_data<rallyx_state>();
 	/* the radar tilemap is just 8x32. We rely on the tilemap code to repeat it across

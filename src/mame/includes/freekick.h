@@ -26,7 +26,7 @@ public:
 /*----------- defined in video/freekick.c -----------*/
 
 VIDEO_START(freekick);
-VIDEO_UPDATE(gigas);
-VIDEO_UPDATE(pbillrd);
-VIDEO_UPDATE(freekick);
+SCREEN_UPDATE(gigas);
+SCREEN_UPDATE(pbillrd);
+SCREEN_UPDATE(freekick);
 WRITE8_HANDLER( freek_videoram_w );

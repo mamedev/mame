@@ -45,4 +45,4 @@ public:
 
 /*----------- defined in video/taitoair.c -----------*/
 
-VIDEO_UPDATE( taitoair );
+SCREEN_UPDATE( taitoair );

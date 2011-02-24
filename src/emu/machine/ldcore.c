@@ -1212,7 +1212,7 @@ void laserdisc_overlay_enable(device_t *device, int enable)
     video update callback
 -------------------------------------------------*/
 
-VIDEO_UPDATE( laserdisc )
+SCREEN_UPDATE( laserdisc )
 {
 	device_t *laserdisc = screen->machine->m_devicelist.first(LASERDISC);
 	if (laserdisc != NULL)

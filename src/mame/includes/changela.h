@@ -52,7 +52,7 @@ public:
 /*----------- defined in video/changela.c -----------*/
 
 VIDEO_START( changela );
-VIDEO_UPDATE( changela );
+SCREEN_UPDATE( changela );
 
 WRITE8_HANDLER( changela_colors_w );
 WRITE8_HANDLER( changela_mem_device_select_w );

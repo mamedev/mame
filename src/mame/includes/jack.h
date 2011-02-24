@@ -42,8 +42,8 @@ READ8_HANDLER( jack_flipscreen_r );
 WRITE8_HANDLER( jack_flipscreen_w );
 
 VIDEO_START( jack );
-VIDEO_UPDATE( jack );
+SCREEN_UPDATE( jack );
 
 PALETTE_INIT( joinem );
 VIDEO_START( joinem );
-VIDEO_UPDATE( joinem );
+SCREEN_UPDATE( joinem );

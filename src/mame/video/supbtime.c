@@ -88,7 +88,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 /******************************************************************************/
 
-VIDEO_UPDATE(supbtime)
+SCREEN_UPDATE(supbtime)
 {
 	supbtime_state *state = screen->machine->driver_data<supbtime_state>();
 	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);

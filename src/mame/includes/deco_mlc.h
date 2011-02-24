@@ -21,5 +21,5 @@ public:
 /*----------- defined in video/deco_mlc.c -----------*/
 
 VIDEO_START( mlc );
-VIDEO_UPDATE( mlc );
-VIDEO_EOF( mlc );
+SCREEN_UPDATE( mlc );
+SCREEN_EOF( mlc );

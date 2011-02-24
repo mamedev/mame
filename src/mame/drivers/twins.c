@@ -110,7 +110,7 @@ static VIDEO_START(twins)
 	state->pal = auto_alloc_array(machine, UINT16, 0x100);
 }
 
-static VIDEO_UPDATE(twins)
+static SCREEN_UPDATE(twins)
 {
 	twins_state *state = screen->machine->driver_data<twins_state>();
 	int y,x,count;
@@ -194,11 +194,11 @@ static MACHINE_CONFIG_START( twins, twins_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320,256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+	MCFG_SCREEN_UPDATE(twins)
 
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(twins)
-	MCFG_VIDEO_UPDATE(twins)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -217,7 +217,7 @@ static VIDEO_START(twinsa)
 	state->pal = auto_alloc_array(machine, UINT16, 0x1000);
 }
 
-static VIDEO_UPDATE(twinsa)
+static SCREEN_UPDATE(twinsa)
 {
 	twins_state *state = screen->machine->driver_data<twins_state>();
 	int y,x,count;
@@ -285,11 +285,11 @@ static MACHINE_CONFIG_START( twinsa, twins_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320,256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+	MCFG_SCREEN_UPDATE(twinsa)
 
 	MCFG_PALETTE_LENGTH(0x1000)
 
 	MCFG_VIDEO_START(twinsa)
-	MCFG_VIDEO_UPDATE(twinsa)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

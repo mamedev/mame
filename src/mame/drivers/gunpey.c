@@ -57,7 +57,7 @@ static VIDEO_START( gunpey )
 	blit_buffer = auto_alloc_array(machine, UINT16, 512*512);
 }
 
-static VIDEO_UPDATE( gunpey )
+static SCREEN_UPDATE( gunpey )
 {
 	int x,y;
 	int count;
@@ -328,12 +328,12 @@ static MACHINE_CONFIG_START( gunpey, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 512-1)
+	MCFG_SCREEN_UPDATE(gunpey)
 
 	MCFG_PALETTE_LENGTH(0x800)
 	MCFG_PALETTE_INIT(gunpey)
 
 	MCFG_VIDEO_START(gunpey)
-	MCFG_VIDEO_UPDATE(gunpey)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 

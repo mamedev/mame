@@ -147,7 +147,7 @@ static VIDEO_START( vega )
 	state->vega_vram = auto_alloc_array(machine, UINT32, 0x14000*2/4);
 }
 
-static VIDEO_UPDATE( vega )
+static SCREEN_UPDATE( vega )
 {
 	vegaeo_state *state = screen->machine->driver_data<vegaeo_state>();
 	int x,y,count;
@@ -191,11 +191,11 @@ static MACHINE_CONFIG_START( vega, vegaeo_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_UPDATE(vega)
 
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_VIDEO_START(vega)
-	MCFG_VIDEO_UPDATE(vega)
 
 	/* sound hardware */
 	MCFG_AT28C16_ADD( "at28c16", NULL )

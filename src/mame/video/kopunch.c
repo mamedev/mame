@@ -97,7 +97,7 @@ VIDEO_START( kopunch )
 	tilemap_set_scrolldx(state->bg_tilemap, 16, 16);
 }
 
-VIDEO_UPDATE( kopunch )
+SCREEN_UPDATE( kopunch )
 {
 	kopunch_state *state = screen->machine->driver_data<kopunch_state>();
 

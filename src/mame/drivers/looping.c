@@ -277,7 +277,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 }
 
 
-static VIDEO_UPDATE( looping )
+static SCREEN_UPDATE( looping )
 {
 	looping_state *state = screen->machine->driver_data<looping_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
@@ -634,13 +634,13 @@ static MACHINE_CONFIG_START( looping, looping_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_UPDATE(looping)
 
 	MCFG_GFXDECODE(looping)
 	MCFG_PALETTE_LENGTH(32)
 
 	MCFG_PALETTE_INIT(looping)
 	MCFG_VIDEO_START(looping)
-	MCFG_VIDEO_UPDATE(looping)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

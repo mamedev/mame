@@ -70,7 +70,7 @@ VIDEO_START( rampart )
  *
  *************************************/
 
-VIDEO_UPDATE( rampart )
+SCREEN_UPDATE( rampart )
 {
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;

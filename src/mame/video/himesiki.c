@@ -117,7 +117,7 @@ static void himesiki_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 	}
 }
 
-VIDEO_UPDATE( himesiki )
+SCREEN_UPDATE( himesiki )
 {
 	himesiki_state *state = screen->machine->driver_data<himesiki_state>();
 	int x = -(state->scrollx[0] << 8 | state->scrollx[1]) & 0x1ff;

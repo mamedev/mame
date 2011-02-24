@@ -118,7 +118,7 @@ static void draw_main(running_machine *machine, bitmap_t *bitmap, const rectangl
 
 }
 
-static VIDEO_UPDATE( blackt96 )
+static SCREEN_UPDATE( blackt96 )
 {
 	int count;
 	int x,y;
@@ -488,11 +488,11 @@ static MACHINE_CONFIG_START( blackt96, driver_device )
 	MCFG_SCREEN_SIZE(256, 256)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 16*32-1, 0*8, 16*32-1)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 256-1, 0*8, 208-1)
+	MCFG_SCREEN_UPDATE(blackt96)
 
 	MCFG_PALETTE_LENGTH(0x800)
 
 	MCFG_VIDEO_START(blackt96)
-	MCFG_VIDEO_UPDATE(blackt96)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

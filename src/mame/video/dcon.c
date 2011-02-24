@@ -269,7 +269,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectan
 	}
 }
 
-VIDEO_UPDATE( dcon )
+SCREEN_UPDATE( dcon )
 {
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
@@ -294,7 +294,7 @@ VIDEO_UPDATE( dcon )
 	return 0;
 }
 
-VIDEO_UPDATE( sdgndmps )
+SCREEN_UPDATE( sdgndmps )
 {
 	static int last_gfx_bank=0;
 

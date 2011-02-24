@@ -31,7 +31,7 @@ public:
  *
  *************************************/
 
-static VIDEO_UPDATE( embargo )
+static SCREEN_UPDATE( embargo )
 {
 	embargo_state *state = screen->machine->driver_data<embargo_state>();
 	offs_t offs;
@@ -263,13 +263,12 @@ static MACHINE_CONFIG_START( embargo, embargo_state )
 	MCFG_MACHINE_RESET(embargo)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(embargo)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_UPDATE(embargo)
 
 MACHINE_CONFIG_END
 

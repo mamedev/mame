@@ -25,7 +25,7 @@ extern int esripsys__12sel;
 extern int esripsys_video_firq_en;
 
 VIDEO_START( esripsys );
-VIDEO_UPDATE( esripsys );
+SCREEN_UPDATE( esripsys );
 
 WRITE8_HANDLER( esripsys_bg_intensity_w );
 INTERRUPT_GEN( esripsys_vblank_irq );

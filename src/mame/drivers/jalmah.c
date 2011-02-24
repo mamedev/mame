@@ -345,7 +345,7 @@ static void draw_sc3_layer(bitmap_t *bitmap, const rectangle *cliprect)
 	}
 }
 
-static VIDEO_UPDATE( jalmah )
+static SCREEN_UPDATE( jalmah )
 {
 	static UINT8 cur_prin;
 	jalmah_priority_system(screen->machine);
@@ -404,7 +404,7 @@ static VIDEO_UPDATE( jalmah )
 	return 0;
 }
 
-static VIDEO_UPDATE( urashima )
+static SCREEN_UPDATE( urashima )
 {
 	/*this game doesn't use the RANGE register at all.*/
 	tilemap_set_scrollx( sc0_tilemap_0, 0, jm_scrollram[0]);
@@ -1317,12 +1317,12 @@ static MACHINE_CONFIG_START( jalmah, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(jalmah)
 
 	MCFG_PALETTE_LENGTH(0x400)
 	MCFG_MACHINE_RESET(jalmah)
 
 	MCFG_VIDEO_START(jalmah)
-	MCFG_VIDEO_UPDATE(jalmah)
 
 	MCFG_TIMER_ADD_PERIODIC("mcusim", jalmah_mcu_sim, attotime::from_hz(10000)) // not real, but for simulating the MCU
 
@@ -1339,7 +1339,8 @@ static MACHINE_CONFIG_DERIVED( urashima, jalmah )
 	MCFG_GFXDECODE(urashima)
 
 	MCFG_VIDEO_START(urashima)
-	MCFG_VIDEO_UPDATE(urashima)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(urashima)
 MACHINE_CONFIG_END
 
 /*

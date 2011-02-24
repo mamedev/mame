@@ -445,7 +445,7 @@ WRITE32_HANDLER( gaelco3d_paletteram_020_w )
  *
  *************************************/
 
-VIDEO_UPDATE( gaelco3d )
+SCREEN_UPDATE( gaelco3d )
 {
 	gaelco3d_state *state = screen->machine->driver_data<gaelco3d_state>();
 	int x, y, ret;

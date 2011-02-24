@@ -434,7 +434,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 	tilemap_draw(bitmap, &clip, state->bg_tilemap, 0, 0);
 }
 
-VIDEO_UPDATE( psychic5 )
+SCREEN_UPDATE( psychic5 )
 {
 	psychic5_state *state = screen->machine->driver_data<psychic5_state>();
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
@@ -446,7 +446,7 @@ VIDEO_UPDATE( psychic5 )
 	return 0;
 }
 
-VIDEO_UPDATE( bombsa )
+SCREEN_UPDATE( bombsa )
 {
 	psychic5_state *state = screen->machine->driver_data<psychic5_state>();
 	if (state->bg_status & 1)	/* Backgound enable */

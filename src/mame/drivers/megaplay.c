@@ -618,17 +618,17 @@ static VIDEO_START(megplay)
 //  VIDEO_START_CALL(megaplay_normal);
 }
 
-static VIDEO_UPDATE(megplay)
+static SCREEN_UPDATE(megplay)
 {
 	//printf("megplay vu\n");
-	VIDEO_UPDATE_CALL(megadriv);
-//  VIDEO_UPDATE_CALL(megaplay_normal);
-	VIDEO_UPDATE_CALL(megaplay_bios);
+	SCREEN_UPDATE_CALL(megadriv);
+//  SCREEN_UPDATE_CALL(megaplay_normal);
+	SCREEN_UPDATE_CALL(megaplay_bios);
 	return 0;
 }
 
 
-//extern VIDEO_EOF(megadriv);
+//extern SCREEN_EOF(megadriv);
 static MACHINE_RESET( megaplay )
 {
 	mplay_state *state = machine->driver_data<mplay_state>();
@@ -639,10 +639,10 @@ static MACHINE_RESET( megaplay )
 	MACHINE_RESET_CALL(megatech_bios);
 }
 
-static VIDEO_EOF( megaplay )
+static SCREEN_EOF( megaplay )
 {
-	VIDEO_EOF_CALL(megadriv);
-	VIDEO_EOF_CALL(megatech_bios);
+	SCREEN_EOF_CALL(megadriv);
+	SCREEN_EOF_CALL(megatech_bios);
 }
 
 static MACHINE_CONFIG_START( megaplay, mplay_state )
@@ -657,7 +657,6 @@ static MACHINE_CONFIG_START( megaplay, mplay_state )
 	//MCFG_CPU_VBLANK_INT_HACK(megaplay_bios_irq, 262)
 
 	MCFG_MACHINE_RESET( megaplay )
-	MCFG_VIDEO_EOF( megaplay )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -667,7 +666,9 @@ static MACHINE_CONFIG_START( megaplay, mplay_state )
 
 	/* New update functions to handle the extra layer */
 	MCFG_VIDEO_START(megplay)
-	MCFG_VIDEO_UPDATE(megplay)
+	MCFG_SCREEN_MODIFY("megadriv")
+	MCFG_SCREEN_UPDATE(megplay)
+	MCFG_SCREEN_EOF( megaplay )
 MACHINE_CONFIG_END
 
 

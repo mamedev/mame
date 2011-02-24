@@ -87,7 +87,7 @@ static VIDEO_START( supdrapo )
 }
 
 
-static VIDEO_UPDATE( supdrapo )
+static SCREEN_UPDATE( supdrapo )
 {
 	supdrapo_state *state = screen->machine->driver_data<supdrapo_state>();
 	int x, y;
@@ -448,13 +448,13 @@ static MACHINE_CONFIG_START( supdrapo, supdrapo_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(supdrapo)
 
 	MCFG_GFXDECODE(supdrapo)
 	MCFG_PALETTE_LENGTH(0x100)
 	MCFG_PALETTE_INIT(sdpoker)
 
 	MCFG_VIDEO_START(supdrapo)
-	MCFG_VIDEO_UPDATE(supdrapo)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

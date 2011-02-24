@@ -71,7 +71,7 @@ public:
 	void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT8* primap );
 	void gp9001_draw_custom_tilemap(running_machine* machine, bitmap_t* bitmap, tilemap_t* tilemap, const UINT8* priremap, const UINT8* pri_enable );
 	void gp9001_render_vdp(running_machine* machine, bitmap_t* bitmap, const rectangle* cliprect);
-	void gp9001_video_eof(void);
+	void gp9001_screen_eof(void);
 	void create_tilemaps(int region);
 	void init_scroll_regs(void);
 

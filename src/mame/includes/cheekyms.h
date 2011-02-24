@@ -30,6 +30,6 @@ public:
 
 PALETTE_INIT( cheekyms );
 VIDEO_START( cheekyms );
-VIDEO_UPDATE( cheekyms );
+SCREEN_UPDATE( cheekyms );
 WRITE8_HANDLER( cheekyms_port_40_w );
 WRITE8_HANDLER( cheekyms_port_80_w );

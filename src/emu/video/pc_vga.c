@@ -189,7 +189,7 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_vga )
 
 	MCFG_VIDEO_START(vga)
 	MCFG_VIDEO_RESET(vga)
-	MCFG_VIDEO_UPDATE(pc_video)
+	MCFG_SCREEN_UPDATE(pc_video)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( pcvideo_pc1640 )
@@ -202,7 +202,7 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_pc1640 )
 
 	MCFG_VIDEO_START(ega)
 	MCFG_VIDEO_RESET(ega)
-	MCFG_VIDEO_UPDATE(pc_video)
+	MCFG_SCREEN_UPDATE(pc_video)
 MACHINE_CONFIG_END
 
 /***************************************************************************/

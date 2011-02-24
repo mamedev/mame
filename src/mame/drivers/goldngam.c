@@ -248,7 +248,7 @@ static VIDEO_START( goldngam )
 
 }
 
-static VIDEO_UPDATE( goldngam )
+static SCREEN_UPDATE( goldngam )
 {
 
 	int x, y;
@@ -555,6 +555,7 @@ static MACHINE_CONFIG_START( swisspkr, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 43*8-1, 1*8, 37*8-1)	// 312x288
+	MCFG_SCREEN_UPDATE(goldngam)
 
 	MCFG_GFXDECODE(goldngam)
 
@@ -562,7 +563,6 @@ static MACHINE_CONFIG_START( swisspkr, driver_device )
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_VIDEO_START(goldngam)
-	MCFG_VIDEO_UPDATE(goldngam)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

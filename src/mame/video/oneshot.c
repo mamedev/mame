@@ -156,7 +156,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 }
 
-VIDEO_UPDATE( oneshot )
+SCREEN_UPDATE( oneshot )
 {
 	oneshot_state *state = screen->machine->driver_data<oneshot_state>();
 
@@ -173,7 +173,7 @@ VIDEO_UPDATE( oneshot )
 	return 0;
 }
 
-VIDEO_UPDATE( maddonna )
+SCREEN_UPDATE( maddonna )
 {
 	oneshot_state *state = screen->machine->driver_data<oneshot_state>();
 

@@ -87,7 +87,7 @@ WRITE8_HANDLER( speedatk_6845_w )
 	}
 }
 
-VIDEO_UPDATE( speedatk )
+SCREEN_UPDATE( speedatk )
 {
 	speedatk_state *state = screen->machine->driver_data<speedatk_state>();
 	int x,y;

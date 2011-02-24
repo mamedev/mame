@@ -42,7 +42,7 @@ WRITE16_HANDLER( jumping_spritectrl_w )
 
 /***************************************************************************/
 
-VIDEO_UPDATE( rainbow )
+SCREEN_UPDATE( rainbow )
 {
 	rainbow_state *state = screen->machine->driver_data<rainbow_state>();
 	int layer[2];
@@ -87,7 +87,7 @@ VIDEO_START( jumping )
 }
 
 
-VIDEO_UPDATE( jumping )
+SCREEN_UPDATE( jumping )
 {
 	rainbow_state *state = screen->machine->driver_data<rainbow_state>();
 	UINT16 *spriteram = state->spriteram;

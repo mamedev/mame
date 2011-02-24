@@ -469,7 +469,7 @@ static VIDEO_START( vidadcba )
 }
 
 
-static VIDEO_UPDATE( videopkr )
+static SCREEN_UPDATE( videopkr )
 {
 	tilemap_mark_all_tiles_dirty(bg_tilemap);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
@@ -1201,11 +1201,12 @@ static MACHINE_CONFIG_START( videopkr, driver_device )
 
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(2080)
+	MCFG_SCREEN_UPDATE(videopkr)
+
 	MCFG_GFXDECODE(videopkr)
 	MCFG_PALETTE_INIT(videopkr)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_VIDEO_START(videopkr)
-	MCFG_VIDEO_UPDATE(videopkr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

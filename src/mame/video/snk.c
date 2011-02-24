@@ -990,7 +990,7 @@ static void tdfever_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 
 /**************************************************************/
 
-VIDEO_UPDATE( marvins )
+SCREEN_UPDATE( marvins )
 {
 	snk_state *state = screen->machine->driver_data<snk_state>();
 
@@ -1009,7 +1009,7 @@ VIDEO_UPDATE( marvins )
 }
 
 
-VIDEO_UPDATE( tnk3 )
+SCREEN_UPDATE( tnk3 )
 {
 	snk_state *state = screen->machine->driver_data<snk_state>();
 
@@ -1024,7 +1024,7 @@ VIDEO_UPDATE( tnk3 )
 }
 
 
-VIDEO_UPDATE( ikari )
+SCREEN_UPDATE( ikari )
 {
 	snk_state *state = screen->machine->driver_data<snk_state>();
 
@@ -1042,7 +1042,7 @@ VIDEO_UPDATE( ikari )
 }
 
 
-VIDEO_UPDATE( gwar )
+SCREEN_UPDATE( gwar )
 {
 	snk_state *state = screen->machine->driver_data<snk_state>();
 
@@ -1061,7 +1061,7 @@ VIDEO_UPDATE( gwar )
 }
 
 
-VIDEO_UPDATE( tdfever )
+SCREEN_UPDATE( tdfever )
 {
 	snk_state *state = screen->machine->driver_data<snk_state>();
 

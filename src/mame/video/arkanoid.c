@@ -202,7 +202,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 }
 
 
-VIDEO_UPDATE( arkanoid )
+SCREEN_UPDATE( arkanoid )
 {
 	arkanoid_state *state = screen->machine->driver_data<arkanoid_state>();
 
@@ -211,7 +211,7 @@ VIDEO_UPDATE( arkanoid )
 	return 0;
 }
 
-VIDEO_UPDATE( hexa )
+SCREEN_UPDATE( hexa )
 {
 	arkanoid_state *state = screen->machine->driver_data<arkanoid_state>();
 

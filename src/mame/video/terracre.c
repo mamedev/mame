@@ -201,7 +201,7 @@ VIDEO_START( amazon )
 	state_save_register_global(machine, yscroll);
 }
 
-VIDEO_UPDATE( amazon )
+SCREEN_UPDATE( amazon )
 {
 	if( xscroll&0x2000 )
 		bitmap_fill( bitmap,cliprect ,get_black_pen(screen->machine));

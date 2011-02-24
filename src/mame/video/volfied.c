@@ -128,7 +128,7 @@ static void refresh_pixel_layer( running_machine *machine, bitmap_t *bitmap )
 	}
 }
 
-VIDEO_UPDATE( volfied )
+SCREEN_UPDATE( volfied )
 {
 	volfied_state *state = screen->machine->driver_data<volfied_state>();
 

@@ -37,5 +37,5 @@ WRITE8_HANDLER( gberet_sprite_bank_w );
 
 PALETTE_INIT( gberet );
 VIDEO_START( gberet );
-VIDEO_UPDATE( gberet );
-VIDEO_UPDATE( gberetb );
+SCREEN_UPDATE( gberet );
+SCREEN_UPDATE( gberetb );

@@ -105,7 +105,7 @@ static WRITE8_HANDLER( sbw_videoram_w )
 	}
 }
 
-static VIDEO_UPDATE(sbowling)
+static SCREEN_UPDATE(sbowling)
 {
 	sbowling_state *state = screen->machine->driver_data<sbowling_state>();
 
@@ -382,11 +382,11 @@ static MACHINE_CONFIG_START( sbowling, sbowling_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 262)		/* vert size taken from mw8080bw */
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(sbowling)
 
 	MCFG_PALETTE_LENGTH(0x400)
 	MCFG_PALETTE_INIT(sbowling)
 	MCFG_VIDEO_START(sbowling)
-	MCFG_VIDEO_UPDATE(sbowling)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

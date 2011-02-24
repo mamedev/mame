@@ -175,7 +175,7 @@ static void update_palette( running_machine *machine )
 	}
 } /* update_palette */
 
-static VIDEO_UPDATE(gal3)
+static SCREEN_UPDATE(gal3)
 {
 	int i;
 	char mst[18], slv[18];
@@ -664,6 +664,7 @@ static MACHINE_CONFIG_START( gal3, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 512-1)
+	MCFG_SCREEN_UPDATE(gal3)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -671,12 +672,12 @@ static MACHINE_CONFIG_START( gal3, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 512-1)
+	MCFG_SCREEN_UPDATE(gal3)
 
 	MCFG_GFXDECODE(namcos21)
 	MCFG_PALETTE_LENGTH(NAMCOS21_NUM_COLORS)
 
 	MCFG_VIDEO_START(gal3)
-	MCFG_VIDEO_UPDATE(gal3)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

@@ -15,10 +15,10 @@ extern UINT16 *toki_background2_videoram16;
 extern UINT16 *toki_scrollram16;
 
 VIDEO_START( toki );
-VIDEO_EOF( toki );
-VIDEO_EOF( tokib );
-VIDEO_UPDATE( toki );
-VIDEO_UPDATE( tokib );
+SCREEN_EOF( toki );
+SCREEN_EOF( tokib );
+SCREEN_UPDATE( toki );
+SCREEN_UPDATE( tokib );
 WRITE16_HANDLER( toki_background1_videoram16_w );
 WRITE16_HANDLER( toki_background2_videoram16_w );
 WRITE16_HANDLER( toki_control_w );

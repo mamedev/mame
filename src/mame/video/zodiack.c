@@ -195,7 +195,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( zodiack )
+SCREEN_UPDATE( zodiack )
 {
 	zodiack_state *state = screen->machine->driver_data<zodiack_state>();
 	int i;

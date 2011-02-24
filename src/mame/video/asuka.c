@@ -19,7 +19,7 @@ WRITE16_HANDLER( asuka_spritectrl_w )
                         SCREEN REFRESH
 **************************************************************/
 
-VIDEO_UPDATE( asuka )
+SCREEN_UPDATE( asuka )
 {
 	asuka_state *state = screen->machine->driver_data<asuka_state>();
 	UINT8 layer[3];
@@ -45,7 +45,7 @@ VIDEO_UPDATE( asuka )
 }
 
 
-VIDEO_UPDATE( bonzeadv )
+SCREEN_UPDATE( bonzeadv )
 {
 	asuka_state *state = screen->machine->driver_data<asuka_state>();
 	UINT8 layer[3];

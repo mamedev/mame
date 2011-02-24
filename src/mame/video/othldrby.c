@@ -180,7 +180,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( othldrby )
+SCREEN_UPDATE( othldrby )
 {
 	othldrby_state *state = screen->machine->driver_data<othldrby_state>();
 	int layer;
@@ -224,7 +224,7 @@ VIDEO_UPDATE( othldrby )
 	return 0;
 }
 
-VIDEO_EOF( othldrby )
+SCREEN_EOF( othldrby )
 {
 	othldrby_state *state = machine->driver_data<othldrby_state>();
 

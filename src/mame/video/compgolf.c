@@ -118,7 +118,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( compgolf )
+SCREEN_UPDATE( compgolf )
 {
 	compgolf_state *state = screen->machine->driver_data<compgolf_state>();
 	int scrollx = state->scrollx_hi + state->scrollx_lo;

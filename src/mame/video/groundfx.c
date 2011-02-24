@@ -199,7 +199,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
                 SCREEN REFRESH
 **************************************************************/
 
-VIDEO_UPDATE( groundfx )
+SCREEN_UPDATE( groundfx )
 {
 	groundfx_state *state = screen->machine->driver_data<groundfx_state>();
 	device_t *tc0100scn = screen->machine->device("tc0100scn");

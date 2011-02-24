@@ -116,7 +116,7 @@ VIDEO_START( drmicro)
 	tilemap_set_transparent_pen(state->bg2, 0);
 }
 
-VIDEO_UPDATE( drmicro )
+SCREEN_UPDATE( drmicro )
 {
 	drmicro_state *state = screen->machine->driver_data<drmicro_state>();
 	int offs, adr, g;

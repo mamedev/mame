@@ -71,7 +71,7 @@ static VIDEO_START( itgambl2 )
 }
 
 /* (dirty) debug code for looking 8bpps blitter-based gfxs */
-static VIDEO_UPDATE( itgambl2 )
+static SCREEN_UPDATE( itgambl2 )
 {
 	int x,y,count;
 	const UINT8 *blit_ram = screen->machine->region("gfx1")->base();
@@ -260,13 +260,14 @@ static MACHINE_CONFIG_START( itgambl2, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE( itgambl2 )
+
 	MCFG_MACHINE_RESET( itgambl2 )
 	MCFG_PALETTE_INIT( itgambl2 )
 
 	MCFG_GFXDECODE(itgambl2)
 	MCFG_PALETTE_LENGTH(0x200)
 	MCFG_VIDEO_START( itgambl2 )
-	MCFG_VIDEO_UPDATE( itgambl2 )
 
     /* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

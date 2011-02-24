@@ -201,7 +201,7 @@ VIDEO_START(taotaido)
 }
 
 
-VIDEO_UPDATE(taotaido)
+SCREEN_UPDATE(taotaido)
 {
 //  tilemap_set_scrollx(bg_tilemap,0,(taotaido_scrollram[0x380/2]>>4)); // the values put here end up being wrong every other frame
 //  tilemap_set_scrolly(bg_tilemap,0,(taotaido_scrollram[0x382/2]>>4)); // the values put here end up being wrong every other frame
@@ -230,7 +230,7 @@ VIDEO_UPDATE(taotaido)
 	return 0;
 }
 
-VIDEO_EOF( taotaido )
+SCREEN_EOF( taotaido )
 {
 	/* sprites need to be delayed by 2 frames? */
 

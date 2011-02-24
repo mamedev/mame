@@ -66,8 +66,8 @@ extern UINT8 megadrive_io_ctrl_regs[3];
 MACHINE_START( megadriv );
 MACHINE_RESET( megadriv );
 VIDEO_START( megadriv );
-VIDEO_UPDATE( megadriv );
-VIDEO_EOF( megadriv );
+SCREEN_UPDATE( megadriv );
+SCREEN_EOF( megadriv );
 
 
 extern UINT16* megadrive_vdp_palette_lookup;

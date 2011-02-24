@@ -77,7 +77,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-static VIDEO_UPDATE(hanaroku)
+static SCREEN_UPDATE(hanaroku)
 {
 	bitmap_fill(bitmap, cliprect, 0x1f0);	// ???
 	draw_sprites(screen->machine, bitmap, cliprect);
@@ -270,13 +270,13 @@ static MACHINE_CONFIG_START( hanaroku, albazc_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 48*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(hanaroku)
 
 	MCFG_GFXDECODE(hanaroku)
 	MCFG_PALETTE_LENGTH(0x200)
 
 	MCFG_PALETTE_INIT(hanaroku)
 	MCFG_VIDEO_START(hanaroku)
-	MCFG_VIDEO_UPDATE(hanaroku)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

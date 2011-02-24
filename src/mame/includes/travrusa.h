@@ -24,4 +24,4 @@ WRITE8_HANDLER( travrusa_flipscreen_w );
 PALETTE_INIT( travrusa );
 PALETTE_INIT( shtrider );
 VIDEO_START( travrusa );
-VIDEO_UPDATE( travrusa );
+SCREEN_UPDATE( travrusa );

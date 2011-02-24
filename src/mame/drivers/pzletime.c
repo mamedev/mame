@@ -74,7 +74,7 @@ static VIDEO_START( pzletime )
 	tilemap_set_transparent_pen(state->txt_tilemap, 0);
 }
 
-static VIDEO_UPDATE( pzletime )
+static SCREEN_UPDATE( pzletime )
 {
 	pzletime_state *state = screen->machine->driver_data<pzletime_state>();
 	int count;
@@ -323,13 +323,13 @@ static MACHINE_CONFIG_START( pzletime, pzletime_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_UPDATE(pzletime)
 	MCFG_GFXDECODE(pzletime)
 	MCFG_PALETTE_LENGTH(0x300 + 32768)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	MCFG_PALETTE_INIT(pzletime)
 	MCFG_VIDEO_START(pzletime)
-	MCFG_VIDEO_UPDATE(pzletime)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

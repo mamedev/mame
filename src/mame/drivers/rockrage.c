@@ -315,6 +315,7 @@ static MACHINE_CONFIG_START( rockrage, rockrage_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(rockrage)
 
 	MCFG_K007342_ADD("k007342", rockrage_k007342_intf)
 	MCFG_K007420_ADD("k007420", rockrage_k007420_intf)
@@ -323,7 +324,6 @@ static MACHINE_CONFIG_START( rockrage, rockrage_state )
 	MCFG_PALETTE_LENGTH(64 + 2*16*16)
 
 	MCFG_PALETTE_INIT(rockrage)
-	MCFG_VIDEO_UPDATE(rockrage)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

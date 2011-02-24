@@ -312,7 +312,7 @@ static void fuuki32_draw_layer( running_machine *machine, bitmap_t *bitmap, cons
 	}
 }
 
-VIDEO_UPDATE( fuuki32 )
+SCREEN_UPDATE( fuuki32 )
 {
 	fuuki32_state *state = screen->machine->driver_data<fuuki32_state>();
 	UINT16 layer0_scrollx, layer0_scrolly;
@@ -373,7 +373,7 @@ VIDEO_UPDATE( fuuki32 )
 	return 0;
 }
 
-VIDEO_EOF( fuuki32 )
+SCREEN_EOF( fuuki32 )
 {
 	fuuki32_state *state = machine->driver_data<fuuki32_state>();
 

@@ -58,7 +58,7 @@ WRITE8_HANDLER( djboy_paletteram_w )
 	palette_set_color_rgb(space->machine, offset / 2, pal4bit(val >> 8), pal4bit(val >> 4), pal4bit(val >> 0));
 }
 
-VIDEO_UPDATE( djboy )
+SCREEN_UPDATE( djboy )
 {
 	/**
      * xx------ msb x
@@ -81,7 +81,7 @@ VIDEO_UPDATE( djboy )
 	return 0;
 }
 
-VIDEO_EOF( djboy )
+SCREEN_EOF( djboy )
 {
 	djboy_state *state = machine->driver_data<djboy_state>();
 	pandora_eof(state->pandora);

@@ -209,7 +209,7 @@ static WRITE8_HANDLER( mjderngr_palbank_w )
 }
 
 
-static VIDEO_UPDATE( royalmah )
+static SCREEN_UPDATE( royalmah )
 {
 	royalmah_state *state = screen->machine->driver_data<royalmah_state>();
 	UINT8 *videoram = state->videoram;
@@ -3178,7 +3178,6 @@ static MACHINE_CONFIG_START( royalmah, royalmah_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(royalmah)
 	MCFG_PALETTE_LENGTH(16*2)
 	MCFG_PALETTE_INIT(royalmah)
 
@@ -3188,6 +3187,7 @@ static MACHINE_CONFIG_START( royalmah, royalmah_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 247)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_UPDATE(royalmah)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

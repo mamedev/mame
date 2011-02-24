@@ -236,7 +236,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-VIDEO_UPDATE( cloak )
+SCREEN_UPDATE( cloak )
 {
 	cloak_state *state = screen->machine->driver_data<cloak_state>();
 	set_pens(screen->machine);

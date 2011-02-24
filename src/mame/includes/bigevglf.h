@@ -60,7 +60,7 @@ READ8_HANDLER( bigevglf_mcu_status_r );
 /*----------- defined in video/bigevglf.c -----------*/
 
 VIDEO_START( bigevglf );
-VIDEO_UPDATE( bigevglf );
+SCREEN_UPDATE( bigevglf );
 
 READ8_HANDLER( bigevglf_vidram_r );
 WRITE8_HANDLER( bigevglf_vidram_w );

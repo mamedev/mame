@@ -81,7 +81,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 /******************************************************************************/
 
-VIDEO_UPDATE( stadhero )
+SCREEN_UPDATE( stadhero )
 {
 	stadhero_state *state = screen->machine->driver_data<stadhero_state>();
 	state->flipscreen=state->pf2_control_0[0]&0x80;

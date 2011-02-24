@@ -105,7 +105,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-VIDEO_UPDATE(pirates)
+SCREEN_UPDATE(pirates)
 {
 	tilemap_set_scrollx(bg_tilemap,0,pirates_scroll[0]);
 	tilemap_set_scrollx(fg_tilemap,0,pirates_scroll[0]);

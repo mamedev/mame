@@ -245,7 +245,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const recta
 }
 
 
-VIDEO_UPDATE( ginganin )
+SCREEN_UPDATE( ginganin )
 {
 	ginganin_state *state = screen->machine->driver_data<ginganin_state>();
 	int layers_ctrl1 = state->layers_ctrl;

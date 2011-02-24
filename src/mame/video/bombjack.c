@@ -133,7 +133,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( bombjack )
+SCREEN_UPDATE( bombjack )
 {
 	bombjack_state *state = screen->machine->driver_data<bombjack_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);

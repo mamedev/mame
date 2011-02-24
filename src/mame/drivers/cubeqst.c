@@ -94,7 +94,7 @@ static WRITE16_HANDLER( palette_w )
 }
 
 /* TODO: This is a simplified version of what actually happens */
-static VIDEO_UPDATE( cubeqst )
+static SCREEN_UPDATE( cubeqst )
 {
 	int y;
 

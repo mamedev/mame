@@ -322,7 +322,7 @@ static void draw_roz(bitmap_t *bitmap, const rectangle *cliprect,int priority)
 
 
 
-VIDEO_UPDATE( ms32 )
+SCREEN_UPDATE( ms32 )
 {
 	int scrollx,scrolly;
 	int asc_pri;

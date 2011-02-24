@@ -445,11 +445,11 @@ static MACHINE_CONFIG_START( policetr, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(400, 262)	/* needs to be verified */
 	MCFG_SCREEN_VISIBLE_AREA(0, 393, 0, 239)
+	MCFG_SCREEN_UPDATE(policetr)
 
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_VIDEO_START(policetr)
-	MCFG_VIDEO_UPDATE(policetr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

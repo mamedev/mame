@@ -17,7 +17,7 @@ PALETTE_INIT( galpanic );
 WRITE16_HANDLER( galpanic_bgvideoram_w );
 WRITE16_HANDLER( galpanic_paletteram_w );
 VIDEO_START( galpanic );
-VIDEO_UPDATE( galpanic );
-VIDEO_UPDATE( comad );
+SCREEN_UPDATE( galpanic );
+SCREEN_UPDATE( comad );
 
 

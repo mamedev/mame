@@ -441,12 +441,12 @@ static MACHINE_CONFIG_START( wwfsstar, wwfsstar_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 320, 0, 256, 272, 8, 248)	/* HTOTAL and VTOTAL are guessed */
+	MCFG_SCREEN_UPDATE(wwfsstar)
 
 	MCFG_GFXDECODE(wwfsstar)
 	MCFG_PALETTE_LENGTH(384)
 
 	MCFG_VIDEO_START(wwfsstar)
-	MCFG_VIDEO_UPDATE(wwfsstar)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -163,7 +163,7 @@ static VIDEO_START( magic10 )
 	tilemap_set_transparent_pen(layer2_tilemap, 0);
 }
 
-static VIDEO_UPDATE( magic10 )
+static SCREEN_UPDATE( magic10 )
 {
 	/*TODO: understand where this comes from. */
 	tilemap_set_scrollx(layer2_tilemap, 0, layer2_offset[0]);
@@ -707,12 +707,12 @@ static MACHINE_CONFIG_START( magic10, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 44*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(magic10)
 
 	MCFG_PALETTE_LENGTH(0x100)
 	MCFG_GFXDECODE(magic10)
 
 	MCFG_VIDEO_START(magic10)
-	MCFG_VIDEO_UPDATE(magic10)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

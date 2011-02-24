@@ -135,7 +135,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( commando )
+SCREEN_UPDATE( commando )
 {
 	commando_state *state = screen->machine->driver_data<commando_state>();
 
@@ -145,7 +145,7 @@ VIDEO_UPDATE( commando )
 	return 0;
 }
 
-VIDEO_EOF( commando )
+SCREEN_EOF( commando )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 

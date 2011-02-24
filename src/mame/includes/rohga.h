@@ -41,7 +41,7 @@ WRITE16_HANDLER( rohga_buffer_spriteram16_w );
 
 VIDEO_START( rohga );
 
-VIDEO_UPDATE( rohga );
-VIDEO_UPDATE( schmeisr );
-VIDEO_UPDATE( wizdfire );
-VIDEO_UPDATE( nitrobal );
+SCREEN_UPDATE( rohga );
+SCREEN_UPDATE( schmeisr );
+SCREEN_UPDATE( wizdfire );
+SCREEN_UPDATE( nitrobal );

@@ -132,7 +132,7 @@ VIDEO_START( simpl156 )
 	state_save_register_global_pointer(machine, machine->generic.paletteram.u16, 0x1000/2);
 }
 
-VIDEO_UPDATE( simpl156 )
+SCREEN_UPDATE( simpl156 )
 {
 	simpl156_state *state = screen->machine->driver_data<simpl156_state>();
 

@@ -629,7 +629,7 @@ VIDEO_START( s16a_bootleg_passsht )
 }
 
 // Passing Shot (2 player), Shinobi (Datsu), Wonderboy 3
-VIDEO_UPDATE( s16a_bootleg )
+SCREEN_UPDATE( s16a_bootleg )
 {
 	segas1x_bootleg_state *state = screen->machine->driver_data<segas1x_bootleg_state>();
 
@@ -687,7 +687,7 @@ VIDEO_UPDATE( s16a_bootleg )
 }
 
 /* The Passing Shot 4 Player bootleg has weird scroll registers (different offsets, ^0x7 xor) */
-VIDEO_UPDATE( s16a_bootleg_passht4b )
+SCREEN_UPDATE( s16a_bootleg_passht4b )
 {
 	segas1x_bootleg_state *state = screen->machine->driver_data<segas1x_bootleg_state>();
 
@@ -730,7 +730,7 @@ VIDEO_UPDATE( s16a_bootleg_passht4b )
 
 /***************************************************************************/
 
-VIDEO_UPDATE( system16 )
+SCREEN_UPDATE( system16 )
 {
 	segas1x_bootleg_state *state = screen->machine->driver_data<segas1x_bootleg_state>();
 
@@ -776,7 +776,7 @@ VIDEO_UPDATE( system16 )
 }
 
 
-VIDEO_UPDATE( system18old )
+SCREEN_UPDATE( system18old )
 {
 	segas1x_bootleg_state *state = screen->machine->driver_data<segas1x_bootleg_state>();
 

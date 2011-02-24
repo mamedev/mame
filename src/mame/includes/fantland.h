@@ -30,4 +30,4 @@ public:
 
 /*----------- defined in video/fantland.c -----------*/
 
-VIDEO_UPDATE( fantland );
+SCREEN_UPDATE( fantland );

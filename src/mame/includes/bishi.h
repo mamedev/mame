@@ -37,4 +37,4 @@ public:
 extern void bishi_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags);
 
 VIDEO_START(bishi);
-VIDEO_UPDATE(bishi);
+SCREEN_UPDATE(bishi);

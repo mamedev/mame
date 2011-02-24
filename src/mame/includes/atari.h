@@ -586,7 +586,7 @@ extern char atari_frame_message[64+1];
 extern int atari_frame_counter;
 
 extern VIDEO_START( atari );
-extern VIDEO_UPDATE( atari );
+extern SCREEN_UPDATE( atari );
 
 INTERRUPT_GEN( a400_interrupt );
 INTERRUPT_GEN( a800_interrupt );

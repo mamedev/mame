@@ -349,7 +349,7 @@ static VIDEO_START( ppmast93 )
 	tilemap_set_transparent_pen(state->fg_tilemap,0);
 }
 
-static VIDEO_UPDATE( ppmast93 )
+static SCREEN_UPDATE( ppmast93 )
 {
 	ppmast93_state *state = screen->machine->driver_data<ppmast93_state>();
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
@@ -376,6 +376,7 @@ static MACHINE_CONFIG_START( ppmast93, ppmast93_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE(ppmast93)
 
 	MCFG_GFXDECODE(ppmast93)
 
@@ -383,7 +384,6 @@ static MACHINE_CONFIG_START( ppmast93, ppmast93_state )
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(ppmast93)
-	MCFG_VIDEO_UPDATE(ppmast93)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

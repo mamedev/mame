@@ -83,7 +83,7 @@ static VIDEO_START( chinsan )
 {
 }
 
-static VIDEO_UPDATE( chinsan )
+static SCREEN_UPDATE( chinsan )
 {
 	chinsan_state *state = screen->machine->driver_data<chinsan_state>();
 	int y, x, count;
@@ -607,13 +607,13 @@ static MACHINE_CONFIG_START( chinsan, chinsan_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_VISIBLE_AREA(24, 512-24-1, 16, 256-16-1)
+	MCFG_SCREEN_UPDATE(chinsan)
 
 	MCFG_GFXDECODE(chinsan)
 	MCFG_PALETTE_LENGTH(0x100)
 	MCFG_PALETTE_INIT(chinsan)
 
 	MCFG_VIDEO_START(chinsan)
-	MCFG_VIDEO_UPDATE(chinsan)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

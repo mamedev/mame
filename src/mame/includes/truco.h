@@ -10,5 +10,5 @@ public:
 
 /*----------- defined in video/truco.c -----------*/
 
-VIDEO_UPDATE( truco );
+SCREEN_UPDATE( truco );
 PALETTE_INIT( truco );

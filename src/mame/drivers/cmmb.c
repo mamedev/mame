@@ -58,7 +58,7 @@ static VIDEO_START( cmmb )
 
 }
 
-static VIDEO_UPDATE( cmmb )
+static SCREEN_UPDATE( cmmb )
 {
 	cmmb_state *state = screen->machine->driver_data<cmmb_state>();
 	UINT8 *videoram = state->videoram;
@@ -310,11 +310,12 @@ static MACHINE_CONFIG_START( cmmb, cmmb_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(cmmb)
+
 	MCFG_GFXDECODE(cmmb)
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_VIDEO_START(cmmb)
-	MCFG_VIDEO_UPDATE(cmmb)
 
 	MCFG_MACHINE_RESET(cmmb)
 

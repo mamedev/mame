@@ -22,9 +22,9 @@ public:
 /*----------- defined in video/eprom.c -----------*/
 
 VIDEO_START( eprom );
-VIDEO_UPDATE( eprom );
+SCREEN_UPDATE( eprom );
 
 VIDEO_START( guts );
-VIDEO_UPDATE( guts );
+SCREEN_UPDATE( guts );
 
 void eprom_scanline_update(screen_device &screen, int scanline);

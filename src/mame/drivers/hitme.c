@@ -69,7 +69,7 @@ static VIDEO_START( barricad )
 }
 
 
-static VIDEO_UPDATE( hitme )
+static SCREEN_UPDATE( hitme )
 {
 	hitme_state *state = screen->machine->driver_data<hitme_state>();
 	/* the card width resistor comes from an input port, scaled to the range 0-25 kOhms */
@@ -117,7 +117,7 @@ static VIDEO_UPDATE( hitme )
 }
 
 
-static VIDEO_UPDATE( barricad )
+static SCREEN_UPDATE( barricad )
 {
 	hitme_state *state = screen->machine->driver_data<hitme_state>();
 	tilemap_draw(bitmap, cliprect, state->tilemap, 0, 0);
@@ -333,13 +333,13 @@ static MACHINE_CONFIG_START( hitme, hitme_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(40*8, 19*10)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 19*10-1)
+	MCFG_SCREEN_UPDATE(hitme)
 
 	MCFG_GFXDECODE(hitme)
 	MCFG_PALETTE_LENGTH(2)
 
 	MCFG_PALETTE_INIT(black_and_white)
 	MCFG_VIDEO_START(hitme)
-	MCFG_VIDEO_UPDATE(hitme)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -363,11 +363,11 @@ static MACHINE_CONFIG_DERIVED( barricad, hitme )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(32*8, 24*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
+	MCFG_SCREEN_UPDATE(barricad)
 
 	MCFG_GFXDECODE(barricad)
 
 	MCFG_VIDEO_START(barricad)
-	MCFG_VIDEO_UPDATE(barricad)
 MACHINE_CONFIG_END
 
 

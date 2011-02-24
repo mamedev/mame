@@ -34,4 +34,4 @@ public:
 WRITE16_HANDLER( twocrude_palette_24bit_rg_w );
 WRITE16_HANDLER( twocrude_palette_24bit_b_w );
 
-VIDEO_UPDATE( twocrude );
+SCREEN_UPDATE( twocrude );

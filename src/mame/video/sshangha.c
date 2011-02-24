@@ -172,7 +172,7 @@ VIDEO_START( sshangha )
 
 /******************************************************************************/
 
-VIDEO_UPDATE( sshangha )
+SCREEN_UPDATE( sshangha )
 {
 	sshangha_state *state = screen->machine->driver_data<sshangha_state>();
 	int offs;

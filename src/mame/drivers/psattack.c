@@ -109,12 +109,12 @@ static VIDEO_START(psattack)
 }
 
 
-static VIDEO_UPDATE(psattack)
+static SCREEN_UPDATE(psattack)
 {
 	return 0;
 }
 
-static VIDEO_EOF(psattack)
+static SCREEN_EOF(psattack)
 {
 
 }
@@ -174,10 +174,10 @@ static MACHINE_CONFIG_START( psattack, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_UPDATE(psattack)
+	MCFG_SCREEN_EOF(psattack)
 
 	MCFG_VIDEO_START(psattack)
-	MCFG_VIDEO_UPDATE(psattack)
-	MCFG_VIDEO_EOF(psattack)
 
 	MCFG_PALETTE_INIT(RRRRR_GGGGGG_BBBBB)
 	MCFG_PALETTE_LENGTH(65536)

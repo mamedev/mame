@@ -984,9 +984,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 ***************************************************************************/
 
-VIDEO_UPDATE( eaglshot )
+SCREEN_UPDATE( eaglshot )
 {
-	return VIDEO_UPDATE_CALL(ssv);
+	return SCREEN_UPDATE_CALL(ssv);
 }
 
 /*
@@ -1165,12 +1165,12 @@ static void gdfs_draw_zooming_sprites(running_machine *machine, bitmap_t *bitmap
 	}	/* sprites list */
 }
 
-VIDEO_UPDATE( gdfs )
+SCREEN_UPDATE( gdfs )
 {
 	ssv_state *state = screen->machine->driver_data<ssv_state>();
 	int pri;
 
-	VIDEO_UPDATE_CALL(ssv);
+	SCREEN_UPDATE_CALL(ssv);
 
 	for (pri = 0; pri <= 0xf; pri++)
 		gdfs_draw_zooming_sprites(screen->machine, bitmap, cliprect, pri);
@@ -1189,7 +1189,7 @@ void ssv_enable_video(running_machine *machine, int enable)
 	state->enable_video = enable;
 }
 
-VIDEO_UPDATE( ssv )
+SCREEN_UPDATE( ssv )
 {
 	rectangle clip = { 0, 0, 0, 0 };
 

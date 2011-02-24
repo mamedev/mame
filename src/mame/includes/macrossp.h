@@ -47,5 +47,5 @@ WRITE32_HANDLER( macrossp_scrc_videoram_w );
 WRITE32_HANDLER( macrossp_text_videoram_w );
 
 VIDEO_START(macrossp);
-VIDEO_UPDATE(macrossp);
-VIDEO_EOF(macrossp);
+SCREEN_UPDATE(macrossp);
+SCREEN_EOF(macrossp);

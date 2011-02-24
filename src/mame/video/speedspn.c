@@ -90,7 +90,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 }
 
 
-VIDEO_UPDATE(speedspn)
+SCREEN_UPDATE(speedspn)
 {
 	if (speedspn_display_disable)
 	{

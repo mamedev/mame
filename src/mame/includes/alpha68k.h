@@ -51,12 +51,12 @@ PALETTE_INIT( paddlem );
 
 VIDEO_START( alpha68k );
 
-VIDEO_UPDATE( kyros );
-VIDEO_UPDATE( sstingry );
-VIDEO_UPDATE( alpha68k_I );
-VIDEO_UPDATE( alpha68k_II );
-VIDEO_UPDATE( alpha68k_V );
-VIDEO_UPDATE( alpha68k_V_sb );
+SCREEN_UPDATE( kyros );
+SCREEN_UPDATE( sstingry );
+SCREEN_UPDATE( alpha68k_I );
+SCREEN_UPDATE( alpha68k_II );
+SCREEN_UPDATE( alpha68k_V );
+SCREEN_UPDATE( alpha68k_V_sb );
 
 void alpha68k_V_video_bank_w(running_machine *machine, int bank);
 void alpha68k_flipscreen_w(running_machine *machine, int flip);

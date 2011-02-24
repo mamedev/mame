@@ -762,7 +762,7 @@ static VIDEO_START( wcrdxtnd )
 	bg_tilemap = tilemap_create(machine, xtnd_get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
-static VIDEO_UPDATE( goldnpkr )
+static SCREEN_UPDATE( goldnpkr )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	return 0;
@@ -2901,6 +2901,7 @@ static MACHINE_CONFIG_START( goldnpkr_base, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE((39+1)*8, (31+1)*8)                  /* From MC6845 init, registers 00 & 04 (programmed with value-1). */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 29*8-1)    /* From MC6845 init, registers 01 & 06. */
+	MCFG_SCREEN_UPDATE(goldnpkr)
 
 	MCFG_MC6845_ADD("crtc", MC6845, CPU_CLOCK, mc6845_intf)	/* 68B45 or 6845s @ CPU clock */
 
@@ -2908,7 +2909,6 @@ static MACHINE_CONFIG_START( goldnpkr_base, driver_device )
 	MCFG_PALETTE_INIT(goldnpkr)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_VIDEO_START(goldnpkr)
-	MCFG_VIDEO_UPDATE(goldnpkr)
 MACHINE_CONFIG_END
 
 

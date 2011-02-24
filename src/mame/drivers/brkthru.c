@@ -405,10 +405,10 @@ static MACHINE_CONFIG_START( brkthru, brkthru_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 8, 248, 272, 8, 248)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE(brkthru)
 
 	MCFG_PALETTE_INIT(brkthru)
 	MCFG_VIDEO_START(brkthru)
-	MCFG_VIDEO_UPDATE(brkthru)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -457,10 +457,10 @@ static MACHINE_CONFIG_START( darwin, brkthru_state )
                   = 57.444855Hz
         tuned by Shingo SUZUKI(VSyncMAME Project) 2000/10/19 */
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE(brkthru)
 
 	MCFG_PALETTE_INIT(brkthru)
 	MCFG_VIDEO_START(brkthru)
-	MCFG_VIDEO_UPDATE(brkthru)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -54,5 +54,5 @@ WRITE16_HANDLER( volfied_video_mask_w );
 READ16_HANDLER( volfied_video_ram_r );
 READ16_HANDLER( volfied_video_ctrl_r );
 
-VIDEO_UPDATE( volfied );
+SCREEN_UPDATE( volfied );
 VIDEO_START( volfied );

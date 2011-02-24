@@ -65,7 +65,7 @@ extern WRITE16_HANDLER(splndrbt_bg_scrolly_w);
 
 extern PALETTE_INIT( equites );
 extern VIDEO_START( equites );
-extern VIDEO_UPDATE( equites );
+extern SCREEN_UPDATE( equites );
 extern PALETTE_INIT( splndrbt );
 extern VIDEO_START( splndrbt );
-extern VIDEO_UPDATE( splndrbt );
+extern SCREEN_UPDATE( splndrbt );

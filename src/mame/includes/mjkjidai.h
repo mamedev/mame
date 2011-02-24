@@ -19,7 +19,7 @@ public:
 /*----------- defined in video/mjkjidai.c -----------*/
 
 VIDEO_START( mjkjidai );
-VIDEO_UPDATE( mjkjidai );
+SCREEN_UPDATE( mjkjidai );
 WRITE8_HANDLER( mjkjidai_videoram_w );
 WRITE8_HANDLER( mjkjidai_ctrl_w );
 

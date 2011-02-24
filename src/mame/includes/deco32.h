@@ -72,13 +72,13 @@ VIDEO_START( dragngun );
 VIDEO_START( lockload );
 VIDEO_START( nslasher );
 
-VIDEO_EOF( captaven );
-VIDEO_EOF( dragngun );
+SCREEN_EOF( captaven );
+SCREEN_EOF( dragngun );
 
-VIDEO_UPDATE( captaven );
-VIDEO_UPDATE( fghthist );
-VIDEO_UPDATE( dragngun );
-VIDEO_UPDATE( nslasher );
+SCREEN_UPDATE( captaven );
+SCREEN_UPDATE( fghthist );
+SCREEN_UPDATE( dragngun );
+SCREEN_UPDATE( nslasher );
 
 
 WRITE32_HANDLER( deco32_pf1_data_w );

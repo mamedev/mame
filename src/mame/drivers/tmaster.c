@@ -311,7 +311,7 @@ static VIDEO_START( galgames )
 	state->compute_addr = galgames_compute_addr;
 }
 
-static VIDEO_UPDATE( tmaster )
+static SCREEN_UPDATE( tmaster )
 {
 	tmaster_state *state = screen->machine->driver_data<tmaster_state>();
 	int layers_ctrl = -1;
@@ -913,11 +913,11 @@ static MACHINE_CONFIG_START( tm3k, tmaster_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(400, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE(tmaster)
 
 	MCFG_PALETTE_LENGTH(0x1000)
 
 	MCFG_VIDEO_START(tmaster)
-	MCFG_VIDEO_UPDATE(tmaster)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -983,11 +983,11 @@ static MACHINE_CONFIG_START( galgames, tmaster_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(400, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE(tmaster)
 
 	MCFG_PALETTE_LENGTH(0x1000)	// only 0x100 used
 
 	MCFG_VIDEO_START(galgames)
-	MCFG_VIDEO_UPDATE(tmaster)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

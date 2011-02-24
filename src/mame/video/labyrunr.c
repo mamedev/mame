@@ -180,7 +180,7 @@ WRITE8_HANDLER( labyrunr_vram2_w )
 
 ***************************************************************************/
 
-VIDEO_UPDATE( labyrunr )
+SCREEN_UPDATE( labyrunr )
 {
 	labyrunr_state *state = screen->machine->driver_data<labyrunr_state>();
 	UINT8 ctrl_0 = k007121_ctrlram_r(state->k007121, 0);

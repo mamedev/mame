@@ -227,7 +227,7 @@ static void superqix_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 	}
 }
 
-VIDEO_UPDATE( pbillian )
+SCREEN_UPDATE( pbillian )
 {
 	superqix_state *state = screen->machine->driver_data<superqix_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
@@ -254,7 +254,7 @@ VIDEO_UPDATE( pbillian )
 	return 0;
 }
 
-VIDEO_UPDATE( superqix )
+SCREEN_UPDATE( superqix )
 {
 	superqix_state *state = screen->machine->driver_data<superqix_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER1, 0);

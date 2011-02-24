@@ -271,7 +271,7 @@ static VIDEO_START( dgpix )
 	vram = auto_alloc_array(machine, UINT32, 0x40000*2/4);
 }
 
-static VIDEO_UPDATE( dgpix )
+static SCREEN_UPDATE( dgpix )
 {
 	int y;
 
@@ -323,12 +323,12 @@ static MACHINE_CONFIG_START( dgpix, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_UPDATE(dgpix)
 
 	MCFG_PALETTE_INIT(BBBBB_GGGGG_RRRRR)
 	MCFG_PALETTE_LENGTH(32768)
 
 	MCFG_VIDEO_START(dgpix)
-	MCFG_VIDEO_UPDATE(dgpix)
 
 	/* sound hardware */
 	// KS0164 sound chip

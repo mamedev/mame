@@ -254,7 +254,7 @@ static VIDEO_RESET( mystston )
  *
  *************************************/
 
-static VIDEO_UPDATE( mystston )
+static SCREEN_UPDATE( mystston )
 {
 	mystston_state *state = screen->machine->driver_data<mystston_state>();
 
@@ -322,10 +322,8 @@ GFXDECODE_END
  *************************************/
 
 MACHINE_CONFIG_FRAGMENT( mystston_video )
-
 	MCFG_VIDEO_START(mystston)
 	MCFG_VIDEO_RESET(mystston)
-	MCFG_VIDEO_UPDATE(mystston)
 
 	MCFG_GFXDECODE(mystston)
 	MCFG_PALETTE_LENGTH(0x40)
@@ -333,4 +331,5 @@ MACHINE_CONFIG_FRAGMENT( mystston_video )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_UPDATE(mystston)
 MACHINE_CONFIG_END

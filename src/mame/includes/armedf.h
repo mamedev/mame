@@ -30,8 +30,8 @@ public:
 
 /*----------- defined in video/armedf.c -----------*/
 
-VIDEO_UPDATE( armedf );
-VIDEO_EOF( armedf );
+SCREEN_UPDATE( armedf );
+SCREEN_EOF( armedf );
 VIDEO_START( armedf );
 
 WRITE16_HANDLER( armedf_bg_videoram_w );

@@ -32,5 +32,5 @@ WRITE16_HANDLER( crshrace_roz_bank_w );
 WRITE16_HANDLER( crshrace_gfxctrl_w );
 
 VIDEO_START( crshrace );
-VIDEO_EOF( crshrace );
-VIDEO_UPDATE( crshrace );
+SCREEN_EOF( crshrace );
+SCREEN_UPDATE( crshrace );

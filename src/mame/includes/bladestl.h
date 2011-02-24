@@ -32,7 +32,7 @@ public:
 
 PALETTE_INIT( bladestl );
 
-VIDEO_UPDATE( bladestl );
+SCREEN_UPDATE( bladestl );
 
 void bladestl_tile_callback(running_machine *machine, int layer, int bank, int *code, int *color, int *flags);
 void bladestl_sprite_callback(running_machine *machine, int *code, int *color);

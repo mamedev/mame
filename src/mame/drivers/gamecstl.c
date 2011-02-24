@@ -124,7 +124,7 @@ static void draw_char(bitmap_t *bitmap, const rectangle *cliprect, const gfx_ele
 	}
 }
 
-static VIDEO_UPDATE(gamecstl)
+static SCREEN_UPDATE(gamecstl)
 {
 	int i, j;
 	const gfx_element *gfx = screen->machine->gfx[0];
@@ -691,12 +691,12 @@ static MACHINE_CONFIG_START( gamecstl, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 199)
+	MCFG_SCREEN_UPDATE(gamecstl)
 
 	MCFG_GFXDECODE(CGA)
 	MCFG_PALETTE_LENGTH(16)
 
 	MCFG_VIDEO_START(gamecstl)
-	MCFG_VIDEO_UPDATE(gamecstl)
 
 MACHINE_CONFIG_END
 

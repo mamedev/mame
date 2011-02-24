@@ -33,4 +33,4 @@ public:
 
 WRITE16_HANDLER( rastan_spritectrl_w );
 
-VIDEO_UPDATE( rastan );
+SCREEN_UPDATE( rastan );

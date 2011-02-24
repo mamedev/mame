@@ -38,4 +38,4 @@ WRITE8_HANDLER(kncljoe_scroll_w);
 
 PALETTE_INIT( kncljoe );
 VIDEO_START( kncljoe );
-VIDEO_UPDATE( kncljoe );
+SCREEN_UPDATE( kncljoe );

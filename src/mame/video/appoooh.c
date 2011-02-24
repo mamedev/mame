@@ -270,7 +270,7 @@ static void robowres_draw_sprites( bitmap_t *dest_bmp, const rectangle *cliprect
 }
 
 
-VIDEO_UPDATE( appoooh )
+SCREEN_UPDATE( appoooh )
 {
 	appoooh_state *state = screen->machine->driver_data<appoooh_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
@@ -300,7 +300,7 @@ VIDEO_UPDATE( appoooh )
 	return 0;
 }
 
-VIDEO_UPDATE( robowres )
+SCREEN_UPDATE( robowres )
 {
 	appoooh_state *state = screen->machine->driver_data<appoooh_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);

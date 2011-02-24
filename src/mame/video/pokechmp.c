@@ -71,7 +71,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-VIDEO_UPDATE( pokechmp )
+SCREEN_UPDATE( pokechmp )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);

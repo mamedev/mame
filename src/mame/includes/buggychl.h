@@ -41,4 +41,4 @@ WRITE8_HANDLER( buggychl_bg_scrollx_w );
 
 PALETTE_INIT( buggychl );
 VIDEO_START( buggychl );
-VIDEO_UPDATE( buggychl );
+SCREEN_UPDATE( buggychl );

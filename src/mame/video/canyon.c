@@ -82,7 +82,7 @@ static void draw_bombs( running_machine *machine, bitmap_t *bitmap, const rectan
 }
 
 
-VIDEO_UPDATE( canyon )
+SCREEN_UPDATE( canyon )
 {
 	canyon_state *state = screen->machine->driver_data<canyon_state>();
 

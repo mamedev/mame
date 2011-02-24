@@ -36,7 +36,7 @@ WRITE16_HANDLER( opwolf_spritectrl_w )
 
 /***************************************************************************/
 
-VIDEO_UPDATE( opwolf )
+SCREEN_UPDATE( opwolf )
 {
 	opwolf_state *state = screen->machine->driver_data<opwolf_state>();
 	int layer[2];

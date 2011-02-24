@@ -27,4 +27,4 @@ WRITE8_HANDLER( yard_flipscreen_w );
 
 PALETTE_INIT( yard );
 VIDEO_START( yard );
-VIDEO_UPDATE( yard );
+SCREEN_UPDATE( yard );

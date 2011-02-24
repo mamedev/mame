@@ -154,7 +154,7 @@ static void sauro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 	}
 }
 
-VIDEO_UPDATE( sauro )
+SCREEN_UPDATE( sauro )
 {
 	sauro_state *state = screen->machine->driver_data<sauro_state>();
 
@@ -230,7 +230,7 @@ static void trckydoc_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 	}
 }
 
-VIDEO_UPDATE( trckydoc )
+SCREEN_UPDATE( trckydoc )
 {
 	sauro_state *state = screen->machine->driver_data<sauro_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);

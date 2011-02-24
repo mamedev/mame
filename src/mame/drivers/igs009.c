@@ -258,7 +258,7 @@ static VIDEO_START(gp98)
 }
 
 
-static VIDEO_UPDATE(jingbell)
+static SCREEN_UPDATE(jingbell)
 {
 	igs009_state *state = screen->machine->driver_data<igs009_state>();
 	int layers_ctrl = state->video_enable ? -1 : 0;
@@ -689,12 +689,12 @@ static MACHINE_CONFIG_START( jingbell, igs009_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
+	MCFG_SCREEN_UPDATE(jingbell)
 
 	MCFG_GFXDECODE(jingbell)
 	MCFG_PALETTE_LENGTH(0x400)
 
 	MCFG_VIDEO_START(jingbell)
-	MCFG_VIDEO_UPDATE(jingbell)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

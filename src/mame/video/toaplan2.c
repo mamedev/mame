@@ -330,7 +330,7 @@ WRITE16_HANDLER( batrider_objectbank_w )
 }
 
 // Dogyuun doesn't appear to require fancy mixing?
-VIDEO_UPDATE( toaplan2_dual )
+SCREEN_UPDATE( toaplan2_dual )
 {
 	toaplan2_state *state = screen->machine->driver_data<toaplan2_state>();
 
@@ -353,7 +353,7 @@ VIDEO_UPDATE( toaplan2_dual )
 
 
 // renders to 2 bitmaps, and mixes output
-VIDEO_UPDATE( toaplan2_mixed )
+SCREEN_UPDATE( toaplan2_mixed )
 {
 	toaplan2_state *state = screen->machine->driver_data<toaplan2_state>();
 
@@ -453,7 +453,7 @@ VIDEO_UPDATE( toaplan2_mixed )
 	return 0;
 }
 
-VIDEO_UPDATE( toaplan2 )
+SCREEN_UPDATE( toaplan2 )
 {
 	toaplan2_state *state = screen->machine->driver_data<toaplan2_state>();
 
@@ -472,21 +472,21 @@ VIDEO_UPDATE( toaplan2 )
 	return 0;
 }
 
-VIDEO_UPDATE( truxton2 )
+SCREEN_UPDATE( truxton2 )
 {
 	toaplan2_state *state = screen->machine->driver_data<toaplan2_state>();
 
-	VIDEO_UPDATE_CALL(toaplan2);
+	SCREEN_UPDATE_CALL(toaplan2);
 	tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);
 	return 0;
 }
 
 
-VIDEO_UPDATE( batrider )
+SCREEN_UPDATE( batrider )
 {
 	toaplan2_state *state = screen->machine->driver_data<toaplan2_state>();
 
-	VIDEO_UPDATE_CALL( toaplan2 );
+	SCREEN_UPDATE_CALL( toaplan2 );
 
 	int line;
 	rectangle clip;
@@ -517,21 +517,21 @@ VIDEO_UPDATE( batrider )
 
 
 
-VIDEO_UPDATE( dogyuun )
+SCREEN_UPDATE( dogyuun )
 {
-	VIDEO_UPDATE_CALL( toaplan2_dual );
+	SCREEN_UPDATE_CALL( toaplan2_dual );
 	return 0;
 }
 
-VIDEO_UPDATE( batsugun )
+SCREEN_UPDATE( batsugun )
 {
-	VIDEO_UPDATE_CALL( toaplan2_mixed );
+	SCREEN_UPDATE_CALL( toaplan2_mixed );
 	return 0;
 }
 
-VIDEO_EOF( toaplan2 )
+SCREEN_EOF( toaplan2 )
 {
 	toaplan2_state *state = machine->driver_data<toaplan2_state>();
-	if (state->vdp0) state->vdp0->gp9001_video_eof();
-	if (state->vdp1) state->vdp1->gp9001_video_eof();
+	if (state->vdp0) state->vdp0->gp9001_screen_eof();
+	if (state->vdp1) state->vdp1->gp9001_screen_eof();
 }

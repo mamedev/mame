@@ -881,13 +881,12 @@ static MACHINE_CONFIG_START( systeme, driver_device )
 	MCFG_SCREEN_SIZE(256, 256)
 //  MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 223)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 191)
-
+	MCFG_SCREEN_UPDATE(systeme) /* Copies a bitmap */
+	MCFG_SCREEN_EOF(systeme) /* Used to Sync the timing */
 
 	MCFG_PALETTE_LENGTH(0x200)
 
 	MCFG_VIDEO_START(sms)
-	MCFG_VIDEO_UPDATE(systeme) /* Copies a bitmap */
-	MCFG_VIDEO_EOF(systeme) /* Used to Sync the timing */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

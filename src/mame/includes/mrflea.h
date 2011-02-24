@@ -36,4 +36,4 @@ WRITE8_HANDLER( mrflea_gfx_bank_w );
 WRITE8_HANDLER( mrflea_videoram_w );
 WRITE8_HANDLER( mrflea_spriteram_w );
 
-VIDEO_UPDATE( mrflea );
+SCREEN_UPDATE( mrflea );

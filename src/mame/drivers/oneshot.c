@@ -390,12 +390,12 @@ static MACHINE_CONFIG_START( oneshot, oneshot_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0*16, 20*16-1, 0*16, 15*16-1)
+	MCFG_SCREEN_UPDATE(oneshot)
 
 	MCFG_GFXDECODE(oneshot)
 	MCFG_PALETTE_LENGTH(0x400)
 
 	MCFG_VIDEO_START(oneshot)
-	MCFG_VIDEO_UPDATE(oneshot)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -412,7 +412,8 @@ static MACHINE_CONFIG_DERIVED( maddonna, oneshot )
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(maddonna) // no crosshair
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(maddonna) // no crosshair
 MACHINE_CONFIG_END
 
 

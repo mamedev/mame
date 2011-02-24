@@ -36,7 +36,7 @@ VIDEO_START(sbugger)
 	state->tilemap = tilemap_create(machine, get_sbugger_tile_info, tilemap_scan_rows, 8, 16, 64, 16);
 }
 
-VIDEO_UPDATE(sbugger)
+SCREEN_UPDATE(sbugger)
 {
 	sbugger_state *state = screen->machine->driver_data<sbugger_state>();
 	tilemap_draw(bitmap,cliprect,state->tilemap,0,0);

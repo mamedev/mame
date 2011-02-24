@@ -339,7 +339,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 ***************************************************************************/
 
 
-VIDEO_UPDATE( powerins )
+SCREEN_UPDATE( powerins )
 {
 	powerins_state *state = screen->machine->driver_data<powerins_state>();
 	int layers_ctrl = -1;

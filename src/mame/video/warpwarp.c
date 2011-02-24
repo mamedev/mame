@@ -237,7 +237,7 @@ static void draw_ball(bitmap_t *bitmap, const rectangle *cliprect,pen_t pen)
 	}
 }
 
-VIDEO_UPDATE( geebee )
+SCREEN_UPDATE( geebee )
 {
 	/* use an overlay only in upright mode */
 	if (geebee_handleoverlay)

@@ -1075,7 +1075,7 @@ static void draw_ground(running_machine *machine, bitmap_t *dst, const rectangle
 #endif
 /**********************************************************************/
 
-VIDEO_UPDATE( apache3 )
+SCREEN_UPDATE( apache3 )
 {
 	update_cluts(screen->machine, 1024, 0, 2048);
 
@@ -1089,7 +1089,7 @@ VIDEO_UPDATE( apache3 )
 	return 0;
 }
 
-VIDEO_UPDATE( roundup5 )
+SCREEN_UPDATE( roundup5 )
 {
 //  UINT16 bg_x_scroll=roundup5_unknown1[0];
 //  UINT16 bg_y_scroll=roundup5_unknown2[0];
@@ -1109,7 +1109,7 @@ VIDEO_UPDATE( roundup5 )
 	return 0;
 }
 
-VIDEO_UPDATE( cyclwarr )
+SCREEN_UPDATE( cyclwarr )
 {
 	bigfight_bank=bigfight_a40000[0];
 	if (bigfight_bank!=bigfight_last_bank)
@@ -1133,7 +1133,7 @@ VIDEO_UPDATE( cyclwarr )
 	return 0;
 }
 
-VIDEO_UPDATE( bigfight )
+SCREEN_UPDATE( bigfight )
 {
 	bigfight_bank=bigfight_a40000[0];
 	if (bigfight_bank!=bigfight_last_bank)

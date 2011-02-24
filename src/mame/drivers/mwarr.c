@@ -457,7 +457,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-static VIDEO_UPDATE( mwarr )
+static SCREEN_UPDATE( mwarr )
 {
 	mwarr_state *state = screen->machine->driver_data<mwarr_state>();
 	int i;
@@ -549,12 +549,12 @@ static MACHINE_CONFIG_START( mwarr, mwarr_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8+1, 48*8-1-8-1, 0, 30*8-1)
+	MCFG_SCREEN_UPDATE(mwarr)
 
 	MCFG_GFXDECODE(mwarr)
 	MCFG_PALETTE_LENGTH(0x800)
 
 	MCFG_VIDEO_START(mwarr)
-	MCFG_VIDEO_UPDATE(mwarr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

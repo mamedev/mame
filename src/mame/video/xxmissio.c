@@ -137,7 +137,7 @@ static void draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, const gfx_
 }
 
 
-VIDEO_UPDATE( xxmissio )
+SCREEN_UPDATE( xxmissio )
 {
 	tilemap_mark_all_tiles_dirty_all(screen->machine);
 	tilemap_set_flip_all(screen->machine, flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);

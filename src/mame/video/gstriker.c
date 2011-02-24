@@ -530,7 +530,7 @@ WRITE16_HANDLER( gsx_videoram3_w )
 #endif
 
 
-VIDEO_UPDATE(gstriker)
+SCREEN_UPDATE(gstriker)
 {
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 

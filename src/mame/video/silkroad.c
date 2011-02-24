@@ -141,7 +141,7 @@ VIDEO_START(silkroad)
 	tilemap_set_transparent_pen(state->fg3_tilemap, 0);
 }
 
-VIDEO_UPDATE(silkroad)
+SCREEN_UPDATE(silkroad)
 {
 	silkroad_state *state = screen->machine->driver_data<silkroad_state>();
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);

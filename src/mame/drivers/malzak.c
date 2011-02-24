@@ -412,6 +412,7 @@ static MACHINE_CONFIG_START( malzak, malzak_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(480, 512)	/* vert size is a guess */
 	MCFG_SCREEN_VISIBLE_AREA(0, 479, 0, 479)
+	MCFG_SCREEN_UPDATE(malzak)
 
 	MCFG_GFXDECODE(malzak)
 	MCFG_PALETTE_LENGTH(128)
@@ -421,7 +422,6 @@ static MACHINE_CONFIG_START( malzak, malzak_state )
 	MCFG_S2636_ADD("s2636_1", malzac_s2636_1_config)
 
 	MCFG_SAA5050_ADD("saa5050", malzac_saa5050_intf)
-	MCFG_VIDEO_UPDATE(malzak)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

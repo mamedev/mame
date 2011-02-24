@@ -141,7 +141,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-VIDEO_UPDATE( mustache )
+SCREEN_UPDATE( mustache )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);

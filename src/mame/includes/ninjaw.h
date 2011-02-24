@@ -40,4 +40,4 @@ public:
 /*----------- defined in video/ninjaw.c -----------*/
 
 VIDEO_START( ninjaw );
-VIDEO_UPDATE( ninjaw );
+SCREEN_UPDATE( ninjaw );

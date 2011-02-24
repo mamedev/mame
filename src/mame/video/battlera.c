@@ -307,7 +307,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 /******************************************************************************/
 
-VIDEO_UPDATE( battlera )
+SCREEN_UPDATE( battlera )
 {
 	battlera_state *state = screen->machine->driver_data<battlera_state>();
 	int offs,code,scrollx,scrolly,mx,my;

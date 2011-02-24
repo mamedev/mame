@@ -768,7 +768,7 @@ static void tecmosys_do_final_mix(running_machine *machine, bitmap_t* bitmap)
 	}
 }
 
-static VIDEO_UPDATE(deroon)
+static SCREEN_UPDATE(deroon)
 {
 
 	bitmap_fill(bitmap,cliprect,screen->machine->pens[0x4000]);
@@ -898,11 +898,11 @@ static MACHINE_CONFIG_START( deroon, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(deroon)
 
 	MCFG_PALETTE_LENGTH(0x4000+0x800)
 
 	MCFG_VIDEO_START(deroon)
-	MCFG_VIDEO_UPDATE(deroon)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

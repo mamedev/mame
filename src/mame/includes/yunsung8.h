@@ -36,4 +36,4 @@ WRITE8_HANDLER( yunsung8_videoram_w );
 WRITE8_HANDLER( yunsung8_flipscreen_w );
 
 VIDEO_START( yunsung8 );
-VIDEO_UPDATE( yunsung8 );
+SCREEN_UPDATE( yunsung8 );

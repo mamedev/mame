@@ -137,7 +137,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( boogwing )
+SCREEN_UPDATE( boogwing )
 {
 	boogwing_state *state = screen->machine->driver_data<boogwing_state>();
 	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);

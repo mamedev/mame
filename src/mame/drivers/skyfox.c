@@ -258,12 +258,12 @@ static MACHINE_CONFIG_START( skyfox, skyfox_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0+0x60, 320-1+0x60, 0+16, 256-1-16)	// from $30*2 to $CC*2+8
+	MCFG_SCREEN_UPDATE(skyfox)
 
 	MCFG_GFXDECODE(skyfox)
 	MCFG_PALETTE_LENGTH(256+256)	/* 256 static colors (+256 for the background??) */
 
 	MCFG_PALETTE_INIT(skyfox)
-	MCFG_VIDEO_UPDATE(skyfox)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

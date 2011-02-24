@@ -15,7 +15,7 @@ extern size_t rpunch_bitmapram_size;
 extern int rpunch_sprite_palette;
 
 VIDEO_START( rpunch );
-VIDEO_UPDATE( rpunch );
+SCREEN_UPDATE( rpunch );
 
 WRITE16_HANDLER( rpunch_videoram_w );
 WRITE16_HANDLER( rpunch_videoreg_w );

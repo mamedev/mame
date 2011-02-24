@@ -241,11 +241,12 @@ static MACHINE_CONFIG_START( ambush, ambush_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-3)  /* The -3 makes the cocktail mode perfect */
+	MCFG_SCREEN_UPDATE(ambush)
+
 	MCFG_GFXDECODE(ambush)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(ambush)
-	MCFG_VIDEO_UPDATE(ambush)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

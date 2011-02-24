@@ -41,5 +41,5 @@ WRITE8_HANDLER( popper_gfx_bank_w );
 
 PALETTE_INIT( popper );
 VIDEO_START( popper );
-VIDEO_UPDATE( popper );
+SCREEN_UPDATE( popper );
 

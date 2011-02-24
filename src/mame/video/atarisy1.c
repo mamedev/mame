@@ -497,7 +497,7 @@ static void update_timers(running_machine *machine, int scanline)
  *
  *************************************/
 
-VIDEO_UPDATE( atarisy1 )
+SCREEN_UPDATE( atarisy1 )
 {
 	atarisy1_state *state = screen->machine->driver_data<atarisy1_state>();
 	atarimo_rect_list rectlist;

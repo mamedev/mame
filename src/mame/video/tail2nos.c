@@ -177,7 +177,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( tail2nos )
+SCREEN_UPDATE( tail2nos )
 {
 	tail2nos_state *state = screen->machine->driver_data<tail2nos_state>();
 

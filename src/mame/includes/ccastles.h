@@ -49,7 +49,7 @@ public:
 
 
 VIDEO_START( ccastles );
-VIDEO_UPDATE( ccastles );
+SCREEN_UPDATE( ccastles );
 
 WRITE8_HANDLER( ccastles_hscroll_w );
 WRITE8_HANDLER( ccastles_vscroll_w );

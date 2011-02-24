@@ -512,7 +512,7 @@ static void prosoccr_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 /***************************************************************************/
 
-VIDEO_UPDATE( prosoccr )
+SCREEN_UPDATE( prosoccr )
 {
 	liberate_state *state = screen->machine->driver_data<liberate_state>();
 	tilemap_set_scrolly(state->back_tilemap, 0,  state->io_ram[1]);
@@ -529,7 +529,7 @@ VIDEO_UPDATE( prosoccr )
 	return 0;
 }
 
-VIDEO_UPDATE( prosport )
+SCREEN_UPDATE( prosport )
 {
 	liberate_state *state = screen->machine->driver_data<liberate_state>();
 	UINT8 *videoram = state->videoram;
@@ -573,7 +573,7 @@ VIDEO_UPDATE( prosport )
 	return 0;
 }
 
-VIDEO_UPDATE( boomrang )
+SCREEN_UPDATE( boomrang )
 {
 	liberate_state *state = screen->machine->driver_data<liberate_state>();
 	tilemap_set_scrolly(state->back_tilemap, 0,  state->io_ram[1]);
@@ -593,7 +593,7 @@ VIDEO_UPDATE( boomrang )
 	return 0;
 }
 
-VIDEO_UPDATE( liberate )
+SCREEN_UPDATE( liberate )
 {
 	liberate_state *state = screen->machine->driver_data<liberate_state>();
 	tilemap_set_scrolly(state->back_tilemap, 0,  state->io_ram[1]);

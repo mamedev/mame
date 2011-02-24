@@ -537,9 +537,9 @@ static MACHINE_CONFIG_START( gauntlet, gauntlet_state )
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a SYNGEN chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
+	MCFG_SCREEN_UPDATE(gauntlet)
 
 	MCFG_VIDEO_START(gauntlet)
-	MCFG_VIDEO_UPDATE(gauntlet)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -32,4 +32,4 @@ WRITE16_HANDLER( glass_vram_w );
 WRITE16_HANDLER( glass_blitter_w );
 
 VIDEO_START( glass );
-VIDEO_UPDATE( glass );
+SCREEN_UPDATE( glass );

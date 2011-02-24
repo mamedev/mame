@@ -124,7 +124,7 @@ static VIDEO_START(dunhuang)
 	state->save_item(NAME(state->paldata));
 }
 
-static VIDEO_UPDATE( dunhuang )
+static SCREEN_UPDATE( dunhuang )
 {
 	dunhuang_state *state = screen->machine->driver_data<dunhuang_state>();
 	int layers_ctrl = -1;
@@ -824,12 +824,12 @@ static MACHINE_CONFIG_START( dunhuang, dunhuang_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0+8, 512-8-1, 0+16, 256-16-1)
+	MCFG_SCREEN_UPDATE(dunhuang)
 
 	MCFG_GFXDECODE(dunhuang)
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(dunhuang)
-	MCFG_VIDEO_UPDATE(dunhuang)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

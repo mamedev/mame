@@ -139,7 +139,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( gng )
+SCREEN_UPDATE( gng )
 {
 	gng_state *state = screen->machine->driver_data<gng_state>();
 
@@ -150,7 +150,7 @@ VIDEO_UPDATE( gng )
 	return 0;
 }
 
-VIDEO_EOF( gng )
+SCREEN_EOF( gng )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 

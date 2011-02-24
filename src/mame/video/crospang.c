@@ -215,7 +215,7 @@ VIDEO_START( crospang )
 	tilemap_set_transparent_pen(state->fg_layer, 0);
 }
 
-VIDEO_UPDATE( crospang )
+SCREEN_UPDATE( crospang )
 {
 	crospang_state *state = screen->machine->driver_data<crospang_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_layer, 0, 0);

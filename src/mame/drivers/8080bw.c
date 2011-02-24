@@ -394,7 +394,8 @@ static MACHINE_CONFIG_DERIVED( invadpt2, mw8080bw_root )
 	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(invadpt2)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(invadpt2)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
@@ -569,7 +570,8 @@ static MACHINE_CONFIG_DERIVED( cosmo, mw8080bw_root )
 	MCFG_MACHINE_START(extra_8080bw)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(cosmo)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(cosmo)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
@@ -798,7 +800,8 @@ static MACHINE_CONFIG_DERIVED( lrescue, mw8080bw_root )
 	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(invadpt2)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(invadpt2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -946,7 +949,8 @@ static MACHINE_CONFIG_DERIVED( rollingc, mw8080bw_root )
 	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(rollingc)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(rollingc)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
@@ -1063,7 +1067,8 @@ static MACHINE_CONFIG_DERIVED( schaser, mw8080bw_root )
 	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(schaser)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(schaser)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1131,7 +1136,8 @@ static MACHINE_CONFIG_DERIVED( schasercv, mw8080bw_root )
 	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(schasercv)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(schasercv)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
@@ -1211,7 +1217,8 @@ static MACHINE_CONFIG_DERIVED( sflush, mw8080bw_root )
 	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(sflush)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(sflush)
 
 MACHINE_CONFIG_END
 
@@ -1317,7 +1324,8 @@ static MACHINE_CONFIG_DERIVED( lupin3, mw8080bw_root )
 	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(indianbt)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(indianbt)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
@@ -1336,7 +1344,8 @@ static MACHINE_CONFIG_DERIVED( lupin3a, mw8080bw_root )
 	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(lupin3)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(lupin3)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
@@ -1456,7 +1465,8 @@ static MACHINE_CONFIG_DERIVED( polaris, mw8080bw_root )
 	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(polaris)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(polaris)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1578,7 +1588,8 @@ static MACHINE_CONFIG_DERIVED( ballbomb, mw8080bw_root )
 	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(ballbomb)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(ballbomb)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
@@ -1751,7 +1762,8 @@ static MACHINE_CONFIG_DERIVED( indianbt, mw8080bw_root )
 	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(indianbt)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(indianbt)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
@@ -1824,7 +1836,8 @@ static MACHINE_CONFIG_DERIVED( steelwkr, mw8080bw_root )
 	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(invadpt2)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(invadpt2)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
@@ -1959,7 +1972,7 @@ static MACHINE_CONFIG_DERIVED( shuttlei, mw8080bw_root )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
-	MCFG_VIDEO_UPDATE(shuttlei)
+	MCFG_SCREEN_UPDATE(shuttlei)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
@@ -2139,7 +2152,8 @@ MACHINE_CONFIG_DERIVED( vortex, mw8080bw_root )
 
 	/* video hardware */
 	// TODO: replace with modified invaders color renderer code allowing midscanline color writes
-	MCFG_VIDEO_UPDATE(invaders)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(invaders)
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")

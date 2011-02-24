@@ -43,4 +43,4 @@ WRITE8_HANDLER( dogfgt_1800_w );
 
 PALETTE_INIT( dogfgt );
 VIDEO_START( dogfgt );
-VIDEO_UPDATE( dogfgt );
+SCREEN_UPDATE( dogfgt );

@@ -40,4 +40,4 @@ extern void chqflag_zoom_callback_0(running_machine *machine, int *code,int *col
 extern void chqflag_zoom_callback_1(running_machine *machine, int *code,int *color,int *flags);
 
 VIDEO_START( chqflag );
-VIDEO_UPDATE( chqflag );
+SCREEN_UPDATE( chqflag );

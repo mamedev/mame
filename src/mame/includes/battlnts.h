@@ -28,7 +28,7 @@ public:
 
 WRITE8_HANDLER( battlnts_spritebank_w );
 
-VIDEO_UPDATE( battlnts );
+SCREEN_UPDATE( battlnts );
 
 void battlnts_tile_callback(running_machine *machine, int layer, int bank, int *code, int *color, int *flags);
 void battlnts_sprite_callback(running_machine *machine, int *code, int *color);

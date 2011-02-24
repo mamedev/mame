@@ -328,7 +328,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( pang )
+SCREEN_UPDATE( pang )
 {
 	mitchell_state *state = screen->machine->driver_data<mitchell_state>();
 

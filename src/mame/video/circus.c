@@ -113,7 +113,7 @@ static void circus_draw_fg( running_machine *machine, bitmap_t *bitmap, const re
 	draw_line(bitmap, cliprect, 231, 192, 248, 192, 0);
 }
 
-VIDEO_UPDATE( circus )
+SCREEN_UPDATE( circus )
 {
 	circus_state *state = screen->machine->driver_data<circus_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
@@ -184,7 +184,7 @@ static void robotbwl_draw_ball( running_machine *machine, bitmap_t *bitmap, cons
 			state->clown_y + 8, state->clown_x + 8, 0);
 }
 
-VIDEO_UPDATE( robotbwl )
+SCREEN_UPDATE( robotbwl )
 {
 	circus_state *state = screen->machine->driver_data<circus_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
@@ -205,7 +205,7 @@ static void crash_draw_car( running_machine *machine, bitmap_t *bitmap, const re
 		state->clown_y, state->clown_x - 1, 0);
 }
 
-VIDEO_UPDATE( crash )
+SCREEN_UPDATE( crash )
 {
 	circus_state *state = screen->machine->driver_data<circus_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
@@ -213,7 +213,7 @@ VIDEO_UPDATE( crash )
 	return 0;
 }
 
-VIDEO_UPDATE( ripcord )
+SCREEN_UPDATE( ripcord )
 {
 	circus_state *state = screen->machine->driver_data<circus_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);

@@ -282,7 +282,7 @@ static void exctsccr_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 
 
-VIDEO_UPDATE( champbas )
+SCREEN_UPDATE( champbas )
 {
 	champbas_state *state = screen->machine->driver_data<champbas_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
@@ -290,7 +290,7 @@ VIDEO_UPDATE( champbas )
 	return 0;
 }
 
-VIDEO_UPDATE( exctsccr )
+SCREEN_UPDATE( exctsccr )
 {
 	champbas_state *state = screen->machine->driver_data<champbas_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);

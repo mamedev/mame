@@ -225,11 +225,11 @@ static MACHINE_CONFIG_START( victory, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* using the standard Exidy video parameters for now, needs to be confirmed */
 	MCFG_SCREEN_RAW_PARAMS(VICTORY_PIXEL_CLOCK, VICTORY_HTOTAL, VICTORY_HBEND, VICTORY_HBSTART, VICTORY_VTOTAL, VICTORY_VBEND, VICTORY_VBSTART)
+	MCFG_SCREEN_UPDATE(victory)
 
 	MCFG_PALETTE_LENGTH(64)
 
 	MCFG_VIDEO_START(victory)
-	MCFG_VIDEO_UPDATE(victory)
 
 	/* audio hardware */
 	MCFG_FRAGMENT_ADD(victory_audio)

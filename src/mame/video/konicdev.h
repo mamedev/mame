@@ -710,7 +710,7 @@ int k055555_get_palette_index(device_t *device, int idx);
 WRITE16_DEVICE_HANDLER( k054338_word_w ); // "CLCT" registers
 WRITE32_DEVICE_HANDLER( k054338_long_w );
 int k054338_register_r(device_t *device, int reg);
-void k054338_update_all_shadows(device_t *device, int rushingheroes_hack);			// called at the beginning of VIDEO_UPDATE()
+void k054338_update_all_shadows(device_t *device, int rushingheroes_hack);			// called at the beginning of SCREEN_UPDATE()
 void k054338_fill_solid_bg(device_t *device, bitmap_t *bitmap);				// solid backcolor fill
 void k054338_fill_backcolor(device_t *device, bitmap_t *bitmap, int mode);	// unified fill, 0=solid, 1=gradient (by using a k055555)
 int  k054338_set_alpha_level(device_t *device, int pblend);							// blend style 0-2

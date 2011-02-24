@@ -23,4 +23,4 @@ WRITE16_HANDLER( tecmo16_scroll_char_y_w );
 VIDEO_START( fstarfrc );
 VIDEO_START( ginkun );
 VIDEO_START( riot );
-VIDEO_UPDATE( tecmo16 );
+SCREEN_UPDATE( tecmo16 );

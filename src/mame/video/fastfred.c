@@ -308,7 +308,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 }
 
 
-VIDEO_UPDATE( fastfred )
+SCREEN_UPDATE( fastfred )
 {
 	fastfred_state *state = screen->machine->driver_data<fastfred_state>();
 	bitmap_fill(bitmap, cliprect, *state->background_color);
@@ -378,7 +378,7 @@ VIDEO_START( imago )
 	palette_set_color(machine,256+64+1,MAKE_RGB(0x00,0x00,0x00));
 }
 
-VIDEO_UPDATE( imago )
+SCREEN_UPDATE( imago )
 {
 	fastfred_state *state = screen->machine->driver_data<fastfred_state>();
 	tilemap_draw(bitmap,cliprect,state->web_tilemap,0,0);

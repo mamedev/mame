@@ -79,7 +79,7 @@ VIDEO_START( quizpani )
 	tilemap_set_transparent_pen(txt_tilemap,15);
 }
 
-VIDEO_UPDATE( quizpani )
+SCREEN_UPDATE( quizpani )
 {
 	tilemap_set_scrollx(bg_tilemap, 0, quizpani_scrollreg[0] - 64);
 	tilemap_set_scrolly(bg_tilemap, 0, quizpani_scrollreg[1] + 16);

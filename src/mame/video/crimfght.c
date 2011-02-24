@@ -77,7 +77,7 @@ VIDEO_START( crimfght )
 
 ***************************************************************************/
 
-VIDEO_UPDATE( crimfght )
+SCREEN_UPDATE( crimfght )
 {
 	crimfght_state *state = screen->machine->driver_data<crimfght_state>();
 

@@ -406,7 +406,8 @@ static MACHINE_CONFIG_DERIVED( trckydoc, tecfri )
 	MCFG_GFXDECODE(trckydoc)
 
 	MCFG_VIDEO_START(trckydoc)
-	MCFG_VIDEO_UPDATE(trckydoc)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(trckydoc)
 
 MACHINE_CONFIG_END
 
@@ -423,7 +424,8 @@ static MACHINE_CONFIG_DERIVED( sauro, tecfri )
 	MCFG_GFXDECODE(sauro)
 
 	MCFG_VIDEO_START(sauro)
-	MCFG_VIDEO_UPDATE(sauro)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(sauro)
 
 	MCFG_SOUND_ADD("speech", SP0256, 3120000)
 	MCFG_SOUND_CONFIG(sauro_sp256)

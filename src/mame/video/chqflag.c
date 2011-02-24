@@ -71,7 +71,7 @@ VIDEO_START( chqflag )
 
 ***************************************************************************/
 
-VIDEO_UPDATE( chqflag )
+SCREEN_UPDATE( chqflag )
 {
 	chqflag_state *state = screen->machine->driver_data<chqflag_state>();
 

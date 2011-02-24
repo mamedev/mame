@@ -140,7 +140,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-static VIDEO_UPDATE( mirage )
+static SCREEN_UPDATE( mirage )
 {
 	mirage_state *state = screen->machine->driver_data<mirage_state>();
 	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);
@@ -158,7 +158,7 @@ static VIDEO_UPDATE( mirage )
 	return 0;
 }
 
-static VIDEO_EOF( mirage )
+static SCREEN_EOF( mirage )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	buffer_spriteram16_w(space,0,0,0xffff);
@@ -399,12 +399,11 @@ static MACHINE_CONFIG_START( mirage, mirage_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_UPDATE(mirage)
+	MCFG_SCREEN_EOF(mirage)
 
 	MCFG_GFXDECODE(mirage)
 	MCFG_PALETTE_LENGTH(1024)
-
-	MCFG_VIDEO_UPDATE(mirage)
-	MCFG_VIDEO_EOF(mirage)
 
 	MCFG_DECO16IC_ADD("deco_custom", mirage_deco16ic_intf)
 

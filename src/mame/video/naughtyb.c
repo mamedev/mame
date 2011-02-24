@@ -210,7 +210,7 @@ WRITE8_HANDLER( popflame_videoreg_w )
 
 
 ***************************************************************************/
-VIDEO_UPDATE( naughtyb )
+SCREEN_UPDATE( naughtyb )
 {
 	naughtyb_state *state = screen->machine->driver_data<naughtyb_state>();
 	UINT8 *videoram = state->videoram;

@@ -133,7 +133,7 @@ WRITE8_HANDLER( gridlee_palette_select_w )
 /* all the BALSENTE_VBEND adjustments are needed because the hardware has a seperate counting chain
    to address the video memory instead of using the video chain directly */
 
-VIDEO_UPDATE( gridlee )
+SCREEN_UPDATE( gridlee )
 {
 	gridlee_state *state = screen->machine->driver_data<gridlee_state>();
 	const pen_t *pens = &screen->machine->pens[state->palettebank_vis * 32];

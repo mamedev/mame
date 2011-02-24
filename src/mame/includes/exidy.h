@@ -33,7 +33,7 @@ extern UINT8 *exidy_sprite_enable;
 
 void exidy_video_config(UINT8 _collision_mask, UINT8 _collision_invert, int _is_2bpp);
 VIDEO_START( exidy );
-VIDEO_UPDATE( exidy );
+SCREEN_UPDATE( exidy );
 
 INTERRUPT_GEN( exidy_vblank_interrupt );
 INTERRUPT_GEN( teetert_vblank_interrupt );

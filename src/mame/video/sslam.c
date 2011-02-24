@@ -191,7 +191,7 @@ VIDEO_START(powerbls)
 	state->save_item(NAME(state->sprites_x_offset));
 }
 
-VIDEO_UPDATE(sslam)
+SCREEN_UPDATE(sslam)
 {
 	sslam_state *state = screen->machine->driver_data<sslam_state>();
 
@@ -231,7 +231,7 @@ VIDEO_UPDATE(sslam)
 	return 0;
 }
 
-VIDEO_UPDATE(powerbls)
+SCREEN_UPDATE(powerbls)
 {
 	sslam_state *state = screen->machine->driver_data<sslam_state>();
 

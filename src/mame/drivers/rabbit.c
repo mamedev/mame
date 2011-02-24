@@ -430,7 +430,7 @@ static void rabbit_drawtilemap( running_machine *machine, bitmap_t *bitmap, cons
 			tran ? 0 : TILEMAP_DRAW_OPAQUE,0);
 }
 
-static VIDEO_UPDATE(rabbit)
+static SCREEN_UPDATE(rabbit)
 {
 	rabbit_state *state = screen->machine->driver_data<rabbit_state>();
 	int prilevel;
@@ -976,12 +976,12 @@ static MACHINE_CONFIG_START( rabbit, rabbit_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 64*16-1, 0*16, 64*16-1)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 20*16-1, 32*16, 48*16-1)
+	MCFG_SCREEN_UPDATE(rabbit)
 
 	MCFG_PALETTE_LENGTH(0x4000)
 	MCFG_PALETTE_INIT( all_black ) // the status bar palette doesn't get transfered (or our colour select is wrong).. more obvious when it's black than in 'MAME default' colours
 
 	MCFG_VIDEO_START(rabbit)
-	MCFG_VIDEO_UPDATE(rabbit)
 MACHINE_CONFIG_END
 
 

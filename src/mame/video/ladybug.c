@@ -282,7 +282,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( ladybug )
+SCREEN_UPDATE( ladybug )
 {
 	ladybug_state *state = screen->machine->driver_data<ladybug_state>();
 	int offs;
@@ -306,12 +306,12 @@ VIDEO_UPDATE( ladybug )
 	return 0;
 }
 
-VIDEO_EOF( sraider )	/* update starfield position */
+SCREEN_EOF( sraider )	/* update starfield position */
 {
 	redclash_update_stars_state(machine);
 }
 
-VIDEO_UPDATE( sraider )
+SCREEN_UPDATE( sraider )
 {
 	ladybug_state *state = screen->machine->driver_data<ladybug_state>();
 

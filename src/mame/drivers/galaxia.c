@@ -31,7 +31,7 @@ TS 2008.08.12:
 static UINT8 *galaxia_video;
 static UINT8 *galaxia_color;
 
-static VIDEO_UPDATE( galaxia )
+static SCREEN_UPDATE( galaxia )
 {
 	int x,y, count;
 
@@ -270,6 +270,7 @@ static MACHINE_CONFIG_START( galaxia, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE(galaxia)
 
 	MCFG_GFXDECODE(galaxia)
 	MCFG_PALETTE_LENGTH(0x100)
@@ -277,8 +278,6 @@ static MACHINE_CONFIG_START( galaxia, driver_device )
 	MCFG_S2636_ADD("s2636_0", s2636_0_config)
 	MCFG_S2636_ADD("s2636_1", s2636_1_config)
 	MCFG_S2636_ADD("s2636_2", s2636_2_config)
-
-	MCFG_VIDEO_UPDATE(galaxia)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

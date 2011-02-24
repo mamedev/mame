@@ -76,7 +76,7 @@ static VIDEO_START( flyball )
 }
 
 
-static VIDEO_UPDATE( flyball )
+static SCREEN_UPDATE( flyball )
 {
 	flyball_state *state = screen->machine->driver_data<flyball_state>();
 	int pitcherx = state->pitcher_horz;
@@ -415,12 +415,12 @@ static MACHINE_CONFIG_START( flyball, flyball_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
+	MCFG_SCREEN_UPDATE(flyball)
 
 	MCFG_GFXDECODE(flyball)
 	MCFG_PALETTE_LENGTH(4)
 
 	MCFG_PALETTE_INIT(flyball)
-	MCFG_VIDEO_UPDATE(flyball)
 	MCFG_VIDEO_START(flyball)
 
 	/* sound hardware */

@@ -37,7 +37,7 @@ VIDEO_START( s3c2410 )
 	s3c24xx_video_start( device, machine);
 }
 
-VIDEO_UPDATE( s3c2410 )
+SCREEN_UPDATE( s3c2410 )
 {
 	device_t *device = screen->machine->device( S3C2410_TAG);
 	return s3c24xx_video_update( device, screen, bitmap, cliprect);

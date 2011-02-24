@@ -664,7 +664,7 @@ static const ym2610_interface ym2610_config =
 
 /******************************************************************************/
 
-static VIDEO_EOF( bbuster )
+static SCREEN_EOF( bbuster )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
@@ -672,7 +672,7 @@ static VIDEO_EOF( bbuster )
 	buffer_spriteram16_2_w(space,0,0,0xffff);
 }
 
-static VIDEO_EOF( mechatt )
+static SCREEN_EOF( mechatt )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	buffer_spriteram16_w(space,0,0,0xffff);
@@ -699,12 +699,13 @@ static MACHINE_CONFIG_START( bbusters, bbusters_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(bbuster)
+	MCFG_SCREEN_EOF(bbuster)
+
 	MCFG_GFXDECODE(bbusters)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_VIDEO_START(bbuster)
-	MCFG_VIDEO_UPDATE(bbuster)
-	MCFG_VIDEO_EOF(bbuster)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -736,12 +737,13 @@ static MACHINE_CONFIG_START( mechatt, bbusters_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(mechatt)
+	MCFG_SCREEN_EOF(mechatt)
+
 	MCFG_GFXDECODE(mechatt)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START(mechatt)
-	MCFG_VIDEO_UPDATE(mechatt)
-	MCFG_VIDEO_EOF(mechatt)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

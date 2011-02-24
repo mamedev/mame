@@ -61,7 +61,7 @@ public:
 PALETTE_INIT( psx );
 VIDEO_START( psx_type1 );
 VIDEO_START( psx_type2 );
-VIDEO_UPDATE( psx );
+SCREEN_UPDATE( psx );
 INTERRUPT_GEN( psx_vblank );
 extern void psx_gpu_reset( running_machine *machine );
 extern void psx_gpu_read( running_machine *, UINT32 *p_ram, INT32 n_size );

@@ -489,6 +489,8 @@ static MACHINE_CONFIG_START( crshrace, crshrace_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_UPDATE(crshrace)
+	MCFG_SCREEN_EOF(crshrace)
 
 	MCFG_GFXDECODE(crshrace)
 	MCFG_PALETTE_LENGTH(2048)
@@ -496,8 +498,6 @@ static MACHINE_CONFIG_START( crshrace, crshrace_state )
 	MCFG_K053936_ADD("k053936", crshrace_k053936_intf)
 
 	MCFG_VIDEO_START(crshrace)
-	MCFG_VIDEO_EOF(crshrace)
-	MCFG_VIDEO_UPDATE(crshrace)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

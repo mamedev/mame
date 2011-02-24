@@ -122,7 +122,7 @@ static void kickgoal_draw_sprites( running_machine *machine, bitmap_t *bitmap,co
 }
 
 
-VIDEO_UPDATE( kickgoal )
+SCREEN_UPDATE( kickgoal )
 {
 	kickgoal_state *state = screen->machine->driver_data<kickgoal_state>();
 
@@ -253,7 +253,7 @@ static void actionhw_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 }
 
 
-VIDEO_UPDATE( actionhw )
+SCREEN_UPDATE( actionhw )
 {
 	kickgoal_state *state = screen->machine->driver_data<kickgoal_state>();
 	/* set scroll */

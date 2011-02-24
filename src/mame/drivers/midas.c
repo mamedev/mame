@@ -59,7 +59,7 @@
 static UINT16 *midas_gfxram, *midas_gfxregs;
 
 static VIDEO_START( midas );
-static VIDEO_UPDATE( midas );
+static SCREEN_UPDATE( midas );
 
 static tilemap_t *tmap;
 
@@ -162,7 +162,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-static VIDEO_UPDATE( midas )
+static SCREEN_UPDATE( midas )
 {
 	int layers_ctrl = -1;
 
@@ -687,12 +687,12 @@ static MACHINE_CONFIG_START( livequiz, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-16-1)
+	MCFG_SCREEN_UPDATE(midas)
 
 	MCFG_GFXDECODE(midas)
 	MCFG_PALETTE_LENGTH(0x10000)
 
 	MCFG_VIDEO_START(midas)
-	MCFG_VIDEO_UPDATE(midas)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -722,12 +722,12 @@ static MACHINE_CONFIG_START( hammer, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-16-1)
+	MCFG_SCREEN_UPDATE(midas)
 
 	MCFG_GFXDECODE(midas)
 	MCFG_PALETTE_LENGTH(0x10000)
 
 	MCFG_VIDEO_START(midas)
-	MCFG_VIDEO_UPDATE(midas)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

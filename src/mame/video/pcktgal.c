@@ -97,7 +97,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-VIDEO_UPDATE( pcktgal )
+SCREEN_UPDATE( pcktgal )
 {
 	pcktgal_state *state = screen->machine->driver_data<pcktgal_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);

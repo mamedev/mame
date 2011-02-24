@@ -287,7 +287,7 @@ WRITE16_HANDLER( m90_video_w )
 	markdirty(pf2_wide_layer,m90_video_control_data[6] & 0x2,offset);
 }
 
-VIDEO_UPDATE( m90 )
+SCREEN_UPDATE( m90 )
 {
 	static int last_pf1,last_pf2;
 	int pf1_base = m90_video_control_data[5] & 0x3;
@@ -455,7 +455,7 @@ VIDEO_UPDATE( m90 )
 	return 0;
 }
 
-VIDEO_UPDATE( bomblord )
+SCREEN_UPDATE( bomblord )
 {
 	int i;
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
@@ -507,7 +507,7 @@ VIDEO_UPDATE( bomblord )
 	return 0;
 }
 
-VIDEO_UPDATE( dynablsb )
+SCREEN_UPDATE( dynablsb )
 {
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));

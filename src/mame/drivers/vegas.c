@@ -508,7 +508,7 @@ static void remap_dynamic_addresses(running_machine *machine);
  *
  *************************************/
 
-static VIDEO_UPDATE( vegas )
+static SCREEN_UPDATE( vegas )
 {
 	vegas_state *state = screen->machine->driver_data<vegas_state>();
 	return voodoo_update(state->voodoo, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
@@ -2279,8 +2279,7 @@ static MACHINE_CONFIG_START( vegascore, vegas_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-
-	MCFG_VIDEO_UPDATE(vegas)
+	MCFG_SCREEN_UPDATE(vegas)
 MACHINE_CONFIG_END
 
 

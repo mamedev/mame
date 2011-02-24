@@ -162,7 +162,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-VIDEO_UPDATE( shadfrce )
+SCREEN_UPDATE( shadfrce )
 {
 	shadfrce_state *state = screen->machine->driver_data<shadfrce_state>();
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
@@ -182,7 +182,7 @@ VIDEO_UPDATE( shadfrce )
 	return 0;
 }
 
-VIDEO_EOF( shadfrce )
+SCREEN_EOF( shadfrce )
 {
 	shadfrce_state *state = machine->driver_data<shadfrce_state>();
 

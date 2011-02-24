@@ -249,7 +249,7 @@ static void ddealer_draw_video_layer( running_machine *machine, UINT16* vreg_bas
 }
 
 
-static VIDEO_UPDATE( ddealer )
+static SCREEN_UPDATE( ddealer )
 {
 	ddealer_state *state = screen->machine->driver_data<ddealer_state>();
 	tilemap_set_scrollx(state->back_tilemap, 0, state->flipscreen ? -192 : -64);
@@ -633,11 +633,11 @@ static MACHINE_CONFIG_START( ddealer, ddealer_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(ddealer)
 
 	MCFG_PALETTE_LENGTH(0x400)
 
 	MCFG_VIDEO_START(ddealer)
-	MCFG_VIDEO_UPDATE(ddealer)
 
 	MCFG_TIMER_ADD_PERIODIC("coinsim", ddealer_mcu_sim, attotime::from_hz(10000)) // not real, but for simulating the MCU
 

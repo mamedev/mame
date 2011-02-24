@@ -57,5 +57,5 @@ READ8_HANDLER( lkage_mcu_status_r );
 
 WRITE8_HANDLER( lkage_videoram_w );
 VIDEO_START( lkage );
-VIDEO_UPDATE( lkage );
+SCREEN_UPDATE( lkage );
 

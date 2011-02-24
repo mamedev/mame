@@ -281,11 +281,11 @@ VIDEO_START( generic_bitmapped )
 
 
 /*-------------------------------------------------
-    VIDEO_UPDATE( generic_bitmapped ) - blast the
+    SCREEN_UPDATE( generic_bitmapped ) - blast the
     generic bitmap to the screen
 -------------------------------------------------*/
 
-VIDEO_UPDATE( generic_bitmapped )
+SCREEN_UPDATE( generic_bitmapped )
 {
 	copybitmap(bitmap, screen->machine->generic.tmpbitmap, 0, 0, 0, 0, cliprect);
 	return 0;

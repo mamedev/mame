@@ -15,4 +15,4 @@ extern WRITE8_HANDLER( gridiron_led0_w );
 extern WRITE8_HANDLER( gridiron_led1_w );
 
 extern VIDEO_START( tehkanwc );
-extern VIDEO_UPDATE( tehkanwc );
+extern SCREEN_UPDATE( tehkanwc );

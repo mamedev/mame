@@ -326,7 +326,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 ***************************************************************************/
 
-VIDEO_UPDATE( clshroad )
+SCREEN_UPDATE( clshroad )
 {
 	int scrollx  = clshroad_vregs[ 0 ] + (clshroad_vregs[ 1 ] << 8);
 //  int priority = clshroad_vregs[ 2 ];

@@ -47,6 +47,6 @@ READ8_HANDLER( system1_sprite_collision_r );
 WRITE8_HANDLER( system1_sprite_collision_w );
 WRITE8_HANDLER( system1_sprite_collision_reset_w );
 
-VIDEO_UPDATE( system1 );
-VIDEO_UPDATE( system2 );
-VIDEO_UPDATE( system2_rowscroll );
+SCREEN_UPDATE( system1 );
+SCREEN_UPDATE( system2 );
+SCREEN_UPDATE( system2_rowscroll );

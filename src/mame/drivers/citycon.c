@@ -225,13 +225,13 @@ static MACHINE_CONFIG_START( citycon, citycon_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(citycon)
 
 	MCFG_GFXDECODE(citycon)
 	MCFG_PALETTE_LENGTH(640+1024)	/* 640 real palette + 1024 virtual palette */
 	MCFG_PALETTE_INIT(all_black) /* guess */
 
 	MCFG_VIDEO_START(citycon)
-	MCFG_VIDEO_UPDATE(citycon)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

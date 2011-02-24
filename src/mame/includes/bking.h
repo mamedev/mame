@@ -60,5 +60,5 @@ READ8_HANDLER( bking_pos_r );
 
 PALETTE_INIT( bking );
 VIDEO_START( bking );
-VIDEO_UPDATE( bking );
-VIDEO_EOF( bking );
+SCREEN_UPDATE( bking );
+SCREEN_EOF( bking );

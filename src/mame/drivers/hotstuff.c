@@ -12,7 +12,7 @@ VIDEO_START( hotstuff )
 
 /* the first 0x20 bytes in every 0x200 (each line) of video ram are the colour data, providing a palette of 16 RGB444 colours for that line */
 
-VIDEO_UPDATE( hotstuff )
+SCREEN_UPDATE( hotstuff )
 {
 	int count, y,yyy,x,xxx;
 	UINT16 row_palette_data[0x10];
@@ -76,11 +76,11 @@ static MACHINE_CONFIG_START( hotstuff, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(128*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA((0x10*4)+8, 101*8-1, 0*8, 33*8-1)
+	MCFG_SCREEN_UPDATE(hotstuff)
 
 	MCFG_PALETTE_LENGTH(0x200)
 
 	MCFG_VIDEO_START(hotstuff)
-	MCFG_VIDEO_UPDATE(hotstuff)
 MACHINE_CONFIG_END
 
 

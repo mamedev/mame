@@ -7590,7 +7590,7 @@ void K053250_set_LayerOffset(int chip, int offsx, int offsy)
 	K053250_info.chip[chip].offsy = offsy;
 }
 
-// The DMA process should be instantaneous but since rendering in MAME is performed at VIDEO_UPDATE()
+// The DMA process should be instantaneous but since rendering in MAME is performed at SCREEN_UPDATE()
 // the K053250 memory must be buffered to maintain visual integrity.
 static void K053250_dma(running_machine *machine, int chip, int limiter)
 {

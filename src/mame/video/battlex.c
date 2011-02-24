@@ -120,7 +120,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 }
 
-VIDEO_UPDATE(battlex)
+SCREEN_UPDATE(battlex)
 {
 	battlex_state *state = screen->machine->driver_data<battlex_state>();
 

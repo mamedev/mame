@@ -53,4 +53,4 @@ WRITE8_HANDLER( skydiver_2000_201F_w );
 WRITE8_HANDLER( skydiver_width_w );
 WRITE8_HANDLER( skydiver_coin_lockout_w );
 VIDEO_START( skydiver );
-VIDEO_UPDATE( skydiver );
+SCREEN_UPDATE( skydiver );

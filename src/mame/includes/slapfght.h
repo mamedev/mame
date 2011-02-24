@@ -89,8 +89,8 @@ extern UINT8 *slapfight_fixvideoram;
 extern UINT8 *slapfight_fixcolorram;
 extern UINT8 *slapfight_scrollx_lo,*slapfight_scrollx_hi,*slapfight_scrolly;
 
-VIDEO_UPDATE( slapfight );
-VIDEO_UPDATE( perfrman );
+SCREEN_UPDATE( slapfight );
+SCREEN_UPDATE( perfrman );
 VIDEO_START( slapfight );
 VIDEO_START( perfrman );
 

@@ -314,7 +314,7 @@ VIDEO_START( ojankoc )
 
 ******************************************************************************/
 
-VIDEO_UPDATE( ojankohs )
+SCREEN_UPDATE( ojankohs )
 {
 	ojankohs_state *state = screen->machine->driver_data<ojankohs_state>();
 
@@ -325,7 +325,7 @@ VIDEO_UPDATE( ojankohs )
 	return 0;
 }
 
-VIDEO_UPDATE( ojankoc )
+SCREEN_UPDATE( ojankoc )
 {
 	ojankohs_state *state = screen->machine->driver_data<ojankohs_state>();
 	int offs;

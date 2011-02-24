@@ -39,5 +39,5 @@ WRITE8_HANDLER( commando_scrolly_w );
 WRITE8_HANDLER( commando_c804_w );
 
 VIDEO_START( commando );
-VIDEO_UPDATE( commando );
-VIDEO_EOF( commando );
+SCREEN_UPDATE( commando );
+SCREEN_EOF( commando );

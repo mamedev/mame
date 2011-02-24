@@ -85,7 +85,7 @@ static void TilemapCB(UINT16 code, int *tile, int *mask )
 }
 
 
-VIDEO_UPDATE( namcofl )
+SCREEN_UPDATE( namcofl )
 {
 	int pri;
 

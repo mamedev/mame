@@ -218,7 +218,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const recta
 }
 
 
-VIDEO_UPDATE( sf )
+SCREEN_UPDATE( sf )
 {
 	sf_state *state = screen->machine->driver_data<sf_state>();
 

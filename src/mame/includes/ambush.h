@@ -25,4 +25,4 @@ public:
 /*----------- defined in video/ambush.c -----------*/
 
 PALETTE_INIT( ambush );
-VIDEO_UPDATE( ambush );
+SCREEN_UPDATE( ambush );

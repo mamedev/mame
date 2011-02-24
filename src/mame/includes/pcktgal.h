@@ -18,4 +18,4 @@ WRITE8_HANDLER( pcktgal_flipscreen_w );
 
 PALETTE_INIT( pcktgal );
 VIDEO_START( pcktgal );
-VIDEO_UPDATE( pcktgal );
+SCREEN_UPDATE( pcktgal );

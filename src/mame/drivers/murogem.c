@@ -167,7 +167,7 @@ GFXDECODE_END
 static PALETTE_INIT(murogem)
 {}
 
-static VIDEO_UPDATE(murogem)
+static SCREEN_UPDATE(murogem)
 {
 	int xx,yy,count;
 	count = 0x000;
@@ -220,12 +220,12 @@ static MACHINE_CONFIG_START( murogem, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE((39+1)*8, (38+1)*8)           // Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1).
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)    // Taken from MC6845 init, registers 01 & 06.
+	MCFG_SCREEN_UPDATE(murogem)
 
 	MCFG_GFXDECODE(murogem)
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_PALETTE_INIT(murogem)
-	MCFG_VIDEO_UPDATE(murogem)
 
 	MCFG_MC6845_ADD("crtc", MC6845, 750000, mc6845_intf) /* ? MHz */
 MACHINE_CONFIG_END

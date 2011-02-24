@@ -128,7 +128,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 /******************************************************************************/
 
-VIDEO_UPDATE( alpha68k_II )
+SCREEN_UPDATE( alpha68k_II )
 {
 	alpha68k_state *state = screen->machine->driver_data<alpha68k_state>();
 
@@ -275,7 +275,7 @@ static void draw_sprites_V( running_machine *machine, bitmap_t *bitmap, const re
 	}
 }
 
-VIDEO_UPDATE( alpha68k_V )
+SCREEN_UPDATE( alpha68k_V )
 {
 	alpha68k_state *state = screen->machine->driver_data<alpha68k_state>();
 	UINT16 *spriteram = state->spriteram;
@@ -316,7 +316,7 @@ VIDEO_UPDATE( alpha68k_V )
 	return 0;
 }
 
-VIDEO_UPDATE( alpha68k_V_sb )
+SCREEN_UPDATE( alpha68k_V_sb )
 {
 	alpha68k_state *state = screen->machine->driver_data<alpha68k_state>();
 
@@ -368,7 +368,7 @@ static void draw_sprites_I( running_machine *machine, bitmap_t *bitmap, const re
 	}
 }
 
-VIDEO_UPDATE( alpha68k_I )
+SCREEN_UPDATE( alpha68k_I )
 {
 	alpha68k_state *state = screen->machine->driver_data<alpha68k_state>();
 	int yshift = (state->microcontroller_id == 0x890a) ? 1 : 0; // The Next Space is 1 pixel off
@@ -501,7 +501,7 @@ static void kyros_draw_sprites( running_machine *machine, bitmap_t *bitmap, cons
 	}
 }
 
-VIDEO_UPDATE( kyros )
+SCREEN_UPDATE( kyros )
 {
 	alpha68k_state *state = screen->machine->driver_data<alpha68k_state>();
 	colortable_entry_set_value(screen->machine->colortable, 0x100, *state->videoram & 0xff);
@@ -561,7 +561,7 @@ static void sstingry_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 	}
 }
 
-VIDEO_UPDATE( sstingry )
+SCREEN_UPDATE( sstingry )
 {
 	alpha68k_state *state = screen->machine->driver_data<alpha68k_state>();
 	colortable_entry_set_value(screen->machine->colortable, 0x100, *state->videoram & 0xff);

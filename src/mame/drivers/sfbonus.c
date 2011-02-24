@@ -904,7 +904,7 @@ static void sfbonus_draw_reel_layer(screen_device *screen, bitmap_t *bitmap, con
 
 }
 
-static VIDEO_UPDATE(sfbonus)
+static SCREEN_UPDATE(sfbonus)
 {
 
 	int globalyscroll = (sfbonus_vregs[2] | sfbonus_vregs[3]<<8);
@@ -1266,11 +1266,11 @@ static MACHINE_CONFIG_START( sfbonus, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(128*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 288-1)
-
+	MCFG_SCREEN_UPDATE(sfbonus)
+	
 	MCFG_PALETTE_LENGTH(0x100*2) // *2 for priority workaraound / custom drawing
 
 	MCFG_VIDEO_START(sfbonus)
-	MCFG_VIDEO_UPDATE(sfbonus)
 
 	/* Parrot 3 seems fine at 1 Mhz, but Double Challenge isn't? */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

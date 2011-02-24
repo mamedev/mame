@@ -181,7 +181,7 @@ update_palette( running_machine *machine )
 } /* update_palette */
 
 
-VIDEO_UPDATE( namcos21 )
+SCREEN_UPDATE( namcos21 )
 {
 	namcos21_state *state = screen->machine->driver_data<namcos21_state>();
 	UINT8 *videoram = state->videoram;
@@ -245,7 +245,7 @@ VIDEO_UPDATE( namcos21 )
 		}
 	} /* winrun bitmap layer */
 	return 0;
-} /* VIDEO_UPDATE( namcos21 ) */
+} /* SCREEN_UPDATE( namcos21 ) */
 
 /*********************************************************************************************/
 

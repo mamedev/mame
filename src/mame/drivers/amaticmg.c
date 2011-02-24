@@ -397,7 +397,7 @@ static VIDEO_START( amaticmg )
 {
 }
 
-static VIDEO_UPDATE( amaticmg )
+static SCREEN_UPDATE( amaticmg )
 {
 	return 0;
 }
@@ -631,6 +631,7 @@ static MACHINE_CONFIG_START( amaticmg, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE(amaticmg)
 
 //  MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
 
@@ -639,7 +640,6 @@ static MACHINE_CONFIG_START( amaticmg, driver_device )
 	MCFG_PALETTE_INIT(amaticmg)
 	MCFG_PALETTE_LENGTH(0x100)
 	MCFG_VIDEO_START(amaticmg)
-	MCFG_VIDEO_UPDATE(amaticmg)
 
 	/* sound hardware */
 //  MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -236,7 +236,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	}
 }
 
-static VIDEO_UPDATE( panicr)
+static SCREEN_UPDATE( panicr)
 {
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 	tilemap_mark_all_tiles_dirty( txttilemap );
@@ -388,13 +388,13 @@ static MACHINE_CONFIG_START( panicr, panicr_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(panicr)
 
 	MCFG_GFXDECODE(panicr)
 	MCFG_PALETTE_LENGTH(256*3)
 	MCFG_PALETTE_INIT(panicr)
 
 	MCFG_VIDEO_START(panicr)
-	MCFG_VIDEO_UPDATE(panicr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -196,7 +196,7 @@ static VIDEO_START( miniboy7 )
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 37, 37);
 }
 
-static VIDEO_UPDATE( miniboy7 )
+static SCREEN_UPDATE( miniboy7 )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	return 0;
@@ -446,13 +446,13 @@ static MACHINE_CONFIG_START( miniboy7, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE((47+1)*8, (39+1)*8)                  /* Taken from MC6845, registers 00 & 04. Normally programmed with (value-1) */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 37*8-1, 0*8, 37*8-1)    /* Taken from MC6845, registers 01 & 06 */
+	MCFG_SCREEN_UPDATE(miniboy7)
 
 	MCFG_GFXDECODE(miniboy7)
 
 	MCFG_PALETTE_INIT(miniboy7)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_VIDEO_START(miniboy7)
-	MCFG_VIDEO_UPDATE(miniboy7)
 
 	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK/12, mc6845_intf) /* guess */
 

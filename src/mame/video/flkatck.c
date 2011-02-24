@@ -132,7 +132,7 @@ WRITE8_HANDLER( flkatck_k007121_regs_w )
 
 ***************************************************************************/
 
-VIDEO_UPDATE( flkatck )
+SCREEN_UPDATE( flkatck )
 {
 	flkatck_state *state = screen->machine->driver_data<flkatck_state>();
 	rectangle clip[2];

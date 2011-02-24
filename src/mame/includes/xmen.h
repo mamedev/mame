@@ -42,6 +42,6 @@ void xmen_tile_callback(running_machine *machine, int layer,int bank,int *code,i
 void xmen_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask);
 
 VIDEO_START( xmen6p );
-VIDEO_UPDATE( xmen );
-VIDEO_UPDATE( xmen6p );
-VIDEO_EOF( xmen6p );
+SCREEN_UPDATE( xmen );
+SCREEN_UPDATE( xmen6p );
+SCREEN_EOF( xmen6p );

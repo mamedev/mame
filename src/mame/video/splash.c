@@ -256,7 +256,7 @@ static void funystrp_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 
 ***************************************************************************/
 
-VIDEO_UPDATE( splash )
+SCREEN_UPDATE( splash )
 {
 	splash_state *state = screen->machine->driver_data<splash_state>();
 
@@ -272,7 +272,7 @@ VIDEO_UPDATE( splash )
 	return 0;
 }
 
-VIDEO_UPDATE( funystrp )
+SCREEN_UPDATE( funystrp )
 {
 	splash_state *state = screen->machine->driver_data<splash_state>();
 

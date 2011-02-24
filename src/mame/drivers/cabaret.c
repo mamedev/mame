@@ -104,7 +104,7 @@ static VIDEO_START(cabaret)
 }
 
 
-static VIDEO_UPDATE(cabaret)
+static SCREEN_UPDATE(cabaret)
 {
 	cabaret_state *state = screen->machine->driver_data<cabaret_state>();
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
@@ -341,12 +341,12 @@ static MACHINE_CONFIG_START( cabaret, cabaret_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE(cabaret)
 
 	MCFG_GFXDECODE(cabaret)
 	MCFG_PALETTE_LENGTH(0x800)
 
 	MCFG_VIDEO_START(cabaret)
-	MCFG_VIDEO_UPDATE(cabaret)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -57,7 +57,7 @@ static INTERRUPT_GEN( rotaryf_interrupt )
  *
  *************************************/
 
-static VIDEO_UPDATE( rotaryf )
+static SCREEN_UPDATE( rotaryf )
 {
 	rotaryf_state *state = screen->machine->driver_data<rotaryf_state>();
 	offs_t offs;
@@ -170,13 +170,12 @@ static MACHINE_CONFIG_START( rotaryf, rotaryf_state )
 	MCFG_CPU_VBLANK_INT_HACK(rotaryf_interrupt,5)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(rotaryf)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(32*8, 262)		/* vert size is a guess, taken from mw8080bw */
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 30*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_UPDATE(rotaryf)
 
 MACHINE_CONFIG_END
 

@@ -37,12 +37,12 @@ WRITE16_HANDLER( toki_control_w )
 	COMBINE_DATA(&toki_scrollram16[offset]);
 }
 
-VIDEO_EOF( toki )
+SCREEN_EOF( toki )
 {
 	buffer_spriteram16_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, 0, 0xffff);
 }
 
-VIDEO_EOF( tokib )
+SCREEN_EOF( tokib )
 {
 	buffer_spriteram16_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, 0, 0xffff);
 }
@@ -266,7 +266,7 @@ static void tokib_draw_sprites(running_machine *machine, bitmap_t *bitmap,const 
  *
  *************************************/
 
-VIDEO_UPDATE( toki )
+SCREEN_UPDATE( toki )
 {
 	int background_y_scroll,foreground_y_scroll,background_x_scroll,foreground_x_scroll;
 
@@ -300,7 +300,7 @@ VIDEO_UPDATE( toki )
 	return 0;
 }
 
-VIDEO_UPDATE( tokib )
+SCREEN_UPDATE( tokib )
 {
 	tilemap_set_scroll_rows(foreground_layer,1);
 	tilemap_set_scroll_rows(background_layer,1);

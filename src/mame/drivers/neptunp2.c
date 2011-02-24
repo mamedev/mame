@@ -14,7 +14,7 @@ static VIDEO_START( neptunp2 )
 
 }
 
-static VIDEO_UPDATE( neptunp2 )
+static SCREEN_UPDATE( neptunp2 )
 {
 	return 0;
 }
@@ -81,11 +81,11 @@ static MACHINE_CONFIG_START( neptunp2, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(neptunp2)
 	MCFG_GFXDECODE(neptunp2)
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_VIDEO_START(neptunp2)
-	MCFG_VIDEO_UPDATE(neptunp2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -224,7 +224,7 @@ VIDEO_START( ashnojoe )
 	tilemap_set_transparent_pen(state->joetilemap5, 15);
 }
 
-VIDEO_UPDATE( ashnojoe )
+SCREEN_UPDATE( ashnojoe )
 {
 	ashnojoe_state *state = screen->machine->driver_data<ashnojoe_state>();
 

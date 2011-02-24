@@ -82,7 +82,7 @@ static VIDEO_START( cultures )
 	tilemap_set_scrolldy(state->bg2_tilemap, 255, 0);
 }
 
-static VIDEO_UPDATE( cultures )
+static SCREEN_UPDATE( cultures )
 {
 	cultures_state *state = screen->machine->driver_data<cultures_state>();
 	int attr;
@@ -400,12 +400,12 @@ static MACHINE_CONFIG_START( cultures, cultures_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(cultures)
 
 	MCFG_GFXDECODE(culture)
 	MCFG_PALETTE_LENGTH(0x2000)
 
 	MCFG_VIDEO_START(cultures)
-	MCFG_VIDEO_UPDATE(cultures)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

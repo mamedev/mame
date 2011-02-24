@@ -54,7 +54,7 @@ static VIDEO_START( mgolf )
 }
 
 
-static VIDEO_UPDATE( mgolf )
+static SCREEN_UPDATE( mgolf )
 {
 	mgolf_state *state = screen->machine->driver_data<mgolf_state>();
 	int i;
@@ -334,13 +334,13 @@ static MACHINE_CONFIG_START( mgolf, mgolf_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 223)
+	MCFG_SCREEN_UPDATE(mgolf)
 
 	MCFG_GFXDECODE(mgolf)
 	MCFG_PALETTE_LENGTH(4)
 
 	MCFG_PALETTE_INIT(mgolf)
 	MCFG_VIDEO_START(mgolf)
-	MCFG_VIDEO_UPDATE(mgolf)
 
 	/* sound hardware */
 MACHINE_CONFIG_END

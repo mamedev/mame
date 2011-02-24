@@ -426,7 +426,7 @@ static const mc6845_interface mc6845_intf =
 };
 
 
-static VIDEO_UPDATE( nyny )
+static SCREEN_UPDATE( nyny )
 {
 	nyny_state *state = screen->machine->driver_data<nyny_state>();
 
@@ -730,11 +730,10 @@ static MACHINE_CONFIG_START( nyny, nyny_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(nyny)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256)	/* temporary, CRTC will configure screen */
+	MCFG_SCREEN_UPDATE(nyny)
 
 	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
 

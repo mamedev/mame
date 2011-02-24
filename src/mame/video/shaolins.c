@@ -192,7 +192,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-VIDEO_UPDATE( shaolins )
+SCREEN_UPDATE( shaolins )
 {
 	shaolins_state *state = screen->machine->driver_data<shaolins_state>();
 

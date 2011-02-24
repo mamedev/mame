@@ -215,7 +215,7 @@ static VIDEO_START( dreamwld )
 	tilemap_set_transparent_pen(state->bg2_tilemap,0);
 }
 
-static VIDEO_UPDATE( dreamwld )
+static SCREEN_UPDATE( dreamwld )
 {
 	dreamwld_state *state = screen->machine->driver_data<dreamwld_state>();
 
@@ -435,12 +435,12 @@ static MACHINE_CONFIG_START( dreamwld, dreamwld_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512,256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 304-1, 0, 224-1)
+	MCFG_SCREEN_UPDATE(dreamwld)
 
 	MCFG_PALETTE_LENGTH(0x1000)
 	MCFG_GFXDECODE(dreamwld)
 
 	MCFG_VIDEO_START(dreamwld)
-	MCFG_VIDEO_UPDATE(dreamwld)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

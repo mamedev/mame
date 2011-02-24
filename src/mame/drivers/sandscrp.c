@@ -133,7 +133,7 @@ static INTERRUPT_GEN( sandscrp_interrupt )
 }
 
 
-static VIDEO_EOF( sandscrp )
+static SCREEN_EOF( sandscrp )
 {
 	sandscrp_state *state = machine->driver_data<sandscrp_state>();
 	device_t *pandora = machine->device("pandora");
@@ -482,6 +482,8 @@ static MACHINE_CONFIG_START( sandscrp, sandscrp_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
+	MCFG_SCREEN_UPDATE(sandscrp)
+	MCFG_SCREEN_EOF(sandscrp)
 
 	MCFG_GFXDECODE(sandscrp)
 	MCFG_PALETTE_LENGTH(2048)
@@ -489,8 +491,6 @@ static MACHINE_CONFIG_START( sandscrp, sandscrp_state )
 	MCFG_KANEKO_PANDORA_ADD("pandora", sandscrp_pandora_config)
 
 	MCFG_VIDEO_START(sandscrp_1xVIEW2)
-	MCFG_VIDEO_EOF(sandscrp)
-	MCFG_VIDEO_UPDATE(sandscrp)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

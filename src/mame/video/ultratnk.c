@@ -55,7 +55,7 @@ VIDEO_START( ultratnk )
 }
 
 
-VIDEO_UPDATE( ultratnk )
+SCREEN_UPDATE( ultratnk )
 {
 	ultratnk_state *state = screen->machine->driver_data<ultratnk_state>();
 	UINT8 *videoram = state->videoram;
@@ -90,7 +90,7 @@ VIDEO_UPDATE( ultratnk )
 }
 
 
-VIDEO_EOF( ultratnk )
+SCREEN_EOF( ultratnk )
 {
 	ultratnk_state *state = machine->driver_data<ultratnk_state>();
 	int i;

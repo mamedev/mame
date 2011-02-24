@@ -199,7 +199,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 ***************************************************************************/
 
-VIDEO_UPDATE( thoop2 )
+SCREEN_UPDATE( thoop2 )
 {
 	thoop2_state *state = screen->machine->driver_data<thoop2_state>();
 	/* set scroll registers */

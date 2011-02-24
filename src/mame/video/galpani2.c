@@ -151,7 +151,7 @@ VIDEO_START( galpani2 )
 
 ***************************************************************************/
 
-VIDEO_UPDATE( galpani2 )
+SCREEN_UPDATE( galpani2 )
 {
 	int layers_ctrl = -1;
 

@@ -37,4 +37,4 @@ public:
 /*----------- defined in video/psikyo4.c -----------*/
 
 VIDEO_START( psikyo4 );
-VIDEO_UPDATE( psikyo4 );
+SCREEN_UPDATE( psikyo4 );

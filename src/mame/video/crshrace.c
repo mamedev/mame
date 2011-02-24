@@ -185,7 +185,7 @@ static void draw_fg(running_machine *machine, bitmap_t *bitmap, const rectangle 
 }
 
 
-VIDEO_UPDATE( crshrace )
+SCREEN_UPDATE( crshrace )
 {
 	crshrace_state *state = screen->machine->driver_data<crshrace_state>();
 
@@ -217,7 +217,7 @@ VIDEO_UPDATE( crshrace )
 	return 0;
 }
 
-VIDEO_EOF( crshrace )
+SCREEN_EOF( crshrace )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 

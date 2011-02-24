@@ -89,7 +89,7 @@ VIDEO_START( qwak )
 
 
 
-VIDEO_UPDATE( runaway )
+SCREEN_UPDATE( runaway )
 {
 	runaway_state *state = screen->machine->driver_data<runaway_state>();
 	int i;
@@ -124,7 +124,7 @@ VIDEO_UPDATE( runaway )
 }
 
 
-VIDEO_UPDATE( qwak )
+SCREEN_UPDATE( qwak )
 {
 	runaway_state *state = screen->machine->driver_data<runaway_state>();
 	int i;

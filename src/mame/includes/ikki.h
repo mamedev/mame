@@ -30,4 +30,4 @@ WRITE8_HANDLER( ikki_scrn_ctrl_w );
 
 PALETTE_INIT( ikki );
 VIDEO_START( ikki );
-VIDEO_UPDATE( ikki );
+SCREEN_UPDATE( ikki );

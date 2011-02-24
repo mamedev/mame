@@ -85,7 +85,7 @@ WRITE8_HANDLER( finalizr_videoctrl_w )
 
 
 
-VIDEO_UPDATE( finalizr )
+SCREEN_UPDATE( finalizr )
 {
 	finalizr_state *state = screen->machine->driver_data<finalizr_state>();
 	int offs;

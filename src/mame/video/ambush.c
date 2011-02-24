@@ -87,7 +87,7 @@ static void draw_chars( running_machine *machine, bitmap_t *bitmap, const rectan
 }
 
 
-VIDEO_UPDATE( ambush )
+SCREEN_UPDATE( ambush )
 {
 	ambush_state *state = screen->machine->driver_data<ambush_state>();
 	int offs;

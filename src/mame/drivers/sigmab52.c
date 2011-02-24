@@ -144,7 +144,7 @@ static VIDEO_START( jwildb52 )
 }
 
 
-static VIDEO_UPDATE( jwildb52 )
+static SCREEN_UPDATE( jwildb52 )
 {
 	device_t *hd63484 = screen->machine->device("hd63484");
 
@@ -586,6 +586,7 @@ static MACHINE_CONFIG_START( jwildb52, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(1024, 1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 384-1)
+	MCFG_SCREEN_UPDATE(jwildb52)
 
 	MCFG_HD63484_ADD("hd63484", jwildb52_hd63484_intf)
 
@@ -593,7 +594,6 @@ static MACHINE_CONFIG_START( jwildb52, driver_device )
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_VIDEO_START(jwildb52)
-	MCFG_VIDEO_UPDATE(jwildb52)
 
 MACHINE_CONFIG_END
 

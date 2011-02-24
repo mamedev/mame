@@ -348,12 +348,12 @@ static MACHINE_CONFIG_START( taotaido, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_UPDATE(taotaido)
+	MCFG_SCREEN_EOF( taotaido )
 
 	MCFG_PALETTE_LENGTH(0x800)
 
 	MCFG_VIDEO_START(taotaido)
-	MCFG_VIDEO_UPDATE(taotaido)
-	MCFG_VIDEO_EOF( taotaido )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

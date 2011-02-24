@@ -133,7 +133,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 
 
-static VIDEO_UPDATE( wcvol95 )
+static SCREEN_UPDATE( wcvol95 )
 {
 	deco156_state *state = screen->machine->driver_data<deco156_state>();
 
@@ -415,12 +415,12 @@ static MACHINE_CONFIG_START( hvysmsh, deco156_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_UPDATE(wcvol95)
 
 	MCFG_GFXDECODE(hvysmsh)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START(wcvol95)
-	MCFG_VIDEO_UPDATE(wcvol95)
 
 	MCFG_DECO16IC_ADD("deco_custom", deco156_deco16ic_intf)
 
@@ -454,12 +454,12 @@ static MACHINE_CONFIG_START( wcvol95, deco156_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_UPDATE(wcvol95)
 
 	MCFG_GFXDECODE(hvysmsh)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START(wcvol95)
-	MCFG_VIDEO_UPDATE(wcvol95)
 
 	MCFG_DECO16IC_ADD("deco_custom", deco156_deco16ic_intf)
 

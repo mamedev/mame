@@ -368,12 +368,12 @@ static MACHINE_CONFIG_START( sshangha, sshangha_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_UPDATE(sshangha)
 
 	MCFG_GFXDECODE(sshangha)
 	MCFG_PALETTE_LENGTH(4096)
 
 	MCFG_VIDEO_START(sshangha)
-	MCFG_VIDEO_UPDATE(sshangha)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") /* sure it's stereo? */

@@ -234,7 +234,7 @@ static VIDEO_START(luckgrln)
 	tilemap_set_transparent_pen( reel4_tilemap, 0 );
 }
 
-static VIDEO_UPDATE(luckgrln)
+static SCREEN_UPDATE(luckgrln)
 {
 	int y,x;
 	int count = 0;
@@ -829,12 +829,12 @@ static MACHINE_CONFIG_START( luckgrln, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE(luckgrln)
 
 	MCFG_GFXDECODE(luckgrln)
 	MCFG_PALETTE_LENGTH(0x8000)
 
 	MCFG_VIDEO_START(luckgrln)
-	MCFG_VIDEO_UPDATE(luckgrln)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

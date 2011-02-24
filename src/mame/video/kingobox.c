@@ -246,7 +246,7 @@ static void kingofb_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 	}
 }
 
-VIDEO_UPDATE( kingofb )
+SCREEN_UPDATE( kingofb )
 {
 	kingofb_state *state = screen->machine->driver_data<kingofb_state>();
 
@@ -308,7 +308,7 @@ static void ringking_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 	}
 }
 
-VIDEO_UPDATE( ringking )
+SCREEN_UPDATE( ringking )
 {
 	kingofb_state *state = screen->machine->driver_data<kingofb_state>();
 

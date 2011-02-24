@@ -269,7 +269,7 @@ static void trojan_draw_sprites( running_machine *machine, bitmap_t *bitmap, con
 	}
 }
 
-VIDEO_UPDATE( lwings )
+SCREEN_UPDATE( lwings )
 {
 	lwings_state *state = screen->machine->driver_data<lwings_state>();
 
@@ -279,7 +279,7 @@ VIDEO_UPDATE( lwings )
 	return 0;
 }
 
-VIDEO_UPDATE( trojan )
+SCREEN_UPDATE( trojan )
 {
 	lwings_state *state = screen->machine->driver_data<lwings_state>();
 
@@ -291,7 +291,7 @@ VIDEO_UPDATE( trojan )
 	return 0;
 }
 
-VIDEO_EOF( lwings )
+SCREEN_EOF( lwings )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 

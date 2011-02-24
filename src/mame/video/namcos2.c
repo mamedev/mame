@@ -460,7 +460,7 @@ ApplyClip( rectangle *clip, const rectangle *cliprect )
 	sect_rect(clip, cliprect);
 } /* ApplyClip */
 
-VIDEO_UPDATE( namcos2_default )
+SCREEN_UPDATE( namcos2_default )
 {
 	rectangle clip;
 	int pri;
@@ -497,7 +497,7 @@ VIDEO_START( finallap )
 	namco_road_init(machine, 3);
 }
 
-VIDEO_UPDATE( finallap )
+SCREEN_UPDATE( finallap )
 {
 	rectangle clip;
 	int pri;
@@ -534,7 +534,7 @@ VIDEO_START( luckywld )
 	}
 } /* luckywld */
 
-VIDEO_UPDATE( luckywld )
+SCREEN_UPDATE( luckywld )
 {
 	rectangle clip;
 	int pri;
@@ -567,7 +567,7 @@ VIDEO_START( sgunner )
 	namco_obj_init( machine, 0, 0x0, NULL );
 }
 
-VIDEO_UPDATE( sgunner )
+SCREEN_UPDATE( sgunner )
 {
 	rectangle clip;
 	int pri;
@@ -593,7 +593,7 @@ VIDEO_START( metlhawk )
 	namco_roz_init( machine, 1, "gfx5" );
 }
 
-VIDEO_UPDATE( metlhawk )
+SCREEN_UPDATE( metlhawk )
 {
 	rectangle clip;
 	int pri;

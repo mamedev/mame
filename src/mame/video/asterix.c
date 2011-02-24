@@ -46,7 +46,7 @@ void asterix_tile_callback( running_machine *machine, int layer, int *code, int 
 	*code = (*code & 0x03ff) | state->tilebanks[(*code >> 10) & 3];
 }
 
-VIDEO_UPDATE( asterix )
+SCREEN_UPDATE( asterix )
 {
 	asterix_state *state = screen->machine->driver_data<asterix_state>();
 	static const int K053251_CI[4] = { K053251_CI0, K053251_CI2, K053251_CI3, K053251_CI4 };

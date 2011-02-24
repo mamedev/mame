@@ -398,7 +398,7 @@ static VIDEO_START(varia)
 	tilemap_set_transparent_pen(state->vmetal_mid2tilemap, 15);
 }
 
-static VIDEO_UPDATE(varia)
+static SCREEN_UPDATE(varia)
 {
 	metro_state *state = screen->machine->driver_data<metro_state>();
 
@@ -435,12 +435,12 @@ static MACHINE_CONFIG_START( varia, metro_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(2048, 2048)
 	MCFG_SCREEN_VISIBLE_AREA(0+64, 319+64, 0+64, 223+64)
+	MCFG_SCREEN_UPDATE(varia)
 
 	MCFG_GFXDECODE(vmetal)
 	MCFG_PALETTE_LENGTH(0x4000)
 
 	MCFG_VIDEO_START(varia)
-	MCFG_VIDEO_UPDATE(varia)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

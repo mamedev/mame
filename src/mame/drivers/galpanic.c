@@ -125,7 +125,7 @@ The current set of Super Model is an example of type C
 #include "video/kan_pand.h"
 #include "includes/galpanic.h"
 
-static VIDEO_EOF( galpanic )
+static SCREEN_EOF( galpanic )
 {
 	device_t *pandora = machine->device("pandora");
 	pandora_eof(pandora);
@@ -885,6 +885,8 @@ static MACHINE_CONFIG_START( galpanic, galpanic_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
+	MCFG_SCREEN_UPDATE(galpanic)
+	MCFG_SCREEN_EOF( galpanic )
 
 	MCFG_GFXDECODE(galpanic)
 	MCFG_PALETTE_LENGTH(1024 + 32768)
@@ -893,8 +895,6 @@ static MACHINE_CONFIG_START( galpanic, galpanic_state )
 
 	MCFG_PALETTE_INIT(galpanic)
 	MCFG_VIDEO_START(galpanic)
-	MCFG_VIDEO_UPDATE(galpanic)
-	MCFG_VIDEO_EOF( galpanic )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -922,8 +922,8 @@ static MACHINE_CONFIG_DERIVED( comad, galpanic )
 	MCFG_DEVICE_REMOVE("pandora")
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(comad)
-	MCFG_VIDEO_EOF(0)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(comad)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( supmodel, comad )
@@ -935,8 +935,8 @@ static MACHINE_CONFIG_DERIVED( supmodel, comad )
 	MCFG_CPU_VBLANK_INT_HACK(galpanic_interrupt,2)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(comad)
-	MCFG_VIDEO_EOF(0)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(comad)
 
 	/* sound hardware */
 	MCFG_OKIM6295_REPLACE("oki", 1584000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
@@ -952,8 +952,8 @@ static MACHINE_CONFIG_DERIVED( fantsia2, comad )
 	MCFG_CPU_PROGRAM_MAP(fantsia2_map)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(comad)
-	MCFG_VIDEO_EOF(0)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(comad)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( galhustl, comad )
@@ -965,8 +965,8 @@ static MACHINE_CONFIG_DERIVED( galhustl, comad )
 	MCFG_CPU_VBLANK_INT_HACK(galhustl_interrupt,3)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(comad)
-	MCFG_VIDEO_EOF(0)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(comad)
 
 	/* sound hardware */
 	MCFG_OKIM6295_REPLACE("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
@@ -982,7 +982,8 @@ static MACHINE_CONFIG_DERIVED( zipzap, comad )
 	MCFG_CPU_VBLANK_INT_HACK(galhustl_interrupt,3)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(comad)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(comad)
 
 	/* sound hardware */
 	MCFG_OKIM6295_REPLACE("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified

@@ -239,7 +239,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( ironhors )
+SCREEN_UPDATE( ironhors )
 {
 	ironhors_state *state = screen->machine->driver_data<ironhors_state>();
 	int row;
@@ -352,7 +352,7 @@ static void farwest_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 	}
 }
 
-VIDEO_UPDATE( farwest)
+SCREEN_UPDATE( farwest)
 {
 	ironhors_state *state = screen->machine->driver_data<ironhors_state>();
 	int row;

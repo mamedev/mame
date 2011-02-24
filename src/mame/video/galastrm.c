@@ -435,7 +435,7 @@ static void tc0610_rotate_draw(running_machine *machine, bitmap_t *bitmap, bitma
                 SCREEN REFRESH
 **************************************************************/
 
-VIDEO_UPDATE( galastrm )
+SCREEN_UPDATE( galastrm )
 {
 	galastrm_state *state = screen->machine->driver_data<galastrm_state>();
 	device_t *tc0100scn = screen->machine->device("tc0100scn");

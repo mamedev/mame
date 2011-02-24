@@ -97,8 +97,8 @@ extern VIDEO_START( s16a_bootleg );
 extern VIDEO_START( s16a_bootleg_wb3bl );
 extern VIDEO_START( s16a_bootleg_shinobi );
 extern VIDEO_START( s16a_bootleg_passsht );
-extern VIDEO_UPDATE( s16a_bootleg );
-extern VIDEO_UPDATE( s16a_bootleg_passht4b );
+extern SCREEN_UPDATE( s16a_bootleg );
+extern SCREEN_UPDATE( s16a_bootleg_passht4b );
 extern WRITE16_HANDLER( s16a_bootleg_tilemapselect_w );
 extern WRITE16_HANDLER( s16a_bootleg_bgscrolly_w );
 extern WRITE16_HANDLER( s16a_bootleg_bgscrollx_w );
@@ -111,8 +111,8 @@ extern WRITE16_HANDLER( sys16_textram_w );
 
 /* "normal" video hardware */
 extern VIDEO_START( system16 );
-extern VIDEO_UPDATE( system16 );
+extern SCREEN_UPDATE( system16 );
 
 /* system18 video hardware */
 extern VIDEO_START( system18old );
-extern VIDEO_UPDATE( system18old );
+extern SCREEN_UPDATE( system18old );

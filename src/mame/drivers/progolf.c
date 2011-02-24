@@ -87,7 +87,7 @@ static VIDEO_START( progolf )
 }
 
 
-static VIDEO_UPDATE( progolf )
+static SCREEN_UPDATE( progolf )
 {
 	progolf_state *state = screen->machine->driver_data<progolf_state>();
 	UINT8 *videoram = state->videoram;
@@ -468,6 +468,7 @@ static MACHINE_CONFIG_START( progolf, progolf_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(progolf)
 
 	MCFG_GFXDECODE(progolf)
 	MCFG_PALETTE_LENGTH(32*3)
@@ -475,7 +476,6 @@ static MACHINE_CONFIG_START( progolf, progolf_state )
 
 	MCFG_MC6845_ADD("crtc", MC6845, 3000000/4, mc6845_intf)	/* hand tuned to get ~57 fps */
 	MCFG_VIDEO_START(progolf)
-	MCFG_VIDEO_UPDATE(progolf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

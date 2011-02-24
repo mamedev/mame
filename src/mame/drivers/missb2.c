@@ -24,7 +24,7 @@ OKI M6295 sound ROM dump is bad.
 
 /* Video Hardware */
 
-static VIDEO_UPDATE( missb2 )
+static SCREEN_UPDATE( missb2 )
 {
 	bublbobl_state *state = screen->machine->driver_data<bublbobl_state>();
 	int offs;
@@ -468,11 +468,10 @@ static MACHINE_CONFIG_START( missb2, bublbobl_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(missb2)
 
 	MCFG_GFXDECODE(missb2)
 	MCFG_PALETTE_LENGTH(512)
-
-	MCFG_VIDEO_UPDATE(missb2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

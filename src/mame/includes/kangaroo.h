@@ -28,7 +28,7 @@ public:
 /*----------- defined in video/kangaroo.c -----------*/
 
 VIDEO_START( kangaroo );
-VIDEO_UPDATE( kangaroo );
+SCREEN_UPDATE( kangaroo );
 
 WRITE8_HANDLER( kangaroo_videoram_w );
 WRITE8_HANDLER( kangaroo_video_control_w );

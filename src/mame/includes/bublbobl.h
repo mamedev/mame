@@ -94,4 +94,4 @@ WRITE8_HANDLER( bublbobl_68705_ddr_b_w );
 
 /*----------- defined in video/bublbobl.c -----------*/
 
-VIDEO_UPDATE( bublbobl );
+SCREEN_UPDATE( bublbobl );

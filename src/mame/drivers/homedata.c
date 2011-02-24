@@ -1274,14 +1274,14 @@ static MACHINE_CONFIG_START( mrokumei, homedata_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	// visible area can be changed at runtime
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(mrokumei)
+	MCFG_SCREEN_EOF(homedata)
 
 	MCFG_GFXDECODE(mrokumei)
 	MCFG_PALETTE_LENGTH(0x8000)
 
 	MCFG_PALETTE_INIT(mrokumei)
 	MCFG_VIDEO_START(mrokumei)
-	MCFG_VIDEO_UPDATE(mrokumei)
-	MCFG_VIDEO_EOF(homedata)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1343,14 +1343,14 @@ static MACHINE_CONFIG_START( reikaids, homedata_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 16, 256-1-16)
+	MCFG_SCREEN_UPDATE(reikaids)
+	MCFG_SCREEN_EOF(homedata)
 
 	MCFG_GFXDECODE(reikaids)
 	MCFG_PALETTE_LENGTH(0x8000)
 
 	MCFG_PALETTE_INIT(reikaids)
 	MCFG_VIDEO_START(reikaids)
-	MCFG_VIDEO_UPDATE(reikaids)
-	MCFG_VIDEO_EOF(homedata)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1395,14 +1395,14 @@ static MACHINE_CONFIG_START( pteacher, homedata_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	// visible area can be changed at runtime
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(pteacher)
+	MCFG_SCREEN_EOF(homedata)
 
 	MCFG_GFXDECODE(pteacher)
 	MCFG_PALETTE_LENGTH(0x8000)
 
 	MCFG_PALETTE_INIT(pteacher)
 	MCFG_VIDEO_START(pteacher)
-	MCFG_VIDEO_UPDATE(pteacher)
-	MCFG_VIDEO_EOF(homedata)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1560,13 +1560,13 @@ static MACHINE_CONFIG_START( mirderby, homedata_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(mirderby)
 
 	MCFG_GFXDECODE(mirderby)
 	MCFG_PALETTE_LENGTH(0x8000)
 
 	MCFG_PALETTE_INIT(mirderby)
 	MCFG_VIDEO_START(mirderby)
-	MCFG_VIDEO_UPDATE(mirderby)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

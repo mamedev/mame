@@ -132,7 +132,7 @@ video_update_common(running_machine *machine, bitmap_t *bitmap, const rectangle 
 
 /************************************************************************************************/
 
-VIDEO_UPDATE( namconb1 )
+SCREEN_UPDATE( namconb1 )
 {
 	/* compute window for custom screen blanking */
 	rectangle clip;
@@ -171,7 +171,7 @@ VIDEO_START( namconb1 )
 
 /****************************************************************************************************/
 
-VIDEO_UPDATE( namconb2 )
+SCREEN_UPDATE( namconb2 )
 {
 	/* compute window for custom screen blanking */
 	rectangle clip;

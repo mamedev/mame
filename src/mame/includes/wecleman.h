@@ -46,9 +46,9 @@ WRITE16_HANDLER( wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w );
 WRITE16_HANDLER( wecleman_videostatus_w );
 WRITE16_HANDLER( wecleman_pageram_w );
 WRITE16_HANDLER( wecleman_txtram_w );
-VIDEO_UPDATE( wecleman );
+SCREEN_UPDATE( wecleman );
 VIDEO_START( wecleman );
-VIDEO_UPDATE( hotchase );
+SCREEN_UPDATE( hotchase );
 VIDEO_START( hotchase );
 
 void hotchase_zoom_callback_0(running_machine *machine, int *code,int *color,int *flags);

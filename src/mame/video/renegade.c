@@ -129,7 +129,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-VIDEO_UPDATE( renegade )
+SCREEN_UPDATE( renegade )
 {
 	tilemap_set_scrollx(bg_tilemap, 0, renegade_scrollx);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0 , 0);

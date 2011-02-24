@@ -19,5 +19,5 @@ WRITE16_HANDLER( dynduke_gfxbank_w );
 WRITE16_HANDLER( dynduke_control_w );
 WRITE16_HANDLER( dynduke_paletteram_w );
 VIDEO_START( dynduke );
-VIDEO_UPDATE( dynduke );
-VIDEO_EOF( dynduke );
+SCREEN_UPDATE( dynduke );
+SCREEN_EOF( dynduke );

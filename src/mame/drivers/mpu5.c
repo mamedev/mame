@@ -28,7 +28,7 @@ static VIDEO_START(mpu5)
 
 }
 
-static VIDEO_UPDATE(mpu5)
+static SCREEN_UPDATE(mpu5)
 {
 	return 0;
 }
@@ -44,11 +44,11 @@ static MACHINE_CONFIG_START( mpu5, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, 48*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(mpu5)
 
 	MCFG_PALETTE_LENGTH(0x200)
 
 	MCFG_VIDEO_START(mpu5)
-	MCFG_VIDEO_UPDATE(mpu5)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	/* unknown sound */

@@ -209,7 +209,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
  *
  *************************************/
 
-VIDEO_UPDATE( timeplt )
+SCREEN_UPDATE( timeplt )
 {
 	timeplt_state *state = screen->machine->driver_data<timeplt_state>();
 

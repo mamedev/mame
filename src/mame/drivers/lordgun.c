@@ -692,12 +692,12 @@ static MACHINE_CONFIG_START( lordgun, lordgun_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(0x200, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0,0x1c0-1, 0,0xe0-1)
+	MCFG_SCREEN_UPDATE(lordgun)
 
 	MCFG_GFXDECODE(lordgun)
 	MCFG_PALETTE_LENGTH(0x800 * 8)	// 0x800 real colors, repeated per priority level
 
 	MCFG_VIDEO_START(lordgun)
-	MCFG_VIDEO_UPDATE(lordgun)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -736,12 +736,12 @@ static MACHINE_CONFIG_START( aliencha, lordgun_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(0x200, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0,0x1c0-1, 0,0xe0-1)
+	MCFG_SCREEN_UPDATE(lordgun)
 
 	MCFG_GFXDECODE(lordgun)
 	MCFG_PALETTE_LENGTH(0x800 * 8)	// 0x800 real colors, repeated per priority level
 
 	MCFG_VIDEO_START(lordgun)
-	MCFG_VIDEO_UPDATE(lordgun)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

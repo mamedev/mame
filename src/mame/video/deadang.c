@@ -128,7 +128,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-VIDEO_UPDATE( deadang )
+SCREEN_UPDATE( deadang )
 {
 	/* Setup the tilemaps */
 	tilemap_set_scrolly( pf3_layer,0, ((deadang_scroll_ram[0x01]&0xf0)<<4)+((deadang_scroll_ram[0x02]&0x7f)<<1)+((deadang_scroll_ram[0x02]&0x80)>>7) );

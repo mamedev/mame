@@ -111,7 +111,7 @@ static void momoko_draw_bg_pri( running_machine *machine, bitmap_t *bitmap, int 
 
 /****************************************************************************/
 
-VIDEO_UPDATE( momoko )
+SCREEN_UPDATE( momoko )
 {
 	momoko_state *state = screen->machine->driver_data<momoko_state>();
 	int x, y, dx, dy, rx, ry, radr, chr, sy, fx, fy, px, py, offs, col, pri, flip ;

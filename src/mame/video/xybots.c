@@ -103,7 +103,7 @@ VIDEO_START( xybots )
  *
  *************************************/
 
-VIDEO_UPDATE( xybots )
+SCREEN_UPDATE( xybots )
 {
 	xybots_state *state = screen->machine->driver_data<xybots_state>();
 	atarimo_rect_list rectlist;

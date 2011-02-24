@@ -124,7 +124,7 @@ VIDEO_START(ksayakyu)
 	tilemap_set_transparent_pen(state->textmap, 0);
 }
 
-VIDEO_UPDATE(ksayakyu)
+SCREEN_UPDATE(ksayakyu)
 {
 	ksayakyu_state *state = screen->machine->driver_data<ksayakyu_state>();
 

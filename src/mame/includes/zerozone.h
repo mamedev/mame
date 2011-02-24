@@ -29,4 +29,4 @@ WRITE16_HANDLER( zerozone_tilemap_w );
 WRITE16_HANDLER( zerozone_tilebank_w );
 
 VIDEO_START( zerozone );
-VIDEO_UPDATE( zerozone );
+SCREEN_UPDATE( zerozone );

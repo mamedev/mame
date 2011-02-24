@@ -34,4 +34,4 @@ WRITE8_HANDLER( bombjack_background_w );
 WRITE8_HANDLER( bombjack_flipscreen_w );
 
 VIDEO_START( bombjack );
-VIDEO_UPDATE( bombjack );
+SCREEN_UPDATE( bombjack );

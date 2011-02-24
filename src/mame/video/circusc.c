@@ -198,7 +198,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( circusc )
+SCREEN_UPDATE( circusc )
 {
 	circusc_state *state = screen->machine->driver_data<circusc_state>();
 	int i;

@@ -268,7 +268,7 @@ static TIMER_CALLBACK( starfire_scanline_callback )
 	state->scanline_timer->adjust(machine->primary_screen->time_until_pos(y), y);
 }
 
-VIDEO_UPDATE( starfire )
+SCREEN_UPDATE( starfire )
 {
 	starfire_state *state = screen->machine->driver_data<starfire_state>();
     copybitmap(bitmap, state->starfire_screen, 0, 0, 0, 0, cliprect);

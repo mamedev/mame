@@ -206,7 +206,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 }
 
 
-VIDEO_UPDATE( skydiver )
+SCREEN_UPDATE( skydiver )
 {
 	skydiver_state *state = screen->machine->driver_data<skydiver_state>();
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);

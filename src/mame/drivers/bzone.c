@@ -563,9 +563,9 @@ static MACHINE_CONFIG_START( bzone_base, driver_device )
 	MCFG_SCREEN_REFRESH_RATE(40)
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 580, 0, 400)
+	MCFG_SCREEN_UPDATE(vector)
 
 	MCFG_VIDEO_START(avg_bzone)
-	MCFG_VIDEO_UPDATE(vector)
 
 	/* Drivers */
 	MCFG_MATHBOX_ADD("mathbox")

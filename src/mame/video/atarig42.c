@@ -180,7 +180,7 @@ void atarig42_scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-VIDEO_UPDATE( atarig42 )
+SCREEN_UPDATE( atarig42 )
 {
 	atarig42_state *state = screen->machine->driver_data<atarig42_state>();
 	bitmap_t *priority_bitmap = screen->machine->priority_bitmap;
@@ -227,7 +227,7 @@ VIDEO_UPDATE( atarig42 )
 	return 0;
 }
 
-VIDEO_EOF( atarig42 )
+SCREEN_EOF( atarig42 )
 {
 	atarig42_state *state = machine->driver_data<atarig42_state>();
 

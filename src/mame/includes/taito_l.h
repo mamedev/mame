@@ -56,9 +56,9 @@ public:
 
 /*----------- defined in video/taito_l.c -----------*/
 
-VIDEO_EOF( taitol );
+SCREEN_EOF( taitol );
 VIDEO_START( taitol );
-VIDEO_UPDATE( taitol );
+SCREEN_UPDATE( taitol );
 
 void taitol_chardef14_m(running_machine *machine, int offset);
 void taitol_chardef15_m(running_machine *machine, int offset);

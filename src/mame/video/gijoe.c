@@ -75,7 +75,7 @@ VIDEO_START( gijoe )
 	state->save_item(NAME(state->layer_pri));
 }
 
-VIDEO_UPDATE( gijoe )
+SCREEN_UPDATE( gijoe )
 {
 	gijoe_state *state = screen->machine->driver_data<gijoe_state>();
 	static const int K053251_CI[4] = { K053251_CI1, K053251_CI2, K053251_CI3, K053251_CI4 };

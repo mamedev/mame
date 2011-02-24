@@ -216,7 +216,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-VIDEO_UPDATE( pitnrun )
+SCREEN_UPDATE( pitnrun )
 {
 	pitnrun_state *state = screen->machine->driver_data<pitnrun_state>();
 	int dx=0,dy=0;

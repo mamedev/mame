@@ -30,4 +30,4 @@ extern void crimfght_tile_callback(running_machine *machine, int layer,int bank,
 extern void crimfght_sprite_callback(running_machine *machine, int *code,int *color,int *priority,int *shadow);
 
 VIDEO_START( crimfght );
-VIDEO_UPDATE( crimfght );
+SCREEN_UPDATE( crimfght );

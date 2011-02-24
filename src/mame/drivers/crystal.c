@@ -631,7 +631,7 @@ static void SetVidReg( address_space *space, UINT16 reg, UINT16 val )
 }
 
 
-static VIDEO_UPDATE( crystal )
+static SCREEN_UPDATE( crystal )
 {
 	crystal_state *state = screen->machine->driver_data<crystal_state>();
 	address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -692,7 +692,7 @@ static VIDEO_UPDATE( crystal )
 	return 0;
 }
 
-static VIDEO_EOF(crystal)
+static SCREEN_EOF(crystal)
 {
 	crystal_state *state = machine->driver_data<crystal_state>();
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -832,9 +832,8 @@ static MACHINE_CONFIG_START( crystal, crystal_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-
-	MCFG_VIDEO_UPDATE(crystal)
-	MCFG_VIDEO_EOF(crystal)
+	MCFG_SCREEN_UPDATE(crystal)
+	MCFG_SCREEN_EOF(crystal)
 
 	MCFG_VIDEO_VRENDER0_ADD("vr0", vr0video_config)
 

@@ -312,7 +312,7 @@ WRITE16_HANDLER( atarisy2_videoram_w )
  *
  *************************************/
 
-VIDEO_UPDATE( atarisy2 )
+SCREEN_UPDATE( atarisy2 )
 {
 	atarisy2_state *state = screen->machine->driver_data<atarisy2_state>();
 	bitmap_t *priority_bitmap = screen->machine->priority_bitmap;

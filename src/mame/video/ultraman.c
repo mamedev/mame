@@ -122,7 +122,7 @@ WRITE16_HANDLER( ultraman_gfxctrl_w )
 
 ***************************************************************************/
 
-VIDEO_UPDATE( ultraman )
+SCREEN_UPDATE( ultraman )
 {
 	ultraman_state *state = screen->machine->driver_data<ultraman_state>();
 

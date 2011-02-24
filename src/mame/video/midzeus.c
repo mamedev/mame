@@ -310,7 +310,7 @@ static void exit_handler(running_machine &machine)
  *
  *************************************/
 
-VIDEO_UPDATE( midzeus )
+SCREEN_UPDATE( midzeus )
 {
 	int x, y;
 

@@ -341,6 +341,7 @@ static MACHINE_CONFIG_START( speedatk, speedatk_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(speedatk)
 
 	MCFG_MC6845_ADD("crtc", H46505, MASTER_CLOCK/16, mc6845_intf)	/* hand tuned to get ~60 fps */
 
@@ -349,7 +350,6 @@ static MACHINE_CONFIG_START( speedatk, speedatk_state )
 	MCFG_PALETTE_INIT(speedatk)
 
 	MCFG_VIDEO_START(speedatk)
-	MCFG_VIDEO_UPDATE(speedatk)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

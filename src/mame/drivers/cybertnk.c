@@ -198,7 +198,7 @@ static void draw_pixel( bitmap_t* bitmap, const rectangle *cliprect, int y, int 
 	*BITMAP_ADDR16(bitmap, y, x) = pen;
 }
 
-static VIDEO_UPDATE( cybertnk )
+static SCREEN_UPDATE( cybertnk )
 {
 	device_t *left_screen  = screen->machine->device("lscreen");
 	device_t *right_screen = screen->machine->device("rscreen");
@@ -859,6 +859,7 @@ static MACHINE_CONFIG_START( cybertnk, driver_device )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_UPDATE(cybertnk)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -866,12 +867,12 @@ static MACHINE_CONFIG_START( cybertnk, driver_device )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_UPDATE(cybertnk)
 
 	MCFG_GFXDECODE(cybertnk)
 	MCFG_PALETTE_LENGTH(0x4000)
 
 	MCFG_VIDEO_START(cybertnk)
-	MCFG_VIDEO_UPDATE(cybertnk)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

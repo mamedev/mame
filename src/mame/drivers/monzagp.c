@@ -53,7 +53,7 @@ static VIDEO_START(monzagp)
 	vram = auto_alloc_array(machine, UINT8, 0x10000);
 }
 
-static VIDEO_UPDATE(monzagp)
+static SCREEN_UPDATE(monzagp)
 {
 	int x,y;
 
@@ -251,13 +251,13 @@ static MACHINE_CONFIG_START( monzagp, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(monzagp)
 
 	MCFG_PALETTE_LENGTH(0x200)
 	MCFG_PALETTE_INIT(monzagp)
 
 	MCFG_GFXDECODE(monzagp)
 	MCFG_VIDEO_START(monzagp)
-	MCFG_VIDEO_UPDATE(monzagp)
 MACHINE_CONFIG_END
 
 ROM_START( monzagp )

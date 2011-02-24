@@ -71,11 +71,11 @@ WRITE16_HANDLER( mcr68_paletteram_w );
 WRITE16_HANDLER( mcr68_videoram_w );
 
 VIDEO_START( mcr68 );
-VIDEO_UPDATE( mcr68 );
+SCREEN_UPDATE( mcr68 );
 
 WRITE16_HANDLER( zwackery_paletteram_w );
 WRITE16_HANDLER( zwackery_videoram_w );
 WRITE16_HANDLER( zwackery_spriteram_w );
 
 VIDEO_START( zwackery );
-VIDEO_UPDATE( zwackery );
+SCREEN_UPDATE( zwackery );

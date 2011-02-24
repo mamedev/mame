@@ -78,7 +78,7 @@ VIDEO_START( trucocl )
 	bg_tilemap = tilemap_create( machine, get_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32 );
 }
 
-VIDEO_UPDATE( trucocl )
+SCREEN_UPDATE( trucocl )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	return 0;

@@ -362,7 +362,7 @@ VIDEO_START( pgm )
 	state->save_item(NAME(*state->tmppgmbitmap));
 }
 
-VIDEO_UPDATE( pgm )
+SCREEN_UPDATE( pgm )
 {
 	pgm_state *state = screen->machine->driver_data<pgm_state>();
 	int y;
@@ -418,7 +418,7 @@ VIDEO_UPDATE( pgm )
 	return 0;
 }
 
-VIDEO_EOF( pgm )
+SCREEN_EOF( pgm )
 {
 	pgm_state *state = machine->driver_data<pgm_state>();
 

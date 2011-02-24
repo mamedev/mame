@@ -78,8 +78,8 @@ VIDEO_START( roundup5 );
 VIDEO_START( cyclwarr );
 VIDEO_START( bigfight );
 
-VIDEO_UPDATE( roundup5 );
-VIDEO_UPDATE( apache3 );
-VIDEO_UPDATE( cyclwarr );
-VIDEO_UPDATE( bigfight );
+SCREEN_UPDATE( roundup5 );
+SCREEN_UPDATE( apache3 );
+SCREEN_UPDATE( cyclwarr );
+SCREEN_UPDATE( bigfight );
 

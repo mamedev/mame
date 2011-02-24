@@ -175,7 +175,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 }
 
 
-VIDEO_UPDATE( tp84 )
+SCREEN_UPDATE( tp84 )
 {
 	tp84_state *state = screen->machine->driver_data<tp84_state>();
 	rectangle clip = *cliprect;

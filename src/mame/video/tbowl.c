@@ -211,7 +211,7 @@ VIDEO_START( tbowl )
 }
 
 
-VIDEO_UPDATE( tbowl )
+SCREEN_UPDATE( tbowl )
 {
 	device_t *left_screen  = screen->machine->device("lscreen");
 	device_t *right_screen = screen->machine->device("rscreen");

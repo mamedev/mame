@@ -100,7 +100,7 @@ WRITE16_HANDLER( klax_latch_w )
  *
  *************************************/
 
-VIDEO_UPDATE( klax )
+SCREEN_UPDATE( klax )
 {
 	klax_state *state = screen->machine->driver_data<klax_state>();
 	atarimo_rect_list rectlist;

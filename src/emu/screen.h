@@ -77,6 +77,8 @@ extern const device_type SCREEN;
 
 // callback that is called to notify of a change in the VBLANK state
 typedef void (*vblank_state_changed_func)(screen_device &device, void *param, bool vblank_state);
+typedef UINT32 (*screen_update_func)(screen_device *screen, bitmap_t *bitmap, const rectangle *cliprect);
+typedef void (*screen_eof_func)(screen_device *screen, running_machine *machine);
 
 
 // ======================> screen_device_config
@@ -107,6 +109,7 @@ public:
 	float yoffset() const { return m_yoffset; }
 	float xscale() const { return m_xscale; }
 	float yscale() const { return m_yscale; }
+	bool have_screen_update() const { return m_screen_update != NULL; }
 
 	// inline configuration helpers
 	static void static_set_format(device_config *device, bitmap_format format);
@@ -117,6 +120,8 @@ public:
 	static void static_set_size(device_config *device, UINT16 width, UINT16 height);
 	static void static_set_visarea(device_config *device, INT16 minx, INT16 maxx, INT16 miny, INT16 maxy);
 	static void static_set_default_position(device_config *device, double xscale, double xoffs, double yscale, double yoffs);
+	static void static_set_screen_update(device_config *device, screen_update_func callback);
+	static void static_set_screen_eof(device_config *device, screen_eof_func callback);
 
 private:
 	// device_config overrides
@@ -132,6 +137,8 @@ private:
 	bitmap_format		m_format;					// bitmap format
 	float				m_xoffset, m_yoffset;		// default X/Y offsets
 	float				m_xscale, m_yscale;			// default X/Y scale factor
+	screen_update_func	m_screen_update;			// screen update callback
+	screen_eof_func		m_screen_eof;				// screen eof callback
 };
 
 
@@ -157,6 +164,8 @@ public:
 	const rectangle &visible_area() const { return m_visarea; }
 	bitmap_format format() const { return m_config.m_format; }
 	render_container &container() const { assert(m_container != NULL); return *m_container; }
+	bool screen_update(bitmap_t &bitmap, const rectangle &cliprect);	
+	void screen_eof();
 
 	// dynamic configuration
 	void configure(int width, int height, const rectangle &visarea, attoseconds_t frame_period);
@@ -269,6 +278,13 @@ private:
 //**************************************************************************
 //  SCREEN DEVICE CONFIGURATION MACROS
 //**************************************************************************
+#define SCREEN_UPDATE_NAME(name)		screen_update_##name
+#define SCREEN_UPDATE(name)				UINT32 SCREEN_UPDATE_NAME(name)(screen_device *screen, bitmap_t *bitmap, const rectangle *cliprect)
+#define SCREEN_UPDATE_CALL(name)		SCREEN_UPDATE_NAME(name)(screen, bitmap, cliprect)
+
+#define SCREEN_EOF_NAME(name)			screen_eof_##name
+#define SCREEN_EOF(name)				void SCREEN_EOF_NAME(name)(screen_device *screen, running_machine *machine)
+#define SCREEN_EOF_CALL(name)			SCREEN_EOF_NAME(name)(screen, machine)
 
 #define MCFG_SCREEN_ADD(_tag, _type) \
 	MCFG_DEVICE_ADD(_tag, SCREEN, 0) \
@@ -301,5 +317,10 @@ private:
 #define MCFG_SCREEN_DEFAULT_POSITION(_xscale, _xoffs, _yscale, _yoffs)	\
 	screen_device_config::static_set_default_position(device, _xscale, _xoffs, _yscale, _yoffs); \
 
+#define MCFG_SCREEN_UPDATE(_func) \
+	screen_device_config::static_set_screen_update(device, SCREEN_UPDATE_NAME(_func)); \
+
+#define MCFG_SCREEN_EOF(_func) \
+	screen_device_config::static_set_screen_eof(device, SCREEN_EOF_NAME(_func)); \
 
 #endif	/* __SCREEN_H__ */

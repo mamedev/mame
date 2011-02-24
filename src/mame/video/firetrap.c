@@ -271,7 +271,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( firetrap )
+SCREEN_UPDATE( firetrap )
 {
 	firetrap_state *state = screen->machine->driver_data<firetrap_state>();
 	tilemap_draw(bitmap, cliprect, state->bg2_tilemap, 0, 0);

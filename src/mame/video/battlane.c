@@ -234,7 +234,7 @@ static void draw_fg_bitmap( running_machine *machine, bitmap_t *bitmap )
 	}
 }
 
-VIDEO_UPDATE( battlane )
+SCREEN_UPDATE( battlane )
 {
 	battlane_state *state = screen->machine->driver_data<battlane_state>();
 

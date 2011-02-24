@@ -185,7 +185,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 /******************************************************************************/
 
-VIDEO_UPDATE( karnov )
+SCREEN_UPDATE( karnov )
 {
 	karnov_state *state = screen->machine->driver_data<karnov_state>();
 	draw_background(screen->machine, bitmap, cliprect);

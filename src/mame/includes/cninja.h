@@ -40,8 +40,8 @@ public:
 
 VIDEO_START( stoneage );
 
-VIDEO_UPDATE( cninja );
-VIDEO_UPDATE( cninjabl );
-VIDEO_UPDATE( edrandy );
-VIDEO_UPDATE( robocop2 );
-VIDEO_UPDATE( mutantf );
+SCREEN_UPDATE( cninja );
+SCREEN_UPDATE( cninjabl );
+SCREEN_UPDATE( edrandy );
+SCREEN_UPDATE( robocop2 );
+SCREEN_UPDATE( mutantf );

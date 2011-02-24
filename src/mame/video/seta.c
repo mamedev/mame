@@ -982,7 +982,7 @@ static void draw_tilemap_palette_effect(running_machine *machine, bitmap_t *bitm
 ***************************************************************************/
 
 /* For games without tilemaps */
-VIDEO_UPDATE( seta_no_layers )
+SCREEN_UPDATE( seta_no_layers )
 {
 	set_pens(screen->machine);
 	bitmap_fill(bitmap,cliprect,0x1f0);
@@ -992,7 +992,7 @@ VIDEO_UPDATE( seta_no_layers )
 
 
 /* For games with 1 or 2 tilemaps */
-static VIDEO_UPDATE( seta_layers )
+static SCREEN_UPDATE( seta_layers )
 {
 	seta_state *state = screen->machine->driver_data<seta_state>();
 	int layers_ctrl = -1;
@@ -1200,22 +1200,22 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 }
 
 
-VIDEO_UPDATE( seta )
+SCREEN_UPDATE( seta )
 {
 	set_pens(screen->machine);
-	return VIDEO_UPDATE_CALL(seta_layers);
+	return SCREEN_UPDATE_CALL(seta_layers);
 }
 
 
-VIDEO_UPDATE( usclssic )
+SCREEN_UPDATE( usclssic )
 {
 	usclssic_set_pens(screen->machine);
-	return VIDEO_UPDATE_CALL(seta_layers);
+	return SCREEN_UPDATE_CALL(seta_layers);
 }
 
 
-VIDEO_UPDATE( inttoote )
+SCREEN_UPDATE( inttoote )
 {
 	/* no palette to set */
-	return VIDEO_UPDATE_CALL(seta_layers);
+	return SCREEN_UPDATE_CALL(seta_layers);
 }

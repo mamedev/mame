@@ -123,7 +123,7 @@ WRITE16_HANDLER( gradius3_gfxram_w )
 
 ***************************************************************************/
 
-VIDEO_UPDATE( gradius3 )
+SCREEN_UPDATE( gradius3 )
 {
 	gradius3_state *state = screen->machine->driver_data<gradius3_state>();
 

@@ -112,7 +112,7 @@ static void clear_extra_columns( running_machine *machine, bitmap_t *bitmap, pen
 }
 
 
-VIDEO_UPDATE( invadpt2 )
+SCREEN_UPDATE( invadpt2 )
 {
 	mw8080bw_state *state = screen->machine->driver_data<mw8080bw_state>();
 	pen_t pens[NUM_PENS];
@@ -144,7 +144,7 @@ VIDEO_UPDATE( invadpt2 )
 }
 
 
-VIDEO_UPDATE( ballbomb )
+SCREEN_UPDATE( ballbomb )
 {
 	mw8080bw_state *state = screen->machine->driver_data<mw8080bw_state>();
 	pen_t pens[NUM_PENS];
@@ -177,7 +177,7 @@ VIDEO_UPDATE( ballbomb )
 }
 
 
-VIDEO_UPDATE( schaser )
+SCREEN_UPDATE( schaser )
 {
 	mw8080bw_state *state = screen->machine->driver_data<mw8080bw_state>();
 	pen_t pens[NUM_PENS];
@@ -218,7 +218,7 @@ VIDEO_UPDATE( schaser )
 }
 
 
-VIDEO_UPDATE( schasercv )
+SCREEN_UPDATE( schasercv )
 {
 	mw8080bw_state *state = screen->machine->driver_data<mw8080bw_state>();
 	pen_t pens[NUM_PENS];
@@ -244,7 +244,7 @@ VIDEO_UPDATE( schasercv )
 }
 
 
-VIDEO_UPDATE( rollingc )
+SCREEN_UPDATE( rollingc )
 {
 	mw8080bw_state *state = screen->machine->driver_data<mw8080bw_state>();
 	pen_t pens[NUM_PENS];
@@ -269,7 +269,7 @@ VIDEO_UPDATE( rollingc )
 }
 
 
-VIDEO_UPDATE( polaris )
+SCREEN_UPDATE( polaris )
 {
 	mw8080bw_state *state = screen->machine->driver_data<mw8080bw_state>();
 	pen_t pens[NUM_PENS];
@@ -341,7 +341,7 @@ VIDEO_UPDATE( polaris )
 }
 
 
-VIDEO_UPDATE( lupin3 )
+SCREEN_UPDATE( lupin3 )
 {
 	mw8080bw_state *state = screen->machine->driver_data<mw8080bw_state>();
 	pen_t pens[NUM_PENS];
@@ -366,7 +366,7 @@ VIDEO_UPDATE( lupin3 )
 }
 
 
-VIDEO_UPDATE( cosmo )
+SCREEN_UPDATE( cosmo )
 {
 	mw8080bw_state *state = screen->machine->driver_data<mw8080bw_state>();
 	pen_t pens[NUM_PENS];
@@ -393,7 +393,7 @@ VIDEO_UPDATE( cosmo )
 }
 
 
-VIDEO_UPDATE( indianbt )
+SCREEN_UPDATE( indianbt )
 {
 	mw8080bw_state *state = screen->machine->driver_data<mw8080bw_state>();
 	pen_t pens[NUM_PENS];
@@ -425,7 +425,7 @@ VIDEO_UPDATE( indianbt )
 }
 
 
-VIDEO_UPDATE( shuttlei )
+SCREEN_UPDATE( shuttlei )
 {
 	mw8080bw_state *state = screen->machine->driver_data<mw8080bw_state>();
 	pen_t pens[2] = { RGB_BLACK, RGB_WHITE };
@@ -456,7 +456,7 @@ VIDEO_UPDATE( shuttlei )
 }
 
 
-VIDEO_UPDATE( sflush )
+SCREEN_UPDATE( sflush )
 {
 	mw8080bw_state *state = screen->machine->driver_data<mw8080bw_state>();
 	pen_t pens[NUM_PENS];

@@ -370,7 +370,7 @@ static VIDEO_START(jchan)
 
 
 
-static VIDEO_UPDATE(jchan)
+static SCREEN_UPDATE(jchan)
 {
 	jchan_state *state = screen->machine->driver_data<jchan_state>();
 	int x,y;
@@ -382,7 +382,7 @@ static VIDEO_UPDATE(jchan)
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
-	VIDEO_UPDATE_CALL(jchan_view2);
+	SCREEN_UPDATE_CALL(jchan_view2);
 
 	bitmap_fill(state->sprite_bitmap_1, cliprect, 0x0000);
 	bitmap_fill(state->sprite_bitmap_2, cliprect, 0x0000);
@@ -684,11 +684,11 @@ static MACHINE_CONFIG_START( jchan, jchan_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(jchan)
 
 	MCFG_PALETTE_LENGTH(0x10000)
 
 	MCFG_VIDEO_START(jchan)
-	MCFG_VIDEO_UPDATE(jchan)
 	
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

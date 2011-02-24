@@ -19,4 +19,4 @@ public:
 /*----------- defined in video/thunderj.c -----------*/
 
 VIDEO_START( thunderj );
-VIDEO_UPDATE( thunderj );
+SCREEN_UPDATE( thunderj );

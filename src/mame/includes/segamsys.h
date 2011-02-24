@@ -8,15 +8,15 @@ enum sms_mapper
 
 ADDRESS_MAP_EXTERN( sms_io_map, 8 );
 
-extern VIDEO_UPDATE(megatech_bios);
-extern VIDEO_UPDATE(megaplay_bios);
-extern VIDEO_UPDATE(megatech_md_sms);
+extern SCREEN_UPDATE(megatech_bios);
+extern SCREEN_UPDATE(megaplay_bios);
+extern SCREEN_UPDATE(megatech_md_sms);
 extern DRIVER_INIT( megatech_bios );
 extern DRIVER_INIT( hazemd_segasyse );
 extern MACHINE_RESET(megatech_bios);
 extern MACHINE_RESET(megatech_md_sms);
-extern VIDEO_EOF(megatech_bios);
-extern VIDEO_EOF(megatech_md_sms);
+extern SCREEN_EOF(megatech_bios);
+extern SCREEN_EOF(megatech_md_sms);
 
 extern READ8_HANDLER( sms_vcounter_r );
 extern READ8_HANDLER( sms_vdp_data_r );
@@ -35,14 +35,14 @@ extern READ8_HANDLER( md_sms_vdp_ctrl_r );
 extern WRITE8_HANDLER( md_sms_vdp_ctrl_w );
 
 extern VIDEO_START(sms);
-extern VIDEO_EOF(sms);
+extern SCREEN_EOF(sms);
 extern MACHINE_RESET(sms);
 extern READ8_HANDLER( sms_vdp_2_data_r );
 extern WRITE8_HANDLER( sms_vdp_2_data_w );
 extern READ8_HANDLER( sms_vdp_2_ctrl_r );
 extern WRITE8_HANDLER( sms_vdp_2_ctrl_w );
-extern VIDEO_EOF(systeme);
-extern VIDEO_UPDATE(systeme);
+extern SCREEN_EOF(systeme);
+extern SCREEN_UPDATE(systeme);
 extern MACHINE_RESET(systeme);
 extern UINT8* sms_mainram;
 extern UINT8* vdp2_vram_bank0;

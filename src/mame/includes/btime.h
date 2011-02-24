@@ -59,13 +59,13 @@ PALETTE_INIT( lnc );
 VIDEO_START( btime );
 VIDEO_START( bnj );
 
-VIDEO_UPDATE( btime );
-VIDEO_UPDATE( cookrace );
-VIDEO_UPDATE( bnj );
-VIDEO_UPDATE( lnc );
-VIDEO_UPDATE( zoar );
-VIDEO_UPDATE( disco );
-VIDEO_UPDATE( eggs );
+SCREEN_UPDATE( btime );
+SCREEN_UPDATE( cookrace );
+SCREEN_UPDATE( bnj );
+SCREEN_UPDATE( lnc );
+SCREEN_UPDATE( zoar );
+SCREEN_UPDATE( disco );
+SCREEN_UPDATE( eggs );
 
 WRITE8_HANDLER( btime_paletteram_w );
 WRITE8_HANDLER( bnj_background_w );

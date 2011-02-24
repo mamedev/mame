@@ -161,7 +161,7 @@ VIDEO_START(flower)
 	tilemap_set_scrolly(flower_text_right_tilemap, 0, 16);
 }
 
-VIDEO_UPDATE( flower )
+SCREEN_UPDATE( flower )
 {
 	rectangle myclip = *cliprect;
 

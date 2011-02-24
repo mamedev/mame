@@ -1078,7 +1078,7 @@ void tms34010_get_display_params(device_t *cpu, tms34010_display_params *params)
 }
 
 
-VIDEO_UPDATE( tms340x0 )
+SCREEN_UPDATE( tms340x0 )
 {
 	pen_t blackpen = get_black_pen(screen->machine);
 	tms34010_display_params params;

@@ -92,7 +92,7 @@ static VIDEO_START( good )
 	tilemap_set_transparent_pen(state->fg_tilemap, 0xf);
 }
 
-static VIDEO_UPDATE( good )
+static SCREEN_UPDATE( good )
 {
 	good_state *state = screen->machine->driver_data<good_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
@@ -286,11 +286,11 @@ static MACHINE_CONFIG_START( good, good_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(1*16, 23*16-1, 0*16, 14*16-1)
+	MCFG_SCREEN_UPDATE(good)
 
 	MCFG_PALETTE_LENGTH(0x400)
 
 	MCFG_VIDEO_START(good)
-	MCFG_VIDEO_UPDATE(good)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

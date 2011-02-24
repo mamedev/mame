@@ -147,7 +147,7 @@ static VIDEO_START( wallc )
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols_flip_y,	8, 8, 32, 32);
 }
 
-static VIDEO_UPDATE( wallc )
+static SCREEN_UPDATE( wallc )
 {
 	wallc_state *state = screen->machine->driver_data<wallc_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
@@ -305,13 +305,13 @@ static MACHINE_CONFIG_START( wallc, wallc_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(wallc)
 
 	MCFG_GFXDECODE(wallc)
 	MCFG_PALETTE_LENGTH(32)
 
 	MCFG_PALETTE_INIT(wallc)
 	MCFG_VIDEO_START(wallc)
-	MCFG_VIDEO_UPDATE(wallc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -16,7 +16,7 @@ extern UINT8 *gomoku_bgram;
 
 PALETTE_INIT( gomoku );
 VIDEO_START( gomoku );
-VIDEO_UPDATE( gomoku );
+SCREEN_UPDATE( gomoku );
 
 WRITE8_HANDLER( gomoku_videoram_w );
 WRITE8_HANDLER( gomoku_colorram_w );

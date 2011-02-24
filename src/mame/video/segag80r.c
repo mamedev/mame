@@ -811,7 +811,7 @@ static void draw_background_full_scroll(bitmap_t *bitmap, const rectangle *clipr
  *
  *************************************/
 
-VIDEO_UPDATE( segag80r )
+SCREEN_UPDATE( segag80r )
 {
 	UINT8 transparent_pens[16];
 

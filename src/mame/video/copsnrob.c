@@ -8,7 +8,7 @@
 #include "includes/copsnrob.h"
 
 
-VIDEO_UPDATE( copsnrob )
+SCREEN_UPDATE( copsnrob )
 {
 	copsnrob_state *state = screen->machine->driver_data<copsnrob_state>();
 	int offs, x, y;

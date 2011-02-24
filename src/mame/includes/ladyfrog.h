@@ -49,4 +49,4 @@ READ8_HANDLER( ladyfrog_videoram_r );
 
 VIDEO_START( ladyfrog );
 VIDEO_START( toucheme );
-VIDEO_UPDATE( ladyfrog );
+SCREEN_UPDATE( ladyfrog );

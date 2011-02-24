@@ -234,7 +234,7 @@ VIDEO_START( inufuku )
 
 ******************************************************************************/
 
-VIDEO_UPDATE( inufuku )
+SCREEN_UPDATE( inufuku )
 {
 	inufuku_state *state = screen->machine->driver_data<inufuku_state>();
 	int i;

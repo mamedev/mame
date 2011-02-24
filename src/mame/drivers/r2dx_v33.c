@@ -167,7 +167,7 @@ static VIDEO_START( rdx_v33 )
 	tilemap_set_transparent_pen(tx_tilemap, 15);
 }
 
-static VIDEO_UPDATE( rdx_v33 )
+static SCREEN_UPDATE( rdx_v33 )
 {
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
@@ -657,12 +657,12 @@ static MACHINE_CONFIG_START( rdx_v33, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(rdx_v33)
 
 	MCFG_GFXDECODE(rdx_v33)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_VIDEO_START(rdx_v33)
-	MCFG_VIDEO_UPDATE(rdx_v33)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -692,11 +692,11 @@ static MACHINE_CONFIG_START( nzerotea, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
+	MCFG_SCREEN_UPDATE(rdx_v33)
 	MCFG_GFXDECODE(rdx_v33)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_VIDEO_START(rdx_v33)
-	MCFG_VIDEO_UPDATE(rdx_v33)
 
 	/* sound hardware */
 //  SEIBU_SOUND_SYSTEM_YM2151_RAIDEN2_INTERFACE(28636360/8,28636360/28,1,2)

@@ -338,7 +338,7 @@ static void copy_screen(running_machine *machine, bitmap_t *bitmap, const rectan
 }
 #endif
 
-VIDEO_UPDATE( model3 )
+SCREEN_UPDATE( model3 )
 {
 	model3_state *state = screen->machine->driver_data<model3_state>();
 #if 0

@@ -227,7 +227,7 @@ WRITE16_HANDLER( toobin_slip_w )
  *
  *************************************/
 
-VIDEO_UPDATE( toobin )
+SCREEN_UPDATE( toobin )
 {
 	toobin_state *state = screen->machine->driver_data<toobin_state>();
 	bitmap_t *priority_bitmap = screen->machine->priority_bitmap;

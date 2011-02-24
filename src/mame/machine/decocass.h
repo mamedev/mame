@@ -195,6 +195,6 @@ extern WRITE8_HANDLER( decocass_center_h_shift_space_w );
 extern WRITE8_HANDLER( decocass_center_v_shift_w );
 
 extern VIDEO_START( decocass );
-extern VIDEO_UPDATE( decocass );
+extern SCREEN_UPDATE( decocass );
 
 void decocass_video_state_save_init(running_machine *machine);

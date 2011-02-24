@@ -341,7 +341,7 @@ static void fill_poly( bitmap_t *bitmap, const rectangle *cliprect, const struct
 	}
 }
 
-VIDEO_UPDATE( taitoair )
+SCREEN_UPDATE( taitoair )
 {
 	taitoair_state *state = screen->machine->driver_data<taitoair_state>();
 

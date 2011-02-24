@@ -123,7 +123,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( goindol )
+SCREEN_UPDATE( goindol )
 {
 	goindol_state *state = screen->machine->driver_data<goindol_state>();
 	tilemap_set_scrollx(state->fg_tilemap, 0, *state->fg_scrollx);

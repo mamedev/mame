@@ -27,8 +27,8 @@ public:
 #define REALBRK_H
 
 VIDEO_START(realbrk);
-VIDEO_UPDATE(realbrk);
-VIDEO_UPDATE(dai2kaku);
+SCREEN_UPDATE(realbrk);
+SCREEN_UPDATE(dai2kaku);
 
 WRITE16_HANDLER( realbrk_vram_0_w );
 WRITE16_HANDLER( realbrk_vram_1_w );

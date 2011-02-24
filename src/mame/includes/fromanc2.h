@@ -33,7 +33,7 @@ public:
 
 /*----------- defined in video/fromanc2.c -----------*/
 
-VIDEO_UPDATE( fromanc2 );
+SCREEN_UPDATE( fromanc2 );
 VIDEO_START( fromanc2 );
 VIDEO_START( fromancr );
 VIDEO_START( fromanc4 );

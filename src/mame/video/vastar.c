@@ -196,7 +196,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	}
 }
 
-VIDEO_UPDATE( vastar )
+SCREEN_UPDATE( vastar )
 {
 	vastar_state *state = screen->machine->driver_data<vastar_state>();
 	int i;

@@ -121,7 +121,7 @@ INLINE int get_sprite_y(UINT8 *video_ram, int n)
 }
 
 
-VIDEO_UPDATE( sprint2 )
+SCREEN_UPDATE( sprint2 )
 {
 	sprint2_state *state = screen->machine->driver_data<sprint2_state>();
 	UINT8 *video_ram = state->video_ram;
@@ -144,7 +144,7 @@ VIDEO_UPDATE( sprint2 )
 }
 
 
-VIDEO_EOF( sprint2 )
+SCREEN_EOF( sprint2 )
 {
 	sprint2_state *state = machine->driver_data<sprint2_state>();
 	UINT8 *video_ram = state->video_ram;

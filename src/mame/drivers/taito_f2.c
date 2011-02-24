@@ -3460,13 +3460,13 @@ static MACHINE_CONFIG_START( taito_f2, taitof2_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(taitof2)
+	MCFG_SCREEN_EOF(taitof2_no_buffer)
 
 	MCFG_GFXDECODE(taitof2)
 	MCFG_PALETTE_LENGTH(4096)
 
 	MCFG_VIDEO_START(taitof2_default)
-	MCFG_VIDEO_EOF(taitof2_no_buffer)
-	MCFG_VIDEO_UPDATE(taitof2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3505,7 +3505,8 @@ static MACHINE_CONFIG_DERIVED( finalb, taito_f2_tc0220ioc )
 	/* video hardware */
 	MCFG_GFXDECODE(finalb)
 	MCFG_VIDEO_START(taitof2_finalb)
-	MCFG_VIDEO_EOF(taitof2_partial_buffer_delayed)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_EOF(taitof2_partial_buffer_delayed)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", finalb_tc0100scn_intf)
 	MCFG_TC0110PCR_ADD("tc0110pcr", taitof2_tc0110pcr_intf)
@@ -3521,8 +3522,9 @@ static MACHINE_CONFIG_DERIVED( dondokod, taito_f2_tc0220ioc )
 	/* video hardware */
 	MCFG_GFXDECODE(pivot)
 	MCFG_VIDEO_START(taitof2_dondokod)
-	MCFG_VIDEO_EOF(taitof2_partial_buffer_delayed)
-	MCFG_VIDEO_UPDATE(taitof2_pri_roz)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_EOF(taitof2_partial_buffer_delayed)
+	MCFG_SCREEN_UPDATE(taitof2_pri_roz)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", dondokod_tc0100scn_intf)
 	MCFG_TC0430GRW_ADD("tc0280grd", taitof2_tc0280grd_intf)
@@ -3538,7 +3540,8 @@ static MACHINE_CONFIG_DERIVED( megab, taito_f2_tc0220ioc )
 
 	/* video hardware */
 	MCFG_VIDEO_START(taitof2_megab)
-	MCFG_VIDEO_UPDATE(taitof2_pri)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(taitof2_pri)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
 	MCFG_TC0360PRI_ADD("tc0360pri")
@@ -3554,8 +3557,9 @@ static MACHINE_CONFIG_DERIVED( thundfox, taito_f2_tc0220ioc )
 	/* video hardware */
 	MCFG_GFXDECODE(thundfox)
 	MCFG_VIDEO_START(taitof2_thundfox)
-	MCFG_VIDEO_EOF(taitof2_partial_buffer_delayed_thundfox)
-	MCFG_VIDEO_UPDATE(taitof2_thundfox)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(taitof2_thundfox)
+	MCFG_SCREEN_EOF(taitof2_partial_buffer_delayed_thundfox)
 
 	MCFG_TC0100SCN_ADD("tc0100scn_1", thundfox_tc0100scn_intf_1)
 	MCFG_TC0100SCN_ADD("tc0100scn_2", thundfox_tc0100scn_intf_2)
@@ -3572,7 +3576,8 @@ static MACHINE_CONFIG_DERIVED( cameltry, taito_f2_tc0220ioc )
 	/* video hardware */
 	MCFG_GFXDECODE(pivot)
 	MCFG_VIDEO_START(taitof2_dondokod)
-	MCFG_VIDEO_UPDATE(taitof2_pri_roz)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(taitof2_pri_roz)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", dondokod_tc0100scn_intf)
 	MCFG_TC0430GRW_ADD("tc0280grd", taitof2_tc0280grd_intf)
@@ -3588,7 +3593,8 @@ static MACHINE_CONFIG_DERIVED( qtorimon, taito_f2_tc0220ioc )
 
 	/* video hardware */
 	MCFG_GFXDECODE(yuyugogo)
-	MCFG_VIDEO_EOF(taitof2_partial_buffer_delayed)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_EOF(taitof2_partial_buffer_delayed)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", taitof2_tc0100scn_intf)
 	MCFG_TC0110PCR_ADD("tc0110pcr", taitof2_tc0110pcr_intf)
@@ -3603,8 +3609,9 @@ static MACHINE_CONFIG_DERIVED( liquidk, taito_f2_tc0220ioc )
 
 	/* video hardware */
 	MCFG_VIDEO_START(taitof2_megab)
-	MCFG_VIDEO_EOF(taitof2_partial_buffer_delayed)
-	MCFG_VIDEO_UPDATE(taitof2_pri)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(taitof2_pri)
+	MCFG_SCREEN_EOF(taitof2_partial_buffer_delayed)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
 	MCFG_TC0360PRI_ADD("tc0360pri")
@@ -3619,7 +3626,8 @@ static MACHINE_CONFIG_DERIVED( quizhq, taito_f2 )
 
 	/* video hardware */
 	MCFG_GFXDECODE(yuyugogo)
-	MCFG_VIDEO_EOF(taitof2_partial_buffer_delayed)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_EOF(taitof2_partial_buffer_delayed)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", taitof2_tc0100scn_intf)
 	MCFG_TC0110PCR_ADD("tc0110pcr", taitof2_tc0110pcr_intf)
@@ -3634,8 +3642,9 @@ static MACHINE_CONFIG_DERIVED( ssi, taito_f2_tc0510nio )
 
 	/* video hardware */
 	MCFG_VIDEO_START(taitof2_ssi)
-	MCFG_VIDEO_EOF(taitof2_partial_buffer_delayed_thundfox)	// buffer_delayed_thundfox instead of buffer_delayed fixes the butterfly powerup
-	MCFG_VIDEO_UPDATE(taitof2_ssi)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(taitof2_ssi)
+	MCFG_SCREEN_EOF(taitof2_partial_buffer_delayed_thundfox)	// buffer_delayed_thundfox instead of buffer_delayed fixes the butterfly powerup
 
 	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
 MACHINE_CONFIG_END
@@ -3649,8 +3658,9 @@ static MACHINE_CONFIG_DERIVED( gunfront, taito_f2_tc0510nio )
 
 	/* video hardware */
 	MCFG_VIDEO_START(taitof2_gunfront)
-	MCFG_VIDEO_EOF(taitof2_partial_buffer_delayed)
-	MCFG_VIDEO_UPDATE(taitof2_pri)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(taitof2_pri)
+	MCFG_SCREEN_EOF(taitof2_partial_buffer_delayed)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
 	MCFG_TC0360PRI_ADD("tc0360pri")
@@ -3665,7 +3675,8 @@ static MACHINE_CONFIG_DERIVED( growl, taito_f2 )
 
 	/* video hardware */
 	MCFG_VIDEO_START(taitof2_growl)
-	MCFG_VIDEO_UPDATE(taitof2_pri)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(taitof2_pri)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
 	MCFG_TC0360PRI_ADD("tc0360pri")
@@ -3695,8 +3706,9 @@ static MACHINE_CONFIG_DERIVED( footchmp, taito_f2 )
 	/* video hardware */
 	MCFG_GFXDECODE(deadconx)
 	MCFG_VIDEO_START(taitof2_footchmp)
-	MCFG_VIDEO_EOF(taitof2_full_buffer_delayed)
-	MCFG_VIDEO_UPDATE(taitof2_deadconx)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(taitof2_deadconx)
+	MCFG_SCREEN_EOF(taitof2_full_buffer_delayed)
 
 	MCFG_TC0480SCP_ADD("tc0480scp", footchmp_tc0480scp_intf)
 	MCFG_TC0360PRI_ADD("tc0360pri")
@@ -3718,8 +3730,9 @@ static MACHINE_CONFIG_DERIVED( hthero, taito_f2 )
 	/* video hardware */
 	MCFG_GFXDECODE(deadconx)
 	MCFG_VIDEO_START(taitof2_hthero)
-	MCFG_VIDEO_EOF(taitof2_full_buffer_delayed)
-	MCFG_VIDEO_UPDATE(taitof2_deadconx)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(taitof2_deadconx)
+	MCFG_SCREEN_EOF(taitof2_full_buffer_delayed)
 
 	MCFG_TC0360PRI_ADD("tc0360pri")
 	MCFG_TC0480SCP_ADD("tc0480scp", hthero_tc0480scp_intf)
@@ -3734,7 +3747,8 @@ static MACHINE_CONFIG_DERIVED( koshien, taito_f2_tc0510nio )
 
 	/* video hardware */
 	MCFG_VIDEO_START(taitof2_koshien)
-	MCFG_VIDEO_UPDATE(taitof2_pri)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(taitof2_pri)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", koshien_tc0100scn_intf)
 	MCFG_TC0360PRI_ADD("tc0360pri")
@@ -3750,7 +3764,8 @@ static MACHINE_CONFIG_DERIVED( yuyugogo, taito_f2_tc0510nio )
 	/* video hardware */
 	MCFG_GFXDECODE(yuyugogo)
 	MCFG_VIDEO_START(taitof2_yuyugogo)
-	MCFG_VIDEO_UPDATE(taitof2_yesnoj)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(taitof2_yesnoj)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
 MACHINE_CONFIG_END
@@ -3764,7 +3779,8 @@ static MACHINE_CONFIG_DERIVED( ninjak, taito_f2 )
 
 	/* video hardware */
 	MCFG_VIDEO_START(taitof2_ninjak)
-	MCFG_VIDEO_UPDATE(taitof2_pri)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(taitof2_pri)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", finalb_tc0100scn_intf)
 	MCFG_TC0360PRI_ADD("tc0360pri")
@@ -3779,7 +3795,8 @@ static MACHINE_CONFIG_DERIVED( solfigtr, taito_f2 )
 
 	/* video hardware */
 	MCFG_VIDEO_START(taitof2_solfigtr)
-	MCFG_VIDEO_UPDATE(taitof2_pri)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(taitof2_pri)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", solfigtr_tc0100scn_intf)
 	MCFG_TC0360PRI_ADD("tc0360pri")
@@ -3793,7 +3810,8 @@ static MACHINE_CONFIG_DERIVED( qzquest, taito_f2_tc0510nio )
 	MCFG_CPU_PROGRAM_MAP(qzquest_map)
 
 	/* video hardware */
-	MCFG_VIDEO_EOF(taitof2_partial_buffer_delayed)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_EOF(taitof2_partial_buffer_delayed)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", taitof2_tc0100scn_intf)
 MACHINE_CONFIG_END
@@ -3808,7 +3826,8 @@ static MACHINE_CONFIG_DERIVED( pulirula, taito_f2_tc0510nio )
 	/* video hardware */
 	MCFG_GFXDECODE(pivot)
 	MCFG_VIDEO_START(taitof2_pulirula)
-	MCFG_VIDEO_UPDATE(taitof2_pri_roz)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(taitof2_pri_roz)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", dondokod_tc0100scn_intf)
 	MCFG_TC0430GRW_ADD("tc0430grw", taitof2_tc0430grw_intf)
@@ -3826,7 +3845,8 @@ static MACHINE_CONFIG_DERIVED( metalb, taito_f2_tc0510nio )
 	MCFG_GFXDECODE(deadconx)
 	MCFG_PALETTE_LENGTH(8192)
 	MCFG_VIDEO_START(taitof2_metalb)
-	MCFG_VIDEO_UPDATE(taitof2_metalb)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(taitof2_metalb)
 
 	MCFG_TC0480SCP_ADD("tc0480scp", metalb_tc0480scp_intf)
 	MCFG_TC0360PRI_ADD("tc0360pri")
@@ -3841,7 +3861,8 @@ static MACHINE_CONFIG_DERIVED( qzchikyu, taito_f2_tc0510nio )
 
 	/* video hardware */
 	MCFG_VIDEO_START(taitof2_qzchikyu)
-	MCFG_VIDEO_EOF(taitof2_partial_buffer_delayed_qzchikyu)
+	MCFG_SCREEN_MODIFY("screen")	
+	MCFG_SCREEN_EOF(taitof2_partial_buffer_delayed_qzchikyu)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", qzchikyu_tc0100scn_intf)
 MACHINE_CONFIG_END
@@ -3856,7 +3877,8 @@ static MACHINE_CONFIG_DERIVED( yesnoj, taito_f2 )
 	/* video hardware */
 	MCFG_GFXDECODE(yuyugogo)
 	MCFG_VIDEO_START(taitof2_yesnoj)
-	MCFG_VIDEO_UPDATE(taitof2_yesnoj)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(taitof2_yesnoj)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
 MACHINE_CONFIG_END
@@ -3871,7 +3893,8 @@ static MACHINE_CONFIG_DERIVED( deadconx, taito_f2 )
 	/* video hardware */
 	MCFG_GFXDECODE(deadconx)
 	MCFG_VIDEO_START(taitof2_deadconx)
-	MCFG_VIDEO_UPDATE(taitof2_deadconx)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(taitof2_deadconx)
 
 	MCFG_TC0480SCP_ADD("tc0480scp", deadconx_tc0480scp_intf)
 	MCFG_TC0360PRI_ADD("tc0360pri")
@@ -3887,7 +3910,8 @@ static MACHINE_CONFIG_DERIVED( deadconxj, taito_f2 )
 	/* video hardware */
 	MCFG_GFXDECODE(deadconx)
 	MCFG_VIDEO_START(taitof2_deadconxj)
-	MCFG_VIDEO_UPDATE(taitof2_deadconx)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(taitof2_deadconx)
 
 	MCFG_TC0480SCP_ADD("tc0480scp", deadconxj_tc0480scp_intf)
 	MCFG_TC0360PRI_ADD("tc0360pri")
@@ -3902,7 +3926,8 @@ static MACHINE_CONFIG_DERIVED( dinorex, taito_f2_tc0510nio )
 
 	/* video hardware */
 	MCFG_VIDEO_START(taitof2_dinorex)
-	MCFG_VIDEO_UPDATE(taitof2_pri)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(taitof2_pri)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
 	MCFG_TC0360PRI_ADD("tc0360pri")
@@ -3917,7 +3942,8 @@ static MACHINE_CONFIG_DERIVED( qjinsei, taito_f2_tc0510nio )
 
 	/* video hardware */
 	MCFG_VIDEO_START(taitof2_quiz)
-	MCFG_VIDEO_UPDATE(taitof2_pri)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(taitof2_pri)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
 	MCFG_TC0360PRI_ADD("tc0360pri")
@@ -3932,7 +3958,8 @@ static MACHINE_CONFIG_DERIVED( qcrayon, taito_f2_tc0510nio )
 
 	/* video hardware */
 	MCFG_VIDEO_START(taitof2_quiz)
-	MCFG_VIDEO_UPDATE(taitof2_pri)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(taitof2_pri)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
 	MCFG_TC0360PRI_ADD("tc0360pri")
@@ -3947,7 +3974,8 @@ static MACHINE_CONFIG_DERIVED( qcrayon2, taito_f2_tc0510nio )
 
 	/* video hardware */
 	MCFG_VIDEO_START(taitof2_quiz)
-	MCFG_VIDEO_UPDATE(taitof2_pri)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(taitof2_pri)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
 	MCFG_TC0360PRI_ADD("tc0360pri")
@@ -3963,7 +3991,8 @@ static MACHINE_CONFIG_DERIVED( driftout, taito_f2_tc0510nio )
 	/* video hardware */
 	MCFG_GFXDECODE(pivot)
 	MCFG_VIDEO_START(taitof2_driftout)
-	MCFG_VIDEO_UPDATE(taitof2_pri_roz)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(taitof2_pri_roz)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", dondokod_tc0100scn_intf)
 	MCFG_TC0430GRW_ADD("tc0430grw", taitof2_tc0430grw_intf)
@@ -3992,13 +4021,13 @@ static MACHINE_CONFIG_START( cameltrya, taitof2_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(taitof2_pri_roz)
+	MCFG_SCREEN_EOF(taitof2_no_buffer)
 
 	MCFG_GFXDECODE(pivot)
 	MCFG_PALETTE_LENGTH(4096)
 
 	MCFG_VIDEO_START(taitof2_dondokod)
-	MCFG_VIDEO_EOF(taitof2_no_buffer)
-	MCFG_VIDEO_UPDATE(taitof2_pri_roz)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", dondokod_tc0100scn_intf)
 	MCFG_TC0430GRW_ADD("tc0280grd", taitof2_tc0280grd_intf)
@@ -4042,13 +4071,13 @@ static MACHINE_CONFIG_START( driveout, taitof2_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(taitof2_pri_roz)
+	MCFG_SCREEN_EOF(taitof2_no_buffer)
 
 	MCFG_GFXDECODE(pivot)
 	MCFG_PALETTE_LENGTH(4096)
 
 	MCFG_VIDEO_START(taitof2_driftout)
-	MCFG_VIDEO_EOF(taitof2_no_buffer)
-	MCFG_VIDEO_UPDATE(taitof2_pri_roz)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", dondokod_tc0100scn_intf)
 	MCFG_TC0430GRW_ADD("tc0430grw", taitof2_tc0430grw_intf)

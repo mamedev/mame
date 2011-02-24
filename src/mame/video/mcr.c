@@ -401,7 +401,7 @@ static void render_sprites_91464(running_machine *machine, bitmap_t *bitmap, con
  *
  *************************************/
 
-VIDEO_UPDATE( mcr )
+SCREEN_UPDATE( mcr )
 {
 	/* update the flip state */
 	tilemap_set_flip(bg_tilemap, mcr_cocktail_flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);

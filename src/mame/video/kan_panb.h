@@ -1,4 +1,4 @@
-VIDEO_UPDATE( honeydol );
-VIDEO_UPDATE( twinadv );
-VIDEO_UPDATE( wintbob );
-VIDEO_UPDATE( snowbro3 );
+SCREEN_UPDATE( honeydol );
+SCREEN_UPDATE( twinadv );
+SCREEN_UPDATE( wintbob );
+SCREEN_UPDATE( snowbro3 );

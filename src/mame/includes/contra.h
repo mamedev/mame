@@ -47,5 +47,5 @@ WRITE8_HANDLER( contra_text_cram_w );
 WRITE8_HANDLER( contra_K007121_ctrl_0_w );
 WRITE8_HANDLER( contra_K007121_ctrl_1_w );
 
-VIDEO_UPDATE( contra );
+SCREEN_UPDATE( contra );
 VIDEO_START( contra );

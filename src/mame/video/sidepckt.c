@@ -141,7 +141,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 }
 
 
-VIDEO_UPDATE( sidepckt )
+SCREEN_UPDATE( sidepckt )
 {
 	sidepckt_state *state = screen->machine->driver_data<sidepckt_state>();
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,TILEMAP_DRAW_LAYER1,0);

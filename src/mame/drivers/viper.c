@@ -62,7 +62,7 @@ public:
 
 //#define VIPER_DEBUG_LOG
 
-static VIDEO_UPDATE(viper)
+static SCREEN_UPDATE(viper)
 {
 	device_t *device = screen->machine->device("voodoo");
 	return voodoo_update(device, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
@@ -660,10 +660,9 @@ static MACHINE_CONFIG_START( viper, viper_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(800, 600)
 	MCFG_SCREEN_VISIBLE_AREA(0, 799, 0, 599)
+	MCFG_SCREEN_UPDATE(viper)
 
 	MCFG_PALETTE_LENGTH(65536)
-
-	MCFG_VIDEO_UPDATE(viper)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

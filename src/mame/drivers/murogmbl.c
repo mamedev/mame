@@ -81,7 +81,7 @@ static VIDEO_START(murogmbl)
 
 }
 
-static VIDEO_UPDATE(murogmbl)
+static SCREEN_UPDATE(murogmbl)
 {
 	const gfx_element *gfx = screen->machine->gfx[0];
 	int count = 0;
@@ -182,11 +182,11 @@ static MACHINE_CONFIG_START( murogmbl, driver_device )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(murogmbl)
 
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(murogmbl)
-	MCFG_VIDEO_UPDATE(murogmbl)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac1", DAC, 0)

@@ -116,7 +116,7 @@ static VIDEO_START(calchase)
 
 }
 
-static VIDEO_UPDATE(calchase)
+static SCREEN_UPDATE(calchase)
 {
 	int x,y,count,i;
 
@@ -676,9 +676,9 @@ static MACHINE_CONFIG_START( calchase, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(calchase)
 
 	MCFG_VIDEO_START(calchase)
-	MCFG_VIDEO_UPDATE(calchase)
 MACHINE_CONFIG_END
 
 static DRIVER_INIT( calchase )

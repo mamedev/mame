@@ -27,7 +27,7 @@ public:
 /*----------- defined in video/stlforce.c -----------*/
 
 VIDEO_START( stlforce );
-VIDEO_UPDATE( stlforce );
+SCREEN_UPDATE( stlforce );
 WRITE16_HANDLER( stlforce_tx_videoram_w );
 WRITE16_HANDLER( stlforce_mhigh_videoram_w );
 WRITE16_HANDLER( stlforce_mlow_videoram_w );

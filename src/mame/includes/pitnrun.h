@@ -55,4 +55,4 @@ WRITE8_HANDLER( pitnrun_scroll_w );
 
 PALETTE_INIT(pitnrun);
 VIDEO_START(pitnrun);
-VIDEO_UPDATE(pitnrun);
+SCREEN_UPDATE(pitnrun);

@@ -198,7 +198,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( lsasquad )
+SCREEN_UPDATE( lsasquad )
 {
 	lsasquad_state *state = screen->machine->driver_data<lsasquad_state>();
 	bitmap_fill(bitmap, cliprect, 511);
@@ -211,7 +211,7 @@ VIDEO_UPDATE( lsasquad )
 }
 
 
-VIDEO_UPDATE( daikaiju )
+SCREEN_UPDATE( daikaiju )
 {
 	bitmap_fill(bitmap, cliprect, 511);
 	drawbg(screen->machine, bitmap, cliprect, 0); // bottom

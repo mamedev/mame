@@ -185,7 +185,7 @@ VIDEO_START( apple10 )
 	bg_tilemap = tilemap_create(machine, apple10_get_bg_tile_info, tilemap_scan_rows, 4, 8, 128, 30);
 }
 
-VIDEO_UPDATE( snookr10 )
+SCREEN_UPDATE( snookr10 )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	return 0;

@@ -327,7 +327,7 @@ static void draw_sprites(running_machine *machine, jedi_state *state, bitmap_t *
  *
  *************************************/
 
-static VIDEO_UPDATE( jedi )
+static SCREEN_UPDATE( jedi )
 {
 	jedi_state *state = screen->machine->driver_data<jedi_state>();
 
@@ -355,14 +355,12 @@ static VIDEO_UPDATE( jedi )
  *************************************/
 
 MACHINE_CONFIG_FRAGMENT( jedi_video )
-
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(64*8, 262) /* verify vert size */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 37*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(jedi)
 
 	MCFG_VIDEO_START(jedi)
-	MCFG_VIDEO_UPDATE(jedi)
 MACHINE_CONFIG_END

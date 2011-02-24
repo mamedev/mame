@@ -5,7 +5,7 @@ extern UINT8 *tankbust_videoram;
 extern UINT8 *tankbust_colorram;
 
 VIDEO_START( tankbust );
-VIDEO_UPDATE( tankbust );
+SCREEN_UPDATE( tankbust );
 
 WRITE8_HANDLER( tankbust_background_videoram_w );
 READ8_HANDLER( tankbust_background_videoram_r );

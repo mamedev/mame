@@ -289,7 +289,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	}
 }
 
-VIDEO_UPDATE( senjyo )
+SCREEN_UPDATE( senjyo )
 {
 	senjyo_state *state = screen->machine->driver_data<senjyo_state>();
 	int i;

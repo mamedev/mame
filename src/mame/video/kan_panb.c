@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "kan_panb.h"
 
-VIDEO_UPDATE( honeydol )
+SCREEN_UPDATE( honeydol )
 {
 	UINT16 *spriteram16 = screen->machine->generic.spriteram.u16;
 	int sx=0, sy=0, x=0, y=0, offs;
@@ -88,7 +88,7 @@ VIDEO_UPDATE( honeydol )
 }
 
 
-VIDEO_UPDATE( twinadv )
+SCREEN_UPDATE( twinadv )
 {
 	UINT16 *spriteram16 = screen->machine->generic.spriteram.u16;
 	int sx=0, sy=0, x=0, y=0, offs;
@@ -143,7 +143,7 @@ VIDEO_UPDATE( twinadv )
 }
 
 
-VIDEO_UPDATE( wintbob )
+SCREEN_UPDATE( wintbob )
 {
 	UINT16 *spriteram16 = screen->machine->generic.spriteram.u16;
 	int offs;
@@ -186,7 +186,7 @@ VIDEO_UPDATE( wintbob )
 }
 
 
-VIDEO_UPDATE( snowbro3 )
+SCREEN_UPDATE( snowbro3 )
 {
 	UINT16 *spriteram16 = screen->machine->generic.spriteram.u16;
 	int sx=0, sy=0, x=0, y=0, offs;

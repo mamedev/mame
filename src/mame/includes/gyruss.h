@@ -32,4 +32,4 @@ READ8_HANDLER( gyruss_scanline_r );
 
 PALETTE_INIT( gyruss );
 VIDEO_START( gyruss );
-VIDEO_UPDATE( gyruss );
+SCREEN_UPDATE( gyruss );

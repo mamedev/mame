@@ -117,7 +117,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( markham )
+SCREEN_UPDATE( markham )
 {
 	markham_state *state = screen->machine->driver_data<markham_state>();
 	int i;

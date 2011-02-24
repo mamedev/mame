@@ -39,4 +39,4 @@ WRITE16_HANDLER( madmotor_pf2_data_w );
 WRITE16_HANDLER( madmotor_pf3_data_w );
 
 VIDEO_START( madmotor );
-VIDEO_UPDATE( madmotor );
+SCREEN_UPDATE( madmotor );

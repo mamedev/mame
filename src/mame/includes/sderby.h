@@ -25,6 +25,6 @@ WRITE16_HANDLER( sderby_videoram_w );
 WRITE16_HANDLER( sderby_md_videoram_w );
 WRITE16_HANDLER( sderby_fg_videoram_w );
 VIDEO_START( sderby );
-VIDEO_UPDATE( sderby );
-VIDEO_UPDATE( pmroulet );
+SCREEN_UPDATE( sderby );
+SCREEN_UPDATE( pmroulet );
 WRITE16_HANDLER( sderby_scroll_w );

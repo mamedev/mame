@@ -432,9 +432,9 @@ static MACHINE_CONFIG_START( eprom, eprom_state )
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a SYNGEN chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
+	MCFG_SCREEN_UPDATE(eprom)
 
 	MCFG_VIDEO_START(eprom)
-	MCFG_VIDEO_UPDATE(eprom)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(jsa_i_mono_speech)
@@ -464,9 +464,9 @@ static MACHINE_CONFIG_START( klaxp, eprom_state )
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a SYNGEN chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
+	MCFG_SCREEN_UPDATE(eprom)
 
 	MCFG_VIDEO_START(eprom)
-	MCFG_VIDEO_UPDATE(eprom)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(jsa_ii_mono)
@@ -496,9 +496,9 @@ static MACHINE_CONFIG_START( guts, eprom_state )
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a SYNGEN chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
+	MCFG_SCREEN_UPDATE(guts)
 
 	MCFG_VIDEO_START(guts)
-	MCFG_VIDEO_UPDATE(guts)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(jsa_ii_mono)

@@ -19,4 +19,4 @@ public:
 /*----------- defined in video/shuuz.c -----------*/
 
 VIDEO_START( shuuz );
-VIDEO_UPDATE( shuuz );
+SCREEN_UPDATE( shuuz );

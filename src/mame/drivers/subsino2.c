@@ -455,7 +455,7 @@ static VIDEO_START( xtrain )
 	ss9601_reelrects = xtrain_reelrects;
 }
 
-static VIDEO_UPDATE( subsino2 )
+static SCREEN_UPDATE( subsino2 )
 {
 	int layers_ctrl = ~ss9601_disable;
 	int y;
@@ -1862,12 +1862,12 @@ static MACHINE_CONFIG_START( bishjan, driver_device )
 	MCFG_SCREEN_SIZE( 512, 256 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 512-1, 0, 256-16-1 )
 	MCFG_SCREEN_REFRESH_RATE( 60 )
+	MCFG_SCREEN_UPDATE( subsino2 )
 
 	MCFG_GFXDECODE( ss9601 )
 	MCFG_PALETTE_LENGTH( 256 )
 
 	MCFG_VIDEO_START( subsino2 )
-	MCFG_VIDEO_UPDATE( subsino2 )
 
 	// sound hardware
 	// SS9904?
@@ -1891,12 +1891,12 @@ static MACHINE_CONFIG_START( mtrain, driver_device )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 512-1, 0, 256-32-1 )
 	MCFG_SCREEN_REFRESH_RATE( 58.7270 )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// game reads vblank state
+	MCFG_SCREEN_UPDATE( subsino2 )
 
 	MCFG_GFXDECODE( ss9601 )
 	MCFG_PALETTE_LENGTH( 256 )
 
 	MCFG_VIDEO_START( mtrain )
-	MCFG_VIDEO_UPDATE( subsino2 )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1925,12 +1925,12 @@ static MACHINE_CONFIG_START( saklove, driver_device )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 512-1, 0, 256-16-1 )
 	MCFG_SCREEN_REFRESH_RATE( 58.7270 )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// game reads vblank state
+	MCFG_SCREEN_UPDATE( subsino2 )
 
 	MCFG_GFXDECODE( ss9601 )
 	MCFG_PALETTE_LENGTH( 256 )
 
 	MCFG_VIDEO_START( subsino2 )
-	MCFG_VIDEO_UPDATE( subsino2 )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1963,12 +1963,12 @@ static MACHINE_CONFIG_START( xplan, driver_device )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 512-1, 0, 256-16-1 )
 	MCFG_SCREEN_REFRESH_RATE( 58.7270 )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// game reads vblank state
+	MCFG_SCREEN_UPDATE( subsino2 )
 
 	MCFG_GFXDECODE( ss9601 )
 	MCFG_PALETTE_LENGTH( 256 )
 
 	MCFG_VIDEO_START( subsino2 )
-	MCFG_VIDEO_UPDATE( subsino2 )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

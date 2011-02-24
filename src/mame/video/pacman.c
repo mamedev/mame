@@ -217,7 +217,7 @@ WRITE8_HANDLER( pacman_flipscreen_w )
 }
 
 
-VIDEO_UPDATE( pacman )
+SCREEN_UPDATE( pacman )
 {
 	if (bgpriority != 0)
 		bitmap_fill(bitmap,cliprect,0);
@@ -393,7 +393,7 @@ VIDEO_START( s2650games )
 	tilemap_set_scroll_cols(bg_tilemap, 32);
 }
 
-VIDEO_UPDATE( s2650games )
+SCREEN_UPDATE( s2650games )
 {
 	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
 	UINT8 *spriteram_2 = screen->machine->generic.spriteram2.u8;

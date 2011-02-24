@@ -33,5 +33,5 @@ WRITE8_HANDLER( gng_bgscrolly_w );
 WRITE8_HANDLER( gng_flipscreen_w );
 
 VIDEO_START( gng );
-VIDEO_UPDATE( gng );
-VIDEO_EOF( gng );
+SCREEN_UPDATE( gng );
+SCREEN_EOF( gng );

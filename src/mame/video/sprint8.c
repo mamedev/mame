@@ -158,7 +158,7 @@ static TIMER_CALLBACK( sprint8_collision_callback )
 }
 
 
-VIDEO_UPDATE( sprint8 )
+SCREEN_UPDATE( sprint8 )
 {
 	sprint8_state *state = screen->machine->driver_data<sprint8_state>();
 	set_pens(state, screen->machine->colortable);
@@ -168,7 +168,7 @@ VIDEO_UPDATE( sprint8 )
 }
 
 
-VIDEO_EOF( sprint8 )
+SCREEN_EOF( sprint8 )
 {
 	sprint8_state *state = machine->driver_data<sprint8_state>();
 	int x;

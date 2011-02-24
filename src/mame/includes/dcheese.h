@@ -42,7 +42,7 @@ void dcheese_signal_irq(running_machine *machine, int which);
 
 PALETTE_INIT( dcheese );
 VIDEO_START( dcheese );
-VIDEO_UPDATE( dcheese );
+SCREEN_UPDATE( dcheese );
 
 WRITE16_HANDLER( madmax_blitter_color_w );
 WRITE16_HANDLER( madmax_blitter_xparam_w );

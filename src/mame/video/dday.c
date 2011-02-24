@@ -315,7 +315,7 @@ WRITE8_HANDLER( dday_control_w )
 
 ***************************************************************************/
 
-VIDEO_UPDATE( dday )
+SCREEN_UPDATE( dday )
 {
 	dday_state *state = screen->machine->driver_data<dday_state>();
 

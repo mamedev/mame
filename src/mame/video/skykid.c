@@ -236,7 +236,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 }
 
 
-VIDEO_UPDATE( skykid )
+SCREEN_UPDATE( skykid )
 {
 	skykid_state *state = screen->machine->driver_data<skykid_state>();
 	if (flip_screen_get(screen->machine))

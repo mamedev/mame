@@ -20,4 +20,4 @@ public:
 
 /*----------- defined in video/taito_o.c -----------*/
 
-VIDEO_UPDATE( parentj );
+SCREEN_UPDATE( parentj );

@@ -88,7 +88,7 @@ VIDEO_START( shuuz )
  *
  *************************************/
 
-VIDEO_UPDATE( shuuz )
+SCREEN_UPDATE( shuuz )
 {
 	shuuz_state *state = screen->machine->driver_data<shuuz_state>();
 	atarimo_rect_list rectlist;

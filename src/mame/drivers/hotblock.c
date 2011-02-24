@@ -138,7 +138,7 @@ static VIDEO_START(hotblock)
 	state->save_item(NAME(state->pal));
 }
 
-static VIDEO_UPDATE(hotblock)
+static SCREEN_UPDATE(hotblock)
 {
 	hotblock_state *state = screen->machine->driver_data<hotblock_state>();
 	int y, x, count;
@@ -222,11 +222,11 @@ static MACHINE_CONFIG_START( hotblock, hotblock_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(1024,1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+	MCFG_SCREEN_UPDATE(hotblock)
 
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_VIDEO_START(hotblock)
-	MCFG_VIDEO_UPDATE(hotblock)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

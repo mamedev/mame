@@ -670,7 +670,7 @@ static void drgnbowl_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 	}
 }
 
-VIDEO_UPDATE( gaiden )
+SCREEN_UPDATE( gaiden )
 {
 	gaiden_state *state = screen->machine->driver_data<gaiden_state>();
 	bitmap_fill(screen->machine->priority_bitmap,    cliprect, 0);
@@ -696,7 +696,7 @@ VIDEO_UPDATE( gaiden )
 
 }
 
-VIDEO_UPDATE( raiga )
+SCREEN_UPDATE( raiga )
 {
 	gaiden_state *state = screen->machine->driver_data<gaiden_state>();
 	bitmap_fill(screen->machine->priority_bitmap,    cliprect, 0);
@@ -721,7 +721,7 @@ VIDEO_UPDATE( raiga )
 	return 0;
 }
 
-VIDEO_UPDATE( drgnbowl )
+SCREEN_UPDATE( drgnbowl )
 {
 	gaiden_state *state = screen->machine->driver_data<gaiden_state>();
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);

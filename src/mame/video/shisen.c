@@ -62,7 +62,7 @@ VIDEO_START( sichuan2 )
 		 8, 8, 64, 32);
 }
 
-VIDEO_UPDATE( sichuan2 )
+SCREEN_UPDATE( sichuan2 )
 {
 	shisen_state *state = screen->machine->driver_data<shisen_state>();
 

@@ -159,7 +159,7 @@ static VIDEO_START( hvyunit )
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 }
 
-static VIDEO_UPDATE( hvyunit )
+static SCREEN_UPDATE( hvyunit )
 {
 #define SX_POS	96
 #define SY_POS	0
@@ -174,7 +174,7 @@ static VIDEO_UPDATE( hvyunit )
 	return 0;
 }
 
-static VIDEO_EOF( hvyunit )
+static SCREEN_EOF( hvyunit )
 {
 	hvyunit_state *state = machine->driver_data<hvyunit_state>();
 	pandora_eof(state->pandora);
@@ -671,6 +671,8 @@ static MACHINE_CONFIG_START( hvyunit, hvyunit_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
+	MCFG_SCREEN_UPDATE(hvyunit)
+	MCFG_SCREEN_EOF(hvyunit)
 
 	MCFG_GFXDECODE(hvyunit)
 	MCFG_PALETTE_LENGTH(0x800)
@@ -678,8 +680,6 @@ static MACHINE_CONFIG_START( hvyunit, hvyunit_state )
 	MCFG_KANEKO_PANDORA_ADD("pandora", hvyunit_pandora_config)
 
 	MCFG_VIDEO_START(hvyunit)
-	MCFG_VIDEO_UPDATE(hvyunit)
-	MCFG_VIDEO_EOF(hvyunit)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

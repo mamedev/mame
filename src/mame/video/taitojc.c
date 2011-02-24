@@ -206,7 +206,7 @@ VIDEO_START( taitojc )
 }
 
 //static int tick = 0;
-VIDEO_UPDATE( taitojc )
+SCREEN_UPDATE( taitojc )
 {
 	taitojc_state *state = screen->machine->driver_data<taitojc_state>();
 	int i;

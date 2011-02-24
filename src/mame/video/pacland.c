@@ -373,7 +373,7 @@ static void draw_fg(running_machine *machine, bitmap_t *bitmap, const rectangle 
 }
 
 
-VIDEO_UPDATE( pacland )
+SCREEN_UPDATE( pacland )
 {
 	pacland_state *state = screen->machine->driver_data<pacland_state>();
 	int row;

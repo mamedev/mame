@@ -59,7 +59,7 @@ static WRITE8_HANDLER( dotrikun_color_w )
 }
 
 
-static VIDEO_UPDATE( dotrikun )
+static SCREEN_UPDATE( dotrikun )
 {
 	dotrikun_state *state = screen->machine->driver_data<dotrikun_state>();
 	int x,y,i;
@@ -160,11 +160,10 @@ static MACHINE_CONFIG_START( dotrikun, dotrikun_state )
 	MCFG_MACHINE_RESET(dotrikun)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(dotrikun)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK, 256+32, 0, 256, 192+32, 0, 192) // FIXME: h/v params of this are completely inaccurate, shows it especially under the "CRT test"
+	MCFG_SCREEN_UPDATE(dotrikun)
 
 	/* sound hardware */
 MACHINE_CONFIG_END

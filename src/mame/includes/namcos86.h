@@ -4,8 +4,8 @@ extern UINT8 *rthunder_videoram1, *rthunder_videoram2, *rthunder_spriteram;
 
 PALETTE_INIT( namcos86 );
 VIDEO_START( namcos86 );
-VIDEO_UPDATE( namcos86 );
-VIDEO_EOF( namcos86 );
+SCREEN_UPDATE( namcos86 );
+SCREEN_EOF( namcos86 );
 
 READ8_HANDLER( rthunder_videoram1_r );
 WRITE8_HANDLER( rthunder_videoram1_w );

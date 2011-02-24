@@ -53,4 +53,4 @@ public:
 /*----------- defined in video/othunder.c -----------*/
 
 VIDEO_START( othunder );
-VIDEO_UPDATE( othunder );
+SCREEN_UPDATE( othunder );

@@ -34,13 +34,13 @@ WRITE16_HANDLER( rocknms_sub_vram_fg_w );
 WRITE16_HANDLER( rocknms_sub_vram_rot_w );
 
 VIDEO_START( tetrisp2 );
-VIDEO_UPDATE( tetrisp2 );
+SCREEN_UPDATE( tetrisp2 );
 
 VIDEO_START( rockntread );
-VIDEO_UPDATE( rockntread );
+SCREEN_UPDATE( rockntread );
 
 VIDEO_START( rocknms );
-VIDEO_UPDATE( rocknms );
+SCREEN_UPDATE( rocknms );
 
 VIDEO_START( nndmseal );
 void tetrisp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, bitmap_t *bitmap_pri, const rectangle *cliprect, UINT8* priram, UINT16 *sprram_top, size_t sprram_size, int gfxnum, int reverseorder, int flip, int allowzoom);

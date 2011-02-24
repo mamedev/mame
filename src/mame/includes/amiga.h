@@ -477,7 +477,7 @@ extern const UINT16 amiga_expand_byte[256];
 
 PALETTE_INIT( amiga );
 VIDEO_START( amiga );
-VIDEO_UPDATE( amiga );
+SCREEN_UPDATE( amiga );
 
 void amiga_copper_setpc(running_machine *machine, UINT32 pc);
 int amiga_copper_execute_next(running_machine *machine, int xpos);
@@ -491,7 +491,7 @@ void amiga_sprite_enable_comparitor(running_machine *machine, int which, int ena
 /*----------- defined in video/amigaaga.c -----------*/
 
 VIDEO_START( amiga_aga );
-VIDEO_UPDATE( amiga_aga );
+SCREEN_UPDATE( amiga_aga );
 
 void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanline);
 void amiga_aga_palette_write(running_machine *machine, int color_reg, UINT16 data);

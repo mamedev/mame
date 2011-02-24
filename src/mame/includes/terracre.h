@@ -19,4 +19,4 @@ WRITE16_HANDLER( amazon_scrolly_w );
 WRITE16_HANDLER( amazon_scrollx_w );
 WRITE16_HANDLER( amazon_flipscreen_w );
 VIDEO_START( amazon );
-VIDEO_UPDATE( amazon );
+SCREEN_UPDATE( amazon );

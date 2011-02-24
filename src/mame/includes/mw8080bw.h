@@ -294,29 +294,29 @@ WRITE8_HANDLER( shuttlei_sh_port_2_w );
 
 /*----------- defined in video/mw8080bw.c -----------*/
 
-VIDEO_UPDATE( mw8080bw );
+SCREEN_UPDATE( mw8080bw );
 
-VIDEO_UPDATE( spcenctr );
+SCREEN_UPDATE( spcenctr );
 
-VIDEO_UPDATE( phantom2 );
-VIDEO_EOF( phantom2 );
+SCREEN_UPDATE( phantom2 );
+SCREEN_EOF( phantom2 );
 
-VIDEO_UPDATE( invaders );
+SCREEN_UPDATE( invaders );
 
 
 /*----------- defined in video/8080bw.c -----------*/
 
 MACHINE_START( extra_8080bw_vh );
 
-VIDEO_UPDATE( invadpt2 );
-VIDEO_UPDATE( ballbomb );
-VIDEO_UPDATE( schaser );
-VIDEO_UPDATE( schasercv );
-VIDEO_UPDATE( rollingc );
-VIDEO_UPDATE( polaris );
-VIDEO_UPDATE( lupin3 );
-VIDEO_UPDATE( cosmo );
-VIDEO_UPDATE( indianbt );
-VIDEO_UPDATE( shuttlei );
-VIDEO_UPDATE( sflush );
+SCREEN_UPDATE( invadpt2 );
+SCREEN_UPDATE( ballbomb );
+SCREEN_UPDATE( schaser );
+SCREEN_UPDATE( schasercv );
+SCREEN_UPDATE( rollingc );
+SCREEN_UPDATE( polaris );
+SCREEN_UPDATE( lupin3 );
+SCREEN_UPDATE( cosmo );
+SCREEN_UPDATE( indianbt );
+SCREEN_UPDATE( shuttlei );
+SCREEN_UPDATE( sflush );
 

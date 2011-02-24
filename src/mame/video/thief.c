@@ -112,7 +112,7 @@ VIDEO_START( thief ){
 	thief_coprocessor.context_ram = auto_alloc_array(machine, UINT8, 0x400 );
 }
 
-VIDEO_UPDATE( thief ){
+SCREEN_UPDATE( thief ){
 	thief_state *state = screen->machine->driver_data<thief_state>();
 	UINT8 *videoram = state->videoram;
 	UINT32 offs;

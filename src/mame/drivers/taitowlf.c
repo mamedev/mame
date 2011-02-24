@@ -81,7 +81,7 @@ static void draw_char(bitmap_t *bitmap, const rectangle *cliprect, const gfx_ele
 	}
 }
 
-static VIDEO_UPDATE(taitowlf)
+static SCREEN_UPDATE(taitowlf)
 {
 	taitowlf_state *state = screen->machine->driver_data<taitowlf_state>();
 	int i, j;
@@ -671,13 +671,12 @@ static MACHINE_CONFIG_START( taitowlf, taitowlf_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 199)
+	MCFG_SCREEN_UPDATE(taitowlf)
 
 	MCFG_GFXDECODE(CGA)
 	MCFG_PALETTE_LENGTH(16)
 
 	MCFG_VIDEO_START(taitowlf)
-	MCFG_VIDEO_UPDATE(taitowlf)
-
 MACHINE_CONFIG_END
 
 static void set_gate_a20(running_machine *machine, int a20)

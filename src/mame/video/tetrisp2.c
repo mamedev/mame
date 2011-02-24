@@ -499,7 +499,7 @@ void tetrisp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, bitmap_t 
 
 ***************************************************************************/
 
-VIDEO_UPDATE( tetrisp2 )
+SCREEN_UPDATE( tetrisp2 )
 {
 	int flipscreen;
 	int asc_pri;
@@ -583,7 +583,7 @@ VIDEO_UPDATE( tetrisp2 )
 	return 0;
 }
 
-VIDEO_UPDATE( rockntread )
+SCREEN_UPDATE( rockntread )
 {
 	int flipscreen;
 	int asc_pri;
@@ -670,7 +670,7 @@ VIDEO_UPDATE( rockntread )
 
 
 
-VIDEO_UPDATE( rocknms )
+SCREEN_UPDATE( rocknms )
 {
 	int asc_pri;
 	int scr_pri;

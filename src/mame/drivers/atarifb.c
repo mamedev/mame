@@ -570,12 +570,13 @@ static MACHINE_CONFIG_START( atarifb, atarifb_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(38*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 38*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_UPDATE(atarifb)
+
 	MCFG_GFXDECODE(atarifb)
 	MCFG_PALETTE_LENGTH(12)
 
 	MCFG_PALETTE_INIT(atarifb)
 	MCFG_VIDEO_START(atarifb)
-	MCFG_VIDEO_UPDATE(atarifb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -601,7 +602,8 @@ static MACHINE_CONFIG_DERIVED( abaseb, atarifb )
 	MCFG_CPU_PROGRAM_MAP(abaseb_map)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(abaseb)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(abaseb)
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("discrete", DISCRETE, 0)
@@ -619,8 +621,8 @@ static MACHINE_CONFIG_DERIVED( soccer, atarifb )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 38*8-1, 2*8, 32*8-1)
-	MCFG_GFXDECODE(soccer)
-	MCFG_VIDEO_UPDATE(soccer)
+	MCFG_SCREEN_UPDATE(soccer)
+	MCFG_GFXDECODE(soccer)	
 MACHINE_CONFIG_END
 
 

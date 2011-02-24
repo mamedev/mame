@@ -432,12 +432,12 @@ static MACHINE_CONFIG_START( dcheese, dcheese_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(360, 262)	/* guess, need to see what the games write to the vid registers */
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_UPDATE(dcheese)
 
 	MCFG_PALETTE_LENGTH(65534)
 
 	MCFG_PALETTE_INIT(dcheese)
 	MCFG_VIDEO_START(dcheese)
-	MCFG_VIDEO_UPDATE(dcheese)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

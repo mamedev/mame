@@ -79,7 +79,7 @@ static void draw_sprites( running_machine *machine, bitmap_t* bitmap, const rect
 }
 
 
-VIDEO_UPDATE( orbit )
+SCREEN_UPDATE( orbit )
 {
 	orbit_state *state = screen->machine->driver_data<orbit_state>();
 

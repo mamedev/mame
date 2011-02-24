@@ -133,7 +133,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 ***************************************************************************/
 
-VIDEO_UPDATE( targeth )
+SCREEN_UPDATE( targeth )
 {
 	targeth_state *state = screen->machine->driver_data<targeth_state>();
 	/* set scroll registers */

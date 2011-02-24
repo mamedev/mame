@@ -185,7 +185,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-VIDEO_UPDATE( tiamc1 )
+SCREEN_UPDATE( tiamc1 )
 {
 #if 0
 	int i;

@@ -358,7 +358,7 @@ static void draw_pixram( running_machine *machine, bitmap_t *bitmap, const recta
 		copybitmap(bitmap, state->tmp_bitmap2, f, f, state->xoffset, 0, cliprect);
 }
 
-VIDEO_UPDATE( fortyl )
+SCREEN_UPDATE( fortyl )
 {
 	fortyl_state *state = screen->machine->driver_data<fortyl_state>();
 	draw_pixram(screen->machine, bitmap, cliprect);

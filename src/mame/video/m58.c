@@ -312,7 +312,7 @@ static void draw_panel( running_machine *machine, bitmap_t *bitmap, const rectan
  *
  *************************************/
 
-VIDEO_UPDATE( yard )
+SCREEN_UPDATE( yard )
 {
 	m58_state *state = screen->machine->driver_data<m58_state>();
 

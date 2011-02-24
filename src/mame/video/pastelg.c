@@ -306,7 +306,7 @@ VIDEO_START( pastelg )
 
 
 ******************************************************************************/
-VIDEO_UPDATE( pastelg )
+SCREEN_UPDATE( pastelg )
 {
 	if (pastelg_dispflag)
 	{

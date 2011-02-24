@@ -76,7 +76,7 @@ static VIDEO_START( taitotz )
 {
 }
 
-static VIDEO_UPDATE( taitotz )
+static SCREEN_UPDATE( taitotz )
 {
 	return 0;
 }
@@ -116,9 +116,9 @@ static MACHINE_CONFIG_START( taitotz, driver_device )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
+	MCFG_SCREEN_UPDATE(taitotz)
 
 	MCFG_VIDEO_START(taitotz)
-	MCFG_VIDEO_UPDATE(taitotz)
 MACHINE_CONFIG_END
 
 #define TAITOTZ_BIOS	\

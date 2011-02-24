@@ -1134,7 +1134,7 @@ VIDEO_START( tx1 )
 	interrupt_timer->adjust(machine->primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
 
-VIDEO_EOF( tx1 )
+SCREEN_EOF( tx1 )
 {
 	/* /VSYNC: Update TZ113 */
 	tx1_vregs.slin_val += tx1_vregs.slin_inc;
@@ -1190,7 +1190,7 @@ static void tx1_combine_layers(running_machine *machine, bitmap_t *bitmap, int s
 	}
 }
 
-VIDEO_UPDATE( tx1 )
+SCREEN_UPDATE( tx1 )
 {
 	device_t *left_screen   = screen->machine->device("lscreen");
 	device_t *centre_screen = screen->machine->device("cscreen");
@@ -3067,7 +3067,7 @@ VIDEO_START( buggybjr )
 	interrupt_timer->adjust(machine->primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
 
-VIDEO_EOF( buggyboy )
+SCREEN_EOF( buggyboy )
 {
 	/* /VSYNC: Update TZ113 @ 219 */
 	vregs.slin += vregs.slin_inc;
@@ -3077,7 +3077,7 @@ VIDEO_EOF( buggyboy )
 }
 
 
-VIDEO_UPDATE( buggyboy )
+SCREEN_UPDATE( buggyboy )
 {
 	device_t *left_screen = screen->machine->device("lscreen");
 	device_t *center_screen = screen->machine->device("cscreen");
@@ -3107,7 +3107,7 @@ VIDEO_UPDATE( buggyboy )
 
 }
 
-VIDEO_UPDATE( buggybjr )
+SCREEN_UPDATE( buggybjr )
 {
 	memset(bb_obj_bmp, 0, 256*240);
 

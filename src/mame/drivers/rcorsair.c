@@ -100,7 +100,7 @@ static VIDEO_START( rcorsair )
 {
 }
 
-static VIDEO_UPDATE( rcorsair )
+static SCREEN_UPDATE( rcorsair )
 {
 
 	return 0;
@@ -121,12 +121,12 @@ static MACHINE_CONFIG_START( rcorsair, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE(rcorsair)
 
 	MCFG_GFXDECODE(rcorsair)
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(rcorsair)
-	MCFG_VIDEO_UPDATE(rcorsair)
 MACHINE_CONFIG_END
 
 ROM_START( rcorsair )

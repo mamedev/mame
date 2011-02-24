@@ -30,7 +30,7 @@ public:
 
 
 
-static VIDEO_UPDATE( ultrsprt )
+static SCREEN_UPDATE( ultrsprt )
 {
 	ultrsprt_state *state = screen->machine->driver_data<ultrsprt_state>();
 	int i, j;
@@ -235,10 +235,9 @@ static MACHINE_CONFIG_START( ultrsprt, ultrsprt_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 399)
+	MCFG_SCREEN_UPDATE(ultrsprt)
 
 	MCFG_PALETTE_LENGTH(8192)
-
-	MCFG_VIDEO_UPDATE(ultrsprt)
 
 	/* sound hardware */
 	MCFG_K056800_ADD("k056800", ultrsprt_k056800_interface)

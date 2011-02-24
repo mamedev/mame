@@ -25,7 +25,7 @@ public:
 /*----------- defined in video/sshangha.c -----------*/
 
 VIDEO_START( sshangha );
-VIDEO_UPDATE( sshangha );
+SCREEN_UPDATE( sshangha );
 
 WRITE16_HANDLER( sshangha_pf2_data_w );
 WRITE16_HANDLER( sshangha_pf1_data_w );

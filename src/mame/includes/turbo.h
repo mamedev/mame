@@ -89,14 +89,14 @@ WRITE8_DEVICE_HANDLER( buckrog_sound_b_w );
 
 PALETTE_INIT( turbo );
 VIDEO_START( turbo );
-VIDEO_UPDATE( turbo );
+SCREEN_UPDATE( turbo );
 
 PALETTE_INIT( subroc3d );
-VIDEO_UPDATE( subroc3d );
+SCREEN_UPDATE( subroc3d );
 
 PALETTE_INIT( buckrog );
 VIDEO_START( buckrog );
-VIDEO_UPDATE( buckrog );
+SCREEN_UPDATE( buckrog );
 
 WRITE8_HANDLER( turbo_videoram_w );
 WRITE8_HANDLER( buckrog_bitmap_w );

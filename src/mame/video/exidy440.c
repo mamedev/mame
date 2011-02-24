@@ -435,7 +435,7 @@ static void update_screen(screen_device &screen, bitmap_t *bitmap, const rectang
  *
  *************************************/
 
-static VIDEO_UPDATE( exidy440 )
+static SCREEN_UPDATE( exidy440 )
 {
 	/* redraw the screen */
 	update_screen(*screen, bitmap, cliprect, 0, TRUE);
@@ -467,7 +467,7 @@ static VIDEO_UPDATE( exidy440 )
 }
 
 
-static VIDEO_UPDATE( topsecex )
+static SCREEN_UPDATE( topsecex )
 {
 	/* redraw the screen */
 	update_screen(*screen, bitmap, cliprect, *topsecex_yscroll, FALSE);
@@ -486,20 +486,20 @@ static VIDEO_UPDATE( topsecex )
 MACHINE_CONFIG_FRAGMENT( exidy440_video )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_VIDEO_START(exidy440)
-	MCFG_VIDEO_UPDATE(exidy440)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_UPDATE(exidy440)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_FRAGMENT( topsecex_video )
 	MCFG_VIDEO_ATTRIBUTES(0)
 	MCFG_VIDEO_START(topsecex)
-	MCFG_VIDEO_UPDATE(topsecex)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, TOPSECEX_VBSTART)
+	MCFG_SCREEN_UPDATE(topsecex)
 MACHINE_CONFIG_END

@@ -276,7 +276,7 @@ static void mcr3_update_sprites(running_machine *machine, bitmap_t *bitmap, cons
  *
  *************************************/
 
-VIDEO_UPDATE( mcr3 )
+SCREEN_UPDATE( mcr3 )
 {
 	/* update the flip state */
 	tilemap_set_flip(bg_tilemap, mcr_cocktail_flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
@@ -290,7 +290,7 @@ VIDEO_UPDATE( mcr3 )
 }
 
 
-VIDEO_UPDATE( spyhunt )
+SCREEN_UPDATE( spyhunt )
 {
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */

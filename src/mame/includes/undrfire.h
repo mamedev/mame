@@ -28,5 +28,5 @@ public:
 /*----------- defined in video/undrfire.c -----------*/
 
 VIDEO_START( undrfire );
-VIDEO_UPDATE( undrfire );
-VIDEO_UPDATE( cbombers );
+SCREEN_UPDATE( undrfire );
+SCREEN_UPDATE( cbombers );

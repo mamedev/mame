@@ -160,7 +160,7 @@ static PALETTE_INIT( shougi )
 
 
 
-static VIDEO_UPDATE( shougi )
+static SCREEN_UPDATE( shougi )
 {
 	shougi_state *state = screen->machine->driver_data<shougi_state>();
 	int offs;
@@ -415,11 +415,11 @@ static MACHINE_CONFIG_START( shougi, shougi_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 255)
+	MCFG_SCREEN_UPDATE(shougi)
 
 	MCFG_PALETTE_LENGTH(32)
 
 	MCFG_PALETTE_INIT(shougi)
-	MCFG_VIDEO_UPDATE(shougi)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

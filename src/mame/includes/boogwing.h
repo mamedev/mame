@@ -35,5 +35,5 @@ public:
 
 /*----------- defined in video/boogwing.c -----------*/
 
-VIDEO_UPDATE( boogwing );
+SCREEN_UPDATE( boogwing );
 

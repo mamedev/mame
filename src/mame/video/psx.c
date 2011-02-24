@@ -797,7 +797,7 @@ VIDEO_START( psx_type2 )
 	psx_gpu_init(machine, 2);
 }
 
-VIDEO_UPDATE( psx )
+SCREEN_UPDATE( psx )
 {
 	psx_gpu *p_psxgpu = screen->machine->driver_data<psx_state>()->p_psxgpu;
 	UINT32 n_x;

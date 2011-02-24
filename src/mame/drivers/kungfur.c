@@ -114,7 +114,7 @@ static void draw_led(bitmap_t *bitmap, int x, int y,UINT8 value)
 }
 
 /* actually debugging purpose, it will be converted to the artwork system at some point. */
-static VIDEO_UPDATE( kungfur )
+static SCREEN_UPDATE( kungfur )
 {
 	kungfur_state *state = screen->machine->driver_data<kungfur_state>();
 //  popmessage("%02x %02x %02x %02x %02x %02x",io_data[0],io_data[1],io_data[2],io_data[3],io_data[4],io_data[5]);
@@ -369,10 +369,10 @@ static MACHINE_CONFIG_START( kungfur, kungfur_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(kungfur)
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_VIDEO_START(kungfur)
-	MCFG_VIDEO_UPDATE(kungfur)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

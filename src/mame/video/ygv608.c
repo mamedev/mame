@@ -718,7 +718,7 @@ static const char *const mode[] = {
 static const char *const psize[] = { "8x8", "16x16", "32x32", "64x64" };
 #endif
 
-VIDEO_UPDATE( ygv608 )
+SCREEN_UPDATE( ygv608 )
 {
 #ifdef _SHOW_VIDEO_DEBUG
     char buffer[64];

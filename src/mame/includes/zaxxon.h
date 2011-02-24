@@ -71,7 +71,7 @@ VIDEO_START( zaxxon );
 VIDEO_START( razmataz );
 VIDEO_START( congo );
 
-VIDEO_UPDATE( zaxxon );
-VIDEO_UPDATE( razmataz );
-VIDEO_UPDATE( congo );
-VIDEO_UPDATE( futspy );
+SCREEN_UPDATE( zaxxon );
+SCREEN_UPDATE( razmataz );
+SCREEN_UPDATE( congo );
+SCREEN_UPDATE( futspy );

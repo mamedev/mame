@@ -9,5 +9,5 @@ PALETTE_INIT( snookr10 );
 PALETTE_INIT( apple10 );
 VIDEO_START( snookr10 );
 VIDEO_START( apple10 );
-VIDEO_UPDATE( snookr10 );
+SCREEN_UPDATE( snookr10 );
 

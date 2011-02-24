@@ -38,7 +38,7 @@ static VIDEO_START(fortecar)
 {
 }
 
-static VIDEO_UPDATE(fortecar)
+static SCREEN_UPDATE(fortecar)
 {
 	int x,y,count;
 	count = 0;
@@ -291,6 +291,7 @@ static MACHINE_CONFIG_START( fortecar, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE(fortecar)
 
 	MCFG_MACHINE_RESET(fortecar)
 
@@ -304,7 +305,6 @@ static MACHINE_CONFIG_START( fortecar, driver_device )
 	MCFG_PALETTE_INIT(fortecar)
 
 	MCFG_VIDEO_START(fortecar)
-	MCFG_VIDEO_UPDATE(fortecar)
 
 	MCFG_MC6845_ADD("crtc", MC6845, 6000000/4, mc6845_intf)	/* unknown type / hand tuned to get ~60 fps */
 

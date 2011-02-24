@@ -2794,7 +2794,7 @@ static void cps1_render_high_layer( running_machine *machine, bitmap_t *bitmap, 
 
 ***************************************************************************/
 
-VIDEO_UPDATE( cps1 )
+SCREEN_UPDATE( cps1 )
 {
 	cps_state *state = screen->machine->driver_data<cps_state>();
 	int layercontrol, l0, l1, l2, l3;
@@ -2946,7 +2946,7 @@ if (0 && input_code_pressed(screen->machine, KEYCODE_Z))
 	return 0;
 }
 
-VIDEO_EOF( cps1 )
+SCREEN_EOF( cps1 )
 {
 	cps_state *state = machine->driver_data<cps_state>();
 

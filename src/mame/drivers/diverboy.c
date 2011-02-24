@@ -109,7 +109,7 @@ static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rect
 	}
 }
 
-static VIDEO_UPDATE(diverboy)
+static SCREEN_UPDATE(diverboy)
 {
 //  bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 	draw_sprites(screen->machine, bitmap, cliprect);
@@ -268,11 +268,11 @@ static MACHINE_CONFIG_START( diverboy, diverboy_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8+4, 40*8+1, 2*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(diverboy)
 
 	MCFG_PALETTE_LENGTH(0x400)
 
 	MCFG_VIDEO_START(diverboy)
-	MCFG_VIDEO_UPDATE(diverboy)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

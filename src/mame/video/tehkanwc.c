@@ -160,7 +160,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-VIDEO_UPDATE( tehkanwc )
+SCREEN_UPDATE( tehkanwc )
 {
 	tilemap_set_scrollx(bg_tilemap, 0, scroll_x[0] + 256 * scroll_x[1]);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);

@@ -164,7 +164,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-VIDEO_UPDATE( prehisle )
+SCREEN_UPDATE( prehisle )
 {
 	prehisle_state *state = screen->machine->driver_data<prehisle_state>();
 

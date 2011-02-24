@@ -54,11 +54,11 @@ extern VIDEO_START( gwar );
 extern VIDEO_START( psychos );
 extern VIDEO_START( tdfever );
 
-extern VIDEO_UPDATE( marvins );
-extern VIDEO_UPDATE( tnk3 );
-extern VIDEO_UPDATE( ikari );
-extern VIDEO_UPDATE( gwar );
-extern VIDEO_UPDATE( tdfever );
+extern SCREEN_UPDATE( marvins );
+extern SCREEN_UPDATE( tnk3 );
+extern SCREEN_UPDATE( ikari );
+extern SCREEN_UPDATE( gwar );
+extern SCREEN_UPDATE( tdfever );
 
 extern WRITE8_HANDLER( snk_fg_scrollx_w );
 extern WRITE8_HANDLER( snk_fg_scrolly_w );

@@ -172,7 +172,7 @@ static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rect
 
 /******************************************************************************/
 
-VIDEO_UPDATE( dassault )
+SCREEN_UPDATE( dassault )
 {
 	dassault_state *state = screen->machine->driver_data<dassault_state>();
 	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);

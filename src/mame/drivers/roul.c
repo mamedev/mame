@@ -184,7 +184,7 @@ static VIDEO_START(roul)
 	videobuf = auto_alloc_array_clear(machine, UINT8, VIDEOBUF_SIZE);
 }
 
-static VIDEO_UPDATE(roul)
+static SCREEN_UPDATE(roul)
 {
 	int i,j;
 	for (i = 0; i < 256; i++)
@@ -263,11 +263,11 @@ static MACHINE_CONFIG_START( roul, driver_device )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(roul)
 
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(roul)
-	MCFG_VIDEO_UPDATE(roul)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, 1000000)

@@ -24,5 +24,5 @@ WRITE16_HANDLER( toypop_merged_background_w );
 WRITE8_HANDLER( toypop_palettebank_w );
 WRITE16_HANDLER( toypop_flipscreen_w );
 VIDEO_START( toypop );
-VIDEO_UPDATE( toypop );
+SCREEN_UPDATE( toypop );
 PALETTE_INIT( toypop );

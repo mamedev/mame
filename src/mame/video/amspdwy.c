@@ -146,7 +146,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 ***************************************************************************/
 
-VIDEO_UPDATE( amspdwy )
+SCREEN_UPDATE( amspdwy )
 {
 	amspdwy_state *state = screen->machine->driver_data<amspdwy_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);

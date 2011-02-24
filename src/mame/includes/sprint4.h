@@ -20,8 +20,8 @@ public:
 
 PALETTE_INIT( sprint4 );
 
-VIDEO_EOF( sprint4 );
+SCREEN_EOF( sprint4 );
 VIDEO_START( sprint4 );
-VIDEO_UPDATE( sprint4 );
+SCREEN_UPDATE( sprint4 );
 
 WRITE8_HANDLER( sprint4_video_ram_w );

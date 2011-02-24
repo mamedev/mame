@@ -23,5 +23,5 @@ WRITE16_HANDLER( wrally_coin_lockout_w );
 /*----------- defined in video/wrally.c -----------*/
 
 VIDEO_START( wrally );
-VIDEO_UPDATE( wrally );
+SCREEN_UPDATE( wrally );
 

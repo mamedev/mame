@@ -248,7 +248,7 @@ static void cntsteer_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 	}
 }
 
-static VIDEO_UPDATE( zerotrgt )
+static SCREEN_UPDATE( zerotrgt )
 {
 	cntsteer_state *state = screen->machine->driver_data<cntsteer_state>();
 
@@ -299,7 +299,7 @@ static VIDEO_UPDATE( zerotrgt )
 	return 0;
 }
 
-static VIDEO_UPDATE( cntsteer )
+static SCREEN_UPDATE( cntsteer )
 {
 	cntsteer_state *state = screen->machine->driver_data<cntsteer_state>();
 
@@ -889,6 +889,7 @@ static MACHINE_CONFIG_START( cntsteer, cntsteer_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_UPDATE(cntsteer)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -897,7 +898,6 @@ static MACHINE_CONFIG_START( cntsteer, cntsteer_state )
 //  MCFG_PALETTE_INIT(zerotrgt)
 
 	MCFG_VIDEO_START(cntsteer)
-	MCFG_VIDEO_UPDATE(cntsteer)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -939,13 +939,13 @@ static MACHINE_CONFIG_START( zerotrgt, cntsteer_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_UPDATE(zerotrgt)
 
 	MCFG_GFXDECODE(zerotrgt)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(zerotrgt)
 	MCFG_VIDEO_START(zerotrgt)
-	MCFG_VIDEO_UPDATE(zerotrgt)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

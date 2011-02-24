@@ -920,7 +920,7 @@ VIDEO_RESET( neogeo )
  *
  *************************************/
 
-VIDEO_UPDATE( neogeo )
+SCREEN_UPDATE( neogeo )
 {
 	neogeo_state *state = screen->machine->driver_data<neogeo_state>();
 

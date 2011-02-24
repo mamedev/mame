@@ -40,7 +40,7 @@ static UINT8 *tile_control_ram;
 static UINT8 ld_video_visible;
 
 /* VIDEO GOODS */
-static VIDEO_UPDATE( esh )
+static SCREEN_UPDATE( esh )
 {
 	int charx, chary;
 

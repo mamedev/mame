@@ -213,9 +213,9 @@ static MACHINE_CONFIG_START( vindictr, vindictr_state )
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a SYNGEN chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
+	MCFG_SCREEN_UPDATE(vindictr)
 
 	MCFG_VIDEO_START(vindictr)
-	MCFG_VIDEO_UPDATE(vindictr)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(jsa_i_stereo_pokey)

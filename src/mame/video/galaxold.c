@@ -1869,7 +1869,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, UINT8 *spri
 }
 
 
-VIDEO_UPDATE( galaxold )
+SCREEN_UPDATE( galaxold )
 {
 	draw_background(screen->machine, bitmap, cliprect);
 
@@ -1899,7 +1899,7 @@ VIDEO_UPDATE( galaxold )
 }
 
 
-VIDEO_UPDATE( dambustr )
+SCREEN_UPDATE( dambustr )
 {
 	int i, j;
 	UINT8 color;

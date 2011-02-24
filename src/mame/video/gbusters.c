@@ -47,7 +47,7 @@ VIDEO_START( gbusters )
 }
 
 
-VIDEO_UPDATE( gbusters )
+SCREEN_UPDATE( gbusters )
 {
 	gbusters_state *state = screen->machine->driver_data<gbusters_state>();
 

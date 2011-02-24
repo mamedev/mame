@@ -26,12 +26,12 @@ static VIDEO_START(ddz)
 }
 
 
-static VIDEO_UPDATE(ddz)
+static SCREEN_UPDATE(ddz)
 {
 	return 0;
 }
 
-static VIDEO_EOF(ddz)
+static SCREEN_EOF(ddz)
 {
 
 }
@@ -67,12 +67,12 @@ static MACHINE_CONFIG_START( ddz, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_UPDATE(ddz)
+	MCFG_SCREEN_EOF(ddz)
 
 	MCFG_PALETTE_LENGTH(8192)
 
 	MCFG_VIDEO_START(ddz)
-	MCFG_VIDEO_UPDATE(ddz)
-	MCFG_VIDEO_EOF(ddz)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

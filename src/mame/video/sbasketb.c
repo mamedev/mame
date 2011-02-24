@@ -171,7 +171,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( sbasketb )
+SCREEN_UPDATE( sbasketb )
 {
 	sbasketb_state *state = screen->machine->driver_data<sbasketb_state>();
 	int col;

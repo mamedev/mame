@@ -167,8 +167,8 @@ WRITE16_HANDLER( cps2_objram2_w );
 
 VIDEO_START( cps1 );
 VIDEO_START( cps2 );
-VIDEO_UPDATE( cps1 );
-VIDEO_EOF( cps1 );
+SCREEN_UPDATE( cps1 );
+SCREEN_EOF( cps1 );
 
 void cps1_get_video_base(running_machine *machine);
 void cps2_set_sprite_priorities(running_machine *machine);

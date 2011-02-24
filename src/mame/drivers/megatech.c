@@ -442,7 +442,7 @@ static VIDEO_START(mtnew)
 }
 
 //attotime::never
-static VIDEO_UPDATE(mtnew)
+static SCREEN_UPDATE(mtnew)
 {
 	mtech_state *state = screen->machine->driver_data<mtech_state>();
 	device_t *megadriv_screen = screen->machine->device("megadriv");
@@ -452,24 +452,24 @@ static VIDEO_UPDATE(mtnew)
 	{
 		/* if we're running an sms game then use the SMS update.. maybe this should be moved to the megadrive emulation core as compatibility mode is a feature of the chip */
 		if (!state->current_game_is_sms)
-			VIDEO_UPDATE_CALL(megadriv);
+			SCREEN_UPDATE_CALL(megadriv);
 		else
-			VIDEO_UPDATE_CALL(megatech_md_sms);
+			SCREEN_UPDATE_CALL(megatech_md_sms);
 	}
 	else if (screen == menu_screen)
-		VIDEO_UPDATE_CALL(megatech_bios);
+		SCREEN_UPDATE_CALL(megatech_bios);
 	return 0;
 }
 
-static VIDEO_EOF(mtnew)
+static SCREEN_EOF(mtnew)
 {
 	mtech_state *state = machine->driver_data<mtech_state>();
 	if (!state->current_game_is_sms)
-		VIDEO_EOF_CALL(megadriv);
+		SCREEN_EOF_CALL(megadriv);
 	else
-		VIDEO_EOF_CALL(megatech_md_sms);
+		SCREEN_EOF_CALL(megatech_md_sms);
 
-	VIDEO_EOF_CALL(megatech_bios);
+	SCREEN_EOF_CALL(megatech_bios);
 }
 
 static MACHINE_RESET(mtnew)
@@ -495,8 +495,6 @@ static MACHINE_CONFIG_START( megatech, mtech_state )
 	MCFG_MACHINE_RESET(mtnew)
 
 	MCFG_VIDEO_START(mtnew)
-	MCFG_VIDEO_UPDATE(mtnew)
-	MCFG_VIDEO_EOF(mtnew)
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhovu)
 
@@ -505,6 +503,8 @@ static MACHINE_CONFIG_START( megatech, mtech_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(342,262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
+	MCFG_SCREEN_UPDATE(mtnew)
+	MCFG_SCREEN_EOF(mtnew)
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("sn2", SN76496, MASTER_CLOCK/15)

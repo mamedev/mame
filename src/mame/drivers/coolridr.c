@@ -292,7 +292,7 @@ static VIDEO_START(coolridr)
 	state->test_offs = 0x2000;
 }
 
-static VIDEO_UPDATE(coolridr)
+static SCREEN_UPDATE(coolridr)
 {
 	coolridr_state *state = screen->machine->driver_data<coolridr_state>();
 	/* planes seems to basically be at 0x8000 and 0x28000... */
@@ -1113,12 +1113,12 @@ static MACHINE_CONFIG_START( coolridr, coolridr_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(128*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 128*8-1, 0*8, 64*8-1) //TODO: these are just two different screens
+	MCFG_SCREEN_UPDATE(coolridr)
 
 	MCFG_PALETTE_LENGTH(0x10000)
 	MCFG_MACHINE_RESET(coolridr)
 
 	MCFG_VIDEO_START(coolridr)
-	MCFG_VIDEO_UPDATE(coolridr)
 MACHINE_CONFIG_END
 
 ROM_START( coolridr )

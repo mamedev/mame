@@ -661,14 +661,15 @@ static MACHINE_CONFIG_START( airbustr, airbustr_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(airbustr)
+	MCFG_SCREEN_EOF(airbustr)
+
 	MCFG_GFXDECODE(airbustr)
 	MCFG_PALETTE_LENGTH(768)
 
 	MCFG_KANEKO_PANDORA_ADD("pandora", airbustr_pandora_config)
 
 	MCFG_VIDEO_START(airbustr)
-	MCFG_VIDEO_UPDATE(airbustr)
-	MCFG_VIDEO_EOF(airbustr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

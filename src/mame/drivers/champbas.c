@@ -95,7 +95,7 @@ TODO:
  *
  *************************************/
 
-static VIDEO_EOF( champbas )
+static SCREEN_EOF( champbas )
 {
 	champbas_state *state = machine->driver_data<champbas_state>();
 	state->watchdog_count++;
@@ -617,14 +617,14 @@ static MACHINE_CONFIG_START( talbot, champbas_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(champbas)
+	MCFG_SCREEN_EOF(champbas)
 
 	MCFG_GFXDECODE(talbot)
 	MCFG_PALETTE_LENGTH(0x200)
 
 	MCFG_PALETTE_INIT(champbas)
 	MCFG_VIDEO_START(champbas)
-	MCFG_VIDEO_UPDATE(champbas)
-	MCFG_VIDEO_EOF(champbas)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -653,14 +653,14 @@ static MACHINE_CONFIG_START( champbas, champbas_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(champbas)
+	MCFG_SCREEN_EOF(champbas)
 
 	MCFG_GFXDECODE(champbas)
 	MCFG_PALETTE_LENGTH(0x200)
 
 	MCFG_PALETTE_INIT(champbas)
 	MCFG_VIDEO_START(champbas)
-	MCFG_VIDEO_UPDATE(champbas)
-	MCFG_VIDEO_EOF(champbas)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -711,14 +711,14 @@ static MACHINE_CONFIG_START( exctsccr, champbas_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(exctsccr)
+	MCFG_SCREEN_EOF(champbas)
 
 	MCFG_GFXDECODE(exctsccr)
 	MCFG_PALETTE_LENGTH(0x200)
 
 	MCFG_PALETTE_INIT(exctsccr)
 	MCFG_VIDEO_START(exctsccr)
-	MCFG_VIDEO_UPDATE(exctsccr)
-	MCFG_VIDEO_EOF(champbas)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -763,14 +763,14 @@ static MACHINE_CONFIG_START( exctsccrb, champbas_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(exctsccr)
+	MCFG_SCREEN_EOF(champbas)
 
 	MCFG_GFXDECODE(exctsccr)
 	MCFG_PALETTE_LENGTH(0x200)
 
 	MCFG_PALETTE_INIT(exctsccr)
 	MCFG_VIDEO_START(exctsccr)
-	MCFG_VIDEO_UPDATE(exctsccr)
-	MCFG_VIDEO_EOF(champbas)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

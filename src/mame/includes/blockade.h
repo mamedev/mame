@@ -23,7 +23,7 @@ public:
 WRITE8_HANDLER( blockade_videoram_w );
 
 VIDEO_START( blockade );
-VIDEO_UPDATE( blockade );
+SCREEN_UPDATE( blockade );
 
 /*----------- defined in audio/blockade.c -----------*/
 

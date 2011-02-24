@@ -36,5 +36,5 @@ WRITE16_HANDLER( othldrby_vreg_addr_w );
 WRITE16_HANDLER( othldrby_vreg_w );
 
 VIDEO_START( othldrby );
-VIDEO_EOF( othldrby );
-VIDEO_UPDATE( othldrby );
+SCREEN_EOF( othldrby );
+SCREEN_UPDATE( othldrby );

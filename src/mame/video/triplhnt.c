@@ -128,7 +128,7 @@ static void draw_sprites(running_machine *machine, bitmap_t* bitmap, const recta
 }
 
 
-VIDEO_UPDATE( triplhnt )
+SCREEN_UPDATE( triplhnt )
 {
 	device_t *discrete = screen->machine->device("discrete");
 

@@ -359,7 +359,7 @@ WRITE32_HANDLER( policetr_palette_data_w )
  *
  *************************************/
 
-VIDEO_UPDATE( policetr )
+SCREEN_UPDATE( policetr )
 {
 	int width = cliprect->max_x - cliprect->min_x + 1;
 	int y;

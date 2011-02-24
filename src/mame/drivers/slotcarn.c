@@ -523,7 +523,7 @@ GFXDECODE_END
 
 
 
-static VIDEO_UPDATE( slotcarn )
+static SCREEN_UPDATE( slotcarn )
 {
 	device_t *mc6845 = screen->machine->device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
@@ -609,12 +609,12 @@ static MACHINE_CONFIG_START( slotcarn, driver_device )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 512, 0, 512, 256, 0, 256)	/* temporary, CRTC will configure screen */
+	MCFG_SCREEN_UPDATE(slotcarn)
 
 	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
 
 	MCFG_GFXDECODE(slotcarn)
 	MCFG_PALETTE_LENGTH(0x400)
-	MCFG_VIDEO_UPDATE(slotcarn)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

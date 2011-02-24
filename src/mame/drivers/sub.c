@@ -130,7 +130,7 @@ static VIDEO_START(sub)
 {
 }
 
-static VIDEO_UPDATE(sub)
+static SCREEN_UPDATE(sub)
 {
 	sub_state *state = screen->machine->driver_data<sub_state>();
 	const gfx_element *gfx = screen->machine->gfx[0];
@@ -438,13 +438,13 @@ static MACHINE_CONFIG_START( sub, sub_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
+	MCFG_SCREEN_UPDATE(sub)
 
 	MCFG_GFXDECODE(sub)
 	MCFG_PALETTE_LENGTH(0x400)
 	MCFG_PALETTE_INIT(sub)
 
 	MCFG_VIDEO_START(sub)
-	MCFG_VIDEO_UPDATE(sub)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

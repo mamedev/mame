@@ -40,7 +40,7 @@ VIDEO_START( fgoal )
 }
 
 
-VIDEO_UPDATE( fgoal )
+SCREEN_UPDATE( fgoal )
 {
 	fgoal_state *state = screen->machine->driver_data<fgoal_state>();
 	const UINT8* VRAM = state->video_ram;

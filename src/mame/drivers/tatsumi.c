@@ -882,12 +882,12 @@ static MACHINE_CONFIG_START( apache3, tatsumi_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(CLOCK_2 / 8, 400, 0, 320, 280, 0, 240) // TODO: Hook up CRTC
+	MCFG_SCREEN_UPDATE(apache3)
 
 	MCFG_GFXDECODE(apache3)
 	MCFG_PALETTE_LENGTH(1024 + 4096) /* 1024 real colours, and 4096 arranged as series of cluts */
 
 	MCFG_VIDEO_START(apache3)
-	MCFG_VIDEO_UPDATE(apache3)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -924,12 +924,12 @@ static MACHINE_CONFIG_START( roundup5, tatsumi_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(roundup5)
 
 	MCFG_GFXDECODE(roundup5)
 	MCFG_PALETTE_LENGTH(1024 + 4096) /* 1024 real colours, and 4096 arranged as series of cluts */
 
 	MCFG_VIDEO_START(roundup5)
-	MCFG_VIDEO_UPDATE(roundup5)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -967,12 +967,12 @@ static MACHINE_CONFIG_START( cyclwarr, tatsumi_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(cyclwarr)
 
 	MCFG_GFXDECODE(cyclwarr)
 	MCFG_PALETTE_LENGTH(8192 + 8192)
 
 	MCFG_VIDEO_START(cyclwarr)
-	MCFG_VIDEO_UPDATE(cyclwarr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1010,12 +1010,12 @@ static MACHINE_CONFIG_START( bigfight, tatsumi_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(bigfight)
 
 	MCFG_GFXDECODE(cyclwarr)
 	MCFG_PALETTE_LENGTH(8192 + 8192)
 
 	MCFG_VIDEO_START(bigfight)
-	MCFG_VIDEO_UPDATE(bigfight)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

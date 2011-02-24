@@ -396,7 +396,7 @@ static const rectangle magical_visible1alt = { 0*8, (16+48)*8-1,  4*8,  16*8-1 }
 static const rectangle magical_visible2alt = { 0*8, (16+48)*8-1, 16*8,  28*8-1 };
 
 
-VIDEO_UPDATE( goldstar )
+SCREEN_UPDATE( goldstar )
 {
 	goldstar_state *state = screen->machine->driver_data<goldstar_state>();
 	int i;
@@ -442,7 +442,7 @@ VIDEO_UPDATE( goldstar )
 }
 
 
-VIDEO_UPDATE( magical )
+SCREEN_UPDATE( magical )
 {
 	goldstar_state *state = screen->machine->driver_data<goldstar_state>();
 	int i;
@@ -494,7 +494,7 @@ VIDEO_UPDATE( magical )
 }
 
 
-VIDEO_UPDATE( unkch )
+SCREEN_UPDATE( unkch )
 {
 	goldstar_state *state = screen->machine->driver_data<goldstar_state>();
 	int i;
@@ -544,7 +544,7 @@ VIDEO_UPDATE( unkch )
 	return 0;
 }
 
-VIDEO_UPDATE( cmast91 )
+SCREEN_UPDATE( cmast91 )
 {
 	goldstar_state *state = screen->machine->driver_data<goldstar_state>();
 	int i;
@@ -576,7 +576,7 @@ VIDEO_UPDATE( cmast91 )
 	return 0;
 }
 
-VIDEO_UPDATE( amcoe1a )
+SCREEN_UPDATE( amcoe1a )
 {
 	goldstar_state *state = screen->machine->driver_data<goldstar_state>();
 	int i;

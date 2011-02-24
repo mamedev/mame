@@ -120,7 +120,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( pushman )
+SCREEN_UPDATE( pushman )
 {
 	pushman_state *state = screen->machine->driver_data<pushman_state>();
 

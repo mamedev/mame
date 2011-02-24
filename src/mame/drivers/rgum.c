@@ -25,7 +25,7 @@ static VIDEO_START(royalgum)
 
 }
 
-static VIDEO_UPDATE(royalgum)
+static SCREEN_UPDATE(royalgum)
 {
 	int x,y,count;
 	const gfx_element *gfx = screen->machine->gfx[0];
@@ -262,6 +262,7 @@ static MACHINE_CONFIG_START( rgum, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE(royalgum)
 
 	MCFG_MC6845_ADD("crtc", MC6845, 24000000/16, mc6845_intf)	/* unknown clock & type, hand tuned to get ~50 fps (?) */
 
@@ -271,7 +272,6 @@ static MACHINE_CONFIG_START( rgum, driver_device )
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(royalgum)
-	MCFG_VIDEO_UPDATE(royalgum)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

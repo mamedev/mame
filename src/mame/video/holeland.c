@@ -188,7 +188,7 @@ static void crzrally_draw_sprites( running_machine *machine, bitmap_t *bitmap,co
 	}
 }
 
-VIDEO_UPDATE( holeland )
+SCREEN_UPDATE( holeland )
 {
 	holeland_state *state = screen->machine->driver_data<holeland_state>();
 /*tilemap_mark_all_tiles_dirty(state->bg_tilemap); */
@@ -198,7 +198,7 @@ VIDEO_UPDATE( holeland )
 	return 0;
 }
 
-VIDEO_UPDATE( crzrally )
+SCREEN_UPDATE( crzrally )
 {
 	holeland_state *state = screen->machine->driver_data<holeland_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);

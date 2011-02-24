@@ -137,7 +137,7 @@ VIDEO_START( m15 )
 
 ***************************************************************************/
 
-VIDEO_UPDATE( m10 )
+SCREEN_UPDATE( m10 )
 {
 	m10_state *state = screen->machine->driver_data<m10_state>();
 	int offs;
@@ -177,7 +177,7 @@ VIDEO_UPDATE( m10 )
 
 ***************************************************************************/
 
-VIDEO_UPDATE( m15 )
+SCREEN_UPDATE( m15 )
 {
 	m10_state *state = screen->machine->driver_data<m10_state>();
 	int offs;

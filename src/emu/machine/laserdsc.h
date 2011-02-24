@@ -77,7 +77,7 @@ struct _laserdisc_config
 	const char *			screen;
 
 	/* overlay information */
-	video_update_func		overupdate;
+	screen_update_func		overupdate;
 	UINT32					overwidth, overheight, overformat;
 	rectangle				overclip;
 	float					overposx, overposy;
@@ -103,7 +103,7 @@ struct _laserdisc_config
 	MCFG_DEVICE_CONFIG_DATAPTR(laserdisc_config, audio, _func)
 
 #define MCFG_LASERDISC_OVERLAY(_update, _width, _height, _format) \
-	MCFG_DEVICE_CONFIG_DATAPTR(laserdisc_config, overupdate, VIDEO_UPDATE_NAME(_update)) \
+	MCFG_DEVICE_CONFIG_DATAPTR(laserdisc_config, overupdate, SCREEN_UPDATE_NAME(_update)) \
 	MCFG_DEVICE_CONFIG_DATA32(laserdisc_config, overwidth, _width) \
 	MCFG_DEVICE_CONFIG_DATA32(laserdisc_config, overheight, _height) \
 	MCFG_DEVICE_CONFIG_DATA32(laserdisc_config, overformat, _format)
@@ -126,20 +126,20 @@ struct _laserdisc_config
 /* use these to add laserdisc screens with proper video update parameters */
 #define MCFG_LASERDISC_SCREEN_ADD_NTSC(_tag, _overlayformat) \
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER) \
-	MCFG_VIDEO_UPDATE(laserdisc) \
 	\
 	MCFG_SCREEN_ADD(_tag, RASTER) \
 	MCFG_SCREEN_FORMAT(_overlayformat) \
 	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz*2, 910, 0, 704, 525, 44, 524) \
+	MCFG_SCREEN_UPDATE(laserdisc) \
 
 /* not correct yet; fix me... */
 #define MCFG_LASERDISC_SCREEN_ADD_PAL(_tag, _format) \
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER) \
-	MCFG_VIDEO_UPDATE(laserdisc) \
 	\
 	MCFG_SCREEN_ADD(_tag, RASTER) \
 	MCFG_SCREEN_FORMAT(_format) \
 	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz, 910, 0, 704, 525.0/2, 0, 480/2) \
+	MCFG_SCREEN_UPDATE(laserdisc) \
 
 
 
@@ -196,7 +196,7 @@ void laserdisc_video_enable(device_t *device, int enable);
 void laserdisc_overlay_enable(device_t *device, int enable);
 
 /* video update callback */
-VIDEO_UPDATE( laserdisc );
+SCREEN_UPDATE( laserdisc );
 
 
 

@@ -26,6 +26,6 @@ WRITE8_HANDLER( hyperspt_flipscreen_w );
 
 PALETTE_INIT( hyperspt );
 VIDEO_START( hyperspt );
-VIDEO_UPDATE( hyperspt );
+SCREEN_UPDATE( hyperspt );
 VIDEO_START( roadf );
 

@@ -51,5 +51,5 @@ WRITE8_HANDLER( djboy_videoram_w );
 WRITE8_HANDLER( djboy_paletteram_w );
 
 VIDEO_START( djboy );
-VIDEO_UPDATE( djboy );
-VIDEO_EOF( djboy );
+SCREEN_UPDATE( djboy );
+SCREEN_EOF( djboy );

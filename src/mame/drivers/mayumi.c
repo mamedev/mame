@@ -61,7 +61,7 @@ static WRITE8_HANDLER( mayumi_videoram_w )
 	tilemap_mark_tile_dirty(state->tilemap, offset & 0x7ff);
 }
 
-static VIDEO_UPDATE( mayumi )
+static SCREEN_UPDATE( mayumi )
 {
 	mayumi_state *state = screen->machine->driver_data<mayumi_state>();
 	tilemap_draw(bitmap, cliprect, state->tilemap, 0, 0);
@@ -385,13 +385,13 @@ static MACHINE_CONFIG_START( mayumi, mayumi_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(2*8, 62*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(mayumi)
 
 	MCFG_GFXDECODE(mayumi)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START(mayumi)
-	MCFG_VIDEO_UPDATE(mayumi)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

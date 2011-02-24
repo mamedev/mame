@@ -280,7 +280,7 @@ VIDEO_START( tia )
 }
 
 
-VIDEO_UPDATE( tia )
+SCREEN_UPDATE( tia )
 {
 	screen_height = screen->height();
 	copybitmap(bitmap, helper[2], 0, 0, 0, 0, cliprect);

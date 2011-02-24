@@ -91,7 +91,7 @@ public:
 					}	\
 			}
 
-static VIDEO_UPDATE( drill )
+static SCREEN_UPDATE( drill )
 {
 	_2mindril_state *state = screen->machine->driver_data<_2mindril_state>();
 	bitmap_fill(bitmap, NULL, 0);
@@ -458,10 +458,11 @@ static MACHINE_CONFIG_START( drill, _2mindril_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(128*16, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239-16)
+	MCFG_SCREEN_UPDATE(drill)
+
 	MCFG_PALETTE_LENGTH(0x1000)
 
 	MCFG_VIDEO_START(drill)
-	MCFG_VIDEO_UPDATE(drill)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

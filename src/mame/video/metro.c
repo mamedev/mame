@@ -720,7 +720,7 @@ static void draw_layers( running_machine *machine, bitmap_t *bitmap, const recta
 
 
 
-VIDEO_UPDATE( metro )
+SCREEN_UPDATE( metro )
 {
 	metro_state *state = screen->machine->driver_data<metro_state>();
 	int pri, layers_ctrl = -1;

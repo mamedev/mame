@@ -897,6 +897,7 @@ static MACHINE_CONFIG_START( polepos, polepos_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(polepos)
 
 	/* should be correct, but makes polepos2 and clones fail to boot */
 //  MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 384, 0, 256, 264, 16, 224+16)
@@ -907,7 +908,6 @@ static MACHINE_CONFIG_START( polepos, polepos_state )
 
 	MCFG_PALETTE_INIT(polepos)
 	MCFG_VIDEO_START(polepos)
-	MCFG_VIDEO_UPDATE(polepos)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -980,6 +980,7 @@ static MACHINE_CONFIG_START( topracern, polepos_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(polepos)
 
 	MCFG_GFXDECODE(polepos)
 	MCFG_PALETTE_LENGTH(0x0f00)
@@ -987,7 +988,6 @@ static MACHINE_CONFIG_START( topracern, polepos_state )
 
 	MCFG_PALETTE_INIT(polepos)
 	MCFG_VIDEO_START(polepos)
-	MCFG_VIDEO_UPDATE(polepos)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

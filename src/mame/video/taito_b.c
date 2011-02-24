@@ -359,7 +359,7 @@ g_profiler.start(PROFILER_USER1);
 g_profiler.stop();
 }
 
-VIDEO_UPDATE( taitob )
+SCREEN_UPDATE( taitob )
 {
 	taitob_state *state = screen->machine->driver_data<taitob_state>();
 	UINT8 video_control = tc0180vcu_get_videoctrl(state->tc0180vcu, 0);
@@ -395,7 +395,7 @@ VIDEO_UPDATE( taitob )
 
 
 
-VIDEO_EOF( taitob )
+SCREEN_EOF( taitob )
 {
 	taitob_state *state = machine->driver_data<taitob_state>();
 	UINT8 video_control = tc0180vcu_get_videoctrl(state->tc0180vcu, 0);

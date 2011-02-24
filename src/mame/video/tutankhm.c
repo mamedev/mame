@@ -59,7 +59,7 @@ static void get_pens( running_machine *machine, pen_t *pens )
  *
  *************************************/
 
-VIDEO_UPDATE( tutankhm )
+SCREEN_UPDATE( tutankhm )
 {
 	tutankhm_state *state = screen->machine->driver_data<tutankhm_state>();
 	int xorx = state->flip_x ? 255 : 0;

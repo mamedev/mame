@@ -124,7 +124,7 @@ VIDEO_START( ikki )
 }
 
 
-VIDEO_UPDATE( ikki )
+SCREEN_UPDATE( ikki )
 {
 	ikki_state *state = screen->machine->driver_data<ikki_state>();
 	offs_t offs;

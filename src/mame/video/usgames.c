@@ -67,7 +67,7 @@ WRITE8_HANDLER( usgames_charram_w )
 }
 
 
-VIDEO_UPDATE(usgames)
+SCREEN_UPDATE(usgames)
 {
 	tilemap_draw(bitmap,cliprect,usgames_tilemap,0,0);
 	return 0;

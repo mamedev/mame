@@ -223,7 +223,7 @@ static void flstory_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 	}
 }
 
-VIDEO_UPDATE( flstory )
+SCREEN_UPDATE( flstory )
 {
 	flstory_state *state = screen->machine->driver_data<flstory_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0 | TILEMAP_DRAW_LAYER1, 0);
@@ -280,7 +280,7 @@ static void victnine_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 	}
 }
 
-VIDEO_UPDATE( victnine )
+SCREEN_UPDATE( victnine )
 {
 	flstory_state *state = screen->machine->driver_data<flstory_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
@@ -288,7 +288,7 @@ VIDEO_UPDATE( victnine )
 	return 0;
 }
 
-VIDEO_UPDATE( rumba )
+SCREEN_UPDATE( rumba )
 {
 	flstory_state *state = screen->machine->driver_data<flstory_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0 | TILEMAP_DRAW_LAYER1, 0);

@@ -97,7 +97,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
                 SCREEN REFRESH
 **************************************************************/
 
-VIDEO_UPDATE( ninjaw )
+SCREEN_UPDATE( ninjaw )
 {
 	ninjaw_state *state = screen->machine->driver_data<ninjaw_state>();
 	int xoffs = 0;

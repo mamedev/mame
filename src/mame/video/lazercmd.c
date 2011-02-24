@@ -50,7 +50,7 @@ static void plot_pattern( running_machine *machine, bitmap_t *bitmap, int x, int
 }
 
 
-VIDEO_UPDATE( lazercmd )
+SCREEN_UPDATE( lazercmd )
 {
 	lazercmd_state *state = screen->machine->driver_data<lazercmd_state>();
 	int i, x, y;

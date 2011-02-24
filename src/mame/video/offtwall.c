@@ -88,7 +88,7 @@ VIDEO_START( offtwall )
  *
  *************************************/
 
-VIDEO_UPDATE( offtwall )
+SCREEN_UPDATE( offtwall )
 {
 	offtwall_state *state = screen->machine->driver_data<offtwall_state>();
 	atarimo_rect_list rectlist;

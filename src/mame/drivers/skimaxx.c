@@ -134,11 +134,11 @@ static VIDEO_START( skimaxx )
 	memory_configure_bank(machine, "bank1", 1, 1, skimaxx_bg_buffer_front, 0);
 }
 
-static VIDEO_UPDATE( skimaxx )
+static SCREEN_UPDATE( skimaxx )
 {
 //  popmessage("%02x %02x", input_port_read(screen->machine, "X"), input_port_read(screen->machine, "Y") );
 
-	VIDEO_UPDATE_CALL(tms340x0);
+	SCREEN_UPDATE_CALL(tms340x0);
 
 	return 0;
 }
@@ -525,10 +525,10 @@ static MACHINE_CONFIG_START( skimaxx, driver_device )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(0x400, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x280-1, 0, 0xf0-1)
+//  MCFG_SCREEN_UPDATE(tms340x0)
+	MCFG_SCREEN_UPDATE(skimaxx)
 
 	MCFG_VIDEO_START(skimaxx)
-//  MCFG_VIDEO_UPDATE(tms340x0)
-	MCFG_VIDEO_UPDATE(skimaxx)
 
 //  MCFG_GFXDECODE( skimaxx )
 

@@ -388,7 +388,7 @@ static VIDEO_START( stactics )
  *
  *************************************/
 
-static VIDEO_UPDATE( stactics )
+static SCREEN_UPDATE( stactics )
 {
 	stactics_state *state = screen->machine->driver_data<stactics_state>();
 
@@ -419,10 +419,10 @@ MACHINE_CONFIG_FRAGMENT( stactics_video )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(stactics)
 
 	MCFG_PALETTE_LENGTH(0x400)
 
 	MCFG_PALETTE_INIT(stactics)
 	MCFG_VIDEO_START(stactics)
-	MCFG_VIDEO_UPDATE(stactics)
 MACHINE_CONFIG_END

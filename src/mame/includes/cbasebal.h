@@ -38,4 +38,4 @@ WRITE8_HANDLER( cbasebal_scrollx_w );
 WRITE8_HANDLER( cbasebal_scrolly_w );
 
 VIDEO_START( cbasebal );
-VIDEO_UPDATE( cbasebal );
+SCREEN_UPDATE( cbasebal );

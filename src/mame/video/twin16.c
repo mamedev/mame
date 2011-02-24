@@ -520,7 +520,7 @@ VIDEO_START( twin16 )
 	state_save_register_global(machine, state->sprite_busy);
 }
 
-VIDEO_UPDATE( twin16 )
+SCREEN_UPDATE( twin16 )
 {
 	twin16_state *state = screen->machine->driver_data<twin16_state>();
 	int text_flip=0;
@@ -537,7 +537,7 @@ VIDEO_UPDATE( twin16 )
 	return 0;
 }
 
-VIDEO_EOF( twin16 )
+SCREEN_EOF( twin16 )
 {
 	twin16_state *state = machine->driver_data<twin16_state>();
 	twin16_set_sprite_timer(machine);

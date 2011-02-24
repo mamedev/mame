@@ -49,7 +49,7 @@ VIDEO_START( bigrun );
 VIDEO_START( cischeat );
 VIDEO_START( f1gpstar );
 
-VIDEO_UPDATE( bigrun );
-VIDEO_UPDATE( cischeat );
-VIDEO_UPDATE( f1gpstar );
-VIDEO_UPDATE( scudhamm );
+SCREEN_UPDATE( bigrun );
+SCREEN_UPDATE( cischeat );
+SCREEN_UPDATE( f1gpstar );
+SCREEN_UPDATE( scudhamm );

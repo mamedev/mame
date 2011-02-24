@@ -42,7 +42,7 @@ READ16_HANDLER( deniam_coinctrl_r );
 WRITE16_HANDLER( deniam_coinctrl_w );
 
 VIDEO_START( deniam );
-VIDEO_UPDATE( deniam );
+SCREEN_UPDATE( deniam );
 
 DRIVER_INIT( logicpro );
 DRIVER_INIT( karianx );

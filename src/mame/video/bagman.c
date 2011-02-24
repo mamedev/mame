@@ -146,7 +146,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 }
 
 
-VIDEO_UPDATE( bagman )
+SCREEN_UPDATE( bagman )
 {
 	if (*bagman_video_enable == 0)
 		return 0;

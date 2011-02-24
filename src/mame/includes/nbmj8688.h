@@ -3,8 +3,9 @@
 PALETTE_INIT( mbmj8688_8bit );
 PALETTE_INIT( mbmj8688_12bit );
 PALETTE_INIT( mbmj8688_16bit );
-VIDEO_UPDATE( mbmj8688 );
-VIDEO_UPDATE( mbmj8688_LCD );
+SCREEN_UPDATE( mbmj8688 );
+SCREEN_UPDATE( mbmj8688_lcd0 );
+SCREEN_UPDATE( mbmj8688_lcd1 );
 VIDEO_START( mbmj8688_8bit );
 VIDEO_START( mbmj8688_hybrid_12bit );
 VIDEO_START( mbmj8688_pure_12bit );

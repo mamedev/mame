@@ -143,7 +143,7 @@ void blstroid_scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-VIDEO_UPDATE( blstroid )
+SCREEN_UPDATE( blstroid )
 {
 	blstroid_state *state = screen->machine->driver_data<blstroid_state>();
 	atarimo_rect_list rectlist;

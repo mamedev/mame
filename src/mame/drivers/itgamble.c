@@ -66,7 +66,7 @@ static VIDEO_START( itgamble )
 {
 }
 
-static VIDEO_UPDATE( itgamble )
+static SCREEN_UPDATE( itgamble )
 {
 	return 0;
 }
@@ -192,12 +192,13 @@ static MACHINE_CONFIG_START( itgamble, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE( itgamble )
+
 	MCFG_MACHINE_RESET( itgamble )
 
 	MCFG_GFXDECODE(itgamble)
 	MCFG_PALETTE_LENGTH(0x200)
 	MCFG_VIDEO_START( itgamble )
-	MCFG_VIDEO_UPDATE( itgamble )
 
     /* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

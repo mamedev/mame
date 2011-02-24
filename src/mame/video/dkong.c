@@ -974,7 +974,7 @@ VIDEO_START( dkong )
 	}
 }
 
-VIDEO_UPDATE( dkong )
+SCREEN_UPDATE( dkong )
 {
 	dkong_state *state = screen->machine->driver_data<dkong_state>();
 
@@ -1002,7 +1002,7 @@ VIDEO_UPDATE( dkong )
 	return 0;
 }
 
-VIDEO_UPDATE( pestplce )
+SCREEN_UPDATE( pestplce )
 {
 	dkong_state *state = screen->machine->driver_data<dkong_state>();
 	int offs;
@@ -1024,7 +1024,7 @@ VIDEO_UPDATE( pestplce )
 	return 0;
 }
 
-VIDEO_UPDATE( spclforc )
+SCREEN_UPDATE( spclforc )
 {
 	dkong_state *state = screen->machine->driver_data<dkong_state>();
 

@@ -566,7 +566,7 @@ static VIDEO_START( norautp )
 }
 
 
-static VIDEO_UPDATE( norautp )
+static SCREEN_UPDATE( norautp )
 {
 	int x, y, count;
 
@@ -1264,13 +1264,13 @@ static MACHINE_CONFIG_START( noraut_base, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(2*16, 31*16-1, (0*16) + 8, 16*16-1)	/* the hardware clips the top 8 pixels */
+	MCFG_SCREEN_UPDATE(norautp)
 
 	MCFG_GFXDECODE(norautp)
 
 	MCFG_PALETTE_INIT(norautp)
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_VIDEO_START(norautp)
-	MCFG_VIDEO_UPDATE(norautp)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -37,7 +37,7 @@ public:
 /*----------- defined in video/plygonet.c -----------*/
 
 VIDEO_START( polygonet );
-VIDEO_UPDATE( polygonet );
+SCREEN_UPDATE( polygonet );
 
 READ32_HANDLER( polygonet_ttl_ram_r );
 WRITE32_HANDLER( polygonet_ttl_ram_w );

@@ -905,9 +905,9 @@ static MACHINE_CONFIG_START( firetrk, firetrk_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_UPDATE(firetrk)
 
 	MCFG_VIDEO_START(firetrk)
-	MCFG_VIDEO_UPDATE(firetrk)
 	MCFG_PALETTE_INIT(firetrk)
 	MCFG_PALETTE_LENGTH(28)
 	MCFG_GFXDECODE(firetrk)
@@ -928,8 +928,10 @@ static MACHINE_CONFIG_DERIVED( superbug, firetrk )
 	MCFG_CPU_PROGRAM_MAP(superbug_map)
 
 	/* video hardware */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(superbug)
+
 	MCFG_VIDEO_START(superbug)
-	MCFG_VIDEO_UPDATE(superbug)
 	MCFG_GFXDECODE(superbug)
 	MCFG_PALETTE_LENGTH(28)
 
@@ -947,8 +949,10 @@ static MACHINE_CONFIG_DERIVED( montecar, firetrk )
 	MCFG_CPU_PROGRAM_MAP(montecar_map)
 
 	/* video hardware */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(montecar)
+	
 	MCFG_VIDEO_START(montecar)
-	MCFG_VIDEO_UPDATE(montecar)
 	MCFG_GFXDECODE(montecar)
 
 	MCFG_PALETTE_INIT(montecar)

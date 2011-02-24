@@ -24,4 +24,4 @@ WRITE8_HANDLER( yiear_control_w );
 
 PALETTE_INIT( yiear );
 VIDEO_START( yiear );
-VIDEO_UPDATE( yiear );
+SCREEN_UPDATE( yiear );

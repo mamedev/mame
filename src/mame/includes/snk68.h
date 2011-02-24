@@ -22,7 +22,7 @@ public:
 
 VIDEO_START( pow );
 VIDEO_START( searchar );
-VIDEO_UPDATE( pow );
+SCREEN_UPDATE( pow );
 WRITE16_HANDLER( pow_paletteram16_word_w );
 WRITE16_HANDLER( pow_flipscreen16_w );
 WRITE16_HANDLER( searchar_flipscreen16_w );

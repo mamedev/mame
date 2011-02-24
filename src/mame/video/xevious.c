@@ -497,7 +497,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 }
 
 
-VIDEO_UPDATE( xevious )
+SCREEN_UPDATE( xevious )
 {
 	_galaga_state *state =  screen->machine->driver_data<_galaga_state>();
 

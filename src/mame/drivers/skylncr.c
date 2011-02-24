@@ -138,7 +138,7 @@ static const rectangle visible2 = { 0*8, (20+48)*8-1, 12*8, (12+7)*8-1 };
 static const rectangle visible3 = { 0*8, (20+48)*8-1, 20*8, (20+7)*8-1 };
 
 
-static VIDEO_UPDATE( skylncr )
+static SCREEN_UPDATE( skylncr )
 {
 	int i;
 
@@ -678,12 +678,12 @@ static MACHINE_CONFIG_START( skylncr, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE(skylncr)
 
 	MCFG_GFXDECODE(skylncr)
 	MCFG_PALETTE_LENGTH(0x200)
 
 	MCFG_VIDEO_START(skylncr)
-	MCFG_VIDEO_UPDATE(skylncr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

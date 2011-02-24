@@ -48,7 +48,7 @@ READ8_HANDLER( retofinv_mcu_status_r );
 
 VIDEO_START( retofinv );
 PALETTE_INIT( retofinv );
-VIDEO_UPDATE( retofinv );
+SCREEN_UPDATE( retofinv );
 WRITE8_HANDLER( retofinv_bg_videoram_w );
 WRITE8_HANDLER( retofinv_fg_videoram_w );
 WRITE8_HANDLER( retofinv_gfx_ctrl_w );

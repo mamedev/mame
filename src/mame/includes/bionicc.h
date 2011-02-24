@@ -36,5 +36,5 @@ WRITE16_HANDLER( bionicc_scroll_w );
 WRITE16_HANDLER( bionicc_gfxctrl_w );
 
 VIDEO_START( bionicc );
-VIDEO_UPDATE( bionicc );
-VIDEO_EOF( bionicc );
+SCREEN_UPDATE( bionicc );
+SCREEN_EOF( bionicc );

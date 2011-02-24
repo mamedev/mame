@@ -250,7 +250,7 @@ static void f1gp_draw_sprites( running_machine *machine, bitmap_t *bitmap, const
 }
 
 
-VIDEO_UPDATE( f1gp )
+SCREEN_UPDATE( f1gp )
 {
 	f1gp_state *state = screen->machine->driver_data<f1gp_state>();
 
@@ -343,7 +343,7 @@ static void f1gpb_draw_sprites( running_machine *machine, bitmap_t *bitmap,const
 	}
 }
 
-VIDEO_UPDATE( f1gpb )
+SCREEN_UPDATE( f1gpb )
 {
 	f1gp_state *state = screen->machine->driver_data<f1gp_state>();
 	UINT32 startx, starty;
@@ -444,7 +444,7 @@ static void f1gp2_draw_sprites( running_machine *machine, bitmap_t *bitmap, cons
 }
 
 
-VIDEO_UPDATE( f1gp2 )
+SCREEN_UPDATE( f1gp2 )
 {
 	f1gp_state *state = screen->machine->driver_data<f1gp_state>();
 

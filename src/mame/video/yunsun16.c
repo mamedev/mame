@@ -200,7 +200,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 ***************************************************************************/
 
 
-VIDEO_UPDATE( yunsun16 )
+SCREEN_UPDATE( yunsun16 )
 {
 	yunsun16_state *state = screen->machine->driver_data<yunsun16_state>();
 

@@ -909,7 +909,7 @@ static VIDEO_START( coinmstr )
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 46, 32);
 }
 
-static VIDEO_UPDATE( coinmstr )
+static SCREEN_UPDATE( coinmstr )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	return 0;
@@ -1011,12 +1011,12 @@ static MACHINE_CONFIG_START( coinmstr, coinmstr_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 46*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(coinmstr)
 
 	MCFG_GFXDECODE(coinmstr)
 	MCFG_PALETTE_LENGTH(46*32*4)
 
 	MCFG_VIDEO_START(coinmstr)
-	MCFG_VIDEO_UPDATE(coinmstr)
 
 	MCFG_MC6845_ADD("crtc", H46505, 14000000 / 16, h46505_intf)
 

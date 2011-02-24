@@ -42,5 +42,5 @@ PALETTE_INIT( robowres );
 WRITE8_HANDLER( appoooh_scroll_w );
 WRITE8_HANDLER( appoooh_out_w );
 VIDEO_START( appoooh );
-VIDEO_UPDATE( appoooh );
-VIDEO_UPDATE( robowres );
+SCREEN_UPDATE( appoooh );
+SCREEN_UPDATE( robowres );

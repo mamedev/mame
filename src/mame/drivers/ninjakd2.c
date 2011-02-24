@@ -924,13 +924,13 @@ static MACHINE_CONFIG_START( ninjakd2, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
+	MCFG_SCREEN_UPDATE(ninjakd2)
+	MCFG_SCREEN_EOF(ninjakd2)
 
 	MCFG_GFXDECODE(ninjakd2)
 	MCFG_PALETTE_LENGTH(0x300)
 
 	MCFG_VIDEO_START(ninjakd2)
-	MCFG_VIDEO_UPDATE(ninjakd2)
-	MCFG_VIDEO_EOF(ninjakd2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -995,7 +995,8 @@ static MACHINE_CONFIG_DERIVED( robokid, mnight )
 	MCFG_PALETTE_LENGTH(0x400)	// RAM is this large, but still only 0x300 colors used
 
 	MCFG_VIDEO_START(robokid)
-	MCFG_VIDEO_UPDATE(robokid)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(robokid)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( omegaf, robokid )
@@ -1009,7 +1010,8 @@ static MACHINE_CONFIG_DERIVED( omegaf, robokid )
 
 	/* video hardware */
 	MCFG_VIDEO_START(omegaf)
-	MCFG_VIDEO_UPDATE(omegaf)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(omegaf)
 MACHINE_CONFIG_END
 
 

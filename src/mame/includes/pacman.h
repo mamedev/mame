@@ -11,7 +11,7 @@ extern UINT8 *pacman_colorram;
 
 PALETTE_INIT( pacman );
 VIDEO_START( pacman );
-VIDEO_UPDATE( pacman );
+SCREEN_UPDATE( pacman );
 
 WRITE8_HANDLER( pacman_videoram_w );
 WRITE8_HANDLER( pacman_colorram_w );
@@ -29,7 +29,7 @@ WRITE8_HANDLER( vanvan_bgcolor_w );
 
 
 VIDEO_START( s2650games );
-VIDEO_UPDATE( s2650games );
+SCREEN_UPDATE( s2650games );
 
 extern UINT8 *s2650games_spriteram;
 extern UINT8 *s2650games_tileram;

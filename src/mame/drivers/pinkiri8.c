@@ -189,7 +189,7 @@ ronjan
 
 */
 
-static VIDEO_UPDATE( pinkiri8 )
+static SCREEN_UPDATE( pinkiri8 )
 {
 	static int col_bank;
 	const gfx_element *gfx = screen->machine->gfx[0];
@@ -1119,11 +1119,12 @@ static MACHINE_CONFIG_START( pinkiri8, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 64*8-1)
+	MCFG_SCREEN_UPDATE(pinkiri8)
+
 	MCFG_GFXDECODE(pinkiri8)
 	MCFG_PALETTE_LENGTH(0x2000)
 
 	MCFG_VIDEO_START(pinkiri8)
-	MCFG_VIDEO_UPDATE(pinkiri8)
 
 	MCFG_DEVICE_ADD("janshivdp", JANSHIVDP, 0)
 

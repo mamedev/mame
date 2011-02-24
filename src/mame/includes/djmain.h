@@ -20,7 +20,7 @@ public:
 
 /*----------- defined in video/djmain.c -----------*/
 
-VIDEO_UPDATE( djmain );
+SCREEN_UPDATE( djmain );
 VIDEO_START( djmain );
 
 void djmain_tile_callback(running_machine* machine, int layer, int *code, int *color, int *flags);

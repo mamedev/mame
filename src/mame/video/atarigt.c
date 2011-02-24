@@ -506,7 +506,7 @@ PrimRage GALs:
 */
 
 
-VIDEO_UPDATE( atarigt )
+SCREEN_UPDATE( atarigt )
 {
 	atarigt_state *state = screen->machine->driver_data<atarigt_state>();
 	bitmap_t *mo_bitmap = atarirle_get_vram(state->rle, 0);
@@ -632,7 +632,7 @@ VIDEO_UPDATE( atarigt )
 	return 0;
 }
 
-VIDEO_EOF( atarigt )
+SCREEN_EOF( atarigt )
 {
 	atarigt_state *state = machine->driver_data<atarigt_state>();
 

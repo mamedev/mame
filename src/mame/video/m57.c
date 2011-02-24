@@ -267,7 +267,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
  *
  *************************************/
 
-VIDEO_UPDATE( m57 )
+SCREEN_UPDATE( m57 )
 {
 	draw_background(screen->machine, bitmap, cliprect);
 	draw_sprites(screen->machine, bitmap, cliprect);

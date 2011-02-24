@@ -1,6 +1,6 @@
 /*----------- defined in video/nbmj8891.c -----------*/
 
-VIDEO_UPDATE( nbmj8891 );
+SCREEN_UPDATE( nbmj8891 );
 VIDEO_START( nbmj8891_1layer );
 VIDEO_START( nbmj8891_2layer );
 

@@ -69,4 +69,4 @@ public:
 WRITE16_HANDLER( darius_fg_layer_w );
 
 VIDEO_START( darius );
-VIDEO_UPDATE( darius );
+SCREEN_UPDATE( darius );

@@ -576,7 +576,7 @@ WRITE16_HANDLER( tmnt_priority_w )
 
 ***************************************************************************/
 
-VIDEO_UPDATE( mia )
+SCREEN_UPDATE( mia )
 {
 	tmnt_state *state = screen->machine->driver_data<tmnt_state>();
 
@@ -591,7 +591,7 @@ VIDEO_UPDATE( mia )
 	return 0;
 }
 
-VIDEO_UPDATE( tmnt )
+SCREEN_UPDATE( tmnt )
 {
 	tmnt_state *state = screen->machine->driver_data<tmnt_state>();
 
@@ -607,7 +607,7 @@ VIDEO_UPDATE( tmnt )
 }
 
 
-VIDEO_UPDATE( punkshot )
+SCREEN_UPDATE( punkshot )
 {
 	tmnt_state *state = screen->machine->driver_data<tmnt_state>();
 
@@ -637,7 +637,7 @@ VIDEO_UPDATE( punkshot )
 }
 
 
-VIDEO_UPDATE( lgtnfght )
+SCREEN_UPDATE( lgtnfght )
 {
 	tmnt_state *state = screen->machine->driver_data<tmnt_state>();
 	int bg_colorbase;
@@ -684,7 +684,7 @@ popmessage("%04x", state->glfgreat_pixel);
 		return state->glfgreat_pixel & 0xff;
 }
 
-VIDEO_UPDATE( glfgreat )
+SCREEN_UPDATE( glfgreat )
 {
 	tmnt_state *state = screen->machine->driver_data<tmnt_state>();
 	int bg_colorbase;
@@ -738,7 +738,7 @@ VIDEO_UPDATE( glfgreat )
 	return 0;
 }
 
-VIDEO_UPDATE( tmnt2 )
+SCREEN_UPDATE( tmnt2 )
 {
 	tmnt_state *state = screen->machine->driver_data<tmnt_state>();
 	double brt;
@@ -786,12 +786,12 @@ VIDEO_UPDATE( tmnt2 )
 			palette_set_shadow_mode(screen->machine, 0);
 	}
 
-	VIDEO_UPDATE_CALL(lgtnfght);
+	SCREEN_UPDATE_CALL(lgtnfght);
 	return 0;
 }
 
 
-VIDEO_UPDATE( thndrx2 )
+SCREEN_UPDATE( thndrx2 )
 {
 	tmnt_state *state = screen->machine->driver_data<tmnt_state>();
 	int bg_colorbase;
@@ -831,7 +831,7 @@ VIDEO_UPDATE( thndrx2 )
 
 ***************************************************************************/
 
-VIDEO_EOF( blswhstl )
+SCREEN_EOF( blswhstl )
 {
 	tmnt_state *state = machine->driver_data<tmnt_state>();
 	k053245_clear_buffer(state->k053245);

@@ -148,7 +148,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 }
 
 
-VIDEO_UPDATE( cheekyms )
+SCREEN_UPDATE( cheekyms )
 {
 	cheekyms_state *state = screen->machine->driver_data<cheekyms_state>();
 	int y, x;

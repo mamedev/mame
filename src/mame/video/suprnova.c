@@ -1007,7 +1007,7 @@ static void supernova_draw_b( bitmap_t *bitmap, bitmap_t* bitmap_flags, const re
 	}
 }
 
-VIDEO_UPDATE(skns)
+SCREEN_UPDATE(skns)
 {
 	palette_update(screen->machine);
 
@@ -1187,7 +1187,7 @@ VIDEO_UPDATE(skns)
 	return 0;
 }
 
-VIDEO_EOF(skns)
+SCREEN_EOF(skns)
 {
 
 }

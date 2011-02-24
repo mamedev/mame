@@ -23,4 +23,4 @@ WRITE8_HANDLER( rocnrope_flipscreen_w );
 
 PALETTE_INIT( rocnrope );
 VIDEO_START( rocnrope );
-VIDEO_UPDATE( rocnrope );
+SCREEN_UPDATE( rocnrope );

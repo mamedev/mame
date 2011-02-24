@@ -141,7 +141,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( yiear )
+SCREEN_UPDATE( yiear )
 {
 	yiear_state *state = screen->machine->driver_data<yiear_state>();
 

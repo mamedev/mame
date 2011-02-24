@@ -23,5 +23,5 @@ public:
 
 WRITE16_HANDLER( splash_vram_w );
 VIDEO_START( splash );
-VIDEO_UPDATE( splash );
-VIDEO_UPDATE( funystrp );
+SCREEN_UPDATE( splash );
+SCREEN_UPDATE( funystrp );

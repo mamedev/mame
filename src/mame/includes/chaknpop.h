@@ -45,7 +45,7 @@ WRITE8_HANDLER( chaknpop_mcu_port_c_w );
 
 PALETTE_INIT( chaknpop );
 VIDEO_START( chaknpop );
-VIDEO_UPDATE( chaknpop );
+SCREEN_UPDATE( chaknpop );
 
 READ8_HANDLER( chaknpop_gfxmode_r );
 WRITE8_HANDLER( chaknpop_gfxmode_w );

@@ -84,8 +84,8 @@ PALETTE_INIT( montecar );
 VIDEO_START( firetrk );
 VIDEO_START( superbug );
 VIDEO_START( montecar );
-VIDEO_UPDATE( firetrk );
-VIDEO_UPDATE( superbug );
-VIDEO_UPDATE( montecar );
+SCREEN_UPDATE( firetrk );
+SCREEN_UPDATE( superbug );
+SCREEN_UPDATE( montecar );
 
 

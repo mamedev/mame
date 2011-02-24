@@ -352,7 +352,7 @@ static void draw_objects(running_machine *machine, grchamp_state *state, int y, 
 }
 
 
-VIDEO_UPDATE( grchamp )
+SCREEN_UPDATE( grchamp )
 {
 	static const rgb_t objpix_lookup[8] =
 	{

@@ -45,7 +45,7 @@ VIDEO_START( timscanr )
  *
  *************************************/
 
-VIDEO_UPDATE( system16b )
+SCREEN_UPDATE( system16b )
 {
 	/* if no drawing is happening, fill with black and get out */
 	if (!segaic16_display_enable)

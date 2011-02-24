@@ -194,7 +194,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	}
 }
 
-VIDEO_UPDATE( sprcros2 )
+SCREEN_UPDATE( sprcros2 )
 {
 	sprcros2_state *state = screen->machine->driver_data<sprcros2_state>();
 

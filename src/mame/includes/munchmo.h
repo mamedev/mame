@@ -41,4 +41,4 @@ WRITE8_HANDLER( mnchmobl_flipscreen_w );
 
 PALETTE_INIT( mnchmobl );
 VIDEO_START( mnchmobl );
-VIDEO_UPDATE( mnchmobl );
+SCREEN_UPDATE( mnchmobl );

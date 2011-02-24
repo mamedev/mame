@@ -28,4 +28,4 @@ WRITE8_HANDLER( pacland_bankswitch_w );
 
 PALETTE_INIT( pacland );
 VIDEO_START( pacland );
-VIDEO_UPDATE( pacland );
+SCREEN_UPDATE( pacland );

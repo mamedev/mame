@@ -18,7 +18,7 @@
 #include "includes/malzak.h"
 
 
-VIDEO_UPDATE( malzak )
+SCREEN_UPDATE( malzak )
 {
 	malzak_state *state = screen->machine->driver_data<malzak_state>();
 	int sx, sy;

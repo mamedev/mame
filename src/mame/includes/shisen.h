@@ -18,4 +18,4 @@ WRITE8_HANDLER( sichuan2_bankswitch_w );
 WRITE8_HANDLER( sichuan2_paletteram_w );
 
 VIDEO_START( sichuan2 );
-VIDEO_UPDATE( sichuan2 );
+SCREEN_UPDATE( sichuan2 );

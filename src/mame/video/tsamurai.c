@@ -203,7 +203,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-VIDEO_UPDATE( tsamurai )
+SCREEN_UPDATE( tsamurai )
 {
 	tsamurai_state *state = screen->machine->driver_data<tsamurai_state>();
 	int i;
@@ -268,7 +268,7 @@ VIDEO_START( vsgongf )
 	state->foreground = tilemap_create(machine, get_vsgongf_tile_info,tilemap_scan_rows,8,8,32,32);
 }
 
-VIDEO_UPDATE( vsgongf )
+SCREEN_UPDATE( vsgongf )
 {
 	tsamurai_state *state = screen->machine->driver_data<tsamurai_state>();
 	#ifdef MAME_DEBUG

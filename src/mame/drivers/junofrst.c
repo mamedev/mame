@@ -424,8 +424,7 @@ static MACHINE_CONFIG_START( junofrst, junofrst_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)	/* not sure about the visible area */
-
-	MCFG_VIDEO_UPDATE(tutankhm)
+	MCFG_SCREEN_UPDATE(tutankhm)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

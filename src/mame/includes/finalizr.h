@@ -40,4 +40,4 @@ WRITE8_HANDLER( finalizr_videoctrl_w );
 
 PALETTE_INIT( finalizr );
 VIDEO_START( finalizr );
-VIDEO_UPDATE( finalizr );
+SCREEN_UPDATE( finalizr );

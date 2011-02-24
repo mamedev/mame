@@ -152,7 +152,7 @@ VIDEO_START( suprslam )
 	tilemap_set_transparent_pen(state->screen_tilemap, 15);
 }
 
-VIDEO_UPDATE( suprslam )
+SCREEN_UPDATE( suprslam )
 {
 	suprslam_state *state = screen->machine->driver_data<suprslam_state>();
 	tilemap_set_scrollx( state->screen_tilemap,0, state->screen_vregs[0x04/2] );

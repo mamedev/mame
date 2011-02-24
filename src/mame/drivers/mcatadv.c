@@ -461,6 +461,8 @@ static MACHINE_CONFIG_START( mcatadv, mcatadv_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
+	MCFG_SCREEN_UPDATE(mcatadv)
+	MCFG_SCREEN_EOF(mcatadv) // Buffer Spriteram
 
 	MCFG_GFXDECODE(mcatadv)
 	MCFG_PALETTE_LENGTH(0x2000/2)
@@ -468,8 +470,6 @@ static MACHINE_CONFIG_START( mcatadv, mcatadv_state )
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))	/* a guess, and certainly wrong */
 
 	MCFG_VIDEO_START(mcatadv)
-	MCFG_VIDEO_EOF(mcatadv) // Buffer Spriteram
-	MCFG_VIDEO_UPDATE(mcatadv)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

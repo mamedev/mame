@@ -664,7 +664,7 @@ static VIDEO_START( peplus )
 	memset(palette_ram2, 0, 0x3000);
 }
 
-static VIDEO_UPDATE( peplus )
+static SCREEN_UPDATE( peplus )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
@@ -1030,6 +1030,7 @@ static MACHINE_CONFIG_START( peplus, peplus_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE((52+1)*8, (31+1)*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 25*8-1)
+	MCFG_SCREEN_UPDATE(peplus)
 
 	MCFG_GFXDECODE(peplus)
 	MCFG_PALETTE_LENGTH(16*16*2)
@@ -1039,7 +1040,6 @@ static MACHINE_CONFIG_START( peplus, peplus_state )
 
 	MCFG_PALETTE_INIT(peplus)
 	MCFG_VIDEO_START(peplus)
-	MCFG_VIDEO_UPDATE(peplus)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

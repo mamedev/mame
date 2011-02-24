@@ -248,7 +248,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 
 
-VIDEO_UPDATE( trackfld )
+SCREEN_UPDATE( trackfld )
 {
 	trackfld_state *state = screen->machine->driver_data<trackfld_state>();
 	int row, scrollx;

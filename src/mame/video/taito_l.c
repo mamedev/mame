@@ -284,7 +284,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 }
 
 
-VIDEO_UPDATE( taitol )
+SCREEN_UPDATE( taitol )
 {
 	taitol_state *state = screen->machine->driver_data<taitol_state>();
 	int dx, dy;
@@ -327,7 +327,7 @@ VIDEO_UPDATE( taitol )
 
 
 
-VIDEO_EOF( taitol )
+SCREEN_EOF( taitol )
 {
 	taitol_state *state = machine->driver_data<taitol_state>();
 	UINT8 *spriteram = state->rambanks + 0xb000;

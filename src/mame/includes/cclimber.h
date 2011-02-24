@@ -35,18 +35,18 @@ WRITE8_HANDLER( cannonb_flip_screen_w );
 
 PALETTE_INIT( cclimber );
 VIDEO_START( cclimber );
-VIDEO_UPDATE( cclimber );
+SCREEN_UPDATE( cclimber );
 
 PALETTE_INIT( swimmer );
 VIDEO_START( swimmer );
-VIDEO_UPDATE( swimmer );
+SCREEN_UPDATE( swimmer );
 
 PALETTE_INIT( yamato );
-VIDEO_UPDATE( yamato );
+SCREEN_UPDATE( yamato );
 
 PALETTE_INIT( toprollr );
 VIDEO_START( toprollr );
-VIDEO_UPDATE( toprollr );
+SCREEN_UPDATE( toprollr );
 
 
 /*----------- defined in audio/cclimber.c -----------*/

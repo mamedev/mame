@@ -335,9 +335,9 @@ VIDEO_START( segag80v )
 }
 
 
-VIDEO_UPDATE( segag80v )
+SCREEN_UPDATE( segag80v )
 {
 	sega_generate_vector_list(screen->machine);
-	VIDEO_UPDATE_CALL(vector);
+	SCREEN_UPDATE_CALL(vector);
 	return 0;
 }

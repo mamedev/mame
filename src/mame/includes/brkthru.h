@@ -38,4 +38,4 @@ WRITE8_HANDLER( brkthru_bgram_w );
 WRITE8_HANDLER( brkthru_fgram_w );
 VIDEO_START( brkthru );
 PALETTE_INIT( brkthru );
-VIDEO_UPDATE( brkthru );
+SCREEN_UPDATE( brkthru );

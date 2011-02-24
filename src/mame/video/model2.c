@@ -2742,7 +2742,7 @@ static void convert_bitmap( running_machine *machine, bitmap_t *dst, bitmap_t *s
 	}
 }
 
-VIDEO_UPDATE(model2)
+SCREEN_UPDATE(model2)
 {
 	model2_state *state = screen->machine->driver_data<model2_state>();
 	logerror("--- frame ---\n");

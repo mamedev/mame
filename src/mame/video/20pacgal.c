@@ -406,7 +406,7 @@ static void draw_stars(_20pacgal_state *state, bitmap_t *bitmap, const rectangle
  *
  *************************************/
 
-static VIDEO_UPDATE( 20pacgal )
+static SCREEN_UPDATE( 20pacgal )
 {
 	_20pacgal_state *state = screen->machine->driver_data<_20pacgal_state>();
 
@@ -428,13 +428,11 @@ static VIDEO_UPDATE( 20pacgal )
  *************************************/
 
 MACHINE_CONFIG_FRAGMENT( 20pacgal_video )
-
-	MCFG_VIDEO_UPDATE(20pacgal)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(SCREEN_WIDTH, SCREEN_HEIGHT)
 	MCFG_SCREEN_VISIBLE_AREA(0, SCREEN_WIDTH - 1, 0, SCREEN_HEIGHT - 1)
+	MCFG_SCREEN_UPDATE(20pacgal)	
 MACHINE_CONFIG_END

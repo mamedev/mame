@@ -55,4 +55,4 @@ WRITE8_HANDLER( starcrus_proj_parm_1_w );
 WRITE8_HANDLER( starcrus_proj_parm_2_w );
 READ8_HANDLER( starcrus_coll_det_r );
 VIDEO_START( starcrus );
-VIDEO_UPDATE( starcrus );
+SCREEN_UPDATE( starcrus );

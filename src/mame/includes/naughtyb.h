@@ -19,4 +19,4 @@ WRITE8_HANDLER( popflame_videoreg_w );
 
 VIDEO_START( naughtyb );
 PALETTE_INIT( naughtyb );
-VIDEO_UPDATE( naughtyb );
+SCREEN_UPDATE( naughtyb );

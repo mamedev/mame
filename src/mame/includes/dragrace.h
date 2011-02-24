@@ -51,4 +51,4 @@ DISCRETE_SOUND_EXTERN( dragrace );
 /*----------- defined in video/dragrace.c -----------*/
 
 VIDEO_START( dragrace );
-VIDEO_UPDATE( dragrace );
+SCREEN_UPDATE( dragrace );

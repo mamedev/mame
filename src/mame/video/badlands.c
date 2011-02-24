@@ -110,7 +110,7 @@ WRITE16_HANDLER( badlands_pf_bank_w )
  *
  *************************************/
 
-VIDEO_UPDATE( badlands )
+SCREEN_UPDATE( badlands )
 {
 	badlands_state *state = screen->machine->driver_data<badlands_state>();
 	atarimo_rect_list rectlist;

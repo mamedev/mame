@@ -61,7 +61,7 @@ static VIDEO_START( shanghai )
 {
 }
 
-static VIDEO_UPDATE( shanghai )
+static SCREEN_UPDATE( shanghai )
 {
 	device_t *hd63484 = screen->machine->device("hd63484");
 	int x, y, b, src;
@@ -438,12 +438,12 @@ static MACHINE_CONFIG_START( shanghai, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(384, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1) // Base Screen is 384 pixel
+	MCFG_SCREEN_UPDATE(shanghai)
 
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(shanghai)
 	MCFG_VIDEO_START(shanghai)
-	MCFG_VIDEO_UPDATE(shanghai)
 
 	MCFG_HD63484_ADD("hd63484", shanghai_hd63484_intf)
 
@@ -473,11 +473,11 @@ static MACHINE_CONFIG_START( shangha2, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(384, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1) // Base Screen is 384 pixel
+	MCFG_SCREEN_UPDATE(shanghai)
 
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_VIDEO_START(shanghai)
-	MCFG_VIDEO_UPDATE(shanghai)
 
 	MCFG_HD63484_ADD("hd63484", shanghai_hd63484_intf)
 
@@ -512,11 +512,11 @@ static MACHINE_CONFIG_START( kothello, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(384, 280)
 	MCFG_SCREEN_VISIBLE_AREA(8, 384-1, 0, 250-1) // Base Screen is 376 pixel
+	MCFG_SCREEN_UPDATE(shanghai)
 
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_VIDEO_START(shanghai)
-	MCFG_VIDEO_UPDATE(shanghai)
 
 	MCFG_HD63484_ADD("hd63484", shanghai_hd63484_intf)
 

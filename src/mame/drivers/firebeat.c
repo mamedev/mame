@@ -513,7 +513,7 @@ static void gcu_exec_display_list(running_machine *machine, bitmap_t *bitmap, co
 	};
 }
 
-static VIDEO_UPDATE(firebeat)
+static SCREEN_UPDATE(firebeat)
 {
 	firebeat_state *state = screen->machine->driver_data<firebeat_state>();
 	int chip;
@@ -1992,12 +1992,12 @@ static MACHINE_CONFIG_START( firebeat, firebeat_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
+	MCFG_SCREEN_UPDATE(firebeat)
 
 	MCFG_PALETTE_LENGTH(32768)
 
 	MCFG_PALETTE_INIT(RRRRR_GGGGG_BBBBB)
 	MCFG_VIDEO_START(firebeat)
-	MCFG_VIDEO_UPDATE(firebeat)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2039,6 +2039,7 @@ static MACHINE_CONFIG_START( firebeat2, firebeat_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
+	MCFG_SCREEN_UPDATE(firebeat)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2046,9 +2047,9 @@ static MACHINE_CONFIG_START( firebeat2, firebeat_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
+	MCFG_SCREEN_UPDATE(firebeat)
 
 	MCFG_VIDEO_START(firebeat)
-	MCFG_VIDEO_UPDATE(firebeat)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

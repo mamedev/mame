@@ -150,7 +150,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( mnchmobl )
+SCREEN_UPDATE( mnchmobl )
 {
 	draw_background(screen->machine, bitmap, cliprect);
 	draw_sprites(screen->machine, bitmap, cliprect);

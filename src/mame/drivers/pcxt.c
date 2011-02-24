@@ -203,7 +203,7 @@ static void cga_alphanumeric_tilemap(running_machine *machine, bitmap_t *bitmap,
 }
 
 
-static VIDEO_UPDATE( filetto )
+static SCREEN_UPDATE( filetto )
 {
 /*          xx1x xxxx  Attribute bit 7. 0=blink, 1=Intesity
             xxx1 xxxx  640x200 mode
@@ -255,7 +255,7 @@ static void vga_bitmap_layer(running_machine *machine, bitmap_t *bitmap,const re
 }
 
 /*S3 Video card,VGA*/
-static VIDEO_UPDATE( tetriskr )
+static SCREEN_UPDATE( tetriskr )
 {
 	bitmap_fill(bitmap, cliprect, 0);
 
@@ -945,13 +945,13 @@ static MACHINE_CONFIG_START( filetto, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 640-1, 0*8, 480-1)
+	MCFG_SCREEN_UPDATE(filetto)
 
 	MCFG_PALETTE_LENGTH(0x300)
 
 	MCFG_PALETTE_INIT(filetto)
 
 	MCFG_VIDEO_START(filetto)
-	MCFG_VIDEO_UPDATE(filetto)
 
 	/*Sound Hardware*/
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -992,13 +992,13 @@ static MACHINE_CONFIG_START( tetriskr, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 640-1, 0*8, 480-1)
+	MCFG_SCREEN_UPDATE(tetriskr)
 
 	MCFG_PALETTE_LENGTH(0x300)
 
 	MCFG_PALETTE_INIT(filetto)
 
 	MCFG_VIDEO_START(tetriskr)
-	MCFG_VIDEO_UPDATE(tetriskr)
 
 	/*Sound Hardware*/
 	MCFG_SPEAKER_STANDARD_MONO("mono")

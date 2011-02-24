@@ -404,7 +404,7 @@ VIDEO_START( nbmj8900_2layer )
 
 
 ******************************************************************************/
-VIDEO_UPDATE( nbmj8900 )
+SCREEN_UPDATE( nbmj8900 )
 {
 	int x, y;
 

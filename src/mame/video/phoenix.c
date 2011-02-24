@@ -448,7 +448,7 @@ READ_LINE_DEVICE_HANDLER( survival_sid_callback )
 
 ***************************************************************************/
 
-VIDEO_UPDATE( phoenix )
+SCREEN_UPDATE( phoenix )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);

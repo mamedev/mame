@@ -2422,7 +2422,7 @@ static void print_mixer_data(segas32_state *state, int which)
 	}
 }
 
-VIDEO_UPDATE( system32 )
+SCREEN_UPDATE( system32 )
 {
 	segas32_state *state = screen->machine->driver_data<segas32_state>();
 	UINT8 enablemask;
@@ -2601,7 +2601,7 @@ for (showclip = 0; showclip < 4; showclip++)
 }
 
 
-VIDEO_UPDATE( multi32 )
+SCREEN_UPDATE( multi32 )
 {
 	segas32_state *state = screen->machine->driver_data<segas32_state>();
 	UINT8 enablemask;

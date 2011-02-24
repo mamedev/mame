@@ -421,7 +421,7 @@ static void video_update_common( running_machine *machine, bitmap_t *bitmap, con
 }
 
 
-static VIDEO_UPDATE( astrof )
+static SCREEN_UPDATE( astrof )
 {
 	pen_t pens[ASTROF_NUM_PENS];
 
@@ -433,7 +433,7 @@ static VIDEO_UPDATE( astrof )
 }
 
 
-static VIDEO_UPDATE( tomahawk )
+static SCREEN_UPDATE( tomahawk )
 {
 	pen_t pens[TOMAHAWK_NUM_PENS];
 
@@ -979,7 +979,8 @@ static MACHINE_CONFIG_DERIVED( astrof, base )
 	MCFG_MACHINE_START(astrof)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(astrof)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(astrof)
 
 	/* audio hardware */
 	MCFG_FRAGMENT_ADD(astrof_audio)
@@ -1004,7 +1005,8 @@ static MACHINE_CONFIG_DERIVED( spfghmk2, base )
 	MCFG_MACHINE_START(spfghmk2)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(astrof)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(astrof)
 
 	/* audio hardware */
 	MCFG_FRAGMENT_ADD(spfghmk2_audio)
@@ -1020,7 +1022,8 @@ static MACHINE_CONFIG_DERIVED( tomahawk, base )
 	MCFG_MACHINE_START(tomahawk)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(tomahawk)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(tomahawk)
 
 	/* audio hardware */
 	MCFG_FRAGMENT_ADD(tomahawk_audio)

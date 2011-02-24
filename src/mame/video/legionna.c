@@ -406,7 +406,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 #define LAYER_DB 0
 
-VIDEO_UPDATE( legionna )
+SCREEN_UPDATE( legionna )
 {
 	/* Setup the tilemaps */
 	tilemap_set_scrollx( background_layer, 0, legionna_scrollram16[0] );
@@ -435,7 +435,7 @@ VIDEO_UPDATE( legionna )
 }
 
 
-VIDEO_UPDATE( godzilla )
+SCREEN_UPDATE( godzilla )
 {
 //  tilemap_set_scrollx( text_layer, 0, 0 );
 //  tilemap_set_scrolly( text_layer, 0, 112 );
@@ -463,7 +463,7 @@ VIDEO_UPDATE( godzilla )
 	return 0;
 }
 
-VIDEO_UPDATE( grainbow )
+SCREEN_UPDATE( grainbow )
 {
 	/* Setup the tilemaps */
 	tilemap_set_scrollx( background_layer, 0, legionna_scrollram16[0] );

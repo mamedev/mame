@@ -23,4 +23,4 @@ READ8_HANDLER( thief_coprocessor_r );
 WRITE8_HANDLER( thief_coprocessor_w );
 
 VIDEO_START( thief );
-VIDEO_UPDATE( thief );
+SCREEN_UPDATE( thief );

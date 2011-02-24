@@ -307,7 +307,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-VIDEO_UPDATE( gaplus )
+SCREEN_UPDATE( gaplus )
 {
 	gaplus_state *state = screen->machine->driver_data<gaplus_state>();
 	/* flip screen control is embedded in RAM */
@@ -329,7 +329,7 @@ VIDEO_UPDATE( gaplus )
 }
 
 
-VIDEO_EOF( gaplus )	/* update starfields */
+SCREEN_EOF( gaplus )	/* update starfields */
 {
 	gaplus_state *state = machine->driver_data<gaplus_state>();
 	struct star *stars = state->stars;

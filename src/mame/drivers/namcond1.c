@@ -312,12 +312,12 @@ static MACHINE_CONFIG_START( namcond1, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(288, 224)   // maximum display resolution (512x512 in theory)
 	MCFG_SCREEN_VISIBLE_AREA(0, 287, 0, 223)   // default visible area
+	MCFG_SCREEN_UPDATE(ygv608)
 
 	MCFG_GFXDECODE(namcond1)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_VIDEO_START(ygv608)
-	MCFG_VIDEO_UPDATE(ygv608)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

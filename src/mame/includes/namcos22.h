@@ -66,10 +66,10 @@ WRITE32_HANDLER( namcos22_dspram_w );
 
 
 VIDEO_START( namcos22 );
-VIDEO_UPDATE( namcos22 );
+SCREEN_UPDATE( namcos22 );
 
 VIDEO_START( namcos22s );
-VIDEO_UPDATE( namcos22s );
+SCREEN_UPDATE( namcos22s );
 
 void namcos22_draw_direct_poly( running_machine *machine, const UINT16 *pSource );
 extern UINT32 namcos22_point_rom_r( offs_t offs );

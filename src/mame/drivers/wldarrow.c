@@ -52,7 +52,7 @@ static void get_pens(pen_t *pens)
 }
 
 
-static VIDEO_UPDATE( wldarrow )
+static SCREEN_UPDATE( wldarrow )
 {
 	pen_t pens[NUM_PENS];
 	offs_t offs;
@@ -354,14 +354,13 @@ static MACHINE_CONFIG_START( wldarrow, driver_device )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(wldarrow)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_UPDATE(wldarrow)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -164,7 +164,7 @@ static VIDEO_START(galaxi)
 	tilemap_set_scrolldx(state->bg3_tmap, -8, 0);
 }
 
-static VIDEO_UPDATE(galaxi)
+static SCREEN_UPDATE(galaxi)
 {
 	galaxi_state *state = screen->machine->driver_data<galaxi_state>();
 	int layers_ctrl = -1;
@@ -409,12 +409,12 @@ static MACHINE_CONFIG_START( galaxi, galaxi_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(16*5, 512-16*2-1, 16*1, 256-1)
+	MCFG_SCREEN_UPDATE(galaxi)
 
 	MCFG_GFXDECODE(galaxi)
 	MCFG_PALETTE_LENGTH(0x400)
 
 	MCFG_VIDEO_START(galaxi)
-	MCFG_VIDEO_UPDATE(galaxi)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

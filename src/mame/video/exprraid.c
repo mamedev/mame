@@ -136,7 +136,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( exprraid )
+SCREEN_UPDATE( exprraid )
 {
 	exprraid_state *state = screen->machine->driver_data<exprraid_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);

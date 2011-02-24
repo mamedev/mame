@@ -305,7 +305,7 @@ static VIDEO_START( drw80pkr )
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 24, 27);
 }
 
-static VIDEO_UPDATE( drw80pkr )
+static SCREEN_UPDATE( drw80pkr )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
@@ -443,13 +443,13 @@ static MACHINE_CONFIG_START( drw80pkr, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE((31+1)*8, (31+1)*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 24*8-1, 0*8, 27*8-1)
+	MCFG_SCREEN_UPDATE(drw80pkr)
 
 	MCFG_GFXDECODE(drw80pkr)
 	MCFG_PALETTE_LENGTH(16*16)
 
 	MCFG_PALETTE_INIT(drw80pkr)
 	MCFG_VIDEO_START(drw80pkr)
-	MCFG_VIDEO_UPDATE(drw80pkr)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

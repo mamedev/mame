@@ -220,7 +220,7 @@ VIDEO_START( williams2 )
  *
  *************************************/
 
-VIDEO_UPDATE( williams )
+SCREEN_UPDATE( williams )
 {
 	rgb_t pens[16];
 	int x, y;
@@ -247,7 +247,7 @@ VIDEO_UPDATE( williams )
 }
 
 
-VIDEO_UPDATE( blaster )
+SCREEN_UPDATE( blaster )
 {
 	rgb_t pens[16];
 	int x, y;
@@ -289,7 +289,7 @@ VIDEO_UPDATE( blaster )
 }
 
 
-VIDEO_UPDATE( williams2 )
+SCREEN_UPDATE( williams2 )
 {
 	rgb_t pens[16];
 	int x, y;

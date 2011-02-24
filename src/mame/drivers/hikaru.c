@@ -332,7 +332,7 @@ static VIDEO_START(hikaru)
 
 }
 
-static VIDEO_UPDATE(hikaru)
+static SCREEN_UPDATE(hikaru)
 {
 	return 0;
 }
@@ -394,11 +394,11 @@ static MACHINE_CONFIG_START( hikaru, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_UPDATE(hikaru)
 
 	MCFG_PALETTE_LENGTH(0x1000)
 
 	MCFG_VIDEO_START(hikaru)
-	MCFG_VIDEO_UPDATE(hikaru)
 
 //  MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 //  MCFG_SOUND_ADD("aica", AICA, 0)

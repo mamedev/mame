@@ -39,4 +39,4 @@ WRITE8_HANDLER( bogeyman_paletteram_w );
 
 PALETTE_INIT( bogeyman );
 VIDEO_START( bogeyman );
-VIDEO_UPDATE( bogeyman );
+SCREEN_UPDATE( bogeyman );

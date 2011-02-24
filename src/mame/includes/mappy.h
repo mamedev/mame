@@ -18,14 +18,14 @@ public:
 
 VIDEO_START( phozon );
 PALETTE_INIT( phozon );
-VIDEO_UPDATE( phozon );
+SCREEN_UPDATE( phozon );
 
 PALETTE_INIT( superpac );
 PALETTE_INIT( mappy );
 VIDEO_START( superpac );
 VIDEO_START( mappy );
-VIDEO_UPDATE( superpac );
-VIDEO_UPDATE( mappy );
+SCREEN_UPDATE( superpac );
+SCREEN_UPDATE( mappy );
 WRITE8_HANDLER( superpac_videoram_w );
 WRITE8_HANDLER( mappy_videoram_w );
 WRITE8_HANDLER( mappy_scroll_w );

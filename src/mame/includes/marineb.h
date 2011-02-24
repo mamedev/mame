@@ -33,8 +33,8 @@ WRITE8_HANDLER( marineb_flipscreen_y_w );
 
 PALETTE_INIT( marineb );
 VIDEO_START( marineb );
-VIDEO_UPDATE( marineb );
-VIDEO_UPDATE( changes );
-VIDEO_UPDATE( springer );
-VIDEO_UPDATE( hoccer );
-VIDEO_UPDATE( hopprobo );
+SCREEN_UPDATE( marineb );
+SCREEN_UPDATE( changes );
+SCREEN_UPDATE( springer );
+SCREEN_UPDATE( hoccer );
+SCREEN_UPDATE( hopprobo );

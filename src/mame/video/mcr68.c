@@ -329,7 +329,7 @@ static void zwackery_update_sprites(running_machine *machine, bitmap_t *bitmap, 
  *
  *************************************/
 
-VIDEO_UPDATE( mcr68 )
+SCREEN_UPDATE( mcr68 )
 {
 	mcr68_state *state = screen->machine->driver_data<mcr68_state>();
 	/* draw the background */
@@ -347,7 +347,7 @@ VIDEO_UPDATE( mcr68 )
 }
 
 
-VIDEO_UPDATE( zwackery )
+SCREEN_UPDATE( zwackery )
 {
 	mcr68_state *state = screen->machine->driver_data<mcr68_state>();
 	/* draw the background */

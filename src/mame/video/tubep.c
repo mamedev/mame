@@ -608,7 +608,7 @@ void tubep_vblank_end(void)
 }
 
 
-VIDEO_UPDATE( tubep )
+SCREEN_UPDATE( tubep )
 {
 	int DISP_ = DISP^1;
 
@@ -763,7 +763,7 @@ WRITE8_HANDLER( rjammer_background_page_w )
 }
 
 
-VIDEO_UPDATE( rjammer )
+SCREEN_UPDATE( rjammer )
 {
 	int DISP_ = DISP^1;
 

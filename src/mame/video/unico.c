@@ -334,7 +334,7 @@ static void zeropnt2_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 
 ***************************************************************************/
 
-VIDEO_UPDATE( unico )
+SCREEN_UPDATE( unico )
 {
 	int layers_ctrl = -1;
 
@@ -373,7 +373,7 @@ if ( input_code_pressed(screen->machine, KEYCODE_Z) || input_code_pressed(screen
 	return 0;
 }
 
-VIDEO_UPDATE( zeropnt2 )
+SCREEN_UPDATE( zeropnt2 )
 {
 	int layers_ctrl = -1;
 

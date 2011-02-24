@@ -1278,7 +1278,7 @@ static int debug_viewer( running_machine *machine, bitmap_t *bitmap, const recta
 
 
 
-VIDEO_UPDATE( hanamai )
+SCREEN_UPDATE( hanamai )
 {
 	dynax_state *state = screen->machine->driver_data<dynax_state>();
 	int layers_ctrl = ~state->layer_enable;
@@ -1314,7 +1314,7 @@ VIDEO_UPDATE( hanamai )
 }
 
 
-VIDEO_UPDATE( hnoridur )
+SCREEN_UPDATE( hnoridur )
 {
 	dynax_state *state = screen->machine->driver_data<dynax_state>();
 	int layers_ctrl = ~BITSWAP8(state->hanamai_priority, 7, 6, 5, 4, 0, 1, 2, 3);
@@ -1351,7 +1351,7 @@ VIDEO_UPDATE( hnoridur )
 }
 
 
-VIDEO_UPDATE( sprtmtch )
+SCREEN_UPDATE( sprtmtch )
 {
 	dynax_state *state = screen->machine->driver_data<dynax_state>();
 	int layers_ctrl = ~state->layer_enable;
@@ -1369,7 +1369,7 @@ VIDEO_UPDATE( sprtmtch )
 	return 0;
 }
 
-VIDEO_UPDATE( jantouki )
+SCREEN_UPDATE( jantouki )
 {
 	dynax_state *state = screen->machine->driver_data<dynax_state>();
 	int layers_ctrl = state->layer_enable;
@@ -1400,7 +1400,7 @@ VIDEO_UPDATE( jantouki )
 }
 
 
-VIDEO_UPDATE( mjdialq2 )
+SCREEN_UPDATE( mjdialq2 )
 {
 	dynax_state *state = screen->machine->driver_data<dynax_state>();
 	int layers_ctrl = ~state->layer_enable;
@@ -1425,13 +1425,13 @@ VIDEO_START(htengoku)
 	VIDEO_START_CALL(hnoridur);
 }
 
-VIDEO_UPDATE(htengoku)
+SCREEN_UPDATE(htengoku)
 {
 	dynax_state *state = screen->machine->driver_data<dynax_state>();
 	int layer, x, y;
 
 	// render the layers, one by one, "dynax.c" style. Then convert the pixmaps to "ddenlovr.c"
-	// format and let VIDEO_UPDATE(ddenlovr) do the final compositing (priorities + palettes)
+	// format and let SCREEN_UPDATE(ddenlovr) do the final compositing (priorities + palettes)
 	for (layer = 0; layer < 4; layer++)
 	{
 		bitmap_fill(bitmap, cliprect, 0);
@@ -1442,5 +1442,5 @@ VIDEO_UPDATE(htengoku)
 				state->ddenlovr_pixmap[3 - layer][y * 512 + x] = (UINT8)(*BITMAP_ADDR16(bitmap, y, x));
 	}
 
-	return VIDEO_UPDATE_CALL(ddenlovr);
+	return SCREEN_UPDATE_CALL(ddenlovr);
 }

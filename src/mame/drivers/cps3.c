@@ -894,7 +894,7 @@ static void cps3_draw_tilemapsprite_line(running_machine *machine, int tmnum, in
 	}
 }
 
-static VIDEO_UPDATE(cps3)
+static SCREEN_UPDATE(cps3)
 {
 	cps3_state *state = screen->machine->driver_data<cps3_state>();
 	int y,x, count;
@@ -2507,6 +2507,7 @@ static MACHINE_CONFIG_START( cps3, cps3_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_60MHz/8, 486, 0, 384, 259, 0, 224)
+	MCFG_SCREEN_UPDATE(cps3)
 /*
     Measured clocks:
         V = 59.5992Hz
@@ -2524,7 +2525,6 @@ static MACHINE_CONFIG_START( cps3, cps3_state )
 	MCFG_PALETTE_LENGTH(0x10000) // actually 0x20000 ...
 
 	MCFG_VIDEO_START(cps3)
-	MCFG_VIDEO_UPDATE(cps3)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

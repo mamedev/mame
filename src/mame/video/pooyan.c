@@ -192,7 +192,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
  *
  *************************************/
 
-VIDEO_UPDATE( pooyan )
+SCREEN_UPDATE( pooyan )
 {
 	pooyan_state *state = screen->machine->driver_data<pooyan_state>();
 

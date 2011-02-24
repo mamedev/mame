@@ -103,7 +103,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
  *
  *************************************/
 
-VIDEO_UPDATE( meadows )
+SCREEN_UPDATE( meadows )
 {
 	meadows_state *state = screen->machine->driver_data<meadows_state>();
 	/* draw the background */

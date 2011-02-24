@@ -94,7 +94,7 @@ INLINE unsigned char get_display_color (unsigned char color, int invert)
 
 /* Code to change the FLASH status every 25 frames. Note this must be
    independent of frame skip etc. */
-static VIDEO_EOF( spectrum )
+static SCREEN_EOF( spectrum )
 {
     spectrum_frame_number++;
     if (spectrum_frame_number >= 25)
@@ -109,7 +109,7 @@ INLINE void spectrum_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;
 }
 
-static VIDEO_UPDATE( spectrum )
+static SCREEN_UPDATE( spectrum )
 {
     /* for now do a full-refresh */
     int x, y, b, scrx, scry;
@@ -313,12 +313,13 @@ static MACHINE_CONFIG_START( photon2, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(SPEC_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT)
 	MCFG_SCREEN_VISIBLE_AREA(0, SPEC_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)
+	MCFG_SCREEN_UPDATE( spectrum )
+	MCFG_SCREEN_EOF( spectrum )
+
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT( spectrum )
 
 	MCFG_VIDEO_START( spectrum )
-	MCFG_VIDEO_UPDATE( spectrum )
-	MCFG_VIDEO_EOF( spectrum )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

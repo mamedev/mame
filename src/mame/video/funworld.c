@@ -193,7 +193,7 @@ VIDEO_START(magicrd2)
 }
 
 
-VIDEO_UPDATE(funworld)
+SCREEN_UPDATE(funworld)
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	return 0;

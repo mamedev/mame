@@ -18,5 +18,5 @@ WRITE8_HANDLER( zac_s2636_w );
 READ8_HANDLER( tinvader_port_0_r );
 
 VIDEO_START( tinvader );
-VIDEO_UPDATE( tinvader );
+SCREEN_UPDATE( tinvader );
 

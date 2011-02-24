@@ -114,7 +114,7 @@ VIDEO_START(fitfight)
 	tilemap_set_transparent_pen(state->fof_txt_tilemap, 0);
 }
 
-VIDEO_UPDATE(fitfight)
+SCREEN_UPDATE(fitfight)
 {
 	fitfight_state *state = screen->machine->driver_data<fitfight_state>();
 

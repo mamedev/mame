@@ -53,7 +53,7 @@ static void draw_sprites( running_machine *machine,  bitmap_t *bitmap, const rec
 	}
 }
 
-VIDEO_UPDATE( bsktball )
+SCREEN_UPDATE( bsktball )
 {
 	bsktball_state *state = screen->machine->driver_data<bsktball_state>();
 

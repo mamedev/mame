@@ -837,7 +837,7 @@ WRITE8_HANDLER( pteacher_blitter_start_w )
 
 ***************************************************************************/
 
-VIDEO_UPDATE( mrokumei )
+SCREEN_UPDATE( mrokumei )
 {
 	homedata_state *state = screen->machine->driver_data<homedata_state>();
 	int flags,width;
@@ -882,7 +882,7 @@ VIDEO_UPDATE( mrokumei )
 }
 
 #ifdef UNUSED_FUNCTION
-VIDEO_UPDATE( reikaids )
+SCREEN_UPDATE( reikaids )
 {
 	homedata_state *state = screen->machine->driver_data<homedata_state>();
 	int flags;
@@ -917,7 +917,7 @@ VIDEO_UPDATE( reikaids )
 }
 #endif
 
-VIDEO_UPDATE( reikaids )
+SCREEN_UPDATE( reikaids )
 {
 	homedata_state *state = screen->machine->driver_data<homedata_state>();
 	int flags;
@@ -964,7 +964,7 @@ VIDEO_UPDATE( reikaids )
 }
 
 
-VIDEO_UPDATE( pteacher )
+SCREEN_UPDATE( pteacher )
 {
 	homedata_state *state = screen->machine->driver_data<homedata_state>();
 	int flags, scroll_low, scroll_high;
@@ -1043,13 +1043,13 @@ VIDEO_UPDATE( pteacher )
 	return 0;
 }
 
-VIDEO_UPDATE( mirderby )
+SCREEN_UPDATE( mirderby )
 {
 	return 0;
 }
 
 
-VIDEO_EOF( homedata )
+SCREEN_EOF( homedata )
 {
 	homedata_state *state = machine->driver_data<homedata_state>();
 	state->visible_page ^= 1;

@@ -484,9 +484,9 @@ static void update_sprites(running_machine* machine)
 	////// The glitch is correct behavior.
 
 
-VIDEO_UPDATE( ninjakd2 )
+SCREEN_UPDATE( ninjakd2 )
 {
-	// updating sprites here instead than in video_eof avoids a palette glitch
+	// updating sprites here instead than in screen_eof avoids a palette glitch
 	// at the end of the "rainbow sky" screens.
 	update_sprites(screen->machine);
 	sprites_updated = 1;
@@ -502,7 +502,7 @@ VIDEO_UPDATE( ninjakd2 )
 	return 0;
 }
 
-VIDEO_UPDATE( robokid )
+SCREEN_UPDATE( robokid )
 {
 	update_sprites(screen->machine);
 	sprites_updated = 1;
@@ -522,7 +522,7 @@ VIDEO_UPDATE( robokid )
 	return 0;
 }
 
-VIDEO_UPDATE( omegaf )
+SCREEN_UPDATE( omegaf )
 {
 	update_sprites(screen->machine);
 	sprites_updated = 1;
@@ -543,7 +543,7 @@ VIDEO_UPDATE( omegaf )
 }
 
 
-VIDEO_EOF( ninjakd2 )
+SCREEN_EOF( ninjakd2 )
 {
 	if (!sprites_updated)
 		update_sprites(machine);

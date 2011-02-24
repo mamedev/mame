@@ -67,7 +67,7 @@ static VIDEO_START( nightgal )
 	state->save_item(NAME(state->blit_buffer));
 }
 
-static VIDEO_UPDATE( nightgal )
+static SCREEN_UPDATE( nightgal )
 {
 	nightgal_state *state = screen->machine->driver_data<nightgal_state>();
 	int x, y;
@@ -879,12 +879,12 @@ static MACHINE_CONFIG_START( royalqn, nightgal_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE(nightgal)
 	MCFG_PALETTE_INIT(nightgal)
 
 	MCFG_PALETTE_LENGTH(0x10)
 
 	MCFG_VIDEO_START(nightgal)
-	MCFG_VIDEO_UPDATE(nightgal)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

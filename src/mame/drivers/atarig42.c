@@ -582,10 +582,10 @@ static MACHINE_CONFIG_START( atarig42, atarig42_state )
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
+	MCFG_SCREEN_UPDATE(atarig42)
+	MCFG_SCREEN_EOF(atarig42)
 
 	MCFG_VIDEO_START(atarig42)
-	MCFG_VIDEO_EOF(atarig42)
-	MCFG_VIDEO_UPDATE(atarig42)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(jsa_iii_mono)

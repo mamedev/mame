@@ -153,7 +153,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 
 
-static VIDEO_UPDATE( backfire )
+static SCREEN_UPDATE( backfire )
 {
 	backfire_state *state = screen->machine->driver_data<backfire_state>();
 
@@ -495,6 +495,7 @@ static MACHINE_CONFIG_START( backfire, backfire_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_UPDATE(backfire)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -502,9 +503,9 @@ static MACHINE_CONFIG_START( backfire, backfire_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_UPDATE(backfire)
 
 	MCFG_VIDEO_START(backfire)
-	MCFG_VIDEO_UPDATE(backfire)
 
 	MCFG_DECO16IC_ADD("deco_custom", backfire_deco16ic_intf)
 

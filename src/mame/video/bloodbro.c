@@ -229,7 +229,7 @@ static void weststry_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 
 
 
-VIDEO_UPDATE( bloodbro )
+SCREEN_UPDATE( bloodbro )
 {
 	tilemap_set_scrollx(bg_tilemap,0,bloodbro_scroll[0x10]);	/* ? */
 	tilemap_set_scrolly(bg_tilemap,0,bloodbro_scroll[0x11]);	/* ? */
@@ -245,7 +245,7 @@ VIDEO_UPDATE( bloodbro )
 	return 0;
 }
 
-VIDEO_UPDATE( weststry )
+SCREEN_UPDATE( weststry )
 {
 //  tilemap_set_scrollx(bg_tilemap,0,bloodbro_scroll[0x10]);    /* ? */
 //  tilemap_set_scrolly(bg_tilemap,0,bloodbro_scroll[0x11]);    /* ? */
@@ -262,7 +262,7 @@ VIDEO_UPDATE( weststry )
 }
 
 
-VIDEO_UPDATE( skysmash )
+SCREEN_UPDATE( skysmash )
 {
 	tilemap_set_scrollx(bg_tilemap,0,bloodbro_scroll[0x08]);
 	tilemap_set_scrolly(bg_tilemap,0,bloodbro_scroll[0x09]);	/* ? */

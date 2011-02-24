@@ -138,7 +138,7 @@ static VIDEO_START( calorie )
 	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 }
 
-static VIDEO_UPDATE( calorie )
+static SCREEN_UPDATE( calorie )
 {
 	calorie_state *state = screen->machine->driver_data<calorie_state>();
 	int x;
@@ -451,12 +451,12 @@ static MACHINE_CONFIG_START( calorie, calorie_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
+	MCFG_SCREEN_UPDATE(calorie)
 
 	MCFG_GFXDECODE(calorie)
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(calorie)
-	MCFG_VIDEO_UPDATE(calorie)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

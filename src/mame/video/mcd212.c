@@ -1661,20 +1661,15 @@ VIDEO_START( cdimono1 )
     state->lcdbitmap = downcast<screen_device *>(machine->device("lcd"))->alloc_compatible_bitmap();
 }
 
-VIDEO_UPDATE( cdimono1 )
+SCREEN_UPDATE( cdimono1 )
+{
+    copybitmap(bitmap, screen->machine->generic.tmpbitmap, 0, 0, 0, 0, cliprect);
+    return 0;
+}
+
+SCREEN_UPDATE( cdimono1_lcd )
 {
     cdi_state *state = screen->machine->driver_data<cdi_state>();
-    device_t *main_screen = screen->machine->device("screen");
-    device_t *lcd_screen = screen->machine->device("lcd");
-
-    if (screen == main_screen)
-    {
-        copybitmap(bitmap, screen->machine->generic.tmpbitmap, 0, 0, 0, 0, cliprect);
-    }
-    else if (screen == lcd_screen)
-    {
-        copybitmap(bitmap, state->lcdbitmap, 0, 0, 0, 0, cliprect);
-    }
-
+    copybitmap(bitmap, state->lcdbitmap, 0, 0, 0, 0, cliprect);
     return 0;
 }

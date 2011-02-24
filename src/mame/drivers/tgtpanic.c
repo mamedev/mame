@@ -22,7 +22,7 @@ static UINT8 color;
  *
  *************************************/
 
-static VIDEO_UPDATE( tgtpanic )
+static SCREEN_UPDATE( tgtpanic )
 {
 	UINT32 colors[4];
 	UINT32 offs;
@@ -126,14 +126,13 @@ static MACHINE_CONFIG_START( tgtpanic, driver_device )
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 20) /* Unverified */
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(tgtpanic)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60) /* Unverified */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* Unverified */
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 192 - 1, 0, 192 - 1)
+	MCFG_SCREEN_UPDATE(tgtpanic)
 MACHINE_CONFIG_END
 
 

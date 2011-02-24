@@ -385,7 +385,7 @@ static void update_one_screen(screen_device &screen, bitmap_t *bitmap, const rec
 }
 
 
-VIDEO_UPDATE( cyberbal )
+SCREEN_UPDATE( cyberbal )
 {
 	update_one_screen(*screen, bitmap, cliprect);
 	return 0;

@@ -248,7 +248,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
                         SCREEN REFRESH
 **************************************************************/
 
-VIDEO_UPDATE( gcpinbal )
+SCREEN_UPDATE( gcpinbal )
 {
 	gcpinbal_state *state = screen->machine->driver_data<gcpinbal_state>();
 	int i;

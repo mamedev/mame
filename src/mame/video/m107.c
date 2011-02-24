@@ -387,7 +387,7 @@ WRITE16_HANDLER( m107_spritebuffer_w )
 
 /*****************************************************************************/
 
-VIDEO_UPDATE( m107 )
+SCREEN_UPDATE( m107 )
 {
 	m107_update_scroll_positions(screen->machine);
 	m107_screenrefresh(screen->machine, bitmap, cliprect);

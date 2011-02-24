@@ -173,7 +173,7 @@ VIDEO_START( bankp )
 	state->save_item(NAME(state->priority));
 }
 
-VIDEO_UPDATE( bankp )
+SCREEN_UPDATE( bankp )
 {
 	bankp_state *state = screen->machine->driver_data<bankp_state>();
 

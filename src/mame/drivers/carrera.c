@@ -237,7 +237,7 @@ static GFXDECODE_START( carrera )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
-static VIDEO_UPDATE(carrera)
+static SCREEN_UPDATE(carrera)
 {
 
 	int x,y;
@@ -327,14 +327,13 @@ static MACHINE_CONFIG_START( carrera, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE(carrera)
 
 	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK / 16, mc6845_intf)
 
 	MCFG_GFXDECODE(carrera)
 	MCFG_PALETTE_LENGTH(32)
 	MCFG_PALETTE_INIT(carrera)
-
-	MCFG_VIDEO_UPDATE(carrera)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

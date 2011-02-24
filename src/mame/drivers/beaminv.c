@@ -164,7 +164,7 @@ static MACHINE_RESET( beaminv )
  *
  *************************************/
 
-static VIDEO_UPDATE( beaminv )
+static SCREEN_UPDATE( beaminv )
 {
 	beaminv_state *state = screen->machine->driver_data<beaminv_state>();
 	offs_t offs;
@@ -338,13 +338,12 @@ static MACHINE_CONFIG_START( beaminv, beaminv_state )
 	MCFG_MACHINE_RESET(beaminv)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(beaminv)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 247, 16, 231)
 	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_UPDATE(beaminv)
 
 MACHINE_CONFIG_END
 

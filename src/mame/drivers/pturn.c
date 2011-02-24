@@ -145,7 +145,7 @@ static VIDEO_START(pturn)
 	tilemap_set_transparent_pen(state->bgmap,0);
 }
 
-static VIDEO_UPDATE(pturn)
+static SCREEN_UPDATE(pturn)
 {
 	pturn_state *state = screen->machine->driver_data<pturn_state>();
 	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
@@ -493,12 +493,12 @@ static MACHINE_CONFIG_START( pturn, pturn_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(pturn)
 
 	MCFG_PALETTE_LENGTH(0x100)
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
 
 	MCFG_VIDEO_START(pturn)
-	MCFG_VIDEO_UPDATE(pturn)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

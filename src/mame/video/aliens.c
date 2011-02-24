@@ -75,7 +75,7 @@ VIDEO_START( aliens )
 
 ***************************************************************************/
 
-VIDEO_UPDATE( aliens )
+SCREEN_UPDATE( aliens )
 {
 	aliens_state *state = screen->machine->driver_data<aliens_state>();
 

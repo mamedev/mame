@@ -250,7 +250,7 @@ static void draw_water(colortable_t *colortable, bitmap_t* bitmap, const rectang
 }
 
 
-VIDEO_UPDATE( wolfpack )
+SCREEN_UPDATE( wolfpack )
 {
 	wolfpack_state *state = screen->machine->driver_data<wolfpack_state>();
 	int i;
@@ -291,7 +291,7 @@ VIDEO_UPDATE( wolfpack )
 }
 
 
-VIDEO_EOF( wolfpack )
+SCREEN_EOF( wolfpack )
 {
 	wolfpack_state *state = machine->driver_data<wolfpack_state>();
 	rectangle rect;

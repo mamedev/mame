@@ -28,9 +28,9 @@ public:
 
 /*----------- defined in video/mcatadv.c -----------*/
 
-VIDEO_UPDATE( mcatadv );
+SCREEN_UPDATE( mcatadv );
 VIDEO_START( mcatadv );
-VIDEO_EOF( mcatadv );
+SCREEN_EOF( mcatadv );
 
 WRITE16_HANDLER( mcatadv_videoram1_w );
 WRITE16_HANDLER( mcatadv_videoram2_w );

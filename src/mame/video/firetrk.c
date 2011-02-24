@@ -357,7 +357,7 @@ static void check_collision(firetrk_state *state, int which)
 }
 
 
-VIDEO_UPDATE( firetrk )
+SCREEN_UPDATE( firetrk )
 {
 	firetrk_state *state = screen->machine->driver_data<firetrk_state>();
 	tilemap_mark_all_tiles_dirty_all(screen->machine);
@@ -392,7 +392,7 @@ VIDEO_UPDATE( firetrk )
 }
 
 
-VIDEO_UPDATE( superbug )
+SCREEN_UPDATE( superbug )
 {
 	firetrk_state *state = screen->machine->driver_data<firetrk_state>();
 	tilemap_mark_all_tiles_dirty_all(screen->machine);
@@ -422,7 +422,7 @@ VIDEO_UPDATE( superbug )
 }
 
 
-VIDEO_UPDATE( montecar )
+SCREEN_UPDATE( montecar )
 {
 	firetrk_state *state = screen->machine->driver_data<firetrk_state>();
 	tilemap_mark_all_tiles_dirty_all(screen->machine);

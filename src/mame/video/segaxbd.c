@@ -34,7 +34,7 @@ VIDEO_START( xboard )
  *
  *************************************/
 
-VIDEO_UPDATE( xboard )
+SCREEN_UPDATE( xboard )
 {
 	segas1x_state *state = screen->machine->driver_data<segas1x_state>();
 

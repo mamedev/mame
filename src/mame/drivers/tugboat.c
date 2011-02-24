@@ -115,7 +115,7 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap,const rectan
 	}
 }
 
-static VIDEO_UPDATE( tugboat )
+static SCREEN_UPDATE( tugboat )
 {
 	int startaddr0 = hd46505_0_reg[0x0c]*256 + hd46505_0_reg[0x0d];
 	int startaddr1 = hd46505_1_reg[0x0c]*256 + hd46505_1_reg[0x0d];
@@ -328,12 +328,12 @@ static MACHINE_CONFIG_START( tugboat, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8,32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8,31*8-1,2*8,30*8-1)
+	MCFG_SCREEN_UPDATE(tugboat)
 
 	MCFG_GFXDECODE(tugboat)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(tugboat)
-	MCFG_VIDEO_UPDATE(tugboat)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

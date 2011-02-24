@@ -240,7 +240,7 @@ static void draw_sprites( running_machine* machine, bitmap_t *bitmap,const recta
 #undef DRAW_SPRITE
 
 
-VIDEO_UPDATE( ddragon )
+SCREEN_UPDATE( ddragon )
 {
 	ddragon_state *state = screen->machine->driver_data<ddragon_state>();
 

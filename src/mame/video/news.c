@@ -97,7 +97,7 @@ WRITE8_HANDLER( news_bgpic_w )
 
 ***************************************************************************/
 
-VIDEO_UPDATE( news )
+SCREEN_UPDATE( news )
 {
 	news_state *state = screen->machine->driver_data<news_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);

@@ -208,7 +208,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-VIDEO_UPDATE( mario )
+SCREEN_UPDATE( mario )
 {
 	mario_state	*state = screen->machine->driver_data<mario_state>();
 	int t;

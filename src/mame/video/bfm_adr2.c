@@ -216,7 +216,7 @@ VIDEO_START( adder2 )
 // video update ///////////////////////////////////////////////////////////
 static const rectangle visible1 = { 0, 400-1,  0,  280-1 };  //minx,maxx, miny,maxy
 
-VIDEO_UPDATE( adder2 )
+SCREEN_UPDATE( adder2 )
 {
 	if (adder2_screen_page_reg & SL_DISPLAY) tilemap_draw(bitmap, &visible1, tilemap1, 0, 0);
 	else                                     tilemap_draw(bitmap, &visible1, tilemap0, 0, 0);

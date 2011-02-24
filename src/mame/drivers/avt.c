@@ -458,7 +458,7 @@ static VIDEO_START( avt )
 }
 
 
-static VIDEO_UPDATE( avt )
+static SCREEN_UPDATE( avt )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	return 0;
@@ -811,6 +811,7 @@ static MACHINE_CONFIG_START( avt, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)	/* 240x224 (through CRTC) */
+	MCFG_SCREEN_UPDATE(avt)
 
 	MCFG_GFXDECODE(avt)
 
@@ -818,7 +819,6 @@ static MACHINE_CONFIG_START( avt, driver_device )
 	MCFG_PALETTE_LENGTH(8*16)
 
 	MCFG_VIDEO_START(avt)
-	MCFG_VIDEO_UPDATE(avt)
 
 	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)	/* guess */
 

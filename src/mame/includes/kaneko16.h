@@ -117,13 +117,13 @@ VIDEO_START( berlwall );
 VIDEO_START( sandscrp_1xVIEW2 );
 
 
-VIDEO_UPDATE( kaneko16 );
-VIDEO_UPDATE( sandscrp );
-VIDEO_UPDATE( berlwall );
-VIDEO_UPDATE( jchan_view2 );
+SCREEN_UPDATE( kaneko16 );
+SCREEN_UPDATE( sandscrp );
+SCREEN_UPDATE( berlwall );
+SCREEN_UPDATE( jchan_view2 );
 
 VIDEO_START( galsnew );
-VIDEO_UPDATE( galsnew );
+SCREEN_UPDATE( galsnew );
 
 extern UINT16* galsnew_bg_pixram;
 extern UINT16* galsnew_fg_pixram;
@@ -140,7 +140,7 @@ extern UINT16 *galpani2_bg15;
 
 PALETTE_INIT( galpani2 );
 VIDEO_START( galpani2 );
-VIDEO_UPDATE( galpani2 );
+SCREEN_UPDATE( galpani2 );
 
 WRITE16_HANDLER( galpani2_palette_0_w );
 WRITE16_HANDLER( galpani2_palette_1_w );

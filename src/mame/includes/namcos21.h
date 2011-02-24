@@ -35,4 +35,4 @@ extern READ16_HANDLER(winrun_gpu_register_r);
 extern WRITE16_HANDLER(winrun_gpu_register_w);
 
 extern VIDEO_START( namcos21 ) ;
-extern VIDEO_UPDATE( namcos21 );
+extern SCREEN_UPDATE( namcos21 );

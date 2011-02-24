@@ -2575,7 +2575,7 @@ VIDEO_START(dc)
 
 }
 
-VIDEO_UPDATE(dc)
+SCREEN_UPDATE(dc)
 {
 	/******************
       MAME note

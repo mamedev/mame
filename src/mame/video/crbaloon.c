@@ -148,7 +148,7 @@ static void draw_sprite_and_check_collision(running_machine *machine, bitmap_t *
 }
 
 
-VIDEO_UPDATE( crbaloon )
+SCREEN_UPDATE( crbaloon )
 {
 	crbaloon_state *state = screen->machine->driver_data<crbaloon_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);

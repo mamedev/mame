@@ -202,9 +202,9 @@ PALETTE_INIT( radarscp1 );
 PALETTE_INIT( dkong3 );
 
 VIDEO_START( dkong );
-VIDEO_UPDATE( dkong );
-VIDEO_UPDATE( pestplce );
-VIDEO_UPDATE( spclforc );
+SCREEN_UPDATE( dkong );
+SCREEN_UPDATE( pestplce );
+SCREEN_UPDATE( spclforc );
 
 /*----------- defined in audio/dkong.c -----------*/
 

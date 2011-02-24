@@ -492,14 +492,14 @@ static void draw_sprites_aoh(screen_device *screen, bitmap_t *bitmap)
 }
 
 
-static VIDEO_UPDATE( common )
+static SCREEN_UPDATE( common )
 {
 	bitmap_fill(bitmap,cliprect,0);
 	draw_sprites(screen, bitmap);
 	return 0;
 }
 
-static VIDEO_UPDATE( aoh )
+static SCREEN_UPDATE( aoh )
 {
 	bitmap_fill(bitmap,cliprect,0);
 	draw_sprites_aoh(screen, bitmap);
@@ -648,11 +648,10 @@ static MACHINE_CONFIG_START( common, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(31, 350, 16, 255)
+	MCFG_SCREEN_UPDATE(common)
 
 	MCFG_PALETTE_LENGTH(0x8000)
 	MCFG_GFXDECODE(vamphalf)
-
-	MCFG_VIDEO_UPDATE(common)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( sound_ym_oki )
@@ -779,11 +778,10 @@ static MACHINE_CONFIG_START( aoh, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(64, 511-64, 16, 255-16)
+	MCFG_SCREEN_UPDATE(aoh)
 
 	MCFG_PALETTE_LENGTH(0x8000)
 	MCFG_GFXDECODE(vamphalf)
-
-	MCFG_VIDEO_UPDATE(aoh)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

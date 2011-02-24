@@ -315,6 +315,7 @@ static MACHINE_CONFIG_START( travrusa, travrusa_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(travrusa)
 
 	MCFG_GFXDECODE(travrusa)
 
@@ -322,7 +323,6 @@ static MACHINE_CONFIG_START( travrusa, travrusa_state )
 
 	MCFG_PALETTE_INIT(travrusa)
 	MCFG_VIDEO_START(travrusa)
-	MCFG_VIDEO_UPDATE(travrusa)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(m52_sound_c_audio)

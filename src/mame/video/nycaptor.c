@@ -249,7 +249,7 @@ static void nycaptor_setmask( running_machine *machine )
 }
 #endif
 
-VIDEO_UPDATE( nycaptor )
+SCREEN_UPDATE( nycaptor )
 {
 	nycaptor_state *state = screen->machine->driver_data<nycaptor_state>();
 

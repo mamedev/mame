@@ -340,7 +340,7 @@ static void pkunwar_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 
 
 
-VIDEO_UPDATE( nova2001 )
+SCREEN_UPDATE( nova2001 )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
@@ -354,7 +354,7 @@ VIDEO_UPDATE( nova2001 )
 	return 0;
 }
 
-VIDEO_UPDATE( pkunwar )
+SCREEN_UPDATE( pkunwar )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
 
@@ -365,7 +365,7 @@ VIDEO_UPDATE( pkunwar )
 	return 0;
 }
 
-VIDEO_UPDATE( ninjakun )
+SCREEN_UPDATE( ninjakun )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
@@ -378,7 +378,7 @@ VIDEO_UPDATE( ninjakun )
 	return 0;
 }
 
-VIDEO_UPDATE( raiders5 )
+SCREEN_UPDATE( raiders5 )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 

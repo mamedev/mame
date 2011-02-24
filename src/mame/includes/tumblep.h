@@ -27,4 +27,4 @@ public:
 
 /*----------- defined in video/tumblep.c -----------*/
 
-VIDEO_UPDATE( tumblep );
+SCREEN_UPDATE( tumblep );

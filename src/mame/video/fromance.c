@@ -422,7 +422,7 @@ static void draw_sprites( screen_device &screen, bitmap_t *bitmap, const rectang
  *
  *************************************/
 
-VIDEO_UPDATE( fromance )
+SCREEN_UPDATE( fromance )
 {
 	fromance_state *state = screen->machine->driver_data<fromance_state>();
 
@@ -437,7 +437,7 @@ VIDEO_UPDATE( fromance )
 }
 
 
-VIDEO_UPDATE( pipedrm )
+SCREEN_UPDATE( pipedrm )
 {
 	fromance_state *state = screen->machine->driver_data<fromance_state>();
 

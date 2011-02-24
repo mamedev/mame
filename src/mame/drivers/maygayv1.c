@@ -280,7 +280,7 @@ static VIDEO_START( maygayv1 )
 }
 
 
-static VIDEO_UPDATE( maygayv1 )
+static SCREEN_UPDATE( maygayv1 )
 {
 	maygayv1_state *state = screen->machine->driver_data<maygayv1_state>();
 	i82716_t &i82716 = state->i82716;
@@ -411,7 +411,7 @@ static VIDEO_UPDATE( maygayv1 )
 	return 0;
 }
 
-static VIDEO_EOF( maygayv1 )
+static SCREEN_EOF( maygayv1 )
 {
 	maygayv1_state *state = machine->driver_data<maygayv1_state>();
 	i82716_t &i82716 = state->i82716;
@@ -1047,14 +1047,14 @@ static MACHINE_CONFIG_START( maygayv1, maygayv1_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 300 - 1)
+	MCFG_SCREEN_UPDATE(maygayv1)
+	MCFG_SCREEN_EOF(maygayv1)
 
 	MCFG_PALETTE_LENGTH(16)
 
 	MCFG_DUART68681_ADD("duart68681", DUART_CLOCK, maygayv1_duart68681_config)
 
 	MCFG_VIDEO_START(maygayv1)
-	MCFG_VIDEO_UPDATE(maygayv1)
-	MCFG_VIDEO_EOF(maygayv1)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

@@ -73,7 +73,7 @@ VIDEO_START( bottom9 )
 
 ***************************************************************************/
 
-VIDEO_UPDATE( bottom9 )
+SCREEN_UPDATE( bottom9 )
 {
 	bottom9_state *state = screen->machine->driver_data<bottom9_state>();
 

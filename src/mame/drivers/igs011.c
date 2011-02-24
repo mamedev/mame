@@ -142,7 +142,7 @@ static VIDEO_START( igs011 )
 	state->lhb2_pen_hi = 0;
 }
 
-static VIDEO_UPDATE( igs011 )
+static SCREEN_UPDATE( igs011 )
 {
 	igs011_state *state = screen->machine->driver_data<igs011_state>();
 #ifdef MAME_DEBUG
@@ -2338,7 +2338,7 @@ static READ16_HANDLER( vbowl_unk_r )
 	return 0xffff;
 }
 
-static VIDEO_EOF( vbowl )
+static SCREEN_EOF( vbowl )
 {
 	igs011_state *state = machine->driver_data<igs011_state>();
 	state->vbowl_trackball[0] = state->vbowl_trackball[1];
@@ -3527,12 +3527,12 @@ static MACHINE_CONFIG_START( igs011_base, igs011_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
+	MCFG_SCREEN_UPDATE( igs011 )
 
 	MCFG_PALETTE_LENGTH(0x800)
 //  MCFG_GFXDECODE(igs011)
 
 	MCFG_VIDEO_START( igs011 )
-	MCFG_VIDEO_UPDATE( igs011 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3650,7 +3650,8 @@ static MACHINE_CONFIG_DERIVED( vbowl, igs011_base )
 	MCFG_CPU_PROGRAM_MAP(vbowl)
 	MCFG_CPU_VBLANK_INT_HACK(vbowl_interrupt,3+4)
 
-	MCFG_VIDEO_EOF(vbowl)	// trackball
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_EOF(vbowl)	// trackball
 //  MCFG_GFXDECODE(igs011_hi)
 
 	MCFG_DEVICE_REMOVE("oki")

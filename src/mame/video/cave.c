@@ -1590,7 +1590,7 @@ static void cave_tilemap_3_draw( running_machine *machine, bitmap_t *bitmap, con
 }
 
 
-VIDEO_UPDATE( cave )
+SCREEN_UPDATE( cave )
 {
 	cave_state *state = screen->machine->driver_data<cave_state>();
 	int pri, pri2;

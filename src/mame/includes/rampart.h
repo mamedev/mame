@@ -21,6 +21,6 @@ public:
 /*----------- defined in video/rampart.c -----------*/
 
 VIDEO_START( rampart );
-VIDEO_UPDATE( rampart );
+SCREEN_UPDATE( rampart );
 
 void rampart_bitmap_render(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);

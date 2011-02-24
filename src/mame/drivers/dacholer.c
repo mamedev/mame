@@ -362,7 +362,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-static VIDEO_UPDATE(dacholer)
+static SCREEN_UPDATE(dacholer)
 {
 	dacholer_state *state = screen->machine->driver_data<dacholer_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
@@ -523,13 +523,13 @@ static MACHINE_CONFIG_START( dacholer, dacholer_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1-16)
+	MCFG_SCREEN_UPDATE(dacholer)
 
 	MCFG_PALETTE_LENGTH(32)
 	MCFG_PALETTE_INIT(dacholer)
 	MCFG_GFXDECODE(dacholer)
 
 	MCFG_VIDEO_START(dacholer)
-	MCFG_VIDEO_UPDATE(dacholer)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

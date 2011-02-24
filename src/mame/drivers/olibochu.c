@@ -219,7 +219,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-static VIDEO_UPDATE( olibochu )
+static SCREEN_UPDATE( olibochu )
 {
 	olibochu_state *state = screen->machine->driver_data<olibochu_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
@@ -459,13 +459,13 @@ static MACHINE_CONFIG_START( olibochu, olibochu_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_UPDATE(olibochu)
 
 	MCFG_GFXDECODE(olibochu)
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_PALETTE_INIT(olibochu)
 	MCFG_VIDEO_START(olibochu)
-	MCFG_VIDEO_UPDATE(olibochu)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

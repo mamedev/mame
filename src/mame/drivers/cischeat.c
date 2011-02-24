@@ -1602,12 +1602,12 @@ static MACHINE_CONFIG_START( bigrun, cischeat_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1,	0+16, 256-16-1)
+	MCFG_SCREEN_UPDATE(bigrun)
 
 	MCFG_GFXDECODE(bigrun)
 	MCFG_PALETTE_LENGTH(16*16 * 3 + 64*16 * 2 + 64*16)	/* scroll 0,1,2; road 0,1; sprites */
 
 	MCFG_VIDEO_START(bigrun)
-	MCFG_VIDEO_UPDATE(bigrun)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1642,12 +1642,12 @@ static MACHINE_CONFIG_DERIVED( cischeat, bigrun )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1,	0+16, 256-16-8-1)
+	MCFG_SCREEN_UPDATE(cischeat)
 
 	MCFG_GFXDECODE(cischeat)
 	MCFG_PALETTE_LENGTH(32*16 * 3 + 64*16 * 2 + 128*16)	/* scroll 0,1,2; road 0,1; sprites */
 
 	MCFG_VIDEO_START(cischeat)
-	MCFG_VIDEO_UPDATE(cischeat)
 MACHINE_CONFIG_END
 
 
@@ -1674,7 +1674,8 @@ static MACHINE_CONFIG_DERIVED( f1gpstar, bigrun )
 	MCFG_PALETTE_LENGTH(16*16 * 3 + 64*16 * 2 + 128*16)	/* scroll 0,1,2; road 0,1; sprites */
 
 	MCFG_VIDEO_START(f1gpstar)
-	MCFG_VIDEO_UPDATE(f1gpstar)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(f1gpstar)
 MACHINE_CONFIG_END
 
 
@@ -1733,12 +1734,12 @@ static MACHINE_CONFIG_START( scudhamm, cischeat_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0 +16, 256-1 -16)
+	MCFG_SCREEN_UPDATE(scudhamm)
 
 	MCFG_GFXDECODE(scudhamm)
 	MCFG_PALETTE_LENGTH(16*16+16*16+128*16)
 
 	MCFG_VIDEO_START(f1gpstar)
-	MCFG_VIDEO_UPDATE(scudhamm)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

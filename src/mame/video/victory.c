@@ -1097,7 +1097,7 @@ static TIMER_CALLBACK( bgcoll_irq_callback )
  *
  *************************************/
 
-VIDEO_UPDATE( victory )
+SCREEN_UPDATE( victory )
 {
 	int bgcollmask = (video_control & 4) ? 4 : 7;
 	int count = 0;

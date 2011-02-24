@@ -448,9 +448,9 @@ static MACHINE_CONFIG_START( cloud9, cloud9_state )
 	MCFG_SCREEN_SIZE(HTOTAL, VTOTAL)
 	MCFG_SCREEN_VBLANK_TIME(0)			/* VBLANK is handled manually */
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 231)
+	MCFG_SCREEN_UPDATE(cloud9)
 
 	MCFG_VIDEO_START(cloud9)
-	MCFG_VIDEO_UPDATE(cloud9)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

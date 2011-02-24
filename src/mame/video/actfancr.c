@@ -150,7 +150,7 @@ READ8_HANDLER( actfancr_pf2_data_r )
 
 /******************************************************************************/
 
-VIDEO_UPDATE( actfancr )
+SCREEN_UPDATE( actfancr )
 {
 	actfancr_state *state = screen->machine->driver_data<actfancr_state>();
 	UINT8 *buffered_spriteram = screen->machine->generic.buffered_spriteram.u8;
@@ -236,7 +236,7 @@ VIDEO_UPDATE( actfancr )
 	return 0;
 }
 
-VIDEO_UPDATE( triothep )
+SCREEN_UPDATE( triothep )
 {
 	actfancr_state *state = screen->machine->driver_data<actfancr_state>();
 	UINT8 *buffered_spriteram = screen->machine->generic.buffered_spriteram.u8;

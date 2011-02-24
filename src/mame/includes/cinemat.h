@@ -76,6 +76,6 @@ VIDEO_START( cinemat_16level );
 VIDEO_START( cinemat_64level );
 VIDEO_START( cinemat_color );
 VIDEO_START( cinemat_qb3color );
-VIDEO_UPDATE( cinemat );
+SCREEN_UPDATE( cinemat );
 
-VIDEO_UPDATE( spacewar );
+SCREEN_UPDATE( spacewar );

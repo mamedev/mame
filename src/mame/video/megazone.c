@@ -111,7 +111,7 @@ VIDEO_START( megazone )
 }
 
 
-VIDEO_UPDATE( megazone )
+SCREEN_UPDATE( megazone )
 {
 	megazone_state *state = screen->machine->driver_data<megazone_state>();
 	int offs;

@@ -370,10 +370,11 @@ static MACHINE_CONFIG_START( sothello, driver_device )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(512 + 32, (212 + 28) * 2)
     MCFG_SCREEN_VISIBLE_AREA(0, 512 + 32 - 1, 0, (212 + 28) * 2 - 1)
+    MCFG_SCREEN_UPDATE(generic_bitmapped)
+
     MCFG_PALETTE_LENGTH(512)
     MCFG_PALETTE_INIT( v9938 )
     MCFG_VIDEO_START(sothello)
-    MCFG_VIDEO_UPDATE(generic_bitmapped)
 
     /* sound hardware */
     MCFG_SPEAKER_STANDARD_MONO("mono")

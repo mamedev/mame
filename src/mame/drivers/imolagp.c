@@ -195,7 +195,7 @@ static VIDEO_START( imolagp )
 }
 
 
-static VIDEO_UPDATE( imolagp )
+static SCREEN_UPDATE( imolagp )
 {
 	imolagp_state *state = screen->machine->driver_data<imolagp_state>();
 	int scroll2 = state->scroll ^ 0x03;
@@ -570,10 +570,10 @@ static MACHINE_CONFIG_START( imolagp, imolagp_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256,256)
 	MCFG_SCREEN_VISIBLE_AREA(0+64-16,255,0+16,255)
+	MCFG_SCREEN_UPDATE(imolagp)
 
 	MCFG_PALETTE_LENGTH(0x20)
 	MCFG_VIDEO_START(imolagp)
-	MCFG_VIDEO_UPDATE(imolagp)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

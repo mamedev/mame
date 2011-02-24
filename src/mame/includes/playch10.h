@@ -65,4 +65,4 @@ WRITE8_HANDLER( playch10_videoram_w );
 PALETTE_INIT( playch10 );
 VIDEO_START( playch10 );
 VIDEO_START( playch10_hboard );
-VIDEO_UPDATE( playch10 );
+SCREEN_UPDATE( playch10 );

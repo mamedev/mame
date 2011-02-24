@@ -264,7 +264,7 @@ static void draw_bitmap( running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-VIDEO_UPDATE( chaknpop )
+SCREEN_UPDATE( chaknpop )
 {
 	chaknpop_state *state = screen->machine->driver_data<chaknpop_state>();
 

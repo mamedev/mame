@@ -9,5 +9,5 @@ WRITE16_HANDLER( taotaido_sprite_character_bank_select_w );
 WRITE16_HANDLER( taotaido_tileregs_w );
 WRITE16_HANDLER( taotaido_bgvideoram_w );
 VIDEO_START( taotaido );
-VIDEO_UPDATE( taotaido );
-VIDEO_EOF( taotaido );
+SCREEN_UPDATE( taotaido );
+SCREEN_EOF( taotaido );

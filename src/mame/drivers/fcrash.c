@@ -216,7 +216,7 @@ static void fcrash_build_palette( running_machine *machine )
 	}
 }
 
-static VIDEO_UPDATE( fcrash )
+static SCREEN_UPDATE( fcrash )
 {
 	cps_state *state = screen->machine->driver_data<cps_state>();
 	int layercontrol, l0, l1, l2, l3;
@@ -297,7 +297,7 @@ static VIDEO_UPDATE( fcrash )
 }
 
 // doesn't have the scroll offsets like fcrash
-static VIDEO_UPDATE( kodb )
+static SCREEN_UPDATE( kodb )
 {
 	cps_state *state = screen->machine->driver_data<cps_state>();
 	int layercontrol, l0, l1, l2, l3;
@@ -745,13 +745,13 @@ static MACHINE_CONFIG_START( fcrash, cps_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_UPDATE(fcrash)
+	MCFG_SCREEN_EOF(cps1)
 
 	MCFG_GFXDECODE(cps1)
 	MCFG_PALETTE_LENGTH(4096)
 
 	MCFG_VIDEO_START(cps1)
-	MCFG_VIDEO_EOF(cps1)
-	MCFG_VIDEO_UPDATE(fcrash)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -796,13 +796,13 @@ static MACHINE_CONFIG_START( kodb, cps_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_UPDATE(kodb)
+	MCFG_SCREEN_EOF(cps1)
 
 	MCFG_GFXDECODE(cps1)
 	MCFG_PALETTE_LENGTH(0xc00)
 
 	MCFG_VIDEO_START(cps1)
-	MCFG_VIDEO_EOF(cps1)
-	MCFG_VIDEO_UPDATE(kodb)
 
 	/* sound hardware */
 //  MCFG_SPEAKER_STANDARD_MONO("mono")

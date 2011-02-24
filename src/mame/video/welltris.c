@@ -240,7 +240,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 	}
 }
 
-VIDEO_UPDATE( welltris )
+SCREEN_UPDATE( welltris )
 {
 	welltris_state *state = screen->machine->driver_data<welltris_state>();
 	tilemap_set_scrollx(state->char_tilemap, 0, state->scrollx);

@@ -350,7 +350,7 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
  *
  *************************************/
 
-VIDEO_UPDATE( exerion )
+SCREEN_UPDATE( exerion )
 {
 	exerion_state *state = screen->machine->driver_data<exerion_state>();
 	int sx, sy, offs, i;

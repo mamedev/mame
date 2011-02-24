@@ -323,7 +323,7 @@ static void hedpanic_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 ***************************************************************************/
 
-VIDEO_UPDATE( esd16 )
+SCREEN_UPDATE( esd16 )
 {
 	esd16_state *state = screen->machine->driver_data<esd16_state>();
 	int layers_ctrl = -1;
@@ -357,7 +357,7 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 }
 
 
-VIDEO_UPDATE( hedpanic )
+SCREEN_UPDATE( hedpanic )
 {
 	esd16_state *state = screen->machine->driver_data<esd16_state>();
 	int layers_ctrl = -1;
@@ -420,7 +420,7 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 }
 
 // uses older style sprites
-VIDEO_UPDATE( hedpanio )
+SCREEN_UPDATE( hedpanio )
 {
 	esd16_state *state = screen->machine->driver_data<esd16_state>();
 	int layers_ctrl = -1;

@@ -155,7 +155,7 @@ WRITE8_HANDLER( fastlane_vram2_w )
 
 ***************************************************************************/
 
-VIDEO_UPDATE( fastlane )
+SCREEN_UPDATE( fastlane )
 {
 	fastlane_state *state = screen->machine->driver_data<fastlane_state>();
 	rectangle finalclip0 = state->clip0, finalclip1 = state->clip1;

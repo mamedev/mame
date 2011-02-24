@@ -30,7 +30,7 @@ public:
 };
 
 
-static VIDEO_UPDATE( mosaicf2 )
+static SCREEN_UPDATE( mosaicf2 )
 {
 	mosaicf2_state *state = screen->machine->driver_data<mosaicf2_state>();
 	offs_t offs;
@@ -146,11 +146,10 @@ static MACHINE_CONFIG_START( mosaicf2, mosaicf2_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 223)
+	MCFG_SCREEN_UPDATE(mosaicf2)
 
 	MCFG_PALETTE_INIT(RRRRR_GGGGG_BBBBB)
 	MCFG_PALETTE_LENGTH(32768)
-
-	MCFG_VIDEO_UPDATE(mosaicf2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

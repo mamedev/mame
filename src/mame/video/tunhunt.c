@@ -376,7 +376,7 @@ static void draw_shell(running_machine *machine,
 			255-hposition-16,vstart-32,0 );
 }
 
-VIDEO_UPDATE( tunhunt )
+SCREEN_UPDATE( tunhunt )
 {
 	tunhunt_state *state = screen->machine->driver_data<tunhunt_state>();
 	set_pens(screen->machine);

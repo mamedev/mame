@@ -500,7 +500,7 @@ static void state_save_register(running_machine *machine)
  *
  *************************************/
 
-VIDEO_UPDATE( galaxian )
+SCREEN_UPDATE( galaxian )
 {
 	/* draw the background layer (including stars) */
 	(*galaxian_draw_background_ptr)(screen->machine, bitmap, cliprect);

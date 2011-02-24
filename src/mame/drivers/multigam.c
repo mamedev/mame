@@ -1056,7 +1056,7 @@ static VIDEO_START( multigam )
 {
 }
 
-static VIDEO_UPDATE( multigam )
+static SCREEN_UPDATE( multigam )
 {
 	/* render the ppu */
 	ppu2c0x_render(screen->machine->device("ppu"), bitmap, 0, 0, 0, 0);
@@ -1147,13 +1147,13 @@ static MACHINE_CONFIG_START( multigam, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(multigam)
 
 	MCFG_GFXDECODE(multigam)
 	MCFG_PALETTE_LENGTH(8*4*16)
 
 	MCFG_PALETTE_INIT(multigam)
 	MCFG_VIDEO_START(multigam)
-	MCFG_VIDEO_UPDATE(multigam)
 
 	MCFG_PPU2C04_ADD("ppu", ppu_interface)
 

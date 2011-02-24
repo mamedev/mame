@@ -37,4 +37,4 @@ extern WRITE8_HANDLER( c1942_palette_bank_w );
 
 extern PALETTE_INIT( 1942 );
 extern VIDEO_START( 1942 );
-extern VIDEO_UPDATE( 1942 );
+extern SCREEN_UPDATE( 1942 );

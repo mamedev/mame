@@ -281,7 +281,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 ***************************************************************************/
 
 
-VIDEO_UPDATE( skyfox )
+SCREEN_UPDATE( skyfox )
 {
 	bitmap_fill(bitmap, cliprect, 255);	// the bg is black
 	draw_background(screen->machine, bitmap, cliprect);

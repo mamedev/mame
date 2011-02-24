@@ -5,5 +5,5 @@ extern UINT8 *wiping_colorram;
 
 WRITE8_HANDLER( wiping_flipscreen_w );
 PALETTE_INIT( wiping );
-VIDEO_UPDATE( wiping );
+SCREEN_UPDATE( wiping );
 

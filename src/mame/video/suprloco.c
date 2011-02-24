@@ -268,7 +268,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-VIDEO_UPDATE( suprloco )
+SCREEN_UPDATE( suprloco )
 {
 	suprloco_state *state = screen->machine->driver_data<suprloco_state>();
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);

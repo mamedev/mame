@@ -565,7 +565,7 @@ static VIDEO_START(wheelfir)
 	state->tmp_bitmap[1] = auto_bitmap_alloc(machine, 512, 512, BITMAP_FORMAT_INDEXED16);
 }
 
-static VIDEO_UPDATE(wheelfir)
+static SCREEN_UPDATE(wheelfir)
 {
 	wheelfir_state *state = screen->machine->driver_data<wheelfir_state>();
 
@@ -596,7 +596,7 @@ static VIDEO_UPDATE(wheelfir)
 	return 0;
 }
 
-static VIDEO_EOF( wheelfir )
+static SCREEN_EOF( wheelfir )
 {
 	wheelfir_state *state = machine->driver_data<wheelfir_state>();
 	bitmap_fill(state->tmp_bitmap[LAYER_FG], &machine->primary_screen->visible_area(),0);
@@ -821,11 +821,11 @@ static MACHINE_CONFIG_START( wheelfir, wheelfir_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-
-
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(336, NUM_SCANLINES+NUM_VBLANK_LINES)
 	MCFG_SCREEN_VISIBLE_AREA(0,335, 0, NUM_SCANLINES-1)
+	MCFG_SCREEN_UPDATE(wheelfir)
+	MCFG_SCREEN_EOF(wheelfir)
 
 	MCFG_PALETTE_LENGTH(NUM_COLORS)
 
@@ -834,8 +834,6 @@ static MACHINE_CONFIG_START( wheelfir, wheelfir_state )
 	MCFG_MACHINE_START(wheelfir)
 
 	MCFG_VIDEO_START(wheelfir)
-	MCFG_VIDEO_UPDATE(wheelfir)
-	MCFG_VIDEO_EOF(wheelfir)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

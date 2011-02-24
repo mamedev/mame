@@ -1162,12 +1162,12 @@ VIDEO_START( nslasher )
 
 /******************************************************************************/
 
-VIDEO_EOF( captaven )
+SCREEN_EOF( captaven )
 {
 	memcpy(machine->generic.buffered_spriteram.u32,machine->generic.spriteram.u32,machine->generic.spriteram_size);
 }
 
-VIDEO_EOF( dragngun )
+SCREEN_EOF( dragngun )
 {
 	deco32_state *state = machine->driver_data<deco32_state>();
 	state->raster_display_position=0;
@@ -1280,7 +1280,7 @@ static void combined_tilemap_draw(running_machine* machine, bitmap_t *bitmap, co
 
 /******************************************************************************/
 
-VIDEO_UPDATE( captaven )
+SCREEN_UPDATE( captaven )
 {
 	deco32_state *state = screen->machine->driver_data<deco32_state>();
 	int pf1_enable,pf2_enable,pf3_enable;
@@ -1340,7 +1340,7 @@ VIDEO_UPDATE( captaven )
 	return 0;
 }
 
-VIDEO_UPDATE( dragngun )
+SCREEN_UPDATE( dragngun )
 {
 	deco32_state *state = screen->machine->driver_data<deco32_state>();
 	/* Tilemap graphics banking */
@@ -1426,7 +1426,7 @@ VIDEO_UPDATE( dragngun )
 	return 0;
 }
 
-VIDEO_UPDATE( fghthist )
+SCREEN_UPDATE( fghthist )
 {
 	deco32_state *state = screen->machine->driver_data<deco32_state>();
 	/* Dirty tilemaps if any globals change */
@@ -1620,7 +1620,7 @@ static void mixDualAlphaSprites(bitmap_t *bitmap, const rectangle *cliprect, con
 	}
 }
 
-VIDEO_UPDATE( nslasher )
+SCREEN_UPDATE( nslasher )
 {
 	deco32_state *state = screen->machine->driver_data<deco32_state>();
 	int alphaTilemap=0;

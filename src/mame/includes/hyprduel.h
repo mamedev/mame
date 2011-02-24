@@ -62,4 +62,4 @@ WRITE16_HANDLER( hyprduel_scrollreg_init_w );
 
 VIDEO_START( hyprduel_14220 );
 VIDEO_START( magerror_14220 );
-VIDEO_UPDATE( hyprduel );
+SCREEN_UPDATE( hyprduel );

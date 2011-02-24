@@ -18,4 +18,4 @@ WRITE8_HANDLER( tunhunt_videoram_w );
 
 PALETTE_INIT( tunhunt );
 VIDEO_START( tunhunt );
-VIDEO_UPDATE( tunhunt );
+SCREEN_UPDATE( tunhunt );

@@ -42,4 +42,4 @@ WRITE16_HANDLER(dbz_bg1_videoram_w);
 WRITE16_HANDLER(dbz_bg2_videoram_w);
 
 VIDEO_START(dbz);
-VIDEO_UPDATE(dbz);
+SCREEN_UPDATE(dbz);

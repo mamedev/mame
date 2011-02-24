@@ -643,7 +643,7 @@ static void wgp_piv_layer_draw( running_machine *machine, bitmap_t *bitmap, cons
                         SCREEN REFRESH
 **************************************************************/
 
-VIDEO_UPDATE( wgp )
+SCREEN_UPDATE( wgp )
 {
 	wgp_state *state = screen->machine->driver_data<wgp_state>();
 	int i;

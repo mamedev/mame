@@ -138,7 +138,7 @@ VIDEO_START( scotrsht )
 	tilemap_set_scroll_cols(state->bg_tilemap, 64);
 }
 
-VIDEO_UPDATE( scotrsht )
+SCREEN_UPDATE( scotrsht )
 {
 	scotrsht_state *state = screen->machine->driver_data<scotrsht_state>();
 	int col;

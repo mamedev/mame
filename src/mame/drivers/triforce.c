@@ -410,7 +410,7 @@ static VIDEO_START(triforce)
 
 }
 
-static VIDEO_UPDATE(triforce)
+static SCREEN_UPDATE(triforce)
 {
 	return 0;
 }
@@ -432,11 +432,11 @@ static MACHINE_CONFIG_START( triforce_base, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
+	MCFG_SCREEN_UPDATE(triforce)
 
 	MCFG_PALETTE_LENGTH(65536)
 
 	MCFG_VIDEO_START(triforce)
-	MCFG_VIDEO_UPDATE(triforce)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( triforcegd, triforce_base )

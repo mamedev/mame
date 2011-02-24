@@ -71,7 +71,7 @@ VIDEO_START( xmen6p )
 
 ***************************************************************************/
 
-VIDEO_UPDATE( xmen )
+SCREEN_UPDATE( xmen )
 {
 	xmen_state *state = screen->machine->driver_data<xmen_state>();
 	int layer[3], bg_colorbase;
@@ -107,7 +107,7 @@ VIDEO_UPDATE( xmen )
 }
 
 
-VIDEO_UPDATE( xmen6p )
+SCREEN_UPDATE( xmen6p )
 {
 	xmen_state *state = screen->machine->driver_data<xmen_state>();
 	int x, y;
@@ -135,7 +135,7 @@ VIDEO_UPDATE( xmen6p )
 }
 
 /* my lefts and rights are mixed up in several places.. */
-VIDEO_EOF( xmen6p )
+SCREEN_EOF( xmen6p )
 {
 	xmen_state *state = machine->driver_data<xmen_state>();
 	int layer[3], bg_colorbase;

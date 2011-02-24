@@ -519,7 +519,7 @@ VIDEO_START( decocass )
 	gfx_element_decode(machine->gfx[2], 16);
 }
 
-VIDEO_UPDATE( decocass )
+SCREEN_UPDATE( decocass )
 {
 	decocass_state *state = screen->machine->driver_data<decocass_state>();
 	int scrollx, scrolly_l, scrolly_r;

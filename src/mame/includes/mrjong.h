@@ -27,4 +27,4 @@ WRITE8_HANDLER( mrjong_flipscreen_w );
 
 PALETTE_INIT( mrjong );
 VIDEO_START( mrjong );
-VIDEO_UPDATE( mrjong );
+SCREEN_UPDATE( mrjong );

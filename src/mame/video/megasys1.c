@@ -937,7 +937,7 @@ PALETTE_INIT( megasys1 )
 ***************************************************************************/
 
 
-VIDEO_UPDATE( megasys1 )
+SCREEN_UPDATE( megasys1 )
 {
 	int i,flag,pri,primask;
 	int active_layers;
@@ -1032,7 +1032,7 @@ VIDEO_UPDATE( megasys1 )
 	return 0;
 }
 
-VIDEO_EOF( megasys1 )
+SCREEN_EOF( megasys1 )
 {
 	/* Sprite are TWO frames ahead, like NMK16 HW. */
 //megasys1_objectram

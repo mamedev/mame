@@ -49,7 +49,7 @@ VIDEO_START( lasso );
 VIDEO_START( wwjgtin );
 VIDEO_START( pinbo );
 
-VIDEO_UPDATE( lasso );
-VIDEO_UPDATE( chameleo );
-VIDEO_UPDATE( wwjgtin );
-VIDEO_UPDATE( pinbo );
+SCREEN_UPDATE( lasso );
+SCREEN_UPDATE( chameleo );
+SCREEN_UPDATE( wwjgtin );
+SCREEN_UPDATE( pinbo );

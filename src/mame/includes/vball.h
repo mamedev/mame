@@ -10,7 +10,7 @@ extern int vball_gfxset;
 extern int vb_scrollx[256];
 
 VIDEO_START( vb );
-VIDEO_UPDATE( vb );
+SCREEN_UPDATE( vb );
 void vb_bgprombank_w(running_machine *machine, int bank);
 void vb_spprombank_w(running_machine *machine, int bank);
 WRITE8_HANDLER( vb_attrib_w );

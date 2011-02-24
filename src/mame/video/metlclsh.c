@@ -242,7 +242,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 ***************************************************************************/
 
-VIDEO_UPDATE( metlclsh )
+SCREEN_UPDATE( metlclsh )
 {
 	metlclsh_state *state = screen->machine->driver_data<metlclsh_state>();
 

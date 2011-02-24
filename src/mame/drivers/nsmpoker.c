@@ -110,7 +110,7 @@ static VIDEO_START( nsmpoker )
 }
 
 
-static VIDEO_UPDATE( nsmpoker )
+static SCREEN_UPDATE( nsmpoker )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	return 0;
@@ -389,6 +389,7 @@ static MACHINE_CONFIG_START( nsmpoker, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(nsmpoker)
 
 	MCFG_GFXDECODE(nsmpoker)
 
@@ -396,7 +397,6 @@ static MACHINE_CONFIG_START( nsmpoker, driver_device )
 	MCFG_PALETTE_LENGTH(8)
 
 	MCFG_VIDEO_START(nsmpoker)
-	MCFG_VIDEO_UPDATE(nsmpoker)
 
 MACHINE_CONFIG_END
 

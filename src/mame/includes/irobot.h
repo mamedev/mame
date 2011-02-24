@@ -84,7 +84,7 @@ WRITE8_HANDLER( irobot_sharedmem_w );
 
 PALETTE_INIT( irobot );
 VIDEO_START( irobot );
-VIDEO_UPDATE( irobot );
+SCREEN_UPDATE( irobot );
 
 WRITE8_HANDLER( irobot_paletteram_w );
 

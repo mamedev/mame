@@ -346,7 +346,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-VIDEO_UPDATE( sidearms )
+SCREEN_UPDATE( sidearms )
 {
 	sidearms_state *state = screen->machine->driver_data<sidearms_state>();
 
@@ -366,7 +366,7 @@ VIDEO_UPDATE( sidearms )
 	return 0;
 }
 
-VIDEO_EOF( sidearms )
+SCREEN_EOF( sidearms )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 

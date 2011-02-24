@@ -206,7 +206,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 }
 
 
-VIDEO_UPDATE( cop01 )
+SCREEN_UPDATE( cop01 )
 {
 	cop01_state *state = screen->machine->driver_data<cop01_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->vreg[1] + 256 * (state->vreg[2] & 1));

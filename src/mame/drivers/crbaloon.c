@@ -370,7 +370,6 @@ static MACHINE_CONFIG_START( crbaloon, crbaloon_state )
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_VIDEO_START(crbaloon)
-	MCFG_VIDEO_UPDATE(crbaloon)
 
 	MCFG_GFXDECODE(crbaloon)
 	MCFG_PALETTE_LENGTH(32)
@@ -382,6 +381,7 @@ static MACHINE_CONFIG_START( crbaloon, crbaloon_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_UPDATE(crbaloon)
 
 	/* audio hardware */
 	MCFG_FRAGMENT_ADD(crbaloon_audio)

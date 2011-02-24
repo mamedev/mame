@@ -18,7 +18,7 @@ static VIDEO_START(buster)
 
 }
 
-static VIDEO_UPDATE(buster)
+static SCREEN_UPDATE(buster)
 {
 	const gfx_element *gfx = screen->machine->gfx[0];
 	int count = 0x0000;
@@ -82,12 +82,12 @@ static MACHINE_CONFIG_START( buster, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
+	MCFG_SCREEN_UPDATE(buster)
 
 	MCFG_GFXDECODE(buster)
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(buster)
-	MCFG_VIDEO_UPDATE(buster)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

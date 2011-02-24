@@ -139,7 +139,7 @@ VIDEO_START(drgnmst)
 	tilemap_set_scroll_rows(state->md_tilemap, 1024);
 }
 
-VIDEO_UPDATE(drgnmst)
+SCREEN_UPDATE(drgnmst)
 {
 	drgnmst_state *state = screen->machine->driver_data<drgnmst_state>();
 	int y, rowscroll_bank;

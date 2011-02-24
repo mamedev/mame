@@ -79,7 +79,7 @@ static pen_t ttmajng_make_pen(UINT8 color)
  *  a black output.
  */
 
-VIDEO_UPDATE( route16 )
+SCREEN_UPDATE( route16 )
 {
 	offs_t offs;
 
@@ -184,13 +184,13 @@ static int video_update_stratvox_ttmahjng(running_machine *machine, bitmap_t *bi
 }
 
 
-VIDEO_UPDATE( stratvox )
+SCREEN_UPDATE( stratvox )
 {
 	return video_update_stratvox_ttmahjng(screen->machine, bitmap, cliprect, route16_make_pen);
 }
 
 
-VIDEO_UPDATE( ttmahjng )
+SCREEN_UPDATE( ttmahjng )
 {
 	return video_update_stratvox_ttmahjng(screen->machine, bitmap, cliprect, ttmajng_make_pen);
 }

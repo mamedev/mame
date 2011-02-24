@@ -77,7 +77,7 @@ VIDEO_START( arcadecl )
  *
  *************************************/
 
-VIDEO_UPDATE( arcadecl )
+SCREEN_UPDATE( arcadecl )
 {
 	rampart_state *state = screen->machine->driver_data<rampart_state>();
 

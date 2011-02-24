@@ -92,7 +92,7 @@ struct _s3c2400_interface
 DEVICE_GET_INFO( s3c2400 );
 
 VIDEO_START( s3c2400 );
-VIDEO_UPDATE( s3c2400 );
+SCREEN_UPDATE( s3c2400 );
 
 void s3c2400_uart_fifo_w( device_t *device, int uart, UINT8 data);
 

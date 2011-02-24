@@ -121,7 +121,7 @@ VIDEO_START( thunderj )
  *
  *************************************/
 
-VIDEO_UPDATE( thunderj )
+SCREEN_UPDATE( thunderj )
 {
 	thunderj_state *state = screen->machine->driver_data<thunderj_state>();
 	bitmap_t *priority_bitmap = screen->machine->priority_bitmap;

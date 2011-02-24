@@ -42,4 +42,4 @@ WRITE8_HANDLER( circusc_colorram_w );
 VIDEO_START( circusc );
 WRITE8_HANDLER( circusc_flipscreen_w );
 PALETTE_INIT( circusc );
-VIDEO_UPDATE( circusc );
+SCREEN_UPDATE( circusc );

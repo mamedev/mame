@@ -475,7 +475,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
  *
  *************************************/
 
-VIDEO_UPDATE( zaxxon )
+SCREEN_UPDATE( zaxxon )
 {
 	zaxxon_state *state = screen->machine->driver_data<zaxxon_state>();
 
@@ -486,7 +486,7 @@ VIDEO_UPDATE( zaxxon )
 }
 
 
-VIDEO_UPDATE( futspy )
+SCREEN_UPDATE( futspy )
 {
 	zaxxon_state *state = screen->machine->driver_data<zaxxon_state>();
 
@@ -497,7 +497,7 @@ VIDEO_UPDATE( futspy )
 }
 
 
-VIDEO_UPDATE( razmataz )
+SCREEN_UPDATE( razmataz )
 {
 	zaxxon_state *state = screen->machine->driver_data<zaxxon_state>();
 
@@ -508,7 +508,7 @@ VIDEO_UPDATE( razmataz )
 }
 
 
-VIDEO_UPDATE( congo )
+SCREEN_UPDATE( congo )
 {
 	zaxxon_state *state = screen->machine->driver_data<zaxxon_state>();
 

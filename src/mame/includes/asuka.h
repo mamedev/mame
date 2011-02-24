@@ -51,5 +51,5 @@ WRITE16_HANDLER( bonzeadv_cchip_ram_w );
 
 WRITE16_HANDLER( asuka_spritectrl_w );
 
-VIDEO_UPDATE( asuka );
-VIDEO_UPDATE( bonzeadv );
+SCREEN_UPDATE( asuka );
+SCREEN_UPDATE( bonzeadv );

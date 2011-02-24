@@ -36,7 +36,7 @@ public:
 };
 
 
-static VIDEO_UPDATE( destroyr )
+static SCREEN_UPDATE( destroyr )
 {
 	destroyr_state *state = screen->machine->driver_data<destroyr_state>();
 	int i, j;
@@ -451,11 +451,11 @@ static MACHINE_CONFIG_START( destroyr, destroyr_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
+	MCFG_SCREEN_UPDATE(destroyr)
 
 	MCFG_GFXDECODE(destroyr)
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(destroyr)
-	MCFG_VIDEO_UPDATE(destroyr)
 
 	/* sound hardware */
 MACHINE_CONFIG_END

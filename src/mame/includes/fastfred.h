@@ -41,9 +41,9 @@ WRITE8_HANDLER( fastfred_colorbank1_w );
 WRITE8_HANDLER( fastfred_colorbank2_w );
 WRITE8_HANDLER( fastfred_flip_screen_x_w );
 WRITE8_HANDLER( fastfred_flip_screen_y_w );
-VIDEO_UPDATE( fastfred );
+SCREEN_UPDATE( fastfred );
 
 VIDEO_START( imago );
-VIDEO_UPDATE( imago );
+SCREEN_UPDATE( imago );
 WRITE8_HANDLER( imago_fg_videoram_w );
 WRITE8_HANDLER( imago_charbank_w );

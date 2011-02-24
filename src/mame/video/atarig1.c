@@ -151,7 +151,7 @@ void atarig1_scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-VIDEO_UPDATE( atarig1 )
+SCREEN_UPDATE( atarig1 )
 {
 	atarig1_state *state = screen->machine->driver_data<atarig1_state>();
 
@@ -166,7 +166,7 @@ VIDEO_UPDATE( atarig1 )
 	return 0;
 }
 
-VIDEO_EOF( atarig1 )
+SCREEN_EOF( atarig1 )
 {
 	atarig1_state *state = machine->driver_data<atarig1_state>();
 

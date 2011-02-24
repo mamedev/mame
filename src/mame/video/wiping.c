@@ -90,7 +90,7 @@ WRITE8_HANDLER( wiping_flipscreen_w )
 }
 
 
-VIDEO_UPDATE( wiping )
+SCREEN_UPDATE( wiping )
 {
 	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
 	int offs;

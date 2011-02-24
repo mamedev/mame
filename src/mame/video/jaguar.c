@@ -926,7 +926,7 @@ VIDEO_START( cojag )
  *
  *************************************/
 
-VIDEO_UPDATE( cojag )
+SCREEN_UPDATE( cojag )
 {
 	/* if not enabled, just blank */
 	if (!(gpu_regs[VMODE] & 1))

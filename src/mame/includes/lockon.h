@@ -80,8 +80,8 @@ public:
 
 PALETTE_INIT( lockon );
 VIDEO_START( lockon );
-VIDEO_UPDATE( lockon );
-VIDEO_EOF( lockon );
+SCREEN_UPDATE( lockon );
+SCREEN_EOF( lockon );
 READ16_HANDLER( lockon_crtc_r );
 WRITE16_HANDLER( lockon_crtc_w );
 WRITE16_HANDLER( lockon_rotate_w );

@@ -265,7 +265,7 @@ WRITE8_HANDLER( ccastles_bitmode_addr_w )
  *
  *************************************/
 
-VIDEO_UPDATE( ccastles )
+SCREEN_UPDATE( ccastles )
 {
 	ccastles_state *state = screen->machine->driver_data<ccastles_state>();
 	UINT8 *spriteaddr = &state->spriteram[state->video_control[7] * 0x100];	/* BUF1/BUF2 */

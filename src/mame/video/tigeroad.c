@@ -160,7 +160,7 @@ VIDEO_START( tigeroad )
 	tilemap_set_transparent_pen(state->fg_tilemap, 3);
 }
 
-VIDEO_UPDATE( tigeroad )
+SCREEN_UPDATE( tigeroad )
 {
 	tigeroad_state *state = screen->machine->driver_data<tigeroad_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
@@ -171,7 +171,7 @@ VIDEO_UPDATE( tigeroad )
 	return 0;
 }
 
-VIDEO_EOF( tigeroad )
+SCREEN_EOF( tigeroad )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 

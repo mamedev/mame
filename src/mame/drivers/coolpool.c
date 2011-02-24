@@ -885,11 +885,10 @@ static MACHINE_CONFIG_START( amerdart, coolpool_state )
 	MCFG_TIMER_ADD("nvram_timer", nvram_write_timeout)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(tms340x0)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz/6, 212*2, 0, 161*2, 262, 0, 241)
+	MCFG_SCREEN_UPDATE(tms340x0)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -918,11 +917,10 @@ static MACHINE_CONFIG_START( coolpool, coolpool_state )
 	/* video hardware */
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
 
-	MCFG_VIDEO_UPDATE(tms340x0)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz/6, 424, 0, 320, 262, 0, 240)
+	MCFG_SCREEN_UPDATE(tms340x0)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

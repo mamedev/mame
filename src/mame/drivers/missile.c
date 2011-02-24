@@ -664,7 +664,7 @@ static UINT8 read_vram(address_space *space, offs_t address)
  *
  *************************************/
 
-static VIDEO_UPDATE( missile )
+static SCREEN_UPDATE( missile )
 {
 	missile_state *state = screen->machine->driver_data<missile_state>();
 	UINT8 *videoram = state->videoram;
@@ -1040,8 +1040,7 @@ static MACHINE_CONFIG_START( missile, missile_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-
-	MCFG_VIDEO_UPDATE(missile)
+	MCFG_SCREEN_UPDATE(missile)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

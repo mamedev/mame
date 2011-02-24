@@ -62,7 +62,7 @@ VIDEO_START( spy )
 
 ***************************************************************************/
 
-VIDEO_UPDATE( spy )
+SCREEN_UPDATE( spy )
 {
 	spy_state *state = screen->machine->driver_data<spy_state>();
 

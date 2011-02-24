@@ -116,7 +116,7 @@ static PALETTE_INIT( othello )
 	palette_set_color(machine, 0x0f, MAKE_RGB(0xff, 0xff, 0xff));
 }
 
-static VIDEO_UPDATE( othello )
+static SCREEN_UPDATE( othello )
 {
 	othello_state *state = screen->machine->driver_data<othello_state>();
 
@@ -435,11 +435,10 @@ static MACHINE_CONFIG_START( othello, othello_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*6, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*6-1, 0*8, 64*8-1)
+	MCFG_SCREEN_UPDATE(othello)
 
 	MCFG_PALETTE_LENGTH(0x10)
 	MCFG_PALETTE_INIT(othello)
-
-	MCFG_VIDEO_UPDATE(othello)
 
 	MCFG_MC6845_ADD("crtc", H46505, 1000000 /* ? MHz */, h46505_intf)	/* H46505 @ CPU clock */
 

@@ -200,7 +200,7 @@ static void mcatadv_draw_tilemap_part( UINT16* current_scroll, UINT16* current_v
 	}
 }
 
-VIDEO_UPDATE( mcatadv )
+SCREEN_UPDATE( mcatadv )
 {
 	mcatadv_state *state = screen->machine->driver_data<mcatadv_state>();
 	int i;
@@ -269,7 +269,7 @@ VIDEO_START( mcatadv )
 	state->save_pointer(NAME(state->vidregs_old), (0x0f + 1) / 2);
 }
 
-VIDEO_EOF( mcatadv )
+SCREEN_EOF( mcatadv )
 {
 	mcatadv_state *state = machine->driver_data<mcatadv_state>();
 	memcpy(state->spriteram_old, state->spriteram, state->spriteram_size);

@@ -137,7 +137,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-VIDEO_UPDATE( seicross )
+SCREEN_UPDATE( seicross )
 {
 	seicross_state *state = screen->machine->driver_data<seicross_state>();
 	int col;

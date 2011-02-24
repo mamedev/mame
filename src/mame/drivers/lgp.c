@@ -82,7 +82,7 @@ static emu_timer *irq_timer;
 
 
 /* VIDEO GOODS */
-static VIDEO_UPDATE( lgp )
+static SCREEN_UPDATE( lgp )
 {
 	int charx, chary;
 

@@ -187,7 +187,7 @@ static VIDEO_START( photon )
 {
 }
 
-static VIDEO_UPDATE( photon )
+static SCREEN_UPDATE( photon )
 {
 	return pk8000_video_update(screen, bitmap, cliprect, screen->machine->region("maincpu")->base());
 }
@@ -209,11 +209,11 @@ static MACHINE_CONFIG_START( photon, driver_device )
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(256+32, 192+32)
     MCFG_SCREEN_VISIBLE_AREA(0, 256+32-1, 0, 192+32-1)
+    MCFG_SCREEN_UPDATE(photon)
     MCFG_PALETTE_LENGTH(16)
     MCFG_PALETTE_INIT(pk8000)
 
     MCFG_VIDEO_START(photon)
-    MCFG_VIDEO_UPDATE(photon)
 
     MCFG_I8255A_ADD( "ppi8255_1", pk8000_ppi8255_interface_1 )
     MCFG_I8255A_ADD( "ppi8255_2", pk8000_ppi8255_interface_2 )

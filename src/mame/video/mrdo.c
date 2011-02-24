@@ -260,7 +260,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const recta
 	}
 }
 
-VIDEO_UPDATE( mrdo )
+SCREEN_UPDATE( mrdo )
 {
 	mrdo_state *state = screen->machine->driver_data<mrdo_state>();
 

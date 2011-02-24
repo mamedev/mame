@@ -153,7 +153,7 @@ VIDEO_START( gomoku )
 
 ******************************************************************************/
 
-VIDEO_UPDATE( gomoku )
+SCREEN_UPDATE( gomoku )
 {
 	UINT8 *GOMOKU_BG_X = screen->machine->region( "user1" )->base();
 	UINT8 *GOMOKU_BG_Y = screen->machine->region( "user2" )->base();

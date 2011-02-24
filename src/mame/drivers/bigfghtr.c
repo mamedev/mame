@@ -271,7 +271,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 }
 
 
-static VIDEO_UPDATE( bigfghtr )
+static SCREEN_UPDATE( bigfghtr )
 {
 	bigfghtr_state *state = screen->machine->driver_data<bigfghtr_state>();
 	int sprite_enable = state->vreg & 0x200;
@@ -306,7 +306,7 @@ static VIDEO_UPDATE( bigfghtr )
 
 
 
-static VIDEO_EOF( bigfghtr )
+static SCREEN_EOF( bigfghtr )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	buffer_spriteram16_w(space, 0, 0, 0xffff);
@@ -702,12 +702,13 @@ static MACHINE_CONFIG_START( bigfghtr, bigfghtr_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 1*8, 31*8-1 )
+	MCFG_SCREEN_UPDATE(bigfghtr)
+	MCFG_SCREEN_EOF(bigfghtr)
+
 	MCFG_GFXDECODE(bigfghtr)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_VIDEO_EOF(bigfghtr)
 	MCFG_VIDEO_START(bigfghtr)
-	MCFG_VIDEO_UPDATE(bigfghtr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

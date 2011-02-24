@@ -22,7 +22,7 @@ extern UINT8 *victory_videoram;
 extern UINT8 *victory_charram;
 
 VIDEO_START( victory );
-VIDEO_UPDATE( victory );
+SCREEN_UPDATE( victory );
 INTERRUPT_GEN( victory_vblank_interrupt );
 
 READ8_HANDLER( victory_video_control_r );

@@ -649,7 +649,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 	}
 } /* draw_background */
 
-VIDEO_UPDATE( namcona1 )
+SCREEN_UPDATE( namcona1 )
 {
 	int which;
 	int priority;

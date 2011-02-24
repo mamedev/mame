@@ -111,9 +111,9 @@ VIDEO_START( seta_1_layer);
 VIDEO_START( seta_2_layers);
 VIDEO_START( oisipuzl_2_layers );
 
-VIDEO_UPDATE( seta );
-VIDEO_UPDATE( seta_no_layers );
-VIDEO_UPDATE( usclssic );
-VIDEO_UPDATE( inttoote );
+SCREEN_UPDATE( seta );
+SCREEN_UPDATE( seta_no_layers );
+SCREEN_UPDATE( usclssic );
+SCREEN_UPDATE( inttoote );
 
 

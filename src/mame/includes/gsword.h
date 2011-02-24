@@ -32,4 +32,4 @@ WRITE8_HANDLER( gsword_scroll_w );
 PALETTE_INIT( josvolly );
 PALETTE_INIT( gsword );
 VIDEO_START( gsword );
-VIDEO_UPDATE( gsword );
+SCREEN_UPDATE( gsword );

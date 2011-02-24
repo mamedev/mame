@@ -457,7 +457,7 @@ static void draw_sprite(bitmap_t *bitmap, int xsize,int ysize, int offset, int x
 }
 
 /* sprite format / offset could be completely wrong, this is just based on our (currently incorrect) vram access */
-static VIDEO_UPDATE(littlerb)
+static SCREEN_UPDATE(littlerb)
 {
 	int x,y,offs, code;
 	int xsize,ysize;
@@ -506,13 +506,13 @@ static MACHINE_CONFIG_START( littlerb, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 320-1, 0*8, 256-1)
+	MCFG_SCREEN_UPDATE(littlerb)
 
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_DEVICE_ADD("littlerbvdp", LITTLERBVDP, 0)
 
 //  MCFG_PALETTE_INIT(littlerb)
-	MCFG_VIDEO_UPDATE(littlerb)
 MACHINE_CONFIG_END
 
 ROM_START( littlerb )

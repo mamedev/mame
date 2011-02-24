@@ -101,7 +101,7 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 }
 
 
-VIDEO_UPDATE( galspnbl )
+SCREEN_UPDATE( galspnbl )
 {
 	galspnbl_state *state = screen->machine->driver_data<galspnbl_state>();
 	int offs;

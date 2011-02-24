@@ -108,7 +108,7 @@ static VIDEO_START( lastfght )
 }
 
 
-static VIDEO_UPDATE( lastfght )
+static SCREEN_UPDATE( lastfght )
 {
 	lastfght_state *state = screen->machine->driver_data<lastfght_state>();
 
@@ -586,9 +586,9 @@ static MACHINE_CONFIG_START( lastfght, lastfght_state )
 	MCFG_SCREEN_SIZE( 512, 256 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 512-1, 0, 256-16-1 )
 	MCFG_SCREEN_REFRESH_RATE( 60 )
+	MCFG_SCREEN_UPDATE( lastfght )
 
 	MCFG_VIDEO_START( lastfght )
-	MCFG_VIDEO_UPDATE( lastfght )
 MACHINE_CONFIG_END
 
 

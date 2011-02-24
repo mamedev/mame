@@ -144,7 +144,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 }
 
 
-VIDEO_UPDATE( timelimt )
+SCREEN_UPDATE( timelimt )
 {
 	tilemap_set_scrollx(bg_tilemap, 0, scrollx);
 	tilemap_set_scrolly(bg_tilemap, 0, scrolly);

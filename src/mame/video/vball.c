@@ -163,7 +163,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 #undef DRAW_SPRITE
 
-VIDEO_UPDATE( vb )
+SCREEN_UPDATE( vb )
 {
 	int i;
 

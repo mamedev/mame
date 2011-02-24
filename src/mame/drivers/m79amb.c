@@ -80,7 +80,7 @@ static WRITE8_HANDLER( ramtek_videoram_w )
 	state->videoram[offset] = data & ~*state->mask;
 }
 
-static VIDEO_UPDATE( ramtek )
+static SCREEN_UPDATE( ramtek )
 {
 	m79amb_state *state = screen->machine->driver_data<m79amb_state>();
 	offs_t offs;
@@ -217,8 +217,7 @@ static MACHINE_CONFIG_START( m79amb, m79amb_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
-
-	MCFG_VIDEO_UPDATE(ramtek)
+	MCFG_SCREEN_UPDATE(ramtek)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

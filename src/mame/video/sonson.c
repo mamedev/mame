@@ -175,7 +175,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( sonson )
+SCREEN_UPDATE( sonson )
 {
 	sonson_state *state = screen->machine->driver_data<sonson_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);

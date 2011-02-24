@@ -768,11 +768,11 @@ VIDEO_START( atari )
  * Refresh screen bitmap.
  * Note: Actual drawing is done scanline wise during atari_interrupt
  ************************************************************************/
-VIDEO_UPDATE( atari )
+SCREEN_UPDATE( atari )
 {
 	UINT32 new_tv_artifacts;
 
-	VIDEO_UPDATE_CALL(generic_bitmapped);
+	SCREEN_UPDATE_CALL(generic_bitmapped);
 
 	new_tv_artifacts = input_port_read_safe(screen->machine, "artifacts", 0);
 	if( tv_artifacts != new_tv_artifacts )

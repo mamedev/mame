@@ -31,7 +31,7 @@ WRITE16_HANDLER( rastan_spritectrl_w )
 
 /***************************************************************************/
 
-VIDEO_UPDATE( rastan )
+SCREEN_UPDATE( rastan )
 {
 	rastan_state *state = screen->machine->driver_data<rastan_state>();
 	int layer[2];

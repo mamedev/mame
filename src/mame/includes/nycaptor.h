@@ -72,4 +72,4 @@ WRITE8_HANDLER( nycaptor_gfxctrl_w );
 WRITE8_HANDLER( nycaptor_scrlram_w );
 
 VIDEO_START( nycaptor );
-VIDEO_UPDATE( nycaptor );
+SCREEN_UPDATE( nycaptor );

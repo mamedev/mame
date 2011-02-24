@@ -106,7 +106,7 @@ static VIDEO_START( yumefuda )
 	state->bg_tilemap = tilemap_create(machine, y_get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
-static VIDEO_UPDATE( yumefuda )
+static SCREEN_UPDATE( yumefuda )
 {
 	albazg_state *state = screen->machine->driver_data<albazg_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
@@ -417,6 +417,7 @@ static MACHINE_CONFIG_START( yumefuda, albazg_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 32*8-1)
+	MCFG_SCREEN_UPDATE( yumefuda )
 
 	MCFG_MC6845_ADD("crtc", H46505, MASTER_CLOCK/16, mc6845_intf)	/* hand tuned to get ~60 fps */
 
@@ -424,7 +425,6 @@ static MACHINE_CONFIG_START( yumefuda, albazg_state )
 	MCFG_PALETTE_LENGTH(0x80)
 
 	MCFG_VIDEO_START( yumefuda )
-	MCFG_VIDEO_UPDATE( yumefuda )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

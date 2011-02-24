@@ -147,7 +147,7 @@ static VIDEO_START(cshooter)
 	tilemap_set_transparent_pen(cshooter_txtilemap, 3);
 }
 
-static VIDEO_UPDATE(cshooter)
+static SCREEN_UPDATE(cshooter)
 {
 	bitmap_fill(bitmap, cliprect, 0/*get_black_pen(screen->screen->machine)*/);
 	tilemap_mark_all_tiles_dirty(cshooter_txtilemap);
@@ -450,12 +450,12 @@ static MACHINE_CONFIG_START( cshooter, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1-16)
+	MCFG_SCREEN_UPDATE(cshooter)
 
 	MCFG_GFXDECODE(cshooter)
 	MCFG_PALETTE_LENGTH(0x1000)
 
 	MCFG_VIDEO_START(cshooter)
-	MCFG_VIDEO_UPDATE(cshooter)
 
 	/* sound hardware */
 	/* YM2151 and ym3931 seibu custom cpu running at XTAL_14_31818MHz/4 */
@@ -478,12 +478,12 @@ static MACHINE_CONFIG_START( airraid, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1-16)
+	MCFG_SCREEN_UPDATE(cshooter)
 
 	MCFG_GFXDECODE(cshooter)
 	MCFG_PALETTE_LENGTH(0x1000)
 
 	MCFG_VIDEO_START(cshooter)
-	MCFG_VIDEO_UPDATE(cshooter)
 
 	/* sound hardware */
 	SEIBU_AIRRAID_SOUND_SYSTEM_YM2151_INTERFACE(XTAL_14_31818MHz/4)

@@ -118,7 +118,7 @@ VIDEO_START( spbactn )
 	state->tile_bitmap_fg = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 }
 
-VIDEO_UPDATE( spbactn )
+SCREEN_UPDATE( spbactn )
 {
 	spbactn_state *state = screen->machine->driver_data<spbactn_state>();
 	int offs, sx, sy;

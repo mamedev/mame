@@ -33,7 +33,7 @@ static UINT8 *colorram;
 					x<<3, y<<3,\
 					transparency?transparency:(UINT32)-1);
 
-static VIDEO_UPDATE( cardline )
+static SCREEN_UPDATE( cardline )
 {
 	int x,y;
 	bitmap_fill(bitmap,cliprect,0);
@@ -207,12 +207,11 @@ static MACHINE_CONFIG_START( cardline, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 35*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(cardline)
 
 	MCFG_GFXDECODE(cardline)
 	MCFG_PALETTE_LENGTH(512)
 	MCFG_PALETTE_INIT(cardline)
-
-	MCFG_VIDEO_UPDATE(cardline)
 
 	MCFG_DEFAULT_LAYOUT(layout_cardline)
 

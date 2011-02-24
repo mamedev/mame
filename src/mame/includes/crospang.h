@@ -30,7 +30,7 @@ public:
 /*----------- defined in video/crospang.c -----------*/
 
 VIDEO_START( crospang );
-VIDEO_UPDATE( crospang );
+SCREEN_UPDATE( crospang );
 
 WRITE16_HANDLER ( crospang_fg_scrolly_w );
 WRITE16_HANDLER ( crospang_bg_scrolly_w );

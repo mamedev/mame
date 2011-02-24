@@ -128,7 +128,7 @@ VIDEO_START(bigstrkb)
 	tilemap_set_transparent_pen(state->tilemap3,15);
 }
 
-VIDEO_UPDATE(bigstrkb)
+SCREEN_UPDATE(bigstrkb)
 {
 	bigstrkb_state *state = screen->machine->driver_data<bigstrkb_state>();
 

@@ -27,4 +27,4 @@ public:
 
 /*----------- defined in video/dietgo.c -----------*/
 
-VIDEO_UPDATE( dietgo );
+SCREEN_UPDATE( dietgo );

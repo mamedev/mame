@@ -90,7 +90,7 @@ VIDEO_START( magmax )
 
 
 
-VIDEO_UPDATE( magmax )
+SCREEN_UPDATE( magmax )
 {
 	magmax_state *state = screen->machine->driver_data<magmax_state>();
 	UINT16 *videoram = state->videoram;

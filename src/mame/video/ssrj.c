@@ -273,7 +273,7 @@ PALETTE_INIT( ssrj )
 			palette_set_color_rgb(machine, i*8+j, fakecols[i][j][0], fakecols[i][j][1], fakecols[i][j][2]);
 }
 
-VIDEO_UPDATE( ssrj )
+SCREEN_UPDATE( ssrj )
 {
 	ssrj_state *state = screen->machine->driver_data<ssrj_state>();
 

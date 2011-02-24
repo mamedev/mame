@@ -272,7 +272,7 @@ VIDEO_START( angelkds )
 
 /* enable bits are uncertain */
 
-VIDEO_UPDATE( angelkds )
+SCREEN_UPDATE( angelkds )
 {
 	angelkds_state *state = screen->machine->driver_data<angelkds_state>();
 	const rectangle &visarea = screen->visible_area();

@@ -233,7 +233,7 @@ void eprom_scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-VIDEO_UPDATE( eprom )
+SCREEN_UPDATE( eprom )
 {
 	eprom_state *state = screen->machine->driver_data<eprom_state>();
 	atarimo_rect_list rectlist;
@@ -388,7 +388,7 @@ VIDEO_UPDATE( eprom )
 }
 
 
-VIDEO_UPDATE( guts )
+SCREEN_UPDATE( guts )
 {
 	eprom_state *state = screen->machine->driver_data<eprom_state>();
 	atarimo_rect_list rectlist;

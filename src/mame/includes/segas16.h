@@ -103,23 +103,23 @@ public:
 
 VIDEO_START( hangon );
 VIDEO_START( sharrier );
-VIDEO_UPDATE( hangon );
+SCREEN_UPDATE( hangon );
 
 /*----------- defined in video/segas16a.c -----------*/
 
 VIDEO_START( system16a );
-VIDEO_UPDATE( system16a );
+SCREEN_UPDATE( system16a );
 
 /*----------- defined in video/segas16b.c -----------*/
 
 VIDEO_START( system16b );
 VIDEO_START( timscanr );
-VIDEO_UPDATE( system16b );
+SCREEN_UPDATE( system16b );
 
 /*----------- defined in video/segas18.c -----------*/
 
 VIDEO_START( system18 );
-VIDEO_UPDATE( system18 );
+SCREEN_UPDATE( system18 );
 
 void system18_set_grayscale(running_machine *machine, int enable);
 void system18_set_vdp_enable(running_machine *machine, int eanble);
@@ -129,18 +129,18 @@ void system18_set_vdp_mixing(running_machine *machine, int mixing);
 
 VIDEO_START( outrun );
 VIDEO_START( shangon );
-VIDEO_UPDATE( outrun );
-VIDEO_UPDATE( shangon );
+SCREEN_UPDATE( outrun );
+SCREEN_UPDATE( shangon );
 
 /*----------- defined in video/segaxbd.c -----------*/
 
 VIDEO_START( xboard );
-VIDEO_UPDATE( xboard );
+SCREEN_UPDATE( xboard );
 
 /*----------- defined in video/segaybd.c -----------*/
 
 VIDEO_START( yboard );
-VIDEO_UPDATE( yboard );
+SCREEN_UPDATE( yboard );
 
 
 /*----------- defined in machine/s16fd.c -----------*/

@@ -217,7 +217,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( exedexes )
+SCREEN_UPDATE( exedexes )
 {
 	exedexes_state *state = screen->machine->driver_data<exedexes_state>();
 	if (state->sc2on)
@@ -245,7 +245,7 @@ VIDEO_UPDATE( exedexes )
 	return 0;
 }
 
-VIDEO_EOF( exedexes )
+SCREEN_EOF( exedexes )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 

@@ -3267,7 +3267,7 @@ VIDEO_START(n64)
 	}
 }
 
-VIDEO_UPDATE(n64)
+SCREEN_UPDATE(n64)
 {
 	_n64_state *state = screen->machine->driver_data<_n64_state>();
 

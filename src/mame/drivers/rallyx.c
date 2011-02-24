@@ -912,13 +912,13 @@ static MACHINE_CONFIG_START( rallyx, rallyx_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(36*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(rallyx)
 
 	MCFG_GFXDECODE(rallyx)
 	MCFG_PALETTE_LENGTH(64*4+4)
 
 	MCFG_PALETTE_INIT(rallyx)
 	MCFG_VIDEO_START(rallyx)
-	MCFG_VIDEO_UPDATE(rallyx)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -952,13 +952,13 @@ static MACHINE_CONFIG_START( jungler, rallyx_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(36*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(jungler)
 
 	MCFG_GFXDECODE(jungler)
 	MCFG_PALETTE_LENGTH(64*4+4+64)
 
 	MCFG_PALETTE_INIT(jungler)
 	MCFG_VIDEO_START(jungler)
-	MCFG_VIDEO_UPDATE(jungler)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(locomotn_sound)
@@ -971,7 +971,8 @@ static MACHINE_CONFIG_DERIVED( tactcian, jungler )
 
 	/* video hardware */
 	MCFG_VIDEO_START(locomotn)
-	MCFG_VIDEO_UPDATE(locomotn)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(locomotn)
 MACHINE_CONFIG_END
 
 
@@ -982,8 +983,8 @@ static MACHINE_CONFIG_DERIVED( locomotn, jungler )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(locomotn)
 	MCFG_VIDEO_START(locomotn)
-	MCFG_VIDEO_UPDATE(locomotn)
 MACHINE_CONFIG_END
 
 
@@ -994,8 +995,8 @@ static MACHINE_CONFIG_DERIVED( commsega, jungler )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(locomotn)
 	MCFG_VIDEO_START(commsega)
-	MCFG_VIDEO_UPDATE(locomotn)
 MACHINE_CONFIG_END
 
 

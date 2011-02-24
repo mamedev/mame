@@ -184,12 +184,12 @@ VIDEO_START( mjelctrn );
 VIDEO_START( neruton );
 VIDEO_START( htengoku );
 
-VIDEO_UPDATE( hanamai );
-VIDEO_UPDATE( hnoridur );
-VIDEO_UPDATE( sprtmtch );
-VIDEO_UPDATE( mjdialq2 );
-VIDEO_UPDATE( jantouki );
-VIDEO_UPDATE( htengoku );
+SCREEN_UPDATE( hanamai );
+SCREEN_UPDATE( hnoridur );
+SCREEN_UPDATE( sprtmtch );
+SCREEN_UPDATE( mjdialq2 );
+SCREEN_UPDATE( jantouki );
+SCREEN_UPDATE( htengoku );
 
 PALETTE_INIT( sprtmtch );
 
@@ -205,4 +205,4 @@ WRITE8_HANDLER( ddenlovr_transparency_pen_w );
 WRITE8_HANDLER( ddenlovr_transparency_mask_w );
 
 VIDEO_START(ddenlovr);
-VIDEO_UPDATE(ddenlovr);
+SCREEN_UPDATE(ddenlovr);

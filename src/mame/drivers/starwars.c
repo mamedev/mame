@@ -338,9 +338,9 @@ static MACHINE_CONFIG_START( starwars, starwars_state )
 	MCFG_SCREEN_REFRESH_RATE(40)
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 250, 0, 280)
+	MCFG_SCREEN_UPDATE(vector)
 
 	MCFG_VIDEO_START(avg_starwars)
-	MCFG_VIDEO_UPDATE(vector)
 
 	/* sound hardware */
 	MCFG_SOUND_START(starwars)

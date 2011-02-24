@@ -172,7 +172,7 @@ static VIDEO_START(egghunt)
 	state->save_item(NAME(state->spram));
 }
 
-static VIDEO_UPDATE(egghunt)
+static SCREEN_UPDATE(egghunt)
 {
 	egghunt_state *state = screen->machine->driver_data<egghunt_state>();
 	tilemap_draw(bitmap,cliprect, state->bg_tilemap, 0, 0);
@@ -426,12 +426,12 @@ static MACHINE_CONFIG_START( egghunt, egghunt_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_UPDATE(egghunt)
 
 	MCFG_GFXDECODE(egghunt)
 	MCFG_PALETTE_LENGTH(0x400)
 
 	MCFG_VIDEO_START(egghunt)
-	MCFG_VIDEO_UPDATE(egghunt)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

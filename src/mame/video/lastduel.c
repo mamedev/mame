@@ -269,7 +269,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( lastduel )
+SCREEN_UPDATE( lastduel )
 {
 	lastduel_state *state = screen->machine->driver_data<lastduel_state>();
 
@@ -282,7 +282,7 @@ VIDEO_UPDATE( lastduel )
 	return 0;
 }
 
-VIDEO_UPDATE( madgear )
+SCREEN_UPDATE( madgear )
 {
 	lastduel_state *state = screen->machine->driver_data<lastduel_state>();
 
@@ -306,7 +306,7 @@ VIDEO_UPDATE( madgear )
 	return 0;
 }
 
-VIDEO_EOF( lastduel )
+SCREEN_EOF( lastduel )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 

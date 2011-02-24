@@ -482,7 +482,7 @@ static VIDEO_START( 7mezzo )
 	bg_tilemap = tilemap_create(machine, get_7mezzo_tile_info, tilemap_scan_rows, 8, 8, 32, 29);
 }
 
-static VIDEO_UPDATE( magicfly )
+static SCREEN_UPDATE( magicfly )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	return 0;
@@ -772,13 +772,13 @@ static MACHINE_CONFIG_START( magicfly, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE((39+1)*8, (31+1)*8)				/* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1). */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 29*8-1)	/* Taken from MC6845 init, registers 01 & 06. */
+	MCFG_SCREEN_UPDATE(magicfly)
 
 	MCFG_GFXDECODE(magicfly)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_PALETTE_INIT(magicfly)
 
 	MCFG_VIDEO_START(magicfly)
-	MCFG_VIDEO_UPDATE(magicfly)
 
 	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK/16, mc6845_intf) /* guess */
 

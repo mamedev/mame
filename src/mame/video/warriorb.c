@@ -84,7 +84,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
                 SCREEN REFRESH
 **************************************************************/
 
-VIDEO_UPDATE( warriorb )
+SCREEN_UPDATE( warriorb )
 {
 	warriorb_state *state = screen->machine->driver_data<warriorb_state>();
 	int xoffs = 0;

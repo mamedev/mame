@@ -31,7 +31,7 @@ public:
  *
  *************************************/
 
-static VIDEO_UPDATE( minivadr )
+static SCREEN_UPDATE( minivadr )
 {
 	minivadr_state *state = screen->machine->driver_data<minivadr_state>();
 	offs_t offs;
@@ -92,8 +92,7 @@ static MACHINE_CONFIG_START( minivadr, minivadr_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
-
-	MCFG_VIDEO_UPDATE(minivadr)
+	MCFG_SCREEN_UPDATE(minivadr)
 
 	/* the board has no sound hardware */
 MACHINE_CONFIG_END

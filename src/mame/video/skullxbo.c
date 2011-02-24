@@ -242,7 +242,7 @@ void skullxbo_scanline_update(running_machine *machine, int scanline)
  *
  *************************************/
 
-VIDEO_UPDATE( skullxbo )
+SCREEN_UPDATE( skullxbo )
 {
 	skullxbo_state *state = screen->machine->driver_data<skullxbo_state>();
 	atarimo_rect_list rectlist;

@@ -47,7 +47,7 @@ static VIDEO_START(mlanding)
 // 256: Cockpit
 // 512: control centre screen
 // 768: plane landing sequence
-static VIDEO_UPDATE(mlanding)
+static SCREEN_UPDATE(mlanding)
 {
 	int x, y;
 
@@ -749,11 +749,11 @@ static MACHINE_CONFIG_START( mlanding, driver_device )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 14*8, 511)
+	MCFG_SCREEN_UPDATE(mlanding)
 
 	MCFG_PALETTE_LENGTH(512*16)
 
 	MCFG_VIDEO_START(mlanding)
-	MCFG_VIDEO_UPDATE(mlanding)
 
 	MCFG_MACHINE_RESET(mlanding)
 

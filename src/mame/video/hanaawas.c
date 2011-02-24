@@ -108,7 +108,7 @@ VIDEO_START( hanaawas )
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
-VIDEO_UPDATE( hanaawas )
+SCREEN_UPDATE( hanaawas )
 {
 	hanaawas_state *state = screen->machine->driver_data<hanaawas_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);

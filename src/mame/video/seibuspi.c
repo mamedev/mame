@@ -613,7 +613,7 @@ static void combine_tilemap(running_machine *machine, bitmap_t *bitmap, const re
 
 
 
-VIDEO_UPDATE( spi )
+SCREEN_UPDATE( spi )
 {
 	INT16 *back_rowscroll, *mid_rowscroll, *fore_rowscroll;
 	if( layer_bank & 0x80000000 ) {
@@ -674,7 +674,7 @@ VIDEO_START( sys386f2 )
 	memset(alpha_table, 0, 8192 * sizeof(UINT8));
 }
 
-VIDEO_UPDATE( sys386f2 )
+SCREEN_UPDATE( sys386f2 )
 {
 	bitmap_fill(bitmap, cliprect, 0);
 	draw_sprites(screen->machine, bitmap, cliprect, 0);

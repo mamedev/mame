@@ -269,7 +269,7 @@ static VIDEO_START( cham24 )
 {
 }
 
-static VIDEO_UPDATE( cham24 )
+static SCREEN_UPDATE( cham24 )
 {
 	/* render the ppu */
 	ppu2c0x_render(screen->machine->device("ppu"), bitmap, 0, 0, 0, 0);
@@ -323,13 +323,13 @@ static MACHINE_CONFIG_START( cham24, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(cham24)
 
 	MCFG_GFXDECODE(cham24)
 	MCFG_PALETTE_LENGTH(8*4*16)
 
 	MCFG_PALETTE_INIT(cham24)
 	MCFG_VIDEO_START(cham24)
-	MCFG_VIDEO_UPDATE(cham24)
 
 	MCFG_PPU2C04_ADD("ppu", ppu_interface)
 

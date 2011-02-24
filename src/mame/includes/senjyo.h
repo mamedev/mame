@@ -62,4 +62,4 @@ WRITE8_HANDLER( senjyo_bg3videoram_w );
 WRITE8_HANDLER( senjyo_bgstripes_w );
 
 VIDEO_START( senjyo );
-VIDEO_UPDATE( senjyo );
+SCREEN_UPDATE( senjyo );

@@ -30,7 +30,7 @@ extern const samples_interface triplhnt_samples_interface;
 /*----------- defined in video/triplhnt.c -----------*/
 
 VIDEO_START( triplhnt );
-VIDEO_UPDATE( triplhnt );
+SCREEN_UPDATE( triplhnt );
 
 extern UINT8* triplhnt_playfield_ram;
 extern UINT8* triplhnt_vpos_ram;

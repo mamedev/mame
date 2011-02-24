@@ -132,7 +132,7 @@ static VIDEO_START(koikoi)
 	state->tmap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
-static VIDEO_UPDATE(koikoi)
+static SCREEN_UPDATE(koikoi)
 {
 	koikoi_state *state = screen->machine->driver_data<koikoi_state>();
 	tilemap_draw(bitmap, cliprect, state->tmap, 0, 0);
@@ -373,13 +373,13 @@ static MACHINE_CONFIG_START( koikoi, koikoi_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(koikoi)
 
 	MCFG_GFXDECODE(koikoi)
 	MCFG_PALETTE_LENGTH(8*32)
 	MCFG_PALETTE_INIT(koikoi)
 
 	MCFG_VIDEO_START(koikoi)
-	MCFG_VIDEO_UPDATE(koikoi)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

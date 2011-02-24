@@ -92,5 +92,5 @@ void carpolo_generate_car_border_interrupt(running_machine *machine, int car, in
 
 PALETTE_INIT( carpolo );
 VIDEO_START( carpolo );
-VIDEO_UPDATE( carpolo );
-VIDEO_EOF( carpolo );
+SCREEN_UPDATE( carpolo );
+SCREEN_EOF( carpolo );

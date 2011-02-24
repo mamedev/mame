@@ -272,7 +272,8 @@ void video_manager::frame_update(bool debug)
 		else
 		{
 			g_profiler.start(PROFILER_VIDEO);
-			m_machine.driver_data<driver_device>()->video_eof();
+			for (screen_device *screen = m_machine.first_screen(); screen != NULL; screen = screen->next_screen())
+				screen->screen_eof();
 			g_profiler.stop();
 		}
 	}

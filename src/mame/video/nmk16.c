@@ -498,7 +498,7 @@ static void nmk16_draw_sprites_flipsupported(running_machine *machine, bitmap_t 
 }
 
 
-VIDEO_UPDATE( macross )
+SCREEN_UPDATE( macross )
 {
 	tilemap_set_scrollx(tx_tilemap,0,-videoshift);
 
@@ -513,7 +513,7 @@ VIDEO_UPDATE( macross )
 	return 0;
 }
 
-VIDEO_UPDATE( tdragon )
+SCREEN_UPDATE( tdragon )
 {
 //  mcu_run(screen->machine, 1);
 
@@ -530,7 +530,7 @@ VIDEO_UPDATE( tdragon )
 	return 0;
 }
 
-VIDEO_UPDATE( hachamf )
+SCREEN_UPDATE( hachamf )
 {
 //  mcu_run(screen->machine, 0);
 
@@ -547,7 +547,7 @@ VIDEO_UPDATE( hachamf )
 	return 0;
 }
 
-VIDEO_UPDATE( manybloc )
+SCREEN_UPDATE( manybloc )
 {
 	tilemap_set_scrollx(tx_tilemap,0,-videoshift);
 
@@ -562,7 +562,7 @@ VIDEO_UPDATE( manybloc )
 	return 0;
 }
 
-VIDEO_UPDATE( tharrier )
+SCREEN_UPDATE( tharrier )
 {
 	/* I think the protection device probably copies this to the regs... */
 	UINT16 tharrier_scroll = nmk16_mainram[0x9f00/2];
@@ -580,7 +580,7 @@ VIDEO_UPDATE( tharrier )
 	return 0;
 }
 
-VIDEO_UPDATE( gunnail )
+SCREEN_UPDATE( gunnail )
 {
 	int y1;
 	int i=16;
@@ -658,7 +658,7 @@ VIDEO_UPDATE( gunnail )
 	return 0;
 }
 
-VIDEO_UPDATE( bioship )
+SCREEN_UPDATE( bioship )
 {
 	UINT16 *tilerom = (UINT16 *)screen->machine->region("gfx5")->base();
 	int scrollx=-(bioship_scroll[1] + bioship_scroll[0]*256);
@@ -710,7 +710,7 @@ VIDEO_UPDATE( bioship )
 	return 0;
 }
 
-VIDEO_UPDATE( strahl )
+SCREEN_UPDATE( strahl )
 {
 	tilemap_set_scrollx(tx_tilemap,0,-videoshift);
 
@@ -726,7 +726,7 @@ VIDEO_UPDATE( strahl )
 	return 0;
 }
 
-VIDEO_UPDATE( bjtwin )
+SCREEN_UPDATE( bjtwin )
 {
 	tilemap_set_scrollx(bg_tilemap0,0,-videoshift);
 
@@ -740,7 +740,7 @@ VIDEO_UPDATE( bjtwin )
 	return 0;
 }
 
-VIDEO_EOF( nmk )
+SCREEN_EOF( nmk )
 {
 	/* sprites are DMA'd from Main RAM to a private buffer automatically
        (or at least this is how I interpret the datasheet) */
@@ -752,7 +752,7 @@ VIDEO_EOF( nmk )
 	memcpy(spriteram_old2,nmk16_mainram+0x8000/2,0x1000);
 }
 
-VIDEO_EOF( strahl )
+SCREEN_EOF( strahl )
 {
 	/* sprites are DMA'd from Main RAM to a private buffer automatically
        (or at least this is how I interpret the datasheet) */
@@ -891,12 +891,12 @@ static void redhawki_video_update(running_machine *machine, bitmap_t *bitmap, co
 	nmk16_draw_sprites_flipsupported(machine, bitmap,cliprect,0);
 }
 
-VIDEO_UPDATE( afega )		{	video_update(screen->machine,bitmap,cliprect, 1, -0x100,+0x000, 0x0001);	return 0; }
-VIDEO_UPDATE( bubl2000 )	{	video_update(screen->machine,bitmap,cliprect, 0, -0x100,+0x000, 0x0001);	return 0; }	// no flipscreen support, I really would confirmation from the schematics
-VIDEO_UPDATE( redhawkb )	{	video_update(screen->machine,bitmap,cliprect, 0, +0x000,+0x100, 0x0001);	return 0; }
-VIDEO_UPDATE( redhawki )	{	redhawki_video_update(screen->machine,bitmap,cliprect); return 0;} // strange scroll regs
+SCREEN_UPDATE( afega )		{	video_update(screen->machine,bitmap,cliprect, 1, -0x100,+0x000, 0x0001);	return 0; }
+SCREEN_UPDATE( bubl2000 )	{	video_update(screen->machine,bitmap,cliprect, 0, -0x100,+0x000, 0x0001);	return 0; }	// no flipscreen support, I really would confirmation from the schematics
+SCREEN_UPDATE( redhawkb )	{	video_update(screen->machine,bitmap,cliprect, 0, +0x000,+0x100, 0x0001);	return 0; }
+SCREEN_UPDATE( redhawki )	{	redhawki_video_update(screen->machine,bitmap,cliprect); return 0;} // strange scroll regs
 
-VIDEO_UPDATE( firehawk )
+SCREEN_UPDATE( firehawk )
 {
 	tilemap_set_scrolly(bg_tilemap0, 0, afega_scroll_1[1] + 0x100);
 	tilemap_set_scrollx(bg_tilemap0, 0, afega_scroll_1[0]);

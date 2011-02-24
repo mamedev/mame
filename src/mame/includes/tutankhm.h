@@ -26,4 +26,4 @@ public:
 WRITE8_HANDLER( tutankhm_flip_screen_x_w );
 WRITE8_HANDLER( tutankhm_flip_screen_y_w );
 
-VIDEO_UPDATE( tutankhm );
+SCREEN_UPDATE( tutankhm );

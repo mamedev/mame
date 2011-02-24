@@ -428,7 +428,7 @@ static void taito_update_sprites_active_area( running_machine *machine )
 	}
 }
 
-VIDEO_EOF( taito_no_buffer )
+SCREEN_EOF( taito_no_buffer )
 {
 	slapshot_state *state = machine->driver_data<slapshot_state>();
 
@@ -454,7 +454,7 @@ One exception is the "puck" in early attract which is
 a bg layer given priority over some sprites.
 ********************************************************************/
 
-VIDEO_UPDATE( slapshot )
+SCREEN_UPDATE( slapshot )
 {
 	slapshot_state *state = screen->machine->driver_data<slapshot_state>();
 	UINT8 layer[5];

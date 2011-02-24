@@ -73,7 +73,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const recta
 
 /* Video on the orginal */
 
-VIDEO_UPDATE( pktgaldx )
+SCREEN_UPDATE( pktgaldx )
 {
 	pktgaldx_state *state = screen->machine->driver_data<pktgaldx_state>();
 	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);
@@ -92,7 +92,7 @@ VIDEO_UPDATE( pktgaldx )
 
 /* Video for the bootleg */
 
-VIDEO_UPDATE( pktgaldb )
+SCREEN_UPDATE( pktgaldb )
 {
 	pktgaldx_state *state = screen->machine->driver_data<pktgaldx_state>();
 	int x, y;

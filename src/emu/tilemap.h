@@ -199,7 +199,7 @@
             tilemap_set_transparent_pen(tmap, 0);
         }
 
-        VIDEO_UPDATE( mydriver )
+        SCREEN_UPDATE( mydriver )
         {
             // draw the tilemap first, fully opaque since it needs to
             // erase all previous pixels

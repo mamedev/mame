@@ -238,7 +238,7 @@ VIDEO_START( lucky74 )
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }
 
-VIDEO_UPDATE( lucky74 )
+SCREEN_UPDATE( lucky74 )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);

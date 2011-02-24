@@ -30,4 +30,4 @@ extern WRITE8_HANDLER( battlex_flipscreen_w );
 
 extern PALETTE_INIT( battlex );
 extern VIDEO_START( battlex );
-extern VIDEO_UPDATE( battlex );
+extern SCREEN_UPDATE( battlex );

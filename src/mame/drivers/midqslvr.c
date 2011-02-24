@@ -27,7 +27,7 @@ static VIDEO_START(midqslvr)
 {
 }
 
-static VIDEO_UPDATE(midqslvr)
+static SCREEN_UPDATE(midqslvr)
 {
 	return 0;
 }
@@ -55,10 +55,10 @@ static MACHINE_CONFIG_START( midqslvr, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 199)
+	MCFG_SCREEN_UPDATE(midqslvr)
 	MCFG_PALETTE_LENGTH(16)
 
 	MCFG_VIDEO_START(midqslvr)
-	MCFG_VIDEO_UPDATE(midqslvr)
 MACHINE_CONFIG_END
 
 ROM_START( offrthnd )

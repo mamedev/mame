@@ -67,4 +67,4 @@ WRITE32_HANDLER( jaguar_tom_regs32_w );
 READ32_HANDLER( cojag_gun_input_r );
 
 VIDEO_START( cojag );
-VIDEO_UPDATE( cojag );
+SCREEN_UPDATE( cojag );

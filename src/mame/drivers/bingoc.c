@@ -51,7 +51,7 @@ static VIDEO_START(bingoc)
 
 }
 
-static VIDEO_UPDATE(bingoc)
+static SCREEN_UPDATE(bingoc)
 {
 	return 0;
 }
@@ -156,11 +156,11 @@ static MACHINE_CONFIG_START( bingoc, bingoc_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE(bingoc)
 
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(bingoc)
-	MCFG_VIDEO_UPDATE(bingoc)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") //might just be mono...
 

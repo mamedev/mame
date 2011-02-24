@@ -100,7 +100,7 @@ static UINT16* vid_1_shared_RAM;
 static int crtc_select;
 
 
-static VIDEO_UPDATE( vcombat )
+static SCREEN_UPDATE( vcombat )
 {
 	int y;
 	const rgb_t *const pens = tlc34076_get_pens(screen->machine->device("tlc34076"));
@@ -583,12 +583,12 @@ static MACHINE_CONFIG_START( vcombat, driver_device )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz / 2, 400, 0, 256, 291, 0, 208)
-
+	MCFG_SCREEN_UPDATE(vcombat)
+	
 	MCFG_SCREEN_ADD("aux", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz / 2, 400, 0, 256, 291, 0, 208)
-
-	MCFG_VIDEO_UPDATE(vcombat)
+	MCFG_SCREEN_UPDATE(vcombat)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -620,8 +620,7 @@ static MACHINE_CONFIG_START( shadfgtr, driver_device )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_20MHz / 4, 320, 0, 256, 277, 0, 224)
-
-	MCFG_VIDEO_UPDATE(vcombat)
+	MCFG_SCREEN_UPDATE(vcombat)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

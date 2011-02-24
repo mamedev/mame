@@ -512,7 +512,7 @@ static void rshark_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 }
 
 
-VIDEO_UPDATE( lastday )
+SCREEN_UPDATE( lastday )
 {
 	dooyong_state *state = screen->machine->driver_data<dooyong_state>();
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
@@ -527,7 +527,7 @@ VIDEO_UPDATE( lastday )
 	return 0;
 }
 
-VIDEO_UPDATE( gulfstrm )
+SCREEN_UPDATE( gulfstrm )
 {
 	dooyong_state *state = screen->machine->driver_data<dooyong_state>();
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
@@ -541,7 +541,7 @@ VIDEO_UPDATE( gulfstrm )
 	return 0;
 }
 
-VIDEO_UPDATE( pollux )
+SCREEN_UPDATE( pollux )
 {
 	dooyong_state *state = screen->machine->driver_data<dooyong_state>();
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
@@ -555,7 +555,7 @@ VIDEO_UPDATE( pollux )
 	return 0;
 }
 
-VIDEO_UPDATE( flytiger )
+SCREEN_UPDATE( flytiger )
 {
 	dooyong_state *state = screen->machine->driver_data<dooyong_state>();
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
@@ -578,7 +578,7 @@ VIDEO_UPDATE( flytiger )
 }
 
 
-VIDEO_UPDATE( bluehawk )
+SCREEN_UPDATE( bluehawk )
 {
 	dooyong_state *state = screen->machine->driver_data<dooyong_state>();
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
@@ -593,7 +593,7 @@ VIDEO_UPDATE( bluehawk )
 	return 0;
 }
 
-VIDEO_UPDATE( primella )
+SCREEN_UPDATE( primella )
 {
 	dooyong_state *state = screen->machine->driver_data<dooyong_state>();
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
@@ -605,7 +605,7 @@ VIDEO_UPDATE( primella )
 	return 0;
 }
 
-VIDEO_UPDATE( rshark )
+SCREEN_UPDATE( rshark )
 {
 	dooyong_state *state = screen->machine->driver_data<dooyong_state>();
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
@@ -620,7 +620,7 @@ VIDEO_UPDATE( rshark )
 	return 0;
 }
 
-VIDEO_UPDATE( popbingo )
+SCREEN_UPDATE( popbingo )
 {
 	dooyong_state *state = screen->machine->driver_data<dooyong_state>();
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
@@ -931,14 +931,14 @@ VIDEO_START( popbingo )
 }
 
 
-VIDEO_EOF( dooyong )
+SCREEN_EOF( dooyong )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	buffer_spriteram_w(space, 0, 0);
 }
 
-VIDEO_EOF( rshark )
+SCREEN_EOF( rshark )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 

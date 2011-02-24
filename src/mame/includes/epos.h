@@ -25,4 +25,4 @@ public:
 /*----------- defined in video/epos.c -----------*/
 
 WRITE8_HANDLER( epos_port_1_w );
-VIDEO_UPDATE( epos );
+SCREEN_UPDATE( epos );

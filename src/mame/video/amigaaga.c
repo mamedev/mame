@@ -860,7 +860,7 @@ void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int s
  *
  *************************************/
 
-VIDEO_UPDATE( amiga_aga )
+SCREEN_UPDATE( amiga_aga )
 {
 	int y;
 

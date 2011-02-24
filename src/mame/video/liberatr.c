@@ -296,7 +296,7 @@ void liberatr_state::draw_bitmap(bitmap_t &bitmap, pen_t *pens)
 }
 
 
-bool liberatr_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+bool liberatr_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	pen_t pens[NUM_PENS];
 	get_pens(pens);

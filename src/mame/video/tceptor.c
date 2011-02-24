@@ -520,7 +520,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 }
 
 
-VIDEO_UPDATE( tceptor )
+SCREEN_UPDATE( tceptor )
 {
 	tceptor_state *state = screen->machine->driver_data<tceptor_state>();
 	rectangle rect;
@@ -567,7 +567,7 @@ VIDEO_UPDATE( tceptor )
 }
 
 
-VIDEO_EOF( tceptor )
+SCREEN_EOF( tceptor )
 {
 	tceptor_state *state = machine->driver_data<tceptor_state>();
 	memcpy(state->sprite_ram_buffered, state->sprite_ram, 0x200);

@@ -178,7 +178,7 @@ static void draw_foreground( running_machine *machine, bitmap_t *bitmap, const r
 	}
 }
 
-VIDEO_UPDATE( tnzs )
+SCREEN_UPDATE( tnzs )
 {
 	tnzs_state *state = screen->machine->driver_data<tnzs_state>();
 	/* If the byte at f300 has bit 6 set, flip the screen
@@ -202,7 +202,7 @@ VIDEO_UPDATE( tnzs )
 	return 0;
 }
 
-VIDEO_EOF( tnzs )
+SCREEN_EOF( tnzs )
 {
 	tnzs_state *state = machine->driver_data<tnzs_state>();
 	int ctrl2 =	state->objctrl[1];

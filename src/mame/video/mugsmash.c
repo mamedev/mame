@@ -151,7 +151,7 @@ VIDEO_START( mugsmash )
 	state->tilemap2 = tilemap_create(machine, get_mugsmash_tile_info2, tilemap_scan_rows, 16, 16, 32, 32);
 }
 
-VIDEO_UPDATE( mugsmash )
+SCREEN_UPDATE( mugsmash )
 {
 	mugsmash_state *state = screen->machine->driver_data<mugsmash_state>();
 

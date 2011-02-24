@@ -450,7 +450,7 @@ static void m92_screenrefresh(running_machine *machine, bitmap_t *bitmap,const r
 }
 
 
-VIDEO_UPDATE( m92 )
+SCREEN_UPDATE( m92 )
 {
 	m92_update_scroll_positions(screen->machine);
 	m92_screenrefresh(screen->machine, bitmap, cliprect);

@@ -312,7 +312,7 @@ static void set_scroll(running_machine *machine, int layer)
 }
 
 
-VIDEO_UPDATE( baraduke )
+SCREEN_UPDATE( baraduke )
 {
 	baraduke_state *state = screen->machine->driver_data<baraduke_state>();
 	int back;
@@ -339,7 +339,7 @@ VIDEO_UPDATE( baraduke )
 }
 
 
-VIDEO_EOF( baraduke )
+SCREEN_EOF( baraduke )
 {
 	baraduke_state *state = machine->driver_data<baraduke_state>();
 	if (state->copy_sprites)

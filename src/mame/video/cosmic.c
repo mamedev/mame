@@ -546,7 +546,7 @@ static void nomnlnd_draw_background( screen_device *screen, bitmap_t *bitmap, co
 }
 
 
-VIDEO_UPDATE( cosmicg )
+SCREEN_UPDATE( cosmicg )
 {
 	bitmap_fill(bitmap, cliprect, 0);
 	draw_bitmap(screen->machine, bitmap, cliprect);
@@ -554,7 +554,7 @@ VIDEO_UPDATE( cosmicg )
 }
 
 
-VIDEO_UPDATE( panic )
+SCREEN_UPDATE( panic )
 {
 	bitmap_fill(bitmap, cliprect, 0);
 	draw_bitmap(screen->machine, bitmap, cliprect);
@@ -563,7 +563,7 @@ VIDEO_UPDATE( panic )
 }
 
 
-VIDEO_UPDATE( cosmica )
+SCREEN_UPDATE( cosmica )
 {
 	bitmap_fill(bitmap, cliprect, 0);
 	cosmica_draw_starfield(screen, bitmap, cliprect);
@@ -573,7 +573,7 @@ VIDEO_UPDATE( cosmica )
 }
 
 
-VIDEO_UPDATE( magspot )
+SCREEN_UPDATE( magspot )
 {
 	bitmap_fill(bitmap, cliprect, 0);
 	draw_bitmap(screen->machine, bitmap, cliprect);
@@ -582,7 +582,7 @@ VIDEO_UPDATE( magspot )
 }
 
 
-VIDEO_UPDATE( devzone )
+SCREEN_UPDATE( devzone )
 {
 	cosmic_state *state = screen->machine->driver_data<cosmic_state>();
 
@@ -597,7 +597,7 @@ VIDEO_UPDATE( devzone )
 }
 
 
-VIDEO_UPDATE( nomnlnd )
+SCREEN_UPDATE( nomnlnd )
 {
 	cosmic_state *state = screen->machine->driver_data<cosmic_state>();
 

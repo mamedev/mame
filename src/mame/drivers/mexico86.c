@@ -501,12 +501,12 @@ static MACHINE_CONFIG_START( mexico86, mexico86_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(mexico86)
 
 	MCFG_GFXDECODE(mexico86)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MCFG_VIDEO_UPDATE(mexico86)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -527,7 +527,8 @@ static MACHINE_CONFIG_DERIVED( knightb, mexico86 )
 	MCFG_DEVICE_REMOVE("sub")
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(kikikai)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(kikikai)
 MACHINE_CONFIG_END
 
 
@@ -541,7 +542,8 @@ static MACHINE_CONFIG_DERIVED( kikikai, knightb )
 	MCFG_DEVICE_REMOVE("mcu")	// we don't have code for the MC6801U4
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(kikikai)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(kikikai)
 MACHINE_CONFIG_END
 
 

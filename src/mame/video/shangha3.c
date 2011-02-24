@@ -261,7 +261,7 @@ else
 }
 
 
-VIDEO_UPDATE( shangha3 )
+SCREEN_UPDATE( shangha3 )
 {
 	shangha3_state *state = screen->machine->driver_data<shangha3_state>();
 

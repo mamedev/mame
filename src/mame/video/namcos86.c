@@ -341,7 +341,7 @@ static void set_scroll(running_machine *machine, int layer)
 }
 
 
-VIDEO_UPDATE( namcos86 )
+SCREEN_UPDATE( namcos86 )
 {
 	int layer;
 
@@ -374,7 +374,7 @@ VIDEO_UPDATE( namcos86 )
 }
 
 
-VIDEO_EOF( namcos86 )
+SCREEN_EOF( namcos86 )
 {
 	if (copy_sprites)
 	{

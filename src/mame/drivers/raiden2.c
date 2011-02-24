@@ -879,9 +879,9 @@ static VIDEO_START( raiden2 )
 	tilemap_set_transparent_pen(state->text_layer, 15);
 }
 
-/* VIDEO UPDATE (move to video file) */
+/* SCREEN_UPDATE (move to video file) */
 
-static VIDEO_UPDATE ( raiden2 )
+static SCREEN_UPDATE( raiden2 )
 {
 	raiden2_state *state = screen->machine->driver_data<raiden2_state>();
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
@@ -1732,11 +1732,11 @@ static MACHINE_CONFIG_START( raiden2, raiden2_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 30*8-1)
+	MCFG_SCREEN_UPDATE(raiden2)
 	MCFG_GFXDECODE(raiden2)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_VIDEO_START(raiden2)
-	MCFG_VIDEO_UPDATE(raiden2)
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM2151_RAIDEN2_INTERFACE(28636360/8,28636360/28,1,2)
@@ -1788,11 +1788,11 @@ static MACHINE_CONFIG_START( zeroteam, raiden2_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
+	MCFG_SCREEN_UPDATE(raiden2)
 	MCFG_GFXDECODE(raiden2)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_VIDEO_START(raiden2)
-	MCFG_VIDEO_UPDATE(raiden2)
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4,1320000)

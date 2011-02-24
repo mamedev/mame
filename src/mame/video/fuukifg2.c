@@ -279,7 +279,7 @@ static void fuuki16_draw_layer( running_machine *machine, bitmap_t *bitmap, cons
 	}
 }
 
-VIDEO_UPDATE( fuuki16 )
+SCREEN_UPDATE( fuuki16 )
 {
 	fuuki16_state *state = screen->machine->driver_data<fuuki16_state>();
 	UINT16 layer0_scrollx, layer0_scrolly;

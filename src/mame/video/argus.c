@@ -1194,7 +1194,7 @@ static void butasan_log_vram(running_machine *machine)
 #endif
 }
 
-VIDEO_UPDATE( argus )
+SCREEN_UPDATE( argus )
 {
 	argus_state *state = screen->machine->driver_data<argus_state>();
 	bg_setting(screen->machine);
@@ -1211,7 +1211,7 @@ VIDEO_UPDATE( argus )
 	return 0;
 }
 
-VIDEO_UPDATE( valtric )
+SCREEN_UPDATE( valtric )
 {
 	argus_state *state = screen->machine->driver_data<argus_state>();
 	bg_setting(screen->machine);
@@ -1225,7 +1225,7 @@ VIDEO_UPDATE( valtric )
 	return 0;
 }
 
-VIDEO_UPDATE( butasan )
+SCREEN_UPDATE( butasan )
 {
 	argus_state *state = screen->machine->driver_data<argus_state>();
 	bg_setting(screen->machine);

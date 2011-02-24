@@ -172,7 +172,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-VIDEO_UPDATE( shootout )
+SCREEN_UPDATE( shootout )
 {
 	shootout_state *state = screen->machine->driver_data<shootout_state>();
 
@@ -184,7 +184,7 @@ VIDEO_UPDATE( shootout )
 	return 0;
 }
 
-VIDEO_UPDATE( shootouj )
+SCREEN_UPDATE( shootouj )
 {
 	shootout_state *state = screen->machine->driver_data<shootout_state>();
 

@@ -34,4 +34,4 @@ extern void aliens_tile_callback(running_machine *machine, int layer,int bank,in
 extern void aliens_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask,int *shadow);
 
 VIDEO_START( aliens );
-VIDEO_UPDATE( aliens );
+SCREEN_UPDATE( aliens );

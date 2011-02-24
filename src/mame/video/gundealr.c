@@ -132,7 +132,7 @@ WRITE8_HANDLER( gundealr_flipscreen_w )
 
 ***************************************************************************/
 
-VIDEO_UPDATE( gundealr )
+SCREEN_UPDATE( gundealr )
 {
 	gundealr_state *state = screen->machine->driver_data<gundealr_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);

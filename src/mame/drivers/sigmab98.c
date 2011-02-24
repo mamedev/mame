@@ -214,7 +214,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-static VIDEO_UPDATE(sigmab98)
+static SCREEN_UPDATE(sigmab98)
 {
 	int layers_ctrl = -1;
 
@@ -591,7 +591,7 @@ static WRITE8_HANDLER( vblank_w )
 	vblank = (vblank & ~0x03) | (data & 0x03);
 }
 
-static VIDEO_EOF( sammymdl )
+static SCREEN_EOF( sammymdl )
 {
 	vblank &= ~0x01;
 }
@@ -1552,11 +1552,10 @@ static MACHINE_CONFIG_START( gegege, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(0x200, 0x200)
 	MCFG_SCREEN_VISIBLE_AREA(0,0x140-1, 0,0xf0-1)
+	MCFG_SCREEN_UPDATE(sigmab98)
 
 	MCFG_GFXDECODE(sigmab98)
 	MCFG_PALETTE_LENGTH(0x100)
-
-	MCFG_VIDEO_UPDATE(sigmab98)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1606,12 +1605,11 @@ static MACHINE_CONFIG_START( sammymdl, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(0x140, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xf0-1)
+	MCFG_SCREEN_UPDATE(sigmab98)
+	MCFG_SCREEN_EOF(sammymdl)
 
 	MCFG_GFXDECODE(sigmab98)
 	MCFG_PALETTE_LENGTH(0x100)
-
-	MCFG_VIDEO_UPDATE(sigmab98)
-	MCFG_VIDEO_EOF(sammymdl)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

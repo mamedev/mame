@@ -38,4 +38,4 @@ WRITE8_HANDLER( mikie_flipscreen_w );
 
 PALETTE_INIT( mikie );
 VIDEO_START( mikie );
-VIDEO_UPDATE( mikie );
+SCREEN_UPDATE( mikie );

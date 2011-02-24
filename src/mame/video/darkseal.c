@@ -289,7 +289,7 @@ VIDEO_START( darkseal )
 
 /******************************************************************************/
 
-VIDEO_UPDATE( darkseal )
+SCREEN_UPDATE( darkseal )
 {
 	darkseal_state *state = screen->machine->driver_data<darkseal_state>();
 	state->flipscreen=!(state->control_0[0]&0x80);

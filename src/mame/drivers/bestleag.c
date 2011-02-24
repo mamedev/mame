@@ -161,7 +161,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-static VIDEO_UPDATE(bestleag)
+static SCREEN_UPDATE(bestleag)
 {
 	bestleag_state *state = screen->machine->driver_data<bestleag_state>();
 	tilemap_set_scrollx(state->bg_tilemap,0,(state->vregs[0x00/2] & 0xfff) + (state->vregs[0x08/2] & 0x7) - 3);
@@ -178,7 +178,7 @@ static VIDEO_UPDATE(bestleag)
 	return 0;
 }
 
-static VIDEO_UPDATE(bestleaw)
+static SCREEN_UPDATE(bestleaw)
 {
 	bestleag_state *state = screen->machine->driver_data<bestleag_state>();
 	tilemap_set_scrollx(state->bg_tilemap,0,state->vregs[0x08/2]);
@@ -364,12 +364,12 @@ static MACHINE_CONFIG_START( bestleag, bestleag_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(bestleag)
 
 	MCFG_GFXDECODE(bestleag)
 	MCFG_PALETTE_LENGTH(0x800)
 
 	MCFG_VIDEO_START(bestleag)
-	MCFG_VIDEO_UPDATE(bestleag)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -379,8 +379,8 @@ static MACHINE_CONFIG_START( bestleag, bestleag_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bestleaw, bestleag )
-
-	MCFG_VIDEO_UPDATE(bestleaw)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(bestleaw)
 MACHINE_CONFIG_END
 
 

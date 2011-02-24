@@ -117,7 +117,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 }
 
 
-static VIDEO_UPDATE( dominob )
+static SCREEN_UPDATE( dominob )
 {
 	dominob_state *state = screen->machine->driver_data<dominob_state>();
 	int x,y;
@@ -303,12 +303,12 @@ static MACHINE_CONFIG_START( dominob, dominob_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(dominob)
 
 	MCFG_GFXDECODE(dominob)
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_VIDEO_START(dominob)
-	MCFG_VIDEO_UPDATE(dominob)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

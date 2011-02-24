@@ -356,7 +356,7 @@ static int circle_collision(starshp1_state *state, const rectangle *rect)
 }
 
 
-VIDEO_UPDATE( starshp1 )
+SCREEN_UPDATE( starshp1 )
 {
 	starshp1_state *state = screen->machine->driver_data<starshp1_state>();
 	set_pens(state, screen->machine->colortable);
@@ -386,7 +386,7 @@ VIDEO_UPDATE( starshp1 )
 }
 
 
-VIDEO_EOF( starshp1 )
+SCREEN_EOF( starshp1 )
 {
 	starshp1_state *state = machine->driver_data<starshp1_state>();
 	rectangle rect;

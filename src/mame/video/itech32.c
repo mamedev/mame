@@ -1430,7 +1430,7 @@ READ32_HANDLER( itech020_video_r )
  *
  *************************************/
 
-VIDEO_UPDATE( itech32 )
+SCREEN_UPDATE( itech32 )
 {
 	itech32_state *state = screen->machine->driver_data<itech32_state>();
 	int y;

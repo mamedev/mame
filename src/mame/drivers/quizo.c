@@ -74,7 +74,7 @@ static PALETTE_INIT(quizo)
 	}
 }
 
-static VIDEO_UPDATE( quizo )
+static SCREEN_UPDATE( quizo )
 {
 	quizo_state *state = screen->machine->driver_data<quizo_state>();
 	UINT8 *videoram = state->videoram;
@@ -213,11 +213,10 @@ static MACHINE_CONFIG_START( quizo, quizo_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 320-1, 0*8, 200-1)
+	MCFG_SCREEN_UPDATE(quizo)
 
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT(quizo)
-
-	MCFG_VIDEO_UPDATE(quizo)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

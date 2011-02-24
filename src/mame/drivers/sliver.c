@@ -483,7 +483,7 @@ static VIDEO_START(sliver)
 	state->bitmap_fg = machine->primary_screen->alloc_compatible_bitmap();
 }
 
-static VIDEO_UPDATE(sliver)
+static SCREEN_UPDATE(sliver)
 {
 	sliver_state *state = screen->machine->driver_data<sliver_state>();
 
@@ -585,9 +585,9 @@ static MACHINE_CONFIG_START( sliver, sliver_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 384-1-16, 0*8, 240-1)
+	MCFG_SCREEN_UPDATE(sliver)
 
 	MCFG_VIDEO_START(sliver)
-	MCFG_VIDEO_UPDATE(sliver)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

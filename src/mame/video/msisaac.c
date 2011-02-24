@@ -244,7 +244,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( msisaac )
+SCREEN_UPDATE( msisaac )
 {
 	msisaac_state *state = screen->machine->driver_data<msisaac_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);

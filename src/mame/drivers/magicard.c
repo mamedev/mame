@@ -361,7 +361,7 @@ static VIDEO_START(magicard)
 
 }
 
-static VIDEO_UPDATE(magicard)
+static SCREEN_UPDATE(magicard)
 {
 	int x,y;
 	UINT32 count;
@@ -634,11 +634,11 @@ static MACHINE_CONFIG_START( magicard, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1) //dynamic resolution,TODO
+	MCFG_SCREEN_UPDATE(magicard)
 
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(magicard)
-	MCFG_VIDEO_UPDATE(magicard)
 
 	MCFG_MACHINE_RESET(magicard)
 

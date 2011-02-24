@@ -19,4 +19,4 @@ public:
 PALETTE_INIT( xyonix );
 WRITE8_HANDLER( xyonix_vidram_w );
 VIDEO_START(xyonix);
-VIDEO_UPDATE(xyonix);
+SCREEN_UPDATE(xyonix);

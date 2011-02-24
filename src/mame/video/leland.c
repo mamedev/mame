@@ -402,7 +402,7 @@ READ8_HANDLER( ataxx_svram_port_r )
  *
  *************************************/
 
-static VIDEO_UPDATE( leland )
+static SCREEN_UPDATE( leland )
 {
 	int y;
 
@@ -470,7 +470,7 @@ static VIDEO_UPDATE( leland )
  *
  *************************************/
 
-static VIDEO_UPDATE( ataxx )
+static SCREEN_UPDATE( ataxx )
 {
 	int y;
 
@@ -539,7 +539,6 @@ MACHINE_CONFIG_FRAGMENT( leland_video )
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_VIDEO_START(leland)
-	MCFG_VIDEO_UPDATE(leland)
 
 	MCFG_PALETTE_LENGTH(1024)
 
@@ -548,11 +547,12 @@ MACHINE_CONFIG_FRAGMENT( leland_video )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_UPDATE(leland)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_DERIVED( ataxx_video, leland_video )
-
 	MCFG_VIDEO_START(ataxx)
-	MCFG_VIDEO_UPDATE(ataxx)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(ataxx)
 MACHINE_CONFIG_END

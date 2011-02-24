@@ -8,4 +8,4 @@
 /*----------- defined in video/arcadecl.c -----------*/
 
 VIDEO_START( arcadecl );
-VIDEO_UPDATE( arcadecl );
+SCREEN_UPDATE( arcadecl );

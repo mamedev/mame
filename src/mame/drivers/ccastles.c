@@ -498,9 +498,9 @@ static MACHINE_CONFIG_START( ccastles, ccastles_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, 0, HTOTAL - 1, VTOTAL, 0, VTOTAL - 1)	/* will be adjusted later */
+	MCFG_SCREEN_UPDATE(ccastles)
 
 	MCFG_VIDEO_START(ccastles)
-	MCFG_VIDEO_UPDATE(ccastles)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

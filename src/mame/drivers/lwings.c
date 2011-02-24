@@ -797,13 +797,13 @@ static MACHINE_CONFIG_START( lwings, lwings_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_UPDATE(lwings)
+	MCFG_SCREEN_EOF(lwings)
 
 	MCFG_GFXDECODE(lwings)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START(lwings)
-	MCFG_VIDEO_EOF(lwings)
-	MCFG_VIDEO_UPDATE(lwings)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -840,7 +840,8 @@ static MACHINE_CONFIG_DERIVED( trojan, lwings )
 	MCFG_GFXDECODE(trojan)
 
 	MCFG_VIDEO_START(trojan)
-	MCFG_VIDEO_UPDATE(trojan)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(trojan)
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("5205", MSM5205, XTAL_455kHz)	/* verified on PCB */

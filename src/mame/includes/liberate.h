@@ -31,10 +31,10 @@ public:
 /*----------- defined in video/liberate.c -----------*/
 
 PALETTE_INIT( liberate );
-VIDEO_UPDATE( prosoccr );
-VIDEO_UPDATE( prosport );
-VIDEO_UPDATE( liberate );
-VIDEO_UPDATE( boomrang );
+SCREEN_UPDATE( prosoccr );
+SCREEN_UPDATE( prosport );
+SCREEN_UPDATE( liberate );
+SCREEN_UPDATE( boomrang );
 VIDEO_START( prosoccr );
 VIDEO_START( prosport );
 VIDEO_START( boomrang );

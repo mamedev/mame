@@ -40,4 +40,4 @@ public:
 
 /*----------- defined in video/lazercmd.c -----------*/
 
-VIDEO_UPDATE( lazercmd );
+SCREEN_UPDATE( lazercmd );

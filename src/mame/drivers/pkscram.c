@@ -219,7 +219,7 @@ static VIDEO_START( pkscramble )
 	tilemap_set_transparent_pen(fg_tilemap,15);
 }
 
-static VIDEO_UPDATE( pkscramble )
+static SCREEN_UPDATE( pkscramble )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,md_tilemap,0,0);
@@ -293,12 +293,12 @@ static MACHINE_CONFIG_START( pkscramble, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
+	MCFG_SCREEN_UPDATE(pkscramble)
 
 	MCFG_PALETTE_LENGTH(0x800)
 	MCFG_GFXDECODE(pkscram)
 
 	MCFG_VIDEO_START(pkscramble)
-	MCFG_VIDEO_UPDATE(pkscramble)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

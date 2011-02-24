@@ -175,7 +175,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-VIDEO_UPDATE( mikie )
+SCREEN_UPDATE( mikie )
 {
 	mikie_state *state = screen->machine->driver_data<mikie_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_CATEGORY(0), 0);

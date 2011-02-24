@@ -312,7 +312,7 @@ VIDEO_START( nbmj8991 )
 	memset(nbmj8991_videoram, 0x00, (width * height * sizeof(UINT8)));
 }
 
-VIDEO_UPDATE( nbmj8991_type1 )
+SCREEN_UPDATE( nbmj8991_type1 )
 {
 	int x, y;
 
@@ -351,7 +351,7 @@ VIDEO_UPDATE( nbmj8991_type1 )
 	return 0;
 }
 
-VIDEO_UPDATE( nbmj8991_type2 )
+SCREEN_UPDATE( nbmj8991_type2 )
 {
 	int x, y;
 

@@ -39,4 +39,4 @@ public:
 /*----------- defined in video/galastrm.c -----------*/
 
 VIDEO_START( galastrm );
-VIDEO_UPDATE( galastrm );
+SCREEN_UPDATE( galastrm );

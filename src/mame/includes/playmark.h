@@ -63,7 +63,7 @@ VIDEO_START( excelsr );
 VIDEO_START( hotmind );
 VIDEO_START( hrdtimes );
 
-VIDEO_UPDATE( bigtwin );
-VIDEO_UPDATE( wbeachvl );
-VIDEO_UPDATE( excelsr );
-VIDEO_UPDATE( hrdtimes );
+SCREEN_UPDATE( bigtwin );
+SCREEN_UPDATE( wbeachvl );
+SCREEN_UPDATE( excelsr );
+SCREEN_UPDATE( hrdtimes );

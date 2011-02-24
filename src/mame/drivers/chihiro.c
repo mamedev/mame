@@ -298,6 +298,11 @@ static MACHINE_START( chihiro )
 		debug_console_register_command(machine,"jamdis",CMDFLAG_NONE,0,2,3,jamtable_disasm_command);
 }
 
+static SCREEN_UPDATE( chihiro )
+{
+    return 0;
+}
+
 static MACHINE_CONFIG_START( chihiro_base, driver_device )
 
 	/* basic machine hardware */
@@ -323,6 +328,7 @@ static MACHINE_CONFIG_START( chihiro_base, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
+	MCFG_SCREEN_UPDATE(chihiro)
 
 	MCFG_MACHINE_START(chihiro)
 

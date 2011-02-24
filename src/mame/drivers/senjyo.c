@@ -568,12 +568,12 @@ static MACHINE_CONFIG_START( senjyo, senjyo_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(senjyo)
 
 	MCFG_GFXDECODE(senjyo)
 	MCFG_PALETTE_LENGTH(512+2)	/* 512 real palette + 2 for the radar */
 
 	MCFG_VIDEO_START(senjyo)
-	MCFG_VIDEO_UPDATE(senjyo)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

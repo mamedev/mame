@@ -907,7 +907,7 @@ static void draw_bitmap( running_machine *machine, bitmap_t *bitmap )
 }
 
 
-static VIDEO_UPDATE( nmg5 )
+static SCREEN_UPDATE( nmg5 )
 {
 	nmg5_state *state = screen->machine->driver_data<nmg5_state>();
 
@@ -1051,12 +1051,12 @@ static MACHINE_CONFIG_START( nmg5, nmg5_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_UPDATE(nmg5)
 
 	MCFG_GFXDECODE(nmg5)
 	MCFG_PALETTE_LENGTH(0x400)
 
 	MCFG_VIDEO_START(nmg5)
-	MCFG_VIDEO_UPDATE(nmg5)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

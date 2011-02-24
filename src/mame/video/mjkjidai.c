@@ -131,7 +131,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 
 
-VIDEO_UPDATE( mjkjidai )
+SCREEN_UPDATE( mjkjidai )
 {
 	if (!display_enable)
 		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));

@@ -126,7 +126,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-VIDEO_UPDATE( strnskil )
+SCREEN_UPDATE( strnskil )
 {
 	int row;
 	const UINT8 *usr1 = screen->machine->region("user1")->base();

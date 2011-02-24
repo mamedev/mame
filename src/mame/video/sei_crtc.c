@@ -269,7 +269,7 @@ VIDEO_START( seibu_crtc )
 	seibucrtc_sc0bank = 0;
 }
 
-VIDEO_UPDATE( seibu_crtc )
+SCREEN_UPDATE( seibu_crtc )
 {
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0x7ff]); //black pen
 

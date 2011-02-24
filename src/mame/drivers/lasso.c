@@ -521,13 +521,13 @@ static MACHINE_CONFIG_START( base, lasso_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(lasso)
 
 	MCFG_GFXDECODE(lasso)
 	MCFG_PALETTE_LENGTH(0x40)
 
 	MCFG_PALETTE_INIT(lasso)
 	MCFG_VIDEO_START(lasso)
-	MCFG_VIDEO_UPDATE(lasso)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -557,7 +557,8 @@ static MACHINE_CONFIG_DERIVED( chameleo, base )
 	MCFG_CPU_PROGRAM_MAP(chameleo_audio_map)
 
 	/* video hardware */
-	MCFG_VIDEO_UPDATE(chameleo)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(chameleo)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( wwjgtin, base )
@@ -575,12 +576,12 @@ static MACHINE_CONFIG_DERIVED( wwjgtin, base )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)	// Smaller visible area?
+	MCFG_SCREEN_UPDATE(wwjgtin)
 	MCFG_GFXDECODE(wwjgtin)	// Has 1 additional layer
 	MCFG_PALETTE_LENGTH(0x40 + 16*16)
 
 	MCFG_PALETTE_INIT(wwjgtin)
 	MCFG_VIDEO_START(wwjgtin)
-	MCFG_VIDEO_UPDATE(wwjgtin)
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("dac", DAC, 0)
@@ -603,7 +604,8 @@ static MACHINE_CONFIG_DERIVED( pinbo, base )
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START(pinbo)
-	MCFG_VIDEO_UPDATE(pinbo)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(pinbo)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("sn76489.1")

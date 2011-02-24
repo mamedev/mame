@@ -601,9 +601,9 @@ static MACHINE_CONFIG_START( tempest, tempest_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 580, 0, 570)
+	MCFG_SCREEN_UPDATE(vector)
 
 	MCFG_VIDEO_START(avg_tempest)
-	MCFG_VIDEO_UPDATE(vector)
 
 	/* Drivers */
 	MCFG_MATHBOX_ADD("mathbox")

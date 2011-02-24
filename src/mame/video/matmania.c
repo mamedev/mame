@@ -127,7 +127,7 @@ VIDEO_START( matmania )
 
 
 
-VIDEO_UPDATE( matmania )
+SCREEN_UPDATE( matmania )
 {
 	matmania_state *state = screen->machine->driver_data<matmania_state>();
 	UINT8 *spriteram = state->spriteram;
@@ -199,7 +199,7 @@ VIDEO_UPDATE( matmania )
 	return 0;
 }
 
-VIDEO_UPDATE( maniach )
+SCREEN_UPDATE( maniach )
 {
 	matmania_state *state = screen->machine->driver_data<matmania_state>();
 	UINT8 *spriteram = state->spriteram;

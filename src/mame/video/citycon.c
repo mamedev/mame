@@ -140,7 +140,7 @@ INLINE void changecolor_RRRRGGGGBBBBxxxx( running_machine *machine, int color, i
 	palette_set_color_rgb(machine, color, pal4bit(data >> 12), pal4bit(data >> 8), pal4bit(data >> 4));
 }
 
-VIDEO_UPDATE( citycon )
+SCREEN_UPDATE( citycon )
 {
 	citycon_state *state = screen->machine->driver_data<citycon_state>();
 	int offs, scroll;

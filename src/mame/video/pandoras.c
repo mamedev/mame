@@ -177,7 +177,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( pandoras )
+SCREEN_UPDATE( pandoras )
 {
 	pandoras_state *state = screen->machine->driver_data<pandoras_state>();
 	tilemap_draw(bitmap,cliprect, state->layer0, 1 ,0);

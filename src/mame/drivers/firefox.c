@@ -181,7 +181,7 @@ static VIDEO_START( firefox )
 }
 
 
-static VIDEO_UPDATE( firefox )
+static SCREEN_UPDATE( firefox )
 {
 	firefox_state *state = screen->machine->driver_data<firefox_state>();
 	int sprite;

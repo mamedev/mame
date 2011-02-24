@@ -184,7 +184,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-VIDEO_UPDATE( ssozumo )
+SCREEN_UPDATE( ssozumo )
 {
 	ssozumo_state *state = screen->machine->driver_data<ssozumo_state>();
 

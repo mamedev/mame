@@ -44,9 +44,9 @@ VIDEO_START( butasan );
 VIDEO_RESET( argus );
 VIDEO_RESET( valtric );
 VIDEO_RESET( butasan );
-VIDEO_UPDATE( argus );
-VIDEO_UPDATE( valtric );
-VIDEO_UPDATE( butasan );
+SCREEN_UPDATE( argus );
+SCREEN_UPDATE( valtric );
+SCREEN_UPDATE( butasan );
 
 READ8_HANDLER( argus_txram_r );
 READ8_HANDLER( argus_bg1ram_r );

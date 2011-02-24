@@ -39,4 +39,4 @@ WRITE16_HANDLER( suprslam_bg_videoram_w );
 WRITE16_HANDLER( suprslam_bank_w );
 
 VIDEO_START( suprslam );
-VIDEO_UPDATE( suprslam );
+SCREEN_UPDATE( suprslam );

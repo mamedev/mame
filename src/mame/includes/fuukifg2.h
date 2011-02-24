@@ -38,4 +38,4 @@ WRITE16_HANDLER( fuuki16_vram_2_w );
 WRITE16_HANDLER( fuuki16_vram_3_w );
 
 VIDEO_START( fuuki16 );
-VIDEO_UPDATE( fuuki16 );
+SCREEN_UPDATE( fuuki16 );

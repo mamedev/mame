@@ -322,7 +322,7 @@ static MACHINE_CONFIG_START( gunsmoke, gunsmoke_state )
 
 	MCFG_PALETTE_INIT(gunsmoke)
 	MCFG_VIDEO_START(gunsmoke)
-	MCFG_VIDEO_UPDATE(gunsmoke)
+	MCFG_SCREEN_UPDATE(gunsmoke)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

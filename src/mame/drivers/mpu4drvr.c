@@ -485,7 +485,7 @@ static UINT8 IR13_scn2674_scroll_end;
 static UINT8 IR13_scn2674_split_register_2;
 
 
-static VIDEO_UPDATE( mpu4_vid )
+static SCREEN_UPDATE( mpu4_vid )
 {
 	int x, y/*, count = 0*/;
 
@@ -2188,7 +2188,7 @@ static PALETTE_INIT( dealem )
 }
 
 
-static VIDEO_UPDATE(dealem)
+static SCREEN_UPDATE(dealem)
 {
 	int x,y;
 	int count = 0;
@@ -2381,6 +2381,7 @@ static MACHINE_CONFIG_START( mpu4_vid, driver_device )
 	MCFG_SCREEN_SIZE(64*8, 40*8) // note this directly affects the scanline counters used below, and thus the timing of everything
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 63*8-1, 0*8, 37*8-1)
 	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_UPDATE(mpu4_vid)
 
 	MCFG_CPU_ADD("video", M68000, VIDEO_MASTER_CLOCK )
 	MCFG_CPU_PROGRAM_MAP(mpu4_68k_map)
@@ -2390,7 +2391,6 @@ static MACHINE_CONFIG_START( mpu4_vid, driver_device )
 	MCFG_MACHINE_START(mpu4_vid)
 	MCFG_MACHINE_RESET(mpu4_vid)
 	MCFG_VIDEO_START (mpu4_vid)
-	MCFG_VIDEO_UPDATE(mpu4_vid)
 
 	MCFG_PALETTE_LENGTH(16)
 
@@ -2446,6 +2446,7 @@ static MACHINE_CONFIG_START( bwbvid, driver_device )
 	MCFG_SCREEN_SIZE(64*8, 40*8) // note this directly affects the scanline counters used below, and thus the timing of everything
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 63*8-1, 0*8, 37*8-1)
 	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_UPDATE(mpu4_vid)
 
 	MCFG_CPU_ADD("video", M68000, VIDEO_MASTER_CLOCK )
 	MCFG_CPU_PROGRAM_MAP(bwbvid_68k_map)
@@ -2455,7 +2456,6 @@ static MACHINE_CONFIG_START( bwbvid, driver_device )
 	MCFG_MACHINE_START(mpu4_vid)
 	MCFG_MACHINE_RESET(mpu4_vid)
 	MCFG_VIDEO_START (mpu4_vid)
-	MCFG_VIDEO_UPDATE(mpu4_vid)
 
 	MCFG_PALETTE_LENGTH(16)
 
@@ -2518,9 +2518,9 @@ static MACHINE_CONFIG_START( dealem, driver_device )
 	MCFG_SCREEN_SIZE((54+1)*8, (32+1)*8)					/* Taken from 6845 init, registers 00 & 04. Normally programmed with (value-1) */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 31*8-1)		/* Taken from 6845 init, registers 01 & 06 */
 	MCFG_SCREEN_REFRESH_RATE(56)							/* Measured accurately from the flip-flop, but 6845 handles this */
+	MCFG_SCREEN_UPDATE(dealem)
 
 	MCFG_GFXDECODE(dealem)
-	MCFG_VIDEO_UPDATE(dealem)
 
 	MCFG_PALETTE_LENGTH(32)
 	MCFG_PALETTE_INIT(dealem)

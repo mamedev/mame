@@ -145,7 +145,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( mrjong )
+SCREEN_UPDATE( mrjong )
 {
 	mrjong_state *state = screen->machine->driver_data<mrjong_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);

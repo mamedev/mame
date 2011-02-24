@@ -305,7 +305,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 }
 
 
-VIDEO_UPDATE( digdug )
+SCREEN_UPDATE( digdug )
 {
 	_galaga_state *state =  screen->machine->driver_data<_galaga_state>();
 

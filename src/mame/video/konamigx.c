@@ -2380,7 +2380,7 @@ VIDEO_START(racinfrc)
 
 }
 
-VIDEO_UPDATE(konamigx)
+SCREEN_UPDATE(konamigx)
 {
 	int i, newbank, newbase, dirty, unchained;
 	bitmap_t* realbitmap = bitmap;

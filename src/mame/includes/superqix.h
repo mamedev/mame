@@ -42,6 +42,6 @@ WRITE8_HANDLER( pbillian_0410_w );
 WRITE8_HANDLER( superqix_0410_w );
 
 VIDEO_START( pbillian );
-VIDEO_UPDATE( pbillian );
+SCREEN_UPDATE( pbillian );
 VIDEO_START( superqix );
-VIDEO_UPDATE( superqix );
+SCREEN_UPDATE( superqix );

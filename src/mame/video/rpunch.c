@@ -282,7 +282,7 @@ static void draw_bitmap(bitmap_t *bitmap, const rectangle *cliprect)
  *
  *************************************/
 
-VIDEO_UPDATE( rpunch )
+SCREEN_UPDATE( rpunch )
 {
 	int effbins;
 

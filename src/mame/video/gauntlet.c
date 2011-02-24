@@ -175,7 +175,7 @@ WRITE16_HANDLER( gauntlet_yscroll_w )
  *
  *************************************/
 
-VIDEO_UPDATE( gauntlet )
+SCREEN_UPDATE( gauntlet )
 {
 	gauntlet_state *state = screen->machine->driver_data<gauntlet_state>();
 	atarimo_rect_list rectlist;

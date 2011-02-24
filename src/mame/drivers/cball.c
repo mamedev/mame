@@ -50,7 +50,7 @@ static VIDEO_START( cball )
 }
 
 
-static VIDEO_UPDATE( cball )
+static SCREEN_UPDATE( cball )
 {
 	cball_state *state = screen->machine->driver_data<cball_state>();
 
@@ -238,13 +238,13 @@ static MACHINE_CONFIG_START( cball, cball_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 223)
+	MCFG_SCREEN_UPDATE(cball)
 
 	MCFG_GFXDECODE(cball)
 	MCFG_PALETTE_LENGTH(6)
 
 	MCFG_PALETTE_INIT(cball)
 	MCFG_VIDEO_START(cball)
-	MCFG_VIDEO_UPDATE(cball)
 
 	/* sound hardware */
 MACHINE_CONFIG_END

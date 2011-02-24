@@ -115,7 +115,7 @@ static VIDEO_START( skyarmy )
 }
 
 
-static VIDEO_UPDATE( skyarmy )
+static SCREEN_UPDATE( skyarmy )
 {
 	skyarmy_state *state = screen->machine->driver_data<skyarmy_state>();
 	UINT8 *spriteram = state->spriteram;
@@ -286,13 +286,13 @@ static MACHINE_CONFIG_START( skyarmy, skyarmy_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8,32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8,32*8-1,1*8,31*8-1)
+	MCFG_SCREEN_UPDATE(skyarmy)
 
 	MCFG_GFXDECODE(skyarmy)
 	MCFG_PALETTE_LENGTH(32)
 
 	MCFG_PALETTE_INIT(skyarmy)
 	MCFG_VIDEO_START(skyarmy)
-	MCFG_VIDEO_UPDATE(skyarmy)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

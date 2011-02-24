@@ -1164,7 +1164,7 @@ static void rallybik_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
     Draw the game screen in the given bitmap_t.
 ***************************************************************************/
 
-VIDEO_UPDATE( rallybik )
+SCREEN_UPDATE( rallybik )
 {
 	toaplan1_state *state = screen->machine->driver_data<toaplan1_state>();
 	int priority;
@@ -1188,7 +1188,7 @@ VIDEO_UPDATE( rallybik )
 	return 0;
 }
 
-VIDEO_UPDATE( toaplan1 )
+SCREEN_UPDATE( toaplan1 )
 {
 	toaplan1_state *state = screen->machine->driver_data<toaplan1_state>();
 	int priority;
@@ -1220,14 +1220,14 @@ VIDEO_UPDATE( toaplan1 )
     assume it happens automatically every frame, at the end of vblank
 ****************************************************************************/
 
-VIDEO_EOF( rallybik )
+SCREEN_EOF( rallybik )
 {
 	toaplan1_state *state = machine->driver_data<toaplan1_state>();
 
 	memcpy(state->buffered_spriteram, state->spriteram, state->spriteram_size);
 }
 
-VIDEO_EOF( toaplan1 )
+SCREEN_EOF( toaplan1 )
 {
 	toaplan1_state *state = machine->driver_data<toaplan1_state>();
 
@@ -1235,7 +1235,7 @@ VIDEO_EOF( toaplan1 )
 	memcpy(state->buffered_spritesizeram16, state->spritesizeram16, TOAPLAN1_SPRITESIZERAM_SIZE);
 }
 
-VIDEO_EOF( samesame )
+SCREEN_EOF( samesame )
 {
 	toaplan1_state *state = machine->driver_data<toaplan1_state>();
 

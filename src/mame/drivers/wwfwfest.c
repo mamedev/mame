@@ -379,7 +379,7 @@ static const ym2151_interface ym2151_config =
 	dd3_ymirq_handler
 };
 
-static VIDEO_EOF( wwfwfest )
+static SCREEN_EOF( wwfwfest )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
@@ -406,13 +406,13 @@ static MACHINE_CONFIG_START( wwfwfest, driver_device )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 320, 272, 8, 248)	/* HTOTAL and VTOTAL are guessed */
+	MCFG_SCREEN_UPDATE(wwfwfest)
+	MCFG_SCREEN_EOF(wwfwfest)
 
 	MCFG_GFXDECODE(wwfwfest)
 	MCFG_PALETTE_LENGTH(8192)
 
 	MCFG_VIDEO_START(wwfwfest)
-	MCFG_VIDEO_EOF(wwfwfest)
-	MCFG_VIDEO_UPDATE(wwfwfest)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

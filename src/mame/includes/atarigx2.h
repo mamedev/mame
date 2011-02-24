@@ -33,8 +33,8 @@ public:
 /*----------- defined in video/atarigx2.c -----------*/
 
 VIDEO_START( atarigx2 );
-VIDEO_EOF( atarigx2 );
-VIDEO_UPDATE( atarigx2 );
+SCREEN_EOF( atarigx2 );
+SCREEN_UPDATE( atarigx2 );
 
 WRITE16_HANDLER( atarigx2_mo_control_w );
 

@@ -176,7 +176,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 ***************************************************************************/
 
-VIDEO_UPDATE( wrally )
+SCREEN_UPDATE( wrally )
 {
 	wrally_state *state = screen->machine->driver_data<wrally_state>();
 	/* set scroll registers */

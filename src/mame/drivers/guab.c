@@ -243,7 +243,7 @@ static VIDEO_START( guab )
 }
 
 
-static VIDEO_UPDATE( guab )
+static SCREEN_UPDATE( guab )
 {
 	int x, y;
 	struct tms34061_display state;
@@ -800,11 +800,11 @@ static MACHINE_CONFIG_START( guab, guab_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
+	MCFG_SCREEN_UPDATE(guab)
 
 	MCFG_PALETTE_LENGTH(16)
 
 	MCFG_VIDEO_START(guab)
-	MCFG_VIDEO_UPDATE(guab)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

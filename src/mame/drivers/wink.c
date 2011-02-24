@@ -52,7 +52,7 @@ static VIDEO_START( wink )
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
-static VIDEO_UPDATE( wink )
+static SCREEN_UPDATE( wink )
 {
 	wink_state *state = screen->machine->driver_data<wink_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
@@ -353,12 +353,12 @@ static MACHINE_CONFIG_START( wink, wink_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(wink)
 
 	MCFG_GFXDECODE(wink)
 	MCFG_PALETTE_LENGTH(16)
 
 	MCFG_VIDEO_START(wink)
-	MCFG_VIDEO_UPDATE(wink)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

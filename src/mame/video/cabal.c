@@ -146,7 +146,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 }
 
 
-VIDEO_UPDATE( cabal )
+SCREEN_UPDATE( cabal )
 {
 	cabal_state *state = screen->machine->driver_data<cabal_state>();
 	tilemap_draw(bitmap,cliprect,state->background_layer,TILEMAP_DRAW_OPAQUE,0);

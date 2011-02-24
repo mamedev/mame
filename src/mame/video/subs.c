@@ -37,7 +37,7 @@ WRITE8_HANDLER( subs_invert2_w )
 }
 
 
-VIDEO_UPDATE( subs )
+SCREEN_UPDATE( subs )
 {
 	subs_state *state = screen->machine->driver_data<subs_state>();
 	UINT8 *videoram = state->videoram;

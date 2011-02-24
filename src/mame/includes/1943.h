@@ -35,4 +35,4 @@ extern WRITE8_HANDLER( c1943_colorram_w );
 
 extern PALETTE_INIT( 1943 );
 extern VIDEO_START( 1943 );
-extern VIDEO_UPDATE( 1943 );
+extern SCREEN_UPDATE( 1943 );

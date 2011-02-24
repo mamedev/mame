@@ -119,7 +119,7 @@ static VIDEO_START(magictg)
 
 }
 
-static VIDEO_UPDATE(magictg)
+static SCREEN_UPDATE(magictg)
 {
 	return 0;
 }
@@ -151,11 +151,11 @@ static MACHINE_CONFIG_START( magictg, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(1024, 1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 16, 447)
+	MCFG_SCREEN_UPDATE(magictg)
 
 	MCFG_PALETTE_LENGTH(0x1000)
 
 	MCFG_VIDEO_START(magictg)
-	MCFG_VIDEO_UPDATE(magictg)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( magictg )

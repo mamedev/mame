@@ -21,7 +21,7 @@ static VIDEO_START(chsuper)
 {
 }
 
-static VIDEO_UPDATE(chsuper)
+static SCREEN_UPDATE(chsuper)
 {
 	const gfx_element *gfx = screen->machine->gfx[0];
 	UINT8 *vram = screen->machine->region("vram")->base();
@@ -205,6 +205,7 @@ static MACHINE_CONFIG_START( chsuper, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0, 30*8-1)
+	MCFG_SCREEN_UPDATE(chsuper)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -212,7 +213,6 @@ static MACHINE_CONFIG_START( chsuper, driver_device )
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(chsuper)
-	MCFG_VIDEO_UPDATE(chsuper)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

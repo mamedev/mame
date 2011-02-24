@@ -288,7 +288,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 }
 
 
-VIDEO_UPDATE( pow )
+SCREEN_UPDATE( pow )
 {
 	snk68_state *state = screen->machine->driver_data<snk68_state>();
 

@@ -60,8 +60,8 @@ extern UINT32 *f3_vram,*f3_line_ram;
 extern UINT32 *f3_pf_data,*f3_pivot_ram;
 
 VIDEO_START( f3 );
-VIDEO_UPDATE( f3 );
-VIDEO_EOF( f3 );
+SCREEN_UPDATE( f3 );
+SCREEN_EOF( f3 );
 
 WRITE32_HANDLER( f3_control_0_w );
 WRITE32_HANDLER( f3_control_1_w );

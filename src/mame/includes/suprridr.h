@@ -22,4 +22,4 @@ int suprridr_is_screen_flipped(void);
 WRITE8_HANDLER( suprridr_fgram_w );
 WRITE8_HANDLER( suprridr_bgram_w );
 
-VIDEO_UPDATE( suprridr );
+SCREEN_UPDATE( suprridr );

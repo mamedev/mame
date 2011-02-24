@@ -102,7 +102,7 @@ WRITE8_HANDLER(lethalen_palette_control)
 	}
 }
 
-VIDEO_UPDATE(lethalen)
+SCREEN_UPDATE(lethalen)
 {
 	lethal_state *state = screen->machine->driver_data<lethal_state>();
 

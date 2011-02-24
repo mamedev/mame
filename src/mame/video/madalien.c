@@ -251,7 +251,7 @@ WRITE8_HANDLER( madalien_charram_w )
 }
 
 
-static VIDEO_UPDATE( madalien )
+static SCREEN_UPDATE( madalien )
 {
 	madalien_state *state = screen->machine->driver_data<madalien_state>();
 	int flip = BIT(input_port_read(screen->machine, "DSW"), 6) && BIT(*state->video_control, 0);
@@ -399,12 +399,12 @@ MACHINE_CONFIG_FRAGMENT( madalien_video )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 336, 0, 256, 288, 0, 256)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE(madalien)
 
 	MCFG_GFXDECODE(madalien)
 	MCFG_PALETTE_LENGTH(0x30)
 	MCFG_PALETTE_INIT(madalien)
 	MCFG_VIDEO_START(madalien)
-	MCFG_VIDEO_UPDATE(madalien)
 
 	MCFG_MC6845_ADD("crtc", MC6845, PIXEL_CLOCK / 8, mc6845_intf)
 MACHINE_CONFIG_END

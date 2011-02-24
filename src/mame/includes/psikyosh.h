@@ -46,5 +46,5 @@ public:
 /*----------- defined in video/psikyosh.c -----------*/
 
 VIDEO_START( psikyosh );
-VIDEO_UPDATE( psikyosh );
-VIDEO_EOF( psikyosh );
+SCREEN_UPDATE( psikyosh );
+SCREEN_EOF( psikyosh );

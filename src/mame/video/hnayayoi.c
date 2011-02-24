@@ -263,7 +263,7 @@ static void draw_layer_interleaved( running_machine *machine, bitmap_t *bitmap, 
 }
 
 
-VIDEO_UPDATE( hnayayoi )
+SCREEN_UPDATE( hnayayoi )
 {
 	hnayayoi_state *state = screen->machine->driver_data<hnayayoi_state>();
 	int col0 = (state->palbank >>  0) & 0x0f;

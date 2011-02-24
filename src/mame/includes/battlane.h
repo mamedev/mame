@@ -37,4 +37,4 @@ WRITE8_HANDLER( battlane_bitmap_w );
 WRITE8_HANDLER( battlane_video_ctrl_w );
 
 VIDEO_START( battlane );
-VIDEO_UPDATE( battlane );
+SCREEN_UPDATE( battlane );

@@ -280,7 +280,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	}
 }
 
-VIDEO_UPDATE( kikcubic )
+SCREEN_UPDATE( kikcubic )
 {
 	vigilant_state *state = screen->machine->driver_data<vigilant_state>();
 	UINT8 *videoram = state->videoram;
@@ -305,7 +305,7 @@ VIDEO_UPDATE( kikcubic )
 	return 0;
 }
 
-VIDEO_UPDATE( vigilant )
+SCREEN_UPDATE( vigilant )
 {
 	int i;
 

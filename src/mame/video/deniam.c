@@ -377,7 +377,7 @@ static void set_fg_page( running_machine *machine, int page, int value )
 	}
 }
 
-VIDEO_UPDATE( deniam )
+SCREEN_UPDATE( deniam )
 {
 	deniam_state *state = screen->machine->driver_data<deniam_state>();
 	int bg_scrollx, bg_scrolly, fg_scrollx, fg_scrolly;

@@ -243,7 +243,7 @@ static INTERRUPT_GEN( raiden_interrupt )
 	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc8/4);	/* VBL */
 }
 
-static VIDEO_EOF( raiden )
+static SCREEN_EOF( raiden )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	buffer_spriteram16_w(space,0,0,0xffff); /* Could be a memory location instead */
@@ -275,13 +275,13 @@ static MACHINE_CONFIG_START( raiden, raiden_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(raiden)
+	MCFG_SCREEN_EOF(raiden)
 
 	MCFG_GFXDECODE(raiden)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_VIDEO_START(raiden)
-	MCFG_VIDEO_EOF(raiden)
-	MCFG_VIDEO_UPDATE(raiden)
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_RAIDEN_INTERFACE(XTAL_14_31818MHz/4,XTAL_12MHz/12) // frequency and pin 7 verified (pin set in audio\seibu.h)

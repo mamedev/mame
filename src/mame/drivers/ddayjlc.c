@@ -380,7 +380,7 @@ static VIDEO_START( ddayjlc )
 	state->bg_tilemap = tilemap_create(machine, get_tile_info_bg, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
-static VIDEO_UPDATE( ddayjlc )
+static SCREEN_UPDATE( ddayjlc )
 {
 	ddayjlc_state *state = screen->machine->driver_data<ddayjlc_state>();
 	UINT32 i;
@@ -529,13 +529,13 @@ static MACHINE_CONFIG_START( ddayjlc, ddayjlc_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(ddayjlc)
 
 	MCFG_GFXDECODE(ddayjlc)
 	MCFG_PALETTE_LENGTH(0x200)
 	MCFG_PALETTE_INIT(ddayjlc)
 
 	MCFG_VIDEO_START(ddayjlc)
-	MCFG_VIDEO_UPDATE(ddayjlc)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

@@ -80,7 +80,7 @@ static VIDEO_START( rmhaihai )
 		8, 8, 64, 32);
 }
 
-static VIDEO_UPDATE( rmhaihai )
+static SCREEN_UPDATE( rmhaihai )
 {
 	rmhaihai_state *state = screen->machine->driver_data<rmhaihai_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
@@ -470,13 +470,13 @@ static MACHINE_CONFIG_START( rmhaihai, rmhaihai_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 60*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(rmhaihai)
 
 	MCFG_GFXDECODE(rmhaihai)
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START(rmhaihai)
-	MCFG_VIDEO_UPDATE(rmhaihai)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

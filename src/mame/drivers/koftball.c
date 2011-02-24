@@ -82,7 +82,7 @@ static VIDEO_START( koftball )
 	tilemap_set_transparent_pen(state->tilemap_1,0);
 }
 
-static VIDEO_UPDATE( koftball )
+static SCREEN_UPDATE( koftball )
 {
 	koftball_state *state = screen->machine->driver_data<koftball_state>();
 	tilemap_draw( bitmap, cliprect, state->tilemap_2, 0, 0);
@@ -232,6 +232,7 @@ static MACHINE_CONFIG_START( koftball, koftball_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_UPDATE(koftball)
 
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_GFXDECODE(koftball)
@@ -241,7 +242,6 @@ static MACHINE_CONFIG_START( koftball, koftball_state )
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_VIDEO_START(koftball)
-	MCFG_VIDEO_UPDATE(koftball)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

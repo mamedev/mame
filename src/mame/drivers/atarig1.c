@@ -472,10 +472,10 @@ static MACHINE_CONFIG_START( atarig1, atarig1_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* note: these parameters are from published specs, not derived */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
+	MCFG_SCREEN_UPDATE(atarig1)
+	MCFG_SCREEN_EOF(atarig1)
 
 	MCFG_VIDEO_START(atarig1)
-	MCFG_VIDEO_EOF(atarig1)
-	MCFG_VIDEO_UPDATE(atarig1)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(jsa_ii_mono)

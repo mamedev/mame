@@ -35,7 +35,7 @@ public:
 
 PALETTE_INIT( cop01 );
 VIDEO_START( cop01 );
-VIDEO_UPDATE( cop01 );
+SCREEN_UPDATE( cop01 );
 
 WRITE8_HANDLER( cop01_background_w );
 WRITE8_HANDLER( cop01_foreground_w );

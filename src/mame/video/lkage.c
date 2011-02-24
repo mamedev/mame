@@ -172,7 +172,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( lkage )
+SCREEN_UPDATE( lkage )
 {
 	lkage_state *state = screen->machine->driver_data<lkage_state>();
 	int bank;

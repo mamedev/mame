@@ -29,5 +29,5 @@ WRITE8_HANDLER( sauro_palette_bank_w );
 VIDEO_START( sauro );
 VIDEO_START( trckydoc );
 
-VIDEO_UPDATE( sauro );
-VIDEO_UPDATE( trckydoc );
+SCREEN_UPDATE( sauro );
+SCREEN_UPDATE( trckydoc );

@@ -38,4 +38,4 @@ WRITE8_HANDLER( goindol_fg_videoram_w );
 WRITE8_HANDLER( goindol_bg_videoram_w );
 
 VIDEO_START( goindol );
-VIDEO_UPDATE( goindol );
+SCREEN_UPDATE( goindol );

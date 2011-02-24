@@ -177,7 +177,7 @@ static void set_tilemap_scrolly( running_machine *machine, int cols )
 }
 
 
-VIDEO_UPDATE( marineb )
+SCREEN_UPDATE( marineb )
 {
 	marineb_state *state = screen->machine->driver_data<marineb_state>();
 	int offs;
@@ -239,7 +239,7 @@ VIDEO_UPDATE( marineb )
 }
 
 
-VIDEO_UPDATE( changes )
+SCREEN_UPDATE( changes )
 {
 	marineb_state *state = screen->machine->driver_data<marineb_state>();
 	int offs, sx, sy, code, col, flipx, flipy;
@@ -318,7 +318,7 @@ VIDEO_UPDATE( changes )
 }
 
 
-VIDEO_UPDATE( springer )
+SCREEN_UPDATE( springer )
 {
 	marineb_state *state = screen->machine->driver_data<marineb_state>();
 	int offs;
@@ -378,7 +378,7 @@ VIDEO_UPDATE( springer )
 }
 
 
-VIDEO_UPDATE( hoccer )
+SCREEN_UPDATE( hoccer )
 {
 	marineb_state *state = screen->machine->driver_data<marineb_state>();
 	int offs;
@@ -422,7 +422,7 @@ VIDEO_UPDATE( hoccer )
 }
 
 
-VIDEO_UPDATE( hopprobo )
+SCREEN_UPDATE( hopprobo )
 {
 	marineb_state *state = screen->machine->driver_data<marineb_state>();
 	int offs;

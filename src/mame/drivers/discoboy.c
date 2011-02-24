@@ -120,7 +120,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 }
 
 
-static VIDEO_UPDATE( discoboy )
+static SCREEN_UPDATE( discoboy )
 {
 	discoboy_state *state = screen->machine->driver_data<discoboy_state>();
 	UINT16 x, y;
@@ -486,12 +486,12 @@ static MACHINE_CONFIG_START( discoboy, discoboy_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, 512-1-8*8, 0+8, 256-1-8)
+	MCFG_SCREEN_UPDATE(discoboy)
 
 	MCFG_GFXDECODE(discoboy)
 	MCFG_PALETTE_LENGTH(0x1000)
 
 	MCFG_VIDEO_START(discoboy)
-	MCFG_VIDEO_UPDATE(discoboy)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -157,7 +157,7 @@ static void draw_boxer( running_machine *machine, bitmap_t* bitmap, const rectan
 }
 
 
-static VIDEO_UPDATE( boxer )
+static SCREEN_UPDATE( boxer )
 {
 	boxer_state *state = screen->machine->driver_data<boxer_state>();
 	int i, j;
@@ -450,11 +450,11 @@ static MACHINE_CONFIG_START( boxer, boxer_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 262)
 	MCFG_SCREEN_VISIBLE_AREA(8, 247, 0, 239)
+	MCFG_SCREEN_UPDATE(boxer)
 
 	MCFG_GFXDECODE(boxer)
 	MCFG_PALETTE_LENGTH(4)
 	MCFG_PALETTE_INIT(boxer)
-	MCFG_VIDEO_UPDATE(boxer)
 
 	/* sound hardware */
 MACHINE_CONFIG_END

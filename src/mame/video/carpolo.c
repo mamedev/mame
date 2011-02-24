@@ -221,7 +221,7 @@ static void draw_sprite(running_machine *machine, bitmap_t *bitmap, const rectan
 }
 
 
-VIDEO_UPDATE( carpolo )
+SCREEN_UPDATE( carpolo )
 {
 	carpolo_state *state = screen->machine->driver_data<carpolo_state>();
 	/* draw the playfield elements in the correct priority order */
@@ -549,7 +549,7 @@ static int check_sprite_border_collision(running_machine *machine, UINT8 x1, UIN
 }
 
 
-VIDEO_EOF( carpolo )
+SCREEN_EOF( carpolo )
 {
 	carpolo_state *state = machine->driver_data<carpolo_state>();
 	int col_x, col_y;

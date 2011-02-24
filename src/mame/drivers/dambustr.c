@@ -260,13 +260,13 @@ static MACHINE_CONFIG_START( dambustr, dambustr_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(dambustr)
 
 	MCFG_GFXDECODE(dambustr)
 	MCFG_PALETTE_LENGTH(32+2+64+8)		/* 32 for the characters, 2 for the bullets, 64 for the stars, 8 for the background */
 
 	MCFG_PALETTE_INIT(dambustr)
 	MCFG_VIDEO_START(dambustr)
-	MCFG_VIDEO_UPDATE(dambustr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

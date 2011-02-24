@@ -43,7 +43,7 @@ public:
 	virtual void machine_reset();
 
 	virtual void video_start();
-	bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect) { m_vis->update_screen(&bitmap, &cliprect); return false; }
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect) { m_vis->update_screen(&bitmap, &cliprect); return false; }
 
 	DECLARE_READ8_MEMBER( draco_sound_in_r );
 	DECLARE_READ8_MEMBER( draco_sound_ay8910_r );

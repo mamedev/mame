@@ -103,7 +103,7 @@ VIDEO_START( quasar )
 	state->save_pointer(NAME(state->effectram), 0x400);
 }
 
-VIDEO_UPDATE( quasar )
+SCREEN_UPDATE( quasar )
 {
 	cvs_state *state = screen->machine->driver_data<cvs_state>();
 	int offs;

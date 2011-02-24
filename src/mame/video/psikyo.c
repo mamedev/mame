@@ -524,7 +524,7 @@ static int tilemap_width( int size )
 		return 0x10 * 16;
 }
 
-VIDEO_UPDATE( psikyo )
+SCREEN_UPDATE( psikyo )
 {
 	psikyo_state *state = screen->machine->driver_data<psikyo_state>();
 	int i, layers_ctrl = -1;
@@ -698,7 +698,7 @@ VIDEO_UPDATE( psikyo )
 
 */
 
-VIDEO_UPDATE( psikyo_bootleg )
+SCREEN_UPDATE( psikyo_bootleg )
 {
 	psikyo_state *state = screen->machine->driver_data<psikyo_state>();
 	int i, layers_ctrl = -1;
@@ -865,7 +865,7 @@ VIDEO_UPDATE( psikyo_bootleg )
 }
 
 
-VIDEO_EOF( psikyo )
+SCREEN_EOF( psikyo )
 {
 	psikyo_state *state = machine->driver_data<psikyo_state>();
 	memcpy(state->spritebuf2, state->spritebuf1, 0x2000);

@@ -1449,9 +1449,9 @@ static MACHINE_CONFIG_START( defender, williams_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK*2/3, 512, 10, 304, 260, 7, 245)
+	MCFG_SCREEN_UPDATE(williams)
 
 	MCFG_VIDEO_START(williams)
-	MCFG_VIDEO_UPDATE(williams)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1588,7 +1588,8 @@ static MACHINE_CONFIG_DERIVED( blaster, williams )
 
 	/* video hardware */
 	MCFG_VIDEO_START(blaster)
-	MCFG_VIDEO_UPDATE(blaster)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(blaster)
 
 	/* pia */
 	MCFG_PIA6821_MODIFY("pia_0", williams_49way_pia_0_intf)
@@ -1628,9 +1629,9 @@ static MACHINE_CONFIG_START( williams2, williams_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK*2/3, 512, 8, 284, 260, 8, 248)
+	MCFG_SCREEN_UPDATE(williams2)
 
 	MCFG_VIDEO_START(williams2)
-	MCFG_VIDEO_UPDATE(williams2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -520,7 +520,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 }
 
 
-VIDEO_UPDATE( polepos )
+SCREEN_UPDATE( polepos )
 {
 	polepos_state *state = screen->machine->driver_data<polepos_state>();
 	rectangle clip = *cliprect;

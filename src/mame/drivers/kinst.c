@@ -220,7 +220,7 @@ static MACHINE_RESET( kinst )
  *
  *************************************/
 
-static VIDEO_UPDATE( kinst )
+static SCREEN_UPDATE( kinst )
 {
 	int y;
 
@@ -658,11 +658,10 @@ static MACHINE_CONFIG_START( kinst, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_UPDATE(kinst)
 
 	MCFG_PALETTE_INIT(BBBBB_GGGGG_RRRRR)
 	MCFG_PALETTE_LENGTH(32768)
-
-	MCFG_VIDEO_UPDATE(kinst)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(dcs_audio_2k)

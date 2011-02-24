@@ -14,4 +14,4 @@ PALETTE_INIT( popeye );
 PALETTE_INIT( popeyebl );
 VIDEO_START( skyskipr );
 VIDEO_START( popeye );
-VIDEO_UPDATE( popeye );
+SCREEN_UPDATE( popeye );

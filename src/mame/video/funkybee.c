@@ -160,7 +160,7 @@ static void draw_columns( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( funkybee )
+SCREEN_UPDATE( funkybee )
 {
 	funkybee_state *state = screen->machine->driver_data<funkybee_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);

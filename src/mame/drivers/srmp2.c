@@ -1161,12 +1161,12 @@ static MACHINE_CONFIG_START( srmp2, srmp2_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(464, 256-16)
 	MCFG_SCREEN_VISIBLE_AREA(16, 464-1, 8, 256-1-24)
+	MCFG_SCREEN_UPDATE(srmp2)		/* just draw the sprites */
 
 	MCFG_GFXDECODE(srmp2)
 	MCFG_PALETTE_LENGTH(1024)	/* sprites only */
 
 	MCFG_PALETTE_INIT(srmp2)
-	MCFG_VIDEO_UPDATE(srmp2)		/* just draw the sprites */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1201,12 +1201,12 @@ static MACHINE_CONFIG_START( srmp3, srmp2_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(400, 256-16)
 	MCFG_SCREEN_VISIBLE_AREA(16, 400-1, 8, 256-1-24)
+	MCFG_SCREEN_UPDATE(srmp3)	/* just draw the sprites */
 
 	MCFG_GFXDECODE(srmp3)
 	MCFG_PALETTE_LENGTH(512)	/* sprites only */
 
 	MCFG_PALETTE_INIT(srmp3)
-	MCFG_VIDEO_UPDATE(srmp3)	/* just draw the sprites */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1249,11 +1249,10 @@ static MACHINE_CONFIG_START( mjyuugi, srmp2_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(400, 256-16)
 	MCFG_SCREEN_VISIBLE_AREA(16, 400-1, 0, 256-1-16)
+	MCFG_SCREEN_UPDATE(mjyuugi)			/* just draw the sprites */
 
 	MCFG_GFXDECODE(srmp3)
 	MCFG_PALETTE_LENGTH(512)			/* sprites only */
-
-	MCFG_VIDEO_UPDATE(mjyuugi)			/* just draw the sprites */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

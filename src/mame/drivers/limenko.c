@@ -427,7 +427,7 @@ static VIDEO_START( limenko )
 	sprites_bitmap_pri = auto_bitmap_alloc(machine,384,240,BITMAP_FORMAT_INDEXED8);
 }
 
-static VIDEO_UPDATE( limenko )
+static SCREEN_UPDATE( limenko )
 {
 	// limenko_videoreg[4] ???? It always has this value: 0xffeffff8 (2 signed bytes? values: -17 and -8 ?)
 
@@ -655,12 +655,12 @@ static MACHINE_CONFIG_START( limenko, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(384, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 383, 0, 239)
+	MCFG_SCREEN_UPDATE(limenko)
 
 	MCFG_GFXDECODE(limenko)
 	MCFG_PALETTE_LENGTH(0x1000)
 
 	MCFG_VIDEO_START(limenko)
-	MCFG_VIDEO_UPDATE(limenko)
 
 	/* sound hardware */
 MACHINE_CONFIG_END
@@ -683,12 +683,12 @@ static MACHINE_CONFIG_START( spotty, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(384, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 383, 0, 239)
+	MCFG_SCREEN_UPDATE(limenko)
 
 	MCFG_GFXDECODE(limenko)
 	MCFG_PALETTE_LENGTH(0x1000)
 
 	MCFG_VIDEO_START(limenko)
-	MCFG_VIDEO_UPDATE(limenko)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

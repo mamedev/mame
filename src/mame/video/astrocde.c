@@ -301,7 +301,7 @@ static void init_savestate(running_machine *machine)
  *
  *************************************/
 
-VIDEO_UPDATE( astrocde )
+SCREEN_UPDATE( astrocde )
 {
 	astrocde_state *state = screen->machine->driver_data<astrocde_state>();
 	UINT8 *videoram = state->videoram;
@@ -386,7 +386,7 @@ VIDEO_UPDATE( astrocde )
 }
 
 
-VIDEO_UPDATE( profpac )
+SCREEN_UPDATE( profpac )
 {
 	int y;
 

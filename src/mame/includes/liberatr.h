@@ -37,7 +37,7 @@ protected:
 	virtual void machine_start();
 
 	virtual void video_start();
-	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	void init_planet(planet &liberatr_planet, UINT8 *planet_rom);
 	void get_pens(pen_t *pens);

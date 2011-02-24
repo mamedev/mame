@@ -387,7 +387,7 @@ static void sortlayers(int *layer,int *pri)
 	SWAP(1,2)
 }
 
-VIDEO_UPDATE( macrossp )
+SCREEN_UPDATE( macrossp )
 {
 	macrossp_state *state = screen->machine->driver_data<macrossp_state>();
 	int layers[3],layerpri[3];
@@ -429,7 +429,7 @@ state->scrc_videoregs[2]);// 08 - 0b
 	return 0;
 }
 
-VIDEO_EOF( macrossp )
+SCREEN_EOF( macrossp )
 {
 	macrossp_state *state = machine->driver_data<macrossp_state>();
 

@@ -185,7 +185,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 }
 
 
-VIDEO_UPDATE( perfrman )
+SCREEN_UPDATE( perfrman )
 {
 	tilemap_set_flip( pf1_tilemap, flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	tilemap_set_scrolly( pf1_tilemap ,0 , 0 );
@@ -206,7 +206,7 @@ VIDEO_UPDATE( perfrman )
 }
 
 
-VIDEO_UPDATE( slapfight )
+SCREEN_UPDATE( slapfight )
 {
 	UINT8 *buffered_spriteram = screen->machine->generic.buffered_spriteram.u8;
 	int offs;

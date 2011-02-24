@@ -457,7 +457,7 @@ static VIDEO_START( sms )
 	state_save_register_global_bitmap(machine, sms_bitmap);
 }
 
-static VIDEO_UPDATE( sms )
+static SCREEN_UPDATE( sms )
 {
 	copybitmap(bitmap, sms_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
@@ -557,12 +557,12 @@ static MACHINE_CONFIG_START( sms, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(0x1b0, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x1af, 0, 0xff)
+	MCFG_SCREEN_UPDATE(sms)
 
 	MCFG_PALETTE_LENGTH(8)
 
 	MCFG_PALETTE_INIT(sms)
 	MCFG_VIDEO_START(sms)
-	MCFG_VIDEO_UPDATE(sms)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

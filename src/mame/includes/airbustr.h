@@ -45,5 +45,5 @@ WRITE8_HANDLER( airbustr_colorram2_w );
 WRITE8_HANDLER( airbustr_scrollregs_w );
 
 VIDEO_START( airbustr );
-VIDEO_UPDATE( airbustr );
-VIDEO_EOF( airbustr );
+SCREEN_UPDATE( airbustr );
+SCREEN_EOF( airbustr );

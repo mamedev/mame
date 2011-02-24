@@ -57,7 +57,7 @@ VIDEO_START( sprint4 )
 }
 
 
-VIDEO_UPDATE( sprint4 )
+SCREEN_UPDATE( sprint4 )
 {
 	sprint4_state *state = screen->machine->driver_data<sprint4_state>();
 	UINT8 *videoram = state->videoram;
@@ -88,7 +88,7 @@ VIDEO_UPDATE( sprint4 )
 }
 
 
-VIDEO_EOF( sprint4 )
+SCREEN_EOF( sprint4 )
 {
 	sprint4_state *state = machine->driver_data<sprint4_state>();
 	UINT8 *videoram = state->videoram;

@@ -553,7 +553,7 @@ static void video_update_common(device_t *screen, bitmap_t *bitmap, const rectan
  *
  *************************************/
 
-VIDEO_UPDATE( system1 )
+SCREEN_UPDATE( system1 )
 {
 	system1_state *state = screen->machine->driver_data<system1_state>();
 	UINT8 *videoram = state->videoram;
@@ -589,7 +589,7 @@ VIDEO_UPDATE( system1 )
 }
 
 
-VIDEO_UPDATE( system2 )
+SCREEN_UPDATE( system2 )
 {
 	system1_state *state = screen->machine->driver_data<system1_state>();
 	UINT8 *videoram = state->videoram;
@@ -632,7 +632,7 @@ VIDEO_UPDATE( system2 )
 }
 
 
-VIDEO_UPDATE( system2_rowscroll )
+SCREEN_UPDATE( system2_rowscroll )
 {
 	system1_state *state = screen->machine->driver_data<system1_state>();
 	UINT8 *videoram = state->videoram;

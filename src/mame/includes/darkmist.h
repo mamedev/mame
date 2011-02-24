@@ -18,6 +18,6 @@ public:
 /*----------- defined in video/darkmist.c -----------*/
 
 VIDEO_START( darkmist );
-VIDEO_UPDATE( darkmist );
+SCREEN_UPDATE( darkmist );
 PALETTE_INIT( darkmist );
 

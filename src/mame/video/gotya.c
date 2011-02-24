@@ -177,7 +177,7 @@ static void draw_status( running_machine *machine, bitmap_t *bitmap, const recta
 	draw_status_row(machine, bitmap, cliprect, 34, 15);
 }
 
-VIDEO_UPDATE( gotya )
+SCREEN_UPDATE( gotya )
 {
 	gotya_state *state = screen->machine->driver_data<gotya_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, -(*state->scroll + (state->scroll_bit_8 * 256)) - 2 * 8);

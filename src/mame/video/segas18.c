@@ -148,7 +148,7 @@ static void draw_vdp(device_t *screen, bitmap_t *bitmap, const rectangle *clipre
  *
  *************************************/
 
-VIDEO_UPDATE( system18 )
+SCREEN_UPDATE( system18 )
 {
 	segas1x_state *state = screen->machine->driver_data<segas1x_state>();
 	int vdppri, vdplayer;

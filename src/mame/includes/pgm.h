@@ -120,5 +120,5 @@ WRITE16_HANDLER( pgm_tx_videoram_w );
 WRITE16_HANDLER( pgm_bg_videoram_w );
 
 VIDEO_START( pgm );
-VIDEO_EOF( pgm );
-VIDEO_UPDATE( pgm );
+SCREEN_EOF( pgm );
+SCREEN_UPDATE( pgm );

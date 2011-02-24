@@ -30,4 +30,4 @@ public:
 
 WRITE8_HANDLER( malzak_playfield_w );
 
-VIDEO_UPDATE( malzak );
+SCREEN_UPDATE( malzak );

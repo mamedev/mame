@@ -3,7 +3,7 @@
 extern UINT8 *speedspn_attram;
 
 VIDEO_START( speedspn );
-VIDEO_UPDATE( speedspn );
+SCREEN_UPDATE( speedspn );
 
 WRITE8_HANDLER( speedspn_vidram_w );
 WRITE8_HANDLER( speedspn_attram_w );

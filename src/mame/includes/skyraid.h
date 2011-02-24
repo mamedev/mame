@@ -29,4 +29,4 @@ extern WRITE8_DEVICE_HANDLER( skyraid_sound_w );
 /*----------- defined in video/skyraid.c -----------*/
 
 VIDEO_START(skyraid);
-VIDEO_UPDATE(skyraid);
+SCREEN_UPDATE(skyraid);

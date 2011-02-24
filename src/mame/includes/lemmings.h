@@ -32,5 +32,5 @@ WRITE16_HANDLER( lemmings_pixel_1_w );
 WRITE16_HANDLER( lemmings_vram_w );
 
 VIDEO_START( lemmings );
-VIDEO_EOF( lemmings );
-VIDEO_UPDATE( lemmings );
+SCREEN_EOF( lemmings );
+SCREEN_UPDATE( lemmings );

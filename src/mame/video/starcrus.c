@@ -425,7 +425,7 @@ static int collision_check_s2p1p2(running_machine *machine)
 	return 0;
 }
 
-VIDEO_UPDATE( starcrus )
+SCREEN_UPDATE( starcrus )
 {
 	starcrus_state *state = screen->machine->driver_data<starcrus_state>();
 

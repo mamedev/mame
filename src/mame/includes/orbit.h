@@ -50,6 +50,6 @@ DISCRETE_SOUND_EXTERN( orbit );
 /*----------- defined in video/orbit.c -----------*/
 
 VIDEO_START( orbit );
-VIDEO_UPDATE( orbit );
+SCREEN_UPDATE( orbit );
 
 extern WRITE8_HANDLER( orbit_playfield_w );

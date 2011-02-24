@@ -607,12 +607,12 @@ static MACHINE_CONFIG_START( ddragon3, ddragon3_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 448, 0, 320, 272, 8, 248)	/* HTOTAL and VTOTAL are guessed */
+	MCFG_SCREEN_UPDATE(ddragon3)
 
 	MCFG_GFXDECODE(ddragon3)
 	MCFG_PALETTE_LENGTH(768)
 
 	MCFG_VIDEO_START(ddragon3)
-	MCFG_VIDEO_UPDATE(ddragon3)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -640,8 +640,9 @@ static MACHINE_CONFIG_DERIVED( ctribe, ddragon3 )
 
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(ctribe_sound_map)
-
-	MCFG_VIDEO_UPDATE(ctribe)
+	
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(ctribe)
 
 	MCFG_SOUND_MODIFY("ym2151")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.20)

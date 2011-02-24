@@ -50,4 +50,4 @@ WRITE8_HANDLER( firetrap_bg2_scrolly_w );
 
 PALETTE_INIT( firetrap );
 VIDEO_START( firetrap );
-VIDEO_UPDATE( firetrap );
+SCREEN_UPDATE( firetrap );

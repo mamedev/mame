@@ -1022,6 +1022,7 @@ static MACHINE_CONFIG_START( yboard, segas1x_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(342,262)	/* to be verified */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_UPDATE(yboard)
 
 	MCFG_SEGA16SP_ADD_YBOARD_16B("segaspr1")
 	MCFG_SEGA16SP_ADD_YBOARD("segaspr2")
@@ -1029,7 +1030,6 @@ static MACHINE_CONFIG_START( yboard, segas1x_state )
 	MCFG_PALETTE_LENGTH(8192*3)
 
 	MCFG_VIDEO_START(yboard)
-	MCFG_VIDEO_UPDATE(yboard)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -1179,7 +1179,7 @@ static void end_of_frame(running_machine *machine, struct sms_vdp *chip)
 }
 
 
-VIDEO_EOF(sms)
+SCREEN_EOF(sms)
 {
 	end_of_frame(machine, md_sms_vdp);
 
@@ -1248,24 +1248,24 @@ MACHINE_RESET(megatech_bios)
 	vdp1->sms_scanline_timer->adjust(attotime::zero);
 }
 
-VIDEO_EOF(systeme)
+SCREEN_EOF(systeme)
 {
 	end_of_frame(machine, vdp1);
 	end_of_frame(machine, vdp2);
 }
 
 
-VIDEO_EOF(megatech_md_sms)
+SCREEN_EOF(megatech_md_sms)
 {
 	end_of_frame(machine, md_sms_vdp);
 }
 
-VIDEO_EOF(megatech_bios)
+SCREEN_EOF(megatech_bios)
 {
 	end_of_frame(machine, vdp1);
 }
 
-VIDEO_UPDATE(megatech_md_sms)
+SCREEN_UPDATE(megatech_md_sms)
 {
 	int x,y;
 
@@ -1284,7 +1284,7 @@ VIDEO_UPDATE(megatech_md_sms)
 }
 
 
-VIDEO_UPDATE(megatech_bios)
+SCREEN_UPDATE(megatech_bios)
 {
 	int x,y;
 
@@ -1302,7 +1302,7 @@ VIDEO_UPDATE(megatech_bios)
 	return 0;
 }
 
-VIDEO_UPDATE(megaplay_bios)
+SCREEN_UPDATE(megaplay_bios)
 {
 	int x,y;
 
@@ -1323,7 +1323,7 @@ VIDEO_UPDATE(megaplay_bios)
 	return 0;
 }
 
-VIDEO_UPDATE(systeme)
+SCREEN_UPDATE(systeme)
 {
 //  show_tiles();
 	int x,y;
@@ -1726,12 +1726,12 @@ MACHINE_CONFIG_START( sms, driver_device )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 223)
 //  MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 191)
+	MCFG_SCREEN_UPDATE(megatech_md_sms) /* Copies a bitmap */
+	MCFG_SCREEN_EOF(sms) /* Used to Sync the timing */
 
 	MCFG_PALETTE_LENGTH(0x200)
 
 	MCFG_VIDEO_START(sms)
-	MCFG_VIDEO_UPDATE(megatech_md_sms) /* Copies a bitmap */
-	MCFG_VIDEO_EOF(sms) /* Used to Sync the timing */
 
 	MCFG_NVRAM_HANDLER( sms )
 

@@ -139,7 +139,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-static VIDEO_UPDATE(astrocorp)
+static SCREEN_UPDATE(astrocorp)
 {
 	astrocorp_state *state = screen->machine->driver_data<astrocorp_state>();
 
@@ -478,12 +478,12 @@ static MACHINE_CONFIG_START( showhand, astrocorp_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+	MCFG_SCREEN_UPDATE(astrocorp)
 
 	MCFG_GFXDECODE(astrocorp)
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(astrocorp)
-	MCFG_VIDEO_UPDATE(astrocorp)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -528,12 +528,12 @@ static MACHINE_CONFIG_START( skilldrp, astrocorp_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(0x200, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x200-1, 0, 0xf0-1)
+	MCFG_SCREEN_UPDATE(astrocorp)
 
 	MCFG_GFXDECODE(astrocorp)
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_VIDEO_START(astrocorp)
-	MCFG_VIDEO_UPDATE(astrocorp)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

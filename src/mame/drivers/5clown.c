@@ -506,7 +506,7 @@ static VIDEO_START(fclown)
 }
 
 
-static VIDEO_UPDATE( fclown )
+static SCREEN_UPDATE( fclown )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	return 0;
@@ -1050,13 +1050,13 @@ static MACHINE_CONFIG_START( fclown, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE((39+1)*8, (31+1)*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(fclown)
 
 	MCFG_GFXDECODE(fclown)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_PALETTE_INIT(fclown)
 
 	MCFG_VIDEO_START(fclown)
-	MCFG_VIDEO_UPDATE(fclown)
 
 	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK/16, mc6845_intf) /* guess */
 

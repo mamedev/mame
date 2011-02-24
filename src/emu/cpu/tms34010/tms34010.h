@@ -204,7 +204,7 @@ struct _tms34010_config
 
 
 /* PUBLIC FUNCTIONS - 34010 */
-VIDEO_UPDATE( tms340x0 );
+SCREEN_UPDATE( tms340x0 );
 void tms34010_get_display_params(device_t *cpu, tms34010_display_params *params);
 
 DECLARE_LEGACY_CPU_DEVICE(TMS34010, tms34010);

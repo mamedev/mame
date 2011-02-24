@@ -1428,7 +1428,7 @@ static void filter_bitmap(bitmap_t *bitmap, int mask)
 }
 
 
-static VIDEO_UPDATE( halleys )
+static SCREEN_UPDATE( halleys )
 {
 	int i, j;
 
@@ -1456,7 +1456,7 @@ static VIDEO_UPDATE( halleys )
 }
 
 
-static VIDEO_UPDATE( benberob )
+static SCREEN_UPDATE( benberob )
 {
 	if (io_ram[0xa0] & 0x80)
 		copy_scroll_op(bitmap, render_layer[2], *scrollx1, *scrolly1);
@@ -1952,12 +1952,12 @@ static MACHINE_CONFIG_START( halleys, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(SCREEN_WIDTH, SCREEN_HEIGHT)
 	MCFG_SCREEN_VISIBLE_AREA(VIS_MINX, VIS_MAXX, VIS_MINY, VIS_MAXY)
+	MCFG_SCREEN_UPDATE(halleys)
 
 	MCFG_PALETTE_LENGTH(PALETTE_SIZE)
 	MCFG_PALETTE_INIT(halleys)
 
 	MCFG_VIDEO_START(halleys)
-	MCFG_VIDEO_UPDATE(halleys)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1981,7 +1981,9 @@ static MACHINE_CONFIG_DERIVED( benberob, halleys )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL_19_968MHz/12) /* not verified but pcb identical to halley's comet */
 	MCFG_CPU_VBLANK_INT_HACK(benberob_interrupt, 4)
-	MCFG_VIDEO_UPDATE(benberob)
+	
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(benberob)
 MACHINE_CONFIG_END
 
 

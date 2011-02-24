@@ -463,15 +463,16 @@ static MACHINE_CONFIG_START( cyberbal, cyberbal_state )
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240)
+	MCFG_SCREEN_UPDATE(cyberbal)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240)
+	MCFG_SCREEN_UPDATE(cyberbal)
 
 	MCFG_VIDEO_START(cyberbal)
-	MCFG_VIDEO_UPDATE(cyberbal)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -510,9 +511,9 @@ static MACHINE_CONFIG_START( cyberbal2p, cyberbal_state )
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240)
+	MCFG_SCREEN_UPDATE(cyberbal)
 
 	MCFG_VIDEO_START(cyberbal2p)
-	MCFG_VIDEO_UPDATE(cyberbal)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(jsa_ii_mono)

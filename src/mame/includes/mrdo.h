@@ -32,4 +32,4 @@ WRITE8_HANDLER( mrdo_flipscreen_w );
 
 PALETTE_INIT( mrdo );
 VIDEO_START( mrdo );
-VIDEO_UPDATE( mrdo );
+SCREEN_UPDATE( mrdo );

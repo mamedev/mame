@@ -279,7 +279,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const UINT1
 
 /******************************************************************************/
 
-VIDEO_UPDATE( bbuster )
+SCREEN_UPDATE( bbuster )
 {
 	bbusters_state *state = screen->machine->driver_data<bbusters_state>();
 
@@ -297,7 +297,7 @@ VIDEO_UPDATE( bbuster )
 	return 0;
 }
 
-VIDEO_UPDATE( mechatt )
+SCREEN_UPDATE( mechatt )
 {
 	bbusters_state *state = screen->machine->driver_data<bbusters_state>();
 

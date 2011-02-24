@@ -399,7 +399,7 @@ VIDEO_START( niyanpai )
 
 
 ******************************************************************************/
-VIDEO_UPDATE( niyanpai )
+SCREEN_UPDATE( niyanpai )
 {
 	int i;
 	int x, y;

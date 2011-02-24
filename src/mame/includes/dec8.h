@@ -41,14 +41,14 @@ public:
 
 
 PALETTE_INIT( ghostb );
-VIDEO_UPDATE( cobracom );
-VIDEO_UPDATE( ghostb );
-VIDEO_UPDATE( srdarwin );
-VIDEO_UPDATE( gondo );
-VIDEO_UPDATE( garyoret );
-VIDEO_UPDATE( lastmisn );
-VIDEO_UPDATE( shackled );
-VIDEO_UPDATE( oscar );
+SCREEN_UPDATE( cobracom );
+SCREEN_UPDATE( ghostb );
+SCREEN_UPDATE( srdarwin );
+SCREEN_UPDATE( gondo );
+SCREEN_UPDATE( garyoret );
+SCREEN_UPDATE( lastmisn );
+SCREEN_UPDATE( shackled );
+SCREEN_UPDATE( oscar );
 VIDEO_START( cobracom );
 VIDEO_START( oscar );
 VIDEO_START( ghostb );

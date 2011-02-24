@@ -7108,7 +7108,7 @@ VIDEO_START(megadriv)
 	segac2_sp_pal_lookup[3] = 0x30;
 }
 
-VIDEO_UPDATE(megadriv)
+SCREEN_UPDATE(megadriv)
 {
 	/* Copy our screen buffer here */
 	copybitmap(bitmap, render_bitmap, 0, 0, 0, 0, cliprect);
@@ -9233,7 +9233,7 @@ void megadriv_stop_scanline_timer(void)
 
 /* VIDEO_EOF is used to resync the scanline counters */
 
-VIDEO_EOF(megadriv)
+SCREEN_EOF(megadriv)
 {
 	rectangle visarea;
 	int scr_width = 320;
@@ -9404,6 +9404,8 @@ MACHINE_CONFIG_FRAGMENT( md_ntsc )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
+	MCFG_SCREEN_UPDATE(megadriv) /* Copies a bitmap */
+	MCFG_SCREEN_EOF(megadriv) /* Used to Sync the timing */
 
 #ifndef MESS
 	MCFG_NVRAM_HANDLER(megadriv)
@@ -9412,8 +9414,6 @@ MACHINE_CONFIG_FRAGMENT( md_ntsc )
 	MCFG_PALETTE_LENGTH(0x200)
 
 	MCFG_VIDEO_START(megadriv)
-	MCFG_VIDEO_UPDATE(megadriv) /* Copies a bitmap */
-	MCFG_VIDEO_EOF(megadriv) /* Used to Sync the timing */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -9455,6 +9455,8 @@ MACHINE_CONFIG_FRAGMENT( md_pal )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
+	MCFG_SCREEN_UPDATE(megadriv) /* Copies a bitmap */
+	MCFG_SCREEN_EOF(megadriv) /* Used to Sync the timing */
 
 #ifndef MESS
 	MCFG_NVRAM_HANDLER(megadriv)
@@ -9463,8 +9465,6 @@ MACHINE_CONFIG_FRAGMENT( md_pal )
 	MCFG_PALETTE_LENGTH(0x200)
 
 	MCFG_VIDEO_START(megadriv)
-	MCFG_VIDEO_UPDATE(megadriv) /* Copies a bitmap */
-	MCFG_VIDEO_EOF(megadriv) /* Used to Sync the timing */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

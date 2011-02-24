@@ -310,13 +310,13 @@ static MACHINE_CONFIG_START( ddribble, ddribble_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 /*  MCFG_SCREEN_SIZE(64*8, 32*8)
     MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1) */
+	MCFG_SCREEN_UPDATE(ddribble)
 
 	MCFG_GFXDECODE(ddribble)
 	MCFG_PALETTE_LENGTH(64 + 256)
 
 	MCFG_PALETTE_INIT(ddribble)
 	MCFG_VIDEO_START(ddribble)
-	MCFG_VIDEO_UPDATE(ddribble)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

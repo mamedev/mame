@@ -232,7 +232,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	}
 }
 
-VIDEO_UPDATE( tryout )
+SCREEN_UPDATE( tryout )
 {
 	tryout_state *state = screen->machine->driver_data<tryout_state>();
 	int scrollx = 0;

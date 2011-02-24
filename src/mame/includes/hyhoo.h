@@ -2,7 +2,7 @@
 
 extern UINT8 *hyhoo_clut;
 
-VIDEO_UPDATE( hyhoo );
+SCREEN_UPDATE( hyhoo );
 VIDEO_START( hyhoo );
 
 WRITE8_HANDLER( hyhoo_blitter_w );

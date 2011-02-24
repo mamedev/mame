@@ -182,7 +182,7 @@ VIDEO_START( esripsys )
 	state_save_register_global(machine, esripsys__12sel);
 }
 
-VIDEO_UPDATE( esripsys )
+SCREEN_UPDATE( esripsys )
 {
 	int x, y;
 

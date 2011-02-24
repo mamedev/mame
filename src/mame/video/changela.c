@@ -722,7 +722,7 @@ static TIMER_CALLBACK( changela_scanline_callback )
 	state->scanline_timer->adjust(machine->primary_screen->time_until_pos(sy), sy);
 }
 
-VIDEO_UPDATE( changela )
+SCREEN_UPDATE( changela )
 {
 	changela_state *state = screen->machine->driver_data<changela_state>();
 	copybitmap(bitmap, state->river_bitmap, 0, 0, 0, 0, cliprect);

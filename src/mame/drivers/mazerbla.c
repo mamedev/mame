@@ -150,7 +150,7 @@ static int dbg_lookup = 4;	//4= off
 
 static int planes_enabled[4] = {1,1,1,1}; //all enabled
 
-VIDEO_UPDATE( test_vcu )
+SCREEN_UPDATE( test_vcu )
 {
 	mazerbla_state *state = screen->machine->driver_data<mazerbla_state>();
 	char buf[128];
@@ -248,7 +248,7 @@ VIDEO_UPDATE( test_vcu )
 #endif
 
 
-static VIDEO_UPDATE( mazerbla )
+static SCREEN_UPDATE( mazerbla )
 {
 	mazerbla_state *state = screen->machine->driver_data<mazerbla_state>();
 	UINT32 color_base = 0;
@@ -1505,12 +1505,12 @@ static MACHINE_CONFIG_START( mazerbla, mazerbla_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(mazerbla)
 
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(mazerbla)
 	MCFG_VIDEO_START(mazerbla)
-	MCFG_VIDEO_UPDATE(mazerbla)
 
 	/* sound hardware */
 MACHINE_CONFIG_END
@@ -1546,12 +1546,12 @@ static MACHINE_CONFIG_START( greatgun, mazerbla_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(mazerbla)
 
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT(mazerbla)
 	MCFG_VIDEO_START(mazerbla)
-	MCFG_VIDEO_UPDATE(mazerbla)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

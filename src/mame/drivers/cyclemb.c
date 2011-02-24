@@ -108,7 +108,7 @@ static VIDEO_START( cyclemb )
 
 }
 
-static VIDEO_UPDATE( cyclemb )
+static SCREEN_UPDATE( cyclemb )
 {
 	int x,y,count;
 	const gfx_element *gfx = screen->machine->gfx[0];
@@ -530,12 +530,13 @@ static MACHINE_CONFIG_START( cyclemb, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE(cyclemb)
+
 	MCFG_GFXDECODE(cyclemb)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_PALETTE_INIT(cyclemb)
 
 	MCFG_VIDEO_START(cyclemb)
-	MCFG_VIDEO_UPDATE(cyclemb)
 
 	MCFG_MACHINE_RESET(cyclemb)
 

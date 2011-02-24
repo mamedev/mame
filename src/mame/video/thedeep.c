@@ -212,7 +212,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 ***************************************************************************/
 
-VIDEO_UPDATE( thedeep )
+SCREEN_UPDATE( thedeep )
 {
 	int scrollx = thedeep_scroll[0] + (thedeep_scroll[1]<<8);
 	int scrolly = thedeep_scroll[2] + (thedeep_scroll[3]<<8);

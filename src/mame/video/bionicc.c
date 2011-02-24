@@ -246,7 +246,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE( bionicc )
+SCREEN_UPDATE( bionicc )
 {
 	bionicc_state *state = screen->machine->driver_data<bionicc_state>();
 
@@ -260,7 +260,7 @@ VIDEO_UPDATE( bionicc )
 	return 0;
 }
 
-VIDEO_EOF( bionicc )
+SCREEN_EOF( bionicc )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
