@@ -1583,6 +1583,21 @@ input_port_value input_port_read(running_machine *machine, const char *tag)
 
 
 /*-------------------------------------------------
+    input_port_read - return the value of
+    an device input port specified by tag
+-------------------------------------------------*/
+
+input_port_value input_port_read(running_machine *machine, device_t *device, const char *tag)
+{
+	astring tempstring;
+	const input_port_config *port = machine->port(device->baseconfig().subtag(tempstring, tag));
+	if (port == NULL)
+		fatalerror("Unable to locate input port '%s'", tag);
+	return input_port_read_direct(port);
+}
+
+
+/*-------------------------------------------------
     input_port_read_safe - return the value of
     an input port specified by tag, or a default
     value if the port does not exist

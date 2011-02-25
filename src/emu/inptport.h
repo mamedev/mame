@@ -1137,6 +1137,9 @@ input_port_value input_port_read_direct(const input_port_config *port);
 /* return the value of an input port specified by tag */
 input_port_value input_port_read(running_machine *machine, const char *tag);
 
+/* return the value of an input port specified by tag */
+input_port_value input_port_read(running_machine *machine, device_t *device, const char *tag);
+
 /* return the value of an input port specified by tag, or a default value if the port does not exist */
 input_port_value input_port_read_safe(running_machine *machine, const char *tag, input_port_value defvalue);
 
