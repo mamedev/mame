@@ -924,6 +924,7 @@ static MACHINE_CONFIG_DERIVED( comad, galpanic )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE(comad)
+	MCFG_SCREEN_EOF(0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( supmodel, comad )
@@ -937,6 +938,7 @@ static MACHINE_CONFIG_DERIVED( supmodel, comad )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE(comad)
+	MCFG_SCREEN_EOF(0)
 
 	/* sound hardware */
 	MCFG_OKIM6295_REPLACE("oki", 1584000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
@@ -954,6 +956,7 @@ static MACHINE_CONFIG_DERIVED( fantsia2, comad )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE(comad)
+	MCFG_SCREEN_EOF(0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( galhustl, comad )
@@ -967,6 +970,7 @@ static MACHINE_CONFIG_DERIVED( galhustl, comad )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE(comad)
+	MCFG_SCREEN_EOF(0)
 
 	/* sound hardware */
 	MCFG_OKIM6295_REPLACE("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified

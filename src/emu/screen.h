@@ -286,6 +286,8 @@ private:
 #define SCREEN_EOF(name)				void SCREEN_EOF_NAME(name)(screen_device *screen, running_machine *machine)
 #define SCREEN_EOF_CALL(name)			SCREEN_EOF_NAME(name)(screen, machine)
 
+#define screen_eof_0 					NULL
+
 #define MCFG_SCREEN_ADD(_tag, _type) \
 	MCFG_DEVICE_ADD(_tag, SCREEN, 0) \
 	MCFG_SCREEN_TYPE(_type) \
