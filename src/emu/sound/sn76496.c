@@ -111,7 +111,7 @@
         * Test the NCR7496; Smspower says the whitenoise taps are A and E,
           but this needs verification on real hardware.
         * Factor out common code so that the SAA1099 can share some code.
-		* Convert to modern device
+        * Convert to modern device
 ***************************************************************************/
 
 #include "emu.h"
