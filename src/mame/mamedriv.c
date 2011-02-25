@@ -9690,7 +9690,11 @@ Other Sun games
 	DRIVER( sloco93 )	/* 1993, Unknown */
 	DRIVER( sloco93a )	/* 1993, Unknown */
 	DRIVER( maverik )	/* 198?, Unknown */
+	DRIVER( brasil86 )	/* 1986, Unknown */
+	DRIVER( brasil87 )	/* 1987, Unknown */
 	DRIVER( brasil89 )	/* 1989, Unknown */
+	DRIVER( brasil89a )	/* 1989, Unknown */
+	DRIVER( brasil93 )	/* 1993, Unknown */
 	DRIVER( poker91 )	/* 1991, Unknown */
 	DRIVER( genie )		/* (c) 198? Video Fun Games Ltd. */
 	DRIVER( silverga )	/* 1983, Unknown */

@@ -63,7 +63,11 @@
     * Royale (set 1).                           198?, Unknown.
     * Royale (set 2).                           198?, Unknown.
     * Maverik.                                  198?, Unknown.
-    * Brasil'89.                                1989, Unknown.
+    * Brasil 86.                                1986, Unknown.
+    * Brasil 87.                                1987, Unknown.
+    * Brasil 89 (set 1).                        1989, Unknown.
+    * Brasil 89 (set 2).                        1989, Unknown.
+    * Brasil 93.                                1993, Unknown.
     * Poker 91.                                 1991, Unknown.
     * Genie.                                    198?, Video Fun Games Ltd.
     * Silver Game.                              1983, Unknown.
@@ -4215,9 +4219,82 @@ ROM_START( maverik )
 	ROM_LOAD( "82s129.9c",		0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
 ROM_END
 
+/*****************************
+
+  Brasil XX sets...
+ 
+ ****************************/
+ROM_START( brasil86 )
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* brasil86.128: Brasil 86, BS clone. */
+	ROM_LOAD( "brasil86.128",	0x4000, 0x4000, CRC(0e88b434) SHA1(80f921c277f4253c29ee80e9cfb046ade1f66300) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(			0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "4s.bin",	0x2000, 0x1000, CRC(0ac197eb) SHA1(fdf2b134c662f3c4d4a19d93a82d130ba643ace8) )    /* text layer */
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "7.bin",	0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "6.bin",	0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "5.bin",	0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.9c",		0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
+ROM_START( brasil87 )
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* brasil87.128: Brasil 87, BS clone. */
+	ROM_LOAD( "brasil87.128",	0x4000, 0x4000, CRC(6cfdaea9) SHA1(0704e61c1c573e99e130c22787b529ac5544c631) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(			0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "4s.bin",	0x2000, 0x1000, CRC(0ac197eb) SHA1(fdf2b134c662f3c4d4a19d93a82d130ba643ace8) )    /* text layer */
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "7.bin",	0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "6.bin",	0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "5.bin",	0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.9c",		0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
 ROM_START( brasil89 )
 	ROM_REGION( 0x10000, "maincpu", 0 )	/* brasil89.128: Brasil 89, BS clone. */
 	ROM_LOAD( "brasil89.128",	0x4000, 0x4000, CRC(9030e0db) SHA1(d073ed0ddd3e5df6a3387e10e05ca34bc491eb35) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(			0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "4s.bin",	0x2000, 0x1000, CRC(0ac197eb) SHA1(fdf2b134c662f3c4d4a19d93a82d130ba643ace8) )    /* text layer */
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "7.bin",	0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "6.bin",	0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "5.bin",	0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.9c",		0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
+ROM_START( brasil89a )
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* brasil89a.128: Brasil 89a, BS clone. */
+	ROM_LOAD( "brasil89a.128",	0x4000, 0x4000, CRC(41a93a99) SHA1(70eeaddbdd9d3a587d1330b81d21d881ab0a8c91) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(			0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "4s.bin",	0x2000, 0x1000, CRC(0ac197eb) SHA1(fdf2b134c662f3c4d4a19d93a82d130ba643ace8) )    /* text layer */
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "7.bin",	0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "6.bin",	0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "5.bin",	0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.9c",		0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
+ROM_START( brasil93 )
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* brasil93.128: Brasil 93, BS clone. No lights */
+	ROM_LOAD( "brasil93.128",	0x4000, 0x4000, CRC(cc25909f) SHA1(635184022bcb8936c396cb9fcfa6367fcae906fb) )
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
 	ROM_FILL(			0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
@@ -4749,7 +4826,11 @@ GAMEL( 198?, royalea,  royale,   goldnpkr, royale,   royale,   ROT0,   "<unknown
 GAME(  1993, sloco93,  0,        witchcrd, sloco93,  0,        ROT0,   "<unknown>",                "Super Loco 93 (Spanish, set 1)",          0 )
 GAME(  1993, sloco93a, sloco93,  witchcrd, sloco93,  0,        ROT0,   "<unknown>",                "Super Loco 93 (Spanish, set 2)",          0 )
 GAME(  198?, maverik,  0,        witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Maverik",                                 0 )
-GAMEL( 1989, brasil89, 0,        witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Brasil 89",                               0,                layout_goldnpkr )
+GAMEL( 1986, brasil86, 0,        witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Brasil 86",                               0,                layout_goldnpkr )
+GAMEL( 1987, brasil87, 0,        witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Brasil 87",                               0,                layout_goldnpkr )
+GAMEL( 1989, brasil89, 0,        witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Brasil 89 (set 1)",                       0,                layout_goldnpkr )
+GAMEL( 1989, brasil89a,brasil89, witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Brasil 89 (set 2)",                       0,                layout_goldnpkr )
+GAME(  1993, brasil93, 0,        witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Brasil 93",                               0 )				// no lamps
 GAME(  1991, poker91,  0,        witchcrd, poker91,  0,        ROT0,   "<unknown>",                "Poker 91",                                0 )
 GAME(  198?, genie,    0,        genie,    genie,    0,        ROT0,   "Video Fun Games Ltd.",     "Genie",                                   0 )
 
