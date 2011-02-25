@@ -505,6 +505,10 @@ static MACHINE_CONFIG_START( megatech, mtech_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE(mtnew)
 	MCFG_SCREEN_EOF(mtnew)
+	
+	MCFG_SCREEN_MODIFY("megadriv")
+	MCFG_SCREEN_UPDATE(mtnew)
+	MCFG_SCREEN_EOF(mtnew)
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("sn2", SN76496, MASTER_CLOCK/15)
