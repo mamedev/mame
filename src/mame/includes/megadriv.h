@@ -226,11 +226,11 @@ public:
 	megadriv_cart md_cart;
 };
 
-class pico_state : public md_base_state
+class pico_state : public md_cons_state
 {
 public:
 	pico_state(running_machine &machine, const driver_device_config_base &config)
-	: md_base_state(machine, config) { }
+	: md_cons_state(machine, config) { }
 	
 	UINT8 page_register;
 };
