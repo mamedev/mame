@@ -66,13 +66,11 @@ ROM_START(apollo13)
 ROM_END
 
 /*-------------------------------------------------------------------
-/ Austin Powers
+/ Austin Powers (3.01)
 /-------------------------------------------------------------------*/
-ROM_START(austin)
+ROM_START(aust301)
 	ROM_REGION(0x80000, "user1", 0)
-	ROM_LOAD("apcpu.302", 0x00000, 0x20000, CRC(2920b59b) SHA1(280cebbb39980fbcfd91fc1cf87a40ad926ffecb)) // ver 3.02
-	//ROM_LOAD("apcpu.300", 0x00000, 0x20000, CRC(a06b2b03) SHA1(4c36212b43fdc497773425e586f64c3064e7000c)) // ver 3.00
-	//ROM_LOAD("apcpu.201", 0x00000, 0x20000, CRC(a4ddcdca) SHA1(c1eb1ae3b9c9b10410d107165f3bddaa514c2113)) // ver 2.01
+	ROM_LOAD("apcpu.301", 0x00000, 0x20000, CRC(868d1f38) SHA1(df08b48437f88e66c4caa80602c28a2223f180b9))
 	ROM_RELOAD(0x20000, 0x20000)
 	ROM_RELOAD(0x40000, 0x20000)
 	ROM_RELOAD(0x60000, 0x20000)
@@ -81,7 +79,75 @@ ROM_START(austin)
 	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
 	ROM_REGION(0x80000, "gfx3", 0)
 	ROM_LOAD("apdsp-a.300", 0x00000, 0x80000, CRC(ecf2c3bb) SHA1(952a7873067b8c70043a38a39a8f65089103336b)) // ver 3.00
-	//ROM_LOAD("apdsp-a.200", 0x00000, 0x80000, CRC(f3ca7fca) SHA1(b6b702ad7af75b3010a280adb99e4ee484a03242)) // ver 2.00
+	ROM_REGION(0x010000, "cpu2", 0)
+	ROM_LOAD("apsndu7.100",0x0000,0x10000,CRC(d0e79d59) SHA1(7c3f1fa79ff193a976986339a551e3d03208550f))
+	ROM_REGION(0x400000, "sound1", 0)
+	ROM_LOAD("apsndu17.100", 0x000000, 0x100000, CRC(c1e33fee) SHA1(5a3581584cc1a841d884de4628f7b65d8670f96a))
+	ROM_LOAD("apsndu21.100", 0x100000, 0x100000, CRC(07c3e077) SHA1(d48020f7da400c3682035d537289ce9a30732d74))
+	ROM_LOAD("apsndu36.100", 0x200000, 0x100000, CRC(f70f2828) SHA1(9efbed4f68c22eb26e9100afaca5ebe85a97b605))
+	ROM_LOAD("apsndu37.100", 0x300000, 0x100000, CRC(ddf0144b) SHA1(c2a56703a41ee31841993d63385491259d5a13f8))
+ROM_END
+
+/*-------------------------------------------------------------------
+/ Austin Powers (3.00)
+/-------------------------------------------------------------------*/
+ROM_START(aust300)
+	ROM_REGION(0x80000, "user1", 0)
+	ROM_LOAD("apcpu.300", 0x00000, 0x20000, CRC(a06b2b03) SHA1(4c36212b43fdc497773425e586f64c3064e7000c))
+	ROM_RELOAD(0x20000, 0x20000)
+	ROM_RELOAD(0x40000, 0x20000)
+	ROM_RELOAD(0x60000, 0x20000)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_COPY( "user1", 0x18000, 0x8000, 0x8000)
+	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "gfx3", 0)
+	ROM_LOAD("apdsp-a.300", 0x00000, 0x80000, CRC(ecf2c3bb) SHA1(952a7873067b8c70043a38a39a8f65089103336b))
+	ROM_REGION(0x010000, "cpu2", 0)
+	ROM_LOAD("apsndu7.100",0x0000,0x10000,CRC(d0e79d59) SHA1(7c3f1fa79ff193a976986339a551e3d03208550f))
+	ROM_REGION(0x400000, "sound1", 0)
+	ROM_LOAD("apsndu17.100", 0x000000, 0x100000, CRC(c1e33fee) SHA1(5a3581584cc1a841d884de4628f7b65d8670f96a))
+	ROM_LOAD("apsndu21.100", 0x100000, 0x100000, CRC(07c3e077) SHA1(d48020f7da400c3682035d537289ce9a30732d74))
+	ROM_LOAD("apsndu36.100", 0x200000, 0x100000, CRC(f70f2828) SHA1(9efbed4f68c22eb26e9100afaca5ebe85a97b605))
+	ROM_LOAD("apsndu37.100", 0x300000, 0x100000, CRC(ddf0144b) SHA1(c2a56703a41ee31841993d63385491259d5a13f8))
+ROM_END
+
+/*-------------------------------------------------------------------
+/ Austin Powers (2.01)
+/-------------------------------------------------------------------*/
+ROM_START(aust201)
+	ROM_REGION(0x80000, "user1", 0)
+	ROM_LOAD("apcpu.201", 0x00000, 0x20000, CRC(a4ddcdca) SHA1(c1eb1ae3b9c9b10410d107165f3bddaa514c2113))
+	ROM_RELOAD(0x20000, 0x20000)
+	ROM_RELOAD(0x40000, 0x20000)
+	ROM_RELOAD(0x60000, 0x20000)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_COPY( "user1", 0x18000, 0x8000, 0x8000)
+	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "gfx3", 0)
+	ROM_LOAD("apdsp-a.200", 0x00000, 0x80000, CRC(f3ca7fca) SHA1(b6b702ad7af75b3010a280adb99e4ee484a03242))
+	ROM_REGION(0x010000, "cpu2", 0)
+	ROM_LOAD("apsndu7.100",0x0000,0x10000,CRC(d0e79d59) SHA1(7c3f1fa79ff193a976986339a551e3d03208550f))
+	ROM_REGION(0x400000, "sound1", 0)
+	ROM_LOAD("apsndu17.100", 0x000000, 0x100000, CRC(c1e33fee) SHA1(5a3581584cc1a841d884de4628f7b65d8670f96a))
+	ROM_LOAD("apsndu21.100", 0x100000, 0x100000, CRC(07c3e077) SHA1(d48020f7da400c3682035d537289ce9a30732d74))
+	ROM_LOAD("apsndu36.100", 0x200000, 0x100000, CRC(f70f2828) SHA1(9efbed4f68c22eb26e9100afaca5ebe85a97b605))
+	ROM_LOAD("apsndu37.100", 0x300000, 0x100000, CRC(ddf0144b) SHA1(c2a56703a41ee31841993d63385491259d5a13f8))
+ROM_END
+
+/*-------------------------------------------------------------------
+/ Austin Powers (3.02)
+/-------------------------------------------------------------------*/
+ROM_START(austin)
+	ROM_REGION(0x80000, "user1", 0)
+	ROM_LOAD("apcpu.302", 0x00000, 0x20000, CRC(2920b59b) SHA1(280cebbb39980fbcfd91fc1cf87a40ad926ffecb))	
+	ROM_RELOAD(0x20000, 0x20000)
+	ROM_RELOAD(0x40000, 0x20000)
+	ROM_RELOAD(0x60000, 0x20000)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_COPY( "user1", 0x18000, 0x8000, 0x8000)
+	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "gfx3", 0)
+	ROM_LOAD("apdsp-a.300", 0x00000, 0x80000, CRC(ecf2c3bb) SHA1(952a7873067b8c70043a38a39a8f65089103336b))
 	ROM_REGION(0x010000, "cpu2", 0)
 	ROM_LOAD("apsndu7.100",0x0000,0x10000,CRC(d0e79d59) SHA1(7c3f1fa79ff193a976986339a551e3d03208550f))
 	ROM_REGION(0x400000, "sound1", 0)
@@ -2145,6 +2211,9 @@ ROM_END
 
 GAME(1995,	apollo13,	0,			whitestar,	whitestar,	whitestar,	ROT0,	"Sega",		"Apollo 13",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(2001,	austin,		0,			whitestar,	whitestar,	whitestar,	ROT0,	"Stern",	"Austin Powers (3.02)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(2001,	aust301,	austin,		whitestar,	whitestar,	whitestar,	ROT0,	"Stern",	"Austin Powers (3.01)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(2001,	aust300,	austin,		whitestar,	whitestar,	whitestar,	ROT0,	"Stern",	"Austin Powers (3.00)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(2001,	aust201,	austin,		whitestar,	whitestar,	whitestar,	ROT0,	"Stern",	"Austin Powers (2.01)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(2001,	austnew,	austin,		whitestar,	whitestar,	whitestar,	ROT0,	"Stern",	"Austin Powers (ARM7 Sound Board)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(2001,	austinf,	austin,		whitestar,	whitestar,	whitestar,	ROT0,	"Stern",	"Austin Powers (France)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(2001,	austing,	austin,		whitestar,	whitestar,	whitestar,	ROT0,	"Stern",	"Austin Powers (Germany)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

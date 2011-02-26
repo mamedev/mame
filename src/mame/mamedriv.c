@@ -11580,6 +11580,9 @@ Other Sun games
 
 	// whitestar.c
 	DRIVER( apollo13 )
+	DRIVER( aust301 )
+	DRIVER( aust300 )
+	DRIVER( aust201 )
 	DRIVER( austin )
 	DRIVER( austnew )
 	DRIVER( austinf )
