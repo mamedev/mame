@@ -445,8 +445,14 @@ static void updateflip(running_machine *machine)
 
 void flip_screen_set(running_machine *machine, int on)
 {
-	flip_screen_x_set(machine, on);
-	flip_screen_y_set(machine, on);
+	generic_video_private *state = machine->generic_video_data;
+	if (on) on = ~0;
+	if (state->flip_screen_x != on || state->flip_screen_y != on)
+	{
+		if (!on) updateflip(machine); // flip visarea back
+		state->flip_screen_x = state->flip_screen_y = on;
+		updateflip(machine);
+	}
 }
 
 
@@ -463,6 +469,7 @@ void flip_screen_set_no_update(running_machine *machine, int on)
      * bypass update_flip
      */
 	generic_video_private *state = machine->generic_video_data;
+	if (on) on = ~0;
 	state->flip_screen_x = on;
 }
 
