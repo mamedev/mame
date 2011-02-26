@@ -313,6 +313,9 @@ VIDEO_START( pengo )
 	xoffsethack = 0;
 
 	bg_tilemap = tilemap_create( machine, pacman_get_tile_info, pacman_scan_rows,  8, 8, 36, 28 );
+
+	tilemap_set_scrolldx( bg_tilemap, 0, 384 - 288 );
+	tilemap_set_scrolldy( bg_tilemap, 0, 264 - 224 );
 }
 
 WRITE8_HANDLER( pengo_palettebank_w )
