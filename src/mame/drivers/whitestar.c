@@ -769,13 +769,11 @@ ROM_END
 /-------------------------------------------------------------------*/
 
 /*-------------------------------------------------------------------
-/ Monopoly
+/ Monopoly (3.20)
 /-------------------------------------------------------------------*/
 ROM_START(monopolp)
 	ROM_REGION(0x80000, "user1", 0)
-	ROM_LOAD("moncpu.320", 0x00000, 0x20000, CRC(6c107c8b) SHA1(236d85b971c70a30e663787d643e6d589591d582)) // ver 3.20
-	//ROM_LOAD("moncpu.301", 0x00000, 0x20000, CRC(24978872) SHA1(48ef94fd720cdafc61f8de5efd5c6b6731237b18)) // ver 3.01
-    //ROM_LOAD("moncpu.233", 0x00000, 0x20000, CRC(f20a5ca6) SHA1(12ae56bd149aa6635c19f4dd73580db550b26963)) // ver 2.33
+	ROM_LOAD("moncpu.320", 0x00000, 0x20000, CRC(6c107c8b) SHA1(236d85b971c70a30e663787d643e6d589591d582))
 	ROM_RELOAD(0x20000, 0x20000)
 	ROM_RELOAD(0x40000, 0x20000)
 	ROM_RELOAD(0x60000, 0x20000)
@@ -783,8 +781,7 @@ ROM_START(monopolp)
 	ROM_COPY( "user1", 0x18000, 0x8000, 0x8000)
 	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
 	ROM_REGION(0x80000, "gfx3", 0)
-	ROM_LOAD("mondsp-a.301", 0x00000, 0x80000, CRC(c4e2e032) SHA1(691f7b6ed0616338683f7e3f316d64a70db58dd4))  // ver 3.01
-	//ROM_LOAD("mondsp-a.206", 0x00000, 0x80000, CRC(6df6e158) SHA1(d3a9be2dc189b44b9e4b9f77f5011ed931df5634))  // ver 2.06
+	ROM_LOAD("mondsp-a.301", 0x00000, 0x80000, CRC(c4e2e032) SHA1(691f7b6ed0616338683f7e3f316d64a70db58dd4))
 	ROM_REGION(0x010000, "cpu2", 0)
 	ROM_LOAD("mnsndu7.100",0x0000,0x10000,CRC(400442e7) SHA1(d6c075dc439d5366b7ae71b5a523b86543b1ecd6))
 	ROM_REGION(0x400000, "sound1", 0)
@@ -793,7 +790,10 @@ ROM_START(monopolp)
 	ROM_LOAD("mnsndu36.100", 0x200000, 0x100000, CRC(c845aa97) SHA1(2632aa8c5576b7afcb96693fa524c7d0350ac9a8))
 ROM_END
 
-ROM_START(monopole)
+/*-------------------------------------------------------------------
+/ Monopoly (3.03)
+/-------------------------------------------------------------------*/
+ROM_START(monop303)
 	ROM_REGION(0x80000, "user1", 0)
 	ROM_LOAD("moncpu.303", 0x00000, 0x20000, CRC(4a66c9e4) SHA1(a368b0ced32f1017e781a59108670b979b50c9d7))
 	ROM_RELOAD(0x20000, 0x20000)
@@ -811,6 +811,76 @@ ROM_START(monopole)
 	ROM_LOAD("mnsndu21.100", 0x100000, 0x100000, CRC(e0727e1f) SHA1(2093dba6e2f59cd1d1fc49c8d995b603ea0913ba))
 	ROM_LOAD("mnsndu36.100", 0x200000, 0x100000, CRC(c845aa97) SHA1(2632aa8c5576b7afcb96693fa524c7d0350ac9a8))
 ROM_END
+
+/*-------------------------------------------------------------------
+/ Monopoly (3.01)
+/-------------------------------------------------------------------*/
+ROM_START(monop301)
+	ROM_REGION(0x80000, "user1", 0)
+	ROM_LOAD("moncpu.301", 0x00000, 0x20000, CRC(24978872) SHA1(48ef94fd720cdafc61f8de5efd5c6b6731237b18))
+	ROM_RELOAD(0x20000, 0x20000)
+	ROM_RELOAD(0x40000, 0x20000)
+	ROM_RELOAD(0x60000, 0x20000)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_COPY( "user1", 0x18000, 0x8000, 0x8000)
+	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "gfx3", 0)
+	ROM_LOAD("mondsp-a.301", 0x00000, 0x80000, CRC(c4e2e032) SHA1(691f7b6ed0616338683f7e3f316d64a70db58dd4))
+	ROM_REGION(0x010000, "cpu2", 0)
+	ROM_LOAD("mnsndu7.100",0x0000,0x10000,CRC(400442e7) SHA1(d6c075dc439d5366b7ae71b5a523b86543b1ecd6))
+	ROM_REGION(0x400000, "sound1", 0)
+	ROM_LOAD("mnsndu17.100", 0x000000, 0x100000, CRC(f9bc55e8) SHA1(7dc41521305021961927ebde4dcf22611e3d622d))
+	ROM_LOAD("mnsndu21.100", 0x100000, 0x100000, CRC(e0727e1f) SHA1(2093dba6e2f59cd1d1fc49c8d995b603ea0913ba))
+	ROM_LOAD("mnsndu36.100", 0x200000, 0x100000, CRC(c845aa97) SHA1(2632aa8c5576b7afcb96693fa524c7d0350ac9a8))
+ROM_END
+
+/*-------------------------------------------------------------------
+/ Monopoly (2.51)
+/-------------------------------------------------------------------*/
+ROM_START(monop251)
+	ROM_REGION(0x80000, "user1", 0)
+	ROM_LOAD("moncpu.251", 0x00000, 0x20000, CRC(0645cfae) SHA1(d979234150b7fb62718debbeeeca1466a6c0344f)) 
+	ROM_RELOAD(0x20000, 0x20000)
+	ROM_RELOAD(0x40000, 0x20000)
+	ROM_RELOAD(0x60000, 0x20000)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_COPY( "user1", 0x18000, 0x8000, 0x8000)
+	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "gfx3", 0)
+	ROM_LOAD("mondsp-a.206", 0x00000, 0x80000, CRC(6df6e158) SHA1(d3a9be2dc189b44b9e4b9f77f5011ed931df5634))
+	ROM_REGION(0x010000, "cpu2", 0)
+	ROM_LOAD("mnsndu7.100",0x0000,0x10000,CRC(400442e7) SHA1(d6c075dc439d5366b7ae71b5a523b86543b1ecd6))
+	ROM_REGION(0x400000, "sound1", 0)
+	ROM_LOAD("mnsndu17.100", 0x000000, 0x100000, CRC(f9bc55e8) SHA1(7dc41521305021961927ebde4dcf22611e3d622d))
+	ROM_LOAD("mnsndu21.100", 0x100000, 0x100000, CRC(e0727e1f) SHA1(2093dba6e2f59cd1d1fc49c8d995b603ea0913ba))
+	ROM_LOAD("mnsndu36.100", 0x200000, 0x100000, CRC(c845aa97) SHA1(2632aa8c5576b7afcb96693fa524c7d0350ac9a8))
+ROM_END
+
+/*-------------------------------------------------------------------
+/ Monopoly (2.33)
+/-------------------------------------------------------------------*/
+ROM_START(monop233)
+	ROM_REGION(0x80000, "user1", 0)
+	ROM_LOAD("moncpu.233", 0x00000, 0x20000, CRC(f20a5ca6) SHA1(12ae56bd149aa6635c19f4dd73580db550b26963)) 
+	ROM_RELOAD(0x20000, 0x20000)
+	ROM_RELOAD(0x40000, 0x20000)
+	ROM_RELOAD(0x60000, 0x20000)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_COPY( "user1", 0x18000, 0x8000, 0x8000)
+	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "gfx3", 0)
+	ROM_LOAD("mondsp-a.203", 0x00000, 0x80000, CRC(6e4678fb) SHA1(c0f41f01e9e20e741f1b13d3bd6e824486ba9a0a))
+	ROM_REGION(0x010000, "cpu2", 0)
+	ROM_LOAD("mnsndu7.100",0x0000,0x10000,CRC(400442e7) SHA1(d6c075dc439d5366b7ae71b5a523b86543b1ecd6))
+	ROM_REGION(0x400000, "sound1", 0)
+	ROM_LOAD("mnsndu17.100", 0x000000, 0x100000, CRC(f9bc55e8) SHA1(7dc41521305021961927ebde4dcf22611e3d622d))
+	ROM_LOAD("mnsndu21.100", 0x100000, 0x100000, CRC(e0727e1f) SHA1(2093dba6e2f59cd1d1fc49c8d995b603ea0913ba))
+	ROM_LOAD("mnsndu36.100", 0x200000, 0x100000, CRC(c845aa97) SHA1(2632aa8c5576b7afcb96693fa524c7d0350ac9a8))
+ROM_END
+
+/*-------------------------------------------------------------------
+/ Monopoly (3.20) (ARM7 Sound Board)
+/-------------------------------------------------------------------*/
 ROM_START(mononew)
 	ROM_REGION(0x80000, "user1", 0)
 	ROM_LOAD("moncpu.320", 0x00000, 0x20000, CRC(6c107c8b) SHA1(236d85b971c70a30e663787d643e6d589591d582))
@@ -832,6 +902,10 @@ ROM_START(mononew)
 	ROM_LOAD("mnsndu21.100", 0x100000, 0x100000, CRC(e0727e1f) SHA1(2093dba6e2f59cd1d1fc49c8d995b603ea0913ba))
 	ROM_LOAD("mnsndu36.100", 0x200000, 0x100000, CRC(c845aa97) SHA1(2632aa8c5576b7afcb96693fa524c7d0350ac9a8))
 ROM_END
+
+/*-------------------------------------------------------------------
+/ Monopoly (France)
+/-------------------------------------------------------------------*/
 ROM_START(monopolf)
 	ROM_REGION(0x80000, "user1", 0)
 	ROM_LOAD("moncpu.320", 0x00000, 0x20000, CRC(6c107c8b) SHA1(236d85b971c70a30e663787d643e6d589591d582))
@@ -850,6 +924,10 @@ ROM_START(monopolf)
 	ROM_LOAD("mnsndu21.100", 0x100000, 0x100000, CRC(e0727e1f) SHA1(2093dba6e2f59cd1d1fc49c8d995b603ea0913ba))
 	ROM_LOAD("mnsndu36.100", 0x200000, 0x100000, CRC(c845aa97) SHA1(2632aa8c5576b7afcb96693fa524c7d0350ac9a8))
 ROM_END
+
+/*-------------------------------------------------------------------
+/ Monopoly (France)
+/-------------------------------------------------------------------*/
 ROM_START(monopolg)
 	ROM_REGION(0x80000, "user1", 0)
 	ROM_LOAD("moncpu.320", 0x00000, 0x20000, CRC(6c107c8b) SHA1(236d85b971c70a30e663787d643e6d589591d582))
@@ -868,6 +946,10 @@ ROM_START(monopolg)
 	ROM_LOAD("mnsndu21.100", 0x100000, 0x100000, CRC(e0727e1f) SHA1(2093dba6e2f59cd1d1fc49c8d995b603ea0913ba))
 	ROM_LOAD("mnsndu36.100", 0x200000, 0x100000, CRC(c845aa97) SHA1(2632aa8c5576b7afcb96693fa524c7d0350ac9a8))
 ROM_END
+
+/*-------------------------------------------------------------------
+/ Monopoly (Italy)
+/-------------------------------------------------------------------*/
 ROM_START(monopoli)
 	ROM_REGION(0x80000, "user1", 0)
 	ROM_LOAD("moncpu.320", 0x00000, 0x20000, CRC(6c107c8b) SHA1(236d85b971c70a30e663787d643e6d589591d582))
@@ -886,6 +968,10 @@ ROM_START(monopoli)
 	ROM_LOAD("mnsndu21.100", 0x100000, 0x100000, CRC(e0727e1f) SHA1(2093dba6e2f59cd1d1fc49c8d995b603ea0913ba))
 	ROM_LOAD("mnsndu36.100", 0x200000, 0x100000, CRC(c845aa97) SHA1(2632aa8c5576b7afcb96693fa524c7d0350ac9a8))
 ROM_END
+
+/*-------------------------------------------------------------------
+/ Monopoly (Spain)
+/-------------------------------------------------------------------*/
 ROM_START(monopoll)
 	ROM_REGION(0x80000, "user1", 0)
 	ROM_LOAD("moncpu.320", 0x00000, 0x20000, CRC(6c107c8b) SHA1(236d85b971c70a30e663787d643e6d589591d582))
@@ -2092,7 +2178,10 @@ GAME(2001,	hirol_it,	hirolcas,	whitestar,	whitestar,	whitestar,	ROT0,	"Stern",	"
 GAME(1996,	id4,		0,			whitestar,	whitestar,	whitestar,	ROT0,	"Sega",		"Independence Day",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1998,	lostspc,	0,			whitestar,	whitestar,	whitestar,	ROT0,	"Sega",		"Lost in Space",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(2001,	monopolp,	0,			whitestar,	whitestar,	whitestar,	ROT0,	"Stern",	"Monopoly (3.20)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(2002,	monopole,	monopolp,	whitestar,	whitestar,	whitestar,	ROT0,	"Stern",	"Monopoly (3.03)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(2002,	monop303,	monopolp,	whitestar,	whitestar,	whitestar,	ROT0,	"Stern",	"Monopoly (3.03)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(2002,	monop301,	monopolp,	whitestar,	whitestar,	whitestar,	ROT0,	"Stern",	"Monopoly (3.01)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(2002,	monop251,	monopolp,	whitestar,	whitestar,	whitestar,	ROT0,	"Stern",	"Monopoly (2.51)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(2002,	monop233,	monopolp,	whitestar,	whitestar,	whitestar,	ROT0,	"Stern",	"Monopoly (2.33)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(2002,	monopolf,	monopolp,	whitestar,	whitestar,	whitestar,	ROT0,	"Stern",	"Monopoly (France)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(2002,	monopolg,	monopolp,	whitestar,	whitestar,	whitestar,	ROT0,	"Stern",	"Monopoly (Germany)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(2002,	monopoli,	monopolp,	whitestar,	whitestar,	whitestar,	ROT0,	"Stern",	"Monopoly (Italy)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
