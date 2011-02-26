@@ -932,7 +932,7 @@ Guru's Readme
 Atomis Wave (system overview)
 Sammy/SEGA, 2002
 
-This is one of the latest arcade systems so far, basically just a Dreamcast using ROM carts.
+The Atomiswave System is basically just a Sega Dreamcast using ROM carts.
 
 PCB Layout
 ----------
@@ -1033,11 +1033,11 @@ Pin     Function    I/O    Pin   Function  I/O
 The bottom of the PCB contains nothing significant except some connectors. One for the game cart, one for special controls
 or I/O, one for a communication module, one for a cooling fan and one for the serial connection daughterboard.
 
----------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------
 
 
 
-Atomiswave cart PCB layout and game usage (revision 0.4 13/9/2010 6:12pm)
+Atomiswave cart PCB layout and game usage (revision 1.0 26/2/2011 5:59pm)
 -----------------------------------------
 
 Type 1 ROM Board:
@@ -1075,6 +1075,7 @@ Notes:
                Dolphin Blue                          AX0401F01
                Maximum Speed                         AX0501F01
                Demolish Fist                         AX0601F01
+               Guilty Gear X Ver. 1.5                AX0801F01
                Guilt Gear Isuka                      AX1201F01
                Knights Of Valour Seven Spirits       AX1301F01
                Salaryman Kintaro                     AX1401F01
@@ -1090,12 +1091,7 @@ Notes:
                The name in the archive has been devised purely for convenience.
                This ROM holds the main program.
 
-IC10 to IC17 - Custom-badged 128M TSOP48 mask ROMs. I suspect they are Macronix
-               ROMs because the ROM on the main board is also a custom Macronix
-               ROM and they have a history of producing custom ROMs for other
-               companies that hide their ROM types like Nintendo etc. May as well
-               be MX23L12810 or MR27V12800J, which have the same pinout.
-
+IC10 to IC17 - Custom-badged 128M TSOP48 mask ROMs.
                IC10 - Not Populated for 7 ROMs or less (ROM 01 if 8 ROMs are populated)
                IC11 - ROM 01 (or ROM 02 if 8 ROMs are populated)
                IC12 - ROM 02 (or ROM 03 if 8 ROMs are populated)
@@ -1114,6 +1110,7 @@ IC10 to IC17 - Custom-badged 128M TSOP48 mask ROMs. I suspect they are Macronix
                Dolphin Blue                          AX0401M01 to AX0405M01    5
                Maximum Speed                         AX0501M01 to AX0505M01    5
                Demolish Fist                         AX0601M01 to AX0607M01    7
+               Guilty Gear X Ver. 1.5                AX0801M01 to AX0807M01    7
                Guilty Gear Isuka                     AX1201M01 to AX1208M01    8
                Knights Of Valour Seven Spirits       AX1301M01 to AX1307M01    7
                Salaryman Kintaro                     AX1401M01 to AX1407M01    7
@@ -1158,6 +1155,7 @@ Notes:
                Game (sorted by code)                 Code
                -----------------------------------------------
                Samurai Spirits Tenkaichi Kenkakuden  AX2901F01
+               Metal Slug 6                          AX3001F01
                The King Of Fighters XI               AX3201F01
                Neogeo Battle Coliseum                AX3301F01
                Rumble Fish 2                         AX3401F01
@@ -1169,8 +1167,7 @@ Notes:
                is a TSOP48, using the middle pins. The other 2 pins on each side of the ROM
                are not connected to anything.
 
-       MROM* - Custom-badged SSOP70 mask ROMs. These may be OKI MR26V25605 or MR26V25655 (256M)
-               or possibly 26V51253 (512M) or something else similar.
+       MROM* - Custom-badged 256M SSOP70 mask ROMs
 
                ROM Codes
                ---------
@@ -1178,6 +1175,7 @@ Notes:
                Game (sorted by code)                 Code                      of ROMs
                -----------------------------------------------------------------------
                Samurai Spirits Tenkaichi Kenkakuden  AX2901M01 to AX2907M01    7
+               Metal Slug 6                          AX3001M01 to AX3004M01    4
                The King Of Fighters XI               AX3201M01 to AX3207M01    7
                Neogeo Battle Coliseum                AX3301M01 to AX3307M01    7
                Rumble Fish 2                         AX3401M01 to AX3405M01    5
@@ -1190,6 +1188,7 @@ This type is manufactured by Sega when Sammy merged with Sega.
 171-8355A
 PC BD A/W 128M FLASH
 837-14608 (sticker for Extreme Hunting 2 Tournament Edition)
+837-14695 (sticker for Dirty Pigskin Football)
 |----------------------------|
 | XC9536*         U16   U2*  |
 |                            |
@@ -1215,40 +1214,27 @@ Notes:
                Game                                  Part#      Sticker
                ---------------------------------------------------------
                Extreme Hunting 2 Tournament Edition  315-6428P  315-6248
+               Dirty Pigskin Football                ?          ?
 
           U* - Fujitsu MBM29PL12LM-10PCN 128M MirrorFlash TSOP56 flash ROM.
                (configured as 16Mbytes x8bit or 8Mwords x16bit)
                This ROM has no additional custom markings. The name in the archive has been devised
-               purely for convenience. The number of ROMs may vary between games. So far all 8
-               positions have been seen populated. It's also possible all positions are present
-               when manufactured, each board is programmed to requirements and depending on the total
-               data length, some ROMs may be empty.
+               purely for convenience using the Sega 837- sticker number. The number of ROMs may vary 
+               between games. So far all 8 positions have been seen populated. It's also possible all 
+               positions are present when manufactured, each board is programmed to requirements and 
+               depending on the total data length, some ROMs may be empty.
 
-
-               Other games not dumped (some may have been cancelled, * = known to be released)
-               ----------------------
-               Chase 1929
-               Dirty Pigskin
-               Force Five
-               Guilty Gear X Version 1.5 *
-               Kenju
-               Metal Slug 6 *
-               Premier Eleven
-               Sushi Bar
-           The King Of Fighters XI *
-               Sega Clay Challenge *
-               Sega Bass Fishing Challenge *
 
 
 Network Board
 -------------
 
-This board is required for Extreme Hunting 2 Tournament Edition, although it doesn't need to be connected
-to a network or another Atomiswave unit to boot up. However it must be plugged into the PCB in the
-communication slot or the game will not go in-game. It will boot but then displays NETWORK BOARD ERROR
-if not present. Externally there's a hole for an RJ45 network cable and a slot for a PIC16C621/PIC16C622
-PIC enclosed in a black plastic housing. This is the same type as used in NAOMI etc. This board probably acts
-like the NAOMI network DIMM board minus the on-board DIMM RAM storage.
+This board is required for Extreme Hunting 2 Tournament Edition (and possibly some other Sega-made Atomiswave carts)
+although it doesn't need to be connected to a network or another Atomiswave unit to boot up. However it must be 
+plugged into the PCB in the communication slot or the game will not go in-game. It will boot but then displays 
+NETWORK BOARD ERROR if not present. Externally there's a hole for an RJ45 network cable and a slot for a 
+PIC16C621/PIC16C622 PIC enclosed in a black plastic housing. This is the same type as used in NAOMI etc. This 
+board probably acts like the NAOMI network DIMM board minus the on-board DIMM RAM storage.
 
 837-14508R
 171-8324C
@@ -1285,6 +1271,7 @@ Notes:
                            Game                                   Sega Part#
                            ---------------------------------------------------
                            Extreme Hunting 2 Tournament Edition   317-0445-COM
+
 
 AW-NET Network Board
 --------------------
@@ -1334,6 +1321,18 @@ Notes:
       CN3 - Gun connection for player 2 pump switch
       CN4 - Gun connection for player 1 trigger and optical
       CN5 - Gun connection for player 1 pump switch
+
+
+Other games not dumped (some may have been cancelled)
+----------------------
+Chase 1929
+Force Five
+Kenju
+Premier Eleven
+Sushi Bar
+Sega Clay Challenge
+Sega Bass Fishing Challenge
+
 */
 
 #include "emu.h"
@@ -6923,6 +6922,7 @@ static const UINT32 dirtypig_key = 0xc194f;
 static const UINT32 mslug6_key   = 0x53627;
 static const UINT32 samsptk_key  = 0xe935f;
 static const UINT32 ggx15_key    = 0x91257;
+static const UINT32 rumblef2_key = 0xd674a;
 
 static DRIVER_INIT( atomiswave )
 {
@@ -6975,6 +6975,7 @@ AW_DRIVER_INIT(dirtypig)
 AW_DRIVER_INIT(mslug6)
 AW_DRIVER_INIT(samsptk)
 AW_DRIVER_INIT(ggx15)
+AW_DRIVER_INIT(rumblef2)
 
 ROM_START( fotns )
 	ROM_REGION( 0x200000, "awflash", 0)
@@ -7297,6 +7298,20 @@ ROM_START( ggx15 )
         ROM_LOAD( "ax0807m01.ic17", 0x7000000, 0x1000000, CRC(e397dd79) SHA1(5fec32dc19dd71ef0d451f8058186f998015723b) ) 
 ROM_END
 
+ROM_START( rumblef2 )
+	ROM_REGION( 0x200000, "awflash", 0)
+	AW_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE)
+	ROM_LOAD( "ax3401p01.fmem1", 0x0000000, 0x0800000, CRC(a33601cf) SHA1(2dd60a9c3a2517f2257ab69288fa95645de133fa) ) 
+	ROM_LOAD( "ax3401m01.mrom1", 0x1000000, 0x2000000, CRC(60894d4c) SHA1(5b21af3c7c82d4d64bfd8498c26283111ada1298) ) 
+	ROM_LOAD( "ax3402m01.mrom2", 0x3000000, 0x2000000, CRC(e4224cc9) SHA1(dcab06fcf48cda286f93d2b37f03a83abf3230cb) ) 
+	ROM_LOAD( "ax3403m01.mrom3", 0x5000000, 0x2000000, CRC(081c0edb) SHA1(63a3f1b5f9d7ca4367868c492236406f23996cc3) ) 
+	ROM_LOAD( "ax3404m01.mrom4", 0x7000000, 0x2000000, CRC(a426b443) SHA1(617aab42e432a80b0663281fb7faa6c14ef4f149) ) 
+	ROM_LOAD( "ax3405m01.mrom5", 0x9000000, 0x2000000, CRC(4766ce56) SHA1(349b82013a75905ae5520b14a87702c9038a5def) ) 
+	ROM_COPY( "user1", 0x9000000, 0xb000000, 0x2000000)
+ROM_END
+
 /* Atomiswave */
 GAME( 2001, awbios,   0,        aw,    aw,    atomiswave, ROT0, "Sammy",                           "Atomiswave Bios", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
@@ -7313,6 +7328,7 @@ GAME( 2004, salmankt, awbios,   aw,    aw,    salmankt, ROT0, "Sammy",          
 GAME( 2004, ftspeed,  awbios,   aw,    aw,    ftspeed,  ROT0, "Sammy",				 "Faster Than Speed", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2004, kov7sprt, awbios,   aw,    aw,    kov7sprt, ROT0, "Sammy / IGS",			 "Knights of Valour - The Seven Spirits", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 2005, vfurlong, awbios,   aw,    aw,    vfurlong, ROT0, "Sammy",			         "Net Select Keiba Victory Furlong", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2004, rumblef2, awbios,   aw,    aw,    rumblef2, ROT0, "Sammy / Dimps",                   "The Rumble Fish 2", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2005, ngbc,     awbios,   aw,    aw,    ngbc,     ROT0, "Sammy / SNK Playmore",            "Neo-Geo Battle Coliseum", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2005, samsptk,  awbios,   aw,    aw,    samsptk,  ROT0, "Sammy / SNK Playmore",            "Samurai Spirits Tenkaichi Kenkakuden", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2005, kofxi,    awbios,   aw,    aw,    kofxi,    ROT0, "Sammy / SNK Playmore",            "The King of Fighters XI", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
