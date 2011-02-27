@@ -1340,7 +1340,7 @@ Sega Bass Fishing Challenge
 #include "sound/aica.h"
 #include "includes/dc.h"
 
-#define CPU_CLOCK (70000000)
+#define CPU_CLOCK (200000000)
 static UINT32 *dc_sound_ram;
 static macronix_29l001mc_device *awflash;
 
