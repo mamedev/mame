@@ -10959,9 +10959,6 @@ Other Sun games
 	DRIVER( tomy_h30 )
 	DRIVER( wwfr_106 )
 	DRIVER( wwfr_103 )
-	DRIVER( titanic )
-	DRIVER( monopred )
-	DRIVER( wackadoo )
 
 
 	// de_3b.c
@@ -10986,8 +10983,10 @@ Other Sun games
 	DRIVER( frankstg )
 	DRIVER( mav_402 )
 	DRIVER( mav_401 )
+	DRIVER( mav_400 )
 	DRIVER( mav_100 )
 	DRIVER( detest )
+	DRIVER( ctcheese )
 
 
 	// flicker.c
@@ -11680,6 +11679,10 @@ Other Sun games
 	DRIVER( twst_404 )
 	DRIVER( twst_300 )
 	DRIVER( viprsega )
+	DRIVER( ctchzdlx )
+	DRIVER( titanic )
+	DRIVER( monopred )
+	DRIVER( wackadoo )
 
 
 	// white_mod.c

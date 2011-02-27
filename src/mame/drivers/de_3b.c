@@ -370,6 +370,21 @@ ROM_START(mav_401)
 	ROM_RELOAD(0x100000 + 0x80000, 0x80000)
 ROM_END
 
+ROM_START(mav_400)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("mavgc5.400", 0x0000, 0x10000, CRC(e2d0a88b) SHA1(d1571edba47aecc871ac0cfdaabca31774f70fa1))
+	ROM_REGION(0x01000000, "cpu3", 0)
+	ROM_LOAD16_BYTE("mavdisp0.400", 0x00000001, 0x00080000, CRC(b6069484) SHA1(2878d9a0151194bd4a0e12e2f75b02a5d7316b68))
+	ROM_LOAD16_BYTE("mavdisp3.400", 0x00000000, 0x00080000, CRC(149f871f) SHA1(e29a8bf149b77bccaeed202786cf76d9a4fd51df))
+	ROM_REGION(0x010000, "cpu2", 0)
+	ROM_LOAD("mavu7.dat", 0x0000, 0x10000, CRC(427e6ab9) SHA1(6ad9295097f3d498383c91adf4ca667f797f29b1))
+	ROM_REGION(0x200000, "sound1", 0)
+	ROM_LOAD("mavu17.dat", 0x000000, 0x80000, CRC(cba377b8) SHA1(b7551b6cb64357cdacf1a96cedfccbabf4bd070a))
+	ROM_RELOAD(0x000000 + 0x80000, 0x80000)
+	ROM_LOAD("mavu21.dat", 0x100000, 0x80000, CRC(be0c6a6f) SHA1(4fee912d9f0d4b196dbfacf06a4202b2fa3037b1))
+	ROM_RELOAD(0x100000 + 0x80000, 0x80000)
+ROM_END
+
 ROM_START(mav_100)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("mavcpu.100", 0x0000, 0x10000, CRC(13fdc959) SHA1(f8155f0fe5d4c3fe55000ab3b57f298fd9229fef))
@@ -382,6 +397,24 @@ ROM_START(mav_100)
 	ROM_LOAD("mavu17.dat", 0x000000, 0x80000, CRC(cba377b8) SHA1(b7551b6cb64357cdacf1a96cedfccbabf4bd070a))
 	ROM_RELOAD(0x000000 + 0x80000, 0x80000)
 	ROM_LOAD("mavu21.dat", 0x100000, 0x80000, CRC(be0c6a6f) SHA1(4fee912d9f0d4b196dbfacf06a4202b2fa3037b1))
+	ROM_RELOAD(0x100000 + 0x80000, 0x80000)
+ROM_END
+
+/*-------------------------------------------------------------
+/ Cut The Cheese (Redemption, Data East hardware)
+/------------------------------------------------------------*/
+ROM_START(ctcheese)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("ctcc5.bin", 0x0000, 0x10000, CRC(465d41de) SHA1(0e30b527d5b47f8823cbe6f196052b090e69e907))
+	ROM_REGION(0x01000000, "cpu3", 0)
+	ROM_LOAD16_BYTE("ctcdsp0.bin", 0x00000001, 0x00080000, CRC(6885734d) SHA1(9ac82c9c8bf4e66d2999fbfd08617ef6c266dfe8))
+	ROM_LOAD16_BYTE("ctcdsp3.bin", 0x00000000, 0x00080000, CRC(0c2b3f3c) SHA1(cb730cc6fdd2a2786d25b46b1c45466ee56132d1))
+	ROM_REGION(0x010000, "cpu2", 0)
+	ROM_LOAD("ctcu7.bin", 0x0000, 0x10000, CRC(406b9b9e) SHA1(f3f86c368c92ee0cb47323e6e0ca0fa05b6122bd))
+	ROM_REGION(0x200000, "sound1", 0)
+	ROM_LOAD("ctcu17.bin", 0x000000, 0x80000, NO_DUMP)
+	ROM_RELOAD(0x000000 + 0x80000, 0x80000)
+	ROM_LOAD("ctcu21.bin", 0x100000, 0x80000, NO_DUMP)
 	ROM_RELOAD(0x100000 + 0x80000, 0x80000)
 ROM_END
 
@@ -419,5 +452,7 @@ GAME(1994,	frankst,	0,				de_3b,	de_3b,	de_3b,	ROT0,	"Sega",				"Mary Shelley's 
 GAME(1995,	frankstg,	frankst,		de_3b,	de_3b,	de_3b,	ROT0,	"Sega",				"Mary Shelley's Frankenstein (Germany)",GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1994,	mav_402,	0,				de_3b,	de_3b,	de_3b,	ROT0,	"Sega",				"Maverick (Display Rev. 4.02)",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1994,	mav_401,	mav_402,		de_3b,	de_3b,	de_3b,	ROT0,	"Sega",				"Maverick (Display Rev. 4.01)",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1994,	mav_400,	mav_402,		de_3b,	de_3b,	de_3b,	ROT0,	"Sega",				"Maverick (Display Rev. 4.00)",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1994,	mav_100,	mav_402,		de_3b,	de_3b,	de_3b,	ROT0,	"Sega",				"Maverick (1.00)",						GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1998,	detest,		0,				de_3b,	de_3b,	de_3b,	ROT0,	"Data East",		"Data East Test Chip",					GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1996,	ctcheese,	0,				de_3b,	de_3b,	de_3b,	ROT0,	"Sega",				"Cut The Cheese (Redemption)",			GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
