@@ -36,16 +36,9 @@ ToDo:
 
 - all games that uses YUV just updates one frame then dies, why?
 
-- all or almost all games seems to have issues with the sound loops, for example sfz3ugd keeps to say "This-This-This ..." at start-up
-  instead of completing the phrase;
-
-- suchie3: used to boot (at least go over the I/O test), it doesn't now, might be protection related.
+- SH to ARM sound streaming doesn't work (used by ADX compression system)
 
 - ngdup23a, ngdup23c: missing DIMM emulation, hence they can't possibly work, emulate the DIMM means to add an extra SH-4 ...
-
-- totd: emulation exits at some point during attract mode without any output.
-
-- spkrbtl: ARM CPU crashes sometimes? Also, it crashes when entering into the gameplay.
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -1347,7 +1340,7 @@ Sega Bass Fishing Challenge
 #include "sound/aica.h"
 #include "includes/dc.h"
 
-#define CPU_CLOCK (200000000)
+#define CPU_CLOCK (70000000)
 static UINT32 *dc_sound_ram;
 static macronix_29l001mc_device *awflash;
 
@@ -3578,16 +3571,6 @@ ROM_START( mvsc2 )
 	ROM_LOAD("mpr-23061.ic30",  0x7000000, 0x0800000, CRC(fb1844c4) SHA1(1d1571516a6dbed0c4ded3b80efde9cc9281f66f) )
 	ROM_LOAD("mpr-23083.ic31",  0x7800000, 0x0400000, CRC(c61d2dfe) SHA1(a05fb979ed7c8040de91716fc8814e6bd995efa2) )
 	ROM_LOAD("mpr-23084.ic32",  0x8000000, 0x0400000, CRC(e228cdfd) SHA1(d02a2e3557bd24cf34c5ddb42d41ca15e78ae885) )
-
-
-
-	// DMA protection data
-	ROM_LOAD("88000000.bin", 0x8800000, 0x025f00, CRC(77d79823) SHA1(2545d28eee47114e8ffb9bc6d7a910e90fc48420) )
-	ROM_LOAD("88026440.bin", 0x8830000, 0x016520, CRC(dad9ebbd) SHA1(39c0697caa2b5ee11d99e75726e92ed86a23f10b) )
-	ROM_LOAD("8803bda0.bin", 0x8850000, 0x01e5e0, CRC(9e0b8202) SHA1(729bed557c1a00da13c990603bbadab38d90285e) )
-	ROM_LOAD("8805a560.bin", 0x8870000, 0x0017a0, CRC(7bc27482) SHA1(6ce6074cf47989f42af02deb7aac52883912784a) )
-	ROM_LOAD("8805b720.bin", 0x8880000, 0x02b5a0, CRC(485d0aef) SHA1(853f4b49b489cc512c906edcaf3cd8b5bf4c64c0) )
-	ROM_LOAD("8808b7e0.bin", 0x88a0000, 0x013ec0, CRC(0fc8f363) SHA1(dad30d43cef89d01ce80301b1d796aabad755de6) )
 ROM_END
 
 /* toy fighter - 1999 sega */
@@ -4033,9 +4016,6 @@ ROM_START( qmegamis )
 	ROM_LOAD32_WORD("mpr-23226.ic32", 0x8000002, 0x0800000, CRC(cd5da506) SHA1(2e76c8892c1d389b0f12a0046213f43d2ab07d78) ) //ic 17
 
 	ROM_COPY( "user1", 0x1400000, 0x0800000, 0x0800000 ) // mirror data for IC1 (no test on this game, but layout is the same as gram2000)
-
-	// trojaned protection data (must be in the "user1" region because it's accessed via DMA)
-	ROM_LOAD( "81452000_dma.bin", 0x9000000, 0x000120, CRC(96049488) SHA1(e2b98e8986f8cbf026db50a652300081a8e470b0) )
 ROM_END
 
 /*

@@ -2,8 +2,8 @@
 
     Naomi plug-in board emulator
 
-    emulator by Samuele Zannoli
-    protection chip by R. Belmont, reverse engineering by Deunan Knute
+    emulator by Samuele Zannoli and R. Belmont
+    reverse engineering by ElSemi, Deunan Knute, Andreas Naive, Olivier Galibert, and Cah4e3
 
 **************************************************************************/
 
@@ -61,10 +61,9 @@
     In other words, disable DMA once before using PIO (most games using both access types do that when the DMA terminates).
     This bit is also used to reset the chip's internal protection mechanism on "Oh! My Goddess" to a known state.
 
-    * bit 29 (mode bit 1) is address shuffle bit
+    * bit 29 (mode bit 1) is "M1" compression bit on Actel carts, other functions on others
     It's actually the opposite, when set the addressing is following the chip layout and when cleared the protection chip will have it's fun
-    with address lines 10 to 23(?). It's not a simple swap function, rather a lookup table and one with repeating results too.
-    The few games I got to work never made any use of that bit, it's always set for all normal reads.
+    doing a decompression + XOR on the data for Actel carts.  Non-Actel carts may ignore this bit or remap the address space.
 
     * bit 28 (mode bit 0) is unused (so far)
     Or it could really be the last address bit to allow up to 512MB of data on a cart?
@@ -179,7 +178,7 @@ Atomiswave ROM board specs from Cah4e3 @ http://cah4e3.wordpress.com/2009/07/26/
 
 #define NAOMIBD_FLAG_AUTO_ADVANCE	(8)	// address auto-advances on read
 #define NAOMIBD_FLAG_SPECIAL_MODE	(4)	// used to access protection registers
-#define NAOMIBD_FLAG_ADDRESS_SHUFFLE	(2)	// 0 to let protection chip en/decrypt, 1 for normal
+#define NAOMIBD_FLAG_DMA_COMPRESSION    (2)	// 0 protection chip decompresses DMA data, 1 for normal DMA reads
 
 #define NAOMIBD_PRINTF_PROTECTION	(0)	// 1 to printf protection access details
 
@@ -188,8 +187,6 @@ Atomiswave ROM board specs from Cah4e3 @ http://cah4e3.wordpress.com/2009/07/26/
  *  Structures
  *
  *************************************/
-
-#define MAX_PROT_REGIONS	(32)
 
 #define PACK_BUF_SIZE (32768)
 
@@ -218,6 +215,11 @@ struct _naomibd_prot
     UINT8 pak_byte, cmd_byte;
     int seed;
     UINT8 pak_buf[PACK_BUF_SIZE];
+
+    UINT8 *s_input;
+    UINT8 s_xor[4];
+    UINT8 s_dict[111];
+    int s_subst, s_out_len, s_out_cnt, s_shift, s_bits, s_in_len, s_in_pos;
 };
 
 typedef struct _naomibd_state naomibd_state;
@@ -237,12 +239,8 @@ struct _naomibd_state
 
 	// live decrypt vars
 	UINT32				dc_gamekey, dc_seqkey, dc_dmakey;
-	UINT8				dc_cart_ram[128*1024];	// internal cartridge RAM
+	UINT8				dc_cart_ram[256*1024];	// internal cartridge RAM
 	INT32				dc_m3_ptr;
-
-	#if NAOMIBD_PRINTF_PROTECTION
-	int				prot_pio_count;
-	#endif
 
 	naomibd_prot		prot;
 };
@@ -342,8 +340,6 @@ INLINE naomibd_state *get_safe_token(device_t *device)
 int naomibd_interrupt_callback(device_t *device, naomibd_interrupt_func callback)
 {
 	naomibd_config *config = (naomibd_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
-	//naomibd_state *v = get_safe_token(device);
-
 	config->interrupt = callback;
 	return 0;
 }
@@ -354,10 +350,168 @@ int naomibd_get_type(device_t *device)
 	return v->type;
 }
 
-
-void *naomibd_get_memory(device_t *device)
+// M1 decryption/decompression
+static UINT8 naomibd_m1dec_readbyte(naomibd_state *naomibd)
 {
-	return get_safe_token(device)->memory;
+    UINT8 v;
+
+    switch (naomibd->prot.s_in_pos & 3)
+    {
+        case 0:
+            v = naomibd->prot.s_input[naomibd->prot.s_in_pos + 3];
+            v ^= naomibd->prot.s_input[naomibd->prot.s_in_pos + 1];
+            break;
+
+        case 1:
+            v = naomibd->prot.s_input[naomibd->prot.s_in_pos + 1];
+            v ^= naomibd->prot.s_input[naomibd->prot.s_in_pos - 1];
+            break;
+
+        case 2:
+            v = naomibd->prot.s_input[naomibd->prot.s_in_pos - 1];
+            break;
+
+        case 3:
+            v = naomibd->prot.s_input[naomibd->prot.s_in_pos - 3];
+            break;
+    }
+
+    v ^= naomibd->prot.s_xor[naomibd->prot.s_in_pos & 3];
+    naomibd->prot.s_in_pos++;
+    return v;
+}
+
+static void naomibd_m1dec_storebyte (naomibd_state *naomibd, UINT8 b)
+{
+    if (naomibd->prot.s_subst && naomibd->prot.s_out_cnt >= 2)
+    {
+        b = naomibd->dc_cart_ram[naomibd->prot.s_out_cnt - 2] - b;
+    }
+    naomibd->dc_cart_ram[naomibd->prot.s_out_cnt] = b;
+    naomibd->prot.s_out_cnt++;
+
+    if (naomibd->prot.s_out_cnt >= (256*1024))
+    {
+        fatalerror("naomibd: M1 decode exceeds buffer size!\n");
+    }
+}
+
+static void naomibd_m1dec_shiftin(naomibd_state *naomibd)
+{
+    naomibd->prot.s_shift <<= 8;
+    naomibd->prot.s_shift |= naomibd_m1dec_readbyte(naomibd);
+    naomibd->prot.s_bits += 8;
+}
+
+static void naomibd_m1_decode(naomibd_state *naomibd)
+{
+    int i, eos;
+    
+    naomibd->prot.s_xor [0] = (UINT8)naomibd->dc_dmakey;
+    naomibd->prot.s_xor [1] = (UINT8)(naomibd->dc_dmakey >> 8);
+    naomibd->prot.s_xor [2] = (UINT8)(naomibd->dc_dmakey >> 16);
+    naomibd->prot.s_xor [3] = (UINT8)(naomibd->dc_dmakey >> 24);
+    
+	#if NAOMIBD_PRINTF_PROTECTION
+    printf("M1 decode: dma offset %x, key %x\n", naomibd->dma_offset, naomibd->dc_dmakey);
+    #endif
+
+    naomibd->prot.s_input = naomibd->memory + naomibd->dma_offset;
+    naomibd->prot.s_in_pos = 0;
+
+    // read in the dictionary
+    for (i = 0; i < 111; i++)
+    {
+        naomibd->prot.s_dict [i] = naomibd_m1dec_readbyte(naomibd);
+    }
+    
+    // control bits
+    naomibd->prot.s_subst = (naomibd->prot.s_dict [0] & 64) ? 1 : 0;
+    
+    // command stream
+    naomibd->prot.s_out_cnt = 0, eos = 0;
+    naomibd->prot.s_shift = 0, naomibd->prot.s_bits = 0;    
+    while (!eos)
+    {
+        int code, addr, t;
+    
+        if (naomibd->prot.s_bits < 2)
+            naomibd_m1dec_shiftin(naomibd);
+
+        code = (naomibd->prot.s_shift >> (naomibd->prot.s_bits - 2)) & 3;
+        switch (code)
+        {
+            case 0:
+                // 00-aa
+                if (naomibd->prot.s_bits < 4)
+                    naomibd_m1dec_shiftin(naomibd);
+                addr = (naomibd->prot.s_shift >> (naomibd->prot.s_bits - 4)) & 3;
+                naomibd->prot.s_bits -= 4;
+                if (addr == 0)
+                {
+                    // quotation
+                    if (naomibd->prot.s_bits < 8)
+                        naomibd_m1dec_shiftin (naomibd);
+                    t = (naomibd->prot.s_shift >> (naomibd->prot.s_bits - 8)) & 255;
+                    naomibd->prot.s_bits -= 8;
+                    naomibd_m1dec_storebyte(naomibd, t);
+                    break;
+                }
+                naomibd_m1dec_storebyte(naomibd, naomibd->prot.s_dict [addr]);
+                break;
+    
+                case 1:
+                    if (naomibd->prot.s_bits < 5)
+                        naomibd_m1dec_shiftin (naomibd);
+                    t = (naomibd->prot.s_shift >> (naomibd->prot.s_bits - 3)) & 1;
+                    if (t == 0)
+                    {
+                        // 010-aa
+                        addr = (naomibd->prot.s_shift >> (naomibd->prot.s_bits - 5)) & 3;
+                        addr += 4;
+                        naomibd->prot.s_bits -= 5;
+                    }
+                    else
+                    {
+                        // 011-aaa
+                        if (naomibd->prot.s_bits < 6)
+                            naomibd_m1dec_shiftin (naomibd);
+                        addr = (naomibd->prot.s_shift >> (naomibd->prot.s_bits - 6)) & 7;
+                        addr += 8;
+                        naomibd->prot.s_bits -= 6;
+                    }
+                    naomibd_m1dec_storebyte(naomibd, naomibd->prot.s_dict [addr]);
+                    break;
+    
+                case 2:
+                    if (naomibd->prot.s_bits < 7)
+                        naomibd_m1dec_shiftin(naomibd);
+                    // 10-aaaaa
+                    addr = (naomibd->prot.s_shift >> (naomibd->prot.s_bits - 7)) & 31;
+                    addr += 16;
+                    naomibd->prot.s_bits -= 7;
+                    naomibd_m1dec_storebyte(naomibd, naomibd->prot.s_dict [addr]);
+                    break;
+    
+                case 3:
+                    if (naomibd->prot.s_bits < 8)
+                        naomibd_m1dec_shiftin(naomibd);
+                    // 11-aaaaaa
+                    addr = (naomibd->prot.s_shift >> (naomibd->prot.s_bits - 8)) & 63;
+                    addr += 48;
+                    naomibd->prot.s_bits -= 8;
+                    if (addr == 111)
+                    {
+                        // end of stream
+                        eos = 1;
+                    }
+                    else
+                    {
+                        naomibd_m1dec_storebyte(naomibd, naomibd->prot.s_dict [addr]);
+                    }
+                    break;
+        }
+    }
 }
 
 // Streaming M2/M3 protection and decompression
@@ -367,7 +521,7 @@ INLINE UINT16 bswap16(UINT16 in)
     return ((in>>8) | (in<<8));
 }
 
-UINT16 naomibd_get_decrypted_stream(naomibd_state *naomibd)
+static UINT16 naomibd_get_decrypted_stream(naomibd_state *naomibd)
 {
 	UINT16 wordn = bswap16(naomibd->prot.ptr[naomibd->prot.count++]);
 
@@ -378,7 +532,7 @@ UINT16 naomibd_get_decrypted_stream(naomibd_state *naomibd)
 	return wordn;
 }
 
-void naomibd_init_stream(naomibd_state *naomibd)
+static void naomibd_init_stream(naomibd_state *naomibd)
 {
 	naomibd->prot.last_word = 0;
 	
@@ -395,7 +549,7 @@ void naomibd_init_stream(naomibd_state *naomibd)
 	}
 }
 
-UINT16 naomibd_get_compressed_bit(naomibd_state *naomibd)
+static UINT16 naomibd_get_compressed_bit(naomibd_state *naomibd)
 {
    if(naomibd->prot.pak_bit == 0)
    {
@@ -410,7 +564,7 @@ UINT16 naomibd_get_compressed_bit(naomibd_state *naomibd)
    return naomibd->prot.pak_word >> 15;
 }
 
-UINT16 naomibd_get_decompressed_stream(naomibd_state *naomibd)
+static UINT16 naomibd_get_decompressed_stream(naomibd_state *naomibd)
 {
 /* node format
 0xxxxxxx - next node index
@@ -558,7 +712,7 @@ UINT16 naomibd_get_decompressed_stream(naomibd_state *naomibd)
 
 // stream read protected PIO hook
 //-----------------------------------------------------------
-UINT16 naomibd_get_data_stream(naomibd_state *naomibd)
+static UINT16 naomibd_get_data_stream(naomibd_state *naomibd)
 {
 	UINT16 wordn;
 
@@ -574,8 +728,31 @@ UINT16 naomibd_get_data_stream(naomibd_state *naomibd)
 	return wordn;
 }
 
+void *naomibd_get_memory(device_t *device)
+{
+	naomibd_state *naomibd = get_safe_token(device);
+
+    // for M1 decodes, return the buffer we'll DMA from
+	if (!(naomibd->dma_offset_flags & NAOMIBD_FLAG_DMA_COMPRESSION) && (naomibd->type == ROM_BOARD) && (naomibd->dc_dmakey != 0))
+    {
+        // perform the M1 decode
+        naomibd_m1_decode(naomibd);
+
+        // return the pointer to our output buffer
+        return naomibd->dc_cart_ram;
+    }
+
+    if (!(naomibd->dma_offset_flags & NAOMIBD_FLAG_DMA_COMPRESSION) && (naomibd->type == ROM_BOARD))
+    {
+        logerror("Unhandled M1 DMA with key %x, flags %x, offset %x\n", naomibd->dc_dmakey, naomibd->dma_offset_flags, naomibd->dma_offset);
+    }
+
+	return get_safe_token(device)->memory;
+}
+
 offs_t naomibd_get_dmaoffset(device_t *device)
 {
+	naomibd_state *naomibd = get_safe_token(device);
 	offs_t result = 0;
 
 	#if NAOMIBD_PRINTF_PROTECTION
@@ -583,38 +760,17 @@ offs_t naomibd_get_dmaoffset(device_t *device)
 	#endif
 
 	// if the flag is cleared that lets the protection chip go,
-	// we need to handle this specially.  but not on DIMM boards.
-	if (!(get_safe_token(device)->dma_offset_flags & NAOMIBD_FLAG_ADDRESS_SHUFFLE) && (get_safe_token(device)->type == ROM_BOARD))
+	// we need to handle this specially.  but not on DIMM boards or if there's no key.
+	if (!(naomibd->dma_offset_flags & NAOMIBD_FLAG_DMA_COMPRESSION) && (naomibd->type == ROM_BOARD) && (naomibd->dc_dmakey != 0))
 	{
-		if (!strcmp(device->machine->gamedrv->name, "qmegamis"))
-		{
-			result = 0x9000000;
-			return result;
-		}
-		else if (!strcmp(device->machine->gamedrv->name, "mvsc2"))
-		{
-			switch (get_safe_token(device)->dma_offset)
-			{
-				case 0x08000000: result = 0x8800000;	break;
-				case 0x08026440: result = 0x8830000;	break;
-				case 0x0803bda0: result = 0x8850000;	break;
-				case 0x0805a560: result = 0x8870000;	break;
-				case 0x0805b720: result = 0x8880000;	break;
-				case 0x0808b7e0: result = 0x88a0000;	break;
-				default:
-					result = get_safe_token(device)->dma_offset;
-					break;
-			}
-
-			return result;
-		}
-		else
-		{
-			logerror("Protected DMA not handled for this game (dma_offset %x)\n", get_safe_token(device)->dma_offset);
-		}
+        // no offset, start at the beginning of cart ram for M1 transfers
+        result = 0;
 	}
+    else
+    {
+        result = get_safe_token(device)->dma_offset;
+    }
 
-	result = get_safe_token(device)->dma_offset;
 	return result;
 }
 
@@ -650,6 +806,32 @@ static void init_save_state(device_t *device)
 	device->save_item(NAME(v->aw_offset));
 	device->save_item(NAME(v->aw_file_base));
 	device->save_item(NAME(v->aw_file_offset));
+	device->save_item(NAME(v->dc_m3_ptr));
+	device->save_item(NAME(v->dc_cart_ram));
+    device->save_item(NAME(v->prot.last_word));
+    device->save_item(NAME(v->prot.aux_word));
+    device->save_item(NAME(v->prot.pak_word));
+    device->save_item(NAME(v->prot.heading_word));
+    device->save_item(NAME(v->prot.count));
+    device->save_item(NAME(v->prot.pak_bit));
+    device->save_item(NAME(v->prot.control_bits));
+    device->save_item(NAME(v->prot.pak_state));
+    device->save_item(NAME(v->prot.dec_count));
+    device->save_item(NAME(v->prot.pak_buf_size));
+    device->save_item(NAME(v->prot.pak_buf_pos));
+    device->save_item(NAME(v->prot.pak_fetch_ofs));
+    device->save_item(NAME(v->prot.pak_byte));
+    device->save_item(NAME(v->prot.cmd_byte));
+    device->save_item(NAME(v->prot.seed));
+    device->save_item(NAME(v->prot.s_xor));
+    device->save_item(NAME(v->prot.s_dict));
+    device->save_item(NAME(v->prot.s_subst));
+    device->save_item(NAME(v->prot.s_out_len));
+    device->save_item(NAME(v->prot.s_out_cnt));
+    device->save_item(NAME(v->prot.s_shift));
+    device->save_item(NAME(v->prot.s_bits));
+    device->save_item(NAME(v->prot.s_in_len));
+    device->save_item(NAME(v->prot.s_in_pos));
 }
 
 
@@ -802,7 +984,7 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 					v->aw_offset &= 0xffff;
 					v->aw_offset |= ((data>>16) & 0xffff0000);
 					v->dma_offset = v->aw_offset*2;
-					v->dma_offset_flags = NAOMIBD_FLAG_ADDRESS_SHUFFLE|NAOMIBD_FLAG_AUTO_ADVANCE;	// force normal DMA mode
+					v->dma_offset_flags = NAOMIBD_FLAG_DMA_COMPRESSION|NAOMIBD_FLAG_AUTO_ADVANCE;	// force normal DMA mode
 					//printf("EPR_OFFSETH = %x, dma_offset %x\n", (UINT32)(data>>32), v->dma_offset);
 				}
 
@@ -895,7 +1077,7 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 				// DMA_OFFSETH
 				v->dma_offset &= 0xffff;
 				v->dma_offset |= (data >> 16) & 0x1fff0000;
-				v->dma_offset_flags = (data>>28);
+				v->dma_offset_flags = (data>>(28+16));
 			}
 			if(ACCESSING_BITS_0_15)
 			{
@@ -917,8 +1099,6 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 
 						#if NAOMIBD_PRINTF_PROTECTION
 						printf("Protection: set up read @ %x, key %x (PIO %x DMA %x) [%s]\n", v->prot_offset*2, v->prot_key, v->rom_offset, v->dma_offset, device->machine->describe_context());
-
-						v->prot_pio_count = 0;
 						#endif
 
 						// if dc_gamekey isn't -1, we can live-decrypt this one
@@ -1843,9 +2023,8 @@ static DEVICE_START( naomibd )
 	/* store a pointer back to the device */
 	v->device = device;
 
-	#if NAOMIBD_PRINTF_PROTECTION
-	v->prot_pio_count = 0;
-	#endif
+    v->dc_dmakey = 0;
+
 	for (i=0; i<ARRAY_LENGTH(naomibd_translate_tbl); i++)
 	{
 		if (!strcmp(device->machine->gamedrv->name, naomibd_translate_tbl[i].name))
