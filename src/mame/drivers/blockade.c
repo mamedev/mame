@@ -593,6 +593,6 @@ ROM_END
 GAMEL(1976, blockade,  0,        blockade, blockade, 0, ROT0, "Gremlin", "Blockade", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_blockade )
 GAMEL(1976, comotion,  0,        blockade, comotion, 0, ROT0, "Gremlin", "Comotion", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_blockade )
 GAME( 1978, blasto,    0,        blasto,   blasto,   0, ROT0, "Gremlin", "Blasto", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // b/w, no overlay
-GAMEL(1977, hustle,    0,        blasto,   hustle,   0, ROT0, "Gremlin", "Hustle", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_blockade ) // also seen with a yellow overlay, but much less common than green
+GAMEL(1977, hustle,    0,        blasto,   hustle,   0, ROT0, "Gremlin", "Hustle", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_blockade )
 GAME( 1977, mineswpr,  0,        blasto,   mineswpr, 0, ROT0, "Amutech", "Minesweeper", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1977, mineswpr4, mineswpr, blasto,   mineswpr4,0, ROT0, "Amutech", "Minesweeper (4-Player)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
