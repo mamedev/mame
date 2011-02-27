@@ -2,73 +2,65 @@
 <mamelayout version="2">
 	<element name="overlay" defstate="1">
 		<rect state="1">
-			<bounds left="0" top="0" right="28" bottom="34" />
-			<color red="1" green="1" blue="1" />
-		</rect>
-		<rect state="1">
-			<bounds left="0" top="0" right="1" bottom="0" />
-			<color red="1" green="1" blue="1" />
-		</rect>
-		<rect state="1">
-			<bounds left="0" top="32" right="28" bottom="34" />
+			<bounds left="0" top="0" right="224" bottom="272" />
 			<color red="1" green="1" blue="1" />
 		</rect>
 
 		<rect state="1">
-			<bounds left="0" top="1" right="28" bottom="4" />
+			<bounds left="191.5" top="7.5" right="224" bottom="40.5" />
+			<color red="0.627" green="0" blue="0.878" />
+		</rect>
+		<rect state="1">
+			<bounds left="0" top="7.5" right="32.5" bottom="40.5" />
+			<color red="0.627" green="0" blue="0.878" />
+		</rect>
+
+		<rect state="1">
+			<bounds left="23.5" top="7.5" right="200.5" bottom="32.5" />
 			<color red="0.878" green="0" blue="0.627" />
 		</rect>
 
 		<rect state="1">
-			<bounds left="24" top="4" right="28" bottom="5" />
-			<color red="0.627" green="0" blue="0.878" />
-		</rect>
-		<rect state="1">
-			<bounds left="0" top="4" right="4" bottom="5" />
-			<color red="0.627" green="0" blue="0.878" />
-		</rect>
-
-		<rect state="1">
-			<bounds left="4" top="4" right="24" bottom="5" />
+			<bounds left="32.5" top="32.5" right="191.5" bottom="40.5" />
 			<color red="1" green="0.816" blue="0" />
 		</rect>
 		
 		<rect state="1">
-			<bounds left="27" top="5" right="28" bottom="28" />
+			<bounds left="215.5" top="40.5" right="224" bottom="223.5" />
 			<color red="0.627" green="0" blue="0.878" />
 		</rect>
 		<rect state="1">
-			<bounds left="0" top="5" right="1" bottom="28" />
+			<bounds left="0" top="40.5" right="8.5" bottom="223.5" />
 			<color red="0.627" green="0" blue="0.878" />
 		</rect>
 
 		<rect state="1">
-			<bounds left="24" top="5" right="27" bottom="28" />
-			<color red="0" green="0" blue="1" />
+			<bounds left="191.5" top="40.5" right="215.5" bottom="223.5" />
+			<color red="0" green="0.333" blue="1" />
 		</rect>
 		<rect state="1">
-			<bounds left="1" top="5" right="4" bottom="28" />
-			<color red="0" green="0" blue="1" />
+			<bounds left="8.5" top="40.5" right="32.5" bottom="223.5" />
+			<color red="0" green="0.333" blue="1" />
 		</rect>
 		<rect state="1">
-			<bounds left="13" top="12" right="15" bottom="13" />
-			<color red="0" green="0" blue="1" />
+			<bounds left="103.625" top="95.5" right="120.375" bottom="104.5" />
+			<color red="0" green="0.333" blue="1" />
 		</rect>
 		<rect state="1">
-			<bounds left="16" top="21" right="18" bottom="23" />
-			<color red="0" green="0" blue="1" />
+			<bounds left="128" top="168" right="144" bottom="184" />
+			<color red="0" green="0.333" blue="1" />
 		</rect>
 		<rect state="1">
-			<bounds left="10" top="21" right="12" bottom="23" />
-			<color red="0" green="0" blue="1" />
+			<bounds left="80" top="168" right="96" bottom="184" />
+			<color red="0" green="0.333" blue="1" />
 		</rect>
 
 		<rect state="1">
-			<bounds left="0" top="28" right="28" bottom="29" />
+			<bounds left="0" top="223.5" right="224" bottom="232.5" />
 			<color red="0.878" green="0" blue="0.627" />
 		</rect>
 		<rect state="1">
-			<bounds left="0" top="29" right="28" bottom="32" />
+			<bounds left="0" top="232.5" right="224" bottom="256" />
 			<color red="0.627" green="0" blue="0.878" />
 		</rect>
 	</element>
