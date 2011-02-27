@@ -125,7 +125,7 @@ protected:
 	public:
 		okim_voice();
 		void generate_audio(direct_read_data &direct, 
-                			stream_sample_t *buffer, 
+                			stream_sample_t **buffers, 
                 			int samples,
 			                const UINT8 global_volume,
                             const UINT32 clock,
@@ -149,9 +149,9 @@ protected:
 		bool	m_playing;			// playback state
 		UINT32	m_sample;			// current sample number
 
-		UINT8	m_channel_volume;	// volume set with the CVOL command
-		UINT8	m_pan_volume_left;  // volume set with the PAN command
-		UINT8	m_pan_volume_right; // volume set with the PAN command
+		UINT8	m_channel_volume;	// volume index set with the CVOL command
+		UINT8	m_pan_volume_left;  // volume index set with the PAN command
+		UINT8	m_pan_volume_right; // volume index set with the PAN command
 
         INT32	m_startSample;		// interpolation state - sample to interpolate from
         INT32	m_endSample;		// interpolation state - sample to interpolate to
@@ -169,9 +169,9 @@ protected:
 
     UINT8 m_TMP_register;
     
-	UINT8 m_global_volume;		// volume set with the OPT command
-    UINT8 m_filter_type;
-	UINT8 m_output_level;
+	UINT8 m_global_volume;		// volume index set with the OPT command
+    UINT8 m_filter_type;		// interpolation filter type set with the OPT command
+	UINT8 m_output_level;		// flag stating if a voltage follower is connected
 
 	static const int OKIM9810_VOICES = 8;
 	okim_voice m_voice[OKIM9810_VOICES];

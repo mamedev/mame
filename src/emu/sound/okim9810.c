@@ -150,7 +150,7 @@ void okim9810_device::device_start()
 
 	// create the stream
 	//int divisor = m_config.m_pin7 ? 132 : 165;
-	m_stream = m_machine.sound().stream_alloc(*this, 0, 1, clock());
+	m_stream = m_machine.sound().stream_alloc(*this, 0, 2, clock());
 
     // save state stuff
     // m_TMP_register
@@ -196,12 +196,13 @@ void okim9810_device::device_clock_changed()
 
 void okim9810_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	// reset the output stream
+	// reset the output streams
 	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
+	memset(outputs[1], 0, samples * sizeof(*outputs[1]));
     
 	// iterate over voices and accumulate sample data
 	for (int voicenum = 0; voicenum < OKIM9810_VOICES; voicenum++)
-		m_voice[voicenum].generate_audio(*m_direct, outputs[0], samples, m_global_volume, clock(), m_filter_type);
+		m_voice[voicenum].generate_audio(*m_direct, outputs, samples, m_global_volume, clock(), m_filter_type);
 }
 
 
@@ -456,7 +457,7 @@ okim9810_device::okim_voice::okim_voice()
 //-------------------------------------------------
 
 void okim9810_device::okim_voice::generate_audio(direct_read_data &direct, 
-        										 stream_sample_t *buffer, 
+        										 stream_sample_t **buffers, 
         										 int samples,
         										 const UINT8 global_volume,
                                                  const UINT32 clock,
@@ -466,12 +467,16 @@ void okim9810_device::okim_voice::generate_audio(direct_read_data &direct,
 	if (!m_playing)
 		return;
 
+	// seperate out left and right channels
+	stream_sample_t *outL = buffers[0];
+    stream_sample_t *outR = buffers[1];
+
+    // get left and right volumes
+	UINT8 volume_scale_left = volume_scale(global_volume, m_channel_volume, m_pan_volume_left);
+	UINT8 volume_scale_right = volume_scale(global_volume, m_channel_volume, m_pan_volume_right);
+
     // total samples per byte
     UINT32 totalInterpSamples = clock / m_samplingFreq;
-
-    // TODO: Stereo (it's only mono now [left channel])
-	UINT8 volume_scale_left = volume_scale(global_volume, m_channel_volume, m_pan_volume_left);
-	// UINT8 volume_scale_right = volume_scale(global_volume, m_channel_volume, m_pan_volume_right);
 
 	// loop while we still have samples to generate
 	while (samples-- != 0)
@@ -527,20 +532,23 @@ void okim9810_device::okim_voice::generate_audio(direct_read_data &direct,
             }
         }
 
-        // TODO: Proper numeric types.
+        // TODO: Interpolate using proper numeric types.
         float progress = (float)m_interpSampleNum / (float)totalInterpSamples;
         INT32 interpValue = (INT32)((float)m_startSample + (((float)m_endSample-(float)m_startSample) * progress));
 
-        // No filtering?
+        // if filtering is unwanted
         if (filter_type != OKIM9810_SECONDARY_FILTER && filter_type != OKIM9810_PRIMARY_FILTER)
             interpValue = m_startSample;
 
-		// output to the buffer, scaling by the volume
+		// output to the stereo buffers, scaling by the volume
 		// signal in range -2048..2047, volume in range 2..128 => signal * volume / 8 in range -32768..32767
-        interpValue = (interpValue * (INT32)volume_scale_left) / 8;
-        *buffer++ += interpValue;
+        INT32 interpValueL = (interpValue * (INT32)volume_scale_left) / 8;
+        *outL++ += interpValueL;
 
-		// If the interpsample has reached its limit, move on to the next sample
+        INT32 interpValueR = (interpValue * (INT32)volume_scale_right) / 8;
+        *outR++ += interpValueR;
+
+		// if the interpsample has reached its end, move on to the next sample
         m_interpSampleNum++;
         if (m_interpSampleNum >= totalInterpSamples)
         {
@@ -548,6 +556,7 @@ void okim9810_device::okim_voice::generate_audio(direct_read_data &direct,
             m_sample++;
         }
 
+        // the end of the stream has been reached
 		if (m_sample >= m_count)
 		{
             if (!m_looping)
@@ -570,13 +579,13 @@ void okim9810_device::okim_voice::generate_audio(direct_read_data &direct,
 //  Returns a value from the volume lookup table.
 //-------------------------------------------------
 
-UINT8 okim9810_device::okim_voice::volume_scale(const UINT8 global_volume,
-				                                const UINT8 channel_volume,
-                                                const UINT8 pan_volume) const
+UINT8 okim9810_device::okim_voice::volume_scale(const UINT8 global_volume_index,
+				                                const UINT8 channel_volume_index,
+                                                const UINT8 pan_volume_index) const
 {
-    const UINT8& V = channel_volume;
-    const UINT8& L = pan_volume;
-    const UINT8& O = global_volume;
+    const UINT8& V = channel_volume_index;
+    const UINT8& L = pan_volume_index;
+    const UINT8& O = global_volume_index;
     UINT32 index = (V+L) + (O*3);
     
     if (index > 15)

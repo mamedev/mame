@@ -1605,8 +1605,8 @@ static MACHINE_CONFIG_START( sammymdl, driver_device )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_OKIM9810_ADD("oki", XTAL_4_096MHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
 
