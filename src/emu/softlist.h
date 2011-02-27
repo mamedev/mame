@@ -46,6 +46,7 @@ struct software_info
 	const char *parentname;
 	const char *year;			/* Copyright year on title screen, actual release dates can be tracked in external resources */
 	const char *publisher;
+	feature_list *other_info;
 	UINT32 supported;
 	software_part *partdata;
 	struct software_info *next;	/* Used internally */
