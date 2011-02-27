@@ -91,54 +91,133 @@ Arcade Version (Coin-Op) by InfoCube (Pisa, Italy)
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
+#include "machine/mc146818.h"
+#include "machine/8042kbdc.h"
+#include "machine/pcshare.h"
+#include "video/pc_vga.h"
+#include "video/pc_video.h"
 
-static VIDEO_START(pangofun)
-{
-}
-
-static SCREEN_UPDATE(pangofun)
-{
-	return 0;
-}
-
-static ADDRESS_MAP_START( pangofun_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
+static ADDRESS_MAP_START( pcat_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
+	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM
+	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0)
+	AM_RANGE(0x000f0000, 0x000fffff) AM_ROM AM_REGION("bios", 0 )
+	AM_RANGE(0x00100000, 0x001fffff) AM_RAM
+	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("bios", 0 )
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( pcat_io, ADDRESS_SPACE_IO, 32 )
+	AM_IMPORT_FROM(pcat32_io_common)
+	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8_MODERN("rtc", mc146818_device, read, write, 0xffffffff)
+ADDRESS_MAP_END
+
+#define AT_KEYB_HELPER(bit, text, key1) \
+	PORT_BIT( bit, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(text) PORT_CODE(key1)
 
 static INPUT_PORTS_START( pangofun )
+	PORT_START("pc_keyboard_0")
+	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED ) 	/* unused scancode 0 */
+	AT_KEYB_HELPER( 0x0002, "Esc",          KEYCODE_Q           ) /* Esc                         01  81 */
+
+	PORT_START("pc_keyboard_1")
+	AT_KEYB_HELPER( 0x0020, "Y",            KEYCODE_Y           ) /* Y                           15  95 */
+	AT_KEYB_HELPER( 0x1000, "Enter",        KEYCODE_ENTER       ) /* Enter                       1C  9C */
+
+	PORT_START("pc_keyboard_2")
+
+	PORT_START("pc_keyboard_3")
+	AT_KEYB_HELPER( 0x0002, "N",            KEYCODE_N           ) /* N                           31  B1 */
+	AT_KEYB_HELPER( 0x0800, "F1",           KEYCODE_S           ) /* F1                          3B  BB */
+
+	PORT_START("pc_keyboard_4")
+
+	PORT_START("pc_keyboard_5")
+
+	PORT_START("pc_keyboard_6")
+	AT_KEYB_HELPER( 0x0040, "(MF2)Cursor Up",		KEYCODE_UP          ) /* Up                          67  e7 */
+	AT_KEYB_HELPER( 0x0080, "(MF2)Page Up",			KEYCODE_PGUP        ) /* Page Up                     68  e8 */
+	AT_KEYB_HELPER( 0x0100, "(MF2)Cursor Left",		KEYCODE_LEFT        ) /* Left                        69  e9 */
+	AT_KEYB_HELPER( 0x0200, "(MF2)Cursor Right",	KEYCODE_RIGHT       ) /* Right                       6a  ea */
+	AT_KEYB_HELPER( 0x0800, "(MF2)Cursor Down",		KEYCODE_DOWN        ) /* Down                        6c  ec */
+	AT_KEYB_HELPER( 0x1000, "(MF2)Page Down",		KEYCODE_PGDN        ) /* Page Down                   6d  ed */
+	AT_KEYB_HELPER( 0x4000, "Del",      		    KEYCODE_A           ) /* Delete                      6f  ef */
+
+	PORT_START("pc_keyboard_7")
 INPUT_PORTS_END
+
+static void pangofun_set_keyb_int(running_machine *machine, int state)
+{
+	pic8259_ir1_w(machine->device("pic8259_1"), state);
+}
+
+static const struct pc_vga_interface vga_interface ={
+	NULL,
+	NULL,
+	NULL,
+	ADDRESS_SPACE_IO,
+	0x0000
+};
+
+static void set_gate_a20(running_machine *machine, int a20)
+{
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_A20, a20);
+}
+
+static void keyboard_interrupt(running_machine *machine, int state)
+{
+	pic8259_ir1_w(machine->device("pic8259_1"), state);
+}
+
+static int pcat_dyn_get_out2(running_machine *machine) {
+	return pit8253_get_output(machine->device("pit8254"), 2 );
+}
+
+
+static const struct kbdc8042_interface at8042 =
+{
+	KBDC8042_AT386, set_gate_a20, keyboard_interrupt, pcat_dyn_get_out2
+};
+
+static MACHINE_START( pangofun )
+{
+	cpu_set_irq_callback(machine->device("maincpu"), pcat_irq_callback);
+	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, pangofun_set_keyb_int);
+	kbdc8042_init(machine, &at8042);
+}
 
 
 static MACHINE_CONFIG_START( pangofun, driver_device )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I486, 14318180*2)	/* I486 ?? Mhz */
-	MCFG_CPU_PROGRAM_MAP(pangofun_map)
+	MCFG_CPU_ADD("maincpu", I486, 40000000 )	/* I486 ?? Mhz */	
+	MCFG_CPU_PROGRAM_MAP(pcat_map)	
+	MCFG_CPU_IO_MAP(pcat_io)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_FRAGMENT_ADD( pcvideo_vga )
+	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE(pangofun)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
-	MCFG_PALETTE_LENGTH(0x100)
-
-	MCFG_VIDEO_START(pangofun)
+	MCFG_MACHINE_START(pangofun)		
+	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )	
+	MCFG_FRAGMENT_ADD( pcat_common )
 MACHINE_CONFIG_END
 
 
 ROM_START(pangofun)
-	ROM_REGION32_LE(0x20000, "maincpu", 0)	/* motherboard bios */
+	ROM_REGION32_LE(0x20000, "bios", 0)	/* motherboard bios */
 	ROM_LOAD("bios.bin", 0x000000, 0x10000, CRC(e70168ff) SHA1(4a0d985c218209b7db2b2d33f606068aae539020) )
 
-	ROM_REGION32_LE(0x20000, "user1", 0)	/* gfx card bios */
-	ROM_LOAD("vgabios.bin", 0x000000, 0x20000, NO_DUMP ) // 1x maskrom (28pin)
+//	ROM_REGION32_LE(0x20000, "video_bios", 0)	/* gfx card bios */
+//	ROM_LOAD("vgabios.bin", 0x000000, 0x20000, NO_DUMP ) // 1x maskrom (28pin)
+	ROM_REGION(0x20000, "video_bios", 0)	/* Trident TVGA9000 BIOS */
+	ROM_LOAD16_BYTE("prom.vid", 0x00000, 0x04000, CRC(ad7eadaf) SHA1(ab379187914a832284944e81e7652046c7d938cc) )
+	ROM_CONTINUE(				0x00001, 0x04000 )
 
 	/* this is what was on the rom board, mapping unknown */
-	ROM_REGION32_LE(0xa00000, "user2", 0)	/* rom board */
+	ROM_REGION32_LE(0xa00000, "game_prg", 0)	/* rom board */
 	ROM_LOAD32_WORD("bank0.u11", 0x000000, 0x80000, CRC(6ce951d7) SHA1(1dd09491c651920a8a507bdc6584400367e5a292) )
 	ROM_LOAD32_WORD("bank0.u31", 0x000002, 0x80000, CRC(b6c06baf) SHA1(79074b086d24737d629272d98f17de6e1e650485) )
 	ROM_LOAD32_WORD("bank1.u12", 0x100000, 0x80000, CRC(5adc1f2e) SHA1(17abde7a2836d042a698661339eefe242dd9af0d) )
@@ -159,5 +238,9 @@ ROM_START(pangofun)
 	ROM_LOAD32_WORD("bank8.u39", 0x900002, 0x20000, CRC(72422c66) SHA1(40b8cca3f99925cf019053921165f6a4a30d784d) )
 ROM_END
 
+static DRIVER_INIT(pangofun)
+{
+	pc_vga_init(machine, &vga_interface, NULL);
+}
 
-GAME( 1995, pangofun,  0,   pangofun, pangofun, 0, ROT0, "InfoCube", "Pango Fun (Italy)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1995, pangofun,  0,   pangofun, pangofun, pangofun, ROT0, "InfoCube", "Pango Fun (Italy)", GAME_NOT_WORKING|GAME_NO_SOUND )
