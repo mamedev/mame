@@ -6,6 +6,7 @@ thanks to Angelo Salese for some precious advice
 TO DO:
 - check palette
 - check blitter command 0x00
+- screen orientation is wrong (should clearly be ROT90 or 270 with blitter mods)
 
 Has 36 pin Cherry master looking edge connector
 
