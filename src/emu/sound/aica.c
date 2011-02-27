@@ -135,12 +135,16 @@ struct _SLOT
 #define MIFULL(aica)		((aica->udata.data[4]>>0x0)&0x0200)
 #define MIEMPTY(aica)		((aica->udata.data[4]>>0x0)&0x0100)
 
-#define AFSEL(aica)		((aica->udata.data[6]>>0x0)&0x4000)
-#define MSLC(aica)		((aica->udata.data[6]>>0x8)&0x3F)
+#define AFSEL(aica)		((aica->udata.data[0xc/2]>>0x0)&0x4000)
+#define MSLC(aica)		((aica->udata.data[0xc/2]>>0x8)&0x3F)
 
 #define SCILV0(aica)    	((aica->udata.data[0xa8/2]>>0x0)&0xff)
 #define SCILV1(aica)    	((aica->udata.data[0xac/2]>>0x0)&0xff)
 #define SCILV2(aica)    	((aica->udata.data[0xb0/2]>>0x0)&0xff)
+
+#define MCIEB(aica)    	((aica->udata.data[0xb4/2]>>0x0)&0xff)
+#define MCIPD(aica)    	((aica->udata.data[0xb8/2]>>0x0)&0xff)
+#define MCIRE(aica)    	((aica->udata.data[0xbc/2]>>0x0)&0xff)
 
 #define SCIEX0	0
 #define SCIEX1	1
@@ -802,6 +806,16 @@ static void AICA_UpdateReg(aica_state *AICA, int reg)
 				AICA->IrqMidi=DecodeSCI(AICA,SCIMID);
 			}
 			break;
+
+		case 0xb4:
+		case 0xb5:
+		case 0xb6:
+		case 0xb7:
+			if (MCIEB(AICA) & 0x20)
+			{
+				logerror("AICA: Interrupt requested on SH-4!\n");
+			}
+			break;
 	}
 }
 
@@ -833,11 +847,11 @@ static void AICA_UpdateRegR(aica_state *AICA, int reg)
 		case 0x10:	// LP check
 		case 0x11:
 			{
-				int MSLC = (AICA->udata.data[0xc/2]>>8) & 0x3f;	// which slot are we monitoring?
+				int slotnum = MSLC(AICA);
+				struct _SLOT *slot=AICA->Slots + slotnum;
+				UINT16 LP = 0;
 				if (!(AFSEL(AICA)))
 				{
-					struct _SLOT *slot=AICA->Slots + MSLC;
-					UINT16 LP;
 					UINT16 SGC;
 					int EG;
 
@@ -851,14 +865,29 @@ static void AICA_UpdateRegR(aica_state *AICA, int reg)
 
 					AICA->udata.data[0x10/2] = (EG & 0x1FF8) | SGC | LP;
 				}
+				else
+				{
+					LP = slot->lpend ? 0x8000 : 0x0000;
+					AICA->udata.data[0x10/2] = LP;
+				}
 			}
 			break;
 
 		case 0x14:	// CA (slot address)
 		case 0x15:
 			{
-				int MSLC = (AICA->udata.data[0xc/2]>>8) & 0x3f;	// which slot are we monitoring?
-				unsigned int CA = AICA->Slots[MSLC].cur_addr>>(SHIFT+12);
+				int slotnum = MSLC(AICA);
+				struct _SLOT *slot=AICA->Slots+slotnum;
+				unsigned int CA = 0;
+
+				if (PCMS(slot) == 0)   	// 16-bit samples
+				{
+					CA = (slot->cur_addr>>(SHIFT-1))&AICA->RAM_MASK16;
+				}
+				else	// 8-bit PCM and 4-bit ADPCM
+				{
+					CA = (slot->cur_addr>>SHIFT)&AICA->RAM_MASK;
+				}
 
 				AICA->udata.data[0x14/2] = CA;
 			}
