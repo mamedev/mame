@@ -13,7 +13,7 @@
 		</rect>
 	</element>
 
-	<view name="Green Color Overlay">
+	<view name="Green Overlay">
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
@@ -21,7 +21,7 @@
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</overlay>
 	</view>
-	<view name="Yellow Color Overlay">
+	<view name="Yellow Overlay">
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
