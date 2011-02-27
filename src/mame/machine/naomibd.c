@@ -181,7 +181,7 @@ Atomiswave ROM board specs from Cah4e3 @ http://cah4e3.wordpress.com/2009/07/26/
 #define NAOMIBD_FLAG_SPECIAL_MODE	(4)	// used to access protection registers
 #define NAOMIBD_FLAG_ADDRESS_SHUFFLE	(2)	// 0 to let protection chip en/decrypt, 1 for normal
 
-#define NAOMIBD_PRINTF_PROTECTION	(1)	// 1 to printf protection access details
+#define NAOMIBD_PRINTF_PROTECTION	(0)	// 1 to printf protection access details
 
 /*************************************
  *
@@ -191,13 +191,33 @@ Atomiswave ROM board specs from Cah4e3 @ http://cah4e3.wordpress.com/2009/07/26/
 
 #define MAX_PROT_REGIONS	(32)
 
+#define PACK_BUF_SIZE (32768)
+
+enum
+{
+	CMD_READY = 0,
+	CMD_FETCH,
+	CMD_REPEAT
+};
+
 typedef struct _naomibd_config_table naomibd_config_table;
 struct _naomibd_config_table
 {
 	const char *name;
-	int reverse_bytes;
-	int live_key;
-	UINT32	transtbl[MAX_PROT_REGIONS*3];
+	int m2m3_key;
+    int m1_key;
+};
+
+typedef struct _naomibd_prot naomibd_prot;
+struct _naomibd_prot
+{
+	UINT16 last_word, aux_word, pak_word, heading_word;
+	UINT16 *ptr;
+	int count, pak_bit, control_bits, pak_state, dec_count, pak_buf_size, pak_buf_pos;
+    int pak_fetch_ofs;
+    UINT8 pak_byte, cmd_byte;
+    int seed;
+    UINT8 pak_buf[PACK_BUF_SIZE];
 };
 
 typedef struct _naomibd_state naomibd_state;
@@ -208,7 +228,6 @@ struct _naomibd_state
 	device_t *device;				/* pointer to our containing device */
 
 	UINT8 *				memory;
-	UINT8 *				protdata;
 	chd_file *			gdromchd;
 	UINT8 *				picdata;
 	UINT32				rom_offset, rom_offset_flags, dma_count;
@@ -216,19 +235,16 @@ struct _naomibd_state
 	UINT32				prot_offset, prot_key;
 	UINT32				aw_offset, aw_file_base, aw_file_offset;
 
-	INT32				prot_sum;
-
-	const UINT32			*prot_translate;
-	int				prot_reverse_bytes;
-
 	// live decrypt vars
-	UINT32				dc_gamekey, dc_seqkey, dc_seed;
+	UINT32				dc_gamekey, dc_seqkey, dc_dmakey;
 	UINT8				dc_cart_ram[128*1024];	// internal cartridge RAM
-	INT32				dc_m3_ptr, dc_m2_ptr, dc_readback;
+	INT32				dc_m3_ptr;
 
 	#if NAOMIBD_PRINTF_PROTECTION
 	int				prot_pio_count;
 	#endif
+
+	naomibd_prot		prot;
 };
 
 // maps protection offsets to real addresses
@@ -237,70 +253,65 @@ struct _naomibd_state
 static const naomibd_config_table naomibd_translate_tbl[] =
 {
 	// games where on-the-fly decryption works (many of these are fully playable in MAME, just slow)
-	{ "18wheelr", 0, 0x07cf54, { 0x1502, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "alpilota", 0, 0x070e41, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "alpiltdx", 0, 0x070e41, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "capsnk", 0, 0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "capsnka", 0, 0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "crackndj", 0, 0x1c2347, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "crzytaxi", 0, 0x0d2f45, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "csmash", 1, 0x103347, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "csmasho", 1, 0x103347, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "cspike", 0, 0x0e2010, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "deathcox", 0, 0x0b64d0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "derbyoc", 0, 0x0fee35, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "dybb99", 0, 0x048a01, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "f355twin", 0, 0x06efd4, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "f355twn2", 0, 0x1666c6, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "ggram2", 0, 0x074a61, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "gundmct",  0, 0x0e8010, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "gwing2",  0, 0x0b25d0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "hmgeo",   0, 0x038510, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "jambo",    0, 0x0fab95, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "otrigger", 0, 0x0fea94, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "pjustic", 0, 0x0725d0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "pstone", 0, 0x0e69c1, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "pstone2", 0, 0x0b8dc0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "puyoda", 0, 0x0acd40, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "ringout", 0, 0x0b1e40, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "samba", 0, 0x0a8b5d, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "samba2k", 0, 0x1702cf, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "slasho", 0, 0x1a66ca, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "smlg99", 0, 0x048a01, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "spawn", 0, 0x078d01, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "sstrkfgt", 0, 0x132303, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "suchie3", 0, 0x0368e1, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "toyfight", 0, 0x02ca85, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "vf4cart", 0, 0x2ef2f96, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "vtennis", 0, 0x03eb15, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "vonot", 0, 0x010715, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "wldkicks", 0, 0xae2901, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "wwfroyal",0, 0x1627c3, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "zerogu2", 0, 0x07c010, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "zombrvn", 0, 0x012b41, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-
-	// games where the encryption is stacked with the ASIC's compression
-	{ "doa2", 0, -1, { -1, 0x500, 0, -1, 0x20504, 0x20000, -1, 0x40508, 0x40000, -1, 0x6050c, 0x60000, -1, 0x80510, 0x80000,	// 0x8ad01, has compression
-		    -1, 0xa0514, 0xa0000, -1, 0xc0518, 0xc0000, -1, 0xe051c, 0xe0000, -1, 0x100520,0x100000, -1, 0x118a3a, 0x120000,
-		    -1, 0x12c0d8, 0x140000, -1, 0x147e22, 0x160000, -1, 0x1645ce, 0x180000, -1, 0x17c6b2, 0x1a0000,
-		    -1, 0x19902e, 0x1c0000, -1, 0x1b562a, 0x1e0000, -1, 0xffffffff, 0xffffffff } },
-	{ "doa2m", 0, -1, { -1, 0x500, 0, -1, 0x20504, 0x20000, -1, 0x40508, 0x40000, -1, 0x6050c, 0x60000, -1, 0x80510, 0x80000,
-		    -1, 0xa0514, 0xa0000, -1, 0xc0518, 0xc0000, -1, 0xe051c, 0xe0000, -1, 0x100520,0x100000, -1, 0x11a5b4, 0x120000,
-		    -1, 0x12e7c4, 0x140000, -1, 0x1471f6, 0x160000, -1, 0x1640c4, 0x180000, -1, 0x1806ca, 0x1a0000,
-		    -1, 0x199df4, 0x1c0000, -1, 0x1b5d0a, 0x1e0000, 0xffffffff, 0xffffffff } },
-	{ "ggx",      0, -1, { -1, 0x200000, 0x100000, -1, 0x210004, 0x110000, -1, 0x220008, 0x120000, -1, 0x228000, 0x130000,	// 0x76110, uses compression
-		          0x3af9, 0, 0x000000, 0x2288, 0, 0x010000, 0xe5e6, 0, 0x020000, 0xebb0, 0, 0x030000,
-			  0x0228, 0, 0x040000, 0x872c, 0, 0x050000, 0xbba0, 0, 0x060000, 0x772f, 0, 0x070000,
-			  0x2924, 0, 0x080000, 0x3222, 0, 0x090000, 0x7954, 0, 0x0a0000, 0x5acd, 0, 0x0b0000,
-			  0xdd19, 0, 0x0c0000, 0x2428, 0, 0x0d0000, 0x3329, 0, 0x0e0000, 0x2142, 0, 0x0f0000,
-		          0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "sgtetris", 0, -1, { 0x1234, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },	// 0x08ae51, uses compression
-//  { "virnbao", 0, 0x68b58, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },     // note: "virnba" set doesn't have protection
-//  { "vs2_2k", 0, 0x88b08, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "18wheelr", 0x07cf54, 0 },
+	{ "alpilota", 0x070e41, 0 }, 
+	{ "alpiltdx", 0x070e41, 0 }, 
+	{ "capsnk", 0, 0 }, 
+	{ "capsnka", 0, 0 }, 
+	{ "crackndj", 0x1c2347, 0 }, 
+	{ "crzytaxi", 0x0d2f45, 0 }, 
+	{ "csmash", 0x103347, 0 }, 
+	{ "csmasho", 0x103347, 0 }, 
+	{ "cspike", 0x0e2010, 0 }, 
+	{ "deathcox", 0x0b64d0, 0 }, 
+	{ "derbyoc", 0x0fee35, 0 }, 
+	{ "doa2", 0x8ad01, 0 }, 
+	{ "doa2m", 0x8ad01, 0 }, 
+	{ "dybb99", 0x048a01, 0 },
+	{ "f355twin", 0x06efd4, 0 }, 
+	{ "f355twn2", 0x1666c6, 0 }, 
+	{ "ggram2", 0x074a61, 0 }, 
+	{ "ggx", 0x076110, 0 }, 
+    { "gram2000", 0, 0x7f805c3f },
+	{ "gundmct", 0x0e8010, 0 }, 
+	{ "gwing2",  0x0b25d0, 0 }, 
+	{ "hmgeo",   0x038510, 0 }, 
+	{ "jambo",   0x0fab95, 0 }, 
+    { "kick4csh", 0, 0x820857c9 },
+    { "mvsc2", 0, 0xc18b6e7c },
+	{ "otrigger", 0x0fea94, 0 },  
+	{ "pjustic", 0x0725d0, 0 }, 
+	{ "pstone", 0x0e69c1, 0 }, 
+	{ "pstone2", 0x0b8dc0, 0 }, 
+	{ "puyoda", 0x0acd40, 0 }, 
+    { "qmegamis", 0, 0xcd9b4896 },
+	{ "ringout", 0x0b1e40, 0 }, 
+	{ "samba", 0x0a8b5d, 0 }, 
+	{ "samba2k", 0x1702cf, 0 }, 
+	{ "sgtetris", 0x8ae51, 0 }, 
+    { "shootopl", 0, 0xa0f37ca7 },
+    { "shootpl", 0, 0x9d8de9cd },
+    { "shootplm", 0, 0x9d8de9cd },
+	{ "slasho", 0x1a66ca, 0 }, 
+	{ "smlg99", 0x048a01, 0 }, 
+	{ "spawn", 0x078d01, 0 }, 
+	{ "sstrkfgt", 0x132303, 0 }, 
+	{ "suchie3", 0x0368e1, 0 }, 
+	{ "toyfight", 0x02ca85, 0 }, 
+	{ "vf4cart", 0x2ef2f96, 0 }, 
+    { "vf4evoct", 0, 0x1e5bb0cd },
+    { "virnbao", 0x68b58, 0 },      // note: "virnba" set doesn't have protection
+    { "vs2_2k", 0x88b08, 0 }, 
+	{ "vtennis", 0x03eb15, 0 }, 
+	{ "vtenis2c", 0, 0x2d2d4743 }, 
+	{ "vonot", 0x010715, 0 }, 
+	{ "wldkicks", 0xae2901, 0 }, 
+	{ "wwfroyal", 0x1627c3, 0 }, 
+	{ "zerogu2", 0x07c010, 0 }, 
+	{ "zombrvn", 0x012b41, 0 }, 
 };
 
 // forward declaration for decrypt function
-static void stream_decrypt(UINT32 game_key, UINT32 sequence_key, UINT16 seed, UINT8* ciphertext, UINT8* plaintext, int length);
 static UINT16 block_decrypt(UINT32 game_key, UINT16 sequence_key, UINT16 counter, UINT16 data);
 
 /***************************************************************************
@@ -349,6 +360,219 @@ void *naomibd_get_memory(device_t *device)
 	return get_safe_token(device)->memory;
 }
 
+// Streaming M2/M3 protection and decompression
+
+INLINE UINT16 bswap16(UINT16 in)
+{
+    return ((in>>8) | (in<<8));
+}
+
+UINT16 naomibd_get_decrypted_stream(naomibd_state *naomibd)
+{
+	UINT16 wordn = bswap16(naomibd->prot.ptr[naomibd->prot.count++]);
+
+	naomibd->prot.aux_word = block_decrypt(naomibd->dc_gamekey, naomibd->dc_seqkey, naomibd->prot.seed++, wordn);
+	wordn = (naomibd->prot.last_word&~3) | (naomibd->prot.aux_word&3);
+	naomibd->prot.last_word = naomibd->prot.aux_word;
+
+	return wordn;
+}
+
+void naomibd_init_stream(naomibd_state *naomibd)
+{
+	naomibd->prot.last_word = 0;
+	
+	naomibd->prot.control_bits = naomibd_get_decrypted_stream(naomibd);
+	naomibd->prot.heading_word = naomibd_get_decrypted_stream(naomibd);
+	
+	if (naomibd->prot.control_bits & 2)
+	{
+	   naomibd->prot.pak_bit = 0;
+	   naomibd->prot.pak_state = CMD_READY;
+	   naomibd->prot.dec_count = 0;
+	   naomibd->prot.pak_buf_size = 256 << (naomibd->prot.control_bits & 1);
+	   naomibd->prot.pak_buf_pos = 0;
+	}
+}
+
+UINT16 naomibd_get_compressed_bit(naomibd_state *naomibd)
+{
+   if(naomibd->prot.pak_bit == 0)
+   {
+       naomibd->prot.pak_bit = 15;
+       naomibd->prot.pak_word = naomibd_get_decrypted_stream(naomibd);
+   }
+   else
+   {
+       naomibd->prot.pak_bit--;
+       naomibd->prot.pak_word<<=1;
+   }
+   return naomibd->prot.pak_word >> 15;
+}
+
+UINT16 naomibd_get_decompressed_stream(naomibd_state *naomibd)
+{
+/* node format
+0xxxxxxx - next node index
+1a0bbccc - end node
+           a - 0 = repeat
+               1 = fetch
+           b - if a = 1
+               00 - fetch  0
+               01 - fetch  1
+               11 - fetch -1
+               if a = 0
+               000
+           c - repeat/fetch counter
+               count = ccc + 1
+11111111 - empty node
+*/
+   static UINT8 trees[9][2][32] = {
+      {
+         {0x01,0x10,0x0f,0x05,0xc4,0x13,0x87,0x0a,0xcc,0x81,0xce,0x0c,0x86,0x0e,0x84,0xc2,
+          0x11,0xc1,0xc3,0xcf,0x15,0xc8,0xcd,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,},
+         {0xc7,0x02,0x03,0x04,0x80,0x06,0x07,0x08,0x09,0xc9,0x0b,0x0d,0x82,0x83,0x85,0xc0,
+          0x12,0xc6,0xc5,0x14,0x16,0xca,0xcb,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,},
+      },
+      {
+         {0x02,0x80,0x05,0x04,0x81,0x10,0x15,0x82,0x09,0x83,0x0b,0x0c,0x0d,0xdc,0x0f,0xde,
+          0x1c,0xcf,0xc5,0xdd,0x86,0x16,0x87,0x18,0x19,0x1a,0xda,0xca,0xc9,0x1e,0xce,0xff,},
+         {0x01,0x17,0x03,0x0a,0x08,0x06,0x07,0xc2,0xd9,0xc4,0xd8,0xc8,0x0e,0x84,0xcb,0x85,
+          0x11,0x12,0x13,0x14,0xcd,0x1b,0xdb,0xc7,0xc0,0xc1,0x1d,0xdf,0xc3,0xc6,0xcc,0xff,},
+      },
+      {
+         {0xc6,0x80,0x03,0x0b,0x05,0x07,0x82,0x08,0x15,0xdc,0xdd,0x0c,0xd9,0xc2,0x14,0x10,
+          0x85,0x86,0x18,0x16,0xc5,0xc4,0xc8,0xc9,0xc0,0xcc,0xff,0xff,0xff,0xff,0xff,0xff,},
+         {0x01,0x02,0x12,0x04,0x81,0x06,0x83,0xc3,0x09,0x0a,0x84,0x11,0x0d,0x0e,0x0f,0x19,
+          0xca,0xc1,0x13,0xd8,0xda,0xdb,0x17,0xde,0xcd,0xcb,0xff,0xff,0xff,0xff,0xff,0xff,},
+      },
+      {
+         {0x01,0x80,0x0d,0x04,0x05,0x15,0x83,0x08,0xd9,0x10,0x0b,0x0c,0x84,0x0e,0xc0,0x14,
+          0x12,0xcb,0x13,0xca,0xc8,0xc2,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,},
+         {0xc5,0x02,0x03,0x07,0x81,0x06,0x82,0xcc,0x09,0x0a,0xc9,0x11,0xc4,0x0f,0x85,0xd8,
+          0xda,0xdb,0xc3,0xdc,0xdd,0xc1,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,},
+      },
+      {
+         {0x01,0x80,0x06,0x0c,0x05,0x81,0xd8,0x84,0x09,0xdc,0x0b,0x0f,0x0d,0x0e,0x10,0xdb,
+          0x11,0xca,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,},
+         {0xc4,0x02,0x03,0x04,0xcb,0x0a,0x07,0x08,0xd9,0x82,0xc8,0x83,0xc0,0xc1,0xda,0xc2,
+          0xc9,0xc3,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,},
+      },
+      {
+         {0x01,0x02,0x06,0x0a,0x83,0x0b,0x07,0x08,0x09,0x82,0xd8,0x0c,0xd9,0xda,0xff,0xff,
+          0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,},
+         {0xc3,0x80,0x03,0x04,0x05,0x81,0xca,0xc8,0xdb,0xc9,0xc0,0xc1,0x0d,0xc2,0xff,0xff,
+          0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,},
+      },
+      {
+         {0x01,0x02,0x03,0x04,0x81,0x07,0x08,0xd8,0xda,0xd9,0xff,0xff,0xff,0xff,0xff,0xff,
+          0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,},
+         {0xc2,0x80,0x05,0xc9,0xc8,0x06,0x82,0xc0,0x09,0xc1,0xff,0xff,0xff,0xff,0xff,0xff,
+          0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,},
+      },
+      {
+         {0x01,0x80,0x04,0xc8,0xc0,0xd9,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+          0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,},
+         {0xc1,0x02,0x03,0x81,0x05,0xd8,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+          0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,},
+      },
+      {
+         {0x01,0xd8,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+          0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,},
+         {0xc0,0x80,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+          0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,},
+      },
+   };
+
+   UINT32 word_complete = 2;
+   UINT16 wordn = 0;
+
+   while(word_complete)
+   {
+      switch(naomibd->prot.pak_state)
+      {
+      case CMD_READY:
+      {
+         UINT32 tmp = 0;
+         INT32 slot = (naomibd->prot.pak_buf_pos & (naomibd->prot.pak_buf_size-1));
+         if(slot > 0)
+         {
+            if(slot < (naomibd->prot.pak_buf_size-7))
+               slot = 1;
+            else
+               slot = (slot & 7) + 1;
+         }
+         while (!(tmp&0x80))
+           if(naomibd_get_compressed_bit(naomibd))
+              tmp = trees[slot][1][tmp];
+           else
+              tmp = trees[slot][0][tmp];
+         if(tmp != 0xff)
+         {
+            naomibd->prot.pak_byte = (tmp&7)+1;
+            if(tmp&0x40)
+            {
+               static INT32 cmds[4] = {0, 1, 0, -1};
+               naomibd->prot.pak_fetch_ofs = cmds[(tmp&0x18)>>3];
+               naomibd->prot.pak_state = CMD_FETCH;
+            }
+            else
+            {
+               UINT8 byten;
+               naomibd->prot.pak_state = CMD_REPEAT;
+               byten =          naomibd_get_compressed_bit(naomibd)  << 1;
+               byten = (byten | naomibd_get_compressed_bit(naomibd)) << 1;
+               byten = (byten | naomibd_get_compressed_bit(naomibd)) << 1;
+               byten = (byten | naomibd_get_compressed_bit(naomibd)) << 1;
+               byten = (byten | naomibd_get_compressed_bit(naomibd)) << 1;
+               byten = (byten | naomibd_get_compressed_bit(naomibd)) << 1;
+               byten = (byten | naomibd_get_compressed_bit(naomibd)) << 1;
+               byten =  byten | naomibd_get_compressed_bit(naomibd);
+               naomibd->prot.cmd_byte = byten;
+            }
+         }
+         break;
+      }
+      case CMD_FETCH:
+         naomibd->prot.cmd_byte = naomibd->prot.pak_buf[(naomibd->prot.pak_buf_pos-naomibd->prot.pak_buf_size+naomibd->prot.pak_fetch_ofs)&(PACK_BUF_SIZE-1)];
+
+      case CMD_REPEAT:
+         naomibd->prot.pak_buf[naomibd->prot.pak_buf_pos&(PACK_BUF_SIZE-1)]=naomibd->prot.cmd_byte;
+         if(word_complete&2)
+		 {
+            wordn = naomibd->prot.cmd_byte << 8;
+		 }
+         else
+		 {
+            wordn = wordn | naomibd->prot.cmd_byte;
+		 }
+         word_complete--;
+         naomibd->prot.pak_byte--;
+         naomibd->prot.pak_buf_pos++;
+         if(naomibd->prot.pak_byte == 0) naomibd->prot.pak_state = CMD_READY;
+         break;
+      }
+   }
+   return wordn;
+}
+
+// stream read protected PIO hook
+//-----------------------------------------------------------
+UINT16 naomibd_get_data_stream(naomibd_state *naomibd)
+{
+	UINT16 wordn;
+
+	if(naomibd->prot.control_bits&2)
+	{
+		wordn = naomibd_get_decompressed_stream(naomibd);
+	}
+	else
+	{
+		wordn = naomibd_get_decrypted_stream(naomibd);
+	}
+
+	return wordn;
+}
 
 offs_t naomibd_get_dmaoffset(device_t *device)
 {
@@ -438,8 +662,6 @@ static void init_save_state(device_t *device)
 
 static void soft_reset(naomibd_state *v)
 {
-	v->prot_sum = 0;
-
 	v->dc_m3_ptr = 0;
 	v->dc_seqkey = 0;
 }
@@ -474,50 +696,11 @@ READ64_DEVICE_HANDLER( naomibd_r )
 			// can we live-decrypt this game?
 			if (v->dc_gamekey != -1)
 			{
-				ret = (UINT64)(v->dc_cart_ram[v->dc_readback+1] | (v->dc_cart_ram[v->dc_readback]<<8));
-				v->dc_readback += 2;
+				ret = (UINT64)naomibd_get_data_stream(v);
 			}
 			else
 			{
-				if (v->rom_offset == 0x1fffe)
-				{
-					UINT8 *prot = (UINT8 *)v->protdata;
-					UINT32 byte_offset = v->prot_offset*2;
-
-					// this is a good time to clear the prot_sum
-					v->prot_sum = 0;
-
-					if (v->prot_translate == NULL)
-					{
-						#if NAOMIBD_PRINTF_PROTECTION
-						v->prot_pio_count += 2;
-						printf("naomibd: reading protection data, but none was supplied (now %x bytes)\n", v->prot_pio_count);
-						#endif
-						return 0;
-					}
-
-					#if NAOMIBD_PRINTF_PROTECTION
-					v->prot_pio_count += 2;
-					printf("naomibd: PIO read count %x\n", v->prot_pio_count);
-					#endif
-
-					if (v->prot_reverse_bytes)
-					{
-						ret = (UINT64)(prot[byte_offset+1] | (prot[byte_offset]<<8));
-					}
-					else
-					{
-						ret = (UINT64)(prot[byte_offset] | (prot[byte_offset+1]<<8));
-					}
-
-					v->prot_offset++;
-				}
-				#if NAOMIBD_PRINTF_PROTECTION
-				else
-				{
-					printf("Bad protection offset read %x\n", v->rom_offset);
-				}
-				#endif
+                ret = U64(0);
 			}
 		}
 		else
@@ -733,7 +916,7 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 						v->prot_key = data;
 
 						#if NAOMIBD_PRINTF_PROTECTION
-						printf("Protection: set up read @ %x, key %x sum %x (PIO %x DMA %x) [%s]\n", v->prot_offset*2, v->prot_key, v->prot_sum, v->rom_offset, v->dma_offset, device->machine->describe_context());
+						printf("Protection: set up read @ %x, key %x (PIO %x DMA %x) [%s]\n", v->prot_offset*2, v->prot_key, v->rom_offset, v->dma_offset, device->machine->describe_context());
 
 						v->prot_pio_count = 0;
 						#endif
@@ -741,113 +924,44 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 						// if dc_gamekey isn't -1, we can live-decrypt this one
 						if (v->dc_gamekey != -1)
 						{
-							UINT8 temp_ram[128*1024];
 							UINT8 *ROM = (UINT8 *)v->memory;
 
-							v->dc_seed = 0;
-							v->dc_readback = 0;
 							v->dc_seqkey = v->prot_key;
 
-							#if NAOMIBD_PRINTF_PROTECTION
-							printf("M2/M3 decrypt: gamekey %x seqkey %x seed %x length %x\n", v->dc_gamekey, v->dc_seqkey, v->dc_seed, v->dc_m3_ptr);
-							#endif
-
-							// M2: just decrypt up to the size limit since we don't know the size in advance
 							if (v->prot_offset != 0x2000000/2)
 							{
-								// decrypt to temp buffer
-								stream_decrypt(v->dc_gamekey, v->dc_seqkey, v->prot_offset&0xffff, &ROM[v->prot_offset*2], temp_ram, 128*1024);
+								// M2: decrypt from ROM
+								v->prot.ptr = (UINT16 *)&ROM[v->prot_offset*2];
+								v->prot.seed = v->prot_offset&0xffff;
+    							#if NAOMIBD_PRINTF_PROTECTION
+    							printf("M2 decrypt: gamekey %x seqkey %x length %x\n", v->dc_gamekey, v->dc_seqkey, v->dc_m3_ptr);
+    							#endif
 							}
 							else
 							{
-								// decrypt cart ram to temp buffer
-								stream_decrypt(v->dc_gamekey, v->dc_seqkey, v->dc_seed, v->dc_cart_ram, temp_ram, v->dc_m3_ptr);
+								// M3: decrypt from cart ram
+								v->prot.ptr = (UINT16 *)v->dc_cart_ram;
+								v->prot.seed = 0;
+    							#if NAOMIBD_PRINTF_PROTECTION
+    							printf("M3 decrypt: gamekey %x seqkey %x length %x\n", v->dc_gamekey, v->dc_seqkey, v->dc_m3_ptr);
+    							#endif
 							}
 
-							#if NAOMIBD_PRINTF_PROTECTION
-							printf("result: %02x %02x %02x %02x %02x %02x %02x %02x\n",
-								temp_ram[0], temp_ram[1], temp_ram[2], temp_ram[3],
-								temp_ram[4], temp_ram[5], temp_ram[6], temp_ram[7]);
-							#endif
-
-							// copy results to cart ram for readback
-							memcpy(v->dc_cart_ram, temp_ram, 128*1024);
+							v->prot.count = 0;
+							naomibd_init_stream(v);
 
 							v->dc_m3_ptr = 0;
-							v->prot_sum = 0;
 						}
-						else
-						{
-							// translate address if necessary
-							if (v->prot_translate != NULL)
-							{
-								int i = 0;
-								while (v->prot_translate[i+1] != 0xffffffff)
-								{
-									// should we match by key, address, or sum?
-									if (v->prot_translate[i] == -2)	// match sum
-									{
-										if (v->prot_translate[i+1] == v->prot_sum)
-										{
-											#if NAOMIBD_PRINTF_PROTECTION
-											printf("Protection: got sum %x, translated to %x\n", v->prot_sum, v->prot_translate[i+2]);
-											#endif
-											v->prot_offset = v->prot_translate[i+2]/2;
-											break;
-										}
-										else
-										{
-											i+= 3;
-										}
-									}
-									else if (v->prot_translate[i] == -1)	// match address
-									{
-										if (v->prot_translate[i+1] == (v->prot_offset*2))
-										{
-											#if NAOMIBD_PRINTF_PROTECTION
-											printf("Protection: got offset %x, translated to %x\n", v->prot_offset, v->prot_translate[i+2]);
-											#endif
-											v->prot_offset = v->prot_translate[i+2]/2;
-											break;
-										}
-										else
-										{
-											i += 3;
-										}
-									}
-									else	// match key
-									{
-										if (v->prot_translate[i] == v->prot_key)
-										{
-											#if NAOMIBD_PRINTF_PROTECTION
-											printf("Protection: got key %x, translated to %x\n", v->prot_key, v->prot_translate[i+2]);
-											#endif
-											v->prot_offset = v->prot_translate[i+2]/2;
-											break;
-										}
-										else
-										{
-											i+= 3;
-										}
-									}
-								}
-							}
-							#if NAOMIBD_PRINTF_PROTECTION
-							else
-							{
-								printf("naomibd: protection not handled for this game\n");
-							}
-							#endif
-						}
+                        #if NAOMIBD_PRINTF_PROTECTION
+                        else
+                        {
+                            printf("naomibd: protection not handled for this game\n");
+                        }
+                        #endif
 						break;
 
 					case 0x2000000:
 					case 0x2020000:
-						#if NAOMIBD_PRINTF_PROTECTION
-						printf("Protection write %04x to upload @ %x\n", (UINT32)(data&0xffff), v->dc_m3_ptr);
-						#endif
-						v->prot_sum += (INT16)(data&0xffff);
-
 						v->dc_cart_ram[v->dc_m3_ptr] = (data&0xff);
 						v->dc_cart_ram[v->dc_m3_ptr+1] = (data>>8)&0xff;
 						v->dc_m3_ptr += 2;
@@ -1703,43 +1817,6 @@ static UINT16 block_decrypt(UINT32 game_key, UINT16 sequence_key, UINT16 counter
     return aux;
 }
 
-static void stream_decrypt(UINT32 game_key, UINT32 sequence_key, UINT16 seed, UINT8* ciphertext, UINT8* plaintext, int length)
-{
-    UINT16 counter = seed;
-    UINT16 last_word;
-    UINT16 plain_word;
-    UINT16 aux_word;
-    int control_bits;
-    UINT16 heading_word;
-
-    last_word = block_decrypt(game_key, sequence_key, counter, *ciphertext<<8 | *(ciphertext+1));
-    control_bits = last_word&3;
-    ++counter; ciphertext+=2;
-
-    aux_word = block_decrypt(game_key, sequence_key, counter, *ciphertext<<8 | *(ciphertext+1));
-    heading_word = (last_word&~3) | (aux_word&3);
-    last_word = aux_word;
-    ++counter; ciphertext+=2;
-
-    if (BIT(control_bits,1)==0)  // no decompression, just decryption
-    {
-        for (; length>0; length-=2, ++counter, ciphertext+=2)
-        {
-            aux_word = block_decrypt(game_key, sequence_key, counter, *ciphertext<<8 | *(ciphertext+1));
-            plain_word = (last_word&~3) | (aux_word&3);
-            last_word = aux_word;
-
-            *(plaintext++) = plain_word>>8;
-            *(plaintext++) = plain_word&0xff;
-        }
-    }
-    else  // decryption plus decompression
-    {
-    	fatalerror("NAOMI ASIC compression unsupported\n");
-        return;  // not implemented, decompression has not been fully reverse engineered as of february/2010
-    }
-}
-
 /***************************************************************************
     DEVICE INTERFACE
 ***************************************************************************/
@@ -1766,8 +1843,6 @@ static DEVICE_START( naomibd )
 	/* store a pointer back to the device */
 	v->device = device;
 
-	/* find the protection address translation for this game */
-	v->prot_translate = (UINT32 *)0;
 	#if NAOMIBD_PRINTF_PROTECTION
 	v->prot_pio_count = 0;
 	#endif
@@ -1775,9 +1850,8 @@ static DEVICE_START( naomibd )
 	{
 		if (!strcmp(device->machine->gamedrv->name, naomibd_translate_tbl[i].name))
 		{
-			v->prot_translate = &naomibd_translate_tbl[i].transtbl[0];
-			v->prot_reverse_bytes = naomibd_translate_tbl[i].reverse_bytes;
-			v->dc_gamekey = naomibd_translate_tbl[i].live_key;
+            v->dc_gamekey = naomibd_translate_tbl[i].m2m3_key;
+            v->dc_dmakey = naomibd_translate_tbl[i].m1_key;
 			break;
 		}
 	}
@@ -1787,7 +1861,6 @@ static DEVICE_START( naomibd )
 	{
 		case ROM_BOARD:
 			v->memory = (UINT8 *)device->machine->region(config->regiontag)->base();
-			v->protdata = (UINT8 *)device->machine->region("naomibd_prot")->base();
 			break;
 
 		case AW_ROM_BOARD:
