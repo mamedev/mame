@@ -8053,6 +8053,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( funcube2 )	/* (c) 2001 Namco */
 	DRIVER( funcube4 )	/* (c) 2001 Namco */
 	DRIVER( trophyh )	/* (c) 2002 Sammy USA Corporation */
+	DRIVER( reelquak )	/* (c) ???? <unknown> */
 
 	/* SSV System (Seta, Sammy, Visco) games */
 	DRIVER( srmp4 )		/* (c) 1993 Seta */
@@ -8556,6 +8557,7 @@ Other Sun games
 
 	/* Sigma B98 / Sammy Medal Games */
 	DRIVER( gegege )	/* (c) 1997 Banpresto / Sigma */
+	DRIVER( sammymdl )	/* (c) 2000-2003 Sammy */
 	DRIVER( animalc )	/* (c) 2000 Sammy */
 	DRIVER( itazuram )	/* (c) 2000 Sammy */
 	DRIVER( pyenaget )	/* (c) 2000 Sammy */
@@ -9608,6 +9610,7 @@ Other Sun games
 	DRIVER( smoto20 )	/* (c) 1996 Subsino */
 	DRIVER( smoto16 )	/* (c) 1996 Subsino */
 	DRIVER( mtrain )	/* (c) 1996 Subsino */
+	DRIVER( mtrainnv )	/* (c) 1996 Subsino */
 	DRIVER( expcard )	/* (c) 1998 American Alpha */
 	DRIVER( saklove )	/* (c) 1998 Subsino */
 	DRIVER( bishjan )	/* (c) 1999 Subsino */

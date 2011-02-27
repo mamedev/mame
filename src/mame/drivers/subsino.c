@@ -1107,6 +1107,48 @@ static ADDRESS_MAP_START( stisub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0xfc00, 0xfdff ) AM_RAM_WRITE(subsino_reel3_ram_w) AM_BASE(&reel3_ram)
 ADDRESS_MAP_END
 
+
+/***************************************************************************
+                        Magic Train (Clear NVRAM ROM?)
+***************************************************************************/
+
+static ADDRESS_MAP_START( mtrainnv_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE( 0x00000, 0x0bfff ) AM_ROM
+
+	AM_RANGE( 0x0c000, 0x0cfff ) AM_RAM
+
+	AM_RANGE( 0x0d000, 0x0d000 ) AM_READ_PORT( "SW1" )
+	AM_RANGE( 0x0d001, 0x0d001 ) AM_READ_PORT( "SW2" )
+	AM_RANGE( 0x0d002, 0x0d002 ) AM_READ_PORT( "SW3" )
+
+	AM_RANGE( 0x0d004, 0x0d004 ) AM_READ_PORT( "SW4" )
+	AM_RANGE( 0x0d005, 0x0d005 ) AM_READ_PORT( "INB" )
+	AM_RANGE( 0x0d006, 0x0d006 ) AM_READ_PORT( "INA" )
+//	AM_RANGE( 0x0d008, 0x0d008 ) AM_READWRITE
+//	AM_RANGE( 0x0d009, 0x0d009 ) AM_WRITE
+//	AM_RANGE( 0x0d00a, 0x0d00a ) AM_WRITE
+//	AM_RANGE( 0x0d00b, 0x0d00b ) AM_WRITE
+	AM_RANGE( 0x0d00c, 0x0d00c ) AM_READ_PORT( "INC" )
+
+	AM_RANGE( 0x0d010, 0x0d013 ) AM_WRITE(colordac_w)
+
+//	AM_RANGE( 0x0d012, 0x0d012 ) AM_WRITE
+
+	AM_RANGE( 0x0d016, 0x0d017 ) AM_DEVWRITE( "ymsnd", ym3812_w )
+
+//	AM_RANGE( 0x0d018, 0x0d018 ) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+
+	AM_RANGE( 0x0e000, 0x0e7ff ) AM_RAM_WRITE( subsino_colorram_w ) AM_BASE( &colorram )
+	AM_RANGE( 0x0e800, 0x0efff ) AM_RAM_WRITE( subsino_videoram_w ) AM_BASE( &videoram )
+
+	AM_RANGE( 0xf000, 0xf7ff ) AM_READWRITE(reel_scrollattr_r, reel_scrollattr_w)
+
+	AM_RANGE( 0xf800, 0xf9ff ) AM_RAM_WRITE(subsino_reel1_ram_w) AM_BASE(&reel1_ram)
+	AM_RANGE( 0xfa00, 0xfbff ) AM_RAM_WRITE(subsino_reel2_ram_w) AM_BASE(&reel2_ram)
+	AM_RANGE( 0xfc00, 0xfdff ) AM_RAM_WRITE(subsino_reel3_ram_w) AM_BASE(&reel3_ram)
+ADDRESS_MAP_END
+
+
 static ADDRESS_MAP_START( subsino_iomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
 ADDRESS_MAP_END
@@ -2703,6 +2745,13 @@ static MACHINE_CONFIG_START( stisub, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( mtrainnv, stisub )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mtrainnv_map)
+MACHINE_CONFIG_END
+
 
 /***************************************************************************
 *                               ROMs Loading                               *
@@ -3356,6 +3405,32 @@ ROM_END
 
 
 /***************************************************************************
+
+  This is allegedly Magic Train - Clear NVRAM ROM:
+
+  Subsino sold a "Settings/Clear ROM" for some released titles.
+  These devices are *extremely* expensive (and ultra rare, only sold
+  to big casino corporations), and should be placed in the empty socket
+  to fix a dead board due to NVRAM corruption.
+
+  A version of Magic Train running on subsino.c (unlike mtrain, which is
+  subsino2.c) is needed to match this program ROM.
+
+***************************************************************************/
+
+ROM_START( mtrainnv )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mtrain_settings.bin", 0x00000, 0x10000, CRC(584af1b5) SHA1(91d966d282823dddfdc455bb03728fcdf3713dd7) )
+
+	ROM_REGION( 0x10000, "tilemap", 0 )
+	ROM_COPY( "maincpu", 0x0000, 0x00000, 0x10000 )	// just to show something
+
+	ROM_REGION( 0x10000, "reels", 0 )
+	ROM_COPY( "maincpu", 0x0000, 0x00000, 0x10000 )	// just to show something
+ROM_END
+
+
+/***************************************************************************
 *                        Driver Init / Decryption                          *
 ***************************************************************************/
 
@@ -3529,7 +3604,19 @@ static DRIVER_INIT( stisub )
 	reel1_attr = auto_alloc_array(machine, UINT8, 0x200);
 	reel2_attr = auto_alloc_array(machine, UINT8, 0x200);
 	reel3_attr = auto_alloc_array(machine, UINT8, 0x200);
+}
 
+static DRIVER_INIT( mtrainnv )
+{
+	stisub_colorram = auto_alloc_array(machine, UINT8, 256*3);
+
+	reel1_scroll = auto_alloc_array(machine, UINT8, 0x40);
+	reel2_scroll = auto_alloc_array(machine, UINT8, 0x40);
+	reel3_scroll = auto_alloc_array(machine, UINT8, 0x40);
+
+	reel1_attr = auto_alloc_array(machine, UINT8, 0x200);
+	reel2_attr = auto_alloc_array(machine, UINT8, 0x200);
+	reel3_attr = auto_alloc_array(machine, UINT8, 0x200);
 }
 
 
@@ -3537,18 +3624,19 @@ static DRIVER_INIT( stisub )
 *                               Game Drivers                               *
 ***************************************************************************/
 
-/*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY            FULLNAME                               FLAGS   LAYOUT      */
-GAMEL( 1990, victor21, 0,        victor21, victor21, victor21, ROT0, "Subsino / Buffy", "Victor 21",                            0,      layout_victor21 )
-GAMEL( 1991, victor5,  0,        victor5,  victor5,  victor5,  ROT0, "Subsino",         "G.E.A.",                               0,      layout_victor5 )	// PCB black-box was marked 'victor 5' - in-game says G.E.A with no manufacturer info?
-GAMEL( 1992, tisub,    0,        tisub,    tisub,    tisub,    ROT0, "Subsino",         "Treasure Island (Subsino, set 1)",     0,      layout_tisub )
-GAMEL( 1992, tisuba,   tisub,    tisub,    tisub,    tisuba,   ROT0, "Subsino",         "Treasure Island (Subsino, set 2)",     0,      layout_tisub )
-GAMEL( 1991, crsbingo, 0,        crsbingo, crsbingo, crsbingo, ROT0, "Subsino",         "Poker Carnival",                       0,      layout_crsbingo )
-GAMEL( 1995, stisub,   0,        stisub,   stisub,   stisub,   ROT0, "American Alpha",  "Treasure Bonus (Subsino)",     		0,      layout_stisub )		// board CPU module marked 'Super Treasure Island' (alt title?)
-GAMEL( 1996, sharkpy,  0,        sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.3)",            0,      layout_sharkpy )	// missing POST messages?
-GAMEL( 1996, sharkpya, sharkpy,  sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.6)",            0,      layout_sharkpy )	// missing POST messages?
-GAMEL( 1995, sharkpye, sharkpy,  sharkpy,  sharkpye, sharkpye, ROT0, "American Alpha",  "Shark Party (English, Alpha license)", 0,      layout_sharkpye )	// PCB black-box was marked 'victor 6'
-GAMEL( 1995, victor6,  0,        sharkpy,  victor6,  sharkpye, ROT0, "American Alpha",  "Victor 6 (v2.3N)",                     0,      layout_sharkpye )	// ^^
-GAMEL( 1995, victor6a, victor6,  sharkpy,  victor6a, sharkpye, ROT0, "American Alpha",  "Victor 6 (v2.3)",                      0,      layout_sharkpye )	// ^^
-GAMEL( 1995, victor6b, victor6,  sharkpy,  victor6b, sharkpye, ROT0, "American Alpha",  "Victor 6 (v1.2)",                      0,      layout_sharkpye )	// ^^ Version # according to label, not displayed
-GAMEL( 1996, smoto20,  0,        srider,   smoto20,  smoto20,  ROT0, "Subsino",         "Super Rider (Italy, v2.0)",            0,      layout_smoto )
-GAMEL( 1996, smoto16,  smoto20,  srider,   smoto16,  smoto16,  ROT0, "Subsino",         "Super Moto (Italy, v1.6)",             0,      layout_smoto )
+//     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY            FULLNAME                                FLAGS            LAYOUT
+GAMEL( 1990, victor21,  0,        victor21, victor21, victor21, ROT0, "Subsino / Buffy", "Victor 21",                            0,               layout_victor21 )
+GAMEL( 1991, victor5,   0,        victor5,  victor5,  victor5,  ROT0, "Subsino",         "G.E.A.",                               0,               layout_victor5  )	// PCB black-box was marked 'victor 5' - in-game says G.E.A with no manufacturer info?
+GAMEL( 1992, tisub,     0,        tisub,    tisub,    tisub,    ROT0, "Subsino",         "Treasure Island (Subsino, set 1)",     0,               layout_tisub    )
+GAMEL( 1992, tisuba,    tisub,    tisub,    tisub,    tisuba,   ROT0, "Subsino",         "Treasure Island (Subsino, set 2)",     0,               layout_tisub    ) 
+GAMEL( 1991, crsbingo,  0,        crsbingo, crsbingo, crsbingo, ROT0, "Subsino",         "Poker Carnival",                       0,               layout_crsbingo )
+GAMEL( 1995, stisub,    0,        stisub,   stisub,   stisub,   ROT0, "American Alpha",  "Treasure Bonus (Subsino)",             0,               layout_stisub   )	// board CPU module marked 'Super Treasure Island' (alt title?)
+GAMEL( 1996, sharkpy,   0,        sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.3)",            0,               layout_sharkpy  )	// missing POST messages?
+GAMEL( 1996, sharkpya,  sharkpy,  sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.6)",            0,               layout_sharkpy  )	// missing POST messages?
+GAMEL( 1995, sharkpye,  sharkpy,  sharkpy,  sharkpye, sharkpye, ROT0, "American Alpha",  "Shark Party (English, Alpha license)", 0,               layout_sharkpye )	// PCB black-box was marked 'victor 6'
+GAMEL( 1995, victor6,   0,        sharkpy,  victor6,  sharkpye, ROT0, "American Alpha",  "Victor 6 (v2.3N)",                     0,               layout_sharkpye )	// ^^
+GAMEL( 1995, victor6a,  victor6,  sharkpy,  victor6a, sharkpye, ROT0, "American Alpha",  "Victor 6 (v2.3)",                      0,               layout_sharkpye )	// ^^
+GAMEL( 1995, victor6b,  victor6,  sharkpy,  victor6b, sharkpye, ROT0, "American Alpha",  "Victor 6 (v1.2)",                      0,               layout_sharkpye )	// ^^ Version # according to label, not displayed
+GAMEL( 1996, smoto20,   0,        srider,   smoto20,  smoto20,  ROT0, "Subsino",         "Super Rider (Italy, v2.0)",            0,               layout_smoto    )
+GAMEL( 1996, smoto16,   smoto20,  srider,   smoto16,  smoto16,  ROT0, "Subsino",         "Super Moto (Italy, v1.6)",             0,               layout_smoto    )
+GAME ( 1996, mtrainnv,  mtrain,   mtrainnv, stisub,   mtrainnv, ROT0, "Subsino",         "Magic Train (Clear NVRAM ROM?)",       GAME_NOT_WORKING )

@@ -70,11 +70,16 @@ http://www.tsc-acnet.com/index.php?sort=8&action=cataloglist&s=1&mode=3&genre_id
 
 To Do:
 
+- KL5C80 emulation is needed to consolidate the sammymdl games in one memory map and to run the BIOS
 - Remove ROM patches from gegege
 - gegege checks the EEPROM output after reset, and wants a timed 0->1 transition or locks up while
   saving setting in service mode. Using a reset_delay of 7 works, unless when "play style" is set
   to "coin" (it probably changes the number of reads from port $C0).
   I guess the reset_delay mechanism should be implemented with a timer in eeprom.c.
+- animalc needs a green backgound during part of the intro (floating animals in and out of the screen).
+  This can be achieved using either pen 0 or ff as background color, but messes up the other games.
+- pyenaget intro: when the theater scrolls out to the left, the train should scroll in from the right,
+  with no visible gaps. It currently leaves the screen empty instead, for several seconds.
 
 Notes:
 
@@ -679,7 +684,7 @@ static ADDRESS_MAP_START( animalc_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE( sammymdl_leds_w )
 	AM_RANGE( 0x34, 0x34 ) AM_READ( unk_34_r )
 	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE_MODERN("oki", okim9810_device, write )
-	AM_RANGE( 0x90, 0x91 ) AM_DEVWRITE_MODERN("oki", okim9810_device, write_TMP_register )
+	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE_MODERN("oki", okim9810_device, write_TMP_register )
 	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD_MODERN("oki", okim9810_device, read )
 	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE( sammymdl_hopper_w )
 	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE( watchdog_reset_w )	// 1
@@ -911,7 +916,7 @@ static ADDRESS_MAP_START( haekaka_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x31, 0x31 ) AM_WRITE( haekaka_coin_w )
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE( haekaka_leds_w )
 	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE_MODERN("oki", okim9810_device, write )
-	AM_RANGE( 0x90, 0x91 ) AM_DEVWRITE_MODERN("oki", okim9810_device, write_TMP_register )
+	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE_MODERN("oki", okim9810_device, write_TMP_register )
 	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD_MODERN("oki", okim9810_device, read )
 	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE( sammymdl_hopper_w )
 	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE( watchdog_reset_w )	// 1
@@ -1149,7 +1154,7 @@ static ADDRESS_MAP_START( itazuram_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x31, 0x31 ) AM_WRITE( sammymdl_coin_w )
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE( sammymdl_leds_w )
 	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE_MODERN("oki", okim9810_device, write )
-	AM_RANGE( 0x90, 0x91 ) AM_DEVWRITE_MODERN("oki", okim9810_device, write_TMP_register )
+	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE_MODERN("oki", okim9810_device, write_TMP_register )
 	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD_MODERN("oki", okim9810_device, read )
 	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE( sammymdl_hopper_w )
 	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE( watchdog_reset_w )	// 1
@@ -1363,7 +1368,7 @@ static ADDRESS_MAP_START( tdoboon_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x31, 0x31 ) AM_WRITE( sammymdl_coin_w )
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE( sammymdl_leds_w )
 	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE_MODERN("oki", okim9810_device, write )
-	AM_RANGE( 0x90, 0x91 ) AM_DEVWRITE_MODERN("oki", okim9810_device, write_TMP_register )
+	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE_MODERN("oki", okim9810_device, write_TMP_register )
 	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD_MODERN("oki", okim9810_device, read )
 	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE( sammymdl_hopper_w )
 	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE( watchdog_reset_w )	// 1
@@ -1581,6 +1586,8 @@ static MACHINE_RESET( sammymdl )
 
 static MACHINE_CONFIG_START( sammymdl, driver_device )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_20MHz / 2)	// !! KL5C80A120FP @ 10MHz? (actually 4 times faster than Z80) !!
+	MCFG_CPU_PROGRAM_MAP( animalc_map )
+	MCFG_CPU_IO_MAP( animalc_io )
 
 	MCFG_MACHINE_RESET( sammymdl )
 
@@ -1851,6 +1858,20 @@ static DRIVER_INIT( gegege )
 
 ***************************************************************************/
 
+#define SAMMYMDL_BIOS																								\
+	ROM_REGION( 0x80000, "mainbios", 0 )																			\
+	ROM_SYSTEM_BIOS( 0, "v5", "IPL Ver. 5.0" )																		\
+	ROM_LOAD( "vm1211l01.u2", 0x000000, 0x080000, CRC(c3c74dc5) SHA1(07352e6dba7514214e778ba39e1ca773e4698858) )
+
+ROM_START( sammymdl )
+	SAMMYMDL_BIOS
+
+	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x200000, "sprites", ROMREGION_ERASEFF )
+ROM_END
 
 /***************************************************************************
 
@@ -1863,6 +1884,8 @@ static DRIVER_INIT( gegege )
 ***************************************************************************/
 
 ROM_START( animalc )
+	SAMMYMDL_BIOS
+
 	ROM_REGION( 0x1000000, "oki", 0 )
 	ROM_LOAD( "vx2302l01.u021", 0x00000, 0x200000, CRC(84cf123b) SHA1(d8b425c93ff1a560e3f92c70d7eb93a05c3581af) )
 
@@ -1898,6 +1921,8 @@ static DRIVER_INIT( animalc )
 ***************************************************************************/
 
 ROM_START( itazuram )
+	SAMMYMDL_BIOS
+
 	ROM_REGION( 0x1000000, "oki", 0 )
 	ROM_LOAD( "vx2002l01.u021", 0x00000, 0x200000, CRC(ddbdd2f3) SHA1(91f67a938929be0261442e066e3d2c03b5e9f06a) )
 
@@ -1953,6 +1978,8 @@ static DRIVER_INIT( itazuram )
 ***************************************************************************/
 
 ROM_START( tdoboon )
+	SAMMYMDL_BIOS
+
 	ROM_REGION( 0x1000000, "oki", 0 )
 	ROM_LOAD( "em4210l01.u021.bin", 0x00000, 0x200000, CRC(3523e314) SHA1(d07c5d17d3f285be4cde810547f427e84f98968f) )
 
@@ -1973,6 +2000,8 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( pyenaget )
+	SAMMYMDL_BIOS
+
 	ROM_REGION( 0x1000000, "oki", 0 )
 	ROM_LOAD( "vx1802l01.u021", 0x00000, 0x200000, CRC(7a22a657) SHA1(2a98085862fd958209253c5401e41eae4f7c06ea) )
 
@@ -2007,6 +2036,8 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( haekaka )
+	SAMMYMDL_BIOS
+
 	ROM_REGION( 0x1000000, "oki", 0 )
 	ROM_LOAD( "em4208l01.u021.bin", 0x00000, 0x200000, CRC(d23bb748) SHA1(38d5b6c4b2cd470b3a68574aeca3f9fa9032245e) )
 
@@ -2038,10 +2069,11 @@ static DRIVER_INIT( haekaka )
 
 ***************************************************************************/
 
-GAME( 1997, gegege,   0, gegege,   gegege,   gegege,   ROT0, "Banpresto / Sigma", "GeGeGe no Kitarou Youkai Slot", 0                    )
+GAME( 1997, gegege,   0,        gegege,   gegege,   gegege,   ROT0, "Banpresto / Sigma", "GeGeGe no Kitarou Youkai Slot", 0 )
 // Sammy Medal Games:
-GAME( 2000, animalc,  0, animalc,  sammymdl, animalc,  ROT0, "Sammy",             "Animal Catch",                  GAME_IMPERFECT_SOUND )
-GAME( 2000, itazuram, 0, itazuram, sammymdl, itazuram, ROT0, "Sammy",             "Itazura Monkey",                GAME_IMPERFECT_SOUND )
-GAME( 2000, pyenaget, 0, pyenaget, sammymdl, haekaka,  ROT0, "Sammy",             "Pye-nage Taikai",               GAME_IMPERFECT_SOUND )
-GAME( 2000, tdoboon,  0, tdoboon,  haekaka,  haekaka,  ROT0, "Sammy",             "Taihou de Doboon",              GAME_IMPERFECT_SOUND )
-GAME( 2001, haekaka,  0, haekaka,  haekaka,  haekaka,  ROT0, "Sammy",             "Hae Hae Ka Ka Ka",              GAME_IMPERFECT_SOUND )
+GAME( 2000, sammymdl, 0,        sammymdl, sammymdl, 0,        ROT0, "Sammy",             "Sammy Medal Game System Bios",  GAME_IS_BIOS_ROOT )
+GAME( 2000, animalc,  sammymdl, animalc,  sammymdl, animalc,  ROT0, "Sammy",             "Animal Catch",                  0 )
+GAME( 2000, itazuram, sammymdl, itazuram, sammymdl, itazuram, ROT0, "Sammy",             "Itazura Monkey",                0 )
+GAME( 2000, pyenaget, sammymdl, pyenaget, sammymdl, haekaka,  ROT0, "Sammy",             "Pye-nage Taikai",               0 )
+GAME( 2000, tdoboon,  sammymdl, tdoboon,  haekaka,  haekaka,  ROT0, "Sammy",             "Taihou de Doboon",              0 )
+GAME( 2001, haekaka,  sammymdl, haekaka,  haekaka,  haekaka,  ROT0, "Sammy",             "Hae Hae Ka Ka Ka",              0 )

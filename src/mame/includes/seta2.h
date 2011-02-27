@@ -8,7 +8,7 @@ public:
 	optional_shared_ptr<UINT16> m_nvram;
 
 	UINT16 *vregs;
-	int yoffset;
+	int xoffset, yoffset;
 	int keyboard_row;
 
 	UINT16 *spriteram;
@@ -32,8 +32,7 @@ public:
 WRITE16_HANDLER( seta2_vregs_w );
 
 VIDEO_START( seta2 );
-VIDEO_START( seta2_offset );
+VIDEO_START( seta2_xoffset );
+VIDEO_START( seta2_yoffset );
 SCREEN_UPDATE( seta2 );
 SCREEN_EOF( seta2 );
-
-
