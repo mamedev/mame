@@ -181,6 +181,20 @@ ROM_START(eballdlx)
 	ROM_LOAD("838-10_5.532", 0xf000, 0x1000, CRC(9c63925d) SHA1(abd1fa6308d3569e16ee10bfabce269a124d8f26))
 ROM_END
 
+ROM_START(eballd14)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "838-14_2.732", 0x1000, 0x0800, CRC(27eeabde) SHA1(a8f81dbb70202bdad1c9734d629e8a5c27f2a835))
+	ROM_CONTINUE( 0x5000, 0x0800)
+	ROM_LOAD( "720-52_6.732", 0x1800, 0x0800, CRC(2a43d9fb) SHA1(9ff903c32b80780383578a9abaa3ef9d3bcecbc7) )
+	ROM_CONTINUE( 0x5800, 0x0800)
+	ROM_RELOAD( 0xf000, 0x1000)
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("838-08_3.532", 0xd000, 0x1000, CRC(c39478d7) SHA1(8148aca7c4113921ab882da32d6d88e66abb22cc))
+	ROM_LOAD("838-09_4.716", 0xe000, 0x0800, CRC(518ea89e) SHA1(a387274ef530bb57f31819733b35615a39260126))
+	ROM_RELOAD(0xe800, 0x0800)
+	ROM_LOAD("838-10_5.532", 0xf000, 0x1000, CRC(9c63925d) SHA1(abd1fa6308d3569e16ee10bfabce269a124d8f26))
+ROM_END
+
 /*--------------------------------
 / Elektra
 /-------------------------------*/
@@ -1269,7 +1283,8 @@ GAME( 1981, centaur,  0,		by35, by35, by35, ROT0, "Bally","Centaur", GAME_NOT_WO
 GAME( 1985, cosflash, flashgdn, by35, by35, by35, ROT0, "Bell Games","Cosmic Flash", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME( 1985, cybrnaut, 0,		by35, by35, by35, ROT0, "Bally","Cybernaut", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME( 1979, dollyptn, 0,		by35, by35, by35, ROT0, "Bally","Dolly Parton", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1981, eballdlx, 0,		by35, by35, by35, ROT0, "Bally","Eight Ball Deluxe", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1981, eballdlx, 0,		by35, by35, by35, ROT0, "Bally","Eight Ball Deluxe (rev. 15)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1981, eballd14, eballdlx, by35, by35, by35, ROT0, "Bally","Eight Ball Deluxe (rev. 14)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME( 1981, elektra,  0,		by35, by35, by35, ROT0, "Bally","Elektra", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME( 1981, embryon,  0,		by35, by35, by35, ROT0, "Bally","Embryon", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME( 1981, fathom,   0,		by35, by35, by35, ROT0, "Bally","Fathom", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
