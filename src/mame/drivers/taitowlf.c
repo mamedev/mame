@@ -221,7 +221,7 @@ static void intel82439tx_pci_w(device_t *busdevice, device_t *device, int functi
 
 static UINT8 piix4_config_r(device_t *busdevice, device_t *device, int function, int reg)
 {
-	taitowlf_state *state = device->machine->driver_data<taitowlf_state>();
+	taitowlf_state *state = busdevice->machine->driver_data<taitowlf_state>();
 //  mame_printf_debug("PIIX4: read %d, %02X\n", function, reg);
 	return state->piix4_config_reg[function][reg];
 }
@@ -562,8 +562,7 @@ INPUT_PORTS_END
 static IRQ_CALLBACK(irq_callback)
 {
 	taitowlf_state *state = device->machine->driver_data<taitowlf_state>();
-	int r = 0;
-	r = pic8259_acknowledge( state->pic8259_2);
+	int r = pic8259_acknowledge( state->pic8259_2);
 	if (r==0)
 	{
 		r = pic8259_acknowledge( state->pic8259_1);
@@ -651,17 +650,11 @@ static MACHINE_CONFIG_START( taitowlf, taitowlf_state )
 	MCFG_PCI_BUS_DEVICE(7, NULL, intel82371ab_pci_r, intel82371ab_pci_w)
 
 	MCFG_PIT8254_ADD( "pit8254", taitowlf_pit8254_config )
-
 	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )
-
 	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, dma8237_2_config )
-
 	MCFG_PIC8259_ADD( "pic8259_1", taitowlf_pic8259_1_config )
-
 	MCFG_PIC8259_ADD( "pic8259_2", taitowlf_pic8259_2_config )
-
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt)
-
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
 	/* video hardware */
