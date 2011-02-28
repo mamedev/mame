@@ -353,7 +353,7 @@ int naomibd_get_type(device_t *device)
 // M1 decryption/decompression
 static UINT8 naomibd_m1dec_readbyte(naomibd_state *naomibd)
 {
-    UINT8 v;
+    UINT8 v = 0;
 
     switch (naomibd->prot.s_in_pos & 3)
     {
