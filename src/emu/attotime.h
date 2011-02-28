@@ -353,12 +353,12 @@ inline attotime min(const attotime &left, const attotime &right)
 inline attotime max(const attotime &left, const attotime &right)
 {
 	if (left.seconds > right.seconds)
-		return right;
-	if (left.seconds < right.seconds)
 		return left;
-	if (left.attoseconds > right.attoseconds)
+	if (left.seconds < right.seconds)
 		return right;
-	return left;
+	if (left.attoseconds > right.attoseconds)
+		return left;
+	return right;
 }
 
 
