@@ -199,12 +199,22 @@ const char *hash_base::string(astring &buffer)
 
 bool hash_base::from_string(const char *&string, int length)
 {
+	// reset the error and our buffer
+	m_parse_error = false;
+	memset(m_bufptr, 0, m_length);
+
+	// special case for idiom HASH(1) to map to a dummy (0) hash
+	if (string[0] == '1' && fromhex(string[1]) == -1)
+	{
+		string++;
+		return true;
+	}
+						
 	// fail if we're too short
 	if (length < 2 * m_length)
 		return false;
 
 	// loop over bytes
-	m_parse_error = false;
 	for (int index = 0; index < m_length; index++)
 	{
 		// parse the upper digit
@@ -212,7 +222,6 @@ bool hash_base::from_string(const char *&string, int length)
 		if (upper == -1)
 		{
 			m_parse_error = true;
-			memset(m_bufptr, 0, m_length);
 			return false;
 		}
 		
@@ -221,7 +230,6 @@ bool hash_base::from_string(const char *&string, int length)
 		if (lower == -1)
 		{
 			m_parse_error = true;
-			memset(m_bufptr, 0, m_length);
 			return false;
 		}
 
