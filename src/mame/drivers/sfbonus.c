@@ -1267,7 +1267,7 @@ static MACHINE_CONFIG_START( sfbonus, driver_device )
 	MCFG_SCREEN_SIZE(128*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 288-1)
 	MCFG_SCREEN_UPDATE(sfbonus)
-	
+
 	MCFG_PALETTE_LENGTH(0x100*2) // *2 for priority workaraound / custom drawing
 
 	MCFG_VIDEO_START(sfbonus)

@@ -198,7 +198,7 @@ static WRITE16_HANDLER( genesis_ssf2_bank_w )
 
 	if ((state->md_cart.ssf2_lastoff != offset) || (state->md_cart.ssf2_lastdata != data))
 	{
-		state->md_cart.ssf2_lastoff = offset; 
+		state->md_cart.ssf2_lastoff = offset;
 		state->md_cart.ssf2_lastdata = data;
 		switch (offset << 1)
 		{
@@ -1301,7 +1301,7 @@ static void setup_megadriv_sram(device_image_interface &image)
 	switch (state->md_cart.type)
 	{
 		// These types only come from xml
-		// TODO: Eventually megadriv_backupram should point to the allocated cart:sram region! 
+		// TODO: Eventually megadriv_backupram should point to the allocated cart:sram region!
 		// For now, we only use the region as a placeholder to carry size info...
 		case SEGA_SRAM:
 			state->md_cart.sram_start = 0x200000;

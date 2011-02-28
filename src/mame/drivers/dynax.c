@@ -4958,7 +4958,7 @@ static MACHINE_CONFIG_START( tenkai, dynax_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(4, 512-1, 4, 255-8-4)	// hide first 4 horizontal pixels (see scroll of gal 4 in test mode)
 	MCFG_SCREEN_UPDATE(hnoridur)
-	
+
 	MCFG_PALETTE_LENGTH(16*256)
 
 	MCFG_VIDEO_START(mjelctrn)
@@ -5027,7 +5027,7 @@ static MACHINE_CONFIG_START( gekisha, dynax_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(2, 256-1, 16, 256-1)
-	MCFG_SCREEN_UPDATE(mjdialq2)	
+	MCFG_SCREEN_UPDATE(mjdialq2)
 
 	MCFG_PALETTE_LENGTH(512)
 	MCFG_PALETTE_INIT(sprtmtch)			// static palette

@@ -48,7 +48,7 @@ const unsigned int spu_base_frequency_hz=44100;
 
 class stream_buffer;
 
-class spu_device : public device_t, public device_sound_interface 
+class spu_device : public device_t, public device_sound_interface
 {
 	friend class spu_device_config;
 

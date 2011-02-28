@@ -1008,6 +1008,6 @@ WRITE32_HANDLER(archimedes_memc_page_w)
 	// now go ahead and set the mapping in the page table
 	memc_pages[log] = phys + (memc*0x80);
 
-//	printf("PC=%08x = MEMC_PAGE(%d): W %08x: log %x to phys %x, MEMC %d, perms %d\n", cpu_get_pc(space->cpu),memc_pagesize, data, log, phys, memc, perms);
+//  printf("PC=%08x = MEMC_PAGE(%d): W %08x: log %x to phys %x, MEMC %d, perms %d\n", cpu_get_pc(space->cpu),memc_pagesize, data, log, phys, memc, perms);
 }
 

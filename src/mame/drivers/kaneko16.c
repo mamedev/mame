@@ -1824,7 +1824,7 @@ static MACHINE_CONFIG_START( berlwall, driver_device )
 
 	MCFG_PALETTE_INIT(berlwall)
 	MCFG_VIDEO_START(berlwall)
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

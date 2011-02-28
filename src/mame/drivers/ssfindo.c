@@ -1,7 +1,7 @@
 /************************************************************************
- 
+
  'RISC PC' hardware
- 
+
  See See Find Out [Icarus 1999]
  Pang Pang Car [Icarus 1999]
  Tetris Fighters [Sego Entertainment 2001]
@@ -724,7 +724,7 @@ ROM_START( tetfight )
 
 	ROM_REGION(0x100000, "user5", ROMREGION_ERASE00 )/*  qdsp samples */
 	// probably the same, but wasn't dumped
-	//ROM_LOAD( "1008s-1.u16",	0x000000, 0x100000, CRC(9aef9545) SHA1(f23ef72c3e3667923768dfdd0c5b4951b23dcbcf) )
+	//ROM_LOAD( "1008s-1.u16",  0x000000, 0x100000, CRC(9aef9545) SHA1(f23ef72c3e3667923768dfdd0c5b4951b23dcbcf) )
 
 	ROM_REGION(0x100000, "user6", 0 ) /* samples - same internal structure as qdsp samples  */
 	ROM_LOAD( "u11",		0x000000, 0x80000, CRC(073050f6) SHA1(07f362f3ba468bde2341a99e6b26931d11459a92) )

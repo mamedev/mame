@@ -164,7 +164,7 @@ public:
 	const rectangle &visible_area() const { return m_visarea; }
 	bitmap_format format() const { return m_config.m_format; }
 	render_container &container() const { assert(m_container != NULL); return *m_container; }
-	bool screen_update(bitmap_t &bitmap, const rectangle &cliprect);	
+	bool screen_update(bitmap_t &bitmap, const rectangle &cliprect);
 	void screen_eof();
 
 	// dynamic configuration
@@ -286,7 +286,7 @@ private:
 #define SCREEN_EOF(name)				void SCREEN_EOF_NAME(name)(screen_device *screen, running_machine *machine)
 #define SCREEN_EOF_CALL(name)			SCREEN_EOF_NAME(name)(screen, machine)
 
-#define screen_eof_0 					NULL
+#define screen_eof_0					NULL
 
 #define MCFG_SCREEN_ADD(_tag, _type) \
 	MCFG_DEVICE_ADD(_tag, SCREEN, 0) \

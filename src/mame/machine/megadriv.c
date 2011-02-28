@@ -3865,7 +3865,7 @@ int segacd_ret = 0;
 
 
 #define TOCCMD_CURPOS    (0x0)
-#define TOCCMD_TRKPOS 	 (0x1)
+#define TOCCMD_TRKPOS	 (0x1)
 #define TOCCMD_CURTRK    (0x2)
 #define TOCCMD_LENGTH    (0x3)
 #define TOCCMD_FIRSTLAST (0x4)
@@ -4181,7 +4181,7 @@ void CDD_GetTrackPos(void)
 	int elapsedlba;
 	UINT32 msf;
 	CDD_STATUS &= 0xFF;
-	//	UINT32 end_msf = ;
+	//  UINT32 end_msf = ;
 	if(segacd.cd == NULL) // no cd is there, bail out
 		return;
 	CDD_STATUS |= SCD_STATUS;
@@ -4506,7 +4506,7 @@ void CDC_Do_DMA(running_machine* machine, int rate)
 		{
 			space->write_byte(0xff2000+(((dstoffset*2)+1)&0x1fff),data >> 8);
 			space->write_byte(0xff2000+(((dstoffset*2)+3)&0x1fff),data & 0xff);
-		//	printf("PCM_DMA writing %04x %04x\n",0xff2000+(dstoffset*2), data);
+		//  printf("PCM_DMA writing %04x %04x\n",0xff2000+(dstoffset*2), data);
 		}
 		else
 		{
@@ -4694,7 +4694,7 @@ static const char *const CDD_import_cmdnames[] =
 {
 	"Get Status",			// 0
 	"Stop ALL",				// 1
-	"Handle TOC", 			// 2
+	"Handle TOC",			// 2
 	"Play",					// 3
 	"Seek",					// 4
 	"<undefined>",			// 5
@@ -5273,7 +5273,7 @@ static READ16_HANDLER( segacd_main_dataram_part1_r )
 			// do we care about the ret bit?? HOTA is missing some startup screens...
 			//if (!segacd_ret)
 			//{
-			//	return segacd_dataram[offset+0x20000/2];
+			//  return segacd_dataram[offset+0x20000/2];
 			//}
 			//else
 			{
@@ -5901,7 +5901,7 @@ void segacd_init_main_cpu( running_machine* machine )
 	segacd_gfx_conversion_timer->adjust(attotime::never);
 
 	segacd_hock_timer = machine->scheduler().timer_alloc(FUNC(segacd_access_timer_callback));
-//	segacd_hock_timer->adjust( attotime::from_nsec(20000000), 0, attotime::from_nsec(20000000));
+//  segacd_hock_timer->adjust( attotime::from_nsec(20000000), 0, attotime::from_nsec(20000000));
 	segacd_hock_timer->adjust( attotime::from_hz(75),0, attotime::from_hz(75));
 
 	segacd_irq3_timer = machine->scheduler().timer_alloc(FUNC(segacd_irq3_timer_callback));
@@ -6125,7 +6125,7 @@ static WRITE16_HANDLER( segacd_irq_mask_w )
 {
 	UINT16 control = CDD_CONTROL;
 
-//	printf("segacd_irq_mask_w %04x %04x (CDD control is %04x)\n",data, mem_mask, control);
+//  printf("segacd_irq_mask_w %04x %04x (CDD control is %04x)\n",data, mem_mask, control);
 
 	if (data & 0x10)
 	{
@@ -6207,7 +6207,7 @@ static WRITE16_HANDLER( segacd_stampsize_w )
 	{
 		segacd_stampsize = data & 0x07;
 		//if (data & 0xf8)
-		//	printf("    unused bits (LSB) set in stampsize!\n");
+		//  printf("    unused bits (LSB) set in stampsize!\n");
 
 		//if (data&1) printf("    Repeat On\n");
 		//else printf("    Repeat Off\n");
@@ -6446,7 +6446,7 @@ static READ16_HANDLER( segacd_imagebuffer_offset_r )
 static WRITE16_HANDLER( segacd_imagebuffer_offset_w )
 {
 	COMBINE_DATA(&segacd_imagebuffer_offset);
-//	printf("segacd_imagebuffer_offset_w %04x\n", segacd_imagebuffer_offset);
+//  printf("segacd_imagebuffer_offset_w %04x\n", segacd_imagebuffer_offset);
 }
 
 static READ16_HANDLER( segacd_imagebuffer_vcell_size_r )

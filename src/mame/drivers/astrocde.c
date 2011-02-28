@@ -1303,7 +1303,7 @@ static MACHINE_CONFIG_DERIVED( astrocade_16color_base, astrocade_base )
 
 	MCFG_PALETTE_INIT(profpac)
 	MCFG_VIDEO_START(profpac)
-	
+
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE(profpac)
 MACHINE_CONFIG_END

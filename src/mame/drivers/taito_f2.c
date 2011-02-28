@@ -3861,7 +3861,7 @@ static MACHINE_CONFIG_DERIVED( qzchikyu, taito_f2_tc0510nio )
 
 	/* video hardware */
 	MCFG_VIDEO_START(taitof2_qzchikyu)
-	MCFG_SCREEN_MODIFY("screen")	
+	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_EOF(taitof2_partial_buffer_delayed_qzchikyu)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", qzchikyu_tc0100scn_intf)

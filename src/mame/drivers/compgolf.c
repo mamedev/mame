@@ -272,7 +272,7 @@ static MACHINE_CONFIG_START( compgolf, compgolf_state )
 	MCFG_GFXDECODE(compgolf)
 
 	MCFG_VIDEO_START(compgolf)
-	
+
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)

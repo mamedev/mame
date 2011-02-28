@@ -183,7 +183,7 @@ void x76f100_device::scl_0()
 		sdar = shift & 1;
 		shift >>= 1;
 		bit++;
-		
+
 		if(bit == 8) {
 			bit = 0;
 			byte++;
@@ -265,7 +265,7 @@ void x76f100_device::scl_1()
 			}
 		}
 		break;
-		
+
 	case STATE_READ_DATA:
 		if(bit < 8) {
 			if(bit == 0) {

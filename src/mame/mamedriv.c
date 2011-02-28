@@ -3385,7 +3385,7 @@ V-V                           TP-027
 	/* Namco System 10 */
 	DRIVER( mrdrilr2 )	/* 2000.07 Mr Driller 2 (DR21 Ver.A) */
 	DRIVER( mrdrlr2a )      /* 2000.?? Mr Driller 2 (DR22 Ver.A) */
-	DRIVER( ptblank3 ) 	/* 2000.12 Point Blank 3 / Gunbalina */
+	DRIVER( ptblank3 )	/* 2000.12 Point Blank 3 / Gunbalina */
 						/* 2001.02 Photo Battole */
 						/* 2001.02 Taiko no Tatsujin */
 						/* 2001.03 Gahaha Ippatsudou */

@@ -400,7 +400,7 @@ static MACHINE_CONFIG_START( atetrisb2, atetris_state )
 	MCFG_SCREEN_UPDATE(atetris)
 
 	MCFG_VIDEO_START(atetris)
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

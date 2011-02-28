@@ -4222,7 +4222,7 @@ ROM_END
 /*****************************
 
   Brasil XX sets...
- 
+
  ****************************/
 ROM_START( brasil86 )
 	ROM_REGION( 0x10000, "maincpu", 0 )	/* brasil86.128: Brasil 86, BS clone. */

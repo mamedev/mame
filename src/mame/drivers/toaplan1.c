@@ -1820,7 +1820,7 @@ static MACHINE_CONFIG_START( vimana, toaplan1_state )
 	MCFG_PALETTE_LENGTH((64*16)+(64*16))
 
 	MCFG_VIDEO_START(toaplan1)
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

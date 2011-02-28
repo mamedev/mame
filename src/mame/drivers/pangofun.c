@@ -190,8 +190,8 @@ static MACHINE_START( pangofun )
 
 static MACHINE_CONFIG_START( pangofun, driver_device )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I486, 40000000 )	/* I486 ?? Mhz */	
-	MCFG_CPU_PROGRAM_MAP(pcat_map)	
+	MCFG_CPU_ADD("maincpu", I486, 40000000 )	/* I486 ?? Mhz */
+	MCFG_CPU_PROGRAM_MAP(pcat_map)
 	MCFG_CPU_IO_MAP(pcat_io)
 
 	/* video hardware */
@@ -200,8 +200,8 @@ static MACHINE_CONFIG_START( pangofun, driver_device )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
-	MCFG_MACHINE_START(pangofun)		
-	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )	
+	MCFG_MACHINE_START(pangofun)
+	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 	MCFG_FRAGMENT_ADD( pcat_common )
 MACHINE_CONFIG_END
 
@@ -210,8 +210,8 @@ ROM_START(pangofun)
 	ROM_REGION32_LE(0x20000, "bios", 0)	/* motherboard bios */
 	ROM_LOAD("bios.bin", 0x000000, 0x10000, CRC(e70168ff) SHA1(4a0d985c218209b7db2b2d33f606068aae539020) )
 
-//	ROM_REGION32_LE(0x20000, "video_bios", 0)	/* gfx card bios */
-//	ROM_LOAD("vgabios.bin", 0x000000, 0x20000, NO_DUMP ) // 1x maskrom (28pin)
+//  ROM_REGION32_LE(0x20000, "video_bios", 0)   /* gfx card bios */
+//  ROM_LOAD("vgabios.bin", 0x000000, 0x20000, NO_DUMP ) // 1x maskrom (28pin)
 	ROM_REGION(0x20000, "video_bios", 0)	/* Trident TVGA9000 BIOS */
 	ROM_LOAD16_BYTE("prom.vid", 0x00000, 0x04000, CRC(ad7eadaf) SHA1(ab379187914a832284944e81e7652046c7d938cc) )
 	ROM_CONTINUE(				0x00001, 0x04000 )

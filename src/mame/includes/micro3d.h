@@ -17,7 +17,7 @@ class micro3d_state : public driver_device
 public:
 	micro3d_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
-	
+
 	UINT16				*shared_ram;
 	device_t			*duart68681;
 	UINT8				m68681_tx0;

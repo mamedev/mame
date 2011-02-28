@@ -1,6 +1,6 @@
-/* 
-	Commodore Amiga CD-32 and related hardware
-	(Cubo CD32 for arcades)
+/*
+    Commodore Amiga CD-32 and related hardware
+    (Cubo CD32 for arcades)
 
    Driver by Mariusz Wojcieszek
    CD-ROM controller by Ernesto Corvi
@@ -854,7 +854,7 @@ CONS( 1993, cd32,    0,       0,      cd32,   cd32,   cd32,   "Commodore Busines
 /*
 
    Cubo CD32 (additional hardware and games by CD Express, Milan, Italy)
-   
+
    The CuboCD32 is a stock retail CD32 unit with additional hardware to adapt it
    for JAMMA use
 

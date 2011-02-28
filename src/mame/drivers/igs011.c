@@ -978,7 +978,7 @@ static WRITE16_HANDLER( igs011_prot_addr_w )
 /*
 static READ16_HANDLER( igs011_prot_fake_r )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+    igs011_state *state = space->machine->driver_data<igs011_state>();
     switch (offset)
     {
         case 0: return state->prot1;
@@ -1204,7 +1204,7 @@ static WRITE16_HANDLER( igs012_prot_reset_w )
 /*
 static READ16_HANDLER( igs012_prot_fake_r )
 {
-	igs011_state *state = space->machine->driver_data<igs011_state>();
+    igs011_state *state = space->machine->driver_data<igs011_state>();
     switch (offset)
     {
         case 0: return state->igs012_prot;

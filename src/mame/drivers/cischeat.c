@@ -186,7 +186,7 @@ Cisco Heat.
 
 **************************************************************************/
 
-static READ16_HANDLER( sharedram1_r ) 
+static READ16_HANDLER( sharedram1_r )
 {
 	cischeat_state *state = space->machine->driver_data<cischeat_state>();
 	return state->sharedram1[offset];

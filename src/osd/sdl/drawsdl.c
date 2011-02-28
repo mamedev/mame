@@ -89,7 +89,7 @@ struct _sdl_scale_mode
 #if (!SDL_VERSION_ATLEAST(1,3,0))
 	int				extra_flags;		/* Texture/surface flags */
 #else
-	//SDL_ScaleMode	sdl_scale_mode;		/* sdl 1.3 scale mode    */
+	//SDL_ScaleMode sdl_scale_mode;     /* sdl 1.3 scale mode    */
 	int				sdl_scale_mode;		/* got removed recently - trying to get it in again */
 #endif
 	int				pixel_format;		/* Pixel/Overlay format  */

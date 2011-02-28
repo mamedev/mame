@@ -6701,7 +6701,7 @@ M68KMAKE_OP(movec, 32, rc, .)
 						m68k->cacr = REG_DA[(word2 >> 12) & 15] & 0x0f;
 					}
 
-//					logerror("movec to cacr=%04x\n", m68k->cacr);
+//                  logerror("movec to cacr=%04x\n", m68k->cacr);
 					if (m68k->cacr & (M68K_CACR_CI | M68K_CACR_CEI))
 					{
 						m68ki_ic_clear(m68k);

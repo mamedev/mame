@@ -996,7 +996,7 @@ static MACHINE_CONFIG_START( zwackery, mcr68_state )
 	MCFG_PALETTE_LENGTH(4096)
 
 	MCFG_VIDEO_START(zwackery)
-	
+
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(chip_squeak_deluxe)
 MACHINE_CONFIG_END

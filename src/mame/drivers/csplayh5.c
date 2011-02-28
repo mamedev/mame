@@ -234,7 +234,7 @@ static WRITE8_HANDLER( tmpz84c011_pio_w)
 /* CPU interface */
 static READ8_HANDLER( tmpz84c011_0_pa_r )
 {
-	csplayh5_state *state = space->machine->driver_data<csplayh5_state>(); 
+	csplayh5_state *state = space->machine->driver_data<csplayh5_state>();
 	return (tmpz84c011_pio_r(space,0) & ~state->pio_dir[0]) | (state->pio_latch[0] & state->pio_dir[0]);
 }
 

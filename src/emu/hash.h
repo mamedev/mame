@@ -73,11 +73,11 @@ class hash_base
 public:
     // construction/destruction
     hash_base(char id, const char *name, UINT8 length, UINT8 *bufptr);
-    
+
     // operators
     bool operator==(const hash_base &rhs) const { return (m_length == rhs.m_length && memcmp(m_bufptr, rhs.m_bufptr, m_length) == 0); }
     bool operator!=(const hash_base &rhs) const { return (m_length != rhs.m_length || memcmp(m_bufptr, rhs.m_bufptr, m_length) != 0); }
-    
+
     // getters
     hash_base *next() const { return m_next; }
     char id() const { return m_id; }
@@ -86,24 +86,24 @@ public:
     bool in_progress() const { return m_in_progress; }
     bool parse_error() const { return m_parse_error; }
     UINT8 byte(int index) const { return (index >= 0 && index < m_length) ? m_bufptr[index] : 0; }
-    
+
     // buffer conversion
     const UINT8 *buffer() { return m_bufptr; }
     bool from_buffer(const UINT8 *buffer, int buflen);
-    
+
     // string conversion
     const char *string(astring &buffer);
     bool from_string(const char *&string,  int length);
-    
+
     // creation
     virtual void begin() = 0;
     virtual void buffer(const UINT8 *data, UINT32 length) = 0;
     virtual void end() = 0;
-   
+
 protected:
 	// internal helpers
     int fromhex(char c);
-    
+
     // internal state
     hash_base *		m_next;
     const char *	m_name;
@@ -125,12 +125,12 @@ public:
 	static const char HASH_CRC = 'R';
 	static const char HASH_MD5 = 'M';
 	static const char HASH_SHA1 = 'S';
-	
+
 	// common combinations for requests
 	static const char *HASH_TYPES_CRC;
 	static const char *HASH_TYPES_CRC_SHA1;
 	static const char *HASH_TYPES_ALL;
-	
+
 	// flags are identified by punctuation marks
 	static const char FLAG_NO_DUMP = '!';
 	static const char FLAG_BAD_DUMP = '^';
@@ -140,7 +140,7 @@ public:
     hash_collection(const char *string);
     hash_collection(const hash_collection &src);
     ~hash_collection();
-    
+
     // operators
     hash_collection &operator=(const hash_collection &src);
     bool operator==(const hash_collection &rhs) const;
@@ -158,16 +158,16 @@ public:
 	hash_base *add_from_buffer(char type, const UINT8 *buffer, int bufflen);
 	hash_base *add_from_string(char type, const char *buffer, int length);
 	bool remove(char type);
-	
+
 	// CRC-specific helpers
 	bool crc(UINT32 &result);
 	hash_base *add_crc(UINT32 crc);
 
-	// string conversion    
+	// string conversion
     const char *internal_string(astring &buffer) const;
     const char *macro_string(astring &buffer) const;
     bool from_internal_string(const char *string);
-    
+
 	// creation
     void begin(const char *types = NULL);
     void buffer(const UINT8 *data, UINT32 length);
@@ -181,7 +181,7 @@ private:
 
 	// internal state
 	astring					m_flags;
-    simple_list<hash_base> 	m_hashlist;
+    simple_list<hash_base>	m_hashlist;
 };
 
 

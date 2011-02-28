@@ -142,9 +142,9 @@ struct _SLOT
 #define SCILV1(aica)    	((aica->udata.data[0xac/2]>>0x0)&0xff)
 #define SCILV2(aica)    	((aica->udata.data[0xb0/2]>>0x0)&0xff)
 
-#define MCIEB(aica)    	((aica->udata.data[0xb4/2]>>0x0)&0xff)
-#define MCIPD(aica)    	((aica->udata.data[0xb8/2]>>0x0)&0xff)
-#define MCIRE(aica)    	((aica->udata.data[0xbc/2]>>0x0)&0xff)
+#define MCIEB(aica) 	((aica->udata.data[0xb4/2]>>0x0)&0xff)
+#define MCIPD(aica) 	((aica->udata.data[0xb8/2]>>0x0)&0xff)
+#define MCIRE(aica) 	((aica->udata.data[0xbc/2]>>0x0)&0xff)
 
 #define SCIEX0	0
 #define SCIEX1	1
@@ -880,7 +880,7 @@ static void AICA_UpdateRegR(aica_state *AICA, int reg)
 				struct _SLOT *slot=AICA->Slots+slotnum;
 				unsigned int CA = 0;
 
-				if (PCMS(slot) == 0)   	// 16-bit samples
+				if (PCMS(slot) == 0)	// 16-bit samples
 				{
 					CA = (slot->cur_addr>>(SHIFT-1))&AICA->RAM_MASK16;
 				}

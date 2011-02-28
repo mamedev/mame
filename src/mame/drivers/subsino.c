@@ -1124,19 +1124,19 @@ static ADDRESS_MAP_START( mtrainnv_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0d004, 0x0d004 ) AM_READ_PORT( "SW4" )
 	AM_RANGE( 0x0d005, 0x0d005 ) AM_READ_PORT( "INB" )
 	AM_RANGE( 0x0d006, 0x0d006 ) AM_READ_PORT( "INA" )
-//	AM_RANGE( 0x0d008, 0x0d008 ) AM_READWRITE
-//	AM_RANGE( 0x0d009, 0x0d009 ) AM_WRITE
-//	AM_RANGE( 0x0d00a, 0x0d00a ) AM_WRITE
-//	AM_RANGE( 0x0d00b, 0x0d00b ) AM_WRITE
+//  AM_RANGE( 0x0d008, 0x0d008 ) AM_READWRITE
+//  AM_RANGE( 0x0d009, 0x0d009 ) AM_WRITE
+//  AM_RANGE( 0x0d00a, 0x0d00a ) AM_WRITE
+//  AM_RANGE( 0x0d00b, 0x0d00b ) AM_WRITE
 	AM_RANGE( 0x0d00c, 0x0d00c ) AM_READ_PORT( "INC" )
 
 	AM_RANGE( 0x0d010, 0x0d013 ) AM_WRITE(colordac_w)
 
-//	AM_RANGE( 0x0d012, 0x0d012 ) AM_WRITE
+//  AM_RANGE( 0x0d012, 0x0d012 ) AM_WRITE
 
 	AM_RANGE( 0x0d016, 0x0d017 ) AM_DEVWRITE( "ymsnd", ym3812_w )
 
-//	AM_RANGE( 0x0d018, 0x0d018 ) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+//  AM_RANGE( 0x0d018, 0x0d018 ) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 
 	AM_RANGE( 0x0e000, 0x0e7ff ) AM_RAM_WRITE( subsino_colorram_w ) AM_BASE( &colorram )
 	AM_RANGE( 0x0e800, 0x0efff ) AM_RAM_WRITE( subsino_videoram_w ) AM_BASE( &videoram )
@@ -2668,7 +2668,7 @@ static MACHINE_CONFIG_START( srider, driver_device )
 	MCFG_PALETTE_INIT(subsino_3proms)
 
 	MCFG_VIDEO_START(subsino)
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -3628,7 +3628,7 @@ static DRIVER_INIT( mtrainnv )
 GAMEL( 1990, victor21,  0,        victor21, victor21, victor21, ROT0, "Subsino / Buffy", "Victor 21",                            0,               layout_victor21 )
 GAMEL( 1991, victor5,   0,        victor5,  victor5,  victor5,  ROT0, "Subsino",         "G.E.A.",                               0,               layout_victor5  )	// PCB black-box was marked 'victor 5' - in-game says G.E.A with no manufacturer info?
 GAMEL( 1992, tisub,     0,        tisub,    tisub,    tisub,    ROT0, "Subsino",         "Treasure Island (Subsino, set 1)",     0,               layout_tisub    )
-GAMEL( 1992, tisuba,    tisub,    tisub,    tisub,    tisuba,   ROT0, "Subsino",         "Treasure Island (Subsino, set 2)",     0,               layout_tisub    ) 
+GAMEL( 1992, tisuba,    tisub,    tisub,    tisub,    tisuba,   ROT0, "Subsino",         "Treasure Island (Subsino, set 2)",     0,               layout_tisub    )
 GAMEL( 1991, crsbingo,  0,        crsbingo, crsbingo, crsbingo, ROT0, "Subsino",         "Poker Carnival",                       0,               layout_crsbingo )
 GAMEL( 1995, stisub,    0,        stisub,   stisub,   stisub,   ROT0, "American Alpha",  "Treasure Bonus (Subsino)",             0,               layout_stisub   )	// board CPU module marked 'Super Treasure Island' (alt title?)
 GAMEL( 1996, sharkpy,   0,        sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.3)",            0,               layout_sharkpy  )	// missing POST messages?

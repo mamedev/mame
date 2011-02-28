@@ -156,11 +156,11 @@ static WRITE8_HANDLER( gunpey_blitter_w )
 		}
 
 
-//		printf("%02x %02x %02x %02x|%02x %02x %02x %02x|%02x %02x %02x %02x|%02x %02x %02x %02x\n"
-//		,blit_ram[0],blit_ram[1],blit_ram[2],blit_ram[3]
-//		,blit_ram[4],blit_ram[5],blit_ram[6],blit_ram[7]
-//		,blit_ram[8],blit_ram[9],blit_ram[0xa],blit_ram[0xb]
-//		,blit_ram[0xc],blit_ram[0xd],blit_ram[0xe],blit_ram[0xf]);
+//      printf("%02x %02x %02x %02x|%02x %02x %02x %02x|%02x %02x %02x %02x|%02x %02x %02x %02x\n"
+//      ,blit_ram[0],blit_ram[1],blit_ram[2],blit_ram[3]
+//      ,blit_ram[4],blit_ram[5],blit_ram[6],blit_ram[7]
+//      ,blit_ram[8],blit_ram[9],blit_ram[0xa],blit_ram[0xb]
+//      ,blit_ram[0xc],blit_ram[0xd],blit_ram[0xe],blit_ram[0xf]);
 	}
 }
 

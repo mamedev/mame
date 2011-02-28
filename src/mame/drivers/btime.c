@@ -1545,7 +1545,7 @@ static MACHINE_CONFIG_DERIVED( cookrace, btime )
 	/* video hardware */
 	MCFG_GFXDECODE(cookrace)
 	MCFG_PALETTE_LENGTH(16)
-	
+
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE(cookrace)
 MACHINE_CONFIG_END

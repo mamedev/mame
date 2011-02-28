@@ -34,24 +34,24 @@
 											const int wetvol_r,
 											const unsigned int _sz);
 		void comb_allpass4(signed short *sp,
-					 						 signed short *dp,
-					 						 const comb_param &comb_delay,
-					 						 const int comb_gain,
-					 						 const int allpass_delay,
-					 						 const int allpass_gain,
-					 						 const int *rvol,
-					 						 const unsigned int sz);
+											 signed short *dp,
+											 const comb_param &comb_delay,
+											 const int comb_gain,
+											 const int allpass_delay,
+											 const int allpass_gain,
+											 const int *rvol,
+											 const unsigned int sz);
 		void comb_allpass1(signed short *sp,
-					 						 signed short *dp,
-					 						 const comb_param &comb_delay,
-					 						 const int comb_gain,
-					 						 const int allpass_delay,
-					 						 const int allpass_gain,
-					 						 const int *rvol,
-					 						 const unsigned int sz);
+											 signed short *dp,
+											 const comb_param &comb_delay,
+											 const int comb_gain,
+											 const int allpass_delay,
+											 const int allpass_gain,
+											 const int *rvol,
+											 const unsigned int sz);
 		void bandpass(signed short *sp,
-					 				const reverb_params *rp,
-					 				const unsigned int sz);
+									const reverb_params *rp,
+									const unsigned int sz);
 
 	public:
 		reverb(const int hz, const int maxdelay=65536);

@@ -458,7 +458,7 @@ void video_manager::begin_recording(const char *name, movie_format format)
 			filerr = m_mngfile->open(name);
 		else
 			filerr = open_next(*m_mngfile, "mng");
-			
+
 		if (filerr == FILERR_NONE)
 		{
 			// start the capture
@@ -1096,7 +1096,7 @@ void video_manager::create_snapshot_bitmap(device_t *screen)
 
 //-------------------------------------------------
 //  open_next - open the next non-existing file of
-//  type filetype according to our numbering 
+//  type filetype according to our numbering
 //  scheme
 //-------------------------------------------------
 

@@ -533,7 +533,7 @@ WRITE32_HANDLER( psx_dma_w )
 			p_psx->n_dicr = ( p_psx->n_dicr & ( 0x80000000 | ~mem_mask ) ) |
 				( p_psx->n_dicr & ~data & 0x7f000000 & mem_mask ) |
 				( data & 0x00ffffff & mem_mask );
-		
+
 			if( ( p_psx->n_dicr & 0x80000000 ) != 0 && ( p_psx->n_dicr & 0x7f000000 ) == 0 )
 			{
 				verboselog( p_psx, 2, "dma interrupt cleared\n" );

@@ -672,7 +672,7 @@ static MACHINE_CONFIG_DERIVED( fspider, jollyjgr )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(fspider_map)
-	
+
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE(fspider)
 

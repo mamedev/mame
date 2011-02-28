@@ -169,7 +169,7 @@ READ8_DEVICE_HANDLER( rf5c68_r )
 	chip->stream->update();
 	shift = (offset & 1) ? 11 + 8 : 11;
 
-//	printf("%08x\n",(chip->chan[(offset & 0x0e) >> 1].addr));
+//  printf("%08x\n",(chip->chan[(offset & 0x0e) >> 1].addr));
 
 	return (chip->chan[(offset & 0x0e) >> 1].addr) >> (shift);
 }

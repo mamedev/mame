@@ -334,11 +334,11 @@ static READ8_HANDLER( iox_status_r )
 static WRITE8_HANDLER( iox_command_w )
 {
 	/*
-	bit wise command port apparently
-	0x01: selects both sides
-	0x02: selects p1 side
-	0x04: selects p2 side
-	*/
+    bit wise command port apparently
+    0x01: selects both sides
+    0x02: selects p1 side
+    0x04: selects p2 side
+    */
 
 	iox_mux = data;
 	iox_ff = 0; // this also set flip flop back to 0
@@ -1542,13 +1542,13 @@ ROM_END
 
 
 
-GAME( 1987, srmp1,     0,        srmp2,    srmp2,    0,       ROT0, "Seta",  				"Super Real Mahjong Part 1 (Japan)",  0 )
-GAME( 1987, srmp2,     0,        srmp2,    srmp2,    0,       ROT0, "Seta",  				"Super Real Mahjong Part 2 (Japan)",  0 )
-GAME( 1988, srmp3,     0,        srmp3,    srmp3,    0,       ROT0, "Seta",  				"Super Real Mahjong Part 3 (Japan)",  0 )
+GAME( 1987, srmp1,     0,        srmp2,    srmp2,    0,       ROT0, "Seta", 				"Super Real Mahjong Part 1 (Japan)",  0 )
+GAME( 1987, srmp2,     0,        srmp2,    srmp2,    0,       ROT0, "Seta", 				"Super Real Mahjong Part 2 (Japan)",  0 )
+GAME( 1988, srmp3,     0,        srmp3,    srmp3,    0,       ROT0, "Seta", 				"Super Real Mahjong Part 3 (Japan)",  0 )
 GAME( 1988, rmgoldyh,  srmp3,    rmgoldyh, rmgoldyh, 0,       ROT0, "Seta (Alba license)",	"Real Mahjong Gold Yumehai / Super Real Mahjong GOLD part.2 [BET] (Japan)",  0 )
-GAME( 1990, mjyuugi,   0,        mjyuugi,  mjyuugi,  0,       ROT0, "Visco", 				"Mahjong Yuugi (Japan set 1)",        0 )
-GAME( 1990, mjyuugia,  mjyuugi,  mjyuugi,  mjyuugi,  0,       ROT0, "Visco", 				"Mahjong Yuugi (Japan set 2)",        0 )
-GAME( 1991, ponchin,   0,        mjyuugi,  ponchin,  0,       ROT0, "Visco", 				"Mahjong Pon Chin Kan (Japan set 1)", 0 )
-GAME( 1991, ponchina,  ponchin,  mjyuugi,  ponchin,  0,       ROT0, "Visco", 				"Mahjong Pon Chin Kan (Japan set 2)", 0 )
+GAME( 1990, mjyuugi,   0,        mjyuugi,  mjyuugi,  0,       ROT0, "Visco",				"Mahjong Yuugi (Japan set 1)",        0 )
+GAME( 1990, mjyuugia,  mjyuugi,  mjyuugi,  mjyuugi,  0,       ROT0, "Visco",				"Mahjong Yuugi (Japan set 2)",        0 )
+GAME( 1991, ponchin,   0,        mjyuugi,  ponchin,  0,       ROT0, "Visco",				"Mahjong Pon Chin Kan (Japan set 1)", 0 )
+GAME( 1991, ponchina,  ponchin,  mjyuugi,  ponchin,  0,       ROT0, "Visco",				"Mahjong Pon Chin Kan (Japan set 2)", 0 )
 
 

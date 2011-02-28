@@ -4308,8 +4308,8 @@ ROM_START( ddp3blk )
 ROM_END
 
 /* this is on PGM2, the main board contains 2 custom ASICs, no roms or other kind of bios, I don't know how compatible the
-   hardware is otherwise, but I imagine it's well protected 
-   
+   hardware is otherwise, but I imagine it's well protected
+
    they appear to have the main program inside a custom ASIC (probably ARM again) as the carts will boot to 'PROGRAM ERROR'
    even if you strip them of program roms.
 

@@ -163,17 +163,17 @@ static WRITE8_HANDLER(port_w)
 
 static WRITE8_HANDLER(port0_w)
 {
-//	printf("P0 %x = %x\n",cpu_get_pc(space->cpu),data);
+//  printf("P0 %x = %x\n",cpu_get_pc(space->cpu),data);
 }
 
 static WRITE8_HANDLER(port1_w)
 {
-//	printf("P1 %x = %x\n",cpu_get_pc(space->cpu),data);
+//  printf("P1 %x = %x\n",cpu_get_pc(space->cpu),data);
 }
 
 static WRITE8_HANDLER(port2_w)
 {
-//	printf("P2 %x = %x\n",cpu_get_pc(space->cpu),data);
+//  printf("P2 %x = %x\n",cpu_get_pc(space->cpu),data);
 	coordy=data;
 }
 

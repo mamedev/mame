@@ -1212,9 +1212,9 @@ Notes:
           U* - Fujitsu MBM29PL12LM-10PCN 128M MirrorFlash TSOP56 flash ROM.
                (configured as 16Mbytes x8bit or 8Mwords x16bit)
                This ROM has no additional custom markings. The name in the archive has been devised
-               purely for convenience using the Sega 837- sticker number. The number of ROMs may vary 
-               between games. So far all 8 positions have been seen populated. It's also possible all 
-               positions are present when manufactured, each board is programmed to requirements and 
+               purely for convenience using the Sega 837- sticker number. The number of ROMs may vary
+               between games. So far all 8 positions have been seen populated. It's also possible all
+               positions are present when manufactured, each board is programmed to requirements and
                depending on the total data length, some ROMs may be empty.
 
 
@@ -1223,10 +1223,10 @@ Network Board
 -------------
 
 This board is required for Extreme Hunting 2 Tournament Edition (and possibly some other Sega-made Atomiswave carts)
-although it doesn't need to be connected to a network or another Atomiswave unit to boot up. However it must be 
-plugged into the PCB in the communication slot or the game will not go in-game. It will boot but then displays 
-NETWORK BOARD ERROR if not present. Externally there's a hole for an RJ45 network cable and a slot for a 
-PIC16C621/PIC16C622 PIC enclosed in a black plastic housing. This is the same type as used in NAOMI etc. This 
+although it doesn't need to be connected to a network or another Atomiswave unit to boot up. However it must be
+plugged into the PCB in the communication slot or the game will not go in-game. It will boot but then displays
+NETWORK BOARD ERROR if not present. Externally there's a hole for an RJ45 network cable and a slot for a
+PIC16C621/PIC16C622 PIC enclosed in a black plastic housing. This is the same type as used in NAOMI etc. This
 board probably acts like the NAOMI network DIMM board minus the on-board DIMM RAM storage.
 
 837-14508R
@@ -6045,7 +6045,7 @@ ROM_START( initdv2j )
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	//PIC16C622A (317-0345-JPN)
 	//(sticker 253-5508-0345J)
-	ROM_LOAD( "317-0345-jpn.pic", 0x000000, 0x004000, CRC(56e1274a) SHA1(735a6071226f3297de64bc0a38be741e87f5d023) ) 
+	ROM_LOAD( "317-0345-jpn.pic", 0x000000, 0x004000, CRC(56e1274a) SHA1(735a6071226f3297de64bc0a38be741e87f5d023) )
 ROM_END
 
 ROM_START( initdv2jo )
@@ -6071,7 +6071,7 @@ ROM_START( initdv2e )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	//PIC16C622A (317-0357-EXP)
-	ROM_LOAD( "317-0357-exp.pic", 0x000000, 0x004000, CRC(38f84b4d) SHA1(03c12d8580da1a4b3a554e62fd8b1f3447b7ebbd) ) 
+	ROM_LOAD( "317-0357-exp.pic", 0x000000, 0x004000, CRC(38f84b4d) SHA1(03c12d8580da1a4b3a554e62fd8b1f3447b7ebbd) )
 ROM_END
 
 ROM_START( initdv3j )
@@ -7197,14 +7197,14 @@ ROM_START( ggx15 )
 	AW_BIOS
 
 	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
-        ROM_LOAD( "ax0801p01.ic18", 0x0000000, 0x0800000, CRC(d920c6bb) SHA1(ab34bbef3c71396447bc5322d8e8786041fc832a) ) 
-        ROM_LOAD( "ax0801m01.ic11", 0x1000000, 0x1000000, CRC(61879b2d) SHA1(9592fbd979cef9d8f465cd92d0f00b9c13ecf7ba) ) 
-        ROM_LOAD( "ax0802m01.ic12", 0x2000000, 0x1000000, CRC(c0ff124d) SHA1(dd403d10de2f097fbaa6b93bc311e2b9e893828d) ) 
-        ROM_LOAD( "ax0803m01.ic13", 0x3000000, 0x1000000, CRC(4400c89a) SHA1(4e13536c01103ecfbfc9e3e33746ceae7a91a520) ) 
-        ROM_LOAD( "ax0804m01.ic14", 0x4000000, 0x1000000, CRC(70f58ab4) SHA1(cd2def19bbad945c87567f8d28f3a2a179a7f7f6) ) 
-        ROM_LOAD( "ax0805m01.ic15", 0x5000000, 0x1000000, CRC(72740e45) SHA1(646eded89f10008c9176cd6772a8ac9d1bf4271a) ) 
-        ROM_LOAD( "ax0806m01.ic16", 0x6000000, 0x1000000, CRC(3bf8ecba) SHA1(43e7fbf21d8ee60bab72ce558640730fd9c3e3b8) ) 
-        ROM_LOAD( "ax0807m01.ic17", 0x7000000, 0x1000000, CRC(e397dd79) SHA1(5fec32dc19dd71ef0d451f8058186f998015723b) ) 
+        ROM_LOAD( "ax0801p01.ic18", 0x0000000, 0x0800000, CRC(d920c6bb) SHA1(ab34bbef3c71396447bc5322d8e8786041fc832a) )
+        ROM_LOAD( "ax0801m01.ic11", 0x1000000, 0x1000000, CRC(61879b2d) SHA1(9592fbd979cef9d8f465cd92d0f00b9c13ecf7ba) )
+        ROM_LOAD( "ax0802m01.ic12", 0x2000000, 0x1000000, CRC(c0ff124d) SHA1(dd403d10de2f097fbaa6b93bc311e2b9e893828d) )
+        ROM_LOAD( "ax0803m01.ic13", 0x3000000, 0x1000000, CRC(4400c89a) SHA1(4e13536c01103ecfbfc9e3e33746ceae7a91a520) )
+        ROM_LOAD( "ax0804m01.ic14", 0x4000000, 0x1000000, CRC(70f58ab4) SHA1(cd2def19bbad945c87567f8d28f3a2a179a7f7f6) )
+        ROM_LOAD( "ax0805m01.ic15", 0x5000000, 0x1000000, CRC(72740e45) SHA1(646eded89f10008c9176cd6772a8ac9d1bf4271a) )
+        ROM_LOAD( "ax0806m01.ic16", 0x6000000, 0x1000000, CRC(3bf8ecba) SHA1(43e7fbf21d8ee60bab72ce558640730fd9c3e3b8) )
+        ROM_LOAD( "ax0807m01.ic17", 0x7000000, 0x1000000, CRC(e397dd79) SHA1(5fec32dc19dd71ef0d451f8058186f998015723b) )
 ROM_END
 
 ROM_START( rumblef2 )
@@ -7212,12 +7212,12 @@ ROM_START( rumblef2 )
 	AW_BIOS
 
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE)
-	ROM_LOAD( "ax3401p01.fmem1", 0x0000000, 0x0800000, CRC(a33601cf) SHA1(2dd60a9c3a2517f2257ab69288fa95645de133fa) ) 
-	ROM_LOAD( "ax3401m01.mrom1", 0x1000000, 0x2000000, CRC(60894d4c) SHA1(5b21af3c7c82d4d64bfd8498c26283111ada1298) ) 
-	ROM_LOAD( "ax3402m01.mrom2", 0x3000000, 0x2000000, CRC(e4224cc9) SHA1(dcab06fcf48cda286f93d2b37f03a83abf3230cb) ) 
-	ROM_LOAD( "ax3403m01.mrom3", 0x5000000, 0x2000000, CRC(081c0edb) SHA1(63a3f1b5f9d7ca4367868c492236406f23996cc3) ) 
-	ROM_LOAD( "ax3404m01.mrom4", 0x7000000, 0x2000000, CRC(a426b443) SHA1(617aab42e432a80b0663281fb7faa6c14ef4f149) ) 
-	ROM_LOAD( "ax3405m01.mrom5", 0x9000000, 0x2000000, CRC(4766ce56) SHA1(349b82013a75905ae5520b14a87702c9038a5def) ) 
+	ROM_LOAD( "ax3401p01.fmem1", 0x0000000, 0x0800000, CRC(a33601cf) SHA1(2dd60a9c3a2517f2257ab69288fa95645de133fa) )
+	ROM_LOAD( "ax3401m01.mrom1", 0x1000000, 0x2000000, CRC(60894d4c) SHA1(5b21af3c7c82d4d64bfd8498c26283111ada1298) )
+	ROM_LOAD( "ax3402m01.mrom2", 0x3000000, 0x2000000, CRC(e4224cc9) SHA1(dcab06fcf48cda286f93d2b37f03a83abf3230cb) )
+	ROM_LOAD( "ax3403m01.mrom3", 0x5000000, 0x2000000, CRC(081c0edb) SHA1(63a3f1b5f9d7ca4367868c492236406f23996cc3) )
+	ROM_LOAD( "ax3404m01.mrom4", 0x7000000, 0x2000000, CRC(a426b443) SHA1(617aab42e432a80b0663281fb7faa6c14ef4f149) )
+	ROM_LOAD( "ax3405m01.mrom5", 0x9000000, 0x2000000, CRC(4766ce56) SHA1(349b82013a75905ae5520b14a87702c9038a5def) )
 	ROM_COPY( "user1", 0x9000000, 0xb000000, 0x2000000)
 ROM_END
 

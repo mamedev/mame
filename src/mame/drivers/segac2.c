@@ -228,8 +228,8 @@ static WRITE16_HANDLER( palette_w )
 	megadrive_vdp_palette_lookup_shadow[offset] = (tmpb) | (tmpg << 5) | (tmpr << 10);
 
 	// how is it calculated on c2?
-	tmpr = tmpr | 0x10;	
-	tmpg = tmpg | 0x10;	
+	tmpr = tmpr | 0x10;
+	tmpg = tmpg | 0x10;
 	tmpb = tmpb | 0x10;
 	megadrive_vdp_palette_lookup_highlight[offset] = (tmpb) | (tmpg << 5) | (tmpr << 10);
 }

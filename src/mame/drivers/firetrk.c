@@ -951,7 +951,7 @@ static MACHINE_CONFIG_DERIVED( montecar, firetrk )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE(montecar)
-	
+
 	MCFG_VIDEO_START(montecar)
 	MCFG_GFXDECODE(montecar)
 

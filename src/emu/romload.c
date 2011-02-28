@@ -461,7 +461,7 @@ static void dump_wrong_and_correct_checksums(rom_load_data *romdata, const hash_
 	romdata->errorstring.catprintf("    EXPECTED: %s\n", hashes.macro_string(tempstr));
 	romdata->errorstring.catprintf("       FOUND: %s\n", acthashes.macro_string(tempstr));
 
-	// warn about any ill-formed hashes	
+	// warn about any ill-formed hashes
 	for (hash_base *hash = hashes.first(); hash != NULL; hash = hash->next())
 		if (hash->parse_error())
 		{

@@ -456,7 +456,7 @@ static const char *get_merge_name(const hash_collection &romhashes, int parents,
 {
 	int parent;
 	const char *merge_name = NULL;
-	
+
 	for (parent = 0; parent < parents; ++parent)
 	{
 		const machine_config *pconfig = &pinfoarray[parent]->mconfig;
@@ -1054,7 +1054,7 @@ static void print_game_info(FILE *out, const game_driver *game)
 			input_port_list_init(portlist, cfg->input_ports(), NULL, 0, FALSE, cfg);
 		}
 	}
-	
+
 	/* print the header and the game name */
 	fprintf(out, "\t<" XML_TOP);
 	fprintf(out, " name=\"%s\"", xml_normalize_string(game->name) );

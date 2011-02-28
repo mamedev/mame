@@ -450,7 +450,7 @@ static MACHINE_CONFIG_START( bwing, bwing_state )
 	MCFG_PALETTE_LENGTH(64)
 
 	MCFG_VIDEO_START(bwing)
-	
+
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

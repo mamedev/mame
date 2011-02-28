@@ -1138,7 +1138,7 @@ static MACHINE_CONFIG_START( cosmicg, cosmic_state )
 
 	MCFG_PALETTE_LENGTH(16)
 
-	MCFG_PALETTE_INIT(cosmicg)	
+	MCFG_PALETTE_INIT(cosmicg)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

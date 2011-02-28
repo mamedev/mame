@@ -213,8 +213,8 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			zoomy = zoomylatch;
 
 			/* Note: like taito_f2.c, this zoom implementation is wrong,
-			chopped up into 16x16 sections instead of one sprite. This
-			is especially visible in rambo3. */
+            chopped up into 16x16 sections instead of one sprite. This
+            is especially visible in rambo3. */
 
 			x = xlatch + (x_no * (0xff - zoomx) + 15) / 16;
 			y = ylatch + (y_no * (0xff - zoomy) + 15) / 16;

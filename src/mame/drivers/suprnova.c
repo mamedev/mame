@@ -33,7 +33,7 @@ video:   Sprite Zooming - the current algorithm is leaving gaps, most noticable 
 
 video:   Sprite positions still kludged slightly (see skns_sprite_kludge)
 
-general: bios is still being skipped, gets stuck at last bios screen if we run it (see #define BIOS_SKIP)   
+general: bios is still being skipped, gets stuck at last bios screen if we run it (see #define BIOS_SKIP)
 
 ------------------
 

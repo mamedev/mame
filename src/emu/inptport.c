@@ -1003,7 +1003,7 @@ time_t input_port_init(running_machine *machine, const input_port_token *tokens,
 		if (config->input_ports()!=NULL) {
 			input_port_list_init(machine->m_portlist, config->input_ports(), errorbuf, sizeof(errorbuf), TRUE, config);
 			if (errorbuf[0] != 0)
-				mame_printf_error("Input port errors:\n%s", errorbuf);			
+				mame_printf_error("Input port errors:\n%s", errorbuf);
 		}
 	}
 
@@ -2937,7 +2937,7 @@ static void port_config_detokenize(ioport_list &portlist, const input_port_token
 					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
 				maskbits = 0;
 
-				string = TOKEN_GET_STRING(ipt);								
+				string = TOKEN_GET_STRING(ipt);
 				if (owner!=NULL) {
 					fulltag = core_strdup(owner->subtag(tempstring, string));
 				} else {

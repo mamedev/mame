@@ -104,7 +104,7 @@
   frequency register, while the others have 0x400 as before. Should fix a bug
   or two on sega games, particularly Vigilante on Sega Master System. Verified
   on SMS hardware.
-  
+
   TODO: * Implement the TMS9919 - any difference to sn94624?
         * Implement the T6W28; has registers in a weird order, needs writes
           to be 'sanitized' first. Also is stereo, similar to game gear.

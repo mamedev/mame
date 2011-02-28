@@ -465,7 +465,7 @@ static void birdtry_i8751_write(running_machine *machine, int data)
 		case 0x20d: hgt = 0x280;			break; /*|*/
 		case 0x20e: hgt = 0x240;			break; /*|*/
 		case 0x20f: hgt = 0x200;			break; /*L*/
-		case 0x534: state->i8751_return = hgt; 	break; /*Shot height*/
+		case 0x534: state->i8751_return = hgt;	break; /*Shot height*/
 
 		/*At the ending screen(???)*/
 		//case 0x3b4: state->i8751_return = 0;       break;

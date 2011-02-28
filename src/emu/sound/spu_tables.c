@@ -455,7 +455,7 @@ spu_device::reverb_preset spu_device::reverb_presets[]=
 			0x0334, 0x01B5, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 			0x0000, 0x0000, 0x01B4, 0x0136, 0x00B8, 0x005C, 0x8000, 0x8000
 		},
-		{ // made up from studio small		[used by BOF3]
+		{ // made up from studio small      [used by BOF3]
 			-0.3112f,
 			0.7832f,
 
@@ -476,7 +476,7 @@ spu_device::reverb_preset spu_device::reverb_presets[]=
 			0x031C, 0x025D, 0x025C, 0x018E, 0x022F, 0x0135, 0x01D2, 0x00B7,
 			0x018F, 0x00B5, 0x00B4, 0x0080, 0x004C, 0x0026, 0x8000, 0x8000
 		},
-		{ // made up from studio large		[used by Fighters Impact]
+		{ // made up from studio large      [used by Fighters Impact]
 			-0.3112f,
 			0.7832f,
 

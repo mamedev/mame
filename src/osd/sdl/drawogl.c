@@ -2091,21 +2091,21 @@ static int texture_shader_create(sdl_window_info *window,
      *
      * Shape the lut texture to achieve texture max size compliance and equal 2D partitioning
      */
-	
+
 	if ( texture->format == SDL_TEXFORMAT_PALETTE16 )
 	{
 		lut_texture_width  = sqrt((double)(texture->lut_table_width));
 		lut_texture_width  = get_valid_pow2_value (lut_texture_width, 1);
-		
+
 		texture->lut_table_height = texture->lut_table_width / lut_texture_width;
-		
+
 		if ( lut_texture_width*texture->lut_table_height < texture->lut_table_width )
 		{
 			texture->lut_table_height  += 1;
 		}
-		
+
 		texture->lut_table_width   = lut_texture_width;
-	} 
+	}
 	else
 	{
 		lut_texture_width = texture->lut_table_width;

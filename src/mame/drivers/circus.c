@@ -30,16 +30,16 @@ A000      Control Switches
 C000      Option Switches
 D000      Paddle Position and Interrupt Reset (where applicable)
 
-	NOTES:
-	- Circus: Taito licensed and releasd the game as "Acrobat TV"
+    NOTES:
+    - Circus: Taito licensed and releasd the game as "Acrobat TV"
 
-	TODO:
-	- generic video timing (vsync, vblank, # of scanlines)
-	- circus/ripcord collision detection:
-	  * is accurate?
-	  * move away from video update (fails with frameskipping)
-	- crash: irq timing
-	- improve discrete sound
+    TODO:
+    - generic video timing (vsync, vblank, # of scanlines)
+    - circus/ripcord collision detection:
+      * is accurate?
+      * move away from video update (fails with frameskipping)
+    - crash: irq timing
+    - improve discrete sound
 
 ***************************************************************************/
 
@@ -88,7 +88,7 @@ static INPUT_PORTS_START( circus )
 	PORT_DIPSETTING(	0x02, "7" )
 	PORT_DIPSETTING(	0x03, "9" )
 	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Coinage ) ) PORT_DIPLOCATION("14A:4,5")
-//	PORT_DIPSETTING(	0x08, DEF_STR( 2C_1C ) )
+//  PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(	0x0c, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(	0x04, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( 1C_2C ) )
@@ -127,7 +127,7 @@ static INPUT_PORTS_START( robotbwl )
 	PORT_DIPSETTING(	0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(	0x08, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( 1C_2C ) )
-//	PORT_DIPSETTING(	0x18, DEF_STR( 1C_2C ) )
+//  PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
 	PORT_DIPNAME( 0x60, 0x00, "Bowl Timer" ) PORT_DIPLOCATION("14A:1,2")
 	PORT_DIPSETTING(	0x00, "3 seconds" )
 	PORT_DIPSETTING(	0x20, "5 seconds" )
@@ -158,7 +158,7 @@ static INPUT_PORTS_START( crash )
 	PORT_DIPSETTING(	0x02, "4" )
 	PORT_DIPSETTING(	0x03, "5" )
 	PORT_DIPNAME( 0x0C, 0x04, DEF_STR( Coinage ) ) PORT_DIPLOCATION("14A:4,5")
-//	PORT_DIPSETTING(	0x0c, DEF_STR( 2C_1C ) )
+//  PORT_DIPSETTING(    0x0c, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(	0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(	0x04, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( 1C_2C ) )
@@ -198,7 +198,7 @@ static INPUT_PORTS_START( ripcord )
 	PORT_DIPSETTING(	0x02, "7" )
 	PORT_DIPSETTING(	0x03, "9" )
 	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Coinage ) ) PORT_DIPLOCATION("14A:4,5")
-//	PORT_DIPSETTING(	0x0c, DEF_STR( 2C_1C ) )
+//  PORT_DIPSETTING(    0x0c, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(	0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(	0x04, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( 1C_2C ) )

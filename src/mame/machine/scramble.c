@@ -597,8 +597,8 @@ DRIVER_INIT( hustlerd )
 	/* the first ROM of the second CPU has data lines D0 and D1 swapped. Decode it. */
 	offs_t A;
 	UINT8 *rom = machine->region("audiocpu")->base();
-		
-		
+
+
 	for (A = 0;A < 0x0800;A++)
 		rom[A] = BITSWAP8(rom[A],7,6,5,4,3,2,0,1);
 }

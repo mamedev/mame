@@ -293,7 +293,7 @@ static void add_info(software_list *swlist, char *feature_name, char *feature_va
 
 	/* First allocate the new entry */
 	new_entry = (feature_list *)pool_malloc_lib(swlist->pool, sizeof(feature_list) );
-	
+
 	if ( new_entry )
 	{
 		new_entry->next = NULL;
@@ -455,7 +455,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 						elem->other_info->name = NULL;
 						elem->other_info->value = NULL;
 					}
-					
+
 					/* Handle the supported flag */
 					elem->supported = SOFTWARE_SUPPORTED_YES;
 					if ( supported && ! strcmp( supported, "partial" ) )
@@ -502,37 +502,37 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 			{
 				const char *str_feature_name = NULL;
 				const char *str_feature_value = NULL;
-				
+
 				for ( ; attributes[0]; attributes += 2 )
 				{
 					if ( !strcmp( attributes[0], "name" ) )
 						str_feature_name = attributes[1];
-					
+
 					if ( !strcmp( attributes[0], "value" ) )
 						str_feature_value = attributes[1];
 				}
-				
+
 				/* Prepare for adding feature to feature list */
 				if ( str_feature_name && swlist->softinfo )
 				{
 					char *name = (char *)pool_malloc_lib(swlist->pool, ( strlen( str_feature_name ) + 1 ) * sizeof(char) );
 					char *value = NULL;
-					
+
 					if ( !name )
 						return;
-					
+
 					strcpy( name, str_feature_name );
-					
+
 					if ( str_feature_value )
 					{
 						value = (char *)pool_malloc_lib(swlist->pool, ( strlen( str_feature_value ) + 1 ) * sizeof(char) );
-						
+
 						if ( !value )
 							return;
-						
+
 						strcpy( value, str_feature_value );
 					}
-					
+
 					add_info( swlist, name, value );
 				}
 			}
@@ -862,7 +862,7 @@ static void end_handler(void *data, const char *name)
 			if ( swlist->softinfo && swlist->softinfo->other_info )
 			{
 				feature_list *list = swlist->softinfo->other_info;
-				
+
 				while( list->next )
 				{
 					add_feature( swlist, list->next->name, list->next->value );

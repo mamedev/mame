@@ -352,7 +352,7 @@ static UINT8 c0,c4,c6,c8;
 static void show_outputs()
 {
 #ifdef MAME_DEBUG
-//	popmessage("0: %02X  4: %02X  6: %02X  8: %02X",c0,c4,c6,c8);
+//  popmessage("0: %02X  4: %02X  6: %02X  8: %02X",c0,c4,c6,c8);
 #endif
 }
 
@@ -605,7 +605,7 @@ static UINT8 out[3];
 static void show_3_outputs()
 {
 #ifdef MAME_DEBUG
-//	popmessage("COIN: %02X  LED: %02X  HOP: %02X", out[0], out[1], out[2]);
+//  popmessage("COIN: %02X  LED: %02X  HOP: %02X", out[0], out[1], out[2]);
 #endif
 }
 // Port 31
@@ -615,9 +615,9 @@ static WRITE8_HANDLER( sammymdl_coin_w )
 	coin_counter_w(space->machine, 1,   data  & 0x02 );	// coin2 in
 	coin_counter_w(space->machine, 2,   data  & 0x04 );	// medal in
 
-//	coin_lockout_w(space->machine, 1, (~data) & 0x08 );	// coin2 lockout?
-//	coin_lockout_w(space->machine, 0, (~data) & 0x10 );	// coin1 lockout
-//	coin_lockout_w(space->machine, 2, (~data) & 0x20 );	// medal lockout?
+//  coin_lockout_w(space->machine, 1, (~data) & 0x08 ); // coin2 lockout?
+//  coin_lockout_w(space->machine, 0, (~data) & 0x10 ); // coin1 lockout
+//  coin_lockout_w(space->machine, 2, (~data) & 0x20 ); // medal lockout?
 
 	out[0] = data;
 	show_3_outputs();
@@ -828,7 +828,7 @@ static READ8_HANDLER( haekaka_b000_r )
 		case 0x65:	// SPRITERAM
 			if (offset < 0x1000)
 				return space->machine->generic.spriteram.u8[offset];
-			
+
 		case 0x67:	// PALETTERAM + TABLE? + REGS
 			if (offset < 0x200)
 				return space->machine->generic.paletteram.u8[offset];
@@ -852,12 +852,12 @@ static WRITE8_HANDLER( haekaka_b000_w )
 				return;
 			}
 			break;
-			
+
 		case 0x67:	// PALETTERAM + TABLE? + REGS
 			if (offset < 0x200)
 			{
 				paletteram_xRRRRRGGGGGBBBBB_be_w(space, offset, data);
-//				space->machine->generic.paletteram.u8[offset] = data;
+//              space->machine->generic.paletteram.u8[offset] = data;
 				return;
 			}
 			else if ((offset >= 0x800) && (offset < 0x880))
@@ -890,9 +890,9 @@ static WRITE8_HANDLER( haekaka_leds_w )
 static WRITE8_HANDLER( haekaka_coin_w )
 {
 	coin_counter_w(space->machine, 0,   data & 0x01 );	// medal out
-//										data & 0x02 ?
-//										data & 0x04 ?
-//										data & 0x10 ?
+//                                      data & 0x02 ?
+//                                      data & 0x04 ?
+//                                      data & 0x10 ?
 
 	out[0] = data;
 	show_3_outputs();
@@ -1331,12 +1331,12 @@ static WRITE8_HANDLER( tdoboon_c000_w )
 				return;
 			}
 			break;
-			
+
 		case 0x66:	// PALETTERAM + TABLE?
 			if (offset < 0x200)
 			{
 				paletteram_xRRRRRGGGGGBBBBB_be_w(space, offset, data);
-//				space->machine->generic.paletteram.u8[offset] = data;
+//              space->machine->generic.paletteram.u8[offset] = data;
 				return;
 			}
 			else if ((offset >= 0x800) && (offset < 0x880))

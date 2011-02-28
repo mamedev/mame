@@ -2028,7 +2028,7 @@ static MACHINE_CONFIG_DERIVED( benberob, halleys )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL_19_968MHz/12) /* not verified but pcb identical to halley's comet */
 	MCFG_CPU_VBLANK_INT_HACK(benberob_interrupt, 4)
-	
+
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE(benberob)
 MACHINE_CONFIG_END

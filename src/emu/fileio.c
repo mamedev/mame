@@ -118,7 +118,7 @@ file_enumerator::~file_enumerator()
 
 
 //-------------------------------------------------
-//  next - return information about the next file 
+//  next - return information about the next file
 //  in the search path
 //-------------------------------------------------
 
@@ -213,11 +213,11 @@ hash_collection &emu_file::hashes(const char *types)
 	for (const char *scan = types; *scan != 0; scan++)
 		if (m_hashes.hash(*scan) == NULL)
 			needed.cat(*scan);
-	
+
 	// if we need nothing, skip it
 	if (!needed)
 		return m_hashes;
-	
+
 	// load the ZIP file if needed
 	if (m_zipfile != NULL && load_zipped_file() != FILERR_NONE)
 		return m_hashes;
@@ -323,7 +323,7 @@ file_error emu_file::open_next()
 	// if we're open from a previous attempt, close up now
 	if (m_file != NULL)
 		close();
-	
+
 	// loop over paths
 	file_error filerr = FILERR_NOT_FOUND;
 	while (m_iterator.next(m_fullpath))
@@ -351,7 +351,7 @@ file_error emu_file::open_next()
 
 
 //-------------------------------------------------
-//  open_ram - open a "file" which is actually 
+//  open_ram - open a "file" which is actually
 //  just an array of data in RAM
 //-------------------------------------------------
 
@@ -360,7 +360,7 @@ file_error emu_file::open_ram(const void *data, UINT32 length)
 	// set a fake filename and CRC
 	m_filename = "RAM";
 	m_crc = 0;
-	
+
 	// use the core_file's built-in RAM support
 	return core_fopen_ram(data, length, m_openflags, &m_file);
 }
@@ -377,19 +377,19 @@ void emu_file::close()
 	if (m_zipfile != NULL)
 		zip_file_close(m_zipfile);
 	m_zipfile = NULL;
-	
+
 	if (m_file != NULL)
 		core_fclose(m_file);
 	m_file = NULL;
-	
+
 	if (m_zipdata != NULL)
 		global_free(m_zipdata);
 	m_zipdata = NULL;
-	
+
 	if (m_remove_on_close)
 		osd_rmfile(m_fullpath);
 	m_remove_on_close = false;
-	
+
 	// reset our hashes and path as well
 	m_hashes.reset();
 	m_fullpath.reset();

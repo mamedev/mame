@@ -415,7 +415,7 @@ static MACHINE_CONFIG_START( mainsnk, mainsnk_state )
 
 	MCFG_PALETTE_INIT(mainsnk)
 	MCFG_VIDEO_START(mainsnk)
-	
+
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 2000000)

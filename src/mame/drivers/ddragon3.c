@@ -640,7 +640,7 @@ static MACHINE_CONFIG_DERIVED( ctribe, ddragon3 )
 
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(ctribe_sound_map)
-	
+
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE(ctribe)
 

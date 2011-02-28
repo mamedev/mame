@@ -195,7 +195,7 @@ static multicart_open_error load_rom_resource(multicart_load_state *state, xml_d
 	{
 		hash_collection actual_hashes;
 		actual_hashes.compute((const UINT8 *)resource->ptr, resource->length, hash_collection::HASH_TYPES_CRC_SHA1);
-		
+
 		hash_collection expected_hashes;
 		expected_hashes.add_from_string(hash_collection::HASH_SHA1, sha1, strlen(sha1));
 

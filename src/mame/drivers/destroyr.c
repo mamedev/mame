@@ -189,7 +189,7 @@ static WRITE8_HANDLER( destroyr_interrupt_ack_w )
 static WRITE8_HANDLER( destroyr_output_w )
 {
 	if (offset & 8) destroyr_misc_w(space, 8, data);
-	
+
 	else switch (offset & 7)
 	{
 	case 0:

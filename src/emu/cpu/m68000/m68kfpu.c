@@ -1318,11 +1318,11 @@ static void fpgen_rm_reg(m68ki_cpu_core *m68k, UINT16 w2)
 			m68k->remaining_cycles -= 109;
 			break;
 		}
-//		case 0x0e:		// FSIN
-//		{
-//			// TODO
-//			break;
-//		}
+//      case 0x0e:      // FSIN
+//      {
+//          // TODO
+//          break;
+//      }
 		case 0x18:		// FABS
 		{
 			REG_FP[dst] = source;

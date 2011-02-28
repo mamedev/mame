@@ -306,10 +306,10 @@ void reverb::comb_allpass(signed short *sp,
 //
 
 void reverb::process(signed short *output,
-						  			 signed short *reverb_input,
-						  			 const reverb_params *rp,
-						  			 const int wetvol_l,
-						  			 const int wetvol_r,
+									 signed short *reverb_input,
+									 const reverb_params *rp,
+									 const int wetvol_l,
+									 const int wetvol_r,
 										 const unsigned int sz)
 {
 	signed short *sp=(signed short *)reverb_input,

@@ -59,7 +59,7 @@ public:
 	// construction/destruction
     hash_crc();
 
-	// operators    
+	// operators
     operator UINT32() const { return (m_buffer[0] << 24) | (m_buffer[1] << 16) | (m_buffer[2] << 8) | m_buffer[3]; }
 
 	// creation
@@ -153,11 +153,11 @@ hash_base::hash_base(char id, const char *name, UINT8 length, UINT8 *bufptr)
 
 int hash_base::fromhex(char c)
 {
-	if (c >= '0' && c <= '9') 
+	if (c >= '0' && c <= '9')
 		return c - '0';
-	else if (c >= 'A' && c <= 'F') 
+	else if (c >= 'A' && c <= 'F')
 		return c - 'A' + 10;
-	else if (c >= 'a' && c <= 'f') 
+	else if (c >= 'a' && c <= 'f')
 		return (c - 'a' + 10);
 	else
 		return -1;
@@ -194,7 +194,7 @@ const char *hash_base::string(astring &buffer)
 
 //-------------------------------------------------
 //  from_string - parse a string into the current
-//	hash
+//  hash
 //-------------------------------------------------
 
 bool hash_base::from_string(const char *&string, int length)
@@ -209,7 +209,7 @@ bool hash_base::from_string(const char *&string, int length)
 		string++;
 		return true;
 	}
-						
+
 	// fail if we're too short
 	if (length < 2 * m_length)
 		return false;
@@ -224,7 +224,7 @@ bool hash_base::from_string(const char *&string, int length)
 			m_parse_error = true;
 			return false;
 		}
-		
+
 		// parse the lower digit
 		int lower = fromhex(string[1]);
 		if (lower == -1)
@@ -233,14 +233,14 @@ bool hash_base::from_string(const char *&string, int length)
 			return false;
 		}
 
-		// set the byte and advance		
+		// set the byte and advance
 		m_bufptr[index] = (upper << 4) | lower;
 		string += 2;
 	}
 	return true;
 }
 
-   
+
 
 //**************************************************************************
 //  HASH CRC
@@ -508,7 +508,7 @@ void hash_collection::reset()
 
 
 //-------------------------------------------------
-//  add_from_buffer - add a new hash, importing 
+//  add_from_buffer - add a new hash, importing
 //  from a buffer
 //-------------------------------------------------
 
@@ -523,21 +523,21 @@ hash_base *hash_collection::add_from_buffer(char type, const UINT8 *buffer, int 
 	hash_base *newhash = alloc_by_id(type);
 	if (newhash == NULL)
 		return NULL;
-	
+
 	// then import
 	if (!newhash->from_buffer(buffer, bufflen))
 	{
 		global_free(newhash);
 		return NULL;
 	}
-	
+
 	// and append to our list
 	return &m_hashlist.append(*newhash);
 }
 
 
 //-------------------------------------------------
-//  add_from_string - add a new hash, importing 
+//  add_from_string - add a new hash, importing
 //  from a string
 //-------------------------------------------------
 
@@ -552,14 +552,14 @@ hash_base *hash_collection::add_from_string(char type, const char *buffer, int l
 	hash_base *newhash = alloc_by_id(type);
 	if (newhash == NULL)
 		return NULL;
-	
+
 	// then import
 	if (!newhash->from_string(buffer, length))
 	{
 		global_free(newhash);
 		return NULL;
 	}
-	
+
 	// and append to our list
 	return &m_hashlist.append(*newhash);
 }
@@ -578,7 +578,7 @@ bool hash_collection::remove(char type)
 			m_hashlist.remove(*hash);
 			return true;
 		}
-	
+
 	// didn't find it
 	return false;
 }
@@ -613,22 +613,22 @@ hash_base *hash_collection::add_crc(UINT32 crc)
 	buffer[1] = crc >> 16;
 	buffer[2] = crc >> 8;
 	buffer[3] = crc >> 0;
-	
+
 	// add it the standard way
 	return add_from_buffer(HASH_CRC, buffer, sizeof(buffer));
 }
 
 
 //-------------------------------------------------
-//  internal_string - convert set of hashes and 
-//  flags to a string in our internal compact 
+//  internal_string - convert set of hashes and
+//  flags to a string in our internal compact
 //  format
 //-------------------------------------------------
 
 const char *hash_collection::internal_string(astring &buffer) const
 {
 	astring temp;
-	
+
 	// output hashes first
 	buffer.reset();
 	for (hash_base *hash = m_hashlist.first(); hash != NULL; hash = hash->next())
@@ -641,7 +641,7 @@ const char *hash_collection::internal_string(astring &buffer) const
 
 
 //-------------------------------------------------
-//  macro_string - convert set of hashes and 
+//  macro_string - convert set of hashes and
 //  flags to a string in the macroized format
 //-------------------------------------------------
 
@@ -679,14 +679,14 @@ bool hash_collection::from_internal_string(const char *string)
 	// determine the end of the string
 	const char *stringend = string + strlen(string);
 	const char *ptr = string;
-	
+
 	// loop until we hit it
 	bool errors = false;
 	while (ptr < stringend)
 	{
 		char c = *ptr++;
 		char lc = tolower(c);
-		
+
 		// non-hex alpha values specify a hash type
 		if (lc >= 'g' && lc <= 'z')
 		{
@@ -700,11 +700,11 @@ bool hash_collection::from_internal_string(const char *string)
 			else
 				errors = true;
 		}
-		
+
 		// hex values are ignored, though unexpected
 		else if ((lc >= '0' && lc <= '9') || (lc >= 'a' && lc <= 'f'))
 			errors = true;
-		
+
 		// anything else is a flag
 		else
 			m_flags.cat(c);
@@ -726,7 +726,7 @@ void hash_collection::begin(const char *types)
 		m_hashlist.append(*alloc_by_id(HASH_MD5)).begin();
 		m_hashlist.append(*alloc_by_id(HASH_SHA1)).begin();
 	}
-	
+
 	// otherwise, just allocate the ones that are specified
 	else
 	{
@@ -736,7 +736,7 @@ void hash_collection::begin(const char *types)
 			hash_base *existing = hash(*scan);
 			if (existing != NULL)
 				m_hashlist.remove(*existing);
-			
+
 			// append a new one
 			m_hashlist.append(*alloc_by_id(*scan)).begin();
 		}
@@ -771,7 +771,7 @@ void hash_collection::end()
 
 
 //-------------------------------------------------
-//  alloc_by_id - based on the ID character, 
+//  alloc_by_id - based on the ID character,
 //  allocate a new hash
 //-------------------------------------------------
 
@@ -788,7 +788,7 @@ hash_base *hash_collection::alloc_by_id(char id)
 
 
 //-------------------------------------------------
-//  copyfrom - copy everything from another 
+//  copyfrom - copy everything from another
 //  collection
 //-------------------------------------------------
 
@@ -796,7 +796,7 @@ void hash_collection::copyfrom(const hash_collection &src)
 {
 	// copy flags directly
 	m_flags = src.m_flags;
-	
+
 	// rebuild the hashlist by copying from the source
 	m_hashlist.reset();
 	for (hash_base *hash = src.first(); hash != NULL; hash = hash->next())

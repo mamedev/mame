@@ -651,7 +651,7 @@ static MACHINE_CONFIG_START( fromancr, fromanc2_state )
 	MCFG_SCREEN_UPDATE(fromanc2)
 
 	MCFG_VIDEO_START(fromancr)
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

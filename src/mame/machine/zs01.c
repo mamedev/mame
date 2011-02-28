@@ -415,7 +415,7 @@ void zs01_device::scl_1()
 							switch(write_buffer[0] & 1) {
 							case COMMAND_WRITE:
 								memcpy(&data[data_offset()], &write_buffer[2], SIZE_DATA_BUFFER);
-								
+
 								/* todo: find out what should be returned. */
 								memset(&read_buffer[0] , 0, SIZE_WRITE_BUFFER);
 								break;
@@ -519,9 +519,9 @@ void zs01_device::sda_0()
 			verboselog(1, "goto start\n");
 			state = STATE_LOAD_COMMAND;
 			break;
-			//	default:
-			//		verboselog(1, "skipped start (default)\n");
-			//		break;
+			//  default:
+			//      verboselog(1, "skipped start (default)\n");
+			//      break;
 		}
 
 		bit = 0;

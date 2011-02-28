@@ -176,7 +176,7 @@ void oki_adpcm2_state::compute_tables()
 		// compute the step value
         int stepval = floor(floatstep * 1.08f);
         floatstep = floatstep * 1.08f;
-        
+
 		// loop over all nibbles and compute the difference
 		for (int nib = 0; nib < 16; nib++)
 		{

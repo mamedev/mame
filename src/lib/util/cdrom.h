@@ -180,12 +180,12 @@ INLINE UINT32 lba_to_msf(UINT32 lba)
 }
 
 // segacd needs it like this.. investigate
-// Angelo also says PCE tracks often start playing at the 
+// Angelo also says PCE tracks often start playing at the
 // wrong address.. related?
 INLINE UINT32 lba_to_msf_alt(int lba)
 {
 	UINT32 ret = 0;
-	
+
 	ret |= ((lba / (60 * 75))&0xff)<<16;
 	ret |= (((lba / 75) % 60)&0xff)<<8;
 	ret |= ((lba % 75)&0xff)<<0;

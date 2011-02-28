@@ -97,10 +97,10 @@ class path_iterator
 public:
 	// construction/destruction
 	path_iterator(core_options &options, const char *searchpath = "");
-	
+
 	// getters
 	bool next(astring &buffer);
-	
+
 	// reset
 	void reset() { m_current = m_base; m_index = 0; }
 
@@ -145,7 +145,7 @@ public:
 	emu_file(core_options &options, const char *searchpath, UINT32 openflags);
 	virtual ~emu_file();
 
-	// getters	
+	// getters
 	operator core_file *();
 	bool open() const { return (m_file != NULL); }
 	const char *filename() const { return m_filename; }
@@ -169,33 +169,33 @@ public:
 	file_error open_next();
 	file_error open_ram(const void *data, UINT32 length);
 	void close();
-	
+
 	// control
 	file_error compress(int compress);
 	int seek(INT64 offset, int whence);
 	UINT64 tell();
 	bool eof();
 	UINT64 size();
-	
+
 	// reading
 	UINT32 read(void *buffer, UINT32 length);
 	int getc();
 	int ungetc(int c);
 	char *gets(char *s, int n);
-	
+
 	// writing
 	UINT32 write(const void *buffer, UINT32 length);
 	int puts(const char *s);
 	int vprintf(const char *fmt, va_list va);
 	int printf(const char *fmt, ...);
-	
+
 private:
 	// internal helpers
 	file_error attempt_zipped();
 	file_error load_zipped_file();
 	bool zip_filename_match(const zip_file_header &header, const astring &filename);
 	bool zip_header_is_path(const zip_file_header &header);
-	
+
 	// internal state
 	astring			m_filename;						// original filename provided
 	astring			m_fullpath;						// full filename

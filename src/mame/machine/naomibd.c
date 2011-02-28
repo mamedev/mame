@@ -252,61 +252,61 @@ static const naomibd_config_table naomibd_translate_tbl[] =
 {
 	// games where on-the-fly decryption works (many of these are fully playable in MAME, just slow)
 	{ "18wheelr", 0x07cf54, 0 },
-	{ "alpilota", 0x070e41, 0 }, 
-	{ "alpiltdx", 0x070e41, 0 }, 
-	{ "capsnk", 0, 0 }, 
-	{ "capsnka", 0, 0 }, 
-	{ "crackndj", 0x1c2347, 0 }, 
-	{ "crzytaxi", 0x0d2f45, 0 }, 
-	{ "csmash", 0x103347, 0 }, 
-	{ "csmasho", 0x103347, 0 }, 
-	{ "cspike", 0x0e2010, 0 }, 
-	{ "deathcox", 0x0b64d0, 0 }, 
-	{ "derbyoc", 0x0fee35, 0 }, 
-	{ "doa2", 0x8ad01, 0 }, 
-	{ "doa2m", 0x8ad01, 0 }, 
+	{ "alpilota", 0x070e41, 0 },
+	{ "alpiltdx", 0x070e41, 0 },
+	{ "capsnk", 0, 0 },
+	{ "capsnka", 0, 0 },
+	{ "crackndj", 0x1c2347, 0 },
+	{ "crzytaxi", 0x0d2f45, 0 },
+	{ "csmash", 0x103347, 0 },
+	{ "csmasho", 0x103347, 0 },
+	{ "cspike", 0x0e2010, 0 },
+	{ "deathcox", 0x0b64d0, 0 },
+	{ "derbyoc", 0x0fee35, 0 },
+	{ "doa2", 0x8ad01, 0 },
+	{ "doa2m", 0x8ad01, 0 },
 	{ "dybb99", 0x048a01, 0 },
-	{ "f355twin", 0x06efd4, 0 }, 
-	{ "f355twn2", 0x1666c6, 0 }, 
-	{ "ggram2", 0x074a61, 0 }, 
-	{ "ggx", 0x076110, 0 }, 
+	{ "f355twin", 0x06efd4, 0 },
+	{ "f355twn2", 0x1666c6, 0 },
+	{ "ggram2", 0x074a61, 0 },
+	{ "ggx", 0x076110, 0 },
     { "gram2000", 0, 0x7f805c3f },
-	{ "gundmct", 0x0e8010, 0 }, 
-	{ "gwing2",  0x0b25d0, 0 }, 
-	{ "hmgeo",   0x038510, 0 }, 
-	{ "jambo",   0x0fab95, 0 }, 
+	{ "gundmct", 0x0e8010, 0 },
+	{ "gwing2",  0x0b25d0, 0 },
+	{ "hmgeo",   0x038510, 0 },
+	{ "jambo",   0x0fab95, 0 },
     { "kick4csh", 0, 0x820857c9 },
     { "mvsc2", 0, 0xc18b6e7c },
-	{ "otrigger", 0x0fea94, 0 },  
-	{ "pjustic", 0x0725d0, 0 }, 
-	{ "pstone", 0x0e69c1, 0 }, 
-	{ "pstone2", 0x0b8dc0, 0 }, 
-	{ "puyoda", 0x0acd40, 0 }, 
+	{ "otrigger", 0x0fea94, 0 },
+	{ "pjustic", 0x0725d0, 0 },
+	{ "pstone", 0x0e69c1, 0 },
+	{ "pstone2", 0x0b8dc0, 0 },
+	{ "puyoda", 0x0acd40, 0 },
     { "qmegamis", 0, 0xcd9b4896 },
-	{ "ringout", 0x0b1e40, 0 }, 
-	{ "samba", 0x0a8b5d, 0 }, 
-	{ "samba2k", 0x1702cf, 0 }, 
-	{ "sgtetris", 0x8ae51, 0 }, 
+	{ "ringout", 0x0b1e40, 0 },
+	{ "samba", 0x0a8b5d, 0 },
+	{ "samba2k", 0x1702cf, 0 },
+	{ "sgtetris", 0x8ae51, 0 },
     { "shootopl", 0, 0xa0f37ca7 },
     { "shootpl", 0, 0x9d8de9cd },
     { "shootplm", 0, 0x9d8de9cd },
-	{ "slasho", 0x1a66ca, 0 }, 
-	{ "smlg99", 0x048a01, 0 }, 
-	{ "spawn", 0x078d01, 0 }, 
-	{ "sstrkfgt", 0x132303, 0 }, 
-	{ "suchie3", 0x0368e1, 0 }, 
-	{ "toyfight", 0x02ca85, 0 }, 
-	{ "vf4cart", 0x2ef2f96, 0 }, 
+	{ "slasho", 0x1a66ca, 0 },
+	{ "smlg99", 0x048a01, 0 },
+	{ "spawn", 0x078d01, 0 },
+	{ "sstrkfgt", 0x132303, 0 },
+	{ "suchie3", 0x0368e1, 0 },
+	{ "toyfight", 0x02ca85, 0 },
+	{ "vf4cart", 0x2ef2f96, 0 },
     { "vf4evoct", 0, 0x1e5bb0cd },
     { "virnbao", 0x68b58, 0 },      // note: "virnba" set doesn't have protection
-    { "vs2_2k", 0x88b08, 0 }, 
-	{ "vtennis", 0x03eb15, 0 }, 
-	{ "vtenis2c", 0, 0x2d2d4743 }, 
-	{ "vonot", 0x010715, 0 }, 
-	{ "wldkicks", 0xae2901, 0 }, 
-	{ "wwfroyal", 0x1627c3, 0 }, 
-	{ "zerogu2", 0x07c010, 0 }, 
-	{ "zombrvn", 0x012b41, 0 }, 
+    { "vs2_2k", 0x88b08, 0 },
+	{ "vtennis", 0x03eb15, 0 },
+	{ "vtenis2c", 0, 0x2d2d4743 },
+	{ "vonot", 0x010715, 0 },
+	{ "wldkicks", 0xae2901, 0 },
+	{ "wwfroyal", 0x1627c3, 0 },
+	{ "zerogu2", 0x07c010, 0 },
+	{ "zombrvn", 0x012b41, 0 },
 };
 
 // forward declaration for decrypt function
@@ -406,12 +406,12 @@ static void naomibd_m1dec_shiftin(naomibd_state *naomibd)
 static void naomibd_m1_decode(naomibd_state *naomibd)
 {
     int i, eos;
-    
+
     naomibd->prot.s_xor [0] = (UINT8)naomibd->dc_dmakey;
     naomibd->prot.s_xor [1] = (UINT8)(naomibd->dc_dmakey >> 8);
     naomibd->prot.s_xor [2] = (UINT8)(naomibd->dc_dmakey >> 16);
     naomibd->prot.s_xor [3] = (UINT8)(naomibd->dc_dmakey >> 24);
-    
+
 	#if NAOMIBD_PRINTF_PROTECTION
     printf("M1 decode: dma offset %x, key %x\n", naomibd->dma_offset, naomibd->dc_dmakey);
     #endif
@@ -424,17 +424,17 @@ static void naomibd_m1_decode(naomibd_state *naomibd)
     {
         naomibd->prot.s_dict [i] = naomibd_m1dec_readbyte(naomibd);
     }
-    
+
     // control bits
     naomibd->prot.s_subst = (naomibd->prot.s_dict [0] & 64) ? 1 : 0;
-    
+
     // command stream
     naomibd->prot.s_out_cnt = 0, eos = 0;
-    naomibd->prot.s_shift = 0, naomibd->prot.s_bits = 0;    
+    naomibd->prot.s_shift = 0, naomibd->prot.s_bits = 0;
     while (!eos)
     {
         int code, addr, t;
-    
+
         if (naomibd->prot.s_bits < 2)
             naomibd_m1dec_shiftin(naomibd);
 
@@ -459,7 +459,7 @@ static void naomibd_m1_decode(naomibd_state *naomibd)
                 }
                 naomibd_m1dec_storebyte(naomibd, naomibd->prot.s_dict [addr]);
                 break;
-    
+
                 case 1:
                     if (naomibd->prot.s_bits < 5)
                         naomibd_m1dec_shiftin (naomibd);
@@ -482,7 +482,7 @@ static void naomibd_m1_decode(naomibd_state *naomibd)
                     }
                     naomibd_m1dec_storebyte(naomibd, naomibd->prot.s_dict [addr]);
                     break;
-    
+
                 case 2:
                     if (naomibd->prot.s_bits < 7)
                         naomibd_m1dec_shiftin(naomibd);
@@ -492,7 +492,7 @@ static void naomibd_m1_decode(naomibd_state *naomibd)
                     naomibd->prot.s_bits -= 7;
                     naomibd_m1dec_storebyte(naomibd, naomibd->prot.s_dict [addr]);
                     break;
-    
+
                 case 3:
                     if (naomibd->prot.s_bits < 8)
                         naomibd_m1dec_shiftin(naomibd);
@@ -535,10 +535,10 @@ static UINT16 naomibd_get_decrypted_stream(naomibd_state *naomibd)
 static void naomibd_init_stream(naomibd_state *naomibd)
 {
 	naomibd->prot.last_word = 0;
-	
+
 	naomibd->prot.control_bits = naomibd_get_decrypted_stream(naomibd);
 	naomibd->prot.heading_word = naomibd_get_decrypted_stream(naomibd);
-	
+
 	if (naomibd->prot.control_bits & 2)
 	{
 	   naomibd->prot.pak_bit = 0;

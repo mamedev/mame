@@ -335,7 +335,7 @@ void x76f041_device::scl_1()
 						byte = 0;
 					break;
 				}
-					
+
 				bit = 0;
 				shift = 0;
 			}

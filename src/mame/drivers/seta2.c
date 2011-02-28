@@ -407,7 +407,7 @@ static WRITE16_HANDLER( reelquak_leds_w )
 		ticket_dispenser_w(space->machine->device("ticket"), 0, (data & 0x0100) >> 1);	// ticket dispenser
 	}
 
-//	popmessage("LED %04X", data);
+//  popmessage("LED %04X", data);
 }
 
 static WRITE16_HANDLER( reelquak_coin_w )
@@ -2423,7 +2423,7 @@ static DRIVER_INIT( funcube4 )
 
 	// Sub CPU
 	sub_cpu[0x4d4/2] = 0x5470;	// rte -> rts
-    
+
     // Audio
     // The first half of the rom appears to be a dupe of the second half with 0xffs destructively interleaved
 	UINT8* oki = (UINT8*) machine->region("oki")->base();
@@ -2611,7 +2611,7 @@ Board:  KE (Namco) ; P0-125A (Seta)
 
 CPU:    TMP68301 (68000 core)
 OSC:    50.0000MHz
-	    32.5304MHz
+        32.5304MHz
 
 Sound:  X1-010
 
@@ -2648,7 +2648,7 @@ Board:  KL (Namco) ; P0-136A (Seta)
 
 CPU:    TMP68301 (68000 core)
 OSC:    50.0000MHz
-	    32.5304MHz
+        32.5304MHz
 
 Sound:  X1-010
 
@@ -2875,7 +2875,7 @@ Other:
 ROMs:
   2 x 27C4001 (@ U2-3)
   5 x 23C32000 (@ U15-18, U32)
-  GAL 16V8? (@ U38) 
+  GAL 16V8? (@ U38)
 
 Note:
 

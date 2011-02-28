@@ -892,7 +892,7 @@ INLINE void BUMP_DI(i386_state *cpustate,int adjustment)
 
 
 /***********************************************************************************
-	I/O ACCESS
+    I/O ACCESS
 ***********************************************************************************/
 
 INLINE UINT8 READPORT8(i386_state *cpustate, offs_t port)

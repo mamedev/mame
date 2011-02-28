@@ -38,7 +38,7 @@ static ADDRESS_MAP_START( pcat_map, ADDRESS_SPACE_PROGRAM, 32 )
 //  AM_RANGE(0x000e0000, 0x000effff) AM_ROM AM_REGION("game_prg", 0)
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROM AM_REGION("bios", 0 )
 	AM_RANGE(0x00100000, 0x001fffff) AM_RAM //AM_REGION("game_prg", 0)
-//	AM_RANGE(0x00200000, 0x00ffffff) AM_RAM
+//  AM_RANGE(0x00200000, 0x00ffffff) AM_RAM
 	//AM_RANGE(0x01000000, 0x01ffffff) AM_RAM
 	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("bios", 0 )
 ADDRESS_MAP_END
@@ -126,15 +126,15 @@ static MACHINE_START( pcat_dyn )
 
 static MACHINE_CONFIG_START( pcat_dyn, driver_device )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I486, 40000000)	/* Am486 DX-40 */	
-	MCFG_CPU_PROGRAM_MAP(pcat_map)	
+	MCFG_CPU_ADD("maincpu", I486, 40000000)	/* Am486 DX-40 */
+	MCFG_CPU_PROGRAM_MAP(pcat_map)
 	MCFG_CPU_IO_MAP(pcat_io)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_vga )		
-	MCFG_SCREEN_MODIFY("screen")		
-	MCFG_SCREEN_REFRESH_RATE(60)		
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */	
+	MCFG_FRAGMENT_ADD( pcvideo_vga )
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_MACHINE_START(pcat_dyn)
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 

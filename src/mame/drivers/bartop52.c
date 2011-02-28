@@ -126,7 +126,7 @@ static MACHINE_CONFIG_START( a5200, driver_device )
 	MCFG_PALETTE_INIT(atari)
 
 	MCFG_VIDEO_START(atari)
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("pokey", POKEY, FREQ_17_EXACT)

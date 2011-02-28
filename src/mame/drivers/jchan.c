@@ -689,7 +689,7 @@ static MACHINE_CONFIG_START( jchan, jchan_state )
 	MCFG_PALETTE_LENGTH(0x10000)
 
 	MCFG_VIDEO_START(jchan)
-	
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* sound hardware */
@@ -792,7 +792,7 @@ static DRIVER_INIT( jchan )
 
 
 	memset(state->mcu_com, 0, 4 * sizeof( UINT16 ) );
-	
+
 	machine->device<nvram_device>("nvram")->set_base(state->nvram_data, sizeof(state->nvram_data));
 }
 
