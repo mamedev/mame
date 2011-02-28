@@ -11,40 +11,39 @@
 #include "includes/spacefb.h"
 
 
-
-static UINT8 spacefb_sound_latch;
-
-
-
 READ8_HANDLER( spacefb_audio_p2_r )
 {
-	return (spacefb_sound_latch & 0x18) << 1;
+	spacefb_state *state = space->machine->driver_data<spacefb_state>();
+	return (state->sound_latch & 0x18) << 1;
 }
 
 
 READ8_HANDLER( spacefb_audio_t0_r )
 {
-	return spacefb_sound_latch & 0x20;
+	spacefb_state *state = space->machine->driver_data<spacefb_state>();
+	return state->sound_latch & 0x20;
 }
 
 
 READ8_HANDLER( spacefb_audio_t1_r )
 {
-	return spacefb_sound_latch & 0x04;
+	spacefb_state *state = space->machine->driver_data<spacefb_state>();
+	return state->sound_latch & 0x04;
 }
 
 
 WRITE8_HANDLER( spacefb_port_1_w )
 {
+	spacefb_state *state = space->machine->driver_data<spacefb_state>();
 	device_t *samples = space->machine->device("samples");
 
 	cputag_set_input_line(space->machine, "audiocpu", 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* enemy killed */
-	if (!(data & 0x01) && (spacefb_sound_latch & 0x01))  sample_start(samples, 0,0,0);
+	if (!(data & 0x01) && (state->sound_latch & 0x01))  sample_start(samples, 0,0,0);
 
 	/* ship fire */
-	if (!(data & 0x40) && (spacefb_sound_latch & 0x40))  sample_start(samples, 1,1,0);
+	if (!(data & 0x40) && (state->sound_latch & 0x40))  sample_start(samples, 1,1,0);
 
 	/*
      *  Explosion Noise
@@ -54,7 +53,7 @@ WRITE8_HANDLER( spacefb_port_1_w )
      *  Fortunately it seems like the recorded sample of the spaceship death is the longest the sample plays for.
      *  We loop it just in case it runs out
      */
-	if ((data & 0x80) != (spacefb_sound_latch & 0x80))
+	if ((data & 0x80) != (state->sound_latch & 0x80))
 	{
 		if (data & 0x80)
 			/* play decaying noise */
@@ -64,7 +63,7 @@ WRITE8_HANDLER( spacefb_port_1_w )
 			sample_start(samples, 2,2,1);
 	}
 
-	spacefb_sound_latch = data;
+	state->sound_latch = data;
 }
 
 

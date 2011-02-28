@@ -2606,7 +2606,7 @@ static const ay8910_interface ay8910_config =
 
 
 
-static MACHINE_CONFIG_START( gionbana, driver_device )
+static MACHINE_CONFIG_START( gionbana, nbmj8891_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 20000000/4)	/* 5.00 MHz ? */

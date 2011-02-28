@@ -41,9 +41,9 @@ static READ8_HANDLER( input_port_r )
 static ADDRESS_MAP_START( gomoku_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x47ff) AM_ROM
 	AM_RANGE(0x4800, 0x4fff) AM_RAM
-	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(gomoku_videoram_w) AM_BASE(&gomoku_videoram)
-	AM_RANGE(0x5400, 0x57ff) AM_RAM_WRITE(gomoku_colorram_w) AM_BASE(&gomoku_colorram)
-	AM_RANGE(0x5800, 0x58ff) AM_RAM_WRITE(gomoku_bgram_w) AM_BASE(&gomoku_bgram)
+	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(gomoku_videoram_w) AM_BASE_MEMBER(gomoku_state, videoram)
+	AM_RANGE(0x5400, 0x57ff) AM_RAM_WRITE(gomoku_colorram_w) AM_BASE_MEMBER(gomoku_state, colorram)
+	AM_RANGE(0x5800, 0x58ff) AM_RAM_WRITE(gomoku_bgram_w) AM_BASE_MEMBER(gomoku_state, bgram)
 	AM_RANGE(0x6000, 0x601f) AM_DEVWRITE("gomoku", gomoku_sound1_w)
 	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE("gomoku", gomoku_sound2_w)
 	AM_RANGE(0x7000, 0x7000) AM_WRITENOP
@@ -117,7 +117,7 @@ static GFXDECODE_START( gomoku )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( gomoku, driver_device )
+static MACHINE_CONFIG_START( gomoku, gomoku_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/12)		 /* 1.536 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(gomoku_map)

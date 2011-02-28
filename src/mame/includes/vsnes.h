@@ -1,3 +1,43 @@
+class vsnes_state : public driver_device
+{
+public:
+	vsnes_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *work_ram;
+	UINT8 *work_ram_1;
+	int coin;
+	int do_vrom_bank;
+	int input_latch[4];
+	int sound_fix;
+	UINT8 last_bank;
+	UINT8* vram;
+	UINT8* vrom[2];
+	UINT8* nt_ram[2];
+	UINT8* nt_page[2][4];
+	UINT32 vrom_size[2];
+	int vrom_banks;
+	int zapstore;
+	int old_bank;
+	int drmario_shiftreg;
+	int drmario_shiftcount;
+	int size16k;
+	int switchlow;
+	int vrom4k;
+	int MMC3_cmd;
+	int MMC3_prg_bank[4];
+	int MMC3_chr_bank[6];
+	int MMC3_prg_mask;
+	int IRQ_enable;
+	int IRQ_count;
+	int IRQ_count_latch;
+	int VSindex;
+	int supxevs_prot_index;
+	int security_counter;
+	int ret;
+};
+
+
 /*----------- defined in video/vsnes.c -----------*/
 
 VIDEO_START( vsnes );

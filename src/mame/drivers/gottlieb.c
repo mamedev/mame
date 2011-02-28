@@ -438,7 +438,7 @@ static TIMER_CALLBACK( laserdisc_philips_callback )
 	gottlieb_state *state = machine->driver_data<gottlieb_state>();
 	int newcode = laserdisc_get_field_code(state->laserdisc, (param == 17) ? LASERDISC_CODE_LINE17 : LASERDISC_CODE_LINE18, TRUE);
 
-	/* the PR8210 sends line 17/18 data on each frame; the state->laserdisc interface
+	/* the PR8210 sends line 17/18 data on each frame; the laserdisc interface
        board receives notification and latches the most recent frame number */
 
 	/* the logic detects a valid code when the top 4 bits are all 1s */

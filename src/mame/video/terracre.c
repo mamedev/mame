@@ -9,19 +9,15 @@
 #include "emu.h"
 #include "includes/terracre.h"
 
-static UINT16 xscroll;
-static UINT16 yscroll;
-static tilemap_t *background, *foreground;
-
-UINT16 *amazon_videoram;
 
 static
 TILE_GET_INFO( get_bg_tile_info )
 {
+	terracre_state *state = machine->driver_data<terracre_state>();
 	/* xxxx.----.----.----
      * ----.xx--.----.----
      * ----.--xx.xxxx.xxxx */
-	unsigned data = amazon_videoram[tile_index];
+	unsigned data = state->amazon_videoram[tile_index];
 	unsigned color = data>>11;
 	SET_TILE_INFO( 1,data&0x3ff,color,0 );
 }
@@ -156,8 +152,9 @@ PALETTE_INIT( amazon )
 
 WRITE16_HANDLER( amazon_background_w )
 {
-	COMBINE_DATA( &amazon_videoram[offset] );
-	tilemap_mark_tile_dirty( background, offset );
+	terracre_state *state = space->machine->driver_data<terracre_state>();
+	COMBINE_DATA( &state->amazon_videoram[offset] );
+	tilemap_mark_tile_dirty( state->background, offset );
 }
 
 WRITE16_HANDLER( amazon_foreground_w )
@@ -165,7 +162,7 @@ WRITE16_HANDLER( amazon_foreground_w )
 	terracre_state *state = space->machine->driver_data<terracre_state>();
 	UINT16 *videoram = state->videoram;
 	COMBINE_DATA( &videoram[offset] );
-	tilemap_mark_tile_dirty( foreground, offset );
+	tilemap_mark_tile_dirty( state->foreground, offset );
 }
 
 WRITE16_HANDLER( amazon_flipscreen_w )
@@ -180,35 +177,39 @@ WRITE16_HANDLER( amazon_flipscreen_w )
 
 WRITE16_HANDLER( amazon_scrolly_w )
 {
-	COMBINE_DATA(&yscroll);
-	tilemap_set_scrolly(background,0,yscroll);
+	terracre_state *state = space->machine->driver_data<terracre_state>();
+	COMBINE_DATA(&state->yscroll);
+	tilemap_set_scrolly(state->background,0,state->yscroll);
 }
 
 WRITE16_HANDLER( amazon_scrollx_w )
 {
-	COMBINE_DATA(&xscroll);
-	tilemap_set_scrollx(background,0,xscroll);
+	terracre_state *state = space->machine->driver_data<terracre_state>();
+	COMBINE_DATA(&state->xscroll);
+	tilemap_set_scrollx(state->background,0,state->xscroll);
 }
 
 VIDEO_START( amazon )
 {
-	background = tilemap_create(machine, get_bg_tile_info,tilemap_scan_cols,16,16,64,32);
-	foreground = tilemap_create(machine, get_fg_tile_info,tilemap_scan_cols,8,8,64,32);
-	tilemap_set_transparent_pen(foreground,0xf);
+	terracre_state *state = machine->driver_data<terracre_state>();
+	state->background = tilemap_create(machine, get_bg_tile_info,tilemap_scan_cols,16,16,64,32);
+	state->foreground = tilemap_create(machine, get_fg_tile_info,tilemap_scan_cols,8,8,64,32);
+	tilemap_set_transparent_pen(state->foreground,0xf);
 
 	/* register for saving */
-	state_save_register_global(machine, xscroll);
-	state_save_register_global(machine, yscroll);
+	state_save_register_global(machine, state->xscroll);
+	state_save_register_global(machine, state->yscroll);
 }
 
 SCREEN_UPDATE( amazon )
 {
-	if( xscroll&0x2000 )
+	terracre_state *state = screen->machine->driver_data<terracre_state>();
+	if( state->xscroll&0x2000 )
 		bitmap_fill( bitmap,cliprect ,get_black_pen(screen->machine));
 	else
-		tilemap_draw( bitmap,cliprect, background, 0, 0 );
+		tilemap_draw( bitmap,cliprect, state->background, 0, 0 );
 
 	draw_sprites(screen->machine, bitmap,cliprect );
-	tilemap_draw( bitmap,cliprect, foreground, 0, 0 );
+	tilemap_draw( bitmap,cliprect, state->foreground, 0, 0 );
 	return 0;
 }

@@ -142,57 +142,71 @@ Iron PCB (same as Final Fight 2?)
 #include "includes/snes.h"
 #include "audio/snes_snd.h"
 
-static INT8 *shared_ram;
-static UINT8 ffight2b_coins;
+
+class snesb_state : public snes_state
+{
+public:
+	snesb_state(running_machine &machine, const driver_device_config_base &config)
+		: snes_state(machine, config) { }
+
+	INT8 *shared_ram;
+	UINT8 ffight2b_coins;
+	INT32 oldinput;
+	INT32 oldcoin;
+	UINT8 cnt;
+};
+
+
 
 static READ8_HANDLER(sharedram_r)
 {
-	static INT32 oldinput=0;
+	snesb_state *state = space->machine->driver_data<snesb_state>();
 	INT32 coincnt;
 	INT32 input = input_port_read(space->machine, "COIN");
 
 	if(input&3)
 	{
-		if( ((input&1)==1)&&((oldinput&1)==0))	{shared_ram[0]++;}
+		if( ((input&1)==1)&&((state->oldinput&1)==0))	{state->shared_ram[0]++;}
 
-		coincnt=shared_ram[0];
+		coincnt=state->shared_ram[0];
 
 		if(coincnt>99){coincnt=99;}
 
-		shared_ram[0xb]=(coincnt/10)+'0';
-		shared_ram[0xa]=(coincnt%10)+'0';
+		state->shared_ram[0xb]=(coincnt/10)+'0';
+		state->shared_ram[0xa]=(coincnt%10)+'0';
 	}
-	oldinput=input;
-	return shared_ram[offset];
+	state->oldinput=input;
+	return state->shared_ram[offset];
 }
 
 static WRITE8_HANDLER(sharedram_w)
 {
-	shared_ram[offset]=data;
+	snesb_state *state = space->machine->driver_data<snesb_state>();
+	state->shared_ram[offset]=data;
 }
 
 static READ8_HANDLER(ffight2b_coin_r)
 {
-	static INT32 oldinput=0;
+	snesb_state *state = space->machine->driver_data<snesb_state>();
 	INT32 input = input_port_read(space->machine, "COIN");
 
-	if( ((input&1)==1)&&((oldinput&1)==0))
+	if( ((input&1)==1)&&((state->oldcoin&1)==0))
 	{
-		INT32 coin_cnt=(ffight2b_coins&0xf)+10*(ffight2b_coins>>4);
+		INT32 coin_cnt=(state->ffight2b_coins&0xf)+10*(state->ffight2b_coins>>4);
 		if(++coin_cnt>99) coin_cnt=99;
-		ffight2b_coins=(coin_cnt%10)|((coin_cnt/10)<<4);
+		state->ffight2b_coins=(coin_cnt%10)|((coin_cnt/10)<<4);
 	}
-	oldinput=input;
-	return ffight2b_coins;
+	state->oldcoin=input;
+	return state->ffight2b_coins;
 }
 
 /* Sonic blast man 2 turbo */
 
 static READ8_HANDLER(sb2b_75bd37_r)
 {
+	snesb_state *state = space->machine->driver_data<snesb_state>();
 	/* protection check */
-	static UINT8 cnt=0;
-	return ++cnt;
+	return ++state->cnt;
 }
 
 static READ8_HANDLER(sb2b_6a6xxx_r)
@@ -497,7 +511,7 @@ static INPUT_PORTS_START( denseib )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( kinstb, snes_state )
+static MACHINE_CONFIG_START( kinstb, snesb_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", _5A22, 3580000*6)	/* 2.68Mhz, also 3.58Mhz */
@@ -529,6 +543,7 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT(kinstb)
 {
+	snesb_state *state = machine->driver_data<snesb_state>();
 	INT32 i;
 	UINT8 *rom = machine->region("user3")->base();
 
@@ -537,7 +552,7 @@ static DRIVER_INIT(kinstb)
 		rom[i] = BITSWAP8(rom[i], 5, 0, 6, 1, 7, 4, 3, 2);
 	}
 
-	shared_ram = auto_alloc_array(machine, INT8, 0x100);
+	state->shared_ram = auto_alloc_array(machine, INT8, 0x100);
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x781000, 0x7810ff, 0, 0, sharedram_r, sharedram_w);
 
 	DRIVER_INIT_CALL(snes_hirom);
@@ -545,6 +560,7 @@ static DRIVER_INIT(kinstb)
 
 static DRIVER_INIT( ffight2b )
 {
+	snesb_state *state = machine->driver_data<snesb_state>();
 	INT32 i;
 	UINT8 *rom = machine->region("user3")->base();
 
@@ -578,7 +594,7 @@ static DRIVER_INIT( ffight2b )
 	rom[0x7ffd] = 0x89;
 	rom[0x7ffc] = 0x54;
 
-	ffight2b_coins = 0;
+	state->ffight2b_coins = 0;
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x7eadce, 0x7eadce, 0, 0, ffight2b_coin_r);
 
 	DRIVER_INIT_CALL(snes);

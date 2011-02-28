@@ -1,7 +1,19 @@
-/*----------- defined in video/clshroad.c -----------*/
+class clshroad_state : public driver_device
+{
+public:
+	clshroad_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-extern UINT8 *clshroad_vram_0, *clshroad_vram_1;
-extern UINT8 *clshroad_vregs;
+	UINT8 *vram_0;
+	UINT8 *vram_1;
+	UINT8 *vregs;
+	tilemap_t *tilemap_0a;
+	tilemap_t *tilemap_0b;
+	tilemap_t *tilemap_1;
+};
+
+
+/*----------- defined in video/clshroad.c -----------*/
 
 WRITE8_HANDLER( clshroad_vram_0_w );
 WRITE8_HANDLER( clshroad_vram_1_w );

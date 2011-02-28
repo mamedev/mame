@@ -60,51 +60,68 @@ Notes:
 #include "sound/nes_apu.h"
 #include "video/ppu2c0x.h"
 
-static UINT8* nt_ram;
-static UINT8* nt_page[4];
 
-static void cham24_set_mirroring( int mirroring )
+class cham24_state : public driver_device
 {
+public:
+	cham24_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8* nt_ram;
+	UINT8* nt_page[4];
+	UINT32 in_0;
+	UINT32 in_1;
+	UINT32 in_0_shift;
+	UINT32 in_1_shift;
+};
+
+
+
+static void cham24_set_mirroring( running_machine *machine, int mirroring )
+{
+	cham24_state *state = machine->driver_data<cham24_state>();
 	switch(mirroring)
 	{
 	case PPU_MIRROR_LOW:
-		nt_page[0] = nt_page[1] = nt_page[2] = nt_page[3] = nt_ram;
+		state->nt_page[0] = state->nt_page[1] = state->nt_page[2] = state->nt_page[3] = state->nt_ram;
 		break;
 	case PPU_MIRROR_HIGH:
-		nt_page[0] = nt_page[1] = nt_page[2] = nt_page[3] = nt_ram + 0x400;
+		state->nt_page[0] = state->nt_page[1] = state->nt_page[2] = state->nt_page[3] = state->nt_ram + 0x400;
 		break;
 	case PPU_MIRROR_HORZ:
-		nt_page[0] = nt_ram;
-		nt_page[1] = nt_ram;
-		nt_page[2] = nt_ram + 0x400;
-		nt_page[3] = nt_ram + 0x400;
+		state->nt_page[0] = state->nt_ram;
+		state->nt_page[1] = state->nt_ram;
+		state->nt_page[2] = state->nt_ram + 0x400;
+		state->nt_page[3] = state->nt_ram + 0x400;
 		break;
 	case PPU_MIRROR_VERT:
-		nt_page[0] = nt_ram;
-		nt_page[1] = nt_ram + 0x400;
-		nt_page[2] = nt_ram;
-		nt_page[3] = nt_ram + 0x400;
+		state->nt_page[0] = state->nt_ram;
+		state->nt_page[1] = state->nt_ram + 0x400;
+		state->nt_page[2] = state->nt_ram;
+		state->nt_page[3] = state->nt_ram + 0x400;
 		break;
 	case PPU_MIRROR_NONE:
 	default:
-		nt_page[0] = nt_ram;
-		nt_page[1] = nt_ram + 0x400;
-		nt_page[2] = nt_ram + 0x800;
-		nt_page[3] = nt_ram + 0xc00;
+		state->nt_page[0] = state->nt_ram;
+		state->nt_page[1] = state->nt_ram + 0x400;
+		state->nt_page[2] = state->nt_ram + 0x800;
+		state->nt_page[3] = state->nt_ram + 0xc00;
 		break;
 	}
 }
 
 static WRITE8_HANDLER( nt_w )
 {
+	cham24_state *state = space->machine->driver_data<cham24_state>();
 	int page = ((offset & 0xc00) >> 10);
-	nt_page[page][offset & 0x3ff] = data;
+	state->nt_page[page][offset & 0x3ff] = data;
 }
 
 static READ8_HANDLER( nt_r )
 {
+	cham24_state *state = space->machine->driver_data<cham24_state>();
 	int page = ((offset & 0xc00) >> 10);
-	return nt_page[page][offset & 0x3ff];
+	return state->nt_page[page][offset & 0x3ff];
 
 }
 
@@ -129,18 +146,16 @@ static WRITE8_DEVICE_HANDLER( psg_4017_w )
 	nes_psg_w(device,0x17, data);
 }
 
-static UINT32 in_0;
-static UINT32 in_1;
-static UINT32 in_0_shift;
-static UINT32 in_1_shift;
 
 static READ8_HANDLER( cham24_IN0_r )
 {
-	return ((in_0 >> in_0_shift++) & 0x01) | 0x40;
+	cham24_state *state = space->machine->driver_data<cham24_state>();
+	return ((state->in_0 >> state->in_0_shift++) & 0x01) | 0x40;
 }
 
 static WRITE8_HANDLER( cham24_IN0_w )
 {
+	cham24_state *state = space->machine->driver_data<cham24_state>();
 	if (data & 0xfe)
 	{
 		//logerror("Unhandled cham24_IN0_w write: data = %02X\n", data);
@@ -151,17 +166,18 @@ static WRITE8_HANDLER( cham24_IN0_w )
 		return;
 	}
 
-	in_0_shift = 0;
-	in_1_shift = 0;
+	state->in_0_shift = 0;
+	state->in_1_shift = 0;
 
-	in_0 = input_port_read(space->machine, "P1");
-	in_1 = input_port_read(space->machine, "P2");
+	state->in_0 = input_port_read(space->machine, "P1");
+	state->in_1 = input_port_read(space->machine, "P2");
 
 }
 
 static READ8_HANDLER( cham24_IN1_r )
 {
-	return ((in_1 >> in_1_shift++) & 0x01) | 0x40;
+	cham24_state *state = space->machine->driver_data<cham24_state>();
+	return ((state->in_1 >> state->in_1_shift++) & 0x01) | 0x40;
 }
 
 static WRITE8_HANDLER( cham24_mapper_w )
@@ -179,7 +195,7 @@ static WRITE8_HANDLER( cham24_mapper_w )
 	memory_set_bankptr(space->machine, "bank1", space->machine->region("gfx1")->base() + (0x2000 * gfx_bank));
 
 	// set gfx mirroring
-	cham24_set_mirroring(gfx_mirroring != 0 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	cham24_set_mirroring(space->machine, gfx_mirroring != 0 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
 	// switch PRG bank
 	if (prg_bank_page_size == 0)
@@ -279,6 +295,7 @@ static SCREEN_UPDATE( cham24 )
 
 static MACHINE_START( cham24 )
 {
+	cham24_state *state = machine->driver_data<cham24_state>();
 	/* switch PRG rom */
 	UINT8* dst = machine->region("maincpu")->base();
 	UINT8* src = machine->region("user1")->base();
@@ -291,11 +308,11 @@ static MACHINE_START( cham24 )
 	memory_set_bankptr(machine, "bank1", machine->region("gfx1")->base());
 
 	/* need nametable ram, though. I doubt this uses more than 2k, but it starts up configured for 4 */
-	nt_ram = auto_alloc_array(machine, UINT8, 0x1000);
-	nt_page[0] = nt_ram;
-	nt_page[1] = nt_ram + 0x400;
-	nt_page[2] = nt_ram + 0x800;
-	nt_page[3] = nt_ram + 0xc00;
+	state->nt_ram = auto_alloc_array(machine, UINT8, 0x1000);
+	state->nt_page[0] = state->nt_ram;
+	state->nt_page[1] = state->nt_ram + 0x400;
+	state->nt_page[2] = state->nt_ram + 0x800;
+	state->nt_page[3] = state->nt_ram + 0xc00;
 
 	/* and read/write handlers */
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, nt_r, nt_w);
@@ -309,7 +326,7 @@ static GFXDECODE_START( cham24 )
 	/* none, the ppu generates one */
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( cham24, driver_device )
+static MACHINE_CONFIG_START( cham24, cham24_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", N2A03, N2A03_DEFAULTCLOCK)
 	MCFG_CPU_PROGRAM_MAP(cham24_map)

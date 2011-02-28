@@ -1,5 +1,21 @@
 #include "devlegcy.h"
 
+class gomoku_state : public driver_device
+{
+public:
+	gomoku_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+	UINT8 *colorram;
+	UINT8 *bgram;
+	int flipscreen;
+	int bg_dispsw;
+	tilemap_t *fg_tilemap;
+	bitmap_t *bg_bitmap;
+};
+
+
 /*----------- defined in audio/gomoku.c -----------*/
 
 WRITE8_DEVICE_HANDLER( gomoku_sound1_w );
@@ -9,10 +25,6 @@ DECLARE_LEGACY_SOUND_DEVICE(GOMOKU, gomoku_sound);
 
 
 /*----------- defined in video/gomoku.c -----------*/
-
-extern UINT8 *gomoku_videoram;
-extern UINT8 *gomoku_colorram;
-extern UINT8 *gomoku_bgram;
 
 PALETTE_INIT( gomoku );
 VIDEO_START( gomoku );

@@ -11,40 +11,6 @@
 #include "video/resnet.h"
 
 
-UINT8 *tubep_textram;
-UINT8 *rjammer_backgroundram;
-UINT8 *tubep_backgroundram;
-UINT8 *tubep_sprite_colorsharedram;
-
-static UINT8 *spritemap;
-static UINT8 prom2[32];
-
-/* Globals */
-/*static UINT8 graph_ctrl[10];*/
-static UINT32	romD_addr =0;
-static UINT32	romEF_addr =0;
-static UINT32	E16_add_b = 0;
-static UINT32	HINV = 0;
-static UINT32	VINV = 0;
-static UINT32	XSize = 0;
-static UINT32	YSize = 0;
-static UINT32	mark_1 = 0;
-static UINT32	mark_2 = 0;
-static UINT32	colorram_addr_hi = 0;
-static UINT32	ls273_g6 = 0;
-static UINT32	ls273_j6 = 0;
-static UINT32	romHI_addr_mid = 0;
-static UINT32	romHI_addr_msb = 0;
-static UINT8	DISP = 0;
-static UINT8	background_romsel = 0;
-static UINT8	color_A4 = 0;
-static UINT8	ls175_b7;
-static UINT8	ls175_e8;
-static UINT8	ls377_data = 0;
-static UINT32	page = 0;
-
-
-
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -167,6 +133,7 @@ static UINT32	page = 0;
 
 PALETTE_INIT( tubep )
 {
+	tubep_state *state = machine->driver_data<tubep_state>();
 	int i,r,g,b;
 
 	/* background/sprites palette variables */
@@ -230,7 +197,7 @@ PALETTE_INIT( tubep )
 	/* sprites use the second PROM to control 8 x LS368. We copy content of this PROM over here */
 	for (i = 0; i < 32; i++)
 	{
-		prom2[i] = *color_prom;
+		state->prom2[i] = *color_prom;
 		color_prom++;
 	}
 
@@ -371,88 +338,95 @@ PALETTE_INIT( tubep )
 
 VIDEO_START( tubep )
 {
-	spritemap = auto_alloc_array(machine, UINT8, 256*256*2);
+	tubep_state *state = machine->driver_data<tubep_state>();
+	state->spritemap = auto_alloc_array(machine, UINT8, 256*256*2);
 
 	/* Set up save state */
-	state_save_register_global(machine, romD_addr);
-	state_save_register_global(machine, romEF_addr);
-	state_save_register_global(machine, E16_add_b);
-	state_save_register_global(machine, HINV);
-	state_save_register_global(machine, VINV);
-	state_save_register_global(machine, XSize);
-	state_save_register_global(machine, YSize);
-	state_save_register_global(machine, mark_1);
-	state_save_register_global(machine, mark_2);
-	state_save_register_global(machine, colorram_addr_hi);
-	state_save_register_global(machine, ls273_g6);
-	state_save_register_global(machine, ls273_j6);
-	state_save_register_global(machine, romHI_addr_mid);
-	state_save_register_global(machine, romHI_addr_msb);
-	state_save_register_global(machine, DISP);
-	state_save_register_global(machine, background_romsel);
-	state_save_register_global(machine, color_A4);
-	state_save_register_global(machine, ls175_b7);
-	state_save_register_global(machine, ls175_e8);
-	state_save_register_global(machine, ls377_data);
-	state_save_register_global(machine, page);
+	state_save_register_global(machine, state->romD_addr);
+	state_save_register_global(machine, state->romEF_addr);
+	state_save_register_global(machine, state->E16_add_b);
+	state_save_register_global(machine, state->HINV);
+	state_save_register_global(machine, state->VINV);
+	state_save_register_global(machine, state->XSize);
+	state_save_register_global(machine, state->YSize);
+	state_save_register_global(machine, state->mark_1);
+	state_save_register_global(machine, state->mark_2);
+	state_save_register_global(machine, state->colorram_addr_hi);
+	state_save_register_global(machine, state->ls273_g6);
+	state_save_register_global(machine, state->ls273_j6);
+	state_save_register_global(machine, state->romHI_addr_mid);
+	state_save_register_global(machine, state->romHI_addr_msb);
+	state_save_register_global(machine, state->DISP);
+	state_save_register_global(machine, state->background_romsel);
+	state_save_register_global(machine, state->color_A4);
+	state_save_register_global(machine, state->ls175_b7);
+	state_save_register_global(machine, state->ls175_e8);
+	state_save_register_global(machine, state->ls377_data);
+	state_save_register_global(machine, state->page);
 }
 
 
 VIDEO_RESET( tubep )
 {
-	memset(spritemap,0,256*256*2);
+	tubep_state *state = machine->driver_data<tubep_state>();
+	memset(state->spritemap,0,256*256*2);
 
-	romD_addr = 0;
-	romEF_addr = 0;
-	E16_add_b = 0;
-	HINV = 0;
-	VINV = 0;
-	XSize = 0;
-	YSize = 0;
-	mark_1 = 0;
-	mark_2 = 0;
-	colorram_addr_hi = 0;
-	ls273_g6 = 0;
-	ls273_j6 = 0;
-	romHI_addr_mid = 0;
-	romHI_addr_msb = 0;
-	DISP = 0;
-	background_romsel = 0;
-	color_A4 = 0;
-	ls175_b7 = 0x0f | 0xf0;
-	ls175_e8 = 0x0f;
-	ls377_data = 0;
-	page = 0;
+	state->romD_addr = 0;
+	state->romEF_addr = 0;
+	state->E16_add_b = 0;
+	state->HINV = 0;
+	state->VINV = 0;
+	state->XSize = 0;
+	state->YSize = 0;
+	state->mark_1 = 0;
+	state->mark_2 = 0;
+	state->colorram_addr_hi = 0;
+	state->ls273_g6 = 0;
+	state->ls273_j6 = 0;
+	state->romHI_addr_mid = 0;
+	state->romHI_addr_msb = 0;
+	state->DISP = 0;
+	state->background_romsel = 0;
+	state->color_A4 = 0;
+	state->ls175_b7 = 0x0f | 0xf0;
+	state->ls175_e8 = 0x0f;
+	state->ls377_data = 0;
+	state->page = 0;
 }
 
 
 WRITE8_HANDLER( tubep_textram_w )
 {
-	tubep_textram[offset] = data;
+	tubep_state *state = space->machine->driver_data<tubep_state>();
+	state->textram[offset] = data;
 }
 
 
 WRITE8_HANDLER( tubep_background_romselect_w )
 {
-	background_romsel = data & 1;
+	tubep_state *state = space->machine->driver_data<tubep_state>();
+	state->background_romsel = data & 1;
 }
 
 
 WRITE8_HANDLER( tubep_colorproms_A4_line_w )
 {
-	color_A4 = (data & 1)<<4;
+	tubep_state *state = space->machine->driver_data<tubep_state>();
+	state->color_A4 = (data & 1)<<4;
 }
 
 
 WRITE8_HANDLER( tubep_background_a000_w )
 {
-	ls175_b7 = ((data & 0x0f) ^ 0x0f) | 0xf0;
+	tubep_state *state = space->machine->driver_data<tubep_state>();
+	state->ls175_b7 = ((data & 0x0f) ^ 0x0f) | 0xf0;
 }
 
 
 WRITE8_HANDLER( tubep_background_c000_w )
 {
-	ls175_e8 = ((data & 0x0f) ^ 0x0f);
+	tubep_state *state = space->machine->driver_data<tubep_state>();
+	state->ls175_e8 = ((data & 0x0f) ^ 0x0f);
 }
 
 
@@ -464,6 +438,7 @@ static TIMER_CALLBACK( sprite_timer_callback )
 
 static void draw_sprite(running_machine *machine)
 {
+	tubep_state *state = machine->driver_data<tubep_state>();
 	UINT32	XDOT;
 	UINT32	YDOT;
 	UINT8 * romCxx  = machine->region("user2")->base()+0x00000;
@@ -472,59 +447,59 @@ static void draw_sprite(running_machine *machine)
 	UINT8 * romHI2  = romCxx+0x14000;
 
 
-	for (YDOT=0; (YDOT^YSize) != 0x00; YDOT++)
+	for (YDOT=0; (YDOT^state->YSize) != 0x00; YDOT++)
 	{
 	/* upper part of the schematic */
-		UINT32 ls273_e12 = romD10[ romD_addr | YDOT ] & 0x7f;
-		UINT32 romEF_addr_now = romEF_addr | ls273_e12;
+		UINT32 ls273_e12 = romD10[ state->romD_addr | YDOT ] & 0x7f;
+		UINT32 romEF_addr_now = state->romEF_addr | ls273_e12;
 		UINT32 E16_add_a = romEF13[ romEF_addr_now ] |
 						 ((romEF13[0x1000 + romEF_addr_now ]&0x0f)<<8);
-		UINT32 F16_add_b = E16_add_a + E16_add_b;
+		UINT32 F16_add_b = E16_add_a + state->E16_add_b;
 
 	/* lower part of the schematic */
-		UINT32 romHI_addr = (YDOT) | (romHI_addr_mid) | (((romHI_addr_msb + 0x800) )&0x1800);
+		UINT32 romHI_addr = (YDOT) | (state->romHI_addr_mid) | (((state->romHI_addr_msb + 0x800) )&0x1800);
 		UINT32 ls273_g4 = romHI2[ romHI_addr ];
 		UINT32 ls273_j4 = romHI2[0x2000+ romHI_addr ];
-		UINT32 ls86_gh5 = ls273_g4 ^ VINV;
-		UINT32 ls86_ij5 = ls273_j4 ^ VINV;
+		UINT32 ls86_gh5 = ls273_g4 ^ state->VINV;
+		UINT32 ls86_ij5 = ls273_j4 ^ state->VINV;
 
-		UINT32 ls157_gh7= ls273_g6 | (mark_2);
-		UINT32 ls157_ij7= ls273_j6 | (mark_1);
-		UINT32 ls283_gh8= (VINV & 1) + ls86_gh5 + ((ls86_gh5 & 0x80)<<1) + ls157_gh7;
-		UINT32 ls283_ij8= (VINV & 1) + ls86_ij5 + ((ls86_ij5 & 0x80)<<1) + ls157_ij7;
+		UINT32 ls157_gh7= state->ls273_g6 | (state->mark_2);
+		UINT32 ls157_ij7= state->ls273_j6 | (state->mark_1);
+		UINT32 ls283_gh8= (state->VINV & 1) + ls86_gh5 + ((ls86_gh5 & 0x80)<<1) + ls157_gh7;
+		UINT32 ls283_ij8= (state->VINV & 1) + ls86_ij5 + ((ls86_ij5 & 0x80)<<1) + ls157_ij7;
 
 		UINT32 ls273_g9 = ls283_gh8;
 		UINT32 ls273_j9 = ls283_ij8;
 
-		for (XDOT=0; (XDOT^XSize) != 0x00; XDOT++)
+		for (XDOT=0; (XDOT^state->XSize) != 0x00; XDOT++)
 		{
 	/* upper part of the schematic */
-			UINT32 romD10_out = romD10[ romD_addr | XDOT ];
+			UINT32 romD10_out = romD10[ state->romD_addr | XDOT ];
 			UINT32 F16_add_a = (romD10_out & 0x7e) >>1;
 			UINT32 romCxx_addr = (F16_add_a + F16_add_b ) & 0xffff;
 			UINT32 romCxx_out = romCxx[ romCxx_addr ];
 
 			UINT32 colorram_addr_lo = (romD10_out&1) ? (romCxx_out>>4)&0x0f: (romCxx_out>>0)&0x0f;
 
-			UINT8 sp_data = tubep_sprite_colorsharedram[ colorram_addr_hi | colorram_addr_lo ] & 0x0f; /* 2114 4-bit RAM */
+			UINT8 sp_data = state->sprite_colorsharedram[ state->colorram_addr_hi | colorram_addr_lo ] & 0x0f; /* 2114 4-bit RAM */
 
 	/* lower part of the schematic */
-			romHI_addr = (XDOT) | (romHI_addr_mid) | (romHI_addr_msb);
+			romHI_addr = (XDOT) | (state->romHI_addr_mid) | (state->romHI_addr_msb);
 			ls273_g4 = romHI2[ romHI_addr ];
 			ls273_j4 = romHI2[0x2000+ romHI_addr ];
-			ls86_gh5 = ls273_g4 ^ HINV;
-			ls86_ij5 = ls273_j4 ^ HINV;
+			ls86_gh5 = ls273_g4 ^ state->HINV;
+			ls86_ij5 = ls273_j4 ^ state->HINV;
 
 			ls157_gh7= ls273_g9;
 			ls157_ij7= ls273_j9;
-			ls283_gh8= (HINV & 1) + ls86_gh5 + ((ls86_gh5 & 0x80)<<1) + ls157_gh7;
-			ls283_ij8= (HINV & 1) + ls86_ij5 + ((ls86_ij5 & 0x80)<<1) + ls157_ij7;
+			ls283_gh8= (state->HINV & 1) + ls86_gh5 + ((ls86_gh5 & 0x80)<<1) + ls157_gh7;
+			ls283_ij8= (state->HINV & 1) + ls86_ij5 + ((ls86_ij5 & 0x80)<<1) + ls157_ij7;
 
 
 			if ( !((ls283_gh8&256) | (ls283_ij8&256)) ) /* skip wrapped sprite area - PAL12L6 (PLA019 in Roller Jammer schematics)*/
 			{
-				if ( spritemap[ (ls283_gh8&255) + (ls283_ij8&255)*256 + DISP*256*256 ] == 0x0f )
-					spritemap[ (ls283_gh8&255) + (ls283_ij8&255)*256 + DISP*256*256 ] = sp_data;
+				if ( state->spritemap[ (ls283_gh8&255) + (ls283_ij8&255)*256 + state->DISP*256*256 ] == 0x0f )
+					state->spritemap[ (ls283_gh8&255) + (ls283_ij8&255)*256 + state->DISP*256*256 ] = sp_data;
 			}
 		}
 	}
@@ -533,64 +508,65 @@ static void draw_sprite(running_machine *machine)
 
 WRITE8_HANDLER( tubep_sprite_control_w )
 {
+	tubep_state *state = space->machine->driver_data<tubep_state>();
 	if (offset < 10)
 	{
 		/*graph_ctrl[offset] = data;*/
 		switch(offset)
 		{
 		case 0:	/*a*/
-			romEF_addr = (0x010 | (data & 0x0f))<<7; /*roms @F13, @E13 have A11 lines connected to +5V directly */
-			HINV = (data & 0x10) ? 0xff: 0x00;
-			VINV = (data & 0x20) ? 0xff: 0x00;
+			state->romEF_addr = (0x010 | (data & 0x0f))<<7; /*roms @F13, @E13 have A11 lines connected to +5V directly */
+			state->HINV = (data & 0x10) ? 0xff: 0x00;
+			state->VINV = (data & 0x20) ? 0xff: 0x00;
 			break;
 
 		case 1:	/*b: XSize-1 */
-			XSize = data & 0x7f;
-			mark_2 = (data&0x80)<<1;
+			state->XSize = data & 0x7f;
+			state->mark_2 = (data&0x80)<<1;
 			break;
 
 		case 2:	/*c: YSize-1 */
-			YSize = data & 0x7f;
-			mark_1 = (data&0x80)<<1;
+			state->YSize = data & 0x7f;
+			state->mark_1 = (data&0x80)<<1;
 			break;
 
 		case 3:	/*d*/
-			ls273_g6 = (data & 0xff);
+			state->ls273_g6 = (data & 0xff);
 			break;
 
 		case 4:	/*e*/
-			ls273_j6 = (data & 0xff);
+			state->ls273_j6 = (data & 0xff);
 			break;
 
 		case 5:	/*f*/
-			romHI_addr_mid = (data & 0x0f)<<7;
-			romHI_addr_msb = (data & 0x30)<<7;
+			state->romHI_addr_mid = (data & 0x0f)<<7;
+			state->romHI_addr_msb = (data & 0x30)<<7;
 			break;
 
 		case 6:	/*g*/
-			romD_addr = (data & 0x3f)<<7;
+			state->romD_addr = (data & 0x3f)<<7;
 			break;
 
 		case 7:	/*h: adder input LSB*/
-			E16_add_b = ((data & 0xff) << 0) | (E16_add_b & 0xff00);
+			state->E16_add_b = ((data & 0xff) << 0) | (state->E16_add_b & 0xff00);
 			break;
 
 		case 8:	/*J: adder input MSB*/
-			E16_add_b = ((data & 0xff) << 8) | (E16_add_b & 0x00ff);
+			state->E16_add_b = ((data & 0xff) << 8) | (state->E16_add_b & 0x00ff);
 			break;
 
 		case 9:	/*K*/
 			/*write to: LS174 @J3 to set color bank (hi address lines to 2114 colorram @J1 ) */
-			colorram_addr_hi = (data & 0x3f) << 4;
+			state->colorram_addr_hi = (data & 0x3f) << 4;
 
 			/*write to: LS74 @D13 to clear the interrupt line /SINT
-            /SINT line will be reasserted in XSize * YSize cycles (RH0 signal cycles)
+            /SINT line will be reasserted in state->XSize * state->YSize cycles (RH0 signal cycles)
             */
 			/* 1.clear the /SINT interrupt line */
 			cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
 
 			/* 2.assert /SINT again after this time */
-			space->machine->scheduler().timer_set( attotime::from_hz(19968000/8) * ((XSize+1)*(YSize+1)), FUNC(sprite_timer_callback));
+			space->machine->scheduler().timer_set( attotime::from_hz(19968000/8) * ((state->XSize+1)*(state->YSize+1)), FUNC(sprite_timer_callback));
 
 			/* 3.clear of /SINT starts sprite drawing circuit */
 			draw_sprite(space->machine);
@@ -599,26 +575,28 @@ WRITE8_HANDLER( tubep_sprite_control_w )
 	}
 }
 
-void tubep_vblank_end(void)
+void tubep_vblank_end(running_machine *machine)
 {
-	DISP = DISP ^ 1;
-	/* logerror("EOF: DISP after this is=%i, and clearing it now.\n", DISP); */
+	tubep_state *state = machine->driver_data<tubep_state>();
+	state->DISP = state->DISP ^ 1;
+	/* logerror("EOF: DISP after this is=%i, and clearing it now.\n", state->DISP); */
 	/* clear the new frame (the one that was (just) displayed)*/
-	memset(spritemap+DISP*256*256, 0x0f, 256*256);
+	memset(state->spritemap+state->DISP*256*256, 0x0f, 256*256);
 }
 
 
 SCREEN_UPDATE( tubep )
 {
-	int DISP_ = DISP^1;
+	tubep_state *state = screen->machine->driver_data<tubep_state>();
+	int DISP_ = state->DISP^1;
 
 	pen_t pen_base = 32; //change it later
 
 	UINT32 v;
 	UINT8 *text_gfx_base = screen->machine->region("gfx1")->base();
-	UINT8 *romBxx = screen->machine->region("user1")->base() + 0x2000*background_romsel;
+	UINT8 *romBxx = screen->machine->region("user1")->base() + 0x2000*state->background_romsel;
 
-	/* logerror(" update: from DISP=%i y_min=%3i y_max=%3i\n", DISP_, cliprect->min_y, cliprect->max_y+1); */
+	/* logerror(" update: from state->DISP=%i y_min=%3i y_max=%3i\n", DISP_, cliprect->min_y, cliprect->max_y+1); */
 
 	for (v = cliprect->min_y; v <= cliprect->max_y; v++)	/* only for current scanline */
 	{
@@ -632,14 +610,14 @@ SCREEN_UPDATE( tubep )
 
 			sp_data2 = sp_data1;
 			sp_data1 = sp_data0;
-			sp_data0 = spritemap[ h + v*256 +(DISP_*256*256) ];
+			sp_data0 = state->spritemap[ h + v*256 +(DISP_*256*256) ];
 
 			text_offs = ((v >> 3) << 6) | ((h >> 3) << 1);
-			text_code = tubep_textram[text_offs];
+			text_code = state->textram[text_offs];
 			text_gfx_data = text_gfx_base[(text_code << 3) | (v & 0x07)];
 
 			if (text_gfx_data & (0x80 >> (h & 0x07)))
-				*BITMAP_ADDR16(bitmap, v, h) = (tubep_textram[text_offs + 1] & 0x0f) | color_A4;
+				*BITMAP_ADDR16(bitmap, v, h) = (state->textram[text_offs + 1] & 0x0f) | state->color_A4;
 			else
 			{
 				UINT32 bg_data;
@@ -653,10 +631,10 @@ SCREEN_UPDATE( tubep )
 				UINT8 romB_data_h = romBxx[ 0x4000 + 0x4000*rom_select + romB_addr ];
 				/* romB_data_h = output of LS374 @B3 or @B4 */
 
-				UINT32 VR_addr = ((romB_data_h + ls175_b7) & 0xfe) << 2;
+				UINT32 VR_addr = ((romB_data_h + state->ls175_b7) & 0xfe) << 2;
 				/* VR_addr = output of LS157s @B1 and @B6 */
 
-				UINT8 xor_logic = (((h^v)&0x80)>>7) ^ (background_romsel & (((v&0x80)>>7)^1));
+				UINT8 xor_logic = (((h^v)&0x80)>>7) ^ (state->background_romsel & (((v&0x80)>>7)^1));
 
 				/* read from ROMs: B1/2 */
 				UINT8 romB_data_l = romBxx[ romB_addr ] ^ (xor_logic?0xff:0x00);
@@ -664,11 +642,11 @@ SCREEN_UPDATE( tubep )
 
 				UINT8 ls157_b11 = (romB_data_l >> ((rom_select==0)?4:0))&0x0f;
 
-				UINT8 ls283_b12 = (ls157_b11 + ls175_e8) & 0x0f;
+				UINT8 ls283_b12 = (ls157_b11 + state->ls175_e8) & 0x0f;
 
 				VR_addr |= (ls283_b12>>1);
 
-				bg_data = tubep_backgroundram[ VR_addr ];
+				bg_data = state->backgroundram[ VR_addr ];
 
 				romB_data_h>>=2;
 
@@ -678,7 +656,7 @@ SCREEN_UPDATE( tubep )
 					sp_data = sp_data1;
 
 				if (sp_data != 0x0f)
-					bg_data = prom2[sp_data | color_A4];
+					bg_data = state->prom2[sp_data | state->color_A4];
 
 				*BITMAP_ADDR16(bitmap, v, h) = pen_base + bg_data*64 + romB_data_h;
 			}
@@ -753,19 +731,22 @@ PALETTE_INIT( rjammer )
 
 WRITE8_HANDLER( rjammer_background_LS377_w )
 {
-	ls377_data = data & 0xff;
+	tubep_state *state = space->machine->driver_data<tubep_state>();
+	state->ls377_data = data & 0xff;
 }
 
 
 WRITE8_HANDLER( rjammer_background_page_w )
 {
-	page = (data & 1) * 0x200;
+	tubep_state *state = space->machine->driver_data<tubep_state>();
+	state->page = (data & 1) * 0x200;
 }
 
 
 SCREEN_UPDATE( rjammer )
 {
-	int DISP_ = DISP^1;
+	tubep_state *state = screen->machine->driver_data<tubep_state>();
+	int DISP_ = state->DISP^1;
 
 	UINT32 v;
 	UINT8 *text_gfx_base = screen->machine->region("gfx1")->base();
@@ -785,10 +766,10 @@ SCREEN_UPDATE( rjammer )
 		UINT8 pal14h4_pin18;
 		UINT8 pal14h4_pin13;
 
-		UINT32 addr = (v*2) | page;
-		UINT32 ram_data = rjammer_backgroundram[ addr ] + 256*(rjammer_backgroundram[ addr+1 ]&0x2f);
+		UINT32 addr = (v*2) | state->page;
+		UINT32 ram_data = state->rjammer_backgroundram[ addr ] + 256*(state->rjammer_backgroundram[ addr+1 ]&0x2f);
 
-		addr = (v>>3) | ((ls377_data&0x1f)<<5);
+		addr = (v>>3) | ((state->ls377_data&0x1f)<<5);
 		pal14h4_pin13 = (rom19C[addr] >> ((v&7)^7) ) &1;
 		pal14h4_pin19 = (ram_data>>13) & 1;
 
@@ -800,14 +781,14 @@ SCREEN_UPDATE( rjammer )
 
 			sp_data2 = sp_data1;
 			sp_data1 = sp_data0;
-			sp_data0 = spritemap[ h + v*256 +(DISP_*256*256) ];
+			sp_data0 = state->spritemap[ h + v*256 +(DISP_*256*256) ];
 
 			text_offs = ((v >> 3) << 6) | ((h >> 3) << 1);
-			text_code = tubep_textram[text_offs];
+			text_code = state->textram[text_offs];
 			text_gfx_data = text_gfx_base[(text_code << 3) | (v & 0x07)];
 
 			if (text_gfx_data & (0x80 >> (h & 0x07)))
-				*BITMAP_ADDR16(bitmap, v, h) = 0x10 | (tubep_textram[text_offs + 1] & 0x0f);
+				*BITMAP_ADDR16(bitmap, v, h) = 0x10 | (state->textram[text_offs + 1] & 0x0f);
 			else
 			{
 				UINT32 sp_data;
@@ -842,7 +823,7 @@ SCREEN_UPDATE( rjammer )
 					else
 						bg_data = (rom11_data>>4) & 0x0f;
 
-					addr = (h>>3) | (ls377_data<<5);
+					addr = (h>>3) | (state->ls377_data<<5);
 					pal14h4_pin18 = (rom19C[addr] >> ((h&7)^7) ) &1;
 
 					/*

@@ -123,11 +123,10 @@
  *
  *************************************/
 
-static emu_timer *interrupt_timer;
-
 
 static TIMER_CALLBACK( interrupt_callback )
 {
+	spacefb_state *state = machine->driver_data<spacefb_state>();
 	int next_vpos;
 
 	/* compute vector and set the interrupt line */
@@ -141,19 +140,21 @@ static TIMER_CALLBACK( interrupt_callback )
 	else
 		next_vpos = SPACEFB_INT_TRIGGER_COUNT_1;
 
-	interrupt_timer->adjust(machine->primary_screen->time_until_pos(next_vpos));
+	state->interrupt_timer->adjust(machine->primary_screen->time_until_pos(next_vpos));
 }
 
 
 static void create_interrupt_timer(running_machine *machine)
 {
-	interrupt_timer = machine->scheduler().timer_alloc(FUNC(interrupt_callback));
+	spacefb_state *state = machine->driver_data<spacefb_state>();
+	state->interrupt_timer = machine->scheduler().timer_alloc(FUNC(interrupt_callback));
 }
 
 
 static void start_interrupt_timer(running_machine *machine)
 {
-	interrupt_timer->adjust(machine->primary_screen->time_until_pos(SPACEFB_INT_TRIGGER_COUNT_1));
+	spacefb_state *state = machine->driver_data<spacefb_state>();
+	state->interrupt_timer->adjust(machine->primary_screen->time_until_pos(SPACEFB_INT_TRIGGER_COUNT_1));
 }
 
 
@@ -199,7 +200,7 @@ static MACHINE_RESET( spacefb )
 static ADDRESS_MAP_START( spacefb_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_NOP
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x3c00) AM_RAM AM_BASE(&spacefb_videoram) AM_SIZE(&spacefb_videoram_size)
+	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x3c00) AM_RAM AM_BASE_MEMBER(spacefb_state, videoram) AM_SIZE_MEMBER(spacefb_state, videoram_size)
 	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3000) AM_RAM
 	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_NOP
 ADDRESS_MAP_END
@@ -333,7 +334,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( spacefb, driver_device )
+static MACHINE_CONFIG_START( spacefb, spacefb_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, SPACEFB_MAIN_CPU_CLOCK)

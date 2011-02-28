@@ -104,20 +104,7 @@ TP-S.1 TP-S.2 TP-S.3 TP-B.1  8212 TP-B.2 TP-B.3          TP-B.4
 #include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
-
 #include "includes/tubep.h"
-
-/* Global variables */
-static UINT8 sound_latch;
-static UINT8 ls74 = 0;
-static UINT8 ls377 = 0;
-
-static emu_timer *interrupt_timer;
-
-
-static int curr_scanline=0;
-
-
 
 
 /*************************************
@@ -160,7 +147,7 @@ static WRITE8_HANDLER( tubep_LS259_w )
 static ADDRESS_MAP_START( tubep_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(tubep_textram_w) AM_BASE(&tubep_textram)	/* RAM on GFX PCB @B13 */
+	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(tubep_textram_w) AM_BASE_MEMBER(tubep_state, textram)	/* RAM on GFX PCB @B13 */
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITEONLY AM_SHARE("share1")
 	AM_RANGE(0xe800, 0xebff) AM_WRITEONLY AM_SHARE("share4")				/* row of 8 x 2147 RAMs on main PCB */
 ADDRESS_MAP_END
@@ -168,15 +155,17 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( main_cpu_irq_line_clear_w )
 {
+	tubep_state *state = space->machine->driver_data<tubep_state>();
 	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
-	logerror("CPU#0 VBLANK int clear at scanline=%3i\n", curr_scanline);
+	logerror("CPU#0 VBLANK int clear at scanline=%3i\n", state->curr_scanline);
 	return;
 }
 
 
 static WRITE8_HANDLER( tubep_soundlatch_w )
 {
-	sound_latch = (data&0x7f) | 0x80;
+	tubep_state *state = space->machine->driver_data<tubep_state>();
+	state->sound_latch = (data&0x7f) | 0x80;
 }
 
 static ADDRESS_MAP_START( tubep_main_portmap, ADDRESS_SPACE_IO, 8 )
@@ -204,8 +193,9 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( second_cpu_irq_line_clear_w )
 {
+	tubep_state *state = space->machine->driver_data<tubep_state>();
 	cputag_set_input_line(space->machine, "slave", 0, CLEAR_LINE);
-	logerror("CPU#1 VBLANK int clear at scanline=%3i\n", curr_scanline);
+	logerror("CPU#1 VBLANK int clear at scanline=%3i\n", state->curr_scanline);
 	return;
 }
 
@@ -215,7 +205,7 @@ static ADDRESS_MAP_START( tubep_second_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(tubep_background_a000_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(tubep_background_c000_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")								/* 6116 #1 */
-	AM_RANGE(0xe800, 0xebff) AM_WRITEONLY AM_SHARE("share4") AM_BASE(&tubep_backgroundram)	/* row of 8 x 2147 RAMs on main PCB */
+	AM_RANGE(0xe800, 0xebff) AM_WRITEONLY AM_SHARE("share4") AM_BASE_MEMBER(tubep_state, backgroundram)	/* row of 8 x 2147 RAMs on main PCB */
 	AM_RANGE(0xf000, 0xf3ff) AM_WRITEONLY AM_SHARE("share3")						/* sprites color lookup table */
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share2")									/* program copies here part of shared ram ?? */
 ADDRESS_MAP_END
@@ -229,10 +219,11 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( tubep_soundlatch_r )
 {
+	tubep_state *state = space->machine->driver_data<tubep_state>();
 	int res;
 
-	res = sound_latch;
-	sound_latch = 0; /* "=0" ????  or "&= 0x7f" ?????  works either way */
+	res = state->sound_latch;
+	state->sound_latch = 0; /* "=0" ????  or "&= 0x7f" ?????  works either way */
 
 	return res;
 }
@@ -269,9 +260,10 @@ ADDRESS_MAP_END
 
 static TIMER_CALLBACK( tubep_scanline_callback )
 {
+	tubep_state *state = machine->driver_data<tubep_state>();
 	int scanline = param;
 
-	curr_scanline = scanline;//for debugging
+	state->curr_scanline = scanline;//for debugging
 
 	/* CPU #0 interrupt */
 	/* activates at the start of VBLANK signal which happens at the beginning of scaline number 240 */
@@ -296,7 +288,7 @@ static TIMER_CALLBACK( tubep_scanline_callback )
 	if (scanline == 16)
 	{
 		logerror("/nmi CPU#3\n");
-		tubep_vblank_end(); /* switch buffered sprite RAM page */
+		tubep_vblank_end(machine); /* switch buffered sprite RAM state->page */
 		cputag_set_input_line(machine, "mcu", INPUT_LINE_NMI, ASSERT_LINE);
 	}
 	/* CPU #3 MS2010-A NMI */
@@ -325,7 +317,7 @@ static TIMER_CALLBACK( tubep_scanline_callback )
 	if (scanline >= 264)
 		scanline = 0;
 
-	interrupt_timer->adjust(machine->primary_screen->time_until_pos(scanline), scanline);
+	state->interrupt_timer->adjust(machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -338,18 +330,20 @@ static TIMER_CALLBACK( tubep_scanline_callback )
 
 static void tubep_setup_save_state(running_machine *machine)
 {
+	tubep_state *state = machine->driver_data<tubep_state>();
 	/* Set up save state */
-	state_save_register_global(machine, sound_latch);
-	state_save_register_global(machine, ls74);
-	state_save_register_global(machine, ls377);
+	state_save_register_global(machine, state->sound_latch);
+	state_save_register_global(machine, state->ls74);
+	state_save_register_global(machine, state->ls377);
 }
 
 
 
 static MACHINE_START( tubep )
 {
+	tubep_state *state = machine->driver_data<tubep_state>();
 	/* Create interrupt timer */
-	interrupt_timer = machine->scheduler().timer_alloc(FUNC(tubep_scanline_callback));
+	state->interrupt_timer = machine->scheduler().timer_alloc(FUNC(tubep_scanline_callback));
 
 	tubep_setup_save_state(machine);
 }
@@ -357,7 +351,8 @@ static MACHINE_START( tubep )
 
 static MACHINE_RESET( tubep )
 {
-	interrupt_timer->adjust(machine->primary_screen->time_until_pos(0));
+	tubep_state *state = machine->driver_data<tubep_state>();
+	state->interrupt_timer->adjust(machine->primary_screen->time_until_pos(0));
 }
 
 
@@ -370,7 +365,7 @@ static MACHINE_RESET( tubep )
 
 /* MS2010-A CPU (equivalent to NSC8105 with one new opcode: 0xec) on graphics PCB */
 static ADDRESS_MAP_START( nsc_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("share3") AM_BASE(&tubep_sprite_colorsharedram)
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("share3") AM_BASE_MEMBER(tubep_state, sprite_colorsharedram)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x2000, 0x2009) AM_WRITE(tubep_sprite_control_w)
 	AM_RANGE(0x200a, 0x200b) AM_WRITENOP /* not used by the games - perhaps designed for debugging */
@@ -404,7 +399,8 @@ static WRITE8_HANDLER( rjammer_LS259_w )
 
 static WRITE8_HANDLER( rjammer_soundlatch_w )
 {
-	sound_latch = data;
+	tubep_state *state = space->machine->driver_data<tubep_state>();
+	state->sound_latch = data;
 	cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -412,7 +408,7 @@ static WRITE8_HANDLER( rjammer_soundlatch_w )
 static ADDRESS_MAP_START( rjammer_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM									/* MB8416 SRAM on daughterboard on main PCB (there are two SRAMs, this is the one on the left) */
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(tubep_textram_w) AM_BASE(&tubep_textram)/* RAM on GFX PCB @B13 */
+	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(tubep_textram_w) AM_BASE_MEMBER(tubep_state, textram)/* RAM on GFX PCB @B13 */
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")						/* MB8416 SRAM on daughterboard (the one on the right) */
 ADDRESS_MAP_END
 
@@ -436,7 +432,7 @@ static ADDRESS_MAP_START( rjammer_second_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM							/* M5M5117P @21G */
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")				/* MB8416 on daughterboard (the one on the right) */
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(&rjammer_backgroundram)/* M5M5117P @19B (background) */
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(tubep_state, rjammer_backgroundram)/* M5M5117P @19B (background) */
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share2")
 ADDRESS_MAP_END
 
@@ -450,9 +446,10 @@ ADDRESS_MAP_END
 
 static TIMER_CALLBACK( rjammer_scanline_callback )
 {
+	tubep_state *state = machine->driver_data<tubep_state>();
 	int scanline = param;
 
-	curr_scanline = scanline;//for debugging
+	state->curr_scanline = scanline;//for debugging
 
 	/* CPU #0 interrupt */
 	/* activates at the start of VBLANK signal which happens at the beginning of scaline number 240 */
@@ -477,7 +474,7 @@ static TIMER_CALLBACK( rjammer_scanline_callback )
 	if (scanline == 16)
 	{
 		logerror("/nmi CPU#3\n");
-		tubep_vblank_end(); /* switch buffered sprite RAM page */
+		tubep_vblank_end(machine); /* switch buffered sprite RAM state->page */
 		cputag_set_input_line(machine, "mcu", INPUT_LINE_NMI, ASSERT_LINE);
 	}
 	/* CPU #3 MS2010-A NMI */
@@ -505,21 +502,23 @@ static TIMER_CALLBACK( rjammer_scanline_callback )
 	if (scanline >= 264)
 		scanline = 0;
 
-	interrupt_timer->adjust(machine->primary_screen->time_until_pos(scanline), scanline);
+	state->interrupt_timer->adjust(machine->primary_screen->time_until_pos(scanline), scanline);
 }
 
 
 static MACHINE_START( rjammer )
 {
+	tubep_state *state = machine->driver_data<tubep_state>();
 	/* Create interrupt timer */
-	interrupt_timer = machine->scheduler().timer_alloc(FUNC(rjammer_scanline_callback));
+	state->interrupt_timer = machine->scheduler().timer_alloc(FUNC(rjammer_scanline_callback));
 
 	tubep_setup_save_state(machine);
 }
 
 static MACHINE_RESET( rjammer )
 {
-	interrupt_timer->adjust(machine->primary_screen->time_until_pos(0));
+	tubep_state *state = machine->driver_data<tubep_state>();
+	state->interrupt_timer->adjust(machine->primary_screen->time_until_pos(0));
 }
 
 
@@ -532,7 +531,8 @@ static MACHINE_RESET( rjammer )
 
 static READ8_HANDLER( rjammer_soundlatch_r )
 {
-	int res = sound_latch;
+	tubep_state *state = space->machine->driver_data<tubep_state>();
+	int res = state->sound_latch;
 	return res;
 }
 
@@ -562,16 +562,17 @@ static WRITE8_DEVICE_HANDLER( rjammer_voice_frequency_select_w )
 
 static void rjammer_adpcm_vck (device_t *device)
 {
-	ls74 = (ls74 + 1) & 1;
+	tubep_state *state = device->machine->driver_data<tubep_state>();
+	state->ls74 = (state->ls74 + 1) & 1;
 
-	if (ls74 == 1)
+	if (state->ls74 == 1)
 	{
-		msm5205_data_w(device, (ls377 >> 0) & 15 );
+		msm5205_data_w(device, (state->ls377 >> 0) & 15 );
 		cputag_set_input_line(device->machine, "soundcpu", 0, ASSERT_LINE );
 	}
 	else
 	{
-		msm5205_data_w(device, (ls377 >> 4) & 15 );
+		msm5205_data_w(device, (state->ls377 >> 4) & 15 );
 	}
 
 }
@@ -579,10 +580,11 @@ static void rjammer_adpcm_vck (device_t *device)
 
 static WRITE8_HANDLER( rjammer_voice_input_w )
 {
+	tubep_state *state = space->machine->driver_data<tubep_state>();
 	/* 8 bits of adpcm data for MSM5205 */
 	/* need to buffer the data, and switch two nibbles on two following interrupts*/
 
-	ls377 = data;
+	state->ls377 = data;
 
 
 	/* NOTE: game resets interrupt line on ANY access to ANY I/O port.
@@ -892,7 +894,7 @@ static const msm5205_interface msm5205_config =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tubep, driver_device )
+static MACHINE_CONFIG_START( tubep, tubep_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,16000000 / 4)	/* 4 MHz */
@@ -954,7 +956,7 @@ static MACHINE_CONFIG_DERIVED( tubepb, tubep )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rjammer, driver_device )
+static MACHINE_CONFIG_START( rjammer, tubep_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,16000000 / 4)	/* 4 MHz */

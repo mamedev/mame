@@ -47,7 +47,7 @@ static READ8_HANDLER( pastelg_sndrom_r )
 {
 	UINT8 *ROM = space->machine->region("voice")->base();
 
-	return ROM[pastelg_blitter_src_addr_r() & 0x7fff];
+	return ROM[pastelg_blitter_src_addr_r(space) & 0x7fff];
 }
 
 static ADDRESS_MAP_START( pastelg_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -77,11 +77,11 @@ static ADDRESS_MAP_START( pastelg_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xe0, 0xe0) AM_READ_PORT("DSWC")
 ADDRESS_MAP_END
 
-static UINT8 mux_data;
 
 static READ8_HANDLER( threeds_inputport1_r )
 {
-	switch(mux_data)
+	pastelg_state *state = space->machine->driver_data<pastelg_state>();
+	switch(state->mux_data)
 	{
 		case 0x01: return input_port_read(space->machine,"KEY0_PL1");
 		case 0x02: return input_port_read(space->machine,"KEY1_PL1");
@@ -95,7 +95,8 @@ static READ8_HANDLER( threeds_inputport1_r )
 
 static READ8_HANDLER( threeds_inputport2_r )
 {
-	switch(mux_data)
+	pastelg_state *state = space->machine->driver_data<pastelg_state>();
+	switch(state->mux_data)
 	{
 		case 0x01: return input_port_read(space->machine,"KEY0_PL2");
 		case 0x02: return input_port_read(space->machine,"KEY1_PL2");
@@ -109,7 +110,8 @@ static READ8_HANDLER( threeds_inputport2_r )
 
 static WRITE8_HANDLER( threeds_inputportsel_w )
 {
-	mux_data = ~data;
+	pastelg_state *state = space->machine->driver_data<pastelg_state>();
+	state->mux_data = ~data;
 }
 
 static ADDRESS_MAP_START( threeds_io_map, ADDRESS_SPACE_IO, 8 )
@@ -405,7 +407,7 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static MACHINE_CONFIG_START( pastelg, driver_device )
+static MACHINE_CONFIG_START( pastelg, pastelg_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 19968000/4)	/* unknown divider, galds definitely relies on this for correct voice pitch */
@@ -465,7 +467,7 @@ Note
 
 */
 
-static MACHINE_CONFIG_START( threeds, driver_device )
+static MACHINE_CONFIG_START( threeds, pastelg_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 19968000/4)	/* unknown divider, galds definitely relies on this for correct voice pitch */

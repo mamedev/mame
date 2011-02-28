@@ -2917,7 +2917,7 @@ static const ay8910_interface ay8910_config =
 
 
 
-static MACHINE_CONFIG_START( NBMJDRV_4096, driver_device )
+static MACHINE_CONFIG_START( NBMJDRV_4096, nbmj8688_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)	/* 5.00 MHz */
@@ -3039,7 +3039,7 @@ static MACHINE_CONFIG_DERIVED( mbmj_p16bit, NBMJDRV_65536 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( mbmj_p16bit_LCD, driver_device )
+static MACHINE_CONFIG_START( mbmj_p16bit_LCD, nbmj8688_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)	/* 5.00 MHz */

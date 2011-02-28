@@ -1,3 +1,9 @@
+typedef struct
+{
+	int writable;	// 1 for RAM, 0 for ROM
+	UINT8* chr;		// direct access to the memory
+} chr_bank;
+
 class playch10_state : public driver_device
 {
 public:
@@ -5,6 +11,40 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	UINT8 *ram_8w;
+	UINT8 *work_ram;
+	int up_8w;
+	UINT8 *timedata;
+	int pc10_nmi_enable;
+	int pc10_dog_di;
+	int pc10_sdcs;
+	int pc10_dispmask;
+	int pc10_int_detect;
+	int pc10_game_mode;
+	int pc10_dispmask_old;
+	int pc10_gun_controller;
+	int cart_sel;
+	int cntrl_mask;
+	int input_latch[2];
+	int mirroring;
+	int MMC2_bank[4];
+	int MMC2_bank_latch[2];
+	UINT8* vrom;
+	UINT8* vram;
+	UINT8* nametable[4];
+	UINT8* nt_ram;
+	chr_bank chr_page[8];
+	int mmc1_shiftreg;
+	int mmc1_shiftcount;
+	int mmc1_rom_mask;
+	int gboard_scanline_counter;
+	int gboard_scanline_latch;
+	int gboard_banks[2];
+	int gboard_4screen;
+	int gboard_last_bank;
+	int gboard_command;
+	int pc10_bios;
+	tilemap_t *bg_tilemap;
 };
 
 
@@ -47,13 +87,6 @@ WRITE8_HANDLER( pc10_prot_w );
 WRITE8_HANDLER( pc10_CARTSEL_w );
 WRITE8_HANDLER( pc10_in0_w );
 
-extern int pc10_nmi_enable;
-extern int pc10_dog_di;
-extern int pc10_sdcs;			/* ShareD Chip Select */
-extern int pc10_dispmask;		/* Display Mask */
-extern int pc10_int_detect;
-extern int pc10_game_mode;
-extern int pc10_dispmask_old;
 
 
 /*----------- defined in video/playch10.c -----------*/

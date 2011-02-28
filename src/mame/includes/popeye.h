@@ -1,9 +1,27 @@
-/*----------- defined in video/popeye.c -----------*/
+class popeye_state : public driver_device
+{
+public:
+	popeye_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-extern UINT8 *popeye_videoram;
-extern UINT8 *popeye_colorram;
-extern UINT8 *popeye_background_pos;
-extern UINT8 *popeye_palettebank;
+	UINT8 prot0;
+	UINT8 prot1;
+	UINT8 prot_shift;
+	int dswbit;
+	UINT8 *videoram;
+	UINT8 *colorram;
+	UINT8 *background_pos;
+	UINT8 *palettebank;
+	UINT8 *bitmapram;
+	bitmap_t *tmpbitmap2;
+	UINT8 invertmask;
+	UINT8 bitmap_type;
+	tilemap_t *fg_tilemap;
+	UINT8 lastflip;
+};
+
+
+/*----------- defined in video/popeye.c -----------*/
 
 WRITE8_HANDLER( popeye_videoram_w );
 WRITE8_HANDLER( popeye_colorram_w );

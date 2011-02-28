@@ -46,9 +46,9 @@ static ADDRESS_MAP_START( clshroad_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa001, 0xa001) AM_WRITENOP	// ? Interrupt related
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(clshroad_flipscreen_w)
 	AM_RANGE(0xa100, 0xa107) AM_READ(clshroad_input_r)
-	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(clshroad_vram_1_w) AM_BASE(&clshroad_vram_1)	// Layer 1
-	AM_RANGE(0xb000, 0xb003) AM_WRITEONLY AM_BASE(&clshroad_vregs)	// Scroll
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(clshroad_vram_0_w) AM_BASE(&clshroad_vram_0)	// Layer 0
+	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(clshroad_vram_1_w) AM_BASE_MEMBER(clshroad_state, vram_1)	// Layer 1
+	AM_RANGE(0xb000, 0xb003) AM_WRITEONLY AM_BASE_MEMBER(clshroad_state, vregs)	// Scroll
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(clshroad_vram_0_w) AM_BASE_MEMBER(clshroad_state, vram_0)	// Layer 0
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( clshroad_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -226,7 +226,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( firebatl, driver_device )
+static MACHINE_CONFIG_START( firebatl, clshroad_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3000000)	/* ? */
@@ -261,7 +261,7 @@ static MACHINE_CONFIG_START( firebatl, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( clshroad, driver_device )
+static MACHINE_CONFIG_START( clshroad, clshroad_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/4)	/* ? real speed unknown. 3MHz is too low and causes problems */

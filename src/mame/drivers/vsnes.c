@@ -148,9 +148,6 @@ Changes:
 
 /******************************************************************************/
 
-/* local stuff */
-static UINT8 *work_ram, *work_ram_1;
-static int coin;
 
 static WRITE8_HANDLER( sprite_dma_0_w )
 {
@@ -166,8 +163,9 @@ static WRITE8_HANDLER( sprite_dma_1_w )
 
 static WRITE8_HANDLER( vsnes_coin_counter_w )
 {
+	vsnes_state *state = space->machine->driver_data<vsnes_state>();
 	coin_counter_w( space->machine, 0, data & 0x01 );
-	coin = data;
+	state->coin = data;
 
 	 //"bnglngby" and "cluclu"
 	if( data & 0xfe )
@@ -178,8 +176,9 @@ static WRITE8_HANDLER( vsnes_coin_counter_w )
 
 static READ8_HANDLER( vsnes_coin_counter_r )
 {
+	vsnes_state *state = space->machine->driver_data<vsnes_state>();
 	//only for platoon
-	return coin;
+	return state->coin;
 }
 
 static WRITE8_HANDLER( vsnes_coin_counter_1_w )
@@ -210,7 +209,7 @@ static WRITE8_DEVICE_HANDLER( psg_4017_w )
 }
 
 static ADDRESS_MAP_START( vsnes_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_BASE(&work_ram)
+	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_BASE_MEMBER(vsnes_state, work_ram)
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu1", ppu2c0x_r, ppu2c0x_w)
 	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE("dac1", dac_w)
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nes1", nes_psg_r, nes_psg_w)
@@ -224,7 +223,7 @@ static ADDRESS_MAP_START( vsnes_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vsnes_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_BASE(&work_ram_1)
+	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_BASE_MEMBER(vsnes_state, work_ram_1)
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu2", ppu2c0x_r, ppu2c0x_w)
 	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE("dac2", dac_w)
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nes2", nes_psg_r, nes_psg_w)
@@ -1641,7 +1640,7 @@ static const nes_interface nes_interface_2 =
 	"sub"
 };
 
-static MACHINE_CONFIG_START( vsnes, driver_device )
+static MACHINE_CONFIG_START( vsnes, vsnes_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", N2A03,N2A03_DEFAULTCLOCK)
@@ -1700,7 +1699,7 @@ static MACHINE_CONFIG_DERIVED( topgun, vsnes )
 	MCFG_PPU2C05_04_ADD("ppu1", vsnes_ppu_interface_1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( vsdual, driver_device )
+static MACHINE_CONFIG_START( vsdual, vsnes_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", N2A03,N2A03_DEFAULTCLOCK)

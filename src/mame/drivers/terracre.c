@@ -89,9 +89,6 @@ AT-2
 #include "sound/3526intf.h"
 #include "includes/terracre.h"
 
-static const UINT16 *mpProtData;
-static UINT8 mAmazonProtCmd;
-static UINT8 mAmazonProtReg[6];
 
 static const UINT16 mAmazonProtData[] =
 {
@@ -161,11 +158,12 @@ static READ8_HANDLER( soundlatch_clear_r )
 
 static READ16_HANDLER( amazon_protection_r )
 {
-	offset = mAmazonProtReg[2];
+	terracre_state *state = space->machine->driver_data<terracre_state>();
+	offset = state->mAmazonProtReg[2];
 	if( offset<=0x56 )
 	{
 		UINT16 data;
-		data = mpProtData[offset/2];
+		data = state->mpProtData[offset/2];
 		if( offset&1 ) return data&0xff;
 		return data>>8;
 	}
@@ -174,17 +172,18 @@ static READ16_HANDLER( amazon_protection_r )
 
 static WRITE16_HANDLER( amazon_protection_w )
 {
+	terracre_state *state = space->machine->driver_data<terracre_state>();
 	if( ACCESSING_BITS_0_7 )
 	{
 		if( offset==1 )
 		{
-			mAmazonProtCmd = data;
+			state->mAmazonProtCmd = data;
 		}
 		else
 		{
-			if( mAmazonProtCmd>=32 && mAmazonProtCmd<=0x37 )
+			if( state->mAmazonProtCmd>=32 && state->mAmazonProtCmd<=0x37 )
 			{
-				mAmazonProtReg[mAmazonProtCmd-0x32] = data;
+				state->mAmazonProtReg[state->mAmazonProtCmd-0x32] = data;
 			}
 		}
 	}
@@ -192,16 +191,17 @@ static WRITE16_HANDLER( amazon_protection_w )
 
 static MACHINE_START( amazon )
 {
+	terracre_state *state = machine->driver_data<terracre_state>();
 	/* set up for save */
-	state_save_register_global(machine, mAmazonProtCmd);
-	state_save_register_global_array(machine, mAmazonProtReg);
+	state_save_register_global(machine, state->mAmazonProtCmd);
+	state_save_register_global_array(machine, state->mAmazonProtReg);
 }
 
 static ADDRESS_MAP_START( terracre_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x020000, 0x0201ff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x020200, 0x021fff) AM_RAM
-	AM_RANGE(0x022000, 0x022fff) AM_WRITE(amazon_background_w) AM_BASE(&amazon_videoram)
+	AM_RANGE(0x022000, 0x022fff) AM_WRITE(amazon_background_w) AM_BASE_MEMBER(terracre_state, amazon_videoram)
 	AM_RANGE(0x023000, 0x023fff) AM_RAM
 	AM_RANGE(0x024000, 0x024001) AM_READ_PORT("P1")
 	AM_RANGE(0x024002, 0x024003) AM_READ_PORT("P2")
@@ -218,7 +218,7 @@ static ADDRESS_MAP_START( amazon_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x0401ff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x040200, 0x040fff) AM_RAM
-	AM_RANGE(0x042000, 0x042fff) AM_WRITE(amazon_background_w) AM_BASE(&amazon_videoram)
+	AM_RANGE(0x042000, 0x042fff) AM_WRITE(amazon_background_w) AM_BASE_MEMBER(terracre_state, amazon_videoram)
 	AM_RANGE(0x044000, 0x044001) AM_READ_PORT("IN0")
 	AM_RANGE(0x044002, 0x044003) AM_READ_PORT("IN1")
 	AM_RANGE(0x044004, 0x044005) AM_READ_PORT("IN2")
@@ -978,17 +978,20 @@ ROM_END
 
 static DRIVER_INIT( amazon )
 {
-	mpProtData = mAmazonProtData;
+	terracre_state *state = machine->driver_data<terracre_state>();
+	state->mpProtData = mAmazonProtData;
 }
 
 static DRIVER_INIT( amatelas )
 {
-	mpProtData = mAmatelasProtData;
+	terracre_state *state = machine->driver_data<terracre_state>();
+	state->mpProtData = mAmatelasProtData;
 }
 
 static DRIVER_INIT( horekid )
 {
-	mpProtData = mHoreKidProtData;
+	terracre_state *state = machine->driver_data<terracre_state>();
+	state->mpProtData = mHoreKidProtData;
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x44004, 0x44005, 0, 0, horekid_IN2_r);
 }
 

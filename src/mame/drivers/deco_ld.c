@@ -242,8 +242,11 @@ static WRITE8_HANDLER( nmimask_w )
 }
 #endif
 
-static INTERRUPT_GEN ( sound_interrupt ) {
-	deco_ld_state *state = device->machine->driver_data<deco_ld_state>(); if (!state->nmimask) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE); }
+static INTERRUPT_GEN ( sound_interrupt )
+{
+	deco_ld_state *state = device->machine->driver_data<deco_ld_state>();
+	if (!state->nmimask) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
 
 
 static ADDRESS_MAP_START( rblaster_sound_map, ADDRESS_SPACE_PROGRAM, 8 )

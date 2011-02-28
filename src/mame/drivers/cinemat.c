@@ -190,7 +190,7 @@ static READ8_HANDLER( speedfrk_gear_r )
 	if ((gearval & 0x0f) != 0x0f)
         state->gear = gearval & 0x0f;
 
-	/* add the start key into the mix -- note that it overlaps 4th state->gear */
+	/* add the start key into the mix -- note that it overlaps 4th gear */
 	if (!(input_port_read(space->machine, "INPUTS") & 0x80))
         state->gear &= ~0x08;
 

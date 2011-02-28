@@ -186,22 +186,47 @@ Cisco Heat.
 
 **************************************************************************/
 
-static READ16_HANDLER( sharedram1_r )  {
-	cischeat_state *state = space->machine->driver_data<cischeat_state>();return state->sharedram1[offset];}
-static READ16_HANDLER( sharedram2_r )  {
-	cischeat_state *state = space->machine->driver_data<cischeat_state>();return state->sharedram2[offset];}
+static READ16_HANDLER( sharedram1_r ) 
+{
+	cischeat_state *state = space->machine->driver_data<cischeat_state>();
+	return state->sharedram1[offset];
+}
 
-static WRITE16_HANDLER( sharedram1_w ) {
-	cischeat_state *state = space->machine->driver_data<cischeat_state>();COMBINE_DATA(&state->sharedram1[offset]);}
-static WRITE16_HANDLER( sharedram2_w ) {
-	cischeat_state *state = space->machine->driver_data<cischeat_state>();COMBINE_DATA(&state->sharedram2[offset]);}
+static READ16_HANDLER( sharedram2_r )
+{
+	cischeat_state *state = space->machine->driver_data<cischeat_state>();
+	return state->sharedram2[offset];
+}
 
-static READ16_HANDLER( rom_1_r ) {
-	cischeat_state *state = space->machine->driver_data<cischeat_state>();return state->rom_1[offset];}
-static READ16_HANDLER( rom_2_r ) {
-	cischeat_state *state = space->machine->driver_data<cischeat_state>();return state->rom_2[offset];}
-static READ16_HANDLER( rom_3_r ) {
-	cischeat_state *state = space->machine->driver_data<cischeat_state>();return state->rom_3[offset];}
+static WRITE16_HANDLER( sharedram1_w )
+{
+	cischeat_state *state = space->machine->driver_data<cischeat_state>();
+	COMBINE_DATA(&state->sharedram1[offset]);
+}
+
+static WRITE16_HANDLER( sharedram2_w )
+{
+	cischeat_state *state = space->machine->driver_data<cischeat_state>();
+	COMBINE_DATA(&state->sharedram2[offset]);
+}
+
+static READ16_HANDLER( rom_1_r )
+{
+	cischeat_state *state = space->machine->driver_data<cischeat_state>();
+	return state->rom_1[offset];
+}
+
+static READ16_HANDLER( rom_2_r )
+{
+	cischeat_state *state = space->machine->driver_data<cischeat_state>();
+	return state->rom_2[offset];
+}
+
+static READ16_HANDLER( rom_3_r )
+{
+	cischeat_state *state = space->machine->driver_data<cischeat_state>();
+	return state->rom_3[offset];
+}
 
 
 /**************************************************************************

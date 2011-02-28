@@ -719,9 +719,7 @@ static void radarscp_step(running_machine *machine, int line_cnt)
      * TRS1 board states 3.3u.
      */
 
-	static double cv1=0,cv2=0,vg1=0,vg2=0,vg3=0,cv3=0,cv4=0;
 	double vg3i;
-	static int pixelcnt = 0;
 	double diff;
 	int sig;
 
@@ -750,26 +748,26 @@ static void radarscp_step(running_machine *machine, int line_cnt)
 		state->rflip_sig = !state->rflip_sig;
 
 	if  (sig) /*  128VF */
-		diff = (0.0 - cv1);
+		diff = (0.0 - state->cv1);
 	else
-		diff = (3.4 - cv1);
+		diff = (3.4 - state->cv1);
 	diff = diff - diff*exp(0.0 - (1.0/RC1 * dt) );
-	cv1 += diff;
+	state->cv1 += diff;
 
-	diff = (cv1 - cv2 - vg1);
+	diff = (state->cv1 - state->cv2 - state->vg1);
 	diff = diff - diff*exp(0.0 - (1.0/RC2 * dt) );
-	cv2 += diff;
+	state->cv2 += diff;
 
-	vg1 = (cv1 - cv2)*0.9 + 0.1 * vg2;
-	vg2 = 5*CD4049(machine, vg1/5);
+	state->vg1 = (state->cv1 - state->cv2)*0.9 + 0.1 * state->vg2;
+	state->vg2 = 5*CD4049(machine, state->vg1/5);
 
 	/* on the real hardware, the gain would be 1.
      * This will not work here.
      */
-	vg3i = 0.9*vg2 + 0.1 * vg3;
-	vg3 = 5*CD4049(machine, vg3i/5);
+	vg3i = 0.9*state->vg2 + 0.1 * state->vg3;
+	state->vg3 = 5*CD4049(machine, vg3i/5);
 
-	state->blue_level = (int)(vg3/5.0*255);
+	state->blue_level = (int)(state->vg3/5.0*255);
 
 	/*
      * Grid signal
@@ -778,31 +776,31 @@ static void radarscp_step(running_machine *machine, int line_cnt)
      */
 	if (state->grid_on && latch8_bit5_r(state->dev_vp2, 0))
 	{
-		diff = (0.0 - cv3);
+		diff = (0.0 - state->cv3);
 		diff = diff - diff*exp(0.0 - (1.0/RC32 * dt) );
 	}
 	else
 	{
-		diff = (5.0 - cv3);
+		diff = (5.0 - state->cv3);
 		diff = diff - diff*exp(0.0 - (1.0/RC31 * dt) );
 	}
-	cv3 += diff;
+	state->cv3 += diff;
 
-	diff = (vg2 - 0.8 * cv3 - cv4);
+	diff = (state->vg2 - 0.8 * state->cv3 - state->cv4);
 	diff = diff - diff*exp(0.0 - (1.0/RC4 * dt) );
-	cv4 += diff;
+	state->cv4 += diff;
 
-	if (CD4049(machine, CD4049(machine, vg2 - cv4))>2.4/5.0) /* TTL - Level */
+	if (CD4049(machine, CD4049(machine, state->vg2 - state->cv4))>2.4/5.0) /* TTL - Level */
 		state->grid_sig = 0;
 	else
 		state->grid_sig = 1;
 
 	/* stars */
-	pixelcnt += HTOTAL;
-	if (pixelcnt > period2 )
+	state->pixelcnt += HTOTAL;
+	if (state->pixelcnt > period2 )
 	{
 		state->star_ff = !state->star_ff;
-		pixelcnt = pixelcnt - period2;
+		state->pixelcnt = state->pixelcnt - period2;
 	}
 
 }
@@ -842,34 +840,33 @@ static void radarscp_scanline(running_machine *machine, int scanline)
 	int 		table_len = state->gfx3_len;
 	int 			x,y,offset;
 	UINT16			*pixel;
-	static int		counter=0;
 	const rectangle &visarea = machine->primary_screen->visible_area();
 
 	y = scanline;
 	radarscp_step(machine, y);
 	if (y <= visarea.min_y || y > visarea.max_y)
-		counter = 0;
+		state->counter = 0;
 	offset = (state->flip ^ state->rflip_sig) ? 0x000 : 0x400;
 	x = 0;
 	while (x < machine->primary_screen->width())
 	{
 		pixel = BITMAP_ADDR16(state->bg_bits, y, x);
-		if ((counter < table_len) && (x == 4 * (table[counter|offset] & 0x7f)))
+		if ((state->counter < table_len) && (x == 4 * (table[state->counter|offset] & 0x7f)))
 		{
-			if ( state->star_ff && (table[counter|offset] & 0x80) )	/* star */
+			if ( state->star_ff && (table[state->counter|offset] & 0x80) )	/* star */
 				*pixel = RADARSCP_STAR_COL;
-			else if (state->grid_sig && !(table[counter|offset] & 0x80))			/* radar */
+			else if (state->grid_sig && !(table[state->counter|offset] & 0x80))			/* radar */
 				*pixel = RADARSCP_GRID_COL_OFFSET+state->grid_col;
 			else
 				*pixel = RADARSCP_BCK_COL_OFFSET + state->blue_level;
-			counter++;
+			state->counter++;
 		}
 		else
 			*pixel = RADARSCP_BCK_COL_OFFSET + state->blue_level;
 		x++;
 	}
-	while ((counter < table_len) && ( x < 4 * (table[counter|offset] & 0x7f)))
-		counter++;
+	while ((state->counter < table_len) && ( x < 4 * (table[state->counter|offset] & 0x7f)))
+		state->counter++;
 }
 
 static TIMER_CALLBACK( scanline_callback )

@@ -39,26 +39,28 @@ dip: 6.7 7.7
 #include "includes/wiping.h"
 
 
-static UINT8 *sharedram1,*sharedram2;
-
 static READ8_HANDLER( shared1_r )
 {
-	return sharedram1[offset];
+	wiping_state *state = space->machine->driver_data<wiping_state>();
+	return state->sharedram1[offset];
 }
 
 static READ8_HANDLER( shared2_r )
 {
-	return sharedram2[offset];
+	wiping_state *state = space->machine->driver_data<wiping_state>();
+	return state->sharedram2[offset];
 }
 
 static WRITE8_HANDLER( shared1_w )
 {
-	sharedram1[offset] = data;
+	wiping_state *state = space->machine->driver_data<wiping_state>();
+	state->sharedram1[offset] = data;
 }
 
 static WRITE8_HANDLER( shared2_w )
 {
-	sharedram2[offset] = data;
+	wiping_state *state = space->machine->driver_data<wiping_state>();
+	state->sharedram2[offset] = data;
 }
 
 
@@ -86,12 +88,12 @@ static WRITE8_HANDLER( subcpu_reset_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_BASE(&wiping_videoram)
-	AM_RANGE(0x8400, 0x87ff) AM_BASE(&wiping_colorram)
+	AM_RANGE(0x8000, 0x83ff) AM_BASE_MEMBER(wiping_state, videoram)
+	AM_RANGE(0x8400, 0x87ff) AM_BASE_MEMBER(wiping_state, colorram)
 	AM_RANGE(0x8800, 0x88ff) AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x8000, 0x8bff) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(shared1_r,shared1_w) AM_BASE(&sharedram1)
-	AM_RANGE(0x9800, 0x9bff) AM_READWRITE(shared2_r,shared2_w) AM_BASE(&sharedram2)
+	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(shared1_r,shared1_w) AM_BASE_MEMBER(wiping_state, sharedram1)
+	AM_RANGE(0x9800, 0x9bff) AM_READWRITE(shared2_r,shared2_w) AM_BASE_MEMBER(wiping_state, sharedram2)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(wiping_flipscreen_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(subcpu_reset_w)
@@ -279,7 +281,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( wiping, driver_device )
+static MACHINE_CONFIG_START( wiping, wiping_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,18432000/6)	/* 3.072 MHz */
