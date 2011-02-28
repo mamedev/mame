@@ -58,12 +58,14 @@ WRITE16_HANDLER( excelsr_scroll_w );
 WRITE16_HANDLER( hrdtimes_scroll_w );
 
 VIDEO_START( bigtwin );
+VIDEO_START( bigtwinb );
 VIDEO_START( wbeachvl );
 VIDEO_START( excelsr );
 VIDEO_START( hotmind );
 VIDEO_START( hrdtimes );
 
 SCREEN_UPDATE( bigtwin );
+SCREEN_UPDATE( bigtwinb );
 SCREEN_UPDATE( wbeachvl );
 SCREEN_UPDATE( excelsr );
 SCREEN_UPDATE( hrdtimes );

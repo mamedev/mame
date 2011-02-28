@@ -1,6 +1,6 @@
 /***************************************************************************
 
-Big Twins
+Big Twin
 World Beach Volley
 Excelsior
 Hot Mind
@@ -23,6 +23,8 @@ Hard Times was hacked from Blood Bros. program code.
 
 Hot Mind is a romswap kit for Hard Times pcb, in fact it was found in a pcb
 marked as HARD TIMES 28-06-94.
+
+The version of Big Twin without girls seems a conversion of Hard Times pcb.
 
 
 Original Bugs:
@@ -243,6 +245,26 @@ static ADDRESS_MAP_START( bigtwin_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
+
+static ADDRESS_MAP_START( bigtwinb_main_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(hrdtimes_bgvideoram_w) AM_BASE_MEMBER(playmark_state, videoram3)
+	AM_RANGE(0x104000, 0x107fff) AM_RAM_WRITE(hrdtimes_fgvideoram_w) AM_BASE_MEMBER(playmark_state, videoram2)
+	AM_RANGE(0x108000, 0x10ffff) AM_RAM_WRITE(hrdtimes_txvideoram_w) AM_BASE_MEMBER(playmark_state, videoram1)
+	AM_RANGE(0x110000, 0x11000d) AM_WRITE(hrdtimes_scroll_w)
+	AM_RANGE(0x201000, 0x2013ff) AM_RAM AM_BASE_SIZE_MEMBER(playmark_state, spriteram, spriteram_size)
+	AM_RANGE(0x280000, 0x2807ff) AM_RAM_WRITE(bigtwin_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("P1")
+	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("P2")
+	AM_RANGE(0x30001a, 0x30001b) AM_READ_PORT("DSW1")
+	AM_RANGE(0x30001c, 0x30001d) AM_READ_PORT("DSW2")
+	AM_RANGE(0x30001e, 0x30001f) AM_WRITE(playmark_snd_command_w)
+	AM_RANGE(0x304000, 0x304001) AM_WRITENOP		/* watchdog? irq ack? */
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM
+ADDRESS_MAP_END
+
+
 static ADDRESS_MAP_START( wbeachvl_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_SIZE_MEMBER(playmark_state, spriteram, spriteram_size)
@@ -380,6 +402,105 @@ static INPUT_PORTS_START( bigtwin )
 	PORT_DIPNAME( 0x04, 0x00, "Censor Pictures" )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) )
+//  PORT_DIPSETTING(    0x20, DEF_STR( Easy ) ) /* Seems same as Medium */
+	PORT_DIPSETTING(	0x30, DEF_STR( Medium ) )
+	PORT_DIPSETTING(	0x10, DEF_STR( Hard ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Coin Mode" )
+	PORT_DIPSETTING(    0x01, "Mode 1" )
+	PORT_DIPSETTING(    0x00, "Mode 2" )
+	PORT_DIPNAME( 0x1e, 0x1e, "Coinage Mode 1" ) PORT_CONDITION("DSW2", 0x01, PORTCOND_EQUALS, 0x01)
+	PORT_DIPSETTING(    0x14, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0x16, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x1a, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 8C_3C ) )
+	PORT_DIPSETTING(    0x1c, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 5C_3C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x1e, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x12, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x06, 0x06, "Coin A Mode 2" ) PORT_CONDITION("DSW2", 0x01, PORTCOND_NOTEQUALS, 0x01)
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x18, 0x18, "Coin B Mode 2" ) PORT_CONDITION("DSW2", 0x01, PORTCOND_NOTEQUALS, 0x01)
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x20, 0x20, "Minimum Credits to Start" )
+	PORT_DIPSETTING(    0x20, "1" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( bigtwinb )
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_START("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Language ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Italian ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -906,6 +1027,12 @@ static GFXDECODE_START( hrdtimes )
 	GFXDECODE_ENTRY( "gfx1", 0, hrdtimes_charlayout, 0x100,  8 )	/* colors 0x100-0x17f */
 GFXDECODE_END
 
+static GFXDECODE_START( bigtwinb )
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 		 0x300, 16 )	/* colors 0x300-0x3ff */
+	GFXDECODE_ENTRY( "gfx1", 0, hrdtimes_tilelayout, 0x000, 16 )	/* colors 0x000-0x0ff */
+	GFXDECODE_ENTRY( "gfx1", 0, hrdtimes_charlayout, 0x200, 16 )	/* colors 0x200-0x2ff */
+GFXDECODE_END
+
 static MACHINE_START( playmark )
 {
 	playmark_state *state = machine->driver_data<playmark_state>();
@@ -981,6 +1108,40 @@ static MACHINE_CONFIG_START( bigtwin, playmark_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( bigtwinb, playmark_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
+	MCFG_CPU_PROGRAM_MAP(bigtwinb_main_map)
+	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
+
+	MCFG_CPU_ADD("audiocpu", PIC16C57, 12000000)	/* 3MHz */
+	/* Program and Data Maps are internal to the MCU */
+	MCFG_CPU_IO_MAP(playmark_sound_io_map)
+
+	MCFG_MACHINE_START(playmark)
+	MCFG_MACHINE_RESET(playmark)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(58)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 64*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(bigtwinb)
+
+	MCFG_GFXDECODE(bigtwinb)
+	MCFG_PALETTE_LENGTH(1024)
+	
+	MCFG_VIDEO_START(bigtwinb)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( wbeachvl, playmark_state )
 
@@ -1160,6 +1321,39 @@ ROM_START( bigtwin )
 
 	ROM_REGION( 0x40000, "oki", 0 )	/* OKIM6295 samples */
 	ROM_LOAD( "1.013",        0x00000, 0x40000, CRC(ff6671dc) SHA1(517941946a3edfc2da0b7aa8a106ebb4ae849beb) )
+ROM_END
+
+
+ROM_START( bigtwinb )
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 68000 code */
+	ROM_LOAD16_BYTE( "2.u67", 0x00000, 0x20000, CRC(f5cdf1a9) SHA1(974328cf2b4ec5834a519e3300ee1ad8bc4d5c04) )
+	ROM_LOAD16_BYTE( "3.u66", 0x00001, 0x20000, CRC(084e990f) SHA1(d7c2e08c7f7c7b453dd19dcf1f30bad46d943c8a) )
+
+	ROM_REGION( 0x1000, "audiocpu", ROMREGION_ERASE00 )	/* sound (PIC16C57) */
+//  ROM_LOAD( "16c57hs.bin",  0x0000, 0x1000, CRC(b4c95cc3) SHA1(7fc9b141e7782aa5c17310ee06db99d884537c30) )
+	/* ROM will be copied here by the init code from "user1" */
+
+	ROM_REGION( 0x3000, "user1", 0 )
+	ROM_LOAD( "16c57hs.015",  0x0000, 0x2d4c, CRC(c07e9375) SHA1(7a6714ab888ea6e37bc037bc7419f0998868cfce) )	/* 16C57 .HEX dump, to be converted */
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "4.u36", 0x000000, 0x20000, CRC(99aaeacc) SHA1(0281237722d5a94fb9831616ae2ffc8288e78e2c) )
+	ROM_CONTINUE(			  0x080000, 0x20000 )
+	ROM_LOAD16_BYTE( "5.u42", 0x000001, 0x20000, CRC(5c1dfd72) SHA1(31fab4d3bd4e8ff5a16daeaff0ccaa4fc8f60c92) )
+	ROM_CONTINUE(			  0x080001, 0x20000 )
+	ROM_LOAD16_BYTE( "6.u39", 0x100000, 0x20000, CRC(788f2df6) SHA1(186f4f9f79c80dc5c6faa9eddc4b3c98b52b374d) )
+	ROM_CONTINUE(			  0x180000, 0x20000 )
+	ROM_LOAD16_BYTE( "7.u45", 0x100001, 0x20000, CRC(aedb2e6d) SHA1(775e13d328c8ee3c36b9d77ad49fa5a092b85a95) )
+	ROM_CONTINUE(			  0x180001, 0x20000 )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "11.u86",       0x00000, 0x20000, CRC(2749644d) SHA1(f506ed1a14ee411eda8a7e639f5572e35b89b13f) )
+	ROM_LOAD( "10.u85",       0x20000, 0x20000, CRC(1d1897af) SHA1(0ad00906b94443d7ceef383717b39c6aa8cca241) )
+	ROM_LOAD( "9.u84",        0x40000, 0x20000, CRC(2a03432e) SHA1(44722b83093211d88460cbcd9e9c0b638d24ad3e) )
+	ROM_LOAD( "8.u83",        0x60000, 0x20000, CRC(2c980c4c) SHA1(77af29a1f5d4302650915f4a7daf2918a2519a6e) )
+
+	ROM_REGION( 0x40000, "oki", 0 )	/* OKIM6295 samples */
+	ROM_LOAD( "io13.bin",     0x00000, 0x40000, CRC(ff6671dc) SHA1(517941946a3edfc2da0b7aa8a106ebb4ae849beb) )
 ROM_END
 
 ROM_START( wbeachvl )
@@ -1513,6 +1707,7 @@ static DRIVER_INIT( bigtwin )
 }
 
 GAME( 1995, bigtwin,   0,        bigtwin,  bigtwin,  bigtwin, ROT0, "Playmark", "Big Twin", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1995, bigtwinb,  bigtwin,  bigtwinb, bigtwinb, bigtwin, ROT0, "Playmark", "Big Twin (No Girls Conversion)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1995, wbeachvl,  0,        wbeachvl, wbeachvl, 0,       ROT0, "Playmark", "World Beach Volley (set 1)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1995, wbeachvl2, wbeachvl, wbeachvl, wbeachvl, 0,       ROT0, "Playmark", "World Beach Volley (set 2)",  GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1996, excelsr,   0,        excelsr,  excelsr,  bigtwin, ROT0, "Playmark", "Excelsior", GAME_SUPPORTS_SAVE )

@@ -80,6 +80,15 @@ static TILE_GET_INFO( hrdtimes_get_tx_tile_info )
 	SET_TILE_INFO(2,code + state->txt_tile_offset, colr >> 13, 0);
 }
 
+static TILE_GET_INFO( bigtwinb_get_tx_tile_info )
+{
+	playmark_state *state = machine->driver_data<playmark_state>();
+	int code = state->videoram1[tile_index] & 0x0fff;
+	int colr = state->videoram1[tile_index] & 0xf000;
+
+	SET_TILE_INFO(2,code + state->txt_tile_offset, colr >> 12, 0);
+}
+
 static TILE_GET_INFO( hrdtimes_get_fg_tile_info )
 {
 	playmark_state *state = machine->driver_data<playmark_state>();
@@ -116,6 +125,29 @@ VIDEO_START( bigtwin )
 	state->xoffset = 0;
 	state->yoffset = 0;
 	state->txt_tile_offset = 0;
+
+	state->pri_masks[0] = 0;
+	state->pri_masks[1] = 0;
+	state->pri_masks[2] = 0;
+}
+
+
+VIDEO_START( bigtwinb )
+{
+	playmark_state *state = machine->driver_data<playmark_state>();
+
+	state->tx_tilemap = tilemap_create(machine, bigtwinb_get_tx_tile_info,tilemap_scan_rows, 8, 8, 64, 64);
+	state->fg_tilemap = tilemap_create(machine, hrdtimes_get_fg_tile_info,tilemap_scan_rows, 16, 16, 32, 32);
+	state->bg_tilemap = tilemap_create(machine, hrdtimes_get_bg_tile_info,tilemap_scan_rows, 16, 16, 32, 32);
+
+	tilemap_set_transparent_pen(state->tx_tilemap, 0);
+	tilemap_set_transparent_pen(state->fg_tilemap, 0);
+
+	tilemap_set_scrolldx(state->bg_tilemap, -4, -4);
+
+	state->xoffset = 1;
+	state->yoffset = 0;
+	state->txt_tile_offset = 0x8000;
 
 	state->pri_masks[0] = 0;
 	state->pri_masks[1] = 0;
@@ -407,6 +439,44 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
+
+static void bigtwinb_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int codeshift )
+{
+	playmark_state *state = machine->driver_data<playmark_state>();
+	int offs, start_offset = state->spriteram_size / 2 - 4;
+	int height = machine->gfx[0]->height;
+	UINT16 *spriteram = state->spriteram;
+
+	// find the "end of list" to draw the sprites in reverse order
+	for (offs = 4; offs < state->spriteram_size / 2; offs += 4)
+	{
+		if (spriteram[offs + 3 - 4] == 0x2000) /* end of list marker */
+		{
+			start_offset = offs - 4;
+			break;
+		}
+	}
+
+	for (offs = start_offset; offs >= 4; offs -= 4)
+	{
+		int sx, sy, code, color, flipx;
+
+		sy = spriteram[offs + 3 - 4];	/* -4? what the... ??? */
+
+		flipx = sy & 0x4000;
+		sx = (spriteram[offs + 1] & 0x01ff) - 16 - 7;
+		sy = (256 - 8 - height - sy) & 0xff;
+		code = spriteram[offs + 2] >> codeshift;
+		color = ((spriteram[offs + 1] & 0xf000) >> 12);
+
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+				 code,
+				 color,
+				 flipx,0,
+				 sx + state->xoffset,sy + state->yoffset, 0);
+	}
+}
+
 static void draw_bitmap( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	playmark_state *state = machine->driver_data<playmark_state>();
@@ -459,6 +529,24 @@ SCREEN_UPDATE( bigtwin )
 		draw_bitmap(screen->machine, bitmap, cliprect);
 	draw_sprites(screen->machine, bitmap, cliprect, 4);
 	tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);
+	return 0;
+}
+
+
+SCREEN_UPDATE( bigtwinb )
+{
+	playmark_state *state = screen->machine->driver_data<playmark_state>();
+
+	// video enabled
+	if (state->scroll[6] & 1)
+	{
+		tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+		tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+		bigtwinb_draw_sprites(screen->machine, bitmap, cliprect, 4);
+		tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);
+	}
+	else
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	return 0;
 }
 

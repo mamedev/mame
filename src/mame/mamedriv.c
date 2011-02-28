@@ -8257,6 +8257,7 @@ Other Sun games
 	DRIVER( magicstk )	/* (c) 1995 */
 	DRIVER( hotminda )	/* (c) 1995 */
 	DRIVER( bigtwin )	/* (c) 1995 */
+	DRIVER( bigtwinb )	/* (c) 1995 */
 	DRIVER( wbeachvl )	/* (c) 1995 */
 	DRIVER( wbeachvl2 )	/* (c) 1995 */
 	DRIVER( excelsr )	/* (c) 1995 */
